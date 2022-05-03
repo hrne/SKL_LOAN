@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_ClFac_Upd" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClFac_Upd" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -92,7 +92,7 @@ BEGIN
     WHEN MATCHED THEN UPDATE
     SET FM."ColSetFlag" = 'Y'
     ;
-
+    
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
@@ -104,6 +104,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClFac_Upd',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 

@@ -31,7 +31,7 @@ BEGIN
           ,S1."StockCode"                 AS "StockCode"           -- 股票代號 VARCHAR2 10 
           ,''                             AS "ListingType"         -- 掛牌別 VARCHAR2 2 
           ,''                             AS "StockType"           -- 股票種類 VARCHAR2 1 
-          ,SPRP."STKPID"                  AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
+          ,S1."CompanyId"                 AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
           ,0                              AS "DataYear"            -- 資料年度 DECIMAL 4 
           ,0                              AS "IssuedShares"        -- 發行股數 DECIMAL 16 2
           ,0                              AS "NetWorth"            -- 非上市(櫃)每股淨值 DECIMAL 16 2
@@ -66,6 +66,7 @@ BEGIN
       SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
             ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
             ,S1."ClNo"                      AS "ClNo"                -- 擔保品號碼 DECIMAL 7 
+            ,MAX(NVL(SPRP."STKPID",' '))    AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
             ,MAX(TCS."NewStockNo")
                                             AS "StockCode"           -- 股票代號 VARCHAR2 4 
             ,SUM(NVL(S2."SGTAUN",0))        AS "ParValue"            -- 每股面額 DECIMAL 16 2
@@ -87,8 +88,8 @@ BEGIN
                             AND S3."GDRNUM" = S1."GDRNUM"
       LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S3."LGTCIF"
                             AND S3."LGTCIF" > 0
-      LEFT JOIN DAT_LN$SPRP SPRP ON SPRP."STKNO1" = S2."SGTNO1"
-                                AND SPRP."STKNO2" = S2."SGTNO2"
+      LEFT JOIN DAT_LN$SPRP SPRP ON SPRP."SGTNO1" = S2."SGTNO1"
+                                AND SPRP."SGTNO2" = S2."SGTNO2"
       LEFT JOIN "TempCdStockMapping" TCS ON TCS."STKNO1" = S2."SGTNO1"
                                         AND TCS."STKNO2" = S2."SGTNO2"
       WHERE S1."ClCode1" >= 3

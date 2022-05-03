@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_RenewMapping_Upd_LoanBorMain" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_RenewMapping_Upd_LoanBorMain" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -32,10 +32,12 @@ BEGIN
    ON (S0."CustNo" = T0."CustNo"
        AND S0."RenewFacmNo" = T0."FacmNo"
        AND S0."RenewBormNo" = T0."BormNo"
-       AND T0."RenewFlag" = 0
       )
    WHEN MATCHED THEN UPDATE
-   SET "RenewFlag" = 1
+   SET T0."RenewFlag" = CASE
+                          WHEN T0."RenewFlag" = '0'
+                          THEN '1'
+                        ELSE T0."RenewFlag" END
    ;
 
     -- 記錄程式結束時間
@@ -49,7 +51,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_RenewMapping_Upd_LoanBorMain',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /

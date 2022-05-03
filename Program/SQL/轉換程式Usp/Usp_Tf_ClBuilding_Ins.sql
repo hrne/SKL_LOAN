@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_ClBuilding_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClBuilding_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -256,6 +256,7 @@ BEGIN
     -- DBMS_OUTPUT.PUT_LINE(dbms_utility.format_error_backtrace);
 
 END;
+
 
 
 

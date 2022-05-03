@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_TmpLA$HGTP_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_TmpLA$HGTP_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -216,7 +216,7 @@ BEGIN
            LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
                                     AND S2.GDRMRK = 1 -- 組長
                                     AND S2.LGTCIF = S1.LGTCIF
-                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
+--                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
            WHERE S1.GDRNUM2 > 0 -- 新光做過唯一性處理的直接寫入
              AND S1.GDRMRK = 0
           ) SC1
@@ -247,7 +247,7 @@ BEGIN
            FROM "TmpLA$HGTP" S1 -- 組員
            LEFT JOIN "TmpLA$HGTP" S2 ON S2.GDRNUM2 = S1.GDRNUM2
                                     AND S2.GDRMRK = 1 -- 組長
-                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
+--                                    AND NVL(S2.HGTCIP,0) = NVL(S1.HGTCIP,0)
            WHERE S1.GDRNUM2 > 0 -- 有被設定過唯一性
              AND S1.GDRMRK = 0
              AND S1."GroupNo" IS NULL
@@ -314,6 +314,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_TmpLA$HGTP_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
 
 /

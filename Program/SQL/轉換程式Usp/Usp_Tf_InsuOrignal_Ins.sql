@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_InsuOrignal_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_InsuOrignal_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -73,6 +73,10 @@ BEGIN
                , INSP."INSIID"
                , ROW_NUMBER() OVER (PARTITION BY INSP."INSNUM"
                                     ORDER BY INSP."INSSDT"
+                                           , INSP."GDRID1"
+                                           , INSP."GDRID2"
+                                           , INSP."GDRNUM"
+                                           , INSP."LGTSEQ"
                                    ) AS "Seq" 
           FROM "LA$INSP" INSP
          ) INSP
@@ -88,6 +92,10 @@ BEGIN
                                                     , CNM."ClNo"
                                                     , FR1P."INSNUM"
                                          ORDER BY FR1P."INSSDT"
+                                                , FR1P."GDRID1"
+                                                , FR1P."GDRID2"
+                                                , FR1P."GDRNUM"
+                                                , FR1P."LGTSEQ"
                                         ) AS "Seq" 
                FROM "LN$FR1P" FR1P
                LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = FR1P."GDRID1"
@@ -136,7 +144,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_InsuOrignal_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /

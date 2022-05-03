@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_FacMain_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_FacMain_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -135,7 +135,7 @@ BEGIN
           ,APLP."APLRDT"                  AS "RecycleDeadline"     -- 循環動用期限 DECIMALD 8 
           -- 2021-02-08 補零
           ,LPAD(APLP."APLUSG",2,'0')      AS "UsageCode"           -- 資金用途別 VARCHAR2 2 
-          ,APLP."CASUNT"                  AS "DepartmentCode"      -- 案件隸屬單位 VARCHAR2 1 
+          ,NVL(APLP."CASUNT",'0')         AS "DepartmentCode"      -- 案件隸屬單位 VARCHAR2 1 
           ,CASE
              WHEN APLP."APLITX" = 1 THEN 'Y' -- 2021-04-15 Wei 增加判斷
            ELSE 'N' END                   AS "IncomeTaxFlag"       -- 代繳所得稅 VARCHAR2 1 
@@ -197,10 +197,7 @@ BEGIN
           ,APLP."APLCRD"                  AS "CreditScore"         -- 信用評分 DECIMAL 3 
           ,APLP."APLCSD"                  AS "GuaranteeDate"       -- 對保日期 DECIMALD 8 
           ,CLF."CNTRCTNO"                 AS "ContractNo"          -- 合約編號 VARCHAR2 10 
-          ,CASE
-             WHEN NVL(APLP."GDRSTS",0) = 1
-             THEN 'Y'
-           ELSE 'N' END                   AS "ColSetFlag"          -- 擔保品設定記號 VARCHAR2 1 
+          ,APLP."GDRSTS"                  AS "ColSetFlag"          -- 擔保品設定記號 VARCHAR2 1 
           ,0                              AS "ActFg"               -- 交易進行記號 DECIMAL 1 
           ,0                              AS "LastAcctDate"        -- 上次交易日 NUMBER(8,0)
           ,''                             AS "LastKinbr"           -- 上次交易行別 VARCHAR2(4 BYTE)
@@ -221,7 +218,12 @@ BEGIN
           -- 待User決定就資料轉什麼值
           -- 預設先擺1:	審查課專案經理
           ,'1'                             AS "ApprovedLevel"       -- 核准層級 VARCHAR2(1 BYTE)
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
+          -- AS400 LA$APLP.APLSDT 鍵檔日期 給 L9110報表使用
+          ,CASE
+             WHEN APLP."APLSDT" > 0
+             THEN TO_DATE(APLP."APLSDT",'YYYYMMDD')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
@@ -306,8 +308,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_FacMain_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
 
 /

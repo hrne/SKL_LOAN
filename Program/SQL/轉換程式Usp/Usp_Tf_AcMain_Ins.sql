@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_AcMain_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcMain_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -147,7 +147,7 @@ BEGIN
     ) AR
     ON (
       AM."AcctCode" = AR."AcctCode"
-      AND AM."AcDate" = "TbsDyf"
+      AND AM."AcDate" = "TbsDyF"
     )
     WHEN MATCHED THEN UPDATE SET
       "YdBal" = AR."RvBal"
@@ -187,9 +187,11 @@ BEGIN
       , AR."AcNoCode"
       , AR."AcSubCode"
       , AR."AcDtlCode"
-      , "TbsDyf" -- "AcDate"
-      , AR."RvBal" -- "DbCnt"
-      , AR."RvBal" -- "DbAmt"
+      , "TbsDyF" -- "AcDate"
+      , AR."RvBal" -- "YdBal"
+      , AR."RvBal" -- "TdBal"
+      , 0 -- "DbCnt"
+      , 0 -- "DbAmt"
       , 0 -- "CrCnt"
       , 0 -- "CrAmt"
       , 0 -- "CoreDbCnt"
@@ -197,7 +199,7 @@ BEGIN
       , 0 -- "CoreCrCnt"
       , 0 -- "CoreCrAmt"
       , AR."AcctCode"
-      , TRUNC("TbsDyf" / 100)
+      , 0
       , JOB_START_TIME
       , '999999'
       , JOB_START_TIME
@@ -216,7 +218,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_AcMain_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /

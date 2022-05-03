@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_ClLand_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClLand_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -40,11 +40,25 @@ BEGIN
           ,TRIM(u'' || NVL(C1."CityItem",'') || NVL(C1."AreaItem",'') ||
                 CASE
                   WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
+                    AND S2."LGTSGM" = '奉口段'
+                  THEN '唪口段'
+                  WHEN NVL(S2."LGTSGM",' ') != ' '
+                    AND S2."LGTSGM" = '奉口'
+                  THEN '唪口段'
+                  WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
+                    AND S2."LGTSGM" = '犁和段'
+                  THEN '犂和段'
+                  WHEN NVL(S2."LGTSGM",' ') != ' '
+                    AND S2."LGTSGM" = '犁和'
+                  THEN '犂和段'
+                  WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
                   THEN S2."LGTSGM"
                   WHEN NVL(S2."LGTSGM",' ') != ' '
                   THEN S2."LGTSGM" || '段'
                 ELSE '' END ||
                 CASE
+                 WHEN NVL(S2."LGTSSG",' ') != ' 'AND INSTR(S2."LGTSSG",'小段') > 0
+                 THEN S2."LGTSSG"
                  WHEN NVL(S2."LGTSSG",' ') != ' '
                  THEN S2."LGTSSG" || '小段'
                 ELSE '' END  ||
@@ -200,11 +214,25 @@ BEGIN
                                 AND NVL(C1."AreaCode",0) != 0
                                 AND LS."IrItem" = CASE
                                                     WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
+                                                         AND S2."LGTSGM" = '奉口段'
+                                                    THEN '唪口段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' '
+                                                         AND S2."LGTSGM" = '奉口'
+                                                    THEN '唪口段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
+                                                         AND S2."LGTSGM" = '犁和段'
+                                                    THEN '犂和段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' '
+                                                         AND S2."LGTSGM" = '犁和'
+                                                    THEN '犂和段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
                                                     THEN S2."LGTSGM"
                                                     WHEN NVL(S2."LGTSGM",' ') != ' '
                                                     THEN S2."LGTSGM" || '段'
                                                   ELSE '' END ||
                                                   CASE
+                                                    WHEN NVL(S2."LGTSSG",' ') != ' ' AND INSTR(S2."LGTSSG",'小段') > 0
+                                                    THEN S2."LGTSSG"
                                                     WHEN NVL(S2."LGTSSG",' ') != ' '
                                                     THEN S2."LGTSSG" || '小段'
                                                   ELSE '' END
@@ -243,6 +271,8 @@ BEGIN
                   THEN S2."LGTSGM" || '段'
                 ELSE '' END ||
                 CASE
+                 WHEN NVL(S2."LGTSSG",' ') != ' 'AND INSTR(S2."LGTSSG",'小段') > 0
+                 THEN S2."LGTSSG"
                  WHEN NVL(S2."LGTSSG",' ') != ' '
                  THEN S2."LGTSSG" || '小段'
                 ELSE '' END  ||
@@ -412,11 +442,25 @@ BEGIN
                                 AND NVL(C1."AreaCode",0) != 0
                                 AND LS."IrItem" = CASE
                                                     WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
+                                                         AND S2."LGTSGM" = '奉口段'
+                                                    THEN '唪口段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' '
+                                                         AND S2."LGTSGM" = '奉口'
+                                                    THEN '唪口段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
+                                                         AND S2."LGTSGM" = '犁和段'
+                                                    THEN '犂和段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' '
+                                                         AND S2."LGTSGM" = '犁和'
+                                                    THEN '犂和段'
+                                                    WHEN NVL(S2."LGTSGM",' ') != ' ' AND INSTR(S2."LGTSGM",'段') > 0
                                                     THEN S2."LGTSGM"
                                                     WHEN NVL(S2."LGTSGM",' ') != ' '
                                                     THEN S2."LGTSGM" || '段'
                                                   ELSE '' END ||
                                                   CASE
+                                                    WHEN NVL(S2."LGTSSG",' ') != ' ' AND INSTR(S2."LGTSSG",'小段') > 0
+                                                    THEN S2."LGTSSG"
                                                     WHEN NVL(S2."LGTSSG",' ') != ' '
                                                     THEN S2."LGTSSG" || '小段'
                                                   ELSE '' END
@@ -496,6 +540,128 @@ BEGIN
     , T1."AreaCode" = SC1."AreaCode"
     ;
 
+merge into "ClBuilding" T
+using (
+with mappingData as (
+select DISTINCT
+       B."ClCode1"
+     , B."ClCode2"
+     , B."ClNo"
+     , B."CityCode"
+     , B."AreaCode"
+     , B."BdLocation"
+     , L.LGTCTY
+     , L.LGTTWN
+     , L.LGTSGM
+     , L.LGTSSG
+     , LS."IrCode"
+from "ClBuilding" B
+left join "ClNoMap" CNM on CNM."ClCode1" = B."ClCode1"
+                       and CNM."ClCode2" = B."ClCode2"
+                       and CNM."ClNo" = B."ClNo"
+                       and CNM."TfStatus" IN ('1','3')
+left join LA$LGTP L on L.GDRID1 = CNM."GdrId1"
+                                 AND L.GDRID2 = CNM."GdrId2"
+                                 AND L.GDRNUM = CNM."GdrNum"
+    LEFT JOIN ( SELECT CITY."CityCode"
+                      ,CITY."CityItem"
+                      ,AREA."AreaCode"
+                      ,AREA."AreaItem"
+                FROM "CdCity" CITY
+                LEFT JOIN "CdArea" AREA ON AREA."CityCode" = CITY."CityCode"
+              ) C1 ON C1."CityItem" LIKE CASE
+                                           WHEN L."LGTCTY" = '　南投' THEN '南投縣'
+                                           WHEN L."LGTCTY" = '　台中' THEN '台中市'
+                                           WHEN L."LGTCTY" = '　台北' THEN '台北市'
+                                           WHEN L."LGTCTY" = '　基隆' THEN '基隆市'
+                                           WHEN L."LGTCTY" = '　彰化' THEN '彰化縣'
+                                           WHEN L."LGTCTY" = '　花蓮' THEN '花蓮縣'
+                                           WHEN L."LGTCTY" = '　雲林' THEN '雲林縣'
+                                           WHEN L."LGTCTY" = '　高雄' THEN '高雄市'
+                                           WHEN L."LGTCTY" = '台中縣' THEN '台中市'
+                                           WHEN L."LGTCTY" = '台北縣' THEN '新北市'
+                                           WHEN L."LGTCTY" = '台南縣' THEN '台南市'
+                                           WHEN L."LGTCTY" = '嘉義嘉' THEN '嘉義市'
+                                           WHEN L."LGTCTY" = '高雄縣' THEN '高雄市'
+                                         ELSE L."LGTCTY" END || '%'
+                  AND NVL(L."LGTCTY",' ') != ' '
+                  AND CASE
+                        WHEN NVL(L."LGTTWN",' ') != ' '
+                             AND C1."AreaItem" LIKE L."LGTTWN" || '%'
+                        THEN 1
+                        WHEN NVL(L."LGTTWN",' ') = ' '
+                             AND NVL(L."LGTCTY",' ') != ' '
+                             AND C1."AreaItem" LIKE L."LGTCTY" || '%'
+                        THEN 1
+                      ELSE 0 END = 1
+    LEFT JOIN "CdLandSection" LS ON LS."CityCode" = C1."CityCode"
+                                AND LS."AreaCode" = C1."AreaCode"
+                                AND NVL(C1."AreaCode",0) != 0
+                                AND LS."IrItem" = CASE
+                                                    WHEN NVL(L."LGTSGM",' ') != ' ' AND INSTR(L."LGTSGM",'段') > 0
+                                                         AND L."LGTSGM" = '奉口段'
+                                                    THEN '唪口段'
+                                                    WHEN NVL(L."LGTSGM",' ') != ' '
+                                                         AND L."LGTSGM" = '奉口'
+                                                    THEN '唪口段'
+                                                    WHEN NVL(L."LGTSGM",' ') != ' ' AND INSTR(L."LGTSGM",'段') > 0
+                                                         AND L."LGTSGM" = '犁和段'
+                                                    THEN '犂和段'
+                                                    WHEN NVL(L."LGTSGM",' ') != ' '
+                                                         AND L."LGTSGM" = '犁和'
+                                                    THEN '犂和段'
+                                                    WHEN NVL(L."LGTSGM",' ') != ' ' AND INSTR(L."LGTSGM",'段') > 0
+                                                    THEN L."LGTSGM"
+                                                    WHEN NVL(L."LGTSGM",' ') != ' '
+                                                    THEN L."LGTSGM" || '段'
+                                                  ELSE '' END ||
+                                                  CASE
+                                                    WHEN NVL(L."LGTSSG",' ') != ' 'AND INSTR(L."LGTSSG",'小段') > 0
+                                                    THEN L."LGTSSG"
+                                                    WHEN NVL(L."LGTSSG",' ') != ' '
+                                                    THEN L."LGTSSG" || '小段'
+                                                  ELSE '' END
+where B."IrCode" is null
+  and B."CityCode" is not null
+  and B."AreaCode" is not null
+  and L.LGTCTY is not null
+  and L.LGTTWN is not null
+  and L.LGTSGM is not null
+  and LS."IrCode" is not null
+  and B."CityCode" = LS."CityCode"
+  and B."AreaCode" = LS."AreaCode"
+)
+select DISTINCT
+       "ClCode1"
+     , "ClCode2"
+     , "ClNo"
+     , "CityCode"
+     , "AreaCode"
+     , "BdLocation"
+     , LGTCTY
+     , LGTTWN
+     , LGTSGM
+     , LGTSSG
+     , "IrCode"
+     , ROW_NUMBER()
+       OVER (
+        PARTITION BY "ClCode1"
+                   , "ClCode2"
+                   , "ClNo"
+        ORDER BY "IrCode"
+       ) AS "Seq"
+from mappingData
+) S
+on (
+S."ClCode1" = T."ClCode1"
+AND S."ClCode2" = T."ClCode2"
+AND S."ClNo" = T."ClNo"
+AND S."Seq" = 1
+)
+when matched then update
+set "IrCode" = S."IrCode"
+;
+
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
@@ -507,8 +673,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClLand_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
 
 /

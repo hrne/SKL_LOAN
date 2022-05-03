@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanNotYet_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_LoanNotYet_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -28,7 +28,6 @@ BEGIN
     SELECT "LA$SDOP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,"LA$SDOP"."LMSAPN"             AS "FacmNo"              -- 額度編號 DECIMAL 3 
           ,LPAD("LA$SDOP"."DOTSID",2,'0') AS "NotYetCode"          -- 未齊件代碼 VARCHAR2 2 
-          ,"TB$DOTP"."DOTDSC"             AS "NotYetItem"          -- 未齊件說明 NVARCHAR2 40 
           ,0                              AS "YetDate"             -- 齊件日期 DECIMALD 8 
           ,0                              AS "CloseDate"           -- 銷號日期 DECIMALD 8 
           ,''                             AS "ReMark"              -- 備註 NVARCHAR2 80
@@ -54,6 +53,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_LoanNotYet_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
 
 /

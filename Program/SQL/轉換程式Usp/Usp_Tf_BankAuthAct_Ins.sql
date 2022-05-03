@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_BankAuthAct_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_BankAuthAct_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -68,15 +68,15 @@ BEGIN
           ,LPAD(S1."LMSPCN",14,'0')       AS "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
           ,CASE
              WHEN NVL(S2."LMSACN",0) = 0 -- 在授權紀錄檔沒資料
-                  AND S1."APLADT" >= "TbsDyF" -- 且動支期限大於等於轉換日
+                  AND S1.APLADT >= "TbsDyF" -- 且動支期限大於等於轉換日
              THEN ' ' -- 空白:未授權
            ELSE '0' END                   AS "Status"              -- 狀態碼 VARCHAR2 1 
-          ,0                              AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
           ,' '                            AS "AcctSeq"             -- 帳號碼 VARCHAR2 2 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,0                              AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
     FROM "LA$APLP" S1
     LEFT JOIN haveRecordData S2 ON S2."LMSACN" = S1."LMSACN"
                                AND S2."LMSPCN" = S1."LMSPCN"
@@ -118,15 +118,15 @@ BEGIN
           ,LPAD(S1."LMSPCN",14,'0')       AS "RepayAcct"           -- 扣款帳號 VARCHAR2 14 
           ,CASE
              WHEN NVL(S2."LMSACN",0) = 0 -- 在授權紀錄檔沒資料
-                  AND S1."APLADT" >= "TbsDyF" -- 且動支期限大於等於轉換日
+                  AND S1.APLADT >= "TbsDyF" -- 且動支期限大於等於轉換日
              THEN ' ' -- 空白:未授權
            ELSE '0' END                   AS "Status"              -- 狀態碼 VARCHAR2 1 
-          ,0                              AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
           ,' '                            AS "AcctSeq"             -- 帳號碼 VARCHAR2 2 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,0                              AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
     FROM "LA$APLP" S1
     LEFT JOIN haveRecordData S2 ON S2."LMSACN" = S1."LMSACN"
                                AND S2."LMSPCN" = S1."LMSPCN"
@@ -182,7 +182,7 @@ BEGIN
     JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
-
+    
     END;
     -- 例外處理
     Exception
@@ -190,6 +190,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_BankAuthAct_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
 
 /

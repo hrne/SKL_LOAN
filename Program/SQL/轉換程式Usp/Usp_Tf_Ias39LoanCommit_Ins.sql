@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_Ias39LoanCommit_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_Ias39LoanCommit_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -51,7 +51,7 @@ BEGIN
           ,"LNWLCTP"."LMSLBL"             AS "UtilBal"             -- 放款餘額 DECIMAL 13 2
           ,"LNWLCTP"."W06AM4"             AS "AvblBal"             -- 可動用餘額 DECIMAL 13 2
           ,"LNWLCTP"."APLRCD"             AS "RecycleCode"         -- 該筆額度是否可循環動用 DECIMAL 1 0
-          ,"LNWLCTP"."APLILC"             AS "IrrevocableFlag"     -- 該筆額度是否為不可徹銷 DECIMAL 1 0
+          ,NVL("LNWLCTP"."APLILC",0)      AS "IrrevocableFlag"     -- 該筆額度是否為不可徹銷 DECIMAL 1 0
           ,'000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3 0
           ,CASE
              WHEN "LNWLCTP"."FSCFLG" = '1'
@@ -113,7 +113,6 @@ BEGIN
                        AND "LNWLCTP"."LMSAPN" = "LNWLCAP"."LMSAPN"
     WHERE NVL("LNWLCTP"."LMSACN",0) = 0 -- 2022-02-08 增加篩選條件:避免與下方SELECT重複
     ;
-    ;
 
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
@@ -131,7 +130,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_Ias39LoanCommit_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /

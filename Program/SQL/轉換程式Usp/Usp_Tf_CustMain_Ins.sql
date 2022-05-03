@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_CustMain_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_CustMain_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -162,6 +162,10 @@ BEGIN
            ELSE JOB_START_TIME
            END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,'' AS "IsLimit"
+          ,'' AS "IsRelated"
+          ,'' AS "IsLnrelNear"
+          ,0 AS "IsDate"
     FROM "CU$CUSP" CUSP
     LEFT JOIN "CU$CUAP" CUAP ON CUAP."CUSID1" = CUSP."CUSID1"
     LEFT JOIN "LN$ENPP" ENPP ON ENPP."LMSACN" = CUSP."LMSACN"
@@ -186,9 +190,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_CustMain_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-
 
 /

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_NegAppr01_Upd" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_NegAppr01_Upd" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -46,10 +46,6 @@ BEGIN
                    ,N1."TitaTlrNo"
                    ,N1."TitaTxtNo"
                    ,N1."FinCode"
-           ORDER BY "AcDate"
-                   ,"TitaTlrNo"
-                   ,"TitaTxtNo"
-                   ,"FinCode"
         ) S1
     ON (    S1."AcDate"    = T1."AcDate"
         AND S1."TitaTlrNo" = T1."TitaTlrNo"

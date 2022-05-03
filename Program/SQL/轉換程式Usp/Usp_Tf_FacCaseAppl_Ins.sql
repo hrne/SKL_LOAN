@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_FacCaseAppl_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_FacCaseAppl_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -54,6 +54,10 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,''                             AS "IsSuspected"
+          ,''                             AS "IsSuspectedCheck"
+          ,''                             AS "IsSuspectedCheckType"
+          ,0                              AS "IsDate"
     FROM "LA$CASP"
     LEFT JOIN "CU$CUSP" ON "CU$CUSP"."CUSCIF" = "LA$CASP"."CUSCIF"
     LEFT JOIN "CustMain" ON TRIM("CustMain"."CustId") = TRIM("CU$CUSP"."CUSID1")
@@ -105,6 +109,10 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6
+          ,''                             AS "IsSuspected"
+          ,''                             AS "IsSuspectedCheck"
+          ,''                             AS "IsSuspectedCheckType"
+          ,0                              AS "IsDate"
     FROM "CustMain" 
     WHERE "CustNo" = 188400
     ;
