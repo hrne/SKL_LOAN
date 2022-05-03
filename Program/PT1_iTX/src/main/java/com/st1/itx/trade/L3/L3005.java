@@ -16,9 +16,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustRmk;
 import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.parse.Parse;
@@ -48,6 +50,8 @@ public class L3005 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	LoanCustRmkService loanCustRmkService;
 
 	@Autowired
 	BaTxCom baTxCom;
@@ -165,7 +169,9 @@ public class L3005 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			BigDecimal wkTempAmt = BigDecimal.ZERO;
 			BigDecimal wkShortfall = BigDecimal.ZERO;
+			BigDecimal wkTotTxAmt = BigDecimal.ZERO;
 
+			String feeMsg = "";
 			tTempVo = new TempVo();
 			if (iTitaHCode == 0 && !ln.getTitaHCode().equals("0")) {
 				continue;
@@ -173,25 +179,44 @@ public class L3005 extends TradeBuffer {
 
 			// 是否顯示分錄清單： Y-有分錄清單 、N-無分錄清單、空白(同交易序號次筆)
 			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("3") || ln.getTitaHCode().equals("4"))
-					&& (ln.getDisplayflag().equals("A") || ln.getDisplayflag().equals("F")))
+					&& (ln.getDisplayflag().equals("A") || ln.getDisplayflag().equals("F"))) {
 				AcFg = "Y";
-			else if (relNo.equals(newRelNo))
+			} else if (relNo.equals(newRelNo)) {
 				AcFg = "";
-			else
+			} else {
 				AcFg = "N";
+				wkTotTxAmt = BigDecimal.ZERO;
+			}
+			wkTotTxAmt = wkTotTxAmt.add(ln.getTxAmt());
+
 			// 費用
 			tTempVo = tTempVo.getVo(ln.getOtherFields());
-			if ((!"".equals(tTempVo.getParam("AcctFee"))
-					&& (parse.stringToBigDecimal(tTempVo.getParam("AcctFee")).compareTo(BigDecimal.ZERO) != 0)
-					|| (!"".equals(tTempVo.getParam("ModifyFee"))
-							&& parse.stringToBigDecimal(tTempVo.getParam("ModifyFee")).compareTo(BigDecimal.ZERO) != 0)
-					|| (!"".equals(tTempVo.getParam("FireFee"))
-							&& parse.stringToBigDecimal(tTempVo.getParam("FireFee")).compareTo(BigDecimal.ZERO) != 0)
-					|| (!"".equals(tTempVo.getParam("LawFee"))
-							&& parse.stringToBigDecimal(tTempVo.getParam("LawFee")).compareTo(BigDecimal.ZERO) != 0)))
-				FeeFg = "Y";
-			else
-				FeeFg = "";
+			if (!"".equals(tTempVo.getParam("AcctFee"))
+					&& parse.stringToBigDecimal(tTempVo.getParam("AcctFee")).compareTo(BigDecimal.ZERO) != 0) {
+				feeMsg += ", 帳管費:" + tTempVo.getParam("AcctFee");
+			}
+
+			if (!"".equals(tTempVo.getParam("FireFee"))
+					&& parse.stringToBigDecimal(tTempVo.getParam("FireFee")).compareTo(BigDecimal.ZERO) != 0) {
+				feeMsg += ", 火險費:" + tTempVo.getParam("FireFee");
+			}
+
+			if (!"".equals(tTempVo.getParam("ModifyFee"))
+					&& parse.stringToBigDecimal(tTempVo.getParam("ModifyFee")).compareTo(BigDecimal.ZERO) != 0) {
+				feeMsg += ", 契變手續費:" + tTempVo.getParam("ModifyFee");
+			}
+
+			if (!"".equals(tTempVo.getParam("LawFee"))
+					&& parse.stringToBigDecimal(tTempVo.getParam("LawFee")).compareTo(BigDecimal.ZERO) != 0) {
+				feeMsg += ", 法務費:" + tTempVo.getParam("LawFee");
+			}
+
+			// 去起頭的逗號
+			if (feeMsg.length() > 2 && feeMsg.startsWith(", ")) {
+				String str = feeMsg.substring(2);
+				feeMsg = str;
+			}
+			
 			// 是否顯示L3913計息明細按鈕
 			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("2") || ln.getTitaHCode().equals("4"))
 					&& (ln.getDisplayflag().equals("I") || ln.getDisplayflag().equals("F"))) {
@@ -215,8 +240,8 @@ public class L3005 extends TradeBuffer {
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());
 			if ("1".equals(ln.getTitaHCode()) || "3".equals(ln.getTitaHCode())) {
-				if ("3210".equals(ln.getTitaTxCd()) || "3220".equals(ln.getTitaTxCd())
-						|| "3230".equals(ln.getTitaTxCd())) {
+				if ("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
+						|| "L3230".equals(ln.getTitaTxCd())) {
 					occursList.putParam("OODesc", "暫收款訂正");
 				} else {
 					occursList.putParam("OODesc", "訂正");
@@ -224,9 +249,14 @@ public class L3005 extends TradeBuffer {
 			} else {
 				occursList.putParam("OODesc", ln.getDesc());
 			}
-			occursList.putParam("OODesc", ln.getDesc());
+			// 先確認此戶有備忘錄 有才給備忘錄按鈕
+			Slice<LoanCustRmk> sLoanCustRmk = loanCustRmkService.BorxNoAll(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getBorxNo(), this.index, this.limit, titaVo);
+			List<LoanCustRmk> lLoanCustRmk = sLoanCustRmk == null ? null : sLoanCustRmk.getContent();
+			
+			occursList.putParam("OOHasRemark", lLoanCustRmk != null && !lLoanCustRmk.isEmpty() ? "Y" : "N");	
 			occursList.putParam("OOFacmNo", ln.getFacmNo());
 			occursList.putParam("OOBormNo", ln.getBormNo());
+			occursList.putParam("OOBorxNo", ln.getBorxNo());
 			occursList.putParam("OORelNo", relNo); // 登放序號
 			occursList.putParam("OOTellerNo", ln.getTitaTlrNo());
 			occursList.putParam("OOTxtNo", ln.getTitaTxtNo());
@@ -247,11 +277,12 @@ public class L3005 extends TradeBuffer {
 			occursList.putParam("OORate", ln.getRate());
 			occursList.putParam("OOTitaHCode", ln.getTitaHCode());
 			occursList.putParam("OOAcFg", AcFg); // 分錄清單Fg
-			occursList.putParam("OOFeeFg", FeeFg); // 資料
+			occursList.putParam("OOFeeMsg", feeMsg); // 資料
 			occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
 			occursList.putParam("OOTxCd", ln.getTitaTxCd()); // 交易代號
 			// 新增摘要 跟費用明細
 			occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
+			occursList.putParam("OOTotTxAmt", wkTotTxAmt); // 交易總金額
 			
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);

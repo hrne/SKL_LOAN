@@ -28,6 +28,9 @@ public interface LoanCustRmkRepositoryDay extends JpaRepository<LoanCustRmk, Loa
   // CustNo = ,AND AcDate =  
   public Optional<LoanCustRmk> findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(int custNo_0, int acDate_1);
 
+  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BorxNo =
+  public Slice<LoanCustRmk> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -158,34 +158,23 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 */
 	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
 
-
-	/**
-	 * 回收短繳本金
-	 */
-	private BigDecimal shortfallPrin = BigDecimal.ZERO;
-
-	/**
-	 * 回收短繳利息
-	 */
-	private BigDecimal shortfallInt = BigDecimal.ZERO;
-
 	/**
 	 * 費用金額
 	 */
 	private BigDecimal feeAmt = BigDecimal.ZERO;
 
 	/**
-	 * 暫收款金額(暫收借(-)、暫收貸(+))
+	 * 暫收款金額(暫收借(-)、暫收貸(+)) (檢核表計算用)
 	 */
 	private BigDecimal tempAmt = BigDecimal.ZERO;
 
 	/**
-	 * 交易金額
+	 * 交易金額) (檢核表計算用)
 	 */
 	private BigDecimal TxAmt = BigDecimal.ZERO;
 
 	/**
-	 * 作帳金額
+	 * 作帳金額) (檢核表計算用)
 	 */
 	private BigDecimal AcAmt = BigDecimal.ZERO;
 
@@ -439,22 +428,6 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.closeBreachAmt = closeBreachAmt;
 	}
 	
-	public BigDecimal getShortfallPrin() {
-		return shortfallPrin;
-	}
-
-	public void setShortfallPrin(BigDecimal shortfallPrin) {
-		this.shortfallPrin = shortfallPrin;
-	}
-
-	public BigDecimal getShortfallInt() {
-		return shortfallInt;
-	}
-
-	public void setShortfallInt(BigDecimal shortfallInt) {
-		this.shortfallInt = shortfallInt;
-	}
-
 	public BigDecimal getFeeAmt() {
 		return feeAmt;
 	}

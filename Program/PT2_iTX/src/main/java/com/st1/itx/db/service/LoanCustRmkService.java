@@ -57,6 +57,20 @@ public interface LoanCustRmkService {
   public LoanCustRmk maxRmkNoFirst(int custNo_0, int acDate_1, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND BorxNo =
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param bormNo_2 bormNo_2
+   * @param borxNo_3 borxNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LoanCustRmk LoanCustRmk of List
+   */
+  public Slice<LoanCustRmk> BorxNoAll(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By LoanCustRmk
    * 
    * @param loanCustRmkId key

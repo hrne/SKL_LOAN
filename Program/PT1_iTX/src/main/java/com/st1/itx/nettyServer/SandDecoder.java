@@ -43,7 +43,6 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-
 		if (!msg.isReadable()) {
 			logger.info("UnReadable...");
 			return;
@@ -53,11 +52,21 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 		logger.info("from : " + ctx.channel().remoteAddress().toString());
 
 		if (!lenFlag) {
+			byte[] dumb = new byte[msg.readableBytes()];
+			msg.readBytes(dumb);
+			msg.resetReaderIndex();
 			this.rSeq = msg.readInt();
 			this.length = msg.readInt();
 			lenFlag = true;
 			logger.info("rSeq : [" + this.rSeq + "]");
 			logger.info("rLen : [" + this.length + "]");
+			byte[] rSeqBytes = new byte[4];
+			rSeqBytes[0] = (byte) ((this.rSeq >> 24) & 0xFF);
+			rSeqBytes[1] = (byte) ((this.rSeq >> 16) & 0xFF);
+			rSeqBytes[2] = (byte) ((this.rSeq >> 8) & 0xFF);
+			rSeqBytes[3] = (byte) (this.rSeq & 0xFF);
+			baos.write(rSeqBytes);
+			rSeqBytes = null;
 		}
 
 		recLen += msg.readableBytes();
@@ -80,7 +89,7 @@ public class SandDecoder extends MessageToMessageDecoder<ByteBuf> {
 		length = 0;
 		baos.close();
 		baos = null;
-		this.ReadComplete(ctx);
+//		this.ReadComplete(ctx);
 //		msg.release();
 	}
 

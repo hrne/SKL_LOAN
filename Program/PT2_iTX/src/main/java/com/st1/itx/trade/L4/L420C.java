@@ -139,39 +139,36 @@ public class L420C extends TradeBuffer {
 			}
 			updateHeadRoutine(titaVo);
 		} else {
-			boolean isTx = true;
-			// 入帳一律再檢核一次
+			// 入帳一律再檢核一次，移除匯款轉帳同戶號多筆檢核
+			tBatxDetail.setProcStsCode("0");
+			TempVo tTempVo = new TempVo();
 			if (functionCode == 0) {
-				tBatxDetail.setProcStsCode("0");
-				// 移除匯款轉帳同戶號多筆檢核
-				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
 				tTempVo.remove("MergeCnt");
 				tTempVo.remove("MergeAmt");
 				tTempVo.remove("MergeSeq");
+				tBatxDetail.setProcNote(tTempVo.getJsonString());
 				tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 				if (!"4".equals(tBatxDetail.getProcStsCode())) {
-					try {
-						batxDetailService.update(tBatxDetail);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "update batxDetail " + e.getErrorMsg());
-					}
-					isTx = false;
+					tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+					throw new LogicException("E0010", tTempVo.getParam("CheckMsg")); // 功能選擇錯誤
 				}
 			}
-			if (isTx) {
-				// 組入帳交易電文
-				TitaVo txTitaVo = new TitaVo();
-				txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, tBatxHead.getBatxTotCnt(), titaVo); // 1:訂正
-				// 執行入帳交易
-				this.info("L420C excuteTx " + txTitaVo);
-				// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
-				TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
-				/* 錯誤 */
-				if (totaVoList != null && totaVoList.size() > 0) {
-					if (totaVoList.get(0).isError())
-						throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
-				}
+			// 組入帳交易電文
+			TitaVo txTitaVo = new TitaVo();
+			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, tBatxHead.getBatxTotCnt(), titaVo); // 1:訂正
+			// 執行入帳交易
+			if (functionCode == 0) {
+				tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
+				txTitaVo.put("CheckMsg", tTempVo.getParam("CheckMsg"));
+			}
+			this.info("L420C excuteTx " + txTitaVo);
+			// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
+			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
+			/* 錯誤 */
+			if (totaVoList != null && totaVoList.size() > 0) {
+				if (totaVoList.get(0).isError())
+					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
 			}
 		}
 		this.addList(this.totaVo);

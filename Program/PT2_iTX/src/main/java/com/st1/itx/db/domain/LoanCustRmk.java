@@ -28,7 +28,7 @@ public class LoanCustRmk implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8089459626926529337L;
+	private static final long serialVersionUID = -732044268752022723L;
 
 @EmbeddedId
   private LoanCustRmkId loanCustRmkId;
@@ -54,6 +54,21 @@ public class LoanCustRmk implements Serializable {
   // 備忘錄說明
   @Column(name = "`RmkDesc`", length = 120)
   private String rmkDesc;
+
+  // 額度編號
+  /* 2022.4.28 by eric */
+  @Column(name = "`FacmNo`")
+  private int facmNo = 0;
+
+  // 撥款序號
+  /* 2022.4.28 by eric */
+  @Column(name = "`BormNo`")
+  private int bormNo = 0;
+
+  // 交易內容檔序號
+  /* 2022.4.28 by eric */
+  @Column(name = "`BorxNo`")
+  private int borxNo = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -180,6 +195,63 @@ public class LoanCustRmk implements Serializable {
   }
 
 /**
+	* 額度編號<br>
+	* 2022.4.28 by eric
+	* @return Integer
+	*/
+  public int getFacmNo() {
+    return this.facmNo;
+  }
+
+/**
+	* 額度編號<br>
+	* 2022.4.28 by eric
+  *
+  * @param facmNo 額度編號
+	*/
+  public void setFacmNo(int facmNo) {
+    this.facmNo = facmNo;
+  }
+
+/**
+	* 撥款序號<br>
+	* 2022.4.28 by eric
+	* @return Integer
+	*/
+  public int getBormNo() {
+    return this.bormNo;
+  }
+
+/**
+	* 撥款序號<br>
+	* 2022.4.28 by eric
+  *
+  * @param bormNo 撥款序號
+	*/
+  public void setBormNo(int bormNo) {
+    this.bormNo = bormNo;
+  }
+
+/**
+	* 交易內容檔序號<br>
+	* 2022.4.28 by eric
+	* @return Integer
+	*/
+  public int getBorxNo() {
+    return this.borxNo;
+  }
+
+/**
+	* 交易內容檔序號<br>
+	* 2022.4.28 by eric
+  *
+  * @param borxNo 交易內容檔序號
+	*/
+  public void setBorxNo(int borxNo) {
+    this.borxNo = borxNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -258,7 +330,8 @@ public class LoanCustRmk implements Serializable {
 
   @Override
   public String toString() {
-    return "LoanCustRmk [loanCustRmkId=" + loanCustRmkId + ", custUKey=" + custUKey + ", rmkDesc=" + rmkDesc + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "LoanCustRmk [loanCustRmkId=" + loanCustRmkId + ", custUKey=" + custUKey + ", rmkDesc=" + rmkDesc + ", facmNo=" + facmNo
+           + ", bormNo=" + bormNo + ", borxNo=" + borxNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

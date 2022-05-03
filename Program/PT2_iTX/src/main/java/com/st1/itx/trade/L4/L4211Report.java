@@ -365,7 +365,7 @@ public class L4211Report extends MakeReport {
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String dfTransferAmt = formatAmt(tfnAllList.get("RepayAmt"), 0);
+			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
 			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
@@ -376,7 +376,7 @@ public class L4211Report extends MakeReport {
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = getBigDecimal(tfnAllList.get("RepayAmt"));
+			transferamt = getBigDecimal(tfnAllList.get("TxAmt"));
 			makeferamt = getBigDecimal(tfnAllList.get("AcctAmt"));
 			principal = getBigDecimal(tfnAllList.get("Principal"));
 			interest = getBigDecimal(tfnAllList.get("Interest"));
@@ -678,7 +678,7 @@ public class L4211Report extends MakeReport {
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String dfTransferAmt = formatAmt(tfnAllList.get("RepayAmt"), 0);
+			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
 			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
@@ -689,7 +689,7 @@ public class L4211Report extends MakeReport {
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = getBigDecimal(tfnAllList.get("RepayAmt"));
+			transferamt = getBigDecimal(tfnAllList.get("TxAmt"));
 			makeferamt = getBigDecimal(tfnAllList.get("AcctAmt"));
 			principal = getBigDecimal(tfnAllList.get("Principal"));
 			interest = getBigDecimal(tfnAllList.get("Interest"));
@@ -987,7 +987,7 @@ public class L4211Report extends MakeReport {
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String dfTransferAmt = formatAmt(tfnAllList.get("RepayAmt"), 0);
+			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
 			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
@@ -998,7 +998,7 @@ public class L4211Report extends MakeReport {
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
 
-			transferamt = getBigDecimal(tfnAllList.get("RepayAmt"));
+			transferamt = getBigDecimal(tfnAllList.get("TxAmt"));
 			makeferamt = getBigDecimal(tfnAllList.get("AcctAmt"));
 			principal = getBigDecimal(tfnAllList.get("Principal"));
 			interest = getBigDecimal(tfnAllList.get("Interest"));

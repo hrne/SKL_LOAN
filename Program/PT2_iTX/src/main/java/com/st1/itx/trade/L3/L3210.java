@@ -93,7 +93,7 @@ public class L3210 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	private CdCodeService cdCodeService;
-	
+
 	@Autowired
 	Parse parse;
 	@Autowired
@@ -117,6 +117,7 @@ public class L3210 extends TradeBuffer {
 	private int iChequeNo;
 	private int iTempReasonCode;
 	private int iTempSourceCode;
+	private int iOverRpFacmNo;
 	private BigDecimal iTempAmt;
 	private LoanCheque tLoanCheque;
 	private LoanChequeId tLoanChequeId;
@@ -134,12 +135,14 @@ public class L3210 extends TradeBuffer {
 	private BigDecimal lawFee;
 	private BigDecimal closeBreachAmt;
 	private boolean isRepaidFee;
+	private int repayFacmNo;
 
 	// initialize variable
 	@PostConstruct
 	public void init() {
 		this.iCustNo = 0;
 		this.iFacmNo = 0;
+		this.iOverRpFacmNo = 0;
 		this.iEntryDate = 0;
 		this.iChequeAcct = 0;
 		this.iChequeNo = 0;
@@ -154,6 +157,7 @@ public class L3210 extends TradeBuffer {
 		this.lawFee = BigDecimal.ZERO;
 		this.closeBreachAmt = BigDecimal.ZERO;
 		this.isRepaidFee = false;
+		this.repayFacmNo = 0;
 	}
 
 	@Override
@@ -174,10 +178,18 @@ public class L3210 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
+		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		if (iFacmNo > 0) {
+			this.repayFacmNo = iFacmNo;
+		}
+		if (iFacmNo == 0 && titaVo.isTrmtypBatch()) {
+			iFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
+		}
+
 		titaVo.setTxAmt(iTempAmt);
 		// 費用抵繳是否抵繳(整批入帳)
 		this.isRepaidFee = false;
-		if (titaVo.get("PayFeeFlag") != null && "Y".equals(titaVo.get("PayFeeFg"))) {
+		if (titaVo.get("PayFeeFlag") != null && "Y".equals(titaVo.get("PayFeeFlag"))) {
 			this.isRepaidFee = true;
 		}
 		// 交易金額
@@ -206,7 +218,7 @@ public class L3210 extends TradeBuffer {
 			if (titaVo.isHcodeNormal()) {
 				addLoanBorTxRoutine();
 			} else {
-				loanCom.setFacmBorTxHcode(iCustNo, iFacmNo, titaVo);
+				loanCom.setFacmBorTxHcode(iCustNo, iFacmNo == 0 ? iOverRpFacmNo : iFacmNo, titaVo);
 			}
 		}
 
@@ -417,7 +429,8 @@ public class L3210 extends TradeBuffer {
 			iRepayType = 9; // 09-其他
 		}
 		// call 應繳試算
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, iTempAmt, titaVo);
+		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, this.repayFacmNo, 0, iRepayType, iTempAmt,
+				titaVo);
 		if (this.baTxList != null) {
 			// 4.本期溢(+)短(-)繳
 			for (BaTxVo ba : this.baTxList) {
@@ -530,14 +543,13 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("LawFee", this.lawFee);
 		}
 		// 新增摘要
-		
-		
+
 		CdCode cdCode = cdCodeService.getItemFirst(3, "TempReasonCode", titaVo.getParam("TempReasonCode"), titaVo);
 
 		if (cdCode != null) {
 			tTempVo.putParam("Note", cdCode.getItem());
 		}
-		
+
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);

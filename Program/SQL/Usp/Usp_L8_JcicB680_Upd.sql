@@ -1,11 +1,10 @@
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB680_Upd"
+(
 -- 程式功能：維護 JcicB680 每月聯徵「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔
 -- 執行時機：每月底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L8_JcicB680_Upd"(20200430,'System');
 --
 
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB680_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
@@ -66,6 +65,26 @@ BEGIN
       AND  M."EntCode"     IN ('0', '2')       -- 自然人
       ;
 
+    -- 寫入資料 Work_B680 - 增加:有額度未動撥且未到期
+    INSERT INTO "Work_B680"
+    SELECT B."CustId"               AS "CustId"            -- 授信戶IDN/BAN
+         , to_number(SUBSTR(B."AcctNo",1, 7))  AS "CustNo"
+         , to_number(SUBSTR(B."AcctNo",8, 3))  AS "FacmNo"
+         , to_number(SUBSTR(B."AcctNo",11,3))  AS "BormNo"
+         , 0                        AS "LoanBal"
+         , NVL(F."LineAmt",0)       AS "LineAmt"
+         , 'X'                      AS "AcctCode"
+         , 0                        AS "BadDebtDate"
+         , 0                        AS "TotalAmt"          -- B201 金額合計(千元)
+    FROM  "JcicB201" B
+      LEFT JOIN "CustMain" M   ON B."DataYM"   =  YYYYMM
+                              AND M."CustNo"   =  to_number(SUBSTR(B."AcctNo",1, 7))
+      LEFT JOIN "FacMain" F    ON F."CustNo"   =  to_number(SUBSTR(B."AcctNo",1, 7))
+                              AND F."FacmNo"   =  to_number(SUBSTR(B."AcctNo",8, 3))
+    WHERE  B."DataYM"      =  YYYYMM
+      AND  M."EntCode"     IN ('0', '2')       -- 自然人
+      AND  to_number(SUBSTR(B."AcctNo",11,3))  =  0  -- 有額度未動撥且未到期
+      ;
 
     -- 寫入資料 Work_B680_F (非呆帳 及 本月轉呆 依統編彙計成一筆)
     INSERT INTO "Work_B680_F"

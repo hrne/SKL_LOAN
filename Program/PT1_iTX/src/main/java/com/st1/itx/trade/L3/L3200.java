@@ -224,7 +224,6 @@ public class L3200 extends TradeBuffer {
 	private int wkIntStartDate = 9991231;
 	private int wkIntEndDate = 0;
 	private int wkRepaykindCode = 0; // 1:部分償還本金 2:回收期數>0 3:回收期數=0 4:清償違約金 5:催收款
-	private int wkRepaidPeriod = 0;
 	private int wkPaidTerms = 0;
 	private int wkDueDate = 0;
 	//
@@ -404,12 +403,6 @@ public class L3200 extends TradeBuffer {
 			iRepayIntDateByFacmNoVo = iRepayIntDateByFacmNoVo.getVo(titaVo.getParam("RepayIntDateByFacmNoVo"));
 		} else {
 			iRepayIntDate = 0;
-		}
-		// 償還本利
-		if (titaVo.isTrmtypBatch() && titaVo.get("RepayLoan") != null) {
-			iRepayLoan = parse.stringToBigDecimal(titaVo.getParam("RepayLoan"));
-		} else {
-			iRepayLoan = BigDecimal.ZERO;
 		}
 		this.info("iRepayIntDate=" + iRepayIntDate + "," + iRepayIntDateByFacmNoVo.toString() + ", iRepayLoan="
 				+ iRepayLoan + ", iExtraRepay=" + iExtraRepay);
@@ -783,7 +776,7 @@ public class L3200 extends TradeBuffer {
 			throw new LogicException(titaVo, "E3070", checkMsg); // 查無可計息的放款資料
 		}
 
-		if (iShortAmt.compareTo(wkTotalShortAmtLimit) > 0) {
+		if (iShortAmt.compareTo(wkTotalShortAmtLimit) > 0 && iExtraRepay.compareTo(BigDecimal.ZERO) == 0) {
 			if (wkTotalPrincipal.compareTo(BigDecimal.ZERO) > 0) {
 				throw new LogicException(titaVo, "E3095", "短繳金額 = " + iShortAmt + " 短繳限額 = " + wkTotalShortAmtLimit); // 短繳本金超過規定百分比金額
 			} else {
@@ -906,7 +899,7 @@ public class L3200 extends TradeBuffer {
 		isLoanClose = false; // 最後一期期款
 		isRepayPrincipal = false; // 回收本金
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
-		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan + ", 試算償還本利:" + iRepayLoan);
+		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan);
 
 		wkIntStartDate = 9991231;
 		wkIntEndDate = 0;
@@ -918,7 +911,6 @@ public class L3200 extends TradeBuffer {
 		wkDelayInt = BigDecimal.ZERO;
 		wkBreachAmt = BigDecimal.ZERO;
 		wkExtraRepay = BigDecimal.ZERO;
-		wkRepaidPeriod = 0;
 
 		// 部分償還餘額 > 0
 		if (wkRepaykindCode == 1) {
@@ -1020,13 +1012,17 @@ public class L3200 extends TradeBuffer {
 		// 回收金額計算
 		lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 
+		// 本次回收期數
+		if (iRepayType == 1) {
+			wkPaidTerms = loanCalcRepayIntCom.getPaidTerms() - wkPrevTermNo;
+		}
+
 		// 計算金額
 		wkPrincipal = loanCalcRepayIntCom.getPrincipal();
 		wkInterest = loanCalcRepayIntCom.getInterest();
 		wkDelayInt = loanCalcRepayIntCom.getDelayInt();
 		wkBreachAmt = loanCalcRepayIntCom.getBreachAmt();
 		wkExtraRepay = loanCalcRepayIntCom.getExtraAmt();
-		wkRepaidPeriod = loanCalcRepayIntCom.getRepaidPeriod();
 
 		// 最後一期期款/部分償還結案
 		if (loanCalcRepayIntCom.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
@@ -1666,9 +1662,6 @@ public class L3200 extends TradeBuffer {
 		if (wkShortCloseBreach.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ShortCloseBreach", wkShortCloseBreach);
 		}
-		if (wkPaidTerms > 0) {
-			tTempVo.putParam("PaidTerms", wkPaidTerms);// 回收期數
-		}
 		if (wkAcctFee.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("AcctFee", wkAcctFee);
 		}
@@ -1887,8 +1880,9 @@ public class L3200 extends TradeBuffer {
 	// 貸方：費用、短繳期金
 	private void batxSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
-		// call 應繳試算
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
+		// call 應繳試算(整批入帳應繳日為會計入、連線用入帳日)
+		this.baTxList = baTxCom.settingUnPaid(titaVo.isTrmtypBatch() ? titaVo.getEntDyI() : iEntryDate, iCustNo,
+				iFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
 		if (this.baTxList != null) {
 			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
 			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {

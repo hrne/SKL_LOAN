@@ -111,7 +111,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
 		sql += "    , BATX.\"EntryDate\" ";// 匯款日
 		sql += "    , BATX.\"DetailSeq\""; // 匯款序號
-		sql += "    , BATX.\"RepayAmt\""; // 匯款金額
+		sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
+		sql += "    , TX2.\"TxAmt\""; // 匯款金額
 		sql += "    , TX2.\"Principal\"";
 		sql += "      + TX2.\"Interest\"";
 		sql += "      + TX2.\"DelayInt\"";
