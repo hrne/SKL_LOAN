@@ -1,5 +1,8 @@
 package com.st1.itx.trade.L4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -105,7 +108,16 @@ public class L4601Report extends MakeReport {
 			// 比較戶號額度 + 分隔線
 			int listsize = slInsuRenewMediaTemp.getContent().size();
 			int count = 0;
-			for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
+			List<InsuRenewMediaTemp> lTemp = new ArrayList<InsuRenewMediaTemp>();
+
+			// 只抓有B有重複的
+			for (InsuRenewMediaTemp l : slInsuRenewMediaTemp.getContent()) {
+				if (!"".equals(l.getCheckResultB())) {
+					lTemp.add(l);
+				}
+			}
+
+			for (InsuRenewMediaTemp t : lTemp) {
 
 				if (rowcount != 0) { // 換頁第一筆不判斷
 					if (!tempcustno.equals(t.getCustNo()) || !tempfacmno.equals(t.getFacmNo())) {

@@ -174,27 +174,28 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				}
 				// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
 			}
-			if (t.getMaturityDate() < nextMonth01) {
-				intCalcCode = "1";
-				amortizedCode = "2";
-				loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
+			// 2022-05-03 智偉:取消整段
+			// if (t.getMaturityDate() < nextMonth01) {
+			// 	intCalcCode = "1";
+			// 	amortizedCode = "2";
+			// 	loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 
-				// 2022-04-22 智偉增加判斷:若到期日在當月者，照AS400多算一天利息
-				if (t.getMaturityDate() >= thisMonth01) {
+			// 	// 2022-04-22 智偉增加判斷:若到期日在當月者，照AS400多算一天利息
+			// 	if (t.getMaturityDate() >= thisMonth01) {
 
-					int orignalMaturityDate = t.getMaturityDate();
-					dDateUtil.init();
-					dDateUtil.setDate_1(orignalMaturityDate);
-					dDateUtil.setDays(1);
-					int newMaturityDate = dDateUtil.getCalenderDay();// 違約金C-止日
+			// 		int orignalMaturityDate = t.getMaturityDate();
+			// 		dDateUtil.init();
+			// 		dDateUtil.setDate_1(orignalMaturityDate);
+			// 		dDateUtil.setDays(1);
+			// 		int newMaturityDate = dDateUtil.getCalenderDay();// 違約金C-止日
 
-					this.info("月底提息時，若到期日在當月者，照AS400多算一天利息");
-					this.info("orignalMaturityDate = " + orignalMaturityDate);
-					this.info("newMaturityDate = " + newMaturityDate);
+			// 		this.info("月底提息時，若到期日在當月者，照AS400多算一天利息");
+			// 		this.info("orignalMaturityDate = " + orignalMaturityDate);
+			// 		this.info("newMaturityDate = " + newMaturityDate);
 
-					loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
-				}
-			}
+			// 		loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
+			// 	}
+			// }
 			loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 			loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));
 			this.info("Caculate log Set ... 戶號= " + t.getCustNo() + "-" + t.getFacmNo() + "-" + t.getBormNo()
