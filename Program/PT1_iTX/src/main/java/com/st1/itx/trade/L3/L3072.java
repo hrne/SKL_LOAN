@@ -62,6 +62,9 @@ public class L3072 extends TradeBuffer {
 		// tita
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iBormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
+		int iBorxNo = parse.stringToInteger(titaVo.getParam("BorxNo"));
 
 		Timestamp ts;
 		Timestamp uts;
@@ -71,17 +74,21 @@ public class L3072 extends TradeBuffer {
 		List<LoanCustRmk> loanCustRmk = new ArrayList<LoanCustRmk>();
 		Slice<LoanCustRmk> sloanCustRmk = null;
 
-		if (iCustNo > 0) {
+		if (iBorxNo > 0) {
+			sloanCustRmk = loanCustRmkService.BorxNoAll(iCustNo, iFacmNo, iBormNo, iBorxNo, this.index, this.limit, titaVo);
+		}
+		else if (iCustNo > 0) {
 			sloanCustRmk = loanCustRmkService.findCustNo(iCustNo, this.index, this.limit, titaVo);
-			loanCustRmk = sloanCustRmk == null ? null : sloanCustRmk.getContent();
 		} else {
 			sloanCustRmk = loanCustRmkService.findAll(this.index, this.limit, titaVo);
-			loanCustRmk = sloanCustRmk == null ? null : sloanCustRmk.getContent();
 		}
 
-		if (loanCustRmk == null) {
+		loanCustRmk = sloanCustRmk == null ? null : sloanCustRmk.getContent();
+		
+		if (loanCustRmk == null || loanCustRmk.isEmpty()) {
 			throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "不存在帳務備忘錄明細檔。"); // 查無資料
 		}
+		
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (sloanCustRmk != null && sloanCustRmk.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
@@ -102,8 +109,8 @@ public class L3072 extends TradeBuffer {
 //			occurslist.putParam("OORmkCode", t.getRmkCode());
 			occurslist.putParam("OORmkDesc", t.getRmkDesc());
 
-			String tempEmpNo = t.getCreateEmpNo() == "" ? t.getLastUpdateEmpNo() : t.getCreateEmpNo();
-			String updateEmpNo = t.getLastUpdateEmpNo() == "" ? t.getCreateEmpNo() : t.getLastUpdateEmpNo();
+			String tempEmpNo = t.getCreateEmpNo().isEmpty() ? t.getLastUpdateEmpNo() : t.getCreateEmpNo();
+			String updateEmpNo = t.getLastUpdateEmpNo().isEmpty() ? t.getCreateEmpNo() : t.getLastUpdateEmpNo();
 
 			occurslist.putParam("OOEmpNo", tempEmpNo);
 
