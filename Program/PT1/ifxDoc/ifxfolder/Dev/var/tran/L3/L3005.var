@@ -376,7 +376,6 @@ K(MODIFYBUTTON,1,帳務備忘錄)
 #OCustNoX=X,100,L
 T(2,#L2r07CustName)
 
-#OCustRmkFlag=X,1,S
 
 #OCurrencyCode=X,3,S
 
@@ -525,13 +524,6 @@ T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
 #OOBTNRMK=X,1,S
 C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=備忘錄查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,cancel))
 
-!備忘錄
-#OOBUF2=X,7,S
-T(2,#OCustNo)
-
-#OOBTN2=X,1,S
-C(5,#OCustRmkFlag,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L2072; ntxbuf=#OOBUF2}),BIND(grid,cancel))
-
 !分錄
 #OOBUF3=X,32,S
 T(2,#OOAcDate+0000000+#OORelNo)
@@ -564,7 +556,6 @@ C(5,#OOLoanIntDetailFg,"Y",$,BIND(grid,cancel))
 
 TXFORM=L3005
 #OCustNo
-#OCustRmkFlag
 #OExcessive
 #OShortfall
 #OCurrencyCode
@@ -636,9 +627,6 @@ TXFORM=L3005
 #OODesc=交易別
 {width:90}
 
-#OONote=摘要
-{width:90}
-
 #OOCurrencyCode=幣別 
 {width:50,align:'center'}
 
@@ -657,14 +645,18 @@ TXFORM=L3005
 #OORateX=利率
 {width:80}
 
-#OOTitaHCodeX=訂正別
-{width:70,align:'center'}
+#OONote=摘要
+{width:90}
+
 
 #OOBTN3=分錄
 {width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}
 
 #OOFeeMsg=費用
 {width:150}
+
+#OOTitaHCodeX=訂正別
+{width:70,align:'center'}
 
 #OOAcDtRelNo=交易序號
 {width:200,align:'center'}

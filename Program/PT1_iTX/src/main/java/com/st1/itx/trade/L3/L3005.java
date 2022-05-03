@@ -14,7 +14,6 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CustRmk;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.service.CustRmkService;
@@ -81,19 +80,19 @@ public class L3005 extends TradeBuffer {
 		int wkEntryDateStart = iEntryDate + 19110000;
 		int wkDateEnd = 99991231;
 
-		String oCustRmkFlag = "N";
+//		String oCustRmkFlag = "N";
 		String loanIntDetailFg = "N";
 
 		String AcFg;
-		String FeeFg;
+//		String FeeFg;
 		String wkCurrencyCode = "";
 
-		Slice<CustRmk> slCustRmk;
+//		Slice<CustRmk> slCustRmk;
 		Slice<LoanBorTx> slLoanBorTx;
 
 		TempVo tTempVo = new TempVo();
 
-		List<CustRmk> lCustRmk;
+//		List<CustRmk> lCustRmk;
 		List<LoanBorTx> lLoanBorTx;
 
 //		LoanEachFeeVo loanEachFeeVo = new LoanEachFeeVo();
@@ -114,16 +113,16 @@ public class L3005 extends TradeBuffer {
 		}
 
 		// 查詢顧客控管警訊檔
-		slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
-		lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
-		if (lCustRmk != null && lCustRmk.size() > 0) {
-			oCustRmkFlag = "Y";
-		}
+//		slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+//		lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
+//		if (lCustRmk != null && lCustRmk.size() > 0) {
+//			oCustRmkFlag = "Y";
+//		}
 		// 查詢各項費用
 		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 
 		this.totaVo.putParam("OCustNo", iCustNo);
-		this.totaVo.putParam("OCustRmkFlag", oCustRmkFlag);
+//		this.totaVo.putParam("OCustRmkFlag", oCustRmkFlag);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);

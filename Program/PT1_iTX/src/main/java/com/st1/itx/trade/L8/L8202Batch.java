@@ -53,6 +53,9 @@ public class L8202Batch extends TradeBuffer {
 	private int processCnt = 0;
 	private int custNo;
 	private Boolean isError = false;
+	private int iEntryDateS = 0;
+	private int iEntryDateE = 0;
+
 	private List<Map<String, String>> fnAllList12 = new ArrayList<>();
 	private List<Map<String, String>> fnAllList3 = new ArrayList<>();
 	private List<MlaundryDetail> lDetail = new ArrayList<MlaundryDetail>();
@@ -61,15 +64,15 @@ public class L8202Batch extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8202Batch ");
 		this.totaVo.init(titaVo);
-		titaVo.putParam("Factor1TotLimit", titaVo.getParam("Factor1TotLimit")); // 洗錢樣態一金額合計超過
-		titaVo.putParam("Factor2Count", titaVo.getParam("Factor2Count")); // 洗錢樣態二次數
-		titaVo.putParam("Factor2AmtStart", titaVo.getParam("Factor2AmtStart")); // 洗錢樣態二單筆起始金額
-		titaVo.putParam("Factor2AmtEnd", titaVo.getParam("Factor2AmtEnd")); // 洗錢樣態二單筆迄止金額
-		titaVo.putParam("Factor3TotLimit", titaVo.getParam("Factor3TotLimit")); // 洗錢樣態三金額合計超過
-		titaVo.putParam("FactorDays", titaVo.getParam("FactorDays")); // 統計期間天數
-		titaVo.putParam("EntryDateS", titaVo.getParam("AcDateStart")); // 入帳日期起日
-		titaVo.putParam("EntryDateE", titaVo.getParam("AcDateEnd")); // 入帳日期迄日
-		titaVo.putParam("FactorDays3", titaVo.getParam("FactorDays3")); // 樣態三統計期間天數
+//		titaVo.getParam("Factor1TotLimit")); // 洗錢樣態一金額合計超過
+//		titaVo.getParam("Factor2Count")); // 洗錢樣態二次數
+//		titaVo.getParam("Factor2AmtStart")); // 洗錢樣態二單筆起始金額
+//		titaVo.getParam("Factor2AmtEnd")); // 洗錢樣態二單筆迄止金額
+//		titaVo.getParam("Factor3TotLimit")); // 洗錢樣態三金額合計超過
+//		titaVo.getParam("FactorDays")); // 統計期間天數
+		iEntryDateS = parse.stringToInteger(titaVo.getParam("EntryDateS")); // 入帳日期起日
+		iEntryDateE = parse.stringToInteger(titaVo.getParam("EntryDateE")); // 入帳日期迄日
+//		titaVo.getParam("FactorDays3")); // 樣態三統計期間天數
 		// 刪除未寫疑似洗錢樣態檢核明細檔的疑似洗錢交易合理性明細檔
 		try {
 			deleteDetail(titaVo);
@@ -124,13 +127,16 @@ public class L8202Batch extends TradeBuffer {
 		this.batchTransaction.commit();
 		// Broadcast
 		if (isError) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(), "程式處理錯誤" + sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(),
+					"程式處理錯誤" + sendMsg, titaVo);
 		} else {
 			if (this.processCnt > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8921", titaVo.getParam("EntryDateS") + titaVo.getParam("EntryDateE"),
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8921",
+						titaVo.getParam("EntryDateS") + titaVo.getParam("EntryDateE"),
 						"疑似洗錢樣態資料已產生，筆數：" + this.processCnt, titaVo);
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(), "無疑似洗錢樣態資料", titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(),
+						"無疑似洗錢樣態資料", titaVo);
 			}
 		}
 		// end
@@ -279,7 +285,8 @@ public class L8202Batch extends TradeBuffer {
 				// F10 洗錢樣態三資料重複 (1.是)
 				custNo = parse.stringToInteger(s.get("F4"));
 				// 專戶不寫
-				if (custNo == this.txBuffer.getSystemParas().getLoanDeptCustNo() || custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				if (custNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
+						|| custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 					continue;
 				}
 				if (parse.stringToInteger(s.get("F2")) > 0 && parse.stringToInteger(s.get("F4")) == 0) {
@@ -328,7 +335,8 @@ public class L8202Batch extends TradeBuffer {
 				// F10 洗錢樣態三資料重複 (1.是)
 				custNo = parse.stringToInteger(s.get("F0"));
 				// 專戶不寫
-				if (custNo == this.txBuffer.getSystemParas().getLoanDeptCustNo() || custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+				if (custNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
+						|| custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 					continue;
 				}
 				if (parse.stringToInteger(s.get("F8")) > 0 && parse.stringToInteger(s.get("F10")) == 0) {
@@ -363,8 +371,10 @@ public class L8202Batch extends TradeBuffer {
 
 	private void deleteDetail(TitaVo titaVo) throws LogicException {
 		this.info("L8202Batch deleteDetail");
-		Slice<MlaundryDetail> slMlaundryDetail = mlaundryDetailService.findEntryDateRange(0, 99991231, Arrays.asList(new String[] { "?" }), 0, Integer.MAX_VALUE, titaVo);
-		List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null : new ArrayList<MlaundryDetail>(slMlaundryDetail.getContent());
+		Slice<MlaundryDetail> slMlaundryDetail = mlaundryDetailService.findEntryDateRange(iEntryDateS + 19110000,
+				iEntryDateE + 19110000, Arrays.asList(new String[] { " " }), 0, Integer.MAX_VALUE, titaVo);
+		List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null
+				: new ArrayList<MlaundryDetail>(slMlaundryDetail.getContent());
 
 		if (lMlaundryDetail != null) {
 			try {

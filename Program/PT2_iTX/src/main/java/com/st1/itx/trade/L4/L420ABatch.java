@@ -369,24 +369,24 @@ public class L420ABatch extends TradeBuffer {
 		if ("4".equals(tDetail.getProcStsCode()) && iTempVo.getParam("MergeSeq").equals(iTempVo.getParam("MergeCnt"))) {
 			for (BaTxVo ba : iBatxList) {
 				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					// 另收費用同費用
+					if (ba.getDataKind() == 6) {
+						ba.setDataKind(1); 
+					}
 					this.info("add =" + ba.toString());
 					lbaTxVo.add(ba);
 				}
 			}
 			lbaTxVo = baTxCom.addByBormNo(iBatxList, titaVo);
 		} else {
-			for (BaTxVo ba : iBatxList) {
-				if (ba.getDataKind() == 4) {
-					BaTxVo baTxVo = new BaTxVo();
-					baTxVo.setDataKind(4);
-					baTxVo.setCustNo(ba.getCustNo()); // 借款人戶號
-					baTxVo.setFacmNo(ba.getFacmNo()); // 額度編號
-					baTxVo.setBormNo(ba.getBormNo()); // 撥款序號
-					baTxVo.setDbCr("C");
-					baTxVo.setAcctAmt(tDetail.getRepayAmt());
-					lbaTxVo.add(baTxVo);
-				}
-			}
+			BaTxVo baTxVo = new BaTxVo();
+			baTxVo.setDataKind(4);
+			baTxVo.setCustNo(tDetail.getCustNo()); // 借款人戶號
+			baTxVo.setFacmNo(tDetail.getFacmNo()); // 額度編號
+			baTxVo.setDbCr("C");
+			baTxVo.setAcctAmt(tDetail.getRepayAmt());
+			lbaTxVo.add(baTxVo);
+			this.info("aaa =" + baTxVo.toString());
 		}
 		for (BaTxVo ba : lbaTxVo) {
 			this.info("ccc =" + ba.toString());
@@ -441,8 +441,7 @@ public class L420ABatch extends TradeBuffer {
 			da.put("IntStartDate", "" + baTxVo.getIntStartDate());
 			da.put("IntEndDate", "" + baTxVo.getIntEndDate());
 			// 本金(A) = 本金 - 本次短繳 + 回收短繳
-			da.put("Principal",
-					"" + baTxVo.getPrincipal().subtract(baTxVo.getUnpaidPrin()));
+			da.put("Principal", "" + baTxVo.getPrincipal().subtract(baTxVo.getUnpaidPrin()));
 			// 利息(B) = 利息 - 本次短繳 + 回收短繳
 			da.put("Interest", "" + baTxVo.getInterest().subtract(baTxVo.getUnpaidInt()));
 			da.put("TempPayAmt", "0"); // 暫付款(C)
@@ -621,40 +620,38 @@ public class L420ABatch extends TradeBuffer {
 // 交易金額 + 暫收借 = 作帳金額 + 暫收貸
 
 		// 本金利息 本金(A)+利息(B)+違約金(D)+費用(H) ==> add to 作帳金額
-		if (iRepayType >= 1 && iRepayType <= 3) {
-			for (BaTxVo ba : iBatxList) {
-				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					// 交易金額放第一筆
-					ba.setTxAmt(wkTxAmt);
-					wkTxAmt = BigDecimal.ZERO;
-					// 本金、利息已包含
-					ba.setAcAmt(ba.getAcctAmt().add(wkFeeAmt));
-					// 本金、利息包含本次短繳，作帳金額扣除
-					ba.setAcAmt(ba.getAcAmt().subtract(ba.getUnpaidPrin()).subtract(ba.getUnpaidInt()));
-					// 費用放第一筆
-					if (wkFeeAmt.compareTo(BigDecimal.ZERO) > 0) {
-						ba.setFeeAmt(wkFeeAmt);
-						wkFeeAmt = BigDecimal.ZERO;
-					}
-					// 溢繳款放第一筆
-					if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
-						ba.setTempAmt(wkOverBal);
-						wkOverBal = BigDecimal.ZERO;
-					}
-					// 暫收抵繳
-					if (wkTempAmt.compareTo(BigDecimal.ZERO) > 0) {
-						if (wkTxBal.compareTo(ba.getAcAmt()) >= 0) {
-							wkTxBal = wkTxBal.subtract(ba.getAcAmt());
-						} else {
-							BigDecimal tempAmt = wkTxBal.subtract(ba.getAcAmt()); // 暫收抵繳為負值
-							ba.setTempAmt(tempAmt);
-							wkTxBal = BigDecimal.ZERO;
-							wkTempBal = wkTempBal.add(tempAmt);
-						}
-					}
-					this.info("settleAcAmt 1.TxBal = " + wkTxBal + ", AcAmt = " + ba.getAcAmt() + ", TempAmt="
-							+ ba.getTempAmt() + ba.toString());
+		for (BaTxVo ba : iBatxList) {
+			if (ba.getRepayType() >= 1 && ba.getRepayType() <= 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				// 交易金額放第一筆
+				ba.setTxAmt(wkTxAmt);
+				wkTxAmt = BigDecimal.ZERO;
+				// 本金、利息已包含
+				ba.setAcAmt(ba.getAcctAmt().add(wkFeeAmt));
+				// 本金、利息包含本次短繳，作帳金額扣除
+				ba.setAcAmt(ba.getAcAmt().subtract(ba.getUnpaidPrin()).subtract(ba.getUnpaidInt()));
+				// 費用放第一筆
+				if (wkFeeAmt.compareTo(BigDecimal.ZERO) > 0) {
+					ba.setFeeAmt(wkFeeAmt);
+					wkFeeAmt = BigDecimal.ZERO;
 				}
+				// 溢繳款放第一筆
+				if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+					ba.setTempAmt(wkOverBal);
+					wkOverBal = BigDecimal.ZERO;
+				}
+				// 暫收抵繳
+				if (wkTempAmt.compareTo(BigDecimal.ZERO) > 0) {
+					if (wkTxBal.compareTo(ba.getAcAmt()) >= 0) {
+						wkTxBal = wkTxBal.subtract(ba.getAcAmt());
+					} else {
+						BigDecimal tempAmt = wkTxBal.subtract(ba.getAcAmt()); // 暫收抵繳為負值
+						ba.setTempAmt(tempAmt);
+						wkTxBal = BigDecimal.ZERO;
+						wkTempBal = wkTempBal.add(tempAmt);
+					}
+				}
+				this.info("settleAcAmt 1.TxBal = " + wkTxBal + ", AcAmt = " + ba.getAcAmt() + ", TempAmt="
+						+ ba.getTempAmt() + ba.toString());
 			}
 		}
 		for (BaTxVo ba : iBatxList) {

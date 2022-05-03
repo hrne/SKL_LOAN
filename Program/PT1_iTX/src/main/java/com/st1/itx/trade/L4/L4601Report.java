@@ -107,10 +107,12 @@ public class L4601Report extends MakeReport {
 			int count = 0;
 			for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
 
-				if (!tempcustno.equals(t.getCustNo()) || !tempfacmno.equals(t.getFacmNo())) {
-					this.print(1, 0,
-							"------------------------------------------------------------------------------------------------------------------------------------------------");
-					rowcount = rowcount + 1;
+				if (rowcount != 0) { // 換頁第一筆不判斷
+					if (!tempcustno.equals(t.getCustNo()) || !tempfacmno.equals(t.getFacmNo())) {
+						this.print(1, 0,
+								"------------------------------------------------------------------------------------------------------------------------------------------------");
+						rowcount = rowcount + 1;
+					}
 				}
 				this.print(1, 2, t.getCustNo());
 				this.print(0, 14, t.getFacmNo());
