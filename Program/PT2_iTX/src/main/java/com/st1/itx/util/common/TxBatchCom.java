@@ -1455,13 +1455,18 @@ public class TxBatchCom extends TradeBuffer {
 		Slice<CustRmk> slCustRmk = custRmkService.findCustNo(tBatxDetail.getCustNo(), this.index, Integer.MAX_VALUE,
 				titaVo);
 		if (slCustRmk != null) {
+			int rmkNo = 0;
+			String rmkDesc = "";
 			for (CustRmk tCustRmk : slCustRmk) {
 				if (parse.isNumeric(tCustRmk.getRmkCode()) && parse.stringToInteger(tCustRmk.getRmkCode()) >= 301
 						&& parse.stringToInteger(tCustRmk.getRmkCode()) <= 310) {
-					this.checkMsg += tCustRmk.getRmkDesc();
-					break;
+					if (rmkNo == 0 || tCustRmk.getRmkNo() > rmkNo) {
+						rmkNo = tCustRmk.getRmkNo();
+						rmkDesc = tCustRmk.getRmkDesc();
+					}
 				}
 			}
+			this.checkMsg += rmkDesc;
 		}
 
 	}

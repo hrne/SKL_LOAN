@@ -26,28 +26,28 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
-@Service("L8202Batch")
-@Scope("prototype")
 /**
  * 
  * 
  * @author Zijin
  * @version 1.0.0
  */
+@Service("L8202Batch")
+@Scope("prototype")
 public class L8202Batch extends TradeBuffer {
 
 	@Autowired
-	public Parse parse;
+	Parse parse;
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
 	@Autowired
-	public MlaundryDetailService mlaundryDetailService;
+	MlaundryDetailService mlaundryDetailService;
 	@Autowired
-	public MlaundryChkDtlService mlaundryChkDtlService;
+	MlaundryChkDtlService mlaundryChkDtlService;
 	@Autowired
-	public WebClient webClient;
+	WebClient webClient;
 	@Autowired
-	public L8202ServiceImpl l8202ServiceImpl;
+	L8202ServiceImpl l8202ServiceImpl;
 
 	private String sendMsg = "";
 	private int processCnt = 0;
@@ -76,6 +76,12 @@ public class L8202Batch extends TradeBuffer {
 		// 刪除未寫疑似洗錢樣態檢核明細檔的疑似洗錢交易合理性明細檔
 		try {
 			deleteDetail(titaVo);
+		} catch (LogicException e) {
+			sendMsg = e.getErrorMsg();
+			isError = true;
+		}
+		try {
+			deleteChkDetail(titaVo);
 		} catch (LogicException e) {
 			sendMsg = e.getErrorMsg();
 			isError = true;
@@ -369,6 +375,12 @@ public class L8202Batch extends TradeBuffer {
 
 	}
 
+	/**
+	 * 刪除MlaundryDetail，僅刪除合理性記號為空白未註記的資料
+	 * 
+	 * @param titaVo TitaVo
+	 * @throws LogicException deleteAll
+	 */
 	private void deleteDetail(TitaVo titaVo) throws LogicException {
 		this.info("L8202Batch deleteDetail");
 		Slice<MlaundryDetail> slMlaundryDetail = mlaundryDetailService.findEntryDateRange(iEntryDateS + 19110000,
@@ -381,6 +393,29 @@ public class L8202Batch extends TradeBuffer {
 				mlaundryDetailService.deleteAll(lMlaundryDetail, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", ", MlaundryDetail deleteAll error : " + e.getErrorMsg());
+			}
+		}
+	}
+
+	/**
+	 * 刪除MlaundryChkDtl
+	 * 
+	 * @param titaVo TitaVo
+	 * @throws LogicException deleteAll
+	 */
+	private void deleteChkDetail(TitaVo titaVo) throws LogicException {
+		this.info("L8202Batch deleteChkDetail");
+		Slice<MlaundryChkDtl> slMlaundryChkDtl = mlaundryChkDtlService.findEntryDateRange(iEntryDateS + 19110000,
+				iEntryDateE + 19110000, 0, Integer.MAX_VALUE, titaVo);
+
+		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null
+				: new ArrayList<MlaundryChkDtl>(slMlaundryChkDtl.getContent());
+
+		if (lMlaundryChkDtl != null) {
+			try {
+				mlaundryChkDtlService.deleteAll(lMlaundryChkDtl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", ", MlaundryChkDtl deleteAll error : " + e.getErrorMsg());
 			}
 		}
 	}

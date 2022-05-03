@@ -582,8 +582,10 @@ public class BaTxCom extends TradeBuffer {
 		this.tmAmt = BigDecimal.ZERO; // this.tmAmt 暫收抵繳金額
 
 		// 合併檢核轉暫收金額加入暫收可抵繳
-		if (tempVo.get("MergeAmt") != null && tempVo.getParam("MergeSeq").equals(tempVo.get("MergeCnt"))) {
-			this.tavAmt = addMergeAmt(iCustNo, this.getOverRpFacmNo(), iTxAmt, this.mergeAmt);
+		if ("L420A".equals(titaVo.getTxcd()) && tempVo.get("MergeAmt") != null) {
+			if (tempVo.getParam("MergeSeq").equals(tempVo.getParam("MergeCnt"))) {
+				this.tavAmt = addMergeAmt(iCustNo, this.getOverRpFacmNo(), iTxAmt, this.mergeAmt);
+			}
 		}
 
 		// 加可抵繳至可償還餘額
@@ -1520,13 +1522,14 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/* 設定費用還款順序 */
-	private void settlePriority(int EntryDate, int RepayType) {
+	private void settlePriority(int EntryDate, int iRepayType) {
 		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:應繳本利 > 6:另收欠款
 		for (BaTxVo ba : this.baTxList) {
-			if (ba.getRepayType() == RepayType && this.txBal.compareTo(ba.getUnPaidAmt()) == 0) {
+			if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType
+					&& this.txBal.compareTo(ba.getUnPaidAmt()) == 0) {
 				ba.setRepayPriority(1);
 			} else if (ba.getDataKind() == 1) {
-				if (ba.getRepayType() == RepayType) {
+				if (ba.getRepayType() == iRepayType) {
 					ba.setRepayPriority(2);
 				} else if (ba.getRepayType() == 1) {
 					ba.setRepayPriority(4);
@@ -1612,13 +1615,14 @@ public class BaTxCom extends TradeBuffer {
 	/* 按額度應繳日回收，應繳日由小到大、計息順序(利率由大到小)、額度由小到大 */
 	private int settleByPayintDate() {
 		this.info("settleByPayintDate ...xxBal=" + this.xxBal);
+		// 本金利息(按應繳日加總至額度)
 		int facmNo = 0;
 		int payIntDate = 0;
 		BigDecimal payintDateAmt = BigDecimal.ZERO;
 		int repayIntDate = 0;
 		boolean isFirstPaid = true;
 		for (BaTxVo ba : this.baTxList) {
-			if (ba.getRepayPriority() == 5) {
+			if (ba.getRepayPriority() == 5 && ba.getPayIntDate() > 0) {
 				if (payIntDate != ba.getPayIntDate() || facmNo != ba.getFacmNo()) {
 					payIntDate = ba.getPayIntDate();
 					facmNo = ba.getFacmNo();
@@ -1707,7 +1711,7 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-		this.info("settlePayintDateAmt PayIntDate=" + payIntDate + ", FacmNo=" + facmNo);
+		this.info("settlePayintDateAmt end " + payIntDate + ", FacmNo=" + facmNo + ", xxbal=" + this.xxBal);
 	}
 
 	/* 計算暫收抵繳作帳金額 */

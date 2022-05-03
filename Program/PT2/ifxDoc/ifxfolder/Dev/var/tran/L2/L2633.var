@@ -1,0 +1,187 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2633)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,247)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];order=1;">
+[
+["[L2633]                                 清償日報表"],
+["#FdTranDate+入帳日期",#TranDate],
+]
+!---------- AP Button AREA ----------   
+![Buttom資料查詢]
+
+! #BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+
+
+! 永遠為必輸欄位
+#FdTranDate=X,2,L
+T(3,*)
+
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF01=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+!CloseReasonCode
+#CDDEF02=x,30,S
+T(3,CdCode.CloseReasonCode)
+
+#CloseReasonCodeHelp=x,1024,S
+
+!CollectWayCode
+#CDDEF03=x,25,S
+T(3,CdCode.CollectWayCode)
+
+#CollectWayCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CurrPrecisionHelp,#HelpDesc1)
+T(2,@CloseReasonCodeHelp,#HelpDesc2)
+T(2,@CollectWayCodeHelp,#HelpDesc3)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#POSINTDT=D,8,S
+T(4,DATE$)
+
+!年月日 必須輸入
+#TranDate=D,7,I
+E(0,#SYSDATE)
+@A(DATE,0,#TranDate)
+V(7)
+
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2633 ----------
+<sub type="FORM" name="L2633">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2633,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2633] 清償日報表)
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranDate
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2633
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2633" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
+[
+["[L2633]                                 清償日報表"],
+["@"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#RPTFG=0,QUERY.GRID,L2633
+#any={detail:true, header:'L2633.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OOCloseReasonCodeX=清償原因
+{width:100,align:'left'}
+
+#OOCloseAmtX=結清金額
+{width:200,align:'right'}
+
+#OOCollectWayCodeX=領取方式
+{width:100,align:'left'}
+
+#OORmk=備註
+{width:100,align:'left'}
+
+#OOTelNo1=聯絡電話1
+{width:100,align:'left'}
+
+#OODocNo=公文編號
+{width:100,align:'center'}
+
+#OOAgreeNo=塗銷編號
+{width:100,align:'left'}
+
+#OOClsNo=銷號欄
+{width:100,align:'left'}
+
+^
+</sub>

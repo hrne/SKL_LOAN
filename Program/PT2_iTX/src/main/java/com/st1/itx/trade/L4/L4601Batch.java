@@ -207,6 +207,8 @@ public class L4601Batch extends TradeBuffer {
 					InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
 
 					tInsuRenewMediaTemp = this.getInsuRenewMediaTemp(t, tInsuRenewMediaTemp, titaVo);
+
+					this.info("tInsuRenewMediaTemp = " + tInsuRenewMediaTemp);
 					// 檢核結果
 					tInsuRenewMediaTemp.setCheckResultA(checkResultA);
 					tInsuRenewMediaTemp.setCheckResultB(checkResultB);
@@ -388,9 +390,10 @@ public class L4601Batch extends TradeBuffer {
 				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 
 		if (slInsuRenewMediaTemp != null) {
-			
-			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>(); 
+
+			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>();
 			lInsuRenewMediaTemp = slInsuRenewMediaTemp.getContent();
+			this.info("lInsuRenewMediaTemp = " + lInsuRenewMediaTemp);
 			try {
 				insuRenewMediaTempService.deleteAll(lInsuRenewMediaTemp, titaVo);
 			} catch (DBException e) {

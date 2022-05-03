@@ -116,9 +116,9 @@ public class L4601 extends TradeBuffer {
 			this.info("errorCCnt  = ");
 			totaC.putParam("ErrorCCnt", errorCCnt);
 			this.addList(totaC);
+			// 產重複投保報表
+			MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
 		}
-		// 產重複投保報表
-		MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
 		
 		this.info("totavoList L4601  = " + this.sendList());
 

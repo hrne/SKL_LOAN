@@ -84,7 +84,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (intSearchFlag == 1) {
 			sql += " where i.\"InsuYearMonth\" >= " + intInsuYearMonth;
 			sql += "   and i.\"InsuYearMonth\" <= " + intInsuYearMonthEnd;
-		} else if (intSearchFlag == 2 && intSearchOption != 0 && intSearchOption != 1) {
+		} else if (intSearchFlag == 2 ) {
 			sql += " where substr(i.\"AcDate\" - 19110000,1,5) = " + intReportYearMonth;
 			sql += "   and i.\"InsuYearMonth\" >= " + intInsuYearMonth;
 			sql += "   and i.\"InsuYearMonth\" <= " + intInsuYearMonthEnd;

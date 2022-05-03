@@ -19,6 +19,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchDeductMedia;
 import com.st1.itx.db.domain.AchDeductMediaId;
 import com.st1.itx.db.domain.BankDeductDtl;
+import com.st1.itx.db.domain.BankRmtf;
+import com.st1.itx.db.domain.BankRmtfId;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
@@ -31,6 +33,7 @@ import com.st1.itx.db.domain.PostDeductMediaId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AchDeductMediaService;
 import com.st1.itx.db.service.BankDeductDtlService;
+import com.st1.itx.db.service.BankRmtfService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.EmpDeductMediaService;
@@ -87,6 +90,9 @@ public class BS401 extends TradeBuffer {
 
 	@Autowired
 	public LoanChequeService loanChequeService;
+
+	@Autowired
+	public BankRmtfService bankRmtfService;
 
 	@Autowired
 	public WebClient webClient;
@@ -183,11 +189,6 @@ public class BS401 extends TradeBuffer {
 				case 0: // 0:入帳
 					// 是否重新檢核
 					boolean isCheck = false;
-
-					// 同戶號合併檢核須重新檢核(入暫收款後)
-					if (tTempVo.get("MergeCnt") != null && tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
-						isCheck = true;
-					}
 
 					// 02.銀行扣款 03.員工扣款 => 1.整批檢核時設定檢核正常，整批入帳時才進行檢核
 					if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
@@ -485,6 +486,9 @@ public class BS401 extends TradeBuffer {
 	// 刪除及刪除回復時回寫媒體檔狀態
 	private void cancelUpdate(BatxDetail tBatxDetail, String StsCode, TitaVo titaVo) throws LogicException {
 		switch (tBatxDetail.getRepayCode()) {
+		case 1:
+			updateBankRmtf(tBatxDetail, titaVo);
+			break;
 		case 2:
 			if ("3".equals(tBatxDetail.getMediaKind())) {
 				updatePostDeduct(tBatxDetail, titaVo);
@@ -644,4 +648,21 @@ public class BS401 extends TradeBuffer {
 		}
 	}
 
+	// 更新匯款轉帳檔 AML回應碼
+	private void updateBankRmtf(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		BankRmtf tBankRmtf = bankRmtfService.holdById(new BankRmtfId(tBatxDetail.getAcDate() + 19110000,
+				tBatxDetail.getBatchNo(), tBatxDetail.getDetailSeq()), titaVo);
+		if (tBankRmtf != null) {
+			if ("D".equals(tBatxDetail.getProcStsCode())) {
+				tBankRmtf.setAmlRsp("D");
+			} else {
+				tBankRmtf.setAmlRsp("");
+			}
+			try {
+				bankRmtfService.update(tBankRmtf);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "update BankRmtf " + e.getErrorMsg());
+			}
+		}
+	}
 }

@@ -108,8 +108,9 @@ public class L8922 extends TradeBuffer {
 					if (!(retxdate >= tMlaundryDetail.getEntryDate())) {
 						continue;
 					}
+				} else {
+					continue;
 				}
-				break;
 			}
 
 			switch (iLevel) {
@@ -118,7 +119,7 @@ public class L8922 extends TradeBuffer {
 				// 主管
 				// 經辦未輸入合理性,主管查不出來
 				this.info("L8922 Rational" + tMlaundryDetail.getRational());
-				if (("").equals(tMlaundryDetail.getRational().trim())) {
+				if (tMlaundryDetail.getRational().trim().isEmpty()) {
 					this.info("Rational 空白");
 					continue;
 				}

@@ -84,4 +84,12 @@ public class BaseTransaction extends SysLogger {
 			transactionManager.commit(status);
 //		this.status = transactionManager.getTransaction(def);
 	}
+
+	public boolean isTxFg() {
+		return txFg;
+	}
+
+	public void setTxFg(boolean txFg) {
+		this.txFg = txFg;
+	}
 }

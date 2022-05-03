@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.hibernate.TransactionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.beans.BeansException;
@@ -28,6 +29,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TotaVoList;
 import com.st1.itx.dataVO.TxCom;
+import com.st1.itx.db.service.TxCurrService;
 import com.st1.itx.db.transaction.BaseTransaction;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
@@ -97,6 +99,26 @@ public class ApControl extends SysLogger {
 
 	@PostConstruct
 	public void init() {
+		this.mustInfo("Test DataBase Transaction....");
+		TxCurrService txCurrService = MySpring.getBean("txCurrService", TxCurrService.class);
+		int tryTimes = 0;
+		while (true) {
+			if (tryTimes > 35) {
+				this.error("Test DataBase Transaction Fail Over 35 Times...");
+				throw new TransactionException("DataBase Transaction Fail");
+			}
+			try {
+				txCurrService.findAll(0, Integer.MAX_VALUE);
+				this.mustInfo("Transaction Test OK....");
+				break;
+			} catch (TransactionException e) {
+				this.error(e.getMessage());
+				if (baseTransaction.isTxFg())
+					baseTransaction.setTxFg(true);
+				baseTransaction.newInit();
+			}
+			tryTimes++;
+		}
 	}
 
 	public String callTrade(String tita) throws Exception {

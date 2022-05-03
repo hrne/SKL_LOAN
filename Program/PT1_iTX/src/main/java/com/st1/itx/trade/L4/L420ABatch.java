@@ -366,14 +366,30 @@ public class L420ABatch extends TradeBuffer {
 		int repayType = tDetail.getRepayType();
 		TempVo iTempVo = new TempVo();
 		iTempVo = iTempVo.getVo(tDetail.getProcNote());
+		int facmNo = tDetail.getFacmNo();
+		for (BaTxVo ba : iBatxList) {
+			if (facmNo == 0 && ba.getDataKind() == 4) {
+				facmNo = ba.getFacmNo();
+			}
+			// 另收費用同費用
+			if (ba.getDataKind() == 6) {
+				ba.setDataKind(1);
+			}
+		}
+
+		String facAcctCode = "999";
+		String facAcctItem = "暫收款 ";
+		if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3 && "4".equals(tDetail.getProcStsCode())) {
+			FacMain tFacMain = facMainService.findById(new FacMainId(tDetail.getCustNo(), facmNo));
+			if (tFacMain != null) {
+				facAcctCode = tFacMain.getAcctCode();
+				facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
+			}
+		}
+		
 		if ("4".equals(tDetail.getProcStsCode()) && iTempVo.getParam("MergeSeq").equals(iTempVo.getParam("MergeCnt"))) {
 			for (BaTxVo ba : iBatxList) {
 				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					// 另收費用同費用
-					if (ba.getDataKind() == 6) {
-						ba.setDataKind(1); 
-					}
-					this.info("add =" + ba.toString());
 					lbaTxVo.add(ba);
 				}
 			}
@@ -386,40 +402,14 @@ public class L420ABatch extends TradeBuffer {
 			baTxVo.setDbCr("C");
 			baTxVo.setAcctAmt(tDetail.getRepayAmt());
 			lbaTxVo.add(baTxVo);
-			this.info("aaa =" + baTxVo.toString());
 		}
+		
 		for (BaTxVo ba : lbaTxVo) {
 			this.info("ccc =" + ba.toString());
 		}
 		// 計算帳務作帳金額
 		lbaTxVo = settleAcAmt(repayType, tDetail.getRepayAmt(), lbaTxVo, titaVo);
-
-		String facAcctCode = "999";
-		String facAcctItem = "暫收款 ";
-		// 還款檢核交易放額度科目
-		if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3 && "4".equals(tDetail.getProcStsCode())) {
-			for (BaTxVo baTxVo : lbaTxVo) {
-				if ("3".equals(baTxVo.getAcctCode().substring(0, 1))) {
-					facAcctCode = baTxVo.getAcctCode();
-					facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
-					break;
-				}
-			}
-			if (facAcctCode.equals("999")) {
-				for (BaTxVo baTxVo : lbaTxVo) {
-					if (baTxVo.getFacmNo() > 0) {
-						FacMain tFacMain = facMainService
-								.findById(new FacMainId(baTxVo.getCustNo(), baTxVo.getFacmNo()));
-						if (tFacMain != null) {
-							facAcctCode = tFacMain.getAcctCode();
-							facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
-							break;
-						}
-					}
-				}
-			}
-		}
-
+		
 		for (BaTxVo baTxVo : lbaTxVo) {
 			if (baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0) {
 				continue;
