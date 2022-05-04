@@ -105,7 +105,7 @@ public class MakeExcel extends CommBuffer {
 
 	private int rowNum = -1;
 
-	private Sheet sheet = null;
+	public Sheet sheet = null;
 
 	/* DB服務注入 */
 	@Autowired

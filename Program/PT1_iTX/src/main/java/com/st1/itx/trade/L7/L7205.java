@@ -2,6 +2,7 @@ package com.st1.itx.trade.L7;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +31,9 @@ import com.st1.itx.db.service.LoanIfrs9ApService;
 import com.st1.itx.db.service.MonthlyFacBalService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-
 
 @Service("L7205")
 @Scope("prototype")
@@ -58,12 +59,17 @@ public class L7205 extends TradeBuffer {
 	public LoanIfrs9ApService tLoanIfrs9ApService;
 	@Autowired
 	public Ias34ApService tIas34ApService;
-	
+
 	@Autowired
 	JobMainService sJobMainService;
-	
+
+	@Autowired
+	MakeExcel makeExcel;
+
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
+
+
 	// 明細資料容器
 	private ArrayList<OccursList> occursList = new ArrayList<>();
 
@@ -75,17 +81,18 @@ public class L7205 extends TradeBuffer {
 		int iYearMonth = parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 		this.info("L7205 YearMonth : " + iYearMonth);
 
-		int dateSent = Integer.parseInt(titaVo.getParam("YearMonth") + "01") ;
+		int dateSent = Integer.parseInt(titaVo.getParam("YearMonth") + "01");
 		dateUtil.init();
 		dateUtil.setDate_1(dateSent);
 		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
-		int iMfbsDy = tTxBizDate.getMfbsDy() + 19110000 ;// 畫面輸入年月的月底營業日
+		int iMfbsDy = tTxBizDate.getMfbsDy() + 19110000;// 畫面輸入年月的月底營業日
 		this.info("L7205 iMfbsDy : " + iMfbsDy);
-		
 
-		//      吃檔                                            
+		// 吃檔
 		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
+
+		this.info("filename=" + filename);
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -96,29 +103,35 @@ public class L7205 extends TradeBuffer {
 			this.info("L7205(" + filename + ") : " + e.getMessage());
 			String ErrorMsg = "檔案不存在,請查驗路徑.\r\n" + filename;
 
-			throw new LogicException(titaVo,"E0014", ErrorMsg);
+			throw new LogicException(titaVo, "E0014", ErrorMsg);
 		}
 
 		titaVo.setDataBaseOnMon();// 指定月報環境
 
-//      切資料
-		setValueFromFile(dataLineList);
-		int CountAll = occursList.size();
-		int CountS = 0 ;
-		int CountF = 0 ;
+		String extension[] = filename.split("\\.");
+		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
+			makeExcel.openExcel(filename, 1);
+			// 切資料
+			setValueFromFileExcel(iYearMonth);
 
-		
+		} else {
+			setValueFromFile(dataLineList);
+		}
+
+		int CountAll = occursList.size();
+		int CountS = 0;
+		int CountF = 0;
+
 		Slice<Ias34Ap> sIas34Ap = null;
 		Slice<LoanIfrs9Ap> sLoanIfrs9Ap = null;
-		
-		
+
 		for (OccursList tempOccursList : occursList) {
-			
+
 			int custno = parse.stringToInteger(tempOccursList.get("CustNo"));
 			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
 			int yearmonth = parse.stringToInteger(tempOccursList.get("YearMonth"));
 			String assetclass = tempOccursList.get("AssetClass");
-			
+
 			if (!(iYearMonth == yearmonth)) {
 				throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + yearmonth);
 			}
@@ -127,11 +140,11 @@ public class L7205 extends TradeBuffer {
 			monthlyFacBalId.setCustNo(custno);
 			monthlyFacBalId.setFacmNo(facmno);
 			monthlyFacBalId.setYearMonth(yearmonth);
-		
+
 			MonthlyFacBal tMonthlyFacBal = tMothlyFacBalService.findById(monthlyFacBalId, titaVo);
-			
-			if(tMonthlyFacBal == null) { 
-				CountF++;                // 失敗筆數+1
+
+			if (tMonthlyFacBal == null) {
+				CountF++; // 失敗筆數+1
 			} else {
 				tMonthlyFacBal.setAssetClass(assetclass);
 				try {
@@ -139,17 +152,17 @@ public class L7205 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
-				CountS++;	             // 成功筆數+1
-			} 
+				CountS++; // 成功筆數+1
+			}
 			// 維護Ifrs9FacData
 			Ifrs9FacDataId ifrs9FacDataId = new Ifrs9FacDataId();
 			ifrs9FacDataId.setCustNo(custno);
 			ifrs9FacDataId.setFacmNo(facmno);
 			ifrs9FacDataId.setDataYM(yearmonth);
-		
+
 			Ifrs9FacData tIfrs9FacData = tIfrs9FacDataService.findById(ifrs9FacDataId, titaVo);
-			
-			if(tIfrs9FacData == null) { 
+
+			if (tIfrs9FacData == null) {
 			} else {
 				tIfrs9FacData.setAssetClass(parse.stringToInteger(assetclass));
 				try {
@@ -157,7 +170,7 @@ public class L7205 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
-			} 
+			}
 			// 維護Ias34Ap
 
 			sIas34Ap = tIas34ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
@@ -175,9 +188,9 @@ public class L7205 extends TradeBuffer {
 					}
 				}
 			}
-			
+
 			// 維護LoanIfrs9Ap
-			
+
 			sLoanIfrs9Ap = tLoanIfrs9ApService.dataEq(custno, facmno, yearmonth, this.index, this.limit, titaVo);
 
 			List<LoanIfrs9Ap> lLoanIfrs9Ap = sLoanIfrs9Ap == null ? null : sLoanIfrs9Ap.getContent();
@@ -198,10 +211,10 @@ public class L7205 extends TradeBuffer {
 		this.totaVo.putParam("CountAll", CountAll);
 		this.totaVo.putParam("CountS", CountS);
 		this.totaVo.putParam("CountF", CountF);
-		
+
 //		 重產LM051報表
-		 titaVo.setBatchJobId("jLM051");
-		 		  
+		titaVo.setBatchJobId("jLM051");
+
 		this.addList(this.totaVo);
 		return this.sendList();
 
@@ -228,6 +241,39 @@ public class L7205 extends TradeBuffer {
 				occursList.putParam("FacmNo", thisColumn[2]);
 				occursList.putParam("AssetClass", thisColumn[3]);
 			}
+			this.occursList.add(occursList);
+		}
+
+	}
+
+	public void setValueFromFileExcel(int YearMonth) throws LogicException {
+
+		int lastRowNum = makeExcel.sheet.getLastRowNum() + 1;
+
+		int iYearMonth = YearMonth;
+		BigDecimal iCustNo = BigDecimal.ZERO;
+		BigDecimal iFacmNo = BigDecimal.ZERO;
+		BigDecimal iAssetClass = BigDecimal.ZERO;
+
+		for (int i = 2; i <= lastRowNum; i++) {
+
+			OccursList occursList = new OccursList();
+
+			iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
+			iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
+			iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
+
+			// 設定明細欄位的擷取位置
+			// 1 YearMonth 年月份 Decimal 6 YYYYMM 西元年月
+			// 2 CustNo 戶號 Decimal 7
+			// 3 FacmNo 額度編號 Decimal 3
+			// 4 AssetClass 資產五分類代號(有擔保部分) Decimal 1
+
+			occursList.putParam("YearMonth", iYearMonth);
+			occursList.putParam("CustNo", iCustNo.intValue());
+			occursList.putParam("FacmNo", iFacmNo.intValue());
+			occursList.putParam("AssetClass", iAssetClass.intValue());
+
 			this.occursList.add(occursList);
 		}
 

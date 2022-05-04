@@ -494,8 +494,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND  (TO_DATE(D1.\"EntryDate\",'YYYY-MM-DD') \n";
 		sql += "                 -  TO_DATE(B2.\"EntryDate\",'YYYY-MM-DD')\n";
 		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
-		sql += "        WHERE D1.\"Rational\" = '?'                      \n";
-		sql += "          AND NVL(B2.\"CustNo\",0)  > 0                  \n";
+		sql += "        WHERE NVL(B2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
 		sql += "         D2.\"EntryDate\"            AS \"EntryDate\"    \n";
@@ -515,8 +514,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND (TO_DATE(D2.\"EntryDate\",'YYYY-MM-DD') \n";
 		sql += "                -  TO_DATE(A2.\"EntryDate\",'YYYY-MM-DD')\n";
 		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
-		sql += "        WHERE D2.\"Rational\" = '?'                      \n";
-		sql += "          AND NVL(A2.\"CustNo\",0)  > 0                  \n";
+		sql += "        WHERE NVL(A2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
 		sql += "         D3.\"EntryDate\"            AS \"EntryDate\"    \n";
@@ -536,8 +534,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND (TO_DATE(D3.\"EntryDate\",'YYYY-MM-DD') \n";
 		sql += "                -  TO_DATE(P2.\"TransDate\",'YYYY-MM-DD')\n";
 		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
-		sql += "        WHERE D3.\"Rational\" = '?'                      \n";
-		sql += "          AND NVL(P2.\"CustNo\",0)  > 0                  \n";
+		sql += "        WHERE NVL(P2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
 		sql += "         D4.\"EntryDate\"            AS \"EntryDate\"    \n";
@@ -557,8 +554,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND (TO_DATE(D4.\"EntryDate\",'YYYY-MM-DD')\n";
 		sql += "                -  TO_DATE(C2.\"EntryDate\",'YYYY-MM-DD')\n";
 		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
-		sql += "        WHERE D4.\"Rational\" = '?'                      \n";
-		sql += "          AND NVL(C2.\"CustNo\",0)  > 0                  \n";
+		sql += "        WHERE NVL(C2.\"CustNo\",0)  > 0                  \n";
 		sql += "      ) F                                                \n";
 		sql += " WHERE (CASE WHEN F.\"Factor\" = 1                       \n";
 		sql += "                  THEN 1                                 \n";

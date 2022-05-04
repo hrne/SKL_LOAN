@@ -35,84 +35,187 @@ public class L9731Report extends MakeReport {
 	MakeExcel makeExcel;
 
 	String txcd = "L9731";
-	String txname = "人工檢核工作表1";
+	String txname = "人工檢核工作表";
+	// 底稿1：五類資產檢核表
+	// 底稿2：放款總歸戶明細表
+	// 底稿3：放款額度明細表
+	// 底稿4：放款餘額明細表
 
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月底日
-	 * @param form      工作表
+	 *
 	 * 
 	 */
-	public boolean exec(TitaVo titaVo, int yearMonth, int form) throws LogicException {
+	public boolean exec(TitaVo titaVo, int yearMonth) throws LogicException {
 		this.info(" exec");
 
 		List<Map<String, String>> findList = null;
 
-		boolean isSize = false;
+		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
-		try {
+//		上傳用 
+//		this.info("L9731 get value" + makeExcel.getValue(2, 2));
+//		this.info("L9731 get value" + makeExcel.getValue(3, 2));
+//		this.info("L9731 get value" + makeExcel.getValue(4, 2));
 
-			switch (form) {
-			case 1:
+//		formNum.forEach(item -> {
+//		this.info("totalItem=" + item);
+//
+//	});	
 
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表", "L9731-人工檢核表",
-						"L9731_底稿_人工檢核表.xlsx", "工作表1");
+		for (int i = 1; i <= totalItem; i++) {
 
-				findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
-				isSize = findList.size() == 0 ? false : true;
-				exportSheet1(titaVo, findList);
+			if (titaVo.getParam("BtnShell" + i).equals("V")) {
 
-				findList = null;
-				findList = l9731ServiceImpl.findSheet2_1(titaVo, yearMonth);
-				isSize = findList.size() == 0 ? false : true;
-				exportSheet2(titaVo, findList, 1);
+				String tradeCode = titaVo.getParam("TradeCode" + i);
+				String tradeName = titaVo.getParam("TradeName" + i);
 
-				findList = null;
-				findList = l9731ServiceImpl.findSheet2_2(titaVo, yearMonth);
-				isSize = findList.size() == 0 ? false : true;
-				exportSheet2(titaVo, findList, 2);
+				try {
 
-				break;
-			case 2:
+					switch (tradeCode) {
+					// 五類資產檢核表
+					case "HANDMADE1":
 
-				List<Map<String, String>> findLA$W30P = null;
+						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表2", "L9731-人工檢核表2",
-						"L9731_底稿_人工檢核表.xlsx", "工作表1");
+						findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
 
-				findList = l9731ServiceImpl.findLA$W30P(titaVo, yearMonth);
-				isSize = findList.size() == 0 ? false : true;
-				exportLA$W30P(titaVo, findLA$W30P);
+						exportSheet1(titaVo, findList);
 
-				break;
+						break;
+					// 放款總歸戶明細表
+					case "HANDMADE2":
+
+						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+
+						findList = l9731ServiceImpl.findSheet2(titaVo, yearMonth);
+
+						exportSheet2(titaVo, findList);
+
+						break;
+					// 放款額度明細表
+					case "HANDMADE3":
+
+						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+
+						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
+
+						exportSheet3(titaVo, findList, 1);
+						findList = l9731ServiceImpl.findSheet3_2(titaVo, yearMonth);
+
+						exportSheet3(titaVo, findList, 2);
+
+						break;
+					// 放款餘額明細表
+					case "HANDMADE4":
+
+						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+
+						findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
+
+						exportSheet4(titaVo, findList, 1);
+
+						break;
+					}
+
+				} catch (Exception e) {
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.info("L9731ServiceImpl.findAll error = " + errors.toString());
+
+				}
+
+				makeExcel.close();
 			}
-
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L9731ServiceImpl.findAll error = " + errors.toString());
-
 		}
-
-		if (isSize == false) {
-			makeExcel.setSheet("工作表1");
-			makeExcel.setValue(2, 1, "本日無資料");
-		}
-
-		makeExcel.close();
 
 		return true;
+
 	}
 
 	/**
-	 * Sheet1
+	 * Sheet1 五類資產檢核表
 	 */
 	private void exportSheet1(TitaVo titaVo, List<Map<String, String>> listL9731) throws LogicException {
-		this.info("L9731Report exportSheet1");
+		this.info("L9731Report exportSheet14");
 
-		makeExcel.setSheet("工作表1");
+		if (listL9731 == null || listL9731.isEmpty()) {
+
+			makeExcel.setValue(2, 1, "本日無資料", "L");
+
+		} else {
+
+			int row = 2;
+
+			for (Map<String, String> tLDVo : listL9731) {
+
+				for (int i = 0; i < tLDVo.size(); i++) {
+
+					String fieldValue = tLDVo.get("F" + i);
+
+					switch (i) {
+					case 0:// 戶號
+						makeExcel.setValue(row, 2, fieldValue, "L");
+						break;
+					case 1:// 額度
+						makeExcel.setValue(row, 3, fieldValue, "L");
+						break;
+					case 9:// 繳息迄日
+						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
+							makeExcel.setValue(row, 4, showBcDate(fieldValue, 0), "C");
+						}
+						break;
+					case 10:// 到期日
+						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
+							makeExcel.setValue(row, 5, showBcDate(fieldValue, 0), "C");
+						}
+						break;
+					case 11:// 放款餘額
+						BigDecimal amt = getBigDecimal(fieldValue);
+						makeExcel.setValue(row, 6, amt, "#,##0", "R");
+						break;
+					case 12:// 逾期數
+
+						makeExcel.setValue(row, 7, fieldValue, "C");
+						break;
+					case 14:// 資產分類
+						makeExcel.setValue(row, 8, fieldValue, "C");
+					default:
+
+						break;
+					}
+				} // for
+
+				row++;
+			} // for
+
+			// excel formula
+			makeExcel.formulaCaculate(1, 6);
+
+			for (int i = 1; i <= listL9731.size(); i++) {
+				makeExcel.formulaCalculate(i + 1, 1);
+			}
+
+		}
+
+	}
+
+	/**
+	 * Sheet2 放款總歸戶明細表
+	 */
+	private void exportSheet2(TitaVo titaVo, List<Map<String, String>> listL9731) throws LogicException {
+		this.info("L9731Report exportSheet1");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -148,12 +251,10 @@ public class L9731Report extends MakeReport {
 	}
 
 	/**
-	 * Sheet2
+	 * Sheet3 放款額度明細表
 	 */
-	private void exportSheet2(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
+	private void exportSheet3(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
 		this.info("L9731Report exportSheet2");
-
-		makeExcel.setSheet("工作表2");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -259,12 +360,10 @@ public class L9731Report extends MakeReport {
 	}
 
 	/**
-	 * LA$W30P
+	 * exportSheet4  放款餘額明細表
 	 */
-	private void exportLA$W30P(TitaVo titaVo, List<Map<String, String>> listL9731) throws LogicException {
-		this.info("L9731Report exportLA$W30P");
-
-		makeExcel.setSheet("la$w30p");
+	private void exportSheet4(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
+		this.info("L9731Report exportSheet14");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -345,4 +444,5 @@ public class L9731Report extends MakeReport {
 		}
 
 	}
+
 }

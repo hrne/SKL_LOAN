@@ -26,8 +26,6 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	
-	
 	/**
 	 * 執行報表輸出
 	 * 
@@ -36,186 +34,6 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	*/
 	public List<Map<String, String>> findSheet1(TitaVo titaVo, int yearMonth) throws Exception {
-		// 年
-		int iYear = yearMonth / 100;
-
-		this.info("L9731.findSheet1 YYMM=" + yearMonth);
-		
-		String sql = " ";
-		sql += "	 WITH \"allMonthMaxLoan\" AS ("; // 
-		sql += "	 	SELECT M.\"CustNo\" AS \"CustNo\"";
-		sql += "	 		  ,MAX(\"MaxLoanBalance\") AS \"MaxLoanBal\"";
-		sql += "	 	FROM(";
-		sql += "	 		SELECT \"CustNo\"";
-		sql += "	 			  ,\"YearMonth\"";
-		sql += "	 			  ,SUM(\"LoanBalance\") AS \"MaxLoanBalance\"";
-		sql += "	 		FROM \"MonthlyLoanBal\"";
-		sql += "	 		WHERE TRUNC(\"YearMonth\" / 100 ) = :year";
-		sql += "	 		  AND \"LoanBalance\" > 0 ";
-		sql += "	 		GROUP BY \"CustNo\"";
-		sql += "	 				,\"YearMonth\"";
-		sql += "	 	)M";
-		sql += "	 	GROUP BY M.\"CustNo\"";
-		sql += "	 ),\"mainData\" AS (";
-		sql += "	 		SELECT \"CustNo\" AS \"CustNo\"";
-		sql += "	 	  		  ,SUM(\"LoanBalance\") AS \"TotalLoanBal\"";
-		sql += "	 		FROM \"MonthlyLoanBal\"";
-		sql += "	 		WHERE \"YearMonth\" = :yymm ";
-		sql += "	 		  AND \"LoanBalance\" > 0 ";
-		sql += "	 		GROUP BY \"CustNo\"";
-		sql += "	 		ORDER BY SUM(\"LoanBalance\") DESC";
-		sql += "	 )";
-		sql += "	 SELECT M.\"CustNo\" AS F0";
-		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F1";
-		sql += "			,C.\"CustId\" AS F2";
-		sql += "			,M.\"TotalLoanBal\" AS F3";
-		sql += "	  FROM \"mainData\" M ";
-		sql += "	  LEFT JOIN \"allMonthMaxLoan\" M2 ON M2.\"CustNo\" = M.\"CustNo\"";
-		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
-		sql += " 	  LEFT JOIN ( SELECT TO_CHAR(\"CusId\") AS \"RptId\" ";
-		sql += "             	  FROM \"RptRelationSelf\" ";
-		sql += "             	  WHERE \"LAW005\" = '1' ";
-		sql += "             	  UNION ";
-		sql += "             	  SELECT TO_CHAR(\"RlbID\") AS \"RptId\" ";
-		sql += "             	  FROM \"RptRelationFamily\" ";
-		sql += "             	  WHERE \"LAW005\" = '1' ";
-		sql += "             	  UNION ";
-		sql += "             	  SELECT TO_CHAR(\"ComNo\") AS \"RptId\" ";
-		sql += "             	  FROM \"RptRelationCompany\" ";
-		sql += "             	  WHERE \"LAW005\" = '1' ";
-		sql += "           	    ) R ON R.\"RptId\" = C.\"CustId\" ";
-		sql += "	  ORDER BY M.\"TotalLoanBal\" DESC";
-
-		this.info("sql=" + sql);
-
-		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		query.setParameter("year", iYear);
-		query.setParameter("yymm", yearMonth);
-		
-		return this.convertToMap(query);
-	}
-	
-	
-	
-	/**
-	 * 執行報表輸出
-	 * 
-	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
-	*/
-	public List<Map<String, String>> findSheet2_1(TitaVo titaVo, int yearMonth) throws Exception {
-		this.info("l9731.findSheet2_1 ");
-
-		String sql = " ";
-		sql += " SELECT M.\"CustNo\"                              AS F0 ";
-		sql += "       ,M.\"FacmNo\"                              AS F1 ";
-		sql += "       ,DECODE(M.\"AcSubBookCode\",'00A',' ','A') AS F2 ";
-		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0)        AS F3 ";
-		sql += "       ,C.\"CustId\"                              AS F4 ";
-		sql += "       ,M.\"CityCode\"                            AS F5 ";
-		sql += "       ,M.\"AcctCode\"                            AS F6 ";
-		sql += "       ,TO_CHAR(M.\"StoreRate\",'0.00000')        AS F7 ";
-		sql += "       ,F.\"FirstDrawdownDate\"                   AS F8 ";
-		sql += "       ,M.\"PrevIntDate\"                         AS F9 ";
-		sql += "       ,F.\"MaturityDate\"                        AS F10 ";
-		sql += "       ,M.\"PrinBalance\"                         AS F11 ";
-		sql += "       ,CASE ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '催協' ";
-		sql += "          WHEN M.\"ProdNo\" IN ('60','61','62') THEN '協' ";
-		sql += "          WHEN M.\"AcctCode\" = 990  THEN '催' ";
-		sql += "          WHEN M.\"OvduTerm\" IN (1,2,3,4,5) THEN TO_CHAR(M.\"OvduTerm\", '9') ";
-		sql += "        ELSE '0' END AS F12";
-		sql += "       ,CASE ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '催協' ";
-		sql += "          WHEN M.\"ProdNo\" IN ('60','61','62') THEN '協' ";
-		sql += "          WHEN M.\"AcctCode\" = 990  THEN '催' ";
-		sql += "        ELSE ' ' END AS F13";
-		sql += "       ,CASE ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"PrinBalance\" = 1 THEN '5' ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '2' ";
-		sql += "          WHEN M.\"OvduTerm\" >= 7 AND M.\"OvduTerm\" <= 12 THEN '2' ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" NOT IN ('60','61','62') THEN '3' ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"OvduTerm\" >= 12 THEN '2' ";
-		sql += "          WHEN M.\"AcctCode\" <> 990 AND M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 THEN '2' ";
-		sql += "          WHEN M.\"AcctCode\" <> 990 AND M.\"OvduTerm\" >= 1 AND M.\"OvduTerm\" <= 6 THEN '2' ";
-		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"OvduTerm\" >= 12 THEN '3' ";
-		sql += "        ELSE '1' END AS F14";
-		sql += "       ,CASE  ";
-		sql += "       	  WHEN (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
-		sql += "       	  THEN 'Z'";
-		sql += "       	  WHEN M.\"ClCode1\" IN (1,2) ";
-		sql += "       	  THEN 'C'";
-		sql += "       	  WHEN M.\"ClCode1\" IN (3) ";
-		sql += "       	  THEN 'D'";
-		sql += "       	ELSE 'C' END	AS F15";
-		sql += "       ,M.\"ProdNo\" 	                          AS F16 ";
-		sql += " FROM \"MonthlyFacBal\" M ";
-		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
-		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";
-		sql += "                        AND F.\"FacmNo\" = M.\"FacmNo\" ";
-		sql += " WHERE M.\"YearMonth\" = :yymm ";
-		sql += "   AND M.\"PrinBalance\" > 0 ";
-		sql += " ORDER BY M.\"CustNo\" ASC ";
-		sql += " 		 ,M.\"FacmNo\" ASC ";
-
-		this.info("sql=" + sql);
-
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-
-		Query query;
-		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yearMonth);
-		return this.convertToMap(query);
-	}
-
-
-
-		/**
-	 * 執行報表輸出
-	 * 
-	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
-	*/
-	public List<Map<String, String>> findSheet2_2(TitaVo titaVo, int yearMonth) throws Exception {
-		this.info("l9731.findSheet2_2 ");
-
-		String sql = " ";
-		sql += " SELECT M.\"CustNo\" || M.\"FacmNo\"              AS F0 ";
-		sql += "       ,C.\"ClTypeJCIC\"                          AS F1 ";
-		sql += "       ,M.\"ProdNo\" 	                          AS F2 ";
-		sql += "       ,F.\"FirstDrawdownDate\"                   AS F3 ";
-		sql += " FROM \"MonthlyLoanBal\" M ";
-		sql += " LEFT JOIN \"CdCl\" C ON C.\"ClCode1\" = M.\"ClCode1\" ";
-		sql += "                     AND C.\"ClCode2\" = M.\"ClCode2\" ";
-		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";
-		sql += "                        AND F.\"FacmNo\" = M.\"FacmNo\" ";
-		sql += " WHERE M.\"YearMonth\" = :yymm ";
-		sql += "   AND M.\"LoanBalance\" > 0 ";
-		sql += " ORDER BY M.\"CustNo\" ASC ";
-		sql += " 		 ,M.\"FacmNo\" ASC ";
-
-		this.info("sql=" + sql);
-
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-
-		Query query;
-		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yearMonth);
-		return this.convertToMap(query);
-	}
-	
-	/**
-	 * 執行報表輸出
-	 * 
-	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
-	*/
-	public List<Map<String, String>> findLA$W30P(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("l9731.findLA$W30P ");
 
 		String sql = "";
@@ -280,5 +98,181 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", yearMonth);
 		return this.convertToMap(query);
 	}
-	
+
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findSheet2(TitaVo titaVo, int yearMonth) throws Exception {
+		// 年
+		int iYear = yearMonth / 100;
+
+		this.info("L9731.findSheet1 YYMM=" + yearMonth);
+
+		String sql = " ";
+		sql += "	 WITH \"allMonthMaxLoan\" AS ("; //
+		sql += "	 	SELECT M.\"CustNo\" AS \"CustNo\"";
+		sql += "	 		  ,MAX(\"MaxLoanBalance\") AS \"MaxLoanBal\"";
+		sql += "	 	FROM(";
+		sql += "	 		SELECT \"CustNo\"";
+		sql += "	 			  ,\"YearMonth\"";
+		sql += "	 			  ,SUM(\"LoanBalance\") AS \"MaxLoanBalance\"";
+		sql += "	 		FROM \"MonthlyLoanBal\"";
+		sql += "	 		WHERE TRUNC(\"YearMonth\" / 100 ) = :year";
+		sql += "	 		  AND \"LoanBalance\" > 0 ";
+		sql += "	 		GROUP BY \"CustNo\"";
+		sql += "	 				,\"YearMonth\"";
+		sql += "	 	)M";
+		sql += "	 	GROUP BY M.\"CustNo\"";
+		sql += "	 ),\"mainData\" AS (";
+		sql += "	 		SELECT \"CustNo\" AS \"CustNo\"";
+		sql += "	 	  		  ,SUM(\"LoanBalance\") AS \"TotalLoanBal\"";
+		sql += "	 		FROM \"MonthlyLoanBal\"";
+		sql += "	 		WHERE \"YearMonth\" = :yymm ";
+		sql += "	 		  AND \"LoanBalance\" > 0 ";
+		sql += "	 		GROUP BY \"CustNo\"";
+		sql += "	 		ORDER BY SUM(\"LoanBalance\") DESC";
+		sql += "	 )";
+		sql += "	 SELECT M.\"CustNo\" AS F0";
+		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F1";
+		sql += "			,C.\"CustId\" AS F2";
+		sql += "			,M.\"TotalLoanBal\" AS F3";
+		sql += "	  FROM \"mainData\" M ";
+		sql += "	  LEFT JOIN \"allMonthMaxLoan\" M2 ON M2.\"CustNo\" = M.\"CustNo\"";
+		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
+		sql += " 	  LEFT JOIN ( SELECT TO_CHAR(\"CusId\") AS \"RptId\" ";
+		sql += "             	  FROM \"RptRelationSelf\" ";
+		sql += "             	  WHERE \"LAW005\" = '1' ";
+		sql += "             	  UNION ";
+		sql += "             	  SELECT TO_CHAR(\"RlbID\") AS \"RptId\" ";
+		sql += "             	  FROM \"RptRelationFamily\" ";
+		sql += "             	  WHERE \"LAW005\" = '1' ";
+		sql += "             	  UNION ";
+		sql += "             	  SELECT TO_CHAR(\"ComNo\") AS \"RptId\" ";
+		sql += "             	  FROM \"RptRelationCompany\" ";
+		sql += "             	  WHERE \"LAW005\" = '1' ";
+		sql += "           	    ) R ON R.\"RptId\" = C.\"CustId\" ";
+		sql += "	  ORDER BY M.\"TotalLoanBal\" DESC";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("year", iYear);
+		query.setParameter("yymm", yearMonth);
+
+		return this.convertToMap(query);
+	}
+
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findSheet3_1(TitaVo titaVo, int yearMonth) throws Exception {
+		this.info("l9731.findSheet2_1 ");
+
+		String sql = " ";
+		sql += " SELECT M.\"CustNo\"                              AS F0 ";
+		sql += "       ,M.\"FacmNo\"                              AS F1 ";
+		sql += "       ,DECODE(M.\"AcSubBookCode\",'00A',' ','A') AS F2 ";
+		sql += "       ,\"Fn_ParseEOL\"(C.\"CustName\", 0)        AS F3 ";
+		sql += "       ,C.\"CustId\"                              AS F4 ";
+		sql += "       ,M.\"CityCode\"                            AS F5 ";
+		sql += "       ,M.\"AcctCode\"                            AS F6 ";
+		sql += "       ,TO_CHAR(M.\"StoreRate\",'0.00000')        AS F7 ";
+		sql += "       ,F.\"FirstDrawdownDate\"                   AS F8 ";
+		sql += "       ,M.\"PrevIntDate\"                         AS F9 ";
+		sql += "       ,F.\"MaturityDate\"                        AS F10 ";
+		sql += "       ,M.\"PrinBalance\"                         AS F11 ";
+		sql += "       ,CASE ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '催協' ";
+		sql += "          WHEN M.\"ProdNo\" IN ('60','61','62') THEN '協' ";
+		sql += "          WHEN M.\"AcctCode\" = 990  THEN '催' ";
+		sql += "          WHEN M.\"OvduTerm\" IN (1,2,3,4,5) THEN TO_CHAR(M.\"OvduTerm\", '9') ";
+		sql += "        ELSE '0' END AS F12";
+		sql += "       ,CASE ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '催協' ";
+		sql += "          WHEN M.\"ProdNo\" IN ('60','61','62') THEN '協' ";
+		sql += "          WHEN M.\"AcctCode\" = 990  THEN '催' ";
+		sql += "        ELSE ' ' END AS F13";
+		sql += "       ,CASE ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"PrinBalance\" = 1 THEN '5' ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '2' ";
+		sql += "          WHEN M.\"OvduTerm\" >= 7 AND M.\"OvduTerm\" <= 12 THEN '2' ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" NOT IN ('60','61','62') THEN '3' ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"OvduTerm\" >= 12 THEN '2' ";
+		sql += "          WHEN M.\"AcctCode\" <> 990 AND M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 THEN '2' ";
+		sql += "          WHEN M.\"AcctCode\" <> 990 AND M.\"OvduTerm\" >= 1 AND M.\"OvduTerm\" <= 6 THEN '2' ";
+		sql += "          WHEN M.\"AcctCode\" = 990 AND M.\"OvduTerm\" >= 12 THEN '3' ";
+		sql += "        ELSE '1' END AS F14";
+		sql += "       ,CASE  ";
+		sql += "       	  WHEN (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
+		sql += "       	  THEN 'Z'";
+		sql += "       	  WHEN M.\"ClCode1\" IN (1,2) ";
+		sql += "       	  THEN 'C'";
+		sql += "       	  WHEN M.\"ClCode1\" IN (3) ";
+		sql += "       	  THEN 'D'";
+		sql += "       	ELSE 'C' END	AS F15";
+		sql += "       ,M.\"ProdNo\" 	                          AS F16 ";
+		sql += " FROM \"MonthlyFacBal\" M ";
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
+		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";
+		sql += "                        AND F.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += " WHERE M.\"YearMonth\" = :yymm ";
+		sql += "   AND M.\"PrinBalance\" > 0 ";
+		sql += " ORDER BY M.\"CustNo\" ASC ";
+		sql += " 		 ,M.\"FacmNo\" ASC ";
+
+		this.info("sql=" + sql);
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		Query query;
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", yearMonth);
+		return this.convertToMap(query);
+	}
+
+	/**
+	 * 執行報表輸出
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * 
+	 */
+	public List<Map<String, String>> findSheet3_2(TitaVo titaVo, int yearMonth) throws Exception {
+		this.info("l9731.findSheet2_2 ");
+
+		String sql = " ";
+		sql += " SELECT M.\"CustNo\" || M.\"FacmNo\"              AS F0 ";
+		sql += "       ,C.\"ClTypeJCIC\"                          AS F1 ";
+		sql += "       ,M.\"ProdNo\" 	                          AS F2 ";
+		sql += "       ,F.\"FirstDrawdownDate\"                   AS F3 ";
+		sql += " FROM \"MonthlyLoanBal\" M ";
+		sql += " LEFT JOIN \"CdCl\" C ON C.\"ClCode1\" = M.\"ClCode1\" ";
+		sql += "                     AND C.\"ClCode2\" = M.\"ClCode2\" ";
+		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";
+		sql += "                        AND F.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += " WHERE M.\"YearMonth\" = :yymm ";
+		sql += "   AND M.\"LoanBalance\" > 0 ";
+		sql += " ORDER BY M.\"CustNo\" ASC ";
+		sql += " 		 ,M.\"FacmNo\" ASC ";
+
+		this.info("sql=" + sql);
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		Query query;
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", yearMonth);
+		return this.convertToMap(query);
+	}
+
 }
