@@ -46,9 +46,41 @@ BEGIN
           ,''                             AS "InsiderPosition"     -- 公司內部人身分註記 VARCHAR2 2 
           ,S1."LegalPersonId"             AS "LegalPersonId"       -- 法定關係人統編 VARCHAR2 10 
           ,S1."LoanToValue"               AS "LoanToValue"         -- 貸放成數(%) DECIMAL 5 2
-          ,0                              AS "ClMtr"               -- 擔保維持率(%) DECIMAL 5 2
-          ,0                              AS "NoticeMtr"           -- 通知追繳維持率(%) DECIMAL 5 2
-          ,0                              AS "ImplementMtr"        -- 實行職權維持率(%) DECIMAL 5 2
+          -- 下列「擔保維持率」、「通知追繳維持率」、「實行質權維持率」與批示條件不同時請自行輸入。
+          -- 50:％　擔保維持率：170％　通知追繳最低維持率：160％　實行質權維持率：140％
+          -- 60:％　擔保維持率：140％　通知追繳最低維持率：135％　實行質權維持率：125％
+          -- 70:％　擔保維持率：125％　通知追繳最低維持率：120％　實行質權維持率：115％
+          -- 80:％　擔保維持率：110％　通知追繳最低維持率：105％　實行質權維持率：100％
+          ,CASE
+             WHEN S1."LoanToValue" <= 50
+             THEN 170
+             WHEN S1."LoanToValue" <= 60
+             THEN 140
+             WHEN S1."LoanToValue" <= 70
+             THEN 125
+             WHEN S1."LoanToValue" <= 80
+             THEN 110
+           ELSE 110 END                   AS "ClMtr"               -- 擔保維持率(%) DECIMAL 5 2
+          ,CASE
+             WHEN S1."LoanToValue" <= 50
+             THEN 160
+             WHEN S1."LoanToValue" <= 60
+             THEN 135
+             WHEN S1."LoanToValue" <= 70
+             THEN 120
+             WHEN S1."LoanToValue" <= 80
+             THEN 105
+           ELSE 105 END                   AS "NoticeMtr"           -- 通知追繳維持率(%) DECIMAL 5 2
+          ,CASE
+             WHEN S1."LoanToValue" <= 50
+             THEN 140
+             WHEN S1."LoanToValue" <= 60
+             THEN 125
+             WHEN S1."LoanToValue" <= 70
+             THEN 115
+             WHEN S1."LoanToValue" <= 80
+             THEN 100
+           ELSE 100 END                   AS "ImplementMtr"        -- 實行職權維持率(%) DECIMAL 5 2
           ,0                              AS "AcMtr"               -- 全戶維持率(%) DECIMAL 5 2
           ,S1."PledgeNo"                  AS "PledgeNo"            -- 質權設定書號 VARCHAR2 14 
           ,''                             AS "ComputeMTR"          -- 計算維持率 VARCHAR2 1 

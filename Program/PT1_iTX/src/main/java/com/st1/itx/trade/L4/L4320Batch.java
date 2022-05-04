@@ -67,11 +67,13 @@ public class L4320Batch extends TradeBuffer {
 
 	@Autowired
 	public CdCityService cdCityService;
-	@Autowired
-	public L4321Report l4321Report;
 
 	@Autowired
 	public L4320ServiceImpl l4320BatchServiceImpl;
+	
+	@Autowired
+	public L4321Report l4321Report;
+
 
 	private HashMap<tmpBorm, BigDecimal> loanBalTot = new HashMap<>();
 	private HashMap<tmpBorm, BigDecimal> facRate = new HashMap<>();
@@ -127,7 +129,9 @@ public class L4320Batch extends TradeBuffer {
 		// 預調週期
 		iNextAdjPeriod = parse.stringToInteger(titaVo.getParam("NextAdjPeriod"));
 
+		// 戶別
 		iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
+		
 		// 調整日期
 		wkAdjDate = this.getTxBuffer().getTxCom().getTbsdy();
 
@@ -139,7 +143,13 @@ public class L4320Batch extends TradeBuffer {
 //		正常
 		if (titaVo.isHcodeNormal()) {
 			try {
-				execute(titaVo);
+				execute(0, titaVo); // 0: 一般
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+			try {
+				execute(4, titaVo); // 4:定期機動指標利率變動調整合約利率
 			} catch (LogicException e) {
 				sendMsg = e.getErrorMsg();
 				flag = false;
@@ -154,7 +164,6 @@ public class L4320Batch extends TradeBuffer {
 				flag = false;
 			}
 		}
-
 		// 產出確認清單
 		if (titaVo.isHcodeNormal()) {
 			this.info("產出確認清單");
@@ -163,6 +172,7 @@ public class L4320Batch extends TradeBuffer {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo() + "L4320", "Y", "LC009",
 					titaVo.getTlrNo(), sendMsg, titaVo);
 		}
+
 		if (flag) {
 			// Broadcast message Link to L4031-利率調整清單
 			setSendMsg(titaVo);
@@ -220,13 +230,13 @@ public class L4320Batch extends TradeBuffer {
 		}
 	}
 
-	private void execute(TitaVo titaVo) throws LogicException {
+	private void execute(int iAdjCode, TitaVo titaVo) throws LogicException {
 
 //      抓取資料
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
-			fnAllList = l4320BatchServiceImpl.findAll(titaVo);
+			fnAllList = l4320BatchServiceImpl.findAll(iAdjCode, titaVo);
 		} catch (Exception e) {
 			throw new LogicException("E0015", ", " + e.getMessage());
 		}
@@ -260,19 +270,17 @@ public class L4320Batch extends TradeBuffer {
 				b = batxRateChangeService.holdById(bId, titaVo);
 				// 已輸入利率跳過
 				boolean isInsert = false;
-				this.info("b = " + b);
 				if (b == null) {
 					isInsert = true;
 					b = new BatxRateChange();
 					b.setBatxRateChangeId(bId);
 				} else {
-					this.info("bsetBatxRateChangeId = " + b.getRateKeyInCode());
 					if (b.getRateKeyInCode() == 1) {
 						continue;
 					}
 				}
 				/* 設定各項值 */
-				seBatxRateChange(b, s, titaVo);
+				seBatxRateChange(iAdjCode, b, s, titaVo);
 
 				// commit per commitCnt
 				processCnt++;
@@ -305,7 +313,8 @@ public class L4320Batch extends TradeBuffer {
 	}
 
 	/* 設定各項值 */
-	private void seBatxRateChange(BatxRateChange b, Map<String, String> s, TitaVo titaVo) throws LogicException {
+	private void seBatxRateChange(int iAdjCode, BatxRateChange b, Map<String, String> s, TitaVo titaVo)
+			throws LogicException {
 
 		// 作業項目
 		b.setTxKind(iTxKind);
@@ -386,16 +395,12 @@ public class L4320Batch extends TradeBuffer {
 		// 本次生效日
 		int effDateCurt = 0;
 
-		// 機動非指數=>抓出的為預調利率(本次生效日)，需抓生效月份前的資料為目前利率與目前生效日
-		// F28 // 機動非指數目前利率
-		// F29 // 機動非指數目前生效日
-		if (iTxKind == 3) {
-			effDateCurt = effectDatePresent;
-			if (parse.stringToInteger(s.get("F29")) > 0) {
-				fitRate = parse.stringToBigDecimal(s.get("F28"));
-				effectDatePresent = StaticTool.bcToRoc(parse.stringToInteger(s.get("F29")));
-				effDateCurt = StaticTool.bcToRoc(parse.stringToInteger(s.get("F19")));
-			}
+		// F28 // 目前利率(指標利率變動調整合約利率)
+		// F29 // 目前生效日(指標利率變動調整合約利率)
+		// 定期機動指標利率變動調整合約利率
+		if (iTxKind == 1 && nextAdjRateDate / 100 != iEffectMonth) {
+			fitRate = parse.stringToBigDecimal(s.get("F28"));
+			effectDatePresent = StaticTool.bcToRoc(parse.stringToInteger(s.get("F29")));
 		}
 
 		// 目前利率 = 借戶利率檔適用利率
@@ -416,9 +421,12 @@ public class L4320Batch extends TradeBuffer {
 
 		// F26 下次繳息日,下次應繳日
 		int nextPayIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F26")));
+		// F28 到期日期
+		int maturityDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F28")));
+
 		// 本次指標利率
 		b.setCurrBaseRate(iBaseRate);
-		// 調整記號 1.批次自動調整 2.按地區別自動調整 3.人工調整(未調整) 9.上次繳息日大於利率生效日
+		// 調整記號 1.批次自動調整 2.按地區別自動調整 3.人工調整(未調整) 4.批次自動調整(提醒建) 9.上次繳息日大於利率生效日
 		int adjCode = 0;
 		// 本次利率
 		BigDecimal rateCurt = BigDecimal.ZERO;
@@ -454,36 +462,49 @@ public class L4320Batch extends TradeBuffer {
 			// 利率按合約 N && 有地區別， 本次利率 = 目前利率 + 地區別加減碼，依地區別利率上、下限調整，不可超過合約加碼利率
 			// 利率按合約 N && 無地區別， 本次利率 = 本次指標利率 +借戶利率檔個人加碼利率
 			if ("Y".equals(incrFlag)) {
-				adjCode = 1;
 				rateCurt = iBaseRate.add(rateIncr);
+			} else {
+				rateCurt = iBaseRate.add(individualIncr);
+			}
+			// F28 到期日期
+	//		int maturityDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F28")));
+
+			// 定期機動指標利率變動調整合約利率
+			if (iAdjCode == 4) {
+				adjCode = 4;
+				warnMsg += ", 定期機動指標利率變動調整合約利率";
+			} else if (maturityDate == nextAdjRateDate) {
+				adjCode = 4;
+				warnMsg += ", 利率調整日為到期日";
+			} else if ("Y".equals(incrFlag)) {
+				adjCode = 1;
 			} else if ("".equals(cityCode.trim())) {
 				adjCode = 3;
-				rateCurt = iBaseRate.add(individualIncr);
 			} else {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
 				rateCurt = fitRate.add(cityIntRateIncr);
-				warnMsg += "地區別加減碼:" + cityIntRateIncr;
+				warnMsg += ", 地區別加減碼:" + cityIntRateIncr;
 				// 依地區別利率上、下限調整
 				if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 					rateCurt = cityIntRateCeiling;
-					warnMsg += "達地區別上限 ";
+					warnMsg += ", 達地區別上限 ";
 				}
 				if (rateCurt.compareTo(cityIntRateFloor) < 0) {
 					rateCurt = cityIntRateFloor;
-					warnMsg += "達地區別下限 ";
+					warnMsg += ", 達地區別下限 ";
 				}
 			}
 
 			if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateCurt) < 0) {
 				rateCurt = contractRate;
-				warnMsg += "達合約利率上限 ";
+				warnMsg += ", 達合約利率上限 ";
 			}
 
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
 			if (adjCode > 1 && b.getOvduTerm() >= 1) {
 				adjCode = 3;
-				warnMsg += "逾 " + dateUtil.getMons() + " 期 ";
+				warnMsg += ", 逾" + dateUtil.getMons() + " 期 ";
 			}
 
 			break;
@@ -513,14 +534,19 @@ public class L4320Batch extends TradeBuffer {
 //		               2.全歸 3.人工調整 
 //		               3.確認後預調週期、預調利率，新增一筆借戶預調利率資料(生效日為借戶利率檔生效日期 + 預調週期)			             
 		case 3:
+			// 本次生效日 =目前生效日
+			effDateCurt = effectDatePresent;
 			// 本次利率 = 原利率 + 地區別利率
 			rateCurt = fitRate.add(cityIntRateIncr);
+			warnMsg += ", 地區別加減碼:" + cityIntRateIncr;
 			// 依地區別利率上、下限調整
 			if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
 				rateCurt = cityIntRateCeiling;
+				warnMsg += "m 達地區別上限 ";
 			}
 			if (rateCurt.compareTo(cityIntRateFloor) < 0) {
 				rateCurt = cityIntRateFloor;
+				warnMsg += ", 達地區別下限 ";
 			}
 			// 3.人工調整
 			adjCode = 3;
@@ -574,20 +600,20 @@ public class L4320Batch extends TradeBuffer {
 
 		if ("3".equals(rateCode) && rateAdjFreq == 0) {
 			errorFlag = 1;
-			checkMsg += "定期機動但無利率調整週期";
+			checkMsg += ", 定期機動但無利率調整週期";
 		}
 
 		// 若利率變動且大於利率生效日
 		if (adjCode == 1) {
 			if (rateCurt.compareTo(fitRate) != 0 && prevIntDate > effDateCurt) {
 				errorFlag = 1;
-				checkMsg += "上次繳息日大於利率生效日";
+				checkMsg += ", 上次繳息日大於利率生效日";
 			}
 		}
 
 		tmpBorm facm = new tmpBorm(custNo, facmNo, 0);
 		if (facRateFlag.get(facm) == 1) {
-			warnMsg += "額度下撥款的目前利率不同"; // warning only
+			warnMsg += ", 額度下撥款的目前利率不同"; // warning only
 		}
 		// 預調週期
 		b.setTxRateAdjFreq(iNextAdjPeriod);
@@ -602,8 +628,17 @@ public class L4320Batch extends TradeBuffer {
 		/* 設定 jsonFields 欄 */
 		TempVo tTempVo = new TempVo();
 		// 檢核訊息
+		// 去起頭的逗號
+		if (checkMsg.length() > 2 && checkMsg.startsWith(", ")) {
+			String str = checkMsg.substring(2);
+			checkMsg = str;
+		}
 		tTempVo.putParam("CheckMsg", checkMsg);
 		// 緊告訊息
+		if (warnMsg.length() > 2 && warnMsg.startsWith(", ")) {
+			String str = warnMsg.substring(2);
+			warnMsg= str;
+		}
 		tTempVo.putParam("warnMsg", warnMsg);
 
 		// 目前利率 <> 借戶利率檔適用利率(預調利率)
@@ -641,7 +676,7 @@ public class L4320Batch extends TradeBuffer {
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
 			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 				batxRateChangeService.holdById(tBatxRateChange, titaVo);
-				if (tBatxRateChange.getConfirmFlag() == 1) {
+				if (tBatxRateChange.getConfirmFlag() > 0) {
 					throw new LogicException("E0008", ", 該筆已確認，請先訂正L4321 ");
 				} else {
 					try {

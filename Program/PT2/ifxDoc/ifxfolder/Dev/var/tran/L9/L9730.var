@@ -44,12 +44,17 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,20];">
 [
 ["[L9730]                                定期機動資料檢核"],
-["@調整日期區間",#InputStartDate,"～",#InputEndDate]
+["@首次調整日期區間",#InputStartDateFirst,"～",#InputEndDateFirst],
+["@下次調整日期區間",#InputStartDateNext,"～",#InputEndDateNext]
 ]
 !---------- AP TEXT AREA Variables ----------
+
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
 
 #TODAY=A,8,S
 T(4,DATE$)
@@ -60,17 +65,35 @@ T(1,#TODAY,2,5)
 #DefaultStartDate=A,7,S
 T(2,#TodayYearMonth+01)
 
-!資料日期
-#InputStartDate=D,7,I
+!首次調整日期
+#InputStartDateFirst=D,7,I
 E(0,#DefaultStartDate)
 @V(7)
-A(DATE,0,#InputStartDate)
+A(DATE,0,#InputStartDateFirst)
 
-#InputEndDate=D,7,I
+#InputEndDateFirst=D,7,I
 T(4,MFBSDY$)
 @V(7)
-A(DATE,0,#InputEndDate)
-V(5,#InputStartDate,9991231)
+A(DATE,0,#InputEndDateFirst)
+V(5,#InputStartDateFirst,9991231)
+C(3,#InputStartDateNext,0,E(0,@InputStartDateNext,#InputStartDateFirst)E(0,@InputEndDateNext,#InputEndDateFirst),$)
+
+!如果首次調整日期有輸入，而下次調整日期沒輸入時
+!預設先帶入首調日區間
+!如果因為某種原因，到這裡下調日還沒代入任何值時
+!代入預設區間
+
+!下次調整日期
+#InputStartDateNext=D,7,I
+C(3,#InputStartDateNext,0,E(0,#DefaultStartDate),$)
+@V(7)
+A(DATE,0,#InputStartDateNext)
+
+#InputEndDateNext=D,7,I
+C(3,#InputEndDateNext,0,T(4,MFBSDY$),$)
+@V(7)
+A(DATE,0,#InputEndDateNext)
+V(5,#InputStartDateNext,9991231)
 
 </sub>
 
@@ -100,8 +123,10 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#InputStartDate
-#InputEndDate
+#InputStartDateFirst
+#InputEndDateFirst
+#InputStartDateNext
+#InputEndDateNext
 </sub>
 
 

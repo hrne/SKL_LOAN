@@ -58,16 +58,18 @@ BEGIN
     INSERT INTO "JcicB207"
     WITH "Work_B207" AS (
 
-    -- 寫入資料 Work_B207    -- 撈應申報之戶號
+    -- 寫入資料 Work_B207    -- 撈應申報之戶號,從201撈出全部自然人
     SELECT DISTINCT
-           M."CustId"                    AS "CustId"            -- ID
+           B."CustId"                    AS "CustId"            -- ID
          , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
                                          AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
-    FROM   "JcicMonthlyLoanData" M
-    WHERE  M."DataYM"   =  YYYYMM
-      AND  M."CustId"   IS NOT NULL
+    FROM   "JcicB201" B
+      LEFT JOIN "JcicMonthlyLoanData" M ON M."DataYM" = YYYYMM 
+                                       AND M."CustNo" = to_number(SUBSTR(B."AcctNo",1, 7))
+    WHERE  B."DataYM"   =  YYYYMM
+      AND  B."CustId"   IS NOT NULL
       AND  M."DrawdownDate" <= TMNDYF
-      AND  M."LoanBal"  >  0           -- 有餘額
+      --AND  M."LoanBal"  >  0           -- 有餘額
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
       )
 
@@ -244,31 +246,5 @@ BEGIN
 
   END;
 END;
-
-
---         , ' '             AS "CustName"          -- 中文姓名
---         , ' '             AS "EName"             -- 英文姓名
---         , 0               AS "Birthday"          -- 出生日期 (民國)
---         , ' '             AS "RegAddr"           -- 戶籍地址
---         , ' '             AS "CurrZip"           -- 聯絡地址郵遞區號
---         , ' '             AS "CurrAddr"          -- 聯絡地址
---         , ' '             AS "Tel"               -- 聯絡電話 (住家優先，再公司)
---         , ' '             AS "Mobile"            -- 行動電話
---         , ' '                                   AS "Filler14"          -- 空白
---         , ' '             AS "EduCode"           -- 教育程度代號 1:博士 2:碩士 3:大學 4:專科 5:高中高職 6:其他
---         , ' '             AS "OwnedHome"         -- 自有住宅有無 Y:有 N:無
---         , ' '             AS "CurrCompName"      -- 任職機構名稱
---         , ' '             AS "CurrCompId"        -- 任職機構統一編號
---         , ' '                                   AS "JobCode"           -- 職業類別  --???
---         , ' '             AS "CurrCompTel"       -- 任職機構電話
---         , ' '             AS "JobTitle"          -- 職位名稱
---         , ' '             AS "JobTenure"         -- 服務年資
---         , 0               AS "IncomeOfYearly"    -- 年收入
---         , 0               AS "IncomeDataDate"    -- 年收入資料年月 (民國)
---         , ' '             AS "Sex"               -- 性別
---         , ' '             AS "NationalityCode"   -- 國籍
---         , ' '             AS "PassportNo"        -- 護照號碼
---         , ' '                                   AS "PreTaxNo"          -- 舊有稅籍編號
---         , ' '             AS "FullCustName"      -- 中文姓名超逾10個字之全名
 
 

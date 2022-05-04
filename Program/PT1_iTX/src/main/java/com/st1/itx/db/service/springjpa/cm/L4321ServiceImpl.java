@@ -32,11 +32,9 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(String AdjCode, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String iAdjDate = String.valueOf(titaVo.getEntDyI() + 19110000);
-		this.info("AdjCode =" + AdjCode);
-		this.info("getEntDyI =" + titaVo.getEntDyI());
+		String iAdjDate = String.valueOf(Integer.valueOf(titaVo.get("AdjDate")) + 19110000);
 		int custType1 = 0;
 		int custType2 = 0;
 		String txKind = titaVo.getParam("TxKind");
@@ -47,7 +45,7 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 			custType1 = 1;
 			custType2 = 2;
 		}
-		int adjCode = Integer.valueOf(AdjCode);
+		int adjCode = Integer.valueOf(titaVo.getParam("AdjCode"));
 
 		this.info("l4321.findAll AdjDate=" + iAdjDate);
 
@@ -73,14 +71,9 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
 				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
 				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
-				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE ";
-//		if ("L4320".equals(titaVo.getTxcd())) {
-//			sql += "BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1 + "AND BR.\"CustCode\" <= "
-//					+ custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
-//		} else {
-			sql += "BR.\"AdjDate\" = " + iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= "
-					+ custType1 + "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
-//		}
+				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
+				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
+				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
 		this.info("sql=" + sql);
 
 		Query query;

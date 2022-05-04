@@ -39,13 +39,15 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int iAdjCode, TitaVo titaVo) throws Exception {
+		// iAdjCode 0: 一般、 4:定期機動指標利率變動調整合約利率
 		int iTxKind = Integer.parseInt(titaVo.getParam("TxKind"));
 		int iEffectMonth = Integer.parseInt(titaVo.getParam("EffectMonth"));
 		int iEffectDate = Integer.parseInt(titaVo.getParam("EffectDate"));
 		int iEffectDateS = 0;
 		int iEffectDateE = 0;
 		if (iEffectMonth > 0) {
+			iEffectDate = iEffectDate + 19110000;
 			iEffectDateS = iEffectMonth * 100 + 19110001;
 			iEffectDateE = iEffectMonth * 100 + 19110031;
 		} else {
@@ -98,6 +100,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 超過 2 年調為 99.9999 % ??????
 
+		// 指標利率代碼
 		int iBaseRateCode = Integer.parseInt(titaVo.getParam("BaseRateCode"));
 
 //		輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
@@ -140,9 +143,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(cc.\"IntRateIncr\", 0)                   as F25 "; // 地區別利率加減碼
 		sql += "   ,b.\"NextPayIntDate\"                         as F26 "; // 下次繳息日,下次應繳日
 		sql += "   ,b.\"DrawdownDate\"                           as F27 "; // 撥款日期
-		sql += "   ,NVL(r2.\"FitRate\", 0)                       as F28 "; // 機動非指數目前利率
-		sql += "   ,NVL(r2.\"EffectDate\", 0)                    as F29 "; // 機動非指數目前生效日
+		sql += "   ,b.\"MaturityDate\"                           as F28 "; // 到期日期
 		sql += " from \"LoanBorMain\" b                                 ";
+// 目前利率(利率檔利率生效日<=指標利率生效日的最後一筆) 
 		sql += " left join(                                             ";
 		sql += "           select                                       ";
 		sql += "            rr.\"CustNo\"                               ";
@@ -156,28 +159,34 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,rr.\"RateIncr\"                             ";
 		sql += "           ,rr.\"IndividualIncr\"                       ";
 		sql += "           ,rr.\"EffectDate\"                           ";
-		sql += "           ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as seq ";
-		sql += "           from \"LoanRateChange\" rr                          ";
-		sql += "           where rr.\"EffectDate\" <= " + iEffectDateE;
+
+// 指標利率調整
+		switch (iTxKind) {
+		case 1: // 定期機動調整
+			// 0: 一般、 4:定期機動指標利率變動調整合約利率
+			if (iAdjCode == 4) {
+				sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as seq ";
+				sql += "       from \"LoanRateChange\" rr                          ";
+				sql += "       where rr.\"EffectDate\" >= " + iEffectDateS;
+			} else {
+				sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as seq ";
+				sql += "       from \"LoanRateChange\" rr                          ";
+				sql += "       where rr.\"EffectDate\" <= " + iEffectDateS;
+			}
+			break;
+		case 2: // 指數型利率調整
+		case 3: // 機動利率調整
+		case 4: // 員工利率調整
+		case 5: // 按商品別調整
+			sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as seq ";
+			sql += "       from \"LoanRateChange\" rr                          ";
+			sql += "       where rr.\"EffectDate\" <= " + iEffectDateE;
+			break;
+		}
 		sql += "        ) r             on  r.\"CustNo\" = b.\"CustNo\"        ";
 		sql += "                       and  r.\"FacmNo\" = b.\"FacmNo\"        ";
 		sql += "                       and  r.\"BormNo\" = b.\"BormNo\"        ";
 		sql += "                       and  r.seq = 1                          ";
-		sql += " left join(                                             ";
-		sql += "           select                                       ";
-		sql += "            rb.\"CustNo\"                              ";
-		sql += "           ,rb.\"FacmNo\"                              ";
-		sql += "           ,rb.\"BormNo\"                              ";
-		sql += "           ,rb.\"FitRate\"                              ";
-		sql += "           ,rb.\"EffectDate\"                           ";
-		sql += "           ,row_number() over (partition by rb.\"CustNo\", rb.\"FacmNo\", rb.\"BormNo\" order by rb.\"EffectDate\" Desc) as seq ";
-		sql += "           from \"LoanRateChange\" rb                          ";
-		sql += "           where rb.\"RateCode\" = '1' and rb.\"BaseRateCode\" = 99 ";
-		sql += "            and  rb.\"EffectDate\" < " + iEffectDateS;
-		sql += "        ) r2            on  r2.\"CustNo\" = b.\"CustNo\"        ";
-		sql += "                       and  r2.\"FacmNo\" = b.\"FacmNo\"        ";
-		sql += "                       and  r2.\"BormNo\" = b.\"BormNo\"        ";
-		sql += "                       and  r2.seq = 1                          ";
 		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = b.\"CustNo\"      ";
 		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
@@ -196,26 +205,32 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
 		}
 		sql += " where b.\"Status\" = 0                                        ";
-		sql += "   and b.\"MaturityDate\" >= b.\"NextAdjRateDate\"              ";
-		sql += "   and b.\"MaturityDate\" >= " + iEffectDateS;
+		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
-//  1.定期機動調整 ==>  1.撥款主檔的利率區分=3.定期機動，下次利率調整日為調整月份
-//	                    2.借戶利率檔的的利率區分=3.定期機動，指標利率種類=該指標利率種類抓，生效日期 <= 調整月份 
+//  1.定期機動調整 ==>  1.下次利率調整日為調整月份(撥款主檔的利率區分=3.定期機動)
+//	                   2.指標利率變動調整合約利率(指標利率相同且利率檔利率生效日>=指標利率生效日)
 		if (iTxKind == 1) {
-			sql += "       and b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= " + iEffectDateS;
-			sql += "       and b.\"NextAdjRateDate\" <= " + iEffectDateE;
+			sql += "       and b.\"RateCode\" = '3' ";
 			sql += "       and r.\"BaseRateCode\" = " + iBaseRateCode;
 			sql += "       and r.\"RateCode\" = '3'                  ";
+			// 0: 一般、 4:定期機動指標利率變動調整合約利率
+			if (iAdjCode == 0) {
+				sql += "       and b.\"NextAdjRateDate\" >= " + iEffectDateS;
+				sql += "       and b.\"NextAdjRateDate\" <= " + iEffectDateE;
+			} else {
+				sql += "       and b.\"NextAdjRateDate\" > " + iEffectDateE;
+				sql += "       and NVL(r.\"EffectDate\",0)  > 0 ";
+			}
 		}
 // 2.指數型利率調整 ==> 1.撥款主檔的利率區分=1.機動
-//                      2.借戶利率檔的利率區分=1.機動,指標利率種類=該指標利率種類,生效日期 <= 調整日期 
+//                     2.有最近利率借戶利率檔的利率區分=1.機動,指標利率種類=該指標利率種類,生效日期 <= 調整日期 
 		if (iTxKind == 2) {
 			sql += "       and b.\"RateCode\" = '1'                  ";
 			sql += "       and r.\"BaseRateCode\" = " + iBaseRateCode;
 			sql += "       and r.\"RateCode\" = '1'  ";
 		}
-// 3.機動利率調整 ==> 1.撥款主檔的利率區分=1.機動
+// 3.機動利率調整 ==>  1.撥款主檔的利率區分=1.機動
 //                    2.借戶利率檔的利率區分=1.機動,指標利率種類=99，生效日期 = 調整月份，商品<>員工利率
 		if (iTxKind == 3) {
 			sql += "           and b.\"RateCode\" = '1' ";

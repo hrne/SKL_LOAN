@@ -31,7 +31,7 @@ BEGIN
           ,S1."StockCode"                 AS "StockCode"           -- 股票代號 VARCHAR2 10 
           ,''                             AS "ListingType"         -- 掛牌別 VARCHAR2 2 
           ,''                             AS "StockType"           -- 股票種類 VARCHAR2 1 
-          ,SPRP."STKPID"                  AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
+          ,S1."CompanyId"                 AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
           ,0                              AS "DataYear"            -- 資料年度 DECIMAL 4 
           ,0                              AS "IssuedShares"        -- 發行股數 DECIMAL 16 2
           ,0                              AS "NetWorth"            -- 非上市(櫃)每股淨值 DECIMAL 16 2
@@ -46,9 +46,41 @@ BEGIN
           ,''                             AS "InsiderPosition"     -- 公司內部人身分註記 VARCHAR2 2 
           ,S1."LegalPersonId"             AS "LegalPersonId"       -- 法定關係人統編 VARCHAR2 10 
           ,S1."LoanToValue"               AS "LoanToValue"         -- 貸放成數(%) DECIMAL 5 2
-          ,0                              AS "ClMtr"               -- 擔保維持率(%) DECIMAL 5 2
-          ,0                              AS "NoticeMtr"           -- 通知追繳維持率(%) DECIMAL 5 2
-          ,0                              AS "ImplementMtr"        -- 實行職權維持率(%) DECIMAL 5 2
+          -- 下列「擔保維持率」、「通知追繳維持率」、「實行質權維持率」與批示條件不同時請自行輸入。
+          -- 50:％　擔保維持率：170％　通知追繳最低維持率：160％　實行質權維持率：140％
+          -- 60:％　擔保維持率：140％　通知追繳最低維持率：135％　實行質權維持率：125％
+          -- 70:％　擔保維持率：125％　通知追繳最低維持率：120％　實行質權維持率：115％
+          -- 80:％　擔保維持率：110％　通知追繳最低維持率：105％　實行質權維持率：100％
+          ,CASE
+             WHEN S1."LoanToValue" <= 50
+             THEN 170
+             WHEN S1."LoanToValue" <= 60
+             THEN 140
+             WHEN S1."LoanToValue" <= 70
+             THEN 125
+             WHEN S1."LoanToValue" <= 80
+             THEN 110
+           ELSE 110 END                   AS "ClMtr"               -- 擔保維持率(%) DECIMAL 5 2
+          ,CASE
+             WHEN S1."LoanToValue" <= 50
+             THEN 160
+             WHEN S1."LoanToValue" <= 60
+             THEN 135
+             WHEN S1."LoanToValue" <= 70
+             THEN 120
+             WHEN S1."LoanToValue" <= 80
+             THEN 105
+           ELSE 105 END                   AS "NoticeMtr"           -- 通知追繳維持率(%) DECIMAL 5 2
+          ,CASE
+             WHEN S1."LoanToValue" <= 50
+             THEN 140
+             WHEN S1."LoanToValue" <= 60
+             THEN 125
+             WHEN S1."LoanToValue" <= 70
+             THEN 115
+             WHEN S1."LoanToValue" <= 80
+             THEN 100
+           ELSE 100 END                   AS "ImplementMtr"        -- 實行職權維持率(%) DECIMAL 5 2
           ,0                              AS "AcMtr"               -- 全戶維持率(%) DECIMAL 5 2
           ,S1."PledgeNo"                  AS "PledgeNo"            -- 質權設定書號 VARCHAR2 14 
           ,''                             AS "ComputeMTR"          -- 計算維持率 VARCHAR2 1 
@@ -66,6 +98,7 @@ BEGIN
       SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
             ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
             ,S1."ClNo"                      AS "ClNo"                -- 擔保品號碼 DECIMAL 7 
+            ,MAX(NVL(SPRP."STKPID",' '))    AS "CompanyId"           -- 發行公司統一編號 VARCHAR2 10 
             ,MAX(TCS."NewStockNo")
                                             AS "StockCode"           -- 股票代號 VARCHAR2 4 
             ,SUM(NVL(S2."SGTAUN",0))        AS "ParValue"            -- 每股面額 DECIMAL 16 2
@@ -87,8 +120,8 @@ BEGIN
                             AND S3."GDRNUM" = S1."GDRNUM"
       LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S3."LGTCIF"
                             AND S3."LGTCIF" > 0
-      LEFT JOIN DAT_LN$SPRP SPRP ON SPRP."STKNO1" = S2."SGTNO1"
-                                AND SPRP."STKNO2" = S2."SGTNO2"
+      LEFT JOIN DAT_LN$SPRP SPRP ON SPRP."SGTNO1" = S2."SGTNO1"
+                                AND SPRP."SGTNO2" = S2."SGTNO2"
       LEFT JOIN "TempCdStockMapping" TCS ON TCS."STKNO1" = S2."SGTNO1"
                                         AND TCS."STKNO2" = S2."SGTNO2"
       WHERE S1."ClCode1" >= 3

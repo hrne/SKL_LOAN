@@ -98,30 +98,32 @@ public class L4321Report extends MakeReport {
 
 				switch (j) {
 				case 1:
-					fileNm = fileNm1+"-批次自動調整";
+					fileNm = fileNm1 + "-批次自動調整";
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 					break;
 				case 2:
-					fileNm = fileNm1+"-按地區別調整";
+					fileNm = fileNm1 + "-按地區別調整";
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+							"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 					break;
 				case 3:
-					fileNm = fileNm1+"-人工調整";
+					fileNm = fileNm1 + "-人工調整";
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 					break;
 				default:
 					break;
 				}
-
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-						"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
-
-//				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", "利率調整作業確認", "LNW171E",
-//						"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
+				titaVo.putParam("AdjCode", j);
+				titaVo.putParam("AdjDate", titaVo.getEntDyI());
 
 //				設定工作表名稱
 //				String iENTDY = titaVo.get("ENTDY");
 //				makeExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
 
 				try {
-					fnAllList = L4321ServiceImpl.findAll(parse.IntegerToString(j, 1), titaVo);
+					fnAllList = L4321ServiceImpl.findAll(titaVo);
 				} catch (Exception e) {
 					StringWriter errors = new StringWriter();
 					e.printStackTrace(new PrintWriter(errors));
@@ -149,6 +151,7 @@ public class L4321Report extends MakeReport {
 //			0		1		2	3	4	5	6		7		8		9		10		11		12		13		14		15		16		17	
 //			 鄉鎮區	地區別	戶號	 額度	撥款	戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	利率代碼 	利率名稱	目前利率	擬調		下限		上限		
 //			 北投區	台北市	548040	2	1	600,000 48,897 	1080319	1090919	1090810	1E	退休滿五年員工	1.8600	1.7500	1.75	2.55	1.75
+
 							case 2:
 							case 3:
 							case 4:
@@ -167,10 +170,15 @@ public class L4321Report extends MakeReport {
 							case 13:
 							case 14:
 							case 15:
-							case 16:
-							case 17:
 								// 利率
 								makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
+								break;
+							case 16:
+							case 17:
+								if (j == 2) {
+									// 利率
+									makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
+								}
 								break;
 							default:
 								// 字串左靠
@@ -190,29 +198,35 @@ public class L4321Report extends MakeReport {
 			switch (this.iAdjCode) {
 			case 1:
 				fileNm += "-批次自動調整";
+				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 				break;
 			case 2:
 				fileNm += "-按地區別調整";
+				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+						"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 				break;
 			case 3:
 				fileNm += "-人工調整";
+				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 				break;
 			default:
 				break;
 			}
 
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-					"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
+//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+//					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 
 //			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", "利率調整作業確認", "LNW171E",
-//					"LNW171E(10909調息檔)機動-底稿.xlsx", "正常件");
+//					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 
 //			設定工作表名稱
 //			String iENTDY = titaVo.get("ENTDY");
 //			makeExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
 
 			try {
-				fnAllList = L4321ServiceImpl.findAll(parse.IntegerToString(this.iAdjCode, 1), titaVo);
+				fnAllList = L4321ServiceImpl.findAll(titaVo);
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
@@ -258,10 +272,15 @@ public class L4321Report extends MakeReport {
 						case 13:
 						case 14:
 						case 15:
-						case 16:
-						case 17:
 							// 利率
 							makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
+							break;
+						case 16:
+						case 17:
+							if (this.iAdjCode == 2) {
+								// 利率
+								makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
+							}
 							break;
 						default:
 							// 字串左靠

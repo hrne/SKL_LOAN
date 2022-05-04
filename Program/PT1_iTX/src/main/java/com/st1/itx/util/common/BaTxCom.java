@@ -2050,7 +2050,7 @@ public class BaTxCom extends TradeBuffer {
 									this.lawFee = this.lawFee.add(rv.getRvBal());
 									break;
 								case "YOP": // YOP 清償違約金(未收費用，清償時寫入)
-									baTxVo.setRepayType(9); // 09-其他(清償違約金)
+									baTxVo.setRepayType(3); // 03-提前清償違約金
 									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 									baTxVo.setCloseBreachAmt(rv.getRvBal());
 									this.shortCloseBreach = this.shortCloseBreach.add(rv.getRvBal());

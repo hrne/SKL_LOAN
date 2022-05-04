@@ -215,8 +215,8 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "      ,i.\"FireInsuPrem\"      as  F11";
 		sqlL4965 += "      ,i.\"EthqInsuCovrg\"     as  F12";
 		sqlL4965 += "      ,i.\"EthqInsuPrem\"      as  F13";
-		sqlL4965 += "      ,i.\"InsuStartDate\" - 19110000     as  F14";
-		sqlL4965 += "      ,i.\"InsuEndDate\"   - 19110000     as  F15";
+		sqlL4965 += "      ,case when(i.\"InsuStartDate\" - 19110000) > 0 then  i.\"InsuStartDate\" - 19110000 else 0   end  as  F14";
+		sqlL4965 += "      ,case when(i.\"InsuEndDate\"   - 19110000) > 0 then  i.\"InsuStartDate\" - 19110000 else 0   end  as  F15";
 		sqlL4965 += "      ,i.\"PrevInsuNo\"       as  F16";
 		sqlL4965 += "      ,i.\"InsuTypeCode\"       as  F17";
 		sqlL4965 += "  from ( select ";
@@ -304,8 +304,8 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "      ,i.\"FireInsuPrem\"      as  F11";
 		sqlL4965 += "      ,i.\"EthqInsuCovrg\"     as  F12";
 		sqlL4965 += "      ,i.\"EthqInsuPrem\"      as  F13";
-		sqlL4965 += "      ,i.\"InsuStartDate\" - 19110000     as  F14";
-		sqlL4965 += "      ,i.\"InsuEndDate\"   - 19110000     as  F15";
+		sqlL4965 += "      ,case when(i.\"InsuStartDate\" - 19110000) > 0 then  i.\"InsuStartDate\" - 19110000 else 0   end  as  F14";
+		sqlL4965 += "      ,case when(i.\"InsuEndDate\"   - 19110000) > 0 then  i.\"InsuStartDate\" - 19110000 else 0   end  as  F15";
 		sqlL4965 += "      ,i.\"PrevInsuNo\"       as  F16";
 		sqlL4965 += "      ,i.\"InsuTypeCode\"      as  F17";
 		sqlL4965 += "  from ( select ";

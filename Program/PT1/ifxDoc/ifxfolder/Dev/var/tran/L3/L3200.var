@@ -822,7 +822,7 @@ T(3,)T(H,#PayFeeFlag,#YNHelp)
 
 
 #SendL3r06B=X,1,S
-C(3,#RepayType,2,$,S)
+IF(#RepayType==2||#RepayType==1,$,S)
 C(3,#RepayType,12,S,$)
 E(0,@RimFuncCode,2)
 E(0,@RimCustNo,#TimCustNo)
@@ -841,7 +841,9 @@ C(3,#L3r06CloseBreachAmtUnpaid,0,T(3,@BreachCodeX,),T(3,@BreachCodeX,領清償�
 
 !還款類別為[02.部分償還]且[是否內含費用]為[Y.是]時加費用
 #SumRepayAmt=m,14.2,S
-IF(#RepayType==2&&#PayFeeFlag=="N",E(0,#L3r06RepayAmt+#L3r06Shortfall),E(0,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall))
+IF(#RepayType==2||#RepayType==1,$,E(0,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall))
+IF(#RepayType==2||#RepayType==1,$,s)
+IF(#PayFeeFlag=="N",E(0,#L3r06RepayAmt+#L3r06Shortfall),E(0,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall))
 
 
 !回收金額

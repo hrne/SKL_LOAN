@@ -75,6 +75,7 @@ public class L4321Batch extends TradeBuffer {
 	private int processCnt = 0;
 	private TempVo tTempVo = new TempVo();
 	private String sendMsg = "";
+	private String iLableBX = "";
 	private int custType1 = 0;
 	private int custType2 = 0;
 	private int wkConfirmFlag = 0;
@@ -93,6 +94,7 @@ public class L4321Batch extends TradeBuffer {
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 		this.iAdjCode = parse.stringToInteger(titaVo.getParam("AdjCode"));
+		this.iLableBX = titaVo.getParam("LableBX");
 		// 設定分頁、筆數
 		this.index = titaVo.getReturnIndex();
 		this.limit = Integer.MAX_VALUE;
@@ -188,26 +190,26 @@ public class L4321Batch extends TradeBuffer {
 			default:
 				break;
 			}
-			switch (this.iAdjCode) {
-			case 1:
-				sendMsg = sendMsg + "，批次自動調整";
-				break;
-			case 2:
-				sendMsg = sendMsg + "，按地區別調整";
-				break;
-			case 3:
-				sendMsg = sendMsg + "，人工調整";
-				break;
-			default:
-				break;
-			}
+//			switch (this.iAdjCode) {
+//			case 1:
+//				sendMsg = sendMsg + "，批次自動調整";
+//				break;
+//			case 2:
+//				sendMsg = sendMsg + "，按地區別調整";
+//				break;
+//			case 3:
+//				sendMsg = sendMsg + "，人工調整";
+//				break;
+//			default:
+//				break;
+//			}
 
 			if (titaVo.isHcodeNormal()) {
-				sendMsg = sendMsg + "，完成確認，筆數：" + this.processCnt;
+				sendMsg = sendMsg + "，iLableBX，完成確認，筆數：" + this.processCnt;
 			} else {
-				sendMsg = sendMsg + "，取消確認，筆數：" + this.processCnt;
+				sendMsg = sendMsg + "，iLableBX，取消確認，筆數：" + this.processCnt;
 			}
-
+			
 			if (titaVo.isHcodeNormal()) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 						titaVo.getEmpNot() + "L4321", sendMsg, titaVo);

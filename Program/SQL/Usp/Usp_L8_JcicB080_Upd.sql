@@ -1,9 +1,8 @@
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB080_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB080_Upd"
 (
 -- 程式功能：維護 JcicB080 每月聯徵授信額度資料檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB080_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB080_Upd"(20200430,'999999');
 --
 
     -- 參數
@@ -82,6 +81,18 @@ BEGIN
     WHERE  M."Status" IN (99)
       AND  WK."CustNo" IS NULL
     GROUP BY M."CustNo", M."FacmNo"
+--    UNION  --改由201加入仍有效之資料
+--    -- 寫入資料 Work_B080    -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額（未申報 B201 ）
+--    SELECT YYYYMM                                AS "DataYM"
+--         , M."CustNo"                            AS "CustNo"            -- 戶號
+--         , M."FacmNo"                            AS "FacmNo"            -- 額度編號
+--         , LPAD(M."CustNo", 7, '0') || LPAD(M."FacmNo", 3, '0')
+--                                                 AS "B201FacmNo"        -- B201 上階額度
+--    FROM   "FacMain" M
+--    WHERE M."RecycleCode" = 1 -- 循環動用
+--      AND M."RecycleDeadline" >= TBSDYF -- 未至循環動用期限
+--      AND M."UtilAmt" = 0 -- 放款餘額為0 
+--      AND M."LineAmt" - M."UtilBal" > 0 -- 尚有可動用額度餘額
     )
 
     SELECT

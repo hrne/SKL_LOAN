@@ -106,7 +106,6 @@ public class L4601Report extends MakeReport {
 			tempcustno = slInsuRenewMediaTemp.getContent().get(0).getCustNo();
 			tempfacmno = slInsuRenewMediaTemp.getContent().get(0).getFacmNo();
 			// 比較戶號額度 + 分隔線
-			int listsize = slInsuRenewMediaTemp.getContent().size();
 			int count = 0;
 			List<InsuRenewMediaTemp> lTemp = new ArrayList<InsuRenewMediaTemp>();
 
@@ -116,6 +115,8 @@ public class L4601Report extends MakeReport {
 					lTemp.add(l);
 				}
 			}
+
+			int listsize = lTemp.size();
 
 			for (InsuRenewMediaTemp t : lTemp) {
 
