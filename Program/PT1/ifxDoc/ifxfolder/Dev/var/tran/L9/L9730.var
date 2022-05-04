@@ -71,8 +71,20 @@ E(0,#DefaultStartDate)
 @V(7)
 A(DATE,0,#InputStartDateFirst)
 
+!用StartDate算月底日給EndDate
+#NextMonthStartDate=D,8,S
+E(0,#InputStartDateFirst)
+D(7,2,#NextMonthStartDate,1,0)
+
+#NextYearMonth=A,5,S
+T(1,#NextMonthStartDate,2,5)
+
+#DefaultEndDate=D,8,S
+T(2,#NextYearMonth+01)
+D(7,3,#DefaultEndDate,0,1)
+
 #InputEndDateFirst=D,7,I
-T(4,MFBSDY$)
+E(0,#DefaultEndDate)
 @V(7)
 A(DATE,0,#InputEndDateFirst)
 V(5,#InputStartDateFirst,9991231)
@@ -89,8 +101,20 @@ C(3,#InputStartDateNext,0,E(0,#DefaultStartDate),$)
 @V(7)
 A(DATE,0,#InputStartDateNext)
 
+!用StartDate算月底日給EndDate
+#NextMonthStartDate=_,_,S
+E(0,#InputStartDateNext)
+D(7,2,#NextMonthStartDate,1,0)
+
+#NextYearMonth=_,_,S
+T(1,#NextMonthStartDate,2,5)
+
+#DefaultEndDate=_,_,S
+T(2,#NextYearMonth+01)
+D(7,3,#DefaultEndDate,0,1)
+
 #InputEndDateNext=D,7,I
-C(3,#InputEndDateNext,0,T(4,MFBSDY$),$)
+E(0,#DefaultEndDate)
 @V(7)
 A(DATE,0,#InputEndDateNext)
 V(5,#InputStartDateNext,9991231)
@@ -109,7 +133,7 @@ V(5,#InputStartDateNext,9991231)
 !C(5,#TXFORM,L9730,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L9730]            X800)
+T(3,[L9730]            定期機動資料檢核            )
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 

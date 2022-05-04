@@ -19,7 +19,6 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -457,33 +456,33 @@ public class L4601Batch extends TradeBuffer {
 
 	private void checkReportB(InsuRenew t, TitaVo titaVo) throws LogicException {
 		this.info("ReportB Start...");
-		Slice<InsuRenew> sl2InsuRenew = insuRenewService.findL4601B(calYear(iInsuEndMonth, -1), t.getClCode1(),
-				t.getClCode2(), t.getClNo(), 0, 1, titaVo);
-		InsuRenew t2InsuRenew = null;
-		if (sl2InsuRenew != null) {
-			t2InsuRenew = sl2InsuRenew.getContent().get(0);
-		}
+//		Slice<InsuRenew> sl2InsuRenew = insuRenewService.findL4601B(calYear(iInsuEndMonth, -1), t.getClCode1(),
+//				t.getClCode2(), t.getClNo(), 0, 1, titaVo);
+//		InsuRenew t2InsuRenew = null;
+//		if (sl2InsuRenew != null) {
+//			t2InsuRenew = sl2InsuRenew.getContent().get(0);
+//		}
 
 //		或 新保檔之保險迄日 不等於 新寫入續保檔之保險起日
-		InsuOrignal t2InsuOrignal = insuOrignalService.clNoFirst(t.getClCode1(), t.getClCode2(), t.getClNo(), titaVo);
+//		InsuOrignal t2InsuOrignal = insuOrignalService.clNoFirst(t.getClCode1(), t.getClCode2(), t.getClNo(), titaVo);
 
-		if (t2InsuRenew != null) {
-			if (t2InsuRenew.getInsuEndDate() != t.getInsuStartDate()) {
-				if ("".equals(checkResultB)) {
-					checkResultB += "21";
-				} else {
-					checkResultB += ",21";
-				}
-			}
-		} else if (t2InsuOrignal != null) {
-			if (t2InsuOrignal.getInsuEndDate() != t.getInsuStartDate()) {
-				if ("".equals(checkResultB)) {
-					checkResultB += "22";
-				} else {
-					checkResultB += ",22";
-				}
-			}
-		}
+//		if (t2InsuRenew != null) {
+//			if (t2InsuRenew.getInsuEndDate() != t.getInsuStartDate()) {
+//				if ("".equals(checkResultB)) {
+//					checkResultB += "21";
+//				} else {
+//					checkResultB += ",21";
+//				}
+//			}
+//		} else if (t2InsuOrignal != null) {
+//			if (t2InsuOrignal.getInsuEndDate() != t.getInsuStartDate()) {
+//				if ("".equals(checkResultB)) {
+//					checkResultB += "22";
+//				} else {
+//					checkResultB += ",22";
+//				}
+//			}
+//		}
 
 //		重複投保
 		Slice<InsuRenew> sl3InsuRenew = insuRenewService.findL4601B(iInsuEndMonth, t.getClCode1(), t.getClCode2(),
@@ -546,28 +545,28 @@ public class L4601Batch extends TradeBuffer {
 
 	}
 
-	private int calYear(int today, int year) throws LogicException {
-		int resultMonth = 0;
+//	private int calYear(int today, int year) throws LogicException {
+//		int resultMonth = 0;
 //	10801
 //	201901
 //	1080101
 //	trans today = Bc format
-		if (today < 100000) {
-			today = parse.stringToInteger((today + 191100) + "01");
-		} else if (today < 1000000) {
-			today = parse.stringToInteger(today + "01");
-		} else if (today < 10000000) {
-			today = today + 19110000;
-		}
-
-		dateUtil.init();
-		dateUtil.setDate_1(today);
-		dateUtil.setYears(year);
-		today = dateUtil.getCalenderDay();
-
-		resultMonth = parse.stringToInteger((today + "").substring(0, 6));
-
-		return resultMonth;
-	}
+//		if (today < 100000) {
+//			today = parse.stringToInteger((today + 191100) + "01");
+//		} else if (today < 1000000) {
+//			today = parse.stringToInteger(today + "01");
+//		} else if (today < 10000000) {
+//			today = today + 19110000;
+//		}
+//
+//		dateUtil.init();
+//		dateUtil.setDate_1(today);
+//		dateUtil.setYears(year);
+//		today = dateUtil.getCalenderDay();
+//
+//		resultMonth = parse.stringToInteger((today + "").substring(0, 6));
+//
+//		return resultMonth;
+//	}
 
 }

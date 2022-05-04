@@ -1,10 +1,9 @@
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB090_Upd"
+(
 -- 程式功能：維護 JcicB090 每月聯徵擔保品關聯檔資料檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB090_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB090_Upd"(20200430,'999999');
 --
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB090_Upd"
-(
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
     EmpNo          IN  VARCHAR2    -- 經辦
@@ -71,20 +70,24 @@ BEGIN
     FROM   "JcicB080" M
         LEFT JOIN "ClFac" F    ON F."CustNo"   = SUBSTR(M."FacmNo",1,7)
                               AND F."FacmNo"   = SUBSTR(M."FacmNo",8,3)
-                              AND F."MainFlag" = 'Y'
-        LEFT JOIN "JcicMonthlyLoanData" J                -- 不含預約撥款
-                               ON J."DataYM"   = YYYYMM
-                              AND J."CustNo"   = SUBSTR(M."FacmNo",1,7)
-                              AND J."FacmNo"   = SUBSTR(M."FacmNo",8,3)
-                              AND J."Status"   NOT IN (3,5,9)   -- 非結清
-        LEFT JOIN "LoanBorMain" L
-                               ON L."CustNo"   = SUBSTR(M."FacmNo",1,7)
-                              AND L."FacmNo"   = SUBSTR(M."FacmNo",8,3)
-                              AND L."Status"   IN (99)          -- 預約撥款
+                              --AND F."MainFlag" = 'Y'
+        LEFT JOIN "ClMain" CM  ON CM."ClCode1"  = F."ClCode1"
+                              AND CM."ClCode2"  = F."ClCode2"
+                              AND CM."ClNo"     = F."ClNo"
+--        LEFT JOIN "JcicMonthlyLoanData" J                -- 不含預約撥款
+--                               ON J."DataYM"   = YYYYMM
+--                              AND J."CustNo"   = SUBSTR(M."FacmNo",1,7)
+--                              AND J."FacmNo"   = SUBSTR(M."FacmNo",8,3)
+--                              AND J."Status"   NOT IN (3,5,9)   -- 非結清
+--        LEFT JOIN "LoanBorMain" L
+--                               ON L."CustNo"   = SUBSTR(M."FacmNo",1,7)
+--                              AND L."FacmNo"   = SUBSTR(M."FacmNo",8,3)
+--                              AND L."Status"   IN (99)          -- 預約撥款
     WHERE  M."DataYM"   =   YYYYMM
       AND  M."FacmNo"   IS  NOT NULL
       AND  F."ClNo"     IS  NOT NULL
-      AND  ( J."CustNo" IS  NOT NULL  OR  L."CustNo" IS  NOT NULL )   -- 非結清 OR 預約撥款
+--      AND  ( J."CustNo" IS  NOT NULL  OR  L."CustNo" IS  NOT NULL )   -- 非結清 OR 預約撥款
+      AND  CM."ClStatus" IN '1'  -- 已抵押
     GROUP BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
     ORDER BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
       ;

@@ -865,7 +865,8 @@ BEGIN
               WHEN M."Status" IN (0, 2, 6, 7)
               THEN 1
               WHEN M."Status" IN (3, 5)
-                   AND M."UtilAmt" = 0
+--                   AND M."UtilAmt" = 0
+                   AND M."LoanBal" = 0  -- 需含單一撥款結案
                    AND Tx."CustNo" IS NOT NULL -- 是結案戶
               THEN 1
               WHEN M."BormNo" = 0 THEN 1 -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額

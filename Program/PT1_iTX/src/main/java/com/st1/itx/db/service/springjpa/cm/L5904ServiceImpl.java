@@ -93,10 +93,10 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and i.\"ApplDate\" <= " + applEndDate;
 
 		if (!"00".equals(usageCode)) {
-			sql += "   and \"UsageCode\" = '" + usageCode+"'";
+			sql += "   and \"UsageCode\" = :usageCode";
 		}
 		if (type == 1 || type == 2) {
-			sql += "   and i.\"ApplCode\" = 01  ";
+			sql += "   and i.\"ApplCode\" = '1'  ";
 			sql += "   and NVL(i2.\"CustNo\",0) = 0                             ";
 		}
 		sql += " order by  i.\"UsageCode\",i.\"ApplDate\",i.\"CustNo\"                          ";
@@ -106,6 +106,11 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
+		
+		if (!"00".equals(usageCode))
+		{
+			query.setParameter("usageCode", usageCode);
+		}
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
