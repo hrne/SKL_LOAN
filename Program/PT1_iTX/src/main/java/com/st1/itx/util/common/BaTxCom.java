@@ -483,11 +483,6 @@ public class BaTxCom extends TradeBuffer {
 			if (iRepayType == 1) {
 				this.tempVo.putParam("PreRepayTerms", 0);
 			}
-			// Sort
-			if (iRepayType == 1 || iRepayType == 2) {
-				repayLoaSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
-			}
-
 		}
 
 // STEP 3: 例外處理
@@ -1102,15 +1097,10 @@ public class BaTxCom extends TradeBuffer {
 			this.info("FacStatus =" + this.facStatus);
 			return;
 		}
-		// sort
-		if (iRepayType == 1 || iRepayType == 2) {
-			repayLoaSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
-		}
-
 	}
 
 	/* 還款主檔清單排序 */
-	private void repayLoaSort(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
+	private void repayLoanSort(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
 			throws LogicException {
 
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
@@ -1195,8 +1185,12 @@ public class BaTxCom extends TradeBuffer {
 		this.info("   TxAmt     = " + iTxAmt);
 		this.info("   Terms     = " + iTerms);
 		this.info("   extraRepay = " + this.extraRepay);
+		// sort
+		if (iRepayType == 1 || iRepayType == 2) {
+			repayLoanSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
+		}
 		loanSetRepayIntCom.setTxBuffer(this.getTxBuffer());
-		loanCalcRepayIntCom.init(); // 2022-05-05 Wei新增
+		loanCalcRepayIntCom.init(); 
 		BigDecimal wkExtraRepayRemaind = this.extraRepay;
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 		int wkTerms = 0;

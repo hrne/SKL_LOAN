@@ -456,7 +456,7 @@ T(6A,#AcDate+#BatchNo+#DetailSeq+#RepayTypeA+#CustNoA+#ProcStsCode)
 #batch-row-status=X,50,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,14,O
+#batch-row-txtno=X,18,O
 
 </sub>
 

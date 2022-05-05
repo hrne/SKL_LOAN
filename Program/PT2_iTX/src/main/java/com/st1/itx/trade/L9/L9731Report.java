@@ -159,7 +159,8 @@ public class L9731Report extends MakeReport {
 			int row = 2;
 
 			for (Map<String, String> tLDVo : listL9731) {
-
+				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
+						"L");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -203,10 +204,7 @@ public class L9731Report extends MakeReport {
 			// excel formula
 			makeExcel.formulaCaculate(1, 6);
 
-			for (int i = 1; i <= listL9731.size(); i++) {
-				makeExcel.formulaCalculate(i + 1, 1);
-			}
-
+	
 		}
 
 	}
@@ -267,8 +265,9 @@ public class L9731Report extends MakeReport {
 				int row = 2;
 
 				for (Map<String, String> tLDVo : listL9731) {
-					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "L");
-					
+					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
+							"L");
+
 					for (int i = 0; i < tLDVo.size(); i++) {
 
 						String fieldValue = tLDVo.get("F" + i);
@@ -361,7 +360,7 @@ public class L9731Report extends MakeReport {
 	}
 
 	/**
-	 * exportSheet4  放款餘額明細表
+	 * exportSheet4 放款餘額明細表
 	 */
 	private void exportSheet4(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
 		this.info("L9731Report exportSheet4");
@@ -375,7 +374,8 @@ public class L9731Report extends MakeReport {
 			int row = 2;
 
 			for (Map<String, String> tLDVo : listL9731) {
-				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "L");
+				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
+						"L");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);

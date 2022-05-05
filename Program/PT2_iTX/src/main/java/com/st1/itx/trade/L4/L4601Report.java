@@ -72,8 +72,6 @@ public class L4601Report extends MakeReport {
 	private int pageIndex = 38;
 	private int reporttype = 0;
 
-	// 戶號額度
-	private HashMap<tmpCF, Integer> infor = new HashMap<>();
 
 	public void printHeaderP() {
 		this.setFont(1, 10);
@@ -114,6 +112,11 @@ public class L4601Report extends MakeReport {
 	}
 
 	private void Report(TitaVo titaVo, Slice<InsuRenewMediaTemp> sL4601List) throws LogicException {
+		
+		
+		// 戶號額度
+		HashMap<tmpCF, Integer> infor = new HashMap<>();
+		
 		if (reporttype == 1) {
 			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4601", reportName, "", "A4", "L");
 		} else {
@@ -140,17 +143,27 @@ public class L4601Report extends MakeReport {
 					} else {
 						infor.put(tmp, Integer.sum(infor.get(tmp), 1)); // 累積次數為了第一張表 需戶號額度都相同重複
 					}
-
 				}
 			}
 
+			this.info("infor ... " + infor);
+
 			for (InsuRenewMediaTemp l : sL4601List.getContent()) {
 				if (!"".equals(l.getCheckResultB())) {
+
 					if (reporttype == 1) {
 						tmpCF tmp = new tmpCF(parse.stringToInteger(l.getCustNo()),
 								parse.stringToInteger(l.getFacmNo()));
-						if (infor.get(tmp) >= 2) {
-							lTemp.add(l);
+
+						this.info("tmp ... " + tmp);
+
+						if (infor.get(tmp) != null) {
+
+							this.info("infor : " + infor.get(tmp));
+							
+							if (infor.get(tmp) >= 2) {
+								lTemp.add(l);
+							}
 						}
 					} else {
 						lTemp.add(l);
@@ -243,12 +256,44 @@ public class L4601Report extends MakeReport {
 			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + "]";
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + custNo;
+			result = prime * result + facmNo;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			tmpCF other = (tmpCF) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (custNo != other.custNo)
+				return false;
+			if (facmNo != other.facmNo)
+				return false;
+			return true;
+		}
+
 		private void setCustNo(int custNo) {
 			this.custNo = custNo;
 		}
 
 		private void setFacmNo(int facmNo) {
 			this.facmNo = facmNo;
+		}
+
+		private L4601Report getEnclosingInstance() {
+			return L4601Report.this;
 		}
 
 	}

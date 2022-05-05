@@ -56,35 +56,39 @@ public class L9733Report extends MakeReport {
 	}
 
 	public boolean exportExcel(List<Map<String, String>> listL9733, TitaVo titaVo) throws LogicException {
-		if (listL9733 == null || listL9733.isEmpty())
-			return false;
+		
+		boolean result = true;
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName,
-				txcd + "_" + txName + ".xlsx", "X817");
+				"L9733_底稿_利率調整檢核-下調日為月底日.xlsx", "X817");
 
 		int row = 2;
 
-		for (Map<String, String> tL9733 : listL9733) {
+		if (listL9733 == null || listL9733.isEmpty()) {
+			makeExcel.setValue(row, 1, "本日無資料", "R");
+			result = false;
+		} else {
+			for (Map<String, String> tL9733 : listL9733) {
 
-			makeExcel.setValue(row, 1, tL9733.get("CustNo"));
-			makeExcel.setValue(row, 2, tL9733.get("FacmNo"));
-			makeExcel.setValue(row, 3, tL9733.get("BormNo"));
-			makeExcel.setValue(row, 4, this.showBcDate(tL9733.get("FirstDrawdownDate"), 0));
-			makeExcel.setValue(row, 5, this.showBcDate(tL9733.get("FirstAdjRateDate"), 0));
-			makeExcel.setValue(row, 6, this.showBcDate(tL9733.get("NextAdjRateDate"), 0));
-			makeExcel.setValue(row, 7, tL9733.get("RateAdjFreq"));
-			makeExcel.setValue(row, 8, tL9733.get("FirstDrawdownDateNEW"));
-			makeExcel.setValue(row, 9, tL9733.get("FirstAdjRateDateNEW"));
-			makeExcel.setValue(row, 10, tL9733.get("NextAdjRateDateNEW"));
-			makeExcel.setValue(row, 11, this.showBcDate(tL9733.get("MaturityDate"), 0));
+				makeExcel.setValue(row, 1, tL9733.get("CustNo"), "R");
+				makeExcel.setValue(row, 2, tL9733.get("FacmNo"), "R");
+				makeExcel.setValue(row, 3, tL9733.get("BormNo"), "R");
+				makeExcel.setValue(row, 4, this.showBcDate(tL9733.get("FirstDrawdownDate"), 0), "C");
+				makeExcel.setValue(row, 5, this.showBcDate(tL9733.get("FirstAdjRateDate"), 0), "C");
+				makeExcel.setValue(row, 6, this.showBcDate(tL9733.get("NextAdjRateDate"), 0), "C");
+				makeExcel.setValue(row, 7, tL9733.get("RateAdjFreq"), "R");
+				makeExcel.setValue(row, 8, tL9733.get("FirstDrawdownDateNEW"), "C");
+				makeExcel.setValue(row, 9, tL9733.get("FirstAdjRateDateNEW"), "C");
+				makeExcel.setValue(row, 10, tL9733.get("NextAdjRateDateNEW"), "C");
+				makeExcel.setValue(row, 11, this.showBcDate(tL9733.get("MaturityDate"), 0), "C");
 
-			row++;
+				row++;
+			}
 		}
-
 //		long sno = 
 		makeExcel.close();
 //		makeExcel.toExcel(sno);
 
-		return true;
+		return result;
 	}
 }

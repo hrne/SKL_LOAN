@@ -1,0 +1,581 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6989)
+
+#SECNO=_,_,S
+T(3,01)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,696)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,1)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6989]                                 聯貸費用攤提入帳作業                                                            "],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6001進入),$)
+
+#NTXBUF=X,15,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,#SelectCode,@NTXBUF,1,1)
+
+
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
+
+! 功能
+#FUNCD=A,1,S
+T(1,#NTXBUF,1,1)
+
+
+! 轉催收日
+#TransCollDate=D,7,S
+T(2,#DT)
+
+! 查詢範圍 功能: 9.查詢時須輸入，其它隱藏
+#SelectCode=A,1,S
+C(3,#CHAIN,1,s,$)
+! HELP(1: 昨日留存;2: 本日新增;3: 全部;4: 本日處理;5: 本日刪除;6:保留;7: 未處理;9: 未處理-撥款)
+! @V(1,1,2,3,4,5,6,7,9)
+
+! #SelectCodeX=X,16,L
+! C(2,#SelectCode,T(3,),
+!                T(3,昨日留存),
+!                T(3,本日新增),
+!                T(3,全部),
+!                T(3,本日處理),
+!                T(3,本日刪除),
+!                T(3,保留),
+!                T(3,未處理),
+!                T(3,),
+!                T(3,未處理-撥款),
+!  )
+
+
+#RPTFG=A,1,S
+C(2,#SelectCode,
+S,
+E(0,4),
+E(0,4),
+E(0,4),
+E(0,5),
+E(0,6),
+E(0,2),
+E(0,3),
+S,
+E(0,7),
+)
+
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6989 ----------
+<sub type="FORM" name="L6989">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6989,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6989] 聯貸費用攤提入帳作業)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+#O_FUNCD=X,1,L
+
+#O_SELECT_CD=X,1,L
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOProcStatus=A,1,O
+
+#OOProcStatusX=X,16,L
+SWITCH(#OOProcStatus,0,T(3,0.未處理),
+                          1,T(3,1.已保留),
+                          2,T(3,2.已處理),
+                          3,T(3,3.已刪除),
+)
+
+#OOCustNo=A,7,O
+E(0,@TimCustNo,#OOCustNo)
+#OOFacmNo=A,3,O
+E(0,@FacmNo,#OOFacmNo)
+
+#OOCustNoX=X,11,S
+T(2,#OOCustNo+-+#OOFacmNo)
+
+#OOCustName=x,100,O
+#OOSyndFeeYYYMM=A,5,O
+#OOSyndFee=m,14.2,O
+#OOFeeCode=X,3,O
+#OOTitaCrDb=A,1,S
+
+#OOTitaCrDbX=X,10,L
+SWITCH(#OOTitaCrDb,1,T(3,借),
+				   2,T(3,貸),
+				   T(3,))
+
+#OOAcDate=D,7,O
+
+#OORelNo=X,25,O
+#OORelNoX=X,25,O
+
+#OOItemCode=X,6,O
+#OODtlValue=X,15,O
+#OOTempItemCode=A,2,O
+E(0,@TempItemCode,#OOTempItemCode)
+
+#OOKINBR=X,4,S
+T(1,@OOKINBR,#OORelNo,8,4)
+#OOTlrNo=X,6,S
+T(1,@OOTlrNo,#OORelNo,12,6)
+#OOTxtNo=A,8,L
+T(1,@OOTxtNo,#OORelNo,18,8)
+
+!交易序號
+! #TxtNo=A,8,L
+
+#ColA=A,1,S
+E(0,@TXAMT,#OOSyndFee)
+T(2,@MRKEY,#OOCustNo+-+#OOFacmNo)
+T(2,@BATCHNO,#OOItemCode)
+T(2,@TxItemCode,#OOItemCode)
+T(2,@TxCustNo,#OOCustNo)
+T(2,@TxFacmNo,#OOFacmNo)
+T(2,@TxBormNo,000)
+T(2,@TxDtlValue,#OODtlValue)
+T(2,@TxSelectCode,#SelectCode)
+E(0,@TempReasonCode,5)
+T(2,@CurrencyCode,TWD)
+E(0,@TimTempAmt,#OOSyndFee)
+T(B,@RemoveNo,#OODtlValue)
+E(0,@TwTempAmt,#OOSyndFee)
+E(0,@UsTempAmt,#OOSyndFee)
+E(0,@CustNo,#OOCustNo)
+
+#RpFlag=A,1,S
+E(0,2)
+
+#TITFCD=_,_,S
+E(0,1)
+
+! ifxBatch相關參數
+#secret-no=x,1000,S
+IF(#SelectCode==4,T(2,@ORGKIN,#OOKINBR)T(2,@ORGTLR,#OOTlrNo)T(2,@ORGTNO,#OOTxtNo)E(0,@OrgEntdy,#SYSDATE)E(0,@HCODE,1),$)
+T(6A,#TXAMT+#TimCustNo+#CustId+#ApplNo+#FacmNo+#TempReasonCode+#TempItemCode+#CurrencyCode+#AcSubBookCode+#TimTempAmt+#ChangeDate
++#ChangeItemCode+#Year+#Month+#Description+#BormNo+#RemoveNo+#BDCLFg+#Supervisor+#Remark+#END+#CustNo+#TwTempAmt+#UsTempAmt
++#RpCustNo1+#RpFacmNo1+#RpCode1+#RpAmt1+#RpRemitBank1+#RpRemitBranch1+#RpRemitAcctNo1+#RpCustName1+#RpRemark1+#TxDtlValue+#TxSelectCode+#TxItemCode
++#TxCustNo+#TxFacmNo+#TxBormNo)
+
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,18,O
+
+#TXTNO=_,_,S
+
+! L6901分錄
+#DTL_BUF=X,100,S
+T(2,#OOAcDate+0000000+#OOKINBR+#OOTlrNo+#OOTxtNo)
+
+#DTL_BTN=X,3,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#DTL_BUF})
+
+
+#TimCustNo=A,7,S
+#CustId=X,10,S
+#ApplNo=A,7,S
+#FacmNo=A,3,S
+#TempReasonCode=A,1,S
+#TempItemCode=A,2,S
+#CurrencyCode=X,3,S
+#AcSubBookCode=X,3,S
+#TimTempAmt=m,14.2,S
+#ChangeDate=D,7,S
+#ChangeItemCode=A,2,S
+#Year=A,3,S
+#Month=A,2,S
+#Description=X,30,S
+#BormNo=A,3,S
+#RemoveNo=X,15,S
+#BDCLFg=X,1,S
+#Supervisor=X,6,S
+#Remark=X,60,S
+#CustNo=A,7,S
+#TwTempAmt=m,14,S
+#UsTempAmt=m,14.2,S
+
+#RpCustNo1=A,7,S
+#RpFacmNo1=A,3,S
+#RpCode1=A,2,S
+#RpAmt1=m,14,S
+#RpRemitBank1=x,3,S
+#RpRemitBranch1=x,4,S
+#RpRemitAcctNo1=A,14,S
+#RpCustName1=c,100,S
+#RpRemark1=X,100,S
+#TxDtlValue=X,15,S
+#TxSelectCode=X,1,S
+#TxItemCode=X,6,S
+#TxCustNo=A,7,S
+#TxFacmNo=A,3,S
+#TxBormNo=A,3,S
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TransCollDate
+#SelectCode
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L6989
+#OOProcStatus
+#OOCustNo
+#OOFacmNo
+#OOCustName
+#OOSyndFeeYYYMM
+#OOSyndFee
+#OOFeeCode
+#OOTitaCrDb
+#OOAcDate
+#OORelNo
+#OOItemCode
+#OODtlValue
+#OOTempItemCode
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="O1" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];order=1">
+[
+["[L6989]                                 聯貸費用攤提入帳作業                                                                            "],
+[""],
+]
+</sub>
+<sub type="PART" name="O2" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];order=1">
+[
+["[L6989]                                 聯貸費用攤提入帳作業                                                                            "],
+[""],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+
+<sub type="SELECT">
+#batch-print=2,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=3,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=5,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=6,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=7,L618B.PFNX,NA,,,,,,1169:827
+^
+
+#RPTFG=2,QUERY.GRID,O1
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'取消保留',
+	type:'5',
+	rim:'L618A',
+	txtno:'#secret-no',
+	pfnx:"L618A.PFNX",
+	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#OOCustNoX
+#secret-no
+
+#OODtlValue
+
+#OOSyndFeeYYYMM=費用年月
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度編號
+{width:100,align:'center'}
+
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OODtlValue=明細鍵值
+{width:150,align:'left'}
+
+#OOSyndFee=費用
+{width:150,align:'right'}
+
+#OORelNo=登放序號
+{width:150,align:'left'}
+
+
+^
+
+#RPTFG=3,QUERY.GRID,O1
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],}
+#OOCustNoX
+#secret-no
+
+#OODtlValue
+
+#OOSyndFeeYYYMM=費用年月
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度編號
+{width:100,align:'center'}
+
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OODtlValue=明細鍵值
+{width:150,align:'left'}
+
+#OOSyndFee=費用
+{width:150,align:'right'}
+
+#OORelNo=登放序號
+{width:150,align:'left'}
+
+
+^
+
+#RPTFG=4,QUERY.GRID,O1
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOSyndFeeYYYMM=費用年月
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度編號
+{width:100,align:'center'}
+
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OODtlValue=明細鍵值
+{width:150,align:'left'}
+
+#OOSyndFee=費用
+{width:150,align:'right'}
+
+#OORelNo=登放序號
+{width:150,align:'left'}
+
+#DTL_BTN=
+{width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
+
+^
+
+#RPTFG=5,QUERY.GRID,O1
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'訂正',
+	type:'5',
+	rim:'L3230',
+	txtno:'#secret-no',
+	pfnx:"L618B.PFNX",
+	col_captions:["戶號","交易序號                             ","處理結果"],
+	col_names:["#OOCustNoX","#batch-row-txtno","#batch-row-status"]
+	}
+}
+
+#secret-no
+#OOCustNoX
+#OODtlValue
+
+#OOSyndFeeYYYMM=費用年月
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度編號
+{width:100,align:'center'}
+
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OODtlValue=明細鍵值
+{width:150,align:'left'}
+
+#OOSyndFee=費用
+{width:150,align:'right'}
+
+#OORelNo=登放序號
+{width:150,align:'left'}
+
+
+^
+
+
+#RPTFG=6,QUERY.GRID,O1
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'取消刪除',
+	type:'5',
+	rim:'L618A',
+	txtno:'#secret-no',
+	pfnx:"L618A.PFNX",
+	col_captions:["戶號","明細鍵值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#secret-no
+#OOCustNoX
+#OODtlValue
+
+#OOSyndFeeYYYMM=費用年月
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度編號
+{width:100,align:'center'}
+
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OODtlValue=明細鍵值
+{width:150,align:'left'}
+
+#OOSyndFee=費用
+{width:150,align:'right'}
+
+#OORelNo=登放序號
+{width:150,align:'left'}
+
+
+^
+
+#RPTFG=7,QUERY.GRID,O1
+#any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'銷帳',
+	type:'5',
+	rim:'L3230',
+	txtno:'#secret-no',
+	pfnx:"L618B.PFNX",
+	col_captions:["戶號","明細鍵值","交易序號                             ","處理結果                                                                                       "],
+	col_names:["#OOCustNoX","#OODtlValue","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#OOCustNoX
+#secret-no
+#OODtlValue
+
+#OOSyndFeeYYYMM=費用年月
+{width:100,align:'center'}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+
+#OOFacmNo=額度編號
+{width:100,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OODtlValue=明細鍵值
+{width:150,align:'left'}
+
+#OOSyndFee=費用
+{width:150,align:'right'}
+
+#OORelNoX=登放序號
+{width:150,align:'left'}
+
+
+^
+
+
+
+</sub>

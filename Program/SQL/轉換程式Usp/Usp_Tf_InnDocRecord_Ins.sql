@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_InnDocRecord_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_InnDocRecord_Ins" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_InnDocRecord_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -31,27 +26,50 @@ BEGIN
                               ORDER BY "LN$DOCP"."LMSACN","LN$DOCP"."LMSAPN")
                                           AS "ApplSeq"             -- 申請序號 VARCHAR2 3 0
           ,''                             AS "TitaActFg"           -- 登放記號 VARCHAR2 1 0
-          ,''                             AS "ApplCode"            -- 申請或歸還 VARCHAR2 1 0
-          ,NVL("CdEmp"."EmployeeNo",'')
+          ,CASE
+             WHEN "LN$DOCP"."DOCBDT" != 0
+             THEN '2'
+           ELSE '1' END                   AS "ApplCode"            -- 申請或歸還 VARCHAR2 1 0
+          ,NVL(T."CUSEMP","CdEmp"."EmployeeNo")
                                           AS "ApplEmpNo"           -- 借閱人 VARCHAR2 6 0
           ,''                             AS "KeeperEmpNo"         -- 管理人 VARCHAR2 6 0
-          ,LPAD("LN$DOCP"."DOCPUR",2,'0') AS "UsageCode"           -- 用途 VARCHAR2 2 0
+          ,CASE LPAD("LN$DOCP"."DOCPUR",2,'0')
+             WHEN '01'
+             THEN '01'
+             WHEN '02'
+             THEN '02'
+             WHEN '03'
+             THEN '03'
+             WHEN '04'
+             THEN '04'
+             WHEN '05'
+             THEN '05'
+             WHEN '06'
+             THEN '06'
+             WHEN '07'
+             THEN '07'
+             WHEN '08'
+             THEN '08'
+           ELSE '08' END                  AS "UsageCode"           -- 用途 VARCHAR2 2 0
           ,''                             AS "CopyCode"            -- 正本/影本 VARCHAR2 1 0
           ,"LN$DOCP"."DOCLDT"             AS "ApplDate"            -- 借閱日期 DecimalD 8 0
           ,"LN$DOCP"."DOCBDT"             AS "ReturnDate"          -- 歸還日期 DecimalD 8 0
           ,''                             AS "ReturnEmpNo"         -- 歸還人 VARCHAR2 6 0
           ,"LN$DOCP"."NGRRMK60"           AS "Remark"              -- 備註 NVARCHAR2 60 0
-          ,''                             AS "ApplObj"             -- 借閱項目 VARCHAR2 1 0
+          ,'4'                            AS "ApplObj"             -- 借閱項目 VARCHAR2 1 0
           ,0                              AS "TitaEntDy"           -- 登錄日期 DecimalD 8 0
           ,''                             AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
           ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
-          ,null                           AS "JsonFields"          -- JsonFields
+          ,'{"DOCEMN":"'
+          || TRIM("LN$DOCP"."DOCEMN")
+          ||'"}'                           AS "JsonFields"          -- JsonFields
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LN$DOCP"
     LEFT JOIN "CdEmp" ON TRIM("CdEmp"."Fullname") = TRIM("LN$DOCP"."DOCEMN")
+    LEFT JOIN LN$DTYP T on TRIM(TO_SINGLE_BYTE(T.EMPNAM)) = TRIM("LN$DOCP".DOCEMN)
     ;
 
     -- 記錄寫入筆數
@@ -68,7 +86,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_InnDocRecord_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-/

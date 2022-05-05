@@ -1,0 +1,559 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L698A)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,497)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,1)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L698A]                                 應處理明細                                                            "],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,41,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@SelectCode,#NTXBUF,1,1)
+T(1,@ItemCode,#NTXBUF,2,6)
+T(1,@AutoFg,#NTXBUF,38,1)
+
+
+#SelectCode=A,1,S
+#SelectCodeX=X,16,L
+C(2,#SelectCode,T(3,),
+               T(3,昨日留存),
+               T(3,本日新增),
+               T(3,全部),
+               T(3,本日處理),
+               T(3,本日刪除),
+               T(3,保留),
+               T(3,未處理),
+               T(3,),
+               T(3,處理-按鈕),
+ )
+
+! 處理之交易代號
+#ItemCode=X,6,S
+
+#AutoFg=X,1,S
+
+
+#RPTFG=A,1,S
+C(2,#SelectCode,
+S,
+E(0,4),
+E(0,4),
+E(0,4),
+E(0,5),
+E(0,6),
+E(0,2),
+E(0,3),
+S,
+E(0,8),
+)
+
+#checkautofg=X,1,S
+IF(#AutoFg=="Y",E(0,@RPTFG,7),$)
+
+
+
+
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L698A ----------
+<sub type="FORM" name="L698A">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L698A,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L698A] 應處理明細)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 資料日期
+#OOAcDate=D,7,L
+! 狀態
+#OOStatus=A,1,S
+#OOStatus_LB=X,16,L
+SWITCH(#OOStatus,0,T(3,0.未處理),
+                          1,T(3,1.已保留),
+                          2,T(3,2.已處理),
+                          3,T(3,3.已刪除),
+)
+! 戶號
+#OOCustNo=A,7,S
+#OOFacmNo=A,3,S
+#OOBormNo=A,3,S
+#OOCustNoX=X,15,L
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+! 戶名
+#OOCustName=X,100,L
+
+! 處理事項說明
+#OOProcessNote=x,300,S
+
+
+! 登放序號
+#OOTxSn=X,25,L
+C(3,#OOStatus,0,S,$)
+
+#OOExcuteTxcd=X,5,S
+
+! 項目
+#OOItemCode=X,6,S
+
+! 細項鍵值
+#OODtlValue=x,30,S
+
+
+#OOCustId=X,10,S
+
+
+#ColA=A,1,S
+T(2,@MRKEY,#OOCustNoX)
+T(2,@BATCHNO,#OOItemCode)
+
+T(2,@TxItemCode,#OOItemCode)
+T(2,@TxCustNo,#OOCustNo)
+T(2,@TxFacmNo,#OOFacmNo)
+T(2,@TxBormNo,#OOBormNo)
+T(2,@TxDtlValue,#OODtlValue)
+T(2,@TxSelectCode,#SelectCode)
+T(2,@TxExcuteTxcd,#OOExcuteTxcd)
+
+#TxItemCode=X,6,S
+#TxCustNo=A,7,S
+#TxFacmNo=A,3,S
+#TxBormNo=A,3,S
+#TxDtlValue=x,30,S
+#TxSelectCode=X,1,S
+#TxExcuteTxcd=X,5,S
+
+! ifxBatch相關參數 
+#secret-no=x,1000,S
+T(6A,#TxItemCode+#TxCustNo+#TxFacmNo+#TxBormNo
++#TxDtlValue+#TxSelectCode+#MRKEY
++#BATCHNO+#TxExcuteTxcd)
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,18,O
+
+
+!交易序號
+#TXTNO=_,_,S
+
+!查詢
+#OOBUF5=X,58,S
+T(2,#TxCustNo+#TxFacmNo+#TxBormNo)
+
+#OOBUFL1=X,20,S
+T(2,2+#OOCustId)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=#OOExcuteTxcd;ntxbuf=#OOBUF5})
+C(5,#OOExcuteTxcd,L1103,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=修改;ntxbuf=#OOBUFL1}),$)
+C(5,#OOExcuteTxcd,L3731,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=改呆帳結案戶;ntxbuf=#OOBUF5}),$)
+
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#SelectCode
+#ItemCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L698A
+#OOAcDate
+#OOStatus
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustName
+#OOProcessNote
+#OOTxSn
+#OOExcuteTxcd
+#OOItemCode
+#OODtlValue
+#OOCustId
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#batch-print=2,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=3,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=5,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=6,L618A.PFNX,NA,,,,,,1169:827
+^
+#batch-print=7,L618A.PFNX,NA,,,,,,1169:827
+^
+
+#RPTFG=2,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'取消保留',
+	type:'5',
+	rim:'L618A',
+	pfnx:"L618A.PFNX",
+	txtno:'#secret-no',
+	col_captions:["戶號","明細值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#TXTNO","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#TXTNO=交易序號
+{width:80,align:'center'}
+
+#OODtlValue
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+
+^
+
+#RPTFG=3,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'保留;刪除',
+	type:'5',
+	rim:'L618A',
+	pfnx:"L618A.PFNX",
+	txtno:'#secret-no',
+	col_captions:["戶號","明細值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#TXTNO","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#TXTNO=交易序號
+{width:80,align:'center'}
+
+#OODtlValue
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+^
+
+#RPTFG=4,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+^
+#RPTFG=5,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'取消處理',
+	type:'5',
+	rim:'L618A',
+	pfnx:"L618A.PFNX",
+	txtno:'#secret-no',
+	col_captions:["戶號","明細值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#TXTNO","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#TXTNO=交易序號
+{width:80,align:'center'}
+
+#OODtlValue
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+^
+
+#RPTFG=6,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'取消刪除',
+	type:'5',
+	rim:'L618A',
+	pfnx:"L618A.PFNX",
+	txtno:'#secret-no',
+	col_captions:["戶號","明細值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#TXTNO","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#TXTNO=交易序號
+{width:80,align:'center'}
+
+#OODtlValue
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+^
+
+#RPTFG=7,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'批次執行',
+	type:'5',
+	rim:'L618A',
+	pfnx:"L618A.PFNX",
+	txtno:'#secret-no',
+	col_captions:["戶號","明細值","交易序號","處理結果"],
+	col_names:["#OOCustNoX","#OODtlValue","#TXTNO","#batch-row-status"]
+	}
+}
+
+#secret-no
+
+#TXTNO=交易序號
+{width:80,align:'center'}
+
+#OODtlValue
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+^
+
+
+#RPTFG=8,QUERY.GRID
+#any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOStatus_LB=狀態
+{width:80,align:'center'}
+
+#OOCustNoX=戶號
+{width:150,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'left'}
+
+#OODtlValue=明細項目
+{width:300,align:'left'}
+
+
+#OOProcessNote=處理事項說明
+{width:300,align:'left'}
+
+#OOAcDate=資料日期
+{width:80,align:'center'}
+
+#OOBTN5=
+{width:100,search:false,formatter:'cust:bind-button:#OOExcuteTxcd',align:'center',canExport:false}
+
+
+#OOTxSn=登放序號
+{width:160,align:'left'}
+
+^
+
+
+<include src="PRT.icf::INQ01.sel" map="i=L698A;cpi=15"/>
+
+%
+@^
+</sub>

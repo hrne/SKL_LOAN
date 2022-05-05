@@ -69,7 +69,6 @@ public class L7205 extends TradeBuffer {
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
 
-
 	// 明細資料容器
 	private ArrayList<OccursList> occursList = new ArrayList<>();
 
@@ -110,10 +109,10 @@ public class L7205 extends TradeBuffer {
 
 		String extension[] = filename.split("\\.");
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
+			// 打開上傳的excel檔案，預設讀取第1個工作表
 			makeExcel.openExcel(filename, 1);
 			// 切資料
-			setValueFromFileExcel(iYearMonth);
-
+			setValueFromFileExcel(titaVo, iYearMonth);
 		} else {
 			setValueFromFile(dataLineList);
 		}
@@ -246,9 +245,12 @@ public class L7205 extends TradeBuffer {
 
 	}
 
-	public void setValueFromFileExcel(int YearMonth) throws LogicException {
+	public void setValueFromFileExcel(TitaVo titaVo, int YearMonth) throws LogicException {
 
+		// 取得工作表資料的最後一列
 		int lastRowNum = makeExcel.sheet.getLastRowNum() + 1;
+
+		this.info("lastRowNum=" + lastRowNum);
 
 		int iYearMonth = YearMonth;
 		BigDecimal iCustNo = BigDecimal.ZERO;
@@ -259,9 +261,25 @@ public class L7205 extends TradeBuffer {
 
 			OccursList occursList = new OccursList();
 
-			iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
-			iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
-			iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
+			// 等於1，表示前大於後
+			// 等於0，表示前等於後
+			// 等於-1，表示前小於後
+//			if ((iCustNo.compareTo(BigDecimal.ZERO) == -1 || iCustNo == null)
+//					&& (iFacmNo.compareTo(BigDecimal.ZERO) == -1 || iFacmNo == null)
+//					&& (iAssetClass.compareTo(BigDecimal.ZERO) == -1 || iAssetClass == null)) {
+//		}
+
+			try {
+				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
+				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
+				iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
+			} catch (Exception e) {
+//				this.info("L7205(Excel欄位應為iCustNo在B欄、iFacmNo在C欄、iAssetClass為H欄)請確認格式 : " + e.getMessage());
+				
+				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
+				
+				throw new LogicException(titaVo, "E0015", ErrorMsg);
+			}
 
 			// 設定明細欄位的擷取位置
 			// 1 YearMonth 年月份 Decimal 6 YYYYMM 西元年月

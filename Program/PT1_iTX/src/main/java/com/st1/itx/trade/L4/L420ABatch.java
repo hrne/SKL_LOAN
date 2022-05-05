@@ -387,18 +387,19 @@ public class L420ABatch extends TradeBuffer {
 			}
 		}
 		
+		ArrayList<BaTxVo> listbaTxVo = new ArrayList<BaTxVo>();
 		if ("4".equals(tDetail.getProcStsCode()) && iTempVo.getParam("MergeSeq").equals(iTempVo.getParam("MergeCnt"))) {
 			for (BaTxVo ba : iBatxList) {
 				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					lbaTxVo.add(ba);
+					listbaTxVo.add(ba);
 				}
 			}
-			lbaTxVo = baTxCom.addByBormNo(iBatxList, titaVo);
+			lbaTxVo = baTxCom.addByBormNo(listbaTxVo, titaVo);
 		} else {
 			BaTxVo baTxVo = new BaTxVo();
 			baTxVo.setDataKind(4);
 			baTxVo.setCustNo(tDetail.getCustNo()); // 借款人戶號
-			baTxVo.setFacmNo(tDetail.getFacmNo()); // 額度編號
+			baTxVo.setFacmNo(facmNo); // 額度編號
 			baTxVo.setDbCr("C");
 			baTxVo.setAcctAmt(tDetail.getRepayAmt());
 			lbaTxVo.add(baTxVo);

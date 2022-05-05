@@ -40,16 +40,16 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("會計日期     = " + iDAY);
 
 		// 新增保護機制 當除數為0 該欄位輸出為0
-		String sql = " SELECT CF.\"CustNo\" "; // 戶號
-		sql += "      , CF.\"FacmNo\" ";
-		sql += "      , CF.\"ClCode1\" ";
-		sql += "      , CF.\"ClCode2\" ";
-		sql += "      , CF.\"ClNo\" ";
-		sql += "      , CS.\"LoanToValue\"  as \"LoanToValue\" ";// 核貸成數
-		sql += "      , CS.\"SettingBalance\"  as \"SettingBalance\" ";// 設 定 股 數 ( 股 )
-		sql += "      , NVL(LBM.\"LoanBal\",0)  AS \"LoanBal\" ";// 目前餘額(萬)
-		sql += "      , CS.\"YdClosingPrice\" ";
-		sql += "        * CS.\"SettingBalance\" AS \"TotalMarketValue\" ";// 擔保品總市價
+		String sql = " SELECT CF.\"CustNo\" "; // 戶號 0
+		sql += "      , CF.\"FacmNo\" ";//1
+		sql += "      , CF.\"ClCode1\" ";//2
+		sql += "      , CF.\"ClCode2\" ";//3
+		sql += "      , CF.\"ClNo\" ";//4
+		sql += "      , CS.\"LoanToValue\" / 100  as \"LoanToValue\" ";// 核貸成數5
+		sql += "      , CS.\"SettingBalance\"  as \"SettingBalance\" ";// 設 定 股 數 ( 股 )6
+		sql += "      , NVL(LBM.\"LoanBal\",0)  AS \"LoanBal\" ";// 目前餘額(萬)7
+		sql += "      , CS.\"YdClosingPrice\" ";//
+		sql += "        * CS.\"SettingBalance\" AS \"TotalMarketValue\" ";// 擔保品總市價8
 		sql += "      , Case ";
 		sql += "          when ";
 		sql += "             ( CS.\"YdClosingPrice\" * CS.\"SettingBalance\" ) = 0 ";
@@ -57,28 +57,28 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        else  NVL(LBM.\"LoanBal\",0)  ";
 		sql += "              / ( CS.\"YdClosingPrice\"  ";
 		sql += "                   * CS.\"SettingBalance\" )  ";
-		sql += "                      * 100 end AS \"ActualLoanToValue\" ";// 實貸成數
+		sql += "                       end AS \"ActualLoanToValue\" ";// 實貸成數9
 		sql += "      , Case ";
 		sql += "          when CS.\"SettingBalance\" = 0 ";
 		sql += "          then 0 ";
 		sql += "        else NVL(LBM.\"LoanBal\",0) ";
-		sql += "             / CS.\"SettingBalance\" end AS \"LoanPerShare\" ";// 每股貸放
+		sql += "             / CS.\"SettingBalance\" end AS \"LoanPerShare\" ";// 每股貸放10
 		sql += "      ,Case ";
 		sql += "         when ( CS.\"LoanToValue\" * CS.\"SettingBalance\" / 100) =0 ";
 		sql += "         then 0 ";
 		sql += "       else NVL(LBM.\"LoanBal\",0)  ";
 		sql += "            / ( CS.\"LoanToValue\"  ";
 		sql += "                 * CS.\"SettingBalance\"  ";
-		sql += "                    / 100)      end AS \"ModifiedEvaPrice\" ";// 調整後鑑定單價
-		sql += "      , CS.\"ClMtr\"                AS \"ClMtr\" ";// 擔保品維持率
+		sql += "                    / 100)      end AS \"ModifiedEvaPrice\" ";// 調整後鑑定單價11
+		sql += "      , CS.\"ClMtr\"     /100           AS \"ClMtr\" ";// 擔保品維持率12
 		sql += "      , Case ";
 		sql += "          when CS.\"SettingBalance\" * CS.\"ClMtr\" / 100  = 0 ";
 		sql += "          then 0 ";
 		sql += "        else NVL(LBM.\"LoanBal\",0) ";
 		sql += "             / CS.\"SettingBalance\" ";
 		sql += "                * CS.\"ClMtr\"  ";
-		sql += "                  / 100    end  AS \"RecoveryPrice\" "; // 追繳價格
-		sql += "      , CS.\"YdClosingPrice\" as \"YdClosingPrice\" "; // 收盤價
+		sql += "                  / 100    end  AS \"RecoveryPrice\" "; // 追繳價格13
+		sql += "      , CS.\"YdClosingPrice\" as \"YdClosingPrice\" "; // 收盤價14
 		sql += "      , Case ";
 		sql += "          when  NVL(LBM.\"LoanBal\",0)* 100 =0 ";
 		sql += "          then 0 ";
@@ -86,7 +86,7 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        CS.\"YdClosingPrice\" ";
 		sql += "        * CS.\"SettingBalance\" ";
 		sql += "        / NVL(LBM.\"LoanBal\",0) ";
-		sql += "        * 100               end  AS \"TotalMtr\" ";// 全戶維持率
+		sql += "                       end  AS \"TotalMtr\" ";// 全戶維持率15
 		sql += "      , CASE ";
 		sql += "          WHEN CS.\"YdClosingPrice\" < Case  ";
 		sql += "                                       when CS.\"SettingBalance\"  * CS.\"ClMtr\" / 100 =0 ";
@@ -97,11 +97,11 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                        * CS.\"ClMtr\" ";
 		sql += "                                           / 100 end  ";
 		sql += "          THEN '是' ";
-		sql += "        ELSE '否' END         AS \"IsClosingPriceLessThanRecoveryPrice\" ";
-		sql += "    , CM.\"CustName\" AS \"CustName\" "; // 戶名
-		sql += "    , CS.\"StockCode\" AS \"StockCode\" "; // 股票代號
-		sql += "    , NVL(CDS.\"StockItem\",' ') AS \"StockItem\""; // 股票名稱
-		sql += "    , OwnerCM.\"CustName\" AS \"OwnerName\" "; // 擔保品提供人姓名
+		sql += "        ELSE '否' END         AS \"IsClosingPriceLessThanRecoveryPrice\" ";//16
+		sql += "    , CM.\"CustName\" AS \"CustName\" "; // 戶名17
+		sql += "    , CS.\"StockCode\" AS \"StockCode\" "; // 股票代號18
+		sql += "    , NVL(CDS.\"StockItem\",' ') AS \"StockItem\""; // 股票名稱19
+		sql += "    , OwnerCM.\"CustName\" AS \"OwnerName\" "; // 擔保品提供人姓名20
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
 		sql += "                  , \"FacmNo\" ";
@@ -120,7 +120,7 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CustMain\" OwnerCM ON OwnerCM.\"CustUKey\" = CS.\"OwnerCustUKey\" ";
 		sql += " WHERE CF.\"ClCode1\" = 3 ";
 		sql += "   AND CF.\"CustNo\" != 0 ";
-//		  。 。   sql +="   AND NVL(LBM.\"LoanBal\",0) > 0 ";
+	    sql += "   AND NVL(LBM.\"LoanBal\",0) > 0 ";
 
 		this.info("L9732sql=" + sql);
 		Query query;

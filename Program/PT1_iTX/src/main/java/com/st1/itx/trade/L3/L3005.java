@@ -163,12 +163,12 @@ public class L3005 extends TradeBuffer {
 		String newRelNo = "";
 		// 如有有找到資料
 
+		BigDecimal wkTotTxAmt = BigDecimal.ZERO;
 		for (LoanBorTx ln : lLoanBorTx) {
 			newRelNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
 			OccursList occursList = new OccursList();
 			BigDecimal wkTempAmt = BigDecimal.ZERO;
 			BigDecimal wkShortfall = BigDecimal.ZERO;
-			BigDecimal wkTotTxAmt = BigDecimal.ZERO;
 
 			String feeMsg = "";
 			tTempVo = new TempVo();
@@ -176,6 +176,9 @@ public class L3005 extends TradeBuffer {
 				continue;
 			}
 
+			if (!relNo.equals(newRelNo)){
+				wkTotTxAmt = BigDecimal.ZERO;
+			}
 			// 是否顯示分錄清單： Y-有分錄清單 、N-無分錄清單、空白(同交易序號次筆)
 			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("3") || ln.getTitaHCode().equals("4"))
 					&& (ln.getDisplayflag().equals("A") || ln.getDisplayflag().equals("F"))) {
@@ -184,7 +187,6 @@ public class L3005 extends TradeBuffer {
 				AcFg = "";
 			} else {
 				AcFg = "N";
-				wkTotTxAmt = BigDecimal.ZERO;
 			}
 			wkTotTxAmt = wkTotTxAmt.add(ln.getTxAmt());
 

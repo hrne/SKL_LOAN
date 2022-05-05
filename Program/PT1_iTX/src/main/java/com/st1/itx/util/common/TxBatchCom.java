@@ -1287,6 +1287,9 @@ public class TxBatchCom extends TradeBuffer {
 				}
 				// 部分償還本金
 				this.checkMsg += ", 部分償還金額 :" + this.tTempVo.get("ExtraRepay");
+				if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
+					this.checkMsg += ", 短繳利息:" + this.shortAmt;
+				}
 
 				// 檢核正常
 				this.procStsCode = "4"; // 4.檢核正常
