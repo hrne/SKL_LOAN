@@ -1088,9 +1088,9 @@ public class TxBatchCom extends TradeBuffer {
 			}
 			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + unfinishCnt);
 
-			// 訂正成功後為未檢核，需重新檢核
-			if ("0".equals(tDetail.getProcStsCode())) {
-				tBatxHead.setBatxExeCode("0");// 0.待檢核
+			// 訂正成功後更新為入帳未完
+			if (titaVo.isHcodeErase()) {
+				tBatxHead.setBatxExeCode("3");// 3.入帳未完
 			}
 
 			try {

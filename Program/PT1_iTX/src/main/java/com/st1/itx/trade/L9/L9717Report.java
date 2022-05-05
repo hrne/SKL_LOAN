@@ -491,9 +491,9 @@ public class L9717Report extends MakeReport {
 					}
 
 					break;
-					
-					default:
-						break;
+
+				default:
+					break;
 				}
 
 				// 根據樣張，大額客戶別不做每筆資料換行畫線

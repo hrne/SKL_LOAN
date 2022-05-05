@@ -131,6 +131,8 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal fitRate = BigDecimal.ZERO; // 目前利率
 	private int repayIntDate = 0; // 還款應繳日
 	private TempVo repayIntDateByFacmNoVo = new TempVo(); // 額度還款應繳日
+	private int prevPayIntDate; // 上次繳息日
+	private int nextPayIntDate; // 下次繳息日
 	private int ovduTerms = 0; // 逾期數
 	private int ovduDays = 0; // 逾期天數
 	private int terms = 0; // 繳期數
@@ -185,8 +187,9 @@ public class BaTxCom extends TradeBuffer {
 		// 期款
 		this.unpaidFlag = "Y";// 是否可欠繳
 		this.preRepayTerms = 0; // 期款可預收期數
-		this.repayIntDate = 0; // repayIntDate 還款應繳日
+		this.repayIntDate = 0; // 還款應繳日
 		this.repayIntDateByFacmNoVo = new TempVo(); // 額度還款應繳日
+		this.nextPayIntDate = 0; // 下次應繳日
 
 		// 部分還款
 		this.extraRepay = BigDecimal.ZERO; // 部分還款金額
@@ -480,6 +483,10 @@ public class BaTxCom extends TradeBuffer {
 			if (iRepayType == 1) {
 				this.tempVo.putParam("PreRepayTerms", 0);
 			}
+			// Sort
+			if (iRepayType == 1 || iRepayType == 2) {
+				repayLoaSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
+			}
 
 		}
 
@@ -533,13 +540,10 @@ public class BaTxCom extends TradeBuffer {
 // 3). 02-部分償還
 		if (iRepayType == 2) {
 			// 有期款未回收，變更還款類別為期款 -> 下次應繳日 < 應繳日
-			for (LoanBorMain ln : lLoanBorMain) {
-				if (ln.getNextPayIntDate() <= iPayIntDate) {
-					iRepayType = 1;
-					tempVo.putParam("RepayTypeChange", 1);
-					tempVo.putParam("NextPayIntDate", ln.getNextPayIntDate());
-					break;
-				}
+			if (this.nextPayIntDate <= iPayIntDate) {
+				iRepayType = 1;
+				tempVo.putParam("RepayTypeChange", 1);
+				tempVo.putParam("NextPayIntDate", this.nextPayIntDate); // 下次應繳日
 			}
 			this.extraRepay = repayAmt; // 部分還款金額
 			this.payFeeFlag = "N"; // 是否回收費用
@@ -626,6 +630,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 			// RepayIntDate 還款應繳日(0: -> 無實際還款
 			this.repayIntDate = settleByPayintDate();
+			tempVo.putParam("NextPayIntDate", this.nextPayIntDate); // 下次應繳日
 		}
 
 		// 部分償還、結案
@@ -655,8 +660,7 @@ public class BaTxCom extends TradeBuffer {
 
 // STEP 9 : TempVo 共同設定值
 
-		// 是否回收費用
-		tempVo.putParam("PayFeeFlag", this.payFeeFlag);
+		tempVo.putParam("PayFeeFlag", this.payFeeFlag); // 是否回收費用
 
 		// 戶號狀況
 		if (this.facStatus > 0) {
@@ -1084,6 +1088,12 @@ public class BaTxCom extends TradeBuffer {
 			if (ln.getStatus() == 0) {
 				this.lLoanBorMain.add(ln);
 				this.loanBal = this.loanBal.add(ln.getLoanBal()); // 還款前本金餘額
+				if (this.nextPayIntDate == 0 || ln.getNextPayIntDate() < this.nextPayIntDate) {
+					this.nextPayIntDate = ln.getNextPayIntDate(); // 下次應繳日
+				}
+				if (this.prevPayIntDate == 0 || ln.getPrevPayIntDate() < this.prevPayIntDate) {
+					this.prevPayIntDate = ln.getPrevPayIntDate(); // 上次繳息日
+				}
 			}
 		}
 		// 戶況
@@ -1092,6 +1102,16 @@ public class BaTxCom extends TradeBuffer {
 			this.info("FacStatus =" + this.facStatus);
 			return;
 		}
+		// sort
+		if (iRepayType == 1 || iRepayType == 2) {
+			repayLoaSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
+		}
+
+	}
+
+	/* 還款主檔清單排序 */
+	private void repayLoaSort(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
+			throws LogicException {
 
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
 			@Override
@@ -1107,6 +1127,12 @@ public class BaTxCom extends TradeBuffer {
 					}
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
 						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
+					}
+					if (c1.getFacmNo() != c2.getFacmNo()) {
+						return c1.getFacmNo() - c2.getFacmNo();
+					}
+					if (c1.getBormNo() != c2.getBormNo()) {
+						return c1.getBormNo() - c2.getBormNo();
 					}
 				}
 				// 部分償還時排序,依利率順序由大到小
@@ -1140,12 +1166,12 @@ public class BaTxCom extends TradeBuffer {
 						// 一般情況
 						return c1UsageCode - c2UsageCode;
 					}
-				}
-				if (c1.getFacmNo() != c2.getFacmNo()) {
-					return c2.getFacmNo() - c1.getFacmNo();
-				}
-				if (c1.getBormNo() != c2.getBormNo()) {
-					return c2.getBormNo() - c1.getBormNo();
+					if (c1.getFacmNo() != c2.getFacmNo()) {
+						return c2.getFacmNo() - c1.getFacmNo();
+					}
+					if (c1.getBormNo() != c2.getBormNo()) {
+						return c1.getBormNo() - c2.getBormNo();
+					}
 				}
 				return 0;
 			}
@@ -1170,10 +1196,10 @@ public class BaTxCom extends TradeBuffer {
 		this.info("   Terms     = " + iTerms);
 		this.info("   extraRepay = " + this.extraRepay);
 		loanSetRepayIntCom.setTxBuffer(this.getTxBuffer());
+		loanCalcRepayIntCom.init(); // 2022-05-05 Wei新增
 		BigDecimal wkExtraRepayRemaind = this.extraRepay;
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 		int wkTerms = 0;
-		int nextIntDate = 0;
 
 		for (LoanBorMain ln : this.lLoanBorMain) {
 			if (ln.getStatus() != 0) {
@@ -1181,9 +1207,6 @@ public class BaTxCom extends TradeBuffer {
 			}
 			this.info("order2 = " + ln.getLoanBorMainId());
 			this.calcLoanBal = ln.getLoanBal(); // 還款前本金餘額
-			if (ln.getNextPayIntDate() < nextIntDate || nextIntDate == 0) {
-				nextIntDate = ln.getNextPayIntDate();
-			}
 			switch (iRepayType) {
 			case 1: // 01-期款
 				if (iTerms == 0) {
@@ -1360,12 +1383,10 @@ public class BaTxCom extends TradeBuffer {
 
 		}
 		// 逾期期數、逾期天數
-		if (nextIntDate > 0 && nextIntDate < iEntryDate)
-
-		{
+		if (nextPayIntDate > 0 && nextPayIntDate < iPayIntDate) {
 			dDateUtil.init();
-			dDateUtil.setDate_1(nextIntDate);
-			dDateUtil.setDate_2(iEntryDate);
+			dDateUtil.setDate_1(nextPayIntDate);
+			dDateUtil.setDate_2(iPayIntDate);
 			dDateUtil.dateDiff();
 			this.ovduTerms = dDateUtil.getMons();
 			this.ovduDays = dDateUtil.getDays();
@@ -1459,7 +1480,8 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom EmptyLoanBaTxVo ...");
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(2); // 2.本金利息
-		baTxVo.setIntStartDate(ln.getPrevPayIntDate()); // 繳息迄日
+		baTxVo.setIntStartDate(ln.getPrevPayIntDate()); // 上次繳息
+		baTxVo.setIntEndDate(ln.getNextPayIntDate()); // 下次繳息日
 		baTxVo.setRepayType(iRepayType); // 還款類別
 		baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
 		baTxVo.setCustNo(iCustNo); // 借款人戶號
@@ -1574,42 +1596,6 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-	}
-
-	// 取得額度應繳日金額，短繳限額
-	private BigDecimal settleUnpaidInt() {
-
-		BigDecimal wkShortRmd = BigDecimal.ZERO.subtract(this.xxBal);
-		// 回沖收回短繳
-		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 1 && ba.getRepayType() == 1) {
-				if (wkShortRmd.compareTo(ba.getInterest()) > 0) {
-					ba.setAcctAmt(ba.getInterest());
-					wkShortRmd = wkShortRmd.subtract(ba.getInterest());
-					this.xxBal = this.xxBal.add(ba.getInterest());
-				} else {
-					ba.setAcctAmt(ba.getInterest().subtract(wkShortRmd));
-					this.xxBal = this.xxBal.add(wkShortRmd);
-					wkShortRmd = BigDecimal.ZERO;
-				}
-			}
-		}
-		// 短繳
-		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 2) {
-				if (wkShortRmd.compareTo(ba.getInterest()) > 0) {
-					ba.setUnpaidInt(ba.getInterest());
-					wkShortRmd = wkShortRmd.subtract(ba.getInterest());
-				} else {
-					ba.setUnpaidInt(ba.getInterest().subtract(wkShortRmd));
-					wkShortRmd = BigDecimal.ZERO;
-				}
-			}
-		}
-
-		this.info("settleUnpaidInt end wkShortRmd=" + wkShortRmd + ", xxBal=" + xxBal);
-
-		return wkShortRmd;
 	}
 
 	/* 按額度應繳日回收，應繳日由小到大、計息順序(利率由大到小)、額度由小到大 */
@@ -2443,6 +2429,24 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public TempVo getTempVo() {
 		return tempVo;
+	}
+
+	/**
+	 * 上次繳息日
+	 * 
+	 * @return 上次繳息日
+	 */
+	public int getPrevPayIntDate() {
+		return prevPayIntDate;
+	}
+
+	/**
+	 * 下次繳息日
+	 * 
+	 * @return 下次繳息日
+	 */
+	public int getNextPayIntDate() {
+		return nextPayIntDate;
 	}
 
 }

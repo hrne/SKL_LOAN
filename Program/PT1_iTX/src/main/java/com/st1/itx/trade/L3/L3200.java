@@ -616,6 +616,12 @@ public class L3200 extends TradeBuffer {
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
 						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
+					if (c1.getFacmNo() != c2.getFacmNo()) {
+						return c1.getFacmNo() - c2.getFacmNo();
+					}
+					if (c1.getBormNo() != c2.getBormNo()) {
+						return c1.getBormNo() - c2.getBormNo();
+					}
 				}
 				// 部分償還金額 > 0時排序
 //					利率高至低>用途別>由額度編號大至小
@@ -648,12 +654,12 @@ public class L3200 extends TradeBuffer {
 						// 一般情況
 						return c1UsageCode - c2UsageCode;
 					}
-				}
-				if (c1.getFacmNo() != c2.getFacmNo()) {
-					return c2.getFacmNo() - c1.getFacmNo();
-				}
-				if (c1.getBormNo() != c2.getBormNo()) {
-					return c2.getBormNo() - c1.getBormNo();
+					if (c1.getFacmNo() != c2.getFacmNo()) {
+						return c2.getFacmNo() - c1.getFacmNo();
+					}
+					if (c1.getBormNo() != c2.getBormNo()) {
+						return c1.getBormNo() - c2.getBormNo();
+					}
 				}
 				return 0;
 			}

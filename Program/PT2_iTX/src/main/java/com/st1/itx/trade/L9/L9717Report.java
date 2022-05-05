@@ -491,7 +491,7 @@ public class L9717Report extends MakeReport {
 					}
 
 					break;
-					
+
 				default:
 					break;
 				}
