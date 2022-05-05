@@ -83,7 +83,7 @@ public class L9731Report extends MakeReport {
 								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
 								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
-						findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
+						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
 
 						exportSheet1(titaVo, findList);
 
@@ -110,9 +110,9 @@ public class L9731Report extends MakeReport {
 						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
 
 						exportSheet3(titaVo, findList, 1);
-						findList = l9731ServiceImpl.findSheet3_2(titaVo, yearMonth);
+//						findList = l9731ServiceImpl.findSheet3_2(titaVo, yearMonth);
 
-						exportSheet3(titaVo, findList, 2);
+//						exportSheet3(titaVo, findList, 2);
 
 						break;
 					// 放款餘額明細表
@@ -215,7 +215,7 @@ public class L9731Report extends MakeReport {
 	 * Sheet2 放款總歸戶明細表
 	 */
 	private void exportSheet2(TitaVo titaVo, List<Map<String, String>> listL9731) throws LogicException {
-		this.info("L9731Report exportSheet1");
+		this.info("L9731Report exportSheet2");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -254,7 +254,7 @@ public class L9731Report extends MakeReport {
 	 * Sheet3 放款額度明細表
 	 */
 	private void exportSheet3(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
-		this.info("L9731Report exportSheet2");
+		this.info("L9731Report exportSheet3");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -267,7 +267,8 @@ public class L9731Report extends MakeReport {
 				int row = 2;
 
 				for (Map<String, String> tLDVo : listL9731) {
-
+					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "L");
+					
 					for (int i = 0; i < tLDVo.size(); i++) {
 
 						String fieldValue = tLDVo.get("F" + i);
@@ -326,34 +327,34 @@ public class L9731Report extends MakeReport {
 				makeExcel.formulaCaculate(1, 6);
 				makeExcel.formulaCaculate(1, 13);
 
-				for (int i = 1; i <= listL9731.size(); i++) {
-					makeExcel.formulaCalculate(i + 1, 1);
-				}
+//				for (int i = 1; i <= listL9731.size(); i++) {
+//					makeExcel.formulaCalculate(i + 1, 1);
+//				}
 
 			}
-			if (form == 2) {
-
-				int row = 2;
-
-				for (Map<String, String> tLDVo : listL9731) {
-					// 戶號額度
-					String custfacm = tLDVo.get("F0") == null && !tLDVo.get("F0").isEmpty() ? " " : tLDVo.get("F0");
-					makeExcel.setValue(row, 20, custfacm, "R");
-					// 擔保品類別
-					String clType = tLDVo.get("F1") == null && !tLDVo.get("F1").isEmpty() ? " " : tLDVo.get("F1");
-					makeExcel.setValue(row, 21, clType, "R");
-					// 商品利率代碼
-					String prodNo = tLDVo.get("F2") == null && !tLDVo.get("F2").isEmpty() ? " " : tLDVo.get("F2");
-					makeExcel.setValue(row, 22, prodNo, "C");
-					// 初貸日期
-					String fDrawDownDate = tLDVo.get("F3") == null && !tLDVo.get("F3").isEmpty() ? " "
-							: tLDVo.get("F3");
-					makeExcel.setValue(row, 23, fDrawDownDate, "C");
-
-					row++;
-				}
-
-			}
+//			if (form == 2) {
+//
+//				int row = 2;
+//
+//				for (Map<String, String> tLDVo : listL9731) {
+//					// 戶號額度
+//					String custfacm = tLDVo.get("F0") == null && !tLDVo.get("F0").isEmpty() ? " " : tLDVo.get("F0");
+//					makeExcel.setValue(row, 20, custfacm, "R");
+//					// 擔保品類別
+//					String clType = tLDVo.get("F1") == null && !tLDVo.get("F1").isEmpty() ? " " : tLDVo.get("F1");
+//					makeExcel.setValue(row, 21, clType, "R");
+//					// 商品利率代碼
+//					String prodNo = tLDVo.get("F2") == null && !tLDVo.get("F2").isEmpty() ? " " : tLDVo.get("F2");
+//					makeExcel.setValue(row, 22, prodNo, "C");
+//					// 初貸日期
+//					String fDrawDownDate = tLDVo.get("F3") == null && !tLDVo.get("F3").isEmpty() ? " "
+//							: tLDVo.get("F3");
+//					makeExcel.setValue(row, 23, fDrawDownDate, "C");
+//
+//					row++;
+//				}
+//
+//			}
 
 		}
 
@@ -363,7 +364,7 @@ public class L9731Report extends MakeReport {
 	 * exportSheet4  放款餘額明細表
 	 */
 	private void exportSheet4(TitaVo titaVo, List<Map<String, String>> listL9731, int form) throws LogicException {
-		this.info("L9731Report exportSheet14");
+		this.info("L9731Report exportSheet4");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -374,7 +375,7 @@ public class L9731Report extends MakeReport {
 			int row = 2;
 
 			for (Map<String, String> tLDVo : listL9731) {
-
+				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "L");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -437,9 +438,9 @@ public class L9731Report extends MakeReport {
 			} // for
 
 			// 放款餘額總計的 excel formula
-			for (int i = 1; i <= listL9731.size(); i++) {
-				makeExcel.formulaCalculate(i + 1, 1);
-			}
+//			for (int i = 1; i <= listL9731.size(); i++) {
+//				makeExcel.formulaCalculate(i + 1, 1);
+//			}
 			makeExcel.formulaCaculate(1, 18);
 		}
 

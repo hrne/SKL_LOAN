@@ -171,7 +171,8 @@ public class L4031 extends TradeBuffer {
 //                  0.全部                                2(無利率欄)
 // 1.定期機動調整
 // 3.機動利率調整                                                                                           
-//                  1.批次自動調整                        5(目前&調後)   
+//              	1.批次自動調整                       			  5(目前&調後)   
+//              	4.批次自動調整(調整件)           			  5(目前&調後)   
 //                  2.按地區別調整                                                   
 //                                      0.未調整 9:待處理 7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
 //                                      1.已調整               6(有地區別，可選擇<取消調整>)         
@@ -206,6 +207,10 @@ public class L4031 extends TradeBuffer {
 				case 3:
 					lableBX = "人工調整";
 					break;
+				case 4:
+					lableBX = "批次自動調整（提醒件）";
+					rptFg = 5;
+					break;
 				}
 				if (adjCode == 2 || adjCode == 3) {
 					switch (keyinCode) {
@@ -221,7 +226,7 @@ public class L4031 extends TradeBuffer {
 						break;
 					}
 					if (keyinCode == 0 || keyinCode == 9) {
-						if ((txKind == 1 && adjCode == 2) || txKind == 3)  {
+						if ((txKind == 1 && adjCode == 2) || txKind == 3) {
 							rptFg = 7;
 						} else {
 							rptFg = 3;

@@ -175,7 +175,7 @@ public class L4101ReportA extends MakeReport {
 			// 明細資料第一行
 //			print(1, 1, "　　");
 			print(0, 1, this.showRocDate(acDate, 1)); // 日期
-			print(0, 11, tempL4101Vo + " " + tCdAcCode.getAcNoItem()); // 科子細目+科子細目名稱
+			print(0, 11, acNoCode + " " + tCdAcCode.getAcNoItem()); // 科子細目+科子細目名稱
 
 			print(0, 105, formatAmt(dbAmt.get(tempL4101Vo), 0), "R"); // 借方金額
 			print(0, 125, formatAmt(crAmt.get(tempL4101Vo), 0), "R");// 貸方金額
@@ -207,14 +207,15 @@ public class L4101ReportA extends MakeReport {
 		cnt = 0;
 		int oldCustNo = 0;
 		int oldFacmNo = 0;
+		String wkRelTxSeq = "";
 		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
 
-				if (tAcDetail.getCustNo() != oldCustNo || tAcDetail.getFacmNo() != oldFacmNo) {
-					oldCustNo = tAcDetail.getCustNo();
-					oldFacmNo = tAcDetail.getFacmNo();
+				if (!wkRelTxSeq.equals(tAcDetail.getRelTxseq())) {
+					wkRelTxSeq = tAcDetail.getRelTxseq();
 					cnt++;
 				}
+
 				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11)
 						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
 				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2)
@@ -255,10 +256,30 @@ public class L4101ReportA extends MakeReport {
 
 			if (tempList != null && tempList.size() != 0) {
 //				sort by acNoCode, acSubCode, acDtlCode
+//				tempList.sort((c1, c2) -> {
+//					int result = 0;
+//					this.info("c1 = " + c1);
+//					this.info("c2 = " + c2);
+//					if (c1.substring(0, 16).compareTo(c2.substring(0, 16)) != 0) {
+//						result = c1.substring(0, 16).compareTo(c2.substring(0, 16));
+//					}
+//					return result;
+//				});
+
 				tempList.sort((c1, c2) -> {
 					int result = 0;
-					if (c1.substring(0, 16).compareTo(c2.substring(0, 16)) != 0) {
-						result = c1.substring(0, 16).compareTo(c2.substring(0, 16));
+//					if ((dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1))
+//							.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)) != 0) {
+//						result = (dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1))
+//								.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2));
+//						this.info("test" + (dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1))
+//								.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)));
+//					}
+//					借方金額在前排序
+					if ((dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2))
+							.compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1)) != 0) {
+						result = (dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2))
+								.compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1));
 					}
 					return result;
 				});

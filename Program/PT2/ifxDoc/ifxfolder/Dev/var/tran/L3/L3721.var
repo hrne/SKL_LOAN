@@ -1,0 +1,941 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,2)
+
+#ACTFG=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+
+#InitValue=@,1,S
+T(3,@FdApplNo, )
+T(3,@FdFacmNo,*)
+T(3,@FdBormNo,*)
+T(3,@FdRateCode2,*)
+T(3,@FdEffectDate2,*)
+T(3,@FdProdNo2,*)
+T(3,@FdBaseRateCode2,*)
+T(3,@FdFitRate2,*)
+T(F,@BormNo,1)
+E(0,@FacmNo,0)
+E(0,@BormNo,0)
+
+#WkPercent=X,1,S
+T(3,%)
+
+#WkCaseNo=A,7,S
+
+#WkFacmNo=A,3,S
+
+#ActFgHelp=x,20,S
+T(3,1:登錄;2:放行)
+
+#WkButton=X,1,S
+K(MODIFYBUTTON,登錄)
+C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[150,200,150,200];printer.width=[20,80];order=1">
+[
+["[L3721]                                 借戶利率變更"],
+[#<->#,"#FdActFg+登放記號",#ACTFGX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@",#BTN1,#CustNoX],
+[#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
+[#<->#,"#FdApplNo+核准編號",#ApplNo,"@@",#BTN3,#ApplNoX],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
+! ["#FdBormNo+撥款序號",#BormNo],
+[#<->#,"#FdNextRateAdjDate1+下次利率調整日",#NextRateAdjDate1],
+["#FdEffectDate1+生效日期",#EffectDate1],
+["#FdRateCode1+利率區分",#RateCode1X],
+! ["#FdAmortizedCode+攤還方式",#AmortizedCode1X],
+["#FdProdNo1+商品代碼",#ProdNo1,#ProdNo1X],
+["#FdBaseRateCode1+指標利率代碼",#BaseRateCode1,#BaseRateCode1X],
+["#FdBaseRate1+指標利率",#BaseRate1X],
+["#FdFitRate1+適用利率",#FitRate1X],
+! ["#FdProdRate1+商品利率",#ProdRate1X],
+["#FdRateIncr1+加碼利率",#RateIncr1X],
+["#FdIndividualIncr1+個別加碼利率",#IndividualIncr1X],
+[#<->#,"是否刪除",#DeleteFg,#DeleteFgX],
+[#<->#,"<font color=red>@@@調後","@"],
+["#FdEffectDate2+生效日期",#EffectDate2],
+["#FdRateCode2+利率區分",#RateCode2,#RateCode2X],
+["#FdProdNo2+商品代碼",#ProdNo2,#ProdNo2X],
+["#FdBaseRateCode2+指標利率代碼",#BaseRateCode2,#BaseRateCode2X], 
+["#FdBaseRate2+指標利率",#BaseRate2X],
+["#FdFitRate2+適用利率",#FitRate2,"@%"],
+! ["#FdProdRate2+商品利率",#ProdRate2X],
+["#FdRateIncr2+加碼利率",#RateIncr2,"@%"], 
+! ["#FdIndividualIncr2+個別加碼利率",#IndividualIncr2X],
+[#<->#,"#FdRemark+備註",#Remark],
+[#<->#,"#FdNextRateAdjDate2+下次利率調整日",#NextRateAdjDate2],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+#BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
+#BTN4=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
+! #BTN6=X,15,I,ui:button;value:商品參數查詢;enable:1;tabbable:0;title: L2001 商品參數明細資料查詢
+
+#BUF1=X,42,S
+HIDE(#BTN1,#BTN2,#BTN3)
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!RateCode 利率區分
+#CDDEF01=x,20,S
+T(3,CdCode.FacmRateCode)
+
+#RateCodeHelp=x,1024,S
+
+!BaseRateCode 指標利率代碼
+#CDDEF02=x,20,S
+T(3,CdCode.BaseRate0)
+
+#BaseRateCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@RateCodeHelp,#HelpDesc1)
+T(2,@BaseRateCodeHelp,#HelpDesc2) 
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+![登放記號]
+#FdActFg=X,2,L
+
+#ACTFG=_,_,S
+
+#ACTFGX=X,8,L
+T(3,)T(H,#ACTFG,#ActFgHelp)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3932借戶利率查詢]進入),$),$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#init=X,1,S
+T(F,#CustNo,0)
+T(F,#FacmNo,0)
+HIDE(#BTN4)
+INVOKEJS(SHOW,p1,12,16,0)
+
+#rimtxtype=X,2,S
+
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@rimtxtype,#NTXBUF,1,2)
+T(1,@CustNo,#NTXBUF,6,7)
+C(3,#CustNo,0,E(0,@CHAIN,0),$)
+C(3,#CHAIN,1,$,s)
+T(1,@CustId,#NTXBUF,13,10)
+T(1,@ApplNo,#NTXBUF,23,7)
+T(1,@FacmNo,#NTXBUF,30,3)
+C(3,#FacmNo,0,E(0,@CHAIN,0),$)
+C(3,#CHAIN,1,$,s)
+C(5,#rimtxtype,L4,s,$)
+T(1,@BormNo,#NTXBUF,33,3)
+T(1,@EffectDate1,#NTXBUF,43,7)
+T(1,@CheckChangFg,#NTXBUF,82,1)
+
+#chainbaserate2=X,2,S
+#chainbaserate4=X,4,S
+#chainbaserate6=X,7,S
+#chainFitRate2=X,2,S
+#chainFitRate4=X,4,S
+#chainFitRate6=X,7,S
+#chainRateIncr2=X,2,S
+#chainRateIncr4=X,4,S
+#chainRateIncr6=X,7,S
+#chainIndividualIncr2=X,2,S
+#chainIndividualIncr4=X,4,S
+#chainIndividualIncr6=X,7,S
+
+#CheckChangFg=X,1,S
+
+#CHAINTXCD=_,_,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
+
+#BUF1A=X,18,S
+T(3,00000009999999000)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
+
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=A,7,I
+C(3,#FKEY,0,$,s)
+C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
+C(3,#CHAIN,1,s,$)
+INVOKEJS(SHOW,p1,2,4,1)
+SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+! CALL(#InitValue)
+
+#WKBTN1=X,1,S
+C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+
+#BUF2A=X,18,S
+T(2,#CustNo+9999999000)
+
+#BIND2A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
+
+#SendL2r07A=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustNoX=X,100,L
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+C(3,#FKEY,0,$,s)
+C(3,#CHAIN,1,S,$)
+C(3,#CustNo,0,$,S)
+INVOKEJS(SHOW,p1,3,4,1)
+SHOW(#BTN2)HIDE(#BTN1,#BTN3)
+CALL(#InitValue)
+@C(4,#CustId,S,$)
+V(7)A(ID_UNINO,0,#CustId)
+
+#WKBTN2=X,1,S
+C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
+C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
+
+#SendL2r07B=X,1,S
+C(3,#FKEY,0,$,s)
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustIdX=X,100,L
+C(3,#FKEY,0,$,s)
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+#BUF3A=X,18,S
+T(3,000000099999990)
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
+
+![核准編號]
+#FdApplNo=X,2,L
+
+#ApplNo=A,7,I
+C(3,#FKEY,0,$,s)
+C(3,#CHAIN,1,s,$)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+INVOKEJS(SHOW,p1,4,4,1)
+SHOW(#BTN3)
+CALL(#InitValue)
+T(3,@FdApplNo,*)
+@V(2,0)
+
+#WKBTN3=X,1,S
+C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+
+#BUF3B=X,18,S
+T(2,#ApplNo+99999990)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo:ApplNoX<-OOCustName})
+
+#HIDEALLBTN=X,1,S
+C(3,#CHAIN,1,$,S)
+HIDE(#BTN1,#BTN2,#BTN3)
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05A=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+E(0,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07C=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+
+#TimCustNo=A,7,S
+C(3,#FKEY,0,$,s)
+E(0,0)
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+T(2,@LockCustNo,#TimCustNo)
+<include src="COM.icf::LockControl.rtn"/>
+
+#BUF4A=X,35,S
+T(2,#WkCaseNo+#CustNo+#CustId+#ApplNo+#WkFacmNo)
+
+#BIND4A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:BormNo<-OOBormNo})
+
+![額度編號]
+!必須輸入
+#FdFacmNo=X,2,L
+
+#FacmNo=A,3,I
+C(3,#FKEY,0,$,s)
+C(3,#CHAIN,1,s,$)
+C(3,#ApplNo,0,$,s)
+@V(2,0)
+
+!用戶號,額度號碼調L2R05
+#SendL2r05B=X,1,S
+C(3,#FKEY,0,$,s)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimApplNo,0)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+![撥款序號]
+!可不輸入
+#FdBormNo=X,2,L
+C(3,#FKEY,0,$,s)
+C(3,#L2r05BormCount,1,T(3, )T(F,@BormNo,0),T(3,*)T(F,@BormNo,1))
+
+#BormNo=A,3,S
+C(3,#FKEY,0,$,s)
+C(3,#CHAIN,1,C(5,#rimtxtype,L4,$,s),$)
+IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
+IF(#L2r05BormCount>=1,s,$)
+
+!查尋放款主檔
+#SendL3r02=X,1,S
+C(3,#BormNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+RESET_RIM(#SendL3r02,L3R02)
+S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L3R02)
+
+#MRKEY=_,_,S
+T(2,#TimCustNo+-+#FacmNo)
+
+!下次利率調整日
+#FdNextRateAdjDate1=X,2,L
+
+#NextRateAdjDate1=D,7,L
+C(3,#FKEY,0,$,s)
+C(3,#L3r02NextRateAdjDate,0,S,$)
+E(0,#L3r02NextRateAdjDate)
+
+#NNextRateAdjDate=D,8,S
+C(3,#L3r02NextRateAdjDate,0,S,$)
+D(7,2,#L3r02NextRateAdjDate,#L3r02RateAdjFreq,0)
+E(0,@NextRateAdjDate2,#NNextRateAdjDate)
+
+
+![利率區分]
+!自動顯示不必輸入 1:機動 2:固動 3:定期機動
+#FdRateCode1=X,2,L
+
+#RateCode1=A,1,S
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+E(0,#L3r02RateCode)
+
+#RateCode1X=X,10,L
+T(3,)T(H,#RateCode1,#RateCodeHelp)  
+
+![攤還方式]
+!自動顯示不必輸入 1.按月繳息 2.到期取息 3.本息平均法 4.本金平均法
+! #FdAmortizedCode=X,2,L
+
+! #AmortizedCode1=A,1,S
+! C(3,#FKEY,0,$,s)
+! E(0,#L3r02AmortizedCode)
+
+! #AmortizedCode1X=X,12,L
+! C(3,#AmortizedCode1,0,S,$)
+! T(A,#AmortizedCode1,L2DEF,FacmAmortizedCodeDef,FacmAmortizedCode,FacmAmortizedCodeX)            
+#RimChangFg=X,1,S
+!查詢下次利率調整日期的放款利率變動檔
+#SendL3r09=X,1,S
+C(3,#FKEY,0,$,s)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+T(2,@RimChangFg,#CheckChangFg)
+C(3,#CHAIN,1,C(3,#EffectDate1,0,C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate)),E(0,@RimEffectDate,#EffectDate1)),C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate)))
+! C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate))
+RESET_RIM(#SendL3r09,L3R09)
+S(L3R09,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEffectDate,#RimChangFg)
+R(1,L3R09)
+
+![生效日期]
+!自動顯示不必輸入
+#FdEffectDate1=X,2,L
+
+#EffectDate1=D,7,L
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+E(0,#L3r09EffectDate)
+
+![商品代碼]
+!自動顯示不必輸入
+#FdProdNo1=X,2,L
+
+#ProdNo1=X,5,L
+C(3,#FKEY,0,$,s)
+T(2,#L3r09ProdNo)
+C(3,#CHAIN,1,C(5,#rimtxtype,L4,$,s),$)
+
+!尋找商品參數檔資料
+#SendL2r01A=X,1,S
+T(2,@RimProdNo,#ProdNo1)
+E(0,@RimFuncCode,5)
+RESET_RIM(#SendL2r01A,L2R01)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+
+#ProdNo1X=X,60,L
+C(3,#FKEY,0,$,s)
+T(2,#L2r01ProdName)
+
+![指標利率代碼]
+!自動顯示不必輸入
+#FdBaseRateCode1=X,2,L
+
+#BaseRateCode1=A,2,L
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+T(2,#L3r09BaseRateCode)
+
+#BaseRateCode1X=X,30,L
+C(3,#FKEY,0,$,s)
+C(3,#BaseRateCode1,0,S,$)
+T(3,)T(H,#BaseRateCode1,#BaseRateCodeHelp)            
+! T(2,@BaseRateCode2X,#BaseRateCode1X)
+
+![指標利率]
+!自動顯示不必輸入
+#FdBaseRate1=X,2,L
+
+#BaseRate1=n,2.4,S
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+E(0,#L3r09BaseRate)
+
+#WkRate11=X,7,S
+C(3,#FKEY,0,$,s)
+X(@WkRate11,#BaseRate1)
+P(R,#WkRate11)
+
+#BaseRate1X=X,8,L
+C(3,#FKEY,0,$,s)
+T(2,@BaseRate1X,#WkRate11+#WkPercent)
+P(L,#BaseRate1X)
+
+
+
+![商品利率]
+!自動顯示不必輸入
+#FdProdRate1=X,2,L
+
+#ProdRate1=n,2.4,L 
+C(3,#FKEY,0,$,s) 
+E(0,#L3r09ProdRate)  
+
+#WkRate12=X,7,S
+X(#ProdRate1)
+P(R,#WkRate12)
+
+#ProdRate1X=X,8,L
+C(3,#FKEY,0,$,s)
+T(2,#WkRate12+#WkPercent)
+P(L,#ProdRate1X)
+
+!加減碼是否依合約
+#IncrFlag1=X,1,S
+C(3,#FKEY,0,$,s)
+T(2,#L3r09IncrFlag)
+T(2,@IncrFlag2,#IncrFlag1)
+
+![利率加減碼]
+!自動顯示不必輸入
+#FdRateIncr1=X,2,L
+
+#RateIncr1=n,2.4,L
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+E(0,#L3r09RateIncr)
+
+#WkRate13=X,7,S
+X(#RateIncr1)
+P(R,#WkRate13)
+
+#RateIncr1X=X,8,L
+C(3,#FKEY,0,$,s)
+T(2,#WkRate13+#WkPercent) 
+P(L,#RateIncr1X)
+
+![個別加減碼]
+!自動顯示不必輸入
+#FdIndividualIncr1=X,2,L
+
+#IndividualIncr1=n,2.4,L
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+E(0,#L3r09IndividualIncr)
+
+#WkRate14=X,7,S
+X(#IndividualIncr1)
+P(R,#WkRate14)
+
+#IndividualIncr1X=X,8,L
+C(3,#FKEY,0,$,s)
+T(2,#WkRate14+#WkPercent) 
+P(L,#IndividualIncr1X)
+
+![適用利率]
+!自動顯示不必輸入
+#FdFitRate1=X,2,L
+
+#FitRate1=n,2.4,L
+C(3,#FKEY,0,$,s)
+! C(3,#CHAIN,1,s,$)
+E(0,#L3r09FitRate)
+E(0,@FitRate2,#FitRate1)
+
+#WkRate15=X,7,S
+X(#FitRate1)
+P(R,#WkRate15)
+
+#FitRate1X=X,8,L
+C(3,#FKEY,0,$,s)
+T(2,#WkRate15+#WkPercent) 
+P(L,#FitRate1X)
+
+!--------------------- 調後
+!是否刪除
+#DeleteFg=X,1,I
+C(3,#FKEY,0,$,s)
+IF(#CheckChangFg=="N"||#CheckChangFg=="",T(3,N),$)
+IF(#CheckChangFg=="N"||#CheckChangFg=="",s,$)
+! C(5,#CheckChangFg,N,T(3,N),$)
+! C(5,#CheckChangFg,N,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+
+#DeleteFgX=X,4,L
+C(5,#DeleteFg,N,INVOKEJS(SHOW,p1,12,16,1),INVOKEJS(SHOW,p1,12,16,0))
+C(4,#DeleteFg,S,$)
+T(3,)T(H,#DeleteFg,#YNHelp)
+C(5,#DeleteFg,Y,E(0,@EffectDate2,#EffectDate1),E(0,@EffectDate2,0))
+C(5,#DeleteFg,Y,T(3,@Remark,刪除),T(3,@Remark,))
+C(5,#CheckChangFg,Y,E(0,@EffectDate2,#EffectDate1),$)
+
+#checkdel=X,1,S
+T(F,#EffectDate2,1)
+T(F,#RateCode2,1)
+T(F,#ProdNo2,1)
+T(F,#BaseRateCode2,1)
+T(F,#FitRate2,1)
+T(F,#RateIncr2,1)
+T(F,#NextRateAdjDate2,1)
+C(5,#DeleteFg,Y,$,S)
+T(2,@RateCode2,#RateCode1)
+T(2,@ProdNo2,#ProdNo1)
+T(2,@BaseRateCode2,#BaseRateCode1)
+E(0,@FitRate2,#FitRate1)
+E(0,@RateIncr2,#RateIncr1)
+E(0,@BaseRate2,#BaseRate1)
+E(0,@ProdRate2,#ProdRate1)
+T(F,#EffectDate2,0)
+T(F,#RateCode2,0)
+T(F,#ProdNo2,0)
+T(F,#BaseRateCode2,0)
+T(F,#FitRate2,0)
+T(F,#RateIncr2,0)
+T(F,#NextRateAdjDate2,0)
+
+![生效日期]
+!必須輸入
+!不預設本營業日,須 >= 上次繳息日 AND < 到期日
+#FdEffectDate2=X,2,L
+
+#EffectDate2=D,7,I
+C(5,#CheckChangFg,Y,s,$)
+C(5,#DeleteFg,Y,s,$)
+@
+C(4,#EffectDate2,V(P,生效日必須輸入),$)
+A(DATE,0,#EffectDate2)
+! V(6,010101,#EffectDate1)
+IF(#EffectDate2<=#EffectDate1,V(P,需大於生效日),$)
+V(5,#L3r02PrevPayIntDate,#L3r02MaturityDate)
+
+
+
+#effFg=X,1,S
+T(3,N)
+
+#sdate=D,7,S
+E(0,#SYSDATE)
+
+#dateyymm=A,6,S
+T(1,#sdate,1,5)
+
+#effdateyymm=A,6,S
+T(1,#EffectDate2,1,5)
+
+#checkdate=+n,6,S
+E(0,#effdateyymm-#dateyymm)
+
+
+#checkeffectdate=X,1,S
+IF(#checkdate>0,T(3,@effFg,Y),T(3,@effFg,N))
+
+
+
+!#FdAdjust=X,2,L
+#GetValue=X,1,S
+C(3,#FKEY,0,$,s)
+C(5,#DeleteFg,Y,s,$)
+E(0,@RateCode2,#RateCode1)
+T(2,@ProdNo2,#L3r09FacProdNo)
+! T(2,@ProdNo2X,#L3r09ProdName)
+T(2,@BaseRateCode2,#L3r09FacBaseRateCode)
+T(H,@BaseRateCode2X,#BaseRateCode2,#BaseRateCodeHelp)
+! E(0,@EffectDate2,#L3r02NextRateAdjDate)
+
+!尋找商品參數檔資料
+#SendL2r01B=X,1,S
+T(2,@RimProdNo,#ProdNo2)
+E(0,@RimFuncCode,5)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+T(2,@ProdNo2X,#L2r01ProdName)
+
+![利率區分]
+!自動顯示不必輸入 1:機動 2:固動 3:定期機動
+#FdRateCode2=X,2,L
+
+#RateCode2=A,1,I
+C(5,#DeleteFg,Y,s,$)
+HELP(#RateCodeHelp)
+@V(H,#RateCodeHelp)
+
+#RateCode2X=X,10,L
+T(3,)T(H,#RateCode2,#RateCodeHelp)
+C(3,#RateCode2,1,C(3,#BaseRateCode2,99,INVOKEJS(SHOW,p1,18,18,1),INVOKEJS(SHOW,p1,18,18,0)),INVOKEJS(SHOW,p1,18,18,1))
+C(3,#RateCode2,2,INVOKEJS(SHOW,p1,18,18,0),$)
+
+
+#BUF6A=X,6,S
+T(2,#ProdNo2+0)
+
+! #BIND6A=X,1,S
+! BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF6A;ntxbuf5=type<-1:ProdNo2<-OOProdNo})
+
+![商品代碼]
+!必須輸入
+#FdProdNo2=X,2,L
+
+#ProdNo2=X,5,L
+C(5,#DeleteFg,Y,s,$)
+! SHOW(#BTN6)
+! @V(7)
+
+! #BUF6B=X,6,S
+! T(2,#ProdNo2+0)
+
+! #BIND6B=X,1,S
+! BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF6B;ntxbuf5=type<-1:ProdNo2<-OOProdNo})
+
+!尋找商品參數檔資料
+#SendL2r01C=X,1,S
+T(2,@RimProdNo,#ProdNo2)
+E(0,@RimFuncCode,5)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+#ProdNo2X=X,60,L
+T(2,#L2r01ProdName)
+
+![指標利率代碼]
+!必須輸入
+#FdBaseRateCode2=X,2,L
+
+#BaseRateCode2=A,2,L
+C(5,#DeleteFg,Y,s,$)
+! HELP(#BaseRateCodeHelp)
+! E(0,#BaseRateCode1)
+! @V(H,#BaseRateCodeHelp)
+
+#BaseRateCode2X=X,30,L
+C(3,#BaseRateCode2,0,S,$)
+T(3,)T(H,#BaseRateCode2,#BaseRateCodeHelp)
+
+!尋找指標利率檔資料
+#SendL2r06=X,1,S
+C(5,#DeleteFg,Y,s,$)
+T(2,@RimCurrencyCode,#L3r02CurrencyCode)
+T(2,@RimBaseRateCode,#BaseRateCode2)
+E(0,@RimEffectDate,#EffectDate2)
+E(0,@RimEffectTime,0)
+RESET_RIM(#SendL2r06,L2R06)
+S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
+R(1,L2R06)
+
+![指標利率]
+!自動顯示不必輸入
+#FdBaseRate2=X,2,L
+
+#BaseRate2=n,2.4,S
+C(5,#DeleteFg,Y,s,$)
+E(0,#L2r06Rate)
+
+#WkRate21=X,7,S
+X(#BaseRate2)
+P(R,#WkRate21)
+
+#BaseRate2X=X,8,L
+T(2,#WkRate21+#WkPercent) 
+P(L,#BaseRate2X)
+
+![商品利率]
+!自動顯示不必輸入
+#FdProdRate2=X,2,L
+
+#ProdRate2=n,2.4,L
+C(5,#DeleteFg,Y,s,$)
+E(0,#L2r06Rate+#L2r01ProdIncr)
+
+#WkRate22=X,7,S
+X(#ProdRate2)
+P(R,#WkRate22)
+
+#ProdRate2X=X,8,L
+T(2,#WkRate22+#WkPercent) 
+P(L,#ProdRate2X)
+
+!加減碼是否依合約
+#IncrFlag2=X,1,S
+T(2,#L2r01IncrFlag)
+
+![適用利率]
+!自動顯示不必輸入
+#FdFitRate2=X,2,L
+
+#FitRate2=n,2.4,I
+C(5,#DeleteFg,Y,s,$)
+C(5,#effFg,Y,IF(#BaseRateCode2<99,S,$),$)
+
+![加碼利率]
+!當加減碼別=1時必須輸入否則不必輸入
+#FdRateIncr2=X,2,L
+
+#RateIncr2=n,2.4,I
+C(5,#DeleteFg,Y,s,$)
+! C(5,#IncrFlag2,Y,$,S)
+C(5,#effFg,Y,IF(#BaseRateCode2<99,$,S),S)
+! E(0,#FitRate2-#BaseRate2)
+
+! #WkRate24=X,7,S
+! X(#RateIncr2)
+! P(R,#WkRate24)
+
+! #RateIncr2X=X,8,L
+! T(2,#WkRate24+#WkPercent)
+! P(L,#RateIncr2X) 
+
+![個別加碼利率]
+! #FdIndividualIncr2=X,2,L
+
+! #IndividualIncr2=n,2.4,L
+! C(5,#IncrFlag2,Y,S,$)
+! E(0,#FitRate2-#BaseRate2)
+
+! #WkRate25=X,7,S
+! X(#IndividualIncr2)
+! P(R,#WkRate25)
+
+! #IndividualIncr2X=X,8,L
+! T(2,#WkRate25+#WkPercent)
+! P(L,#IndividualIncr2X) 
+
+![備註]
+#FdRemark=X,2,L
+
+#Remark=x,60,I
+
+![下次利率調整日期]
+#FdNextRateAdjDate2=X,2,L
+
+#NextRateAdjDate2=D,7,I
+C(5,#DeleteFg,Y,s,$)
+C(4,#EffectDate2,S,$)
+C(3,#RateCode2,1,C(3,#BaseRateCode2,99,$,S),$)
+C(3,#RateCode2,2,S,$)
+@A(DATE,0,#NextRateAdjDate2)
+IF(#NextRateAdjDate2<=#EffectDate2,V(P,下次利率調整日不可小於等於生效日期),$)
+
+
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R06.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L3R02.dec"/>
+<include src="ROM.icf::L3R09.dec"/>
+
+</sub>
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3721 ----------
+<sub type="FORM" name="L3721">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L3721,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3721] 借戶利率變更)
+
+
+! #Entdy=X,8,S
+! T(2,#ENTDY)
+
+! #TxNo=X,18,S
+! T(2,#KINBR+#TLRNO+#TXTNO)
+
+! #RimData=x,100,S
+! T(6A,#Entdy+#TxNo)
+
+! #button=x,100,S
+! T(2,{ cmd=SendOut;once=1; ntxcd=L3721; txno=#RimData;rim=LCR05;auto=true})ASGN(BTN_NEW1$)
+! C(3,#FKEY,0,$,s)
+! K(MODIFYBUTTON,1,提交)
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+
+#TimCustNo#FacmNo#RateCode2#EffectDate2
+#ProdNo2#ProdNo2X#ProdRate2
+#BaseRateCode2#BaseRate2#IncrFlag2#FitRate2#RateIncr2
+#Remark#NextRateAdjDate2
+#CustNo#CustId#ApplNo
+#ProdNo1
+#BaseRateCode1
+#BaseRate1
+#RateIncr1
+#IncrFlag1
+#DeleteFg
+#CheckChangFg
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L3721^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R06.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L3R02.tom"/>
+<include src="ROM.icf::L3R09.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+</sub>

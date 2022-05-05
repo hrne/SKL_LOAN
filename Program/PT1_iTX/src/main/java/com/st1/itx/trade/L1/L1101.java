@@ -34,6 +34,7 @@ import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankRelationCom;
+import com.st1.itx.util.common.CustCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.data.BankRelationVo;
@@ -67,6 +68,8 @@ public class L1101 extends TradeBuffer {
 	public CdEmpService cdEmpService;
 	@Autowired
 	public CustNoticeCom custNoticeCom;
+	@Autowired
+	public CustCom custCom;
 	@Autowired
 	public BankRelationCom bankRelationCom;
 	@Autowired
@@ -208,7 +211,7 @@ public class L1101 extends TradeBuffer {
 			}
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
-			iDataLog.exec();
+			iDataLog.exec("修改顧客資料", "CustUKey:" + tCustMain.getCustUKey());
 
 			// by eric 2021.7.31
 			setCustCross(titaVo, tCustMain);
@@ -441,7 +444,11 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setCustName(titaVo.getParam("CustName"));
 		tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("Birthday")));
 		tCustMain.setSex(titaVo.getParam("Sex"));
-		tCustMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
+		String custTypeCode = titaVo.getParam("CustTypeCode");
+		if (isEloan) {
+			custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
+		}
+		tCustMain.setCustTypeCode(custTypeCode);
 		tCustMain.setIndustryCode(titaVo.getParam("IndustryCode"));
 		tCustMain.setNationalityCode(titaVo.getParam("NationalityCode"));
 		tCustMain.setBussNationalityCode(titaVo.getParam("BussNationalityCode"));

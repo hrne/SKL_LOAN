@@ -256,10 +256,12 @@ public class L4101Batch extends TradeBuffer {
 //			5.傳票明細表
 		doRptC(titaVo);
 
-//		6.撥款未齊件表
-		doRptD(titaVo);
-//		7.貸款自動轉帳申請書明細表
-		doRptE(titaVo);
+		if (iItemCode == 1) {
+//			6.撥款未齊件表
+			doRptD(titaVo);
+//			7.貸款自動轉帳申請書明細表
+			doRptE(titaVo);
+		}
 
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 

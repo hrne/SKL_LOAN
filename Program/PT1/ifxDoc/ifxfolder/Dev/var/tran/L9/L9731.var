@@ -44,7 +44,7 @@ E(0,0)
 ["[L9731]                                 人工檢核工作表"],
 ["@@@@@年月份",#InputYear,"@/@",#InputMonth],
 ["#grid#,{id:1,expand:false,loop:4,row_height:1,s_cols:[150,50], p_cols:[8,8]}","","",
-[],[#BtnShell1,#TradeName1,#TradeCode1],
+[],[#TradeName1,#BtnShell1,#TradeCode1],
 ],
 ]
 
@@ -82,12 +82,14 @@ T(1,#TradeDic{i},3,9)
 HIDE(#TradeCode{i})
 
 ! TradeName: all bytes after 8th in TradeDic. The Chinese Name of a trade.
-#TradeName{i}=X,37,L
+#TradeName{i}=X,17,L
 T(1,#TradeDic{i},13,48)
 
 ##end
 
-
+! Clearing the SELECT ALL button, for unselecting a single trade
+! 修改這裡的 loop times
+#FuncClearSelectAll=@,1,S
 
 
 ##loop{times:4,i:1}
@@ -114,6 +116,9 @@ BIND(#BtnShell{i},click,{cmd=CALLSEND;DOCODE=Btn{i}FSMP})
 ! 0, 1, empty
 #Btn{i}FSMP=@,1,S
 C(5,#BtnShell{i},V,T(3,@BtnShell{i},　)T(1,@tmpTargetCat,#TradeCat{i},1,1)CALL(#FuncClearSelectAll),T(3,@BtnShell{i},V))
+
+
+
 
 !---------- TRADE ENDS ----------
 
@@ -158,11 +163,11 @@ INVOKEJS(SHOW,#tmpGrdId,0)
 
 
 #InputYear=N,3,I
-T(1,@InputYear,#SYSDATE,1,3)
+T(1,@InputYear,#SYSDATE,0,3)
 @V(5,0,999)
 
 #InputMonth=A,2,I
-T(1,@InputMonth,#SYSDATE,4,2)
+T(1,@InputMonth,#SYSDATE,3,2)
 @V(5,1,12)
 
 #tmpTargetCat=X,1,S

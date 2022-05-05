@@ -157,7 +157,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportDebt2, finReportDebt);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -321,7 +321,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportReview2, finReportReview);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.覆審比率表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.覆審比率表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -376,7 +376,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportQuality2, finReportQuality);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.財報品質", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.財報品質", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -448,7 +448,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportRate2, finReportRate);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.財務比率表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.財務比率表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -504,7 +504,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportCashFlow2, finReportCashFlow);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.現金流量表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.現金流量表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -568,7 +568,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportProfit2, finReportProfit);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {

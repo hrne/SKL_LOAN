@@ -193,7 +193,7 @@ public class L1109 extends TradeBuffer {
 		this.info("L1109 cnt = " + cnt);
 		if (cnt > 0) {
 			iDataLog.setEnv(titaVo, iCustMain, iCustMain);
-			iDataLog.exec("修改顧客 " + iCustMain.getCustId() + " 交互運用資料", "CustUKey:" + iCustMain.getCustUKey());
+			iDataLog.exec("修改顧客交互運用資料", "CustUKey:" + iCustMain.getCustUKey());
 		}
 
 		this.addList(this.totaVo);

@@ -37,7 +37,7 @@ public class L9731p extends TradeBuffer {
 	public WebClient webClient;
 
 	String TXCD = "L9731";
-	String TXName = "人工檢核工作表1";
+	String TXName = "人工檢核工作表";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -55,12 +55,26 @@ public class L9731p extends TradeBuffer {
 
 		this.info("iYearMonth= " + iYearMonth);
 
-		boolean isFinish = l9731Report.exec(titaVo, iYearMonth, 1);
-		isFinish = l9731Report.exec(titaVo, iYearMonth, 2);
+		boolean isFinish = l9731Report.exec(titaVo, iYearMonth);
+		
+		
+
+		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
+
+		String tradeName = "";
+
+		for (int i = 1; i <= totalItem; i++) {
+			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+				tradeName += (titaVo.getParam("TradeName" + i) + "、");
+			}
+		}
+
+		tradeName = tradeName.substring(0, tradeName.length() - 1);
+
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+					titaVo.getParam("TLRNO"), TXCD + TXName + "(" + tradeName + ")已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);

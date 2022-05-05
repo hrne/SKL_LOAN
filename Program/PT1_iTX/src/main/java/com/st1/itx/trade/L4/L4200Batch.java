@@ -361,7 +361,7 @@ public class L4200Batch extends TradeBuffer {
 						sendMsg = e.getMessage();
 						checkFlag = false;
 					}
-				} else if (filename.indexOf("PRSBCP4-53N") >= 0 && checkFlag) {
+				} else if (filename.indexOf("PRSBCP4_53N") >= 0 && checkFlag) {
 					String filePath2P1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 							+ File.separatorChar + filename;
 					this.info("銀行扣帳回應檔 Start With -> " + filePath2P1);
@@ -379,7 +379,7 @@ public class L4200Batch extends TradeBuffer {
 						sendMsg = e.getMessage();
 						checkFlag = false;
 					}
-				} else if (filename.indexOf("PRSBCP4-8460001") >= 0 && checkFlag) {
+				} else if (filename.indexOf("PRSBCP4_8460001") >= 0 && checkFlag) {
 					String filePath2P2 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 							+ File.separatorChar + filename;
 					this.info("銀行扣帳回應檔 Start With -> " + filePath2P2);
@@ -397,7 +397,7 @@ public class L4200Batch extends TradeBuffer {
 						sendMsg = e.getMessage();
 						checkFlag = false;
 					}
-				} else if (filename.indexOf("PRSBCP4-8460002") >= 0 && checkFlag) {
+				} else if (filename.indexOf("PRSBCP4_8460002") >= 0 && checkFlag) {
 					String filePath2P3 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 							+ File.separatorChar + filename;
 					this.info("銀行扣帳回應檔 Start With -> " + filePath2P3);
@@ -734,18 +734,16 @@ public class L4200Batch extends TradeBuffer {
 				tBankRmtf.setBalance(parse.stringToBigDecimal(tempOccursList.get("OccBalance")).divide(bigDe100));
 				tBankRmtf.setRemintBank(tempOccursList.get("OccBankCode"));
 				tBankRmtf.setTraderInfo(tempOccursList.get("OccTrader"));
-
-//				E.AML 姓名檢核
-				txAmlCom.setTxBuffer(this.getTxBuffer());
-				tempVo = txAmlCom.bankRmtf(tempVo, tBankRmtf, titaVo);
-				tBatxDetail.setProcNote(tempVo.getJsonString());
-
-//				F.insert BankRmtf、BatxDetail
 				try {
 					bankRmtfService.insert(tBankRmtf, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "tBankRmtf Insert Fail : " + e.getErrorMsg());
 				}
+//				E.AML 姓名檢核
+				txAmlCom.setTxBuffer(this.getTxBuffer());
+				tempVo = txAmlCom.bankRmtf(tempVo, tBankRmtf, titaVo);
+				tBatxDetail.setProcNote(tempVo.getJsonString());
+//				F.insert BankRmtf、BatxDetail
 				totAmt = totAmt.add(tBatxDetail.getRepayAmt());
 				entryDate = tBatxDetail.getEntryDate();
 				try {
@@ -1620,7 +1618,7 @@ public class L4200Batch extends TradeBuffer {
 //		1.檔名不符處理範圍 ： 檢核檔名
 //        1).匯款轉帳： rbalmall
 //        2).ACH扣款： AHR11P, AHR12P
-//        3).郵局扣款：PRSBCP4-53N, PRSBCP4-8460001, PRSBCP4-8460002
+//        3).郵局扣款：PRSBCP4_53N, PRSBCP4_8460001, PRSBCP4_8460002
 //        4).員工扣薪：10H, LNM
 //        5).支票兌現：mortgage
 //		2.檔案錯誤  ...： 檢核檔案內容，若格式不合，此階段先提出錯誤
@@ -1683,7 +1681,7 @@ public class L4200Batch extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
-			} else if (filename.indexOf("PRSBCP4-53N") >= 0) {
+			} else if (filename.indexOf("PRSBCP4_53N") >= 0) {
 				bankDeductKind = 1;
 				try {
 					postDeductFileVo.setValueFromFile(dataLineList1);
@@ -1692,7 +1690,7 @@ public class L4200Batch extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
-			} else if (filename.indexOf("PRSBCP4-8460001") >= 0) {
+			} else if (filename.indexOf("PRSBCP4_8460001") >= 0) {
 				bankDeductKind = 1;
 				try {
 					postDeductFileVo.setValueFromFile(dataLineList1);
@@ -1701,7 +1699,7 @@ public class L4200Batch extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
-			} else if (filename.indexOf("PRSBCP4-8460002") >= 0) {
+			} else if (filename.indexOf("PRSBCP4_8460002") >= 0) {
 				bankDeductKind = 1;
 				try {
 					postDeductFileVo.setValueFromFile(dataLineList1);

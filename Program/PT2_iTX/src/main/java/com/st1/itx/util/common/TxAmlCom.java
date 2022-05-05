@@ -15,12 +15,14 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
 import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BankRmtf;
+import com.st1.itx.db.domain.BankRmtfId;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.domain.TxAmlLog;
+import com.st1.itx.db.service.BankRmtfService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxAmlLogService;
@@ -121,6 +123,9 @@ public class TxAmlCom extends TradeBuffer {
 	@Autowired
 	public CdEmpService cdEmpService;
 
+	@Autowired
+	public BankRmtfService bankRmtfService;
+
 	private CustMain tCustMain = new CustMain();
 	private int custNo = 0;
 
@@ -178,7 +183,7 @@ public class TxAmlCom extends TradeBuffer {
 	 * 撥款匯款 Call By L3220 暫收款退還
 	 * 
 	 * @param titaVo TitaVo
-	 * @throws LogicException ..
+	 * @throws LogicException Exception
 	 */
 	public void remitOut(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");
@@ -215,7 +220,8 @@ public class TxAmlCom extends TradeBuffer {
 			/* SecNo : 01:撥款匯款 */
 			/* 撥款方式為 1 ~ 89 */
 			if ("01".equals(titaVo.getSecNo()) && titaVo.get("RpCode" + i) != null) {
-				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0 && parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
+				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0
+						&& parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
 					// 保單角色： 4.借款人/7.轉帳委託人(BY 匯款戶名)
 					custNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
 					tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
@@ -305,7 +311,8 @@ public class TxAmlCom extends TradeBuffer {
 
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號 ：03+戶號(7)+扣款銀行(3)+扣款帳號(14)
-		checkAmlVo.setTransactionId("03-" + parse.IntegerToString(tAchAuthLog.getCustNo(), 7) + "-" + tAchAuthLog.getRepayBank() + "-" + tAchAuthLog.getRepayAcct() + "-" + titaVo.getCalDy());
+		checkAmlVo.setTransactionId("03-" + parse.IntegerToString(tAchAuthLog.getCustNo(), 7) + "-"
+				+ tAchAuthLog.getRepayBank() + "-" + tAchAuthLog.getRepayAcct() + "-" + titaVo.getCalDy());
 		checkAmlVo.setAcctNo(tAchAuthLog.getCustNo() + "-" + tAchAuthLog.getFacmNo()); // 放款案號：戶號-額度
 		checkAmlVo.setCaseNo("AUTH"); // 案號：AUTH
 		// 保單角色： 4.借款人/7.轉帳委託人
@@ -370,7 +377,8 @@ public class TxAmlCom extends TradeBuffer {
 //   2.為凍結名單/未確定名單 ==> E022
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號： 03+戶號(7)+郵局帳戶別(1)+扣款帳號(14)
-		checkAmlVo.setTransactionId("03-" + parse.IntegerToString(tPostAuthLog.getCustNo(), 7) + "-" + tPostAuthLog.getPostDepCode() + "-" + tPostAuthLog.getRepayAcct() + "-" + titaVo.getCalDy());
+		checkAmlVo.setTransactionId("03-" + parse.IntegerToString(tPostAuthLog.getCustNo(), 7) + "-"
+				+ tPostAuthLog.getPostDepCode() + "-" + tPostAuthLog.getRepayAcct() + "-" + titaVo.getCalDy());
 		checkAmlVo.setUnit("10HC00"); // 查詢單位：10HC00
 		checkAmlVo.setAcceptanceUnit(""); // 代辦單位：space
 		checkAmlVo.setAcctNo(tPostAuthLog.getCustNo() + "-" + tPostAuthLog.getFacmNo()); // 放款案號：戶號-額度
@@ -437,7 +445,8 @@ public class TxAmlCom extends TradeBuffer {
 //		2.為凍結名單/未確定名單
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號： 03+戶號(7)+扣款銀行(3)+郵局帳戶別(1)+扣款帳號(14)
-		checkAmlVo.setTransactionId("03" + tBankDeductDtl.getCustNo() + tBankDeductDtl.getRepayBank() + tBankDeductDtl.getPostCode() + tBankDeductDtl.getRepayAcctNo());
+		checkAmlVo.setTransactionId("03" + tBankDeductDtl.getCustNo() + tBankDeductDtl.getRepayBank()
+				+ tBankDeductDtl.getPostCode() + tBankDeductDtl.getRepayAcctNo());
 		checkAmlVo.setAcctNo(tBankDeductDtl.getCustNo() + "-" + tBankDeductDtl.getFacmNo()); // 放款案號：戶號-額度
 		checkAmlVo.setCaseNo("DEDUCT"); // 案號：DEDUCT
 		// 保單角色： 4.借款人/7.轉帳委託人
@@ -569,10 +578,11 @@ public class TxAmlCom extends TradeBuffer {
 		// 支票兌現： 03+批號(6)+戶號(7)+支票帳號(9)+支票號碼(7))+檢查類別(1)-1.借款人 2.發票人
 
 		if (tBatxDetail.getRepayCode() == 1) {
-			transactionId = "03-" + tBatxDetail.getBatchNo() + "-" + parse.IntegerToString(tBatxDetail.getDetailSeq(), 6);
+			transactionId = "03-" + tBatxDetail.getBatchNo() + "-"
+					+ parse.IntegerToString(tBatxDetail.getDetailSeq(), 6);
 		} else if (tBatxDetail.getRepayCode() == 4) {
-			transactionId = "03-" + tBatxDetail.getBatchNo() + "-" + parse.IntegerToString(tBatxDetail.getCustNo(), 7) + "-" + tBatxDetail.getRvNo().substring(0, 9) + "-"
-					+ tBatxDetail.getRvNo().substring(10, 17);
+			transactionId = "03-" + tBatxDetail.getBatchNo() + "-" + parse.IntegerToString(tBatxDetail.getCustNo(), 7)
+					+ "-" + tBatxDetail.getRvNo().substring(0, 9) + "-" + tBatxDetail.getRvNo().substring(10, 17);
 		}
 
 		// 1.借款人, AML回應碼 : 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單
@@ -617,7 +627,8 @@ public class TxAmlCom extends TradeBuffer {
 		if (tBankRmtf.getCustNo() > 0) {
 			tCustMain = custMainService.custNoFirst(tBankRmtf.getCustNo(), tBankRmtf.getCustNo(), titaVo);
 			if (tCustMain != null) {
-				checkAmlVo = customerCheck(tBankRmtf.getCustNo(), transactionId, tBankRmtf.getBatchNo(), tCustMain, titaVo);
+				checkAmlVo = customerCheck(tBankRmtf.getCustNo(), transactionId, tBankRmtf.getBatchNo(), tCustMain,
+						titaVo);
 				tTempVo.put("AmlRsp1", checkAmlVo.getConfirmStatus());
 				custName = tCustMain.getCustName();
 			}
@@ -638,6 +649,9 @@ public class TxAmlCom extends TradeBuffer {
 			checkAmlVo = traderCheck(tBankRmtf, transactionId, traderName, titaVo);
 			tTempVo.put("AmlRsp2", checkAmlVo.getConfirmStatus());
 		}
+		// 更新匯款轉帳檔 AML回應碼
+		updateBankRmtf(tBankRmtf.getAcDate(),tBankRmtf.getBatchNo(),tBankRmtf.getDetailSeq(),tTempVo,titaVo);
+		
 		return tTempVo;
 	}
 
@@ -651,11 +665,13 @@ public class TxAmlCom extends TradeBuffer {
 	 * @return TempVo
 	 * @throws LogicException LogicException
 	 */
-	public TempVo batxCheque(TempVo tTempVo, LoanCheque tLoanCheque, String batchNo, TitaVo titaVo) throws LogicException {
+	public TempVo batxCheque(TempVo tTempVo, LoanCheque tLoanCheque, String batchNo, TitaVo titaVo)
+			throws LogicException {
 		this.info("TxAmlCom batxCheque .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號 03+[批號(6)+戶號(7)+支票帳號(9)+支票號碼(7)]+檢查類別(1)-1.借款人 2.交易人/發票人
-		String transactionId = batchNo + "-" + parse.IntegerToString(tLoanCheque.getCustNo(), 7) + "-" + parse.IntegerToString(tLoanCheque.getChequeAcct(), 9) + "-"
+		String transactionId = batchNo + "-" + parse.IntegerToString(tLoanCheque.getCustNo(), 7) + "-"
+				+ parse.IntegerToString(tLoanCheque.getChequeAcct(), 9) + "-"
 				+ parse.IntegerToString(tLoanCheque.getChequeNo(), 7);
 		// 1.借款人, AML回應碼 : 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單
 		String custName = "";
@@ -674,7 +690,8 @@ public class TxAmlCom extends TradeBuffer {
 	}
 
 	/*---------- 1.借款人 ----------*/
-	private CheckAmlVo customerCheck(int custNo, String transactionId, String batchNo, CustMain tCustMain, TitaVo titaVo) throws LogicException {
+	private CheckAmlVo customerCheck(int custNo, String transactionId, String batchNo, CustMain tCustMain,
+			TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom bankRmtf .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號 03+transactionI+檢查類別(1)-1.借款人 2.交易人
@@ -691,7 +708,8 @@ public class TxAmlCom extends TradeBuffer {
 	}
 
 	/*---------- 2.發票人 ----------*/
-	private CheckAmlVo ChequerCheck(LoanCheque tLoanCheque, String transactionId, String batchNo, TitaVo titaVo) throws LogicException {
+	private CheckAmlVo ChequerCheck(LoanCheque tLoanCheque, String transactionId, String batchNo, TitaVo titaVo)
+			throws LogicException {
 		this.info("TxAmlCom bankRmtf .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號 03+transactionId+檢查類別(1)-1.借款人 2.交易人/發票人
@@ -712,7 +730,8 @@ public class TxAmlCom extends TradeBuffer {
 	}
 
 	/*---------- 2.交易人 ----------*/
-	private CheckAmlVo traderCheck(BankRmtf tBankRmtf, String transactionId, String traderName, TitaVo titaVo) throws LogicException {
+	private CheckAmlVo traderCheck(BankRmtf tBankRmtf, String transactionId, String traderName, TitaVo titaVo)
+			throws LogicException {
 		this.info("TxAmlCom bankRmtf .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號 03+批號(6)+明細序號(6)+檢查類別(1)-1.借款人 2.交易人/發票人
@@ -723,7 +742,8 @@ public class TxAmlCom extends TradeBuffer {
 //		0087 ＡＴ存入  -->10.現金繳款人
 //		0071 匯入匯款   -->11.匯款人
 //		else         -->7.轉帳委託人
-		if ("0001".equals(tBankRmtf.getDscptCode()) || "0002".equals(tBankRmtf.getDscptCode()) || "0087".equals(tBankRmtf.getDscptCode()))
+		if ("0001".equals(tBankRmtf.getDscptCode()) || "0002".equals(tBankRmtf.getDscptCode())
+				|| "0087".equals(tBankRmtf.getDscptCode()))
 			checkAmlVo.setRoleId("10");
 		else if ("0087".equals(tBankRmtf.getDscptCode()))
 			checkAmlVo.setRoleId("11");
@@ -746,8 +766,10 @@ public class TxAmlCom extends TradeBuffer {
 	/* 檢查AML紀錄檔 */
 	private CheckAmlVo amlLogCheck(CheckAmlVo checkAmlVo, TitaVo titaVo) throws LogicException {
 
-		this.info("TxAmlLog amlLogCheck, Entdy=" + titaVo.getEntDyI() + ", TransactionId=" + checkAmlVo.getTransactionId());
-		TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(titaVo.getEntDyI() + 19110000, checkAmlVo.getTransactionId(), titaVo);
+		this.info("TxAmlLog amlLogCheck, Entdy=" + titaVo.getEntDyI() + ", TransactionId="
+				+ checkAmlVo.getTransactionId());
+		TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(titaVo.getEntDyI() + 19110000,
+				checkAmlVo.getTransactionId(), titaVo);
 		// AML紀錄檔存在，檢核狀態 = 1.需審查/確認 => AML姓名再檢核
 		if (tTxAmlLog != null) {
 			if ("1".equals(tTxAmlLog.getConfirmStatus())) {
@@ -789,6 +811,29 @@ public class TxAmlCom extends TradeBuffer {
 		}
 
 		return checkAmlVo;
+	}
+
+	// 更新匯款轉帳檔 AML回應碼
+	private void updateBankRmtf(int acDate, String batchNo, int DetailSeq, TempVo tempVo, TitaVo titaVo)
+			throws LogicException {
+		String amlRsp = "0";
+		if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2"))
+				|| "2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
+			if ("2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
+				amlRsp = "2";
+			} else if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2"))) {
+				amlRsp = "1";
+			}
+		}
+		BankRmtf tBankRmtf = bankRmtfService.holdById(new BankRmtfId(acDate + 19110000, batchNo, DetailSeq), titaVo);
+		if (tBankRmtf != null && tBankRmtf.getAmlRsp().equals(amlRsp)) {
+			tBankRmtf.setAmlRsp(amlRsp);
+			try {
+				bankRmtfService.update(tBankRmtf);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "update BankRmtf " + e.getErrorMsg());
+			}
+		}
 	}
 
 	/* AML檢核回應訊息 */

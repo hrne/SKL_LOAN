@@ -247,7 +247,7 @@ public class L1108 extends TradeBuffer {
 					CustNotice nCustNotice = tranDesc(tCustNotice);
 
 					iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
-					iDataLog.exec("修改顧客 " + custMain.getCustId() + "/" + oCustNotice.getFormNo() + " " + formx + " 通知書",
+					iDataLog.exec("修改顧客/" + oCustNotice.getFormNo() + " " + formx + " 通知設定",
 							"CustUKey:" + custMain.getCustUKey());
 				}
 			}

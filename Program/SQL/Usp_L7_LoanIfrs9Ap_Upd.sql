@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Ap_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Ap_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Ap 每月IFRS9欄位清單A檔
 -- 執行時機：每月底日終批次(換日前)
@@ -353,7 +353,8 @@ BEGIN
          , NVL(F."EvaAmt", 0)                        AS "EvaAmt"            -- 原始鑑價金額
          , NVL(M."FirstDueDate", 0)                  AS "FirstDueDate"      -- 首次應繳日
          , NVL(M."TotalPeriod", 0)                   AS "TotalPeriod"       -- 總期數
-         , CASE WHEN NVL(F."LineAmt", 0) < NVL(F."UtilBal", 0) THEN 0
+         , CASE WHEN TRUNC(NVL(F."UtilDeadline", 0) / 100 ) <= YYYYMM   THEN 0    
+                WHEN NVL(F."LineAmt", 0) < NVL(F."UtilBal", 0) THEN 0
                 ELSE NVL(F."LineAmt", 0) - NVL(F."UtilBal", 0)
            END                                       AS "AvblBal"           -- 可動用餘額(台幣)
          , NVL(F."RecycleCode", 0)                   AS "RecycleCode"       -- 該筆額度是否可循環動用 (0=非循環動用 1=循環動用)

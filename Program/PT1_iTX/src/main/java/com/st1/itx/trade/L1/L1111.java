@@ -83,7 +83,7 @@ public class L1111 extends TradeBuffer {
 //		}
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, beforeCustMain, uCustMain);
-		iDataLog.exec("變更顧客 " + beforeCustMain.getCustId() + " 證號/" + iMarkX, "CustUKey:" + beforeCustMain.getCustUKey());
+		iDataLog.exec("變更顧客證號/" + iMarkX, "CustUKey:" + beforeCustMain.getCustUKey());
 
 		this.addList(this.totaVo);
 		return this.sendList();

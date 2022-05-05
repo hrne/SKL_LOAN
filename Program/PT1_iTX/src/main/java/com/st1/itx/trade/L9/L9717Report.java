@@ -44,6 +44,10 @@ public class L9717Report extends MakeReport {
 	// 製表時間
 	private String nowTime;
 
+
+
+	List<BigDecimal> list = new ArrayList<BigDecimal>(14);
+
 	String rocYear;
 	String rocMonth;
 
@@ -84,7 +88,7 @@ public class L9717Report extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
-		
+
 		this.setFont(1, 10);
 
 //		this.info("L9717Report.printHeader");
@@ -126,8 +130,10 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
-			this.print(-7, 1, " 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
+			this.print(-6, 1,
+					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
+			this.print(-7, 1,
+					" 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
 			this.print(-8, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -144,8 +150,10 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
-			this.print(-7, 1, " 　　　　　　　　     　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
+			this.print(-6, 1,
+					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
+			this.print(-7, 1,
+					" 　　　　　　　　     　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
 			this.print(-8, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -162,8 +170,10 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, " 　　　　　 　      　　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
-			this.print(-7, 1, " 　　　　　經辦     　　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
+			this.print(-6, 1,
+					" 　　　　　 　      　　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
+			this.print(-7, 1,
+					" 　　　　　經辦     　　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
 			this.print(-8, 1, newBorder);
 			this.print(-8, 1, newBorder);
 
@@ -207,7 +217,7 @@ public class L9717Report extends MakeReport {
 		this.newPage();
 
 		List<Map<String, String>> lL9717 = null;
-		this.info("currentSort="+currentSort);
+		this.info("currentSort=" + currentSort);
 		try {
 			lL9717 = l9717ServiceImpl.findAll(titaVo, currentSort);
 		} catch (Exception e) {
@@ -394,7 +404,96 @@ public class L9717Report extends MakeReport {
 
 				for (int i = 0; i < columnList.size(); i++) {
 					this.info(currentSort + " [" + i + "]: " + tLDVo.get("F" + i));
-					this.print(0, columnList.get(i).getPos(), columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i), columnList.get(i).getSort());
+					this.print(0, columnList.get(i).getPos(),
+							columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0)
+									: tLDVo.get("F" + i),
+							columnList.get(i).getSort());
+				}
+
+				BigDecimal ovdu = BigDecimal.ZERO;
+				BigDecimal amt = BigDecimal.ZERO;
+
+				switch (currentSort) {
+				case Year:
+					// F1 一期件數 26 C
+					// F2 一期金額 39 R
+					// F3 二期件數 44 C
+					// F4 二期金額 57 R
+					// F5 三期件數 62 C
+					// F6 三期金額 75 R
+					// F7 四期件數 80 C
+					// F8 四期金額 93 R
+					// F9 五期件數 98 C
+					// F10 五期金額 111 R
+					// F11 六期件數 116 C
+					// F12 六期金額 129 R
+					// F13 轉催收件數 134 C
+					// F14 轉催收金額 147 R
+
+					for (int i = 1; i < 15; i++) {
+						if (columnList.get(i).getIsAmount()) {
+							amt = amt.add(new BigDecimal(formatAmt(tLDVo.get("F" + i), 0)));
+							if (list.size() == 14) {
+								list.set(i - 1, amt);
+							} else {
+								list.add(amt);
+							}
+						} else {
+							ovdu = ovdu.add(new BigDecimal(tLDVo.get("F" + i)));
+
+							if (list.size() == 14) {
+								list.set(i - 1, ovdu);
+							} else {
+								list.add(ovdu);
+							}
+						}
+
+					}
+
+					break;
+
+				case Agent:
+				case LargeAmt_Agent:
+
+					// F2 一期件數 26 C
+					// F3 一期金額 39 R
+					// F4 二期件數 44 C
+					// F5 二期金額 57 R
+					// F6 三期件數 62 C
+					// F7 三期金額 75 R
+					// F8 四期件數 80 C
+					// F9 四期金額 93 R
+					// F10 五期件數 98 C
+					// F11 五期金額 111 R
+					// F12 六期件數 116 C
+					// F13 六期金額 129 R
+					// F14 轉催收件數 134 C
+					// F15 轉催收金額 147 R
+
+					for (int i = 2; i < 16; i++) {
+						if (columnList.get(i).getIsAmount()) {
+							amt = amt.add(new BigDecimal(tLDVo.get("F" + i)));
+							if (list.size() == 14) {
+								list.set(i - 1, amt);
+							} else {
+								list.add(amt);
+							}
+						} else {
+							ovdu = ovdu.add(new BigDecimal(tLDVo.get("F" + i)));
+
+							if (list.size() == 14) {
+								list.set(i - 1, ovdu);
+							} else {
+								list.add(ovdu);
+							}
+						}
+
+					}
+
+					break;
+					
+					default:
+						break;
 				}
 
 				// 根據樣張，大額客戶別不做每筆資料換行畫線
@@ -432,6 +531,38 @@ public class L9717Report extends MakeReport {
 				break;
 			}
 
+			if (currentSort != OutputSortBy.LargeAmt_Customer) {
+				this.print(1, 1, newBorder);
+				this.print(1, 1, "");
+				this.print(1, 1, newBorder);
+
+				// F2 一期件數 26 C
+				// F3 一期金額 39 R
+				// F4 二期件數 44 C
+				// F5 二期金額 57 R
+				// F6 三期件數 62 C
+				// F7 三期金額 75 R
+				// F8 四期件數 80 C
+				// F9 四期金額 93 R
+				// F10 五期件數 98 C
+				// F11 五期金額 111 R
+				// F12 六期件數 116 C
+				// F13 六期金額 129 R
+				// F14 轉催收件數 134 C
+				// F15 轉催收金額 147 R
+
+				for (int i = 0, space = 1; i < list.size(); i = i + 2, space++) {
+
+					this.print(1, 26 + (18 * space), formatAmt(list.get(i), 0), "C");
+				}
+
+				for (int i = 1, space = 1; i < list.size(); i = i + 2, space++) {
+					this.print(1, 39 + (18 * space), list.get(i).toString(), "R");
+				}
+
+				this.print(1, 1, "各期小計");
+				this.print(1, 1, newBorder);
+			}
 			this.print(0, countX, "總計：　　" + formatAmt(totalCount, 0) + " 筆", "R");
 			this.print(0, amtX, formatAmt(totalAmt, 0), "R");
 			this.print(1, 1, newBorder);
@@ -441,11 +572,11 @@ public class L9717Report extends MakeReport {
 				this.print(1, 1, "『因組織變動因素，經辦人員餘期案件統計基準：94年元月前以授信人員為統計對象，94年元月起則更改為放款專員。』");
 			}
 
-                        return true;
+			return true;
 
 		} else {
 			print(1, 1, "本日無資料!!!");
-                        return false;
+			return false;
 		}
 	}
 
@@ -453,9 +584,9 @@ public class L9717Report extends MakeReport {
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
-		
+
 		boolean result = fillData(titaVo);
-		
+
 		this.close();
 
 		return result;
@@ -491,7 +622,7 @@ public class L9717Report extends MakeReport {
 
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-		
+
 		return makePdf(titaVo);
 	}
 }

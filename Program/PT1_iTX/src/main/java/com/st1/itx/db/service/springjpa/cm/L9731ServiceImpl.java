@@ -110,7 +110,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 年
 		int iYear = yearMonth / 100;
 
-		this.info("L9731.findSheet1 YYMM=" + yearMonth);
+		this.info("L9731.findSheet2 YYMM=" + yearMonth);
 
 		String sql = " ";
 		sql += "	 WITH \"allMonthMaxLoan\" AS ("; //
@@ -176,7 +176,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 */
 	public List<Map<String, String>> findSheet3_1(TitaVo titaVo, int yearMonth) throws Exception {
-		this.info("l9731.findSheet2_1 ");
+		this.info("l9731.findSheet3_1 ");
 
 		String sql = " ";
 		sql += " SELECT M.\"CustNo\"                              AS F0 ";
@@ -248,7 +248,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 */
 	public List<Map<String, String>> findSheet3_2(TitaVo titaVo, int yearMonth) throws Exception {
-		this.info("l9731.findSheet2_2 ");
+		this.info("l9731.findSheet3_2 ");
 
 		String sql = " ";
 		sql += " SELECT M.\"CustNo\" || M.\"FacmNo\"              AS F0 ";
