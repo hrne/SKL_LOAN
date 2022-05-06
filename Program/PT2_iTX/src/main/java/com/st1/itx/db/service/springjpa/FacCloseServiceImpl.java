@@ -373,6 +373,53 @@ em = null;
   }
 
   @Override
+  public FacClose findFacmNoMaxCloseNoFirst(int custNo_0, int facmNo_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findFacmNoMaxCloseNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
+    Optional<FacClose> facCloseT = null;
+    if (dbName.equals(ContentName.onDay))
+      facCloseT = facCloseReposDay.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+    else if (dbName.equals(ContentName.onMon))
+      facCloseT = facCloseReposMon.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+    else if (dbName.equals(ContentName.onHist))
+      facCloseT = facCloseReposHist.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+    else 
+      facCloseT = facCloseRepos.findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(custNo_0, facmNo_1);
+
+    return facCloseT.isPresent() ? facCloseT.get() : null;
+  }
+
+  @Override
+  public Slice<FacClose> findEntryDateRange(int entryDate_0, int entryDate_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<FacClose> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findEntryDateRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = facCloseReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, entryDate_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = facCloseReposMon.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, entryDate_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = facCloseReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, entryDate_1, pageable);
+    else 
+      slice = facCloseRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, entryDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public FacClose holdById(FacCloseId facCloseId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

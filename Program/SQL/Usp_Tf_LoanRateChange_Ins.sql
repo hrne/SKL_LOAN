@@ -53,8 +53,8 @@ BEGIN
           ,R."LMSASQ"                     AS "BormNo"              -- 撥款序號 DECIMAL 3 0
           ,R."EffectDate"                 AS "EffectDate"          -- 生效日期 DECIMALD 8 0
           ,CASE
-             WHEN R."IncrRateEffectDate" > 0 
-                  AND R."IncrRateEffectDate" <= R."EffectDate"
+             WHEN R."IncrEffectDate" > 0 
+                  AND R."IncrEffectDate" <= R."EffectDate"
                   -- 有建加碼利率者,放2
              THEN 2
            ELSE 0 END                     AS "Status"              -- 狀態 DECIMAL 1 0             Lai 2021/1/14
@@ -73,12 +73,19 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'{'
+           || '"IncrEffectDate":'
+           || CASE
+                WHEN R."IncrEffectDate" > 0
+                THEN R."IncrEffectDate"
+              ELSE '' END
+           || '}'                         AS "OtherFields"         -- JsonFields VARCHAR2 2000
     FROM (SELECT LM."LMSACN"
                 ,LM."LMSAPN"
                 ,LM."LMSASQ"
                 ,LM."IRTBCD"
                 ,LM."AILIRT"
-                ,NVL(LA."ASCADT",0)  AS "IncrRateEffectDate" -- 加碼利率生效日 新系統 無此欄位
+                ,NVL(LA."ASCADT",0)  AS "IncrEffectDate" -- 加碼利率生效日 新系統 無此欄位
                 ,LI."IRTADT"         AS "EffectDate" -- 基本利率生效日
                 ,NVL(LA."ASCRAT",LM."IRTASC")
                                      AS "RateIncr" -- 加碼利率
@@ -189,6 +196,13 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,'{'
+           || '"IncrEffectDate":'
+           || CASE
+                WHEN "ASCADT" > 0
+                THEN "ASCADT"
+              ELSE '' END
+           || '}'                         AS "OtherFields"         -- JsonFields VARCHAR2 2000
     FROM rawData
     WHERE NVL("CbSeq",1) = 1
     ;

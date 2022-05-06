@@ -586,8 +586,8 @@ TXFORM=L3002
 #OODrawdownAmtX=撥款金額
 {width:170}
 
-#OODepartment=企金別
-{width:80,align:'center'}
+#OODepartment=案件隸屬單位
+{width:120,align:'center'}
 
 #OOUsageCodeX=用途別
 {width:80,align:'center'}
@@ -640,8 +640,8 @@ TXFORM=L3002
 #OODrawdownAmtX=撥款金額
 {width:170}
 
-#OODepartment=企金別
-{width:80,align:'center'}
+#OODepartment=案件隸屬單位
+{width:120,align:'center'}
 
 #OOUsageCodeX=用途別
 {width:80,align:'center'}

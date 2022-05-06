@@ -111,7 +111,7 @@ public class ApControl extends SysLogger {
 				txCurrService.findAll(0, Integer.MAX_VALUE);
 				this.mustInfo("Transaction Test OK....");
 				break;
-			} catch (TransactionException e) {
+			} catch (Exception e) {
 				this.error(e.getMessage());
 				if (baseTransaction.isTxFg())
 					baseTransaction.setTxFg(true);

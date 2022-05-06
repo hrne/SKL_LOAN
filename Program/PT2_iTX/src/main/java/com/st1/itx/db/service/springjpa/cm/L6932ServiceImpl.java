@@ -51,7 +51,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int BormNo = Integer.parseInt(titaVo.getParam("BORM_SEQ").toString());
 		String iTxtNo = titaVo.getParam("TxtNo").trim();
 		String iMrKey = titaVo.getParam("MrKey").trim();
-
+		
 		String sql = "SELECT A.\"TranNo\",";
 		sql += "B.\"TranItem\",";
 		sql += "A.\"CustNo\",";

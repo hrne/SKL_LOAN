@@ -353,9 +353,13 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@ClaimDate,#L8r21ClaimDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
-@C(5,#ClaimStatus,1,$,V(7))
+@
+!C(5,#ClaimStatus,1,$,V(7))
 A(DATE,0,#ClaimDate)
-IF(#ClaimDate <= #ApplyDate,V(P,法院裁定日期須大於遞狀日期),$)
+C(3,#ClaimStatus,2,V(7),$)
+C(4,#ClaimDate,$,IF(#ClaimDate <= #ApplyDate,V(P,法院裁定日期須大於遞狀日期),$))
+
+!IF(#ClaimStatus == 2 , IF(#ClaimDate <= #ApplyDate,V(P,法院裁定日期須大於遞狀日期),$),$)
 
 
 ![轉JCIC文字檔日期]

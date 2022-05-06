@@ -1,0 +1,10 @@
+" A4
+   整批訂正
+
+   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATE}} 時間:{{#now!}}
+
+
+   
+     整批訂正 
+
+{{#batch-detail}}

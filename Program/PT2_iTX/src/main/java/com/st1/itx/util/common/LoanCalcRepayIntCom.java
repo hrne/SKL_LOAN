@@ -1057,7 +1057,8 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkRateIncr = tLoanRateChange.getRateIncr(); // 加碼利率
 		wkIndividualIncr = tLoanRateChange.getIndividualIncr(); // 個別加碼利率
 
-		if (tLoanRateChange.getEffectDate() == iDrawdownDate) {
+		// 利率生效日<=撥款日
+		if (tLoanRateChange.getEffectDate() <= iDrawdownDate) {
 			wkBeforeStoreRate = tLoanRateChange.getFitRate();
 		}
 
@@ -1069,6 +1070,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		dDateUtil.setDays(1);
 		tLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo,
 				dDateUtil.getCalenderDay() + 19110000, titaVo);
+		// 利率相同跳過、找下一筆
+		if (tLoanRateChange != null && tLoanRateChange.getFitRate().compareTo(wkFitRate) == 0) {
+			dDateUtil.init();
+			dDateUtil.setDate_1(tLoanRateChange.getEffectDate());
+			dDateUtil.setDays(1);
+			tLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo,
+					dDateUtil.getCalenderDay() + 19110000, titaVo);
+		}
 		wkNextEffectDate = tLoanRateChange != null ? tLoanRateChange.getEffectDate() : 9991231;
 		wkNextFitRate = tLoanRateChange != null ? tLoanRateChange.getFitRate() : wkFitRate;
 

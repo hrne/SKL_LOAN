@@ -61,6 +61,7 @@ public class L2633Report extends MakeReport {
 	private String pageOrientation = "L";
 	private int iCustNo = 0;
 	private int iCloseNo = 0;
+	private BigDecimal msAmt = BigDecimal.ZERO;
 	// 製表日期
 	private String nowDate;
 	// 製表時間
@@ -144,10 +145,43 @@ public class L2633Report extends MakeReport {
 		this.setCharSpaces(0);
 		// 入帳日期
 		int iTranDate = parse.stringToInteger(titaVo.getParam("TranDate"));
+		// 入帳日月初日
+		String trandDateMS = parse.IntegerToString((iTranDate / 100), 5) + "01";
+		this.info("trandDateMS = " + trandDateMS);
 		// new ArrayList
 		List<FacClose> lFacClose = new ArrayList<FacClose>();
 		Slice<FacClose> slFacClose = null;
+		List<FacClose> allFacClose = new ArrayList<FacClose>();
+		Slice<FacClose> sallFacClose = null;
+		sallFacClose = sFacCloseService.findEntryDateRange(parse.stringToInteger(trandDateMS) + 19110000,
+				iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+		allFacClose = sallFacClose == null ? null : sallFacClose.getContent();
+		int k = 1;
+		int msCnt = 0;
+		if (allFacClose != null) {
+			for (FacClose msFacClose : allFacClose) {
 
+//				只找同戶號額度最後一筆序號
+				if (k < allFacClose.size() && msFacClose.getCustNo() == allFacClose.get(k).getCustNo()
+						&& msFacClose.getFacmNo() == allFacClose.get(k).getFacmNo()
+						&& msFacClose.getEntryDate() == allFacClose.get(k).getEntryDate()) {
+					k++;
+					continue;
+				}
+//				只找結案
+				if (msFacClose.getCloseDate() == 0) {
+					k++;
+					continue;
+				}
+				k++;
+				this.info("getCustNo = " + msFacClose.getCustNo());
+				this.info("getFacmNo = " + msFacClose.getFacmNo());
+				this.info("getCloseAmt = " + msFacClose.getCloseAmt());
+				this.info("getEntryDate = " + msFacClose.getEntryDate());
+				msCnt++;
+				msAmt = msAmt.add(msFacClose.getCloseAmt());
+			}
+		}
 		slFacClose = sFacCloseService.findEntryDate(iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		lFacClose = slFacClose == null ? null : slFacClose.getContent();
 
@@ -171,6 +205,11 @@ public class L2633Report extends MakeReport {
 //			只找同戶號額度最後一筆序號
 			if (i < lFacClose.size() && tFacClose.getCustNo() == lFacClose.get(i).getCustNo()
 					&& tFacClose.getFacmNo() == lFacClose.get(i).getFacmNo()) {
+				i++;
+				continue;
+			}
+//			只找結案
+			if (tFacClose.getCloseDate() == 0) {
 				i++;
 				continue;
 			}
@@ -208,12 +247,16 @@ public class L2633Report extends MakeReport {
 			print(0, 140, FormatUtil.padX("" + tFacClose.getDocNo(), 7)); // 公文編號
 			print(0, 149, FormatUtil.padX(tFacClose.getAgreeNo(), 20)); // 塗銷編號
 			print(0, 171, FormatUtil.padX(tFacClose.getClsNo(), 20)); // 銷號欄
+			print(1, 1, "　　　　　　           ");
 		}
 
 		print(1, 1, "－－－－－－　－－－－－－－－－－　－－－－－－－－－－－　－－－－－－－－－　－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－");
 		print(1, 1, "　　　　　　           ");
 		print(0, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　合　計：" + parse.IntegerToString(cnt, 3) + "件" + "　＄"); // 合計戶
 		print(0, 97, formatAmt(totAmt, 0), "R");// 合計金額
+		print(1, 1, "　　　　　　           ");
+		print(0, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　月初至本日共：" + parse.IntegerToString(msCnt, 3) + "件" + "　＄"); // 合計戶
+		print(0, 97, formatAmt(msAmt, 0), "R");// 合計金額
 
 //		for (int j = 1; j <= 400; j++) {
 //			if ((j % 10) == 0) {

@@ -56,6 +56,9 @@ public interface FacCloseRepositoryHist extends JpaRepository<FacClose, FacClose
   // CustNo = ,AND FacmNo = 
   public Optional<FacClose> findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(int custNo_0, int facmNo_1);
 
+  // EntryDate >= ,AND EntryDate <= 
+  public Slice<FacClose> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int entryDate_0, int entryDate_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

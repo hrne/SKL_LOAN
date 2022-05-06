@@ -186,9 +186,9 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				if (unpayTerms >= 2) {
 					// 計息方式調成1:以日計息
 					intCalcCode = "1";
+					amortizedCode = "2";
 				}
 
-				// amortizedCode = "2";
 				// loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 
 				// 2022-04-22 智偉增加判斷:若到期日在當月者，照AS400多算一天利息

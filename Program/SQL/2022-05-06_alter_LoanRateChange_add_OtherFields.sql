@@ -1,0 +1,1 @@
+alter table "LoanRateChange" add "OtherFields" VARCHAR2(2000);

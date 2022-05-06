@@ -432,7 +432,7 @@ public class L9717Report extends MakeReport {
 
 					for (int i = 1; i < 15; i++) {
 						if (columnList.get(i).getIsAmount()) {
-							amt = amt.add(new BigDecimal(formatAmt(tLDVo.get("F" + i), 0)));
+							amt = amt.add(new BigDecimal(tLDVo.get("F" + i)));
 							if (list.size() == 14) {
 								list.set(i - 1, amt);
 							} else {

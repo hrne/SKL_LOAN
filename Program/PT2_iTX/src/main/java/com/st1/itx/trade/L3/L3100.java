@@ -32,6 +32,7 @@ import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.FacMainService;
@@ -61,46 +62,7 @@ import com.st1.itx.util.parse.Parse;
  * b.撥款方式區分為即時(單筆匯款)及預撥(整批匯款),前者以電話通知匯款,後者以報表及匯款單交出納匯款.
  * c.此交易為2段式交易
  */
-/*
- * Tita
- * TimCustNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * RateIncr=+9,2.4
- * ApproveRate=9,2.4
- * RateCode=9,1
- * RateAdjFreq=9,2
- * DrawdownCode=9,1
- * CurrencyCode=X,3
- * TimDrawdownAmt=9,14.2
- * DrawdownDate=9,7
- * LoanTermYy=9,2
- * LoanTermMm=9,2
- * LoanTermDd=9,3
- * MaturityDate=9,7
- * AmortizedCode=9,1
- * FreqBase=9,1
- * PayIntFreq=9,2
- * RepayFreq=9,2
- * GracePeriod=9,3
- * GraceDate=9,7
- * SpecificDd=9,2
- * SPECIFICDATE=9,8
- * FirstDueDate=9,7
- * FirstAdjRateDate=9,7
- * NextIntDate=9,8
- * NextRepayDate=9,8
- * TOTALPERIOD=9,3
- * TimAcctFee=9,14.2
- * TimFinalBal=9,14.2
- * NotYetFlag=X,1
- * PieceCode=X,1
- * UsageCode=9,1
- * SynLoan=9,3
- * RenewFlag=X,1
- * OLDFacmNo=9,3
- * OLDBormNo=9,3
- */
+
 /**
  * L3100 撥款
  * 
@@ -130,6 +92,10 @@ public class L3100 extends TradeBuffer {
 	public TxTempService txTempService;
 	@Autowired
 	public ClFacService clFacService;
+	@Autowired
+	public AcReceivableService acReceivableService;
+	@Autowired
+	public L3100Report l3100Report;
 
 	@Autowired
 	Parse parse;
@@ -188,6 +154,8 @@ public class L3100 extends TradeBuffer {
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 	private List<FacProdStepRate> lFacProdStepRate = new ArrayList<FacProdStepRate>();
+	private Slice<AcReceivable> slAcReceivable;
+	private List<AcReceivable> lAcReceivableList;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -253,11 +221,36 @@ public class L3100 extends TradeBuffer {
 		// 維護放款交易內容檔
 		LoanBorTxRoutine();
 
-		// 帳管費
-		AcctFeeRoutine();
+		// 需檢查是否建檔
+		// 檢查業務科目戶號額度 金額相同者
+		slAcReceivable = acReceivableService.useL2062Eq("F12", iCustNo, iFacmNo, iFacmNo, 0, 1, 0, Integer.MAX_VALUE,
+				titaVo);
 
-		// 手續費
-		HandlingFeeRoutine();
+		Boolean acctFeeExist = false;
+		Boolean handlingFeeExist = false;
+		if (slAcReceivable != null) {
+			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
+			for (AcReceivable t : lAcReceivable) {
+				// 檢查金額是否相符
+				if (t.getRvAmt().compareTo(iAcctFee) == 0) {
+					acctFeeExist = true;
+				}
+				if (t.getRvAmt().compareTo(iHandlingFee) == 0) {
+					handlingFeeExist = true;
+				}
+				if (acctFeeExist && handlingFeeExist) {
+					break;
+				}
+			}
+		}
+		if (!acctFeeExist) {
+			// 帳管費
+			AcctFeeRoutine();
+		}
+		if (!handlingFeeExist) {
+			// 手續費
+			HandlingFeeRoutine();
+		}
 
 		// 預約撥款到期； 撥款於經辦提交時檢核(Call by ApControl)
 		if (wkReserve && titaVo.isHcodeNormal()) {
@@ -274,6 +267,13 @@ public class L3100 extends TradeBuffer {
 		// 業績處理
 		PfDetailRoutine();
 
+		totaVo.put("DPdfSnoF", 0);
+		// 登錄修正 撥款傳票主管審核
+
+		if (titaVo.isActfgEntry() && (titaVo.isHcodeNormal() || titaVo.isHcodeModify())) {
+//			撥款傳票主管審核
+			doRptA(titaVo);
+		}
 		this.totaVo.putParam("BormNo", wkBormNo);
 		this.totaVo.put("PdfSnoF", "" + sno);
 		this.addList(this.totaVo);
@@ -293,7 +293,7 @@ public class L3100 extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 
 			Slice<ClFac> slClFac = clFacService.facmNoEq(iCustNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
-			if (slClFac == null ) {
+			if (slClFac == null) {
 				throw new LogicException(titaVo, "E0015", "此額度未關聯擔保品不可撥款"); // 檢查錯誤
 			}
 
@@ -767,19 +767,21 @@ public class L3100 extends TradeBuffer {
 		if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
 			this.info("lFacProdStepRate = " + lFacProdStepRate);
 			for (FacProdStepRate tFacProdStepRate : lFacProdStepRate) {
+				
 				// 利率起日
 				dDateUtil.init();
 				dDateUtil.setMons(tFacProdStepRate.getMonthStart() - 1);
 				dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate()); // 階梯式利率月份以額度初貸日為準
 				wkStartDate = dDateUtil.getCalenderDay();
+//				2022/05/06會議 階梯式利率月份以額度初貸日為準
+				wkEffectDate = wkStartDate;
 				// 利率起日、利率起日，小於撥款日
-
 				// 利率起日小於撥款日=> 撥款日為生效日；否則利率起日為生效日
-				if (wkStartDate <= tLoanBorMain.getDrawdownDate()) {
-					wkEffectDate = tLoanBorMain.getDrawdownDate();
-				} else {
-					wkEffectDate = wkStartDate;
-				}
+//				if (wkStartDate <= tLoanBorMain.getDrawdownDate()) {
+//					wkEffectDate = tLoanBorMain.getDrawdownDate();
+//				} else {
+//					wkEffectDate = wkStartDate;
+//				}
 				SetLoanRateChange2(tFacProdStepRate);
 				this.info("tFacProdStepRate = " + tFacProdStepRate);
 				this.info("wkStartDate = " + wkStartDate);
@@ -893,6 +895,7 @@ public class L3100 extends TradeBuffer {
 			acDetailCom.run(titaVo);
 			this.setTxBuffer(acDetailCom.getTxBuffer());
 		}
+
 	}
 
 	private void AcctFeeRoutine() throws LogicException {
@@ -907,6 +910,7 @@ public class L3100 extends TradeBuffer {
 			tAcReceivable.setFacmNo(iFacmNo);
 			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3));
 			tAcReceivable.setRvAmt(iAcctFee);
+			tAcReceivable.setOpenAcDate(this.parse.stringToInteger(titaVo.getParam("FirstDueDate")));
 			lAcReceivable.add(tAcReceivable);
 			acReceivableCom.setTxBuffer(this.getTxBuffer());
 			acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳
@@ -927,6 +931,7 @@ public class L3100 extends TradeBuffer {
 			tAcReceivable.setFacmNo(iFacmNo);
 			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "-2");
 			tAcReceivable.setRvAmt(iHandlingFee);
+			tAcReceivable.setOpenAcDate(this.parse.stringToInteger(titaVo.getParam("FirstDueDate")));
 			lAcReceivable.add(tAcReceivable);
 			acReceivableCom.setTxBuffer(this.getTxBuffer());
 			acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳
@@ -1235,5 +1240,26 @@ public class L3100 extends TradeBuffer {
 		tLoanRateChange.setAcDate(titaVo.getEntDyI());
 		tLoanRateChange.setTellerNo(titaVo.getTlrNo());
 		tLoanRateChange.setTxtNo(titaVo.getTxtNo());
+	}
+
+	public void doRptA(TitaVo titaVo) throws LogicException {
+		this.info("L3100 doRpt started.");
+		l3100Report.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+
+		l3100Report.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l3100Report.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		long rptNoA = l3100Report.close();
+
+		// 產生PDF檔案
+		l3100Report.toPdf(rptNoA);
+
+		this.info("L3100 doRpt finished.");
+		totaVo.put("DPdfSnoF", Long.toString(rptNoA));
+
 	}
 }
