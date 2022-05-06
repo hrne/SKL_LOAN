@@ -32,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class LoanCalcRepayIntCom extends CommBuffer {
 	// input 共同參數
-	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
 	private int iFacmNo;
 	private int iBormNo;
@@ -187,7 +186,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		initWorkRoutine();
 
 		// 檢查輸入資料
-		checkInputRoutine();
+		checkInputRoutine(titaVo);
 
 		// 調整違約金生效日遇假日
 		adjustBreachValidDateRoutine();
@@ -244,7 +243,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if ("Y".equals(iCaseCloseFlag) || wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 			wkTotalExtraRepay = BigDecimal.ZERO;
 			for (int i = 0; i <= wkCalcVoCount; i++) {
-				if (extraRepayRoutine(i) == true) {
+				if (extraRepayRoutine(i, titaVo) == true) {
 					break;
 				}
 			}
@@ -255,7 +254,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		// 計算合計數
 		for (int i = 0; i <= wkCalcVoCount; i++) {
-			totalAmtRoutine(i);
+			totalAmtRoutine(i, titaVo);
 		}
 
 		// 計算下次收息日
@@ -388,7 +387,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	}
 
 	// 檢查輸入資料
-	private void checkInputRoutine() throws LogicException {
+	private void checkInputRoutine(TitaVo titaVo) throws LogicException {
 		this.info("   checkInputRoutine ");
 
 		if (!(iRateCode.equals("1") || iRateCode.equals("2") || iRateCode.equals("3"))) {
@@ -824,7 +823,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   wkIntEndDate    = " + wkIntEndDate);
 		do {
 			wkIntEndDateX = 0;
-			findRateChangeRoutine();
+			findRateChangeRoutine(titaVo);
 			if (wkIntEndDate > wkNextEffectDate) {
 				wkIntEndDateX = wkIntEndDate;
 				wkIntEndDate = wkNextEffectDate;
@@ -1031,7 +1030,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	}
 
 	// 利率變動檔
-	private void findRateChangeRoutine() throws LogicException {
+	private void findRateChangeRoutine(TitaVo titaVo) throws LogicException {
 		this.info("findRateChangeRoutine ... ");
 		this.info("    RateCode=" + iRateCode);
 		this.info("    CustNo=" + iCustNo);
@@ -1335,7 +1334,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		// 期數不同調整期金
 		if (wkIndex == wkCalcVoCount || vCalcRepayIntVo.getTermNo() != lCalcRepayIntVo.get(wkIndex + 1).getTermNo()) {
-			adjustDueAmtRoutine();
+			adjustDueAmtRoutine(titaVo);
 		}
 
 		this.info("   after getInterestFlag = " + vCalcRepayIntVo.getInterestFlag());
@@ -1345,7 +1344,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	}
 
 	// 調整期金
-	private void adjustDueAmtRoutine() throws LogicException {
+	private void adjustDueAmtRoutine(TitaVo titaVo) throws LogicException {
 		// 攤還方式=3.本息平均法 且 攤還額異動碼=1:變 且利率有變動
 		if (iAmortizedCode != 3 || !"1".equals(iExtraRepayCode)
 				|| vCalcRepayIntVo.getNextStoreRate().compareTo(wkBeforeStoreRate) == 0) {
@@ -1501,14 +1500,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 		lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
 
-		fillBreachInterestRoutine(wkIndex); // 計算延遲息違約金
+		fillBreachInterestRoutine(wkIndex, titaVo); // 計算延遲息違約金
 
 		this.info("fillBreachRoutine end ");
 		return wkIndex;
 	}
 
 	// 計算違約金, 遲延息
-	private void fillBreachInterestRoutine(int wkIndex) throws LogicException {
+	private void fillBreachInterestRoutine(int wkIndex, TitaVo titaVo) throws LogicException {
 		this.info("fillBreachInterestRoutine ... ");
 		this.info("   wkIndex = " + wkIndex);
 		this.info("   iUsageCode       資金用途別     = " + iUsageCode);
@@ -2106,7 +2105,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	// d 部分償還本金內含利息時扣除全部利息
 	// e.是否重算期金，由交易處理。
 
-	private boolean extraRepayRoutine(int wkIndex) throws LogicException {
+	private boolean extraRepayRoutine(int wkIndex, TitaVo titaVo) throws LogicException {
 		this.info("extraRepayRoutine ... ");
 		this.info("   wkIndex         = " + wkIndex);
 		this.info("   wkCalcVoCount   = " + wkCalcVoCount);
@@ -2238,7 +2237,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		return false;
 	}
 
-	private void totalAmtRoutine(int wkIndex) throws LogicException {
+	private void totalAmtRoutine(int wkIndex, TitaVo titaVo) throws LogicException {
 		this.info("totalAmtRoutine ... ");
 		this.info("   wkIndex    = " + wkIndex);
 		this.info("   iSyndFlag  = " + iSyndFlag);

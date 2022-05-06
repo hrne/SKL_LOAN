@@ -160,7 +160,7 @@ public class L9731Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-						"L");
+						"######0","L");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -266,7 +266,7 @@ public class L9731Report extends MakeReport {
 
 				for (Map<String, String> tLDVo : listL9731) {
 					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-							"L");
+							"######0","R");
 
 					for (int i = 0; i < tLDVo.size(); i++) {
 
@@ -314,7 +314,7 @@ public class L9731Report extends MakeReport {
 							makeExcel.setValue(row, col, fieldValue, "C");
 							break;
 						default:
-							makeExcel.setValue(row, col, fieldValue, "L");
+//							makeExcel.setValue(row, col, fieldValue, "L");
 							break;
 						}
 					} // for
@@ -375,7 +375,7 @@ public class L9731Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-						"L");
+						"######0","R");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -429,7 +429,7 @@ public class L9731Report extends MakeReport {
 						break;
 
 					default:
-						makeExcel.setValue(row, col, fieldValue, "L");
+//						makeExcel.setValue(row, col, fieldValue, "L");
 						break;
 					}
 				} // for
