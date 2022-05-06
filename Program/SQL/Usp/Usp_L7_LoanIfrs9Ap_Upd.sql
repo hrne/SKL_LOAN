@@ -97,7 +97,7 @@ BEGIN
       FROM "InsuRenew"
       WHERE TRUNC("InsuStartDate" / 100) <= YYYYMM
         AND CASE
-              WHEN "AcDate" = 0 -- 未銷直接計入
+              WHEN "AcDate" = 0 AND "RenewCode" = 2 -- 續保未銷直接計入
               THEN 1
               WHEN TRUNC("AcDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
               THEN 1
@@ -353,7 +353,7 @@ BEGIN
          , NVL(F."EvaAmt", 0)                        AS "EvaAmt"            -- 原始鑑價金額
          , NVL(M."FirstDueDate", 0)                  AS "FirstDueDate"      -- 首次應繳日
          , NVL(M."TotalPeriod", 0)                   AS "TotalPeriod"       -- 總期數
-         , CASE WHEN TRUNC(NVL(F."UtilDeadline", 0) / 100 ) <= YYYYMM   THEN 0    
+         , CASE WHEN TRUNC(NVL(F."UtilDeadline", 0) / 100 ) <= YYYYMM   THEN 0    -- 動支期限到期
                 WHEN NVL(F."LineAmt", 0) < NVL(F."UtilBal", 0) THEN 0
                 ELSE NVL(F."LineAmt", 0) - NVL(F."UtilBal", 0)
            END                                       AS "AvblBal"           -- 可動用餘額(台幣)

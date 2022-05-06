@@ -2,17 +2,15 @@ package com.st1.itx.util.common;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
-
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.LoanBorMainService;
-import com.st1.itx.util.date.DateUtil;
 
 /**
  * 設定額度戶況<BR>
@@ -27,17 +25,27 @@ public class FacStatusCom {
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
+	
 	@Autowired
-	public LoanBorMainService loanBorMainService;
-
+	LoanBorMainService loanBorMainService;
+	
+	/**
+	 * 額度
+	 * @return
+	 */
+	public int getFacmNo() {
+		return facmNo;
+	}
+	
+	private int  facmNo = 0;
+	
 	/**
 	 * 設定額度戶況
 	 * 
 	 * @param lLoanBorMain List of LoanBorMain
-	 * @param tbsdy        會計日期
-	 * @return status 0.正常戶 1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶
-	 *         8.債權轉讓戶 9.呆帳結案戶
+	 * @param tbsdy        會計日期 
+	 * @return status 0.正常戶  1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶 8.債權轉讓戶 9.呆帳結案戶
 	 * @throws LogicException LogicException
 	 */
 	public int settingStatus(List<LoanBorMain> lLoanBorMain, int tbsdy) throws LogicException {
@@ -124,12 +132,17 @@ public class FacStatusCom {
 				}
 
 			}
-
+		}
+		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
+			if (tmpLoanBorMain.getStatus() ==  tmpLoanBorMain.getStatus()) {
+                this.facmNo = tmpLoanBorMain.getFacmNo();
+			}
 		}
 		return status;
 	}
 
-	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy, TitaVo titaVo) throws LogicException {
+	
+	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy,TitaVo titaVo) throws LogicException {
 		int priorty = 11;
 		int status = 0;
 //	 priority    status  
@@ -146,7 +159,7 @@ public class FacStatusCom {
 
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 		Slice<LoanBorMain> slLoanBorMain = null;
-
+		
 		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();

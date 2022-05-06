@@ -1,5 +1,7 @@
 package com.st1.itx.config;
 
+import java.util.Objects;
+
 import com.st1.itx.eum.ThreadVariable;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -15,7 +17,7 @@ public class TaskContextBasedDiscriminator extends AbstractDiscriminator<ILoggin
 
 	public String getDiscriminatingValue(ILoggingEvent iLoggingEvent) {
 		String userId = ThreadVariable.getEmpNot();
-		if (userId.isEmpty())
+		if (Objects.isNull(userId) || userId.trim().isEmpty())
 			return DEFAULT_VALUE;
 		else
 			return userId;

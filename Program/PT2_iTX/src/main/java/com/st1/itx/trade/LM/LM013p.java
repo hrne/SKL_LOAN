@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class LM013p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM013p.class);
 
 	@Autowired
 	LM013Report lM013Report;
@@ -40,10 +39,12 @@ public class LM013p extends TradeBuffer {
 
 		this.info("LM013p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
-
+		
 		lM013Report.setParentTranCode(parentTranCode);
+		
+		int type = Integer.valueOf(titaVo.getParam("inputType"));
 
-		boolean isFinish = lM013Report.exec(titaVo);
+		boolean isFinish = lM013Report.exec(titaVo,type);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM013金檢報表(放款種類表)已完成", titaVo);

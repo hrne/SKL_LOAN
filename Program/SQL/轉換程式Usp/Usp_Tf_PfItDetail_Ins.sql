@@ -90,6 +90,7 @@ BEGIN
             FROM "LN$AA1P" A1
             LEFT JOIN "TmpQQQP" QQ ON QQ."LMSACN" = A1."LMSACN"
                                   AND QQ."LMSAPN" = A1."LMSAPN"
+                                  AND QQ."CASCDE" = A1."CASCDE"
             WHERE NVL("LMSLLD",0) > 20200610
               AND NVL("LMSLLD",0) < 29101231) S1
     -- 計算累積撥款金額 (合計到額度層 ??? )

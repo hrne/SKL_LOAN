@@ -214,7 +214,7 @@ T(2,#OOCustNo+－+#OOFacmNo)
 #OOEntryDate=D,7,L
 
 ! 法拍費用
-#OOFee=m,12.2,L
+#OOFee=m,12,L
 
 
 ! 科目名稱

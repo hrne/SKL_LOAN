@@ -386,11 +386,11 @@ public class L420ABatch extends TradeBuffer {
 				facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
 			}
 		}
-		
+
 		ArrayList<BaTxVo> listbaTxVo = new ArrayList<BaTxVo>();
 		if ("4".equals(tDetail.getProcStsCode()) && iTempVo.getParam("MergeSeq").equals(iTempVo.getParam("MergeCnt"))) {
 			for (BaTxVo ba : iBatxList) {
-				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0 || ba.getDataKind() == 4) {
 					listbaTxVo.add(ba);
 				}
 			}
@@ -404,13 +404,13 @@ public class L420ABatch extends TradeBuffer {
 			baTxVo.setAcctAmt(tDetail.getRepayAmt());
 			lbaTxVo.add(baTxVo);
 		}
-		
+
 		for (BaTxVo ba : lbaTxVo) {
 			this.info("ccc =" + ba.toString());
 		}
 		// 計算帳務作帳金額
 		lbaTxVo = settleAcAmt(repayType, tDetail.getRepayAmt(), lbaTxVo, titaVo);
-		
+
 		for (BaTxVo baTxVo : lbaTxVo) {
 			if (baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0) {
 				continue;
@@ -431,10 +431,8 @@ public class L420ABatch extends TradeBuffer {
 			da.put("CloseReasonCode", tTempVo.getParam("CloseReasonCode"));
 			da.put("IntStartDate", "" + baTxVo.getIntStartDate());
 			da.put("IntEndDate", "" + baTxVo.getIntEndDate());
-			// 本金(A) = 本金 - 本次短繳 + 回收短繳
-			da.put("Principal", "" + baTxVo.getPrincipal().subtract(baTxVo.getUnpaidPrin()));
-			// 利息(B) = 利息 - 本次短繳 + 回收短繳
-			da.put("Interest", "" + baTxVo.getInterest().subtract(baTxVo.getUnpaidInt()));
+			da.put("Principal", "" + baTxVo.getPrincipal()); // // 本金(A)
+			da.put("Interest", "" + baTxVo.getInterest()); // 利息(B)
 			da.put("TempPayAmt", "0"); // 暫付款(C)
 			da.put("BreachAmt", "" + baTxVo.getDelayInt().add(baTxVo.getBreachAmt()).add(baTxVo.getCloseBreachAmt())); // 違約金(D)
 			da.put("TempDr",
@@ -550,7 +548,7 @@ public class L420ABatch extends TradeBuffer {
 		return msg;
 	}
 
-	private ArrayList<BaTxVo> settleAcAmt(int iRepayType, BigDecimal iTxAmt, ArrayList<BaTxVo> iBatxList, TitaVo titaVo)
+	private ArrayList<BaTxVo> settleAcAmt(int iRepayType, BigDecimal iTxAmt, ArrayList<BaTxVo> iBaTxList, TitaVo titaVo)
 			throws LogicException {
 		this.info("settleAcAmt ... iRepayType=" + iRepayType + ", iTxAmt=" + iTxAmt);
 		// 計算金額
@@ -562,9 +560,8 @@ public class L420ABatch extends TradeBuffer {
 		BigDecimal wkTempAmt = BigDecimal.ZERO;
 		BigDecimal wkTempBal = BigDecimal.ZERO;
 		BigDecimal wkFeeAmt = BigDecimal.ZERO;
-
 		// 計算短溢收金額 ，溢(C)短(D)繳
-		for (BaTxVo ba : iBatxList) {
+		for (BaTxVo ba : iBaTxList) {
 			this.info("settleAcAmt= " + ba.toString());
 			// 計算費用
 			if (ba.getFeeAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -589,29 +586,69 @@ public class L420ABatch extends TradeBuffer {
 		this.info("settleAcAmt wkFeeAmt=" + wkFeeAmt + ", wkOverAmt=" + wkOverAmt + ", wkShortAmt=" + wkShortAmt
 				+ ", wkTempAmt=" + wkTempAmt);
 
-		// 回收短繳(G) ==>
+		// 回收短繳(G)、本次短繳
+		// 1.期金 => 已在BaTxCom 計算
+		// 2. 部分償還本金時，短繳金額先扣除回收短繳利息，再扣除利息
+		if (iRepayType == 2 && wkShortAmt.compareTo(BigDecimal.ZERO) > 0) {
+			// 短繳金額先扣除回收短繳利息
+			for (BaTxVo ba : iBaTxList) {
+				if (ba.getDataKind() == 1 && ba.getRepayType() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					if (wkShortAmt.compareTo(ba.getInterest()) > 0) {
+						wkShortAmt = wkShortAmt.subtract(ba.getInterest());
+						ba.setInterest(BigDecimal.ZERO);
+						ba.setAcctAmt(BigDecimal.ZERO);
+					} else {
+						ba.setInterest(ba.getInterest().subtract(wkShortAmt));
+						ba.setAcctAmt(ba.getAcctAmt().subtract(wkShortAmt));
+						wkShortAmt = BigDecimal.ZERO;
+					}
+					this.info("RepayType == 2 xxx wkShortAmt=" + wkShortAmt + ba.toString());
+				}
+			}
+			// 短繳金額先扣除扣除利息
+			for (BaTxVo ba : iBaTxList) {
+				if (ba.getDataKind() == 2) {
+					this.info("RepayType == 2 wkShortAmt=" + wkShortAmt + ba.toString());
+					if (wkShortAmt.compareTo(ba.getInterest()) > 0) {
+						ba.setUnpaidInt(ba.getInterest());
+						wkShortAmt = wkShortAmt.subtract(ba.getInterest());
+					} else {
+						ba.setUnpaidInt(wkShortAmt);
+						ba.setInterest(ba.getInterest().subtract(wkShortAmt));
+						wkShortAmt = BigDecimal.ZERO;
+					}
+					this.info("RepayType == 2 end wkShortAmt=" + wkShortAmt + ba.toString());
+				}
+			}
+		}
+
+		// 回收短繳(G) ==> 放在償還本利那筆
 		if (iRepayType >= 1 && iRepayType <= 3) {
-			for (BaTxVo ba : this.baTxList) {
+			for (BaTxVo ba : iBaTxList) {
 				if (ba.getDataKind() == 1 && ba.getRepayType() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					// 放相同額度撥款的本利資料筆
-					for (BaTxVo da : iBatxList) {
+					for (BaTxVo da : iBaTxList) {
 						if (ba.getDataKind() == 2 && da.getFacmNo() == ba.getFacmNo()
-								&& da.getBormNo() == ba.getFacmNo()) {
-							da.setPrincipal(ba.getPrincipal());
-							da.setInterest(ba.getInterest());
-							da.setCloseBreachAmt(ba.getCloseBreachAmt());
+								&& da.getBormNo() == ba.getBormNo()) {
+							da.setPrincipal(da.getPrincipal().add(ba.getPrincipal()));
+							da.setInterest(da.getInterest().add(ba.getInterest()));
+							da.setCloseBreachAmt(da.getCloseBreachAmt().add(ba.getCloseBreachAmt()));
 							da.setAcctAmt(da.getAcctAmt().add(ba.getAcctAmt()));
+							ba.setPrincipal(BigDecimal.ZERO);
+							ba.setInterest(BigDecimal.ZERO);
+							ba.setCloseBreachAmt(BigDecimal.ZERO);
 							ba.setAcctAmt(BigDecimal.ZERO);
 						}
 					}
 				}
 			}
 		}
+
 		// 作帳金額 = 本金(A)+利息(B)+違約金(D)+費用(H)+回收短繳(G)
 // 交易金額 + 暫收借 = 作帳金額 + 暫收貸
 
 		// 本金利息 本金(A)+利息(B)+違約金(D)+費用(H) ==> add to 作帳金額
-		for (BaTxVo ba : iBatxList) {
+		for (BaTxVo ba : iBaTxList) {
 			if (ba.getRepayType() >= 1 && ba.getRepayType() <= 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 				// 交易金額放第一筆
 				ba.setTxAmt(wkTxAmt);
@@ -645,7 +682,7 @@ public class L420ABatch extends TradeBuffer {
 						+ ba.getTempAmt() + ba.toString());
 			}
 		}
-		for (BaTxVo ba : iBatxList) {
+		for (BaTxVo ba : iBaTxList) {
 			if (ba.getDataKind() == 4) {
 				// 交易金額放第一筆
 				ba.setTxAmt(wkTxAmt);
@@ -678,7 +715,7 @@ public class L420ABatch extends TradeBuffer {
 
 		// 作帳金額 = 作帳金額 + (暫收貸 - 暫收借)
 		BigDecimal acAmt = BigDecimal.ZERO;
-		for (BaTxVo ba : iBatxList) {
+		for (BaTxVo ba : iBaTxList) {
 			ba.setAcAmt(ba.getAcAmt().add(ba.getTempAmt()));
 			acAmt = acAmt.add(ba.getAcAmt());
 			this.info("SettleAcAmt end " + ba.toString());
@@ -688,7 +725,7 @@ public class L420ABatch extends TradeBuffer {
 		} else {
 			this.info("SettleAcAmt unEqual 交易金額" + iTxAmt + "<> 作帳金額 " + acAmt + "，差額= " + iTxAmt.subtract(acAmt));
 		}
-		return iBatxList;
+		return iBaTxList;
 	}
 
 }

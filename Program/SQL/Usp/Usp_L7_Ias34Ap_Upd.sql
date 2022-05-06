@@ -1,8 +1,8 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ap_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_Ias34Ap_Upd"
 (
 -- 程式功能：維護 Ias34Ap 每月IAS34資料欄位清單A檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_Ias34Ap_Upd"(20201231,'System',0);
+-- 執行方式：EXEC "Usp_L7_Ias34Ap_Upd"(20211230,'999999',1);
 --
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -96,7 +96,7 @@ BEGIN
       FROM "InsuRenew"
       WHERE TRUNC("InsuStartDate" / 100) <= YYYYMM
         AND CASE
-              WHEN "AcDate" = 0 -- 未銷直接計入
+              WHEN "AcDate" = 0 AND "RenewCode" = 2 -- 續保未銷直接計入
               THEN 1
               WHEN TRUNC("AcDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
               THEN 1
@@ -329,8 +329,7 @@ BEGIN
          , NVL(F."Zip3", ' ')                        AS "Zip3"              -- 擔保品地區別 (郵遞區號)
          , NVL(F."ProdNo", ' ')                      AS "ProdNo"            -- 商品利率代碼
          , CASE
---             WHEN F."EntCode" IN ('1') THEN 1  -- 企金
-             WHEN F."EntCode" IN ('1','2') THEN 1  -- 企金
+             WHEN F."EntCode" IN ('1') THEN 1  -- 企金不含企金自然人BY舜雯
              ELSE 2
            END                                       AS "CustKind"          -- 企業戶/個人戶 (1=企業戶 2=個人戶)
          , NVL(F."AssetClass", 0)                    AS "AssetClass"        -- 五類資產分類

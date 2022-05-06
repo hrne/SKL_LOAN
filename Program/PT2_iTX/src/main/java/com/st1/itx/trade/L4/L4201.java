@@ -81,22 +81,22 @@ public class L4201 extends TradeBuffer {
 		}
 		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
-		int oldPreRepayTerms = 1;
+		int oldPreRepayTerms = 0;
 		if (tBatxDetail.getRepayType() == 1) {
 			if (tTempVo.get("PreRepayTerms") != null) {
-				oldPreRepayTerms = 0;
+				oldPreRepayTerms = parse.stringToInteger(tTempVo.get("PreRepayTerms"));
 				tTempVo.remove("PreRepayTerms");
 			}
 		}
 //		整批變更還款類別
-		int newPreRepayTerms = 1;
+		int newPreRepayTerms = 0;
 		if (titaVo.get("selectTotal") != null) {
 			btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
 			// 期款 0-1, 1-2, 2-3, 3-1(不預收)
 			switch (btnIndex) {
 			case 0:
 				iRepayTypeA = 1;
-				newPreRepayTerms = 1;
+				newPreRepayTerms = this.txBuffer.getSystemParas().getPreRepayTermsBatch();
 				break;
 			case 1:
 				iRepayTypeA = 2;
@@ -118,12 +118,17 @@ public class L4201 extends TradeBuffer {
 		tBatxDetail.setCustNo(iCustNoA);
 		tBatxDetail.setProcStsCode("0");
 		tBatxDetail.setProcStsCode(iProcStsCode);
-		if (newPreRepayTerms == 0) {
-			tTempVo.putParam("PreRepayTerms", 0);
+		if (tBatxDetail.getRepayType() == 1) {
+			tTempVo.putParam("PreRepayTerms", newPreRepayTerms);
 		}
-
+		// 再檢核一次，移除匯款轉帳同戶號多筆檢核
+		tTempVo.remove("MergeCnt");
+		tTempVo.remove("MergeAmt");
+		tTempVo.remove("MergeSeq");
 		tBatxDetail.setProcNote(tTempVo.getJsonString());
-		tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
+		if ("1".equals(iProcStsCode)) {
+			tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
+		}
 		try {
 			batxDetailService.update(tBatxDetail);
 		} catch (DBException e) {

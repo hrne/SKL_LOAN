@@ -496,6 +496,8 @@ public class BaTxCom extends TradeBuffer {
 		if (tempVo.get("MergeAmt") != null) {
 			if (iRepayType >= 1 && iRepayType <= 3) {
 				if (!tempVo.get("MergeSeq").equals(tempVo.get("MergeCnt"))) {
+					// getOverRpFacmNo
+					repayLoanSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
 					this.payFeeFlag = "N";
 					iRepayType = 9;
 					this.baTxList = new ArrayList<BaTxVo>();
@@ -1094,8 +1096,8 @@ public class BaTxCom extends TradeBuffer {
 		// 戶況
 		if (this.lLoanBorMain.size() == 0) {
 			this.facStatus = facStatusCom.settingStatus(slLoanBorMain.getContent(), iEntryDate);
-			this.info("FacStatus =" + this.facStatus);
-			return;
+			this.overRpFacmNo = facStatusCom.getFacmNo(); // 溢短繳額度;
+			this.info("FacStatus =" + this.facStatus + ", overRpFacmNo=" + this.overRpFacmNo);
 		}
 	}
 
@@ -1168,7 +1170,7 @@ public class BaTxCom extends TradeBuffer {
 		});
 
 		this.overRpFacmNo = this.lLoanBorMain.get(0).getFacmNo(); // 溢短繳額度;
-		this.info("repayLoanList end overRpFacmNo = " + this.lLoanBorMain.get(0).getFacmNo());
+		this.info("repayLoanSort end overRpFacmNo = " + this.lLoanBorMain.get(0).getFacmNo());
 
 	}
 
@@ -1185,12 +1187,15 @@ public class BaTxCom extends TradeBuffer {
 		this.info("   TxAmt     = " + iTxAmt);
 		this.info("   Terms     = " + iTerms);
 		this.info("   extraRepay = " + this.extraRepay);
-		// sort
-		if (iRepayType == 1 || iRepayType == 2) {
-			repayLoanSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
+		if (this.lLoanBorMain.size() == 0) {
+			return;
 		}
+		// sort
+		repayLoanSort(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
+
+		// RepayInt begin
 		loanSetRepayIntCom.setTxBuffer(this.getTxBuffer());
-		loanCalcRepayIntCom.init(); 
+		loanCalcRepayIntCom.init();
 		BigDecimal wkExtraRepayRemaind = this.extraRepay;
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 		int wkTerms = 0;
@@ -1607,8 +1612,6 @@ public class BaTxCom extends TradeBuffer {
 					payIntDate = ba.getPayIntDate();
 					facmNo = ba.getFacmNo();
 					payintDateAmt = getPayintDateAmt(payIntDate, facmNo);
-					this.info("settleByPayintDate xxBal=" + this.xxBal + ", rePayIntDate=" + payIntDate
-							+ ", payintDateAmt=" + payintDateAmt + ", shortAmtLimit=" + shortAmtLimit);
 					// 餘額不足只算第一期
 					if (this.xxBal.add(this.shortAmtLimit).compareTo(payintDateAmt) < 0) {
 						if (isFirstPaid) {
@@ -1634,12 +1637,12 @@ public class BaTxCom extends TradeBuffer {
 		BigDecimal wkPayintDateAmt = BigDecimal.ZERO;
 		BigDecimal wkShortAmtLimit = BigDecimal.ZERO;
 		BigDecimal wkNowBal = this.xxBal;
+		BigDecimal wkUnpaidAmt = BigDecimal.ZERO;
 		this.shortAmtLimit = BigDecimal.ZERO;
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getFacmNo() == facmNo && ba.getAcctAmt().equals(BigDecimal.ZERO)) {
 				if (ba.getRepayPriority() == 5 && ba.getPayIntDate() == payIntDate) {
 					wkPayintDateAmt = wkPayintDateAmt.add(ba.getUnPaidAmt());
-					wkNowBal = wkNowBal.subtract(ba.getUnPaidAmt());
 					// 可欠繳且最後一期可欠繳
 					if (this.unpaidFlag.equals("Y") && this.xxBal.compareTo(BigDecimal.ZERO) > 0) {
 						// 依短繳限額 1.還本金額 2.還息金額
@@ -1648,24 +1651,24 @@ public class BaTxCom extends TradeBuffer {
 									.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
 									.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
 							if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit.compareTo(
-									new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) < 0) {
+									new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
 								wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
 							}
+							// 短繳金額= 負餘額(取正值)-已短繳餘額
+							wkNowBal = wkNowBal.subtract(ba.getUnPaidAmt());
 							if (wkNowBal.compareTo(BigDecimal.ZERO) < 0) {
-								if (wkNowBal.add(wkShortAmtLimit).compareTo(BigDecimal.ZERO) > 0) {
-									ba.setUnpaidPrin(BigDecimal.ZERO.subtract(wkNowBal));
-									wkNowBal = BigDecimal.ZERO;
-								}
+								ba.setUnpaidPrin(BigDecimal.ZERO.subtract(wkNowBal).subtract(wkUnpaidAmt));
+								wkUnpaidAmt = wkUnpaidAmt.add(ba.getUnpaidPrin());
 							}
 						} else {
 							wkShortAmtLimit = ba.getInterest()
 									.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
 									.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+							// 短繳金額= 負餘額(取正值)-已短繳餘額
+							wkNowBal = wkNowBal.subtract(ba.getUnPaidAmt());
 							if (wkNowBal.compareTo(BigDecimal.ZERO) < 0) {
-								if (wkNowBal.add(wkShortAmtLimit).compareTo(BigDecimal.ZERO) > 0) {
-									ba.setUnpaidInt(BigDecimal.ZERO.subtract(wkNowBal));
-									wkNowBal = BigDecimal.ZERO;
-								}
+								ba.setUnpaidInt(BigDecimal.ZERO.subtract(wkNowBal).subtract(wkUnpaidAmt));
+								wkUnpaidAmt = wkUnpaidAmt.add(ba.getUnpaidInt());
 							}
 						}
 						this.shortAmtLimit = this.shortAmtLimit.add(wkShortAmtLimit);
@@ -1673,7 +1676,11 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
+		this.info("getPayintDateAmt end xxBal=" + this.xxBal + ", rePayIntDate=" + payIntDate + ", payintDateAmt="
+				+ wkPayintDateAmt + ", wkUnpaidAmt=" + wkUnpaidAmt + ", shortAmtLimit=" + shortAmtLimit);
+
 		return wkPayintDateAmt;
+
 	}
 
 	// 更新額度應繳日金額

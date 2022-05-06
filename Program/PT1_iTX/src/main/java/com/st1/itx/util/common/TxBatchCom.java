@@ -1287,12 +1287,16 @@ public class TxBatchCom extends TradeBuffer {
 				}
 				// 部分償還本金
 				this.checkMsg += ", 部分償還金額 :" + this.tTempVo.get("ExtraRepay");
-				if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
-					this.checkMsg += ", 短繳利息:" + this.shortAmt;
-				}
 
 				// 檢核正常
 				this.procStsCode = "4"; // 4.檢核正常
+				if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
+					this.checkMsg += ", 有溢繳款:" + this.overAmt;
+				}
+
+				if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
+					this.checkMsg += ", 有短繳款:" + this.shortAmt;
+				}
 				apendcheckMsgAmounts(tBatxDetail, titaVo);
 				break;
 			// 03-結案
@@ -1708,15 +1712,13 @@ public class TxBatchCom extends TradeBuffer {
 			this.facStatus = parse.stringToInteger(this.tTempVo.get("FacStatus"));
 
 		}
-
-		// 結案記號判斷
+		// 結案記號、應繳本利
 		boolean isCloseFg = true;
-
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			for (BaTxVo baTxVo : baTxList) {
 				if (baTxVo.getDataKind() == 2) {
 					this.loanBal = loanBal.add(baTxVo.getLoanBal());
-					// 應繳
+					// 應繳本利
 					if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt());
 						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
@@ -1729,22 +1731,15 @@ public class TxBatchCom extends TradeBuffer {
 					if (baTxVo.getCloseFg() == 0) {
 						isCloseFg = false;
 					}
-					// 計息起日
-					if (this.intStartDate == 0 || baTxVo.getIntStartDate() < this.intStartDate) {
-						this.intStartDate = baTxVo.getIntStartDate();
-					}
-					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
-						this.principal = this.principal.add(baTxVo.getPrincipal());
-						this.interest = this.interest.add(baTxVo.getInterest());
-						this.delayInt = this.delayInt.add(baTxVo.getDelayInt());
-						this.breachAmt = this.breachAmt.add(baTxVo.getBreachAmt());
-						// 計息止日(還款)
-						if (baTxVo.getIntEndDate() > this.intEndDate) {
-							this.intEndDate = baTxVo.getIntEndDate();
-						}
-					}
 				}
+			}
+			if (!isCloseFg) {
+				this.closeFg = 0;
+			}
+		}
+
+		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
+			for (BaTxVo baTxVo : baTxList) {
 				if (baTxVo.getDataKind() == 1) {
 					// 應繳費用 = 1.應收費用+未收費用
 					// +短繳期金
@@ -1789,6 +1784,23 @@ public class TxBatchCom extends TradeBuffer {
 						this.unPayRepayTypeFee = this.unPayRepayTypeFee.add(baTxVo.getUnPaidAmt());
 					}
 				}
+				if (baTxVo.getDataKind() == 2) {
+					// 計息起日
+					if (this.intStartDate == 0 || baTxVo.getIntStartDate() < this.intStartDate) {
+						this.intStartDate = baTxVo.getIntStartDate();
+					}
+					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
+						this.principal = this.principal.add(baTxVo.getPrincipal());
+						this.interest = this.interest.add(baTxVo.getInterest());
+						this.delayInt = this.delayInt.add(baTxVo.getDelayInt());
+						this.breachAmt = this.breachAmt.add(baTxVo.getBreachAmt());
+						// 計息止日(還款)
+						if (baTxVo.getIntEndDate() > this.intEndDate) {
+							this.intEndDate = baTxVo.getIntEndDate();
+						}
+					}
+				}
 
 				if (baTxVo.getDataKind() == 3) {
 					this.tavAmt = this.tavAmt.add(baTxVo.getUnPaidAmt());
@@ -1813,9 +1825,6 @@ public class TxBatchCom extends TradeBuffer {
 						}
 					}
 				}
-			}
-			if (!isCloseFg) {
-				this.closeFg = 0;
 			}
 		}
 

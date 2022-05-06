@@ -72,7 +72,6 @@ public class L4601Report extends MakeReport {
 	private int pageIndex = 38;
 	private int reporttype = 0;
 
-
 	public void printHeaderP() {
 		this.setFont(1, 10);
 
@@ -112,23 +111,19 @@ public class L4601Report extends MakeReport {
 	}
 
 	private void Report(TitaVo titaVo, Slice<InsuRenewMediaTemp> sL4601List) throws LogicException {
-		
-		
+
 		// 戶號額度
 		HashMap<tmpCF, Integer> infor = new HashMap<>();
-		
+
 		if (reporttype == 1) {
 			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4601", reportName, "", "A4", "L");
 		} else {
 			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4601", reportName, "", "A4", "L");
 		}
 		String tempcustno = "";
-		String tempfacmno = "";
 		int rowcount = 0;
 		if (sL4601List != null) {
 			this.info("List is true");
-			tempcustno = sL4601List.getContent().get(0).getCustNo();
-			tempfacmno = sL4601List.getContent().get(0).getFacmNo();
 			// 比較戶號額度 + 分隔線
 			int count = 0;
 			List<InsuRenewMediaTemp> lTemp = new ArrayList<InsuRenewMediaTemp>();
@@ -160,7 +155,7 @@ public class L4601Report extends MakeReport {
 						if (infor.get(tmp) != null) {
 
 							this.info("infor : " + infor.get(tmp));
-							
+
 							if (infor.get(tmp) >= 2) {
 								lTemp.add(l);
 							}
@@ -172,15 +167,19 @@ public class L4601Report extends MakeReport {
 			}
 
 			int listsize = lTemp.size();
+			tempcustno = lTemp.get(0).getCustNo();
+
 			if (lTemp.size() != 0) {
 				for (InsuRenewMediaTemp t : lTemp) {
 
 					if (rowcount != 0) { // 換頁第一筆不判斷
-						if (!tempcustno.equals(t.getCustNo()) && !tempfacmno.equals(t.getFacmNo())) {
+
+						if (!tempcustno.equals(t.getCustNo())) {
 							this.print(1, 0,
 									"------------------------------------------------------------------------------------------------------------------------------------------------");
 							rowcount = rowcount + 1;
 						}
+
 					}
 					this.print(1, 2, t.getCustNo());
 					this.print(0, 14, t.getFacmNo());
@@ -201,7 +200,7 @@ public class L4601Report extends MakeReport {
 					}
 					rowcount = rowcount + 2;
 					tempcustno = t.getCustNo();
-					tempfacmno = t.getFacmNo();
+	
 					count++;
 
 					if (listsize == count) { // 最後一筆

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanRateChange_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_LoanRateChange_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -43,6 +43,9 @@ BEGIN
         12/16修改
         1.增加判斷"加減碼是否依合約"
         2.增加判斷 LA$IRTP.IRTADT 早於西元帳務日
+
+        2022/5/6修改
+        不排除早於帳號撥款日的利率、加碼利率
     */
     INSERT INTO "LoanRateChange"
     SELECT R."LMSACN"                     AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
@@ -94,10 +97,10 @@ BEGIN
                                 AND LA."LMSAPN" = LI."LMSAPN"
                                 AND LA."LMSASQ" = LI."LMSASQ"
                                 AND LA."ASCADT" <= LI."IRTADT"
-                                AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
+                                -- AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
           WHERE NVL(LI."IRTADT",0) > 0 -- 篩選放款戶利率檔生效日期不為0者
             AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
-            AND LI."IRTADT" >= LM."LMSLLD" -- 基本利率生效日期>=撥款日
+            -- AND LI."IRTADT" >= LM."LMSLLD" -- 基本利率生效日期>=撥款日
          ) R
     LEFT JOIN "FacProd" FP ON FP."ProdNo" = R."IRTBCD"
     WHERE R."Seq" = 1 -- 加碼利率生效日早於適用利率生效日且最近的一筆
@@ -115,6 +118,9 @@ BEGIN
      *
      * 2021-04-12 智偉 修改 將未來的加碼利率轉入
      * 2022-03-16 智偉 修改 將未被寫入的加碼利率轉入
+     * 
+     * 2022/5/6修改
+     * 不排除早於帳號撥款日的利率、加碼利率
     */
     INSERT INTO "LoanRateChange"
     WITH rawData AS (
@@ -158,7 +164,7 @@ BEGIN
         AND NVL(LRC."EffectDate",0) = 0 -- 尚未被記錄在放款利率變動檔的加碼利率才寫入
         AND NVL(FP."BaseRateCode",'00') IN ('01','02')
         AND LM."LMSLLD" <= "TbsDyF" -- 排除預約撥款
-        AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
+        -- AND LA."ASCADT" >= LM."LMSLLD" -- 加碼利率生效日期>=撥款日
         AND LA."ASCADT" > "TbsDyF" -- 未來的加碼利率
     )
     SELECT "LMSACN"                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
@@ -411,6 +417,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_LoanRateChange_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 /

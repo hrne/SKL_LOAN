@@ -61,6 +61,8 @@ public class ThreadVariable {
 	}
 
 	public static void clearThreadLocal() {
+		if (!Objects.isNull(threadLocal.get()))
+			threadLocal.get().clear();
 		threadLocal.remove();
 	}
 

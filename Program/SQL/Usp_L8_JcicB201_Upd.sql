@@ -758,11 +758,38 @@ BEGIN
                   WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."GraceDate",0) / 100) - 191100 )  ) ,5,'0')   
              END                                   AS "GraceEndYM"        -- 房貸寬限期截止年月
-           , ' '                                   AS "GreenFg"           -- 綠色授信註記
-           , ' '                                   AS "GreenCode"         -- 綠色支出類別
-           , ' '                                   AS "SustainFg"         -- 永續績效連結授信註記
-           , ' '                                   AS "SustainCode"       -- 永續績效連結授信類別
-           , ' '                                   AS "SustainNoReachFg"  -- 永續績效連結授信約定條件全部未達成通報
+           , CASE WHEN NVL(F."Grcd",' ') = ' ' AND M."EntCode" IN ('1') THEN 'N'  -- 企金不可空白
+                  WHEN NVL(F."Grcd",' ') = ' ' AND M."EntCode" NOT IN ('1') AND
+                       TRUNC(NVL(M."DrawdownDate", 0) / 100 ) >= 202203 THEN 'N' -- 非企金但撥款日大於等於111年03月則不可空白
+                  WHEN NVL(F."Grcd",' ') = ' ' THEN ' '
+                  WHEN F."Grcd" NOT IN ('Y','N') THEN 'N'
+                  ELSE F."Grcd"     
+             END                                   AS "GreenFg"           -- 綠色授信註記
+           , CASE WHEN NVL(F."Grcd",' ') IN ('Y') AND NVL(F."GrKind",' ') IN ('A','B','C','D','E','F','G','H','I','J') 
+                       THEN F."GrKind"
+                  WHEN NVL(F."Grcd",' ') IN ('Y') THEN 'Z'     
+                  ELSE ' '
+             END                                   AS "GreenCode"         -- 綠色支出類別
+           , CASE WHEN NVL(F."EsGcd",' ') = ' ' AND M."EntCode" IN ('1') THEN 'N'  -- 企金不可空白
+                  WHEN NVL(F."EsGcd",' ') = ' ' AND M."EntCode" NOT IN ('1') AND
+                       TRUNC(NVL(M."DrawdownDate", 0) / 100 ) >= 202203 THEN 'N' -- 非企金但撥款日大於等於111年03月則不可空白
+                  WHEN NVL(F."EsGcd",' ') = ' ' THEN ' '
+                  WHEN F."EsGcd" NOT IN ('Y','N') THEN 'N'
+                  ELSE F."EsGcd"     
+             END                                   AS "SustainFg"         -- 永續績效連結授信註記
+           , CASE WHEN NVL(F."EsGcd",' ') IN ('Y') AND NVL(F."EsGKind",' ') IN ('1','2','3','4','5','6','7') 
+                       THEN F."EsGKind"
+                  WHEN NVL(F."EsGcd",' ') IN ('Y') THEN '1' -- 預設值     
+                  ELSE ' '
+             END                                   AS "SustainCode"       -- 永續績效連結授信類別
+           , CASE WHEN NVL(F."EsGcd",' ') = ' ' AND M."EntCode" IN ('1') THEN 'N'
+                  WHEN NVL(F."EsGcd",' ') = ' ' AND M."EntCode" NOT IN ('1') AND
+                       TRUNC(NVL(M."DrawdownDate", 0) / 100 ) >= 202203 THEN 'N' -- 非企金但撥款日大於等於111年03月則不可空白
+                  WHEN NVL(F."EsGcd",' ') = ' ' THEN ' '
+                  WHEN F."EsGcnl" NOT IN ('Y','N') THEN 'N'
+                  WHEN F."EsGcd" IN ('N') THEN 'N'
+                  ELSE F."EsGcnl"
+             END                                   AS "SustainNoReachFg"  -- 永續績效連結授信約定條件全部未達成通報
            , CASE
                WHEN M."CustNo" IN (0269376) AND M."FacmNo" IN (003) AND M."BormNo" IN (001) THEN 09912  -- 特例 (ref: LN15H1)
                WHEN TRUNC(NVL(M."BadDebtDate",0) / 100) < 191100 THEN TRUNC(NVL(M."BadDebtDate",0) / 100)
@@ -1122,41 +1149,6 @@ BEGIN
 
     UPD_CNT := UPD_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('UPDATE 呆帳：更新 DelayBal 逾期未還餘額 END');
-
----- 呆帳：更新 DelayBal 逾期未還餘額（台幣）
---    DBMS_OUTPUT.PUT_LINE('UPDATE 呆帳：更新 DelayBal 逾期未還餘額 ');
---
---    MERGE INTO "JcicB201" M
---    USING ( SELECT M."DataYM"
---                 , TRIM(to_char(M."CustNo",'0000000')) || TRIM(to_char(M."FacmNo",'000')) || TRIM(to_char(M."BormNo",'000')) AS "AcctNo"
---                 , SUM( NVL(O."BadDebtBal",0) )  AS "BadDebtBal"
---            FROM "JcicMonthlyLoanData" M
---              LEFT JOIN "LoanOverdue" O  ON O."CustNo"   =  M."CustNo"
---                                        AND O."FacmNo"   =  M."FacmNo"
---                                        AND O."BormNo"   =  M."BormNo"
---                                        AND O."Status"   IN (3)  -- 呆帳
---            WHERE M."DataYM"    =  YYYYMM
---              AND M."Status"    IN (6)   -- 呆帳
---            GROUP BY M."DataYM", M."CustNo", M."FacmNo", M."BormNo"
---          ) B
---    ON (    M."DataYM"    =  YYYYMM
---        AND M."AcctNo"    =  B."AcctNo"
---       )
---    WHEN MATCHED THEN UPDATE
---      SET M."DelayBal" =  CASE
---                            WHEN NVL(B."BadDebtBal",0) = 0  THEN 0
---                            WHEN TRUNC( NVL(B."BadDebtBal",0) / 1000, 0) = 0 THEN 1
---                            ELSE TRUNC( NVL(B."BadDebtBal",0) / 1000, 0)
---                          END
---        , M."SmallAmt" =  CASE
---                            WHEN M."AcctNo" IN ('0234349001002') THEN 1   -- 特例 (ref: LN15H1)
---                            WHEN NVL(B."BadDebtBal",0) <= 1499   THEN NVL(B."BadDebtBal",0)
---                            ELSE 0
---                          END
---      ;
---
---    UPD_CNT := UPD_CNT + sql%rowcount;
---    DBMS_OUTPUT.PUT_LINE('UPDATE 呆帳：更新 DelayBal 逾期未還餘額 END');
 
 
 -- 更新 SmallAmt 授信餘額列報1（千元）之原始金額（元）
