@@ -58,7 +58,7 @@ public class AjaxController extends SysLogger {
 
 	@PostConstruct
 	public void init() {
-		this.info("AjaxController Init....");
+		this.mustInfo("AjaxController Init....");
 	}
 
 	@RequestMapping(value = "menu2/jsonp", method = RequestMethod.GET)
@@ -90,7 +90,7 @@ public class AjaxController extends SysLogger {
 	@RequestMapping(value = "download/file/{fileNo}")
 	public void getFile(@PathVariable String fileNo, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
-		this.info("getFile FileNo : [" + fileNo + "]");
+		this.mustInfo("getFile FileNo : [" + fileNo + "]");
 
 		Long fileNoL = Long.parseLong(fileNo);
 
@@ -110,7 +110,7 @@ public class AjaxController extends SysLogger {
 				IOUtils.copy(inputStream, response.getOutputStream());
 				response.flushBuffer();
 			} else
-				this.info("txAttachment is Null");
+				this.mustInfo("txAttachment is Null");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -128,7 +128,7 @@ public class AjaxController extends SysLogger {
 	@RequestMapping(value = "download/file/{sno}/{fileType}/{name}")
 	public void getFile(@PathVariable String sno, @PathVariable String fileType, String name, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
-		this.info("getFile...");
+		this.mustInfo("getFile...");
 
 		fileType = fileType == null ? "" : fileType.trim();
 		if (fileType.equals("7")) {
@@ -166,7 +166,14 @@ public class AjaxController extends SysLogger {
 		Manufacture manufacture = MySpring.getBean("manufacture", Manufacture.class);
 		manufacture.setTitaVo(titaVo);
 
-		manufacture.exec();
+		try {
+			manufacture.exec();
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+		}
+		
 		String fileName = manufacture.getFilename() + manufacture.getExt();
 		String saveName = manufacture.getSavename();
 		String titleName = manufacture.getTitleName().isEmpty() ? "空白" : manufacture.getTitleName();
@@ -174,7 +181,7 @@ public class AjaxController extends SysLogger {
 		InputStream inputStream = null;
 		try {
 			File file = new File(fileName);
-			this.info("get filepath : " + file.getPath());
+			this.mustInfo("get filepath : " + file.getPath());
 
 			inputStream = new FileInputStream(file);
 			response.addHeader("Access-Control-Allow-Origin", "*");
@@ -211,8 +218,8 @@ public class AjaxController extends SysLogger {
 		Map<String, String> _m = this.stringToMap(_d);
 		ThreadVariable.setObject(ContentName.loggerFg, "1".equals(_m.get("Log")) ? true : false);
 
-		this.info("printReport Active!");
-		this.info("Param : " + _d);
+		this.mustInfo("printReport Active!");
+		this.mustInfo("Param : " + _d);
 
 		long reportNo = Long.parseLong(Objects.isNull(_m.get("reportNo")) ? "0" : _m.get("reportNo").trim());
 //		String printer = Objects.isNull(_m.get("printer")) ? "" : _m.get("printer").trim();
@@ -230,8 +237,8 @@ public class AjaxController extends SysLogger {
 				if (p.get("printJson") != null)
 					pLi.add((List<Map<String, ?>>) p.get("printJson"));
 
-				this.info("morePage : " + "1".equals(p.get("morePage").toString()));
-				this.info("pageNo   : " + pageNo);
+				this.mustInfo("morePage : " + "1".equals(p.get("morePage").toString()));
+				this.mustInfo("pageNo   : " + pageNo);
 
 				if (pageNo == 1) {
 					prt = (String) p.get("Printer");

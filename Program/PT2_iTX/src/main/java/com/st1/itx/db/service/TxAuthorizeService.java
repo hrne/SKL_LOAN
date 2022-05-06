@@ -73,6 +73,19 @@ public interface TxAuthorizeService {
   public Slice<TxAuthorize> findCreatDate(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * Entdy &gt;= ,AND Entdy &lt;=,AND SupNo %
+   *
+   * @param entdy_0 entdy_0
+   * @param entdy_1 entdy_1
+   * @param supNo_2 supNo_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxAuthorize TxAuthorize of List
+   */
+  public Slice<TxAuthorize> findSupNoEntdy(int entdy_0, int entdy_1, String supNo_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By TxAuthorize
    * 
    * @param autoSeq key

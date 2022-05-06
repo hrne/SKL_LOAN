@@ -3723,6 +3723,21 @@ TXFORM=L2R62
 ^
 </L2R62.tom>
 
+!    L2R63 : FOR L2980 上次列印人員
+<L2R63.dec>
+#L2r63PrintDate=D,7,S
+#L2r63TlrNo=x,20,S
+#L2r63ExpectedRate=m,2.4,S
+</L2R63.dec>
+
+<L2R63.tom>
+TXFORM=L2R63
+#L2r63PrintDate
+#L2r63TlrNo
+#L2r63ExpectedRate
+^
+</L2R63.tom>
+
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S

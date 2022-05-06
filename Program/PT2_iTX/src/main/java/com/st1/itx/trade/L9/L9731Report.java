@@ -45,7 +45,7 @@ public class L9731Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月底日
+	 * @param yearMonth 西元年月
 	 *
 	 * 
 	 */
@@ -55,6 +55,8 @@ public class L9731Report extends MakeReport {
 		List<Map<String, String>> findList = null;
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
+
+		int rocYearMonth = yearMonth - 191100;
 
 //		上傳用 
 //		this.info("L9731 get value" + makeExcel.getValue(2, 2));
@@ -80,19 +82,19 @@ public class L9731Report extends MakeReport {
 					case "HANDMADE1":
 
 						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
-								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
 								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
 						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
 
-						exportSheet1(titaVo, findList);
+						exportSheet1(titaVo, findList, rocYearMonth);
 
 						break;
 					// 放款總歸戶明細表
 					case "HANDMADE2":
 
 						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
-								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
 								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
 						findList = l9731ServiceImpl.findSheet2(titaVo, yearMonth);
@@ -104,7 +106,7 @@ public class L9731Report extends MakeReport {
 					case "HANDMADE3":
 
 						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
-								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
 								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
 						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
@@ -119,7 +121,7 @@ public class L9731Report extends MakeReport {
 					case "HANDMADE4":
 
 						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
-								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")",
+								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
 								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
 						findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
@@ -147,7 +149,8 @@ public class L9731Report extends MakeReport {
 	/**
 	 * Sheet1 五類資產檢核表
 	 */
-	private void exportSheet1(TitaVo titaVo, List<Map<String, String>> listL9731) throws LogicException {
+	private void exportSheet1(TitaVo titaVo, List<Map<String, String>> listL9731, int rocYearMonth)
+			throws LogicException {
 		this.info("L9731Report exportSheet14");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
@@ -157,10 +160,11 @@ public class L9731Report extends MakeReport {
 		} else {
 
 			int row = 2;
+			makeExcel.setValue(1, 9, rocYearMonth, "C");
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-						"######0","L");
+						"######0", "L");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -204,7 +208,6 @@ public class L9731Report extends MakeReport {
 			// excel formula
 			makeExcel.formulaCaculate(1, 6);
 
-	
 		}
 
 	}
@@ -266,7 +269,7 @@ public class L9731Report extends MakeReport {
 
 				for (Map<String, String> tLDVo : listL9731) {
 					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-							"######0","R");
+							"######0", "R");
 
 					for (int i = 0; i < tLDVo.size(); i++) {
 
@@ -375,7 +378,7 @@ public class L9731Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-						"######0","R");
+						"######0", "R");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);

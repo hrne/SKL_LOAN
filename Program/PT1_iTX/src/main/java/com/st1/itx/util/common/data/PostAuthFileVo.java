@@ -49,7 +49,7 @@ public class PostAuthFileVo extends FileVo {
 			// 頁首
 			if (i < headerCounts) {
 				// 設定頁首欄位的擷取位置
-				// 無首筆
+				// 無
 			}
 
 			// 明細
@@ -135,6 +135,7 @@ public class PostAuthFileVo extends FileVo {
 
 			if (i > (LastIndex - footerCounts)) {
 				// 設定頁尾欄位的擷取位置s
+				this.put("FootMediaDate", thisLine.substring(8, 16));
 				this.put("FootCreateDate", thisLine.substring(26, 34));
 				this.put("FootErrorCnt", thisLine.substring(34, 40));
 				this.put("FootSuccsCnt", thisLine.substring(40, 46));

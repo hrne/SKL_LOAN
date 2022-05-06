@@ -465,17 +465,12 @@ public class TxBatchCom extends TradeBuffer {
 			// 應繳試算
 			settingUnPaid(tDetail, titaVo);
 
-			// step01. 應繳試算
-			if ("0".equals(this.procStsCode) && this.repayLoan.compareTo(BigDecimal.ZERO) == 0 && this.facStatus > 0) {
-				checkFacStatus(titaVo);
-			}
-
-			// step02. 01-期款，最後一期，還款類別為03-結案
+			// step01. 01-期款，最後一期，還款類別為03-結案
 			if ("0".equals(this.procStsCode) && this.repayType == 1 && this.closeFg > 0) {
 				this.repayType = 3;
 			}
 
-			// step03. 依還款類別檢核
+			// step02. 依還款類別檢核
 			if ("0".equals(this.procStsCode)) {
 				settingprocStsCode(tDetail, titaVo);
 			}
@@ -1210,9 +1205,13 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg += ", 同戶號合併檢核 總金額:" + this.tTempVo.get("MergeAmt") + " ";
 			checkAmt = parse.stringToBigDecimal(this.tTempVo.get("MergeAmt"));
 		}
-
+		// step01. 應繳試算
+        // 合併檢核、轉暫收
 		if (this.tTempVo.get("MergeAmt") != null && !tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
 			this.checkMsg += ", 轉暫收";
+		} else if (this.facStatus > 0) {
+			checkFacStatus(titaVo);
+			apendcheckMsgAmounts(tBatxDetail, titaVo);
 		} else {
 			switch (this.repayType) {
 			// 無還款類別

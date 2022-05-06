@@ -105,7 +105,7 @@ public class L4211Report extends MakeReport {
 	String year = "";
 	String month = "";
 	String date = "";
-	
+
 	String txCode = "";
 	String reportName = "";
 
@@ -118,8 +118,8 @@ public class L4211Report extends MakeReport {
 		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + txCode);
-		this.print(-3, this.getMidXAxis() - 1 , reportName, "R");
-		this.print(-3, this.getMidXAxis() + 1 , " ---- (     )", "L");
+		this.print(-3, this.getMidXAxis() - 1, reportName, "R");
+		this.print(-3, this.getMidXAxis() + 1, " ---- (     )", "L");
 		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
@@ -162,8 +162,8 @@ public class L4211Report extends MakeReport {
 		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + txCode);
-		this.print(-3, this.getMidXAxis() - 1 , reportName + " - 以金額排序", "R");
-		this.print(-3, this.getMidXAxis() + 1 , " ---- (     )", "L");
+		this.print(-3, this.getMidXAxis() - 1, reportName + " - 以金額排序", "R");
+		this.print(-3, this.getMidXAxis() + 1, " ---- (     )", "L");
 		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
@@ -201,8 +201,8 @@ public class L4211Report extends MakeReport {
 		this.print(-2, 167, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + txCode);
-		this.print(-3, this.getMidXAxis() - 1 , reportName + " - 依戶號", "R");
-		this.print(-3, this.getMidXAxis() + 1 , " ---- (     )", "L");
+		this.print(-3, this.getMidXAxis() - 1, reportName + " - 依戶號", "R");
+		this.print(-3, this.getMidXAxis() + 1, " ---- (     )", "L");
 		this.print(-3, 167, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 150, "頁    數：" + this.getNowPage());
@@ -287,43 +287,27 @@ public class L4211Report extends MakeReport {
 //        "BormNo" ASC
 
 		// facmno, bormno 已經在 query 裡面 concat 到 custno，所以不在這裡加sort
-		
-		fnAllList1 = sortMapListCom.beginSort(fnAllList)
-				.ascString("ReconCode")
-				.ascString("BatchNo")
-				.ascString("SortingForSubTotal")
-				.ascString("EntryDate")
-				.ascString("DetailSeq")
-				.ascString("CustNo")
+
+		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("CustNo")
 				.getList();
 
-		fnAllList2 = sortMapListCom.beginSort(fnAllList)
-				.ascString("ReconCode")
-				.ascString("BatchNo")
-				.ascString("SortingForSubTotal")
-				.ascString("EntryDate")
-				.descNumber("RepayAmt")
-				.ascString("CustNo")
+		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
 				.getList();
 
-		fnAllList3 = sortMapListCom.beginSort(fnAllList)
-				.ascString("ReconCode")
-				.ascString("BatchNo")
-				.ascString("SortingForSubTotal")
-				.ascString("EntryDate")
-				.ascString("CustNo")
-				.getList();
+		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").getList();
 
-		makePdf(fnAllList1, fnAllList2, fnAllList3, true, titaVo);
+		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
 
 	private void makePdf(List<Map<String, String>> fnAllList1, List<Map<String, String>> fnAllList2,
 			List<Map<String, String>> fnAllList3, boolean isBatchMapList, TitaVo titaVo) throws LogicException {
-		
+
 		txCode = this.getParentTranCode();
-		
-		if (txCode == null || txCode.trim().isEmpty())
-		{
+
+		if (txCode == null || txCode.trim().isEmpty()) {
 			txCode = titaVo.getTxcd();
 		}
 		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表" : "匯款總傳票明細表";
@@ -395,7 +379,8 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+							|| lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, lastAcctItem);
@@ -456,7 +441,8 @@ public class L4211Report extends MakeReport {
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+								|| lastSortingForSubTotal.equals(" ")) {
 							this.print(1, 2, "暫收款");
 						} else {
 							this.print(1, 2, lastAcctItem);
@@ -502,7 +488,8 @@ public class L4211Report extends MakeReport {
 					if (tfnAllList.get("ReconCode").equals("P03")) {
 						this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 					} else {
-						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
+																									// (P03銀行存款－新光匯款轉帳)
 					}
 					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
@@ -518,7 +505,7 @@ public class L4211Report extends MakeReport {
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
 			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-			
+
 			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
@@ -605,11 +592,12 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, lastAcctItem);
-					}
+				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+						|| lastSortingForSubTotal.equals(" ")) {
+					this.print(1, 2, "暫收款");
+				} else {
+					this.print(1, 2, lastAcctItem);
+				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();
@@ -708,7 +696,8 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+							|| lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, lastAcctItem);
@@ -770,7 +759,8 @@ public class L4211Report extends MakeReport {
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+								|| lastSortingForSubTotal.equals(" ")) {
 							this.print(1, 2, "暫收款");
 						} else {
 							this.print(1, 2, lastAcctItem);
@@ -816,7 +806,8 @@ public class L4211Report extends MakeReport {
 					if (tfnAllList.get("ReconCode").equals("P03")) {
 						this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 					} else {
-						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
+																									// (P03銀行存款－新光匯款轉帳)
 					}
 					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
@@ -831,7 +822,7 @@ public class L4211Report extends MakeReport {
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
 			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-			
+
 			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
@@ -918,7 +909,8 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+						|| lastSortingForSubTotal.equals(" ")) {
 					this.print(1, 2, "暫收款");
 				} else {
 					this.print(1, 2, lastAcctItem);
@@ -1017,7 +1009,8 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+							|| lastSortingForSubTotal.equals(" ")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, lastAcctItem);
@@ -1079,7 +1072,8 @@ public class L4211Report extends MakeReport {
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+								|| lastSortingForSubTotal.equals(" ")) {
 							this.print(1, 2, "暫收款");
 						} else {
 							this.print(1, 2, lastAcctItem);
@@ -1125,7 +1119,8 @@ public class L4211Report extends MakeReport {
 					if (tfnAllList.get("ReconCode").equals("P03")) {
 						this.print(-3, this.getMidXAxis() + 10, "A7", "C");
 					} else {
-						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+						this.print(-3, this.getMidXAxis() + 10, tfnAllList.get("ReconCode"), "C");// 存摺代號(表頭)A1~A7
+																									// (P03銀行存款－新光匯款轉帳)
 					}
 					this.print(-5, 15, tfnAllList.get("BatchNo"));// 批次號碼(表頭)
 					this.print(-8, 0, "");
@@ -1140,7 +1135,7 @@ public class L4211Report extends MakeReport {
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
 			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-			
+
 			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
@@ -1227,11 +1222,12 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("") || lastSortingForSubTotal.equals(" ")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, lastAcctItem);
-					}
+				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
+						|| lastSortingForSubTotal.equals(" ")) {
+					this.print(1, 2, "暫收款");
+				} else {
+					this.print(1, 2, lastAcctItem);
+				}
 				this.print(0, 14, " 小計 ");
 
 				atAll();
@@ -1246,7 +1242,7 @@ public class L4211Report extends MakeReport {
 				totalsumCollection = totalsumCollection.add(allsumCollection);
 				totalsumShortPayment = totalsumShortPayment.add(allsumShortPayment);
 				totalsumOthers = totalsumOthers.add(allsumOthers);
-				
+
 				this.print(1, 0, "");
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -1287,8 +1283,8 @@ public class L4211Report extends MakeReport {
 
 		if (allsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 29, formatAmt(allsumTransferAmt, 0), "R");
-		} 
-		
+		}
+
 		if (allsumMakeferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 40, formatAmt(allsumMakeferAmt, 0), "R");
 		}
@@ -1296,31 +1292,31 @@ public class L4211Report extends MakeReport {
 		if (allsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 103, formatAmt(allsumPrincipal, 0), "R");
 		}
-		
+
 		if (allsumPayment.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 121, formatAmt(allsumPayment, 0), "R");
 		}
-		
+
 		if (allsumDamages.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 131, formatAmt(allsumDamages, 0), "R");
 		}
-		
+
 		if (allsumTemporaryLoan.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 143, formatAmt(allsumTemporaryLoan, 0), "R");
 		}
-		
+
 		if (allsumShortPayment.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 160, formatAmt(allsumShortPayment, 0), "R");
 		}
-		
+
 		if (allsumOthers.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 167, formatAmt(allsumOthers, 0), "R");
 		}
-		
+
 		if (allsumInterest.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(1, 112, formatAmt(allsumInterest, 0), "R");
 		}
-		
+
 		if (allsumCollection.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 151, formatAmt(allsumCollection, 0), "R");
 		}
@@ -1332,42 +1328,41 @@ public class L4211Report extends MakeReport {
 		if (totalsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 29, formatAmt(totalsumTransferAmt, 0), "R");
 		}
-		
+
 		if (totalsumMakerferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 40, formatAmt(totalsumMakerferAmt, 0), "R");
 		}
 		if (totalsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 103, formatAmt(totalsumPrincipal, 0), "R");
 		}
-		
+
 		if (totalsumPayment.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 121, formatAmt(totalsumPayment, 0), "R");
 		}
-		
+
 		if (totalsumDamages.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 131, formatAmt(totalsumDamages, 0), "R");
 		}
-		
+
 		if (totalsumTemporaryLoan.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 143, formatAmt(totalsumTemporaryLoan, 0), "R");
 		}
-		
+
 		if (totalsumShortPayment.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 160, formatAmt(totalsumShortPayment, 0), "R");
 		}
-		
+
 		if (totalsumOthers.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 167, formatAmt(totalsumOthers, 0), "R");
 		}
-		
+
 		if (totalsumInterest.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(1, 112, formatAmt(totalsumInterest, 0), "R");
 		}
-		
+
 		if (totalsumCollection.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, 151, formatAmt(totalsumCollection, 0), "R");
 		}
-		
 
 	}
 

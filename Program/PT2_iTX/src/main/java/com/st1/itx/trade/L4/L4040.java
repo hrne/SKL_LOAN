@@ -391,6 +391,7 @@ public class L4040 extends TradeBuffer {
 						occursListOutput.putParam("OOProcessDate", processDate);
 						occursListOutput.putParam("OORetrDate", retrDate);
 						occursListOutput.putParam("OOAuthStatus", result.get("F9"));
+						occursListOutput.putParam("OOStampFinishDate", stampFinishDate-19110000); // TODO:核印完成日期
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursListOutput);
 

@@ -1,0 +1,425 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4414)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4414" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4414]                                 上傳授權提回檔"],
+[#<->#,"#FdBUTTON_FLD+選擇檔案","#BUTTON_FLD"],
+]
+
+#FdBUTTON_FLD=X,2,L
+T(3,*)
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![提回訊息]
+#CDDEF01=x,26,S
+T(3,CdCode.AuthStatus)
+
+#AuthStatusHelp=x,1024,S
+
+![核印註記]
+#CDDEF02=x,26,S
+T(3,CdCode.StampCode)
+
+#StampCodeHelp=x,1024,S
+
+![狀況代號]
+#CDDEF03=x,26,S
+T(3,CdCode.AuthErrorCode)
+
+#AuthErrorCodeHelp=x,1024,S
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AuthStatusHelp,#HelpDesc1)
+T(2,@StampCodeHelp,#HelpDesc2)
+T(2,@AuthErrorCodeHelp,#HelpDesc3)
+
+![一般數值 multiple:true 可上船多個檔案]
+#BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600
+
+#BIND_ABA=X,1,S
+BIND(#BUTTON_FLD,click)
+
+#FILENA=x,1000,S
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+![顯示註記]
+#L444APRT=A,1,S
+C(5,#TXFORM,L444A,$,S)
+E(0,1)
+! 第一張報表格式於程式前面宣告
+![資料表頭(HEADER)長度]
+#L444AHD=n,3,S
+C(5,#TXFORM,L444A,$,S)E(0,47)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L444ALN=n,3,S
+C(5,#TXFORM,L444A,$,S)E(0,45)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L444AQPRT=n,2,S
+C(5,#TXFORM,L444A,$,S)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L444ALOOP=n,3,S
+C(5,#TXFORM,L444A,$,S)E(0,1)ASGN(LOOPHEIGHT$)
+
+![顯示註記]
+#L444BPRT=A,1,S
+C(5,#TXFORM,L444B,$,S)
+E(0,1)
+![資料表頭(HEADER)長度]
+#L444BHD=n,3,S
+C(5,#TXFORM,L444B,$,S)E(0,47)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L444BLN=n,3,S
+C(5,#TXFORM,L444B,$,S)E(0,61)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L444BQPRT=n,2,S
+C(5,#TXFORM,L444B,$,S)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L444BLOOP=n,3,S
+C(5,#TXFORM,L444B,$,S)E(0,1)ASGN(LOOPHEIGHT$)
+
+
+![顯示註記]
+#L444CPRT=A,1,S
+C(5,#TXFORM,L444C,$,S)
+E(0,1)
+![資料表頭(HEADER)長度]
+#L444CHD=n,3,S
+C(5,#TXFORM,L444C,$,S)E(0,47)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L444CLN=n,3,S
+C(5,#TXFORM,L444C,$,S)E(0,47)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L444CQPRT=n,2,S
+C(5,#TXFORM,L444C,$,S)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L444CLOOP=n,3,S
+C(5,#TXFORM,L444C,$,S)E(0,1)ASGN(LOOPHEIGHT$)
+
+</sub>
+!------------ TXFORM = L4414 -----------
+
+! 新光
+<sub type="FORM" name="L444A" tota-mode="1">
+#OBcDateA=X,8,O
+#OTimeA=X,8,O
+#OHeadRocTxdayA=D,7,O
+#OCntA=m,6,O
+IF(#OCntA>=1,s,$)
+E(0,@L444APRT,0)
+#OTotalCntA=m,6,O
+#OFinishCntA=m,6,O
+#OCancelCntA=m,6,O
+
+
+#L444A_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 戶號
+#OOCustNoA=A,7,O
+#OOCustNameA=x,20,O
+! 額度
+#OOFacmNoA=A,3,O
+! 扣款帳號
+#OORepayAcctA=A,14,O
+! --------------ACH--------------
+! 提回訊息
+#OOCreateFlagA=X,1,O
+! 提回訊息
+#OOAuthStatusA=X,1,O
+#OOAuthStatusAX=X,20,O
+C(3,#OOAuthStatusA,0,
+    C(5,#OOCreateFlagA,D,T(2,取消授權扣款),
+        C(5,#OOCreateFlagA,A,T(2,成功授權),T(2,))),
+T(3,)T(H,#OOAuthStatusA,#AuthStatusHelp))
+
+!SWITCH(#OOAuthStatusA,
+!0,T(2,成功新增或取消授權扣款),
+!1,T(2,印鑑不符),
+!2,T(2,無此帳號),
+!3,T(2,委繳戶統一編號不符),
+!4,T(2,已核印成功在案),
+!5,T(2,原交易不存在),
+!6,T(2,電子資料與授權書內容不符),
+!7,T(2,帳戶已結清),
+!8,T(2,印鑑不清),
+!9,T(2,其他),
+!A,T(2,未收到授權書),
+!B,T(2,用戶號碼錯誤),
+!C,T(2,靜止戶),
+!D,T(2,未收到聲明書),
+!E,T(2,授權書資料不全),
+!F,T(2,警示戶),
+!G,T(2,本帳戶不適用授權扣繳),
+!H,T(2,已於他行授權扣款),
+!I,T(2,該用戶已死亡),
+!Z,T(2,未交易或匯入失敗資料),T(2,))
+! --------------ACH--------------
+![防止二次單據]
+E(0,@L444BPRT,0)
+E(0,@L444CPRT,0)
+</sub>
+
+! 他行
+<sub type="FORM" name="L444B" tota-mode="1">
+#OBcDateB=X,8,O
+#OTimeB=X,8,O
+#OHeadRocTxdayB=D,7,O
+#OCntB=m,6,O
+IF(#OCntB>=1,s,$)
+E(0,@L444BPRT,0)
+
+#OTotalCntB=m,6,O
+
+#OFinishCntB=m,6,O
+#OCancelCntB=m,6,O
+
+#L444B_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 戶號
+#OOCustNoB=A,7,O
+#OOCustNameB=x,20,O
+! 額度
+#OOFacmNoB=A,3,O
+! 扣款銀行
+#OORepayBankXB=x,16,O
+! 扣款帳號
+#OORepayAcctB=A,14,O
+! --------------ACH--------------
+! 提回訊息
+#OOCreateFlagB=X,1,O
+! 提回訊息
+#OOAuthStatusB=X,1,O
+#OOAuthStatusBX=X,20,O
+C(3,#OOAuthStatusB,0,
+    C(5,#OOCreateFlagB,D,T(2,取消授權扣款),
+        C(5,#OOCreateFlagB,A,T(2,成功新增),T(2,))),
+T(3,)T(H,#OOAuthStatusB,#AuthStatusHelp))
+!SWITCH(#OOAuthStatusB,
+!0,T(2,成功新增或取消授權扣款),
+!1,T(2,印鑑不符),
+!2,T(2,無此帳號),
+!3,T(2,委繳戶統一編號不符),
+!4,T(2,已核印成功在案),
+!5,T(2,原交易不存在),
+!6,T(2,電子資料與授權書內容不符),
+!7,T(2,帳戶已結清),
+!8,T(2,印鑑不清),
+!9,T(2,其他),
+!A,T(2,未收到授權書),
+!B,T(2,用戶號碼錯誤),
+!C,T(2,靜止戶),
+!D,T(2,未收到聲明書),
+!E,T(2,授權書資料不全),
+!F,T(2,警示戶),
+!G,T(2,本帳戶不適用授權扣繳),
+!H,T(2,已於他行授權扣款),
+!I,T(2,該用戶已死亡),
+!Z,T(2,未交易或匯入失敗資料),T(2,))
+! --------------ACH--------------
+![防止二次單據]
+E(0,@L444APRT,0)
+E(0,@L444CPRT,0)
+</sub>
+
+<sub type="FORM" name="L444C" tota-mode="1">
+#OBcDateC=X,8,O
+#OTimeC=X,8,O
+#OFootCreateDateC=D,7,O
+#OCntC=m,6,O
+IF(#OCntC>=1,s,$)
+E(0,@L444CPRT,0)
+
+#OTotalCntC=m,6,O
+
+#OFinishCntC=m,6,O
+#OCancelCntC=m,6,O
+
+#L444C_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 戶號
+#OOCustNoC=A,7,O
+! 額度
+#OOFacmNoC=A,3,O
+#OOCustNameC=x,20,O
+! 扣款帳號
+#OORepayAcctC=A,14,O
+
+! --------------POST--------------
+! 核印註記
+#OOStampCodeC=A,1,O	
+#OOStampCodeCX=X,12,O
+T(3,)T(H,#OOStampCodeC,#StampCodeHelp)
+!SWITCH(#OOStampCodeC,
+!1,T(2,局帳號不符),
+!2,T(2,戶名不符),
+!3,T(2,身分證號不符),
+!4,T(2,印鑑不符),
+!9,T(2,其他),T(2,))
+
+! 狀況代號
+#OOAuthErrorCodeC=X,2,O
+#OOAuthErrorCodeCX=X,13,O
+T(3,)T(H,#OOAuthErrorCodeC,#AuthErrorCodeHelp)
+!WITCH(#OOAuthErrorCodeC,00,T(3,00-成功),
+!                       03,T(3,03-已終止代繳),
+!                       06,T(3,06-凍結警示戶),
+!                       07,T(3,07-支票專戶),
+!                       08,T(3,08-帳號錯誤),
+!                       09,T(3,09-終止戶),
+!                       10,T(3,10-身分證不符),
+!                       11,T(3,11-轉出戶),
+!                       12,T(3,12-拒絕往來戶),
+!                       13,T(3,13-無此編號),
+!                       14,T(3,14-編號已存在),
+!                       16,T(3,16-管制帳戶),
+!                       17,T(3,17-掛失戶),
+!                       18,T(3,18-異常帳戶),
+!                       19,T(3,19-編號非英數),
+!                       91,T(3,91-期限未扣款),
+!                       98,T(3,98-其他),T(2,))
+
+! --------------POST--------------
+![防止二次單據]
+E(0,@L444APRT,0)
+E(0,@L444BPRT,0)
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FILENA
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L444A
+#OBcDateA
+#OTimeA
+#OHeadRocTxdayA
+#OCntA
+#OTotalCntA
+#OFinishCntA
+#OCancelCntA
+#OOCustNoA
+#OOCustNameA
+#OOFacmNoA
+#OORepayAcctA
+#OOCreateFlagA
+#OOAuthStatusA
+^
+TXFORM=L444B
+#OBcDateB
+#OTimeB
+#OHeadRocTxdayB
+#OCntB
+#OTotalCntB
+#OFinishCntB
+#OCancelCntB
+#OOCustNoB
+#OOCustNameB
+#OOFacmNoB
+#OORepayBankXB
+#OORepayAcctB
+#OOCreateFlagB
+#OOAuthStatusB
+^
+TXFORM=L444C
+#OBcDateC
+#OTimeC
+#OFootCreateDateC
+#OCntC
+#OTotalCntC
+#OFinishCntC
+#OCancelCntC
+#OOCustNoC
+#OOFacmNoC
+#OOCustNameC
+#OORepayAcctC
+#OOStampCodeC
+#OOAuthErrorCodeC
+^
+</sub>
+
+
+
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+#L444APRT=1,L444A,NA,,D,15
+#OBcDateA
+#OTimeA
+#OHeadRocTxdayA
+%
+#OOCustNoA
+#OOFacmNoA
+#OOCustNameA
+#OORepayAcctA
+#OOAuthStatusAX
+@
+#OTotalCntA
+#OFinishCntA
+#OCancelCntA
+^
+#L444BPRT=1,L444B,NA,,D,15
+#OBcDateB
+#OTimeB
+#OHeadRocTxdayB
+%
+#OOCustNoB
+#OOFacmNoB
+#OOCustNameB
+#OORepayBankXB
+#OORepayAcctB
+#OOAuthStatusBX
+@
+#OTotalCntB
+#OFinishCntB
+#OCancelCntB
+^
+#L444CPRT=1,L444C,NA,,D,15
+#OBcDateC
+#OTimeC
+#OFootCreateDateC
+%
+#OOCustNoC
+#OOFacmNoC
+#OOCustNameC
+#OORepayAcctC
+#OOStampCodeCX
+#OOAuthErrorCodeCX
+@
+#OTotalCntC
+#OFinishCntC
+#OCancelCntC
+^
+</sub>

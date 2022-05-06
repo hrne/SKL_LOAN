@@ -27,6 +27,7 @@ import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.AchAuthFileVo;
 import com.st1.itx.util.common.data.PostAuthFileVo;
@@ -58,6 +59,8 @@ public class L4414 extends TradeBuffer {
 
 	@Autowired
 	public CdBankService cdBankService;
+	@Autowired
+	public LoanCom loanCom;
 
 	@Autowired
 	public FileCom fileCom;
@@ -206,7 +209,6 @@ public class L4414 extends TradeBuffer {
 		totaA.putParam("MSGID", "L444A");
 		totaA.putParam("OBcDateA", bcDate); // 日期
 		totaA.putParam("OTimeA", time); // 時間
-		totaA.putParam("OHeadRocTxdayA", headRocTxday); // 資料建檔日期
 		totaA.putParam("OCntA", cntA); // 總筆數
 		totaA.putParam("OTotalCntA", cntA); // 總筆數
 		totaA.putParam("OFinishCntA", finishCntA); // 成功筆數
@@ -216,7 +218,6 @@ public class L4414 extends TradeBuffer {
 		totaB.putParam("MSGID", "L444B");
 		totaB.putParam("OBcDateB", bcDate); // 日期
 		totaB.putParam("OTimeB", time); // 時間
-		totaB.putParam("OHeadRocTxdayB", headRocTxday); // 資料建檔日期
 		totaB.putParam("OCntB", cntB); // 總筆數
 		totaB.putParam("OTotalCntB", cntB); // 總筆數
 		totaB.putParam("OFinishCntB", finishCntB); // 成功筆數
@@ -226,7 +227,6 @@ public class L4414 extends TradeBuffer {
 		totaC.putParam("MSGID", "L444C");
 		totaC.putParam("OBcDateC", bcDate); // 日期
 		totaC.putParam("OTimeC", time); // 時間
-		totaC.putParam("OFootCreateDateC", footCreateDateC); // 資料建檔日期
 		totaC.putParam("OCntC", cntC); // 總筆數
 		totaC.putParam("OTotalCntC", cntC); // 總筆數
 		totaC.putParam("OFinishCntC", finishCntC); // 成功筆數
@@ -288,7 +288,7 @@ public class L4414 extends TradeBuffer {
 
 						if ("0".equals("" + tempOccursList.get("AuthStatus"))) {
 							this.info("Update StampFinishDate !!!");
-							tAchAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+							tAchAuthLog.setStampFinishDate(headRocTxday);
 
 						} else {
 
@@ -324,8 +324,10 @@ public class L4414 extends TradeBuffer {
 
 		if (uploadFile != null && uploadFile.size() != 0) {
 
+			// 取值
 //			9	FootErrorCnt    錯誤筆數		34-40	9(6)	初始值為0，回送時使用	
 //			10	FootSuccsCnt    成功筆數		40-46	9(6)	初始值為0，回送時使用	
+			headRocTxday = parse.stringToInteger("" + postAuthFileVo.get("FootMediaDate"));
 			int footErrorCnt = parse.stringToInteger("" + postAuthFileVo.get("FootErrorCnt"));
 			int footSuccsCnt = parse.stringToInteger("" + postAuthFileVo.get("FootSuccsCnt"));
 			footCreateDateC = parse.stringToInteger("" + postAuthFileVo.get("FootCreateDate")) - 19110000;
@@ -360,7 +362,7 @@ public class L4414 extends TradeBuffer {
 					if ("00".equals(FormatUtil.pad9("" + tempOccursList.get("AuthErrorCode"), 2))) {
 						this.info("Update StampFinishDate !!!");
 //						申請UP核印完成日期,清空核印取消日期
-						tPostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+						tPostAuthLog.setStampFinishDate(headRocTxday);
 						tPostAuthLog.setStampCancelDate(0);
 
 						finishCntC++;
@@ -453,7 +455,7 @@ public class L4414 extends TradeBuffer {
 					}
 
 					tPostAuthLog.setAuthApplCode("4");
-					tPostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog.setStampFinishDate(headRocTxday);
 					tPostAuthLog.setStampCancelDate(0);
 
 					// 變更帳號檔
@@ -506,11 +508,13 @@ public class L4414 extends TradeBuffer {
 		if ("103".equals(tAchAuthLog.getRepayBank())) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustNoA", tAchAuthLog.getCustNo());
+			occursList.putParam("OOCustNameA", loanCom.getCustNameByNo(tAchAuthLog.getCustNo()));
 			occursList.putParam("OOFacmNoA", tAchAuthLog.getFacmNo());
 			occursList.putParam("OORepayAcctA", tAchAuthLog.getRepayAcct());
 			occursList.putParam("OOAuthStatusA", tAchAuthLog.getAuthStatus());
 			occursList.putParam("OOCreateFlagA", tAchAuthLog.getCreateFlag());
 
+			totaA.putParam("OHeadRocTxdayA", tAchAuthLog.getPropDate()); // 資料建檔日期
 			this.totaA.addOccursList(occursList);
 			if ("0".equals(tAchAuthLog.getAuthStatus())) {
 				finishCntA++;
@@ -521,6 +525,7 @@ public class L4414 extends TradeBuffer {
 		} else {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustNoB", tAchAuthLog.getCustNo());
+			occursList.putParam("OOCustNameB", loanCom.getCustNameByNo(tAchAuthLog.getCustNo()));
 			occursList.putParam("OOFacmNoB", tAchAuthLog.getFacmNo());
 			if (bankX(tAchAuthLog.getRepayBank(), titaVo).length() > 8) {
 				occursList.putParam("OORepayBankXB", bankX(tAchAuthLog.getRepayBank(), titaVo).substring(0, 8));
@@ -531,6 +536,7 @@ public class L4414 extends TradeBuffer {
 			occursList.putParam("OOAuthStatusB", tAchAuthLog.getAuthStatus());
 			occursList.putParam("OOCreateFlagB", tAchAuthLog.getCreateFlag());
 
+			totaB.putParam("OHeadRocTxdayB", tAchAuthLog.getPropDate()); // 資料建檔日期
 			this.totaB.addOccursList(occursList);
 
 			if ("0".equals(tAchAuthLog.getAuthStatus())) {
@@ -546,9 +552,11 @@ public class L4414 extends TradeBuffer {
 		OccursList occursList = new OccursList();
 		occursList.putParam("OOCustNoC", tPostAuthLog.getCustNo());
 		occursList.putParam("OOFacmNoC", tPostAuthLog.getFacmNo());
+		occursList.putParam("OOCustNameC", loanCom.getCustNameByNo(tPostAuthLog.getCustNo()));
 		occursList.putParam("OORepayAcctC", tPostAuthLog.getRepayAcct());
 		occursList.putParam("OOStampCodeC", tPostAuthLog.getStampCode());
 		occursList.putParam("OOAuthErrorCodeC", tPostAuthLog.getAuthErrorCode());
+		totaC.putParam("OFootCreateDateC", tPostAuthLog.getPropDate()); // 資料建檔日期
 
 		/* 將每筆資料放入Tota的OcList */
 		this.totaC.addOccursList(occursList);

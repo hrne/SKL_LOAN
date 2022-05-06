@@ -44,7 +44,7 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,LBM.\"FirstAdjRateDate\" AS \"FirstAdjRateDate\" ";
 		sql += "       ,LRC.\"ProdNo\"           AS \"ProdNo\" ";
 		sql += "       ,LBM.\"RateIncr\"         AS \"LBMRateIncr\" ";
-		sql += "       ,LRC.\"EffectDate\"       AS \"EffectDate\" ";
+		sql += "       ,NVL(JSON_VALUE(LRC.\"OtherFields\", '$.IncrEffectDate'), LRC.\"EffectDate\")       AS \"EffectDate\" ";
 		sql += "       ,LRC.\"RateIncr\"         AS \"LRCRateIncr\" ";
 		sql += "       ,LBM.\"LoanBal\"          AS \"LoanBal\" ";
 		sql += " FROM \"LoanRateChange\" LRC ";
@@ -55,12 +55,13 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND ( (     NVL(LBM.\"LoanBal\", 0) != 0 ";
 		sql += "           AND NVL(LBM.\"NextAdjRateDate\", 0) BETWEEN :inputStartDateNext AND :inputEndDateNext "; // A. 如果餘額為0且下次調整日在此區間
 		sql += "         ) ";
-		sql += "         OR NVL(LBM.\"FirstAdjRateDate\", 0) BETWEEN :inputStartDateFirst AND :inputEndDateFirst ";   // B. 如果首次調整日在此區間（餘額可為0）
+		sql += "         OR    NVL(LBM.\"FirstAdjRateDate\", 0) BETWEEN :inputStartDateFirst AND :inputEndDateFirst "; // B. 如果首次調整日在此區間（餘額可為0）
 		sql += "       ) ";
 		sql += " ORDER BY \"CustNo\" ASC ";
 		sql += "         ,\"FacmNo\" ASC ";
 		sql += "         ,\"BormNo\" ASC ";
-		sql += "         ,\"EffectDate\" ASC ";
+		sql += "        ,\"EffectDate\" ASC ";
+		
 
 
 		this.info("sql=" + sql);

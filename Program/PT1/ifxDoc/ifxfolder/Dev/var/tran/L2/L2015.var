@@ -371,7 +371,7 @@ TXFORM=L2015
 #OOAcctCodeX=業務科目
 {width:150,align:'center'}
 
-#OOLastUpdate=最後修改日
+#OOLastUpdate=最後修改日期
 {width:130,align:'center'}
 
 #OOLastEmp=最後修改人員

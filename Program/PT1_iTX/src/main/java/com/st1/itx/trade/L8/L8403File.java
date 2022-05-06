@@ -1961,10 +1961,23 @@ public class L8403File extends MakeFile {
 					String iApprove = sJcicZ049.getApprove();
 					String iClaimDate = String.valueOf(sJcicZ049.getClaimDate());
 					int ixClaimDate = Integer.valueOf(sJcicZ049.getClaimDate());
+					
+					this.info("年度別資料" +iYear );
+					this.info("年度別資料2" +ixYear );
+					
+					/**新增如果年度別沒有輸入會帶0近來，但是在印出時應該顯示為空白*/
+					String iYear2 ="";
+					if(iYear.equals("0")) {
+						iYear2 =  " ";
+					}else {
+						iYear2 = iYear;
+					}
+					this.info("年度別資料3" +iYear2 );
+					
 					String iUkey = sJcicZ049.getUkey();
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "49" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
-							+ StringUtils.rightPad(iClaimStatus, 1, "") + StringUtils.leftPad(iApplyDate, 7, '0') + iCourtCode + StringUtils.leftPad(iYear, 3, '0')
+							+ StringUtils.rightPad(iClaimStatus, 1, "") + StringUtils.leftPad(iApplyDate, 7, '0') + iCourtCode + StringUtils.leftPad(iYear2, 3, "")
 							+ iCourtDiv + iCourtCaseNo + StringUtils.rightPad(iApprove, 1, "") + StringUtils.leftPad(iClaimDate, 7, '0')
 							+ StringUtils.rightPad("", 46);
 					this.put(text);

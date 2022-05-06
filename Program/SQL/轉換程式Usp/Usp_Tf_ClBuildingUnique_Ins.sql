@@ -50,6 +50,7 @@ BEGIN
                            PARTITION BY "GroupNo"
                                       , "SecGroupNo"
                            ORDER BY "LMSACN" -- 2022-03-10 Wei
+                                  , "GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
                                   , "LMSAPN" DESC -- 2022-03-10 Wei
                                   , "GDRID1"
                                   , "GDRID2"

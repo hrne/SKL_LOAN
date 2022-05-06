@@ -220,15 +220,22 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 
 		// 計算利息
+		int wkRemoveCnt = 0; // 移除筆數(計算金額=0)
 		for (int i = 0; i <= wkCalcVoCount; i++) {
 			this.info("fillInterestRoutine i = " + i);
 			vCalcRepayIntVo = lCalcRepayIntVo.get(i);
-			if (vCalcRepayIntVo.getEndDate() >= iIntStartDate) {
-				wkAmt = calcInterestRoutine();
-				vCalcRepayIntVo.setInterest(wkAmt);
-				lCalcRepayIntVo.set(i, vCalcRepayIntVo);
+			if (vCalcRepayIntVo.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+				if (vCalcRepayIntVo.getEndDate() >= iIntStartDate) {
+					wkAmt = calcInterestRoutine();
+					vCalcRepayIntVo.setInterest(wkAmt);
+					lCalcRepayIntVo.set(i, vCalcRepayIntVo);
+				}
+			} else {
+				lCalcRepayIntVo.remove(i);
+				wkRemoveCnt++;
 			}
 		}
+		wkCalcVoCount = wkCalcVoCount - wkRemoveCnt;
 
 		// 計算違約金
 		if (!iBreachReliefFlag.equals("Y")) { // 減免違約金 Y:是 N:否
@@ -368,6 +375,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		isRateChange = false;
 		wkInterestFlag = "1".equals(iIntCalcCode) ? 1 : 2; // 1:按日計息 2:按月計息
 		wkExtraRepay = iExtraRepay;
+		wkTotalExtraRepay = BigDecimal.ZERO;
 		// 結案記號 = Y 時，部分償還本金是否內含利息 Y:是
 		if ("Y".equals(iCaseCloseFlag)) {
 			iExtraRepayFlag = "Y";
@@ -1310,7 +1318,12 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					dDateUtil.setDate_1(vCalcRepayIntVo.getStartDate());
 					wkInterest = calcInterestRoutine().add(wkDuraInt);
 					if (vCalcRepayIntVo.getDueAmt().compareTo(wkInterest) > 0) {
-						vCalcRepayIntVo.setPrincipal(vCalcRepayIntVo.getDueAmt().subtract(wkInterest));
+						if (vCalcRepayIntVo.getDueAmt().subtract(wkInterest)
+								.compareTo(vCalcRepayIntVo.getAmount()) > 0) {
+							vCalcRepayIntVo.setPrincipal(vCalcRepayIntVo.getAmount());
+						} else {
+							vCalcRepayIntVo.setPrincipal(vCalcRepayIntVo.getDueAmt().subtract(wkInterest));
+						}
 					} else {
 						vCalcRepayIntVo.setPrincipal(new BigDecimal(0));
 					}

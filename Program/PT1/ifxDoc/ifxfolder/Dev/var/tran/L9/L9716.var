@@ -52,12 +52,15 @@ E(0,0)
 E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
+#LastMonthDate=D,8,S
+D(7,3,#SYSDATE,1,0)
+
 #inputYear=N,3,I
-T(1,@inputYear,#SYSDATE,2,3)
+T(1,@inputYear,#LastMonthDate,2,3)
 @V(5,0,999)
 
 #inputMonth=A,2,I
-T(1,@inputMonth,#SYSDATE,5,2)
+T(1,@inputMonth,#LastMonthDate,5,2)
 @V(5,1,12)
 
 #inputCollPsnShow=X,6,I

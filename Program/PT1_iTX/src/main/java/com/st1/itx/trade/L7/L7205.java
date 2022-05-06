@@ -111,10 +111,21 @@ public class L7205 extends TradeBuffer {
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
 			makeExcel.openExcel(filename, 1);
+
+			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 9).toString()).intValue() + 191100;
+			this.info("fileYearMonth=" + fileYearMonth);
+
+			if (fileYearMonth != iYearMonth) {
+				String ErrorMsg = "輸入的年月份(" + (iYearMonth-191100) + ")與檔案年月份(" + (fileYearMonth-191100) + ")不同，請確認檔案年月份。";
+				throw new LogicException(titaVo, "E0014", ErrorMsg);
+			}
 			// 切資料
 			setValueFromFileExcel(titaVo, iYearMonth);
-		} else {
+		} else if ("csv".equals(extension[extension.length - 1])) {
 			setValueFromFile(dataLineList);
+		} else {
+			String ErrorMsg = "請上傳正確附檔名之檔案-csv,xls,xlsx";
+			throw new LogicException(titaVo, "E0014", ErrorMsg);
 		}
 
 		int CountAll = occursList.size();
@@ -275,9 +286,9 @@ public class L7205 extends TradeBuffer {
 				iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
 			} catch (Exception e) {
 //				this.info("L7205(Excel欄位應為iCustNo在B欄、iFacmNo在C欄、iAssetClass為H欄)請確認格式 : " + e.getMessage());
-				
+
 				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
-				
+
 				throw new LogicException(titaVo, "E0015", ErrorMsg);
 			}
 

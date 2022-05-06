@@ -51,29 +51,76 @@ BEGIN
     INS_CNT := 0;
 
     INSERT INTO "JcicB090"
+    WITH rawData AS (
+      SELECT M."CustId"
+           , F."ClCode1"
+           , F."ClCode2"
+           , F."ClNo"
+           , M."FacmNo"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY M."CustId"
+                          , M."FacmNo"
+                          , NVL(CB."CityCode", ' ')
+                          , NVL(CB."AreaCode", ' ')
+                          , NVL(CB."BdNo1", '00000')
+                          , NVL(CB."BdNo2", '000')
+               ORDER BY CASE
+                          WHEN F."MainFlag" = 'Y'
+                          THEN 0
+                        ELSE 1 END -- 主要擔保品排在第一筆
+                      , F."ClCode1"
+                      , F."ClCode2"
+                      , F."ClNo"
+             ) AS "ClBdNoSeq"
+      FROM   "JcicB080" M
+          LEFT JOIN "ClFac" F    ON F."CustNo"   = SUBSTR(M."FacmNo",1,7)
+                                AND F."FacmNo"   = SUBSTR(M."FacmNo",8,3)
+          LEFT JOIN "ClMain" CM  ON CM."ClCode1"  = F."ClCode1"
+                                AND CM."ClCode2"  = F."ClCode2"
+                                AND CM."ClNo"     = F."ClNo"
+          LEFT JOIN "ClBuilding" CB ON CB."ClCode1"  = F."ClCode1"
+                                   AND CB."ClCode2"  = F."ClCode2"
+                                   AND CB."ClNo"     = F."ClNo"
+                                   AND F."ClCode1" = 1
+      WHERE  M."DataYM"   =   YYYYMM
+        AND  M."FacmNo"   IS  NOT NULL
+        AND  F."ClNo"     IS  NOT NULL
+        AND  CM."ClStatus" IN '1'  -- 已抵押
+      --GROUP BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
+      ORDER BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
+    )
     SELECT
            YYYYMM                                AS "DataYM"            -- 資料年月
          , '90'                                  AS "DataType"          -- 資料別
          , '458'                                 AS "BankItem"          -- 總行代號
          , '0001'                                AS "BranchItem"        -- 分行代號
          , ' '                                   AS "Filler4"           -- 空白
-         , M."CustId"                            AS "CustId"            -- 授信戶IDN/BAN
-         , TRIM(to_char(F."ClCode1",'0')) || TRIM(to_char(F."ClCode2",'00')) ||
-           TRIM(to_char(F."ClNo",'0000000'))     AS "ClActNo"           -- 擔保品控制編碼
-         , M."FacmNo"                            AS "FacmNo"            -- 額度控制編碼
+         , r."CustId"                            AS "CustId"            -- 授信戶IDN/BAN
+         , TRIM(to_char(r."ClCode1",'0')) || TRIM(to_char(r."ClCode2",'00')) ||
+           TRIM(to_char(r."ClNo",'0000000'))     AS "ClActNo"           -- 擔保品控制編碼
+         , r."FacmNo"                            AS "FacmNo"            -- 額度控制編碼
          , ' '                                   AS "GlOverseas"        -- 海外不動產擔保品資料註記
          , YYYYMM - 191100                       AS "JcicDataYM"        -- 資料所屬年月
          , JOB_START_TIME                        AS "CreateDate"        -- 建檔日期時間
          , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
          , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
          , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
-    FROM   "JcicB080" M
-        LEFT JOIN "ClFac" F    ON F."CustNo"   = SUBSTR(M."FacmNo",1,7)
-                              AND F."FacmNo"   = SUBSTR(M."FacmNo",8,3)
-                              --AND F."MainFlag" = 'Y'
-        LEFT JOIN "ClMain" CM  ON CM."ClCode1"  = F."ClCode1"
-                              AND CM."ClCode2"  = F."ClCode2"
-                              AND CM."ClNo"     = F."ClNo"
+    FROM rawData r
+    WHERE CASE
+            WHEN r."ClCode1" != 1 -- 非房地擔保品
+            THEN 1
+            WHEN r."ClCode1" = 1 -- 房地擔保品
+                 AND r."ClBdNoSeq" = 1 -- 建號相同時只取一筆
+            THEN 1
+          ELSE 0 END = 1
+    -- FROM   "JcicB080" M
+    --     LEFT JOIN "ClFac" F    ON F."CustNo"   = SUBSTR(M."FacmNo",1,7)
+    --                           AND F."FacmNo"   = SUBSTR(M."FacmNo",8,3)
+    --                           --AND F."MainFlag" = 'Y'
+    --     LEFT JOIN "ClMain" CM  ON CM."ClCode1"  = F."ClCode1"
+    --                           AND CM."ClCode2"  = F."ClCode2"
+    --                           AND CM."ClNo"     = F."ClNo"
 --        LEFT JOIN "JcicMonthlyLoanData" J                -- 不含預約撥款
 --                               ON J."DataYM"   = YYYYMM
 --                              AND J."CustNo"   = SUBSTR(M."FacmNo",1,7)
@@ -83,13 +130,13 @@ BEGIN
 --                               ON L."CustNo"   = SUBSTR(M."FacmNo",1,7)
 --                              AND L."FacmNo"   = SUBSTR(M."FacmNo",8,3)
 --                              AND L."Status"   IN (99)          -- 預約撥款
-    WHERE  M."DataYM"   =   YYYYMM
-      AND  M."FacmNo"   IS  NOT NULL
-      AND  F."ClNo"     IS  NOT NULL
+    -- WHERE  M."DataYM"   =   YYYYMM
+    --   AND  M."FacmNo"   IS  NOT NULL
+    --   AND  F."ClNo"     IS  NOT NULL
 --      AND  ( J."CustNo" IS  NOT NULL  OR  L."CustNo" IS  NOT NULL )   -- 非結清 OR 預約撥款
-      AND  CM."ClStatus" IN '1'  -- 已抵押
-    GROUP BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
-    ORDER BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
+    --   AND  CM."ClStatus" IN '1'  -- 已抵押
+    -- GROUP BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
+    -- ORDER BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

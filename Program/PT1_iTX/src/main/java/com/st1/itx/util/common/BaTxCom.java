@@ -1195,7 +1195,7 @@ public class BaTxCom extends TradeBuffer {
 
 		// RepayInt begin
 		loanSetRepayIntCom.setTxBuffer(this.getTxBuffer());
-		loanCalcRepayIntCom.init();
+
 		BigDecimal wkExtraRepayRemaind = this.extraRepay;
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 		int wkTerms = 0;

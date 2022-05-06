@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_ClBuildingUnique_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClBuildingUnique_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -50,6 +50,7 @@ BEGIN
                            PARTITION BY "GroupNo"
                                       , "SecGroupNo"
                            ORDER BY "LMSACN" -- 2022-03-10 Wei
+                                  , "GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
                                   , "LMSAPN" DESC -- 2022-03-10 Wei
                                   , "GDRID1"
                                   , "GDRID2"
@@ -255,6 +256,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClBuildingUnique_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 /

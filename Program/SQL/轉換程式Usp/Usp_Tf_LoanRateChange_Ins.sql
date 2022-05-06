@@ -77,7 +77,7 @@ BEGIN
            || '"IncrEffectDate":'
            || CASE
                 WHEN R."IncrEffectDate" > 0
-                THEN R."IncrEffectDate"
+                THEN TO_CHAR(R."IncrEffectDate")
               ELSE '' END
            || '}'                         AS "OtherFields"         -- JsonFields VARCHAR2 2000
     FROM (SELECT LM."LMSACN"
@@ -200,7 +200,7 @@ BEGIN
            || '"IncrEffectDate":'
            || CASE
                 WHEN "ASCADT" > 0
-                THEN "ASCADT"
+                THEN TO_CHAR("ASCADT")
               ELSE '' END
            || '}'                         AS "OtherFields"         -- JsonFields VARCHAR2 2000
     FROM rawData
