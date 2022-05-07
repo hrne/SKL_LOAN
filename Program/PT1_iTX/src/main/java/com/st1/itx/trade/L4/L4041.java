@@ -485,7 +485,8 @@ public class L4041 extends TradeBuffer {
 						occursListOutput.putParam("OORetrDate", retrDate);
 						occursListOutput.putParam("OOAuthCode", result.get("F5"));
 						occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
-
+						occursListOutput.putParam("OOStampFinishDate", stampFinishDate);
+						
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursListOutput);
 						PostAuthLogId tPostAuthLogId = new PostAuthLogId();

@@ -12,7 +12,7 @@ E(0,16)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,50)ASGN(INQLEN$)
+E(0,57)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -70,13 +70,19 @@ T(3,CdCode.AuthCode)
 
 #AuthCodeHelp=x,1024,S 
 
+! 授權狀態下拉選單
+#CDDEF03=x,20,S
+T(3,CdCode.AuthErrorCode)
+#AuthErrorCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
 R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@PostDepCodeHelp,#HelpDesc1) 
 T(2,@AuthCodeHelp,#HelpDesc2) 
+T(2,@AuthErrorCodeHelp,#HelpDesc3) 
 
 #AuthCodeHelp2=x,1024,S
 T(2,0:全部;+#HelpDesc2)
@@ -167,7 +173,7 @@ T(H,#AuthCode,#AuthCodeHelp2)
 
 ![顯示方式] 2-無勾 3-申請 4-終止
 #RPTFG=A,1,S
-C(3,#FunctionCode,1,C(3,#AuthApplCode,3,E(0,4),E(0,3)),E(0,2))
+C(3,#FunctionCode,1,C(3,#AuthApplCode,3,E(0,4),C(3,#AuthApplCode,1,E(0,3),E(0,5))),E(0,2))
 
 </sub>
 
@@ -243,6 +249,8 @@ T(3,)T(H,#OOPostDepCode,#PostDepCodeHelp)
 #OOAuthErrorCode=X,2,O
 ! 狀況代號
 #OOAuthErrorCodeX=X,13,O
+T(3,)T(H,#OOAuthErrorCode,#AuthErrorCodeHelp)
+
 !SWITCH(#OOAuthErrorCode,00,T(3,00-成功),
 !                        03,T(3,03-已終止代繳),
 !                        06,T(3,06-凍結警示戶),
@@ -269,6 +277,7 @@ T(3,)T(H,#OOPostDepCode,#PostDepCodeHelp)
 T(3,)T(H,#OOAuthCode,#AuthCodeHelp)
 !SWITCH(#OOAuthCode,1,T(2,期款),2,T(2,火險))
 
+#OOStampFinishDate=D,7,O
 
 #secret-no=x,1000,S
 T(6A,#OOAuthCreateDate+#OOAuthApplCode+#OOCustNo+#OOPostDepCode+#OORepayAcct+#OOAuthCode+#AuthApplCode)
@@ -319,6 +328,7 @@ TXFORM=L4041
 #OORetrDate
 #OOAuthErrorCode
 #OOAuthCode
+#OOStampFinishDate
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -394,6 +404,41 @@ ifxBatch:{
 #OOPropDate=提出日期
 {width:100,align:'center'}
 #OORetrDate=提回日期
+{width:100,align:'center'}
+^
+
+#RPTFG=5,QUERY.GRID,
+#any={header:'L4041.part',caption:'[L4041]郵局授權資料',width:1200,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+	name:'申請',
+	type:'5',
+	rim:'L441A',
+	txtno:'#secret-no',
+	pfnx:"L4041.PFNX",
+	col_captions:["交易序號","交易狀態"],
+	col_names:["#batch-row-txtno","#batch-row-status"]
+	}
+}
+#secret-no
+#OOCustNo=戶號
+{width:70,align:'center'}
+#OOFacmNo=額度
+{width:50,align:'center'}
+#OOAuthApplCodeX=授權註記
+{width:100,align:'center'}
+#OOPostDepCodeX=帳戶別
+{width:100,align:'center'}
+#OOAuthCodeX=授權代碼
+{width:100,align:'center'}
+#OORepayAcct=扣款帳號
+{width:120,align:'left'}
+#OOPropDate=提出日期
+{width:100,align:'center'}
+#OORetrDate=提回日期
+{width:100,align:'center'}
+#OOAuthErrorCodeX=失敗原因
+{width:100,align:'center'}
+#OOStampFinishDate=核印完成日期
 {width:100,align:'center'}
 ^
 #RPTFG=2,QUERY.GRID

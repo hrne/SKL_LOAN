@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Dp_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Dp_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Dp 每月IFRS9欄位清單D檔
 -- 執行時機：每月底日終批次(換日前)
@@ -160,7 +160,8 @@ BEGIN
       FROM "InsuRenew"
       WHERE TRUNC("InsuStartDate" / 100) <= YYYYMM
         AND CASE
-              WHEN "AcDate" = 0 -- 未銷直接計入
+              WHEN "AcDate" = 0 AND "RenewCode" = 2 
+                   AND  "InsuYearMonth" <= YYYYMM  -- 未銷直接計入
               THEN 1
               WHEN TRUNC("AcDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
               THEN 1

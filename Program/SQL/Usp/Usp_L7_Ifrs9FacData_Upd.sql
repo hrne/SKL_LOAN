@@ -1,9 +1,8 @@
-
-CREATE OR REPLACE NONEDTIONABLE PROCEDURE "Usp_L7_Ifrs9FacData_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_Ifrs9FacData_Upd"
 (
 -- 程式功能：維護 Ifrs9FacData 每月IFRS9額度資料檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_Ifrs9FacData_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L7_Ifrs9FacData_Upd"(20200430,'999999');
 --
 -- 額度資料
 
@@ -121,7 +120,9 @@ BEGIN
            END                                  AS "ApproveDate"       -- 核准日期(額度)
                                                                           -- 1.優先取用對保日期
                                                                           -- 2.無對保日採用准駁日
-         , NVL(F."UtilDeadline",0)              AS "UtilDeadline"      -- 動支期限
+         , CASE WHEN F."RecycleCode" IN ('1') THEN NVL(F."RecycleDeadline",0)  -- 循環動用
+                ELSE NVL(F."UtilDeadline",0)                                   -- 非循環動用
+           END                                  AS "UtilDeadline"      -- 動支期限
          --, NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
          , CASE
              WHEN  M."DrawdownFg" = 0 AND F."LastBormRvNo" > 900

@@ -7,6 +7,7 @@
 !#TXCD
 !T(3,XW111)
 
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
 ![一段式/二段式/三段式]
 #RELCD=_,_,S
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
@@ -354,13 +355,13 @@ C(3,#ApplNo,0,$,s)
 
 !用戶號,額度號碼調L2R05
 #SendL2r05B=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimApplNo,0)
 E(0,@RimCaseNo,0)
-RESET_RIM(#SendL2r05A,L2R05)
+RESET_RIM(#SendL2r05B,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
 
@@ -371,13 +372,13 @@ C(3,#FKEY,0,$,s)
 C(3,#L2r05BormCount,1,T(3, )T(F,@BormNo,0),T(3,*)T(F,@BormNo,1))
 
 #BormNo=A,3,S
-C(3,#FKEY,0,$,s)
 C(3,#CHAIN,1,C(5,#rimtxtype,L4,$,s),$)
 IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
 IF(#L2r05BormCount>=1,s,$)
 
 !查尋放款主檔
 #SendL3r02=X,1,S
+IF(#FKEY==0||#FKEY==7,$,s)
 C(3,#BormNo,0,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#TimCustNo)
@@ -602,11 +603,13 @@ HELP(#YNHelp)
 C(5,#DeleteFg,N,INVOKEJS(SHOW,p1,12,16,1),INVOKEJS(SHOW,p1,12,16,0))
 C(4,#DeleteFg,S,$)
 T(3,)T(H,#DeleteFg,#YNHelp)
+C(3,#FKEY,0,$,s)
 C(5,#DeleteFg,Y,E(0,@EffectDate2,#EffectDate1),E(0,@EffectDate2,0))
 C(5,#DeleteFg,Y,T(3,@Remark,刪除),T(3,@Remark,))
 C(5,#CheckChangFg,Y,E(0,@EffectDate2,#EffectDate1),$)
 
 #checkdel=X,1,S
+C(3,#FKEY,0,$,s)
 T(F,#EffectDate2,1)
 T(F,#RateCode2,1)
 T(F,#ProdNo2,1)

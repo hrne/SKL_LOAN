@@ -97,7 +97,8 @@ BEGIN
       FROM "InsuRenew"
       WHERE TRUNC("InsuStartDate" / 100) <= YYYYMM
         AND CASE
-              WHEN "AcDate" = 0 AND "RenewCode" = 2 -- 續保未銷直接計入
+              WHEN "AcDate" = 0 AND "RenewCode" = 2 
+                   AND  "InsuYearMonth" <= YYYYMM -- 續保未銷直接計入
               THEN 1
               WHEN TRUNC("AcDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
               THEN 1

@@ -47,6 +47,9 @@ public class L9717Report extends MakeReport {
 
 
 	List<BigDecimal> list = new ArrayList<BigDecimal>(14);
+	
+	BigDecimal ovdu = BigDecimal.ZERO;
+	BigDecimal amt = BigDecimal.ZERO;
 
 	String rocYear;
 	String rocMonth;
@@ -410,8 +413,7 @@ public class L9717Report extends MakeReport {
 							columnList.get(i).getSort());
 				}
 
-				BigDecimal ovdu = BigDecimal.ZERO;
-				BigDecimal amt = BigDecimal.ZERO;
+			
 
 				switch (currentSort) {
 				case Year:
@@ -533,9 +535,8 @@ public class L9717Report extends MakeReport {
 
 			if (currentSort != OutputSortBy.LargeAmt_Customer) {
 				this.print(1, 1, newBorder);
-				this.print(1, 1, "");
+				this.print(1, 1, " ");
 				this.print(1, 1, newBorder);
-
 				// F2 一期件數 26 C
 				// F3 一期金額 39 R
 				// F4 二期件數 44 C
@@ -551,18 +552,23 @@ public class L9717Report extends MakeReport {
 				// F14 轉催收件數 134 C
 				// F15 轉催收金額 147 R
 
+				this.print(1, 1, "各期小計");
+				
+				
+				
 				for (int i = 0, space = 1; i < list.size(); i = i + 2, space++) {
 
-					this.print(1, 26 + (18 * space), formatAmt(list.get(i), 0), "C");
+					this.print(0, 26 + (18 * space), formatAmt(list.get(i), 0), "C");
 				}
 
 				for (int i = 1, space = 1; i < list.size(); i = i + 2, space++) {
-					this.print(1, 39 + (18 * space), list.get(i).toString(), "R");
+					this.print(0, 39 + (18 * space), list.get(i).toString(), "R");
 				}
 
-				this.print(1, 1, "各期小計");
 				this.print(1, 1, newBorder);
+				
 			}
+			this.print(1, 1, " ");
 			this.print(0, countX, "總計：　　" + formatAmt(totalCount, 0) + " 筆", "R");
 			this.print(0, amtX, formatAmt(totalAmt, 0), "R");
 			this.print(1, 1, newBorder);

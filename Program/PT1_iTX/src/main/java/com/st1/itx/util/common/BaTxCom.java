@@ -574,7 +574,7 @@ public class BaTxCom extends TradeBuffer {
 
 // STEP 6: 提前償還計算清償違約金
 		if (iRepayType == 2 || iRepayType == 3) {
-			getCloseBreachAmt(iEntryDate, iCustNo, iFacmNo, titaVo);
+			getCloseBreachAmt(iEntryDate, iCustNo, iFacmNo, iRepayType, titaVo);
 		}
 
 // STEP 4: 設定總金額
@@ -1495,7 +1495,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	// 計算清償違約金
-	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {
+	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, int iRepayType, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmt...");
 		String collectFlag = this.tempVo.getParam("CollectFlag");
 
@@ -1528,7 +1528,7 @@ public class BaTxCom extends TradeBuffer {
 		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
 			baTxVo = new BaTxVo();
 			baTxVo.setDataKind(6); // 6.另收欠款
-			baTxVo.setRepayType(9); // 09-其他(清償違約金)
+			baTxVo.setRepayType(iRepayType); 
 			baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
 			baTxVo.setCustNo(iCustNo); // 借款人戶號
 			baTxVo.setFacmNo(iFacmNo); // 額度編號
