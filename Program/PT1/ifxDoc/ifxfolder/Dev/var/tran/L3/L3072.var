@@ -71,10 +71,17 @@ T(1,@FacmNo,#NTXBUF,8,3)
 T(1,@BormNo,#NTXBUF,11,3)
 T(1,@BorxNo,#NTXBUF,14,4)
 
-#BUFCREATE=X,11,S
-T(2,1+#CustNo+          +000+00+#120spc)
+!1時只送這些
+!CustNo 7
+!FacmNo 3
+!BormNo 3
+!BorxNo 4
+#BUFCREATE=X,17,S
+T(2,1+#CustNo+#FacmNo+#BormNo+#BorxNo)
 
+! 只有在額度, 撥款, 交易內容檔序號都有時才允許新增
 #button=x,100,S
+IF(#FacmNo == 0 || #BormNo == 0 || #BorxNo == 0,S,$)
 T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUFCREATE})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
 
@@ -165,6 +172,12 @@ T(3,1)ASGN(LOOP$)
 #OOCustNo=A,7,L
 C(3,#FacmNo,0,$,T(2,@FacmNoX,#FacmNo)T(2,@BormNoX,#BormNo)T(2,@BorxNoX,#BorxNo))
 
+#OOFacmNo=A,3,S
+
+#OOBormNo=A,3,S
+
+#OOBorxNo=A,4,S
+
 #OOAcDate=D,7,L
 
 #OORmkNo=A,3,L
@@ -239,6 +252,9 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF5})
 <sub type="TOM">
 TXFORM=L3072
 #OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOBorxNo
 #OOAcDate
 #OORmkNo
 #OORmkCode

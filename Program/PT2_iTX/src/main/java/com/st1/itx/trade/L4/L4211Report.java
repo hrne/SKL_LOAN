@@ -147,7 +147,7 @@ public class L4211Report extends MakeReport {
 		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		this.print(-7, 1,
-				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	   戶名    	          計息起迄日     	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 費用");
+				" 匯款日    匯款序號    匯款金額   作帳金額 戶號           	   戶名    	        計息起迄日       	    本金       利息     暫付款     違約金   	 暫收借    暫收貸    短繳  	 費用");
 		this.print(-8, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		// 1234567-001-001 11 我是一二三 11 111/11/11-111/11/11
@@ -533,10 +533,21 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, 60, name);
-			this.print(0, 71, tfnAllList.get("CloseReasonCode"));
-			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
-					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+			this.print(0, 69, tfnAllList.get("CloseReasonCode"));
 
+			if ("9991231".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
+				this.print(0, 72, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+
+			} else {
+				this.print(0, 72, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
+						+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+			}
+			
+			if (dfPrincipal.equals("0")) {
+				this.print(0, 102, "", "R"); // 本金
+			} else {
+				this.print(0, 102, dfPrincipal, "R"); // 本金
+			}
 			if (dfInterest.equals("0")) {
 				this.print(0, 112, "", "R"); // 利息
 			} else {
@@ -566,11 +577,6 @@ public class L4211Report extends MakeReport {
 				this.print(0, 167, "", "R"); // 帳管費及其他
 			} else {
 				this.print(0, 167, dfOthers, "R"); // 帳管費及其他
-			}
-			if (dfPrincipal.equals("0")) {
-				this.print(0, 103, "", "R"); // 本金
-			} else {
-				this.print(0, 103, dfPrincipal, "R"); // 本金
 			}
 			if (dfTemporaryLoan.equals("0")) {
 				this.print(0, 143, "", "R"); // 暫收借
@@ -850,10 +856,21 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, 60, name);
-			this.print(0, 71, tfnAllList.get("CloseReasonCode"));
-			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
-					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+			this.print(0, 69, tfnAllList.get("CloseReasonCode"));
 
+			if ("9991231".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
+				this.print(0, 72, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+
+			} else {
+				this.print(0, 72, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
+						+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+			}
+			
+			if (dfPrincipal.equals("0")) {
+				this.print(0, 102, "", "R"); // 本金
+			} else {
+				this.print(0, 102, dfPrincipal, "R"); // 本金
+			}
 			if (dfInterest.equals("0")) {
 				this.print(0, 112, "", "R"); // 利息
 			} else {
@@ -883,11 +900,6 @@ public class L4211Report extends MakeReport {
 				this.print(0, 167, "", "R"); // 帳管費及其他
 			} else {
 				this.print(0, 167, dfOthers, "R"); // 帳管費及其他
-			}
-			if (dfPrincipal.equals("0")) {
-				this.print(0, 103, "", "R"); // 本金
-			} else {
-				this.print(0, 103, dfPrincipal, "R"); // 本金
 			}
 			if (dfTemporaryLoan.equals("0")) {
 				this.print(0, 143, "", "R"); // 暫收借
@@ -1163,10 +1175,21 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, 60, name);
-			this.print(0, 71, tfnAllList.get("CloseReasonCode"));
-			this.print(0, 74, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
-					+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+			this.print(0, 69, tfnAllList.get("CloseReasonCode"));
 
+			if ("9991231".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
+				this.print(0, 72, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+
+			} else {
+				this.print(0, 72, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
+						+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
+			}
+			
+			if (dfPrincipal.equals("0")) {
+				this.print(0, 102, "", "R"); // 本金
+			} else {
+				this.print(0, 102, dfPrincipal, "R"); // 本金
+			}
 			if (dfInterest.equals("0")) {
 				this.print(0, 112, "", "R"); // 利息
 			} else {
@@ -1196,11 +1219,6 @@ public class L4211Report extends MakeReport {
 				this.print(0, 167, "", "R"); // 帳管費及其他
 			} else {
 				this.print(0, 167, dfOthers, "R"); // 帳管費及其他
-			}
-			if (dfPrincipal.equals("0")) {
-				this.print(0, 103, "", "R"); // 本金
-			} else {
-				this.print(0, 103, dfPrincipal, "R"); // 本金
 			}
 			if (dfTemporaryLoan.equals("0")) {
 				this.print(0, 143, "", "R"); // 暫收借
@@ -1290,7 +1308,7 @@ public class L4211Report extends MakeReport {
 		}
 
 		if (allsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
-			this.print(0, 103, formatAmt(allsumPrincipal, 0), "R");
+			this.print(0, 102, formatAmt(allsumPrincipal, 0), "R");
 		}
 
 		if (allsumPayment.compareTo(BigDecimal.ZERO) != 0) {
@@ -1333,7 +1351,7 @@ public class L4211Report extends MakeReport {
 			this.print(0, 40, formatAmt(totalsumMakerferAmt, 0), "R");
 		}
 		if (totalsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
-			this.print(0, 103, formatAmt(totalsumPrincipal, 0), "R");
+			this.print(0, 102, formatAmt(totalsumPrincipal, 0), "R");
 		}
 
 		if (totalsumPayment.compareTo(BigDecimal.ZERO) != 0) {

@@ -209,7 +209,7 @@ public class L4321Batch extends TradeBuffer {
 			} else {
 				sendMsg = sendMsg + "，iLableBX，取消確認，筆數：" + this.processCnt;
 			}
-			
+
 			if (titaVo.isHcodeNormal()) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 						titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
@@ -355,14 +355,19 @@ public class L4321Batch extends TradeBuffer {
 		if (tLoanBorMain == null) {
 			throw new LogicException("E0006", "BS430 LoanBorMain " + tLoanBorMainId);
 		}
+		// 下次利率調整日期超過到期日放到期日
 		if (titaVo.isHcodeNormal()) {
 			dateUtil.init();
 			dateUtil.setDate_1(tBatxRateChange.getCurtEffDate());
 			dateUtil.setMons(tLoanBorMain.getRateAdjFreq()); // 調整周期(單位固定為月)
 			nextAdjDate = dateUtil.getCalenderDay();
+			if (nextAdjDate > tLoanBorMain.getMaturityDate()) {
+				nextAdjDate = tLoanBorMain.getMaturityDate();
+			}
 		} else {
 			nextAdjDate = tBatxRateChange.getPreNextAdjDate();
 		}
+
 		tLoanBorMain.setNextAdjRateDate(nextAdjDate);
 
 		try {

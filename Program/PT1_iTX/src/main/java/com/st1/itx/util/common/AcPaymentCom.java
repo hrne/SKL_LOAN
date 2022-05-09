@@ -216,7 +216,8 @@ public class AcPaymentCom extends TradeBuffer {
 			} else {
 				acDetail.setRvNo("FacmNo" + titaVo.getParam("RpFacmNo" + i));
 				acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-				acDetail.setSlipNote("新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));
+				acDetail.setSlipNote(
+						"新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));
 			}
 			break;
 		case "092":
@@ -330,7 +331,8 @@ public class AcPaymentCom extends TradeBuffer {
 
 		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
 		if (tLoanCheque == null) {
-			throw new LogicException(titaVo, "E0006", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006",
+					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
 		}
 
 		// 更新欄
@@ -341,10 +343,12 @@ public class AcPaymentCom extends TradeBuffer {
 		// 正常交易
 		if (titaVo.isHcodeNormal()) {
 			if (!(tLoanCheque.getStatusCode().equals("1") || tLoanCheque.getStatusCode().equals("4"))) {
-				throw new LogicException(titaVo, "E3057", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 該票據狀況碼非為兌現，不可入帳
+				throw new LogicException(titaVo, "E3057",
+						"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 該票據狀況碼非為兌現，不可入帳
 			}
 			if (tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt()).compareTo(iRpAmt) < 0) {
-				throw new LogicException(titaVo, "E3058", "支票尚未入帳金額 = " + tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt())); // 暫收金額超過支票尚未入帳金額
+				throw new LogicException(titaVo, "E3058",
+						"支票尚未入帳金額 = " + tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt())); // 暫收金額超過支票尚未入帳金額
 			}
 			tLoanCheque.setStatusCode("1"); // 1: 兌現入帳
 			tLoanCheque.setRepaidAmt(tLoanCheque.getRepaidAmt().add(iRpAmt));
@@ -369,7 +373,8 @@ public class AcPaymentCom extends TradeBuffer {
 		try {
 			loanChequeService.update(tLoanCheque, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007",
+					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 	}
 
@@ -389,7 +394,8 @@ public class AcPaymentCom extends TradeBuffer {
 			/* SecNo : 01:撥款匯款 */
 			/* 撥款方式為 1 ~ 89 */
 			if (titaVo.getSecNo().equals("01") && titaVo.get("RpCode" + i) != null) {
-				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0 && parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
+				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0
+						&& parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
 
 					/* BankRemit寫入 */
 					procBankRemit(i, titaVo);
@@ -457,7 +463,8 @@ public class AcPaymentCom extends TradeBuffer {
 				BankRemit t2BankRemit = new BankRemit();
 				t2BankRemit = moveTitaToBankRemit(i, t2BankRemit, titaVo);// 搬BankRemit內容
 				if (isModifyRemit(tBankRemit, t2BankRemit)) {
-					if (t2BankRemit.getDrawdownCode() != tBankRemit.getDrawdownCode() && tBankRemit.getDrawdownCode() == 01) {
+					if (t2BankRemit.getDrawdownCode() != tBankRemit.getDrawdownCode()
+							&& tBankRemit.getDrawdownCode() == 01) {
 						tBankRemit.setStatusCode(4); // 4.產檔後改單筆匯款
 					} else {
 						tBankRemit.setStatusCode(3);// 3. 產檔後修正
@@ -504,7 +511,8 @@ public class AcPaymentCom extends TradeBuffer {
 			} else {
 				transactionId += titaVo.getTxSeq();
 			}
-			TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(tBankRemit.getAcDate() + 19110000, transactionId, titaVo);
+			TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(tBankRemit.getAcDate() + 19110000,
+					transactionId, titaVo);
 			if (tTxAmlLog == null) {
 				throw new LogicException(titaVo, "E0014", "TxAmlLog not found"); // 檔案錯誤
 			}
@@ -610,9 +618,13 @@ public class AcPaymentCom extends TradeBuffer {
 
 		tTempVo.clear();
 		Boolean isModify = true;
-		if (t2BankRemit.getDrawdownCode() == tBankRemit.getDrawdownCode() && t2BankRemit.getRemitBank().equals(tBankRemit.getRemitBank())
-				&& t2BankRemit.getRemitBranch().equals(tBankRemit.getRemitBranch()) && t2BankRemit.getRemitAcctNo().equals(tBankRemit.getRemitAcctNo())
-				&& t2BankRemit.getCustName().equals(tBankRemit.getCustName()) && t2BankRemit.getRemark().equals(tBankRemit.getRemark()) && t2BankRemit.getRemitAmt().equals(tBankRemit.getRemitAmt())) {
+		if (t2BankRemit.getDrawdownCode() == tBankRemit.getDrawdownCode()
+				&& t2BankRemit.getRemitBank().equals(tBankRemit.getRemitBank())
+				&& t2BankRemit.getRemitBranch().equals(tBankRemit.getRemitBranch())
+				&& t2BankRemit.getRemitAcctNo().equals(tBankRemit.getRemitAcctNo())
+				&& t2BankRemit.getCustName().equals(tBankRemit.getCustName())
+				&& t2BankRemit.getRemark().equals(tBankRemit.getRemark())
+				&& t2BankRemit.getRemitAmt().equals(tBankRemit.getRemitAmt())) {
 			isModify = false;
 		}
 		if (isModify) {
@@ -673,7 +685,8 @@ public class AcPaymentCom extends TradeBuffer {
 			// 報表代號(交易代號)
 			remitformVo.setReportCode(titaVo.getTxCode());
 			// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
-			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_" + tBankRemit.getBormNo());
+			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_"
+					+ tBankRemit.getBormNo());
 
 			remitForm.open(titaVo, remitformVo);
 
@@ -698,7 +711,8 @@ public class AcPaymentCom extends TradeBuffer {
 				remitformVo.setReportCode(titaVo.getTxCode());
 
 				// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
-				remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_" + tBankRemit.getBormNo());
+				remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo()
+						+ "_" + tBankRemit.getBormNo());
 
 				// 申請日期(民國年)
 				remitformVo.setApplyDay(titaVo.getEntDyI());
@@ -752,7 +766,7 @@ public class AcPaymentCom extends TradeBuffer {
 				remitformVo.setRemitId("03458902");
 
 				// 匯款人電話
-				remitformVo.setRemitTel("23895858#7086");
+				remitformVo.setRemitTel("23895858");
 
 				// 附言
 				remitformVo.setNote(tBankRemit.getRemark());

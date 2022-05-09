@@ -522,7 +522,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
 
 #OOBTNRMK=X,1,S
-C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=備忘錄查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,cancel))
+C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,cancel))
 
 !分錄
 #OOBUF3=X,32,S

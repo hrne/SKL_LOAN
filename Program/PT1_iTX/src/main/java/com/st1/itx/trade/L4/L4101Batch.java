@@ -512,7 +512,7 @@ public class L4101Batch extends TradeBuffer {
 				remitformVo.setRemitId("03458902");
 
 				// 匯款人電話
-				remitformVo.setRemitTel("23895858#7086");
+				remitformVo.setRemitTel("23895858");
 
 				// 附言
 				remitformVo.setNote(tBankRemit.getRemark());

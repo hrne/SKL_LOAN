@@ -70,10 +70,9 @@ public class L4320Batch extends TradeBuffer {
 
 	@Autowired
 	public L4320ServiceImpl l4320BatchServiceImpl;
-	
+
 	@Autowired
 	public L4321Report l4321Report;
-
 
 	private HashMap<tmpBorm, BigDecimal> loanBalTot = new HashMap<>();
 	private HashMap<tmpBorm, BigDecimal> facRate = new HashMap<>();
@@ -96,9 +95,9 @@ public class L4320Batch extends TradeBuffer {
 	private int wkLastMonthDateS = 0;
 	private int commitCnt = 200;
 	private int processCnt = 0;
-	private int custNo;
-	private int facmNo;
-	private int bormNo;
+	private int custNo = 0;
+	private int facmNo = 0;
+	private int bormNo = 0;
 	private Boolean flag = true;
 
 	@Override
@@ -131,7 +130,7 @@ public class L4320Batch extends TradeBuffer {
 
 		// 戶別
 		iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
-		
+
 		// 調整日期
 		wkAdjDate = this.getTxBuffer().getTxCom().getTbsdy();
 
@@ -148,11 +147,16 @@ public class L4320Batch extends TradeBuffer {
 				sendMsg = e.getErrorMsg();
 				flag = false;
 			}
-			try {
-				execute(4, titaVo); // 4:定期機動指標利率變動調整合約利率
-			} catch (LogicException e) {
-				sendMsg = e.getErrorMsg();
-				flag = false;
+			if (flag && iTxKind == 1) {
+				loanBalTot = new HashMap<>();
+				facRate = new HashMap<>();
+				facRateFlag = new HashMap<>();
+				try {
+					execute(4, titaVo); // 4:定期機動指標利率變動調整合約利率
+				} catch (LogicException e) {
+					sendMsg = e.getErrorMsg();
+					flag = false;
+				}
 			}
 		}
 //		訂正
@@ -257,9 +261,9 @@ public class L4320Batch extends TradeBuffer {
 				// F0 戶號
 				// F1 額度
 				// F2 撥款
-				custNo = parse.stringToInteger(s.get("F0"));
-				facmNo = parse.stringToInteger(s.get("F1"));
-				bormNo = parse.stringToInteger(s.get("F2"));
+				custNo = parse.stringToInteger(s.get("CustNo"));
+				facmNo = parse.stringToInteger(s.get("FacmNo"));
+				bormNo = parse.stringToInteger(s.get("BormNo"));
 				BatxRateChange b = new BatxRateChange();
 				BatxRateChangeId bId = new BatxRateChangeId();
 				// 調整日期
@@ -267,15 +271,16 @@ public class L4320Batch extends TradeBuffer {
 				bId.setCustNo(custNo);
 				bId.setFacmNo(facmNo);
 				bId.setBormNo(bormNo);
+				this.info("bId=" + bId.toString());
 				b = batxRateChangeService.holdById(bId, titaVo);
-				// 已輸入利率跳過
+				// 已確認跳過
 				boolean isInsert = false;
 				if (b == null) {
 					isInsert = true;
 					b = new BatxRateChange();
 					b.setBatxRateChangeId(bId);
 				} else {
-					if (b.getRateKeyInCode() == 1) {
+					if (b.getConfirmFlag() >= 1) {
 						continue;
 					}
 				}
@@ -283,8 +288,8 @@ public class L4320Batch extends TradeBuffer {
 				seBatxRateChange(iAdjCode, b, s, titaVo);
 
 				// commit per commitCnt
-				processCnt++;
-				if (processCnt % commitCnt == 0) {
+				this.processCnt++;
+				if (this.processCnt % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
 
@@ -315,29 +320,29 @@ public class L4320Batch extends TradeBuffer {
 	/* 設定各項值 */
 	private void seBatxRateChange(int iAdjCode, BatxRateChange b, Map<String, String> s, TitaVo titaVo)
 			throws LogicException {
-
+		this.info("seBatxRateChange ... iAdjCode=" + iAdjCode);
 		// 作業項目
 		b.setTxKind(iTxKind);
 
 		// F3 下次利率調整日期
-		int nextAdjRateDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F3")));
+		int nextAdjRateDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextAdjRateDate")));
 		b.setPreNextAdjDate(nextAdjRateDate); // 下次利率調整日期
 		// F4 上次繳息日,繳息迄日
-		// F27 撥款日期
-		int prevIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F4")));
-		int drawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F27")));
+		// DrawdownDate 撥款日期
+		int prevIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("PrevPayIntDate")));
+		int drawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("DrawdownDate")));
 		if (prevIntDate == 0) {
 			b.setPrevIntDate(drawdownDate);
 		} else {
 			b.setPrevIntDate(prevIntDate);
 		}
 		// F5 利率調整週期
-		int rateAdjFreq = parse.stringToInteger(s.get("F5"));
+		int rateAdjFreq = parse.stringToInteger(s.get("RateAdjFreq"));
 		b.setPreNextAdjFreq(rateAdjFreq);
 		// F6 餘額
 		// F7 撥款金額
-		BigDecimal loanBal = parse.stringToBigDecimal(s.get("F6"));
-		BigDecimal drawdownAmt = parse.stringToBigDecimal(s.get("F7"));
+		BigDecimal loanBal = parse.stringToBigDecimal(s.get("LoanBal"));
+		BigDecimal drawdownAmt = parse.stringToBigDecimal(s.get("DrawdownAmt"));
 		b.setLoanBalance(loanBal);
 		b.setDrawdownAmt(drawdownAmt);
 		// 全戶餘額
@@ -345,69 +350,70 @@ public class L4320Batch extends TradeBuffer {
 		b.setTotBalance(loanBalTot.get(cust));
 		// F11 員工利率記號
 		// F12 借戶利率檔是否依合約記號
-		String incrFlag = s.get("F12");
+		String incrFlag = s.get("IncrFlag");
 		b.setIncrFlag(incrFlag);
 		// F13 借戶利率檔指標利率代碼
-		String baseRateCode = s.get("F13");
+		String baseRateCode = s.get("BaseRateCode");
 		b.setBaseRateCode(baseRateCode);
 		// F15 借戶利率檔利率區分 共用代碼檔 1: 機動 2: 固動 3: 定期機動
-		String rateCode = s.get("F15");
+		String rateCode = s.get("RateCode");
 		b.setRateCode(rateCode);
 		// F16 借戶利率檔商品代碼
-		String prodNo = s.get("F16");
+		String prodNo = s.get("ProdNo");
 		b.setProdNo(prodNo);
 		// F21 擔保品地區別
-		String cityCode = s.get("F21");
+		String cityCode = s.get("CityCode");
 		b.setCityCode(cityCode);
 		// F20 擔保品地區別
-		int cntCode = parse.stringToInteger(s.get("F20"));
-		b.setCustCode(cntCode);
+		int entCode = parse.stringToInteger(s.get("EntCode"));
+		b.setCustCode(entCode);
 		// F22 擔保品鄉鎮別
-		b.setAreaCode(s.get("F22"));
+		b.setAreaCode(s.get("AreaCode"));
 		// F23 地區別利率上限
-		BigDecimal cityIntRateCeiling = parse.stringToBigDecimal(s.get("F23"));
+		BigDecimal cityIntRateCeiling = parse.stringToBigDecimal(s.get("CityIntRateCeiling"));
 		// F24 地區別利率下限
-		BigDecimal cityIntRateFloor = parse.stringToBigDecimal(s.get("F24"));
-		// F25 地區別利率加減碼
-		BigDecimal cityIntRateIncr = parse.stringToBigDecimal(s.get("F25"));
+		BigDecimal cityIntRateFloor = parse.stringToBigDecimal(s.get("CityIntRateFloor"));
+		// IntRateIncr 地區別利率加減碼
+		BigDecimal cityIntRateIncr = parse.stringToBigDecimal(s.get("CityIntRateIncr"));
 
 		// F8 額度核准利率
-//		BigDecimal approveRateFac = parse.stringToBigDecimal(s.get("F8"));
+//		BigDecimal approveRateFac = parse.stringToBigDecimal(s.get("FacApproveRate"));
 		// F9 額度加碼利率
-//		BigDecimal rateIncrFac = parse.stringToBigDecimal(s.get("F9"));
+//		BigDecimal rateIncrFac = parse.stringToBigDecimal(s.get("FacRateIncr"));
 		// F10 額度個人加碼利率(未用)
+//		BigDecimal individualIncr = parse.stringToBigDecimal(s.get("FacIndividualIncr"));
 
 		// F17 借戶利率檔加碼利率
-		BigDecimal rateIncr = parse.stringToBigDecimal(s.get("F17"));
+		BigDecimal rateIncr = parse.stringToBigDecimal(s.get("RateIncr"));
 		b.setRateIncr(rateIncr);
 		b.setContrRateIncr(rateIncr);
 
 		// F18 借戶利率檔個人加碼利率
-		BigDecimal individualIncr = parse.stringToBigDecimal(s.get("F18"));
+		BigDecimal individualIncr = parse.stringToBigDecimal(s.get("IndividualIncr"));
 		b.setIndividualIncr(individualIncr);
 
 		// F14 借戶利率檔適用利率
-		BigDecimal fitRate = parse.stringToBigDecimal(s.get("F14"));
+		BigDecimal presentRate = parse.stringToBigDecimal(s.get("FitRate"));
 
 		// F19 借戶利率檔生效日
-		int effectDatePresent = StaticTool.bcToRoc(parse.stringToInteger(s.get("F19")));
+		int presentEffectDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("EffectDate")));
 
 		// 本次生效日
 		int effDateCurt = 0;
 
-		// F28 // 目前利率(指標利率變動調整合約利率)
-		// F29 // 目前生效日(指標利率變動調整合約利率)
-		// 定期機動指標利率變動調整合約利率
-		if (iTxKind == 1 && nextAdjRateDate / 100 != iEffectMonth) {
-			fitRate = parse.stringToBigDecimal(s.get("F28"));
-			effectDatePresent = StaticTool.bcToRoc(parse.stringToInteger(s.get("F29")));
+		// 機動非指數=>抓出的為預調利率(本次生效日)，需抓生效月份前的資料為目前利率與目前生效日
+		// 定期機動指標利率變動調整合約利率=>抓出的為需調整利率(本次生效日)，需抓生效月份前的資料為目前利率與目前生效日
+		if (iTxKind == 3 || iAdjCode == 4) {
+			effDateCurt = presentEffectDate;
+			presentRate = parse.stringToBigDecimal(s.get("PresentRate"));
+			presentEffectDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("PresEffDate")));
 		}
 
 		// 目前利率 = 借戶利率檔適用利率
-		b.setPresentRate(fitRate);
+		b.setPresentRate(presentRate);
 
 		// 目前生效日 = 借戶利率檔生效日
-		b.setPresEffDate(effectDatePresent);
+		b.setPresEffDate(presentEffectDate);
 
 		// 合約利率=生效之指標利率+目前之合約加減碼； 自訂利率 =>0
 		BigDecimal contrBaseRate = BigDecimal.ZERO;
@@ -419,10 +425,10 @@ public class L4320Batch extends TradeBuffer {
 		b.setContrBaseRate(contrBaseRate);
 		b.setContractRate(contractRate);
 
-		// F26 下次繳息日,下次應繳日
-		int nextPayIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F26")));
-		// F28 到期日期
-		int maturityDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F28")));
+		// NextPayIntDate 下次繳息日,下次應繳日
+		int nextPayIntDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextPayIntDate")));
+		// MaturityDate 到期日期
+		int maturityDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("MaturityDate")));
 
 		// 本次指標利率
 		b.setCurrBaseRate(iBaseRate);
@@ -466,9 +472,9 @@ public class L4320Batch extends TradeBuffer {
 			} else {
 				rateCurt = iBaseRate.add(individualIncr);
 			}
-			// F28 到期日期
-	//		int maturityDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("F28")));
-
+			// MaturityDate 到期日期
+			// int maturityDate =
+			// StaticTool.bcToRoc(parse.stringToInteger(s.get("MaturityDate")));
 			// 定期機動指標利率變動調整合約利率
 			if (iAdjCode == 4) {
 				adjCode = 4;
@@ -483,7 +489,7 @@ public class L4320Batch extends TradeBuffer {
 			} else {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
-				rateCurt = fitRate.add(cityIntRateIncr);
+				rateCurt = presentRate.add(cityIntRateIncr);
 				warnMsg += ", 地區別加減碼:" + cityIntRateIncr;
 				// 依地區別利率上、下限調整
 				if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
@@ -523,6 +529,7 @@ public class L4320Batch extends TradeBuffer {
 			// 1.自動調整
 			adjCode = 1;
 			break;
+
 //3.機動非指數利率調整
 //
 //		                  輸入: 生效月份 : default下個月 
@@ -534,10 +541,9 @@ public class L4320Batch extends TradeBuffer {
 //		               2.全歸 3.人工調整 
 //		               3.確認後預調週期、預調利率，新增一筆借戶預調利率資料(生效日為借戶利率檔生效日期 + 預調週期)			             
 		case 3:
-			// 本次生效日 =目前生效日
-			effDateCurt = effectDatePresent;
+			// 本次生效日(已放好)
 			// 本次利率 = 原利率 + 地區別利率
-			rateCurt = fitRate.add(cityIntRateIncr);
+			rateCurt = presentRate.add(cityIntRateIncr);
 			warnMsg += ", 地區別加減碼:" + cityIntRateIncr;
 			// 依地區別利率上、下限調整
 			if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
@@ -564,7 +570,7 @@ public class L4320Batch extends TradeBuffer {
 			if (iRate.compareTo(BigDecimal.ZERO) > 0) {
 				rateCurt = iRate;
 			} else {
-				rateCurt = fitRate.add(iRateIncr);
+				rateCurt = presentRate.add(iRateIncr);
 			}
 			// 1.自動調整
 			adjCode = 1;
@@ -582,7 +588,7 @@ public class L4320Batch extends TradeBuffer {
 			if (iRate.compareTo(BigDecimal.ZERO) > 0) {
 				rateCurt = iRate;
 			} else {
-				rateCurt = fitRate.add(iRateIncr);
+				rateCurt = presentRate.add(iRateIncr);
 			}
 			// 3.人工調整
 			adjCode = 3;
@@ -605,7 +611,7 @@ public class L4320Batch extends TradeBuffer {
 
 		// 若利率變動且大於利率生效日
 		if (adjCode == 1) {
-			if (rateCurt.compareTo(fitRate) != 0 && prevIntDate > effDateCurt) {
+			if (rateCurt.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
 				errorFlag = 1;
 				checkMsg += ", 上次繳息日大於利率生效日";
 			}
@@ -637,20 +643,15 @@ public class L4320Batch extends TradeBuffer {
 		// 緊告訊息
 		if (warnMsg.length() > 2 && warnMsg.startsWith(", ")) {
 			String str = warnMsg.substring(2);
-			warnMsg= str;
+			warnMsg = str;
 		}
-		tTempVo.putParam("warnMsg", warnMsg);
-
-		// 目前利率 <> 借戶利率檔適用利率(預調利率)
-		if (fitRate.compareTo(parse.stringToBigDecimal(s.get("F14"))) != 0) {
-			tTempVo.putParam("FitRate", s.get("F14"));
-		}
+		tTempVo.putParam("WarnMsg", warnMsg);
 
 		b.setJsonFields(tTempVo.getJsonString());
 
 		/* 設定調整後利率 */
 		// 利率輸入記號 0.未調整 1.已調整 9.待處理(檢核有誤)
-		if ((adjCode == 1) && errorFlag == 0) {
+		if ((adjCode == 1 || adjCode == 4) && errorFlag == 0) {
 			b.setAdjustedRate(rateCurt); // 調整後利率
 			b.setRateKeyInCode(1); // 利率輸入記號 0.未調整 1.已調整 9.待處理(檢核有誤)
 		} else {
@@ -686,7 +687,7 @@ public class L4320Batch extends TradeBuffer {
 					}
 				}
 			}
-			processCnt = lBatxRateChange.size();
+			this.processCnt = lBatxRateChange.size();
 		}
 	}
 
@@ -763,15 +764,15 @@ public class L4320Batch extends TradeBuffer {
 			for (int j = 1; j <= fnAllList.size(); j++) {
 				i = j - 1;
 
-				int custNo = parse.stringToInteger(fnAllList.get(i).get("F0"));
+				int custNo = parse.stringToInteger(fnAllList.get(i).get("CustNo"));
 
 				tmpBorm cust = new tmpBorm(custNo, 0, 0);
 
 				if (loanBalTot.containsKey(cust)) {
 					loanBalTot.put(cust,
-							loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
+							loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("LoanBal"))));
 				} else {
-					loanBalTot.put(cust, parse.stringToBigDecimal(fnAllList.get(i).get("F6")));
+					loanBalTot.put(cust, parse.stringToBigDecimal(fnAllList.get(i).get("LoanBal")));
 				}
 			}
 		}
@@ -785,16 +786,11 @@ public class L4320Batch extends TradeBuffer {
 			for (int j = 1; j <= fnAllList.size(); j++) {
 				i = j - 1;
 
-				int custNo = parse.stringToInteger(fnAllList.get(i).get("F0"));
-				int facmNo = parse.stringToInteger(fnAllList.get(i).get("F1"));
+				int custNo = parse.stringToInteger(fnAllList.get(i).get("CustNo"));
+				int facmNo = parse.stringToInteger(fnAllList.get(i).get("FacmNo"));
 
 				tmpBorm facm = new tmpBorm(custNo, facmNo, 0);
-
-				if (iTxKind == 3) {
-					fitRate = parse.stringToBigDecimal(fnAllList.get(i).get("F29"));
-				} else {
-					fitRate = parse.stringToBigDecimal(fnAllList.get(i).get("F14"));
-				}
+				fitRate = parse.stringToBigDecimal(fnAllList.get(i).get("FitRate"));
 
 				if (!facRateFlag.containsKey(facm)) {
 					facRateFlag.put(facm, 0);
@@ -806,6 +802,7 @@ public class L4320Batch extends TradeBuffer {
 					}
 				} else {
 					facRate.put(facm, fitRate);
+					this.info(facm.toString() + " facRate=" + facRate.get(facm));
 				}
 			}
 		}

@@ -2,7 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -13,7 +12,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBaseRate;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBaseRateService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -31,13 +32,16 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6032 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6032.class);
 
 	/* DB服務注入 */
 	@Autowired
-	public CdBaseRateService sCdBaseRateService;
+	private CdBaseRateService sCdBaseRateService;
+
 	@Autowired
-	Parse parse;
+	private CdEmpService cdEmpService;
+	
+	@Autowired
+	private Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -80,6 +84,8 @@ public class L6032 extends TradeBuffer {
 			occursList.putParam("OOEffectDate", tCdBaseRate.getEffectDate());
 			occursList.putParam("OORemark", tCdBaseRate.getRemark());
 			occursList.putParam("OOEffectFlag", tCdBaseRate.getEffectFlag());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBaseRate.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdBaseRate.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdBaseRate.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBaseRate.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -92,5 +98,15 @@ public class L6032 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

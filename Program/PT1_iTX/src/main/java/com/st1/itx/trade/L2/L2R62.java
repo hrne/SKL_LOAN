@@ -92,6 +92,9 @@ public class L2R62 extends TradeBuffer {
 //			this.totaVo.putParam("L2r62RmkCode", tLoanCustRmk.getRmkCode());
 			this.totaVo.putParam("L2r62RmkDesc", tLoanCustRmk.getRmkDesc());
 			this.totaVo.putParam("L2r62EmpNo", tLoanCustRmk.getCreateEmpNo());
+			this.totaVo.putParam("L2r62FacmNo", tLoanCustRmk.getFacmNo());
+			this.totaVo.putParam("L2r62BormNo", tLoanCustRmk.getBormNo());
+			this.totaVo.putParam("L2r62BorxNo", tLoanCustRmk.getBorxNo());
 			CdEmp cdEmp = cdEmpService.findById(tLoanCustRmk.getCreateEmpNo(), titaVo);
 
 			if (cdEmp == null) {

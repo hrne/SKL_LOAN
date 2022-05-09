@@ -157,7 +157,6 @@ T(2,@AuthType,#L4R31AuthType)
 T(2,@CalDate,#L4R31CalDate)
 T(2,@CalTime,#L4R31CalTime)
 
-
 ! 作業項目
 #FuncCode=A,1,S
 C(3,#CHAIN,0,E(0,1),$)
@@ -165,7 +164,6 @@ C(2,#FuncCode,$,s,$,s,$,$)
 HELP(#FuncCodeHelp)
 @C(3,#CHAIN,0,V(1,1),V(1,1,2,4,5))
 E(0,@FUNCIND,#FuncCode)
-
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S
@@ -357,8 +355,6 @@ RESET_RIM(#SendL4R23,L4R23)
 S(L4R23,1,#RimCustNo,#RimAcctNo,#RimBankNo,#RimFacmNo)
 R(1,L4R23)
 
-
-
 ! 檢查該帳號是否授權
 ! 4R21
 #SendL4R22A=X,1,S
@@ -503,10 +499,10 @@ T(2,@RelAcctName,#L4r03CustName)
 T(2,@RelationId,#L4r03CustId)
 T(2,@RelAcctGenderP,#L4r03Gender)
 T(2,@RelAcctGender,#L4r03Gender)
+E(0,@RelAcctBirthday,#L4r03Birthday)
 
 #SetBirth=X,1,S
 IF(#FuncCode==1 || #FuncCode==2,$,s)
-E(0,@RelAcctBirthday,#L4r03Birthday)
 
 ! 性別
 #RelAcctGenderP=X,1,S
@@ -536,7 +532,7 @@ T(2,需小於+#AuthCreateDate)
 
 #SetValue4=A,1,S
 IF(#CustIdLen==10,
-s,
+$,
 E(0,@RelAcctBirthday,0)
 E(0,@RelAcctGender,0))
 C(3,#CustIdLen,10,SHOW(#RelAcctBirthday,#RelAcctGender),HIDE(#RelAcctBirthday,#RelAcctGender))

@@ -104,6 +104,9 @@ public class L3072 extends TradeBuffer {
 			OccursList occurslist = new OccursList();
 
 			occurslist.putParam("OOCustNo", t.getCustNo());
+			occurslist.putParam("OOFacmNo", t.getFacmNo());
+			occurslist.putParam("OOBormNo", t.getBormNo());
+			occurslist.putParam("OOBorxNo", t.getBorxNo());
 			occurslist.putParam("OOAcDate", t.getAcDate());
 			occurslist.putParam("OORmkNo", t.getRmkNo());
 //			occurslist.putParam("OORmkCode", t.getRmkCode());

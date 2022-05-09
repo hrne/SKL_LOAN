@@ -12,7 +12,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdVarValue;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdVarValueService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -31,11 +33,12 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6052 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6052.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdVarValueService sCdVarValueService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -80,6 +83,8 @@ public class L6052 extends TradeBuffer {
 			occursList.putParam("OOLoanTotalLmt", tCdVarValue.getLoanTotalLmt());
 			occursList.putParam("OONoGurTotalLmt", tCdVarValue.getNoGurTotalLmt());
 			occursList.putParam("OOTotalequity", tCdVarValue.getTotalequity());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdVarValue.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdVarValue.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdVarValue.getLastUpdateEmpNo() + " " + empName(titaVo, tCdVarValue.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -89,8 +94,18 @@ public class L6052 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
+		
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

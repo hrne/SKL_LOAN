@@ -15,10 +15,13 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.TxAuthGroup;
 import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.service.CdEmpService;
 
 @Service("L6043")
 @Scope("prototype")
@@ -37,6 +40,12 @@ public class L6043 extends TradeBuffer {
 
 	@Autowired
 	public CdBranchService cdBranchService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
+	
+	@Autowired
+	Parse parse;
 
 	HashMap<String, String> branchItems = new HashMap<String, String>();
 
@@ -49,9 +58,9 @@ public class L6043 extends TradeBuffer {
 		String iAuthNo = titaVo.getParam("AuthNo") + "%";
 		int iStatus1 = Integer.parseInt(titaVo.getParam("Status"));
 		int iStatus2 = 0;
-		if (iStatus1 == 9) {
-			iStatus1 = 0;
-			iStatus2 = 1;
+		if(iStatus1==9) {
+			iStatus1=0;
+			iStatus2=1;
 		}
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -83,7 +92,10 @@ public class L6043 extends TradeBuffer {
 				occursList.putParam("OBranchNo", tTxAuthGroup.getBranchNo());
 				occursList.putParam("OBranchItem", getBranchItem(tTxAuthGroup.getBranchNo().trim(), titaVo));
 				occursList.putParam("OLevelFg", tTxAuthGroup.getLevelFg());
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxAuthGroup.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxAuthGroup.getLastUpdate()));
+				occursList.putParam("OOLastEmp", tTxAuthGroup.getLastUpdateEmpNo() + " " + empName(titaVo, tTxAuthGroup.getLastUpdateEmpNo()));
 
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -126,5 +138,14 @@ public class L6043 extends TradeBuffer {
 		}
 
 		return branchItem;
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }
