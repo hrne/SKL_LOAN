@@ -81,9 +81,8 @@ T(1,@IsOldData,#NTXBUF,19,1)
 #BUFCREATE=X,17,S
 T(2,1+#CustNo+#FacmNo+#BormNo+#BorxNo)
 
-! 只有在非轉換資料時才允許新增
 #button=x,100,S
-C(5,#IsOldData,Y,S,$)
+C(3,#FacmNo,0,S,$)
 T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUFCREATE})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
 
@@ -171,7 +170,6 @@ E(0,5)
 
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
-
 
 #OOCustNo=A,7,L
 C(3,#FacmNo,0,$,T(2,@FacmNoX,#FacmNo)T(2,@BormNoX,#BormNo)T(2,@BorxNoX,#BorxNo))
@@ -277,11 +275,8 @@ TXFORM=L3072
 <sub type="PART" name="L3072" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">
 [
 ["[L3072]                                 帳務備忘錄明細資料查詢                                                                   "],
-["借戶戶號",#OCustNo],
+["借戶戶號",#OCustNo,#FacmNoX,#BormNoX,#BorxNoX],
 ["借款人戶名",#CustName],
-["額度編號",#FacmNoX],
-["撥款序號",#BormNoX],
-["交易內容檔序號",#BorxNoX]
 ]
 </sub>
 !---------- 單據輸出組合 ----------

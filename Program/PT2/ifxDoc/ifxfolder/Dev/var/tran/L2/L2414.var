@@ -436,6 +436,7 @@ T(2,#GdRid1+-+#GdRid2+-+#GdRnum)
 <include src="ROM.icf::L2R22.dec"/>
 !RIM取擔保主檔
 #RimL2r22=X,1,S
+IF(#FunCd == 1,S,$)
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
 E(0,@RimClNo,#ClNo)
@@ -445,6 +446,7 @@ S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
 R(1,L2R22)
 
 #checkL2r22=X,1,S
+IF(#FunCd == 1,S,$)
 T(2,@ClTypeCode,#L2r22ClTypeCode)
 E(0,@EvaDate,#L2r22EvaDate)
 T(2,@CityCode,#L2r22CityCode)

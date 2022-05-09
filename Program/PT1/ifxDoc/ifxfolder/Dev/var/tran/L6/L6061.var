@@ -350,6 +350,12 @@ TXFORM=L6061
 
 #OOAcNoItem=科子細目名稱
 {width:300,align:'left'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 ^
 
 

@@ -71,14 +71,18 @@ BEGIN
                    ,M."AcSubBookCode"
           UNION 
           --擔保放款-折溢價
-          SELECT "MonthEndYm"            AS "YearMonth"     --資料年月
+          SELECT I."YearMonth"           AS "YearMonth"     --資料年月
                 ,'61'                    AS "AssetClass"    --資產分類
                 ,'999'                   AS "AcSubBookCode" --區隔帳冊
-                ,SUM("TdBal")            AS "Amt"           --(61)擔保品溢折價
-          FROM "AcMain"
-          WHERE "AcNoCode" IN ( '10600304000' )  --擔保放款-折溢價
-            AND "MonthEndYm" = TYYMM
-          GROUP BY "MonthEndYm"
+                ,ROUND(SUM(NVL("AccumDPAmortized",0)),0)  AS "Amt"   --(61)擔保品溢折價
+          FROM "Ias39IntMethod" I
+          LEFT JOIN "MonthlyLoanBal" MLB ON MLB."YearMonth" = I."YearMonth"
+                                        AND MLB."CustNo" = I."CustNo"
+                                        AND MLB."FacmNo" = I."FacmNo"
+                                        AND MLB."BormNo" = I."BormNo"
+          WHERE I."YearMonth" = TYYMM 
+            AND MLB."AcctCode" <> 990
+          GROUP BY I."YearMonth"
                   ,'61'
                   ,'999'
           UNION 

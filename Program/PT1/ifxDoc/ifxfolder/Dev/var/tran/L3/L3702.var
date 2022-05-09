@@ -42,10 +42,7 @@ E(0,0)
 [
 ["[L3702]                                 帳務備忘錄明細資料維護"],
 ["#FdFunCd+功能",#FunCdX],
-["#FdCustNo+借戶戶號",#CustNo,#CustName],
-["#FdFacmNo+額度編號",#FacmNo],
-["#FdBormNo+放款序號",#BormNo],
-["#FdBorxNo+交易內容檔序號",#BorxNo],
+["#FdCustNo+借戶戶號",#CustNo,"-",#FacmNo,"-",#BormNo,"-",#BorxNo,#CustName],
 ["#FdAcDate+會計日期",#AcDate], 
 ["#FdNo0+備忘錄序號",#RmkNo], 
 !["#FdNo1+備忘錄代碼",#RmkCode,#RmkCodeX],
@@ -138,6 +135,7 @@ C(5,#FdAcDate,*,T(F,@AcDate,1),T(F,@AcDate,0))
 !只有複製時才套RmkDesc
 !非新增時套FacmNo, BormNo, BorxNo
 #RimL2r62_FunCd3=X,1,S
+IF(#CHAIN_FunCd == 1 && #FunCd == 1,S,$)
 E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimAcDate,#CHAIN_AcDate)
@@ -184,7 +182,6 @@ IF(#FunCd==1 || #FunCd==2,T(F,@RmkCode,1),T(F,@RmkCode,0)T(F,@RmkDesc,0))
 IF(#FunCd==2,T(F,@CustNo,0),$)
 IF(#FunCd==1,T(F,@RmkNo,0),T(F,@RmkNo,0))
 IF(#FunCd==4 || #FunCd==5,T(F,@CustNo,0)T(F,@RmkNo,0),$)
-IF(#CHAIN_FunCd==1,$,T(F,@FacmNo,0)T(F,@BormNo,0)T(F,@BorxNo,0))
 
 ![借戶戶號]
 !按[瀏覽]連結[顧客明細資料查詢] 必須輸入且存在於顧客檔
@@ -193,16 +190,12 @@ IF(#CHAIN_FunCd==1,$,T(F,@FacmNo,0)T(F,@BormNo,0)T(F,@BorxNo,0))
 ! @V(2,0)
 
 !無論新舊資料都可能是0
-#FacmNo=A,3,I
-IF(#CHAIN_FunCd==1,$,s)
+#FacmNo=A,3,L
 
 !無論新舊資料都可能是0
-#BormNo=A,3,I
-IF(#CHAIN_FunCd==1,$,s)
+#BormNo=A,3,L
 
-#BorxNo=A,4,I
-IF(#CHAIN_FunCd==1,$,s)
-@V(2,0)
+#BorxNo=A,4,L
 
 #CUSTID=X,10,S
 @C(4,#CUSTID,S,$)

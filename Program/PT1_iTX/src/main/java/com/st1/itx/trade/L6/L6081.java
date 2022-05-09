@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -107,6 +108,7 @@ public class L6081 extends TradeBuffer {
 			}
 
 			occursList.putParam("OOWorkMonth", reWorkMonth - 191100);
+
 			this.totaVo.addOccursList(occursList);
 		}
 		/* 將每筆資料放入Tota的OcList */

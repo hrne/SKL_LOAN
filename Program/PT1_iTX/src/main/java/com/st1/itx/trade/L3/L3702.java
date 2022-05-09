@@ -77,6 +77,13 @@ public class L3702 extends TradeBuffer {
 
 		// 新增或複製
 		if (iFunCd == 1) {
+						
+			// 測試該戶號是否存在客戶主檔
+			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
+			// 該戶號部存在客戶主檔 拋錯
+			if (tCustMain == null) {
+				throw new LogicException(titaVo, "E0005", "戶號" + iCustNo + ",不存在客戶主檔。");
+			}
 			
 			// 額度
 			int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
@@ -85,15 +92,10 @@ public class L3702 extends TradeBuffer {
 			// 放款明細序號
 			int iBorxNo = parse.stringToInteger(titaVo.getParam("BorxNo"));
 			
+			// 新舊資料的額度和撥款都有可能為0
+			// 因此只檢查BorxNo
 			if (iBorxNo <= 0)
 				throw new LogicException(titaVo, "E0019", "交易內容檔序號（" + iBorxNo +"）不可為 0。");
-			
-			// 測試該戶號是否存在客戶主檔
-			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-			// 該戶號部存在客戶主檔 拋錯
-			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0005", "戶號" + iCustNo + ",不存在客戶主檔。");
-			}
 			
 			LoanCustRmk loanCustRmk = loanCustRmkService.maxRmkNoFirst(iCustNo, iAcDate + 19110000, titaVo);
 			if (loanCustRmk == null) {

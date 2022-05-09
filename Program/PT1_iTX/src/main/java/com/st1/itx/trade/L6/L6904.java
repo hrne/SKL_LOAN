@@ -16,8 +16,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -42,6 +44,8 @@ public class L6904 extends TradeBuffer {
 	public AcDetailService sAcDetailService;
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -245,6 +249,8 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OOSlipNote", slipNote);
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
 			switch (iInqType) {
 			case 0: // 全部彙計方式
 				occursList.putParam("OOInqData", "");
@@ -371,5 +377,14 @@ public class L6904 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

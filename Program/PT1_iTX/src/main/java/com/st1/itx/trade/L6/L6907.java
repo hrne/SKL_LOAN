@@ -19,8 +19,10 @@ import com.st1.itx.db.domain.AcReceivable;
 //import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -46,6 +48,9 @@ public class L6907 extends TradeBuffer {
 
 	@Autowired
 	public CdAcCodeService cdAcCodeService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
 
 	/* 日期工具 */
 	@Autowired
@@ -183,6 +188,8 @@ public class L6907 extends TradeBuffer {
 			occurslist.putParam("OO_SUM", rvBal);
 			occurslist.putParam("OOAcBookCode", tAcReceivable.getAcBookCode());
 			occurslist.putParam("OOAcSubBookCode", tAcReceivable.getAcSubBookCode());
+			occurslist.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcReceivable.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcReceivable.getLastUpdate()));
+			occurslist.putParam("OOLastEmp", tAcReceivable.getLastUpdateEmpNo() + " " + empName(titaVo, tAcReceivable.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
@@ -244,5 +251,14 @@ public class L6907 extends TradeBuffer {
 		}
 
 		return acctItem;
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

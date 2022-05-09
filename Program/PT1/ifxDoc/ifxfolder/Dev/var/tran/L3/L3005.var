@@ -522,21 +522,22 @@ IF(#OOAcFg=="",T(3,內容),T(3,內容查詢))
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 
+!查詢buf
 #OOBTNRMKNTXBUF=X,18,S
 T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOIsOldData)
 
-#OOBTNRMK=X,1,S
-C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,cancel))
-
+!buf
 !最新格式參照L3702 功能1
 !新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo 1-7-3-3-4
 #OOBUFCreate=X,19,S
 T(2,1+#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+OOIsOldData)
 
-!轉換資料不允許做新增
-#OOBTNRMKCreate=X,1,S
-C(5,#OOIsOldData,Y,S,$)
-BIND(grid,{ cmd=CHAIN; ntxcd=L3702;text=新增;ntxbuf=#OOBUFCreate})
+!有備忘錄時提供查詢按鈕
+!否則為新增，但不允許額度或撥款為0者做新增
+#OOBTNRMK=X,1,S
+C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=查詢;ntxbuf=#OOBTNRMKNTXBUF}),$)
+C(5,#OOHasRemark,Y,s,$)
+IF(#OOFacmNo == 0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L3702;text=新增;ntxbuf=#OOBUFCreate}))
 
 !分錄
 #OOBUF3=X,32,S
@@ -627,11 +628,8 @@ TXFORM=L3005
 ! #OOBTN2=
 ! {width:60,search:false,formatter:'cust:bind-button:備忘錄;L2072 顧客控管警訊明細資料查詢',align:'center',canExport:false}
 
-#OOBTNRMK=備忘錄查詢
-{width:90,search:false,formatter:'cust:bind-button:查詢;L3072 帳務備忘錄明細資料查詢',align:'center',canExport:false}
-
-#OOBTNRMKCreate=備忘錄新增
-{width:90,search:false,formatter:'cust:bind-button:新增;L3072 帳務備忘錄明細資料查詢',align:'center',canExport:false}
+#OOBTNRMK=備忘錄
+{width:55,search:false,formatter:'cust:bind-button:查詢;L3072 帳務備忘錄明細資料查詢',align:'center',canExport:false}
 
 #OOEntryDate=入帳日期
 {width:80,align:'center'}

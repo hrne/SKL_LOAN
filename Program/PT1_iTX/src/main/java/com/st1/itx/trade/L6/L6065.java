@@ -12,7 +12,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdOverdue;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -31,11 +33,12 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6065 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6065.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdOverdueService sCdOverdueService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -84,6 +87,8 @@ public class L6065 extends TradeBuffer {
 			occursList.putParam("OOOverdueSign", tCdOverdue.getOverdueSign());
 			occursList.putParam("OOOverdueCode", tCdOverdue.getOverdueCode());
 			occursList.putParam("OOOverdueItem", tCdOverdue.getOverdueItem());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdOverdue.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdOverdue.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdOverdue.getLastUpdateEmpNo() + " " + empName(titaVo, tCdOverdue.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -97,5 +102,14 @@ public class L6065 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

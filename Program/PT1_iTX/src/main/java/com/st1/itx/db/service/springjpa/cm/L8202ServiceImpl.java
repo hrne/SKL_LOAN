@@ -377,7 +377,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    FROM rawData M \n";
 		sql += "    LEFT JOIN \"BankRmtf\" B ON B.\"CustNo\" = M.\"CustNo\" \n";
 		sql += "                          AND NVL(B.\"AmlRsp\",'9') in ('0','1','2') \n";
-		sql += "                          AND M.\"EntryDate\" > B.\"EntryDate\" \n";
+		sql += "                          AND M.\"EntryDate\" >= B.\"EntryDate\" \n";
 		sql += "                          AND TO_DATE(M.\"EntryDate\",'YYYY-MM-DD') \n";
 		sql += "                              - TO_DATE(B.\"EntryDate\",'YYYY-MM-DD') \n";
 		sql += "                              <= :iFactorDays3 \n";
