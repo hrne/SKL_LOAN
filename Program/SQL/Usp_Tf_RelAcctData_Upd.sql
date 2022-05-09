@@ -131,7 +131,6 @@ BEGIN
 
     commit;
 
-    END;
     -- 例外處理
     Exception
     WHEN OTHERS THEN

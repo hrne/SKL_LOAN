@@ -22,9 +22,13 @@ BEGIN
     INSERT INTO "InnDocRecord"
     SELECT "LN$DOCP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LN$DOCP"."LMSAPN"             AS "FacmNo"              -- 額度號碼 DECIMAL 3 0
-          ,ROW_NUMBER() OVER (PARTITION BY "LN$DOCP"."LMSACN","LN$DOCP"."LMSAPN"
-                              ORDER BY "LN$DOCP"."LMSACN","LN$DOCP"."LMSAPN")
-                                          AS "ApplSeq"             -- 申請序號 VARCHAR2 3 0
+          ,LPAD(
+           ROW_NUMBER()
+           OVER (
+            PARTITION BY "LN$DOCP"."LMSACN"
+                        ,"LN$DOCP"."LMSAPN"
+            ORDER BY "LN$DOCP"."DOCLDT"
+           ),3,'0')                       AS "ApplSeq"             -- 申請序號 VARCHAR2 3 0
           ,''                             AS "TitaActFg"           -- 登放記號 VARCHAR2 1 0
           ,CASE
              WHEN "LN$DOCP"."DOCBDT" != 0

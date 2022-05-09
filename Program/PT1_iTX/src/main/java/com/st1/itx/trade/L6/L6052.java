@@ -16,6 +16,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdVarValue;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdVarValueService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 

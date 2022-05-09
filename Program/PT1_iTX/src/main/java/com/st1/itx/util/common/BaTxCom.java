@@ -998,6 +998,7 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setUnpaidInt(ba.getUnpaidInt()); // 短繳利息
 				baTxVo.setLoanBalPaid(ba.getLoanBalPaid()); // 還款後餘額
 				baTxVo.setUnPaidAmt(ba.getUnPaidAmt());
+				baTxVo.setCloseBreachAmt(ba.getCloseBreachAmt()); // 清償違約金
 				baTxVo.setAcctAmt(ba.getAcctAmt()); // 出帳金額
 				baTxVo.setFeeAmt(ba.getFeeAmt()); // 費用金額
 				baTxVo.setTempAmt(ba.getTempAmt()); // 暫收款金額(暫收借(-)、暫收貸(+)) [檢核表用]
@@ -1025,6 +1026,7 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setLoanBalPaid(baTxVo.getLoanBalPaid().add(ba.getLoanBalPaid())); // 還款後餘額
 				baTxVo.setUnpaidPrin(baTxVo.getUnpaidPrin().add(ba.getUnpaidPrin())); // 短繳本金
 				baTxVo.setUnpaidInt(baTxVo.getUnpaidInt().add(ba.getUnpaidInt())); // 短繳利息
+				baTxVo.setCloseBreachAmt(baTxVo.getCloseBreachAmt().add(ba.getCloseBreachAmt())); // 清償違約金
 				baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(ba.getUnPaidAmt()));
 				baTxVo.setAcctAmt(baTxVo.getAcctAmt().add(ba.getAcctAmt())); // 出帳金額
 				baTxVo.setLoanBal(baTxVo.getLoanBal().add(ba.getLoanBal())); // 放款餘額(還款前、只放第一期)

@@ -14,8 +14,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdArea;
 import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -33,13 +35,14 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6075 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6075.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdCityService sCdCityService;
 	@Autowired
 	public CdAreaService sCdAreaService;
+	@Autowired
+	public CdEmpService sCdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -80,7 +83,9 @@ public class L6075 extends TradeBuffer {
 			occursList.putParam("OOCityCode", tCdArea.getCityCode());
 			occursList.putParam("OOAreaCode", tCdArea.getAreaCode());
 			occursList.putParam("OOAreaItem", tCdArea.getAreaItem());
-
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdArea.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdArea.getLastUpdate())); // 最後修改日期
+			occursList.putParam("OOLastEmp", tCdArea.getLastUpdateEmpNo() + " " + empName(titaVo, tCdArea.getLastUpdateEmpNo())); // 最後修改人員
+			
 			// 查詢地區別代碼檔
 			CdCity tCdCity = new CdCity();
 			tCdCity = sCdCityService.findById(tCdArea.getCityCode(), titaVo);
@@ -103,5 +108,15 @@ public class L6075 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

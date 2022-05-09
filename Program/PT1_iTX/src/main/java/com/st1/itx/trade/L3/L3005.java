@@ -80,22 +80,17 @@ public class L3005 extends TradeBuffer {
 		int wkEntryDateStart = iEntryDate + 19110000;
 		int wkDateEnd = 99991231;
 
-//		String oCustRmkFlag = "N";
 		String loanIntDetailFg = "N";
 
 		String AcFg;
-//		String FeeFg;
 		String wkCurrencyCode = "";
 
-//		Slice<CustRmk> slCustRmk;
 		Slice<LoanBorTx> slLoanBorTx;
 
 		TempVo tTempVo = new TempVo();
 
-//		List<CustRmk> lCustRmk;
 		List<LoanBorTx> lLoanBorTx;
 
-//		LoanEachFeeVo loanEachFeeVo = new LoanEachFeeVo();
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -112,23 +107,13 @@ public class L3005 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		// 查詢顧客控管警訊檔
-//		slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
-//		lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
-//		if (lCustRmk != null && lCustRmk.size() > 0) {
-//			oCustRmkFlag = "Y";
-//		}
 		// 查詢各項費用
 		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 
 		this.totaVo.putParam("OCustNo", iCustNo);
-//		this.totaVo.putParam("OCustRmkFlag", oCustRmkFlag);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-		// if (iCustDataCtrl == 1) {
-		// this.totaVo.putParam("OCustNo", "");
-		// }
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -284,6 +269,9 @@ public class L3005 extends TradeBuffer {
 			// 新增摘要 跟費用明細
 			occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
 			occursList.putParam("OOTotTxAmt", wkTotTxAmt); // 交易總金額
+			
+			// 判定是否是轉換資料
+			occursList.putParam("OOIsOldData", "999999".equals(ln.getCreateEmpNo()) || ln.getCreateEmpNo().trim().isEmpty() ? "Y" : "N");
 			
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);

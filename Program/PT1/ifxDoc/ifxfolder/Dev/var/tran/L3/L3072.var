@@ -63,13 +63,15 @@ E(0,0)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3005交易明細資料查詢]進入),$)
 
+!#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOIsOldData
+!7-3-3-4-1
 #NTXBUF=X,50,S
-!CCCCCCCPPPQQQRRRR
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
 T(1,@BormNo,#NTXBUF,11,3)
 T(1,@BorxNo,#NTXBUF,14,4)
+T(1,@IsOldData,#NTXBUF,19,1)
 
 !1時只送這些
 !CustNo 7
@@ -79,9 +81,9 @@ T(1,@BorxNo,#NTXBUF,14,4)
 #BUFCREATE=X,17,S
 T(2,1+#CustNo+#FacmNo+#BormNo+#BorxNo)
 
-! 只有在額度, 撥款, 交易內容檔序號都有時才允許新增
+! 只有在非轉換資料時才允許新增
 #button=x,100,S
-IF(#FacmNo == 0 || #BormNo == 0 || #BorxNo == 0,S,$)
+C(5,#IsOldData,Y,S,$)
 T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUFCREATE})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
 
@@ -93,6 +95,8 @@ K(MODIFYBUTTON,1,新增)
 #BormNo=A,3,L
 
 #BorxNo=A,4,L
+
+#IsOldData=X,1,L
 
 #FacmNoX=X,3,L
 

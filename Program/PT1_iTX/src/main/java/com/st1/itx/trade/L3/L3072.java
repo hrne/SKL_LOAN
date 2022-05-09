@@ -109,7 +109,6 @@ public class L3072 extends TradeBuffer {
 			occurslist.putParam("OOBorxNo", t.getBorxNo());
 			occurslist.putParam("OOAcDate", t.getAcDate());
 			occurslist.putParam("OORmkNo", t.getRmkNo());
-//			occurslist.putParam("OORmkCode", t.getRmkCode());
 			occurslist.putParam("OORmkDesc", t.getRmkDesc());
 
 			String tempEmpNo = t.getCreateEmpNo().isEmpty() ? t.getLastUpdateEmpNo() : t.getCreateEmpNo();

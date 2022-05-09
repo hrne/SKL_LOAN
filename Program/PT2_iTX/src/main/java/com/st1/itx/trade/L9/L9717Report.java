@@ -48,8 +48,7 @@ public class L9717Report extends MakeReport {
 
 	List<BigDecimal> list = new ArrayList<BigDecimal>(14);
 	
-	BigDecimal ovdu = BigDecimal.ZERO;
-	BigDecimal amt = BigDecimal.ZERO;
+
 
 	String rocYear;
 	String rocMonth;
@@ -431,17 +430,19 @@ public class L9717Report extends MakeReport {
 					// F12 六期金額 129 R
 					// F13 轉催收件數 134 C
 					// F14 轉催收金額 147 R
-
+				
 					for (int i = 1; i < 15; i++) {
+						BigDecimal ovdu = BigDecimal.ZERO;
+						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							amt = amt.add(new BigDecimal(tLDVo.get("F" + i)));
+							amt = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
 							if (list.size() == 14) {
 								list.set(i - 1, amt);
 							} else {
 								list.add(amt);
 							}
 						} else {
-							ovdu = ovdu.add(new BigDecimal(tLDVo.get("F" + i)));
+							ovdu = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
 
 							if (list.size() == 14) {
 								list.set(i - 1, ovdu);
@@ -471,17 +472,19 @@ public class L9717Report extends MakeReport {
 					// F13 六期金額 129 R
 					// F14 轉催收件數 134 C
 					// F15 轉催收金額 147 R
-
+	
 					for (int i = 2; i < 16; i++) {
+						BigDecimal ovdu = BigDecimal.ZERO;
+						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							amt = amt.add(new BigDecimal(tLDVo.get("F" + i)));
+							amt = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
 							if (list.size() == 14) {
 								list.set(i - 2, amt);
 							} else {
 								list.add(amt);
 							}
 						} else {
-							ovdu = ovdu.add(new BigDecimal(tLDVo.get("F" + i)));
+							ovdu = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
 
 							if (list.size() == 14) {
 								list.set(i - 2, ovdu);
@@ -534,8 +537,7 @@ public class L9717Report extends MakeReport {
 			}
 
 			if (currentSort != OutputSortBy.LargeAmt_Customer) {
-				this.print(1, 1, newBorder);
-				this.print(1, 1, " ");
+	
 				this.print(1, 1, newBorder);
 				// F2 一期件數 26 C
 				// F3 一期金額 39 R
@@ -556,12 +558,12 @@ public class L9717Report extends MakeReport {
 				
 				
 				
-				for (int i = 0, space = 1; i < list.size(); i = i + 2, space++) {
+				for (int i = 0, space = 0; i < list.size(); i = i + 2, space++) {
 
 					this.print(0, 26 + (18 * space), formatAmt(list.get(i), 0), "C");
 				}
 
-				for (int i = 1, space = 1; i < list.size(); i = i + 2, space++) {
+				for (int i = 1, space = 0; i < list.size(); i = i + 2, space++) {
 					this.print(0, 39 + (18 * space), list.get(i).toString(), "R");
 				}
 

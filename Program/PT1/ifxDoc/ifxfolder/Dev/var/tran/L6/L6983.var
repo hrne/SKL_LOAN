@@ -239,6 +239,12 @@ SWITCH(#OOTitaCrDb,1,T(3,借),
 #OORelNo=X,25,L
 #OORelNoX=X,25,L
 
+! 最後修改日期
+#OOLastUpdate=x,20,S
+
+! 最後修改人員
+#OOLastEmp=x,47,S
+
 ! 項目
 #OOItemCode=X,6,S
 
@@ -351,6 +357,8 @@ TXFORM=L6983
 #OOItemCode
 #OOBormNo
 #OODtlValue
+#OOLastUpdate
+#OOLastEmp
 ^
 </sub>
 
@@ -442,6 +450,12 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 ^
 
 #RPTFG=3,QUERY.GRID,O1
@@ -490,6 +504,12 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 ^
 
 #RPTFG=4,QUERY.GRID,O1
@@ -522,6 +542,12 @@ ifxBatch:{
 
 #OORelNo=登放序號
 {width:150,align:'left'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 
 ^
 
@@ -570,6 +596,12 @@ ifxBatch:{
 
 #OORelNo=登放序號
 {width:150,align:'left'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 
 #DTL_BTN=
 {width:100,search:false,formatter:'cust:bind-button:#DTL_BTN',align:'center',canExport:false}
@@ -623,6 +655,12 @@ ifxBatch:{
 #OORelNo=登放序號
 {width:150,align:'left'}
 
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 ^
 
 #RPTFG=7,QUERY.GRID,O1
@@ -670,6 +708,12 @@ ifxBatch:{
 
 #OORelNoX=登放序號
 {width:150,align:'left'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 
 ^
 

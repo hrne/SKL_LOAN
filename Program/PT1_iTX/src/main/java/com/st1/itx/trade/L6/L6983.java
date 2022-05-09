@@ -12,9 +12,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.TxToDoDetailService;
@@ -47,10 +49,14 @@ public class L6983 extends TradeBuffer {
 	@Autowired
 	public ForeclosureFeeService sForeclosureFeeService;
 
+	@Autowired
+	private CdEmpService cdEmpService;
+	
 	private int selectCode = 0;
 	private int custNo = 0;
 	private int trasCollDate = 0;
 	private int cnt = 0;
+
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -101,7 +107,7 @@ public class L6983 extends TradeBuffer {
 
 				// 取未銷 銷帳日期=0,轉催收日=0
 				if (tmpForeclosureFee.getCloseDate() == 0 && tmpForeclosureFee.getOverdueDate() == 0) {
-					int recordNo = tmpForeclosureFee.getRecordNo();
+					tmpForeclosureFee.getRecordNo();
 
 					OccursList occursList = new OccursList();
 
@@ -125,7 +131,9 @@ public class L6983 extends TradeBuffer {
 					occursList.putParam("OOFeeCode", tmpForeclosureFee.getFeeCode()); // 科目名稱代號
 					occursList.putParam("OOTitaCrDb", 1); // 借貸
 					occursList.putParam("OOAcDate", tmpForeclosureFee.getReceiveDate()); // 收件日
-					occursList.putParam("OORelNo", "");
+					occursList.putParam("OORelNo", ""); // 登放序號
+					occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tmpForeclosureFee.getLastUpdate()) + " " + parse.timeStampToStringTime(tmpForeclosureFee.getLastUpdate())); // 最後修改日期
+					occursList.putParam("OOLastEmp", tmpForeclosureFee.getLastUpdateEmpNo() + " " + empName(titaVo, tmpForeclosureFee.getLastUpdateEmpNo())); // 最後修改人員
 					occursList.putParam("OOItemCode", "TRLW00");
 					occursList.putParam("OOBormNo", "");
 					occursList.putParam("OODtlValue", parse.IntegerToString(tmpForeclosureFee.getRecordNo(), 7));// 銷帳編號
@@ -193,6 +201,8 @@ public class L6983 extends TradeBuffer {
 					occursList.putParam("OOTitaCrDb", 1); // 借貸
 					occursList.putParam("OOAcDate", tForeclosureFee.getReceiveDate()); // 收件日
 					occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+					occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tForeclosureFee.getLastUpdate()) + " " + parse.timeStampToStringTime(tForeclosureFee.getLastUpdate())); // 最後修改日期
+					occursList.putParam("OOLastEmp", tForeclosureFee.getLastUpdateEmpNo() + " " + empName(titaVo, tForeclosureFee.getLastUpdateEmpNo())); // 最後修改人員
 					occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 					occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 					occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
@@ -262,4 +272,13 @@ public class L6983 extends TradeBuffer {
 		return result;
 	}
 
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
+	}
 }

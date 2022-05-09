@@ -108,6 +108,7 @@ public class L7205 extends TradeBuffer {
 		titaVo.setDataBaseOnMon();// 指定月報環境
 
 		String extension[] = filename.split("\\.");
+		this.info("file extension="+extension[extension.length - 1]);
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
 			makeExcel.openExcel(filename, 1);
