@@ -16,9 +16,11 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -42,6 +44,8 @@ import com.st1.itx.util.parse.Parse;
 public class L6908 extends TradeBuffer {
 
 	/* DB服務注入 */
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	public AcDetailService sAcDetailService;
 	@Autowired
@@ -149,6 +153,7 @@ public class L6908 extends TradeBuffer {
 				}
 			}
 		}
+		// 補差額
 		if (rvCls.compareTo(BigDecimal.ZERO) > 0) {
 			clsFlag = 0;
 			rvAmt = rvCls;
@@ -158,7 +163,6 @@ public class L6908 extends TradeBuffer {
 		}
 		this.info("rvAmt=" + rvAmt + ", rvCls=" + rvCls);
 
-		// 如銷帳差額 = 0，先補起帳金額，再補差額
 		if (tAcReceivable != null) {
 			if (rvAmt.compareTo(BigDecimal.ZERO) != 0) {
 				OccursList occursList = new OccursList();
@@ -173,6 +177,8 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOSlipNote", "");
 				occursList.putParam("OOAcDate", tAcReceivable.getOpenAcDate());
 				occursList.putParam("OOClsFlag", clsFlag);
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcReceivable.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcReceivable.getLastUpdate()));
+				occursList.putParam("OOLastEmp", tAcReceivable.getLastUpdateEmpNo() + " " + empName(titaVo, tAcReceivable.getLastUpdateEmpNo()));
 				this.totaVo.addOccursList(occursList);
 			}
 		}
@@ -246,5 +252,14 @@ public class L6908 extends TradeBuffer {
 		}
 		return uTranItem;
 
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

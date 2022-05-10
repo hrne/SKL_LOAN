@@ -19,9 +19,11 @@ import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.AcMainId;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -52,6 +54,8 @@ public class L6903 extends TradeBuffer {
 	public TxTranCodeService sTxTranCodeService;
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 	private String debits[] = { "1", "5", "6", "9" }; // 資產、支出為借方科目，負債、收入為貸方科目
@@ -165,6 +169,8 @@ public class L6903 extends TradeBuffer {
 			occursList.putParam("OODbCr", tAcDetail.getDbCr());
 			occursList.putParam("OOTxAmt", tAcDetail.getTxAmt());
 			occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
 
 			// 餘額
 			// 借方科目{ "1", "5","6","9" }資產
@@ -229,5 +235,14 @@ public class L6903 extends TradeBuffer {
 
 		return uTranItem;
 
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

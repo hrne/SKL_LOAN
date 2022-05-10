@@ -431,18 +431,18 @@ public class L9717Report extends MakeReport {
 					// F13 轉催收件數 134 C
 					// F14 轉催收金額 147 R
 				
-					for (int i = 1; i < 15; i++) {
+					for (int i = 1,k = 0; i < 15; i++,k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							amt = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
+							amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 							if (list.size() == 14) {
 								list.set(i - 1, amt);
 							} else {
 								list.add(amt);
 							}
 						} else {
-							ovdu = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
+							ovdu = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 
 							if (list.size() == 14) {
 								list.set(i - 1, ovdu);
@@ -473,18 +473,18 @@ public class L9717Report extends MakeReport {
 					// F14 轉催收件數 134 C
 					// F15 轉催收金額 147 R
 	
-					for (int i = 2; i < 16; i++) {
+					for (int i = 2, k = 0; i < 16; i++,k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							amt = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
+							amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 							if (list.size() == 14) {
 								list.set(i - 2, amt);
 							} else {
 								list.add(amt);
 							}
 						} else {
-							ovdu = list.get(i).add(new BigDecimal(tLDVo.get("F" + i)));
+							ovdu = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 
 							if (list.size() == 14) {
 								list.set(i - 2, ovdu);

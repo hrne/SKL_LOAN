@@ -73,7 +73,7 @@ public class BatxRateChange implements Serializable {
   private String incrFlag;
 
   // 調整記號
-  /* 1:批次自動調整2:按地區別調整3:人工調整 */
+  /* 1:批次自動調整2:按地區別調整3:人工調整4.批次自動調整(提醒件) (下次利率調整日為到期日、非下次利率調整日調整) */
   @Column(name = "`AdjCode`")
   private int adjCode = 0;
 
@@ -187,7 +187,7 @@ public class BatxRateChange implements Serializable {
   private int txRateAdjFreq = 0;
 
   // jason格式紀錄欄
-  @Column(name = "`JsonFields`", length = 300)
+  @Column(name = "`JsonFields`", length = 2000)
   private String jsonFields;
 
   // 逾期期數
@@ -417,6 +417,8 @@ N:否
 	* 1:批次自動調整
 2:按地區別調整
 3:人工調整
+4.批次自動調整(提醒件)
+ (下次利率調整日為到期日、非下次利率調整日調整)
 	* @return Integer
 	*/
   public int getAdjCode() {
@@ -428,6 +430,8 @@ N:否
 	* 1:批次自動調整
 2:按地區別調整
 3:人工調整
+4.批次自動調整(提醒件)
+ (下次利率調整日為到期日、非下次利率調整日調整)
   *
   * @param adjCode 調整記號
 	*/

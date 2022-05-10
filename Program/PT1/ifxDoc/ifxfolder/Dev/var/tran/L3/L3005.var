@@ -425,13 +425,9 @@ IF(#OOAcDate==0,S,$)
 
 #OOBorxNo=A,4,S
 
-!是否為轉換資料
-!Y/N
-#OOIsOldData=X,1,S
-
 #OOFacmNoX=X,7,L
-C(3,#OOBormNo,0,T(2,#OOFacmNo),T(2,#OOFacmNo+-+#OOBormNo))
-! T(2,#OOFacmNo+-+#OOBormNo)
+! C(3,#OOBormNo,0,T(2,#OOFacmNo),T(2,#OOFacmNo+-+#OOBormNo))
+T(2,#OOFacmNo+-+#OOBormNo)
 
 #OOKinbr=A,4,S
 
@@ -524,20 +520,17 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 
 !查詢buf
 #OOBTNRMKNTXBUF=X,18,S
-T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOIsOldData)
+T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
 
 !buf
 !最新格式參照L3702 功能1
 !新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo 1-7-3-3-4
 #OOBUFCreate=X,19,S
-T(2,1+#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+OOIsOldData)
+T(2,1+#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
 
-!有備忘錄時提供查詢按鈕
-!否則為新增，但不允許額度或撥款為0者做新增
+!有備忘錄時提供查詢按鈕，否則為新增按鈕
 #OOBTNRMK=X,1,S
-C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=查詢;ntxbuf=#OOBTNRMKNTXBUF}),$)
-C(5,#OOHasRemark,Y,s,$)
-IF(#OOFacmNo == 0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L3702;text=新增;ntxbuf=#OOBUFCreate}))
+C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,{ cmd=CHAIN; ntxcd=L3702;text=新增;ntxbuf=#OOBUFCreate}))
 
 !分錄
 #OOBUF3=X,32,S
@@ -597,7 +590,6 @@ TXFORM=L3005
 #OOTempAmt
 #OONote
 #OOTotTxAmt
-#OOIsOldData
 ^
 
 <include src="COM.icf::TRCTL.tom"/>

@@ -279,6 +279,25 @@ em = null;
   }
 
   @Override
+  public BatxRateChange findL2980printFirst(int custNo_0, int facmNo_1, int bormNo_2, int preNextAdjDate_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findL2980printFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " preNextAdjDate_3 : " +  preNextAdjDate_3);
+    Optional<BatxRateChange> batxRateChangeT = null;
+    if (dbName.equals(ContentName.onDay))
+      batxRateChangeT = batxRateChangeReposDay.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndPreNextAdjDateIs(custNo_0, facmNo_1, bormNo_2, preNextAdjDate_3);
+    else if (dbName.equals(ContentName.onMon))
+      batxRateChangeT = batxRateChangeReposMon.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndPreNextAdjDateIs(custNo_0, facmNo_1, bormNo_2, preNextAdjDate_3);
+    else if (dbName.equals(ContentName.onHist))
+      batxRateChangeT = batxRateChangeReposHist.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndPreNextAdjDateIs(custNo_0, facmNo_1, bormNo_2, preNextAdjDate_3);
+    else 
+      batxRateChangeT = batxRateChangeRepos.findTopByCustNoIsAndFacmNoIsAndBormNoIsAndPreNextAdjDateIs(custNo_0, facmNo_1, bormNo_2, preNextAdjDate_3);
+
+    return batxRateChangeT.isPresent() ? batxRateChangeT.get() : null;
+  }
+
+  @Override
   public BatxRateChange holdById(BatxRateChangeId batxRateChangeId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

@@ -94,7 +94,7 @@ public class L4321Report extends MakeReport {
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
 		if ("L4320".equals(titaVo.getTxcd())) {
 
-			for (int j = 1; j <= 3; j++) {
+			for (int j = 1; j <= 4; j++) {
 
 				switch (j) {
 				case 1:
@@ -109,6 +109,11 @@ public class L4321Report extends MakeReport {
 					break;
 				case 3:
 					fileNm = fileNm1 + "-人工調整";
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+					break;
+				case 4:
+					fileNm = fileNm1 + "-批次自動調整（提醒件）";
 					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
 							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 					break;
@@ -197,17 +202,22 @@ public class L4321Report extends MakeReport {
 
 			switch (this.iAdjCode) {
 			case 1:
-				fileNm += "-批次自動調整";
+				fileNm += fileNm1 + "-批次自動調整";
 				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
 						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 				break;
 			case 2:
-				fileNm += "-按地區別調整";
+				fileNm += fileNm1 + "-按地區別調整";
 				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
 						"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 				break;
 			case 3:
-				fileNm += "-人工調整";
+				fileNm += fileNm1 + "-人工調整";
+				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+				break;
+			case 4:
+				fileNm += fileNm1 + "-批次自動調整（提醒件）";
 				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
 						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 				break;

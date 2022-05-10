@@ -510,6 +510,18 @@ E(0,#L3r09NextFitRate)
 C(3,#L3r09NextFitRate,0,S,$)
 E(0,#L3r09NextEffectDate)
 
+
+#RimL2r63=X,1,S
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#TimBormNo)
+RESET_RIM(#SendL2r63,L2R63)
+S(L2R63,1,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L2R63)
+T(2,@LastPrintDate,#L2r63PrintDate)
+T(2,@TlrNo,#L2r63TlrNo)
+E(0,@LastExpectedRate,#L2r63ExpectedRate)
+
 ! [門牌號碼]
 #FdBdLocation=X,2,L
 
@@ -621,7 +633,9 @@ C(3,#Reason,4,$,S)
 ![列印人]
 #FdTlrNo=X,2,L
 
-#TlrNo=X,10,L
+#TlrNo=X,20,L
+
+
 
 ![5.延長年期]
 #FdExtendYear=X,2,L
@@ -657,7 +671,7 @@ T(2,#CustNo)
 <include src="ROM.icf::L2R27.dec"/>
 <include src="ROM.icf::L2R09.dec"/>
 <include src="ROM.icf::L3R09.dec"/>
-
+<include src="ROM.icf::L2R63.dec"/>
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
@@ -752,6 +766,7 @@ TXFORM=L2980
 <include src="ROM.icf::L2R11.tom"/>
 <include src="ROM.icf::L2R09.tom"/>
 <include src="ROM.icf::L3R09.tom"/>
+<include src="ROM.icf::L2R63.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

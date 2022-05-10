@@ -125,6 +125,18 @@ public interface BatxRateChangeService {
   public Slice<BatxRateChange> findL4320Erase(int adjDate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND PreNextAdjDate =
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param bormNo_2 bormNo_2
+   * @param preNextAdjDate_3 preNextAdjDate_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxRateChange BatxRateChange of List
+   */
+  public BatxRateChange findL2980printFirst(int custNo_0, int facmNo_1, int bormNo_2, int preNextAdjDate_3, TitaVo... titaVo);
+
+  /**
    * hold By BatxRateChange
    * 
    * @param batxRateChangeId key

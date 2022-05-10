@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.MlaundryRecord;
-import com.st1.itx.db.domain.MlaundryRecordId;
 import com.st1.itx.db.repository.online.MlaundryRecordRepository;
 import com.st1.itx.db.repository.day.MlaundryRecordRepositoryDay;
 import com.st1.itx.db.repository.mon.MlaundryRecordRepositoryMon;
@@ -59,21 +58,21 @@ public class MlaundryRecordServiceImpl extends ASpringJpaParm implements Mlaundr
   }
 
   @Override
-  public MlaundryRecord findById(MlaundryRecordId mlaundryRecordId, TitaVo... titaVo) {
+  public MlaundryRecord findById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + mlaundryRecordId);
+    this.info("findById " + dbName + " " + logNo);
     Optional<MlaundryRecord> mlaundryRecord = null;
     if (dbName.equals(ContentName.onDay))
-      mlaundryRecord = mlaundryRecordReposDay.findById(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordReposDay.findById(logNo);
     else if (dbName.equals(ContentName.onMon))
-      mlaundryRecord = mlaundryRecordReposMon.findById(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordReposMon.findById(logNo);
     else if (dbName.equals(ContentName.onHist))
-      mlaundryRecord = mlaundryRecordReposHist.findById(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordReposHist.findById(logNo);
     else 
-      mlaundryRecord = mlaundryRecordRepos.findById(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordRepos.findById(logNo);
     MlaundryRecord obj = mlaundryRecord.isPresent() ? mlaundryRecord.get() : null;
       if(obj != null) {
         EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
@@ -91,9 +90,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "RecordDate", "CustNo", "FacmNo", "BormNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LogNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RecordDate", "CustNo", "FacmNo", "BormNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = mlaundryRecordReposDay.findAll(pageable);
@@ -223,20 +222,58 @@ em = null;
   }
 
   @Override
-  public MlaundryRecord holdById(MlaundryRecordId mlaundryRecordId, TitaVo... titaVo) {
+  public MlaundryRecord findCustNoFirst(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int repayDate_5, int repayDate_6, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + mlaundryRecordId);
+    this.info("findCustNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3 + " bormNo_4 : " +  bormNo_4 + " repayDate_5 : " +  repayDate_5 + " repayDate_6 : " +  repayDate_6);
+    Optional<MlaundryRecord> mlaundryRecordT = null;
+    if (dbName.equals(ContentName.onDay))
+      mlaundryRecordT = mlaundryRecordReposDay.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualAndRepayDateLessThanEqualOrderByLogNoDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, repayDate_6);
+    else if (dbName.equals(ContentName.onMon))
+      mlaundryRecordT = mlaundryRecordReposMon.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualAndRepayDateLessThanEqualOrderByLogNoDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, repayDate_6);
+    else if (dbName.equals(ContentName.onHist))
+      mlaundryRecordT = mlaundryRecordReposHist.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualAndRepayDateLessThanEqualOrderByLogNoDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, repayDate_6);
+    else 
+      mlaundryRecordT = mlaundryRecordRepos.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualAndRepayDateLessThanEqualOrderByLogNoDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, repayDate_6);
+
+    return mlaundryRecordT.isPresent() ? mlaundryRecordT.get() : null;
+  }
+
+  @Override
+  public MlaundryRecord maxLogNoFirst(int custNo_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("maxLogNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    Optional<MlaundryRecord> mlaundryRecordT = null;
+    if (dbName.equals(ContentName.onDay))
+      mlaundryRecordT = mlaundryRecordReposDay.findTopByCustNoGreaterThanOrderByLogNoDesc(custNo_0);
+    else if (dbName.equals(ContentName.onMon))
+      mlaundryRecordT = mlaundryRecordReposMon.findTopByCustNoGreaterThanOrderByLogNoDesc(custNo_0);
+    else if (dbName.equals(ContentName.onHist))
+      mlaundryRecordT = mlaundryRecordReposHist.findTopByCustNoGreaterThanOrderByLogNoDesc(custNo_0);
+    else 
+      mlaundryRecordT = mlaundryRecordRepos.findTopByCustNoGreaterThanOrderByLogNoDesc(custNo_0);
+
+    return mlaundryRecordT.isPresent() ? mlaundryRecordT.get() : null;
+  }
+
+  @Override
+  public MlaundryRecord holdById(Long logNo, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + logNo);
     Optional<MlaundryRecord> mlaundryRecord = null;
     if (dbName.equals(ContentName.onDay))
-      mlaundryRecord = mlaundryRecordReposDay.findByMlaundryRecordId(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordReposDay.findByLogNo(logNo);
     else if (dbName.equals(ContentName.onMon))
-      mlaundryRecord = mlaundryRecordReposMon.findByMlaundryRecordId(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordReposMon.findByLogNo(logNo);
     else if (dbName.equals(ContentName.onHist))
-      mlaundryRecord = mlaundryRecordReposHist.findByMlaundryRecordId(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordReposHist.findByLogNo(logNo);
     else 
-      mlaundryRecord = mlaundryRecordRepos.findByMlaundryRecordId(mlaundryRecordId);
+      mlaundryRecord = mlaundryRecordRepos.findByLogNo(logNo);
     return mlaundryRecord.isPresent() ? mlaundryRecord.get() : null;
   }
 
@@ -245,16 +282,16 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Hold " + dbName + " " + mlaundryRecord.getLogNo());
     Optional<MlaundryRecord> mlaundryRecordT = null;
     if (dbName.equals(ContentName.onDay))
-      mlaundryRecordT = mlaundryRecordReposDay.findByMlaundryRecordId(mlaundryRecord.getMlaundryRecordId());
+      mlaundryRecordT = mlaundryRecordReposDay.findByLogNo(mlaundryRecord.getLogNo());
     else if (dbName.equals(ContentName.onMon))
-      mlaundryRecordT = mlaundryRecordReposMon.findByMlaundryRecordId(mlaundryRecord.getMlaundryRecordId());
+      mlaundryRecordT = mlaundryRecordReposMon.findByLogNo(mlaundryRecord.getLogNo());
     else if (dbName.equals(ContentName.onHist))
-      mlaundryRecordT = mlaundryRecordReposHist.findByMlaundryRecordId(mlaundryRecord.getMlaundryRecordId());
+      mlaundryRecordT = mlaundryRecordReposHist.findByLogNo(mlaundryRecord.getLogNo());
     else 
-      mlaundryRecordT = mlaundryRecordRepos.findByMlaundryRecordId(mlaundryRecord.getMlaundryRecordId());
+      mlaundryRecordT = mlaundryRecordRepos.findByLogNo(mlaundryRecord.getLogNo());
     return mlaundryRecordT.isPresent() ? mlaundryRecordT.get() : null;
   }
 
@@ -269,8 +306,8 @@ em = null;
          empNot = empNot.isEmpty() ? "System" : empNot;		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Insert..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
-    if (this.findById(mlaundryRecord.getMlaundryRecordId(), titaVo) != null)
+    this.info("Insert..." + dbName + " " + mlaundryRecord.getLogNo());
+    if (this.findById(mlaundryRecord.getLogNo(), titaVo) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
@@ -300,7 +337,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Update..." + dbName + " " + mlaundryRecord.getLogNo());
     if (!empNot.isEmpty())
       mlaundryRecord.setLastUpdateEmpNo(empNot);
 
@@ -325,7 +362,7 @@ em = null;
 		} else
        empNot = ThreadVariable.getEmpNot();
 
-    this.info("Update..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Update..." + dbName + " " + mlaundryRecord.getLogNo());
     if (!empNot.isEmpty())
       mlaundryRecord.setLastUpdateEmpNo(empNot);
 
@@ -337,7 +374,7 @@ em = null;
         mlaundryRecordReposHist.saveAndFlush(mlaundryRecord);
     else 
       mlaundryRecordRepos.saveAndFlush(mlaundryRecord);	
-    return this.findById(mlaundryRecord.getMlaundryRecordId());
+    return this.findById(mlaundryRecord.getLogNo());
   }
 
   @Override
@@ -345,7 +382,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Delete..." + dbName + " " + mlaundryRecord.getLogNo());
     if (dbName.equals(ContentName.onDay)) {
       mlaundryRecordReposDay.delete(mlaundryRecord);	
       mlaundryRecordReposDay.flush();

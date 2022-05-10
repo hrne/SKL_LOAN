@@ -1,0 +1,301 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6088)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,104)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6088]                                 員工資料檔查詢"],
+!["#FdMain+查詢條件","@(單位代號、員工編號、員工姓名，擇一輸入，不輸入查全部)"],
+["#FdCenterCode+單位代號",#CenterCode,#BTNA,#CenterCodeName],
+["#FdEmployeeNo+員工編號",#EmployeeNo],
+["#FdEmployeeNoX+員工姓名",#EmployeeNoX],
+["#FdAgStatusCode+是否在職",#AgStatusCode,#AgStatusCodeX,"@(輸入空白查全部)"],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+#FdMain=X,2,L
+#BTNA=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+
+#Submit=X,4,S
+K(MODIFYBUTTON,查詢)
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!EnableFg
+#CDDEF0001=x,20,S
+T(3,CdCode.AgCurInd)
+#CDDEF0002=x,20,S
+T(3,CdCode.EmpIdentity)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AgCurIndHelp,#HelpDesc1)
+T(2,@EmpIdentityHelp,#HelpDesc2)
+#AgCurIndHelp=x,50,S
+#EmpIdentityHelp=x,1024,S
+!---------- AP TEXT AREA Variables ----------
+
+#FdCenterCode=X,2,L
+#FdEmployeeNo=X,2,L
+#FdEmployeeNoX=X,2,L
+#FdAgStatusCode=X,2,L
+!#FdRPTFG=X,2,L
+!T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,7,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_EmployeeNo=X,6,S
+T(1,#NTXBUF,1,6)
+
+#CHAIN_AgCurInd=X,1,S
+T(1,#NTXBUF,7,1)
+C(3,#CHAIN,1,T(2,@EmployeeNo,#CHAIN_EmployeeNo),)
+C(3,#CHAIN,1,T(2,@AgStatusCode,#CHAIN_AgCurInd),)
+
+
+#BUFA=X,1,S
+
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#BUFA;ntxbuf5=type<-1:CenterCode<-OOUnitCode:CenterCodeName<-OOUnitItem})
+
+! 單位代號
+#CenterCode=X,6,I
+@T(3,@CenterCodeName,)
+!C(3,#CHAIN,1,s,$)
+! INVOKEJS(SHOW,p1,1,3,1)
+! @C(4,#CenterCode,INVOKEJS(SHOW,p1,1,1,0)INVOKEJS(SHOW,p1,2,3,1),INVOKEJS(SHOW,p1,2,3,0))
+<include src="ROM.icf::L5R14.dec"/>
+#RimL5R14=X,1,S
+#RimAreaCode=X,6,S
+T(2,#CenterCode)
+#RimChoose=X,1,S
+T(2,1)
+C(4,#CenterCode,s,$)
+C(4,#CenterCodeName,$,s)
+RESET_RIM(#RimChoose,L5R14)
+S(L5R14,1,#RimChoose,#RimAreaCode)
+R(1,L5R14)
+T(2,@CenterCodeName,#L5R14AreaItem)
+
+
+
+! 單位代號中文
+#CenterCodeName=X,40,L
+C(4,#CenterCode,S,s)
+
+!員工編號
+#EmployeeNo=X,6,I
+!C(3,#CHAIN,1,s,$)
+C(4,#CenterCode,$,S)
+! C(4,#CenterCode,INVOKEJS(SHOW,p1,2,2,1),S)
+! @C(4,#EmployeeNo,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,3,3,0))
+
+! 員工姓名
+#EmployeeNoX=x,40,I
+!C(3,#CHAIN,1,s,$)
+C(4,#CenterCode,$,S)
+C(4,#EmployeeNo,$,S)
+! C(4,#EmployeeNo,INVOKEJS(SHOW,p1,3,3,1),S)
+! @C(4,#EmployeeNoX,INVOKEJS(SHOW,p1,3,3,0),$)
+
+!現職記號
+#AgStatusCode=X,1,I
+!C(3,#CHAIN,1,s,$)
+T(3,Y)
+HELP(#AgCurIndHelp)
+@T(3,@AgStatusCodeX,)
+C(4,#AgStatusCode,$,V(H,#AgCurIndHelp))
+
+#AgStatusCodeX=X,6,L
+T(H,#AgStatusCode,#AgCurIndHelp)
+!<include src="COM.icf::RPTFG.dec"/>
+
+#RPTFG=A,1,S
+E(0,0)
+
+#TXMT=A,1,S
+!C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6088 ----------
+<sub type="FORM" name="L6088">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6088,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6088] 員工資料檔)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 員工編號(TOTA)
+#OOEmployeeNo=X,6,L
+
+! 身份證字號(TOTA)
+#OOAgentId=X,10,L
+
+! 員工姓名(TOTA)
+#OOFullname=x,80,L
+
+! 單位代號(TOTA)
+#OOCenterCode=X,6,L
+
+! 單位名稱
+#OOCenterCodeName=X,20,L
+
+! 員工身份別(TOTA)
+#OOCommLineType=X,1,S
+#OOCommLineTypeX=X,20,L
+C(4,#OOCommLineType,S,$)
+T(H,#OOCommLineType,#EmpIdentityHelp)   
+
+! 現職(TOTA)
+#OOAgCurInd=X,1,L
+
+! 資料日期
+#OODataDate=X,10,L
+
+! 最後修改日期
+#OOLastUpdate=x,20,S
+
+! 最後修改人員
+#OOLastEmp=x,47,S
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CenterCode
+#EmployeeNo
+#EmployeeNoX
+#AgStatusCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R14.tom"/>
+
+TXFORM=L6088
+#OOEmployeeNo
+#OOAgentId
+#OOFullname
+#OOCenterCode
+#OOCenterCodeName
+#OOCommLineType
+#OOAgCurInd
+#OODataDate
+#OOLastUpdate
+#OOLastEmp
+
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+!---------- 單據輸出組合 ----------
+
+<sub type="PART" name="L6088" layout="cols=1;screen.width=[100,900];printer.width=[15,30,15,30];">
+[
+["[L6088]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@員工資料檔查詢                                         "],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6088
+#any={detail:true, header:'L6088.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOEmployeeNo=員工編號
+{width:100,align:'center'}
+
+#OOAgentId=身份證字號
+{width:100,align:'center'}
+
+#OOFullname=員工姓名
+{width:100,align:'center'}
+
+#OOCenterCode=單位代號
+{width:100,align:'center'}
+
+#OOCenterCodeName=單位名稱
+{width:100,align:'left'}
+
+#OOCommLineTypeX=員工身份別
+{width:100,align:'left'}
+
+#OOAgCurInd=現職
+{width:50,align:'center'}
+
+#OODataDate=資料日期
+{width:100,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:120,align:'left'}
+
+^
+
+</sub>

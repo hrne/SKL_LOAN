@@ -50,12 +50,11 @@ public class L6905 extends TradeBuffer {
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
 	@Autowired
+	public CdEmpService cdEmpService;
+	@Autowired
 	public TxTellerService sTxTellerService;
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
-	@Autowired
-	CdEmpService cdEmpService;
-
 	@Autowired
 	private L6905ServiceImpl l6905ServiceImpl;
 
@@ -391,7 +390,6 @@ public class L6905 extends TradeBuffer {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
 			occursList.putParam("OOSlipNo", tAcDetail.getSlipNo());
-
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 

@@ -352,23 +352,20 @@ public class L4211Report extends MakeReport {
 		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
 
 		// 暫存L4211相同科目同戶號TxAmt累加
+		if ("L4211".equals(txCode)) {
+			for (Map<String, String> tfnAllList : fnAllList) {
 
-		for (Map<String, String> tfnAllList : fnAllList) {
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
-			tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo")),
-					parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
-
-			if (!TxAmtMap.containsKey(tmp)) {
-				TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
-			} else {
-				TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				if (!TxAmtMap.containsKey(tmp)) {
+					TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
+				} else {
+					TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				}
 			}
 		}
-
 		for (Map<String, String> tfnAllList : fnAllList) {
-
-			tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo")),
-					parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -538,12 +535,17 @@ public class L4211Report extends MakeReport {
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 
 				if ("L4211".equals(txCode)) {
+
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
 					if (TxAmtMap.get(tmp) != null) {
 						this.print(0, 29, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
 				} else {
 					this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 				}
+
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
@@ -701,23 +703,20 @@ public class L4211Report extends MakeReport {
 		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
 
 		// 暫存L4211相同科目同戶號TxAmt累加
+		if ("L4211".equals(txCode)) {
+			for (Map<String, String> tfnAllList : fnAllList) {
 
-		for (Map<String, String> tfnAllList : fnAllList) {
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
-			tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo")),
-					parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
-
-			if (!TxAmtMap.containsKey(tmp)) {
-				TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
-			} else {
-				TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				if (!TxAmtMap.containsKey(tmp)) {
+					TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
+				} else {
+					TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				}
 			}
 		}
-
 		for (Map<String, String> tfnAllList : fnAllList) {
-
-			tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo")),
-					parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -887,9 +886,14 @@ public class L4211Report extends MakeReport {
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 
 				if ("L4211".equals(txCode)) {
+
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
 					if (TxAmtMap.get(tmp) != null) {
 						this.print(0, 29, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
+
 				} else {
 					this.print(0, 29, dfTransferAmt, "R");// 匯款金額
 				}
@@ -1047,23 +1051,22 @@ public class L4211Report extends MakeReport {
 		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
 
 		// 暫存L4211相同科目同戶號TxAmt累加
+		if ("L4211".equals(txCode)) {
 
-		for (Map<String, String> tfnAllList : fnAllList) {
+			for (Map<String, String> tfnAllList : fnAllList) {
 
-			tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo")),
-					parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
-			if (!TxAmtMap.containsKey(tmp)) {
-				TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
-			} else {
-				TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				if (!TxAmtMap.containsKey(tmp)) {
+					TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
+				} else {
+					TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				}
 			}
 		}
 
 		for (Map<String, String> tfnAllList : fnAllList) {
-
-			tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo")),
-					parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
@@ -1233,6 +1236,9 @@ public class L4211Report extends MakeReport {
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 
 				if ("L4211".equals(txCode)) {
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
 					if (TxAmtMap.get(tmp) != null) {
 						this.print(0, 29, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}

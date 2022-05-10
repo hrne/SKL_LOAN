@@ -13,7 +13,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBcm;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -36,6 +38,8 @@ public class L6086 extends TradeBuffer {
 	@Autowired
 	public CdBcmService sCdBcmService;
 	@Autowired
+	public CdEmpService sCdEmpService;
+	@Autowired
 	Parse parse;
 
 	@Override
@@ -57,17 +61,17 @@ public class L6086 extends TradeBuffer {
 		// 查詢分公司資料檔
 		Slice<CdBcm> slCdBcm;
 		if (!(iDistCode.isEmpty() || iDistCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findDistCode1(iDistCode + "%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistCode1(iDistCode+"%", this.index, this.limit, titaVo);
 		} else if (!(iDeptCode.isEmpty() || iDeptCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode + "%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode+"%", this.index, this.limit, titaVo);
 		} else if (!(iUnitCode.isEmpty() || iUnitCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode + "%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode+"%", this.index, this.limit, titaVo);
 		} else {
 			slCdBcm = sCdBcmService.findAll(this.index, this.limit, titaVo);
 		}
 		List<CdBcm> lCdBcm = slCdBcm == null ? null : slCdBcm.getContent();
 
-		if (lCdBcm == null || lCdBcm.size() == 0 || lCdBcm.isEmpty()) {
+		if (lCdBcm == null || lCdBcm.size() == 0 ||lCdBcm.isEmpty()) {
 			throw new LogicException(titaVo, "E0001", "分公司資料檔"); // 查無資料
 		}
 		// 如有找到資料
@@ -80,6 +84,8 @@ public class L6086 extends TradeBuffer {
 				occursList.putParam("OODeptItem", tCdBcm.getDeptItem());
 				occursList.putParam("OODistCode", tCdBcm.getDistCode());
 				occursList.putParam("OODistItem", tCdBcm.getDistItem());
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
+				occursList.putParam("OOLastEmp", tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -93,5 +99,15 @@ public class L6086 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

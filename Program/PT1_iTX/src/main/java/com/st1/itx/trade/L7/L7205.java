@@ -108,7 +108,7 @@ public class L7205 extends TradeBuffer {
 		titaVo.setDataBaseOnMon();// 指定月報環境
 
 		String extension[] = filename.split("\\.");
-		this.info("file extension="+extension[extension.length - 1]);
+		this.info("file extension=" + extension[extension.length - 1]);
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
 			makeExcel.openExcel(filename, 1);
@@ -117,7 +117,8 @@ public class L7205 extends TradeBuffer {
 			this.info("fileYearMonth=" + fileYearMonth);
 
 			if (fileYearMonth != iYearMonth) {
-				String ErrorMsg = "輸入的年月份(" + (iYearMonth-191100) + ")與檔案年月份(" + (fileYearMonth-191100) + ")不同，請確認檔案年月份。";
+				String ErrorMsg = "輸入的年月份(" + (iYearMonth - 191100) + ")與檔案年月份(" + (fileYearMonth - 191100)
+						+ ")不同，請確認檔案年月份。";
 				throw new LogicException(titaVo, "E0014", ErrorMsg);
 			}
 			// 切資料
@@ -280,13 +281,24 @@ public class L7205 extends TradeBuffer {
 //					&& (iFacmNo.compareTo(BigDecimal.ZERO) == -1 || iFacmNo == null)
 //					&& (iAssetClass.compareTo(BigDecimal.ZERO) == -1 || iAssetClass == null)) {
 //		}
-
+			
+//			this.info("iCustNo=" + makeExcel.getValue(i, 2).toString());
+//			this.info("iFacmNo=" + makeExcel.getValue(i, 3).toString());
+//			this.info("iAssetClass=" + makeExcel.getValue(i, 8).toString());
+		
+			//正常是連續的資料串，遇到空值強行結束
+			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length()==0 || makeExcel.getValue(i, 8).toString().length()==0) {
+			
+				break;
+			}
+			
+			
 			try {
 				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
 				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
 				iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
+
 			} catch (Exception e) {
-//				this.info("L7205(Excel欄位應為iCustNo在B欄、iFacmNo在C欄、iAssetClass為H欄)請確認格式 : " + e.getMessage());
 
 				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
 

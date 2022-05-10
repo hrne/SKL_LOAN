@@ -73,12 +73,16 @@ public class L3072 extends TradeBuffer {
 		// new ArrayList
 		List<LoanCustRmk> loanCustRmk = new ArrayList<LoanCustRmk>();
 		Slice<LoanCustRmk> sloanCustRmk = null;
-
+		
+		// 以 BorxNo 判定是否舊資料
+		// 1. 有輸入 BorxNo 時：判定為完整戶號-額度-撥款-BorxZNo，就依那樣去找
+		// 2. 只有輸入到戶號時：L3005 點擊「帳戶備忘錄」進入，只顯示舊資料
+		// 3. 其他情況：findAll
 		if (iBorxNo > 0) {
-			sloanCustRmk = loanCustRmkService.BorxNoAll(iCustNo, iFacmNo, iBormNo, iBorxNo, this.index, this.limit, titaVo);
+			sloanCustRmk = loanCustRmkService.borxNoAll(iCustNo, iFacmNo, iBormNo, iBorxNo, this.index, this.limit, titaVo);
 		}
 		else if (iCustNo > 0) {
-			sloanCustRmk = loanCustRmkService.findCustNo(iCustNo, this.index, this.limit, titaVo);
+			sloanCustRmk = loanCustRmkService.custNoAndBorxNo(iCustNo, iCustNo, 0, 0, this.index, this.limit, titaVo);
 		} else {
 			sloanCustRmk = loanCustRmkService.findAll(this.index, this.limit, titaVo);
 		}
@@ -86,7 +90,12 @@ public class L3072 extends TradeBuffer {
 		loanCustRmk = sloanCustRmk == null ? null : sloanCustRmk.getContent();
 		
 		if (loanCustRmk == null || loanCustRmk.isEmpty()) {
-			throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "不存在帳務備忘錄明細檔。"); // 查無資料
+			if (iBorxNo > 0)
+			{
+				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "不存在帳務備忘錄明細檔。"); // 查無資料
+			} else {
+				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "在帳務備忘錄明細檔沒有舊系統資料。請直接從【L3005 交易明細資料查詢】依每筆交易明細查詢。"); // 查無資料
+			}
 		}
 		
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

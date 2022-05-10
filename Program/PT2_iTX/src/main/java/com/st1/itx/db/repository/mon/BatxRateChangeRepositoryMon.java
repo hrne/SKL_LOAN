@@ -40,6 +40,9 @@ public interface BatxRateChangeRepositoryMon extends JpaRepository<BatxRateChang
   // AdjDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
   public Slice<BatxRateChange> findAllByAdjDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int adjDate_0, String titaTlrNo_1, String titaTxtNo_2, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND PreNextAdjDate =
+  public Optional<BatxRateChange> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndPreNextAdjDateIs(int custNo_0, int facmNo_1, int bormNo_2, int preNextAdjDate_3);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

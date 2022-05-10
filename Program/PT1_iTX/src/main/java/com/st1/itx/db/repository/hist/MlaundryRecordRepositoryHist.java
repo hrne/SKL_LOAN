@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.MlaundryRecord;
-import com.st1.itx.db.domain.MlaundryRecordId;
 
 /**
  * Gen By Tool
@@ -20,7 +19,7 @@ import com.st1.itx.db.domain.MlaundryRecordId;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface MlaundryRecordRepositoryHist extends JpaRepository<MlaundryRecord, MlaundryRecordId> {
+public interface MlaundryRecordRepositoryHist extends JpaRepository<MlaundryRecord, Long> {
 
   // RecordDate >= ,AND RecordDate <= ,AND ActualRepayDate >= ,AND ActualRepayDate <= 
   public Slice<MlaundryRecord> findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(int recordDate_0, int recordDate_1, int actualRepayDate_2, int actualRepayDate_3, Pageable pageable);
@@ -34,10 +33,16 @@ public interface MlaundryRecordRepositoryHist extends JpaRepository<MlaundryReco
   // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <= ,AND RepayDate >=
   public Slice<MlaundryRecord> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualOrderByRepayDateAsc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int repayDate_5, Pageable pageable);
 
+  // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <= ,AND RepayDate >= ,AND RepayDate <=
+  public Optional<MlaundryRecord> findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualAndRepayDateLessThanEqualOrderByLogNoDesc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int repayDate_5, int repayDate_6);
+
+  // CustNo >
+  public Optional<MlaundryRecord> findTopByCustNoGreaterThanOrderByLogNoDesc(int custNo_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
-  public Optional<MlaundryRecord> findByMlaundryRecordId(MlaundryRecordId mlaundryRecordId);
+  public Optional<MlaundryRecord> findByLogNo(Long logNo);
 
 }
 

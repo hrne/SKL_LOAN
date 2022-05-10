@@ -7,7 +7,6 @@
 #TXCD
 T(3,L8202)
 
-
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -111,7 +110,6 @@ V(5,#EntryDateS,#DATE)
 !統計期間天數
 #FactorDays=N,3,S
 
-
 ! 樣態一-金額合計超過
 #Factor1TotLimit=m,14,S
 
@@ -128,16 +126,8 @@ V(5,#EntryDateS,#DATE)
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,S
 
-#NTXBUF1=X,18,S
-T(2,#EntryDateS+#EntryDateE)ASGN(NTXBUF$)
-
-#TmpNTXCD=X,5,S
-T(3,L8921)
-ASGN(NTXCD$)
-
 #RPTFG=A,1,S
 E(0,0)
-
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L8R49.dec"/>
@@ -189,7 +179,6 @@ TXFORM=L8202
 
 
 !---------- 單據輸出組合 ----------
-<sub type="SELECT">
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
 </sub>

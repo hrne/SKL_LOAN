@@ -8,8 +8,11 @@ import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
 
@@ -29,25 +32,29 @@ public class MlaundryRecord implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3081477238905709327L;
+	private static final long serialVersionUID = -3759470986307542814L;
 
-@EmbeddedId
-  private MlaundryRecordId mlaundryRecordId;
+// 序號
+  @Id
+  @Column(name = "`LogNo`")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`MlaundryRecord_SEQ`")
+  @SequenceGenerator(name = "`MlaundryRecord_SEQ`", sequenceName = "`MlaundryRecord_SEQ`", allocationSize = 1)
+  private Long logNo = 0L;
 
   // 訪談日期
-  @Column(name = "`RecordDate`", insertable = false, updatable = false)
+  @Column(name = "`RecordDate`")
   private int recordDate = 0;
 
   // 戶號
-  @Column(name = "`CustNo`", insertable = false, updatable = false)
+  @Column(name = "`CustNo`")
   private int custNo = 0;
 
   // 額度編號
-  @Column(name = "`FacmNo`", insertable = false, updatable = false)
+  @Column(name = "`FacmNo`")
   private int facmNo = 0;
 
   // 撥款序號
-  @Column(name = "`BormNo`", insertable = false, updatable = false)
+  @Column(name = "`BormNo`")
   private int bormNo = 0;
 
   // 預定還款日期
@@ -108,12 +115,24 @@ public class MlaundryRecord implements Serializable {
   private String lastUpdateEmpNo;
 
 
-  public MlaundryRecordId getMlaundryRecordId() {
-    return this.mlaundryRecordId;
+/**
+	* 序號<br>
+	* 
+	* @return Long
+	*/
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  public Long getLogNo() {
+    return this.logNo;
   }
 
-  public void setMlaundryRecordId(MlaundryRecordId mlaundryRecordId) {
-    this.mlaundryRecordId = mlaundryRecordId;
+/**
+	* 序號<br>
+	* 
+  *
+  * @param logNo 序號
+	*/
+  public void setLogNo(Long logNo) {
+    this.logNo = logNo;
   }
 
 /**
@@ -462,8 +481,9 @@ public class MlaundryRecord implements Serializable {
 
   @Override
   public String toString() {
-    return "MlaundryRecord [mlaundryRecordId=" + mlaundryRecordId + ", repayDate=" + repayDate + ", actualRepayDate=" + actualRepayDate
-           + ", repayAmt=" + repayAmt + ", actualRepayAmt=" + actualRepayAmt + ", career=" + career + ", income=" + income + ", repaySource=" + repaySource + ", repayBank=" + repayBank
-           + ", description=" + description + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "MlaundryRecord [logNo=" + logNo + ", recordDate=" + recordDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", repayDate=" + repayDate
+           + ", actualRepayDate=" + actualRepayDate + ", repayAmt=" + repayAmt + ", actualRepayAmt=" + actualRepayAmt + ", career=" + career + ", income=" + income + ", repaySource=" + repaySource
+           + ", repayBank=" + repayBank + ", description=" + description + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

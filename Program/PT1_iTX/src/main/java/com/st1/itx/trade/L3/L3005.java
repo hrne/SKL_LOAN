@@ -236,7 +236,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OODesc", ln.getDesc());
 			}
 			// 先確認此戶有備忘錄 有才給備忘錄按鈕
-			Slice<LoanCustRmk> sLoanCustRmk = loanCustRmkService.BorxNoAll(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getBorxNo(), this.index, this.limit, titaVo);
+			Slice<LoanCustRmk> sLoanCustRmk = loanCustRmkService.borxNoAll(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getBorxNo(), this.index, this.limit, titaVo);
 			List<LoanCustRmk> lLoanCustRmk = sLoanCustRmk == null ? null : sLoanCustRmk.getContent();
 			
 			occursList.putParam("OOHasRemark", lLoanCustRmk != null && !lLoanCustRmk.isEmpty() ? "Y" : "N");	
@@ -269,9 +269,6 @@ public class L3005 extends TradeBuffer {
 			// 新增摘要 跟費用明細
 			occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
 			occursList.putParam("OOTotTxAmt", wkTotTxAmt); // 交易總金額
-			
-			// 判定是否是轉換資料
-			occursList.putParam("OOIsOldData", "999999".equals(ln.getCreateEmpNo()) || ln.getCreateEmpNo().trim().isEmpty() ? "Y" : "N");
 			
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);

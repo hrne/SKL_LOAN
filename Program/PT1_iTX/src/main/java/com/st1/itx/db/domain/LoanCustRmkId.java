@@ -67,8 +67,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 2022.4.10 by eric
-轉換需同步調整邏輯
+	* 2022.4.10 by eric轉換需同步調整邏輯
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -77,8 +76,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 2022.4.10 by eric
-轉換需同步調整邏輯
+	* 2022.4.10 by eric轉換需同步調整邏輯
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/
