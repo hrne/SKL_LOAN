@@ -169,6 +169,8 @@ public class L6906 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -219,5 +221,14 @@ public class L6906 extends TradeBuffer {
 
 		return uTlrItem;
 
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }
