@@ -221,6 +221,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  THEN 'D'";
 		sql += "       	ELSE 'C' END	AS F15";
 		sql += "       ,M.\"ProdNo\" 	                          AS F16 ";
+		sql += "       ,M.\"LawAmount\"	                          AS F17 ";
 		sql += " FROM \"MonthlyFacBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";

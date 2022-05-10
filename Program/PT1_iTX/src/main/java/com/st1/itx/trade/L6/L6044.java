@@ -152,6 +152,8 @@ public class L6044 extends TradeBuffer {
 
 			DateTime = this.parse.timeStampToString(tTxAuthorize.getLastUpdate());
 			occursList.putParam("OODateTime", DateTime);
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxAuthorize.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxAuthorize.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tTxAuthorize.getLastUpdateEmpNo() + " " + empName(titaVo, tTxAuthorize.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 		this.totaVo.addOccursList(occursList);
@@ -199,6 +201,15 @@ public class L6044 extends TradeBuffer {
 
 		return uTlrItem;
 
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 
 }

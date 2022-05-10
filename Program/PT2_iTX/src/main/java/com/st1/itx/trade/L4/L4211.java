@@ -1,10 +1,6 @@
 package com.st1.itx.trade.L4;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -40,44 +36,8 @@ public class L4211 extends TradeBuffer {
 		this.info("active L4211 ");
 		this.totaVo.init(titaVo);
 
-		Boolean cheakfg = false;
+		MySpring.newTask("L4211Batch", this.txBuffer, titaVo);
 
-		List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
-
-		if ("1".equals(titaVo.get("FunctionCode"))) {
-			// 產生匯款總傳票明細表
-
-			try {
-				fnAllList = l4211ARServiceImpl.findAll(titaVo, 1);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("L4211ServiceImpl.findAll error = " + errors.toString());
-			}
-		} else {
-			// 產生匯款總傳票明細表依戶號排序
-			try {
-				fnAllList = l4211BRServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("L4211ServiceImpl.findAll error = " + errors.toString());
-			}
-
-		}
-
-		if (fnAllList.size() == 0) {
-			cheakfg = true;
-		}
-
-
-		if (cheakfg) {
-			throw new LogicException("E2003", "查無資料"); // 查無資料
-		} else {
-			// 執行交易
-			MySpring.newTask("L4211Batch", this.txBuffer, titaVo);
-		}
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -105,8 +105,11 @@ T(1,#NTXBUF,19,3)
 #CHAIN_RepayDate=D,7,S
 T(1,#NTXBUF,22,7)
 
+#CHAIN_LogNo=A,20,S
+T(1,#NTXBUF,29,20)
+
 #CHAIN_RepayAmt=m,14.2,S
-T(1,#NTXBUF,29,14)
+T(1,#NTXBUF,49,14)
 
 
 #CHAINSET=X,1,S
@@ -119,7 +122,12 @@ E(0,@FacmNo,#CHAIN_FacmNo)
 E(0,@BormNo,#CHAIN_BormNo)
 E(0,@RepayDate,#CHAIN_RepayDate)
 E(0,@RepayAmt,#CHAIN_RepayAmt)
+E(0,@LogNo,#CHAIN_LogNo)
 
+#LogNo=A,20,S
+
+#RimLogNo=A,20,S
+E(0,#LogNo)
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5:查詢)
 #FuncCode=A,1,S
@@ -171,22 +179,11 @@ T(2,@FdDescription,#WKPSC)
 #DATE=D,8,S
 T(4,CDATE$)
 
-#RimRecordDate=9,7,S
-E(0,#RecordDate)
-#RimCustNo=9,7,S
-E(0,#CustNo)
-#RimFacmNo=9,3,S
-E(0,#FacmNo)
-#RimBormNo=9,3,S
-E(0,#BormNo)
-
 !複製先調RIM
 #SendL8R51A=X,1,S
 C(3,#FuncCode,3,$,s)
-E(0,@RimFuncCode,5)
-T(2,@RimTxCode,#TXCD)
 RESET_RIM(#SendL8R51,L8R51)
-S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
+S(L8R51,1,#RimLogNo)
 R(1,L8R51)
 E(0,@RepayDate,#L8R51RepayDate)
 E(0,@RepayAmt,#L8R51RepayAmt)
@@ -201,8 +198,9 @@ T(2,@CustName,#L8R51CustName)
 T(H,#RepaySourceX,#RepaySource,#ApHelp)
 
 !訪談日期  
+!新增時自動代入當日
 #RecordDate=D,7,L
-C(3,#FuncCode,3,$,T(1,#DATE,2,7))
+C(3,#FuncCode,1,T(1,#DATE,2,7),$)
 !C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 !C(3,#FuncCode,3,$,T(1,#DATE,2,7))
 !D(8)
@@ -226,17 +224,13 @@ C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 @V(7)
 
+#RimCustNo=A,7,S
+
 #SendL8R51B=X,1,S
-E(0,@RimFuncCode,#FuncCode)
-T(2,@RimTxCode,#TXCD)
-IF(#FuncCode==1 || #FuncCode==3,
-E(0,#RimRecordDate,#RecordDate)
+E(0,#RimLogNo,#LogNo)
 E(0,#RimCustNo,#CustNo)
-E(0,#RimFacmNo,#FacmNo)
-E(0,#RimBormNo,#BormNo)
-,$)
 RESET_RIM(#SendL8R51,L8R51)
-S(L8R51,1,#RimFuncCode,#RimTxCode,#RimRecordDate,#RimCustNo,#RimFacmNo,#RimBormNo)
+S(L8R51,1,#RimLogNo,#RimCustNo)
 R(1,L8R51)
 
 #SETA=X,1,S
@@ -363,6 +357,7 @@ T(3,[L8204]  疑似洗錢交易訪談記錄維護)
 #ActualRepayDate
 #ActualRepayAmt
 #Description
+#LogNo
 #END
 </sub>
 

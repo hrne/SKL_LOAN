@@ -13,8 +13,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.MlaundryRecord;
-import com.st1.itx.db.domain.MlaundryRecordId;
 import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryRecordService;
@@ -83,7 +81,6 @@ public class L8923 extends TradeBuffer {
 		
 		int iFacmNo = 0;
 		int iBormNo = 0;
-		MlaundryRecord iMlaundryRecord = null;
 		
 		// 如有找到資料
 		if (resultList != null && resultList.size() > 0) {
@@ -110,21 +107,17 @@ public class L8923 extends TradeBuffer {
 				occursList.putParam("OORepayAmt", result.get("F5")); // 還款金額
 				
 				occursList.putParam("OOActualRepayAmt", result.get("F14")); // 實際還款金額
+				occursList.putParam("OOLogNo", result.get("F15")); // LogNo
 				
 				occursList.putParam("OOEmpNo", result.get("F10")); // 經辦
 			
 				iFacmNo = parse.stringToInteger(result.get("F3"));
 				iBormNo = parse.stringToInteger(result.get("F4"));
-			
-				iMlaundryRecord = sMlaundryRecordService.findById(new MlaundryRecordId(recorddate+19110000,iCustNo,iFacmNo,iBormNo), titaVo);
-				if(iMlaundryRecord!=null) {
-					DateTime = this.parse.timeStampToString(iMlaundryRecord.getLastUpdate()); // 異動日期
-					this.info("DateTime="+DateTime);
-					Date = FormatUtil.left(DateTime, 9);
-					this.info("Date="+Date);
-				} else {
-					Date = "";
-				}
+		
+				DateTime = result.get("F11"); // 異動日期
+				this.info("DateTime="+DateTime);
+				Date = FormatUtil.left(DateTime, 9);
+				this.info("Date="+Date);
 			
 				occursList.putParam("OOUpdate", Date);// 異動日期
 				String mrkey = recorddate + String.format("%07d", iCustNo)+String.format("%03d", iFacmNo)+String.format("%03d", iBormNo);

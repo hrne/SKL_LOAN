@@ -1321,8 +1321,11 @@ T(3,指定單位)
 <LockControl.rtn>
 
 #oLockCustNo=A,7,S
-C(3,#FKEY,0,$,s)
-C(3,#oLockCustNo,#LockCustNo,s,$)
+
+#LCR97Rim=x,1,S
+C(3,#FKEY,0,$,C(3,#FKEY,7,$,S))
+C(3,#oLockCustNo,#LockCustNo,S,$)
+RESET_RIM(#LCR97Rim,LCR97)
 S(LCR97,01,#LockCustNo,#LockNo)
 R(1,LCR97)
 T(2,@oLockCustNo,#LockCustNo)

@@ -356,6 +356,7 @@ public class L4211Report extends MakeReport {
 			for (Map<String, String> tfnAllList : fnAllList) {
 
 				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("DetailSeq")),
 						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 				if (!TxAmtMap.containsKey(tmp)) {
@@ -537,6 +538,7 @@ public class L4211Report extends MakeReport {
 				if ("L4211".equals(txCode)) {
 
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("DetailSeq")),
 							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 					if (TxAmtMap.get(tmp) != null) {
@@ -707,6 +709,7 @@ public class L4211Report extends MakeReport {
 			for (Map<String, String> tfnAllList : fnAllList) {
 
 				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("DetailSeq")),
 						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 				if (!TxAmtMap.containsKey(tmp)) {
@@ -888,6 +891,7 @@ public class L4211Report extends MakeReport {
 				if ("L4211".equals(txCode)) {
 
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("DetailSeq")),
 							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 					if (TxAmtMap.get(tmp) != null) {
@@ -1056,6 +1060,7 @@ public class L4211Report extends MakeReport {
 			for (Map<String, String> tfnAllList : fnAllList) {
 
 				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("DetailSeq")),
 						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 				if (!TxAmtMap.containsKey(tmp)) {
@@ -1237,6 +1242,7 @@ public class L4211Report extends MakeReport {
 
 				if ("L4211".equals(txCode)) {
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("DetailSeq")),
 							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
 
 					if (TxAmtMap.get(tmp) != null) {
@@ -1480,17 +1486,20 @@ public class L4211Report extends MakeReport {
 	 */
 	private class tmpFacm {
 
-		public tmpFacm(int custNo, int sortingForSubTotal) {
+		public tmpFacm(int custNo, int detailSeq, int sortingForSubTotal) {
 			this.setCustNo(custNo);
+			this.setDetailSeq(detailSeq);
 			this.setSortingForSubTotal(sortingForSubTotal);
 		}
 
 		private int custNo = 0;
+		private int detailSeq = 0;
 		private int sortingForSubTotal = 0;
 
 		@Override
 		public String toString() {
-			return "tmpFacm [custNo=" + custNo + ", sortingForSubTotal=" + sortingForSubTotal + "]";
+			return "tmpFacm [custNo=" + custNo + ", detailSeq=" + detailSeq + ", sortingForSubTotal="
+					+ sortingForSubTotal + "]";
 		}
 
 		@Override
@@ -1499,6 +1508,7 @@ public class L4211Report extends MakeReport {
 			int result = 1;
 			result = prime * result + getEnclosingInstance().hashCode();
 			result = prime * result + custNo;
+			result = prime * result + detailSeq;
 			result = prime * result + sortingForSubTotal;
 			return result;
 		}
@@ -1516,6 +1526,8 @@ public class L4211Report extends MakeReport {
 				return false;
 			if (custNo != other.custNo)
 				return false;
+			if (detailSeq != other.detailSeq)
+				return false;
 			if (sortingForSubTotal != other.sortingForSubTotal)
 				return false;
 			return true;
@@ -1523,6 +1535,10 @@ public class L4211Report extends MakeReport {
 
 		private void setCustNo(int custNo) {
 			this.custNo = custNo;
+		}
+
+		private void setDetailSeq(int detailSeq) {
+			this.detailSeq = detailSeq;
 		}
 
 		private void setSortingForSubTotal(int sortingForSubTotal) {

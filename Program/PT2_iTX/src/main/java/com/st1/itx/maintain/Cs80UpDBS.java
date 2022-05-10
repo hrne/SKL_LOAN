@@ -120,7 +120,7 @@ public class Cs80UpDBS extends CommBuffer {
 				// 銷定戶號自動解鑜控制
 				if (!tota.isError() && LockNo > 0) {
 					if ((titaVo.getRelCodeI() <= 1 && titaVo.getActFgI() <= 1 && (titaVo.isHcodeNormal() || titaVo.isHcodeErase()))
-							|| (titaVo.getRelCodeI() == 2 && titaVo.getActFgI() == 1 && titaVo.isHcodeErase()) || (titaVo.getRelCodeI() == 2 && titaVo.getActFgI() == 2 && titaVo.isHcodeNormal())) {
+							|| (titaVo.getRelCodeI() == 2 && titaVo.getActFgI() == 1 && titaVo.isHcodeErase()) || (titaVo.getRelCodeI() == 2 && titaVo.getActFgI() == 1 && titaVo.isHcodeNormal())) {
 
 						this.info("CS80 .... LockControl.ToUnLock");
 
@@ -150,6 +150,7 @@ public class Cs80UpDBS extends CommBuffer {
 //			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
 //				this.custRmk();
 //			}
+
 			if (!this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
 				if (tota.isError() && this.titaVo.isTrmtypBatch())
 					;

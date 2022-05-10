@@ -113,7 +113,8 @@ public class L7205 extends TradeBuffer {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
 			makeExcel.openExcel(filename, 1);
 
-			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 9).toString()).intValue() + 191100;
+			// 取得年月
+			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
 			this.info("fileYearMonth=" + fileYearMonth);
 
 			if (fileYearMonth != iYearMonth) {
@@ -143,6 +144,10 @@ public class L7205 extends TradeBuffer {
 			int facmno = parse.stringToInteger(tempOccursList.get("FacmNo"));
 			int yearmonth = parse.stringToInteger(tempOccursList.get("YearMonth"));
 			String assetclass = tempOccursList.get("AssetClass");
+			BigDecimal lawAmount = BigDecimal.ZERO;
+			if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
+				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
+			}
 
 			if (!(iYearMonth == yearmonth)) {
 				throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + yearmonth);
@@ -159,8 +164,14 @@ public class L7205 extends TradeBuffer {
 				CountF++; // 失敗筆數+1
 			} else {
 				tMonthlyFacBal.setAssetClass(assetclass);
+				
+				if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
+					tMonthlyFacBal.setLawAmount(lawAmount);
+				}
+
 				try {
 					tMothlyFacBalService.update(tMonthlyFacBal, titaVo);
+
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 				}
@@ -269,7 +280,7 @@ public class L7205 extends TradeBuffer {
 		BigDecimal iCustNo = BigDecimal.ZERO;
 		BigDecimal iFacmNo = BigDecimal.ZERO;
 		BigDecimal iAssetClass = BigDecimal.ZERO;
-
+		BigDecimal iLawAmount = BigDecimal.ZERO;
 		for (int i = 2; i <= lastRowNum; i++) {
 
 			OccursList occursList = new OccursList();
@@ -287,8 +298,7 @@ public class L7205 extends TradeBuffer {
 //			this.info("iAssetClass=" + makeExcel.getValue(i, 8).toString());
 		
 			//正常是連續的資料串，遇到空值強行結束
-			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length()==0 || makeExcel.getValue(i, 8).toString().length()==0) {
-			
+			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length()==0 || makeExcel.getValue(i, 8).toString().length()==0 || makeExcel.getValue(i, 9).toString().length()==0) {
 				break;
 			}
 			
@@ -297,7 +307,7 @@ public class L7205 extends TradeBuffer {
 				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
 				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
 				iAssetClass = new BigDecimal(makeExcel.getValue(i, 8).toString());
-
+				iLawAmount = new BigDecimal(makeExcel.getValue(i, 9).toString());
 			} catch (Exception e) {
 
 				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
@@ -315,6 +325,7 @@ public class L7205 extends TradeBuffer {
 			occursList.putParam("CustNo", iCustNo.intValue());
 			occursList.putParam("FacmNo", iFacmNo.intValue());
 			occursList.putParam("AssetClass", iAssetClass.intValue());
+			occursList.putParam("LawAmount", iLawAmount.intValue());
 
 			this.occursList.add(occursList);
 		}

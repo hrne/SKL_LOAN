@@ -10,7 +10,6 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryRecord;
-import com.st1.itx.db.domain.MlaundryRecordId;
 import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -47,7 +46,7 @@ public class L8204 extends TradeBuffer {
 	SendRsp sendRsp;
 
 //	private List<String> lStatusCode = new ArrayList<String>();
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8204 ");
@@ -60,6 +59,8 @@ public class L8204 extends TradeBuffer {
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		int iRecordDate = this.parse.stringToInteger(titaVo.getParam("RecordDate"));
 		int iFRecordDate = iRecordDate + 19110000;
+		
+		long iLogNo = Long.parseLong(titaVo.getParam("LogNo"));
 		this.info("L8204 iFRecordDate : " + iFRecordDate);
 
 		// 檢查輸入資料
@@ -68,64 +69,28 @@ public class L8204 extends TradeBuffer {
 		}
 
 		// 更新疑似洗錢交易訪談記錄檔
-		MlaundryRecord tMlaundryRecord = new MlaundryRecord();
-		MlaundryRecordId tMlaundryRecordId = new MlaundryRecordId();
+		this.info("iFuncCode: "+ iFuncCode);
 		switch (iFuncCode) {
 		case 1: // 新增
-			moveMlaundryRecord(tMlaundryRecord, tMlaundryRecordId, iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo, titaVo);
-			try {
-				this.info("1");
-				sMlaundryRecordService.insert(tMlaundryRecord);
-				this.info("L8204 ins : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-			} catch (DBException e) {
-				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", titaVo.getParam("CustNo")); // 新增資料已存在
-				} else {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
-			}
+		case 3: // 複製
+			insertMlaundryRecord(iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo,
+					titaVo);
 			break;
 		case 2: // 修改
-			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
-			this.info("L8204 upd : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-			if (tMlaundryRecord == null) {
-				throw new LogicException(titaVo, "E0003", titaVo.getParam("CustNo")); // 修改資料不存在
-			}
-			MlaundryRecord tMlaundryRecord2 = (MlaundryRecord) dataLog.clone(tMlaundryRecord); ////
-			try {
-				moveMlaundryRecord(tMlaundryRecord, tMlaundryRecordId, iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo, titaVo);
-				tMlaundryRecord = sMlaundryRecordService.update2(tMlaundryRecord,titaVo); ////
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
-			dataLog.setEnv(titaVo, tMlaundryRecord2, tMlaundryRecord); ////
-			dataLog.exec("修改疑似洗錢交易訪談記錄"); ////
-			break;
-		case 3: // 複製新增
-			moveMlaundryRecord(tMlaundryRecord, tMlaundryRecordId, iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo, titaVo);
-			try {
-				this.info("3");
-				sMlaundryRecordService.insert(tMlaundryRecord);
-				this.info("L8204 ins : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-			} catch (DBException e) {
-				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", titaVo.getParam("CustNo")); // 新增資料已存在
-				} else {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
-			}
+			updateMlaundryRecord(iLogNo, iFuncCode, iFRecordDate, iCustNo, iFacmNo,
+					iBormNo, titaVo);
 			break;
 		case 4: // 刪除
-			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
-			this.info("L8204 del : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
-			
-				// 刷主管卡後始可刪除
-				// 交易需主管核可
-				if (!titaVo.getHsupCode().equals("1")) {
-					// titaVo.getSupCode();
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-				}
-						
+			MlaundryRecord tMlaundryRecord = sMlaundryRecordService.findById(iLogNo, titaVo);
+			this.info("L8204 del : " + iLogNo);
+
+			// 刷主管卡後始可刪除
+			// 交易需主管核可
+			if (!titaVo.getHsupCode().equals("1")) {
+				// titaVo.getSupCode();
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+
 			if (tMlaundryRecord != null) {
 				try {
 					sMlaundryRecordService.delete(tMlaundryRecord);
@@ -139,35 +104,80 @@ public class L8204 extends TradeBuffer {
 			dataLog.exec("刪除疑似洗錢交易訪談記錄"); ////
 			break;
 		}
-		this.info("3");
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	private void moveMlaundryRecord(MlaundryRecord mMlaundryRecord, MlaundryRecordId mMlaundryRecordId, int mFuncCode, int mFRecordDate, int mCustNo, int mFacmNo, int mBormNo, TitaVo titaVo)
-			throws LogicException {
+	private void insertMlaundryRecord(int mFuncCode,
+			int mFRecordDate, int mCustNo, int mFacmNo, int mBormNo, TitaVo titaVo) throws LogicException {
 
-		mMlaundryRecordId.setRecordDate(mFRecordDate);
-		mMlaundryRecordId.setCustNo(mCustNo);
-		mMlaundryRecordId.setFacmNo(mFacmNo);
-		mMlaundryRecordId.setBormNo(mBormNo);
-		mMlaundryRecord.setMlaundryRecordId(mMlaundryRecordId);
+		MlaundryRecord tMlaundryRecord = new MlaundryRecord();
+			
+		setValues(tMlaundryRecord, mFuncCode, mFRecordDate, mCustNo, mFacmNo, mBormNo, titaVo);
+		
+		try {
+			this.info("L8204 ins : " + mFRecordDate + "-" + mCustNo + "-" + mFacmNo + "-"
+					+ mBormNo);
+			sMlaundryRecordService.insert(tMlaundryRecord);
+		} catch (DBException e) {
+			if (e.getErrorId() == 2) {
+				throw new LogicException(titaVo, "E0002", titaVo.getParam("CustNo")); // 新增資料已存在
+			} else {
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+		}
+	}
+	
+	private void updateMlaundryRecord(long iLogNo, int mFuncCode,
+			int mFRecordDate, int mCustNo, int mFacmNo, int mBormNo, TitaVo titaVo) throws LogicException {
+		
+		MlaundryRecord tMlaundryRecordToEdit = sMlaundryRecordService.holdById(iLogNo, titaVo);
+		
+		if (tMlaundryRecordToEdit == null)
+			throw new LogicException("E0007", "找不到目標 LogNo: " + iLogNo);
+		
+		MlaundryRecord tMlaundryRecordOriginal = (MlaundryRecord) dataLog.clone(tMlaundryRecordToEdit); ////
+		
+		setValues(tMlaundryRecordToEdit, mFuncCode, mFRecordDate, mCustNo, mFacmNo, mBormNo, titaVo);
+		
+		try {
 
-		mMlaundryRecord.setRepayDate(this.parse.stringToInteger(titaVo.getParam("RepayDate")));
-		mMlaundryRecord.setRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("RepayAmt")));
-		mMlaundryRecord.setActualRepayDate(this.parse.stringToInteger(titaVo.getParam("ActualRepayDate")));
-		mMlaundryRecord.setActualRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("ActualRepayAmt")));
-		mMlaundryRecord.setCareer(titaVo.getParam("Career"));
-		mMlaundryRecord.setIncome(titaVo.getParam("Income"));
-		mMlaundryRecord.setRepaySource(this.parse.stringToInteger(titaVo.getParam("RepaySource")));
-		mMlaundryRecord.setRepayBank(titaVo.getParam("RepayBank"));
-		mMlaundryRecord.setDescription(titaVo.getParam("Description"));
+			tMlaundryRecordToEdit = sMlaundryRecordService.update2(tMlaundryRecordToEdit, titaVo); ////
+		} catch (DBException e) {
+			if (e.getErrorId() == 2) {
+				throw new LogicException(titaVo, "E0002", titaVo.getParam("CustNo")); // 新增資料已存在
+			} else {
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+		}
+		dataLog.setEnv(titaVo, tMlaundryRecordOriginal, tMlaundryRecordToEdit); ////
+		dataLog.exec("修改疑似洗錢交易訪談記錄"); ////
+	}
+	
+	private void setValues(MlaundryRecord tMlaundryRecord, int mFuncCode,
+			int mFRecordDate, int mCustNo, int mFacmNo, int mBormNo, TitaVo titaVo) throws LogicException
+	{
+		tMlaundryRecord.setRecordDate(mFRecordDate);
+		tMlaundryRecord.setCustNo(mCustNo);
+		tMlaundryRecord.setFacmNo(mFacmNo);
+		tMlaundryRecord.setBormNo(mBormNo);
+		tMlaundryRecord.setRepayDate(this.parse.stringToInteger(titaVo.getParam("RepayDate")));
+		tMlaundryRecord.setRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("RepayAmt")));
+		tMlaundryRecord.setActualRepayDate(this.parse.stringToInteger(titaVo.getParam("ActualRepayDate")));
+		tMlaundryRecord.setActualRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("ActualRepayAmt")));
+		tMlaundryRecord.setCareer(titaVo.getParam("Career"));
+		tMlaundryRecord.setIncome(titaVo.getParam("Income"));
+		tMlaundryRecord.setRepaySource(this.parse.stringToInteger(titaVo.getParam("RepaySource")));
+		tMlaundryRecord.setRepayBank(titaVo.getParam("RepayBank"));
+		tMlaundryRecord.setDescription(titaVo.getParam("Description"));
 
 		if (mFuncCode != 2) {
-			mMlaundryRecord.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			mMlaundryRecord.setCreateEmpNo(titaVo.getTlrNo());
+			tMlaundryRecord.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tMlaundryRecord.setCreateEmpNo(titaVo.getTlrNo());
 		}
-		mMlaundryRecord.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-		mMlaundryRecord.setLastUpdateEmpNo(titaVo.getTlrNo());
+		tMlaundryRecord
+				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		tMlaundryRecord.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 }

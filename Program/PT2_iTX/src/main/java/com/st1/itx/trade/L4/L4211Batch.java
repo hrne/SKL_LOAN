@@ -24,7 +24,7 @@ import com.st1.itx.util.parse.Parse;
  */
 @Service("L4211Batch")
 @Scope("prototype")
-public class L4211Batch  extends TradeBuffer{
+public class L4211Batch extends TradeBuffer {
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -33,42 +33,71 @@ public class L4211Batch  extends TradeBuffer{
 	/* 日期工具 */
 	@Autowired
 	DateUtil dDateUtil;
-	
+
 	@Autowired
 	public WebClient webClient;
-	
+
 	@Autowired
 	public L4211Report l4211Report;
-	
+
 	@Autowired
 	public L4211Report2 l4211Report2;
-	
+
 	@Autowired
 	public L4211AServiceImpl l4211AServiceImpl;
-	
+
 	@Autowired
 	public L4211BServiceImpl l4211BServiceImpl;
-	
+
+	private String sendMsg = "";
+	private Boolean flag = true;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4211Batch ");
 		this.totaVo.init(titaVo);
 
-		if("1".equals(titaVo.get("FunctionCode"))) {
-		  //產生匯款總傳票明細表
-		  l4211Report.exec(titaVo);
-		} else {
-		  //產生匯款總傳票明細表依戶號排序
-		  l4211Report2.exec(titaVo);
-		}
-		String sendMsg = "L4211-報表已完成";
-		
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4211",
-				sendMsg, titaVo);
+		if ("1".equals(titaVo.get("FunctionCode"))) {
+			// 產生匯款總傳票明細表
 
-		
+			try {
+				l4211Report.exec(titaVo);
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+
+		} else {
+			// 產生匯款總傳票明細表依戶號排序
+
+			try {
+				l4211Report2.exec(titaVo);
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+
+		}
+
+		// 送出通知訊息
+		sendMessage(titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 
 	}
+
+	private void sendMessage(TitaVo titaVo) throws LogicException {
+		if (flag) {
+
+			sendMsg = "L4211-報表已完成";
+
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4211", sendMsg, titaVo);
+		} else {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4211", "", sendMsg,
+					titaVo);
+		}
+	}
+
 }

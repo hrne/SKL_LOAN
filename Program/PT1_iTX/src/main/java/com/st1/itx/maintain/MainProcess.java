@@ -334,16 +334,14 @@ public class MainProcess extends SysLogger {
 		}
 
 		/* 自動鎖定戶號 */
-		int LockCustNo = Integer.parseInt(this.titaVo.get("LockCustNo").toString());
-		long LockNo = Long.parseLong(this.titaVo.get("LockNo").toString());
-		if ((this.titaVo.getRelCodeI() <= 1 && this.titaVo.getActFgI() <= 1 && this.titaVo.isHcodeErase() && LockCustNo > 0 && LockNo > 0)
-				|| (this.titaVo.getRelCodeI() == 2 && this.titaVo.getActFgI() == 2 && this.titaVo.isHcodeErase() && this.titaVo.isHcodeErase() && LockCustNo > 0 && LockNo > 0)) {
-			lockControl.setTitaVo(this.titaVo);
+//		int LockCustNo = Integer.parseInt(this.titaVo.get("LockCustNo").toString());
+//		long LockNo = Long.parseLong(this.titaVo.get("LockNo").toString());
+//		if ((this.titaVo.getRelCodeI() <= 1 && this.titaVo.getActFgI() <= 1 && this.titaVo.isHcodeErase() && LockCustNo > 0 && LockNo > 0)
+//				|| (this.titaVo.getRelCodeI() == 2 && this.titaVo.getActFgI() == 2 && this.titaVo.isHcodeErase() && this.titaVo.isHcodeErase() && LockCustNo > 0 && LockNo > 0)) {
+//			lockControl.setTitaVo(this.titaVo);
 //			long newLockNo = lockControl.ToLock(Integer.parseInt(this.titaVo.get("LockCustNo").toString()), this.titaVo.getTxCode(), 0L);
-//			long newLockNo = lockControl.ToLock(this.titaVo,Integer.parseInt(this.titaVo.get("LockCustNo").toString()), this.titaVo.getTxCode(), 0L);
-			long newLockNo = lockControl.ToLock(Integer.parseInt(this.titaVo.get("LockCustNo").toString()), this.titaVo.getTxCode(), 0L);
-			this.titaVo.put("LockNo", String.valueOf(newLockNo));
-		}
+//			this.titaVo.put("LockNo", String.valueOf(newLockNo));
+//		}
 
 		/* FOR UPACTR CS13-SET-BOOKING */
 		this.setBooking();
@@ -651,8 +649,8 @@ public class MainProcess extends SysLogger {
 
 		}
 
-		this.titaVo.put("LockNo", String.valueOf(txFlow.getLockNo()));
-		this.titaVo.put("LockCustNo", String.valueOf(txFlow.getLockCustNo()));
+//		this.titaVo.put("LockNo", String.valueOf(txFlow.getLockNo()));
+//		this.titaVo.put("LockCustNo", String.valueOf(txFlow.getLockCustNo()));
 
 		txCom.setAcCnt(txFlow.getAcCnt());
 

@@ -75,19 +75,27 @@ public class L3702 extends TradeBuffer {
 		loanCustRmkId.setAcDate(iAcDate);
 		loanCustRmkId.setRmkNo(iRmkNo);
 
-		// 新增
+		// 新增或複製
 		if (iFunCd == 1) {
+						
 			// 測試該戶號是否存在客戶主檔
 			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
 			// 該戶號部存在客戶主檔 拋錯
 			if (tCustMain == null) {
 				throw new LogicException(titaVo, "E0005", "戶號" + iCustNo + ",不存在客戶主檔。");
 			}
-//			tLoanCustRmk = loanCustRmkService.findById(loanCustRmkId);
-//			// 新增時 該戶號,備忘錄序號查有資料 拋錯
-//			if (tLoanCustRmk != null) {
-//				throw new LogicException(titaVo, "E0002", "該戶號,備忘錄序號" + iCustNo + iRmkNo + "已存在於帳務備忘錄明細檔。");
-//			}
+			
+			// 額度
+			int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+			// 撥款序號
+			int iBormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
+			// 放款明細序號
+			int iBorxNo = parse.stringToInteger(titaVo.getParam("BorxNo"));
+			
+			// 新舊資料的額度和撥款都有可能為0
+			// 因此只檢查BorxNo
+			if (iBorxNo <= 0)
+				throw new LogicException(titaVo, "E0019", "交易內容檔序號（" + iBorxNo +"）不可為 0。");
 			
 			LoanCustRmk loanCustRmk = loanCustRmkService.maxRmkNoFirst(iCustNo, iAcDate + 19110000, titaVo);
 			if (loanCustRmk == null) {
@@ -105,18 +113,13 @@ public class L3702 extends TradeBuffer {
 
 			tLoanCustRmk.setLoanCustRmkId(loanCustRmkId);
 			tLoanCustRmk.setCustNo(iCustNo);
+			tLoanCustRmk.setFacmNo(iFacmNo);
+			tLoanCustRmk.setBormNo(iBormNo);
+			tLoanCustRmk.setBorxNo(iBorxNo);
 			tLoanCustRmk.setAcDate(iAcDate);
 			tLoanCustRmk.setRmkNo(iRmkNo);
 			tLoanCustRmk.setCustUKey(tCustMain.getCustUKey());
-//			tLoanCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
 			tLoanCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
-//			tLoanCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
-//			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
-
-			// 新增須刷主管卡 經理層級
-//			if (titaVo.getEmpNos().trim().isEmpty()) {
-//				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-//			}
 
 			/* 存入DB */
 			try {

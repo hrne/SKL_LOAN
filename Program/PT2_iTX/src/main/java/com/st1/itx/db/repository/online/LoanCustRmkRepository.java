@@ -28,8 +28,14 @@ public interface LoanCustRmkRepository extends JpaRepository<LoanCustRmk, LoanCu
   // CustNo = ,AND AcDate =  
   public Optional<LoanCustRmk> findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(int custNo_0, int acDate_1);
 
-  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BorxNo =
+  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BorxNo = 
   public Slice<LoanCustRmk> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, Pageable pageable);
+
+  // BorxNo >= ,AND BorxNo <= 
+  public Slice<LoanCustRmk> findAllByBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByCreateDateAsc(int borxNo_0, int borxNo_1, Pageable pageable);
+
+  // CustNo >= ,AND CustNo <= ,AND BorxNo >= ,AND BorxNo <= 
+  public Slice<LoanCustRmk> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndBorxNoGreaterThanEqualAndBorxNoLessThanEqual(int custNo_0, int custNo_1, int borxNo_2, int borxNo_3, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

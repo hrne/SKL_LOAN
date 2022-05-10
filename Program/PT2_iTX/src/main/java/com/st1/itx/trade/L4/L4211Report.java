@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -336,7 +337,7 @@ public class L4211Report extends MakeReport {
 //        this.toPdf(sno);
 	}
 
-	private void report1(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
+	private void report1(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
 		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
@@ -347,6 +348,24 @@ public class L4211Report extends MakeReport {
 		int pageCnt = 0;
 
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
+//		
+		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
+
+		// 暫存L4211相同科目同戶號TxAmt累加
+		if ("L4211".equals(txCode)) {
+			for (Map<String, String> tfnAllList : fnAllList) {
+
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("DetailSeq")),
+						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
+				if (!TxAmtMap.containsKey(tmp)) {
+					TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
+				} else {
+					TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				}
+			}
+		}
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
@@ -515,7 +534,19 @@ public class L4211Report extends MakeReport {
 
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
-				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
+
+				if ("L4211".equals(txCode)) {
+
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("DetailSeq")),
+							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
+					if (TxAmtMap.get(tmp) != null) {
+						this.print(0, 29, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
+					}
+				} else {
+					this.print(0, 29, dfTransferAmt, "R");// 匯款金額
+				}
 
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
@@ -535,14 +566,14 @@ public class L4211Report extends MakeReport {
 			this.print(0, 60, name);
 			this.print(0, 69, tfnAllList.get("CloseReasonCode"));
 
-			if ("9991231".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
+			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, 72, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
 			} else {
 				this.print(0, 72, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
 						+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 			}
-			
+
 			if (dfPrincipal.equals("0")) {
 				this.print(0, 102, "", "R"); // 本金
 			} else {
@@ -659,7 +690,7 @@ public class L4211Report extends MakeReport {
 		} // for
 	}
 
-	private void report2(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
+	private void report2(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
 		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
@@ -670,6 +701,24 @@ public class L4211Report extends MakeReport {
 		int pageCnt = 0;
 
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
+
+		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
+
+		// 暫存L4211相同科目同戶號TxAmt累加
+		if ("L4211".equals(txCode)) {
+			for (Map<String, String> tfnAllList : fnAllList) {
+
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("DetailSeq")),
+						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
+				if (!TxAmtMap.containsKey(tmp)) {
+					TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
+				} else {
+					TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				}
+			}
+		}
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
@@ -838,7 +887,20 @@ public class L4211Report extends MakeReport {
 
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
-				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
+
+				if ("L4211".equals(txCode)) {
+
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("DetailSeq")),
+							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
+					if (TxAmtMap.get(tmp) != null) {
+						this.print(0, 29, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
+					}
+
+				} else {
+					this.print(0, 29, dfTransferAmt, "R");// 匯款金額
+				}
 
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
@@ -858,14 +920,14 @@ public class L4211Report extends MakeReport {
 			this.print(0, 60, name);
 			this.print(0, 69, tfnAllList.get("CloseReasonCode"));
 
-			if ("9991231".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
+			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, 72, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
 			} else {
 				this.print(0, 72, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
 						+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 			}
-			
+
 			if (dfPrincipal.equals("0")) {
 				this.print(0, 102, "", "R"); // 本金
 			} else {
@@ -978,7 +1040,7 @@ public class L4211Report extends MakeReport {
 		} // for
 	}
 
-	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) {
+	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
 		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
 		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
@@ -989,6 +1051,26 @@ public class L4211Report extends MakeReport {
 		int pageCnt = 0;
 
 		String scode = ""; // 暫存流水序號(相同的時候匯款金額判斷不用出現)
+
+		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
+
+		// 暫存L4211相同科目同戶號TxAmt累加
+		if ("L4211".equals(txCode)) {
+
+			for (Map<String, String> tfnAllList : fnAllList) {
+
+				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+						parse.stringToInteger(tfnAllList.get("DetailSeq")),
+						parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
+				if (!TxAmtMap.containsKey(tmp)) {
+					TxAmtMap.put(tmp, getBigDecimal(tfnAllList.get("TxAmt")));
+				} else {
+					TxAmtMap.put(tmp, TxAmtMap.get(tmp).add(getBigDecimal(tfnAllList.get("TxAmt"))));
+				}
+			}
+		}
+
 		for (Map<String, String> tfnAllList : fnAllList) {
 
 			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
@@ -1157,7 +1239,18 @@ public class L4211Report extends MakeReport {
 
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, 16, tfnAllList.get("DetailSeq"), "C");// 匯款序號
-				this.print(0, 29, dfTransferAmt, "R");// 匯款金額
+
+				if ("L4211".equals(txCode)) {
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
+							parse.stringToInteger(tfnAllList.get("DetailSeq")),
+							parse.stringToInteger(tfnAllList.get("SortingForSubTotal")));
+
+					if (TxAmtMap.get(tmp) != null) {
+						this.print(0, 29, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
+					}
+				} else {
+					this.print(0, 29, dfTransferAmt, "R");// 匯款金額
+				}
 
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
@@ -1177,14 +1270,14 @@ public class L4211Report extends MakeReport {
 			this.print(0, 60, name);
 			this.print(0, 69, tfnAllList.get("CloseReasonCode"));
 
-			if ("9991231".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
+			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, 72, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
 			} else {
 				this.print(0, 72, showRocDate(tfnAllList.get("IntStartDate"), 1) + "-"
 						+ showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 			}
-			
+
 			if (dfPrincipal.equals("0")) {
 				this.print(0, 102, "", "R"); // 本金
 			} else {
@@ -1382,6 +1475,79 @@ public class L4211Report extends MakeReport {
 			this.print(0, 151, formatAmt(totalsumCollection, 0), "R");
 		}
 
+	}
+
+//	暫時紀錄戶號科目
+	/**
+	 * 
+	 * @author custNo <br>
+	 *         sortingForSubTotal <br>
+	 *
+	 */
+	private class tmpFacm {
+
+		public tmpFacm(int custNo, int detailSeq, int sortingForSubTotal) {
+			this.setCustNo(custNo);
+			this.setDetailSeq(detailSeq);
+			this.setSortingForSubTotal(sortingForSubTotal);
+		}
+
+		private int custNo = 0;
+		private int detailSeq = 0;
+		private int sortingForSubTotal = 0;
+
+		@Override
+		public String toString() {
+			return "tmpFacm [custNo=" + custNo + ", detailSeq=" + detailSeq + ", sortingForSubTotal="
+					+ sortingForSubTotal + "]";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + custNo;
+			result = prime * result + detailSeq;
+			result = prime * result + sortingForSubTotal;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			tmpFacm other = (tmpFacm) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (custNo != other.custNo)
+				return false;
+			if (detailSeq != other.detailSeq)
+				return false;
+			if (sortingForSubTotal != other.sortingForSubTotal)
+				return false;
+			return true;
+		}
+
+		private void setCustNo(int custNo) {
+			this.custNo = custNo;
+		}
+
+		private void setDetailSeq(int detailSeq) {
+			this.detailSeq = detailSeq;
+		}
+
+		private void setSortingForSubTotal(int sortingForSubTotal) {
+			this.sortingForSubTotal = sortingForSubTotal;
+		}
+
+		private L4211Report getEnclosingInstance() {
+			return L4211Report.this;
+		}
 	}
 
 }

@@ -151,7 +151,7 @@ public class L9731Report extends MakeReport {
 	 */
 	private void exportSheet1(TitaVo titaVo, List<Map<String, String>> listL9731, int rocYearMonth)
 			throws LogicException {
-		this.info("L9731Report exportSheet14");
+		this.info("L9731Report exportSheet1");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
@@ -160,7 +160,7 @@ public class L9731Report extends MakeReport {
 		} else {
 
 			int row = 2;
-			makeExcel.setValue(1, 9, rocYearMonth, "C");
+			makeExcel.setValue(1, 10, rocYearMonth, "C");
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
@@ -196,6 +196,10 @@ public class L9731Report extends MakeReport {
 						break;
 					case 14:// 資產分類
 						makeExcel.setValue(row, 8, fieldValue, "C");
+					case 17:// 是否有901 拍定不足額
+						BigDecimal amt901 = getBigDecimal(fieldValue);
+						makeExcel.setValue(row, 9, amt901, "#,##0", "R");	
+					
 					default:
 
 						break;

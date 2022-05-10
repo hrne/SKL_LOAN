@@ -396,11 +396,11 @@ T(2,#OOTitaSupNo+ +#OOSupItem)
 
 !經辦
 #OOTitaTlrNo=X,6,S
-#OOTlrItem=X,20,S
-#OOTitaTlrNoX=X,27,S
+#OOTlrItem=X,40,S
+#OOTitaTlrNoX=X,47,S
 T(2,#OOTitaTlrNo+ +#OOTlrItem)
 
-!序號
+!登放序號
 #OORelSeqNo=X,8,S
 T(1,#OORelTxseq,11,8)
 
@@ -410,6 +410,14 @@ T(2,#AcDate+0000000+#OORelTxseq)
 
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
+
+! 最後修改日期
+#OOLastUpdate=x,20,S
+T(2,#OOLastDate+ +#OOLastTime)
+
+! 最後修改人員
+#OOLastEmp=x,47,S
+T(2,#OOTitaTlrNo+ +#OOTlrItem)
 
 </sub>
 
@@ -461,6 +469,8 @@ TXFORM=L6905
 #OORelDy
 #OORelTxseq
 #OOSlipNo
+#OOLastUpdate
+
 ^
 </sub>
 
@@ -514,6 +524,11 @@ TXFORM=L6905
 {width:300,align:'left'}
 #OOSlipNo=傳票號碼
 {width:70,align:'center'}
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+#OOLastEmp=最後修改人員
+{width:120,align:'left'}
+
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6905;cpi=15"/>
 %

@@ -224,10 +224,13 @@ C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 @V(7)
 
+#RimCustNo=A,7,S
+
 #SendL8R51B=X,1,S
 E(0,#RimLogNo,#LogNo)
+E(0,#RimCustNo,#CustNo)
 RESET_RIM(#SendL8R51,L8R51)
-S(L8R51,1,#RimLogNo)
+S(L8R51,1,#RimLogNo,#RimCustNo)
 R(1,L8R51)
 
 #SETA=X,1,S

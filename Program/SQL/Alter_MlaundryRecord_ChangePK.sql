@@ -3,5 +3,5 @@ ALTER TABLE "MlaundryRecord" ADD "LogNo" DECIMAL(11);
 UPDATE "MlaundryRecord" SET "MlaundryRecord"."LogNo" = rownum;
 ALTER TABLE "MlaundryRecord" MODIFY ("LogNo" DECIMAL(11) NOT NULL);
 ALTER TABLE "MlaundryRecord" DROP PRIMARY KEY;
-ALTER TABLE "MlaundryRecord" ADD CONSTRAINT "MlaundryRecord_PK" PRIMARY KEY ("LogNo");
+ALTER TABLE "MlaundryRecord" ADD CONSTRAINT "MlaundryRecord_PK2" PRIMARY KEY ("LogNo");
 CREATE SEQUENCE "MlaundryRecord_SEQ" MINVALUE 1 MAXVALUE 2147483647 INCREMENT BY 1 START WITH 1 NOCACHE CYCLE;

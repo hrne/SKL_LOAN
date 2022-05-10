@@ -435,18 +435,21 @@ public class L9717Report extends MakeReport {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
+							
 							if (list.size() == 14) {
+								amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 								list.set(i - 1, amt);
 							} else {
+								amt = new BigDecimal(tLDVo.get("F" + i));
 								list.add(amt);
 							}
 						} else {
-							ovdu = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 
 							if (list.size() == 14) {
+								ovdu = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 								list.set(i - 1, ovdu);
 							} else {
+								ovdu = new BigDecimal(tLDVo.get("F" + i));
 								list.add(ovdu);
 							}
 						}
@@ -477,18 +480,21 @@ public class L9717Report extends MakeReport {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 							if (list.size() == 14) {
+								amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 								list.set(i - 2, amt);
 							} else {
+								amt = new BigDecimal(tLDVo.get("F" + i));
 								list.add(amt);
 							}
 						} else {
-							ovdu = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 
 							if (list.size() == 14) {
+								ovdu = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 								list.set(i - 2, ovdu);
 							} else {
+								ovdu = new BigDecimal(tLDVo.get("F" + i));
+
 								list.add(ovdu);
 							}
 						}

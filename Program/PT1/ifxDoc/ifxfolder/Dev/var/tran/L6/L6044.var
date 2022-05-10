@@ -188,6 +188,11 @@ T(2,#OOTlrNo+ +#OOTlrItem)
 #OOSupNoItem=X,27,L
 T(2,#OOSupNo+ +#OOSupItem)
 
+!最後修改人員&日期
+#OOLastUpdate=x,20,S
+
+#OOLastEmp=x,47,S
+
 </sub>
 
 
@@ -217,6 +222,8 @@ TXFORM=L6044
 #OOTlrItem
 #OOSupItem
 #OODateTime
+#OOLastUpdate
+#OOLastEmp
 ^
 </sub>
 
@@ -255,6 +262,12 @@ TXFORM=L6044
 
 #OOTxSeq=交易序號
 {width:130,align:'left'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 
 ^
 
