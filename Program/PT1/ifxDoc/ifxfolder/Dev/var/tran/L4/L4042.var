@@ -435,6 +435,8 @@ TXFORM=L4042
 {width:100}
 #OORetrDate=提回日期
 {width:100}
+#OOStampFinishDate=核印完成日期
+{width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
 #OOBTN_HISTORY=歷程
@@ -472,6 +474,8 @@ TXFORM=L4042
 {width:100}
 #OORetrDate=提回日期
 {width:100}
+#OOStampFinishDate=核印完成日期
+{width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
 #OOBTN_HISTORY=歷程
@@ -508,6 +512,8 @@ TXFORM=L4042
 {width:100}
 #OORetrDate=提回日期
 {width:100}
+#OOStampFinishDate=核印完成日期
+{width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
 #OOBTN_HISTORY=歷程
@@ -543,6 +549,8 @@ TXFORM=L4042
 #OOPropDate=提出日期
 {width:100}
 #OORetrDate=提回日期
+{width:100}
+#OOStampFinishDate=核印完成日期
 {width:100}
 #OOBTN_CONNECT=帳號
 {search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}

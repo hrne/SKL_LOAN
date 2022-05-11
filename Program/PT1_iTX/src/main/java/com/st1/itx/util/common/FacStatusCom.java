@@ -26,42 +26,50 @@ public class FacStatusCom {
 	/* 日期工具 */
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	@Autowired
 	LoanBorMainService loanBorMainService;
-	
+
 	/**
 	 * 額度
+	 * 
 	 * @return
 	 */
 	public int getFacmNo() {
 		return facmNo;
 	}
-	
-	private int  facmNo = 0;
-	
+
+	private int facmNo = 0;
+
 	/**
 	 * 設定額度戶況
 	 * 
 	 * @param lLoanBorMain List of LoanBorMain
-	 * @param tbsdy        會計日期 
-	 * @return status 0.正常戶  1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶 8.債權轉讓戶 9.呆帳結案戶
+	 * @param tbsdy        會計日期
+	 * @return status 0.正常戶 1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶
+	 *         8.債權轉讓戶 9.呆帳結案戶
 	 * @throws LogicException LogicException
 	 */
 	public int settingStatus(List<LoanBorMain> lLoanBorMain, int tbsdy) throws LogicException {
 		int priorty = 11;
 		int status = 0;
-//	 priority    status  
-//		  1  --  6.呆帳戶
-//		  2  --  7.部分轉呆戶
-//		  3  --  2.催收戶
-//		  4  --  4.逾期戶(正常戶逾期超過一個月)
-//		  5  --  0.正常戶
-//		  6  --  5.催收結案戶
-//		  7  --  8.債權轉讓戶
-//		  8  --  9.呆帳結案戶
-//		  9  --  3.結案戶
-//       10  --  1.展期戶
+
+		// 2022-05-10 智偉增加:防呆
+		if (lLoanBorMain == null || lLoanBorMain.isEmpty()) {
+			this.facmNo = 0;
+			return status;
+		}
+		// priority status
+		// 1 -- 6.呆帳戶
+		// 2 -- 7.部分轉呆戶
+		// 3 -- 2.催收戶
+		// 4 -- 4.逾期戶(正常戶逾期超過一個月)
+		// 5 -- 0.正常戶
+		// 6 -- 5.催收結案戶
+		// 7 -- 8.債權轉讓戶
+		// 8 -- 9.呆帳結案戶
+		// 9 -- 3.結案戶
+		// 10 -- 1.展期戶
 		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
 			if (tmpLoanBorMain.getStatus() < 90) {
 				switch (tmpLoanBorMain.getStatus()) {
@@ -134,35 +142,40 @@ public class FacStatusCom {
 			}
 		}
 		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
-			if (tmpLoanBorMain.getStatus() ==  tmpLoanBorMain.getStatus()) {
-                this.facmNo = tmpLoanBorMain.getFacmNo();
+			if (tmpLoanBorMain.getStatus() == tmpLoanBorMain.getStatus()) {
+				this.facmNo = tmpLoanBorMain.getFacmNo();
 			}
 		}
 		return status;
 	}
 
-	
-	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy,TitaVo titaVo) throws LogicException {
+	public int getLoanStatus(int iCustNo, int iFacmNo, int tbsdy, TitaVo titaVo) throws LogicException {
 		int priorty = 11;
 		int status = 0;
-//	 priority    status  
-//		  1  --  6.呆帳戶
-//		  2  --  7.部分轉呆戶
-//		  3  --  2.催收戶
-//		  4  --  4.逾期戶(正常戶逾期超過一個月)
-//		  5  --  0.正常戶
-//		  6  --  5.催收結案戶
-//		  7  --  8.債權轉讓戶
-//		  8  --  9.呆帳結案戶
-//		  9  --  3.結案戶
-//       10  --  1.展期戶
+		// priority status
+		// 1 -- 6.呆帳戶
+		// 2 -- 7.部分轉呆戶
+		// 3 -- 2.催收戶
+		// 4 -- 4.逾期戶(正常戶逾期超過一個月)
+		// 5 -- 0.正常戶
+		// 6 -- 5.催收結案戶
+		// 7 -- 8.債權轉讓戶
+		// 8 -- 9.呆帳結案戶
+		// 9 -- 3.結案戶
+		// 10 -- 1.展期戶
 
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 		Slice<LoanBorMain> slLoanBorMain = null;
-		
-		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
+
+		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE,
+				titaVo);
 
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+
+		// 2022-05-10 智偉增加:防呆
+		if (lLoanBorMain == null || lLoanBorMain.isEmpty()) {
+			return status;
+		}
 		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
 			if (tmpLoanBorMain.getStatus() < 90) {
 				switch (tmpLoanBorMain.getStatus()) {

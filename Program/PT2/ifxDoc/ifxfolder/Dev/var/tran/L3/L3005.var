@@ -368,7 +368,7 @@ T(2,#TimCustNo)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L3072; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,帳務備忘錄)
+K(MODIFYBUTTON,1,帳務備忘錄（原系統）)
 
 
 #OCustNo=A,7,L
@@ -519,14 +519,14 @@ IF(#OOAcFg=="",T(3,內容),T(3,內容查詢))
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 
 !查詢buf
-#OOBTNRMKNTXBUF=X,18,S
-T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
+#OOBTNRMKNTXBUF=X,25,S
+T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOAcDate)
 
 !buf
 !最新格式參照L3702 功能1
-!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo 1-7-3-3-4
-#OOBUFCreate=X,19,S
-T(2,1+#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
+!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo-AcDate 1-7-3-3-4-7
+#OOBUFCreate=X,26,S
+T(2,1+#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOAcDate)
 
 !有備忘錄時提供查詢按鈕，否則為新增按鈕
 #OOBTNRMK=X,1,S

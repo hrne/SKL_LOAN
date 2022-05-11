@@ -193,10 +193,10 @@ public class L4601Report extends MakeReport {
 					this.print(1, 0, "");
 
 					if (reporttype == 1) {
+						this.print(0, 21, t.getAddress());
+					} else {
 						this.print(0, 21, "建號： " + t.getPostalCode());
 						this.print(0, 48, t.getAddress());
-					} else {
-						this.print(0, 21, t.getAddress());
 					}
 					rowcount = rowcount + 2;
 					tempcustno = t.getCustNo();

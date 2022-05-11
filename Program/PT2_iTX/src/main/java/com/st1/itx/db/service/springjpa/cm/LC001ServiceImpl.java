@@ -41,7 +41,7 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iMrKey = " + iCustNo);
 		String iMkey = "";
 		if (!iCustNo.equals("0000000")) {
-			iMkey = iCustNo + "-%";
+			iMkey = iCustNo + "%";
 		}
 		this.info("iMkey = " + iMkey);
 

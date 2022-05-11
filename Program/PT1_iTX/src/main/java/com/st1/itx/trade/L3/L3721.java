@@ -215,12 +215,12 @@ public class L3721 extends TradeBuffer {
 			if ("Y".equals(iDeleteFg)) {
 				throw new LogicException(titaVo, "E0010", "刪除，不可修正"); // 功能選擇錯誤
 			}
-			EntryModifyRoutine();
+			EntryEraseRoutine();
 			EntryNormalRoutine();
 		}
 		// 訂正
-		if (titaVo.isHcodeErase()) {
-			throw new LogicException(titaVo, "E0010", "不可訂正"); // 功能選擇錯誤
+		if (titaVo.isHcodeErase() && titaVo.isActfgEntry()) {
+			EntryEraseRoutine();
 		}
 		// 放行
 		if (titaVo.isActfgSuprele()) {
@@ -280,13 +280,13 @@ public class L3721 extends TradeBuffer {
 			// 新增放款利率變動檔
 			if ("Y".equals(iDeleteFg)) {
 				wkEffectDate = iEffectDate;
-				//變更,刪除利率新增DATELOG,新增不寫DATELOG
+				// 變更,刪除利率新增DATELOG,新增不寫DATELOG
 				DelLoanRateChangeRoutine(wkEffectDate);
 			} else {
 				if (wkInsertFlag.equals("Y")) {
 					InsLoanRateChangeRoutine();
 				} else {
-					//變更,刪除利率新增DATELOG,新增不寫DATELOG
+					// 變更,刪除利率新增DATELOG,新增不寫DATELOG
 					UpdLoanRateChangeRoutine();
 				}
 				// 新增自訂利率的機動利率的預調利率
@@ -514,7 +514,7 @@ public class L3721 extends TradeBuffer {
 		this.info("UpdLoanRateChangeRoutine ...");
 
 		beforeLoanRateChange = (LoanRateChange) datalog.clone(tLoanRateChange);
-		
+
 		tLoanRateChange.setRateCode(iRateCode);
 		tLoanRateChange.setProdNo(iProdNo);
 		tLoanRateChange.setBaseRateCode(iBaseRateCode);
@@ -545,7 +545,7 @@ public class L3721 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0006", "放款利率變動檔"); // 鎖定資料時，發生錯誤
 		}
 		try {
-			
+
 			datalog.setEnv(titaVo, tLoanRateChange, tLoanRateChange);
 			datalog.exec("刪除放款利率變動檔");
 			loanRateChangeService.delete(tLoanRateChange, titaVo);
@@ -720,7 +720,7 @@ public class L3721 extends TradeBuffer {
 		}
 	}
 
-	private void EntryModifyRoutine() throws LogicException {
+	private void EntryEraseRoutine() throws LogicException {
 		this.info("EntryModifyRoutine ... ");
 
 		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
@@ -756,6 +756,11 @@ public class L3721 extends TradeBuffer {
 			// 刪除放款利率變動檔(預調利率)
 			if (wkNextRateAdjDate > 0) {
 				DelLoanRateChangeNextAdj(wkNextRateAdjDate);
+			}
+			// 註記交易內容檔
+			if (titaVo.isHcodeErase()) {
+				loanCom.setLoanBorTxHcode(wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, wkNewBorxNo,
+						tLoanBorMain.getLoanBal(), titaVo);
 			}
 			// 刪除原交易內容檔
 			if (titaVo.isHcodeModify()) {

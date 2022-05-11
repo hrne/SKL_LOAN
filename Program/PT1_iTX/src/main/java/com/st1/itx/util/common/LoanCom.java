@@ -19,6 +19,8 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
+import com.st1.itx.db.domain.TxRecord;
+import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.CdBankService;
@@ -27,6 +29,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
@@ -79,6 +82,8 @@ public class LoanCom extends TradeBuffer {
 	public LoanBorMainService loanBorMainService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
+	@Autowired
+	public TxRecordService txRecordService;
 
 	@Autowired
 	Parse parse;
@@ -270,9 +275,9 @@ public class LoanCom extends TradeBuffer {
 		}
 		// 新增放款交易內容檔(入帳金額轉暫收款-冲正產生)
 		if ("3".equals(tLoanBorTx2.getTitaHCode()) && tLoanBorTx2.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
-			addFacmBorTxNextDateErase(tLoanBorTx2,  titaVo);	
+			addFacmBorTxNextDateErase(tLoanBorTx2, titaVo);
 		}
-		
+
 	}
 
 	/**
@@ -1124,8 +1129,14 @@ public class LoanCom extends TradeBuffer {
 
 		if (ln.getLastEntDy() != titaVo.getOrgEntdyI() || !ln.getLastKinbr().equals(titaVo.getOrgKin())
 				|| !ln.getLastTlrNo().equals(titaVo.getOrgTlr()) || !ln.getLastTxtNo().equals(titaVo.getOrgTno())) {
+			TxRecord tTxRecord = txRecordService.findById(new TxRecordId(ln.getLastEntDy() + 19110000,
+					ln.getLastKinbr() + ln.getLastTlrNo() + ln.getLastTxtNo()), titaVo);
+			String s = "";
+			if (tTxRecord != null) {
+				s = ", " + tTxRecord.getTranNo() + (tTxRecord.getFlowStep() == 2 ? "主管放行" : "");
+			}
 			throw new LogicException(titaVo, "E3088", "最近一筆交易序號 = " + ln.getLastEntDy() + "-" + ln.getLastKinbr() + "-"
-					+ ln.getLastTlrNo() + "-" + ln.getLastTxtNo()); // 放款交易訂正須由最後一筆交易開始訂正
+					+ ln.getLastTlrNo() + "-" + ln.getLastTxtNo() + s); // 放款交易訂正須由最後一筆交易開始訂正
 		}
 		// 登錄訂正
 		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {

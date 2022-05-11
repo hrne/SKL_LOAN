@@ -47,7 +47,7 @@ E(0,0)
 ["#FdNo0+備忘錄序號",#RmkNo], 
 !["#FdNo1+備忘錄代碼",#RmkCode,#RmkCodeX],
 ["#FdRmkDesc+備忘錄說明",#RmkDesc],
-["#FdEmpNm+經辦姓名",#EmpName],
+["#FdEmpNm+建檔經辦",#EmpName],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -103,7 +103,7 @@ C(3,#CHAIN,1,$,S)
 E(0,1)
 ASGN(CAUTO$)
 
-!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo 1-7-3-3-4
+!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo-AcDate 1-7-3-3-4-7
 !其他時: FunCd-CustNo-AcDate-RmkNo 1-7-7-3
 #NTXBUF=X,156,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -113,13 +113,14 @@ T(1,@CustNo,#NTXBUF,2,7)
 C(3,#FunCd,1,T(1,@FacmNo,#NTXBUF,9,3),$)
 C(3,#FunCd,1,T(1,@BormNo,#NTXBUF,12,3),$)
 C(3,#FunCd,1,T(1,@BorxNo,#NTXBUF,15,4),$)
+C(3,#FunCd,1,T(1,@AcDate,#NTXBUF,19,7),$)
 C(3,#FunCd,1,s,$)
 T(1,@AcDate,#NTXBUF,9,7)
 T(1,@RmkNo,#NTXBUF,16,3)
 T(1,@CHAIN_AcDate,#NTXBUF,9,7)
 T(1,@CHAIN_RmkNo,#NTXBUF,16,3)
 #FdAcDate=X,2,L
-C(2,#FunCd,T(3,),T(3,*),T(3,),T(3,*),T(3,),T(3,))
+C(2,#FunCd,T(3,),T(3, ),T(3,),T(3, ),T(3,),T(3,))
 C(5,#FdAcDate,*,T(F,@AcDate,1),T(F,@AcDate,0))
 
 !調RIM參數
@@ -251,7 +252,7 @@ C(2,#FunCd,$,T(4,EMPNM$),T(4,EMPNM$),$,$,$,$)
 E(0,#SYSDATE)
 
 #AcDate=D,7,I
-C(2,#FunCd,s,$,s,$,s,s)
+C(2,#FunCd,s,s,s,s,s,s)
 @
 V(7)
 A(DATE,0,#AcDate)

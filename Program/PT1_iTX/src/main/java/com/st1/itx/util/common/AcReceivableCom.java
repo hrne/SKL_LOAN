@@ -142,10 +142,18 @@ public class AcReceivableCom extends TradeBuffer {
 					else
 						wkRvFg = 0;
 				}
+				// L3250 暫收款退還沖正(轉換前交易)，一律為起帳
+				if ("L3250".equals(titaVo.getTxcd())) {
+					wkRvFg = 0;
+				}
+
 				// 銷帳業務科目
 				wkAcctCode = ac.getAcctCode();
 				if (tTempVo.getParam("RvAcctCode").length() == 3) {
 					wkAcctCode = tTempVo.getParam("RvAcctCode");
+				}
+				if (tTempVo.getParam("OpenAcDate").length() > 0) {
+					wkOpenAcDate = parse.stringToInteger(tTempVo.getParam("OpenAcDate"));
 				}
 				wkRvNo = ac.getRvNo().trim();
 				// 短繳本金Zxx銷帳，除銷放款科目帳外，需另作短繳本金Zxx銷帳
@@ -558,7 +566,12 @@ public class AcReceivableCom extends TradeBuffer {
 		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) < 0
 				|| tAcReceivable.getAcBal().compareTo(BigDecimal.ZERO) < 0) {
 			this.info("銷帳金額超過原入帳金額 :" + ", bizTbsdy=" + bizTbsdy + ", AcBal=" + tAcReceivable.getRvBal());
-			throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivableId + "銷帳金額超過原入帳金額");
+			if (titaVo.isHcodeErase()) {
+				throw new LogicException(titaVo, "E6003",
+						"AcReceivable update " + tAcReceivableId + "銷帳金額超過原入帳金額，請依序訂正");
+			} else {
+				throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivableId + "銷帳金額超過原入帳金額");
+			}
 		}
 
 		this.info("AcReceivable update End :" + tAcReceivable.toString());

@@ -437,8 +437,6 @@ ifxBatch:{
 {width:100}
 #OOAuthStatusX=失敗原因
 {width:100}
-#OOStampFinishDate=核印完成日期
-{width:100}
 
 ^
 #RPTFG=2,QUERY.GRID
