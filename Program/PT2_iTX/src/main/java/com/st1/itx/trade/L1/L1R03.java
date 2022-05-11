@@ -93,7 +93,7 @@ public class L1R03 extends TradeBuffer {
 		// 資產負債表
 		FinReportDebtId finReportDebtId = new FinReportDebtId();
 		finReportDebtId.setCustUKey(iCustUKey);
-		finReportDebtId.setUKey(iUKey);
+		finReportDebtId.setUkey(iUKey);
 
 		FinReportDebt finReportDebt = finReportDebtService.findById(finReportDebtId, titaVo);
 
@@ -211,7 +211,7 @@ public class L1R03 extends TradeBuffer {
 			if (finReportDebt2 != null) {
 				FinReportProfitId finReportProfitId2 = new FinReportProfitId();
 				finReportProfitId2.setCustUKey(finReportDebt2.getCustUKey());
-				finReportProfitId2.setUkey(finReportDebt2.getUKey());
+				finReportProfitId2.setUkey(finReportDebt2.getUkey());
 
 				FinReportProfit finReportProfit2 = finReportProfitService.findById(finReportProfitId2, titaVo);
 				if (finReportProfit2 != null) {
@@ -250,7 +250,7 @@ public class L1R03 extends TradeBuffer {
 		// 現金流量表
 		FinReportCashFlowId finReportCashFlowId = new FinReportCashFlowId();
 		finReportCashFlowId.setCustUKey(iCustUKey);
-		finReportCashFlowId.setUKey(iUKey);
+		finReportCashFlowId.setUkey(iUKey);
 
 		FinReportCashFlow finReportCashFlow = finReportCashFlowService.findById(finReportCashFlowId, titaVo);
 
@@ -279,7 +279,7 @@ public class L1R03 extends TradeBuffer {
 
 		FinReportRateId finReportRateId = new FinReportRateId();
 		finReportRateId.setCustUKey(iCustUKey);
-		finReportRateId.setUKey(iUKey);
+		finReportRateId.setUkey(iUKey);
 
 		FinReportRate finReportRate = finReportRateService.findById(finReportRateId, titaVo);
 
@@ -341,7 +341,7 @@ public class L1R03 extends TradeBuffer {
 
 		FinReportQualityId finReportQualityId = new FinReportQualityId();
 		finReportQualityId.setCustUKey(iCustUKey);
-		finReportQualityId.setUKey(iUKey);
+		finReportQualityId.setUkey(iUKey);
 
 		FinReportQuality finReportQuality = finReportQualityService.findById(finReportQualityId, titaVo);
 
@@ -370,7 +370,7 @@ public class L1R03 extends TradeBuffer {
 
 		FinReportReviewId finReportReviewId = new FinReportReviewId();
 		finReportReviewId.setCustUKey(iCustUKey);
-		finReportReviewId.setUKey(iUKey);
+		finReportReviewId.setUkey(iUKey);
 
 		FinReportReview finReportReview = finReportReviewService.findById(finReportReviewId, titaVo);
 

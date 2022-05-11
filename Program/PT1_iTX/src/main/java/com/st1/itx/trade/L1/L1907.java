@@ -68,7 +68,7 @@ public class L1907 extends TradeBuffer {
 
 //		String iCustFullname = titaVo.getParam("CustFullname");
 
-		CustMain iCustMain = new CustMain();
+		new CustMain();
 		Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(custMain.getCustUKey(), this.index, this.limit, titaVo);
 		List<FinReportDebt> lFinReportDebt = slFinReportDebt == null ? null : slFinReportDebt.getContent();
 
@@ -79,7 +79,7 @@ public class L1907 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("OCustUKey", tFinReportDebt.getCustUKey());
-				occursList.putParam("OUKey", tFinReportDebt.getUKey());
+				occursList.putParam("OUKey", tFinReportDebt.getUkey());
 				occursList.putParam("OCustId", iCustId);
 				occursList.putParam("OYear", tFinReportDebt.getStartYY() - 1911);
 				occursList.putParam("OMonth", tFinReportDebt.getStartMM() + "~" + tFinReportDebt.getEndMM());

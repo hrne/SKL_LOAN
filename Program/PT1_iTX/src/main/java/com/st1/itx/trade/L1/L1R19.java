@@ -90,7 +90,7 @@ public class L1R19 extends TradeBuffer {
 		if (finReportDebt != null) {
 			FinReportProfitId finReportProfitId = new FinReportProfitId();
 			finReportProfitId.setCustUKey(finReportDebt.getCustUKey());
-			finReportProfitId.setUkey(finReportDebt.getUKey());
+			finReportProfitId.setUkey(finReportDebt.getUkey());
 
 			FinReportProfit FinReportProfit = iFinReportProfitService.findById(finReportProfitId, titaVo);
 			if (FinReportProfit != null) {
@@ -143,7 +143,7 @@ public class L1R19 extends TradeBuffer {
 				this.info("資產負債表無去年資料回傳0");
 				totaVo.putParam("L1R19GrowRate", 0);
 			} else {
-				iLastUKey = iFinReportDebt.getUKey();
+				iLastUKey = iFinReportDebt.getUkey();
 				FinReportProfitId iFinReportProfitId = new FinReportProfitId();
 				iFinReportProfitId.setCustUKey(iCustUKey);
 				iFinReportProfitId.setUkey(iLastUKey);

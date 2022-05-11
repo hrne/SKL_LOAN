@@ -114,7 +114,7 @@ public class L1107 extends TradeBuffer {
 
 			FinReportDebtId finReportDebtId = new FinReportDebtId();
 			finReportDebtId.setCustUKey(iCustUKey);
-			finReportDebtId.setUKey(iUKey);
+			finReportDebtId.setUkey(iUKey);
 			finReportDebt.setFinReportDebtId(finReportDebtId);
 
 			finReportDebt = setFinReportDebt(titaVo, finReportDebt);
@@ -133,7 +133,7 @@ public class L1107 extends TradeBuffer {
 		} else if ("2".equals(iFunCd)) { // 修改
 			FinReportDebtId finReportDebtId = new FinReportDebtId();
 			finReportDebtId.setCustUKey(iCustUKey);
-			finReportDebtId.setUKey(iUKey);
+			finReportDebtId.setUkey(iUKey);
 
 			FinReportDebt finReportDebt = finReportDebtService.holdById(finReportDebtId, titaVo);
 
@@ -157,7 +157,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportDebt2, finReportDebt);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.資產負債表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -172,7 +172,7 @@ public class L1107 extends TradeBuffer {
 		} else if ("4".equals(iFunCd)) { // 刪除
 			FinReportDebtId finReportDebtId = new FinReportDebtId();
 			finReportDebtId.setCustUKey(iCustUKey);
-			finReportDebtId.setUKey(iUKey);
+			finReportDebtId.setUkey(iUKey);
 
 			FinReportDebt finReportDebt = finReportDebtService.holdById(finReportDebtId, titaVo);
 
@@ -191,7 +191,7 @@ public class L1107 extends TradeBuffer {
 
 			FinReportCashFlowId finReportCashFlowId = new FinReportCashFlowId();
 			finReportCashFlowId.setCustUKey(iCustUKey);
-			finReportCashFlowId.setUKey(iUKey);
+			finReportCashFlowId.setUkey(iUKey);
 
 			FinReportCashFlow finReportCashFlow = finReportCashFlowService.holdById(finReportCashFlowId, titaVo);
 
@@ -208,7 +208,7 @@ public class L1107 extends TradeBuffer {
 
 			FinReportRateId finReportRateId = new FinReportRateId();
 			finReportRateId.setCustUKey(iCustUKey);
-			finReportRateId.setUKey(iUKey);
+			finReportRateId.setUkey(iUKey);
 
 			FinReportRate finReportRate = finReportRateService.holdById(finReportRateId, titaVo);
 
@@ -225,7 +225,7 @@ public class L1107 extends TradeBuffer {
 
 			FinReportQualityId finReportQualityId = new FinReportQualityId();
 			finReportQualityId.setCustUKey(iCustUKey);
-			finReportQualityId.setUKey(iUKey);
+			finReportQualityId.setUkey(iUKey);
 
 			FinReportQuality finReportQuality = finReportQualityService.holdById(finReportQualityId, titaVo);
 
@@ -242,7 +242,7 @@ public class L1107 extends TradeBuffer {
 
 			FinReportReviewId finReportReviewId = new FinReportReviewId();
 			finReportReviewId.setCustUKey(iCustUKey);
-			finReportReviewId.setUKey(iUKey);
+			finReportReviewId.setUkey(iUKey);
 
 			FinReportReview finReportReview = finReportReviewService.holdById(finReportReviewId, titaVo);
 
@@ -267,7 +267,7 @@ public class L1107 extends TradeBuffer {
 
 		FinReportReviewId finReportReviewId = new FinReportReviewId();
 		finReportReviewId.setCustUKey(iCustUKey);
-		finReportReviewId.setUKey(iUKey);
+		finReportReviewId.setUkey(iUKey);
 
 		FinReportReview finReportReview = finReportReviewService.holdById(finReportReviewId, titaVo);
 
@@ -321,7 +321,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportReview2, finReportReview);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.覆審比率表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.覆審比率表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -343,7 +343,7 @@ public class L1107 extends TradeBuffer {
 
 		FinReportQualityId finReportQualityId = new FinReportQualityId();
 		finReportQualityId.setCustUKey(iCustUKey);
-		finReportQualityId.setUKey(iUKey);
+		finReportQualityId.setUkey(iUKey);
 
 		FinReportQuality finReportQuality = finReportQualityService.holdById(finReportQualityId, titaVo);
 
@@ -376,7 +376,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportQuality2, finReportQuality);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.財報品質", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.財報品質", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -398,7 +398,7 @@ public class L1107 extends TradeBuffer {
 
 		FinReportRateId finReportRateId = new FinReportRateId();
 		finReportRateId.setCustUKey(iCustUKey);
-		finReportRateId.setUKey(iUKey);
+		finReportRateId.setUkey(iUKey);
 
 		FinReportRate finReportRate = finReportRateService.holdById(finReportRateId, titaVo);
 
@@ -448,7 +448,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportRate2, finReportRate);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.財務比率表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.財務比率表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -470,7 +470,7 @@ public class L1107 extends TradeBuffer {
 
 		FinReportCashFlowId finReportCashFlowId = new FinReportCashFlowId();
 		finReportCashFlowId.setCustUKey(iCustUKey);
-		finReportCashFlowId.setUKey(iUKey);
+		finReportCashFlowId.setUkey(iUKey);
 
 		FinReportCashFlow finReportCashFlow = finReportCashFlowService.holdById(finReportCashFlowId, titaVo);
 
@@ -504,7 +504,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportCashFlow2, finReportCashFlow);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.現金流量表", "CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.現金流量表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {
@@ -568,7 +568,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportProfit2, finReportProfit);
-					dataLog.exec("修改顧客 " + iCustId + "/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {

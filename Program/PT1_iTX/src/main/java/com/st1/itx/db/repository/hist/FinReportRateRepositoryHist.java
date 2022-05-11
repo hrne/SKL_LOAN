@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,12 +22,13 @@ import com.st1.itx.db.domain.FinReportRateId;
  */
 public interface FinReportRateRepositoryHist extends JpaRepository<FinReportRate, FinReportRateId> {
 
-	// CustUKey =
-	public Slice<FinReportRate> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
+  // CustUKey = 
+  public Slice<FinReportRate> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<FinReportRate> findByFinReportRateId(FinReportRateId finReportRateId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<FinReportRate> findByFinReportRateId(FinReportRateId finReportRateId);
 
 }
+

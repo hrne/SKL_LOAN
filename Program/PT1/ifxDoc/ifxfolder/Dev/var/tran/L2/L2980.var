@@ -521,6 +521,7 @@ R(1,L2R63)
 T(2,@LastPrintDate,#L2r63PrintDate)
 T(2,@TlrNo,#L2r63TlrNo)
 E(0,@LastExpectedRate,#L2r63ExpectedRate)
+C(3,#LastExpectedRate,0,HIDE(#LastExpectedRate),SHOW(#LastExpectedRate))
 
 ! [門牌號碼]
 #FdBdLocation=X,2,L

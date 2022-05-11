@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,15 +22,16 @@ import com.st1.itx.db.domain.FinReportDebtId;
  */
 public interface FinReportDebtRepositoryMon extends JpaRepository<FinReportDebt, FinReportDebtId> {
 
-	// CustUKey =
-	public Slice<FinReportDebt> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
+  // CustUKey = 
+  public Slice<FinReportDebt> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
 
-	// CustUKey = ,AND StartYY =
-	public Optional<FinReportDebt> findTopByCustUKeyIsAndStartYYIs(String custUKey_0, int startYY_1);
+  // CustUKey = ,AND StartYY =
+  public Optional<FinReportDebt> findTopByCustUKeyIsAndStartYYIs(String custUKey_0, int startYY_1);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<FinReportDebt> findByFinReportDebtId(FinReportDebtId finReportDebtId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<FinReportDebt> findByFinReportDebtId(FinReportDebtId finReportDebtId);
 
 }
+
