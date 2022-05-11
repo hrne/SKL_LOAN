@@ -608,6 +608,9 @@ public class AcPaymentCom extends TradeBuffer {
 		tBankRemit.setRemark(titaVo.getParam("RpRemark" + i));
 		tBankRemit.setCurrencyCode(titaVo.getCurName());
 		tBankRemit.setRemitAmt(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i)));
+		tBankRemit.setCustId(titaVo.get("RemitId"));
+		tBankRemit.setCustBirthday(parse.stringToInteger(titaVo.get("RemitBirthday")));
+		tBankRemit.setCustGender(titaVo.get("RemitGender"));
 		return tBankRemit;
 
 		/* --------設定建值 End-------- */

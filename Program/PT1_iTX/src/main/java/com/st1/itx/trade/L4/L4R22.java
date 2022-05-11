@@ -11,8 +11,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.service.AchAuthLogService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
@@ -36,6 +38,8 @@ public class L4R22 extends TradeBuffer {
 
 	@Autowired
 	public PostAuthLogService postAuthLogService;
+	@Autowired
+	public CustMainService custMainService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -82,8 +86,24 @@ public class L4R22 extends TradeBuffer {
 				relationCode = tPostAuthLog.getRelationCode();
 				relAcctName = tPostAuthLog.getRelAcctName();
 				relationId = tPostAuthLog.getRelationId();
-				relAcctBirthday = tPostAuthLog.getRelAcctBirthday();
-				relAcctGender = tPostAuthLog.getRelAcctGender();
+				CustMain tCustMain = custMainService.custIdFirst(relationId, titaVo);
+				relAcctBirthday = 0;
+				relAcctGender = "";
+
+				if (tPostAuthLog.getRelAcctBirthday() != 0) {
+					relAcctBirthday = tPostAuthLog.getRelAcctBirthday();
+				} else {
+					if (tCustMain != null) {
+						relAcctBirthday = tCustMain.getBirthday();
+					}
+				}
+				if (!tPostAuthLog.getRelAcctGender().isEmpty()) {
+					relAcctGender = tPostAuthLog.getRelAcctGender();
+				} else {
+					if (tCustMain != null) {
+						relAcctGender = tCustMain.getSex();
+					}
+				}
 				limitAmt = tPostAuthLog.getLimitAmt();
 			} else {
 				this.info("tPostAuthLog null ... ");
@@ -100,7 +120,7 @@ public class L4R22 extends TradeBuffer {
 				this.info("tAchAuthLog ... " + tAchAuthLog.toString());
 
 				int flag = 0;
-				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() == 0) { // 申請授權未提出 
+				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() == 0) { // 申請授權未提出
 					flag = 8;
 				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 已提回授權成功
 					flag = 1;
@@ -117,8 +137,24 @@ public class L4R22 extends TradeBuffer {
 				relationCode = tAchAuthLog.getRelationCode();
 				relAcctName = tAchAuthLog.getRelAcctName();
 				relationId = tAchAuthLog.getRelationId();
-				relAcctBirthday = tAchAuthLog.getRelAcctBirthday();
-				relAcctGender = tAchAuthLog.getRelAcctGender();
+
+				CustMain tCustMain = custMainService.custIdFirst(relationId, titaVo);
+				relAcctBirthday = 0;
+				relAcctGender = "";
+				if (tAchAuthLog.getRelAcctBirthday() != 0) {
+					relAcctBirthday = tAchAuthLog.getRelAcctBirthday();
+				} else {
+					if (tCustMain != null) {
+						relAcctBirthday = tCustMain.getBirthday();
+					}
+				}
+				if (!tAchAuthLog.getRelAcctGender().isEmpty()) {
+					relAcctGender = tAchAuthLog.getRelAcctGender();
+				} else {
+					if (tCustMain != null) {
+						relAcctGender = tCustMain.getSex();
+					}
+				}
 				limitAmt = tAchAuthLog.getLimitAmt();
 				wkNewCreateFlag = tAchAuthLog.getCreateFlag();
 				if (funCd == 2) {

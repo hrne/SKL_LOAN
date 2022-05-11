@@ -128,7 +128,7 @@ C(5,#TXFORM,L444C,$,S)E(0,1)ASGN(LOOPHEIGHT$)
 
 ! 新光
 <sub type="FORM" name="L444A" tota-mode="1">
-#OBcDateA=X,8,O
+#OROCDateA=X,9,O
 #OTimeA=X,8,O
 #OHeadRocTxdayA=D,7,O
 #OCntA=m,6,O
@@ -189,7 +189,7 @@ E(0,@L444CPRT,0)
 
 ! 他行
 <sub type="FORM" name="L444B" tota-mode="1">
-#OBcDateB=X,8,O
+#OROCDateB=X,9,O
 #OTimeB=X,8,O
 #OHeadRocTxdayB=D,7,O
 #OCntB=m,6,O
@@ -251,7 +251,7 @@ E(0,@L444CPRT,0)
 </sub>
 
 <sub type="FORM" name="L444C" tota-mode="1">
-#OBcDateC=X,8,O
+#OROCDateC=X,9,O
 #OTimeC=X,8,O
 #OFootCreateDateC=D,7,O
 #OCntC=m,6,O
@@ -324,7 +324,7 @@ E(0,@L444BPRT,0)
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L444A
-#OBcDateA
+#OROCDateA
 #OTimeA
 #OHeadRocTxdayA
 #OCntA
@@ -339,7 +339,7 @@ TXFORM=L444A
 #OOAuthStatusA
 ^
 TXFORM=L444B
-#OBcDateB
+#OROCDateB
 #OTimeB
 #OHeadRocTxdayB
 #OCntB
@@ -355,7 +355,7 @@ TXFORM=L444B
 #OOAuthStatusB
 ^
 TXFORM=L444C
-#OBcDateC
+#OROCDateC
 #OTimeC
 #OFootCreateDateC
 #OCntC
@@ -376,7 +376,7 @@ TXFORM=L444C
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
 #L444APRT=1,L444A,NA,,D,15
-#OBcDateA
+#OROCDateA
 #OTimeA
 #OHeadRocTxdayA
 %
@@ -391,7 +391,7 @@ TXFORM=L444C
 #OCancelCntA
 ^
 #L444BPRT=1,L444B,NA,,D,15
-#OBcDateB
+#OROCDateB
 #OTimeB
 #OHeadRocTxdayB
 %
@@ -407,7 +407,7 @@ TXFORM=L444C
 #OCancelCntB
 ^
 #L444CPRT=1,L444C,NA,,D,15
-#OBcDateC
+#OROCDateC
 #OTimeC
 #OFootCreateDateC
 %

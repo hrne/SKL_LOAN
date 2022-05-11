@@ -46,7 +46,7 @@ public class L9717Report extends MakeReport {
 
 
 
-	List<BigDecimal> list = new ArrayList<BigDecimal>(14);
+	List<BigDecimal> list = null;
 	
 
 
@@ -430,7 +430,8 @@ public class L9717Report extends MakeReport {
 					// F12 六期金額 129 R
 					// F13 轉催收件數 134 C
 					// F14 轉催收金額 147 R
-				
+					list = new ArrayList<BigDecimal>(14);
+					
 					for (int i = 1,k = 0; i < 15; i++,k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
@@ -475,7 +476,8 @@ public class L9717Report extends MakeReport {
 					// F13 六期金額 129 R
 					// F14 轉催收件數 134 C
 					// F15 轉催收金額 147 R
-	
+					list = new ArrayList<BigDecimal>(14);
+					
 					for (int i = 2, k = 0; i < 16; i++,k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
@@ -563,14 +565,14 @@ public class L9717Report extends MakeReport {
 				this.print(1, 1, "各期小計");
 				
 				
-				
+				//
 				for (int i = 0, space = 0; i < list.size(); i = i + 2, space++) {
 
 					this.print(0, 26 + (18 * space), formatAmt(list.get(i), 0), "C");
 				}
 
 				for (int i = 1, space = 0; i < list.size(); i = i + 2, space++) {
-					this.print(0, 39 + (18 * space), list.get(i).toString(), "R");
+					this.print(0, 39 + (18 * space), formatAmt(list.get(i), 0), "R");
 				}
 
 				this.print(1, 1, newBorder);

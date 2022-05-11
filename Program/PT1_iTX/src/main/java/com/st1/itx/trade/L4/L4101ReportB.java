@@ -275,10 +275,10 @@ public class L4101ReportB extends MakeReport {
 			} else {
 				wkBankItem = remitBank;
 				wkBranchItem = remitBranch;
-
 			}
 
 			String wkCustName = tBankRemit.getCustName(); // 收款戶名
+			String custId = tBankRemit.getCustId();
 			tBankRemit.getAmlRsp();
 			// 尋找Aml回應碼中文
 			CdCode tCdCode = cdCodeService.getItemFirst(8, "ConfirmStatus", tBankRemit.getAmlRsp(), titaVo);
@@ -286,7 +286,6 @@ public class L4101ReportB extends MakeReport {
 				wkAmlRspItem = tCdCode.getItem();
 			} else {
 				this.info("tCdCode = null ");
-
 				wkAmlRspItem = tBankRemit.getAmlRsp();
 			}
 			this.info("wkAmlRspItem = " + wkAmlRspItem);
@@ -308,7 +307,7 @@ public class L4101ReportB extends MakeReport {
 			print(0, 7, custNo + "-" + facmNo + "-" + bormNo);// 戶號
 			print(0, 29, wkBankItem);// 銀行別
 			print(0, 52, remitAcctNo);// 匯款帳號
-			print(0, 69, FormatUtil.padX("" + wkCustName, 20));// 收款戶名
+			print(0, 69, FormatUtil.padX("" + wkCustName, 20) );// 收款戶名
 			print(0, 91, wkAmlRspItem);// AML回應碼
 			print(0, 131, formatAmt(remitAmt, 0), "R");// 匯款金額
 			print(0, 154, FormatUtil.padX("" + wkFullName, 20));// 專辦
@@ -321,6 +320,7 @@ public class L4101ReportB extends MakeReport {
 			print(1, 1, "　　");
 			print(0, 7, FormatUtil.padX("" + custName, 20));// 戶名
 			print(0, 29, wkBranchItem);// 分行別
+			print(0, 69, custId);// 收款id
 			print(0, 131, formatAmt(wkLineAmt, 0), "R");// 核貸金額
 			this.info("i  " + i);
 			this.info("lBankRemit size =   " + lBankRemit.size());

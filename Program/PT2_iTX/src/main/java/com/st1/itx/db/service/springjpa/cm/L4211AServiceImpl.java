@@ -30,7 +30,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 	String inputReconCode;
 	int inputAcDate;
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int report) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		inputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
 		if (inputReconCode.equals("A7")) {
 			inputReconCode = "P03";
@@ -187,19 +187,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 		sql += "                           , '6' "; // 批次入帳
 		sql += "                           , '7') ";// 轉暫收
-		sql += " ORDER BY  BATX.\"ReconCode\"";
-		sql += "      , BATX.\"BatchNo\"";
-		sql += "      , \"SortingForSubTotal\"";
-		sql += "      , BATX.\"EntryDate\"";
-		if (report == 1) {
-			sql += "      , BATX.\"DetailSeq\"";
-		}
-		if (report == 2) {
-			sql += "      , BATX.\"RepayAmt\" DESC";
-		}
-		sql += "      , TX2.\"CustNo\"";
-		sql += "      , TX2.\"FacmNo\"";
-		sql += "      , TX2.\"BormNo\"";
+		
 
 		this.info("sql=" + sql);
 		Query query;

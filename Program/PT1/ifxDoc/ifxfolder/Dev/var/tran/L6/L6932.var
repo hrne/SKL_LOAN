@@ -293,7 +293,9 @@ T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 
 #OMrKey=x,50,S
 #OReason=x,120,S
+!最後修改日期
 #OLastUpdate=x,40,S
+!最後修改人員
 #OLastEmp=x,30,S
 !會計日期
 #OTxDate=D,7,S
@@ -372,9 +374,9 @@ TXFORM=L6932
 {width:300,align:'left'}
 #OReason=修改原因
 {width:400,align:'left'}
-#OLastUpdate=修改日期
+#OLastUpdate=最後修改日期
 {width:140,align:'left'}
-#OLastEmp=修改人員
+#OLastEmp=最後修改人員
 {width:140,align:'left'}
 #OTxDate=會計日期
 {width:100,align:'left'}

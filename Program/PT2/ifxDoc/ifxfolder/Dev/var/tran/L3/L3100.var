@@ -436,6 +436,7 @@ INVOKEJS(SHOW,p7,0)
 HIDE(#UsFinalBal,#UsPieceCodeSecondAmt,#LbUsAcctFee,#UsDrawdownAmt,#UsHandlingFee)
 
 #BeforeDrawdownAmt=m,14.2,S
+C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
 
 
 #FdACTFG=X,2,L
@@ -960,7 +961,6 @@ C(3,#DrawdownCode,0,S,$)T(H,#DrawdownCode,#DrawdownCodeHelp)
 #Available=+m,14.2,S
 E(0,#L2r05AvailableAmt+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 ! E(0,#L2r05AvailableAmt+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
-
 
 #AvailableX=X,22,S
 CALL2(#ADJUSTDOT,#PRECISION,#Available,#AvailableX)
@@ -1789,7 +1789,6 @@ E(0,#BaseRate+#L2r01ProdIncr)
 
 #RateIncr=+n,2.4,L
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
-C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
 
 ! #WkRateIncr=X,7,S
 ! X(#RateIncr)
@@ -2056,12 +2055,8 @@ E(0,@RP_CUSTNO,#TimCustNo)
 
 <include src="RPDTL.icf::RPCOL.dec"/>
 
-
 #checkAMLName=X,1,S
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,INVOKEJS(SHOW,p7,1),INVOKEJS(SHOW,p7,0))
-
-
-
 
 #RPTITLEtt=X,26,L
 IF(#RP_AmlCheckName==#TimCustNoX,T(3,匯款人資料（本人）)
@@ -2070,7 +2065,6 @@ IF(#RP_AmlCheckName==#RelationName,T(3,匯款人資料（同銀扣第三人）)
                                    T(3,@INITp7, ),$)
 IF(#RP_AmlCheckName!=#TimCustNoX&&#RP_AmlCheckName!=#RelationName,T(3,匯款人資料)
                                                                   T(3,@INITp7,1),$)
-
 
 #INITp7=X,1,S
 C(4,#INITp7,T(3,@RpRemitIdKind, )

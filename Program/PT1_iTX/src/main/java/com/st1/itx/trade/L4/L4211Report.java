@@ -238,19 +238,30 @@ public class L4211Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		List<Map<String, String>> fnAllList1 = new ArrayList<Map<String, String>>();
-		List<Map<String, String>> fnAllList2 = new ArrayList<Map<String, String>>();
-		List<Map<String, String>> fnAllList3 = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
 
 		try {
-			fnAllList1 = l4211ARServiceImpl.findAll(titaVo, 1);
-			fnAllList2 = l4211ARServiceImpl.findAll(titaVo, 2);
-			fnAllList3 = l4211ARServiceImpl.findAll(titaVo, 3);
+			fnAllList = l4211ARServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4211ServiceImpl.findAll error = " + errors.toString());
 		}
+
+		List<Map<String, String>> fnAllList1 = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> fnAllList2 = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> fnAllList3 = new ArrayList<Map<String, String>>();
+
+		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("CustNo")
+				.getList();
+
+		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
+				.getList();
+
+		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}

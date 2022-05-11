@@ -203,11 +203,11 @@ public class L4414 extends TradeBuffer {
 		// 取當前日期時間
 		this.nowDate = makeReport.dDateUtil.getNowStringRoc();
 		this.nowTime = makeReport.dDateUtil.getNowStringTime();
-		String bcDate = makeReport.showBcDate(this.nowDate, 1);
+		String rocDate = makeReport.showRocDate(nowDate, 1);
 		String time = makeReport.showTime(this.nowTime);
 
 		totaA.putParam("MSGID", "L444A");
-		totaA.putParam("OBcDateA", bcDate); // 日期
+		totaA.putParam("OROCDateA", rocDate); // 日期
 		totaA.putParam("OTimeA", time); // 時間
 		totaA.putParam("OCntA", cntA); // 總筆數
 		totaA.putParam("OTotalCntA", cntA); // 總筆數
@@ -216,7 +216,7 @@ public class L4414 extends TradeBuffer {
 		this.addList(this.totaA);
 
 		totaB.putParam("MSGID", "L444B");
-		totaB.putParam("OBcDateB", bcDate); // 日期
+		totaB.putParam("OROCDateB", rocDate); // 日期
 		totaB.putParam("OTimeB", time); // 時間
 		totaB.putParam("OCntB", cntB); // 總筆數
 		totaB.putParam("OTotalCntB", cntB); // 總筆數
@@ -225,7 +225,7 @@ public class L4414 extends TradeBuffer {
 		this.addList(this.totaB);
 
 		totaC.putParam("MSGID", "L444C");
-		totaC.putParam("OBcDateC", bcDate); // 日期
+		totaC.putParam("OROCDateC", rocDate); // 日期
 		totaC.putParam("OTimeC", time); // 時間
 		totaC.putParam("OCntC", cntC); // 總筆數
 		totaC.putParam("OTotalCntC", cntC); // 總筆數

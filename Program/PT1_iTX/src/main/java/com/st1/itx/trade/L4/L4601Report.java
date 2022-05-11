@@ -167,9 +167,11 @@ public class L4601Report extends MakeReport {
 			}
 
 			int listsize = lTemp.size();
-			tempcustno = lTemp.get(0).getCustNo();
 
 			if (lTemp.size() != 0) {
+				
+				tempcustno = lTemp.get(0).getCustNo();
+				
 				for (InsuRenewMediaTemp t : lTemp) {
 
 					if (rowcount != 0) { // 換頁第一筆不判斷
