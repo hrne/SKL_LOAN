@@ -21,6 +21,7 @@ import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -30,6 +31,7 @@ import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxTranCodeService;
@@ -54,6 +56,8 @@ public class L3100Report extends MakeReport {
 	TxTranCodeService txTranCodeService;
 	@Autowired
 	FacMainService facMainService;
+	@Autowired
+	CdEmpService cdEmpService;
 
 	@Autowired
 	LoanCom loanCom;
@@ -265,6 +269,11 @@ public class L3100Report extends MakeReport {
 //				this.print(-1, i, "" + (i % 10));
 //				this.print(-i, 1, "" + (i % 10));
 //			}
+
+			CdEmp tCdEmp = new CdEmp();
+
+			tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
+
 			LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(
 					parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")),
 					parse.stringToInteger(titaVo.getParam("BormNo"))), titaVo);
@@ -339,7 +348,9 @@ public class L3100Report extends MakeReport {
 			print(3, 1, "總經理：　　　　　　　　　副總經理：　　　　　　　　　資深協理：　　　　　　　　　協理：　　　　　　　　經理：　　　　　　　　經辦：");
 			print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　覆核：　　　　　　　　");
 			this.setFont(1, 12);
-			print(-15, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　" + this.titaVo.getEmpNm());
+			if (tCdEmp != null) {
+				print(-15, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　" + tCdEmp.getFullname());
+			}
 			this.setFont(1, 12);
 		}
 	}

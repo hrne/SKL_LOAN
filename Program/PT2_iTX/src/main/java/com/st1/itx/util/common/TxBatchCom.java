@@ -1031,7 +1031,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 訂正交易
 				unfinishCnt = 1;
 				this.info("updBatxResult 訂正交易");
-				tDetail.setProcStsCode("2"); // 訂正後為 2.人工處理
+				tDetail.setProcStsCode("0"); // 訂正後為 0:未檢核 
 				if (this.tTempVo.get("RepayType") != null) {
 					tDetail.setRepayType(parse.stringToInteger(this.tTempVo.get("RepayType"))); // 還原還款類別
 				}
