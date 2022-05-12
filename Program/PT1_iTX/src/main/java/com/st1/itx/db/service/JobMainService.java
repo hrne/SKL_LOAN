@@ -196,6 +196,16 @@ public interface JobMainService {
 
   /**
    * Stored Procedure<br>
+   * (月底日日終批次)更新 ForeclosureFinished 法拍完成檔
+   * @param  tbsdyf int
+   * @param  empNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L2_ForeclosureFinished_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
    * (月底日日終批次)維護MonthlyLoanBal每月放款餘額檔
    * @param  tbsdyf int
    * @param  empNo String

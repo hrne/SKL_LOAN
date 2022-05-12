@@ -481,6 +481,22 @@ em = null;
   }
 
   @Override
+  public void Usp_L2_ForeclosureFinished_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL2ForeclosurefinishedUpd(tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL2ForeclosurefinishedUpd(tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL2ForeclosurefinishedUpd(tbsdyf,  empNo);
+   else
+      jobMainRepos.uspL2ForeclosurefinishedUpd(tbsdyf,  empNo);
+  }
+
+  @Override
   public void Usp_L9_MonthlyLoanBal_Upd(int tbsdyf,  String empNo, TitaVo... titaVo) {
     String dbName = "";
     

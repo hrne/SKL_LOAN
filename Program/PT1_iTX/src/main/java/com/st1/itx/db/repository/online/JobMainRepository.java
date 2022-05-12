@@ -55,6 +55,10 @@ public interface JobMainRepository extends JpaRepository<JobMain, JobMainId> {
   @Procedure(value = "\"Usp_L8_JcicB211_Upd\"")
   public void uspL8Jcicb211Upd(int tbsdyf,  String empNo);
 
+  // (月底日日終批次)更新 ForeclosureFinished 法拍完成檔
+  @Procedure(value = "\"Usp_L2_ForeclosureFinished_Upd\"")
+  public void uspL2ForeclosurefinishedUpd(int tbsdyf,  String empNo);
+
   // (月底日日終批次)維護MonthlyLoanBal每月放款餘額檔
   @Procedure(value = "\"Usp_L9_MonthlyLoanBal_Upd\"")
   public void uspL9MonthlyloanbalUpd(int tbsdyf,  String empNo);

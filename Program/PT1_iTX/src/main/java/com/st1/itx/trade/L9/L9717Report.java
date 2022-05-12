@@ -433,7 +433,7 @@ public class L9717Report extends MakeReport {
 					// F12 六期金額 129 R
 					// F13 轉催收件數 134 C
 					// F14 轉催收金額 147 R
-					list = new ArrayList<BigDecimal>(14);
+					
 					
 					for (int i = 1,k = 0; i < 15; i++,k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
