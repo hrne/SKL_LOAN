@@ -327,6 +327,9 @@ SWITCH(#OOClsFlag,0,T(3,起帳),
 ! 交易日期
 #OOAcDate=D,7,L
 
+!入帳日期
+#OOEntryDate=D,7,L
+
 ! 交易金額
 #OORvAmt=+m,14.2,S
 #OORvAmt1=+m,14,S
@@ -360,10 +363,9 @@ T(2,#OOTitaTxCd+ +#OOTranItem)
 !摘要
 #OOSlipNote=X,160,L
 
-!最後修改人員&日期
-#OOLastUpdate=x,20,S
+#OOCreateDate=D,7,L
 
-#OOLastEmp=x,47,S
+#OOCreateTime=X,10,L
 
 </sub>
 
@@ -397,14 +399,15 @@ TXFORM=L6908
 #OOClsFlag
 #OORvNo
 #OOAcDate
+#OOEntryDate
 #OORvAmt
 #OOTitaTlrNo
 #OOTitaTxtNo
 #OOTitaTxCd
 #OOTranItem
 #OOSlipNote
-#OOLastUpdate
-#OOLastEmp
+#OOCreateDate
+#OOCreateTime
 ^
 </sub>
 
@@ -432,6 +435,9 @@ TXFORM=L6908
 #OOAcDate=會計日期
 {width:80,align:'center'}
 
+#OOEntryDate=入帳日期
+{width:80,align:'center'}
+
 #OORvAmt00=起帳金額
 {width:120,align:'right'}
 
@@ -444,15 +450,14 @@ TXFORM=L6908
 #OOSlipNote=摘要
 {width:500,align:'left'}
 
+#OOCreateDate=建檔日期
+{width:100,align:'left'}
+
+#OOCreateTime=建檔時間
+{width:100,align:'left'}
+
 #OORelNo=交易序號
 {width:120,align:'center'}
-
-
-#OOLastUpdate=最後修改日期
-{width:150,align:'center'}
-
-#OOLastEmp=最後修改人員
-{width:110,align:'center'}
 
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6908;cpi=15"/>

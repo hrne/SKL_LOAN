@@ -46,7 +46,7 @@ public class L9717Report extends MakeReport {
 
 
 
-	List<BigDecimal> list = null;
+
 	
 
 
@@ -229,6 +229,9 @@ public class L9717Report extends MakeReport {
 		}
 
 		if (lL9717 != null && !lL9717.isEmpty()) {
+			
+			
+			List<BigDecimal> list = new ArrayList<BigDecimal>(14);
 
 			BigDecimal totalCount = BigDecimal.ZERO;
 			BigDecimal totalAmt = BigDecimal.ZERO;
@@ -413,7 +416,7 @@ public class L9717Report extends MakeReport {
 				}
 
 			
-
+				//合計以上所有件數及金額的各期小計處理
 				switch (currentSort) {
 				case Year:
 					// F1 一期件數 26 C
@@ -476,7 +479,7 @@ public class L9717Report extends MakeReport {
 					// F13 六期金額 129 R
 					// F14 轉催收件數 134 C
 					// F15 轉催收金額 147 R
-					list = new ArrayList<BigDecimal>(14);
+					
 					
 					for (int i = 2, k = 0; i < 16; i++,k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
@@ -517,7 +520,6 @@ public class L9717Report extends MakeReport {
 			}
 
 			// 總計
-
 			this.print(1, 0, "");
 
 			int countX = 0;
@@ -562,10 +564,9 @@ public class L9717Report extends MakeReport {
 				// F14 轉催收件數 134 C
 				// F15 轉催收金額 147 R
 
+				
 				this.print(1, 1, "各期小計");
-				
-				
-				//
+				//印出各期小計
 				for (int i = 0, space = 0; i < list.size(); i = i + 2, space++) {
 
 					this.print(0, 26 + (18 * space), formatAmt(list.get(i), 0), "C");

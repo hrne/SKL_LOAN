@@ -38,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4960 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4960.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -101,17 +100,15 @@ public class L4960 extends TradeBuffer {
 
 			lInsuRenew = new ArrayList<InsuRenew>(l0InsuRenew);
 
-//			ClCode1 > ClCode2 > ClNo > InsuMonth DESC
+//			InsuYearMonth > InsuStartDate > InsuEndDate  DESC
 			lInsuRenew.sort((c1, c2) -> {
 				int result = 0;
-				if (c1.getClCode1() - c2.getClCode1() != 0) {
-					result = c1.getClCode1() - c2.getClCode1();
-				} else if (c1.getClCode2() - c2.getClCode2() != 0) {
-					result = c1.getClCode2() - c2.getClCode2();
-				} else if (c1.getClNo() - c2.getClNo() != 0) {
-					result = c1.getClNo() - c2.getClNo();
-				} else if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
+				if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
 					result = c2.getInsuYearMonth() - c1.getInsuYearMonth();
+				} else if (c1.getInsuStartDate() - c2.getInsuStartDate() != 0) {
+					result = c2.getInsuStartDate() - c1.getInsuStartDate();
+				} else if (c1.getInsuEndDate() - c2.getInsuEndDate() != 0) {
+					result = c2.getInsuEndDate() - c1.getInsuEndDate();
 				} else {
 					result = 0;
 				}
@@ -228,24 +225,12 @@ public class L4960 extends TradeBuffer {
 			this.setClNo(clNo);
 		}
 
-		public int getClCode1() {
-			return clCode1;
-		}
-
 		public void setClCode1(int clCode1) {
 			this.clCode1 = clCode1;
 		}
 
-		public int getClCode2() {
-			return clCode2;
-		}
-
 		public void setClCode2(int clCode2) {
 			this.clCode2 = clCode2;
-		}
-
-		public int getClNo() {
-			return clNo;
 		}
 
 		public void setClNo(int clNo) {

@@ -178,18 +178,6 @@ public class LM051Report extends MakeReport {
 			// F6 逾期數；8
 
 			String ovduText = tLDVo.get("F6");
-//			if (!tLDVo.get("F17").isEmpty()) {
-//				if (Integer.valueOf(tLDVo.get("F6")) == 99) {
-//					// 協or協*or催協
-//					ovduText = tLDVo.get("F17");
-//				} else {
-//					// *協-逾期數
-//					ovduText = tLDVo.get("F17") + tLDVo.get("F6");
-//				}
-//			} else {
-			// 逾期數
-//				ovduText = tLDVo.get("F6");
-//			}
 
 			makeExcel.setValue(row, 8, ovduText, "C");
 			// F7 地區別；9
@@ -222,6 +210,16 @@ public class LM051Report extends MakeReport {
 			makeExcel.setValue(row, 20, tLDVo.get("F12"), "L");
 			// F13 基本利率代碼(商品代號)；21
 			makeExcel.setValue(row, 21, tLDVo.get("F13"), "C");
+
+			// F17 無擔保金額
+			// 本身資產分類不是5 且 金額不等於0 時，放入值
+			BigDecimal class5 = tLDVo.get("F17").isEmpty() || tLDVo.get("F17") == null ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F17"));
+			if (tLDVo.get("F16") != "5" && BigDecimal.ZERO.equals(class5)) {
+				makeExcel.setValue(row, 17, class5, "#,##0");
+
+			}
+			
 		}
 
 	}

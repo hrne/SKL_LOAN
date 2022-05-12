@@ -27,7 +27,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 執行報表輸出
+	 * 執行報表輸出(放款餘額明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
@@ -54,8 +54,10 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(F.\"LineAmt\",0)                      AS F14 ";
 		sql += "       ,NVL(L.\"DrawdownAmt\",0)                  AS F15 ";
 		sql += "       ,M.\"LoanBalance\"                         AS F16 ";
-		sql += "       ,M.\"ProdNo\" 	                          AS F17 ";
-		sql += "       ,F.\"FirstDrawdownDate\"                   AS F18 ";
+		sql += "       ,M.\"CityCode\"                         	  AS F17 ";
+		sql += "       ,CB.\"BdLocation\"                         AS F18 ";
+		sql += "       ,M.\"ProdNo\" 	                          AS F19 ";
+		sql += "       ,F.\"FirstDrawdownDate\"                   AS F20 ";
 		sql += "       ,CASE  ";
 		sql += "       	  WHEN F.\"FirstDrawdownDate\" >= 20100101 ";
 		sql += "           AND (MF.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
@@ -63,7 +65,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  WHEN F.\"FirstDrawdownDate\" < 20100101 ";
 		sql += "           AND (MF.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
 		sql += "       	  THEN '*'";
-		sql += "       	  ELSE ' ' END	AS F19";
+		sql += "       	  ELSE ' ' END	AS F21";
 		sql += "       ,CASE  ";
 		sql += "       	  WHEN (MF.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]'))";
 		sql += "       	  THEN 'Z'";
@@ -71,7 +73,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	  THEN 'C'";
 		sql += "       	  WHEN M.\"ClCode1\" IN (3) ";
 		sql += "       	  THEN 'D'";
-		sql += "       	  ELSE 'C' END  AS F20";
+		sql += "       	  ELSE 'C' END  AS F22";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";
@@ -85,6 +87,9 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"CustNo\" = F.\"CustNo\" ";
 		sql += "                               AND MF.\"FacmNo\" = F.\"FacmNo\" ";
 		sql += "                               AND MF.\"YearMonth\" = M.\"YearMonth\" ";
+		sql += " LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" = M.\"ClCode1\"";
+		sql += "                            AND CB.\"ClCode2\" = M.\"ClCode2\"";
+		sql += "                            AND CB.\"ClNo\" = M.\"ClNo\"";
 		sql += " WHERE M.\"YearMonth\" = :yymm ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";
@@ -100,7 +105,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 執行報表輸出
+	 * 執行報表輸出(放款總歸戶明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
@@ -169,7 +174,7 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 執行報表輸出
+	 * 執行報表輸出(五類資產檢核表、放款額度明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月

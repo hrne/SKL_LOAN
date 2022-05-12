@@ -63,7 +63,7 @@ public class CustCom extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "eLoan客戶代碼:" + custTypeCode);
 		}
 		
-		return cdConvertCode.getCodeType();
+		return cdConvertCode.getNewCode();
 	}
 
 	/**

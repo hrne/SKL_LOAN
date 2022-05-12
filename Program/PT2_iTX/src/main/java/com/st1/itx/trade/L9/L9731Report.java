@@ -177,14 +177,14 @@ public class L9731Report extends MakeReport {
 						makeExcel.setValue(row, 3, fieldValue, "L");
 						break;
 					case 9:// 繳息迄日
-						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
-							makeExcel.setValue(row, 4, showBcDate(fieldValue, 0), "C");
-						}
+
+						makeExcel.setValue(row, 4, showBcDate(fieldValue, 0), "C");
+
 						break;
 					case 10:// 到期日
-						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
-							makeExcel.setValue(row, 5, showBcDate(fieldValue, 0), "C");
-						}
+
+						makeExcel.setValue(row, 5, showBcDate(fieldValue, 0), "C");
+
 						break;
 					case 11:// 放款餘額
 						BigDecimal amt = getBigDecimal(fieldValue);
@@ -198,8 +198,8 @@ public class L9731Report extends MakeReport {
 						makeExcel.setValue(row, 8, fieldValue, "C");
 					case 17:// 是否有901 拍定不足額
 						BigDecimal amt901 = getBigDecimal(fieldValue);
-						makeExcel.setValue(row, 9, amt901, "#,##0", "R");	
-					
+						makeExcel.setValue(row, 9, amt901, "#,##0", "R");
+
 					default:
 
 						break;
@@ -305,9 +305,9 @@ public class L9731Report extends MakeReport {
 						case 8:// 撥款日
 						case 9:// 繳息迄日
 						case 10:// 到期日
-							if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
+//							if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
 								makeExcel.setValue(row, col, showBcDate(fieldValue, 0), "C");
-							}
+//							}
 							break;
 						case 11:// 放款餘額
 							BigDecimal amt = getBigDecimal(fieldValue);
@@ -382,7 +382,7 @@ public class L9731Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : listL9731) {
 				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
-						"######0", "R");
+						"###0", "R");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -409,9 +409,9 @@ public class L9731Report extends MakeReport {
 					case 8:// 到期日
 					case 11:// 繳息迄日
 					case 12:// 轉催收日期
-						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
+//						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
 							makeExcel.setValue(row, col, showBcDate(fieldValue, 0), "C");
-						}
+//						}
 						break;
 					case 9:// 利率
 						BigDecimal rate = getBigDecimal(fieldValue);
@@ -427,12 +427,16 @@ public class L9731Report extends MakeReport {
 						BigDecimal amt = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col, amt, "#,##0", "R");
 						break;
-
-					case 17:// 商品利率代碼
-					case 18:// 初貸日
-					case 19:// 政策性_專案貸款
-					case 20:// 擔保品類別
-						makeExcel.setValue(row, col + 1, fieldValue, "C");
+					case 17:// 擔保品地區別
+						makeExcel.setValue(row, col, fieldValue, "R");
+					case 18:// 擔保品地區別地址
+						makeExcel.setValue(row, col, fieldValue, "L");
+						break;
+					case 19:// 商品利率代碼
+					case 20:// 初貸日
+					case 21:// 政策性_專案貸款
+					case 22:// 擔保品類別
+						makeExcel.setValue(row, col, fieldValue, "C");
 						break;
 
 					default:

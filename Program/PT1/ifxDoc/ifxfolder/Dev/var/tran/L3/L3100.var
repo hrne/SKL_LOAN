@@ -537,7 +537,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<
 
 T(3,#CustNoX,)
 #SendL2r07A=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
@@ -546,7 +546,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #CustNoX=x,2.50,L
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
 T(2,#L2r07CustName)
 
@@ -582,7 +582,7 @@ A(ID_UNINO,0,#CustId)
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
 
 #SendL2r07B=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustId,S,$)
 T(2,@RimCustId,#CustId)
 E(0,@RimCustNo,#CustNo)
@@ -651,7 +651,7 @@ R(1,L2R05)
 T(2,@FacmNo,#L2r05FacmNo)
 
 #SendL2r07C=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 T(2,@RimCustId,#L2r05CustId)

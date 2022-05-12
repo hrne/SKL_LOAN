@@ -143,7 +143,7 @@ public class L4002 extends TradeBuffer {
 			occursList.putParam("OOTotalRepayAmt", 0);
 			occursList.putParam("OOToDoRepayAmt", 0);
 			occursList.putParam("OOUnDoRepayAmt", 0);
-			occursList.putParam("OOLabelFgA", "");
+			occursList.putParam("OOLabelFgA", "D");
 			occursList.putParam("OOLabelFgB", "");
 			occursList.putParam("OOLabelFgC", "");
 
@@ -461,14 +461,14 @@ public class L4002 extends TradeBuffer {
 						} else {
 							canEnterCnt.put(grp1, 1);
 						}
-						// 可暫收筆數
-						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-								|| tBatxDetail.getProcStsCode().equals("4")) {
-							if (canTempCnt.containsKey(grp3)) {
-								canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
-							} else {
-								canTempCnt.put(grp3, 1);
-							}
+					}
+					// 可暫收筆數
+					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+							|| tBatxDetail.getProcStsCode().equals("4")) {
+						if (canTempCnt.containsKey(grp3)) {
+							canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
+						} else {
+							canTempCnt.put(grp3, 1);
 						}
 					}
 				} else {
@@ -547,7 +547,7 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOUnDoRepayAmt", unDoAmtSum.get(tempL4002Vo));
 // LabelFgA 整批刪除(D)、刪除回復(R)、整批訂正(H)
 // LabelFgB             整批檢核(C)、整批入帳(E)
-// LabelFgC 轉暫收(T) 待處理筆數 - 需檢核筆數 > 0
+// LabelFgC 轉暫收(T) 待處理筆數  > 0 & head
 
 				String labelFgA = "";
 				String labelFgB = "";

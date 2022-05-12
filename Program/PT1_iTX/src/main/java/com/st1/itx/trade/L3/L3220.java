@@ -407,7 +407,7 @@ public class L3220 extends TradeBuffer {
 			titaVo.putParam("fmCustName", titaVo.getParam("RpCustName1")); // 戶名
 			titaVo.putParam("fmCustNo", iCustNo); // 備註(戶號)
 
-			sno = formCom.exec(titaVo);
+			 formCom.exec(titaVo);
 		}
 	}
 

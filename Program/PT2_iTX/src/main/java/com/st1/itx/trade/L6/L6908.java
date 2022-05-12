@@ -16,10 +16,12 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -50,6 +52,8 @@ public class L6908 extends TradeBuffer {
 	public TxTranCodeService sTxTranCodeService;
 	@Autowired
 	public AcReceivableService sAcReceivableService;
+	@Autowired
+	public LoanBorTxService sLoanBorTxService;
 	@Autowired
 	Parse parse;
 
@@ -149,6 +153,7 @@ public class L6908 extends TradeBuffer {
 				}
 			}
 		}
+		// 補差額
 		if (rvCls.compareTo(BigDecimal.ZERO) > 0) {
 			clsFlag = 0;
 			rvAmt = rvCls;
@@ -158,7 +163,6 @@ public class L6908 extends TradeBuffer {
 		}
 		this.info("rvAmt=" + rvAmt + ", rvCls=" + rvCls);
 
-		// 如銷帳差額 = 0，先補起帳金額，再補差額
 		if (tAcReceivable != null) {
 			if (rvAmt.compareTo(BigDecimal.ZERO) != 0) {
 				OccursList occursList = new OccursList();
@@ -173,6 +177,19 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOSlipNote", "");
 				occursList.putParam("OOAcDate", tAcReceivable.getOpenAcDate());
 				occursList.putParam("OOClsFlag", clsFlag);
+
+				int entryDate = 0;
+				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(tAcReceivable.getOpenAcDate() + 19110000,
+						tAcReceivable.getTitaTlrNo(), parse.IntegerToString(tAcReceivable.getTitaTxtNo(), 8), titaVo);
+				if (tLoanBorTx != null) {
+					entryDate = tLoanBorTx.getEntryDate();
+				}
+				occursList.putParam("OOEntryDate", entryDate);
+
+				occursList.putParam("OOCreateDate",
+						parse.timeStampToStringDate(tAcReceivable.getCreateDate()).replace("/", ""));
+				occursList.putParam("OOCreateTime", parse.timeStampToStringTime(tAcReceivable.getCreateDate()));
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}
@@ -208,6 +225,16 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOTitaTxCd", tAcDetail.getTitaTxCd());
 				occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
 				occursList.putParam("OOAcDate", tAcDetail.getAcDate());
+				int entryDate = 0;
+				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(tAcDetail.getAcDate() + 19110000,
+						tAcDetail.getTitaTlrNo(), parse.IntegerToString(tAcDetail.getTitaTxtNo(), 8), titaVo);
+				if (tLoanBorTx != null) {
+					entryDate = tLoanBorTx.getEntryDate();
+				}
+				occursList.putParam("OOEntryDate", entryDate);
+				occursList.putParam("OOCreateDate",
+						parse.timeStampToStringDate(tAcDetail.getCreateDate()).replace("/", ""));
+				occursList.putParam("OOCreateTime", parse.timeStampToStringTime(tAcDetail.getCreateDate()));
 
 				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
 					clsFlag = 0;

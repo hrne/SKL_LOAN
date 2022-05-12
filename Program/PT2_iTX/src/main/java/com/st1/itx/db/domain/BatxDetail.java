@@ -74,7 +74,7 @@ public class BatxDetail implements Serializable {
   private String rvNo;
 
   // 還款類別
-  /* CdCode.RepayType1:期款2:部分償還3:結案4:帳管費5:火險費6:契變手續費7:法務費9:其他11:債協匯入款(虛擬帳號為9510500NNNNNNN) */
+  /* CdCode.RepayType1:期款2:部分償還3:結案4:帳管費5:火險費6:契變手續費7:法務費9:其他11:債協匯入款(虛擬帳號為9510500NNNNNNN)12:催收收回 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -117,7 +117,7 @@ public class BatxDetail implements Serializable {
 
   // 處理說明
   /* jsonformat處理說明+備註(例：不足金額)支票：金額#RP_CHQUEAMTX(16) */
-  @Column(name = "`ProcNote`", length = 600)
+  @Column(name = "`ProcNote`", length = 2000)
   private String procNote;
 
   // 經辦
@@ -372,6 +372,7 @@ public class BatxDetail implements Serializable {
 7:法務費
 9:其他
 11:債協匯入款(虛擬帳號為9510500NNNNNNN)
+12:催收收回
 	* @return Integer
 	*/
   public int getRepayType() {
@@ -390,6 +391,7 @@ public class BatxDetail implements Serializable {
 7:法務費
 9:其他
 11:債協匯入款(虛擬帳號為9510500NNNNNNN)
+12:催收收回
   *
   * @param repayType 還款類別
 	*/

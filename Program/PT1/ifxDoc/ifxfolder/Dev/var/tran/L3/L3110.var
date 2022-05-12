@@ -562,7 +562,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<
 
 T(3,#CustNoX,)
 #SendL2r07A=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
 T(3,@RimCustId, )
 E(0,@RimCustNo,#CustNo)
@@ -571,7 +571,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #CustNoX=X,100,L
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
 T(2,#L2r07CustName)
 
@@ -607,7 +607,7 @@ C(3,#FKEY,0,$,s)
 C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
 
 #SendL2r07B=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustId,S,$)
 T(2,@RimCustId,#CustId)
 E(0,@RimCustNo,0)
@@ -660,7 +660,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#ApplNo,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,0)
@@ -673,7 +673,7 @@ R(1,L2R05)
 T(2,@FacmNo,#L2r05FacmNo)
 
 #SendL2r07C=X,1,S
-C(3,#FKEY,0,$,s)
+IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,$,S)
 C(4,#CustId,$,S)
 T(2,@RimCustId,#L2r05CustId)

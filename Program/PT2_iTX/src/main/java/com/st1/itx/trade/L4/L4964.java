@@ -73,7 +73,7 @@ public class L4964 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		List<InsuRenew> l0InsuRenew = new ArrayList<InsuRenew>();
-		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>();
+		List<InsuOrignal> l0InsuOrignal = new ArrayList<InsuOrignal>();
 
 		int clCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int clCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
@@ -92,7 +92,7 @@ public class L4964 extends TradeBuffer {
 		sInsuOrignal = insuOrignalService.clNoEqual(clCode1, clCode2, clNo, this.index, this.limit);
 
 		l0InsuRenew = slInsuRenew == null ? null : slInsuRenew.getContent();
-		lInsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
+		l0InsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
 
 		String bdLocation;
 		ClBuilding tClBuilding = new ClBuilding();
@@ -122,29 +122,32 @@ public class L4964 extends TradeBuffer {
 		Boolean occursflg = true;
 
 		if (l0InsuRenew != null && l0InsuRenew.size() != 0) {
-			
+
 			ArrayList<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
 
 			lInsuRenew = new ArrayList<InsuRenew>(l0InsuRenew);
 
-//			ClCode1 > ClCode2 > ClNo > InsuMonth DESC
+//			InsuMonth DESC > ClCode1 > ClCode2 > ClNo > 
 			lInsuRenew.sort((c1, c2) -> {
 				int result = 0;
-				if (c1.getClCode1() - c2.getClCode1() != 0) {
-					result = c1.getClCode1() - c2.getClCode1();
-				} else if (c1.getClCode2() - c2.getClCode2() != 0) {
-					result = c1.getClCode2() - c2.getClCode2();
-				} else if (c1.getClNo() - c2.getClNo() != 0) {
-					result = c1.getClNo() - c2.getClNo();
-				} else if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
+				if (c1.getInsuYearMonth() - c2.getInsuYearMonth() != 0) {
 					result = c2.getInsuYearMonth() - c1.getInsuYearMonth();
+				} else if (c1.getInsuStartDate() - c2.getInsuStartDate() != 0) {
+					result = c2.getInsuStartDate() - c1.getInsuStartDate();
+				} else if (c1.getInsuEndDate() - c2.getInsuEndDate() != 0) {
+					result = c2.getInsuEndDate() - c1.getInsuEndDate();
+				} else if (c1.getPrevInsuNo().compareTo(c2.getPrevInsuNo()) != 0) {
+					result = c2.getPrevInsuNo().compareTo(c1.getPrevInsuNo());
+				} else if (c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo()) != 0) {
+					result = c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo());
+				} else if (c2.getNowInsuNo().compareTo(c1.getNowInsuNo()) != 0) {
+					result = c2.getNowInsuNo().compareTo(c1.getNowInsuNo());
 				} else {
 					result = 0;
 				}
 				return result;
 			});
-			
-			
+
 			for (InsuRenew tInsuRenew : lInsuRenew) {
 
 				tmpInsu tmp = new tmpInsu(tInsuRenew.getOrigInsuNo(), tInsuRenew.getInsuCompany());
@@ -225,7 +228,29 @@ public class L4964 extends TradeBuffer {
 
 			}
 		}
-		if (lInsuOrignal != null && lInsuOrignal.size() != 0) {
+		if (l0InsuOrignal != null && l0InsuOrignal.size() != 0) {
+
+			ArrayList<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>();
+
+			lInsuOrignal = new ArrayList<InsuOrignal>(l0InsuOrignal);
+
+			lInsuOrignal.sort((c1, c2) -> {
+				int result = 0;
+
+				if (c1.getInsuStartDate() - c2.getInsuStartDate() != 0) {
+					result = c2.getInsuStartDate() - c1.getInsuStartDate();
+				} else if (c1.getInsuEndDate() - c2.getInsuEndDate() != 0) {
+					result = c2.getInsuEndDate() - c1.getInsuEndDate();
+				} else if (c1.getOrigInsuNo().compareTo(c2.getOrigInsuNo()) != 0) {
+					result = c2.getOrigInsuNo().compareTo(c1.getOrigInsuNo());
+				} else if (c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo()) != 0) {
+					result = c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo());
+				} else {
+					result = 0;
+				}
+				return result;
+			});
+
 			for (InsuOrignal tInsuOrignal : lInsuOrignal) {
 
 				tmpInsu tmp = new tmpInsu(tInsuOrignal.getOrigInsuNo(), tInsuOrignal.getInsuCompany());
@@ -318,7 +343,7 @@ public class L4964 extends TradeBuffer {
 
 				} // else
 			} // for
-		} 
+		}
 //		else {
 //			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
 //		}

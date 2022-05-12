@@ -838,6 +838,7 @@ RESET_RIM(#SendL3r06B,L3R06)
 S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
 R(1,L3R06)
 C(3,#L3r06CloseBreachAmtUnpaid,0,T(3,@BreachCodeX,),T(3,@BreachCodeX,領清償證明時收取))
+E(0,@PayMethodFg,#L3r06PayMethodFg)
 
 !還款類別為[02.部分償還]且[是否內含費用]為[Y.是]時加費用
 #SumRepayAmt=m,14.2,S
@@ -1099,6 +1100,9 @@ T(3,，)
 T(B,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
 P(L,#ShortfallXX)
 
+!是否顯示繳納方式記號
+!0=不顯示輸入 1=顯示輸入
+#PayMethodFg=A,1,S
 
 ![繳納方式]
 #FdPayMethod=X,2,L
@@ -1107,6 +1111,7 @@ T(3,*)
 #PayMethod=A,1,I
 C(3,#TimExtraRepay,0,S,$)
 C(3,#RepayType,12,S,$)
+C(3,#PayMethodFg,1,$,S)
 HELP(#PayMethodHelp)
 @V(H,#PayMethodHelp)
 

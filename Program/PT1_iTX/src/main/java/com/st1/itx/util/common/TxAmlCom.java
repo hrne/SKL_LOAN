@@ -91,7 +91,7 @@ import com.st1.itx.util.parse.Parse;
 /**
  * AML交易檢核<BR>
  * 1.hcodeSendOut 撥款匯款 Call by Call by ApControl 經辦提交<BR>
- * 2.remitL3220 撥款匯款 (暫收款退還 ) Call by Call by L3220 暫收款退還<BR>
+ * 2.remitOut 暫收款退還  Call by Call by L3220 暫收款退還<BR>
  * 3.achAuth ACH 銀扣授權 ACH Call by call by L440A<BR>
  * 4.postAuth ACH 銀扣授權 ACH Call by call by L441A<BR>
  * 5.bankDeduct 產出銀扣檔 Call by L4450-產出銀行扣帳檔、L4451-銀行扣帳檔維護、L4452-產出媒體檔<BR>
@@ -826,7 +826,7 @@ public class TxAmlCom extends TradeBuffer {
 			}
 		}
 		BankRmtf tBankRmtf = bankRmtfService.holdById(new BankRmtfId(acDate + 19110000, batchNo, DetailSeq), titaVo);
-		if (tBankRmtf != null && tBankRmtf.getAmlRsp().equals(amlRsp)) {
+		if (tBankRmtf != null && !tBankRmtf.getAmlRsp().equals(amlRsp)) {
 			tBankRmtf.setAmlRsp(amlRsp);
 			try {
 				bankRmtfService.update(tBankRmtf);

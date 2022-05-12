@@ -16,12 +16,12 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
 import com.st1.itx.db.domain.CdAcCode;
-import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -45,8 +45,6 @@ public class L6908 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdEmpService cdEmpService;
-	@Autowired
 	public AcDetailService sAcDetailService;
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
@@ -54,6 +52,8 @@ public class L6908 extends TradeBuffer {
 	public TxTranCodeService sTxTranCodeService;
 	@Autowired
 	public AcReceivableService sAcReceivableService;
+	@Autowired
+	public LoanBorTxService sLoanBorTxService;
 	@Autowired
 	Parse parse;
 
@@ -177,8 +177,19 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOSlipNote", "");
 				occursList.putParam("OOAcDate", tAcReceivable.getOpenAcDate());
 				occursList.putParam("OOClsFlag", clsFlag);
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcReceivable.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcReceivable.getLastUpdate()));
-				occursList.putParam("OOLastEmp", tAcReceivable.getLastUpdateEmpNo() + " " + empName(titaVo, tAcReceivable.getLastUpdateEmpNo()));
+
+				int entryDate = 0;
+				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(tAcReceivable.getOpenAcDate() + 19110000,
+						tAcReceivable.getTitaTlrNo(), parse.IntegerToString(tAcReceivable.getTitaTxtNo(), 8), titaVo);
+				if (tLoanBorTx != null) {
+					entryDate = tLoanBorTx.getEntryDate();
+				}
+				occursList.putParam("OOEntryDate", entryDate);
+
+				occursList.putParam("OOCreateDate",
+						parse.timeStampToStringDate(tAcReceivable.getCreateDate()).replace("/", ""));
+				occursList.putParam("OOCreateTime", parse.timeStampToStringTime(tAcReceivable.getCreateDate()));
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}
@@ -214,6 +225,16 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOTitaTxCd", tAcDetail.getTitaTxCd());
 				occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
 				occursList.putParam("OOAcDate", tAcDetail.getAcDate());
+				int entryDate = 0;
+				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(tAcDetail.getAcDate() + 19110000,
+						tAcDetail.getTitaTlrNo(), parse.IntegerToString(tAcDetail.getTitaTxtNo(), 8), titaVo);
+				if (tLoanBorTx != null) {
+					entryDate = tLoanBorTx.getEntryDate();
+				}
+				occursList.putParam("OOEntryDate", entryDate);
+				occursList.putParam("OOCreateDate",
+						parse.timeStampToStringDate(tAcDetail.getCreateDate()).replace("/", ""));
+				occursList.putParam("OOCreateTime", parse.timeStampToStringTime(tAcDetail.getCreateDate()));
 
 				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
 					clsFlag = 0;
@@ -252,14 +273,5 @@ public class L6908 extends TradeBuffer {
 		}
 		return uTranItem;
 
-	}
-	private String empName(TitaVo titaVo, String empNo) throws LogicException {
-		String rs = empNo;
-
-		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
-		if (cdEmp != null) {
-			rs = cdEmp.getFullname();
-		}
-		return rs;
 	}
 }
