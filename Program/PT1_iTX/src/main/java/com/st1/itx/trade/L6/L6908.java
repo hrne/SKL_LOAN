@@ -97,7 +97,7 @@ public class L6908 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 316 * 100 = 31,600
+		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
 
 		// 查詢會計帳務明細檔
 		Slice<AcDetail> slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
@@ -251,12 +251,6 @@ public class L6908 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
 
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slAcDetail != null && slAcDetail.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			// this.totaVo.setMsgEndToEnter();// 手動折返
-			this.totaVo.setMsgEndToAuto();// 自動折返
-		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

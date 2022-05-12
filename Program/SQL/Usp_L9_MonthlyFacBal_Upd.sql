@@ -137,7 +137,8 @@ BEGIN
                  WHEN L."OvduTerm" >= 1                        -- 二之2 逾繳超過清償期1-6月者 
                       THEN '22'
                  WHEN FAC."ProdNo" IN('60','61','62')          -- 二之1 債信已不良者（有擔保分期協議且正常還款者） 
-                      THEN '21'                                --  60:協議還款-定期機動 61:協議還款-機動 62:協議還款-固定
+                      THEN '2'                                 --  60:協議還款-定期機動 61:協議還款-機動 62:協議還款-固定
+                                                               -- 20220512 改由後續程式判斷
             END                       AS "AssetClass"          -- 資產五分類代號
           , 0                         AS "StoreRate"           -- 計息利率
           ,JOB_START_TIME             AS "CreateDate"          -- 建檔日期時間

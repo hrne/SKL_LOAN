@@ -56,9 +56,7 @@ public class L6982 extends TradeBuffer {
 
 	private int selectCode = 0;
 	private int custNo = 0;
-	private int trasCollDate = 0;
-	private int facmNo = 0;
-	private String rvNo = "";
+//	private int trasCollDate = 0;
 	private int cnt = 0;
 
 	@Override
@@ -75,7 +73,7 @@ public class L6982 extends TradeBuffer {
 
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
 		custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-		trasCollDate = parse.stringToInteger(titaVo.getParam("TransCollDate"));
+//		trasCollDate = parse.stringToInteger(titaVo.getParam("TransCollDate"));
 
 		// 0.未處理
 		// 1.已保留
@@ -106,14 +104,15 @@ public class L6982 extends TradeBuffer {
 
 			}
 			for (InsuRenew tmpInsuRenew : lInsuRenew) {
-				if (tmpInsuRenew.getAcDate() == 0 && tmpInsuRenew.getStatusCode() == 1) {
+				if (tmpInsuRenew.getAcDate() == 0 && tmpInsuRenew.getStatusCode() == 2) {
 					OccursList occursList = new OccursList();
 
 					occursList.putParam("OOProcStatus", 0);
 					occursList.putParam("OOFireInsuMonth", tmpInsuRenew.getInsuYearMonth() - 191100);
 					occursList.putParam("OOCustNo", tmpInsuRenew.getCustNo());
 					occursList.putParam("OOFacmNo", tmpInsuRenew.getFacmNo());
-					occursList.putParam("OOColNo", tmpInsuRenew.getClCode1() + "-" + tmpInsuRenew.getClCode2() + "-" + tmpInsuRenew.getClNo());
+					occursList.putParam("OOColNo",
+							tmpInsuRenew.getClCode1() + "-" + tmpInsuRenew.getClCode2() + "-" + tmpInsuRenew.getClNo());
 					occursList.putParam("OOInsuNo", tmpInsuRenew.getPrevInsuNo());
 					occursList.putParam("OOInsuFireFee", tmpInsuRenew.getFireInsuPrem());
 					occursList.putParam("OOEthqInsuFee", tmpInsuRenew.getEthqInsuPrem());
@@ -175,12 +174,14 @@ public class L6982 extends TradeBuffer {
 				tTxToDoDetail.getFacmNo();
 				tTxToDoDetail.getDtlValue().trim();
 				InsuRenew tIsuRenew = new InsuRenew();
-				tIsuRenew = insuRenewService.prevInsuNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getDtlValue().trim(), titaVo);
+				tIsuRenew = insuRenewService.prevInsuNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(),
+						tTxToDoDetail.getDtlValue().trim(), titaVo);
 
 				occursList.putParam("OOProcStatus", tTxToDoDetail.getStatus());
 				if (tIsuRenew != null) {
 					occursList.putParam("OOFireInsuMonth", tIsuRenew.getInsuYearMonth() - 191100);
-					occursList.putParam("OOColNo", tIsuRenew.getClCode1() + "-" + tIsuRenew.getClCode2() + "-" + tIsuRenew.getClNo());
+					occursList.putParam("OOColNo",
+							tIsuRenew.getClCode1() + "-" + tIsuRenew.getClCode2() + "-" + tIsuRenew.getClNo());
 					occursList.putParam("OOInsuNo", tIsuRenew.getPrevInsuNo());
 					occursList.putParam("OOInsuFireFee", tIsuRenew.getFireInsuPrem());
 					occursList.putParam("OOEthqInsuFee", tIsuRenew.getEthqInsuPrem());
@@ -199,7 +200,8 @@ public class L6982 extends TradeBuffer {
 				}
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
+						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());

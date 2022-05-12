@@ -33,6 +33,7 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(TitaVo titaVo, int index, int limit) throws Exception {
 
+		String tlrNo = titaVo.get("TLRNO").trim();
 		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim()) + 19110000;
 		String iBrNo = titaVo.get("iBrNo").trim();
 		String iTlrNo = titaVo.get("iTlrNo").trim();
@@ -65,6 +66,7 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CdBranch\" C on C.\"BranchNo\"=A.\"BrNo\"";
 		sql += " left join \"CdEmp\" D on D.\"EmployeeNo\"=A.\"TlrNo\"";
 		sql += " left join \"TxFlow\" E on E.\"Entdy\"=A.\"Entdy\" AND E.\"FlowNo\"=A.\"FlowNo\"";
+		sql += " left join \"TxTeller\" F on F.\"TlrNo\"=:TlrNo ";
 		sql += " where A.\"Entdy\"=:entdy";
 		sql += "   and A.\"BrNo\"=:brno";
 		sql += "   and A.\"TxResult\"=:txresult";
@@ -75,11 +77,17 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and A.\"MrKey\" like :iMkey";
 		}
 		if (!"".equals(iTlrNo)) {
-			sql += "   and A.\"TlrNo\" like :tlrno";
+			sql += "   and A.\"TlrNo\" like :itlrno";
 		}
 		if (!"".equals(iTranNo)) {
-			sql += "   and A.\"TranNo\" like :tranNo";
+			sql += "   and A.\"TranNo\" like :itranNo";
 		}
+		sql += " and ((F.\"LevelFg\"=1 and A.\"FlowStep\" in (2,4)) or (F.\"LevelFg\"=3 and A.\"FlowStep\" in (0,1,3))) ";
+//		if (tlrLevel == 1) {
+//			sql += " and A.\"FlowStep\" in (2,4) ";
+//		} else {
+//			sql += " and A.\"FlowStep\" in (0,1,3) ";
+//		}
 
 		sql += " order by A.\"CreateDate\" DESC";
 
@@ -97,11 +105,12 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("cancancel", 1);
 		query.setParameter("actionfg", 0);
 		query.setParameter("hcode", 1);
+		query.setParameter("TlrNo", tlrNo);
 		if (!"".equals(iTlrNo)) {
-			query.setParameter("tlrno", iTlrNo + "%");
+			query.setParameter("itlrno", iTlrNo + "%");
 		}
 		if (!"".equals(iTranNo)) {
-			query.setParameter("tranNo", iTranNo + "%");
+			query.setParameter("itranNo", iTranNo + "%");
 		}
 		if (!iCustNo.equals("0000000")) {
 			query.setParameter("iMkey", iMkey);

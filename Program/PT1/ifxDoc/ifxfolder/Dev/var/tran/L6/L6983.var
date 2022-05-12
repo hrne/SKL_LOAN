@@ -96,7 +96,7 @@ T(1,#DATE,2,7)
 !戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
-INVOKEJS(SHOW,p1,1,2,1)
+!INVOKEJS(SHOW,p1,1,2,1)
 ! SHOW(#BTN1)
 
 #MRKEY=_,_,S
@@ -105,7 +105,7 @@ T(2,#CustNo)
 
 #WKBTN1=X,1,S
 ! C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
-C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
+!C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
 
 ! 轉催收日
 #TransCollDate=D,7,S

@@ -62,7 +62,7 @@ public class LC001 extends TradeBuffer {
 
 		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
 		this.info("LC001 tbsdy = " + tbsdy);
-		
+
 		try {
 
 			List<Map<String, String>> lc001List = lc001ServiceImpl.findAll(titaVo, index, limit);
@@ -96,7 +96,7 @@ public class LC001 extends TradeBuffer {
 					// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
 					int supRelease = 0;
 					if (daFlowType > 1 && daEntdy < tbsdy) {
-						//非一段式交易,不可訂正非本日交易
+						// 非一段式交易,不可訂正非本日交易
 						supRelease = 1;
 					} else if (daFlowType > 1 && daFlowStep == 1) {
 						if (daFlowStep != daFlowStep2 || (daFlowStep == 1 && daSubmitFg == 1 && daFlowMode != 3)) {

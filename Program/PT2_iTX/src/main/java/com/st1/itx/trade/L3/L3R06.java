@@ -2,6 +2,8 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +67,8 @@ public class L3R06 extends TradeBuffer {
 	private int iRepayTerms;
 	private int iRepayType;
 	private int iEntryDate;
+	private int payMethodFg = 0;
+
 	private String iExtraRepayFlag;
 	private String iTxCode = "";
 	private String oCurrencyCode = "";
@@ -159,6 +163,7 @@ public class L3R06 extends TradeBuffer {
 		this.totaVo.putParam("L3r06TotalFee", oTotalFee);
 		this.totaVo.putParam("L3r06RpFacmNo", oRpFacmNo);
 		this.totaVo.putParam("L3r06CloseBreachAmtUnpaid", oCloseBreachAmtUnpaid);
+		this.totaVo.putParam("L3r06PayMethodFg", payMethodFg);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -223,6 +228,7 @@ public class L3R06 extends TradeBuffer {
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
+//		檢核
 		for (LoanBorMain ln : lLoanBorMain) {
 			if ((iTxCode.equals("L3440") && ln.getStatus() == 2)
 					|| (!iTxCode.equals("L3440") && (ln.getStatus() == 0 || ln.getStatus() == 4))) {
@@ -234,9 +240,25 @@ public class L3R06 extends TradeBuffer {
 					continue;
 				}
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
-					if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+					if (ln.getNextPayIntDate() <= iEntryDate) {
 						throw new LogicException(titaVo, "E3072", "應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有其款未回收
 					}
+				}
+			}
+		}
+
+//		TODO: Sorting 部分償還時 需要繳費用的額度才需要檢查攤還方式是否為3
+		if (iRepayType == 2) {
+			Sorting();
+		}
+		int test = 0;
+		for (LoanBorMain ln : lLoanBorMain) {
+			if ((iTxCode.equals("L3440") && ln.getStatus() == 2)
+					|| (!iTxCode.equals("L3440") && (ln.getStatus() == 0 || ln.getStatus() == 4))) {
+				if ("5".equals(ln.getAmortizedCode())) { // 攤還方式 = 5.按月撥款收息(逆向貸款)
+					continue;
+				}
+				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
 					wkTerms = 0;
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
 					if (wkExtraRepay.compareTo(ln.getLoanBal()) >= 0 || iEntryDate >= ln.getMaturityDate()) {
@@ -287,6 +309,13 @@ public class L3R06 extends TradeBuffer {
 						}
 						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
 					}
+				}
+//				TODO:UI控制 繳納方式: 攤還方式為3時記號為1否則為0 1.顯示可輸入 2.不顯示不可輸入 
+				test++;
+				this.info("L3R06 test = " + lLoanBorMain.size() + test);
+				this.info("L3R06 ln攤還方式 = " + ln.getAmortizedCode());
+				if ("3".equals(ln.getAmortizedCode()) || "4".equals(ln.getAmortizedCode())) {
+					payMethodFg = 1;
 				}
 				loanCalcRepayIntCom.getRepayInt(titaVo);
 				oLoanBal = oLoanBal.add(ln.getLoanBal());
@@ -346,6 +375,65 @@ public class L3R06 extends TradeBuffer {
 		}
 
 		this.info("RepayAmtRoutine end ");
+	}
+
+	private void Sorting() throws LogicException {
+		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
+			public int compare(LoanBorMain c1, LoanBorMain c2) {
+				// status
+				if (c1.getStatus() != c2.getStatus()) {
+					return c1.getStatus() - c2.getStatus();
+				}
+				// 回收金額 > 0時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
+//				if (iRepayType == 1) {
+//					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
+//						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
+//					}
+//					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+//						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
+//					}
+//				}
+				// 部分償還金額 > 0時排序
+//					利率高至低>用途別>由額度編號大至小
+//					用途別為9->1->3->4->5->6->2
+//					欄位代碼       欄位說明     
+//					1            週轉金    
+//					2            購置不動產
+//					3            營業用資產
+//					4            固定資產  
+//					5            企業投資  
+//					6            購置動產
+//					9            其他					
+				if (iRepayType == 2) {
+					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
+					}
+					// 若用途別不同
+					if (!c1.getUsageCode().equals(c2.getUsageCode())) {
+						int c1UsageCode = Integer.parseInt(c1.getUsageCode());
+						int c2UsageCode = Integer.parseInt(c2.getUsageCode());
+
+						// C1優先的特殊情況
+						if (c1UsageCode == 9 || c2UsageCode == 2) {
+							return -1;
+						}
+						// C2優先的特殊情況
+						if (c1UsageCode == 2 || c2UsageCode == 9) {
+							return 1;
+						}
+						// 一般情況
+						return c1UsageCode - c2UsageCode;
+					}
+				}
+				if (c1.getFacmNo() != c2.getFacmNo()) {
+					return c2.getFacmNo() - c1.getFacmNo();
+				}
+				if (c1.getBormNo() != c2.getBormNo()) {
+					return c2.getBormNo() - c1.getBormNo();
+				}
+				return 0;
+			}
+		});
 	}
 
 	private void EachFeeRoutine() throws LogicException {

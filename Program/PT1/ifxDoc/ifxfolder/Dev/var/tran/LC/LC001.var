@@ -223,7 +223,7 @@ TXFORM=LC001
 #BrNo=使用單位
 {width:150,align:'left'}
 
-#TlrNo=經辦
+#TlrNo=使用者
 {width:120,align:'left'}
 
 #TypeX=類別

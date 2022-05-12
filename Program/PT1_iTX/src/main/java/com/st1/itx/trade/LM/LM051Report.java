@@ -213,8 +213,8 @@ public class LM051Report extends MakeReport {
 
 			// F17 無擔保金額
 			// 本身資產分類不是5 且 金額不等於0 時，放入值
-			BigDecimal class5 = tLDVo.get("F17").isEmpty() || tLDVo.get("F17") == null ? BigDecimal.ZERO
-					: new BigDecimal(tLDVo.get("F17"));
+			BigDecimal class5 = tLDVo.get("F15").isEmpty() || tLDVo.get("F15") == null ? BigDecimal.ZERO
+					: new BigDecimal(tLDVo.get("F15"));
 			if (tLDVo.get("F16") != "5" && BigDecimal.ZERO.equals(class5)) {
 				makeExcel.setValue(row, 17, class5, "#,##0");
 

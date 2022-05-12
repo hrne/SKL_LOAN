@@ -8,6 +8,10 @@
 	<!-- 作業名稱 -->
 	<job id="eomFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
+		<!-- Usp_L2_ForeclosureFinished_Upd -->
+		<step id="l2ForeclosureFinishedUpd" parent="parentStep" next="l5InnReCheckUpd">
+			<tasklet ref="L2ForeclosureFinishedUpd" />
+		</step>
 		<!-- Usp_L5_InnReCheck_Upd -->
 		<step id="l5InnReCheckUpd" parent="parentStep" next="l9MonthlyLoanBalUpd">
 			<tasklet ref="L5InnReCheckUpd" />

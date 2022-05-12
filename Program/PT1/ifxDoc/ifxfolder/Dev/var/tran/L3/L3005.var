@@ -635,6 +635,9 @@ TXFORM=L3005
 #OODesc=交易別
 {width:90}
 
+#OOTitaHCodeX=訂正別
+{width:70,align:'center'}
+
 #OOCurrencyCode=幣別 
 {width:50,align:'center'}
 
@@ -662,9 +665,6 @@ TXFORM=L3005
 
 #OOFeeMsg=費用
 {width:150}
-
-#OOTitaHCodeX=訂正別
-{width:70,align:'center'}
 
 #OOAcDtRelNo=交易序號
 {width:200,align:'center'}
