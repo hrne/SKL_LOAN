@@ -1,7 +1,7 @@
 " A4
    轉暫收
 
-   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATE}} 時間:{{#now!}}
+   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATE007}} 時間:{{#now!}}
 
 
    

@@ -78,6 +78,7 @@ BEGIN
                 , A1."BCMCOD"
                 , A1."UNTBRN"
                 , A1."BCMDPT"
+                , QQ."CUSEMP"
                 , QQ."ID1X"
                 , QQ."ID7X"
                 , QQ."YAG3LV"
@@ -99,7 +100,7 @@ BEGIN
     LEFT JOIN "TB$WKMP" S2 ON S2."DATES" <= S1."LMSLLD"
                           AND S2."DATEE" >= S1."LMSLLD"
     -- AS400員工檔
-    LEFT JOIN "LN$DTYP" S3 ON S3.CUSID1 = S1.ID1X -- 介紹人
+    LEFT JOIN "LN$DTYP" S3 ON S3.CUSID1 = NVL(S1.ID1X,S1."CUSEMP") -- 介紹人 -- 2022-05-13 智偉修改:ID1X NULL 時用CUSEMP補上
     LEFT JOIN "LN$DTYP" S4 ON S4.CUSID1 = S1.ID7X -- 處經理
     LEFT JOIN "CdBcm" S5 ON S5."UnitCode" = S1."BCMCOD"
     WHERE S1."Seq" = 1

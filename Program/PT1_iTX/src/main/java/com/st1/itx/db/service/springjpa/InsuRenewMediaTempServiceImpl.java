@@ -123,13 +123,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("fireInsuMonthRg " + dbName + " : " + "fireInsuMonth_0 : " + fireInsuMonth_0 + " fireInsuMonth_1 : " +  fireInsuMonth_1);
     if (dbName.equals(ContentName.onDay))
-      slice = insuRenewMediaTempReposDay.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
+      slice = insuRenewMediaTempReposDay.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAscSeqAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewMediaTempReposMon.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
+      slice = insuRenewMediaTempReposMon.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAscSeqAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewMediaTempReposHist.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
+      slice = insuRenewMediaTempReposHist.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAscSeqAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
     else 
-      slice = insuRenewMediaTempRepos.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
+      slice = insuRenewMediaTempRepos.findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAscSeqAsc(fireInsuMonth_0, fireInsuMonth_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

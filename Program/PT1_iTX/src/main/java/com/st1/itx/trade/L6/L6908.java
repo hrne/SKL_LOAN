@@ -2,6 +2,8 @@ package com.st1.itx.trade.L6;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -100,9 +102,9 @@ public class L6908 extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
 
 		// 查詢會計帳務明細檔
-		Slice<AcDetail> slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-				iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt, iFAcDateEd, this.index,
-				this.limit, titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode, iBranchNo, iCurrencyCode,
+				iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt, iFAcDateEd, this.index, this.limit,
+				titaVo);
 
 // AcReceivable RvAmt=100, Rvbal=80,  rvCls  = 80      
 // ACDTL        起帳             TxAmt=100, rvCls  = -20
@@ -166,6 +168,8 @@ public class L6908 extends TradeBuffer {
 		}
 		this.info("rvAmt=" + rvAmt + ", rvCls=" + rvCls);
 
+		List<OccursList> tOccursList = new ArrayList<OccursList>();
+
 		if (tAcReceivable != null) {
 			if (rvAmt.compareTo(BigDecimal.ZERO) != 0) {
 				OccursList occursList = new OccursList();
@@ -193,7 +197,8 @@ public class L6908 extends TradeBuffer {
 						parse.timeStampToStringDate(tAcReceivable.getCreateDate()).replace("/", ""));
 				occursList.putParam("OOCreateTime", parse.timeStampToStringTime(tAcReceivable.getCreateDate()));
 
-				this.totaVo.addOccursList(occursList);
+//				this.totaVo.addOccursList(occursList);
+				tOccursList.add(occursList);
 			}
 		}
 		// 如有找到資料
@@ -251,13 +256,32 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOClsFlag", clsFlag);
 
 				/* 將每筆資料放入Tota的OcList */
-				this.totaVo.addOccursList(occursList);
+//				this.totaVo.addOccursList(occursList);
+				tOccursList.add(occursList);
 			}
 		}
+
+		// 輸出排序時間
+		tOccursList.sort((c1, c2) -> {
+			int result = 0;
+			this.info("c1 = " + c1);
+			this.info("c2 = " + c2);
+			if (c1.get("OOCreateDate").compareTo(c2.get("OOCreateDate")) != 0) {
+				result = c1.get("OOCreateDate").compareTo(c2.get("OOCreateDate"));
+			} else {
+				result = 0;
+			}
+			return result;
+		});
+
+		for (LinkedHashMap<String, String> t : tOccursList) {
+			this.totaVo.addOccursList(t);
+		}
+
 		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

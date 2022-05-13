@@ -11,7 +11,12 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingId;
+import com.st1.itx.db.domain.ClNoMap;
+import com.st1.itx.db.domain.ClNoMapId;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
+import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClNoMapService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
@@ -19,6 +24,7 @@ import com.st1.itx.db.service.InsuRenewMediaTempService;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component("L4601Report")
@@ -39,12 +45,11 @@ public class L4601Report extends MakeReport {
 	@Autowired
 	public InsuRenewMediaTempService insuRenewMediaTempService;
 
-//	@Autowired
-//	public ClBuildingService clBuildingService;
+	@Autowired
+	public ClBuildingService clBuildingService;
 
 	@Autowired
-	public ClNoMapService clNoMapService;
-
+	public ClNoMapService sClNoMapService;
 	@Autowired
 	Parse parse;
 
@@ -121,6 +126,7 @@ public class L4601Report extends MakeReport {
 			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4601", reportName, "", "A4", "L");
 		}
 		String tempcustno = "";
+		String tempseq = "";
 		int rowcount = 0;
 		if (sL4601List != null) {
 			this.info("List is true");
@@ -169,14 +175,14 @@ public class L4601Report extends MakeReport {
 			int listsize = lTemp.size();
 
 			if (lTemp.size() != 0) {
-				
+
 				tempcustno = lTemp.get(0).getCustNo();
-				
+				tempseq = lTemp.get(0).getSeq();
 				for (InsuRenewMediaTemp t : lTemp) {
 
 					if (rowcount != 0) { // 換頁第一筆不判斷
 
-						if (!tempcustno.equals(t.getCustNo())) {
+						if (!tempcustno.equals(t.getCustNo()) || !tempseq.equals(t.getSeq())) {
 							this.print(1, 0,
 									"------------------------------------------------------------------------------------------------------------------------------------------------");
 							rowcount = rowcount + 1;
@@ -186,7 +192,34 @@ public class L4601Report extends MakeReport {
 					this.print(1, 2, t.getCustNo());
 					this.print(0, 14, t.getFacmNo());
 					this.print(0, 21, t.getLoanCustName());
-					this.print(0, 48, t.getClCode1() + "-" + t.getClCode2() + "-" + t.getClNo());
+
+					ClNoMap tClNoMap = new ClNoMap();
+
+					ClNoMapId clNoMapId = new ClNoMapId();
+					clNoMapId.setGdrId1(parse.stringToInteger(t.getClCode1()));
+					clNoMapId.setGdrId2(parse.stringToInteger(t.getClCode2()));
+					clNoMapId.setGdrNum(parse.stringToInteger(t.getClNo()));
+					clNoMapId.setLgtSeq(parse.stringToInteger(t.getSeq()));
+
+					tClNoMap = sClNoMapService.findById(clNoMapId, titaVo);
+
+					int ClCode1 = 0, ClCode2 = 0, ClNo = 0;
+					// ClNoMap 與 InsuRenewMediaTemp 擔保品編號2 差補0
+					if (tClNoMap != null) {
+						this.print(0, 48, tClNoMap.getClCode1() + "-" + FormatUtil.pad9("" + tClNoMap.getClCode2(), 2)
+								+ "-" + tClNoMap.getClNo());
+
+						ClCode1 = tClNoMap.getClCode1();
+						ClCode2 = tClNoMap.getClCode2();
+						ClNo = tClNoMap.getClNo();
+					} else {
+						this.print(0, 48, t.getClCode1() + "-" + t.getClCode2() + "-" + t.getClNo());
+
+						ClCode1 = parse.stringToInteger(t.getClCode1());
+						ClCode2 = parse.stringToInteger(t.getClCode2());
+						ClNo = parse.stringToInteger(t.getClNo());
+					}
+
 					this.print(0, 64, showBcDate(t.getNewInsuStartDate(), 0));
 					this.print(0, 79, showBcDate(t.getNewInsuEndDate(), 0));
 					this.print(0, 94, t.getInsuNo());
@@ -194,15 +227,32 @@ public class L4601Report extends MakeReport {
 					this.print(0, 127, showBcDate(t.getInsuEndDate(), 0));
 					this.print(1, 0, "");
 
+					ClBuildingId clBuildingId = new ClBuildingId();
+					clBuildingId.setClCode1(ClCode1);
+					clBuildingId.setClCode2(ClCode2);
+					clBuildingId.setClNo(ClNo);
+
+					ClBuilding tClBuilding = clBuildingService.findById(clBuildingId, titaVo);
+
 					if (reporttype == 1) {
-						this.print(0, 21, t.getAddress());
+						if (tClBuilding != null) {
+							this.print(0, 21, tClBuilding.getBdLocation());
+						} else {
+							this.print(0, 21, t.getAddress());
+						}
 					} else {
-						this.print(0, 21, "建號： " + t.getPostalCode());
-						this.print(0, 48, t.getAddress());
+						if (tClBuilding != null) {
+							this.print(0, 21, "建號： " + tClBuilding.getBdNo1());
+							this.print(0, 48, tClBuilding.getBdLocation());
+						} else {
+							this.print(0, 21, "建號： " + t.getPostalCode());
+							this.print(0, 48, t.getAddress());
+						}
+
 					}
 					rowcount = rowcount + 2;
 					tempcustno = t.getCustNo();
-	
+
 					count++;
 
 					if (listsize == count) { // 最後一筆

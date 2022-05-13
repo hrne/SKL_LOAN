@@ -58,8 +58,9 @@ BEGIN
                     , CNM."GDRNUM"
                     , CNM."LGTSEQ"
            )                              AS "PublicSeq"           -- 公設序號 DECIMAL 7 0
-          ,NVL(PH."HGTPNM",0)             AS "PublicBdNo1"         -- 公設建號 DECIMAL 5 0
-          ,NVL(PH."HGTPNM2",0)            AS "PublicBdNo2"         -- 公設建號(子號) DECIMAL 3 0
+          ,LPAD(NVL(PH."HGTPNM",0),5,'0') AS "PublicBdNo1"         -- 公設建號 DECIMAL 5 0
+          ,LPAD(NVL(PH."HGTPNM2",0),3,'0')
+                                          AS "PublicBdNo2"         -- 公設建號(子號) DECIMAL 3 0
           ,NVL(HG."HGTPSM",0)             AS "Area"                -- 登記面積(坪) DECIMAL 16 2
         --   ,SUM(HG."HGTPSM")               AS "Area"                -- 登記面積(坪) DECIMAL 16 2
           ,''                             AS "OwnerId"             -- 所有權人統編 VARCHAR2 10 0
