@@ -1,0 +1,255 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6062)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,107)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+!#FirstIn=A,1,S
+!E(0,1)
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6062]                                 行業別代號資料查詢"],
+["#FdIndustryCode+行業代號",#IndustryCode],
+["#FdIndustryItem+行業名稱",#IndustryItem],
+
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:新增行業別代號;enable:1;tabbable:0;title:L6602 行業別代號資料維護
+!#BUF1=X,42,S
+
+!---------- AP TEXT AREA Variables ----------
+
+#FdIndustryCode=X,2,L
+#FdIndustryItem=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6602; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,查詢)
+C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增行業別代號))
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+!行業代號
+#IndustryCode=X,6,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
+@C(4,#IndustryCode,$,V(9))
+
+#IndustryItem=X,20,I
+
+#BUF1=X,7,S
+!C(4,#IndustryCode,HIDE(#BTN1),SHOW(#BTN1))
+!T(2,1+#IndustryCode)
+!!(0,@FirstIn,0)
+
+!#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6602; ntxbuf=#BUF1})
+
+!#CHAINXMT=X,1,S
+!C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+!<include src="COM.icf::RPTFG.dec"/>
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6062 ----------
+<sub type="FORM" name="L6062">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6062,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6062] 行業別代號資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+#OIndustryCode=X,6,L
+T(2,#IndustryCode)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 行業代號(TOTA)
+#OOIndustryCode=X,6,L
+
+! 行業說明(TOTA)
+#OOIndustryItem=X,100,L
+
+! 主計處大類(TOTA)
+#OOMainType=X,1,L
+
+#OOCHAIN=A,1,S
+T(4,CHAIN$)
+
+!最後修改人員&日期
+#OOLastUpdate=x,20,S
+
+#OOLastEmp=x,47,S
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=X,108,S
+T(2,#OOFunc2+#OOIndustryCode+#OOIndustryItem+#OOMainType)
+
+! 連結時隱藏按鈕
+#OOBTN2=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6602;text=修改;ntxbuf=#OOBUF2})
+IF(#OOCHAIN==1,BIND(grid,cancel),$)
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=X,108,S
+T(2,#OOFunc4+#OOIndustryCode+#OOIndustryItem+#OOMainType)
+
+! 連結時隱藏按鈕
+#OOBTN4=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6602;text=刪除;ntxbuf=#OOBUF4})
+IF(#OOCHAIN==1,BIND(grid,cancel),$)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#IndustryCode
+#IndustryItem
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L6062
+#OOIndustryCode
+#OOIndustryItem
+#OOMainType
+#OOLastUpdate
+#OOLastEmp
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6062" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6062]                                 行業別代號資料查詢                                             "],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L6062
+#any={detail:true, header:'L6062.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OOIndustryCode=行業代號
+{width:70,align:'center'}
+
+#OOIndustryItem=行業說明
+{width:250,align:'left'}
+
+#OOMainType=主計處</br>大類
+{width:60,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
+^
+
+#RPTFG2=2,QUERY.GRID,L6062
+#any={detail:true, header:'L6062.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOIndustryCode=行業代號
+{width:70,align:'center'}
+
+#OOIndustryItem=行業說明
+{width:250,align:'left'}
+
+#OOMainType=主計處</br>大類
+{width:60,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
+^
+</sub>

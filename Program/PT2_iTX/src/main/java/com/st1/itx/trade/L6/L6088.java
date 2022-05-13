@@ -18,6 +18,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita EmployeeNo=X,6 AgCurInd=X,1 END=X,1
@@ -38,6 +39,9 @@ public class L6088 extends TradeBuffer {
 
 	@Autowired
 	public CdBcmService iCdBcmService;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -124,6 +128,9 @@ public class L6088 extends TradeBuffer {
 				uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
 				occursList.putParam("OODataDate", uaDate);
 			}
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdEmp.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdEmp.getLastUpdate())); // 最後修改日期
+			occursList.putParam("OOLastEmp", tCdEmp.getLastUpdateEmpNo() + " " + empName(titaVo, tCdEmp.getLastUpdateEmpNo())); // 最後修改人員
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -136,5 +143,15 @@ public class L6088 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

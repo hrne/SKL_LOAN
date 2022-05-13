@@ -505,23 +505,16 @@ public class TxBatchCom extends TradeBuffer {
 
 	}
 
-	// 催呆戶轉暫收、結案戶人工作業
+	// 催呆、結案戶轉暫收
 	public void checkFacStatus(TitaVo titaVo) throws LogicException {
 		CdCode tCdCode = cdCodeService.findById(new CdCodeId("Status", "" + parse.IntegerToString(this.facStatus, 2)),
 				titaVo);
 		if (tCdCode != null) {
 			this.checkMsg += tCdCode.getItem() + "";
 		}
-		// 催呆戶須轉暫收
-		if ((this.repayType <= 3)) {
-			this.procStsCode = "2"; // 2.人工處理
-		} else {
-			if (this.facStatus == 3) {
-				this.procStsCode = "2"; // 2.人工處理
-			} else {
-				this.procStsCode = "4"; // 4.檢核正常
-			}
-		}
+		// 催呆戶、結案戶須轉暫收
+		this.repayType = 9;
+		this.procStsCode = "4"; // 4.檢核正常
 	}
 
 	/**
@@ -1031,7 +1024,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 訂正交易
 				unfinishCnt = 1;
 				this.info("updBatxResult 訂正交易");
-				tDetail.setProcStsCode("0"); // 訂正後為 0:未檢核 
+				tDetail.setProcStsCode("0"); // 訂正後為 0:未檢核
 				if (this.tTempVo.get("RepayType") != null) {
 					tDetail.setRepayType(parse.stringToInteger(this.tTempVo.get("RepayType"))); // 還原還款類別
 				}
@@ -1206,7 +1199,7 @@ public class TxBatchCom extends TradeBuffer {
 			checkAmt = parse.stringToBigDecimal(this.tTempVo.get("MergeAmt"));
 		}
 		// step01. 應繳試算
-        // 合併檢核、轉暫收
+		// 合併檢核、轉暫收
 		if (this.tTempVo.get("MergeAmt") != null && !tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
 			this.checkMsg += ", 轉暫收";
 		} else if (this.facStatus > 0) {

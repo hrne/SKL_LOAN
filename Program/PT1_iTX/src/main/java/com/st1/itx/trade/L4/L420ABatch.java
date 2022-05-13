@@ -302,12 +302,16 @@ public class L420ABatch extends TradeBuffer {
 
 	// 更新同步更新同戶號檢核狀態
 	private void doMergeUpdate(int iRepayType, String iProcStsCode, TitaVo titaVo) throws LogicException {
-		// 任一筆非成功=> 2:人工處理
+		// 任一筆 1.<檢核錯誤> 非成功=> 2:人工處理
 		// 還款類別不同需重新檢核((合併總額不同)
 		// 還款類別為結案則全部為結案(結案收全部費用)
 		String procStsCode = "4";
+		// 任一筆檢核錯誤 => 3.檢核錯誤
 		for (BatxDetail t : l3BatxDetail) {
-			if (!"4".equals(t.getProcStsCode())) {
+			if ("3".equals(t.getProcStsCode())) {
+				procStsCode = "3";
+			}
+			if (!"4".equals(t.getProcStsCode()) && "4".equals(procStsCode)) {
 				procStsCode = "2";
 			}
 			if (t.getRepayType() != iRepayType) {

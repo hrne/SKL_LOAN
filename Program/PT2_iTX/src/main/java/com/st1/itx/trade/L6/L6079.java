@@ -13,7 +13,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdAcBook;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdAcBookService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -31,11 +33,12 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6079 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6079.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdAcBookService sCdAcBookService;
+	@Autowired
+	public CdEmpService sCdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -76,6 +79,9 @@ public class L6079 extends TradeBuffer {
 			occursList.putParam("OOCurrencyCode", tCdAcBook.getCurrencyCode());
 			occursList.putParam("OOTargetAmt", tCdAcBook.getTargetAmt());
 			occursList.putParam("OOActualAmt", tCdAcBook.getActualAmt());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcBook.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdAcBook.getLastUpdate())); // 最後修改日期
+			occursList.putParam("OOLastEmp", tCdAcBook.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcBook.getLastUpdateEmpNo())); // 最後修改人員
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -88,5 +94,15 @@ public class L6079 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

@@ -152,6 +152,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iCustNo, int iFacmNo, int iBormNo,
 			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmtAll  ");
+		this.info("iListVo  =" + iListVo.size());
 
 		int wkFacmNoStart = 1;
 		int wkFacmNoEnd = 999;
@@ -180,16 +181,24 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				continue;
 			}
 
-			// 前期
-			loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
-
-			// 本期
+			// 前期、本期
 			if (iListVo != null && iListVo.size() > 0) {
+				int facmNo = 0;
 				for (LoanCloseBreachVo iVo : iListVo) {
 					if (iVo.getFacmNo() == tFacMain.getFacmNo()) {
-						addListVoRoutine(iVo, titaVo);
+						if (facmNo == 0 || facmNo != iVo.getFacmNo()) {
+							this.info("facmNo == 0 || facmNo != iVo.getFacmNo() ");
+							loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), 0, titaVo);
+							facmNo = iVo.getFacmNo();
+						}
+						if (iVo.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
+							addListVoRoutine(iVo, titaVo);
+						}
 					}
 				}
+			} else {
+				this.info("iListVo = null");
+				loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
 			}
 			// 計算清償違約金 By 額度
 			calculateRoutine(tFacMain, tFacProd, titaVo);

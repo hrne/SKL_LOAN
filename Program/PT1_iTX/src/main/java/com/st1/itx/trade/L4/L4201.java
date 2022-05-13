@@ -116,7 +116,6 @@ public class L4201 extends TradeBuffer {
 		}
 		tBatxDetail.setRepayType(iRepayTypeA);
 		tBatxDetail.setCustNo(iCustNoA);
-		tBatxDetail.setProcStsCode("0");
 		tBatxDetail.setProcStsCode(iProcStsCode);
 		if (tBatxDetail.getRepayType() == 1) {
 			tTempVo.putParam("PreRepayTerms", newPreRepayTerms);
@@ -126,7 +125,7 @@ public class L4201 extends TradeBuffer {
 		tTempVo.remove("MergeAmt");
 		tTempVo.remove("MergeSeq");
 		tBatxDetail.setProcNote(tTempVo.getJsonString());
-		if ("1".equals(iProcStsCode)) {
+		if (!"1".equals(iProcStsCode)) {
 			tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
 		}
 		try {

@@ -78,6 +78,8 @@ public class L6074 extends TradeBuffer {
 			occursList.putParam("OOCityCode", tCdCity.getCityCode());
 			occursList.putParam("OOCityItem", tCdCity.getCityItem());
 			occursList.putParam("OOUnitCode", tCdCity.getUnitCode());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdCity.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdCity.getLastUpdate())); // 最後修改日期
+			occursList.putParam("OOLastEmp", tCdCity.getLastUpdateEmpNo() + " " + empName(titaVo, tCdCity.getLastUpdateEmpNo())); // 最後修改人員
 //			occursList.putParam("OOAccCollPsn", tCdCity.getAccCollPsn());
 //			occursList.putParam("OOLegalPsn", tCdCity.getLegalPsn());
 //			occursList.putParam("OOIntRateCeiling", tCdCity.getIntRateCeiling());
@@ -106,5 +108,15 @@ public class L6074 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

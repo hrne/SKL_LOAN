@@ -1505,7 +1505,7 @@ public class BaTxCom extends TradeBuffer {
 		ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 		ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 		for (BaTxVo baTxVo : this.baTxList) {
-			if (baTxVo.getDataKind() == 2 && baTxVo.getExtraAmt().compareTo(BigDecimal.ZERO) > 0) {
+			if (baTxVo.getDataKind() == 2) {
 				LoanCloseBreachVo v = new LoanCloseBreachVo();
 				v.setCustNo(baTxVo.getCustNo());
 				v.setFacmNo(baTxVo.getFacmNo());

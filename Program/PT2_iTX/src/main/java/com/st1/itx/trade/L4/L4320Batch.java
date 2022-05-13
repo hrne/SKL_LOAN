@@ -478,10 +478,9 @@ public class L4320Batch extends TradeBuffer {
 			// 定期機動指標利率變動調整合約利率
 			if (iAdjCode == 4) {
 				adjCode = 4;
-				warnMsg += ", 定期機動指標利率變動調整合約利率";
-			} else if (maturityDate == nextAdjRateDate) {
-				adjCode = 4;
-				warnMsg += ", 利率調整日為到期日";
+				if (nextAdjRateDate < wkLastMonthDateS && nextAdjRateDate < maturityDate ) {
+					warnMsg += ", 下次利率調整日小於調整月份";				
+				}
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1;
 			} else if ("".equals(cityCode.trim())) {
@@ -508,7 +507,7 @@ public class L4320Batch extends TradeBuffer {
 			}
 
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
-			if (adjCode > 1 && b.getOvduTerm() >= 1) {
+			if (adjCode == 2 && b.getOvduTerm() >= 1) {
 				adjCode = 3;
 				warnMsg += ", 逾" + dateUtil.getMons() + " 期 ";
 			}

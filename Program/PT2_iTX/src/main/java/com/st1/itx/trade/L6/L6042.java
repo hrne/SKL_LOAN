@@ -13,7 +13,10 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTranCodeService;
 
 @Service("L6042")
@@ -25,11 +28,14 @@ import com.st1.itx.db.service.TxTranCodeService;
  * @version 1.0.0
  */
 public class L6042 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6042.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public TxTranCodeService txTranCodeService;
+	@Autowired
+	public CdEmpService cdEmpService;
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -57,6 +63,8 @@ public class L6042 extends TradeBuffer {
 				occursList.putParam("OTranNo", tTxTranCode.getTranNo());
 				occursList.putParam("OTranItem", tTxTranCode.getTranItem());
 				occursList.putParam("ODesc", tTxTranCode.getDesc());
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxTranCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxTranCode.getLastUpdate()));
+				occursList.putParam("OOLastEmp", tTxTranCode.getLastUpdateEmpNo() + " " + empName(titaVo, tTxTranCode.getLastUpdateEmpNo()));
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -70,5 +78,14 @@ public class L6042 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

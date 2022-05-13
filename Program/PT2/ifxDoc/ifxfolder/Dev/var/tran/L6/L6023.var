@@ -1,0 +1,240 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6023)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,64)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+!#FirstIn=A,1,S
+!E(0,1)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6203; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增代碼)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6023]                                 收件字代碼查詢"],
+["#FdLandOfficeCode+地政別代碼",#LandOfficeCode,#LandOfficeCodeX],
+["#FdRecWord+收件字代碼",#RecWord],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:新增保證人關係代碼;Enable:1;tabbable:0;title:L6607 保證人關係代碼維護
+!#BUF1=X,42,S
+
+
+!---------- AP TEXT AREA Variables ----------
+#FdLandOfficeCode=X,2,L
+#FdRecWord=X,2,L
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@LandOfficeCode,#NTXBUF,1,2),$)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#LoanOfficeHelp=X,2000,S
+
+#City=X,2,S
+#CityCode=X,2,S
+
+! 依縣市別組地政下拉選單
+#RimL2r59=X,1,S
+T(2,@CityCode,#City)
+RESET_RIM(#RimL2r59,L2R59)
+S(L2R59,1,#CityCode)
+R(1,L2R59)
+T(2,@LoanOfficeHelp,#L2r59Help1)
+
+
+!地政別代碼
+#LandOfficeCode=X,2,I
+HELP(#LoanOfficeHelp)
+C(3,#CHAIN,1,s,$)
+@T(3,@LandOfficeCodeX,)
+@C(4,#LandOfficeCode,S,V(H,#LoanOfficeHelp))
+
+#LandOfficeCodeX=X,8,L
+C(4,#LandOfficeCode,S,$)
+T(H,#LandOfficeCode,#LoanOfficeHelp)
+
+
+!收件字代碼
+#RecWord=X,3,I
+C(3,#CHAIN,1,s,$)
+
+#RPTFG=A,1,S
+E(0,0)
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+!<include src="COM.icf::RPTFG.dec"/>
+
+<include src="ROM.icf::L2R59.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6023 ----------
+<sub type="FORM" name="L6023">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6023,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6023] 收件字代碼查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 地政別代碼
+#OOLandOfficeCode=X,2,L
+
+! 收件字代碼
+
+#OORecWord=X,3,L
+
+! 收件字說明
+
+#OORecWordItem=x,60,L
+
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=X,65,S
+T(2,#OOFunc2+#OOLandOfficeCode+#OORecWord)
+
+#OOBTN2=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=修改;ntxbuf=#OOBUF2})
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=X,65,S
+T(2,#OOFunc4+#OOLandOfficeCode+#OORecWord)
+
+#OOBTN4=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=刪除;ntxbuf=#OOBUF4})
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#LandOfficeCode
+#RecWord
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6023
+#OOLandOfficeCode
+#OORecWord
+#OORecWordItem
+^
+<include src="ROM.icf::L2R59.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6023" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6023]                                 收件字代碼查詢                                             "],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L6023
+#any={detail:true, header:'L6023.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OOLandOfficeCode=地政別代碼
+{width:100,align:'center'}
+
+#OORecWord=收件字代碼
+{width:80,align:'left'}
+
+#OORecWordItem=收件字說明
+{width:120,align:'center'}
+
+^
+
+#RPTFG2=2,QUERY.GRID,L6023
+#any={detail:true, header:'L6023.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOLandOfficeCode=地政別代碼
+{width:100,align:'center'}
+
+#OORecWord=收件字代碼
+{width:80,align:'left'}
+
+#OORecWordItem=收件字說明
+{width:120,align:'center'}
+^
+
+</sub>

@@ -18,6 +18,7 @@ import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -42,6 +43,8 @@ public class L6904 extends TradeBuffer {
 	public AcDetailService sAcDetailService;
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
+	@Autowired
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 

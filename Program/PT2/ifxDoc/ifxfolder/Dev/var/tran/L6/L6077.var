@@ -142,6 +142,12 @@ T(2,#OODataYearX+/+#OODataMonthX)
 ! 支出合計(TOTA)
 #OOExpend=m,16,L
 
+! 最後修改日期
+#OOLastUpdate=x,20,S
+
+! 最後修改人員
+#OOLastEmp=x,47,S
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -188,6 +194,8 @@ TXFORM=L6077
 #OODataYearMonth
 #OOIncome
 #OOExpend
+#OOLastUpdate
+#OOLastEmp
 ^
 </sub>
 
@@ -222,6 +230,12 @@ TXFORM=L6077
 
 #OOExpend=支出合計
 {width:150,align:'right'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:120,align:'left'}
 
 ^
 

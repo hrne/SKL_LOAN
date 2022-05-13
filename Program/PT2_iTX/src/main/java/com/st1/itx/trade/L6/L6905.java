@@ -17,11 +17,11 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
-import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.db.service.springjpa.cm.L6905ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -54,7 +54,7 @@ public class L6905 extends TradeBuffer {
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
 	@Autowired
-	CdEmpService cdEmpService;
+	public CdEmpService sCdEmpService;
 
 	@Autowired
 	private L6905ServiceImpl l6905ServiceImpl;
@@ -104,8 +104,8 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOSupItem", d.get("TitaSupNo"));
 			occursList.putParam("OOTitaSupNo", d.get("SUPNAME"));
 
-			occursList.putParam("OOTlrItem", d.get("TitaTlrNo"));
-			occursList.putParam("OOTitaTlrNo", d.get("TLRNAME"));
+			occursList.putParam("OOTlrItem", d.get("TLRNAME"));
+			occursList.putParam("OOTitaTlrNo", d.get("TitaTlrNo"));
 
 			occursList.putParam("OORelTxseq", d.get("RelTxseq"));
 
@@ -391,7 +391,7 @@ public class L6905 extends TradeBuffer {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
 			occursList.putParam("OOSlipNo", tAcDetail.getSlipNo());
-
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 
@@ -433,7 +433,7 @@ public class L6905 extends TradeBuffer {
 
 		CdEmp tCdEmp = new CdEmp();
 
-		tCdEmp = cdEmpService.findById(uTlrNo, titaVo);
+		tCdEmp = sCdEmpService.findById(uTlrNo, titaVo);
 
 		if (tCdEmp == null) {
 			uTlrItem = uTlrNo;

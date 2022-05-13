@@ -1,0 +1,374 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6994)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,168)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+#FirstIn=A,1,S
+E(0,1)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6754; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增標準設定)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6994]                                 業績件數及金額核算標準設定查詢"],
+["#FdWorkMonth+工作月",#WorkMonth],
+!["#FdOption+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,14,I,ui:button;value:新增計件代碼;enable:1;tabbable:0;title:L6754 業績件數及金額核算標準設定維護
+!#BUF1=X,42,S
+#FdWorkMonth=X,1,L
+T(3,*)
+#FdOption=X,1,L
+T(3, )
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6084進入),$)
+
+#NTXBUF=X,5,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(2,@WorkMonth,#NTXBUF,1,5))
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#ApHelp=x,1024,S
+T(3,CdCode.PieceCode)
+S(XXR99,01,#ApHelp)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,#HelpDesc1)
+
+! 工作月
+#WorkMonth=A,5,I
+C(3,#CHAIN,1,s,$)
+@A(YM13,1,#WorkMonth)
+
+
+!HELP( : 綁約2年以下或未綁約;
+!     A: 新貸件;
+!     B: 新貸件（同押品，數額度之額度一以外）;
+!     C: 原額度內－動支件;
+!     D: 新增額度－增貸件（指有增加設定抵押權者）;
+!     E: 展期件;
+!      : 有綁約2年（含）以上;
+!     1: 新貸件;
+!     2: 新貸件（同押品，數額度之額度一以外）;
+!     3: 原額度內－動支件;
+!     4: 新增額度－增貸件（指有增加設定抵押權者）;
+!     5: 展期件;
+!      : 無關綁約;
+!     6: 原額度內－6個月內動支件（還款後6個月內再動支者）;
+!     7: 服務件;
+!     8: 特殊件;
+!     9: 固特利契轉)
+!@V(3, ,A,B,C,D,E,1,2,3,4,5,6,7,8,9,0)
+
+#BUF1=X,2,S
+!C(4,#PieceCode,HIDE(#BTN1),SHOW(#BTN1))
+!T(2,1+#PieceCode)
+E(0,@FirstIn,0)
+
+!#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6754; ntxbuf=#BUF1})
+
+!<include src="COM.icf::RPTFG.dec"/>
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6994 ----------
+<sub type="FORM" name="L6994">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6994,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6994] 業績件數及金額核算標準設定)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 計件代碼(TOTA)
+#OOPieceCode=X,1,S
+
+#OOPieceCodeX=X,50,S
+T(H,#OOPieceCode,#ApHelp)
+
+#OOPieceCodeX1=X,52,L
+T(2,#OOPieceCode+ +#OOPieceCodeX)
+
+
+! 介紹單位_件數(TOTA)
+#OOUnitCnt=n,2.2,L
+
+! 介紹單位_計件金額門檻(TOTA)
+#OOUnitAmtCond=m,14.2,S
+#OOUnitAmtCond1=m,14,S
+E(0,#OOUnitAmtCond)
+#OOUnitAmtCondX=X,17,L
+X(#OOUnitAmtCond1)
+
+! 介紹單位_撥款業績比例(TOTA)
+#OOUnitPercent=n,3.2,S
+#OOUnitPercentX=X,10,S
+X(2,#OOUnitPercent)P(L,#OOUnitPercentX,)
+
+#OOUnitPercentX1=X,11,L
+C(1,#OOUnitPercent,S,T(2, ),T(B,#OOUnitPercentX))
+
+
+! 介紹人_介紹獎金比例(TOTA)
+#OOIntrodPerccent=n,3.6,S
+#OOIntrodPerccentX=X,10,S
+X(2,#OOIntrodPerccent)P(L,#OOIntrodPerccentX,)
+
+#OOIntrodPerccentX1=X,11,L
+C(1,#OOIntrodPerccent,S,T(2, ),T(B,#OOIntrodPerccentX))
+
+! 介紹人_介紹獎金門檻(新增額度) (TOTA)
+#OOIntrodAmtCond=m,14.2,S
+#OOIntrodAmtCond1=m,14,S
+E(0,#OOIntrodAmtCond)
+#OOIntrodAmtCondX=X,17,L
+X(#OOIntrodAmtCond1)
+
+! 介紹人_換算業績率(分母)(TOTA)
+#OOIntrodPfEqBase=m,14.2,L
+
+! 介紹人_換算業績率(分子)(TOTA)
+#OOIntrodPfEqAmt=m,14.2,L
+
+! 介紹人_業務報酬率(分母)(TOTA)
+#OOIntrodRewardBase=m,14.2,L
+
+! 介紹人_業務報酬率(分子)(TOTA)
+#OOIntrodReward=m,14.2,L
+
+
+! 房貸專員_件數(TOTA)
+#OOBsOffrCnt=n,2.2,L
+
+! 房貸專員_件數上限(TOTA)
+#OOBsOffrCntLimit=n,2.2,L
+
+! 房貸專員_計件金額門檻(TOTA)
+#OOBsOffrAmtCond=m,14.2,S
+#OOBsOffrAmtCond1=m,14,S
+E(0,#OOBsOffrAmtCond)
+#OOBsOffrAmtCondX=X,17,L
+X(#OOBsOffrAmtCond1)
+
+! 房貸專員_撥款業績比例(TOTA)
+#OOBsOffrPerccent=n,3.2,S
+#OOBsOffrPerccentX=X,10,S
+X(2,#OOBsOffrPerccent)P(L,#OOBsOffrPerccentX,)
+
+#OOBsOffrPerccentX1=X,11,L
+C(1,#OOBsOffrPerccent,S,T(2, ),T(B,#OOBsOffrPerccentX))
+
+! 最後修改日期
+#OOLastUpdate=x,20,S
+
+! 最後修改人員
+#OOLastEmp=x,47,S
+
+!1:已停效
+#OOFlag=A,1,S
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=X,7,S
+T(2,#OOFunc2+#WorkMonth+#OOPieceCode)
+
+#OOBTN2=X,4,S
+IF(#OOFlag==0 || #OOFlag==1,BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=修改;ntxbuf=#OOBUF2}),
+														BIND(grid,cancel))	
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=X,7,S
+T(2,#OOFunc4+#WorkMonth+#OOPieceCode)
+
+#OOBTN4=X,4,S
+IF(#OOFlag==0 ,BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=刪除;ntxbuf=#OOBUF4}),
+							 BIND(grid,cancel))	
+
+! 查詢的按鈕
+#OOFunc5=A,1,S
+E(0,5)
+
+#OOBUF5=X,7,S
+T(2,#OOFunc5+#WorkMonth+#OOPieceCode)
+
+#OOBTN5=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=查詢;ntxbuf=#OOBUF5})
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#WorkMonth
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=L6994
+#OOPieceCode
+#OOUnitCnt
+#OOUnitAmtCond
+#OOUnitPercent
+#OOIntrodPerccent
+#OOIntrodAmtCond
+#OOIntrodPfEqBase
+#OOIntrodPfEqAmt
+#OOIntrodRewardBase
+#OOIntrodReward
+#OOBsOffrCnt
+#OOBsOffrCntLimit
+#OOBsOffrAmtCond
+#OOBsOffrPerccent
+#OOFlag
+#OOLastUpdate
+#OOLastEmp
+
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L6994" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6994]                                 業績件數及金額核算標準設定查詢                                                                                                                      "],
+]
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6994
+#any={detail:true, header:'L6994.part', caption:'', width:1000, rowNum:10, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+!!#OOBTN5=
+!!{width:50,search:false,formatter:'cust:bind-button:#OOBTN5',align:'center',canExport:false}
+
+#OOPieceCodeX1=計件代碼
+{width:100,align:'left'}
+
+#OOUnitCnt=介紹單位<br>件數
+{width:80,align:'right'}
+
+#OOUnitAmtCondX=介紹單位<br>計件金額門檻
+{width:110,align:'right'}
+
+#OOUnitPercentX1=介紹單位<br>撥款業績比例
+{width:110,align:'right'}
+
+#OOIntrodPerccentX1=介紹人<br>介紹獎金比例
+{width:100,align:'right'}
+
+#OOIntrodAmtCondX=介紹人<br>介紹獎金門檻<br>(新增額度)
+{width:110,align:'right'}
+
+#OOIntrodPfEqBase=介紹人<br>換算業績率<br>(分母)
+{width:110,align:'right'}
+
+#OOIntrodPfEqAmt=介紹人<br>換算業績率<br>(分子)
+{width:110,align:'right'}
+
+#OOIntrodRewardBase=介紹人<br>業務報酬率<br>(分母)
+{width:110,align:'right'}
+
+#OOIntrodReward=介紹人<br>業務報酬率<br>(分子)
+{width:110,align:'right'}
+
+#OOBsOffrCnt=房貸專員<br>件數
+{width:110,align:'right'}
+
+#OOBsOffrCntLimit=房貸專員<br>件數上限
+{width:110,align:'right'}
+
+#OOBsOffrAmtCondX=房貸專員<br>計件金額門檻
+{width:110,align:'right'}
+
+#OOBsOffrPerccentX1=房貸專員<br>撥款業績比例
+{width:110,align:'right'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:120,align:'left'}
+
+^
+
+</sub>

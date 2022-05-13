@@ -240,15 +240,14 @@ public class L3R11 extends TradeBuffer {
 			wkTotaCount++;
 			// 提前還款金額=> add 清償違約金 List
 			wkExtraRepay = loanCalcRepayIntCom.getExtraAmt();
-			if (wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-				LoanCloseBreachVo v = new LoanCloseBreachVo();
-				v.setCustNo(ln.getCustNo());
-				v.setFacmNo(ln.getFacmNo());
-				v.setBormNo(ln.getBormNo());
-				v.setExtraRepay(wkExtraRepay);
-				v.setEndDate(iEntryDate);
-				iListCloseBreach.add(v);
-			}
+			LoanCloseBreachVo v = new LoanCloseBreachVo();
+			v.setCustNo(ln.getCustNo());
+			v.setFacmNo(ln.getFacmNo());
+			v.setBormNo(ln.getBormNo());
+			v.setExtraRepay(wkExtraRepay);
+			v.setEndDate(iEntryDate);
+			iListCloseBreach.add(v);
+
 		}
 		if (wkTotaCount == 0) {
 			throw new LogicException(titaVo, "E3081", ""); // 無符合結案區分之撥款資料

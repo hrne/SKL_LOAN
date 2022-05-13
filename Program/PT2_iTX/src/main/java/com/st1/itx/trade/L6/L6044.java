@@ -91,7 +91,7 @@ public class L6044 extends TradeBuffer {
 		// 查詢主管授權紀錄
 		Slice<TxAuthorize> slTxAuthorize = null;
 		if (iEntdyS>0) {
-			slTxAuthorize = sTxAuthorizeService.findEntdy(iEntdyS+19110000, iEntdyE+19110000, iSupNo +"%", this.index, this.limit, titaVo);
+			slTxAuthorize = sTxAuthorizeService.findSupNoEntdy(iEntdyS+19110000, iEntdyE+19110000, iSupNo +"%", this.index, this.limit, titaVo);
 		} else if(iTxDateS>0){
 			slTxAuthorize = sTxAuthorizeService.findCreatDate(ts1, ts2, iSupNo +"%", this.index, this.limit, titaVo);
 		}
@@ -102,7 +102,6 @@ public class L6044 extends TradeBuffer {
 		if (lTxAuthorize == null || lTxAuthorize.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "主管授權紀錄"); // 查無資料
 		}
-		
 		
 		// 如有找到資料
 		for (TxAuthorize tTxAuthorize : lTxAuthorize) {
@@ -155,7 +154,7 @@ public class L6044 extends TradeBuffer {
 			occursList.putParam("OODateTime", DateTime);
 
 			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
+		this.totaVo.addOccursList(occursList);
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

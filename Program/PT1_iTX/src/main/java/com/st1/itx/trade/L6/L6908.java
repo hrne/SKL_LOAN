@@ -145,11 +145,14 @@ public class L6908 extends TradeBuffer {
 						continue;
 					}
 				}
-
-				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
-					rvCls = rvCls.subtract(tAcDetail.getTxAmt());
-				} else {
+				if (tAcDetail.getReceivableFlag() >= 3) {
 					rvCls = rvCls.add(tAcDetail.getTxAmt());
+				} else {
+					if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
+						rvCls = rvCls.subtract(tAcDetail.getTxAmt());
+					} else {
+						rvCls = rvCls.add(tAcDetail.getTxAmt());
+					}
 				}
 			}
 		}
@@ -236,10 +239,14 @@ public class L6908 extends TradeBuffer {
 						parse.timeStampToStringDate(tAcDetail.getCreateDate()).replace("/", ""));
 				occursList.putParam("OOCreateTime", parse.timeStampToStringTime(tAcDetail.getCreateDate()));
 
-				if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
-					clsFlag = 0;
-				} else {
+				if (tAcDetail.getReceivableFlag() >= 3) {
 					clsFlag = 1;
+				} else {
+					if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
+						clsFlag = 0;
+					} else {
+						clsFlag = 1;
+					}
 				}
 				occursList.putParam("OOClsFlag", clsFlag);
 
@@ -250,7 +257,6 @@ public class L6908 extends TradeBuffer {
 		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

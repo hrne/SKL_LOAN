@@ -91,7 +91,7 @@ import com.st1.itx.util.parse.Parse;
 /**
  * AML交易檢核<BR>
  * 1.hcodeSendOut 撥款匯款 Call by Call by ApControl 經辦提交<BR>
- * 2.remitOut 暫收款退還  Call by Call by L3220 暫收款退還<BR>
+ * 2.remitOut 暫收款退還 Call by Call by L3220 暫收款退還<BR>
  * 3.achAuth ACH 銀扣授權 ACH Call by call by L440A<BR>
  * 4.postAuth ACH 銀扣授權 ACH Call by call by L441A<BR>
  * 5.bankDeduct 產出銀扣檔 Call by L4450-產出銀行扣帳檔、L4451-銀行扣帳檔維護、L4452-產出媒體檔<BR>
@@ -604,6 +604,11 @@ public class TxAmlCom extends TradeBuffer {
 				tTempVo.put("AmlRsp2", checkAmlVo.getConfirmStatus()); // 檢核狀態
 			}
 		}
+		// 更新匯款轉帳檔 AML回應碼
+		if (tBatxDetail.getRepayCode() == 1) {
+			updateBankRmtf(tBatxDetail.getAcDate(), tBatxDetail.getBatchNo(), tBatxDetail.getDetailSeq(), tTempVo,
+					titaVo);
+		}
 
 		return tTempVo;
 	}
@@ -650,8 +655,8 @@ public class TxAmlCom extends TradeBuffer {
 			tTempVo.put("AmlRsp2", checkAmlVo.getConfirmStatus());
 		}
 		// 更新匯款轉帳檔 AML回應碼
-		updateBankRmtf(tBankRmtf.getAcDate(),tBankRmtf.getBatchNo(),tBankRmtf.getDetailSeq(),tTempVo,titaVo);
-		
+		updateBankRmtf(tBankRmtf.getAcDate(), tBankRmtf.getBatchNo(), tBankRmtf.getDetailSeq(), tTempVo, titaVo);
+
 		return tTempVo;
 	}
 
@@ -817,8 +822,8 @@ public class TxAmlCom extends TradeBuffer {
 	private void updateBankRmtf(int acDate, String batchNo, int DetailSeq, TempVo tempVo, TitaVo titaVo)
 			throws LogicException {
 		String amlRsp = "0";
-		if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2"))
-				|| "2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
+		if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2")) || "2".equals(tempVo.get("AmlRsp1"))
+				|| "2".equals(tempVo.get("AmlRsp2"))) {
 			if ("2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
 				amlRsp = "2";
 			} else if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2"))) {

@@ -14,7 +14,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdSyndFee;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdSyndFeeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -33,6 +35,8 @@ public class L6022 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdSyndFeeService cdSyndFeeService;
+    @Autowired 
+	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -68,6 +72,8 @@ public class L6022 extends TradeBuffer {
 			occursList.putParam("OOSyndFeeCode", tCdSyndFee.getSyndFeeCode());
 			occursList.putParam("OOSyndFeeItem", tCdSyndFee.getSyndFeeItem());
 			occursList.putParam("OOAcctCode", tCdSyndFee.getAcctCode());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdSyndFee.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdSyndFee.getLastUpdate()));
+			occursList.putParam("OOLastEmp",tCdSyndFee.getLastUpdateEmpNo() + " " + empName(titaVo, tCdSyndFee.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -80,5 +86,14 @@ public class L6022 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }
