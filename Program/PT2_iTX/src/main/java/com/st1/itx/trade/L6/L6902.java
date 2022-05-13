@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L6;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,10 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -42,6 +45,8 @@ public class L6902 extends TradeBuffer {
 	public AcMainService sAcMainService;
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
+	@Autowired
+	public CdEmpService sCdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -119,6 +124,10 @@ public class L6902 extends TradeBuffer {
 				occursList.putParam("OOCrAmt", tAcMain.getCrAmt());
 				occursList.putParam("OODbCr", dbcr);
 				occursList.putParam("OOTdBal", tAcMain.getTdBal());
+				Timestamp lastUpdateTime = tAcMain.getLastUpdate();
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
+				String lastUpdateEmpNo = tAcMain.getLastUpdateEmpNo();
+				occursList.putParam("OOLastEmp", findEmpNoAndName(lastUpdateEmpNo, titaVo));
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -130,6 +139,8 @@ public class L6902 extends TradeBuffer {
 			int acdate = 0;
 			String acbookcode = "";
 			String acsubbookcode="";
+			Timestamp lastUpdateTime = null;
+			String lastUpdateEmpNo = "";
 			
 			for (AcMain tAcMain : lAcMain) {
 								
@@ -142,6 +153,8 @@ public class L6902 extends TradeBuffer {
 					this.info("dbAmt="+dbAmt+",crAmt="+crAmt+",tdbal="+tdbal);
 					acdate = tAcMain.getAcDate();
 					acsubbookcode=tAcMain.getAcSubBookCode();
+					lastUpdateTime = tAcMain.getLastUpdate();
+					lastUpdateEmpNo = tAcMain.getLastUpdateEmpNo();
 					continue;
 				}
 
@@ -154,6 +167,8 @@ public class L6902 extends TradeBuffer {
 					acdate = tAcMain.getAcDate();
 					acbookcode = tAcMain.getAcBookCode();
 					acsubbookcode=tAcMain.getAcSubBookCode();
+					lastUpdateTime = tAcMain.getLastUpdate();
+					lastUpdateEmpNo = tAcMain.getLastUpdateEmpNo();
 					continue;
 				}
 					OccursList occursList = new OccursList();
@@ -164,6 +179,9 @@ public class L6902 extends TradeBuffer {
 					occursList.putParam("OOCrAmt", crAmt);
 					occursList.putParam("OODbCr", dbcr);
 					occursList.putParam("OOTdBal", tdbal);
+					occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
+					occursList.putParam("OOLastEmp", findEmpNoAndName(lastUpdateEmpNo, titaVo));
+					
 					
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
@@ -175,6 +193,8 @@ public class L6902 extends TradeBuffer {
 					acdate = tAcMain.getAcDate();
 					acbookcode = tAcMain.getAcBookCode();
 					acsubbookcode = tAcMain.getAcSubBookCode();
+					lastUpdateTime = tAcMain.getLastUpdate();
+					lastUpdateEmpNo = tAcMain.getLastUpdateEmpNo();
 					dbAmt = dbAmt.add(tAcMain.getDbAmt());
 					crAmt = crAmt.add(tAcMain.getCrAmt());
 					tdbal = tdbal.add(tAcMain.getTdBal());
@@ -189,6 +209,8 @@ public class L6902 extends TradeBuffer {
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OODbCr", dbcr);
 			occursList.putParam("OOTdBal", tdbal);
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
+			occursList.putParam("OOLastEmp", findEmpNoAndName(lastUpdateEmpNo, titaVo));
 			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -205,5 +227,16 @@ public class L6902 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private String findEmpNoAndName(String empNo, TitaVo titaVo) {
+
+		String empName = empNo;
+		
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if(cdEmp != null)
+			empName = cdEmp.getFullname();
+		
+		return empNo + empName;
 	}
 }

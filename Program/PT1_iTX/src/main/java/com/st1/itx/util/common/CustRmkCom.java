@@ -60,6 +60,8 @@ public class CustRmkCom extends TradeBuffer {
 	public ArrayList<TotaVo> getCustRmk(TitaVo titaVo, int iCustNo) throws LogicException {
 		this.info("CustRmkCom.getCustRmk = " + iCustNo);
 
+		this.totaVo.init(titaVo);
+		
 		// 查詢顧客控管警訊檔
 
 		Slice<CustRmk> slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
@@ -85,6 +87,8 @@ public class CustRmkCom extends TradeBuffer {
 //					"該戶有顧客控管警訊", titaVo);
 //			this.info("time=" + parse.IntegerToString(dateUtil.getNowIntegerTime() / 100 + 3, 4));
 
+		} else {
+			this.addList(this.totaVo);
 		}
 
 		return this.sendList();

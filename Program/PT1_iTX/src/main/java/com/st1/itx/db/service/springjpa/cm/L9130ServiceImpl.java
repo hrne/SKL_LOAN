@@ -105,7 +105,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
-		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
+		sql += "           AND ACD.\" \"  = '8' ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
@@ -166,6 +166,10 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(NVL(ACD.\"TxAmt\",0)) AS \"TxAmt\" "; // 金額
 		sql += "      , ACD.\"AcSubBookCode\"                  "; // 區隔帳冊
 		sql += "      , RPAD(CDAC.\"AcNoItem\",40,' ') AS \"AcNoItem\" "; // 傳票摘要
+		sql += "      , CASE ";
+		sql += "          WHEN ACD.\"ReceivableFlag\" = '8' ";
+		sql += "          THEN ACD.\"RvNo\" ";
+		sql += "        ELSE ' ' END              AS \"AcReceivableCode\" "; // 銷帳碼
 		sql += " FROM \"AcDetail\" ACD ";
 		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                            AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -180,6 +184,10 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
 		sql += "        , ACD.\"DbCr\"          "; // 借貸別
 		sql += "        , RPAD(CDAC.\"AcNoItem\",40,' ') "; // 傳票摘要
+		sql += "        , CASE ";
+		sql += "            WHEN ACD.\"ReceivableFlag\" = '8' ";
+		sql += "            THEN ACD.\"RvNo\" ";
+		sql += "          ELSE ' ' END "; // 銷帳碼
 		sql += " ORDER BY ACD.\"AcDate\"        "; // 會計日期
 		sql += "        , ACD.\"AcBookCode\"    "; // 帳冊別: 000:全公司
 		sql += "        , ACD.\"AcSubBookCode\" "; // 區隔帳冊
@@ -187,6 +195,10 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
 		sql += "        , ACD.\"DbCr\" DESC     "; // 借貸別
 		sql += "        , RPAD(CDAC.\"AcNoItem\",40,' ') "; // 傳票摘要
+		sql += "        , CASE ";
+		sql += "            WHEN ACD.\"ReceivableFlag\" = '8' ";
+		sql += "            THEN ACD.\"RvNo\" ";
+		sql += "          ELSE ' ' END "; // 銷帳碼
 
 		this.info("L9130ServiceImpl sql=" + sql);
 		Query query;

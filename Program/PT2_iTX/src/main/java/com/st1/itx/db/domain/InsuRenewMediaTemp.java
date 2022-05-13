@@ -29,7 +29,7 @@ public class InsuRenewMediaTemp implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8584572447196525352L;
 
 // 序號
   @Id

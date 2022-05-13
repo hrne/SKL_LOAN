@@ -27,14 +27,13 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private BaseEntityManager baseEntityManager;
 
 	@Autowired
-	public Parse parse;
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int iAdjCode, TitaVo titaVo) throws Exception {
 		// iAdjCode 0: 一般、 4:定期機動指標利率變動調整合約利率
 		int iTxKind = Integer.parseInt(titaVo.getParam("TxKind"));
@@ -163,7 +162,10 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 1: // 定期機動調整
 			sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as seq ";
 			sql += "       from \"LoanRateChange\" rr                          ";
-			sql += "       where rr.\"EffectDate\" <= " + iEffectDateS;
+			sql += "       left join \"LoanBorMain\" LBM on LBM.\"CustNo\" = rr.\"CustNo\" ";
+			sql += "                                    AND LBM.\"FacmNo\" = rr.\"FacmNo\" ";
+			sql += "                                    AND LBM.\"BormNo\" = rr.\"BormNo\" ";
+			sql += "       where rr.\"EffectDate\" <= LBM.\"NextAdjRateDate\" ";
 			break;
 		case 2: // 指數型利率調整
 		case 3: // 機動利率調整
@@ -332,5 +334,129 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("result ..." + result);
 
 		return result;
+	}
+
+	/**
+	 * 檢核本次指標利率與前一筆是否有差異
+	 * 
+	 * @param iBaseRateCode 指標利率代碼
+	 * @param iEffectDate   指標利率生效日
+	 * @param titaVo        TitaVo
+	 * @return 查詢結果
+	 */
+	public List<Map<String, String>> checkBaseRateChange(String iBaseRateCode, int iEffectDate, TitaVo titaVo) {
+
+		if (iEffectDate <= 19110000) {
+			iEffectDate += 19110000;
+		}
+
+		String currencyCode = "TWD";
+
+		String sql = "";
+
+		sql += "WITH rawData AS ( ";
+		sql += "    SELECT \"BaseRateCode\" ";
+		sql += "         , \"BaseRate\" ";
+		sql += "         , ROW_NUMBER() ";
+		sql += "           OVER ( ";
+		sql += "               PARTITION BY \"BaseRateCode\" ";
+		sql += "               ORDER BY \"EffectDate\" DESC ";
+		sql += "           ) AS \"Seq\" ";
+		sql += "    FROM \"CdBaseRate\" ";
+		sql += "    WHERE \"CurrencyCode\" = :inputCurrencyCode "; // -- 幣別
+		sql += "      AND \"BaseRateCode\" = :inputBaseRateCode "; // -- 指標利率代碼
+		sql += "      AND \"EffectDate\" <= :inputEffectDate -"; // - 生效日期
+		sql += "      AND \"EffectFlag\" <= 1 "; // --生效記號 0:已放行 1:已使用 2:未放行
+		sql += ") ";
+		sql += "SELECT R1.\"BaseRate\" ";
+		sql += "     , NVL(R2.\"BaseRate\",0) AS \"OriBaseRate\" ";
+		sql += "     , CASE ";
+		sql += "         WHEN R1.\"EffectDate\" != :inputEffectDate "; // -- 未抓到生效日期為傳入參數當天的情形
+		sql += "         THEN 'N' ";
+		sql += "         WHEN R2.\"BaseRateCode\" IS NULL "; // -- 沒有上一筆的情形
+		sql += "         THEN 'Y' ";
+		sql += "         WHEN NVL(R2.\"BaseRate\",0) != R1.\"BaseRate\" "; // -- 利率不同
+		sql += "         THEN 'Y' ";
+		sql += "       ELSE 'N' END AS \"BaseRateChangeFlag\" ";
+		sql += "FROM rawData R1 ";
+		sql += "LEFT JOIN rawData R2 ON R2.\"BaseRateCode\" = R1.\"BaseRateCode\" ";
+		sql += "                    AND R2.\"Seq\" = 2 ";
+		sql += "WHERE R1.\"Seq\" = 1 ";
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputCurrencyCode", currencyCode);
+		query.setParameter("inputBaseRateCode", iBaseRateCode);
+		query.setParameter("inputEffectDate", iEffectDate);
+		return this.convertToMap(query);
+	}
+
+	/**
+	 * 取得受指標利率異動影響的客戶名單
+	 * 
+	 * @param iBaseRateCode 指標利率代碼
+	 * @param iCustType     客戶別
+	 * @param iEffectDate   指標利率生效日
+	 * @param titaVo        TitaVo
+	 * @return 查詢結果
+	 */
+	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate,
+			TitaVo titaVo) {
+		String sql = "";
+		sql += "WITH rawData AS ( ";
+		sql += "    SELECT LRC.\"CustNo\" ";
+		sql += "         , LRC.\"FacmNo\" ";
+		sql += "         , LRC.\"BormNo\" ";
+		sql += "         , LRC.\"EffectDate\" ";
+		sql += "         , LRC.\"ProdNo\" ";
+		sql += "         , LRC.\"RateIncr\" ";
+		sql += "         , LRC.\"IndividualIncr\" ";
+		sql += "         , LRC.\"FitRate\" ";
+		sql += "         , ROW_NUMBER() ";
+		sql += "           OVER ( ";
+		sql += "               PARTITION BY LRC.\"CustNo\" ";
+		sql += "                          , LRC.\"FacmNo\" ";
+		sql += "                          , LRC.\"BormNo\" ";
+		sql += "               ORDER BY LRC.\"EffectDate\" ASC ";
+		sql += "           ) AS \"Seq\"  ";
+		sql += "    FROM \"LoanRateChange\" LRC ";
+		sql += "    LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = LRC.\"CustNo\" ";
+		sql += "                               AND LBM.\"FacmNo\" = LRC.\"FacmNo\" ";
+		sql += "                               AND LBM.\"BormNo\" = LRC.\"BormNo\" ";
+		sql += "    LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LRC.\"CustNo\" ";
+		sql += "    WHERE NVL(LBM.\"MaturityDate\",0) >= :inputEffectDate ";
+		sql += "      AND LRC.\"EffectDate\" >= :inputEffectDate ";
+		sql += "      AND LRC.\"BaseRateCode\" = :inputBaseRateCode ";
+		sql += "      AND LRC.\"RateCode\" = '3' ";
+		sql += "      AND CASE ";
+		sql += "            WHEN :inputCustType = 1 ";
+		sql += "                 AND NVL(CM.\"EntCode\",'0') = '0' ";
+		sql += "            THEN 1 ";
+		sql += "            WHEN :inputCustType = 2 ";
+		sql += "                 AND NVL(CM.\"EntCode\",'0') != '0' ";
+		sql += "            THEN 1 ";
+		sql += "          ELSE 0 END = 1";
+		sql += ") ";
+		sql += "SELECT \"CustNo\" ";
+		sql += "     , \"FacmNo\" ";
+		sql += "     , \"BormNo\" ";
+		sql += "     , \"EffectDate\" ";
+		sql += "     , \"ProdNo\" ";
+		sql += "     , \"RateIncr\" ";
+		sql += "     , \"IndividualIncr\" ";
+		sql += "     , \"FitRate\" ";
+		sql += "FROM rawData ";
+		sql += "WHERE \"Seq\" = 1 ";
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputBaseRateCode", iBaseRateCode);
+		query.setParameter("inputEffectDate", iEffectDate);
+		query.setParameter("inputCustType", iCustType);
+		return this.convertToMap(query);
 	}
 }

@@ -16,14 +16,20 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BatxBaseRateChange;
+import com.st1.itx.db.domain.BatxBaseRateChangeId;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
+import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.domain.LoanRateChangeId;
+import com.st1.itx.db.service.BatxBaseRateChangeService;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.db.service.springjpa.cm.L4320ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.StaticTool;
@@ -67,6 +73,12 @@ public class L4320Batch extends TradeBuffer {
 
 	@Autowired
 	public CdCityService cdCityService;
+
+	@Autowired
+	private BatxBaseRateChangeService sBatxBaseRateChangeService;
+
+	@Autowired
+	private LoanRateChangeService sLoanRateChangeService;
 
 	@Autowired
 	public L4320ServiceImpl l4320BatchServiceImpl;
@@ -141,6 +153,14 @@ public class L4320Batch extends TradeBuffer {
 
 //		正常
 		if (titaVo.isHcodeNormal()) {
+			// 2022-05-13 ST1 Wei 新增
+			// 若作業項目為1:定期機動調整
+			// 且 指標利率生效日=本次利率調整生效月份
+			// 調整 所有受此指標利率影響的借戶利率
+			if (iTxKind == 1 && (iEffectDate / 100) == iEffectMonth) {
+				doBaseRateChange(titaVo);
+			}
+
 			try {
 				execute(0, titaVo); // 0: 一般
 			} catch (LogicException e) {
@@ -478,8 +498,8 @@ public class L4320Batch extends TradeBuffer {
 			// 定期機動指標利率變動調整合約利率
 			if (iAdjCode == 4) {
 				adjCode = 4;
-				if (nextAdjRateDate < wkLastMonthDateS && nextAdjRateDate < maturityDate ) {
-					warnMsg += ", 下次利率調整日小於調整月份";				
+				if (nextAdjRateDate < wkLastMonthDateS && nextAdjRateDate < maturityDate) {
+					warnMsg += ", 下次利率調整日小於調整月份";
 				}
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1;
@@ -802,6 +822,196 @@ public class L4320Batch extends TradeBuffer {
 				} else {
 					facRate.put(facm, fitRate);
 					this.info(facm.toString() + " facRate=" + facRate.get(facm));
+				}
+			}
+		}
+	}
+
+	// 指標利率異動
+	private void doBaseRateChange(TitaVo titaVo) throws LogicException {
+		this.info("doBaseRateChange ...");
+		// 指標利率代碼 iBaseRateCode
+		// 客戶別 iCustType 1:個金 2:企金
+		// 指標利率生效日 iEffectDate
+
+		// 檢核:本次指標利率與前一筆是否有差異
+		List<Map<String, String>> checkResultList = l4320BatchServiceImpl.checkBaseRateChange(iBaseRateCode,
+				iEffectDate, titaVo);
+
+		if (checkResultList == null || checkResultList.isEmpty()) {
+			this.info("checkResultList is null.");
+			return;
+		}
+		Map<String, String> checkResult = checkResultList.get(0);
+		BigDecimal baseRate = parse.stringToBigDecimal(checkResult.get("BaseRate"));
+		BigDecimal oriBaseRate = parse.stringToBigDecimal(checkResult.get("OriBaseRate"));
+		String baseRateChangeFlag = checkResult.get("BaseRateChangeFlag");
+
+		if (baseRateChangeFlag == null || !baseRateChangeFlag.equals("Y")) {
+			this.info("baseRateChangeFlag != Y");
+			return;
+		}
+
+		// 取得受影響的客戶名單
+		List<Map<String, String>> baseRateChangeCustList = l4320BatchServiceImpl.getBaseRateChangeCust(iBaseRateCode,
+				iCustType, iEffectDate, titaVo);
+
+		if (baseRateChangeCustList == null || baseRateChangeCustList.isEmpty()) {
+			this.info("baseRateChangeCustList is null.");
+			return;
+		}
+
+		// 寫入BatxBaseRateChange
+		setBatxBaseRateChangeAll(baseRate, oriBaseRate, baseRateChangeCustList, titaVo);
+
+		// 更新放款利率檔資料
+		updateLoanRateChangeAll(baseRate, baseRateChangeCustList, titaVo);
+	}
+
+	private void setBatxBaseRateChangeAll(BigDecimal baseRate, BigDecimal oriBaseRate,
+			List<Map<String, String>> baseRateChangeCustList, TitaVo titaVo) throws LogicException {
+
+		int adjDate = titaVo.getEntDyI() < 19110000 ? titaVo.getEntDyI() + 19110000 : titaVo.getEntDyI();
+
+		boolean isExist;
+		BatxBaseRateChangeId batxBaseRateChangeId;
+		BatxBaseRateChange batxBaseRateChange;
+		BigDecimal rateIncr;
+		BigDecimal individualIncr;
+		BigDecimal fitRate;
+		BigDecimal newFitRate;
+		TempVo tTempVo;
+
+		for (Map<String, String> baseRateChangeCust : baseRateChangeCustList) {
+			int custEffectDate = parse.stringToInteger(baseRateChangeCust.get("EffectDate"));
+
+			batxBaseRateChangeId = new BatxBaseRateChangeId();
+			batxBaseRateChangeId.setAdjDate(adjDate);
+			batxBaseRateChangeId.setCustNo(parse.stringToInteger(baseRateChangeCust.get("CustNo")));
+			batxBaseRateChangeId.setFacmNo(parse.stringToInteger(baseRateChangeCust.get("FacmNo")));
+			batxBaseRateChangeId.setBormNo(parse.stringToInteger(baseRateChangeCust.get("BormNo")));
+
+			batxBaseRateChange = sBatxBaseRateChangeService.holdById(batxBaseRateChangeId, titaVo);
+
+			if (batxBaseRateChange == null) {
+				isExist = false;
+				batxBaseRateChange = new BatxBaseRateChange();
+				batxBaseRateChange.setBatxBaseRateChangeId(batxBaseRateChangeId);
+				batxBaseRateChange.setAdjDate(adjDate);
+				batxBaseRateChange.setCustNo(parse.stringToInteger(baseRateChangeCust.get("CustNo")));
+				batxBaseRateChange.setFacmNo(parse.stringToInteger(baseRateChangeCust.get("FacmNo")));
+				batxBaseRateChange.setBormNo(parse.stringToInteger(baseRateChangeCust.get("BormNo")));
+				batxBaseRateChange.setTitaTlrNo(titaVo.getTlrNo());
+				batxBaseRateChange.setTitaTxtNo(titaVo.getTxtNo());
+			} else {
+				isExist = true;
+				// 若已存在,且指標利率相同,跳過這筆
+				if (batxBaseRateChange.getBaseRate().compareTo(baseRate) == 0) {
+					continue;
+				}
+			}
+			batxBaseRateChange.setProdNo(baseRateChangeCust.get("ProdNo"));
+			batxBaseRateChange.setBaseRateCode(iBaseRateCode);
+			batxBaseRateChange.setOriBaseRate(oriBaseRate);
+			batxBaseRateChange.setBaseRateEffectDate(iEffectDate <= 19110000 ? iEffectDate + 19110000 : iEffectDate);
+			batxBaseRateChange.setBaseRate(baseRate);
+
+			// 原加碼利率
+			rateIncr = parse.stringToBigDecimal(baseRateChangeCust.get("RateIncr"));
+			// 原個別加碼利率
+			individualIncr = parse.stringToBigDecimal(baseRateChangeCust.get("IndividualIncr"));
+			// 原利率
+			fitRate = parse.stringToBigDecimal(baseRateChangeCust.get("FitRate"));
+
+			// 運算新的適用利率
+			newFitRate = baseRate.add(rateIncr).add(individualIncr);
+			batxBaseRateChange.setFitRate(newFitRate);
+
+			if (fitRate.compareTo(newFitRate) == 0) {
+				// 若利率未變動，放款利率變動檔生效日擺0
+				batxBaseRateChange.setTxEffectDate(0);
+			} else {
+				batxBaseRateChange.setTxEffectDate(custEffectDate);
+			}
+
+			tTempVo = new TempVo();
+			tTempVo.putParam("RateIncr", rateIncr);
+			tTempVo.putParam("IndividualIncr", individualIncr);
+			tTempVo.putParam("FitRate", fitRate);
+			tTempVo.putParam("EffectDate", custEffectDate);
+			batxBaseRateChange.setJsonFields(tTempVo.getJsonString());
+
+			if (isExist) {
+				// update
+				try {
+					sBatxBaseRateChangeService.update(batxBaseRateChange, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0007", "BatxBaseRateChange update error : " + e.getErrorMsg());
+				}
+			} else {
+				// insert
+				try {
+					sBatxBaseRateChangeService.insert(batxBaseRateChange, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", ", BatxBaseRateChange insert error : " + e.getErrorMsg());
+				}
+			}
+		}
+	}
+
+	private void updateLoanRateChangeAll(BigDecimal baseRate, List<Map<String, String>> baseRateChangeCustList,
+			TitaVo titaVo) throws LogicException {
+
+		LoanRateChangeId loanRateChangeId;
+		LoanRateChange loanRateChange;
+		int tmpCustNo;
+		int tmpFacmNo;
+		int tmpBormNo;
+		int custEffectDate;
+		BigDecimal rateIncr;
+		BigDecimal individualIncr;
+		BigDecimal fitRate;
+		BigDecimal newFitRate;
+
+		for (Map<String, String> baseRateChangeCust : baseRateChangeCustList) {
+
+			loanRateChangeId = new LoanRateChangeId();
+
+			tmpCustNo = parse.stringToInteger(baseRateChangeCust.get("CustNo"));
+			tmpFacmNo = parse.stringToInteger(baseRateChangeCust.get("FacmNo"));
+			tmpBormNo = parse.stringToInteger(baseRateChangeCust.get("BormNo"));
+			custEffectDate = parse.stringToInteger(baseRateChangeCust.get("EffectDate"));
+
+			loanRateChangeId.setCustNo(tmpCustNo);
+			loanRateChangeId.setFacmNo(tmpFacmNo);
+			loanRateChangeId.setBormNo(tmpBormNo);
+			loanRateChangeId.setEffectDate(custEffectDate);
+
+			loanRateChange = sLoanRateChangeService.holdById(loanRateChangeId, titaVo);
+
+			if (loanRateChange == null) {
+				this.error("loanRateChange null.");
+			} else {
+				// 原加碼利率
+				rateIncr = parse.stringToBigDecimal(baseRateChangeCust.get("RateIncr"));
+				// 原個別加碼利率
+				individualIncr = parse.stringToBigDecimal(baseRateChangeCust.get("IndividualIncr"));
+				// 原利率
+				fitRate = parse.stringToBigDecimal(baseRateChangeCust.get("FitRate"));
+
+				// 運算新的適用利率
+				newFitRate = baseRate.add(rateIncr).add(individualIncr);
+				loanRateChange.setFitRate(newFitRate);
+
+				if (fitRate.compareTo(newFitRate) != 0) {
+					// update
+					try {
+						sLoanRateChangeService.update(loanRateChange, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0007", "LoanRateChange update error : " + e.getErrorMsg());
+					}
+				} else {
+					this.info("此筆利率異動後相同,不更新.");
 				}
 			}
 		}

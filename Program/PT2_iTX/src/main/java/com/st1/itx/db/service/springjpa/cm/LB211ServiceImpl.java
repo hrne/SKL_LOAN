@@ -57,10 +57,32 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// B211 聯徵每日授信餘額變動資料檔
-		sql = "SELECT M.\"BankItem\" " + "     , M.\"BranchItem\" " + "     , M.\"TranCode\" " + "     , M.\"CustId\" " + "     , M.\"SubTranCode\" " + "     , M.\"AcDate\" " + "     , M.\"AcctNo\" "
-				+ "     , M.\"TxAmt\" " + "     , M.\"LoanBal\" " + "     , M.\"RepayCode\" " + "     , M.\"NegStatus\" " + "     , M.\"AcctCode\" " + "     , M.\"SubAcctCode\" "
-				+ "     , M.\"BadDebtDate\" " + "     , M.\"ConsumeFg\" " + "     , M.\"FinCode\" " + "     , M.\"UsageCode\" " + "     , M.\"Filler18\" " + " FROM  \"JcicB211\" M "
-				+ " WHERE ( M.\"DataYMD\" Between :acdateStart  AND :acdateEnd  )" + " ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\"  ";
+		sql = "SELECT M.\"BankItem\"   ";
+		sql += "     , M.\"BranchItem\" ";
+		sql += "     , M.\"TranCode\"   ";
+		sql += "     , M.\"CustId\"     ";
+		sql += "     , M.\"SubTranCode\"";
+		sql += "     , M.\"AcDate\"     ";
+		sql += "     , M.\"AcctNo\"     ";
+		sql += "     , M.\"TxAmt\"      ";
+		sql += "     , M.\"LoanBal\"    ";
+		sql += "     , M.\"RepayCode\"  ";
+		sql += "     , M.\"NegStatus\"  ";
+		sql += "     , M.\"AcctCode\"   ";
+		sql += "     , M.\"SubAcctCode\"";
+		sql += "     , M.\"BadDebtDate\"";
+		sql += "     , M.\"ConsumeFg\"  ";
+		sql += "     , M.\"FinCode\"    ";
+		sql += "     , M.\"UsageCode\"  ";
+		sql += "     , M.\"Filler18\"   ";
+		sql += "     , LB.\"SpecificDd\"";
+		sql += "     , LB.\"Status\"    ";
+		sql += "   FROM  \"JcicB211\" M ";
+		sql += "   LEFT JOIN \"LoanBorMain\" LB ON LB.\"CustNo\" = substr(M.\"AcctNo\",1,7)";
+		sql += "                               AND LB.\"FacmNo\" = substr(M.\"AcctNo\",8,3)";
+		sql += "                               AND LB.\"BormNo\" = substr(M.\"AcctNo\",12,3)";
+		sql += "   WHERE ( M.\"DataYMD\" Between :acdateStart  AND :acdateEnd  )";
+		sql += "   ORDER BY M.\"BankItem\", M.\"BranchItem\", M.\"AcctNo\", M.\"AcDate\", M.\"TranCode\", M.\"LoanBal\"  ";
 
 		this.info("sql=" + sql);
 

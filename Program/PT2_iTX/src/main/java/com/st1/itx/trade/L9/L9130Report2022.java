@@ -286,6 +286,7 @@ public class L9130Report2022 extends MakeReport {
 			dbCr = l9130.get("F4"); // 借貸別
 			txAmt = l9130.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(l9130.get("F5")); // 金額
 			slipRmk = l9130.get("F7"); // 科目名稱
+			acReceivableCode= l9130.get("F8"); // 銷帳碼
 
 			// 借方金額累加
 			drAmtTotal = dbCr.equals("D") ? drAmtTotal.add(txAmt) : drAmtTotal;

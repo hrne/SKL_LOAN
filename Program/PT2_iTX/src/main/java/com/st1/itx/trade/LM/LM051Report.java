@@ -74,13 +74,9 @@ public class LM051Report extends MakeReport {
 
 		List<Map<String, String>> lM051List = null;
 
-//		int dataSize = 0;
 
-		// 有四種不同條件，要query 5次
-//		for (int i = 1; i <= 5; i++) {
 		try {
 
-//			lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100, i);
 			lM051List = lM051ServiceImpl.findAll(titaVo, thisYM + 191100);
 
 		} catch (Exception e) {
@@ -89,15 +85,11 @@ public class LM051Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM051ServiceImpl.findAll error = " + errors.toString());
 		}
-//		dataSize += lM051List.size();
+
 
 		if (lM051List.size() > 0) {
-
 			exportExcel(lM051List);
-
 		}
-
-//		}
 
 		if (lM051List.size() == 0) {
 			makeExcel.setValue(3, 1, "本日無資料");
@@ -215,7 +207,7 @@ public class LM051Report extends MakeReport {
 			// 本身資產分類不是5 且 金額不等於0 時，放入值
 			BigDecimal class5 = tLDVo.get("F15").isEmpty() || tLDVo.get("F15") == null ? BigDecimal.ZERO
 					: new BigDecimal(tLDVo.get("F15"));
-			if (tLDVo.get("F16") != "5" && BigDecimal.ZERO.equals(class5)) {
+			if (tLDVo.get("F16") != "5" && !BigDecimal.ZERO.equals(class5)) {
 				makeExcel.setValue(row, 17, class5, "#,##0");
 
 			}

@@ -9,13 +9,10 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.LoanCustRmk;
-import com.st1.itx.db.domain.LoanCustRmkId;
-import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.LoanCustRmkService;
+import com.st1.itx.db.domain.TxTranCode;
+import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.common.CustRmkCom;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L2R62")
@@ -23,88 +20,35 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 
  * 
- * @author YuJiaXing
+ * @author eric chang
  * @version 1.0.0
  */
 public class L2R62 extends TradeBuffer {
 
-	/* DB服務注入 */
 	@Autowired
-	public LoanCustRmkService loanCustRmkService;
+	public TxTranCodeService txTranCodeService;
 
 	@Autowired
-	public CdEmpService cdEmpService;
+	private CustRmkCom custRmkCom;
 
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L2R62 ");
+		this.info("active L2R62 = " + titaVo.getTxcd() + "/" + titaVo.getParam("RmkCustNo"));
 		this.totaVo.init(titaVo);
 
-		// tita
-		// 功能 1新增 2修改 4刪除 5查詢
-		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
-		// 戶號
-		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
-		// 會計日期
-		int iAcDate = parse.stringToInteger(titaVo.getParam("RimAcDate"));
-		// 備忘錄序號
-		int iRmkNo = parse.stringToInteger(titaVo.getParam("RimRmkNo"));
+		int custNo = parse.stringToInteger(titaVo.getParam("RmkCustNo"));
 
-		// new table
-		LoanCustRmk tLoanCustRmk = new LoanCustRmk();
-		// new PK
-		LoanCustRmkId loanCustRmkId = new LoanCustRmkId();
-		// 塞值到TablePK
-		loanCustRmkId.setCustNo(iCustNo);
-		loanCustRmkId.setAcDate(iAcDate);
-		loanCustRmkId.setRmkNo(iRmkNo);
-		// FunCd 1新增
-		if (iFunCd == 1) {
+		TxTranCode txTranCode = txTranCodeService.findById(titaVo.getTxcd(), titaVo);
 
-			// 測試該戶號是否存在帳務備忘錄明細檔
-			tLoanCustRmk = loanCustRmkService.maxRmkNoFirst(iCustNo, iAcDate, titaVo);
-			// 不存在備忘錄序號為1
-			if (tLoanCustRmk == null) {
-				tLoanCustRmk = new LoanCustRmk();
-			}
-			this.info("RmkNo :" + tLoanCustRmk.getRmkNo());
-			this.totaVo.putParam("L2r62RmkNo", tLoanCustRmk.getRmkNo() + 1);
-			this.totaVo.putParam("L2r62RmkCode", "");
-			this.totaVo.putParam("L2r62RmkDesc", "");
-			// FunCd 2修改.4刪除.5查詢
+		if (txTranCode != null && txTranCode.getCustRmkFg() == 1) {
+			return custRmkCom.getCustRmk(titaVo, custNo);
 		} else {
-			tLoanCustRmk = loanCustRmkService.findById(loanCustRmkId, titaVo);
-			// 該戶號 備忘錄序號查不到資料 拋錯
-			if (tLoanCustRmk == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "備忘錄序號" + iRmkNo + "不存在帳務備忘錄明細檔。"); // 查詢資料不存在
-			}
-
-			this.totaVo.putParam("L2r62AcDate", tLoanCustRmk.getAcDate());
-			this.totaVo.putParam("L2r62RmkNo", tLoanCustRmk.getRmkNo());
-//			this.totaVo.putParam("L2r62RmkCode", tLoanCustRmk.getRmkCode());
-			this.totaVo.putParam("L2r62RmkDesc", tLoanCustRmk.getRmkDesc());
-			this.totaVo.putParam("L2r62EmpNo", tLoanCustRmk.getCreateEmpNo());
-			this.totaVo.putParam("L2r62FacmNo", tLoanCustRmk.getFacmNo());
-			this.totaVo.putParam("L2r62BormNo", tLoanCustRmk.getBormNo());
-			this.totaVo.putParam("L2r62BorxNo", tLoanCustRmk.getBorxNo());
-			CdEmp cdEmp = cdEmpService.findById(tLoanCustRmk.getCreateEmpNo(), titaVo);
-
-			if (cdEmp == null) {
-				this.totaVo.putParam("L2r62EmpName", tLoanCustRmk.getCreateEmpNo());
-			} else {
-				this.totaVo.putParam("L2r62EmpName", cdEmp.getFullname());
-			}
+			this.addList(this.totaVo);
+			return this.sendList();
 		}
 
-		this.addList(this.totaVo);
-		return this.sendList();
 	}
 }

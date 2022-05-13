@@ -132,6 +132,13 @@ public class L9130 extends TradeBuffer {
 			this.error("L9130產生L9131總帳日結單代傳票時發生錯誤 = " + errors.toString());
 		}
 
+		// 2022-05-13 ST1 Wei 新增:
+		// from Linda : 珮瑜產生批號90~99時，只需上傳傳票，產生L9131報表，後面的報表不產
+		if (iBatchNo >= 90 && iBatchNo <= 99) {
+			this.addList(this.totaVo);
+			return this.sendList();
+		}
+
 		try {
 			tranL9132.run(titaVo);
 		} catch (Exception e) {

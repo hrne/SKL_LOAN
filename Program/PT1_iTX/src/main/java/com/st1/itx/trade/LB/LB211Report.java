@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LB211ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SystemParasService;
@@ -43,6 +44,9 @@ public class LB211Report extends MakeReport {
 
 	@Autowired
 	public MakeFile makeFile;
+
+	@Autowired
+	public Parse parse;
 
 	@Autowired
 	public SystemParasService sSystemParasService;
@@ -77,6 +81,22 @@ public class LB211Report extends MakeReport {
 		}
 		this.info("--------LBList.size()=" + listCount);
 
+		// 逾期期數＝報送日期的年月－（繳息迄日＋１個月的年月）,但若應繳日＞報送日期的日時，再減回１期
+
+		// 應繳日SpecificDd > strTodaydd 且 第10個欄位RepayCode > 0 且 Status不是(2,6)
+		for (Map<String, String> t : LBList) {
+			if (parse.stringToInteger(t.get("SpecificDd")) > parse.stringToInteger(strTodaydd)
+					&& parse.isNumeric(t.get("RepayCode")) && parse.stringToInteger(t.get("Status")) != 2
+					&& parse.stringToInteger(t.get("Status")) != 6) {
+
+				if (parse.stringToInteger(t.get("RepayCode")) > 0) {
+//					t.put("RepayCode", "" + (parse.stringToInteger(t.get("RepayCode")) - 1));
+					t.put("F9", "" + (parse.stringToInteger(t.get("RepayCode")) - 1));
+				}
+			}
+
+		}
+
 		try {
 			// txt
 			genFile(titaVo, LBList);
@@ -106,13 +126,13 @@ public class LB211Report extends MakeReport {
 
 		String acctDate = titaVo.getEntDy(); // 8位 民國年
 		this.info("-----LB211 genFile acctDate=" + acctDate);
-		
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01"; 
+			sfileNo2 = "01";
 		}
 
 		// 查詢系統參數設定檔-JCIC放款報送人員資料
@@ -130,7 +150,7 @@ public class LB211Report extends MakeReport {
 		} else {
 			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
 		}
-		
+
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17";
 		String txt1[] = txt.split(";");
 
@@ -238,7 +258,8 @@ public class LB211Report extends MakeReport {
 			// 末筆
 			strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumTxAmt), 13, '0') // 本筆撥款／還款總金額
 					+ makeFile.fillStringL(String.valueOf(sumLoanBal), 12, '0') // 本筆撥款／還款後餘額
-					+ StringUtils.repeat(" ", 2) + makeFile.fillStringL(String.valueOf(listCount), 9, '0') + StringUtils.repeat(" ", 197);
+					+ StringUtils.repeat(" ", 2) + makeFile.fillStringL(String.valueOf(listCount), 9, '0')
+					+ StringUtils.repeat(" ", 197);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -254,7 +275,7 @@ public class LB211Report extends MakeReport {
 		this.info("=========== LB211 genExcel: ");
 		this.info("LB211 genExcel TitaVo=" + titaVo);
 
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
