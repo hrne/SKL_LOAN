@@ -1,0 +1,248 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8401)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,80];">
+[
+["[L8401]                                 產生JCIC日報媒體檔"],
+["#FdAcDate+會計日期",#AcDateStart,"~",#AcDateEnd],
+["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
+["#FdJcicEmpName+審查聯絡人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
+
+["@"],
+["@",#BtnAll,"@全選"],
+["@",#Btn1,"@B204 聯徵授信餘額日報檔"],
+["@",#Btn2,"@B211 聯徵每日授信餘額變動資料檔"],
+["@"],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!---------- Required Input Setting ----------
+#FdAcDate=X,2,L
+T(3,*)
+#FdFileDay=X,2,L
+T(3,*)
+#FdFileNo=X,2,L
+T(3, )
+#FdJcicEmpName=X,2,L
+T(3, )
+#FdJcicEmpTel=X,2,L
+T(3, )
+
+! 業務類型
+#BusinessType=X,2,S
+T(3,LN)
+
+#SendL6R28=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimTxCode,L8401)
+T(2,@RimBusinessType,#BusinessType)
+RESET_RIM(#SendL6R28,L6R28)
+S(L6R28,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
+R(1,L6R28)
+T(2,@JcicEmpName,#L6R28JcicEmpName)
+T(2,@JcicEmpTel,#L6R28JcicEmpTel)
+
+
+! 必輸欄位
+##loop{times:1,i:1}
+#R{i}=X,1,L
+INVOKEJS(SHOW,#R{i},0)
+K(LIGHT,#R{i},TXTRED,0)
+##end
+
+! 永遠為必輸欄位
+#ALWAYS_HIGHLIGHT=@,1,S
+T(3,@R1,*)
+
+
+#BtnAll=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+##loop {times:2,i:1}
+#Btn{i}=X,1,I,ui:button;value: ;enable:1;tabbable:0
+##end
+
+#BtnBind=X,1,S
+BIND(#BtnAll,click, {cmd=CALLSEND;DOCODE=BtnAllProc})
+##loop {times:2,i:1}
+BIND(#Btn{i},click, {cmd=CALLSEND;DOCODE=Btn{i}Proc})
+##end
+
+#BtnAllProc=@,1,S
+C(5,#BtnAll,V,T(3,@BtnAll, ),T(3,@BtnAll,V))
+##loop {times:2,i:1}
+T(2,@Btn{i},#BtnAll)
+C(5,#Btn{i},V,T(3,@DAILY{i},Y),T(3,@DAILY{i}, )) 
+##end
+
+##loop {times:2,i:1}
+#Btn{i}Proc=@,1,S
+C(5,#Btn{i},V,T(3,@Btn{i}, )T(3,@DAILY{i}, )T(3,@BtnAll, ),T(3,@DAILY{i},Y)T(3,@Btn{i},V)) 
+##end
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#DT1=D,8,S
+T(4,DATE$)
+
+#DT2=D,7,S
+T(1,#DT1,2,7)
+
+
+#DT_YM=A,5,S
+T(1,#DT1,2,5)
+
+! #DT_MM_LAST=A,2,S
+! E(0,#DT_MM-1)
+
+!會計日期
+!#ACCTDATE=D,7,L
+!T(2,#DT2)
+!!@V(7)A(DATE,0,#ACCTDATE)
+!!V(5,0,#DT2)
+
+![上營業日期C1200-LTXDY]民國年
+#DT3=D,8,S
+T(4,LBSDY$)
+#DT4=D,7,S
+T(1,#DT3,2,7)
+
+!日曆日
+#DT5=X,8,S
+T(4,#SYSCDATE)
+
+#Day=D,7,L
+T(1,#DT1,2,7)
+E(0,@FileDay,#Day)
+
+!會計日期起迄
+#AcDateStart=D,7,I
+C(3,#CHAIN,0,E(0,#DT2),s)
+D(8)	
+@V(7)A(4,0,#AcDateStart)V(5,0010101,#DT2)
+
+#AcDateEnd=D,7,I
+C(3,#CHAIN,0,E(0,#DT2),s)
+D(8)
+@V(7)A(4,0,#AcDateEnd)V(5,#AcDateStart,#DT2)
+
+
+
+#FileDay=D,7,L
+
+#FileNo=A,2,I
+E(0,1)
+@V(2,0)
+#JcicEmpName=x,8,L
+#JcicEmpTel=x,16,L
+
+
+##loop {times:2,i:1} 
+#DAILY{i}=X,1,S
+##end
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R28.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8401 ----------1個TOTA要印多張單據,要tota-mode="1"
+!<sub type="FORM" name="L8401" tota-mode="1">
+<sub type="FORM" name="L8401">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8401,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8401] 產生JCIC日報媒體檔)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#AcDateStart
+#AcDateEnd
+#FileNo
+##loop {times:2,i:1}
+#DAILY{i}
+##end
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8401^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R28.tom"/>
+</sub>
+
+<sub type="PART" name="L8401" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8401]                                 產生JCIC日報媒體檔"],
+[""],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

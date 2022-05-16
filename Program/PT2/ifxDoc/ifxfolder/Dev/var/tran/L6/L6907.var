@@ -81,7 +81,7 @@ T(2,#AcSubBookCodeHelp,#HelpDesc3)
 
 !銷帳記號
 #ClsFgH=x,50,S
-T(3,0:未銷 ;1:已銷)
+T(3,0:未銷 ;1:已銷 ; 2:全部)
 
 
 #CHAIN=A,1,S
@@ -294,6 +294,8 @@ T(2,#FacmNo)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
+#L6908Flag=X,1,S
+
 ! 科子細目
 #OOAcNoCode=X,11,S
 #OOAcSubCode=X,5,S
@@ -308,6 +310,8 @@ T(2,#OOCustNo+-+#OOFacmNo)
 ! 業務科目
 #OOAcctCode=X,3,L
 #OOAcctItem=x,40,L
+T(H,#OOAcctCode,#AcctCodeHelp)
+
 #OOAcctCodeX=x,50,L
 T(2,#OOAcctCode+ +#OOAcctItem)
 
@@ -355,8 +359,7 @@ X(#OO_SUM1)
 T(2,#AcBookCode+#OOAcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate+#OOAcctCode)
 
 #OOBTN5=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5})
-
+C(4,#L6908Flag,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5}))
 </sub>
 
 
@@ -383,6 +386,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5})
 <include src="ROM.icf::L6R23.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L6907
+#L6908Flag
 #OOAcNoCode
 #OOAcSubCode
 #OOAcDtlCode

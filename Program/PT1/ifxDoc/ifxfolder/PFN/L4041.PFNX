@@ -1,7 +1,7 @@
 " A4
    產生郵局授權資料
 
-   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATE}}  時間:{{#now!}}
+   經辦:{{#TLRNO}} {{#EMPNM}} ^ 日期:{{#SYSDATE007}}  時間:{{#now!}}
 
 總筆數:{{#batch-rows}}  選擇筆數:{{#batch-rows-selected}}  成功筆數:{{#batch-rows-ok}} 失敗筆數:{{#batch-rows-error}}
    

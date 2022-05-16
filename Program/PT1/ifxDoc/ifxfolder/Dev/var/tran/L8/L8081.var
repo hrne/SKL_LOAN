@@ -163,7 +163,8 @@ T(H,#ProcessType,#ProcessTypeHelp)
 #Status=X,1,I
 C(3,#AutoSubmit,1,s,$)
 HELP(#AMLStatusHelp,cols:1)
-@V(H,#AMLStatusHelp)
+@T(3,@StatusX,)
+V(H,#AMLStatusHelp)
 
 #StatusX=X,20,L
 T(H,#Status,#AMLStatusHelp)
@@ -301,7 +302,7 @@ T(3,L8100)
 #batch-row-status=X,30,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,14,O
+#batch-row-txtno=X,18,O
 
 
 !! ------- end of batch variables   -------------

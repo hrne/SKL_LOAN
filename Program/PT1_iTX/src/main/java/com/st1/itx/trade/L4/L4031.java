@@ -42,6 +42,7 @@ public class L4031 extends TradeBuffer {
 
 	private HashMap<tmpBatx, Integer> sumCnt = new HashMap<>();// 要處理筆數
 	private HashMap<tmpBatx, Integer> ignCnt = new HashMap<>();// 待處理筆數
+	private HashMap<tmpBatx, Integer> proCnt = new HashMap<>();// 需處理筆數
 	private HashMap<tmpBatx, Integer> totCnt = new HashMap<>();// 總筆數
 	private HashMap<tmpBatx, Integer> conCnt = new HashMap<>();// 已確認筆數
 	private HashMap<tmpBatx, Integer> relCnt = new HashMap<>();// 已放行筆數
@@ -120,7 +121,7 @@ public class L4031 extends TradeBuffer {
 					continue;
 				}
 				OccursList occursList = new OccursList();
-				this.info("totCnt=" + totCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
+				this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
 						+ ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
 						+ conCnt.get(tempL4031Vo) + ", relCnt=" + relCnt.get(tempL4031Vo));
 				this.info("CheckFlag=" + CheckFlag.get(tempL4031Vo));
@@ -138,22 +139,22 @@ public class L4031 extends TradeBuffer {
 						checkFlag = CheckFlag.get(tempL4031Vo);
 					} else {
 
-						if (relCnt.get(tempL4031Vo).equals(totCnt.get(tempL4031Vo))) {
+						if (relCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
 							status = 2; // 2.已確認放行
 							checkFlag = 1; // 1-已確認報表
-						} else if (conCnt.get(tempL4031Vo).equals(totCnt.get(tempL4031Vo))) {
+						} else if (conCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
 							status = 1; // 1.確認未放行
 							checkFlag = 9;
-						} else if (keyinCnt.get(tempL4031Vo).equals(totCnt.get(tempL4031Vo))) {
+						} else if (keyinCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
 							status = 0; // 0.未確認
 							checkFlag = 0; // 0-確認
 						}
 					}
 				}
 				if (tempL4031Vo.getRank() == 1) {
-					if (relCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+					if (relCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
 						status = 2;
-					} else if (conCnt.get(tempL4031Vo) == totCnt.get(tempL4031Vo)) {
+					} else if (conCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
 						status = 1;
 					} else {
 						status = 0;
@@ -208,8 +209,10 @@ public class L4031 extends TradeBuffer {
 					lableBX = "人工調整";
 					break;
 				case 4:
-					lableBX = "批次自動調整（提醒件）";
+					lableBX = "檢核提醒件";
 					rptFg = 5;
+					checkFlag = 9;
+					status = 9;
 					break;
 				}
 				if (adjCode == 2 || adjCode == 3) {
@@ -371,38 +374,47 @@ public class L4031 extends TradeBuffer {
 		}
 		totCnt.put(grp, totCnt.get(grp) + 1);
 
+		if (!proCnt.containsKey(grp)) {
+			proCnt.put(grp, 0);
+		}
 		if (!sumCnt.containsKey(grp)) {
 			sumCnt.put(grp, 0);
 		}
+		if (!ignCnt.containsKey(grp)) {
+			ignCnt.put(grp, 0);
+		}
+		if (!conCnt.containsKey(grp)) {
+			conCnt.put(grp, 0);
+		}
+		if (!relCnt.containsKey(grp)) {
+			relCnt.put(grp, 0);
+		}
+		if (!keyinCnt.containsKey(grp)) {
+			keyinCnt.put(grp, 0);
+		}
+
+		// 提醒件不累計
+		if (tBatxRateChange.getAdjCode() == 4) {
+			return;
+		}
+
+		proCnt.put(grp, proCnt.get(grp) + 1);
 
 		if (tBatxRateChange.getRateKeyInCode() != 9) {
 			sumCnt.put(grp, sumCnt.get(grp) + 1);
-		}
-
-		if (!ignCnt.containsKey(grp)) {
-			ignCnt.put(grp, 0);
 		}
 
 		if (tBatxRateChange.getRateKeyInCode() == 9) {
 			ignCnt.put(grp, ignCnt.get(grp) + 1);
 		}
 
-		if (!conCnt.containsKey(grp)) {
-			conCnt.put(grp, 0);
-		}
 		if (tBatxRateChange.getConfirmFlag() == 1) {
 			conCnt.put(grp, conCnt.get(grp) + 1);
-		}
-		if (!relCnt.containsKey(grp)) {
-			relCnt.put(grp, 0);
 		}
 		if (tBatxRateChange.getConfirmFlag() == 2) {
 			relCnt.put(grp, relCnt.get(grp) + 1);
 		}
 
-		if (!keyinCnt.containsKey(grp)) {
-			keyinCnt.put(grp, 0);
-		}
 		if (tBatxRateChange.getRateKeyInCode() == 1) {
 			keyinCnt.put(grp, keyinCnt.get(grp) + 1);
 		}

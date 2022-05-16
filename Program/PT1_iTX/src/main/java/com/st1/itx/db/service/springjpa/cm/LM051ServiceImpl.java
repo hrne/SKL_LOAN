@@ -89,10 +89,11 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\""; // F3
 		sql += "			,M.\"PrinBalance\""; // F4
 		sql += "			,M.\"FacAcctCode\""; // F5
-		sql += "			,CASE";
-		sql += "			   WHEN M.\"OvduText\" = ' ' ";
-		sql += "			   THEN TO_CHAR(M.\"OvduTerm\",'9')";
-		sql += "			 ELSE M.\"OvduText\" END AS \"OvduTerm\"";// F6
+//		sql += "			,CASE";
+//		sql += "			   WHEN M.\"OvduText\" = ' ' ";
+//		sql += "			   THEN TO_CHAR(M.\"OvduTerm\",'9')";
+//		sql += "			 ELSE M.\"OvduText\" END AS \"OvduTerm\"";// F6
+		sql += "			,M.\"OvduTerm2\" AS \"OvduTerm\"";
 		sql += "			,M.\"CityCode\""; // F7
 		sql += "			,M.\"PrevIntDate\""; // F8
 		sql += "			,SUBSTR(M.\"AssetClass\",0,1) AS \"Class\""; // F9
@@ -127,19 +128,20 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				     WHEN M.\"OvduTerm\" > 5 OR M.\"OvduTerm\"= 0 THEN 99";
 		sql += "					 ELSE M.\"OvduTerm\"";
 		sql += "				   END) AS \"OvduTerm\"";
+		sql += "				 ,M.\"OvduTerm\" AS \"OvduTerm2\"";
 		sql += "				 ,M.\"OvduDays\"";
 		sql += "				 ,M.\"CityCode\"";
 		sql += "				 ,M.\"PrevIntDate\"";
 		sql += "				 ,M.\"RenewCode\"";
 		sql += "				 ,M.\"LawAmount\"";
-		sql += "				 ,(CASE";
-		sql += "				     WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 AND M.\"AcctCode\" <> 990 THEN '*協-' || SUBSTR(M.\"OvduTerm\",0,1) ";
-		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 AND M.\"OvduDays\" =0 AND M.\"AcctCode\" <> 990 THEN '協' ";
-		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduDays\" > 0 AND M.\"OvduDays\" < 30 AND M.\"AcctCode\" <> 990 THEN '協*' ";
-		sql += "					 WHEN M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"AcctCode\" = 990 THEN '催' ";
-		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"AcctCode\" = 990  THEN '催協' ";
-		sql += "					 ELSE ' '";
-		sql += "				   END) AS \"OvduText\"";
+//		sql += "				 ,(CASE";
+//		sql += "				     WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 AND M.\"AcctCode\" <> 990 THEN '*協-' || SUBSTR(M.\"OvduTerm\",0,1) ";
+//		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 AND M.\"OvduDays\" =0 AND M.\"AcctCode\" <> 990 THEN '協' ";
+//		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduDays\" > 0 AND M.\"OvduDays\" < 30 AND M.\"AcctCode\" <> 990 THEN '協*' ";
+//		sql += "					 WHEN M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"AcctCode\" = 990 THEN '催' ";
+//		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"AcctCode\" = 990  THEN '催協' ";
+//		sql += "					 ELSE ' '";
+//		sql += "				   END) AS \"OvduText\"";
 		sql += "				 ,M.\"ProdNo\"";
 		sql += "				 ,SUBSTR(CLS.\"AssetClass\",0,1) AS \"AssetNum\"";
 		sql += "				 ,CLS.\"AssetClass\" AS \"AssetClass\"";
@@ -167,8 +169,8 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  LEFT JOIN \"CdAcBook\" B ON B.\"AcSubBookCode\" = M.\"AcSubBookCode\"";
 		sql += "	  LEFT JOIN \"CdCode\" CD ON CD.\"Code\" = L.\"LegalProg\"";
 		sql += "	   					     AND CD.\"DefCode\" = 'LegalProg' ";
-		sql += "	  ORDER BY DECODE(M.\"OvduText\",' ',1,'*協-' || SUBSTR(M.\"OvduTerm\",0,1),2,'協',3,'協*',4,'催',5,'催協',6) ASC";
-		sql += "	  		  ,M.\"OvduTerm\" ASC";
+//		sql += "	  ORDER BY DECODE(M.\"OvduText\",' ',1,'*協-' || SUBSTR(M.\"OvduTerm\",0,1),2,'協',3,'協*',4,'催',5,'催協',6) ASC";
+		sql += "	  ORDER BY M.\"OvduTerm\" ASC";
 		sql += "	  		  ,M.\"CustNo\" ASC";
 		sql += "	  		  ,M.\"FacmNo\" ASC";
 		this.info("sql=" + sql);

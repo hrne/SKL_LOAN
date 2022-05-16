@@ -109,7 +109,9 @@ public class L6934 extends TradeBuffer {
 			}
 			String oval = map.get("o").toString();
 			String nval = map.get("n").toString();
-			if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
+			if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld)
+					|| "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld) || "上次會計日".equals(fld) || "會計日期".equals(fld)
+					|| "上次交易行別".equals(fld) || "上次交易日".equals(fld)) {
 				continue;
 			}
 			this.info(fld + " = " + oval + " to " + nval);

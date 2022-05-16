@@ -252,7 +252,7 @@ public class L4601Report extends MakeReport {
 					}
 					rowcount = rowcount + 2;
 					tempcustno = t.getCustNo();
-
+					tempseq = t.getSeq();
 					count++;
 
 					if (listsize == count) { // 最後一筆

@@ -22,7 +22,7 @@ T(3,LM085)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[LM085]                                  逾期月報表 "],
+["[LM085]                                  放款逾期月報表 "],
 [#<->#,"@產製金額單位",#UnitCode,#UnitName],
 ]
 
@@ -55,7 +55,7 @@ C(2,#UnitCode,T(3,元),T(3,千元),T(3,百萬元),T(3,億元))
 C(5,#TXFORM,LM085,$,S)
 
 #SCRTIL=_,_,S
-T(3,[LM085] LM085逾期月報表)
+T(3,[LM085] LM085放款逾期月報表)
 
 </sub>
 
@@ -66,7 +66,7 @@ T(3,[LM085] LM085逾期月報表)
 C(5,#TXFORM,LM085,$,S)
 
 #SCRTIL=_,_,S
-T(3,[LM085] LM085逾期月報表)
+T(3,[LM085] LM085放款逾期月報表)
 
 
 #OEMPNOS=X,6,S
