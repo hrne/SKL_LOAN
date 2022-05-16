@@ -944,6 +944,7 @@ public class L4320Batch extends TradeBuffer {
 				// update
 				try {
 					sBatxBaseRateChangeService.update(batxBaseRateChange, titaVo);
+					this.batchTransaction.commit();
 				} catch (DBException e) {
 					throw new LogicException("E0007", "BatxBaseRateChange update error : " + e.getErrorMsg());
 				}
@@ -951,6 +952,7 @@ public class L4320Batch extends TradeBuffer {
 				// insert
 				try {
 					sBatxBaseRateChangeService.insert(batxBaseRateChange, titaVo);
+					this.batchTransaction.commit();
 				} catch (DBException e) {
 					throw new LogicException("E0005", ", BatxBaseRateChange insert error : " + e.getErrorMsg());
 				}
@@ -1006,6 +1008,7 @@ public class L4320Batch extends TradeBuffer {
 					// update
 					try {
 						sLoanRateChangeService.update(loanRateChange, titaVo);
+						this.batchTransaction.commit();
 					} catch (DBException e) {
 						throw new LogicException("E0007", "LoanRateChange update error : " + e.getErrorMsg());
 					}
