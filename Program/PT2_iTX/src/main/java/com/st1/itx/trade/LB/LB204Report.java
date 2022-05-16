@@ -2,6 +2,7 @@ package com.st1.itx.trade.LB;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -14,23 +15,19 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LB204ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
-import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.MakeFile;
-
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.text.DecimalFormat;
+import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component("lB204Report")
 @Scope("prototype")
 
 public class LB204Report extends MakeReport {
 
-	Date dateNow = new Date();
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-	String strToday = String.valueOf(Integer.parseInt(sdf.format(dateNow)) - 19110000); // 民國年月日
-	String strTodayMM = strToday.substring(3, 5); // 月
-	String strTodaydd = strToday.substring(5, 7); // 日
+	String strToday = "";
+	String strTodayMM = "";
+	String strTodaydd = "";
+
 	int listCount = 0;
 
 	@Autowired
@@ -38,6 +35,9 @@ public class LB204Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	@Autowired
+	public Parse parse;
 
 	@Autowired
 	public MakeFile makeFile;
@@ -50,6 +50,11 @@ public class LB204Report extends MakeReport {
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB204 聯徵授信餘額日報檔
+
+		strToday = String.valueOf(parse.stringToInteger(titaVo.getEntDy())); // 7位 民國年
+		strTodayMM = strToday.substring(3, 5); // 月
+		strTodaydd = strToday.substring(5, 7); // 日
+
 		this.info("-----strToday=" + strToday);
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
@@ -101,12 +106,12 @@ public class LB204Report extends MakeReport {
 		String acctDate = titaVo.getEntDy(); // 8位 民國年
 		this.info("-----LB204 genFile acctDate=" + acctDate);
 
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01"; 
+			sfileNo2 = "01";
 		}
 
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12";
@@ -209,7 +214,8 @@ public class LB204Report extends MakeReport {
 			// 末筆
 			strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumLineAmt), 11, '0') // 訂約總金額
 					+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumDrawdownAmt), 11, '0') // 授信／清償金額總金額
-					+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 7, '0') + StringUtils.repeat(" ", 86);
+					+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 7, '0')
+					+ StringUtils.repeat(" ", 86);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -225,7 +231,7 @@ public class LB204Report extends MakeReport {
 		this.info("=========== LB204 genExcel: ");
 		this.info("LB204 genExcel TitaVo=" + titaVo);
 
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";

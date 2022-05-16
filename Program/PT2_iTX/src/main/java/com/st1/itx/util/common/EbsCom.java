@@ -24,11 +24,17 @@ import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SlipEbsRecordService;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.tradeService.CommBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Component("EbsCom")
 @Scope("prototype")
 public class EbsCom extends CommBuffer {
 
+	@Autowired
+	private DateUtil dDateUtil;
+	@Autowired
+	private WebClient webClient;
 	@Autowired
 	private SystemParasService sSystemParasService;
 	@Autowired
@@ -48,6 +54,9 @@ public class EbsCom extends CommBuffer {
 		this.info("EbsCom ebsFg = " + (ebsFg == null ? "" : ebsFg));
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
+			// 訊息通知 SystemParas.EbsFg != Y
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "",
+					"系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
 			return;
 		}
 
@@ -65,7 +74,11 @@ public class EbsCom extends CommBuffer {
 		// 分析回傳資料
 		String returnStatus = analyzeResult(requestJO, result, titaVo);
 
-		if (returnStatus != null && returnStatus.equals("E")) {
+		if (returnStatus != null && returnStatus.equals("S")) {
+			// 發送成功訊息
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功",
+					titaVo);
+		} else {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
 		}
 	}
@@ -107,7 +120,8 @@ public class EbsCom extends CommBuffer {
 		return requestJO;
 	}
 
-	private String post(String slipMediaUrl, String ebsAuth, JSONObject requestJo, TitaVo titaVo) throws LogicException {
+	private String post(String slipMediaUrl, String ebsAuth, JSONObject requestJo, TitaVo titaVo)
+			throws LogicException {
 		String jsonString = requestJo.toString();
 		HttpHeaders headers = setEbsHeader(ebsAuth);
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);

@@ -171,7 +171,7 @@ public class Cs80UpDBS extends CommBuffer {
 		}
 
 		// 2022.1.11 by eric,,2022.5.13改限inq交易,upd交易改輸入戶號調rim L2R62顯示
-		if (this.titaVo.isTxcdInq()&&!this.titaVo.isRim()) {
+		if (this.titaVo.isTxcdInq() && !this.titaVo.isRim()) {
 			TotaVo tota = this.totaVoList.get(0);
 			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
 				this.custRmk();

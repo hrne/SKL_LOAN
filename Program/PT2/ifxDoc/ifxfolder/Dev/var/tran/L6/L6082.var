@@ -132,6 +132,12 @@ T(3,1)ASGN(LOOP$)
 ! 業績年度(TOTA)
 #OOYear=A,3,L
 
+! 最後修改日期
+#OOLastUpdate=x,20,S
+
+! 最後修改人員
+#OOLastEmp=x,47,S
+
 ! 工作月份(TOTA)
 !#OOMonth=A,2,L
 
@@ -188,6 +194,8 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6752;text=查詢;ntxbuf=#OOBUF5})
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L6082
 #OOYear
+#OOLastUpdate
+#OOLastEmp
 
 ^
 </sub>
@@ -217,6 +225,12 @@ TXFORM=L6082
 
 #OOYear=業績年度
 {width:70,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:120,align:'left'}
 
 !#OOMonth=工作月份
 !{width:100,align:'center'}

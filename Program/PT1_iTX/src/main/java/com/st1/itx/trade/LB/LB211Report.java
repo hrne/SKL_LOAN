@@ -12,28 +12,23 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.springjpa.cm.LB211ServiceImpl;
-import com.st1.itx.util.common.MakeExcel;
-import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.parse.Parse;
-import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SystemParasService;
-
-import java.util.Date;
-import java.text.SimpleDateFormat;
-//import java.text.DecimalFormat;
+import com.st1.itx.db.service.springjpa.cm.LB211ServiceImpl;
+import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component("lB211Report")
 @Scope("prototype")
 
 public class LB211Report extends MakeReport {
 
-	Date dateNow = new Date();
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-	String strToday = String.valueOf(Integer.parseInt(sdf.format(dateNow)) - 19110000); // 民國年月日
-	String strTodayMM = strToday.substring(3, 5); // 月
-	String strTodaydd = strToday.substring(5, 7); // 日
+	String strToday = "";
+	String strTodayMM = "";
+	String strTodaydd = "";
+
 	int listCount = 0;
 
 	@Autowired
@@ -59,10 +54,14 @@ public class LB211Report extends MakeReport {
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB211 聯徵每日授信餘額變動資料檔
+
+		strToday = String.valueOf(parse.stringToInteger(titaVo.getEntDy())); // 7位 民國年
+		strTodayMM = strToday.substring(3, 5); // 月
+		strTodaydd = strToday.substring(5, 7); // 日
+
 		this.info("-----strToday=" + strToday);
 		this.info("-----strTodayMM=" + strTodayMM);
 		this.info("-----strTodaydd=" + strTodaydd);
-
 		List<Map<String, String>> LBList = null;
 
 		try {

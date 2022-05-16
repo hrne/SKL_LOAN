@@ -436,7 +436,7 @@ ifxBatch:{
 {width:150,align:'left'}
 
 #OOAcctItem=科目
-{width:150,align:'left'}
+{width:180,align:'left'}
 
 #OOAcDate=會計日期
 {width:150,align:'center'}
@@ -490,7 +490,7 @@ ifxBatch:{
 {width:150,align:'left'}
 
 #OOAcctItem=科目
-{width:150,align:'left'}
+{width:180,align:'left'}
 
 #OOAcDate=會計日期
 {width:150,align:'center'}
@@ -532,7 +532,7 @@ ifxBatch:{
 {width:150,align:'left'}
 
 #OOAcctItem=科目
-{width:150,align:'left'}
+{width:180,align:'left'}
 
 #OOAcDate=會計日期
 {width:150,align:'center'}
@@ -587,7 +587,7 @@ ifxBatch:{
 {width:150,align:'left'}
 
 #OOAcctItem=科目
-{width:150,align:'left'}
+{width:180,align:'left'}
 
 #OOAcDate=會計日期
 {width:150,align:'center'}
@@ -639,7 +639,7 @@ ifxBatch:{
 {width:150,align:'left'}
 
 #OOAcctItem=科目
-{width:150,align:'left'}
+{width:180,align:'left'}
 
 #OOAcDate=會計日期
 {width:150,align:'center'}
@@ -690,7 +690,7 @@ ifxBatch:{
 {width:150,align:'left'}
 
 #OOAcctItem=科目
-{width:150,align:'left'}
+{width:180,align:'left'}
 
 #OOAcDate=會計日期
 {width:150,align:'center'}
