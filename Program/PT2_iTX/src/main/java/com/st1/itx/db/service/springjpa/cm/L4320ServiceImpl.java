@@ -357,6 +357,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "WITH rawData AS ( ";
 		sql += "    SELECT \"BaseRateCode\" ";
 		sql += "         , \"BaseRate\" ";
+		sql += "         , \"EffectDate\" ";
 		sql += "         , ROW_NUMBER() ";
 		sql += "           OVER ( ";
 		sql += "               PARTITION BY \"BaseRateCode\" ";
