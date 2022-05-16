@@ -74,6 +74,9 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iDeductDateStart = 0; // 追繳
 		int iDeductDateEnd = 0; // 追繳
 		int iOpItem = Integer.parseInt(titaVo.getParam("OpItem"));
+		
+		String iRepayBank = titaVo.getParam("RepayBank");
+		boolean useRepayBank = iRepayBank != null && !iRepayBank.trim().isEmpty();
 
 		if (Integer.parseInt(titaVo.getParam("AchSpecificDdFrom")) > 0) {
 			iAchSpecificDdFrom = Integer.parseInt(titaVo.getParam("AchSpecificDdFrom")) + 19110000;
@@ -260,24 +263,26 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            end ";
 		sql += "        else 1 ";
 		sql += "        end = 1 ";
+		if (useRepayBank)
+			sql += "    and nvl(ba.\"RepayBank\",'null') = :iRepayBank";
 		if (iOpItem == 1) {
-			sql += "    and nvl(ba.\"RepayBank\",'000') not in ('000','700') ";
+			sql += "    and nvl(ba.\"RepayBank\",'null') not in ('null','700') ";
 		} else if (iOpItem == 2) {
-			sql += "    and nvl(ba.\"RepayBank\",'000') = '700' ";
+			sql += "    and nvl(ba.\"RepayBank\",'null') = '700' ";
 		} else {
-			sql += "    and nvl(ba.\"RepayBank\",'000') != '000' ";
+			sql += "    and nvl(ba.\"RepayBank\",'null') != 'null' ";
 		}
 		sql += "    and case ";
 		// RepayBank = 700 = 郵局
 		// 郵局-條件1: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
 		// ___________ 且 指定應繳日(2碼dd) = 郵局扣款應繳日的應繳日(2碼dd)
-		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
+		sql += "          when nvl(ba.\"RepayBank\", 'null') = '700' ";
 		sql += "               and b.\"NextPayIntDate\" <= :iPostSpecificDd  ";
 		sql += "               and b.\"SpecificDd\" = :iPostSpecificDay ";
 		sql += "          then 1 ";
 		// 郵局-條件2: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
 		// ___________ 且 指定應繳日(2碼dd) = 郵局二扣應繳日的應繳日(2碼dd)
-		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
+		sql += "          when nvl(ba.\"RepayBank\", 'null') = '700' ";
 		sql += "               and b.\"NextPayIntDate\" <= :iPostSecondSpecificDd ";
 		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
@@ -296,13 +301,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// RepayBank not in (null,700) = ACH
 		// ACH-條件1: 下繳日(8碼yyyymmdd) <= ACH扣款應繳日止日(8碼yyyymmdd)
 		// __________ 且 指定應繳日(2碼dd) IN ACH扣款應繳日的應繳日(2碼dd)
-		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+		sql += "          when nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"NextPayIntDate\" <= :iAchSpecificDdTo ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
 		sql += "          then 1 ";
 		// ACH-條件2: 下繳日(8碼yyyymmdd) <= ACH二扣應繳日止日(8碼yyyymmdd)
 		// __________ 且 指定應繳日(2碼dd) IN ACH二扣應繳日的應繳日(2碼dd)
-		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+		sql += "          when nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"NextPayIntDate\" <= :iAchSecondSpecificDdTo ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSecondSpecificDays ";
 		sql += "          then 1 ";
@@ -320,12 +325,12 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "          then 1 ";
 		// 郵局-費用: 費用檔有撈到就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
-		sql += "               and nvl(ba.\"RepayBank\", '000') = '700' ";
+		sql += "               and nvl(ba.\"RepayBank\", 'null') = '700' ";
 		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
 		// ACH-費用: 費用檔有撈到就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
-		sql += "               and nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+		sql += "               and nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
 		sql += "          then 1 ";
 		// 追加逾期期數
@@ -358,6 +363,9 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("iPostSecondSpecificDd", iPostSecondSpecificDd);
 		query.setParameter("iPostSecondSpecificDay", iPostSecondSpecificDay);
+		
+		if (useRepayBank)
+			query.setParameter("iRepayBank", iRepayBank);
 
 		return this.convertToMap(query);
 	}
@@ -394,6 +402,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int facmNo = Integer.parseInt(titaVo.getParam("FacmNo").trim());
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 		int repayType = Integer.parseInt(titaVo.getParam("RepayType")); // 還款類別
+		
+		String iRepayBank = titaVo.getParam("RepayBank");
+		boolean useRepayBank = iRepayBank != null && !iRepayBank.trim().isEmpty();
+		
 		String sql = "  select                                                          ";
 		sql += "  b.\"CustNo\"                                               AS \"CustNo\"          ";
 		sql += " ,b.\"FacmNo\"                                               AS \"FacmNo\"          ";
@@ -465,8 +477,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
 		sql += "                            and  a.seq = 1                 ";
 		sql += "   where f.\"RepayCode\" = 2                               ";
-		sql += "    and nvl(ba.\"RepayBank\",'000') <> '000'               ";
+		sql += "    and nvl(ba.\"RepayBank\",'null') <> 'null'               ";
 		sql += "    and b.\"CustNo\"= " + custNo;
+		if (useRepayBank)
+			sql += "    and nvl(ba.\"RepayBank\",'null') = :iRepayBank";
 		if (facmNo > 0) {
 			sql += "    and b.\"FacmNo\"= " + facmNo;
 		}
@@ -494,6 +508,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
+		if (useRepayBank)
+			query.setParameter("iRepayBank", iRepayBank);
+		
 		return this.convertToMap(query);
 	}
 

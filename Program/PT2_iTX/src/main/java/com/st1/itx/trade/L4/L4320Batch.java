@@ -390,11 +390,11 @@ public class L4320Batch extends TradeBuffer {
 		// F22 擔保品鄉鎮別
 		b.setAreaCode(s.get("AreaCode"));
 		// F23 地區別利率上限
-		BigDecimal cityIntRateCeiling = parse.stringToBigDecimal(s.get("CityIntRateCeiling"));
+		BigDecimal cityRateCeiling = parse.stringToBigDecimal(s.get("CityRateCeiling"));
 		// F24 地區別利率下限
-		BigDecimal cityIntRateFloor = parse.stringToBigDecimal(s.get("CityIntRateFloor"));
+		BigDecimal cityRateFloor = parse.stringToBigDecimal(s.get("CityRateFloor"));
 		// IntRateIncr 地區別利率加減碼
-		BigDecimal cityIntRateIncr = parse.stringToBigDecimal(s.get("CityIntRateIncr"));
+		BigDecimal cityRateIncr = parse.stringToBigDecimal(s.get("CityRateIncr"));
 
 		// F8 額度核准利率
 //		BigDecimal approveRateFac = parse.stringToBigDecimal(s.get("FacApproveRate"));
@@ -508,15 +508,15 @@ public class L4320Batch extends TradeBuffer {
 			} else {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
-				rateCurt = presentRate.add(cityIntRateIncr);
-				warnMsg += ", 地區別加減碼:" + cityIntRateIncr;
+				rateCurt = presentRate.add(cityRateIncr);
+				warnMsg += ", 地區別加減碼:" + cityRateIncr;
 				// 依地區別利率上、下限調整
-				if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
-					rateCurt = cityIntRateCeiling;
+				if (rateCurt.compareTo(cityRateCeiling) > 0) {
+					rateCurt = cityRateCeiling;
 					warnMsg += ", 達地區別上限 ";
 				}
-				if (rateCurt.compareTo(cityIntRateFloor) < 0) {
-					rateCurt = cityIntRateFloor;
+				if (rateCurt.compareTo(cityRateFloor) < 0) {
+					rateCurt = cityRateFloor;
 					warnMsg += ", 達地區別下限 ";
 				}
 			}
@@ -562,15 +562,15 @@ public class L4320Batch extends TradeBuffer {
 		case 3:
 			// 本次生效日(已放好)
 			// 本次利率 = 原利率 + 地區別利率
-			rateCurt = presentRate.add(cityIntRateIncr);
-			warnMsg += ", 地區別加減碼:" + cityIntRateIncr;
+			rateCurt = presentRate.add(cityRateIncr);
+			warnMsg += ", 地區別加減碼:" + cityRateIncr;
 			// 依地區別利率上、下限調整
-			if (rateCurt.compareTo(cityIntRateCeiling) > 0) {
-				rateCurt = cityIntRateCeiling;
+			if (rateCurt.compareTo(cityRateCeiling) > 0) {
+				rateCurt = cityRateCeiling;
 				warnMsg += "m 達地區別上限 ";
 			}
-			if (rateCurt.compareTo(cityIntRateFloor) < 0) {
-				rateCurt = cityIntRateFloor;
+			if (rateCurt.compareTo(cityRateFloor) < 0) {
+				rateCurt = cityRateFloor;
 				warnMsg += ", 達地區別下限 ";
 			}
 			// 3.人工調整

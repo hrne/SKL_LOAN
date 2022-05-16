@@ -13,8 +13,11 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBank;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBankService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita BankCode=X,3 BranchCode=X,4 BankItem=x,50 END=X,1
@@ -30,11 +33,14 @@ import com.st1.itx.tradeService.TradeBuffer;
  */
 
 public class L6071 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6071.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdBankService sCdBankService;
+	@Autowired
+	CdEmpService cdEmpService;
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -79,6 +85,8 @@ public class L6071 extends TradeBuffer {
 			occursList.putParam("OOBranchCode", tCdBank.getBranchCode());
 			occursList.putParam("OOBankItem", tCdBank.getBankItem());
 			occursList.putParam("OOBranchItem", tCdBank.getBranchItem());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBank.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdBank.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdBank.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBank.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -91,5 +99,14 @@ public class L6071 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

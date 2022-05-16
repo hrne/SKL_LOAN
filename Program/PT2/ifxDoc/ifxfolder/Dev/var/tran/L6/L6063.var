@@ -206,6 +206,11 @@ T(B,#OOClItem)
 ! JCIC類別(TOTA)
 #OOClTypeJCIC=X,2,L
 
+!最後修改人員&日期
+#OOLastUpdate=x,20,S
+
+#OOLastEmp=x,47,S
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -246,6 +251,8 @@ TXFORM=L6063
 #OOClCode2
 #OOClItem
 #OOClTypeJCIC
+#OOLastUpdate
+#OOLastEmp
 ^
 </sub>
 
@@ -283,6 +290,12 @@ TXFORM=L6063
 
 #OOClTypeJCIC=JCIC類別
 {width:70,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 ^
 
 #RPTFG2=2,QUERY.GRID,L6063
@@ -302,5 +315,11 @@ TXFORM=L6063
 
 #OOClTypeJCIC=JCIC類別
 {width:70,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
 ^
 </sub>

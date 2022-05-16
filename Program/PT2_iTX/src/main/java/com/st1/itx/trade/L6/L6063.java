@@ -13,7 +13,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCl;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdClService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -38,6 +40,8 @@ public class L6063 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdClService sCdClService;
+	@Autowired
+	CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -80,6 +84,8 @@ public class L6063 extends TradeBuffer {
 			occursList.putParam("OOClCode2", tCdCl.getClCode2());
 			occursList.putParam("OOClItem", tCdCl.getClItem());
 			occursList.putParam("OOClTypeJCIC", tCdCl.getClTypeJCIC());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdCl.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdCl.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdCl.getLastUpdateEmpNo() + " " + empName(titaVo, tCdCl.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -93,5 +99,14 @@ public class L6063 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
 	}
 }

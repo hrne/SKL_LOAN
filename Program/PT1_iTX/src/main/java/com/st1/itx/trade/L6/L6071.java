@@ -38,7 +38,7 @@ public class L6071 extends TradeBuffer {
 	@Autowired
 	public CdBankService sCdBankService;
 	@Autowired
-	public CdEmpService cdEmpService;
+	CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
 

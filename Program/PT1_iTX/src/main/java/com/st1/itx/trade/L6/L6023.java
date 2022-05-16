@@ -35,8 +35,8 @@ public class L6023 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdLandOfficeService cdLandOfficeService;
-    @Autowired 
-	public CdEmpService cdEmpService;
+	@Autowired
+	public CdEmpService sCdEmpService;
 	@Autowired
 	Parse parse;
 
@@ -79,7 +79,7 @@ public class L6023 extends TradeBuffer {
 			occursList.putParam("OORecWord", t.getRecWord());
 			occursList.putParam("OORecWordItem", t.getRecWordItem());
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(t.getLastUpdate())+ " " +parse.timeStampToStringTime(t.getLastUpdate()));
-			occursList.putParam("OOLastEmp",t.getLastUpdateEmpNo() + " " + empName(titaVo, t.getLastUpdateEmpNo()));
+			occursList.putParam("OOLastEmp", t.getLastUpdateEmpNo() + " " + empName(titaVo, t.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			wkCnt++;
 			this.totaVo.addOccursList(occursList);
@@ -99,7 +99,7 @@ public class L6023 extends TradeBuffer {
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 
-		CdEmp cdEmp = cdEmpService.findById(empNo, titaVo);
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
 		if (cdEmp != null) {
 			rs = cdEmp.getFullname();
 		}

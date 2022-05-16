@@ -52,6 +52,24 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "InsuRenew"
+    WITH txData AS (
+      SELECT TX.TRXDAT
+           , TX.TRXNMT
+           , NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"
+           , TX.TRXAMT
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY TX.TRXDAT
+                          , TX.TRXNMT
+                          , TX.TRXAMT
+               ORDER BY CASE
+                          WHEN TRXTRN = '3037' THEN 0
+                        ELSE 1 END
+                      , TRXNM2
+             ) AS "TxSeq"
+      FROM LA$TRXP TX
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = TX.TRXMEM
+    )
     SELECT S0."ClCode1"                   AS "ClCode1"             -- 擔保品-代號1 DECIMAL 1 0
           ,S0."ClCode2"                   AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
           ,S0."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 0
@@ -119,7 +137,7 @@ BEGIN
            , NVL(FR1P."INSEDT2",0)          AS "InsuEndDate"         -- 保險迄日 Decimald 8 0
            , NVL(FR1P."INSTOT",0)           AS "TotInsuPrem"         -- 總保費 DECIMAL 14 0
            , NVL(FR1P."TRXDAT",0)           AS "AcDate"              -- 會計日期 Decimald 8 0
-           , FR1P."UPDATE_IDENT"            AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
+           , NVL(TX."TitaTlrNo",'999999')   AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
            , FR1P."TRXNMT"                  AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
            , FR1P."CHKPRT"                  AS "NotiTempFg"          -- 入通知檔 VARCHAR2 1 0
            , CASE
@@ -149,6 +167,10 @@ BEGIN
                              AND CNM."GdrId2" = FR1P."GDRID2"
                              AND CNM."GdrNum" = FR1P."GDRNUM"
                              AND CNM."LgtSeq" = FR1P."LGTSEQ"
+      LEFT JOIN txData TX ON TX."TRXDAT" = FR1P."TRXDAT"
+                         AND TX."TRXNMT" = FR1P."TRXNMT"
+                         AND TX."TRXAMT" = FR1P."INSTOT"
+                         AND TX."TxSeq" = 1
       WHERE NVL(TRIM(FR1P."ADTYMT"),0) > 0
         AND NVL(TRIM(FR1P."INSNUM"),' ') <> ' '
         -- AND NVL(TRIM(FR1P."INSNUM2"),' ') <> ' '

@@ -150,6 +150,12 @@ T(3,1)ASGN(LOOP$)
 
 #OORecWordItem=x,60,L
 
+!最後修改人員&日期
+#OOLastUpdate=x,20,S
+
+#OOLastEmp=x,47,S
+
+
 
 ! 修改的按鈕
 #OOFunc2=A,1,S
@@ -188,6 +194,8 @@ TXFORM=L6023
 #OOLandOfficeCode
 #OORecWord
 #OORecWordItem
+#OOLastUpdate
+#OOLastEmp
 ^
 <include src="ROM.icf::L2R59.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
@@ -222,6 +230,12 @@ TXFORM=L6023
 #OORecWordItem=收件字說明
 {width:120,align:'center'}
 
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 ^
 
 #RPTFG2=2,QUERY.GRID,L6023
@@ -235,6 +249,13 @@ TXFORM=L6023
 
 #OORecWordItem=收件字說明
 {width:120,align:'center'}
+
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 ^
 
 </sub>

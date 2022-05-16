@@ -156,6 +156,7 @@ T(3,1)ASGN(LOOP$)
 #OOLastEmp=x,47,S
 
 
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -234,6 +235,7 @@ TXFORM=L6023
 
 #OOLastEmp=最後修改人員
 {width:110,align:'center'}
+
 ^
 
 #RPTFG2=2,QUERY.GRID,L6023
@@ -253,6 +255,7 @@ TXFORM=L6023
 
 #OOLastEmp=最後修改人員
 {width:110,align:'center'}
+
 ^
 
 </sub>

@@ -168,6 +168,11 @@ T(B,#OOBankItem+#OOBranchItem)
 #OOCHAIN=A,1,S
 T(4,CHAIN$)
 
+!最後修改人員&日期
+#OOLastUpdate=x,20,S
+
+#OOLastEmp=x,47,S
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -213,6 +218,8 @@ TXFORM=L6071
 #OOBranchCode
 #OOBankItem
 #OOBranchItem
+#OOLastUpdate
+#OOLastEmp
 ^
 </sub>
 
@@ -250,6 +257,12 @@ TXFORM=L6071
 #OOBranchItem=分行名稱
 {width:230,align:'left'}
 
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 #OOItem=
 {width:1,hidden:true}
 
@@ -279,6 +292,12 @@ TXFORM=L6071
 #OOBranchItem=分行名稱
 {width:230,align:'left'}
 
+#OOLastUpdate=最後修改日期
+{width:150,align:'center'}
+
+#OOLastEmp=最後修改人員
+{width:110,align:'center'}
+
 #OOItem=
 {width:1,hidden:true}
 
@@ -290,6 +309,5 @@ TXFORM=L6071
 
 #OOTBankCode=
 {width:1,hidden:true}
-
 ^
 </sub>
