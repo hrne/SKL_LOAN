@@ -365,7 +365,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    FROM \"CdBaseRate\" ";
 		sql += "    WHERE \"CurrencyCode\" = :inputCurrencyCode "; // -- 幣別
 		sql += "      AND \"BaseRateCode\" = :inputBaseRateCode "; // -- 指標利率代碼
-		sql += "      AND \"EffectDate\" <= :inputEffectDate -"; // - 生效日期
+		sql += "      AND \"EffectDate\" <= :inputEffectDate "; // -- 生效日期
 		sql += "      AND \"EffectFlag\" <= 1 "; // --生效記號 0:已放行 1:已使用 2:未放行
 		sql += ") ";
 		sql += "SELECT R1.\"BaseRate\" ";

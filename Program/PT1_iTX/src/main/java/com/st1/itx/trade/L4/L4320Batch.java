@@ -381,12 +381,12 @@ public class L4320Batch extends TradeBuffer {
 		// F16 借戶利率檔商品代碼
 		String prodNo = s.get("ProdNo");
 		b.setProdNo(prodNo);
+		// F20 企金別
+		int entCode = parse.stringToInteger(s.get("EntCode"));
+		b.setCustCode(entCode);
 		// F21 擔保品地區別
 		String cityCode = s.get("CityCode");
 		b.setCityCode(cityCode);
-		// F20 擔保品地區別
-		int entCode = parse.stringToInteger(s.get("EntCode"));
-		b.setCustCode(entCode);
 		// F22 擔保品鄉鎮別
 		b.setAreaCode(s.get("AreaCode"));
 		// F23 地區別利率上限
@@ -422,8 +422,7 @@ public class L4320Batch extends TradeBuffer {
 		int effDateCurt = 0;
 
 		// 機動非指數=>抓出的為預調利率(本次生效日)，需抓生效月份前的資料為目前利率與目前生效日
-		// 定期機動指標利率變動調整合約利率=>抓出的為需調整利率(本次生效日)，需抓生效月份前的資料為目前利率與目前生效日
-		if (iTxKind == 3 || iAdjCode == 4) {
+		if (iTxKind == 3) {
 			effDateCurt = presentEffectDate;
 			presentRate = parse.stringToBigDecimal(s.get("PresentRate"));
 			presentEffectDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("PresEffDate")));
