@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.LoanRateChange;
-
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
@@ -155,6 +156,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	public LoanRateChangeService loanRateChangeService;
 
 	@Autowired
+	private AcReceivableService sAcReceivableService;
+
+	@Autowired
 	LoanDueAmtCom loanDueAmtCom;
 	@Autowired
 	DateUtil dDateUtil;
@@ -240,6 +244,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		// 計算違約金
 		if (!iBreachReliefFlag.equals("Y")) { // 減免違約金 Y:是 N:否
 			wkDuraInt = BigDecimal.ZERO;
+
 			for (int i = 0; i <= wkCalcVoCount; i++) {
 				i = fillBreachRoutine(i);
 			}
@@ -1535,6 +1540,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   getDuraFlag      分段計息記號  = " + lCalcRepayIntVo.get(wkIndex).getDuraFlag());
 		this.info("   getStoreRate     年利率            = " + lCalcRepayIntVo.get(wkIndex).getStoreRate());
 
+		AcReceivable acReceivable;
+		BigDecimal shortPrincipal = BigDecimal.ZERO;
+
 		int wkDays = 0;
 		int wkOdDays = 0; // 逾期日數
 		int wkDaysA = 0; // 逾期6個月內
@@ -1658,6 +1666,16 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		} else {
 			wkDelayBase = vCalcRepayIntVo.getPrincipal().add(vCalcRepayIntVo.getInterest().add(wkDuraInt));
 		}
+		// 若為最後一筆，且此戶已到期
+		if (wkIndex == wkCalcVoCount && iMaturityDate == vCalcRepayIntVo.getEndDate()) {
+			acReceivable = sAcReceivableService.acctCodeLikeFirst("Z%", vCalcRepayIntVo.getCustNo(),
+					vCalcRepayIntVo.getFacmNo(), parse.IntegerToString(vCalcRepayIntVo.getBormNo(), 3), titaVo);
+			if (acReceivable != null) {
+				shortPrincipal = acReceivable.getRvBal();
+				wkDelayBase = wkDelayBase.subtract(shortPrincipal);
+				this.info("已到期且為最後一筆,計算本金減去短收本金");
+			}
+		}
 		// 2022-03-11 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
 //		BigDecimal wkDaysDenominator = new BigDecimal(wkDays).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
 
@@ -1690,6 +1708,13 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			// 用途別 非購置不動產者
 			// 計算基礎為當期應繳期款(本金+利息)
 			wkBreachBase = vCalcRepayIntVo.getPrincipal().add(vCalcRepayIntVo.getInterest().add(wkDuraInt));
+		}
+		// 若為最後一筆，且此戶已到期
+		if (wkIndex == wkCalcVoCount && iMaturityDate == vCalcRepayIntVo.getEndDate()) {
+			if (shortPrincipal.compareTo(BigDecimal.ZERO) != 0) {
+				wkBreachBase = wkBreachBase.subtract(shortPrincipal);
+				this.info("已到期且為最後一筆,違約金計算本金減去短收本金");
+			}
 		}
 
 		this.info("違約金當期計算基礎結果：wkBreachBase = " + wkBreachBase);

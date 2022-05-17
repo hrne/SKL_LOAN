@@ -274,6 +274,18 @@ public interface AcReceivableService {
   public Slice<AcReceivable> useBs902Eq(int custNo_0, int custNo_1, int clsFlag_2, int receivableFlag_3, String rvNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcctCode % ,AND CustNo = ,AND FacmNo = ,AND RvNo = 
+   *
+   * @param acctCode_0 acctCode_0
+   * @param custNo_1 custNo_1
+   * @param facmNo_2 facmNo_2
+   * @param rvNo_3 rvNo_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public AcReceivable acctCodeLikeFirst(String acctCode_0, int custNo_1, int facmNo_2, String rvNo_3, TitaVo... titaVo);
+
+  /**
    * hold By AcReceivable
    * 
    * @param acReceivableId key

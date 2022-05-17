@@ -108,7 +108,7 @@ T(1,#NTXBUF,22,7)
 #CHAIN_LogNo=A,20,S
 T(1,#NTXBUF,29,20)
 
-#CHAIN_RepayAmt=m,14.2,S
+#CHAIN_RepayAmt=m,14,S
 T(1,#NTXBUF,49,14)
 
 

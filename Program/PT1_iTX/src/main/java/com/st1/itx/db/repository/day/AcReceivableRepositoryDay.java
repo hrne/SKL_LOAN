@@ -71,14 +71,8 @@ public interface AcReceivableRepositoryDay extends JpaRepository<AcReceivable, A
   // CustNo >= ,AND CustNo <= ,AND ClsFlag = ,AND ReceivableFlag = ,AND RvNo %
   public Slice<AcReceivable> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(int custNo_0, int custNo_1, int clsFlag_2, int receivableFlag_3, String rvNo_4, Pageable pageable);
 
-  // AcBookCode = ,AND AcSubBookCode %,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode = ,AND AcDtlCode = ,AND CustNo >= ,AND CustNo <= 
-  public Slice<AcReceivable> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, String acDtlCode_6, int custNo_7, int custNo_8, Pageable pageable);
-
-  // AcBookCode = ,AND AcSubBookCode % ,AND CustNo = ,AND AcctFlag = ,AND FacmNo >= ,AND FacmNo <=
-  public Slice<AcReceivable> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(String acBookCode_0, String acSubBookCode_1, int custNo_2, int acctFlag_3, int facmNo_4, int facmNo_5, Pageable pageable);
-
-  // AcBookCode = ,AND AcSubBookCode % ,AND AcctCode = ,AND CustNo >= ,AND CustNo <=
-  public Slice<AcReceivable> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(String acBookCode_0, String acSubBookCode_1, String acctCode_2, int custNo_3, int custNo_4, Pageable pageable);
+  // AcctCode % ,AND CustNo = ,AND FacmNo = ,AND RvNo = 
+  public Optional<AcReceivable> findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(String acctCode_0, int custNo_1, int facmNo_2, String rvNo_3);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

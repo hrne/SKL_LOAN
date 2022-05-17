@@ -227,6 +227,9 @@ public class L4031 extends TradeBuffer {
 						lableBX += "(待輸入)";
 						checkFlag = 2; // 2-輸入利率
 						break;
+					case 9:
+						lableBX += "(檢核有誤)";
+						break;
 					}
 					if (keyinCode == 0 || keyinCode == 9) {
 						if ((txKind == 1 && adjCode == 2) || txKind == 3) {

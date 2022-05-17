@@ -16,7 +16,6 @@ import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -41,26 +40,24 @@ public class L3R11 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public LoanBorMainService loanBorMainService;
+	private LoanBorMainService loanBorMainService;
 	@Autowired
-	public LoanOverdueService loanOverdueService;
+	private LoanOverdueService loanOverdueService;
 	@Autowired
-	public AcReceivableService acReceivableService;
-	@Autowired
-	public FacCloseService facCloseService;
+	private FacCloseService facCloseService;
 
 	@Autowired
-	Parse parse;
+	private Parse parse;
 	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 	@Autowired
-	BaTxCom baTxCom;
+	private BaTxCom baTxCom;
 	@Autowired
-	LoanSetRepayIntCom loanSetRepayIntCom;
+	private LoanSetRepayIntCom loanSetRepayIntCom;
 	@Autowired
-	LoanCalcRepayIntCom loanCalcRepayIntCom;
+	private LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
-	LoanCloseBreachCom loanCloseBreachCom;
+	private LoanCloseBreachCom loanCloseBreachCom;
 
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private String iTxCode;
@@ -129,11 +126,6 @@ public class L3R11 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
 		// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-		for (LoanBorMain ln : lLoanBorMain) {
-			if (iBormNo > 0 && ln.getBormNo() != iBormNo) {
-				continue;
-			}
-		}
 		for (LoanBorMain ln : lLoanBorMain) {
 			if (iBormNo > 0 && ln.getBormNo() != iBormNo) {
 				continue;

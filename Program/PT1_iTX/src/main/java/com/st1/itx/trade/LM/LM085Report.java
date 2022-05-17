@@ -80,7 +80,7 @@ public class LM085Report extends MakeReport {
 //			exportPart2(fnAllList,1);
 			fnAllList = lm085ServiceImpl.findPart2_2(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			exportPart2(fnAllList,2);
+			exportPart2(fnAllList, 2);
 //			fnAllList = lm085ServiceImpl.findPart2_3(titaVo, yearMonth);
 //			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
 //			exportPart2(fnAllList,3);
@@ -154,27 +154,27 @@ public class LM085Report extends MakeReport {
 
 	}
 
-	private void exportPart2(List<Map<String, String>> dataList,int form) throws LogicException {
+	private void exportPart2(List<Map<String, String>> dataList, int form) throws LogicException {
 		int row = 0;
-		
+
 		switch (form) {
 		case 1:
 			// B16
 			makeExcel.formulaCalculate(16, 2);
 			// B18
 			makeExcel.formulaCalculate(18, 2);
-			
+
 			break;
 		case 2:
 			row = 17;
 			for (Map<String, String> r : dataList) {
 				int rowSpace = Integer.valueOf(r.get("F0"));
-				int percent = Integer.valueOf(r.get("F1"));
-				
-				makeExcel.setValue(row + rowSpace, 6, percent,"0.000 %");
+				BigDecimal percent = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
+						: new BigDecimal(r.get("F1"));
+
+				makeExcel.setValue(row + rowSpace, 6, percent, "0.000 %");
 			}
-			
-			
+
 			// F15
 			makeExcel.formulaCalculate(15, 6);
 			break;

@@ -168,9 +168,9 @@ public class AcPaymentCom extends TradeBuffer {
 // 2-應付
 //		201:整批匯款                        P02 銀行存款－新光       
 //		202:單筆匯款                        P02 銀行存款－新光
-//		204:退款台新(存款憑條)    P04 銀行存款－台新
-//		205:退款他行(整批匯款)    P02 銀行存款－新光
-//		211:退款新光(存款憑條)    P03 銀行存款－新光
+//		204:退款他行(匯款單)           P02 銀行存款－台新
+//		205:核心匯款(整批匯款)        P02 銀行存款－新光
+//		211:退款新光(存款憑條)        P03 銀行存款－新光
 //		
 
 // 0-共用
@@ -266,7 +266,7 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setAcctCode("P02");
 			break;
 		case "204":
-			acDetail.setAcctCode("P04");
+			acDetail.setAcctCode("P02");
 			break;
 		case "205":
 			acDetail.setAcctCode("P02");

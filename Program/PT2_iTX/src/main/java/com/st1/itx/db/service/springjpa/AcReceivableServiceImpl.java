@@ -541,6 +541,25 @@ em = null;
   }
 
   @Override
+  public AcReceivable acctCodeLikeFirst(String acctCode_0, int custNo_1, int facmNo_2, String rvNo_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("acctCodeLikeFirst " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " rvNo_3 : " +  rvNo_3);
+    Optional<AcReceivable> acReceivableT = null;
+    if (dbName.equals(ContentName.onDay))
+      acReceivableT = acReceivableReposDay.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
+    else if (dbName.equals(ContentName.onMon))
+      acReceivableT = acReceivableReposMon.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
+    else if (dbName.equals(ContentName.onHist))
+      acReceivableT = acReceivableReposHist.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
+    else 
+      acReceivableT = acReceivableRepos.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
+
+    return acReceivableT.isPresent() ? acReceivableT.get() : null;
+  }
+
+  @Override
   public AcReceivable holdById(AcReceivableId acReceivableId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

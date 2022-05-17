@@ -541,87 +541,22 @@ em = null;
   }
 
   @Override
-  public Slice<AcReceivable> acrvClsFlag2SubBook(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, String acDtlCode_6, int custNo_7, int custNo_8, int index, int limit, TitaVo... titaVo) {
+  public AcReceivable acctCodeLikeFirst(String acctCode_0, int custNo_1, int facmNo_2, String rvNo_3, TitaVo... titaVo) {
     String dbName = "";
-    Slice<AcReceivable> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("acrvClsFlag2SubBook " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acNoCode_4 : " +  acNoCode_4 + " acSubCode_5 : " +  acSubCode_5 + " acDtlCode_6 : " +  acDtlCode_6 + " custNo_7 : " +  custNo_7 + " custNo_8 : " +  custNo_8);
+    this.info("acctCodeLikeFirst " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " rvNo_3 : " +  rvNo_3);
+    Optional<AcReceivable> acReceivableT = null;
     if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, custNo_8, pageable);
+      acReceivableT = acReceivableReposDay.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
     else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, custNo_8, pageable);
+      acReceivableT = acReceivableReposMon.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
     else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, custNo_8, pageable);
+      acReceivableT = acReceivableReposHist.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
     else 
-      slice = acReceivableRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, custNo_8, pageable);
+      acReceivableT = acReceivableRepos.findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(acctCode_0, custNo_1, facmNo_2, rvNo_3);
 
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<AcReceivable> acrvFacmNo2SubBook(String acBookCode_0, String acSubBookCode_1, int custNo_2, int acctFlag_3, int facmNo_4, int facmNo_5, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<AcReceivable> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("acrvFacmNo2SubBook " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " custNo_2 : " +  custNo_2 + " acctFlag_3 : " +  acctFlag_3 + " facmNo_4 : " +  facmNo_4 + " facmNo_5 : " +  facmNo_5);
-    if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, custNo_2, acctFlag_3, facmNo_4, facmNo_5, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, custNo_2, acctFlag_3, facmNo_4, facmNo_5, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, custNo_2, acctFlag_3, facmNo_4, facmNo_5, pageable);
-    else 
-      slice = acReceivableRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndCustNoIsAndAcctFlagIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, custNo_2, acctFlag_3, facmNo_4, facmNo_5, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<AcReceivable> acctCode2SubBook(String acBookCode_0, String acSubBookCode_1, String acctCode_2, int custNo_3, int custNo_4, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<AcReceivable> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("acctCode2SubBook " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " acctCode_2 : " +  acctCode_2 + " custNo_3 : " +  custNo_3 + " custNo_4 : " +  custNo_4);
-    if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, acctCode_2, custNo_3, custNo_4, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, acctCode_2, custNo_3, custNo_4, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, acctCode_2, custNo_3, custNo_4, pageable);
-    else 
-      slice = acReceivableRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByAcctCodeAscCustNoAscFacmNoAsc(acBookCode_0, acSubBookCode_1, acctCode_2, custNo_3, custNo_4, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
+    return acReceivableT.isPresent() ? acReceivableT.get() : null;
   }
 
   @Override

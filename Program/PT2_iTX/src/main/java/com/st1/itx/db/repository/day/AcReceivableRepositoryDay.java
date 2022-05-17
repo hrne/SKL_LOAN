@@ -71,6 +71,9 @@ public interface AcReceivableRepositoryDay extends JpaRepository<AcReceivable, A
   // CustNo >= ,AND CustNo <= ,AND ClsFlag = ,AND ReceivableFlag = ,AND RvNo %
   public Slice<AcReceivable> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndClsFlagIsAndReceivableFlagIsAndRvNoLikeOrderByCustNoAscFacmNoAsc(int custNo_0, int custNo_1, int clsFlag_2, int receivableFlag_3, String rvNo_4, Pageable pageable);
 
+  // AcctCode % ,AND CustNo = ,AND FacmNo = ,AND RvNo = 
+  public Optional<AcReceivable> findTopByAcctCodeLikeAndCustNoIsAndFacmNoIsAndRvNoIsOrderByAcctCodeAscCustNoAscFacmNoAscRvNoAsc(String acctCode_0, int custNo_1, int facmNo_2, String rvNo_3);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

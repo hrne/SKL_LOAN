@@ -35,6 +35,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.GSeqCom;
+import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -88,6 +89,8 @@ public class L2153 extends TradeBuffer {
 	BankAuthActCom bankAuthActCom;
 	@Autowired
 	public ClFacCom clFacCom;
+	@Autowired
+	LoanCloseBreachCom loanCloseBreachCom;
 
 	// input area
 	private TitaVo titaVo = new TitaVo();
@@ -160,6 +163,11 @@ public class L2153 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2003", "商品參數檔  商品代碼=" + iProdNo); // 查無資料
 		}
 
+		// Eloan 清償違約說明
+		if (this.isEloan) {
+			titaVo.putParam("Breach", loanCloseBreachCom.getBreachDescription(iProdNo, titaVo));
+		}
+		
 		isElaonUpdate = false;
 		// Eloan check 是否重送 Y -> 修正
 		if (this.isEloan) {
@@ -483,7 +491,6 @@ public class L2153 extends TradeBuffer {
 			tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
 			tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
 		}
-
 
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(new BigDecimal("0"));

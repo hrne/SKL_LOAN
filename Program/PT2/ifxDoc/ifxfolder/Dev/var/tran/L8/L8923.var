@@ -234,7 +234,7 @@ X(#OOActualRepayAmt1)
 ! 修改的按鈕
 ! 1+7+7+3+3+7+20+14.2
 #OOBUF2=X,70,S
-T(2,2+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt)
+T(2,2+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt1)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=修改;ntxbuf=#OOBUF2})
@@ -248,21 +248,21 @@ BIND(grid,{cmd=CHAIN;ntxcd=L3005;text=明細;ntxbuf=#OOBUF3})
 
 ! 刪除的按鈕
 #OOBUF4=X,70,S
-T(2,4+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt)
+T(2,4+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt1)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=刪除;ntxbuf=#OOBUF4})
 
 ! 查詢的按鈕
 #OOBUF5=X,70,S
-T(2,5+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt)
+T(2,5+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt1)
 
 #OOBTN5=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=查詢;ntxbuf=#OOBUF5})
 
 ! 複製的按鈕
 #OOBUF6=X,70,S
-T(2,3+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt)
+T(2,3+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepayAmt1)
 
 #OOBTN6=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=複製;ntxbuf=#OOBUF6})
