@@ -48,7 +48,6 @@ E(0,0)
 ["[L6062]                                 行業別代號資料查詢"],
 ["#FdIndustryCode+行業代號",#IndustryCode],
 ["#FdIndustryItem+行業名稱",#IndustryItem],
-
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -141,6 +140,9 @@ T(3,1)ASGN(LOOP$)
 ! 主計處大類(TOTA)
 #OOMainType=X,1,L
 
+! 企金放款產業評等(TOTA)
+#OOIndustryRating=X,1,L
+
 #OOCHAIN=A,1,S
 T(4,CHAIN$)
 
@@ -153,8 +155,8 @@ T(4,CHAIN$)
 #OOFunc2=A,1,S
 E(0,2)
 
-#OOBUF2=X,108,S
-T(2,#OOFunc2+#OOIndustryCode+#OOIndustryItem+#OOMainType)
+#OOBUF2=X,109,S
+T(2,#OOFunc2+#OOIndustryCode+#OOIndustryItem+#OOMainType+#OOIndustryRating)
 
 ! 連結時隱藏按鈕
 #OOBTN2=X,4,S
@@ -165,8 +167,8 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 #OOFunc4=A,1,S
 E(0,4)
 
-#OOBUF4=X,108,S
-T(2,#OOFunc4+#OOIndustryCode+#OOIndustryItem+#OOMainType)
+#OOBUF4=X,109,S
+T(2,#OOFunc4+#OOIndustryCode+#OOIndustryItem+#OOMainType+#OOIndustryRating)
 
 ! 連結時隱藏按鈕
 #OOBTN4=X,4,S
@@ -191,6 +193,7 @@ TXFORM=L6062
 #OOIndustryCode
 #OOIndustryItem
 #OOMainType
+#OOIndustryRating
 #OOLastUpdate
 #OOLastEmp
 ^
@@ -224,6 +227,9 @@ TXFORM=L6062
 
 #OOMainType=主計處</br>大類
 {width:60,align:'center'}
+
+#OOIndustryRating=企金放款</br>產業評等
+{width:70,align:'center'}
 
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}
