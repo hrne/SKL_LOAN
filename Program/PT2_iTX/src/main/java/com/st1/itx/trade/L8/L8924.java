@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L8;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
@@ -133,8 +136,12 @@ public class L8924 extends TradeBuffer {
 				}
 				
 				occursList.putParam("OMrKey", txDataLog.getMrKey());
-
-				occursList.putParam("OReason", txDataLog.getReason());
+				
+				// 如果變更明細有詳細的 before/after 那就列出
+				// 否則用 TxDataLog.Reason
+				
+				String beforeAfter = getBeforeAfter(txDataLog);
+				occursList.putParam("OReason", beforeAfter != null && !beforeAfter.trim().isEmpty() ? beforeAfter : txDataLog.getReason());
 
 				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
 
@@ -151,6 +158,7 @@ public class L8924 extends TradeBuffer {
 				occursList.putParam("OTxDate", txDataLog.getTxDate());
 				occursList.putParam("OTxSeq", txDataLog.getTxSeq());
 				occursList.putParam("OTxSno", txDataLog.getTxSno());
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -166,6 +174,37 @@ public class L8924 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+	
+	@SuppressWarnings("unchecked")
+	private String getBeforeAfter(TxDataLog txDataLog) throws LogicException
+	{
+		List<String> results = new ArrayList<String>();
+		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+		try {
+			this.info("txDataLog.getContent()=" + txDataLog.getContent());
+			listMap = new ObjectMapper().readValue(txDataLog.getContent(), ArrayList.class);
+		} catch (IOException e) {
+			throw new LogicException("EC009", "資料格式");
+		}
+		
+		for (HashMap<String, Object> map : listMap) {
 
+			boolean hasF = map.get("f") != null;
+			boolean hasN = map.get("n") != null;
+			String fld = hasF ? map.get("f").toString() : "";
+			String nval = hasN ? map.get("n").toString() : "";
+			
+			if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
+				continue;
+			}
+			
+			if (hasF || hasN)
+			{
+				results.add(fld + ":" + nval);
+			}
+		}
+		
+		return String.join(",", results);
+	}
 
 }

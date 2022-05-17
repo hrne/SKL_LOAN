@@ -79,19 +79,20 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , A.\"LoanBal\" ";
 		sql += "            , A.\"IntRate\" ";
 		sql += "            , DECODE(A.\"IntStartDate\", 0, 99991231, A.\"IntStartDate\") \"IntStartDate\" ";
-		sql += "            , CASE WHEN A.\"PayIntDate\" <= ";
-		sql += "                        TO_CHAR(ADD_MONTHS(TO_DATE(:bcYearMonth || '01', 'YYYYMMDD') - 1, 1), 'YYYYMMDD') ";
-		sql += "                    AND SUBSTR(A.\"IntStartDate\", 1, 6) != :bcYearMonth ";
-		sql += "                       THEN A.\"Interest\" "; // 繳息日小於等於月底日曆日，且繳息起日非當月
-		sql += "                       ELSE 0 ";
-		sql += "              END                                                     \"UnpaidInt\" "; // 已到期
-		sql += "            , CASE WHEN A.\"PayIntDate\" > ";
-		sql += "                        TO_CHAR(ADD_MONTHS(TO_DATE(:bcYearMonth || '01', 'YYYYMMDD') - 1, 1), 'YYYYMMDD') ";
-		sql += "                       THEN A.\"Interest\" "; // 繳息日大於月底日曆日
-		sql += "                   WHEN SUBSTR(A.\"IntStartDate\", 1, 6) = :bcYearMonth ";
-		sql += "                       THEN A.\"Interest\" "; // 計息起日為同月時，視為未到期
-		sql += "                       ELSE 0 ";
-		sql += "              END                                                     \"UnexpiredInt\" "; // 未到期
+		sql += "            , CASE ";
+		sql += "                WHEN TRUNC(A.\"PayIntDate\" / 100) <= :bcYearMonth ";
+		sql += "                     AND TRUNC(A.\"IntStartDate\" / 100) <= :bcYearMonth";
+		sql += "                     AND TRUNC(A.\"IntEndDate\" / 100) <= :bcYearMonth";
+		sql += "                THEN A.\"Interest\" ";
+		sql += "                ELSE 0 ";
+		sql += "              END                      AS \"UnpaidInt\" "; // 已到期
+		sql += "            , CASE ";
+		sql += "                WHEN TRUNC(A.\"PayIntDate\" / 100) <= :bcYearMonth ";
+		sql += "                     AND TRUNC(A.\"IntStartDate\" / 100) <= :bcYearMonth";
+		sql += "                     AND TRUNC(A.\"IntEndDate\" / 100) <= :bcYearMonth";
+		sql += "                THEN 0 ";
+		sql += "                ELSE A.\"Interest\" ";
+		sql += "              END                      AS \"UnexpiredInt\" "; // 未到期
 		sql += "       FROM \"AcLoanInt\" A ";
 		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\" ";
 		sql += "       WHERE A.\"YearMonth\" = :bcYearMonth ";

@@ -38,11 +38,11 @@ public class L6062 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdIndustryService sCdIndustryService;
+	private CdIndustryService sCdIndustryService;
 	@Autowired
-	public CdEmpService cdEmpService;
+	private CdEmpService cdEmpService;
 	@Autowired
-	Parse parse;
+	private Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -61,16 +61,17 @@ public class L6062 extends TradeBuffer {
 
 		// 查詢行業別代號資料檔
 		Slice<CdIndustry> slCdIndustry;
-		if(iIndustryCode.isEmpty() && iIndustryItem.isEmpty()) {
+		if (iIndustryCode.isEmpty() && iIndustryItem.isEmpty()) {
 			slCdIndustry = sCdIndustryService.findAll(this.index, this.limit, titaVo);
 		} else if (!iIndustryCode.isEmpty()) {
-			slCdIndustry = sCdIndustryService.findIndustryCode(iIndustryCode+"%", this.index, this.limit, titaVo);
-		} else{
-			slCdIndustry = sCdIndustryService.findIndustryItem("%"+iIndustryItem+"%", this.index, this.limit, titaVo);
+			slCdIndustry = sCdIndustryService.findIndustryCode(iIndustryCode + "%", this.index, this.limit, titaVo);
+		} else {
+			slCdIndustry = sCdIndustryService.findIndustryItem("%" + iIndustryItem + "%", this.index, this.limit,
+					titaVo);
 		}
 		List<CdIndustry> lCdIndustry = slCdIndustry == null ? null : slCdIndustry.getContent();
 
-		if (lCdIndustry == null || lCdIndustry.size() == 0) {
+		if (lCdIndustry == null || lCdIndustry.isEmpty()) {
 			throw new LogicException(titaVo, "E0001", "行業別代號資料檔"); // 查無資料
 		}
 		// 如有找到資料
@@ -79,8 +80,11 @@ public class L6062 extends TradeBuffer {
 			occursList.putParam("OOIndustryCode", tCdIndustry.getIndustryCode());
 			occursList.putParam("OOIndustryItem", tCdIndustry.getIndustryItem());
 			occursList.putParam("OOMainType", tCdIndustry.getMainType());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdIndustry.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdIndustry.getLastUpdate()));
-			occursList.putParam("OOLastEmp", tCdIndustry.getLastUpdateEmpNo() + " " + empName(titaVo, tCdIndustry.getLastUpdateEmpNo()));
+			occursList.putParam("OOIndustryRating", tCdIndustry.getIndustryRating());
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdIndustry.getLastUpdate()) + " "
+					+ parse.timeStampToStringTime(tCdIndustry.getLastUpdate()));
+			occursList.putParam("OOLastEmp",
+					tCdIndustry.getLastUpdateEmpNo() + " " + empName(titaVo, tCdIndustry.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -94,6 +98,7 @@ public class L6062 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

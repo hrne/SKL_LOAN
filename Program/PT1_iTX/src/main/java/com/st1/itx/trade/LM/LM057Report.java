@@ -111,7 +111,7 @@ public class LM057Report extends MakeReport {
 				int bormNo = lM057Vo.get("F3").isEmpty() ? 0 : Integer.valueOf(lM057Vo.get("F3"));
 				String custName = lM057Vo.get("F4").isEmpty() ? " " : lM057Vo.get("F4");
 				BigDecimal loan = lM057Vo.get("F5").isEmpty() ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F5"));
-				String date = showBcDate(lM057Vo.get("F6"), 0);			
+				String date = showBcDate(lM057Vo.get("F6"), 0);
 				BigDecimal rate = getBigDecimal(lM057Vo.get("F7"));
 				String type = lM057Vo.get("F8");
 				String leg = lM057Vo.get("F9").isEmpty() ? " " : lM057Vo.get("F9");
@@ -170,6 +170,7 @@ public class LM057Report extends MakeReport {
 
 		BigDecimal amount = BigDecimal.ZERO;
 		BigDecimal colTotal = BigDecimal.ZERO;
+		BigDecimal total = BigDecimal.ZERO;
 		// 可能可去掉這層，
 		for (Map<String, String> lM057Vo : listData) {
 
@@ -177,59 +178,76 @@ public class LM057Report extends MakeReport {
 
 			switch (lM057Vo.get("F0")) {
 			case "B1":
-
 				// 甲類-放款本金超過清償期三個月而未獲清償，或雖未屆滿三個月，但以向主、從償務人訴追或楚芬擔保品者
 				makeExcel.setValue(5, 4, amount, "#,##0");
-				colTotal = colTotal.add(amount);
+//				colTotal = colTotal.add(amount);
 				break;
 			case "B3":
 				// 甲類-放款本金未按期攤超過六個月
 				makeExcel.setValue(7, 4, amount, "#,##0");
-				colTotal = colTotal.add(amount);
+//				colTotal = colTotal.add(amount);
 				break;
+//			case "C2":
+//				// 乙類-分期償還放款未按期攤超過三至六個月
+//				makeExcel.setValue(11, 4, amount, "#,##0");
+//				colTotal = colTotal.add(amount);
+//				break;
+			case "Ovdu":
 			case "C2":
 				// 乙類-分期償還放款未按期攤超過三至六個月
 				makeExcel.setValue(11, 4, amount, "#,##0");
-				colTotal = colTotal.add(amount);
-				break;
-			case "Ovdu":
-				// 乙類-分期償還放款未按期攤超過三至六個月
-				makeExcel.setValue(11, 4, amount, "#,##0");
-				colTotal = colTotal.add(amount);
+//				colTotal = colTotal.add(amount);
 				break;
 			case "C5":
 				// 已確定分配之債權，惟尚未獲分款者
 				makeExcel.setValue(14, 4, amount, "#,##0");
-				colTotal = colTotal.add(amount);
+//				colTotal = colTotal.add(amount);
 				break;
-//			case "TOTAL":
-//				// 放款總額(含轉列催收款)
-//				makeExcel.setValue(18, 4, amount, "#,##0");
-//				break;
-//			case "DPLoan":
-//				// 擔保放款(溢折價)
-//				makeExcel.setValue(18, 4, amount, "#,##0");
-//				break;
+			case "C7":
+				// 其它
+				makeExcel.setValue(16, 4, amount, "#,##0");
+//				colTotal = colTotal.add(amount);
+				break;
 
 			default:
 				break;
 			}
 
-			if ("DPCol".equals(lM057Vo.get("F0"))) {
-				// 逾期放款總額
+			
+			switch (lM057Vo.get("F0")) {
+			case "B1":
+			case "B3":
+			case "Ovdu":
+			case "C2":
+			case "C5":
+			case "C7":
 				colTotal = colTotal.add(amount);
+				
 				makeExcel.setValue(19, 4, colTotal, "#,##0");
 
+				break;
+
+
+			default:
+				break;
+			}
+			
+			
+			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0"))) {
+				// 逾期放款總額
+				colTotal = colTotal.add(amount);
+
 			}
 
-			if ("Total".equals(lM057Vo.get("F0"))) {
+			if ("Total".equals(lM057Vo.get("F0")) || "Collection".equals(lM057Vo.get("F0")) || "Loss".equals(lM057Vo.get("F0"))) {
 				// 放款總額
-				makeExcel.setValue(18, 4, amount, "#,##0");
-
+				total = total.add(amount);
 			}
+				
 
 		}
-
+		makeExcel.setValue(18, 4, total, "#,##0");
+		makeExcel.setValue(19, 4, colTotal, "#,##0");
 		// 重整公式
 		makeExcel.formulaCaculate(9, 4);
 		makeExcel.formulaCaculate(17, 4);

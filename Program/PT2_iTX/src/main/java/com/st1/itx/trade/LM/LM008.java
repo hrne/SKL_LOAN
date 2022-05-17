@@ -30,7 +30,7 @@ public class LM008 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	WebClient webClient;
-
+	
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -50,9 +50,5 @@ public class LM008 extends BatchBase implements Tasklet, InitializingBean {
 		lM008report.setParentTranCode(this.getParent());
 		lM008report.setTxBuffer(this.getTxBuffer());
 		lM008report.exec(titaVo);
-
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM008應收利息明細表已完成", titaVo);
-
 	}
-
 }

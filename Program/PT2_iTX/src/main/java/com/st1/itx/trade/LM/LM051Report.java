@@ -183,7 +183,7 @@ public class LM051Report extends MakeReport {
 			// F9分類項目:11
 			makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
 			// F4 五類金額(用F16區分F4)=；12~17
-			putAsset(row, tLDVo.get("F4"), tLDVo.get("F16"));
+			putAsset(row, tLDVo.get("F4"), tLDVo.get("F17"));
 			// F10 分類標準(文字)；18
 			String classText = "";
 			if (tLDVo.get("F13") == "60" || tLDVo.get("F13") == "61" || tLDVo.get("F13") == "62") {

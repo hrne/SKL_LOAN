@@ -1,0 +1,441 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L3914)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,116)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,20)ASGN(INQPRT$)
+
+#button=x,1,S
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L3914]                                 暫收款退還／銷帳資料查詢"],
+["#FdCustNo+．借戶戶號",#CustNo,#CustNoX],
+["#FdCustId+．統一編號",#CustId,#CustIdX],
+["#FdApplNo+．核准編號",#ApplNo,#ApplNoX],
+["#FdAcDate+會計日期",#AcDate],
+["#FdEntryDate+入帳日期",#EntryDate],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+! #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+! #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
+! #BTN4=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+
+! #BUF1=X,42,S
+! HIDE(#BTN1,#BTN2,#BTN3,#BTN4)
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!幣別小數位
+#CDDEF01=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+#CDDEF02=x,30,S                  
+T(3,CdCode.BatchRepayCode)                  
+                                      
+#RepayCodeHelp=x,1024,S  
+
+!科目
+#CDDEF03=x,26,S
+T(3,CdCode.AcctCode)
+#AcctCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@CurrPrecisionHelp,#HelpDesc1) 
+T(2,@RepayCodeHelp,#HelpDesc2)
+T(2,@AcctCodeHelp,#HelpDesc3)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,100,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(3,#CHAIN,1,T(1,@ChainCustNo,#NTXBUF,6,7),$)
+
+#ChainCustNo=A,7,S
+C(3,#ChainCustNo,0,E(0,@CHAIN,0),$)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#CHAINTXCD=_,_,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
+
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=X,7,I
+T(3,#FdApplNo, )
+C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
+C(3,#CHAIN,1,s,$)
+@C(4,#CustNo,S,$)
+T(3,#CustNoX,)
+V(9)
+
+#TmpCustNo=A,7,S
+C(4,#CustNo,S,$)
+E(0,@TmpCustNo,#CustNo)
+T(2,@CustNo,#TmpCustNo)
+
+#SendL2r07A=X,1,S
+C(4,#CustNo,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustNoX=X,100,L
+C(4,#CustNo,S,T(2,#L2r07CustName))
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+T(3,#FdApplNo, )
+C(4,#CustNo,$,S)
+@C(4,#CustId,S,$)
+V(7)
+T(3,#CustIdX,)
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#SendL2r07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustIdX=X,100,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+
+![核准編號]
+#FdApplNo=X,2,L
+
+#ApplNo=X,7,I
+C(4,#CustNo,$,S)
+C(4,#CustId,$,S)
+@
+C(4,#ApplNo,V(P,需擇一輸入查詢條件),$)
+V(9)
+T(3,#ApplNoX,)
+
+#TmpApplNo=A,7,S
+C(4,#ApplNo,S,$)
+E(0,@TmpApplNo,#ApplNo)
+T(2,@ApplNo,#TmpApplNo)
+
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05A=X,1,S
+C(4,#ApplNo,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+#SendL2r07C=X,1,S
+C(4,#ApplNo,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+C(4,#ApplNo,S,T(2,#L2r07CustName))
+
+#TimCustNo=A,7,S
+E(0,0)
+C(4,#CustNo,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(4,#ApplNo,$,E(0,#L2r05CustNo))
+
+#TimCustNoX=X,100,S
+C(4,#CustNo,$,T(2,#CustNoX))
+C(4,#CustId,$,T(2,#CustIdX))
+C(4,#ApplNo,$,T(2,#ApplNoX))
+
+![會計日期]
+!DEFAULT當月1日,必須輸入
+#FdAcDate=X,2,L
+
+#AcDate=D,7,I
+E(0,#SYSDATE/100)
+E(0,#AcDate*100+1)
+C(3,#CHAIN,1,s,$)
+@A(DATE,0,#AcDate)
+
+
+![入帳日期]
+#FdEntryDate=X,2,L
+
+#EntryDate=D,7,I
+C(3,#AcDate,0,$,S)
+E(0,#SYSDATE/100)
+E(0,#EntryDate*100+1)
+@V(7)A(DATE,0,#EntryDate)
+
+#RPTFG=A,1,S
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L3R02.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3914 ----------
+<sub type="FORM" name="L3914">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L3914,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3914] 暫收款退還／銷帳資料查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#OCustNo=A,7,L
+E(0,#TimCustNo)
+
+#OCustNoX=X,100,L
+T(2,#TimCustNoX)
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+!固定新台幣
+#OOCurrencyCode=X,3,O
+T(3,TWD)
+
+#OOPrecision=N,1,S
+E(0,0)T(H,#OOCurrencyCode,#CurrPrecisionHelp)
+
+!入帳日期
+#OOEntryDate=D,7,O
+!會計日期
+#OOAcDate=D,7,O
+!摘要
+#OODesc=x,300,O
+!業務科目代號
+#OOAcctCode=X,3,O
+#OOAcctItem=x,30,O
+T(3,)T(H,#OOAcctCode,#AcctCodeHelp)
+#OOAcctCodeX=x,35,O
+T(2,#OOAcctCode+-+#OOAcctItem)
+!額度編號
+#OOFacmNo=A,3,O
+!記帳金額
+#OOTxAmt=+m,14.2,O
+
+#OOTxAmtX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOTxAmt,#OOTxAmtX)
+P(R,#OOTxAmtX)
+!銷帳編號
+#OORvNo=x,15,O
+!經辦
+#OOTellerNo=x,6,O
+!交易序號
+#OOTxtNo=x,8,O
+
+
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#TimCustNo#AcDate#EntryDate
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L3914
+#OOEntryDate
+#OOAcDate
+#OODesc
+#OOAcctCode
+#OOFacmNo
+#OOTxAmt
+#OORvNo
+#OOTellerNo
+#OOTxtNo
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L3R02.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L3914" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];">
+[
+["[L3914]                                 暫收款退還／銷帳資料查詢"],
+["@借戶戶號",#OCustNo,#OCustNoX],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L3914
+#any={detail:true, header:'L3914.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+
+#OOEntryDate=入帳日期
+{width:85,align:'center'}
+
+#OOAcDate=會計日期
+{width:85,align:'center'}
+
+#OODesc=摘要
+{width:90}
+
+#OOAcctCodeX=業務科目代號
+{width:120,align:'center'}
+
+#OOFacmNo=額度編號
+{width:85,align:'center'}
+
+#OOTxAmtX=記帳金額
+{width:170}
+
+#OORvNo=銷帳編號
+{width:130,align:'center'}
+
+#OOTellerNo=經辦
+{width:50,align:'center'}
+ 
+#OOTxtNo=交易序號
+{width:90}
+
+#OOTxAmt=
+{width:1,hidden:true}
+#OOAcctCode=
+{width:1,hidden:true}
+#OOAcctItem=
+{width:1,hidden:true}
+#OCustNo=
+{width:1,hidden:true}
+^
+
+#RPTFG2=2,QUERY.GRID,L3914
+#any={detail:true, header:'L3914.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOEntryDate=入帳日期
+{width:85,align:'center'}
+
+#OOAcDate=會計日期
+{width:85,align:'center'}
+
+#OODesc=摘要
+{width:90}
+
+#OOAcctCodeX=業務科目代號
+{width:120,align:'center'}
+
+#OOFacmNo=額度編號
+{width:85,align:'center'}
+
+#OOTxAmtX=記帳金額
+{width:170}
+
+#OORvNo=銷帳編號
+{width:130,align:'center'}
+
+#OOTellerNo=經辦
+{width:50,align:'center'}
+ 
+#OOTxtNo=交易序號
+{width:90}
+
+#OOTxAmt=
+{width:1,hidden:true}
+#OOAcctCode=
+{width:1,hidden:true}
+#OOAcctItem=
+{width:1,hidden:true}
+
+^
+</sub>

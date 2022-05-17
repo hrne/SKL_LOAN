@@ -94,17 +94,17 @@ public class L4201 extends TradeBuffer {
 			btnIndex = parse.stringToInteger(titaVo.getBtnIndex());
 			// 期款 0-1, 1-2, 2-3, 3-1(不預收)
 			switch (btnIndex) {
-			case 0:
+			case 0: // 期款
 				iRepayTypeA = 1;
 				newPreRepayTerms = this.txBuffer.getSystemParas().getPreRepayTermsBatch();
 				break;
-			case 1:
+			case 1: // 部分償還
 				iRepayTypeA = 2;
 				break;
-			case 2:
+			case 2:  // 結案
 				iRepayTypeA = 3;
 				break;
-			case 3:
+			case 3: // 期款(不預收)
 				iRepayTypeA = 1;
 				newPreRepayTerms = 0;
 				break;
@@ -117,8 +117,11 @@ public class L4201 extends TradeBuffer {
 		tBatxDetail.setRepayType(iRepayTypeA);
 		tBatxDetail.setCustNo(iCustNoA);
 		tBatxDetail.setProcStsCode(iProcStsCode);
+		// 預收期數
 		if (tBatxDetail.getRepayType() == 1) {
 			tTempVo.putParam("PreRepayTerms", newPreRepayTerms);
+		} else {
+			tTempVo.remove("PreRepayTerms");			
 		}
 		// 再檢核一次，移除匯款轉帳同戶號多筆檢核
 		tTempVo.remove("MergeCnt");

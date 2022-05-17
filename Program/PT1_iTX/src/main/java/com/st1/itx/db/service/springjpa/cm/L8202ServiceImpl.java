@@ -344,7 +344,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iFactor3TotLimit = titaVo.getParam("Factor3TotLimit"); // 洗錢樣態三金額合計超過
 		String iFactorDays3 = titaVo.getParam("FactorDays3"); // 統計期間天數
 		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateS")) + 19110000; // 入帳日期起日
-		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE")) + 19110000; // 入帳日期迄日
+		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE3")) + 19110000; // 入帳日期迄日
 
 		this.info("findAll3 iFactor3TotLimit = " + iFactor3TotLimit);
 		this.info("findAll3 iFactorDays3 = " + iFactorDays3);

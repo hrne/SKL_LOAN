@@ -1,0 +1,498 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
+#SECNO=_,_,S
+T(3,09)
+
+![借貸別 (1:借 2:貸)]
+#CRDB=_,_,S
+E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,登錄)
+</sub>
+<sub type="DC" name="BFRP">
+<include src="RPDTL.icf::BFRP.dec"/>
+</sub>
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+#InitValue=@,1,S
+E(0,@TempReasonCode,1)
+T(3,@CurrencyCode,TWD)
+HIDE(#what)
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,1000];printer.width=[20,150];">
+[
+["[L3250]                                 暫收款退還沖正（轉換前交易）"],
+["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+["#FdCustId+統一編號",#CustId,"@@@",#BTN2,#CustIdX],
+["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+["#FdTempReasonCode+暫收帳戶",#TempReasonCodeX],
+["@",#BTN8],
+["#FdAcctCode+作業項目",#AcctCodeX],
+["#FdFacmNo+額度編號",#FacmNo],
+["#FdEntryDate+入帳日期",#EntryDate],
+["#FdAcDate+會計日期",#AcDate],
+["#FdRvNo+銷帳編號",#RvNo],
+["#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdTempAmt+暫收款金額",#TwTempAmt,#UsTempAmt],
+["#FdTellerNo+經辦",#TellerNo],
+["#FdTxtNo+交易序號",#TxtNo],
+["#FdRemark+備註",#Remark],
+["#FdDescription+摘要內容",#Description,#what],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+#BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0;title: L2016 核准號碼明細資料查詢;
+! #BTN6=X,15,I,ui:button;value:撥款明細查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
+
+
+#BUF1=X,42,S
+HIDE(#BTN1,#BTN2,#BTN3,#what)
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!CurrencyCode幣別名稱
+#CDDEF01=x,30,S
+T(3,CdCode.Currency)
+
+#CurrencyCodeHelp=x,1024,S
+
+!幣別小數位
+#CDDEF02=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+!作業項目
+#CDDEF03=x,26,S
+T(3,CdCode.Temp2ItemCode)
+
+#Temp2ItemCodeHelp=x,1024,S
+
+!暫收帳戶
+#CDDEF04=x,26,S
+T(3,CdCode.Temp2ReasonCode)
+
+#Temp2ReasonCodeHelp=x,1024,S
+
+!科目
+#CDDEF05=x,26,S
+T(3,CdCode.AcctCode)
+#AcctCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CurrencyCodeHelp,#HelpDesc1)
+T(2,@CurrPrecisionHelp,#HelpDesc2)
+T(2,@Temp2ItemCodeHelp,#HelpDesc3)
+T(HELP,@Temp2ItemCodeHelp,#Temp2ItemCodeHelp,-,17;23)
+T(2,@Temp2ReasonCodeHelp,#HelpDesc4)
+T(2,@AcctCodeHelp,#HelpDesc5)
+! T(HELP,@AcctCodeHelp,#AcctCodeHelp,+,F07;F09;F10;F12;F24;F25;F27;F29;F30)
+
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+HIDE(#UsTempAmt)
+
+#NTXBUF=X,31,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#FdRvNo=X,2,L
+#FdCurrencyCode=X,2,L
+#FdTempAmt=X,2,L
+#FdRemark=X,2,L
+#FdDescription=X,2,L
+
+#InitFd=X,1,S
+
+
+#BUF1A=X,30,S
+T(3,00000019999999000)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
+
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=X,7,I
+SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+CALL(#InitValue)
+@
+HIDE(#BTN1)
+
+#CustNo2=A,7,S
+C(4,#CustNo,S,$)
+E(0,#CustNo)
+T(2,@CustNo,#CustNo2)
+T(3,#CustNoX,)
+
+#SendL2r07A=X,1,S
+C(4,#CustNo,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@CustNoX,#L2r07CustName)
+
+#CustNoX=X,100,L
+C(4,#CustNo,S,$)
+
+#BUF2A=X,100,S
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+T(3,@FdApplNo, )
+C(3,#CHAIN,1,s,$)
+C(4,#CustNo,$,s)
+SHOW(#BTN2)HIDE(#BTN1,#BTN3)
+CALL(#InitValue)
+@
+T(3,#CustIdX,)
+A(ID_UNINO,0,#CustId)
+HIDE(#BTN2)
+
+
+#BUF2B=X,100,S
+T(2,0000000+#CustId)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#SendL2r07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@CustIdX,#L2r07CustName)
+
+#CustIdX=X,100,L
+C(4,#CustId,S,$)
+
+#WkStartDate=D,7,S
+E(0,#SYSDATE)
+
+#BUF3A=X,45,S
+T(2,0000001999999900000000000000          0000000)
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
+
+![核准編號]
+#FdApplNo=X,2,L
+C(3,#CHAIN,1,S,$)
+C(4,#CustNo,$,S)
+C(4,#CustId,$,S)
+T(3,*)
+
+#ApplNo=X,7,I
+C(3,#CHAIN,1,s,$)
+C(4,#CustNo,$,S)
+C(4,#CustId,$,S)
+SHOW(#BTN3)HIDE(#BTN1,#BTN2)
+CALL(#InitValue)
+@C(4,#ApplNo,V(P,需擇一輸入),$)
+HIDE(#BTN3)
+
+#ApplNo2=A,7,S
+C(4,#ApplNo,S,$)
+E(0,#ApplNo)
+T(2,@ApplNo,#ApplNo2)
+T(3,#ApplNoX,)
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05A=X,1,S
+C(4,#ApplNo,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+E(0,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07C=X,1,S
+C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@ApplNoX,#L2r07CustName)
+
+#ApplNoX=X,100,L
+C(4,#ApplNo,S,$)
+
+#TimCustNo=A,7,S
+E(0,0)
+C(4,#CustNo,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(4,#ApplNo,$,E(0,#L2r05CustNo))
+T(2,@LockCustNo,#TimCustNo)
+! <include src="COM.icf::LockControl.rtn"/>
+
+![暫收帳戶]預設1
+#FdTempReasonCode=X,2,L
+
+#TempReasonCode=A,1,S
+E(0,@TempReasonCode,1)
+
+#TempReasonCodeX=X,16,L
+T(3,)T(H,#TempReasonCode,#Temp2ReasonCodeHelp) 
+
+![作業項目]
+#FdAcctCode=X,2,L
+
+#BUF8=X,100,S
+T(2,#TXCD+#TimCustNo)
+
+
+#BIND8=X,1,S
+BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L3914; ntxbuf=#BUF8;ntxbuf5=type<-1:
+CustNo<-OCustNo:
+AcctCode<-OOAcctCode:
+AcctCodeX<-OOAcctItem:
+FacmNo<-OOFacmNo:
+RvNo<-OORvNo:
+EntryDate<-OOEntryDate:
+AcDate<-OOAcDate:
+TwTempAmt<-OOTxAmt:
+UsTempAmt<-OOTxAmt:
+TellerNo<-OOTellerNo:
+ORGTLR<-OOTellerNo:
+TxtNo<-OOTxtNo:
+ORGTNO<-OOTxtNo:
+Description<-OODesc})
+
+
+#BTN8=X,30,I,ui:button;value:暫收款退還／銷帳資料查詢;enable:1;tabbable:1;backNext:true;title: L3914 暫收款退還／銷帳資料查詢
+
+
+#AcctCode=X,3,S
+C(4,#AcctCode,V(P,請點選[暫收款退還／銷帳資料查詢]),$)
+! HELP(#AcctCodeHelp,cols:2)
+! @V(H,#AcctCodeHelp)
+
+#AcctCodeX=X,20,L
+T(3,)T(H,#AcctCode,#AcctCodeHelp)
+
+![額度編號]
+!作業項目=9,10,25,29必須輸入,其他不可輸入
+#FdFacmNo=X,2,L
+
+#FacmNo=A,3,L
+
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+
+!入帳日期
+#FdEntryDate=X,2,L
+
+#EntryDate=D,7,L
+
+!會計日期
+#FdAcDate=X,2,L
+
+#AcDate=D,7,L
+![銷帳編號]
+#RvNo=X,20,L
+
+![幣別]
+
+#CurrencyCode=X,3,L
+T(3,TWD)
+
+#Precision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+#CurrencyCodeX=X,10,S
+T(3,)T(H,#CurrencyCode,#CurrencyCodeHelp) 
+
+![SWIFT幣別三碼]
+#CURNM=_,_,S
+T(2,#CurrencyCode)
+
+#WkHideAmt=X,1,S
+C(3,#Precision,0,SHOW(#TwTempAmt)
+                 HIDE(#UsTempAmt)
+                ,HIDE(#TwTempAmt)
+                 SHOW(#UsTempAmt))
+
+
+![暫收款金額]
+#TwTempAmt=m,14,L
+C(3,#Precision,0,$,S)
+
+#UsTempAmt=m,14.2,L
+C(3,#Precision,0,S,$)
+
+#TimTempAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))
+
+![交易金額]
+#TXAMT=_,_,S
+E(0,#TimTempAmt)
+
+!經辦
+#FdTellerNo=X,2,L
+#TellerNo=x,6,L
+
+!交易序號
+#FdTxtNo=X,2,L
+#TxtNo=A,8,L
+
+!備註
+#Remark=X,60,L
+C(3,#AcctCode,8,$,S)
+
+![摘要內容]
+#Description=X,30,L
+
+#what=X,1,I
+@T(3,)
+
+! <include src="RPDTL.icf::RPCOL.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
+<include src="ROM.icf::L3R02.dec"/>
+<include src="ROM.icf::L3R05.dec"/>
+<include src="ROM.icf::L2R08.dec"/>
+</sub>
+!--------- 收付欄 -----------------------
+! <sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
+! [
+! <include src="RPDTL.icf::RPDTL.scr"/>
+! ]
+! </sub>
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+<include src="PRT.icf::FM101.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3250 ----------
+<sub type="FORM" name="L3250">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L3250,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3250] 暫收款退還沖正（轉換前交易）)
+
+</sub>
+!---------- TXFORM = FM101 交易分錄----------
+<sub type="FORM" name="FM101">
+<include src="PRT.icf::FM101.form"/>
+</sub>
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+
+#TimCustNo#CustId#ApplNo#FacmNo
+#TempReasonCode#AcctCode
+#CurrencyCode
+#TimTempAmt
+#EntryDate
+#AcDate
+#TellerNo
+#TxtNo
+#Description#RvNo
+#Remark
+#END
+#CustNo
+#TwTempAmt
+#UsTempAmt
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L3250^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
+<include src="ROM.icf::L3R02.tom"/>
+<include src="ROM.icf::L3R05.tom"/>
+<include src="PRT.icf::FM101.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+<include src="PRT.icf::FM101.sel" map="landscape=1;size=830:1170" />
+</sub>

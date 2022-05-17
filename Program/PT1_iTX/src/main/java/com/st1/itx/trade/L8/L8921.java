@@ -13,8 +13,10 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryChkDtl;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryChkDtlService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
@@ -41,6 +43,8 @@ public class L8921 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 	@Autowired
+	CdCodeService sCdCodeService;
+	@Autowired
 	Parse parse;
 
 	@Override
@@ -66,12 +70,12 @@ public class L8921 extends TradeBuffer {
 
 		// 查詢疑似洗錢樣態檢核明細檔檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;
-		if (iFactor == 0) {
+		if(iFactor==0) {
 			slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
 		} else {
 			slMlaundryChkDtl = sMlaundryChkDtlService.findFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
 		}
-
+		
 		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
 
 		if (lMlaundryChkDtl == null || lMlaundryChkDtl.size() == 0) {
@@ -89,12 +93,17 @@ public class L8921 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 			}
+			
 
 			occursList.putParam("OOFactor", tMlaundryChkDtl.getFactor()); // 交易樣態
 			occursList.putParam("OOEntryDate", tMlaundryChkDtl.getEntryDate()); // 入帳日期
 			occursList.putParam("OOCustNo", tMlaundryChkDtl.getCustNo()); // 戶號
 			occursList.putParam("OORepayItem", tMlaundryChkDtl.getRepayItem()); // 來源
-			occursList.putParam("OODscptCode", tMlaundryChkDtl.getDscptCode()); // 匯款摘要
+			
+			// 匯款摘要
+			CdCode tCdCode = sCdCodeService.getItemFirst(4, "BankRmftCode", tMlaundryChkDtl.getDscptCode(), titaVo);
+			occursList.putParam("OODscptCode", tCdCode != null ? tCdCode.getItem() : "");
+			
 			occursList.putParam("OOTxAmt", tMlaundryChkDtl.getTxAmt()); // 交易金額
 			occursList.putParam("OOTotalAmt", tMlaundryChkDtl.getTotalAmt()); // 累計金額
 			occursList.putParam("OOTotalCnt", tMlaundryChkDtl.getTotalCnt()); // 累計筆數

@@ -33,13 +33,13 @@ public class L6602 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdIndustryService sCdIndustryService;
+	private CdIndustryService sCdIndustryService;
 	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 	@Autowired
-	Parse parse;
+	private Parse parse;
 	@Autowired
-	public DataLog dataLog;
+	private DataLog dataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -117,6 +117,7 @@ public class L6602 extends TradeBuffer {
 		mCdIndustry.setIndustryCode(titaVo.getParam("IndustryCode"));
 		mCdIndustry.setIndustryItem(titaVo.getParam("IndustryItem"));
 		mCdIndustry.setMainType(titaVo.getParam("MainType"));
+		mCdIndustry.setIndustryRating(titaVo.getParam("IndustryRating"));
 
 		if (mFuncCode != 2) {
 			mCdIndustry.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

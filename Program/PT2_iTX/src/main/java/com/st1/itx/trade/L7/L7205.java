@@ -29,6 +29,9 @@ import com.st1.itx.db.service.Ifrs9FacDataService;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.db.service.LoanIfrs9ApService;
 import com.st1.itx.db.service.MonthlyFacBalService;
+import com.st1.itx.db.service.MonthlyLM052AssetClassService;
+import com.st1.itx.db.service.MonthlyLM052LoanAssetService;
+import com.st1.itx.db.service.MonthlyLM052OvduService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeExcel;
@@ -59,7 +62,13 @@ public class L7205 extends TradeBuffer {
 	public LoanIfrs9ApService tLoanIfrs9ApService;
 	@Autowired
 	public Ias34ApService tIas34ApService;
-
+	@Autowired
+	MonthlyLM052AssetClassService sLM052AssetClass;
+	@Autowired
+	MonthlyLM052LoanAssetService sLM052LoanAsset;
+	@Autowired
+	MonthlyLM052OvduService sLM052Ovdu;
+	
 	@Autowired
 	JobMainService sJobMainService;
 
@@ -236,7 +245,8 @@ public class L7205 extends TradeBuffer {
 		this.totaVo.putParam("CountF", CountF);
 
 //		 重產LM051報表
-		titaVo.setBatchJobId("jLM051");
+		titaVo.setBatchJobId( "jLM051");
+		updLM052ReportSP(titaVo,iYearMonth);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -332,4 +342,17 @@ public class L7205 extends TradeBuffer {
 
 	}
 
+	
+	private void updLM052ReportSP(TitaVo titaVo,int yearMonth) {
+		this.info("upd LM052 SP start.");
+		String empNo = titaVo.getTlrNo();
+		this.info("empNo=" + empNo);
+		this.info("yearMonth=" + yearMonth);
+		
+		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
+		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
+		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
+
+		this.info("upd LM052 SP finished.");
+	}
 }

@@ -90,6 +90,20 @@ public class L3250 extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L3250 ");
+		this.info("   isActfgEntry   = " + titaVo.isActfgEntry());
+		this.info("   isActfgRelease = " + titaVo.isActfgRelease());
+		this.info("   isHcodeNormal  = " + titaVo.isHcodeNormal());
+		this.info("   isHcodeErase   = " + titaVo.isHcodeErase());
+		this.info("   isHcodeModify  = " + titaVo.isHcodeModify());
+		this.info("   EntdyI         = " + titaVo.getEntDyI());
+		this.info("   Kinbr          = " + titaVo.getKinbr());
+		this.info("   TlrNo          = " + titaVo.getTlrNo());
+		this.info("   Tno            = " + titaVo.getTxtNo());
+		this.info("   OrgEntdyI      = " + titaVo.getOrgEntdyI());
+		this.info("   OrgKin         = " + titaVo.getOrgKin());
+		this.info("   OrgTlr         = " + titaVo.getOrgTlr());
+		this.info("   OrgTno         = " + titaVo.getOrgTno());
+
 
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
@@ -105,8 +119,11 @@ public class L3250 extends TradeBuffer {
 		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
 		iRvNo = titaVo.getParam("RvNo");
 		iAcctCode = titaVo.getParam("AcctCode");
-		// Check Input
 
+
+		
+		
+		// Check Input
 		checkInputRoutine();
 
 		// 沖正處理
@@ -161,7 +178,7 @@ public class L3250 extends TradeBuffer {
 		// 查詢放款交易內容檔
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990, 0, ltitaHCode,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 0, 900, 0, ltitaHCode,
 				iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
@@ -175,6 +192,8 @@ public class L3250 extends TradeBuffer {
 			}
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), titaVo);
+
+
 		}
 	}
 

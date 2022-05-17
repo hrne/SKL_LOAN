@@ -118,10 +118,12 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,M.\"RenewCode\""; // F14
 		sql += "			,M.\"LawAmount\""; // F15
 		sql += "			,M.\"AssetClass\""; // F16
+		sql += "			,M.\"PrinLawDiff\""; // F17
 		sql += "	  FROM(SELECT M.\"CustNo\"";
 		sql += "				 ,M.\"FacmNo\"";
 		sql += "				 ,DECODE(M.\"AcSubBookCode\",'201','00A',' ') AS \"AcSubBookCode\"";
-		sql += "				 ,M.\"PrinBalance\" - M.\"LawAmount\" AS \"PrinBalance\"";
+		sql += "				 ,M.\"PrinBalance\" AS \"PrinBalance\"";
+		sql += "				 ,M.\"PrinBalance\" - M.\"LawAmount\" AS \"PrinLawDiff\"";
 		sql += "				 ,M.\"FacAcctCode\"";
 		sql += "				 ,M.\"AcctCode\"";
 		sql += "				 ,(CASE";

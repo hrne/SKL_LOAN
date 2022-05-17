@@ -1,6 +1,5 @@
 package com.st1.itx.util.common;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,8 +186,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				if (unpayTerms >= 2) {
 					// 計息方式調成1:以日計息
 					intCalcCode = "1";
-					amortizedCode = "2";
-					loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
+//					amortizedCode = "2";
+//					loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 
 					// 2022-05-09 智偉增加判斷
 					// 符合此條件者
