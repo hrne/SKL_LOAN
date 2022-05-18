@@ -21,15 +21,17 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,40];">
 [
 ["[L8202]                                 疑似洗錢樣態資料產生"],
-["#FdEntryDate+入帳日期",#EntryDateS,"~",#EntryDateE],
+["#FdEntryDate+入帳日期",#EntryDateS],
 ["#FdFactorDays+統計期間天數",#FactorDays," (洗錢樣態一、二)"],
+["#FdFactorRange+統計期間",#EntryDateSL,"~",#EntryDateE],
 ["@洗錢樣態一","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
 ["@洗錢樣態二","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactor2Count+次數",#Factor2Count],
 ["#FdFactor2AmtStart+單筆金額起迄",#Factor2AmtStart,"~",#Factor2AmtEnd],
-["@洗錢樣態三","匯款摘要0087ＡＴ存入&0001現金存入"],
+["@洗錢樣態三","匯款摘要0087ＡＴ存入或0001現金存入"],
 ["#FdFactorDays3+統計期間天數",#FactorDays3],
+["#FdFactorRange+統計期間",#EntryDateSL3,"~",#EntryDateE3],
 ["#FdFactor3TotLimit+金額合計超過",#Factor3TotLimit],
 ]
 !---------- AP Button AREA ----------
@@ -48,6 +50,7 @@ T(3, )
 T(3,*)
 #FdFactorDays=X,2,L
 #FdFactorDays3=X,2,L
+#FdFactorRange=X,2,L
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -99,16 +102,16 @@ T(4,LBSDY$)
 E(0,#LDATE)
 D(8)
 @A(DATE,0,#EntryDateS)
-V(5,0010101,#DATE)
+V(5,790101,#DATE)
 
-#EntryDateE=D,7,I
-E(0,#LDATE)
-D(8)
-@A(DATE,0,#EntryDateE)
-V(5,#EntryDateS,#DATE)
+#EntryDateSL=D,7,L
+E(0,#EntryDateS)
+
+#EntryDateSL3=D,7,L
+E(0,#EntryDateS)
 
 !統計期間天數
-#FactorDays=N,3,S
+#FactorDays=A,3,S
 
 ! 樣態一-金額合計超過
 #Factor1TotLimit=m,14,S
@@ -122,9 +125,23 @@ V(5,#EntryDateS,#DATE)
 #Factor2AmtEnd=m,14,S
 
 !統計期間天數
-#FactorDays3=N,3,S
+#FactorDays3=A,3,S
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,S
+
+#EntryDateE8=D,8,S
+E(0,#EntryDateS+19110000)
+D(6,2,#EntryDateE8,#FactorDays)
+
+#EntryDateE=D,7,L
+E(0,#EntryDateE8-19110000)
+
+#EntryDateE38=D,8,S
+E(0,#EntryDateS+19110000)
+D(6,2,#EntryDateE38,#FactorDays3)
+
+#EntryDateE3=D,7,L
+E(0,#EntryDateE38-19110000)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -157,6 +174,7 @@ T(3,[L8202] 疑似洗錢樣態資料產生)
 <sub type="TIM">
 #EntryDateS
 #EntryDateE
+#EntryDateE3
 #Factor1TotLimit
 #Factor2Count
 #Factor2AmtStart

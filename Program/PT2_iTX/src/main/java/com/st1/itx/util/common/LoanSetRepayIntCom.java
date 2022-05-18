@@ -185,7 +185,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 
 				if (unpayTerms >= 2) {
 					// 計息方式調成1:以日計息
-					intCalcCode = "1";
+//					intCalcCode = "1";
 //					amortizedCode = "2";
 //					loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 

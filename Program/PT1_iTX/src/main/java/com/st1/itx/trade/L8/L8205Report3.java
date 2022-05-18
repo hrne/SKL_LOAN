@@ -59,7 +59,7 @@ public class L8205Report3 extends MakeReport {
 		this.print(-3, 5, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 50, "新光人壽保險股份有限公司", "C");
 		this.print(-4, 5, "報  表：" + this.getRptCode());
-		this.print(-4, 40, "洗錢樣態3延遲交易確認報表");
+		this.print(-4, 40, "洗錢樣態3未完成交易確認報表");
 		this.print(-3, 80, "報表等級：機密" );
 		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-4, 80, "日　　期：" + bcDate);
@@ -149,7 +149,7 @@ public class L8205Report3 extends MakeReport {
 				if(custname.length()>8) {
 					custname = custname.substring(0, 8);
 				}
-				print(0, 24, tL8205Vo.get("F3"));
+				print(0, 24, custname);
 								
 				// 累積金額
 				BigDecimal f4 = tL8205Vo.get("F4") == "0" || tL8205Vo.get("F4") == null || tL8205Vo.get("F4").length() == 0 || tL8205Vo.get("F4").equals(" ") ? BigDecimal.ZERO

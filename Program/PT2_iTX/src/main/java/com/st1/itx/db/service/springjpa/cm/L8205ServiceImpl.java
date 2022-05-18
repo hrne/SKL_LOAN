@@ -216,7 +216,6 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iActualRepayDate = iActualRepayDate+19110000; 
 		}
 		
-		boolean useActualRepayDate = iActualRepayDate > 0;
 		boolean useCustNo = iCustNo > 0;
 
 		String sql = "";
@@ -240,12 +239,15 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CdCode\" CD on CD.\"DefCode\" = 'RepaySource'			\n";
 		sql += "and CD.\"Code\" = M.\"RepaySource\"			\n";
 		sql += "left join \"CdEmp\" E on E.\"EmployeeNo\" = M.\"CreateEmpNo\"			\n";
-		sql += "where 1 = 1 ";
-		if (useActualRepayDate)
-			sql += " AND M.\"ActualRepayDate\" = :actualRepayDate";
-		else
-			sql += " AND M.\"RepayDate\" = :repayDate";			
-		
+		// 條件：資料有實際償還日期時比實際償還日期
+		//                       否則比預定償還日期
+		sql += "WHERE CASE WHEN NVL(M.\"ActualRepayDate\", 0) > 0 ";
+		sql += "           THEN M.\"ActualRepayDate\" ";
+		sql += "           ELSE M.\"RepayDate\" END ";
+		sql += "      = ";
+		sql += "      CASE WHEN NVL(M.\"ActualRepayDate\", 0) > 0 ";
+		sql += "           THEN :actualRepayDate ";
+		sql += "           ELSE :repayDate END ";
 		if(useCustNo) {
 			sql += " and M.\"CustNo\" = :custNo";
 		}
@@ -256,11 +258,9 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
-		if (useActualRepayDate)
-			query.setParameter("actualRepayDate", iActualRepayDate);
-		else
-			query.setParameter("repayDate", iRepayDate);
+		
+		query.setParameter("actualRepayDate", iActualRepayDate);
+		query.setParameter("repayDate", iRepayDate);
 		
 		if (useCustNo)
 			query.setParameter("custNo", iCustNo);
