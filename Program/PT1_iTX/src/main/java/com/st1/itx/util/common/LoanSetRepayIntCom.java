@@ -1,5 +1,6 @@
 package com.st1.itx.util.common;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,7 +175,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
 			}
 			// 2022-05-04 智偉: 到期日早於本月月底日
-			if (t.getMaturityDate() < nextMonth01 && t.getPrevPayIntDate() < t.getMaturityDate()) {
+			if (t.getMaturityDate() < nextMonth01 && t.getPrevPayIntDate() > 0 && t.getPrevPayIntDate() < t.getMaturityDate()) {
 
 				// 2022-05-04 智偉: 上繳日與到期日超過一期
 				dDateUtil.init();
@@ -185,19 +186,19 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 
 				if (unpayTerms >= 2) {
 					// 計息方式調成1:以日計息
-//					intCalcCode = "1";
-//					amortizedCode = "2";
-//					loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
+					intCalcCode = "1";
+					amortizedCode = "2";
+					loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 
 					// 2022-05-09 智偉增加判斷
 					// 符合此條件者
 					// 照AS400多算一天利息
-//					int orignalMaturityDate = t.getMaturityDate();
-//					dDateUtil.init();
-//					dDateUtil.setDate_1(orignalMaturityDate);
-//					dDateUtil.setDays(1);
-//					int newMaturityDate = dDateUtil.getCalenderDay();
-//					loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
+					int orignalMaturityDate = t.getMaturityDate();
+					dDateUtil.init();
+					dDateUtil.setDate_1(orignalMaturityDate);
+					dDateUtil.setDays(1);
+					int newMaturityDate = dDateUtil.getCalenderDay();
+					loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
 				}
 			}
 			loanCalcRepayIntCom.setIntCalcCode(intCalcCode);

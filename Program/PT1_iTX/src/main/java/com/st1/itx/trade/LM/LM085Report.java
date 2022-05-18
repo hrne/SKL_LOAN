@@ -59,6 +59,8 @@ public class LM085Report extends MakeReport {
 				"放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")", "LM085-" + iRocYeatMonth + "_放款逾期月報表",
 				"LM085_底稿_放款逾期月報表.xlsx", "X月");
 
+		makeExcel.setSheet("X月", iYearMonth % 100 + "月");
+
 		makeExcel.setValue(2, 1,
 				"－" + (iRocYeatMonth / 100) + "." + String.format("%02d", (iRocYeatMonth % 100)) + "－");
 
@@ -124,15 +126,15 @@ public class LM085Report extends MakeReport {
 		for (Map<String, String> r : dataList) {
 
 			col = enToNumber(r.get("F0").toString().substring(0, 1));
+			// 限制超出L欄以後不設值 略過
+			if (col > 12) {
+				break;
+			}
 			row = Integer.valueOf(r.get("F0").toString().substring(1, 2));
 			amt = getBigDecimal(r.get("F1").toString());
 
 			this.info("col=" + col + ",row=" + row);
 
-			// 限制超出L欄以後不設值 略過
-			if (col > 12) {
-				break;
-			}
 
 			makeExcel.setValue(row, col, amt, "#,##0", "R");
 
@@ -201,15 +203,15 @@ public class LM085Report extends MakeReport {
 			for (Map<String, String> r : dataList) {
 
 				col = enToNumber(r.get("F0").toString().substring(0, 1));
+				// 限制超出L欄以後不設值 略過
+				if (col > 12) {
+					break;
+				}
 				row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
 				amt = getBigDecimal(r.get("F1").toString());
 
 //				this.info("col=" + col + ",row=" + row);
 
-				// 限制超出L欄以後不設值 略過
-				if (col > 12) {
-					break;
-				}
 
 				makeExcel.setValue(row, col, amt, "#,##0", "R");
 
@@ -237,15 +239,15 @@ public class LM085Report extends MakeReport {
 			for (Map<String, String> r : dataList) {
 				// 因欄位不同無法更改
 				col = enToNumber(r.get("F0").toString().substring(0, 1)) + 4;
+				if (col > 12) {
+					break;
+				}
 				row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
 				amt = getBigDecimal(r.get("F1").toString());
 
 //				this.info("col=" + col + ",row=" + row);
 
 				// 限制超出L欄以後不設值 略過
-				if (col > 12) {
-					break;
-				}
 
 				makeExcel.setValue(row, col, amt, "#,##0", "R");
 

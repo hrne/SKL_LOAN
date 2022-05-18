@@ -61,15 +61,10 @@ public class L8922 extends TradeBuffer {
 		String Date = "";
 		int iFactor = this.parse.stringToInteger(titaVo.getParam("Factor"));
 		int iType = this.parse.stringToInteger(titaVo.getParam("Type"));
-		int iAcDateStart = this.parse.stringToInteger(titaVo.getParam("AcDateStart"));
-		int iAcDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDateEnd"));
-		int iFAcDateStart = iAcDateStart + 19110000;
-		int iFAcDateEnd = iAcDateEnd + 19110000;
 		int iLevel = this.txBuffer.getTxCom().getTlrLevel();
-		this.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
 		this.info("L8922 iLevel : " + iLevel);
-
-		int retxdate = 0;
+		this.info("L8922 iType : " + iType);
+		this.info("L8922 iFactor : " + iFactor);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -78,43 +73,42 @@ public class L8922 extends TradeBuffer {
 		this.limit = 100; // 461 * 100 = 46,100
 
 		// 查詢疑似洗錢交易合理性明細檔檔
-		Slice<MlaundryDetail> slMlaundryDetail;
-		slMlaundryDetail = sMlaundryDetailService.findbyDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
+		Slice<MlaundryDetail> slMlaundryDetail = null;
+		if (iType == 1)
+		{
+			int iAcDateStart = this.parse.stringToInteger(titaVo.getParam("AcDateStart"));
+			int iAcDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDateEnd"));
+			int iFAcDateStart = iAcDateStart + 19110000;
+			int iFAcDateEnd = iAcDateEnd + 19110000;
+			this.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
+			slMlaundryDetail = sMlaundryDetailService.findbyDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
+		} else if (iType == 2)
+		{
+			slMlaundryDetail = sMlaundryDetailService.findAll(this.index, this.limit, titaVo);
+		}
+		
 		List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null : slMlaundryDetail.getContent();
 
 		if (lMlaundryDetail == null || lMlaundryDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "疑似洗錢交易合理性明細檔"); // 查無資料
 		}
+		
+		boolean hasOutput = false;
 		// 如有找到資料
 		for (MlaundryDetail tMlaundryDetail : lMlaundryDetail) {
+			
+			if (iType == 2)
+			{
+				// 未完成時只接受 ManagerCheck 不為 Y 者
+				if ("Y".equals(tMlaundryDetail.getManagerCheck()))
+						continue;
+			}
+			
 			OccursList occursList = new OccursList();
 
 			// 0:全部;1:樣態1;2:樣態2;3:樣態3 -> 不等時找下一筆
 			if (!(iFactor == 0) && !(iFactor == tMlaundryDetail.getFactor())) {
 				continue;
-			}
-
-			switch (iType) {
-
-			case 1:
-				// 查詢種類 1:合理性;
-				break;
-
-			case 2:
-				// 2:延遲交易確認
-
-				dateUtil.init();
-
-				if (tMlaundryDetail.getManagerDate() != 0) {
-					retxdate = dateUtil.getbussDate(tMlaundryDetail.getManagerDate(), -4);
-					this.info("延期交易日=" + retxdate);
-					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
-					if (!(retxdate >= tMlaundryDetail.getEntryDate())) {
-						continue;
-					}
-				} else {
-					continue;
-				}
 			}
 
 			switch (iLevel) {
@@ -145,11 +139,8 @@ public class L8922 extends TradeBuffer {
 			occursList.putParam("OOFactor", tMlaundryDetail.getFactor()); // 交易樣態
 			occursList.putParam("OOCustNo", tMlaundryDetail.getCustNo()); // 戶號
 			occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
-//			occursList.putParam("OOFacmNo", tMlaundryDetail.getFacmNo()); // 額度編號
-//			occursList.putParam("OOBormNo", tMlaundryDetail.getBormNo()); // 撥款序號
 			occursList.putParam("OOTotalCnt", tMlaundryDetail.getTotalCnt()); // 累積筆數
 			occursList.putParam("OOTotalAmt", tMlaundryDetail.getTotalAmt()); // 累積金額
-//			occursList.putParam("OOMemoSeq", tMlaundryDetail.getMemoSeq()); // 備忘錄序號
 			occursList.putParam("OORational", tMlaundryDetail.getRational()); // 合理性記號
 			occursList.putParam("OOEmpNoDesc", tMlaundryDetail.getEmpNoDesc().replace("$n", "\n")); // 經辦合理性說明
 			occursList.putParam("OOManagerDesc", tMlaundryDetail.getManagerDesc().replace("$n", "\n")); // 主管覆核說明
@@ -165,6 +156,8 @@ public class L8922 extends TradeBuffer {
 			titaVo.putParam("CustNo", tMlaundryDetail.getCustNo());
 			titaVo.putParam("ActualRepayDateStart", tMlaundryDetail.getEntryDate());
 			titaVo.putParam("ActualRepayDateEnd", tMlaundryDetail.getEntryDate());
+			titaVo.putParam("RecordDateStart", 0);
+			titaVo.putParam("RecordDateEnd", 0);
 			
 			List<Map<String, String>> queryResult = null;
 			try {
@@ -183,12 +176,19 @@ public class L8922 extends TradeBuffer {
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
+			hasOutput = true;
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slMlaundryDetail != null && slMlaundryDetail.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
+		}
+		
+		if (!hasOutput)
+		{
+			this.error("Tried to output, but hasOutput == false...");
+			throw new LogicException(titaVo, "E0001", "疑似洗錢交易合理性明細檔"); // 實際上沒有任何輸出, 視為查無資料
 		}
 
 		this.addList(this.totaVo);

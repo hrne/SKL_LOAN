@@ -40,7 +40,7 @@ public class EbsCom extends CommBuffer {
 	@Autowired
 	private SlipEbsRecordService sSlipEbsRecordService;
 
-	public void sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo) throws LogicException {
+	public boolean sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo) throws LogicException {
 		this.info("EbsCom sendSlipMediaToEbs.");
 
 		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
@@ -57,7 +57,7 @@ public class EbsCom extends CommBuffer {
 			// 訊息通知 SystemParas.EbsFg != Y
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "",
 					"系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
-			return;
+			return true;
 		}
 
 		// 取得Url
@@ -78,6 +78,7 @@ public class EbsCom extends CommBuffer {
 			// 發送成功訊息
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功",
 					titaVo);
+			return true;
 		} else {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
 		}

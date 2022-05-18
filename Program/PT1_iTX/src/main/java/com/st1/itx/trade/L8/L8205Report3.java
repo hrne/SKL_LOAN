@@ -109,7 +109,7 @@ public class L8205Report3 extends MakeReport {
 		String edEntryDate = titaVo.getParam("DateEnd");
 		edEntryDate = edEntryDate.substring(0, 3)+"/"+edEntryDate.substring(3, 5)+"/"+edEntryDate.substring(5, 7);
 				
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態3延遲交易確認報表", "", "A4", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態3未完成交易確認報表", "", "A4", "P");
 
 				
 				
@@ -129,7 +129,7 @@ public class L8205Report3 extends MakeReport {
 				if (mangerdate != 0) {
 					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 4);					
 					this.info("pdf retxdate=" + retxdate);
-					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
+					// 未完成交易確認=依據[主管同意日期] >=入帳日＋4營業日
 					if (!(mangerdate >= retxdate)) {
 						continue;
 					}
@@ -205,7 +205,7 @@ public class L8205Report3 extends MakeReport {
 
 	public void makeExcel(TitaVo titaVo) throws LogicException{
 		
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態3延遲交易確認報表", "L8205" + "_" + "洗錢樣態3延遲交易確認報表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態3未完成交易確認報表", "L8205" + "_" + "洗錢樣態3未完成交易確認報表");
 		printExcelHeader();
 		
 		
@@ -223,7 +223,7 @@ public class L8205Report3 extends MakeReport {
 				if (mangerdate != 0) {
 					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 4);					
 					this.info("excel retxdate=" + retxdate);
-					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
+					// 未完成交易確認=依據[主管同意日期] >=入帳日＋4營業日
 					if (!(mangerdate >= retxdate)) {
 						continue;
 					}

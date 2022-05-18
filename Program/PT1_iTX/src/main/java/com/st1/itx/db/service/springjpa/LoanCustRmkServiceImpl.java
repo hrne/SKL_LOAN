@@ -124,13 +124,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = loanCustRmkReposDay.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
+      slice = loanCustRmkReposDay.findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanCustRmkReposMon.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
+      slice = loanCustRmkReposMon.findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanCustRmkReposHist.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
+      slice = loanCustRmkReposHist.findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(custNo_0, pageable);
     else 
-      slice = loanCustRmkRepos.findAllByCustNoIsOrderByAcDateDescRmkNoAsc(custNo_0, pageable);
+      slice = loanCustRmkRepos.findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(custNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -139,106 +139,50 @@ em = null;
   }
 
   @Override
-  public LoanCustRmk maxRmkNoFirst(int custNo_0, int acDate_1, TitaVo... titaVo) {
+  public Slice<LoanCustRmk> findRmkCode(String rmkCode_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanCustRmk> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findRmkCode " + dbName + " : " + "rmkCode_0 : " + rmkCode_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanCustRmkReposDay.findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(rmkCode_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanCustRmkReposMon.findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(rmkCode_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanCustRmkReposHist.findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(rmkCode_0, pageable);
+    else 
+      slice = loanCustRmkRepos.findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(rmkCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public LoanCustRmk maxRmkNoFirst(int custNo_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("maxRmkNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " acDate_1 : " +  acDate_1);
+    this.info("maxRmkNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
     Optional<LoanCustRmk> loanCustRmkT = null;
     if (dbName.equals(ContentName.onDay))
-      loanCustRmkT = loanCustRmkReposDay.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
+      loanCustRmkT = loanCustRmkReposDay.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
     else if (dbName.equals(ContentName.onMon))
-      loanCustRmkT = loanCustRmkReposMon.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
+      loanCustRmkT = loanCustRmkReposMon.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
     else if (dbName.equals(ContentName.onHist))
-      loanCustRmkT = loanCustRmkReposHist.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
+      loanCustRmkT = loanCustRmkReposHist.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
     else 
-      loanCustRmkT = loanCustRmkRepos.findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(custNo_0, acDate_1);
+      loanCustRmkT = loanCustRmkRepos.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
 
     return loanCustRmkT.isPresent() ? loanCustRmkT.get() : null;
-  }
-
-  @Override
-  public Slice<LoanCustRmk> borxNoAll(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<LoanCustRmk> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("borxNoAll " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " borxNo_3 : " +  borxNo_3);
-    if (dbName.equals(ContentName.onDay))
-      slice = loanCustRmkReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(custNo_0, facmNo_1, bormNo_2, borxNo_3, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = loanCustRmkReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(custNo_0, facmNo_1, bormNo_2, borxNo_3, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = loanCustRmkReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(custNo_0, facmNo_1, bormNo_2, borxNo_3, pageable);
-    else 
-      slice = loanCustRmkRepos.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(custNo_0, facmNo_1, bormNo_2, borxNo_3, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<LoanCustRmk> borxNoEquals(int borxNo_0, int borxNo_1, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<LoanCustRmk> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("borxNoEquals " + dbName + " : " + "borxNo_0 : " + borxNo_0 + " borxNo_1 : " +  borxNo_1);
-    if (dbName.equals(ContentName.onDay))
-      slice = loanCustRmkReposDay.findAllByBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByCreateDateAsc(borxNo_0, borxNo_1, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = loanCustRmkReposMon.findAllByBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByCreateDateAsc(borxNo_0, borxNo_1, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = loanCustRmkReposHist.findAllByBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByCreateDateAsc(borxNo_0, borxNo_1, pageable);
-    else 
-      slice = loanCustRmkRepos.findAllByBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByCreateDateAsc(borxNo_0, borxNo_1, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<LoanCustRmk> custNoAndBorxNo(int custNo_0, int custNo_1, int borxNo_2, int borxNo_3, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<LoanCustRmk> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("custNoAndBorxNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " borxNo_2 : " +  borxNo_2 + " borxNo_3 : " +  borxNo_3);
-    if (dbName.equals(ContentName.onDay))
-      slice = loanCustRmkReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndBorxNoGreaterThanEqualAndBorxNoLessThanEqual(custNo_0, custNo_1, borxNo_2, borxNo_3, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = loanCustRmkReposMon.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndBorxNoGreaterThanEqualAndBorxNoLessThanEqual(custNo_0, custNo_1, borxNo_2, borxNo_3, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = loanCustRmkReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndBorxNoGreaterThanEqualAndBorxNoLessThanEqual(custNo_0, custNo_1, borxNo_2, borxNo_3, pageable);
-    else 
-      slice = loanCustRmkRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndBorxNoGreaterThanEqualAndBorxNoLessThanEqual(custNo_0, custNo_1, borxNo_2, borxNo_3, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override

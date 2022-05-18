@@ -1194,6 +1194,34 @@ em = null;
   }
 
   @Override
+  public Slice<AcDetail> findSlipBatNo(int acDate_0, int slipBatNo_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findSlipBatNo " + dbName + " : " + "acDate_0 : " + acDate_0 + " slipBatNo_1 : " +  slipBatNo_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcDateIsAndSlipBatNoIs(acDate_0, slipBatNo_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcDateIsAndSlipBatNoIs(acDate_0, slipBatNo_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcDateIsAndSlipBatNoIs(acDate_0, slipBatNo_1, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcDateIsAndSlipBatNoIs(acDate_0, slipBatNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public AcDetail holdById(AcDetailId acDetailId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

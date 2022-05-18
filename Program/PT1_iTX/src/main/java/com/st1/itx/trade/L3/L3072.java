@@ -18,6 +18,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -33,11 +34,16 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L3072 extends TradeBuffer {
 
+	@Autowired
+	public CdEmpService sCdEmpService;
+
 	/* DB服務注入 */
 	@Autowired
-	public CdEmpService cdEmpService;
+	public LoanCustRmkService sLoanCustRmkService;
+
+	/* DB服務注入 */
 	@Autowired
-	public LoanCustRmkService loanCustRmkService;
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -62,44 +68,30 @@ public class L3072 extends TradeBuffer {
 		// tita
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-		int iBormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
-		int iBorxNo = parse.stringToInteger(titaVo.getParam("BorxNo"));
 
 		Timestamp ts;
 		Timestamp uts;
 		String createDate = "";
 		String updateDate = "";
 		// new ArrayList
-		List<LoanCustRmk> loanCustRmk = new ArrayList<LoanCustRmk>();
-		Slice<LoanCustRmk> sloanCustRmk = null;
-		
-		// 以 BorxNo 判定是否舊資料
-		// 1. 有輸入 BorxNo 時：判定為完整戶號-額度-撥款-BorxZNo，就依那樣去找
-		// 2. 只有輸入到戶號時：L3005 點擊「帳戶備忘錄」進入，只顯示舊資料
-		// 3. 其他情況：findAll
-		if (iBorxNo > 0) {
-			sloanCustRmk = loanCustRmkService.borxNoAll(iCustNo, iFacmNo, iBormNo, iBorxNo, this.index, this.limit, titaVo);
-		}
-		else if (iCustNo > 0) {
-			sloanCustRmk = loanCustRmkService.custNoAndBorxNo(iCustNo, iCustNo, 0, 0, this.index, this.limit, titaVo);
+		List<LoanCustRmk> lLoanCustRmk = new ArrayList<LoanCustRmk>();
+		Slice<LoanCustRmk> slLoanCustRmk = null;
+
+		// PK
+		// 測試該戶號是否有資料存在帳戶備忘錄明細資料檔
+		if (iCustNo > 0) {
+			slLoanCustRmk = sLoanCustRmkService.findCustNo(iCustNo, this.index, this.limit, titaVo);
+			lLoanCustRmk = slLoanCustRmk == null ? null : slLoanCustRmk.getContent();
 		} else {
-			sloanCustRmk = loanCustRmkService.findAll(this.index, this.limit, titaVo);
+			slLoanCustRmk = sLoanCustRmkService.findAll(this.index, this.limit, titaVo);
+			lLoanCustRmk = slLoanCustRmk == null ? null : slLoanCustRmk.getContent();
 		}
 
-		loanCustRmk = sloanCustRmk == null ? null : sloanCustRmk.getContent();
-		
-		if (loanCustRmk == null || loanCustRmk.isEmpty()) {
-			if (iBorxNo > 0)
-			{
-				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "不存在帳務備忘錄明細檔。"); // 查無資料
-			} else {
-				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "在帳務備忘錄明細檔沒有舊系統資料。請直接從【L3005 交易明細資料查詢】依每筆交易明細查詢。"); // 查無資料
-			}
+		if (lLoanCustRmk == null) {
+			throw new LogicException(titaVo, "E2003", "L3072 該戶號" + iCustNo + "不存在帳戶備忘錄明細資料檔。");
 		}
-		
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (sloanCustRmk != null && sloanCustRmk.hasNext()) {
+		if (slLoanCustRmk != null && slLoanCustRmk.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
@@ -107,26 +99,23 @@ public class L3072 extends TradeBuffer {
 
 		CdEmp tCdEmp = new CdEmp();
 
-		for (LoanCustRmk t : loanCustRmk) {
-			this.info("tCustRmk---->" + t);
+		for (LoanCustRmk tLoanCustRmk : lLoanCustRmk) {
+			this.info("tLoanCustRmk---->" + tLoanCustRmk);
 			// new occurs
 			OccursList occurslist = new OccursList();
 
-			occurslist.putParam("OOCustNo", t.getCustNo());
-			occurslist.putParam("OOFacmNo", t.getFacmNo());
-			occurslist.putParam("OOBormNo", t.getBormNo());
-			occurslist.putParam("OOBorxNo", t.getBorxNo());
-			occurslist.putParam("OOAcDate", t.getAcDate());
-			occurslist.putParam("OORmkNo", t.getRmkNo());
-			occurslist.putParam("OORmkDesc", t.getRmkDesc());
+			occurslist.putParam("OOCustNo", tLoanCustRmk.getCustNo());
+			occurslist.putParam("OORmkNo", tLoanCustRmk.getRmkNo());
+			occurslist.putParam("OORmkCode", tLoanCustRmk.getRmkCode());
+			occurslist.putParam("OORmkDesc", tLoanCustRmk.getRmkDesc());
 
-			String tempEmpNo = t.getCreateEmpNo().isEmpty() ? t.getLastUpdateEmpNo() : t.getCreateEmpNo();
-			String updateEmpNo = t.getLastUpdateEmpNo().isEmpty() ? t.getCreateEmpNo() : t.getLastUpdateEmpNo();
+			String tempEmpNo = tLoanCustRmk.getCreateEmpNo() == "" ? tLoanCustRmk.getLastUpdateEmpNo() : tLoanCustRmk.getCreateEmpNo();
+			String updateEmpNo = tLoanCustRmk.getLastUpdateEmpNo() == "" ? tLoanCustRmk.getCreateEmpNo() : tLoanCustRmk.getLastUpdateEmpNo();
 
 			occurslist.putParam("OOEmpNo", tempEmpNo);
 
 			occurslist.putParam("OOEmpName", ""); // 建檔人員姓名
-			tCdEmp = cdEmpService.findById(tempEmpNo, titaVo);
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);
 
 			if (tCdEmp != null) {
 				occurslist.putParam("OOEmpName", tCdEmp.getFullname()); // 建檔人員姓名
@@ -135,15 +124,15 @@ public class L3072 extends TradeBuffer {
 			occurslist.putParam("OOUpdateEmpNo", updateEmpNo);
 
 			occurslist.putParam("OOUpdateEmpName", ""); // 更新人員姓名
-			tCdEmp = cdEmpService.findById(updateEmpNo, titaVo);
+			tCdEmp = sCdEmpService.findById(updateEmpNo, titaVo);
 
 			if (tCdEmp != null) {
 				occurslist.putParam("OOUpdateEmpName", tCdEmp.getFullname()); // 更新人員姓名
 			}
 
 			// 宣告
-			ts = t.getCreateDate();
-			uts = t.getLastUpdate();
+			ts = tLoanCustRmk.getCreateDate();
+			uts = tLoanCustRmk.getLastUpdate();
 			this.info("ts = " + ts);
 			this.info("uts = " + uts);
 			DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
@@ -158,8 +147,6 @@ public class L3072 extends TradeBuffer {
 
 			occurslist.putParam("OOCreateDate", createDate);
 			occurslist.putParam("OOLastUpdate", updateDate);
-
-			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 
 		}

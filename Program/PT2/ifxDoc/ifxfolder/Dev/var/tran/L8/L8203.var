@@ -97,7 +97,7 @@ T(3,Y:是;N:否)
 
 !同意不同意
 #AgreeHelp=x,50,L
-T(3,Y:同意;N:不同意)
+T(3,Y:同意;N:退回)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -108,7 +108,6 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_FuncCode=X,1,S
 T(1,#NTXBUF,1,1)
-C(3,#CHAIN_FuncCode,5,E(0,@ACTFG,0),$)
 
 #CHAIN_AcDate=X,7,S
 T(1,#NTXBUF,2,7)
@@ -355,12 +354,12 @@ D(8)
 !主管覆核日期(主管第二次覆核 才會顯示)
 !如果ManagerCheck為N, 自動帶入當天並略過
 #ManagerCheckDate=D,7,H
-C(5,#ManagerCheck,N,E(0,#CDATE),$)
-C(5,#ManagerCheck,N,s,$)
 C(3,#ManagerDate,0,S,$)
 C(3,#Level,1,$,s)
 C(3,#CheckDate,1,$,E(0,#CDATE))
 C(3,#CheckDate,1,s,$)
+C(5,#ManagerCheck,N,E(0,#CDATE),$)
+C(5,#ManagerCheck,N,s,$)
 C(3,#ManagerCheckDate,0,$,s)
 D(8)
 

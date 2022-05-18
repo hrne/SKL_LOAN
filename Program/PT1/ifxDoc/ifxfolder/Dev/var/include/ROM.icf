@@ -67,6 +67,7 @@
 !    L2R56 : 商品建檔時組出清償說明
 !    L2R57 : 依企金使用記號組出商品下拉式選單
 !    L2R58 : 依鍵值查詢銷帳檔資料
+!    L3R30 : 帳戶備忘錄資料
 !    L1R01 : 尋找客戶檔資料
 !    L1R02 : 尋找客戶關聯戶資料
 !    L1R03 : 尋找客戶額度檔資料
@@ -3745,6 +3746,22 @@ TXFORM=L2R63
 </L2R63.tom>
 
 ------------------------------------------------------------
+
+!    L3R30 : 帳戶備忘錄資料
+<L3R30.dec>
+#L3r30RmkNo=A,3,S
+#L3r30RmkCode=A,3,S
+#L3r30RmkDesc=c,120,S
+</L3R30.dec>
+
+<L3R30.tom>
+TXFORM=L3R30
+#L3r30RmkNo
+#L3r30RmkCode
+#L3r30RmkDesc
+^
+</L3R30.tom>
+
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
 #RimChequeNo=A,7,S

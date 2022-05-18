@@ -233,7 +233,7 @@ public class LM057Report extends MakeReport {
 			}
 			
 			
-			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0"))) {
+			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0"))|| "Loss".equals(lM057Vo.get("F0"))) {
 				// 逾期放款總額
 				colTotal = colTotal.add(amount);
 

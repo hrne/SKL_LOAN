@@ -188,7 +188,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM \"rawData\" ";
 		sql += "      ),";
 		sql += " 	\"tempTotal\" AS (";
-		sql += " 		SELECT 'ToTal' AS \"Item\"";
+		sql += " 		SELECT 'Total' AS \"Item\"";
 		sql += " 			  ,SUM(\"LoanBalance\") AS \"AMT\" ";
 		sql += " 		FROM \"MonthlyLoanBal\"";
 		sql += " 		WHERE \"LoanBalance\" > 0 ";

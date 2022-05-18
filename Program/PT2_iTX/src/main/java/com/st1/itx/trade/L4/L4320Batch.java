@@ -453,8 +453,8 @@ public class L4320Batch extends TradeBuffer {
 		b.setCurrBaseRate(iBaseRate);
 		// 調整記號 1.批次自動調整 2.按地區別自動調整 3.人工調整(未調整) 4.批次自動調整(提醒建) 9.上次繳息日大於利率生效日
 		int adjCode = 0;
-		// 本次利率
-		BigDecimal rateCurt = BigDecimal.ZERO;
+		// 擬調利率
+		BigDecimal rateProp = BigDecimal.ZERO;
 
 		// 逾期期數
 		b.setOvduTerm(0);
@@ -487,9 +487,9 @@ public class L4320Batch extends TradeBuffer {
 			// 利率按合約 N && 有地區別， 本次利率 = 目前利率 + 地區別加減碼，依地區別利率上、下限調整，不可超過合約加碼利率
 			// 利率按合約 N && 無地區別， 本次利率 = 本次指標利率 +借戶利率檔個人加碼利率
 			if ("Y".equals(incrFlag)) {
-				rateCurt = iBaseRate.add(rateIncr);
+				rateProp = iBaseRate.add(rateIncr);
 			} else {
-				rateCurt = iBaseRate.add(individualIncr);
+				rateProp = iBaseRate.add(individualIncr);
 			}
 			// MaturityDate 到期日期
 			// int maturityDate =
@@ -507,22 +507,22 @@ public class L4320Batch extends TradeBuffer {
 			} else {
 				adjCode = 2;
 				// 本次利率 = 目前利率 + 地區別加減碼
-				rateCurt = presentRate.add(cityRateIncr);
-				warnMsg += ", 地區別加減碼:" + cityRateIncr;
+				rateProp = presentRate.add(cityRateIncr);
+				String warn = "";
 				// 依地區別利率上、下限調整
-				if (rateCurt.compareTo(cityRateCeiling) > 0) {
-					rateCurt = cityRateCeiling;
-					warnMsg += ", 達地區別上限 ";
+				if (rateProp.compareTo(cityRateCeiling) > 0) {
+					rateProp = cityRateCeiling;
+					warn = ", 達地區別上限 ";
 				}
-				if (rateCurt.compareTo(cityRateFloor) < 0) {
-					rateCurt = cityRateFloor;
-					warnMsg += ", 達地區別下限 ";
+				if (rateProp.compareTo(cityRateFloor) < 0) {
+					rateProp = cityRateFloor;
+					warn = ", 達地區別下限 ";
 				}
-			}
-
-			if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateCurt) < 0) {
-				rateCurt = contractRate;
-				warnMsg += ", 達合約利率上限 ";
+				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
+					rateProp = contractRate;
+					warn = ", 達合約利率上限 ";
+				}
+				warnMsg += warn + ", 地區別加減碼:" + cityRateIncr;
 			}
 
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
@@ -543,7 +543,7 @@ public class L4320Batch extends TradeBuffer {
 			// 本次生效日 = 指標利率生效日
 			effDateCurt = iEffectDate;
 			// 本次利率 = 本次指標利率 + 目前合約加減碼
-			rateCurt = iBaseRate.add(rateIncr);
+			rateProp = iBaseRate.add(rateIncr);
 			// 1.自動調整
 			adjCode = 1;
 			break;
@@ -561,17 +561,17 @@ public class L4320Batch extends TradeBuffer {
 		case 3:
 			// 本次生效日(已放好)
 			// 本次利率 = 原利率 + 地區別利率
-			rateCurt = presentRate.add(cityRateIncr);
-			warnMsg += ", 地區別加減碼:" + cityRateIncr;
+			rateProp = presentRate.add(cityRateIncr);
 			// 依地區別利率上、下限調整
-			if (rateCurt.compareTo(cityRateCeiling) > 0) {
-				rateCurt = cityRateCeiling;
+			if (rateProp.compareTo(cityRateCeiling) > 0) {
+				rateProp = cityRateCeiling;
 				warnMsg += "m 達地區別上限 ";
 			}
-			if (rateCurt.compareTo(cityRateFloor) < 0) {
-				rateCurt = cityRateFloor;
+			if (rateProp.compareTo(cityRateFloor) < 0) {
+				rateProp = cityRateFloor;
 				warnMsg += ", 達地區別下限 ";
 			}
+			warnMsg += ", 地區別加減碼:" + cityRateIncr;
 			// 3.人工調整
 			adjCode = 3;
 			break;
@@ -586,9 +586,9 @@ public class L4320Batch extends TradeBuffer {
 			effDateCurt = iEffectDate;
 			// 本次利率 = 原利率 + 批次加減碼
 			if (iRate.compareTo(BigDecimal.ZERO) > 0) {
-				rateCurt = iRate;
+				rateProp = iRate;
 			} else {
-				rateCurt = presentRate.add(iRateIncr);
+				rateProp = presentRate.add(iRateIncr);
 			}
 			// 1.自動調整
 			adjCode = 1;
@@ -604,9 +604,9 @@ public class L4320Batch extends TradeBuffer {
 			effDateCurt = iEffectDate;
 			// 本次利率 = 目前利率 + 批次加減碼
 			if (iRate.compareTo(BigDecimal.ZERO) > 0) {
-				rateCurt = iRate;
+				rateProp = iRate;
 			} else {
-				rateCurt = presentRate.add(iRateIncr);
+				rateProp = presentRate.add(iRateIncr);
 			}
 			// 3.人工調整
 			adjCode = 3;
@@ -617,7 +617,7 @@ public class L4320Batch extends TradeBuffer {
 		// 本次生效日
 		b.setCurtEffDate(effDateCurt);
 		// 擬調利率
-		b.setProposalRate(rateCurt);
+		b.setProposalRate(rateProp);
 
 		/* 檢核有誤 */
 		int errorFlag = 0;
@@ -629,7 +629,7 @@ public class L4320Batch extends TradeBuffer {
 
 		// 若利率變動且大於利率生效日
 		if (adjCode == 1) {
-			if (rateCurt.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
+			if (rateProp.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
 				errorFlag = 1;
 				checkMsg += ", 上次繳息日大於利率生效日";
 			}
@@ -669,8 +669,8 @@ public class L4320Batch extends TradeBuffer {
 
 		/* 設定調整後利率 */
 		// 利率輸入記號 0.未調整 1.已調整 9.待處理(檢核有誤)
-		if ((adjCode == 1 || adjCode == 4) && errorFlag == 0) {
-			b.setAdjustedRate(rateCurt); // 調整後利率
+		if ((adjCode == 1 || adjCode == 2) && errorFlag == 0) {
+			b.setAdjustedRate(rateProp); // 調整後利率
 			b.setRateKeyInCode(1); // 利率輸入記號 0.未調整 1.已調整 9.待處理(檢核有誤)
 		} else {
 			if (errorFlag == 0) {
@@ -944,7 +944,6 @@ public class L4320Batch extends TradeBuffer {
 				// update
 				try {
 					sBatxBaseRateChangeService.update(batxBaseRateChange, titaVo);
-					this.batchTransaction.commit();
 				} catch (DBException e) {
 					throw new LogicException("E0007", "BatxBaseRateChange update error : " + e.getErrorMsg());
 				}
@@ -952,7 +951,6 @@ public class L4320Batch extends TradeBuffer {
 				// insert
 				try {
 					sBatxBaseRateChangeService.insert(batxBaseRateChange, titaVo);
-					this.batchTransaction.commit();
 				} catch (DBException e) {
 					throw new LogicException("E0005", ", BatxBaseRateChange insert error : " + e.getErrorMsg());
 				}
@@ -1008,7 +1006,6 @@ public class L4320Batch extends TradeBuffer {
 					// update
 					try {
 						sLoanRateChangeService.update(loanRateChange, titaVo);
-						this.batchTransaction.commit();
 					} catch (DBException e) {
 						throw new LogicException("E0007", "LoanRateChange update error : " + e.getErrorMsg());
 					}

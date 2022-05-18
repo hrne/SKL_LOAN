@@ -83,6 +83,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                WHEN TRUNC(A.\"PayIntDate\" / 100) <= :bcYearMonth ";
 		sql += "                     AND TRUNC(A.\"IntStartDate\" / 100) <= :bcYearMonth";
 		sql += "                     AND TRUNC(A.\"IntEndDate\" / 100) <= :bcYearMonth";
+		sql += "                     AND TRUNC(LBM.\"MaturityDate\" / 100) > :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
 		sql += "                THEN A.\"Interest\" ";
 		sql += "                ELSE 0 ";
 		sql += "              END                      AS \"UnpaidInt\" "; // 已到期
@@ -90,11 +91,15 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                WHEN TRUNC(A.\"PayIntDate\" / 100) <= :bcYearMonth ";
 		sql += "                     AND TRUNC(A.\"IntStartDate\" / 100) <= :bcYearMonth";
 		sql += "                     AND TRUNC(A.\"IntEndDate\" / 100) <= :bcYearMonth";
+		sql += "                     AND TRUNC(LBM.\"MaturityDate\" / 100) > :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
 		sql += "                THEN 0 ";
 		sql += "                ELSE A.\"Interest\" ";
 		sql += "              END                      AS \"UnexpiredInt\" "; // 未到期
 		sql += "       FROM \"AcLoanInt\" A ";
 		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\" ";
+		sql += "       LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = A.\"CustNo\" ";
+		sql += "                                    AND LBM.\"FacmNo\" = A.\"FacmNo\" ";
+		sql += "                                    AND LBM.\"BormNo\" = A.\"BormNo\" ";
 		sql += "       WHERE A.\"YearMonth\" = :bcYearMonth ";
 		sql += "         AND A.\"AcctCode\" = :acctCode ";
 		sql += "      ) S1 ";

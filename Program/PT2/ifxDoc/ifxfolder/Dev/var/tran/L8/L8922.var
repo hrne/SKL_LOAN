@@ -73,7 +73,7 @@ T(4,LEVEL$)
 
 ! Type
 #TypeHelp=x,100,S
-T(3,1:合理性;2:延遲交易確認)
+T(3,1:合理性;2:未完成)
 
 
 !查詢種類
@@ -85,6 +85,12 @@ V(H,#TypeHelp)
 
 #TypeX=X,12,L
 T(H,#Type,#TypeHelp)
+
+!Type為1時顯示入帳日期
+!為2時隱藏入帳日期
+#HideByType=A,1,S
+C(3,#Type,1,INVOKEJS(SHOW,p1,2,2,1),$)
+C(3,#Type,2,INVOKEJS(SHOW,p1,2,2,0),$)
 
 ! 交易樣態(Factor)
 #FactorHelpRim=X,1,S
@@ -122,13 +128,16 @@ T(4,CDATE$)
 T(4,LBSDY$)
 
 !入帳日期起止
+!Type為2時清空跳過
 #AcDateStart=D,7,I
+C(3,#Type,2,S,$)
 E(0,#LDATE)
 D(8)
 @V(7)A(DATE,0,#AcDateStart)
 V(5,0010101,#CDATE)
 
 #AcDateEnd=D,7,I
+C(3,#Type,2,S,$)
 E(0,#LDATE)
 D(8)	
 @V(7)A(DATE,0,#AcDateEnd)
@@ -265,10 +274,10 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5})
 
 ! 查詢的按鈕
 #OOBUF6=X,23,S
-T(2,5+#OOAcDate+#OOFactor+#OOCustNo)
+T(2,#OOAcDate+#OOCustNo+#OOFactor)
 
 #OOBTN6=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=查詢;ntxbuf=#OOBUF6})
+BIND(grid,{cmd=CHAIN;ntxcd=L8926;text=查詢;ntxbuf=#OOBUF6})
 
 !是否有訪談 - Y/N
 #OOHasL8923=X,1,S

@@ -509,7 +509,7 @@ public class L5500Batch extends TradeBuffer {
 		String sql = "select a.\"AreaCode\" ";
 		sql += ",NVL(b.\"lPerfCnt\",0) as \"lPerfCnt\",NVL(b.\"lPerfAmt\",0) as \"lPerfAmt\" ";
 		sql += ",NVL(c.\"PerfCnt\",0) as \"PerfCnt\",NVL(c.\"PerfAmt\",0) as \"PerfAmt\" ";
-		sql += "from (select distinct(\"AreaCode\") as \"AreaCode\" from \"PfBsOfficer\") a ";
+		sql += "from (select distinct(\"AreaCode\") as \"AreaCode\" from \"PfBsOfficer\" where \"AreaCode\" is not null) a ";
 		sql += "left join (";
 		sql += "  select bb.\"AreaCode\",sum(NVL(cc.\"AdjPerfCnt\",aa.\"PerfCnt\")) as \"lPerfCnt\",sum(NVL(cc.\"AdjPerfAmt\",aa.\"PerfAmt\")) as \"lPerfAmt\" ";
 		sql += "  from \"PfBsDetail\" aa ";
@@ -524,8 +524,9 @@ public class L5500Batch extends TradeBuffer {
 		sql += "  left join \"PfBsOfficer\" bb on bb.\"WorkMonth\"=:workmonth and bb.\"EmpNo\"=aa.\"BsOfficer\" ";
 		sql += "  left join \"PfBsDetailAdjust\" cc on cc.\"CustNo\"=aa.\"CustNo\" and cc.\"FacmNo\"=aa.\"FacmNo\" and cc.\"BormNo\"=aa.\"BormNo\" ";
 		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null ";
-		sql += "  group by bb.\"AreaCode\"";
-		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\"";
+		sql += "  group by bb.\"AreaCode\" ";
+		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\" ";
+		sql +="order by a.\"AreaCode\" ";
 
 		Map<String, String> conds = new HashMap<String, String>();
 

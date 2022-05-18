@@ -94,7 +94,7 @@ BEGIN
                                    --    有足無擔保--逾繳超過清償期1-6月者 
                   ELSE '' END AS "AssetClass"  
                  ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
-                 ,SUM(M."PrinBalance")      AS "Amt"           --放款餘額
+                 ,SUM(M."PrinBalance" - M."LawAmount")      AS "Amt"           --放款餘額
            FROM "MonthlyFacBal" M
            WHERE M."PrinBalance" > 0
              AND M."YearMonth" = TYYMM
@@ -134,6 +134,18 @@ BEGIN
                     THEN '2'       --(22)第二類-應予注意：
                                    --    有足無擔保--逾繳超過清償期1-6月者 
                   ELSE '' END  	  
+                   ,M."AcSubBookCode"
+           UNION 
+           SELECT M."YearMonth"
+                 ,'5'                AS "AssetClass"    --第五類
+                 ,M."AcSubBookCode"  AS "AcSubBookCode" --區隔帳冊
+                 ,SUM(M."LawAmount") AS "Amt"           --無擔保放款餘額
+           FROM "MonthlyFacBal" M
+           WHERE M."LawAmount" > 0
+             AND M."YearMonth" = TYYMM
+             AND M."AssetClass" IS NOT NULL
+           GROUP BY M."YearMonth"
+                   ,'5'
                    ,M."AcSubBookCode"
           UNION 
           --擔保放款-折溢價

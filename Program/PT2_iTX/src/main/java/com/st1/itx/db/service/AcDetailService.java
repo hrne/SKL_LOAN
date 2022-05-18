@@ -679,6 +679,18 @@ public interface AcDetailService {
   public Slice<AcDetail> acdtlTitaBatchNoSlipNo(String branchNo_0, String currencyCode_1, int acDate_2, String titaBatchNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcDate = ,AND SlipBatNo = 
+   *
+   * @param acDate_0 acDate_0
+   * @param slipBatNo_1 slipBatNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> findSlipBatNo(int acDate_0, int slipBatNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcDetail
    * 
    * @param acDetailId key

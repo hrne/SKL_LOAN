@@ -255,7 +255,7 @@ T(2,#TXCD+#TimCustNo+000+000)
 
 #BIND4=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF4;ntxbuf5=type<-1:TxtNo<-OOTxtNo:TellerNo<-OOTellerNo:AcDate<-OOAcDate:IntEndDate<-OOIntEndDate
-:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:CustNo<-OCustNo:BormNo<-OOBormNo:Principal<-OOPrincipal:Interest<-OOInterest:BreachAmt<-OOBreachAmt})
+:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:TempCustNo<-OCustNo:CustNo<-OCustNo:BormNo<-OOBormNo:Principal<-OOPrincipal:Interest<-OOInterest:BreachAmt<-OOBreachAmt})
 
 !額度編號
 #FdFacmNo=X,2,L
@@ -269,10 +269,13 @@ T(2,#TXCD+#TimCustNo+#FacmNo+000)
 
 #BIND5=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF5;ntxbuf5=type<-1:TxtNo<-OOTxtNo:TellerNo<-OOTellerNo:AcDate<-OOAcDate:IntEndDate<-OOIntEndDate
-:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:CustNo<-OCustNo:BormNo<-OOBormNo:Principal<-OOPrincipal:Interest<-OOInterest:BreachAmt<-OOBreachAmt})
+:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:TempCustNo<-OCustNo:CustNo<-OCustNo:BormNo<-OOBormNo:Principal<-OOPrincipal:Interest<-OOInterest:BreachAmt<-OOBreachAmt})
 
-#Check=X,1,L
-C(4,#EntryDate,V(P,請點選繳息情形查詢，帶回繳息資料),s))
+#TempCustNo=A,7,L
+
+#Check=A,1,L
+C(3,#TempCustNo,0,V(P,請點選繳息情形查詢，帶回繳息資料),s)
+
 
 #FdBormNo=X,2,L
 #BormNo=A,3,L

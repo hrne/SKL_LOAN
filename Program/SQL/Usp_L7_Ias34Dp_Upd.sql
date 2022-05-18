@@ -126,8 +126,8 @@ BEGIN
            , "FacmNo"
            , SUM("TotInsuPrem") AS "Fee"
       FROM "InsuRenew"
-      WHERE TRUNC("InsuStartDate" / 100) <= YYYYMM
-        AND CASE
+      WHERE 
+            CASE
               WHEN "AcDate" = 0 AND "RenewCode" = 2 
                    AND  "InsuYearMonth" <= YYYYMM  -- 未銷直接計入
               THEN 1

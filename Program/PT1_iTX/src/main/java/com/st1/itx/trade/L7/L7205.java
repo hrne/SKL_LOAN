@@ -348,10 +348,10 @@ public class L7205 extends TradeBuffer {
 		String empNo = titaVo.getTlrNo();
 		this.info("empNo=" + empNo);
 		this.info("yearMonth=" + yearMonth);
-		
+		//僅影響此USP，需update資料
 		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
-		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
-		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
+//		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
+//		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);
 
 		this.info("upd LM052 SP finished.");
 	}

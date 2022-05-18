@@ -18,9 +18,11 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.SlipMedia2022Id;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.springjpa.cm.L9130ServiceImpl;
 import com.st1.itx.util.common.EbsCom;
@@ -56,6 +58,9 @@ public class L9130Report2022 extends MakeReport {
 	/* DB服務注入 */
 	@Autowired
 	private AcCloseService sAcCloseService;
+
+	@Autowired
+	private AcDetailService sAcDetailService;
 
 	/* DB服務注入 */
 	@Autowired
@@ -229,15 +234,21 @@ public class L9130Report2022 extends MakeReport {
 		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
 				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 
+		SlipMedia2022 tempTableSlipMedia2022;
+
 		// 若已存在,是重新製作傳票媒體
 		if (sSlipMedia2022 != null && !sSlipMedia2022.isEmpty()) {
 			// 更新原傳票媒體的"是否為最新"(LatestFlag)欄位
 			for (SlipMedia2022 tSlipMedia2022 : sSlipMedia2022.getContent()) {
-				tSlipMedia2022.setLatestFlag("N");
-				try {
-					sSlipMedia2022Service.update(tSlipMedia2022, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0003", "傳票媒體檔");
+				SlipMedia2022Id pkSlipMedia2022Id = tSlipMedia2022.getSlipMedia2022Id();
+				tempTableSlipMedia2022 = sSlipMedia2022Service.holdById(pkSlipMedia2022Id, titaVo);
+				if (tempTableSlipMedia2022 != null) {
+					tempTableSlipMedia2022.setLatestFlag("N");
+					try {
+						sSlipMedia2022Service.update(tempTableSlipMedia2022, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0003", "傳票媒體檔");
+					}
 				}
 			}
 		}
@@ -286,7 +297,7 @@ public class L9130Report2022 extends MakeReport {
 			dbCr = l9130.get("F4"); // 借貸別
 			txAmt = l9130.get("F5") == null ? BigDecimal.ZERO : new BigDecimal(l9130.get("F5")); // 金額
 			slipRmk = l9130.get("F7"); // 科目名稱
-			acReceivableCode= l9130.get("F8"); // 銷帳碼
+			acReceivableCode = l9130.get("F8"); // 銷帳碼
 
 			// 借方金額累加
 			drAmtTotal = dbCr.equals("D") ? drAmtTotal.add(txAmt) : drAmtTotal;
@@ -406,15 +417,42 @@ public class L9130Report2022 extends MakeReport {
 		specialHandling(i, titaVo);
 
 		// 統計並送出
-		doSummaryAndSendToEbs(titaVo);
+		boolean sendEbsOK = doSummaryAndSendToEbs(titaVo);
 
 		// 寫產檔記錄到TxFile
 		long fileno = makeFile.close();
 
+		// 2022-05-18 ST1 Wei 新增:
+		// 若 批號>=90 且 上傳EBS結果為成功時
+		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
+		if (sendEbsOK && iBatchNo >= 90) {
+			// iAcDate + 19110000
+			// iBatchNo
+			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
+					Integer.MAX_VALUE, titaVo);
+
+			if (slAcDetail == null || slAcDetail.isEmpty()) {
+				return;
+			} else {
+				List<AcDetail> lAcDetail = slAcDetail.getContent();
+
+				AcDetail tempAcDetail;
+				for (AcDetail tAcDetail : lAcDetail) {
+					tempAcDetail = sAcDetailService.holdById(tAcDetail, titaVo);
+					tempAcDetail.setEntAc(9);
+					try {
+						sAcDetailService.update(tempAcDetail, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+					}
+				}
+			}
+		}
+
 		this.info("makeFile close fileno = " + fileno);
 	}
 
-	private void doSummaryAndSendToEbs(TitaVo titaVo) throws LogicException {
+	private boolean doSummaryAndSendToEbs(TitaVo titaVo) throws LogicException {
 
 		JSONArray summaryTbl = new JSONArray();
 
@@ -443,10 +481,12 @@ public class L9130Report2022 extends MakeReport {
 //        "CURRENCY_CODE": "NTD",
 //        "TOTAL_AMOUNT": 12450
 
-		ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
+		boolean sendEbsOK = ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
 
 		drAmtTotal = BigDecimal.ZERO;
 		journalTbl = new JSONArray();
+
+		return sendEbsOK;
 	}
 
 	/**

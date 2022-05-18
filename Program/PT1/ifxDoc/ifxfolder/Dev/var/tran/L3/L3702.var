@@ -38,37 +38,32 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[155,1000];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,1000];printer.width=[20,20];">
 [
 ["[L3702]                                 帳務備忘錄明細資料維護"],
-["#FdFunCd+功能",#FunCdX],
-["#FdCustNo+借戶戶號",#CustNo,"-",#FacmNo,"-",#BormNo,"-",#BorxNo,#CustName],
-["#FdAcDate+會計日期",#AcDate], 
-["#FdNo0+備忘錄序號",#RmkNo], 
-!["#FdNo1+備忘錄代碼",#RmkCode,#RmkCodeX],
-["#FdRmkDesc+備忘錄說明",#RmkDesc],
-["#FdEmpNm+建檔經辦",#EmpName],
+["#FdFUNCD+功能",#FunCdX],
+["#FdCUSTNO+借戶戶號",#CustNo,#BTN1,#CustName],
+["#FdEMPNM+經辦姓名",#EmpName],
+["#FdNO0+備忘錄序號",#RmkNo],
+["#FdNO1+備忘錄代碼",#RmkCode,#RmkCodeX],
+["#FdNO2+備忘錄說明",#RmkDesc],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 
 
 !必輸欄位
-#FdEmpNm=X,2,L
-#FdNo0=X,2,L
+#FdEMPNM=X,2,L
+#FdNO0=X,2,L
 
 
 !永遠為必輸欄位
-#FdFunCd=X,2,L
-#FdCustNo=X,2,L
-#FdBormNo=X,2,L
-#FdFacmNo=X,2,L
-#FdBorxNo=X,2,L
-#FdNo1=X,2,L
+#FdFUNCD=X,2,L
+#FdCUSTNO=X,2,L
+#FdNO1=X,2,L
 T(3,*)
-
-#FdRmkDesc=X,2,L
+#FdNO2=X,2,L
 T(3,*)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -82,7 +77,7 @@ T(3,1:新增;2:修改;4:刪除;5:查詢)
 
 !RmkCode
 #CDDEF0001=x,20,S
-T(3,CdCode.RmkCode)
+T(3,CdCode.LoanRmkCode)
 
 #RmkCodeHelp=x,1024,S
 
@@ -97,64 +92,19 @@ T(2,@RmkCodeHelp,#HelpDesc1)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3072帳務備忘錄明細資料查詢]進入),$)
 
-!自動更新L1905機制
-#AutoReFresh=A,1,S
-C(3,#CHAIN,1,$,S)
-E(0,1)
-ASGN(CAUTO$)
-
-!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo-AcDate 1-7-3-3-4-7
-!其他時: FunCd-CustNo-AcDate-RmkNo 1-7-7-3
 #NTXBUF=X,156,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-T(1,@CHAIN_FunCd,#NTXBUF,1,1)
 T(1,@CustNo,#NTXBUF,2,7)
-C(3,#FunCd,1,T(1,@FacmNo,#NTXBUF,9,3),$)
-C(3,#FunCd,1,T(1,@BormNo,#NTXBUF,12,3),$)
-C(3,#FunCd,1,T(1,@BorxNo,#NTXBUF,15,4),$)
-C(3,#FunCd,1,T(1,@AcDate,#NTXBUF,19,7),$)
-C(3,#FunCd,1,s,$)
-T(1,@AcDate,#NTXBUF,9,7)
-T(1,@RmkNo,#NTXBUF,16,3)
-T(1,@CHAIN_AcDate,#NTXBUF,9,7)
-T(1,@CHAIN_RmkNo,#NTXBUF,16,3)
-#FdAcDate=X,2,L
-C(2,#FunCd,T(3,),T(3, ),T(3,),T(3, ),T(3,),T(3,))
-C(5,#FdAcDate,*,T(F,@AcDate,1),T(F,@AcDate,0))
+T(1,@EmpName,#NTXBUF,9,10)
+T(1,@RmkNo,#NTXBUF,19,3)
+T(1,@RmkCode,#NTXBUF,22,3)
+T(1,@RmkDesc,#NTXBUF,25,120),$)
 
-!調RIM參數
-#RimAcDate=D,7,S
-#RimRmkNo=A,3,S
 
-#CHAIN_FunCd=A,1,S
-#CHAIN_AcDate=D,7,S
-#CHAIN_RmkNo=A,3,S
-!檢查cod是否有變更
-#Old_RmkCode=A,3,S
-
-!只有複製時才套RmkDesc
-!非新增時套FacmNo, BormNo, BorxNo
-#RimL2r62_FunCd3=X,1,S
-IF(#CHAIN_FunCd == 1 && #FunCd == 1,S,$)
-E(0,@RimFunCd,5)
-E(0,@RimCustNo,#CustNo)
-E(0,@RimAcDate,#CHAIN_AcDate)
-E(0,@RimRmkNo,#CHAIN_RmkNo)
-RESET_RIM(#RimL2r62_FunCd3,L2R62)
-S(L2R62,1,#RimFunCd,#RimCustNo,#RimAcDate,#RimRmkNo)
-R(1,L2R62)
-!E(0,@RmkCode,#L2r62RmkCode)
-!T(H,@RmkCodeX,#RmkCode,#RmkCodeHelp)
-C(3,#CHAIN_FunCd,3,T(2,@RmkDesc,#L2r62RmkDesc),$)
-C(3,#CHAIN_FunCd,1,$,E(0,@FacmNo,#L2r62FacmNo))
-C(3,#CHAIN_FunCd,1,$,E(0,@BormNo,#L2r62BormNo))
-C(3,#CHAIN_FunCd,1,$,E(0,@BorxNo,#L2r62BorxNo))
-
-![功能] 
+![功能]
 !下拉式選單 1.新增 2.修改 4.刪除 5.查詢
 #FunCd=A,1,S
-C(3,#CHAIN_FunCd,3,E(0,1),$)
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
@@ -169,34 +119,37 @@ C(3,#FunCd,5,K(NOBUTTON,CLOSEY),$)
 
 #ShowFd=X,1,S
 C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
-!T(2,@FdNo1,#ShowFd)
-T(2,@FdRmkDesc,#ShowFd)
+T(2,@FdNO1,#ShowFd)
+T(2,@FdNO2,#ShowFd)
+
 
 #WKSTAR=X,2,L
 C(2,#FunCd,S,T(3,*),S,S,S,S)
+T(2,@FdCUSTNO,#ShowFd)
 
 #WKSTAR1=X,2,L
 C(2,#FunCd,S,S,T(3,*),S,T(3, ),T(3, ))
 
+
+
 #WKTF=X,1,S
 IF(#FunCd==1 || #FunCd==2,T(F,@RmkCode,1),T(F,@RmkCode,0)T(F,@RmkDesc,0))
-IF(#FunCd==2,T(F,@CustNo,0),$)
+IF(#FunCd==2,T(F,@CustNo,0)HIDE(#BTN1),$)
 IF(#FunCd==1,T(F,@RmkNo,0),T(F,@RmkNo,0))
-IF(#FunCd==4 || #FunCd==5,T(F,@CustNo,0)T(F,@RmkNo,0),$)
+IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustNo,0)T(F,@RmkNo,0),$ )
+
+
+#BUF1=X,18,S
+
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo})
 
 ![借戶戶號]
 !按[瀏覽]連結[顧客明細資料查詢] 必須輸入且存在於顧客檔
-#CustNo=A,7,L
-! C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-! @V(2,0)
-
-!無論新舊資料都可能是0
-#FacmNo=A,3,L
-
-!無論新舊資料都可能是0
-#BormNo=A,3,L
-
-#BorxNo=A,4,L
+#CustNo=A,7,I
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+@V(2,0)
 
 #CUSTID=X,10,S
 @C(4,#CUSTID,S,$)
@@ -213,8 +166,9 @@ A(ID_UNINO,0,#CUSTID)
 E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#RimL1r01,L1R01)
-S(L1R01,1,#RimCustId,#RimFunCd,#RimCustNo)
-R(1,L1R01)
+!S(L1R01,1,#RimCustId,#RimFunCd,#RimCustNo)
+!R(1,L1R01)
+
 
 #checkL1R01=X,1,S
 T(2,@CustName,#L1r01CustName)
@@ -222,20 +176,6 @@ T(2,@CustName,#L1r01CustName)
 #CustName=X,100,L
 
 
-<include src="ROM.icf::L2R62.dec"/>
-!調RIML2R62備忘錄序號
-!#RimL2r62=X,1,S
-!C(3,#FunCd,1,$,S)
-!E(0,@RimFunCd,1)
-!E(0,@RimCustNo,#CustNo)
-!E(0,@RimRmkNo,0)
-!RESET_RIM(#RimL2r62,L2R62)
-!S(L2R62,1,#RimFunCd,#RimCustNo,#RimRmkNo)
-!R(1,L2R62)
-
-!#checkL2r62RmkNo=X,1,S
-!C(3,#FunCd,1,$,S)
-!E(0,@RmkNo,#L2r62RmkNo)
 
 ![經辦編號]
 #TlrNo=X,6,S
@@ -243,70 +183,88 @@ T(4,TLRNO$)
 
 ![經辦姓名]
 !自動顯示不必輸入
-#EmpName=X,20,L
-C(2,#FunCd,$,T(4,EMPNM$),T(4,EMPNM$),$,$,$,$)
+#EmpName=X,10,L
+T(4,EMPNM$)
 
-!會計日期
 
-#SysDate=D,7,S
-E(0,#SYSDATE)
 
-#AcDate=D,7,I
-C(2,#FunCd,s,s,s,s,s,s)
-@
-V(7)
-A(DATE,0,#AcDate)
-IF(#AcDate>#SysDate,V(P,不得超過會計日),$)
+
+!調RIM參數
+#RimRmkNo=A,3,S
+#RimOtxDate=D,7,S
+
+<include src="ROM.icf::L3R30.dec"/>
+!調RIML3R30備忘錄序號
+#RimL3r30=X,1,S
+C(3,#FunCd,1,$,S)
+E(0,@RimFunCd,1)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimRmkNo,0)
+RESET_RIM(#RimL3r30,L3R30)
+!S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
+!R(1,L3R30)
+
+#checkL3r30RmkNo=X,1,S
+C(3,#FunCd,1,$,S)
+E(0,@RmkNo,#L3r30RmkNo)
+
 
 ![備忘錄序號]
 !新增時由系統自動編流水號,其他則必須輸入
 #RmkNo=A,3,L
 
-#MRKEY=_,_,S
-T(2,#CustNo+-+#AcDate+-+#RmkNo)
 
-!調RIML2R62
-#RimL2r62find=X,1,S
+!調RIML3R30
+#RimL3r30find=X,1,S
 C(3,#FunCd,1,S,$)
 E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
-E(0,@RimAcDate,#AcDate)
 E(0,@RimRmkNo,#RmkNo)
-RESET_RIM(#RimL2r62find,L2R62)
-S(L2R62,1,#RimFunCd,#RimCustNo,#RimAcDate,#RimRmkNo)
-R(1,L2R62)
-T(2,@RmkDesc,#L2r62RmkDesc)
-T(2,@EmpName,#L2r62EmpName)
-!E(0,@RmkCode,#L2r62RmkCode)
-!T(H,@RmkCodeX,#RmkCode,#RmkCodeHelp)
+RESET_RIM(#RimL3r30find,L3R30)
+!S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
+!R(1,L3R30)
+
+#checkL3r30=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RmkCode,#L3r30RmkCode)
+T(2,@RmkDesc,#L3r30RmkDesc)
+
+
 
 ![備忘錄代碼]
 !必須輸入
-!#RmkCode=A,3,I
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!C(3,#CHAIN,1,C(3,#FunCd,4,s,$),$)
-!C(3,#CHAIN,1,C(3,#FunCd,5,s,$),$)
-!E(0,@Old_RmkCode,#RmkCode)
-!HELP(#RmkCodeHelp)
-!@V(H,#RmkCodeHelp)
-
-!#RmkCodeX=x,120,L
-!T(H,#RmkCode,#RmkCodeHelp)
-
-![備忘錄說明] 
-!新增、修改時備忘錄代碼若為其他則此欄必須輸入,其他則自動顯示不必輸入
-!2022.3.18 QC1698皆必須輸入
-#RmkDesc=x,120,I
+#RmkCode=A,3,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!C(3,#RmkCode,#Old_RmkCode,$,T(2,@RmkDesc,#RmkCodeX))
-! C(3,#CHAIN_FunCd,3,C(3,#RmkCode,#Old_RmkCode,$,T(2,@RmkDesc,#RmkCodeX)),C(3,#RmkCode,#Old_RmkCode,$,T(2,@RmkDesc,#RmkCodeX)))
-@
-V(7)
+C(3,#CHAIN,1,C(3,#FunCd,4,s,$),$)
+C(3,#CHAIN,1,C(3,#FunCd,5,s,$),$)
+HELP(#RmkCodeHelp)
+@V(H,#RmkCodeHelp)
+
+
+#RmkCodeX=c,120,L
+T(H,#RmkCode,#RmkCodeHelp)
+
+
+![備忘錄說明]
+!新增、修改時備忘錄代碼若為其他則此欄必須輸入,其他則自動顯示不必輸入
+!2022.3.18 QC1698皆必須輸入
+!#RmkDesc=c,120,I
+#RmkDesc=x,10.50,I
+TOOLTIP(Alt+Enter換行，Enter跳一下欄位)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+T(2,@RmkDesc,#RmkCodeX)
+!T(2,#RmkDesc,#RmkCodeX)
+!IF(#RmkCode == 999, T(F,@RmkDesc,1)T(2,@FdNO2,*), T(F,@RmkDesc,0)T(2,@FdNO2,))
+!C(3,#RmkCode,999,$,S)
+@V(7)
 
 
 #RPTFG=A,1,S
+
+
+
 
 </sub>
 
@@ -323,7 +281,7 @@ V(7)
 !C(5,#TXFORM,L3702,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L3702] 帳務備忘錄明細資料維護)
+T(3,[L3702] 顧客控管警訊資料維護)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -337,29 +295,33 @@ T(3,[L3702] 帳務備忘錄明細資料維護)
 <sub type="TIM">
 #FunCd
 #CustNo
-#AcDate
+#TlrNo
 #RmkNo
+#RmkCode
 #RmkDesc
-#FacmNo
-#BormNo
-#BorxNo
 </sub>
-!#RmkNo
-!#RmkCode
 
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L3702
-#RmkNo
-^
+TXFORM=L3702^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L1R01.tom"/>
-<include src="ROM.icf::L2R62.tom"/>
+<include src="ROM.icf::L3R30.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
+<sub type="PART" name="L3702" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L3702]                                 帳戶備忘錄資料維護"],
+[#<->#,"@案件編號"],
+[#<->#,"@統一編號"],
+["@借戶戶號"],
+["@核准編號"],
+]
+</sub>
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
+
 <include src="PRT.icf::UPD01.sel"/>
 </sub>
