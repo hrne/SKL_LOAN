@@ -232,15 +232,23 @@ public class AcEnterCom extends TradeBuffer {
 		// 會計日期
 		AcDate = this.txBuffer.getTxCom().getTbsdy();
 
-		// 傳票批號 >= 90 提存入帳 => 僅更新AcDetail會計帳務明細檔
+		// 傳票批號 >= 90 提存入帳 => 僅更新AcDetail會計帳務明細檔，訂正提存傳票，視同隔日訂正
 		if (acList.get(0).getSlipBatNo() >= 90) {
 			AcDate = acList.get(0).getAcDate();
+			// 會計帳務明細
+			if (AcHCode == 1) {
+				AcHCode = 2;
+				this.txBuffer.getTxCom().setBookAcHcode(2);
+				procAcHCode2(acList);
+				acList = this.txBuffer.getAcDetailList(); // 沖正分錄
+			}
 			// 業務關帳檢核
 			procAccloseCheck();
-			// 3.acList檢核
+			// acList檢核
 			procAcListCheck();
-			// 會計帳務明細
+			// 更新會計帳務明細檔
 			procAcDetailUpdate();
+			
 			return this.sendList();
 		}
 
@@ -564,6 +572,7 @@ public class AcEnterCom extends TradeBuffer {
 //	       A.來源科目不回沖，轉至'暫收款－可抵繳'科目(TAV)   
 //         B.若為債協入帳則轉至'債協退還款'科目(T2x)  
 		int rpFacmno = 0;
+		int slipBatNo = 0;
 		if (acList0 == null) {
 			throw new LogicException(titaVo, "E6003", "訂正或主管放行時AcDetail NotFound " + RelDy + RelTxseq);
 		}
@@ -572,6 +581,7 @@ public class AcEnterCom extends TradeBuffer {
 			if (rpFacmno == 0 || ac.getFacmNo() < rpFacmno) {
 				rpFacmno = ac.getFacmNo();
 			}
+			slipBatNo = ac.getSlipBatNo();
 		}
 
 		// 債協入帳
@@ -628,6 +638,10 @@ public class AcEnterCom extends TradeBuffer {
 			} else {
 				acDetail.setDbCr("D");
 			}
+			if 	(slipBatNo >= 90 ) {
+				acDetail.setSlipBatNo(slipBatNo);
+			}
+
 			acList2.add(acDetail);
 		}
 		this.txBuffer.addAllAcDetailList(acList2);

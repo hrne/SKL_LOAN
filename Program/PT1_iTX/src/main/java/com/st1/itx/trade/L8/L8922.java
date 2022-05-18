@@ -2,6 +2,7 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +16,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryDetail;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryDetailService;
+import com.st1.itx.db.service.springjpa.cm.L8923ServiceImpl;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -41,6 +43,8 @@ public class L8922 extends TradeBuffer {
 	public MlaundryDetailService sMlaundryDetailService;
 	@Autowired
 	public CustMainService sCustMainService;
+	@Autowired
+	L8923ServiceImpl l8923ServiceImpl;
 	@Autowired
 	Parse parse;
 
@@ -156,6 +160,21 @@ public class L8922 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOManagerDate", tMlaundryDetail.getManagerDate()); // 主管同意日期
 			}
+			
+			// 先檢查是否有訪談, Y/N
+			titaVo.putParam("CustNo", tMlaundryDetail.getCustNo());
+			titaVo.putParam("ActualRepayDateStart", tMlaundryDetail.getEntryDate());
+			titaVo.putParam("ActualRepayDateEnd", tMlaundryDetail.getEntryDate());
+			
+			List<Map<String, String>> queryResult = null;
+			try {
+				 queryResult = l8923ServiceImpl.queryfindbycustno(this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				this.error("L8922 queryResult got exception: " + e.getMessage());
+			}
+			
+			occursList.putParam("OOHasL8923", queryResult != null && !queryResult.isEmpty() ? "Y" : "N");
+			
 
 			DateTime = this.parse.timeStampToString(tMlaundryDetail.getLastUpdate()); // 異動日期
 			this.info("L8922 DateTime : " + DateTime);

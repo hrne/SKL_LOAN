@@ -108,6 +108,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_FuncCode=X,1,S
 T(1,#NTXBUF,1,1)
+C(3,#CHAIN_FuncCode,5,E(0,@ACTFG,0),$)
 
 #CHAIN_AcDate=X,7,S
 T(1,#NTXBUF,2,7)
@@ -130,7 +131,7 @@ E(0,@CustNo,#CHAIN_CustNo)
 
 
 
-! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
 #FuncCode=A,1,S
 T(F,@FuncCode,0)
 T(F,@CustName,0)
@@ -141,7 +142,8 @@ E(0,@FUNCIND,#FuncCode)
 
 #FuncCodeX=X,12,L
 T(H,#FuncCode,#TranKeyHelp)
-C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(3,#FuncCode,5,T(2,查詢),$)
 
 #AGAIN=X,1,S
 IF(#FuncCode==4 || #FuncCode==2,$,S)
@@ -164,6 +166,8 @@ IF (#FuncCode==1 ,T(F,@TotalAmt,1)T(F,@TotalCnt,1),T(F,@TotalAmt,0)T(F,@TotalCnt
 IF(#Level==3 & #FuncCode!=4,T(F,@Rational,1)T(F,@EmpNoDesc,1),T(F,@Rational,0)T(F,@EmpNoDesc,0))     
 
 IF(#Level==1 & #FuncCode!=4,T(F,@ManagerCheck,1)T(F,@ManagerCheckDesc,1)T(F,@ManagerDate,1),T(F,@ManagerCheck,0)T(F,@ManagerCheckDesc,0)T(F,@ManagerDate,0)T(F,@ManagerCheckDate,0))     
+
+IF(#FuncCode==5,T(F,#TotalAmt,0)T(F,#Rational,0)T(F,#EmpNoDesc,0)K(NOBUTTON,CLOSEY),$)
 
 #WKPSC=X,2,S
 
@@ -268,12 +272,12 @@ IF(#L8R50ManagerDate!=0 && #L8R50ManagerCheckDate!=0,INVOKEJS(SHOW,p1,11,11,1),$
 
 !累積金額
 #TotalAmt=m,14,I
-IF(#FuncCode==2 || #FuncCode==4,s,$)
+IF(#FuncCode==2 || #FuncCode==4 || #FuncCode==5,s,$)
 @V(2,0)
 
 !累積筆數
 #TotalCnt=N,4,I
-IF(#FuncCode==2 || #FuncCode==4,s,$)
+IF(#FuncCode==2 || #FuncCode==4 || #FuncCode==5,s,$)
 @V(2,0)
 
 !備忘錄序號
@@ -284,6 +288,7 @@ IF(#FuncCode==2 || #FuncCode==4,s,$)
 !合理性
 #Rational=X,1,I
 C(3,#FuncCode,4,s)
+C(3,#FuncCode,5,s)
 C(3,#Level,3,$,s)
 HELP(#YesNoHelp)
 @T(3,@RationalX,)
@@ -295,6 +300,7 @@ T(H,#Rational,#YesNoHelp)
 !經辦合理性說明
 #EmpNoDesc=X,2.50,I
 C(3,#FuncCode,4,s)
+C(3,#FuncCode,5,s)
 C(3,#Level,3,$,s)
 
 !主管覆核
@@ -302,6 +308,7 @@ C(3,#Level,3,$,s)
 T(4,@Level,LEVEL$)
 T(4,@CDATE,CDATE$)
 C(3,#FuncCode,4,s,$)
+C(3,#FuncCode,5,s,$)
 C(3,#Level,1,$,s)
 IF(#CDATE!=#ManagerDate && #ManagerDate!=0,E(0,@ManagerDateCopy,#ManagerDate),$)
 IF(#ManagerDateCopy>0,INVOKEJS(SHOW,p1,11,11,1),INVOKEJS(SHOW,p1,11,11,0))
@@ -323,7 +330,7 @@ C(3,#Level,1,$,s)
 C(5,#ManagerCheck,Y,T(3,*),S)
 
 #WKNAME1=X,1,S
-T(2,@FdManagerDesc,#WKSTAR3)
+IF(#FuncCode==5,T(2,@FdManagerDesc,),T(2,@FdManagerDesc,#WKSTAR3))
 
 
 #ManagerCheckX=X,6,L
@@ -361,6 +368,7 @@ D(8)
 !主管覆核說明
 #ManagerDesc=X,2.50,H
 C(3,#FuncCode,4,s,$)
+C(3,#FuncCode,5,s,$)
 C(3,#Level,1,$,s)
 @C(5,#ManagerCheck,N,C(4,#ManagerDesc,V(7),$),$)
 

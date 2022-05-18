@@ -572,6 +572,10 @@ TXFORM=L3911
 #RPTFG2=1,QUERY.GRID,L3911
 #any={detail:true, header:'L3911.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
 
+#OOPrincipal
+#OOInterest
+#OOBreachAmt
+
 #OOBTN1=內容查詢
 {width:80,search:false,formatter:'cust:bind-button:內容查詢;L3917 繳息明細查詢',align:'center',canExport:false}
 
@@ -630,6 +634,10 @@ TXFORM=L3911
 
 #RPTFG2=2,QUERY.GRID,L3911
 #any={detail:true, header:'L3911.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOPrincipal
+#OOInterest
+#OOBreachAmt
 
 #OOFacmNo=額度編號 
 {width:85,align:'center'}

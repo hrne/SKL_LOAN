@@ -37,13 +37,13 @@ public class L5500ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int limit;
 
 	public List<Map<String, String>> findData(int index, int limit, String sql, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
-		this.info("FindData");
+		this.info("FindData 1");
 
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		this.info("JcicServiceImpl sql=[" + sql + "]");
+		this.info("L5500ServiceImpl sql=[" + sql + "]");
 
 		Query query;
 
@@ -56,7 +56,7 @@ public class L5500ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (queryKey != null && queryKey.size() != 0) {
 			for (String key : queryKey.keySet()) {
-				this.info("JcicService FindJcic Key=[" + key + "],keyValue=[" + queryKey.get(key) + "]");
+				this.info("L5500Service Find Key=[" + key + "],keyValue=[" + queryKey.get(key) + "]");
 				query.setParameter(key, queryKey.get(key));
 			}
 		}
@@ -75,19 +75,19 @@ public class L5500ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<String[]> FindData(int index, int limit, String sql, Map<String, String> queryKey, TitaVo titaVo) throws LogicException {
-		this.info("FindData");
+		this.info("FindData 2");
 
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		this.info("JcicServiceImpl sql=[" + sql + "]");
+		this.info("L5500ServiceImpl sql=[" + sql + "]");
 
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		this.info("JcicServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
+		this.info("L5500ServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 

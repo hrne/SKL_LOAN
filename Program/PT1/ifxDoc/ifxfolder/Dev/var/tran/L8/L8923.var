@@ -83,8 +83,21 @@ T(2,#HelpDesc1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-#NTXBUF=X,4,S
+!接收此格式: ActualRepayDateStart-ActualRepayDateEnd-CustNo 7-7-7
+#NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CHAIN_DateStart,#NTXBUF,1,7)
+T(1,@CHAIN_DateEnd,#NTXBUF,8,7)
+T(1,@CHAIN_CustNo,#NTXBUF,15,7)
+E(0,@ActualRepayDateStart,#CHAIN_DateStart)
+E(0,@ActualRepayDateEnd,#CHAIN_DateEnd)
+E(0,@CustNo,#CHAIN_CustNo)
+XMT()
+
+! 7+7+7
+#CHAIN_DateStart=X,7,S
+#CHAIN_DateEnd=X,7,S
+#CHAIN_CustNo=X,7,S
 
 #BUF0=X,50,S
 T(2,1+0000000000000000000000000000000000000000000000000)

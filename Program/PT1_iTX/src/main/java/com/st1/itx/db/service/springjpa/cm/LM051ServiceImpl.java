@@ -89,11 +89,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\""; // F3
 		sql += "			,M.\"PrinBalance\""; // F4
 		sql += "			,M.\"FacAcctCode\""; // F5
-//		sql += "			,CASE";
-//		sql += "			   WHEN M.\"OvduText\" = ' ' ";
-//		sql += "			   THEN TO_CHAR(M.\"OvduTerm\",'9')";
-//		sql += "			 ELSE M.\"OvduText\" END AS \"OvduTerm\"";// F6
-		sql += "			,M.\"OvduTerm2\" AS \"OvduTerm\"";
+		sql += "			,M.\"OvduTerm2\" AS \"OvduTerm\"";// F6
 		sql += "			,M.\"CityCode\""; // F7
 		sql += "			,M.\"PrevIntDate\""; // F8
 		sql += "			,SUBSTR(M.\"AssetClass\",0,1) AS \"Class\""; // F9

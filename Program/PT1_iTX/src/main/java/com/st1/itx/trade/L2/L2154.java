@@ -360,14 +360,15 @@ public class L2154 extends TradeBuffer {
 					beforeFacMain.setLastTlrNo(tFacMain.getLastTlrNo());
 					beforeFacMain.setLastTxtNo(tFacMain.getLastTxtNo());
 					datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-					datalog.setLog("扣款銀行", tTempVo.get("RepayBank"), this.titaVo.getParam("RepayBank"));
-					datalog.setLog("扣款帳號", tTempVo.get("RepayAcctNo"), this.titaVo.getParam("RepayAcctNo"));
-					datalog.setLog("扣款帳號.郵局存款別", tTempVo.get("PostCode"), this.titaVo.getParam("PostCode"));
-					datalog.setLog("扣款帳號.與借款人關係", tTempVo.get("RelationCode"), this.titaVo.getParam("RelationCode"));
-					datalog.setLog("扣款帳號.帳戶戶名", tTempVo.get("RelationName"), this.titaVo.getParam("RelationName"));
-					datalog.setLog("扣款帳號.身份證字號", tTempVo.get("RelationId"), this.titaVo.getParam("RelationId"));
-					datalog.setLog("扣款帳號.出生日期", tTempVo.get("RelationBirthday"), this.titaVo.getParam("RelationBirthday"));
-					datalog.setLog("扣款帳號.性別", tTempVo.get("RelationGender"), this.titaVo.getParam("RelationGender"));
+					
+//					datalog.setLog("扣款銀行", tTempVo.get("RepayBank"), this.titaVo.getParam("RepayBank"));
+//					datalog.setLog("扣款帳號", tTempVo.get("RepayAcctNo"), this.titaVo.getParam("RepayAcctNo"));
+//					datalog.setLog("扣款帳號.郵局存款別", tTempVo.get("PostCode"), this.titaVo.getParam("PostCode"));
+//					datalog.setLog("扣款帳號.與借款人關係", tTempVo.get("RelationCode"), this.titaVo.getParam("RelationCode"));
+//					datalog.setLog("扣款帳號.帳戶戶名", tTempVo.get("RelationName"), this.titaVo.getParam("RelationName"));
+//					datalog.setLog("扣款帳號.身份證字號", tTempVo.get("RelationId"), this.titaVo.getParam("RelationId"));
+//					datalog.setLog("扣款帳號.出生日期", tTempVo.get("RelationBirthday"), this.titaVo.getParam("RelationBirthday"));
+//					datalog.setLog("扣款帳號.性別", tTempVo.get("RelationGender"), this.titaVo.getParam("RelationGender"));
 
 					datalog.exec("修改額度主檔資料", String.format("%07d-%03d-%07d", tFacMain.getCustNo(), tFacMain.getFacmNo(), tFacMain.getApplNo()));
 

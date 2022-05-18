@@ -102,8 +102,8 @@ public class HlThreeDetail implements Serializable {
   @Column(name = "`FirAppDate`")
   private int firAppDate = 0;
 
-  // 基本利率代碼
-  @Column(name = "`BiReteNo`", length = 2)
+  // 商品代碼/基本利率代碼
+  @Column(name = "`BiReteNo`", length = 5)
   private String biReteNo;
 
   // 二階換算業績
@@ -528,7 +528,7 @@ public class HlThreeDetail implements Serializable {
   }
 
 /**
-	* 基本利率代碼<br>
+	* 商品代碼/基本利率代碼<br>
 	* 
 	* @return String
 	*/
@@ -537,10 +537,10 @@ public class HlThreeDetail implements Serializable {
   }
 
 /**
-	* 基本利率代碼<br>
+	* 商品代碼/基本利率代碼<br>
 	* 
   *
-  * @param biReteNo 基本利率代碼
+  * @param biReteNo 商品代碼/基本利率代碼
 	*/
   public void setBiReteNo(String biReteNo) {
     this.biReteNo = biReteNo;

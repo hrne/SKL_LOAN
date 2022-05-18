@@ -204,8 +204,6 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> L8205Rpt5(TitaVo titaVo) throws Exception {
 
 		this.info("L8205Rpt5");
-		String iReCordStart = titaVo.getParam("DateStart");
-		String iReCordEnd = titaVo.getParam("DateEnd");
 		int iRepayDate = Integer.parseInt(titaVo.getParam("RepayDate"));
 		int iActualRepayDate = Integer.parseInt(titaVo.getParam("ActualRepayDate"));
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
@@ -217,9 +215,9 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if(iActualRepayDate>0) {
 			iActualRepayDate = iActualRepayDate+19110000; 
 		}
-		int fReCordStart = Integer.parseInt(iReCordStart) + 19110000;
-		int fReCordEnd = Integer.parseInt(iReCordEnd) + 19110000;
-		this.info("fReCordStart=" + fReCordStart + ",fReCordEnd=" + fReCordEnd);
+		
+		boolean useActualRepayDate = iActualRepayDate > 0;
+		boolean useCustNo = iCustNo > 0;
 
 		String sql = "";
 		sql += " SELECT                               			    \n";
@@ -242,17 +240,14 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CdCode\" CD on CD.\"DefCode\" = 'RepaySource'			\n";
 		sql += "and CD.\"Code\" = M.\"RepaySource\"			\n";
 		sql += "left join \"CdEmp\" E on E.\"EmployeeNo\" = M.\"CreateEmpNo\"			\n";
-		sql += "where M.\"RecordDate\" >= :recordStart and M.\"RecordDate\" <= :recordEnd  \n";
-		if(iRepayDate>0) {
-			sql += " and M.\"RepayDate\" = "+iRepayDate+"\n";
-		}
+		sql += "where 1 = 1 ";
+		if (useActualRepayDate)
+			sql += " AND M.\"ActualRepayDate\" = :actualRepayDate";
+		else
+			sql += " AND M.\"RepayDate\" = :repayDate";			
 		
-		if(iActualRepayDate>0) {
-			sql += " and M.\"ActualRepayDate\" = "+iActualRepayDate+"\n";
-		}
-		
-		if(iCustNo>0) {
-			sql += " and M.\"CustNo\" = "+iCustNo+"\n";
+		if(useCustNo) {
+			sql += " and M.\"CustNo\" = :custNo";
 		}
 		sql += " order by M.\"RecordDate\" ";
 
@@ -262,11 +257,13 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("recordStart", fReCordStart);
-		query.setParameter("recordEnd", fReCordEnd);
-//		query.setParameter("repaydate", iRepayDate);
-//		query.setParameter("actualrepaydate", iActualRepayDate);
-//		query.setParameter("custno", iCustNo);
+		if (useActualRepayDate)
+			query.setParameter("actualRepayDate", iActualRepayDate);
+		else
+			query.setParameter("repayDate", iRepayDate);
+		
+		if (useCustNo)
+			query.setParameter("custNo", iCustNo);
 
 		return this.convertToMap(query);
 	}

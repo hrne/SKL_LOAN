@@ -18,7 +18,7 @@ create table "HlThreeDetail" (
   "DistName" nvarchar2(20),
   "UnitName" nvarchar2(20),
   "FirAppDate" decimal(8, 0) default 0 not null,
-  "BiReteNo" varchar2(2),
+  "BiReteNo" varchar2(5),
   "TwoYag" decimal(14, 2) default 0 not null,
   "ThreeYag" decimal(14, 2) default 0 not null,
   "TwoPay" decimal(14, 2) default 0 not null,
@@ -61,7 +61,7 @@ comment on column "HlThreeDetail"."DeptName" is '部室中文';
 comment on column "HlThreeDetail"."DistName" is '區部中文';
 comment on column "HlThreeDetail"."UnitName" is '單位中文';
 comment on column "HlThreeDetail"."FirAppDate" is '首次撥款日';
-comment on column "HlThreeDetail"."BiReteNo" is '基本利率代碼';
+comment on column "HlThreeDetail"."BiReteNo" is '商品代碼/基本利率代碼';
 comment on column "HlThreeDetail"."TwoYag" is '二階換算業績';
 comment on column "HlThreeDetail"."ThreeYag" is '三階換算業績';
 comment on column "HlThreeDetail"."TwoPay" is '二階業務報酬';

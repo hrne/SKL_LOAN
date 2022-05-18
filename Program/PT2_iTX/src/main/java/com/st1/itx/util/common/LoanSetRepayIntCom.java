@@ -192,12 +192,12 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 					// 2022-05-09 智偉增加判斷
 					// 符合此條件者
 					// 照AS400多算一天利息
-					int orignalMaturityDate = t.getMaturityDate();
-					dDateUtil.init();
-					dDateUtil.setDate_1(orignalMaturityDate);
-					dDateUtil.setDays(1);
-					int newMaturityDate = dDateUtil.getCalenderDay();
-					loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
+//					int orignalMaturityDate = t.getMaturityDate();
+//					dDateUtil.init();
+//					dDateUtil.setDate_1(orignalMaturityDate);
+//					dDateUtil.setDays(1);
+//					int newMaturityDate = dDateUtil.getCalenderDay();
+//					loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
 				}
 			}
 			loanCalcRepayIntCom.setIntCalcCode(intCalcCode);

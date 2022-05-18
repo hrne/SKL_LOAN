@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L6_CdBcm_Ins"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L6_CdBcm_Ins"
 (
     -- 參數
     "EmpNo" IN VARCHAR2   --批次紀錄識別碼
@@ -9,7 +9,7 @@ CREATE OR REPLACE PROCEDURE "Usp_L6_CdBcm_Ins"
 AS
 BEGIN
 
--- exec "Usp_L6_CdBcm_Ins"('DataTf');
+-- exec "Usp_L6_CdBcm_Ins"('999999');
 
     -- 筆數預設0
 --     INS_CNT:=0;
@@ -40,7 +40,7 @@ BEGIN
           ,SUBSTR("EmpNo",0,6)        AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6
           ,'Y'                        AS "Enable"          -- 啟用記號 VARCHAR2 1
     FROM (SELECT "CenterCode"                                --單位代號
-                ,"CenterCodeName"                            --單位名稱
+                ,MAX("CenterCodeName")  AS "CenterCodeName"  --單位名稱
                 ,MAX("CenterCode1")     AS "CenterCode1"     --區部代號
                 ,MAX("CenterCode1Name") AS "CenterCode1Name" --區部名稱
                 ,MAX("CenterCode2")     AS "CenterCode2"     --部室代號
@@ -73,7 +73,6 @@ BEGIN
                 WHERE "CenterCode2" IS NOT NULL
                ) S0
           GROUP BY "CenterCode"        --單位代號
-                  ,"CenterCodeName"    --單位名稱
          ) S1
     ;
 
