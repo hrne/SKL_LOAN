@@ -282,11 +282,14 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8926;text=查詢;ntxbuf=#OOBUF6})
 !是否有訪談 - Y/N
 #OOHasL8923=X,1,S
 
+#TodayCDate=D,7,S
+E(0,#SYSCDATE)
+
 #OOBUFL8923=X,100,S
-T(2,#OOAcDate+#OOAcDate+#OOCustNo)
+T(2,#OOAcDate+#TodayCDate+#OOCustNo)
 
 #OOBTNL8923=X,4,S
-C(5,#OOHasL8923,Y,BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,cancel))
+C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,cancel))
 
 
 </sub>
@@ -318,6 +321,7 @@ TXFORM=L8922
 #OOManagerDesc
 #OOManagerCheck
 #OOManagerDate
+#OOHasL8923
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

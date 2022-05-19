@@ -2,8 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -14,8 +12,10 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryDetail;
+import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryDetailService;
+import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.springjpa.cm.L8923ServiceImpl;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -41,6 +41,8 @@ public class L8922 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public MlaundryDetailService sMlaundryDetailService;
+	@Autowired
+	MlaundryRecordService sMlaundryRecordService;
 	@Autowired
 	public CustMainService sCustMainService;
 	@Autowired
@@ -84,7 +86,7 @@ public class L8922 extends TradeBuffer {
 			slMlaundryDetail = sMlaundryDetailService.findbyDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
 		} else if (iType == 2)
 		{
-			slMlaundryDetail = sMlaundryDetailService.findAll(this.index, this.limit, titaVo);
+			slMlaundryDetail = sMlaundryDetailService.findAll(0, Integer.MAX_VALUE, titaVo);
 		}
 		
 		List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null : slMlaundryDetail.getContent();
@@ -159,14 +161,10 @@ public class L8922 extends TradeBuffer {
 			titaVo.putParam("RecordDateStart", 0);
 			titaVo.putParam("RecordDateEnd", 0);
 			
-			List<Map<String, String>> queryResult = null;
-			try {
-				 queryResult = l8923ServiceImpl.queryfindbycustno(this.index, this.limit, titaVo);
-			} catch (Exception e) {
-				this.error("L8922 queryResult got exception: " + e.getMessage());
-			}
+			// 訪談按鈕顯示邏輯：該戶號有Record訪談日期大於Detail入帳日期的資料時，就有訪談資料
+			MlaundryRecord MlaundryRecord = sMlaundryRecordService.findCustNoAndRecordDateFirst(tMlaundryDetail.getCustNo(), tMlaundryDetail.getEntryDate() + 19110000, 99991231, titaVo);
 			
-			occursList.putParam("OOHasL8923", queryResult != null && !queryResult.isEmpty() ? "Y" : "N");
+			occursList.putParam("OOHasL8923", MlaundryRecord != null ? "Y" : "N");
 			
 
 			DateTime = this.parse.timeStampToString(tMlaundryDetail.getLastUpdate()); // 異動日期

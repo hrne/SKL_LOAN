@@ -102,7 +102,7 @@ public class L8921 extends TradeBuffer {
 			
 			// 匯款摘要
 			CdCode tCdCode = sCdCodeService.getItemFirst(4, "BankRmftCode", tMlaundryChkDtl.getDscptCode(), titaVo);
-			occursList.putParam("OODscptCode", tCdCode != null ? tCdCode.getItem() : "");
+			occursList.putParam("OODscptCode", tCdCode != null ? tCdCode.getItem() : tMlaundryChkDtl.getDscptCode());
 			
 			occursList.putParam("OOTxAmt", tMlaundryChkDtl.getTxAmt()); // 交易金額
 			occursList.putParam("OOTotalAmt", tMlaundryChkDtl.getTotalAmt()); // 累計金額

@@ -39,6 +39,9 @@ public interface MlaundryRecordRepositoryHist extends JpaRepository<MlaundryReco
   // CustNo >
   public Optional<MlaundryRecord> findTopByCustNoGreaterThanOrderByLogNoDesc(int custNo_0);
 
+  // CustNo = ,AND RecordDate >= ,AND RecordDate <=
+  public Optional<MlaundryRecord> findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(int custNo_0, int recordDate_1, int recordDate_2);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -113,6 +113,17 @@ public interface MlaundryRecordService {
   public MlaundryRecord maxLogNoFirst(int custNo_0, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND RecordDate &gt;= ,AND RecordDate &lt;=
+   *
+   * @param custNo_0 custNo_0
+   * @param recordDate_1 recordDate_1
+   * @param recordDate_2 recordDate_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice MlaundryRecord MlaundryRecord of List
+   */
+  public MlaundryRecord findCustNoAndRecordDateFirst(int custNo_0, int recordDate_1, int recordDate_2, TitaVo... titaVo);
+
+  /**
    * hold By MlaundryRecord
    * 
    * @param logNo key

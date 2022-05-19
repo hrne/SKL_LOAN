@@ -260,6 +260,25 @@ em = null;
   }
 
   @Override
+  public MlaundryRecord findCustNoAndRecordDateFirst(int custNo_0, int recordDate_1, int recordDate_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findCustNoAndRecordDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " recordDate_1 : " +  recordDate_1 + " recordDate_2 : " +  recordDate_2);
+    Optional<MlaundryRecord> mlaundryRecordT = null;
+    if (dbName.equals(ContentName.onDay))
+      mlaundryRecordT = mlaundryRecordReposDay.findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(custNo_0, recordDate_1, recordDate_2);
+    else if (dbName.equals(ContentName.onMon))
+      mlaundryRecordT = mlaundryRecordReposMon.findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(custNo_0, recordDate_1, recordDate_2);
+    else if (dbName.equals(ContentName.onHist))
+      mlaundryRecordT = mlaundryRecordReposHist.findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(custNo_0, recordDate_1, recordDate_2);
+    else 
+      mlaundryRecordT = mlaundryRecordRepos.findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(custNo_0, recordDate_1, recordDate_2);
+
+    return mlaundryRecordT.isPresent() ? mlaundryRecordT.get() : null;
+  }
+
+  @Override
   public MlaundryRecord holdById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
