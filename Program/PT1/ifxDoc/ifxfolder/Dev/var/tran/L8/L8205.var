@@ -94,6 +94,7 @@ C(3,#Type,5,T(2,訪談日期),T(2,入帳日期))
 
 
 #DateStart=D,7,I
+C(3,#Type,5,S,$)
 T(1,#DATE,2,7)
 D(8)
 @

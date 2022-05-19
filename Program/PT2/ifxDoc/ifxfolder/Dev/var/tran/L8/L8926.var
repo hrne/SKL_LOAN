@@ -129,8 +129,10 @@ T(3,[L8926] 疑似洗錢交易合理性明細查詢)
 #OCustNo=A,7,L
 #OCustName=X,100,L
 #OFactor=N,2,L
-#OFactorX=X,5,L
-T(2,樣態+#OFactor)
+#OFactor1=A,1,L
+E(0,#OFactor)
+#OFactorX=X,6,L
+T(2,樣態+#OFactor1)
 #OTotalAmt=m,14,L
 #OTotalCnt=N,4,L
 #ORational=X,1,L

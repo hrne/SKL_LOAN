@@ -40,27 +40,15 @@ public class LMR42 extends TradeBuffer {
 
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LM042 ");
-			
+
 		this.totaVo.init(titaVo);
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
-		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
-		// 找當月12筆(一整組為12筆)
-		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
-
-		// 判斷有無當月資料
-		if (sMonthlyLM042RBC == null) {
-			this.info("insert data");
-			// 新增當月資料
-			insertData(titaVo, yearMonth);
-
-			// 新增後再次搜尋
-			sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
-		}
+		Slice<MonthlyLM042RBC> sMonthlyLM042RBC= checkAndUpdateData(titaVo, yearMonth);
 
 		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
 
@@ -188,6 +176,62 @@ public class LMR42 extends TradeBuffer {
 			e.printStackTrace();
 		}
 
+	}
+
+	private Slice<MonthlyLM042RBC> checkAndUpdateData(TitaVo titaVo, int yearMonth) throws LogicException {
+
+		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
+
+		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
+
+		// 判斷有無當月資料
+		if (sMonthlyLM042RBC == null) {
+			this.info("insert data");
+			// 新增當月資料
+			insertData(titaVo, yearMonth);
+
+			// 新增後再次搜尋
+			sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
+		}
+
+		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
+
+		this.info("lMonthlyLM042RBC=" + lMonthlyLM042RBC.toString());
+
+		for (MonthlyLM042RBC tMonthlyLM042RBC : lMonthlyLM042RBC) {
+
+			switch (tMonthlyLM042RBC.getLoanItem()) {
+			case "A":
+				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor1")));
+				break;
+			case "B":
+				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor2")));
+				break;
+			case "C":
+				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor3")));
+				break;
+			case "D":
+				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor4")));
+				break;
+			case "E":
+				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor5")));
+				break;
+			case "F":
+				tMonthlyLM042RBC.setRiskFactor(new BigDecimal(titaVo.getParam("RiskFactor6")));
+				break;
+			}
+
+		}
+
+		try {
+			sMonthlyLM042RBCService.updateAll(lMonthlyLM042RBC, titaVo);
+		} catch (DBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.info("update done");
+
+		return sMonthlyLM042RBC;
 	}
 
 }

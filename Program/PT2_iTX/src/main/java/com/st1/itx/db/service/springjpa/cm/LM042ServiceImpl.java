@@ -119,6 +119,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND \"MonthEndYm\" = :yymm ";
 		sql += " GROUP BY 'tDisPreRemFees'";
 		// 催收款項
+		sql += " UNION ";
 		sql += " SELECT 'oDisPreRemFees' AS \"Item\" ";
 		sql += " 	   ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " FROM \"AcMain\"";

@@ -85,7 +85,7 @@ T(1,#NTXBUF,9,3)
 #CHAIN_BormNo=X,3,S
 T(1,#NTXBUF,12,3)
 
-#CHAIN_AcDAte=D,7,S
+#CHAIN_AcDate=D,7,S
 T(1,#NTXBUF,15,7)
 
 #CHAIN_Factor=A,2,S
@@ -95,6 +95,7 @@ T(1,#NTXBUF,22,2)
 C(3,#CHAIN,1,$,S)
 E(0,@TRN_CODE,#CHAIN_Code)
 E(0,@CUST_NO,#CHAIN_CutNo)
+E(0,@CDATESTART,#CHAIN_AcDate)
 
 
 
@@ -133,8 +134,7 @@ T(2,#SUMDATE2+#SUMDATE3)
 
 !交易日期起日
 #CDATESTART=D,7,I
-E(0,#SUMDATE3)
-C(3,#CHAIN,0,$,s)
+C(3,#CHAIN,0,E(0,#SUMDATE3),s)
 D(8)
 @V(7)A(DATE,0,#CDATESTART)
 V(5,0010101,#DATE)
@@ -156,7 +156,7 @@ E(0,#CUST_NO)
 
 #MRKEY=_,_,S
 C(3,#CHAIN,1,$,S)
-C(3,#TRN_CODE,1,C(3,#CHAIN_AcDAte,0,S,T(2,#CHAIN_AcDAte+-+#CHAIN_Factor+-+#CHAIN_CutNo)),T(2,#CHAIN_AcDAte+#CHAIN_CutNo+#CHAIN_FacmNo+#CHAIN_BormNo))
+C(3,#TRN_CODE,1,C(3,#CHAIN_AcDate,0,S,T(2,#CHAIN_AcDate+-+#CHAIN_Factor+-+#CHAIN_CutNo)),T(2,#CHAIN_AcDate+#CHAIN_CutNo+#CHAIN_FacmNo+#CHAIN_BormNo))
 
 
 
@@ -266,14 +266,13 @@ TXFORM=L8924
 <sub type="SELECT">
 
 #RPTFG=0,QUERY.GRID,L8924
-#any={detail:true, header:'L8924.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60], sortname:'#OLastUpdate desc'}
+#any={detail:true, header:'L8924.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60], sortname:'#OLastUpdate asc'}
 
-#OLastUpdate=修改日期
-{width:140,align:'left'}
 
 #OOBtnA=變更明細
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
-
+#OLastUpdate=修改日期
+{width:140,align:'left'}
 #OCustNoX=戶號
 {width:100,align:'center'}
 #OCustName=戶名
