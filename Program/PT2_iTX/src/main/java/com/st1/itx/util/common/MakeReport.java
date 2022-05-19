@@ -56,6 +56,7 @@ import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.filter.SafeClose;
+import com.st1.itx.util.format.FormatUtil;
 
 /**
  * 
@@ -1060,9 +1061,11 @@ public class MakeReport extends CommBuffer {
 
 				if ("P".equals(pageOrientation)) {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
+					this.print(2, this.getMidXAxis(), "");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
 				} else {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
+					this.print(2, this.getMidXAxis(), "");
 					this.print(1, this.getMidXAxis(), signOff1, "C");
 				}
 			}
@@ -1434,7 +1437,10 @@ public class MakeReport extends CommBuffer {
 								supna = cdEmp.getFullname();
 							}
 						}
-						txt = "經辦：" + tlrna + "                  主管：" + supna;
+						txt = "經辦：";
+						txt += FormatUtil.padX(tlrna,20);
+						txt += "主管：";
+						txt += FormatUtil.padX(supna,20);
 					}
 
 					String align = map.get("align").toString();

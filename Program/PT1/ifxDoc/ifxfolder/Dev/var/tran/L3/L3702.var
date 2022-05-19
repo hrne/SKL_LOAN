@@ -166,8 +166,8 @@ A(ID_UNINO,0,#CUSTID)
 E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#RimL1r01,L1R01)
-!S(L1R01,1,#RimCustId,#RimFunCd,#RimCustNo)
-!R(1,L1R01)
+S(L1R01,1,#RimCustId,#RimFunCd,#RimCustNo)
+R(1,L1R01)
 
 
 #checkL1R01=X,1,S
@@ -201,8 +201,8 @@ E(0,@RimFunCd,1)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimRmkNo,0)
 RESET_RIM(#RimL3r30,L3R30)
-!S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
-!R(1,L3R30)
+S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
+R(1,L3R30)
 
 #checkL3r30RmkNo=X,1,S
 C(3,#FunCd,1,$,S)
@@ -221,8 +221,8 @@ E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimRmkNo,#RmkNo)
 RESET_RIM(#RimL3r30find,L3R30)
-!S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
-!R(1,L3R30)
+S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
+R(1,L3R30)
 
 #checkL3r30=X,1,S
 C(3,#FunCd,1,S,$)
@@ -251,10 +251,10 @@ T(H,#RmkCode,#RmkCodeHelp)
 !2022.3.18 QC1698皆必須輸入
 !#RmkDesc=c,120,I
 #RmkDesc=x,10.50,I
-TOOLTIP(Alt+Enter換行，Enter跳一下欄位)
+TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-T(2,@RmkDesc,#RmkCodeX)
+C(4,#RmkDesc,T(2,@RmkDesc,#RmkCodeX),$)
 !T(2,#RmkDesc,#RmkCodeX)
 !IF(#RmkCode == 999, T(F,@RmkDesc,1)T(2,@FdNO2,*), T(F,@RmkDesc,0)T(2,@FdNO2,))
 !C(3,#RmkCode,999,$,S)

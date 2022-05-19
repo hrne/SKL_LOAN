@@ -41,6 +41,7 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHERE 'N' IN (\"PaperNotice\", \"MsgNotice\", \"EmailNotice\") ";
 		sql += "                    ) ";
 		sql += " SELECT UNIQUE LPAD(CN.\"CustNo\", 7, '0')                   AS \"CustNo\" ";
+		sql += "             , CN.\"FacmNo\"                                 AS \"FacmNo\" ";
 		sql += "             , CM.\"CustName\"                               AS \"CustName\" ";
 		sql += "             , CECreate.\"Fullname\"                         AS \"CreateName\" ";
 		sql += "             , TO_CHAR(CN.\"CreateDate\", 'YYYY') - 1911 || ";
@@ -63,6 +64,7 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND CNPRT.\"CustNo\" BETWEEN :custNoStart AND :custNoEnd ";
 		sql += "   AND TO_CHAR(CN.\"LastUpdate\", 'YYYYMMDD') BETWEEN :findDateStart AND :findDateEnd ";
 		sql += " ORDER BY \"CustNo\" ASC ";
+		sql += "         ,\"FacmNo\" ASC ";
 
 
 		this.info("sql=" + sql);
