@@ -6,8 +6,6 @@ K(MODIFYBUTTON,查詢)
 
 <sub type="SYS" name="label">
 
-!#TXCD
-!T(3,L3072)
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
@@ -37,9 +35,17 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 
+
+
+
 #120spc=X,155,S
 
+#BUF2=X,11,S
+T(2,1+0000000+          +000+00+#120spc)
 
+#button=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
 
 </sub>
 
@@ -47,54 +53,46 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
 [
 ["[L3072]                                 帳務備忘錄明細資料查詢"],
-["#FdCustNo+借戶戶號",#CustNo,#CustName],
+["#FdCustNo+借戶戶號",#CustNo,#BTN1,#CustName],
 ]
 
 #FdCustNo=X,2,L
+T(3,*)
 
 #RimFunCd=A,1,S
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-! #BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3005交易明細資料查詢]進入),$)
 
-!#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#AcDate
-!7-3-3-4-7
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CustNo,#NTXBUF,1,7)
-T(1,@FacmNo,#NTXBUF,8,3)
-T(1,@BormNo,#NTXBUF,11,3)
-T(1,@BorxNo,#NTXBUF,14,4)
-T(1,@EnterAcDate,#NTXBUF,18,7)
 
-#EnterAcDate=D,7,S
 
-!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo-AcDate 1-7-3-3-4-7
-!最新格式請參考L3702
-#BUFCREATE=X,25,S
-T(2,1+#CustNo+#FacmNo+#BormNo+#BorxNo+#EnterAcDate)
 
-#button=x,100,S
-C(3,#FacmNo,0,S,$)
-T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUFCREATE})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,新增)
+#BUF1=X,42,S
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNo2<-OOCustNo:CustName<-OOCustName})
+
 
 !借戶戶號
-#CustNo=A,7,L
+#CustNo=A,7,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
+C(3,#CHAIN,1,s,$)
+@V(2,0)
 
-#FacmNo=A,3,L
+#oCustNo=A,7,L
+E(0,#CustNo)
 
-#BormNo=A,3,L
-
-#BorxNo=A,4,L
+#CustNo2=A,7,S
 
 #RimL1r09=X,1,S
+C(3,#CustNo,#CustNo2,s,$)
 E(0,@RimFunCd,1)
 T(2,@RimCustId,)
 E(0,@RimCustNo,#CustNo)
@@ -128,14 +126,11 @@ T(2,#CustNo)
 !---------- TXFORM = L3072 ----------
 <sub type="FORM" name="L3072">
 
-!#SCRPRT=_,_,S
-!C(5,#TXFORM,L3072,$,S)
-
 #SCRTIL=_,_,S
 T(3,[L3072] 帳務備忘錄明細資料查詢)
 
 !借戶戶號
-#OCustNo=A,7,L
+#OCustNo=A,7,S
 E(0,#CustNo)
 
 
@@ -145,7 +140,7 @@ E(0,2)
 
 !複製
 #FUNC3=A,1,S
-E(0,3)
+E(0,1)
 
 !刪除
 #FUNC4=A,1,S
@@ -159,21 +154,11 @@ E(0,5)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 
-#OCustNoX=X,20,L
-C(3,#BorxNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo+-+#BormNo+-+#BorxNo))
-
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
+
 #OOCustNo=A,7,L
-
-#OOFacmNo=A,3,S
-
-#OOBormNo=A,3,S
-
-#OOBorxNo=A,4,S
-
-#OOAcDate=D,7,L
 
 #OORmkNo=A,3,L
 
@@ -202,28 +187,28 @@ T(2,#OOUpdateEmpNo+  +#OOUpdateEmpName)
 
 !修改
 #OOBUF2=X,156,S
-T(2,#FUNC2+#OOCustNo+#OOAcDate+#OORmkNo+#OORmkCode+#OORmkDesc)
+T(2,#FUNC2+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF2})
 
 !複製
 #OOBUF3=X,156,S
-T(2,#FUNC3+#OOCustNo+#OOAcDate+#OORmkNo+#OORmkCode+#OORmkDesc)
+T(2,#FUNC3+#OOCustNo+#OOEmpName+#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN3=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF3})
 
 !刪除
-#OOBUF4=X,200,S
-T(2,#FUNC4+#OOCustNo+#OOAcDate+#OORmkNo+#OORmkCode+#OORmkDesc)
+#OOBUF4=X,156,S
+T(2,#FUNC4+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN4=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF4})
 
 !查詢
 #OOBUF5=X,155,S
-T(2,#FUNC5+#OOCustNo+#OOAcDate+#OORmkNo+#OORmkCode+#OORmkDesc)
+T(2,#FUNC5+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF5})
@@ -236,9 +221,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF5})
 !------ 上行電文 ------
 <sub type="TIM">
 #CustNo
-#FacmNo
-#BormNo
-#BorxNo
 #END
 </sub>
 
@@ -247,10 +229,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF5})
 <sub type="TOM">
 TXFORM=L3072
 #OOCustNo
-#OOFacmNo
-#OOBormNo
-#OOBorxNo
-#OOAcDate
 #OORmkNo
 #OORmkCode
 #OORmkDesc
@@ -267,8 +245,8 @@ TXFORM=L3072
 
 <sub type="PART" name="L3072" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">
 [
-["[L3072]                                 帳務備忘錄明細資料查詢                                                                   "],
-["借戶戶號",#OCustNoX],
+["[L3072]                                 帳戶備忘錄明細資料查詢                                                                   "],
+["借戶戶號",#oCustNo],
 ["借款人戶名",#CustName],
 ]
 </sub>
@@ -290,17 +268,24 @@ TXFORM=L3072
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
-#OOAcDate=會計日期
-{width:80,align:'center'}
+
+!#OOCustNo=戶號
+!{width:80,align:'center'}
 
 #OORmkNo=序號
-{width:60,align:'center'}
+{width:80,align:'center'}
 
 #OORmkDesc=備忘錄說明
-{width:600}
+{width:500}
+
+#OOName=建立經辦姓名
+{width:120,align:'center'}
+
+#OOCreateDate=建立日期
+{width:100,align:'center'}
 
 #OOName1=最後修改經辦
-{width:120,align:'left'}
+{width:120,align:'center'}
 
 #OOLastUpdate=最後修改日期
 {width:100,align:'center'}

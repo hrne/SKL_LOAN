@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_AcReceivable_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcReceivable_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -442,7 +442,8 @@ BEGIN
     WITH lastDateData AS (
       SELECT MAX(BKPDAT) AS MAX_BKPDAT
       FROM LADACTP ACTP
-      WHERE ACTP.LMSACN != 601776
+      WHERE ACTP.LMSACN NOT IN (601776,610940)
+      -- 2022-05-19 智偉增加 from Lai : 暫收款排除610940
     )
     , ACT AS (
       -- 篩選出基本資料

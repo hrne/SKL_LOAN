@@ -342,7 +342,7 @@ public class BankAuthActCom extends TradeBuffer {
 						try {
 							bankAuthActService.update(tBankAuthAct, titaVo);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+							throw new LogicException(titaVo, "E0007", "BankAuthAct" + e.getErrorMsg());
 						}
 
 						insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
@@ -423,7 +423,7 @@ public class BankAuthActCom extends TradeBuffer {
 			try {
 				bankAuthActService.update(tBankAuthAct, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007", "BankAuthAct" + e.getErrorMsg());
 			}
 		}
 
@@ -437,7 +437,7 @@ public class BankAuthActCom extends TradeBuffer {
 					try {
 						bankAuthActService.update(tBankAuthAct, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+						throw new LogicException(titaVo, "E0007", "BankAuthAct" + e.getErrorMsg());
 					}
 
 					insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
@@ -505,7 +505,7 @@ public class BankAuthActCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "額度主檔" + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-			datalog.exec();
+			datalog.exec("銀行/郵局扣款授權成功");
 		}
 	}
 
@@ -545,7 +545,7 @@ public class BankAuthActCom extends TradeBuffer {
 		try {
 			postAuthLogService.update(tPostAuthLog, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
 		// 新增郵局授權記錄歷史檔
@@ -570,7 +570,7 @@ public class BankAuthActCom extends TradeBuffer {
 				try {
 					bankAuthActService.update(tBankAuthAct, titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+					throw new LogicException(titaVo, "E0007", "BankAuthAct" + e.getErrorMsg());
 				}
 				insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
 
@@ -578,6 +578,89 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 	}
 
+	public void update(TitaVo titaVo) throws LogicException {
+		this.info("bankAuthActCom updAchAuth ...");
+		
+		setVarValue(titaVo);
+		if ("700".equals(iRepayBank)) {
+			//同時更新頭險及期款
+			updatePost(titaVo,"1");
+			updatePost(titaVo,"2");
+		} else {
+			updateAch(titaVo);
+		}
+	}
+	
+	private void updatePost(TitaVo titaVo,String authCode) throws LogicException {
+		PostAuthLogId tPostAuthLogId = new PostAuthLogId();
+		tPostAuthLogId.setAuthCreateDate(parse.stringToInteger(titaVo.getParam("AuthCreateDate")));
+		tPostAuthLogId.setAuthApplCode("1");
+		tPostAuthLogId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+		tPostAuthLogId.setPostDepCode(titaVo.getParam("PostDepCode"));
+		tPostAuthLogId.setRepayAcct(titaVo.getParam("RepayAcct"));
+		tPostAuthLogId.setAuthCode(authCode);
+		PostAuthLog tPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
+		if (tPostAuthLog == null) {
+			throw new LogicException("E0015", "此筆授權資料檔找不到"); // 檢查錯誤
+		}
+		if ("00".equals(tPostAuthLog.getAuthErrorCode())) {
+			throw new LogicException("E0015", "需未授權成功才可變動"); // 檢查錯誤
+		}
+		
+		if ("Y".equals(tPostAuthLog.getPostMediaCode())) {
+			throw new LogicException("E0015", "已提出授權，不可變動"); // 檢查錯誤
+		}
+		
+		tPostAuthLog.setLimitAmt(iLimitAmt);
+		tPostAuthLog.setRelationCode(iRelationCode);
+		tPostAuthLog.setRelAcctName(iRelAcctName);
+		tPostAuthLog.setRelationId(iRelationId);
+		tPostAuthLog.setRelAcctBirthday(parse.stringToInteger(iRelAcctBirthday));
+		tPostAuthLog.setRelAcctGender(iRelAcctGender);
+
+		try {
+			postAuthLogService.update(tPostAuthLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+		}
+	}
+	
+	private void updateAch(TitaVo titaVo) throws LogicException {
+
+		AchAuthLogId tAchAuthLogId = new AchAuthLogId();
+		tAchAuthLogId.setAuthCreateDate(parse.stringToInteger(titaVo.getParam("AuthCreateDate")));
+		tAchAuthLogId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+		tAchAuthLogId.setRepayBank(titaVo.getParam("RepayBank"));
+		tAchAuthLogId.setRepayAcct(titaVo.getParam("RepayAcct"));
+		tAchAuthLogId.setCreateFlag("A");
+		AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
+		
+		if (tAchAuthLog == null) {
+			throw new LogicException("E0015", "此筆授權資料檔找不到"); // 檢查錯誤
+		}
+
+		if ("0".equals(tAchAuthLog.getAuthStatus())) {
+			throw new LogicException("E0015", "需未授權成功才可變動"); // 檢查錯誤
+		}
+		
+		if ("Y".equals(tAchAuthLog.getMediaCode())) {
+			throw new LogicException("E0015", "已提出授權，不可變動"); // 檢查錯誤
+		}
+		
+		
+		tAchAuthLog.setLimitAmt(iLimitAmt);
+		tAchAuthLog.setRelationCode(iRelationCode);
+		tAchAuthLog.setRelAcctName(iRelAcctName);
+		tAchAuthLog.setRelationId(iRelationId);
+		tAchAuthLog.setRelAcctBirthday(parse.stringToInteger(iRelAcctBirthday));
+		tAchAuthLog.setRelAcctGender(iRelAcctGender);
+
+		try {
+			achAuthLogService.update(tAchAuthLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "AchAuthLog:" + e.getErrorMsg());
+		}
+    }
 	/**
 	 * 維護ACH授權檔
 	 * 
@@ -612,7 +695,7 @@ public class BankAuthActCom extends TradeBuffer {
 		try {
 			achAuthLogService.update(tAchAuthLog, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
 
 		// 新增ACH授權記錄歷史檔
@@ -637,7 +720,7 @@ public class BankAuthActCom extends TradeBuffer {
 				try {
 					bankAuthActService.update(tBankAuthAct, titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+					throw new LogicException(titaVo, "E0007", "BankAuthAct" + e.getErrorMsg());
 				}
 				insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
 

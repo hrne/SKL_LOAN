@@ -65,7 +65,8 @@ public class L9702Report extends MakeReport {
 
 		String today = dDateUtil.getNowStringBc();
 
-		this.print(-1, 120, "日　　期：" + this.showBcDate(today, 1), "R");
+		this.print(-1, 116, "機密等級：　密", "R");
+		this.print(-2, 120, "日　　期：" + this.showBcDate(today, 1), "R");
 
 		this.print(-2, 3, "報　表：" + this.getRptCode());
 
@@ -77,11 +78,11 @@ public class L9702Report extends MakeReport {
 			this.print(-2, 60, "放款餘額及財收統計表－非企金", "C");
 		}
 
-		this.print(-2, 120, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+		this.print(-3, 120, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6),
 				"R");
 
-		this.print(-3, 115, "頁　　次：　" + this.getNowPage(), "R");
+		this.print(-4, 115, "頁　　次：　" + this.getNowPage(), "R");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(4);

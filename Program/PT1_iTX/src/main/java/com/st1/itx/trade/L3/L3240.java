@@ -32,6 +32,7 @@ import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -75,7 +76,9 @@ public class L3240 extends TradeBuffer {
 	AcDetailCom acDetailCom;
 	@Autowired
 	AcReceivableCom acReceivableCom;
-
+	@Autowired
+	public SendRsp sendRsp;
+	
 	private TitaVo titaVo;
 	private int iCustNo;
 	private int iFacmNo;
@@ -130,6 +133,13 @@ public class L3240 extends TradeBuffer {
 		iTellerNo = titaVo.getParam("TellerNo");
 		iTxtNo = titaVo.getParam("TxtNo");
 
+		
+		this.info("titaVo.getHsupCode() =" + titaVo.getHsupCode());
+		this.info("titaVo.getEmpNos().trim() =" + titaVo.getEmpNos().trim() );
+		if (!titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
+		}
+		
 		// Check Input
 
 		checkInputRoutine();

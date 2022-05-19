@@ -27,7 +27,7 @@ import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
-import com.st1.itx.db.domain.CustRmk;
+import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.LoanBook;
@@ -38,7 +38,7 @@ import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdCodeService;
-import com.st1.itx.db.service.CustRmkService;
+import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
@@ -196,7 +196,7 @@ public class TxBatchCom extends TradeBuffer {
 	public TxErrCodeService txErrCodeService;
 
 	@Autowired
-	public CustRmkService custRmkService;
+	public LoanCustRmkService loanCustRmkService;
 
 	@Autowired
 	public CdCodeService cdCodeService;
@@ -1454,17 +1454,17 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg += ", 應繳本利:" + this.unPayLoan;
 		}
 		// 顧客控管警訊檔
-		Slice<CustRmk> slCustRmk = custRmkService.findCustNo(tBatxDetail.getCustNo(), this.index, Integer.MAX_VALUE,
+		Slice<LoanCustRmk> slLoanCustRmk = loanCustRmkService.findCustNo(tBatxDetail.getCustNo(), this.index, Integer.MAX_VALUE,
 				titaVo);
-		if (slCustRmk != null) {
+		if (slLoanCustRmk != null) {
 			int rmkNo = 0;
 			String rmkDesc = "";
-			for (CustRmk tCustRmk : slCustRmk) {
-				if (parse.isNumeric(tCustRmk.getRmkCode()) && parse.stringToInteger(tCustRmk.getRmkCode()) >= 301
-						&& parse.stringToInteger(tCustRmk.getRmkCode()) <= 310) {
-					if (rmkNo == 0 || tCustRmk.getRmkNo() > rmkNo) {
-						rmkNo = tCustRmk.getRmkNo();
-						rmkDesc = tCustRmk.getRmkDesc();
+			for (LoanCustRmk tLoanCustRmk : slLoanCustRmk) {
+				if (parse.isNumeric(tLoanCustRmk.getRmkCode()) && parse.stringToInteger(tLoanCustRmk.getRmkCode()) >= 301
+						&& parse.stringToInteger(tLoanCustRmk.getRmkCode()) <= 310) {
+					if (rmkNo == 0 || tLoanCustRmk.getRmkNo() > rmkNo) {
+						rmkNo = tLoanCustRmk.getRmkNo();
+						rmkDesc = tLoanCustRmk.getRmkDesc();
 					}
 				}
 			}

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanCustRmk_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_LoanCustRmk_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -27,26 +27,23 @@ BEGIN
     INSERT INTO "LoanCustRmk"
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
          , S1."TRXDAT"                    AS "AcDate"              -- 會計日期 DECIMALD 8
-          ,S1."DOCSEQ"                    AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
-          ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
-          ,S1."DOCTXT"                    AS "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
-          ,CASE
+         , S1."DOCSEQ"                    AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
+         , '301'                          AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
+         , S1."DOCTXT"                    AS "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
+         , CASE
              WHEN S1."TRXDAT" > 0
              THEN TO_DATE(S1."TRXDAT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                            AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,CASE
+         , NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+         , CASE
              WHEN S1."TRXDAT" > 0
              THEN TO_DATE(S1."TRXDAT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+         , NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "DAT_LNDOCP" S1
-    LEFT JOIN "CustMain" on "CustMain"."CustNo" = S1."LMSACN"
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."TRXMEM"
-    WHERE S1."LMSACN" > 0
-      AND NVL("CustMain"."CustUKey",' ') <> ' '
     ;
 
     -- 記錄寫入筆數
@@ -63,6 +60,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_LoanCustRmk_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 /

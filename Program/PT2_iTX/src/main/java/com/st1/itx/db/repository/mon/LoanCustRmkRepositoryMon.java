@@ -23,19 +23,13 @@ import com.st1.itx.db.domain.LoanCustRmkId;
 public interface LoanCustRmkRepositoryMon extends JpaRepository<LoanCustRmk, LoanCustRmkId> {
 
   // CustNo = 
-  public Slice<LoanCustRmk> findAllByCustNoIsOrderByAcDateDescRmkNoAsc(int custNo_0, Pageable pageable);
+  public Slice<LoanCustRmk> findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(int custNo_0, Pageable pageable);
 
-  // CustNo = ,AND AcDate =  
-  public Optional<LoanCustRmk> findTopByCustNoIsAndAcDateIsOrderByRmkNoDesc(int custNo_0, int acDate_1);
+  // RmkCode =
+  public Slice<LoanCustRmk> findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(String rmkCode_0, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BorxNo = 
-  public Slice<LoanCustRmk> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByCreateDateAsc(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, Pageable pageable);
-
-  // BorxNo >= ,AND BorxNo <= 
-  public Slice<LoanCustRmk> findAllByBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByCreateDateAsc(int borxNo_0, int borxNo_1, Pageable pageable);
-
-  // CustNo >= ,AND CustNo <= ,AND BorxNo >= ,AND BorxNo <= 
-  public Slice<LoanCustRmk> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndBorxNoGreaterThanEqualAndBorxNoLessThanEqual(int custNo_0, int custNo_1, int borxNo_2, int borxNo_3, Pageable pageable);
+  // CustNo = 
+  public Optional<LoanCustRmk> findTopByCustNoIsOrderByRmkNoDesc(int custNo_0);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

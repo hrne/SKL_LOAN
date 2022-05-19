@@ -63,7 +63,7 @@ public class LM014Report extends MakeReport {
 	public void printHeader() {
 
 		// 設定字體大小
-		this.setFontSize(8);
+		this.setFontSize(9);
 
 		this.print(-1, 146, "機密等級：密");
 
@@ -187,16 +187,16 @@ public class LM014Report extends MakeReport {
 					print(1, 0, "｜　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　｜　　　　　　　　｜　　　　｜　　　　　　　｜　　　　　　　　｜　　　　｜　　　　　　　　｜　　　　｜　　　　　　　｜");
 					print(0, 4, tLDVo.get("F0"), "L");
 					print(0, 24, tLDVo.get("F1"), "L");
-					print(0, 53, formatAmt(tLDVo.get("F2"), 0), "R");
-					print(0, 62, tLDVo.get("F3"), "R");
-					print(0, 81, formatAmt(tLDVo.get("F4"), 0), "R");
-					print(0, 90, tLDVo.get("F5"), "R");
-					print(0, 97, tLDVo.get("F6"), "L");
-					print(0, 125, formatAmt(tLDVo.get("F7"), 0), "R");
-					print(0, 134, tLDVo.get("F8"), "R");
-					print(0, 153, formatAmt(tLDVo.get("F9"), 0), "R");
-					print(0, 162, tLDVo.get("F10"), "R");
-					print(0, 168, tLDVo.get("F11"), "L");
+					print(0, 60, formatAmt(tLDVo.get("F2"), 0), "R");
+					print(0, 72, tLDVo.get("F3"), "R");
+					print(0, 92, formatAmt(tLDVo.get("F4"), 0), "R");
+					print(0, 103, tLDVo.get("F5"), "R");
+					print(0, 111, tLDVo.get("F6"), "L");
+					print(0, 142, formatAmt(tLDVo.get("F7"), 0), "R");
+					print(0, 153, tLDVo.get("F8"), "R");
+					print(0, 173, formatAmt(tLDVo.get("F9"), 0), "R");
+					print(0, 184, tLDVo.get("F10"), "R");
+					print(0, 192, tLDVo.get("F11"), "L");
 				}
 
 				print(1, 0, "└─────────────────┴────────┴────┴────────┴────┴───────┴────────┴────┴────────┴────┴───────┘");

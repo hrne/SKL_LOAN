@@ -13,20 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 
-/**
- * Tita<br>
- * FUNCTIONCD=9,1<br>
- * CUSTNO=9,7<br>
- * FACMNO=9,3<br>
- * REPAYBANK=9,3<br>
- * REPAYACCTNO=9,14<br>
- * LIMAMT=9,14.2<br>
- * RELATIONIND=9,2<br>
- * RELACCTNAME=X,100<br>
- * RELACCTBIRTH=9,7<br>
- * RELACCTGENDER=X,1<br>
- * END=X,1<br>
- */
 
 @Service("L4410")
 @Scope("prototype")
@@ -52,8 +38,9 @@ public class L4410 extends TradeBuffer {
 		} else if ("2".equals(titaVo.getParam("FuncCode"))) {
 			// 授權狀態未授權先刪除後新增
 			if ("".equals(titaVo.getParam("AuthStatus").trim())) {
-				bankAuthActCom.del("A", titaVo);
-				bankAuthActCom.add("A", titaVo);
+//				bankAuthActCom.del("A", titaVo);
+//				bankAuthActCom.add("A", titaVo);
+				bankAuthActCom.update(titaVo);
 			} else {
 				if ("A".equals(iCreateFlag)) {
 					bankAuthActCom.mntAchAuth("0", titaVo);

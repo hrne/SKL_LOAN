@@ -6,9 +6,9 @@ create table "HlThreeLaqhcp" (
   "UnitCode" varchar2(6),
   "DistCode" varchar2(6),
   "DeptCode" varchar2(6),
-  "UnitName" varchar2(20),
-  "DistName" varchar2(20),
-  "DeptName" varchar2(20),
+  "UnitName" nvarchar2(20),
+  "DistName" nvarchar2(20),
+  "DeptName" nvarchar2(20),
   "EmpName" nvarchar2(15),
   "DepartOfficer" nvarchar2(15),
   "DirectorCode" varchar2(1),
@@ -30,7 +30,7 @@ create table "HlThreeLaqhcp" (
   "LastUpdateEmpNo" varchar2(6)
 );
 
-alter table "HlThreeLaqhcp" add constraint "HlThreeLaqhcp_PK" primary key("CalDate", "DeptCode", "DistCode", "UnitCode");
+alter table "HlThreeLaqhcp" add constraint "HlThreeLaqhcp_PK" primary key("DeptCode", "DistCode", "UnitCode");
 
 comment on table "HlThreeLaqhcp" is '單位、區部、部室業績累計檔';
 comment on column "HlThreeLaqhcp"."CalDate" is '年月日';

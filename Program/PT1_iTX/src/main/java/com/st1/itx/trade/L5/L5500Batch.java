@@ -151,7 +151,7 @@ public class L5500Batch extends TradeBuffer {
 			try {
 				hlThreeDetailService.deleteAll(lHlThreeDetail, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "HlThreeLaqhcp");
+				throw new LogicException(titaVo, "E0005", "HlThreeDetail");
 			}
 		}
 		String sql = "select ";
@@ -351,6 +351,7 @@ public class L5500Batch extends TradeBuffer {
 
 	// 單位、區部、部室業績累計檔
 	private void procHlThreeLaqhcp(TitaVo titaVo) throws LogicException {
+		this.info("L5500Batch.procHlThreeLaqhcp");
 		// delete
 		Slice<HlThreeLaqhcp> slHlThreeLaqhcp = hlThreeLaqhcpService.findAll(0, Integer.MAX_VALUE, titaVo);
 		List<HlThreeLaqhcp> lHlThreeLaqhcp = slHlThreeLaqhcp == null ? null : slHlThreeLaqhcp.getContent();
@@ -496,6 +497,7 @@ public class L5500Batch extends TradeBuffer {
 
 	// 區域中心房貸專員業績統計
 	private void procHlAreaLnYg6Pt(TitaVo titaVo) throws LogicException {
+		this.info("L5500Batch.procHlAreaLnYg6Pt begin");
 		// delete
 		Slice<HlAreaLnYg6Pt> slHlAreaLnYg6Pt = hlAreaLnYg6PtService.findCalDate(entday, 0, Integer.MAX_VALUE);
 		List<HlAreaLnYg6Pt> lHlAreaLnYg6Pt = slHlAreaLnYg6Pt == null ? null : slHlAreaLnYg6Pt.getContent();
@@ -575,6 +577,7 @@ public class L5500Batch extends TradeBuffer {
 	// 房貨專員目標檔案
 
 	private void procHlEmpLnYg5Pt(TitaVo titaVo) throws LogicException {
+		this.info("L5500Batch.procHlEmpLnYg5Pt begin");
 		// delete
 		Slice<HlEmpLnYg5Pt> slHlEmpLnYg5Pt = hlEmpLnYg5PtService.findCalDate(entday, 0, Integer.MAX_VALUE);
 		List<HlEmpLnYg5Pt> lHlEmpLnYg5Pt = slHlEmpLnYg5Pt == null ? null : slHlEmpLnYg5Pt.getContent();
@@ -648,6 +651,7 @@ public class L5500Batch extends TradeBuffer {
 
 	// 借款人資料
 	private void ProcHlCusData(TitaVo titaVo) throws LogicException {
+		this.info("L5500Batch.ProcHlCusData begin");
 		// initialize
 		Slice<HlCusData> slHlCusData = hlCusDataService.findAll(0, Integer.MAX_VALUE);
 		List<HlCusData> lHlCusData = slHlCusData == null ? null : slHlCusData.getContent();
@@ -655,7 +659,7 @@ public class L5500Batch extends TradeBuffer {
 			try {
 				hlCusDataService.deleteAll(lHlCusData, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "HlAreaData");
+				throw new LogicException(titaVo, "E0005", "HlCusData");
 			}
 		}
 
@@ -697,6 +701,7 @@ public class L5500Batch extends TradeBuffer {
 
 	// 區域資料主檔
 	private void ProcHlAreaData(TitaVo titaVo) throws LogicException {
+		this.info("L5500.ProcHlAreaData begin");
 		// initialize
 		Slice<HlAreaData> slHlAreaData = hlAreaDataService.findAll(0, Integer.MAX_VALUE);
 		List<HlAreaData> lHlAreaData = slHlAreaData == null ? null : slHlAreaData.getContent();

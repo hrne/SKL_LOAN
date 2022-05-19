@@ -442,7 +442,8 @@ BEGIN
     WITH lastDateData AS (
       SELECT MAX(BKPDAT) AS MAX_BKPDAT
       FROM LADACTP ACTP
-      WHERE ACTP.LMSACN != 601776
+      WHERE ACTP.LMSACN NOT IN (601776,610940)
+      -- 2022-05-19 智偉增加 from Lai : 暫收款排除610940
     )
     , ACT AS (
       -- 篩選出基本資料

@@ -35,7 +35,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		String iFactor3TotLimit = titaVo.getParam("Factor3TotLimit"); // 洗錢樣態三金額合計超過
 		String iFactorDays = titaVo.getParam("FactorDays"); // 統計期間天數
 //		String iFactorDays3 = titaVo.getParam("FactorDays3"); // 統計期間天數
-		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateS")) + 19110000; // 入帳日期起日
+		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateSL")) + 19110000; // 入帳日期起日
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE")) + 19110000; // 入帳日期迄日
 
 		this.info("findAll12 iFactor1TotLimit = " + iFactor1TotLimit);
@@ -136,9 +136,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    LEFT JOIN \"BankRmtf\" B ON  B.\"CustNo\" = M.\"CustNo\" ";
 		sql += "                            AND NVL(B.\"AmlRsp\",'9') in ('0','1','2') ";
 		sql += "                            AND M.\"EntryDate\" >= B.\"EntryDate\" ";
-		sql += "                            AND TO_DATE(M.\"EntryDate\",'YYYY-MM-DD') ";
-		sql += "                                - TO_DATE(B.\"EntryDate\",'YYYY-MM-DD')  ";
-		sql += "                                <= :iFactorDays ";
+		sql += "                            AND B.\"EntryDate\" BETWEEN :iEntryDateS AND :iEntryDateE ";
 		sql += "    WHERE NVL(B.\"RepayAmt\",0) > 0 ";
 		sql += "    GROUP BY M.\"CustNo\" ";
 		sql += "           , M.\"EntryDate\" ";
@@ -169,9 +167,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AND A.\"AcDate\" > 0 ";
 		sql += "                                  AND A.\"ReturnCode\" IN ('00') ";
 		sql += "                                  AND M.\"EntryDate\" >= A.\"EntryDate\" ";
-		sql += "                                  AND TO_DATE(M.\"EntryDate\",'YYYY-MM-DD') ";
-		sql += "                                      - TO_DATE(A.\"EntryDate\",'YYYY-MM-DD') ";
-		sql += "                                      <= :iFactorDays ";
+		sql += "                                  AND A.\"EntryDate\" BETWEEN :iEntryDateS AND :iEntryDateE ";
 		sql += "    WHERE NVL(A.\"RepayAmt\",0) > 0 ";
 		sql += "    GROUP BY M.\"CustNo\" ";
 		sql += "           , M.\"EntryDate\" ";
@@ -202,9 +198,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND P.\"ProcNoteCode\" IN ('00') ";
 		sql += "                                   AND P.\"AcDate\" > 0 ";
 		sql += "                                   AND M.\"EntryDate\" >= P.\"TransDate\" ";
-		sql += "                                   AND TO_DATE(M.\"EntryDate\",'YYYY-MM-DD')  ";
-		sql += "                                       - TO_DATE(P.\"TransDate\",'YYYY-MM-DD')  ";
-		sql += "                                       <= :iFactorDays ";
+		sql += "                                   AND P.\"TransDate\" BETWEEN :iEntryDateS AND :iEntryDateE ";
 		sql += "    WHERE NVL(P.\"RepayAmt\",0) > 0 ";
 		sql += "    GROUP BY M.\"CustNo\" ";
 		sql += "           , M.\"EntryDate\" ";
@@ -235,9 +229,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND C.\"StatusCode\" =  '1' "; // 1: 兌現入帳
 		sql += "                              AND C.\"EntryDate\" > 0 ";
 		sql += "                              AND M.\"EntryDate\" >= C.\"EntryDate\" ";
-		sql += "                              AND TO_DATE(M.\"EntryDate\",'YYYY-MM-DD') ";
-		sql += "                                  - TO_DATE(C.\"EntryDate\",'YYYY-MM-DD') ";
-		sql += "                                  <= :iFactorDays  ";
+		sql += "                              AND C.\"EntryDate\" BETWEEN :iEntryDateS AND :iEntryDateE ";
 		sql += "    WHERE NVL(C.\"ChequeAmt\",0) > 0 ";
 		sql += "    GROUP BY M.\"CustNo\" ";
 		sql += "           , M.\"EntryDate\" ";
@@ -330,7 +322,6 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iFactor2Count", iFactor2Count);
 		query.setParameter("iFactor2AmtStart", iFactor2AmtStart);
 		query.setParameter("iFactor2AmtEnd", iFactor2AmtEnd);
-		query.setParameter("iFactorDays", iFactorDays);
 		query.setParameter("iEntryDateS", iEntryDateS);
 		query.setParameter("iEntryDateE", iEntryDateE);
 		return this.convertToMap(query);
@@ -343,7 +334,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		String iFactor2AmtEnd = titaVo.getParam("Factor2AmtEnd"); // 洗錢樣態二單筆迄止金額
 		String iFactor3TotLimit = titaVo.getParam("Factor3TotLimit"); // 洗錢樣態三金額合計超過
 		String iFactorDays3 = titaVo.getParam("FactorDays3"); // 統計期間天數
-		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateS")) + 19110000; // 入帳日期起日
+		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateSL3")) + 19110000; // 入帳日期起日
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE3")) + 19110000; // 入帳日期迄日
 
 		this.info("findAll3 iFactor3TotLimit = " + iFactor3TotLimit);
@@ -378,9 +369,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    LEFT JOIN \"BankRmtf\" B ON B.\"CustNo\" = M.\"CustNo\" \n";
 		sql += "                          AND NVL(B.\"AmlRsp\",'9') in ('0','1','2') \n";
 		sql += "                          AND M.\"EntryDate\" >= B.\"EntryDate\" \n";
-		sql += "                          AND TO_DATE(M.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                              - TO_DATE(B.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                              <= :iFactorDays3 \n";
+		sql += "                          AND B.\"EntryDate\" BETWEEN :iEntryDateS AND :iEntryDateE ";
 		sql += "    WHERE M.\"Factor3\" = 1 \n";
 		sql += "      AND B.\"DscptCode\" IN ('0087','0001') \n";
 		sql += "    GROUP BY M.\"CustNo\", M.\"EntryDate\" \n";
@@ -406,17 +395,18 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iFactor3TotLimit", iFactor3TotLimit);
-		query.setParameter("iFactorDays3", iFactorDays3);
 		query.setParameter("iEntryDateS", iEntryDateS);
 		query.setParameter("iEntryDateE", iEntryDateE);
 		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findChkDtl12(TitaVo titaVo) throws Exception {
-		String iFactorDays = titaVo.getParam("FactorDays"); // 統計期間天數
 		String iFactor2AmtStart = titaVo.getParam("Factor2AmtStart"); // 洗錢樣態二單筆起始金額
 		String iFactor2AmtEnd = titaVo.getParam("Factor2AmtEnd"); // 洗錢樣態二單筆迄止金額
 		String sql = "　";
+		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateSL")) + 19110000; // 入帳日期起日
+		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE")) + 19110000; // 入帳日期迄日
+		
 		sql += " SELECT \n";
 		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期
 		sql += " ,F.\"Factor\"               AS F1 \n"; // 交易樣態
@@ -429,8 +419,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,F.\"TxAmt\"                AS F7 \n"; // 交易金額
 		sql += " ,F.\"TotalCnt\"             AS F8 \n"; // 累積筆數
 		sql += " ,F.\"TotalAmt\"             AS F9 \n"; // 累積金額
-		sql += " ,TO_CHAR(TO_DATE(F.\"EntryDate\",'YYYY-MM-DD') - " + iFactorDays + ",'YYYYMMDD') \n";
-		sql += "                             AS F10 \n"; // 統計期間起日
+		sql += " ,:EntryDateS                AS F10 \n"; // 統計期間起日
 		sql += "  FROM (                                            \n";
 		sql += "        SELECT                                           \n";
 		sql += "         D1.\"EntryDate\"            AS \"EntryDate\"    \n";
@@ -447,9 +436,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"BankRmtf\" B2                        \n";
 		sql += "               ON  B2.\"CustNo\" = D1.\"CustNo\"         \n";
 		sql += "              AND  NVL(B2.\"AmlRsp\",'9') in ('0','1','2') ";
-		sql += "              AND  (TO_DATE(D1.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                 -  TO_DATE(B2.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
+		sql += "              AND  B2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE NVL(B2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
@@ -467,9 +454,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON A2.\"CustNo\" =  D2.\"CustNo\"         \n";
 		sql += "              AND A2.\"AcDate\" > 0                      \n";
 		sql += "              AND A2.\"ReturnCode\" IN ('00')            \n";
-		sql += "              AND (TO_DATE(D2.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                -  TO_DATE(A2.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
+		sql += "              AND A2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE NVL(A2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
@@ -487,9 +472,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON P2.\"CustNo\" =  D3.\"CustNo\"         \n";
 		sql += "              AND P2.\"ProcNoteCode\" IN ('00')          \n";
 		sql += "              AND P2.\"AcDate\" > 0                      \n";
-		sql += "              AND (TO_DATE(D3.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                -  TO_DATE(P2.\"TransDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
+		sql += "              AND P2.\"TransDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE NVL(P2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
@@ -507,9 +490,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON C2.\"CustNo\" =  D4.\"CustNo\"         \n";
 		sql += "              AND C2.\"EntryDate\" > 0                   \n";
 		sql += "              AND C2.\"StatusCode\" =  '1'               \n"; // 1: 兌現入帳
-		sql += "              AND (TO_DATE(D4.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                -  TO_DATE(C2.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays + "\n";
+		sql += "              AND C2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE NVL(C2.\"CustNo\",0)  > 0                  \n";
 		sql += "      ) F                                                \n";
 		sql += " WHERE (CASE WHEN F.\"Factor\" = 1                       \n";
@@ -519,17 +500,23 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND F.\"TxAmt\" <= " + iFactor2AmtEnd + "\n";
 		sql += "                  THEN 1                                 \n";
 		sql += "        END ) > 0                                        \n";
+		sql += "   AND F.\"EntryDate\" = :EntryDateE ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
+		query.setParameter("EntryDateS", iEntryDateS);
+		query.setParameter("EntryDateE", iEntryDateE);
+		
 		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findChkDtl3(TitaVo titaVo) throws Exception {
-		String iFactorDays3 = titaVo.getParam("FactorDays3"); // 統計期間天數
+		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateSL3")) + 19110000; // 入帳日期起日
+		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE3")) + 19110000; // 入帳日期迄日
 		String sql = "　";
 		sql += " SELECT \n";
 		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期
@@ -543,8 +530,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,F.\"TxAmt\"                AS F7 \n"; // 交易金額
 		sql += " ,F.\"TotalCnt\"             AS F8 \n"; // 累積筆數
 		sql += " ,F.\"TotalAmt\"             AS F9 \n"; // 累積金額
-		sql += " ,TO_CHAR(TO_DATE(F.\"EntryDate\",'YYYY-MM-DD') - " + iFactorDays3 + ",'YYYYMMDD') \n";
-		sql += "                             AS F10 \n"; // 統計期間起日
+		sql += " ,:EntryDateS                AS F10 \n"; // 統計期間起日
 		sql += "  FROM (                                            \n";
 		sql += "        SELECT                                           \n";
 		sql += "         D1.\"EntryDate\"            AS \"EntryDate\"    \n";
@@ -561,9 +547,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"BankRmtf\" B2                        \n";
 		sql += "               ON  B2.\"CustNo\" = D1.\"CustNo\"         \n";
 		sql += "              AND  NVL(B2.\"AmlRsp\",'9') in ('0','1','2') ";
-		sql += "              AND  (TO_DATE(D1.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                 -  TO_DATE(B2.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays3 + "\n";
+		sql += "              AND  B2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE D1.\"Rational\" = '?'                      \n";
 		sql += "          AND NVL(B2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
@@ -582,9 +566,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON A2.\"CustNo\" =  D2.\"CustNo\"         \n";
 		sql += "              AND A2.\"AcDate\" > 0                      \n";
 		sql += "              AND A2.\"ReturnCode\" IN ('00')            \n";
-		sql += "              AND (TO_DATE(D2.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                -  TO_DATE(A2.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays3 + "\n";
+		sql += "              AND A2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE D2.\"Rational\" = '?'                      \n";
 		sql += "          AND NVL(A2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
@@ -603,9 +585,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON P2.\"CustNo\" =  D3.\"CustNo\"         \n";
 		sql += "              AND P2.\"ProcNoteCode\" IN ('00')          \n";
 		sql += "              AND P2.\"AcDate\" > 0                      \n";
-		sql += "              AND (TO_DATE(D3.\"EntryDate\",'YYYY-MM-DD') \n";
-		sql += "                -  TO_DATE(P2.\"TransDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays3 + "\n";
+		sql += "              AND P2.\"TransDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE D3.\"Rational\" = '?'                      \n";
 		sql += "          AND NVL(P2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
@@ -624,9 +604,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON C2.\"CustNo\" =  D4.\"CustNo\"         \n";
 		sql += "              AND C2.\"EntryDate\" > 0                   \n";
 		sql += "              AND C2.\"StatusCode\" =  '1'               \n"; // 1: 兌現入帳
-		sql += "              AND (TO_DATE(D4.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                -  TO_DATE(C2.\"EntryDate\",'YYYY-MM-DD')\n";
-		sql += "                   )  BETWEEN 0 AND " + iFactorDays3 + "\n";
+		sql += "              AND C2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
 		sql += "        WHERE D4.\"Rational\" = '?'                      \n";
 		sql += "          AND NVL(C2.\"CustNo\",0)  > 0                  \n";
 		sql += "      ) F                                                \n";
@@ -635,12 +613,17 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  THEN 1                                 \n";
 		sql += "             ELSE 0                                      \n";
 		sql += "        END ) > 0                                        \n";
+		sql += "   AND F.\"EntryDate\" = :EntryDateE ";
 
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
+		query.setParameter("EntryDateS", iEntryDateS);
+		query.setParameter("EntryDateE", iEntryDateE);
+		
 		return this.convertToMap(query);
 	}
 }

@@ -104,11 +104,25 @@ D(8)
 @A(DATE,0,#EntryDateS)
 V(5,790101,#DATE)
 
+! 退回 FactorDays 天
+! 再加 1 天, 因迄日也含
+#EntryDateSL8=D,8,S
+E(0,#EntryDateS+19110000)
+D(6,3,#EntryDateSL8,#FactorDays)
+D(6,2,#EntryDateSL8,1)
+
 #EntryDateSL=D,7,L
-E(0,#EntryDateS)
+E(0,#EntryDateSL8-19110000)
+
+! 退回 FactorDays3 天
+! 再加 1 天, 因迄日也含
+#EntryDateSL38=D,8,S
+E(0,#EntryDateS+19110000)
+D(6,3,#EntryDateSL38,#FactorDays3)
+D(6,2,#EntryDateSL38,1)
 
 #EntryDateSL3=D,7,L
-E(0,#EntryDateS)
+E(0,#EntryDateSL38-19110000)
 
 !統計期間天數
 #FactorDays=A,3,S
@@ -129,19 +143,11 @@ E(0,#EntryDateS)
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,S
 
-#EntryDateE8=D,8,S
-E(0,#EntryDateS+19110000)
-D(6,2,#EntryDateE8,#FactorDays)
-
 #EntryDateE=D,7,L
-E(0,#EntryDateE8-19110000)
-
-#EntryDateE38=D,8,S
-E(0,#EntryDateS+19110000)
-D(6,2,#EntryDateE38,#FactorDays3)
+E(0,#EntryDateS)
 
 #EntryDateE3=D,7,L
-E(0,#EntryDateE38-19110000)
+E(0,#EntryDateS)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -172,7 +178,8 @@ T(3,[L8202] 疑似洗錢樣態資料產生)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#EntryDateS
+#EntryDateSL
+#EntryDateSL3
 #EntryDateE
 #EntryDateE3
 #Factor1TotLimit

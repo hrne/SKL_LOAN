@@ -291,7 +291,5 @@ TXFORM=L3072
 {width:100,align:'center'}
 ^
 
-<include src="PRT.icf::INQ01.sel" map="i=L3072;cpi=15"/>
-
 <include src="PRT.icf::INQ01.sel"/>
 </sub>

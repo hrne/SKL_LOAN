@@ -50,6 +50,7 @@ public class L4101ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "    LEFT JOIN \"CdLoanNotYet\" cl on cl.\"NotYetCode\" = ln.\"NotYetCode\""; 
 		sql +=  "    WHERE";
 		sql +=  "    lb.\"DrawdownDate\" = :drawdowndate";
+		sql +=  "    AND lb.\"BormNo\" >= 900";
 		sql +=  "    ORDER BY ln.\"CustNo\",lb.\"FacmNo\",lb.\"BormNo\",ln.\"NotYetCode\"";
 		this.info("sql=" + sql);
 		Query query;

@@ -15,7 +15,6 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
@@ -226,20 +225,17 @@ public class L3005 extends TradeBuffer {
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());
 			if ("1".equals(ln.getTitaHCode()) || "3".equals(ln.getTitaHCode())) {
-				if ("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
-						|| "L3230".equals(ln.getTitaTxCd())) {
-					occursList.putParam("OODesc", "暫收款訂正");
-				} else {
-					occursList.putParam("OODesc", "訂正");
-				}
+//				if ("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
+//						|| "L3230".equals(ln.getTitaTxCd())) {
+//					occursList.putParam("OODesc", "暫收款訂正");
+//				} else {
+//					occursList.putParam("OODesc", "訂正");
+//				}
 			} else {
 				occursList.putParam("OODesc", ln.getDesc());
 			}
 			// 先確認此戶有備忘錄 有才給備忘錄按鈕
-			Slice<LoanCustRmk> sLoanCustRmk = loanCustRmkService.borxNoAll(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), ln.getBorxNo(), this.index, this.limit, titaVo);
-			List<LoanCustRmk> lLoanCustRmk = sLoanCustRmk == null ? null : sLoanCustRmk.getContent();
 			
-			occursList.putParam("OOHasRemark", lLoanCustRmk != null && !lLoanCustRmk.isEmpty() ? "Y" : "N");	
 			occursList.putParam("OOFacmNo", ln.getFacmNo());
 			occursList.putParam("OOBormNo", ln.getBormNo());
 			occursList.putParam("OOBorxNo", ln.getBorxNo());

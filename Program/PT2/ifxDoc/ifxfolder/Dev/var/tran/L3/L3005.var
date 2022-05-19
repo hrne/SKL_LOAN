@@ -518,19 +518,10 @@ IF(#OOAcFg=="",T(3,內容),T(3,內容查詢))
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 
-!查詢buf
-#OOBTNRMKNTXBUF=X,25,S
-T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOAcDate)
-
-!buf
-!最新格式參照L3702 功能1
-!新增時: FunCd-CustNo-FacmNo-BormNo-BorxNo-AcDate 1-7-3-3-4-7
-#OOBUFCreate=X,26,S
-T(2,1+#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OOAcDate)
-
-!有備忘錄時提供查詢按鈕，否則為新增按鈕
-#OOBTNRMK=X,1,S
-C(5,#OOHasRemark,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3072;text=查詢;ntxbuf=#OOBTNRMKNTXBUF}),BIND(grid,{ cmd=CHAIN; ntxcd=L3702;text=新增;ntxbuf=#OOBUFCreate}))
+!維護
+#OOBTNRMK=X,77,S
+T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OONote)
+BIND(grid,{ cmd=CHAIN; ntxcd=L3703;text=維護;ntxbuf=#OOBTNRMK})
 
 !分錄
 #OOBUF3=X,32,S
@@ -620,9 +611,6 @@ TXFORM=L3005
 ! #OOBTN2=
 ! {width:60,search:false,formatter:'cust:bind-button:備忘錄;L2072 顧客控管警訊明細資料查詢',align:'center',canExport:false}
 
-#OOBTNRMK=備忘錄
-{width:55,search:false,formatter:'cust:bind-button:查詢;L3072 帳務備忘錄明細資料查詢',align:'center',canExport:false}
-
 #OOEntryDate=入帳日期
 {width:80,align:'center'}
 
@@ -659,6 +647,8 @@ TXFORM=L3005
 #OONote=摘要
 {width:90}
 
+#OOBTNRMK=摘要
+{width:55,search:true,formatter:'cust:bind-button:維護;L3703 帳務明細摘要維護',align:'center',canExport:false}
 
 #OOBTN3=分錄
 {width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}

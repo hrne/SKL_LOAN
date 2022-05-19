@@ -28,12 +28,11 @@ public class LoanCustRmkId implements Serializable {
   private int custNo = 0;
 
   // 會計日期
-  /* 2022.4.10 by eric轉換需同步調整邏輯 */
+  /* 新增此筆帳務備忘錄時的系統會計日期 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
   // 備忘錄序號
-  /* 轉換需同步調整邏輯 */
   @Column(name = "`RmkNo`")
   private int rmkNo = 0;
 
@@ -67,7 +66,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 2022.4.10 by eric轉換需同步調整邏輯
+	* 新增此筆帳務備忘錄時的系統會計日期
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -76,7 +75,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 2022.4.10 by eric轉換需同步調整邏輯
+	* 新增此筆帳務備忘錄時的系統會計日期
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/
@@ -86,7 +85,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 備忘錄序號<br>
-	* 轉換需同步調整邏輯
+	* 
 	* @return Integer
 	*/
   public int getRmkNo() {
@@ -95,7 +94,7 @@ public class LoanCustRmkId implements Serializable {
 
 /**
 	* 備忘錄序號<br>
-	* 轉換需同步調整邏輯
+	* 
   *
   * @param rmkNo 備忘錄序號
 	*/

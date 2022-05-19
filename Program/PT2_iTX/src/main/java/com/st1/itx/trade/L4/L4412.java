@@ -20,23 +20,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunctionCode=9,1<br>
- * CustId=X,10<br>
- * AuthApplCode=X,1<br>
- * CustNo=9,7<br>
- * PostDepCode=X,1<br>
- * RepayAcct=9,14<br>
- * RepayAcctSeq=9,2<br>
- * AuthCode=9,1<br>
- * RelationCode=9,2<br>
- * RelAcctName=X,100<br>
- * RelAcctBirthday=9,7<br>
- * RelAcctGender=X,1<br>
- * AuthCreatedate=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L4412")
 @Scope("prototype")
@@ -94,8 +77,9 @@ public class L4412 extends TradeBuffer {
 
 			// 授權狀態未授權先刪除後新增
 			if ("".equals(titaVo.getParam("AuthErrorCode").trim())) {
-				bankAuthActCom.del("A", titaVo);
-				bankAuthActCom.add("A", titaVo);
+//				bankAuthActCom.del("A", titaVo);
+//				bankAuthActCom.add("A", titaVo);
+				bankAuthActCom.update(titaVo);
 			} else {
 				if ("1".equals(iAuthApplCode)) {
 					bankAuthActCom.mntPostAuth("0", titaVo);
