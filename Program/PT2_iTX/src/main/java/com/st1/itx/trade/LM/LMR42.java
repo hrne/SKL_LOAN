@@ -48,7 +48,19 @@ public class LMR42 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
-		Slice<MonthlyLM042RBC> sMonthlyLM042RBC= checkAndUpdateData(titaVo, yearMonth);
+		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
+		
+		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
+
+		// 判斷有無當月資料
+		if (sMonthlyLM042RBC == null) {
+			this.info("insert data");
+			// 新增當月資料
+			insertData(titaVo, yearMonth);
+
+			// 新增後再次搜尋
+			sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
+		}
 
 		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
 

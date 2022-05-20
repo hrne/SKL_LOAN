@@ -221,7 +221,7 @@ public class LM057Report extends MakeReport {
 			case "C2":
 			case "C5":
 			case "C7":
-				colTotal = colTotal.add(amount);
+		
 				
 				makeExcel.setValue(19, 4, colTotal, "#,##0");
 

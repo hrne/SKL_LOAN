@@ -239,6 +239,7 @@ public class LM085Report extends MakeReport {
 			for (Map<String, String> r : dataList) {
 				// 因欄位不同無法更改
 				col = enToNumber(r.get("F0").toString().substring(0, 1)) + 4;
+				// 限制超出L欄以後不設值 略過
 				if (col > 12) {
 					break;
 				}
@@ -247,7 +248,6 @@ public class LM085Report extends MakeReport {
 
 //				this.info("col=" + col + ",row=" + row);
 
-				// 限制超出L欄以後不設值 略過
 
 				makeExcel.setValue(row, col, amt, "#,##0", "R");
 
@@ -340,14 +340,22 @@ public class LM085Report extends MakeReport {
 			varRow++;
 		}
 
-		for (int r = 45; r <= 55; r++) {
-			makeExcel.formulaCalculate(r, 5);
-		}
-
-		for (int c = 2; c <= 6; c++) {
-			makeExcel.formulaCalculate(56, c);
-			makeExcel.formulaCalculate(57, c);
-		}
+//		for (int r = 45; r <= 55; r++) {
+//			makeExcel.formulaCalculate(r, 5);
+//		}
+//
+//		for (int c = 2; c <= 6; c++) {
+//			makeExcel.formulaCalculate(56, c);
+//			makeExcel.formulaCalculate(57, c);
+//		}
+		
+		makeExcel.formulaCalculate(varRow, 2);
+		makeExcel.formulaCalculate(varRow, 4);
+		makeExcel.formulaCalculate(varRow, 6);
+		makeExcel.formulaCalculate(varRow+1, 2);
+		makeExcel.formulaCalculate(varRow+1, 4);
+		makeExcel.formulaCalculate(varRow+1, 6);
+		
 
 	}
 

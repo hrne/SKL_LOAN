@@ -74,11 +74,14 @@ public class LM042p extends TradeBuffer {
 
 		
 		
-		int yearMonth = thisYM;
+//		int yearMonth = thisYM;
+		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
 		int tYMD = ymd(yearMonth, 0);//本月底日
 		int lYMD = ymd(yearMonth, -1);//上月底日
 
+		
+		
 		checkAndUpdateData(titaVo, yearMonth);
 
 		this.info("LM042p titaVo.getTxcd() = " + titaVo.getTxcd());
