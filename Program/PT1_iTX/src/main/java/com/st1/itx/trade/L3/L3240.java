@@ -132,14 +132,13 @@ public class L3240 extends TradeBuffer {
 		iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		iTellerNo = titaVo.getParam("TellerNo");
 		iTxtNo = titaVo.getParam("TxtNo");
-
 		
 		this.info("titaVo.getHsupCode() =" + titaVo.getHsupCode());
 		this.info("titaVo.getEmpNos().trim() =" + titaVo.getEmpNos().trim() );
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
 		}
-		
+
 		// Check Input
 
 		checkInputRoutine();
@@ -372,36 +371,6 @@ public class L3240 extends TradeBuffer {
 						tLoanBorMain.getFreqBase(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
 						tLoanBorMain.getPrevRepaidDate(), tLoanBorMain.getMaturityDate(), tLoanBorMain.getGraceDate()));
 
-		BigDecimal wkDueAmt = BigDecimal.ZERO;
-
-		// 計算期金
-		// 攤還方式=3.本息平均法 且 攤還額異動碼=1:變 且利率有變動
-		if ("3".equals(tLoanBorMain.getAmortizedCode()) && "1".equals(tFacMain.getExtraRepayCode())) {
-			// 重新計算寬限期數
-			tLoanBorMain.setGracePeriod(loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(),
-					tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(),
-					tLoanBorMain.getSpecificDd(), tLoanBorMain.getGraceDate()));
-
-			int wkRestPeriod = 0;
-			int wkGracePeriod = 0;
-
-			// 期數不同且利率有變動 ==> 須調整期金
-			// 過了寬限期，用剩餘期數計算；寬緩期內用總期數期減寬限期數計算
-			if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getGraceDate()) {
-				wkRestPeriod = tLoanBorMain.getTotalPeriod() - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(),
-						tLoanBorMain.getRepayFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-						tLoanBorMain.getPrevPayIntDate());
-				wkGracePeriod = 0;
-			} else {
-				wkRestPeriod = tLoanBorMain.getTotalPeriod();
-				wkGracePeriod = tLoanBorMain.getGracePeriod();
-			}
-
-			wkDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(), "3",
-					tLoanBorMain.getFreqBase(), wkRestPeriod, wkGracePeriod, tLoanBorMain.getPayIntFreq(),
-					tLoanBorMain.getFinalBal(), titaVo);
-			tLoanBorMain.setDueAmt(wkDueAmt);
-		}
 		wkNewBorxNo = tLoanBorMain.getLastBorxNo() + 1;
 
 		tLoanBorMain.setLastBorxNo(wkNewBorxNo);

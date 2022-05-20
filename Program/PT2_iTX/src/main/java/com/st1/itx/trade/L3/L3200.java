@@ -499,9 +499,9 @@ public class L3200 extends TradeBuffer {
 			loanBookRoutine();
 		}
 
-		// 疑似洗錢交易訪談記錄檔處理
+		// 更新疑似洗錢交易訪談記錄檔
 		if (iRepayType == 2) {
-			mlaundryRecordRoutine();
+			loanCom.updateMlaundryRecord(iCustNo, iFacmNo, iBormNo, iEntryDate, iTxAmt, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -2087,7 +2087,7 @@ public class L3200 extends TradeBuffer {
 	private void mlaundryRecordRoutine() throws LogicException {
 		this.info("mlaundryRecordRoutine ...");
 		Slice<MlaundryRecord> slMlaundryRecord = mlaundryRecordService.findCustNoEq(iCustNo, iFacmNo,
-				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
+				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate + 19110000, this.index,
 				Integer.MAX_VALUE, titaVo);
 		if (slMlaundryRecord == null) {
 			return;

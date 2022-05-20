@@ -136,7 +136,7 @@ C(2,#FunCd,S,S,T(3,*),S,T(3, ),T(3, ))
 IF(#FunCd==1 || #FunCd==2,T(F,@RmkCode,1),T(F,@RmkCode,0)T(F,@RmkDesc,0))
 IF(#FunCd==2,T(F,@CustNo,0)HIDE(#BTN1),$)
 IF(#FunCd==1,T(F,@RmkNo,0),T(F,@RmkNo,0))
-IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustNo,0)T(F,@RmkNo,0),$ )
+IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustNo,0)T(F,@RmkCode,0),$ )
 
 
 #BUF1=X,18,S
@@ -163,6 +163,7 @@ A(ID_UNINO,0,#CUSTID)
 <include src="ROM.icf::L1R01.dec"/>
 !調RIML1R01取CustName
 #RimL1r01=X,1,S
+E(0,@RimFunCd,4)
 E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#RimL1r01,L1R01)
@@ -184,8 +185,8 @@ T(4,TLRNO$)
 ![經辦姓名]
 !自動顯示不必輸入
 #EmpName=X,10,L
-T(4,EMPNM$)
-
+!T(4,EMPNM$)
+IF(#FunCd==1 || #FunCd==2,T(F,@CustNo,0)T(4,EMPNM$)HIDE(#BTN1),$)
 
 
 
@@ -216,16 +217,20 @@ E(0,@RmkNo,#L3r30RmkNo)
 
 !調RIML3R30
 #RimL3r30find=X,1,S
-C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,$,S)
+C(3,#FunCd,5,$,S)
+E(0,@RimFunCd,4)
 E(0,@RimFunCd,5)
 E(0,@RimCustNo,#CustNo)
+E(0,@RimRmkNo,0)
 E(0,@RimRmkNo,#RmkNo)
 RESET_RIM(#RimL3r30find,L3R30)
 S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo)
 R(1,L3R30)
 
 #checkL3r30=X,1,S
-C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,S,$)
+C(3,#FunCd,5,S,$)
 E(0,@RmkCode,#L3r30RmkCode)
 T(2,@RmkDesc,#L3r30RmkDesc)
 

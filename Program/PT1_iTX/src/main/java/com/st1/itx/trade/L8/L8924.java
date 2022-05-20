@@ -142,14 +142,20 @@ public class L8924 extends TradeBuffer {
 				
 				String beforeAfter = getBeforeAfter(txDataLog);
 				occursList.putParam("OReason", beforeAfter != null && !beforeAfter.trim().isEmpty() ? beforeAfter : txDataLog.getReason());
-
+				
 				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
 
 				occursList.putParam("OLastUpdate", lastUpdate);
+				
+				// 此次修改是主管覆核?
+				// (放行時 update, 最後修改者仍會是經辦代號
+				//  所以用這種比較 hacky 的作法...)		
+				// 同樣邏輯在 L8925 有用到
+				boolean isSupervisor = txDataLog.getReason() != null && "主管覆核".equals(txDataLog.getReason().trim());
 
-				String lastEmp = txDataLog.getLastUpdateEmpNo();
-				if (txDataLog.getLastUpdateEmpNo() != null && txDataLog.getLastUpdateEmpNo().toString().length() > 0) {
-					CdEmp cdEmp = cdEmpService.findById(txDataLog.getLastUpdateEmpNo(), titaVo);
+				String lastEmp = isSupervisor ? txDataLog.getTlrNo() : txDataLog.getLastUpdateEmpNo();
+				if (lastEmp != null && lastEmp.length() > 0) {
+					CdEmp cdEmp = cdEmpService.findById(lastEmp, titaVo);
 					if (cdEmp != null) {
 						lastEmp += " " + StringCut.stringCut(cdEmp.getFullname(), 0, 10);
 					}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
@@ -19,6 +20,7 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
+import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.domain.TxTemp;
@@ -29,6 +31,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
@@ -84,6 +87,8 @@ public class LoanCom extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public TxRecordService txRecordService;
+	@Autowired
+	public MlaundryRecordService mlaundryRecordService;
 
 	@Autowired
 	Parse parse;
@@ -1231,6 +1236,48 @@ public class LoanCom extends TradeBuffer {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+		}
+	}
+
+	/**
+	 *  更新疑似洗錢交易訪談記錄檔
+	 * @param iCustNo 戶號
+	 * @param iFacmNo 額度
+	 * @param iBormNo 撥款
+	 * @param iEntryDate 入帳日
+	 * @param iRepayAmt 還款金額
+	 * @param titaVo
+	 * @throws LogicException
+	 */
+	public void updateMlaundryRecord(int iCustNo, int iFacmNo, int iBormNo, int iEntryDate, BigDecimal iRepayAmt,
+			TitaVo titaVo) throws LogicException {
+		this.info("mlaundryRecordRoutine ...");
+		Slice<MlaundryRecord> slMlaundryRecord = mlaundryRecordService.findCustNoEq(iCustNo, iFacmNo,
+				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate + 19110000, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slMlaundryRecord == null) {
+			return;
+		}
+		for (MlaundryRecord t : slMlaundryRecord.getContent()) {
+			MlaundryRecord tMlaundryRecord = mlaundryRecordService.holdById(t, titaVo);
+			if (titaVo.isHcodeNormal()) {
+				if (t.getActualRepayDate() == 0) {
+					tMlaundryRecord.setActualRepayDate(iEntryDate);
+					tMlaundryRecord.setActualRepayAmt(iRepayAmt);// 實際還本金額
+					break;
+				}
+			} else {
+				if (t.getActualRepayDate() == iEntryDate) {
+					tMlaundryRecord.setActualRepayDate(0);
+					tMlaundryRecord.setActualRepayAmt(BigDecimal.ZERO);// 實際還本金額
+					break;
+				}
+			}
+			try {
+				mlaundryRecordService.update(tMlaundryRecord, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "疑似洗錢交易訪談記錄檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
 		}
 	}
 

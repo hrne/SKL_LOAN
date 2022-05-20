@@ -233,14 +233,16 @@ public class LM057Report extends MakeReport {
 			}
 			
 			
-			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0"))|| "Loss".equals(lM057Vo.get("F0"))) {
+			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0"))|| "Collection".equals(lM057Vo.get("F0"))) {
 				// 逾期放款總額
+				this.info("colTotal"+lM057Vo.get("F0")+"="+colTotal + "+" +amount);
 				colTotal = colTotal.add(amount);
 
 			}
 
 			if ("Total".equals(lM057Vo.get("F0")) || "Collection".equals(lM057Vo.get("F0")) || "Loss".equals(lM057Vo.get("F0"))) {
 				// 放款總額
+				this.info("total"+lM057Vo.get("F0")+"="+total + "+" +amount);
 				total = total.add(amount);
 			}
 				

@@ -28,7 +28,6 @@ import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -330,15 +329,15 @@ public class L3420 extends TradeBuffer {
 				iTmpAmt = iTmpAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 暫收抵繳金額
 			}
 		}
-		
+
 		// 放款交易明細檔的交易金額為實際支付金額
-		iTxAmt = iRealRepayAmt; 
-	
+		iTxAmt = iRealRepayAmt;
+
 		// 系統交易記錄檔的金額為實際支付金額或暫收款金額
 		if (iTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 			titaVo.setTxAmt(iTxAmt);
 		} else {
-			titaVo.setTxAmt(BigDecimal.ZERO.subtract(iTmpAmt));		
+			titaVo.setTxAmt(BigDecimal.ZERO.subtract(iTmpAmt));
 		}
 
 		// 按清償違約金、違約金、 延滯息、利息順序減免
@@ -466,8 +465,8 @@ public class L3420 extends TradeBuffer {
 		// 清償作業檔處理
 		FacCloseRoutine();
 
-		// 疑似洗錢交易訪談記錄檔處理
-		mlaundryRecordRoutine();
+		// 更新疑似洗錢交易訪談記錄檔
+		loanCom.updateMlaundryRecord(iCustNo, iFacmNo, iBormNo, iEntryDate, iTxAmt, titaVo);
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -2016,47 +2015,6 @@ public class L3420 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "清償作業檔 Key = " + iCustNo + wkCloseNo); // 新增資料時，發生錯誤 }
 			}
-		}
-	}
-
-	// 疑似洗錢交易訪談記錄檔處理
-	private void mlaundryRecordRoutine() throws LogicException {
-		this.info("mlaundryRecordRoutine ...");
-		Slice<MlaundryRecord> slMlaundryRecord = mlaundryRecordService.findCustNoEq(iCustNo, iFacmNo,
-				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
-				Integer.MAX_VALUE, titaVo);
-		if (slMlaundryRecord == null) {
-			return;
-		}
-		for (MlaundryRecord t : slMlaundryRecord.getContent()) {
-			if (titaVo.isHcodeNormal()) {
-				if (t.getActualRepayDate() == 0) {
-					updateMlaundryRecord(t);
-					break;
-				}
-			} else {
-				if (t.getActualRepayDate() == wkTbsDy) {
-					updateMlaundryRecord(t);
-					break;
-				}
-			}
-		}
-	}
-
-	// 疑似洗錢交易訪談記錄檔更新
-	private void updateMlaundryRecord(MlaundryRecord t) throws LogicException {
-		MlaundryRecord tMlaundryRecord = mlaundryRecordService.holdById(t, titaVo);
-		if (titaVo.isHcodeNormal()) {
-			tMlaundryRecord.setActualRepayDate(iEntryDate);
-			tMlaundryRecord.setActualRepayAmt(iRealRepayAmt);// 實際還本金額
-		} else {
-			tMlaundryRecord.setActualRepayDate(0);
-			tMlaundryRecord.setActualRepayAmt(BigDecimal.ZERO);// 實際還本金額
-		}
-		try {
-			mlaundryRecordService.update(tMlaundryRecord, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "疑似洗錢交易訪談記錄檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 	}
 

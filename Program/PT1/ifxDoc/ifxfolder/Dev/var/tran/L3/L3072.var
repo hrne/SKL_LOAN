@@ -201,14 +201,14 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF3})
 
 !刪除
 #OOBUF4=X,156,S
-T(2,#FUNC4+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
+T(2,#FUNC4+#OOCustNo+#OOEmpName+#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN4=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF4})
 
 !查詢
-#OOBUF5=X,155,S
-T(2,#FUNC5+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
+#OOBUF5=X,156,S
+T(2,#FUNC5+#OOCustNo+#OOEmpName+#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#OOBUF5})
@@ -289,7 +289,9 @@ TXFORM=L3072
 
 #OOLastUpdate=最後修改日期
 {width:100,align:'center'}
+
 ^
+
 
 <include src="PRT.icf::INQ01.sel"/>
 </sub>

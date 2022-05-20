@@ -17,11 +17,15 @@ import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.InsuOrignal;
+import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.InsuOrignalService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -58,6 +62,12 @@ public class L2042 extends TradeBuffer {
 
 	@Autowired
 	public CustMainService custMainService;
+
+	@Autowired
+	InsuRenewService sInsuRenewService;
+
+	@Autowired
+	InsuOrignalService sInsuOrignalService;
 
 	/* 日期工具 */
 	@Autowired
@@ -137,7 +147,8 @@ public class L2042 extends TradeBuffer {
 			int clcode1 = tClBuilding.getClCode1();
 			int clcode2 = tClBuilding.getClCode2();
 			int clno = tClBuilding.getClNo();
-			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clcode1, clcode2, clno, this.index, this.limit, titaVo);
+			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clcode1, clcode2, clno,
+					this.index, this.limit, titaVo);
 
 			List<ClBuildingOwner> lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 			if (lClBuildingOwner != null) {
@@ -168,6 +179,20 @@ public class L2042 extends TradeBuffer {
 			occurslist.putParam("OOBdNo2", tClBuilding.getBdNo2());
 			occurslist.putParam("OOSettingAmt", tClImm.getSettingAmt());
 			occurslist.putParam("OOBdLocation", tClBuilding.getBdLocation().trim());
+
+			// 確認有無保險單, 邏輯參考 L4964
+			// Y/N
+			Slice<InsuRenew> slInsuRenew = sInsuRenewService.findNowInsuEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index,
+					this.limit, titaVo);
+			Slice<InsuOrignal> slInsuOrignal = sInsuOrignalService.clNoEqual(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index,
+					this.limit, titaVo);
+			List<InsuRenew> lInsuRenew = slInsuRenew != null ? slInsuRenew.getContent() : null;
+			List<InsuOrignal> lInsuOrignal = slInsuOrignal != null ? slInsuOrignal.getContent() : null;
+
+			boolean hasInsu =    (lInsuRenew != null && !lInsuRenew.isEmpty())
+					          || (lInsuOrignal != null && !lInsuOrignal.isEmpty());
+
+			occurslist.putParam("OOHasInsu", hasInsu ? "Y" : "N");
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);

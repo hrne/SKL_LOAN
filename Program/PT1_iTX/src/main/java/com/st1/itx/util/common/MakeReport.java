@@ -1437,10 +1437,11 @@ public class MakeReport extends CommBuffer {
 								supna = cdEmp.getFullname();
 							}
 						}
-						txt = "經辦：";
-						txt += FormatUtil.padX(tlrna,20);
+						txt = FormatUtil.padX(" ", 30);
+						txt += "經辦：";
+						txt += FormatUtil.padX(tlrna, 20);
 						txt += "主管：";
-						txt += FormatUtil.padX(supna,20);
+						txt += FormatUtil.padX(supna, 20);
 					}
 
 					String align = map.get("align").toString();

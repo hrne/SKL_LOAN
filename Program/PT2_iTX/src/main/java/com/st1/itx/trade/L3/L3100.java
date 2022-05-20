@@ -767,7 +767,7 @@ public class L3100 extends TradeBuffer {
 		if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
 			this.info("lFacProdStepRate = " + lFacProdStepRate);
 			for (FacProdStepRate tFacProdStepRate : lFacProdStepRate) {
-				
+
 				// 利率起日
 				dDateUtil.init();
 				dDateUtil.setMons(tFacProdStepRate.getMonthStart() - 1);
@@ -1163,32 +1163,14 @@ public class L3100 extends TradeBuffer {
 
 	private void SetLoanRateChange2(FacProdStepRate mFacProdStpeRate) throws LogicException {
 		this.info("SetLoanRateChange2 ...");
-		int wkStartDate;
-		int wkEndDate;
 		int wkEffectDate;
 
-		// 利率起日
+		// 利率起日為生效日
 		dDateUtil.init();
 		dDateUtil.setMons(mFacProdStpeRate.getMonthStart() - 1);
 		dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate()); // 階梯式利率月份以額度初貸日為準
-		wkStartDate = dDateUtil.getCalenderDay();
-		// 利率起日
-		dDateUtil.init();
-		dDateUtil.setMons(mFacProdStpeRate.getMonthEnd());
-		dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
-		wkEndDate = dDateUtil.getCalenderDay();
+		wkEffectDate = dDateUtil.getCalenderDay();
 
-		// 利率起日、利率起日，小於撥款日
-		if (wkStartDate < iDrawdownDate && wkEndDate < iDrawdownDate) {
-			return;
-		}
-
-		// 利率起日小於撥款日=> 撥款日為生效日；否則利率起日為生效日
-		if (wkStartDate < iDrawdownDate) {
-			wkEffectDate = iDrawdownDate;
-		} else {
-			wkEffectDate = wkStartDate;
-		}
 		// 查詢指標利率檔
 		CdBaseRate tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(),
 				tFacMain.getBaseRateCode(), 10101, wkEffectDate + 19110000);
@@ -1207,24 +1189,17 @@ public class L3100 extends TradeBuffer {
 		tLoanRateChange.setBormNo(wkBormNo);
 		tLoanRateChange.setEffectDate(wkEffectDate);
 		tLoanRateChange.setLoanRateChangeId(tLoanRateChangeId);
-		tLoanRateChange.setStatus(0);
-		// 指標利率代碼與額度檔相同(01: 保單分紅利率 02: 中華郵政二年期定儲機動利率 99: 自訂利率)
-		tLoanRateChange.setBaseRateCode(tFacMain.getBaseRateCode());
-		// RateCode 利率區分 (1:機動 2:固定 3:定期機動)，機動的固定利率與撥款主檔不同 (例如：郵局機動利率)
-		// RateType 利率型態 1: 固定利率 2: 加碼利率
-		if ("1".equals(tLoanBorMain.getRateCode()) && "1".equals(mFacProdStpeRate.getRateType())) {
-			tLoanRateChange.setRateCode("2"); // 固定
-		} else {
-			tLoanRateChange.setRateCode(tLoanBorMain.getRateCode()); // 與撥款主檔相同
-		}
-		// 固定利率
+		tLoanRateChange.setStatus(2);
+		// 固定利率、加碼利率
 		if ("1".equals(mFacProdStpeRate.getRateType())) {
+			tLoanRateChange.setRateCode("2"); // 固定
+			tLoanRateChange.setBaseRateCode("99");
 			tLoanRateChange.setFitRate(mFacProdStpeRate.getRateIncr());
 			tLoanRateChange.setRateIncr(new BigDecimal(0));
 			tLoanRateChange.setIndividualIncr(new BigDecimal(0));
-		} else
-		// 加碼利率
-		{
+		} else {
+			tLoanRateChange.setRateCode(tLoanBorMain.getRateCode()); // 與撥款主檔相同
+			tLoanRateChange.setBaseRateCode(tFacMain.getBaseRateCode());
 			if (tFacProd.getIncrFlag().equals("Y")) {
 				tLoanRateChange.setRateIncr(mFacProdStpeRate.getRateIncr());
 				tLoanRateChange.setIndividualIncr(new BigDecimal(0));
