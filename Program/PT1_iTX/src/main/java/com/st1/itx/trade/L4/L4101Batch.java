@@ -614,11 +614,13 @@ public class L4101Batch extends TradeBuffer {
 		this.info("L4101E doRpt started.");
 		l4101ReportE.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
+//		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 
+		
 		l4101ReportE.setParentTranCode(parentTranCode);
 
 		// 撈資料組報表
-		l4101ReportE.exec(titaVo);
+		l4101ReportE.exec(titaVo,acDate);
 
 		// 寫產檔記錄到TxReport
 		long rptNod = l4101ReportE.close();

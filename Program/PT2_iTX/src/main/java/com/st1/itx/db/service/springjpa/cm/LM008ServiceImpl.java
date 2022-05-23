@@ -61,47 +61,57 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String bcYearMonth = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
 		String sql = "";
-		sql += " SELECT \"AcctCode\"                   AS \"AcctCode\" ";
-		sql += "      , \"Aging\"                      AS \"Aging\" ";
-		sql += "      , \"CustNo\"                     AS \"CustNo\" ";
-		sql += "      , \"FacmNo\"                     AS \"FacmNo\" ";
+		sql += " SELECT \"AcctCode\"                     AS \"AcctCode\" ";
+		sql += "      , \"Aging\"                        AS \"Aging\" ";
+		sql += "      , \"CustNo\"                       AS \"CustNo\" ";
+		sql += "      , \"FacmNo\"                       AS \"FacmNo\" ";
 		sql += "      , \"Fn_ParseEOL\"(\"CustName\", 0) AS \"CustName\" ";
-		sql += "      , SUM(\"LoanBal\")               AS \"LoanBal\" ";
-		sql += "      , MAX(\"IntRate\")               AS \"IntRate\" ";
-		sql += "      , MIN(\"IntStartDate\")          AS \"IntStartDate\" ";
-		sql += "      , SUM(\"UnpaidInt\")             AS \"UnpaidInt\" ";
-		sql += "      , SUM(\"UnexpiredInt\")          AS \"UnexpiredInt\" ";
+		sql += "      , SUM(CASE WHEN \"UnpaidInt\" + \"UnexpiredInt\" > 0 "; // 我們需要利息為 0 者來找出其他如迄日、利率...等等欄位的應顯示內容，
+		sql += "                 THEN \"LoanBal\" ";                          // 但放款餘額不可計入此類資料的餘額。
+		sql += "            ELSE 0 END)                  AS \"LoanBal\" ";
+		sql += "      , MAX(CASE WHEN \"seq\" = 1 "; // 根據 2022 年 3 月的樣張，原報表應該是每戶底下最大的額度、最大的撥款，以及最大的期數
+		sql += "                 THEN \"IntRate\" "; // 的那筆利率
+		sql += "             ELSE 0 END)                 AS \"IntRate\" ";
+		sql += "      , MIN(CASE WHEN \"IntStartDate\" >= 19110101 "; // 找出此月此戶此額度最起先的計息迄日
+		sql += "                 THEN \"IntStartDate\" ";             // 但因為 AcLoanInt 資料的這個欄位可能是 0，所以透過 MIN 排除掉此欄日期不合法的資料
+		sql += "            ELSE 99991231 END)           AS \"IntStartDate\" ";
+		sql += "      , SUM(\"UnpaidInt\")               AS \"UnpaidInt\" ";
+		sql += "      , SUM(\"UnexpiredInt\")            AS \"UnexpiredInt\" ";
 		sql += " FROM (SELECT A.\"AcctCode\" ";
 		sql += "            , A.\"Aging\" ";
 		sql += "            , A.\"CustNo\" ";
 		sql += "            , C.\"CustName\" ";
 		sql += "            , A.\"FacmNo\" ";
+		sql += "            , ROW_NUMBER() OVER (PARTITION BY A.\"AcctCode\" ";
+		sql += "                                             ,A.\"CustNo\" ";
+		sql += "                                             ,A.\"FacmNo\" ";
+		sql += "                                             ,DECODE(A.\"IntRate\", 0, 0, 1) "; // 有些資料計息利率是 0，透過這裡讓非 0 的利率優先
+		sql += "                                 ORDER BY A.\"BormNo\" DESC ";
+		sql += "                                         ,A.\"TermNo\" DESC) AS \"seq\" ";
 		sql += "            , A.\"LoanBal\" ";
 		sql += "            , A.\"IntRate\" ";
-		sql += "            , DECODE(A.\"IntStartDate\", 0, 99991231, A.\"IntStartDate\") \"IntStartDate\" ";
-		sql += "            , CASE ";
-		sql += "                WHEN TRUNC(A.\"PayIntDate\" / 100) <= :bcYearMonth ";
-		sql += "                     AND TRUNC(A.\"IntStartDate\" / 100) <= :bcYearMonth";
-		sql += "                     AND TRUNC(A.\"IntEndDate\" / 100) <= :bcYearMonth";
-		sql += "                     AND TRUNC(LBM.\"MaturityDate\" / 100) > :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
-		sql += "                THEN A.\"Interest\" ";
-		sql += "                ELSE 0 ";
-		sql += "              END                      AS \"UnpaidInt\" "; // 已到期
-		sql += "            , CASE ";
-		sql += "                WHEN TRUNC(A.\"PayIntDate\" / 100) <= :bcYearMonth ";
-		sql += "                     AND TRUNC(A.\"IntStartDate\" / 100) <= :bcYearMonth";
-		sql += "                     AND TRUNC(A.\"IntEndDate\" / 100) <= :bcYearMonth";
-		sql += "                     AND TRUNC(LBM.\"MaturityDate\" / 100) > :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
-		sql += "                THEN 0 ";
-		sql += "                ELSE A.\"Interest\" ";
-		sql += "              END                      AS \"UnexpiredInt\" "; // 未到期
+		sql += "            , A.\"IntStartDate\" ";
+		sql += "            , CASE WHEN TRUNC(A.\"PayIntDate\" / 100)     <= :bcYearMonth ";
+		sql += "                    AND TRUNC(A.\"IntStartDate\" / 100)   <= :bcYearMonth ";
+		sql += "                    AND TRUNC(A.\"IntEndDate\" / 100)     <= :bcYearMonth ";
+		sql += "                    AND TRUNC(LBM.\"MaturityDate\" / 100) >  :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
+		sql += "                   THEN A.\"Interest\" ";
+		sql += "                   ELSE 0 ";
+		sql += "              END AS \"UnpaidInt\" "; // 已到期
+		sql += "            , CASE WHEN TRUNC(A.\"PayIntDate\" / 100)     <= :bcYearMonth ";
+		sql += "                    AND TRUNC(A.\"IntStartDate\" / 100)   <= :bcYearMonth ";
+		sql += "                    AND TRUNC(A.\"IntEndDate\" / 100)     <= :bcYearMonth ";
+		sql += "                    AND TRUNC(LBM.\"MaturityDate\" / 100) >  :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
+		sql += "                   THEN 0 ";
+		sql += "                   ELSE A.\"Interest\" ";
+		sql += "              END AS \"UnexpiredInt\" "; // 未到期
 		sql += "       FROM \"AcLoanInt\" A ";
 		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\" ";
 		sql += "       LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = A.\"CustNo\" ";
 		sql += "                                    AND LBM.\"FacmNo\" = A.\"FacmNo\" ";
 		sql += "                                    AND LBM.\"BormNo\" = A.\"BormNo\" ";
 		sql += "       WHERE A.\"YearMonth\" = :bcYearMonth ";
-		sql += "         AND A.\"AcctCode\" = :acctCode ";
+		sql += "         AND A.\"AcctCode\"  = :acctCode ";
 		sql += "      ) S1 ";
 		sql += " GROUP BY \"AcctCode\" ";
 		sql += "        , \"Aging\" ";
@@ -112,8 +122,6 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , \"Aging\" ";
 		sql += "        , \"CustNo\" ";
 		sql += "        , \"FacmNo\" ";
-
-		
 		
 		this.info("sql=" + sql);
 

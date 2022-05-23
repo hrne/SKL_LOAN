@@ -151,13 +151,13 @@ public class L9705Report extends MakeReport {
 				if (tL9Vo.get("RepayCode") != null) {
 					repayCode = tL9Vo.get("RepayCode");
 				}
-				
+
 				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
 				// input parameter: CUSTNO
 				// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
 				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, "L9705", titaVo))
 					continue;
-				
+
 //				if (tL9Vo.get("CustName") != null) {
 //					custName = tL9Vo.get("CustName");
 //				}
@@ -177,7 +177,7 @@ public class L9705Report extends MakeReport {
 				}
 
 				try {
-					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0,titaVo);
+					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
 					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 				} catch (LogicException e) {
 					this.error("listBaTxVo ErrorMsg :" + e.getMessage());
@@ -217,8 +217,7 @@ public class L9705Report extends MakeReport {
 						nameLength = custMain.getCustName().length();
 					}
 
-					printCm(2, 7,
-							String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
+					printCm(2, 7, String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
 
 					setFont(1, 11);
 
@@ -233,10 +232,7 @@ public class L9705Report extends MakeReport {
 
 					y = top + yy + (++l) * h;
 
-					printCm(1.5, y,
-							"戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-"
-									+ String.format("%03d", Integer.valueOf(facmNo)) + "  目前利率："
-									+ padStart(6, "" + intRate) + "%");
+					printCm(1.5, y, "戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-" + String.format("%03d", Integer.valueOf(facmNo)) + "  目前利率：" + padStart(6, "" + intRate) + "%");
 
 					y = top + yy + (++l) * h;
 
@@ -271,7 +267,6 @@ public class L9705Report extends MakeReport {
 					int BreachAmt = 0;
 					int UnPaidAmt = 0;
 					int LoanBal = 0;
-					
 
 					for (BaTxVo baTxVo : listBaTxVo) {
 						// 本金、利息
@@ -307,8 +302,7 @@ public class L9705Report extends MakeReport {
 						}
 						y = top + yy + (++l) * h;
 						// 應繳日
-						printCm(1, y, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
-								+ tempDate.substring(5, 7));
+						printCm(1, y, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 						// 違約金
 						printCm(4.5, y, String.format("%,d", BreachAmt), "R");
 						// 本金
@@ -327,8 +321,15 @@ public class L9705Report extends MakeReport {
 					} // loop -- batxCom
 
 					l++;
+					
+					if ("L8101".equals(titaVo.getTxCode())) {
+						y = top + yy + (++l) * h;
+						this.printCm(1, y, "＊＊房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話、或姓名、身份證統一編號等");
+						y = top + yy + (++l) * h;
+						this.printCm(1, y, "　　重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。");
+					}
+					
 					y = top + yy + (++l) * h;
-
 					printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 
 					// 滯繳通知單
@@ -345,13 +346,13 @@ public class L9705Report extends MakeReport {
 					// L4702-C： 本日有匯款轉帳且有滯繳
 					if ("B".equals(conditionCode)) {
 						y = top + yy + (++l) * h;
-						this.printCm(1, y,
-								"＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");
+						this.printCm(1, y, "＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");
 						y = top + yy + (++l) * h;
 						this.printCm(1, y, "＊＊您好！本月份扣款含年度火險、地震險保費、每月房貸期款，因您存款不足；");
 						y = top + yy + (++l) * h;
 						this.printCm(1, y, "　　請速將本期款匯入期款專用帳號。");
 					}
+					
 					y = top + yy + (++l) * h;
 					this.printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 
@@ -382,8 +383,7 @@ public class L9705Report extends MakeReport {
 
 						if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
 //							y = top + yy + (++l) * h;
-							this.printCm(1, 29.5, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt)
-									+ "業已入帳無誤。");
+							this.printCm(1, 29.5, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
 						}
 					}
 
@@ -393,19 +393,18 @@ public class L9705Report extends MakeReport {
 					}
 				}
 			} // for
-			
+
 			if (cnt == 0) {
 				printCm(1, 4, "*******    查無資料   ******");
 			}
-			
-		} // else 
+
+		} // else
 
 		// 關閉報表
 		long sno = this.close();
 
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"),
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"),
 					titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
 		}
 		return sno;

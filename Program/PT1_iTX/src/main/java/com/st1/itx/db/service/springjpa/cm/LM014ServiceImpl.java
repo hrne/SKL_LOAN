@@ -291,7 +291,7 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("     SELECT mlb.\"YearMonth\" \"YearMonth\" ");
 			result.append("           ,NVL(mlb.\"AcSubBookCode\", ' ') \"AcSubBookCode\" ");
 			result.append("           ,CdC.\"Item\" \"AcSubBookItem\" ");
-			result.append("           ,CASE WHEN mlb.\"ProdNo\" IN ('1','1A','38','EM','EN','EO') ");
+			result.append("           ,CASE WHEN mlb.\"ProdNo\" IN ('1','1A','38','EM','EN','EO','EP','EQ','ER','ES') ");
 			result.append("                 THEN '4' ");
 			result.append("                 WHEN mlb.\"ClCode1\" IN (1,2) ");
 			result.append("                 THEN '3' ");
@@ -618,7 +618,7 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append(" WITH TotalData AS ( ");
 			result.append("     SELECT mlb.\"YearMonth\" \"YearMonth\" ");
 			result.append("           ,rel.\"IsRels\" \"IsRels\" ");
-			result.append("           ,CASE WHEN mlb.\"ProdNo\" IN ('1','1A','38','EM','EN','EO') ");
+			result.append("           ,CASE WHEN mlb.\"ProdNo\" IN ('1','1A','38','EM','EN','EO','EP','EQ','ER','ES') ");
 			result.append("                 THEN '4' ");
 			result.append("                 WHEN mlb.\"ClCode1\" IN (1,2) ");
 			result.append("                 THEN '3' ");

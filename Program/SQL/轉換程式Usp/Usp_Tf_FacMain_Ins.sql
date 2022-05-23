@@ -70,7 +70,14 @@ BEGIN
              THEN LMSP."FirstDrawdownDate"
            ELSE 0
            END                            AS "FirstDrawdownDate"   -- 初貸日 DECIMALD 8 
-          ,APLP."APLDLD"                  AS "MaturityDate"        -- 到期日 NUMBER(8,0)
+          ,CASE
+             WHEN APLP."APLDLD" != 0
+             THEN APLP."APLDLD"
+             WHEN APLP."APLDLD" = 0
+                  AND APLP."APLLSQ" >= 1 -- 最終序號
+                  AND APLP."APLCNT" >= 1 -- 撥款筆數
+             THEN LMSP2."LMSDLD"
+           ELSE 0 END                     AS "MaturityDate"        -- 到期日 NUMBER(8,0)
           ,CASE
              WHEN APLP."ACTACT" = '310' THEN '1' -- 以日計息
              WHEN S1."TRXJAC" = 1            THEN '1' -- 以日計息 
@@ -280,6 +287,23 @@ BEGIN
                        , "LMSAPN"
               ) LMSP ON LMSP."LMSACN" = APLP."LMSACN"
                     AND LMSP."LMSAPN" = APLP."LMSAPN"
+    LEFT JOIN ( SELECT APLP."LMSACN"
+                     , APLP."LMSAPN"
+                     , LMSP."LMSDLD"
+                FROM (
+                  SELECT "LMSACN"
+                       , "LMSAPN"
+                  FROM "LA$APLP" 
+                  WHERE "APLDLD" = 0
+                    AND "APLLSQ" >= 1 -- 最終序號
+                    AND "APLCNT" >= 1 -- 撥款筆數
+                ) APLP
+                LEFT JOIN "LA$LMSP" LMSP ON LMSP."LMSACN" = APLP."LMSACN"
+                                        AND LMSP."LMSAPN" = APLP."LMSAPN"
+                                        AND LMSP."LMSASQ" = 1
+                WHERE LMSP."LMSDLD" != 0                
+              ) LMSP2 ON LMSP2."LMSACN" = APLP."LMSACN"
+                     AND LMSP2."LMSAPN" = APLP."LMSAPN"
     WHERE NVL(APPL."ApplNo",0) != 0
     ;
 

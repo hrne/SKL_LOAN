@@ -165,6 +165,7 @@ BEGIN
              , "EffectDate"
         FROM "CdBaseRate"
         WHERE "BaseRateCode" IN ('01','02')
+          AND C."EffectFlag" = 1
       ) CB ON CB."BaseRateCode" = FP."BaseRateCode"
           AND CB."EffectDate" <= LA."ASCADT"
       WHERE NVL(LM."LMSACN",0) > 0 -- 有串到放款主檔的資料才寫入
@@ -207,42 +208,6 @@ BEGIN
     WHERE NVL("CbSeq",1) = 1
     ;
 
-    -- 記錄寫入筆數
-    -- INS_CNT := INS_CNT + sql%rowcount;
-
-    /* 更新 "LoanRateChange". "FitRate" "適用利率" if  "FitRate"  = 0 DECIMAL 6 4 */
-    -- MERGE INTO "LoanRateChange" T1
-    -- USING (
-    --   SELECT L."CustNo"              -- 借款人戶號 DECIMAL 7 0
-    --         ,L."FacmNo"              -- 額度編號 DECIMAL 3 0
-    --         ,L."BormNo"              -- 撥款序號 DECIMAL 3 0
-    --         ,L."EffectDate"          -- 生效日期 DECIMALD 8 0
-    --         ,L."RateIncr" + L."BaseRate" AS "FitRate" -- 適用利率
-    --   FROM ( SELECT        
-    --            R."CustNo"              AS "CustNo" 
-    --           ,R."FacmNo"              AS "FacmNo" 
-    --           ,R."BormNo"              AS "BormNo"
-    --           ,R."EffectDate"          AS "EffectDate"  
-    --           ,R."RateIncr"            AS "RateIncr" 
-    --           ,C."BaseRate"            AS "BaseRate"
-    --           ,ROW_NUMBER() OVER (PARTITION BY R."CustNo", R."FacmNo" ,R."BormNo" 
-    --                               ORDER BY C."EffectDate" DESC) AS "Seq"
-    --          FROM "LoanRateChange" R
-    --          LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode"
-    --                                  AND C."EffectDate" <= R."EffectDate"
-    --          WHERE R."BaseRateCode"  IN ('01','02')  
-    --           AND  R."FitRate"   = 0              
-    --         ) L
-    --    WHERE L."Seq" = 1
-    -- ) S1 ON (    S1."CustNo" = T1."CustNo"
-    --          AND S1."FacmNo" = T1."FacmNo"
-    --          AND S1."BormNo" = T1."BormNo"
-    --          AND S1."EffectDate" = T1."EffectDate"
-    --          AND S1."FitRate" IS NOT NULL)
-    -- WHEN MATCHED THEN UPDATE SET
-    -- T1."FitRate" = S1."FitRate"
-    -- ;
-
     /* 更新 "LoanRateChange"."IndividualIncr" "IncrFlag" = "N" 個別加碼利率 DECIMAL 6 4 */
     MERGE INTO "LoanRateChange" T1
     USING (
@@ -262,6 +227,7 @@ BEGIN
                                   ORDER BY C."EffectDate" DESC) AS "Seq"
              FROM "LoanRateChange" R
              LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode"
+                                     AND C."EffectFlag" = 1
                                      AND C."EffectDate" <= R."EffectDate"
              WHERE R."BaseRateCode"  IN ('01','02')  
               AND  R."IncrFlag" = 'N'
@@ -335,6 +301,7 @@ BEGIN
                                   ORDER BY C."EffectDate" DESC) AS "Seq"
              FROM "LoanRateChange" R
              LEFT JOIN "CdBaseRate" C ON C."BaseRateCode" = R."BaseRateCode"
+                                     AND C."EffectFlag" = 1
                                      AND C."EffectDate" <= R."EffectDate"
              WHERE R."BaseRateCode"  IN ('01','02')  
               AND  R."RateIncr" = 0                  

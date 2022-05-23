@@ -33,11 +33,16 @@ public class L9708ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo,int acDate) throws Exception {
 
 		this.info("L9708.findAll");
 
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
+		
+		if(acDate > 0) {
+			iDAY = String.valueOf(acDate);
+		}
+		
 		this.info("會計日期     = " + iDAY);
 		
 		String sql = "";
