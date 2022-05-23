@@ -49,24 +49,21 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("l4321.findAll AdjDate=" + iAdjDate);
 
-		String sql = "SELECT CC.\"CityItem\"   " // 鄉鎮區
-				+ "      , CA.\"AreaItem\"      " // 地區別
-				+ "      , BR.\"CustNo\"        " // 戶號
-				+ "      , BR.\"FacmNo\"        " // 額度
-				+ "      , BR.\"BormNo\"        " // 撥款
-				+ "      , CM.\"CustName\"      " // 戶名
-				+ "      , BR.\"DrawdownAmt\"   " // 撥款金額
-				+ "      , BR.\"LoanBalance\"   " // 放款餘額
-				+ "      , BR.\"PresEffDate\"   " // 目前生效日
-				+ "      , BR.\"CurtEffDate\"   " // 本次生效日
-				+ "      , BR.\"PrevIntDate\"   " // 繳息迄日
+		String sql = "SELECT CC.\"CityItem\"    " // F0 鄉鎮區
+				+ "      , CA.\"AreaItem\"      " // F1 地區別
+				+ "      , BR.\"CustNo\"        " // F2 戶號
+				+ "      , BR.\"FacmNo\"        " // F3 額度
+				+ "      , BR.\"BormNo\"        " // F4 撥款
+				+ "      , CM.\"CustName\"      " // F5 戶名
+				+ "      , BR.\"DrawdownAmt\"   " // F6 撥款金額
+				+ "      , BR.\"LoanBalance\"   " // F7 放款餘額
+				+ "      , BR.\"PresEffDate\"   " // F8 目前生效日
+				+ "      , BR.\"CurtEffDate\"   " // F9 本次生效日
+				+ "      , BR.\"PrevIntDate\"   " // F10 繳息迄日
 				+ "      , BR.\"ProdNo\"        " // 利率代碼
 				+ "      , FP.\"ProdName\"      " // 利率名稱
 				+ "      , BR.\"PresentRate\"   " // 目前利率
-				+ "      , BR.\"ProposalRate\"  " // 擬調
-				+ "      , CC.\"IntRateFloor\"  " // 下限
-				+ "      , CC.\"IntRateCeiling\"" // 上限
-				+ "      , BR.\"AdjustedRate\"  " // 調後
+				+ "      , BR.\"AdjustedRate\"  " // 調後利率
 				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
 				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
 				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "

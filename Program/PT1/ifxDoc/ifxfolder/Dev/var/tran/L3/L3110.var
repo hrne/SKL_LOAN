@@ -682,7 +682,6 @@ RESET_RIM(#SendL2r07C,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 T(2,@ApplNoX,#L2r07CustName)
-
 #ApplNoX=X,100,L
 C(4,#ApplNo,S,$)
 
@@ -693,13 +692,16 @@ RESET_RIM(#SendL6r28,L6R28)
 S(L6R28,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
 R(1,L6R28)
 
+
 #TimCustNo=A,7,S
 E(0,0)
 C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
+T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::CustRmk.rtn"/>
 
 #TimCustNoX=x,100,S
 E(0,0)
@@ -1898,6 +1900,8 @@ P(1,#RelationId)
 #CheckRelationIdKind=X,1,S
 IF(#RelationGender==""||#checkcustidlen==8,E(0,2),E(0,1))
 
+#MRKEY=_,_,S
+T(2,#TimCustNo+-+#FacmNo)
 
 #BTNHIDEP5=X,15,I,ui:button;value:  扣款帳號  ;enable:1;tabbable:0
 C(3,#HIDE5FG,0,CALL(#HIDEP5),$)

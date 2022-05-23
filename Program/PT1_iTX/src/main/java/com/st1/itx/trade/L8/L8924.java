@@ -142,6 +142,7 @@ public class L8924 extends TradeBuffer {
 				
 				String beforeAfter = getBeforeAfter(txDataLog);
 				occursList.putParam("OReason", beforeAfter != null && !beforeAfter.trim().isEmpty() ? beforeAfter : txDataLog.getReason());
+				occursList.putParam("OReasonX", beforeAfter != null && !beforeAfter.trim().isEmpty() ? beforeAfter.replace("\\n", " ") : txDataLog.getReason());
 				
 				String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
 

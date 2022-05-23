@@ -87,61 +87,50 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("today = " + today);
 
 		String sql = " ";
-		sql += " select                                                         ";
-		sql += "   b.\"AdjDate\"          as F0                                 ";
-		sql += " , b.\"CustNo\"           as F1                                 ";
-		sql += " , b.\"FacmNo\"           as F2                                 ";
-		sql += " , b.\"BormNo\"           as F3                                 ";
-		sql += " , b.\"TxKind\"           as F4                                 ";
-		sql += " , b.\"DrawdownAmt\"      as F5                                 ";
-		sql += " , b.\"CityCode\"         as F6                                 ";
-		sql += " , b.\"AreaCode\"         as F7                                 ";
-		sql += " , b.\"IncrFlag\"         as F8                                 ";
-		sql += " , b.\"AdjCode\"          as F9                                 ";
-		sql += " , b.\"RateKeyInCode\"    as F10                                ";
-		sql += " , b.\"ConfirmFlag\"      as F11                                ";
-		sql += " , b.\"TotBalance\"       as F12                                ";
-		sql += " , b.\"LoanBalance\"      as F13                                ";
-		sql += " , b.\"PresEffDate\"      as F14                                ";
-		sql += " , b.\"CurtEffDate\"      as F15                                ";
-		sql += " , b.\"PreNextAdjDate\"   as F16                                ";
-		sql += " , b.\"PreNextAdjFreq\"   as F17                                ";
-		sql += " , b.\"PrevIntDate\"      as F18                                ";
-		sql += " , b.\"CustCode\"         as F19                                ";
-		sql += " , b.\"ProdNo\"           as F20                                ";
-		sql += " , b.\"RateIncr\"         as F21                                ";
-		sql += " , b.\"ContractRate\"     as F22                                ";
-		sql += " , b.\"PresentRate\"      as F23                                ";
-		sql += " , b.\"ProposalRate\"     as F24                                ";
-		sql += " , b.\"AdjustedRate\"     as F25                                ";
-		sql += " , b.\"ContrBaseRate\"    as F26                                ";
-		sql += " , b.\"ContrRateIncr\"    as F27                                ";
-		sql += " , b.\"IndividualIncr\"   as F28                                ";
-		sql += " , b.\"BaseRateCode\"     as F29                                ";
-		sql += " , b.\"RateCode\"         as F30                                ";
-		sql += " , b.\"CurrBaseRate\"     as F31                                ";
-		sql += " , b.\"TxEffectDate\"     as F32                                ";
-		sql += " , b.\"TxRateAdjFreq\"    as F33                                ";
-		sql += " , b.\"JsonFields\"       as F34                                ";
-		sql += " , cm.\"CustName\"        as F35                                ";
-		sql += " , cb.\"BaseRate\"        as F36                                ";
-		sql += " , cc.\"CityItem\"        as F37                                ";
-		sql += " , cc.\"IntRateCeiling\"  as F38                                ";
-		sql += " , cc.\"IntRateFloor\"    as F39                                ";
-		sql += " , ca.\"AreaItem\"        as F40                                ";
-		sql += " , b.\"OvduTerm\"         as F41                                ";
-		sql += " from \"BatxRateChange\" b                                      ";
+		sql += " select                              ";  
+		sql += "   b.\"AdjDate\"                     "; // F0
+		sql += " , b.\"CustNo\"                      "; // F1
+		sql += " , b.\"FacmNo\"                      "; // F2
+		sql += " , b.\"BormNo\"                      "; // F3  
+		sql += " , b.\"TxKind\"                      "; // F4  
+		sql += " , b.\"DrawdownAmt\"                 "; // F5  
+		sql += " , b.\"CityCode\"                    "; // F6  
+		sql += " , b.\"AreaCode\"                    "; // F7  
+		sql += " , b.\"IncrFlag\"                    "; // F8  
+		sql += " , b.\"AdjCode\"                     "; // F9  
+		sql += " , b.\"RateKeyInCode\"               "; // F10 
+		sql += " , b.\"ConfirmFlag\"                 "; // F11 
+		sql += " , b.\"TotBalance\"                  "; // F12 
+		sql += " , b.\"LoanBalance\"                 "; // F13 
+		sql += " , b.\"PresEffDate\"                 "; // F14 
+		sql += " , b.\"CurtEffDate\"                 "; // F15 
+		sql += " , b.\"PreNextAdjDate\"              "; // F16 
+		sql += " , b.\"PreNextAdjFreq\"              "; // F17 
+		sql += " , b.\"PrevIntDate\"                 "; // F18 
+		sql += " , b.\"CustCode\"                    "; // F19 
+		sql += " , b.\"ProdNo\"                      "; // F20		
+		sql += " , b.\"RateIncr\"                    "; // F21 
+		sql += " , b.\"ContractRate\"                "; // F22 
+		sql += " , b.\"PresentRate\"                 "; // F23 
+		sql += " , b.\"ProposalRate\"                "; // F24 
+		sql += " , b.\"AdjustedRate\"                "; // F25 
+		sql += " , b.\"ContrBaseRate\"               "; // F26 
+		sql += " , b.\"ContrRateIncr\"               "; // F27 
+		sql += " , b.\"IndividualIncr\"              "; // F28 
+		sql += " , b.\"BaseRateCode\"                "; // F29 
+		sql += " , b.\"RateCode\"                    "; // F30 
+		sql += " , b.\"CurrBaseRate\"                "; // F31 
+		sql += " , b.\"TxEffectDate\"                "; // F32 
+		sql += " , b.\"TxRateAdjFreq\"               "; // F33 
+		sql += " , b.\"JsonFields\"                  "; // F34 
+		sql += " , cm.\"CustName\"                   "; // F35 
+		sql += " , cc.\"CityItem\"                   "; // F36 
+		sql += " , cc.\"IntRateCeiling\"             "; // F37 
+		sql += " , cc.\"IntRateFloor\"               "; // F38 
+		sql += " , ca.\"AreaItem\"                   "; // F39 
+		sql += " , b.\"OvduTerm\"                    "; // F40 
+    	sql += " from \"BatxRateChange\" b                                      ";
 		sql += " left join \"CustMain\" cm on cm.\"CustNo\" = b.\"CustNo\"      ";
-		sql += " left join (                                                    ";
-		sql += "     select                                                     ";
-		sql += "      \"BaseRateCode\"                                          ";
-		sql += "     ,\"BaseRate\"                                              ";
-		sql += "     ,row_number() over (partition by \"BaseRateCode\" order by \"EffectDate\" Desc) as seq ";
-		sql += "     from \"CdBaseRate\"                                        ";
-		sql += "     where \"CurrencyCode\" = 'TWD'                             ";
-		sql += "       and  \"EffectDate\" <= " + today;
-		sql += " ) cb on cb.\"BaseRateCode\" = b.\"BaseRateCode\"               ";
-		sql += "     and cb.seq = 1                                             ";
 		sql += " left join \"CdCity\" cc  on cc.\"CityCode\" = b.\"CityCode\"   ";
 		sql += " left join \"CdArea\" ca  on ca.\"CityCode\" = b.\"CityCode\"   ";
 		sql += "                       and ca.\"AreaCode\" = b.\"AreaCode\"     ";
@@ -191,7 +180,7 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		size = result.size();
 		this.info("Total size ..." + size);
 
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {

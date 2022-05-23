@@ -92,219 +92,86 @@ public class L4321Report extends MakeReport {
 			break;
 		}
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
-		if ("L4320".equals(titaVo.getTxcd())) {
+		switch (this.iAdjCode) {
+		case 1:
+			fileNm += fileNm1 + "-批次自動調整";
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+			break;
+		case 2:
+			fileNm += fileNm1 + "-按地區別調整";
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+					"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
+			break;
+		case 3:
+			fileNm += fileNm1 + "-人工調整";
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
+					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+			break;
+		default:
+			break;
+		}
 
-			for (int j = 1; j <= 4; j++) {
+		try {
+			fnAllList = L4321ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("L4321ServiceImpl.findAll error = " + errors.toString());
+		}
 
-				switch (j) {
-				case 1:
-					fileNm = fileNm1 + "-批次自動調整";
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-					break;
-				case 2:
-					fileNm = fileNm1 + "-按地區別調整";
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-							"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
-					break;
-				case 3:
-					fileNm = fileNm1 + "-人工調整";
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-					break;
-				case 4:
-					fileNm = fileNm1 + "-批次自動調整（提醒件）";
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-							"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-					break;
-				default:
-					break;
-				}
-				titaVo.putParam("AdjCode", j);
-				titaVo.putParam("AdjDate", titaVo.getEntDyI());
-
-//				設定工作表名稱
-//				String iENTDY = titaVo.get("ENTDY");
-//				makeExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
-
-				try {
-					fnAllList = L4321ServiceImpl.findAll(titaVo);
-				} catch (Exception e) {
-					StringWriter errors = new StringWriter();
-					e.printStackTrace(new PrintWriter(errors));
-					this.info("L4321ServiceImpl.findAll error = " + errors.toString());
-				}
-
-				if (fnAllList.size() > 0) {
-					String fdnm = "";
-//					從第幾列開始(表頭位置)
-					int row = 1;
-
-					for (Map<String, String> tLDVo : fnAllList) {
-						this.info("tLDVo-------->" + tLDVo.toString());
-						row++;
-
-//						i = 欄數(Columns)
-						for (int i = 0; i < tLDVo.size(); i++) {
-
-//							預設每個欄位名稱為F1~Fn
-							fdnm = "F" + String.valueOf(i);
-
-//							設定每欄之Format
-							switch (i) {
-
-//			0		1		2	3	4	5	6		7		8		9		10		11		12		13		14		15		16		17	
-//			 鄉鎮區	地區別	戶號	 額度	撥款	戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	利率代碼 	利率名稱	目前利率	擬調		下限		上限		
-//			 北投區	台北市	548040	2	1	600,000 48,897 	1080319	1090919	1090810	1E	退休滿五年員工	1.8600	1.7500	1.75	2.55	1.75
-
-							case 2:
-							case 3:
-							case 4:
-								// 戶號(數字右靠)
-								if (tLDVo.get(fdnm).equals("")) {
-									makeExcel.setValue(row, i + 1, 0);
-								} else {
-									makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)));
-								}
-								break;
-							case 6:
-							case 7:
-								// 金額
-								makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#,##0");
-								break;
-							case 13:
-							case 14:
-							case 15:
-								// 利率
-								makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
-								break;
-							case 16:
-							case 17:
-								if (j == 2) {
-									// 利率
-									makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
-								}
-								break;
-							default:
-								// 字串左靠
-								makeExcel.setValue(row, i + 1, tLDVo.get(fdnm));
-								break;
-							}
-						}
-					}
-				}
-
-				long sno = makeExcel.close();
-				makeExcel.toExcel(sno);
-
-			}
-		} else {
-
-			switch (this.iAdjCode) {
-			case 1:
-				fileNm += fileNm1 + "-批次自動調整";
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-				break;
-			case 2:
-				fileNm += fileNm1 + "-按地區別調整";
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-						"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
-				break;
-			case 3:
-				fileNm += fileNm1 + "-人工調整";
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-				break;
-			case 4:
-				fileNm += fileNm1 + "-批次自動調整（提醒件）";
-				makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-						"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-				break;
-			default:
-				break;
-			}
-
-//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-//					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-
-//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4321", "利率調整作業確認", "LNW171E",
-//					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
-
-//			設定工作表名稱
-//			String iENTDY = titaVo.get("ENTDY");
-//			makeExcel.setSheet("108.04", iENTDY.substring(1, 4) + "." + iENTDY.substring(4, 6));
-
-			try {
-				fnAllList = L4321ServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("L4321ServiceImpl.findAll error = " + errors.toString());
-			}
-
-			if (fnAllList.size() > 0) {
-				String fdnm = "";
+		if (fnAllList.size() > 0) {
+			String fdnm = "";
 //				從第幾列開始(表頭位置)
-				int row = 1;
+			int row = 1;
 
-				for (Map<String, String> tLDVo : fnAllList) {
-					this.info("tLDVo-------->" + tLDVo.toString());
-					row++;
+			for (Map<String, String> tLDVo : fnAllList) {
+				this.info("tLDVo-------->" + tLDVo.toString());
+				row++;
 
 //					i = 欄數(Columns)
-					for (int i = 0; i < tLDVo.size(); i++) {
+				for (int i = 0; i < tLDVo.size(); i++) {
 
 //						預設每個欄位名稱為F1~Fn
-						fdnm = "F" + String.valueOf(i);
+					fdnm = "F" + String.valueOf(i);
 
 //						設定每欄之Format
-						switch (i) {
+					switch (i) {
 
-//		0		1		2	3	4	5	6		7		8		9		10		11		12		13		14		15		16		17	
-//		 鄉鎮區	地區別	戶號	 額度	撥款	戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	利率代碼 	利率名稱	目前利率	擬調		下限		上限		
-//		 北投區	台北市	548040	2	1	600,000 48,897 	1080319	1090919	1090810	1E	退休滿五年員工	1.8600	1.7500	1.75	2.55	1.75
-						case 2:
-						case 3:
-						case 4:
-							// 戶號(數字右靠)
-							if (tLDVo.get(fdnm).equals("")) {
-								makeExcel.setValue(row, i + 1, 0);
-							} else {
-								makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)));
-							}
-							break;
-						case 6:
-						case 7:
-							// 金額
-							makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#,##0");
-							break;
-						case 13:
-						case 14:
-						case 15:
-							// 利率
-							makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
-							break;
-						case 16:
-						case 17:
-							if (this.iAdjCode == 2) {
-								// 利率
-								makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
-							}
-							break;
-						default:
-							// 字串左靠
-							makeExcel.setValue(row, i + 1, tLDVo.get(fdnm));
-							break;
+//		0		1		2	3	4	     5  	6		7		8		  9		     10		   11		12		   13	    14	
+//		 鄉鎮區	地區別	戶號	 額度 撥款	戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	利率代碼 	利率名稱	目前利率 	調整後利率
+//		 北投區	台北市	548040	2	1	600,000 48,897 	1080319	1090919	1090810	1E	退休滿五年員工	1.8600	      1.25  	1.75	
+					case 2:
+					case 3:
+					case 4:
+						// 戶號(數字右靠)
+						if (tLDVo.get(fdnm).equals("")) {
+							makeExcel.setValue(row, i + 1, 0);
+						} else {
+							makeExcel.setValue(row, i + 1, Integer.valueOf(tLDVo.get(fdnm)));
 						}
+						break;
+					case 6:
+					case 7:
+						// 金額
+						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#,##0");
+						break;
+					case 13:
+					case 14:
+						// 利率
+						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
+						break;
+					default:
+						// 字串左靠
+						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm));
+						break;
 					}
 				}
 			}
-
-			sno = makeExcel.close();
-			makeExcel.toExcel(sno);
-
 		}
+
+		sno = makeExcel.close();
+		makeExcel.toExcel(sno);
 
 		return sno;
 	}

@@ -234,6 +234,15 @@ C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 
+#TimCustNo=A,7,S
+E(0,0)
+C(4,#CustNo,$,E(0,#CustNo))
+
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
+
 #RPTFG=A,2,S
 E(0,8)
 #CurrencyCode=X,3,S
@@ -2088,7 +2097,7 @@ TXFORM=L3912
 [#CloseBreachX,#OUnpaidAmt],["@匯款帳號",#ORemitAcctNo],
 ["@短收金額",#OShortFallX],["@溢收金額",#OOverflowX],
 ["@主管編號",#OSupperNo,#OSupperNoX],["@減免金額",#OReduceAmt],
-["@櫃員編號",#OTellerNo,#OTellerNoX],["@交易序號",#OTxtNo]
+["@櫃員編號",#OTellerNo,#OTellerNoX],["@交易序號",#OTxtNo],
 ["@作業日期",#OTxDate,#OTxTimeX],["@",""],
 ["@批次號碼",#OBatchNo],["@匯款序號",#ORemitSeq],
 ["@暫收原因",#OTempReasonCode,#OTempReasonCodeX],["@扣款銀行",#ORepayBank,#ORepayBankX],

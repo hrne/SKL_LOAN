@@ -137,15 +137,15 @@ T(2,#SUMDATE2+#SUMDATE3)
 C(3,#CHAIN,0,E(0,#SUMDATE3),s)
 D(8)
 @V(7)A(DATE,0,#CDATESTART)
-V(5,0010101,#DATE)
+V(5,0,#SYSCDATE)
 
 !交易日期止日
 #CDATEEND=D,7,I
-E(0,#DATE)
+E(0,#SYSCDATE)
 C(3,#CHAIN,0,$,s)
 D(8)
 @V(7)A(DATE,0,#CDATEEND)
-V(5,#CDATESTART,#DATE)
+V(5,#CDATESTART,#SYSCDATE)
 
 ! 戶號
 #CUST_NO=A,7,I
@@ -205,6 +205,7 @@ T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 
 #OMrKey=x,20,S
 #OReason=x,120,S
+#OReasonX=x,120,S
 #OLastUpdate=x,40,S
 #OLastEmp=x,30,S
 !會計日期
@@ -246,6 +247,7 @@ TXFORM=L8924
 #OBormNo
 #OMrKey
 #OReason
+#OReasonX
 #OLastUpdate
 #OLastEmp
 #OTxDate
@@ -279,7 +281,7 @@ TXFORM=L8924
 {width:150,align:'left'}
 #OMrKey=參考編號
 {width:150,align:'left'}
-#OReason=修改內容
+#OReasonX=修改內容
 {width:400,align:'left'}
 #OLastEmp=修改人員
 {width:140,align:'left'}

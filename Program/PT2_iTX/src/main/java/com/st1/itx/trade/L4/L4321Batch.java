@@ -190,24 +190,11 @@ public class L4321Batch extends TradeBuffer {
 			default:
 				break;
 			}
-//			switch (this.iAdjCode) {
-//			case 1:
-//				sendMsg = sendMsg + "，批次自動調整";
-//				break;
-//			case 2:
-//				sendMsg = sendMsg + "，按地區別調整";
-//				break;
-//			case 3:
-//				sendMsg = sendMsg + "，人工調整";
-//				break;
-//			default:
-//				break;
-//			}
 
 			if (titaVo.isHcodeNormal()) {
-				sendMsg = sendMsg + "，iLableBX，完成確認，筆數：" + this.processCnt;
+				sendMsg = sendMsg + "，" + iLableBX + "，完成確認，筆數：" + this.processCnt;
 			} else {
-				sendMsg = sendMsg + "，iLableBX，取消確認，筆數：" + this.processCnt;
+				sendMsg = sendMsg + "，" + iLableBX + "，取消確認，筆數：" + this.processCnt;
 			}
 
 			if (titaVo.isHcodeNormal()) {
@@ -365,7 +352,7 @@ public class L4321Batch extends TradeBuffer {
 				nextAdjDate = tLoanBorMain.getMaturityDate();
 			}
 		} else {
-			nextAdjDate = tBatxRateChange.getPreNextAdjDate();
+			nextAdjDate = tBatxRateChange.getCurtEffDate();
 		}
 
 		tLoanBorMain.setNextAdjRateDate(nextAdjDate);
@@ -388,7 +375,7 @@ public class L4321Batch extends TradeBuffer {
 			if (tBatxRateChange.getIncrFlag().equals("Y")) {
 				rateIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
 			} else {
-				rateIncr = tBatxRateChange.getRateIncr();
+				rateIncr = tBatxRateChange.getContrRateIncr();
 				individualIncr = tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getCurrBaseRate());
 			}
 		}
@@ -538,9 +525,8 @@ public class L4321Batch extends TradeBuffer {
 		if (this.iConfirmFlag == 1) {
 			effectDateS = tBatxRateChange.getCurtEffDate();
 			baseRate = tBatxRateChange.getCurrBaseRate();
-		} else
+		} else {
 		// 取消確認時，生效起日＝目前生效日， 指標利率＝目前利率 - (利率加減碼or個別加減碼)
-		{
 			effectDateS = tBatxRateChange.getPresEffDate();
 			if ("Y".equals(tBatxRateChange.getIncrFlag())) { // 加減碼是否依合約
 				baseRate = tBatxRateChange.getPresentRate().subtract(tBatxRateChange.getRateIncr());

@@ -1,5 +1,7 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -269,16 +271,44 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findPart2_3(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("LM085ServiceImpl findPart2_1 ");
-
+		//上個年月
+		int lyeatMonth = ymd(yearMonth,-1) / 100;
+		//下月1號
+		int nDate = (ymd(yearMonth,1)  / 100 ) * 100 + 1;
+		
 		String sql = " ";
-		sql += "	";
+		sql += "	SELECT COUNT(*) AS \"F0\"";
+		sql += "	      ,SUM(NVL(\"PrinBalance\",0) + NVL(LT.\"Interest\",0)) AS \"F1\"";
+		sql += "	FROM \"MonthlyFacBal\" M"; 
+		sql += "	LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = M.\"CustNo\"";
+		sql += "							AND FM.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "	LEFT JOIN \"MonthlyLoanBal\" MB ON MB.\"CustNo\" = FM.\"CustNo\"";
+		sql += "								   AND MB.\"FacmNo\" = FM.\"FacmNo\"";
+		sql += "								   AND MB.\"BormNo\" = FM.\"LastBormNo\"";
+		sql += "								   AND MB.\"YearMonth\" = M.\"YearMonth\"";
+		sql += "	LEFT JOIN \"LoanBorTx\" LT ON LT.\"CustNo\" = MB.\"CustNo\"";
+		sql += "							  AND LT.\"FacmNo\" = MB.\"FacmNo\"";
+		sql += "							  AND LT.\"BormNo\" = MB.\"BormNo\"";
+		sql += "							  AND LT.\"TitaTxCd\" = 'L3420'";
+		sql += "							  AND LT.\"DueDate\" > TO_NUMBER(TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR( :acdate),'YYYYMMDD'),-1),'YYYYMMDD')) ";
+		sql += "							  AND LT.\"DueDate\" <= :acdate ";
+		sql += "	WHERE M.\"YearMonth\" = :lyymm";
+		sql += "	  AND M.\"PrinBalance\" > 0";
+		//--須出滿5期但未滿6期的轉催收戶號
+		sql += "	  AND TRUNC(MONTHS_BETWEEN(TO_DATE(:acdate , 'YYYYMMDD'),TO_DATE(DECODE(M.\"NextIntDate\" , 0 ,19110101,M.\"NextIntDate\"),'YYYYMMDD'))) >= 5";
+		sql += "	  AND TRUNC(MONTHS_BETWEEN(TO_DATE(:acdate , 'YYYYMMDD'),TO_DATE(DECODE(M.\"NextIntDate\" , 0 ,19110101,M.\"NextIntDate\"),'YYYYMMDD'))) <= 6";
+		//--因為有月初1號 指定日
+		sql += "	  AND TO_NUMBER(TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(M.\"NextIntDate\"),'YYYYMMDD'),6),'YYYYMMDD')) <= ";
+		sql += "		  TO_NUMBER(TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR( :lyymm * 100 + 1 ),'YYYYMMDD'),2),'YYYYMMDD'))";
+		sql += "	  AND LT.\"CustNo\" IS NOT NULL ";
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yearMonth);
+		query.setParameter("lyymm", lyeatMonth);
+		query.setParameter("acdate", nDate);
 
 		return this.convertToMap(query);
 	}
@@ -530,7 +560,14 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-
+	/**
+	 * 判斷單位
+	 * @param unitCode 
+	 * 		  0:元,
+	 * 		  1:千元,
+	 * 		  2:百萬元,
+	 * 		  3:億元
+	 * */
 	private Integer unitChange(String unitCode) {
 		int unit = 0;
 		switch (unitCode) {
@@ -549,6 +586,30 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		this.info("unit="+unit);
 		return unit;
+	}
+	
+	/**
+	 * 取得月底日
+	 * @param yearMonth 西元年月(YYYYMM)
+	 * @param num 單位(0=本月底日,1=下月底日,-1=上月底日)
+	 * */
+	private Integer ymd(int yearMonth,int num) {
+		
+		// 格式
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		Calendar calendar = Calendar.getInstance();
+
+		int iYear = yearMonth/100;
+		int iMonth = yearMonth%100;
+		
+		int number = num - 1;
+		// 設月底日
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth + number);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		
+		return Integer.valueOf(dateFormat.format(calendar.getTime()));
 	}
 
 }

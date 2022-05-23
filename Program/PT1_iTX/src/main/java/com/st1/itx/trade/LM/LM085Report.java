@@ -83,9 +83,9 @@ public class LM085Report extends MakeReport {
 			fnAllList = lm085ServiceImpl.findPart2_2(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
 			exportPart2(fnAllList, 2);
-//			fnAllList = lm085ServiceImpl.findPart2_3(titaVo, yearMonth);
-//			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-//			exportPart2(fnAllList,3);
+			fnAllList = lm085ServiceImpl.findPart2_3(titaVo, yearMonth);
+			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			exportPart2(fnAllList,3);
 			// 上月資料
 			fnAllList = lm085ServiceImpl.findPart3(titaVo, lastYearMonth, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
@@ -181,6 +181,17 @@ public class LM085Report extends MakeReport {
 			makeExcel.formulaCalculate(15, 6);
 			break;
 		case 3:
+			
+			row = 24;
+			for (Map<String, String> r : dataList) {
+				int count = Integer.valueOf(r.get("F0"));
+				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
+						: new BigDecimal(r.get("F1"));
+
+				makeExcel.setValue(row , 6, count,"R");
+				makeExcel.setValue(row , 7, amt, "#,##0","R");
+				row++;
+			}
 			break;
 		}
 

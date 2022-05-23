@@ -139,8 +139,10 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,b.\"NextPayIntDate\"                         as \"NextPayIntDate\" "; // 下次繳息日,下次應繳日
 		sql += "   ,b.\"DrawdownDate\"                           as \"DrawdownDate\" "; // 撥款日期
 		sql += "   ,b.\"MaturityDate\"                           as \"MaturityDate\" "; // 到期日期
+		sql += "   ,b.\"FirstAdjRateDate\"                       as \"FirstAdjRateDate\"  "; // 首次利率調整日期
 		sql += "   ,NVL(r2.\"EffectDate\", 0)                    as \"PresEffDate\" "; // 目前生效日
 		sql += "   ,NVL(r2.\"FitRate\", 0)                       as \"PresentRate\" "; // 目前利率
+		sql += "   ,NVL(tx.\"EntryDate\", 0)                     as \"EntryDate\" "; // 入帳日期
 		sql += " from \"LoanBorMain\" b                                 ";
 // 要調整的利率資料
 		sql += " left join(                                             ";
@@ -205,6 +207,13 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and cm.\"ClCode2\" = cf.\"ClCode2\"     ";
 		sql += "                       and cm.\"ClNo\" = cf.\"ClNo\"           ";
 		sql += " left join \"CdCity\" cc  on cc.\"CityCode\" = cm.\"CityCode\" ";
+		sql += " left join \"LoanBorTx\" tx  on tx.\"CustNo\" = b.\"CustNo\" ";
+		sql += "                       and  tx.\"FacmNo\" = b.\"FacmNo\"        ";
+		sql += "                       and  tx.\"BormNo\" = b.\"BormNo\"        ";
+		sql += "                       and  tx.\"IntEndDate\" = b.\"PrevPayIntDate\"  ";
+		sql += "                       and  tx.\"TitaTxCd\" = 'L3200'           ";
+		sql += "                       and  tx.\"TitaHCode\" = '0'              ";
+		sql += "                       and  tx.\"ExtraRepay\" = 0               "; // 不含提前償還本金
 		if (iTxKind == 4) {
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
@@ -405,11 +414,6 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 */
 	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate,
 			TitaVo titaVo) {
-
-		if (iEffectDate <= 19110000) {
-			iEffectDate += 19110000;
-		}
-		
 		String sql = "";
 		sql += "WITH rawData AS ( ";
 		sql += "    SELECT LRC.\"CustNo\" ";

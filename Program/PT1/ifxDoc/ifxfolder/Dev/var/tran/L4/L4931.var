@@ -293,11 +293,6 @@ C(3,#OOContrRateIncr,#OOIndividualIncr,T(2,#XXRateIncr),T(2,#XXRateIncr+#STARSYM
 
 #OOProcNote=x,300,O
 
-! 擬調利率生效日
-#OONextAdjDate=D,7,O
-! 擬調利率
-#OONextAdjRate=m,2.4,O
-
 #OOOvduTerm=A,2,O
 
 ! 查詢利率歷程
@@ -384,8 +379,6 @@ TXFORM=L4931
 #OOUpperLimitRate
 #OOLowerLimitRate
 #OOProcNote
-#OONextAdjDate
-#OONextAdjRate
 #OOOvduTerm
 ^
 <include src="ROM.icf::L4R12.tom"/>
@@ -460,10 +453,6 @@ ifxBatch:{
 {width:120}
 #OOProdNo=商品代碼
 {width:120}
-!#OONextAdjDate=擬調利率生效日
-!{width:120}
-!#OONextAdjRate=擬調利率
-!{width:120}
 #OOPresentRate=目前利率
 {width:120,align:'right'}
 #OOProposalRate=擬調利率
@@ -621,7 +610,7 @@ ifxBatch:{
 {width:120}
 #OOProdNo=商品代碼
 {width:120}
-#OORateIncrX=加碼利率
+#OORateIncrX=加碼值
 {width:120,align:'right'}
 #OOContractRate=合約利率
 {width:120,align:'right'}
@@ -683,11 +672,7 @@ ifxBatch:{
 {width:120}
 #OOProdNo=商品代碼
 {width:120}
-!#OONextAdjDate=擬調利率生效日
-!{width:120}
-!#OONextAdjRate=擬調利率
-!{width:120}
-#OORateIncrX=加碼利率
+#OORateIncrX=加碼值
 {width:120,align:'right'}
 #OOContractRate=合約利率
 {width:120,align:'right'}

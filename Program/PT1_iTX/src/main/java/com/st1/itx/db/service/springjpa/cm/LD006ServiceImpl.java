@@ -66,6 +66,12 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示 此三金額修改為撥款層而非額度層總計
 		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 -- 參考L5051
 		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額
+		sql += "       ,NVL(e4.\"Fullname\", '') AS \"ManagerName1\""; // 介紹人主管姓名1
+		sql += "       ,NVL(e4.\"AgLevel\", '')  AS \"AgLevel1\""; // 介紹人主管職等1
+		sql += "       ,NVL(e5.\"Fullname\", '') AS \"ManagerName2\""; // 介紹人主管姓名2
+		sql += "       ,NVL(e5.\"AgLevel\", '')  AS \"AgLevel2\""; // 介紹人主管職等2
+		sql += "       ,NVL(e6.\"Fullname\", '') AS \"ManagerName3\""; // 介紹人主管姓名3
+		sql += "       ,NVL(e6.\"AgLevel\", '')  AS \"AgLevel3\""; // 介紹人主管職等3
 		sql += " FROM \"PfItDetail\" I";
 		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\"    = I.\"PerfDate\""; // 取房貸專員
 		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
@@ -79,6 +85,9 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdEmp\" E1 ON E1.\"EmployeeNo\" = I.\"Introducer\""; // 取介紹人姓名
 		sql += " LEFT JOIN \"CdEmp\" E2 ON E2.\"EmployeeNo\" = I.\"UnitManager\""; // 取處經理姓名(介紹人)
 		sql += " LEFT JOIN \"CdEmp\" E3 ON E3.\"EmployeeNo\" = I.\"DistManager\""; // 取區經理姓名(介紹人)
+		sql += " left join \"CdEmp\" e4 on e4.\"AgentCode\"=e1.\"DirectorId\" ";
+		sql += " left join \"CdEmp\" e5 on e5.\"AgentCode\"=e4.\"DirectorId\" ";
+		sql += " left join \"CdEmp\" e6 on e6.\"AgentCode\"=e5.\"DirectorId\" ";
 		sql += " LEFT JOIN \"CdBcm\" B0 ON B0.\"UnitCode\" = B.\"DeptCode\" "; // 取部室中文(房貸專員)
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DeptCode\""; // 取部室中文(介紹人)
