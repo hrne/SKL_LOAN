@@ -103,7 +103,7 @@ public class L6982 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2003", "火險單續保檔");
 
 			}
-			for (InsuRenew tmpInsuRenew : lInsuRenew) {
+			for (InsuRenew tmpInsuRenew : lInsuRenew) { // 借支
 				if (tmpInsuRenew.getAcDate() == 0 && tmpInsuRenew.getStatusCode() == 1) {
 					OccursList occursList = new OccursList();
 

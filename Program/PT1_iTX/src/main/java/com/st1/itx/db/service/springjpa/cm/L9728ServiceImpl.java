@@ -35,36 +35,43 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9728ServiceImpl findDateEnd = " + findDateEnd);
 		
 		String sql = "";
-		sql += " WITH OutputData AS ( ";
-		sql += "     SELECT * ";
-		sql += "     FROM \"CustNotice\" ";
-		sql += "     WHERE 'N' IN (\"PaperNotice\", \"MsgNotice\", \"EmailNotice\") ";
-		sql += "                    ) ";
-		sql += " SELECT UNIQUE LPAD(CN.\"CustNo\", 7, '0')                   AS \"CustNo\" ";
-		sql += "             , CN.\"FacmNo\"                                 AS \"FacmNo\" ";
-		sql += "             , CM.\"CustName\"                               AS \"CustName\" ";
-		sql += "             , CECreate.\"Fullname\"                         AS \"CreateName\" ";
-		sql += "             , TO_CHAR(CN.\"CreateDate\", 'YYYY') - 1911 || ";
-		sql += "               TO_CHAR(CN.\"CreateDate\", '/MM/DD hh:mm:ss') AS \"CreateDate\" ";
-		sql += "             , CEUpdate.\"Fullname\"                         AS \"UpdateName\" ";
-		sql += "             , TO_CHAR(CN.\"LastUpdate\", 'YYYY') - 1911 || ";
-		sql += "               TO_CHAR(CN.\"LastUpdate\", '/MM/DD hh:mm:ss') AS \"UpdateDate\" ";
-		sql += " FROM OutputData CN ";
-		sql += " LEFT JOIN ( ";
-		sql += "     SELECT \"CustNo\" ";
-		sql += "          , \"FacmNo\" ";
-		sql += "          , \"FormNo\" ";
-		sql += "          , ROW_NUMBER() over (PARTITION BY \"CustNo\" ORDER BY \"FormNo\" ASC, \"LastUpdate\" DESC ) \"Seq\" ";
-		sql += "     FROM OutputData ";
-		sql += "           ) CNPRT ON CNPRT.\"CustNo\" = CN.\"CustNo\" AND CNPRT.\"FacmNo\" = CN.\"FacmNo\" AND CNPRT.\"FormNo\" = CN.\"FormNo\" ";
+		sql += " WITH CNSeq AS ";
+		sql += "          (SELECT \"CustNo\" ";
+		sql += "                , \"FacmNo\" ";
+		sql += "                , \"CreateEmpNo\" ";
+		sql += "                , \"CreateDate\" ";
+		sql += "                , \"LastUpdateEmpNo\" ";
+		sql += "                , \"LastUpdate\" ";
+		sql += "                , ROW_NUMBER() OVER (PARTITION BY \"CustNo\" ";
+		sql += "                                                 ,\"FacmNo\" ";
+		sql += "                                     ORDER BY \"CreateDate\" ASC)  \"CreateSeq\" ";
+		sql += "                , ROW_NUMBER() OVER (PARTITION BY \"CustNo\" ";
+		sql += "                                                 ,\"FacmNo\" ";
+		sql += "                                     ORDER BY \"LastUpdate\" DESC) \"UpdateSeq\" ";
+		sql += "           FROM \"CustNotice\" ";
+		sql += "          ) ";
+		sql += " SELECT UNIQUE CN.\"CustNo\"               AS \"CustNo\" ";
+		sql += "             , CN.\"FacmNo\"               AS \"FacmNo\" ";
+		sql += "             , CM.\"CustName\"             AS \"CustName\" ";
+		sql += "             , CECreate.\"Fullname\"       AS \"CreateName\" ";
+		sql += "             , CNSeqCreate.\"CreateDate\"  AS \"CreateDate\" ";
+		sql += "             , CEUpdate.\"Fullname\"       AS \"UpdateName\" ";
+		sql += "             , CNSeqUpdate.\"LastUpdate\"  AS \"UpdateDate\" ";
+		sql += " FROM \"CustNotice\" CN ";
+		sql += " LEFT JOIN CnSeq CNSeqCreate ON CNSeqCreate.\"CustNo\" = CN.\"CustNo\" ";
+		sql += "                            AND CNSeqCreate.\"FacmNo\" = CN.\"FacmNo\" ";
+		sql += " LEFT JOIN CnSeq CNSeqUpdate ON CNSeqUpdate.\"CustNo\" = CN.\"CustNo\" ";
+		sql += "                            AND CNSeqUpdate.\"FacmNo\" = CN.\"FacmNo\" ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = CN.\"CustNo\" ";
-		sql += " LEFT JOIN \"CdEmp\" CECreate ON CECreate.\"EmployeeNo\" = CN.\"CreateEmpNo\" ";
-		sql += " LEFT JOIN \"CdEmp\" CEUpdate ON CEUpdate.\"EmployeeNo\" = CN.\"LastUpdateEmpNo\" ";
-		sql += " WHERE CNPRT.\"Seq\" = 1 ";
-		sql += "   AND CNPRT.\"CustNo\" BETWEEN :custNoStart AND :custNoEnd ";
-		sql += "   AND TO_CHAR(CN.\"LastUpdate\", 'YYYYMMDD') BETWEEN :findDateStart AND :findDateEnd ";
-		sql += " ORDER BY \"CustNo\" ASC ";
-		sql += "         ,\"FacmNo\" ASC ";
+		sql += " LEFT JOIN \"CdEmp\" CECreate ON CECreate.\"EmployeeNo\" = CNSeqCreate.\"CreateEmpNo\" ";
+		sql += " LEFT JOIN \"CdEmp\" CEUpdate ON CEUpdate.\"EmployeeNo\" = CNSeqUpdate.\"LastUpdateEmpNo\" ";
+		sql += " WHERE 'N' IN (CN.\"PaperNotice\", CN.\"MsgNotice\", CN.\"EmailNotice\") "; // 需有任一項設定為不通知
+		sql += "   AND CNSeqCreate.\"CreateSeq\" = 1 "; // 顯示該額度最早的建立者與建立日期（配合 UNIQUE）
+		sql += "   AND CNSeqUpdate.\"UpdateSeq\" = 1 "; // 顯示該額度最新的修改者與建立日期（配合 UNIQUE）
+		sql += "   AND CN.\"CustNo\" BETWEEN :custNoStart AND :custNoEnd "; // 戶號區間
+		sql += "   AND CNSeqUpdate.\"LastUpdate\" BETWEEN TO_TIMESTAMP(TO_CHAR(:findDateStart), 'YYYYMMDD') AND TO_TIMESTAMP(TO_CHAR(:findDateEnd), 'YYYYMMDD') + 1"; // 日期區間
+		sql += " ORDER BY CN.\"CustNo\" ASC ";
+		sql += "        , CN.\"FacmNo\" ASC ";
 
 
 		this.info("sql=" + sql);

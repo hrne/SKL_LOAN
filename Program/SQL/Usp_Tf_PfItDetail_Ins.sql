@@ -25,12 +25,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "PfItDetail"
-    SELECT ROW_NUMBER() OVER (ORDER BY S1."LMSLLD"
-                                     , S1."LMSACN"
-                                     , S1."LMSAPN"
-                                     , S1."LMSASQ"
-                                     , S1."CASCDE"
-                             )            AS "LogNo"
+    SELECT "PfItDetail_SEQ".nextval       AS "LogNo"
          , S1."LMSLLD"                    AS "PerfDate"            -- 業績日期 DecimalD 8 0
          , S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0
          , S1."LMSAPN"                    AS "FacmNo"              -- 額度編號 DECIMAL 3 0

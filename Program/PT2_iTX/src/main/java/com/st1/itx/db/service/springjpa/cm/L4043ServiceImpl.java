@@ -53,7 +53,7 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		this.info("L4920.findAll");
+		this.info("L4043.findAll");
 
 		int iSearchFlag = parse.stringToInteger(titaVo.get("SearchFlag"));
 		int iDateFrom = parse.stringToInteger(titaVo.get("DateFrom")) + 19110000;
@@ -90,25 +90,29 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,p.\"LastUpdateEmpNo\"      as F25                                       ";
 		sql += " ,To_CHAR(p.\"LastUpdate\",'YYYYMMDD')           as F26                                       ";
 		sql += " ,p.\"StampCancelDate\"   as F27                                      ";
+		sql += " ,case when ph.\"LogNo\" is null then 'N' else 'Y' end as F28         ";
 		sql += " from \"PostAuthLog\" p                                               ";
+		sql += " left join \"PostAuthLogHistory\" ph on ph.\"CustNo\" = p.\"CustNo\"  ";
+		sql += "                                    and ph.\"FacmNo\" = p.\"FacmNo\"  ";
+		sql += "                                    and ph.\"AuthCode\" = p.\"AuthCode\"";
 		sql += " where                                                                ";
 		if (iSearchFlag == 1) {
-			sql += "            \"AuthCreateDate\" >= " + iDateFrom;
-			sql += "        and \"AuthCreateDate\" <= " + iDateTo;
+			sql += "            p.\"AuthCreateDate\" >= " + iDateFrom;
+			sql += "        and p.\"AuthCreateDate\" <= " + iDateTo;
 		}
 		if (iSearchFlag == 2) {
-			sql += "            \"PropDate\" >= " + iDateFrom;
-			sql += "        and \"PropDate\" <= " + iDateTo;
+			sql += "            p.\"PropDate\" >= " + iDateFrom;
+			sql += "        and p.\"PropDate\" <= " + iDateTo;
 		}
 		if (iSearchFlag == 3) {
-			sql += "            \"RetrDate\" >= " + iDateFrom;
-			sql += "        and \"RetrDate\" <= " + iDateTo;
+			sql += "            p.\"RetrDate\" >= " + iDateFrom;
+			sql += "        and p.\"RetrDate\" <= " + iDateTo;
 		}
 		if (iSearchFlag == 4) {
-			sql += "            \"CustNo\" = " + iCustNo;
+			sql += "            p.\"CustNo\" = " + iCustNo;
 		}
 		if (iSearchFlag == 5) {
-			sql += "            \"RepayAcct\" = " + iRepayAcct;
+			sql += "            p.\"RepayAcct\" = " + iRepayAcct;
 		}
 		sql += " order by p.\"CustNo\", p.\"FacmNo\", p.\"CreateDate\" Desc , p.\"AuthCode\" ";
 		sql += " ) a where a.\"F21\" = 1 ";

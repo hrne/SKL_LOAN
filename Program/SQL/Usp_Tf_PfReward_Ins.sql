@@ -1,4 +1,9 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_Tf_PfReward_Ins" 
+--------------------------------------------------------
+--  DDL for Procedure Usp_Tf_PfReward_Ins
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_PfReward_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -81,11 +86,7 @@ BEGIN
                           AND CB."LMSAPN" = IB."LMSAPN"
                           AND IB."IbSeq" = 1
     )
-    SELECT ROW_NUMBER() OVER (ORDER BY S1."LMSLLD"
-                                     , S1."LMSACN"
-                                     , S1."LMSAPN"
-                                     , S1."LMSASQ"
-                             )            AS "LogNo"
+    SELECT "PfReward_SEQ".nextval         AS "LogNo"
          , S1."LMSLLD"                    AS "PerfDate"            -- 業績日期 DecimalD 8 0
          , S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 7 0
          , S1."LMSAPN"                    AS "FacmNo"              -- 額度編號 DECIMAL 3 0
@@ -149,5 +150,4 @@ BEGIN
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_PfReward_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
 
-
-
+/

@@ -81,11 +81,12 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " \"AcBookCode\" as \"AcBookCode\", "; // F11
 		sql += " \"AcSubBookCode\" as \"AcSubBookCode\", "; // F12
 		sql += " \"LastUpdate\" as \"LastUpdate\", "; // F13
-		sql += " \"LastUpdateEmpNo\" as \"LastUpdateEmpNo\", "; // F14
-		sql += " \"ReceivableFlag\" as \"ReceivableFlag\" "; // F15
+		sql += " \"LastUpdateEmpNo\" as \"LastUpdateEmpNo\" "; // F14
 //		sql += " \"ClsFlag\" as ClsFlag "; //F15 拿來判斷用的
 		sql += " FROM \"AcReceivable\" ";
 		sql += " where \"AcBookCode\" = 000 "; // 固定傳入
+		sql += "   and \"AcctFlag\"   = 0 ";
+		sql += "   and \"FacmNo\"   <= 999 ";
 		// 加入判斷空白跳過該篩選
 		// 區隔帳冊
 		if (!"".equals(iAcSubBookCode)) {

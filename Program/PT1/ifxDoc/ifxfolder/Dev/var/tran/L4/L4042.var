@@ -291,6 +291,9 @@ T(1,#OOTitaTxCd,1,2)
 #OOProcessTime=A,6,O
 
 #OOAuthMeth=X,1,O
+
+#OOHistory=X,1,O
+
 ! #OOBUF_CREAT=X,1,S
 ! T(2,1)
 #OOBUF_EDIT=X,500,S
@@ -350,7 +353,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4940; ntxbuf=#OOBUF_CONNECT})
 T(2,#OOCustNo+#OOFacmNo)
 
 #OOBTN_HISTORY=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L4941; ntxbuf=#OOBUF_HISTORY})
+IF(#OOHistory=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L4941; ntxbuf=#OOBUF_HISTORY}),BIND(grid,cancel))
+
 
 </sub>
 
@@ -394,6 +398,7 @@ TXFORM=L4042
 #OOProcessDate
 #OOProcessTime
 #OOAuthMeth
+#OOHistory
 ^
 </sub>
 !---------- 單據輸出組合 ----------

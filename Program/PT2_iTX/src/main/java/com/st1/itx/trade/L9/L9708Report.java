@@ -59,7 +59,7 @@ public class L9708Report extends MakeReport {
 		 */
 
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "扣款銀行　　　　              撥款日期　　　　　　　　戶 號　額度　　　　　　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
+		print(1, 1, "扣款銀行　　　　              撥款日期　　　　　　　　戶 號　　　　　　額度　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		   
 		// 明細起始列(自訂亦必須)
@@ -88,7 +88,7 @@ public class L9708Report extends MakeReport {
 
 		List<Map<String, String>> l9708List = null;
 		try {
-			l9708List = l9708ServiceImpl.findAll(titaVo);
+			l9708List = l9708ServiceImpl.findAll(titaVo,0);
 			this.info("L9708Report findAll =" + l9708List.toString());
 		} catch (Exception e) {
 			this.info("L9708ServiceImpl.LoanBorTx error = " + e.toString());
@@ -133,7 +133,7 @@ public class L9708Report extends MakeReport {
 
 				this.print(0, 30, showRocDate(Integer.valueOf(l9708Vo.get("F2")), 1));
 				this.print(0, 52, String.format("%07d",Integer.valueOf(l9708Vo.get("F3"))));
-				this.print(0, 59, String.format("%03d", Integer.valueOf(l9708Vo.get("F4"))));
+				this.print(0, 68, String.format("%03d", Integer.valueOf(l9708Vo.get("F4"))));
 				this.print(0, 82, showRocDate(Integer.valueOf(l9708Vo.get("F5")), 1));
 				this.print(0, 100, l9708Vo.get("F6"));
 				this.print(0, 125, l9708Vo.get("F7"));

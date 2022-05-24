@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9728ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -71,13 +72,13 @@ public class L9728Report extends MakeReport {
 		this.print(-2, this.getMidXAxis(), "申請不列印書面通知書控管報表", "C");
 		this.print(-2, 123, "時  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-3, 123, "頁  數：" + this.getNowPage());
-		this.print(-4, 1, String.format("  戶號... %d - %d ", custNoStart, custNoEnd));
+		this.print(-4, 1, String.format("  戶號... %07d - %07d ", custNoStart, custNoEnd));
 		this.print(-5, 1, String.format("  期間... %s - %s ", this.showRocDate(findDateStart, 1), this.showRocDate(findDateEnd, 1)));
 		/**
 		 * ------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		this.print(-7, 1,"       戶號    戶名                                     新增者       新增時間              最後修改者   最後修改時間");
+		this.print(-7, 1,"       戶號    額度 戶名                                新增者       新增時間              最後修改者   最後修改時間");
 		this.print(-8, 1,"  ========================================================================================================================================");
 		
 		this.setBeginRow(9);
@@ -106,12 +107,13 @@ public class L9728Report extends MakeReport {
 		} else {
 			for (Map<String, String> l9728Vo : list)
 			{
-				this.print(1, 8, l9728Vo.get("CustNo"));
-				this.print(0, 16, l9728Vo.get("CustName"));
+				this.print(1, 8, FormatUtil.pad9(l9728Vo.get("CustNo"), 7));
+				this.print(0, 16, l9728Vo.get("FacmNo"));
+				this.print(0, 21, l9728Vo.get("CustName"));
 				this.print(0, 57, l9728Vo.get("CreateName"));
-				this.print(0, 70, l9728Vo.get("CreateDate"));
+				this.print(0, 70, parse.stringToStringDateTime(l9728Vo.get("CreateDate")));
 				this.print(0, 92, l9728Vo.get("UpdateName"));
-				this.print(0, 105, l9728Vo.get("UpdateDate"));
+				this.print(0, 105, parse.stringToStringDateTime(l9728Vo.get("UpdateDate")));
 			}
 		}
 		

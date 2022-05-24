@@ -138,7 +138,8 @@ public class L4042 extends TradeBuffer {
 				occursList.putParam("OOProcessDate", processdate);
 				occursList.putParam("OOProcessTime", result.get("F22"));
 				occursList.putParam("OOAuthMeth", authMeth);
-				
+				// 判斷是否有歷程
+				occursList.putParam("OOHistory", result.get("F24"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

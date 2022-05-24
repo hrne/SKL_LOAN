@@ -175,6 +175,8 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOButtenFlagA", result.get("F21"));
 				occursList.putParam("OORetFlag", wkRetFlag);
 				occursList.putParam("OOTitaTxCd", result.get("F22"));
+				// 判斷是否有歷程
+				occursList.putParam("OOHistory", result.get("F28"));
 				
 				createempno = findCdEmp(createempno,titaVo);
 				lastupdateempno = findCdEmp(lastupdateempno,titaVo);

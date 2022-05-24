@@ -204,15 +204,16 @@ public class L4101ReportB extends MakeReport {
 			this.info("getCustNo =" + tBankRemit.getCustNo());
 			this.info("oldFacmNo =" + oldFacmNo);
 			this.info("getFacmNo =" + tBankRemit.getFacmNo());
+
+			if (tBankRemit.getCustNo() != oldCustNo ) {
+				cnt++;
+			}
 			if (tBankRemit.getCustNo() != oldCustNo || tBankRemit.getFacmNo() != oldFacmNo) {
 				oldCustNo = tBankRemit.getCustNo();
 				oldFacmNo = tBankRemit.getFacmNo();
 				subTotal = BigDecimal.ZERO;
 			}
 			
-			if (tBankRemit.getCustNo() != oldCustNo ) {
-				cnt++;
-			}
 
 //			if (!this.nowAcBookCode.equals(tAcDetail.getAcBookCode())) {
 //				// 修改表頭的帳冊別欄位
