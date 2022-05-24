@@ -53,9 +53,9 @@ public class L8205Report2 extends MakeReport {
 
 	public void printHeaderL() {
 		this.print(-3, 5, "程式ID：" + this.getParentTranCode());
-		this.print(-3, 50, "新光人壽保險股份有限公司", "C");
+		this.print(-3, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-4, 5, "報  表：" + this.getRptCode());
-		this.print(-4, 36, "疑似洗錢樣態1、2交易合理性報表");
+		this.print(-4, this.getMidXAxis(), "疑似洗錢樣態1、2合理性報表", "C");
 		this.print(-3, 80, "報表等級：機密" );
 		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-4, 80, "日　　期：" + bcDate);
@@ -104,7 +104,7 @@ public class L8205Report2 extends MakeReport {
 		String edEntryDate = titaVo.getParam("DateEnd");
 		edEntryDate = edEntryDate.substring(0, 3)+"/"+edEntryDate.substring(3, 5)+"/"+edEntryDate.substring(5, 7);
 		
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態1、2交易合理性報表", "", "A4", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態1、2合理性報表", "", "A4", "P");
 		
 		if (L8205List != null && L8205List.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -114,6 +114,10 @@ public class L8205Report2 extends MakeReport {
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 			for (Map<String, String> tL8205Vo : L8205List) {
+				
+				// 檢查列數
+				checkRow(stEntryDate, edEntryDate);
+				
 				// 樣態
 				print(1, 4, tL8205Vo.get("F0"));
 
@@ -162,9 +166,6 @@ public class L8205Report2 extends MakeReport {
 				}
 				print(1, 4, "主管覆核: "+check);
 				print(1, 4, "");
-				
-				// 檢查列數
-				checkRow(stEntryDate, edEntryDate);
 			}
 
 		} else {

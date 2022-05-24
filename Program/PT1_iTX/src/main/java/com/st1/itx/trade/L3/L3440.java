@@ -413,6 +413,25 @@ public class L3440 extends TradeBuffer {
 		}
 	}
 
+	// 調整下次利率調整日 > 會計日
+	private int NextAdjRateDateRoutine() throws LogicException {
+		int nextAdjDate = tLoanBorMain.getNextAdjRateDate();
+		if (tLoanBorMain.getNextAdjRateDate() > 0 && tLoanBorMain.getRateAdjFreq() > 0
+				&& tLoanBorMain.getNextAdjRateDate() < titaVo.getEntDyI()) {
+			do {
+				dDateUtil.init();
+				dDateUtil.setDate_1(nextAdjDate);
+				dDateUtil.setMons(tLoanBorMain.getRateAdjFreq()); // 調整周期(單位固定為月)
+				nextAdjDate = dDateUtil.getCalenderDay();
+			} while (nextAdjDate < titaVo.getEntDyI());
+
+			if (nextAdjDate > tLoanBorMain.getMaturityDate()) {
+				nextAdjDate = tLoanBorMain.getMaturityDate();
+			}
+		}
+		return nextAdjDate;
+	}
+
 	private void ReplyEraseRoutine() throws LogicException {
 		this.info("ReplyEraseRoutine ...");
 
@@ -613,6 +632,7 @@ public class L3440 extends TradeBuffer {
 		tTempVo.putParam("OvduBreachBal", od.getOvduBreachBal());
 		tTempVo.putParam("OvduBal", od.getOvduBal());
 		tTempVo.putParam("ReplyReduceAmt", od.getReplyReduceAmt());
+		tTempVo.putParam("NextAdjRateDate", tLoanBorMain.getNextAdjRateDate());
 		tTempVo.putParam("LastEntDy", tLoanBorMain.getLastEntDy());
 		tTempVo.putParam("LastKinbr", tLoanBorMain.getLastKinbr());
 		tTempVo.putParam("LastTlrNo", tLoanBorMain.getLastTlrNo());
@@ -644,6 +664,8 @@ public class L3440 extends TradeBuffer {
 			tLoanBorMain.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
 			tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
 		}
+		int nextAdjRateDate = NextAdjRateDateRoutine();
+		tLoanBorMain.setNextAdjRateDate(nextAdjRateDate);
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
 		tLoanBorMain.setLastKinbr(titaVo.getKinbr());
 		tLoanBorMain.setLastTlrNo(titaVo.getTlrNo());
@@ -868,8 +890,8 @@ public class L3440 extends TradeBuffer {
 	private void batxSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 99, BigDecimal.ZERO, titaVo); // //
-																												// 99-費用全部(含未到期)
+		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 99, BigDecimal.ZERO, titaVo); // //
+		// 99-費用全部(含未到期)
 		wkTotalFee = baTxCom.getShortfall().add(baTxCom.getModifyFee()).add(baTxCom.getAcctFee())
 				.add(baTxCom.getFireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollFireFee())
 				.add(baTxCom.getCollLawFee());
@@ -968,6 +990,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorMain.setNextPayIntDate(this.parse.stringToInteger(tTempVo.get("NextPayIntDate")));
 		tLoanBorMain.setNextRepayDate(this.parse.stringToInteger(tTempVo.get("NextRepayDate")));
 		tLoanBorMain.setDueAmt(this.parse.stringToBigDecimal(tTempVo.get("DueAmt")));
+		tLoanBorMain.setNextAdjRateDate(this.parse.stringToInteger(tTempVo.get("NextAdjRateDate")));
 		tLoanBorMain.setLastEntDy(this.parse.stringToInteger(tTempVo.get("LastEntDy")));
 		tLoanBorMain.setLastKinbr(tTempVo.get("LastKinbr"));
 		tLoanBorMain.setLastTlrNo(tTempVo.get("LastTlrNo"));

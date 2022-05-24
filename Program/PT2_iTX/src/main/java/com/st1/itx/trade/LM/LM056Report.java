@@ -158,37 +158,24 @@ public class LM056Report extends MakeReport {
 
 		int row = 0;
 		int col = 0;
-		BigDecimal tempAmt = BigDecimal.ZERO;
+		BigDecimal amt = BigDecimal.ZERO;
 
 		// 參考 LM057的表14-5
-		for (Map<String, String> lM056Vo : listData) {
+		for (Map<String, String> r : listData) {
 
-			// 金額
-			tempAmt = lM056Vo.get("F1").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
-
-			// H37 放款總計
-			// D40 甲類逾期放款金額
-			// D41 乙類逾期放款金額
-			// D44 逾期放款比率%
-			if (lM056Vo.get("F0").equals("B")) {
-
-				row = 40;
-				col = 4;
-
-			} else if (lM056Vo.get("F0").equals("C")) {
-
-				row = 41;
-				col = 4;
-
-			} else if (lM056Vo.get("F0").equals("TOTAL")) {
-				row = 37;
-				col = 8;
-
+			col = enToNumber(r.get("F0").toString().substring(0, 1));
+			// 排除N欄以後不設值 略過
+			if (col > 12) {
+				break;
 			}
+			row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
+			amt = getBigDecimal(r.get("F1").toString());
 
-			makeExcel.setValue(row, col, tempAmt, "#,##0", "R");
+
+			makeExcel.setValue(row, col, amt, "#,##0", "R");
 
 		}
+
 		// 重整
 		// D42 甲類逾期放款比率%(含壽險保單質押放款)
 		makeExcel.formulaCaculate(42, 4);
@@ -196,6 +183,29 @@ public class LM056Report extends MakeReport {
 		makeExcel.formulaCaculate(43, 4);
 		// D44 逾期放款比率%(含壽險保單質押放款)
 		makeExcel.formulaCaculate(44, 4);
+		
+		makeExcel.formulaCaculate(45, 4);
+		makeExcel.formulaCaculate(46, 4);
+		makeExcel.formulaCaculate(47, 4);
 	}
+	/**
+	 * 英文轉數字
+	 * 
+	 * @param colText 英文字母
+	 */
+	private int enToNumber(String colText) {
+		String colTxt = "";
+		int col = 0;
 
+		colTxt = colText.toUpperCase();
+
+		char[] tokens = colTxt.toCharArray();
+
+		for (char token : tokens) {
+			col = Integer.valueOf(token) - 64;
+		}
+
+		return col;
+
+	}
 }

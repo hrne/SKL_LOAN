@@ -165,7 +165,7 @@ BEGIN
              , "EffectDate"
         FROM "CdBaseRate"
         WHERE "BaseRateCode" IN ('01','02')
-          AND C."EffectFlag" = 1
+          AND "EffectFlag" = 1
       ) CB ON CB."BaseRateCode" = FP."BaseRateCode"
           AND CB."EffectDate" <= LA."ASCADT"
       WHERE NVL(LM."LMSACN",0) > 0 -- 有串到放款主檔的資料才寫入

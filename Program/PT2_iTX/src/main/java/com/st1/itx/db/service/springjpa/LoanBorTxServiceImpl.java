@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -124,13 +127,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("borxAcDateRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3 + " bormNo_4 : " +  bormNo_4 + " acDate_5 : " +  acDate_5 + " acDate_6 : " +  acDate_6 + " displayflag_7 : " +  displayflag_7);
     if (dbName.equals(ContentName.onDay))
-      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
+      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
+      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
+      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
     else 
-      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
+      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndAcDateGreaterThanEqualAndAcDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaTlrNoAscTitaTxtNoAscDisplayflagAscFacmNoAscBormNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, acDate_5, acDate_6, displayflag_7, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -227,13 +230,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("borxEntryDateRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3 + " bormNo_4 : " +  bormNo_4 + " entryDate_5 : " +  entryDate_5 + " entryDate_6 : " +  entryDate_6 + " displayflag_7 : " +  displayflag_7);
     if (dbName.equals(ContentName.onDay))
-      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+      slice = loanBorTxReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+      slice = loanBorTxReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+      slice = loanBorTxReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
     else 
-      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
+      slice = loanBorTxRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscCreateDateAscDisplayflagAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, entryDate_5, entryDate_6, displayflag_7, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

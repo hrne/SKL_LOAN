@@ -354,7 +354,7 @@ D(8)
 !主管覆核日期(主管第二次覆核 才會顯示)
 !如果ManagerCheck為N, 自動帶入當天並略過
 #ManagerCheckDate=D,7,H
-C(3,#ManagerDate,0,S,$)
+C(3,#ManagerDate,0,s,$)
 C(3,#Level,1,$,s)
 C(3,#CheckDate,1,$,E(0,#CDATE))
 C(3,#CheckDate,1,s,$)

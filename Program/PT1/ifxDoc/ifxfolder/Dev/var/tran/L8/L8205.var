@@ -47,7 +47,7 @@ T(3,*)
 #FdCustNo=X,2,L
 
 #TypeHelp=x,200,S
-T(3,1:洗錢樣態3合理性報表;2:洗錢樣態1、2合理性報表;3:洗錢樣態3未完成交易報表;4:洗錢樣態1、2未完成交易報表;5:洗錢訪談報表)
+T(3,1:疑似洗錢樣態3合理性報表;2:疑似洗錢樣態1、2合理性報表;3:疑似洗錢樣態3未完成交易確認報表;4:疑似洗錢樣態1、2未完成交易確認報表;5:疑似洗錢交易登記表)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -84,7 +84,7 @@ HELP(#TypeHelp)
 V(H,#TypeHelp)
 C(3,#Type,5,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,5,1)T(2,@FdRecordDate,),INVOKEJS(SHOW,p1,2,2,1)INVOKEJS(SHOW,p1,3,5,0)T(2,@FdRecordDate,*))
 
-#TypeX=X,20,L
+#TypeX=X,40,L
 T(H,#Type,#TypeHelp)
 
 #DateItem=X,8,L

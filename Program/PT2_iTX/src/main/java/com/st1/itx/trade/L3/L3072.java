@@ -140,11 +140,12 @@ public class L3072 extends TradeBuffer {
 			createDate = sdfdate.format(ts);
 			updateDate = sdfdate.format(uts);
 
-			createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 7);
-			updateDate = parse.IntegerToString(parse.stringToInteger(updateDate) - 19110000, 7);
+			createDate = parse.timeStampToStringDate(tLoanCustRmk.getCreateDate()).replace("/", "");
+			updateDate = parse.timeStampToStringDate(tLoanCustRmk.getLastUpdate()).replace("/", "");
 			this.info("createDate = " + createDate);
 			this.info("updateDate = " + updateDate);
-
+			
+			
 			occurslist.putParam("OOCreateDate", createDate);
 			occurslist.putParam("OOLastUpdate", updateDate);
 			this.totaVo.addOccursList(occurslist);

@@ -56,9 +56,9 @@ public class L8205Report4 extends MakeReport {
 
 	public void printHeaderL() {
 		this.print(-3, 5, "程式ID：" + this.getParentTranCode());
-		this.print(-3, 50, "新光人壽保險股份有限公司", "C");
+		this.print(-3, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-4, 5, "報  表：" + this.getRptCode());
-		this.print(-4, 38, "洗錢樣態1、2未完成交易確認報表");
+		this.print(-4, this.getMidXAxis(), "洗錢樣態1、2未完成交易確認報表", "C");
 		this.print(-3, 80, "報表等級：機密" );
 		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-4, 80, "日　　期：" + bcDate);
@@ -117,6 +117,10 @@ public class L8205Report4 extends MakeReport {
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 			for (Map<String, String> tL8205Vo : L8205List) {
+				
+				// 檢查列數
+				checkRow(stEntryDate, edEntryDate);
+				
 				int mangerdate = Integer.parseInt(tL8205Vo.get("F10"));
 				this.info("mangerdate=="+mangerdate);
 				dateUtil.init();
@@ -178,9 +182,6 @@ public class L8205Report4 extends MakeReport {
 				}
 				print(1, 4, "主管覆核: "+check);
 				print(1, 4, "");
-				
-				// 檢查列數
-				checkRow(stEntryDate, edEntryDate);
 			}
 
 		} else {

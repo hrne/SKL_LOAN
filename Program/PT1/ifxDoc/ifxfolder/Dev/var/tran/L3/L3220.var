@@ -281,7 +281,9 @@ C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
+T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::CustRmk.rtn"/>
 
 #TimFacmNo=A,3,S
 C(4,#ApplNo,E(0,0),E(0,#L2r05FacmNo))
@@ -389,7 +391,9 @@ C(3,#Precision,0,$,s)
 C(3,#TempItemCode,1,S,$)
 C(3,#TempItemCode,2,S,$)
 C(3,#TempItemCode,3,S,$)
-@V(5,0,#L3r05TempAmt)
+@
+V(2,0)
+V(5,0,#L3r05TempAmt)
 
 #UsTempAmt=m,14.2,I
 C(3,#L3r05TempAmt,0,S,$)
@@ -397,7 +401,9 @@ C(3,#Precision,0,s,$)
 C(3,#TempItemCode,1,S,$)
 C(3,#TempItemCode,2,S,$)
 C(3,#TempItemCode,3,S,$)
-@V(5,0,#L3r05TempAmt)
+@
+V(2,0)
+V(5,0,#L3r05TempAmt)
 
 #TimTempAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))

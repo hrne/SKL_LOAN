@@ -64,7 +64,7 @@ public class L8205Report5 extends MakeReport {
 		this.print(-3, 5, "");
 		this.print(-3, 50, "");
 		this.print(-4, 5, "");
-		this.print(-4, 60, "疑似洗錢交易登記表");
+		this.print(-4, this.getMidXAxis(), "疑似洗錢交易登記表", "C");
 		this.print(-3, 80, "");
 		this.print(-4, 113, "機密等級 : 機密");
 		this.print(-5, 113, "文件持有人請嚴加管控本項文件" );
@@ -109,6 +109,9 @@ public class L8205Report5 extends MakeReport {
 			this.print(-9, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 			for (Map<String, String> tL8205Vo : L8205List) {
+				
+				// 檢查列數
+				checkRow();
 				
 				//訪談日期
 				int recorddate = Integer.parseInt(tL8205Vo.get("F0"))-19110000;
@@ -196,9 +199,6 @@ public class L8205Report5 extends MakeReport {
 					print(1, 101, description4);
 				}
 				
-				
-				// 檢查列數
-				checkRow();
 			}
 
 		} else {

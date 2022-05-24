@@ -223,7 +223,7 @@ BEGIN
           ,'0000'                         AS "BranchNo"
           -- 核准層級為新增欄位
           -- 待User決定就資料轉什麼值
-          -- 預設先擺1:	審查課專案經理
+          -- 預設先擺1: 審查課專案經理
           ,'1'                             AS "ApprovedLevel"       -- 核准層級 VARCHAR2(1 BYTE)
           -- AS400 LA$APLP.APLSDT 鍵檔日期 給 L9110報表使用
           ,CASE
@@ -234,6 +234,11 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,''                             AS "Grcd"                -- 綠色授信註記 VARCHAR2 1
+          ,''                             AS "GrKind"              -- 綠色支出類別 VARCHAR2 1
+          ,''                             AS "EsGcd"               -- 永續績效連結授信註記 VARCHAR2 1
+          ,''                             AS "EsGKind"             -- 永續績效連結授信類別 VARCHAR2 1
+          ,''                             AS "EsGcnl"              -- 永續績效連結授信約定條件全部未達成通報 VARCHAR2 1
     FROM "LA$APLP" APLP
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN"
     LEFT JOIN "FacCaseAppl" APPL ON APPL."ApplNo" = APLP."APLNUM"

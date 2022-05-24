@@ -208,6 +208,9 @@ public class L4101ReportB extends MakeReport {
 				oldCustNo = tBankRemit.getCustNo();
 				oldFacmNo = tBankRemit.getFacmNo();
 				subTotal = BigDecimal.ZERO;
+			}
+			
+			if (tBankRemit.getCustNo() != oldCustNo ) {
 				cnt++;
 			}
 

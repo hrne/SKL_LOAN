@@ -114,9 +114,6 @@ public class LM042Report extends MakeReport {
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM042", "RBC表_會計部", "LM042-RBC表_會計部",
 				"LM042_底稿_RBC表_會計部_共三份.xlsx", "統計數");
 
-//		Object test = makeExcel.getValue(7, 3);
-//		this.info("LM042 get value" + test.toString());
-//		iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		iYear = thisYMD / 10000;
 		iMonth = (thisYMD / 100) % 100;
 //		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
@@ -244,11 +241,12 @@ public class LM042Report extends MakeReport {
 				makeExcel.setValue(row, col, amt, "#,##0");
 
 			}
-
+			
+			//R=27 C=3~6
 			for (int i = 3; i <= 6; i++) {
 				makeExcel.formulaCaculate(27, i);
 			}
-
+			//R=21~27 C=8
 			for (int i = 21; i <= 27; i++) {
 				makeExcel.formulaCaculate(i, 8);
 			}
@@ -329,7 +327,22 @@ public class LM042Report extends MakeReport {
 //				}
 
 			}
-
+			
+			this.info("C5(C-利關人-1類)="+cY1Amt);
+			this.info("C6(C-非利關人-1類)="+cN1Amt);
+			this.info("C7(D-無-1類)="+dN1Amt);
+			this.info("C8(Z-利關人-1類)="+zY1Amt);
+			this.info("C9(Z-非利關人-1類)="+zN1Amt);
+			
+			this.info("D6(C-非利關人-2類)="+cN2Amt);
+			this.info("D9(Z-非利關人-2類)="+zN2Amt);
+			
+			this.info("E6(C-非利關人-3類)="+cN3Amt);
+			this.info("E9(Z-非利關人-3類)="+zN3Amt);
+			
+			this.info("G6(C-非利關人-5類)="+cN5Amt);
+			this.info("G9(Z-非利關人-5類)="+zN5Amt);
+			
 			// 統計數 C5
 			makeExcel.setValue(5, 3, cY1Amt, "#,##0");
 			// 統計數 C6
@@ -352,7 +365,7 @@ public class LM042Report extends MakeReport {
 			// 統計數 E9
 			makeExcel.setValue(9, 5, zN3Amt, "#,##0");
 			// 統計數 G9
-			makeExcel.setValue(9, 5, zN3Amt, "#,##0");
+			makeExcel.setValue(9, 5, zN5Amt, "#,##0");
 
 			// 統計數I5
 			cYToTalAmt = cYToTalAmt.add(cY1Amt);
@@ -373,6 +386,9 @@ public class LM042Report extends MakeReport {
 			i10ToTalAmt = i10ToTalAmt.add(tDisPreRemFees).add(oDisPreRemFees);
 			makeExcel.setValue(9, 10, i10ToTalAmt, "#,##0");
 
+			this.info("===============================");
+
+			
 			// 重整合計公式C11~I11
 			for (int i = 3; i <= 9; i++) {
 				makeExcel.formulaCaculate(11, i);
@@ -405,11 +421,11 @@ public class LM042Report extends MakeReport {
 
 			}
 
-			BigDecimal percent0005 = new BigDecimal("0.005");
-			BigDecimal percent0015 = new BigDecimal("0.015");
-			BigDecimal percent0020 = new BigDecimal("0.02");
-			BigDecimal percent0100 = new BigDecimal("0.01");
-			BigDecimal percent1000 = new BigDecimal("1");
+			BigDecimal percent0_005 = new BigDecimal("0.005");
+			BigDecimal percent0_015 = new BigDecimal("0.015");
+			BigDecimal percent0_02 = new BigDecimal("0.02");
+			BigDecimal percent0_1 = new BigDecimal("0.1");
+			BigDecimal percent1 = new BigDecimal("1");
 
 			BigDecimal cY1loseToTalAmt = BigDecimal.ZERO;
 			BigDecimal cN1loseToTalAmt = BigDecimal.ZERO;
@@ -425,50 +441,50 @@ public class LM042Report extends MakeReport {
 			
 			//備抵損失I
 			//J5 C*
-			cY1loseToTalAmt = cY1Amt.multiply(percent0005).setScale(0, BigDecimal.ROUND_HALF_UP);
+			cY1loseToTalAmt = cY1Amt.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(5, 10, cY1loseToTalAmt, "#,##0");
 
 			//J6 C非
 			cN1loseToTalAmt = cY1Amt.subtract(cHouseAndRepair);
-			cN1loseToTalAmt = cN1loseToTalAmt.multiply(percent0005).setScale(0, BigDecimal.ROUND_HALF_UP);
+			cN1loseToTalAmt = cN1loseToTalAmt.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
 			cN1loseToTalAmt = cN1loseToTalAmt
-					.add(cHouseAndRepair.multiply(percent0015).setScale(0, BigDecimal.ROUND_HALF_UP));
+					.add(cHouseAndRepair.multiply(percent0_015).setScale(0, BigDecimal.ROUND_HALF_UP));
 			makeExcel.setValue(6, 10, cN1loseToTalAmt, "#,##0");
 
 			//J7 D
-			dN1loseToTalAmt = dN1Amt.multiply(percent0005).setScale(0, BigDecimal.ROUND_HALF_UP);
+			dN1loseToTalAmt = dN1Amt.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(7, 10, dN1loseToTalAmt, "#,##0");
 
 			//J8 Z*
-			zY1loseToTalAmt = zY1Amt.multiply(percent0005).setScale(0, BigDecimal.ROUND_HALF_UP);
+			zY1loseToTalAmt = zY1Amt.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(8, 10, zY1loseToTalAmt, "#,##0");
 
 			//J9 Z非
-			zN1loseToTalAmt = zN1Amt.multiply(percent0005).setScale(0, BigDecimal.ROUND_HALF_UP);
+			zN1loseToTalAmt = zN1Amt.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(9, 10, zN1loseToTalAmt, "#,##0");
 
 			//備抵損失II
 			//K11 C非
 			cN2loseToTalAmt = cN2Amt.add(sIntRecv);
-			cN2loseToTalAmt = cN2loseToTalAmt.multiply(percent0020).setScale(0, BigDecimal.ROUND_HALF_UP);
+			cN2loseToTalAmt = cN2loseToTalAmt.multiply(percent0_02).setScale(0, BigDecimal.ROUND_HALF_UP);
 			cN2loseToTalAmt = cN2loseToTalAmt.add(new BigDecimal("0.4")).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(6, 11, cN2loseToTalAmt, "#,##0");
 			
 			//K11 Z非
-			zN2loseToTalAmt = zN2Amt.multiply(percent0020).setScale(0, BigDecimal.ROUND_HALF_UP);
+			zN2loseToTalAmt = zN2Amt.multiply(percent0_02).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(9, 11, zN2loseToTalAmt, "#,##0");
 
 			//備抵損失III
 			//L6 C非
-			cY3loseToTalAmt = cN3Amt.multiply(percent0100).setScale(0, BigDecimal.ROUND_HALF_UP);
+			cY3loseToTalAmt = cN3Amt.multiply(percent0_1).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(9, 12, cY3loseToTalAmt, "#,##0");
 
 			//備抵損失V
 			//N6 C非
-			cN5loseToTalAmt = cN5Amt.multiply(percent1000).setScale(0, BigDecimal.ROUND_HALF_UP);
+			cN5loseToTalAmt = cN5Amt.multiply(percent1).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(6, 14, cN5loseToTalAmt, "#,##0");
 			//N9 Z非
-			zN5loseToTalAmt = zN5Amt.multiply(percent1000).setScale(0, BigDecimal.ROUND_HALF_UP);
+			zN5loseToTalAmt = zN5Amt.multiply(percent1).setScale(0, BigDecimal.ROUND_HALF_UP);
 			makeExcel.setValue(9, 14, zN5loseToTalAmt, "#,##0");
 
 			//總計

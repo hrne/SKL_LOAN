@@ -65,19 +65,19 @@ public class LM014Report extends MakeReport {
 		// 設定字體大小
 		this.setFontSize(9);
 
-		this.print(-1, 146, "機密等級：密");
+		this.print(-1, 186, "機密等級：密");
 
 		this.print(-2, 3, "程式ＩＤ：" + this.getParentTranCode());
-		this.print(-2, 86, "新光人壽保險股份有限公司", "C");
-		this.print(-2, 146, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
+		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
+		this.print(-2, 186, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
 
 		this.print(-3, 3, "報　　表：" + this.getRptCode());
-		this.print(-3, 86, "平均利率月報表《" + currentReportType.value + "》", "C");
-		this.print(-3, 146, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, this.getMidXAxis(), "平均利率月報表《" + currentReportType.value + "》", "C");
+		this.print(-3, 186, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
-		this.print(-4, 146, "頁　　數：" + this.getNowPage());
+		this.print(-4, 186, "頁　　數：" + this.getNowPage());
 
-		this.print(-5, 86, getshowRocDate(this.getReportDate()), "C");
+		this.print(-5, this.getMidXAxis(), getshowRocDate(this.getReportDate()), "C");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(6);
