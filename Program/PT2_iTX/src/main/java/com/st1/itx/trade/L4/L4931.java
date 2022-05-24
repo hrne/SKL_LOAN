@@ -64,7 +64,7 @@ public class L4931 extends TradeBuffer {
 			// *** 折返控制相關 ***
 			resultList = l4931ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
-			this.error("l4920ServiceImpl findByCondition " + e.getMessage());
+			this.error("l4931ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
 
@@ -77,16 +77,11 @@ public class L4931 extends TradeBuffer {
 			}
 
 			for (Map<String, String> result : resultList) {
+				this.info("result =" + result.toString());
 				OccursList occursList = new OccursList();
-
-				dateUtil.init();
-				dateUtil.setDate_1(parse.stringToInteger(result.get("F15")));
-				dateUtil.setMons(parse.stringToInteger(result.get("F17"))); // 調整周期(單位固定為月)
-				int nextAdjDate = dateUtil.getCalenderDay();
-
-				int presEffDate = parse.stringToInteger(result.get("F14"));
-				int curtEffDate = parse.stringToInteger(result.get("F15"));
-				int prevIntDate = parse.stringToInteger(result.get("F18"));
+				int presEffDate = parse.stringToInteger(result.get("PresEffDate"));
+				int curtEffDate = parse.stringToInteger(result.get("CurtEffDate"));
+				int prevIntDate = parse.stringToInteger(result.get("PrevIntDate"));
 
 				if (presEffDate > 19110000) {
 					presEffDate = presEffDate - 19110000;
@@ -97,42 +92,33 @@ public class L4931 extends TradeBuffer {
 				if (prevIntDate > 19110000) {
 					prevIntDate = prevIntDate - 19110000;
 				}
-
-				if (nextAdjDate > 19110000) {
-					nextAdjDate = nextAdjDate - 19110000;
-				}
-				occursList.putParam("OOCityItem", result.get("F37"));
-				occursList.putParam("OOAreaItem", result.get("F40"));
-				occursList.putParam("OOAdjCode", result.get("F9"));
-				occursList.putParam("OOCustNo", result.get("F1"));
-				occursList.putParam("OOFacmNo", result.get("F2"));
-				occursList.putParam("OOBormNo", result.get("F3"));
-				occursList.putParam("OOCustName", result.get("F35"));
-				occursList.putParam("OOTotalLoanBal", result.get("F12"));
-				occursList.putParam("OODrawdownAmt", result.get("F5"));
-				occursList.putParam("OOLoanBal", result.get("F13"));
+				occursList.putParam("OOCityItem", result.get("CityItem"));
+				occursList.putParam("OOAreaItem", result.get("AreaItem"));
+				occursList.putParam("OOAdjCode", result.get("AdjCode"));
+				occursList.putParam("OOCustNo", result.get("CustNo"));
+				occursList.putParam("OOFacmNo", result.get("FacmNo"));
+				occursList.putParam("OOBormNo", result.get("BormNo"));
+				occursList.putParam("OOCustName", result.get("CustName"));
+				occursList.putParam("OOTotalLoanBal", result.get("TotalLoanBal"));
+				occursList.putParam("OODrawdownAmt", result.get("DrawdownAmt"));
+				occursList.putParam("OOLoanBal", result.get("LoanBal"));
 				occursList.putParam("OOPresEffDate", presEffDate);
 				occursList.putParam("OOCurtEffDate", curtEffDate);
 				occursList.putParam("OOPrevIntDate", prevIntDate);
-				occursList.putParam("OOCustCode", result.get("F19"));
-				occursList.putParam("OOProdNo", result.get("F20"));
-				occursList.putParam("OORateIncr", result.get("F21"));
-				occursList.putParam("OOContractRate", result.get("F22"));
-				occursList.putParam("OOPresentRate", result.get("F23"));
-				occursList.putParam("OOProposalRate", result.get("F24"));
-				occursList.putParam("OOAdjustedRate", result.get("F25"));
-				occursList.putParam("OOContrIndexRate", result.get("F26"));
-				occursList.putParam("OOContrRateIncr", result.get("F27"));
-				occursList.putParam("OOPropIndexRate", result.get("F36"));
-				occursList.putParam("OOIndividualIncr", result.get("F28"));
-				occursList.putParam("OOUpperLimitRate", result.get("F38"));
-				occursList.putParam("OOLowerLimitRate", result.get("F39"));
-//				擬調利率生效日
-				occursList.putParam("OONextAdjDate", nextAdjDate);
-//				擬調利率
-				occursList.putParam("OONextAdjRate", result.get("F25"));
-//              逾期期數
-				occursList.putParam("OOOvduTerm", result.get("F41"));
+				occursList.putParam("OOCustCode", result.get("CustCode"));
+				occursList.putParam("OOProdNo", result.get("ProdNo"));
+				occursList.putParam("OORateIncr", result.get("RateIncr"));
+				occursList.putParam("OOContractRate", result.get("ContractRate"));
+				occursList.putParam("OOPresentRate", result.get("PresentRate"));
+				occursList.putParam("OOProposalRate", result.get("ProposalRate"));
+				occursList.putParam("OOAdjustedRate", result.get("AdjustedRate"));
+				occursList.putParam("OOContrIndexRate", result.get("ContrBaseRate"));
+				occursList.putParam("OOContrRateIncr", result.get("ContrRateIncr"));
+				occursList.putParam("OOPropIndexRate", result.get("CurrBaseRate"));
+				occursList.putParam("OOIndividualIncr", result.get("IndividualIncr"));
+				occursList.putParam("OOUpperLimitRate", result.get("UpperLimitRate"));
+				occursList.putParam("OOLowerLimitRate", result.get("LowerLimitRate"));
+				occursList.putParam("OOOvduTerm", result.get("OvduTerm"));
 
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(result.get("F34"));
@@ -142,12 +128,6 @@ public class L4931 extends TradeBuffer {
 				}
 				if (tempVo.get("WarnMsg") != null) {
 					procNote += tempVo.get("WarnMsg");
-				}
-				if (tempVo.get("keyinMsg") != null) {
-					procNote += tempVo.get("keyinMsg");
-				}
-				if (!procNote.isEmpty()) {
-					procNote = "檢核訊息:" + procNote + " ";
 				}
 				occursList.putParam("OOProcNote", procNote);
 

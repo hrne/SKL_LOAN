@@ -55,7 +55,6 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        FROM \"AcLoanInt\" ALI ";
 		sql += "        LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = ALI.\"CustNo\" ";
 		sql += "        WHERE ALI.\"IntStartDate\" > 0 "; // 非滯繳息
-		sql += "          AND ALI.\"Interest\"     > 0 "; // 只顯示利息大於0者
 		sql += "          AND ALI.\"YearMonth\"    = :inputYearMonth ) ALI ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
 		sql += "                   ,SUM(\"Interest\") \"Interest\" ";
@@ -64,6 +63,7 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND \"YearMonth\"    = :inputYearMonth ";
 		sql += "             GROUP BY \"CustNo\" ) ALIDelayed ON ALIDelayed.\"CustNo\" = ALI.\"CustNo\" ";
 		sql += "                                             AND ALI.\"Seq\"           = 1 ";
+		sql += " WHERE ALI.\"Interest\" + NVL(ALIDelayed.\"Interest\", 0) > 0 "; // 只顯示應繳利息大於 0 者
 		sql += " GROUP BY ALI.\"Aging\" ";
 		sql += "         ,ALI.\"CustNoShow\" ";
 		sql += "         ,ALI.\"CustName\" ";

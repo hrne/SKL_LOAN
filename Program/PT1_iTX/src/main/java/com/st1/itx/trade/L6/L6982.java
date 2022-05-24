@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L6;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +12,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -56,9 +53,6 @@ public class L6982 extends TradeBuffer {
 
 	@Autowired
 	public InsuRenewService insuRenewService;
-	
-	@Autowired
-	public CdEmpService sCdEmpService;
 
 	private int selectCode = 0;
 	private int custNo = 0;
@@ -110,7 +104,7 @@ public class L6982 extends TradeBuffer {
 
 			}
 			for (InsuRenew tmpInsuRenew : lInsuRenew) {
-				if (tmpInsuRenew.getAcDate() == 0 && tmpInsuRenew.getStatusCode() == 2) {
+				if (tmpInsuRenew.getAcDate() == 0 && tmpInsuRenew.getStatusCode() == 1) {
 					OccursList occursList = new OccursList();
 
 					occursList.putParam("OOProcStatus", 0);
@@ -129,12 +123,6 @@ public class L6982 extends TradeBuffer {
 					occursList.putParam("OOItemCode", "TRIS00");
 					occursList.putParam("OOBormNo", "");
 					occursList.putParam("OODtlValue", tmpInsuRenew.getPrevInsuNo());
-					// 最後修改時間
-					Timestamp lastUpdateTime = tmpInsuRenew.getLastUpdate();
-					occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
-					// 最後修改人員
-					String lastUpdateEmpNo = tmpInsuRenew.getLastUpdateEmpNo();
-					occursList.putParam("OOLastEmp", getLastUpdateEmp(lastUpdateEmpNo, titaVo));
 					cnt++;
 					this.totaVo.addOccursList(occursList);
 				}
@@ -209,8 +197,6 @@ public class L6982 extends TradeBuffer {
 					occursList.putParam("OOInsuStartDate", 0);
 					occursList.putParam("OOInsuEndDate", 0);
 					occursList.putParam("OOTransCollAmt", 0);
-					occursList.putParam("OOLastUpdate", "");
-					occursList.putParam("OOLastEmp", "");
 				}
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
@@ -219,12 +205,6 @@ public class L6982 extends TradeBuffer {
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
-				// 最後修改時間
-				Timestamp lastUpdateTime = tTxToDoDetail.getLastUpdate();
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
-				// 最後修改人員
-				String lastUpdateEmpNo = tTxToDoDetail.getLastUpdateEmpNo();
-				occursList.putParam("OOLastEmp", getLastUpdateEmp(lastUpdateEmpNo, titaVo));
 				cnt++;
 				this.totaVo.addOccursList(occursList);
 			}
@@ -281,16 +261,4 @@ public class L6982 extends TradeBuffer {
 		return result;
 	}
 
-	private String getLastUpdateEmp(String empNo, TitaVo titaVo) throws LogicException {
-		
-		String empName = null;
-		
-		CdEmp tCdEmp = sCdEmpService.findById(empNo, titaVo);
-		if(tCdEmp != null)
-			empName = tCdEmp.getFullname();
-		
-		empName = empName.equals("") ? empNo : empName;
-		
-		return empNo + " " + empName;
-	}
 }
