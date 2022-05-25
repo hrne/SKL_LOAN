@@ -97,12 +97,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,NVL(L.\"Amount\",0) AS \"Amount\""; // F11
 		sql += "			,(CASE ";
 		sql += "				WHEN M.\"PrinBalance\" = 1 THEN '無擔保'";
-		sql += "				WHEN M.\"PrinBalance\" > 1 THEN '有擔保'";
+		sql += "				WHEN M.\"PrinBalance\" > 1 AND M.\"AcctCode\" = 990 THEN '有擔保'";
+		sql += "				WHEN M.\"PrinBalance\" > 1 THEN '有足額擔保'";
 		sql += "			  ELSE '' END) ||";
 		sql += "			 (CASE ";
 		sql += "				WHEN M.\"AcctCode\" <> 990 THEN '--但債信不良(' || M.\"AssetNum\" || ')' ";
 		sql += "			  ELSE '' END) ||";
 		sql += "			 (CASE ";
+		sql += "				WHEN M.\"AcctCode\" = 990 AND M.\"ProdNo\" IN ('60','61','62') THEN '--協議後正常還款'";
 		sql += "				WHEN M.\"OvduTerm\" > 0 AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 THEN '--逾期'";
 		sql += "				WHEN M.\"OvduDays\" = 0 THEN '--正常繳息'";
 		sql += "				WHEN M.\"OvduDays\" > 0 AND M.\"OvduDays\" <= 30 THEN '--逾期未滿30日'";
@@ -132,18 +134,9 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,M.\"PrevIntDate\"";
 		sql += "				 ,M.\"RenewCode\"";
 		sql += "				 ,M.\"LawAmount\"";
-//		sql += "				 ,(CASE";
-//		sql += "				     WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 AND M.\"AcctCode\" <> 990 THEN '*協-' || SUBSTR(M.\"OvduTerm\",0,1) ";
-//		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 AND M.\"OvduDays\" =0 AND M.\"AcctCode\" <> 990 THEN '協' ";
-//		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduDays\" > 0 AND M.\"OvduDays\" < 30 AND M.\"AcctCode\" <> 990 THEN '協*' ";
-//		sql += "					 WHEN M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"AcctCode\" = 990 THEN '催' ";
-//		sql += "					 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"AcctCode\" = 990  THEN '催協' ";
-//		sql += "					 ELSE ' '";
-//		sql += "				   END) AS \"OvduText\"";
 		sql += "				 ,M.\"ProdNo\"";
 		sql += "				 ,SUBSTR(CLS.\"AssetClass\",0,1) AS \"AssetNum\"";
 		sql += "				 ,CLS.\"AssetClass\" AS \"AssetClass\"";
-		
 		sql += "		   FROM \"MonthlyFacBal\" M";
 		sql += "		   LEFT JOIN \"tempClass\" CLS ON CLS.\"CustNo\" = M.\"CustNo\"";
 		sql += "		   							  AND CLS.\"FacmNo\" = M.\"FacmNo\"";
@@ -212,12 +205,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
 			sql += "                 ELSE 0 END";
 			sql += "                ) AS \"LnAmt\"";
-//			sql += "             -";
-//			sql += "             SUM(CASE WHEN I.\"YearMonth\" = :lyymm";
-//			sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
-//			sql += "                 ELSE 0 END";
-//			sql += "                )";
-//			sql += "             AS \"LnAmt\"";
 			sql += "      FROM \"Ias39IntMethod\" I";
 			sql += "      LEFT JOIN \"MonthlyLoanBal\" MLB ON I.\"YearMonth\" = MLB.\"YearMonth\" ";
 			sql += "                                      AND I.\"CustNo\" = MLB.\"CustNo\" ";

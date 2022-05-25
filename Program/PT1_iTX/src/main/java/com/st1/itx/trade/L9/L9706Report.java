@@ -28,7 +28,7 @@ public class L9706Report extends MakeReport {
 
 		this.setFontSize(13);
 		this.info("L9706 exec" + this.titaVo.get("ENTDY"));
-		this.print(-1, 19, "貸   款   餘   額   證   明   書             機密等級：普通");
+		this.print(-1, this.getMidXAxis(), "貸   款   餘   額   證   明   書" , "C");
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(2);
 
@@ -58,7 +58,7 @@ public class L9706Report extends MakeReport {
 
 		if (loanBTXList != null && loanBTXList.size() != 0) {
 			for (Map<String, String> tL9706Vo : loanBTXList) {
-				if (cnt == 2) {
+				if (cnt == 1) {
 					this.newPage();
 					cnt = 0;
 				}
@@ -120,52 +120,44 @@ public class L9706Report extends MakeReport {
 		this.print(1, 1, "");
 		this.print(1, 5, "查");
 
-		this.print(0, 13, tL9706Vo.get("F0"));
-		this.print(0, 58, "君前於");
-		this.print(1, 1, "");
-		this.print(1, 37, tranDate(tL9706Vo.get("F1")), "R");
-		this.print(0, 37, "向本公司申借");
-
+		this.print(0, 8, tL9706Vo.get("F0"));
+		this.print(0, 53, "君(身分證字號");
+		this.print(0, 66, tL9706Vo.get("F9")+")，");
+		this.print(1,1,"");
+		this.print(1, 3, "於 " + showRocDate(tL9706Vo.get("F1"),0));
+		this.print(0, 20, "向本公司辦理" );
+		
 		tmp = "";
 		if (!tL9706Vo.get("F2").equals("0")) {
-			tmp = tmp + tL9706Vo.get("F2") + "年";
+			tmp = tmp + tL9706Vo.get("F2") + " 年";
 		}
 		if (!tL9706Vo.get("F3").equals("0")) {
-			tmp = tmp + tL9706Vo.get("F3") + "月";
+			tmp = tmp + tL9706Vo.get("F3") + " 月";
 		}
 		if (!tL9706Vo.get("F4").equals("0")) {
-			tmp = tmp + tL9706Vo.get("F4") + "天";
+			tmp = tmp + tL9706Vo.get("F4") + " 天";
 		}
-		tmp = tmp + "期";
-
-		this.print(0, 50, tmp);
-		this.print(0, 58, "購置住");
-		this.print(1, 1, "");
-		this.print(1, 1, "宅貸款金額");
+		tmp = tmp + "期 ";
+		this.print(0, 32, tmp);
 		tmp = ConvertUpMoney.toChinese(tL9706Vo.get("F5"));
-		this.print(0, 12, tmp + "整");
-		this.print(0, 62, "，");
+		this.print(0, 40, "購置貸款，借款金額"+tmp+"整，");
 		tmp = String.format("%07d", Integer.valueOf(tL9706Vo.get("F6"))) + " - " + String.format("%03d", Integer.valueOf(tL9706Vo.get("F7")));
-		this.print(1, 1, "");
-		this.print(1, 1, "戶號 ");
-		this.print(0, 6, tmp);
-		this.print(0, 20, "截至");
-		this.print(0, 62, iENTDAY, "R");
-		this.print(0, 62, "止");
-		this.print(1, 1, "");
-		this.print(1, 1, "尚欠本金餘額");
+		this.print(1,1,"");
+		this.print(1, 3, "戶號  "+ tmp+ "截至民國"+ showRocDate(titaVo.getParam("ENTDY"),0)+"止");
 		tmp = ConvertUpMoney.toChinese(tL9706Vo.get("F8"));
-		this.print(0, 14, tmp + "整");
-		this.print(0, 62, "。");
+		this.print(1,1,"");
+		this.print(1, 3,"貸款餘額為新台幣"+tmp + "整。");
+		this.print(1,1,"");
+		this.print(1, 3,"貸款抵押標的物地址為"+tL9706Vo.get("F10")+"。");
 		this.print(1, 1, "");
 		this.print(1, 18, "此  致");
 		this.print(1, 1, "");
-		this.print(1, 9, "台  照");
+		this.print(1, 9, "台照");
 		this.print(1, 1, "");
-		this.print(1, 40, "新光人壽保險股份有限公司");
+		this.print(1, 76, "新光人壽保險股份有限公司敬啟","R");
 		this.print(1, 1, "");
-		this.print(1, 4, "中 　 華 　 民 　 國  ");
-		this.print(0, 64, iENTDAY, "R");
+		this.print(1, 4, "中 　 　　華 　 　　民 　 　　國  "+ iENTDAY);
+//		this.print(0, 66, iENTDAY, "R");
 	}
 
 	private String tranDate(String date) {

@@ -325,7 +325,7 @@ BEGIN
          , CASE WHEN WK."DataFg" = 1 THEN IA."OvduDays"
                 WHEN M."NextPayIntDate" IS NULL  THEN 0
                 WHEN M."MaturityDate" < M."NextPayIntDate"
-                     THEN ( LastYMD - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
+                     THEN ( LastYMD - TO_DATE(M."MaturityDate",'yyyy-mm-dd') )
                 ELSE ( LastYMD - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd'))
            END                                       AS "OvduDays"           -- 逾期繳款天數
          , CASE WHEN WK."DataFg" = 1 THEN IA."OvduDate"

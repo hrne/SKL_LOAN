@@ -350,7 +350,7 @@ SHOW(#BTN3)HIDE(#BTN1,#BTN6,#BTN2,#BTN7)
 CALL(#InitValue)
 @
 C(4,#CustNo,C(4,#CustId,C(4,#ApplNo,V(P,需擇一輸入),$),$),$)
-
+C(4,#CustNo,C(4,#CustId,T(3,@FdApplNo,*),T(3,@FdApplNo, )),T(3,@FdApplNo, ))
 
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)

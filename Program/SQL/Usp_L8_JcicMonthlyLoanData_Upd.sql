@@ -292,11 +292,12 @@ BEGIN
                  , "ClFac"."FacmNo"
                  , "ClFac"."ClCode1"
                  , "ClFac"."ClCode2"
-                 , SUM(NVL("ClImm"."SettingAmt",0))  AS "SettingAmt"
+--                 , SUM(NVL("ClImm"."SettingAmt",0))  AS "SettingAmt"
+                 , SUM(NVL("ClFac"."OriSettingAmt",0))  AS "SettingAmt"  -- 使用原始鑑估值
             FROM  "ClFac"
-              LEFT JOIN "ClImm"   ON "ClImm"."ClCode1"   =  "ClFac"."ClCode1"
-                                 AND "ClImm"."ClCode2"   =  "ClFac"."ClCode2"
-                                 AND "ClImm"."ClNo"      =  "ClFac"."ClNo"
+--              LEFT JOIN "ClImm"   ON "ClImm"."ClCode1"   =  "ClFac"."ClCode1"
+--                                 AND "ClImm"."ClCode2"   =  "ClFac"."ClCode2"
+--                                 AND "ClImm"."ClNo"      =  "ClFac"."ClNo"
             WHERE NVL("ClFac"."ClCode1", 0) IN (1, 2)
             GROUP BY "ClFac"."CustNo", "ClFac"."FacmNo", "ClFac"."ClCode1", "ClFac"."ClCode2"
           ) T

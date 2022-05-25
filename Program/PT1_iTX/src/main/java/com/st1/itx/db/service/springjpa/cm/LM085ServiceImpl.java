@@ -61,13 +61,13 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
 		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G6','G7')";
 		sql += "		UNION";
-		sql += "		SELECT 'G8' AS \"Column\"";
+		sql += "		SELECT 'E9' AS \"Column\"";
 		sql += "			  ,\"LoanBal\" AS \"Value\"";
 		sql += "		FROM \"MonthlyLM052AssetClass\"";
 		sql += "		WHERE \"YearMonth\" = :yymm ";
 		sql += "		  AND \"AssetClassNo\" = 62 ";
 		sql += "		UNION";
-		sql += "		SELECT 'E9' AS \"Column\"";
+		sql += "		SELECT 'G8' AS \"Column\"";
 		sql += "			  ,NVL(R.\"LnAmt\",0) AS \"Value\"";
 		sql += "		FROM \"roundData\" R";
 		sql += "	),\"tempAmt\" AS (";

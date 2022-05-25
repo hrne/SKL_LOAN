@@ -40,17 +40,24 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iCUSTNO = titaVo.get("CUSTNO");
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
 		String iENTDAY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
+		String iFlag = titaVo.get("ClsFlag");
+		int iFacmMo = Integer.valueOf(titaVo.get("FacmNo"));
+		this.info("iDAY    =" + iDAY);
+		this.info("iENTDAY =" + iENTDAY);
+		this.info("iFlag   =" + iFlag);
+		this.info("iFacmMo =" + iFacmMo);
 
-		String sql = "SELECT  \"Fn_ParseEOL\"(C.\"CustName\",0) F0";
-		sql += "             , F.\"FirstDrawdownDate\" F1";
-		sql += "             , F.\"LoanTermYy\" F2";
-		sql += "             , F.\"LoanTermMm\" F3";
-		sql += "             , F.\"LoanTermDd\" F4";
-		sql += "             , F.\"LineAmt\" F5";
-		sql += "             , M.\"CustNo\" F6";
-		sql += "             , M.\"FacmNo\" F7";
-		sql += "             , M.\"LoanBal\" F8";
-
+		String sql = "SELECT  \"Fn_ParseEOL\"(C.\"CustName\",0) \"F0\" ";
+		sql += "             , F.\"FirstDrawdownDate\" \"F1\" ";
+		sql += "             , F.\"LoanTermYy\" \"F2\" ";
+		sql += "             , F.\"LoanTermMm\" \"F3\" ";
+		sql += "             , F.\"LoanTermDd\" \"F4\" ";
+		sql += "             , F.\"LineAmt\" \"F5\" ";
+		sql += "             , M.\"CustNo\" \"F6\" ";
+		sql += "             , M.\"FacmNo\" \"F7\" ";
+		sql += "             , M.\"LoanBal\" \"F8\" ";
+		sql += "             , C.\"CustId\" \"F9\" ";
+		sql += "             , H.\"BdLocation\"  \"F10\" ";
 		if (iDAY.equals(iENTDAY)) {
 			sql += "       FROM ( SELECT  M.\"CustNo\"";
 			sql += "                    , M.\"FacmNo\"";
@@ -73,14 +80,29 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ON   C.\"CustNo\" = M.\"CustNo\"";
 		sql += "       LEFT JOIN \"FacMain\" F ON F.\"CustNo\"= M.\"CustNo\"";
 		sql += "              AND  F.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "       LEFT JOIN \"ClFac\"      g ON g.\"CustNo\" = m.\"CustNo\"";
+		sql += "              AND g.\"FacmNo\" = m.\"FacmNo\"";
+        sql += "       LEFT JOIN \"ClBuilding\" h ON g.\"ClCode1\" = h.\"ClCode1\"";
+        sql += "              AND g.\"ClCode2\" = h.\"ClCode2\"";
+        sql += "              AND g.\"ClNo\" = h.\"ClNo\"";
+		// 20220523新增條件
+		if (iFlag.equals("N") && iFacmMo == 0) {
+			sql += "                 where m.\"LoanBal\" != 0 ";
+		} else if (iFlag.equals("Y") && iFacmMo != 0) {
+			sql += "                 where m.\"LoanBal\" = 0 ";
+			sql += "                 and M.\"FacmNo\" = :iFamcNo  ";
+		}
 
-		this.info("sql=" + sql);
+		this.info("L9706 Simplsql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("icustno", iCUSTNO);
 		if (!iDAY.equals(iENTDAY)) {
 			query.setParameter("iday", iDAY);
+		}
+		if (iFacmMo != 0) {
+			query.setParameter("iFacmMo", iFacmMo);
 		}
 		return this.convertToMap(query.getResultList());
 	}

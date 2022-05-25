@@ -2387,14 +2387,14 @@ C(3,#RecycleCode,0,T(2,@FdRecycleDeadline, )
 
 #ShowP4=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#ExtraRepayCode,#ExtraRepayCodeX,#CustTypeCode,#CustTypeCodeX,#RuleCode,#RuleCodeX,#RecycleCode,#RecycleCodeX,#RecycleDeadlineX,#UsageCode,#UsageCodeX,#CompensateFlag,#CompensateFlagX,#IrrevocableFlag,#IrrevocableFlagX,#RateAdjNoticeCode,#RateAdjNoticeCodeX,#PieceCode,#PieceCodeX,#CreditScore)
+    SHOW(#ExtraRepayCode,#ExtraRepayCodeX,#CustTypeCode,#CustTypeCodeX,#RuleCode,#RuleCodeX,#RecycleCode,#RecycleCodeX,#RecycleDeadlineX,#UsageCode,#UsageCodeX,#CompensateFlag,#CompensateFlagX,#IrrevocableFlag,#IrrevocableFlagX,#RateAdjNoticeCode,#RateAdjNoticeCodeX,#PieceCode,#PieceCodeX,#CreditScore,#Grcd,#EsGcd,#EsGcnl)
     HIDE(#LbCreditScoreX)
     C(3,#RecycleCode,0,HIDE(#RecycleDeadline)T(3, )
                      ,SHOW(#RecycleDeadline)T(2,#WkStar))
     C(3,#L2r01ExtraRepayCode,9,$,HIDE(#ExtraRepayCode))
     C(3,#L2r01RecycleCode,9,$,HIDE(#RecycleCode))                     
    ,SHOW(#ExtraRepayCodeX,#CustTypeCodeX,#RuleCodeX,#RecycleCodeX,#IntCalcCode,#LbRecycleDeadline,#UsageCodeX,#CompensateFlagX,#IrrevocableFlagX,#RateAdjNoticeCodeX,#PieceCodeX,#LbCreditScoreX)
-    HIDE(#ExtraRepayCode,#CustTypeCode,#RuleCode,#RecycleCode,#IntCalcCode,#RecycleDeadline,#UsageCode,#CompensateFlag,#IrrevocableFlag,#RateAdjNoticeCode,#CreditScore)
+    HIDE(#ExtraRepayCode,#CustTypeCode,#RuleCode,#RecycleCode,#IntCalcCode,#RecycleDeadline,#UsageCode,#CompensateFlag,#IrrevocableFlag,#RateAdjNoticeCode,#CreditScore,#Grcd,#EsGcd,#EsGcnl)
     C(3,#RecycleCode,0,HIDE(#LbRecycleDeadline)
                      ,SHOW(#LbRecycleDeadline)))
 
@@ -3345,6 +3345,7 @@ D(8)
 
 #Grcd=X,1,I
 C(3,#UpdateCode,1,$,s)
+C(3,#FuncCode,5,$,S)
 C(3,#Hide7Fg,0,CALL(#HideP7),$)
 HELP(#YesNoHelp)
 @

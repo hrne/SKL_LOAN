@@ -1,4 +1,9 @@
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicB096_Upd"
+--------------------------------------------------------
+--  DDL for Procedure Usp_L8_JcicB096_Upd
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB096_Upd" 
 (
 -- 程式功能：維護 JcicB096 每月聯徵不動產擔保品明細-地號附加檔
 -- 執行時機：每月底日終批次(換日前)
@@ -49,93 +54,131 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('INSERT JcicB096');
 
     INSERT INTO "JcicB096"
-    WITH "Work_B096_All" AS (
-
-    SELECT
-           M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
-         , CF."ClCode1"                          AS "ClCode1"           -- 擔保品代號1
-         , CF."ClCode2"                          AS "ClCode2"           -- 擔保品代號2
-         , CF."ClNo"                             AS "ClNo"              -- 擔保品編號
-         , NVL(L."LandSeq",0)                    AS "LandSeq"           -- 土地序號
-         , CASE WHEN TRIM(NVL(L."CityCode",' ')) = '' THEN ' '
-                ELSE SUBSTR('00' || TRIM(L."CityCode"), -2)
-           END                                   AS "CityCode"          -- 縣市別
-         , CASE WHEN TRIM(NVL(L."AreaCode",' ')) = '' THEN ' '
-                ELSE SUBSTR('00' || TRIM(L."AreaCode"), -2)
-           END                                   AS "AreaCode"          -- 鄉鎮市區別
-         , CASE
-             WHEN TRIM(L."IrCode") IS NOT NULL THEN SUBSTR('0000' || L."IrCode", -4)
-             ELSE '0001'
-           END                                   AS "IrCode"            -- 段、小段號
-         , NVL(L."LandNo1", 0)                   AS "LandNo1"           -- 地號-前四碼
-         , NVL(L."LandNo2", 0)                   AS "LandNo2"           -- 地號-後四碼
-    FROM   "JcicB090" M
-      LEFT JOIN "CdCl"         ON "CdCl"."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1))
-                              AND "CdCl"."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
-      LEFT JOIN "ClFac"  CF    ON CF."CustNo"     = to_number(SUBSTR(M."FacmNo",1,7))
-                              AND CF."FacmNo"     = to_number(SUBSTR(M."FacmNo",8,3))  -- 關聯所有擔保品編號(含主要擔保品)
-                              AND CF."MainFlag"   = 'Y'
-      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = CF."ClCode1"
-                              AND CI."ClCode2"  = CF."ClCode2"
-                              AND CI."ClNo"     = CF."ClNo"
-      LEFT JOIN "ClLand"  L    ON L."ClCode1" = CF."ClCode1"
-                              AND L."ClCode2" = CF."ClCode2"
-                              AND L."ClNo"    = CF."ClNo"
+    WITH "Work_B096_Sum_rawData" AS (
+    SELECT DISTINCT
+           M."ClActNo"
+         , M."LandNo1"
+         , M."LandNo2"
+    FROM   "JcicB092" M
     WHERE  M."DataYM" =  YYYYMM
-      AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')   -- 主要擔保品為不動產
-      AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
-      AND  ( NVL(TRIM(L."LandNo1"),0)  > 0 OR NVL(TRIM(L."LandNo2"),0) > 0 )
+    )
+    , "Work_B096_Sum" AS (
+    SELECT M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
+         , M."LandNo1"                           AS "LandNo1"           -- 地號-前四碼
+         , M."LandNo2"                           AS "LandNo2"           -- 地號-後四碼
+         , SUM(L."Area")                         AS "Area"              -- 土地面積
+    FROM   "Work_B096_Sum_rawData" M
+      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
+                              AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
+                              AND CI."ClNo"       = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN "ClLand"  L    ON L."ClCode1"     = CI."ClCode1"
+                              AND L."ClCode2"     = CI."ClCode2"
+                              AND L."ClNo"        = CI."ClNo"
+                              AND L."LandNo1"     = M."LandNo1"
+                              AND L."LandNo2"     = M."LandNo2"
+    WHERE  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
+      AND  M."LandNo1" + M."LandNo2" != 0
+      GROUP BY M."ClActNo" , M."LandNo1" , M."LandNo2"            
+    )
+    , "Work_B096_Data" AS (
+    SELECT M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
+         , M."LandNo1"                           AS "LandNo1"           -- 地號-前四碼
+         , M."LandNo2"                           AS "LandNo2"           -- 地號-後四碼
+         , MAX(CASE
+                 WHEN CF1."MainFlag" = 'Y'
+                 THEN 0
+               ELSE NVL(WK2."Area",0) END)       AS "Area"              -- 土地面積
+         , MIN(L."LandSeq")                      AS "LandSeq"
+         , MAX(L."LandCode")                     AS "LandCode"
+         , MAX(L."LandZoningCode")               AS "LandZoningCode"
+         , MAX(L."PostedLandValue")              AS "PostedLandValue" 
+         , MAX(L."PostedLandValueYearMonth")     AS "PostedLandValueYearMonth" 
+    FROM   "Work_B096_Sum_rawData" M
+      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
+                              AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
+                              AND CI."ClNo"       = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN "ClFac" CF1 ON CF1."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
+                           AND CF1."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
+                           AND CF1."ClNo"       = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN "ClFac" CF2 ON CF2."CustNo"    = CF1."CustNo"
+                           AND CF2."FacmNo"    = CF1."FacmNo"
+                           AND CF2."MainFlag"  = 'Y'
+      LEFT JOIN "ClLand"  L    ON L."ClCode1"     = CF2."ClCode1"
+                              AND L."ClCode2"     = CF2."ClCode2"
+                              AND L."ClNo"        = CF2."ClNo"
+                              AND L."LandNo1"     = M."LandNo1"
+                              AND L."LandNo2"     = M."LandNo2"
+      LEFT JOIN "Work_B096_Sum" WK2 ON to_number(SUBSTR(WK2."MainClActNo",1,1)) = CF2."ClCode1" 
+                                   AND to_number(SUBSTR(WK2."MainClActNo",2,2)) = CF2."ClCode2" 
+                                   AND to_number(SUBSTR(WK2."MainClActNo",4,7)) = CF2."ClNo" 
+                                   AND WK2."LandNo1" = M."LandNo1"
+                                   AND WK2."LandNo2" = M."LandNo2"
+    WHERE  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
+      AND  ( M."LandNo1" > 0 OR M."LandNo2" > 0 )
+      GROUP BY M."ClActNo" , M."LandNo1" , M."LandNo2"            
     )
     , "Work_B096" AS (
 
     SELECT
-           WK."MainClActNo"              AS "MainClActNo"       -- 主要擔保品控制編碼
-         , WK."ClCode1"                  AS "ClCode1"           -- 擔保品代號1
-         , WK."ClCode2"                  AS "ClCode2"           -- 擔保品代號2
-         , WK."ClNo"                     AS "ClNo"              -- 擔保品編號
-         , WK."LandSeq"                  AS "LandSeq"           -- 土地序號
-         , WK."CityCode"                 AS "CityCode"          -- 縣市別
-         , WK."AreaCode"                 AS "AreaCode"          -- 鄉鎮市區別
-         , WK."IrCode"                   AS "IrCode"            -- 段、小段號
-         , WK."LandNo1"                  AS "LandNo1"           -- 地號-前四碼
-         , WK."LandNo2"                  AS "LandNo2"           -- 地號-後四碼
-    FROM   "Work_B096_All" WK
-    GROUP BY WK."MainClActNo", WK."ClCode1", WK."ClCode2", WK."ClNo", WK."LandSeq"
-           , WK."CityCode", WK."AreaCode", WK."IrCode"
-           , WK."LandNo1", WK."LandNo2"
+           M."ClActNo"                   AS "MainClActNo"       -- 主要擔保品控制編碼
+         , M."OwnerId"                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
+         , M."CityJCICCode"              AS "CityCode"          -- 縣市別
+         , M."AreaJCICCode"              AS "AreaCode"          -- 鄉鎮市區別
+         , M."IrCode"                    AS "IrCode"            -- 段、小段號
+         , M."LandNo1"                   AS "LandNo1"           -- 地號-前四碼
+         , M."LandNo2"                   AS "LandNo2"           -- 地號-後四碼
+         , NVL(WK."Area",WK2."Area")     AS "Area"              -- 面積
+         , WK2."LandSeq"                  AS "LandSeq"
+         , WK2."LandCode"                 AS "LandCode"
+         , WK2."LandZoningCode"           AS "LandZoningCode"
+         , WK2."PostedLandValue"          AS "PostedLandValue"
+         , WK2."PostedLandValueYearMonth" AS "PostedLandValueYearMonth"
+    FROM "JcicB092" M  
+      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
+                              AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
+                              AND CI."ClNo"       = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN "Work_B096_Sum" WK ON WK."MainClActNo" = M."ClActNo"
+                                     AND WK."LandNo1" = M."LandNo1"
+                                     AND WK."LandNo2" = M."LandNo2"
+      LEFT JOIN "Work_B096_Data" WK2 ON WK2."MainClActNo" = M."ClActNo"
+                                    AND WK2."LandNo1" = M."LandNo1"
+                                    AND WK2."LandNo2" = M."LandNo2"
+    WHERE  M."DataYM" =  YYYYMM
+      AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
+      AND  ( M."LandNo1" > 0 OR M."LandNo2" > 0 )
+
+--    GROUP BY WK."MainClActNo", WK."ClCode1", WK."ClCode2", WK."ClNo", WK."LandSeq"
+--           , WK."CityCode", WK."AreaCode", WK."IrCode"
+--           , WK."LandNo1", WK."LandNo2"
     )
 
 
-    SELECT
+    SELECT DISTINCT
            YYYYMM                                AS "DataYM"            -- 資料年月                      DECIMAL   6
          , '96'                                  AS "DataType"          -- 資料別                        VARCHAR2  2
          , '458'                                 AS "BankItem"          -- 總行代號                      VARCHAR2  3
          , '0001'                                AS "BranchItem"        -- 分行代號                      VARCHAR2  4
          , ' '                                   AS "Filler4"           -- 空白                          VARCHAR2  2
          , WK."MainClActNo"                      AS "ClActNo"           -- 擔保品控制編碼 (主要擔保品)   VARCHAR2  50
-         , WK."LandSeq"                          AS "LandSeq"           -- 土地序號                      DECIMAL   3
-         , CASE
-             WHEN LandOwner."OwnerId"      IS NOT NULL THEN LandOwner."OwnerId"
-             ELSE ' '
-           END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
---         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
-         , NVL("CdArea"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
-         , NVL(TRIM(WK."AreaCode"),0)            AS "AreaCode"          -- 鄉鎮市區別
+         , 1                                     AS "LandSeq"           -- 土地序號                      DECIMAL   3
+         , WK."OwnerId"                          AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
+         , WK."CityCode"                         AS "CityCode"          -- 縣市別
+         , WK."AreaCode"                         AS "AreaCode"          -- 鄉鎮市區別
          , WK."IrCode"                           AS "IrCode"            -- 段、小段號
          , WK."LandNo1"                          AS "LandNo1"           -- 地號-前四碼
          , WK."LandNo2"                          AS "LandNo2"           -- 地號-後四碼
          , CASE
-             WHEN TRIM(NVL(L."LandCode",'')) = '' THEN ' '  -- 空白
-             WHEN L."LandCode" IN ('01')          THEN 'C'  -- 建
-             WHEN L."LandCode" IN ('02')          THEN 'A'  -- 田
-             WHEN L."LandCode" IN ('03')          THEN 'B'  -- 旱
-             WHEN L."LandCode" IN ('05')          THEN 'D'  -- 道
-             WHEN L."LandCode" IN ('04','06','07','08','09','10') THEN 'Z'  -- 其他
-             ELSE ' '                                                       -- 空白
+             WHEN TRIM(NVL(WK."LandCode",'')) = '' THEN 'E'  -- 空白
+             WHEN WK."LandCode" IN ('01')          THEN 'C'  -- 建
+             WHEN WK."LandCode" IN ('02')          THEN 'A'  -- 田
+             WHEN WK."LandCode" IN ('03')          THEN 'B'  -- 旱
+             WHEN WK."LandCode" IN ('05')          THEN 'D'  -- 道
+             WHEN WK."LandCode" IN ('04','06','07','08','09','10') THEN 'Z'  -- 其他
+             ELSE 'E'                                                       -- 空白
            END                                   AS "LandCode"          -- 地目  (ref:AS400 LN15M1)      VARCHAR2  1
          , CASE
-             WHEN NVL(L."Area",0) = 0 THEN 0.01
-             ELSE TRUNC(NVL(L."Area",0)  / 0.3025, 2)
+             WHEN NVL(WK."Area",0) = 0 THEN 0.01
+             ELSE TRUNC(NVL(WK."Area",0)  / 0.3025, 2)
            END                                   AS "Area"              -- 面積                          DECIMAL   10
 --L."LandZoningCode" , 土地使用區分 , VARCHAR2 , 2 , 共用代碼檔
 -- 01: 特定農業區02: 一般農業區03: 鄉村區04: 工業區05: 森林區06: 山坡地保育區07: 風景區08: 特定專用區09: 國家公園區
@@ -146,11 +189,15 @@ BEGIN
 -- 50: 停車場保留地51: 河道保留地52: 港埠保留地53: 學校保留地54: 社教機構保留地55: 體育場保留地56: 市場保留地57: 醫療衛生機構保留地58: 機關保留地59: 公用事業保留地
 -- 60: 加油站保留地61: 其他保留地
          , CASE
-             WHEN L."LandZoningCode" IS NULL                  THEN 'Z' --其他
-             WHEN L."LandZoningCode" IN ('1')                 THEN 'A' --住宅區
-             WHEN L."LandZoningCode" IN ('2')                 THEN 'B' --商業區
-             WHEN L."LandZoningCode" IN ('4')                 THEN 'Z' --其他
-             WHEN L."LandZoningCode" IN ('3','5','6','7','8') THEN 'R' --鄉村區
+             WHEN WK."LandZoningCode" IS NULL                  THEN 'Z' --其他
+--             WHEN WK."LandZoningCode" IN ('1')                 THEN 'A' --住宅區
+--             WHEN WK."LandZoningCode" IN ('2')                 THEN 'B' --商業區
+--             WHEN WK."LandZoningCode" IN ('4')                 THEN 'Z' --其他
+--             WHEN WK."LandZoningCode" IN ('3','5','6','7','8') THEN 'R' --鄉村區
+             WHEN WK."LandZoningCode" IN ('10')                THEN 'A' --住宅區
+             WHEN WK."LandZoningCode" IN ('11')                THEN 'B' --商業區
+             WHEN WK."LandZoningCode" IN ('24')                THEN 'Z' --其他
+             WHEN WK."LandZoningCode" IN ('03')                THEN 'R' --鄉村區
              ELSE 'Z'   --其他
            END                                   AS "LandZoningCode"    -- 使用分區   VARCHAR2  1   -- (ref:LN15M1 (#M3760 98))
 --       , CASE
@@ -189,9 +236,11 @@ BEGIN
 --             END
 --         END                                   AS "LandUsageType"     -- 使用地類別  都市土地 VARCHAR2  2
          , CASE
-             WHEN L."LandZoningCode" IS NULL             THEN 'Z'
-             WHEN L."LandZoningCode" IN ('1')            THEN 'AZ'
-             WHEN L."LandZoningCode" IN ('2')            THEN 'BZ'
+             WHEN WK."LandZoningCode" IS NULL             THEN 'Z'
+--             WHEN WK."LandZoningCode" IN ('1')            THEN 'AZ'
+--             WHEN WK."LandZoningCode" IN ('2')            THEN 'BZ'
+             WHEN WK."LandZoningCode" IN ('10')           THEN 'AZ'
+             WHEN WK."LandZoningCode" IN ('11')           THEN 'BZ'
              ELSE 'Z'
            END                                   AS "LandUsageType"     -- 使用地類別  都市土地 VARCHAR2  2  -- (ref:LN15M1 (#M3760 99))
 
@@ -218,13 +267,13 @@ BEGIN
 --           ELSE 'Z '
 --         END                                   AS "LandUsageType"     -- 使用地類別  --???都市土地     VARCHAR2  2
          , CASE
-             WHEN ROUND( NVL(L."PostedLandValue",0) / 1000, 0) = 0 THEN 10 -- (ref:AS400 LN15M1)
-             ELSE ROUND( NVL(L."PostedLandValue",0) / 1000, 0)
+             WHEN ROUND( NVL(WK."PostedLandValue",0) / 1000, 0) = 0 THEN 10 -- (ref:AS400 LN15M1)
+             ELSE ROUND( NVL(WK."PostedLandValue",0) / 1000, 0)
            END                                   AS "PostedLandValue"   -- 公告土地現值                  DECIMAL   10
          , CASE
-             WHEN NVL(L."PostedLandValueYearMonth",0) = 0 THEN 9607   -- (ref:AS400 LN15M1)
-             WHEN NVL(L."PostedLandValueYearMonth",0) < 191100 THEN NVL(L."PostedLandValueYearMonth",0)
-             ELSE L."PostedLandValueYearMonth" - 191100
+             WHEN NVL(WK."PostedLandValueYearMonth",0) = 0 THEN 9607   -- (ref:AS400 LN15M1)
+             WHEN NVL(WK."PostedLandValueYearMonth",0) < 191100 THEN NVL(WK."PostedLandValueYearMonth",0)
+             ELSE WK."PostedLandValueYearMonth" - 191100
            END                                   AS "PostedLandValueYearMonth" -- 公告土地現值年月              DECIMAL   5
          , ' '                                   AS "Filler18"           -- 空白                          VARCHAR2  30
          , YYYYMM - 191100                       AS "JcicDataYM"         -- 資料所屬年月                  DECIMAL   5
@@ -233,26 +282,12 @@ BEGIN
          , JOB_START_TIME                        AS "LastUpdate"         -- 最後更新日期時間
          , EmpNo                                 AS "LastUpdateEmpNo"    -- 最後更新人員
     FROM   "Work_B096" WK
-      LEFT JOIN "CdCity"       ON "CdCity"."CityCode"  = WK."CityCode"
-      LEFT JOIN "CdArea"       ON "CdArea"."CityCode"  = WK."CityCode"
-                              AND "CdArea"."AreaCode"  = WK."AreaCode"
-      LEFT JOIN "ClLand"  L    ON L."ClCode1" = WK."ClCode1"
-                              AND L."ClCode2" = WK."ClCode2"
-                              AND L."ClNo"    = WK."ClNo"
-                              AND L."LandSeq" = WK."LandSeq"
+      LEFT JOIN "ClLand"  L    ON L."ClCode1" = to_number(SUBSTR(WK."MainClActNo",1,1))
+                              AND L."ClCode2" = to_number(SUBSTR(WK."MainClActNo",2,2))
+                              AND L."ClNo"    = to_number(SUBSTR(WK."MainClActNo",4,7))
                               AND L."LandNo1" = WK."LandNo1"
                               AND L."LandNo2" = WK."LandNo2"
-      LEFT JOIN ( SELECT O."ClCode1"
-                       , O."ClCode2"
-                       , O."ClNo"
-                       , O."LandSeq"
-                       , C."CustId"  AS "OwnerId"
-                    FROM "ClLandOwner" O
-                      LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
-                  ) LandOwner        ON LandOwner."ClCode1" = L."ClCode1"
-                                    AND LandOwner."ClCode2" = L."ClCode2"
-                                    AND LandOwner."ClNo"    = L."ClNo"
-                                    AND LandOwner."LandSeq" = L."LandSeq"
+                              AND L."LandSeq" = WK."LandSeq"
       ;
 
 
@@ -271,3 +306,5 @@ BEGIN
 
   END;
 END;
+
+/

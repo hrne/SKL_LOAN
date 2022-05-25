@@ -272,17 +272,16 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<
 
 ![核准編號]
 #FdApplNo=X,2,L
-C(3,#CHAIN,1,S,$)
-C(3,#Flag,0,$,S)
-T(3,*)
 
 #ApplNo=X,7,I
 C(3,#CHAIN,1,S,$)
 C(3,#Flag,0,$,S)
+C(4,#CustNo,C(4,#CustId,T(3,@FdApplNo,*),T(3,@FdApplNo, )),T(3,@FdApplNo, ))
 SHOW(#BTN3)
 CALL(#InitValue)
 @
-C(3,#CustNo,0,C(4,#CustId,C(4,#ApplNo,V(P,需擇一輸入),$),$),$)
+C(4,#CustNo,C(4,#CustId,C(4,#ApplNo,V(P,需擇一輸入),$),$),$)
+C(4,#CustNo,C(4,#CustId,T(3,@FdApplNo,*),T(3,@FdApplNo, )),T(3,@FdApplNo, ))
 
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)

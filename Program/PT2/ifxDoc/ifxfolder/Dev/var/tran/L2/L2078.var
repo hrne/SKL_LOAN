@@ -349,7 +349,7 @@ TXFORM=L2078
 {width:180,align:'center'}
 
 #OOFeeCodeXX=科目
-{width:120,align:'center'}
+{width:120,align:'left'}
 
 !#OOCaseCode=件別
 !{width:50,align:'center'}
@@ -389,7 +389,7 @@ TXFORM=L2078
 {width:180,align:'center'}
 
 #OOFeeCodeXX=科目
-{width:120,align:'center'}
+{width:120,align:'left'}
 
 !#OOCaseCode=件別
 !{width:50,align:'center'}

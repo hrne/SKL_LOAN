@@ -110,14 +110,12 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     where ";
 		sql += "     a.\"DefType\" = :iDefType and  ";
 		sql += "     a.\"DefCode\" = :iDefCode and ";
-		sql += "     b.\"DefType\" = :iDefType and ";
 		sql += "     b.\"DefCode\" = 'CodeType' ";
 		        } 
 		      if (titaVo.getParam("DefType").length() !=0 && !"0".equals(inItem) && "0".equals(inDefCode)){
 		sql += "     where ";
 		sql += "     a.\"DefType\" = :iDefType and  ";
 		sql += "     a.\"Item\"    = :iItem and ";
-		sql += "     b.\"DefType\" = :iDefType and ";
 		sql += "     b.\"DefCode\" = 'CodeType' ";
 		        }  
 		      if (!"0".equals(inDefCode) && !"0".equals(inItem) && titaVo.getParam("DefType").length() ==0 ){
@@ -131,7 +129,6 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     a.\"DefType\" = :iDefType and  ";
 		sql += "     a.\"DefCode\" = :iDefCode and ";		
 		sql += "     a.\"Item\"    = :iItem and ";
-		sql += "     b.\"DefType\" = :iDefType and ";
 		sql += "     b.\"DefCode\" = 'CodeType' ";
 		        } 		   
    

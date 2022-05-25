@@ -1,4 +1,4 @@
-﻿----- BASIC LABEL Variables ----------
+----- BASIC LABEL Variables ----------
 <sub type="SYS">
 </sub>
 
@@ -186,7 +186,7 @@ T(3,[L6088] 員工資料檔)
 T(3,1)ASGN(LOOP$)
 
 ! 員工編號(TOTA)
-#OOEmployeeNo=X,6,L
+#OOEmployeeNo=x,10,L
 
 ! 身份證字號(TOTA)
 #OOAgentId=X,10,L
@@ -194,29 +194,47 @@ T(3,1)ASGN(LOOP$)
 ! 員工姓名(TOTA)
 #OOFullname=x,80,L
 
+! 組長
+#OOChief=x,93,L
+
+! 主任
+#OODirector=x,93,L
+
+! 處長
+#OOManager=x,93,L
+
 ! 單位代號(TOTA)
-#OOCenterCode=X,6,L
+#OOCenterCode=x,6,L
 
 ! 單位名稱
-#OOCenterCodeName=X,20,L
+#OOCenterCodeName=x,40,L
 
-! 員工身份別(TOTA)
-#OOCommLineType=X,1,S
-#OOCommLineTypeX=X,20,L
-C(4,#OOCommLineType,S,$)
-T(H,#OOCommLineType,#EmpIdentityHelp)   
+! 區部代號(TOTA)
+#OOCenterCode1=x,6,L
+
+! 區部名稱
+#OOCenterCode1Name=x,40,L
+
+! 部室代號(TOTA)
+#OOCenterCode2=x,6,L
+
+! 部室名稱
+#OOCenterCode2Name=x,40,L
+
+! ! 員工身份別(TOTA)
+! #OOCommLineType=X,1,S
+! #OOCommLineTypeX=X,20,L
+! C(4,#OOCommLineType,S,$)
+! T(H,#OOCommLineType,#EmpIdentityHelp)   
+
+! 員工身份別
+#OOAgStatus=x,100,L
 
 ! 現職(TOTA)
 #OOAgCurInd=X,1,L
 
 ! 資料日期
 #OODataDate=X,10,L
-
-! 最後修改日期
-#OOLastUpdate=x,20,S
-
-! 最後修改人員
-#OOLastEmp=x,47,S
 
 </sub>
 
@@ -241,13 +259,18 @@ TXFORM=L6088
 #OOEmployeeNo
 #OOAgentId
 #OOFullname
+#OOChief
+#OODirector
+#OOManager
 #OOCenterCode
 #OOCenterCodeName
-#OOCommLineType
+#OOCenterCode1
+#OOCenterCode1Name
+#OOCenterCode2
+#OOCenterCode2Name
+#OOAgStatus
 #OOAgCurInd
 #OODataDate
-#OOLastUpdate
-#OOLastEmp
 
 ^
 </sub>
@@ -267,34 +290,52 @@ TXFORM=L6088
 #any={detail:true, header:'L6088.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOEmployeeNo=員工編號
-{width:100,align:'center'}
+{width:70,align:'center'}
 
 #OOAgentId=身份證字號
-{width:100,align:'center'}
+{width:85,align:'center'}
 
 #OOFullname=員工姓名
+{width:70,align:'center'}
+
+#OOChief=組長
+{width:100,align:'center'}
+
+#OODirector=主任
+{width:100,align:'center'}
+
+#OOManager=處長
 {width:100,align:'center'}
 
 #OOCenterCode=單位代號
-{width:100,align:'center'}
+{width:70,align:'center'}
 
 #OOCenterCodeName=單位名稱
 {width:100,align:'left'}
 
-#OOCommLineTypeX=員工身份別
+#OOCenterCode1=區部代號
+{width:70,align:'center'}
+
+#OOCenterCode1Name=區部名稱
 {width:100,align:'left'}
 
+#OOCenterCode2=部室代號
+{width:70,align:'center'}
+
+#OOCenterCode2Name=部室名稱
+{width:120,align:'left'}
+
+! #OOCommLineTypeX=員工身份別
+! {width:100,align:'left'}
+
+#OOAgStatus=員工身份別
+{width:90,align:'left'}
+
 #OOAgCurInd=現職
-{width:50,align:'center'}
+{width:40,align:'center'}
 
 #OODataDate=資料日期
-{width:100,align:'center'}
-
-#OOLastUpdate=最後修改日期
-{width:150,align:'center'}
-
-#OOLastEmp=最後修改人員
-{width:120,align:'left'}
+{width:75,align:'center'}
 
 ^
 

@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ifrs9LoanData_Upd"
+create or replace NONEDITIONABLE PROCEDURE "Usp_L7_Ifrs9LoanData_Upd" 
 (
 -- 程式功能：維護 Ifrs9LoanData 每月IFRS9撥款資料檔
 -- 執行時機：每月底日終批次(換日前)
@@ -82,6 +82,8 @@ BEGIN
                   END
                 WHEN NVL(M."NextPayIntDate",0) = 0 THEN 0
                 WHEN M."NextPayIntDate" >= TMNDYF  THEN 0
+                WHEN M."MaturityDate" <= M."NextPayIntDate" THEN
+                     ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."MaturityDate",'yyyy-mm-dd') )
                 WHEN M."NextRepayDate"  >  TMNDYF  THEN
                      ( TO_DATE(TMNDYF,'yyyy-mm-dd') - TO_DATE(M."NextPayIntDate",'yyyy-mm-dd') )
                 WHEN M."NextRepayDate"  >  M."NextPayIntDate" THEN

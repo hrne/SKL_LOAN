@@ -535,7 +535,9 @@ BEGIN
            , 0                                     AS "TotalAmt"          -- 金額合計  (後面更新處理)
            , M."CustId"                            AS "CustId"            -- 授信戶IDN/BAN
            , ' '                                   AS "CustIdErr"         -- 上欄IDN或BAN錯誤註記
-           , M."SuvId"                             AS "SuvId"             -- 負責人IDN/負責之事業體BAN
+           , CASE WHEN M."EntCode" IN ('0' , '2') THEN ' '
+                  ELSE M."SuvId"
+             END                                   AS "SuvId"             -- 負責人IDN/負責之事業體BAN
            , ' '                                   AS "SuvIdErr"          -- 上欄IDN或BAN錯誤註記
            , M."OverseasId"                        AS "OverseasId"        -- 外僑兼具中華民國國籍IDN
            , CASE WHEN M."EntCode" IN ('0') THEN '060000'                 -- 個人戶固定為60000
@@ -682,7 +684,7 @@ BEGIN
            , ' '            AS "NegTransYM"        -- 債權轉讓年月/債權轉讓後原債權機構買回年月
            , ' '                                   AS "Filler443"         -- 空白
            , M."ClType"                            AS "ClType"            -- 擔保品組合型態
-           , ROUND(NVL(M."EvaAmt",0) / 1000, 0)    AS "ClEvaAmt"          -- 擔保品(合計)鑑估值
+           , TRUNC(NVL(M."EvaAmt",0) / 1000, 0)    AS "ClEvaAmt"          -- 擔保品(合計)鑑估值
            , NVL(M."ClTypeCode",' ')               AS "ClTypeCode"        -- 擔保品類別(JCIC)
            , CASE
                WHEN M."SyndNo" > 0 THEN 'A'
@@ -699,13 +701,14 @@ BEGIN
            , ' '                                   AS "Filler51"          -- 空白
            , ' '                                   AS "Filler52"          -- 空白
            , 'N'                                   AS "PayablesFg"        -- 代放款註記
-           , CASE
-               WHEN N."CustNo" IS NULL THEN 'N'
-               WHEN N."CaseKindCode" IN ('1' , '2') THEN 'A'
-               WHEN N."CaseKindCode" IN ('3') THEN 'B'
-               WHEN N."CaseKindCode" IN ('4') THEN 'C'
-               ELSE 'N'
-             END                                   AS "NegFg"             -- 債務協商註記
+--           , CASE
+--               WHEN N."CustNo" IS NULL THEN 'N'
+--               WHEN N."CaseKindCode" IN ('1' , '2') THEN 'A'
+--               WHEN N."CaseKindCode" IN ('3') THEN 'B'
+--               WHEN N."CaseKindCode" IN ('4') THEN 'C'
+--               ELSE 'N'
+--             END                                   AS "NegFg"             -- 債務協商註記
+           , 'N'                                   AS "NegFg"             -- 債務協商註記
            , 'N'                                   AS "Filler533"         -- (109年新增)無擔保貸款......
            , CASE WHEN NVL(WK1."CustId",' ') = ' ' THEN ' '
                   ELSE NVL(WK1."GuaTypeJcic",' ')  

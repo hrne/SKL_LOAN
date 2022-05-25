@@ -58,10 +58,14 @@ public class L6043 extends TradeBuffer {
 		String iAuthNo = titaVo.getParam("AuthNo") + "%";
 		int iStatus1 = Integer.parseInt(titaVo.getParam("Status"));
 		int iStatus2 = 0;
+		if(iStatus1==1)
+			iStatus2=1;
 		if(iStatus1==9) {
 			iStatus1=0;
 			iStatus2=1;
 		}
+		this.info("iStatus1 : " + iStatus1);
+		this.info("iStatus2 : " + iStatus2);
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */

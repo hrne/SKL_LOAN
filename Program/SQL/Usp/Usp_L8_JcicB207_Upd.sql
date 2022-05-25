@@ -130,7 +130,7 @@ BEGIN
            END                                   AS "Mobile"            -- 行動電話
          , ' '                                   AS "Filler14"          -- 空白
          , CASE
-             WHEN C."EduCode" IS NULL  THEN ' '
+             WHEN C."EduCode" IS NULL  THEN '6'
              WHEN C."EduCode" IN ('7') THEN '1'
              WHEN C."EduCode" IN ('6') THEN '2'
              WHEN C."EduCode" IN ('5') THEN '3'

@@ -1,4 +1,9 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB090_Upd"
+--------------------------------------------------------
+--  DDL for Procedure Usp_L8_JcicB090_Upd
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB090_Upd" 
 (
 -- 程式功能：維護 JcicB090 每月聯徵擔保品關聯檔資料檔
 -- 執行時機：每月底日終批次(換日前)
@@ -61,10 +66,32 @@ BEGIN
              OVER (
                PARTITION BY M."CustId"
                           , M."FacmNo"
-                          , NVL(CB."CityCode", ' ')
-                          , NVL(CB."AreaCode", ' ')
-                          , NVL(CB."BdNo1", '00000')
-                          , NVL(CB."BdNo2", '000')
+                          , NVL(CASE
+                                  WHEN F."ClCode1" = 1
+                                  THEN CB."CityCode"
+                                  WHEN F."ClCode1" = 2
+                                  THEN CL."CityCode"
+                                ELSE NULL END, ' ')
+                          , NVL(CASE
+                                  WHEN F."ClCode1" = 1
+                                  THEN CB."AreaCode"
+                                  WHEN F."ClCode1" = 2
+                                  THEN CL."AreaCode"
+                                ELSE NULL END, ' ')
+                          , NVL(CASE
+                                  WHEN F."ClCode1" = 1
+                                  THEN CB."BdNo1"
+                                  WHEN F."ClCode1" = 2
+                                  THEN CL."LandNo1"
+                                ELSE NULL END
+                               , '00000')
+                          , NVL(CASE
+                                  WHEN F."ClCode1" = 1
+                                  THEN CB."BdNo2"
+                                  WHEN F."ClCode1" = 2
+                                  THEN CL."LandNo2"
+                                ELSE NULL END
+                               , '000')
                ORDER BY CASE
                           WHEN F."MainFlag" = 'Y'
                           THEN 0
@@ -83,6 +110,10 @@ BEGIN
                                    AND CB."ClCode2"  = F."ClCode2"
                                    AND CB."ClNo"     = F."ClNo"
                                    AND F."ClCode1" = 1
+          LEFT JOIN "ClLand" CL ON CL."ClCode1"  = F."ClCode1"
+                               AND CL."ClCode2"  = F."ClCode2"
+                               AND CL."ClNo"     = F."ClNo"
+                               AND F."ClCode1" = 2
       WHERE  M."DataYM"   =   YYYYMM
         AND  M."FacmNo"   IS  NOT NULL
         AND  F."ClNo"     IS  NOT NULL
@@ -108,10 +139,10 @@ BEGIN
          , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
     FROM rawData r
     WHERE CASE
-            WHEN r."ClCode1" != 1 -- 非房地擔保品
+            WHEN r."ClCode1" NOT IN (1,2) -- 非房地、土地擔保品
             THEN 1
-            WHEN r."ClCode1" = 1 -- 房地擔保品
-                 AND r."ClBdNoSeq" = 1 -- 建號相同時只取一筆
+            WHEN r."ClCode1" IN (1,2) -- 房地、土地擔保品
+                 AND r."ClBdNoSeq" = 1 -- 建號或地號相同時只取一筆
             THEN 1
           ELSE 0 END = 1
     -- FROM   "JcicB080" M
@@ -154,3 +185,5 @@ BEGIN
 
   END;
 END;
+
+/

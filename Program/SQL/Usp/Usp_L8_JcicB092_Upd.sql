@@ -1,4 +1,9 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"
+--------------------------------------------------------
+--  DDL for Procedure Usp_L8_JcicB092_Upd
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd" 
 (
 -- 程式功能：維護 JcicB092 每月聯徵不動產擔保品明細檔
 -- 執行時機：每月底日終批次(換日前)
@@ -12,7 +17,7 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"
 AUTHID CURRENT_USER
 AS
 BEGIN
-	"Usp_L8_JcicB092_Upd_Prear"();
+ "Usp_L8_JcicB092_Upd_Prear"();
   DECLARE
     INS_CNT        INT;         -- 新增筆數
     UPD_CNT        INT;         -- 更新筆數
@@ -46,12 +51,147 @@ BEGIN
     INS_CNT := 0;
 
     INSERT INTO "Work_B092"
+    WITH rawData AS (
+      SELECT M."CustId"
+           , F."ClCode1"
+           , F."ClCode2"
+           , F."ClNo"
+           , M."FacmNo"
+           , ROW_NUMBER()
+             OVER (
+               PARTITION BY M."CustId"
+                          , M."FacmNo"
+                          , NVL(CB."CityCode", ' ')
+                          , NVL(CB."AreaCode", ' ')
+                          , NVL(CB."BdNo1", '00000')
+                          , NVL(CB."BdNo2", '000')
+               ORDER BY CASE
+                          WHEN F."MainFlag" = 'Y'
+                          THEN 0
+                        ELSE 1 END -- 主要擔保品排在第一筆
+                      , F."ClCode1"
+                      , F."ClCode2"
+                      , F."ClNo"
+             ) AS "ClBdNoSeq"
+      FROM   "JcicB080" M
+          LEFT JOIN "ClFac" F    ON F."CustNo"   = to_number(SUBSTR(M."FacmNo",1,7))
+                                AND F."FacmNo"   = to_number(SUBSTR(M."FacmNo",8,3))
+          LEFT JOIN "ClMain" CM  ON CM."ClCode1"  = F."ClCode1"
+                                AND CM."ClCode2"  = F."ClCode2"
+                                AND CM."ClNo"     = F."ClNo"
+          LEFT JOIN "ClBuilding" CB ON CB."ClCode1"  = F."ClCode1"
+                                   AND CB."ClCode2"  = F."ClCode2"
+                                   AND CB."ClNo"     = F."ClNo"
+                                   AND F."ClCode1" = 1
+      WHERE  M."DataYM"   =   YYYYMM
+        AND  M."FacmNo"   IS  NOT NULL
+        AND  F."ClNo"     IS  NOT NULL
+      ORDER BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
+    )
+    , ClcountData AS ( --含未抵押建號資料
+      SELECT r."FacmNo"                          AS "FacmNo"            -- 額度控制編碼
+           , COUNT(*)                            AS "ClCount"           -- 擔保品筆數
+      FROM rawData r
+      WHERE CASE
+--              WHEN r."ClCode1" != 1 -- 非房地擔保品
+--              THEN 1
+              WHEN r."ClCode1" = 1 -- 房地擔保品
+                   AND r."ClBdNoSeq" = 1 -- 建號相同時只取一筆
+              THEN 1
+              ELSE 0 END = 1
+      GROUP BY r."FacmNo"
+    )
+    , ClLandRawData AS (
+      SELECT r."FacmNo" -- 額度控制編碼
+           , TO_NUMBER(CL."LandNo1") AS "LandNo1" -- 地號
+           , TO_NUMBER(CL."LandNo2") AS "LandNo2"-- 地號(子號)
+           , CL."Area" -- 土地面積加總
+           , CL."LVITax" -- 土地增值稅加總
+           , CL."CityCode" -- 縣市別
+           , CL."AreaCode" -- 鄉鎮市區別
+           , CL."LVITaxYearMonth" -- 應計土地增值稅之預估年月
+           , CL."IrCode" -- 段小段
+      FROM rawData r
+      LEFT JOIN "ClLand" CL ON CL."ClCode1" = r."ClCode1" 
+                           AND CL."ClCode2" = r."ClCode2"
+                           AND CL."ClNo" = r."ClNo"
+      WHERE CASE WHEN NVL(TO_NUMBER(CL."LandNo1"), 0) > 0 THEN 1
+                 WHEN NVL(TO_NUMBER(CL."LandNo2"), 0) > 0 THEN 1
+                 ELSE 0 END = 1
+    )
+    , ClLandData AS (
+      SELECT r."FacmNo"                          AS "FacmNo"            -- 額度控制編碼
+           , r."LandNo1"                         AS "LandNo1"           -- 地號
+           , r."LandNo2"                         AS "LandNo2"           -- 地號(子號)
+           , SUM(r."Area")                       AS "ClAreaCount"       -- 土地面積加總
+           , SUM(r."LVITax")                     AS "LVITax"            -- 土地增值稅加總
+           , MAX(r."CityCode")                   AS "CityCode"          -- 縣市別
+           , MAX(r."AreaCode")                   AS "AreaCode"          -- 鄉鎮市區別
+           , MIN(r."LVITaxYearMonth")            AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月
+           , MAX(r."IrCode")                     AS "IrCode"            -- 段小段
+      FROM ClLandRawData r
+      GROUP BY r."FacmNo" 
+             , r."LandNo1"
+             , r."LandNo2"
+    )
+    , LineAmtData AS (
+      SELECT CF."ClCode1"
+            ,CF."ClCode2"
+            ,CF."ClNo"
+            ,CF."CustNo"
+            ,F."LineAmt"
+            ,ROW_NUMBER()
+             OVER (
+               PARTITION BY CF."ClCode1"
+                          , CF."ClCode2"
+                          , CF."ClNo"
+                          , CF."CustNo"
+               ORDER BY CF."FacmNo" desc
+             ) AS "FacmNoSeq"
+      FROM "ClFac" CF
+      LEFT JOIN "FacMain" F ON F."CustNo" = CF."CustNo"
+                           AND F."FacmNo" = CF."FacmNo"
+      WHERE CF."CustNo" != 0
+--        AND CF."MainFlag" = 'Y'
+    )
+    -- 2022-05-24 Wei 新增此段 目的: 該戶號同擔保品的額度加總
+    -- 先找出有同擔保品的額度資料
+    , sameClRawData AS (
+        SELECT "CustNo"
+             , "ClCode1"
+             , "ClCode2"
+             , "ClNo"
+        FROM "ClFac"
+        GROUP BY "CustNo"
+               , "ClCode1"
+               , "ClCode2"
+               , "ClNo"
+        HAVING COUNT(*) >= 2
+    )
+    , sameClFacmNoData AS (
+        SELECT DISTINCT
+               S."CustNo"
+             , CF."FacmNo"
+        FROM sameClRawData S
+        LEFT JOIN "ClFac" CF ON CF."CustNo" = S."CustNo"
+                            AND CF."ClCode1" = S."ClCode1"
+                            AND CF."ClCode2" = S."ClCode2"
+                            AND CF."ClNo" = S."ClNo"
+    )
+    , sameClLineAmtData AS (
+      SELECT S."CustNo"
+           , SUM(F."LineAmt") AS "SameClLineAmt"
+      FROM sameClFacmNoData S
+      LEFT JOIN "FacMain" F ON F."CustNo" = S."CustNo"
+                           AND F."FacmNo" = S."FacmNo"
+      GROUP BY S."CustNo"
+    )
     SELECT  -- count(*) as "Count"
            M."FacmNo"                            AS "FacmNo"
          , M."ClActNo"                           AS "MainClActNo"    -- 主要擔保品控制編碼
-         , CF."ClCode1"                          AS "ClCode1"        -- 擔保品代號1
-         , CF."ClCode2"                          AS "ClCode2"        -- 擔保品代號2
-         , CF."ClNo"                             AS "ClNo"           -- 擔保品編號
+         , CM."ClCode1"                          AS "ClCode1"        -- 擔保品代號1
+         , CM."ClCode2"                          AS "ClCode2"        -- 擔保品代號2
+         , CM."ClNo"                             AS "ClNo"           -- 擔保品編號
          , NVL(CD2."ClTypeJCIC",' ')             AS "ClTypeJCIC"     -- 擔保品類別
          , CASE
              WHEN BuildingOwner."OwnerId"  IS NOT NULL THEN BuildingOwner."OwnerId"
@@ -59,7 +199,10 @@ BEGIN
              WHEN BuPublicOwner."OwnerId"  IS NOT NULL THEN BuPublicOwner."OwnerId"
              ELSE ' '
            END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
-         , SUBSTR('00000000' || TRUNC(NVL(CM."EvaAmt",0) / 1000), -8)
+         , SUBSTR('00000000' || TRUNC(CASE
+                                        WHEN NVL(CM."EvaAmt",0) = 0 
+                                        THEN NVL(SCLAD."SameClLineAmt",0)
+                                      ELSE NVL(CM."EvaAmt",0) END / 1000), -8)
                                                  AS "EvaAmt"            -- 鑑估(總市)值
          , CASE
              WHEN TRUNC(NVL(CM."EvaDate",0) / 100) < 191100 THEN TRUNC(NVL(CM."EvaDate",0) / 100)
@@ -89,21 +232,44 @@ BEGIN
            END                                   AS "IssueEndDate"      -- 權利到期年月
 --         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"
          , NVL("CdArea"."JcicCityCode", ' ')     AS "CityCode"
-         , NVL(TRIM(L."AreaCode"), '00')         AS "AreaCode"
+--         , NVL(TRIM( NVL(L."AreaCode",CLL."AreaCode")), '00')         AS "AreaCode"
+         , NVL("CdArea"."JcicAreaCode", '00')     AS "AreaCode"
          , CASE
 --           WHEN "ClBuilding"."IrCode" IS NOT NULL THEN SUBSTR('0000' || "ClBuilding"."IrCode", -4)
-             WHEN L."IrCode" IS NOT NULL THEN SUBSTR('0000' || L."IrCode", -4)
+--             WHEN L."IrCode" IS NOT NULL THEN SUBSTR('0000' || L."IrCode", -4)
+--             WHEN NVL(CLL."LandNo1", 0) = NVL(L."LandNo1", 0) 
+--                  AND NVL(CLL."LandNo2", 0) = NVL(L."LandNo2", 0)
+--             THEN NVL(TRIM( NVL(L."IrCode",CLL."IrCode")), '0001') 
+--             WHEN  NVL(L."LandNo1", 0)  = 0 AND NVL(L."LandNo2", 0) = 0
+--             THEN NVL(TRIM( NVL(L."IrCode",CLL."IrCode")), '0001')
+             WHEN NVL(CLL."LandNo1", 0)
+                  + NVL(CLL."LandNo2", 0) != 0
+             THEN NVL(TRIM(CLL."IrCode"), '0001')
              ELSE '0001'
-           END                                   AS "IrCode"            -- 段、小段號
-         , NVL(L."LandNo1", 0)                   AS "LandNo1"           -- 地號-前四碼
-         , NVL(L."LandNo2", 0)                   AS "LandNo2"           -- 地號-後四碼
-         , NVL(B."BdNo1", 0)                     AS "BdNo1"             -- 建號-前五碼
-         , NVL(B."BdNo2", 0)                     AS "BdNo2"             -- 建號-後三碼
-         , NVL("CdArea"."Zip3",' ')              AS "Zip"               -- 郵遞區號
-         , TRUNC(NVL(L."LVITax",'0') / 1000)     AS "LVITax"            -- 擔保品預估應計土地增值稅合計
+           END                                     AS "IrCode"            -- 段、小段號
+--         , NVL(L."LandNo1", 0)                   AS "LandNo1"           -- 地號-前四碼
+--         , NVL(L."LandNo2", 0)                   AS "LandNo2"           -- 地號-後四碼
+         , NVL(CLL."LandNo1", 0)        AS "LandNo1"           -- 地號-前四碼
+         , NVL(CLL."LandNo2", 0)        AS "LandNo2"           -- 地號-後四碼
+         , NVL(B."BdNo1", 0)            AS "BdNo1"             -- 建號-前五碼
+         , NVL(B."BdNo2", 0)            AS "BdNo2"             -- 建號-後三碼
+         , NVL("CdArea"."Zip3",' ')                AS "Zip"               -- 郵遞區號
+--         , TRUNC(NVL(L."LVITax",'0') / 1000)     AS "LVITax"            -- 擔保品預估應計土地增值稅合計
+         , CASE  
+--             WHEN NVL(CLL."LandNo1", 0) = NVL(L."LandNo1", 0) 
+--                  AND NVL(CLL."LandNo2", 0) = NVL(L."LandNo2", 0)
+--             THEN TRUNC( NVL(CLL."LVITax", 0)  / 1000  )
+--             WHEN  NVL(L."LandNo1", 0)  = 0
+--                  AND NVL(L."LandNo2", 0) = 0
+--             THEN TRUNC( NVL(CLL."LVITax", 0)  / 1000  )
+             WHEN NVL(CLL."LandNo1", 0)
+                  + NVL(CLL."LandNo2", 0) != 0
+             THEN TRUNC( NVL(CLL."LVITax", 0)  / 1000  )
+             ELSE 0     
+           END                                   AS "LVITax"            -- 擔保品預估應計土地增值稅合計
          , CASE
-             WHEN NVL(L."LVITaxYearMonth",0) < 191100 THEN NVL(L."LVITaxYearMonth",0)
-             ELSE NVL(L."LVITaxYearMonth",0) - 191100
+             WHEN NVL(CLL."LVITaxYearMonth",0) < 191100 THEN NVL(CLL."LVITaxYearMonth",0)
+             ELSE NVL(CLL."LVITaxYearMonth",0) - 191100
            END                                   AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月  (後面再額外判斷 '日期')
          , CASE
              WHEN TRUNC(NVL(B."ContractPrice",0) / 1000, 0) = 0 THEN '        '
@@ -132,28 +298,45 @@ BEGIN
              ELSE '000000000'
            END                                   AS "Area"              -- 車位單獨登記面積 (1平方公尺=0.3025坪)
          , CASE
-             WHEN NVL(LandOwner."OwnerTotal",0) = 0 THEN TRUNC( NVL(L."Area", 0) / 0.3025 , 2 )
-             ELSE TRUNC( NVL(L."Area", 0) * NVL(LandOwner."OwnerPart", 0) / NVL(LandOwner."OwnerTotal", 0) / 0.3025 , 2 )
+--             WHEN NVL(LandOwner."OwnerTotal",0) = 0 THEN TRUNC( NVL(L."Area", 0) / 0.3025 , 2 )
+--             ELSE TRUNC( NVL(L."Area", 0) * NVL(LandOwner."OwnerPart", 0) / NVL(LandOwner."OwnerTotal", 0) / 0.3025 , 2 )
+--             WHEN NVL(CLL."LandNo1", 0) = NVL(L."LandNo1", 0) 
+--                  AND NVL(CLL."LandNo2", 0) = NVL(L."LandNo2", 0)
+--             THEN TRUNC( NVL(CLL."ClAreaCount", 0) / NVL(CLC."ClCount",1) / 0.3025 , 2 )
+--             WHEN  NVL(L."LandNo1", 0)  = 0
+--                  AND NVL(L."LandNo2", 0) = 0
+--             THEN TRUNC( NVL(CLL."ClAreaCount", 0) / NVL(CLC."ClCount",1) / 0.3025 , 2 )
+             WHEN NVL(CLL."LandNo1", 0)
+                  + NVL(CLL."LandNo2", 0) != 0
+             THEN TRUNC( NVL(CLL."ClAreaCount", 0) / NVL(CLC."ClCount",1) / 0.3025 , 2 )
+             ELSE 0     
            END                                   AS "LandOwnedArea"     -- 土地持份面積 (1平方公尺=0.3025坪)
-         , TRUNC(NVL(F."LineAmt",0))             AS "LineAmt"           -- 核准額度
+         , TRUNC(CASE
+                   WHEN NVL(SCLAD."SameClLineAmt",0) != 0
+                   THEN NVL(SCLAD."SameClLineAmt",0)
+                 ELSE NVL(LAD."LineAmt",0) END)  AS "LineAmt"           -- 核准額度
     FROM   "JcicB090" M
       LEFT JOIN "CdCl"         ON "CdCl"."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1))
                               AND "CdCl"."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
       LEFT JOIN "FacMain" F    ON F."CustNo"   =  to_number(SUBSTR(M."FacmNo",1,7))
                               AND F."FacmNo"   =  to_number(SUBSTR(M."FacmNo",8,3))
-      LEFT JOIN "ClFac"  CF    ON CF."CustNo"   =  to_number(SUBSTR(M."FacmNo",1,7))
-                              AND CF."FacmNo"   =  to_number(SUBSTR(M."FacmNo",8,3))  -- 關聯所有擔保品編號(含主要擔保品)
-      LEFT JOIN "CdCl" CD2     ON CD2."ClCode1"  = CF."ClCode1"
-                              AND CD2."ClCode2"  = CF."ClCode2"           -- 關聯擔保品類別
-      LEFT JOIN "ClMain" CM    ON CM."ClCode1"  = CF."ClCode1"
-                              AND CM."ClCode2"  = CF."ClCode2"
-                              AND CM."ClNo"     = CF."ClNo"
-      LEFT JOIN "ClImm" CI    ON CI."ClCode1"  = CF."ClCode1"
-                              AND CI."ClCode2"  = CF."ClCode2"
-                              AND CI."ClNo"     = CF."ClNo"
+      --LEFT JOIN "ClFac"  CF    ON CF."CustNo"   =  to_number(SUBSTR(M."FacmNo",1,7))
+      --                        AND CF."FacmNo"   =  to_number(SUBSTR(M."FacmNo",8,3))  -- 關聯所有擔保品編號(含主要擔保品)
+      LEFT JOIN "CdCl" CD2     ON CD2."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1))
+                              AND CD2."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))           -- 關聯擔保品類別
+      LEFT JOIN "ClMain" CM    ON CM."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1))
+                              AND CM."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
+                              AND CM."ClNo"     = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN "ClImm" CI    ON CI."ClCode1"   = CM."ClCode1"
+                              AND CI."ClCode2"  = CM."ClCode2"
+                              AND CI."ClNo"     = CM."ClNo"
       LEFT JOIN "ClBuilding"  B     ON B."ClCode1" = CM."ClCode1"
                                    AND B."ClCode2" = CM."ClCode2"
                                    AND B."ClNo"    = CM."ClNo"
+      LEFT JOIN "ClLand" L ON L."ClCode1" = CM."ClCode1"
+                          AND L."ClCode2" = CM."ClCode2"
+                          AND L."ClNo"    = CM."ClNo"
+                          AND CM."ClCode1" = 2 -- 土地的時候才自己串土地檔
       LEFT JOIN (
         SELECT "ClCode1"
              , "ClCode2"
@@ -166,47 +349,83 @@ BEGIN
       ) CP ON CP."ClCode1"      = B."ClCode1"
           AND CP."ClCode2"      = B."ClCode2"
           AND CP."ClNo"         = B."ClNo"
-      LEFT JOIN "ClLand"  L    ON L."ClCode1" = CM."ClCode1"
-                              AND L."ClCode2" = CM."ClCode2"
-                              AND L."ClNo"    = CM."ClNo"
-      LEFT JOIN "CdCity"       ON to_number("CdCity"."CityCode")  = to_number(NVL(trim(L."CityCode"), 0))
-      LEFT JOIN "CdArea"       ON "CdArea"."CityCode"   = L."CityCode"
-                              AND "CdArea"."AreaCode"   = L."AreaCode"
       LEFT JOIN ( SELECT DISTINCT
                          O."ClCode1", O."ClCode2", O."ClNo", O."OwnerPart", O."OwnerTotal"
                        , C."CustId"  AS "OwnerId"
                   FROM "ClBuildingOwner" O
                     LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
-                ) BuildingOwner    ON BuildingOwner."ClCode1" = CF."ClCode1"
-                                  AND BuildingOwner."ClCode2" = CF."ClCode2"
-                                  AND BuildingOwner."ClNo"    = CF."ClNo"
+                ) BuildingOwner    ON BuildingOwner."ClCode1" = CM."ClCode1"
+                                  AND BuildingOwner."ClCode2" = CM."ClCode2"
+                                  AND BuildingOwner."ClNo"    = CM."ClNo"
       LEFT JOIN ( SELECT DISTINCT
-                         O."ClCode1", O."ClCode2", O."ClNo", O."OwnerPart", O."OwnerTotal"
+                         O."ClCode1"
+                       , O."ClCode2"
+                       , O."ClNo"
+                       , NVL(O."OwnerPart",O2."OwnerPart") AS "OwnerPart"
+                       , NVL(O."OwnerTotal",O2."OwnerTotal") AS "OwnerTotal"
                        , C."CustId"  AS "OwnerId"
                   FROM "ClLandOwner" O
+                  LEFT JOIN (
+                    SELECT CF1."ClCode1"
+                         , CF1."ClCode2"
+                         , CF1."ClNo"
+                         , CLO."OwnerPart"
+                         , CLO."OwnerTotal"
+                         , CLO."OwnerCustUKey"
+                    FROM "ClFac" CF1
+                    LEFT JOIN "ClFac" CF2 ON CF2."CustNo" = CF1."CustNo"
+                                         AND CF2."FacmNo" = CF2."FacmNo"
+                                         AND CF2."MainFlag" = 'Y'
+                    LEFT JOIN "ClLandOwner" CLO ON CLO."ClCode1" = CF2."ClCode1"
+                                               AND CLO."ClCode2" = CF2."ClCode2"
+                                               AND CLO."ClNo" = CF2."ClNo"
+                    WHERE CF1."MainFlag" != 'Y'
+                      AND CLO."OwnerPart" IS NOT NULL
+                  ) O2 ON O2."ClCode1" = O."ClCode1"
+                      AND O2."ClCode2" = O."ClCode2"
+                      AND O2."ClNo" = O."ClNo"
                     LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
-                ) LandOwner        ON LandOwner."ClCode1" = CF."ClCode1"
-                                  AND LandOwner."ClCode2" = CF."ClCode2"
-                                  AND LandOwner."ClNo"    = CF."ClNo"
+                ) LandOwner        ON LandOwner."ClCode1" = CM."ClCode1"
+                                  AND LandOwner."ClCode2" = CM."ClCode2"
+                                  AND LandOwner."ClNo"    = CM."ClNo"
                                   AND BuildingOwner."OwnerId" IS NULL
       LEFT JOIN ( SELECT DISTINCT
                          O."ClCode1", O."ClCode2", O."ClNo", O."OwnerId"
                   FROM "ClBuildingPublic" O
-                ) BuPublicOwner    ON BuPublicOwner."ClCode1" = CF."ClCode1"
-                                  AND BuPublicOwner."ClCode2" = CF."ClCode2"
-                                  AND BuPublicOwner."ClNo"    = CF."ClNo"
+                ) BuPublicOwner    ON BuPublicOwner."ClCode1" = CM."ClCode1"
+                                  AND BuPublicOwner."ClCode2" = CM."ClCode2"
+                                  AND BuPublicOwner."ClNo"    = CM."ClNo"
                                   AND LandOwner."OwnerId"     IS NULL
                                   AND BuildingOwner."OwnerId" IS NULL
+      LEFT JOIN ClcountData CLC ON CLC."FacmNo" = M."FacmNo"
+      LEFT JOIN CllandData  CLL ON CLL."FacmNo" = M."FacmNo"
+                               AND CASE
+                                     WHEN CM."ClCode1" = 2
+                                          AND L."LandNo1" = CLL."LandNo1"
+                                          AND L."LandNo2" = CLL."LandNo2"
+                                     THEN 1
+                                     WHEN CM."ClCode1" != 2
+                                     THEN 1
+                                   ELSE 0 END = 1
+      LEFT JOIN "CdCity"       ON "CdCity"."CityCode"  = NVL(CLL."CityCode",CM."CityCode")
+      LEFT JOIN "CdArea"       ON "CdArea"."CityCode"   = NVL(CLL."CityCode",CM."CityCode")
+                              AND "CdArea"."AreaCode"   = NVL(CLL."AreaCode",CM."AreaCode")
+      LEFT JOIN LineAmtData LAD ON LAD."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1))
+                               AND LAD."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2))
+                               AND LAD."ClNo" = to_number(SUBSTR(M."ClActNo",4,7))
+                               AND LAD."CustNo" = to_number(SUBSTR(M."FacmNo",1,7))
+                               AND LAD."FacmNoSeq" = 1
+      LEFT JOIN sameClLineAmtData SCLAD ON SCLAD."CustNo" = to_number(SUBSTR(M."FacmNo",1,7))
     WHERE  M."DataYM"  =  YYYYMM
       AND  M."ClActNo" IS NOT NULL
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')         -- 主要擔保品為不動產
       AND  SUBSTR(CD2."ClTypeJCIC",1,1) IN ('2')            -- 擔保品為不動產
 --    AND  L."ClNo" IS NOT NULL
-      AND  NVL(L."LandNo1", 0) > 0
-      AND  ( NVL(L."LandNo1", 0)   > 0 OR NVL(L."LandNo2", 0)   > 0 OR
+      --AND  NVL(L."LandNo1", 0) > 0
+      AND  ( NVL(CLL."LandNo1", 0)   > 0 OR NVL(CLL."LandNo2", 0)   > 0 OR
              NVL(B."BdNo1", 0) > 0 OR NVL(B."BdNo2", 0) > 0 )
-      AND ( ( CF."ClCode1" NOT IN (1) ) OR
-            ( CF."ClCode1" IN (1) AND ( NVL(B."BdNo1", 0) > 0 OR
+      AND ( ( CM."ClCode1" NOT IN (1) ) OR
+            ( CM."ClCode1" IN (1) AND ( NVL(B."BdNo1", 0) > 0 OR
                                         NVL(B."BdNo2", 0) > 0 ) )
           )
 --and M."FacmNo" = '1285192004'
@@ -280,7 +499,7 @@ BEGIN
          , MAX(WK."DispPrice")                   AS "DispPrice"         -- 處分價格
          , MAX(WK."IssueEndDate")                AS "IssueEndDate"      -- 權利到期年月
          , WK."CityCode"                         AS "CityJCICCode"      -- 縣市別
-         , WK."AreaCode"                         AS "AreaJCICCode"      -- 鄉鎮市區別
+         , TO_NUMBER(WK."AreaCode")              AS "AreaJCICCode"      -- 鄉鎮市區別
          , WK."IrCode"                           AS "IrCode"            -- 段、小段號
          , WK."LandNo1"                          AS "LandNo1"           -- 地號-前四碼
          , WK."LandNo2"                          AS "LandNo2"           -- 地號-後四碼
@@ -363,13 +582,15 @@ BEGIN
     UPD_CNT := 0;
 
     UPDATE "JcicB092" M
---    SET   M."EvaAmt" = SUBSTR('00000000' || TRUNC(to_number(M."LVITax")), -8)
---        , M."LVITax" = SUBSTR('00000000' || TRUNC(to_number(M."EvaAmt")), -8)
      SET  M."EvaAmt" = LPAD(M."LVITax",8,'0')
          ,M."LVITax" = LPAD(M."EvaAmt",8,'0')
     WHERE M."DataYM" =  YYYYMM
       AND M."LVITax" <> 'X'
-      AND M."EvaAmt" < M."LVITax"
+      AND CASE
+            WHEN M."LVITax" <> 'X'
+                 AND to_number(M."EvaAmt") < to_number(M."LVITax")
+            THEN 1
+          ELSE 0 END = 1
      ;
 
     UPD_CNT := UPD_CNT + sql%rowcount;
@@ -408,6 +629,21 @@ BEGIN
 --  DBMS_OUTPUT.PUT_LINE('UPDATE Area UPD_CNT=' || UPD_CNT);
     DBMS_OUTPUT.PUT_LINE('UPDATE Area END');
 
+-- 土地持分面積之處理 - 有地號時面積不可為0 FOR檢核
+    DBMS_OUTPUT.PUT_LINE('UPDATE LandOwnedArea');
+    UPD_CNT := 0;
+
+    UPDATE "JcicB092" M
+    SET   M."LandOwnedArea" = '0000000.01'
+    WHERE M."DataYM"      =  YYYYMM
+      AND ( M."LandNo1" > 0 OR  M."LandNo2" > 0 )  
+      AND to_number(M."LandOwnedArea") =  0
+     ;
+
+    UPD_CNT := UPD_CNT + sql%rowcount;
+--  DBMS_OUTPUT.PUT_LINE('UPDATE Area UPD_CNT=' || UPD_CNT);
+    DBMS_OUTPUT.PUT_LINE('UPDATE Area END');
+
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
@@ -421,30 +657,4 @@ BEGIN
   END;
 END;
 
---"Work_B092"
---     , ' '      as "ClTypeJCIC"
---     , ' '      as "OwnerId"
---     , ' '      as "EvaAmt"
---     , 0        as "EvaDate"
---     , 0        as "SettingDate"
---     , ' '      as "MonthSettingAmt"     -- varchar2(8)
---     , 0        as "SettingSeq"          -- decimal(1, 0)
---     , ' '      as "PreSettingAmt"       -- varchar2(8)
---     , ' '      as "DispPrice"           -- varchar2(8)
---     , 0        as "IssueEndDate"        -- decimal(5, 0)
---     , ' '      as "CityCode"            -- varchar2(2)
---     , ' '      as "AreaCode"            -- varchar2(2)
---     , ' '      as "IrCode"              -- varchar2(4)
---     , 0        as "LandNo1"             -- decimal(4, 0)
---     , 0        as "LandNo2"             -- decimal(4, 0)
---     , 0        as "BdNo1"               -- decimal(5, 0)
---     , 0        as "BdNo2"               -- decimal(3, 0)
---     , ' '      as "Zip"                 -- varchar2(5)
---     , 0        as "LVITax"              -- decimal(14,2)
---     , 0        as "LVITaxYearMonth"     -- decimal(5, 0)
---     , ' '      as "ContractPrice"       -- varchar2(8)
---     , ' '      as "ContractDate"        -- varchar2(8)
---     , ' '      as "ParkingTypeCode"     -- varchar2(1)
---     , ' '      as "Area"                -- varchar2(9)
---     , 0        as "LandOwnedArea"       -- decimal(14, 2)
---     , 0        as "LineAmt"             -- decimal(14, 0)
+/

@@ -1,4 +1,9 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Hp_Upd"
+--------------------------------------------------------
+--  DDL for Procedure Usp_L7_LoanIfrs9Hp_Upd
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Hp_Upd" 
 (
 -- 程式功能：維護 LoanIfrs9Hp 每月IFRS9欄位清單8
 -- 執行時機：每月底日終批次(換日前)
@@ -88,8 +93,49 @@ BEGIN
     GROUP BY A."CustNo", A."FacmNo", A."ApproveDate"
     ORDER BY A."CustNo", A."FacmNo"
       )
-
-
+    , rawData AS (
+        SELECT FSL."CustNo"
+             , FSL."FacmNo"
+             , FSL."MainApplNo"
+             , FSL."KeyinSeq"
+             , FSL."LineAmt" AS "LimitLineAmt"
+             , FM."UtilBal"
+        FROM "FacShareLimit" FSL
+        LEFT JOIN "FacMain" FM ON FM."CustNo" = FSL."CustNo"
+                              AND FM."FacmNo" = FSL."FacmNo"
+    )
+    , maxSeqData AS (
+        SELECT "MainApplNo"
+             , MAX("KeyinSeq") AS "MaxSeq"
+        FROM rawData
+        GROUP BY "MainApplNo"
+    )
+    , lastSeqData AS (
+        SELECT r1."MainApplNo"
+             , r1."CustNo"
+             , r1."FacmNo"
+             , r1."LimitLineAmt" - SUM(r2."UtilBal") AS "LimitLineAmt"
+        FROM rawData r1
+        LEFT JOIN rawData r2 ON r2."MainApplNo" = r1."MainApplNo"
+                            AND r2."KeyinSeq" < r1."KeyinSeq"
+        LEFT JOIN maxSeqData m ON m."MainApplNo" = r1."MainApplNo"
+        WHERE r1."KeyinSeq" = m."MaxSeq" 
+        GROUP BY r1."MainApplNo"
+               , r1."CustNo"
+               , r1."FacmNo"
+               , r1."LimitLineAmt"
+    )
+    , shareFacData AS (
+        SELECT r."CustNo"
+             , r."FacmNo"
+             , MAX(NVL(l."LimitLineAmt",r."UtilBal")) AS "ShareLineAmt" 
+        FROM rawData r
+        LEFT JOIN lastSeqData l ON l."MainApplNo" = r."MainApplNo"
+                               AND l."CustNo" = r."CustNo"
+                               AND l."FacmNo" = r."FacmNo"
+        GROUP BY r."CustNo"
+               , r."FacmNo"
+    )
     SELECT YYYYMM                               AS "DataYM"             -- 年月份
          , HP."CustNo"                          AS "CustNo"             -- 戶號
          , NVL(C."CustId", ' ')                 AS "CustId"             -- 借款人ID / 統編
@@ -104,7 +150,7 @@ BEGIN
                   THEN NVL(L."DrawdownDate",0)
              ELSE NVL(F."FirstDrawdownDate",0)
            END                                  AS "FirstDrawdownDate"  -- 初貸日期
-         , NVL(F."LineAmt",0)                   AS "LineAmt"            -- 核准金額(台幣)
+         , NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) AS "LineAmt"            -- 核准金額(台幣)
          , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"      -- 產品別
          , CASE WHEN NVL(F."RecycleCode",0) = 0 AND NVL(F."UtilDeadline",0) >= TMNDYF --非循環且動支期限>=月底日  
                      THEN  ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
@@ -118,7 +164,8 @@ BEGIN
          , CASE WHEN F."IrrevocableFlag" = 'Y' THEN 1
                 ELSE 0
            END                                  AS "IrrevocableFlag"    -- 該筆額度是否為不可撤銷  -- 1=是 0=否
-         , CASE WHEN NVL(C."EntCode",' ') IN ('1','2') THEN        -- 企金 - 第一碼為CdIndustry.MainType	主計處大類
+         , CASE WHEN NVL(C."EntCode",' ') IN ('2') THEN '00000'
+                WHEN NVL(C."EntCode",' ') IN ('1') THEN        -- 企金 - 第一碼為CdIndustry.MainType	主計處大類
                      CDI."MainType" || SUBSTR(C."IndustryCode",3,4)       
                 ELSE '60000'
            END                                  AS "IndustryCode"       -- 主計處行業別代碼 
@@ -166,6 +213,8 @@ BEGIN
                                 AND CL."ClCode2"  =  "ClFac"."ClCode2"
                                 AND CL."ClNo"     =  "ClFac"."ClNo"
          LEFT JOIN "CdIndustry" CDI ON CDI."IndustryCode" = C."IndustryCode"
+        LEFT JOIN shareFacData sfd ON sfd."CustNo" = HP."CustNo"
+                                  AND sfd."FacmNo" = HP."FacmNo"
     ORDER BY HP."CustNo", HP."FacmNo"
       ;
 
@@ -248,3 +297,5 @@ END;
      --  , 0                                    AS "LGD"                -- 違約損失率
      --  , 0                                    AS "LineAmtCurr"        -- 核准金額(交易幣)
      --  , 0                                    AS "AvblBalCurr"        -- 可動用餘額(交易幣)
+
+/

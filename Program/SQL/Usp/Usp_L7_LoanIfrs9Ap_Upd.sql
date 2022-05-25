@@ -1,4 +1,9 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Ap_Upd"
+--------------------------------------------------------
+--  DDL for Procedure Usp_L7_LoanIfrs9Ap_Upd
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Ap_Upd" 
 (
 -- 程式功能：維護 LoanIfrs9Ap 每月IFRS9欄位清單A檔
 -- 執行時機：每月底日終批次(換日前)
@@ -262,6 +267,49 @@ BEGIN
              , "FacmNo"
              , "RvNo"
     )
+    , rawData AS (
+        SELECT FSL."CustNo"
+             , FSL."FacmNo"
+             , FSL."MainApplNo"
+             , FSL."KeyinSeq"
+             , FSL."LineAmt" AS "LimitLineAmt"
+             , FM."UtilBal"
+        FROM "FacShareLimit" FSL
+        LEFT JOIN "FacMain" FM ON FM."CustNo" = FSL."CustNo"
+                              AND FM."FacmNo" = FSL."FacmNo"
+    )
+    , maxSeqData AS (
+        SELECT "MainApplNo"
+             , MAX("KeyinSeq") AS "MaxSeq"
+        FROM rawData
+        GROUP BY "MainApplNo"
+    )
+    , lastSeqData AS (
+        SELECT r1."MainApplNo"
+             , r1."CustNo"
+             , r1."FacmNo"
+             , r1."LimitLineAmt" - SUM(r2."UtilBal") AS "LimitLineAmt"
+        FROM rawData r1
+        LEFT JOIN rawData r2 ON r2."MainApplNo" = r1."MainApplNo"
+                            AND r2."KeyinSeq" < r1."KeyinSeq"
+        LEFT JOIN maxSeqData m ON m."MainApplNo" = r1."MainApplNo"
+        WHERE r1."KeyinSeq" = m."MaxSeq" 
+        GROUP BY r1."MainApplNo"
+               , r1."CustNo"
+               , r1."FacmNo"
+               , r1."LimitLineAmt"
+    )
+    , shareFacData AS (
+        SELECT r."CustNo"
+             , r."FacmNo"
+             , MAX(NVL(l."LimitLineAmt",r."UtilBal")) AS "ShareLineAmt" 
+        FROM rawData r
+        LEFT JOIN lastSeqData l ON l."MainApplNo" = r."MainApplNo"
+                               AND l."CustNo" = r."CustNo"
+                               AND l."FacmNo" = r."FacmNo"
+        GROUP BY r."CustNo"
+               , r."FacmNo"
+    )
     SELECT
            YYYYMM                                    AS "DataYM"            -- 資料年月
          , M."CustNo"                                AS "CustNo"            -- 戶號
@@ -279,7 +327,7 @@ BEGIN
          , NVL(M."DrawdownDate", 0)                  AS "DrawdownDate"      -- 撥款日期
          , NVL(F."MaturityDate",0)                   AS "FacLineDate"       -- 到期日(額度)
          , NVL(M."MaturityDate", 0)                  AS "MaturityDate"      -- 到期日(撥款)
-         , NVL(F."LineAmt",0)                        AS "LineAmt"           -- 核准金額
+         , NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) AS "LineAmt"           -- 核准金額
          , NVL(M."DrawdownAmt", 0)                   AS "DrawdownAmt"       -- 撥款金額
          , NVL(ACF."AcctFee", 0)                     AS "AcctFee"           -- 帳管費
          , NVL(M."LoanBal", 0)                       AS "LoanBal"           -- 本金餘額(撥款)
@@ -392,6 +440,8 @@ BEGIN
       LEFT JOIN AcctFeeData ACF ON ACF."CustNo" = LPAD(M."CustNo",7,'0')
                                AND ACF."FacmNo" = LPAD(M."FacmNo",3,'0')
                                AND ACF."RvNo"   = LPAD(M."BormNo",3,'0')
+      LEFT JOIN shareFacData sfd ON sfd."CustNo" = M."CustNo"
+                                AND sfd."FacmNo" = M."FacmNo"
     WHERE  M."DataYM"  =  YYYYMM
       AND  TRUNC(NVL(M."DrawdownDate", 0) / 100 ) <= YYYYMM
       ;
@@ -432,3 +482,5 @@ BEGIN
 
   END;
 END;
+
+/

@@ -30,11 +30,19 @@ public class LY004Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 
 		int entdyf = titaVo.getEntDyI() + 19110000;
 
-		int inputYearMonth = entdyf / 100;
+		int iYear = entdyf / 10000;
+		
+		int iMonth = entdyf % 10000;
+		
+		if(iMonth != 12) {
+			iYear = iYear - 1;
+		}
+		
+		int inputYearMonth = (iYear * 100) + 12;
 
 		List<Map<String, String>> lY004List = null;
 
@@ -84,9 +92,13 @@ public class LY004Report extends MakeReport {
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(6, 2, "本日無資料!!");
+			
+			return false;
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		 makeExcel.close();
+		 
+		 return true;
+
 	}
 }

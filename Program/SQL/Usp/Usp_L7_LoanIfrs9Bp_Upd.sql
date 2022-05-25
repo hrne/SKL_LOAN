@@ -1,4 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Bp_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Bp_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Bp 每月IFRS9欄位清單B檔
 -- 執行時機：每月底日終批次(換日前)

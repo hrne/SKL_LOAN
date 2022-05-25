@@ -1,4 +1,9 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB095_Upd"
+--------------------------------------------------------
+--  DDL for Procedure Usp_L8_JcicB095_Upd
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB095_Upd" 
 (
 -- 程式功能：維護 JcicB095 每月聯徵不動產擔保品明細-建號附加檔
 -- 執行時機：每月底日終批次(換日前)
@@ -51,71 +56,54 @@ BEGIN
     INS_CNT := 0;
 
     INSERT INTO "JcicB095"
-    WITH "Work_B095_All" AS (
-    SELECT
+    WITH rawData AS (
+    SELECT DISTINCT
            M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
-         , CF."ClCode1"                          AS "ClCode1"           -- 擔保品代號1
-         , CF."ClCode2"                          AS "ClCode2"           -- 擔保品代號2
-         , CF."ClNo"                             AS "ClNo"              -- 擔保品編號
-         , CASE WHEN TRIM(B."CityCode") IS NOT NULL THEN B."CityCode"
-                ELSE NVL(TRIM(L."CityCode"),' ')
-           END                                   AS "CityCode"          -- 縣市別
-         , CASE WHEN TRIM(B."AreaCode") IS NOT NULL THEN B."AreaCode"
-                ELSE NVL(TRIM(L."AreaCode"),' ')
-           END                                   AS "AreaCode"          -- 鄉鎮市區別
-         , CASE
-             WHEN TRIM(B."IrCode") IS NOT NULL THEN SUBSTR('0000' || B."IrCode", -4)
-             WHEN TRIM(L."IrCode") IS NOT NULL THEN SUBSTR('0000' || L."IrCode", -4)
-             ELSE '0001'
-           END                                   AS "IrCode"            -- 段、小段號
-         , NVL(B."BdNo1", 0)                     AS "BdNo1"             -- 建號-前五碼
-         , NVL(B."BdNo2", 0)                     AS "BdNo2"             -- 建號-後三碼
-    FROM   "JcicB090" M
-      LEFT JOIN "CdCl"         ON "CdCl"."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1))
-                              AND "CdCl"."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
-      LEFT JOIN "ClFac"  CF    ON CF."CustNo"     = to_number(SUBSTR(M."FacmNo",1,7))
-                              AND CF."FacmNo"     = to_number(SUBSTR(M."FacmNo",8,3))  -- 關聯所有擔保品編號(含主要擔保品)
-      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = CF."ClCode1"
-                              AND CI."ClCode2"  = CF."ClCode2"
-                              AND CI."ClNo"     = CF."ClNo"
-      LEFT JOIN "ClBuilding"  B     ON B."ClCode1" = CF."ClCode1"
-                                   AND B."ClCode2" = CF."ClCode2"
-                                   AND B."ClNo"    = CF."ClNo"
-      LEFT JOIN "ClLand"  L    ON L."ClCode1" = CF."ClCode1"
-                              AND L."ClCode2" = CF."ClCode2"
-                              AND L."ClNo"    = CF."ClNo"
-                              AND L."LandSeq" = 1
+         , M."BdNo1"                             AS "BdNo1"             -- 建號-前五碼
+         , M."BdNo2"                             AS "BdNo2"             -- 建號-後三碼
+    FROM   "JcicB092" M
     WHERE  M."DataYM" =  YYYYMM
-      AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')   -- 主要擔保品為不動產
+      AND  ( M."BdNo1" > 0 OR M."BdNo2" > 0 )
+      GROUP BY M."ClActNo" , M."BdNo1" , M."BdNo2"            
+    )
+    , "Work_B095_Sum" AS (
+    SELECT 
+           M."MainClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
+         , M."BdNo1"                             AS "BdNo1"             -- 建號-前五碼
+         , M."BdNo2"                             AS "BdNo2"             -- 建號-後三碼
+         , SUM(CB."Area")                        AS "Area"              -- 公設面積
+    FROM  rawData M
+      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."MainClActNo",1,1))
+                              AND CI."ClCode2"    = to_number(SUBSTR(M."MainClActNo",2,2))
+                              AND CI."ClNo"       = to_number(SUBSTR(M."MainClActNo",4,7))
+      LEFT JOIN "ClBuildingPublic" CB ON CB."ClCode1" = CI."ClCode1"
+                                     AND CB."ClCode2" = CI."ClCode2"
+                                     AND CB."ClNo"    = CI."ClNo"
+    WHERE  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
+      GROUP BY M."MainClActNo" , M."BdNo1" , M."BdNo2"            
+    )
+    , "Work_B095" AS (
+    SELECT 
+           M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
+         , M."OwnerId"                           AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
+         , M."CityJCICCode"                      AS "CityCode"          -- 縣市別
+         , M."AreaJCICCode"                      AS "AreaCode"          -- 鄉鎮市區別
+         , M."IrCode"                            AS "IrCode"            -- 段、小段號
+         , M."BdNo1"                             AS "BdNo1"             -- 建號-前五碼
+         , M."BdNo2"                             AS "BdNo2"             -- 建號-後三碼
+         , WK."Area"                             AS "Area"              -- 公設面積
+    FROM   "JcicB092" M
+      LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
+                              AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
+                              AND CI."ClNo"       = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN "Work_B095_Sum" WK ON WK."MainClActNo" = M."ClActNo"
+                                     AND WK."BdNo1" = M."BdNo1"
+                                     AND WK."BdNo2" = M."BdNo2"
+    WHERE  M."DataYM" =  YYYYMM
       AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
-      AND  ( NVL(TRIM(B."BdNo1"),0)  > 0 OR NVL(TRIM(B."BdNo2"),0) > 0 )
-    )
-	  , "Work_B095" AS (
-    SELECT "MainClActNo"       -- 主要擔保品控制編碼
-         , "ClCode1"           -- 擔保品代號1
-         , "ClCode2"           -- 擔保品代號2
-         , "ClNo"              -- 擔保品編號
-         , "CityCode"          -- 縣市別
-         , "AreaCode"          -- 鄉鎮市區別
-         , "IrCode"            -- 段、小段號
-         , "BdNo1"             -- 建號-前五碼
-         , "BdNo2"             -- 建號-後三碼
-         , ROW_NUMBER()
-           OVER (
-            PARTITION BY "MainClActNo"
-                       , "CityCode"
-                       , "AreaCode"
-                       , "IrCode"
-                       , "BdNo1"
-                       , "BdNo2"
-            ORDER BY "ClCode1" 
-                   , "ClCode2"
-                   , "ClNo"
-           ) AS "Seq"                  
-    FROM "Work_B095_All"
-    )
+      AND  ( M."BdNo1" > 0 OR M."BdNo2" > 0 )
 
-
+    )
     SELECT DISTINCT
            YYYYMM                                AS "DataYM"            -- 資料年月
          , '95'                                  AS "DataType"          -- 資料別
@@ -123,15 +111,9 @@ BEGIN
          , '0001'                                AS "BranchItem"        -- 分行代號
          , ' '                                   AS "Filler4"           -- 空白
          , WK."MainClActNo"                      AS "ClActNo"           -- 擔保品控制編碼 (主要擔保品)   VARCHAR2 50
-         , CASE
-             WHEN BuildingOwner."OwnerId"  IS NOT NULL THEN BuildingOwner."OwnerId"
-             WHEN LandOwner."OwnerId"      IS NOT NULL THEN LandOwner."OwnerId"
-             WHEN BuPublicOwner."OwnerId"  IS NOT NULL THEN BuPublicOwner."OwnerId"
-             ELSE ' '
-           END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
-         , NVL("CdArea"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
---         , NVL("CdCity"."JcicCityCode", ' ')     AS "CityCode"          -- 縣市別
-         , NVL(TRIM(WK."AreaCode"),0)            AS "AreaCode"          -- 鄉鎮市區別
+         , WK."OwnerId"                          AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
+         , WK."CityCode"                         AS "CityCode"           -- 縣市別
+         , WK."AreaCode"                         AS "AreaCode"           -- 鄉鎮市區別
          , WK."IrCode"                           AS "IrCode"            -- 段、小段號
          , WK."BdNo1"                            AS "BdNo1"             -- 建號-前五碼
          , WK."BdNo2"                            AS "BdNo2"             -- 建號-後三碼
@@ -145,7 +127,7 @@ BEGIN
              TRIM(NVL(B."Num", ''))  ||
              ( CASE
                  WHEN TRIM(NVL(B."NumDash", '')) IS NOT NULL THEN TRIM(NVL2(B."NumDash", '之' || B."NumDash", ''))
-                 ELSE N''
+                 ELSE u''
                END) ||
              ( CASE
                  WHEN TRIM(NVL(B."Num", '')) IS NULL AND TRIM(NVL(B."NumDash", '')) IS NULL THEN ''
@@ -207,7 +189,7 @@ BEGIN
                                                  AS "FloorArea"         -- 主建物(層次)面積 (後面再處理) DECIMAL  10,2
          , TRUNC(NVL(B."BdSubArea",0)  / 0.3025, 2)
                                                  AS "BdSubArea"         -- 附屬建物面積 (後面再處理)     DECIMAL  10,2
-         , TRUNC(NVL("ClBuildingPublic"."Area",0) / 0.3025, 2)
+         , TRUNC(NVL(WK."Area",0) / 0.3025, 2)
                                                  AS "PublicArea"        -- 共同部份持分面積 (後面再處理) DECIMAL  10,2
          , ' '                                   AS "Filler33"          -- 空白                          VARCHAR2 44
          , YYYYMM - 191100                       AS "JcicDataYM"        -- 資料所屬年月                  DECIMAL  5
@@ -216,53 +198,12 @@ BEGIN
          , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
          , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
     FROM   "Work_B095" WK
-      LEFT JOIN "CdCity"       ON "CdCity"."CityCode"  = WK."CityCode"
-      LEFT JOIN "CdArea"       ON "CdArea"."CityCode"  = WK."CityCode"
-                              AND "CdArea"."AreaCode"  = WK."AreaCode"
-      LEFT JOIN "ClMain" CM    ON CM."ClCode1"  = WK."ClCode1"
-                              AND CM."ClCode2"  = WK."ClCode2"
-                              AND CM."ClNo"     = WK."ClNo"
-      LEFT JOIN "ClImm" CI    ON  CI."ClCode1"  = CM."ClCode1"
-                              AND CI."ClCode2"  = CM."ClCode2"
-                              AND CI."ClNo"     = CM."ClNo"
-      LEFT JOIN "ClBuilding"  B     ON B."ClCode1" = CM."ClCode1"
-                                   AND B."ClCode2" = CM."ClCode2"
-                                   AND B."ClNo"    = CM."ClNo"
-      LEFT JOIN "ClBuildingPublic"   ON "ClBuildingPublic"."ClCode1" = B."ClCode1"
-                                    AND "ClBuildingPublic"."ClCode2" = B."ClCode2"
-                                    AND "ClBuildingPublic"."ClNo"    = B."ClNo"
-                                    AND "ClBuildingPublic"."PublicBdNo1"   = B."BdNo1"
-                                    AND "ClBuildingPublic"."PublicBdNo2"   = B."BdNo2"
-      LEFT JOIN "ClLand"  L    ON L."ClCode1" = CM."ClCode1"
-                              AND L."ClCode2" = CM."ClCode2"
-                              AND L."ClNo"    = CM."ClNo"
-                              AND L."LandSeq" = 1
-      LEFT JOIN ( SELECT DISTINCT
-                         O."ClCode1", O."ClCode2", O."ClNo", O."OwnerPart", O."OwnerTotal"
-                       , C."CustId"  AS "OwnerId"
-                  FROM "ClBuildingOwner" O
-                    LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
-                ) BuildingOwner    ON BuildingOwner."ClCode1" = CM."ClCode1"
-                                  AND BuildingOwner."ClCode2" = CM."ClCode2"
-                                  AND BuildingOwner."ClNo"    = CM."ClNo"
-      LEFT JOIN ( SELECT DISTINCT
-                         O."ClCode1", O."ClCode2", O."ClNo", O."OwnerPart", O."OwnerTotal"
-                       , C."CustId"  AS "OwnerId"
-                  FROM "ClLandOwner" O
-                    LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
-                ) LandOwner        ON LandOwner."ClCode1" = CM."ClCode1"
-                                  AND LandOwner."ClCode2" = CM."ClCode2"
-                                  AND LandOwner."ClNo"    = CM."ClNo"
-                                  AND BuildingOwner."OwnerId" IS NULL
-      LEFT JOIN ( SELECT DISTINCT
-                         O."ClCode1", O."ClCode2", O."ClNo", O."OwnerId"
-                  FROM "ClBuildingPublic" O
-                ) BuPublicOwner    ON BuPublicOwner."ClCode1" = CM."ClCode1"
-                                  AND BuPublicOwner."ClCode2" = CM."ClCode2"
-                                  AND BuPublicOwner."ClNo"    = CM."ClNo"
-                                  AND LandOwner."OwnerId"     IS NULL
-                                  AND BuildingOwner."OwnerId" IS NULL
-    WHERE WK."Seq" = 1  
+      LEFT JOIN "CdArea"       ON "CdArea"."JcicCityCode"  = WK."CityCode"
+                              AND "CdArea"."JcicAreaCode"  = WK."AreaCode"
+      LEFT JOIN "CdCity"       ON "CdCity"."CityCode"  =  "CdArea"."CityCode"  
+      LEFT JOIN "ClBuilding"  B     ON B."ClCode1" = to_number(SUBSTR(WK."MainClActNo",1,1))
+                                   AND B."ClCode2" = to_number(SUBSTR(WK."MainClActNo",2,2))
+                                   AND B."ClNo"    = to_number(SUBSTR(WK."MainClActNo",4,7))
     ;
 
 
@@ -347,4 +288,4 @@ BEGIN
   END;
 END;
 
-
+/
