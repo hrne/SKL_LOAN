@@ -120,7 +120,7 @@ T(2,@AuthStatusHelp,#HelpDesc6)
 T(2,@AmlRspHelp,#HelpDesc7)
 
 
-#NTXBUF=X,45,S
+#NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
 T(1,@AuthCreateDate,#NTXBUF,2,7)
@@ -129,23 +129,26 @@ T(1,@RepayBank,#NTXBUF,16,3)
 T(1,@RepayAcct,#NTXBUF,19,14)
 T(1,@CreateFlag,#NTXBUF,33,1)
 T(1,@CreateFlagTemp,#NTXBUF,33,1)
+T(1,@LogNo,#NTXBUF,34,11)
 T(H,@RepayBankX,#RepayBank,#BankCdHelp)
 T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 INVOKEJS(SHOW,p1,02,02,1)
 
 #RimRepayAcct=A,14,S
 #RimRepayBank=A,3,S
+#RimLogNo=A,11,S
 
 ! L4R31 調AchAuthLog資料
 #SendL4R31=X,1,S
 C(3,#FuncCode,1,s,$)
+E(0,@RimLogNo,#LogNo)
 E(0,@RimAuthCreateDate,#AuthCreateDate)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimRepayBank,#RepayBank)
 T(2,@RimRepayAcct,#RepayAcct)
 T(2,@RimCreateFlag,#CreateFlag)
 RESET_RIM(#SendL4R31,L4R31)
-S(L4R31,1,#RimAuthCreateDate,#RimCustNo,#RimRepayBank,#RimRepayAcct,#RimCreateFlag)
+S(L4R31,1,#RimLogNo,#RimAuthCreateDate,#RimCustNo,#RimRepayBank,#RimRepayAcct,#RimCreateFlag)
 R(1,L4R31)
 E(0,@FacmNo,#L4R31FacmNo)
 E(0,@LimitAmt,#L4R31LimitAmt)
@@ -247,6 +250,8 @@ T(H,#FuncCode,#FuncCodeHelp)
 C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
 C(3,#FuncCode,5,K(NOBUTTON,CLOSEY),$)
 
+#LogNo=A,11,S
+
 ! PK ---FOR UPDATE TABLE
 ! 建檔日期
 #AuthCreateDate=D,7,S
@@ -272,13 +277,14 @@ C(3,#FuncCode,1,$,s)
 C(3,#FuncCode,1,s,$)
 C(3,#FuncCode,5,S,$)
 E(0,@RimFuncCode,#FuncCode)
+E(0,@RimLogNo,#LogNo)
 E(0,@RimAuthCreateDate,#AuthCreateDate)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimAcctNo,#RepayAcct)
 E(0,@RimBankNo,#RepayBank)
 T(2,@RimCreateFlag,#CreateFlag)
 RESET_RIM(#SendL4R24A,L4R24)
-S(L4R24,1,#RimFuncCode,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimCreateFlag)
+S(L4R24,1,#RimFuncCode,#RimLogNo,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimCreateFlag)
 R(1,L4R24)
 
 

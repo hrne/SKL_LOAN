@@ -179,13 +179,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCreatDate " + dbName + " : " + "createDate_0 : " + createDate_0 + " createDate_1 : " +  createDate_1 + " supNo_2 : " +  supNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = txAuthorizeReposDay.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeReposDay.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txAuthorizeReposMon.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeReposMon.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txAuthorizeReposHist.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeReposHist.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
     else 
-      slice = txAuthorizeRepos.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeRepos.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

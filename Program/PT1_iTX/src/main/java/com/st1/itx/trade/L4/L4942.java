@@ -69,7 +69,8 @@ public class L4942 extends TradeBuffer {
 		if ("".equals(iAuthType)) {
 			sPostAuthLogHistory = postAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
 		} else {
-			sPostAuthLogHistory = postAuthLogHistoryService.facmNoAuthCodeEq(custNo, facmNo, iAuthType, index, limit, titaVo);
+			sPostAuthLogHistory = postAuthLogHistoryService.facmNoAuthCodeEq(custNo, facmNo, iAuthType, index, limit,
+					titaVo);
 		}
 		lPostAuthLogHistory = sPostAuthLogHistory == null ? null : sPostAuthLogHistory.getContent();
 
@@ -98,12 +99,14 @@ public class L4942 extends TradeBuffer {
 					DateFormat sdftime = new SimpleDateFormat("HHmmss");
 
 					updateTime = sdftime.format(ts);
-					updateTime = updateTime.substring(0, 2) + ":" + updateTime.substring(2, 4) + ":" + updateTime.substring(4, 6);
+					updateTime = updateTime.substring(0, 2) + ":" + updateTime.substring(2, 4) + ":"
+							+ updateTime.substring(4, 6);
 
 				}
 				this.info("updateTime = " + updateTime);
 
 				OccursList occursList = new OccursList();
+				occursList.putParam("OOLogNo", tPostAuthLogHistory.getLogNo());
 				occursList.putParam("OOCustNo", tPostAuthLogHistory.getCustNo());
 				occursList.putParam("OOFacmNo", tPostAuthLogHistory.getFacmNo());
 				occursList.putParam("OOAuthType", tPostAuthLogHistory.getAuthCode());

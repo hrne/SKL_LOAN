@@ -90,7 +90,7 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ,act.\"ProcessDate\"          as F21                                        ";
 		sql += "    ,act.\"ProcessTime\"          as F22                                        ";
 		sql += "    ,act.\"AuthMeth\"          as F23                                        ";
-		sql += "    ,case when act.\"LogNo\" is null then 'N' else 'Y' end as F24            ";
+		sql += "    ,case when ah.\"LogNo\" is null then 'N' else 'Y' end as F24            ";
 		sql += "   from \"AchAuthLog\" act                                            ";
 		sql += "   left join \"AchAuthLogHistory\" ah on ah.\"CustNo\" = act.\"CustNo\"  ";
 		sql += "                                    and ah.\"FacmNo\" = act.\"FacmNo\"  ";

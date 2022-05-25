@@ -179,6 +179,8 @@ T(3,[L4942] 郵局授權資料)
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
 
+#OOLogNo=A,11,O
+
 #OOCustNo=A,7,O
 
 #OOFacmNo=A,3,O
@@ -240,24 +242,7 @@ IF(#OODeleteDate==0,T(2,),T(2,Y))
 
 ! #OOBUF_CREAT=X,1,S 改由上方畫面新增
 ! T(2,1)
-#OOBUF_EDIT=X,500,S
-T(2,2
-+#OOAuthCreateDate
-+#OOCreateFlag
-+#OOCustNo
-+#OOPostDepCode
-+#OORepayAcctLog
-+#OOAuthType
-)
-#OOBUF_DELETE=X,500,S
-T(2,4
-+#OOAuthCreateDate
-+#OOCreateFlag
-+#OOCustNo
-+#OOPostDepCode
-+#OORepayAcctLog
-+#OOAuthType
-)
+
 #OOBUF_SEARCH=X,500,S
 T(2,5
 +#OOAuthCreateDate
@@ -266,34 +251,11 @@ T(2,5
 +#OOPostDepCode
 +#OORepayAcctLog
 +#OOAuthType
++#OOLogNo
 )
-! #OOBTN_CREAT=A,2,O
-! BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_CREAT})
-#OOBTN_EDIT=A,2,O
-C(4,#OOAuthErrorCode,C(4,#OOPostMediaCode,BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_EDIT}),BIND(grid,cancel)),BIND(grid,cancel))
-C(4,#OOAuthErrorCode,s,$)
-IF(#OOAuthErrorCode=="00",
-IF(#OOCreateFlag=="2",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_EDIT})),
-BIND(grid,cancel))
-
-#OOBTN_DELETE=A,2,O
-IF(#OOPostMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_DELETE}))
-IF(#OOPostMediaCode=="Y",s,$)
 
 #OOBTN_SEARCH=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_SEARCH})
-
-#OOBUF_CONNECT=X,500,S
-T(2,#OOCustNo+#OORepayAcctLog)
-
-#OOBTN_CONNECT=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L4940; ntxbuf=#OOBUF_CONNECT})
-
-#OOBUF_HISTORY=X,500,S
-T(2,#OOCustNo+#OOFacmNo)
-
-#OOBTN_HISTORY=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L4942; ntxbuf=#OOBUF_HISTORY})
 
 </sub>
 
@@ -310,6 +272,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4942; ntxbuf=#OOBUF_HISTORY})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L4942
+#OOLogNo
 #OOCustNo
 #OOFacmNo
 #OOAuthType

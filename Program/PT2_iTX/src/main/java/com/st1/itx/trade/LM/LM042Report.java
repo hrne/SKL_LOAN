@@ -477,7 +477,7 @@ public class LM042Report extends MakeReport {
 			//備抵損失III
 			//L6 C非
 			cY3loseToTalAmt = cN3Amt.multiply(percent0_1).setScale(0, BigDecimal.ROUND_HALF_UP);
-			makeExcel.setValue(9, 12, cY3loseToTalAmt, "#,##0");
+			makeExcel.setValue(6, 12, cY3loseToTalAmt, "#,##0");
 
 			//備抵損失V
 			//N6 C非

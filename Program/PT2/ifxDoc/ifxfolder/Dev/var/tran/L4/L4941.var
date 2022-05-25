@@ -156,6 +156,8 @@ T(3,[L4941] ACH授權資料歷史紀錄查詢)
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
 
+#OOLogNo=A,11,O
+
 #OOCustNo=A,7,O
 
 #OOFacmNo=A,3,O
@@ -203,24 +205,7 @@ IF(#OODeleteDate==0,T(2,),T(2,Y))
 #OODate=D,7,O
 #OOLastUpdateTime=X,10,O
 
-! #OOBUF_CREAT=X,1,S
-! T(2,1)
-#OOBUF_EDIT=X,500,S
-T(2,2
-+#OOAuthCreateDate
-+#OOCustNo
-+#OORepayBank
-+#OORepayAcct
-+#OOCreateFlag
-)
-#OOBUF_DELETE=X,500,S
-T(2,4
-+#OOAuthCreateDate
-+#OOCustNo
-+#OORepayBank
-+#OORepayAcct
-+#OOCreateFlag
-)
+
 #OOBUF_SEARCH=X,500,S
 T(2,5
 +#OOAuthCreateDate
@@ -228,10 +213,10 @@ T(2,5
 +#OORepayBank
 +#OORepayAcct
 +#OOCreateFlag
++#OOLogNo
 )
 
-! #OOBTN_CREAT=A,2,O 改為頁面上方新增
-! BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_CREAT})
+
 
 #OOBTN_SEARCH=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_SEARCH})
@@ -251,6 +236,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_SEARCH})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L4941
+#OOLogNo
 #OOCustNo
 #OOFacmNo
 #OORepayBank

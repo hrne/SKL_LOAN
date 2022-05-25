@@ -28,7 +28,7 @@ public interface TxAuthorizeRepository extends JpaRepository<TxAuthorize, Long> 
   public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
 
   // CreateDate>=, AND CreateDate<= ,AND SupNo %
-  public Slice<TxAuthorize> findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, Pageable pageable);
+  public Slice<TxAuthorize> findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, Pageable pageable);
 
   // Entdy >= ,AND Entdy <=,AND SupNo %
   public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderBySupNoAscEntdyAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);

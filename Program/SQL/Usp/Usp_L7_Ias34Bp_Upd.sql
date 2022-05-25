@@ -1,8 +1,8 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_Ias34Bp_Upd"
+create or replace PROCEDURE "Usp_L7_Ias34Bp_Upd"
 (
 -- 程式功能：維護 Ias34Bp 每月IAS34資料欄位清單B檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_Ias34Bp_Upd"(20211230,'999999');
+-- 執行方式：EXEC "Usp_L7_Ias34Bp_Upd"(20200420,'999999');
 --
 
     -- 參數
@@ -47,8 +47,7 @@ BEGIN
     ;
 
     -- 寫入資料
-    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp');
-    INS_CNT := 0;
+    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp LoanRateChange');
 
     INSERT INTO "Ias34Bp"
     SELECT
@@ -94,18 +93,7 @@ BEGIN
         LEFT JOIN "LoanRateChange" LRC ON LRC."CustNo" = LBM."CustNo"
                                       AND LRC."FacmNo" = LBM."FacmNo"
                                       AND LRC."BormNo" = LBM."BormNo"
-                                      AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
-        LEFT JOIN (
-            SELECT DISTINCT
-                   "CustNo"
-                 , "FacmNo"
-                 , "BormNo"
-                 , "Status"
-            FROM "LoanRateChange"
-            WHERE "Status" = 2 -- 找出任一筆有建過加碼的資料
-        ) LRC_2 ON LRC_2."CustNo" = LBM."CustNo"
-               AND LRC_2."FacmNo" = LBM."FacmNo"
-               AND LRC_2."BormNo" = LBM."BormNo"
+                                      AND LRC."Status" = 2 -- 串加碼資料
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
                                AND FAC."FacmNo" = LBM."FacmNo"
         LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
@@ -122,8 +110,7 @@ BEGIN
         ) CBR ON CBR."BaseRateCode" = PROD."BaseRateCode"
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."FirstAdjRateDate",0) / 100) > YYYYMM
-          AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
-          AND NVL(LRC_2."Status",0) != 2 -- 剔除有建加碼資料
+          AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有加碼資料的,才寫入
         UNION
         SELECT LBM."CustNo"
              , LBM."FacmNo"
@@ -137,18 +124,7 @@ BEGIN
         LEFT JOIN "LoanRateChange" LRC ON LRC."CustNo" = LBM."CustNo"
                                       AND LRC."FacmNo" = LBM."FacmNo"
                                       AND LRC."BormNo" = LBM."BormNo"
-                                      AND TRUNC(NVL(LRC."EffectDate",0) / 100) > YYYYMM
-        LEFT JOIN (
-            SELECT DISTINCT
-                   "CustNo"
-                 , "FacmNo"
-                 , "BormNo"
-                 , "Status"
-            FROM "LoanRateChange"
-            WHERE "Status" = 2 -- 找出任一筆有建過加碼的資料
-        ) LRC_2 ON LRC_2."CustNo" = LBM."CustNo"
-               AND LRC_2."FacmNo" = LBM."FacmNo"
-               AND LRC_2."BormNo" = LBM."BormNo"
+                                      AND LRC."Status" = 2 -- 串加碼資料
         LEFT JOIN "FacMain" FAC ON FAC."CustNo" = LBM."CustNo"
                                AND FAC."FacmNo" = LBM."FacmNo"
         LEFT JOIN "FacProd" PROD ON PROD."ProdNo" = FAC."ProdNo"
@@ -165,8 +141,7 @@ BEGIN
         ) CBR ON CBR."BaseRateCode" = PROD."BaseRateCode"
              AND CBR."Seq" = 1 -- 只抓基礎利率生效日最接近本月月底日的一筆
         WHERE TRUNC(NVL(LBM."NextAdjRateDate",0) / 100) > YYYYMM
-          AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有未來資料的,才寫入
-          AND NVL(LRC_2."Status",0) != 2 -- 剔除有建加碼資料
+          AND NVL(LRC."EffectDate",0) = 0 -- 在於放款利率變動檔沒有加碼資料的,才寫入
       ) C ON C."CustNo"  = M."CustNo"
          AND C."FacmNo"  = M."FacmNo"
          AND C."BormNo"  = M."BormNo"
@@ -188,7 +163,9 @@ BEGIN
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;
-    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp END');
+    DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp LoanRateChange END');
+
+
     DBMS_OUTPUT.PUT_LINE('INSERT Ias34Bp INS_CNT=' || INS_CNT);
 
 

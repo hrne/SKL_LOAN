@@ -44,7 +44,15 @@ public class LY005Report extends MakeReport {
 
 		int entdyf = titaVo.getEntDyI() + 19110000;
 
-		int inputYearMonth = entdyf / 100;
+		int iYear = entdyf / 10000;
+		
+		int iMonth = entdyf % 10000;
+		
+		if(iMonth != 12) {
+			iYear = iYear - 1;
+		}
+		
+		int inputYearMonth = (iYear * 100) + 12;
 
 		CdVarValue tCdVarValue = sCdVarValueService.findYearMonthFirst(inputYearMonth, titaVo);
 

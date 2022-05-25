@@ -52,6 +52,7 @@ T(1,@CustNo,#NTXBUF,10,7)
 T(1,@PostDepCode,#NTXBUF,17,1)
 T(1,@RepayAcct,#NTXBUF,18,14)
 T(1,@AuthCode,#NTXBUF,32,1)
+T(1,@LogNo,#NTXBUF,33,11)
 INVOKEJS(SHOW,p1,02,02,1)
 
 #FdFuncCodeX=X,2,L
@@ -156,10 +157,12 @@ T(2,@AmlRspHelp,#HelpDesc8)
 
 #RimRepayAcct=A,14,S
 #RimAuthCode=A,1,S
+#RimLogNo=A,11,S
 
 ! L4R30 調PostAuthLog資料
 #SendL4R30=X,1,S
 C(3,#FuncCode,1,s,$)
+E(0,@RimLogNo,#LogNo)
 E(0,@RimAuthCreateDate,#AuthCreateDate)
 T(2,@RimAuthApplCode,#AuthApplCode)
 E(0,@RimCustNo,#CustNo)
@@ -167,7 +170,7 @@ T(2,@RimPostDepCode,#PostDepCode)
 T(2,@RimRepayAcct,#RepayAcct)
 T(2,@RimAuthCode,#AuthCode)
 RESET_RIM(#SendL4R30,L4R30)
-S(L4R30,1,#RimAuthCreateDate,#RimAuthApplCode,#RimCustNo,#RimPostDepCode,#RimRepayAcct,#RimAuthCode)
+S(L4R30,1,#RimLogNo,#RimAuthCreateDate,#RimAuthApplCode,#RimCustNo,#RimPostDepCode,#RimRepayAcct,#RimAuthCode)
 R(1,L4R30)
 T(2,@CustId,#L4R30CustId)
 T(2,@CustIdTemp2,#L4R30CustId)
@@ -212,8 +215,7 @@ T(2,@LastUpdateEmpNo,#RimEmployeeNo+ +#L6R17Fullname)
 
 #PREVALUE=A,1,S
 
-
-
+#LogNo=A,11,S
 
 #CDT=D,7,S
 
@@ -377,6 +379,7 @@ T(F,@LimitAmt,1))
 #SendL4R24A=X,1,S
 C(3,#FuncCode,1,s,$)
 E(0,@RimFuncCode,#FuncCode)
+E(0,@RimLogNo,#LogNo)
 E(0,@RimAuthCreateDate,#AuthCreateDate)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimAcctNo,#RepayAcct)
@@ -384,7 +387,7 @@ E(0,@RimBankNo,700)
 E(0,@RimAuthApplCode,#AuthApplCode)
 T(2,@RimPostDepCode,#PostDepCode)
 RESET_RIM(#SendL4R24A,L4R24)
-S(L4R24,1,#RimFuncCode,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimAuthApplCode,#RimPostDepCode)
+S(L4R24,1,#RimFuncCode,#RimLogNo,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimAuthApplCode,#RimPostDepCode)
 R(1,L4R24)
 
 ! 戶號
@@ -601,8 +604,13 @@ C(4,#AuthErrorCode,s,$)
 T(2,1)
 HELP(1:申請;9:暫停)
 @V(1,1,9)
-#AuthApplCodeX=X,4,L
-SWITCH(#AuthApplCode,1,T(2,申請),2,T(2,終止),9,T(2,暫停),T(2,))
+#AuthApplCodeX=X,8,L
+SWITCH(#AuthApplCode,1,T(2,申請),
+					 2,T(2,終止),
+					 3,T(2,郵局終止),
+					 4,T(2,誤終止),
+					 8,T(2,恢復授權),
+					 9,T(2,暫停授權),T(2,))
 
 #AcctCheckFlag23=A,1,S
 E(0,@AcctCheckFlag23,#L4r23CheckCode)
@@ -641,6 +649,7 @@ T(2,@RelAcctGenderX,)
 
 #RelationCodeX=X,4,L
 T(H,#RelationCode,#RelationCodeHelp)
+
 
 #closeRela=X,1,S
 IF(#FuncCode==1,$,s)
