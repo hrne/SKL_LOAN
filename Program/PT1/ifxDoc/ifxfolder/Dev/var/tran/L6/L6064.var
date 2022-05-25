@@ -149,7 +149,7 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 #DefCode=x,20,I
 C(3,#CHAIN,1,s,$)
 !HELP(#DefCodeH)
-@C(4,#DefCode,$,V(H,#DefCodeH))
+!@C(4,#DefCode,$,V(H,#DefCodeH))
 
 !處理
 
