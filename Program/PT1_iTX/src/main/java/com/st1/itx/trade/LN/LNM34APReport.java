@@ -93,6 +93,7 @@ public class LNM34APReport extends MakeReport {
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM34AP genFile : ");
+		boolean isNewForm = false; // 格式:false舊格式,true新格式
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;"
 				+ "F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;F40";
 		String txt1[] = txt.split(";");
@@ -213,7 +214,11 @@ public class LNM34APReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 轉銷呆帳金額
 						case 23:
-							strField = makeFile.fillStringL(strField, 2, '0');
+							if (isNewForm == true) {
+								strField = makeFile.fillStringL(strField, 2, '0');
+							} else {
+								strField = makeFile.fillStringL(strField, 1, '0');
+							}
 							break; // 符合減損客觀證據之條件
 						case 24:
 							strField = makeFile.fillStringL(strField, 3, '0');
@@ -246,7 +251,11 @@ public class LNM34APReport extends MakeReport {
 							strField = makeFile.fillStringR(strField, 3, ' ');
 							break; // 擔保品地區別(擔保品郵遞區號)
 						case 33:
-							strField = makeFile.fillStringR(strField, 5, ' ');
+							if (isNewForm == true) {
+								strField = makeFile.fillStringR(strField, 5, ' ');
+							} else {
+								strField = makeFile.fillStringR(strField, 2, ' ');
+							}
 							break; // 商品利率代碼
 						case 34:
 							strField = makeFile.fillStringL(strField, 1, '0');

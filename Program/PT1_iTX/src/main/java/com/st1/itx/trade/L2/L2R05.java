@@ -172,7 +172,7 @@ public class L2R05 extends TradeBuffer {
 					this.addList(this.totaVo);
 					return this.sendList();
 				}
-				throw new LogicException(titaVo, "E0001", " 額度主檔 核准編號 = " + iApplNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E2022", "此核准編號" + iApplNo + "在額度主檔無資料"); // 查詢資料不存在
 			}
 			if ((iTxCode.equals("L3410") || iTxCode.equals("L3420")) && iCustNo > 0) {
 				if (iCustNo != tFacMain.getCustNo()) {

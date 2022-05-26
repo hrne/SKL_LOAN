@@ -171,7 +171,12 @@ public class BS900 extends TradeBuffer {
 				if ("ICR".equals(t.getAcctCode())) {
 					continue;
 				}
-				String rvNo = getRvNo(titaVo);
+				// 銷帳碼=原銷帳碼
+				String rvNo = t.getRvNo();
+				// 無銷帳碼則自編
+				if (rvNo.trim().isEmpty()) {
+					rvNo = getRvNo(titaVo);
+				}
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setItemCode("ACCL01");
 				tTxToDoDetail.setDtlValue(rvNo);
@@ -280,8 +285,9 @@ public class BS900 extends TradeBuffer {
 
 	private void addTxToDoThisMonth(String acctCode, String aging, String acBookCode, String acSubBookCode,
 			BigDecimal intAmt, TitaVo titaVo) throws LogicException {
-		// 提存(傳票批號:99)
-		String rvNo = getRvNo(titaVo);
+
+		// 銷帳碼(15)=年月(5)-業務科目(3)-帳齡(1)-區隔帳冊(3)
+		String rvNo = iAcDate / 100 + acctCode + "-" + aging + "-" + acSubBookCode;
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL01");
 		tTxToDoDetail.setDtlValue(rvNo);
@@ -289,7 +295,7 @@ public class BS900 extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		tTempVo.clear();
 		tTempVo.putParam("AcDate", iAcDate);
-		tTempVo.putParam("SlipBatNo", "99");
+		tTempVo.putParam("SlipBatNo", "99");// 提存(傳票批號:99)
 		tTempVo.putParam("AcclType", "利息提存");
 		tTempVo.putParam("AcctCode", acctCode);
 		tTempVo.putParam("SlipNote", gettingSlipNote(aging));

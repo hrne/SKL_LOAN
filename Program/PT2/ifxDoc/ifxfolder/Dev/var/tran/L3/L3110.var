@@ -1827,7 +1827,7 @@ T(3,)T(H,#RepayCode,#RepayCodeHelp)
 !依核准額度自動顯示,不可修改 L2R05
 #FdRepayBank=X,2,L
 
-#RepayBank=A,3,S
+#RepayBank=X,3,S
 
 #SendL2r09A=X,1,S
 C(3,#RepayCode,2,$,S)

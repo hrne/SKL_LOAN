@@ -93,6 +93,7 @@ public class LNM34DPReport extends MakeReport {
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM34DP genFile : ");
+		boolean isNewForm = false; // 格式:false舊格式,true新格式
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;"
 				+ "F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;F40;F41;F42;F43";
 		String txt1[] = txt.split(";");
@@ -317,7 +318,11 @@ public class LNM34DPReport extends MakeReport {
 							strField = makeFile.fillStringR(strField, 3, ' ');
 							break; // 擔保品地區別(擔保品郵遞區號)
 						case 42:
-							strField = makeFile.fillStringR(strField, 5, ' ');
+							if (isNewForm == true) {
+								strField = makeFile.fillStringR(strField, 5, ' ');
+							} else {
+								strField = makeFile.fillStringR(strField, 2, ' ');
+							}
 							break; // 商品利率代碼
 						case 43:
 							strField = makeFile.fillStringL(strField, 1, '0');

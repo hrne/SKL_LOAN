@@ -66,6 +66,7 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示 此三金額修改為撥款層而非額度層總計
 		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 -- 參考L5051
 		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額
+		sql += "       ,NVL(e1.\"AgLevel\", '')  AS \"AgLevel0\""; // 介紹人職等
 		sql += "       ,NVL(e4.\"Fullname\", '') AS \"ManagerName1\""; // 介紹人主管姓名1
 		sql += "       ,NVL(e4.\"AgLevel\", '')  AS \"AgLevel1\""; // 介紹人主管職等1
 		sql += "       ,NVL(e5.\"Fullname\", '') AS \"ManagerName2\""; // 介紹人主管姓名2

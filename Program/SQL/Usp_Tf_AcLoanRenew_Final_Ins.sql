@@ -19,23 +19,25 @@ BEGIN
       SELECT NB.LMSACN
            , NB.LMSAPN
            , NB.LMSASQ
+           , NB.NEGNUM
+           , NVL(ALR."CustNo",0) AS ALR_CustNo
       FROM LN$NODP NB
       LEFT JOIN "AcLoanRenew" ALR ON ALR."CustNo" = NB.LMSACN
                                  AND ALR."OldFacmNo" = NB.LMSAPN
                                  AND ALR."OldBormNo" = NB.LMSASQ
       WHERE CHGFLG = 'B'
-        AND NVL(ALR."CustNo",0) = 0 -- 必須沒串到
     )
     , noExistNewData AS (
       SELECT NA.LMSACN
            , NA.LMSAPN
            , NA.LMSASQ
+           , NA.NEGNUM
+           , NVL(ALR."CustNo",0) AS ALR_CustNo
       FROM LN$NODP NA
       LEFT JOIN "AcLoanRenew" ALR ON ALR."CustNo" = NA.LMSACN
                                  AND ALR."NewFacmNo" = NA.LMSAPN
                                  AND ALR."NewBormNo" = NA.LMSASQ
       WHERE CHGFLG = 'A'
-        AND NVL(ALR."CustNo",0) = 0 -- 必須沒串到
     )
     , noExistData AS (
         select O.LMSACN AS "CustNo"
@@ -43,9 +45,15 @@ BEGIN
              , N.LMSASQ AS "NewBormNo"
              , O.LMSAPN AS "OldFacmNo"
              , O.LMSASQ AS "OldBormNo"
+             , O.NEGNUM
         from noExistOldData O
            , noExistNewData N
         WHERE O.LMSACN = N.LMSACN
+          AND O.NEGNUM = N.NEGNUM
+          AND CASE
+                WHEN O.ALR_CustNo = 0 AND N.ALR_CustNo = 0
+                THEN 0
+              ELSE 1 END = 1
     )
     SELECT n."CustNo"
          , n."NewFacmNo"
@@ -59,6 +67,10 @@ BEGIN
          , JOB_START_TIME     AS "CreateDate"
          , '999999'           AS "LastUpdateEmpNo"
          , JOB_START_TIME     AS "LastUpdate"
+         ,'{"NegNo":"'
+           || n."NEGNUM" -- 協議件編號
+           || '"'
+           || '}'             AS "OtherFields"
     FROM noExistData n
     LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = n."CustNo"
                                AND LBM."FacmNo" = n."NewFacmNo"

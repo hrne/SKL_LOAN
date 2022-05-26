@@ -28,10 +28,10 @@ public interface TxAuthorizeRepositoryDay extends JpaRepository<TxAuthorize, Lon
   public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
 
   // CreateDate>=, AND CreateDate<= ,AND SupNo %
-  public Slice<TxAuthorize> findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAsc(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, Pageable pageable);
+  public Slice<TxAuthorize> findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, Pageable pageable);
 
   // Entdy >= ,AND Entdy <=,AND SupNo %
-  public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderBySupNoAscEntdyAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
+  public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

@@ -27,10 +27,7 @@ BEGIN
           ,S0."RenewBormNo"               AS "NewBormNo"           -- 新撥款序號 DECIMAL 3
           ,S0."CloseFacmNo"               AS "OldFacmNo"           -- 舊額度編號 DECIMAL 6
           ,S0."CloseBormNo"               AS "OldBormNo"           -- 舊撥款序號 DECIMAL 6
-          ,CASE
-             WHEN NVL(NA."LMSACN",0) != 0
-             THEN '2' -- 2022-05-23 Wei 新增,案例提供by Linda 戶號402 在AS400只有建協議檔沒有建借新還舊檔
-           ELSE '1' END                   AS "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
+          ,'1'                            AS "ReNewCode"           -- 展期記號 VARCHAR2 1 (1:一般 2:協議)
           ,CASE
              WHEN S0."Seq" = 1 -- 新撥款對到舊撥款 最早的一筆 為Y
              THEN 'Y'
@@ -40,6 +37,7 @@ BEGIN
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,''                             AS "OtherFields"
     FROM (SELECT "AcDate"
                , "CustNo"
                , "CloseFacmNo"
@@ -69,16 +67,6 @@ BEGIN
                          , "RenewBormNo"
                  ) S
           ) S0
-    LEFT JOIN (
-      SELECT DISTINCT
-             "LMSACN"
-           , "LMSAPN"
-           , "LMSASQ"
-      FROM "LN$NODP"
-      WHERE "CHGFLG" = 'A'
-    ) NA ON NA."LMSACN" = S0."CustNo"
-        AND NA."LMSAPN" = S0."RenewFacmNo"
-        AND NA."LMSASQ" = S0."RenewBormNo"
     LEFT JOIN "AcLoanRenew" S1 ON S1."CustNo" = S0."CustNo"
                               AND S1."NewFacmNo" = S0."RenewFacmNo"
                               AND S1."NewBormNo" = S0."RenewBormNo"

@@ -68,6 +68,7 @@ BEGIN
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,''                             AS "OtherFields"
     FROM (SELECT "LMSACN"
                 ,"LMSAPN"
                 ,"LMSASQ"
@@ -108,16 +109,20 @@ BEGIN
              , A."LMSASQ"
              , A."LMSAPN1" AS "OLD_LMSAPN"
              , A."LMSASQ1" AS "OLD_LMSASQ"
+             , NA."NEGNUM" AS "NEGNUM"
         FROM ACNP A
         LEFT JOIN "LN$NODP" NB ON NB."LMSACN" = A."LMSACN"
                               AND NB."LMSAPN" = A."LMSAPN1"
                               AND NB."LMSASQ" = A."LMSASQ1"
                               AND NB."CHGFLG" = 'B'
+                              AND 
         LEFT JOIN "LN$NODP" NA ON NA."LMSACN" = A."LMSACN"
                               AND NA."LMSAPN" = A."LMSAPN"
                               AND NA."LMSASQ" = A."LMSASQ"
                               AND NA."CHGFLG" = 'A'
-        WHERE NVL(NA."NEGNUM",0) + NVL(NB."NEGNUM",0) > 0
+        WHERE NVL(NA."NEGNUM",0) != 0
+          AND NVL(NB."NEGNUM",0) != 0
+          AND NVL(NA."NEGNUM",0) = NVL(NB."NEGNUM",0)
       )
       SELECT S1."LMSACN"                    AS "CustNo"              -- 戶號 DECIMAL 3
             ,S1."LMSAPN"                    AS "NewFacmNo"           -- 新額度編號 DECIMAL 3
@@ -132,6 +137,10 @@ BEGIN
             ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
             ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
             ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
+            ,'{"NegNo":"'
+              || S1."NEGNUM" -- 協議件編號
+              || '"'
+              || '}'                        AS "OtherFields"
       FROM joinedData S1
       LEFT JOIN LA$LMSP S3 ON S3.LMSACN = S1.LMSACN
                           AND S3.LMSAPN = S1.LMSAPN
@@ -150,6 +159,7 @@ BEGIN
     )
     WHEN MATCHED THEN UPDATE
     SET "RenewCode" = '2'
+      , "OtherFields" = SOURCE_TABLE."OtherFields"
     WHEN NOT MATCHED THEN INSERT (
         "CustNo"          -- 戶號 DECIMAL 3
       , "NewFacmNo"       -- 新額度編號 DECIMAL 3
@@ -163,6 +173,7 @@ BEGIN
       , "CreateDate"      -- 建檔日期時間 DATE  
       , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
       , "LastUpdate"      -- 最後更新日期時間 DATE  
+      , "OtherFields"
     ) VALUES (
         SOURCE_TABLE."CustNo"          -- 戶號 DECIMAL 3
       , SOURCE_TABLE."NewFacmNo"       -- 新額度編號 DECIMAL 3
@@ -176,6 +187,7 @@ BEGIN
       , SOURCE_TABLE."CreateDate"      -- 建檔日期時間 DATE  
       , SOURCE_TABLE."LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
       , SOURCE_TABLE."LastUpdate"      -- 最後更新日期時間 DATE  
+      , SOURCE_TABLE."OtherFields"
     )
     ;
 

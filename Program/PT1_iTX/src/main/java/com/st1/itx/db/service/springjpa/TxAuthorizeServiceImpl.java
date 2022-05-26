@@ -179,13 +179,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCreatDate " + dbName + " : " + "createDate_0 : " + createDate_0 + " createDate_1 : " +  createDate_1 + " supNo_2 : " +  supNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = txAuthorizeReposDay.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeReposDay.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txAuthorizeReposMon.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeReposMon.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txAuthorizeReposHist.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeReposHist.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
     else 
-      slice = txAuthorizeRepos.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByCreateDateAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
+      slice = txAuthorizeRepos.findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(createDate_0, createDate_1, supNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -207,13 +207,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findSupNoEntdy " + dbName + " : " + "entdy_0 : " + entdy_0 + " entdy_1 : " +  entdy_1 + " supNo_2 : " +  supNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = txAuthorizeReposDay.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderBySupNoAscEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+      slice = txAuthorizeReposDay.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(entdy_0, entdy_1, supNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = txAuthorizeReposMon.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderBySupNoAscEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+      slice = txAuthorizeReposMon.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(entdy_0, entdy_1, supNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = txAuthorizeReposHist.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderBySupNoAscEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+      slice = txAuthorizeReposHist.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(entdy_0, entdy_1, supNo_2, pageable);
     else 
-      slice = txAuthorizeRepos.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderBySupNoAscEntdyAsc(entdy_0, entdy_1, supNo_2, pageable);
+      slice = txAuthorizeRepos.findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(entdy_0, entdy_1, supNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

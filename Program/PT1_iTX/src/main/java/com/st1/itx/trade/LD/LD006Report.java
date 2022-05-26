@@ -89,7 +89,9 @@ public class LD006Report extends MakeReport {
 						break;
 					case 20: // U欄:區經理 by eric 2022.5.20
 						String manager = "";
-						if (!tLDVo.get("AgLevel1").isEmpty() && "H".equals(tLDVo.get("AgLevel1").substring(0, 1))) {
+						if (!tLDVo.get("AgLevel0").isEmpty() && "H".equals(tLDVo.get("AgLevel0").substring(0, 1))) {
+							manager = tLDVo.get("ItName");
+						} else if (!tLDVo.get("AgLevel1").isEmpty() && "H".equals(tLDVo.get("AgLevel1").substring(0, 1))) {
 							manager = tLDVo.get("ManagerName1");
 						} else if (!tLDVo.get("AgLevel2").isEmpty() && "H".equals(tLDVo.get("AgLevel2").substring(0, 1))) {
 							manager = tLDVo.get("ManagerName2");

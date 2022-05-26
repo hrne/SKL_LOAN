@@ -212,7 +212,7 @@ TXFORM=L6082
 <sub type="SELECT">
 
 #RPTFG=0,QUERY.GRID,L6082
-#any={detail:true, header:'L6082.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L6082.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60], sortname:'#OOYear desc'}
 
 #OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
