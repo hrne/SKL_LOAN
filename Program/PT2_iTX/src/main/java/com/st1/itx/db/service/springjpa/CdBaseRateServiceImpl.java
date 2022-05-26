@@ -190,13 +190,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("baseRateCodeRange " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " baseRateCode_2 : " +  baseRateCode_2 + " effectDate_3 : " +  effectDate_3 + " effectDate_4 : " +  effectDate_4);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
+      slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateAsc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBaseRateReposMon.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
+      slice = cdBaseRateReposMon.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateAsc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBaseRateReposHist.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
+      slice = cdBaseRateReposHist.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateAsc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
     else 
-      slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
+      slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateAsc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

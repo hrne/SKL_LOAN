@@ -5037,12 +5037,14 @@ TXFORM=L4R11
 <L4R12.dec>
 #L4r12Rate=m,2.4,S
 #L4r12EffectDate=D,7,S
+#L4r12EffectFlag=A,1,S
 </L4R12.dec>
 
 <L4R12.tom>
 TXFORM=L4R12
 #L4r12Rate
 #L4r12EffectDate
+#L4r12EffectFlag
 ^
 </L4R12.tom>
 

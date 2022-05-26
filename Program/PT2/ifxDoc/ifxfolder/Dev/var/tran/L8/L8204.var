@@ -84,7 +84,7 @@ T(2,@ApHelp,#HelpDesc2)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8923 疑似洗錢交易訪談記錄查詢]進入),$)
 
-#NTXBUF=X,50,S
+#NTXBUF=X,62,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_FuncCode=X,1,S
@@ -107,7 +107,7 @@ T(1,#NTXBUF,22,7)
 
 #CHAIN_LogNo=A,20,S
 T(1,#NTXBUF,29,20)
-
+!ALERT(#CHAIN_LogNo)
 #CHAIN_RepayAmt=m,14,S
 T(1,#NTXBUF,49,14)
 
@@ -121,8 +121,8 @@ E(0,@CustNo,#CHAIN_CustNo)
 E(0,@FacmNo,#CHAIN_FacmNo)
 E(0,@BormNo,#CHAIN_BormNo)
 E(0,@RepayDate,#CHAIN_RepayDate)
-E(0,@RepayAmt,#CHAIN_RepayAmt)
 E(0,@LogNo,#CHAIN_LogNo)
+E(0,@RepayAmt,#CHAIN_RepayAmt)
 
 #LogNo=A,20,S
 

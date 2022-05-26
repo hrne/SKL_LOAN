@@ -29,7 +29,7 @@ public class CdBaseRate implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 749812469678718208L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private CdBaseRateId cdBaseRateId;

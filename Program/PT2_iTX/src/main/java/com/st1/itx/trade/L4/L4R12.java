@@ -25,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R12 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R12.class);
 
 	@Autowired
 	public Parse parse;
@@ -45,17 +44,20 @@ public class L4R12 extends TradeBuffer {
 
 		String rateCode = titaVo.getParam("RimBaseRateCode");
 		BigDecimal rate = BigDecimal.ZERO;
+		int effectFlag = 0;
 		int date = 0;
 
 		t01CdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", rateCode, 0, 99991231);
 		if (t01CdBaseRate != null) {
 			rate = t01CdBaseRate.getBaseRate();
 			date = t01CdBaseRate.getEffectDate();
+			effectFlag = t01CdBaseRate.getEffectFlag();
 			this.info("t01CdBaseRate : " + t01CdBaseRate.getBaseRate() + "EffectFlag = " + t01CdBaseRate.getEffectFlag() + "...");
 		}
 
 		this.totaVo.putParam("L4r12Rate", rate);
 		this.totaVo.putParam("L4r12EffectDate", date);
+		this.totaVo.putParam("L4r12EffectFlag", effectFlag);
 
 		this.addList(this.totaVo);
 		return this.sendList();

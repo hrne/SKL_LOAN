@@ -223,28 +223,30 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 		}
 
-		// 計算利息
-		int wkRemoveCnt = 0; // 移除筆數(計算金額=0)
-		for (int i = 0; i <= wkCalcVoCount; i++) {
-			this.info("fillInterestRoutine i = " + i);
-			vCalcRepayIntVo = lCalcRepayIntVo.get(i);
-			if (vCalcRepayIntVo.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-				if (vCalcRepayIntVo.getEndDate() >= iIntStartDate) {
-					wkAmt = calcInterestRoutine();
-					vCalcRepayIntVo.setInterest(wkAmt);
-					lCalcRepayIntVo.set(i, vCalcRepayIntVo);
-				}
-			} else {
+		// 移除計算金額=0
+		int wkRemoveCnt = 0;
+		for (int i = wkCalcVoCount; i >= 0; i--) {
+			if (lCalcRepayIntVo.get(i).getAmount().compareTo(BigDecimal.ZERO) == 0) {
 				lCalcRepayIntVo.remove(i);
 				wkRemoveCnt++;
 			}
 		}
 		wkCalcVoCount = wkCalcVoCount - wkRemoveCnt;
 
+		// 計算利息
+		for (int i = 0; i <= wkCalcVoCount; i++) {
+			this.info("fillInterestRoutine i = " + i);
+			vCalcRepayIntVo = lCalcRepayIntVo.get(i);
+			if (vCalcRepayIntVo.getEndDate() >= iIntStartDate) {
+				wkAmt = calcInterestRoutine();
+				vCalcRepayIntVo.setInterest(wkAmt);
+				lCalcRepayIntVo.set(i, vCalcRepayIntVo);
+			}
+		}
+
 		// 計算違約金
 		if (!iBreachReliefFlag.equals("Y")) { // 減免違約金 Y:是 N:否
 			wkDuraInt = BigDecimal.ZERO;
-
 			for (int i = 0; i <= wkCalcVoCount; i++) {
 				i = fillBreachRoutine(i);
 			}
@@ -879,6 +881,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 
 		lCalcRepayIntVo.set(wkCalcVoIndex, vCalcRepayIntVo);
+		this.info("specifyTermsRateRoutine end wkCalcVoIndex=" + wkCalcVoIndex);
 	}
 
 	private int freqMonthRoutine() throws LogicException {

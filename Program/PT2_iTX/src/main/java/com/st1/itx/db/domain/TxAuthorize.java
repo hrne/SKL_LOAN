@@ -31,7 +31,7 @@ public class TxAuthorize implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7533718110193861301L;
+	private static final long serialVersionUID = 1L;
 
 // 序號
   @Id

@@ -177,6 +177,9 @@ BEGIN
                             AND CF."ClCode1" = S."ClCode1"
                             AND CF."ClCode2" = S."ClCode2"
                             AND CF."ClNo" = S."ClNo"
+        LEFT JOIN "JcicB090" J ON to_number(SUBSTR(J."FacmNo",1,7)) = S."CustNo"
+                              AND to_number(SUBSTR(J."FacmNo",8,3)) = CF."FacmNo"
+        WHERE J."FacmNo" IS NOT NULL --2022/05/26 加總時只考慮B090有的資料
     )
     , sameClLineAmtData AS (
       SELECT S."CustNo"

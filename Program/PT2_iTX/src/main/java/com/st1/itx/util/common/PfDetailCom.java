@@ -1167,7 +1167,7 @@ public class PfDetailCom extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo); // 全部
 		List<CdBonusCo> lCdBonusCo = slCdBonusCo == null ? null : slCdBonusCo.getContent();
 		// 計件代碼，不計入
-		if (lCdBonusCo == null || !isCoBonus(pf.getPieceCode(), lCdBonusCo)) {
+		if (lCdBonusCo == null || !isCoBonusPieceCode(pf.getPieceCode(), lCdBonusCo)) {
 			this.info("PfDetailCom CdBonusCo not include ");
 			return pf;
 		}
@@ -1198,7 +1198,7 @@ public class PfDetailCom extends TradeBuffer {
 		BigDecimal repayBonusFac = BigDecimal.ZERO;
 		if (lPfDetail != null) {
 			for (PfDetail it : lPfDetail) {
-				if (isCoBonus(it.getPieceCode(), lCdBonusCo)) {
+				if (isCoBonusPieceCode(it.getPieceCode(), lCdBonusCo)) {
 					if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 						if (it.getRepayType() == 0) {
 							drawDownBonusFac = drawDownBonusFac.add(it.getCoorgnizerBonus());
@@ -1238,14 +1238,15 @@ public class PfDetailCom extends TradeBuffer {
 
 		// 計算協辦獎金
 		BigDecimal coBonus = BigDecimal.ZERO;
-		for (CdBonusCo cd : lCdBonusCo) {
-			if (cd.getConditionCode() == 2 && cd.getCondition().equals(tPfCoOfficer.getEmpClass())) {
-				if ("Y".equals(tPfCoOfficer.getClassPass()))
-					coBonus = cd.getClassPassBonus();
-				else
-					coBonus = cd.getBonus();
+		if (isCoBonusConditionAmt(computeBonusAmt, lCdBonusCo))
+			for (CdBonusCo cd : lCdBonusCo) {
+				if (cd.getConditionCode() == 2 && cd.getCondition().equals(tPfCoOfficer.getEmpClass())) {
+					if ("Y".equals(tPfCoOfficer.getClassPass()))
+						coBonus = cd.getClassPassBonus();
+					else
+						coBonus = cd.getBonus();
+				}
 			}
-		}
 		// 協辦獎金 = 新協辦獎金 - 已計協辦獎金
 		pf.setCoorgnizerBonus(coBonus.subtract(bonusFac));
 
@@ -1253,8 +1254,21 @@ public class PfDetailCom extends TradeBuffer {
 
 	}
 
+	// 是否達到金額門檻
+	private boolean isCoBonusConditionAmt(BigDecimal computeBonusAmt, List<CdBonusCo> lCdBonusCo) {
+		boolean isConditionAmt = false; // 篩選條件-計件代碼，是否計入，預設false
+		for (CdBonusCo cd : lCdBonusCo) {
+			if (cd.getConditionCode() == 1 && computeBonusAmt.compareTo(cd.getConditionAmt()) >= 0) {
+				isConditionAmt = true;
+				break;
+			}
+		}
+		this.info("computeBonusAmt " + computeBonusAmt + "," + isConditionAmt);
+		return isConditionAmt;
+	}
+
 	// 計件代碼，是否計入
-	private boolean isCoBonus(String pieceCode, List<CdBonusCo> lCdBonusCo) {
+	private boolean isCoBonusPieceCode(String pieceCode, List<CdBonusCo> lCdBonusCo) {
 		boolean piceInclude = false; // 篩選條件-計件代碼，是否計入，預設false
 		for (CdBonusCo cd : lCdBonusCo) {
 			if (cd.getConditionCode() == 1 && pieceCode.equals(cd.getCondition())) {

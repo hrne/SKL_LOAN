@@ -52,6 +52,14 @@ E(0,0)
 ]
 !---------- AP TEXT AREA Variables ----------
 
+! 接受格式:戶號起+戶號止 7+7
+#NTXBUF=X,14,S
+T(4,NTXBUF$)
+
+#NTXBUFWK=A,1,S
+T(1,@CustNoStart,#NTXBUF,1,7)
+T(1,@CustNoEnd,#NTXBUF,8,7)
+
 #RPTFG=A,1,S
 E(0,0)
 
@@ -64,7 +72,7 @@ C(3,#CustNoEnd,0,E(0,9999999))
 
 #FindDateStart=D,7,I
 E(0,0)
-@V(7)
+@
 A(DATE,1,#FindDateStart)
 
 

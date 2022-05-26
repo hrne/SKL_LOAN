@@ -19,7 +19,7 @@ public class AcReceivableId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8626321893687912764L;
+	private static final long serialVersionUID = 1L;
 
 // 業務科目代號
   /* CdAcCode會計科子細目設定檔 */

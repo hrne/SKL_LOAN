@@ -29,7 +29,7 @@ public class AcReceivable implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1805293039174189924L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private AcReceivableId acReceivableId;

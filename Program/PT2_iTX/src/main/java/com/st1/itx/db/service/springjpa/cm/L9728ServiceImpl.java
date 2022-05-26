@@ -69,7 +69,7 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND CNSeqCreate.\"CreateSeq\" = 1 "; // 顯示該額度最早的建立者與建立日期（配合 UNIQUE）
 		sql += "   AND CNSeqUpdate.\"UpdateSeq\" = 1 "; // 顯示該額度最新的修改者與建立日期（配合 UNIQUE）
 		sql += "   AND CN.\"CustNo\" BETWEEN :custNoStart AND :custNoEnd "; // 戶號區間
-		sql += "   AND CNSeqUpdate.\"LastUpdate\" BETWEEN TO_TIMESTAMP(TO_CHAR(:findDateStart), 'YYYYMMDD') AND TO_TIMESTAMP(TO_CHAR(:findDateEnd), 'YYYYMMDD') + 1"; // 日期區間
+		sql += "   AND CNSeqUpdate.\"LastUpdate\" BETWEEN TO_TIMESTAMP(TO_CHAR(:findDateStart), 'YYYYMMDD') AND TO_TIMESTAMP(TO_CHAR(:findDateEnd) || ' 23:59:59', 'YYYYMMDD HH24:MI:SS')"; // 日期區間
 		sql += " ORDER BY CN.\"CustNo\" ASC ";
 		sql += "        , CN.\"FacmNo\" ASC ";
 

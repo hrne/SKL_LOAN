@@ -355,7 +355,8 @@ C(3,#AmtStartRange{j},0,S,E(0,@AcceptableAmtStart,#AmtEndRange{j}+1))
 C(3,#AmtStartRange{j},0,S,INVOKEJS(SHOW,grd1_{k},1))
 C(3,#AmtStartRange{j},0,S,$)
 C(2,#FuncCode,$,$,$,$,s,s)
-@C(3,#AmtStartRange{i},0,$,V(5,#AcceptableAmtStart,99999999999999))
+@C(3,#AmtStartRange{i},0,s,$)
+C(3,#AmtStartRange{i},#AcceptableAmtStart,s,V(3,0,#AcceptableAmtStart))
 
 #sign{i}=X,1,L
 C(3,#AmtStartRange{i},0,S,T(3,~))

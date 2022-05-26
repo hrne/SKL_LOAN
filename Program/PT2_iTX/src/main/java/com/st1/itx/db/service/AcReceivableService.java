@@ -286,6 +286,56 @@ public interface AcReceivableService {
   public AcReceivable acctCodeLikeFirst(String acctCode_0, int custNo_1, int facmNo_2, String rvNo_3, TitaVo... titaVo);
 
   /**
+   * AcBookCode = ,AND AcSubBookCode %,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode = ,AND AcDtlCode = ,AND CustNo &gt;= ,AND CustNo &lt;= 
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acNoCode_4 acNoCode_4
+   * @param acSubCode_5 acSubCode_5
+   * @param acDtlCode_6 acDtlCode_6
+   * @param custNo_7 custNo_7
+   * @param custNo_8 custNo_8
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public Slice<AcReceivable> acrvClsFlag2SubBook(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, String acNoCode_4, String acSubCode_5, String acDtlCode_6, int custNo_7, int custNo_8, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND CustNo = ,AND AcctFlag = ,AND FacmNo &gt;= ,AND FacmNo &lt;=
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param custNo_2 custNo_2
+   * @param acctFlag_3 acctFlag_3
+   * @param facmNo_4 facmNo_4
+   * @param facmNo_5 facmNo_5
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public Slice<AcReceivable> acrvFacmNo2SubBook(String acBookCode_0, String acSubBookCode_1, int custNo_2, int acctFlag_3, int facmNo_4, int facmNo_5, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND AcctCode = ,AND CustNo &gt;= ,AND CustNo &lt;=
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param acctCode_2 acctCode_2
+   * @param custNo_3 custNo_3
+   * @param custNo_4 custNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public Slice<AcReceivable> acctCode2SubBook(String acBookCode_0, String acSubBookCode_1, String acctCode_2, int custNo_3, int custNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcReceivable
    * 
    * @param acReceivableId key

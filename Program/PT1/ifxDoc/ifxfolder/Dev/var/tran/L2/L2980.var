@@ -82,7 +82,7 @@ E(0,0)
 ["#FdShortenYear+4.縮短年期",#ShortenYear,"@年"],
 ["#FdTlrNo+列印人",#TlrNo],
 ["#FdExtendYear+5.延長年期",#ExtendYear,"@年"],
-["#FdLastExpectedRate+擬調利率",#LastExpectedRate],
+["#FdLastExpectedRate+擬調利率",#LastExpectedRate,"@%"],
 [#<->#,"#FdReMark+備註",#ReMark],
 ]
 
@@ -336,6 +336,9 @@ R(1,L2R05)
 
 
 #TimBormNo=A,3,L
+E(0,#L2r05BormNo)
+
+#BormNo=A,3,L
 E(0,#L2r05BormNo)
 
 #RimBormNo=A,3,L
@@ -708,6 +711,7 @@ T(3,1)ASGN(LOOP$)
 #CustNo
 #CustId
 #FacmNo
+#BormNo
 #CustTypeCode
 #CustTypeCodeX
 #CustName

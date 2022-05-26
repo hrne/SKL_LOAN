@@ -37,7 +37,9 @@ public class L9728Report extends MakeReport {
 	int custNoEnd;
 	int findDateStart;
 	int findDateEnd;
-
+	
+	boolean useDate;
+	
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9728Report exec start ...");
 
@@ -45,11 +47,13 @@ public class L9728Report extends MakeReport {
 		
 		custNoStart = parse.stringToInteger(titaVo.get("CustNoStart"));
 		custNoEnd = parse.stringToInteger(titaVo.get("CustNoEnd"));
-		findDateStart = parse.stringToInteger(titaVo.get("FindDateStart"));
+		findDateStart = parse.stringToInteger(titaVo.get("FindDateStart"));		
 		findDateEnd = parse.stringToInteger(titaVo.get("FindDateEnd"));
-
+		
+		useDate = findDateStart > 0 && findDateEnd >= findDateStart;
+				
 		try {
-			listL9728 = L9728ServiceImpl.findAll(custNoStart, custNoEnd, findDateStart + 19110000, findDateEnd + 19110000, titaVo);
+			listL9728 = L9728ServiceImpl.findAll(custNoStart, custNoEnd, useDate ? findDateStart + 19110000 : 19110101, useDate ? findDateEnd + 19110000 : 99991231, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -73,7 +77,9 @@ public class L9728Report extends MakeReport {
 		this.print(-2, 123, "時  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-3, 123, "頁  數：" + this.getNowPage());
 		this.print(-4, 1, String.format("  戶號... %07d - %07d ", custNoStart, custNoEnd));
-		this.print(-5, 1, String.format("  期間... %s - %s ", this.showRocDate(findDateStart, 1), this.showRocDate(findDateEnd, 1)));
+		
+		if (useDate)
+			this.print(-5, 1, String.format("  期間... %s - %s ", this.showRocDate(findDateStart, 1), this.showRocDate(findDateEnd, 1)));
 		/**
 		 * ------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890

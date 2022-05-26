@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L6;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,22 +75,29 @@ public class L6907 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "會計銷帳檔");
 		}
 
-		BigDecimal rvBal = BigDecimal.ZERO;
-
+//		BigDecimal rvBal = BigDecimal.ZERO;
+//		BigDecimal iRvBal0 = BigDecimal.ZERO;
+//		BigDecimal iRvBal = BigDecimal.ZERO;
 		for (Map<String, String> tAcReceivable : L6907List) {
 			OccursList occursList = new OccursList();
-
-			// 同戶號、業務代號金額累加全部(同戶號、業務代號戶號合計需相同)2022/2/21
-
-			for (Map<String, String> tAcReceivable2 : L6907List) {
-				if (tAcReceivable2.get("CustNo") == tAcReceivable.get("CustNo")
-						&& (tAcReceivable2.get("AcctCode").equals(tAcReceivable.get("AcctCode")))) {
-					rvBal = rvBal.add(new BigDecimal(tAcReceivable2.get("RvBal")));
-					this.info("CustNo==" + tAcReceivable2.get("CustNo") + ",AcctCode==" + tAcReceivable2.get("AcctCode")
-							+ ",rvBal==" + rvBal);
-				}
-			}
-
+//			rvBal = BigDecimal.ZERO;
+//			iRvBal0 = BigDecimal.ZERO;
+//			iRvBal = BigDecimal.ZERO;
+//			// 同戶號、業務代號金額累加全部(同戶號、業務代號戶號合計需相同)
+//			
+//			for(Map<String, String> tAcReceivable2 : L6907List) {
+//				if(tAcReceivable2.get("CustNo").equals(tAcReceivable.get("CustNo"))
+//						&&tAcReceivable2.get("AcctCode").equals(tAcReceivable.get("AcctCode"))){
+//					if(tAcReceivable2.get("rvBal") == null) {
+//						 iRvBal0 = new BigDecimal(0);
+//					}else {						
+//						 iRvBal = new BigDecimal(tAcReceivable2.get("rvBal")); 
+//					}
+//					rvBal = rvBal.add(iRvBal);
+//				}
+//			}
+			
+			
 			// new occurs
 			// 科子項目
 //			occursList.putParam("OOAcNoCode",tAcReceivable.get("AcNoCode"));
@@ -99,16 +105,7 @@ public class L6907 extends TradeBuffer {
 //			occursList.putParam("OOAcDtlCode",tAcReceivable.get("AcDtlCode"));
 //			occursList.putParam("OOAcctItem",tAcReceivable.get("AcctItem")); // 用不到
 //			occursList.putParam("OOAcBookCode",tAcReceivable.get("AcBookCode"));
-
-			// Y-顯示[明細]按鈕
-			String l6908Flag = "Y";
-			// 未收費用未變動不顯示按鈕
-			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
-					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
-				l6908Flag = "";
-			}
-			occursList.putParam("L6908Flag", l6908Flag);
-
+																																																																																																																												
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));
@@ -127,7 +124,7 @@ public class L6907 extends TradeBuffer {
 			// 未銷餘額 OORvBal
 			occursList.putParam("OORvBal", tAcReceivable.get("RvBal"));
 			// 業務科目合計 OO_SUM1
-			occursList.putParam("OO_SUM", rvBal);
+			occursList.putParam("OO_SUM",tAcReceivable.get("SumRvBal"));
 			// 區隔帳冊 OOAcSubBookCode
 			occursList.putParam("OOAcSubBookCode", tAcReceivable.get("AcSubBookCode"));
 			// 最後修改日期 OOLastUpdate
@@ -138,6 +135,7 @@ public class L6907 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 
 		}
+
 
 		this.addList(this.totaVo);
 		return this.sendList();

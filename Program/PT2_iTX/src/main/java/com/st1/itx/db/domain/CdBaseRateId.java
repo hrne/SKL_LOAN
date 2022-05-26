@@ -21,7 +21,7 @@ public class CdBaseRateId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7306735981594376024L;
+	private static final long serialVersionUID = 1L;
 
 // 幣別
   /* 共用代碼檔TWD:新台幣 */

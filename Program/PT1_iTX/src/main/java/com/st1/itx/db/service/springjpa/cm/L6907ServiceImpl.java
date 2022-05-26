@@ -63,30 +63,42 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iFacmNo     = " + iFacmNo); // 0
 
 		String sql = "Select";
-		sql += " \"AcNoCode\" as  \"AcNoCode\", "; // F0
-		sql += " \"AcSubCode\" as \"AcSubCode\", "; // F1
-		sql += " \"AcDtlCode\" as \"AcDtlCode\", "; // F2
-		sql += " \"AcctCode\" as \"AcctCode\",  "; // F3
-		sql += " \"CustNo\" as \"CustNo\", "; // F4
-		sql += " \"FacmNo\" as \"FacmNo\", "; // F5
-		sql += " \"RvNo\" as \"RvNo\",  "; // F6
-		sql += " CASE WHEN \"OpenAcDate\" = 0 ";
-		sql += " THEN 0 ";
-		sql += " ELSE TRUNC(\"OpenAcDate\" - 19110000)  END as \"OpenAcDate\", "; // F7
-		sql += " \"RvAmt\" as \"RvAmt\", "; // F8
-		sql += " CASE WHEN \"LastTxDate\" = 0 ";
-		sql += " THEN 0 ";
-		sql += " ELSE TRUNC(\"LastTxDate\" - 19110000)  END as \"LastTxDate\", "; // F9
-		sql += " \"RvBal\" as \"RvBal\", "; // F10
-		sql += " \"AcBookCode\" as \"AcBookCode\", "; // F11
-		sql += " \"AcSubBookCode\" as \"AcSubBookCode\", "; // F12
-		sql += " \"LastUpdate\" as \"LastUpdate\", "; // F13
-		sql += " \"LastUpdateEmpNo\" as \"LastUpdateEmpNo\" "; // F14
-//		sql += " \"ClsFlag\" as ClsFlag "; //F15 拿來判斷用的
-		sql += " FROM \"AcReceivable\" ";
-		sql += " where \"AcBookCode\" = 000 "; // 固定傳入
-		sql += "   and \"AcctFlag\"   = 0 ";
-		sql += "   and \"FacmNo\"   <= 999 ";
+		sql += "    A.\"AcNoCode\"          AS \"AcNoCode\", ";
+		sql += "    A.\"AcSubCode\"         AS \"AcSubCode\", ";
+		sql += "    A.\"AcDtlCode\"         AS \"AcDtlCode\", ";
+		sql += "    A.\"AcctCode\"          AS \"AcctCode\", ";
+		sql += "    A.\"CustNo\"            AS \"CustNo\", ";
+		sql += "    A.\"FacmNo\"            AS \"FacmNo\", ";
+		sql += "    A.\"RvNo\"              AS \"RvNo\", ";
+		sql += "    CASE ";
+		sql += "        WHEN A.\"OpenAcDate\" = 0 THEN ";
+		sql += "            0 ";
+		sql += "        ELSE ";
+		sql += "            trunc(A.\"OpenAcDate\" - 19110000) ";
+		sql += "    END AS \"OpenAcDate\", ";
+		sql += "    A.\"RvAmt\"             AS \"RvAmt\", ";
+		sql += "    CASE ";
+		sql += "        WHEN A.\"LastTxDate\" = 0 THEN ";
+		sql += "            0 ";
+		sql += "        ELSE ";
+		sql += "            trunc(A.\"LastTxDate\" - 19110000) ";
+		sql += "    END AS \"LastTxDate\", ";
+		sql += "    A.\"RvBal\"             AS \"RvBal\", ";
+		sql += "    B.\"ToAml\"           AS \"SumRvBal\", ";
+		sql += "    A.\"AcBookCode\"        AS \"AcBookCode\", ";
+		sql += "    A.\"AcSubBookCode\"     AS \"AcSubBookCode\", ";
+		sql += "    A.\"LastUpdate\"        AS \"LastUpdate\", ";
+		sql += "    A.\"LastUpdateEmpNo\"   AS \"LastUpdateEmpNo\" ";
+		sql += "    FROM ";
+		sql += "    \"AcReceivable\" A ";
+		sql += "    LEFT JOIN ( ";
+		sql += "    SELECT  ";
+		sql += "    \"AcctCode\"         , ";
+		sql += "    SUM(\"RvBal\") AS \"ToAml\" ";
+		sql += "    FROM \"AcReceivable\" ";
+		sql += "     where \"AcBookCode\" = 000 "; // 固定傳入
+		sql += "       and \"AcctFlag\"   = 0 ";
+		sql += "       and \"FacmNo\"   <= 999 ";
 		// 加入判斷空白跳過該篩選
 		// 區隔帳冊
 		if (!"".equals(iAcSubBookCode)) {
@@ -117,6 +129,42 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iClsFlag != 2) {
 			sql += " and  \"ClsFlag\" = :iClsFlag";
 		}
+		sql += "         GROUP BY \"AcctCode\" ";
+		sql += "    ) B ON A.\"AcctCode\" = B.\"AcctCode\" ";
+		sql += " where A.\"AcBookCode\" = 000 "; // 固定傳入
+		sql += "   and A.\"AcctFlag\"   = 0 ";
+		sql += "   and A.\"FacmNo\"   <= 999 ";
+		// 加入判斷空白跳過該篩選
+		// 區隔帳冊
+		if (!"".equals(iAcSubBookCode)) {
+			sql += "and A.\"AcSubBookCode\" = :iAcSubBookCode ";
+		}
+		// 科子項目
+		if (!"".equals(iAcNoCode)) {
+			sql += "and A.\"AcNoCode\" = :iAcNoCode   ";
+		}
+		if (!"".equals(iAcSubCode)) {
+			sql += "and A.\"AcSubCode\" = :iAcSubCode  ";
+		}
+		if (!"".equals(iAcDtlCode)) {
+			sql += "and A.\"AcDtlCode\" = :iAcDtlCode  ";
+		}
+		// 戶號
+		if (iCustNo != 0) {
+			sql += "and A.\"CustNo\" = :iCustNo  ";
+		}
+		if (iFacmNo != 0) {
+			sql += "and A.\"FacmNo\" = :iFacmNo  ";
+		}
+		// 業務科目
+		if (!"".equals(iAcctCode)) {
+			sql += " and A.\"AcctCode\" = :iAcctCode ";
+		}
+		// 銷帳記號
+		if (iClsFlag != 2) {
+			sql += " and  A.\"ClsFlag\" = :iClsFlag";
+		}
+		sql += "  order by  A.\"AcctCode\" ";
 
 		this.info("L6907Service SQL=" + sql);
 

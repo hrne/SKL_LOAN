@@ -7,15 +7,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.LoanBorMain;
-import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -44,6 +44,9 @@ public class L2R63 extends TradeBuffer {
 	@Autowired
 	public DateUtil dateUtil;
 
+	@Autowired
+	private TxToDoDetailReserveService txToDoDetailReserveService;
+
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
@@ -61,38 +64,27 @@ public class L2R63 extends TradeBuffer {
 		this.info("FacmNo = " + iFacmNo);
 		this.info("BormNo = " + iBormNo);
 
-		LoanBorMainId loanBorMainId = new LoanBorMainId();
-		loanBorMainId.setCustNo(iCustNo);
-		loanBorMainId.setFacmNo(iFacmNo);
-		loanBorMainId.setBormNo(iBormNo);
-
-		LoanBorMain tLoanBorMain = new LoanBorMain();
-
-		tLoanBorMain = loanBorMainService.findById(loanBorMainId, titaVo);
+		TxToDoDetailReserve tTxToDoDetailReserve = txToDoDetailReserveService.FindL2980First("L2980", iCustNo, iFacmNo,
+				iBormNo, titaVo);
 
 		this.totaVo.putParam("L2r63PrintDate", "");
 		this.totaVo.putParam("L2r63TlrNo", "");
 		this.totaVo.putParam("L2r63ExpectedRate", "");
 
-		if (tLoanBorMain != null) {
-			int NextAdjRateDate = tLoanBorMain.getNextAdjRateDate(); // 下次利率調整日期 去查 BatxRateChange
-//			BatxRateChangeId batxRateChangeId = new BatxRateChangeId();
-			BatxRateChange tbatxRateChange = new BatxRateChange();
+		if (tTxToDoDetailReserve != null) {
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(tTxToDoDetailReserve.getProcessNote());
 
-			tbatxRateChange = batxRateChangeService.findL2980printFirst(iCustNo, iFacmNo, iBormNo, NextAdjRateDate,
-					titaVo);
+			this.totaVo.putParam("L2r63PrintDate", tTempVo.getParam("LastPrintDate")); // 最後更新日期
 
-			if (tbatxRateChange != null) {
-				this.totaVo.putParam("L2r63PrintDate",
-						this.parse.timeStampToStringDate(tbatxRateChange.getLastUpdate()).replace("/", "")); // 最後更新日期
+			CdEmp cdEmp = cdEmpService.findById(tTempVo.getParam("TlrNo"), titaVo);
 
-				CdEmp cdEmp = cdEmpService.findById(tbatxRateChange.getLastUpdateEmpNo(), titaVo);
+			if (cdEmp != null) {
+				this.totaVo.putParam("L2r63TlrNo", cdEmp.getFullname()); // 最後更新櫃員
+			}
 
-				if (cdEmp != null) {
-					this.totaVo.putParam("L2r63TlrNo", cdEmp.getFullname()); // 最後更新櫃員
-				}
-
-				this.totaVo.putParam("L2r63ExpectedRate", tbatxRateChange.getProposalRate()); // 擬調利率
+			if (tTempVo.get("LastExpectedRate") != null) {
+				this.totaVo.putParam("L2r63ExpectedRate", tTempVo.getParam("LastExpectedRate")); // 擬調利率
 			}
 		}
 

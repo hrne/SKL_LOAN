@@ -248,12 +248,15 @@ S(L4R12,1,#RimBaseRateCode)
 R(1,L4R12)
 E(0,@EffectDate,#L4r12EffectDate)
 E(5,@BaseRate,#L4r12Rate)
+E(0,@EffectFlag,#L4r12EffectFlag)
 
 ! 生效日期
 #EffectDate=D,7,I
 IF(#TxKind==4,$,IF(#TxKind==5,$,s))
 E(0,#SYSDATE)
 @V(7)A(DATE,0,#EffectDate)
+
+#EffectFlag=A,1,S
 
 ! 指標利率
 #BaseRate=m,2.4,L
@@ -877,6 +880,7 @@ A(ID_UNINO,0,#GroupId)
 #EffectMonth
 #BaseRateCode
 #EffectDate
+#EffectFlag
 #BaseRate
 #Rate
 #RateIncr

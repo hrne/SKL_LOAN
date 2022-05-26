@@ -81,7 +81,7 @@ T(2,#AcSubBookCodeHelp,#HelpDesc3)
 
 !銷帳記號
 #ClsFgH=x,50,S
-T(3,0:未銷 ;1:已銷 ; 2:全部)
+T(3,0:未銷 ;1:已銷 ;2:全部)
 
 
 #CHAIN=A,1,S
