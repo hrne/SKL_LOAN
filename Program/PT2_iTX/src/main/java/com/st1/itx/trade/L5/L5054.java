@@ -6,15 +6,19 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L5054ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L5054")
@@ -37,6 +41,9 @@ public class L5054 extends TradeBuffer {
 
 	@Autowired
 	public L5054ServiceImpl l5054ServiceImpl;
+	
+	@Autowired
+	TxDataLogService sTxDataLogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -108,7 +115,7 @@ public class L5054 extends TradeBuffer {
 					workSeason -= 19110;
 				}
 				occursList.putParam("OWorkSeason", workSeason);//
-
+				
 				if (MapL5054.get("MediaDate") == null || "".equals(MapL5054.get("MediaDate"))) {
 					occursList.putParam("OMediaFg", 0);//
 					occursList.putParam("OMediaDate", 0);
@@ -116,7 +123,7 @@ public class L5054 extends TradeBuffer {
 					occursList.putParam("OMediaFg", 1);//
 					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5054.get("MediaDate")));
 				}
-
+				
 				occursList.putParam("OManualFg", MapL5054.get("F14"));//
 
 				this.info("L5054 CreateDate =" + MapL5054.get("CreateDate") + "/" + MapL5054.get("LastUpdate"));
@@ -128,7 +135,17 @@ public class L5054 extends TradeBuffer {
 
 				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5054.get("LastUpdate")));
 
-				occursList.putParam("OLastEmp", MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
+				occursList.putParam("OLastEmp",
+						MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
+				
+				// 歷程按鈕顯示與否
+				// 邏輯同 L6933
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5504", FormatUtil.pad9(MapL5054.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5054.get("F3"), 3) + "-" + workMonth, 0,
+						1, titaVo);
+				
+				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
+				
+				occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
 
 				this.totaVo.addOccursList(occursList);
 			}

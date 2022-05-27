@@ -2,6 +2,7 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustRmkCom;
 import com.st1.itx.util.common.LoanAvailableAmt;
@@ -48,6 +53,10 @@ public class L3001 extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	LoanBorTxService sLoanBorTxService;
+	@Autowired
+	LoanRateChangeService sLoanRateChangeService;
 
 	@Autowired
 	Parse parse;
@@ -219,7 +228,40 @@ public class L3001 extends TradeBuffer {
 			occursList.putParam("OOShareFacFg", wkFacShareFg); // 合併額度控管記號
 			occursList.putParam("OOClShareFg", wkClShareFg); // 擔保品配額記號
 			occursList.putParam("OOLastBormNo", tFacMain.getLastBormNo()); // 已撥款序號
-
+			
+			// 檢查是否有【交易】按鈕
+			// 邏輯同 L3005
+			
+			// acdate: 本月第一天
+			int acDate = (titaVo.getEntDyI() + 19110000) / 100 * 100 + 1;
+			
+			Slice<LoanBorTx> slLoanBorTx = sLoanBorTxService.borxAcDateRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0,
+					999, acDate, 99991231, Arrays.asList("Y", "I", "A", "F"), this.index, 1, titaVo);
+			List<LoanBorTx> lLoanBorTx = slLoanBorTx != null ? slLoanBorTx.getContent() : null;
+			
+			occursList.putParam("OOHasL3005", lLoanBorTx != null && !lLoanBorTx.isEmpty() ? "Y" : "N");
+			
+			// 檢查是否有【繳息】按鈕
+			// 邏輯同 L3911
+			
+			slLoanBorTx = sLoanBorTxService.borxIntEndDateDescRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(),
+					0, 999, 19110101, titaVo.getEntDyI() + 19110000, Arrays.asList("Y", "I", "F"),
+					this.index, this.limit, titaVo);
+			
+			lLoanBorTx = slLoanBorTx != null ? slLoanBorTx.getContent() : null;
+			
+			occursList.putParam("OOHasL3911", lLoanBorTx != null && !lLoanBorTx.isEmpty() ? "Y" : "N");
+			
+			// 檢查是否有【利率】按鈕
+			// 邏輯同 L3932
+			
+			Slice<LoanRateChange> slLoanRateChange = sLoanRateChangeService.rateChangeFacmNoRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 0, 99991231, this.index,
+					1, titaVo);
+			
+			List<LoanRateChange> lLoanRateChange = slLoanRateChange != null ? slLoanRateChange.getContent() : null;
+			
+			occursList.putParam("OOHasL3932", lLoanRateChange != null && !lLoanRateChange.isEmpty() ? "Y" : "N");
+			
 			this.totaVo.addOccursList(occursList);
 		}
 
@@ -235,7 +277,6 @@ public class L3001 extends TradeBuffer {
 //			custRmkCom.getCustRmk(titaVo, iCustNo);
 //			this.addAllList(custRmkCom.getCustRmk(titaVo, iCustNo));
 		}
-
 		// end
 		this.addList(this.totaVo);
 		return this.sendList();

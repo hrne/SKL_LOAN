@@ -526,21 +526,26 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2038; ntxbuf=#OOBUF6})
 #OOBUF7=X,100,S
 T(2,#OOCustNo+#OOFacmNo+000+#EntryDate+#EntryDate)
 
+!用於判定下列三個按鈕是否該顯示, Y/N
+#OOHasL3005=X,1,S
+#OOHasL3911=X,1,S
+#OOHasL3932=X,1,S
+
 #OOBTN7=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF7})
+C(5,#OOHasL3005,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF7}),BIND(grid,cancel))
 
 #OOBUF8=X,100,S
 T(2,#TXCD+#OOCustNo+#OOFacmNo+000)
 
 #OOBTN8=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L3911; ntxbuf=#OOBUF8})
+C(5,#OOHasL3911,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L3911; ntxbuf=#OOBUF8}),BIND(grid,cancel))
 
 
 #OOBUF9=X,100,S
 T(2,#TXCD+#OOCustNo+#OOFacmNo+000)
 
 #OOBTN9=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L3932; ntxbuf=#OOBUF9})
+C(5,#OOHasL3932,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L3932; ntxbuf=#OOBUF9}),BIND(grid,cancel))
 
 
 !連結 L291B額度合併控管額度查詢
@@ -587,6 +592,9 @@ TXFORM=L3001
 #OValidFacm#OLineAmt#OUtilAmt#OUtilBal#OAvailable
 #OOCaseNo#OOCustNo#OOFacmNo#OOApplNo#OODeadline#OOCurrencyCode#OOLineAmt
 #OOUtilAmt#OOUtilBal#OOAvailable#OOShareFacFg#OOClShareFg#OOLastBormNo
+#OOHasL3005
+#OOHasL3911
+#OOHasL3932
 ^
 
 <include src="COM.icf::TRCTL.tom"/>

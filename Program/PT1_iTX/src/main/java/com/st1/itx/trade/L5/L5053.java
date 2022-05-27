@@ -6,15 +6,19 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L5053ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 //import com.st1.itx.db.domain.vo.L5053Vo;
 //import com.st1.itx.db.domain.PfRewardMedia;
@@ -50,6 +54,9 @@ public class L5053 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
+	
+	@Autowired
+	TxDataLogService sTxDataLogService;
 
 	@Autowired
 	public L5053ServiceImpl l5053ServiceImpl;
@@ -149,6 +156,15 @@ public class L5053 extends TradeBuffer {
 				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5053.get("LastUpdate")));
 				
 				occursList.putParam("OLastEmp", MapL5053.get("LastUpdateEmpNo") + " " + MapL5053.get("LastUpdateEmpName"));
+				
+				// 歷程按鈕顯示與否
+				// 邏輯同 L6933
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5503", FormatUtil.pad9(MapL5053.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5053.get("F3"), 3) + "-" + workMonth, 0,
+						1, titaVo);
+				
+				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
+				
+				occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
 				
 				this.totaVo.addOccursList(occursList);
 			}

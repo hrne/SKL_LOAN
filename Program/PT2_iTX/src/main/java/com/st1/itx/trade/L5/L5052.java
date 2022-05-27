@@ -8,16 +8,19 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L5052ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -48,6 +51,9 @@ public class L5052 extends TradeBuffer {
 
 	@Autowired
 	public L5052ServiceImpl l5052ServiceImpl;
+	
+	@Autowired
+	TxDataLogService sTxDataLogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -118,9 +124,10 @@ public class L5052 extends TradeBuffer {
 			}
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim())
+						|| !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
-						putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm);
+						putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm, titaVo);
 					}
 
 					WorkMonth = d.get("WorkMonth").trim();
@@ -147,7 +154,8 @@ public class L5052 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt, new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm);
+				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt,
+						new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm, titaVo);
 			}
 
 			dd.clear();
@@ -156,7 +164,7 @@ public class L5052 extends TradeBuffer {
 		}
 
 		if ("Y".equals(SumByFacm)) {
-			putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm);
+			putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm, titaVo);
 		}
 
 		if (L5052List != null && L5052List.size() >= this.limit) {
@@ -173,7 +181,8 @@ public class L5052 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt, BigDecimal DrawdownAmt, int canModify, String SumByFacm) {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt,
+			BigDecimal DrawdownAmt, int canModify, String SumByFacm, TitaVo titaVo) {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -227,9 +236,19 @@ public class L5052 extends TradeBuffer {
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOLog", LogFg);
 
-		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
-		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
-
+		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
+		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName")); 
+		
+		// 歷程按鈕顯示與否
+		// 邏輯同 L6933
+		
+		Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5502", FormatUtil.pad9(d.get("CustNo"), 7) + "-" + FormatUtil.pad9(d.get("FacmNo"), 3) + "-" + d.get("WorkMonth").trim(), 0,
+				1, titaVo);
+		
+		List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
+		
+		occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
+		
 		this.totaVo.addOccursList(occursList);
 
 	}

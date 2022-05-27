@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L5;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L6932ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -49,6 +52,9 @@ public class L5051 extends TradeBuffer {
 	@Autowired
 	private L5051ServiceImpl l5051ServiceImpl;
 
+	@Autowired
+	L6932ServiceImpl l6932ServiceImpl;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5051 ");
@@ -79,7 +85,7 @@ public class L5051 extends TradeBuffer {
 		if (L5051List == null || L5051List.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-		
+
 		this.info("L5051List.size() =" + L5051List.size());
 
 		Map<String, String> dd = new HashMap<String, String>();
@@ -101,7 +107,7 @@ public class L5051 extends TradeBuffer {
 				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim())
 						|| !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
-						putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 1, SumByFacm);
+						putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 1, SumByFacm, titaVo);
 					}
 
 					WorkMonth = d.get("WorkMonth").trim();
@@ -146,8 +152,9 @@ public class L5051 extends TradeBuffer {
 				int canmodify = 0;
 				if (d.get("MediaFg") == null || "".equals(d.get("MediaFg"))) {
 					canmodify = 1;
-				} 
-				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt,PerfReward,PerfAmt, 1, canmodify, SumByFacm);
+				}
+				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1,
+						canmodify, SumByFacm, titaVo);
 			}
 
 			dd.clear();
@@ -155,7 +162,7 @@ public class L5051 extends TradeBuffer {
 		}
 
 		if ("Y".equals(SumByFacm)) {
-			putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 0, SumByFacm);
+			putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 0, SumByFacm, titaVo);
 		}
 
 //		this.info("dd =" + dd.get("LogNo"));
@@ -175,7 +182,8 @@ public class L5051 extends TradeBuffer {
 	}
 
 	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt,
-			BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm) {
+			BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm, TitaVo titaVo)
+			throws LogicException {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -221,12 +229,38 @@ public class L5051 extends TradeBuffer {
 		occursList.putParam("OOCanModify", canModify);
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOWorkMonth", WorkMonth);
-		
+
 		occursList.putParam("OOLog", d.get("LOGCNT"));
-		
-		occursList.putParam("OOMediaDate", parse.stringToStringDate(d.get("MediaDate"))); 
-		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
-		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName")); 
+
+		occursList.putParam("OOMediaDate", parse.stringToStringDate(d.get("MediaDate")));
+		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
+		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
+
+		// L6932 用的參數
+		titaVo.putParam("ST_DT", "0010101");
+		titaVo.putParam("ED_DT", "9991231");
+		titaVo.putParam("SX_DT", "0");
+		titaVo.putParam("EX_DT", "0");
+		titaVo.putParam("TRN_CODE", "L5501");
+		titaVo.putParam("TRN_CODE2", "");
+		titaVo.putParam("CUST_NO", d.get("CustNo"));
+		titaVo.putParam("FACM_NO", d.get("FacmNo"));
+		titaVo.putParam("BORM_SEQ", "000");
+		titaVo.putParam("TxtNo", "");
+		titaVo.putParam("MrKey", "");
+
+		List<Map<String, String>> l6932Vo;
+
+		try {
+			l6932Vo = l6932ServiceImpl.FindData(titaVo, this.index, 1);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L6932ServiceImpl.findAll error = " + errors.toString());
+			throw new LogicException("E0013", "L6932ServiceImpl");
+		}
+
+		occursList.putParam("OOHasHistory", l6932Vo != null && !l6932Vo.isEmpty() ? "Y" : "N");
 
 		this.totaVo.addOccursList(occursList);
 	}
