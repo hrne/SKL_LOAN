@@ -194,11 +194,11 @@ em = null;
   }
 
   @Override
-  public TxToDoDetailReserve FindL2980First(String itemCode_0, int custNo_1, int facmNo_2, int bormNo_3, TitaVo... titaVo) {
+  public TxToDoDetailReserve FindL2880First(String itemCode_0, int custNo_1, int facmNo_2, int bormNo_3, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("FindL2980First " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3);
+    this.info("FindL2880First " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3);
     Optional<TxToDoDetailReserve> txToDoDetailReserveT = null;
     if (dbName.equals(ContentName.onDay))
       txToDoDetailReserveT = txToDoDetailReserveReposDay.findTopByItemCodeIsAndCustNoIsAndFacmNoIsAndBormNoIsOrderByLogNoAsc(itemCode_0, custNo_1, facmNo_2, bormNo_3);

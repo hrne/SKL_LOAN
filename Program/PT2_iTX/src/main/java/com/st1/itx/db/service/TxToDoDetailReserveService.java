@@ -87,7 +87,7 @@ public interface TxToDoDetailReserveService {
    * @param titaVo Variable-Length Argument
    * @return Slice TxToDoDetailReserve TxToDoDetailReserve of List
    */
-  public TxToDoDetailReserve FindL2980First(String itemCode_0, int custNo_1, int facmNo_2, int bormNo_3, TitaVo... titaVo);
+  public TxToDoDetailReserve FindL2880First(String itemCode_0, int custNo_1, int facmNo_2, int bormNo_3, TitaVo... titaVo);
 
   /**
    * hold By TxToDoDetailReserve

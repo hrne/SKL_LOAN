@@ -168,7 +168,7 @@ public class BS900 extends TradeBuffer {
 				titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
-				if ("ICR".equals(t.getAcctCode())) {
+				if ("ICR".equals(t.getAcctCode()) && t.getEntAc() == 1) {
 					continue;
 				}
 				// 銷帳碼=原銷帳碼

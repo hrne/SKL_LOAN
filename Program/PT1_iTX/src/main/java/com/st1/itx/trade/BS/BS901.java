@@ -105,7 +105,7 @@ public class BS901 extends TradeBuffer {
 					Integer.MAX_VALUE, titaVo);
 			if (slAcDetail != null) {
 				for (AcDetail t : slAcDetail.getContent()) {
-					if ("ORI".equals(t.getAcctCode())) {
+					if ("ORI".equals(t.getAcctCode()) && t.getEntAc() == 1) {
 						String rvNo = getRvNo(titaVo);
 						TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 						tTxToDoDetail.setItemCode("ACCL02");

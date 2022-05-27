@@ -31,7 +31,7 @@ public class TxToDoDetailReserve implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -3762842056059284972L;
 
 // 序號
   @Id

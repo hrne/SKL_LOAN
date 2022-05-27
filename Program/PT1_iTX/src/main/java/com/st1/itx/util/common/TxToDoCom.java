@@ -822,6 +822,9 @@ public class TxToDoCom extends TradeBuffer {
 		case "NOTI02": // L4454 寫入應處理明細留存檔，紀錄列印日期
 			settingValue = "NOTI02;R;-;Y;-;-;     ;     ;L4454;-;銀扣二扣失敗明信片";
 			break;
+		case "L2880": // 個人房貸
+			settingValue = "L2880;R;-;Y;-;-;     ;     ;L2880;-;個人房貸調整作業";
+			break;
 		case "L2921":
 			settingValue = "L2921 ;-;M;-;-;-;L2921;     ;L2921;-;未齊件到期通知";
 			break;

@@ -60,32 +60,23 @@ public class L6088 extends TradeBuffer {
 				
 		for(Map<String, String> m : lL6088) {
 			
-			String agLevel;
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOEmployeeNo", m.get("EmployeeNo"));
 			occursList.putParam("OOAgentId", m.get("AgentId"));
 			occursList.putParam("OOFullname", m.get("Fullname"));
 			
-			// 檢查上層長官職等是否符合
-			agLevel = m.get("FirstSuperiorAgLevel");
-			if(!agLevel.trim().isEmpty() && agLevel.toUpperCase().startsWith("K"))
-				occursList.putParam("OOChief", m.get("FirstSuperiorEmpNo") + " " + m.get("FirstSuperiorName"));
-			else
-				occursList.putParam("OOChief", "");
-			
-			// 檢查上上層長官職等是否符合
-			agLevel = m.get("SecondSuperiorAgLevel");
-			if(!agLevel.trim().isEmpty() && agLevel.toUpperCase().startsWith("H"))
-				occursList.putParam("OODirector", m.get("SecondSuperiorEmpNo") + " " + m.get("SecondSuperiorName"));
-			else
-				occursList.putParam("OODirector", "");
-			
-			// 檢查上上上層長官職等是否符合
-			agLevel = m.get("ThirdSuperiorAgLevel");
-			if(!agLevel.trim().isEmpty() && agLevel.toUpperCase().startsWith("E"))
-				occursList.putParam("OOManager", m.get("ThirdSuperiorEmpNo") + " " + m.get("ThirdSuperiorName"));
-			else
-				occursList.putParam("OOManager", "");
+			// 把各員工資料(4筆)，放入符合自己職等的欄位
+			occursList.putParam("OOChief", "");
+			occursList.putParam("OODirector", "");
+			occursList.putParam("OOManager", "");
+			if(!m.get("EmployeeAgLevel").trim().isEmpty())
+				putEmpToAgCol(occursList, m.get("EmployeeAgLevel"), m.get("EmployeeNo"),  m.get("Fullname"));
+			if(!m.get("FirstSuperiorAgLevel").trim().isEmpty())
+				putEmpToAgCol(occursList, m.get("FirstSuperiorAgLevel"), m.get("FirstSuperiorEmpNo"),  m.get("FirstSuperiorName"));
+			if(!m.get("SecondSuperiorAgLevel").trim().isEmpty())
+				putEmpToAgCol(occursList, m.get("SecondSuperiorAgLevel"), m.get("SecondSuperiorEmpNo"),  m.get("SecondSuperiorName"));
+			if(!m.get("ThirdSuperiorAgLevel").trim().isEmpty())
+				putEmpToAgCol(occursList, m.get("ThirdSuperiorAgLevel"), m.get("ThirdSuperiorEmpNo"),  m.get("ThirdSuperiorName"));
 			
 			occursList.putParam("OOCenterCode", m.get("UnitCode"));
 			occursList.putParam("OOCenterCodeName", m.get("UnitItem"));
@@ -111,5 +102,22 @@ public class L6088 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
+	
+	/**
+	 * 將放入的員工資料，依據該員工的職等，放到屬於自己職等的欄位
+	 * @param occursList 正在使用的 OccursList
+	 * @param agLevel 員工的職等
+	 * @param empNo 員工的編號
+	 * @param empName 員工的姓名
+	 */
+	private void putEmpToAgCol(OccursList occursList, String agLevel, String empNo, String empName) {
+		
+		if(agLevel.toUpperCase().startsWith("K"))
+			occursList.putParam("OOChief", empNo + " " + empName);
+		else if(agLevel.toUpperCase().startsWith("H"))
+			occursList.putParam("OODirector", empNo + " " + empName);
+		else if(agLevel.toUpperCase().startsWith("E"))
+			occursList.putParam("OOManager", empNo + " " + empName);
+	}
+	
 }

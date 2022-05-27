@@ -237,7 +237,7 @@ public class AcEnterCom extends TradeBuffer {
 			AcDate = acList.get(0).getAcDate();
 			// 會計帳務明細
 			if (AcHCode == 1) {
-				AcHCode = 0;
+				AcHCode = 2;
 				this.txBuffer.getTxCom().setBookAcHcode(2);
 				procAcHCode90(acList);
 				acList = this.txBuffer.getAcDetailList(); // 沖正分錄
@@ -664,6 +664,8 @@ public class AcEnterCom extends TradeBuffer {
 		List<AcDetail> acList2 = new ArrayList<AcDetail>();
 		int i = acList0.size();
 		for (AcDetail ac : acList0) {
+			// 原分錄，入總帳記號 2:被沖正(隔日訂正)
+			ac.setEntAc(2);			
 			i++;
 			acDetail = new AcDetail();
 			acDetail.setCustNo(ac.getCustNo());
@@ -686,6 +688,12 @@ public class AcEnterCom extends TradeBuffer {
 			}
 			acList2.add(acDetail);
 		}
+		// 更新原分錄
+		try {
+			acDetailService.updateAll(acList0, titaVo); // update AcDetail
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E6003", "procAcHCode2 update " + e.getErrorMsg());
+		}		
 		this.txBuffer.addAllAcDetailList(acList2);
 
 		/* 產生會計分錄 */
