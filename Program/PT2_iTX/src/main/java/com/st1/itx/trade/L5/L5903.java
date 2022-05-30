@@ -6,17 +6,21 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.TxAttachment;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.TxAttachmentService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.service.springjpa.cm.L5903ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -49,6 +53,9 @@ public class L5903 extends TradeBuffer {
 
 	@Autowired
 	public L5903ServiceImpl l5903ServiceImpl;
+	
+	@Autowired
+	TxAttachmentService sTxAttachmentService;
 
 	@Autowired
 	public TxTellerService txTellerService;
@@ -135,6 +142,13 @@ public class L5903 extends TradeBuffer {
 				occursList.putParam("OOKeeperEmpNo", result.get("F13"));
 				occursList.putParam("OOApplEmpNo", result.get("F14"));
 				occursList.putParam("OOReturnEmpNo", result.get("F15"));
+				
+				// 判斷是否應顯示【附件查詢】按鈕
+				
+				Slice<TxAttachment> slTxAttachment = sTxAttachmentService.findByTran("L5103", FormatUtil.pad9(result.get("F0"), 7)+"-"+FormatUtil.pad9(result.get("F1"), 3)+"-"+FormatUtil.pad9(result.get("F2"), 3), 0, 1, titaVo);
+				List<TxAttachment> lTxAttachment = slTxAttachment == null ? null : slTxAttachment.getContent();
+				
+				occursList.putParam("OOHasAttachment", lTxAttachment != null && !lTxAttachment.isEmpty() ? "Y" : "N");
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

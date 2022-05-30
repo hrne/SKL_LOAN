@@ -240,9 +240,9 @@ public class L5060 extends TradeBuffer {
 				occursList.putParam("OOAlertDate", Integer.valueOf(thisL5060Vo.get("F4")) - 19110000);
 			}
 			if (Integer.valueOf(thisL5060Vo.get("F4")) < this.getTxBuffer().getTxBizDate().getTbsDyf()) {
-				occursList.putParam("OOClFlagB", 1);// 提醒日按鈕
+				occursList.putParam("OOClFlagB", 0);// 提醒日按鈕
 			} else {
-				occursList.putParam("OOClFlagB", 1);// 測試用設為1:開
+				occursList.putParam("OOClFlagB", 1);
 			}
 			occursList.putParam("OOClCustNo", thisL5060Vo.get("F15"));
 			occursList.putParam("OOClFacmNo", thisL5060Vo.get("F16"));

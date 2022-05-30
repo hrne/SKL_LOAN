@@ -13,9 +13,11 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryDetail;
 import com.st1.itx.db.domain.MlaundryRecord;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryDetailService;
 import com.st1.itx.db.service.MlaundryRecordService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.springjpa.cm.L8923ServiceImpl;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -47,6 +49,8 @@ public class L8922 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	L8923ServiceImpl l8923ServiceImpl;
+	@Autowired
+	TxDataLogService sTxDataLogService;
 	@Autowired
 	Parse parse;
 
@@ -171,6 +175,24 @@ public class L8922 extends TradeBuffer {
 			this.info("L8922 DateTime : " + DateTime);
 			Date = FormatUtil.left(DateTime, 9);
 			occursList.putParam("OOUpdate", Date);
+			
+			
+			// 歷程按鈕顯示或隱藏
+			 Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByCustNo1(tMlaundryDetail.getEntryDate() + 19110000, parse.stringToInteger(titaVo.getCalDy()) + 19110000, "L8203", tMlaundryDetail.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			 List<TxDataLog> lTxDataLog = slTxDataLog == null ? new ArrayList<TxDataLog>() : slTxDataLog.getContent();
+			 
+			 boolean hasResult = false;
+			 
+			 for (TxDataLog txDataLog : lTxDataLog)
+			 {
+				 if (txDataLog.getMrKey().equals((tMlaundryDetail.getEntryDate()) + "-" + parse.IntegerToString(tMlaundryDetail.getFactor(), 2) + "-" + parse.IntegerToString(tMlaundryDetail.getCustNo(), 7)))
+				 {
+					 hasResult = true;
+					 break;
+				 }
+			 }
+			 
+			 occursList.putParam("OOHasHistory", hasResult ? "Y" : "N");
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

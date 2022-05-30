@@ -194,9 +194,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6301;text=刪除;ntxbuf=#OOBUF_4})
 T(2,#OOBaseRateCode)
 
 #OOBTN_5=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6032;text=查詢指標利率;ntxbuf=#OOBUF_5})
-
-
+C(2,#OOEffectFlag,BIND(grid,{cmd=CHAIN;ntxcd=L6032;text=查詢指標利率;ntxbuf=#OOBUF_5}),BIND(grid,cancel))
 </sub>
 
 

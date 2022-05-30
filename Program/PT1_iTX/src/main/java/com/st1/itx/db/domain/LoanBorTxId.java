@@ -19,7 +19,7 @@ public class LoanBorTxId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -8293198287402141220L;
 
 // 借款人戶號
   @Column(name = "`CustNo`")

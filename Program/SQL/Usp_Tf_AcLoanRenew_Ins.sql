@@ -190,37 +190,6 @@ BEGIN
     )
     ;
 
-    MERGE INTO "AcLoanRenew" ALR
-    USING (
-      SELECT "CustNo"              -- 戶號 DECIMAL 3
-           , "NewFacmNo"           -- 新額度編號 DECIMAL 3
-           , "NewBormNo"           -- 新撥款序號 DECIMAL 3
-           , "OldFacmNo"           -- 舊額度編號 DECIMAL 6
-           , "OldBormNo"           -- 舊撥款序號 DECIMAL 6
-           -- 2022-01-03 智偉修改:最後統一更新
-           -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
-           , ROW_NUMBER()
-             OVER (
-               PARTITION BY "CustNo"
-                          , "NewFacmNo"
-                          , "NewBormNo"
-               ORDER BY "OldFacmNo"
-                      , "OldBormNo"
-             ) AS "Seq"
-      FROM "AcLoanRenew"
-    ) N
-    ON (
-      N."CustNo" = ALR."CustNo"
-      AND N."NewFacmNo" = ALR."NewFacmNo"
-      AND N."NewBormNo" = ALR."NewBormNo"
-      AND N."OldFacmNo" = ALR."OldFacmNo"
-      AND N."OldBormNo" = ALR."OldBormNo"
-      AND N."Seq" = 1
-    )
-    WHEN MATCHED THEN UPDATE SET
-    "MainFlag" = 'Y' -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
-    ;
-
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 

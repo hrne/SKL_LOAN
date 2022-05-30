@@ -266,11 +266,15 @@ C(3,#Level,1,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=刪除;ntxb
 
 
 ! 歷程的按鈕
+
+!是否有歷程 - Y/N
+#OOHasHistory=X,1,S
+
 #OOBUF5=X,32,S
 T(2,1+#OOCustNo+000000+#OOAcDate+#OOFactor)
 
 #OOBTN5=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5})
+C(5,#OOHasHistory,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5}),BIND(grid,cancel))
 
 ! 查詢的按鈕
 #OOBUF6=X,23,S
@@ -322,6 +326,7 @@ TXFORM=L8922
 #OOManagerCheck
 #OOManagerDate
 #OOHasL8923
+#OOHasHistory
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

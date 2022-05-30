@@ -89,7 +89,7 @@ T(1,@ApplDateTo,#NTXBUF,15,7)
 T(1,@UsageCode,#NTXBUF,22,2)
 T(1,@ApplCode,#NTXBUF,24,2)
 INVOKEJS(SHOW,p1,02,02,1)
-!<瀏覽>
+!<瀏覽>                                   
 #BUFA=X,74,S
 T(2,#CustNo)
 #BINDA=X,1,S
@@ -232,8 +232,13 @@ T(2,#OOCustNo+-+#OOFacmNo+-+#OOApplSeq+ 檔案借閱+#LC014Text)
 #BufLC014=X,200,S
 T(2,L5103+#OOCustNo+#OOFacmNo+000+#LC014Mrkey+#LC014Note)
 
-#BTN=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})
+
+! 檢查是否有附件資料，再顯示這個按鈕
+! Y/N
+#OOHasAttachment=X,1,S
+
+#BTN=X,1,S
+C(5,#OOHasAttachment,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014}),BIND(grid,cancel))
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -267,6 +272,7 @@ TXFORM=L5903
 #OOKeeperEmpNo
 #OOApplEmpNo
 #OOReturnEmpNo
+#OOHasAttachment
 ^
 </sub>
 

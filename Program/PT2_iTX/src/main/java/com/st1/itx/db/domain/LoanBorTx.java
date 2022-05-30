@@ -29,7 +29,7 @@ public class LoanBorTx implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 9119226293997969828L;
 
 @EmbeddedId
   private LoanBorTxId loanBorTxId;

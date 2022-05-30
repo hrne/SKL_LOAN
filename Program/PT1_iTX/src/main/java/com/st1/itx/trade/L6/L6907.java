@@ -105,7 +105,16 @@ public class L6907 extends TradeBuffer {
 //			occursList.putParam("OOAcDtlCode",tAcReceivable.get("AcDtlCode"));
 //			occursList.putParam("OOAcctItem",tAcReceivable.get("AcctItem")); // 用不到
 //			occursList.putParam("OOAcBookCode",tAcReceivable.get("AcBookCode"));
-																																																																																																																												
+
+			// Y-顯示[明細]按鈕
+			String l6908Flag = "Y";
+			// 未收費用未變動不顯示按鈕
+			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
+					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
+				l6908Flag = "";
+			}
+			occursList.putParam("L6908Flag", l6908Flag);
+			
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));

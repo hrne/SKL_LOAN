@@ -127,7 +127,7 @@ BEGIN
            , SUM(r."LVITax")                     AS "LVITax"            -- 土地增值稅加總
            , MAX(r."CityCode")                   AS "CityCode"          -- 縣市別
            , MAX(r."AreaCode")                   AS "AreaCode"          -- 鄉鎮市區別
-           , MIN(r."LVITaxYearMonth")            AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月
+           , MAX(r."LVITaxYearMonth")            AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月
            , MAX(r."IrCode")                     AS "IrCode"            -- 段小段
       FROM ClLandRawData r
       GROUP BY r."FacmNo" 

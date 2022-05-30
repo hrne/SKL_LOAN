@@ -14,61 +14,96 @@ BEGIN
     JOB_START_TIME := SYSTIMESTAMP;
 
     -- 尚未被建立在AcLoanRenew的交叉相乘寫入
-    INSERT INTO "AcLoanRenew"
-    WITH noExistOldData AS (
-      SELECT NB.LMSACN
-           , NB.LMSAPN
-           , NB.LMSASQ
-           , NB.NEGNUM
-      FROM LN$NODP NB
-      WHERE CHGFLG = 'B'
+    MERGE INTO "AcLoanRenew" ALR
+    USING (
+      WITH noExistOldData AS (
+        SELECT NB.LMSACN
+            , NB.LMSAPN
+            , NB.LMSASQ
+            , NB.NEGNUM
+        FROM LN$NODP NB
+        WHERE CHGFLG = 'B'
+      )
+      , noExistNewData AS (
+        SELECT NA.LMSACN
+            , NA.LMSAPN
+            , NA.LMSASQ
+            , NA.NEGNUM
+        FROM LN$NODP NA
+        WHERE CHGFLG = 'A'
+      )
+      , noExistData AS (
+          select O.LMSACN AS "CustNo"
+              , N.LMSAPN AS "NewFacmNo"
+              , N.LMSASQ AS "NewBormNo"
+              , O.LMSAPN AS "OldFacmNo"
+              , O.LMSASQ AS "OldBormNo"
+              , O.NEGNUM
+          from noExistOldData O
+            , noExistNewData N
+          WHERE O.LMSACN = N.LMSACN
+            AND O.NEGNUM = N.NEGNUM
+      )
+      SELECT n."CustNo"
+          , n."NewFacmNo"
+          , n."NewBormNo"
+          , n."OldFacmNo"
+          , n."OldBormNo"
+          , '2'                AS "RenewCode"
+          , 'N'                AS "MainFlag"
+          , NVL(LBM."DrawdownDate",0) AS "AcDate"
+          , '999999'           AS "CreateEmpNo"
+          , JOB_START_TIME     AS "CreateDate"
+          , '999999'           AS "LastUpdateEmpNo"
+          , JOB_START_TIME     AS "LastUpdate"
+          ,'{"NegNo":"'
+            || n."NEGNUM" -- 協議件編號
+            || '"'
+            || '}'             AS "OtherFields"
+      FROM noExistData n
+      LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = n."CustNo"
+                                AND LBM."FacmNo" = n."NewFacmNo"
+                                AND LBM."BormNo" = n."NewBormNo"
+    ) N
+    ON (
+      N."CustNo" = ALR."CustNo"
+      AND N."NewFacmNo" = ALR."NewFacmNo"
+      AND N."NewBormNo" = ALR."NewBormNo"
+      AND N."OldFacmNo" = ALR."OldFacmNo"
+      AND N."OldBormNo" = ALR."OldBormNo"
     )
-    , noExistNewData AS (
-      SELECT NA.LMSACN
-           , NA.LMSAPN
-           , NA.LMSASQ
-           , NA.NEGNUM
-      FROM LN$NODP NA
-      WHERE CHGFLG = 'A'
+    WHEN MATCHED THEN UPDATE
+    SET "RenewCode" = '2'
+      , "OtherFields" = N."OtherFields"
+    WHEN NOT MATCHED THEN INSERT (
+        "CustNo"
+      , "NewFacmNo"
+      , "NewBormNo"
+      , "OldFacmNo"
+      , "OldBormNo"
+      , "RenewCode"
+      , "MainFlag"
+      , "AcDate"
+      , "CreateEmpNo"
+      , "CreateDate"
+      , "LastUpdateEmpNo"
+      , "LastUpdate"
+      , "OtherFields"
+    ) VALUES (
+        N."CustNo"
+      , N."NewFacmNo"
+      , N."NewBormNo"
+      , N."OldFacmNo"
+      , N."OldBormNo"
+      , N."RenewCode"
+      , N."MainFlag"
+      , N."AcDate"
+      , N."CreateEmpNo"
+      , N."CreateDate"
+      , N."LastUpdateEmpNo"
+      , N."LastUpdate"
+      , N."OtherFields"
     )
-    , noExistData AS (
-        select O.LMSACN AS "CustNo"
-             , N.LMSAPN AS "NewFacmNo"
-             , N.LMSASQ AS "NewBormNo"
-             , O.LMSAPN AS "OldFacmNo"
-             , O.LMSASQ AS "OldBormNo"
-             , O.NEGNUM
-        from noExistOldData O
-           , noExistNewData N
-        WHERE O.LMSACN = N.LMSACN
-          AND O.NEGNUM = N.NEGNUM
-    )
-    SELECT n."CustNo"
-         , n."NewFacmNo"
-         , n."NewBormNo"
-         , n."OldFacmNo"
-         , n."OldBormNo"
-         , '2'                AS "RenewCode"
-         , 'N'                AS "MainFlag"
-         , NVL(LBM."DrawdownDate",0) AS "AcDate"
-         , '999999'           AS "CreateEmpNo"
-         , JOB_START_TIME     AS "CreateDate"
-         , '999999'           AS "LastUpdateEmpNo"
-         , JOB_START_TIME     AS "LastUpdate"
-         ,'{"NegNo":"'
-           || n."NEGNUM" -- 協議件編號
-           || '"'
-           || '}'             AS "OtherFields"
-    FROM noExistData n
-    LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = n."CustNo"
-                               AND LBM."FacmNo" = n."NewFacmNo"
-                               AND LBM."BormNo" = n."NewBormNo"
-    LEFT JOIN "AcLoanRenew" ALR ON ALR."CustNo" = n."CustNo"
-                               AND ALR."OldFacmNo" = n."OldFacmNo"
-                               AND ALR."OldBormNo" = n."OldBormNo"
-                               AND ALR."NewFacmNo" = n."NewFacmNo"
-                               AND ALR."NewBormNo" = n."NewBormNo"
-    WHERE ALR."CustNo" IS NULL
     ;
 
     MERGE INTO "AcLoanRenew" ALR
@@ -96,10 +131,12 @@ BEGIN
       AND N."NewBormNo" = ALR."NewBormNo"
       AND N."OldFacmNo" = ALR."OldFacmNo"
       AND N."OldBormNo" = ALR."OldBormNo"
-      AND N."Seq" = 1
     )
     WHEN MATCHED THEN UPDATE SET
-    "MainFlag" = 'Y' -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
+    "MainFlag" = CASE
+                   WHEN N."Seq"
+                   THEN 'Y' -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
+                 ELSE 'N' END
     ;
 
     -- 記錄程式結束時間

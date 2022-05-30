@@ -136,13 +136,17 @@ public class L9710Report extends MakeReport {
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "寬限到期明細表", "", "A4", "L");
 
-
+		//記錄筆數
+		int count = 0 ;
+		
 		if (l9710List != null && l9710List.size() != 0) {
 
 			// 輸出Excel
 
 			for (Map<String, String> tL9710Vo : l9710List) {
-
+				
+				count++;
+				
 				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
 					if (cnt > 0) {
 						reportTot();
@@ -154,7 +158,12 @@ public class L9710Report extends MakeReport {
 
 				f0 = tL9710Vo.get("F0");
 				f1 = tL9710Vo.get("CityCode");
-
+				
+				if(count == 40) {
+					this.newPage();
+					count = 0 ;
+				}
+				
 				report(tL9710Vo);
 			}
 
