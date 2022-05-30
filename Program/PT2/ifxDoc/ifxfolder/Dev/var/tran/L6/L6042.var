@@ -126,11 +126,14 @@ T(2,#OFunc5+#OTranNo)
 #OBTN5=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6402;text=查詢;ntxbuf=#OBUF5})
 
+! 檢查歷程按鈕，是否需要顯示的參數
+#OOHasL6933=X,1,S
+
 #OBUF6=X,65,S
 T(2,L6402+CODE:+#OTranNo)
 
 #OBTN6=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6})
+C(5,#OOHasL6933,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6}),BIND(grid,cancel))
 
 ! 修改的按鈕
 #OFunc2=A,1,S
@@ -170,6 +173,7 @@ TXFORM=L6042
 #ODesc
 #OOLastUpdate
 #OOLastEmp
+#OOHasL6933
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

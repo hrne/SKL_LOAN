@@ -190,8 +190,10 @@ E(0,4)
 #OBUF4=X,65,S
 T(2,L6403+CODE:+#OAuthNo)
 
+#OOHasL6933=X,1,S
+
 #OBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF4})
+C(5,#OOHasL6933,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF4}),BIND(grid,cancel))
 </sub>
 
 
@@ -216,6 +218,7 @@ TXFORM=L6043
 #OLevelFg
 #OOLastUpdate
 #OOLastEmp
+#OOHasL6933
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

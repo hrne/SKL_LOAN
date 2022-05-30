@@ -59,15 +59,17 @@ public interface CdBankService {
   public Slice<CdBank> branchCodeLike(String bankCode_0, String branchCode_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * BankItem %
+   * BankCode % ,AND BranchCode % ,AND BankItem %
    *
-   * @param bankItem_0 bankItem_0
+   * @param bankCode_0 bankCode_0
+   * @param branchCode_1 branchCode_1
+   * @param bankItem_2 bankItem_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice CdBank CdBank of List
    */
-  public Slice<CdBank> bankItemLike(String bankItem_0, int index, int limit, TitaVo... titaVo);
+  public Slice<CdBank> bankItemLike(String bankCode_0, String branchCode_1, String bankItem_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CdBank

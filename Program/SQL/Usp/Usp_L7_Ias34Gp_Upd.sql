@@ -1,8 +1,8 @@
-create or replace PROCEDURE "Usp_L7_Ias34Gp_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_Ias34Gp_Upd" 
 (
 -- 程式功能：維護 Ias34Gp 每月IAS34資料欄位清單G檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_Ias34Gp_Upd"(20200420,'System');
+-- 執行方式：EXEC "Usp_L7_Ias34Gp_Upd"(20200420,'999999');
 --
 
     -- 參數
@@ -23,7 +23,6 @@ BEGIN
     LYYYYMM        INT;         -- 上月年月
     MM             INT;         -- 本月月份
     YYYY           INT;         -- 本月年度
-    OccursNum      NUMBER;
   BEGIN
     INS_CNT := 0;
     UPD_CNT := 0;
@@ -52,23 +51,24 @@ BEGIN
              , "NewBormNo"
              , "OldFacmNo"
              , "OldBormNo"
+             , NVL( JSON_VALUE ("OtherFields", '$.NegNo'),0) AS "AgreeSeq"
         FROM "AcLoanRenew"
         WHERE "RenewCode" = '2'
     )
-    , OrderData AS (
-        SELECT "CustNo"
-             , "NewFacmNo"
-             , "NewBormNo"
-             , "OldFacmNo"
-             , "OldBormNo"
-             , DENSE_RANK()
-               OVER (
-                   PARTITION BY "CustNo"
-                   ORDER BY "NewFacmNo"
-                          , "NewBormNo"
-               ) AS "AgreeSeq"
-        FROM RawData
-    )
+--    , OrderData AS (
+--        SELECT "CustNo"
+--             , "NewFacmNo"
+--             , "NewBormNo"
+--             , "OldFacmNo"
+--             , "OldBormNo"
+--             , DENSE_RANK()
+--               OVER (
+--                   PARTITION BY "CustNo"
+--                   ORDER BY "NewFacmNo"
+--                          , "NewBormNo"
+--               ) AS "AgreeSeq"
+--        FROM RawData
+--    )
     -- 協議後
     SELECT "CustNo"                             AS "CustNo"             -- 戶號
          , 'A'                                  AS "AgreeFg"            -- 協議前後 B=協議前; A=協議後
@@ -76,7 +76,7 @@ BEGIN
          , "NewBormNo"                          AS "BormNo"             -- 撥款序號
          , "AgreeSeq"                           AS "AgreeSeq"           -- 本筆協議序號
          , 0                                    AS "RenewYM"            -- 協議年月
-    FROM OrderData
+    FROM RawData
     UNION
     -- 協議前
     SELECT "CustNo"                             AS "CustNo"             -- 戶號
@@ -85,7 +85,7 @@ BEGIN
          , "OldBormNo"                          AS "BormNo"             -- 撥款序號
          , "AgreeSeq"                           AS "AgreeSeq"           -- 本筆協議序號
          , 0                                    AS "RenewYM"            -- 協議年月
-    FROM OrderData
+    FROM RawData
     ;
 
     -- 刪除舊資料
@@ -98,9 +98,7 @@ BEGIN
     -- 寫入資料
     DBMS_OUTPUT.PUT_LINE('INSERT Ias34Gp');
 
-    -- ** 按 "戶號,會計日" 產生 "協議編號" (ref: 2020/12 LNM34GP CustNo=1201366)
     INSERT INTO "Ias34Gp"
-    -- 協議後
     SELECT
            YYYYMM                               AS "DataYM"             -- 年月份
          , GP."CustNo"                          AS "CustNo"             -- 戶號

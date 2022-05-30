@@ -17,7 +17,9 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.TxAuthGroup;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.TxAuthGroupService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
@@ -43,6 +45,9 @@ public class L6043 extends TradeBuffer {
 	
 	@Autowired
 	public CdEmpService cdEmpService;
+	
+	@Autowired
+	public TxDataLogService txDataLogService;
 	
 	@Autowired
 	Parse parse;
@@ -98,7 +103,20 @@ public class L6043 extends TradeBuffer {
 				occursList.putParam("OLevelFg", tTxAuthGroup.getLevelFg());
 				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxAuthGroup.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxAuthGroup.getLastUpdate()));
 				occursList.putParam("OOLastEmp", tTxAuthGroup.getLastUpdateEmpNo() + " " + empName(titaVo, tTxAuthGroup.getLastUpdateEmpNo()));
-
+				
+				// 新增功能：歷程按鈕，如果查無資料就不顯示該按鈕
+				Slice<TxDataLog> slTxDataLog = null;
+				try {
+					slTxDataLog = txDataLogService.findByTranNo("L6403", "CODE:" + tTxAuthGroup.getAuthNo(), 0, 1);
+				} catch(Exception e) {
+					this.error("L6043 Exeception When txDataLogService: " + e.getMessage());
+					throw new LogicException("E0013", "txDataLogService");
+				}
+				List<TxDataLog> lTxDataLog = (slTxDataLog == null) ? null : slTxDataLog.getContent();
+				if(lTxDataLog == null || lTxDataLog.isEmpty())
+					occursList.putParam("OOHasL6933", "N");
+				else
+					occursList.putParam("OOHasL6933", "Y");
 				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

@@ -115,7 +115,6 @@ BEGIN
                               AND NB."LMSAPN" = A."LMSAPN1"
                               AND NB."LMSASQ" = A."LMSASQ1"
                               AND NB."CHGFLG" = 'B'
-                              AND 
         LEFT JOIN "LN$NODP" NA ON NA."LMSACN" = A."LMSACN"
                               AND NA."LMSAPN" = A."LMSAPN"
                               AND NA."LMSASQ" = A."LMSASQ"

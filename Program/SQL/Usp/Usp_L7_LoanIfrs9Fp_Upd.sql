@@ -1,8 +1,8 @@
-create or replace PROCEDURE "Usp_L7_LoanIfrs9Fp_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Fp_Upd" 
 (
 -- 程式功能：維護 LoanIfrs9Fp 每月IFRS9欄位清單F檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Fp_Upd"(20201231,'System');
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Fp_Upd"(20201231,'999999');
 --
 
     -- 參數
@@ -50,23 +50,24 @@ BEGIN
              , "NewBormNo"
              , "OldFacmNo"
              , "OldBormNo"
+             , NVL( JSON_VALUE ("OtherFields", '$.NegNo'),0) AS "AgreeSeq"
         FROM "AcLoanRenew"
         WHERE "RenewCode" = '2'
     )
-    , OrderData AS (
-        SELECT "CustNo"
-             , "NewFacmNo"
-             , "NewBormNo"
-             , "OldFacmNo"
-             , "OldBormNo"
-             , DENSE_RANK()
-               OVER (
-                   PARTITION BY "CustNo"
-                   ORDER BY "NewFacmNo"
-                          , "NewBormNo"
-               ) AS "AgreeSeq"
-        FROM RawData
-    )
+--    , OrderData AS (
+--        SELECT "CustNo"
+--             , "NewFacmNo"
+--             , "NewBormNo"
+--             , "OldFacmNo"
+--             , "OldBormNo"
+--             , DENSE_RANK()
+--               OVER (
+--                   PARTITION BY "CustNo"
+--                   ORDER BY "NewFacmNo"
+--                          , "NewBormNo"
+--               ) AS "AgreeSeq"
+--        FROM RawData
+--    )
     -- 協議後
     SELECT "CustNo"                             AS "CustNo"             -- 戶號
          , 'A'                                  AS "AgreeFg"            -- 協議前後 B=協議前; A=協議後
@@ -74,7 +75,7 @@ BEGIN
          , "NewBormNo"                          AS "BormNo"             -- 撥款序號
          , "AgreeSeq"                           AS "AgreeSeq"           -- 本筆協議序號
          , 0                                    AS "RenewYM"            -- 協議年月
-    FROM OrderData
+    FROM RawData
     UNION
     -- 協議前
     SELECT "CustNo"                             AS "CustNo"             -- 戶號
@@ -83,7 +84,7 @@ BEGIN
          , "OldBormNo"                          AS "BormNo"             -- 撥款序號
          , "AgreeSeq"                           AS "AgreeSeq"           -- 本筆協議序號
          , 0                                    AS "RenewYM"            -- 協議年月
-    FROM OrderData
+    FROM RawData
     ;
 
     -- 刪除舊資料

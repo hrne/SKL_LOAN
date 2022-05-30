@@ -178,8 +178,11 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6702;text=查詢;ntxbuf=#OOBUF5})
 #OBUF6=X,65,S
 T(2,L6702+CODE:+#OOBranchNo)
 
+! 檢查歷程按鈕，是否需要顯示的參數
+#OOHasL6933=X,1,S
+
 #OBTN6=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6})
+C(5,#OOHasL6933,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L6933;text=歷程;ntxbuf=#OBUF6}),BIND(grid,cancel))
 
 </sub>
 
@@ -201,6 +204,7 @@ TXFORM=L6072
 #OOBranchItem
 #OOLastUpdate
 #OOLastEmp
+#OOHasL6933
 ^
 </sub>
 

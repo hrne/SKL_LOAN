@@ -28,8 +28,8 @@ public interface CdBankRepositoryDay extends JpaRepository<CdBank, CdBankId> {
   // BankCode % ,AND BranchCode %
   public Slice<CdBank> findAllByBankCodeLikeAndBranchCodeLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, String branchCode_1, Pageable pageable);
 
-  // BankItem %
-  public Slice<CdBank> findAllByBankItemLikeOrderByBankCodeAscBranchCodeAsc(String bankItem_0, Pageable pageable);
+  // BankCode % ,AND BranchCode % ,AND BankItem %
+  public Slice<CdBank> findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, String branchCode_1, String bankItem_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

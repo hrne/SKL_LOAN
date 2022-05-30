@@ -21,9 +21,11 @@ import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.TxDataLogService;
 
 @Service("L6041")
 @Scope("prototype")
@@ -47,6 +49,9 @@ public class L6041 extends TradeBuffer {
 
 	@Autowired
 	CdEmpService cdEmpService;
+	
+	@Autowired
+	TxDataLogService sTxDataLogService;
 
 	@Autowired
 	Parse parse;
@@ -139,7 +144,12 @@ public class L6041 extends TradeBuffer {
 				} else {
 					occursList.putParam("OGroupItem", "");
 				}
-
+				
+				//若有歷程就顯示，無則不顯示
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L6401", "CODE:" +  tTxTeller.getTlrNo(), 0,
+						1, titaVo);
+				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
+				occursList.putParam("OHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

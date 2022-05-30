@@ -365,7 +365,7 @@ BEGIN
              WHEN NVL(M."AmortizedCode",'0') = '2' THEN '4'  -- 2.到期取息(到期繳息還本)
              WHEN NVL(M."AmortizedCode",'0') = '3' THEN '2'  -- 3.本息平均法(期金)
              WHEN NVL(M."AmortizedCode",'0') = '4' THEN '3'  -- 4.本金平均法
-             WHEN NVL(M."AmortizedCode",'0') = '5' THEN '4'  -- 5.按月撥款收息(逆向貸款)  --???
+             WHEN NVL(M."AmortizedCode",'0') = '5' THEN '4'  -- 5.按月撥款收息(逆向貸款)  
              ELSE '3'
            END                                       AS "AmortizedCode"     -- 契約當時還款方式
          , CASE
@@ -403,8 +403,8 @@ BEGIN
          , NVL(M."FirstDueDate", 0)                  AS "FirstDueDate"      -- 首次應繳日
          , NVL(M."TotalPeriod", 0)                   AS "TotalPeriod"       -- 總期數
          , CASE WHEN TRUNC(NVL(F."UtilDeadline", 0) / 100 ) <= YYYYMM   THEN 0    -- 動支期限到期
-                WHEN NVL(F."LineAmt", 0) < NVL(F."UtilBal", 0) THEN 0
-                ELSE NVL(F."LineAmt", 0) - NVL(F."UtilBal", 0)
+                WHEN NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) < NVL(F."UtilBal", 0) THEN 0
+                ELSE NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) - NVL(F."UtilBal", 0)
            END                                       AS "AvblBal"           -- 可動用餘額(台幣)
          , NVL(F."RecycleCode", 0)                   AS "RecycleCode"       -- 該筆額度是否可循環動用 (0=非循環動用 1=循環動用)
          , NVL(F."IrrevocableFlag", 0)               AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷 (1=是 0=否)

@@ -167,7 +167,7 @@ em = null;
   }
 
   @Override
-  public Slice<CdBank> bankItemLike(String bankItem_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<CdBank> bankItemLike(String bankCode_0, String branchCode_1, String bankItem_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CdBank> slice = null;
     if (titaVo.length != 0)
@@ -178,15 +178,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("bankItemLike " + dbName + " : " + "bankItem_0 : " + bankItem_0);
+    this.info("bankItemLike " + dbName + " : " + "bankCode_0 : " + bankCode_0 + " branchCode_1 : " +  branchCode_1 + " bankItem_2 : " +  bankItem_2);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBankReposDay.findAllByBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankItem_0, pageable);
+      slice = cdBankReposDay.findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, bankItem_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBankReposMon.findAllByBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankItem_0, pageable);
+      slice = cdBankReposMon.findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, bankItem_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBankReposHist.findAllByBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankItem_0, pageable);
+      slice = cdBankReposHist.findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, bankItem_2, pageable);
     else 
-      slice = cdBankRepos.findAllByBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankItem_0, pageable);
+      slice = cdBankRepos.findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(bankCode_0, branchCode_1, bankItem_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

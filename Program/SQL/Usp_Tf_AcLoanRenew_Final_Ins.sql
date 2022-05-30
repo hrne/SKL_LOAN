@@ -20,11 +20,7 @@ BEGIN
            , NB.LMSAPN
            , NB.LMSASQ
            , NB.NEGNUM
-           , NVL(ALR."CustNo",0) AS ALR_CustNo
       FROM LN$NODP NB
-      LEFT JOIN "AcLoanRenew" ALR ON ALR."CustNo" = NB.LMSACN
-                                 AND ALR."OldFacmNo" = NB.LMSAPN
-                                 AND ALR."OldBormNo" = NB.LMSASQ
       WHERE CHGFLG = 'B'
     )
     , noExistNewData AS (
@@ -32,11 +28,7 @@ BEGIN
            , NA.LMSAPN
            , NA.LMSASQ
            , NA.NEGNUM
-           , NVL(ALR."CustNo",0) AS ALR_CustNo
       FROM LN$NODP NA
-      LEFT JOIN "AcLoanRenew" ALR ON ALR."CustNo" = NA.LMSACN
-                                 AND ALR."NewFacmNo" = NA.LMSAPN
-                                 AND ALR."NewBormNo" = NA.LMSASQ
       WHERE CHGFLG = 'A'
     )
     , noExistData AS (
@@ -50,10 +42,6 @@ BEGIN
            , noExistNewData N
         WHERE O.LMSACN = N.LMSACN
           AND O.NEGNUM = N.NEGNUM
-          AND CASE
-                WHEN O.ALR_CustNo = 0 AND N.ALR_CustNo = 0
-                THEN 0
-              ELSE 1 END = 1
     )
     SELECT n."CustNo"
          , n."NewFacmNo"
@@ -62,7 +50,7 @@ BEGIN
          , n."OldBormNo"
          , '2'                AS "RenewCode"
          , 'N'                AS "MainFlag"
-         , LBM."DrawdownDate" AS "AcDate"
+         , NVL(LBM."DrawdownDate",0) AS "AcDate"
          , '999999'           AS "CreateEmpNo"
          , JOB_START_TIME     AS "CreateDate"
          , '999999'           AS "LastUpdateEmpNo"
@@ -75,6 +63,12 @@ BEGIN
     LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = n."CustNo"
                                AND LBM."FacmNo" = n."NewFacmNo"
                                AND LBM."BormNo" = n."NewBormNo"
+    LEFT JOIN "AcLoanRenew" ALR ON ALR."CustNo" = n."CustNo"
+                               AND ALR."OldFacmNo" = n."OldFacmNo"
+                               AND ALR."OldBormNo" = n."OldBormNo"
+                               AND ALR."NewFacmNo" = n."NewFacmNo"
+                               AND ALR."NewBormNo" = n."NewBormNo"
+    WHERE ALR."CustNo" IS NULL
     ;
 
     MERGE INTO "AcLoanRenew" ALR

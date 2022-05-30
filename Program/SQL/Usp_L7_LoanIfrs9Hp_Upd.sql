@@ -153,9 +153,9 @@ BEGIN
          , NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) AS "LineAmt"            -- 核准金額(台幣)
          , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"      -- 產品別
          , CASE WHEN NVL(F."RecycleCode",0) = 0 AND NVL(F."UtilDeadline",0) >= TMNDYF --非循環且動支期限>=月底日  
-                     THEN  ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
+                     THEN  ( NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
                 WHEN NVL(F."RecycleCode",0) = 1 AND NVL(F."RecycleDeadline",0) >= TMNDYF --循環且循環動支期限>=月底日    
-                     THEN  ( NVL(F."LineAmt",0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
+                     THEN  ( NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) - NVL(F."UtilBal",0) + HP."PreDrawdownAmt" )
                 ELSE 0     
            END                                  AS "AvblBal"            -- 可動用餘額(台幣)
                                                                            -- 核准額度 - 已動用額度餘額
@@ -275,27 +275,5 @@ BEGIN
   END;
 END;
 
-     --  , YYYYMM                               AS "DataYM"             -- 年月份
-     --  , HP."CustNo"                          AS "CustNo"             -- 戶號
-     --  , NVL("CustMain"."CustId", ' ')        AS "CustId"             -- 借款人ID / 統編
-     --  , HP."FacmNo"                          AS "FacmNo"             -- 額度編號
-     --  , 0                                    AS "ApplNo"             -- 核准號碼
-     --  , 0                                    AS "CustKind"           -- 企業戶/個人戶
-     --  , 0                                    AS "ApproveDate"        -- 核准日期
-     --  , 0                                    AS "FirstDrawdownDate"  -- 初貸日期
-     --  , 0                                    AS "LineAmt"            -- 核准金額(台幣)
-     --  , ' '                                  AS "Ifrs9ProdCode"      -- 產品別
-     --  , 0                                    AS "AvblBal"            -- 可動用餘額(台幣)
-     --  , ' '                                  AS "RecycleCode"        -- 該筆額度是否可循環動用
-     --  , ' '                                  AS "IrrevocableFlag"    -- 該筆額度是否為不可徹銷
-     --  , ' '                                  AS "IndustryCode"       -- 主計處行業別代碼
-     --  , ' '                                  AS "OriRating"          -- 原始認列時時信用評等
-     --  , ' '                                  AS "OriModel"           -- 原始認列時信用評等模型
-     --  , ' '                                  AS "Rating"             -- 財務報導日時信用評等
-     --  , ' '                                  AS "Model"              -- 財務報導日時信用評等模型
-     --  , 0                                    AS "LGDModel"           -- 違約損失率模型
-     --  , 0                                    AS "LGD"                -- 違約損失率
-     --  , 0                                    AS "LineAmtCurr"        -- 核准金額(交易幣)
-     --  , 0                                    AS "AvblBalCurr"        -- 可動用餘額(交易幣)
 
 /

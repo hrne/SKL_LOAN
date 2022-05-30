@@ -12,12 +12,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.TxTranCodeService;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L6042")
 @Scope("prototype")
@@ -34,6 +36,8 @@ public class L6042 extends TradeBuffer {
 	public TxTranCodeService txTranCodeService;
 	@Autowired
 	public CdEmpService cdEmpService;
+	@Autowired
+	public TxDataLogService txDataLogService;
 	@Autowired
 	Parse parse;
 
@@ -65,6 +69,22 @@ public class L6042 extends TradeBuffer {
 				occursList.putParam("ODesc", tTxTranCode.getDesc());
 				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxTranCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxTranCode.getLastUpdate()));
 				occursList.putParam("OOLastEmp", tTxTranCode.getLastUpdateEmpNo() + " " + empName(titaVo, tTxTranCode.getLastUpdateEmpNo()));
+				
+				// 新增：歷程查詢按鈕，如果查無資料就不顯示按鈕
+				Slice<TxDataLog> slTxDataLog = null;
+				try {
+					slTxDataLog = txDataLogService.findByTranNo("L6402", "CODE:" + tTxTranCode.getTranNo(), 0, 1, titaVo);
+				} catch (Exception e) {
+					this.error("L6042 Exception when txDataLogService: " + e.getMessage());
+					throw new LogicException("E0013", "txDataLogService");
+				}
+				List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
+				if(lTxDataLog == null || lTxDataLog.isEmpty())
+					occursList.putParam("OOHasL6933", "N");
+				else
+					occursList.putParam("OOHasL6933", "Y");
+					
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

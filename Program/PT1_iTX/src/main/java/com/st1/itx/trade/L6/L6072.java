@@ -14,8 +14,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -41,6 +43,8 @@ public class L6072 extends TradeBuffer {
 	public CdBranchService sCdBranchService;
 	@Autowired
 	public CdEmpService cdEmpService;
+	@Autowired
+	public TxDataLogService txDataLogService;
 	@Autowired
 	Parse parse;
 
@@ -72,6 +76,21 @@ public class L6072 extends TradeBuffer {
 			occursList.putParam("OOBranchItem", tCdBranch.getBranchItem());
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBranch.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdBranch.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdBranch.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBranch.getLastUpdateEmpNo()));
+			
+			// 新增功能：歷程按鈕，如果查無資料就不顯示該按鈕
+			Slice<TxDataLog> slTxDataLog = null;
+			try {
+				slTxDataLog = txDataLogService.findByTranNo("L6702", "CODE:" + tCdBranch.getBranchNo(), 0, 1);
+			} catch(Exception e) {
+				this.error("L6702 Exeception When txDataLogService: " + e.getMessage());
+				throw new LogicException("E0013", "txDataLogService");
+			}
+			List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
+			if(lTxDataLog == null || lTxDataLog.isEmpty())
+				occursList.putParam("OOHasL6933", "N");
+			else
+				occursList.putParam("OOHasL6933", "Y");
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

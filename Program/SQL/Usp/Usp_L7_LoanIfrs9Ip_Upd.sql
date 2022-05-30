@@ -1,9 +1,9 @@
 
-CREATE OR REPLACE PROCEDURE "Usp_L7_LoanIfrs9Ip_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Ip_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Ip 每月IFRS9欄位清單9
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Ip_Upd"(20201231,'System',0);
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Ip_Upd"(20201231,'System',1);
 --
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -240,13 +240,11 @@ BEGIN
          , NVL(M."ApproveDate",0)                    AS "ApproveDate"       -- 核准日期(額度)
          , NVL(M."FirstDrawdownDate",0)              AS "FirstDrawdownDate" -- 初貸日期
          , NVL(M."LineAmt",0)                        AS "LineAmt"           -- 核准金額
-         --, NVL(M."AcctFee",0)                        AS "AcctFee"           -- 帳管費
          , CASE 
              WHEN TRUNC(NVL(M."FirstDrawdownDate",0) / 100) > YYYYMM   
                   THEN  NVL(M."AcctFee",0)
              ELSE 0
            END                                       AS "AcctFee"           -- 帳管費
---         , NVL(M."LawFee",0) + NVL(M."FireFee",0)    AS "Fee"               -- 法拍及火險費用
          , NVL(AF."AvgLawFee",0)
            + NVL(AF."AvgInsuFee",0)                  AS "Fee"               -- 法拍及火險費用
          , NVL(F."ApproveRate", 0) / 100             AS "ApproveRate"       -- 核准利率
@@ -278,6 +276,7 @@ BEGIN
                 WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 35 THEN  'D'  -- D=台中市
                 WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 65 THEN  'E'  -- E=台南市
                 WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 70 THEN  'F'  -- F=高雄市
+                WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 0  THE   ' '  -- 空白代表由使用者處理
                 ELSE 'G'                                            -- G=其他
            END                                       AS "CityCode"          -- 擔保品地區別
          , NVL(M."ProdNo", ' ')                      AS "ProdNo"            -- 商品利率代碼
@@ -372,37 +371,4 @@ BEGIN
   END;
 END;
 
-
---       , 0      AS "ApplNo"            -- 核准號碼
---       , 0      AS "DrawdownFg"        -- 已核撥記號 (0:未核撥 1:已核撥)
---       , 0      AS "ApproveDate"       -- 核准日期(額度)
---       , 0      AS "FirstDrawdownDate" -- 初貸日期
---       , 0      AS "LineAmt"           -- 核准金額
---       , 0      AS "AcctFee"           -- 帳管費
---       , 0      AS "Fee"               -- 法拍及火險費用
---       , 0      AS "ApproveRate"       -- 核准利率
---       , 0      AS "GracePeriod"       -- 初貸時約定還本寬限期
---       , ' '    AS "AmortizedCode"     -- 契約當時還款方式(月底日)
---       , ' '    AS "RateCode"          -- 契約當時利率調整方式(月底日)
---       , 0      AS "RepayFreq"         -- 契約約定當時還本週期(月底日)
---       , 0      AS "PayIntFreq"        -- 契約約定當時繳息週期(月底日)
---       , ' '    AS "IndustryCode"      -- 授信行業別
---       , ' '    AS "ClTypeJCIC"        -- 擔保品類別
---       , ' '    AS "CityCode"          -- 擔保品地區別
---       , ' '    AS "ProdNo"            -- 商品利率代碼
---       , 0      AS "CustKind"          -- 1=企業戶(含企金自然人)/2=個人戶
---       , ' '    AS "Ifrs9ProdCode"     -- 產品別
---       , 0      AS "EvaAmt"            -- 原始鑑價金額
---       , 0      AS "AvblBal"           -- 可動用餘額(台幣) = 核准金額(台幣) ???
---       , ' '    AS "RecycleCode"       -- 該筆額度是否可循環動用  -- 0:非循環 1:循環
---       , ' '    AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  -- 1=是 0=否
---       , ' '    AS "LoanTer"           -- 合約期限
---       , ' '    AS "AcCode"            -- 備忘分錄會計科目(8碼)
---       , 0      AS "AcCurcd"           -- 記帳幣別 1=台幣 2=美元 3=澳幣 4=人民幣 5=歐元
---       , ' '    AS "AcBookCode"        -- 會計帳冊 (1=一般 2=分紅 3=利變 4=OIU)
---       , ' '    AS "CurrencyCode"      -- 交易幣別 NTD
---       , 0      AS "ExchangeRate"      -- 報導日匯率
---       , 0      AS "LineAmtCurr"       -- 核准金額(交易幣) (後面再更新)
---       , 0      AS "AcctFeeCurr"       -- 帳管費(交易幣) (後面再更新)
---       , 0      AS "FeeCurr"           -- 法拍及火險費用(交易幣) (後面再更新)
 
