@@ -59,7 +59,6 @@ public class AcLoanRenewCom extends TradeBuffer {
 	private int iNewBormNo = 0;
 
 	/*----------- 更新會計借新還舊檔 -------------- */
-	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("AcLoanRenewCom ... ");
 
@@ -113,6 +112,9 @@ public class AcLoanRenewCom extends TradeBuffer {
 			tTempVo = tTempVo.getVo(acRv.getJsonFields());
 			// 1:展期(新額度) 2:借新還舊(同額度)
 			if ("1".equals(tTempVo.get("CaseCloseCode")) || "2".equals(tTempVo.get("CaseCloseCode"))) {
+				if (acRv.getLastAcDate() != ac.getAcDate()) {
+					continue;
+				}
 				tAcLoanRenewId = new AcLoanRenewId();
 				tAcLoanRenewId.setCustNo(acRv.getCustNo());
 				tAcLoanRenewId.setNewFacmNo(iNewFacmNo); // 0123456-890-234

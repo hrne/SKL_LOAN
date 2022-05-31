@@ -159,7 +159,7 @@ public class L5053 extends TradeBuffer {
 				
 				// 歷程按鈕顯示與否
 				// 邏輯同 L6933
-				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5503", FormatUtil.pad9(MapL5053.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5053.get("F3"), 3) + "-" + FormatUtil.pad9(MapL5053.get("F4"), 3), 0,
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5503", FormatUtil.pad9(MapL5053.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5053.get("F3"), 3) + "-" + FormatUtil.pad9(MapL5053.get("F4"), 3) + "-1", 0,
 						1, titaVo);
 				
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;

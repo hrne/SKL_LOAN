@@ -521,6 +521,7 @@ INVOKEJS(SHOW,p8,0)
 HIDE(#UsDrawdownAmt,#LbUsAcctFee,#UsFinalBal,#UsPieceCodeSecondAmt)
 
 #BeforeDrawdownAmt=m,14.2,S
+C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
 
 ![登放記號]
 #FdActFg=X,2,L
@@ -1709,7 +1710,6 @@ C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)
 
 #RateIncr=+n,2.4,L
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
-C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
                   
 ![核准利率]
 !依核准額度自動顯示不必輸入 L2R05

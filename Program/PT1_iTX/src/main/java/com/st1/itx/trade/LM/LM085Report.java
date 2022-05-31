@@ -144,8 +144,9 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(7, 6);
 		makeExcel.formulaCalculate(8, 6);
 		makeExcel.formulaCalculate(9, 6);
-
-		makeExcel.formulaCalculate(7, 9);
+		
+		makeExcel.formulaCalculate(8, 7);
+		makeExcel.formulaCalculate(9, 7);
 
 		makeExcel.formulaCalculate(10, 2);
 		makeExcel.formulaCalculate(10, 3);
@@ -285,7 +286,7 @@ public class LM085Report extends MakeReport {
 	private void exportPart4(List<Map<String, String>> dataList, int dataSize) throws LogicException {
 
 		int col = 0;
-		int varRow = 41;
+		int vaRow = 41;
 		BigDecimal amt = BigDecimal.ZERO;
 
 		// 最少11列數，最多14列數，基礎為11個列數 根據資料筆數 做插入多少列
@@ -324,31 +325,31 @@ public class LM085Report extends MakeReport {
 			}
 
 			// 年月
-			makeExcel.setValue(varRow, 1, yearMonthText, "C");
+			makeExcel.setValue(vaRow, 1, yearMonthText, "C");
 
 			// 放款餘額
 			col = enToNumber(r.get("F1").toString());
 			amt = getBigDecimal(r.get("F2").toString());
 
-			makeExcel.setValue(varRow, col, amt, "#,###.##0", "R");
+			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
 
 			// 逾放總額
 			col = enToNumber(r.get("F3").toString());
 			amt = getBigDecimal(r.get("F4").toString());
 
-			makeExcel.setValue(varRow, col, amt, "#,###.##0", "R");
+			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
 
 			// 逾放比
-			makeExcel.setValue(varRow, 6, getBigDecimal(r.get("F4").toString())
+			makeExcel.setValue(vaRow, 6, getBigDecimal(r.get("F4").toString())
 					.divide(getBigDecimal(r.get("F2").toString()), 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
 
 			// 當年度轉呆金額
 			col = enToNumber(r.get("F5").toString());
 			amt = getBigDecimal(r.get("F6").toString());
 
-			makeExcel.setValue(varRow, col, amt, "#,###.##0", "R");
+			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
 
-			varRow++;
+			vaRow++;
 		}
 
 //		for (int r = 45; r <= 55; r++) {
@@ -360,12 +361,12 @@ public class LM085Report extends MakeReport {
 //			makeExcel.formulaCalculate(57, c);
 //		}
 		
-		makeExcel.formulaCalculate(varRow, 2);
-		makeExcel.formulaCalculate(varRow, 4);
-		makeExcel.formulaCalculate(varRow, 6);
-		makeExcel.formulaCalculate(varRow+1, 2);
-		makeExcel.formulaCalculate(varRow+1, 4);
-		makeExcel.formulaCalculate(varRow+1, 6);
+		makeExcel.formulaCalculate(vaRow, 2);
+		makeExcel.formulaCalculate(vaRow, 4);
+		makeExcel.formulaCalculate(vaRow, 6);
+		makeExcel.formulaCalculate(vaRow+1, 2);
+		makeExcel.formulaCalculate(vaRow+1, 4);
+		makeExcel.formulaCalculate(vaRow+1, 6);
 		
 
 	}

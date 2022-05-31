@@ -265,12 +265,6 @@ public class LoanCom extends TradeBuffer {
 		// 訂正轉換資料為帳務交易
 		if ("L3240".equals(titaVo.getTxcd()) || "L3250".equals(titaVo.getTxcd())) {
 			tLoanBorTx2.setDisplayflag("A");
-		} else {
-			if ("Y".equals(tLoanBorTx2.getDisplayflag())) {
-				tLoanBorTx2.setDisplayflag("Y");
-			} else {
-				tLoanBorTx2.setDisplayflag("A");
-			}
 		}
 		tLoanBorTx2.setLoanBal(iLoanBal);
 		try {
@@ -1240,12 +1234,13 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
-	 *  更新疑似洗錢交易訪談記錄檔
-	 * @param iCustNo 戶號
-	 * @param iFacmNo 額度
-	 * @param iBormNo 撥款
+	 * 更新疑似洗錢交易訪談記錄檔
+	 * 
+	 * @param iCustNo    戶號
+	 * @param iFacmNo    額度
+	 * @param iBormNo    撥款
 	 * @param iEntryDate 入帳日
-	 * @param iRepayAmt 還款金額
+	 * @param iRepayAmt  還款金額
 	 * @param titaVo
 	 * @throws LogicException
 	 */

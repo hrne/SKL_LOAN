@@ -1133,7 +1133,7 @@ IF(#FirstRateAdjDate1 > 0 && #FirstRateAdjDate1 < #SYSDATE,S,$)
 D(8)
 @IF(#RateCode1=="3" && #RateCode2=="" && #RateAdjFreq2=="" && #FirstRateAdjDate2==0,s,$)
 A(DATE,0,#FirstRateAdjDate2)
-V(5,#SYSDATE,#L3r02MaturityDate)
+V(5,#L3r02DrawdownDate,#L3r02MaturityDate)
 !V(2,#FirstRateAdjDate1)
 
 #FirstRateAdjDateY=X,1,L
