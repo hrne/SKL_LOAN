@@ -47,9 +47,6 @@ public interface FacCloseRepositoryMon extends JpaRepository<FacClose, FacCloseI
   // ApplDate >= ,AND ApplDate <=
   public Slice<FacClose> findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int applDate_0, int applDate_1, Pageable pageable);
 
-  // CloseDate > ,AND ReceiveFg = ,AND ReceiveDate <=
-  public Slice<FacClose> findAllByCloseDateGreaterThanAndReceiveFgIsAndReceiveDateLessThanEqualOrderByCustNoAscFacmNoAsc(int closeDate_0, int receiveFg_1, int receiveDate_2, Pageable pageable);
-
   // CustNo >= ,AND CustNo <= 
   public Slice<FacClose> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, int custNo_1, Pageable pageable);
 

@@ -210,7 +210,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		GROUP BY CASE";
 		sql += "				   WHEN M.\"DepartmentCode\" = '1' AND M.\"AcctCode\" <> '990' ";
 		sql += "				   THEN 3 ";
-		sql += "			     ELSE 4 END ";
+		sql += "			     ELSE 2 END ";
 		sql += "		UNION";
 		sql += "		SELECT 2 AS \"DepartmentCode\"";
 		sql += "			  ,NVL(\"Value\",0) AS \"Value\"";
@@ -270,7 +270,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	public List<Map<String, String>> findPart2_3(TitaVo titaVo, int yearMonth) throws Exception {
-		this.info("LM085ServiceImpl findPart2_1 ");
+		this.info("LM085ServiceImpl findPart2_3 ");
 		//上個年月
 		int lyeatMonth = ymd(yearMonth,-1) / 100;
 		//下月1號

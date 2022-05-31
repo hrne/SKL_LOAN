@@ -55,6 +55,7 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT CE.\"EmployeeNo\" ";                              // 員工編號
 		sql += "      , CE.\"AgentId\"    	AS \"AgentId\"";                                 // 身分證字號
 		sql += "      , CE.\"Fullname\"   	AS \"Fullname\"";                                // 員工姓名
+		sql += "      , CE.\"AgLevel\"    	AS \"EmployeeAgLevel\" ";  // 上一級主管職等
 		sql += "      , S1.\"AgLevel\"    	AS \"FirstSuperiorAgLevel\" ";  // 上一級主管職等
 		sql += "      , S1.\"EmployeeNo\"  	AS \"FirstSuperiorEmpNo\" ";     // 上一級主管編號
 		sql += "      , S1.\"Fullname\"   	AS \"FirstSuperiorName\" ";     // 上一級主管姓名

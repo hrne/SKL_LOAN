@@ -35,6 +35,12 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
+/**
+ * Tita<br>
+ * ENTRYDATE=9,7<br>
+ * END=X,1<br>
+ */
+
 @Service("L2077")
 @Scope("prototype")
 /**
@@ -227,7 +233,7 @@ public class L2077 extends TradeBuffer {
 				occursList.putParam("OOAllCloseFg", "N");
 			}
 			occursList.putParam("OORepayFg", wkRepayFg);
-			occursList.putParam("OOReceiveFg", tmpFacClose.getReceiveFg());
+			occursList.putParam("OOReceiveFg", "0");
 			
 			// L6932 用的參數
 			titaVo.putParam("ST_DT", "0010101");

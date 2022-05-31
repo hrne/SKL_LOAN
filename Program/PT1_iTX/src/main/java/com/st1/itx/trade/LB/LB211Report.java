@@ -84,13 +84,42 @@ public class LB211Report extends MakeReport {
 
 		// 應繳日SpecificDd > strTodaydd 且 第10個欄位RepayCode > 0 且 Status不是(2,6)
 		for (Map<String, String> t : LBList) {
-			if (parse.stringToInteger(t.get("SpecificDd")) > parse.stringToInteger(strTodaydd)
-					&& parse.isNumeric(t.get("RepayCode")) && parse.stringToInteger(t.get("Status")) != 2
+			if (parse.isNumeric(t.get("RepayCode")) && parse.stringToInteger(t.get("Status")) != 2
 					&& parse.stringToInteger(t.get("Status")) != 6) {
-
 				if (parse.stringToInteger(t.get("RepayCode")) > 0) {
-//					t.put("RepayCode", "" + (parse.stringToInteger(t.get("RepayCode")) - 1));
-					t.put("F9", "" + (parse.stringToInteger(t.get("RepayCode")) - 1));
+
+					int day = parse.stringToInteger(t.get("NextPayIntDate").substring(1, 3)) * 12
+							+ parse.stringToInteger(t.get("NextPayIntDate").substring(3, 5));
+					int term = parse.stringToInteger(strToday.substring(1, 3)) * 12 + parse.stringToInteger(strTodayMM)
+							- day;
+					
+					this.info("NextPayIntDate = " + t.get("NextPayIntDate"));
+					this.info("day = " + day);
+					this.info("term = " + term);
+					this.info("SpecificDd = " + t.get("SpecificDd"));
+					this.info("strTodaydd = " + parse.stringToInteger(strTodaydd));
+					
+					if (parse.stringToInteger(t.get("SpecificDd")) > parse.stringToInteger(strTodaydd)) {
+						if (term == 0) {
+							t.put("F9", "" + term);
+						} else {
+							// 不能小於0且大於6
+							if (term - 1 >= 6) {
+								t.put("F9", "6");
+							} else {
+								t.put("F9", "" + (term - 1));
+							}
+						}
+					} else {
+
+						// 不能小於0且大於6
+						if (term >= 6) {
+							t.put("F9", "6");
+						} else {
+							t.put("F9", "" + term);
+						}
+					}
+
 				}
 			}
 

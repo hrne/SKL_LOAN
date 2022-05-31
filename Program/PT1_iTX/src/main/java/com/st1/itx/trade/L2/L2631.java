@@ -70,15 +70,15 @@ public class L2631 extends TradeBuffer {
 
 	/* 報表服務注入 */
 	@Autowired
-	public L2076Report L2076Report;
+	public L2634ReportA L2076Report;
 	@Autowired
-	public L2076ReportB L2076ReportB;
+	public L2634ReportB L2076ReportB;
 	@Autowired
-	public L2076ReportC L2076ReportC;
+	public L2634ReportC L2076ReportC;
 	@Autowired
-	public L2076ReportD L2076ReportD;
+	public L2634ReportD L2076ReportD;
 	@Autowired
-	public L2076ReportE L2076ReportE;
+	public L2634ReportE L2076ReportE;
 
 	/* 轉換工具 */
 	@Autowired
@@ -190,7 +190,6 @@ public class L2631 extends TradeBuffer {
 		tFacClose.setTelNo3(titaVo.getParam("TelNo3"));
 		tFacClose.setCloseReasonCode(titaVo.getParam("CloseReasonCode"));
 		tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
-		tFacClose.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
 		tFacClose.setEntryDate(iTranDate);
 		tFacClose.setRmk(titaVo.getParam("Rmk1"));
 		// **[清償違約金即時收取]部分償還時一律記短收，連同下期期款收回，提前結案時計算清償違約金併入結案金額。
@@ -260,10 +259,9 @@ public class L2631 extends TradeBuffer {
 			}
 
 			BeforeFacClose = sFacCloseService.holdById(new FacCloseId(iCustNo, iCloseNo), titaVo);
-			BeforeFacClose.setReceiveFg(1);
 			// 自動取公文編號
 			this.txBuffer.getTxCom();
-			wkDocNo = gGSeqCom.getSeqNo(titaVo.getEntDyI()/10000, 1, "L2", "2631", 9999, titaVo);
+			wkDocNo = gGSeqCom.getSeqNo(titaVo.getEntDyI() / 10000, 1, "L2", "2631", 9999, titaVo);
 			String finalDocNo = StringUtils.leftPad(String.valueOf(wkDocNo), 4, "0");
 
 			this.info("BeforeFacClose = " + BeforeFacClose);
@@ -280,9 +278,6 @@ public class L2631 extends TradeBuffer {
 			tFacClose.setDocNo(parse.stringToInteger(docNo));
 			tFacClose.setClsNo(BeforeFacClose.getClsNo());
 			tFacClose.setRmk(titaVo.getParam("Rmk1"));
-			tFacClose.setClCode1(parse.stringToInteger(titaVo.getParam("OOClCode1")));
-			tFacClose.setClCode2(parse.stringToInteger(titaVo.getParam("OOClCode2")));
-			tFacClose.setClNo(parse.stringToInteger(titaVo.getParam("OOClNo")));
 		}
 		this.info("tFacClose  = " + tFacClose);
 		try {
@@ -293,8 +288,6 @@ public class L2631 extends TradeBuffer {
 
 		if ("7".equals(titaVo.getParam("RpFg"))) {
 
-			pdfSnoF = doRpt(titaVo, tFacClose);
-			this.info("PdfSnoF 清償作業: " + pdfSnoF);
 
 			try {
 				sFacCloseService.update(BeforeFacClose, titaVo);
@@ -337,17 +330,9 @@ public class L2631 extends TradeBuffer {
 									+ titaVo.getKinbr() + " 交易員代號 = " + titaVo.getTlrNo() + " 交易序號 = " + t3txtNo); // 查詢資料不存在
 				}
 
-				doRptB(tFacClose, lTxTemp, titaVo);// 用印申請書
-				doRptC(tFacClose, titaVo.get("selectTotal"), titaVo); // 簽收回條
-				if (tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
-						|| tFacClose.getCollectWayCode().equals("27")) {
-					doRptD(tFacClose, titaVo.get("Addres"), titaVo);// 雙掛號信封
-					doRptE(tFacClose, titaVo.get("Addres"), titaVo);// 雙掛號小單
-				}
-
 				String checkMsg = "抵押權塗銷同意書已完成。";
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo()+"L2631", checkMsg, titaVo);
+						titaVo.getTlrNo() + "L2631", checkMsg, titaVo);
 			}
 		}
 
@@ -355,55 +340,6 @@ public class L2631 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	public long doRpt(TitaVo titaVo, FacClose tFacClose) throws LogicException {
-		this.info("L2076 doRpt started.");
-
-		// 撈資料組報表
-		L2076Report.exec(titaVo, tFacClose);
-
-		// 寫產檔記錄到TxReport
-		long rptNo = L2076Report.close();
-
-		// 產生PDF檔案
-		L2076Report.toPdf(rptNo);
-
-		this.info("L2076 doRpt finished.");
-		return rptNo;
-	}
-
-	public void doRptB(FacClose tFacClose, List<TxTemp> txTemp, TitaVo titaVo) throws LogicException {
-		this.info("L2076B doRptB started.");
-
-		// 撈資料組報表
-		L2076ReportB.exec(tFacClose, txTemp, titaVo);
-
-	}
-
-	public void doRptC(FacClose tFacClose, String selectTotal, TitaVo titaVo)
-			throws LogicException {
-		this.info("L2076C doRptC started.");
-
-		// 撈資料組報表
-		L2076ReportC.exec(tFacClose, selectTotal, titaVo);
-
-	}
-
-	public void doRptD(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
-		this.info("L2076D doRptD started.");
-
-		// 撈資料組報表
-		L2076ReportD.exec(tFacClose, Addres, titaVo);
-
-	}
-
-	public void doRptE(FacClose tFacClose, String Addres, TitaVo titaVo) throws LogicException {
-		this.info("L2076E doRptE started.");
-
-		// 撈資料組報表
-		L2076ReportE.exec(tFacClose, Addres, titaVo);
-
 	}
 
 	public void setTxTemp(String txtNo, TitaVo titaVo) throws LogicException {

@@ -54,7 +54,7 @@ public class L9710p extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info("L9710p titaVo.getTxcd() = " + titaVo.getTxcd());
-
+	
 		String parentTranCode = titaVo.getTxcd();
 
 		l9710Report.setParentTranCode(parentTranCode);
@@ -62,9 +62,12 @@ public class L9710p extends TradeBuffer {
 //		List<Map<String, String>> l9710List = l9710Report.exec(titaVo);
 		List<Map<String, String>> l9710List = null;
 
+		//帳務日(西元)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
+		
 		try {
 
-			l9710List = l9710ServiceImpl.findAll(titaVo);
+			l9710List = l9710ServiceImpl.findAll(titaVo,tbsdy);
 
 		} catch (Exception e) {
 
@@ -79,7 +82,7 @@ public class L9710p extends TradeBuffer {
 			// 0000000多列印一個寬限到期明細表
 			if (iCUSTNO.equals("0000000")) {
 				this.info("active L9710report data detail");
-				l9710Report.exec(titaVo);
+				l9710Report.exec(titaVo,tbsdy);
 
 				infoNotification = "L9710寬限到期明細表已完成";
 				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",

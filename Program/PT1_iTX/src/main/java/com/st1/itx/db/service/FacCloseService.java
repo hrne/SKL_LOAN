@@ -129,19 +129,6 @@ public interface FacCloseService {
   public Slice<FacClose> findApplDateEq(int applDate_0, int applDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CloseDate &gt; ,AND ReceiveFg = ,AND ReceiveDate &lt;=
-   *
-   * @param closeDate_0 closeDate_0
-   * @param receiveFg_1 receiveFg_1
-   * @param receiveDate_2 receiveDate_2
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice FacClose FacClose of List
-   */
-  public Slice<FacClose> findClosedAndReceived(int closeDate_0, int receiveFg_1, int receiveDate_2, int index, int limit, TitaVo... titaVo);
-
-  /**
    * CustNo &gt;= ,AND CustNo &lt;= 
    *
    * @param custNo_0 custNo_0

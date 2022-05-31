@@ -224,16 +224,16 @@ public class L3005 extends TradeBuffer {
 			relNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());
-			if ("1".equals(ln.getTitaHCode()) || "3".equals(ln.getTitaHCode())) {
+//			if ("1".equals(ln.getTitaHCode()) || "3".equals(ln.getTitaHCode())) {
 //				if ("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
 //						|| "L3230".equals(ln.getTitaTxCd())) {
 //					occursList.putParam("OODesc", "暫收款訂正");
 //				} else {
 //					occursList.putParam("OODesc", "訂正");
 //				}
-			} else {
+//			} else {
 				occursList.putParam("OODesc", ln.getDesc());
-			}
+//			}
 			// 先確認此戶有備忘錄 有才給備忘錄按鈕
 			
 			occursList.putParam("OOFacmNo", ln.getFacmNo());

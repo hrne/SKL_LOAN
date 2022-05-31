@@ -33,18 +33,22 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo,int iAcDate) throws Exception {
 
 		this.info("L9710.findAll");
 
 		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
 		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000);
 		String iCUSTNO = titaVo.get("CustNo");
-
+	 
+		
+		
+		
 		this.info("iSDAY:" + iSDAY + ",iEDAY:" + iEDAY + ",iCUSTNO:" + iCUSTNO);
+		this.info("iAcDate:" + iAcDate );
 
 		String sql = " SELECT * ";
-		sql += "       FROM ( SELECT               ' ' F0";
+		sql += "       FROM ( SELECT   ' ' F0";
 		sql += "                     , Cl.\"CityCode\" AS \"CityCode\"";
 		sql += "                     , Ci.\"CityItem\" AS \"CityItem\"";
 		sql += "                     , E.\"Fullname\"  AS \"Fullname\"";
@@ -57,23 +61,13 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                     , M.\"LoanBal\"   AS \"LoanBal\"";
 		sql += "                     , F.\"FirstDrawdownDate\"  AS \"FirstDrawdownDate\"";
 		sql += "                     , M.\"PrevPayIntDate\"     AS \"PrevPayIntDate\"";
-		sql += "                     , RES.\"FitRate\"          AS \"StoreRate\"";
+		sql += "                     , M.\"StoreRate\"          AS \"StoreRate\"";
 		sql += "					 ,DECODE(T.\"TelArea\",NULL,T.\"TelNo\",T.\"TelArea\" || '-' || T.\"TelNo\") AS \"TelNo\"";
 		sql += "                     , T.\"LiaisonName\"   AS \"LiaisonName\"";
 		sql += "                     , M.\"NextRepayDate\" AS \"NextRepayDate\"";
 		sql += "        			 ,C.\"CurrZip3\"       AS \"CurrZip3\"";
 		sql += "        			 ,C.\"CurrZip2\"       AS \"CurrZip2\"";
-		sql += "        			 ,C2.\"CityItem\" ";
-		sql += "        			 || C3.\"AreaItem\"";
-		sql += "        			 || C.\"CurrRoad\"";
-		sql += "        			 || DECODE(C.\"CurrSection\",NULL,'',C.\"CurrSection\" || '段')";
-		sql += "        			 || DECODE(C.\"CurrAlley\",NULL,'',C.\"CurrAlley\" || '巷')";
-		sql += "        			 || DECODE(C.\"CurrLane\",NULL,'',C.\"CurrLane\" || '弄')";
-		sql += "        			 || DECODE(C.\"CurrNumDash\",NULL";
-		sql += "								   ,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '號')";
-		sql += "								   ,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '之') || C.\"CurrNumDash\" || '號')";
-		sql += "        			 || DECODE(C.\"CurrFloor\",NULL,'',C.\"CurrFloor\" || '樓')";
-		sql += "        			 || DECODE(C.\"CurrFloorDash\",NULL,'','之' || C.\"CurrFloorDash\") AS F19";
+		sql += "        			 ,CB.\"BdLocation\" AS \"BdLocation\"";
 		sql += "        			 ,CC.\"Item\" AS \"Item\"";
 		sql += "                     , ROW_NUMBER() OVER ( PARTITION BY M.\"CustNo\", M.\"FacmNo\"";
 		sql += "                                               ORDER BY T.\"TelTypeCode\") AS SEQ";
@@ -81,10 +75,10 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           , M.\"FacmNo\"";
 		sql += "                           , M.\"BormNo\"";
 		sql += "                           , M.\"GraceDate\"";
-		sql += "                           , M2.\"LoanBal\"";
+		sql += "                           , M.\"LoanBal\"";
 		sql += "                           , M.\"PrevPayIntDate\"";
-		sql += "                           , M.\"StoreRate\"";
 		sql += "                           , M.\"NextRepayDate\"";
+		sql += "                           , RES.\"FitRate\" AS \"StoreRate\"";
 		sql += "                     FROM \"LoanBorMain\" M ";
 		sql += "                     LEFT JOIN (";
 		sql += "						  SELECT \"CustNo\"";
@@ -101,6 +95,21 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             					  ,\"FacmNo\"";
 		sql += "                     ) M2 ON M2.\"CustNo\" = M.\"CustNo\"";
 		sql += "                     	 AND M2.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "	  		  		 LEFT JOIN (SELECT \"CustNo\"";
+		sql += "					   		   		  ,\"FacmNo\"";
+		sql += "					           		  ,\"BormNo\"";
+		sql += "					   		   	  	  ,\"EffectDate\"";
+		sql += "					   		   		  ,\"FitRate\"";
+		sql += "					   		   		  ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\"";
+		sql += "													   	       		  ,\"FacmNo\"";
+		sql += "													           		  ,\"BormNo\"";
+		sql += "										       				 ORDER BY \"EffectDate\" DESC) AS \"SEQ\"";
+		sql += "				 				FROM \"LoanRateChange\"";
+		sql += "				 				WHERE \"EffectDate\" <= :iDate ";
+		sql += "				 			   )RES ON RES.\"CustNo\" = M.\"CustNo\"";
+		sql += "				    			   AND RES.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "								   AND RES.\"BormNo\" = M.\"BormNo\"";
+		sql += "								   AND RES.\"SEQ\" = 1";
 		sql += "                     WHERE M.\"GraceDate\"  >= :isday";
 		sql += "                       AND  M.\"GraceDate\"  <= :ieday";
 		sql += "                       AND  M.\"LoanBal\"  > 0";
@@ -108,19 +117,6 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                       AND  M.\"CustNo\"     =  :icustno";
 		}
 		sql += "                                                           ) M";
-		sql += "	  		  LEFT JOIN (SELECT \"CustNo\"";
-		sql += "					   		   ,\"FacmNo\"";
-		sql += "					           ,\"BormNo\"";
-		sql += "					   		   ,\"EffectDate\"";
-		sql += "					   		   ,\"FitRate\"";
-		sql += "					   		   ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\"";
-		sql += "													   	       ,\"FacmNo\"";
-		sql += "													           ,\"BormNo\"";
-		sql += "										       					 ORDER BY \"EffectDate\" DESC) AS \"SEQ\"";
-		sql += "				 FROM \"LoanRateChange\" )RES ON RES.\"CustNo\" = M.\"CustNo\"";
-		sql += "				    						 AND RES.\"FacmNo\" = M.\"FacmNo\"";
-		sql += "								  			 AND RES.\"BormNo\" = M.\"BormNo\"";
-		sql += "								  			 AND RES.\"SEQ\" = 1";
 		sql += "              LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
 		sql += "              LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                                     AND F.\"FacmNo\" = M.\"FacmNo\"";
@@ -131,9 +127,9 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     AND Cl.\"ClCode2\" =  CF.\"ClCode2\"";
 		sql += "                                     AND Cl.\"ClNo\"    =  CF.\"ClNo\"";
 		sql += "              LEFT JOIN \"CdCity\" Ci ON Ci.\"CityCode\" =  Cl.\"CityCode\"";
-		sql += "              LEFT JOIN \"CdCity\" C2 ON C2.\"CityCode\" =  C.\"CurrCityCode\"";
-		sql += "              LEFT JOIN \"CdArea\" C3 ON C3.\"CityCode\" =  C.\"CurrCityCode\"";
-		sql += "                                     AND C3.\"AreaCode\" =  C.\"CurrAreaCode\"";
+		sql += "              LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" =  CF.\"ClCode1\"";
+		sql += "                                         AND CB.\"ClCode2\" =  CF.\"ClCode2\"";
+		sql += "                                         AND CB.\"ClNo\"    =  CF.\"ClNo\"";
 		sql += "              LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" =  F.\"BusinessOfficer\"";
 		sql += "			  LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'RepayCode'";
 		sql += "						   		     AND CC.\"Code\" = F.\"RepayCode\"";
@@ -153,6 +149,8 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("isday", iSDAY);
 		query.setParameter("ieday", iEDAY);
+		query.setParameter("iDate", iAcDate);
+		
 		if (!iCUSTNO.equals("0000000")) {
 			query.setParameter("icustno", iCUSTNO);
 		}

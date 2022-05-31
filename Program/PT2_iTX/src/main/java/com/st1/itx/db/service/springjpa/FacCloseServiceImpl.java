@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -309,34 +312,6 @@ em = null;
       slice = facCloseReposHist.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(applDate_0, applDate_1, pageable);
     else 
       slice = facCloseRepos.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(applDate_0, applDate_1, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<FacClose> findClosedAndReceived(int closeDate_0, int receiveFg_1, int receiveDate_2, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<FacClose> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findClosedAndReceived " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " receiveFg_1 : " +  receiveFg_1 + " receiveDate_2 : " +  receiveDate_2);
-    if (dbName.equals(ContentName.onDay))
-      slice = facCloseReposDay.findAllByCloseDateGreaterThanAndReceiveFgIsAndReceiveDateLessThanEqualOrderByCustNoAscFacmNoAsc(closeDate_0, receiveFg_1, receiveDate_2, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = facCloseReposMon.findAllByCloseDateGreaterThanAndReceiveFgIsAndReceiveDateLessThanEqualOrderByCustNoAscFacmNoAsc(closeDate_0, receiveFg_1, receiveDate_2, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = facCloseReposHist.findAllByCloseDateGreaterThanAndReceiveFgIsAndReceiveDateLessThanEqualOrderByCustNoAscFacmNoAsc(closeDate_0, receiveFg_1, receiveDate_2, pageable);
-    else 
-      slice = facCloseRepos.findAllByCloseDateGreaterThanAndReceiveFgIsAndReceiveDateLessThanEqualOrderByCustNoAscFacmNoAsc(closeDate_0, receiveFg_1, receiveDate_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

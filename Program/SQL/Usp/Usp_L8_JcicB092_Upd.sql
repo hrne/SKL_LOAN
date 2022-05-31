@@ -423,17 +423,25 @@ BEGIN
       AND  M."ClActNo" IS NOT NULL
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')         -- 主要擔保品為不動產
       AND  SUBSTR(CD2."ClTypeJCIC",1,1) IN ('2')            -- 擔保品為不動產
---    AND  L."ClNo" IS NOT NULL
-      --AND  NVL(L."LandNo1", 0) > 0
-      AND  ( NVL(CLL."LandNo1", 0)   > 0 OR NVL(CLL."LandNo2", 0)   > 0 OR
-             NVL(B."BdNo1", 0) > 0 OR NVL(B."BdNo2", 0) > 0 )
-      AND ( ( CM."ClCode1" NOT IN (1) ) OR
-            ( CM."ClCode1" IN (1) AND ( NVL(B."BdNo1", 0) > 0 OR
-                                        NVL(B."BdNo2", 0) > 0 ) )
-          )
---and M."FacmNo" = '1285192004'
---order by L."CityCode", L."AreaCode", L."IrCode",
---         L."LandNo1", L."LandNo2", B."BdNo1", B."BdNo2"
+      AND  CASE
+             WHEN CM."ClCode1" != 1
+             THEN 1
+             WHEN CM."ClCode1" = 1
+             THEN CASE
+                    WHEN NVL(B."BdNo1",0) != 0
+                         AND NVL(CLL."LandNo1",0) != 0
+                    THEN 1
+                    WHEN NVL(B."BdNo1",0) != 0
+                         AND NVL(CLL."LandNo2",0) != 0
+                    THEN 1
+                    WHEN NVL(B."BdNo2",0) != 0
+                         AND NVL(CLL."LandNo1",0) != 0
+                    THEN 1
+                    WHEN NVL(B."BdNo2",0) != 0
+                         AND NVL(CLL."LandNo2",0) != 0
+                    THEN 1
+                  ELSE 0 END
+           ELSE 0 END = 1
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;

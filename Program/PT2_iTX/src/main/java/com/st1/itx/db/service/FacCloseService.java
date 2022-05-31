@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.FacClose;
@@ -127,19 +129,6 @@ public interface FacCloseService {
    * @return Slice FacClose FacClose of List
    */
   public Slice<FacClose> findApplDateEq(int applDate_0, int applDate_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CloseDate &gt; ,AND ReceiveFg = ,AND ReceiveDate &lt;=
-   *
-   * @param closeDate_0 closeDate_0
-   * @param receiveFg_1 receiveFg_1
-   * @param receiveDate_2 receiveDate_2
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice FacClose FacClose of List
-   */
-  public Slice<FacClose> findClosedAndReceived(int closeDate_0, int receiveFg_1, int receiveDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo &gt;= ,AND CustNo &lt;= 

@@ -118,7 +118,7 @@ public class L9710Report extends MakeReport {
 //		this.setMaxRows(45);
 //	}
 
-	public List<Map<String, String>> exec(TitaVo titaVo) throws LogicException {
+	public List<Map<String, String>> exec(TitaVo titaVo, int iAcDate) throws LogicException {
 
 		this.info("L9710Report exec");
 
@@ -126,7 +126,7 @@ public class L9710Report extends MakeReport {
 
 		try {
 			
-			l9710List = l9710ServiceImpl.findAll(titaVo);
+			l9710List = l9710ServiceImpl.findAll(titaVo,iAcDate);
 			
 		} catch (Exception e) {
 			

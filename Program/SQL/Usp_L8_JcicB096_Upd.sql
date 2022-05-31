@@ -103,9 +103,18 @@ BEGIN
       LEFT JOIN "ClFac" CF2 ON CF2."CustNo"    = CF1."CustNo"
                            AND CF2."FacmNo"    = CF1."FacmNo"
                            AND CF2."MainFlag"  = 'Y'
-      LEFT JOIN "ClLand"  L    ON L."ClCode1"     = CF2."ClCode1"
-                              AND L."ClCode2"     = CF2."ClCode2"
-                              AND L."ClNo"        = CF2."ClNo"
+      LEFT JOIN "ClLand"  L    ON L."ClCode1"     = CASE
+                                                      WHEN to_number(SUBSTR(M."ClActNo",1,1)) = 1 -- 房地擔保品
+                                                      THEN CF2."ClCode1"
+                                                    ELSE to_number(SUBSTR(M."ClActNo",1,1)) END
+                              AND L."ClCode2"     = CASE
+                                                      WHEN to_number(SUBSTR(M."ClActNo",1,1)) = 1 -- 房地擔保品
+                                                      THEN CF2."ClCode2"
+                                                    ELSE to_number(SUBSTR(M."ClActNo",2,2)) END
+                              AND L."ClNo"        = CASE
+                                                      WHEN to_number(SUBSTR(M."ClActNo",1,1)) = 1 -- 房地擔保品
+                                                      THEN CF2."ClNo"
+                                                    ELSE to_number(SUBSTR(M."ClActNo",4,7)) END
                               AND L."LandNo1"     = M."LandNo1"
                               AND L."LandNo2"     = M."LandNo2"
       LEFT JOIN "Work_B096_Sum" WK2 ON to_number(SUBSTR(WK2."MainClActNo",1,1)) = CF2."ClCode1" 

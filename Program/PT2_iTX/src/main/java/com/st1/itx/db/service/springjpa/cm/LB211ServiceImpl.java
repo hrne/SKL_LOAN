@@ -77,6 +77,7 @@ public class LB211ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , M.\"Filler18\"   ";
 		sql += "     , LB.\"SpecificDd\"";
 		sql += "     , LB.\"Status\"    ";
+		sql += "     , CASE WHEN LB.\"NextPayIntDate\" - 19110000 > 0  THEN LB.\"NextPayIntDate\" - 19110000 ELSE 0 END  AS  \"NextPayIntDate\"";
 		sql += "   FROM  \"JcicB211\" M ";
 		sql += "   LEFT JOIN \"LoanBorMain\" LB ON LB.\"CustNo\" = substr(M.\"AcctNo\",1,7)";
 		sql += "                               AND LB.\"FacmNo\" = substr(M.\"AcctNo\",8,3)";

@@ -118,9 +118,6 @@ public class L2R45 extends TradeBuffer {
 		this.totaVo.putParam("L2r45DocNo", tFacClose.getDocNo());
 		this.totaVo.putParam("L2r45ClsNo", tFacClose.getClsNo());
 		this.totaVo.putParam("L2r45Rmk", tFacClose.getRmk());
-		this.totaVo.putParam("L2r45ClCode1", tFacClose.getClCode1());
-		this.totaVo.putParam("L2r45ClCode2", tFacClose.getClCode2());
-		this.totaVo.putParam("L2r45ClNo", tFacClose.getClNo());
 		this.totaVo.putParam("L2r45Addres", WkRegAddres);
 
 		this.addList(this.totaVo);

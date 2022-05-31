@@ -3,12 +3,14 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,9 +48,6 @@ public interface FacCloseRepository extends JpaRepository<FacClose, FacCloseId> 
 
   // ApplDate >= ,AND ApplDate <=
   public Slice<FacClose> findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int applDate_0, int applDate_1, Pageable pageable);
-
-  // CloseDate > ,AND ReceiveFg = ,AND ReceiveDate <=
-  public Slice<FacClose> findAllByCloseDateGreaterThanAndReceiveFgIsAndReceiveDateLessThanEqualOrderByCustNoAscFacmNoAsc(int closeDate_0, int receiveFg_1, int receiveDate_2, Pageable pageable);
 
   // CustNo >= ,AND CustNo <= 
   public Slice<FacClose> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, int custNo_1, Pageable pageable);
