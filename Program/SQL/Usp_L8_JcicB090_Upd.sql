@@ -66,9 +66,6 @@ BEGIN
              OVER (
                PARTITION BY M."CustId"
                           , M."FacmNo"
-                          , F."ClCode1"
-                          , F."ClCode2"
-                          , F."ClNo"
                           , NVL(CASE
                                   WHEN F."ClCode1" = 1
                                   THEN CB."CityCode"
