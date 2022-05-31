@@ -43,7 +43,7 @@ E(0,0)
 [#<->#,"#FdCreateFlag+新增或取消",#CreateFlag,#CreateFlagX],
 [#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdPropDate+提出日期+(+起日+)",#PropDate],
-[#<->#,"#FdAuthCreateDate+資料產生日期",#AuthCreateDate],
+[#<->#,"#FdDataCreateDate+資料產生日期",#DataCreateDate],
 [#<->#,"#FdRepayBank+扣款銀行",#RepayBank,#RepayBankX],
 ]
 
@@ -53,7 +53,7 @@ T(3,*)
 T(3,*)
 #FdCustNo=X,2,L
 #FdPropDate=X,2,L
-#FdAuthCreateDate=X,2,L
+#FdDataCreateDate=X,2,L
 #FdRepayBank=X,2,L
 
 ! Help
@@ -141,10 +141,10 @@ C(3,#CustNo,0,T(1,#SYSCDATE,2,7),E(0,0))
 @C(3,#CustNo,0,C(4,#PropDate,V(P,戶號及提出日期擇一輸入),$),$)
 C(3,#PropDate,0,$,A(DATE,0,#PropDate))
 
-#AuthCreateDate=D,7,I
+#DataCreateDate=D,7,I
 C(3,#FunctionCode,1,S,$)
 T(1,#SYSCDATE,2,7)
-@C(3,#AuthCreateDate,0,$,A(DATE,0,#AuthCreateDate))
+@C(3,#DataCreateDate,0,$,A(DATE,0,#DataCreateDate))
 
 #RepayBank=A,1,I
 C(3,#FunctionCode,1,S,$)
@@ -291,7 +291,7 @@ T(6A,#OOAuthCreateDate+#OOCustNo+#OORepayBank+#OORepayAcct+#OOCreateFlag+#Create
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#FunctionCode#CreateFlag#CustNo#PropDate#AuthCreateDate#RepayBank
+#FunctionCode#CreateFlag#CustNo#PropDate#DataCreateDate#RepayBank
 #END
 </sub>
 

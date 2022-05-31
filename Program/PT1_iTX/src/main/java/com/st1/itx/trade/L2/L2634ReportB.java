@@ -31,7 +31,7 @@ import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-@Component("L2076ReportB")
+@Component("L2634ReportB")
 @Scope("prototype")
 public class L2634ReportB extends MakeReport {
 

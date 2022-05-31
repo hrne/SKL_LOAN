@@ -1111,7 +1111,8 @@ T(2,@GrKind,#L2r05GrKind)
 T(2,@EsGcd,#L2r05EsGcd)
 T(2,@EsGKind,#L2r05EsGKind)
 T(2,@EsGcnl,#L2r05EsGcnl)
-C(3,#FuncCode,5,E(0,@BaseRate,#L2r05BaseRate),$)
+E(0,@BaseRate,#L2r05BaseRate)
+! C(3,#FuncCode,5,E(0,@BaseRate,#L2r05BaseRate),$)
 ##loop{times:10,n:1}
 E(0,@StepMonthS{n},#L2r05StepRateMonths{n})
 E(0,@StepMonthE{n},#L2r05StepRateMonthE{n})
@@ -1230,9 +1231,9 @@ C(3,#UpdateCode,1,RESET_RIM(#SendL2r06A,L2R06),$)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
 
-#RcvL2r06=X,1,S
-C(3,#FuncCode,5,S,$)
-E(0,@BaseRate,#L2r06Rate)
+! #RcvL2r06=X,1,S
+! C(3,#FuncCode,5,S,$)
+! E(0,@BaseRate,#L2r06Rate)
 !參數rim
 
 #RcvL2r08A=X,1,S
@@ -1557,7 +1558,7 @@ R(1,L2R06)
 
 #BaseRate=n,2.4,L
 C(3,#FuncCode,5,s,$)
-E(0,#L2r06Rate)
+! E(0,#L2r06Rate)
 
 !#Wk_BaseRate=X,8,S
 !X(#BaseRate)
