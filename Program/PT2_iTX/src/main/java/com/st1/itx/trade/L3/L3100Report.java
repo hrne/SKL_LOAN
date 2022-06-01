@@ -117,7 +117,7 @@ public class L3100Report extends MakeReport {
 		this.print(-1, 98, "機密等級：" + this.security);
 		this.print(-2, 2, "報　表：" + this.reportCode);
 		this.print(-2, 59, this.reportItem, "C");
-		this.print(-2, 98, "日　　期：" + showBcDate(this.nowDate, 1));
+		this.print(-2, 98, "日　　期：" + this.showRocDate(this.nowDate, 1));
 		this.print(-3, 2, "來源別：放款服務課");
 		this.print(-3, 98, "時　　間：" + showTime(this.nowTime));
 //		this.print(-4, 2, "批號：" + "01");

@@ -93,7 +93,7 @@ public class L2634ReportB extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.info("L2076ReportB.printHeader");
+		this.info("L2634ReportB.printHeader");
 
 //		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
 //		this.print(-3, 55, "抵押權塗銷同意書", "C");
@@ -117,7 +117,7 @@ public class L2634ReportB extends MakeReport {
 
 	public Boolean exec(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 
-		this.info("L2076ReportB exec");
+		this.info("L2634ReportB exec");
 
 		exportPdf(lClOtherRights, titaVo);
 
@@ -127,7 +127,7 @@ public class L2634ReportB extends MakeReport {
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631B", "用印申請書", "", "L2631B_用印申請書.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634B", "用印申請書", "", "L2631B_用印申請書.pdf");
 
 		this.setFont(1);
 

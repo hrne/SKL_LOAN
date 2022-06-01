@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class FacClose implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6292229162985508611L;
-
-@EmbeddedId
+  @EmbeddedId
   private FacCloseId facCloseId;
 
   // 戶號
@@ -128,6 +124,11 @@ public class FacClose implements Serializable {
   // 備註
   @Column(name = "`Rmk`", length = 100)
   private String rmk;
+
+  // 領取記號
+  /* 0:未領取1:已領取 */
+  @Column(name = "`ReceiveFg`")
+  private int receiveFg = 0;
 
   // 郵寄地址
   @Column(name = "`PostAddress`", length = 100)
@@ -629,6 +630,27 @@ public class FacClose implements Serializable {
   }
 
 /**
+	* 領取記號<br>
+	* 0:未領取
+1:已領取
+	* @return Integer
+	*/
+  public int getReceiveFg() {
+    return this.receiveFg;
+  }
+
+/**
+	* 領取記號<br>
+	* 0:未領取
+1:已領取
+  *
+  * @param receiveFg 領取記號
+	*/
+  public void setReceiveFg(int receiveFg) {
+    this.receiveFg = receiveFg;
+  }
+
+/**
 	* 郵寄地址<br>
 	* 
 	* @return String
@@ -729,7 +751,7 @@ public class FacClose implements Serializable {
     return "FacClose [facCloseId=" + facCloseId + ", facmNo=" + facmNo + ", actFlag=" + actFlag + ", funCode=" + funCode + ", carLoan=" + carLoan
            + ", applDate=" + applDate + ", closeDate=" + closeDate + ", closeInd=" + closeInd + ", closeReasonCode=" + closeReasonCode + ", closeAmt=" + closeAmt + ", collectFlag=" + collectFlag
            + ", collectWayCode=" + collectWayCode + ", receiveDate=" + receiveDate + ", telNo1=" + telNo1 + ", telNo2=" + telNo2 + ", telNo3=" + telNo3 + ", entryDate=" + entryDate
-           + ", agreeNo=" + agreeNo + ", docNo=" + docNo + ", clsNo=" + clsNo + ", rmk=" + rmk + ", postAddress=" + postAddress + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", agreeNo=" + agreeNo + ", docNo=" + docNo + ", clsNo=" + clsNo + ", rmk=" + rmk + ", receiveFg=" + receiveFg + ", postAddress=" + postAddress
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

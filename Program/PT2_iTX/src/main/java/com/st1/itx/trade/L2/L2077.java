@@ -1,14 +1,11 @@
 package com.st1.itx.trade.L2;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +26,6 @@ import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.LoanBorMainService;
-import com.st1.itx.db.service.springjpa.cm.L6932ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.date.DateUtil;
@@ -62,9 +58,6 @@ public class L2077 extends TradeBuffer {
 	public LoanBorMainService loanBorMainService;
 	@Autowired
 	public ClFacService clFacService;
-	
-	@Autowired
-	public L6932ServiceImpl l6932ServiceImpl;
 
 	/* 日期工具 */
 	@Autowired
@@ -103,7 +96,7 @@ public class L2077 extends TradeBuffer {
 		Slice<FacClose> slFacClose = null;
 		// 處理邏輯 三擇一輸入
 		if (iCustNoS != 0) {
-			slFacClose =sFacCloseService.findCustNoRange(iCustNoS, iCustNoE, this.index, this.limit, titaVo);
+			slFacClose = sFacCloseService.findCustNoRange(iCustNoS, iCustNoE, this.index, this.limit, titaVo);
 			lFacClose = slFacClose == null ? null : slFacClose.getContent();
 		} else if (iTranDate > 0) {
 			slFacClose = sFacCloseService.findEntryDate(iTranDate + 19110000, this.index, this.limit, titaVo);
@@ -128,7 +121,7 @@ public class L2077 extends TradeBuffer {
 		this.info("Size =" + lFacClose.size());
 		int i = 1;
 		for (FacClose tmpFacClose : lFacClose) {
-			
+
 //			只找同戶號額度最後一筆序號
 			if (i < lFacClose.size() && tmpFacClose.getCustNo() == lFacClose.get(i).getCustNo()
 					&& tmpFacClose.getFacmNo() == lFacClose.get(i).getFacmNo()) {
@@ -233,33 +226,7 @@ public class L2077 extends TradeBuffer {
 				occursList.putParam("OOAllCloseFg", "N");
 			}
 			occursList.putParam("OORepayFg", wkRepayFg);
-			occursList.putParam("OOReceiveFg", "0");
-			
-			// L6932 用的參數
-			titaVo.putParam("ST_DT", "0010101");
-			titaVo.putParam("ED_DT", "9991231");
-			titaVo.putParam("SX_DT", "0");
-			titaVo.putParam("EX_DT", "0");
-			titaVo.putParam("TRN_CODE", "L2632");
-			titaVo.putParam("TRN_CODE2", "");
-			titaVo.putParam("CUST_NO", tmpFacClose.getCustNo());
-			titaVo.putParam("FACM_NO", tmpFacClose.getFacmNo());
-			titaVo.putParam("BORM_SEQ", "000");
-			titaVo.putParam("TxtNo", "");
-			titaVo.putParam("MrKey", "");
-			
-			List<Map<String, String>> l6932Vo;
-			
-			try {
-				l6932Vo = l6932ServiceImpl.FindData(titaVo, this.index, 1);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.error("L6932ServiceImpl.findAll error = " + errors.toString());
-				throw new LogicException("E0013", "L6932ServiceImpl");
-			}
-			
-			occursList.putParam("OOHasHistory", l6932Vo != null && !l6932Vo.isEmpty() ? "Y" : "N");
+			occursList.putParam("OOReceiveFg", tmpFacClose.getReceiveFg());
 
 			this.info("occursList L2077" + occursList);
 			this.totaVo.addOccursList(occursList);

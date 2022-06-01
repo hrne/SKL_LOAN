@@ -304,13 +304,10 @@ C(3,#OOFunCode,2,E(0,2),$)
 C(3,#OOFunCode,3,E(0,3),$)
 
 #OOBUF6=X,60,S
-T(2,#FUNC6+#OOCustNo+#OOFacmNo+#OOCloseNo)
-C(3,#FUNC6,2,IF(#OORepayFg=="Y",$,T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)),$)
+! T(2,#FUNC6+#OOCustNo+#OOFacmNo+#OOCloseNo)
+T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
+! C(3,#FUNC6,2,IF(#OORepayFg=="Y",$,T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)),$)
 
-#BTNNAME=X,1,S
-T(3,@OOBTN6,領取清償證明)
-C(3,#FUNC6,3,T(3,@OOBTN6,補發清償證明),$)
-C(3,#FUNC6,2,T(3,@OOBTN6,清償作業補領),$)
 
 !作業項目=0.清償,領取方式為01.20時連動L2631否則連動L2076
 !結案日期為0時隱藏按鈕
@@ -318,13 +315,14 @@ C(3,#FUNC6,2,T(3,@OOBTN6,清償作業補領),$)
 !作業項目=2.補領且累短收(清償違約金)為0時顯示連動L2076
 !OOReceiveFg為1=已領過隱藏按鈕
 #OOBTN6=X,16,S
-C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=#OOBTN6; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}))
+BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6})
+! C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}))
 IF(#OOCloseDate==0,BIND(grid,cancel),$)
-IF(#OOAllCloseFg=="N",BIND(grid,cancel),$)
-IF(#OOAllCloseFg=="N",s,$)
-C(3,#OOFunCode,2,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}),$),$)
-C(3,#OOFunCode,3,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=#OOBTN6; ntxbuf=#OOBUF6}),$),$)
-C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
+! IF(#OOAllCloseFg=="N",BIND(grid,cancel),$)
+! IF(#OOAllCloseFg=="N",s,$)
+! C(3,#OOFunCode,2,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}),$),$)
+! C(3,#OOFunCode,3,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}),$),$)
+C(3,#FUNC6,1,C(3,#OOReceiveFg,0,BIND(grid,cancel),$),$)
 
 !用於判定是否有歷程，Y/N
 #OOHasHistory=X,1,S
@@ -393,8 +391,8 @@ TXFORM=L2077
 #RPTFG=0,QUERY.GRID,L2077
 #any={detail:true, header:'L2077.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN6=清償證明
-{width:120,search:false,formatter:'cust:bind-button:',align:'center',canExport:false}
+#OOBTN6=新增
+{width:50,search:false,formatter:'cust:bind-button:新增',align:'center',canExport:false}
 
 #OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}

@@ -14,6 +14,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.ClOtherRightsId;
+import com.st1.itx.db.domain.FacClose;
+import com.st1.itx.db.domain.FacCloseId;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandOfficeService;
@@ -106,13 +108,13 @@ public class L2634 extends TradeBuffer {
 			if (lClOtherRights != null) {
 				if (iType == 1) {
 					doReport1(titaVo);
-					setChoiceDate0(titaVo);
 				}
 //				類別 2 清償塗銷同意書
 				else {
 					doReport2(titaVo);
-					setChoiceDate0(titaVo);
+
 				}
+				setChoiceDate0(titaVo);
 			}
 
 		}
@@ -122,7 +124,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 //	更新篩選資料日期
-	public void setChoiceDate(TitaVo titaVo) throws LogicException {
+	private void setChoiceDate(TitaVo titaVo) throws LogicException {
 
 		int custNo = 0;
 		int closeNo = 0;
@@ -132,6 +134,19 @@ public class L2634 extends TradeBuffer {
 		if (titaVo.get("OOCloseNo") != null || !titaVo.get("OOCloseNo").isEmpty()) {
 			closeNo = parse.stringToInteger(titaVo.get("OOCloseNo"));
 		}
+//		列印塗銷同意書更新清償作業檔領取記號
+		if (iType == 2) {
+			FacClose tFacClose = sFacCloseService.holdById(new FacCloseId(custNo, closeNo), titaVo);
+			if (tFacClose != null) {
+				tFacClose.setReceiveFg(1);
+				try {
+					sFacCloseService.update(tFacClose, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0007", "L2634A FacClose update " + e.getErrorMsg());
+				}
+			}
+		}
+
 		int clCode1 = 0;
 		int clCode2 = 0;
 		int clNo = 0;
@@ -167,7 +182,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 //	更新篩選資料日期
-	public void setChoiceDate0(TitaVo titaVo) throws LogicException {
+	private void setChoiceDate0(TitaVo titaVo) throws LogicException {
 
 		for (ClOtherRights t : lClOtherRights) {
 			ClOtherRights tClOtherRights = ClOtherRightsService.holdById(t, titaVo);
@@ -175,6 +190,10 @@ public class L2634 extends TradeBuffer {
 				tClOtherRights.setChoiceDate(0);
 				tClOtherRights.setCustNo(0);
 				tClOtherRights.setCloseNo(0);
+				if (iType == 2) {
+					tClOtherRights.setReceiveFg(1);
+				}
+
 				try {
 					ClOtherRightsService.update(tClOtherRights, titaVo);
 				} catch (DBException e) {
@@ -187,7 +206,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 	// 撈今日篩選資料日期 用印申請書及其他
-	public void doReport1(TitaVo titaVo) throws LogicException {
+	private void doReport1(TitaVo titaVo) throws LogicException {
 
 		doRptB(lClOtherRights, titaVo); // 用印申請書
 		doRptC(lClOtherRights, titaVo);// 簽收回條
@@ -197,13 +216,13 @@ public class L2634 extends TradeBuffer {
 	}
 
 	// 撈今日篩選資料日期 塗銷同意書
-	public void doReport2(TitaVo titaVo) throws LogicException {
+	private void doReport2(TitaVo titaVo) throws LogicException {
 
 		doRptA(lClOtherRights, titaVo); // 清償塗銷同意書
 	}
 
 	// 清償塗銷同意書
-	public void doRptA(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	private void doRptA(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("L2076B doRptB started.");
 
 		// 撈資料組報表
@@ -211,7 +230,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 	// 用印申請書
-	public void doRptB(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	private void doRptB(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("L2076B doRptB started.");
 
 		// 撈資料組報表
@@ -219,7 +238,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 	// 簽收回條
-	public void doRptC(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	private void doRptC(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("L2076C doRptC started.");
 
 		// 撈資料組報表
@@ -228,7 +247,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 	// 雙掛號信封
-	public void doRptD(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	private void doRptD(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("L2076D doRptD started.");
 
 		// 撈資料組報表
@@ -237,7 +256,7 @@ public class L2634 extends TradeBuffer {
 	}
 
 	// 雙掛號小單
-	public void doRptE(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	private void doRptE(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("L2076E doRptE started.");
 
 		// 撈資料組報表

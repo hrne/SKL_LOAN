@@ -60,11 +60,11 @@ public class L2634ReportE extends MakeReport {
 
 	public Long exec(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 
-		this.info("L2076ReportE exec");
+		this.info("L2634ReportE exec");
 
 //		String tran = titaVo.getTxCode().isEmpty() ? "L2631E" : titaVo.getTxCode();
 
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631E", "中華郵政掛號郵件收件回執", "cm,19,9.5", "P");
+		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634E", "中華郵政掛號郵件收件回執", "cm,19,9.5", "P");
 
 		this.setFont(1);
 

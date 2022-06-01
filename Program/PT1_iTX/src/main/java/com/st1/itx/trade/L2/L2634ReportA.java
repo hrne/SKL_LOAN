@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdCity;
@@ -26,6 +28,7 @@ import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
+import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -47,6 +50,8 @@ public class L2634ReportA extends MakeReport {
 	public CustMainService sCustMainService;
 	@Autowired
 	public FacCloseService sFacCloseService;
+	@Autowired
+	GSeqCom gGSeqCom;
 
 //	private static DecimalFormat df = new DecimalFormat("#########################0.0#");
 
@@ -66,7 +71,7 @@ public class L2634ReportA extends MakeReport {
 	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
 	private int reportDate = 0;
 	private String brno = "";
-	private String reportCode = "L2631";
+	private String reportCode = "L2634";
 	private String reportItem = "抵押權塗銷同意書";
 	private String security = "";
 //	private String pageSize ="A5";
@@ -84,7 +89,7 @@ public class L2634ReportA extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		logger.info("L2076Report.printHeader");
+		this.info("L2634ReportA.printHeader");
 
 //		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
 //		this.print(-3, 55, "抵押權塗銷同意書", "C");
@@ -107,7 +112,7 @@ public class L2634ReportA extends MakeReport {
 	}
 
 	public void exec(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
-		logger.info("L2076Report exec ...");
+		this.info("L2634ReportA exec ...");
 
 		// 設定字體1:標楷體 字體大小36
 		this.setFont(1, 36);
@@ -118,13 +123,20 @@ public class L2634ReportA extends MakeReport {
 //		this.NowTime = dDateUtil.getNowStringTime();
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, "A4", pageOrientation);
-		
+
 		for (ClOtherRights t : lClOtherRights) {
 
 			iCustNo = t.getCustNo();
 			iCloseNo = t.getCloseNo();
 			reportItem = "抵押權塗銷同意書,戶號 :" + iCustNo;
 
+			// 自動取公文編號
+			int wkDocNo = 0;
+
+			wkDocNo = gGSeqCom.getSeqNo(titaVo.getEntDyI() / 10000, 1, "L2", "2631", 9999, titaVo);
+			String finalDocNo = StringUtils.leftPad(String.valueOf(wkDocNo), 4, "0");
+
+			String docNo = titaVo.getCalDy().substring(0, 3) + finalDocNo;
 
 			this.setCharSpaces(0);
 
@@ -143,7 +155,16 @@ public class L2634ReportA extends MakeReport {
 			FacCloseId FacCloseId = new FacCloseId();
 			FacCloseId.setCustNo(iCustNo);
 			FacCloseId.setCloseNo(iCloseNo);
-
+//			更新公文編號
+			FacClose updFacClose = sFacCloseService.holdById(FacCloseId, titaVo);
+			if (updFacClose != null) {
+				updFacClose.setDocNo(parse.stringToInteger(docNo));
+				try {
+					sFacCloseService.update(updFacClose, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "清償作業檔");
+				}
+			}
 			FacClose tFacClose = sFacCloseService.findById(FacCloseId, titaVo);
 			int DocNo = tFacClose.getDocNo();
 			String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
@@ -164,8 +185,7 @@ public class L2634ReportA extends MakeReport {
 			// 地政
 			String wkLandAdm = "";
 			if ("".equals(t.getOtherLandAdm())) {
-				CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", t.getLandAdm()),
-						titaVo);
+				CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", t.getLandAdm()), titaVo);
 				if (tCdCode != null) {
 					wkLandAdm = tCdCode.getItem();
 				}
@@ -201,17 +221,17 @@ public class L2634ReportA extends MakeReport {
 			// 金額轉中文大寫
 			String amtChinese = this.convertAmtToChinese(wkSecuredTotal) + "元整";
 
-			logger.info("Doc = " + DocNo);
-			logger.info("DocNoyy = " + DocNoyy);
-			logger.info("DocNoseQ = " + DocNoseQ);
-			logger.info("wkCity = " + wkCity);
-			logger.info("wkLandAdm = " + wkLandAdm);
-			logger.info("RecYear = " + wkRecYear);
-			logger.info("RecWord = " + wkRecWord);
-			logger.info("RecNumber = " + wkRecNumber);
-			logger.info("RightsNote = " + wkRightsNote);
-			logger.info("SecuredTotal = " + wkSecuredTotal);
-			logger.info("amtChinese = " + amtChinese);
+			this.info("Doc = " + DocNo);
+			this.info("DocNoyy = " + DocNoyy);
+			this.info("DocNoseQ = " + DocNoseQ);
+			this.info("wkCity = " + wkCity);
+			this.info("wkLandAdm = " + wkLandAdm);
+			this.info("RecYear = " + wkRecYear);
+			this.info("RecWord = " + wkRecWord);
+			this.info("RecNumber = " + wkRecNumber);
+			this.info("RightsNote = " + wkRightsNote);
+			this.info("SecuredTotal = " + wkSecuredTotal);
+			this.info("amtChinese = " + amtChinese);
 //		ClCode1擔保品代號1
 //		ClCode2擔保品代號2
 //		ClNo擔保品編號
@@ -223,7 +243,7 @@ public class L2634ReportA extends MakeReport {
 //		RecNumber收件號
 //		RightsNote權利價值說明
 //		SecuredTotal擔保債權總金額
-			if ("3".equals(funCdString)) {
+			if (t.getReceiveFg() == 1) {
 
 				Point a = new Point(85, 200);
 				Point b = new Point(120, 200);
@@ -317,7 +337,7 @@ public class L2634ReportA extends MakeReport {
 			this.print(1, 1, " ");
 			this.print(1, 10, "地　  　址 : 台北市忠孝西路1段66號31～43樓");
 			this.print(1, 1, " ");
-			if ("3".equals(funCdString)) {
+			if (t.getReceiveFg() == 1) {
 				this.print(1, 17, "※他項權利證明書與抵押權設定契約書已由客戶領取無誤。");
 			} else {
 				this.print(1, 1, " ");
@@ -336,7 +356,7 @@ public class L2634ReportA extends MakeReport {
 			}
 		}
 
-		 this.close();
+		this.close();
 
 	}
 

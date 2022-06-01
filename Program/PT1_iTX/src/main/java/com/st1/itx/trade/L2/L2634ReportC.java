@@ -65,7 +65,7 @@ public class L2634ReportC extends MakeReport {
 	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
 	private int reportDate = 0;
 	private String brno = "";
-	private String reportCode = "L2076";
+	private String reportCode = "L2634";
 	private String reportItem = "簽收回條";
 	private String defaultPdf = "";
 
@@ -85,7 +85,7 @@ public class L2634ReportC extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.info("L2076ReportB.printHeader");
+		this.info("L2634ReportC.printHeader");
 
 //		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
 //		this.print(-3, 55, "抵押權塗銷同意書", "C");
@@ -109,7 +109,7 @@ public class L2634ReportC extends MakeReport {
 
 	public Boolean exec(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 
-		this.info("L2076ReportB exec");
+		this.info("L2634ReportC exec");
 
 		exportPdf(lClOtherRights, titaVo);
 
@@ -119,7 +119,7 @@ public class L2634ReportC extends MakeReport {
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631C", "簽收回條", "", "L2631C_簽收回條.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634C", "簽收回條", "", "L2631C_簽收回條.pdf");
 
 		this.setFont(1);
 
