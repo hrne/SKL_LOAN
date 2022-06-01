@@ -42,7 +42,7 @@ E(0,0)
 [
 ["[L9717]                                 逾期及轉催收件統計表"],
 ["#R3+@年月份",#inputYear,"@/@",#inputMonth],
-["#R2+@房貸專員員編",#inputBusinessOfficer],
+["#R2+@房貸專員員編",#inputBusinessOfficer, " ( 全部:999999 )"],
 ["#R1+@滯繳期數",#inputOverdueTermMin,"～",#inputOverdueTermMax],
 ]
 !---------- AP Button AREA ----------
@@ -98,6 +98,7 @@ T(1,@inputMonth,#LastMonthDate,5,2)
 
 !房貸專員員編
 #inputBusinessOfficer=X,6,I
+E(0,999999)
 
 </sub>
 

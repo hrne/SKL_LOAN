@@ -103,11 +103,8 @@ public class L2075 extends TradeBuffer {
 		// tita
 		int iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
 		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
-		int iFunCode = parse.stringToInteger(titaVo.getParam("FunCode"));
 		int iType = parse.stringToInteger(titaVo.getParam("Type"));
-		String iIsRepeat = titaVo.getParam("IsRepeat");
 
-		if (iFunCode == 1) {
 
 			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
@@ -209,12 +206,6 @@ public class L2075 extends TradeBuffer {
 						this.info("lClOtherRights != null");
 						for (ClOtherRights tClOtherRights : lClOtherRights) {
 
-//							不查詢已篩選過資料
-							if ("N".equals(iIsRepeat)) {
-								if (tClOtherRights.getChoiceDate() > 0) {
-									continue;
-								}
-							}
 							// wk
 							String wkCityItem = "";
 							String wkLandOfficeItem = "";
@@ -284,7 +275,7 @@ public class L2075 extends TradeBuffer {
 
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
-		}
+		
 
 		this.addList(this.totaVo);
 		return this.sendList();

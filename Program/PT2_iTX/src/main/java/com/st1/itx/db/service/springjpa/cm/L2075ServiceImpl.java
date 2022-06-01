@@ -60,7 +60,6 @@ public class L2075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// tita
 		int iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"))+19110000;
 		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"))+19110000;
-		int iFunCode = parse.stringToInteger(titaVo.getParam("FunCode"));
 		int iType = parse.stringToInteger(titaVo.getParam("Type"));
 
 		String sql = " SELECT f.* ";
@@ -81,14 +80,12 @@ public class L2075ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("iEntryDate=" + iEntryDate);
 		this.info("iApplDate=" + iApplDate);
-		this.info("iFunCode=" + iFunCode);
 		this.info("iType=" + iType);
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		query = em.createNativeQuery(sql);
 //		query.setParameter("entryDate", iEntryDate);
 //		query.setParameter("applDate", iApplDate);
-//		query.setParameter("funCode", iFunCode);
 //		query.setParameter("type", iType);
 		this.info("L2075Service FindData=" + query);
 

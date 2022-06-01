@@ -114,7 +114,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MFB.\"CustNo\" ";
 			sql += "                              AND FM.\"FacmNo\" = MFB.\"FacmNo\" ";
 			sql += "        WHERE  FM.\"FirstDrawdownDate\" >= 19810101 ";
-			sql += "          AND (NVL(:businessOfficer, ' ') = ' ' OR :businessOfficer = FM.\"BusinessOfficer\") ";
+			sql += "          AND (NVL(:businessOfficer, ' ') = '999999' OR :businessOfficer = FM.\"BusinessOfficer\") ";
 			sql += "   		  AND MFB.\"OvduDays\" > 0 ";
 //			sql += "   		  AND MFB.\"OvduTerm\" <> 0 ";
 			sql += "      ) ";
@@ -269,7 +269,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                       AND FM.\"FacmNo\" = M.\"FacmNo\" ";
 			sql += " LEFT JOIN \"CdEmp\" BusinessOfficer ON BusinessOfficer.\"EmployeeNo\" = FM.\"BusinessOfficer\" ";
 			sql += " LEFT JOIN \"CdEmp\" CreditOfficer ON CreditOfficer.\"EmployeeNo\" = FM.\"CreditOfficer\" ";
-			sql += " WHERE ( :businessOfficer = ' '  ";
+			sql += " WHERE ( :businessOfficer = '999999'  ";
 			sql += "    OR  NVL (CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
 			sql += "                   THEN BusinessOfficer.\"EmployeeNo\" ";
 			sql += "       		  ELSE CreditOfficer.\"EmployeeNo\" END,  ' ') = :businessOfficer )";

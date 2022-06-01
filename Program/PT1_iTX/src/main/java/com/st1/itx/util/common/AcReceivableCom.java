@@ -566,11 +566,12 @@ public class AcReceivableCom extends TradeBuffer {
 		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) < 0
 				|| tAcReceivable.getAcBal().compareTo(BigDecimal.ZERO) < 0) {
 			this.info("銷帳金額超過原入帳金額 :" + ", bizTbsdy=" + bizTbsdy + ", AcBal=" + tAcReceivable.getRvBal());
+			String str = "科目=" + tAcReceivable.getAcctCode() + ", 戶號=" + tAcReceivable.getCustNo() + "-"
+					+ parse.IntegerToString(tAcReceivable.getFacmNo(), 3) + " " + tAcReceivable.getRvNo();
 			if (titaVo.isHcodeErase()) {
-				throw new LogicException(titaVo, "E6003",
-						"AcReceivable update " + tAcReceivableId + "銷帳金額超過原入帳金額，請依序訂正");
+				throw new LogicException(titaVo, "E6003", "銷帳金額超過原入帳金額，請依序訂正 " + str);
 			} else {
-				throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivableId + "銷帳金額超過原入帳金額");
+				throw new LogicException(titaVo, "E6003", "銷帳金額超過原入帳金額 " + str);
 			}
 		}
 

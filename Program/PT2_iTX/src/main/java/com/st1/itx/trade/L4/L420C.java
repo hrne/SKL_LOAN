@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -167,8 +171,22 @@ public class L420C extends TradeBuffer {
 			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
 			/* 錯誤 */
 			if (totaVoList != null && totaVoList.size() > 0) {
-				if (totaVoList.get(0).isError())
-					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
+				if (totaVoList.get(0).isError()) {
+					// 先去錯誤訊訊息中文，LogicException會再組一次
+					String errmsg = totaVoList.get(0).getErrorMsg();
+					int iBeg = 0;
+					int iEnd = errmsg.length();
+					for (int i = 0; i < errmsg.length(); i++) {
+						if (iBeg == 0 && "(".equals(errmsg.substring(i, i + 1))) {
+							iBeg = i + 1;
+						}
+						if (")".equals(errmsg.substring(i, i + 1))) {
+							iEnd = i;
+						}
+					}
+					errmsg = errmsg.substring(iBeg, iEnd);
+					throw new LogicException(totaVoList.get(0).getMsgId(), errmsg);
+				}
 			}
 		}
 		this.addList(this.totaVo);

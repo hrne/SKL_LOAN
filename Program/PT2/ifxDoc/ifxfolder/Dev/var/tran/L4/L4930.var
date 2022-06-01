@@ -294,6 +294,9 @@ SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxb
 #secret-no=x,1000,S
 T(6A,#OOAcDate+#OOBatchNo+#OODetailSeq+#FunctionCode)
 
+#custfacmno=X,11,S
+T(2,#OOCustNo+-+#OOFacmNo)
+
 #batch-detail=x,100000,S
 
 #batch-print=A,1,S
@@ -311,7 +314,7 @@ T(6A,#OOAcDate+#OOBatchNo+#OODetailSeq+#FunctionCode)
 #batch-rows-error=X,2,S
 
 !#batch-row-status 該列傳送狀態
-#batch-row-status=X,50,S
+#batch-row-status=X,100,S
 
 !#batch-row-txtno 該列傳送序號
 #batch-row-txtno=X,18,O
@@ -412,12 +415,13 @@ ifxBatch:{
 	rim:'L420C',
 	txtno:'#secret-no',
 	pfnx:"L4930B.PFNX",
-	col_captions:["訂正序號","訂正狀態"],
-	col_names:["#batch-row-txtno","#batch-row-status"]
+	col_captions:["戶號","訂正序號","訂正狀態"],
+	col_names:["#custfacmno","#batch-row-txtno","#batch-row-status"]
 	}
 }
 
 #secret-no
+#custfacmno
 
 #OOBatchNo=批號
 {width:70}

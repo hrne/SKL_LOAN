@@ -1,11 +1,12 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -13,9 +14,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
-
-import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.springjpa.cm.L6069ServiceImpl;
 
 @Service("L6069")
 @Scope("prototype")
@@ -31,9 +32,14 @@ public class L6069 extends TradeBuffer {
 	@Autowired
 	public CdCodeService sCdCodeDefService;
 
+	@Autowired
+	private L6069ServiceImpl l6069ServiceImpl;
+
+	@Autowired
+	Parse parse;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L6069 ");
 		this.info("active L6069 ");
 		this.totaVo.init(titaVo);
 
@@ -41,47 +47,47 @@ public class L6069 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 200; // 64 * 200 = 12,800
+		this.limit = 100; // 64 * 200 = 12,800
 
-		String iDefType = titaVo.getParam("DefType");
-		String iCode = titaVo.getParam("Code");
-		String iItem = titaVo.getParam("Item");
-		int iDefType9 = 0;
-		if(!iDefType.isEmpty()) {
-		 iDefType9 =Integer.parseInt(iDefType);
-		}
-		Slice<CdCode> slCdCode = null;
-		if ("".equals(iDefType) && iCode.length() == 0 && iItem.length()==0 ||"".equals(iDefType) && iCode.length() > 0) {
-			slCdCode = sCdCodeDefService.defCodeEq("CodeType", iCode + "%", this.index, this.limit, titaVo);
-		}else if (iItem.length() > 0 && iDefType.length()>0 && iCode.length()>0) {
-			slCdCode = sCdCodeDefService.defItemEq2(iCode ,iDefType9 ,"%" + iItem + "%", this.index, this.limit, titaVo);
-		}else if (iItem.length() > 0 && iDefType.length()>0) {
-			slCdCode = sCdCodeDefService.defItemEq2("CodeType",iDefType9 ,"%" + iItem + "%", this.index, this.limit, titaVo);
-		}else if (iItem.length() > 0) {
-			slCdCode = sCdCodeDefService.defItemEq("CodeType","%" + iItem + "%", this.index, this.limit, titaVo);
-		}else if(iDefType9!=0){			
-			slCdCode = sCdCodeDefService.defCodeEq2("CodeType", iDefType9, iCode + "%", this.index, this.limit, titaVo);
-		}
-		
-		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
+		List<Map<String, String>> L6069List = null;
 
-		if (lCdCode == null) {
-			throw new LogicException("E0001", "");
-		} else {
-			for (CdCode tCdCode : lCdCode) {
+		try {
+			L6069List = l6069ServiceImpl.FindAll(titaVo, this.index, this.limit);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			throw new LogicException(titaVo, "E0001", "SQL ERROR");
+		}
+
+		List<LinkedHashMap<String, String>> chkOccursList = null;
+		if (L6069List != null && L6069List.size() > 0) {
+			for (Map<String, String> c : L6069List) {
 				OccursList occursList = new OccursList();
-				occursList.putParam("OOCode", tCdCode.getCode().trim());
-				occursList.putParam("OOItem", tCdCode.getItem().trim());
-				occursList.putParam("OOType", tCdCode.getDefType());
-				/* 將每筆資料放入Tota的OcList */
+
+				occursList.putParam("OOCustNo", c.get("ACODE")); // 代號
+
+				occursList.putParam("OOCode", c.get("ADEFCODE"));// 代碼檔代號
+
+				occursList.putParam("OOItem", c.get("AITEM"));// 代碼類別說明
+
+				occursList.putParam("OODefItem", c.get("BITEM"));// 代碼檔類別名稱
+
+				occursList.putParam("OOType", c.get("ADEFTYPE"));// 業務類別
+
+				occursList.putParam("OOTypeX", c.get("BCODE"));// 業務類別說明
+
 				this.totaVo.addOccursList(occursList);
+			} // for
+			chkOccursList = this.totaVo.getOccursList();
+
+			if (L6069List != null && L6069List.size() >= this.limit) {
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				titaVo.setReturnIndex(this.setIndexNext());
+				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
 		}
 
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slCdCode != null && slCdCode.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
+		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
+			throw new LogicException("E2003", ""); // 查無資料
 		}
 
 		this.addList(this.totaVo);

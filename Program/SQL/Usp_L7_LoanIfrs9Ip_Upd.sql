@@ -276,7 +276,7 @@ BEGIN
                 WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 35 THEN  'D'  -- D=台中市
                 WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 65 THEN  'E'  -- E=台南市
                 WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 70 THEN  'F'  -- F=高雄市
-                WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 0  THE   ' '  -- 空白代表由使用者處理
+                WHEN to_number(NVL(trim(NVL(M."CityCode",' ')),0)) = 0  THEN  ' '  -- 空白代表由使用者處理
                 ELSE 'G'                                            -- G=其他
            END                                       AS "CityCode"          -- 擔保品地區別
          , NVL(M."ProdNo", ' ')                      AS "ProdNo"            -- 商品利率代碼

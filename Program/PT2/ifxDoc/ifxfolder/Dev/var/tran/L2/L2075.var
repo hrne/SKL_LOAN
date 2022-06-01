@@ -40,19 +40,15 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];order=1;">
 [
-["[L2075]                                 清償作業-塗銷同意書列印"],
+["[L2075]                                 清償作業-申請書及塗銷同意書列印"],
 ["#FdEntryDate+入帳日期",#EntryDate],
 ["#FdApplDate+申請日期",#ApplDate],
-["#FdFunCode+作業功能",#FunCode,#FunCodX],
 ["#FdType+類別",#Type,#TypeX],
-["#FdIsRepeat+是否重印",#IsRepeat],
 ]
 
 #FdEntryDate=X,2,L
 #FdApplDate=X,2,L
-#FdFunCode=X,2,L
 #FdType=X,2,L
-#FdIsRepeat=X,2,L
 
 
 !---------- AP Button AREA ----------   
@@ -63,14 +59,12 @@ E(0,0)
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
-#FunCodeHelp=X,100,S
-T(3,1:勾選資料;2:列印)
+
 #TypeHelp=X,100,S
 T(3,1:申請書及其他;2:塗銷同意書)
 #FunCode2Help=x,1024,S
 T(3,0:清償;1:請領;2:補領;3:補發)
-#YorNHelp=x,1024,S
-T(3,Y:是;N:否)
+
 
 #CDDEF0001=x,26,S
 T(3,CdCode.CurrPrecision)
@@ -120,15 +114,6 @@ D(8)
 A(DATE,0,#ApplDate)
 V(2,0)
 
-!作業功能
-#FunCode=A,1,I
-C(3,#CHAIN,1,s,$)
-HELP(#FunCodeHelp)
-@V(H,#FunCodeHelp)
-
-#FunCodX=X,30,L
-T(H,#FunCode,#FunCodeHelp)
-
 !類別
 #Type=A,1,I
 C(3,#CHAIN,1,s,$)
@@ -138,9 +123,6 @@ HELP(#TypeHelp)
 #TypeX=X,30,L
 T(H,#Type,#TypeHelp)
 
-#IsRepeat=X,1,I
-HELP(#YorNHelp)
-@V(H,#YorNHelp)
 
 
 
@@ -223,7 +205,7 @@ T(H,#OORightsNote,#ClRightsNoteHelp)
 #OOAllClose=X,1,O
 
 #secret-no=x,1000,S
-T(6A,#EntryDate+#ApplDate+#FunCode+#Type+#OOCustNo+#OOCloseNo+#OOClCode1+#OOClCode2+#OOClNo+#OOSeq)
+T(6A,#EntryDate+#ApplDate+#Type+#OOCustNo+#OOCloseNo+#OOClCode1+#OOClCode2+#OOClNo+#OOSeq)
 
 
 
@@ -249,9 +231,7 @@ T(3,成功 請至LC009)
 <sub type="TIM">
 #EntryDate
 #ApplDate
-#FunCode
 #Type
-#IsRepeat
 #END
 </sub>
 
@@ -297,7 +277,7 @@ TXFORM=L2075
 
 <sub type="PART" name="L2075" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
 [
-["[L2075]                                 清償作業-塗銷同意書列印"],
+["[L2075]                                 清償作業-申請書及塗銷同意書列印"],
 ["@"],
 ]
 </sub>

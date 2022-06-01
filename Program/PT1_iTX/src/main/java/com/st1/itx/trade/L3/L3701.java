@@ -59,70 +59,7 @@ import com.st1.itx.util.parse.Parse;
  * g.延長年期、寬限期變更時要收取契變手續費、因此要連結[貸後契變手續費維護]。
  * h.警告訊息(warning):變更繳款方式前應確認期款已繳至最近一期，若無，需通知客戶繳入。
  */
-/*
- * Tita
- * TimCustNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * FacmOnlyFlag=X,1
- * RateCodeY=X,1
- * RateCode2=X,1
- * RateIncrY=X,1
- * RateIncr2=X,7
- * RateIncr2N=9,7.4
- * IndividualIncrY=X,1
- * IndividualIncr2=X,7
- * IndividualIncr2N=9,7.4
- * RateAdjFreqY=X,1
- * RateAdjFreq2=X,2
- * FirstRateAdjDateY=X,1
- * FirstRateAdjDate2=9,7
- * NextRateAdjDateY=X,1
- * NextRateAdjDate2=9,7
- * AcctCodeY=X,1
- * AcctCode2=X,3
- * MaturityDateY=X,1
- * MaturityDate2=9,7
- * AmortizedCodeY=X,1
- * AmortizedCode2=X,2
- * PayIntFreqY=X,1
- * PayIntFreq2=X,2
- * RepayFreqY=X,1
- * RepayFreq2=X,2
- * ProhibitDateY=X,1
- * ProhibitDate2=9,7
- * GraceDateY=X,1
- * GraceDate2=9,7
- * FirstDueDateY=X,1
- * FirstDueDate2=9,7
- * SpecificDdY=X,1
- * SpecificDd2=X,2
- * AcctFeeY=X,1
- * AcctFee2=X,17
- * AcctFee2N=9,17.2
- * RepayCodeY=X,1
- * RepayCode2=X,2
- * RepayBankY=X,1
- * RepayBank2=X,3
- * RepayAcctNoY=X,1
- * RepayAcctNo2=X,14
- * PostCodeY=X,1
- * PostCode2=X,1
- * RelationCodeY=X,1
- * RelationCode2=X,2
- * RelationNameY=X,1
- * RelationName2=X,100
- * RelationIdY=X,1
- * RelationId2=X,10
- * RelationBirthdayY=X,1
- * RelationBirthday2=9,7
- * RelationGenderY=X,1
- * RelationGender2=X,1
- * RemarkY=X,1
- * Remark2=X,60
- * ProcessDateY=X,1
- * ProcessDate2=9,7
- */
+
 /**
  * L3701 放款內容變更
  * 
@@ -1160,9 +1097,9 @@ public class L3701 extends TradeBuffer {
 			if (overdueFlag) {
 				throw new LogicException(titaVo, "E0019", "催收戶不可變[首次調整日期]"); // 輸入資料錯誤
 			}
-			if (tLoanBorMain.getFirstAdjRateDate() < wkTbsDy) {
-				throw new LogicException(titaVo, "E0019", "已過首次調整日,不可變更[首次調整日期]"); // 輸入資料錯誤
-			}
+//			if (tLoanBorMain.getFirstAdjRateDate() < wkTbsDy) {
+//				throw new LogicException(titaVo, "E0019", "已過首次調整日,不可變更[首次調整日期]"); // 輸入資料錯誤
+//			}
 			updLoanBorMain = true;
 			tTemp2Vo.putParam("FstRtAdjDtY", iFirstRateAdjDateY);
 			tTemp1Vo.putParam("FstRtAdjDtY", iFirstRateAdjDateY);

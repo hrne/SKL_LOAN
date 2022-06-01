@@ -78,7 +78,6 @@ public class L2634 extends TradeBuffer {
 	public LoanCom loanCom;
 	int iEntryDate = 0;
 	int iApplDate = 0;
-	int iFunCode = 0;
 	int iType = 0;
 	int choiceDate = 0;
 	List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
@@ -91,7 +90,6 @@ public class L2634 extends TradeBuffer {
 		// tita
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
 		iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
-		iFunCode = parse.stringToInteger(titaVo.getParam("FunCode"));
 		iType = parse.stringToInteger(titaVo.getParam("Type"));
 		choiceDate = dateUtil.getNowIntegerRoc();
 //		更新篩選資料日期

@@ -1,0 +1,231 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L4966)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,251)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+#button=x,1,S
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+!#FKEY
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4966" layout="cols=1;screen.width=[130,1100];printer.width=[20,20];">
+[
+["[L4966]                                 火險佣金資料查詢"],
+["#FdMain+查詢條件","@(借款人統編、借款人戶號、業務員統編、業務員員編，需擇一輸入)"],
+["#FdCustId+借款人統編",#CustId],
+["#FdCustNo+借款人戶號",#CustNo],
+["#FdEmpId+業務員統編",#EmpId],
+["#FdFireOfficer+業務員員編",#FireOfficer],
+]
+
+#FdMain=X,2,L
+#FdCustId=X,2,L
+#FdCustNo=X,2,L
+#FdEmpId=X,2,L
+#FdFireOfficer=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+!---------- AP TEXT AREA Variables ----------
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,13,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+!T(1,@SearchFlag,#NTXBUF,1,1)
+!T(1,@CustNo,#NTXBUF,2,7)
+!T(1,@FacmNo,#NTXBUF,9,3)
+
+
+#CustId=X,10,I
+@A(ID_UNINO,0,#CustId)
+
+#CustNo=A,7,I
+C(4,#CustId,$,S)
+
+! #MRKEY=_,_,S
+! C(3,#CustNo,0,S,T(2,#CustNo))
+
+!借款人統編找借款人戶號
+<include src="ROM.icf::L2R47.dec"/>
+#Rim2R47CustId=X,10,S
+
+#RimL2R47=X,1,S
+C(4,#CustId,S,$)
+T(2,@Rim2R47CustId,#CustId)
+RESET_RIM(#RimL2R47,L2R47)
+S(L2R47,1,#Rim2R47CustId)
+R(1,L2R47)
+
+#MRKEY=_,_,S
+C(4,#CustId,C(3,#CustNo,0,S,T(2,#CustNo)),T(2,#L2R47CustNo)) 
+
+#EmpId=X,10,I
+C(4,#CustId,$,S)
+C(3,#CustNo,0,$,S)
+@A(ID_UNINO,0,#EmpId)
+
+#FireOfficer=X,6,I
+C(4,#CustId,$,S)
+C(3,#CustNo,0,$,S)
+C(4,#EmpId,$,S)
+@
+C(4,#FireOfficer,V(P,借款人統編、借款人戶號、業務員統編、業務員原編擇一輸入),$)
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L4966 ----------
+<sub type="FORM" name="L4966">
+#SCRTIL=_,_,S
+T(3,[L4966] 保險單明細資料)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOInsuYearMonth=A,6,O
+#OONowInsuNo=X,20,O
+#OOInsuCate=A,2,O
+#OOInsuPrem=m,14,O
+#OOInsuStartDate=D,7,O
+#OOInsuEndDate=D,7,O
+#OOInsuredAddr=X,120,O
+#OOCustNo=A,7,O
+#OOFacmNo=A,3,O
+#OOCustName=X,200,O
+#OOFireOfficer=X,46,O
+#OOEmpId=X,10,O
+#OODueAmt=m,14,O
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustId
+#CustNo
+#EmpId
+#FireOfficer
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L4966
+#OOInsuYearMonth
+#OONowInsuNo
+#OOInsuCate
+#OOInsuPrem
+#OOInsuStartDate
+#OOInsuEndDate
+#OOInsuredAddr
+#OOCustNo
+#OOFacmNo
+#OOCustName
+#OOFireOfficer
+#OOEmpId
+#OODueAmt
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4966" layout="cols=3;screen.width=[100,900];order=1;">
+[
+["[L4966                                  火險佣金資料查詢"],
+[""],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID
+#any={detail:true, header:'L4966.part',caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOInsuYearMonth=年月份
+{width:60,align:'center'}
+
+#OONowInsuNo=保單號碼
+{width:80,align:'center'}
+
+#OOInsuCate=險種
+{width:40,align:'center'}
+
+#OOInsuPrem=保費
+{width:100,align:'right'}
+
+#OOInsuStartDate=起保日期
+{width:100,align:'center'}
+
+#OOInsuEndDate=到期日期
+{width:100,align:'center'}
+
+#OOInsuredAddr=被保險人地址
+{width:300,align:'left'}
+
+#OOCustNo=戶號
+{width:60,align:'center'}
+
+#OOFacmNo=額度
+{width:40,align:'center'}
+
+#OOCustName=戶名
+{width:200,align:'left'}
+
+#OOFireOfficer=火險服務
+{width:100,align:'left'}
+
+#OOEmpId=火險服務ＩＤ
+{width:100,align:'left'}
+
+#OODueAmt=應領金額
+{width:100,align:'right'}
+^
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>
