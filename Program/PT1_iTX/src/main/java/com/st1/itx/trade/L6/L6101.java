@@ -296,7 +296,7 @@ public class L6101 extends TradeBuffer {
 	private int findTxToDoMain(int fUnProcessCnt, TitaVo titaVo) throws LogicException {
 
 		Slice<TxToDoMain> slTxToDoMain;
-		slTxToDoMain = sTxToDoMainService.findAll(this.index, Integer.MAX_VALUE);
+		slTxToDoMain = sTxToDoMainService.findAll(this.index, Integer.MAX_VALUE,titaVo);
 		List<TxToDoMain> lTxToDoMain = slTxToDoMain == null ? null : slTxToDoMain.getContent();
 
 		if (lTxToDoMain == null || lTxToDoMain.size() == 0) {

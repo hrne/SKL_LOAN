@@ -76,14 +76,17 @@ public class L560BReport extends MakeReport {
 			throw new LogicException(titaVo, "E0001", "客戶主檔無此戶號:" + iCustNo);
 		}
 		// 檢查債協主檔
-		Slice<NegMain> iNegMain = null;
+//		Slice<NegMain> iNegMain = null;
 		NegMain rNegMain = new NegMain();
-		iNegMain = iNegMainService.forLetter(Integer.valueOf(iCustNo), "1", 0, Integer.MAX_VALUE, titaVo);
-		if (iNegMain == null) {
+		rNegMain = iNegMainService.custNoFirst(Integer.valueOf(iCustNo), titaVo);
+//		if (iNegMain == null) {
+//			throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶號:" + titaVo.getParam("OOCustNo"));
+//		}
+//		rNegMain = iNegMain.getContent().get(0);
+
+		if (rNegMain == null) {
 			throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶號:" + titaVo.getParam("OOCustNo"));
 		}
-		rNegMain = iNegMain.getContent().get(0);
-
 		switch (adjFlag) {
 		case "0": // 前置協商毀諾通知函
 			if (!rNegMain.getStatus().equals("0") && !rNegMain.getStatus().equals("2")) {// 債協戶況需為正常或毀諾
@@ -137,14 +140,17 @@ public class L560BReport extends MakeReport {
 			printCm(1, 3, "致　" + iCustName + " 君：");
 			printRectCm(2, 4, 64, 20, "台端所辦理之「消費者債務清理條例前置協商」業已毀諾，惠請 查照。");
 			printRectCm(2, 5, 63, 20, "一、依「消費者債務清理條例前置協商」相關規定辦理。");
-			printRectCm(2, 6, 63, 4, 20, "二、台端於" + iNegYyy + "年" + iNegMm + "月" + iNegDd + "日簽訂前置協商機制協議書後並未依約繳還各債權金融機構之欠款，屢經通知，仍未獲繳款，已違反前置協商協議書之約定，本行於" + iCloseYyy + "年" + iCloseMm + "月" + iCloseDd
-					+ "日依規定向財團法人金融聯合徵信中心及各債權金融機構通知台端前置協商已毀諾。");
+			printRectCm(2, 6, 63, 4, 20,
+					"二、台端於" + iNegYyy + "年" + iNegMm + "月" + iNegDd
+							+ "日簽訂前置協商機制協議書後並未依約繳還各債權金融機構之欠款，屢經通知，仍未獲繳款，已違反前置協商協議書之約定，本行於" + iCloseYyy + "年" + iCloseMm
+							+ "月" + iCloseDd + "日依規定向財團法人金融聯合徵信中心及各債權金融機構通知台端前置協商已毀諾。");
 			printRectCm(2, 9, 63, 4, 20, "三、再按「消費者債務清理條例前置協商」規定，毀諾後各金融機構即日起恢復催收作業。");
 			printRectCm(2, 11, 63, 20, "四、台端後續可依下列方式清理債務:");
 			printRectCm(2.5, 12, 63, 20, "(一)個別協商(向各金融機構申請)。");
 			printRectCm(2.5, 13, 63, 4, 20, "(二)個別協商一致性方案(向無擔保最大債權金融機構申請，相關申請資訊請參閱銀行公會網站https://www.twidrp.org.tw/)。");
 			printRectCm(2.5, 15, 63, 20, "(三)前置調解(向住、居所地之法院或鄉、鎮、市、區調解委員會聲請)。");
-			printRectCm(2.5, 16, 63, 4, 20, "(四)更生或清算程序(向住、居所地之法院聲請，相關資訊請查閱司法院網站https://www.judicial.gov.tw/index.asp →業務綜覽→消費者債務清理)。");
+			printRectCm(2.5, 16, 63, 4, 20,
+					"(四)更生或清算程序(向住、居所地之法院聲請，相關資訊請查閱司法院網站https://www.judicial.gov.tw/index.asp →業務綜覽→消費者債務清理)。");
 			printCm(2.5, 19, "謹 此");
 			printCm(20, 23, "新光人壽保險股份有限公司   敬上", "R");
 			printCm(20, 24, "（聯絡電話：(02)2389-5858#7076 承辦人員：邱小姐）", "R");
@@ -174,7 +180,8 @@ public class L560BReport extends MakeReport {
 			// 計算剩餘期數
 			int remainPeriod = sNegCom.nper(rNegMain.getPrincipalBal(), rNegMain.getDueAmt(), rNegMain.getIntRate());
 			// 計算應繳金額:最多扣到本金=0為止
-			BigDecimal iCount = sNegCom.calAccuDueAmt(rNegMain.getDueAmt(), rNegMain.getPrincipalBal(), rNegMain.getIntRate(), gapMonth, 0);// 最後一位參數傳0代表計算本利和
+			BigDecimal iCount = sNegCom.calAccuDueAmt(rNegMain.getDueAmt(), rNegMain.getPrincipalBal(),
+					rNegMain.getIntRate(), gapMonth, 0);// 最後一位參數傳0代表計算本利和
 
 			if (gapMonth > remainPeriod) {// 應繳期數不可大於剩餘期數(不超過到期日)
 				gapMonth = remainPeriod;
@@ -208,8 +215,10 @@ public class L560BReport extends MakeReport {
 			printCm(10, 1, "前置協商逾期繳款通知函", "C");
 			setFont(1, 14);
 			printCm(1, 3, "敬啟者：");
-			printRectCm(1, 4, 70, 20, "台端業依消費者債務清理條例成立前置調解清償方案，依約應於" + iDateString + "繳付協商期付金新臺幣" + reCount + "元，惟迄今尚未繳付，請  台端務必於" + iYyy + "年" + iMm + "月25日前繳納，為維護台端權益，特以此函通知下列事項：");
-			printRectCm(1.5, 7, 65, 4, 20, "一、依貴我雙方簽訂之前置協商機制協議書（金融機構無擔保債權）約定，倘  台端未依協議書約定條件清償者，除協議書自違約日起失去效力，未到期部分之債務視為全部到期，債權金融機構並得回復依各債權金融機構之原契約條件繼續訴追。");
+			printRectCm(1, 4, 70, 20, "台端業依消費者債務清理條例成立前置調解清償方案，依約應於" + iDateString + "繳付協商期付金新臺幣" + reCount
+					+ "元，惟迄今尚未繳付，請  台端務必於" + iYyy + "年" + iMm + "月25日前繳納，為維護台端權益，特以此函通知下列事項：");
+			printRectCm(1.5, 7, 65, 4, 20,
+					"一、依貴我雙方簽訂之前置協商機制協議書（金融機構無擔保債權）約定，倘  台端未依協議書約定條件清償者，除協議書自違約日起失去效力，未到期部分之債務視為全部到期，債權金融機構並得回復依各債權金融機構之原契約條件繼續訴追。");
 			printRectCm(1.5, 10, 65, 4, 20, "二、台端倘未能於" + iYyy + "年" + iMm + "月25日前繳足應繳款項，即視為毀諾，請  台端確實依約履行。");
 			printRectCm(1.5, 12, 65, 20, "三、台端應繳款項請存入本行協商專戶如下：");
 			printRectCm(2.2, 13, 63, 20, "（一）收款銀行：新光銀行城內分行");

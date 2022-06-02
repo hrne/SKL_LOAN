@@ -81,7 +81,7 @@ T(2,#AcSubBookCodeHelp,#HelpDesc3)
 
 !銷帳記號
 #ClsFgH=x,50,S
-T(3,0:未銷 ;1:已銷 ; 2:全部)
+T(3,0:未銷 ;1:已銷 ;2:全部)
 
 
 #CHAIN=A,1,S
@@ -310,7 +310,6 @@ T(2,#OOCustNo+-+#OOFacmNo)
 ! 業務科目
 #OOAcctCode=X,3,L
 #OOAcctItem=x,40,L
-T(H,#OOAcctCode,#AcctCodeHelp)
 
 #OOAcctCodeX=x,50,L
 T(2,#OOAcctCode+ +#OOAcctItem)

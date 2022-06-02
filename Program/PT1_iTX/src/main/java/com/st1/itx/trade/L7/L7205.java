@@ -128,9 +128,7 @@ public class L7205 extends TradeBuffer {
 			this.info("fileYearMonth=" + fileYearMonth);
 
 			if (fileYearMonth != iYearMonth) {
-				String ErrorMsg = "輸入的年月份(" + (iYearMonth - 191100) + ")與檔案年月份(" + (fileYearMonth - 191100)
-						+ ")不同，請確認檔案年月份。";
-				throw new LogicException(titaVo, "E0014", ErrorMsg);
+				throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + iYearMonth);
 			}
 			// 切資料
 			setValueFromFileExcelNew(titaVo, iYearMonth);

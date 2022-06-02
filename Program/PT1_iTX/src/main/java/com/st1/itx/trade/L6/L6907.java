@@ -12,6 +12,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
@@ -50,6 +52,9 @@ public class L6907 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
+
+	private String acctCode;
+	CdAcCode tCdAcCode = new CdAcCode();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -99,11 +104,10 @@ public class L6907 extends TradeBuffer {
 
 			// new occurs
 			// 科子項目
-//			occursList.putParam("OOAcNoCode",tAcReceivable.get("AcNoCode"));
-//			occursList.putParam("OOAcSubCode",tAcReceivable.get("AcSubCode"));
-//			occursList.putParam("OOAcDtlCode",tAcReceivable.get("AcDtlCode"));
-//			occursList.putParam("OOAcctItem",tAcReceivable.get("AcctItem")); // 用不到
-//			occursList.putParam("OOAcBookCode",tAcReceivable.get("AcBookCode"));
+			occursList.putParam("OOAcNoCode", tAcReceivable.get("AcNoCode"));
+			occursList.putParam("OOAcSubCode", tAcReceivable.get("AcSubCode"));
+			occursList.putParam("OOAcDtlCode", tAcReceivable.get("AcDtlCode"));
+			occursList.putParam("OOAcBookCode", tAcReceivable.get("AcBookCode"));
 
 			// Y-顯示[明細]按鈕
 			String l6908Flag = "Y";
@@ -121,6 +125,7 @@ public class L6907 extends TradeBuffer {
 
 			// 業務科目 OOAcctCodeX
 			occursList.putParam("OOAcctCode", tAcReceivable.get("AcctCode"));
+			occursList.putParam("OOAcctItem", getAcctItem(tAcReceivable, titaVo)); // 用不到
 			// 銷帳編號 OORvNo
 			occursList.putParam("OORvNo", tAcReceivable.get("RvNo"));
 			// 起帳日期 OOOpenAcDate
@@ -147,4 +152,56 @@ public class L6907 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
+	private String getAcctItem(Map<String, String> rv, TitaVo titaVo) throws LogicException {
+
+		acctCode = rv.get("AcctCode");
+		if (acctCode == null || acctCode.length() < 3)
+			acctCode = "   ";
+		String acctItem = "";
+
+		CdAcCode tCdAcCode = new CdAcCode();
+		CdAcCodeId CdAcCodeId = new CdAcCodeId();
+//	 	  銷帳科目記號ReceivableFlag = 4-短繳期金
+//		   Z10	短期擔保放款	310	短期擔保放款
+//		   Z20	中期擔保放款	320	中期擔保放款
+//		   Z30	長期擔保放款	330	長期擔保放款
+//		   Z40	三十年房貸	340	三十年房貸
+//
+//		   ZC1	短擔息	      IC1	短擔息
+//		   ZC2	中擔息	      IC2	中擔息
+//		   ZC3	長擔息	      IC3	長擔息
+//		   ZC4	三十年房貸息	  IC4	三十年房貸息
+//		   ZOV	逾期息              IOV	逾期息
+//		   ZOP	違約金              IOP	違約金       
+//
+//	 	   銷帳科目記號ReceivableFlag = 5-另收欠款
+//	       YOP 清償違約金         IOP	違約金              
+		if ("Z".equals(acctCode.substring(0, 1))) {
+			if ("ZC".equals(acctCode.substring(0, 2)))
+				acctItem = "短繳利息";
+			else if ("ZOV".equals(acctCode.substring(0, 2)))
+				acctItem = "短繳逾期息";
+			else if ("ZOP".equals(acctCode))
+				acctItem = "短繳違約金";
+			else
+				acctItem = "短繳本金";
+		}
+		if ("YOP".equals(acctCode))
+			acctItem = "清償違約金";
+		if ("".equals(acctItem)) {
+			if (acctCode.trim().length() > 0) {
+				tCdAcCode = cdAcCodeService.acCodeAcctFirst(acctCode, titaVo);
+			} else {
+				CdAcCodeId.setAcNoCode(rv.get("AcNoCode"));
+				CdAcCodeId.setAcSubCode(rv.get("AcSubCode"));
+				CdAcCodeId.setAcDtlCode(rv.get("AcDtlCode"));
+				tCdAcCode = cdAcCodeService.findById(CdAcCodeId, titaVo);
+			}
+			acctItem = tCdAcCode.getAcctItem();
+		}
+
+		return acctItem;
+	}
+
 }

@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6001 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6001.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -63,7 +62,7 @@ public class L6001 extends TradeBuffer {
 		// new OccursList
 		OccursList OccursList = new OccursList();
 
-		Slice<TxToDoMain> slTxToDoMain = sTxToDoMainService.findAll(this.index, this.limit);
+		Slice<TxToDoMain> slTxToDoMain = sTxToDoMainService.findAll(this.index, this.limit,titaVo);
 		lTxToDoMain = slTxToDoMain == null ? null : slTxToDoMain.getContent();
 
 		if (lTxToDoMain == null) {

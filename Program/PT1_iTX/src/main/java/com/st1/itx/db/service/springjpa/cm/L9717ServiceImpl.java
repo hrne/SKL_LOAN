@@ -383,9 +383,9 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("businessOfficer", titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " "
 				: titaVo.getParam("inputBusinessOfficer"));
 
-		if (kind == OutputSortBy.Year) {
-			query.setParameter("entYear", entYearMonth);
-		}
+//		if (kind == OutputSortBy.Year) {
+//			query.setParameter("entYear", entYearMonth);
+//		}
 
 		this.info("L9717ServiceImpl inputs:");
 		this.info("entYearMonth: " + entYearMonth);
