@@ -144,7 +144,7 @@ INVOKEJS(SHOW,p1,13,19,0)
 ["#FdInterest+利息",#TwInterest,#UsInterest],["#FdModifyFee+契變手續費",#TwModifyFee,#UsModifyFee],
 ["#FdDelayInt+延遲息",#TwDelayInt,#UsDelayInt],["#FdFireFee+火險費",#TwFireFee,#UsFireFee],
 ["#FdBreachAmt+違約金",#TwBreachAmt,#UsBreachAmt],["#FdLawFee+法務費",#TwLawFee,#UsLawFee],
-[#<->#,"#FdShortfall+累短收",#ShortfallX,#ShortfallXX],
+["#FdShortfall+累短收",#ShortfallX,#ShortfallXX],["#FdExcessive+累溢收",#ExcessiveX],
 [#<->#,"#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
 [#<->#,"#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],
 ["#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
@@ -813,17 +813,6 @@ HELP(#YNHelp)
 #UnpaidIntFlagX=X,2,L
 T(3,)T(H,#UnpaidIntFlag,#YNHelp)
 
-#FdPayFeeFlag=X,2,L
-!是否回收費用
-#PayFeeFlag=X,1,I
-T(3,Y)
-C(3,#RepayType,12,s,$)
-IF(#RepayType==1 ||#RepayType==2,$,s)
-HELP(#YNHelp)
-@V(H,#YNHelp)
-
-#PayFeeFlagX=X,2,L
-T(3,)T(H,#PayFeeFlag,#YNHelp)
 
 
 #SendL3r06B=X,1,S
@@ -882,6 +871,8 @@ V(5,1,#SumRepayAmt)
 #TimRepayAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwRepayAmt),E(0,#UsRepayAmt))
 
+
+
 !催收收回金額
 #FdOvduRepay=X,2,L
 
@@ -898,6 +889,18 @@ C(3,#Precision,0,S,$)
 #TimOvduRepay=m,14.2,S
 C(3,#RepayType,12,$,S)
 C(3,#Precision,0,E(0,#TwOvduRepay),E(0,#UsOvduRepay))
+
+#FdPayFeeFlag=X,2,L
+!是否回收費用
+#PayFeeFlag=X,1,I
+T(3,Y)
+C(3,#RepayType,12,s,$)
+IF(#RepayType==1 ||#RepayType==2,$,s)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#PayFeeFlagX=X,2,L
+T(3,)T(H,#PayFeeFlag,#YNHelp)
 
 
 ![本金]
@@ -1104,6 +1107,18 @@ T(3,，)
 #ShortfallXX=X,80,L
 T(B,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
 P(L,#ShortfallXX)
+
+!累溢收
+#FdExcessive=X,2,L
+
+#Excessive=m,14.2,S
+E(0,#L3r06Excessive)
+
+#ExcessiveX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+
+
+
 
 !是否顯示繳納方式記號
 !0=不顯示輸入 1=顯示輸入

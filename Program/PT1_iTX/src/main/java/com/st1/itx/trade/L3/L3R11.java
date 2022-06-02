@@ -275,7 +275,7 @@ public class L3R11 extends TradeBuffer {
 		this.totaVo.putParam("L3r11ShortfallInt", baTxCom.getShortfallInterest());
 		this.totaVo.putParam("L3r11ShortfallPrin", baTxCom.getShortfallPrincipal());
 		this.totaVo.putParam("L3r11ShortCloseBreach", baTxCom.getShortCloseBreach());
-		this.totaVo.putParam("L3r11Excessive", baTxCom.getExcessive());
+		this.totaVo.putParam("L3r11Excessive", baTxCom.getExcessive().add(baTxCom.getExcessiveOther()));
 		this.totaVo.putParam("L3r11ModifyFee", baTxCom.getModifyFee());
 		this.totaVo.putParam("L3r11AcctFee", baTxCom.getAcctFee());
 		this.totaVo.putParam("L3r11FireFee", baTxCom.getFireFee());

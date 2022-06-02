@@ -1,8 +1,8 @@
-CREATE OR REPLACE PROCEDURE "Usp_L7_Ias34Ep_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_Ias34Ep_Upd"
 (
 -- 程式功能：維護 Ias34Ep 每月IAS34資料欄位清單E檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_Ias34Ep_Upd"(20201231,'System',0);
+-- 執行方式：EXEC "Usp_L7_Ias34Ep_Upd"(20201231,'999999',0);
 --
 
     -- 參數
@@ -74,8 +74,12 @@ BEGIN
          , "AcReceivable"."AcctCode"            AS  "AcctCode"
     FROM  "AcReceivable"
       LEFT JOIN "CdAcCode" CD  ON CD."AcctCode" = "AcReceivable"."AcctCode"
+      LEFT JOIN "LoanBorMain" LB ON LB."CustNo" = "AcReceivable"."CustNo"
+                                AND LB."FacmNo" = "AcReceivable"."FacmNo"
+                                AND LB."BormNo" = to_number("AcReceivable"."RvNo")
     WHERE  "AcReceivable"."AcctCode" IN ('310', '320', '330', '340', '990')
-      AND  "AcReceivable"."ClsFlag"  = 0     --未銷
+      AND  LB."Status" IN (0 , 2 , 7)
+--      AND  "AcReceivable"."ClsFlag"  = 0     --未銷
       ;
 
     --合併當年度轉呆帳

@@ -32,8 +32,6 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	// *** 折返控制相關 ***
-	private int index;
 
 	// *** 折返控制相關 ***
 	private int limit;
@@ -88,7 +86,8 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    A.\"AcBookCode\"        AS \"AcBookCode\", ";
 		sql += "    A.\"AcSubBookCode\"     AS \"AcSubBookCode\", ";
 		sql += "    A.\"LastUpdate\"        AS \"LastUpdate\", ";
-		sql += "    A.\"LastUpdateEmpNo\"   AS \"LastUpdateEmpNo\" ";
+		sql += "    A.\"LastUpdateEmpNo\"   AS \"LastUpdateEmpNo\", ";
+		sql += "    A.\"ReceivableFlag\"   AS \"ReceivableFlag\" ";
 		sql += "    FROM ";
 		sql += "    \"AcReceivable\" A ";
 		sql += "    LEFT JOIN ( ";

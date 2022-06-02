@@ -68,7 +68,7 @@ public class L7205 extends TradeBuffer {
 	MonthlyLM052LoanAssetService sLM052LoanAsset;
 	@Autowired
 	MonthlyLM052OvduService sLM052Ovdu;
-	
+
 	@Autowired
 	JobMainService sJobMainService;
 
@@ -120,10 +120,11 @@ public class L7205 extends TradeBuffer {
 		this.info("file extension=" + extension[extension.length - 1]);
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
-			makeExcel.openExcel(filename, 1);
 
+			makeExcel.openExcel(filename, 1);
 			// 取得年月
 			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
+
 			this.info("fileYearMonth=" + fileYearMonth);
 
 			if (fileYearMonth != iYearMonth) {
@@ -132,7 +133,7 @@ public class L7205 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0014", ErrorMsg);
 			}
 			// 切資料
-			setValueFromFileExcel(titaVo, iYearMonth);
+			setValueFromFileExcelNew(titaVo, iYearMonth);
 		} else if ("csv".equals(extension[extension.length - 1])) {
 			setValueFromFile(dataLineList);
 		} else {
@@ -173,7 +174,7 @@ public class L7205 extends TradeBuffer {
 				CountF++; // 失敗筆數+1
 			} else {
 				tMonthlyFacBal.setAssetClass(assetclass);
-				
+
 				if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 					tMonthlyFacBal.setLawAmount(lawAmount);
 				}
@@ -245,8 +246,8 @@ public class L7205 extends TradeBuffer {
 		this.totaVo.putParam("CountF", CountF);
 
 //		 重產LM051報表
-		titaVo.setBatchJobId( "jLM051");
-		updLM052ReportSP(titaVo,iYearMonth);
+		titaVo.setBatchJobId("jLM051");
+		updLM052ReportSP(titaVo, iYearMonth);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -279,7 +280,7 @@ public class L7205 extends TradeBuffer {
 
 	}
 
-	public void setValueFromFileExcel(TitaVo titaVo, int YearMonth) throws LogicException {
+	public void setValueFromFileExcelNew(TitaVo titaVo, int YearMonth) throws LogicException {
 
 		// 取得工作表資料的最後一列
 		int lastRowNum = makeExcel.sheet.getLastRowNum() + 1;
@@ -302,17 +303,18 @@ public class L7205 extends TradeBuffer {
 //					&& (iFacmNo.compareTo(BigDecimal.ZERO) == -1 || iFacmNo == null)
 //					&& (iAssetClass.compareTo(BigDecimal.ZERO) == -1 || iAssetClass == null)) {
 //		}
-			
+
 //			this.info("iCustNo=" + makeExcel.getValue(i, 2).toString());
 //			this.info("iFacmNo=" + makeExcel.getValue(i, 3).toString());
 //			this.info("iAssetClass=" + makeExcel.getValue(i, 8).toString());
-		
-			//正常是連續的資料串，遇到空值強行結束
-			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length()==0 || makeExcel.getValue(i, 8).toString().length()==0 || makeExcel.getValue(i, 9).toString().length()==0) {
+
+			// 正常是連續的資料串，遇到空值強行結束
+			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
+					|| makeExcel.getValue(i, 8).toString().length() == 0
+					|| makeExcel.getValue(i, 9).toString().length() == 0) {
 				break;
 			}
-			
-			
+
 			try {
 				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
 				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
@@ -342,13 +344,71 @@ public class L7205 extends TradeBuffer {
 
 	}
 
-	
-	private void updLM052ReportSP(TitaVo titaVo,int yearMonth) {
+	public void setValueFromFileExcelOld(TitaVo titaVo, int YearMonth) throws LogicException {
+
+		// 取得工作表資料的最後一列
+		int lastRowNum = makeExcel.sheet.getLastRowNum() + 1;
+
+		this.info("lastRowNum=" + lastRowNum);
+
+		int iYearMonth = YearMonth;
+		BigDecimal iCustNo = BigDecimal.ZERO;
+		BigDecimal iFacmNo = BigDecimal.ZERO;
+		BigDecimal iAssetClass = BigDecimal.ZERO;
+		BigDecimal iLawAmount = BigDecimal.ZERO;
+		for (int i = 1; i <= lastRowNum; i++) {
+
+			OccursList occursList = new OccursList();
+
+			// 正常是連續的資料串，遇到空值強行結束
+			if (makeExcel.getValue(i, 1).toString().length() == 0 || makeExcel.getValue(i, 2).toString().length() == 0
+					|| makeExcel.getValue(i, 3).toString().length() == 0
+					|| makeExcel.getValue(i, 4).toString().length() == 0) {
+				break;
+			}
+
+			if (Integer.valueOf(makeExcel.getValue(i, 1).toString()) != iYearMonth) {
+				this.info("輸入的年份：" + iYearMonth);
+				this.info("檔案的年份：" + Integer.valueOf(makeExcel.getValue(i, 1).toString()));
+				throw new LogicException(titaVo, "E0015",
+						"年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + makeExcel.getValue(i, 1));
+
+			}
+			try {
+				iCustNo = new BigDecimal(makeExcel.getValue(i, 2).toString());
+				iFacmNo = new BigDecimal(makeExcel.getValue(i, 3).toString());
+				iAssetClass = new BigDecimal(makeExcel.getValue(i, 4).toString());
+				iLawAmount = new BigDecimal(makeExcel.getValue(i, 5).toString());
+			} catch (Exception e) {
+
+				String ErrorMsg = "L7205(Excel欄位應為戶號在B欄、額度在C欄、資產分類為H欄)，請確認";
+
+				throw new LogicException(titaVo, "E0015", ErrorMsg);
+			}
+
+			// 設定明細欄位的擷取位置
+			// 1 YearMonth 年月份 Decimal 6 YYYYMM 西元年月
+			// 2 CustNo 戶號 Decimal 7
+			// 3 FacmNo 額度編號 Decimal 3
+			// 4 AssetClass 資產五分類代號(有擔保部分) Decimal 1
+
+			occursList.putParam("YearMonth", iYearMonth);
+			occursList.putParam("CustNo", iCustNo.intValue());
+			occursList.putParam("FacmNo", iFacmNo.intValue());
+			occursList.putParam("AssetClass", iAssetClass.intValue());
+			occursList.putParam("LawAmount", iLawAmount.intValue());
+
+			this.occursList.add(occursList);
+		}
+
+	}
+
+	private void updLM052ReportSP(TitaVo titaVo, int yearMonth) {
 		this.info("upd LM052 SP start.");
 		String empNo = titaVo.getTlrNo();
 		this.info("empNo=" + empNo);
 		this.info("yearMonth=" + yearMonth);
-		//僅影響此USP，需update資料
+		// 僅影響此USP，需update資料
 		sLM052AssetClass.Usp_L9_MonthlyLM052AssetClass_Ins(yearMonth, empNo, titaVo);
 //		sLM052LoanAsset.Usp_L9_MonthlyLM052LoanAsset_Ins(yearMonth, empNo, titaVo);
 //		sLM052Ovdu.Usp_L9_MonthlyLM052Ovdu_Ins(yearMonth, empNo, titaVo);

@@ -96,8 +96,7 @@ public class L6907 extends TradeBuffer {
 //					rvBal = rvBal.add(iRvBal);
 //				}
 //			}
-			
-			
+
 			// new occurs
 			// 科子項目
 //			occursList.putParam("OOAcNoCode",tAcReceivable.get("AcNoCode"));
@@ -106,15 +105,15 @@ public class L6907 extends TradeBuffer {
 //			occursList.putParam("OOAcctItem",tAcReceivable.get("AcctItem")); // 用不到
 //			occursList.putParam("OOAcBookCode",tAcReceivable.get("AcBookCode"));
 
-//			// Y-顯示[明細]按鈕
-//			String l6908Flag = "Y";
-//			// 未收費用未變動不顯示按鈕
-//			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
-//					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
-//				l6908Flag = "";
-//			}
-//			occursList.putParam("L6908Flag", l6908Flag);
-			
+			// Y-顯示[明細]按鈕
+			String l6908Flag = "Y";
+			// 未收費用未變動不顯示按鈕
+			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
+					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
+				l6908Flag = "";
+			}
+			occursList.putParam("L6908Flag", l6908Flag);
+
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));
@@ -133,7 +132,7 @@ public class L6907 extends TradeBuffer {
 			// 未銷餘額 OORvBal
 			occursList.putParam("OORvBal", tAcReceivable.get("RvBal"));
 			// 業務科目合計 OO_SUM1
-			occursList.putParam("OO_SUM",tAcReceivable.get("SumRvBal"));
+			occursList.putParam("OO_SUM", tAcReceivable.get("SumRvBal"));
 			// 區隔帳冊 OOAcSubBookCode
 			occursList.putParam("OOAcSubBookCode", tAcReceivable.get("AcSubBookCode"));
 			// 最後修改日期 OOLastUpdate
@@ -144,7 +143,6 @@ public class L6907 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 
 		}
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

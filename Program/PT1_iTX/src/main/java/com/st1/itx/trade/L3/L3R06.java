@@ -207,6 +207,8 @@ public class L3R06 extends TradeBuffer {
 		oShortfallInt = baTxCom.getShortfallInterest();
 		oShortfallPrin = baTxCom.getShortfallPrincipal();
 		oShortCloseBreach = baTxCom.getShortCloseBreach();
+		oExcessive= baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
+		
 		oTotalFee = oTotalFee.add(oModifyFee).add(oAcctFee).add(oFireFee).add(oCollFireFee).add(oLawFee)
 				.add(oCollLawFee);
 

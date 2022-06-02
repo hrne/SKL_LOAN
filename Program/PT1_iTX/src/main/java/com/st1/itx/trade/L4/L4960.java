@@ -166,6 +166,7 @@ public class L4960 extends TradeBuffer {
 				occursList.putParam("OOEndoInsuNo", tInsuRenew.getInsuRenewId().getEndoInsuNo());
 				occursList.putParam("OOSelfInsuCode", selfInsuCode);
 				occursList.putParam("OOStatusCode", tInsuRenew.getStatusCode());
+				occursList.putParam("OOAcDate", tInsuRenew.getAcDate());
 				occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
 
 				/* 將每筆資料放入Tota的OcList */

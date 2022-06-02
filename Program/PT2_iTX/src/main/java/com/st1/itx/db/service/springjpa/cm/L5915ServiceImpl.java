@@ -43,7 +43,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "select a.\"Coorgnizer\",b.\"Fullname\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\",a.\"DrawdownAmt\",a.\"ComputeCoBonusAmt\",a.\"CoorgnizerBonus\" ";
 		sql += "from \"PfDetail\" a ";
 		sql += "left join \"CdEmp\" b on b.\"EmployeeNo\"=a.\"Coorgnizer\" ";
-		sql += "where a.\"WorkMonth\"=:workmonth and a.\"Coorgnizer\" is not null and a.\"RepayType\"=0 ";
+		sql += "where a.\"WorkMonth\"=:workmonth and a.\"Coorgnizer\" is not null and a.\"ComputeCoBonusAmt\">0 and a.\"RepayType\"=0 ";
 		sql += "order by a.\"Coorgnizer\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
 		this.info("sql = " + sql);
 
