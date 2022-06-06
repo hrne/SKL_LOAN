@@ -153,7 +153,9 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 		sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
 		sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
-		sql += "    , DECODE(TX1.\"TitaTxCd\", 'L3210', '999', NVL(FAC.\"AcctCode\",'999')) AS \"SortingForSubTotal\""; // 配合小計產生的排序
+		sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.RepayType'), ' ') IN ('1','2','3') THEN NVL(FAC.\"AcctCode\",'999') ";		
+		sql += "           WHEN TX1.\"TitaTxCd\" = 'L3210' THEN '999' ";
+		sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
 		sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 		sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 		sql += "    , NVL(TX1.\"PaidTerms\", 0) AS \"PaidTerms\" ";

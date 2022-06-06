@@ -117,6 +117,11 @@ public class FacClose implements Serializable {
   @Column(name = "`DocNo`")
   private int docNo = 0;
 
+  // 公文編號(迄)
+  /* 只保留後四碼流水號 */
+  @Column(name = "`DocNoE`")
+  private int docNoE = 0;
+
   // 銷號欄
   @Column(name = "`ClsNo`", length = 18)
   private String clsNo;
@@ -592,6 +597,25 @@ public class FacClose implements Serializable {
   }
 
 /**
+	* 公文編號(迄)<br>
+	* 只保留後四碼流水號
+	* @return Integer
+	*/
+  public int getDocNoE() {
+    return this.docNoE;
+  }
+
+/**
+	* 公文編號(迄)<br>
+	* 只保留後四碼流水號
+  *
+  * @param docNoE 公文編號(迄)
+	*/
+  public void setDocNoE(int docNoE) {
+    this.docNoE = docNoE;
+  }
+
+/**
 	* 銷號欄<br>
 	* 
 	* @return String
@@ -751,7 +775,7 @@ public class FacClose implements Serializable {
     return "FacClose [facCloseId=" + facCloseId + ", facmNo=" + facmNo + ", actFlag=" + actFlag + ", funCode=" + funCode + ", carLoan=" + carLoan
            + ", applDate=" + applDate + ", closeDate=" + closeDate + ", closeInd=" + closeInd + ", closeReasonCode=" + closeReasonCode + ", closeAmt=" + closeAmt + ", collectFlag=" + collectFlag
            + ", collectWayCode=" + collectWayCode + ", receiveDate=" + receiveDate + ", telNo1=" + telNo1 + ", telNo2=" + telNo2 + ", telNo3=" + telNo3 + ", entryDate=" + entryDate
-           + ", agreeNo=" + agreeNo + ", docNo=" + docNo + ", clsNo=" + clsNo + ", rmk=" + rmk + ", receiveFg=" + receiveFg + ", postAddress=" + postAddress
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", agreeNo=" + agreeNo + ", docNo=" + docNo + ", docNoE=" + docNoE + ", clsNo=" + clsNo + ", rmk=" + rmk + ", receiveFg=" + receiveFg
+           + ", postAddress=" + postAddress + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

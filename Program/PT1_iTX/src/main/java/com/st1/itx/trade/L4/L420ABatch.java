@@ -100,7 +100,8 @@ public class L420ABatch extends TradeBuffer {
 	private List<BatxDetail> l2BatxDetail;
 	private List<BatxDetail> l3BatxDetail;
 	private Slice<BatxDetail> slBatxDetail;
-	boolean isRepaytypeNotEqual = false;
+	boolean isMergeCheckAgain = false;
+	private int doneCnt = 0; // 已入帳
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -136,8 +137,8 @@ public class L420ABatch extends TradeBuffer {
 
 		doCheckAll(titaVo);
 
-		// 合併的還款類別設定為費用則須再全部檢核一次
-		if (isRepaytypeNotEqual) {
+		// 合併的還款類別設定為另收費用則須再全部檢核一次
+		if (isMergeCheckAgain) {
 			this.info("RepaytypeNotEqual check again ...");
 			this.l4211MapList = new ArrayList<Map<String, String>>();
 			doCheckAll(titaVo);
@@ -147,8 +148,8 @@ public class L420ABatch extends TradeBuffer {
 
 		// end
 		this.batchTransaction.commit();
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
-				iBatchNo + " 整批檢核, " + msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+				titaVo.getEntDyI() + "0" + tBatxHead.getTitaTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
 
 		// 匯款轉帳檢核明細表
 		if (l4211MapList.size() > 0) {
@@ -169,6 +170,10 @@ public class L420ABatch extends TradeBuffer {
 		if (slBatxDetail != null) {
 			for (BatxDetail t : slBatxDetail.getContent()) {
 				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
+							|| "7".equals(t.getProcStsCode())) {
+						doneCnt++;
+					}
 					if ("0".equals(t.getProcStsCode()) || "2".equals(t.getProcStsCode())
 							|| "3".equals(t.getProcStsCode()) || "4".equals(t.getProcStsCode())) {
 						batxDetailService.holdById(t);
@@ -185,7 +190,7 @@ public class L420ABatch extends TradeBuffer {
 						t.setProcNote(tTempVo.getJsonString());
 						lBatxDetail.add(t);
 						// 匯款轉帳同戶號多筆檢核放 00-未定 01-期款 02-部分還本 03-結案
-						if (t.getRepayCode() == 1 && t.getRepayType() <= 3) {
+						if (t.getRepayCode() == 1) {
 							mapKey = parse.IntegerToString(t.getCustNo(), 7)
 									+ parse.IntegerToString(t.getRepayType(), 2);
 							if (mergeAmt.containsKey(mapKey)) {
@@ -314,14 +319,12 @@ public class L420ABatch extends TradeBuffer {
 			if (!"4".equals(t.getProcStsCode()) && "4".equals(procStsCode)) {
 				procStsCode = "2";
 			}
-			if (t.getRepayType() != iRepayType) {
-				isRepaytypeNotEqual = true;
-			}
-			if (iRepayType == 3) {
-				t.setRepayType(3);
+			if (iRepayType != 3 && t.getRepayType() >= 4 && t.getRepayType() <= 8) {
+				isMergeCheckAgain = true;
+			} else {
+				t.setRepayType(iRepayType);
 			}
 		}
-
 		for (BatxDetail t : l3BatxDetail) {
 			t.setProcStsCode(procStsCode);
 		}
@@ -330,7 +333,6 @@ public class L420ABatch extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "lA2BatxDetail" + e.getErrorMsg());
 		}
-
 		for (BatxDetail t : l3BatxDetail) {
 			addL4211MapList(t, this.baTxList, titaVo);
 		}
@@ -352,6 +354,12 @@ public class L420ABatch extends TradeBuffer {
 			return;
 		}
 		if (iBatxList == null || iBatxList.size() == 0) {
+			this.info("addL4211MapList iBatxList.size = 0 return ");
+			return;
+		}
+		// 已入帳不出表
+		if (doneCnt > 0) {
+			this.info("addL4211MapList doneCnt > 0 return ");
 			return;
 		}
 		String custName = " ";
@@ -454,11 +462,9 @@ public class L420ABatch extends TradeBuffer {
 			da.put("AcctItem", facAcctItem);
 			da.put("RepayItem", getCdCode("RepayType", parse.IntegerToString(tDetail.getRepayType(), 2), titaVo));
 			l4211MapList.add(da);
-		}
-
-		for (Map<String, String> da : l4211MapList) {
 			this.info("addL4211MapList = " + da.toString());
 		}
+
 	}
 
 	private String getCdCode(String iDefCode, String iCode, TitaVo titaVo) throws LogicException {
@@ -657,13 +663,12 @@ public class L420ABatch extends TradeBuffer {
 				// 交易金額放第一筆
 				ba.setTxAmt(wkTxAmt);
 				wkTxAmt = BigDecimal.ZERO;
-				// 本金、利息已包含
-				ba.setAcAmt(ba.getAcctAmt().add(wkFeeAmt));
 				// 本金、利息包含本次短繳，作帳金額扣除
-				ba.setAcAmt(ba.getAcAmt().subtract(ba.getUnpaidPrin()).subtract(ba.getUnpaidInt()));
+				ba.setAcAmt(ba.getAcctAmt().subtract(ba.getUnpaidPrin()).subtract(ba.getUnpaidInt()));
 				// 費用放第一筆
 				if (wkFeeAmt.compareTo(BigDecimal.ZERO) > 0) {
 					ba.setFeeAmt(wkFeeAmt);
+					ba.setAcAmt(ba.getAcAmt().add(wkFeeAmt));
 					wkFeeAmt = BigDecimal.ZERO;
 				}
 				// 溢繳款放第一筆
@@ -694,6 +699,7 @@ public class L420ABatch extends TradeBuffer {
 				// 費用放第一筆
 				if (wkFeeAmt.compareTo(BigDecimal.ZERO) > 0) {
 					ba.setFeeAmt(wkFeeAmt);
+					ba.setAcAmt(wkFeeAmt);
 					wkFeeAmt = BigDecimal.ZERO;
 				}
 				// 溢繳款放第一筆

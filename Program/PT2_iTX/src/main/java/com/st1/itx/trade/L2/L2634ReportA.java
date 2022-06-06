@@ -158,7 +158,11 @@ public class L2634ReportA extends MakeReport {
 //			更新公文編號
 			FacClose updFacClose = sFacCloseService.holdById(FacCloseId, titaVo);
 			if (updFacClose != null) {
-				updFacClose.setDocNo(parse.stringToInteger(docNo));
+				if (updFacClose.getDocNo() == 0) {
+					updFacClose.setDocNo(parse.stringToInteger(docNo));
+				} else {
+					updFacClose.setDocNoE(parse.stringToInteger(finalDocNo));
+				}
 				try {
 					sFacCloseService.update(updFacClose, titaVo);
 				} catch (DBException e) {
@@ -170,8 +174,7 @@ public class L2634ReportA extends MakeReport {
 			String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
 
 			String DocNoseQ = parse.IntegerToString(DocNo, 7).substring(3, 7);
-			// 功能
-			String funCdString = tFacClose.getFunCode();
+
 			// 縣市
 			String wkCity = "";
 			if ("".equals(t.getOtherCity())) {
@@ -243,30 +246,6 @@ public class L2634ReportA extends MakeReport {
 //		RecNumber收件號
 //		RightsNote權利價值說明
 //		SecuredTotal擔保債權總金額
-			if (t.getReceiveFg() == 1) {
-
-				Point a = new Point(85, 200);
-				Point b = new Point(120, 200);
-				Point c = new Point(85, 220);
-				Point d = new Point(120, 220);
-
-				Line ab = new Line(a, b);
-				Line ac = new Line(a, c);
-				Line bd = new Line(b, d);
-				Line cd = new Line(c, d);
-
-				ArrayList<Line> lineList = new ArrayList<Line>();
-
-				lineList.add(ab);
-				lineList.add(ac);
-				lineList.add(bd);
-				lineList.add(cd);
-
-				this.drawLineList(lineList);
-				this.setFont(1, 17);
-				this.print(7, 11, "補發", "L");
-				this.print(-9, 1, " ");
-			}
 			this.print(1, 1, "　　");
 
 			/**
@@ -350,12 +329,43 @@ public class L2634ReportA extends MakeReport {
 			this.print(0, 40, date.substring(0, 3));
 			this.print(0, 52, date.substring(3, 5));
 			this.print(0, 68, date.substring(5, 7));
+			if (t.getReceiveFg() == 1) {
 
+				Point a = new Point(85, 124);
+				Point b = new Point(120, 124);
+				Point c = new Point(85, 144);
+				Point d = new Point(120, 144);
+
+				Line ab = new Line(a, b);
+				Line ac = new Line(a, c);
+				Line bd = new Line(b, d);
+				Line cd = new Line(c, d);
+
+				ArrayList<Line> lineList = new ArrayList<Line>();
+
+				lineList.add(ab);
+				lineList.add(ac);
+				lineList.add(bd);
+				lineList.add(cd);
+
+				this.drawLineList(lineList);
+				this.setFont(1, 17);
+				this.print(-7, 11, "補發", "L");
+				this.setFont(1, 14);
+			}
+////			更新他項權利領取記號 1已領取
+//			ClOtherRights updClOtherRights = sClOtherRightsService.holdById(t, titaVo);
+//			updClOtherRights.setReceiveFg(1);
+//			try {
+//				sClOtherRightsService.update(updClOtherRights, titaVo);
+//			} catch (DBException e) {
+//				throw new LogicException("E0007", "L2634A ClOtherRights update " + e.getErrorMsg());
+//			}
 			if (!isLast) {
 				this.newPage();
 			}
 		}
-
+		this.info("A 結束");
 		this.close();
 
 	}

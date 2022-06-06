@@ -575,13 +575,29 @@ public class ApControl extends SysLogger {
 
 		if (!Objects.isNull(txBuffer)) {
 			if (!Objects.isNull(txBuffer.getAcDetailList()))
-				txBuffer.getAcDetailList().clear();
+				try {
+					txBuffer.getAcDetailList().clear();
+				} catch (Exception e) {
+					this.error(e.getMessage());
+				}
 			if (!Objects.isNull(txBuffer.getAmlList()))
-				txBuffer.getAmlList().clear();
+				try {
+					txBuffer.getAmlList().clear();
+				} catch (Exception e) {
+					this.error(e.getMessage());
+				}
 			if (!Objects.isNull(txBuffer.getReasonLi()))
-				txBuffer.getReasonLi().clear();
+				try {
+					txBuffer.getReasonLi().clear();
+				} catch (Exception e) {
+					this.error(e.getMessage());
+				}
 			if (!Objects.isNull(txBuffer.getRspList()))
-				txBuffer.getRspList().clear();
+				try {
+					txBuffer.getRspList().clear();
+				} catch (Exception e) {
+					this.error(e.getMessage());
+				}
 			txBuffer = null;
 		}
 

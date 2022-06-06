@@ -191,6 +191,7 @@ public class L2634 extends TradeBuffer {
 				tClOtherRights.setCustNo(0);
 				tClOtherRights.setCloseNo(0);
 				if (iType == 2) {
+//					更新他項權利領取記號 1已領取
 					tClOtherRights.setReceiveFg(1);
 				}
 
@@ -223,7 +224,7 @@ public class L2634 extends TradeBuffer {
 
 	// 清償塗銷同意書
 	private void doRptA(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
-		this.info("L2076B doRptB started.");
+		this.info("L2634A doRptA started.");
 
 		// 撈資料組報表
 		l2634ReportA.exec(lClOtherRights, titaVo);
@@ -231,7 +232,7 @@ public class L2634 extends TradeBuffer {
 
 	// 用印申請書
 	private void doRptB(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
-		this.info("L2076B doRptB started.");
+		this.info("L2634B doRptB started.");
 
 		// 撈資料組報表
 		l2634ReportB.exec(lClOtherRights, titaVo);
@@ -239,7 +240,7 @@ public class L2634 extends TradeBuffer {
 
 	// 簽收回條
 	private void doRptC(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
-		this.info("L2076C doRptC started.");
+		this.info("L2634C doRptC started.");
 
 		// 撈資料組報表
 		l2634ReportC.exec(lClOtherRights, titaVo);
@@ -248,7 +249,7 @@ public class L2634 extends TradeBuffer {
 
 	// 雙掛號信封
 	private void doRptD(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
-		this.info("L2076D doRptD started.");
+		this.info("L2634D doRptD started.");
 
 		// 撈資料組報表
 		l2634ReportD.exec(lClOtherRights, titaVo);
@@ -257,7 +258,7 @@ public class L2634 extends TradeBuffer {
 
 	// 雙掛號小單
 	private void doRptE(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
-		this.info("L2076E doRptE started.");
+		this.info("L2634E doRptE started.");
 
 		// 撈資料組報表
 		l2634ReportE.exec(lClOtherRights, titaVo);

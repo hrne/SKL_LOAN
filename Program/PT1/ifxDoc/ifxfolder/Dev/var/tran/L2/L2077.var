@@ -272,7 +272,7 @@ T(2,#FUNC2+#OOCloseDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOClo
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2632; ntxbuf=#OOBUF2})
-C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
+! C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
 !刪除
 #OOBUF4=X,60,S
 T(2,#FUNC4+#OOCloseDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOCloseAmt+#OOCollectWayCode+#OOReceiveDate+#OOCreateDate)
@@ -315,14 +315,14 @@ T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
 !作業項目=2.補領且累短收(清償違約金)為0時顯示連動L2076
 !OOReceiveFg為1=已領過隱藏按鈕
 #OOBTN6=X,16,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6})
+C(3,#OOReceiveFg,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,cancel))
 ! C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}))
-IF(#OOCloseDate==0,BIND(grid,cancel),$)
+! IF(#OOCloseDate==0,BIND(grid,cancel),$)
 ! IF(#OOAllCloseFg=="N",BIND(grid,cancel),$)
 ! IF(#OOAllCloseFg=="N",s,$)
 ! C(3,#OOFunCode,2,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}),$),$)
 ! C(3,#OOFunCode,3,IF(#OORepayFg=="Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}),$),$)
-C(3,#FUNC6,1,C(3,#OOReceiveFg,0,BIND(grid,cancel),$),$)
+! C(3,#FUNC6,1,C(3,#OOReceiveFg,0,BIND(grid,cancel),$),$)
 
 !用於判定是否有歷程，Y/N
 #OOHasHistory=X,1,S

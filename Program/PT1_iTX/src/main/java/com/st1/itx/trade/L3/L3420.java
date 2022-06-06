@@ -35,7 +35,6 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
-import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcPaymentCom;
@@ -105,8 +104,6 @@ public class L3420 extends TradeBuffer {
 	public LoanChequeService loanChequeService;
 	@Autowired
 	public FacCloseService facCloseService;
-	@Autowired
-	public MlaundryRecordService mlaundryRecordService;
 
 	@Autowired
 	Parse parse;

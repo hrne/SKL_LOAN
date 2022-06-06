@@ -123,7 +123,8 @@ public class L4721Report extends MakeReport {
 		print(-42, 3, "銀行匯款");
 		print(-43, 3, "戶名：新光人壽保險股份有限公司");
 		print(-44, 3, "解款行：新光銀行城內分行　新光銀行城內分行代號：1030116");
-		print(-45, 3, "期款專用帳號：95102001302796　　還本專用帳號：95103001302796");
+		print(-45, 3, "期款專用帳號：9510200"+headerCustNo+"　　還本專用帳號：9510300"+headerCustNo);
+		this.info("期款專用帳號：9510200"+headerCustNo+"　　還本專用帳號：9510300"+headerCustNo);
 
 		this.setFontSize(10);
 	}
@@ -305,7 +306,7 @@ public class L4721Report extends MakeReport {
 			throws NumberFormatException, LogicException {
 		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
 		headerCustName = headerBankStatement.get("CustName");
-		headerCustNo = headerBankStatement.get("CustNo");
+		headerCustNo = String.format("%07d",headerBankStatement.get("CustNo"));
 		headerPrintDate = showRocDate(titaVo.getCalDy(), 1);
 		headerRepayDate = headerBankStatement.get("SpecificDd") + "日";
 		headerRepayTypeDesc = headerBankStatement.get("RepayCodeX");
@@ -313,6 +314,7 @@ public class L4721Report extends MakeReport {
 		baTxCom.getDueAmt(effectDate, custNo, facmNo, 0, titaVo);
 		headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 		headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
+		this.info("L4721Report.setHead2" + custNo + "-" + facmNo + "" + effectDate);
 
 	}
 

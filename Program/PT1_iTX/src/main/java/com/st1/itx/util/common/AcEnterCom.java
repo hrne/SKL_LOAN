@@ -217,9 +217,9 @@ public class AcEnterCom extends TradeBuffer {
 //          3.正常交易，from txBuffer
 
 		if (AcHCode > 0 || titaVo.isActfgSuprele()) { // 訂正或主管放行
-			Slice<AcDetail> sacList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, this.index, Integer.MAX_VALUE,
+			Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, this.index, Integer.MAX_VALUE,
 					titaVo); // findByTxseq
-			acList = sacList == null ? null : sacList.getContent();
+			this.acList = slAcList == null ? null : slAcList.getContent();
 			if (acList == null) {
 				throw new LogicException(titaVo, "E6003", "訂正或主管放行時AcDetail NotFound " + RelDy + RelTxseq);
 			}
@@ -665,7 +665,7 @@ public class AcEnterCom extends TradeBuffer {
 		int i = acList0.size();
 		for (AcDetail ac : acList0) {
 			// 原分錄，入總帳記號 2:被沖正(隔日訂正)
-			ac.setEntAc(2);			
+			ac.setEntAc(2);
 			i++;
 			acDetail = new AcDetail();
 			acDetail.setCustNo(ac.getCustNo());
@@ -693,7 +693,7 @@ public class AcEnterCom extends TradeBuffer {
 			acDetailService.updateAll(acList0, titaVo); // update AcDetail
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E6003", "procAcHCode2 update " + e.getErrorMsg());
-		}		
+		}
 		this.txBuffer.addAllAcDetailList(acList2);
 
 		/* 產生會計分錄 */

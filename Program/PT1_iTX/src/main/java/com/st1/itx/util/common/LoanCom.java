@@ -1261,12 +1261,6 @@ public class LoanCom extends TradeBuffer {
 					tMlaundryRecord.setActualRepayAmt(iRepayAmt);// 實際還本金額
 					break;
 				}
-			} else {
-				if (t.getActualRepayDate() == iEntryDate) {
-					tMlaundryRecord.setActualRepayDate(0);
-					tMlaundryRecord.setActualRepayAmt(BigDecimal.ZERO);// 實際還本金額
-					break;
-				}
 			}
 			try {
 				mlaundryRecordService.update(tMlaundryRecord, titaVo);

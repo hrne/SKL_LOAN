@@ -168,12 +168,18 @@ public class L2634ReportC extends MakeReport {
 				this.print(-13, 65, custId); // 統編
 				this.print(-49, 74, tlrName); // 經辦
 
-				if (!isLast) {
+				if (isLast) {
+
+					break;
+				}else {
+					this.info("C newPage");
 					this.newPage();
+					
 				}
 			}
 		}
 
+		this.info("C 結束");
 		this.close();
 
 	}

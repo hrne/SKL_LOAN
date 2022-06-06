@@ -40,15 +40,24 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];order=1;">
 [
-["[L2075]                                 清償作業-申請書及塗銷同意書列印"],
+["[L2075]                                 清償作業-整批列印"],
+["#FdMain+查詢條件","@(入帳日期、申請日期，需擇一輸入)"],
 ["#FdEntryDate+入帳日期",#EntryDate],
 ["#FdApplDate+申請日期",#ApplDate],
 ["#FdType+類別",#Type,#TypeX],
+["#FdSearch+查詢",#Search,#SearchX],
 ]
 
+#FdMain=X,2,L
+T(3,*)
 #FdEntryDate=X,2,L
+T(3,．)
 #FdApplDate=X,2,L
+T(3,．)
 #FdType=X,2,L
+T(3,*)
+#FdSearch=X,2,L
+T(3,*)
 
 
 !---------- AP Button AREA ----------   
@@ -60,11 +69,12 @@ E(0,0)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 
-#TypeHelp=X,100,S
+#TypeHelp=x,1024,S
 T(3,1:申請書及其他;2:塗銷同意書)
 #FunCode2Help=x,1024,S
 T(3,0:清償;1:請領;2:補領;3:補發)
-
+#SearchHelp=x,1024,S
+T(3,1:未列印;9:全部)
 
 #CDDEF0001=x,26,S
 T(3,CdCode.CurrPrecision)
@@ -112,7 +122,7 @@ C(3,#ApplDate,0,E(0,#SYSDATE),$)
 D(8)
 @V(7)
 A(DATE,0,#ApplDate)
-V(2,0)
+C(3,#ApplDate,0,V(P,入帳日期、申請日期需擇一輸入),$)
 
 !類別
 #Type=A,1,I
@@ -123,7 +133,12 @@ HELP(#TypeHelp)
 #TypeX=X,30,L
 T(H,#Type,#TypeHelp)
 
+#Search=A,1,I
+HELP(#SearchHelp)
+@V(H,#SearchHelp)
 
+#SearchX=X,10,L
+T(H,#Search,#SearchHelp)
 
 
 #RPTFG=A,1,S
@@ -232,6 +247,7 @@ T(3,成功 請至LC009)
 #EntryDate
 #ApplDate
 #Type
+#Search
 #END
 </sub>
 
@@ -277,7 +293,7 @@ TXFORM=L2075
 
 <sub type="PART" name="L2075" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
 [
-["[L2075]                                 清償作業-申請書及塗銷同意書列印"],
+["[L2075]                                 清償作業-整批列印"],
 ["@"],
 ]
 </sub>

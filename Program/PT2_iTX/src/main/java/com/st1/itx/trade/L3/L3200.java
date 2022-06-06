@@ -31,7 +31,6 @@ import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
@@ -41,7 +40,6 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
-import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
@@ -129,8 +127,6 @@ public class L3200 extends TradeBuffer {
 	public LoanChequeService loanChequeService;
 	@Autowired
 	public LoanBookService loanBookService;
-	@Autowired
-	public MlaundryRecordService mlaundryRecordService;
 	@Autowired
 	public LoanOverdueService loanOverdueService;
 	@Autowired
@@ -2044,7 +2040,7 @@ public class L3200 extends TradeBuffer {
 	private void loanBookRoutine() throws LogicException {
 		this.info("loanBookRoutine ...");
 		Slice<LoanBook> slLoanBook = loanBookService.bookCustNoRange(iCustNo, iCustNo, iFacmNo,
-				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
+				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate + 19110000, this.index,
 				Integer.MAX_VALUE, titaVo);
 		if (slLoanBook == null) {
 			return;
@@ -2080,47 +2076,6 @@ public class L3200 extends TradeBuffer {
 			loanBookService.update(tLoanBook, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "放款約定還本檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-		}
-	}
-
-	// 疑似洗錢交易訪談記錄檔處理
-	private void mlaundryRecordRoutine() throws LogicException {
-		this.info("mlaundryRecordRoutine ...");
-		Slice<MlaundryRecord> slMlaundryRecord = mlaundryRecordService.findCustNoEq(iCustNo, iFacmNo,
-				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate + 19110000, this.index,
-				Integer.MAX_VALUE, titaVo);
-		if (slMlaundryRecord == null) {
-			return;
-		}
-		for (MlaundryRecord t : slMlaundryRecord.getContent()) {
-			if (titaVo.isHcodeNormal()) {
-				if (t.getActualRepayDate() == 0) {
-					updateMlaundryRecord(t);
-					break;
-				}
-			} else {
-				if (t.getActualRepayDate() == wkTbsDy) {
-					updateMlaundryRecord(t);
-					break;
-				}
-			}
-		}
-	}
-
-	// 疑似洗錢交易訪談記錄檔更新
-	private void updateMlaundryRecord(MlaundryRecord t) throws LogicException {
-		MlaundryRecord tMlaundryRecord = mlaundryRecordService.holdById(t, titaVo);
-		if (titaVo.isHcodeNormal()) {
-			tMlaundryRecord.setActualRepayDate(iEntryDate);
-			tMlaundryRecord.setActualRepayAmt(iExtraRepay);// 實際還本金額
-		} else {
-			tMlaundryRecord.setActualRepayDate(0);
-			tMlaundryRecord.setActualRepayAmt(BigDecimal.ZERO);// 實際還本金額
-		}
-		try {
-			mlaundryRecordService.update(tMlaundryRecord, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "疑似洗錢交易訪談記錄檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 	}
 

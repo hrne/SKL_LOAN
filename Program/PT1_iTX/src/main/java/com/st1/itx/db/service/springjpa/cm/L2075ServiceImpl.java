@@ -58,22 +58,47 @@ public class L2075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L2075.findAll");
 
 		// tita
-		int iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"))+19110000;
-		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"))+19110000;
+		int iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
+		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate")) + 19110000;
 		int iType = parse.stringToInteger(titaVo.getParam("Type"));
-
-		String sql = " SELECT f.* ";
-		sql += "FROM (SELECT \"CustNo\",\"FacmNo\",MAX(\"CloseNo\") AS MAXNO FROM \"FacClose\" GROUP BY \"CustNo\" ,\"FacmNo\" ) r  ";
-		sql += "inner join \"FacClose\" f ";
-		sql += "ON  r.\"CustNo\" = f.\"CustNo\"  ";
-		sql += "AND r.\"FacmNo\" = f.\"FacmNo\"  ";
-		sql += "AND r.\"MAXNO\" = f.\"CloseNo\"  ";
+		String sql = "";
+		sql = " SELECT														";
+		sql += "r2.\"CustNo\",												";
+		sql += "r2.\"FacmNo\",												";
+		sql += "r2.maxno,													";
+		sql += "cf.\"ClCode1\",												";
+		sql += "cf.\"ClCode2\",												";
+		sql += "cf.\"ClNo\"													";
+		sql += "FROM														";
+		sql += "(SELECT														";
+		sql += "r.\"CustNo\",												";
+		sql += "r.\"FacmNo\",												";
+		sql += "r.maxno														";
+		sql += "FROM														";
+		sql += "(															";
+		sql += "SELECT														";
+		sql += "\"CustNo\",													";
+		sql += "\"FacmNo\",													";
+		sql += " MAX(\"CloseNo\") AS maxno									";
+		sql += "FROM														";
+		sql += "\"FacClose\"												";
+		sql += "GROUP BY													";
+		sql += "\"CustNo\",													";
+		sql += "\"FacmNo\"													";
+		sql += ") r  					inner join \"FacClose\"          fc	";
+		sql += "ON fc.\"CustNo\" = r.\"CustNo\"								";
+		sql += "AND fc.\"CloseNo\" = r.maxno								";
 		if (iEntryDate > 19110000) {
-			sql += "AND f.\"EntryDate\"= "+iEntryDate;
+			sql += "AND  fc.\"EntryDate\" = 								" + iEntryDate;
+			sql += " AND \"FunCode\" in ( '1','0')							";
 		} else {
-			sql += "AND f.\"ApplDate\"= "+iApplDate;
+			sql += "AND fc.\"ApplDate\"= 									" + iApplDate;
+			sql += " AND \"FunCode\" in ( '2','3')							";
 		}
-
+		sql += " ) r2														";
+		sql += "left join \"ClFac\"   cf ON r2.\"CustNo\" = cf.\"CustNo\"	";
+		sql += " AND r2.\"FacmNo\" = cf.\"FacmNo\"							";
+		sql += "order by r2.\"CustNo\" ASC,r2.\"FacmNo\"					";
 
 		this.info("sql=" + sql);
 		Query query;

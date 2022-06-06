@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class FacMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4631755510457400623L;
-
-@EmbeddedId
+  @EmbeddedId
   private FacMainId facMainId;
 
   // 借款人戶號
@@ -392,6 +388,14 @@ public class FacMain implements Serializable {
   /* Y:是N:否(2022.4.21異動)by 昱衡 */
   @Column(name = "`EsGcnl`", length = 1)
   private String esGcnl;
+
+  // 展期次數
+  @Column(name = "`RenewCnt`")
+  private int renewCnt = 0;
+
+  // 原額度編號
+  @Column(name = "`OldFacmNo`")
+  private int oldFacmNo = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -2204,6 +2208,44 @@ N:否
   }
 
 /**
+	* 展期次數<br>
+	* 
+	* @return Integer
+	*/
+  public int getRenewCnt() {
+    return this.renewCnt;
+  }
+
+/**
+	* 展期次數<br>
+	* 
+  *
+  * @param renewCnt 展期次數
+	*/
+  public void setRenewCnt(int renewCnt) {
+    this.renewCnt = renewCnt;
+  }
+
+/**
+	* 原額度編號<br>
+	* 
+	* @return Integer
+	*/
+  public int getOldFacmNo() {
+    return this.oldFacmNo;
+  }
+
+/**
+	* 原額度編號<br>
+	* 
+  *
+  * @param oldFacmNo 原額度編號
+	*/
+  public void setOldFacmNo(int oldFacmNo) {
+    this.oldFacmNo = oldFacmNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -2295,7 +2337,7 @@ N:否
            + ", advanceCloseCode=" + advanceCloseCode + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo
            + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
            + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", grcd=" + grcd + ", grKind=" + grKind
-           + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", renewCnt=" + renewCnt + ", oldFacmNo=" + oldFacmNo + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

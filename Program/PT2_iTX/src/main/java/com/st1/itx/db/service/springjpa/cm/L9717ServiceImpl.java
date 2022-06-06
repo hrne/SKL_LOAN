@@ -228,10 +228,10 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 
 		case Agent:
-			sql += " SELECT NVL( ";
+			sql += " SELECT UPPER( NVL( ";
 			sql += "		CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
 			sql += "             THEN FM.\"BusinessOfficer\" ";
-			sql += "        ELSE FM.\"CreditOfficer\" END ,' ')\"Officer\" ";
+			sql += "        ELSE FM.\"CreditOfficer\" END ,' '))\"Officer\" ";
 			sql += "	   ,NVL(";
 			sql += " 	    CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
 			sql += "             THEN BusinessOfficer.\"Fullname\" ";
@@ -275,9 +275,9 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       		  ELSE CreditOfficer.\"EmployeeNo\" END,  ' ') = :businessOfficer )";
 //			sql += "   AND M.\"OvduDays\" > 0 ";
 //			sql += "   AND M.\"OvduTerm\" <> 0 ";
-			sql += " GROUP BY NVL( CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
-			sql += "             		THEN FM.\"BusinessOfficer\" ";
-			sql += "        	   ELSE FM.\"CreditOfficer\" END ,' ')";
+			sql += " GROUP BY UPPER(NVL( CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
+			sql += "             			  THEN FM.\"BusinessOfficer\" ";
+			sql += "        	   			  ELSE FM.\"CreditOfficer\" END ,' '))";
 			sql += "		 ,NVL( CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
 			sql += "             		THEN BusinessOfficer.\"Fullname\" ";
 			sql += "        	   ELSE CreditOfficer.\"Fullname\" END,' ')";

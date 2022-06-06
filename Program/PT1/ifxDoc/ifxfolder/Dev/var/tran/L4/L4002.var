@@ -1,0 +1,557 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4002)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,126)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4002" layout="cols=1;screen.width=[300,700];printer.width=[20,80];order=1">
+[
+["[L4002]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@整批入帳作業"],
+["#FdAcDate+會計日期",#AcDate],
+["#FdProcExeCode+整批狀態",#ProcExeCode,#ProcExeCodeX],
+["#FdTlrNo+經辦",#TlrNo,"@@空白查詢全部"],
+]
+
+#FdAcDate=X,2,L
+T(3,*)
+#FdProcExeCode=X,2,L
+T(3,*)
+#FdTlrNo=X,2,L
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![作業種類]
+#CDDEF01=x,26,S
+T(3,CdCode.BatchWorkFlag)
+
+#WorkFlagHelp=x,1024,S 
+
+![作業狀態]
+#CDDEF02=x,30,S
+T(3,CdCode.BatchStatus)
+
+#StatusHelp=x,1024,S
+
+![來源]
+#CDDEF03=x,26,S
+T(3,CdCode.BatchRepayCode)
+
+#RepayCodeHelp=x,1024,S 
+
+![對帳類別]
+#CDDEF04=x,30,S
+T(3,CdCode.ReconCode)
+
+#ReconCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@WorkFlagHelp,#HelpDesc1)
+T(2,@StatusHelp,#HelpDesc2)
+T(2,@RepayCodeHelp,#HelpDesc3)
+T(2,@ReconCodeHelp,#HelpDesc4)
+
+#ProcExeCodeHelp=x,20,S
+T(3,0:待處理;9:全部)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,14,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@AcDate,#NTXBUF,1,7)
+T(1,@ProcExeCode,#NTXBUF,8,1)
+T(1,@TlrNo,#NTXBUF,9,6)
+
+! 會計日期
+#AcDate=D,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#AcDate,0,E(0,#SYSDATE),$)
+@
+V(7)A(DATE,0,#AcDate)
+
+! 整批狀態
+#ProcExeCode=A,1,I
+C(3,#CHAIN,1,s,$)
+C(3,#ProcExeCode,0,E(0,@ProcExeCode,0),$)
+HELP(#ProcExeCodeHelp)
+@V(H,#ProcExeCodeHelp)
+
+#ProcExeCodeX=x,6,L
+T(3,)T(H,#ProcExeCode,#ProcExeCodeHelp)
+!SWITCH(#ProcExeCode,
+!0,T(2,待處理),
+!9,T(2,全部),
+!T(2,))
+
+! 經辦
+#TlrNo=X,6,I
+C(3,#CHAIN,1,s,$)
+C(4,#TlrNo,T(2,#EMPNOT),$)
+
+#RPTFG=A,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4002 -----------
+<sub type="FORM" name="L4002">
+#SCRTIL=_,_,S
+T(3,[L4002] 整批入帳作業)
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 批號   
+#OOBatchNo=X,6,S
+
+#OOFore4Batx=X,4,S
+T(1,#OOBatchNo,1,4)
+
+! 階級 顯示用 
+! 1:批次號碼合計行
+! 2:來源合計行
+! 3:檔案合計欄
+#OORankFlag=A,1,S
+
+! 作業種類
+! BATX：整批入帳
+! TMPX：預繳期款到期
+! OTRX：其他還款來源
+#OOWorkFlag=A,1,S
+SWITCH(#OOFore4Batx,
+BATX,E(0,1),
+TMPX,E(0,2),
+OTRX,E(0,3))
+
+! 作業狀態
+#OOStatusCode=A,1,S
+! 1.檢核有誤
+! 2.檢核正常
+! 3.入帳未完
+! 4.入帳完成
+! 8.已刪除
+! 9.處理中
+
+#OORepayCode=A,2,S
+
+! 來源
+! 對帳類別 改為使用 X(3)
+! P01	銀行存款－郵局
+! P02	銀行存款－新光 
+! P03	銀行存款－新光 匯款轉帳
+! P04	銀行存款－台新
+! TEM 員工扣薪 15 / 非15 ???
+! TCK 支票
+#OOReconCode=X,3,S
+
+! 總金額
+#OOTotalRepayAmt=+m,14,O
+#OOTotalRepayAmtX=X,21,O
+C(3,#OOTotalRepayAmt,0,T(2, ),X(#OOTotalRepayAmt))
+! 檔名
+#OOFileName=x,40,O
+! 筆數
+#OOFileCnt=m,6,O
+#OOFileCntX=X,7,O
+X(#OOFileCnt)
+! 需處理金額
+#OOToDoRepayAmt=+m,14,O
+#OOToDoRepayAmtX=X,21,O
+C(3,#OOToDoRepayAmt,0,T(2, ),X(#OOToDoRepayAmt))
+! 失敗金額
+#OOUnDoRepayAmt=+m,14,O
+#OOUnDoRepayAmtX=X,21,O
+C(3,#OOUnDoRepayAmt,0,T(2, ),X(#OOUnDoRepayAmt))
+! 不處理X
+#OODntCnt=m,6,O
+#OODntCntX=X,7,O
+X(#OODntCnt)
+! 已處理S
+#OOAlrCnt=m,6,O
+#OOAlrCntX=X,7,O
+X(#OOAlrCnt)
+! 待處理R
+#OOWatCnt=m,6,O
+#OOWatCntX=X,7,O
+X(#OOWatCnt)
+
+! 轉暫收V
+#OOVirCnt=m,6,O
+#OOVirCntX=X,7,O
+X(#OOVirCnt)
+
+#OOLabelFgA=X,1,O
+#OOLabelFgB=X,1,O
+#OOLabelFgC=X,1,O
+
+! 按鈕A 整批訂正;整批刪除;整批入帳;刪除回復
+! LabelFgA 整批訂正(H)、整批刪除(D)、刪除回復(R)、整批入帳(E)
+#OOBTNDISPLAYA=X,8,S
+SWITCH(#OOLabelFgA,
+H,T(2,整批訂正),
+D,T(2,整批刪除),
+R,T(2,刪除回復),
+E,T(2,整批入帳))
+
+! C(3,#OOStatusCode,0,IF(#OOAlrCnt > 0,T(2,整批訂正),T(2,整批刪除)),$)
+! C(3,#OOStatusCode,1,IF(#OOAlrCnt > 0,T(2,整批訂正),T(2,整批刪除)),$)
+! C(3,#OOStatusCode,2,IF(#OOAlrCnt > 0,T(2,整批訂正),T(2,整批刪除)),$)
+! C(3,#OOStatusCode,3,T(2,整批入帳),$)
+! C(3,#OOStatusCode,4,T(2,整批訂正),$)
+! C(3,#OOStatusCode,8,T(2,刪除回復),$)
+
+! 按鈕B 整批檢核;整批入帳;整批訂正
+! LabelFgB 整批檢核(C) 整批入帳(E) 整批訂正(H)
+#OOBTNDISPLAYB=X,10,O
+SWITCH(#OOLabelFgB,
+C,T(2,整批檢核),
+E,T(2,整批入帳),
+H,T(2,整批訂正))
+! C(3,#OOStatusCode,0,T(2,整批檢核),$)
+! C(3,#OOStatusCode,1,T(2,整批檢核),$)
+! C(3,#OOStatusCode,2,T(2,整批入帳),$)
+! C(3,#OOStatusCode,3,T(2,整批訂正),$)
+! C(3,#OOStatusCode,4,T(2,),$)
+
+! 按鈕C 轉暫收
+! LabelFgC 轉暫收(T)
+#OOBTNDISPLAYC=X,10,O
+SWITCH(#OOLabelFgC,
+T,T(2,轉暫收),)
+! C(3,#OOStatusCode,0,T(2,),$)
+! C(3,#OOStatusCode,1,T(2,轉暫收),$)
+! C(3,#OOStatusCode,2,T(2,轉暫收),$)
+! C(3,#OOStatusCode,3,T(2,轉暫收),$)
+! C(3,#OOStatusCode,4,T(2,),$)
+
+! RANK=1 sum by BatchNo
+! RANK=2 sum by BatchNo, RepayCode, ReconCode
+! RANK=3 sum by BatchNo, RepayCode, ReconCode, FileName
+
+! 筆數按鈕_RANK=1
+#OOBUF_L4920C1=X,100,S
+T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+00
+     +   +0000000+ )
+! 筆數按鈕_RANK=2
+#OOBUF_L4920C2=x,100,S
+T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+! 筆數按鈕_RANK=3
+#OOBUF_L4920C3=x,100,S
+T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+
+! 已處理按鈕_RANK=1
+#OOBUF_L4920D1=X,100,S
+T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+00
+     +   +0000000+ )
+! 已處理按鈕_RANK=2
+#OOBUF_L4920D2=x,100,S
+T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+! 已處理按鈕_RANK=3
+#OOBUF_L4920D3=x,100,S
+T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+
+! 待處理按鈕_RANK=1 
+#OOBUF_L4920E1=X,100,S
+T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+00
+     +   +0000000+ )
+! 待處理按鈕_RANK=2 
+#OOBUF_L4920E2=x,100,S
+T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+! 待處理按鈕_RANK=3 
+#OOBUF_L4920E3=x,100,S
+T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+
+! 不處理按鈕_RANK=1 
+#OOBUF_L4920F1=X,100,S
+T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+00
+     +   +0000000+ )
+! 不處理按鈕_RANK=2 
+#OOBUF_L4920F2=x,100,S
+T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+! 不處理按鈕_RANK=3 
+#OOBUF_L4920F3=x,100,S
+T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+
+! 20210113 新增
+! 虛擬轉暫收按鈕_RANK=2
+#OOBUF_L4920H2=x,100,S
+T(2,7+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+     +#OOReconCode+0000000+#OOFileName)
+
+
+! 處理印記 0:入帳 1:刪除 2:訂正 3: 檢核
+#OOBUF_A=X,18,S
+T(2,1+#AcDate+#OOBatchNo+#OOReconCode)
+#OOBUF_B=X,18,S
+T(2,2+#AcDate+#OOBatchNo+#OOReconCode)
+#OOBUF_C=X,18,S
+T(2,0+#AcDate+#OOBatchNo+#OOReconCode)
+#OOBUF_D=X,18,S
+T(2,3+#AcDate+#OOBatchNo+#OOReconCode)
+#OOBUF_E=X,18,S
+T(2,4+#AcDate+#OOBatchNo+#OOReconCode)
+
+! IF(#OOFileName=="",BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_L4920A}),
+!                                  BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_L4920B}))
+! 0.待檢核1.檢核有誤2.檢核正常3.入帳未完4.入帳完成8.已刪除9.處理中
+! 若待處理=0&虛擬轉暫收>0 不出現[入帳]
+
+! LabelFgA 整批訂正(H)L4930、整批刪除(D)L420B、刪除回復(R)L420B、整批入帳(E)L420B
+#OOBTN_A=A,2,O
+C(4,#OOLabelFgA,BIND(grid,cancel),$)
+C(4,#OOLabelFgA,s,$)
+SWITCH(#OOLabelFgA,
+H,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_A}),
+D,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_A}),
+R,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_E}),
+E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_C}))
+
+! 明細查詢
+! LabelFgB 整批檢核(C)L420A 整批入帳(E)L420B 整批訂正(H)L4930
+#OOBTN_B=A,2,O
+C(4,#OOLabelFgB,BIND(grid,cancel),$)
+C(4,#OOLabelFgB,s,$)
+SWITCH(#OOLabelFgB,
+C,BIND(grid,{ cmd=CHAIN;ntxcd=L420A; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_D}),
+E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_C}),
+H,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_A}))
+
+
+! LabelFgC 轉暫收(T)L4930
+#OOBTN_C=A,2,O
+C(4,#OOLabelFgC,BIND(grid,cancel),$)
+C(4,#OOLabelFgC,s,$)
+SWITCH(#OOLabelFgC,
+T,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYC; ntxbuf=#OOBUF_B}),)
+
+
+! 筆數
+#OOBTN_G=A,2,O
+C(3,#OORankFlag,3,BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOFileCntX; ntxbuf=#OOBUF_L4920C3}),
+                  C(3,#OORankFlag,2,
+                  BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOFileCntX; ntxbuf=#OOBUF_L4920C2}),
+                  BIND(grid,cancel)
+                  )
+)! 已入帳
+#OOBTN_D=A,2,O
+C(3,#OOAlrCnt,0,BIND(grid,cancel),
+                C(3,#OORankFlag,3,BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D3}),
+                C(3,#OORankFlag,2,BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D2}),
+	            BIND(grid,cancel)
+                ))
+)
+! 待處理
+#OOBTN_E=A,2,O
+C(3,#OOWatCnt,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOWatCntX; ntxbuf=#OOBUF_L4920E2}))
+! 轉暫收
+#OOBTN_H=A,2,O
+C(3,#OOVirCnt,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOVirCntX; ntxbuf=#OOBUF_L4920H2}))
+! 失敗
+#OOBTN_F=A,2,O
+C(3,#OODntCnt,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OODntCntX; ntxbuf=#OOBUF_L4920F2}))
+
+! ------  顯示用  ------
+! 批號
+#OOBatchNoX=X,6,O
+C(3,#OORankFlag,1,T(2,#OOBatchNo),T(2,))
+! 作業種類
+#OOWorkFlagX=X,12,O
+T(3,)C(3,#OORankFlag,1,T(H,#OOFore4Batx,#WorkFlagHelp))
+!SWITCH(#OOWorkFlag,1,T(3,整批入帳),
+!                   2,T(3,預繳期款到期),
+!                   3,T(3,其他還款來源),T(3, )),T(3, ))
+
+! 作業狀態
+#OOStatusCodeX=X,8,O
+T(3,)C(3,#OORankFlag,1,T(H,#OOStatusCode,#StatusHelp))
+!  SWITCH(#OOStatusCode,0,T(3,待檢核),
+!                       1,T(3,檢核有誤),
+!                       2,T(3,檢核正常),
+!                       3,T(3,入帳未完),
+!                       4,T(3,入帳完成),
+!                       8,T(3,已刪除),
+!                       9,T(3,處理中),T(3, )
+!        )
+!,T(3, ))
+
+! 來源
+#OORepayCodeX=X,16,O
+T(3,)C(3,#OORankFlag,2,T(H,#OORepayCode,#RepayCodeHelp))
+!SWITCH(#OORepayCode,01,T(3,匯款轉帳),
+!                02,T(3,銀行扣款),
+!                03,T(3,員工扣款),
+!                04,T(3,支票兌現),
+!                05,T(3,法院扣薪),
+!                06,T(3,理賠金),
+!                07,T(3,代收款-債權協商),
+!                09,T(3,其他),
+!                11,T(3,匯款轉帳預先作業),
+!                90,T(3,暫收抵繳),
+!                   T(3,)),T(3,))
+!
+! 對帳類別 改為使用 X(3)
+! P01	銀行存款－郵局       POST
+! C01	暫收款－非核心運用   ACH
+! P03	銀行存款－新光       匯款轉帳
+! TEM     暫收款－員工扣薪
+! TCK     暫收款－支票
+#OOReconCodeX=X,20,O
+T(3,)C(3,#OORankFlag,2,T(H,#OOReconCode,#ReconCodeHelp))
+C(4,#OOReconCodeX,T(2,#OOReconCode),$)
+!SWITCH(#OOReconCode,P01,T(3,銀行存款－郵局),
+!                    C01,T(3,暫收款－非核心運用),
+!                    P03,T(3,銀行存款－新光),
+!                    TEM,T(3,暫收款－員工扣薪),
+!                    TCK,T(3,暫收款－支票),T(3, )),T(3, ))
+
+
+! ------  顯示用  ------
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate
+#ProcExeCode
+#TlrNo
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4002
+#OOBatchNo
+#OORankFlag
+#OOStatusCode
+#OORepayCode
+#OOReconCode
+#OOFileName
+#OOFileCnt
+#OOTotalRepayAmt
+#OOToDoRepayAmt
+#OOUnDoRepayAmt
+#OODntCnt
+#OOAlrCnt
+#OOWatCnt
+#OOVirCnt
+#OOLabelFgA
+#OOLabelFgB
+#OOLabelFgC
+^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4002" layout="cols=1;screen.width=[130,870];order=1;">
+[
+["[L4002]                                 整批入帳作業"],
+[""],
+]
+</sub>
+
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID
+#any={detail:true, header:'L4002.part',caption:'', rowNum:20, rowList:[20,40,60]}
+#OOBatchNoX=批號
+{width:55,align:'center'}
+#OOStatusCodeX=作業狀態
+{width:95}
+#OORepayCodeX=來源
+{width:65}
+#OOReconCodeX=對帳類別
+{width:115}
+#OOFileName=檔名
+{width:95}
+#OOBTN_G=筆數
+{search:false,formatter:'cust:bind-button:#OOFileCntX',align:'right',canExport:false,width:65}
+#OOTotalRepayAmtX=總金額
+{width:95,align:'right'}
+#OOBTN_F=失敗
+{search:false,formatter:'cust:bind-button:#OODntCntX',align:'right',canExport:false,width:65}
+#OOUnDoRepayAmtX=失敗金額
+{width:105,align:'right'}
+#OOToDoRepayAmtX=需處理金額
+{width:105,align:'right'}
+#OOBTN_D=已入帳
+{search:false,formatter:'cust:bind-button:#OOAlrCntX',align:'right',canExport:false,width:65}
+#OOBTN_E=待處理
+{search:false,formatter:'cust:bind-button:#OOWatCntX',align:'right',canExport:false,width:65}
+#OOBTN_H=轉暫收
+{search:false,formatter:'cust:bind-button:#OOVirCntX',align:'right',canExport:false,width:65}
+#OOBTN_A=
+{search:false,formatter:'cust:bind-button:#OOBTNDISPLAYA',align:'center',canExport:false,width:65}
+#OOBTN_B=
+{search:false,formatter:'cust:bind-button:#OOBTNDISPLAYB',align:'center',canExport:false,width:65}
+#OOBTN_C=
+{search:false,formatter:'cust:bind-button:#OOBTNDISPLAYC',align:'center',canExport:false,width:55}
+^
+<include src="PRT.icf::INQ04.sel" map="i=L4002;cpi=15"/>
+#AcDate#TlrNo
+%
+#OOBatchNo
+#OORankFlag
+#OOStatusCode
+#OORepayCode
+#OOReconCode
+#OOFileName
+#OOFileCnt
+#OOTotalRepayAmt
+#OOToDoRepayAmt
+#OOUnDoRepayAmt
+#OODntCnt
+#OOAlrCnt
+#OOWatCnt
+#OOVirCnt
+@^
+</sub>
