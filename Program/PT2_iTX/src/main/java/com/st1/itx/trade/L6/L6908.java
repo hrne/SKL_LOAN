@@ -127,7 +127,6 @@ public class L6908 extends TradeBuffer {
 		if (tAcReceivable != null) {
 			rvCls = tAcReceivable.getRvBal();
 		}
-		// 查詢會計科子細目設定檔
 		CdAcCode tCdAcCode = sCdAcCodeService.acCodeAcctFirst(iAcctCode, titaVo);
 		if (tCdAcCode == null) {
 			throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
@@ -135,6 +134,9 @@ public class L6908 extends TradeBuffer {
 		if (slAcDetail != null) {
 			for (AcDetail tAcDetail : slAcDetail.getContent()) {
 				if (tAcDetail.getEntAc() != 1) {
+					continue;
+				}
+				if (tAcDetail.getReceivableFlag() == 0) {
 					continue;
 				}
 				// 銷帳編號有輸入時只查詢銷帳編號的資料，業務科目記號=1.資負明細科目（放款、催收款項..)時撥款序號為銷帳編號
@@ -159,7 +161,9 @@ public class L6908 extends TradeBuffer {
 			}
 		}
 		// 補差額
-		if (rvCls.compareTo(BigDecimal.ZERO) > 0) {
+		if (rvCls.compareTo(BigDecimal.ZERO) > 0)
+
+		{
 			clsFlag = 0;
 			rvAmt = rvCls;
 		} else {
@@ -281,7 +285,7 @@ public class L6908 extends TradeBuffer {
 		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

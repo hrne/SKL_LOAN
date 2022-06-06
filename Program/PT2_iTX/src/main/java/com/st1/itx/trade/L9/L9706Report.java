@@ -1,17 +1,32 @@
 package com.st1.itx.trade.L9;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingId;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacShareAppl;
+import com.st1.itx.db.domain.Guarantor;
+import com.st1.itx.db.service.ClBuildingService;
+import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacShareApplService;
+import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.springjpa.cm.L9706ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.ConvertUpMoney;
+import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L9706Report")
 @Scope("prototype")
@@ -21,19 +36,66 @@ public class L9706Report extends MakeReport {
 	@Autowired
 	L9706ServiceImpl l9706ServiceImpl;
 
+	@Autowired
+	public FacShareApplService facShareApplService;
+
+	@Autowired
+	public GuarantorService guarantorService;
+
+	@Autowired
+	public CustMainService custMainService;
+
+	@Autowired
+	public ClFacService clFacService;
+
+	@Autowired
+	public ClBuildingService clBuildingService;
+
+	@Autowired
+	Parse parse;
+
 	String iENTDAY = "";
+
+	int standardFontSize = 13;
+
+	boolean footerSayContinue = false;
 
 	@Override
 	public void printHeader() {
 
-		this.setFontSize(13);
 		this.info("L9706 exec" + this.titaVo.get("ENTDY"));
-		this.print(-1, this.getMidXAxis(), "貸   款   餘   額   證   明   書" , "C");
+
+		this.setFontSize(standardFontSize - 3);
+		// TODO: header 內容改成跟其他報表統一化
+		// 找 LM012 之類的報表複製一下
+		// 右邊 Align R, x 座標 90
+		// 左邊 Align L, x 座標待測, 可能為 4 ~ 5
+		// 中間 Align C 請用 this.getMidAxis()
+
+		this.print(-1, 90, "機密等級：□極機密 ■機密 □密 □普通", "R");
+		this.print(-2, 90, "文件持有人請嚴加控管本項文件", "R");
+
+		this.setFontSize(standardFontSize + 3);
+		this.print(-4, this.getMidXAxis(), "貸　款　餘　額　證　明　書", "C");
+		this.setFontSize(standardFontSize);
+
+		if (footerSayContinue) // 表示是同額度第二頁
+		{
+			this.print(-6, this.getMidXAxis(), "====　承　上　頁　====", "C");
+		}
+
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(2);
+		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(45);
+		this.setMaxRows(43);
+	}
+
+	@Override
+	public void printFooter() {
+
+		if (footerSayContinue)
+			print(-51, this.getMidXAxis(), "====　續　下　頁　====", "C");
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -45,6 +107,7 @@ public class L9706Report extends MakeReport {
 		iENTDAY = tranDate(titaVo.getParam("ENTDY"));
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9706", "貸款餘額證明書", "普通", "A4", "P");
+		this.setFontSize(standardFontSize);
 
 		List<Map<String, String>> loanBTXList = null;
 
@@ -54,9 +117,10 @@ public class L9706Report extends MakeReport {
 			this.info("L9706ServiceImpl.LoanBorTx error = " + e.toString());
 		}
 
-		this.info("L9706Report LoanBTXList =" + loanBTXList.toString());
+		boolean hasData = loanBTXList != null && !loanBTXList.isEmpty();
 
-		if (loanBTXList != null && loanBTXList.size() != 0) {
+		if (hasData) {
+			this.info("L9706Report LoanBTXList =" + loanBTXList.toString());
 			for (Map<String, String> tL9706Vo : loanBTXList) {
 				if (cnt == 1) {
 					this.newPage();
@@ -71,93 +135,161 @@ public class L9706Report extends MakeReport {
 			this.print(1, 1, "");
 			this.print(1, 1, "");
 			this.print(1, 1, "");
-			this.print(1, 5, "查");
-			this.print(0, 58, "君前於");
-			this.print(1, 1, "");
-			this.print(0, 37, "向本公司申借");
-			this.print(0, 58, "購置住");
-			this.print(1, 1, "");
-			this.print(1, 1, "宅貸款金額");
-			this.print(0, 12, "整");
-			this.print(0, 62, "，");
-			this.print(1, 1, "");
-			this.print(1, 1, "戶號 ");
-			this.print(0, 20, "截至");
-			this.print(0, 62, iENTDAY, "R");
-			this.print(0, 62, "止");
-			this.print(1, 1, "");
-			this.print(1, 1, "尚欠本金餘額");
-			this.print(0, 14, "整");
-			this.print(0, 62, "。");
-			this.print(1, 1, "");
-			this.print(1, 18, "此  致");
-			this.print(1, 1, "");
-			this.print(1, 9, "台  照");
-			this.print(1, 1, "");
-			this.print(1, 40, "新光人壽保險股份有限公司");
-			this.print(1, 1, "");
-			this.print(1, 4, "中 　 華 　 民 　 國  ");
-			this.print(0, 64, iENTDAY, "R");
 		}
 		this.close();
 
 		// 測試用
-		//this.toPdf(sno);
-		if (loanBTXList != null && loanBTXList.size() != 0) {
-			return true;
-		} else {
-			return false;
-		}
+		// this.toPdf(sno);
+		return hasData;
 	}
 
 	private void report1(Map<String, String> tL9706Vo) throws LogicException {
 
-		String tmp = "";
+		this.print(1, 0, "");
 
-		this.print(1, 1, "");
-		this.print(1, 1, "");
-		this.print(1, 1, "");
-		this.print(1, 1, "");
-		this.print(1, 5, "查");
+		footerSayContinue = true; // 沒看 MakeReport，但從測試過程來看，我猜第一頁的 header 在第一次 print 時發動，所以如果這行放在 print
+									// 上面會讓第一頁也有承上頁
 
-		this.print(0, 8, tL9706Vo.get("F0"));
-		this.print(0, 53, "君(身分證字號");
-		this.print(0, 66, tL9706Vo.get("F9")+")，");
-		this.print(1,1,"");
-		this.print(1, 3, "於 " + showRocDate(tL9706Vo.get("F1"),0));
-		this.print(0, 20, "向本公司辦理" );
-		
-		tmp = "";
-		if (!tL9706Vo.get("F2").equals("0")) {
-			tmp = tmp + tL9706Vo.get("F2") + " 年";
+		// 每行起始 3
+		// 每行有效 78
+
+		// 每行長度 76
+
+		// 輸出第一段：基本資料
+
+		// 年月日 期 的部分比較麻煩
+		// 先輸出好
+		int loanTermYy = parse.stringToInteger(tL9706Vo.get("LoanTermYy"));
+		int loanTermMm = parse.stringToInteger(tL9706Vo.get("LoanTermMm"));
+		int loanTermDd = parse.stringToInteger(tL9706Vo.get("LoanTermDd"));
+
+		String loanTermString = (loanTermYy > 0 ? loanTermYy + " 年 " : "") + (loanTermMm > 0 ? loanTermMm + " 月 " : "")
+				+ (loanTermDd > 0 ? loanTermDd + " 日" : "");
+
+		loanTermString = loanTermString.trim();
+
+		// 這邊因為新需求，要把每行做成固定長度，只是可以往下延伸，像 word 排版那樣
+		// 所以用的是先把字串組好，然後依照內容長度拆成多個固定長度的行，達到類似效果
+		String cuscCdX = "";
+		if ("2".equals(tL9706Vo.get("CuscCd"))) {
+			cuscCdX = "統一編號";
+		} else {
+			cuscCdX = "身分證字號";
 		}
-		if (!tL9706Vo.get("F3").equals("0")) {
-			tmp = tmp + tL9706Vo.get("F3") + " 月";
+		String basicInfo = String.format(
+				"　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款餘額為 %s整。",
+				tL9706Vo.get("CustName") // 戶名
+				, cuscCdX, tL9706Vo.get("CustId") // 身分證字號
+				, this.showRocDate(tL9706Vo.get("FirstDrawdownDate"), 0) // 首撥日
+				, loanTermString // 辦理 %s期
+				, ConvertUpMoney.toChinese(tL9706Vo.get("LineAmt")) // 借款金額
+				, FormatUtil.pad9(tL9706Vo.get("CustNo"), 7) // 戶號
+				, FormatUtil.pad9(tL9706Vo.get("FacmNo"), 3) // 額度
+				, this.showRocDate(this.titaVo.getCalDy(), 0) // 截至民國 %s 日
+				, ConvertUpMoney.toChinese(tL9706Vo.get("LoanBal"))); // 貸款餘額
+
+		// 切成當中所有 strings 長度 <= 74 的 string[]
+
+		List<String> split = splitChinese(basicInfo, 74);
+
+		for (String s : split) {
+			this.print(1, 3, s);
 		}
-		if (!tL9706Vo.get("F4").equals("0")) {
-			tmp = tmp + tL9706Vo.get("F4") + " 天";
+
+		// 輸出第二段：共同借款人
+		// 共同借款人資料檔
+		int applNo = parse.stringToInteger(tL9706Vo.get("ApplNo"));
+		List<CustMain> shareList = new ArrayList<CustMain>();
+		FacShareAppl tfacShareAppl = facShareApplService.findById(applNo, titaVo);
+		if (tfacShareAppl != null) {
+			Slice<FacShareAppl> slFacShareApp = facShareApplService.findMainApplNo(tfacShareAppl.getMainApplNo(), 0,
+					Integer.MAX_VALUE, titaVo);
+			for (FacShareAppl t : slFacShareApp.getContent()) {
+				CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
+				if (tCustMain != null) {
+					shareList.add(tCustMain);
+				}
+			}
 		}
-		tmp = tmp + "期 ";
-		this.print(0, 32, tmp);
-		tmp = ConvertUpMoney.toChinese(tL9706Vo.get("F5"));
-		this.print(0, 40, "購置貸款，借款金額"+tmp+"整，");
-		tmp = String.format("%07d", Integer.valueOf(tL9706Vo.get("F6"))) + " - " + String.format("%03d", Integer.valueOf(tL9706Vo.get("F7")));
-		this.print(1,1,"");
-		this.print(1, 3, "戶號  "+ tmp+ "截至民國"+ showRocDate(titaVo.getParam("ENTDY"),0)+"止");
-		tmp = ConvertUpMoney.toChinese(tL9706Vo.get("F8"));
-		this.print(1,1,"");
-		this.print(1, 3,"貸款餘額為新台幣"+tmp + "整。");
-		this.print(1,1,"");
-		this.print(1, 3,"貸款抵押標的物地址為"+tL9706Vo.get("F10")+"。");
+		// 保證人檔的共同借款人，重複剃除
+		Slice<Guarantor> slGuarantor = guarantorService.approveNoEq(applNo, 0, Integer.MAX_VALUE, titaVo);
+		if (slGuarantor != null) {
+			for (Guarantor t : slGuarantor.getContent()) {
+				if ("06".equals(t.getGuaTypeCode())) {
+					boolean isNew = true;
+					for (CustMain c : shareList) {
+						if (c.getCustUKey().equals(t.getGuaUKey())) {
+							isNew = false;
+						}
+					}
+					if (isNew) {
+						CustMain tCustMain = custMainService.findById(t.getGuaUKey(), titaVo);
+						if (tCustMain != null) {
+							shareList.add(tCustMain);
+						}
+
+					}
+				}
+			}
+		}
+		if (shareList.size() > 0) {
+			this.print(1, 0, "");
+			this.print(1, 3, "共同借款人：");
+			for (CustMain tCustMain : shareList) {
+				cuscCdX = "身分證字號";
+				if ("2".equals(tCustMain.getCuscCd())) {
+					cuscCdX = "統一編號";
+				} else {
+					cuscCdX = "身分證字號";
+				}
+				this.print(0, 13, tCustMain.getCustName() + " (" + cuscCdX + tCustMain.getCustId() + ")");
+				this.print(1, 0, "");
+			}
+		}
+
+		// 輸出第三段：所有地址
+		Slice<ClFac> slClFac = clFacService.approveNoEq(applNo, 0, Integer.MAX_VALUE, titaVo);
+		List<ClBuilding> addressList = new ArrayList<ClBuilding>();
+		if (slClFac != null) {
+			for (ClFac f : slClFac.getContent()) {
+				ClBuilding tClBuilding = clBuildingService
+						.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
+				if (tClBuilding != null) {
+					addressList.add(tClBuilding);
+				}
+
+			}
+
+		}
+		if (addressList.size() > 0) {
+			this.print(1, 0, "");
+			this.print(1, 3, "貸款抵押標的物地址：");
+			for (ClBuilding tClBuilding : addressList) {
+				this.print(1, 8, tClBuilding.getBdLocation()); // 每個地址的輸出位置：8
+			}
+		}
+		// 輸出第四段：如果為政府優惠房屋貸款時，要多輸出
+
+		if ("Y".equals(tL9706Vo.get("GovOfferFlag"))) {
+			this.print(1, 0, "");
+			this.print(1, 3, "本案為政府優惠房屋貸款 ： " + tL9706Vo.get("ProdName"));
+		}
+
+		this.print(1, 0, "");
+
+		// footer
+
 		this.print(1, 1, "");
 		this.print(1, 18, "此  致");
 		this.print(1, 1, "");
 		this.print(1, 9, "台照");
 		this.print(1, 1, "");
-		this.print(1, 76, "新光人壽保險股份有限公司敬啟","R");
+		this.print(1, 76, "新光人壽保險股份有限公司敬啟", "R");
 		this.print(1, 1, "");
-		this.print(1, 4, "中 　 　　華 　 　　民 　 　　國  "+ iENTDAY);
+		this.print(1, 4, "中 　 　　華 　 　　民 　 　　國  " + iENTDAY);
 //		this.print(0, 66, iENTDAY, "R");
+
+		footerSayContinue = false;
 	}
 
 	private String tranDate(String date) {
@@ -219,6 +351,74 @@ public class L9706Report extends MakeReport {
 			odata += (char) tranTemp;
 		}
 		return odata;
+	}
+
+	// copied from StringCut
+	private static boolean isChinese(char c) {
+		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+			return true;
+		}
+		return false;
+	}
+
+	private int getThisNumberLength(String data, int leftIndex) {
+
+		int len = 0;
+
+		for (int i = leftIndex; i < data.length(); i++) {
+			if (Character.isDigit(data.charAt(i)))
+				len++;
+			else
+				break;
+		}
+
+		return len;
+	}
+
+	private List<String> splitChinese(String data, int lineLength) {
+		List<String> resultList = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		int currentLength = 0;
+
+		for (int i = 0; i < data.length(); i++) {
+			char thisChar = data.charAt(i);
+			int thisCharLength = isChinese(thisChar) ? 2 : 1;
+
+			// 如果這個字元是數字，檢查從這一位數開始後面還有沒有數字
+			// 如果有，盡量加在一起
+			// 有一些 edge case 沒有處理：
+
+			// 1. 如果數字長度大於 lineLength，會多很多空白的行（TODO: 檢查 thisNumberLength > lineLength
+			// 時擲錯，或者做其他的特殊處理）
+			// 2. 假如數字是 5 位數，同樣的檢查會檢查五次，5,4,3,2,1，會影響效能，有時間可作改善
+
+			int thisNumberLength = 0;
+
+			if (Character.isDigit(thisChar))
+				thisNumberLength = getThisNumberLength(data, i);
+
+			if ((currentLength + Math.max(thisCharLength, thisNumberLength) > lineLength)) {
+				resultList.add(sb.toString());
+				sb.setLength(0);
+				currentLength = 0;
+			}
+
+			currentLength += thisCharLength;
+			sb.append(thisChar);
+		}
+
+		// 最後剩下的所有文字
+		if (sb.length() > 0)
+			resultList.add(sb.toString());
+
+		return resultList;
 	}
 
 }

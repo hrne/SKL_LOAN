@@ -267,8 +267,8 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ) M ";
 			sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = M.\"CustNo\" ";
 			sql += "                       AND FM.\"FacmNo\" = M.\"FacmNo\" ";
-			sql += " LEFT JOIN \"CdEmp\" BusinessOfficer ON BusinessOfficer.\"EmployeeNo\" = FM.\"BusinessOfficer\" ";
-			sql += " LEFT JOIN \"CdEmp\" CreditOfficer ON CreditOfficer.\"EmployeeNo\" = FM.\"CreditOfficer\" ";
+			sql += " LEFT JOIN \"CdEmp\" BusinessOfficer ON UPPER(BusinessOfficer.\"EmployeeNo\") = UPPER(FM.\"BusinessOfficer\") ";
+			sql += " LEFT JOIN \"CdEmp\" CreditOfficer ON UPPER(CreditOfficer.\"EmployeeNo\") = UPPER(FM.\"CreditOfficer\") ";
 			sql += " WHERE ( :businessOfficer = '999999'  ";
 			sql += "    OR  NVL (CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 ";
 			sql += "                   THEN BusinessOfficer.\"EmployeeNo\" ";

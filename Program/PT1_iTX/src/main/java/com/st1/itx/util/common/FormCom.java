@@ -39,12 +39,13 @@ public class FormCom extends MakeReport {
 		String tran = titaVo.getTxcd();
 
 		this.info("titaVo = " + titaVo);
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran , "存入憑條", "cm,20,9.31333", "P");
+		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "存入憑條", "cm,20,9.31333", "P");
 
 		// X軸 ,Y軸
 		setFont(1, 14);
 
 		String date = titaVo.getParam("fmEntryDate");
+
 
 		// 中華民國
 		printCm(15.4, 0.9, date.substring(0, 3));
@@ -54,7 +55,7 @@ public class FormCom extends MakeReport {
 		String account = titaVo.getParam("fmAccount");
 		// 存入帳號 1.5 +0.6... / 3
 		for (int i = 0; i < 13; i++) {
-			double x = 10 - (i * 0.6);
+			double x = 9.9 - (i * 0.615);
 			int ii = 14 - 1 - i;
 			printCm(x, 2.8, account.substring(ii, ii + 1));
 		}
@@ -76,7 +77,6 @@ public class FormCom extends MakeReport {
 		String custNo = FormatUtil.pad9(titaVo.getParam("fmCustNo"), 7);
 		// 戶號
 		printCm(2.8, 5, custNo);
-
 		long sno = this.close();
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
