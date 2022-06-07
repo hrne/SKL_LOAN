@@ -7,7 +7,7 @@ set define off;
 (
 -- 程式功能：維護 JcicB096 每月聯徵不動產擔保品明細-地號附加檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicB096_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L8_JcicB096_Upd"(20200430,'999999');
 --
 
     -- 參數
@@ -93,6 +93,7 @@ BEGIN
          , MAX(L."LandZoningCode")               AS "LandZoningCode"
          , MAX(L."PostedLandValue")              AS "PostedLandValue" 
          , MAX(L."PostedLandValueYearMonth")     AS "PostedLandValueYearMonth" 
+         , MIN(LandOwner."OwnerId")              AS "OwnerId"
     FROM   "Work_B096_Sum_rawData" M
       LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
                               AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
@@ -122,6 +123,34 @@ BEGIN
                                    AND to_number(SUBSTR(WK2."MainClActNo",4,7)) = CF2."ClNo" 
                                    AND WK2."LandNo1" = M."LandNo1"
                                    AND WK2."LandNo2" = M."LandNo2"
+      -- 土地檔擔保品所有權人ID
+      LEFT JOIN ( SELECT DISTINCT
+                         O."ClCode1"
+                       , O."ClCode2"
+                       , O."ClNo"
+                       , C."CustId"  AS "OwnerId"
+                  FROM "ClLandOwner" O
+                  LEFT JOIN (
+                    SELECT CF3."ClCode1"
+                         , CF3."ClCode2"
+                         , CF3."ClNo"
+                         , CLO."OwnerCustUKey"
+                    FROM "ClFac" CF3
+                    LEFT JOIN "ClFac" CF4 ON CF4."CustNo" = CF3."CustNo"
+                                         AND CF4."FacmNo" = CF3."FacmNo"
+                                         AND CF4."MainFlag" = 'Y'
+                    LEFT JOIN "ClLandOwner" CLO ON CLO."ClCode1" = CF4."ClCode1"
+                                               AND CLO."ClCode2" = CF4."ClCode2"
+                                               AND CLO."ClNo" = CF4."ClNo"
+                    WHERE CF3."MainFlag" != 'Y'
+                      AND CLO."OwnerPart" IS NOT NULL
+                  ) O2 ON O2."ClCode1" = O."ClCode1"
+                      AND O2."ClCode2" = O."ClCode2"
+                      AND O2."ClNo" = O."ClNo"
+                    LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
+                ) LandOwner        ON LandOwner."ClCode1" = CF2."ClCode1"
+                                  AND LandOwner."ClCode2" = CF2."ClCode2"
+                                  AND LandOwner."ClNo"    = CF2."ClNo"
     WHERE  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
       AND  ( M."LandNo1" > 0 OR M."LandNo2" > 0 )
       GROUP BY M."ClActNo" , M."LandNo1" , M."LandNo2"            
@@ -129,14 +158,14 @@ BEGIN
     , "Work_B096" AS (
 
     SELECT
-           M."ClActNo"                   AS "MainClActNo"       -- 主要擔保品控制編碼
-         , M."OwnerId"                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
-         , M."CityJCICCode"              AS "CityCode"          -- 縣市別
-         , M."AreaJCICCode"              AS "AreaCode"          -- 鄉鎮市區別
-         , M."IrCode"                    AS "IrCode"            -- 段、小段號
-         , M."LandNo1"                   AS "LandNo1"           -- 地號-前四碼
-         , M."LandNo2"                   AS "LandNo2"           -- 地號-後四碼
-         , NVL(WK."Area",WK2."Area")     AS "Area"              -- 面積
+           M."ClActNo"                    AS "MainClActNo"       -- 主要擔保品控制編碼
+         , WK2."OwnerId"                  AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
+         , M."CityJCICCode"               AS "CityCode"          -- 縣市別
+         , M."AreaJCICCode"               AS "AreaCode"          -- 鄉鎮市區別
+         , M."IrCode"                     AS "IrCode"            -- 段、小段號
+         , M."LandNo1"                    AS "LandNo1"           -- 地號-前四碼
+         , M."LandNo2"                    AS "LandNo2"           -- 地號-後四碼
+         , NVL(WK."Area",WK2."Area")      AS "Area"              -- 面積
          , WK2."LandSeq"                  AS "LandSeq"
          , WK2."LandCode"                 AS "LandCode"
          , WK2."LandZoningCode"           AS "LandZoningCode"
@@ -156,9 +185,6 @@ BEGIN
       AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
       AND  ( M."LandNo1" > 0 OR M."LandNo2" > 0 )
 
---    GROUP BY WK."MainClActNo", WK."ClCode1", WK."ClCode2", WK."ClNo", WK."LandSeq"
---           , WK."CityCode", WK."AreaCode", WK."IrCode"
---           , WK."LandNo1", WK."LandNo2"
     )
 
 

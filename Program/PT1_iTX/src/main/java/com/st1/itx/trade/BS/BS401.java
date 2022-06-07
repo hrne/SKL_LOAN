@@ -102,6 +102,7 @@ public class BS401 extends TradeBuffer {
 	private int iAcDate;
 	private String iBatchNo;
 	private String iReconCode;
+	BatxHead tBatxHead = new BatxHead();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -126,7 +127,7 @@ public class BS401 extends TradeBuffer {
 			BatxHeadId tBatxHeadId = new BatxHeadId();
 			tBatxHeadId.setAcDate(iAcDate);
 			tBatxHeadId.setBatchNo(iBatchNo);
-			BatxHead tBatxHead = batxHeadService.holdById(tBatxHeadId);
+			tBatxHead = batxHeadService.holdById(tBatxHeadId);
 			if (tBatxHead == null) {
 				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
 			}
@@ -195,6 +196,10 @@ public class BS401 extends TradeBuffer {
 						if ("4".equals(tDetail.getProcStsCode())) {
 							isCheck = true;
 						}
+					}
+					// 01.匯款轉帳，檢核錯誤=>再檢核一次
+					if (tDetail.getRepayCode() == 1 && "3".equals(tDetail.getProcStsCode())) {
+						isCheck = true;
 					}
 					if (isCheck) {
 						tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
@@ -287,8 +292,8 @@ public class BS401 extends TradeBuffer {
 
 		// end
 		if (iFunctionCode == 0 || iFunctionCode == 3) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
-					iBatchNo + " 整批入帳, " + msg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+					titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
 		}
 		return this.sendList();
 	}

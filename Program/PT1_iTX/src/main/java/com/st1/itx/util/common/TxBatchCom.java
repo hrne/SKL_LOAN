@@ -1262,7 +1262,9 @@ public class TxBatchCom extends TradeBuffer {
 			case 2:
 				// 有期款未回收，變更還款類別為期款
 				if ("1".equals(tTempVo.getParam("RepayTypeChange"))) {
-					this.checkMsg += " 有期款未回收，變更還款類別為期款，應繳日=" + tTempVo.getParam("NextPayIntDate");
+					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
+					this.procStsCode = "3"; // 3.檢核錯誤
+					break;
 				}
 				// 有即時收取清償違約金
 				// 處理狀態:2.人工處理

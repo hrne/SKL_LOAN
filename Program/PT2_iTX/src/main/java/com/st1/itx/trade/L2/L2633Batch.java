@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L2633Batch")
 @Scope("prototype")
@@ -25,18 +26,30 @@ public class L2633Batch extends TradeBuffer {
 
 	/* 報表服務注入 */
 	@Autowired
-	L2633Report l2633Report;
+	L2633ReportA l2633ReportA;
+	@Autowired
+	L2633ReportB l2633ReportB;
 	@Autowired
 	public WebClient webClient;
 	@Autowired
 	public DateUtil dateUtil;
+	@Autowired
+	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2633Batch ");
 
-//		產出清償日報
-		doRptA(titaVo);
+		int iEntryDate = parse.stringToInteger(titaVo.getParam("TranDate"));
+		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
+		if (iEntryDate > 0) {
+//			產出清償日報(一般結案)
+			doRptA(titaVo);
+		}
+		if (iApplDate > 0) {
+//			產出清償日報(限補領補發)
+			doRptB(titaVo);
+		}
 
 		String checkMsg = "清償日報表產檔已完成。";
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
@@ -46,20 +59,34 @@ public class L2633Batch extends TradeBuffer {
 	}
 
 	public void doRptA(TitaVo titaVo) throws LogicException {
-		this.info("L2633 doRpt started.");
-		l2633Report.setTxBuffer(txBuffer);
+		this.info("L2633ReportA started.");
+		l2633ReportA.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
 
-		l2633Report.setParentTranCode(parentTranCode);
+		l2633ReportA.setParentTranCode(parentTranCode);
 
 		// 撈資料組報表
-		l2633Report.exec(titaVo);
+		l2633ReportA.exec(titaVo);
 
 		// 寫產檔記錄到TxReport
-		long rptNo = l2633Report.close();
+		l2633ReportA.close();
 
-		// 產生PDF檔案
-		l2633Report.toPdf(rptNo);
+		this.info("L2633 doRpt finished.");
+
+	}
+
+	public void doRptB(TitaVo titaVo) throws LogicException {
+		this.info("L2633ReportB started.");
+		l2633ReportB.setTxBuffer(txBuffer);
+		String parentTranCode = titaVo.getTxcd();
+
+		l2633ReportB.setParentTranCode(parentTranCode);
+
+		// 撈資料組報表
+		l2633ReportB.exec(titaVo);
+
+		// 寫產檔記錄到TxReport
+		l2633ReportB.close();
 
 		this.info("L2633 doRpt finished.");
 

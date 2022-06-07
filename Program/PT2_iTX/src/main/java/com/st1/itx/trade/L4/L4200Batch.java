@@ -489,7 +489,7 @@ public class L4200Batch extends TradeBuffer {
 //		執行無誤者連結查詢清單
 		if (checkFlag) {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
-					titaVo.getEntDyI() + "0" + tBatxHead.getTitaTlrNo(), sendMsg, titaVo);
+					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(), sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4200", titaVo.getTlrNo(),
 					sendMsg, titaVo);
