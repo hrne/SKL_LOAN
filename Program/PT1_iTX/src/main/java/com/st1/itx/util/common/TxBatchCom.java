@@ -273,6 +273,8 @@ public class TxBatchCom extends TradeBuffer {
 	private int intStartDate = 0;
 //  計息迄日
 	private int intEndDate = 0;
+//  上次繳息日
+	private int prePayintDate = 0;
 
 //  額度還款應繳日
 	private String repayIntDateByFacmNoVo = null;
@@ -341,6 +343,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.repayIntDateByFacmNoVo = null;
 		this.intStartDate = 0;
 		this.intEndDate = 0;
+		this.prePayintDate = 0;
 		this.facStatus = 0;
 		this.closeFg = 0;
 		this.checkMsg = "";
@@ -1224,7 +1227,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 處理狀態:2.人工處理
 				// 處理說明:繳息迄日:999999
 				if (this.repayLoan.compareTo(BigDecimal.ZERO) == 0) {
-					this.checkMsg += " 繳息迄日:" + this.intStartDate;
+					this.checkMsg += " 繳息迄日:" + this.prePayintDate;
 					apendcheckMsgAmounts(tBatxDetail, titaVo);
 					this.procStsCode = "2"; // 2.人工處理
 					break;
@@ -1780,9 +1783,9 @@ public class TxBatchCom extends TradeBuffer {
 					}
 				}
 				if (baTxVo.getDataKind() == 2) {
-					// 計息起日
-					if (this.intStartDate == 0 || baTxVo.getIntStartDate() < this.intStartDate) {
-						this.intStartDate = baTxVo.getIntStartDate();
+					// 上次繳息日
+					if (this.prePayintDate == 0 || baTxVo.getIntStartDate() < this.prePayintDate) {
+						this.prePayintDate = baTxVo.getIntStartDate();
 					}
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
@@ -1790,7 +1793,9 @@ public class TxBatchCom extends TradeBuffer {
 						this.interest = this.interest.add(baTxVo.getInterest());
 						this.delayInt = this.delayInt.add(baTxVo.getDelayInt());
 						this.breachAmt = this.breachAmt.add(baTxVo.getBreachAmt());
-						// 計息止日(還款)
+						if (this.intStartDate == 0 || baTxVo.getIntStartDate() < this.intStartDate) {
+							this.intStartDate = baTxVo.getIntStartDate();
+						}
 						if (baTxVo.getIntEndDate() > this.intEndDate) {
 							this.intEndDate = baTxVo.getIntEndDate();
 						}

@@ -272,6 +272,8 @@ public class L6908 extends TradeBuffer {
 			this.info("c2 = " + c2);
 			if (c1.get("OOCreateDate").compareTo(c2.get("OOCreateDate")) != 0) {
 				result = c1.get("OOCreateDate").compareTo(c2.get("OOCreateDate"));
+			} if (c1.get("OOCreateTime").compareTo(c2.get("OOCreateTime")) != 0) {
+				result = c1.get("OOCreateTime").compareTo(c2.get("OOCreateTime"));
 			} else {
 				result = 0;
 			}

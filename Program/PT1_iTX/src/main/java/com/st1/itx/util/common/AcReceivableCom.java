@@ -129,9 +129,12 @@ public class AcReceivableCom extends TradeBuffer {
 				// 1.ReceivableFlag >= 3 銷帳
 				// 2.借方科目借方 ("1", "5","6","9") or 貸方科目貸方 -> 0-起帳, else 1-銷帳
 				// 3.TRO借新還舊->相反(貸方科目，先借後貸)
-				if (ac.getReceivableFlag() >= 3)
+				if (ac.getReceivableFlag() >= 3) {
 					wkRvFg = 1;
-				else if ((debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("D"))
+					if (AcHCode == 2) {
+						wkRvFg = 0;
+					}
+				} else if ((debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("D"))
 						|| (!debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("C")))
 					wkRvFg = 0;
 				else
@@ -517,14 +520,15 @@ public class AcReceivableCom extends TradeBuffer {
 	private void updAcReceivable(int AcHCode, int bizTbsdy) throws LogicException {
 
 		// 帳冊別、科子細目
-		tAcReceivable.setAcBookCode(ac.getAcBookCode());
-		tAcReceivable.setAcSubBookCode(ac.getAcSubBookCode());
-		tAcReceivable.setAcSubCode(ac.getAcSubCode());
-		tAcReceivable.setAcDtlCode(ac.getAcDtlCode());
-
-		tAcReceivable.setAcNoCode(ac.getAcNoCode());
-		tAcReceivable.setAcSubCode(ac.getAcSubCode());
-		tAcReceivable.setAcDtlCode(ac.getAcDtlCode());
+		if (tAcReceivable.getAcSubBookCode().trim().isEmpty()) {
+			tAcReceivable.setAcBookCode(ac.getAcBookCode());
+			tAcReceivable.setAcSubBookCode(ac.getAcSubBookCode());
+		}
+		if (tAcReceivable.getAcNoCode().trim().isEmpty()) {
+			tAcReceivable.setAcNoCode(ac.getAcNoCode());
+			tAcReceivable.setAcSubCode(ac.getAcSubCode());
+			tAcReceivable.setAcDtlCode(ac.getAcDtlCode());
+		}
 		// jsonFields 欄
 		settingjsonfields(ac.getJsonFields(), titaVo);
 
@@ -565,7 +569,7 @@ public class AcReceivableCom extends TradeBuffer {
 //5.檢查銷帳金額		
 		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) < 0
 				|| tAcReceivable.getAcBal().compareTo(BigDecimal.ZERO) < 0) {
-			this.info("銷帳金額超過原入帳金額 :" + ", bizTbsdy=" + bizTbsdy + ", AcBal=" + tAcReceivable.getRvBal());
+			this.info("銷帳金額超過原入帳金額 :" + ", bizTbsdy=" + bizTbsdy + ", RvBal=" + tAcReceivable.getRvBal());
 			String str = "科目=" + tAcReceivable.getAcctCode() + ", 戶號=" + tAcReceivable.getCustNo() + "-"
 					+ parse.IntegerToString(tAcReceivable.getFacmNo(), 3) + " " + tAcReceivable.getRvNo();
 			if (titaVo.isHcodeErase()) {

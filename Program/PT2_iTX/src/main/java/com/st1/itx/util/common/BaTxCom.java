@@ -430,11 +430,13 @@ public class BaTxCom extends TradeBuffer {
 // 1).回收金額 = 費用金額 -> 4~9.費用類別
 			for (BaTxVo ba : this.baTxList) {
 				// 相同還款金額(另收欠款)；應收及未收由轉暫收或放款回收時收回
-				if (ba.getRepayType() >= 4 && ba.getDataKind() == 6) {
-					if (iTxAmt.compareTo(ba.getUnPaidAmt()) == 0) {
-						this.info("Feetype=" + ba.toString());
-						iRepayType = ba.getRepayType();
-					}
+				if (ba.getRepayType() >= 4 && ba.getDataKind() == 6 && iTxAmt.compareTo(ba.getUnPaidAmt()) == 0) {
+					this.info("Feetype=" + ba.toString());
+					iRepayType = ba.getRepayType();
+				}
+				if (ba.getRepayType() >= 4 && repayAmt.compareTo(ba.getUnPaidAmt()) == 0) {
+					this.info("Feetype=" + ba.toString());
+					iRepayType = ba.getRepayType();
 				}
 			}
 
@@ -603,7 +605,7 @@ public class BaTxCom extends TradeBuffer {
 
 		// 回收費用，費用類別入帳只會自動收類別相同者
 		if ("Y".equals(this.payFeeFlag)) {
-			settleAcctAmt(1); // 1.還款類別、金額相同 
+			settleAcctAmt(1); // 1.還款類別、金額相同
 			settleAcctAmt(2); // 2.還款類別相同
 		}
 
@@ -1702,8 +1704,9 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-		this.info("getPayintDateAmt end xxBal=" + this.xxBal + ", rePayIntDate=" + payIntDate + ", payintDateAmt="
-				+ wkPayintDateAmt + ", wkUnpaidAmt=" + wkUnpaidAmt + ", shortAmtLimit=" + shortAmtLimit);
+		this.info("getPayintDateAmt end xxBal=" + this.xxBal + ", FacmNo= " + facmNo + ", rePayIntDate=" + payIntDate
+				+ ", payintDateAmt=" + wkPayintDateAmt + ", wkUnpaidAmt=" + wkUnpaidAmt + ", shortAmtLimit="
+				+ shortAmtLimit);
 
 		return wkPayintDateAmt;
 
@@ -1845,7 +1848,7 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setAcctAmt(BigDecimal.ZERO);
 		this.baTxList.add(baTxVo);
 		this.info("addMergeAmt end this.tavAmt=" + this.tavAmt);
-		
+
 		return this.tavAmt;
 	}
 

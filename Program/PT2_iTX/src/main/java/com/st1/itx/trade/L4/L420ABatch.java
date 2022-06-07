@@ -85,9 +85,6 @@ public class L420ABatch extends TradeBuffer {
 	public L4211Report l4211Report;
 
 	private int commitCnt = 20;
-	private int iAcDate;
-	private String iBatchNo;
-	private String iReconCode;
 	private String mapKey;
 	private HashMap<String, Integer> mergeCnt = new HashMap<>();
 	private HashMap<String, BigDecimal> mergeAmt = new HashMap<>();
@@ -99,7 +96,6 @@ public class L420ABatch extends TradeBuffer {
 	private List<BatxDetail> l1BatxDetail;
 	private List<BatxDetail> l2BatxDetail;
 	private List<BatxDetail> l3BatxDetail;
-	private Slice<BatxDetail> slBatxDetail;
 	boolean isMergeCheckAgain = false;
 	private int doneCnt = 0; // 已入帳
 
@@ -112,9 +108,9 @@ public class L420ABatch extends TradeBuffer {
 		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// 會計日期、批號
-		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		iBatchNo = titaVo.getParam("BatchNo");
-		iReconCode = titaVo.getParam("ReconCode").trim();
+		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		String iBatchNo = titaVo.getParam("BatchNo");
+		String iReconCode = titaVo.getParam("ReconCode").trim();
 		// hold 整批入帳總數檔
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(iAcDate);
@@ -133,18 +129,19 @@ public class L420ABatch extends TradeBuffer {
 		this.batchTransaction.commit();
 
 		// findAll 整批入帳明細檔
-		slBatxDetail = batxDetailService.findL4002AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4002AEq(iAcDate, iBatchNo, this.index,
+				Integer.MAX_VALUE);
 
-		doCheckAll(titaVo);
+		doCheckAll(true, iReconCode, slBatxDetail, titaVo);
 
 		// 合併的還款類別設定為另收費用則須再全部檢核一次
 		if (isMergeCheckAgain) {
 			this.info("RepaytypeNotEqual check again ...");
 			this.l4211MapList = new ArrayList<Map<String, String>>();
-			doCheckAll(titaVo);
+			doCheckAll(true, iReconCode, slBatxDetail, titaVo);
 		}
 		// 更新作業狀態
-		String msg = updateHead(tBatxHead, slBatxDetail.getContent(), titaVo);
+		String msg = updateHead(iReconCode, tBatxHead, slBatxDetail.getContent(), titaVo);
 
 		// end
 		this.batchTransaction.commit();
@@ -163,7 +160,22 @@ public class L420ABatch extends TradeBuffer {
 
 	}
 
-	private void doCheckAll(TitaVo titaVo) throws LogicException {
+	/**
+	 * 整批檢核
+	 * 
+	 * @param isCommit     true/false
+	 * @param iReconCode   對帳類別
+	 * @param slBatxDetail slice of BatxDetail
+	 * @param titaVo       TitaVo
+	 * @throws LogicException ....
+	 */
+	public void doCheckAll(boolean isCommit, String iReconCode, Slice<BatxDetail> slBatxDetail, TitaVo titaVo)
+			throws LogicException {
+		this.info("doCheckAll .....");
+
+		mergeCnt = new HashMap<>();
+		mergeAmt = new HashMap<>();
+		mergeProcStsCode = new HashMap<>();
 		lBatxDetail = new ArrayList<BatxDetail>();
 		l1BatxDetail = new ArrayList<BatxDetail>();
 		l2BatxDetail = new ArrayList<BatxDetail>();
@@ -189,8 +201,8 @@ public class L420ABatch extends TradeBuffer {
 						tTempVo.remove("MergeSeq");
 						t.setProcNote(tTempVo.getJsonString());
 						lBatxDetail.add(t);
-						// 匯款轉帳同戶號多筆檢核放 00-未定 01-期款 02-部分還本 03-結案
-						if (t.getRepayCode() == 1) {
+						// 匯款轉帳同戶號多筆檢核放 00-未定 01-期款 02-部分還本 03-結案 09-其他
+						if (t.getRepayCode() == 1 && (t.getRepayType() <= 3 || t.getRepayType() == 9)) {
 							mapKey = parse.IntegerToString(t.getCustNo(), 7)
 									+ parse.IntegerToString(t.getRepayType(), 2);
 							if (mergeAmt.containsKey(mapKey)) {
@@ -213,7 +225,7 @@ public class L420ABatch extends TradeBuffer {
 				this.tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(t.getProcNote());
 				// 匯款轉帳期款多筆，看整個多筆狀態，合併筆數不同需再次檢核
-				if (t.getRepayCode() == 1 && t.getRepayType() <= 3) {
+				if (t.getRepayCode() == 1 && (t.getRepayType() <= 3 || t.getRepayType() == 9)) {
 					mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
 					if (mergeCnt.get(mapKey) != null && mergeCnt.get(mapKey) >= 2) {
 						l2BatxDetail.add(t);
@@ -231,7 +243,7 @@ public class L420ABatch extends TradeBuffer {
 		if (l1BatxDetail.size() > 0) {
 			for (BatxDetail tDetail : l1BatxDetail) {
 				this.info("L1 BatxDetail=" + tDetail.toString());
-				if (cntTrans > this.commitCnt) {
+				if (isCommit && cntTrans > this.commitCnt) {
 					cntTrans = 0;
 					this.batchTransaction.commit();
 				}
@@ -295,18 +307,21 @@ public class L420ABatch extends TradeBuffer {
 					l3BatxDetail.add(tDetail);
 				}
 				if (mergeSeq == mergeCnt.get(mapKey)) {
-					doMergeUpdate(tDetail.getRepayType(), tDetail.getProcStsCode(), titaVo);
+					doMergeUpdate(isCommit, tDetail.getRepayType(), tDetail.getProcStsCode(), titaVo);
 					mergeSeq = 0;
 					l3BatxDetail = new ArrayList<BatxDetail>();
 				}
 			}
 		}
-		this.batchTransaction.commit();
+		if (isCommit) {
+			this.batchTransaction.commit();
+		}
 
 	}
 
 	// 更新同步更新同戶號檢核狀態
-	private void doMergeUpdate(int iRepayType, String iProcStsCode, TitaVo titaVo) throws LogicException {
+	private void doMergeUpdate(boolean isCommit, int iRepayType, String iProcStsCode, TitaVo titaVo)
+			throws LogicException {
 		// 任一筆 1.<檢核錯誤> 非成功=> 2:人工處理
 		// 還款類別不同需重新檢核((合併總額不同)
 		// 還款類別為結案則全部為結案(結案收全部費用)
@@ -336,12 +351,14 @@ public class L420ABatch extends TradeBuffer {
 		for (BatxDetail t : l3BatxDetail) {
 			addL4211MapList(t, this.baTxList, titaVo);
 		}
-
-		this.batchTransaction.commit();
+		if (isCommit) {
+			this.batchTransaction.commit();
+		}
 	}
 
 	private BatxDetail doTxCheck(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
 		this.info("doTxCheck ... " + tDetail.toString());
+		txBatchCom.setTxBuffer(this.getTxBuffer());
 		tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
 		this.baTxList = txBatchCom.getBaTxList();
 		return tDetail;
@@ -477,7 +494,8 @@ public class L420ABatch extends TradeBuffer {
 	}
 
 	/* 更新作業狀態 */
-	private String updateHead(BatxHead tHead, List<BatxDetail> lBatxDetail, TitaVo titaVo) throws LogicException {
+	private String updateHead(String iReconCode, BatxHead tHead, List<BatxDetail> lBatxDetail, TitaVo titaVo)
+			throws LogicException {
 // BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除		
 // this.procStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入 7.虛擬轉暫收
 		int manualCnt = 0; // 需人工處理, 2.人工處理

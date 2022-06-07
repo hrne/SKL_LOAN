@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -54,6 +56,9 @@ public class L4201 extends TradeBuffer {
 	@Autowired
 	public TxBatchCom txBatchCom;
 
+	@Autowired
+	public L420ABatch l420ABatch;
+
 	int btnIndex = 0;
 
 	@Override
@@ -101,7 +106,7 @@ public class L4201 extends TradeBuffer {
 			case 1: // 部分償還
 				iRepayTypeA = 2;
 				break;
-			case 2:  // 結案
+			case 2: // 結案
 				iRepayTypeA = 3;
 				break;
 			case 3: // 期款(不預收)
@@ -121,22 +126,33 @@ public class L4201 extends TradeBuffer {
 		if (tBatxDetail.getRepayType() == 1) {
 			tTempVo.putParam("PreRepayTerms", newPreRepayTerms);
 		} else {
-			tTempVo.remove("PreRepayTerms");			
+			tTempVo.remove("PreRepayTerms");
 		}
-		// 再檢核一次，移除匯款轉帳同戶號多筆檢核
-		tTempVo.remove("MergeCnt");
-		tTempVo.remove("MergeAmt");
-		tTempVo.remove("MergeSeq");
 		tBatxDetail.setProcNote(tTempVo.getJsonString());
-		if (!"1".equals(iProcStsCode)) {
-			tBatxDetail = txBatchCom.txCheck(0, tBatxDetail, titaVo);
-		}
 		try {
 			batxDetailService.update(tBatxDetail);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "update " + e.getErrorMsg());
 		}
+		// 戶號整批檢核
+		doCheckCustNo(tBatxDetail, titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	// 戶號整批檢核
+	private void doCheckCustNo(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		List<String> iProcStsCode = new ArrayList<String>();
+		iProcStsCode.add("0");
+		iProcStsCode.add("2");
+		iProcStsCode.add("3");
+		iProcStsCode.add("4");
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930CAEq(tBatxDetail.getAcDate() + 19110000,
+				tBatxDetail.getBatchNo(), tBatxDetail.getCustNo(), iProcStsCode, 0, Integer.MAX_VALUE, titaVo);
+		if (slBatxDetail != null) {
+			l420ABatch.setTxBuffer(this.txBuffer);
+			l420ABatch.doCheckAll(false, tBatxDetail.getReconCode(), slBatxDetail, titaVo);
+		}
 	}
 }

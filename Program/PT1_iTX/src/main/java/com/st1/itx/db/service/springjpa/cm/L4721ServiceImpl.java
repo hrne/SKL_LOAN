@@ -139,7 +139,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,T.\"TitaTxtNo\"                   ";
 		sql += "        FROM \"LoanBorTx\" T                                             ";
 		sql += "        WHERE T.\"CustNo\" = " + custNo;
-		sql += "         AND  T.\"FacmNo\" = " + facmNo;
+//		sql += "         AND  T.\"FacmNo\" = " + facmNo;
 		sql += "         AND  T.\"TitaHCode\" = 0                                          ";
 		sql += "         AND (T.\"Principal\" + T.\"ExtraRepay\" + T.\"Interest\" + T.\"BreachAmt\" + T.\"CloseBreachAmt\"";
 		sql += "              +  NVL(JSON_VALUE(T.\"OtherFields\",  '$.AcctFee'),0)                   ";

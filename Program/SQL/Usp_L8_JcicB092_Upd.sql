@@ -377,7 +377,7 @@ BEGIN
                          , CLO."OwnerCustUKey"
                     FROM "ClFac" CF1
                     LEFT JOIN "ClFac" CF2 ON CF2."CustNo" = CF1."CustNo"
-                                         AND CF2."FacmNo" = CF2."FacmNo"
+                                         AND CF2."FacmNo" = CF1."FacmNo"
                                          AND CF2."MainFlag" = 'Y'
                     LEFT JOIN "ClLandOwner" CLO ON CLO."ClCode1" = CF2."ClCode1"
                                                AND CLO."ClCode2" = CF2."ClCode2"
