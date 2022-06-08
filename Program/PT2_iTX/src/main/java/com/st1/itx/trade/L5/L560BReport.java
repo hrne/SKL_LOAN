@@ -214,7 +214,7 @@ public class L560BReport extends MakeReport {
 			setFont(1, 20);
 			printCm(10, 1, "前置協商逾期繳款通知函", "C");
 			setFont(1, 14);
-			printCm(1, 3, "敬啟者：");
+			printCm(1, 3, "敬啟者："+ iCustName);
 			printRectCm(1, 4, 70, 20, "台端業依消費者債務清理條例成立前置調解清償方案，依約應於" + iDateString + "繳付協商期付金新臺幣" + reCount
 					+ "元，惟迄今尚未繳付，請  台端務必於" + iYyy + "年" + iMm + "月25日前繳納，為維護台端權益，特以此函通知下列事項：");
 			printRectCm(1.5, 7, 65, 4, 20,

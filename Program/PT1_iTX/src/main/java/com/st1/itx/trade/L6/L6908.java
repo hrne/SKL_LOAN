@@ -85,9 +85,20 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOTranItem", t.get("TranItem"));
 				occursList.putParam("OOTitaTxCd", t.get("TitaTxCd"));
 				occursList.putParam("OOSlipNote", t.get("SlipNote"));
-				occursList.putParam("OOAcDate", parse.stringToInteger(t.get("AcDate")) - 19110000);
+				int acdate = parse.stringToInteger(t.get("AcDate"));
+				int entrydate = parse.stringToInteger(t.get("EntryDate"));
+
+				if(acdate >= 19110000) {
+					acdate = acdate -19110000;
+				}
+				
+				if(entrydate >= 19110000) {
+					entrydate = entrydate -19110000;
+				}
+				
+				occursList.putParam("OOAcDate", acdate);
 				occursList.putParam("OOClsFlag", t.get("ClsFlag"));
-				occursList.putParam("OOEntryDate", parse.stringToInteger(t.get("EntryDate")) - 19110000);
+				occursList.putParam("OOEntryDate", entrydate);
 
 				occursList.putParam("OOCreateDate", parse.stringToStringDate(t.get("CreateDate")).replace("/", ""));
 				occursList.putParam("OOCreateTime", parse.stringToStringTime(t.get("CreateDate")));

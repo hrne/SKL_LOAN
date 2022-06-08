@@ -502,6 +502,14 @@ public class AcReceivableCom extends TradeBuffer {
 							"AcReceivable delete " + tAcReceivableId + e.getErrorMsg());
 				}
 			} else {
+				if (wkOpenAcDate > 0 && wkRvFg == 0) {
+					tAcReceivable.setRvAmt(tAcReceivable.getRvBal());
+					tAcReceivable.setOpenAcDate(wkOpenAcDate);
+					tAcReceivable.setOpenTxCd(ac.getTitaTxCd());
+					tAcReceivable.setOpenKinBr(ac.getTitaKinbr());
+					tAcReceivable.setOpenTlrNo(ac.getTitaTlrNo());
+					tAcReceivable.setOpenTxtNo(ac.getTitaTxtNo());
+				}
 				tAcReceivable.setTitaTxCd(ac.getTitaTxCd());
 				tAcReceivable.setTitaKinBr(ac.getTitaKinbr());
 				tAcReceivable.setTitaTlrNo(ac.getTitaTlrNo());

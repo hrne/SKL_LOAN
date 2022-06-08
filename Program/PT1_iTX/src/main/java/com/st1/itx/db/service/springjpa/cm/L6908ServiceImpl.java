@@ -39,6 +39,8 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int limit;
 
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+	
 	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
 
 		this.info("L6908FindData");
@@ -102,8 +104,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "            0"; 
 		sql +=  "        ELSE"; 
 		sql +=  "            1"; 
-		sql +=  "    END AS \"ClsFlag\","; 
-		sql +=  "    'AcReceivable' AS \"DB\""; 
+		sql +=  "    END AS \"ClsFlag\"";  
 		sql +=  "  FROM"; 
 		sql +=  "    \"AcReceivable\"   ac"; 
 		sql +=  "    LEFT JOIN \"LoanBorTx\"      lb ON lb.\"AcDate\" = ac.\"OpenAcDate\""; 
@@ -169,8 +170,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "            0"; 
 		sql +=  "        ELSE"; 
 		sql +=  "            1"; 
-		sql +=  "    END AS \"ClsFlag\","; 
-		sql +=  "    'AcDetail' AS \"DB\""; 
+		sql +=  "    END AS \"ClsFlag\""; 
 		sql +=  "  FROM"; 
 		sql +=  "    \"AcDetail\"     ad"; 
 		sql +=  "    LEFT JOIN \"LoanBorTx\"    lb ON lb.\"AcDate\" = ad.\"AcDate\""; 
@@ -191,9 +191,10 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "    AND ad.\"AcDate\" >= :acdatest"; 
 		sql +=  "    AND ad.\"AcDate\" <= :acdateed"; 
 		sql +=  "    AND ad.\"RvNo\" IS NOT NULL"; 
-		sql +=  "    AND lpad(ad.\"FacmNo\", 3, '0') = :rvno"; 
 		sql +=  "  ORDER BY \"CreateDate\"";
-
+		
+		sql += " " + sqlRow;
+		
 		this.info("sql = " + sql);
 
 		Query query;
@@ -215,6 +216,8 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("acdatest", iAcdateSt);
 			query.setParameter("acdateed", iAcdateEd);
 			
+			query.setParameter("ThisIndex", index);
+			query.setParameter("ThisLimit", limit);
 			
 		this.info("L6908Service FindData=" + query);
 

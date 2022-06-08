@@ -206,7 +206,7 @@ public class L9706Report extends MakeReport {
 					Integer.MAX_VALUE, titaVo);
 			for (FacShareAppl t : slFacShareApp.getContent()) {
 				CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
-				if (tCustMain != null) {
+				if (tCustMain != null && !tCustMain.getCustId().equals(tL9706Vo.get("CustId"))) {
 					shareList.add(tCustMain);
 				}
 			}
@@ -218,7 +218,7 @@ public class L9706Report extends MakeReport {
 				if ("06".equals(t.getGuaTypeCode())) {
 					boolean isNew = true;
 					for (CustMain c : shareList) {
-						if (c.getCustUKey().equals(t.getGuaUKey())) {
+						if (c.getCustUKey().equals(t.getGuaUKey()) || c.getCustId().equals(tL9706Vo.get("CustId"))) {
 							isNew = false;
 						}
 					}
@@ -269,11 +269,39 @@ public class L9706Report extends MakeReport {
 			}
 		}
 		// 輸出第四段：如果為政府優惠房屋貸款時，要多輸出
+		String loanKind = "";
 
-		if ("Y".equals(tL9706Vo.get("GovOfferFlag"))) {
-			this.print(1, 0, "");
-			this.print(1, 3, "本案為政府優惠房屋貸款 ： " + tL9706Vo.get("ProdName"));
+		switch (tL9706Vo.get("ProdNo").trim().toUpperCase()) {
+		case "IA":
+			loanKind = "青年優專房屋貸款暨信用保證專案";
+			break;
+		case "IB":
+			loanKind = "四千億元優惠購物專案貸款";
+			break;
+		case "IC":
+			loanKind = "續辦二千億元優惠購屋專案貸款";
+			break;
+		case "ID":
+		case "IE":
+			loanKind = "續辦四千八百億元優惠購屋專案貸款";
+			break;
+		case "IF":
+		case "IG":
+			loanKind = "續辦六千億元優惠購屋專案貸款";
+			break;
+		case "IH":
+		case "II":
+			loanKind = "增撥新台幣四千億元優惠購屋專案貸款";
+			break;
+		default:
+			break;
 		}
+		
+		if (!loanKind.isEmpty()) {
+			this.print(1, 0, "");
+			this.print(1, 3, "本案為政府優惠房屋貸款 ： " + loanKind);
+		}
+
 
 		this.print(1, 0, "");
 

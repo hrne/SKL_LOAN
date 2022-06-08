@@ -247,7 +247,10 @@ public class L4721Report extends MakeReport {
 					if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 						dateRange = showRocDate(startDate, 3) + "-" + showRocDate(endDate, 3);
 					}
-
+					
+					if("-".equals(dateRange.trim())) {
+						dateRange = "";
+					}
 					print(0, 10, dateRange);
 
 					// 繳款方式

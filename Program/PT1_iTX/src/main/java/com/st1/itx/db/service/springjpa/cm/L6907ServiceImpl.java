@@ -36,6 +36,8 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int limit;
 
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+	
 	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
 
 		this.info("L6907FindData");
@@ -165,6 +167,8 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "  order by  A.\"AcctCode\" ";
 
+		sql += " " + sqlRow;
+		
 		this.info("L6907Service SQL=" + sql);
 
 		Query query;
@@ -204,6 +208,9 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("iClsFlag", iClsFlag);
 		}
 
+		query.setParameter("ThisIndex", index);
+		query.setParameter("ThisLimit", limit);
+		
 		this.info("L6907Service FindData=" + query);
 
 		// *** 折返控制相關 ***

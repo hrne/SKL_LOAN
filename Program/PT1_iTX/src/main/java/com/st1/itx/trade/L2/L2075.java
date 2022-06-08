@@ -79,6 +79,19 @@ public class L2075 extends TradeBuffer {
 	@Autowired
 	public LoanCom loanCom;
 
+	private OccursList occursList;
+	int custNo = 0;
+	int facmNo = 0;
+	int closeNo = 0;
+	int clCode1 = 0;
+	int clCode2 = 0;
+	int clNo = 0;
+	int entryDate = 0;
+	int applDate = 0;
+	int closeDate = 0;
+	String funCode = "";
+	boolean isAllClose = true;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2075 ");
@@ -126,12 +139,12 @@ public class L2075 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				// funcd1 勾選資料
 				this.info("result = " + result);
-				int custNo = parse.stringToInteger(result.get("CustNo"));
-				int facmNo = parse.stringToInteger(result.get("FacmNo"));
-				int closeNo = parse.stringToInteger(result.get("MAXNO"));
-				int clCode1 = parse.stringToInteger(result.get("ClCode1"));
-				int clCode2 = parse.stringToInteger(result.get("ClCode2"));
-				int clNo = parse.stringToInteger(result.get("ClNo"));
+				custNo = parse.stringToInteger(result.get("CustNo"));
+				facmNo = parse.stringToInteger(result.get("FacmNo"));
+				closeNo = parse.stringToInteger(result.get("MAXNO"));
+				clCode1 = parse.stringToInteger(result.get("ClCode1"));
+				clCode2 = parse.stringToInteger(result.get("ClCode2"));
+				clNo = parse.stringToInteger(result.get("ClNo"));
 				i++;
 				int facmNoS = facmNo;
 				int facmNoE = 999;
@@ -139,10 +152,10 @@ public class L2075 extends TradeBuffer {
 					facmNoE = facmNoS;
 				}
 				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
-				int entryDate = 0;
-				int applDate = 0;
-				int closeDate = 0;
-				String funCode = "";
+				entryDate = 0;
+				applDate = 0;
+				closeDate = 0;
+				funCode = "";
 				if (tFacClose != null) {
 					entryDate = tFacClose.getEntryDate();
 					applDate = tFacClose.getApplDate();
@@ -154,7 +167,7 @@ public class L2075 extends TradeBuffer {
 						titaVo);
 
 				lClFac = slClFac == null ? null : slClFac.getContent();
-				boolean isAllClose = true;
+				isAllClose = true;
 				if (lClFac != null) {
 
 					for (ClFac t2 : lClFac) {
@@ -183,80 +196,42 @@ public class L2075 extends TradeBuffer {
 						}
 					}
 				}
+				if (facmNoS == 0) {
+					if (lClFac != null) {
+						for (ClFac t3 : lClFac) {
+							Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(t3.getClCode1(),
+									t3.getClCode2(), t3.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+							lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 
-				Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(clCode1, clCode2, clNo, 0,
-						Integer.MAX_VALUE, titaVo);
-				lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
+							if (lClOtherRights != null) {
+								for (ClOtherRights tClOtherRights : lClOtherRights) {
+									this.info("tClOtherRights = " + tClOtherRights);
 
-				if (lClOtherRights != null) {
-					for (ClOtherRights tClOtherRights : lClOtherRights) {
-						this.info("tClOtherRights = " + tClOtherRights);
+									if (iType == 2 && iSearch == 1 && tClOtherRights.getReceiveFg() == 1) {
+										this.info("已領取 ");
+										continue;
+									}
 
-						if (iType == 2 && iSearch == 1 && tClOtherRights.getReceiveFg() == 1) {
-							this.info("已領取 ");
-							continue;
-						}
-						OccursList occursList = new OccursList();
-						// wk
-						String wkCityItem = "";
-						String wkLandOfficeItem = "";
-						String wkRecWordItem = "";
-						occursList.putParam("OOTranDate", entryDate);
-						occursList.putParam("OOApplDate", applDate);
-						occursList.putParam("OOFunCode", funCode);
-						occursList.putParam("OOCustNo", custNo);
-						occursList.putParam("OOCloseNo", closeNo);
-						occursList.putParam("OOCustName", loanCom.getCustNameByNo(custNo));
-						occursList.putParam("OOFacmNo", facmNo);
-						occursList.putParam("OOClCode1", tClOtherRights.getClCode1());
-						occursList.putParam("OOClCode2", tClOtherRights.getClCode2());
-						occursList.putParam("OOClNo", tClOtherRights.getClNo());
-						occursList.putParam("OOSeq", tClOtherRights.getSeq());
-						// 找縣市名稱
-						if ("".equals(tClOtherRights.getOtherCity())) {
-							CdCity tCdCity = cdCityService.findById(tClOtherRights.getCity(), titaVo);
-							if (tCdCity != null) {
-								wkCityItem = tCdCity.getCityItem();
+									moveOccursList(tClOtherRights, titaVo);
+								}
 							}
-						} else {
-							wkCityItem = tClOtherRights.getOtherCity();
 						}
-						occursList.putParam("OOCity", wkCityItem);
-						// 找地政所名稱
-						if ("".equals(tClOtherRights.getOtherLandAdm())) {
-							CdCode tCdCode = cdCodeService
-									.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()), titaVo);
-							if (tCdCode != null) {
-								wkLandOfficeItem = tCdCode.getItem();
-							}
-						} else {
-							wkLandOfficeItem = tClOtherRights.getOtherLandAdm();
-						}
-						occursList.putParam("OOLandAdm", wkLandOfficeItem);
-						occursList.putParam("OORecYear", tClOtherRights.getRecYear());
-						// 找 收件字名稱
-						if ("".equals(tClOtherRights.getOtherRecWord())) {
-							CdLandOffice tCdLandOffice = cdLandOfficeService.findById(
-									new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()),
-									titaVo);
-							if (tCdLandOffice != null) {
-								wkRecWordItem = tCdLandOffice.getRecWordItem();
-							}
-						} else {
-							wkRecWordItem = tClOtherRights.getOtherRecWord();
-						}
-						occursList.putParam("OORecWord", wkRecWordItem);
-						occursList.putParam("OORecNumber", tClOtherRights.getRecNumber());
-						occursList.putParam("OORightsNote", tClOtherRights.getRightsNote());
-						occursList.putParam("OOSecuredTotal", tClOtherRights.getSecuredTotal());
-						if (isAllClose) {
-							occursList.putParam("OOAllClose", "Y");
-						} else {
-							occursList.putParam("OOAllClose", "N");
-						}
+					}
+				} else {
+					Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(clCode1, clCode2, clNo, 0,
+							Integer.MAX_VALUE, titaVo);
+					lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 
-						this.info("occursList L2075" + occursList);
-						this.totaVo.addOccursList(occursList);
+					if (lClOtherRights != null) {
+						for (ClOtherRights tClOtherRights : lClOtherRights) {
+							this.info("tClOtherRights = " + tClOtherRights);
+
+							if (iType == 2 && iSearch == 1 && tClOtherRights.getReceiveFg() == 1) {
+								this.info("已領取 ");
+								continue;
+							}
+							moveOccursList(tClOtherRights, titaVo);
+						}
 					}
 				}
 
@@ -288,5 +263,69 @@ public class L2075 extends TradeBuffer {
 		this.info("result ..." + result);
 
 		return result;
+	}
+
+	private void moveOccursList(ClOtherRights tClOtherRights, TitaVo titaVo) {
+
+		occursList = new OccursList();
+		// wk
+		String wkCityItem = "";
+		String wkLandOfficeItem = "";
+		String wkRecWordItem = "";
+		occursList.putParam("OOTranDate", entryDate);
+		occursList.putParam("OOApplDate", applDate);
+		occursList.putParam("OOFunCode", funCode);
+		occursList.putParam("OOCustNo", custNo);
+		occursList.putParam("OOCloseNo", closeNo);
+		occursList.putParam("OOCustName", loanCom.getCustNameByNo(custNo));
+		occursList.putParam("OOFacmNo", facmNo);
+		occursList.putParam("OOClCode1", tClOtherRights.getClCode1());
+		occursList.putParam("OOClCode2", tClOtherRights.getClCode2());
+		occursList.putParam("OOClNo", tClOtherRights.getClNo());
+		occursList.putParam("OOSeq", tClOtherRights.getSeq());
+		// 找縣市名稱
+		if ("".equals(tClOtherRights.getOtherCity())) {
+			CdCity tCdCity = cdCityService.findById(tClOtherRights.getCity(), titaVo);
+			if (tCdCity != null) {
+				wkCityItem = tCdCity.getCityItem();
+			}
+		} else {
+			wkCityItem = tClOtherRights.getOtherCity();
+		}
+		occursList.putParam("OOCity", wkCityItem);
+		// 找地政所名稱
+		if ("".equals(tClOtherRights.getOtherLandAdm())) {
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
+					titaVo);
+			if (tCdCode != null) {
+				wkLandOfficeItem = tCdCode.getItem();
+			}
+		} else {
+			wkLandOfficeItem = tClOtherRights.getOtherLandAdm();
+		}
+		occursList.putParam("OOLandAdm", wkLandOfficeItem);
+		occursList.putParam("OORecYear", tClOtherRights.getRecYear());
+		// 找 收件字名稱
+		if ("".equals(tClOtherRights.getOtherRecWord())) {
+			CdLandOffice tCdLandOffice = cdLandOfficeService
+					.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+			if (tCdLandOffice != null) {
+				wkRecWordItem = tCdLandOffice.getRecWordItem();
+			}
+		} else {
+			wkRecWordItem = tClOtherRights.getOtherRecWord();
+		}
+		occursList.putParam("OORecWord", wkRecWordItem);
+		occursList.putParam("OORecNumber", tClOtherRights.getRecNumber());
+		occursList.putParam("OORightsNote", tClOtherRights.getRightsNote());
+		occursList.putParam("OOSecuredTotal", tClOtherRights.getSecuredTotal());
+		if (isAllClose) {
+			occursList.putParam("OOAllClose", "Y");
+		} else {
+			occursList.putParam("OOAllClose", "N");
+		}
+
+		this.info("occursList L2075" + occursList);
+		this.totaVo.addOccursList(occursList);
 	}
 }

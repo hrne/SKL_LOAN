@@ -516,8 +516,8 @@ public class L3200 extends TradeBuffer {
 			if (iUnpaidIntFlag.equals("N")) {
 				throw new LogicException(titaVo, "E3094", "利息是否可欠繳 = N ");
 			}
-			if (iShortAmt.compareTo(iInterest.add(iShortfallInt)) > 0) {
-				throw new LogicException(titaVo, "E3094", "短繳金額大於利息 " + iInterest.add(iShortfallInt));
+			if (iShortAmt.compareTo(iInterest.add(iShortfallInt).subtract(iReduceAmt)) > 0) {
+				throw new LogicException(titaVo, "E3094", "短繳金額大於利息 " + iInterest.add(iShortfallInt).subtract(iReduceAmt));
 			}
 		}
 
@@ -795,7 +795,6 @@ public class L3200 extends TradeBuffer {
 		if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && !isLoanClose) {
 			if (wkRepaykindCode == 1) { // 部分償還本金欠繳利息
 				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkInterest); // 利息全額
-				this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + "," + wkInterest);
 				if (wkInterest.compareTo(wkUnpaidAmtRemaind) >= 0) {
 					wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
 					wkUnpaidAmtRemaind = BigDecimal.ZERO;
@@ -841,7 +840,8 @@ public class L3200 extends TradeBuffer {
 				}
 			}
 		}
-
+		this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + ", wkUnpaidPrin" + wkUnpaidPrin + ", wkUnpaidInt="
+				+ wkUnpaidInt);
 	}
 
 	// 計算減免
@@ -1967,7 +1967,9 @@ public class L3200 extends TradeBuffer {
 				}
 			}
 		}
-
+		this.info("wkAcctFee=" + wkAcctFee + ", wkModifyFee=" + wkModifyFee + ", wkFireFee=" + wkFireFee + ", wkLawFee="
+				+ wkLawFee + ", wkShortfallInterest=" + wkShortfallInterest + ", wkShortfallPrincipal="
+				+ wkShortfallPrincipal + ", wkShortCloseBreach=" + wkShortCloseBreach);
 	}
 
 	// 欠繳金額處理
