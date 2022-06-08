@@ -65,6 +65,8 @@ public class L3702 extends TradeBuffer {
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		// 備忘錄序號
 		int iRmkNo = parse.stringToInteger(titaVo.getParam("RmkNo"));
+		// 會計日期
+		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
 
 		// new table
 		CustMain tCustMain = new CustMain();
@@ -74,6 +76,7 @@ public class L3702 extends TradeBuffer {
 		// 塞值到TablePK
 		LoanCustRmkId.setCustNo(iCustNo);
 		LoanCustRmkId.setRmkNo(iRmkNo);
+		LoanCustRmkId.setAcDate(iAcDate);
 
 		// 新增
 		if (iFunCd == 1) {
@@ -97,7 +100,8 @@ public class L3702 extends TradeBuffer {
 			tLoanCustRmk.setLoanCustRmkId(LoanCustRmkId);
 			tLoanCustRmk.setCustNo(iCustNo);
 			tLoanCustRmk.setRmkNo(iRmkNo);
-			tLoanCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
+			tLoanCustRmk.setAcDate(iAcDate);
+			tLoanCustRmk.setRmkCode(titaVo.getParam("LoanRmkCode"));
 			tLoanCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
 			tLoanCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
 			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
@@ -127,7 +131,8 @@ public class L3702 extends TradeBuffer {
 			tLoanCustRmk.setLoanCustRmkId(LoanCustRmkId);
 			tLoanCustRmk.setCustNo(iCustNo);
 			tLoanCustRmk.setRmkNo(iRmkNo);
-			tLoanCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
+			tLoanCustRmk.setAcDate(iAcDate);
+			tLoanCustRmk.setRmkCode(titaVo.getParam("LoanRmkCode"));
 			tLoanCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
 			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));	
 

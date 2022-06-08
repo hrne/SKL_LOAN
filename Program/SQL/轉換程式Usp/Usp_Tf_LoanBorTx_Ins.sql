@@ -211,6 +211,7 @@ BEGIN
                                                  ELSE TO_CHAR(TR1."TRXDBC")
                                                  END  ,'0') || '"' -- 減免違約金
            || ',' || '"StampFreeAmt":"' || NVL(TO_CHAR(TR1."TRXNTX"),'0') || '"' -- 免印花稅金額
+           || ',' || '"TempReasonCode":"' || LPAD(NVL(TR1."LMSRSN",0),2,'0') || '"' -- 暫收原因
            || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 

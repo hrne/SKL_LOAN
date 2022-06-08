@@ -42,11 +42,13 @@ E(0,0)
 [
 ["[L3703]                                 帳務明細摘要維護"],
 ["#FdCustNo+借戶戶號",#CustNo,"-",#FacmNo,"-",#BormNo,"-",#BorxNo],
+["#FdLoanNoteCode+摘要代碼",#LoanNoteCode],
 ["#FdRmkDesc+摘要",#Note],
 !["@@@@會計日期",#AcDate],
 !["#FdEmpNm+建檔經辦",#EmpName],
 ]
 !---------- AP Button AREA ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -60,8 +62,20 @@ T(1,#DT1,2,7)
 #DT_YM=A,5,S
 T(1,#DT1,2,5)
 
-! #DT_MM_LAST=A,2,S
-! E(0,#DT_MM-1)
+!LoanNoteCodeHelp 帳務摘要代碼
+#CDDEF0001=x,25,S
+T(3,CdCode.LoanNoteCode)
+
+#LoanNoteCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@LoanNoteCodeHelp,#HelpDesc1)
+
+
 
 !會計日期
 #AcDate=D,7,L
@@ -97,12 +111,19 @@ C(3,#CHAIN,1,s,$)
 C(3,#CHAIN,1,s,$)
 @C(4,#BorxNo,s,$)
 
+#FdLoanNoteCode=X,2,L
+#LoanNoteCode=X,3,I
+HELP(#LoanNoteCodeHelp)
+@C(4,#LoanNoteCode,S,V(H,#LoanNoteCodeHelp))
+
+
 #FdRmkDesc =X,2,L
 
 !#Note=c,120,I
 #Note=x,10.50,I
 C(3,#Note,1,s,$)
 T(2,@Note,#Note)
+C(4,#LoanNoteCode,$,T(H,#LoanNoteCode,#LoanNoteCodeHelp))
 
 #AGAIN=X,1,S
 C(3,#Note,1,S,$)
@@ -146,14 +167,10 @@ T(3,[L3703] 帳務備忘錄明細資料維護)
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L3703
-!#OOCustNo
-!#OOFacmNo
-!#OOBormNo
-!#OOBorxNo
+
 </sub>
 ^
 <include src="COM.icf::TRCTL.tom"/>
-<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

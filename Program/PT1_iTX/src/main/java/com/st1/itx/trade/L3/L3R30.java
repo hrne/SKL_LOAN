@@ -50,6 +50,8 @@ public class L3R30 extends TradeBuffer {
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		// 備忘錄序號
 		int iRmkNo = parse.stringToInteger(titaVo.getParam("RimRmkNo"));
+		// 會計日期
+		int iAcDate = parse.stringToInteger(titaVo.getParam("RimAcDate"));
 
 		// new table
 		LoanCustRmk tLoanCustRmk = new LoanCustRmk();
@@ -58,6 +60,7 @@ public class L3R30 extends TradeBuffer {
 		// 塞值到TablePK
 		LoanCustRmkId.setCustNo(iCustNo);
 		LoanCustRmkId.setRmkNo(iRmkNo);
+		LoanCustRmkId.setAcDate(iAcDate);
 		// FunCd 1新增
 		if (iFunCd == 1) {
 

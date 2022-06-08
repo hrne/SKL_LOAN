@@ -3750,7 +3750,7 @@ TXFORM=L2R63
 !    L3R30 : 帳戶備忘錄資料
 <L3R30.dec>
 #L3r30RmkNo=A,3,S
-#L3r30RmkCode=A,3,S
+#L3r30RmkCode=X,3,S
 #L3r30RmkDesc=c,120,S
 </L3R30.dec>
 

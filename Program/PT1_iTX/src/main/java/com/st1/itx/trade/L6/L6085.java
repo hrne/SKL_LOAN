@@ -69,26 +69,42 @@ public class L6085 extends TradeBuffer {
 		// 查詢分公司資料檔
 		Slice<CdBcm> slCdBcm;
 		if (iInqFg == 1) {
-			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 2) {
-			slCdBcm = sCdBcmService.findDistCode1(iDistCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistCode1(iDistCode + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 3) {
-			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 4) {
-			slCdBcm = sCdBcmService.findUnitManager(iUnitManager+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitManager(iUnitManager + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 5) {
-			slCdBcm = sCdBcmService.findDistManager(iDistManager+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistManager(iDistManager + "%", this.index, this.limit, titaVo);
 		} else if (iInqFg == 6) {
-			slCdBcm = sCdBcmService.findDeptManager(iDeptManager+"%", this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptManager(iDeptManager + "%", this.index, this.limit, titaVo);
 		} else {
 			slCdBcm = sCdBcmService.findAll(this.index, this.limit, titaVo);
 		}
 
-		List<CdBcm> lCdBcm = slCdBcm == null ? null : slCdBcm.getContent();
+		List<CdBcm> lCdBcm = slCdBcm == null ? null : new ArrayList<CdBcm>(slCdBcm.getContent());
 
 		if (lCdBcm == null || lCdBcm.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "分公司資料檔"); // 查無資料
 		}
+
+		// 排序依 交易序號 戶號 由小到大
+		lCdBcm.sort((c1, c2) -> {
+			int result = 0;
+			if (c1.getUnitCode().compareTo(c2.getUnitCode()) != 0) {
+				result = c1.getUnitCode().compareTo(c2.getUnitCode());
+			} else if (c1.getDeptCode().compareTo(c2.getDeptCode()) != 0) {
+				result = c1.getDeptCode().compareTo(c2.getDeptCode());
+			} else if (c1.getDistCode().compareTo(c2.getDistCode()) != 0) {
+				result = c1.getDistCode().compareTo(c2.getDistCode());
+			} else {
+				result = 0;
+			}
+			return result;
+		});
+
 		// 如有找到資料
 		for (CdBcm tCdBcm : lCdBcm) {
 
@@ -108,8 +124,10 @@ public class L6085 extends TradeBuffer {
 			occursList.putParam("OODeptManager", tCdBcm.getDeptManager());
 			occursList.putParam("OODistManager", tCdBcm.getDistManager());
 			occursList.putParam("OOEnable", tCdBcm.getEnable());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
-			occursList.putParam("OOLastEmp", tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " "
+					+ parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
+			occursList.putParam("OOLastEmp",
+					tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
 			unitManagerNm = "";
 			deptManagerNm = "";
 			distManagerNm = "";

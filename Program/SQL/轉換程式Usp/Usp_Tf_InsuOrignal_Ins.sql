@@ -38,12 +38,12 @@ BEGIN
          , NVL(TRIM(FR1P."INSNUM"),' ') AS "EndoInsuNo"      -- 批單號碼 VARCHAR2 17 0
          , MAX(NVL(INSP."INSIID",' '))  AS "InsuCompany"     -- 保險公司 VARCHAR2 2 0
          , CASE
-             WHEN SUM(INSP."INSIAM") > 0 -- 火災險保險金額
-                  AND SUM(INSP."INSIAE") > 0 -- 地震險保險金額
+             WHEN MAX(INSP."INSIAM") > 0 -- 火災險保險金額
+                  AND MAX(INSP."INSIAE") > 0 -- 地震險保險金額
              THEN '01' -- 住宅火險地震險
-             WHEN SUM(INSP."INSIAM") > 0 -- 火災險保險金額
+             WHEN MAX(INSP."INSIAM") > 0 -- 火災險保險金額
              THEN '02' -- 火險
-             WHEN SUM(INSP."INSIAE") > 0 -- 地震險保險金額
+             WHEN MAX(INSP."INSIAE") > 0 -- 地震險保險金額
              THEN '03' -- 地震險
            ELSE '07' -- 其他
            END                          AS "InsuTypeCode"    -- 保險類別 VARCHAR2 2 0
@@ -112,13 +112,13 @@ BEGIN
                     AND FR1P."INSSDT" = INSP."INSSDT"
                     AND FR1P."INSEDT" = INSP."INSEDT"
                     AND FR1P."Seq"    = 1
+                    AND FR1P."INSNUM" != INSP."INSNUM"
     LEFT JOIN "ClNoMap" CNM ON CNM."GdrId1" = INSP."GDRID1"
                            AND CNM."GdrId2" = INSP."GDRID2"
                            AND CNM."GdrNum" = INSP."GDRNUM"
                            AND CNM."LgtSeq" = INSP."LGTSEQ"
     LEFT JOIN NOW_INSUNO ON NOW_INSUNO.INSNUM2 = TRIM(INSP."INSNUM")
     WHERE INSP."Seq" = 1
-      AND  NVL(FR1P."INSNUM",' ') != INSP."INSNUM"
       AND NVL(CNM."ClNo",0) > 0 -- 擔保品存在
       AND (INSP."INSPRM" + INSP."INSEPM") > 0
       AND NVL(INSP."INSIID",' ') != ' '

@@ -120,6 +120,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,X.\"AcDate\"                      ";
 		sql += "       ,X.\"TitaTlrNo\"                   ";
 		sql += "       ,X.\"TitaTxtNo\"                   ";
+		sql += "       ,X.\"RepayCode\"                   ";
 		sql += " FROM ( SELECT MAX(T.\"EntryDate\")                                         AS \"EntryDate\"         ";
 		sql += "             ,MIN(T.\"IntStartDate\")                                       AS \"IntStartDate\"      ";
 		sql += "             ,MAX(T.\"IntEndDate\")                                         AS \"IntEndDate\"        ";
