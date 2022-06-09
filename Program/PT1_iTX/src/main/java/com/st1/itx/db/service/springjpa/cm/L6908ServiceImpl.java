@@ -104,7 +104,8 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "            0"; 
 		sql +=  "        ELSE"; 
 		sql +=  "            1"; 
-		sql +=  "    END AS \"ClsFlag\"";  
+		sql +=  "    END AS \"ClsFlag\",";
+		sql +=  "    'AcReceivable'    AS \"DB\""; 
 		sql +=  "  FROM"; 
 		sql +=  "    \"AcReceivable\"   ac"; 
 		sql +=  "    LEFT JOIN \"LoanBorTx\"      lb ON lb.\"AcDate\" = ac.\"OpenAcDate\""; 
@@ -142,7 +143,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "            AND a.\"EntAc\" = 1"; 
 		sql +=  "            AND a.\"ReceivableFlag\" != 0"; 
 		sql +=  "            AND a.\"RvNo\" IS NOT NULL"; 
-		sql +=  "            AND lpad(a.\"FacmNo\", 3, '0') = :rvno"; 
+//		sql +=  "            AND lpad(a.\"FacmNo\", 3, '0') = :rvno"; 
 		sql +=  "        GROUP BY"; 
 		sql +=  "            a.\"RvNo\""; 
 		sql +=  "    ) t ON t.\"RvNo\" = ac.\"RvNo\""; 
@@ -170,7 +171,8 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  "            0"; 
 		sql +=  "        ELSE"; 
 		sql +=  "            1"; 
-		sql +=  "    END AS \"ClsFlag\""; 
+		sql +=  "    END AS \"ClsFlag\","; 
+		sql +=  "    'AcDetail'    AS \"DB\""; 
 		sql +=  "  FROM"; 
 		sql +=  "    \"AcDetail\"     ad"; 
 		sql +=  "    LEFT JOIN \"LoanBorTx\"    lb ON lb.\"AcDate\" = ad.\"AcDate\""; 

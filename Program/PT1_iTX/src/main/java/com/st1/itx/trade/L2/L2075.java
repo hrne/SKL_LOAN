@@ -198,7 +198,17 @@ public class L2075 extends TradeBuffer {
 				}
 				if (facmNoS == 0) {
 					if (lClFac != null) {
+						int clCode1 = 0;
+						int clCode2 = 0;
+						int clNo = 0;
 						for (ClFac t3 : lClFac) {
+							if (clCode1 != t3.getClCode1() || clCode2 != t3.getClCode2() || clNo != t3.getClNo()) {
+								clCode1 = t3.getClCode1();
+								clCode2 = t3.getClCode2();
+								clNo = t3.getClNo();
+							} else {
+								continue;
+							}
 							Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(t3.getClCode1(),
 									t3.getClCode2(), t3.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 							lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();

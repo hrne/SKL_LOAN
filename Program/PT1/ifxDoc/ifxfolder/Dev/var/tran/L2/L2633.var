@@ -42,6 +42,8 @@ E(0,0)
 [
 ["[L2633]                                 清償日報表"],
 ["#FdTranDate+入帳日期",#TranDate],
+["#FdApplDate+申請日期",#ApplDate],
+
 ]
 !---------- AP Button AREA ----------   
 ![Buttom資料查詢]
@@ -52,6 +54,7 @@ E(0,0)
 ! 永遠為必輸欄位
 #FdTranDate=X,2,L
 T(3,*)
+#FdApplDate=X,2,L
 
 
 !---------- AP TEXT AREA Variables ----------
@@ -95,6 +98,10 @@ T(4,DATE$)
 E(0,#SYSDATE)
 @A(DATE,0,#TranDate)
 V(7)
+!申請日期
+#ApplDate=D,7,I
+E(0,#SYSDATE)
+@A(DATE,0,#TranDate)
 
 
 
@@ -130,6 +137,7 @@ T(3,[L2633] 清償日報表)
 !------ 上行電文 ------
 <sub type="TIM">
 #TranDate
+#ApplDate
 #END
 </sub>
 

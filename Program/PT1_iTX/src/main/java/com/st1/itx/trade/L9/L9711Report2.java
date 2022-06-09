@@ -175,10 +175,11 @@ public class L9711Report2 extends MakeReport {
 	private void report(Map<String, String> tL9711Vo, TxBuffer txbuffer) throws LogicException {
 		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
+	
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
 			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, 0,
+					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 2, 0,
 					titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {

@@ -123,24 +123,40 @@ BEGIN
     -- 更新ClBuildingUnique 同組內有兩個Y者 增加SecGroupNo
     MERGE INTO "ClBuildingUnique" T1
     USING (SELECT S2."GroupNo"
-                 ,S1."MinSecGroupNo"
-                 ,S2."GDRID1"
-                 ,S2."GDRID2"
-                 ,S2."GDRNUM"
-                 ,S2."LGTSEQ"
+                , MIN(NVL(S1."MinSecGroupNo",1)) AS "MinSecGroupNo"
+                , S2."GDRID1"
+                , S2."GDRID2"
+                , S2."GDRNUM"
+                , S2."LGTSEQ"
            FROM (SELECT "GroupNo","SecGroupNo",MAX("TfFg") AS "MaxTfFg" FROM "ClBuildingUnique" GROUP BY "GroupNo","SecGroupNo"
                 ) S0
-           LEFT JOIN (SELECT "GroupNo"
-                            ,MIN("SecGroupNo") AS "MinSecGroupNo"
-                      FROM "ClBuildingUnique"
-                      WHERE "TfFg" = 'Y'
-                      GROUP BY "GroupNo"
+           LEFT JOIN (SELECT CBU."GroupNo"
+                            ,HG.LGTCIF
+                            ,MIN(CBU."SecGroupNo") AS "MinSecGroupNo"
+                      FROM "ClBuildingUnique" CBU
+                      LEFT JOIN LA$HGTP HG ON HG.GDRID1 = CBU.GDRID1
+                                          AND HG.GDRID2 = CBU.GDRID2
+                                          AND HG.GDRNUM = CBU.GDRNUM
+                                          AND HG.LGTSEQ = CBU.LGTSEQ
+                      WHERE CBU."TfFg" = 'Y'
+                      GROUP BY CBU."GroupNo"
+                             , HG.LGTCIF
                      ) S1 ON S1."GroupNo"    = S0."GroupNo"
            LEFT JOIN "ClBuildingUnique" S2 ON S2."GroupNo" = S0."GroupNo"
                                           AND S2."TfFg" = ' '
+           LEFT JOIN LA$HGTP HG2 ON HG2.GDRID1 = S2.GDRID1
+                                AND HG2.GDRID2 = S2.GDRID2
+                                AND HG2.GDRNUM = S2.GDRNUM
+                                AND HG2.LGTSEQ = S2.LGTSEQ
            WHERE S0."MaxTfFg" = ' '
              AND S1."MinSecGroupNo" IS NOT NULL
              AND S2."SecGroupNo" = 0
+             AND HG2.LGTCIF = S1.LGTCIF
+           GROUP BY S2."GroupNo"
+                  , S2."GDRID1"
+                  , S2."GDRID2"
+                  , S2."GDRNUM"
+                  , S2."LGTSEQ"
          ) SC1
     ON (    SC1."GroupNo" = T1."GroupNo"
         AND SC1."GDRID1"  = T1."GDRID1"

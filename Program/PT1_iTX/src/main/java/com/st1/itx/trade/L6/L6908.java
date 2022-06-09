@@ -58,7 +58,7 @@ public class L6908 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
+		this.limit = 100; // 316 * 100 = 31,600
 
 		List<Map<String, String>> L6908List = null;
 
@@ -77,6 +77,9 @@ public class L6908 extends TradeBuffer {
 
 			for (Map<String, String> t : L6908List) {
 
+				if("AcReceivable".equals(t.get("DB")) && "0".equals(t.get("RvAmt"))) {
+					continue;
+				}
 				OccursList occursList = new OccursList();
 				occursList.putParam("OORvNo", t.get("RvNo"));
 				occursList.putParam("OORvAmt", t.get("RvAmt"));

@@ -214,7 +214,7 @@ public class L560BReport extends MakeReport {
 			setFont(1, 20);
 			printCm(10, 1, "前置協商逾期繳款通知函", "C");
 			setFont(1, 14);
-			printCm(1, 3, "敬啟者："+ iCustName);
+			printCm(1, 3, "致　" + iCustName + " 君：");
 			printRectCm(1, 4, 70, 20, "台端業依消費者債務清理條例成立前置調解清償方案，依約應於" + iDateString + "繳付協商期付金新臺幣" + reCount
 					+ "元，惟迄今尚未繳付，請  台端務必於" + iYyy + "年" + iMm + "月25日前繳納，為維護台端權益，特以此函通知下列事項：");
 			printRectCm(1.5, 7, 65, 4, 20,
@@ -224,10 +224,11 @@ public class L560BReport extends MakeReport {
 			printRectCm(2.2, 13, 63, 20, "（一）收款銀行：新光銀行城內分行");
 			printRectCm(2.2, 14, 63, 20, "（二）收款帳號：	9510500-" + StringUtils.leftPad(iCustNo, 7, "0"));
 			printRectCm(2.2, 15, 63, 20, "（三）收款人戶名：新光人壽保險股份有限公司");
-			printRectCm(2, 16, 63, 20, "四、台端倘於收到本通知函時已完成繳款，上述事項請免予處理。");
+			printRectCm(1.5, 16, 65, 20, "四、台端倘於收到本通知函時已完成繳款，上述事項請免予處理。");
 			printCm(2.5, 18, "謹 此");
 			printCm(20, 23, "新光人壽保險股份有限公司   敬上", "R");
 			printCm(20, 24, "（聯絡電話：(02)2389-5858#7076 承辦人員：邱小姐）", "R");
+			printCm(10, 27, "中　　華　　民　　國　" + iCalyy + "　年　" + iCalMm + "　月　" + iCalDd + "　日", "C");
 			break;
 		}
 

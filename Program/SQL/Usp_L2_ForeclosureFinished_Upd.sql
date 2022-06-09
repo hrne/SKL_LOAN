@@ -36,7 +36,7 @@ BEGIN
         WITH rawData AS (
             SELECT "CustNo"
                  , "FacmNo"
-                 , "AcDate"
+                 , "RecordDate"
                  , "LegalProg"
                  , "CreateDate"
                  , "CreateEmpNo"
@@ -46,14 +46,14 @@ BEGIN
                    OVER (
                        PARTITION BY "CustNo"
                                    , "FacmNo"
-                       ORDER BY "AcDate" DESC -- 取最新的法拍完成日
+                       ORDER BY "RecordDate" DESC -- 取最新的法拍完成日
                    ) AS "Seq"
             FROM "CollLaw"
             WHERE "LegalProg" = '060'
         )
         SELECT "CustNo"
              , "FacmNo"
-             , "AcDate"
+             , "RecordDate"
              , "LegalProg"
              , "CreateDate"
              , "CreateEmpNo"
@@ -68,15 +68,15 @@ BEGIN
     )
     WHEN MATCHED THEN UPDATE
     SET T."FinishedDate" = CASE
-                             WHEN S."AcDate" > T."FinishedDate"
-                             THEN S."AcDate"
+                             WHEN S."RecordDate" > T."FinishedDate"
+                             THEN S."RecordDate"
                            ELSE T."FinishedDate" END
       , T."LastUpdate" = CASE
-                           WHEN S."AcDate" > T."FinishedDate"
+                           WHEN S."RecordDate" > T."FinishedDate"
                            THEN S."LastUpdate"
                          ELSE T."LastUpdate" END
       , T."LastUpdateEmpNo" = CASE
-                                WHEN S."AcDate" > T."FinishedDate"
+                                WHEN S."RecordDate" > T."FinishedDate"
                                 THEN S."LastUpdateEmpNo"
                               ELSE T."LastUpdateEmpNo" END
     WHEN NOT MATCHED THEN INSERT
@@ -91,7 +91,7 @@ BEGIN
     ) VALUES (
         S."CustNo"
       , S."FacmNo"
-      , S."AcDate"
+      , S."RecordDate"
       , S."CreateDate"
       , S."CreateEmpNo"
       , S."LastUpdate"
