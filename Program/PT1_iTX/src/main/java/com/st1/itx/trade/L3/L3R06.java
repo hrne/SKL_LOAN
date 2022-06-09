@@ -207,8 +207,8 @@ public class L3R06 extends TradeBuffer {
 		oShortfallInt = baTxCom.getShortfallInterest();
 		oShortfallPrin = baTxCom.getShortfallPrincipal();
 		oShortCloseBreach = baTxCom.getShortCloseBreach();
-		oExcessive= baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
-		
+		oExcessive = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
+
 		oTotalFee = oTotalFee.add(oModifyFee).add(oAcctFee).add(oFireFee).add(oCollFireFee).add(oLawFee)
 				.add(oCollLawFee);
 
@@ -327,9 +327,7 @@ public class L3R06 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-				if (oRpFacmNo == 0) {
-					oRpFacmNo = ln.getFacmNo();
-				}
+				oRpFacmNo = ln.getFacmNo();
 				wkTotaCount++;
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
 					LoanCloseBreachVo v = new LoanCloseBreachVo();

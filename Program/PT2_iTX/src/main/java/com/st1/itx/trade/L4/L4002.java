@@ -465,10 +465,10 @@ public class L4002 extends TradeBuffer {
 					// 可暫收筆數
 					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
 							|| tBatxDetail.getProcStsCode().equals("4")) {
-						if (canTempCnt.containsKey(grp3)) {
-							canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
+						if (canTempCnt.containsKey(grp1)) {
+							canTempCnt.put(grp1, canTempCnt.get(grp1) + 1);
 						} else {
-							canTempCnt.put(grp3, 1);
+							canTempCnt.put(grp1, 1);
 						}
 					}
 				} else {
@@ -569,10 +569,10 @@ public class L4002 extends TradeBuffer {
 				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
 					if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
 						labelFgB = "E";
-					}
-				} else {
-					if (canCheckCnt.get(tempL4002Vo) != null && canCheckCnt.get(tempL4002Vo) > 0) {
-						labelFgB = "C";
+					} else {
+						if (canCheckCnt.get(tempL4002Vo) != null && canCheckCnt.get(tempL4002Vo) > 0) {
+							labelFgB = "C";
+						}
 					}
 				}
 				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {

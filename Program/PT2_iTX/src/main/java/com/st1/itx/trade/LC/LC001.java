@@ -92,6 +92,11 @@ public class LC001 extends TradeBuffer {
 					int daFlowStep2 = X2N(lc001Vo.get("F12")); // sql += ",E.\"FlowStep\" flowFlowStep";
 					int daSubmitFg = X2N(lc001Vo.get("F13")); // sql += ",E.\"SubmitFg\"";
 					int daFlowMode = X2N(lc001Vo.get("F14")); // sql += ",E.\"FlowMode\"";
+					int daOrgEntdy = X2N(lc001Vo.get("F15")); // sql += ",A.\"OrgEntdy\"";
+					String daFlowNo = lc001Vo.get("F16"); // sql += ",A.\"FlowNo\"";
+					String daHcode = lc001Vo.get("F17"); // sql += ",A.\"Hcode\"";
+					String daActionFg = lc001Vo.get("F18"); // sql += ",A.\"ActionFg\"";
+					int daAcCnt = X2N(lc001Vo.get("F19")); // sql += ",A.\"AcCnt\"";
 
 					// 兩段式以上的登錄交易==>主管已放行，不顯示<修正>按鈕
 					int supRelease = 0;
@@ -104,6 +109,7 @@ public class LC001 extends TradeBuffer {
 						}
 
 					}
+
 					OccursList occursList = new OccursList();
 					occursList.putParam("CalDate", daCalDate);
 					occursList.putParam("CalTime", daCalTime);
@@ -118,6 +124,25 @@ public class LC001 extends TradeBuffer {
 					occursList.putParam("FlowType", daFlowType);
 					occursList.putParam("FlowStep", daFlowStep);
 					occursList.putParam("SupRelease", supRelease);
+					if (daOrgEntdy > 0 && daOrgEntdy != daEntdy) {
+						occursList.putParam("OOOrgEntdy", daOrgEntdy - 19110000);
+					} else {
+						occursList.putParam("OOOrgEntdy", "");
+					}
+					occursList.putParam("FlowNo", daFlowNo);
+					if (daAcCnt > 0) {
+						// 當天訂正及被訂正交易 無分錄
+						if (("1".equals(daHcode) && daOrgEntdy == daEntdy) || "1".equals(daActionFg.toString())) {
+							occursList.putParam("AcCnt", 0);
+						} else {
+							occursList.putParam("AcCnt", 1);
+						}
+
+					} else {
+						occursList.putParam("AcCnt", 0);
+					}
+					occursList.putParam("Status", daActionFg);
+
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
 

@@ -326,15 +326,15 @@ C(3,#AmtStartRange0,0,s,INVOKEJS(SHOW,grd1,4,4,1))
 !獎金發放標準檢核
 
 #ChkBonusX1=X,1,S
-IF(#AmtStartRange0>=600000 && #AmtEndRange0==2999999,$,S)
+IF(#AmtStartRange0>=600000 && #AmtEndRange0<=2999999,$,S)
 C(3,#Bonus0,200,$,V(P,60萬含以上未達300萬，核發獎金津貼200元，獎勵津貼輸入錯誤))
 
 #ChkBonusX2=X,1,S
-IF(#AmtStartRange0>=3000000 &&	#AmtEndRange0==5999999,$,S)
+IF(#AmtStartRange0>=3000000 &&	#AmtEndRange0<=5999999,$,S)
 C(3,#Bonus0,500,$,V(P,300萬含以上未達600萬，核發獎金津貼500元，獎勵津貼輸入錯誤))
 
 #ChkBonusX3=X,1,S
-IF(#AmtStartRange0>=6000000 &&	#AmtEndRange0==9999999,$,S)
+IF(#AmtStartRange0>=6000000 &&	#AmtEndRange0<=9999999,$,S)
 C(3,#Bonus0,800,$,V(P,600萬含以上未達1000萬，核發獎金津貼800元，獎勵津貼輸入錯誤))
 
 #ChkBonusX4=X,1,S

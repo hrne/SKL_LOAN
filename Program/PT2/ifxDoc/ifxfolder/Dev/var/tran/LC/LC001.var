@@ -145,13 +145,27 @@ C(3,#TxAmt1,0,T(3,)T(3,@CurName,),X(#TxAmt1)) ! 金額為0時隱藏幣別與金�
 #TypeX=X,8,S
 C(2,#FlowStep,T(3,登錄),T(3,登錄),T(3,放行),T(3,審核),T(3,審核放行))
 
+
+#SupRelease=A,1,S
+#OOOrgEntdy=D,7,S
+C(3,#OOOrgEntdy,0,S,$)
+#FlowNo=X,18,S
+#AcCnt=A,1,S
+#Status=A,1,S
 #RimData=x,100,S
 T(6A,#Entdy+#TxNo)
 
-#SupRelease=A,1,S
-
 #BTN=X,1,S
 C(3,#SupRelease,1,BIND(grid,cancel),BIND(grid,{ cmd=EC;once=1; ntxcd=#TranCode; txno=#RimData;rim=LCR01}))
+
+#RimData2=x,50,S
+C(3,#OOOrgEntdy,0,T(2,#Entdy+#Entdy+#FlowNo),T(2,#Entdy+#OOOrgEntdy+#FlowNo))
+
+#btn_visible2=X,1,S
+C(3,#AcCnt,1,C(3,#Status,0,T(3,1),T(3,0)),T(3,0))
+
+#BTN2=X,1,S
+C(3,#SupRelease,1,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6901; ntxbuf=#RimData2; text=分錄; visible=#btn_visible2}))
 
 
 
@@ -181,6 +195,10 @@ TXFORM=LC001
 #FlowType
 #FlowStep
 #SupRelease
+#OOOrgEntdy
+#FlowNo
+#AcCnt
+#Status
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -195,6 +213,9 @@ TXFORM=LC001
 
 #BTN=訂正
 {width:40,search:false,formatter:'cust:bind-button:訂正',canExport:false,align:'center'}
+
+#BTN2=分錄
+{width:40,search:false,formatter:'cust:bind-button:分錄',canExport:false,align:'center'}
 
 #CalDate=交易日期
 {width:100,align:'center'}

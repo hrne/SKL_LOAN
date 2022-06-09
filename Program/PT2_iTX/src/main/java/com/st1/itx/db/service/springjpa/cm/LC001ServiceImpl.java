@@ -61,6 +61,11 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",E.\"FlowStep\" FlowStep2";
 		sql += ",E.\"SubmitFg\"";
 		sql += ",E.\"FlowMode\"";
+		sql += ",A.\"OrgEntdy\"";
+		sql += ",A.\"FlowNo\"";
+		sql += ",A.\"Hcode\"";
+		sql += ",A.\"ActionFg\"";
+		sql += ",A.\"AcCnt\"";
 		sql += " from \"TxRecord\" A";
 		sql += " left join \"TxTranCode\" B on B.\"TranNo\"=A.\"TranNo\"";
 		sql += " left join \"CdBranch\" C on C.\"BranchNo\"=A.\"BrNo\"";

@@ -353,14 +353,13 @@ public class L3200 extends TradeBuffer {
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
+		iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
 		if (iOverRpFg == 1) {
 			iShortAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
 			iOverAmt = BigDecimal.ZERO;
-			iOverRpFacmNo = 0;
 		} else {
 			iShortAmt = BigDecimal.ZERO;
 			iOverAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
-			iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
 		}
 		iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
 		iDscptCode = this.titaVo.getParam("RpDscpt1"); // 摘要代碼
@@ -792,7 +791,7 @@ public class L3200 extends TradeBuffer {
 		wkUnpaidPrin = BigDecimal.ZERO;
 		wkUnpaidInt = BigDecimal.ZERO;
 		BigDecimal wkShortAmtLimit = BigDecimal.ZERO;
-		if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && !isLoanClose) {
+		if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && !isLoanClose && ln.getFacmNo() == iOverRpFacmNo ) {
 			if (wkRepaykindCode == 1) { // 部分償還本金欠繳利息
 				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkInterest); // 利息全額
 				if (wkInterest.compareTo(wkUnpaidAmtRemaind) >= 0) {
@@ -2000,7 +1999,7 @@ public class L3200 extends TradeBuffer {
 		tAcReceivable.setAcctCode(acctCode);
 		tAcReceivable.setCustNo(wkCustNo);
 		tAcReceivable.setFacmNo(wkFacmNo);
-		tAcReceivable.setRvNo(parse.IntegerToString(wkBormNo, 3));
+		tAcReceivable.setRvNo(parse.IntegerToString(wkBormNo, 3) + "-" + wkBorxNo);		
 		tAcReceivable.setRvAmt(shortAmt);
 		lAcReceivable.add(tAcReceivable);
 	}

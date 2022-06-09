@@ -571,7 +571,7 @@ RESET_RIM(#SendL2r07A,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
-#CustNoX=X,100,L
+#CustNoX=x,100,L
 IF(#FKEY==0||#FKEY==7,$,s)
 C(4,#CustNo,S,$)
 T(2,#L2r07CustName)
@@ -617,7 +617,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 T(2,@CustIdX,#L2r07CustName)
 
-#CustIdX=X,100,L
+#CustIdX=x,100,L
 C(4,#CustId,S,$)
 
 
@@ -683,7 +683,7 @@ RESET_RIM(#SendL2r07C,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 T(2,@ApplNoX,#L2r07CustName)
-#ApplNoX=X,100,L
+#ApplNoX=x,100,L
 C(4,#ApplNo,S,$)
 
 #SendL6r28=X,1,S

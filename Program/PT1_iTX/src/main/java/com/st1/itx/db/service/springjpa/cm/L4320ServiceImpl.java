@@ -414,6 +414,11 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 */
 	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate,
 			TitaVo titaVo) {
+
+		if (iEffectDate <= 19110000) {
+			iEffectDate += 19110000;
+		}
+
 		String sql = "";
 		sql += "WITH rawData AS ( ";
 		sql += "    SELECT LRC.\"CustNo\" ";

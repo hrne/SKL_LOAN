@@ -750,8 +750,9 @@ E(0,@SyndNo,#L2r02SyndNo)
 C(3,#FKEY,0,E(0,0),$)
 
 #RcvL2r05A=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
+IF(#FKEY==0,$,s)
 E(0,@BormNo,#L2r05BormNo)
+IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@ProdNo,#L2r05ProdNo)
 T(2,@BaseRateCode,#L2r05BaseRateCode)
 T(2,@CurrencyCode,#L2r05CurrencyCode)
@@ -2024,6 +2025,7 @@ IF(#RelationGender==""||#checkcustidlen==8,E(0,2),E(0,1))
 
 #MRKEY=_,_,S
 T(2,#TimCustNo+-+#FacmNo)
+C(3,#FKEY,7,T(2,#TimCustNo+-+#FacmNo+-+#BormNo),$)
 
 ![SWIFT幣別三碼]
 #CURNM=_,_,S

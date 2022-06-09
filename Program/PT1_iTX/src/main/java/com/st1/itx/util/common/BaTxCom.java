@@ -1721,9 +1721,7 @@ public class BaTxCom extends TradeBuffer {
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
 					this.txBal = this.txBal.subtract(ba.getAcctAmt());
-					if (this.overRpFacmNo == 0) {
-						this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
-					}
+					this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 				}
 			}
 		}
@@ -1988,7 +1986,7 @@ public class BaTxCom extends TradeBuffer {
 								case "F27": // 聯貸管理費
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
 									baTxVo.setFeeAmt(rv.getRvBal());
-									if (iRepayType >= 4) {
+									if (iRepayType == 3 || iRepayType >= 4) {
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 										this.acctFee = this.acctFee.add(rv.getRvBal());
 									} else {

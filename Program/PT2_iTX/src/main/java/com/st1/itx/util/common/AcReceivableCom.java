@@ -85,6 +85,7 @@ public class AcReceivableCom extends TradeBuffer {
 	private List<String> debitsList = Arrays.asList(debits);
 	private int wkRvFg = 0; // 起銷帳記號 (0-起帳, 1-銷帳 2-訂正)
 	private int wkOpenAcDate = 0; // 起帳日期
+	private int wkRvAmt = 0; // 起帳金額
 	private BigDecimal wkTxAmt = BigDecimal.ZERO; // 起銷帳金額
 	private String wkRvNo = ""; // 銷帳編號
 	private String wkAcctCode = ""; // 業務科目
@@ -502,9 +503,10 @@ public class AcReceivableCom extends TradeBuffer {
 							"AcReceivable delete " + tAcReceivableId + e.getErrorMsg());
 				}
 			} else {
-				if (wkOpenAcDate > 0 && wkRvFg == 0) {
+				// 短繳期金以餘額障為起帳金額
+				if (tAcReceivable.getReceivableFlag() == 4 && tAcReceivable.getClsFlag() == 0) {
 					tAcReceivable.setRvAmt(tAcReceivable.getRvBal());
-					tAcReceivable.setOpenAcDate(wkOpenAcDate);
+					tAcReceivable.setOpenAcDate(ac.getAcDate());
 					tAcReceivable.setOpenTxCd(ac.getTitaTxCd());
 					tAcReceivable.setOpenKinBr(ac.getTitaKinbr());
 					tAcReceivable.setOpenTlrNo(ac.getTitaTlrNo());
