@@ -182,9 +182,9 @@ public class L4721Report extends MakeReport {
 			List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
 //			// 放款利率變動檔生效日，利率未變動為零
-//			if (tBatxRateChange.getTxEffectDate() == 0) {
-//				continue;
-//			}
+			if (tBatxRateChange.getTxEffectDate() == 0) {
+				continue;
+			}
 			// 戶號不同
 			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
 				continue;
@@ -269,7 +269,7 @@ public class L4721Report extends MakeReport {
 
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				// 先更新表頭資料
-				setHead(listL4721Detail.get(0), custNo, facmNo,
+				setHead(listL4721Detail.get(0), custNo, tempfacmno,
 						parse.stringToInteger((listL4721Detail.get(0).get("TxEffectDate"))));
 
 				int times = 0;
@@ -279,7 +279,7 @@ public class L4721Report extends MakeReport {
 
 				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
-					if (tempfacmno != parse.stringToInteger((mapL4721Detail.get("FacmNo")))) {
+					if (tempfacmno != parse.stringToInteger((mapL4721Detail.get("FacmNo"))) && txeffectdate != 0) {
 
 						this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
 
@@ -300,7 +300,7 @@ public class L4721Report extends MakeReport {
 
 						this.newPage();
 //					// 先更新表頭資料
-						setHead(mapL4721Detail, custNo, facmNo,
+						setHead(mapL4721Detail, custNo, tempfacmno,
 								parse.stringToInteger((mapL4721Detail.get("TxEffectDate"))));
 					}
 
@@ -354,11 +354,11 @@ public class L4721Report extends MakeReport {
 					times++;
 
 					// 最後一筆
-					if (times == listL4721Detail.size()) {
+					if (times == listL4721Detail.size() && txeffectdate != 0) {
 						this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
 
 						// 額度號碼
-						print(0, 6, FormatUtil.pad9("" + facmNo, 3));
+						print(0, 6, FormatUtil.pad9("" + tempfacmno, 3));
 
 						// 利率變動日
 						String rateChangeDate = showRocDate(txeffectdate, 0);
