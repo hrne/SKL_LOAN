@@ -125,7 +125,6 @@ public class LoanBorTx implements Serializable {
   private int dueDate = 0;
 
   // 交易金額
-  /* 首筆 */
   @Column(name = "`TxAmt`")
   private BigDecimal txAmt = new BigDecimal("0");
 
@@ -198,17 +197,15 @@ public class LoanBorTx implements Serializable {
   private BigDecimal unpaidCloseBreach = new BigDecimal("0");
 
   // 短收金額
-  /* 首筆 */
   @Column(name = "`Shortfall`")
   private BigDecimal shortfall = new BigDecimal("0");
 
   // 溢收金額
-  /* 首筆 */
   @Column(name = "`Overflow`")
   private BigDecimal overflow = new BigDecimal("0");
 
   // 其他欄位
-  /* 1.減免的金額     2.收取的短繳本金、利息          3.收取的各項費用(首筆) */
+  /* 1.減免的金額     2.收取的短繳本金、利息          3.收取的各項費用 */
   @Column(name = "`OtherFields`", length = 2000)
   private String otherFields;
 
@@ -678,7 +675,7 @@ N:否
 
 /**
 	* 交易金額<br>
-	* 首筆
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getTxAmt() {
@@ -687,7 +684,7 @@ N:否
 
 /**
 	* 交易金額<br>
-	* 首筆
+	* 
   *
   * @param txAmt 交易金額
 	*/
@@ -984,7 +981,7 @@ N:否
 
 /**
 	* 短收金額<br>
-	* 首筆
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getShortfall() {
@@ -993,7 +990,7 @@ N:否
 
 /**
 	* 短收金額<br>
-	* 首筆
+	* 
   *
   * @param shortfall 短收金額
 	*/
@@ -1003,7 +1000,7 @@ N:否
 
 /**
 	* 溢收金額<br>
-	* 首筆
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getOverflow() {
@@ -1012,7 +1009,7 @@ N:否
 
 /**
 	* 溢收金額<br>
-	* 首筆
+	* 
   *
   * @param overflow 溢收金額
 	*/
@@ -1024,7 +1021,7 @@ N:否
 	* 其他欄位<br>
 	* 1.減免的金額
      2.收取的短繳本金、利息     
-     3.收取的各項費用(首筆)
+     3.收取的各項費用
 	* @return String
 	*/
   public String getOtherFields() {
@@ -1035,7 +1032,7 @@ N:否
 	* 其他欄位<br>
 	* 1.減免的金額
      2.收取的短繳本金、利息     
-     3.收取的各項費用(首筆)
+     3.收取的各項費用
   *
   * @param otherFields 其他欄位
 	*/

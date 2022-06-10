@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * FacClose 清償作業檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class FacCloseId implements Serializable {
 
 
-  // 戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7636277796977510217L;
+
+// 戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 

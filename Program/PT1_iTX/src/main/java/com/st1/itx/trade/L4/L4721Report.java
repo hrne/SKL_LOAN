@@ -214,7 +214,7 @@ public class L4721Report extends MakeReport {
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
-			if (listL4721Temp != null && listL4721Head != null) {
+			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null && !listL4721Head.isEmpty()) {
 				// 準備第一張
 				Map<String, String> mapL4721Head = listL4721Head.get(0);
 				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
