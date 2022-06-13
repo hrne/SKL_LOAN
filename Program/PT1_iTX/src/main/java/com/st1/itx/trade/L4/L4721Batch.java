@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.trade.L4.L4721Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -75,9 +74,9 @@ public class L4721Batch extends TradeBuffer {
 			// 設定訊息
 			if (iTxKind <= 3) {
 				if (this.iCustType == 1) {
-					sendMsg = "個金，" + sendMsg;
+					sendMsg = "個金" + sendMsg;
 				} else {
-					sendMsg = "企金，" + sendMsg;
+					sendMsg = "企金" + sendMsg;
 				}
 			}
 
