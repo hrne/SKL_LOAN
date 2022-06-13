@@ -50,7 +50,13 @@ BEGIN
                            PARTITION BY "GroupNo"
                                       , "SecGroupNo"
                            ORDER BY "LMSACN" -- 2022-03-10 Wei
+                                  , CASE
+                                      WHEN "LoanBalTotal" != 0
+                                      THEN 0
+                                    ELSE 1 END -- 2022-06-13 Wei 未結案者優先
                                   , "GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
+                                  , "LGTSAM" DESC
+                                  , "LoanBalTotal" DESC -- 2022-05-23 Wei 放款餘額越大者優先
                                   , "LMSAPN" DESC -- 2022-03-10 Wei
                                   , "GDRID1"
                                   , "GDRID2"

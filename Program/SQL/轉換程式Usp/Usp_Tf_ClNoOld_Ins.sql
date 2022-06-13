@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_ClNoOld_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_ClNoOld_Ins" 
+create or replace PROCEDURE "Usp_Tf_ClNoOld_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -31,7 +26,14 @@ BEGIN
           ,S1."LGTSEQ"      AS "LGTSEQ"      -- 舊擔保品序號 decimal(2, 0) default 0 not null,
           ,S1."GDRNUM2"     AS "GDRNUM2"     -- 舊群組編號 decimal(10, 0) default 0 not null
           ,ROW_NUMBER() OVER (PARTITION BY S1."GDRID1",S1."GDRID2",S1."GDRNUM"
-                              ORDER BY S1."LGTSEQ")
+                              ORDER BY CASE
+                                         WHEN S1."APLLAM" != 0
+                                         THEN 0
+                                       ELSE 1 END -- 2022-06-13 Wei 未結案者優先
+                                     , S1."GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
+                                     , S1."LGTSAM" DESC
+                                     , S1."APLLAM" DESC -- 2022-05-23 Wei 放款餘額越大者優先
+                                     , S1."LGTSEQ")
                             AS "Sequence"
     FROM (
           /* 建物 */
@@ -40,11 +42,17 @@ BEGIN
                 ,S1."GDRNUM"
                 ,S1."LGTSEQ"
                 ,S1."GDRNUM2"
+                ,S1."LGTSAM"
+                ,S1."GRTSTS"
+                ,APLP.APLLAM
           FROM "LA$HGTP" S1
           LEFT JOIN "ClBuildingUnique" S2 ON S2."GDRID1" = S1."GDRID1"
                                          AND S2."GDRID2" = S1."GDRID2"
                                          AND S2."GDRNUM" = S1."GDRNUM"
                                          AND S2."LGTSEQ" = S1."LGTSEQ"
+          LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = S1."GDRID1"
+                                AND APLP."GDRID2" = S1."GDRID2"
+                                AND APLP."GDRNUM" = S1."GDRNUM"
           LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S1."LGTCIF" -- 擔保品提供人
           LEFT JOIN "CustMain" CM ON CM."CustId" = TRIM(CU."CUSID1")
           WHERE CASE
@@ -72,11 +80,17 @@ BEGIN
                 ,S1."GDRNUM"
                 ,S1."LGTSEQ"
                 ,S1."GDRNUM2"
+                ,S1."LGTSAM"
+                ,S1."GRTSTS"
+                ,APLP.APLLAM
           FROM "LA$LGTP" S1
           LEFT JOIN "ClLandUnique" S2 ON S2."GDRID1" = S1."GDRID1"
                                      AND S2."GDRID2" = S1."GDRID2"
                                      AND S2."GDRNUM" = S1."GDRNUM"
                                      AND S2."LGTSEQ" = S1."LGTSEQ"
+          LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = S1."GDRID1"
+                                AND APLP."GDRID2" = S1."GDRID2"
+                                AND APLP."GDRNUM" = S1."GDRNUM"
           LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S1."LGTCIF" -- 擔保品提供人
           LEFT JOIN "CustMain" CM ON CM."CustId" = TRIM(CU."CUSID1")
           WHERE CASE
@@ -104,7 +118,13 @@ BEGIN
                 ,0 AS "LGTSEQ"
                 ,"LN$CGTP"."GDRNUM2"
             --     ,'LN$CGTP' AS "SourceTable"
+                ,"LN$CGTP"."CGT018" AS "LGTSAM"
+                ,"LN$CGTP"."GRTSTS"
+                ,APLP.APLLAM
           FROM "LN$CGTP"
+          LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LN$CGTP"."GDRID1"
+                                AND APLP."GDRID2" = "LN$CGTP"."GDRID2"
+                                AND APLP."GDRNUM" = "LN$CGTP"."GDRNUM"
           WHERE ("LN$CGTP"."GDRNUM2" = 0
                  OR TO_CHAR("LN$CGTP"."GDRID1") || TO_CHAR("LN$CGTP"."GDRID2") || TO_CHAR("LN$CGTP"."GDRNUM")
                     = TO_CHAR("LN$CGTP"."GDRNUM2"))
@@ -116,8 +136,14 @@ BEGIN
                 ,"LA$SGTP"."GDRNUM"
                 ,0 AS "LGTSEQ"
                 ,"LA$SGTP"."GDRNUM2"
+                ,"LA$SGTP"."SGTTOT" AS "LGTSAM"
             --     ,'LA$SGTP' AS "SourceTable"
+                ,"LA$SGTP"."GRTSTS"
+                ,APLP.APLLAM
           FROM "LA$SGTP"
+          LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LA$SGTP"."GDRID1"
+                                AND APLP."GDRID2" = "LA$SGTP"."GDRID2"
+                                AND APLP."GDRNUM" = "LA$SGTP"."GDRNUM"
           WHERE ("LA$SGTP"."GDRNUM2" = 0
                  OR TO_CHAR("LA$SGTP"."GDRID1") || TO_CHAR("LA$SGTP"."GDRID2") || TO_CHAR("LA$SGTP"."GDRNUM")
                     = TO_CHAR("LA$SGTP"."GDRNUM2"))
@@ -130,7 +156,13 @@ BEGIN
                 ,0 AS "LGTSEQ"
                 ,"LA$BGTP"."GDRNUM2"
             --     ,'LA$BGTP' AS "SourceTable"
+                ,"LA$BGTP"."BGTAMT" AS "LGTSAM"
+                ,"LA$BGTP"."GRTSTS"
+                ,APLP.APLLAM
           FROM "LA$BGTP"
+          LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LA$BGTP"."GDRID1"
+                                AND APLP."GDRID2" = "LA$BGTP"."GDRID2"
+                                AND APLP."GDRNUM" = "LA$BGTP"."GDRNUM"
           WHERE ("LA$BGTP"."GDRNUM2" = 0
                  OR TO_CHAR("LA$BGTP"."GDRID1") || TO_CHAR("LA$BGTP"."GDRID2") || TO_CHAR("LA$BGTP"."GDRNUM")
                     = TO_CHAR("LA$BGTP"."GDRNUM2"))
@@ -171,7 +203,3 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClNoOld_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-/

@@ -156,7 +156,12 @@ BEGIN
                                              ,S1.LGTSEQ) AS "SEQ"
                  ,NVL(S2."TfFg",' ')     AS "BuildingTfFg"
                  ,CASE
-                    WHEN S2."TfFg" = 'Y' THEN S3."MaxGroupNo" + RANK() OVER (ORDER BY S1."GroupNo")
+                    WHEN S2."TfFg" = 'Y'
+                    THEN S3."MaxGroupNo" + RANK() OVER (ORDER BY S1."GroupNo")
+                    WHEN S1."GDRID1" = 2
+                         AND S1."GDRID2" = 9
+                         AND S1."GDRNUM" = 108
+                    THEN S3."MaxGroupNo" + RANK() OVER (ORDER BY S1."GroupNo",S1."LGTSEQ")
                   ELSE 0 END  AS "NewGroupNo"
            FROM "TmpLA$LGTP" S1
            LEFT JOIN "ClBuildingUnique" S2 ON S2.GDRID1 = S1.GDRID1
@@ -179,6 +184,10 @@ BEGIN
                       WHEN SC1."GDRMRK" = 1 THEN 'Y'
                       WHEN SC1."SEQ" = 1 THEN 'Y'
                       WHEN SC1."BuildingTfFg" = 'Y' THEN 'Y'
+                      WHEN SC1."GDRID1" = 2
+                           AND SC1."GDRID2" = 9
+                           AND SC1."GDRNUM" = 108
+                      THEN 'Y'
                     ELSE ' ' END
        ,T1."NewGroupNo" = SC1."NewGroupNo"
     ;

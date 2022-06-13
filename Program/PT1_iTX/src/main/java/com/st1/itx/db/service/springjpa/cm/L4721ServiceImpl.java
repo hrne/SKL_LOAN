@@ -93,7 +93,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,B.\"NextPayIntDate\"                                  "; // 下繳日
 		sql += "       ,NVL(CB.\"BdLocation\", ' ')      AS \"Location\"      "; // 押品地址
 		sql += "       ,NVL(CN.\"PaperNotice\", 'Y')     AS \"PaperNotice\"   "; // 書面通知與否 Y:寄送 N:不寄送
-		sql += "       ,BR.\"TxEffectDate\"              AS \"TxEffectDate\"  "; // 利率生效日
+		sql += "       ,CASE WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\""; // 利率生效日
 		sql += "       ,BR.\"PresentRate\"                ";
 		sql += "       ,BR.\"AdjustedRate\"               ";
 		sql += "       ,CASE WHEN B.\"FacmNo\" = BR.\"FacmNo\" THEN 'Y' ELSE 'N' END AS \"Flag\"  "; // 放款利率變動檔生效日，利率未變動為零
@@ -140,6 +140,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		dateUtil.init();
 
 		this.info("BankStatementServiceImpl doDetail");
+		int adjDate = Integer.parseInt(titaVo.getParam("AdjDate")) + 19110000;
 		int ieday = titaVo.getEntDyI() + 19110000;
 		dateUtil.setDate_1(ieday);
 		dateUtil.setMons(-6);
@@ -151,7 +152,12 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		因抓取不到費用類，第一層group by 到額度(同額度同調整日、同源利率
 
 		String sql = " ";
-		sql += " SELECT X.\"FacmNo\"                                         AS \"FacmNo\"   ";
+		sql += " SELECT DISTINCT X.\"CustNo\"                                         AS \"CustNo\"   ";
+		sql += "       ,X.\"FacmNo\"                                         AS \"FacmNo\"   ";
+		sql += "       ,C.\"CustName\"                                        "; // 戶名
+		sql += "       ,LB.\"SpecificDd\"                                      "; // 應繳日
+		sql += "       ,LB.\"LoanBal\"                                         "; // 貸放餘額
+		sql += "       ,LB.\"DueAmt\"                                         "; // 貸放餘額
 		sql += "       ,X.\"EntryDate\"                                       ";
 		sql += "       ,X.\"IntStartDate\"                                    "; // F1:計息期間
 		sql += "       ,X.\"IntEndDate\"                                      "; // F2:計息期間
@@ -161,14 +167,13 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,X.\"Interest\"                                        "; // F6:繳息金額
 		sql += "       ,X.\"BreachAmt\" + \"DelayInt\"                       AS \"BreachAmt\"  "; // F7:違約金+延滯息
 		sql += "       ,X.\"FEE1\" + X.\"FEE2\" + X.\"FEE3\" + X.\"FEE4\"    AS \"OtherFee\"   "; // F8:火險費或其他費用
-		sql += "       ,BR.\"TxEffectDate\"               ";
-		sql += "       ,BR.\"PresentRate\"                ";
-		sql += "       ,BR.\"AdjustedRate\"               ";
+		sql += "       ,CASE WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\"";
+		sql += "       ,NVL(BR.\"PresentRate\",0)                            AS \"PresentRate\"";
+		sql += "       ,NVL(BR.\"AdjustedRate\",0)                           AS \"AdjustedRate\"";
 		sql += "       ,X.\"AcDate\"                      ";
-		sql += "       ,X.\"TitaTlrNo\"                   ";
-		sql += "       ,X.\"TitaTxtNo\"                   ";
 		sql += "       ,X.\"RepayCode\"                   ";
-		sql += " FROM ( SELECT MAX(T.\"FacmNo\")                                            AS \"FacmNo\"            ";
+		sql += " FROM ( SELECT MAX(T.\"CustNo\")                                            AS \"CustNo\"            ";
+		sql += "             ,T.\"FacmNo\"                                                  AS \"FacmNo\"            ";
 		sql += "             ,MAX(T.\"EntryDate\")                                          AS \"EntryDate\"         ";
 		sql += "             ,MIN(T.\"IntStartDate\")                                       AS \"IntStartDate\"      ";
 		sql += "             ,MAX(T.\"IntEndDate\")                                         AS \"IntEndDate\"        ";
@@ -184,8 +189,12 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",  '$.FireFee'),0))       AS FEE3                  ";
 		sql += "             ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",  '$.LawFee'),0))        AS FEE4                  ";
 		sql += "             ,T.\"AcDate\"                      ";
-		sql += "             ,T.\"TitaTlrNo\"                   ";
-		sql += "             ,T.\"TitaTxtNo\"                   ";
+		sql += "             , CASE" ; 
+		sql += "                WHEN t.\"IntStartDate\" = 0" ; 
+		sql += "                  AND t.\"IntEndDate\" = 0 THEN" ; 
+		sql += "                    'Y'" ; 
+		sql += "                ELSE" ; 
+		sql += "                    'N' END AS \"Flag\""                                 ;
 		sql += "        FROM \"LoanBorTx\" T                                             ";
 		sql += "        WHERE T.\"CustNo\" = " + custNo;
 		sql += "         AND  T.\"FacmNo\" != 0 ";
@@ -198,12 +207,27 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                or T.\"TitaTxCd\" = 'L3210' )                                         ";
 		sql += "         AND  T.\"EntryDate\" >= " + isday; // tbsdy六個月前的月初日
 		sql += "         AND  T.\"EntryDate\" <= " + ieday; // tbsdy
-		sql += "       GROUP BY  T.\"AcDate\", T.\"TitaTlrNo\", T.\"TitaTxtNo\"                        ";
+		sql += "       GROUP BY  t.\"FacmNo\", t.\"EntryDate\", t.\"AcDate\", CASE WHEN t.\"IntStartDate\" = 0 AND t.\"IntEndDate\" = 0 THEN 'Y' ELSE 'N' END                      ";
 		sql += "      ) X                                                                             ";
 		sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'RepayCode'                              ";
 		sql += "                        AND CD.\"Code\"    =  X.\"RepayCode\"                         ";
 		sql += " LEFT JOIN \"BatxRateChange\" BR ON BR.\"CustNo\" = " + custNo                        ;
 		sql += "                                AND BR.\"FacmNo\" =  X.\"FacmNo\"                     ";
+		sql += "                                AND BR.\"AdjDate\" = " + adjDate                      ;
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\"   = X.\"CustNo\"                            ";
+		sql += " LEFT JOIN ( SELECT  \"CustNo\" AS \"CustNo\"" ;
+		sql += "                    ,\"FacmNo\"";
+		sql += "                    ,SUM(\"LoanBal\") AS \"LoanBal\"";
+		sql += "                    ,SUM(\"DueAmt\") AS \"DueAmt\"";
+		sql += "                    ,MIN(\"NextPayIntDate\") AS \"NextPayIntDate\""; 
+		sql += "                    ,MAX(\"SpecificDd\") AS \"SpecificDd\""; 
+		sql += "        FROM  \"LoanBorMain\"";
+		sql += "        WHERE  \"CustNo\" = " + custNo;
+		sql += "               AND \"Status\" != 3                                           ";
+		sql += "        GROUP BY   \"CustNo\",\"FacmNo\") LB ON LB.\"CustNo\" = X.\"CustNo\"                         ";
+		sql += "                                            AND LB.\"FacmNo\" =  X.\"FacmNo\"                        ";
+		
+		
 		sql += " ORDER BY X.\"FacmNo\",X.\"EntryDate\"                                                             ";
 
 		this.info("sql=" + sql);

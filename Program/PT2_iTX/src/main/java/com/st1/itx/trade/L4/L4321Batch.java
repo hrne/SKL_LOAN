@@ -216,10 +216,10 @@ public class L4321Batch extends TradeBuffer {
 		this.info("checkComplete...");
 		boolean isComplete = false;
 		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
-				custType1, custType2, iTxKind, 0, 9, 0, this.index, this.limit, titaVo);
+				custType1, custType2, iTxKind, 1, 3, 0, this.index, this.limit, titaVo);
 		if (sBatxRateChange == null) {
 			sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2,
-					iTxKind, 0, 9, 1, this.index, this.limit, titaVo);
+					iTxKind, 1, 3, 1, this.index, this.limit, titaVo);
 			if (sBatxRateChange == null) {
 				isComplete = true;
 			}
@@ -526,7 +526,7 @@ public class L4321Batch extends TradeBuffer {
 			effectDateS = tBatxRateChange.getCurtEffDate();
 			baseRate = tBatxRateChange.getCurrBaseRate();
 		} else {
-		// 取消確認時，生效起日＝目前生效日， 指標利率＝目前利率 - (利率加減碼or個別加減碼)
+			// 取消確認時，生效起日＝目前生效日， 指標利率＝目前利率 - (利率加減碼or個別加減碼)
 			effectDateS = tBatxRateChange.getPresEffDate();
 			if ("Y".equals(tBatxRateChange.getIncrFlag())) { // 加減碼是否依合約
 				baseRate = tBatxRateChange.getPresentRate().subtract(tBatxRateChange.getRateIncr());
