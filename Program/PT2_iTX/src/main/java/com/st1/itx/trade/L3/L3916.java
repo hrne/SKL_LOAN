@@ -20,11 +20,13 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
+import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanOverdueService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.BaTxCom;
@@ -54,6 +56,8 @@ public class L3916 extends TradeBuffer {
 	public LoanOverdueService loanOverdueService;
 	@Autowired
 	public CdBankService cdBankService;
+	@Autowired
+	public LoanRateChangeService loanRateChangeService;
 	@Autowired
 	public AuthLogCom authLogCom;
 	@Autowired
@@ -164,7 +168,14 @@ public class L3916 extends TradeBuffer {
 			dDateUtil.setMons(tFacProd.getProhibitMonth());
 			Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
 		}
-
+//		目前利率
+		LoanRateChange tloanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(
+				tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
+				dDateUtil.getNowIntegerForBC(), titaVo);
+		BigDecimal storeRate = BigDecimal.ZERO;
+		if (tloanRateChange != null) {
+			storeRate = tloanRateChange.getFitRate();
+		}
 //		if (tFacProd.getProhibitMonth() > 0) {
 //			Prohibitperiod = tFacMain.getFirstDrawdownDate() + (tFacProd.getProhibitMonth() * 120000);
 //		} else {
@@ -206,7 +217,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("GraceDate", tLoanBorMain.getGraceDate());
 		this.totaVo.putParam("RenewFlag", tLoanBorMain.getRenewFlag());
 		this.totaVo.putParam("PieceCode", tLoanBorMain.getPieceCode());
-		this.totaVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
+		this.totaVo.putParam("StoreRate", storeRate);
 		this.totaVo.putParam("RateCode", tLoanBorMain.getRateCode());
 		this.totaVo.putParam("RateIncr", tLoanBorMain.getRateIncr());
 		this.totaVo.putParam("FirstAdjRateDate", tLoanBorMain.getFirstAdjRateDate());

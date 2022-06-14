@@ -1,8 +1,10 @@
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -14,11 +16,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.service.CustRmkService;
-import com.st1.itx.db.service.LoanBorMainService;
-import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.service.LoanCustRmkService;
+import com.st1.itx.db.service.springjpa.cm.L3005ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.parse.Parse;
@@ -43,11 +43,7 @@ public class L3005 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CustRmkService custRmkService;
-	@Autowired
-	public LoanBorTxService loanBorTxService;
-	@Autowired
-	public LoanBorMainService loanBorMainService;
+	L3005ServiceImpl l3005ServiceImpl;
 	@Autowired
 	LoanCustRmkService loanCustRmkService;
 
@@ -56,6 +52,8 @@ public class L3005 extends TradeBuffer {
 
 	@Autowired
 	Parse parse;
+
+	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -78,24 +76,13 @@ public class L3005 extends TradeBuffer {
 		int wkAcDateStart = iAcDate + 19110000;
 		int wkEntryDateStart = iEntryDate + 19110000;
 		int wkDateEnd = 99991231;
+		String loanCustRmkX = "";
+		String oLoanCustRmkFlag = "N";
 
 		String loanIntDetailFg = "N";
-
 		String AcFg;
 		String wkCurrencyCode = "";
-
-		Slice<LoanBorTx> slLoanBorTx;
-
-		TempVo tTempVo = new TempVo();
-
-		List<LoanBorTx> lLoanBorTx;
-
-
-		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-
-		// 設定每筆分頁的資料筆數 預設50筆 總長不可超過六萬
-		this.limit = 100; // 100* 154 = 15400
+		List<LoanCustRmk> lLoanCustRmk = new ArrayList<LoanCustRmk>();
 
 		if (iFacmNo != 0) {
 			wkFacmNoStart = iFacmNo;
@@ -109,10 +96,30 @@ public class L3005 extends TradeBuffer {
 		// 查詢各項費用
 		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 
+		// 帳務備忘錄明細檔
+		Slice<LoanCustRmk> sLoanCustRmk = loanCustRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+		if (sLoanCustRmk != null) {
+			lLoanCustRmk = sLoanCustRmk == null ? null : sLoanCustRmk.getContent();
+			for (LoanCustRmk t : lLoanCustRmk) {
+				if (!loanCustRmkX.isEmpty()) {
+					loanCustRmkX += ",";
+				}
+				loanCustRmkX += t.getRmkDesc();
+			}
+			oLoanCustRmkFlag = "Y";
+		}
+
 		this.totaVo.putParam("OCustNo", iCustNo);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
+		this.totaVo.putParam("OLoanCustFlag", oLoanCustRmkFlag);
+		if (loanCustRmkX.length() > 50) {
+			this.totaVo.putParam("OLoanCustRmkX", loanCustRmkX.substring(0, 50) + "...未完"); // 帳務備忘錄
+		} else {
+			this.totaVo.putParam("OLoanCustRmkX", loanCustRmkX); // 帳務備忘錄
+		}
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -126,154 +133,137 @@ public class L3005 extends TradeBuffer {
 		lDisplayFlag.add("A"); // 帳務
 		lDisplayFlag.add("F"); // 繳息首筆
 
-		if (iAcDate == 0) {
-			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart,
-					wkBormNoEnd, wkEntryDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
-		} else {
-			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart,
-					wkBormNoEnd, wkAcDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
+		try {
+			resultList = l3005ServiceImpl.findAll(this.index, this.limit, titaVo);
+		} catch (Exception e) {
+			this.info("Error ... " + e.getMessage());
 		}
 
-		lLoanBorTx = slLoanBorTx == null ? null : new ArrayList<LoanBorTx>(slLoanBorTx.getContent());
-		if (lLoanBorTx == null || lLoanBorTx.size() == 0) {
+		this.info("resultList = " + resultList);
+		if (resultList != null && resultList.size() != 0) {
+
+			this.info("Size =" + resultList.size());
+			int i = 1;
+			String relNo = "";
+			String newRelNo = "";
+			for (Map<String, String> result : resultList) {
+				OccursList occursList = new OccursList();
+
+				String titaTlrNo = result.get("TitaTlrNo");
+				String titaTxtNo = result.get("TitaTxtNo");
+				String titaHCode = result.get("TitaHCode");
+				String displayflag = result.get("Displayflag");
+				String titaCurCd = result.get("TitaCurCd");
+				String desc = result.get("Desc");
+				String titaTxCd = result.get("TitaTxCd");
+				String repayCodeX = result.get("Item");
+				int entryDate = parse.stringToInteger(result.get("EntryDate"));
+				if (entryDate > 0) {
+					entryDate = entryDate - 19110000;
+				}
+				int acDate = parse.stringToInteger(result.get("AcDate"));
+				if (acDate > 0) {
+					acDate = acDate - 19110000;
+				}
+				int facmNo = parse.stringToInteger(result.get("FacmNo"));
+				int bormNo = parse.stringToInteger(result.get("BormNo"));
+				int borxNo = parse.stringToInteger(result.get("BorxNo"));
+				BigDecimal txAmt = parse.stringToBigDecimal(result.get("TxAmt"));
+				BigDecimal tempAmt = parse.stringToBigDecimal(result.get("TempAmt"));
+				BigDecimal loanBal = parse.stringToBigDecimal(result.get("LoanBal"));
+				BigDecimal rate = parse.stringToBigDecimal(result.get("Rate"));
+				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest"))
+						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
+						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
+				newRelNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				TempVo tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(result.get("OtherFields"));
+				BigDecimal wkTempAmt = BigDecimal.ZERO;
+				BigDecimal wkShortfall = BigDecimal.ZERO;
+				BigDecimal wkTotTxAmt = BigDecimal.ZERO;
+
+				if (!relNo.equals(newRelNo)) {
+					wkTotTxAmt = parse.stringToBigDecimal(tTempVo.getParam("TxAmt"));
+				}
+				if ((titaHCode.equals("0") || titaHCode.equals("3") || titaHCode.equals("4"))
+						&& (displayflag.equals("A") || displayflag.equals("F"))) {
+					AcFg = "Y";
+				} else if (relNo.equals(newRelNo)) {
+					AcFg = "";
+				} else {
+					AcFg = "N";
+				}
+				// 是否顯示L3913計息明細按鈕
+				if ((titaHCode.equals("0") || titaHCode.equals("2") || titaHCode.equals("4"))
+						&& (displayflag.equals("I") || displayflag.equals("F"))) {
+					loanIntDetailFg = "Y";
+				} else {
+					loanIntDetailFg = "N";
+				}
+				if (!"".equals(titaCurCd)) {
+					wkCurrencyCode = titaCurCd;
+				}
+				this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
+				wkShortfall = unpaidAmt;
+				// 暫收款金額為負時，為暫收抵繳
+				if (tempAmt.compareTo(BigDecimal.ZERO) < 0) {
+					wkTempAmt = BigDecimal.ZERO.subtract(tempAmt);
+				} else {
+					wkTempAmt = BigDecimal.ZERO;
+					wkShortfall = tempAmt;
+				}
+				relNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				occursList.putParam("OOEntryDate", entryDate);
+				occursList.putParam("OOAcDate", acDate);
+
+				occursList.putParam("OODesc", desc);
+
+				occursList.putParam("OOFacmNo", facmNo);
+				occursList.putParam("OOBormNo", bormNo);
+				occursList.putParam("OOBorxNo", borxNo);
+				occursList.putParam("OORelNo", relNo); // 登放序號
+				occursList.putParam("OOTellerNo", titaTlrNo);
+				occursList.putParam("OOTxtNo", titaTxtNo);
+				occursList.putParam("OOCurrencyCode", titaCurCd);
+				if (titaHCode.equals("1") || titaHCode.equals("3")) {
+					occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(txAmt));
+					occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(wkTempAmt));
+					occursList.putParam("OOShortfall", BigDecimal.ZERO.subtract(wkShortfall));
+
+				} else {
+					occursList.putParam("OOTxAmt", txAmt);
+					occursList.putParam("OOTempAmt", wkTempAmt);
+					occursList.putParam("OOShortfall", wkShortfall);
+
+				}
+
+				occursList.putParam("OOLoanBal", loanBal);
+				occursList.putParam("OORate", rate);
+				occursList.putParam("OOTitaHCode", titaHCode);
+				occursList.putParam("OOAcFg", AcFg); // 分錄清單Fg
+				if ("L3220".equals(titaTxCd) || wkTotTxAmt.compareTo(BigDecimal.ZERO) == 0) {
+					occursList.putParam("OOTxMsg", ""); // 金額+還款類別
+				} else {
+					occursList.putParam("OOTxMsg", repayCodeX + " " + df.format(wkTotTxAmt)); // 金額+還款類別
+				}
+				occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
+				occursList.putParam("OOTxCd", titaTxCd); // 交易代號
+				// 新增摘要 跟費用明細
+				occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
+				occursList.putParam("OOTotTxAmt", wkTotTxAmt); // 交易總金額
+
+				// 將每筆資料放入Tota的OcList
+				this.totaVo.addOccursList(occursList);
+			}
+		} else {
+
 			if (iAcDate == 0) {
 				throw new LogicException(titaVo, "E0001", "入帳日期  " + iEntryDate + " 後無交易資料"); // 查詢資料不存在
 			} else {
 				throw new LogicException(titaVo, "E0001", "會計日期  " + iAcDate + " 後無交易資料"); // 查詢資料不存在
 			}
-		}
-
-		String relNo = "";
-		String newRelNo = "";
-		// 如有有找到資料
-
-		BigDecimal wkTotTxAmt = BigDecimal.ZERO;
-		for (LoanBorTx ln : lLoanBorTx) {
-			newRelNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
-			OccursList occursList = new OccursList();
-			BigDecimal wkTempAmt = BigDecimal.ZERO;
-			BigDecimal wkShortfall = BigDecimal.ZERO;
-
-			String feeMsg = "";
-			tTempVo = new TempVo();
-			if (iTitaHCode == 0 && !ln.getTitaHCode().equals("0")) {
-				continue;
-			}
-
-			if (!relNo.equals(newRelNo)){
-				wkTotTxAmt = BigDecimal.ZERO;
-			}
-			// 是否顯示分錄清單： Y-有分錄清單 、N-無分錄清單、空白(同交易序號次筆)
-			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("3") || ln.getTitaHCode().equals("4"))
-					&& (ln.getDisplayflag().equals("A") || ln.getDisplayflag().equals("F"))) {
-				AcFg = "Y";
-			} else if (relNo.equals(newRelNo)) {
-				AcFg = "";
-			} else {
-				AcFg = "N";
-			}
-			wkTotTxAmt = wkTotTxAmt.add(ln.getTxAmt());
-
-			// 費用
-			tTempVo = tTempVo.getVo(ln.getOtherFields());
-			if (!"".equals(tTempVo.getParam("AcctFee"))
-					&& parse.stringToBigDecimal(tTempVo.getParam("AcctFee")).compareTo(BigDecimal.ZERO) != 0) {
-				feeMsg += ", 帳管費:" + tTempVo.getParam("AcctFee");
-			}
-
-			if (!"".equals(tTempVo.getParam("FireFee"))
-					&& parse.stringToBigDecimal(tTempVo.getParam("FireFee")).compareTo(BigDecimal.ZERO) != 0) {
-				feeMsg += ", 火險費:" + tTempVo.getParam("FireFee");
-			}
-
-			if (!"".equals(tTempVo.getParam("ModifyFee"))
-					&& parse.stringToBigDecimal(tTempVo.getParam("ModifyFee")).compareTo(BigDecimal.ZERO) != 0) {
-				feeMsg += ", 契變手續費:" + tTempVo.getParam("ModifyFee");
-			}
-
-			if (!"".equals(tTempVo.getParam("LawFee"))
-					&& parse.stringToBigDecimal(tTempVo.getParam("LawFee")).compareTo(BigDecimal.ZERO) != 0) {
-				feeMsg += ", 法務費:" + tTempVo.getParam("LawFee");
-			}
-
-			// 去起頭的逗號
-			if (feeMsg.length() > 2 && feeMsg.startsWith(", ")) {
-				String str = feeMsg.substring(2);
-				feeMsg = str;
-			}
-			
-			// 是否顯示L3913計息明細按鈕
-			if ((ln.getTitaHCode().equals("0") || ln.getTitaHCode().equals("2") || ln.getTitaHCode().equals("4"))
-					&& (ln.getDisplayflag().equals("I") || ln.getDisplayflag().equals("F"))) {
-				loanIntDetailFg = "Y";
-			} else {
-				loanIntDetailFg = "N";
-			}
-			if (!"".equals(ln.getTitaCurCd())) {
-				wkCurrencyCode = ln.getTitaCurCd();
-			}
-			this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-
-			wkShortfall = ln.getOverflow().subtract(ln.getShortfall());
-			// 暫收款金額為負時，為暫收抵繳
-			if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
-				wkTempAmt = BigDecimal.ZERO.subtract(ln.getTempAmt());
-			} else {
-				wkTempAmt = BigDecimal.ZERO;
-			}
-			relNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
-			occursList.putParam("OOEntryDate", ln.getEntryDate());
-			occursList.putParam("OOAcDate", ln.getAcDate());
-//			if ("1".equals(ln.getTitaHCode()) || "3".equals(ln.getTitaHCode())) {
-//				if ("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
-//						|| "L3230".equals(ln.getTitaTxCd())) {
-//					occursList.putParam("OODesc", "暫收款訂正");
-//				} else {
-//					occursList.putParam("OODesc", "訂正");
-//				}
-//			} else {
-				occursList.putParam("OODesc", ln.getDesc());
-//			}
-			// 先確認此戶有備忘錄 有才給備忘錄按鈕
-			
-			occursList.putParam("OOFacmNo", ln.getFacmNo());
-			occursList.putParam("OOBormNo", ln.getBormNo());
-			occursList.putParam("OOBorxNo", ln.getBorxNo());
-			occursList.putParam("OORelNo", relNo); // 登放序號
-			occursList.putParam("OOTellerNo", ln.getTitaTlrNo());
-			occursList.putParam("OOTxtNo", ln.getTitaTxtNo());
-			occursList.putParam("OOCurrencyCode", ln.getTitaCurCd());
-			if (ln.getTitaHCode().equals("1") || ln.getTitaHCode().equals("3")) {
-				occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(ln.getTxAmt()));
-				occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(wkTempAmt));
-				occursList.putParam("OOShortfall", BigDecimal.ZERO.subtract(wkShortfall));
-
-			} else {
-				occursList.putParam("OOTxAmt", ln.getTxAmt());
-				occursList.putParam("OOTempAmt", wkTempAmt);
-				occursList.putParam("OOShortfall", wkShortfall);
-
-			}
-
-			occursList.putParam("OOLoanBal", ln.getLoanBal());
-			occursList.putParam("OORate", ln.getRate());
-			occursList.putParam("OOTitaHCode", ln.getTitaHCode());
-			occursList.putParam("OOAcFg", AcFg); // 分錄清單Fg
-			occursList.putParam("OOFeeMsg", feeMsg); // 資料
-			occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
-			occursList.putParam("OOTxCd", ln.getTitaTxCd()); // 交易代號
-			// 新增摘要 跟費用明細
-			occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
-			occursList.putParam("OOTotTxAmt", wkTotTxAmt); // 交易總金額
-			
-			// 將每筆資料放入Tota的OcList
-			this.totaVo.addOccursList(occursList);
-		}
-
-		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
-		if (slLoanBorTx != null && slLoanBorTx.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter(); // 自動折返
 		}
 
 		this.addList(this.totaVo);

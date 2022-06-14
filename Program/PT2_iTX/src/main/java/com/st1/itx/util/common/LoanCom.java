@@ -1,6 +1,7 @@
 package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,13 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
@@ -26,6 +30,7 @@ import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.CdBankService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
@@ -34,6 +39,7 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -89,6 +95,8 @@ public class LoanCom extends TradeBuffer {
 	public TxRecordService txRecordService;
 	@Autowired
 	public MlaundryRecordService mlaundryRecordService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	Parse parse;
@@ -1226,6 +1234,61 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setTxAmt(tx.getTxAmt());
 		tLoanBorTx.setTempAmt(tx.getTxAmt());
 		tLoanBorTx.setTitaHCode("0");
+		try {
+			loanBorTxService.insert(tLoanBorTx, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+		}
+	}
+	
+	/**
+	 *  新增放款交易內容檔(收回費用)
+	 * @param ba  BaTxVo
+	 * @param iRpCode 還款來源
+	 * @param iEntryDate 入帳日
+	 * @param iTxAmt 交易金額
+	 * @param iTempAmt 暫收抵繳金額
+	 * @param iCreateDate 建立日期
+	 * @param titaVo Tita
+	 * @throws LogicException ....
+	 */
+	public void addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, BigDecimal iTxAmt, BigDecimal iTempAmt,
+			Timestamp iCreateDate, TitaVo titaVo) throws LogicException {
+		this.info("addFeeBorTxRoutine ... ");
+
+		LoanBorTx tLoanBorTx = new LoanBorTx();
+		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
+		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId("AcctCode", ba.getAcctCode()), titaVo);
+		tLoanBorTx.setDesc(tCdCode == null ? ba.getAcctCode() : tCdCode.getItem());
+		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
+		tLoanBorTx.setEntryDate(iEntryDate);
+		tLoanBorTx.setDueDate(ba.getPayIntDate());
+		//
+		tLoanBorTx.setTxAmt(iTxAmt); // 本筆交易金額
+		tLoanBorTx.setTempAmt(iTempAmt); // 本筆暫收抵繳
+		tLoanBorTx.setDisplayflag("Y"); // 無繳息
+		// 其他欄位
+		TempVo tTempVo = new TempVo();
+		tTempVo.clear();
+		switch (ba.getRepayType()) {
+		case 4:
+			tTempVo.putParam("AcctFee", ba.getAcctAmt());
+			break;
+		case 5:
+			tTempVo.putParam("FireFee", ba.getAcctAmt());
+			break;
+		case 6:
+			tTempVo.putParam("ModifyFee", ba.getAcctAmt());
+			break;
+		case 7:
+			tTempVo.putParam("LawFee", ba.getAcctAmt());
+			break;
+		}
+		tTempVo.putParam("AcctCode", ba.getAcctCode()); // 業務科目銷
+		tTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
+		tTempVo.putParam("CreateDate", iCreateDate.toString()); 
+		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {

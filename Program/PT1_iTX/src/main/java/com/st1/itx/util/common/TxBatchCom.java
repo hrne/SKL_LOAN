@@ -682,6 +682,11 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("RpType1", tDetail.getRepayType());
 		int i = 1;
 		txTitaVo.putParam("RpCode1", tDetail.getRepayCode());
+		CdCode tCdCode = cdCodeService
+				.findById(new CdCodeId("BatchRepayCode", parse.IntegerToString(tDetail.getRepayCode(), 2)), txTitaVo);
+		if (tCdCode != null) {
+			txTitaVo.putParam("RpCodeX1", tCdCode.getItem());
+		}
 		txTitaVo.putParam("RpAmt1", tDetail.getRepayAmt());
 		txTitaVo.putParam("RpAcctCode1", tDetail.getReconCode());
 		txTitaVo.putParam("RpAcCode1", tDetail.getRepayAcCode());
@@ -710,6 +715,7 @@ public class TxBatchCom extends TradeBuffer {
 				if (amt == null)
 					break;
 				txTitaVo.putParam("RpCode" + i, "90");
+				txTitaVo.putParam("RpCodeX" + i, "暫收抵繳");
 				txTitaVo.putParam("RpAmt" + i, amt);
 				txTitaVo.putParam("RpFacmNo" + i, this.tTempVo.get("TmpFacmNo" + j));
 				this.info("RpAmt:" + amt);
@@ -722,6 +728,10 @@ public class TxBatchCom extends TradeBuffer {
 			txTitaVo.putParam("TimInterest", this.tTempVo.get("Interest"));
 			txTitaVo.putParam("TimDelayInt", this.tTempVo.get("DelayInt"));
 			txTitaVo.putParam("TimBreachAmt", this.tTempVo.get("BreachAmt"));
+			txTitaVo.putParam("TwPrincipal", this.tTempVo.get("Principal"));
+			txTitaVo.putParam("TwInterest", this.tTempVo.get("Interest"));
+			txTitaVo.putParam("TwDelayInt", this.tTempVo.get("DelayInt"));
+			txTitaVo.putParam("TwBreachAmt", this.tTempVo.get("BreachAmt"));
 			shortAmt = this.tTempVo.get("ShortAmt");
 			overAmt = this.tTempVo.get("OverAmt");
 		}
@@ -744,36 +754,39 @@ public class TxBatchCom extends TradeBuffer {
 		}
 		// 其他費用欄
 		if ("L3420".equals(txTitaVo.getTxcd())) {
-			putFeeAmt("AcctFee", "AcctFee1", txTitaVo);
-			putFeeAmt("ModifyFee", "ModifyFee1", txTitaVo);
-			putFeeAmt("FireFee", "FireFee1", txTitaVo);
-			putFeeAmt("LawFee", "LawFee1", txTitaVo);
-			putFeeAmt("ShortfallInt", "ShortfallInt", txTitaVo);
-			putFeeAmt("ShortfallPrin", "ShortfallPrin", txTitaVo);
-			putFeeAmt("ShortCloseBreach", "ShortCloseBreach", txTitaVo);
+			putAmt("AcctFee", "AcctFee1", txTitaVo);
+			putAmt("ModifyFee", "ModifyFee1", txTitaVo);
+			putAmt("FireFee", "FireFee1", txTitaVo);
+			putAmt("LawFee", "LawFee1", txTitaVo);
+			putAmt("ShortfallInt", "ShortfallInt", txTitaVo);
+			putAmt("ShortfallPrin", "ShortfallPrin", txTitaVo);
+			putAmt("ShortCloseBreach", "ShortCloseBreach", txTitaVo);
 		} else if ("L3200".equals(txTitaVo.getTxcd())) {
-			putFeeAmt("AcctFee", "TimAcctFee", txTitaVo);
-			putFeeAmt("ModifyFee", "TimModifyFee", txTitaVo);
-			putFeeAmt("FireFee", "TimFireFee", txTitaVo);
-			putFeeAmt("LawFee", "TimLawFee", txTitaVo);
-			putFeeAmt("ShortfallInt", "TimShortfallInt", txTitaVo);
-			putFeeAmt("ShortfallPrin", "TimShortfallPrin", txTitaVo);
-			putFeeAmt("ShortCloseBreach", "TimShortCloseBreach", txTitaVo);
+			putAmt("AcctFee", "TimAcctFee", txTitaVo);
+			putAmt("ModifyFee", "TimModifyFee", txTitaVo);
+			putAmt("FireFee", "TimFireFee", txTitaVo);
+			putAmt("LawFee", "TimLawFee", txTitaVo);
+			putAmt("ShortfallInt", "TimShortfallInt", txTitaVo);
+			putAmt("ShortfallPrin", "TimShortfallPrin", txTitaVo);
+			putAmt("ShortCloseBreach", "TimShortCloseBreach", txTitaVo);
 		} else {
-			putFeeAmt("AcctFee", "AcctFee", txTitaVo);
-			putFeeAmt("ModifyFee", "ModifyFee", txTitaVo);
-			putFeeAmt("FireFee", "FireFee", txTitaVo);
-			putFeeAmt("LawFee", "LawFee", txTitaVo);
+			putAmt("AcctFee", "AcctFee", txTitaVo);
+			putAmt("ModifyFee", "ModifyFee", txTitaVo);
+			putAmt("FireFee", "FireFee", txTitaVo);
+			putAmt("LawFee", "LawFee", txTitaVo);
 		}
 		return txTitaVo;
 	}
 
-	private void putFeeAmt(String item, String itemName, TitaVo txTitaVo) {
+	private void putAmt(String item, String itemName, TitaVo txTitaVo) {
 		String amt = this.tTempVo.get(item);
-		if (amt == null)
+		if (amt == null) {
 			txTitaVo.putParam(itemName, BigDecimal.ZERO);
-		else
+			txTitaVo.putParam("Tw" + itemName, BigDecimal.ZERO);
+		} else {
 			txTitaVo.putParam(itemName, amt);
+			txTitaVo.putParam("Tw" + itemName, amt);
+		}
 	}
 
 	/* L3210 暫收款登錄 */

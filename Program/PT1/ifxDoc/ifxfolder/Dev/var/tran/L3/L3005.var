@@ -368,7 +368,7 @@ T(2,#TimCustNo)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L3072; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
-K(MODIFYBUTTON,1,帳務備忘錄（原系統）)
+K(MODIFYBUTTON,1,帳務備忘錄)
 
 
 #OCustNo=A,7,L
@@ -376,8 +376,13 @@ K(MODIFYBUTTON,1,帳務備忘錄（原系統）)
 #OCustNoX=X,100,L
 T(2,#L2r07CustName)
 
-
 #OCurrencyCode=X,3,S
+
+#OLoanCustFlag=X,1,S
+
+#OLoanCustRmkX=X,110,L
+T(F,@OLoanCustRmkX,0)
+
 
 #Precision=N,1,S
 E(0,0)T(H,#OCurrencyCode,#CurrPrecisionHelp)
@@ -494,8 +499,8 @@ T(H,#OOTitaHCode,#TitaHCodeHelp)
 !分錄Fg
 #OOAcFg=X,1,S
 
-!feemsg
-#OOFeeMsg=X,120,S
+!TxMsg repaycodeX還款來源+總金額
+#OOTxMsg=X,120,S
 
 !計息明細Fg
 #OOLoanIntDetailFg=X,1,S
@@ -504,6 +509,19 @@ T(H,#OOTitaHCode,#TitaHCodeHelp)
 #OOTxCd=X,5,S
 
 #5sp=X,5,S
+
+
+#Entdy=D,7,S
+E(0,#OOAcDate)
+#TxNo=X,18,S
+T(2,#OORelNo)
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo)
+!訂正按鈕
+#BTN=X,1,S
+IF(#OOAcFg=="",BIND(grid,cancel),C(5,#OOTxCd,L3100,BIND(grid,cancel),C(3,#OOTitaHCode,0,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))))
+C(3,#OOTitaHCode,0,$,$)
+
 
 !查詢
 #OOBUF1=X,61,S
@@ -558,6 +576,8 @@ TXFORM=L3005
 #OExcessive
 #OShortfall
 #OCurrencyCode
+#OLoanCustFlag
+#OLoanCustRmkX
 #OOEntryDate
 #OOAcDate
 #OOFacmNo
@@ -575,7 +595,7 @@ TXFORM=L3005
 #OORate
 #OOTitaHCode
 #OOAcFg
-#OOFeeMsg
+#OOTxMsg
 #OOLoanIntDetailFg
 #OOTxCd
 #OOTempAmt
@@ -596,6 +616,7 @@ TXFORM=L3005
 !["@會計日期",#OAcDate],
 ["@本戶累溢收",#OExcessiveX],
 ["@本戶累短收",#OShortfallX],
+["@",#OLoanCustRmkX],
 ]
 </sub>
 
@@ -607,6 +628,9 @@ TXFORM=L3005
 
 #OOBTN1=內容查詢
 {width:70,search:false,formatter:'cust:bind-button:內容查詢;L3912 交易內容查詢',align:'center',canExport:false}
+#BTN=訂正
+{width:40,search:false,formatter:'cust:bind-button:訂正',canExport:false,align:'center'}
+
 
 ! #OOBTN2=
 ! {width:60,search:false,formatter:'cust:bind-button:備忘錄;L2072 顧客控管警訊明細資料查詢',align:'center',canExport:false}
@@ -653,7 +677,7 @@ TXFORM=L3005
 #OOBTN3=分錄
 {width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}
 
-#OOFeeMsg=費用
+#OOTxMsg=還款來源
 {width:150}
 
 #OOAcDtRelNo=交易序號
@@ -667,6 +691,6 @@ TXFORM=L3005
 #OCustNo#OFacmNo#OBormNo#OCustNoX#OAcDate#OExcessiveX#OShortfallX
 %
 #OOEntryDate#OOAcDate#OOFacmNoX#OODesc#OOCurrencyCode#OOTxAmtX#OOTempAmtX#OOShortfallX#OOLoanBalX
-#OORateX#OOTitaHCodeX#OOFeeMsg#OOAcDtRelNo
+#OORateX#OOTitaHCodeX#OOTxMsg#OOAcDtRelNo
 @^
 </sub>

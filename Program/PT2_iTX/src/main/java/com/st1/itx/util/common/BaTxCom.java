@@ -80,6 +80,7 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal mergeAmt = BigDecimal.ZERO; // mergeAmt 合併檢核總金額
 	private BigDecimal shortAmt = BigDecimal.ZERO; // 短繳(正值)
 	private BigDecimal overAmt = BigDecimal.ZERO; // 溢繳(正值)
+	private int shortFacmNo = 0; // 短繳額度;
 	private int overRpFacmNo = 0; // 溢短繳額度;
 	private int facStatus = 0; // 戶況
 
@@ -158,6 +159,7 @@ public class BaTxCom extends TradeBuffer {
 		this.tmAmt = BigDecimal.ZERO; // 需暫收抵繳金額
 		this.loanBal = BigDecimal.ZERO; // 還款前本金餘額
 		this.shortAmt = BigDecimal.ZERO; // 短繳(正值)
+		this.shortFacmNo = 0; // 短繳額度;
 		this.overAmt = BigDecimal.ZERO; // 溢繳(正值)
 		this.overRpFacmNo = 0; // 溢短繳額度;
 		this.facStatus = 0; // 戶況
@@ -1721,7 +1723,10 @@ public class BaTxCom extends TradeBuffer {
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
 					this.txBal = this.txBal.subtract(ba.getAcctAmt());
-					this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
+					this.shortFacmNo = ba.getFacmNo();// 短繳額度;
+					if (this.overRpFacmNo == 0) {
+						this.overRpFacmNo = ba.getFacmNo();// 溢繳額度;
+					}
 				}
 			}
 		}
@@ -1772,10 +1777,10 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setDataKind(4); // 4.本期溢(+)短(-)繳
 		baTxVo.setRepayType(0);
 		baTxVo.setCustNo(iCustNo);
-		baTxVo.setFacmNo(this.overRpFacmNo);
 		baTxVo.setBormNo(0);
 		baTxVo.setRvNo(" ");
 		baTxVo.setAcctCode("TAV");
+		baTxVo.setFacmNo(this.overRpFacmNo);
 		// 溢繳 = 暫收款存入金額(存入暫收為正、暫收抵繳為負)
 		// 短繳 = 可償還餘額xxBal為負值時取正值
 		if (this.tempAmt.compareTo(BigDecimal.ZERO) >= 0) {
@@ -1783,13 +1788,17 @@ public class BaTxCom extends TradeBuffer {
 			baTxVo.setUnPaidAmt(this.tempAmt);
 			baTxVo.setAcctAmt(this.tempAmt);
 			this.overAmt = baTxVo.getAcctAmt();
-			this.info("溢繳金額= " + this.overAmt);
+			this.info("overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt
+					+ ", 溢繳金額= " + this.overAmt);
 		}
-		if (this.xxBal.compareTo(BigDecimal.ZERO) <= 0) {
+		if (this.xxBal.compareTo(BigDecimal.ZERO) < 0) {
 			baTxVo.setDbCr("D");
 			baTxVo.setUnPaidAmt(BigDecimal.ZERO.subtract(this.xxBal));
 			this.shortAmt = baTxVo.getUnPaidAmt();
-			this.info("短繳金額= " + this.shortAmt);
+			this.overRpFacmNo = this.shortFacmNo;
+			baTxVo.setFacmNo(this.shortFacmNo);
+			this.info("shortRpFacmNo= " + this.shortFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt
+					+ ", 短繳金額= " + this.shortAmt);
 		}
 		this.baTxList.add(baTxVo);
 	}
@@ -2433,9 +2442,9 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/**
-	 * 溢短繳額度
+	 * 溢繳繳額度
 	 * 
-	 * @return BigDecimal
+	 * @return 溢繳繳額度
 	 */
 	public int getOverRpFacmNo() {
 		return overRpFacmNo;

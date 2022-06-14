@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.util.format.FormatUtil;
 
 /**
  * Parse<br>
@@ -136,7 +137,8 @@ public class Parse {
 	 * @return Timestamp
 	 */
 	public Timestamp IntegerToSqlDateO(int date, int time) {
-		String dateS = date + "" + (time == 0 ? "000000" : time);
+		String times = FormatUtil.pad9(time + "", 6);
+		String dateS = date + times;
 		SimpleDateFormat sp = new SimpleDateFormat("yyyyMMddHHmmss");
 		try {
 			Date dateU = sp.parse(dateS);

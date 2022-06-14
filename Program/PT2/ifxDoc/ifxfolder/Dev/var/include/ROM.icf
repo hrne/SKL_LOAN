@@ -4066,6 +4066,7 @@ TXFORM=L3R05
 #L3r06RepayAmt=m,14.2,S
 #L3r06TotalFee=m,14.2,S
 #L3r06RpFacmNo=A,3,S
+#L3r06ShortFacmNo=A,3,S
 #L3r06CloseBreachAmtUnpaid=m,14.2,S
 #L3r06PayMethodFg=A,1,S
 </L3R06.dec>
@@ -4097,6 +4098,7 @@ TXFORM=L3R06
 #L3r06RepayAmt
 #L3r06TotalFee
 #L3r06RpFacmNo
+#L3r06ShortFacmNo
 #L3r06CloseBreachAmtUnpaid
 #L3r06PayMethodFg
 ^

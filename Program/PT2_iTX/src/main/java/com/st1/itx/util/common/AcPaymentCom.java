@@ -308,16 +308,11 @@ public class AcPaymentCom extends TradeBuffer {
 	 * 兌現票入帳更新支票檔
 	 * 
 	 * @param titaVo TitaVo
+	 * @return LoanCheque
 	 * @throws LogicException LogicException
-	 */
-	public void loanCheque(TitaVo titaVo) throws LogicException {
+	 */	
+	public LoanCheque loanCheque(TitaVo titaVo) throws LogicException {
 		this.info("AcPayment LoanCheque ...");
-		// 隔日訂正，來源科目回沖至暫收可抵繳，不處理
-		if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
-			this.info("BookAcHcode = 2, Skip Update");
-			return;
-		}
-
 		int iCustNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
 		String iRpRvno = titaVo.getParam("RpRvno1");
 		int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
@@ -333,6 +328,11 @@ public class AcPaymentCom extends TradeBuffer {
 		if (tLoanCheque == null) {
 			throw new LogicException(titaVo, "E0006",
 					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
+		}
+		// 隔日訂正，來源科目回沖至暫收可抵繳，不處理
+		if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
+			this.info("BookAcHcode = 2, Skip Update");
+			return tLoanCheque;
 		}
 
 		// 更新欄
@@ -376,6 +376,7 @@ public class AcPaymentCom extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007",
 					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
+		return tLoanCheque;
 	}
 
 	/**

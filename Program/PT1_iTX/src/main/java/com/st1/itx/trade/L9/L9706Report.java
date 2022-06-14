@@ -246,16 +246,27 @@ public class L9706Report extends MakeReport {
 				this.print(1, 0, "");
 			}
 		}
-
+//		int facmNo = parse.stringToInteger(tL9706Vo.get("FacmNo"));
 		// 輸出第三段：所有地址
 		Slice<ClFac> slClFac = clFacService.approveNoEq(applNo, 0, Integer.MAX_VALUE, titaVo);
+//		Slice<ClFac> slClFac = clFacService.findRange(applNo,applNo,facmNo,facmNo, 0,Integer.MAX_VALUE, titaVo);
 		List<ClBuilding> addressList = new ArrayList<ClBuilding>();
 		if (slClFac != null) {
+			int tempClCode1 = 0;
+			int tempClCode2 = 0;
+			int tempClNo = 0;
 			for (ClFac f : slClFac.getContent()) {
-				ClBuilding tClBuilding = clBuildingService
-						.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
-				if (tClBuilding != null) {
-					addressList.add(tClBuilding);
+				if (tempClCode1 == f.getClCode1() && tempClCode2 == f.getClCode2() && tempClNo == f.getClNo()) {
+					break;
+				}else {
+					tempClCode1 = f.getClCode1();
+					tempClCode2 = f.getClCode2();
+					tempClNo = f.getClNo();
+					ClBuilding tClBuilding = clBuildingService
+							.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
+					if (tClBuilding != null) {
+						addressList.add(tClBuilding);
+					}
 				}
 
 			}
@@ -265,6 +276,7 @@ public class L9706Report extends MakeReport {
 			this.print(1, 0, "");
 			this.print(1, 3, "貸款抵押標的物地址：");
 			for (ClBuilding tClBuilding : addressList) {
+
 				this.print(1, 8, tClBuilding.getBdLocation()); // 每個地址的輸出位置：8
 			}
 		}
@@ -296,12 +308,11 @@ public class L9706Report extends MakeReport {
 		default:
 			break;
 		}
-		
+
 		if (!loanKind.isEmpty()) {
 			this.print(1, 0, "");
 			this.print(1, 3, "本案為政府優惠房屋貸款 ： " + loanKind);
 		}
-
 
 		this.print(1, 0, "");
 

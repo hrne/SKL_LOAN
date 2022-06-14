@@ -503,15 +503,6 @@ public class AcReceivableCom extends TradeBuffer {
 							"AcReceivable delete " + tAcReceivableId + e.getErrorMsg());
 				}
 			} else {
-				// 短繳期金以餘額障為起帳金額
-				if (tAcReceivable.getReceivableFlag() == 4 && tAcReceivable.getClsFlag() == 0) {
-					tAcReceivable.setRvAmt(tAcReceivable.getRvBal());
-					tAcReceivable.setOpenAcDate(ac.getAcDate());
-					tAcReceivable.setOpenTxCd(ac.getTitaTxCd());
-					tAcReceivable.setOpenKinBr(ac.getTitaKinbr());
-					tAcReceivable.setOpenTlrNo(ac.getTitaTlrNo());
-					tAcReceivable.setOpenTxtNo(ac.getTitaTxtNo());
-				}
 				tAcReceivable.setTitaTxCd(ac.getTitaTxCd());
 				tAcReceivable.setTitaKinBr(ac.getTitaKinbr());
 				tAcReceivable.setTitaTlrNo(ac.getTitaTlrNo());

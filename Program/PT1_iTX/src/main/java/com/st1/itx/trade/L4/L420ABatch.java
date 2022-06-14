@@ -334,7 +334,7 @@ public class L420ABatch extends TradeBuffer {
 			if (!"4".equals(t.getProcStsCode()) && "4".equals(procStsCode)) {
 				procStsCode = "2";
 			}
-			if (iRepayType != 3 && t.getRepayType() >= 4 && t.getRepayType() <= 8) {
+			if (t.getRepayType() != iRepayType) {
 				isMergeCheckAgain = true;
 			} else {
 				t.setRepayType(iRepayType);

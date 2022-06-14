@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L3;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +20,15 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -48,6 +52,10 @@ public class L3002 extends TradeBuffer {
 	public CustMainService custMainService;
 	@Autowired
 	public CdCodeService cdCodeService;
+	@Autowired
+	public LoanRateChangeService loanRateChangeService;
+	@Autowired
+	DateUtil dDateUtil;
 
 	@Autowired
 	Parse parse;
@@ -147,6 +155,14 @@ public class L3002 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001",
 						"額度主檔 借款人戶號 = " + tLoanBorMain.getCustNo() + "額度編號 = " + tLoanBorMain.getFacmNo()); // 查詢資料不存在
 			}
+
+			LoanRateChange tloanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(
+					tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
+					dDateUtil.getNowIntegerForBC(), titaVo);
+			BigDecimal storeRate = BigDecimal.ZERO;
+			if (tloanRateChange != null) {
+				storeRate = tloanRateChange.getFitRate();
+			}
 			occursList.putParam("OOCaseNo", tFacMain.getCreditSysNo());
 			occursList.putParam("OOApplNo", tFacMain.getApplNo());
 			occursList.putParam("OOCustNo", tLoanBorMain.getCustNo());
@@ -173,7 +189,7 @@ public class L3002 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOPrevIntDate", tLoanBorMain.getPrevPayIntDate());
 			}
-			occursList.putParam("OOStoreRate", tLoanBorMain.getStoreRate());
+			occursList.putParam("OOStoreRate", storeRate);
 			occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode());
 			occursList.putParam("OOLoanBal", tLoanBorMain.getLoanBal());
 			occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額 3/29User簡易審查紀錄表

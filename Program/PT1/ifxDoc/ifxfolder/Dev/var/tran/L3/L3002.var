@@ -574,7 +574,7 @@ TXFORM=L3002
 #OOPrevIntDateX=繳息迄日
 {width:85,align:'center'}
 
-#OOStoreRate=利率
+#OOStoreRate=目前利率
 {width:60,align:'center'}
 
 #OOCurrencyCode=幣別
@@ -628,7 +628,7 @@ TXFORM=L3002
 #OOPrevIntDateX=繳息迄日
 {width:85,align:'center'}
 
-#OOStoreRate=利率
+#OOStoreRate=目前利率
 {width:60,align:'center'}
 
 #OOCurrencyCode=幣別

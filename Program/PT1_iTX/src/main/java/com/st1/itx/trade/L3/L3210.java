@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,7 +119,9 @@ public class L3210 extends TradeBuffer {
 	private int iTempReasonCode;
 	private int iTempSourceCode;
 	private int iOverRpFacmNo;
+	private int iRpCode = 0; // 還款來源
 	private BigDecimal iTempAmt;
+	private Timestamp iCreateDate;
 	private LoanCheque tLoanCheque;
 	private LoanChequeId tLoanChequeId;
 	private BigDecimal wkTempAmt;
@@ -129,11 +132,6 @@ public class L3210 extends TradeBuffer {
 	private ArrayList<BaTxVo> baTxList;
 	AcDetail acDetail;
 	List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-	private BigDecimal acctFee;
-	private BigDecimal modifyFee;
-	private BigDecimal fireFee;
-	private BigDecimal lawFee;
-	private BigDecimal closeBreachAmt;
 	private boolean isRepaidFee;
 	private int repayFacmNo;
 
@@ -151,11 +149,6 @@ public class L3210 extends TradeBuffer {
 		this.wkTempAmt = BigDecimal.ZERO;
 		this.tTempVo = new TempVo();
 		this.lAcDetail = new ArrayList<AcDetail>();
-		this.acctFee = BigDecimal.ZERO;
-		this.modifyFee = BigDecimal.ZERO;
-		this.fireFee = BigDecimal.ZERO;
-		this.lawFee = BigDecimal.ZERO;
-		this.closeBreachAmt = BigDecimal.ZERO;
 		this.isRepaidFee = false;
 		this.repayFacmNo = 0;
 	}
@@ -179,12 +172,17 @@ public class L3210 extends TradeBuffer {
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		if (titaVo.get("RpCode1") != null) {
+			iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
+		}
 		if (iFacmNo > 0) {
 			this.repayFacmNo = iFacmNo;
 		}
 		if (iFacmNo == 0 && titaVo.isTrmtypBatch()) {
 			iFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
 		}
+
+		iCreateDate = parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime());
 
 		titaVo.setTxAmt(iTempAmt);
 		// 費用抵繳是否抵繳(整批入帳)
@@ -475,21 +473,11 @@ public class L3210 extends TradeBuffer {
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					lAcDetail.add(acDetail);
-					switch (ba.getRepayType()) {
-					case 4: // 04-帳管費
-						this.acctFee = this.acctFee.add(ba.getAcctAmt());
-						break;
-					case 5: // 05-火險費
-						this.fireFee = this.fireFee.add(ba.getAcctAmt());
-						break;
-					case 6: // 06-契變手續費
-						this.modifyFee = this.modifyFee.add(ba.getAcctAmt());
-						break;
-					case 7: // 07-法務費
-						this.lawFee = this.lawFee.add(ba.getAcctAmt());
-						break;
-					case 9: // 09-其他(清償違約金)
-						this.closeBreachAmt = this.closeBreachAmt.add(ba.getCloseBreachAmt());// 未收清償違約金
+					// 計算本筆暫收金額
+					// 新增放款交易內容檔(收回費用)
+					if (ba.getRepayType() >= 4) {
+						loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, BigDecimal.ZERO, ba.getAcctAmt(),
+								iCreateDate, titaVo);
 					}
 				}
 			}
@@ -514,8 +502,7 @@ public class L3210 extends TradeBuffer {
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTxAmt(iTempAmt);
-		tLoanBorTx.setTempAmt(wkTempAmt);
-		tLoanBorTx.setCloseBreachAmt(this.closeBreachAmt);
+		tLoanBorTx.setTempAmt(iTempAmt);
 
 		// 其他欄位
 		tTempVo.clear();
@@ -530,27 +517,15 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 		}
-		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("AcctFee", this.acctFee);
-		}
-		if (this.modifyFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("ModifyFee", this.modifyFee);
-		}
-		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("FireFee", this.fireFee);
-		}
-		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("LawFee", this.lawFee);
-		}
 		// 新增摘要
-
 		CdCode cdCode = cdCodeService.getItemFirst(3, "TempReasonCode", titaVo.getParam("TempReasonCode"), titaVo);
-
 		if (cdCode != null) {
 			tTempVo.putParam("Note", cdCode.getItem());
 		}
-
+		
+		tTempVo.putParam("CreateDate", iCreateDate.toString()); 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+		
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {

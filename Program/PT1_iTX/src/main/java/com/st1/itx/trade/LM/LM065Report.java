@@ -32,7 +32,7 @@ public class LM065Report extends MakeReport {
 	public void printTitle() {
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo,int yearMonth) throws LogicException {
 
 		this.info("LM065Report exec");
 
@@ -40,9 +40,9 @@ public class LM065Report extends MakeReport {
 		// 年月日
 //		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iYear = yearMonth / 100;
 		// 月
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+		int iMonth = yearMonth % 100;
 
 		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
@@ -74,7 +74,7 @@ public class LM065Report extends MakeReport {
 
 		try {
 
-			fnAllList = lm065ServiceImpl.findAll(titaVo);
+			fnAllList = lm065ServiceImpl.findAll(titaVo,yearMonth);
 
 		} catch (Exception e) {
 

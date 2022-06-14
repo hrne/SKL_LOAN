@@ -95,6 +95,7 @@ public class L3R06 extends TradeBuffer {
 	private BigDecimal oRepayAmt = BigDecimal.ZERO;
 	private BigDecimal oTotalFee = BigDecimal.ZERO;
 	private int oRpFacmNo = 0;
+	private int oShortFacmNo = 0;
 	private BigDecimal oCloseBreachAmtUnpaid = BigDecimal.ZERO;
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
@@ -162,6 +163,7 @@ public class L3R06 extends TradeBuffer {
 		this.totaVo.putParam("L3r06RepayAmt", oRepayAmt);
 		this.totaVo.putParam("L3r06TotalFee", oTotalFee);
 		this.totaVo.putParam("L3r06RpFacmNo", oRpFacmNo);
+		this.totaVo.putParam("L3r06ShortFacmNo", oShortFacmNo);
 		this.totaVo.putParam("L3r06CloseBreachAmtUnpaid", oCloseBreachAmtUnpaid);
 		this.totaVo.putParam("L3r06PayMethodFg", payMethodFg);
 
@@ -327,7 +329,10 @@ public class L3R06 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-				oRpFacmNo = ln.getFacmNo();
+				if(oRpFacmNo==0) {
+					oRpFacmNo = ln.getFacmNo();
+				}
+				oShortFacmNo = ln.getFacmNo();
 				wkTotaCount++;
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
