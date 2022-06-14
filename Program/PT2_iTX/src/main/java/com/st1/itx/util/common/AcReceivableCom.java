@@ -264,8 +264,12 @@ public class AcReceivableCom extends TradeBuffer {
 				tAcReceivableId.setFacmNo(rv.getFacmNo());
 				tAcReceivableId.setRvNo(rv.getRvNo());
 				tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+				if (tAcReceivable == null && rv.getReceivableFlag() == 4 && rv.getRvNo().length() > 3) {
+					tAcReceivableId.setRvNo(rv.getRvNo().substring(0, 3));
+					tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+				}
 				if (tAcReceivable == null) {
-					throw new LogicException(titaVo, "E6003", "AcReceivable.mnt notfound " + tAcReceivableId);
+						throw new LogicException(titaVo, "E6003", "AcReceivable.mnt notfound " + tAcReceivableId);
 				}
 				if (tAcReceivable.getRvBal().compareTo(tAcReceivable.getRvAmt()) != 0) {
 					throw new LogicException(titaVo, "E6003", "已入帳資料不可修改、刪除" + tAcReceivableId);

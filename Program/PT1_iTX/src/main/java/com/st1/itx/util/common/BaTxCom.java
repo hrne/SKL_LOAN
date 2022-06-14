@@ -1960,14 +1960,14 @@ public class BaTxCom extends TradeBuffer {
 								// 本金
 								if ("Z".equals(rv.getAcctCode().substring(0, 1))) {
 									baTxVo.setPrincipal(rv.getRvBal());
-									baTxVo.setBormNo(parse.stringToInteger(rv.getRvNo())); // 短繳期金有撥款序號
+									baTxVo.setBormNo(parse.stringToInteger(rv.getRvNo().substring(0, 3))); // 短繳期金有撥款序號
 									this.shortfall = this.shortfall.add(rv.getRvBal());
 									this.shortfallPrincipal = this.shortfallPrincipal.add(rv.getRvBal());
 								}
 								// 利息
 								if ("I".equals(rv.getAcctCode().substring(0, 1))) {
 									baTxVo.setInterest(rv.getRvBal());
-									baTxVo.setBormNo(parse.stringToInteger(rv.getRvNo())); // 短繳利息有撥款序號
+									baTxVo.setBormNo(parse.stringToInteger(rv.getRvNo().substring(0, 3))); // 短繳期金有撥款序號
 									this.shortfall = this.shortfall.add(rv.getRvBal());
 									this.shortfallInterest = this.shortfallInterest.add(rv.getRvBal());
 								}
