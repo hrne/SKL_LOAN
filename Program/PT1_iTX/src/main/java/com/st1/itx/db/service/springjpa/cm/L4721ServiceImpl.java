@@ -167,7 +167,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,X.\"Interest\"                                        "; // F6:繳息金額
 		sql += "       ,X.\"BreachAmt\" + \"DelayInt\"                       AS \"BreachAmt\"  "; // F7:違約金+延滯息
 		sql += "       ,X.\"FEE1\" + X.\"FEE2\" + X.\"FEE3\" + X.\"FEE4\"    AS \"OtherFee\"   "; // F8:火險費或其他費用
-		sql += "       ,CASE WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\"";
+		sql += "       ,CASE WHEN BR.\"TxEffectDate\" = 0 THEN 0 WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\"";
 		sql += "       ,NVL(BR.\"PresentRate\",0)                            AS \"PresentRate\"";
 		sql += "       ,NVL(BR.\"AdjustedRate\",0)                           AS \"AdjustedRate\"";
 		sql += "       ,X.\"AcDate\"                      ";

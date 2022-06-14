@@ -76,14 +76,21 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " SELECT																	";
-		sql += "      ln.*																	,	";
+
+		sql += "      ln3.*																	,	";
 		sql += "      cd.\"Item\"																";
+		sql += "      ln2.\"SumTxAmt\"																";
+
+		sql += "  FROM							(												";
+		sql += " SELECT																	";
+		sql += "      ln.\"CustNo\"																	,	";
+		sql += "      ln.\"AcDate\"																	,	";
+		sql += "      ln.\"TitaKinBr\"																	,	";
+		sql += "      ln.\"TitaTlrNo\"																	,	";
+		sql += "      ln.\"TitaTxtNo\"																	,	";
+		sql += "      SUM.\"TxAmt\"							as \"SumTxAmt\"						";
 		sql += "  FROM																			";
 		sql += "      \"LoanBorTx\"	ln															";
-
-		sql += "     left join \"CdCode\" cd  													";
-		sql += "     on ln.\"RepayCode\" = cd.\"Code\"   										";
-		sql += "     AND cd.\"DefCode\" = 'RepayCode'   										";
 
 		if (iAcDate == 0) {
 			sql += "      WHERE ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 				";
@@ -100,10 +107,22 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTitaHCode == 0) {
 			sql += "      AND ln.\"TitaHCode\" = '0'											";
 		}
+		sql += "      GROUP BY	 ln.\"CustNo\" , ln\"AcDate\" , ln\"TitaKinBr\" ,ln\"TitaTlrNo\" ,ln\"TitaTxtNo\" ,		";
+		sql += "     ) 			ln2										";
+		sql += "     left join \"LoanBorTx\" ln3  													";
+		sql += "     on ln2.\"CustNo\" = ln3.\"CustNo\"   										";
+		sql += "     on ln2.\"AcDate\" = ln3.\"AcDate\"   										";
+		sql += "     on ln2.\"TitaKinBr\" = ln3.\"TitaKinBr\"   										";
+		sql += "     on ln2.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   										";
+		sql += "     on ln2.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   										";
 
-		sql += "      ORDER BY ln.\"AcDate\" asc, ";
-		sql += " NVL(JSON_VALUE(ln.\"OtherFields\",'$.CreateDate'),ln.\"CreateDate\")  asc, ln.\"Displayflag\" asc ,";
-		sql += "CASE WHEN ln.\"TxAmt\" > 0  THEN 1 ELSE 0 END DESC ";
+		sql += "     left join \"CdCode\" cd  													";
+		sql += "     on ln3.\"RepayCode\" = cd.\"Code\"   										";
+		sql += "     AND cd.\"DefCode\" = 'RepayCode'   										";
+
+		sql += "      ORDER BY ln3.\"AcDate\" asc, ";
+		sql += " NVL(JSON_VALUE(ln3.\"OtherFields\",'$.CreateDate'),ln3.\"CreateDate\")  asc, ln3.\"Displayflag\" asc ,";
+		sql += "CASE WHEN ln2.\"SumTxAmt\" > 0  THEN 1 ELSE 0 END DESC ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);

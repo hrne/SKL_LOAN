@@ -180,6 +180,8 @@ public class L4721Report extends MakeReport {
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4721", "放款本息對帳單暨繳息通知單", "密", "8.5,12", "P");
 
+		
+		Boolean Firstfg = false;
 		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 
 			List<Map<String, String>> listL4721Temp = new ArrayList<Map<String, String>>();
@@ -197,6 +199,12 @@ public class L4721Report extends MakeReport {
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
+			if(!Firstfg) { // 第一筆戶號不先換頁
+				Firstfg = true;
+			} else {
+				this.newPage();
+			}
+			
 			// 檢查 CustNotice 確認這份表是否能出
 			// 跳過 測試用
 //			if (!custNoticeCom.checkIsLetterSendable(null, custNo, facmNo, "L4721", titaVo))
@@ -225,7 +233,7 @@ public class L4721Report extends MakeReport {
 				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
 
 				// 先更新表頭資料
-				setHead(mapL4721Head, custNo, facmNo, parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
+				setHead(mapL4721Head, custNo, parse.stringToInteger(mapL4721Head.get("FacmNo")), parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 
 				print(1, 1, "　");
 
@@ -296,14 +304,14 @@ public class L4721Report extends MakeReport {
 
 				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
-					if (!sameFlg) { // 所有額度都同一天 印同一張
+					if (!sameFlg) { // 額度不同天 印不同張
 
-						if (tempfacmno != parse.stringToInteger((mapL4721Detail.get("FacmNo"))) && txeffectdate != 0) {
+						if (tempfacmno != parse.stringToInteger(mapL4721Detail.get("FacmNo")) && txeffectdate != 0) {
 
 							this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
 
 							// 額度號碼
-							print(0, 6, FormatUtil.pad9("" + facmNo, 3));
+							print(0, 6, FormatUtil.pad9("" + tempfacmno, 3));
 
 							// 利率變動日
 							String rateChangeDate = showRocDate(txeffectdate, 0);
@@ -317,10 +325,10 @@ public class L4721Report extends MakeReport {
 							String newRate = formatAmt(adjustedrate, 2) + "%";
 							print(0, 55, newRate, "R");
 
+							this.newPage();
 //					// 先更新表頭資料
 							setHead(mapL4721Detail, custNo, parse.stringToInteger(mapL4721Detail.get("FacmNo")),
 									parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
-							this.newPage();
 						}
 					} // if
 					print(1, 1, "　");
