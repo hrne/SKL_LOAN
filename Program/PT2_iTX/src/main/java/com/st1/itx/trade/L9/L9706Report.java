@@ -104,7 +104,7 @@ public class L9706Report extends MakeReport {
 
 		int cnt = 0;
 
-		iENTDAY = tranDate(titaVo.getParam("ENTDY"));
+		iENTDAY = tranDate(titaVo.getCalDy());
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9706", "貸款餘額證明書", "普通", "A4", "P");
 		this.setFontSize(standardFontSize);
@@ -249,19 +249,13 @@ public class L9706Report extends MakeReport {
 //		int facmNo = parse.stringToInteger(tL9706Vo.get("FacmNo"));
 		// 輸出第三段：所有地址
 		Slice<ClFac> slClFac = clFacService.approveNoEq(applNo, 0, Integer.MAX_VALUE, titaVo);
+		this.info("slClFac=" + slClFac.toString());
 //		Slice<ClFac> slClFac = clFacService.findRange(applNo,applNo,facmNo,facmNo, 0,Integer.MAX_VALUE, titaVo);
 		List<ClBuilding> addressList = new ArrayList<ClBuilding>();
 		if (slClFac != null) {
-			int tempClCode1 = 0;
-			int tempClCode2 = 0;
-			int tempClNo = 0;
+
 			for (ClFac f : slClFac.getContent()) {
-				if (tempClCode1 == f.getClCode1() && tempClCode2 == f.getClCode2() && tempClNo == f.getClNo()) {
-					break;
-				}else {
-					tempClCode1 = f.getClCode1();
-					tempClCode2 = f.getClCode2();
-					tempClNo = f.getClNo();
+				if (f.getMainFlag() == "Y") {
 					ClBuilding tClBuilding = clBuildingService
 							.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
 					if (tClBuilding != null) {

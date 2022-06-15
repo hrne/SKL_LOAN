@@ -2139,13 +2139,20 @@ public class L3200 extends TradeBuffer {
 		// 交易還款餘額
 		this.wkTxAmtRemaind = this.wkTxAmtRemaind.subtract(this.wkTxAmt);
 
-		// 暫收抵繳金額(暫收款金額為負值) = 本筆交易金額 - 本筆還款金額
-		if (isFirstLoan && iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
-			this.wkTempAmt = iOverAmt;
-			this.wkTxAmt = this.wkTxAmt.add(iOverAmt);
-			this.wkTxAmtRemaind = this.wkTxAmtRemaind.subtract(iOverAmt);
+		if (iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+			if (isFirstLoan) {
+				this.wkTempAmt = iOverAmt;
+				this.wkTxAmt = this.wkTxAmt.add(iOverAmt);
+				this.wkTxAmtRemaind = this.wkTxAmtRemaind.subtract(iOverAmt);
+			} else {
+				this.wkTempAmt = BigDecimal.ZERO;
+			}
+		} else {
+			this.wkTempAmt = this.wkTxAmt.subtract(wkAcRepay);
+			if (this.wkTempAmt.compareTo(this.wkTmpAmtRemaind) < 0) {
+				this.wkTempAmt = this.wkTmpAmtRemaind;
+			}
 		}
-		this.wkTempAmt = this.wkTxAmt.subtract(wkAcRepay);
 		this.wkTmpAmtRemaind = this.wkTmpAmtRemaind.subtract(this.wkTempAmt); // 暫收款餘額
 		this.info("compTxAmt end AcRepay=" + wkAcRepay + ", TotalRepay=" + this.wkTotalRepay + ", TxAmt=" + this.wkTxAmt
 				+ ", TempAmt=" + this.wkTempAmt + ", TxAmtRemaind=" + this.wkTxAmtRemaind + ", TmpAmtRemaind="

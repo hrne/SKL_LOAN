@@ -782,10 +782,10 @@ public class TxBatchCom extends TradeBuffer {
 		String amt = this.tTempVo.get(item);
 		if (amt == null) {
 			txTitaVo.putParam(itemName, BigDecimal.ZERO);
-			txTitaVo.putParam("Tw" + itemName, BigDecimal.ZERO);
+			txTitaVo.putParam("Tw" + item, BigDecimal.ZERO);
 		} else {
 			txTitaVo.putParam(itemName, amt);
-			txTitaVo.putParam("Tw" + itemName, amt);
+			txTitaVo.putParam("Tw" + item, amt);
 		}
 	}
 

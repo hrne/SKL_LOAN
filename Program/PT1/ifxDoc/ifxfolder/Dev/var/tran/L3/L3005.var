@@ -519,7 +519,7 @@ T(2,#OORelNo)
 T(6A,#Entdy+#TxNo)
 !訂正按鈕
 #BTN=X,1,S
-IF(#OOAcFg=="",BIND(grid,cancel),C(5,#OOTxCd,L3100,BIND(grid,cancel),C(3,#OOTitaHCode,0,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))))
+IF(#OOAcFg=="",BIND(grid,cancel),IF(#OOTxCd=="L3100"||#OOTxCd=="L3240"||#OOTxCd=="L3250",BIND(grid,cancel),C(3,#OOTitaHCode,0,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))))
 C(3,#OOTitaHCode,0,$,$)
 
 
@@ -628,9 +628,6 @@ TXFORM=L3005
 
 #OOBTN1=內容查詢
 {width:70,search:false,formatter:'cust:bind-button:內容查詢;L3912 交易內容查詢',align:'center',canExport:false}
-#BTN=訂正
-{width:40,search:false,formatter:'cust:bind-button:訂正',canExport:false,align:'center'}
-
 
 ! #OOBTN2=
 ! {width:60,search:false,formatter:'cust:bind-button:備忘錄;L2072 顧客控管警訊明細資料查詢',align:'center',canExport:false}
@@ -649,6 +646,9 @@ TXFORM=L3005
 
 #OOTitaHCodeX=訂正別
 {width:70,align:'center'}
+
+#BTN=訂正
+{width:40,search:false,formatter:'cust:bind-button:訂正',canExport:false,align:'center'}
 
 #OOCurrencyCode=幣別 
 {width:50,align:'center'}

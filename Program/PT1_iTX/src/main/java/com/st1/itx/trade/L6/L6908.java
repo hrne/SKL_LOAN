@@ -12,6 +12,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
@@ -58,7 +59,7 @@ public class L6908 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 316 * 100 = 31,600
+		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
 
 		List<Map<String, String>> L6908List = null;
 
@@ -76,10 +77,6 @@ public class L6908 extends TradeBuffer {
 		if (L6908List != null) {
 
 			for (Map<String, String> t : L6908List) {
-
-				if("AcReceivable".equals(t.get("DB")) && "0".equals(t.get("RvAmt"))) {
-					continue;
-				}
 				OccursList occursList = new OccursList();
 				occursList.putParam("OORvNo", t.get("RvNo"));
 				occursList.putParam("OORvAmt", t.get("RvAmt"));
@@ -90,15 +87,20 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOSlipNote", t.get("SlipNote"));
 				int acdate = parse.stringToInteger(t.get("AcDate"));
 				int entrydate = parse.stringToInteger(t.get("EntryDate"));
+				int txtNo = parse.stringToInteger(t.get("TitaTxtNo"));
+				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(acdate, t.get("TitaTlrNo"),
+						parse.IntegerToString(txtNo, 8), titaVo);
+				if (tLoanBorTx != null) {
+					entrydate = tLoanBorTx.getEntryDate();
+				}
+				if (acdate >= 19110000) {
+					acdate = acdate - 19110000;
+				}
 
-				if(acdate >= 19110000) {
-					acdate = acdate -19110000;
+				if (entrydate >= 19110000) {
+					entrydate = entrydate - 19110000;
 				}
-				
-				if(entrydate >= 19110000) {
-					entrydate = entrydate -19110000;
-				}
-				
+
 				occursList.putParam("OOAcDate", acdate);
 				occursList.putParam("OOClsFlag", t.get("ClsFlag"));
 				occursList.putParam("OOEntryDate", entrydate);

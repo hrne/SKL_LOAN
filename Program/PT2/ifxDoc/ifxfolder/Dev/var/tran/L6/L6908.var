@@ -93,7 +93,7 @@ T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6907未銷帳餘額明細查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
-#NTXBUF=X,92,S
+#NTXBUF=x,92,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_AcBookCode=X,3,S
@@ -126,7 +126,7 @@ T(1,#NTXBUF,39,3)
 !#CHAIN_BormNo=X,3,S
 !T(1,#NTXBUF,42,3)
 
-#CHAIN_RvNo=X,30,S
+#CHAIN_RvNo=x,30,S
 T(1,#NTXBUF,45,30)
 
 #CHAIN_AcDateSt=D,7,S
@@ -266,7 +266,7 @@ T(H,#AcctCode,#AcctCodeHelp)
 
 
 ! 銷帳編號
-#RvNo=X,30,L
+#RvNo=x,30,L
 C(3,#CHAIN,1,s,$)
 
 

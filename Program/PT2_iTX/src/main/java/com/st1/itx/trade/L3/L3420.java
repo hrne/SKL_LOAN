@@ -731,7 +731,7 @@ public class L3420 extends TradeBuffer {
 			// 結案金額帳務處理
 			AcDetailCloseRoutine();
 			// 計算本筆交易金額
-			compTxAmt(isFirstBorm);
+			compTxAmt(isFirstBorm, false);
 			// 新增放款交易內容檔
 			AddLoanBorTx0Routine();
 			// 業績處理
@@ -1862,7 +1862,7 @@ public class L3420 extends TradeBuffer {
 
 						// 新增放款交易內容檔(收回費用)
 						if (ba.getRepayType() >= 4) {
-							compTxAmt(false);// 計算本筆交易金額
+							compTxAmt(false, true);// 計算本筆交易金額
 							loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, wkTxAmt, wkTempAmt, iCreateDate,
 									titaVo);
 						}
@@ -2047,17 +2047,27 @@ public class L3420 extends TradeBuffer {
 	}
 
 	// 計算本筆交易金額
-	private void compTxAmt(boolean isFirstLoan) throws LogicException {
+	private void compTxAmt(boolean isFirstLoan, boolean isFee) throws LogicException {
 		this.info("compTxAmt ... TotalRepay=" + this.wkTotalRepay + ", TxAmtRemaind=" + this.wkTxAmtRemaind
 				+ ", TmpAmtRemaind=" + this.wkTmpAmtRemaind);
 		// 還款總金額
 		BigDecimal wkAcTotal = this.wkShortfallPrincipal.add(this.wkShortfallInterest).add(this.wkShortCloseBreach);
 		BigDecimal wkAcRepay = BigDecimal.ZERO;
-		for (AcDetail ac : lAcDetail) {
-			if ("C".equals(ac.getDbCr())) {
-				wkAcTotal = wkAcTotal.add(ac.getTxAmt());
-			} else {
-				wkAcTotal = wkAcTotal.subtract((ac.getTxAmt()));
+		if (isFee) {
+			for (AcDetail ac : lAcDetailFee) {
+				if ("C".equals(ac.getDbCr())) {
+					wkAcTotal = wkAcTotal.add(ac.getTxAmt());
+				} else {
+					wkAcTotal = wkAcTotal.subtract((ac.getTxAmt()));
+				}
+			}
+		} else {
+			for (AcDetail ac : lAcDetail) {
+				if ("C".equals(ac.getDbCr())) {
+					wkAcTotal = wkAcTotal.add(ac.getTxAmt());
+				} else {
+					wkAcTotal = wkAcTotal.subtract((ac.getTxAmt()));
+				}
 			}
 		}
 		// 累計還款總金額

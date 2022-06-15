@@ -127,7 +127,7 @@ public class AcReceivableCom extends TradeBuffer {
 			if ((ac.getAcctFlag() == 1 && !"L6801".equals(titaVo.getTxcd()))
 					|| (ac.getReceivableFlag() > 0 && ac.getReceivableFlag() < 8)) {
 				// 銷帳記號 0-起帳 1-銷帳
-				// 1.ReceivableFlag >= 3 銷帳
+				// 1.ReceivableFlag >= 3 貸方銷帳
 				// 2.借方科目借方 ("1", "5","6","9") or 貸方科目貸方 -> 0-起帳, else 1-銷帳
 				// 3.TRO借新還舊->相反(貸方科目，先借後貸)
 				if (ac.getReceivableFlag() >= 3) {
@@ -269,7 +269,7 @@ public class AcReceivableCom extends TradeBuffer {
 					tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
 				}
 				if (tAcReceivable == null) {
-						throw new LogicException(titaVo, "E6003", "AcReceivable.mnt notfound " + tAcReceivableId);
+					throw new LogicException(titaVo, "E6003", "AcReceivable.mnt notfound " + tAcReceivableId);
 				}
 				if (tAcReceivable.getRvBal().compareTo(tAcReceivable.getRvAmt()) != 0) {
 					throw new LogicException(titaVo, "E6003", "已入帳資料不可修改、刪除" + tAcReceivableId);
@@ -477,6 +477,10 @@ public class AcReceivableCom extends TradeBuffer {
 		tAcReceivableId.setFacmNo(ac.getFacmNo());
 		tAcReceivableId.setRvNo(wkRvNo);
 		tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+		if (tAcReceivable == null && ac.getReceivableFlag() == 4 && ac.getRvNo().length() > 3 && wkRvFg > 0) {
+			tAcReceivableId.setRvNo(ac.getRvNo().substring(0, 3));
+			tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+		}
 		if (tAcReceivable == null) {
 			// 0-起帳
 			if (wkRvFg == 0) {

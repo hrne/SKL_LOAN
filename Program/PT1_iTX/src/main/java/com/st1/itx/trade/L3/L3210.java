@@ -476,7 +476,7 @@ public class L3210 extends TradeBuffer {
 					// 計算本筆暫收金額
 					// 新增放款交易內容檔(收回費用)
 					if (ba.getRepayType() >= 4) {
-						loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, BigDecimal.ZERO, ba.getAcctAmt(),
+						loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, BigDecimal.ZERO, BigDecimal.ZERO.subtract(ba.getAcctAmt()),
 								iCreateDate, titaVo);
 					}
 				}
@@ -523,7 +523,6 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("Note", cdCode.getItem());
 		}
 		
-		tTempVo.putParam("CreateDate", iCreateDate.toString()); 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		
 		try {

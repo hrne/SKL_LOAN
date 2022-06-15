@@ -315,7 +315,7 @@ T(2,#OOCustNo+-+#OOFacmNo)
 T(2,#OOAcctCode+ +#OOAcctItem)
 
 ! 銷帳編號
-#OORvNo=X,30,L
+#OORvNo=x,30,L
 ! 起帳日期
 #OOOpenAcDate=D,7,L
 
@@ -354,7 +354,7 @@ X(#OO_SUM1)
 
 
 !明細
-#OOBUF5=X,92,S
+#OOBUF5=x,92,S
 T(2,#AcBookCode+#OOAcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate+#OOAcctCode)
 
 #OOBTN5=X,1,S

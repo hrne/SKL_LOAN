@@ -21,12 +21,13 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.CustMain;
-
+import com.st1.itx.db.domain.JcicZ048;
 /*DB服務*/
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.db.service.springjpa.cm.L5075ServiceImpl;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.JcicZ048Service;
 import com.st1.itx.util.common.NegCom;
 
 /* 交易共用組件 */
@@ -63,6 +64,9 @@ public class L5075 extends TradeBuffer {
 	public CustMainService sCustMainService;
 
 	@Autowired
+	public JcicZ048Service sJcicZ048Service;
+
+	@Autowired
 	public NegCom sNegCom;
 
 	@Autowired
@@ -89,7 +93,7 @@ public class L5075 extends TradeBuffer {
 		this.limit = 100;// 查全部
 
 //		String IsMainFin=titaVo.getParam("IsMainFin").trim(); //是否為最大債權 1:Y;2:N
-//		String WorkSubject=titaVo.getParam("WorkSubject").trim(); //作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
+		String WorkSubject=titaVo.getParam("WorkSubject").trim(); //作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
 		String NextPayDate = titaVo.getParam("NextPayDate").trim(); // 1:滯繳- 逾期基準日;2:應繳-下次應繳日
 //		String CustId=titaVo.getParam("CustId").trim(); //員工編號
 
@@ -142,6 +146,16 @@ public class L5075 extends TradeBuffer {
 				} else {
 					occursList.putParam("OODeferYMStart", NegMainVO.getDeferYMStart());// 延期年月(起)
 					occursList.putParam("OODeferYMEnd", NegMainVO.getDeferYMEnd());// 延期年月(訖)
+				}
+
+				occursList.putParam("OOCustComAddr", "");// 債務人通訊地址
+				if ("1".equals(WorkSubject)) {// 滯繳才需帶出聯徵通訊地址
+					int rcdate = NegMainVO.getApplDate() + 19110000;
+					JcicZ048 tJcicZ048 = sJcicZ048Service.forL5075First(ThisCustId, rcdate, titaVo);
+
+					if (tJcicZ048 != null) {
+						occursList.putParam("OOCustComAddr", tJcicZ048.getCustComAddr());// 債務人通訊地址
+					}
 				}
 				occursList.putParam("OOAcDate", NegTransAcDate);// 會計日期
 				occursList.putParam("OOTitaTlrNo", NegTransTitaTlrNo);// 經辦

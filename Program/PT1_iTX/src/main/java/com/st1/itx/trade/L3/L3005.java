@@ -180,12 +180,14 @@ public class L3005 extends TradeBuffer {
 				newRelNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
+				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
 				BigDecimal wkTempAmt = BigDecimal.ZERO;
 				BigDecimal wkShortfall = BigDecimal.ZERO;
-				BigDecimal wkTotTxAmt = BigDecimal.ZERO;
-
+				String txMsg = "";
 				if (!relNo.equals(newRelNo)) {
-					wkTotTxAmt = parse.stringToBigDecimal(tTempVo.getParam("TxAmt"));
+					if ("2".equals(result.get("TitaCrDb")) && totTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+						txMsg = repayCodeX + " " + df.format(totTxAmt); // 金額+還款類別
+					}
 				}
 				if ((titaHCode.equals("0") || titaHCode.equals("3") || titaHCode.equals("4"))
 						&& (displayflag.equals("A") || displayflag.equals("F"))) {
@@ -206,14 +208,20 @@ public class L3005 extends TradeBuffer {
 					wkCurrencyCode = titaCurCd;
 				}
 				this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-				wkShortfall = unpaidAmt;
+
 				// 暫收款金額為負時，為暫收抵繳
-				if (tempAmt.compareTo(BigDecimal.ZERO) < 0) {
+				if (tempAmt.compareTo(BigDecimal.ZERO) <= 0) {
 					wkTempAmt = BigDecimal.ZERO.subtract(tempAmt);
 				} else {
 					wkTempAmt = BigDecimal.ZERO;
-					wkShortfall = tempAmt;
 				}
+				// 溢短繳
+				if (tempAmt.compareTo(BigDecimal.ZERO) > 0) {
+					wkShortfall = tempAmt;
+				} else {
+					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);
+				}
+
 				relNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);
@@ -243,16 +251,12 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OORate", rate);
 				occursList.putParam("OOTitaHCode", titaHCode);
 				occursList.putParam("OOAcFg", AcFg); // 分錄清單Fg
-				if ("L3220".equals(titaTxCd) || wkTotTxAmt.compareTo(BigDecimal.ZERO) == 0) {
-					occursList.putParam("OOTxMsg", ""); // 金額+還款類別
-				} else {
-					occursList.putParam("OOTxMsg", repayCodeX + " " + df.format(wkTotTxAmt)); // 金額+還款類別
-				}
 				occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
 				occursList.putParam("OOTxCd", titaTxCd); // 交易代號
 				// 新增摘要 跟費用明細
+				occursList.putParam("OOTxMsg", txMsg); // 金額+還款類別
 				occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
-				occursList.putParam("OOTotTxAmt", wkTotTxAmt); // 交易總金額
+				occursList.putParam("OOTotTxAmt", totTxAmt); // 交易總金額
 
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
