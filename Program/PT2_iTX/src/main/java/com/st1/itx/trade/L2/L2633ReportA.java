@@ -200,37 +200,7 @@ public class L2633ReportA extends MakeReport {
 		if (resultList != null && resultList.size() != 0) {
 
 			this.info("Size =" + resultList.size());
-			List<Map<String, String>> resultLista = resultList;
-			resultLista.sort((c1, c2) -> {
-				int result = 0;
-//				1.不領 20.不能領在後排序
-				this.info("c1 = " + c1);
-				this.info("c2 = " + c2);
-				try {
-					this.info("c1 CollectWayCode = " + parse.stringToInteger(c1.get("CollectWayCode")));
-					this.info("c2 CollectWayCode = " + parse.stringToInteger(c2.get("CollectWayCode")));
-					if (parse.stringToInteger(c1.get("CollectWayCode")) != parse
-							.stringToInteger(c2.get("CollectWayCode"))) {
-						if (parse.stringToInteger(c1.get("CollectWayCode")) == 20
-								|| parse.stringToInteger(c1.get("CollectWayCode")) == 1) {
-							result = 1;
-						} else if (parse.stringToInteger(c2.get("CollectWayCode")) == 20
-								|| parse.stringToInteger(c2.get("CollectWayCode")) == 1) {
-							result = -1;
-						} else {
-							result = parse.stringToInteger(c1.get("CollectWayCode"))
-									- parse.stringToInteger(c2.get("CollectWayCode"));
-						}
-					} else {
-						result = 0;
-					}
 
-				} catch (LogicException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return result;
-			});
 			this.open(titaVo, titaVo.getEntDyI(), brno, reportCode, reportItem, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
 			this.setFont(1, 10);

@@ -71,7 +71,10 @@ public class L2633ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "AND f.\"EntryDate\"= " + iEntryDate;
 		sql += " AND f.\"FunCode\" in ( '1','0')							";
 
-		sql += "order by f.\"CustNo\" ASC,f.\"FacmNo\"					";
+		sql += "order by ";
+
+		sql += "         CASE WHEN f.\"CollectWayCode\" IN (1,20)  THEN 0 ELSE 1 END DESC ,";
+		sql += "f.\"CustNo\" ASC,f.\"FacmNo\"					";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -130,7 +133,10 @@ public class L2633ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "AND f.\"ApplDate\"= " + iApplDate;
 		sql += " AND f.\"FunCode\" in ( '2','3')							";
 
-		sql += "order by f.\"CustNo\" ASC,f.\"FacmNo\"					";
+		sql += "order by ";
+
+		sql += "         CASE WHEN f.\"CollectWayCode\" IN (1,20)  THEN 0 ELSE 1 END DESC ,";
+		sql += "f.\"CustNo\" ASC,f.\"FacmNo\"					";
 
 		this.info("sql=" + sql);
 		Query query;

@@ -15,7 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L3005ServiceImpl")
@@ -75,40 +74,62 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 			wkBormNoEnd = iBormNo;
 		}
 
-		String sql = " SELECT																	";
-		sql += "      ln.*																	,	";
-		sql += "      cd.\"Item\"																";
-		sql += "  FROM																			";
+		String sql = "";
+		sql += "  SELECT																	";
+		sql += "   ln3.*          ";
+		sql += "  ,cd.\"Item\"																";
+		sql += "  ,ln2.\"TotTxAmt\"												  ";
+		sql += "  FROM													";
+		sql += "  ( SELECT																	";
+		sql += "      ln.\"CustNo\"				AS	\"CustNo\"										      ";
+		sql += "     ,ln.\"AcDate\"	            AS	\"AcDate\"																 	    ";
+		sql += "     ,ln.\"TitaKinBr\"	        AS	\"TitaKinBr\"																";
+		sql += "     ,ln.\"TitaTlrNo\"	        AS	\"TitaTlrNo\"															  ";
+		sql += "     ,ln.\"TitaTxtNo\"		    AS	\"TitaTxtNo\"														";
+		sql += "     ,MIN(ln.\"TitaCalDy\")     AS 	\"TitaCalDy\"						";
+		sql += "     ,MIN(ln.\"TitaCalTm\")	  	AS	\"TitaCalTm\"               	";
+		sql += "     ,MIN(ln.\"CreateDate\")	AS  \"CreateDate\"					";
+		sql += "     ,SUM(ln.\"TxAmt\")         AS  \"TotTxAmt\"			     	";
+		sql += "    FROM																			";
 		sql += "      \"LoanBorTx\"	ln															";
-
-		sql += "     left join \"CdCode\" cd  													";
-		sql += "     on ln.\"RepayCode\" = cd.\"Code\"   										";
-		sql += "     AND cd.\"DefCode\" = 'RepayCode'   										";
-
+		sql += "    WHERE ln.\"CustNo\" = :CustNo                               				";
 		if (iAcDate == 0) {
-			sql += "      WHERE ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 				";
+			sql += "      AND ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 				";
 		} else {
-			sql += "      WHERE ln.\"AcDate\" BETWEEN :AcDateS AND :DateEnd 					";
+			sql += "      AND ln.\"AcDate\" BETWEEN :AcDateS AND :DateEnd 					";
 		}
-
-		sql += "      AND ln.\"CustNo\" = :CustNo												";
-		sql += "      AND ln.\"FacmNo\" >= :FacmNoS												";
-		sql += "      AND ln.\"FacmNo\" <= :FacmNoE												";
-		sql += "      AND ln.\"BormNo\" >= :BormNoS												";
-		sql += "      AND ln.\"BormNo\" <= :BormNoE												";
 		sql += "      AND ln.\"Displayflag\" IN ('Y','I','A','F')								";
 		if (iTitaHCode == 0) {
 			sql += "      AND ln.\"TitaHCode\" = '0'											";
 		}
-
-		sql += "      ORDER BY ln.\"AcDate\" asc, ";
-		sql += " NVL(JSON_VALUE(ln.\"OtherFields\",'$.CreateDate'),ln.\"CreateDate\")  asc, ln.\"Displayflag\" asc ,";
-		sql += "CASE WHEN ln.\"TxAmt\" > 0  THEN 1 ELSE 0 END DESC ";
+		sql += "      GROUP BY	 ln.\"CustNo\" , ln.\"AcDate\" , ln.\"TitaKinBr\" ,ln.\"TitaTlrNo\" ,ln.\"TitaTxtNo\" 	";
+		sql += "  ) ln2										";
+		sql += " left join \"LoanBorTx\" ln3  											     ";
+		sql += "   ON  ln2.\"CustNo\" = ln3.\"CustNo\"   									 ";
+		sql += "  AND  ln2.\"AcDate\" = ln3.\"AcDate\"   									 ";
+		sql += "  AND  ln2.\"TitaKinBr\" = ln3.\"TitaKinBr\"   								 ";
+		sql += "  AND  ln2.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   								 ";
+		sql += "  AND  ln2.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
+		sql += " left  join \"CdCode\" cd  													 ";
+		sql += "   on  ln3.\"RepayCode\" = cd.\"Code\"   									 ";
+		sql += "  AND cd.\"DefCode\" = 'RepayCode'   									     ";
+		sql += " WHERE ln3.\"FacmNo\" >= :FacmNoS											 ";
+		sql += "  AND  ln3.\"FacmNo\" <= :FacmNoE											 ";
+		sql += "  AND  ln3.\"BormNo\" >= :BormNoS											 ";
+		sql += "  AND  ln3.\"BormNo\" <= :BormNoE											 ";
+		sql += " ORDER BY ln2.\"AcDate\" ASC ";
+		sql += "         ,ln2.\"TitaCalDy\" ASC	                    ";
+		sql += "         ,ln2.\"TitaCalTm\"	ASC                    	";
+		sql += "         ,ln2.\"CreateDate\" ASC                    ";
+		sql += "         ,ln3.\"Displayflag\" ASC                   ";
+		sql += "         ,CASE WHEN ln3.\"TxAmt\" > 0  THEN 1 ELSE 0 END DESC ";
+		sql += "         ,ln3.\"IntStartDate\" ASC                  ";
+		sql += "         ,ln3.\"Rate\" DESC                  ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);
 		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("CustNo", iCustNo);

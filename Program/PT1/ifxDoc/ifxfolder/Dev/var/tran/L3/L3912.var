@@ -429,7 +429,7 @@ E(0,0)T(H,#OCurrencyCode,#CurrPrecisionHelp)
 #OTxAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OTxAmt,#OTxAmtX)
 #OTxAmtXX=X,52,L
-C(5,#ChainAmt,#OTxAmt,T(2,#OTxAmtX),T(B,#ChainAmtX+（本筆：+#OTxAmtX+）))
+C(5,#ChainAmt,#OTxAmt,T(2,#OTxAmtX),T(B,#OTxAmtX+（總金額：+#ChainAmtX+）))
 T(2,@L3200TxAmtX,#OTxAmtXX)
 T(2,@L3410TxAmtX,#OTxAmtXX)
 T(2,@L3440TxAmtX,#OTxAmtXX)
