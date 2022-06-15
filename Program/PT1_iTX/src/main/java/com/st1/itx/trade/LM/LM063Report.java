@@ -3,9 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +37,7 @@ public class LM063Report extends MakeReport {
 		this.info("LM063Report exec");
 		// 取得會計日(同頁面上會計日)
 		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = yearMonth / 100;
 		// 月
@@ -47,8 +45,11 @@ public class LM063Report extends MakeReport {
 		
 		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM063", "02-企金3000萬以上-" + iYearMonth,
-				"LM063_02-企金3000萬以上-" + iYearMonth, "LM063_底稿_企金3000萬以上.xls", "簡表");
+		String txCD = titaVo.getTxcd();
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, "02-企金3000萬以上-" + iYearMonth,
+				txCD+"_02-企金3000萬以上-" + iYearMonth, "LM063_底稿_企金3000萬以上.xls", "簡表");
+
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);

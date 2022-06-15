@@ -180,7 +180,7 @@ public class LM054Report extends MakeReport {
 				mark.add("同一擔保品");
 			}
 
-			for (int i = 0; i <= mark.size(); i++) {
+			for (int i = 0; i < mark.size(); i++) {
 				memo += mark.get(i) + "、";
 			}
 

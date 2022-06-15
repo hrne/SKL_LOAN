@@ -182,6 +182,8 @@ public class L4101 extends TradeBuffer {
 				this.info("batchNo = " + batchNo);
 				this.info("titaVo = " + titaVo.toString());
 				MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
+
+				this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 			}
 		} else {
 
@@ -191,6 +193,8 @@ public class L4101 extends TradeBuffer {
 			this.info("batchNo = " + batchNo);
 			this.info("titaVo = " + titaVo.toString());
 			MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
+
+			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		}
 		totaVo.put("OBatchNo", newBatchNo);
 		this.info("totaB = " + totaB.toString());

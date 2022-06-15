@@ -61,6 +61,7 @@ public class L4101ReportC extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L4101";
 	private String reportItem = "撥款傳票明細表";
+	private String drawdownDate = "";
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
@@ -92,12 +93,15 @@ public class L4101ReportC extends MakeReport {
 			reportItem = "抽退票傳票明細表";
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
+		} else {
+			drawdownDate = "撥款日期：" + this.showRocDate(acDate, 1);
 		}
 		this.print(-2, 85, this.reportItem, "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 2, "來源別：放款服務課");
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 2, "批號：" + titaVo.getBacthNo());
+		this.print(-4, 85, drawdownDate, "C");
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
 
 		// 頁首帳冊別判斷
@@ -116,7 +120,7 @@ public class L4101ReportC extends MakeReport {
 		 */
 
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "傳票號碼　　日期　　科子細目名稱　　　　　　　　　　　　　　　　戶號　　　　　　　　　　　借方金額　　　　貸方金額　　　銀行別　　　　　　　　　　　帳號　　　　　");
+		print(1, 1, "傳票號碼　　日期　　科子細目名稱　　　　　　　　　　　　　　　　戶號　戶名　　　　　　　　借方金額　　　　貸方金額　　　銀行別　　　　　　　　　　　帳號　　　　　");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		print(1, 1, " ");
 	}
@@ -215,7 +219,7 @@ public class L4101ReportC extends MakeReport {
 			// 明細資料第一行
 			print(1, 2, parse.IntegerToString(tAcDetail.getSlipNo(), 6)); // 傳票號碼
 			print(0, 9, this.showRocDate(acDate, 1)); // 會計日期
-			print(0, 19, acNoCode ); // 科子細目
+			print(0, 19, acNoCode); // 科子細目
 			print(0, 64, "" + FormatUtil.pad9("" + tAcDetail.getCustNo(), 7));// 戶號
 			if (c != null) {
 				print(0, 73, FormatUtil.padX("" + c.getCustName(), 20));// 戶名

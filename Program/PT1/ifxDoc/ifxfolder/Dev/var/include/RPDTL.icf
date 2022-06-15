@@ -860,12 +860,17 @@ T(2,@BATCHNO,#RP_BatchNo)
 #RpRemitNm{i}
 #RpType{i}
 ##end
+#END
 #OverRpFg
 #OverRpAmt
 #OverRpFacmNo
 #RP_BatchNo
 #RP_AcDate
-
+##loop {times:5,i:1}
+#RpCodeX{i}
+#RpRemitBankX{i}
+#RpTypeX{i}
+##end
 
 </RPDTL.tim>
 

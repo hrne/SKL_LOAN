@@ -1,0 +1,218 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L9734)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[147,850];printer.width=[20,80];">
+
+[
+["[L9734]                                 覆審報表產製"],
+["#FdYearMonth+資料年月",#YearMonth],
+
+["#grid#,{id:1,expand:false,loop:6,row_height:1,s_cols:[150,50], p_cols:[8,8]}","","",
+[],["",#BtnShell1,#ReportName1],
+],
+]
+
+
+!---------- PREMADE VARIABLES ----------
+! This makes the trades possible to execute on DEV,SIT,UAT
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#Report1=X,30,S
+T(3,A/LM062/個金3000萬以上)
+#Report2=X,30,S
+T(3,B/LM063/企金3000萬以上)
+#Report3=X,30,S
+T(3,C/LM064/個金2000萬以上小於3000萬)
+#Report4=X,30,S
+T(3,D/LM065/個金100萬以上小於2000萬)
+#Report5=X,30,S
+T(3,E/LM066/企金未達3000萬)
+#Report6=X,30,S
+T(3,F/LM067/土地覆審)
+
+##loop{times:6,i:1}
+#ReportCat{i}=X,1,L
+T(1,#Report{i},1,1)
+HIDE(#ReportCat{i})
+
+#ReportCode{i}=X,5,L
+T(1,#Report{i},3,5)
+HIDE(#ReportCode{i})
+
+#ReportName{i}=X,25,L
+T(1,#Report{i},9,25)
+##end
+
+
+! Clearing the SELECT ALL button, for unselecting a single trade
+! 修改這裡的 loop times
+#FuncClearSelectAll=@,1,S
+##loop{times:6,i:1}
+C(5,#tmpTargetCat,{i},T(3,@BtnAllShell{i},　)T(3,@BtnAllShell0,　),$)
+##end
+
+##loop{times:6,i:1}
+
+!---------- BUTTON VISUAL -----------
+
+! BtnShell: Creates visual of button.
+#BtnShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
+
+!---------- BUTTON BINDER -----------
+
+! BtnBind: Bind button to its state machine processor.
+#BtnBind{i}=X,1,S
+BIND(#BtnShell{i},click,{cmd=CALLSEND;DOCODE=Btn{i}FSMP})
+
+!---------- BUTTON STATE MACHINE PROCESSOR -----------
+
+! BtnFSMP: Button Finite-State Machine Processor
+
+! What happens when Button is Clicked?
+! Button State, GoTo, State Visual
+
+! 1, 0, V, also makes its category's Select All go to state 0.
+! 0, 1, empty
+#Btn{i}FSMP=@,1,S
+C(5,#BtnShell{i},V,T(3,@BtnShell{i},　)T(1,@tmpTargetCat,#ReportCat{i},1,1)CALL(#FuncClearSelectAll),T(3,@BtnShell{i},V))
+
+##end
+
+#tmpGrd=x,3,S
+T(3,grd)
+
+#tmpGrdId=x,4,S
+
+! Expand (show all in category)
+! Trade grid id = Category * 2
+#FuncExpandCat=@,1,S
+E(0,@tmpTargetCat,#tmpTargetCat*2)
+T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
+INVOKEJS(SHOW,#tmpGrdId,1)
+
+! Fold (hide all in category)
+#FuncFoldCat=@,1,S
+E(0,@tmpTargetCat,#tmpTargetCat*2)
+T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
+INVOKEJS(SHOW,#tmpGrdId,0)
+
+#DATE=D,8,S
+T(4,DATE$)
+
+#FdYearMonth=X,1,L
+T(2,*)
+
+#YearMonth=A,5,I
+T(1,@YearMonth,#DATE,2,5)
+
+#tmpTargetCat=X,1,S
+
+#tmpLineCounter=N,3,S
+
+! 總項目數 
+#TotalItem=N,3,S
+E(0,6)
+
+
+! Select All in a category
+
+! 修改這裡的 loop times
+#FuncSelectCat=@,1,S
+##loop{times:6,k:1}
+C(5,#ReportCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
+##end
+
+! Unselect All in a category
+
+! 修改這裡的 loop times
+#FuncUnselectCat=@,1,S
+##loop{times:6,i:1}
+C(5,#ReportCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
+##end
+
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L9734 ----------
+<sub type="FORM" name="L9734">
+
+</sub>
+
+
+!------ 上行電文 ------
+! 修改這裡的 loop times
+<sub type="TIM">
+#TotalItem
+#YearMonth
+##loop{times:6,i:1}
+#BtnShell{i}
+#ReportCat{i}
+#ReportCode{i}
+#ReportName{i}
+##end
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L9734^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L9734" layout="cols=3;screen.width=[130,800];printer.width=[15,80];order=1">
+[
+["[L9734]                                覆審報表產製"], 
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

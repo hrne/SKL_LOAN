@@ -126,7 +126,8 @@ public class L4101 extends TradeBuffer {
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
@@ -181,6 +182,8 @@ public class L4101 extends TradeBuffer {
 				this.info("batchNo = " + batchNo);
 				this.info("titaVo = " + titaVo.toString());
 				MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
+
+				this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 			}
 		} else {
 
@@ -190,6 +193,8 @@ public class L4101 extends TradeBuffer {
 			this.info("batchNo = " + batchNo);
 			this.info("titaVo = " + titaVo.toString());
 			MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
+
+			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		}
 		totaVo.put("OBatchNo", newBatchNo);
 		this.info("totaB = " + totaB.toString());

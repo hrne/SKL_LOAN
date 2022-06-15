@@ -3,9 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +38,7 @@ public class LM064Report extends MakeReport {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = yearMonth / 100;
 		// 月
@@ -50,9 +48,11 @@ public class LM064Report extends MakeReport {
 		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
 		this.info("yymm=" + iYearMonth);
+		
+		String txCD = titaVo.getTxcd();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM064", "03-個金2000萬以上小於3000萬-" + iYearMonth,
-				"LM064_03-個金2000萬以上小於3000萬-" + iYearMonth, "LM064_底稿_個金2000萬以上小於3000萬.xls", "簡表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, "03-個金2000萬以上小於3000萬-" + iYearMonth,
+				txCD+"_03-個金2000萬以上小於3000萬-" + iYearMonth, "LM064_底稿_個金2000萬以上小於3000萬.xls", "簡表");
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);

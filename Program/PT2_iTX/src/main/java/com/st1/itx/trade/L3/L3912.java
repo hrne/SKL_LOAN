@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -43,6 +44,7 @@ public class L3912 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	LoanCom loanCom;
+	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -121,7 +123,16 @@ public class L3912 extends TradeBuffer {
 		} else {
 			RPTFG = 8;
 		}
-
+		BigDecimal shortFall = BigDecimal.ZERO;
+		String shortFallX = "";
+		shortFall = tLoanBorTx.getUnpaidInterest().add(tLoanBorTx.getUnpaidPrincipal());
+		if (tLoanBorTx.getUnpaidInterest().compareTo(BigDecimal.ZERO) > 0) {
+			shortFallX = df.format(shortFall) + "（利息）";
+		} else if (tLoanBorTx.getUnpaidPrincipal().compareTo(BigDecimal.ZERO) > 0) {
+			shortFallX = df.format(shortFall) + "（本金）";
+		} else {
+			shortFallX = df.format(shortFall);
+		}
 		this.info("BorxNo     =" + tLoanBorTx.getBorxNo());
 		this.info("TitaTxCd   =" + tLoanBorTx.getTitaTxCd());
 		this.info("RPTFG      =" + RPTFG);
@@ -178,7 +189,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ORemitBankX", loanCom.getBranchItemByBankCode(tTempVo.getParam("RemitBank")));
 		this.totaVo.putParam("OUnpaidBreach", tLoanBorTx.getUnpaidCloseBreach());
 		this.totaVo.putParam("ORemitAcctNo", tTempVo.getParam("RemitAcctNo"));
-		this.totaVo.putParam("OShortFall", tLoanBorTx.getUnpaidInterest().add(tLoanBorTx.getUnpaidPrincipal()));
+		this.totaVo.putParam("OShortFallX", shortFallX);
 		this.totaVo.putParam("OSupperNo", tLoanBorTx.getTitaEmpNoS());
 		this.totaVo.putParam("OSupperNoX", loanCom.getEmpFullnameByEmpNo(tLoanBorTx.getTitaEmpNoS()));
 		this.totaVo.putParam("OReduceAmt", wkReduceAmt);

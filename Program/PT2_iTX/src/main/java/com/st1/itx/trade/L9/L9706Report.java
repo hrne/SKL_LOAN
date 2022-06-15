@@ -246,21 +246,21 @@ public class L9706Report extends MakeReport {
 				this.print(1, 0, "");
 			}
 		}
-//		int facmNo = parse.stringToInteger(tL9706Vo.get("FacmNo"));
+		int facmNo = parse.stringToInteger(tL9706Vo.get("FacmNo"));
 		// 輸出第三段：所有地址
+		this.info("applNo=" + applNo);
+		this.info("facmNo=" + facmNo);
 		Slice<ClFac> slClFac = clFacService.approveNoEq(applNo, 0, Integer.MAX_VALUE, titaVo);
-		this.info("slClFac=" + slClFac.toString());
-//		Slice<ClFac> slClFac = clFacService.findRange(applNo,applNo,facmNo,facmNo, 0,Integer.MAX_VALUE, titaVo);
+
 		List<ClBuilding> addressList = new ArrayList<ClBuilding>();
 		if (slClFac != null) {
 
 			for (ClFac f : slClFac.getContent()) {
-				if (f.getMainFlag() == "Y") {
-					ClBuilding tClBuilding = clBuildingService
-							.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
-					if (tClBuilding != null) {
-						addressList.add(tClBuilding);
-					}
+
+				ClBuilding tClBuilding = clBuildingService
+						.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
+				if (tClBuilding != null) {
+					addressList.add(tClBuilding);
 				}
 
 			}
@@ -269,11 +269,23 @@ public class L9706Report extends MakeReport {
 		if (addressList.size() > 0) {
 			this.print(1, 0, "");
 			this.print(1, 3, "貸款抵押標的物地址：");
-			for (ClBuilding tClBuilding : addressList) {
 
+			// 處理重複地址問題
+			List<ClBuilding> result = new ArrayList<ClBuilding>(addressList.size());
+			for (ClBuilding str : addressList) {
+				if (!result.contains(str)) {
+					result.add(str);
+				}
+			}
+			addressList.clear();
+			addressList.addAll(result);
+
+			for (ClBuilding tClBuilding : addressList) {
 				this.print(1, 8, tClBuilding.getBdLocation()); // 每個地址的輸出位置：8
+
 			}
 		}
+
 		// 輸出第四段：如果為政府優惠房屋貸款時，要多輸出
 		String loanKind = "";
 

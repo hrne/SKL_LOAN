@@ -47,9 +47,11 @@ public class LM065Report extends MakeReport {
 		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
 		this.info("yymm=" + iYearMonth);
+		
+		String txCD = titaVo.getTxcd();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM065", "04-個金100萬以上小於2000萬-" + iYearMonth,
-				"LM065_04-個金100萬以上小於2000萬-" + iYearMonth, "LM065_底稿_個金100萬以上小於2000萬.xls", "簡表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, "04-個金100萬以上小於2000萬-" + iYearMonth,
+				txCD+"_04-個金100萬以上小於2000萬-" + iYearMonth, "LM065_底稿_個金100萬以上小於2000萬.xls", "簡表");
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
 		makeExcel.setWidth(3, 7);

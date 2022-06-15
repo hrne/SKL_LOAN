@@ -629,9 +629,9 @@ T(2,@L3100RemitRemark,#ORemitRemark)
 ![溢短收]
 #OShortFall=+m,14.2,S
 
-#OShortFallX=X,22,L
-CALL2(#ADJUSTDOT,#Precision,#OShortFall,#OShortFallX)
-T(2,@L3200ShortfallX,#OShortFallX)
+#OShortFallX=X,30,L
+! CALL2(#ADJUSTDOT,#Precision,#OShortFall,#OShortFallX)
+! T(2,@L3200ShortfallX,#OShortFallX)
 
 ![櫃員編號]
 #OTellerNo=X,6,L
@@ -2051,7 +2051,7 @@ TXFORM=L3912
 #OCustNo#OFacmNo#OBormNo#OCustNoX#OTxCode#OTxCodeX#OAcctDate#OTellerNo#OTellerNoX#OTxtNo#OHCode#OEntryDate
 #OCurrencyCode#OTxAmt#OLoanBal#ORemitAmt#OPrinciPal#OChequeAmt#OInterest#ODelayInt#OTempRepay
 #OBreachAmt#OTempTax#OTempAmt#OIntStartDate#OIntEndDate#OUnpaidInterest
-#OCaseCloseCode#OUnpaidPrinciPal#ORemitBank#ORemitBankX#OUnpaidBreach#ORemitAcctNo#OShortFall#ORemitCustName#ORemitRemark
+#OCaseCloseCode#OUnpaidPrinciPal#ORemitBank#ORemitBankX#OUnpaidBreach#ORemitAcctNo#OShortFallX#ORemitCustName#ORemitRemark
 #OOverflow#OSupperNo#OSupperNoX#OReduceAmt#OTxDate#OTxTime
 #OStampFreeAmt#OBatchNo#ORepayCode#ORemitSeq#OTempReasonCode#ORepayBank#ORepayBankX
 #OChequeAcctNo#ORepayPeriod#OChequeNo#ONewDueAmt#ONewTotalPeriod

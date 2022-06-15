@@ -3,9 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -35,12 +33,12 @@ public class LM062Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo,int yearMonth) throws LogicException {
+	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 
 		this.info("LM062Report exec");
 		// 取得會計日(同頁面上會計日)
 		// 年月日
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+//		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
 		int iYear = yearMonth / 100;
 		// 月
@@ -50,8 +48,10 @@ public class LM062Report extends MakeReport {
 
 		this.info("yymm=" + iYearMonth);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM062", "01-個金3000萬以上-" + iYearMonth,
-				"LM062_01-個金3000萬以上-" + iYearMonth, "LM062_底稿_個金3000萬以上.xls", "簡表");
+		String txCD = titaVo.getTxcd();
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, "01-個金3000萬以上-" + iYearMonth,
+				txCD + "_01-個金3000萬以上-" + iYearMonth, "LM062_底稿_個金3000萬以上.xls", "簡表");
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
@@ -75,7 +75,7 @@ public class LM062Report extends MakeReport {
 
 		try {
 
-			fnAllList = lm062ServiceImpl.findAll(titaVo,yearMonth);
+			fnAllList = lm062ServiceImpl.findAll(titaVo, yearMonth);
 
 		} catch (Exception e) {
 
@@ -199,8 +199,10 @@ public class LM062Report extends MakeReport {
 					case 11:
 						// K欄 評等
 						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0") ? ""
-										: tLDVo.get(fdnm),"C");
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
 						break;
 					default:
 
