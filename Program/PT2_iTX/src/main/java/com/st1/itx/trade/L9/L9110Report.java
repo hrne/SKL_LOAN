@@ -417,7 +417,7 @@ public class L9110Report extends MakeReport {
 
 			// 7
 			this.print(1, 1, " ");
-			this.print(1, 1, "七、本戶號目前總餘額： " + formatAmt(tL9110.get("F70"), 0) + "　元");
+			this.print(1, 1, "七、本戶號目前總餘額： " + formatAmt(tL9110.get("F55"), 0) + "　元");
 
 			// 8
 			this.print(1, 1, " ");
@@ -719,7 +719,7 @@ public class L9110Report extends MakeReport {
 
 			// 6
 			this.print(1, 1, " ");
-			this.print(1, 1, "六、本戶號目前總餘額： " + formatAmt(tL9110.get("F70"), 0) + "　元");
+			this.print(1, 1, "六、本戶號目前總餘額： " + formatAmt(tL9110.get("F55"), 0) + "　元");
 
 			// 7
 			this.print(1, 1, " ");

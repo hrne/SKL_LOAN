@@ -1230,7 +1230,7 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setDesc("入帳金額轉暫收款-冲正產生");
 		tLoanBorTx.setRepayCode(tx.getRepayCode());
 		tLoanBorTx.setEntryDate(tx.getEntryDate());
-		tLoanBorTx.setDisplayflag("A"); // A:帳務
+		tLoanBorTx.setDisplayflag("Y"); // 
 		tLoanBorTx.setTxAmt(tx.getTxAmt());
 		tLoanBorTx.setTempAmt(tx.getTxAmt());
 		tLoanBorTx.setTitaHCode("0");
@@ -1240,27 +1240,41 @@ public class LoanCom extends TradeBuffer {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
 	}
-	
+
 	/**
-	 *  新增放款交易內容檔(收回費用)
-	 * @param ba  BaTxVo
-	 * @param iRpCode 還款來源
+	 * 新增放款交易內容檔(收回費用)
+	 * 
+	 * @param ba         BaTxVo
+	 * @param iRpCode    還款來源
 	 * @param iEntryDate 入帳日
-	 * @param iTxAmt 交易金額
-	 * @param iTempAmt 暫收抵繳金額
-	 * @param iCreateDate 建立日期
-	 * @param titaVo Tita
+	 * @param iTxAmt     交易金額
+	 * @param iTempAmt   暫收抵繳金額(負值)
+	 * @param iDesc      交易別
+	 * @param titaVo     Tita
 	 * @throws LogicException ....
 	 */
 	public void addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, BigDecimal iTxAmt, BigDecimal iTempAmt,
-			Timestamp iCreateDate, TitaVo titaVo) throws LogicException {
+			String iDesc, TitaVo titaVo) throws LogicException {
 		this.info("addFeeBorTxRoutine ... ");
 
 		LoanBorTx tLoanBorTx = new LoanBorTx();
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
 		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
+		String desc = iDesc;
+		if ("L3230".equals(titaVo.getTxcd())){
+			desc = "暫收銷";
+		}				
+		if (iRpCode == 97) {
+			desc = "轉催收";		
+		}
+		if (iRpCode == 98) {
+			desc = "轉呆帳";		
+		}
+		
 		CdCode tCdCode = cdCodeService.findById(new CdCodeId("AcctCode", ba.getAcctCode()), titaVo);
-		tLoanBorTx.setDesc(tCdCode == null ? ba.getAcctCode() : tCdCode.getItem());
+		desc += tCdCode == null ? ba.getAcctCode() : tCdCode.getItem();
+
+		tLoanBorTx.setDesc(desc);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(ba.getPayIntDate());
@@ -1287,7 +1301,6 @@ public class LoanCom extends TradeBuffer {
 		}
 		tTempVo.putParam("AcctCode", ba.getAcctCode()); // 業務科目銷
 		tTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
-		tTempVo.putParam("CreateDate", iCreateDate.toString()); 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);

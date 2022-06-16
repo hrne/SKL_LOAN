@@ -59,6 +59,11 @@ public class L9734p extends TradeBuffer {
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
+		if (totalItem == 0) {
+			throw new LogicException(titaVo, "E0010", "須勾選至少一項報表");
+		}
+		
+		
 		String tradeName = "";
 
 		for (int i = 1; i <= totalItem; i++) {

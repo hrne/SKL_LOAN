@@ -141,7 +141,6 @@ public class L3005 extends TradeBuffer {
 			this.info("Error ... " + e.getMessage());
 		}
 
-		this.info("resultList = " + resultList);
 		if (resultList != null && resultList.size() != 0) {
 
 			this.info("Size =" + resultList.size());

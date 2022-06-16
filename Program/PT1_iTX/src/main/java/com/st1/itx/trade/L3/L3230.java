@@ -229,6 +229,7 @@ public class L3230 extends TradeBuffer {
 			TempAcDetailRoutine(); // 借: 暫收款科目
 			switch (iTempItemCode) {
 			case "06": // 06.轉帳
+				setLoanBorTxRoutine();
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				// 貸方 收付欄
 				acPaymentCom.setTxBuffer(this.getTxBuffer());
@@ -250,20 +251,17 @@ public class L3230 extends TradeBuffer {
 
 			case "19": // 19.轉債權協商 T10~T13 債協科目
 				NegAcDetailRoutine();
+				setLoanBorTxRoutine();
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
 
 			case "20": // 20.轉應付代收
 				throw new LogicException(titaVo, "E0010", "由L5708 最大債權撥付出帳 "); // E0010 功能選擇錯誤
 
-			case "16": // 16.沖呆帳戶法務費墊付
+			case "16": // 16.3200億專案
 				subsidyInterest();
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
-
-			case "17": // 17.3200億-利變
-			case "23": // 23.3200億傳統A
-				throw new LogicException(titaVo, "E0010", "請使用 L6201 其他傳票輸入"); // E0010 功能選擇錯誤
 
 			case "22": // 22.88風災-保費 ???
 				throw new LogicException(titaVo, "E0010", "無對應之會計科目"); // E0010 功能選擇錯誤
@@ -278,11 +276,6 @@ public class L3230 extends TradeBuffer {
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
 			this.setTxBuffer(acDetailCom.getTxBuffer());
-		}
-
-		// 放款交易內容檔
-		if (iTempAmt.compareTo(new BigDecimal(0)) > 0) {
-			setLoanBorTxRoutine();
 		}
 
 		this.addList(this.totaVo);
@@ -448,20 +441,8 @@ public class L3230 extends TradeBuffer {
 	}
 
 	private void addFeeRoutine(BaTxVo ba) throws LogicException {
-		switch (ba.getRepayType()) {
-		case 4: // 04-帳管費
-			this.acctFee = this.acctFee.add(ba.getUnPaidAmt());
-			break;
-		case 5: // 05-火險費
-			this.fireFee = this.fireFee.add(ba.getUnPaidAmt());
-			break;
-		case 6: // 06-契變手續費
-			this.modifyFee = this.modifyFee.add(ba.getUnPaidAmt());
-			break;
-		case 7: // 07-法務費
-			this.lawFee = this.lawFee.add(ba.getUnPaidAmt());
-			break;
-		}
+		// 新增放款交易內容檔(收回費用)
+		loanCom.addFeeBorTxRoutine(ba, 0, titaVo.getEntDyI(), BigDecimal.ZERO, BigDecimal.ZERO.subtract(ba.getUnPaidAmt()),"暫收銷", titaVo);
 	}
 
 	// 貸: 債權協商對應科目
@@ -651,18 +632,6 @@ public class L3230 extends TradeBuffer {
 
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("Description", titaVo.getParam("Description"));
-		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("AcctFee", this.acctFee);
-		}
-		if (this.modifyFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("ModifyFee", this.modifyFee);
-		}
-		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("FireFee", this.fireFee);
-		}
-		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("LawFee", this.lawFee);
-		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);

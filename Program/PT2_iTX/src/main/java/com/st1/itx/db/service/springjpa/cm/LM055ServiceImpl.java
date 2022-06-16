@@ -46,7 +46,10 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		 * 備抵損失-催收款項-營業稅提撥 或 RBC表的RBC工作表I41欄 來源參考公式
 		 *
 		 *
-		 * 溢折價與催收費用 10600304000 擔保放款-溢折價 10601301000 催收款項-法務費用 10601302000 催收款項-火險費用
+		 * 溢折價與催收費用 
+		 * 10600304000 擔保放款-溢折價 
+		 * 10601301000 催收款項-法務費用 
+		 * 10601302000 催收款項-火險費用
 		 * 10601304000 催收款項-溢折價
 		 */
 		String sql = " ";
@@ -131,6 +134,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	       WHEN M.\"OvduTerm\" >= 7 THEN '4'";
 		sql += "       	       WHEN M.\"OvduTerm\" >= 1 THEN '4'";
 		sql += "       	       WHEN M.\"ProdNo\" IN ('60','61','62') THEN '4'";
+		sql += "       	       ELSE '4' ";
 		sql += "       	     END ) AS \"COL\"";
 		sql += "	      ,( CASE";
 		sql += "       	       WHEN M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') THEN 'Z'";
@@ -150,6 +154,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	        WHEN M.\"OvduTerm\" >= 7 THEN '4'";
 		sql += "       	        WHEN M.\"OvduTerm\" >= 1 THEN '4'";
 		sql += "       	        WHEN M.\"ProdNo\" IN ('60','61','62') THEN '4'";
+		sql += "       	       ELSE '4' ";
 		sql += "       	      END )";
 		sql += "	        ,( CASE";
 		sql += "       	         WHEN M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') THEN 'Z'";

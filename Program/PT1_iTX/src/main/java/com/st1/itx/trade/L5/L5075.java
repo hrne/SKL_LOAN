@@ -22,12 +22,14 @@ import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ048;
+import com.st1.itx.db.domain.JcicZ444;
 /*DB服務*/
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.NegTransService;
 import com.st1.itx.db.service.springjpa.cm.L5075ServiceImpl;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ048Service;
+import com.st1.itx.db.service.JcicZ444Service;
 import com.st1.itx.util.common.NegCom;
 
 /* 交易共用組件 */
@@ -65,6 +67,9 @@ public class L5075 extends TradeBuffer {
 
 	@Autowired
 	public JcicZ048Service sJcicZ048Service;
+
+	@Autowired
+	public JcicZ444Service sJcicZ444Service;
 
 	@Autowired
 	public NegCom sNegCom;
@@ -151,10 +156,16 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOCustComAddr", "");// 債務人通訊地址
 				if ("1".equals(WorkSubject)) {// 滯繳才需帶出聯徵通訊地址
 					int rcdate = NegMainVO.getApplDate() + 19110000;
-					JcicZ048 tJcicZ048 = sJcicZ048Service.forL5075First(ThisCustId, rcdate, titaVo);
-
-					if (tJcicZ048 != null) {
-						occursList.putParam("OOCustComAddr", tJcicZ048.getCustComAddr());// 債務人通訊地址
+					if ("1".equals(NegMainVO.getCaseKindCode())) {// 案件種類:債協
+						JcicZ048 tJcicZ048 = sJcicZ048Service.forL5075First(ThisCustId, rcdate, titaVo);
+						if (tJcicZ048 != null) {
+							occursList.putParam("OOCustComAddr", tJcicZ048.getCustComAddr());// 債務人通訊地址
+						}
+					} else {// 案件種類:前置調解
+						JcicZ444 tJcicZ444 = sJcicZ444Service.forL5075First(ThisCustId, rcdate, titaVo);
+						if (tJcicZ444 != null) {
+							occursList.putParam("OOCustComAddr", tJcicZ444.getCustComAddr());// 債務人通訊地址
+						}
 					}
 				}
 				occursList.putParam("OOAcDate", NegTransAcDate);// 會計日期

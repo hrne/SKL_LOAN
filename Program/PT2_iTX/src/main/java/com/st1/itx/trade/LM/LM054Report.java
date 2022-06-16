@@ -170,10 +170,10 @@ public class LM054Report extends MakeReport {
 			makeExcel.setValue(row, 23, ifrs9, "C");
 
 			ArrayList<String> mark = new ArrayList<String>();
-			if (lM054Vo.get("F22").length() > 0) {
+			if (lM054Vo.get("F22").length() > 1) {
 				mark.add(lM054Vo.get("F22"));
 			}
-			if (lM054Vo.get("F23").length() > 0) {
+			if (lM054Vo.get("F23").length() > 1) {
 				mark.add(lM054Vo.get("F23"));
 			}
 			if (tempNo.equals(lM054Vo.get("F0"))) {

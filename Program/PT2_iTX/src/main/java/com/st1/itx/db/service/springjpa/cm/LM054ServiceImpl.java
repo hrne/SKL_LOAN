@@ -307,8 +307,9 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			query.setParameter("symd", sYmd);// 20211201
 			query.setParameter("eymd", eYmd);// 20211231
-			query.setParameter("lyymm", lYearMonth);// 202111
-			query.setParameter("tyymm", iYearMonth);// 202112
+			query.setParameter("yymm", iYearMonth);
+//			query.setParameter("lyymm", lYearMonth);// 202111
+//			query.setParameter("tyymm", iYearMonth);// 202112
 		}
 		return this.convertToMap(query);
 	}

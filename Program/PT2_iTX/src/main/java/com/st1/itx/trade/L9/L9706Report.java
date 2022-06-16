@@ -271,18 +271,17 @@ public class L9706Report extends MakeReport {
 			this.print(1, 3, "貸款抵押標的物地址：");
 
 			// 處理重複地址問題
-			List<ClBuilding> result = new ArrayList<ClBuilding>(addressList.size());
+			List<String> result = new ArrayList<String>();
 			for (ClBuilding str : addressList) {
-				if (!result.contains(str)) {
-					result.add(str);
+				String tempBdLocation = str.getBdLocation().toString();
+				if (!result.contains(tempBdLocation)) {
+					result.add(tempBdLocation);
 				}
 			}
-			addressList.clear();
-			addressList.addAll(result);
+	
 
-			for (ClBuilding tClBuilding : addressList) {
-				this.print(1, 8, tClBuilding.getBdLocation()); // 每個地址的輸出位置：8
-
+			for (String bdLocation : result) {
+				this.print(1, 8, bdLocation); // 每個地址的輸出位置：8
 			}
 		}
 

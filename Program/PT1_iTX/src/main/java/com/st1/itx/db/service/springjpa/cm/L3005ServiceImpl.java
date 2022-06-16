@@ -117,6 +117,9 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND  ln3.\"FacmNo\" <= :FacmNoE											 ";
 		sql += "  AND  ln3.\"BormNo\" >= :BormNoS											 ";
 		sql += "  AND  ln3.\"BormNo\" <= :BormNoE											 ";
+		if (iTitaHCode == 0) {
+			sql += "      AND ln3.\"TitaHCode\" = '0'											";
+		}
 		sql += " ORDER BY ln2.\"AcDate\" ASC ";
 		sql += "         ,ln2.\"TitaCalDy\" ASC	                    ";
 		sql += "         ,ln2.\"TitaCalTm\"	ASC                    	";

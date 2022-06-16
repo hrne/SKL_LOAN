@@ -121,7 +121,6 @@ public class L3210 extends TradeBuffer {
 	private int iOverRpFacmNo;
 	private int iRpCode = 0; // 還款來源
 	private BigDecimal iTempAmt;
-	private Timestamp iCreateDate;
 	private LoanCheque tLoanCheque;
 	private LoanChequeId tLoanChequeId;
 	private BigDecimal wkTempAmt;
@@ -181,9 +180,6 @@ public class L3210 extends TradeBuffer {
 		if (iFacmNo == 0 && titaVo.isTrmtypBatch()) {
 			iFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
 		}
-
-		iCreateDate = parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime());
-
 		titaVo.setTxAmt(iTempAmt);
 		// 費用抵繳是否抵繳(整批入帳)
 		this.isRepaidFee = false;
@@ -476,8 +472,8 @@ public class L3210 extends TradeBuffer {
 					// 計算本筆暫收金額
 					// 新增放款交易內容檔(收回費用)
 					if (ba.getRepayType() >= 4) {
-						loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, BigDecimal.ZERO, BigDecimal.ZERO.subtract(ba.getAcctAmt()),
-								iCreateDate, titaVo);
+						loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, BigDecimal.ZERO,
+								BigDecimal.ZERO.subtract(ba.getAcctAmt()), "", titaVo);
 					}
 				}
 			}
@@ -522,9 +518,9 @@ public class L3210 extends TradeBuffer {
 		if (cdCode != null) {
 			tTempVo.putParam("Note", cdCode.getItem());
 		}
-		
+
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		
+
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
