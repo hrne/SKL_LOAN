@@ -17,10 +17,12 @@ import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdLandOffice;
 import com.st1.itx.db.domain.CdLandOfficeId;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandOfficeService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -45,6 +47,8 @@ public class L2918 extends TradeBuffer {
 	public CdCityService cdCityService;
 	@Autowired
 	public CdLandOfficeService cdLandOfficeService;
+	@Autowired
+	public ClFacService clFacService;
 
 	/* 日期工具 */
 	@Autowired
@@ -52,6 +56,16 @@ public class L2918 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
+
+	int wkClCode1St = 1;
+	int wkClCode1Ed = 9;
+	int wkClCode2St = 1;
+	int wkClCode2Ed = 99;
+	int wkClNoSt = 1;
+	int wkClNoEd = 9999999;
+	// new ArrayList
+	List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
+	List<ClFac> lClFac = new ArrayList<ClFac>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -66,16 +80,23 @@ public class L2918 extends TradeBuffer {
 		this.limit = 100; // 122 * 400 = 48800
 
 		// tita
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
+		this.info("iCustNo = " + iCustNo);
+		this.info("iFacmNo = " + iFacmNo);
+		this.info("iClCode1 = " + iClCode1);
+		this.info("iClCode2 = " + iClCode2);
+		this.info("iClNo = " + iClNo);
 
-		int wkClCode1St = 1;
-		int wkClCode1Ed = 9;
-		int wkClCode2St = 1;
-		int wkClCode2Ed = 99;
-		int wkClNoSt = 1;
-		int wkClNoEd = 9999999;
+		int wkFacmNoS = 0;
+		int wkFacmNoE = 999;
+		if (iFacmNo > 0) {
+			wkFacmNoS = iFacmNo;
+			wkFacmNoE = iFacmNo;
+		}
 		if (iClCode1 > 0) {
 			wkClCode1St = iClCode1;
 			wkClCode1Ed = iClCode1;
@@ -89,10 +110,39 @@ public class L2918 extends TradeBuffer {
 			wkClNoEd = iClNo;
 		}
 
-		// new ArrayList
-		List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
-		Slice<ClOtherRights> slClOtherRights = sClOtherRightsService.findClCodeRange(wkClCode1St, wkClCode1Ed, wkClCode2St, wkClCode2Ed, wkClNoSt, wkClNoEd, this.index, this.limit, titaVo);
 
+		if (iCustNo > 0) {
+//			依戶號額度查詢
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoS, wkFacmNoE, this.index,
+					this.limit, titaVo);
+			lClFac = slClFac == null ? null : slClFac.getContent();
+			if (lClFac == null) {
+				throw new LogicException(titaVo, "E2003", "此戶號額度，擔保品與額度關聯檔無資料。");
+			}
+			for (ClFac tClFac : lClFac) {
+				wkClCode1St = tClFac.getClCode1();
+				wkClCode1Ed = tClFac.getClCode1();
+				wkClCode2St = tClFac.getClCode2();
+				wkClCode2Ed = tClFac.getClCode2();
+				wkClNoSt = tClFac.getClNo();
+				wkClNoEd = tClFac.getClNo();
+				moveOccursList(titaVo);
+			}
+
+		} else {
+
+			moveOccursList(titaVo);
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	private void moveOccursList(TitaVo titaVo) throws LogicException {
+
+//		依擔保品查詢
+		Slice<ClOtherRights> slClOtherRights = sClOtherRightsService.findClCodeRange(wkClCode1St, wkClCode1Ed,
+				wkClCode2St, wkClCode2Ed, wkClNoSt, wkClNoEd, this.index, this.limit, titaVo);
 		lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 		// 該統編查無擔保品主檔
 		if (lClOtherRights == null) {
@@ -142,7 +192,8 @@ public class L2918 extends TradeBuffer {
 			occurslist.putParam("OORecYear", t.getRecYear());
 			// 找 收件字名稱
 			if ("".equals(t.getOtherRecWord())) {
-				CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
+				CdLandOffice tCdLandOffice = cdLandOfficeService
+						.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
 				if (tCdLandOffice != null) {
 					wkRecWordItem = tCdLandOffice.getRecWordItem();
 				}
@@ -157,7 +208,5 @@ public class L2918 extends TradeBuffer {
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 		}
-		this.addList(this.totaVo);
-		return this.sendList();
 	}
 }

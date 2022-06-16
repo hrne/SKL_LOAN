@@ -359,7 +359,16 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             FROM \"InsuRenew\" IR ";
 		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany'"; // -- 共用代碼檔(保險公司)
 		sql += "                                      AND CDC1.\"Code\"    = IR.\"InsuCompany\"";
+		sql += "             LEFT JOIN ( ";
+		sql += "             	SELECT DISTINCT";
+		sql += "                       \"CustNo\" ";
+		sql += "             	     , \"FacmNo\" ";
+		sql += "                FROM \"ClFac\" ";
+		sql += "                WHERE \"ApproveNo\" = :applNo ";
+		sql += "             ) tempCF ON tempCF.\"CustNo\" = IR.\"CustNo\" ";
+		sql += "                     AND tempCF.\"FacmNo\" = IR.\"FacmNo\" ";
 		sql += "             WHERE NVL(IR.\"NowInsuNo\",' ') != ' ' ";
+		sql += "               AND NVL(tempCF.\"CustNo\",0) != 0 ";
 		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";

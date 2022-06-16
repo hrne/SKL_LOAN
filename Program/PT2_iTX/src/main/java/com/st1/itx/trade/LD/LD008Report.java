@@ -114,8 +114,11 @@ public class LD008Report extends MakeReport {
 
 			String AcSubBookCode = SubBookCodesVo.get("F0");
 
+			
 			rptTypeItem = SubBookCodesVo.get("F1");
 
+			rptTypeItem = rptTypeItem+ ("201".equals(AcSubBookCode) ? "A" : "301".equals(AcSubBookCode) ? "B" :""); 
+			
 			if (!isFirstPage) {
 				// 非第一頁時先換頁
 				this.newPage();

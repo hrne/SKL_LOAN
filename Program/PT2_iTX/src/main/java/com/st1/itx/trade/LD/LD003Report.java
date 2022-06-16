@@ -115,10 +115,10 @@ public class LD003Report extends MakeReport {
 				break;
 
 			}
-			this.print(-11 - (i * 10), 30, "一般帳戶", "L");
-			this.print(-13 - (i * 10), 30, "利變A", "L");
-			this.print(-15 - (i * 10), 30, "利變B", "L");
-			this.print(-17 - (i * 10), 30, "傳統A", "L");
+			this.print(-11 - (i * 10), 30, "傳統帳冊", "L");
+			this.print(-13 - (i * 10), 30, "利變年金帳冊A", "L");
+			this.print(-15 - (i * 10), 30, "利變年金帳冊B", "L");
+			this.print(-17 - (i * 10), 30, "傳統帳冊A", "L");
 		}
 
 		int groupA = 0;

@@ -309,9 +309,6 @@ C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,S,$)
 
 
-#MRKEY=_,_,S
-C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
-C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 
 #SendL3r02=X,1,S
 C(3,#BormNo,0,S,$)
@@ -337,6 +334,12 @@ C(3,#CHAIN,1,s,$)
 @A(DATE,0,#EntryEndDate)
 C(3,#EntryStartDate,0,$,V(5,#EntryStartDate,9991231))
 ! V(5,#EntryStartDate,#SYSDATE)
+
+
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 
 #RPTFG=A,1,S
 
@@ -600,7 +603,7 @@ TXFORM=L3911
 #OOTxAmtX=交易金額
 {width:170}
 
-#OOTempRepayX=暫收金額
+#OOTempRepayX=暫收抵繳
 {width:170}
 
 #OOShortFallX=溢短收
@@ -660,7 +663,7 @@ TXFORM=L3911
 #OOTxAmtX=交易金額
 {width:170}
 
-#OOTempRepayX=暫收金額
+#OOTempRepayX=暫收抵繳
 {width:170}
 
 #OOShortFallX=溢短收

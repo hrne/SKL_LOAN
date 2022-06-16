@@ -57,9 +57,6 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,L.\"PrevPayIntDate\"                      AS F10 ";
 		sql += "       ,NVL(O.\"OvduDate\", 0)                    AS F11 ";
 		sql += "       ,L.\"UsageCode\"                           AS F12 ";
-//		sql += "       ,M.\"ClCode1\"                             AS F13 ";
-//		sql += "       ,M.\"ClCode2\"                             AS F14 ";
-//		sql += "       ,M.\"ClNo\"                                AS F15 ";
 //		sql += "       ,CL.\"OwnerId\"                            AS F16 ";
 //		sql += "       ,CL.\"OwnerName\"                          AS F17 ";
 //		sql += "       ,NVL(CI.\"SettingSeq\",0)                  AS F18 ";
@@ -73,6 +70,9 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,CASE ";
 		sql += "       	  WHEN MF.\"OvduTerm\" IN (1,2,3,4,5) THEN MF.\"OvduTerm\" ";
 		sql += "       	ELSE 0 END AS F17";
+		sql += "       ,M.\"ClCode1\"                             AS F18 ";
+		sql += "       ,M.\"ClCode2\"                             AS F19 ";
+		sql += "       ,M.\"ClNo\"                                AS F20 ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";

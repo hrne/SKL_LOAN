@@ -112,7 +112,7 @@ public class LM054Report extends MakeReport {
 			makeExcel.setValue(row, 14, new BigDecimal(lM054Vo.get("F12")), "#,##0");
 			// 擔保品設定順位
 			makeExcel.setValue(row, 15, lM054Vo.get("F13"), "C");
-			
+
 			// 擔保品估計總值
 			BigDecimal templineAmt = BigDecimal.ZERO;
 			BigDecimal f14 = new BigDecimal(lM054Vo.get("F14").toString());
@@ -122,12 +122,11 @@ public class LM054Report extends MakeReport {
 			} else {
 				templineAmt = f14;
 			}
-			if (!tempNo.equals(lM054Vo.get("F0")) ) {
+			if (!tempNo.equals(lM054Vo.get("F0"))) {
 				makeExcel.setValue(row, 16, templineAmt, "#,##0");
 				// 擔保品核貸金額
 				makeExcel.setValue(row, 17, new BigDecimal(lM054Vo.get("F15")), "#,##0");
 			}
-
 
 			// 轉催收日期
 			makeExcel.setValue(row, 18, lM054Vo.get("F16"), "C");
@@ -186,7 +185,7 @@ public class LM054Report extends MakeReport {
 
 			tempNo = lM054Vo.get("F0");
 			// 備註
-			makeExcel.setValue(row, 24, memo.substring(0, memo.length() - 1), "C");
+			makeExcel.setValue(row, 24, memo.length() > 0 ? memo.substring(0, memo.length() - 1) : memo, "C");
 			memo = "";
 			mark = null;
 
@@ -197,6 +196,5 @@ public class LM054Report extends MakeReport {
 		}
 
 	}
-
 
 }

@@ -72,7 +72,7 @@ public class L2634ReportA extends MakeReport {
 	private int reportDate = 0;
 	private String brno = "";
 	private String reportCode = "L2634";
-	private String reportItem = "抵押權塗銷同意書";
+	private String reportItem = "抵押權塗銷同意書-整批列印";
 	private String security = "";
 //	private String pageSize ="A5";
 	private String pageOrientation = "P";
@@ -212,12 +212,15 @@ public class L2634ReportA extends MakeReport {
 			// 收件號
 			String wkRecNumber = "";
 			wkRecNumber = t.getRecNumber();
-			// 權利價值說明
+			// 權利價值說明 空白(即無代入字樣)"
 			String wkRightsNote = "";
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("ClRightsNote", t.getRightsNote()), titaVo);
-			if (tCdCode != null) {
-				wkRightsNote = tCdCode.getItem();
+			if (!t.getRightsNote().isEmpty()) {
+				CdCode tCdCode = cdCodeService.findById(new CdCodeId("ClRightsNote", t.getRightsNote()), titaVo);
+				if (tCdCode != null) {
+					wkRightsNote = tCdCode.getItem();
+				}
 			}
+
 			// 擔保債權總金額
 			BigDecimal wkSecuredTotal = BigDecimal.ZERO;
 			wkSecuredTotal = t.getSecuredTotal();
@@ -294,7 +297,7 @@ public class L2634ReportA extends MakeReport {
 			this.print(1, 1, " ");
 
 			this.print(1, 10, "權利價值                                                     ");
-			this.print(0, 18, wkRightsNote + " " + amtChinese);
+			this.print(0, 18, wkRightsNote + "最高限額新台幣 " + amtChinese);
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
 
@@ -309,7 +312,7 @@ public class L2634ReportA extends MakeReport {
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
-			this.print(1, 23, "代表人  吳  東  進");
+			this.print(1, 23, "董事長  潘  柏  錚");
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
