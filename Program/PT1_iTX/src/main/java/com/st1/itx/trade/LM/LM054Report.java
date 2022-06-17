@@ -55,7 +55,7 @@ public class LM054Report extends MakeReport {
 		try {
 			fnAllList = lM054ServiceImpl.findAll(titaVo, monthDate, "N");
 
-			makeExcel.setShiftRow(row + 1, fnAllList.size() + 1);
+			makeExcel.setShiftRow(row + 1, fnAllList.size() + 4);
 
 			this.info("size=" + fnAllList.size());
 

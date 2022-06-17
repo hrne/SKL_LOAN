@@ -32,12 +32,11 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-
 	// *** 折返控制相關 ***
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
+
 	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
 
 		this.info("L6907FindData");
@@ -133,7 +132,9 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         GROUP BY \"AcctCode\" ";
 		sql += "    ) B ON A.\"AcctCode\" = B.\"AcctCode\" ";
 		sql += " where A.\"AcBookCode\" = 000 "; // 固定傳入
-		sql += "   and A.\"AcctFlag\"   = 0 ";
+		if ("".equals(iAcctCode)) {
+			sql += "   and A.\"AcctFlag\"   = 0 ";
+		}
 		sql += "   and A.\"FacmNo\"   <= 999 ";
 		// 加入判斷空白跳過該篩選
 		// 區隔帳冊
@@ -168,7 +169,7 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  order by  A.\"AcctCode\" ";
 
 		sql += " " + sqlRow;
-		
+
 		this.info("L6907Service SQL=" + sql);
 
 		Query query;
@@ -210,7 +211,7 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		this.info("L6907Service FindData=" + query);
 
 		// *** 折返控制相關 ***

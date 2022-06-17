@@ -65,7 +65,7 @@ public class L6907 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 45 * 200 = 9000
+		this.limit = Integer.MAX_VALUE; // 45 * 200 = 9000
 
 		List<Map<String, String>> L6907List = null;
 

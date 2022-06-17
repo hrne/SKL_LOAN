@@ -21,6 +21,7 @@ import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
@@ -78,7 +79,7 @@ public class L3240 extends TradeBuffer {
 	AcReceivableCom acReceivableCom;
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	private TitaVo titaVo;
 	private int iCustNo;
 	private int iFacmNo;
@@ -132,22 +133,21 @@ public class L3240 extends TradeBuffer {
 		iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		iTellerNo = titaVo.getParam("TellerNo");
 		iTxtNo = titaVo.getParam("TxtNo");
-		
+
 		this.info("titaVo.getHsupCode() =" + titaVo.getHsupCode());
-		this.info("titaVo.getEmpNos().trim() =" + titaVo.getEmpNos().trim() );
+		this.info("titaVo.getEmpNos().trim() =" + titaVo.getEmpNos().trim());
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
 		}
 
 		// Check Input
-
 		checkInputRoutine();
-		
+
 		// 沖正處理
 		repayEraseRoutine();
 
 		titaVo.setTxAmt(wkTempAmt);
-		titaVo.put("CURNM","TWD");
+		titaVo.put("CURNM", "TWD");
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -176,7 +176,7 @@ public class L3240 extends TradeBuffer {
 			acReceivableCom.mnt(1, lAcReceivableDelete, titaVo); // 1-銷帳
 		}
 		if (lAcReceivableInsert.size() > 0) {
-			acReceivableCom.mnt(0, lAcReceivableDelete, titaVo); // 0-起帳
+			acReceivableCom.mnt(0, lAcReceivableInsert, titaVo); // 0-起帳
 		}
 
 		this.addList(this.totaVo);
@@ -267,44 +267,44 @@ public class L3240 extends TradeBuffer {
 	private void unUpaidRoutine(LoanBorTx tx) throws LogicException {
 		// 刪除本筆回收產生的欠繳
 
-		unpaidAmtRoutine(tx);
+		unpaidAmtRoutine(true, tx);
 
-		// 新增本筆收回的欠繳(前筆的欠繳)
-		List<String> ltitaHCode = new ArrayList<String>();
-		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, tx.getBormNo(),
-				tx.getBormNo(), tx.getIntStartDate() + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		if (slLoanBorTx == null) {
-			return;
+		LoanBorTx lx = null;
+		for (int i = tx.getBorxNo() - 1; i > 1; i--) {
+			lx = loanBorTxService.findById(new LoanBorTxId(tx.getCustNo(), tx.getFacmNo(), tx.getBormNo(), i), titaVo);
+			if (lx == null) {
+				break;
+			}
+			if ("0".equals(lx.getTitaHCode()) && lx.getTitaTxCd().equals("L3200")) {
+				unpaidAmtRoutine(false, lx);
+				break;
+			}
 		}
-
-		LoanBorTx lx = slLoanBorTx.getContent().get(0);
-		unpaidAmtRoutine(lx);
 
 	}
 
 	// 欠繳金額處理
-	private void unpaidAmtRoutine(LoanBorTx tx) throws LogicException {
+	private void unpaidAmtRoutine(boolean isDelete, LoanBorTx tx) throws LogicException {
+		this.info("unpaidAmtRoutine ..." + tx.toString());
 		// 短繳利息, 新增銷帳檔
 		if (tx.getUnpaidInterest().compareTo(BigDecimal.ZERO) > 0) {
-			acRvUnpaidAmt(tx, loanCom.setShortIntAcctCode(tFacMain.getAcctCode()), tx.getUnpaidInterest());
+			acRvUnpaidAmt(isDelete, tx, loanCom.setShortIntAcctCode(tFacMain.getAcctCode()), tx.getUnpaidInterest());
 		}
 
 		// 短繳本金處理, 新增銷帳檔
 		if (tx.getUnpaidPrincipal().compareTo(BigDecimal.ZERO) > 0) {
-			acRvUnpaidAmt(tx, loanCom.setShortPrinAcctCode(tFacMain.getAcctCode()), tx.getUnpaidPrincipal());
+			acRvUnpaidAmt(isDelete, tx, loanCom.setShortPrinAcctCode(tFacMain.getAcctCode()), tx.getUnpaidPrincipal());
 		}
 
 		// 短繳清償違約金處理, 新增銷帳檔
 		if (tx.getUnpaidCloseBreach().compareTo(BigDecimal.ZERO) > 0) {
-			acRvUnpaidAmt(tx, "YOP", tx.getUnpaidCloseBreach());
+			acRvUnpaidAmt(isDelete, tx, "YOP", tx.getUnpaidCloseBreach());
 		}
 	}
 
 	// 短繳金額
-	private void acRvUnpaidAmt(LoanBorTx tx, String acctCode, BigDecimal shortAmt) throws LogicException {
-		this.info("acRvUnpaidAmt ...");
+	private void acRvUnpaidAmt(boolean isDelete, LoanBorTx tx, String acctCode, BigDecimal shortAmt)
+			throws LogicException {
 
 		AcReceivable tAcReceivable = new AcReceivable();
 		tAcReceivable.setReceivableFlag(4); // 短繳期金
@@ -313,7 +313,7 @@ public class L3240 extends TradeBuffer {
 		tAcReceivable.setFacmNo(iFacmNo);
 		tAcReceivable.setRvNo(parse.IntegerToString(tx.getBormNo(), 3));
 		tAcReceivable.setRvAmt(shortAmt);
-		if (tx.getIntEndDate() == iIntEndDate) {
+		if (isDelete) {
 			lAcReceivableDelete.add(tAcReceivable);
 		} else {
 			lAcReceivableInsert.add(tAcReceivable);
@@ -361,8 +361,7 @@ public class L3240 extends TradeBuffer {
 				}
 			}
 		}
-		
-		
+
 		tLoanBorMain.setNextPayIntDate(loanCom.getNextPayIntDate(tLoanBorMain.getAmortizedCode(),
 				tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFreqBase(), tLoanBorMain.getSpecificDate(),
 				tLoanBorMain.getSpecificDd(), tLoanBorMain.getPrevPayIntDate(), tLoanBorMain.getMaturityDate()));

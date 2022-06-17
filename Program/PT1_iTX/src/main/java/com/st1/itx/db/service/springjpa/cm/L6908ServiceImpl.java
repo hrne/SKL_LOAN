@@ -28,19 +28,18 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private BaseEntityManager baseEntityManager;
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 創建程式碼後,檢查初始值
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-
 	// *** 折返控制相關 ***
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
+
 	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
 
 		this.info("L6908FindData");
@@ -53,7 +52,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iRvNo.isEmpty()) {
 			iRvNo = " ";
 		}
-		
+
 		String iAcbookCode = titaVo.get("AcBookCode").trim();
 		String iAcSubBookCode = titaVo.get("AcSubBookCode").trim();
 		String iBranchNo = titaVo.get("BranchNo").trim();
@@ -61,21 +60,21 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iAcNoCode = titaVo.get("AcNoCode").trim();
 		String iAcSubCode = titaVo.get("AcSubCode").trim();
 		String iAcDtlCode = titaVo.get("AcDtlCode").trim();
-		int iAcdateSt = parse.stringToInteger(titaVo.get("AcDateSt").trim()) + 19110000;	
-		int iAcdateEd = parse.stringToInteger(titaVo.get("AcDateEd").trim()) + 19110000;	
-		
+		int iAcdateSt = parse.stringToInteger(titaVo.get("AcDateSt").trim()) + 19110000;
+		int iAcdateEd = parse.stringToInteger(titaVo.get("AcDateEd").trim()) + 19110000;
+
 		if (iAcSubCode.isEmpty()) {
 			iAcSubCode = "     ";
 		}
 		if (iAcDtlCode.isEmpty()) {
 			iAcDtlCode = "  ";
 		}
-		
+
 		this.info("iAcctCode = " + iAcctCode);
 		this.info("iCustNo = " + iCustNo);
 		this.info("iFacmNo = " + iFacmNo);
 		this.info("iRvNo = " + iRvNo);
-		
+
 		this.info("iAcbookCode = " + iAcbookCode);
 		this.info("iAcSubBookCode = " + iAcSubBookCode);
 		this.info("iBranchNo = " + iBranchNo);
@@ -85,142 +84,103 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iAcDtlCode = " + iAcDtlCode);
 		this.info("iAcdateSt = " + iAcdateSt);
 		this.info("iAcdateEd = " + iAcdateEd);
-		
-		
-		
-		String sql = "  SELECT  "; 
-		sql +=  "    t.\"RvNo\"          AS \"RvNo\","; 
-		sql +=  "    t.\"TxAmt\"         AS \"RvAmt\","; 
-		sql +=  "    ac.\"TitaTlrNo\"    AS \"TitaTlrNo\","; 
-		sql +=  "    ac.\"TitaTxtNo\"    AS \"TitaTxtNo\","; 
-		sql +=  "    tc.\"TranItem\"     AS \"TranItem\","; 
-		sql +=  "    ac.\"TitaTxCd\"     AS \"TitaTxCd\","; 
-		sql +=  "    NULL AS \"SlipNote\","; 
-		sql +=  "    ac.\"OpenAcDate\"   AS \"AcDate\","; 
-		sql +=  "    ac.\"CreateDate\"   AS \"CreateDate\","; 
-		sql +=  "    lb.\"EntryDate\"    AS \"EntryDate\","; 
-		sql +=  "    CASE"; 
-		sql +=  "        WHEN t.\"TxAmt\" > 0 THEN"; 
-		sql +=  "            0"; 
-		sql +=  "        ELSE"; 
-		sql +=  "            1"; 
-		sql +=  "    END AS \"ClsFlag\",";
-		sql +=  "    'AcReceivable'    AS \"DB\""; 
-		sql +=  "  FROM"; 
-		sql +=  "    \"AcReceivable\"   ac"; 
-		sql +=  "    LEFT JOIN \"LoanBorTx\"      lb ON lb.\"AcDate\" = ac.\"OpenAcDate\""; 
-		sql +=  "                                AND lb.\"TitaTlrNo\" = ac.\"TitaTlrNo\""; 
-		sql +=  "                                AND lb.\"TitaTxtNo\" = ac.\"TitaTxtNo\""; 
-		sql +=  "    LEFT JOIN \"TxTranCode\"     tc ON tc.\"TranNo\" = ac.\"OpenTxCd\""; 
-		sql +=  "    LEFT JOIN ("; 
-		sql +=  "        SELECT"; 
-		sql +=  "            a.\"RvNo\" ,"; 
-		sql +=  "            SUM("; 
-		sql +=  "                CASE"; 
-		sql +=  "                    WHEN a.\"ReceivableFlag\" >= 3 THEN"; 
-		sql +=  "                        a.\"TxAmt\""; 
-		sql +=  "                    WHEN a.\"DbCr\" = cd.\"DbCr\"    THEN"; 
-		sql +=  "                        a.\"TxAmt\""; 
-		sql +=  "                    ELSE"; 
-		sql +=  "                        - a.\"TxAmt\""; 
-		sql +=  "                END"; 
-		sql +=  "            ) AS \"TxAmt\""; 
-		sql +=  "        FROM"; 
-		sql +=  "            \"AcDetail\"   a"; 
-		sql +=  "            LEFT JOIN \"CdAcCode\"   cd ON cd.\"AcctCode\" = a.\"AcctCode\""; 
-		sql +=  "        WHERE"; 
-		sql +=  "            a.\"AcBookCode\" = :acbookcode"; 
-		sql +=  "            AND a.\"AcSubBookCode\" = :acsubbookcode"; 
-		sql +=  "            AND a.\"BranchNo\" = :branchno"; 
-		sql +=  "            AND a.\"CurrencyCode\" = :currencycode"; 
-		sql +=  "            AND a.\"AcNoCode\" = :acnocode"; 
-		sql +=  "            AND a.\"AcSubCode\" = :acsubcode"; 
-		sql +=  "            AND a.\"AcDtlCode\" = :acdtlcode"; 
-		sql +=  "            AND a.\"CustNo\" = :custno"; 
-		sql +=  "            AND a.\"FacmNo\" = :facmno"; 
-		sql +=  "            AND a.\"AcDate\" >= :acdatest"; 
-		sql +=  "            AND a.\"AcDate\" <= :acdateed"; 
-		sql +=  "            AND a.\"EntAc\" = 1"; 
-		sql +=  "            AND a.\"ReceivableFlag\" != 0"; 
-		sql +=  "            AND a.\"RvNo\" IS NOT NULL"; 
-//		sql +=  "            AND lpad(a.\"FacmNo\", 3, '0') = :rvno"; 
-		sql +=  "        GROUP BY"; 
-		sql +=  "            a.\"RvNo\""; 
-		sql +=  "    ) t ON t.\"RvNo\" = ac.\"RvNo\""; 
-		sql +=  "  WHERE"; 
-		sql +=  "    ac.\"AcctCode\" = :acctcode"; 
-		sql +=  "    AND ac.\"CustNo\" = :custno"; 
-		sql +=  "    AND ac.\"FacmNo\" = :facmno"; 
-		sql +=  "    AND ac.\"RvNo\" = :rvno"; 
-		sql +=  "  UNION"; 
-		sql +=  "  SELECT"; 
-		sql +=  "    ad.\"RvNo\"         AS \"RvNo\","; 
-		sql +=  "    ad.\"TxAmt\"        AS \"RvAmt\","; 
-		sql +=  "    ad.\"TitaTlrNo\"    AS \"TitaTlrNo\","; 
-		sql +=  "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\","; 
-		sql +=  "    tc.\"TranItem\"     AS \"TranItem\","; 
-		sql +=  "    ad.\"TitaTxCd\"     AS \"TitaTxCd\","; 
-		sql +=  "    ad.\"SlipNote\"     AS \"SlipNote\","; 
-		sql +=  "    ad.\"AcDate\"       AS \"AcDate\","; 
-		sql +=  "    ad.\"CreateDate\"   AS \"CreateDate\","; 
-		sql +=  "    lb.\"EntryDate\"    AS \"EntryDate\","; 
-		sql +=  "    CASE"; 
-		sql +=  "        WHEN ad.\"ReceivableFlag\" >= 3 THEN"; 
-		sql +=  "            1"; 
-		sql +=  "        WHEN ad.\"DbCr\" = cd.\"DbCr\"    THEN"; 
-		sql +=  "            0"; 
-		sql +=  "        ELSE"; 
-		sql +=  "            1"; 
-		sql +=  "    END AS \"ClsFlag\","; 
-		sql +=  "    'AcDetail'    AS \"DB\""; 
-		sql +=  "  FROM"; 
-		sql +=  "    \"AcDetail\"     ad"; 
-		sql +=  "    LEFT JOIN \"LoanBorTx\"    lb ON lb.\"AcDate\" = ad.\"AcDate\""; 
-		sql +=  "                                AND lb.\"TitaTlrNo\" = ad.\"TitaTlrNo\""; 
-		sql +=  "                                AND lb.\"TitaTxtNo\" = ad.\"TitaTxtNo\""; 
-		sql +=  "    LEFT JOIN \"TxTranCode\"   tc ON tc.\"TranNo\" = ad.\"TitaTxCd\""; 
-		sql +=  "    LEFT JOIN \"CdAcCode\"     cd ON cd.\"AcctCode\" = ad.\"AcctCode\""; 
-		sql +=  "  WHERE"; 
-		sql +=  "    ad.\"AcBookCode\" = :acbookcode"; 
-		sql +=  "    AND ad.\"AcSubBookCode\" = :acsubbookcode"; 
-		sql +=  "    AND ad.\"BranchNo\" = :branchno"; 
-		sql +=  "    AND ad.\"CurrencyCode\" = :currencycode"; 
-		sql +=  "    AND ad.\"AcNoCode\" = :acnocode"; 
-		sql +=  "    AND ad.\"AcSubCode\" = :acsubcode"; 
-		sql +=  "    AND ad.\"AcDtlCode\" = :acdtlcode"; 
-		sql +=  "    AND ad.\"CustNo\" = :custno"; 
-		sql +=  "    AND ad.\"FacmNo\" = :facmno"; 
-		sql +=  "    AND ad.\"AcDate\" >= :acdatest"; 
-		sql +=  "    AND ad.\"AcDate\" <= :acdateed"; 
-		sql +=  "    AND ad.\"RvNo\" IS NOT NULL"; 
-		sql +=  "  ORDER BY \"CreateDate\"";
-		
+
+		String sql = "  SELECT  ";
+		sql += "    ac.\"RvNo\"          AS \"RvNo\",";
+		sql += "    ac.\"RvAmt\"         AS \"RvAmt\",";
+		sql += "    ac.\"OpenTlrNo\"    AS \"TitaTlrNo\",";
+		sql += "    ac.\"OpenTxtNo\"    AS \"TitaTxtNo\",";
+		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
+		sql += "    ac.\"OpenTxCd\"     AS \"TitaTxCd\",";
+		sql += "    NULL AS \"SlipNote\",";
+		sql += "    ac.\"OpenAcDate\"   AS \"AcDate\",";
+		sql += "    ac.\"CreateDate\"   AS \"CreateDate\",";
+		sql += "    0                   AS \"EntryDate\",";
+		sql += "     0                   AS \"ClsFlag\",";
+		sql += "    'AcReceivable'      AS \"DB\"";
+		sql += "  FROM";
+		sql += "    \"AcReceivable\"   ac";
+		sql += "    LEFT JOIN \"TxTranCode\"     tc ON tc.\"TranNo\" = ac.\"OpenTxCd\"";
+		sql += "  WHERE";
+		sql += "    ac.\"AcctCode\" = :acctcode";
+		sql += "    AND ac.\"CustNo\" = :custno";
+		sql += "    AND ac.\"FacmNo\" = :facmno";
+		sql += "    AND ac.\"RvNo\" = :rvno";
+		sql += "    AND ac.\"ReceivableFlag\" >= 0 ";
+		sql += "  UNION";
+		sql += "  SELECT";
+		sql += "    ad.\"RvNo\"         AS \"RvNo\",";
+		sql += "    ad.\"TxAmt\"        AS \"RvAmt\",";
+		sql += "    ad.\"TitaTlrNo\"    AS \"TitaTlrNo\",";
+		sql += "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\",";
+		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
+		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
+		sql += "    ad.\"SlipNote\"     AS \"SlipNote\",";
+		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
+		sql += "    ad.\"CreateDate\"   AS \"CreateDate\",";
+		sql += "    0                   AS \"EntryDate\",";
+		sql += "     CASE";
+		sql += "        WHEN ad.\"ReceivableFlag\" >= 3 AND ad.\"DbCr\" = 'C' THEN 1 ";
+		sql += "        WHEN ad.\"ReceivableFlag\" >= 3 AND ad.\"DbCr\" = 'D' THEN 0 ";
+		sql += "        WHEN ad.\"AcctCode\" = 'TRO' AND ad.\"DbCr\" = 'D' THEN 0 ";
+		sql += "        WHEN ad.\"AcctCode\" = 'TRO' AND ad.\"DbCr\" = 'C' THEN 1 ";
+		sql += "        WHEN SUBSTR(ad.\"AcNoCode\",1,1) IN ('1','5','6','9') AND ad.\"DbCr\" = 'D' THEN 0 ";
+		sql += "        WHEN SUBSTR(ad.\"AcNoCode\",1,1) IN ('1','5','6','9') AND ad.\"DbCr\" = 'C' THEN 1 ";
+		sql += "        WHEN SUBSTR(ad.\"AcNoCode\",1,1) NOT IN ('1','5','6','9') AND ad.\"DbCr\" = 'D' THEN 1 ";
+		sql += "        WHEN SUBSTR(ad.\"AcNoCode\",1,1) NOT IN ('1','5','6','9') AND ad.\"DbCr\" = 'C' THEN 0 ";
+		sql += "        ELSE  1 ";
+		sql += "      END AS \"ClsFlag\",";
+		sql += "    'AcDetail'    AS \"DB\"";
+		sql += "  FROM";
+		sql += "    \"AcReceivable\"   ar";
+		sql += "  LEFT JOIN  \"AcDetail\"     ad";
+		sql += "     ON ad.\"AcctCode\" = :acctcodeac";
+		sql += "    AND ad.\"CustNo\" = :custno";
+		sql += "    AND ad.\"FacmNo\" = :facmno";
+		sql += "    AND ad.\"AcDate\" >= :acdatest";
+		sql += "    AND ad.\"AcDate\" <= :acdateed";
+		sql += "    AND ad.\"RvNo\"     = :rvno";
+		sql += "    AND ad.\"ReceivableFlag\"  > 0 ";
+		sql += "    AND CASE WHEN  ad.\"AcDate\" = ar.\"OpenAcDate\"";
+		sql += "              AND  ad.\"TitaTlrNo\"= ar.\"OpenTlrNo\" ";
+		sql += "              AND  ad.\"TitaTxtNo\"= ar.\"OpenTxtNo\" ";
+		sql += "             THEN 1 ELSE 0 END = 0 ";
+		sql += "  LEFT JOIN \"TxTranCode\"   tc ON tc.\"TranNo\" = ad.\"TitaTxCd\"";
+		sql += "  WHERE";
+		sql += "    ar.\"AcctCode\" = :acctcode";
+		sql += "    AND ar.\"CustNo\" = :custno";
+		sql += "    AND ar.\"FacmNo\" = :facmno";
+		sql += "    AND ar.\"RvNo\" = :rvno";
+		sql += "    AND NVL(ad.\"ReceivableFlag\", 0 ) >= 0";
+		sql += " ORDER BY \"AcDate\", \"CreateDate\"";
+
 		sql += " " + sqlRow;
-		
+
 		this.info("sql = " + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		// 如果沒取得變數則不會傳入query
-			query.setParameter("acctcode", iAcctCode);
-			query.setParameter("custno", iCustNo);
-			query.setParameter("facmno", iFacmNo);
-			query.setParameter("rvno", iRvNo);			
-			
-			query.setParameter("acbookcode", iAcbookCode);
-			query.setParameter("acsubbookcode", iAcSubBookCode);
-			query.setParameter("branchno", iBranchNo);
-			query.setParameter("currencycode", iCurrencyCode);
-			query.setParameter("acnocode", iAcNoCode);
-			query.setParameter("acsubcode", iAcSubCode);
-			query.setParameter("acdtlcode", iAcDtlCode);
-			query.setParameter("acdatest", iAcdateSt);
-			query.setParameter("acdateed", iAcdateEd);
-			
-			query.setParameter("ThisIndex", index);
-			query.setParameter("ThisLimit", limit);
-			
+		String acctCodeAc = iAcctCode;
+		if (acctCodeAc.substring(0, 1).equals("Z")) {
+			acctCodeAc = "3" + acctCodeAc.substring(1, 3);
+		}
+		if (acctCodeAc.equals("YOP")) {
+			acctCodeAc = "IOP";
+		}
+		query.setParameter("acctcodeac", acctCodeAc);
+		query.setParameter("acctcode", iAcctCode);
+		query.setParameter("custno", iCustNo);
+		query.setParameter("facmno", iFacmNo);
+		query.setParameter("rvno", iRvNo);
+
+		query.setParameter("acdatest", iAcdateSt);
+		query.setParameter("acdateed", iAcdateEd);
+
+		query.setParameter("ThisIndex", index);
+		query.setParameter("ThisLimit", limit);
+
 		this.info("L6908Service FindData=" + query);
 
 		// *** 折返控制相關 ***

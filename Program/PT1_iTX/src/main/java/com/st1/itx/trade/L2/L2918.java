@@ -2,28 +2,21 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCity;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
-import com.st1.itx.db.domain.CdLandOffice;
-import com.st1.itx.db.domain.CdLandOfficeId;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClOtherRights;
-import com.st1.itx.db.service.CdCityService;
-import com.st1.itx.db.service.CdCodeService;
-import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
+import com.st1.itx.db.service.springjpa.cm.L2918ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -42,13 +35,9 @@ public class L2918 extends TradeBuffer {
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
 	@Autowired
-	public CdCodeService cdCodeService;
-	@Autowired
-	public CdCityService cdCityService;
-	@Autowired
-	public CdLandOfficeService cdLandOfficeService;
-	@Autowired
 	public ClFacService clFacService;
+	@Autowired
+	public L2918ServiceImpl l2918ServiceImpl;
 
 	/* 日期工具 */
 	@Autowired
@@ -63,6 +52,18 @@ public class L2918 extends TradeBuffer {
 	int wkClCode2Ed = 99;
 	int wkClNoSt = 1;
 	int wkClNoEd = 9999999;
+	int clCode1 = 0;
+	int clCode2 = 0;
+	int clNo = 0;
+	String clOtherrightsSeq = "";
+	String otherCity = "";
+	String otherLandAdm = "";
+	int recYear = 0;
+	String otherRecWord = "";
+	String recNumber = "";
+	String rightsNote = "";
+	String securedTotal = "";
+	OccursList occurslist = new OccursList();
 	// new ArrayList
 	List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
 	List<ClFac> lClFac = new ArrayList<ClFac>();
@@ -91,47 +92,35 @@ public class L2918 extends TradeBuffer {
 		this.info("iClCode2 = " + iClCode2);
 		this.info("iClNo = " + iClNo);
 
-		int wkFacmNoS = 0;
-		int wkFacmNoE = 999;
-		if (iFacmNo > 0) {
-			wkFacmNoS = iFacmNo;
-			wkFacmNoE = iFacmNo;
-		}
-		if (iClCode1 > 0) {
-			wkClCode1St = iClCode1;
-			wkClCode1Ed = iClCode1;
-		}
-		if (iClCode2 > 0) {
-			wkClCode2St = iClCode2;
-			wkClCode2Ed = iClCode2;
-		}
-		if (iClNo > 0) {
-			wkClNoSt = iClNo;
-			wkClNoEd = iClNo;
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
+		try {
+			resultList = l2918ServiceImpl.findAll(this.index, this.limit, titaVo);
+		} catch (Exception e) {
+			this.info("Error ... " + e.getMessage());
 		}
 
+		this.info("resultList = " + resultList);
+		if (resultList != null && resultList.size() != 0) {
+			this.info("Size =" + resultList.size());
 
-		if (iCustNo > 0) {
-//			依戶號額度查詢
-			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoS, wkFacmNoE, this.index,
-					this.limit, titaVo);
-			lClFac = slClFac == null ? null : slClFac.getContent();
-			if (lClFac == null) {
-				throw new LogicException(titaVo, "E2003", "此戶號額度，擔保品與額度關聯檔無資料。");
-			}
-			for (ClFac tClFac : lClFac) {
-				wkClCode1St = tClFac.getClCode1();
-				wkClCode1Ed = tClFac.getClCode1();
-				wkClCode2St = tClFac.getClCode2();
-				wkClCode2Ed = tClFac.getClCode2();
-				wkClNoSt = tClFac.getClNo();
-				wkClNoEd = tClFac.getClNo();
+			for (Map<String, String> result : resultList) {
+				occurslist = new OccursList();
+
+				clCode1 = parse.stringToInteger(result.get("ClCode1"));
+				clCode2 = parse.stringToInteger(result.get("ClCode2"));
+				clNo = parse.stringToInteger(result.get("ClNo"));
+				clOtherrightsSeq = result.get("Seq");
+				otherCity = result.get("CityItem");
+				otherLandAdm = result.get("LandAdm");
+				recYear = parse.stringToInteger(result.get("RecYear"));
+				otherRecWord = result.get("RecWordItem");
+				recNumber = result.get("RecNumber");
+				rightsNote = result.get("RightsNote");
+				securedTotal = result.get("SecuredTotal");
+				
 				moveOccursList(titaVo);
 			}
-
-		} else {
-
-			moveOccursList(titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -140,73 +129,20 @@ public class L2918 extends TradeBuffer {
 
 	private void moveOccursList(TitaVo titaVo) throws LogicException {
 
-//		依擔保品查詢
-		Slice<ClOtherRights> slClOtherRights = sClOtherRightsService.findClCodeRange(wkClCode1St, wkClCode1Ed,
-				wkClCode2St, wkClCode2Ed, wkClNoSt, wkClNoEd, this.index, this.limit, titaVo);
-		lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
-		// 該統編查無擔保品主檔
-		if (lClOtherRights == null) {
-			throw new LogicException(titaVo, "E2003", "不存在於擔保品他項權利檔。");
-		}
+		occurslist.putParam("OOClCode1", clCode1);
+		occurslist.putParam("OOClCode2", clCode2);
+		occurslist.putParam("OOClNo", clNo);
+		occurslist.putParam("OOClSeq", clOtherrightsSeq);
+		occurslist.putParam("OOCityItem", otherCity);
+		occurslist.putParam("OOLandAdmItem", otherLandAdm);
+		occurslist.putParam("OORecYear", recYear);
+		occurslist.putParam("OORecWordItem", otherRecWord);
+		occurslist.putParam("OORecNumber", recNumber);
+		occurslist.putParam("OORightsNote", rightsNote);
+		occurslist.putParam("OOSecuredTotal", securedTotal);
 
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slClOtherRights != null && slClOtherRights.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			/* 手動折返 */
-			this.totaVo.setMsgEndToEnter();
-		}
+		/* 將每筆資料放入Tota的OcList */
+		this.totaVo.addOccursList(occurslist);
 
-		for (ClOtherRights t : lClOtherRights) {
-			// wk
-			String wkCityItem = "";
-			String wkLandOfficeItem = "";
-			String wkRecWordItem = "";
-
-			// new occurs
-			OccursList occurslist = new OccursList();
-
-			occurslist.putParam("OOClCode1", t.getClCode1());
-			occurslist.putParam("OOClCode2", t.getClCode2());
-			occurslist.putParam("OOClNo", t.getClNo());
-			occurslist.putParam("OOClSeq", t.getSeq());
-			// 找縣市名稱
-			if ("".equals(t.getOtherCity())) {
-				CdCity tCdCity = cdCityService.findById(t.getCity(), titaVo);
-				if (tCdCity != null) {
-					wkCityItem = tCdCity.getCityItem();
-				}
-			} else {
-				wkCityItem = t.getOtherCity();
-			}
-			occurslist.putParam("OOCityItem", wkCityItem);
-			// 找地政所名稱
-			if ("".equals(t.getOtherLandAdm())) {
-				CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", t.getLandAdm()), titaVo);
-				if (tCdCode != null) {
-					wkLandOfficeItem = tCdCode.getItem();
-				}
-			} else {
-				wkLandOfficeItem = t.getOtherLandAdm();
-			}
-			occurslist.putParam("OOLandAdmItem", wkLandOfficeItem);
-			occurslist.putParam("OORecYear", t.getRecYear());
-			// 找 收件字名稱
-			if ("".equals(t.getOtherRecWord())) {
-				CdLandOffice tCdLandOffice = cdLandOfficeService
-						.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
-				if (tCdLandOffice != null) {
-					wkRecWordItem = tCdLandOffice.getRecWordItem();
-				}
-			} else {
-				wkRecWordItem = t.getOtherRecWord();
-			}
-			occurslist.putParam("OORecWordItem", wkRecWordItem);
-			occurslist.putParam("OORecNumber", t.getRecNumber());
-			occurslist.putParam("OORightsNote", t.getRightsNote());
-			occurslist.putParam("OOSecuredTotal", t.getSecuredTotal());
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occurslist);
-		}
 	}
 }
