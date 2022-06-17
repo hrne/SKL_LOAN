@@ -37,7 +37,7 @@ E(0,0)
 
 </sub>
 
-<sub type="DC" name="p1" layout="cols=1;screen.width=[140,860];printer.width=[15,200];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[15,200];">
 [
 ["[L9110]                                 首次撥款審核資料表"],
 ["#R1+@核@准@號@碼@",#APPLNO1,#Btn1],
@@ -90,7 +90,7 @@ E(0,0)
 ["#R48",#APPLNO48,#Btn48],
 ["#R49",#APPLNO49,#Btn49],
 ["#R50",#APPLNO50,#Btn50],
-
+["#RChoice+@列@印@條@件@選@擇@",#Choice,#ChoiceDesc]
 ]
 
 !---------- AP Button AREA ----------
@@ -112,9 +112,12 @@ K(LIGHT,#R1,TXTRED,0)
 #R{i}=X,1,L
 ##end
 
+#RChoice=X,1,L
+
 ! 永遠為必輸欄位
 #ALWAYS_HIGHLIGHT=@,1,S
 T(3,@R1,*)
+T(3,@RChoice,*)
 
 !隱藏2-10行
 #HIDEAPPLNO=X,1,S
@@ -137,6 +140,16 @@ CALL(#ALWAYS_HIGHLIGHT)
 
 #BufSerch=X,15,S
 
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,20,S
+T(3,CdCode.Choice)
+#ChoiceHelpRim=X,1,S
+RESET_RIM(#ChoiceHelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ChoiceHelp,#HelpDesc1)
+#ChoiceHelp=x,1024,S
 
 ! ---------------
 ##loop{times:50,i:1,j:0,k:2}
@@ -157,6 +170,15 @@ IF(#APPLNO{i}>0,SHOW(#APPLNO{k},#Btn{k}),HIDE(#APPLNO{k},#Btn{k}))
 C(3,#APPLNO{i},0,INVOKEJS(SHOW,p1,{k},50,0),INVOKEJS(SHOW,p1,2,{k},1))
 
 ##end
+
+
+#Choice=A,1,I
+HELP(#ChoiceHelp)
+@V(H,#ChoiceHelp)
+T(H,@ChoiceDesc,#Choice,#ChoiceHelp)
+
+#ChoiceDesc=X,10,L
+T(H,#Choice,#ChoiceHelp)
 
 #RPTFG=A,1,S
 E(0,0)
@@ -252,6 +274,7 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 #APPLNO48
 #APPLNO49
 #APPLNO50
+#Choice
 </sub>
 
 
@@ -260,6 +283,7 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 TXFORM=L9110
 #PdfSnoF
 ^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

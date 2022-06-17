@@ -210,7 +210,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,CASE";
 			sql += "		  	 WHEN R.\"ClNo\" = 'Z' THEN '資金專案運用'";
 			sql += "		   ELSE ' ' END AS F23 ";
-			sql += "		  ,' ' AS F24";
+			sql += "		  ,0 AS F24";
 			sql += "		  ,' ' AS F25";
 			sql += "	FROM ( ";
 

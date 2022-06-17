@@ -38,7 +38,7 @@ public class LM029Report extends MakeReport {
 		List<Map<String, String>> listLM029 = null;
 
 		try {
-			listLM029 = lM029ServiceImpl.findAll(titaVo,yearMonth);
+			listLM029 = lM029ServiceImpl.findAll(titaVo, yearMonth);
 			exportExcel(titaVo, listLM029);
 
 		} catch (Exception e) {
@@ -51,15 +51,26 @@ public class LM029Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM029) throws LogicException {
 		this.info("LM029Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表", "LM029_底稿_放款餘額明細表.xlsx", "la$w30p");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表",
+				"LM029_底稿_放款餘額明細表.xlsx", "la$w30p");
+		
+		String today = dDateUtil.getNowStringBc();
+		
+		// 表頭
+		makeExcel.setValue(2, 25, "日　　期：" + this.showBcDate(today, 1));
+		makeExcel.setValue(3, 25, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
+		
+		
 		if (listLM029 == null || listLM029.isEmpty()) {
 
-			makeExcel.setValue(2, 1, "本日無資料", "L");
+			makeExcel.setValue(6, 1, "本日無資料", "L");
 
 		} else {
+			
 
-			int row = 2;
+			int row = 6;
 
 			for (Map<String, String> tLDVo : listLM029) {
 
@@ -94,11 +105,16 @@ public class LM029Report extends MakeReport {
 						makeExcel.setValue(row, col + 1, amt, "#,##0", "R");
 						break;
 					case 16:
-						makeExcel.setValue(row, 4, fieldValue, "L"); // 帳冊別
+						makeExcel.setValue(row, 4, "00A".equals(fieldValue) ? "利變帳冊年金-" : "傳統帳冊" + fieldValue, "L"); // 帳冊別
 						break;
 					case 17:
 						makeExcel.setValue(row, col, fieldValue, "L"); // 餘期數
 						break;
+					case 18:
+					case 19:
+					case 20:
+						makeExcel.setValue(row, col, fieldValue, "L"); // 餘期數
+
 					default:
 						makeExcel.setValue(row, col + 1, fieldValue, "L");
 						break;
@@ -107,9 +123,9 @@ public class LM029Report extends MakeReport {
 
 				row++;
 			} // for
-			
+
 			// 放款餘額總計的 excel formula
-			makeExcel.formulaCaculate(1, 17);
+			makeExcel.formulaCaculate(5, 17);
 		}
 
 		makeExcel.close();
