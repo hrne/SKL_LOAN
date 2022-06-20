@@ -5526,6 +5526,7 @@ TXFORM=L4R32
 #L5r01IntRate=m,2.2,S
 #L5r01FirstDueDate=D,7,S
 #L5r01LastDueDate=D,7,S
+#L5r01NextPayDate=D,7,S
 #L5r01IsMainFin=X,1,S
 #L5r01TotalContrAmt=m,14,S
 #L5r01MainFinCode=X,8,S
@@ -5561,6 +5562,7 @@ TXFORM=L5R01
 #L5r01IntRate
 #L5r01FirstDueDate
 #L5r01LastDueDate
+#L5r01NextPayDate
 #L5r01IsMainFin
 #L5r01TotalContrAmt
 #L5r01MainFinCode

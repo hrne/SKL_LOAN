@@ -31,7 +31,7 @@ E(0,0)
 [#<->#,"#FdDueAmt+期款",#DueAmt],
 ["#FdTotalPeriod+期數",#TotalPeriod],["#FdIntRate+計息條件",#IntRate,"%"],
 ["#FdFirstDueDate+首次應繳日",#FirstDueDate],["#FdLastDueDate+還款結束日",#LastDueDate],
-["#FdFieldName+#FieldName",#TotalContrAmt],
+["#FdFieldName+#FieldName",#TotalContrAmt],["#FdNextPayDate+下次應繳日",#NextPayDate],
 [#<->#,"#FdMainFinCode+最大債權機構",#MainFinCode,#MainFinCodeName],
 ["#FdTwoStepCode+二階段註記",#TwoStepCode,#TwoStepCodeX],
 [#<->#,"@",#BTNK,#BtnConnect,#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL],
@@ -79,6 +79,8 @@ T(3,*)
 T(3,*)
 #FdFieldName=X,1,L
 T(3,*)
+#FdNextPayDate=X,2,L
+T(3,  )
 #FdMainFinCode=X,2,L
 T(3,*)
 #FdTwoStepCode=X,2,L
@@ -263,6 +265,7 @@ E(0,@TotalPeriod,#L5r01TotalPeriod)
 E(0,@IntRate,#L5r01IntRate)
 T(2,@FirstDueDate,#L5r01FirstDueDate)
 T(2,@LastDueDate,#L5r01LastDueDate)
+IF (#FunctionCode=="09"||#FunctionCode=="11",$,T(2,@NextPayDate,#L5r01NextPayDate))
 T(2,@IsMainFin,#L5r01IsMainFin)
 E(0,@TotalContrAmt,#L5r01TotalContrAmt)
 T(2,@MainFinCode,#L5r01MainFinCode)
@@ -676,6 +679,8 @@ IF(#FirstDueDate>#LastDueDate,V(P,[還款結束日]不得小於[首次應繳日]
 
 ! 文字欄位
 #FieldName=X,10,L
+
+#NextPayDate=D,7,L
 
 ! #Msg1=x,1,S
 ! T(3,[)

@@ -149,6 +149,7 @@ public class L5R01 extends TradeBuffer {
 			totaVo.putParam("L5r01IntRate", NegMainVO.getIntRate());//
 			totaVo.putParam("L5r01FirstDueDate", NegMainVO.getFirstDueDate());//
 			totaVo.putParam("L5r01LastDueDate", NegMainVO.getLastDueDate());//
+			totaVo.putParam("L5r01NextPayDate", NegMainVO.getNextPayDate());//
 			totaVo.putParam("L5r01IsMainFin", NegMainVO.getIsMainFin());//
 			totaVo.putParam("L5r01TotalContrAmt", NegMainVO.getTotalContrAmt());//
 			totaVo.putParam("L5r01MainFinCode", NegMainVO.getMainFinCode());//

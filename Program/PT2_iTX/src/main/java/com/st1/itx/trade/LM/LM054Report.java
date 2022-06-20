@@ -70,7 +70,13 @@ public class LM054Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM054ServiceImpl.findAll error = " + errors.toString());
 		}
+				
+		if (fnAllList.size() == 0) {
+	
+			makeExcel.setValue(7, 3, "本日無資料");
 
+		}
+		
 		makeExcel.close();
 
 	}
@@ -175,7 +181,7 @@ public class LM054Report extends MakeReport {
 			if (lM054Vo.get("F23").length() > 1) {
 				mark.add(lM054Vo.get("F23"));
 			}
-			if (tempNo.equals(lM054Vo.get("F0"))) {
+			if (tempNo.equals(lM054Vo.get("F0")) || lM054Vo.get("F0").length() != 8) {
 				mark.add("同一擔保品");
 			}
 

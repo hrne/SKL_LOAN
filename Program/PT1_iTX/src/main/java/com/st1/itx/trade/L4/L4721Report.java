@@ -267,6 +267,11 @@ public class L4721Report extends MakeReport {
 						print(0, 55, newRate, "R");
 					}
 				}
+				
+				// 先更新表頭資料
+				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
+						parse.stringToInteger(mapL4721Head.get("FacmNo")),
+						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 				this.newPage();
 			}
 
@@ -329,11 +334,15 @@ public class L4721Report extends MakeReport {
 								print(0, 55, newRate, "R");
 							}
 
-							this.newPage();
-//					// 先更新表頭資料
 							setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")),
 									parse.stringToInteger(mapL4721Detail.get("FacmNo")),
 									parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
+							
+							this.newPage();
+//					// 先更新表頭資料
+//							setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")),
+//									parse.stringToInteger(mapL4721Detail.get("FacmNo")),
+//									parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
 						} // if
 					} // if
 					print(1, 1, "　");

@@ -70,22 +70,26 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			 */
 
 			sql += "	SELECT LPAD(M.\"CustNo\",7,0) AS F0";
-			sql += "		  ,(CASE";
-			sql += "			  WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
-			sql += "			  WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
-			sql += "			  WHEN M.\"ClCode1\" = 5 THEN 'A'";
-			sql += "			  WHEN M.\"ClCode1\" = 9  THEN 'B'";
-			sql += "			ELSE 'Z' END ) AS F1";
+			sql += "		  ,CASE";
+			sql += "			 WHEN M.\"ClCode1\" IN (3) THEN 'D'";
+			sql += "			 WHEN M.\"ClCode1\" IN (1,2) ";
+			sql += "			  AND (REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')";
+			sql += "			  OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')";
+			sql += "			  OR M.\"FacAcctCode\" = 340 ) ";
+			sql += "			 THEN 'Z' ";
+			sql += "			 WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+			sql += "			ELSE '99' END ) AS \"ClNo\"";
 			sql += "		  ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS F2";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL THEN 'A'";
 			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";
 			sql += "			ELSE 'B' END ) AS F3";
+			//EntCode 0=個金,1=企金,2=企金自然人
 			sql += "		  ,(CASE";
-			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" = 0 THEN 'D'";
-			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" <> 0 THEN 'C'";
-			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND M.\"EntCode\" = 0 THEN 'B'";
-			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND M.\"EntCode\" <> 0 THEN 'A'";
+			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" <> 1 THEN 'D'";
+			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" = 1 THEN 'C'";
+			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND M.\"EntCode\" <> 1 THEN 'B'";
+			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND M.\"EntCode\" = 1 THEN 'A'";
 			sql += "			ELSE ' ' END ) AS F4";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN REGEXP_LIKE(M2.\"ProdNo\",'I[A-Z]') OR M2.\"FacAcctCode\" = 340 THEN 'Y'";
@@ -177,7 +181,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 
 			sql += "	SELECT :eymd  AS F0";
-			sql += "		  ,R.\"ClNo\" AS F1";
+			sql += "		  ,DECODE(R.\"ClNo\",'A','ZZ','B','ZZ',R.\"ClNo\") AS F1";
 			sql += "		  ,CASE";
 			sql += "		  	 WHEN R.\"ClNo\" = 'D' THEN '有價證券'";
 			sql += "		  	 WHEN R.\"ClNo\" = 'Z' THEN '不動產抵押放款'";
