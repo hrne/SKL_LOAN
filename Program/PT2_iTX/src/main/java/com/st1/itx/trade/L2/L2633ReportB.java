@@ -53,7 +53,7 @@ public class L2633ReportB extends MakeReport {
 	private int reportDate = 0;
 	private String brno = "";
 	private String reportCode = "L2633B";
-	private String reportItem = "清償日報表(限補領補發)";
+	private String reportItem = "清償日報表-限補領補發";
 	private String security = "機密";
 	private String defaultPdf = "";
 	private String pageSize = "A4";
@@ -234,6 +234,7 @@ public class L2633ReportB extends MakeReport {
 			// 出空表
 			this.open(titaVo, titaVo.getEntDyI(), brno, reportCode, reportItem, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
+			this.setRptItem("清償日報表-限補領補發(無符合資料)");
 			print(2, 1, "本日無資料");
 			return;
 		}

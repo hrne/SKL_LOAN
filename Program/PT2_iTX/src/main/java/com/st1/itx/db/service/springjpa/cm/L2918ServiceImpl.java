@@ -33,7 +33,11 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public Parse parse;
 
 	// *** 折返控制相關 ***
+	private int index;
+
+	// *** 折返控制相關 ***
 	private int limit;
+
 
 	// *** 折返控制相關 ***
 	private int cnt;
@@ -135,11 +139,15 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " clor.\"Seq\" ASC ";
 		sql += " " + sqlRow;
 
+		// *** 折返控制相關 ***
+		this.index = index;
+		// *** 折返控制相關 ***
+		this.limit = limit;
+		
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
 		if (iCustNo > 0) {
 			query.setParameter("custNo", iCustNo);
 			query.setParameter("facmNoS", wkFacmNoStart);
@@ -178,8 +186,6 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setMaxResults(this.limit);
 		List<Object> result = query.getResultList();
 
-		size = result.size();
-		this.info("Total size ..." + size);
 
 		return this.convertToMap(query);
 	}

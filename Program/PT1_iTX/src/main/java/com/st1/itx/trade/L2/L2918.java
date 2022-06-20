@@ -102,6 +102,7 @@ public class L2918 extends TradeBuffer {
 
 		this.info("resultList = " + resultList);
 		if (resultList != null && resultList.size() != 0) {
+
 			this.info("Size =" + resultList.size());
 
 			for (Map<String, String> result : resultList) {
@@ -118,9 +119,14 @@ public class L2918 extends TradeBuffer {
 				recNumber = result.get("RecNumber");
 				rightsNote = result.get("RightsNote");
 				securedTotal = result.get("SecuredTotal");
-				
+
 				moveOccursList(titaVo);
 			}
+		}
+		if (resultList != null && resultList.size() >= this.limit) {
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
 
 		this.addList(this.totaVo);
@@ -145,4 +151,5 @@ public class L2918 extends TradeBuffer {
 		this.totaVo.addOccursList(occurslist);
 
 	}
+
 }

@@ -50,8 +50,9 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6023]                                 收件字代碼查詢"],
-["#FdLandOfficeCode+地政別代碼",#LandOfficeCode,#LandOfficeCodeX],
-["#FdRecWord+收件字代碼",#RecWord],
+["#FdCity+縣市別",#City,#CityX],
+["#FdLandOfficeCode+地政別",#LandOfficeCode,#LandOfficeCodeX],
+["#FdRecWord+收件字",#RecWord],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -60,6 +61,7 @@ K(MODIFYBUTTON,查詢)
 
 
 !---------- AP TEXT AREA Variables ----------
+#FdCity=X,2,L
 #FdLandOfficeCode=X,2,L
 #FdRecWord=X,2,L
 
@@ -77,7 +79,35 @@ C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
 
 #LoanOfficeHelp=X,2000,S
 
-#City=X,2,S
+
+<include src="ROM.icf::L6R03.dec"/>
+
+!調RIM參數
+#RimCityCode=X,2,S
+#RimAreaCode=X,3,S
+#RimFunCd=A,1,S
+
+! 調RIM取縣市代碼
+#RimL6r03City=X,1,S
+E(0,@RimFunCd,1)
+T(2,@RimCityCode,)
+T(2,@RimAreaCode,)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+
+! 縣市代碼的下拉選單
+#L6r03ResultCity=X,50000,S
+T(2,#L6r03Result)
+
+#City=X,2,I
+HELP(#L6r03ResultCity)
+@C(4,#City,S,V(H,#L6r03ResultCity))
+
+#CityX=X,20,L
+C(4,#City,S,$)
+T(H,#City,#L6r03ResultCity)
+
 #CityCode=X,2,S
 
 ! 依縣市別組地政下拉選單
@@ -94,7 +124,7 @@ T(2,@LoanOfficeHelp,#L2r59Help1)
 HELP(#LoanOfficeHelp)
 C(3,#CHAIN,1,s,$)
 @T(3,@LandOfficeCodeX,)
-@C(4,#LandOfficeCode,S,V(H,#LoanOfficeHelp))
+C(4,#LandOfficeCode,S,V(H,#LoanOfficeHelp))
 
 #LandOfficeCodeX=X,8,L
 C(4,#LandOfficeCode,S,$)
@@ -182,6 +212,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=刪除;ntxbuf=#OOBUF4})
 
 !------ 上行電文 ------
 <sub type="TIM">
+#CityCode
 #LandOfficeCode
 #RecWord
 #END
@@ -198,6 +229,7 @@ TXFORM=L6023
 #OOLastEmp
 ^
 <include src="ROM.icf::L2R59.tom"/>
+<include src="ROM.icf::L6R03.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

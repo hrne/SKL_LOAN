@@ -141,6 +141,7 @@ public class L3005 extends TradeBuffer {
 			this.info("Error ... " + e.getMessage());
 		}
 
+		this.info("resultList = " + resultList);
 		if (resultList != null && resultList.size() != 0) {
 
 			this.info("Size =" + resultList.size());
@@ -182,10 +183,11 @@ public class L3005 extends TradeBuffer {
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
 				BigDecimal wkTempAmt = BigDecimal.ZERO;
 				BigDecimal wkShortfall = BigDecimal.ZERO;
-				String txMsg = "";
 				if (!relNo.equals(newRelNo)) {
-					if ("2".equals(result.get("TitaCrDb")) && totTxAmt.compareTo(BigDecimal.ZERO) > 0) {
-						txMsg = repayCodeX + " " + df.format(totTxAmt); // 金額+還款類別
+					if ("L3220".equals(titaTxCd) || totTxAmt.compareTo(BigDecimal.ZERO) == 0) {
+						occursList.putParam("OOTxMsg", ""); // 金額+還款類別
+					} else {
+						occursList.putParam("OOTxMsg", repayCodeX + " " + df.format(totTxAmt)); // 金額+還款類別
 					}
 				}
 				if ((titaHCode.equals("0") || titaHCode.equals("3") || titaHCode.equals("4"))
@@ -207,20 +209,14 @@ public class L3005 extends TradeBuffer {
 					wkCurrencyCode = titaCurCd;
 				}
 				this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-
+				wkShortfall = unpaidAmt;
 				// 暫收款金額為負時，為暫收抵繳
 				if (tempAmt.compareTo(BigDecimal.ZERO) <= 0) {
 					wkTempAmt = BigDecimal.ZERO.subtract(tempAmt);
 				} else {
 					wkTempAmt = BigDecimal.ZERO;
-				}
-				// 溢短繳
-				if (tempAmt.compareTo(BigDecimal.ZERO) > 0) {
 					wkShortfall = tempAmt;
-				} else {
-					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);
 				}
-
 				relNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);
@@ -253,7 +249,6 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
 				occursList.putParam("OOTxCd", titaTxCd); // 交易代號
 				// 新增摘要 跟費用明細
-				occursList.putParam("OOTxMsg", txMsg); // 金額+還款類別
 				occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
 				occursList.putParam("OOTotTxAmt", totTxAmt); // 交易總金額
 
@@ -267,6 +262,12 @@ public class L3005 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0001", "會計日期  " + iAcDate + " 後無交易資料"); // 查詢資料不存在
 			}
+		}
+
+		if (resultList != null && resultList.size() >= this.limit) {
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
 
 		this.addList(this.totaVo);

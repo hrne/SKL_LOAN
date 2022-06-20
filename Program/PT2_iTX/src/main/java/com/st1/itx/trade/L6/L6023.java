@@ -2,22 +2,17 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.CdLandOffice;
-import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.CdLandOfficeService;
+import com.st1.itx.db.service.springjpa.cm.L6023ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -30,13 +25,11 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6023 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6023.class);
 
 	/* DB服務注入 */
 	@Autowired
-	public CdLandOfficeService cdLandOfficeService;
-	@Autowired
-	public CdEmpService sCdEmpService;
+	public L6023ServiceImpl l6023ServiceImpl;
+
 	@Autowired
 	Parse parse;
 
@@ -55,54 +48,46 @@ public class L6023 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 64 * 200 = 12,800
 
-		// 查詢保證人關係代碼檔
-		Slice<CdLandOffice> slCdLandOffice;
-		if (iLandOfficeCode.isEmpty() || "".equals(iLandOfficeCode)) {
-			slCdLandOffice = cdLandOfficeService.findAll(this.index, this.limit, titaVo);
-		} else {
-			slCdLandOffice = cdLandOfficeService.findLandOfficeCode(iLandOfficeCode, this.index, this.limit, titaVo);
-		}
-		List<CdLandOffice> lCdLandOffice = slCdLandOffice == null ? null : slCdLandOffice.getContent();
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
-		if (lCdLandOffice == null || lCdLandOffice.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "地政收件字檔"); // 查無資料
+		try {
+			resultList = l6023ServiceImpl.findAll(this.index, this.limit, titaVo);
+		} catch (Exception e) {
+			this.info("Error ... " + e.getMessage());
 		}
 
 		int wkCnt = 0;
-		// 如有找到資料
-		for (CdLandOffice t : lCdLandOffice) {
-			if ((!"".equals(iRecWord)) && !iRecWord.equals(t.getRecWord())) {
-				continue;
+		this.info("resultList = " + resultList);
+		if (resultList != null && resultList.size() != 0) {
+
+			this.info("Size =" + resultList.size());
+
+			for (Map<String, String> result : resultList) {
+
+				OccursList occurslist = new OccursList();
+
+				occurslist.putParam("OOLandOfficeCode", result.get("LandOfficeCode"));
+				occurslist.putParam("OORecWord", result.get("RecWord"));
+				occurslist.putParam("OORecWordItem", result.get("RecWordItem"));
+				/* 將每筆資料放入Tota的OcList */
+				wkCnt++;
+				this.totaVo.addOccursList(occurslist);
+
 			}
-			OccursList occursList = new OccursList();
-			occursList.putParam("OOLandOfficeCode", t.getLandOfficeCode());
-			occursList.putParam("OORecWord", t.getRecWord());
-			occursList.putParam("OORecWordItem", t.getRecWordItem());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(t.getLastUpdate())+ " " +parse.timeStampToStringTime(t.getLastUpdate()));
-			occursList.putParam("OOLastEmp", t.getLastUpdateEmpNo() + " " + empName(titaVo, t.getLastUpdateEmpNo()));
-			/* 將每筆資料放入Tota的OcList */
-			wkCnt++;
-			this.totaVo.addOccursList(occursList);
 		}
 
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slCdLandOffice != null && slCdLandOffice.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
-		}
 		if (wkCnt == 0) {
 			throw new LogicException(titaVo, "E0001", "地政收件字檔"); // 查無資料
 		}
+
+		if (resultList != null && resultList.size() >= this.limit) {
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	private String empName(TitaVo titaVo, String empNo) throws LogicException {
-		String rs = empNo;
 
-		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
-		if (cdEmp != null) {
-			rs = cdEmp.getFullname();
-		}
-		return rs;
-	}
 }

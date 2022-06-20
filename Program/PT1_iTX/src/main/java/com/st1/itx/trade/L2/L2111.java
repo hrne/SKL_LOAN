@@ -33,25 +33,7 @@ import com.st1.itx.util.parse.Parse;
  * b.若為團體戶件,則須輸入團體戶之統一編號
  * c.案件核准後,只可修改專辦,協辦, 核決主管,介紹人及駐區資料
  */
-/*
- * FuncCode=X,1
- * CustId=X,10
- * ApplNo=9,7
- * ApplDate=9,7
- * ProdNo=X,5
- * AcctCode=9,3
- * CurrencyCode=X,3
- * TimApplAmt=9,14.2
- * Estimate=X,6
- * PieceCode=X,1
- * CreditOfficer=X,6
- * LoanOfficer=X,6
- * Introducer=X,6
- * Supervisor=X,6
- * Coorgnizer=X,6
- * ProcessCode=9,1
- * GroupId=X,10
- */
+
 /**
  * L2111 案件申請登錄
  * 
@@ -293,6 +275,7 @@ public class L2111 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2006", "案件申請檔"); // 修改資料不存在
 			}
 			if (tFacCaseAppl.getProcessCode().equals("1")) {
+				tFacCaseAppl.setSyndNo(parse.stringToInteger(titaVo.getParam("SyndNo"))); // 聯貸案序號 2021/09/27新增
 				tFacCaseAppl.setCreditOfficer(titaVo.getParam("CreditOfficer"));
 				tFacCaseAppl.setLoanOfficer(titaVo.getParam("LoanOfficer"));
 				tFacCaseAppl.setIntroducer(titaVo.getParam("Introducer"));

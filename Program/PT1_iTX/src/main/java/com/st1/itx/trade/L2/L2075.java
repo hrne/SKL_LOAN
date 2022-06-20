@@ -128,12 +128,6 @@ public class L2075 extends TradeBuffer {
 		this.info("resultList = " + resultList);
 		this.info("resultList.size() = " + resultList.size());
 		if (resultList != null && resultList.size() != 0) {
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (resultList.size() == this.limit && hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
 
 			int i = 1;
 			for (Map<String, String> result : resultList) {
@@ -251,28 +245,13 @@ public class L2075 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 
+		if (resultList != null && resultList.size() >= this.limit) {
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	private Boolean hasNext() {
-		Boolean result = true;
-
-		int times = this.index + 1;
-		int cnt = l2075ServiceImpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
-
-		return result;
 	}
 
 	private void moveOccursList(ClOtherRights tClOtherRights, TitaVo titaVo) {
