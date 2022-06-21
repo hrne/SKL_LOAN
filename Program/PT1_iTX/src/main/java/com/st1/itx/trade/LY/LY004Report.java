@@ -58,9 +58,8 @@ public class LY004Report extends MakeReport {
 
 		// 通用處理
 		// 設定年月份
-		String iRoc = String.valueOf(inputYearMonth/100 - 1911);
-		String iMon =String.valueOf(inputYearMonth% 100 - 1911);
-		makeExcel.setValue(1, 1, String.format("新光人壽保險股份有限公司  %s年度(%s月)報表", iRoc,iMon));
+
+		makeExcel.setValue(1, 1, String.format("新光人壽保險股份有限公司  %s年度(%s月)報表", titaVo.getEntDy().substring(1, 4), titaVo.getEntDy().substring(4, 6)));
 
 		if (lY004List != null && !lY004List.isEmpty()) {
 			// 有資料時處理

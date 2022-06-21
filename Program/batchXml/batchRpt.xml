@@ -454,8 +454,14 @@
 			<tasklet ref="LH001" />
 		</step>
 	</job>
-
 	<!-- 年報 -->
+	<job id="jLY004" parent="parentJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLY004" parent="parentStep">
+			<tasklet ref="LY004" />
+		</step>
+	</job>
+
 	<job id="jLY005" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY005" parent="parentStep">
