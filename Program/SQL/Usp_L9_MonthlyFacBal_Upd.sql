@@ -511,7 +511,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('UPDATE LawAmount END');
 
 --  更新  資產五分類(非1類)
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass');
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1');
 
     MERGE INTO "MonthlyFacBal" M
     USING (
@@ -580,7 +580,9 @@ BEGIN
     
     UPD_CNT := UPD_CNT + sql%rowcount;
 
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass END');
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1 END');
+
+
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;

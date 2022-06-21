@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanBorMain_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_LoanBorMain_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -193,6 +193,11 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          -- 2022-06-21 Wei 新增 from Linda
+          -- 智偉~
+          -- 賴桑說AS400的LA$LMSP.LMSGTP寬限區分要轉資料進來,需要在LoanBorMain加一個欄位,
+          -- 賴桑會調整程式維護欄位(撥款主檔寬限區分欄位為隱藏欄位,判斷是否案件核准時有寬限期)
+          ,"LA$LMSP"."LMSGTP"             AS "GraceFlag"           -- 寬限區分 DECIMAL 1
     FROM "LA$LMSP"
     LEFT JOIN "LN$CLMP" ON "LN$CLMP"."LMSACN" = "LA$LMSP"."LMSACN"
                        AND "LN$CLMP"."LMSAPN" = "LA$LMSP"."LMSAPN"
@@ -315,6 +320,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_LoanBorMain_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 

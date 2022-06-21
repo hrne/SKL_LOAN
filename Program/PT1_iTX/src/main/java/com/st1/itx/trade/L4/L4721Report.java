@@ -215,8 +215,8 @@ public class L4721Report extends MakeReport {
 
 			// 檢查 CustNotice 確認這份表是否能出
 			// 跳過 測試用
-//			if (!custNoticeCom.checkIsLetterSendable(null, custNo, facmNo, "L4721", titaVo))
-//				continue;
+			if (!custNoticeCom.checkIsLetterSendable(null, custNo, facmNo, "L4721", titaVo))
+				continue;
 
 			// 印出有 暫收款額度000的資料 下方帶出利率變動額度
 

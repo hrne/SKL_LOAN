@@ -24,7 +24,7 @@ import com.st1.itx.util.http.WebClient;
 public class LY004p extends TradeBuffer {
 
 	@Autowired
-	LY003Report lY004Report;
+	LY004Report lY004Report;
 
 	@Autowired
 	DateUtil dDateUtil;

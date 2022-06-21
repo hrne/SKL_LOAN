@@ -1,0 +1,1283 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,900];printer.width=[30,30,30,30];order=1">
+[
+["[L2111]                                 案件申請登錄"],
+[#<->#,"#FdFuncCode+功能",#FuncCodeX],
+[#<->#,"#FdCustId+統一編號",#CustId,#BTN1,#CustIdX],
+[#<->#,"#FdApplNo+申請號碼",#ApplNo,"@@@"],
+[#<->#,"#FdCreditSysNo+案件編號",#CreditSysNo],
+[#<->#,"#FdSyndNo+聯貸案編號",#SyndNo,#BTN2],
+[#<->#,"#FdApplDate+申請日期",#ApplDate,#LbApplDate],
+[#<->#,"#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
+[#<->#,"#FdProdNo+申請商品代碼",#ProdNo,#BTN3,#ProdName], 
+! [#<->#,"#FdAcctCode+申請科目",#AcctCode,#AcctCodeX],
+[#<->#,"#FdCurrencyCode+申請幣別",#CurrencyCode],
+[#<->#,"#FdApplAmt+申請金額",#TwApplAmt,#UsApplAmt,#LbApplAmt],
+[#<->#,"#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BTN2=X,15,I,ui:button;value:聯貸案資料查詢;enable:1;tabbable:0;title:L2060 聯貸案明細資料查詢;
+#BTN3=X,15,I,ui:button;value:商品參數查詢;enable:0;tabbable:0;title:L2001 商品參數明細資料查詢
+#BTN4=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN5=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN6=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN7=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN8=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L6088 員工資料檔查詢;
+#BTN9=X,15,I,ui:button;value:協辦人員查詢;enable:1;tabbable:0;title:L5022 協辦人員資料查詢;
+#BTN10=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BUF1=X,42,S
+HIDE(#UsApplAmt)
+
+#Init1=X,1,S
+HIDE(#FinancialBtn)
+
+#FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!FuncCode
+#CDDEF01=x,20,S
+T(3,CdCode.FuncCode)
+
+#FuncCodeHelp=x,1024,S
+
+!PieceCode
+#CDDEF02=x,25,S
+T(3,CdCode.PieceCode)
+
+#PieceCodeHelp=x,1024,S
+
+!ProcessCode
+#CDDEF03=x,25,S
+T(3,CdCode.ApplProcessCode)
+
+#ProcessCodeHelp=x,1024,S
+
+#CDDEF04=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+!YesNo YesNo
+#CDDEF05=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
+!DepartmentCode 案件隸屬單位
+#CDDEF06=x,25,S
+T(3,CdCode.DepartmentCode)
+
+#DepartmentCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+T(2,@PieceCodeHelp,#HelpDesc2) 
+T(2,@ProcessCodeHelp,#HelpDesc3)
+T(2,@CurrPrecisionHelp,#HelpDesc4)
+T(2,@YesNoHelp,#HelpDesc5)
+T(2,@DepartmentCodeHelp,#HelpDesc6)
+
+#Rim1=A,1,S
+
+#SendL2r57=X,1,S
+E(0,@Rim1,1)
+S(L2R57,1,#Rim1)
+R(1,L2R57)
+
+#EntProdNo=x,2480,S
+T(2,#L2r57Help1)
+
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2010申請案件明細資料查詢]進入),$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+C(5,#EMPNOT,ELTEST,INVOKEJS(SHOW,p4,1),INVOKEJS(SHOW,p4,0))
+
+#NTXBUF=X,18,S
+C(3,#CHAIN,1,$,S)
+T(4,NTXBUF$)
+HIDE(#FuncCode)
+T(1,@CustId,#NTXBUF,2,10)
+T(1,@ApplNo,#NTXBUF,12,7)
+
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+![功能]
+!已作過准駁處理之案件不可刪除
+#FdFuncCode=X,2,L
+C(3,#CHAIN,1,T(3, ),T(3,*))
+
+#FdCustId=X,2,L
+#FdApplNo=X,2,L
+#FdCreditSysNo=X,2,L
+#FdSyndNo=X,2,L
+#FdApplDate=X,2,L
+#FdDepartmentCode=X,2,L
+#FdProdNo=X,2,L
+#FdCurrencyCode=X,2,L
+#FdApplAmt=X,2,L
+#FdPieceCode=X,2,L
+#FdEstimate=X,2,L
+#FdCreditOfficer=X,2,L
+#FdLoanOfficer=X,2,L
+#FdSupervisor=X,2,L
+#FdCoorgnizer=X,2,L
+#FdIntroducer=X,2,L
+#FdProcessCode=X,2,L
+#FdGroupId=X,2,L
+#FdFacShareApplNo=X,2,L
+#FdJcicMergeFlag=X,2,L
+#FdIsLimit=X,2,L
+#FdIsRelated=X,2,L
+#FdIsLnrelNear=X,2,L
+#FdIsSuspected=X,2,L
+T(3,*)
+#FdIsSuspected2=X,2,L
+T(3,*)
+
+#FuncCode=A,1,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,1),$)
+C(3,#CHAIN,1,s,$)
+T(F,#CustId,1)
+T(F,#ApplNo,0)
+HELP(1:新增;2:修改;4:刪除;5:查詢))
+@V(7)V(1,1,2,4,5)
+E(0,@FUNCIND,#FuncCode)
+
+#SetSysPar1=X,1,S
+IF(#FuncCode ==1 || #FuncCode ==3,E(0,0)ASGN(AGAIN$),$)
+
+#FuncCodeX=X,4,L
+T(H,#FuncCode,#FuncCodeHelp) 
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+#UpdateCode=N,1,S
+IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
+
+#WkStar=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+
+#WkFdName=X,1,S
+IF(#FuncCode==1 || #FuncCode==3,T(3,@FdApplNo, )T(2,@FdCustId,*),T(2,@FdApplNo,#WkStar)T(2,@FdCustId,))
+T(2,@FdCreditSysNo,#WkStar)
+T(2,@FdApplDate,#WkStar)
+T(2,@FdDepartmentCode,#WkStar)
+T(2,@FdProdNo,#WkStar)
+! T(2,@FdAcctCode,#WkStar)
+T(2,@FdCurrencyCode, )
+T(2,@FdApplAmt,#WkStar)
+T(2,@FdEstimate, )        
+T(2,@FdPieceCode,#WkStar)
+T(2,@FdCreditOfficer, )
+T(2,@FdLoanOfficer, )
+T(2,@FdIntroducer, )
+T(2,@FdSupervisor, )      
+T(2,@FdProcessCode, )
+T(2,@FdGroupId, )
+
+#BUF1A=X,100,S
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
+
+!複製進來先調rim
+#SendL2r02A=X,1,S
+C(3,#FuncCode,3,$,S)
+C(3,#FuncCode,3,T(1,@RimApplNo,#NTXBUF,12,7),E(0,@RimApplNo,#ApplNo))
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimCustId,#CustId)
+RESET_RIM(#SendL2r02A,L2R02)
+S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
+R(1,L2R02)
+
+#RcvL2r02CA=X,1,S
+C(3,#FuncCode,3,$,S)
+E(0,@CreditSysNo,#L2r02CreditSysNo)
+E(0,@SyndNo,#L2r02SyndNo)
+E(0,@ApplDate,#L2r02ApplDate)
+E(0,@LbApplDate,#L2r02ApplDate)
+E(0,@DepartmentCode,#L2r02DepartmentCode)
+T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
+T(2,@ProdNo,#L2r02ProdNo)
+! E(0,@AcctCode,#L2r02AcctCode)
+T(2,@CurrencyCode,#L2r02CurrencyCode)
+E(0,@TwApplAmt,#L2r02ApplAmt)
+E(0,@UsApplAmt,#L2r02ApplAmt)
+T(2,@Estimate,#L2r02Estimate)
+T(2,@PieceCode,#L2r02PieceCode)
+T(2,@CreditOfficer,#L2r02CreditOfficer)
+T(2,@LoanOfficer,#L2r02LoanOfficer)
+T(2,@Introducer,#L2r02Introducer)
+T(2,@Supervisor,#L2r02Supervisor)
+T(2,@Coorgnizer,#L2r02Coorgnizer)
+T(2,@ProcessCode,#L2r02ProcessCode)
+T(2,@GroupId,#L2r02GroupId)
+
+#SendL2r01BB=X,1,S
+C(3,#FuncCode,3,$,S)
+T(2,@RimProdNo,#ProdNo)
+E(0,@RimFuncCode,5)
+RESET_RIM(#SendL2r01BB,L2R01)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+#TMPEB=X,1,S
+C(3,#FuncCode,3,$,S)
+T(2,@ProdName,#L2r01ProdName)
+T(2,@CurrencyCode,#L2r01CurrencyCode)
+
+#RcvL2r07A=X,1,S
+C(3,#FuncCode,3,$,S)
+C(4,#GroupId,S,$)
+T(2,@RimCustId,#GroupId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RcvL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@GroupIdX,#L2r07CustName)
+
+#RcvL2r02C=X,1,S
+C(3,#FuncCode,3,$,S)
+T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)
+C(3,#FuncCode,1,S,$)
+C(3,#FuncCode,3,S,$)
+T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
+
+#RcvL2r08AB=X,1,S	
+C(3,#FuncCode,3,$,S)
+C(3,#UpdateCode,1,$,S)
+C(4,#Estimate,S,$)
+T(2,@RimEmployeeNo,#Estimate)
+T(3,@RimErrorSkip,Y)
+RESET_RIM(#RcvL2r08AB,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@EstimateX,#L2r08FullName)
+
+#RcvL2r08BB=X,1,S	
+C(3,#FuncCode,3,$,S)
+C(3,#UpdateCode,1,$,S)
+C(4,#CreditOfficer,S,$)
+T(2,@RimEmployeeNo,#CreditOfficer)
+T(3,@RimErrorSkip,Y)
+RESET_RIM(#RcvL2r08BB,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@CreditOfficerX,#L2r08FullName)
+
+#RcvL2r08CB=X,1,S
+C(3,#FuncCode,3,$,S)
+C(3,#UpdateCode,1,$,S)	
+C(4,#LoanOfficer,S,$)
+T(2,@RimEmployeeNo,#LoanOfficer)
+T(3,@RimErrorSkip,Y)
+RESET_RIM(#RcvL2r08CB,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@LoanOfficerX,#L2r08FullName)
+
+#RcvL2r08DB=X,1,S
+C(3,#FuncCode,3,$,S)
+C(3,#UpdateCode,1,$,S)
+C(4,#Introducer,S,$)
+T(2,@RimEmployeeNo,#Introducer)
+T(3,@RimErrorSkip,Y)
+RESET_RIM(#RcvL2r08DB,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+
+#RcvL2r08EB=X,1,S
+C(3,#FuncCode,3,$,S)
+C(3,#UpdateCode,1,$,S)	
+C(4,#Supervisor,S,$)
+T(2,@RimEmployeeNo,#Supervisor)
+T(3,@RimErrorSkip,Y)
+RESET_RIM(#RcvL2r08EB,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@SupervisorX,#L2r08FullName)
+
+#RcvL2r13FB=X,1,S
+C(3,#FuncCode,3,$,S)
+C(3,#UpdateCode,1,$,S)	
+C(4,#Coorgnizer,S,$)
+T(2,@RimEmployeeNo,#Coorgnizer)
+E(0,@RimFunCd,5)
+RESET_RIM(#RcvL2r13FB,L2R13)
+S(L2R13,1,#RimFunCd,#RimEmployeeNo)
+R(1,L2R13)
+T(2,@CoorgnizerX,#L2r13FullName)
+
+!---結束---
+
+
+![統一編號]
+
+#CustId=X,10,I
+IF(#FuncCode ==1 || #FuncCode == 3, T(F,#CustId,1),T(F,#CustId,0)HIDE(#BTN1))
+IF(#CHAIN==1 && #FuncCode!=1 && #FuncCode!=3,s,$)
+@V(7)A(ID_UNINO,0,#CustId)
+
+#CustNo=A,7,S
+
+#SendL2r07A=X,1,S
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustIdX=X,100,L
+T(2,#L2r07CustName)
+
+#CustEntCode=A,1,S
+E(0,#L2r07EntCode)
+C(3,#CustEntCode,1,INVOKEJS(SHOW,p2,4,4,0),INVOKEJS(SHOW,p2,4,4,1))
+
+#FinancialBind=X,1,S
+SHOW(#FinancialBtn)
+BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustIdX;ntxbuf5=type<-1})
+
+#SendL2r12=X,1,S
+C(3,#UpdateCode,1,$,S)
+S(L2R12,1,#CustId)
+R(1,L2R12)
+
+#checkL2r12=X,1,S
+C(3,#UpdateCode,1,$,S)
+T(2,@IsLimit,#L2r12IsLimit)
+T(2,@IsRelated,#L2r12IsRelated)
+T(2,@IsLnrelNear,#L2r12IsLnrelNear)
+T(H,@IsLimitX,#IsLimit,#YesNoHelp)
+T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
+T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
+
+#WkStatus=A,1,S
+C(3,#FuncCode,4,E(0,0),E(0,9))
+
+#WkApplNo=A,7,S
+E(0,0)
+
+![申請號碼]
+!新增時不必輸入由電腦自動給號,其他必須輸入
+
+
+#ApplNo=A,7,L
+
+#SendL2r02=X,1,S
+C(3,#FuncCode,3,S,$)
+C(3,#FuncCode,1,S,$)
+C(3,#FuncCode,3,T(1,@RimApplNo,#NTXBUF,12,7),E(0,@RimApplNo,#ApplNo))
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimCustId,#CustId)
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r02,L2R02),$)
+S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
+R(1,L2R02)
+
+#RcvL2r02A=X,1,S
+C(3,#FuncCode,3,S,$)
+C(3,#FuncCode,1,S,$)
+E(0,@CreditSysNo,#L2r02CreditSysNo)
+E(0,@SyndNo,#L2r02SyndNo)
+E(0,@ApplDate,#L2r02ApplDate)
+E(0,@LbApplDate,#L2r02ApplDate)
+E(0,@DepartmentCode,#L2r02DepartmentCode)
+T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
+T(2,@ProdNo,#L2r02ProdNo)
+! E(0,@AcctCode,#L2r02AcctCode)
+T(2,@CurrencyCode,#L2r02CurrencyCode)
+E(0,@TwApplAmt,#L2r02ApplAmt)
+E(0,@UsApplAmt,#L2r02ApplAmt)
+T(2,@Estimate,#L2r02Estimate)
+T(2,@PieceCode,#L2r02PieceCode)
+T(2,@CreditOfficer,#L2r02CreditOfficer)
+T(2,@LoanOfficer,#L2r02LoanOfficer)
+T(2,@Introducer,#L2r02Introducer)
+T(2,@Supervisor,#L2r02Supervisor)
+T(2,@Coorgnizer,#L2r02Coorgnizer)
+T(2,@ProcessCode,#L2r02ProcessCode)
+T(2,@GroupId,#L2r02GroupId)
+C(3,#FuncCode,2,S,$)
+T(2,@IsLimit,#L2r02IsLimit)
+T(2,@IsRelated,#L2r02IsRelated)
+T(2,@IsLnrelNear,#L2r02IsLnrelNear)
+T(2,@IsSuspected,#L2r02IsSuspected)
+T(2,@IsSuspectedCheck,#L2r02IsSuspectedCheck)
+T(2,@IsSuspectedCheckType,#L2r02IsSuspectedCheckType)
+E(0,@IsDate,#L2r02IsDate)
+T(H,@IsLimitX,#IsLimit,#YesNoHelp)
+T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
+T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
+T(H,@IsSuspectedX,#IsSuspected,#YesNoHelp)
+T(H,@IsSuspectedCheckX,#IsSuspectedCheck,#YesNoHelp)
+T(H,@IsSuspectedCheckTypeX,#IsSuspectedCheckType,#YesNoHelp)
+
+#RcvL2r07B=X,1,S
+C(3,#FuncCode,3,S,$)
+C(4,#GroupId,T(2,@GroupIdX,),$)
+C(4,#GroupId,S,$)
+T(2,@RimCustId,#GroupId)
+E(0,@RimCustNo,0)
+C(3,#UpdateCode,1,RESET_RIM(#RcvL2r07B,L2R07),$)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@GroupIdX,#L2r07CustName)
+
+#RcvL2r02B=X,1,S
+T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)
+C(3,#FuncCode,1,S,$)
+C(3,#FuncCode,3,S,$)
+T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
+
+#RcvL2r08A=X,1,S	
+C(3,#FuncCode,3,S,$)
+C(3,#UpdateCode,1,$,S)
+C(4,#Estimate,T(2,@EstimateX,),$)
+C(4,#Estimate,S,$)
+T(3,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#Estimate)
+RESET_RIM(#RcvL2r08A,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@EstimateX,#L2r08FullName)
+
+#RcvL2r08B=X,1,S	
+C(3,#FuncCode,3,S,$)
+C(3,#UpdateCode,1,$,S)
+C(4,#CreditOfficer,T(2,@CreditOfficerX,),$)
+C(4,#CreditOfficer,S,$)
+T(2,@RimEmployeeNo,#CreditOfficer)
+RESET_RIM(#RcvL2r08B,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@CreditOfficerX,#L2r08FullName)
+
+#RcvL2r08C=X,1,S
+C(3,#FuncCode,3,S,$)
+C(3,#UpdateCode,1,$,S)	
+C(4,#LoanOfficer,T(2,@LoanOfficerX,),$)
+C(4,#LoanOfficer,S,$)
+T(3,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#LoanOfficer)
+RESET_RIM(#RcvL2r08C,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@LoanOfficerX,#L2r08FullName)
+
+#RcvL2r08D=X,1,S
+C(3,#FuncCode,3,S,$)
+C(3,#UpdateCode,1,$,S)
+C(4,#Introducer,T(2,@IntroducerX,),$)
+C(4,#Introducer,S,$)
+T(3,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#Introducer)
+RESET_RIM(#RcvL2r08D,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@IntroducerX,#L2r08FullName)
+
+#RcvL2r08E=X,1,S
+C(3,#FuncCode,3,S,$)
+C(3,#UpdateCode,1,$,S)	
+C(4,#Supervisor,T(2,@SupervisorX,),$)
+C(4,#Supervisor,S,$)
+T(3,@RimErrorSkip,Y)
+T(2,@RimEmployeeNo,#Supervisor)
+RESET_RIM(#RcvL2r08E,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@SupervisorX,#L2r08FullName)
+
+#RcvL2r13F=X,1,S
+C(3,#FuncCode,3,S,$)
+C(3,#UpdateCode,1,$,S)	
+C(4,#Coorgnizer,T(2,@CoorgnizerX,),$)
+C(4,#Coorgnizer,S,$)
+T(2,@RimEmployeeNo,#Coorgnizer)
+T(2,@RimFunCd,5)
+RESET_RIM(#RcvL2r13F,L2R13)
+S(L2R13,1,#RimFunCd,#RimEmployeeNo)
+R(1,L2R13)
+T(2,@CoorgnizerX,#L2r13FullName)
+
+!案件核准後,只可修改專辦,協辦, 核決主管,介紹人及駐區資料
+!受理中為0 其他為1
+#ApproveFlag=A,1,S
+E(0,0)
+C(3,#FuncCode,2,$,S)
+C(3,#L2r02ProcessCode,0,E(0,0),E(0,1))
+
+#WkAdjFd1=X,1,S
+C(3,#ApproveFlag,1,$,S)
+T(3,@FdCustId, )
+T(3,@FdCreditSysNo, )
+T(3,@FdApplDate, )
+T(3,@FdDepartmentCode, )
+T(3,@FdProdNo, )
+T(3,@FdApplAmt, )
+T(3,@FdPieceCode, )
+
+#SendL2r01A=X,1,S
+C(3,#FuncCode,1,S,$)
+E(0,@RimFuncCode,5)
+T(2,@RimProdNo,#L2r02ProdNo)
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r01A,L2R01),$)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+#TmpD=X,1,S
+C(3,#FuncCode,1,S,$)
+T(2,@ProdName,#L2r01ProdName)
+! T(A,@AcctCodeX,#AcctCode,L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
+T(2,@CurrencyCode,#L2r01CurrencyCode)
+
+#WkLB=X,1,S
+C(3,#UpdateCode,1,
+   SHOW(#ApplDate,#ProdName,#CurrencyCode,#TwApplAmt,#PieceCodeX,#ProcessCode,#ProcessCodeX,#Estimate,#EstimateX,#CreditOfficer,#CreditOfficerX,#LoanOfficer,#LoanOfficerX,#Introducer,#IntroducerX,#Supervisor,#SupervisorX,#ProcessCodeX,#GroupId,#GroupIdX)
+   SHOW(#BTN3,#BTN4,#BTN5,#BTN6,#BTN7,#BTN8)
+   HIDE(#LbApplDate,#UsApplAmt,#LbApplAmt)
+  ,SHOW(#LbApplDate,#ProdName,#CurrencyCode,#LbApplAmt,#PieceCodeX,#ProcessCodeX,#EstimateX,#CreditOfficerX,#LoanOfficerX,#IntroducerX,#SupervisorX,#ProcessCodeX,#GroupIdX)
+   HIDE(#BTN1,#BTN3,#BTN4,#BTN5,#BTN6,#BTN7,#BTN8,#BTN9)
+   HIDE(#ApplDate,#TwApplAmt,#UsApplAmt,#ProcessCode))
+
+#TextOnOff=X,1,S
+T(F,#CreditSysNo,1)
+T(F,#ApplDate,1)
+T(F,#DepartmentCode,1)
+T(F,#Estimate,1)
+T(F,#CreditOfficer,1)
+T(F,#GroupId,1)
+C(3,#ApproveFlag,1,$,S)
+HIDE(#BTN3,#BTN4,#BTN5,#BTN10)
+T(F,#PieceCode,0)
+T(F,#CreditSysNo,0)
+T(F,#DepartmentCode,0)
+T(F,#ApplDate,0)
+T(F,#ProdNo,0)
+T(F,#Estimate,0)
+T(F,#CreditOfficer,0)
+T(F,#GroupId,0)
+
+
+#TextOnOff2=X,1,S
+C(3,#UpdateCode,1,C(3,#L2r02ProcessCode,2,T(F,#SyndNo,0),T(F,#SyndNo,1)),$)
+C(3,#UpdateCode,1,S,$)
+T(F,#PieceCode,0)
+T(F,#CreditSysNo,0)
+T(F,#DepartmentCode,0)
+T(F,#SyndNo,0)
+T(F,#ProdNo,0)
+T(F,#Estimate,0)
+T(F,#CreditOfficer,0)
+T(F,#LoanOfficer,0)
+T(F,#Introducer,0)
+T(F,#Supervisor,0)
+T(F,#Coorgnizer,0)
+T(F,#GroupId,0)
+T(F,#IsSuspectedCheck,0)
+T(F,#IsSuspectedCheckType,0)
+
+!案件編號
+#CreditSysNo=A,7,I
+C(3,#ApproveFlag,1,s,$)
+C(2,#FuncCode,S,$,$,$,s,s,S)
+@
+V(2,0)
+
+#BUF2=X,17,S
+T(2,L2111+000001999999)
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2060; ntxbuf=#BUF2;ntxbuf5=type<-1:SyndNo<-OOSyndNo})
+
+! 6/17 駁時鎖住不可更改
+![聯貸案編號]
+#SyndNo=A,6,I
+C(2,#FuncCode,S,$,$,$,s,s,S)
+C(3,#L2r02ProcessCode,2,s,$)
+
+#BUF2B=X,17,S
+C(3,#SyndNo,0,T(2,L2111+000001999999),T(2,L2111+#SyndNo+#SyndNo))
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2060; ntxbuf=#BUF2B;ntxbuf5=type<-1:SyndNo<-OOSyndNo})
+
+
+!查詢聯貸訂約檔
+#SendL3r10A=X,1,S
+C(2,#FuncCode,S,$,$,$,S,S,S)
+C(3,#SyndNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimSyndNo,#SyndNo)
+! RESET_RIM(#SendL3r10A,L3R10)
+S(L3R10,1,#RimFuncCode,#RimTxCode,#RimSyndNo)
+R(1,L3R10)
+
+
+![申請日期]
+
+#wkSysCDate=D,7,S
+E(0,#SYSCDATE)
+
+#ApplDate=D,7,I
+C(2,#FuncCode,S,$,$,$,s,s,S)
+C(3,#ApplDate,0,E(0,#SYSCDATE),$)
+C(3,#ApproveFlag,1,s,$)
+D(8)
+@V(2,0)V(7)
+A(DATE,0,#ApplDate)
+IF(#ApplDate>#wkSysCDate,V(P,申請日期不可大於日曆日),$)
+
+
+#LbApplDate=D,7,L
+
+
+!案件隸屬單位
+#DepartmentCode=A,1,I
+C(2,#FuncCode,S,$,$,$,s,s,S)
+C(3,#ApproveFlag,1,s,$)
+HELP(#DepartmentCodeHelp)
+@
+V(H,#DepartmentCodeHelp)
+T(2,@BUF3,#ProdNo)
+
+#DepartmentCodeX=X,10,L
+T(H,#DepartmentCode,#DepartmentCodeHelp)
+
+#BUF3=X,9,S
+T(2,@BUF3,#ProdNo)
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF3;ntxbuf5=type<-1:ProdNo<-OOProdNo:ProdName<-OOProdName})
+
+![申請商品代碼]
+
+#ProdNo=X,5,I
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+C(3,#DepartmentCode,1,HELP(#EntProdNo),$)
+@
+C(3,#DepartmentCode,1,V(H,#EntProdNo),$)
+C(3,#DepartmentCode,1,T(2,@BUF3,#ProdNo+1+Y),T(2,@BUF3,#ProdNo+1))
+V(7)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF3;ntxbuf5=type<-1:ProdNo<-OOProdNo})
+
+! #BIND3B=X,1,S
+! T(2,@BUF3,#ProdNo)
+! BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF3;ntxbuf5=type<-1:ProdNo<-OOProdNo})
+
+#SendL2r01B=X,1,S
+C(3,#UpdateCode,1,$,S)
+T(2,@RimProdNo,#ProdNo)
+E(0,@RimFuncCode,#FuncCode)
+RESET_RIM(#SendL2r01B,L2R01)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+#TMPE=X,1,S
+C(3,#UpdateCode,1,$,S)
+T(2,@ProdName,#L2r01ProdName)
+T(2,@CurrencyCode,#L2r01CurrencyCode)
+
+
+! C(3,#L2r01AcctCode,999,T(2,@FdAcctCode,#WkStar)SHOW(#AcctCode)
+!                    ,T(3,@FdAcctCode, )HIDE(#AcctCode))                   
+! IF(#FuncCode==1 || #FuncCode==3,E(0,@AcctCode,#L2r01AcctCode),$)
+! IF(#FuncCode==1 && #L2r01AcctCode==999,E(0,@AcctCode,0),$)
+! IF(#FuncCode==3 && #L2r01AcctCode==999,E(0,@AcctCode,0),$)
+! IF(#FuncCode==2 && #ProdNo!=#L2r02ProdNo && #L2r01AcctCode==999,E(0,@AcctCode,0),$)                                                                 
+! T(A,@AcctCodeX,#AcctCode,L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
+
+#ProdName=X,60,L
+
+![申請科目]
+!當商品不限制科目時,才須輸入,否則自動顯示不必輸入
+! #FdAcctCode=X,2,L
+
+! #AcctCode=A,3,I
+! C(3,#UpdateCode,1,$,s)
+! C(3,#ApproveFlag,1,s,$)
+! C(3,#L2r01AcctCode,999,$,s)
+! HELP(L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
+! @V(E,0,L2DEF,FacmAcctCodeDef)
+
+! #AcctCodeX=X,20,L
+! T(A,#AcctCode,L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
+
+![申請幣別]
+
+#CurrencyCode=X,3,L
+IF(#FuncCode==1 || #FuncCode==3,T(2,#L2r01CurrencyCode),$)
+
+!#CurrencyCodeX=X,10,L
+
+#Precision=N,1,S
+T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+![申請金額]
+
+#TwApplAmt=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+C(3,#Precision,0,$,s)
+@V(2,0)
+
+#UsApplAmt=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+C(3,#Precision,0,s,$)
+@V(2,0)
+
+#TimApplAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwApplAmt),E(0,#UsApplAmt))
+
+#LbApplAmt=X,21,L
+C(3,#Precision,0,X(#TwApplAmt),X(#UsApplAmt))
+P(L,#LbApplAmt)
+
+
+![計件代碼]
+!必須輸入
+
+#PieceCode=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+HELP(#PieceCodeHelp)
+@V(H,#PieceCodeHelp)
+
+#PieceCodeX=X,50,L
+T(H,#PieceCode,#PieceCodeHelp)
+
+<include src="ROM.icf::L1R16.dec"/>
+! 調是否為關係人rim
+#RimL1R16=X,1,S
+RESET_RIM(#RimL1r16,L1R16)
+T(2,@RimCustId,#CustId)
+T(2,@RimCustName,#CustIdX)
+S(L1R16,1,#RimCustId,#RimCustName)
+R(1,L1R16)
+T(2,@IsLimit,#L1R16IsLimitYn)
+T(2,@IsRelated,#L1R16IsRelatedYn)
+T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
+T(2,@IsSuspected,#L1R16IsSuspectedYn)
+T(2,@IsSuspectedCheck,#L1R16IsSuspectedCheckYn)
+IF(#IsSuspectedCheck=="Y",T(2,@IsSuspectedCheckType,#L1R16IsSuspectedCheckYn),$)
+T(2,@IsDate,#L1R16DataDate)
+
+!是否為授信限制對象
+#IsLimit=X,1,L
+
+#IsLimitX=X,4,L
+C(4,#IsLimit,S,$)
+T(H,#IsLimit,#YesNoHelp)
+
+!是否為利害關係人
+#IsRelated=X,1,L
+
+#IsRelatedX=X,4,L
+C(4,#IsRelated,S,$)
+T(H,#IsRelated,#YesNoHelp)
+
+! !是否為準利害關係人
+#IsLnrelNear=X,1,L
+
+#IsLnrelNearX=X,4,L
+C(4,#IsLnrelNear,S,$)
+T(H,#IsLnrelNear,#YesNoHelp)
+
+#IsSuspected=X,1,L
+
+#IsSuspectedX=X,4,L
+T(H,#IsSuspected,#YesNoHelp)
+
+#IsSuspectedCheck=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#CustEntCode,1,S,$)
+HELP(#YesNoHelp)
+@
+V(H,#YesNoHelp)
+
+#IsSuspectedCheckX=X,4,L
+C(3,#CustEntCode,1,S,$)
+T(H,#IsSuspectedCheck,#YesNoHelp)
+C(5,#IsSuspectedCheck,Y,SHOW(#IsSuspectedCheckType,#IsSuspectedCheckTypeX),HIDE(#IsSuspectedCheckType,#IsSuspectedCheckTypeX))
+
+#IsSuspectedCheckTypeHelp=X,100,S
+T(3, :請選擇;Y:確認核對無誤)
+
+#IsSuspectedCheckType=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#CustEntCode,1,S,$)
+C(5,#IsSuspectedCheck,Y,$,S)
+HELP(#IsSuspectedCheckTypeHelp)
+@
+V(7)
+V(H,#IsSuspectedCheckTypeHelp)
+
+#IsSuspectedCheckTypeX=X,12,L
+T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
+
+#IsDate=D,7,L
+
+!-----
+
+#WkDspAmt1=X,1,S
+C(3,#UpdateCode,1,$,S)
+C(3,#Precision,0,SHOW(#TwApplAmt)HIDE(#UsApplAmt)
+                ,HIDE(#TwApplAmt)SHOW(#UsApplAmt))
+C(3,#ApproveFlag,1,SHOW(#LbApplAmt)HIDE(#TwApplAmt,#UsApplAmt),$)
+                
+#BUF4A=X,7,S
+
+#BIND4A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4A;ntxbuf5=type<-1:Estimate<-OOEmployeeNo:EstimateX<-OOFullname})
+
+![估價]
+!可不輸入
+
+#Estimate=X,6,I
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+
+!有輸入值時查詢L6088 也不該帶值QC1679
+#BUF4B=X,7,S
+!T(2,#Estimate)
+
+#BIND4B=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF4B;ntxbuf5=type<-1:Estimate<-OOEmployeeNo:EstimateX<-OOFullname})
+
+#SendL2r08A=X,1,S
+C(4,#Estimate,S,$)
+T(2,@RimEmployeeNo,#Estimate)
+IF(#L2r02Estimate==#Estimate,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r08A,L2R08),$)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+
+#EstimateX=X,20,L
+C(4,#Estimate,S,$)
+C(3,#UpdateCode,1,$,C(4,#EstimateX,T(2,#L2r08FullName),s))
+C(3,#UpdateCode,1,$,s)
+T(2,#L2r08FullName)
+
+#BUF5A=X,7,S
+
+#BIND5A=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5A;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo:CreditOfficerX<-OOFullname})
+
+![授信]
+
+#CreditOfficer=X,6,I
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+
+!有輸入值時查詢L6088 也不該帶值QC1679
+#BUF5B=X,7,S
+!T(2,#CreditOfficer)
+
+#BIND5B=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF5B;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo:CreditOfficerX<-OOFullname})
+
+#SendL2r08B=X,1,S
+C(4,#CreditOfficer,S,$)
+T(2,@RimEmployeeNo,#CreditOfficer)
+IF(#L2r02CreditOfficer==#CreditOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r08B,L2R08),$)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+
+#CreditOfficerX=X,20,L
+C(4,#CreditOfficer,S,$)
+C(3,#UpdateCode,1,$,C(4,#CreditOfficerX,T(2,#L2r08FullName),s))
+C(3,#UpdateCode,1,$,s)
+T(2,#L2r08FullName)
+
+#BUF6A=X,7,S
+
+#BIND6A=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6A;ntxbuf5=type<-1:LoanOfficer<-OOEmployeeNo:LoanOfficerX<-OOFullname})
+
+![放款專員]
+!可不輸入
+
+#LoanOfficer=X,6,I
+C(3,#UpdateCode,1,$,s)
+
+!有輸入值時查詢L6088 也不該帶值QC1679
+#BUF6B=X,7,S
+!T(2,#LoanOfficer)
+
+#BIND6B=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF6B;ntxbuf5=type<-1:LoanOfficer<-OOEmployeeNo:LoanOfficerX<-OOFullname})
+
+#SendL2r08C=X,1,S
+C(4,#LoanOfficer,S,$)
+T(2,@RimEmployeeNo,#LoanOfficer)
+IF(#L2r02LoanOfficer==#LoanOfficer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r08C,L2R08),$)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+
+#LoanOfficerX=X,20,L
+C(4,#LoanOfficer,S,$)
+C(3,#UpdateCode,1,$,C(4,#LoanOfficerX,T(2,#L2r08FullName),s))
+C(3,#UpdateCode,1,$,s)
+T(2,#L2r08FullName)
+
+
+#BUF8A=X,7,S
+
+#BIND8A=X,1,S
+BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF8A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
+
+
+![核決主管]
+!可不輸入
+
+#Supervisor=X,6,I
+C(3,#UpdateCode,1,$,s)
+
+!有輸入值時查詢L6088 也不該帶值QC1679
+#BUF8B=X,7,S
+!T(2,#Supervisor)
+
+#BIND8B=X,1,S
+BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF8B;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
+
+#SendL2r08E=X,1,S
+C(4,#Supervisor,S,$)
+T(2,@RimEmployeeNo,#Supervisor)
+IF(#L2r02Supervisor==#Supervisor,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r08E,L2R08),$)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+
+#SupervisorX=X,20,L
+C(4,#Supervisor,S,$)
+C(3,#UpdateCode,1,$,C(4,#SupervisorX,T(2,#L2r08FullName),s))
+C(3,#UpdateCode,1,$,s)
+T(2,#L2r08FullName)
+
+#BUF9A=X,7,S
+
+#BIND9A=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF9A;ntxbuf5=type<-1:Coorgnizer<-OOEmpNo:CoorgnizerX<-OOFullname})
+
+
+![協辦]
+!可不輸入
+
+#Coorgnizer=X,6,I
+C(3,#UpdateCode,1,$,s)
+
+#BUF9B=X,7,S
+T(2,#Coorgnizer)
+
+#BIND9B=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF9B;ntxbuf5=type<-1:Coorgnizer<-OOEmpNo:CoorgnizerX<-OOFullname})
+
+#SendL2r13F=X,1,S
+C(4,#Coorgnizer,S,$)
+T(2,@RimEmployeeNo,#Coorgnizer)
+E(0,@RimFunCd,#FuncCode)
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r13F,L2R13),$)
+S(L2R13,1,#RimFunCd,#RimEmployeeNo)
+R(1,L2R13)
+
+#CoorgnizerX=X,20,L
+C(4,#Coorgnizer,S,$)
+C(3,#UpdateCode,1,$,C(4,#CoorgnizerX,T(2,#L2r13FullName),s))
+C(3,#UpdateCode,1,$,s)
+T(2,#L2r13FullName)
+
+
+
+![介紹人]
+!可不輸入
+
+#BUF7A=X,7,S
+
+#BIND7A=X,1,S
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF7A;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:IntroducerX<-OOFullname})
+
+#Introducer=X,6,I
+C(3,#UpdateCode,1,$,s)
+
+#BUF7B=X,7,S
+T(2,#Introducer)
+
+#BIND7B=X,1,S
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF7B;ntxbuf5=type<-1:Introducer<-OOEmployeeNo:IntroducerX<-OOFullname})
+
+#SendL2r08D=X,1,S
+C(4,#Introducer,S,$)
+T(2,@RimEmployeeNo,#Introducer)
+IF(#L2r02Introducer==#Introducer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+C(3,#UpdateCode,1,RESET_RIM(#SendL2r08D,L2R08),$)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+
+#IntroducerX=X,20,L
+C(4,#Introducer,S,$)
+C(3,#UpdateCode,1,$,C(4,#IntroducerX,T(2,#L2r08FullName),s))
+C(3,#UpdateCode,1,$,s)
+T(2,#L2r08FullName)
+
+![處理情形]
+!新增時自動顯示受理中,其他自動顯示不必輸入
+
+#ProcessCode=A,1,S
+C(2,#FuncCode,S,E(0,0),$,E(0,0),s,s,S)
+
+#BUF10A=X,100,S
+
+#BIND10A=X,1,S
+BIND(#BTN10,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupId<-OOCustId:GroupIdX<-OOCustName})
+
+![團體戶]
+!可不輸入
+
+#GroupId=X,10,I
+IF(#FuncCode ==4 || #FuncCode == 5, HIDE(#BTN10),$)
+C(3,#UpdateCode,1,$,s)
+C(3,#ApproveFlag,1,s,$)
+@A(ID_UNINO,0,#GroupId)
+
+#SendL2r07B=X,1,S
+C(4,#GroupId,S,$)
+T(2,@RimCustId,#GroupId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#GroupIdX=X,100,L
+C(4,#GroupId,S,$)
+!C(3,#L2r07CustTypeCode,6,$,V(P,此統編非團體戶))
+T(2,#L2r07CustName)
+
+#ProcessCodeX=X,10,L
+! T(A,#ProcessCode,L2DEF,ApplProcessCodeDef,ApplProcessCode,ApplProcessCodeX)
+
+!申報戶的核准號碼
+#FacShareApplNo=A,7,I
+C(5,#EMPNOT,ELTEST,$,S)
+!是否合併申報
+#JcicMergeFlag=X,1,I
+C(5,#EMPNOT,ELTEST,$,S)
+T(2,Y)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
+
+#JcicMergeFlagX=X,2,L
+T(H,#JcicMergeFlag,#YesNoHelp)
+
+
+#CheckMod=N,2,S
+C(3,#FuncCode,2,$,S)
+E(0,0)
+IF(#ApplDate!=#L2r02ApplDate,E(0,1),$) 
+IF(#ProdNo!=#L2r02ProdNo,E(0,2),$) 
+IF(#TimApplAmt!=#L2r02ApplAmt,E(0,4),$) 
+IF(#Estimate!=#L2r02Estimate,E(0,5),$) 
+IF(#PieceCode!=#L2r02PieceCode,E(0,6),$) 
+IF(#CreditOfficer!=#L2r02CreditOfficer,E(0,7),$) 
+IF(#LoanOfficer!=#L2r02LoanOfficer,E(0,8),$) 
+IF(#Introducer!=#L2r02Introducer,E(0,9),$) 
+IF(#Supervisor!=#L2r02Supervisor,E(0,11),$)
+IF(#Coorgnizer!=#L2r02Coorgnizer,E(0,12),$) 
+IF(#ProcessCode!=#L2r02ProcessCode,E(0,13),$) 
+IF(#GroupId!=#L2r02GroupId,E(0,13),$) 
+IF(#IsSuspected!=#L1R16IsSuspectedYn,E(0,14),$)
+IF(#IsSuspectedCheck!=#L1R16IsSuspectedYn,E(0,15),$)
+IF(#DepartmentCode!=#DepartmentCode,E(0,16),$)
+
+#MSGERR=X,1,S
+@
+C(3,#FuncCode,2,$,S)
+C(3,#CheckMod,0,$,S)
+V(P,修改時，必須至少修改一個項目)   
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
+<include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L3R10.dec"/>
+<include src="ROM.icf::L2R02.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R08.dec"/>
+<include src="ROM.icf::L2R12.dec"/>
+<include src="ROM.icf::L2R13.dec"/>
+<include src="ROM.icf::L2R57.dec"/>
+</sub>
+<sub type="DC" name="p2" layout="cols=3;screen.width=[300,350,300,250];printer.width=[30,30,30,30];order=1">
+[
+[""],
+[#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimit,#IsLimitX],
+[#<->#,"#FdIsRelated+是否為利害關係人",#IsRelated,#IsRelatedX],
+[#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNear,#IsLnrelNearX],
+["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
+["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
+["#FdIsLimit+以上資訊日期",#IsDate],["@@","@@"]
+]
+</sub>
+
+<sub type="DC" name="p3" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+[""],
+["#FdEstimate+估價人員",#Estimate,#BTN4,#EstimateX],          
+["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN5,#CreditOfficerX],
+["#FdLoanOfficer+放款專員",#LoanOfficer,#BTN6,#LoanOfficerX],
+["#FdSupervisor+核決主管",#Supervisor,#BTN8,#SupervisorX],  
+["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN9,#CoorgnizerX],  
+["#FdIntroducer+介紹人",#Introducer,#BTN7,#IntroducerX],     
+[#<->#,"#FdGroupId+團體戶統編",#GroupId,#BTN10,#GroupIdX],
+["#FdProcessCode+處理情形",#ProcessCodeX],
+]
+
+</sub>
+
+<sub type="DC" name="p4" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+["<font color=red>@共同借款人"],
+["#FdFacShareApplNo+核准號碼",#FacShareApplNo],          
+["#FdJcicMergeFlag+是否合併申報",#JcicMergeFlag,#JcicMergeFlagX],
+]
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2111 ----------
+<sub type="FORM" name="L2111">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L2111,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2111] 案件申請登錄)
+
+#OApplNo=A,7,S
+IF(#FuncCode==1 || #FuncCode==3,E(0,@ApplNo,#OApplNo)K(LIGHT,#ApplNo,TXTRED,0,1),S)
+T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FuncCode
+#CustId
+#DepartmentCode
+#ApplNo
+#ApplDate
+#ProdNo
+#CurrencyCode
+#TimApplAmt
+#IsLimit
+#IsRelated
+#IsLnrelNear
+#PieceCode
+#Estimate
+#CreditOfficer
+#LoanOfficer
+#Introducer
+#Supervisor
+#Coorgnizer
+#ProcessCode
+#GroupId
+#FacShareApplNo
+#JcicMergeFlag
+#CreditSysNo
+#IsSuspected
+#IsSuspectedCheck
+#IsSuspectedCheckType
+#IsDate
+#SyndNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2111
+#OApplNo
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R16.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R02.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
+<include src="ROM.icf::L2R12.tom"/>
+<include src="ROM.icf::L2R13.tom"/>
+<include src="ROM.icf::L2R57.tom"/>
+<include src="ROM.icf::L3R10.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+</sub>
