@@ -39,8 +39,19 @@ public class LY003Batch extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LY003Batch ");
 		
+		int entdyf = titaVo.getEntDyI() + 19110000;
+
+		int iYear = entdyf / 10000;
+
+		int iMonth = entdyf % 10000;
+
+		if (iMonth != 12) {
+			iYear = iYear - 1;
+		}
+
+
 		// 年月: 年初~本月 YYY / MM
-		titaVo.putParam("RocYear", titaVo.getEntDyI() / 10000);
+		titaVo.putParam("RocYear", iYear);
 		
 		lY003Report.exec(titaVo);
 	}

@@ -49,15 +49,14 @@ public class LY002Report extends MakeReport {
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LY002.exportExcel active");
 
-		List<Map<String, String>> lY002List = null;
-//		List<Map<String, String>> lY002List2 = null;
-
-		// 年月底
-		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 
 	
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表",
 				"LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
+
+		List<Map<String, String>> lY002List = null;		
+		// 年月底
+		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
 		
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
@@ -92,9 +91,6 @@ public class LY002Report extends MakeReport {
 
 		makeExcel.close();
 
-		if (lY002List.size() == 0) {
-			return false;
-		}
 
 		return true;
 

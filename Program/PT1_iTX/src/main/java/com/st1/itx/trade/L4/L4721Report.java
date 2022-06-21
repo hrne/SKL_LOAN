@@ -198,11 +198,20 @@ public class L4721Report extends MakeReport {
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
-			if (!Firstfg) { // 第一筆戶號不先換頁
-				Firstfg = true;
-			} else {
-				this.newPage();
+			try {
+				listL4721Temp = l4721ServiceImpl.TempQuery(custNo, titaVo);
+			} catch (Exception e) {
+				this.error("bankStatementServiceImpl TempQuery = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
+			
+			try {
+				listL4721Head = l4721ServiceImpl.doQuery(custNo, titaVo);
+			} catch (Exception e) {
+				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
+				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
+			}
+			
 
 			// 檢查 CustNotice 確認這份表是否能出
 			// 跳過 測試用
@@ -211,19 +220,6 @@ public class L4721Report extends MakeReport {
 
 			// 印出有 暫收款額度000的資料 下方帶出利率變動額度
 
-			try {
-				listL4721Temp = l4721ServiceImpl.TempQuery(custNo, titaVo);
-			} catch (Exception e) {
-				this.error("bankStatementServiceImpl TempQuery = " + e.getMessage());
-				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-			}
-
-			try {
-				listL4721Head = l4721ServiceImpl.doQuery(custNo, titaVo);
-			} catch (Exception e) {
-				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
-				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-			}
 
 			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null
 					&& !listL4721Head.isEmpty()) {
@@ -236,6 +232,12 @@ public class L4721Report extends MakeReport {
 						parse.stringToInteger(mapL4721Head.get("FacmNo")),
 						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 
+				if (!Firstfg) { // 第一筆戶號不先換頁
+					Firstfg = true;
+				} else {
+					this.newPage();
+				}
+				
 				print(1, 1, "　");
 
 				// 入帳日期

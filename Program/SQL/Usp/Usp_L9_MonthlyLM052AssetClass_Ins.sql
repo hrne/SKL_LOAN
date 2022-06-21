@@ -98,7 +98,7 @@ BEGIN
            FROM "MonthlyFacBal" M
            WHERE M."PrinBalance" > 0
              AND M."YearMonth" = TYYMM
-             AND M."AssetClass" IS NOT NULL
+             AND M."AssetClass" <> 1
            GROUP BY M."YearMonth"
                   ,M."AssetClass" ||
                   CASE
@@ -134,6 +134,88 @@ BEGIN
                     THEN '2'       --(22)第二類-應予注意：
                                    --    有足無擔保--逾繳超過清償期1-6月者 
                   ELSE '' END  	  
+                   ,M."AcSubBookCode"
+           UNION
+           SELECT M."YearMonth"
+                 ,M."AssetClass" ||
+                  CASE
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%不動產%'
+                    THEN '12'              -- 特定資產放款：建築貸款
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%建築%'
+                    THEN '12'              -- 特定資產放款：建築貸款
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND M."FacAcctCode" = 340
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."UsageCode" = '02' 
+                      AND M."ProdNo" NOT IN ('60','61','62')
+                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+                    THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
+                    ELSE '11'       
+                  END                  AS "AssetClass"	--放款資產項目	  
+                 ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
+                 ,SUM(M."PrinBalance" - M."LawAmount")      AS "Amt"           --放款餘額
+           FROM "MonthlyFacBal" M
+           LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
+                                AND F."FacmNo" = M."FacmNo"
+           LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
+           LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
+                             ,"IndustryItem"
+                       FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
+           WHERE M."PrinBalance" > 0
+             AND M."YearMonth" = TYYMM
+             AND M."AssetClass" = 1
+           GROUP BY M."YearMonth"
+                  ,M."AssetClass" ||
+                  CASE
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%不動產%'
+                    THEN '12'              -- 特定資產放款：建築貸款
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND CDI."IndustryItem" LIKE '%建築%'
+                    THEN '12'              -- 特定資產放款：建築貸款
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND M."FacAcctCode" = 340
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."FirstDrawdownDate" >= 20100101 
+                      AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
+                    THEN '11'               -- 正常繳息
+                    WHEN M."ClCode1" IN (1,2) 
+                      AND F."UsageCode" = '02' 
+                      AND M."ProdNo" NOT IN ('60','61','62')
+                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+                    THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
+                    ELSE '11'       
+                  END  
+                   ,M."AcSubBookCode"
+           UNION 
+           SELECT M."YearMonth"
+                 ,'5'                AS "AssetClass"    --第五類
+                 ,M."AcSubBookCode"  AS "AcSubBookCode" --區隔帳冊
+                 ,SUM(M."LawAmount") AS "Amt"           --無擔保放款餘額
+           FROM "MonthlyFacBal" M
+           WHERE M."LawAmount" > 0
+             AND M."YearMonth" = TYYMM
+             AND M."AssetClass" IS NOT NULL
+           GROUP BY M."YearMonth"
+                   ,'5'
                    ,M."AcSubBookCode"
            UNION 
            SELECT M."YearMonth"

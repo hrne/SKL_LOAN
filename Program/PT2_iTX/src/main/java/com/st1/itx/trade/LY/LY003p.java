@@ -24,7 +24,7 @@ import com.st1.itx.util.http.WebClient;
 public class LY003p extends TradeBuffer {
 
 	@Autowired
-	LY003Report LY003Report;
+	LY003Report lY003Report;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -40,9 +40,9 @@ public class LY003p extends TradeBuffer {
 		this.info("LY003p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
-		LY003Report.setParentTranCode(parentTranCode);
+		lY003Report.setParentTranCode(parentTranCode);
 
-		boolean isFinish = LY003Report.exec(titaVo);
+		boolean isFinish = lY003Report.exec(titaVo);
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LY003 非RBC_表14-2_會計部年度檢查報表已完成", titaVo);
 		} else {

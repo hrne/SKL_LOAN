@@ -25,8 +25,8 @@
 			</flow>
 			<!-- Step: LY004 表14-4_會計部年度檢查報表 --> 
 			<flow>
-				<step id="sLY004" parent="parentStep">
-					<tasklet ref="LY004" />
+				<step id="sLY004Batch" parent="parentStep">
+					<tasklet ref="LY004Batch" />
 				</step>
 			</flow>
 			<!-- Step: LY005 表20_會計部年度檢查報表 --> 

@@ -511,7 +511,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('UPDATE LawAmount END');
 
 --  更新  資產五分類(非1類)
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1');
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass');
 
     MERGE INTO "MonthlyFacBal" M
     USING (
@@ -580,66 +580,7 @@ BEGIN
     
     UPD_CNT := UPD_CNT + sql%rowcount;
 
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass1 END');
-
---  更新  資產五分類(1類)
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2');
-
-    MERGE INTO "MonthlyFacBal" M
-    USING (
-      SELECT M."YearMonth"
-           , M."CustNo"
-           , M."FacmNo" 
-           , CASE
-               WHEN M."ClCode1" IN (1,2) 
-                AND CDI."IndustryItem" LIKE '%不動產%'
-               THEN '12'              -- 特定資產放款：建築貸款
-               WHEN M."ClCode1" IN (1,2) 
-                AND CDI."IndustryItem" LIKE '%建築%'
-               THEN '12'              -- 特定資產放款：建築貸款
-               WHEN M."ClCode1" IN (1,2) 
-                AND F."FirstDrawdownDate" >= 20100101 
-                AND M."FacAcctCode" = 340
-               THEN '11'               -- 正常繳息
-               WHEN M."ClCode1" IN (1,2) 
-                AND F."FirstDrawdownDate" >= 20100101 
-                AND REGEXP_LIKE(M."ProdNo",'I[A-Z]')
-               THEN '11'               -- 正常繳息
-               WHEN M."ClCode1" IN (1,2) 
-                AND F."FirstDrawdownDate" >= 20100101 
-                AND REGEXP_LIKE(M."ProdNo",'8[1-8]')
-               THEN '11'               -- 正常繳息
-               WHEN M."ClCode1" IN (1,2) 
-                AND F."UsageCode" = '02' 
-                AND M."ProdNo" NOT IN ('60','61','62')
-                AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
-               THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
-               ELSE '11'       
-             END                  AS "AssetClass"	--放款資產項目	  
-      FROM "MonthlyFacBal" M
-      LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
-                            AND F."FacmNo" = M."FacmNo"
-      LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"
-      LEFT JOIN ( SELECT DISTINCT SUBSTR("IndustryCode",3,4) AS "IndustryCode"
-                        ,"IndustryItem"
-                  FROM "CdIndustry" ) CDI ON CDI."IndustryCode" = SUBSTR(CM."IndustryCode",3,4)
-      WHERE M."PrinBalance" > 0 
-        AND M."YearMonth" = YYYYMM
-        AND M."AssetClass" = '1'
-    ) TMP
-    ON (
-      TMP."YearMonth" = M."YearMonth"
-      AND TMP."CustNo" = M."CustNo"
-      AND TMP."FacmNo" = M."FacmNo"
-    )
-    WHEN MATCHED THEN UPDATE SET
-    "AssetClass" = TMP."AssetClass"
-    ;
-    
-    UPD_CNT := UPD_CNT + sql%rowcount;
-
-    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass2 END');
-
+    DBMS_OUTPUT.PUT_LINE('UPDATE AssetClass END');
 
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;

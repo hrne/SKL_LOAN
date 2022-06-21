@@ -70,7 +70,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			 */
 
 			sql += "	SELECT LPAD(M.\"CustNo\",7,0) AS F0";
-			sql += "		  ,CASE";
+			sql += "		  ,(CASE";
 			sql += "			 WHEN M.\"ClCode1\" IN (3) THEN 'D'";
 			sql += "			 WHEN M.\"ClCode1\" IN (1,2) ";
 			sql += "			  AND (REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')";
