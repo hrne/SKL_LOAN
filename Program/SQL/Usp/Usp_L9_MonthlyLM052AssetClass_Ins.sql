@@ -1,7 +1,7 @@
 --------------------------------------------------------
 --  DDL for Procedure Usp_Tf_MonthlyLM052AssetClass_Ins
 --------------------------------------------------------
-set define off;
+-- set define off;
 
   CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM052AssetClass_Ins" 
 (
@@ -16,11 +16,23 @@ BEGIN
   -- exec "Usp_L9_MonthlyLM052AssetClass_Ins"(202105,'999999');
   DECLARE
     INS_CNT        INT;         -- 新增筆數
+    LYYMM          INT;         -- 上月年月
+    MM             INT;         -- 本月月份
+    YYYY           INT;         -- 本月年度
     JOB_START_TIME TIMESTAMP;   -- 記錄程式起始時間
     JOB_END_TIME   TIMESTAMP;   -- 記錄程式結束時間
 
   BEGIN
     INS_CNT :=0;
+
+    MM := MOD(TYYMM, 100);
+    YYYY := TRUNC(TYYMM / 100);
+    IF MM = 1 THEN
+       LYYMM := (YYYY - 1) * 100 + 12;
+    ELSE
+       LYYMM := TYYMM - 1;
+    END IF;
+
 
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
@@ -160,7 +172,7 @@ BEGIN
                     WHEN M."ClCode1" IN (1,2) 
                       AND F."UsageCode" = '02' 
                       AND M."ProdNo" NOT IN ('60','61','62')
-                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+                      AND TRUNC(M."PrevIntDate" / 100) >= LYYMM
                     THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
                     ELSE '11'       
                   END                  AS "AssetClass"	--放款資產項目	  
@@ -200,7 +212,7 @@ BEGIN
                     WHEN M."ClCode1" IN (1,2) 
                       AND F."UsageCode" = '02' 
                       AND M."ProdNo" NOT IN ('60','61','62')
-                      AND TRUNC(M."PrevIntDate" / 100) >= LYYYYMM
+                      AND TRUNC(M."PrevIntDate" / 100) >= LYYMM
                     THEN '12'       -- 特定資產放款：購置住宅+修繕貸款              
                     ELSE '11'       
                   END  

@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
+create or replace NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyFacBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)

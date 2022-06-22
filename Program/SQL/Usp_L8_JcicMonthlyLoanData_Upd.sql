@@ -84,7 +84,7 @@ BEGIN
            END                                    AS "IrrevocableFlag"   -- 不可撤銷 Y:是  N:否
          , CASE
              WHEN M."EntCode" IN ('1') THEN 'K'
-             WHEN NVL(C."ClCode1", 0) = 9 AND NVL(C."ClCode1", 1) = 1 THEN 'O'  -- 車貸
+             WHEN NVL(C."ClCode1", 0) = 9 AND NVL(C."ClCode2", 0) = 1 THEN 'O'  -- 車貸
              --WHEN NVL("CdCl"."ClTypeJCIC",' ') IN ('25') AND TRIM(NVL(LM."UsageCode", ' ')) IN ('02','03','04') THEN 'M'
              WHEN TRIM(NVL(LM."UsageCode", ' ')) IN ('02','03','04') THEN 'M'
              ELSE '1'

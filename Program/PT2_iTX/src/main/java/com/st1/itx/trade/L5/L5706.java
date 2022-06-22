@@ -533,7 +533,8 @@ public class L5706 extends TradeBuffer {
 			if (tNegFinAcct != null) {
 
 			} else {
-				throw new LogicException(titaVo, "E0001", "債權金融機構=" + fincode + ",身分證字號=" + id + ",識別碼=" + code);
+				throw new LogicException(titaVo, "E0001",
+						"債權金融機構=" + fincode + ",身分證字號=" + id + ",識別碼=" + code + ",請先由入口交易L5974新增債權金融機構");
 			}
 		} else {
 			throw new LogicException(titaVo, "E0015", "債權金融機構不可空白" + ":身分證字號=" + id + ",識別碼=" + code);
@@ -660,8 +661,7 @@ public class L5706 extends TradeBuffer {
 		String COM_TELNO = getCutSkill(Code, mLineCut, "COM_TELNO", titaVo);// 通訊電話
 		String MOBIL_NO = getCutSkill(Code, mLineCut, "MOBIL_NO", titaVo);// 行動電話
 
-		// 查驗是否已有客戶主檔
-		int CustNo = CheckCustId(IDN_BAN, titaVo);
+		CheckCustId(IDN_BAN, titaVo);
 
 		JcicZ048Id tJcicZ048Id = new JcicZ048Id();
 		tJcicZ048Id.setCustId(IDN_BAN);

@@ -219,10 +219,12 @@ public class L4721Report extends MakeReport {
 				continue;
 
 			// 印出有 暫收款額度000的資料 下方帶出利率變動額度
-
-
+			
+			Boolean HeadFlag = false;
 			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null
 					&& !listL4721Head.isEmpty()) {
+				
+				HeadFlag = true;
 				// 準備第一張
 				Map<String, String> mapL4721Head = listL4721Head.get(0);
 				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
@@ -275,7 +277,7 @@ public class L4721Report extends MakeReport {
 						parse.stringToInteger(mapL4721Head.get("FacmNo")),
 						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 				this.newPage();
-			}
+			} 
 
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
@@ -302,10 +304,15 @@ public class L4721Report extends MakeReport {
 
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
+				
 				// 先更新表頭資料
 				setHead(listL4721Detail.get(0), tempcustno, tempfacmno,
 						parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")) - 19110000);
 
+				if(!HeadFlag) { // 下一筆資料沒有第一張時的換頁
+					this.newPage();
+				}
+				
 				int times = 0;
 				int txeffectdate = 0;
 				BigDecimal presentrate = new BigDecimal("0");
