@@ -89,7 +89,7 @@ public class L8310 extends TradeBuffer {
 		int iClaimStatus = Integer.valueOf(titaVo.getParam("ClaimStatus"));
 		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
 		String iCourtCode = titaVo.getParam("CourtCode");
-		int iYear = Integer.valueOf(titaVo.getParam("Year")) + 1911;
+		int iYear = Integer.valueOf(titaVo.getParam("Year"))+1911;
 		String iCourtDiv = titaVo.getParam("CourtDiv");
 		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
 		String iApprove = titaVo.getParam("Approve");
@@ -179,6 +179,7 @@ public class L8310 extends TradeBuffer {
 			if (uJcicZ049 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ049 oldJcicZ049 = (JcicZ049) iDataLog.clone(uJcicZ049);
 			uJcicZ049.setTranKey(iTranKey);
 			uJcicZ049.setClaimStatus(iClaimStatus);
 			uJcicZ049.setApplyDate(iApplyDate);
@@ -189,7 +190,6 @@ public class L8310 extends TradeBuffer {
 			uJcicZ049.setApprove(iApprove);
 			uJcicZ049.setClaimDate(iClaimDate);
 			uJcicZ049.setOutJcicTxtDate(0);
-			JcicZ049 oldJcicZ049 = (JcicZ049) iDataLog.clone(uJcicZ049);
 			try {
 				sJcicZ049Service.update(uJcicZ049, titaVo);
 			} catch (DBException e) {

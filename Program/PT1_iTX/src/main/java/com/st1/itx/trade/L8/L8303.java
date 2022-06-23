@@ -270,6 +270,7 @@ public class L8303 extends TradeBuffer {
 			if (uJcicZ042 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ042 oldJcicZ042 = (JcicZ042) iDataLog.clone(uJcicZ042);
 			uJcicZ042.setTranKey(iTranKey);
 			uJcicZ042.setIsClaims(iIsClaims);
 			uJcicZ042.setGuarLoanCnt(iGuarLoanCnt);
@@ -295,7 +296,6 @@ public class L8303 extends TradeBuffer {
 			uJcicZ042.setCreditCardPena(iCreditCardPena);
 			uJcicZ042.setCreditCardOther(iCreditCardOther);
 			uJcicZ042.setOutJcicTxtDate(0);
-			JcicZ042 oldJcicZ042 = (JcicZ042) iDataLog.clone(uJcicZ042);
 			try {
 				sJcicZ042Service.update(uJcicZ042, titaVo);
 			} catch (DBException e) {

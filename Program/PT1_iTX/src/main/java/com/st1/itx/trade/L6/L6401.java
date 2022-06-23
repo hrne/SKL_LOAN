@@ -3,16 +3,16 @@ package com.st1.itx.trade.L6;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxAuthGroup;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.domain.TxTellerAuth;
@@ -20,6 +20,7 @@ import com.st1.itx.db.domain.TxTellerAuthId;
 import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.service.TxTellerAuthService;
 import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -131,6 +132,7 @@ public class L6401 extends TradeBuffer {
 		tTxTeller.setDesc(titaVo.getParam("Desc"));
 		tTxTeller.setAmlHighFg(titaVo.getParam("AmlHighFg"));
 		tTxTeller.setAllowFg(Integer.parseInt(titaVo.getParam("AllowFg")));
+		tTxTeller.setEmail(titaVo.getParam("EmailAddress"));
 		
 		tTxTeller.setStation(titaVo.getParam("Station"));
 		tTxTeller.setAdminFg(Integer.parseInt(titaVo.getParam("AdminFg")));

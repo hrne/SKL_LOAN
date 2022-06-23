@@ -104,7 +104,7 @@ public class L8314 extends TradeBuffer {
 		// 檢核項目(D-29)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start KEY值(IDN+報送單位代號+協商申請日)未曾報送過'52':前置協商相關資料報送例外處理則予以剔退
-			// ：@@@function 要改为：custRcSubEq
+			//：@@@function 要改为：custRcSubEq
 			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ052 == null) {
 				if ("A".equals(iTranKey)) {
@@ -157,13 +157,13 @@ public class L8314 extends TradeBuffer {
 			if (uJcicZ053 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ053 oldJcicZ053 = (JcicZ053) iDataLog.clone(uJcicZ053);
 			uJcicZ053.setTranKey(iTranKey);
 			uJcicZ053.setAgreeSend(iAgreeSend);
 			uJcicZ053.setAgreeSendData1(iAgreeSendData1);
 			uJcicZ053.setAgreeSendData2(iAgreeSendData2);
 			uJcicZ053.setChangePayDate(iChangePayDate);
 			uJcicZ053.setOutJcicTxtDate(0);
-			JcicZ053 oldJcicZ053 = (JcicZ053) iDataLog.clone(uJcicZ053);
 			try {
 				sJcicZ053Service.update(uJcicZ053, titaVo);
 			} catch (DBException e) {

@@ -903,17 +903,7 @@ public class MakeReport extends CommBuffer {
 	 * @param y2 繪製結束Y軸
 	 */
 	public void drawLine(int x1, int y1, int x2, int y2) {
-
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("type", 5);
-		map.put("x1", x1);
-		map.put("y1", y1);
-		map.put("x2", x2);
-		map.put("y2", y2);
-		map.put("w", 1);
-		listMap.add(map);
-
-		this.printCnt++;
+		this.drawLine(x1, y1, x2, y2, (double) 1);
 	}
 
 	/**
@@ -1305,8 +1295,16 @@ public class MakeReport extends CommBuffer {
 
 					}
 
-					this.xPoints = writer.getPageSize().getWidth();
-					this.yPoints = writer.getPageSize().getHeight();
+					if ("P".equals(paperorientaton)) {
+						this.xPoints = writer.getPageSize().getWidth();
+						this.yPoints = writer.getPageSize().getHeight();
+					} else {
+						this.xPoints = writer.getPageSize().getHeight();
+						this.yPoints = writer.getPageSize().getWidth();
+					}
+
+					this.info("Page Width , xPoints = " + xPoints);
+					this.info("Page Height , yPoints = " + yPoints);
 
 					document.open();
 
@@ -1467,7 +1465,7 @@ public class MakeReport extends CommBuffer {
 					int x = Integer.parseInt(map.get("x").toString());
 					int y = Integer.parseInt(map.get("y").toString());
 
-					int yy = (int) this.yPoints - y;
+					int yy = (int) (this.yPoints - y);
 
 					String txt = map.get("txt").toString();
 					String align = map.get("align").toString();
@@ -1494,8 +1492,8 @@ public class MakeReport extends CommBuffer {
 //					int py1 = (int) page.getHeight() - y1;
 //					int py2 = (int) page.getHeight() - y2;
 
-					int py1 = (int) this.yPoints - y1;
-					int py2 = (int) this.yPoints - y2;
+					int py1 = (int) (this.yPoints - y1);
+					int py2 = (int) (this.yPoints - y2);
 
 					cb.saveState();
 					// 設定線條寬度
@@ -1504,9 +1502,9 @@ public class MakeReport extends CommBuffer {
 					// 设置画线的颜色
 					cb.setColorStroke(BaseColor.BLACK);
 					// 绘制起点坐标
-					cb.moveTo(x1, py1);
+					cb.moveTo(x1, frameY + py1);
 					// 绘制终点坐标
-					cb.lineTo(x2, py2);
+					cb.lineTo(x2, frameY + py2);
 					// 确认直线的绘制
 					cb.stroke();
 					cb.restoreState();

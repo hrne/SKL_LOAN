@@ -204,14 +204,13 @@ public class L4721Report extends MakeReport {
 				this.error("bankStatementServiceImpl TempQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
-			
+
 			try {
 				listL4721Head = l4721ServiceImpl.doQuery(custNo, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
-			
 
 			// 檢查 CustNotice 確認這份表是否能出
 			// 跳過 測試用
@@ -219,11 +218,11 @@ public class L4721Report extends MakeReport {
 				continue;
 
 			// 印出有 暫收款額度000的資料 下方帶出利率變動額度
-			
+
 			Boolean HeadFlag = false;
 			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null
 					&& !listL4721Head.isEmpty()) {
-				
+
 				HeadFlag = true;
 				// 準備第一張
 				Map<String, String> mapL4721Head = listL4721Head.get(0);
@@ -239,7 +238,7 @@ public class L4721Report extends MakeReport {
 				} else {
 					this.newPage();
 				}
-				
+
 				print(1, 1, "　");
 
 				// 入帳日期
@@ -252,7 +251,7 @@ public class L4721Report extends MakeReport {
 				print(0, 47, formatAmt(mapL4721Temp.get("TxAmt"), 0), "R");
 
 				for (Map<String, String> Head : listL4721Head) {
-					if ("Y".equals(Head.get("Flag"))) {
+					if ("Y".equals(Head.get("Flag")) && parse.stringToInteger(Head.get("TxEffectDate")) != 0) {
 						this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
 
 						// 額度號碼
@@ -271,13 +270,13 @@ public class L4721Report extends MakeReport {
 						print(0, 55, newRate, "R");
 					}
 				}
-				
+
 				// 先更新表頭資料
 				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
 						parse.stringToInteger(mapL4721Head.get("FacmNo")),
 						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 				this.newPage();
-			} 
+			}
 
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
@@ -304,15 +303,15 @@ public class L4721Report extends MakeReport {
 
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
-				
+
 				// 先更新表頭資料
 				setHead(listL4721Detail.get(0), tempcustno, tempfacmno,
-						parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")) - 19110000);
+						parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")));
 
-				if(!HeadFlag) { // 下一筆資料沒有第一張時的換頁
+				if (!HeadFlag) { // 下一筆資料沒有第一張時的換頁
 					this.newPage();
 				}
-				
+
 				int times = 0;
 				int txeffectdate = 0;
 				BigDecimal presentrate = new BigDecimal("0");
@@ -346,70 +345,12 @@ public class L4721Report extends MakeReport {
 							setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")),
 									parse.stringToInteger(mapL4721Detail.get("FacmNo")),
 									parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
-							
+
 							this.newPage();
-//					// 先更新表頭資料
-//							setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")),
-//									parse.stringToInteger(mapL4721Detail.get("FacmNo")),
-//									parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
 						} // if
 					} // if
-					print(1, 1, "　");
 
-					// 入帳日期
-					print(0, 1, showRocDate(mapL4721Detail.get("EntryDate"), 3));
-
-					// 計息期間
-					String dateRange = " ";
-					String startDate = mapL4721Detail.get("IntStartDate");
-					String endDate = mapL4721Detail.get("IntEndDate");
-					String tstartDate = "       ";
-					String tendDate = "       ";
-					// 組成yyymmdd-yyymmdd
-					if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
-
-						if (!"".equals(showRocDate(startDate, 3))) {
-							tstartDate = showRocDate(startDate, 3);
-						}
-
-						if (!"".equals(showRocDate(endDate, 3))) {
-							tendDate = showRocDate(endDate, 3);
-						}
-
-						dateRange = tstartDate + "-" + tendDate;
-					}
-
-					if ("-".equals(dateRange.trim())) {
-						dateRange = "";
-					}
-					print(0, 10, dateRange);
-
-					if (parse.stringToInteger(mapL4721Detail.get("RepayCode")) != 9) {
-						// 繳款方式
-						print(0, 26, mapL4721Detail.get("RepayCodeX"));
-					}
-					// 繳款金額
-					print(0, 47, formatAmt(mapL4721Detail.get("TxAmt"), 0), "R");
-
-					// 攤還本金
-					print(0, 60, formatAmt(mapL4721Detail.get("Principal"), 0), "R");
-
-					// 繳息金額
-					print(0, 73, formatAmt(mapL4721Detail.get("Interest"), 0), "R");
-
-					// 違約金
-					String bt = "";
-					if (!"0".equals(formatAmt(mapL4721Detail.get("BreachAmt"), 0))) {
-						bt = formatAmt(mapL4721Detail.get("BreachAmt"), 0);
-					}
-					print(0, 82, bt, "R");
-
-					// 火險費或其他費用
-					String fe = "";
-					if (!"0".equals(formatAmt(mapL4721Detail.get("OtherFee"), 0))) {
-						fe = formatAmt(mapL4721Detail.get("OtherFee"), 0);
-					}
-					print(0, 98, fe, "R");
+					writedetail(mapL4721Detail);
 
 					times++;
 
@@ -417,48 +358,17 @@ public class L4721Report extends MakeReport {
 					if (times == listL4721Detail.size() && txeffectdate != 0) {
 
 						if (sameFlg) { // 所有額度都同一天 印同一張
-
 							for (Integer key : sameMap.keySet()) {
-
 								this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
-
-								// 額度號碼
-								print(0, 6, FormatUtil.pad9("" + key, 3));
-
-								// 利率變動日
-								String rateChangeDate = showRocDate(sameMap.get(key).getTxEffectDate(), 0);
-								print(0, 16, rateChangeDate);
-
-								// 原利率
-								String originRate = formatAmt(sameMap.get(key).getPresentRate(), 2) + "%";
-								print(0, 43, originRate, "R");
-
-								// 現在利率
-								String newRate = formatAmt(sameMap.get(key).getAdjustedRate(), 2) + "%";
-								print(0, 55, newRate, "R");
-
-							}
-							this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
+								writeLastdetail(key, sameMap.get(key).getTxEffectDate(),
+										sameMap.get(key).getPresentRate(), sameMap.get(key).getAdjustedRate());
+							} // for
 						} else {
 							this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
+							writeLastdetail(tempfacmno, txeffectdate, presentrate, adjustedrate);
+						} // else
 
-							// 額度號碼
-							print(0, 6, FormatUtil.pad9("" + tempfacmno, 3));
-
-							// 利率變動日
-							String rateChangeDate = showRocDate(txeffectdate, 0);
-							print(0, 16, rateChangeDate);
-
-							// 原利率
-							String originRate = formatAmt(presentrate, 2) + "%";
-							print(0, 43, originRate, "R");
-
-							// 現在利率
-							String newRate = formatAmt(adjustedrate, 2) + "%";
-							print(0, 55, newRate, "R");
-
-							this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
-						}
+						this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
 
 						break;
 					}
@@ -597,4 +507,79 @@ public class L4721Report extends MakeReport {
 		}
 	}
 
+	private void writedetail(Map<String, String> mapL4721Detail) throws LogicException {
+		print(1, 1, "　");
+
+		// 入帳日期
+		print(0, 1, showRocDate(mapL4721Detail.get("EntryDate"), 3));
+
+		// 計息期間
+		String dateRange = " ";
+		String startDate = mapL4721Detail.get("IntStartDate");
+		String endDate = mapL4721Detail.get("IntEndDate");
+		String tstartDate = "       ";
+		String tendDate = "       ";
+		// 組成yyymmdd-yyymmdd
+		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+
+			if (!"".equals(showRocDate(startDate, 3))) {
+				tstartDate = showRocDate(startDate, 3);
+			}
+
+			if (!"".equals(showRocDate(endDate, 3))) {
+				tendDate = showRocDate(endDate, 3);
+			}
+
+			dateRange = tstartDate + "-" + tendDate;
+		}
+
+		if ("-".equals(dateRange.trim())) {
+			dateRange = "";
+		}
+		print(0, 10, dateRange);
+
+		if (parse.stringToInteger(mapL4721Detail.get("RepayCode")) != 9) {
+			// 繳款方式
+			print(0, 26, mapL4721Detail.get("RepayCodeX"));
+		}
+		// 繳款金額
+		print(0, 47, formatAmt(mapL4721Detail.get("TxAmt"), 0), "R");
+
+		// 攤還本金
+		print(0, 60, formatAmt(mapL4721Detail.get("Principal"), 0), "R");
+
+		// 繳息金額
+		print(0, 73, formatAmt(mapL4721Detail.get("Interest"), 0), "R");
+
+		// 違約金
+		String bt = "";
+		if (!"0".equals(formatAmt(mapL4721Detail.get("BreachAmt"), 0))) {
+			bt = formatAmt(mapL4721Detail.get("BreachAmt"), 0);
+		}
+		print(0, 82, bt, "R");
+
+		// 火險費或其他費用
+		String fe = "";
+		if (!"0".equals(formatAmt(mapL4721Detail.get("OtherFee"), 0))) {
+			fe = formatAmt(mapL4721Detail.get("OtherFee"), 0);
+		}
+		print(0, 98, fe, "R");
+	}
+
+	private void writeLastdetail(int facmno, int txeffectdate, BigDecimal presentrate, BigDecimal adjustedrate) {
+		// 額度號碼
+		print(0, 6, FormatUtil.pad9("" + facmno, 3));
+
+		// 利率變動日
+		String rateChangeDate = showRocDate(txeffectdate, 0);
+		print(0, 16, rateChangeDate);
+
+		// 原利率
+		String originRate = formatAmt(presentrate, 2) + "%";
+		print(0, 43, originRate, "R");
+
+		// 現在利率
+		String newRate = formatAmt(adjustedrate, 2) + "%";
+		print(0, 55, newRate, "R");
+	}
 }

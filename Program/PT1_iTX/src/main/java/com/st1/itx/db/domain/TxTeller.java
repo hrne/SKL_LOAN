@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class TxTeller implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5117439067178394324L;
-
-// 使用者代號
+  // 使用者代號
   @Id
   @Column(name = "`TlrNo`", length = 6)
   private String tlrNo = " ";
@@ -169,6 +166,10 @@ public class TxTeller implements Serializable {
   // 站別
   @Column(name = "`Station`", length = 3)
   private String station;
+
+  // EmailAddress
+  @Column(name = "`Email`", length = 50)
+  private String email;
 
   // 管理者權限記號
   /* 0.否 1.是 */
@@ -798,6 +799,25 @@ public class TxTeller implements Serializable {
   }
 
 /**
+	* EmailAddress<br>
+	* 
+	* @return String
+	*/
+  public String getEmail() {
+    return this.email == null ? "" : this.email;
+  }
+
+/**
+	* EmailAddress<br>
+	* 
+  *
+  * @param email EmailAddress
+	*/
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+/**
 	* 管理者權限記號<br>
 	* 0.否 1.是
 	* @return Integer
@@ -938,7 +958,7 @@ public class TxTeller implements Serializable {
            + ", loggerFg=" + loggerFg + ", txtNo=" + txtNo + ", ltxDate=" + ltxDate + ", ltxTime=" + ltxTime + ", desc=" + desc + ", lastDate=" + lastDate
            + ", lastTime=" + lastTime + ", amlHighFg=" + amlHighFg + ", authNo1=" + authNo1 + ", authNo2=" + authNo2 + ", authNo3=" + authNo3 + ", authNo4=" + authNo4
            + ", authNo5=" + authNo5 + ", authNo6=" + authNo6 + ", authNo7=" + authNo7 + ", authNo8=" + authNo8 + ", authNo9=" + authNo9 + ", authNo10=" + authNo10
-           + ", station=" + station + ", adminFg=" + adminFg + ", mntDate=" + mntDate + ", mntEmpNo=" + mntEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", station=" + station + ", email=" + email + ", adminFg=" + adminFg + ", mntDate=" + mntDate + ", mntEmpNo=" + mntEmpNo + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -130,10 +130,10 @@ public class L8315 extends TradeBuffer {
 			if (uJcicZ054 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ054 oldJcicZ054 = (JcicZ054) iDataLog.clone(uJcicZ054);
 			uJcicZ054.setTranKey(iTranKey);
 			uJcicZ054.setPayOffResult(iPayOffResult);
 			uJcicZ054.setOutJcicTxtDate(0);
-			JcicZ054 oldJcicZ054 = (JcicZ054) iDataLog.clone(uJcicZ054);
 			try {
 				sJcicZ054Service.update(uJcicZ054, titaVo);
 			} catch (DBException e) {

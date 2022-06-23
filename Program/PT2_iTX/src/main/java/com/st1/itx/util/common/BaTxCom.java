@@ -1585,6 +1585,7 @@ public class BaTxCom extends TradeBuffer {
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt());
 					this.txBal = this.txBal.subtract(ba.getAcctAmt());
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
+					this.shortFacmNo = ba.getFacmNo();// 短繳額度;
 					if (this.overRpFacmNo == 0) {
 						this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 					}
@@ -1597,6 +1598,7 @@ public class BaTxCom extends TradeBuffer {
 					this.xxBal = this.xxBal.subtract(ba.getAcctAmt()); // this.xxBal = this.xxBal - AcctAmt
 					this.txBal = this.txBal.subtract(ba.getAcctAmt()); //
 					this.repayTotal = this.repayTotal.add(ba.getUnPaidAmt());
+					this.shortFacmNo = ba.getFacmNo();// 短繳額度;
 					if (this.overRpFacmNo == 0) {
 						this.overRpFacmNo = ba.getFacmNo();// 溢短繳額度;
 					}
@@ -1922,7 +1924,7 @@ public class BaTxCom extends TradeBuffer {
 				// 利息提存只列欠繳利息
 				if (isAcLoanInt) {
 					if ("I".equals(rv.getAcctCode().substring(0, 1)) && iFacmNo == rv.getFacmNo()
-							&& parse.IntegerToString(iBormNo, 3).equals(rv.getRvNo())) {
+							&& parse.IntegerToString(iBormNo, 3).equals(rv.getRvNo().substring(0, 3))) {
 						baTxVo.setBormNo(iBormNo);
 						baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 						baTxVo.setRepayType(1); // 01-期款

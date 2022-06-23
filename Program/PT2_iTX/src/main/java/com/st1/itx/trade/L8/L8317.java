@@ -83,12 +83,12 @@ public class L8317 extends TradeBuffer {
 		String iCaseStatus = titaVo.getParam("CaseStatus");// 案件狀態
 		int iClaimDate = 0;
 		if ("E".equals(iCaseStatus)) {
-			iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate1"));// 發文日期
+			iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate1"));//發文日期
 		} else {
 			iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate"));// 裁定日期
-		}
+		} 
 		String iCourtCode = titaVo.getParam("CourtCode");// 承審法院代碼
-		int iYear = Integer.valueOf(titaVo.getParam("Year")) + 1911;
+		int iYear = Integer.valueOf(titaVo.getParam("Year"))+1911;
 		String iCourtDiv = titaVo.getParam("CourtDiv");
 		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
 		String iApprove = titaVo.getParam("Approve");
@@ -117,7 +117,8 @@ public class L8317 extends TradeBuffer {
 
 				// 1 start 案件狀態未曾報送過「A:清算程序開始」 前，不能報送「B:清算程序終止(結)」
 				if ("B".equals(iCaseStatus)) {
-					Slice<JcicZ056> sJcicZ056 = sJcicZ056Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ056> sJcicZ056 = sJcicZ056Service.checkCaseStatus(iSubmitKey, iCustId,
+							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ056 == null) {
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "案件狀態未曾報送過「A:清算程序開始」 前，不能報送「B:清算程序終止(結)」 .");
@@ -144,7 +145,8 @@ public class L8317 extends TradeBuffer {
 				// 2 start 報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」
 				// 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.
 				if ("D".equals(iCaseStatus)) {
-					Slice<JcicZ056> sJcicZ056 = sJcicZ056Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ056> sJcicZ056 = sJcicZ056Service.checkCaseStatus(iSubmitKey, iCustId,
+							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ056 == null) {
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」 .");
@@ -154,15 +156,19 @@ public class L8317 extends TradeBuffer {
 					} else {
 						int flagCaseStatus = 0;
 						for (JcicZ056 xJcicZ056 : sJcicZ056) {
-							if (!"D".equals(xJcicZ056.getTranKey()) && (("A".equals(xJcicZ056.getCaseStatus()) || "C".equals(xJcicZ056.getCaseStatus())) && "Y".equals(xJcicZ056.getApprove()))) {
+							if (!"D".equals(xJcicZ056.getTranKey())
+									&& (("A".equals(xJcicZ056.getCaseStatus()) || "C".equals(xJcicZ056.getCaseStatus()))
+											&& "Y".equals(xJcicZ056.getApprove()))) {
 								flagCaseStatus = 1;
 							}
 						}
 						if (flagCaseStatus == 0) {
 							if ("A".equals(iTranKey)) {
-								throw new LogicException("E0005", "報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.");
+								throw new LogicException("E0005",
+										"報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.");
 							} else {
-								throw new LogicException("E0007", "報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.");
+								throw new LogicException("E0007",
+										"報送案件狀態「D:清算撤消免責確定」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」，且12欄「法院裁定免責確定」原填報為Y.");
 							}
 						}
 					}
@@ -186,7 +192,8 @@ public class L8317 extends TradeBuffer {
 					} else {
 						int flagCaseStatus = 0;
 						for (JcicZ056 xJcicZ056 : sJcicZ056) {
-							if (!"D".equals(xJcicZ056.getTranKey()) && ("A".equals(xJcicZ056.getCaseStatus()) || "C".equals(xJcicZ056.getCaseStatus()))) {
+							if (!"D".equals(xJcicZ056.getTranKey()) && ("A".equals(xJcicZ056.getCaseStatus())
+									|| "C".equals(xJcicZ056.getCaseStatus()))) {
 								flagCaseStatus = 1;
 							}
 						}
@@ -205,9 +212,11 @@ public class L8317 extends TradeBuffer {
 				if ("D".equals(iCaseStatus)) {
 					if (!"N".equals(iApprove)) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "案件狀態為「D:清算撤消免責確定」 時，除原必要填報項目外，第12欄「法院裁定免責確定」亦為必要填報項目，且必須填報N.");
+							throw new LogicException("E0005",
+									"案件狀態為「D:清算撤消免責確定」 時，除原必要填報項目外，第12欄「法院裁定免責確定」亦為必要填報項目，且必須填報N.");
 						} else {
-							throw new LogicException("E0007", "案件狀態為「D:清算撤消免責確定」 時，除原必要填報項目外，第12欄「法院裁定免責確定」亦為必要填報項目，且必須填報N.");
+							throw new LogicException("E0007",
+									"案件狀態為「D:清算撤消免責確定」 時，除原必要填報項目外，第12欄「法院裁定免責確定」亦為必要填報項目，且必須填報N.");
 						}
 					}
 				} // 4 end
@@ -257,6 +266,7 @@ public class L8317 extends TradeBuffer {
 			if (uJcicZ056 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ056 oldJcicZ056 = (JcicZ056) iDataLog.clone(uJcicZ056);
 			uJcicZ056.setTranKey(iTranKey);
 			uJcicZ056.setYear(iYear);
 			uJcicZ056.setCourtDiv(iCourtDiv);
@@ -270,7 +280,6 @@ public class L8317 extends TradeBuffer {
 			uJcicZ056.setSaveEndDate(iSaveEndDate);
 			uJcicZ056.setAdminName(iAdminName);
 			uJcicZ056.setOutJcicTxtDate(0);
-			JcicZ056 oldJcicZ056 = (JcicZ056) iDataLog.clone(uJcicZ056);
 			try {
 				sJcicZ056Service.update(uJcicZ056, titaVo);
 			} catch (DBException e) {

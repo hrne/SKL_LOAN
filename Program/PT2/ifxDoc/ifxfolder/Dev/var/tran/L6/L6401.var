@@ -38,6 +38,7 @@ T(3,0:無權限;1:有權限)
 [      "#Fd9+課組別",              #GroupNo,#GroupNoX],
 [      "#FdStation+站別",          #Station,#StationX],
 [      "#FdAdminFg+管理者權限",    #AdminFg,#AdminFgX],
+[#<->#,"#FdEmail+電子信箱",        #EmailAddress],
 [      "#Fd7+狀態",                #Status,#StatusX],
 [      "#AmlHighFgFd+AML定審高風險處理權限",#AmlHighFg,#AmlHighFgX],
 ![#Fd1],
@@ -134,6 +135,8 @@ C(3,#FunCode,5,S,T(3,*))
 #FdAdminFg=X,2,L
 C(3,#FunCode,5,S,T(3,*))
 
+#FdEmail=X,2,L
+
 #FdStation=X,2,L
 
 ![維護記號](1:新增;2:修改;4:刪除;5:查詢)
@@ -162,11 +165,36 @@ E(0,1)ASGN(AGAIN$)
 E(0,#FunCode)
 <include src="COM.icf::CheckAuth.rtn"/>
 
-##loop {times:9,i:2}
-#Fd{i}=X,2,L
+#Fd2=X,2,L
 C(2,#FunCode,s,$,$,s,s,s)
 T(3,*)
-##end
+
+#Fd3=X,2,L
+C(2,#FunCode,s,$,$,s,s,s)
+T(3,*)
+
+#Fd4=X,2,L
+C(2,#FunCode,s,$,$,s,s,s)
+T(3,*)
+
+#Fd5=X,2,L
+T(3,)
+
+#Fd6=X,2,L
+C(2,#FunCode,s,$,$,s,s,s)
+T(3,*)
+
+#Fd7=X,2,L
+C(2,#FunCode,s,$,$,s,s,s)
+T(3,*)
+
+#Fd8=X,2,L
+C(2,#FunCode,s,$,$,s,s,s)
+T(3,*)
+
+#Fd9=X,2,L
+C(2,#FunCode,s,$,$,s,s,s)
+T(3,*)
 
 !顯示框線
 #ShowFrame1=A,1,S
@@ -187,6 +215,7 @@ T(F,@TlrItem,#ShowFrame2)
 T(F,@AllowFg,#ShowFrame2)
 T(F,@Station,#ShowFrame2)
 T(F,@AdminFg,#ShowFrame2)
+T(F,@EmailAddress,#ShowFrame2)
 ##loop {times:40,i:1}
 T(F,@AuthNo{i},#ShowFrame2)
 ##end
@@ -442,6 +471,13 @@ V(H,#AdminFgH)
 
 #AdminFgX=X,2,L
 T(H,#AdminFg,#AdminFgH)
+
+!電子信箱
+#EmailAddress=x,50,I
+C(2,#FunCode,s,$,$,s,s,s)
+@
+IF(#FdEmail=="*",V(7),$)
+C(4,#EmailAddress,$,A(M,0,#EmailAddress))
 
 ![經辦/使用者狀態]
 
@@ -2620,6 +2656,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNo),T(2,#EMPNOS))
 #AmlHighFg
 #Station
 #AdminFg
+#EmailAddress
 ##loop {times:40,i:1}
 #AuthNo{i}
 ##end
@@ -2656,6 +2693,7 @@ TXFORM=L6R20
 #LastUpdateEmpNoX
 #Station
 #AdminFg
+#EmailAddress
 #IsAdmin
 ##loop {times:40,i:1}
 #AuthNo{i}

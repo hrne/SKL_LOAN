@@ -204,7 +204,8 @@ BEGIN
            END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
          , SUBSTR('00000000' || TRUNC(CASE
                                         WHEN NVL(CM."EvaAmt",0) = 0 
-                                        THEN NVL(SCLAD."SameClLineAmt",0)
+--                                        THEN NVL(SCLAD."SameClLineAmt",0)
+                                        THEN NVL(CI."SettingAmt",0)     -- 改為使用設定金額
                                       ELSE NVL(CM."EvaAmt",0) END / 1000), -8)
                                                  AS "EvaAmt"            -- 鑑估(總市)值
          , CASE
@@ -318,6 +319,8 @@ BEGIN
                    WHEN NVL(SCLAD."SameClLineAmt",0) != 0
                    THEN NVL(SCLAD."SameClLineAmt",0)
                  ELSE NVL(LAD."LineAmt",0) END)  AS "LineAmt"           -- 核准額度
+         , SUBSTR('00000000' || TRUNC(NVL(CI."SettingAmt",0) / 1000), -8)
+                                                 AS "CiSettingAmt"      -- 本行設定金額
     FROM   "JcicB090" M
       LEFT JOIN "CdCl"         ON "CdCl"."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1))
                               AND "CdCl"."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
@@ -505,7 +508,8 @@ BEGIN
          , MAX(WK."SettingDate")                 AS "SettingDate"       -- 設定日期
          , MAX(WK."MonthSettingAmt")             AS "MonthSettingAmt"   -- 本行本月設定金額
          , MAX(WK."SettingSeq")                  AS "SettingSeq"        -- 本月設定抵押順位
-         , TRUNC(MAX(WK."LineAmt") * 1.2 / 1000) AS "SettingAmt"        -- 本行累計已設定總金額 = 核准額度 * 1.2 (ref:AS400 LN15M1)
+--         , TRUNC(MAX(WK."LineAmt") * 1.2 / 1000) AS "SettingAmt"        -- 本行累計已設定總金額 = 核准額度 * 1.2 (ref:AS400 LN15M1)
+         , MAX(WK."CiSettingAmt")                AS "SettingAmt"        -- 本行累計已設定總金額
          , MAX(WK."PreSettingAmt")               AS "PreSettingAmt"     -- 其他債權人已設定金額
          , MAX(WK."DispPrice")                   AS "DispPrice"         -- 處分價格
          , MAX(WK."IssueEndDate")                AS "IssueEndDate"      -- 權利到期年月

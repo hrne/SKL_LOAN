@@ -292,6 +292,7 @@ public class L8320 extends TradeBuffer {
 			if (uJcicZ062 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ062 oldJcicZ062 = (JcicZ062) iDataLog.clone(uJcicZ062);
 			uJcicZ062.setCompletePeriod(iCompletePeriod);
 			uJcicZ062.setPeriod(iPeriod);
 			uJcicZ062.setRate(iRate);
@@ -312,7 +313,6 @@ public class L8320 extends TradeBuffer {
 			uJcicZ062.setMonthPayAmt2(iMonthPayAmt2);
 			uJcicZ062.setTranKey(iTranKey);
 			uJcicZ062.setOutJcicTxtDate(0);
-			JcicZ062 oldJcicZ062 = (JcicZ062) iDataLog.clone(uJcicZ062);
 			try {
 				sJcicZ062Service.update(uJcicZ062, titaVo);
 			} catch (DBException e) {

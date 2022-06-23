@@ -88,7 +88,7 @@ public class L8312 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM")) + 191100;
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"))+191100;
 		String iDelayCode = titaVo.getParam("DelayCode");
 		String iDelayDesc = titaVo.getParam("DelayDesc");
 		String iKey = "";
@@ -205,11 +205,11 @@ public class L8312 extends TradeBuffer {
 			if (uJcicZ051 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ051 oldJcicZ051 = (JcicZ051) iDataLog.clone(uJcicZ051);
 			uJcicZ051.setTranKey(iTranKey);
 			uJcicZ051.setDelayCode(iDelayCode);
 			uJcicZ051.setDelayDesc(iDelayDesc);
 			uJcicZ051.setOutJcicTxtDate(0);
-			JcicZ051 oldJcicZ051 = (JcicZ051) iDataLog.clone(uJcicZ051);
 			try {
 				sJcicZ051Service.update(uJcicZ051, titaVo);
 			} catch (DBException e) {

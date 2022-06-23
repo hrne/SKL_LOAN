@@ -93,7 +93,8 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,B.\"NextPayIntDate\"                                  "; // 下繳日
 		sql += "       ,NVL(CB.\"BdLocation\", ' ')      AS \"Location\"      "; // 押品地址
 		sql += "       ,NVL(CN.\"PaperNotice\", 'Y')     AS \"PaperNotice\"   "; // 書面通知與否 Y:寄送 N:不寄送
-		sql += "       ,CASE WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\""; // 利率生效日
+		sql += "       ,CASE WHEN BR.\"TxEffectDate\" = 0 THEN 0 WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\""; // 利率生效日
+//		sql += "       ,CASE WHEN BR.\"TxEffectDate\" IS NOT NULL THEN BR.\"TxEffectDate\" - 19110000 ELSE 0 END AS \"TxEffectDate\""; // 利率生效日
 		sql += "       ,BR.\"PresentRate\"                ";
 		sql += "       ,BR.\"AdjustedRate\"               ";
 		sql += "       ,CASE WHEN B.\"FacmNo\" = BR.\"FacmNo\" THEN 'Y' ELSE 'N' END AS \"Flag\"  "; // 放款利率變動檔生效日，利率未變動為零
@@ -189,12 +190,12 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",  '$.FireFee'),0))       AS FEE3                  ";
 		sql += "             ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",  '$.LawFee'),0))        AS FEE4                  ";
 		sql += "             ,T.\"AcDate\"                      ";
-		sql += "             , CASE" ; 
-		sql += "                WHEN t.\"IntStartDate\" = 0" ; 
-		sql += "                  AND t.\"IntEndDate\" = 0 THEN" ; 
-		sql += "                    'Y'" ; 
-		sql += "                ELSE" ; 
-		sql += "                    'N' END AS \"Flag\""                                 ;
+		sql += "             , CASE";
+		sql += "                WHEN t.\"IntStartDate\" = 0";
+		sql += "                  AND t.\"IntEndDate\" = 0 THEN";
+		sql += "                    'Y'";
+		sql += "                ELSE";
+		sql += "                    'N' END AS \"Flag\"";
 		sql += "        FROM \"LoanBorTx\" T                                             ";
 		sql += "        WHERE T.\"CustNo\" = " + custNo;
 		sql += "         AND  T.\"FacmNo\" != 0 ";
@@ -211,23 +212,23 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ) X                                                                             ";
 		sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'RepayCode'                              ";
 		sql += "                        AND CD.\"Code\"    =  X.\"RepayCode\"                         ";
-		sql += " LEFT JOIN \"BatxRateChange\" BR ON BR.\"CustNo\" = " + custNo                        ;
+		sql += " LEFT JOIN \"BatxRateChange\" BR ON BR.\"CustNo\" = " + custNo;
 		sql += "                                AND BR.\"FacmNo\" =  X.\"FacmNo\"                     ";
-		sql += "                                AND BR.\"AdjDate\" = " + adjDate                      ;
+		sql += "                                AND BR.\"AdjDate\" = " + adjDate;
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\"   = X.\"CustNo\"                            ";
-		sql += " LEFT JOIN ( SELECT  \"CustNo\" AS \"CustNo\"" ;
+		sql += " LEFT JOIN ( SELECT  \"CustNo\" AS \"CustNo\"";
 		sql += "                    ,\"FacmNo\"";
 		sql += "                    ,SUM(\"LoanBal\") AS \"LoanBal\"";
 		sql += "                    ,SUM(\"DueAmt\") AS \"DueAmt\"";
-		sql += "                    ,MIN(\"NextPayIntDate\") AS \"NextPayIntDate\""; 
-		sql += "                    ,MAX(\"SpecificDd\") AS \"SpecificDd\""; 
+		sql += "                    ,MIN(\"NextPayIntDate\") AS \"NextPayIntDate\"";
+		sql += "                    ,MAX(\"SpecificDd\") AS \"SpecificDd\"";
 		sql += "        FROM  \"LoanBorMain\"";
 		sql += "        WHERE  \"CustNo\" = " + custNo;
 		sql += "               AND \"Status\" != 3                                           ";
 		sql += "        GROUP BY   \"CustNo\",\"FacmNo\") LB ON LB.\"CustNo\" = X.\"CustNo\"                         ";
 		sql += "                                            AND LB.\"FacmNo\" =  X.\"FacmNo\"                        ";
-		
-		
+
+		sql += " WHERE LB.\"SpecificDd\" IS NOT NULL";
 		sql += " ORDER BY X.\"FacmNo\",X.\"EntryDate\"                                                             ";
 
 		this.info("sql=" + sql);

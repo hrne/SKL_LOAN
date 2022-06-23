@@ -1,13 +1,12 @@
--- 程式功能：清WK檔,維護 JcicB092 每月聯徵不動產擔保品明細檔
--- 執行時機：每月底日終批次(換日前)
--- 執行方式：由Usp_L8_JcicB092_Upd執行
---
-
-create or replace procedure "Usp_L8_JcicB092_Upd_Prear" AUTHID CURRENT_USER as
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd_Prear" AUTHID CURRENT_USER as
     table_or_view_not_exist exception;
     pragma exception_init(table_or_view_not_exist, -942);
     attempted_ddl_on_in_use_GTT exception;
     pragma exception_init(attempted_ddl_on_in_use_GTT, -14452);
+-- 程式功能：清WK檔,維護 JcicB092 每月聯徵不動產擔保品明細檔
+-- 執行時機：每月底日終批次(換日前)
+-- 執行方式：由Usp_L8_JcicB092_Upd執行
+--
 begin
     execute immediate 'drop table "Work_B092"';
     dbms_output.put_line('drop table Work_B092');
@@ -43,6 +42,7 @@ begin
      			, "Area"             varchar2(9)
      			, "LandOwnedArea"    decimal(14, 2)  default 0 not null
      			, "LineAmt"          decimal(14, 0)  default 0 not null
+     			, "CiSettingAmt"     decimal(14, 0)  default 0 not null
      	) ON COMMIT DELETE ROWS';
     dbms_output.put_line('create table Work_B092');
     exception 
@@ -80,6 +80,7 @@ begin
      							, "Area"             varchar2(9)
      							, "LandOwnedArea"    decimal(14, 2)  default 0 not null
      							, "LineAmt"          decimal(14, 0)  default 0 not null
+     			        , "CiSettingAmt"     decimal(14, 0)  default 0 not null
                          ) ON COMMIT DELETE ROWS';
             dbms_output.put_line('create table Work_B092');
         when attempted_ddl_on_in_use_GTT then

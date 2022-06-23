@@ -599,6 +599,8 @@ RESET_RIM(#SendL3r02,L3R02)
 S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
 R(1,L3R02)
 
+
+
 ![幣別]
 #FdCurrencyCode=X,2,L
 
@@ -631,6 +633,8 @@ C(3,#Precision,0,SHOW(#TwRepayAmt,#TwOvduRepay,#TwCloseBreachAmt,#TwExtraRepay,#
 
 #PreRepayTerms=A,3,S
 E(0,#L6R28PreRepayTerms)
+
+
 
 ![回收期數]
 !部份償還本金時，回收期數不可輸入
@@ -1272,7 +1276,7 @@ E(0,@RP_CUSTNO,#TimCustNo)
 ! 額度
 #TmpFacmNo=X,1,S
 E(0,@RP_FACMNO,#L3r06RpFacmNo)
-
+E(0,@SHORT_FACMNO,#L3r06ShortFacmNo)
 !類別   摘要
 #TmpNote=X,1,S
 T(2,@RP_NOTE,#DetailNote)

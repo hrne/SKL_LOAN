@@ -34,6 +34,7 @@ import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.ClFacCom;
+import com.st1.itx.util.common.CustCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
@@ -81,6 +82,8 @@ public class L2153 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	LoanCom loanCom;
+	@Autowired
+	public CustCom custCom;
 	@Autowired
 	GSeqCom gGSeqCom;
 	@Autowired
@@ -516,17 +519,20 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(titaVo.getParam("UtilDeadline")));
-
 		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
 		tFacMain.setExtraRepayCode(titaVo.getParam("ExtraRepayCode"));
 		tFacMain.setIntCalcCode(titaVo.getParam("IntCalcCode"));
-		tFacMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
+		String custTypeCode = titaVo.getParam("CustTypeCode");
+		if (isEloan) {
+			custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
+		}
+		tFacMain.setCustTypeCode(custTypeCode);
 		tFacMain.setRuleCode(titaVo.getParam("RuleCode"));
 		tFacMain.setRecycleCode(titaVo.getParam("RecycleCode"));
 		tFacMain.setRecycleDeadline(this.parse.stringToInteger(titaVo.getParam("RecycleDeadline")));
-		tFacMain.setUsageCode(titaVo.getParam("UsageCode"));
+		tFacMain.setUsageCode(FormatUtil.pad9(titaVo.getParam("UsageCode"), 2)); // 6/16eloan進來需補0 
 		tFacMain.setDepartmentCode(titaVo.getParam("DepartmentCode"));
 		tFacMain.setIncomeTaxFlag(titaVo.getParam("IncomeTaxFlag"));
 		tFacMain.setCompensateFlag(titaVo.getParam("CompensateFlag"));

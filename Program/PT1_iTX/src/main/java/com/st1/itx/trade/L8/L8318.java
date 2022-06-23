@@ -81,7 +81,7 @@ public class L8318 extends TradeBuffer {
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
-		int iYM = Integer.valueOf(titaVo.getParam("YM")) + 191100;
+		int iYM = Integer.valueOf(titaVo.getParam("YM"))+191100;
 		String iKey = "";
 		// JcicZ060, JcicZ046, JcicZ047, JcicZ062, JcicZ063
 		JcicZ060 iJcicZ060 = new JcicZ060();
@@ -182,10 +182,10 @@ public class L8318 extends TradeBuffer {
 			if (uJcicZ060 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ060 oldJcicZ060 = (JcicZ060) iDataLog.clone(uJcicZ060);
 			uJcicZ060.setTranKey(iTranKey);
 			uJcicZ060.setYM(iYM);
 			uJcicZ060.setOutJcicTxtDate(0);
-			JcicZ060 oldJcicZ060 = (JcicZ060) iDataLog.clone(uJcicZ060);
 			try {
 				sJcicZ060Service.update(uJcicZ060, titaVo);
 			} catch (DBException e) {

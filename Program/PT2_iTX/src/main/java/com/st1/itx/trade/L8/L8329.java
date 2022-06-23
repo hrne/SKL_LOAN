@@ -155,7 +155,7 @@ public class L8329 extends TradeBuffer {
 			}
 
 			// 4 「繳款日期」不得大於資料報送日期--->前端檢核
-
+			
 			// 2.2 start 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號」是否已報送結案，已報送予以剔退處理。
 			// 5 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);

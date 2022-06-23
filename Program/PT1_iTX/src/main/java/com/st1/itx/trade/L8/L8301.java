@@ -210,6 +210,7 @@ public class L8301 extends TradeBuffer {
 			if (uJcicZ040 == null) {
 				throw new LogicException("E0007", "前置協商受理申請暨請求回報債權通知資料");
 			}
+			JcicZ040 oldJcicZ040 = (JcicZ040) iDataLog.clone(uJcicZ040);
 			uJcicZ040.setTranKey(iTranKey);
 			uJcicZ040.setRbDate(iRbDate);
 			uJcicZ040.setApplyType(iApplyType);
@@ -221,7 +222,6 @@ public class L8301 extends TradeBuffer {
 			uJcicZ040.setNotBankId5(iNotBankId5);
 			uJcicZ040.setNotBankId6(iNotBankId6);
 			uJcicZ040.setOutJcicTxtDate(0);
-			JcicZ040 oldJcicZ040 = (JcicZ040) iDataLog.clone(uJcicZ040);
 			try {
 				sJcicZ040Service.update(uJcicZ040, titaVo);
 			} catch (DBException e) {

@@ -95,8 +95,8 @@ public class L8324 extends TradeBuffer {
 		int iFinalPayDay = Integer.valueOf(titaVo.getParam("FinalPayDay"));
 		BigDecimal iNotyetacQuit = new BigDecimal(titaVo.getParam("NotyetacQuit"));
 		int iMothPayDay = Integer.valueOf(titaVo.getParam("MothPayDay"));
-		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate")) + 191100;
-		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate")) + 191100;
+		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate"))+191100;
+		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate"))+191100;
 		String iKey = "";
 
 		// JcicZ443, JcicZ440, JcicZ446

@@ -183,6 +183,7 @@ public class L8304 extends TradeBuffer {
 			if (uJcicZ043 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ043 oldJcicZ043 = (JcicZ043) iDataLog.clone(uJcicZ043);
 			uJcicZ043.setTranKey(iTranKey);
 			uJcicZ043.setCollateralType(iCollateralType);
 			uJcicZ043.setOriginLoanAmt(iOriginLoanAmt);
@@ -195,7 +196,6 @@ public class L8304 extends TradeBuffer {
 			uJcicZ043.setContractStartYM(iContractStartYM);
 			uJcicZ043.setContractEndYM(iContractEndYM);
 			uJcicZ043.setOutJcicTxtDate(0);
-			JcicZ043 oldJcicZ043 = (JcicZ043) iDataLog.clone(uJcicZ043);
 			try {
 				sJcicZ043Service.update(uJcicZ043, titaVo);
 			} catch (DBException e) {

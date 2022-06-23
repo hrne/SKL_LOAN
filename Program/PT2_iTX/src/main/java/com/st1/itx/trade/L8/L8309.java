@@ -97,17 +97,7 @@ public class L8309 extends TradeBuffer {
 		iJcicZ048Id.setRcDate(iRcDate);
 		JcicZ048 chJcicZ048 = new JcicZ048();
 
-		// 檢核項目(D-21)
-		if (!"4".equals(iTranKey_Tmp)) {
-			// start 第9欄、第10欄及第11欄「債務人電話」之其中一欄，需為必要填報項目.
-			if (iCustRegTelNo.trim().isEmpty() && iCustComTelNo.trim().isEmpty() && iCustMobilNo.trim().isEmpty()) {
-				if ("A".equals(iTranKey) || "X".equals(iTranKey)) {
-					throw new LogicException("E0005", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
-				} else {
-					throw new LogicException("E0007", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
-				}
-			}
-		} // 檢核項目 end
+		// 無檢核項目 removed by Fegie 2021/10/25
 
 		switch (iTranKey_Tmp) {
 		case "1":
@@ -139,6 +129,7 @@ public class L8309 extends TradeBuffer {
 			if (uJcicZ048 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ048 oldJcicZ048 = (JcicZ048) iDataLog.clone(uJcicZ048);
 			uJcicZ048.setTranKey(iTranKey);
 			uJcicZ048.setCustRegAddr(iCustRegAddr);
 			uJcicZ048.setCustComAddr(iCustComAddr);
@@ -146,7 +137,6 @@ public class L8309 extends TradeBuffer {
 			uJcicZ048.setCustComTelNo(iCustComTelNo);
 			uJcicZ048.setCustMobilNo(iCustMobilNo);
 			uJcicZ048.setOutJcicTxtDate(0);
-			JcicZ048 oldJcicZ048 = (JcicZ048) iDataLog.clone(uJcicZ048);
 			try {
 				sJcicZ048Service.update(uJcicZ048, titaVo);
 			} catch (DBException e) {

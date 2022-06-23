@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -64,8 +65,8 @@ public class L2634ReportD extends MakeReport {
 	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
 	private int reportDate = 0;
 	private String brno = "";
-	private String reportCode = "L2076";
-	private String reportItem = "用印申請書";
+	private String reportCode = "L2634";
+	private String reportItem = "雙掛號信封-整批列印";
 	private String defaultPdf = "";
 
 	private String security = "";
@@ -84,7 +85,7 @@ public class L2634ReportD extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.info("L2076ReportD.printHeader");
+		this.info("L2634ReportD.printHeader");
 
 //		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
 //		this.print(-3, 55, "抵押權塗銷同意書", "C");
@@ -108,7 +109,7 @@ public class L2634ReportD extends MakeReport {
 
 	public Boolean exec(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 
-		this.info("L2076ReportB exec");
+		this.info("L2634ReportD exec");
 
 		exportPdf(lClOtherRights, titaVo);
 
@@ -118,13 +119,10 @@ public class L2634ReportD extends MakeReport {
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2631D", "雙掛號信封", "", "L2631D_雙掛號信封.pdf");
+		// 設定字體1:標楷體 字體大小36
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634D", "雙掛號信封", "", "L2631D_雙掛號信封.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634D", "雙掛號信封-整批列印", "", "A4", "L");
 
-		this.setFont(1);
-
-		this.setFontSize(16);
-
-		this.setCharSpaces(0);
 		String custId = "";
 
 		for (ClOtherRights t : lClOtherRights) {
@@ -136,10 +134,15 @@ public class L2634ReportD extends MakeReport {
 				closeNo = t.getCloseNo();
 				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
 				if (tFacClose == null) {
+					this.info("tFacClose = null continue 1");
 					continue;
 				}
-				if (!(tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
-						|| tFacClose.getCollectWayCode().equals("27"))) {
+				this.info("CollectWayCode =" + tFacClose.getCollectWayCode());
+				if ("21".equals(tFacClose.getCollectWayCode()) || "26".equals(tFacClose.getCollectWayCode())
+						|| "27".equals(tFacClose.getCollectWayCode())) {
+
+				} else {
+					this.info("continue 2");
 					continue;
 				}
 				getSelecTotal(custNo, closeNo, lClOtherRights, titaVo);
@@ -162,22 +165,154 @@ public class L2634ReportD extends MakeReport {
 				} else {
 					telNo = tFacClose.getTelNo1();
 				}
-
-				this.print(-33, 33, tFacClose.getPostAddress()); // 戶籍地址
-
-				this.print(-35, 33,
-						"#" + StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "  " + custName); // 戶號戶名
-				this.setFontSize(14);
-				this.print(-41, 52, telNo); // 電話
-				this.setFontSize(16);
-
-				if (!isLast) {
-					this.newPage();
+				String WkRegAddres = "";
+				if (tFacClose.getPostAddress().isEmpty()) {
+					WkRegAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
+					if (tCustMain.getCurrZip3() != null || !tCustMain.getCurrZip3().isEmpty()) {
+						if (tCustMain.getCurrZip2() != null || !tCustMain.getCurrZip2().isEmpty()) {
+							WkRegAddres = tCustMain.getCurrZip3() + " " + tCustMain.getCurrZip2() + " " + WkRegAddres;
+						} else {
+							WkRegAddres = tCustMain.getCurrZip3() + " " + WkRegAddres;
+						}
+					}
+				} else {
+					WkRegAddres = tFacClose.getPostAddress();
 				}
+				this.setLineSpaces(5);
+				this.setCharSpaces(0);
+				this.setFont(1);
+				this.setFontSize(15);
+//				this.printImageCm(500, 50, 100, "雙掛號.jpg");
+				this.print(-2, 21, "放款部　放款服務課");
+				this.print(-4, 18, "105　　台北市松山區南京東路五段125號13樓");
+				this.info("1 test 2634 ");
+
+				Point a = new Point(550, 155);
+				Point b = new Point(610, 155);
+				Point c = new Point(550, 185);
+				Point d = new Point(610, 185);
+
+				Point a4 = new Point(546, 151);
+				Point b4 = new Point(614, 151);
+				Point c4 = new Point(546, 189);
+				Point d4 = new Point(614, 189);
+
+				Point a41 = new Point(544, 151);
+				Point b41 = new Point(616, 151);
+				Point c41 = new Point(544, 189);
+				Point d41 = new Point(616, 189);
+
+				Line ab = new Line(a, b);
+				Line ac = new Line(a, c);
+				Line bd = new Line(b, d);
+				Line cd = new Line(c, d);
+
+				Line ab4 = new Line(a41, b41);
+				Line ac4 = new Line(a4, c4);
+				Line bd4 = new Line(b4, d4);
+				Line cd4 = new Line(c41, d41);
+
+				ArrayList<Line> lineList = new ArrayList<Line>();
+				ArrayList<Line> lineList4 = new ArrayList<Line>();
+
+				lineList.add(ab);
+				lineList.add(ac);
+				lineList.add(bd);
+				lineList.add(cd);
+				lineList4.add(ab4);
+				lineList4.add(ac4);
+				lineList4.add(bd4);
+				lineList4.add(cd4);
+
+				this.drawLineList(lineList);
+				this.drawLineList4(lineList4);
+
+				this.print(-8, 80, "雙掛號");
+				this.print(-11, 32, "【限定本人拆閱，若無此人，請寄回本公司】");
+				this.print(-13, 32, WkRegAddres); // 地址
+
+				this.print(-15, 41, "#" + StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "  "
+						+ custName + "  啟"); // 戶號戶名
+				this.print(-17, 39, "電話:" + telNo); // 電話
+
+			}
+
+			if (!isLast) {
+				this.info("D newPage");
+				this.newPage();
 			}
 		}
-		this.close();
+		this.info("D 結束");
 
+		this.close();
+	}
+
+	public void drawLineList(ArrayList<Line> lineList) {
+		if (lineList != null && lineList.size() > 0) {
+			for (Line line : lineList) {
+				drawLine(line);
+			}
+		}
+	}
+
+	public void drawLineList4(ArrayList<Line> lineList) {
+		if (lineList != null && lineList.size() > 0) {
+			for (Line line : lineList) {
+				drawLine4(line);
+			}
+		}
+	}
+
+	public void drawLine(Line line) {
+		this.info("drawLine ");
+		this.drawLine(line.getA().getX(), line.getA().getY(), line.getB().getX(), line.getB().getY());
+	}
+
+	public void drawLine4(Line line) {
+		this.drawLine(line.getA().getX(), line.getA().getY(), line.getB().getX(), line.getB().getY(), 4);
+	}
+
+	class Point {
+		int x = 0;
+		int y = 0;
+
+		public Point(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		public int getX() {
+			return x;
+
+		}
+
+		public int getY() {
+			return y;
+		}
+	}
+
+	public class Line {
+		Point A;
+		Point B;
+
+		/**
+		 * Set a line from A to B
+		 * 
+		 * @param A starting point.
+		 * @param B end.
+		 */
+		public Line(Point A, Point B) {
+			this.A = A;
+			this.B = B;
+		}
+
+		public Point getA() {
+			return A;
+		}
+
+		public Point getB() {
+			return B;
+		}
 	}
 
 	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo)

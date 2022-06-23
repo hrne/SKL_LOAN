@@ -165,7 +165,7 @@ BEGIN
            END                                    AS "EvaAmt"            -- 鑑估總值  (若為0, 後面再處理搬 "核准額度") (ref:AS400 LN15F1 (#M3102 93 10))
          , NVL("ClMain"."DispDate", 0)            AS "DispDate"          -- 擔保品處分日期
          , NVL("LoanSynd"."SyndNo",0)             AS "SyndNo"            -- 聯貸案序號
-         , "ClMain"."SyndCode"                    AS "SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , NVL("LoanSynd"."SyndTypeCodeFlag",' ') AS "SyndCode"          -- 聯貸案類型 A:國內 B:國際
          , NVL("LoanSynd"."SigningDate",0)        AS "SigningDate"       -- 聯貸合約訂定日期
          , NVL("LoanSynd"."SyndAmt",0)            AS "SyndAmt"           -- 聯貸總金額
          , NVL("LoanSynd"."PartAmt",0)            AS "PartAmt"           -- 參貸金額

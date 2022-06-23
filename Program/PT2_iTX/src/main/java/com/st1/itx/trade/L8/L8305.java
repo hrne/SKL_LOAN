@@ -214,6 +214,7 @@ public class L8305 extends TradeBuffer {
 			if (uJcicZ044 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ044 oldJcicZ044 = (JcicZ044) iDataLog.clone(uJcicZ044);
 			uJcicZ044.setTranKey(iTranKey);
 			uJcicZ044.setDebtCode(iDebtCode);
 			uJcicZ044.setNonGageAmt(iNonGageAmt);
@@ -244,7 +245,6 @@ public class L8305 extends TradeBuffer {
 			uJcicZ044.setMonthPayAmt2(iMonthPayAmt2);
 			uJcicZ044.setPayLastAmt2(iPayLastAmt2);
 			uJcicZ044.setOutJcicTxtDate(0);
-			JcicZ044 oldJcicZ044 = (JcicZ044) iDataLog.clone(uJcicZ044);
 			try {
 				sJcicZ044Service.update(uJcicZ044, titaVo);
 			} catch (DBException e) {

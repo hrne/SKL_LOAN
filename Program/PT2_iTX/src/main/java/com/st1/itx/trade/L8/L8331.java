@@ -70,7 +70,7 @@ public class L8331 extends TradeBuffer {
 		String iPayOffResult = titaVo.getParam("PayOffResult");
 		int iPayOffDate = Integer.valueOf(titaVo.getParam("PayOffDate"));
 		String iKey = "";
-
+		
 		// JcicZ454
 		JcicZ454 iJcicZ454 = new JcicZ454();
 		JcicZ454Id iJcicZ454Id = new JcicZ454Id();
@@ -92,7 +92,7 @@ public class L8331 extends TradeBuffer {
 			// 2
 			// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'448'」前置調解無擔保債務還款分配表資料--->1014會議通知不需檢核
 			// 3 「單獨全數受清償日期」不得大於「資料報送日期」--->前端檢核
-
+			
 			// 4 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {

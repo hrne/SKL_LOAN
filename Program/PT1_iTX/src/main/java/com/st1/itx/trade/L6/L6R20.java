@@ -141,6 +141,8 @@ public class L6R20 extends TradeBuffer {
 
 		this.totaVo.putParam("Station", tTxTeller.getStation());
 		this.totaVo.putParam("AdminFg", tTxTeller.getAdminFg());
+		this.totaVo.putParam("EmailAddress", tTxTeller.getEmail()); //6/23新增電子信箱
+		
 
 		this.totaVo.putParam("LastDate", tTxTeller.getLastDate());
 		this.totaVo.putParam("LastTime", tTxTeller.getLastTime());
