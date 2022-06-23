@@ -307,6 +307,15 @@ T(3,)T(H,#RepayTypeA,#RepayTypeHelp)
 #CustNoA=A,7,I
 E(0,#CustNo)
 C(3,#ProcStsCode,1,s,$)
+
+
+
+
+#MRKEY=_,_,S
+T(2,#CustNo)
+
+
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

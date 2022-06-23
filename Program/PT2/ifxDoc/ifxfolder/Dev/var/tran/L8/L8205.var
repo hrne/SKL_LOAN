@@ -125,6 +125,10 @@ V(7)
 C(3,#Type,5,$,S)
 
 
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,T(2,#CustNo))
+
+
 #RPTFG=A,1,S
 E(0,0)
 

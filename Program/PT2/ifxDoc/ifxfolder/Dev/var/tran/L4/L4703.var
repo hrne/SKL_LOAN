@@ -24,10 +24,10 @@ E(0,0)
 [#<->#,"#FdNoticeFlag+通知方式",#NoticeFlag,#NoticeFlagX],
 [#<->#,"#FdAcDate+會計日",#AcDate],
 [#<->#,"#FdEntryDate+入帳日",#EntryDate],
-[#<->#,"#FdPayIntDate+最近繳款日",#PayIntDateSt,"~",#PayIntDateEd"],
+[#<->#,"#FdPayIntDate+最近繳款日",#PayIntDateSt,"~",#PayIntDateEd],
 [#<->#,"#FdUnpaidDay+滯繳日數",#UnpaidDaySt,"~",#UnpaidDayEd],
 [#<->#,"#FdMsg+注意事項",#Msg],
-] 
+]
 
 #FdFunctionCodeX=X,2,L
 #FdCustNo=X,2,L
@@ -225,6 +225,9 @@ T(2,@Msg,#L1R20Msg)
 #ShowMsg=A,1,S
 C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
 INVOKEJS(SHOW,L4703,9,9,#ShowMsg)
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,T(2,#CustNo+-+#FacmNo))
 
 </sub>
 

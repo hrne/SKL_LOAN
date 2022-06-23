@@ -203,7 +203,8 @@ E(0,@RmkNo,#L3r30RmkNo)
 
 #AcDate=D,7,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-@A(DATE,0,#AcDate)
+@V(7)
+A(DATE,0,#AcDate)
 
 !調RIML3R30
 !修改複製刪除查詢時使用
@@ -250,6 +251,10 @@ C(4,#RmkDesc,T(2,@RmkDesc,#RmkCodeX),$)
 
 #RPTFG=A,1,S
 
+
+
+#MRKEY=_,_,S
+T(2,#CustNo)
 
 
 
