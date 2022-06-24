@@ -35,6 +35,7 @@ import com.st1.itx.db.domain.PfCoOfficer;
 import com.st1.itx.db.domain.PfDetail;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.PfReward;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdBonusCoService;
 import com.st1.itx.db.service.CdBonusService;
@@ -51,6 +52,7 @@ import com.st1.itx.db.service.PfCoOfficerService;
 import com.st1.itx.db.service.PfDetailService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.PfRewardService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.PfDetailVo;
 import com.st1.itx.util.date.DateUtil;
@@ -117,6 +119,8 @@ public class PfDetailCom extends TradeBuffer {
 
 	@Autowired
 	CdEmpService cdEmpService;
+	@Autowired
+	TxTellerService txTellerService;
 
 	@Autowired
 	CdBcmService cdBcmService;
@@ -635,10 +639,10 @@ public class PfDetailCom extends TradeBuffer {
 		}
 		// 4.業績追回時通知房貸專員(email)
 		if (!bsOfficer.isEmpty()) {
-			CdEmp tCdEmp = cdEmpService.findById(bsOfficer, titaVo);
-			if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
-				this.info("tCdEmp.getEmail()=" + tCdEmp.getEmail().trim());
-				mailService.setParams(tCdEmp.getEmail(), subject, bodyText);
+			TxTeller tTxTeller = txTellerService.findById(bsOfficer, titaVo);
+			if (tTxTeller != null && !"".equals(tTxTeller.getEmail().trim())) {
+				this.info("tTxTeller.getEmail()=" + tTxTeller.getEmail().trim());
+				mailService.setParams(tTxTeller.getEmail(), subject, bodyText);
 				mailService.exec();
 			}
 		}
@@ -649,10 +653,10 @@ public class PfDetailCom extends TradeBuffer {
 				if ((cd.getWorkMonthStart() == 0 || cd.getWorkMonthStart() <= workMonth)
 						&& (cd.getWorkMonthEnd() == 0 || cd.getWorkMonthEnd() >= workMonth)) {
 					if ("4".equals(cd.getConditionCode1())) {
-						CdEmp tCdEmp = cdEmpService.findById(cd.getCondition(), titaVo);
-						if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
-							this.info("tCdEmp.getEmail()=" + tCdEmp.getEmail().trim());
-							mailService.setParams(tCdEmp.getEmail(), subject, bodyText);
+						TxTeller tTxTeller = txTellerService.findById(cd.getCondition(), titaVo);
+						if (tTxTeller != null && !"".equals(tTxTeller.getEmail().trim())) {
+							this.info("tTxTeller.getEmail()=" + tTxTeller.getEmail().trim());
+							mailService.setParams(tTxTeller.getEmail(), subject, bodyText);
 							mailService.exec();
 						}
 					}

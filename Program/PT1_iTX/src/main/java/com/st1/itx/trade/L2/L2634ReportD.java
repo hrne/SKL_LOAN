@@ -125,9 +125,9 @@ public class L2634ReportD extends MakeReport {
 
 		String custId = "";
 
+		int custNo = 0;
+		int closeNo = 0;
 		for (ClOtherRights t : lClOtherRights) {
-			int custNo = 0;
-			int closeNo = 0;
 			int selectCnt = 0;
 			if (custNo != t.getCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getCustNo();

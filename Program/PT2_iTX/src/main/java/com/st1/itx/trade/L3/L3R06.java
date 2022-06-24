@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -97,7 +96,7 @@ public class L3R06 extends TradeBuffer {
 	private int oRpFacmNo = 0;
 	private int oShortFacmNo = 0;
 	private BigDecimal oCloseBreachAmtUnpaid = BigDecimal.ZERO;
-	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+	private ArrayList<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<BaTxVo> baTxList;
@@ -228,7 +227,7 @@ public class L3R06 extends TradeBuffer {
 		BigDecimal wkExtraRepay = iExtraRepay;
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
 				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
-		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
@@ -329,7 +328,7 @@ public class L3R06 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-				if(oRpFacmNo==0) {
+				if (oRpFacmNo == 0) {
 					oRpFacmNo = ln.getFacmNo();
 				}
 				oShortFacmNo = ln.getFacmNo();
@@ -389,7 +388,7 @@ public class L3R06 extends TradeBuffer {
 				if (c1.getStatus() != c2.getStatus()) {
 					return c1.getStatus() - c2.getStatus();
 				}
-				// 回收金額 > 0時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
+				// 回收金額 > 0時排序,依應繳日順序由小到大、利率順序由大到小、額度由大到小、撥款由大到小
 //				if (iRepayType == 1) {
 //					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
 //						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
@@ -399,7 +398,7 @@ public class L3R06 extends TradeBuffer {
 //					}
 //				}
 				// 部分償還金額 > 0時排序
-//					利率高至低>用途別>由額度編號大至小
+//					利率高至低>用途別>由額度編號大至小、撥款由大到小
 //					用途別為9->1->3->4->5->6->2
 //					欄位代碼       欄位說明     
 //					1            週轉金    
@@ -457,32 +456,8 @@ public class L3R06 extends TradeBuffer {
 		oShortfallInt = baTxCom.getShortfallInterest();
 		oShortfallPrin = baTxCom.getShortfallPrincipal();
 		oShortCloseBreach = baTxCom.getShortCloseBreach();
+		oExcessive = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
 
-		switch (iRepayType) {
-		case 4:
-			if (oAcctFee.compareTo(BigDecimal.ZERO) == 0) {
-				throw new LogicException(titaVo, "E3089",
-						" 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無未收帳管費
-			}
-			break;
-		case 5:
-			if (oFireFee.compareTo(BigDecimal.ZERO) == 0) {
-				throw new LogicException(titaVo, "E3090",
-						" 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無未收火險費
-			}
-			break;
-		case 6:
-			if (oModifyFee.compareTo(BigDecimal.ZERO) == 0) {
-				throw new LogicException(titaVo, "E3091",
-						" 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無未收契變收續費
-			}
-			break;
-		case 7:
-			if (oLawFee.compareTo(BigDecimal.ZERO) == 0) {
-				throw new LogicException(titaVo, "E3092",
-						" 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查無未收法務費
-			}
-		}
 
 		this.info("   oAcctFee        = " + oAcctFee);
 		this.info("   oFireFee        = " + oFireFee);

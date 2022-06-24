@@ -2,7 +2,6 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,8 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -72,34 +71,6 @@ import com.st1.itx.util.parse.Parse;
  * g.回收金額需＜轉催收餘額(當沖轉催收款項時，將沖轉金額輸入在[回收金額]欄位。)
  * h.※期款時收回順序：1.費用。2.欠繳金額。3.應繳日先到先還。5.足夠回收金額最大者優先收回。
  * i.※客戶部分償還時收回順序：1.費用2.欠繳金額3.本金是從利率較高的貸款先還，若金額不足當期期金時，帳務改掛[暫收及待結轉帳項]科目。4.資金用途(週轉金優先收回)5.案件編號(新件優先收回)
- */
-
-/*
- * Tita
- * TimCustNo=9,7
- * CustId=X,10
- * ApplNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * RepayType=9,2 還款類別 1.期款 2.部分償還 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
- * TimRepayAmt=9,14.2
- * TimCloseBreachAmt=9,14.2
- * TimExtraRepay=9,14.2
- * IncludeIntFlag=X,1 是否內含利息 Y:是 N:否
- * UnpaidIntFlag=X,1 利息是否可欠繳 Y:是 N:否
- * RepayTerms=9,2
- * EntryDate=9,7
- * TimAcctFee=9,14.2
- * TimModifyFee=9,14.2
- * TimFireFee=9,14.2
- * TimLawFee=9,14.2
- * PayMethod=9,1 1:減少每期攤還金額 2:縮短應繳期數
- * TimReduceAmt=9,14.2
- * TotalRepayAmt=9,14.2 應收付總金額
- * RealRepayAmt=9,14.2 實際收付金額
- * RqspFlag=X,1
- * ShortPrinRate=9,3
- * ShortIntRate=9,3
  */
 
 /**
@@ -636,7 +607,7 @@ public class L3200 extends TradeBuffer {
 				if (c1.getStatus() != c2.getStatus()) {
 					return c1.getStatus() - c2.getStatus();
 				}
-				// 回收金額 > 0時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
+				// 回收金額 > 0時排序,依應繳日順序由小到大、利率順序由大到小、額度由大到小、期金由大到小
 				if (iRepayType == 1) {
 					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
 						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
@@ -645,14 +616,14 @@ public class L3200 extends TradeBuffer {
 						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
 					if (c1.getFacmNo() != c2.getFacmNo()) {
-						return c1.getFacmNo() - c2.getFacmNo();
+						return c2.getFacmNo() - c1.getFacmNo();
 					}
-					if (c1.getBormNo() != c2.getBormNo()) {
-						return c1.getBormNo() - c2.getBormNo();
+					if (c1.getDueAmt().compareTo(c2.getDueAmt()) != 0) {
+						return c2.getDueAmt().compareTo(c1.getDueAmt());
 					}
 				}
 				// 部分償還金額 > 0時排序
-//					利率高至低>用途別>由額度編號大至小
+//					利率高至低>用途別>由額度編號大至小、撥款由大到小
 //					用途別為9->1->3->4->5->6->2
 //					欄位代碼       欄位說明     
 //					1            週轉金    
@@ -686,7 +657,7 @@ public class L3200 extends TradeBuffer {
 						return c2.getFacmNo() - c1.getFacmNo();
 					}
 					if (c1.getBormNo() != c2.getBormNo()) {
-						return c1.getBormNo() - c2.getBormNo();
+						return c2.getBormNo() - c1.getBormNo();
 					}
 				}
 				return 0;
@@ -1968,7 +1939,7 @@ public class L3200 extends TradeBuffer {
 					ba.setAcctAmt(BigDecimal.ZERO);
 					// 新增放款交易內容檔(收回費用)
 					compTxAmt(false, true);// 計算本筆交易金額
-					loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, wkTxAmt, wkTempAmt,"", titaVo);
+					loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, wkTxAmt, wkTempAmt, "", titaVo);
 				}
 			}
 			this.info("wkAcctFee=" + wkAcctFee + ", wkModifyFee=" + wkModifyFee + ", wkFireFee=" + wkFireFee

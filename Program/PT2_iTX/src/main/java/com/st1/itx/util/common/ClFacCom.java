@@ -98,7 +98,8 @@ public class ClFacCom extends TradeBuffer {
 	 * @param ownerMap 擔保品提供人CustUKey＆與授信戶關係
 	 * @throws LogicException LogicException
 	 */
-	public void insertClFac(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo, int iApplNo, List<HashMap<String, String>> ownerMap) throws LogicException {
+	public void insertClFac(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo, int iApplNo,
+			List<HashMap<String, String>> ownerMap) throws LogicException {
 		ClFacId clFacId = new ClFacId();
 		clFacId.setClCode1(iClCode1);
 		clFacId.setClCode2(iClCode2);
@@ -219,7 +220,8 @@ public class ClFacCom extends TradeBuffer {
 	}
 
 	// 擔保品提供人與授信戶關係
-	private void updateClOwnerRelation(TitaVo titaVo, int iApplNo, List<HashMap<String, String>> ownerMap) throws LogicException {
+	private void updateClOwnerRelation(TitaVo titaVo, int iApplNo, List<HashMap<String, String>> ownerMap)
+			throws LogicException {
 		FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 		if (facMain == null) {
 			throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
@@ -290,8 +292,11 @@ public class ClFacCom extends TradeBuffer {
 		// 有資料才需檢查
 		if (lClFac != null) {
 			for (int i = 0; i < lClFac.size(); i++) {
-				ClMain tClMain = sClMainService.findById(new ClMainId(lClFac.get(i).getClCode1(), lClFac.get(i).getClCode2(), lClFac.get(i).getClNo()), titaVo);
+				ClMain tClMain = sClMainService.findById(
+						new ClMainId(lClFac.get(i).getClCode1(), lClFac.get(i).getClCode2(), lClFac.get(i).getClNo()),
+						titaVo);
 				if (tClMain.getShareTotal().compareTo(wkShareTotal) > 0) {
+					wkShareTotal = tClMain.getShareTotal();
 					mainFlagIdx = i;
 				}
 			}
@@ -334,7 +339,8 @@ public class ClFacCom extends TradeBuffer {
 			return;
 		}
 		// 共同借款人全部
-		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0,
+				Integer.MAX_VALUE, titaVo);
 		// 登錄者為主核准號碼(主額度)，刪除其他(非主額度)自動建立的額度與擔保品關聯檔
 		if (iApproveNo == tFacShareAppl.getMainApplNo()) {
 			for (FacShareAppl facShareAppl : slFacShareAppl.getContent()) {

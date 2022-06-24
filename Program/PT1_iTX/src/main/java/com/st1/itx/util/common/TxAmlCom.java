@@ -17,15 +17,15 @@ import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.BankRmtfId;
 import com.st1.itx.db.domain.BatxDetail;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.domain.TxAmlLog;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.BankRmtfService;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.TxAmlLogService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.CheckAmlVo;
 import com.st1.itx.util.parse.Parse;
@@ -121,7 +121,7 @@ public class TxAmlCom extends TradeBuffer {
 	public CustMainService custMainService;
 
 	@Autowired
-	public CdEmpService cdEmpService;
+	public TxTellerService txTellerService;
 
 	@Autowired
 	public BankRmtfService bankRmtfService;
@@ -856,9 +856,9 @@ public class TxAmlCom extends TradeBuffer {
 	private String empEmail(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom gettingNotifyEmail.....");
 		String empEmail = "";
-		CdEmp tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
-		if (tCdEmp != null && tCdEmp.getEmail() != null) {
-			empEmail = tCdEmp.getEmail();
+		TxTeller tTxTeller = txTellerService.findById(titaVo.getTlrNo(), titaVo);
+		if (tTxTeller != null && tTxTeller.getEmail() != null) {
+			empEmail = tTxTeller.getEmail();
 		}
 
 		return empEmail;

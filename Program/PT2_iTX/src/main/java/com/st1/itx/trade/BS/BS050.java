@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdLoanNotYet;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanNotYet;
-import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdLoanNotYetService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanNotYetService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -48,7 +48,7 @@ public class BS050 extends TradeBuffer {
 	public DateUtil dateUtil;
 
 	@Autowired
-	CdEmpService cdEmpService;
+	private TxTellerService txTellerService;
 	@Autowired
 	private MailService mailService;
 	@Autowired
@@ -59,7 +59,6 @@ public class BS050 extends TradeBuffer {
 	private LoanBorMainService loanBorMainService;
 	@Autowired
 	private FacMainService facMainService;
-
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -108,7 +107,7 @@ public class BS050 extends TradeBuffer {
 				} else {
 					wkNotYetItem = t.getNotYetCode();
 				}
-				
+
 				tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 //				取額度建檔所列[房貸專員/企金人員]
 				if (tFacMain != null && !"".equals(tFacMain.getBusinessOfficer())) {
@@ -151,10 +150,10 @@ public class BS050 extends TradeBuffer {
 				// 經辦代號找員工姓名
 				for (String t3 : lEmpNo) {
 
-					CdEmp tCdEmp = cdEmpService.findById(t3, titaVo);
-					if (tCdEmp != null && !"".equals(tCdEmp.getEmail().trim())) {
-						this.info("tCdEmp.getEmail()=" + tCdEmp.getEmail().trim());
-						mailService.setParams(tCdEmp.getEmail(), subject, bodyText);
+					TxTeller tTxTeller = txTellerService.findById(t3, titaVo);
+					if (tTxTeller != null && !"".equals(tTxTeller.getEmail().trim())) {
+						this.info("tTxTeller.getEmail()=" + tTxTeller.getEmail().trim());
+						mailService.setParams(tTxTeller.getEmail(), subject, bodyText);
 						mailService.exec();
 					}
 				}
