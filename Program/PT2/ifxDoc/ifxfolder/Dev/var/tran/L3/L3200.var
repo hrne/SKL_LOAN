@@ -131,7 +131,7 @@ INVOKEJS(SHOW,p1,13,19,0)
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,"@",#BTN4],
 [#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX],
-[#<->#,"#FdFacmNo+額度編號",#FacmNo,"@",#BTN1],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,"@",#BTN1,#BTN8],
 [#<->#,"#FdBormNo+撥款序號",#BormNo,"@",#BTN7],
 [#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
 [#<->#,"#FdRepayTerms+回收期數",#RepayTerms,"@@",#BTN5],
@@ -160,9 +160,11 @@ INVOKEJS(SHOW,p1,13,19,0)
 #BTN5=X,15,I,ui:button;value:回收試算;enable:1;tabbable:0;title: L3921 回收試算;
 #BTN6=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
 #BTN7=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢;
+#BTN8=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢;
 
 #BIND1AS=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo:CustNoX<-OOCustName})
+
 #BIND2AS=X,1,S
 BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
 #BUF3A=X,18,S
@@ -178,7 +180,7 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<
 
 #BUF1=X,42,S
 HIDE(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#CloseBreachAmtX,#UsExtraRepay,#UsReduceAmt)
-HIDE(#BTN1,#BTN2,#BTN3,#BTN5,#BTN6,#BTN7)SHOW(#BTN4)
+HIDE(#BTN1,#BTN8,#BTN2,#BTN3,#BTN5,#BTN6,#BTN7)SHOW(#BTN4)
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -187,6 +189,21 @@ HIDE(#BTN1,#BTN2,#BTN3,#BTN5,#BTN6,#BTN7)SHOW(#BTN4)
 !RepayType
 !#CDDEF01=x,20,S
 !T(3,CdCode.RepayType)
+
+#WKSPC2=X,2,S
+T(3,，)
+
+#WKINTX=X,6,S
+T(3,[利息 )
+
+#WKPRIX=X,5,S
+T(3,本金 )
+
+#WKCBX=X,10,S
+T(3,清償違約金)
+
+#WKBRAX=X,1,S
+T(3,])
 
 !CurrencyCode
 #CDDEF01=x,30,S
@@ -267,7 +284,7 @@ E(0,0)
 #CustNo=X,7,I
 C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
-SHOW(#BTN6)HIDE(#BTN1,#BTN2,#BTN3,#BTN7)
+SHOW(#BTN6)HIDE(#BTN1,#BTN8,#BTN2,#BTN3,#BTN7)
 @
 HIDE(#BTN6)
 
@@ -307,7 +324,7 @@ C(4,#CustNo,S,T(2,#L2r07CustName))
 T(3,@FdApplNo, )
 C(3,#CHAIN,1,S,$)
 C(3,#Flag,0,$,S)
-SHOW(#BTN2)HIDE(#BTN1,#BTN6,#BTN3,#BTN7)
+SHOW(#BTN2)HIDE(#BTN1,#BTN8,#BTN6,#BTN3,#BTN7)
 CALL(#InitValue)
 @
 C(4,#CustId,S,$)
@@ -346,7 +363,7 @@ C(4,#CustId,S,T(2,#L2r07CustName)T(2,@CustNo,#L2r07CustNo))
 C(3,#CHAIN,1,S,$)
 C(3,#Flag,0,$,S)
 C(4,#CustNo,C(4,#CustId,T(3,@FdApplNo,*),T(3,@FdApplNo, )),T(3,@FdApplNo, ))
-SHOW(#BTN3)HIDE(#BTN1,#BTN6,#BTN2,#BTN7)
+SHOW(#BTN3)HIDE(#BTN1,#BTN8,#BTN6,#BTN2,#BTN7)
 CALL(#InitValue)
 @
 C(4,#CustNo,C(4,#CustId,C(4,#ApplNo,V(P,需擇一輸入),$),$),$)
@@ -370,7 +387,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<
 
 #HIDEALLBTN=X,1,S
 C(3,#CHAIN,1,$,S)
-HIDE(#BTN1,#BTN2,#BTN3)
+HIDE(#BTN1,#BTN8,#BTN2,#BTN3)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
@@ -521,15 +538,75 @@ C(3,#RepayType,12,INVOKEJS(SHOW,p1,11,11,1),$)
 C(3,#RepayType,12,T(F,@TwReduceAmt,0)T(F,@UsReduceAmt,0)
                     ,T(F,@TwReduceAmt,1)T(F,@UsReduceAmt,1))
 
+
+
+!---------------------------------------
+!6/23 start
+
+#SendL3r06S=X,1,S
+E(0,@RimFuncCode,3)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimBormNo,0)
+T(2,@RimCurrencyCode,)
+E(0,@RimExtraRepay,0)
+T(2,@RimIncludeIntFlag,)
+E(0,@RimRepayTerms,0)
+E(0,@RimRepayType,#RepayType)
+E(0,@RimEntryDate,#EntryDate)
+E(0,@RimCloseBreachAmt,0)
+RESET_RIM(#SendL3r06S,L3R06)
+S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
+R(1,L3R06)
+E(0,@TwAcctFee,#L3r06AcctFee)
+E(0,@UsAcctFee,#L3r06AcctFee)
+E(0,@TwModifyFee,#L3r06ModifyFee)
+E(0,@UsModifyFee,#L3r06ModifyFee)
+E(0,@TwFireFee,#L3r06FireFee)
+E(0,@UsFireFee,#L3r06FireFee)
+E(0,@TwLawFee,#L3r06LawFee)
+E(0,@UsLawFee,#L3r06LawFee)
+E(0,@Shortfall,#L3r06Shortfall)
+CALL2(#ADJUSTDOT,#Precision,#Shortfall,#ShortfallX)
+E(0,@ShortfallInt,#L3r06ShortfallInt)
+CALL2(#ADJUSTDOT,#Precision,#ShortfallInt,#ShortfallIntX)
+T(2,@ShortfallIntXX,#WKINTX+#ShortfallIntX)
+P(R,#ShortfallIntXX)
+E(0,@ShortfallPrin,#L3r06ShortfallPrin)
+CALL2(#ADJUSTDOT,#Precision,#ShortfallPrin,#ShortfallPrinX)
+P(R,#ShortfallPrinX)
+T(2,@ShortfallPrinXX,#ShortfallPrinX)
+P(L,#ShortfallPrinXX)
+T(2,@ShortfallPrinXX,#WKPRIX+#ShortfallPrinXX)
+E(0,@ShortCloseBreach,#L3r06ShortCloseBreach)
+CALL2(#ADJUSTDOT,#Precision,#ShortCloseBreach,#ShortCloseBreachX)
+P(R,#ShortCloseBreachX)
+T(B,@ShortCloseBreachXX,#ShortCloseBreachX+#WKBRAX)
+P(L,#ShortCloseBreachXX)
+T(2,@ShortCloseBreachXX,#WKCBX+#ShortCloseBreachXX)
+T(B,@ShortfallXX,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
+P(L,#ShortfallXX)
+E(0,@Excessive,#L3r06Excessive)
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+
+!6/23 end
+!-------------------------------------------------------------
+
+
+
 #BUF1A=X,18,S
 T(2,00000009999999000)
 
 #BUF1B=X,18,S
 T(2,#TimCustNo+#TimCustNo+000)
 
+#BUF8A=X,18,S
+T(2,0000000+#TimCustNo+#CustId+#ApplNo+000)
 
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:CustNoX<-OOCustName})
+#BIND8AS=X,1,S
+BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF8A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 ![額度編號]
 !可不輸入
@@ -543,7 +620,7 @@ C(3,#CHAIN,1,C(5,#txcdtype,L4,$,s),$)
 C(4,#ApplNo,T(F,@FacmNo,1),T(F,@FacmNo,0))
 C(4,#ApplNo,$,s)
 C(3,#L492aRepayType,0,$,$)
-SHOW(#BTN1)HIDE(#BTN3,#BTN6,#BTN2,#BTN7)
+SHOW(#BTN1,#BTN8)HIDE(#BTN3,#BTN6,#BTN2,#BTN7)
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
@@ -580,7 +657,7 @@ C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,T(F,#BormNo,0),T(F,#BormNo,1))
 C(3,#FacmNo,0,S,$)
 C(3,#RepayType,9,S,$)
-SHOW(#BTN7)HIDE(#BTN3,#BTN6,#BTN2,#BTN1)
+SHOW(#BTN7)HIDE(#BTN3,#BTN6,#BTN2,#BTN1,#BTN8)
 ! @C(3,#RepayType,2,V(2,0),$)
 
 #BUF7B=X,18,S
@@ -1055,17 +1132,6 @@ E(0,#L3r06ShortfallInt)
 #TimShortfallInt=m,14.2,S
 E(0,#ShortfallInt)
 
-#WKINTX=X,6,S
-T(3,[利息 )
-
-#WKPRIX=X,5,S
-T(3,本金 )
-
-#WKCBX=X,10,S
-T(3,清償違約金)
-
-#WKBRAX=X,1,S
-T(3,])
 
 #ShortfallIntX=X,22,S
 CALL2(#ADJUSTDOT,#Precision,#ShortfallInt,#ShortfallIntX)
@@ -1100,16 +1166,14 @@ CALL2(#ADJUSTDOT,#Precision,#ShortCloseBreach,#ShortCloseBreachX)
 P(R,#ShortCloseBreachX)
 
 #ShortCloseBreachXX=X,33,S
-T(2,#ShortCloseBreachX+#WKBRAX)
+T(B,#ShortCloseBreachX+#WKBRAX)
 P(L,#ShortCloseBreachXX)
 T(2,#WKCBX+#ShortCloseBreachXX)
 
 
-#WKSPC2=X,2,S
-T(3,，)
 
 #ShortfallXX=X,80,L
-T(B,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
+T(B,@ShortfallXX,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
 P(L,#ShortfallXX)
 
 !累溢收
@@ -1277,9 +1341,12 @@ E(0,@RP_CUSTNO,#TimCustNo)
 #TmpFacmNo=X,1,S
 E(0,@RP_FACMNO,#L3r06RpFacmNo)
 E(0,@SHORT_FACMNO,#L3r06ShortFacmNo)
+
+
 !類別   摘要
 #TmpNote=X,1,S
 T(2,@RP_NOTE,#DetailNote)
+
 
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>

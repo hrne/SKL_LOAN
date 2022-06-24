@@ -46,7 +46,7 @@ public class LogicException extends Exception {
 		if (!errorMsgId.equals("CE901"))
 			this.totaVo.setTxrsutE();
 		this.totaVo.setErrorMsgId(this.errorMsgId);
-		this.totaVo.setErrorMsg(this.errorMsg.length() > 101 ? this.errorMsg.substring(0, 100) : this.errorMsg);
+		this.totaVo.setErrorMsg(this.errorMsg.length() > 200 ? this.errorMsg.substring(0, 200) : this.errorMsg);
 		return this.totaVo;
 	}
 
