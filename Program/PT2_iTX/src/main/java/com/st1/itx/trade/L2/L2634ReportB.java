@@ -127,7 +127,7 @@ public class L2634ReportB extends MakeReport {
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634B", "用印申請書", "", "L2631B_用印申請書.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634B", "用印申請書-整批列印", "", "L2631B_用印申請書.pdf");
 
 		this.setFont(1);
 
@@ -140,73 +140,84 @@ public class L2634ReportB extends MakeReport {
 			cnt++;
 			int custNo = 0;
 			int closeNo = 0;
-			custNo = t.getCustNo();
-			closeNo = t.getCloseNo();
-			FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
-			if (tFacClose == null) {
-				continue;
-			}
+			int selectCnt = 0;
+			if (custNo != t.getCustNo() || closeNo != t.getCloseNo()) {
 
-			CustMain tCustMain = sCustMainService.custNoFirst(tFacClose.getCustNo(), tFacClose.getCustNo(), titaVo);
-			if (tCustMain != null) {
-				custId = tCustMain.getCustId();
-			}
-
-			getSelecTotal(custNo, closeNo, lClOtherRights, titaVo);
-			String wkSysDate = titaVo.getCalDy(); // 系統日國曆
-			this.info("wkSysDate = " + wkSysDate);
-
-			int wkYy = parse.stringToInteger(wkSysDate.substring(0, 3)); // 年
-			int wkMm = parse.stringToInteger(wkSysDate.substring(3, 5)); // 月
-			int wkDd = parse.stringToInteger(wkSysDate.substring(5, 7)); // 日
-			String closeDate = parse.IntegerToString(tFacClose.getCloseDate(), 7); // 結清日期
-			this.info("closeDate = " + closeDate);
-			int wkCloseYy = parse.stringToInteger(closeDate.substring(0, 3)); // 年
-			int wkCloseMm = parse.stringToInteger(closeDate.substring(3, 5)); // 月
-			int wkCloseDd = parse.stringToInteger(closeDate.substring(5, 7)); // 日
-
-			this.info("wkYymmdd = " + wkYy + "/" + wkMm + "/" + wkDd);
-			this.print(-17, 86, "" + wkYy); // 年
-			this.print(-20, 87, "" + wkMm); // 月
-			this.print(-23, 87, "" + wkDd); // 日
-			if (tFacClose.getFacmNo() > 0) {
-				this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-"
-						+ tFacClose.getFacmNo()); // 戶號額度
-			} else {
-				Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(),
-						0, 999, 0, Integer.MAX_VALUE, titaVo);
-				List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
-				String facms = "";
-				String x = "";
-				for (FacMain facMain : lFacMain) {
-					facms += x + facMain.getFacmNo();
-					x = ".";
+				custNo = t.getCustNo();
+				closeNo = t.getCloseNo();
+				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
+				if (tFacClose == null) {
+					continue;
 				}
 
-				this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + facms); // 戶號額度
-			}
-			this.print(-33, 42, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
-			this.print(-36, 42, custId); // 統編
+				CustMain tCustMain = sCustMainService.custNoFirst(tFacClose.getCustNo(), tFacClose.getCustNo(), titaVo);
+				if (tCustMain != null) {
+					custId = tCustMain.getCustId();
+				}
 
-			ClFac t2ClFac = clFacService.clMainFirst(t.getClCode1(), t.getClCode2(), t.getClNo(), "Y", titaVo);
-			String amtChinese = "";
-			// 設定金額
-			BigDecimal wkOriSettingAmt = BigDecimal.ZERO;
-			if (t2ClFac != null) {
-				wkOriSettingAmt = t2ClFac.getOriSettingAmt();
-				amtChinese = this.convertAmtToChinese(wkOriSettingAmt);
-			}
+				getSelecTotal(custNo, closeNo, lClOtherRights, titaVo);
+				String wkSysDate = titaVo.getCalDy(); // 系統日國曆
+				this.info("wkSysDate = " + wkSysDate);
 
-			this.print(-39, 42, amtChinese + " 元整"); // 設定金額
+				int wkYy = parse.stringToInteger(wkSysDate.substring(0, 3)); // 年
+				int wkMm = parse.stringToInteger(wkSysDate.substring(3, 5)); // 月
+				int wkDd = parse.stringToInteger(wkSysDate.substring(5, 7)); // 日
+				String closeDate = parse.IntegerToString(tFacClose.getCloseDate(), 7); // 結清日期
+				this.info("closeDate = " + closeDate);
+				int wkCloseYy = parse.stringToInteger(closeDate.substring(0, 3)); // 年
+				int wkCloseMm = parse.stringToInteger(closeDate.substring(3, 5)); // 月
+				int wkCloseDd = parse.stringToInteger(closeDate.substring(5, 7)); // 日
 
-			this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
+				this.info("wkYymmdd = " + wkYy + "/" + wkMm + "/" + wkDd);
+				this.print(-17, 86, "" + wkYy); // 年
+				this.print(-20, 87, "" + wkMm); // 月
+				this.print(-23, 87, "" + wkDd); // 日
+				if (tFacClose.getFacmNo() > 0) {
+					this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-"
+							+ tFacClose.getFacmNo()); // 戶號額度
+				} else {
+					Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(),
+							tFacClose.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+					List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
+					String facms = "";
+					String x = "";
+					for (FacMain facMain : lFacMain) {
+						facms += x + facMain.getFacmNo();
+						x = ".";
+					}
 
-			if (!isLast) {
-				this.newPage();
+					this.print(-31, 42,
+							StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + facms); // 戶號額度
+				}
+				this.print(-33, 42, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
+				this.print(-36, 42, custId); // 統編
+
+				ClFac t2ClFac = clFacService.clMainFirst(t.getClCode1(), t.getClCode2(), t.getClNo(), "Y", titaVo);
+				String amtChinese = "";
+				// 設定金額
+				BigDecimal wkOriSettingAmt = BigDecimal.ZERO;
+				if (t2ClFac != null) {
+					wkOriSettingAmt = t2ClFac.getOriSettingAmt();
+					amtChinese = this.convertAmtToChinese(wkOriSettingAmt);
+				}
+
+				this.print(-39, 42, amtChinese + " 元整"); // 設定金額
+
+				this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
+
+				if (isLast) {
+
+					break;
+				} else {
+					this.info("B newPage");
+					this.newPage(!isLast);
+
+				}
 			}
 		}
 
-		 this.close();
+		this.info("B 結束");
+		this.close();
 
 	}
 

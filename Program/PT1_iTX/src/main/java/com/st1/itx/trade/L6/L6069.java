@@ -42,7 +42,7 @@ public class L6069 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6069 ");
 		this.totaVo.init(titaVo);
-
+ 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -57,7 +57,7 @@ public class L6069 extends TradeBuffer {
 			// E5004 讀取DB時發生問題
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
-
+		
 		List<LinkedHashMap<String, String>> chkOccursList = null;
 		if (L6069List != null && L6069List.size() > 0) {
 			for (Map<String, String> c : L6069List) {
@@ -87,7 +87,8 @@ public class L6069 extends TradeBuffer {
 		}
 
 		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
-			throw new LogicException("E2003", ""); // 查無資料
+			throw new LogicException("E0001", "查詢資料不存在(共用代碼檔)"); // 查無資料
+		//	throw new LogicException("E2003", ""); // 查無資料
 		}
 
 		this.addList(this.totaVo);

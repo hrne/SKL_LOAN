@@ -64,7 +64,7 @@ public class L2634ReportE extends MakeReport {
 
 //		String tran = titaVo.getTxCode().isEmpty() ? "L2631E" : titaVo.getTxCode();
 
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634E", "中華郵政掛號郵件收件回執", "cm,19,9.5", "P");
+		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634E", "中華郵政掛號郵件收件回執-整批列印", "cm,19,9.5", "P");
 
 		this.setFont(1);
 
@@ -120,6 +120,7 @@ public class L2634ReportE extends MakeReport {
 				this.printCm(8, 7.5, cdEmp.getFullname());
 			}
 		}
+		this.info("E 結束");
 		return this.close();
 
 	}

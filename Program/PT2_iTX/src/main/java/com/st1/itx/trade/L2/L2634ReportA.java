@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -36,8 +34,6 @@ import com.st1.itx.util.parse.Parse;
 @Component("L2634ReportA")
 @Scope("prototype")
 public class L2634ReportA extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L2634ReportA.class);
-
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
 	@Autowired

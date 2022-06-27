@@ -34,7 +34,96 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "FacMain" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "FacMain"
+    INSERT INTO "FacMain" (
+           "CustNo"              -- 借款人戶號 DECIMAL 7 
+          ,"FacmNo"              -- 額度編號 DECIMAL 3 
+          ,"LastBormNo"          -- 已撥款序號 DECIMAL 3 
+          ,"LastBormRvNo"        -- 已預約序號 DECIMAL 3 
+          ,"ApplNo"              -- 申請號碼 DECIMAL 7 
+          ,"CreditSysNo"         -- 徵審系統案號 DECIMAL 7 -- 2020/10/19 Wei修改
+          ,"ProdNo"              -- 商品代碼 VARCHAR2 5 
+          ,"BaseRateCode"        -- 指標利率代碼 VARCHAR2 2 
+          ,"RateIncr"            -- 加碼利率 DECIMAL 6 4 -- 2020/10/19 Wei修改
+          ,"IndividualIncr"      -- 個別加碼 DECIMAL 6 4
+          ,"ApproveRate"         -- 核准利率 DECIMAL 6 4
+          ,"AnnualIncr"          -- 年繳比重優惠加減碼 DECIMAL 6 4
+          ,"EmailIncr"           -- 提供EMAIL優惠減碼 DECIMAL 6 4
+          ,"GraceIncr"           -- 寬限逾一年利率加碼 DECIMAL 6 4
+          ,"RateCode"            -- 利率區分 VARCHAR2 1 
+          ,"FirstRateAdjFreq"    -- 首次利率調整週期 DECIMAL 2 
+          ,"RateAdjFreq"         -- 利率調整週期 DECIMAL 2 
+          ,"CurrencyCode"        -- 核准幣別 VARCHAR2 3 
+          ,"LineAmt"             -- 核准額度 DECIMAL 16 2
+          ,"UtilAmt"             -- 貸出金額(放款餘額) DECIMAL 16 2
+          ,"UtilBal"             -- 已動用額度餘額 DECIMAL 16 2 循環動用還款時會減少,非循環動用還款時不會減少
+          ,"AcctCode"            -- 核准科目 VARCHAR2 3 
+          ,"LoanTermYy"          -- 貸款期間年 DECIMAL 2 
+          ,"LoanTermMm"          -- 貸款期間月 DECIMAL 2 
+          ,"LoanTermDd"          -- 貸款期間日 DECIMAL 3 
+          ,"FirstDrawdownDate"   -- 初貸日 DECIMALD 8 
+          ,"MaturityDate"        -- 到期日 NUMBER(8,0)
+          ,"IntCalcCode"
+          ,"AmortizedCode"       -- 攤還方式 VARCHAR2 1 
+          ,"FreqBase"            -- 週期基準 VARCHAR2 1 
+          ,"PayIntFreq"          -- 繳息週期 DECIMAL 2 
+          ,"RepayFreq"           -- 還本週期 DECIMAL 2 
+          ,"UtilDeadline"        -- 動支期限 DECIMALD 8 
+          ,"GracePeriod"         -- 寬限總月數 DECIMAL 3 
+          ,"AcctFee"             -- 帳管費 DECIMAL 16 2
+          ,"HandlingFee"         -- 手續費 DECIMAL 16 2
+          ,"RuleCode"            -- 規定管制代碼 VARCHAR2
+          ,"ExtraRepayCode"      -- 攤還額異動碼 VARCHAR2 1 
+          ,"CustTypeCode"        -- 客戶別 VARCHAR2 2 
+          ,"RecycleCode"         -- 循環動用 VARCHAR2 1 
+          ,"RecycleDeadline"     -- 循環動用期限 DECIMALD 8 
+          ,"UsageCode"           -- 資金用途別 VARCHAR2 2 
+          ,"DepartmentCode"      -- 案件隸屬單位 VARCHAR2 1 
+          ,"IncomeTaxFlag"       -- 代繳所得稅 VARCHAR2 1 
+          ,"CompensateFlag"      -- 代償碼 VARCHAR2 1 
+          ,"IrrevocableFlag"     -- 不可撤銷 VARCHAR2 1 
+          ,"RateAdjNoticeCode"   -- 利率調整通知 VARCHAR2 1 
+          ,"PieceCode"           -- 計件代碼 VARCHAR2 1 
+          ,"RepayCode"           -- 繳款方式 DECIMAL 2
+          ,"Introducer"          -- 介紹人 VARCHAR2 6 
+          ,"District"            -- 區部 VARCHAR2 6 
+          ,"FireOfficer"         -- 火險服務 VARCHAR2 6 
+          ,"Estimate"            -- 估價 VARCHAR2 6 
+          ,"CreditOfficer"       -- 授信 VARCHAR2 6 
+          ,"LoanOfficer"         -- 放款業務專員 VARCHAR2 6 
+          ,"BusinessOfficer"     -- 房貸專員 VARCHAR2 6 
+          ,"Supervisor"          -- 核決主管 VARCHAR2 6 
+          ,"InvestigateOfficer"  -- 徵信 VARCHAR2 6 
+          ,"EstimateReview"      -- 估價覆核 VARCHAR2 6 
+          ,"Coorgnizer"          -- 協辦人 VARCHAR2 6 
+          ,"AdvanceCloseCode"    -- 提前清償原因 DECIMAL 2
+          ,"ProdBreachFlag"      -- 違約適用方式是否按商品設定 varchar2 1
+          ,"BreachDescription"   -- 違約適用說明 nvarchar2 100
+          ,"CreditScore"         -- 信用評分 DECIMAL 3 
+          ,"GuaranteeDate"       -- 對保日期 DECIMALD 8 
+          ,"ContractNo"          -- 合約編號 VARCHAR2 10 
+          ,"ColSetFlag"          -- 擔保品設定記號 VARCHAR2 1 
+          ,"ActFg"               -- 交易進行記號 DECIMAL 1 
+          ,"LastAcctDate"        -- 上次交易日 NUMBER(8,0)
+          ,"LastKinbr"           -- 上次交易行別 VARCHAR2(4 BYTE)
+          ,"LastTlrNo"           -- 上次櫃員編號 VARCHAR2(6 BYTE)
+          ,"LastTxtNo"           -- 上次交易序號 VARCHAR2(8 BYTE)
+          ,"AcDate"              -- 會計日期 DECIMALD 8 
+          ,"L9110Flag"           -- 是否已列印[撥款審核資料表] VARCHAR2(1 BYTE)
+          ,"BranchNo"
+          ,"ApprovedLevel"       -- 核准層級 VARCHAR2(1 BYTE)
+          ,"CreateDate"          -- 建檔日期時間 DATE  
+          ,"CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,"LastUpdate"          -- 最後更新日期時間 DATE  
+          ,"LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,"Grcd"                -- 綠色授信註記 VARCHAR2 1
+          ,"GrKind"              -- 綠色支出類別 VARCHAR2 1
+          ,"EsGcd"               -- 永續績效連結授信註記 VARCHAR2 1
+          ,"EsGKind"             -- 永續績效連結授信類別 VARCHAR2 1
+          ,"EsGcnl"              -- 永續績效連結授信約定條件全部未達成通報 VARCHAR2 1
+          ,"RenewCnt"            -- 展期次數 DECIMAL 3
+          ,"OldFacmNo"           -- 原額度編號 DECIMAL 3
+          ,"SettingDate"         -- 額度設定日 DECIMALD 8
+    )
     SELECT APLP."LMSACN"                  AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,APLP."LMSAPN"                  AS "FacmNo"              -- 額度編號 DECIMAL 3 
           ,NVL(LMSP."LastBormNo",0)       AS "LastBormNo"          -- 已撥款序號 DECIMAL 3 
@@ -239,6 +328,9 @@ BEGIN
           ,''                             AS "EsGcd"               -- 永續績效連結授信註記 VARCHAR2 1
           ,''                             AS "EsGKind"             -- 永續績效連結授信類別 VARCHAR2 1
           ,''                             AS "EsGcnl"              -- 永續績效連結授信約定條件全部未達成通報 VARCHAR2 1
+          ,APLP."APLEPT"                  AS "RenewCnt"            -- 展期次數 DECIMAL 3
+          ,APLP."APLOAP"                  AS "OldFacmNo"           -- 原額度編號 DECIMAL 3
+          ,APLP."APLSDT"                  AS "SettingDate"         -- 額度設定日 DECIMALD 8
     FROM "LA$APLP" APLP
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN"
     LEFT JOIN "FacCaseAppl" APPL ON APPL."ApplNo" = APLP."APLNUM"

@@ -242,7 +242,7 @@ BEGIN
 	         , JM."EvaAmt"            -- 鑑估總值
 	         , JM."DispDate"          -- 擔保品處分日期
 	         , JM."SyndNo"            -- 聯貸案序號
-	         , JM."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+	         , JM."SyndCode"          -- 聯貸案類型 A:國內 B:國際
 	         , JM."SigningDate"       -- 聯貸合約訂定日期
 	         , JM."SyndAmt"           -- 聯貸總金額
 	         , JM."PartAmt"           -- 參貸金額
@@ -336,7 +336,7 @@ BEGIN
          , JS."EvaAmt"            -- 鑑估總值
          , JS."DispDate"          -- 擔保品處分日期
          , JS."SyndNo"            -- 聯貸案序號
-         , JS."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JS."SyndCode"          -- 聯貸案類型 A:國內 B:國際
          , JS."SigningDate"       -- 聯貸合約訂定日期
          , JS."SyndAmt"           -- 聯貸總金額
          , JS."PartAmt"           -- 參貸金額
@@ -425,7 +425,7 @@ BEGIN
          , JM."EvaAmt"            -- 鑑估總值
          , JM."DispDate"          -- 擔保品處分日期
          , JM."SyndNo"            -- 聯貸案序號
-         , JM."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JM."SyndCode"          -- 聯貸案類型 A:國內 B:國際
          , JM."SigningDate"       -- 聯貸合約訂定日期
          , JM."SyndAmt"           -- 聯貸總金額
          , JM."PartAmt"           -- 參貸金額
@@ -500,7 +500,7 @@ BEGIN
          , JM."EvaAmt"            -- 鑑估總值
          , JM."DispDate"          -- 擔保品處分日期
          , JM."SyndNo"            -- 聯貸案序號
-         , JM."SyndCode"          -- 聯貸案類型 1:主辦行 2:參貸行
+         , JM."SyndCode"          -- 聯貸案類型 A:國內 B:國際
          , JM."SigningDate"       -- 聯貸合約訂定日期
          , JM."SyndAmt"           -- 聯貸總金額
          , JM."PartAmt"           -- 參貸金額
@@ -687,11 +687,11 @@ BEGIN
            , TRUNC(NVL(M."EvaAmt",0) / 1000, 0)    AS "ClEvaAmt"          -- 擔保品(合計)鑑估值
            , NVL(M."ClTypeCode",' ')               AS "ClTypeCode"        -- 擔保品類別(JCIC)
            , CASE
-               WHEN M."SyndNo" > 0 THEN 'A'
+               WHEN M."SyndNo" > 0 THEN NVL(M."SyndCode",' ')
                ELSE ' '
              END                                   AS "SyndKind"          -- 國內或國際聯貸 A:國內 B:國際; 如非屬聯貸案填空白，勿填0
            , CASE
-               WHEN M."SyndNo" > 0 THEN TRIM(to_char(M."SyndNo",'00000000'))
+               WHEN M."SyndNo" > 0 THEN TRIM(to_char(M."SigningDate",'00000000'))
                ELSE ' '
              END                                   AS "SyndContractDate"  -- 聯貸合約訂定日期
            , CASE
@@ -712,53 +712,70 @@ BEGIN
            , 'N'                                   AS "Filler533"         -- (109年新增)無擔保貸款......
            , CASE WHEN NVL(WK1."CustId",' ') = ' ' THEN ' '
                   ELSE NVL(WK1."GuaTypeJcic",' ')  
-             END               AS "GuaTypeCode1"      -- 共同債務人或債務關係人身份代號1
-           , NVL(WK1."CustId",' ')                 AS "GuaId1"            -- 共同債務人或債務關係人身份統一編號1
+             END                                   AS "GuaTypeCode1"      -- 共同債務人或債務關係人身份代號1
+           , CASE WHEN NVL(WK1."GuaTypeJcic",' ') = ' ' THEN ' '
+                  ELSE NVL(WK1."CustId",' ')
+             END                                   AS "GuaId1"            -- 共同債務人或債務關係人身份統一編號1
            , ' '                                   AS "GuaIdErr1"         -- 上欄IDN或BAN錯誤註記
            , CASE WHEN NVL(WK1."CustId",' ') = ' ' THEN ' '
+                  WHEN NVL(WK1."GuaTypeJcic",' ') = ' ' THEN ' '
                   ELSE NVL(WK1."GuaRelJcic",' ')
-             END               AS "GuaRelCode1"       -- 與主債務人關係1
+             END                                   AS "GuaRelCode1"       -- 與主債務人關係1
            , CASE WHEN NVL(WK2."CustId",' ') = ' ' THEN ' '
                   ELSE NVL(WK2."GuaTypeJcic",' ')
-             END               AS "GuaTypeCode2"      -- 共同債務人或債務關係人身份代號2
-           , NVL(WK2."CustId",' ')                 AS "GuaId2"            -- 共同債務人或債務關係人身份統一編號2
+             END                                   AS "GuaTypeCode2"      -- 共同債務人或債務關係人身份代號2
+           , CASE WHEN NVL(WK1."GuaTypeJcic",' ') = ' ' THEN ' '
+                  ELSE NVL(WK2."CustId",' ') 
+             END                                   AS "GuaId2"            -- 共同債務人或債務關係人身份統一編號2
            , ' '                                   AS "GuaIdErr2"         -- 上欄IDN或BAN錯誤註記
            , CASE WHEN NVL(WK2."CustId",' ') = ' ' THEN ' '
+                  WHEN NVL(WK2."GuaTypeJcic",' ') = ' ' THEN ' '
                   ELSE NVL(WK2."GuaRelJcic",' ')
-             END               AS "GuaRelCode2"       -- 與主債務人關係2
+             END                                   AS "GuaRelCode2"       -- 與主債務人關係2
            , CASE WHEN NVL(WK3."CustId",' ') = ' ' THEN ' '
                   ELSE NVL(WK3."GuaTypeJcic",' ')
-             END               AS "GuaTypeCode3"      -- 共同債務人或債務關係人身份代號3
-           , NVL(WK3."CustId",' ')                 AS "GuaId3"            -- 共同債務人或債務關係人身份統一編號3
+             END                                   AS "GuaTypeCode3"      -- 共同債務人或債務關係人身份代號3
+           , CASE WHEN NVL(WK3."GuaTypeJcic",' ') = ' ' THEN ' '
+                  ELSE NVL(WK3."CustId",' ')      
+             END                                   AS "GuaId3"            -- 共同債務人或債務關係人身份統一編號3
            , ' '                                   AS "GuaIdErr3"         -- 上欄IDN或BAN錯誤註記
            , CASE WHEN NVL(WK3."CustId",' ') = ' ' THEN ' '
+                  WHEN NVL(WK3."GuaTypeJcic",' ') = ' ' THEN ' '
                   ELSE NVL(WK3."GuaRelJcic",' ')
-             END               AS "GuaRelCode3"       -- 與主債務人關係3
+             END                                   AS "GuaRelCode3"       -- 與主債務人關係3
            , CASE WHEN NVL(WK4."CustId",' ') = ' ' THEN ' '
                   ELSE NVL(WK4."GuaTypeJcic",' ')
-             END               AS "GuaTypeCode4"      -- 共同債務人或債務關係人身份代號4
-           , NVL(WK4."CustId",' ')                 AS "GuaId4"            -- 共同債務人或債務關係人身份統一編號4
+             END                                   AS "GuaTypeCode4"      -- 共同債務人或債務關係人身份代號4
+           , CASE WHEN NVL(WK4."GuaTypeJcic",' ') = ' ' THEN ' '
+                  ELSE NVL(WK4."CustId",' ')
+             END                                   AS "GuaId4"            -- 共同債務人或債務關係人身份統一編號4
            , ' '                                   AS "GuaIdErr4"         -- 上欄IDN或BAN錯誤註記
            , CASE WHEN NVL(WK4."CustId",' ') = ' ' THEN ' '
+                  WHEN NVL(WK4."GuaTypeJcic",' ') = ' ' THEN ' '
                   ELSE NVL(WK4."GuaRelJcic",' ')
-             END               AS "GuaRelCode4"       -- 與主債務人關係4
+             END                                   AS "GuaRelCode4"       -- 與主債務人關係4
            , CASE WHEN NVL(WK5."CustId",' ') = ' ' THEN ' '
                   ELSE NVL(WK5."GuaTypeJcic",' ')
-             END               AS "GuaTypeCode5"      -- 共同債務人或債務關係人身份代號5
-           , NVL(WK5."CustId",' ')                 AS "GuaId5"            -- 共同債務人或債務關係人身份統一編號5
+             END                                   AS "GuaTypeCode5"      -- 共同債務人或債務關係人身份代號5
+           , CASE WHEN NVL(WK5."GuaTypeJcic",' ') = ' ' THEN ' '
+                  ELSE NVL(WK5."CustId",' ')        
+             END                                   AS "GuaId5"            -- 共同債務人或債務關係人身份統一編號5
            , ' '                                   AS "GuaIdErr5"         -- 上欄IDN或BAN錯誤註記
            , CASE WHEN NVL(WK5."CustId",' ') = ' ' THEN ' '
+                  WHEN NVL(WK5."GuaTypeJcic",' ') = ' ' THEN ' '
                   ELSE NVL(WK5."GuaRelJcic",' ')
-             END               AS "GuaRelCode5"       -- 與主債務人關係5
+             END                                   AS "GuaRelCode5"       -- 與主債務人關係5
            , ' '                                   AS "Filler741"         -- 空白
            , CASE WHEN M."FinCode" NOT IN ('L','M','2')    THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0            THEN '00000'
-                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
+--                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
+                  WHEN NVL(L."GraceFlag",0) = 0 THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."DrawdownDate",0) / 100) -191100 ) ),5,'0') 
              END                                   AS "GraceStartYM"      -- 房貸寬限期起始年月
            , CASE WHEN M."FinCode" NOT IN ('L','M','2') THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0    THEN '00000'
-                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
+--                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
+                  WHEN NVL(L."GraceFlag",0) = 0 THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."GraceDate",0) / 100) - 191100 )  ) ,5,'0')   
              END                                   AS "GraceEndYM"        -- 房貸寬限期截止年月
            , CASE WHEN NVL(F."Grcd",' ') = ' ' AND M."EntCode" IN ('1') THEN 'N'  -- 企金不可空白
@@ -799,7 +816,7 @@ BEGIN
                ELSE TRUNC(NVL(M."BadDebtDate",0) / 100) - 191100
              END                                   AS "BadDebtDate"       -- 呆帳轉銷年月
            , 'X'                                   AS "SyndCode"          -- 聯貸主辦(管理)行註記
-           , 0                                     AS "BankruptDate"      -- 破產宣告日(或法院裁定開始清算日)  --???
+           , 0                                     AS "BankruptDate"      -- 破產宣告日(或法院裁定開始清算日)  
            , 'N'                                   AS "BdLoanFg"          -- 建築貸款註記
            , 0                                     AS "SmallAmt"          -- 授信餘額列報1（千元）之原始金額（元） --（後續更新處理）
            , ' '                                   AS "ExtraAttrCode"     -- 補充揭露案件註記－案件屬性

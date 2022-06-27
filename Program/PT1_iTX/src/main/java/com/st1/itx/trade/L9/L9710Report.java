@@ -40,6 +40,8 @@ public class L9710Report extends MakeReport {
 	int tcnt = 0;
 	int amt = 0;
 	int tamt = 0;
+	
+	int tempCount = 0;
 
 	// 橫式規格
 	@Override
@@ -146,9 +148,10 @@ public class L9710Report extends MakeReport {
 			for (Map<String, String> tL9710Vo : l9710List) {
 				
 				count++;
-				
-				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
-					if (cnt > 0) {
+//				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
+				//不同地區別
+				if (!f1.equals(tL9710Vo.get("CityCode"))) {
+					if (tempCount % 40 > 1) {
 						reportTot();
 					}
 					if (f0.equals(tL9710Vo.get("F0"))) {
@@ -156,18 +159,21 @@ public class L9710Report extends MakeReport {
 					}
 				}
 
-				f0 = tL9710Vo.get("F0");
+//				f0 = tL9710Vo.get("F0");
 				f1 = tL9710Vo.get("CityCode");
 				
-				if(count == 40) {
+				//小計 會加3行，超過40行 換新頁
+				if((tempCount % 40 + 3) >= 40) {
 					this.newPage();
-					count = 0 ;
+//					count = 0 ;
 				}
 				
 				report(tL9710Vo);
 			}
 
-			if (this.getNowPage() > 0) {
+			
+			
+			if (this.getNowPage() > 0 && count == l9710List.size()) {
 				ptfg = 9;
 				reportTot();
 			}
@@ -184,6 +190,7 @@ public class L9710Report extends MakeReport {
 
 	private void report(Map<String, String> tL9710Vo) throws LogicException {
 		String tmp = "";
+		tempCount++;
 		// 押品地區別 (地區代號+地區名字)
 		if (ptfg == 0) {
 			this.print(1, 2, f0);
@@ -238,11 +245,13 @@ public class L9710Report extends MakeReport {
 		amt += Integer.valueOf(tL9710Vo.get("LoanBal"));
 	}
 
+
 	/**
 	 * 小計(總計)筆數及合計核准額度
 	 * 
 	 */
 	private void reportTot() {
+		tempCount= tempCount+3;
 		this.print(1, 1, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		this.print(1, 12, "小　計");
 		this.print(0, 24, String.valueOf(cnt), "R");

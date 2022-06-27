@@ -247,7 +247,7 @@ public class L8403File extends MakeFile {
 	@Autowired
 	DateUtil dDateUtil;
 
-	public long exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo) throws LogicException {
 
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -586,8 +586,8 @@ public class L8403File extends MakeFile {
 		String sCount = String.valueOf(iCount);
 		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
 		this.put(footText);
-		long sno = this.close();
-		return sno;
+	//	long sno = this.close();
+	//	return sno;
 
 	}
 

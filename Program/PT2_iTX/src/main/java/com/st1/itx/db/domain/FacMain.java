@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class FacMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8760803203040064745L;
-
-@EmbeddedId
+  @EmbeddedId
   private FacMainId facMainId;
 
   // 借款人戶號
@@ -400,6 +396,11 @@ public class FacMain implements Serializable {
   // 原額度編號
   @Column(name = "`OldFacmNo`")
   private int oldFacmNo = 0;
+
+  // 額度設定日
+  /* 企金:額度核准時將申請檔內准駁日期寫入[額度設定日ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日期就是上送當下的日期 */
+  @Column(name = "`SettingDate`")
+  private int settingDate = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -2250,6 +2251,27 @@ N:否
   }
 
 /**
+	* 額度設定日<br>
+	* 企金:額度核准時將申請檔內准駁日期寫入[額度設定日
+ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日期就是上送當下的日期
+	* @return Integer
+	*/
+  public int getSettingDate() {
+    return StaticTool.bcToRoc(this.settingDate);
+  }
+
+/**
+	* 額度設定日<br>
+	* 企金:額度核准時將申請檔內准駁日期寫入[額度設定日
+ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日期就是上送當下的日期
+  *
+  * @param settingDate 額度設定日
+  * @throws LogicException when Date Is Warn	*/
+  public void setSettingDate(int settingDate) throws LogicException {
+    this.settingDate = StaticTool.rocToBc(settingDate);
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -2341,7 +2363,7 @@ N:否
            + ", advanceCloseCode=" + advanceCloseCode + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo
            + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
            + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", grcd=" + grcd + ", grKind=" + grKind
-           + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", renewCnt=" + renewCnt + ", oldFacmNo=" + oldFacmNo + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", renewCnt=" + renewCnt + ", oldFacmNo=" + oldFacmNo + ", settingDate=" + settingDate
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

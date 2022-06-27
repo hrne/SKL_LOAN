@@ -28,6 +28,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L2634")
@@ -69,6 +70,8 @@ public class L2634 extends TradeBuffer {
 	public L2634ReportD l2634ReportD;
 	@Autowired
 	public L2634ReportE l2634ReportE;
+	@Autowired
+	public WebClient webClient;
 
 	@Autowired
 	public DateUtil dateUtil;
@@ -99,22 +102,30 @@ public class L2634 extends TradeBuffer {
 
 //		勾選完成最後一筆,列印
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
-//			類別 1 申請書及其他
 
 			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(choiceDate + 19110000,
 					titaVo.getTlrNo(), 0, Integer.MAX_VALUE, titaVo);
 
 			lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 			if (lClOtherRights != null) {
+//				類別 1 申請書及其他
 				if (iType == 1) {
 					doReport1(titaVo);
+
+					String checkMsg = "申請書及其他-整批列印已完成。";
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
 				}
 //				類別 2 清償塗銷同意書
 				else {
 					doReport2(titaVo);
 
+					String checkMsg = "抵押權塗銷同意書-整批列印已完成。";
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
 				}
 				setChoiceDate0(titaVo);
+
 			}
 
 		}

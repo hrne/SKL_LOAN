@@ -128,7 +128,7 @@ public class L2634ReportD extends MakeReport {
 		int custNo = 0;
 		int closeNo = 0;
 		for (ClOtherRights t : lClOtherRights) {
-			int selectCnt = 0;
+
 			if (custNo != t.getCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getCustNo();
 				closeNo = t.getCloseNo();
@@ -140,7 +140,10 @@ public class L2634ReportD extends MakeReport {
 				this.info("CollectWayCode =" + tFacClose.getCollectWayCode());
 				if ("21".equals(tFacClose.getCollectWayCode()) || "26".equals(tFacClose.getCollectWayCode())
 						|| "27".equals(tFacClose.getCollectWayCode())) {
-
+					if (!isLast) {
+						this.info("C newPage");
+						this.newPage();
+					}
 				} else {
 					this.info("continue 2");
 					continue;
@@ -237,9 +240,9 @@ public class L2634ReportD extends MakeReport {
 
 			}
 
-			if (!isLast) {
-				this.info("D newPage");
-				this.newPage();
+			if (isLast) {
+
+				break;
 			}
 		}
 		this.info("D 結束");

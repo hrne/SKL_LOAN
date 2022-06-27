@@ -119,7 +119,7 @@ public class L2634ReportC extends MakeReport {
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634C", "簽收回條", "", "L2631C_簽收回條.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634C", "簽收回條-整批列印", "", "L2631C_簽收回條.pdf");
 
 		this.setFont(1);
 
@@ -173,7 +173,7 @@ public class L2634ReportC extends MakeReport {
 					break;
 				}else {
 					this.info("C newPage");
-					this.newPage();
+					this.newPage(!isLast);
 					
 				}
 			}
