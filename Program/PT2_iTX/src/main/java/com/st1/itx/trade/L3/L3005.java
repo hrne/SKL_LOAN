@@ -209,13 +209,17 @@ public class L3005 extends TradeBuffer {
 					wkCurrencyCode = titaCurCd;
 				}
 				this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-				wkShortfall = unpaidAmt;
-				// 暫收款金額為負時，為暫收抵繳
+				wkShortfall = BigDecimal.ZERO;
+				// 暫收款金額，負為暫收抵繳，正為溢收
 				if (tempAmt.compareTo(BigDecimal.ZERO) <= 0) {
 					wkTempAmt = BigDecimal.ZERO.subtract(tempAmt);
 				} else {
 					wkTempAmt = BigDecimal.ZERO;
 					wkShortfall = tempAmt;
+				}
+				// 有短收金額時為短收
+				if ( unpaidAmt.compareTo(BigDecimal.ZERO) > 0) {
+					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);					
 				}
 				relNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);

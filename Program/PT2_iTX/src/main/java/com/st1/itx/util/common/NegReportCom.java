@@ -1227,7 +1227,7 @@ public class NegReportCom extends CommBuffer {
 							// 發件單位-Order1
 							String FromFinCode = tNegMain.getMainFinCode();// 最大債權銀行代碼
 							// 收件單位-Order2
-							String ToFinCode = tNegAppr01.getFinCode();// 債權機構代號
+							String ToFinCode = tNegAppr01.getRemitBank();// 債權機構代號-需放實際匯出帳號的匯款銀行
 
 							// 轉帳類別(同檔案一致)-Order3
 							String TransAccCode = "02960";// 代發前置協商金融款項

@@ -264,7 +264,6 @@ public class L3200 extends TradeBuffer {
 	private boolean isFirstBorm = true;
 	private boolean isCalcRepayInt = false;
 	private boolean isSettleUnpaid = false;
-	private boolean isLoanClose = false; // 最後一期期款/部分償還結案
 	private boolean isRepayPrincipal = false; // 回收本金
 	private TempVo tTempVo = new TempVo();
 
@@ -694,11 +693,8 @@ public class L3200 extends TradeBuffer {
 			wkTotalBreachAmt = wkTotalBreachAmt.add(wkBreachAmt);
 			wkTotalExtraRepay = wkTotalExtraRepay.add(wkExtraRepay);
 
-			// 計算短繳
-			calcUnpaidAmt(ln);
-
-			// 費用、短繳期金
-			getSettleUnpaid();
+			// 回收累短收
+			settleShortfall();
 
 			// 無(計息)、無(費用、短繳期金)
 			if (!isCalcRepayInt && !isSettleUnpaid) {
@@ -707,16 +703,20 @@ public class L3200 extends TradeBuffer {
 
 			wkTotaCount++;
 
-			// 實收處理
-			// Principal 實收本金 => 扣除短收本金、含收回欠繳本金
-			// 期款最後一期本金含欠繳本金
-			if (isLoanClose) {
-				wkPrincipal = wkPrincipal.subtract(wkUnpaidPrin);
-			} else {
-				wkPrincipal = wkPrincipal.subtract(wkUnpaidPrin).add(wkShortfallPrincipal);
-			}
-			this.info("本金 =" + wkPrincipal);
+			// 計算短繳
+			calcUnpaidAmt(ln);
 
+			// 期款最後一期本金含累短收本金
+			wkPrincipal = wkPrincipal.add(wkShortfallPrincipal);
+			if (wkPrincipal.compareTo(ln.getLoanBal()) >= 0) {
+				this.info("累短收本金" + wkShortfallPrincipal + " 實收本金" + wkPrincipal + " 超過餘額 " + ln.getLoanBal());
+				wkPrincipal = ln.getLoanBal();
+			}
+
+			// Principal 實收本金 => 扣除短收本金、含收回欠繳本金
+			wkPrincipal = wkPrincipal.subtract(wkUnpaidPrin);
+
+			this.info("還款本金=" + wkPrincipal);
 			// Interest 實收利息(已扣除減免) => 扣除短收利息、含收回欠繳利息
 			wkInterest = wkInterest.subtract(wkUnpaidInt).add(wkShortfallInterest);
 
@@ -792,56 +792,57 @@ public class L3200 extends TradeBuffer {
 	private void calcUnpaidAmt(LoanBorMain ln) throws LogicException {
 		wkUnpaidPrin = BigDecimal.ZERO;
 		wkUnpaidInt = BigDecimal.ZERO;
+		if (iShortAmt.compareTo(BigDecimal.ZERO) == 0 || !isCalcRepayInt || ln.getFacmNo() != iOverRpFacmNo) {
+			return;
+		}
 		BigDecimal wkShortAmtLimit = BigDecimal.ZERO;
-		if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && !isLoanClose && ln.getFacmNo() == iOverRpFacmNo) {
-			if (wkRepaykindCode == 1) { // 部分償還本金欠繳利息
-				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkInterest); // 利息全額
-				if (wkInterest.compareTo(wkUnpaidAmtRemaind) >= 0) {
+		if (wkRepaykindCode == 1) { // 部分償還本金欠繳利息
+			wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkInterest); // 利息全額
+			if (wkInterest.compareTo(wkUnpaidAmtRemaind) >= 0) {
+				wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
+				wkUnpaidAmtRemaind = BigDecimal.ZERO;
+			} else {
+				wkUnpaidInt = wkUnpaidInt.add(wkInterest);
+				wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkInterest);
+			}
+		} else {
+			// 到期取息(到期繳息還本)
+			if ("2".equals(ln.getAmortizedCode())) {
+				throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
+
+			}
+			// 依 1.還本金額 2.還息金額
+			if (isRepayPrincipal) {
+				wkShortAmtLimit = wkPrincipal
+						.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
+						.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+				if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit
+						.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
+					wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
+				}
+				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
+				if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
+					wkUnpaidPrin = wkUnpaidPrin.add(wkUnpaidAmtRemaind);
+					wkUnpaidAmtRemaind = BigDecimal.ZERO;
+				} else {
+					wkUnpaidPrin = wkUnpaidPrin.add(wkShortAmtLimit);
+					wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
+				}
+			} else {
+				wkShortAmtLimit = wkInterest
+						.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
+						.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+				wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
+				if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
 					wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
 					wkUnpaidAmtRemaind = BigDecimal.ZERO;
 				} else {
-					wkUnpaidInt = wkUnpaidInt.add(wkInterest);
-					wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkInterest);
-				}
-			} else {
-				// 到期取息(到期繳息還本)
-				if ("2".equals(ln.getAmortizedCode())) {
-					throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
-
-				}
-				// 依 1.還本金額 2.還息金額
-				if (isRepayPrincipal) {
-					wkShortAmtLimit = wkPrincipal
-							.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
-							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-					if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit
-							.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
-						wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
-					}
-					wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
-					if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
-						wkUnpaidPrin = wkUnpaidPrin.add(wkUnpaidAmtRemaind);
-						wkUnpaidAmtRemaind = BigDecimal.ZERO;
-					} else {
-						wkUnpaidPrin = wkUnpaidPrin.add(wkShortAmtLimit);
-						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
-					}
-				} else {
-					wkShortAmtLimit = wkInterest
-							.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
-							.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-					wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(wkShortAmtLimit);
-					if (wkShortAmtLimit.compareTo(wkUnpaidAmtRemaind) >= 0) {
-						wkUnpaidInt = wkUnpaidInt.add(wkUnpaidAmtRemaind);
-						wkUnpaidAmtRemaind = BigDecimal.ZERO;
-					} else {
-						wkUnpaidInt = wkUnpaidInt.add(wkShortAmtLimit);
-						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
-					}
+					wkUnpaidInt = wkUnpaidInt.add(wkShortAmtLimit);
+					wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkShortAmtLimit);
 				}
 			}
 		}
-		this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + ", wkUnpaidPrin" + wkUnpaidPrin + ", wkUnpaidInt="
+		this.info("wkTotalShortAmtLimit= " + wkTotalShortAmtLimit + ", wkUnpaidPrin=" + wkUnpaidPrin + ", wkUnpaidInt="
 				+ wkUnpaidInt);
 	}
 
@@ -899,7 +900,6 @@ public class L3200 extends TradeBuffer {
 	private void calcRepayInt(LoanBorMain ln) throws LogicException {
 		checkMsg = " 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo();
 		isCalcRepayInt = false;
-		isLoanClose = false; // 最後一期期款
 		isRepayPrincipal = false; // 回收本金
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalBreachAmt);
 		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan);
@@ -1026,11 +1026,6 @@ public class L3200 extends TradeBuffer {
 		wkDelayInt = loanCalcRepayIntCom.getDelayInt();
 		wkBreachAmt = loanCalcRepayIntCom.getBreachAmt();
 		wkExtraRepay = loanCalcRepayIntCom.getExtraAmt();
-
-		// 最後一期期款/部分償還結案
-		if (loanCalcRepayIntCom.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
-			isLoanClose = true;
-		}
 
 		// 回收本金
 		if (wkPrincipal.compareTo(BigDecimal.ZERO) > 0) {
@@ -1391,7 +1386,8 @@ public class L3200 extends TradeBuffer {
 //		this.info("   tFacProd.getCharCode() = " + tFacProd.getCharCode());
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLoanBal(tLoanBorMain.getLoanBal().subtract(wkPrincipal));
-		if (tLoanBorMain.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
+		// 還清且無欠繳利息
+		if (tLoanBorMain.getLoanBal().compareTo(BigDecimal.ZERO) == 0 && wkUnpaidInt.compareTo(BigDecimal.ZERO) == 0) {
 			tLoanBorMain.setStatus(3);
 		}
 		if (isCalcRepayInt) {
@@ -1635,11 +1631,11 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTx.setUnpaidCloseBreach(wkUnpaidCloseBreach);// 短繳清償違約金
 		tLoanBorTx.setTxAmt(wkTxAmt);
 		tLoanBorTx.setTempAmt(wkTempAmt); // 暫收抵繳金額
+		tLoanBorTx.setShortfall(wkShortfall); // 全戶累短收金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
 			tLoanBorTx.setOverflow(wkOverflow); // 全戶累溢收金額
-			tLoanBorTx.setShortfall(wkShortfall); // 全戶累短收金額
 		} else if (isCalcRepayInt) {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		} else {
@@ -1881,9 +1877,6 @@ public class L3200 extends TradeBuffer {
 				iFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
 		// 全戶累溢收金額 = 累溢收(交易前 ) + 暫收抵繳(負值) + 本次溢收
 		wkOverflow = baTxCom.getExcessive().add(baTxCom.getExcessiveOther()).add(iTmpAmt).add(iOverAmt);
-		// 累短收金額 = 累短收(交易前 ) - 短收收回 + 本次短收
-		wkShortfall = baTxCom.getShortfall().subtract(iShortfallPrin).subtract(iShortfallInt)
-				.subtract(iShortCloseBreach).add(iShortAmt);
 
 		if (this.baTxList != null) {
 			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
@@ -1947,13 +1940,14 @@ public class L3200 extends TradeBuffer {
 		}
 	}
 
-	// 短繳期金
-	private void getSettleUnpaid() throws LogicException {
+	// 累短收回收
+	private void settleShortfall() throws LogicException {
 		isSettleUnpaid = false;
 		this.wkAcctFee = BigDecimal.ZERO;
 		this.wkModifyFee = BigDecimal.ZERO;
 		this.wkFireFee = BigDecimal.ZERO;
 		this.wkLawFee = BigDecimal.ZERO;
+		this.wkShortfall = BigDecimal.ZERO;// 累短收
 		this.wkShortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
 		this.wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 		this.wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
@@ -1964,6 +1958,7 @@ public class L3200 extends TradeBuffer {
 					if ((ba.getFacmNo() == wkFacmNo || ba.getFacmNo() == 0)
 							&& (ba.getBormNo() == wkBormNo || ba.getBormNo() == 0)) {
 						isSettleUnpaid = true;
+						this.wkShortfall = ba.getAcctAmt();
 						this.wkShortfallPrincipal = ba.getPrincipal();
 						this.wkShortfallInterest = ba.getInterest();
 						this.wkShortCloseBreach = ba.getCloseBreachAmt();

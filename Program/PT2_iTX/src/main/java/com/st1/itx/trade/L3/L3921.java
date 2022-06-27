@@ -23,6 +23,7 @@ import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
@@ -108,6 +109,7 @@ public class L3921 extends TradeBuffer {
 	private BigDecimal oBreachAmt = BigDecimal.ZERO;
 	private BigDecimal oCloseBreachAmt = BigDecimal.ZERO;
 	private BigDecimal wkExtraRepay = BigDecimal.ZERO;
+	private ArrayList<BaTxVo> baTxList;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -139,7 +141,8 @@ public class L3921 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 		// 各項費用
-		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
+		this.baTxList = new ArrayList<BaTxVo>();
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -253,7 +256,7 @@ public class L3921 extends TradeBuffer {
 			ln.setPieceCodeSecondAmt(BigDecimal.ZERO);
 			oRate = ln.getStoreRate();
 			oCurrencyCode = ln.getCurrencyCode();
-			oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal());
+			oPrincipal = oPrincipal.add(getPrincipal(ln, loanCalcRepayIntCom.getPrincipal()));
 			oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 			oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 			oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
@@ -365,6 +368,21 @@ public class L3921 extends TradeBuffer {
 			this.addList(this.totaVo);
 		}
 		return this.sendList();
+	}
+	//
+	private BigDecimal getPrincipal(LoanBorMain ln, BigDecimal principal) throws LogicException {
+		BigDecimal wkPrincipal = principal;
+		for (BaTxVo ba : baTxList) {
+			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo()
+					&& ln.getBormNo() == ba.getBormNo()) {
+				if (wkPrincipal.add(ba.getUnPaidAmt()).compareTo(ln.getLoanBal()) > 0) {
+					wkPrincipal = ln.getLoanBal().subtract(ba.getUnPaidAmt());
+					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 "
+							+ ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
+				}
+			}
+		}
+		return wkPrincipal;
 	}
 
 	private void addOccurs(LoanBorMain ln, TitaVo titaVo) throws LogicException {

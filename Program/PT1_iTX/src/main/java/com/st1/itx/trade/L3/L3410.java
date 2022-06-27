@@ -160,6 +160,7 @@ public class L3410 extends TradeBuffer {
 	private BigDecimal wkTotalBreachAmt = BigDecimal.ZERO;
 	private BigDecimal wkTotalUnpaidInt = BigDecimal.ZERO;
 	private BigDecimal wkTotalFee = BigDecimal.ZERO;
+	private BigDecimal wkShortfall = BigDecimal.ZERO; // 累短收
 	private BigDecimal wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 	private BigDecimal wkShortfallInterest = BigDecimal.ZERO; // 累短收-利息
 	private BigDecimal wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
@@ -745,11 +746,10 @@ public class L3410 extends TradeBuffer {
 		tLoanBorTx.setUnpaidInterest(wkInterest.add(wkDelayInt).add(wkBreachAmt));
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO); //
 		tLoanBorTx.setTempAmt(wkTempAmt); // 暫收抵繳金額
+		tLoanBorTx.setShortfall(wkShortfall); // 短收收回金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
-			tLoanBorTx.setTxAmt(BigDecimal.ZERO);
-			tLoanBorTx.setShortfall(iShortAmt.subtract(iReduceAmt));
 		} else {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		}
@@ -885,6 +885,7 @@ public class L3410 extends TradeBuffer {
 	// 貸方：短繳期金
 	private void getSettleUnpaid() throws LogicException {
 		lAcDetailFee = new ArrayList<AcDetail>();
+		this.wkShortfall = BigDecimal.ZERO;// 累短收
 		this.wkShortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
 		this.wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 		this.wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
@@ -904,20 +905,10 @@ public class L3410 extends TradeBuffer {
 						acDetail.setRvNo(ba.getRvNo());
 						acDetail.setReceivableFlag(ba.getReceivableFlag());
 						lAcDetailFee.add(acDetail);
-						// 短繳
-						if (ba.getRepayType() == 1) {
-							this.wkShortfallPrincipal = ba.getPrincipal();
-							this.wkShortfallInterest = ba.getInterest();
-							this.wkShortCloseBreach = ba.getCloseBreachAmt();
-						} else if (ba.getRepayType() == 4) {
-							this.wkAcctFee = this.wkAcctFee.add(ba.getAcctAmt());
-						} else if (ba.getRepayType() == 5) {
-							this.wkFireFee = this.wkFireFee.add(ba.getAcctAmt());
-						} else if (ba.getRepayType() == 6) {
-							this.wkModifyFee = this.wkModifyFee.add(ba.getAcctAmt());
-						} else if (ba.getRepayType() == 7) {
-							this.wkLawFee = this.wkLawFee.add(ba.getAcctAmt());
-						}
+						this.wkShortfall = ba.getAcctAmt();
+						this.wkShortfallPrincipal = ba.getPrincipal();
+						this.wkShortfallInterest = ba.getInterest();
+						this.wkShortCloseBreach = ba.getCloseBreachAmt();
 						ba.setAcctAmt(BigDecimal.ZERO);
 					}
 				}

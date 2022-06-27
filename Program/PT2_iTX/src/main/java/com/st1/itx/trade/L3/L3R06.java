@@ -324,7 +324,7 @@ public class L3R06 extends TradeBuffer {
 				oLoanBal = oLoanBal.add(ln.getLoanBal());
 				oRate = ln.getStoreRate();
 				oCurrencyCode = ln.getCurrencyCode();
-				oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal());
+				oPrincipal = oPrincipal.add(getPrincipal(ln, loanCalcRepayIntCom.getPrincipal()));
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
@@ -379,6 +379,21 @@ public class L3R06 extends TradeBuffer {
 		}
 
 		this.info("RepayAmtRoutine end ");
+	}
+
+	private BigDecimal getPrincipal(LoanBorMain ln, BigDecimal principal) throws LogicException {
+		BigDecimal wkPrincipal = principal;
+		for (BaTxVo ba : baTxList) {
+			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo()
+					&& ln.getBormNo() == ba.getBormNo()) {
+				if (wkPrincipal.add(ba.getUnPaidAmt()).compareTo(ln.getLoanBal()) > 0) {
+					wkPrincipal = ln.getLoanBal().subtract(ba.getUnPaidAmt());
+					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 "
+							+ ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
+				}
+			}
+		}
+		return wkPrincipal;
 	}
 
 	private void Sorting() throws LogicException {
@@ -457,7 +472,6 @@ public class L3R06 extends TradeBuffer {
 		oShortfallPrin = baTxCom.getShortfallPrincipal();
 		oShortCloseBreach = baTxCom.getShortCloseBreach();
 		oExcessive = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
-
 
 		this.info("   oAcctFee        = " + oAcctFee);
 		this.info("   oFireFee        = " + oFireFee);

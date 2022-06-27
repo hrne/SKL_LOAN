@@ -1417,11 +1417,11 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setShortfall(BigDecimal.ZERO);
 		tLoanBorTx.setTxAmt(wkTxAmt); //
 		tLoanBorTx.setTempAmt(wkTempAmt); // 暫收抵繳金額
+		tLoanBorTx.setShortfall(wkShortfall); // 短收收回金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
 			tLoanBorTx.setOverflow(wkOverflow); // 全戶累溢收金額
-			tLoanBorTx.setShortfall(wkShortfall); // 全戶累短收金額
 		} else {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		}
@@ -1848,9 +1848,6 @@ public class L3420 extends TradeBuffer {
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, iTxAmt, titaVo); // 99-費用全部(含未到期)
 		// 全戶累溢收金額 = 累溢收(交易前 ) + 暫收抵繳(負值) + 本次溢收
 		wkOverflow = baTxCom.getExcessive().add(baTxCom.getExcessiveOther()).add(iTmpAmt).add(iOverAmt);
-		// 累短收金額 = 累短收(交易前 ) - 短收收回 + 本次短收
-		wkShortfall = baTxCom.getShortfall().subtract(iShortfallPrin).subtract(iShortfallInt)
-				.subtract(iShortCloseBreach);
 	}
 
 	// 貸方 : 費用
@@ -1896,6 +1893,7 @@ public class L3420 extends TradeBuffer {
 	// 貸方：短繳
 	private void getSettleUnpaid() throws LogicException {
 		lAcDetailFee = new ArrayList<AcDetail>();
+		this.wkShortfall = BigDecimal.ZERO;// 累短收
 		this.wkShortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
 		this.wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 		this.wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
@@ -1919,7 +1917,7 @@ public class L3420 extends TradeBuffer {
 						acDetail.setRvNo(ba.getRvNo());
 						acDetail.setReceivableFlag(ba.getReceivableFlag());
 						lAcDetailFee.add(acDetail);
-						// 短繳
+						this.wkShortfall = ba.getAcctAmt();
 						this.wkShortfallPrincipal = ba.getPrincipal();
 						this.wkShortfallInterest = ba.getInterest();
 						this.wkShortCloseBreach = ba.getCloseBreachAmt();
