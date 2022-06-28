@@ -16,7 +16,6 @@ import com.st1.itx.eum.ContentName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
-import java.util.List;
 import java.io.*;
 import java.nio.file.Files;
 
@@ -405,8 +404,18 @@ public class MakeFile extends CommBuffer {
 			fw = new BufferedWriter(osw);
 			this.info("MakeFile.toFile opened");
 
-			for (HashMap<String, Object> map : listMap)
-				fw.write(map.get("d").toString() + "\r\n");
+			for (HashMap<String, Object> map : listMap) {
+				if (charsetName.toUpperCase(Locale.getDefault()).equals("BIG5")) {
+					String[] ss = map.get("d").toString().split("");
+					for (String s : ss)
+						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
+							fw.write("　");
+						else
+							fw.write(s);
+					fw.write("\r\n");
+				} else
+					fw.write(map.get("d").toString() + "\r\n");
+			}
 
 			this.info("MakeFile.toFile listmap");
 			fw.flush();

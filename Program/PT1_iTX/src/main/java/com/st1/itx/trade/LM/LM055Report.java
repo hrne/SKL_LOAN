@@ -50,8 +50,7 @@ public class LM055Report extends MakeReport {
 		this.info("LM055Report exec");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
-		
-		
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表",
 				"LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
 
@@ -75,6 +74,54 @@ public class LM055Report extends MakeReport {
 	}
 
 	private void exportExcel(List<Map<String, String>> listData) throws LogicException {
+
+		int col = 0;
+		int row = 0;
+
+//		BigDecimal normalAmount = BigDecimal.ZERO;
+//		BigDecimal specificAmount = BigDecimal.ZERO;
+//		BigDecimal allowAmount = BigDecimal.ZERO;
+
+		String type = "";
+		int kind = 0;
+		BigDecimal amount = BigDecimal.ZERO;
+
+		for (Map<String, String> r : listData) {
+			type = r.get("F0");
+			kind = Integer.valueOf(r.get("F1"));
+			amount = new BigDecimal(r.get("F2"));
+
+			switch (type) {
+			case "A":
+				row = 8;
+				break;
+			case "B":
+				row = 9;
+				break;
+			case "C":
+				row = 10;
+				break;
+			case "D":
+				row = 11;
+				break;
+			case "Z":
+				row = 12;
+				break;
+			case "ZZ":
+				row = 13;
+				break;
+			default:
+				break;
+			}
+		}
+		
+		col = kind + 5;
+		
+		makeExcel.setValue(row, col, amount, "#,##0");
+
+	}
+
+	private void exportExcel2(List<Map<String, String>> listData) throws LogicException {
 
 		int col = 0;
 		int colAllow = 0;

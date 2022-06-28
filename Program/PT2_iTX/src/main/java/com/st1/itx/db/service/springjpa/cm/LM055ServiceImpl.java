@@ -34,7 +34,231 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param yearMonth 西元年月
 	 * 
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
+
+		this.info("lM055.findAll");
+		this.info("yearMonth=" + yearMonth);
+		int ilYearMonth = 0 ;
+		int iYear = yearMonth / 100 ;
+		int iMonth = yearMonth % 100 ;
+		if(iMonth == 1){
+			ilYearMonth = (iYear - 1) * 100 + 12;
+		}else{
+			ilYearMonth = yearMonth - 1 ;
+		}
+
+		String sql = " ";
+		sql += "	WITH \"tempA\" AS (";
+		sql += "	SELECT ( CASE";
+		sql += "       	       WHEN M.\"ClCode1\" IN (3) THEN 'D'";
+		sql += "       	       WHEN M.\"ClCode1\" IN (1,2) ";
+		sql += "		 	    AND ( M.\"FacAcctCode\" = 340 ";
+		sql += "				 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') ";
+		sql += "				 OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z' ";
+		sql += "       	       WHEN M.\"ClCode1\" IN (1,2) THEN 'C' ";
+		sql += "       	     ELSE '99' END ) AS \"TYPE\"";
+		sql += "	      ,M.\"AssetClass\" AS \"KIND\"";
+		sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+		sql += "	FROM \"MonthlyFacBal\" M";
+		sql += "	WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  AND M.\"PrinBalance\" > 0";
+		sql += "	GROUP BY(CASE";
+		sql += "       	       WHEN M.\"ClCode1\" IN (3) THEN 'D'";
+		sql += "       	       WHEN M.\"ClCode1\" IN (1,2) ";
+		sql += "		 	    AND ( M.\"FacAcctCode\" = 340 ";
+		sql += "				 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') ";
+		sql += "				 OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z' ";
+		sql += "       	       WHEN M.\"ClCode1\" IN (1,2) THEN 'C' ";
+		sql += "       	     ELSE '99' END )";
+		sql += "	      ,M.\"AssetClass\"";
+		sql += "	),\"tempB\" AS (";
+		sql += "		SELECT 'A' AS \"ClNo\"";
+		sql += "          	  ,ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"AMT\"";
+		sql += "		FROM \"Ias39IntMethod\" I";
+		sql += "		LEFT JOIN \"MonthlyLoanBal\" MLB ON MLB.\"YearMonth\" = I.\"YearMonth\"";
+		sql += "										AND MLB.\"CustNo\" = I.\"CustNo\"";
+		sql += "										AND MLB.\"FacmNo\" = I.\"FacmNo\"";
+		sql += "										AND MLB.\"BormNo\" = I.\"BormNo\"";
+		sql += "		WHERE I.\"YearMonth\" = :yymm ";
+		sql += "	  	  AND MLB.\"AcctCode\" <> 990 ";
+		sql += "	),\"tempC\" AS (";
+		sql += "	SELECT RES.\"TYPE\" AS \"TYPE\" ";
+		sql += "		  ,RES.\"KIND\" AS \"KIND\" ";
+		sql += "		  ,SUM(RES.\"AMT\") AS \"AMT\"";
+		sql += "	FROM (";
+		sql += "	SELECT ( CASE";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+		sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
+		sql += "			   ELSE '99'";
+		sql += "			 END ) AS \"TYPE\"";
+		sql += "		  ,( CASE";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+		sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
+		sql += "			   ELSE '99'";
+		sql += "			 END ) AS \"KIND\"";
+		sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+		sql += "	FROM \"MonthlyFacBal\" M";
+		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
+		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
+		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
+		sql += "	LEFT JOIN \"CdIndustry\" CDI ON CDI.\"IndustryCode\" = CM.\"IndustryCode\"";
+		sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
+		sql += "	WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  AND M.\"PrinBalance\" > 0";
+		sql += "	  AND M.\"PrevIntDate\"  >= :lyymmdd";
+		sql += "	GROUP BY ( CASE";
+		sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
+		sql += "			     WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+		sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
+		sql += "			     ELSE '99'";
+		sql += "			   END ) ";
+		sql += "		    ,( CASE";
+		sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN '3'";
+		sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+		sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND M.\"ProdNo\" NOT IN ('60','61','62') AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+		sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
+		sql += "			     ELSE '99'";
+		sql += "			   END ))RES ";
+		sql += "	WHERE RES.\"KIND\" IN (1)";
+		sql += "	GROUP BY RES.\"TYPE\"";
+		sql += "			,RES.\"KIND\"";
+		sql += "	),\"tempD\" AS (";
+		sql += "	SELECT SUM(M.\"IntAmtAcc\") AS \"AMT\" ";
+		sql += "	FROM \"MonthlyLoanBal\" M";
+		sql += "	WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  AND M.\"LoanBalance\" > 0 ";
+		sql += "	),\"tempE\" AS (";
+		sql += "	SELECT ( CASE";
+		sql += "			   WHEN M.\"ClCode1\" IN (3) THEN 'D'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+		sql += "			   ELSE '99'";
+		sql += "			 END ) AS \"TYPE\"";
+		sql += "		  ,( CASE";
+		sql += "			   WHEN M.\"OvduTerm\" IN (3,4,5) THEN '1' ";
+		sql += "			   WHEN M.\"AcctCode\" = 990 THEN '1' ";
+		sql += "			   WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 AND M.\"AcctCode\" <> 990 THEN '1' ";
+		sql += "			   WHEN M.\"OvduTerm\" IN (1,2) THEN '2'";
+		sql += "			   ELSE '3'";
+		sql += "			 END ) AS \"KIND\"";
+		sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+		sql += "	FROM \"MonthlyFacBal\" M";
+		sql += "	WHERE M.\"YearMonth\" = :yymm";
+		sql += "	  AND M.\"PrinBalance\" > 0";
+		sql += "	GROUP BY(CASE";
+		sql += "			   WHEN M.\"ClCode1\" IN (3) THEN 'D'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') OR REGEXP_LIKE(M.\"ProdNo\",'8[1-8]')) THEN 'Z'";
+		sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+		sql += "			   ELSE '99'";
+		sql += "			 END )";
+		sql += "		  ,( CASE";
+		sql += "			   WHEN M.\"OvduTerm\" IN (3,4,5) THEN '1' ";
+		sql += "			   WHEN M.\"AcctCode\" = 990 THEN '1' ";
+		sql += "			   WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 AND M.\"AcctCode\" <> 990 THEN '1' ";
+		sql += "			   WHEN M.\"OvduTerm\" IN (1,2) THEN '2'";
+		sql += "			   ELSE '3'";
+		sql += "			 END )";
+		sql += "	),\"tempF\" AS (";
+		sql += "	SELECT 'ZZ' AS \"TYPE\"";
+		sql += "		  ,4 AS \"KIND\"";
+		sql += "		  ,\"LoanBal\" AS \"AMT\"";
+		sql += "	FROM \"MonthlyLM052AssetClass\"";
+		sql += "	WHERE \"YearMonth\" = :yymm";
+		sql += "	  AND \"AssetClassNo\" = 62 ";
+		sql += "	UNION";
+		sql += "    SELECT 'ZZ' AS \"TYPE\"";
+		sql += "          ,3 AS \"KIND\"";
+		sql += "		  ,NVL(R.\"LnAmt\",0) AS \"AMT\"";
+		sql += "    FROM (";
+		sql += "		SELECT ROUND(SUM(NVL(I.\"AccumDPAmortized\", 0)),0) AS \"LnAmt\"";
+		sql += "    	FROM \"Ias39IntMethod\" I";
+		sql += "        LEFT JOIN \"MonthlyLoanBal\" MLB ON I.\"YearMonth\" = MLB.\"YearMonth\" ";
+		sql += "                                        AND I.\"CustNo\" = MLB.\"CustNo\" ";
+		sql += "                                        AND I.\"FacmNo\" = MLB.\"FacmNo\" ";
+		sql += "                                        AND I.\"BormNo\" = MLB.\"BormNo\"";
+		sql += "        WHERE I.\"YearMonth\" IN (:yymm) ";
+		sql += "          AND MLB.\"AcctCode\" <> 990 ) R";
+		sql += "	)";
+		sql += "	SELECT R.\"TYPE\" AS F0";
+		sql += "		  ,R.\"KIND\" AS F1";
+		sql += "		  ,R.\"AMT\" AS F2";
+		sql += "		  ,CASE";
+		sql += "			 WHEN R.\"KIND\" = 1 THEN '逾期放款' ";
+		sql += "			 WHEN R.\"KIND\" = 2 THEN '未列入逾期應予評估放款' ";
+		sql += "			 WHEN R.\"KIND\" = 3 THEN '正常放款I' ";
+		sql += "			 WHEN R.\"KIND\" = 4 THEN '應予注意II' ";
+		sql += "			 WHEN R.\"KIND\" = 5 THEN '可望收回III'";
+		sql += "			 WHEN R.\"KIND\" = 6 THEN '收回困難IV'";
+		sql += "			 WHEN R.\"KIND\" = 7 THEN '收回無望V'";
+		sql += "			 WHEN R.\"KIND\" = 8 THEN '備抵損失I' ";
+		sql += "			 WHEN R.\"KIND\" = 9 THEN '備抵損失II' ";
+		sql += "			 WHEN R.\"KIND\" = 10 THEN '備抵損失III' ";
+		sql += "			 WHEN R.\"KIND\" = 11 THEN '備抵損失IV' ";
+		sql += "			 WHEN R.\"KIND\" =12 THEN '備抵損失V'";
+		sql += "		   END AS F3";
+		sql += "	FROM ( ";
+		sql += "		SELECT E.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,TO_NUMBER(E.\"KIND\") AS \"KIND\"";
+		sql += "			  ,E.\"AMT\" AS \"AMT\"";
+		sql += "		FROM \"tempE\" E";
+		sql += "		WHERE E.\"TYPE\" IN (1,2)";
+		sql += "		UNION";
+		sql += "		SELECT A.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,TO_NUMBER(A.\"KIND\") + 2 AS \"KIND\"";
+		sql += "			  ,A.\"AMT\" AS \"AMT\"";
+		sql += "		FROM \"tempA\" A";
+		sql += "		UNION";
+		sql += "		SELECT A.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,TO_NUMBER(A.\"KIND\") + 7 AS \"KIND\"";
+		sql += "			  ,ROUND(";
+		sql += "			   CASE ";
+		sql += "			  	 WHEN A.\"KIND\" = 1 AND A.\"TYPE\" = 'D' THEN A.\"AMT\" * 0.005 ";
+		sql += "			  	 WHEN A.\"KIND\" = 1 THEN (A.\"AMT\" ";
+		sql += "				      + (SELECT NVL(B.\"AMT\",0) FROM \"tempB\" B)) * 0.005 ";
+		sql += "					  + C.\"AMT\" * 0.01 ";
+		sql += "			  	 WHEN A.\"KIND\" = 2 AND A.\"TYPE\" = 'C' THEN A.\"AMT\" * 0.02 ";
+		sql += "					  + (SELECT NVL(D.\"AMT\",0) FROM \"tempD\" D) * 0.02 ";
+		sql += "			  	 WHEN A.\"KIND\" = 2 THEN A.\"AMT\" * 0.02 ";
+		sql += "			  	 WHEN A.\"KIND\" = 3 THEN A.\"AMT\" * 0.1 ";
+		sql += "			  	 WHEN A.\"KIND\" = 4 THEN A.\"AMT\" * 0.5 ";
+		sql += "			  	 WHEN A.\"KIND\" = 5 THEN A.\"AMT\" * 1";
+		sql += "			   END , 0 ) AS \"AMT\"";
+		sql += "		FROM \"tempA\" A";
+		sql += "		LEFT JOIN \"tempC\" C ON C.\"TYPE\" = A.\"TYPE\"";
+		sql += "							 AND C.\"KIND\" = A.\"KIND\"";
+		sql += "		UNION";
+		sql += "		SELECT F.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,TO_NUMBER(F.\"KIND\") AS \"KIND\"";
+		sql += "			  ,NVL(F.\"AMT\",0) AS \"AMT\"";
+		sql += "		FROM \"tempF\" F";
+		sql += "		UNION";
+		sql += "		SELECT F.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,TO_NUMBER(F.\"KIND\") + 5 AS \"KIND\"";
+		sql += "			  ,ROUND(";
+		sql += "			   CASE ";
+		sql += "			  	 WHEN F.\"KIND\" = 3 THEN F.\"AMT\" * 0.005 ";
+		sql += "			  	 WHEN F.\"KIND\" = 4 THEN F.\"AMT\" * 0.02 ";
+		sql += "			   END , 0 ) AS \"AMT\"";
+		sql += "		FROM \"tempF\" F";
+		sql += "		WHERE F.\"KIND\" IN (3,4)";
+		sql += "	)R";
+		sql += "	ORDER BY R.\"KIND\"";
+	
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", yearMonth);
+		query.setParameter("lyymmdd", ilYearMonth);
+		return this.convertToMap(query);
+	}
+
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {
 
 		this.info("lM055.findAll");
 		this.info("yearMonth=" + yearMonth);
@@ -46,9 +270,9 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		 * 備抵損失-催收款項-營業稅提撥 或 RBC表的RBC工作表I41欄 來源參考公式
 		 *
 		 *
-		 * 溢折價與催收費用 
-		 * 10600304000 擔保放款-溢折價 
-		 * 10601301000 催收款項-法務費用 
+		 * 溢折價與催收費用
+		 * 10600304000 擔保放款-溢折價
+		 * 10601301000 催收款項-法務費用
 		 * 10601302000 催收款項-火險費用
 		 * 10601304000 催收款項-溢折價
 		 */
@@ -85,7 +309,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"PrinBalance\" > 0";
 		sql += "	  AND SUBSTR(M.\"AssetClass\",0,1) = '1' ";
-//		sql += "	  AND M.\"AssetClass\" IS NOT NULL";
+		// sql += " AND M.\"AssetClass\" IS NOT NULL";
 		sql += "	GROUP BY ( CASE";
 		sql += "       	         WHEN M.\"OvduTerm\" IN (3,4,5,6) OR M.\"Status\" IN (2,6,7) THEN '1'";
 		sql += "       	       ELSE '2' END )";
@@ -110,7 +334,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  		 AND M.\"PrinBalance\" > 0";
 		sql += "	 		 AND SUBSTR(M.\"AssetClass\",0,1) <> '1' ";
-//		sql += "	  		 AND M.\"AssetClass\" IS NULL";
+		// sql += " AND M.\"AssetClass\" IS NULL";
 		sql += "	       GROUP BY (CASE";
 		sql += "					   WHEN \"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 		sql += "					   WHEN \"ClCode1\" IN (1,2) THEN 'C'";
@@ -146,7 +370,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"PrinBalance\" > 0";
 		sql += "	  AND SUBSTR(M.\"AssetClass\",0,1) <> '1' ";
-//		sql += "	  AND M.\"AssetClass\" IS NOT NULL";
+		// sql += " AND M.\"AssetClass\" IS NOT NULL";
 		sql += "	GROUP BY (CASE";
 		sql += "       	        WHEN M.\"PrinBalance\" = 1 THEN '7'";
 		sql += "       	        WHEN M.\"OvduTerm\" >= 12 AND M.\"ProdNo\" IN ('60','61','62') THEN '4'";
@@ -172,7 +396,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"PrinBalance\" > 0";
 		sql += "	  AND SUBSTR(M.\"AssetClass\",0,1) <> '1' ";
-//		sql += "	  AND M.\"AssetClass\" IS NULL";
+		// sql += " AND M.\"AssetClass\" IS NULL";
 		sql += "	  AND F.\"UsageCode\" = '02'";
 		sql += "	GROUP BY ( CASE";
 		sql += "       	         WHEN M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]') THEN 'Z'";
@@ -195,7 +419,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  	 			   	  AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  		 AND M.\"PrinBalance\" > 0";
-//		sql += "	  	   	 AND M.\"AssetClass\" IS NULL";
+		// sql += " AND M.\"AssetClass\" IS NULL";
 		sql += "	  		 AND SUBSTR(M.\"AssetClass\",0,1) <> '1' ";
 		sql += "	       GROUP BY DECODE(F.\"UsageCode\",'02','12','11')";
 		sql += "	       UNION";
@@ -214,7 +438,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  		 AND M.\"PrinBalance\" > 0";
 		sql += "	  		 AND SUBSTR(M.\"AssetClass\",0,1) = '1' ";
-//		sql += "	  	   	 AND M.\"AssetClass\" IS NOT NULL";
+		// sql += " AND M.\"AssetClass\" IS NOT NULL";
 		sql += "	       GROUP BY (CASE";
 		sql += "       	       		   WHEN M.\"PrinBalance\" = 1 THEN '5'";
 		sql += "       	       		   WHEN M.\"OvduTerm\" >= 12 AND M.\"ProdNo\" IN ('60','61','62') THEN '2'";
@@ -249,163 +473,4 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-//	@SuppressWarnings({ "unchecked" })
-//	public List<Map<String, String>> findAll_1(TitaVo titaVo) throws Exception {
-//
-//		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-//		String iYYMM = iENTDY.substring(0, 6);
-//
-//		this.info("lM055.findAll_1 ENTDY=" + iENTDY + ",YYMM=" + iYYMM);
-//
-//		// 手搞
-//
-//		String sql = "SELECT I.\"CustNo\"                             F0";
-//		sql += "            ,I.\"CustId\"                             F1";
-//		sql += "            ,I.\"FacmNo\"                             F2";
-//		sql += "            ,I.\"BormNo\"                             F3";
-//		sql += "            ,I.\"LoanBal\"                            F4";
-//		sql += "            ,I.\"OvduDays\"                           F5";
-//		sql += "            ,I.\"OvduDate\"                           F6";
-//		sql += "            ,I.\"ClTypeJCIC\"                         F7";
-//		sql += "            ,I.\"RateCode\"                       F8";
-//		sql += "            ,CASE WHEN I.\"AssetKind\" = NULL THEN '#N/A'";
-//		sql += "                  WHEN I.\"AssetKind\" = 0    THEN '#N/A'";
-//		sql += "             ELSE CAST(I.\"AssetKind\" AS CHAR) END   F9";
-//		sql += "            ,CASE WHEN I.\"OvduDate\" > 0 THEN '催'";
-//		sql += "                  WHEN I.\"OvduDays\" = 0 THEN '#N/A'";
-//		sql += "             ELSE CAST(I.\"OvduTerm\" AS CHAR) END    F10";
-//		sql += "            ,I.\"AcctCode\"                           F11";
-//		sql += "            ,I.\"Project\"                            F12";
-//		sql += "            ,DECODE(I.\"Project\"";
-//		sql += "                  ,'*'";
-//		sql += "                  ,'Z'";
-//		sql += "                  ,I.\"LoanType\")                    F13";
-//		sql += "            ,I.\"Project\"                            F14";
-//		sql += "      FROM (SELECT  I.\"CustNo\"";
-//		sql += "                   ,I.\"CustId\"";
-//		sql += "                   ,I.\"FacmNo\"";
-//		sql += "                   ,I.\"BormNo\"";
-//		sql += "                   ,I.\"AcCode\"";
-//		sql += "                   ,I.\"RateCode\"";
-//		sql += "                   ,I.\"LoanBal\"";
-//		sql += "                   ,I.\"OvduDays\"";
-//		sql += "                   ,I.\"OvduDate\"";
-//		sql += "                   ,I.\"ClTypeJCIC\"";
-//		sql += "                   ,I.\"ProdNo\"";
-//		sql += "                   ,I.\"AssetKind\"";
-//		sql += "                   ,M.\"OvduTerm\"";
-//		sql += "                   ,M.\"AcctCode\"";
-//		sql += "                   ,CASE WHEN M.\"AcctCode\" = '340' THEN '*'";
-//		sql += "                         WHEN I.\"RateCode\" IN ('IA', 'IB', 'IC', 'ID', 'IE', 'IF', 'IG', 'IH') THEN '*'";
-//		sql += "                         WHEN I.\"RateCode\" IN ('81', '82', '83', '84', '85', '86', '87', '88') THEN '*'";
-//		sql += "                    ELSE '' END \"Project\"";
-//		sql += "                   ,CASE WHEN I.\"ClTypeJCIC\" =    '1H' THEN 'E'";
-//		sql += "                         WHEN I.\"ClTypeJCIC\" LIKE '1%' THEN 'D'";
-//		sql += "                         WHEN I.\"ClTypeJCIC\" LIKE '2%' THEN 'C'";
-//		sql += "                         WHEN I.\"ClTypeJCIC\" LIKE '3%' THEN 'B'";
-//		sql += "                         WHEN I.\"ClTypeJCIC\" LIKE '4%' THEN 'B'";
-//		sql += "                    ELSE 'A' END \"LoanType\"";
-//		sql += "            FROM \"Ias34Ap\" I";
-//		sql += "            LEFT JOIN \"MonthlyFacBal\" M ON M.\"YearMonth\" = :yymm";
-//		sql += "                                         AND M.\"CustNo\"    =  I.\"CustNo\"";
-//		sql += "                                         AND M.\"FacmNo\"    =  I.\"FacmNo\"";
-//		sql += "                                             WHERE I.\"DataYM\" = :yymm) I";
-//		sql += "      ORDER BY I.\"CustNo\"";
-//		sql += "              ,I.\"FacmNo\"";
-//		sql += "              ,I.\"BormNo\"";
-//
-//		this.info("sql=" + sql);
-//
-//		Query query;
-//		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-//		query = em.createNativeQuery(sql);
-//		query.setParameter("yymm", iYYMM);
-//		return this.convertToMap(query);
-//	}
-
 }
-
-//String sql = "SELECT I.\"CustNo\"                             F0";
-//sql += "            ,I.\"CustId\"                             F1";
-//sql += "            ,I.\"FacmNo\"                             F2";
-//sql += "            ,I.\"ApplNo\"                             F3";
-//sql += "            ,I.\"BormNo\"                             F4";
-//sql += "            ,I.\"AcCode\"                             F5";
-//sql += "            ,I.\"Status\"                             F6";
-//sql += "            ,I.\"FirstDrawdownDate\"                  F7";
-//sql += "            ,I.\"DrawdownDate\"                       F8";
-//sql += "            ,I.\"FacLineDate\"                        F9";
-//sql += "            ,I.\"MaturityDate\"                       F10";
-//sql += "            ,I.\"LineAmt\"                            F11";
-//sql += "            ,I.\"LoanBal\"                            F12";
-//sql += "            ,I.\"IntAmt\"                             F13";
-//sql += "            ,I.\"Fee\"                                F14";
-//sql += "            ,I.\"Rate\"                               F15";
-//sql += "            ,I.\"OvduDays\"                           F16";
-//sql += "            ,I.\"OvduDate\"                           F17";
-//sql += "            ,I.\"IndustryCode\"                       F18";
-//sql += "            ,I.\"ClTypeJCIC\"                         F19";
-//sql += "            ,I.\"CityCode\"                           F20";
-//sql += "            ,I.\"RateCode\"                       F21";
-//sql += "            ,I.\"CustKind\"                           F22";
-//sql += "            ,CASE WHEN I.\"AssetKind\" = NULL THEN '#N/A'";
-//sql += "                  WHEN I.\"AssetKind\" = 0    THEN '#N/A'";
-//sql += "             ELSE CAST(I.\"AssetKind\" AS CHAR) END   F23";
-//sql += "            ,I.\"ProdNo\"                             F24";
-//sql += "            ,CASE WHEN I.\"AssetKind\" = NULL THEN '#N/A'";
-//sql += "                  WHEN I.\"AssetKind\" = 0    THEN '#N/A'";
-//sql += "             ELSE CAST(I.\"AssetKind\" AS CHAR) END   F25";
-//sql += "            ,CASE WHEN I.\"OvduDate\" > 0 THEN '催'";
-//sql += "                  WHEN I.\"OvduDays\" = 0 THEN '#N/A'";
-//sql += "             ELSE CAST(I.\"OvduTerm\" AS CHAR) END    F26";
-//sql += "            ,I.\"AcctCode\"                           F27";
-//sql += "            ,I.\"Project\"                            F28";
-//sql += "            ,DECODE(I.\"Project\"";
-//sql += "                  ,'*'";
-//sql += "                  ,'Z'";
-//sql += "                   ,I.\"LoanType\")                   F29";
-//sql += "      FROM (SELECT I.\"CustNo\"";
-//sql += "                  ,I.\"CustId\"";
-//sql += "                  ,I.\"FacmNo\"";
-//sql += "                  ,I.\"BormNo\"";
-//sql += "                  ,I.\"AcCode\"";
-//sql += "                  ,I.\"Status\"";
-//sql += "                  ,I.\"FirstDrawdownDate\"";
-//sql += "                  ,I.\"DrawdownDate\"";
-//sql += "                  ,I.\"FacLineDate\"";
-//sql += "                  ,I.\"MaturityDate\"";
-//sql += "                  ,I.\"LineAmt\"";
-//sql += "                  ,I.\"LoanBal\"";
-//sql += "                  ,I.\"IntAmt\"";
-//sql += "                  ,I.\"Fee\"";
-//sql += "                  ,I.\"Rate\"";
-//sql += "                  ,I.\"OvduDays\"";
-//sql += "                  ,I.\"OvduDate\"";
-//sql += "                  ,I.\"IndustryCode\"";
-//sql += "                  ,I.\"ClTypeJCIC\"";
-//sql += "                  ,I.\"CityCode\"";
-//sql += "                  ,I.\"RateCode\"";
-//sql += "                  ,I.\"CustKind\"";
-//sql += "                  ,I.\"ProdNo\"";
-//sql += "                  ,I.\"AssetKind\"";
-//sql += "                  ,M.\"OvduTerm\"";
-//sql += "                  ,M.\"AcctCode\"";
-//sql += "                  ,I.\"ApplNo\"";
-//sql += "                  ,CASE WHEN M.\"AcctCode\" = '340' THEN '*'";
-//sql += "                        WHEN I.\"ProdNo\" LIKE 'I%' THEN '*'";
-//sql += "                        WHEN I.\"ProdNo\" LIKE '8%' THEN '*'";
-//sql += "                   ELSE ' ' END \"Project\"";
-//sql += "                  ,CASE WHEN I.\"ClTypeJCIC\" = '1H' THEN 'E'";
-//sql += "                        WHEN I.\"ClTypeJCIC\" LIKE '1%' THEN 'D'";
-//sql += "                        WHEN I.\"ClTypeJCIC\" LIKE '2%' THEN 'C'";
-//sql += "                        WHEN I.\"ClTypeJCIC\" LIKE '3%' THEN 'B'";
-//sql += "                        WHEN I.\"ClTypeJCIC\" LIKE '4%' THEN 'B'";
-//sql += "                   ELSE 'A' END \"LoanType\"";
-//sql += "            FROM \"Ias34Ap\" I";
-//sql += "            LEFT JOIN \"MonthlyFacBal\" M ON M.\"YearMonth\" = :yymm";
-//sql += "                                         AND M.\"CustNo\"    =  I.\"CustNo\"";
-//sql += "                                         AND M.\"FacmNo\"    =  I.\"FacmNo\"";
-//sql += "            WHERE I.\"DataYM\" = :yymm) I";
-//sql += "      ORDER BY I.\"CustNo\"";
-//sql += "              ,I.\"FacmNo\"";
-//sql += "              ,I.\"BormNo\"";

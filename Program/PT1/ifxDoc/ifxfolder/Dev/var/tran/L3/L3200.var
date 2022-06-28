@@ -953,7 +953,6 @@ V(5,1,#SumRepayAmt)
 C(3,#Precision,0,E(0,#TwRepayAmt),E(0,#UsRepayAmt))
 
 
-
 !催收收回金額
 #FdOvduRepay=X,2,L
 
@@ -979,6 +978,11 @@ C(3,#RepayType,12,s,$)
 IF(#RepayType==1 ||#RepayType==2,$,s)
 HELP(#YNHelp)
 @V(H,#YNHelp)
+IF(#PayFeeFlag=="N",E(0,@SumRepayAmt,#L3r06RepayAmt+#L3r06Shortfall),E(0,@SumRepayAmt,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall))
+E(0,@TwRepayAmt,#SumRepayAmt)
+E(0,@UsRepayAmt,#SumRepayAmt)
+E(0,@TimRepayAmt,#SumRepayAmt)
+
 
 #PayFeeFlagX=X,2,L
 T(3,)T(H,#PayFeeFlag,#YNHelp)

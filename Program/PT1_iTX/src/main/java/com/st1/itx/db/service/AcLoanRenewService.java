@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcLoanRenew;
@@ -67,6 +69,17 @@ public interface AcLoanRenewService {
    * @return Slice AcLoanRenew AcLoanRenew of List
    */
   public Slice<AcLoanRenew> findL2079(int custNo_0, int custNo_1, int oldFacmNo_2, int oldFacmNo_3, int newFacmNo_4, int newFacmNo_5, int acDate_6, int acDate_7, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustNo =
+   *
+   * @param custNo_0 custNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcLoanRenew AcLoanRenew of List
+   */
+  public Slice<AcLoanRenew> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By AcLoanRenew

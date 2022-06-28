@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcLoanRenew implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8067053747456000169L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcLoanRenewId acLoanRenewId;
 
   // 戶號
