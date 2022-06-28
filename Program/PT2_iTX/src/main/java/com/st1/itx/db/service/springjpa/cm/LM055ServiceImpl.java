@@ -204,7 +204,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  ,TO_NUMBER(E.\"KIND\") AS \"KIND\"";
 		sql += "			  ,E.\"AMT\" AS \"AMT\"";
 		sql += "		FROM \"tempE\" E";
-		sql += "		WHERE E.\"TYPE\" IN (1,2)";
+		sql += "		WHERE E.\"KIND\" IN (1,2)";
 		sql += "		UNION";
 		sql += "		SELECT A.\"TYPE\" AS \"TYPE\"";
 		sql += "			  ,TO_NUMBER(A.\"KIND\") + 2 AS \"KIND\"";

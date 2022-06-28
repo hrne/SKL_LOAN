@@ -1,0 +1,264 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#KeyInq=X,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2079)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,21)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L2079]                                 展期件新舊對照查詢"],
+["#FdMain+查詢條件","@(借戶戶號、年月起訖，需擇一輸入)"],
+["#FdCustNo+戶號",#CustNo],
+["#FdYearStart+年月起訖",#YearStart,"/",#MonthStart,"@～@",#YearEnd,"/",#MonthEnd],
+["#FdOldFacmNo+原額度",#OldFacmNo],
+["#FdNewFacmNo+新額度",#NewFacmNo],
+]
+
+#FdMain=X,2,L
+T(3,*)
+#FdCustNo=X,2,L
+#FdYearStart=X,2,L
+T(3,*)
+#FdOldFacmNo=X,2,L
+#FdNewFacmNo=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,26,S
+T(3,CdCode.RenewCode)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@RenewCodeHelp,#HelpDesc1) 
+
+#RenewCodeHelp=x,1024,S
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+
+#NTXBUF=X,34,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@YearStart,#NTXBUF,8,3)
+T(1,@MonthStart,#NTXBUF,11,2)
+T(1,@YearEnd,#NTXBUF,13,3)
+T(1,@MonthEnd,#NTXBUF,16,2)
+T(1,@OldFacmNo,#NTXBUF,18,3)
+T(1,@NewFacmNo,#NTXBUF,21,3)
+
+! 戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+
+#DATE=D,8,S
+T(4,DATE$)
+
+! 年月起
+#YearStart=A,3,I
+C(3,#CHAIN,1,s,$)
+IF(#CustNo>0,S,$)
+T(1,#DATE,2,3)
+@V(2,0)
+#MonthStart=A,2,I
+C(3,#CHAIN,1,s,$)
+IF(#CustNo>0,S,$)
+E(0,1)
+@V(5,1,12)
+
+#YearMonthStart=A,5,S
+T(2,#YearStart+#MonthStart)
+
+
+! 年月迄
+#YearEnd=A,3,I
+C(3,#CHAIN,1,s,$)
+IF(#CustNo>0,S,$)
+E(0,#YearStart)
+@V(5,#YearStart,999)
+
+#MonthEnd=A,2,I
+C(3,#CHAIN,1,s,$)
+IF(#CustNo>0,S,$)
+E(0,#MonthStart)
+@IF(#YearStart == #YearEnd,V(5,#MonthStart,12),V(5,1,12))
+
+#YearMonthEnd=A,5,S
+T(2,#YearEnd+#MonthEnd)
+
+! 原額度
+#OldFacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+! 新額度
+#NewFacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2079 ----------
+<sub type="FORM" name="L2079">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2079,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2079] 展期件新舊對照)
+
+
+!修改
+#FUNC2=A,1,S
+E(0,2)
+
+!複製
+#FUNC3=A,1,S
+E(0,1)
+
+!刪除
+#FUNC4=A,1,S
+E(0,4)
+
+!查詢
+#FUNC5=A,1,S
+E(0,5)
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,L
+#OOOldFacmNo=A,3,L
+#OOOldBormNo=A,3,L
+#OONewFacmNo=A,3,L
+#OONewBormNo=A,3,L
+#OORenewCode=X,1,L
+#OORenewCodeX=x,4,L
+T(H,#OORenewCode,#RenewCodeHelp)
+#OOMainFlag=X,1,L
+#OOAcDate=D,7,L
+#OONegNo=A,8,L
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustNo
+#YearMonthStart
+#YearMonthEnd
+#OldFacmNo
+#NewFacmNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2079
+#OOCustNo
+#OOOldFacmNo
+#OOOldBormNo
+#OONewFacmNo
+#OONewBormNo
+#OORenewCode
+#OOMainFlag
+#OOAcDate
+#OONegNo
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2079" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">
+[
+["[L2079]                                 展期件新舊對照查詢"],
+[""],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L2079
+#any={detail:true, header:'L2079.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOCustNo=戶號
+{width:100,align:'center'}
+#OOOldFacmNo=舊額度號碼
+{width:100,align:'center'}
+#OOOldBormNo=舊撥款序號
+{width:100,align:'center'}
+#OONewFacmNo=新額度號碼
+{width:100,align:'center'}
+#OONewBormNo=新撥款序號
+{width:100,align:'center'}
+#OORenewCodeX=展期記號
+{width:90,align:'center'}
+#OOMainFlag=主要記號
+{width:90,align:'center'}
+#OOAcDate=會計日期
+{width:90,align:'center'}
+#OONegNo=協議編號
+{width:90,align:'center'}
+^
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

@@ -124,7 +124,9 @@ BEGIN
           ,CUAP."CUSWTL"                  AS "CurrCompTel"         -- 任職機構電話 VARCHAR2 16 
           ,CUAP."CUSTIT"                  AS "JobTitle"            -- 職位名稱 NVARCHAR2 20 
           ,CUAP."CUSSVY"                  AS "JobTenure"           -- 服務年資 VARCHAR2 2 
-          ,NVL(CUAP."CUSYIN",0)           AS "IncomeOfYearly"      -- 年收入 DECIMAL 9 
+          -- 2022-06-28 Wei From 家興:資料轉換轉入時單位改為仟元
+          ,TRUNC(NVL(CUAP."CUSYIN",0) / 1000)
+                                          AS "IncomeOfYearly"      -- 年收入 DECIMAL 9 
           ,CUAP."CUSIYM"                  AS "IncomeDataDate"      -- 年收入資料年月 VARCHAR2 6 
           ,CUAP."CUSPNO"                  AS "PassportNo"          -- 護照號碼 VARCHAR2 20 
           ,CUAP."AMLOCD"                  AS "AMLJobCode"          -- AML職業別 VARCHAR2 3 

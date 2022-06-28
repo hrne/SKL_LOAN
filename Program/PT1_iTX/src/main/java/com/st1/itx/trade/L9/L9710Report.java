@@ -156,15 +156,15 @@ public class L9710Report extends MakeReport {
 //				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
 				// 不同地區別
 				if (!f1.equals(tL9710Vo.get("CityCode"))) {
-					divderCount++;
 					if (tempCount % 40 > 1) {
+						divderCount++;
 						reportTot();
 						tempCount = (tempCount % 40) + (3 * divderCount);
 					}
 					if (f0.equals(tL9710Vo.get("F0"))) {
 						ptfg = 0;
 					}
-					info("tempCount" + count + "=" + (tempCount + 3));
+					info("tempCount" + count + "=" + tempCount);
 				}
 
 //				f0 = tL9710Vo.get("F0");

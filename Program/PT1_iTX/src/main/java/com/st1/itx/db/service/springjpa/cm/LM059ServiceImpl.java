@@ -57,10 +57,16 @@ public class LM059ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           UNION ALL";
 		sql += "           SELECT 1 AS \"Group\"";
 		sql += "                 ,0 AS \"LoanBalance\"";
-		sql += "                 ,A.\"TdBal\"";
-		sql += "           FROM \"AcMain\" A";
-		sql += "           WHERE A.\"MonthEndYm\" = :yymm";
-		sql += "             AND A.\"AcctCode\" IN ('F18')"; // 備抵呆帳－催收款項－放款部 2021/2/4
+		sql += "                 ,\"LegalLoss\" AS \"TdbBal\"";
+		sql += "           FROM \"MonthlyLM052Loss\" ";
+		sql += "           WHERE \"YearMonth\" = :yymm";
+//		sql += "           UNION ALL";
+//		sql += "           SELECT 1 AS \"Group\"";
+//		sql += "                 ,0 AS \"LoanBalance\"";
+//		sql += "                 ,A.\"TdBal\"";
+//		sql += "           FROM \"AcMain\" A";
+//		sql += "           WHERE A.\"MonthEndYm\" = :yymm";
+//		sql += "             AND A.\"AcctCode\" IN ('F18')"; // 備抵呆帳－催收款項－放款部 2021/2/4
 		sql += "          ) D";
 		sql += "      GROUP BY D.\"Group\"";
 		this.info("sql=" + sql);

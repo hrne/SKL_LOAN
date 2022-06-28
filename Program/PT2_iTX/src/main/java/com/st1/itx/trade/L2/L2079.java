@@ -16,6 +16,7 @@ import com.st1.itx.db.domain.AcLoanRenew;
 import com.st1.itx.db.service.AcLoanRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.dataVO.TempVo;
 
 @Service("L2079")
 @Scope("prototype")
@@ -38,6 +39,7 @@ public class L2079 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2079 ");
 		this.totaVo.init(titaVo);
+		TempVo tTempVo = new TempVo();
 
 		// 取tita傳入參數
 		String custNo = titaVo.getParam("CustNo").trim();
@@ -102,7 +104,13 @@ public class L2079 extends TradeBuffer {
 
 		// 裝入Tota OccursList
 		for (AcLoanRenew tAcLoanRenew : lAcLoanRenew) {
-
+			//協議件編號
+			tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(tAcLoanRenew.getOtherFields());
+			int iNegNo = 0;
+			if (!"".equals(tTempVo.getParam("NegNo"))) {
+				iNegNo = parse.stringToInteger(tTempVo.getParam("NegNo"));
+			}
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustNo", tAcLoanRenew.getCustNo());
 			occursList.putParam("OOOldFacmNo", tAcLoanRenew.getOldFacmNo());
@@ -112,6 +120,7 @@ public class L2079 extends TradeBuffer {
 			occursList.putParam("OORenewCode", tAcLoanRenew.getRenewCode());
 			occursList.putParam("OOMainFlag", tAcLoanRenew.getMainFlag());
 			occursList.putParam("OOAcDate", tAcLoanRenew.getAcDate());
+			occursList.putParam("OONegNo", iNegNo);
 			this.totaVo.addOccursList(occursList);
 		}
 
