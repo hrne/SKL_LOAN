@@ -58,21 +58,38 @@ BEGIN
     INSERT INTO "JcicB207"
     WITH "Work_B207" AS (
 
-    -- 寫入資料 Work_B207    -- 撈應申報之戶號,從201撈出全部自然人
+    -- 寫入資料 Work_B207    -- 撈應申報之戶號,從201撈出全部自然人,且有餘額取撥款日
     SELECT DISTINCT
            B."CustId"                    AS "CustId"            -- ID
-         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
+         , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" ASC)
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最早貸放的那一筆)
     FROM   "JcicB201" B
       LEFT JOIN "JcicMonthlyLoanData" M ON M."DataYM" = YYYYMM 
                                        AND M."CustNo" = to_number(SUBSTR(B."AcctNo",1, 7))
     WHERE  B."DataYM"   =  YYYYMM
       AND  B."CustId"   IS NOT NULL
       AND  M."DrawdownDate" <= TMNDYF
-      --AND  M."LoanBal"  >  0           -- 有餘額
+      AND  M."LoanBal"  >  0 -- 有餘額
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
       )
-
+    , "Work_B207_All" AS (
+    -- 寫入資料 Work_B207_ALL    -- 撈應申報之戶號,從201撈出全部自然人
+    SELECT DISTINCT
+           B."CustId"                    AS "CustId"            -- ID
+         , CASE
+             WHEN NVL(WK."DrawdownDate",0) = 0
+             THEN first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
+           ELSE NVL(WK."DrawdownDate",0) END
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (若該戶全部已結清則為最近貸放的那一筆)
+    FROM   "JcicB201" B
+      LEFT JOIN "Work_B207" WK          ON B."CustId" = WK."CustId"
+      LEFT JOIN "JcicMonthlyLoanData" M ON M."DataYM" = YYYYMM 
+                                       AND M."CustNo" = to_number(SUBSTR(B."AcctNo",1, 7))
+    WHERE  B."DataYM"   =  YYYYMM
+      AND  B."CustId"   IS NOT NULL
+      AND  M."DrawdownDate" <= TMNDYF
+      AND  M."EntCode"  IN ('0', '2')  -- 自然人
+      )
 
     SELECT
            YYYYMM                                AS "DataYM"            -- 資料年月
@@ -82,8 +99,8 @@ BEGIN
          , TMNDYF - 19110000                     AS "DataDate"          -- 資料日期 (民國)
          , C."CustId"                            AS "CustId"            -- 授信戶IDN
          , CASE
-             WHEN TRIM(NVL(C."CustName", ' ')) = ''  THEN TO_NCHAR('　　　　　　　　　')
-             ELSE RPAD(C."CustName",18,TO_NCHAR('　'))   
+             WHEN TRIM(NVL(C."CustName", ' ')) = ''  THEN TO_NCHAR('　　　　　　　　　　')
+             ELSE RPAD(REPLACE(C."CustName",'　'),20,TO_NCHAR('　'))   
            END                                   AS "CustName"          -- 中文姓名
          --, RPAD(C."CustName",18,'　')            AS "CustName"          -- 中文姓名
          , SUBSTR(NVL(C."EName",' '),1,20)       AS "EName"             -- 英文姓名
@@ -154,13 +171,17 @@ BEGIN
            END                                   AS "JobTitle"          -- 職位名稱
          , NVL(C."JobTenure",' ')                AS "JobTenure"         -- 服務年資
          , CASE
-             WHEN TRUNC(NVL(C."IncomeOfYearly",0) / 1000,0) = 0 THEN 600  -- (ref:LN15J1 (#M4023 1))
-             ELSE TRUNC(NVL(C."IncomeOfYearly",0) / 1000,0)
+             WHEN NVL(C."IncomeOfYearly",0) = 0 THEN 600  -- (ref:LN15J1 (#M4023 1))
+             ELSE NVL(C."IncomeOfYearly",0)
            END                                   AS "IncomeOfYearly"    -- 年收入
          , CASE
+             WHEN to_number(TRIM(NVL(C."IncomeDataDate",0))) >  0 
+                  AND (YYYY - TRUNC(to_number(C."IncomeDataDate")/100) > 30) THEN ( YYYYMM - 191100) -- 與報送年月不可差超過30年
              WHEN to_number(TRIM(NVL(C."IncomeDataDate",0))) >  0 THEN to_number(C."IncomeDataDate") - 191100
+             WHEN NVL(WK."DrawdownDate",0) > 0 
+                  AND (YYYY - TRUNC(NVL(WK."DrawdownDate",0) / 10000)  > 30 ) THEN ( YYYYMM - 191100)
              WHEN NVL(WK."DrawdownDate",0) > 0                    THEN TRUNC((WK."DrawdownDate" - 19110000) / 100)
-             ELSE 0
+             ELSE YYYYMM - 191100
            END                                   AS "IncomeDataDate"    -- 年收入資料年月 (民國)
          , DECODE(C."Sex",'1','M','2','F','F')   AS "Sex"               -- 性別,若代碼非1或2則值放F
          , NVL(C."NationalityCode",'TW')         AS "NationalityCode"   -- 國籍
@@ -171,15 +192,15 @@ BEGIN
            END                                   AS "PassportNo"        -- 護照號碼
          , ' '                                   AS "PreTaxNo"          -- 舊有稅籍編號
          , CASE
-             WHEN lengthb(C."CustName") <= 20 THEN N' '
-             ELSE C."CustName"
+             WHEN lengthb(REPLACE(C."CustName",'　')) <= 20 THEN N' '
+             ELSE REPLACE(C."CustName",'　')
            END                                   AS "FullCustName"      -- 中文姓名超逾10個字之全名
          , ' '                                   AS "Filler30"          -- 空白
          , JOB_START_TIME                        AS "CreateDate"        -- 建檔日期時間
          , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
          , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
          , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
-    FROM  "Work_B207" WK
+    FROM  "Work_B207_All" WK
       LEFT JOIN "CustMain" C         ON C."CustId"      = WK."CustId"
       LEFT JOIN "CdArea"   RegAddr   ON RegAddr."CityCode"  = C."RegCityCode"
                                     AND RegAddr."AreaCode"  = C."RegAreaCode"   -- 戶籍

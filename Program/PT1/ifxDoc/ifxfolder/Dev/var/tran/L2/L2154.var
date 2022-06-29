@@ -3341,12 +3341,13 @@ C(3,#Hide7Fg,0,CALL(#HideP7),$)
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide7Fg,0,CALL(#HideP7),$)
 D(8)
-@V(7)A(DATE,0,#GuaranteeDate)
+@
+C(3,#FuncCode,2,C(4,#GuaranteeDate,C(3,#L2r05GuaranteeDate,0,s,$),$),$)
+V(7)A(DATE,0,#GuaranteeDate)
 
 
 #Grcd=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#FuncCode,5,$,S)
 C(3,#Hide7Fg,0,CALL(#HideP7),$)
 HELP(#YesNoHelp)
 @

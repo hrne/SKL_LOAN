@@ -173,6 +173,7 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(BR.\"AdjustedRate\",0)                           AS \"AdjustedRate\"";
 		sql += "       ,X.\"AcDate\"                      ";
 		sql += "       ,X.\"RepayCode\"                   ";
+		sql += "       ,NVL(CB.\"BdLocation\", ' ')      AS \"Location\"      "; // 押品地址
 		sql += " FROM ( SELECT MAX(T.\"CustNo\")                                            AS \"CustNo\"            ";
 		sql += "             ,T.\"FacmNo\"                                                  AS \"FacmNo\"            ";
 		sql += "             ,MAX(T.\"EntryDate\")                                          AS \"EntryDate\"         ";
@@ -227,7 +228,12 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND \"Status\" != 3                                           ";
 		sql += "        GROUP BY   \"CustNo\",\"FacmNo\") LB ON LB.\"CustNo\" = X.\"CustNo\"                         ";
 		sql += "                                            AND LB.\"FacmNo\" =  X.\"FacmNo\"                        ";
-
+		sql += " LEFT JOIN \"ClFac\" F ON F.\"CustNo\"   =  LB.\"CustNo\"                              ";
+		sql += "                      AND F.\"FacmNo\"   =  LB.\"FacmNo\"                              ";
+		sql += "                      AND F.\"MainFlag\" = 'Y'                                        ";
+		sql += " LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" =  F.\"ClCode1\"                       ";
+		sql += "                            AND CB.\"ClCode2\" =  F.\"ClCode2\"                       ";
+		sql += "                            AND CB.\"ClNo\"    =  F.\"ClNo\"                          ";
 		sql += " WHERE LB.\"SpecificDd\" IS NOT NULL";
 		sql += " ORDER BY X.\"FacmNo\",X.\"EntryDate\"                                                             ";
 

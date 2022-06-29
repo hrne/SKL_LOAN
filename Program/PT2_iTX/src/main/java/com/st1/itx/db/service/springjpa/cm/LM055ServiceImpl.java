@@ -38,13 +38,13 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("lM055.findAll");
 		this.info("yearMonth=" + yearMonth);
-		int ilYearMonth = 0 ;
+		int ilDate = 0 ;
 		int iYear = yearMonth / 100 ;
 		int iMonth = yearMonth % 100 ;
 		if(iMonth == 1){
-			ilYearMonth = (iYear - 1) * 100 + 12;
+			ilDate = (iYear - 1) * 10000 + 1201;
 		}else{
-			ilYearMonth = yearMonth - 1 ;
+			ilDate = (yearMonth - 1) * 100 + 1;
 		}
 
 		String sql = " ";
@@ -254,7 +254,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", yearMonth);
-		query.setParameter("lyymmdd", ilYearMonth);
+		query.setParameter("lyymmdd", yearMonth);
 		return this.convertToMap(query);
 	}
 

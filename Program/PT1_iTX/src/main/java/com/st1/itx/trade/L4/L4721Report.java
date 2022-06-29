@@ -62,6 +62,7 @@ public class L4721Report extends MakeReport {
 	int cnt = 0;
 
 	private HashMap<Integer, tmpFacm> sameMap = new HashMap<>();
+	private Boolean firstfg = true;
 
 	@Override
 	public void printHeader() {
@@ -77,7 +78,11 @@ public class L4721Report extends MakeReport {
 		this.setFontSize(10);
 
 		print(-4, 1, "客戶名稱：" + headerCustName, "L");
-		print(-4, 57, "戶　　號：" + headerCustNo + "-" + headerFacmNo, "L");
+		if (firstfg) {
+			print(-4, 57, "戶　　號：" + headerCustNo , "L");
+		} else {
+			print(-4, 57, "戶　　號：" + headerCustNo + "-" + headerFacmNo, "L");
+		}
 		print(-4, 78, "列印日期：" + headerPrintDate, "L");
 
 		print(-5, 1, "應繳日：" + headerRepayDate, "L");
@@ -190,11 +195,16 @@ public class L4721Report extends MakeReport {
 			if (tBatxRateChange.getTxEffectDate() == 0) {
 				continue;
 			}
-			// 戶號不同
-			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+			// 相同戶號跳過
+			if (custNo == tBatxRateChange.getCustNo()) {
 				continue;
 			}
-
+			
+			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
+			if( custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+				continue;
+			}
+			
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
@@ -228,6 +238,7 @@ public class L4721Report extends MakeReport {
 				Map<String, String> mapL4721Head = listL4721Head.get(0);
 				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
 
+				firstfg = true;
 				// 先更新表頭資料
 				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
 						parse.stringToInteger(mapL4721Head.get("FacmNo")),
@@ -280,6 +291,7 @@ public class L4721Report extends MakeReport {
 
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
+			
 			try {
 				listL4721Detail = l4721ServiceImpl.doDetail(custNo, titaVo);
 			} catch (Exception e) {
@@ -304,6 +316,8 @@ public class L4721Report extends MakeReport {
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
 
+				firstfg = false;
+				
 				// 先更新表頭資料
 				setHead(listL4721Detail.get(0), tempcustno, tempfacmno,
 						parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")));

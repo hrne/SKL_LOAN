@@ -434,6 +434,11 @@ ENABLE(#BTN1)ENABLE(#BTN2)
 #SetSysPar=X,1,S
 E(0,1)ASGN(AGAIN$)
 
+#FdGrcd=X,2,L
+T(2,*)
+#FdEsGcd=X,2,L
+T(2,*)
+
 #init=X,1,S
 HIDE(#Wait)
 T(F,@ProdNo,0)
@@ -2512,7 +2517,6 @@ D(8)
 ! C(3,#HIDE8FG,0,CALL(#HideP8),$)
 
 
-#FdGrcd=X,2,L
 
 #Grcd=X,1,I
 HELP(#YesNoHelp)
@@ -2537,14 +2541,12 @@ V(H,#GrKindHelp)
 C(4,#GrKind,S,$)
 T(H,#GrKind,#GrKindHelp)
 
-
-#FdEsGcd=X,2,L
-
 #EsGcd=X,1,I
 HELP(#YesNoHelp)
 @
 !C(4,#EsGcd,S,$)
 V(H,#YesNoHelp)
+C(5,#EsGcd,Y,T(2,#FdEsGcnl,*)T(F,#EsGcnl,1),T(2,#FdEsGcnl, )T(F,#EsGcnl,0))
 
 #FdEsGKind=X,2,L
 C(5,#EsGcd,Y,T(2,*),T(2, ))

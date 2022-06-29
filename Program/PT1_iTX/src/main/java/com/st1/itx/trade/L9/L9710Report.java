@@ -173,8 +173,8 @@ public class L9710Report extends MakeReport {
 				// 小計 會加3行，超過40行 換新頁
 
 				if (tempCount >= 40) {
-
 					this.newPage();
+					tempCount = 0;
 //					count = 0 ;
 				}
 
@@ -260,7 +260,7 @@ public class L9710Report extends MakeReport {
 	 * 
 	 */
 	private void reportTot() {
-		tempCount = tempCount + 3;
+//		tempCount = tempCount + 3;
 		this.print(1, 1,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		this.print(1, 12, "小　計");
