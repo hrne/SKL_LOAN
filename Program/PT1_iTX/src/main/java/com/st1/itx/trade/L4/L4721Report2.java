@@ -1,8 +1,7 @@
 package com.st1.itx.trade.L4;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -67,8 +67,6 @@ public class L4721Report2 extends MakeReport {
 	String headerLoanBal = "0";
 	String headerExcessive = "";
 	String headerDueAmt = "";
-
-	private HashMap<Integer, tmpFacm> sameMap = new HashMap<>();
 
 	String fileName = "L4721.txt";
 
@@ -131,27 +129,7 @@ public class L4721Report2 extends MakeReport {
 			return result;
 		}
 
-		/*
-		 * 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀 02 陳＊耀 0001743 10 日 銀行扣款
-		 * 0109091600003683931+00000000000+ 030109041301090310-01090410 銀行扣款
-		 * 0000037738+0000032175+00005563+00000000+00000000+ 030109042801090410-01090428
-		 * 匯款轉帳 0000100000+0000100000+00000000+00000000+00000000+
-		 * 030109051201090410-01090510 銀行扣款
-		 * 0000036863+0000031402+00005461+00000000+00000000+ 030109061101090510-01090610
-		 * 銀行扣款 0000036780+0000031446+00005334+00000000+00000000+
-		 * 030109071301090610-01090710 銀行扣款
-		 * 0000036780+0000031490+00005290+00000000+00000000+ 030109081101090710-01090810
-		 * 銀行扣款 0000038939+0000031534+00005246+00000000+00000000+ 030109081200000000
-		 * 00000000 0000000000+0000000000+00000000+00000000+00002159+
-		 * 030109091101090810-01090910 銀行扣款
-		 * 0000036780+0000031820+00004960+00000000+00000000+ 04 45 額度 003 利率自 109 年 09 月
-		 * 01 日起， 由 1.68% 調整為 1.41% 。 45 ※其他額度利率，若有調整另行通知。
-		 * 0500036341+9510200000174395103000001743
-		 */
 		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
-
-			List<Map<String, String>> listL4721Temp = new ArrayList<Map<String, String>>();
-			List<Map<String, String>> listL4721Head = new ArrayList<Map<String, String>>();
 
 //			// 放款利率變動檔生效日，利率未變動為零
 			if (tBatxRateChange.getTxEffectDate() == 0) {
@@ -165,350 +143,154 @@ public class L4721Report2 extends MakeReport {
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
-			try {
-				listL4721Temp = l4721ServiceImpl.TempQuery(custNo, titaVo);
-			} catch (Exception e) {
-				this.error("bankStatementServiceImpl TempQuery = " + e.getMessage());
-				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-			}
+			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
 			try {
-				listL4721Head = l4721ServiceImpl.doQuery(custNo, titaVo);
+				listL4721Detail = l4721ServiceImpl.doDetail(custNo, titaVo);
 			} catch (Exception e) {
 				this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
 				throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
 			}
 
-			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null
-					&& !listL4721Head.isEmpty()) {
-				// 準備第一張
-				Map<String, String> mapL4721Head = listL4721Head.get(0);
-				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
-
-				// 先更新表頭資料
-				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
-						parse.stringToInteger(mapL4721Head.get("FacmNo")),
-						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
+			if (listL4721Detail != null && !listL4721Detail.isEmpty()) {
 
 				String line = "";
 
-				// 01
-				line += "01";
-				line += "";
-				// 加入明細
-				result.add(line);
-				line = "";
-
-				List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
-
-				try {
-					listL4721Detail = l4721ServiceImpl.doDetail(custNo, titaVo);
-				} catch (Exception e) {
-					this.error("bankStatementServiceImpl doQuery = " + e.getMessage());
-					throw new LogicException("E9003", "放款本息對帳單及繳息通知單產出錯誤");
-				}
-
-				if (listL4721Detail != null && !listL4721Detail.isEmpty()) {
-
-					// 判斷是否都為同一天
-
-					Boolean sameFlg = false;
-
-					int tempdate = parse.stringToInteger(listL4721Detail.get(0).get("SpecificDd"));
-					for (Map<String, String> mapL4721Detail : listL4721Detail) {
-						if (tempdate != parse.stringToInteger(mapL4721Detail.get("SpecificDd"))) {
-							sameFlg = true;
-							break;
-						}
+				int tempdate = parse.stringToInteger(listL4721Detail.get(0).get("SpecificDd"));
+				for (Map<String, String> mapL4721Detail : listL4721Detail) {
+					if (tempdate != parse.stringToInteger(mapL4721Detail.get("SpecificDd"))) {
+//							sameFlg = true;
+						break;
 					}
-
-					int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
-					int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
-					// 先更新表頭資料
-					setHead(listL4721Detail.get(0), tempcustno, tempfacmno,
-							parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")) - 19110000);
-
-					int times = 0;
-					int txeffectdate = 0;
-					BigDecimal presentrate = new BigDecimal("0");
-					BigDecimal adjustedrate = new BigDecimal("0");
-
-					// 02
-					line += "02";
-					line += " ";
-					// 加入明細
-					result.add(line);
-
-					for (Map<String, String> mapL4721Detail : listL4721Detail) {
-
-						if (!sameFlg) { // 額度不同天 印不同張
-
-							if (tempfacmno != parse.stringToInteger(mapL4721Detail.get("FacmNo"))) {
-
-								if (txeffectdate != 0) {
-									this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
-//
-//									// 03 資料
-//									line += "03";
-//									line += "";
-//									// 加入明細
-//									result.add(line);
-								}
-
-								setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")),
-										parse.stringToInteger(mapL4721Detail.get("FacmNo")),
-										parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
-
-							} // if
-						} // if
-
-						// 計息期間
-						
-
-						// 03 資料
-						line += "03";
-						line += "";
-						// 加入明細
-						result.add(line);
-						
-			String dateRange = " ";
-			String startDate = mapL4721Detail.get("IntStartDate");
-			String endDate = mapL4721Detail.get("IntEndDate");
-			String tstartDate = "       ";
-			String tendDate = "       ";
-			// 組成yyymmdd-yyymmdd
-			if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
-
-				if (!"".equals(showRocDate(startDate, 3))) {
-					tstartDate = showRocDate(startDate, 3);
 				}
 
-				if (!"".equals(showRocDate(endDate, 3))) {
-					tendDate = showRocDate(endDate, 3);
-				}
+				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
+//				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
 
-				dateRange = tstartDate + "-" + tendDate;
-			}
+				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
-			line += "" + dateRange;
-			
-//			if ("-".equals(dateRange.trim())) {
-//				dateRange = "";
-//			}
-//			print(0, 10, dateRange);
-//
-//			if (parse.stringToInteger(mapL4721Detail.get("RepayCode")) != 9) {
-//				// 繳款方式
-//				print(0, 26, mapL4721Detail.get("RepayCodeX"));
-//			}
-//			// 繳款金額
-//			print(0, 47, formatAmt(mapL4721Detail.get("TxAmt"), 0), "R");
-//
-//			// 攤還本金
-//			print(0, 60, formatAmt(mapL4721Detail.get("Principal"), 0), "R");
-//
-//			// 繳息金額
-//			print(0, 73, formatAmt(mapL4721Detail.get("Interest"), 0), "R");
-//
-//			// 違約金
-//			String bt = "";
-//			if (!"0".equals(formatAmt(mapL4721Detail.get("BreachAmt"), 0))) {
-//				bt = formatAmt(mapL4721Detail.get("BreachAmt"), 0);
-//			}
-//			print(0, 82, bt, "R");
-//
-//			// 火險費或其他費用
-//			String fe = "";
-//			if (!"0".equals(formatAmt(mapL4721Detail.get("OtherFee"), 0))) {
-//				fe = formatAmt(mapL4721Detail.get("OtherFee"), 0);
-//			}
-//			print(0, 98, fe, "R");
-//
-//			times++;
-//
+					// 相同戶號不同額度的輸出
 
-						// 03 資料
-						line += "03";
-						line += "";
-						// 加入明細
+					if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
+						result = sameFacmno(mapL4721Detail, result);
+					} else { // 不同額度 印04並且切到下一個額度循環
+						// 04
+
+						line = "";
+						line += "04";
 						result.add(line);
-//			// 最後一筆
-						if (times == listL4721Detail.size() && txeffectdate != 0) {
+						line = "";
+						result.add(line);
 
-							// 04
-							line += "04";
-							line += "";
-							// 加入明細
-							result.add(line);
+						// 45
 
-							if (sameFlg) { // 所有額度都同一天 印同一張
+						// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
+						line = "";
+						line += "45";
+						line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
+								+ showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
+								+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
+								+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
+						result.add(line);
+						line = "";
+						// 加入換行
+						result.add(line);
 
-								for (Integer key : sameMap.keySet()) {
+						// 05
 
-									// 45
-
-									this.info(line);
-
-									// 加入明細
-									result.add(line);
-									line = "";
-									// 加入換行
-									result.add(line);
-
-								}
-								// this.print(1, 1, "＊其他額度利率，若有調整另行通知。");
-							} else {
-								// this.print(1, 1, "額度 利率自 起， 由 調整為 。");
-
-								// 45
-
-								this.info(line);
-
-								// 加入明細
-								result.add(line);
-								line = "";
-								// 加入換行
-								result.add(line);
-							}
-
-							break;
-						}
-//
-						tmpFacm tmp = new tmpFacm(parse.stringToInteger(mapL4721Detail.get("FacmNo")),
-								parse.stringToInteger(mapL4721Detail.get("TxEffectDate")),
-								new BigDecimal(mapL4721Detail.get("PresentRate")),
-								new BigDecimal(mapL4721Detail.get("AdjustedRate")));
-//
-						if (!sameMap.containsKey(parse.stringToInteger(mapL4721Detail.get("FacmNo")))) {
-							sameMap.put(parse.stringToInteger(mapL4721Detail.get("FacmNo")), tmp);
-						}
-
-						tempfacmno = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
-						txeffectdate = parse.stringToInteger(mapL4721Detail.get("TxEffectDate"));
-						presentrate = new BigDecimal(mapL4721Detail.get("PresentRate"));
-						adjustedrate = new BigDecimal(mapL4721Detail.get("AdjustedRate"));
-
-					} // for
-				} // if
-
-			}
-
-		}
-
+						// 0500036341+9510200000174395103000001743
+						line = "";
+						line += "05";
+						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
+								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
+								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
+						result.add(line);
+						line = "";
+						// 加入換行
+						result.add(line);
+						result = sameFacmno(mapL4721Detail, result);
+					} // else
+				} // for
+			} // for
+		} // for
 		return result;
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
-			throws NumberFormatException, LogicException {
-		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
-		headerCustName = headerBankStatement.get("CustName");
-		headerCustNo = String.format("%07d", Integer.valueOf(headerBankStatement.get("CustNo")));
-		headerFacmNo = String.format("%03d", Integer.valueOf(headerBankStatement.get("FacmNo")));
-		headerPrintDate = showRocDate(titaVo.getCalDy(), 1);
-		headerRepayDate = headerBankStatement.get("SpecificDd") + "日";
-		headerRepayTypeDesc = headerBankStatement.get("RepayCodeX");
-		headerLoanBal = headerBankStatement.get("LoanBal");
+	private List<String> sameFacmno(Map<String, String> tmap, List<String> result) throws LogicException {
 
-		headerDueAmt = "";
-		headerExcessive = "";
+		String line = "";
+		// 01
+
+		// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
+		line = "";
+		line += "01";
+		line += "地址" + tmap.get("Location") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " " + tmap.get("CustName");
+		// 加入明細
+		result.add(line);
+		line = "";
+		result.add(line);
+
+		// 02
+
+		int effectDate = parse.stringToInteger(tmap.get("TxEffectDate"));
 		if (effectDate != 0) {
-			baTxCom.getDueAmt(effectDate, custNo, facmNo, 0, titaVo);
+			baTxCom.getDueAmt(effectDate, parse.stringToInteger(tmap.get("CustNo")),
+					parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
 			headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 			headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
 		} else {
-			headerDueAmt = headerBankStatement.get("DueAmt");
+			headerDueAmt = tmap.get("DueAmt");
 		}
 
+		// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
+		line = "";
+		line += "02";
+		line += " " + tmap.get("CustName") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + tmap.get("SpecificDd")
+				+ " 日" + "          " + tmap.get("RepayCodeX") + "   " + FormatUtil.pad9(tmap.get("LoanBal"), 11)
+				+ headerExcessive;
+
+		// 加入明細
+		result.add(line);
+		line = "";
+		result.add(line);
+
+		// 03
+
+		// 030109041301090310-01090410 銀行扣款
+		// 0000037738+0000032175+00005563+00000000+00000000+
+		line = "";
+		line += "03";
+
+		String dateRange = " ";
+		String startDate = tmap.get("IntStartDate");
+		String endDate = tmap.get("IntEndDate");
+		String tstartDate = "0000000";
+		String tendDate = "0000000";
+		// 組成yyymmdd-yyymmdd
+		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+
+			if (!"".equals(showRocDate(startDate, 3))) {
+				tstartDate = showRocDate(startDate, 3);
+			}
+
+			if (!"".equals(showRocDate(endDate, 3))) {
+				tendDate = showRocDate(endDate, 3);
+			}
+
+			dateRange = tstartDate + "-" + tendDate;
+		}
+
+		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
+				+ FormatUtil.pad9(formatAmt(tmap.get("TxAmt"), 0), 10) + "+"
+				+ FormatUtil.pad9(formatAmt(tmap.get("Principal"), 0), 10) + "+"
+				+ FormatUtil.pad9(formatAmt(tmap.get("Interest"), 0), 10) + "+"
+				+ FormatUtil.pad9(formatAmt(tmap.get("BreachAmt"), 0), 10) + "+"
+				+ FormatUtil.pad9(formatAmt(tmap.get("OtherFee"), 0), 10) + "+";
+		// 加入明細
+		result.add(line);
+		line = "";
+		result.add(line);
+
+		return result;
 	}
-
-//		暫時紀錄戶號額度
-	/**
-	*/
-	private class tmpFacm {
-
-		public tmpFacm(int facmNo, int txeffectdate, BigDecimal presentrate, BigDecimal adjustedrate) {
-			this.setFacmNo(facmNo);
-			this.setTxEffectDate(txeffectdate);
-			this.setPresentRate(presentrate);
-			this.setAdjustedRate(adjustedrate);
-		}
-
-		private int facmNo = 0;
-		private int txeffectdate = 0;
-		private BigDecimal presentrate = new BigDecimal("0");
-		private BigDecimal adjustedrate = new BigDecimal("0");
-
-		@Override
-		public String toString() {
-			return "tmpFacm [facmNo=" + facmNo + ", TxEffectDate=" + txeffectdate + ", PresentRate=" + presentrate
-					+ ", AdjustedRate=" + adjustedrate + "]";
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + facmNo;
-			result = prime * result + txeffectdate;
-			result = prime * result + presentrate.intValue();
-			result = prime * result + adjustedrate.intValue();
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (facmNo != other.facmNo)
-				return false;
-			if (txeffectdate != other.txeffectdate)
-				return false;
-			if (presentrate != other.presentrate)
-				return false;
-			if (adjustedrate != other.adjustedrate)
-				return false;
-			return true;
-		}
-
-		private void setFacmNo(int facmNo) {
-			this.facmNo = facmNo;
-		}
-
-		private int getTxEffectDate() {
-			return txeffectdate;
-		}
-
-		private void setTxEffectDate(int txeffectdate) {
-			this.txeffectdate = txeffectdate;
-		}
-
-		private BigDecimal getPresentRate() {
-			return presentrate;
-		}
-
-		private void setPresentRate(BigDecimal presentrate) {
-			this.presentrate = presentrate;
-		}
-
-		private BigDecimal getAdjustedRate() {
-			return adjustedrate;
-		}
-
-		private void setAdjustedRate(BigDecimal adjustedrate) {
-			this.adjustedrate = adjustedrate;
-		}
-
-		private L4721Report2 getEnclosingInstance() {
-			return L4721Report2.this;
-		}
-	}
-
 }

@@ -67,8 +67,7 @@ K(MODIFYBUTTON,登錄)
 [#<->#,"#FdExcessive+累溢收",#ExcessiveX],
 ["#FdNewApplNo+核准號碼",#NewApplNo,"@@@",#BTN6],["@@@@@展期記號",#RenewCode,#RenewCodeX],
 [#<->#,"#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
-["#FdAdvanceCloseCode+提前清償原因",#AdvanceCloseCode,#AdvanceCloseCodeX],
-["@","@"],
+["#FdAdvanceCloseCode+提前清償原因",#AdvanceCloseCode,#AdvanceCloseCodeX],["@","@"],
 !部分轉呆
 ["#FdOvDuTrfPrincipal+轉催收本金",#OvDuTrfPrincipalX],["#FdOvDuRepayAmt+催收還款金額",#OvDuRepayAmtX],
 ["#FdOvDuTrfInterest+轉催收利息",#OvDuTrfInterestX],["#FdBadDebtTrfAmt+已轉銷呆帳金額",#BadDebtTrfAmtX],
@@ -76,7 +75,8 @@ K(MODIFYBUTTON,登錄)
 ["#FdLawFee2+法務費用",#LawFee2X,"@是否轉呆",#LawFg],["#FdCollLawFee+催收法務費",#CollLawFeeX,"@是否轉呆",#CollLawFg],
 ! ["#FdAcctFee2+帳管費用",#AcctFee2X],
 ["#FdOvDuBal+催收餘額",#OvDuBalX],["#FdTrfOvDuAmt+催收餘額轉銷呆帳",#TwTrfOvDuAmt,#UsTrfOvDuAmt],
-[#<->#,"#FdTrfBadAmt+轉銷呆帳金額",#TwTrfBadAmt,#UsTrfBadAmt]
+[#<->#,"#FdTrfBadAmt+轉銷呆帳金額",#TwTrfBadAmt,#UsTrfBadAmt],
+["#FdBadDebtDate+董事會通過核定日期",#BadDebtDateN,"  第",#BadDebtCnt1,"屆第",#BadDebtCnt2,"次"]
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -1052,6 +1052,35 @@ IF(#CaseCloseCode>=7,s,S)
 
 #TimTrfBadAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwTrfBadAmt),E(0,#UsTrfBadAmt))
+
+![轉呆帳/部分轉呆作業時必要欄位]
+!董事會通過核定日期 #BadDebtDateN 第 #BadDebtCnt1 屆第 #BadDebtCnt2 次
+#FdBadDebtDate=X,2,L
+#BadDebtDateN=D,7,I
+C(3,#BadDebtDateN,0,E(0,#SYSDATE),$)
+C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
+@V(2,0)
+A(DATE,0,#BadDebtDateN)
+
+#BadDebtDateYY=X,3,S
+T(1,#BadDebtDateN,1,3)
+#BadDebtDateMM=X,2,S
+T(1,#BadDebtDateN,4,2)
+#BadDebtDateDD=X,2,S
+T(1,#BadDebtDateN,6,2)
+
+#BadDebtCnt1=A,2,I
+C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
+@V(2,0)
+
+#BadDebtCnt2=A,2,I
+C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
+@V(2,0)
+
+#Description=X,60,S
+IF(#CaseCloseCode>=7,$,S)
+T(2,董事會通過核定日期+#BadDebtDateYY+/+#BadDebtDateMM+/+#BadDebtDateDD+第+#BadDebtCnt1+屆第+#BadDebtCnt2+次)
+
 !---------------------------------------------------------
 
 !應收付類別,2:結案
@@ -1184,6 +1213,7 @@ T(3,[L3420] 結案登錄-不可欠繳)
 #AcctFee1#ModifyFee1#FireFee1#LawFee1#ShortfallInt#ShortfallPrin#ShortCloseBreach#CloseBreachAmt
 #FireFg#CollFireFg#LawFg#CollLawFg#TimTrfOvDuAmt
 #TimInterest#TimDelayInt#TimBreachAmt#TimPrincipal
+#BadDebtDateN#BadDebtCnt1#BadDebtCnt2#Description
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustId#ApplNo
 #TwReduceAmt#UsReduceAmt#TwTrfBadAmt#UsTrfBadAmt

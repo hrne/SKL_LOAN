@@ -145,6 +145,7 @@ public class L9710Report extends MakeReport {
 		// 記錄筆數
 		int count = 0;
 		int divderCount = 0;
+		String tempCity= "";
 
 		if (l9710List != null && l9710List.size() != 0) {
 
@@ -152,29 +153,35 @@ public class L9710Report extends MakeReport {
 
 			for (Map<String, String> tL9710Vo : l9710List) {
 
+				
 				count++;
+
 //				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
 				// 不同地區別
 				if (!f1.equals(tL9710Vo.get("CityCode"))) {
-					if (tempCount % 40 > 1) {
+					
+					if (tempCount % 40 >=0  && count > 1) {
 						divderCount++;
-						reportTot();
+						reportTot(tempCity);
+						
+						// 每一次小計 會加3行
 						tempCount = (tempCount % 40) + (3 * divderCount);
 					}
 					if (f0.equals(tL9710Vo.get("F0"))) {
 						ptfg = 0;
 					}
 					info("tempCount" + count + "=" + tempCount);
+					tempCity = tL9710Vo.get("CityItem");
 				}
 
 //				f0 = tL9710Vo.get("F0");
 				f1 = tL9710Vo.get("CityCode");
 
-				// 小計 會加3行，超過40行 換新頁
-
+				//超過40行 換新頁
 				if (tempCount >= 40) {
 					this.newPage();
-					tempCount = 0;
+					//超過40行重新算(從餘數開始計)
+					tempCount = tempCount % 40;
 //					count = 0 ;
 				}
 
@@ -183,7 +190,7 @@ public class L9710Report extends MakeReport {
 
 			if (this.getNowPage() > 0 && count == l9710List.size()) {
 				ptfg = 9;
-				reportTot();
+				reportTot(tempCity);
 			}
 
 		} else {
@@ -259,10 +266,11 @@ public class L9710Report extends MakeReport {
 	 * 小計(總計)筆數及合計核准額度
 	 * 
 	 */
-	private void reportTot() {
+	private void reportTot(String cityName) {
 //		tempCount = tempCount + 3;
 		this.print(1, 1,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(1, 1, cityName,"R");
 		this.print(1, 12, "小　計");
 		this.print(0, 24, String.valueOf(cnt), "R");
 		this.print(0, 25, "筆");

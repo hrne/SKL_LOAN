@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1194,7 +1193,8 @@ public class L3420 extends TradeBuffer {
 	private void UpdLoanOvdu7Routine(LoanOverdue od) throws LogicException {
 		this.info("UpdLoanOvdu7Routine ... ");
 
-		tLoanOverdue.setBadDebtDate(wkTbsDy);
+		//tLoanOverdue.setBadDebtDate(wkTbsDy);
+		tLoanOverdue.setBadDebtDate(parse.stringToInteger(titaVo.getParam("BadDebtDateN")));// 改放轉呆時畫面輸入的董事會通過核定日期
 		tLoanOverdue.setBadDebtAmt(od.getOvduBal());
 		tLoanOverdue.setBadDebtBal(od.getOvduBal());
 		tLoanOverdue.setOvduPrinBal(BigDecimal.ZERO);
@@ -1215,9 +1215,10 @@ public class L3420 extends TradeBuffer {
 	private void UpdLoanOvdu8Routine(LoanOverdue od) throws LogicException {
 		this.info("UpdLoanOvdu8Routine ... ");
 
-		if (tLoanOverdue.getBadDebtDate() == 0) {
-			tLoanOverdue.setBadDebtDate(wkTbsDy);
-		}
+//		if (tLoanOverdue.getBadDebtDate() == 0) {
+//			tLoanOverdue.setBadDebtDate(wkTbsDy);
+//		}
+		tLoanOverdue.setBadDebtDate(parse.stringToInteger(titaVo.getParam("BadDebtDateN")));// 改放部分轉呆時畫面輸入的董事會通過核定日期
 		tLoanOverdue.setBadDebtAmt(od.getBadDebtAmt().add(wkTrfPrin).add(wkTrfInt).add(wkTrfBreach));
 		tLoanOverdue.setBadDebtBal(od.getBadDebtBal().add(wkTrfPrin).add(wkTrfInt).add(wkTrfBreach));
 		tLoanOverdue.setOvduPrinBal(od.getOvduPrinBal().subtract(wkTrfPrin));
@@ -1417,11 +1418,11 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setShortfall(BigDecimal.ZERO);
 		tLoanBorTx.setTxAmt(wkTxAmt); //
 		tLoanBorTx.setTempAmt(wkTempAmt); // 暫收抵繳金額
-		tLoanBorTx.setShortfall(wkShortfall); // 短收收回金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
 			tLoanBorTx.setOverflow(wkOverflow); // 全戶累溢收金額
+			tLoanBorTx.setShortfall(wkShortfall); // 全戶累短收金額
 		} else {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		}
@@ -1514,6 +1515,7 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("ReduceAmt", iReduceAmt); // 減免金額
 		tTempVo.putParam("PaidTerms", 0);
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
+		tTempVo.putParam("Note", titaVo.getParam("Description"));// 新增摘要-董事會通過核定日期訊息 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -1586,6 +1588,7 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("CaseCloseCode", iCaseCloseCode);
 		tTempVo.putParam("PaidTerms", 0);
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
+		tTempVo.putParam("Note", titaVo.getParam("Description"));// 新增摘要-董事會通過核定日期訊息 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -1848,6 +1851,9 @@ public class L3420 extends TradeBuffer {
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, iTxAmt, titaVo); // 99-費用全部(含未到期)
 		// 全戶累溢收金額 = 累溢收(交易前 ) + 暫收抵繳(負值) + 本次溢收
 		wkOverflow = baTxCom.getExcessive().add(baTxCom.getExcessiveOther()).add(iTmpAmt).add(iOverAmt);
+		// 累短收金額 = 累短收(交易前 ) - 短收收回 + 本次短收
+		wkShortfall = baTxCom.getShortfall().subtract(iShortfallPrin).subtract(iShortfallInt)
+				.subtract(iShortCloseBreach);
 	}
 
 	// 貸方 : 費用
@@ -1893,7 +1899,6 @@ public class L3420 extends TradeBuffer {
 	// 貸方：短繳
 	private void getSettleUnpaid() throws LogicException {
 		lAcDetailFee = new ArrayList<AcDetail>();
-		this.wkShortfall = BigDecimal.ZERO;// 累短收
 		this.wkShortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
 		this.wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 		this.wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
@@ -1917,7 +1922,7 @@ public class L3420 extends TradeBuffer {
 						acDetail.setRvNo(ba.getRvNo());
 						acDetail.setReceivableFlag(ba.getReceivableFlag());
 						lAcDetailFee.add(acDetail);
-						this.wkShortfall = ba.getAcctAmt();
+						// 短繳
 						this.wkShortfallPrincipal = ba.getPrincipal();
 						this.wkShortfallInterest = ba.getInterest();
 						this.wkShortCloseBreach = ba.getCloseBreachAmt();

@@ -62,7 +62,7 @@ public class L4721Report extends MakeReport {
 	int cnt = 0;
 
 	private HashMap<Integer, tmpFacm> sameMap = new HashMap<>();
-	private Boolean firstfg = true;
+	private Boolean first = true;
 
 	@Override
 	public void printHeader() {
@@ -78,7 +78,7 @@ public class L4721Report extends MakeReport {
 		this.setFontSize(10);
 
 		print(-4, 1, "客戶名稱：" + headerCustName, "L");
-		if (firstfg) {
+		if (first) {
 			print(-4, 57, "戶　　號：" + headerCustNo , "L");
 		} else {
 			print(-4, 57, "戶　　號：" + headerCustNo + "-" + headerFacmNo, "L");
@@ -234,11 +234,11 @@ public class L4721Report extends MakeReport {
 					&& !listL4721Head.isEmpty()) {
 
 				HeadFlag = true;
+				first = true;
 				// 準備第一張
 				Map<String, String> mapL4721Head = listL4721Head.get(0);
 				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
 
-				firstfg = true;
 				// 先更新表頭資料
 				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
 						parse.stringToInteger(mapL4721Head.get("FacmNo")),
@@ -282,16 +282,18 @@ public class L4721Report extends MakeReport {
 					}
 				}
 
+				first = false;
 				// 先更新表頭資料
 				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
 						parse.stringToInteger(mapL4721Head.get("FacmNo")),
 						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 				this.newPage();
 			}
-
+			
+			
+			first = false;
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
-			
 			try {
 				listL4721Detail = l4721ServiceImpl.doDetail(custNo, titaVo);
 			} catch (Exception e) {
@@ -316,7 +318,6 @@ public class L4721Report extends MakeReport {
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
 
-				firstfg = false;
 				
 				// 先更新表頭資料
 				setHead(listL4721Detail.get(0), tempcustno, tempfacmno,

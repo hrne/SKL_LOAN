@@ -37,7 +37,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		this.info("lM055.findAll");
-		this.info("yearMonth=" + yearMonth);
+		
 		int ilDate = 0 ;
 		int iYear = yearMonth / 100 ;
 		int iMonth = yearMonth % 100 ;
@@ -47,6 +47,9 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 			ilDate = (yearMonth - 1) * 100 + 1;
 		}
 
+		this.info("yearMonth=" + yearMonth);
+		this.info("ilDate=" + ilDate);
+		
 		String sql = " ";
 		sql += "	WITH \"tempA\" AS (";
 		sql += "	SELECT ( CASE";
@@ -254,7 +257,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", yearMonth);
-		query.setParameter("lyymmdd", yearMonth);
+		query.setParameter("lyymmdd", ilDate);
 		return this.convertToMap(query);
 	}
 
