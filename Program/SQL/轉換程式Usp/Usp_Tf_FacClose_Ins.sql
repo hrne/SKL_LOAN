@@ -90,6 +90,7 @@ CloseReasonCode 需左補0 (2)
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,''                             AS "PostAddress"
     FROM "LN$ENDP" E
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = E."LMSACN"
                             AND APLP."LMSAPN" = E."LMSAPN"

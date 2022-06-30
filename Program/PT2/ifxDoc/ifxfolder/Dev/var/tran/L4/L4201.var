@@ -32,7 +32,7 @@ E(0,0)
 ["@結餘",#Balance],["@匯款銀行代碼",#RemintBankX],
 [#<->#,"@交易人資料",#TraderInfo],
 [#<->#,"@還款類別",#RepayTypeA,#RepayTypeAX],
-[#<->#,"@入帳戶號",#CustNoA],
+[#<->#,"@入帳戶號",#CustNoA,"-",#FacmNoA],
 ]
 #BTN_L3921=X,94,I,ui:button;value:回收試算;enable:1;tabbable:0;
 #BTN_L3200=X,94,I,ui:button;value:回收登錄;enable:1;tabbable:0;
@@ -95,6 +95,8 @@ T(1,@ProcStsCodeTemp,#NTXBUF,83,1)
 T(1,@ProcCode,#NTXBUF,84,5)
 T(1,@ProcDscptCode,#NTXBUF,89,300)
 T(1,@TxSn,#NTXBUF,393,14)
+T(1,@FacmNoA,#NTXBUF,407,3)
+
 INVOKEJS(SHOW,p1,02,02,1)
 IF(#ProcStsCodeTemp == 4 || #ProcStsCodeTemp == 3 || #ProcStsCodeTemp == 2 || #ProcStsCodeTemp == 1 || #ProcStsCodeTemp == 0,T(F,@ProcStsCode,1),T(F,@ProcStsCode,0))
 
@@ -198,7 +200,7 @@ IF(#RepayAmt < 0,T(F,@ProcStsCode,0),$)
 IF(#RepayAmt >= 0,$,s)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
-C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@RepayTypeA,1))
+C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@FacmNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@FacmNoA,1)T(F,@RepayTypeA,1))
 IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,0,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,0,1),IF(#ProcStsCodeTemp == 0,V(1,1,2),V(1,0))))))
 
 #ProcStsCodeX=X,10,L
@@ -308,7 +310,8 @@ T(3,)T(H,#RepayTypeA,#RepayTypeHelp)
 E(0,#CustNo)
 C(3,#ProcStsCode,1,s,$)
 
-
+#FacmNoA=A,3,I
+C(3,#ProcStsCode,1,s,$)
 
 
 #MRKEY=_,_,S
@@ -334,6 +337,7 @@ T(2,#CustNo)
 #DetailSeq
 #RepayTypeA
 #CustNoA
+#FacmNoA
 #ProcStsCode
 #END
 </sub>

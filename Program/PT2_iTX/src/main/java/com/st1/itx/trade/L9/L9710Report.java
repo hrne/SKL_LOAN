@@ -40,7 +40,8 @@ public class L9710Report extends MakeReport {
 	int tcnt = 0;
 	int amt = 0;
 	int tamt = 0;
-
+	
+	//計算當前列數
 	int tempCount = 0;
 
 	// 橫式規格
@@ -155,6 +156,8 @@ public class L9710Report extends MakeReport {
 
 				count++;
 
+
+				
 //				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
 				// 不同地區別
 				if (!f1.equals(tL9710Vo.get("CityCode"))) {
@@ -162,7 +165,11 @@ public class L9710Report extends MakeReport {
 					if (tempCount % 40 >= 0 && count > 1) {
 						divderCount++;
 						reportTot(tempCity);
-
+						
+						if (tempCount >= 40) {
+							divderCount = 0;
+						}
+						
 						// 每一次小計 會加3行
 						tempCount = (tempCount % 40) + (3 * divderCount);
 					}
@@ -172,18 +179,20 @@ public class L9710Report extends MakeReport {
 					info("tempCount" + count + "=" + tempCount);
 					tempCity = tL9710Vo.get("CityItem");
 				}
-
-//				f0 = tL9710Vo.get("F0");
-				f1 = tL9710Vo.get("CityCode");
-
+				
 				// 超過40行 換新頁
 				if (tempCount >= 40) {
 					this.newPage();
 					// 超過40行重新算(從餘數開始計)
 					tempCount = tempCount % 40;
-					divderCount = 0;
+//					divderCount = 0;
 //					count = 0 ;
 				}
+
+//				f0 = tL9710Vo.get("F0");
+				f1 = tL9710Vo.get("CityCode");
+
+		
 
 				report(tL9710Vo);
 			}

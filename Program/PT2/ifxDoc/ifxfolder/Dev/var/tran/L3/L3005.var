@@ -380,7 +380,7 @@ T(2,#L2r07CustName)
 
 #OLoanCustFlag=X,1,S
 
-#OLoanCustRmkX=X,110,L
+#OLoanCustRmkX=X,5.110,L
 T(F,@OLoanCustRmkX,0)
 
 

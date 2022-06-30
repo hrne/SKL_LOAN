@@ -366,7 +366,7 @@ SWITCH(#OOProcStsCode,5,T(2,分錄),
 #OOBUF_L4201=X,416,S
 T(2,#AcDate+#BatchNo+#OODetailSeq+#OOCustNo+#OORepayType
    +#OORepayAmtX+#OOAcctAmtX+#OODisacctAmtX+#OOProcStsCode
-   +#OOProcCode+#OOProcNote+#OOTxSn)
+   +#OOProcCode+#OOProcNote+#OOTxSn+#OOFacmNo)
 
 #OOBUF_L4202=X,418,S
 T(2,#AcDate+#BatchNo+#OODetailSeq+#OOCustNo+#OOFacmNo+#OORepayType

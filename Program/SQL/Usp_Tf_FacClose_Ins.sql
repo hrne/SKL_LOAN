@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_FacClose_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_FacClose_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -90,6 +90,7 @@ CloseReasonCode 需左補0 (2)
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,''                             AS "PostAddress"
     FROM "LN$ENDP" E
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = E."LMSACN"
                             AND APLP."LMSAPN" = E."LMSAPN"
@@ -159,6 +160,7 @@ CloseReasonCode 需左補0 (2)
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_FacClose_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 /

@@ -72,6 +72,7 @@ public class L4201 extends TradeBuffer {
 		int iDetailSeq = parse.stringToInteger(titaVo.getParam("DetailSeq"));
 		int iRepayTypeA = parse.stringToInteger(titaVo.getParam("RepayTypeA"));
 		int iCustNoA = parse.stringToInteger(titaVo.getParam("CustNoA"));
+		int iFacmNoA = parse.stringToInteger(titaVo.getParam("FacmNoA"));
 		String iProcStsCode = titaVo.getParam("ProcStsCode");
 		BatxDetail tBatxDetail = new BatxDetail();
 		BatxDetailId tBatxDetailId = new BatxDetailId();
@@ -121,6 +122,7 @@ public class L4201 extends TradeBuffer {
 		}
 		tBatxDetail.setRepayType(iRepayTypeA);
 		tBatxDetail.setCustNo(iCustNoA);
+		tBatxDetail.setFacmNo(iFacmNoA);
 		tBatxDetail.setProcStsCode(iProcStsCode);
 		// 預收期數
 		if (tBatxDetail.getRepayType() == 1) {

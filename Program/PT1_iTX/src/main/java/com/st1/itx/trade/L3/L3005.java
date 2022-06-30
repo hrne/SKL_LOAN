@@ -3,6 +3,8 @@ package com.st1.itx.trade.L3;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -93,29 +95,53 @@ public class L3005 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		// 查詢各項費用
-		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
-
+		// 查詢各項費用 全戶
+		baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
+		int lLoanCustRmkSize = 0;
 		// 帳務備忘錄明細檔
 		Slice<LoanCustRmk> sLoanCustRmk = loanCustRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+
 		if (sLoanCustRmk != null) {
-			lLoanCustRmk = sLoanCustRmk == null ? null : sLoanCustRmk.getContent();
+
+			lLoanCustRmk = sLoanCustRmk == null ? null : new ArrayList<LoanCustRmk>(sLoanCustRmk.getContent());
+
+			lLoanCustRmkSize = lLoanCustRmk.size();
+//			備忘錄代碼由大到小排序
+			Collections.sort(lLoanCustRmk, new Comparator<LoanCustRmk>() {
+				public int compare(LoanCustRmk c1, LoanCustRmk c2) {
+					if (!c1.getRmkCode().equals(c2.getRmkCode())) {
+						return c2.getRmkCode().compareTo(c1.getRmkCode());
+					}
+
+					return 0;
+				}
+
+			});
+			int cnt = 0;
+//			只顯示前5筆備忘錄資料
+//			超過最後一筆顯示...未完字眼
 			for (LoanCustRmk t : lLoanCustRmk) {
+				cnt++;
+				if (cnt > 5) {
+					break;
+				}
+
 				if (!loanCustRmkX.isEmpty()) {
-					loanCustRmkX += ",";
+					loanCustRmkX += "\n";
 				}
 				loanCustRmkX += t.getRmkDesc();
 			}
+
 			oLoanCustRmkFlag = "Y";
 		}
 
 		this.totaVo.putParam("OCustNo", iCustNo);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
-		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
+		this.totaVo.putParam("OShortfall", BigDecimal.ZERO.subtract(baTxCom.getShortfall()));
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 		this.totaVo.putParam("OLoanCustFlag", oLoanCustRmkFlag);
-		if (loanCustRmkX.length() > 50) {
-			this.totaVo.putParam("OLoanCustRmkX", loanCustRmkX.substring(0, 50) + "...未完"); // 帳務備忘錄
+		if (lLoanCustRmkSize > 5) {
+			this.totaVo.putParam("OLoanCustRmkX", loanCustRmkX + "...未完"); // 帳務備忘錄
 		} else {
 			this.totaVo.putParam("OLoanCustRmkX", loanCustRmkX); // 帳務備忘錄
 		}
@@ -218,8 +244,8 @@ public class L3005 extends TradeBuffer {
 					wkShortfall = tempAmt;
 				}
 				// 有短收金額時為短收
-				if ( unpaidAmt.compareTo(BigDecimal.ZERO) > 0) {
-					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);					
+				if (unpaidAmt.compareTo(BigDecimal.ZERO) > 0) {
+					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);
 				}
 				relNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);

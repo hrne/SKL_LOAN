@@ -111,11 +111,12 @@ public class LM055Report extends MakeReport {
 			default:
 				break;
 			}
-		}
 
 		col = kind + 5;
 
+
 		makeExcel.setValue(row, col, amount, "#,##0");
+		}
 
 	}
 
