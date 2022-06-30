@@ -78,10 +78,6 @@ public class LM055Report extends MakeReport {
 		int col = 0;
 		int row = 0;
 
-//		BigDecimal normalAmount = BigDecimal.ZERO;
-//		BigDecimal specificAmount = BigDecimal.ZERO;
-//		BigDecimal allowAmount = BigDecimal.ZERO;
-
 		String type = "";
 		int kind = 0;
 		BigDecimal amount = BigDecimal.ZERO;
@@ -90,7 +86,9 @@ public class LM055Report extends MakeReport {
 			type = r.get("F0");
 			kind = Integer.valueOf(r.get("F1"));
 			amount = new BigDecimal(r.get("F2"));
-
+			this.info("type=" + type);
+			this.info("kind=" + kind);
+			this.info("amount=" + amount);
 			switch (type) {
 			case "A":
 				row = 8;
@@ -114,9 +112,9 @@ public class LM055Report extends MakeReport {
 				break;
 			}
 		}
-		
+
 		col = kind + 5;
-		
+
 		makeExcel.setValue(row, col, amount, "#,##0");
 
 	}

@@ -179,10 +179,15 @@ BEGIN
           --    WHEN TR1."TRXTOS" < 0 THEN TR1."TRXTOS"
           --  ELSE 0 END                     AS "Shortfall"           -- 短收 DECIMAL 16 2
           ,0                              AS "Shortfall"           -- 短收 DECIMAL 16 2
-          -- ,CASE
-          --    WHEN TR1."TRXTOS" > 0 THEN TR1."TRXTOS"
-          --  ELSE 0 END                     AS "Overflow"            -- 溢收 DECIMAL 16 2
-          ,0                              AS "Overflow"            -- 溢收 DECIMAL 16 2
+          -- 2022-06-30 Wei From Lai Email:
+          -- 給了我一個戶號跟會計日期要把他的累溢收金額轉進來
+          -- 戶號:0307086
+          -- 會計日期:20220128
+          -- 累溢收金額:491
+          ,CASE
+             WHEN TR1."TRXTOS" > 0 THEN TR1."TRXTOS"
+           ELSE 0 END                     AS "Overflow"            -- 溢收 DECIMAL 16 2
+          -- ,0                              AS "Overflow"            -- 溢收 DECIMAL 16 2
           ,'{"CaseCloseCode":"'|| CASE
                                     -- WHEN TR1."TRXTCT" = '1' AND NVL(NOD."LMSACN",0) <> 0 THEN '2'
                                     WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1

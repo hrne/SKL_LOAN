@@ -166,13 +166,19 @@ public class L4721Report2 extends MakeReport {
 
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 //				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
-
+				int times = 0;
 				for (Map<String, String> mapL4721Detail : listL4721Detail) {
 
 					// 相同戶號不同額度的輸出
 
 					if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
-						result = sameFacmno(mapL4721Detail, result);
+						// 該額度第一次進要印0102
+						if (times == 0) {
+							result = sameFacmno(mapL4721Detail, result, false);
+						} else {
+							result = sameFacmno(mapL4721Detail, result, true);
+						}
+						times++;
 					} else { // 不同額度 印04並且切到下一個額度循環
 						// 04
 
@@ -208,53 +214,60 @@ public class L4721Report2 extends MakeReport {
 						line = "";
 						// 加入換行
 						result.add(line);
-						result = sameFacmno(mapL4721Detail, result);
+						result = sameFacmno(mapL4721Detail, result, false);
+						// 換額度要重新算次數
+						times = 0;
 					} // else
+
 				} // for
 			} // for
 		} // for
 		return result;
 	}
 
-	private List<String> sameFacmno(Map<String, String> tmap, List<String> result) throws LogicException {
+	private List<String> sameFacmno(Map<String, String> tmap, List<String> result, Boolean same) throws LogicException {
 
 		String line = "";
-		// 01
 
-		// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
-		line = "";
-		line += "01";
-		line += "地址" + tmap.get("Location") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " " + tmap.get("CustName");
-		// 加入明細
-		result.add(line);
-		line = "";
-		result.add(line);
+		if (same) {
+			// 01
 
-		// 02
+			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
+			line = "";
+			line += "01";
+			line += "地址" + tmap.get("Location") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
+					+ tmap.get("CustName");
+			// 加入明細
+			result.add(line);
+			line = "";
+			result.add(line);
 
-		int effectDate = parse.stringToInteger(tmap.get("TxEffectDate"));
-		if (effectDate != 0) {
-			baTxCom.getDueAmt(effectDate, parse.stringToInteger(tmap.get("CustNo")),
-					parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
-			headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
-			headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
-		} else {
-			headerDueAmt = tmap.get("DueAmt");
-		}
+			// 02
 
-		// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
-		line = "";
-		line += "02";
-		line += " " + tmap.get("CustName") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + tmap.get("SpecificDd")
-				+ " 日" + "          " + tmap.get("RepayCodeX") + "   " + FormatUtil.pad9(tmap.get("LoanBal"), 11)
-				+ headerExcessive;
+			int effectDate = parse.stringToInteger(tmap.get("TxEffectDate"));
+			if (effectDate != 0) {
+				baTxCom.getDueAmt(effectDate, parse.stringToInteger(tmap.get("CustNo")),
+						parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
+				headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
+				headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
+			} else {
+				headerDueAmt = tmap.get("DueAmt");
+			}
 
-		// 加入明細
-		result.add(line);
-		line = "";
-		result.add(line);
+			// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
+			line = "";
+			line += "02";
+			line += " " + tmap.get("CustName") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + tmap.get("SpecificDd")
+					+ " 日" + "          " + tmap.get("RepayCodeX") + "   " + FormatUtil.pad9(tmap.get("LoanBal"), 11)
+					+ headerExcessive;
 
-		// 03
+			// 加入明細
+			result.add(line);
+			line = "";
+			result.add(line);
+
+		} // if
+			// 03
 
 		// 030109041301090310-01090410 銀行扣款
 		// 0000037738+0000032175+00005563+00000000+00000000+

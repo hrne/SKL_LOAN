@@ -36,7 +36,7 @@ import com.st1.itx.util.data.DataLog;
 /**
  * 
  * 
- * @author Luisito
+ * @author Luisito / Mata
  * @version 1.0.0
  */
 public class L8321 extends TradeBuffer {
@@ -144,7 +144,6 @@ public class L8321 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
-
 			break;
 		case "2":
 			iKey = titaVo.getParam("Ukey");
@@ -154,11 +153,11 @@ public class L8321 extends TradeBuffer {
 			if (uJcicZ063 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ063 oldJcicZ063 = (JcicZ063) iDataLog.clone(uJcicZ063);
 			uJcicZ063.setClosedDate(iClosedDate);
 			uJcicZ063.setClosedResult(iClosedResult);
 			uJcicZ063.setTranKey(iTranKey);
 			uJcicZ063.setOutJcicTxtDate(0);
-			JcicZ063 oldJcicZ063 = (JcicZ063) iDataLog.clone(uJcicZ063);
 			try {
 				sJcicZ063Service.update(uJcicZ063, titaVo);
 			} catch (DBException e) {

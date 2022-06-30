@@ -2,8 +2,8 @@
 --  DDL for Procedure Usp_Tf_AcDetail_Ins
 --------------------------------------------------------
 set define off;
- 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_AcDetail_Ins" 
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcDetail_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -183,6 +183,13 @@ BEGIN
                                                         WHEN S3."CORACC" = '40903300'
                                                              AND NVL(S3."CORACS",'     ') = '     '
                                                         THEN '01' -- 放款帳管費
+                                                        -- 2022-06-30 Wei From Lai Email:
+                                                        -- AcNoCode = 20222020000
+                                                        -- 轉 AcDtlCode = 01
+                                                        --    and AcctCode = TAV
+                                                        WHEN S3."CORACC" = '20232020'
+                                                             AND NVL(S3."CORACS",'     ') = '     '
+                                                        THEN '01'
                                                       ELSE '  ' END
           LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC"
                        AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ')
@@ -483,6 +490,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_AcDetail_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 /

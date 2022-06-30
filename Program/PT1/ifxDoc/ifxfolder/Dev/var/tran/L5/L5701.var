@@ -669,10 +669,10 @@ E(0,#TotalPeriod-1)
 #LastDueDateN=A,8,S
 D(7,2,#FirstDueDate,#TotalPeriodN,0)
 
-! 還款結束日
+! 還款結束日-新增債協主檔時才預設為計算出的新還款結束日,否則應預設帶出調RIM的值
 #LastDueDate=D,7,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-E(0,#LastDueDateN)
+IF(#FunctionCode=="02",$,E(0,#LastDueDateN))
 D(8)
 @V(7)A(DATE,0,#LastDueDate)
 IF(#FirstDueDate>#LastDueDate,V(P,[還款結束日]不得小於[首次應繳日]),s)

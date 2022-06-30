@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcReceivable implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcReceivableId acReceivableId;
 
   // 業務科目代號
@@ -44,12 +40,11 @@ public class AcReceivable implements Serializable {
   private int custNo = 0;
 
   // 額度編號
-  /* 借新還舊時放000 */
   @Column(name = "`FacmNo`", insertable = false, updatable = false)
   private int facmNo = 0;
 
   // 銷帳編號
-  /* 1:暫收款－可抵繳 : ''primary key 不可有null, 放一個空白2:擔保放款、催收款項 : 撥款序號(3)3:會計銷帳科目：系統自編(AC+西元年後兩碼+流水號六碼)4:暫收款－支票：支票帳號(9)-支票號碼(7) 5:未收帳管費：第一筆撥款序號(3) 6:未收契變手續費：契變日期(8,西元)+契變序號(02)7:未收、暫收、暫付、催收火險保費：原保險單號碼8:暫付、催收法務費：記錄號碼(8)9:短繳期金：撥款序號(3)10:'FacmNo'+額度編號(暫收款－借新還舊)11:聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM) */
+  /* 1:暫收款－可抵繳 : ''primary key 不可有null, 放一個空白2:擔保放款、催收款項 : 撥款序號(3)3:會計銷帳科目：系統自編(AC+西元年後兩碼+流水號六碼)4:暫收款－支票：支票帳號(9)-支票號碼(7) 5:未收帳管費：第一筆撥款序號(3) 6:未收契變手續費：契變日期(8,西元)+契變序號(02)7:未收、暫收、暫付、催收火險保費：原保險單號碼8:暫付、催收法務費：記錄號碼(8)9:短繳期金：撥款序號(3)10:暫收款－借新還舊: 'FacmNo' + 額度編號(3)11:聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM) */
   @Column(name = "`RvNo`", length = 30, insertable = false, updatable = false)
   private String rvNo;
 
@@ -96,12 +91,11 @@ public class AcReceivable implements Serializable {
   private BigDecimal rvAmt = new BigDecimal("0");
 
   // 未銷餘額
-  /* 含次日 */
   @Column(name = "`RvBal`")
   private BigDecimal rvBal = new BigDecimal("0");
 
   // 會計日餘額
-  /* 不含次日 */
+  /* 同RvBal */
   @Column(name = "`AcBal`")
   private BigDecimal acBal = new BigDecimal("0");
 
@@ -120,7 +114,7 @@ public class AcReceivable implements Serializable {
   private String acSubBookCode;
 
   // 起帳日期
-  /* 火險：原保險單保險迄日、暫付法務費：法務費單據日期 */
+  /* 火險：續保保單保險起日、暫付法務費：法務費單據日期 */
   @Column(name = "`OpenAcDate`")
   private int openAcDate = 0;
 
@@ -241,7 +235,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 額度編號<br>
-	* 借新還舊時放000
+	* 
 	* @return Integer
 	*/
   public int getFacmNo() {
@@ -250,7 +244,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 額度編號<br>
-	* 借新還舊時放000
+	* 
   *
   * @param facmNo 額度編號
 	*/
@@ -269,7 +263,7 @@ public class AcReceivable implements Serializable {
 7:未收、暫收、暫付、催收火險保費：原保險單號碼
 8:暫付、催收法務費：記錄號碼(8)
 9:短繳期金：撥款序號(3)
-10:'FacmNo'+額度編號(暫收款－借新還舊)
+10:暫收款－借新還舊: 'FacmNo' + 額度編號(3)
 11:聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
 	* @return String
 	*/
@@ -288,7 +282,7 @@ public class AcReceivable implements Serializable {
 7:未收、暫收、暫付、催收火險保費：原保險單號碼
 8:暫付、催收法務費：記錄號碼(8)
 9:短繳期金：撥款序號(3)
-10:'FacmNo'+額度編號(暫收款－借新還舊)
+10:暫收款－借新還舊: 'FacmNo' + 額度編號(3)
 11:聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
   *
   * @param rvNo 銷帳編號
@@ -482,7 +476,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 未銷餘額<br>
-	* 含次日
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getRvBal() {
@@ -491,7 +485,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 未銷餘額<br>
-	* 含次日
+	* 
   *
   * @param rvBal 未銷餘額
 	*/
@@ -501,7 +495,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 會計日餘額<br>
-	* 不含次日
+	* 同RvBal
 	* @return BigDecimal
 	*/
   public BigDecimal getAcBal() {
@@ -510,7 +504,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 會計日餘額<br>
-	* 不含次日
+	* 同RvBal
   *
   * @param acBal 會計日餘額
 	*/
@@ -581,7 +575,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 起帳日期<br>
-	* 火險：原保險單保險迄日、暫付法務費：法務費單據日期
+	* 火險：續保保單保險起日、暫付法務費：法務費單據日期
 	* @return Integer
 	*/
   public int getOpenAcDate() {
@@ -590,7 +584,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 起帳日期<br>
-	* 火險：原保險單保險迄日、暫付法務費：法務費單據日期
+	* 火險：續保保單保險起日、暫付法務費：法務費單據日期
   *
   * @param openAcDate 起帳日期
   * @throws LogicException when Date Is Warn	*/
