@@ -166,7 +166,10 @@ public class L9710Report extends MakeReport {
 						divderCount++;
 						reportTot(tempCity);
 						
+						//地區別結束段落與換頁同時
 						if (tempCount >= 40) {
+							this.newPage();
+							tempCount = tempCount % 40;
 							divderCount = 0;
 						}
 						
@@ -185,8 +188,7 @@ public class L9710Report extends MakeReport {
 					this.newPage();
 					// 超過40行重新算(從餘數開始計)
 					tempCount = tempCount % 40;
-//					divderCount = 0;
-//					count = 0 ;
+
 				}
 
 //				f0 = tL9710Vo.get("F0");

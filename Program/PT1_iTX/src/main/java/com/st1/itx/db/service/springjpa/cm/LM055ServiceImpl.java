@@ -51,6 +51,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("ilDate=" + ilDate);
 		
 		String sql = " ";
+		// --取 逾期放款、未列入逾期應予評估放款(KIND=1、2)
 		sql += "	WITH \"tempA\" AS (";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"ClCode1\" IN (3) THEN 'D'";
@@ -74,6 +75,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	       WHEN M.\"ClCode1\" IN (1,2) THEN 'C' ";
 		sql += "       	     ELSE '99' END )";
 		sql += "	      ,M.\"AssetClass\"";
+		//--取 放款折溢價及催收費用
 		sql += "	),\"tempB\" AS (";
 		sql += "		SELECT 'A' AS \"ClNo\"";
 		sql += "          	  ,ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"AMT\"";
@@ -85,8 +87,9 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE I.\"YearMonth\" = :yymm ";
 		sql += "	  	  AND MLB.\"AcctCode\" <> 990 ";
 		sql += "	),\"tempC\" AS (";
+		//--取 購置住宅+修繕貸款(正常)
 		sql += "	SELECT RES.\"TYPE\" AS \"TYPE\" ";
-		sql += "		  ,RES.\"KIND\" AS \"KIND\" ";
+		sql += "		  ,1 AS \"KIND\" ";
 		sql += "		  ,SUM(RES.\"AMT\") AS \"AMT\"";
 		sql += "	FROM (";
 		sql += "	SELECT ( CASE";
@@ -125,14 +128,15 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
 		sql += "			     ELSE '99'";
 		sql += "			   END ))RES ";
-		sql += "	WHERE RES.\"KIND\" IN (1)";
+		sql += "	WHERE RES.\"KIND\" IN (1,2)";
 		sql += "	GROUP BY RES.\"TYPE\"";
-		sql += "			,RES.\"KIND\"";
+		// --取 應收利息
 		sql += "	),\"tempD\" AS (";
 		sql += "	SELECT SUM(M.\"IntAmtAcc\") AS \"AMT\" ";
 		sql += "	FROM \"MonthlyLoanBal\" M";
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"LoanBalance\" > 0 ";
+		// --取 資產五分類(正常、應予注意、可望收回、收回困難、收回無望)
 		sql += "	),\"tempE\" AS (";
 		sql += "	SELECT ( CASE";
 		sql += "			   WHEN M.\"ClCode1\" IN (3) THEN 'D'";
@@ -164,6 +168,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			   WHEN M.\"OvduTerm\" IN (1,2) THEN '2'";
 		sql += "			   ELSE '3'";
 		sql += "			 END )";
+		// --取 折溢價、催收費用
 		sql += "	),\"tempF\" AS (";
 		sql += "	SELECT 'ZZ' AS \"TYPE\"";
 		sql += "		  ,4 AS \"KIND\"";
@@ -232,6 +237,12 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM \"tempA\" A";
 		sql += "		LEFT JOIN \"tempC\" C ON C.\"TYPE\" = A.\"TYPE\"";
 		sql += "							 AND C.\"KIND\" = A.\"KIND\"";
+		sql += "		UNION";
+		sql += "		SELECT F.\"TYPE\" AS \"TYPE\"";
+		sql += "			  ,1 AS \"KIND\"";
+		sql += "			  ,NVL(F.\"AMT\",0) AS \"AMT\"";
+		sql += "		FROM \"tempF\" F";
+		sql += "		WHERE F.\"KIND\" = 4 ";
 		sql += "		UNION";
 		sql += "		SELECT F.\"TYPE\" AS \"TYPE\"";
 		sql += "			  ,TO_NUMBER(F.\"KIND\") AS \"KIND\"";

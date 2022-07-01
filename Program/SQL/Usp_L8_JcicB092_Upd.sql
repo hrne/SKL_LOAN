@@ -156,7 +156,12 @@ BEGIN
     )
     -- 2022-05-24 Wei 新增此段 目的: 該戶號同擔保品的額度加總
     -- 先找出有同擔保品的額度資料
-    , sameClRawData AS (
+    -- 2022-06-30 Wei 修正 Bug 
+    -- CASE : 一戶號下有兩組同擔保品額度時,會多個擔保品的核准額度加總到戶號
+    -- 戶號 380003
+    -- 額度 3,4 擔保品 1-1-1049110 核准金額 4500000+1500000
+    -- 額度 5,6 擔保品 1-1-1056984 核准金額 1000000+3000000
+    , sameClRawData AS ( -- 找出同擔保品多額度的戶號&擔保品號碼
         SELECT "CustNo"
              , "ClCode1"
              , "ClCode2"
@@ -168,9 +173,12 @@ BEGIN
                , "ClNo"
         HAVING COUNT(*) >= 2
     )
-    , sameClFacmNoData AS (
+    , sameClFacmNoData AS ( -- 找出 同擔保品多額度 的 額度號碼(並且篩選有存在於B090)
         SELECT DISTINCT
                S."CustNo"
+             , S."ClCode1"
+             , S."ClCode2"
+             , S."ClNo"
              , CF."FacmNo"
         FROM sameClRawData S
         LEFT JOIN "ClFac" CF ON CF."CustNo" = S."CustNo"
@@ -181,13 +189,19 @@ BEGIN
                               AND to_number(SUBSTR(J."FacmNo",8,3)) = CF."FacmNo"
         WHERE J."FacmNo" IS NOT NULL --2022/05/26 加總時只考慮B090有的資料
     )
-    , sameClLineAmtData AS (
+    , sameClLineAmtData AS ( -- 以 戶號&擔保品號碼 加總 各額度的核准金額
       SELECT S."CustNo"
+           , S."ClCode1"
+           , S."ClCode2"
+           , S."ClNo"
            , SUM(F."LineAmt") AS "SameClLineAmt"
       FROM sameClFacmNoData S
       LEFT JOIN "FacMain" F ON F."CustNo" = S."CustNo"
                            AND F."FacmNo" = S."FacmNo"
       GROUP BY S."CustNo"
+             , S."ClCode1"
+             , S."ClCode2"
+             , S."ClNo"
     )
     SELECT  -- count(*) as "Count"
            M."FacmNo"                            AS "FacmNo"
@@ -422,6 +436,9 @@ BEGIN
                                AND LAD."CustNo" = to_number(SUBSTR(M."FacmNo",1,7))
                                AND LAD."FacmNoSeq" = 1
       LEFT JOIN sameClLineAmtData SCLAD ON SCLAD."CustNo" = to_number(SUBSTR(M."FacmNo",1,7))
+                                       AND SCLAD."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1))
+                                       AND SCLAD."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2))
+                                       AND SCLAD."ClNo" = to_number(SUBSTR(M."ClActNo",4,7))
     WHERE  M."DataYM"  =  YYYYMM
       AND  M."ClActNo" IS NOT NULL
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')         -- 主要擔保品為不動產
