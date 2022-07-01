@@ -116,8 +116,11 @@ public class L6907 extends TradeBuffer {
 					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
 				l6908Flag = "";
 			}
+			// 交易序號 = 0不顯示按鈕 
 			occursList.putParam("L6908Flag", l6908Flag);
-
+            if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
+				l6908Flag = "";         	
+            }
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));

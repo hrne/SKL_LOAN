@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.service.springjpa.cm.LM062ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.LM064ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
@@ -25,6 +26,12 @@ public class LM064Report extends MakeReport {
 	@Autowired
 	LM064ServiceImpl lm064ServiceImpl;
 
+	@Autowired
+	LM062ServiceImpl lm062ServiceImpl;
+	
+	@Autowired
+	LM062Report lm062report;
+	
 	@Autowired
 	MakeExcel makeExcel;
 
@@ -49,10 +56,11 @@ public class LM064Report extends MakeReport {
 
 		this.info("yymm=" + iYearMonth);
 		
-		String txCD = titaVo.getTxcd();
-
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, "03-個金2000萬以上小於3000萬-" + iYearMonth,
-				txCD+"_03-個金2000萬以上小於3000萬-" + iYearMonth, "LM064_底稿_個金2000萬以上小於3000萬.xls", "簡表");
+		String txCD = "LM064";
+		String itemName = "03-個金2000萬以上小於3000萬";
+		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, itemName+"-" + iYearMonth,
+				txCD+"_"+itemName+"-" + iYearMonth, "LM064_底稿_個金2000萬以上小於3000萬.xls", "簡表");
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
@@ -75,11 +83,16 @@ public class LM064Report extends MakeReport {
 		makeExcel.setValue(1, 12, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
+		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
 			fnAllList = lm064ServiceImpl.findAll(titaVo,yearMonth);
 
+			//共用LM062Impl
+			fnAllList2 = lm062ServiceImpl.findList(titaVo, yearMonth,3);
+			 
+			
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -234,8 +247,12 @@ public class LM064Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
 
+	
+		lm062report.dataList(fnAllList2,itemName);
+		
+		
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+
 
 	}
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.service.springjpa.cm.LM062ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.LM065ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
@@ -26,13 +27,19 @@ public class LM065Report extends MakeReport {
 	LM065ServiceImpl lm065ServiceImpl;
 
 	@Autowired
+	LM062ServiceImpl lm062ServiceImpl;
+	
+	@Autowired
+	LM062Report lm062report;
+	
+	@Autowired
 	MakeExcel makeExcel;
 
 	@Override
 	public void printTitle() {
 	}
 
-	public void exec(TitaVo titaVo,int yearMonth) throws LogicException {
+	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 
 		this.info("LM065Report exec");
 
@@ -47,11 +54,12 @@ public class LM065Report extends MakeReport {
 		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
 		this.info("yymm=" + iYearMonth);
-		
-		String txCD = titaVo.getTxcd();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, "04-個金100萬以上小於2000萬-" + iYearMonth,
-				txCD+"_04-個金100萬以上小於2000萬-" + iYearMonth, "LM065_底稿_個金100萬以上小於2000萬.xls", "簡表");
+		String txCD = "LM065";
+		String itemName = "04-個金100萬以上小於2000萬";
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, itemName + "-" + iYearMonth,
+				txCD + "_" + itemName + "-" + iYearMonth, "LM065_底稿_個金100萬以上小於2000萬.xls", "簡表");
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
 		makeExcel.setWidth(3, 7);
@@ -73,10 +81,14 @@ public class LM065Report extends MakeReport {
 		makeExcel.setValue(1, 12, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
+		List<Map<String, String>> fnAllList2 = new ArrayList<>();
 
 		try {
 
-			fnAllList = lm065ServiceImpl.findAll(titaVo,yearMonth);
+			fnAllList = lm065ServiceImpl.findAll(titaVo, yearMonth);
+
+			// 共用LM062Impl
+			fnAllList2 = lm062ServiceImpl.findList(titaVo, yearMonth, 4);
 
 		} catch (Exception e) {
 
@@ -205,8 +217,10 @@ public class LM065Report extends MakeReport {
 					case 13:
 						// M欄 評等
 						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0") ? ""
-										: tLDVo.get(fdnm),"C");
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0")
+										? ""
+										: tLDVo.get(fdnm),
+								"C");
 						break;
 					default:
 
@@ -219,8 +233,6 @@ public class LM065Report extends MakeReport {
 			makeExcel.setValue(row + 1, 8, lday - 19110000, "C");
 			makeExcel.setValue(row + 1, 9, tot, "#,##0", "R");
 
-			// 畫框線
-//			makeExcel.setAddRengionBorder("B", 4, "K", row + 1, 1);
 		} else {
 
 			makeExcel.setValue(3, 2, "本日無資料");
@@ -229,8 +241,9 @@ public class LM065Report extends MakeReport {
 		// 設定高度
 		makeExcel.setHeight(3, 30);
 
+		lm062report.dataList(fnAllList2, itemName);
+
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
 
 	}
 

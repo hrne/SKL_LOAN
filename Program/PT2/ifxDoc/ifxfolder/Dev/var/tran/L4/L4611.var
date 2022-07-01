@@ -583,7 +583,7 @@ T(H,#CommericalFlag,#CommericalFlagHelp)
 C(2,#FunctionCode,s,$,$,s,s,s)
 
 #MRKEY=_,_,S
-T(2,#TimCustNo+-+#FacmNo)
+T(2,#CustNo+-+#FacmNo)
 
 </sub>
 

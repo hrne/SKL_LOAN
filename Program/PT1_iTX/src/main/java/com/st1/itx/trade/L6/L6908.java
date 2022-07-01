@@ -84,7 +84,6 @@ public class L6908 extends TradeBuffer {
 				occursList.putParam("OOTitaTxtNo", t.get("TitaTxtNo"));
 				occursList.putParam("OOTranItem", t.get("TranItem"));
 				occursList.putParam("OOTitaTxCd", t.get("TitaTxCd"));
-				occursList.putParam("OOSlipNote", t.get("SlipNote"));
 				int acdate = parse.stringToInteger(t.get("AcDate"));
 				int entrydate = parse.stringToInteger(t.get("EntryDate"));
 				int txtNo = parse.stringToInteger(t.get("TitaTxtNo"));
@@ -100,8 +99,32 @@ public class L6908 extends TradeBuffer {
 				if (entrydate >= 19110000) {
 					entrydate = entrydate - 19110000;
 				}
+				String openAcDateX = "";
 
-				occursList.putParam("OOAcDate", acdate);
+				if ("0".equals(t.get("DB"))) {
+					switch (titaVo.get("AcctCode")) {
+					case "TMI":
+					case "F09":
+						openAcDateX = "續保保單起日:";
+						break;
+					case "F07":
+						openAcDateX = "單據日期:";
+						break;
+					case "F10":
+						openAcDateX = "首次應繳日:";
+						break;
+					default:
+						break;
+					}
+				}
+
+				if ("".equals(openAcDateX)) {
+					occursList.putParam("OOAcDate", acdate);
+					occursList.putParam("OOSlipNote", t.get("SlipNote"));
+				} else {
+					occursList.putParam("OOAcDate", "");
+					occursList.putParam("OOSlipNote", openAcDateX + acdate);
+				}
 				occursList.putParam("OOClsFlag", t.get("ClsFlag"));
 				occursList.putParam("OOEntryDate", entrydate);
 
@@ -115,5 +138,4 @@ public class L6908 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 }

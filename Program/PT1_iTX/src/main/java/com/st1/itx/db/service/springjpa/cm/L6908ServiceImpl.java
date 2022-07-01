@@ -92,12 +92,13 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ac.\"OpenTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
 		sql += "    ac.\"OpenTxCd\"     AS \"TitaTxCd\",";
-		sql += "    NULL AS \"SlipNote\",";
+		sql += "    ac.\"SlipNote\"     AS \"SlipNote\",";
 		sql += "    ac.\"OpenAcDate\"   AS \"AcDate\",";
 		sql += "    ac.\"CreateDate\"   AS \"CreateDate\",";
 		sql += "    0                   AS \"EntryDate\",";
 		sql += "     0                   AS \"ClsFlag\",";
-		sql += "    'AcReceivable'      AS \"DB\"";
+		sql += "    ac.\"ReceivableFlag\"   AS \"ReceivableFlag\",";
+		sql += "    0                    AS \"DB\"";
 		sql += "  FROM";
 		sql += "    \"AcReceivable\"   ac";
 		sql += "    LEFT JOIN \"TxTranCode\"     tc ON tc.\"TranNo\" = ac.\"OpenTxCd\"";
@@ -130,7 +131,8 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        WHEN SUBSTR(ad.\"AcNoCode\",1,1) NOT IN ('1','5','6','9') AND ad.\"DbCr\" = 'C' THEN 0 ";
 		sql += "        ELSE  1 ";
 		sql += "      END AS \"ClsFlag\",";
-		sql += "    'AcDetail'    AS \"DB\"";
+		sql += "    ar.\"ReceivableFlag\"   AS \"ReceivableFlag\",";
+		sql += "    1                   AS \"DB\"";
 		sql += "  FROM";
 		sql += "    \"AcReceivable\"   ar";
 		sql += "  LEFT JOIN  \"AcDetail\"     ad";
@@ -152,7 +154,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    AND ar.\"FacmNo\" = :facmno";
 		sql += "    AND ar.\"RvNo\" = :rvno";
 		sql += "    AND NVL(ad.\"ReceivableFlag\", 0 ) >= 0";
-		sql += " ORDER BY \"AcDate\", \"CreateDate\"";
+		sql += " ORDER BY \"DB\", \"AcDate\", \"CreateDate\"";
 
 		sql += " " + sqlRow;
 

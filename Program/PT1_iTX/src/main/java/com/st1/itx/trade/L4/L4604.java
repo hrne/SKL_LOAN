@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -156,7 +157,7 @@ public class L4604 extends TradeBuffer {
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
+			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 			acReceivableList.add(acReceivable);
 		}
 		acReceivableCom.mnt(1, acReceivableList, titaVo); // 0-起帳 1-銷帳2-刪除
@@ -174,7 +175,11 @@ public class L4604 extends TradeBuffer {
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			acReceivable.setOpenAcDate(tInsuRenew.getInsuYearMonth() * 100 + 01);
+			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+			TempVo tTempVo = new TempVo();
+			tTempVo.clear();
+			tTempVo.putParam("InsuYearMonth", tInsuRenew.getInsuYearMonth());
+			acReceivable.setJsonFields(tTempVo.getJsonString());
 			acReceivableList.add(acReceivable);
 		}
 		acReceivableCom.mnt(0, acReceivableList, titaVo); // 0-起帳 1-銷帳

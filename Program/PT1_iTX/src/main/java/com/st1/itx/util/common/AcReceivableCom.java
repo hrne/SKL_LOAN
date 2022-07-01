@@ -236,7 +236,7 @@ public class AcReceivableCom extends TradeBuffer {
 		int bizTbsdy = this.txBuffer.getTxBizDate().getTbsDy();
 		// 業務科目記號 <> 0 or 銷帳科目記號 <> 0
 		for (AcReceivable rv : rvList) {
-			this.info("AcReceivableCom mnt " + rv);
+			this.info("AcReceivableCom mnt " + rv.toString());
 
 			if (rv.getReceivableFlag() < 2 || rv.getReceivableFlag() > 5) { // 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 				throw new LogicException(titaVo, "E6003",
@@ -499,8 +499,8 @@ public class AcReceivableCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
 		} else {
 			updAcReceivable(AcHCode, bizTbsdy);
-			// 同交易序號訂正後為已銷帳則刪除，否則更新(短繳期金因同時會有起帳及銷帳因此除外)
-			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1 && tAcReceivable.getReceivableFlag() != 4
+			// 同交易序號訂正後為已銷帳則刪除，否則更新
+			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1 
 					&& tAcReceivable.getTitaTlrNo().equals(this.titaVo.getOrgTlr())
 					&& tAcReceivable.getTitaTxtNo() == parse.stringToInteger(this.titaVo.getOrgTno())) {
 				try {
