@@ -212,12 +212,13 @@ public class L3210 extends TradeBuffer {
 			if (titaVo.isHcodeNormal()) {
 				addLoanBorTxRoutine();
 			} else {
-				loanCom.setFacmBorTxHcode(iCustNo, iFacmNo == 0 ? iOverRpFacmNo : iFacmNo, titaVo);
+				loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);// 訂正放款交易內容檔by交易
 			}
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+
 	}
 
 	// 兌現票入帳處理

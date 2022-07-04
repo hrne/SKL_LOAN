@@ -169,7 +169,7 @@ public class AcReceivableCom extends TradeBuffer {
 					tAcReceivable.setRvAmt(ac.getTxAmt());
 					tAcReceivable.setCustNo(ac.getCustNo());
 					tAcReceivable.setFacmNo(ac.getFacmNo());
-					tAcReceivable.setRvNo(parse.IntegerToString(ac.getBormNo(), 3));
+					tAcReceivable.setRvNo(ac.getRvNo());
 					mntRvList.add(tAcReceivable);
 					wkAcctCode = ac.getAcctCode();
 				}
@@ -421,24 +421,24 @@ public class AcReceivableCom extends TradeBuffer {
 			wkRvFg = 2;
 		}
 
-		this.info("procSetting EntAc =" + ac.getEntAc() + ",ReceivableFlag = " + ac.getReceivableFlag() + ",AcHcode="
-				+ AcHcode + ",wkRvFg=" + wkRvFg + ",wkTxAmt=" + wkTxAmt + ",AcctCode=" + ac.getAcctCode());
-		this.info("debitsList.contains " + debitsList.contains(ac.getAcNoCode().substring(0, 1)) + "AcNoCode="
-				+ ac.getAcNoCode() + ",DbCr=" + ac.getDbCr());
+		// 資負明細科目（放款、催收款項..) --> 撥款序號(擔保放款、催收款項)
+		if ("3".equals(wkAcctCode.substring(0, 1)) || "9".equals(wkAcctCode.substring(0, 1))) {
+			wkRvNo = FormatUtil.pad9(String.valueOf(ac.getBormNo()), 3);
+		}
 
 		// 銷帳編號wkRvNo primary key 不可有null, 放 " "
+		// 銷帳科目記號 = 1-會計銷帳科目 && 起銷帳記號 = 0-起帳 -> 會計銷帳編號
+		// 編號日期, 編號方式=1:年度編號, 業務類別, 交易種類
 		if (wkRvNo.isEmpty()) {
 			wkRvNo = " ";
-			// 資負明細科目（放款、催收款項..) --> 撥款序號(擔保放款、催收款項)
-			if (ac.getAcctFlag() == 1)
-				wkRvNo = FormatUtil.pad9(String.valueOf(ac.getBormNo()), 3);
-			// 銷帳科目記號 = 1-會計銷帳科目 && 起銷帳記號 = 0-起帳 -> 會計銷帳編號
-			// 編號日期, 編號方式=1:年度編號, 業務類別, 交易種類
-			else if (ac.getReceivableFlag() == 1 && wkRvFg == 0)
+			if (ac.getReceivableFlag() == 1 && wkRvFg == 0) {
 				// AC+西元年後兩碼+流水號六碼
 				wkRvNo = "AC" + parse.IntegerToString(ac.getAcDate() + 19110000, 8).substring(2, 4)
 						+ parse.IntegerToString(gSeqCom.getSeqNo(ac.getAcDate(), 1, "L6", "RvNo", 999999, titaVo), 6);
+			}
 		}
+		this.info("procSetting EntAc =" + ac.getEntAc() + ",ReceivableFlag = " + ac.getReceivableFlag() + ",AcHcode="
+				+ AcHcode + ",wkRvFg=" + wkRvFg + ",wkTxAmt=" + wkTxAmt + ",AcctCode=" + wkAcctCode + "RvNo=" + wkRvNo);
 
 	}
 
@@ -477,13 +477,13 @@ public class AcReceivableCom extends TradeBuffer {
 		tAcReceivableId.setFacmNo(ac.getFacmNo());
 		tAcReceivableId.setRvNo(wkRvNo);
 		tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
-		if (tAcReceivable == null && ac.getReceivableFlag() == 4 && ac.getRvNo().length() > 3 && wkRvFg > 0) {
-			tAcReceivableId.setRvNo(ac.getRvNo().substring(0, 3));
+		if (tAcReceivable == null && ac.getReceivableFlag() == 4 && wkRvNo.length() > 3 && wkRvFg > 0) {
+			tAcReceivableId.setRvNo(wkRvNo.substring(0, 3));
 			tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
 		}
 		if (tAcReceivable == null) {
 			// 0-起帳
-			if (wkRvFg == 0) {
+			if (wkRvFg == 0 || AcHCode == 2) {
 				tAcReceivable = new AcReceivable();
 				tAcReceivable.setAcReceivableId(tAcReceivableId);
 				newAcReceivable(bizTbsdy);
@@ -500,7 +500,7 @@ public class AcReceivableCom extends TradeBuffer {
 		} else {
 			updAcReceivable(AcHCode, bizTbsdy);
 			// 同交易序號訂正後為已銷帳則刪除，否則更新
-			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1 
+			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1
 					&& tAcReceivable.getTitaTlrNo().equals(this.titaVo.getOrgTlr())
 					&& tAcReceivable.getTitaTxtNo() == parse.stringToInteger(this.titaVo.getOrgTno())) {
 				try {

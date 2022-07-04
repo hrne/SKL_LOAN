@@ -206,7 +206,11 @@ BEGIN
           ,''                  AS "TitaKinBr"        -- 
           ,S1."TitaTlrNo"      AS "TitaTlrNo"        -- 經辦
           ,S1."TitaTxtNo"      AS "TitaTxtNo"        -- 交易序號
-          ,''                  AS "JsonFields"       -- jason格式紀錄
+          -- 2022-07-04 Wei From Lai email
+          -- 麻煩幫我轉入JsonFields InsuYearMonth 火險單年月 DECIMAL 6 EX.202006
+          ,'{'
+           || ',' || '"InsuYearMonth":"' || LPAD(NVL(S1."InsuYearMonth",0),6,'0') || '"' -- 火險單年月
+           || '}'              AS "JsonFields"       -- jason格式紀錄
           ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 
           ,'999999'            AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 

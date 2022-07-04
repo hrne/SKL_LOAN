@@ -170,7 +170,7 @@ public class L2153 extends TradeBuffer {
 		if (this.isEloan) {
 			titaVo.putParam("Breach", loanCloseBreachCom.getBreachDescription(iProdNo, titaVo));
 		}
-		
+
 		isElaonUpdate = false;
 		// Eloan check 是否重送 Y -> 修正
 		if (this.isEloan) {
@@ -532,7 +532,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setRuleCode(titaVo.getParam("RuleCode"));
 		tFacMain.setRecycleCode(titaVo.getParam("RecycleCode"));
 		tFacMain.setRecycleDeadline(this.parse.stringToInteger(titaVo.getParam("RecycleDeadline")));
-		tFacMain.setUsageCode(FormatUtil.pad9(titaVo.getParam("UsageCode"), 2)); // 6/16eloan進來需補0 
+		tFacMain.setUsageCode(FormatUtil.pad9(titaVo.getParam("UsageCode"), 2)); // 6/16eloan進來需補0
 		tFacMain.setDepartmentCode(titaVo.getParam("DepartmentCode"));
 		tFacMain.setIncomeTaxFlag(titaVo.getParam("IncomeTaxFlag"));
 		tFacMain.setCompensateFlag(titaVo.getParam("CompensateFlag"));
@@ -547,7 +547,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setCreditOfficer(titaVo.getParam("CreditOfficer"));
 		tFacMain.setLoanOfficer(titaVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(titaVo.getParam("BusinessOfficer"));
-		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel")); // TODO:9/27新增
+		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(titaVo.getParam("Supervisor"));
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
@@ -566,6 +566,10 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setLastTxtNo(titaVo.getTxtNo());
 		tFacMain.setAcDate(this.txBuffer.getTxCom().getTbsdy());
 		tFacMain.setL9110Flag("N");
+//		企金，案件申請准駁日期寫入額度設定日
+		if (!isEloan) {
+			tFacMain.setSettingDate(iApproveDate);
+		}
 	}
 
 	// 刪除額度檔

@@ -134,7 +134,7 @@ BEGIN
     )
     WHEN MATCHED THEN UPDATE SET
     "MainFlag" = CASE
-                   WHEN N."Seq"
+                   WHEN N."Seq" = 1
                    THEN 'Y' -- 主要記號 VARCHAR2 1 (Y:新撥款對到舊撥款最早的一筆 )
                  ELSE 'N' END
     ;

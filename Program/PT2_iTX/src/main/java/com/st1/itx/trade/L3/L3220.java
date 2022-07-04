@@ -35,7 +35,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
 import com.st1.itx.util.common.AcPaymentCom;
-import com.st1.itx.util.common.FormCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.date.DateUtil;
@@ -75,10 +74,6 @@ public class L3220 extends TradeBuffer {
 
 	@Autowired
 	AcDetailCom acDetailCom;
-
-	@Autowired
-	FormCom formCom;
-
 	@Autowired
 	AcNegCom acNegCom;
 	@Autowired
@@ -195,7 +190,7 @@ public class L3220 extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 			addLoanBorTxRoutine();
 		} else {
-			loanCom.setFacmBorTxHcode(iCustNo, iFacmNo, titaVo);
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);// 訂正放款交易內容檔by交易
 		}
 
 		// AML交易檢核
@@ -394,20 +389,8 @@ public class L3220 extends TradeBuffer {
 //		05:退款他行(整批匯款)
 //		11:退款新光(存款憑條)
 
-		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry() && iTempItemCode == 4) {
+		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry() && (iTempItemCode == 4 || iTempItemCode == 11)) {
 			sno = acPaymentCom.printRemitForm(titaVo);
-		}
-
-		// 存入憑條(共用)
-		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry() && iTempItemCode == 11) {
-
-			titaVo.putParam("fmEntryDate", this.txBuffer.getTxCom().getTbsdy()); // 日期
-			titaVo.putParam("fmAccount", titaVo.getParam("RpRemitAcctNo1")); // 客戶帳號
-			titaVo.putParam("fmAmt", titaVo.getParam("RpAmt1")); // 金額
-			titaVo.putParam("fmCustName", titaVo.getParam("RpCustName1")); // 戶名
-			titaVo.putParam("fmCustNo", iCustNo); // 備註(戶號)
-
-			 formCom.exec(titaVo);
 		}
 	}
 

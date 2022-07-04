@@ -603,6 +603,7 @@ public class AcEnterCom extends TradeBuffer {
 		for (AcDetail ac : acList0) {
 			// 原分錄，入總帳記號 2:被沖正(隔日訂正)
 			ac.setEntAc(2);
+			this.info("procAcHCode2 ac=" + ac.toString());
 
 			// 產生新分錄，入總帳記號3.沖正(隔日訂正)
 			i++;
@@ -615,6 +616,7 @@ public class AcEnterCom extends TradeBuffer {
 			acDetail.setReceivableFlag(ac.getReceivableFlag());
 			acDetail.setRvNo(ac.getRvNo());
 			acDetail.setSlipNote(ac.getSlipNote());
+			acDetail.setJsonFields(ac.getJsonFields());
 			acDetail.setSumNo(ac.getSumNo());
 			acDetail.setAcBookCode(ac.getAcBookCode());
 			acDetail.setAcSubBookCode(ac.getAcSubBookCode());
@@ -676,6 +678,7 @@ public class AcEnterCom extends TradeBuffer {
 			acDetail.setReceivableFlag(ac.getReceivableFlag());
 			acDetail.setRvNo(ac.getRvNo());
 			acDetail.setSlipNote(ac.getSlipNote());
+			acDetail.setJsonFields(ac.getJsonFields());
 			acDetail.setSumNo(ac.getSumNo());
 			acDetail.setAcBookCode(ac.getAcBookCode());
 			acDetail.setAcSubBookCode(ac.getAcSubBookCode());

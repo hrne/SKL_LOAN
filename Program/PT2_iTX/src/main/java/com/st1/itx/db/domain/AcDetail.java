@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2074956841333392659L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcDetailId acDetailId;
 
   // 登放日期
@@ -126,7 +122,7 @@ public class AcDetail implements Serializable {
   private int acBookFlag = 0;
 
   // 帳冊別
-  /* 系統參數設定檔帶入000：全公司 */
+  /* 系統參數設定檔帶入000：全帳冊 */
   @Column(name = "`AcBookCode`", length = 3)
   private String acBookCode;
 
@@ -136,7 +132,7 @@ public class AcDetail implements Serializable {
   private String acSubBookCode;
 
   // 彙總別
-  /* 撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx)090:暫收抵繳091:借新還舊092:暫收轉帳093:抽退票094:轉債協暫收款095:轉債協退還款101:匯款轉帳102:銀行扣款103:員工扣款104:支票兌現105:法院扣薪106:理賠金107:代收款-債權協商109:其他111:匯款轉帳預先作業201:整批匯款202:單筆匯款204:退款台新(存款憑條)205:退款他行(整批匯款)211:退款新光(存款憑條) */
+  /* 撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx)090:暫收抵繳091:借新還舊092:暫收轉帳093:抽退票094:轉債協暫收款095:轉債協退還款101:匯款轉帳102:銀行扣款103:員工扣款104:支票兌現105:法院扣薪106:理賠金107:代收款-債權協商109:其他111:匯款轉帳預先作業201:整批匯款202:單筆匯款204:退款他行(匯款單)205:核心退款(整批匯款)211:退款新光(存入憑條) */
   @Column(name = "`SumNo`", length = 3)
   private String sumNo;
 
@@ -640,7 +636,7 @@ C:貸
 /**
 	* 帳冊別<br>
 	* 系統參數設定檔帶入
-000：全公司
+000：全帳冊
 	* @return String
 	*/
   public String getAcBookCode() {
@@ -650,7 +646,7 @@ C:貸
 /**
 	* 帳冊別<br>
 	* 系統參數設定檔帶入
-000：全公司
+000：全帳冊
   *
   * @param acBookCode 帳冊別
 	*/
@@ -705,9 +701,9 @@ C:貸
 111:匯款轉帳預先作業
 201:整批匯款
 202:單筆匯款
-204:退款台新(存款憑條)
-205:退款他行(整批匯款)
-211:退款新光(存款憑條)
+204:退款他行(匯款單)
+205:核心退款(整批匯款)
+211:退款新光(存入憑條)
 	* @return String
 	*/
   public String getSumNo() {
@@ -734,9 +730,9 @@ C:貸
 111:匯款轉帳預先作業
 201:整批匯款
 202:單筆匯款
-204:退款台新(存款憑條)
-205:退款他行(整批匯款)
-211:退款新光(存款憑條)
+204:退款他行(匯款單)
+205:核心退款(整批匯款)
+211:退款新光(存入憑條)
   *
   * @param sumNo 彙總別
 	*/

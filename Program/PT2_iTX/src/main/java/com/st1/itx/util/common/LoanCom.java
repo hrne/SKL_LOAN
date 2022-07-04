@@ -3,6 +3,7 @@ package com.st1.itx.util.common;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -49,7 +50,9 @@ import com.st1.itx.util.parse.Parse;
  * 放款公用程式<BR>
  * setTxTemp 設定交易暫存檔(TxTemp)的共同資料<BR>
  * setFacmBorTx 設定放款交易內容檔(到額度)的共同資料<BR>
+ * addFeeBorTxRoutine 新增放款交易內容檔(收回費用)<BR> 
  * setFacmBorTxHcode 訂正時註記放款交易內容檔(到額度)<BR>
+ * setFacmBorTxHcodeByTx 訂正放款交易內容檔by交易 <BR>
  * setLoanBorTx 設定放款交易內容檔(到撥款)的共同資料<BR>
  * setLoanBorTxHcode 訂正時註記放款交易內容檔(到撥款)<BR>
  * setIntAcctCode 抓取本金科目對應的利息科目<BR>
@@ -71,6 +74,7 @@ import com.st1.itx.util.parse.Parse;
  * getSpecificDate 依首次應繳日推算指定基準日期<BR>
  * checkEraseBormTxSeqNo 檢查到撥款的放款交易訂正須由最近一筆交易開始訂正<BR>
  * checkEraseFacmTxSeqNo 檢查到額度的的放款交易訂正須由最近一筆交易開始訂正<BR>
+ * updateMlaundryRecord更新疑似洗錢交易訪談記錄檔<BR>
  * 
  * @author st1
  *
@@ -1230,7 +1234,7 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setDesc("入帳金額轉暫收款-冲正產生");
 		tLoanBorTx.setRepayCode(tx.getRepayCode());
 		tLoanBorTx.setEntryDate(tx.getEntryDate());
-		tLoanBorTx.setDisplayflag("Y"); // 
+		tLoanBorTx.setDisplayflag("Y"); //
 		tLoanBorTx.setTxAmt(tx.getTxAmt());
 		tLoanBorTx.setTempAmt(tx.getTxAmt());
 		tLoanBorTx.setTitaHCode("0");
@@ -1261,16 +1265,16 @@ public class LoanCom extends TradeBuffer {
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
 		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
 		String desc = iDesc;
-		if ("L3230".equals(titaVo.getTxcd())){
+		if ("L3230".equals(titaVo.getTxcd())) {
 			desc = "暫收銷";
-		}				
+		}
 		if (iRpCode == 97) {
-			desc = "轉催收";		
+			desc = "轉催收";
 		}
 		if (iRpCode == 98) {
-			desc = "轉呆帳";		
+			desc = "轉呆帳";
 		}
-		
+
 		CdCode tCdCode = cdCodeService.findById(new CdCodeId("AcctCode", ba.getAcctCode()), titaVo);
 		desc += tCdCode == null ? ba.getAcctCode() : tCdCode.getItem();
 
@@ -1310,6 +1314,26 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
+	 * 訂正放款交易內容檔by交易
+	 * 
+	 * @param iCustNo 戶號
+	 * @param titaVo  Tita
+	 * @throws LogicException ....
+	 */
+	public void setFacmBorTxHcodeByTx(int iCustNo, TitaVo titaVo) throws LogicException {
+		this.info("calcRepayEraseRoutine ...");
+
+		Slice<LoanBorTx> slLoanBortx = loanBorTxService.custNoTxtNoEq(iCustNo, titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
+		if (slLoanBortx == null) {
+			return;
+		}
+		for (LoanBorTx tx : slLoanBortx.getContent()) {
+			setFacmBorTxHcode(iCustNo, tx.getFacmNo(), titaVo);
+		}
+	}
+
+	/**
 	 * 更新疑似洗錢交易訪談記錄檔
 	 * 
 	 * @param iCustNo    戶號
@@ -1317,8 +1341,8 @@ public class LoanCom extends TradeBuffer {
 	 * @param iBormNo    撥款
 	 * @param iEntryDate 入帳日
 	 * @param iRepayAmt  還款金額
-	 * @param titaVo
-	 * @throws LogicException
+	 * @param titaVo     Tita
+	 * @throws LogicException ....
 	 */
 	public void updateMlaundryRecord(int iCustNo, int iFacmNo, int iBormNo, int iEntryDate, BigDecimal iRepayAmt,
 			TitaVo titaVo) throws LogicException {

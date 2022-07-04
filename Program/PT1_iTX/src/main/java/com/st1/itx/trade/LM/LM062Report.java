@@ -233,7 +233,7 @@ public class LM062Report extends MakeReport {
 	
 	
 	/**
-	 * 資料明細(LM062~LM066覆審相關報表共用)
+	 * 資料明細
 	 * @param list
 	 * @param sheetName 工作表名稱
 	 * */
@@ -276,15 +276,16 @@ public class LM062Report extends MakeReport {
 			//營業單位
 			makeExcel.setValue(row,2,branchNo,"R");
 			//戶號
-			makeExcel.setValue(row,3,custNo,"R");
+			makeExcel.setValue(row,3,custNo,"#######","R");
 			//額度
 			makeExcel.setValue(row,4,facmNo,"R");
 			//撥款
 			makeExcel.setValue(row,5,bormNo,"R");
 			//戶名
 			makeExcel.setValue(row,6,custName,"L");
+
 			//撥款日期
-			makeExcel.setValue(row,7,drawdownDate,"R");
+			makeExcel.setValue(row,7,drawdownDate,"","R");
 			//放款餘額
 			makeExcel.setValue(row,8,loanBal,"#,##0","R");
 			//到期日
