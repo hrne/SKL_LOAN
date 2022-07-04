@@ -69,6 +69,8 @@ public class LD007Batch extends BatchBase implements Tasklet, InitializingBean {
 		// ServiceImpl.findAll 接收民國年月
 		titaVo.putParam("workMonthStart", year * 100 + month);
 		titaVo.putParam("workMonthEnd", year * 100 + month);
+		titaVo.putParam("custNo", 0);
+		titaVo.putParam("facmNo", 0);
 
 		lD007Report.exec(titaVo);
 	}

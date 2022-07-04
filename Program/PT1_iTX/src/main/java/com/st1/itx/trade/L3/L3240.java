@@ -92,6 +92,7 @@ public class L3240 extends TradeBuffer {
 	private String iTellerNo;
 	private String iTxtNo;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
+	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 
 	private FacProd tFacProd;
 	private FacMain tFacMain;
@@ -146,8 +147,17 @@ public class L3240 extends TradeBuffer {
 		// 沖正處理
 		repayEraseRoutine();
 
-		titaVo.setTxAmt(wkTempAmt);
+		titaVo.setTxAmt(wkTxAmt);
 		titaVo.put("CURNM", "TWD");
+		// Temp 200
+		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 3 被沖正
+		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 4 沖正
+		// L3240 TxAmt = 300 TempAmt = 300 Loan 0 ==> HCODE = 0 (入帳金額轉暫收款-冲正產生)
+		// Debit: Loan 500 Credit TAV 500(Tx 300, Temp 200)
+		// 入帳金額轉暫收款-冲正產生
+		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+			loanCom.addFacmBorTxNextDateErase(iCustNo, wkTxAmt, titaVo);
+		}
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -439,6 +449,7 @@ public class L3240 extends TradeBuffer {
 		lAcDetail.add(acDetail);
 		wkTempAmt = wkTempAmt.add(tx.getPrincipal().add(tx.getInterest()).add(tx.getDelayInt()).add(tx.getBreachAmt())
 				.add(tx.getCloseBreachAmt()));
+		wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 	}
 
 }

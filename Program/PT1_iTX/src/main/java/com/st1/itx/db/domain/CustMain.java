@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class CustMain implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4978593393417917685L;
-
-// 客戶識別碼
+  // 客戶識別碼
   @Id
   @Column(name = "`CustUKey`", length = 32)
   private String custUKey = " ";
@@ -89,53 +86,53 @@ public class CustMain implements Serializable {
   @Column(name = "`SpouseName`", length = 100)
   private String spouseName;
 
-  // 戶籍-郵遞區號前三碼
+  // 戶籍/公司-郵遞區號前三碼
   @Column(name = "`RegZip3`", length = 3)
   private String regZip3;
 
-  // 戶籍-郵遞區號後三碼
+  // 戶籍/公司-郵遞區號後三碼
   @Column(name = "`RegZip2`", length = 3)
   private String regZip2;
 
-  // 戶籍-縣市代碼
+  // 戶籍/公司-縣市代碼
   /* 地區別與鄉鎮區對照檔CdArea */
   @Column(name = "`RegCityCode`", length = 2)
   private String regCityCode;
 
-  // 戶籍-鄉鎮市區代碼
+  // 戶籍/公司-鄉鎮市區代碼
   /* 地區別與鄉鎮區對照檔CdArea */
   @Column(name = "`RegAreaCode`", length = 3)
   private String regAreaCode;
 
-  // 戶籍-路名
+  // 戶籍/公司-路名
   @Column(name = "`RegRoad`", length = 40)
   private String regRoad;
 
-  // 戶籍-段
+  // 戶籍/公司-段
   @Column(name = "`RegSection`", length = 5)
   private String regSection;
 
-  // 戶籍-巷
+  // 戶籍/公司-巷
   @Column(name = "`RegAlley`", length = 5)
   private String regAlley;
 
-  // 戶籍-弄
+  // 戶籍/公司-弄
   @Column(name = "`RegLane`", length = 5)
   private String regLane;
 
-  // 戶籍-號
+  // 戶籍/公司-號
   @Column(name = "`RegNum`", length = 5)
   private String regNum;
 
-  // 戶籍-號之
+  // 戶籍/公司-號之
   @Column(name = "`RegNumDash`", length = 5)
   private String regNumDash;
 
-  // 戶籍-樓
+  // 戶籍/公司-樓
   @Column(name = "`RegFloor`", length = 5)
   private String regFloor;
 
-  // 戶籍-樓之
+  // 戶籍/公司-樓之
   @Column(name = "`RegFloorDash`", length = 5)
   private String regFloorDash;
 
@@ -638,7 +635,7 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-郵遞區號前三碼<br>
+	* 戶籍/公司-郵遞區號前三碼<br>
 	* 
 	* @return String
 	*/
@@ -647,17 +644,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-郵遞區號前三碼<br>
+	* 戶籍/公司-郵遞區號前三碼<br>
 	* 
   *
-  * @param regZip3 戶籍-郵遞區號前三碼
+  * @param regZip3 戶籍/公司-郵遞區號前三碼
 	*/
   public void setRegZip3(String regZip3) {
     this.regZip3 = regZip3;
   }
 
 /**
-	* 戶籍-郵遞區號後三碼<br>
+	* 戶籍/公司-郵遞區號後三碼<br>
 	* 
 	* @return String
 	*/
@@ -666,17 +663,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-郵遞區號後三碼<br>
+	* 戶籍/公司-郵遞區號後三碼<br>
 	* 
   *
-  * @param regZip2 戶籍-郵遞區號後三碼
+  * @param regZip2 戶籍/公司-郵遞區號後三碼
 	*/
   public void setRegZip2(String regZip2) {
     this.regZip2 = regZip2;
   }
 
 /**
-	* 戶籍-縣市代碼<br>
+	* 戶籍/公司-縣市代碼<br>
 	* 地區別與鄉鎮區對照檔CdArea
 	* @return String
 	*/
@@ -685,17 +682,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-縣市代碼<br>
+	* 戶籍/公司-縣市代碼<br>
 	* 地區別與鄉鎮區對照檔CdArea
   *
-  * @param regCityCode 戶籍-縣市代碼
+  * @param regCityCode 戶籍/公司-縣市代碼
 	*/
   public void setRegCityCode(String regCityCode) {
     this.regCityCode = regCityCode;
   }
 
 /**
-	* 戶籍-鄉鎮市區代碼<br>
+	* 戶籍/公司-鄉鎮市區代碼<br>
 	* 地區別與鄉鎮區對照檔CdArea
 	* @return String
 	*/
@@ -704,17 +701,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-鄉鎮市區代碼<br>
+	* 戶籍/公司-鄉鎮市區代碼<br>
 	* 地區別與鄉鎮區對照檔CdArea
   *
-  * @param regAreaCode 戶籍-鄉鎮市區代碼
+  * @param regAreaCode 戶籍/公司-鄉鎮市區代碼
 	*/
   public void setRegAreaCode(String regAreaCode) {
     this.regAreaCode = regAreaCode;
   }
 
 /**
-	* 戶籍-路名<br>
+	* 戶籍/公司-路名<br>
 	* 
 	* @return String
 	*/
@@ -723,17 +720,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-路名<br>
+	* 戶籍/公司-路名<br>
 	* 
   *
-  * @param regRoad 戶籍-路名
+  * @param regRoad 戶籍/公司-路名
 	*/
   public void setRegRoad(String regRoad) {
     this.regRoad = regRoad;
   }
 
 /**
-	* 戶籍-段<br>
+	* 戶籍/公司-段<br>
 	* 
 	* @return String
 	*/
@@ -742,17 +739,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-段<br>
+	* 戶籍/公司-段<br>
 	* 
   *
-  * @param regSection 戶籍-段
+  * @param regSection 戶籍/公司-段
 	*/
   public void setRegSection(String regSection) {
     this.regSection = regSection;
   }
 
 /**
-	* 戶籍-巷<br>
+	* 戶籍/公司-巷<br>
 	* 
 	* @return String
 	*/
@@ -761,17 +758,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-巷<br>
+	* 戶籍/公司-巷<br>
 	* 
   *
-  * @param regAlley 戶籍-巷
+  * @param regAlley 戶籍/公司-巷
 	*/
   public void setRegAlley(String regAlley) {
     this.regAlley = regAlley;
   }
 
 /**
-	* 戶籍-弄<br>
+	* 戶籍/公司-弄<br>
 	* 
 	* @return String
 	*/
@@ -780,17 +777,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-弄<br>
+	* 戶籍/公司-弄<br>
 	* 
   *
-  * @param regLane 戶籍-弄
+  * @param regLane 戶籍/公司-弄
 	*/
   public void setRegLane(String regLane) {
     this.regLane = regLane;
   }
 
 /**
-	* 戶籍-號<br>
+	* 戶籍/公司-號<br>
 	* 
 	* @return String
 	*/
@@ -799,17 +796,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-號<br>
+	* 戶籍/公司-號<br>
 	* 
   *
-  * @param regNum 戶籍-號
+  * @param regNum 戶籍/公司-號
 	*/
   public void setRegNum(String regNum) {
     this.regNum = regNum;
   }
 
 /**
-	* 戶籍-號之<br>
+	* 戶籍/公司-號之<br>
 	* 
 	* @return String
 	*/
@@ -818,17 +815,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-號之<br>
+	* 戶籍/公司-號之<br>
 	* 
   *
-  * @param regNumDash 戶籍-號之
+  * @param regNumDash 戶籍/公司-號之
 	*/
   public void setRegNumDash(String regNumDash) {
     this.regNumDash = regNumDash;
   }
 
 /**
-	* 戶籍-樓<br>
+	* 戶籍/公司-樓<br>
 	* 
 	* @return String
 	*/
@@ -837,17 +834,17 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-樓<br>
+	* 戶籍/公司-樓<br>
 	* 
   *
-  * @param regFloor 戶籍-樓
+  * @param regFloor 戶籍/公司-樓
 	*/
   public void setRegFloor(String regFloor) {
     this.regFloor = regFloor;
   }
 
 /**
-	* 戶籍-樓之<br>
+	* 戶籍/公司-樓之<br>
 	* 
 	* @return String
 	*/
@@ -856,10 +853,10 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 戶籍-樓之<br>
+	* 戶籍/公司-樓之<br>
 	* 
   *
-  * @param regFloorDash 戶籍-樓之
+  * @param regFloorDash 戶籍/公司-樓之
 	*/
   public void setRegFloorDash(String regFloorDash) {
     this.regFloorDash = regFloorDash;

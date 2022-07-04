@@ -58,7 +58,11 @@ public class LD004Report extends MakeReport {
 	}
 
 	public void makeReport(TitaVo titaVo, List<Map<String, String>> LD004List) throws LogicException {
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD004", "企金戶還本收據及繳息收據", "", "A4", "L");
+
+		String formName = "1".equals(titaVo.getParam("inputOption")) ? "還本收據" : "繳息收據";
+
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD004", "企金戶還本收據及繳息收據(" + formName + ")", "", "A4",
+				"L");
 
 		if (LD004List != null && !LD004List.isEmpty()) {
 
@@ -140,7 +144,10 @@ public class LD004Report extends MakeReport {
 				}
 				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 13, LD4Vo.get("F15"), "C");
-				this.print(0, 34, padStart(LD4Vo.get("F6").toString(), 7, "0") + "-" + padStart(LD4Vo.get("F7").toString(), 3, "0") + "-" + padStart(LD4Vo.get("F8").toString(), 3, "0"));
+				this.print(0, 34,
+						padStart(LD4Vo.get("F6").toString(), 7, "0") + "-"
+								+ padStart(LD4Vo.get("F7").toString(), 3, "0") + "-"
+								+ padStart(LD4Vo.get("F8").toString(), 3, "0"));
 
 				this.print(0, 63, "$");
 
@@ -168,7 +175,8 @@ public class LD004Report extends MakeReport {
 				// 這裡可以考慮改成for迴圈
 
 				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 37, showDate(LD4Vo.get("F11").toString(), 1) + " - " + showDate(LD4Vo.get("F12").toString(), 1));
+				this.print(0, 37,
+						showDate(LD4Vo.get("F11").toString(), 1) + " - " + showDate(LD4Vo.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");

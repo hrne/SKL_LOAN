@@ -61,8 +61,9 @@ import com.st1.itx.util.parse.Parse;
 //*                                                   2).執行新分錄處理->入總帳記號:3-沖正
 //*                                                      a.依原分錄產生借貸相反之新分錄
 //*                                                      b.借方整批入帳來源科目不回沖，轉至'暫收款－可抵繳'科目(TAV)
+//*                                                        新增放款交易內容檔(入帳金額轉暫收款-冲正產生), call loanCom.addFacmBorTxNextDateErase
 //*                                                      
-//*    5.訂正不同傳票批號，視同隔日訂正；經辦需續作訂正(不可修正)		
+//*    5.訂正不同傳票批號，視同隔日訂正；經辦需續作訂正(不可修正)；		
 //*      A.主管放行訂正(二段式) ，視同一段式交易，主管放行訂正不處理
 //*                     ApCtl CALL TxPgm       ---->  ApCtl CALL AcEnter(1.訂正) 
 //*                     1).X                          1).顯示<訂正前批關帳傳票，出沖正帳務；經辦需續作訂正(不可修正)>訊息
@@ -165,6 +166,9 @@ public class AcEnterCom extends TradeBuffer {
 
 	@Autowired
 	public AcDetailCom acDetailCom;
+
+	@Autowired
+	public LoanCom loanCom;
 
 	private TitaVo titaVo;
 
@@ -571,21 +575,14 @@ public class AcEnterCom extends TradeBuffer {
 //	     3.依原分錄產生借貸相反之新分錄(，
 //	       A.來源科目不回沖，轉至'暫收款－可抵繳'科目(TAV)   
 //         B.若為債協入帳則轉至'債協退還款'科目(T2x)  
-		int rpFacmno = 0;
 		if (acList0 == null) {
 			throw new LogicException(titaVo, "E6003", "訂正或主管放行時AcDetail NotFound " + RelDy + RelTxseq);
-		}
-		// 找最小額度編號
-		for (AcDetail ac : acList0) {
-			if (rpFacmno == 0 || ac.getFacmNo() < rpFacmno) {
-				rpFacmno = ac.getFacmNo();
-			}
 		}
 
 		// 債協入帳
 		String negAcctCode = "";
 		boolean isNegTx = false;
-		if (rpFacmno == 0 && acList0.size() == 2) {
+		if (acList0.size() == 2) {
 			for (AcDetail ac : acList0) {
 				if (ac.getDbCr().equals("C") && ac.getAcctCode().length() == 3
 						&& "T1".equals(ac.getAcctCode().substring(0, 2))) {
@@ -626,13 +623,14 @@ public class AcEnterCom extends TradeBuffer {
 				// 整批入帳的隔日訂正，還款來源(1xx-應收)回沖至暫收可抵繳
 				if (acDetail.getSumNo() != null && acDetail.getSumNo().length() == 3
 						&& "1".equals(ac.getSumNo().substring(0, 1)) && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
+					loanCom.setTxBuffer(this.txBuffer);
+					// * 新增放款交易內容檔(入帳金額轉暫收款-冲正產生)
+					int rpFacmno = loanCom.addFacmBorTxNextDateErase(acDetail.getCustNo(), acDetail.getTxAmt(), titaVo);
+					acDetail.setFacmNo(rpFacmno);
 					if (isNegTx) {
 						acDetail.setAcctCode(negAcctCode);
 					} else {
 						acDetail.setAcctCode("TAV");
-					}
-					if (acDetail.getFacmNo() == 0) {
-						acDetail.setFacmNo(rpFacmno);
 					}
 				}
 			} else {

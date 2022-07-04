@@ -145,12 +145,12 @@ public class LoanBorTx implements Serializable {
   private BigDecimal rate = new BigDecimal("0");
 
   // 實收本金
-  /* 扣除短收本金、含收回欠繳本金催收結案時：沖催收款項+利息收入=實收本金+實收利息 */
+  /* 扣除短繳本金、含收回短收本金催收結案時：沖催收款項+利息收入=實收本金+實收利息 */
   @Column(name = "`Principal`")
   private BigDecimal principal = new BigDecimal("0");
 
   // 實收利息
-  /* 扣除減免、扣除短收利息、含收回欠繳利息 */
+  /* 扣除減免、扣除短繳利息、含收回短收利息 */
   @Column(name = "`Interest`")
   private BigDecimal interest = new BigDecimal("0");
 
@@ -169,8 +169,8 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`CloseBreachAmt`")
   private BigDecimal closeBreachAmt = new BigDecimal("0");
 
-  // 暫收款金額
-  /* 存入暫收為正、暫收抵繳為負 */
+  // 暫收抵繳金額
+  /* 正值 */
   @Column(name = "`TempAmt`")
   private BigDecimal tempAmt = new BigDecimal("0");
 
@@ -192,11 +192,13 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`UnpaidCloseBreach`")
   private BigDecimal unpaidCloseBreach = new BigDecimal("0");
 
-  // 短收金額
+  // 收回短收金額
+  /* 新增欄位(轉換資料無) */
   @Column(name = "`Shortfall`")
   private BigDecimal shortfall = new BigDecimal("0");
 
-  // 溢收金額
+  // 累溢收金額
+  /* 全戶 */
   @Column(name = "`Overflow`")
   private BigDecimal overflow = new BigDecimal("0");
 
@@ -785,7 +787,7 @@ N:否
 
 /**
 	* 實收本金<br>
-	* 扣除短收本金、含收回欠繳本金
+	* 扣除短繳本金、含收回短收本金
 催收結案時：沖催收款項+利息收入=實收本金+實收利息
 	* @return BigDecimal
 	*/
@@ -795,7 +797,7 @@ N:否
 
 /**
 	* 實收本金<br>
-	* 扣除短收本金、含收回欠繳本金
+	* 扣除短繳本金、含收回短收本金
 催收結案時：沖催收款項+利息收入=實收本金+實收利息
   *
   * @param principal 實收本金
@@ -806,7 +808,7 @@ N:否
 
 /**
 	* 實收利息<br>
-	* 扣除減免、扣除短收利息、含收回欠繳利息
+	* 扣除減免、扣除短繳利息、含收回短收利息
 	* @return BigDecimal
 	*/
   public BigDecimal getInterest() {
@@ -815,7 +817,7 @@ N:否
 
 /**
 	* 實收利息<br>
-	* 扣除減免、扣除短收利息、含收回欠繳利息
+	* 扣除減免、扣除短繳利息、含收回短收利息
   *
   * @param interest 實收利息
 	*/
@@ -881,8 +883,8 @@ N:否
   }
 
 /**
-	* 暫收款金額<br>
-	* 存入暫收為正、暫收抵繳為負
+	* 暫收抵繳金額<br>
+	* 正值
 	* @return BigDecimal
 	*/
   public BigDecimal getTempAmt() {
@@ -890,10 +892,10 @@ N:否
   }
 
 /**
-	* 暫收款金額<br>
-	* 存入暫收為正、暫收抵繳為負
+	* 暫收抵繳金額<br>
+	* 正值
   *
-  * @param tempAmt 暫收款金額
+  * @param tempAmt 暫收抵繳金額
 	*/
   public void setTempAmt(BigDecimal tempAmt) {
     this.tempAmt = tempAmt;
@@ -976,8 +978,8 @@ N:否
   }
 
 /**
-	* 短收金額<br>
-	* 
+	* 收回短收金額<br>
+	* 新增欄位(轉換資料無)
 	* @return BigDecimal
 	*/
   public BigDecimal getShortfall() {
@@ -985,18 +987,18 @@ N:否
   }
 
 /**
-	* 短收金額<br>
-	* 
+	* 收回短收金額<br>
+	* 新增欄位(轉換資料無)
   *
-  * @param shortfall 短收金額
+  * @param shortfall 收回短收金額
 	*/
   public void setShortfall(BigDecimal shortfall) {
     this.shortfall = shortfall;
   }
 
 /**
-	* 溢收金額<br>
-	* 
+	* 累溢收金額<br>
+	* 全戶
 	* @return BigDecimal
 	*/
   public BigDecimal getOverflow() {
@@ -1004,10 +1006,10 @@ N:否
   }
 
 /**
-	* 溢收金額<br>
-	* 
+	* 累溢收金額<br>
+	* 全戶
   *
-  * @param overflow 溢收金額
+  * @param overflow 累溢收金額
 	*/
   public void setOverflow(BigDecimal overflow) {
     this.overflow = overflow;

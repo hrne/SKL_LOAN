@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.InsuRenew;
+
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorTxService;
@@ -27,8 +28,8 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
- * L3250 暫收款退還沖正(轉換前交易)
- * a.使用時機:費用回收，依交易序號執行沖正
+ * L3250 還款來源冲正
+ * a.使用時機:將暫收款金額轉回還款來源
  * b.本交易不可訂正
  */
 
@@ -82,6 +83,7 @@ public class L3250 extends TradeBuffer {
 	private BigDecimal iTxAmt = BigDecimal.ZERO;
 	private String iRvNo;
 	private String iAcctCode;
+	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 
 	// work area
 	private AcDetail acDetail;
@@ -90,20 +92,6 @@ public class L3250 extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L3250 ");
-		this.info("   isActfgEntry   = " + titaVo.isActfgEntry());
-		this.info("   isActfgRelease = " + titaVo.isActfgRelease());
-		this.info("   isHcodeNormal  = " + titaVo.isHcodeNormal());
-		this.info("   isHcodeErase   = " + titaVo.isHcodeErase());
-		this.info("   isHcodeModify  = " + titaVo.isHcodeModify());
-		this.info("   EntdyI         = " + titaVo.getEntDyI());
-		this.info("   Kinbr          = " + titaVo.getKinbr());
-		this.info("   TlrNo          = " + titaVo.getTlrNo());
-		this.info("   Tno            = " + titaVo.getTxtNo());
-		this.info("   OrgEntdyI      = " + titaVo.getOrgEntdyI());
-		this.info("   OrgKin         = " + titaVo.getOrgKin());
-		this.info("   OrgTlr         = " + titaVo.getOrgTlr());
-		this.info("   OrgTno         = " + titaVo.getOrgTno());
-
 
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
@@ -119,16 +107,16 @@ public class L3250 extends TradeBuffer {
 		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
 		iRvNo = titaVo.getParam("RvNo");
 		iAcctCode = titaVo.getParam("AcctCode");
-
-
-		
-		
 		// Check Input
+
 		checkInputRoutine();
 
 		// 沖正處理
 		repayEraseRoutine();
-
+		// 入帳金額轉暫收款-冲正產生
+		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+			loanCom.addFacmBorTxNextDateErase(iCustNo, wkTxAmt, titaVo);
+		}
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 
@@ -178,7 +166,7 @@ public class L3250 extends TradeBuffer {
 		// 查詢放款交易內容檔
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 0, 900, 0, ltitaHCode,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990, 0, ltitaHCode,
 				iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
@@ -192,8 +180,7 @@ public class L3250 extends TradeBuffer {
 			}
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), titaVo);
-
-
+			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 		}
 	}
 
@@ -225,6 +212,7 @@ public class L3250 extends TradeBuffer {
 					TempVo tTempVo = new TempVo();
 					tTempVo.clear();
 					tTempVo.putParam("OpenAcDate", tInsuRenew.getInsuStartDate());
+					tTempVo.putParam("InsuYearMonth", tInsuRenew.getInsuYearMonth());
 					ac.setJsonFields(tTempVo.getJsonString());
 				}
 			}

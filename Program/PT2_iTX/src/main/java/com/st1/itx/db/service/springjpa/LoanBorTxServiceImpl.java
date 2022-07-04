@@ -205,13 +205,13 @@ em = null;
     this.info("borxTxtNoFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
     Optional<LoanBorTx> loanBorTxT = null;
     if (dbName.equals(ContentName.onDay))
-      loanBorTxT = loanBorTxReposDay.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+      loanBorTxT = loanBorTxReposDay.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByDisplayflagAsc(acDate_0, titaTlrNo_1, titaTxtNo_2);
     else if (dbName.equals(ContentName.onMon))
-      loanBorTxT = loanBorTxReposMon.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+      loanBorTxT = loanBorTxReposMon.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByDisplayflagAsc(acDate_0, titaTlrNo_1, titaTxtNo_2);
     else if (dbName.equals(ContentName.onHist))
-      loanBorTxT = loanBorTxReposHist.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+      loanBorTxT = loanBorTxReposHist.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByDisplayflagAsc(acDate_0, titaTlrNo_1, titaTxtNo_2);
     else 
-      loanBorTxT = loanBorTxRepos.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+      loanBorTxT = loanBorTxRepos.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByDisplayflagAsc(acDate_0, titaTlrNo_1, titaTxtNo_2);
 
     return loanBorTxT.isPresent() ? loanBorTxT.get() : null;
   }

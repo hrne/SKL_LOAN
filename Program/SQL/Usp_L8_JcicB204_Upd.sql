@@ -112,7 +112,7 @@ BEGIN
     WHERE  Tx."AcDate"       =  TBSDYF
       AND  Tx."CustNo"       >  0
       AND  NVL(Tx."TitaHCode", ' ') IN ('0')    -- 正常
-      AND  NVL(Tx."TitaTxCd", ' ')  IN ('L3100', 'L3110', 'L3120')
+      AND  NVL(Tx."TitaTxCd", ' ')  IN ('L3100')  -- 不含預約('L3110', 'L3120')
       AND  NVL(M."RenewFlag", ' ')  NOT IN ('1', '2' ,'Y')
     GROUP BY  Tx."AcDate", Tx."CustNo", Tx."FacmNo", Tx."BormNo"
     )

@@ -35,7 +35,7 @@ public interface LoanBorTxRepositoryMon extends JpaRepository<LoanBorTx, LoanBor
   public Slice<LoanBorTx> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoGreaterThanEqualAndBorxNoLessThanEqualOrderByBorxNoAsc(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, int borxNo_4, Pageable pageable);
 
   // AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
-  public Optional<LoanBorTx> findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acDate_0, String titaTlrNo_1, String titaTxtNo_2);
+  public Optional<LoanBorTx> findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByDisplayflagAsc(int acDate_0, String titaTlrNo_1, String titaTxtNo_2);
 
   // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <= ,AND EntryDate >= ,AND EntryDate <=,AND Displayflag  ^i
   public Slice<LoanBorTx> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByAcDateAscDisplayflagAsc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, Pageable pageable);
