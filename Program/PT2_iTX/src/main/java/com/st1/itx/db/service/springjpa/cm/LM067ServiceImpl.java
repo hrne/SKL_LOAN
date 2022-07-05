@@ -113,4 +113,88 @@ public class LM067ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
+
+/**
+	 * 查詢明細(LM062~LM066覆審相關報表共用)
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * @param conditionCode 條件代碼
+	 * 
+	 */
+	public List<Map<String, String>> findList(TitaVo titaVo, int yearMonth, int conditionCode) throws Exception {
+
+		// 取得會計日(同頁面上會計日)
+		// 年月日
+		// int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
+		int iYear = yearMonth / 100;
+		// 月
+		int iMonth = yearMonth % 100;
+
+		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
+
+		this.info("lM062.findAll iYeariMonth=" + iYearMonth);
+
+		String sql = "	";
+		sql += "	SELECT :cond AS F0";
+		sql += "		  ,C.\"CustNo\" AS F1";
+		sql += "		  ,C.\"FacmNo\" AS F2";
+		sql += "		  ,C.\"BormNo\" AS F3";
+		sql += "		  ,CM.\"CustName\" AS F4";
+		sql += "		  ,R.\"DrawdownDate\" - 19110000 AS F5";
+		sql += "		  ,F.\"LineAmt\" AS F6";
+		sql += "		  ,F.\"UtilAmt\" AS F7";
+		sql += "		  ,' ' AS F8";
+		sql += "		  ,CM.\"CustName\" AS F9";
+		sql += "		  ,CLD.\"LandSeq\" AS F10";
+		sql += "		  ,CLD.\"LandNo1\" AS F11";
+		sql += "		  ,CLD.\"LandNo2\" AS F12";
+		sql += "		  ,CLD.\"Area\" AS F13";
+		sql += "		  ,CM.\"CustTypeCode\" AS F14";
+		sql += "		  ,CC1.\"Item\" AS F15";
+		sql += "		  ,F.\"UsageCode\" AS F16";
+		sql += "		  ,CC2.\"Item\" AS F17";
+		sql += "		  ,CT.\"CityCode\" AS F18";
+		sql += "		  ,CT.\"CityItem\" AS F19";
+		sql += "		  ,MOD(R.\"ReChkYearMonth\",100) AS F20";
+		sql += "		  ,R.\"Remark\" AS F21";
+		sql += "	FROM (";
+		sql += "		SELECT * FROM \"InnReCheck\"";
+		sql += "		WHERE \"YearMonth\" = :yyyymm ";
+		sql += "		  AND \"ConditionCode\" = :cond ";
+		sql += "		  AND \"LoanBal\" > 0 ";
+		sql += "	) R";
+		sql += "	LEFT JOIN (";
+		sql += "		SELECT * FROM \"MonthlyLoanBal\" ";
+		sql += "		WHERE \"YearMonth\" = :yyyymm ";
+		sql += "		  AND \"LoanBalance\" > 0 ";
+		sql += "	) C ON C.\"CustNo\" = R.\"CustNo\" ";
+		sql += "	   AND C.\"FacmNo\" = R.\"FacmNo\" ";
+		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
+		sql += "						   AND F.\"FacmNo\" = R.\"FacmNo\"";
+		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = R.\"CustNo\"";
+		sql += "	LEFT JOIN \"ClLand\" CLD ON CLD.\"ClCode1\" = C.\"ClCode1\"";
+		sql += "							AND CLD.\"ClCode2\" = C.\"ClCode2\"";
+		sql += "							AND CLD.\"ClNo\" = C.\"ClNo\"";
+		sql += "	LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = C.\"CityCode\"";
+		sql += "	LEFT JOIN \"CdCode\" CC1 ON CC1.\"DefCode\" = 'CustTypeCode'";
+		sql += "						   	 AND CC1.\"Code\" = CM.\"CustTypeCode\"";
+		sql += "	LEFT JOIN \"CdCode\" CC2 ON CC2.\"DefCode\" = 'UsageCode'";
+		sql += "						   	 AND CC2.\"Code\" = F.\"UsageCode\"";
+		sql += "	WHERE R.\"CustNo\" IS NOT NULL";
+		sql += "	ORDER BY C.\"CustNo\" ASC";
+		sql += "		    ,C.\"FacmNo\" ASC";
+		sql += "			,C.\"BormNo\" ASC";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yyyymm", iYearMonth);
+		query.setParameter("cond", conditionCode);
+		return this.convertToMap(query);
+	}
+
+
 }

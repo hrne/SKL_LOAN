@@ -106,7 +106,6 @@ public class L3702 extends TradeBuffer {
 			tLoanCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
 			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
-
 			/* 存入DB */
 			try {
 				sLoanCustRmkService.insert(tLoanCustRmk);
@@ -117,7 +116,7 @@ public class L3702 extends TradeBuffer {
 		} else if (iFunCd == 2) {
 
 			tLoanCustRmk = new LoanCustRmk();
-			
+
 			tLoanCustRmk = sLoanCustRmkService.holdById(LoanCustRmkId);
 
 			if (tLoanCustRmk == null) {
@@ -134,7 +133,7 @@ public class L3702 extends TradeBuffer {
 			tLoanCustRmk.setAcDate(iAcDate);
 			tLoanCustRmk.setRmkCode(titaVo.getParam("LoanRmkCode"));
 			tLoanCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
-			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));	
+			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
 			// 非建檔者修改須刷主管卡
 			if (!tLoanCustRmk.getCreateEmpNo().equals(tLoanCustRmk.getLastUpdateEmpNo())
@@ -158,7 +157,6 @@ public class L3702 extends TradeBuffer {
 
 			tLoanCustRmk = new LoanCustRmk();
 
-			
 			tLoanCustRmk = sLoanCustRmkService.holdById(LoanCustRmkId);
 			if (tLoanCustRmk == null) {
 				throw new LogicException(titaVo, "E0004", "L3702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於帳務備忘錄明細資料檔。");
@@ -166,7 +164,7 @@ public class L3702 extends TradeBuffer {
 
 			// 刪除須刷主管卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0704", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
 			}
 
 			try {
@@ -174,6 +172,8 @@ public class L3702 extends TradeBuffer {
 				this.info(" L3702 deleteLoanCustRmkLog" + tLoanCustRmk);
 
 				if (tLoanCustRmk != null) {
+					dataLog.setEnv(titaVo, tLoanCustRmk, tLoanCustRmk);
+					dataLog.exec("刪除帳務備忘錄明細資料檔");
 					sLoanCustRmkService.delete(tLoanCustRmk);
 				}
 			} catch (DBException e) {

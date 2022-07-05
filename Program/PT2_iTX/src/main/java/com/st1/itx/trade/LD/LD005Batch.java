@@ -81,6 +81,16 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 		List<LoanCheque> listLoanCheque = sLoanCheque == null ? new ArrayList<>()
 				: new ArrayList<>(sLoanCheque.getContent());
 
+		this.info("listLoanCheque.size="+listLoanCheque.size());
+		
+		if(listLoanCheque.size() == 0) {
+			
+			titaVo.putParam("inputCustNo", 0);
+			titaVo.putParam("inputDate", tbsdyf);
+
+			lD005Report.exec(titaVo);
+		}
+		
 		Map<Integer, Integer> custNoMap = new HashMap<>();
 
 		for (LoanCheque loanCheque : listLoanCheque) {
@@ -89,7 +99,10 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 
 			if (!custNoMap.containsKey(custNo)) {
 				TitaVo tmpTitaVo = (TitaVo) this.titaVo.clone();
-
+				
+				this.info("inputCustNo="+custNo);
+				this.info("tbsdyf="+tbsdyf);
+				
 				tmpTitaVo.putParam("inputCustNo", custNo);
 				tmpTitaVo.putParam("inputDate", tbsdyf);
 
@@ -98,5 +111,8 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 				custNoMap.put(custNo, 0);
 			}
 		}
+		
+		
+		
 	}
 }

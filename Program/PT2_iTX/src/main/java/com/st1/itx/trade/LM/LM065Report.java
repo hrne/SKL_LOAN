@@ -260,7 +260,7 @@ public void dataList(List<Map<String, String>> list,String sheetName) throws Log
 			int bormNo = Integer.valueOf(r.get("F4"));
 			String custName = r.get("F5");
 			int drawdownDate = Integer.valueOf(r.get("F6"));
-			int loanBal = Integer.valueOf(r.get("F7"));
+			BigDecimal loanBal = new BigDecimal(r.get("F7"));
 			int maturityDate = Integer.valueOf(r.get("F8"));
 			int clcode1 = Integer.valueOf(r.get("F9"));
 			int clcode2 = Integer.valueOf(r.get("F10"));

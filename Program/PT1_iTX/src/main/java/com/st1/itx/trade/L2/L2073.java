@@ -56,10 +56,10 @@ public class L2073 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	MakeReport makeReport;
-	
+
 	@Autowired
 	TxDataLogService sTxDataLogService;
 
@@ -89,6 +89,7 @@ public class L2073 extends TradeBuffer {
 		// new ArrayList
 		List<CustDataCtrl> lCustDataCtrl = new ArrayList<CustDataCtrl>();
 		Slice<CustDataCtrl> slCustDataCtrl = null;
+		String iCustUKey = "";
 		// 統編有輸入
 		if (!iCustId.isEmpty()) {
 			tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
@@ -97,20 +98,21 @@ public class L2073 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "L2073" + "指定統編不存在於客戶主檔。");
 			}
 
-			iCustNo = tCustMain.getCustNo();
-		}
-
-		if (iCustNo > 0) {
-			slCustDataCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
+			iCustUKey = tCustMain.getCustUKey();
+			slCustDataCtrl = sCustDataCtrlService.findCustUKey(iCustUKey, this.index, this.limit, titaVo);
 		} else {
-			slCustDataCtrl = sCustDataCtrlService.findAll(this.index, this.limit, titaVo);
+			if (iCustNo > 0) {
+				slCustDataCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
+			} else {
+				slCustDataCtrl = sCustDataCtrlService.findAll(this.index, this.limit, titaVo);
+			}
 		}
 
 		lCustDataCtrl = slCustDataCtrl == null ? null : slCustDataCtrl.getContent();
 
 		// 查無資料 拋錯
 		if (lCustDataCtrl == null) {
-			throw new LogicException(titaVo, "E2003", "L2073" + "不存在於結清戶個資控管檔。");
+			throw new LogicException(titaVo, "E2003", "不存在於結清戶個資控管檔。");
 		}
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slCustDataCtrl != null && slCustDataCtrl.hasNext()) {
@@ -120,7 +122,7 @@ public class L2073 extends TradeBuffer {
 		}
 
 		for (CustDataCtrl tCustDataCtrl : lCustDataCtrl) {
-			
+
 			String lastUpdate = "";
 
 			// new occurs
@@ -159,15 +161,16 @@ public class L2073 extends TradeBuffer {
 					EmpName = tCdEmp.getFullname();
 				}
 			}
-			
+
 			List<String> searchTXCDs = new ArrayList<String>();
 			searchTXCDs.add("L2703");
 			searchTXCDs.add("L2073");
-			
-			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:"+tCustMain.getCustUKey(), searchTXCDs, titaVo);
-			
+
+			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:" + tCustMain.getCustUKey(), searchTXCDs,
+					titaVo);
+
 			Boolean hasLog = txDataLog != null;
-			
+
 			occurslist.putParam("OOCustUKey", tCustMain.getCustUKey());
 			occurslist.putParam("OOCustId", tCustMain.getCustId());
 			occurslist.putParam("OOCustNo", tCustDataCtrl.getCustNo());

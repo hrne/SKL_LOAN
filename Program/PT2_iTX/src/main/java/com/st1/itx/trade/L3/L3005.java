@@ -106,11 +106,14 @@ public class L3005 extends TradeBuffer {
 			lLoanCustRmk = sLoanCustRmk == null ? null : new ArrayList<LoanCustRmk>(sLoanCustRmk.getContent());
 
 			lLoanCustRmkSize = lLoanCustRmk.size();
-//			備忘錄代碼由大到小排序
+//			備忘錄代碼由大到小排序 序號由大到小
 			Collections.sort(lLoanCustRmk, new Comparator<LoanCustRmk>() {
 				public int compare(LoanCustRmk c1, LoanCustRmk c2) {
 					if (!c1.getRmkCode().equals(c2.getRmkCode())) {
 						return c2.getRmkCode().compareTo(c1.getRmkCode());
+					}
+					if (c1.getRmkNo() != c2.getRmkNo()) {
+						return c2.getRmkNo() - c1.getRmkNo();
 					}
 
 					return 0;
@@ -167,7 +170,6 @@ public class L3005 extends TradeBuffer {
 			this.info("Error ... " + e.getMessage());
 		}
 
-		this.info("resultList = " + resultList);
 		if (resultList != null && resultList.size() != 0) {
 
 			this.info("Size =" + resultList.size());
@@ -187,6 +189,7 @@ public class L3005 extends TradeBuffer {
 				String repayCodeX = result.get("Item");
 				String createEmpNo = result.get("CreateEmpNo");
 				int entryDate = parse.stringToInteger(result.get("EntryDate"));
+				BigDecimal needPaidAmt = BigDecimal.ZERO;
 				if (entryDate > 0) {
 					entryDate = entryDate - 19110000;
 				}
@@ -204,6 +207,7 @@ public class L3005 extends TradeBuffer {
 				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest"))
 						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
+				needPaidAmt = txAmt.subtract(tempAmt).add(unpaidAmt);
 				newRelNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
@@ -284,8 +288,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOTotTxAmt", totTxAmt); // 交易總金額
 				occursList.putParam("OOCreateEmpNo", createEmpNo); // 建檔人員
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號
-				
-				
+				occursList.putParam("OONeedPaidAmt", needPaidAmt); // 應收金額
 
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);

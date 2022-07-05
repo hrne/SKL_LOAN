@@ -474,6 +474,14 @@ P(R,#OOTempAmtX)
 
 #OODisplayFlag=X,1,S
 
+
+#OONeedPaidAmt=+m,14.2,S
+
+#OONeedPaidAmtX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OONeedPaidAmt,#OONeedPaidAmtX)
+P(R,#OONeedPaidAmtX)
+
+
 #OOShortfall=+m,14.2,S
 
 #OOShortfallX=X,22,O
@@ -606,6 +614,7 @@ TXFORM=L3005
 #OOTotTxAmt
 #OOCreateEmpNo
 #OODisplayFlag
+#OONeedPaidAmt
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -662,6 +671,9 @@ TXFORM=L3005
 {width:180}
 
 #OOTempAmtX=暫收抵繳 
+{width:180}
+
+#OONeedPaidAmtX=應收金額
 {width:180}
 
 #OOShortfallX=溢短收

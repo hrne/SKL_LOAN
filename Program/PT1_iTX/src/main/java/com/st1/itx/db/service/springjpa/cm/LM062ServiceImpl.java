@@ -109,9 +109,9 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,C.\"FacmNo\" AS F3";
 		sql += "		  ,C.\"BormNo\" AS F4";
 		sql += "		  ,CM.\"CustName\" AS F5";
-		sql += "		  ,R.\"DrawdownDate\" - 1911000 AS F6";
+		sql += "		  ,R.\"DrawdownDate\" - 19110000 AS F6";
 		sql += "		  ,R.\"LoanBal\" AS F7";
-		sql += "		  ,F.\"MaturityDate\" - 1911000 AS F8";
+		sql += "		  ,F.\"MaturityDate\" - 19110000 AS F8";
 		sql += "		  ,C.\"ClCode1\" AS F9";
 		sql += "		  ,C.\"ClCode2\" AS F10";
 		sql += "		  ,C.\"ClNo\" AS F11";
