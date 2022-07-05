@@ -308,7 +308,7 @@ public class L2634ReportA extends MakeReport {
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
-			this.print(1, 23, "董事長  潘  柏  錚");
+			this.print(1, 23, "代　表　人　董事長  潘  柏  錚");
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
 			this.print(1, 1, " ");
