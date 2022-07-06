@@ -1,9 +1,8 @@
-
-CREATE OR REPLACE PROCEDURE "Usp_L8_JcicRel_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicRel_Upd"
 (
 -- 程式功能：維護 JcicRel 聯徵授信「同一關係企業及集團企業」資料報送檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicRel_Upd"(20200430,'System');
+-- 執行方式：EXEC "Usp_L8_JcicRel_Upd"(20200430,'999999');
 -- 2021-11-22 智偉修改 : 改用With AS 寫法,原本使用CustRel資料,改用ReltMain資料.
 
     -- 參數
@@ -75,8 +74,6 @@ BEGIN
                            AND F."FacmNo" = M."FacmNo"
       LEFT JOIN "CustMain" C ON C."CustNo" = M."CustNo"
       WHERE C."EntCode" IN (1) -- 1:企金
-      --  AND M."DrawdownDate" > L7YMD
-      --  AND M."DrawdownDate" <= YYYYMMDD -- 撥款日期 天數判斷 最近七日撥款 ??????
         AND TRUNC(NVL(M."DrawdownDate",0) / 100) = YYYYMM  -- 撥款日期:限本月資料 
     )
     , "Temp_Work_Rel_2" AS (
@@ -88,11 +85,11 @@ BEGIN
       FROM "ReltMain" RM
       LEFT JOIN "CustMain" C1 ON C1."CustNo"  = RM."CustNo"
       LEFT JOIN "CustMain" C2 ON C2."CustUKey"  = RM."ReltUKey"
-      WHERE --to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) >  L7YMD
-      --  AND to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) <= YYYYMMDD  -- 天數判斷 最近七日有異動 ??? 
-            TRUNC(to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) / 100) =  YYYYMM   --  異動判斷:限本月異動資料
+      LEFT JOIN "Temp_Work_Rel_1" WK ON WK."CustId" = C1."CustId"
+      WHERE TRUNC(to_number(to_char(RM."LastUpdate", 'YYYYMMDD')) / 100) =  YYYYMM   --  異動判斷:限本月異動資料
         AND C1."EntCode" IN (1) -- 1:企金
         AND C2."EntCode" IN (1) -- 1:企金
+        AND WK."CustId" IS NULL -- 需非本月撥款,避免同戶資料重複申報
     )
     SELECT YYYYMMDD                              AS "DataYMD"           -- 資料年月日
          , '458'                                 AS "BankItem"          -- 總行代號

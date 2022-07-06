@@ -57,7 +57,7 @@ HIDE(#what)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,1000];printer.width=[20,150];">
 [
-["[L3250]                                 暫收款退還沖正（轉換前交易）"],
+["[L3250]                                 暫收款退還沖正（轉換前資料）"],
 ["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
 ["#FdCustId+統一編號",#CustId,"@@@",#BTN2,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
@@ -445,7 +445,7 @@ C(3,#AcctCode,8,$,S)
 C(5,#TXFORM,L3250,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L3250] 暫收款退還沖正（轉換前交易）)
+T(3,[L3250] 暫收款退還沖正（轉換前資料）)
 
 </sub>
 !---------- TXFORM = FM101 交易分錄----------

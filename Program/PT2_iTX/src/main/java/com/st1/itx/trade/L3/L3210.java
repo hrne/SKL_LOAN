@@ -483,11 +483,8 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setDesc("暫收款登錄");
-		if (titaVo.get("RpCode1") != null) {
-			tLoanBorTx.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RpCode1"))); // 還款來源
-		}
-
 		tLoanBorTx.setEntryDate(iEntryDate);
+		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTxAmt(iTempAmt);
@@ -496,7 +493,6 @@ public class L3210 extends TradeBuffer {
 		// 其他欄位
 		tTempVo.clear();
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
-		tTempVo.putParam("TempSourceCode", iTempSourceCode);
 		tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 
 		if (titaVo.get("RpDscpt1") != null) {

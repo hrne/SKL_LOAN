@@ -18,6 +18,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
@@ -27,6 +29,7 @@ import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -85,6 +88,8 @@ public class L3230 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public CustMainService custMainService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	Parse parse;
@@ -133,10 +138,7 @@ public class L3230 extends TradeBuffer {
 	private List<LoanOverdue> lLoanOverdue = new ArrayList<LoanOverdue>();
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
-	private BigDecimal acctFee;
-	private BigDecimal modifyFee;
-	private BigDecimal fireFee;
-	private BigDecimal lawFee;
+	private List<LoanBorTx> lLoanBorTx;
 
 	// initialize variable
 	@PostConstruct
@@ -150,10 +152,6 @@ public class L3230 extends TradeBuffer {
 		this.iTempAmt = new BigDecimal(0);
 		this.iRemoveNo = "";
 		this.lAcDetail = new ArrayList<AcDetail>();
-		this.acctFee = BigDecimal.ZERO;
-		this.modifyFee = BigDecimal.ZERO;
-		this.fireFee = BigDecimal.ZERO;
-		this.lawFee = BigDecimal.ZERO;
 	}
 
 	@Override
@@ -224,7 +222,8 @@ public class L3230 extends TradeBuffer {
 // 29.貸後契變手續費           F29	契變手續費
 
 		// 帳務處理
-		if (titaVo.isHcodeNormal() && this.txBuffer.getTxCom().isBookAcYes()) {
+
+		if (titaVo.isHcodeNormal()) {
 			wkTempBal = iTempAmt;
 			TempAcDetailRoutine(); // 借: 暫收款科目
 			switch (iTempItemCode) {
@@ -270,6 +269,7 @@ public class L3230 extends TradeBuffer {
 				// 貸: 作業項目對應科目
 				wkAcctCode = "F" + iTempItemCode;
 				ItemAcDetailRoutine();
+				setLoanBorTxRoutine();
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 			}
 			// 產生會計分錄
@@ -277,7 +277,10 @@ public class L3230 extends TradeBuffer {
 			acDetailCom.run(titaVo);
 			this.setTxBuffer(acDetailCom.getTxBuffer());
 		}
-
+		// 訂正放款交易內容檔by交易
+		if (titaVo.isHcodeErase()) {
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -442,7 +445,8 @@ public class L3230 extends TradeBuffer {
 
 	private void addFeeRoutine(BaTxVo ba) throws LogicException {
 		// 新增放款交易內容檔(收回費用)
-		loanCom.addFeeBorTxRoutine(ba, 0, titaVo.getEntDyI(), BigDecimal.ZERO, BigDecimal.ZERO.subtract(ba.getUnPaidAmt()),"暫收銷", titaVo);
+		loanCom.addFeeBorTxRoutine(ba, 0, titaVo.getEntDyI(), BigDecimal.ZERO,
+				BigDecimal.ZERO.subtract(ba.getUnPaidAmt()), "暫收銷", titaVo);
 	}
 
 	// 貸: 債權協商對應科目
@@ -514,6 +518,9 @@ public class L3230 extends TradeBuffer {
 			loanCom.setTxTemp(tTxTempId, tTxTemp, od.getCustNo(), od.getFacmNo(), od.getBormNo(), od.getOvduNo(),
 					titaVo);
 			tTempVo.clear();
+			tTempVo.putParam("Temp2ReasonCode", iTempReasonCode);
+			tTempVo.putParam("Temp2ItemCode", iTempItemCode);
+			tTempVo.putParam("RemoveNo", iRemoveNo);
 			tTempVo.putParam("BadDebtBal", wkBadDebtBal);
 			tTempVo.putParam("ZeroBadDebtBal", od.getBadDebtBal().compareTo(BigDecimal.ZERO) == 0 ? "Y" : "N");
 			tTxTemp.setText(tTempVo.getJsonString());
@@ -623,7 +630,12 @@ public class L3230 extends TradeBuffer {
 		if ("06".equals(iTempItemCode)) {
 			tLoanBorTx.setDesc("暫收款轉帳");
 		} else {
-			tLoanBorTx.setDesc("暫收款銷帳");
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("Temp2ItemCode", iTempItemCode), titaVo);
+			if (tCdCode == null) {
+				tLoanBorTx.setDesc("暫收款銷帳");
+			} else {
+				tLoanBorTx.setDesc("暫收款" + tCdCode.getItem());
+			}
 		}
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務

@@ -111,10 +111,10 @@ public class L2411 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
-	
+
 	@Autowired
-	public CheckClEva sCheckClEva ;
-	
+	public CheckClEva sCheckClEva;
+
 	/* DB服務注入 */
 	@Autowired
 	public ClParkingTypeService sClParkingTypeService;
@@ -233,7 +233,7 @@ public class L2411 extends TradeBuffer {
 				if (this.isEloan) {
 					iFunCd = 2;
 					// 新增擔保品重評資料
-					sCheckClEva.setClEva(titaVo,iClNo);
+					sCheckClEva.setClEva(titaVo, iClNo);
 				} else {
 					iFunCd = 2;
 					if (iClCode1 == 1) {
@@ -250,7 +250,8 @@ public class L2411 extends TradeBuffer {
 		if (iFunCd == 1 && iClNo == 0) {
 			this.info("新增時取號");
 
-			String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
+			String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0")
+					+ StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
 			iClNo = gGSeqCom.getSeqNo(0, 0, "L2", clCode, 9999999, titaVo);
 
@@ -280,6 +281,20 @@ public class L2411 extends TradeBuffer {
 			tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 			if (tFacMain == null) {
 				throw new LogicException("E2019", "核准號碼 = " + iApplNo);
+			} else {
+//				ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日期就是上送當下的日期
+				if (isEloan) {
+					FacMain updFacMain = sFacMainService.holdById(tFacMain, titaVo);
+					if (updFacMain != null) {
+						updFacMain.setSettingDate(this.txBuffer.getTxCom().getTbsdy());
+						try {
+							sFacMainService.update(updFacMain, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "額度主檔" + e.getErrorMsg());
+						}
+					}
+
+				}
 			}
 		}
 
@@ -499,7 +514,7 @@ public class L2411 extends TradeBuffer {
 							map.put("OwnerCustUKey", custUKey);
 							map.put("OwnerRelCode", relCode);
 							ownerMap.add(map);
-							
+
 							FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 							if (facMain == null) {
 								throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
@@ -510,7 +525,8 @@ public class L2411 extends TradeBuffer {
 							clOwnerRelationId.setCustNo(facMain.getCustNo());
 							clOwnerRelationId.setOwnerCustUKey(custUKey);
 
-							ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
+							ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId,
+									titaVo);
 
 							if (clOwnerRelation == null) {
 								clOwnerRelation = new ClOwnerRelation();
@@ -532,19 +548,19 @@ public class L2411 extends TradeBuffer {
 
 						} // if
 					} // for
-					
-					if(this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+
+					if (this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
 						ClFacId clFacId = new ClFacId();
 						clFacId.setClCode1(iClCode1);
 						clFacId.setClCode2(iClCode2);
 						clFacId.setClNo(iClNo);
-						clFacId.setApproveNo(iApplNo);	
+						clFacId.setApproveNo(iApplNo);
 						ClFac clFac = sClFacService.findById(clFacId, titaVo);
 						if (clFac == null) {
 							clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
 						}
-					} 
-					
+					}
+
 				} // if
 
 			} else
@@ -631,8 +647,9 @@ public class L2411 extends TradeBuffer {
 //		  土地座落+土地所有權人(多)
 		int clNo = 0;
 //		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE, titaVo);
-		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim(), titaVo.getParam("IrCode").trim(),
-				titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(),
+				titaVo.getParam("AreaCode").trim(), titaVo.getParam("IrCode").trim(), titaVo.getParam("BdNo1").trim(),
+				titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
 		List<ClBuilding> lClBuilding = slClBuilding == null ? null : slClBuilding.getContent();
 		if (lClBuilding != null) {
 			for (ClBuilding cl : lClBuilding) {
@@ -651,7 +668,8 @@ public class L2411 extends TradeBuffer {
 	private boolean checkBuildingOwner(int clNo, TitaVo titaVo) throws LogicException {
 // 有一個有權人相同即視為相同
 		boolean isSameOwner = false;
-		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, clNo, this.index, this.limit, titaVo);
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, clNo, this.index,
+				this.limit, titaVo);
 		lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 		if (lClBuildingOwner != null) {
 			for (ClBuildingOwner o : lClBuildingOwner) {
@@ -677,8 +695,10 @@ public class L2411 extends TradeBuffer {
 	// 土地擔保品編號
 	private int getLandClNo(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
-		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim(), titaVo.getParam("IrCodeB").trim(),
-				titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(),
+				titaVo.getParam("AreaCodeB").trim(), titaVo.getParam("IrCodeB").trim(),
+				titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE,
+				titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 		if (lClLand != null) {
 			for (ClLand cl : lClLand) {
@@ -697,7 +717,8 @@ public class L2411 extends TradeBuffer {
 	private boolean checkLandOwner(int clNo, TitaVo titaVo) throws LogicException {
 // 有一個有權人相同即視為相同
 		boolean isSameOwner = false;
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, clNo, 000, this.index, this.limit, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, clNo, 000, this.index,
+				this.limit, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 		if (lClBuildingOwner != null) {
 			for (ClLandOwner o : lClLandOwner) {
@@ -762,7 +783,8 @@ public class L2411 extends TradeBuffer {
 //		2.若設定金額低於可分配金額則為設定金額
 //		3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
 
-		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
+				BigDecimal.ROUND_HALF_UP);
 		if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
 		}
@@ -847,7 +869,8 @@ public class L2411 extends TradeBuffer {
 
 	private void deleteClImmRankDetail(TitaVo titaVo) throws LogicException {
 
-		Slice<ClImmRankDetail> slClImmRankDetail = sClImmRankDetailService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
+		Slice<ClImmRankDetail> slClImmRankDetail = sClImmRankDetailService.clNoEq(iClCode1, iClCode2, iClNo, this.index,
+				this.limit, titaVo);
 		lClImmRankDetail = slClImmRankDetail == null ? null : slClImmRankDetail.getContent();
 		if (lClImmRankDetail != null && lClImmRankDetail.size() > 0) {
 			try {
@@ -969,7 +992,8 @@ public class L2411 extends TradeBuffer {
 
 	// delete 建物所有權人檔
 	private void deleteClBuildingOwner(TitaVo titaVo) throws LogicException {
-		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, this.index,
+				this.limit, titaVo);
 		lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 		if (lClBuildingOwner != null && lClBuildingOwner.size() > 0) {
 			try {
@@ -1031,7 +1055,8 @@ public class L2411 extends TradeBuffer {
 
 	// delete 土地所有權人檔
 	private void deleteClLandOwner(TitaVo titaVo) throws LogicException {
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, 000, this.index, this.limit, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, 000, this.index,
+				this.limit, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 
 		if (lClLandOwner != null && lClLandOwner.size() > 0) {
@@ -1046,7 +1071,8 @@ public class L2411 extends TradeBuffer {
 	// delete 車位
 	private void deleteClParkingType(TitaVo titaVo) throws LogicException {
 		this.info("L2415 deleteClParkingType");
-		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0,
+				Integer.MAX_VALUE);
 		List<ClParkingType> lClParkingType = slClParkingType == null ? null : slClParkingType.getContent();
 		if (lClParkingType != null) {
 			try {
@@ -1072,7 +1098,7 @@ public class L2411 extends TradeBuffer {
 		}
 
 		CityItem = tCdCity.getCityItem().trim();
-		
+
 		String AreaCode = titaVo.getParam("AreaCode").trim();
 
 		String AreaItem = "";
@@ -1082,17 +1108,18 @@ public class L2411 extends TradeBuffer {
 		}
 
 		AreaItem = tCdArea.getAreaItem().trim();
-		
+
 		String IrCode = titaVo.getParam("IrCode").trim();
-		
+
 		String IrItem = "";
-		CdLandSection tCdLandSection = sCdLandSectionService.findById(new CdLandSectionId(CityCode, AreaCode, IrCode), titaVo);
+		CdLandSection tCdLandSection = sCdLandSectionService.findById(new CdLandSectionId(CityCode, AreaCode, IrCode),
+				titaVo);
 		if (tCdLandSection == null) {
 			throw new LogicException("E0003", "地段代碼檔" + CityCode + "-" + AreaCode);
 		}
-		
+
 		IrItem = tCdLandSection.getIrItem().trim();
-		
+
 		String Road = titaVo.getParam("Road").trim();
 		String Section = titaVo.getParam("Section").trim();
 		String Alley = titaVo.getParam("Alley").trim();
@@ -1112,7 +1139,7 @@ public class L2411 extends TradeBuffer {
 			result += IrItem;
 		}
 		if (!Road.isEmpty()) {
-			result += Road ;
+			result += Road;
 		}
 		if (!Section.isEmpty()) {
 			result += Section + "段";
@@ -1138,5 +1165,5 @@ public class L2411 extends TradeBuffer {
 		this.info("L2415 getBdLocation result = " + result);
 		return result;
 	}
-	
+
 }

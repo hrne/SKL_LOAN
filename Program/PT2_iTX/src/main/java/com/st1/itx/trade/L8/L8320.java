@@ -104,7 +104,6 @@ public class L8320 extends TradeBuffer {
 		iJcicZ062Id.setChangePayDate(iChangePayDate);
 		JcicZ062 chJcicZ062 = new JcicZ062();
 		JcicZ060 iJcicZ060 = new JcicZ060();
-		JcicZ060 jJcicZ060 = new JcicZ060();
 		JcicZ060Id iJcicZ060Id = new JcicZ060Id();
 		iJcicZ060Id.setSubmitKey(iSubmitKey);
 		iJcicZ060Id.setCustId(iCustId);
@@ -205,10 +204,10 @@ public class L8320 extends TradeBuffer {
 					}
 					if (new BigDecimal(iMonthPayAmt2).compareTo(xMonthPayAmt) < 0) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
+							throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯利率等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
 //							throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
 						} else {
-							throw new LogicException("E0007", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
+							throw new LogicException("E0007", "「屬階梯式還款註記」填報'Y'，第二階梯利率等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
 //							throw new LogicException("E0007", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
 						}
 					} // 1.10.二.(二).2 end

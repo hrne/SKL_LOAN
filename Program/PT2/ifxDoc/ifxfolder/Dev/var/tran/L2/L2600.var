@@ -313,7 +313,7 @@ T(H,#SyndTypeCode,#SyndTypeCodeHelp)
 
 #LeadingBank=X,7,I
 C(3,#UpdateCode,1,$,s)
-@T(3,@LeadingBank,)
+@T(3,@LeadingBankX,)
 
 !尋找行庫資料檔
 #SendL2r09A=X,1,S

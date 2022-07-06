@@ -109,8 +109,8 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,C.\"FacmNo\" AS F3";
 		sql += "		  ,C.\"BormNo\" AS F4";
 		sql += "		  ,CM.\"CustName\" AS F5";
-		sql += "		  ,R.\"DrawdownDate\" - 19110000 AS F6";
-		sql += "		  ,R.\"LoanBal\" AS F7";
+		sql += "		  ,L.\"DrawdownDate\" - 19110000 AS F6";
+		sql += "		  ,C.\"LoanBalance\" AS F7";
 		sql += "		  ,F.\"MaturityDate\" - 19110000 AS F8";
 		sql += "		  ,C.\"ClCode1\" AS F9";
 		sql += "		  ,C.\"ClCode2\" AS F10";
@@ -141,6 +141,9 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	   AND C.\"FacmNo\" = R.\"FacmNo\" ";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = R.\"FacmNo\"";
+		sql += "	LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = C.\"CustNo\"";
+		sql += "						       AND L.\"FacmNo\" = C.\"FacmNo\"";
+		sql += "						       AND L.\"BormNo\" = C.\"BormNo\"";
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = R.\"CustNo\"";
 		sql += "	LEFT JOIN \"ClLand\" CLD ON CLD.\"ClCode1\" = C.\"ClCode1\"";
 		sql += "							AND CLD.\"ClCode2\" = C.\"ClCode2\"";

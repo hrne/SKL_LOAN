@@ -153,6 +153,12 @@ public class L8302 extends TradeBuffer {
 			if (uJcicZ041 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			//2022/7/6新增錯誤判斷
+			int JcicDate = iJcicZ041.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate);
+			if(JcicDate == 0) {
+				throw new LogicException("E0007", "無此更新資料");
+			}
 			JcicZ041 oldJcicZ041 = (JcicZ041) iDataLog.clone(uJcicZ041);
 			uJcicZ041.setTranKey(iTranKey);
 			uJcicZ041.setScDate(iScDate);
@@ -175,6 +181,13 @@ public class L8302 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			//2022/7/6新增錯誤判斷
+			int JcicDate2 = iJcicZ041.getOutJcicTxtDate();
+			this.info("JcicDate2    = " + JcicDate2);
+			if(JcicDate2 != 0) {
+				throw new LogicException("E0004", "刪除資料不存在");
+			}
+			
 			Slice<JcicZ041Log> dJcicLogZ041 = null;
 			dJcicLogZ041 = sJcicZ041LogService.ukeyEq(iJcicZ041.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ041 == null) {

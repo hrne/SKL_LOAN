@@ -115,7 +115,6 @@ public class L8322 extends TradeBuffer {
 			// 3 第5欄「調解申請日」不得大於「資料報送日」，否則予以剔退.--->(前端檢核)
 			// 4 第8欄「同意書取得日期」不得大於「資料報送日」，否則予以剔退.--->(前端檢核)
 			// 5 第9欄「首次調解日」小於等於第8欄「同意書取得日期」時，第12欄「協辦行是否需自行回報債權」需填報為'N'，否則予以剔退.--->(前端檢核)
-
 			// 6 start 檢核第13~18「未揭露債權機構代號」，若不屬於有效消債條例金融機構代號，則予剔退。
 			try {
 				iL8301SqlReturn = sL8301ServiceImpl.findData(this.index, this.limit, titaVo);
@@ -197,6 +196,7 @@ public class L8322 extends TradeBuffer {
 			if (uJcicZ440 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ440 oldJcicZ440 = (JcicZ440) iDataLog.clone(uJcicZ440);
 			uJcicZ440.setAgreeDate(iAgreeDate);
 			uJcicZ440.setStartDate(iStartDate);
 			uJcicZ440.setRemindDate(iRemindDate);
@@ -210,7 +210,6 @@ public class L8322 extends TradeBuffer {
 			iJcicZ440.setNotBankId6(iNotBankId6);
 			uJcicZ440.setTranKey(iTranKey);
 			uJcicZ440.setOutJcicTxtDate(0);
-			JcicZ440 oldJcicZ440 = (JcicZ440) iDataLog.clone(uJcicZ440);
 			try {
 				sJcicZ440Service.update(uJcicZ440, titaVo);
 			} catch (DBException e) {
