@@ -127,7 +127,6 @@ public class L3210 extends TradeBuffer {
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo;
-	Boolean isBortx;
 	private ArrayList<BaTxVo> baTxList;
 	AcDetail acDetail;
 	List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
@@ -178,7 +177,8 @@ public class L3210 extends TradeBuffer {
 			this.repayFacmNo = iFacmNo;
 		}
 		if (iFacmNo == 0 && titaVo.isTrmtypBatch()) {
-			iFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
+			iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
+			iFacmNo = iOverRpFacmNo;
 		}
 		titaVo.setTxAmt(iTempAmt);
 		// 費用抵繳是否抵繳(整批入帳)
@@ -186,12 +186,6 @@ public class L3210 extends TradeBuffer {
 		if (titaVo.get("PayFeeFlag") != null && "Y".equals(titaVo.get("PayFeeFlag"))) {
 			this.isRepaidFee = true;
 		}
-		// 交易金額
-		if (iTempReasonCode == 3 || iTempReasonCode == 6) // 期票、即期票
-			this.isBortx = false;
-		else
-			this.isBortx = true;
-
 		// 暫收款金額 存入暫收為正
 		wkTempAmt = iTempAmt;
 
@@ -208,12 +202,10 @@ public class L3210 extends TradeBuffer {
 		AcDetailRoutine();
 
 		// 放款交易內容檔
-		if (this.isBortx) {
-			if (titaVo.isHcodeNormal()) {
-				addLoanBorTxRoutine();
-			} else {
-				loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);// 訂正放款交易內容檔by交易
-			}
+		if (titaVo.isHcodeNormal()) {
+			addLoanBorTxRoutine();
+		} else {
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);// 訂正放款交易內容檔by交易
 		}
 
 		this.addList(this.totaVo);

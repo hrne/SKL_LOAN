@@ -181,6 +181,8 @@ public class L3420 extends TradeBuffer {
 	private int wkFacmNoEnd = 999;
 	private int wkBormNoStart = 1;
 	private int wkBormNoEnd = 900;
+	private int renewCnt = 0;
+	private int oldFacmNo = 0;
 	private int wkTotaCount = 0;
 	private int wkIntStartDate = 9991231;
 	private int wkIntEndDate = 0;
@@ -227,6 +229,8 @@ public class L3420 extends TradeBuffer {
 	private AcDetail acDetail;
 	private TempVo tTempVo = new TempVo();
 	private FacMain tFacMain;
+	private FacMain tOldFacMain;
+	private FacMain tNewFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
@@ -350,6 +354,11 @@ public class L3420 extends TradeBuffer {
 
 		// Check Input
 		checkInputRoutine();
+
+		// 展期處理
+		if (iCaseCloseCode == 1) {
+			facRenew(titaVo);
+		}
 
 		// 按清償違約金、違約金、 延滯息、利息順序減免
 		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -1193,7 +1202,7 @@ public class L3420 extends TradeBuffer {
 	private void UpdLoanOvdu7Routine(LoanOverdue od) throws LogicException {
 		this.info("UpdLoanOvdu7Routine ... ");
 
-		//tLoanOverdue.setBadDebtDate(wkTbsDy);
+		// tLoanOverdue.setBadDebtDate(wkTbsDy);
 		tLoanOverdue.setBadDebtDate(parse.stringToInteger(titaVo.getParam("BadDebtDateN")));// 改放轉呆時畫面輸入的董事會通過核定日期
 		tLoanOverdue.setBadDebtAmt(od.getOvduBal());
 		tLoanOverdue.setBadDebtBal(od.getOvduBal());
@@ -1515,7 +1524,7 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("ReduceAmt", iReduceAmt); // 減免金額
 		tTempVo.putParam("PaidTerms", 0);
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
-		tTempVo.putParam("Note", titaVo.getParam("Description"));// 新增摘要-董事會通過核定日期訊息 
+		tTempVo.putParam("Note", titaVo.getParam("Description"));// 新增摘要-董事會通過核定日期訊息
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -1588,7 +1597,7 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("CaseCloseCode", iCaseCloseCode);
 		tTempVo.putParam("PaidTerms", 0);
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
-		tTempVo.putParam("Note", titaVo.getParam("Description"));// 新增摘要-董事會通過核定日期訊息 
+		tTempVo.putParam("Note", titaVo.getParam("Description"));// 新增摘要-董事會通過核定日期訊息
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -2151,5 +2160,46 @@ public class L3420 extends TradeBuffer {
 		this.info("compTxAmt end AcRepay=" + wkAcRepay + ", TotalRepay=" + this.wkTotalRepay + ", TxAmt=" + this.wkTxAmt
 				+ ", TempAmt=" + this.wkTempAmt + ", TxAmtRemaind=" + this.wkTxAmtRemaind + ", TmpAmtRemaind="
 				+ this.wkTmpAmtRemaind);
+	}
+
+	// 展期處理
+	private void facRenew(TitaVo titaVo) throws LogicException {
+		tOldFacMain = new FacMain();
+		tNewFacMain = new FacMain();
+		renewCnt = 0;
+		oldFacmNo = 0;
+//		取舊額度的展期次數+1擺進新額度的展期次數
+//		舊額度擺進新額度的舊額度編號
+		if (titaVo.isHcodeNormal()) {
+			tOldFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+			if (tOldFacMain != null) {
+				renewCnt = tOldFacMain.getRenewCnt() + 1;
+				oldFacmNo = iFacmNo;
+			}
+			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
+			if (tNewFacMain != null) {
+				tNewFacMain.setRenewCnt(renewCnt);
+				tNewFacMain.setOldFacmNo(oldFacmNo);
+				try {
+					facMainService.update(tNewFacMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+
+			}
+//			復原
+		} else {
+			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
+			if (tNewFacMain != null) {
+				tNewFacMain.setRenewCnt(0);
+				tNewFacMain.setOldFacmNo(0);
+				try {
+					facMainService.update(tNewFacMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+
+			}
+		}
 	}
 }

@@ -120,7 +120,7 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,NVL(SUBSTR(CLS.\"IrItem\",1,INSTR(CLS.\"IrItem\",'段',1,1)-1),' ') AS F14";
 		sql += "		  ,NVL(SUBSTR(CLS.\"IrItem\",INSTR(CLS.\"IrItem\",'段',1,1)+1,INSTR(CLS.\"IrItem\",'段',1,2)-1),' ') AS F15";
 		sql += "		  ,NVL(CLB.\"BdLocation\",' ') AS F16";
-		sql += "		  ,R.\"CityItem\" AS F17";
+		sql += "		  ,CT.\"CityCode\" AS F17";
 		sql += "		  ,R.\"ReChkUnit\" AS F18";
 		sql += "		  ,' ' AS F19";
 		sql += "		  ,' ' AS F20";
@@ -146,6 +146,7 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "							AND CLD.\"ClCode2\" = C.\"ClCode2\"";
 		sql += "							AND CLD.\"ClNo\" = C.\"ClNo\"";
 		sql += "							AND CLD.\"LandSeq\" = 1 ";
+		sql += "	LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = C.\"CityCode\"";
 		sql += "	LEFT JOIN \"CdArea\" CA ON CA.\"CityCode\" = CLD.\"CityCode\"";
 		sql += "						   AND CA.\"AreaCode\" = CLD.\"AreaCode\"";
 		sql += "	LEFT JOIN \"CdLandSection\" CLS ON CLS.\"CityCode\" = CLD.\"CityCode\"";

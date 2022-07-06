@@ -140,6 +140,8 @@ public class L3410 extends TradeBuffer {
 	private int wkRepaidPeriod = 0;
 	private int wkPaidTerms = 0;
 	private int wkDueDate = 0;
+	private int renewCnt = 0;
+	private int oldFacmNo = 0;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkPrincipal = BigDecimal.ZERO;
 	private BigDecimal wkInterest = BigDecimal.ZERO;
@@ -174,6 +176,8 @@ public class L3410 extends TradeBuffer {
 	private AcDetail acDetail;
 	private TempVo tTempVo = new TempVo();
 	private FacMain tFacMain;
+	private FacMain tOldFacMain;
+	private FacMain tNewFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
@@ -250,6 +254,11 @@ public class L3410 extends TradeBuffer {
 
 		// Check Input
 		checkInputRoutine();
+
+		// 展期處理
+		if (iCaseCloseCode == 1) {
+			Facrenew(titaVo);
+		}
 
 		// 按違約金、 延滯息、利息順序減免
 		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -973,4 +982,44 @@ public class L3410 extends TradeBuffer {
 				+ this.wkTempAmt + ", TmpAmtRemaind=" + this.wkTmpAmtRemaind);
 	}
 
+	// 展期處理
+	private void Facrenew(TitaVo titaVo) throws LogicException {
+		tOldFacMain = new FacMain();
+		tNewFacMain = new FacMain();
+		renewCnt = 0;
+		oldFacmNo = 0;
+//		取舊額度的展期次數+1擺進新額度的展期次數
+//		舊額度擺進新額度的舊額度編號
+		if (titaVo.isHcodeNormal()) {
+			tOldFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+			if (tOldFacMain != null) {
+				renewCnt = tOldFacMain.getRenewCnt() + 1;
+				oldFacmNo = iFacmNo;
+			}
+			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
+			if (tNewFacMain != null) {
+				tNewFacMain.setRenewCnt(renewCnt);
+				tNewFacMain.setOldFacmNo(oldFacmNo);
+				try {
+					facMainService.update(tNewFacMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+
+			}
+		} else {
+//			復原
+			tNewFacMain = facMainService.holdById(new FacMainId(iCustNo, iNewFacmNo), titaVo);
+			if (tNewFacMain != null) {
+				tNewFacMain.setRenewCnt(0);
+				tNewFacMain.setOldFacmNo(0);
+				try {
+					facMainService.update(tNewFacMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "額度主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+
+			}
+		}
+	}
 }

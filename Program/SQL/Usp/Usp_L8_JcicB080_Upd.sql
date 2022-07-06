@@ -111,13 +111,14 @@ BEGIN
                 ELSE TRUNC( NVL( F."LineAmt",0) / 1000, 0)
            END                                   AS "DrawdownAmt"       -- 本階訂約金額(台幣)  -- (ref:LN15E1 (#M3601 80 8))
          , 0                                     AS "DrawdownAmtFx"     -- 本階訂約金額(外幣)
-         , CASE
-             WHEN NVL(F."GuaranteeDate",0) = 0 THEN
-                CASE WHEN NVL("FacCaseAppl"."ApproveDate",0) = 0 THEN 0
-                     ELSE TRUNC("FacCaseAppl"."ApproveDate" / 100) - 191100
-                END
-             ELSE TRUNC(F."GuaranteeDate" / 100) - 191100
-           END                                   AS "DrawdownDate"      -- 本階額度開始年月
+--         , CASE
+--             WHEN NVL(F."GuaranteeDate",0) = 0 THEN
+--                CASE WHEN NVL("FacCaseAppl"."ApproveDate",0) = 0 THEN 0
+--                     ELSE TRUNC("FacCaseAppl"."ApproveDate" / 100) - 191100
+--                END
+--             ELSE TRUNC(F."GuaranteeDate" / 100) - 191100
+--           END                                   AS "DrawdownDate"      -- 本階額度開始年月
+         , TRUNC(F."SettingDate" / 100) - 191100 AS "DrawdownDate"      -- 本階額度開始年月
          , CASE
              WHEN NVL(F."MaturityDate",0) = 0 THEN 0
              ELSE TRUNC(F."MaturityDate" / 100) - 191100

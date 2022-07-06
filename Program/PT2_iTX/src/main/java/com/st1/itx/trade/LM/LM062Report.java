@@ -253,7 +253,7 @@ public class LM062Report extends MakeReport {
 			int bormNo = Integer.valueOf(r.get("F4"));
 			String custName = r.get("F5");
 			int drawdownDate = Integer.valueOf(r.get("F6"));
-			int loanBal = Integer.valueOf(r.get("F7"));
+			BigDecimal loanBal = new BigDecimal(r.get("F7"));
 			int maturityDate = Integer.valueOf(r.get("F8"));
 			int clcode1 = Integer.valueOf(r.get("F9"));
 			int clcode2 = Integer.valueOf(r.get("F10"));
@@ -263,7 +263,8 @@ public class LM062Report extends MakeReport {
 			String part1 = r.get("F14");
 			String part2 = r.get("F15");
 			String location = r.get("F16");
-			String cityName = r.get("F17");
+//			String cityName = r.get("F17");
+			int cityCode = Integer.valueOf(r.get("F17"));
 			String unit = r.get("F18");
 			String sampleNum = r.get("F19");
 			String sampleType = r.get("F20");
@@ -307,7 +308,7 @@ public class LM062Report extends MakeReport {
 			//門牌號碼
 			makeExcel.setValue(row,17,location,"L");
 			//地區別
-			makeExcel.setValue(row,18,cityName,"L");
+			makeExcel.setValue(row,18,cityCode,"L");
 			//區域中心
 			makeExcel.setValue(row,19,unit,"L");
 			//抽樣總戶數

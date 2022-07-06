@@ -233,7 +233,7 @@ public class LM063Report extends MakeReport {
 	 * @param list
 	 * @param sheetName 工作表名稱
 	 * */
-public void dataList(List<Map<String, String>> list,String sheetName) throws LogicException {
+	public void dataList(List<Map<String, String>> list,String sheetName) throws LogicException {
 		
 		makeExcel.setSheet(sheetName);
 		
@@ -259,7 +259,8 @@ public void dataList(List<Map<String, String>> list,String sheetName) throws Log
 			String part1 = r.get("F14");
 			String part2 = r.get("F15");
 			String location = r.get("F16");
-			String cityName = r.get("F17");
+//			String cityName = r.get("F17");
+			int cityCode = Integer.valueOf(r.get("F17"));
 			String unit = r.get("F18");
 			String sampleNum = r.get("F19");
 			String sampleType = r.get("F20");
@@ -303,7 +304,7 @@ public void dataList(List<Map<String, String>> list,String sheetName) throws Log
 			//門牌號碼
 			makeExcel.setValue(row,17,location,"L");
 			//地區別
-			makeExcel.setValue(row,18,cityName,"L");
+			makeExcel.setValue(row,18,cityCode,"L");
 			//區域中心
 			makeExcel.setValue(row,19,unit,"L");
 			//抽樣總戶數
