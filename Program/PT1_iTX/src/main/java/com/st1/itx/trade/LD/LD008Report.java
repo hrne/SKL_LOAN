@@ -181,6 +181,8 @@ public class LD008Report extends MakeReport {
 		// 計算小計及合計金額
 		computeTotal(cloneListLD008);
 
+		
+		
 		/**
 		 *
 		 * ------------------------------------------------------------------------------------------------------------1
@@ -211,8 +213,16 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ａ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountA, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalA, 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(subTotalA), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(subTotalA), 2), "R"); // 占資金比率
+		String totalA= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(0).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(1).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(2).get("F2")), 2)));
+		String fundsA= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(0).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(1).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(2).get("F2")), 2)));
+		print(0, 147, totalA, "R"); // 各項比率
+		print(0, 163, fundsA, "R"); // 占資金比率
+//		print(0, 147, formatAmt(percentOfTotal(subTotalA), 2), "R"); // 各項比率
+//		print(0, 163, formatAmt(percentOfFunds(subTotalA), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┼────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　關　　係　　人　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(listLD008.get(3).get("F1"), 0), "R"); // 戶數
@@ -235,8 +245,16 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｂ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountB, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalB, 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(subTotalB), 2), "R"); // 占資金比率
+		String totalB= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(3).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(4).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(5).get("F2")), 2)));
+		String fundsB= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(3).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(4).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(5).get("F2")), 2)));
+		print(0, 147, totalB, "R"); // 各項比率
+		print(0, 163, fundsB, "R"); // 占資金比率
+//		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
+//		print(0, 163, formatAmt(percentOfFunds(subTotalB), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┼────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　關　　係　　人　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(listLD008.get(6).get("F1"), 0), "R"); // 戶數
@@ -259,8 +277,16 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｃ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountC, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalC, 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(subTotalC), 2), "R"); // 占資金比率
+		String totalC= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(6).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(7).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(8).get("F2")), 2)));
+		String fundsC= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(6).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(7).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(8).get("F2")), 2)));
+		print(0, 147, totalC, "R"); // 各項比率
+		print(0, 163, fundsC, "R"); // 占資金比率
+//		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
+//		print(0, 163, formatAmt(percentOfFunds(subTotalC), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┴────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　催　　　　收　　　　款　　　　項　　　　　　（Ｄ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(listLD008.get(9).get("F1"), 0), "R"); // 戶數
@@ -351,8 +377,14 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ａ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountA, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalA, 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(subTotalA), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(subTotalA), 2), "R"); // 占資金比率
+		String totalA= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(1).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(2).get("F2")), 2)));
+		String fundsA= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(1).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(2).get("F2")), 2)));
+		print(0, 147, totalA, "R"); // 各項比率
+		print(0, 163, fundsA, "R"); // 占資金比率
+//		print(0, 147, formatAmt(percentOfTotal(subTotalA), 2), "R"); // 各項比率
+//		print(0, 163, formatAmt(percentOfFunds(subTotalA), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┼────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　中　期　擔　保　　　　　｜　　公　　司　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(listLD008r.get(4).get("F1"), 0), "R"); // 戶數
@@ -369,8 +401,14 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｂ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountB, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalB, 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(subTotalB), 2), "R"); // 占資金比率
+		String totalB= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(4).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(5).get("F2")), 2)));
+		String fundsB= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(4).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(5).get("F2")), 2)));
+		print(0, 147, totalB, "R"); // 各項比率
+		print(0, 163, fundsB, "R"); // 占資金比率
+//		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
+//		print(0, 163, formatAmt(percentOfFunds(subTotalB), 2), "R"); // 占資金比率
 		print(1, 1, "├─────────────────┼────────────┼────────────┼──────────────────────┼──────┼───────┤");
 		print(1, 1, "│　　　　　長　期　擔　保　　　　　｜　　公　　司　　戶　　　│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(listLD008r.get(7).get("F1"), 0), "R"); // 戶數
@@ -387,8 +425,14 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｃ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountC, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalC, 0), "R"); // 金額
-		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
-		print(0, 163, formatAmt(percentOfFunds(subTotalC), 2), "R"); // 占資金比率
+		String totalC= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(7).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(8).get("F2")), 2)));
+		String fundsC= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(7).get("F2")), 2))
+				+Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(8).get("F2")), 2)));
+		print(0, 147, totalC, "R"); // 各項比率
+		print(0, 163, fundsC, "R"); // 占資金比率
+//		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
+//		print(0, 163, formatAmt(percentOfFunds(subTotalC), 2), "R"); // 占資金比率
 		print(1, 1, "└──────────────────────────────┴────────────┴──────────────────────┴──────┴───────┘");
 		/**
 		 *

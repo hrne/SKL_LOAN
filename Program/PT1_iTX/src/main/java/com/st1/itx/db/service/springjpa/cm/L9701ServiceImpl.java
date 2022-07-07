@@ -166,7 +166,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "SELECT T.\"CustNo\"";
 		sql += "            ,T.\"FacmNo\"";
-		sql += "            ,T.\"BormNo\"";
+		sql += "            ,LPAD(T.\"BormNo\",3,0) AS \"BormNo\"";
 		sql += "            ,T.\"EntryDate\"";
 		sql += "            ,T.\"Amount\"";
 		sql += "            ,T.\"IntStartDate\"";
@@ -188,8 +188,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHEN CB.\"BdLocation\" IS NOT NULL ";
 		sql += "               THEN CB.\"BdLocation\" ";
 		sql += "             ELSE CL.\"LandLocation\" END AS \"Location\"";
+		sql += "			,T.\"Displayflag\" AS \"Displayflag\"";
 		sql += "      FROM (SELECT \"CustNo\"";
 		sql += "                  ,\"FacmNo\"";
+		sql += "                  ,\"BormNo\"";
 		sql += "                  ,DECODE(\"EntryDate\", 0, \"AcDate\" ,\"EntryDate\")AS \"EntryDate\"";
 		sql += "                  ,\"LoanBal\" + \"Principal\" AS \"Amount\"";
 		sql += "                  ,\"IntStartDate\"  ";
@@ -211,10 +213,12 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,\"TitaCalDy\"  ";
 		sql += "                  ,\"TitaCalTm\"  ";
 		sql += "                  ,1                 AS \"DB\"   ";
+		sql += "				  ,\"Displayflag\" AS \"Displayflag\"";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
 		sql += "             AND ( \"TxAmt\" <> 0";
 		sql += "               OR  \"TempAmt\" <> 0)";
+		sql += "             AND  NVL(\"BormNo\", 0) > 0 ";
 
 		if (iTYPE.equals("1")) {
 			sql += "          AND DECODE(\"EntryDate\", 0, \"AcDate\", \"EntryDate\") >= :isday";
@@ -227,10 +231,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iHFG.equals("0")) {
 			sql += "          AND \"TitaHCode\" = 0";
 		}
-		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", \"Desc\",  \"TitaTlrNo\",  \"TitaTxtNo\" ";
+//		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"BormNo\" , \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", \"Desc\",  \"TitaTlrNo\",  \"TitaTxtNo\" ";
 		sql += "            UNION ALL";
 		sql += "            SELECT F.\"CustNo\"";
 		sql += "                  ,F.\"FacmNo\"";
+		sql += "                  ,0 AS \"BormNo\"";
 		sql += "                  ,Max(M.\"MaturityDate\") AS \"EntryDate\"";
 		sql += "                  ,SUM(CASE WHEN M.\"Status\" IN (2, 7) THEN O.\"OvduBal\"";
 		sql += "                            WHEN M.\"Status\"  =  0     THEN M.\"LoanBal\"";
@@ -248,6 +253,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0    AS \"TitaCalDy\" ";
 		sql += "                  ,0    AS \"TitaCalTm\" ";
 		sql += "                  ,2    AS \"DB\"   ";
+		sql += "                  ,NULL AS \"Displayflag\"   ";
 		sql += "            FROM  \"FacMain\" F";
 		sql += "            LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
 		sql += "                                       AND M.\"FacmNo\" = F.\"FacmNo\"";
@@ -260,6 +266,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND  NVL(M.\"BormNo\", 0) > 0 ";
 		sql += "            GROUP BY F.\"CustNo\"";
 		sql += "                    ,F.\"FacmNo\"";
+//		sql += "                    ,M.\"BormNo\"";
 		sql += "           ) T";
 		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = T.\"CustNo\"";
 		sql += "      LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = T.\"CustNo\"";
@@ -274,7 +281,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
 		sql += "                             AND CL.\"LandSeq\" = 0 ";	
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
-		sql += "      ORDER BY T.\"FacmNo\", T.\"DB\" ,T.\"TitaCalDy\", T.\"TitaCalTm\"";
+		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
 		sql += "              ,T.\"Displayflag\" ";
 		sql += "              ,CASE WHEN T.\"TxAmt\" > 0  THEN 0 ELSE 1 END  ";
 
@@ -311,8 +318,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Desc\"";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
+		sql += "			,T.\"Displayflag\" AS \"Displayflag\"";
 		sql += "      FROM (SELECT \"CustNo\"";
 		sql += "                  ,\"FacmNo\"";
+		sql += "                  ,\"BormNo\"";
 		sql += "                  ,DECODE(\"EntryDate\", 0, \"AcDate\" ,\"EntryDate\")AS \"EntryDate\"";
 		sql += "                  ,\"LoanBal\" + \"Principal\" AS \"Amount\"";
 		sql += "                  ,\"IntStartDate\"  ";
@@ -334,8 +343,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,\"TitaCalDy\"  ";
 		sql += "                  ,\"TitaCalTm\"  ";
 		sql += "                  ,1                 AS \"DB\"   ";
+		sql += "				  ,\"Displayflag\" AS \"Displayflag\"";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
+//		sql += "             AND  NVL(\"BormNo\", 0) > 0 ";
 		if (iTYPE.equals("1")) {
 			sql += "          AND DECODE(\"EntryDate\", 0, \"AcDate\", \"EntryDate\") >= :isday";
 			sql += "          AND DECODE(\"EntryDate\", 0, \"AcDate\", \"EntryDate\") <= :ieday";
@@ -347,10 +358,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iHFG.equals("0")) {
 			sql += "          AND \"TitaHCode\" = 0";
 		}
-		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", \"Desc\",  \"TitaTlrNo\",  \"TitaTxtNo\" ";
+//		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", \"Desc\",  \"TitaTlrNo\",  \"TitaTxtNo\" ";
 		sql += "            UNION ALL";
 		sql += "            SELECT F.\"CustNo\"";
 		sql += "                  ,F.\"FacmNo\"";
+		sql += "                  ,0 AS \"BormNo\"";
 		sql += "                  ,Max(M.\"MaturityDate\") AS \"EntryDate\"";
 		sql += "                  ,SUM(CASE WHEN M.\"Status\" IN (2, 7) THEN O.\"OvduBal\"";
 		sql += "                            WHEN M.\"Status\"  =  0     THEN M.\"LoanBal\"";
@@ -368,6 +380,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0    AS \"TitaCalDy\" ";
 		sql += "                  ,0    AS \"TitaCalTm\" ";
 		sql += "                  ,2    AS \"DB\"   ";
+		sql += "                  ,NULL AS \"Displayflag\"   ";
 		sql += "            FROM  \"FacMain\" F";
 		sql += "            LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
 		sql += "                                       AND M.\"FacmNo\" = F.\"FacmNo\"";
@@ -394,11 +407,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
 		sql += "                             AND CL.\"LandSeq\" = 0 ";	
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
-		sql += "      ORDER BY T.\"FacmNo\", T.\"DB\" ";
-		sql += "              ,T.\"TitaCalDy\", T.\"TitaCalTm\"";
+		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
 		sql += "              ,T.\"Displayflag\" ";
 		sql += "              ,CASE WHEN T.\"TxAmt\" > 0  THEN 0 ELSE 1 END  ";
-
 
 		this.info("sql=" + sql);
 		Query query;

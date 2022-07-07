@@ -89,17 +89,21 @@ public class L2073 extends TradeBuffer {
 		// new ArrayList
 		List<CustDataCtrl> lCustDataCtrl = new ArrayList<CustDataCtrl>();
 		Slice<CustDataCtrl> slCustDataCtrl = null;
-		String iCustUKey = "";
-		// 統編有輸入
-		if (!iCustId.isEmpty()) {
-			tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 
-			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0001", "L2073" + "指定統編不存在於客戶主檔。");
+		String wkCustUKey = "";
+		// 統編有輸入 先查結清戶檔的原統編是否存在,在查客戶主檔統編
+		if (!iCustId.isEmpty()) {
+			slCustDataCtrl = sCustDataCtrlService.findCustId(iCustId, this.index, this.limit, titaVo);
+			if (slCustDataCtrl == null) {
+				tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+				if (tCustMain != null) {
+					wkCustUKey = tCustMain.getCustUKey();
+					slCustDataCtrl = sCustDataCtrlService.findCustUKey(wkCustUKey, this.index, this.limit, titaVo);
+				} else {
+					throw new LogicException(titaVo, "E0001", "L2073" + "指定統編不存在於客戶主檔。");
+				}
 			}
 
-			iCustUKey = tCustMain.getCustUKey();
-			slCustDataCtrl = sCustDataCtrlService.findCustUKey(iCustUKey, this.index, this.limit, titaVo);
 		} else {
 			if (iCustNo > 0) {
 				slCustDataCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);

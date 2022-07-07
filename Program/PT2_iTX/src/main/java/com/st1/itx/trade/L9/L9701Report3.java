@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -39,12 +40,18 @@ public class L9701Report3 extends MakeReport {
 	 */
 	int entday = 0;
 
-	BigDecimal txAmtTotal = BigDecimal.ZERO; // 交易金額合計
-	BigDecimal tempAmtTotal = BigDecimal.ZERO; // 暫收轉帳合計
-	BigDecimal repaidPrinTotal = BigDecimal.ZERO; // 償還本金合計
-	BigDecimal repaidInterestTotal = BigDecimal.ZERO; // 償還利息合計
-	BigDecimal repaidExpTotal = BigDecimal.ZERO; // 償還費用合計
-	BigDecimal tempDiffTotal = BigDecimal.ZERO; // 暫收差額合計
+	BigDecimal principal = BigDecimal.ZERO; // 本金
+	BigDecimal interest = BigDecimal.ZERO; // 利息
+	BigDecimal breachAmt = BigDecimal.ZERO; // 違約金
+	BigDecimal feeAmt = BigDecimal.ZERO; // 費用
+	BigDecimal principalTotal = BigDecimal.ZERO; // 本金合計
+	BigDecimal interestTotal = BigDecimal.ZERO; // 利息合計
+	BigDecimal breachAmtTotal = BigDecimal.ZERO; // 違約金合計
+	BigDecimal feeAmtTotal = BigDecimal.ZERO; // 費用合計
+
+	BigDecimal loanBal = BigDecimal.ZERO; // 放款餘額
+	BigDecimal shortFall = BigDecimal.ZERO; // 累短收
+	BigDecimal excessive = BigDecimal.ZERO; // 累溢收
 
 	@Override
 	public void printHeader() {
@@ -117,49 +124,46 @@ public class L9701Report3 extends MakeReport {
 
 		this.custName = "";
 		this.facmNo = "";
+		boolean isFirst = true;
+
+		int detailCounts = 0;
 
 		if (listL9701 != null && listL9701.size() > 0) {
 
-			this.custName = listL9701.get(0).get("F13");
-			this.facmNo = listL9701.get(0).get("F10");
-
 			this.open(titaVo, entday, titaVo.getKinbr(), "L9701_3", "客戶往來交易明細表", "", "A4", "L");
 
-			boolean isFirst = true;
-
 			for (Map<String, String> tL9701Vo : listL9701) {
-
-				// 判斷額度號碼是否與前筆不同
-				if (!this.facmNo.equals(tL9701Vo.get("F10"))) {
-
-					// 若非首筆且額度號碼與前筆不同時
-					if (!isFirst) {
-						// 印合計
-						printTotal();
-
-						this.facmNo = tL9701Vo.get("F10");
-
-						if (this.NowRow > 11 && this.NowRow < maxDetailCnt - 4) {
-							// 印表頭
-							printDataHeader();
-						} else if (this.NowRow >= maxDetailCnt - 4) {
-							// 若剩餘行數不足四行,先換頁
-							this.newPage(); // 換頁時會印表頭
+				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
+					// 無交易明細且無餘額
+					if (detailCounts == 0) {
+						if (tL9701Vo.get("DB").equals("2")) {
+							BigDecimal unpaidLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
+							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
+								continue;
+							}
 						}
-					} else {
-						this.facmNo = tL9701Vo.get("F10");
+					}
+					if (detailCounts > 0) {
+						reportTotal();
+					}
+					this.custName = tL9701Vo.get("CustName");
+					this.facmNo = tL9701Vo.get("FacmNo");
+					if (isFirst) {
+						printDataHeader();
+						isFirst = false;
+					}
+					if (tL9701Vo.get("DB").equals("2")) {
+						reportTotal();
+						detailCounts = 0;
+						isFirst = true;
 					}
 				}
 
-				// 印明細
-				printDetail(tL9701Vo);
+				if (tL9701Vo.get("DB").equals("1")) {
+					printDetail1(tL9701Vo);
+					detailCounts++;
+				}
 
-				isFirst = false;
-			}
-
-			if (!isFirst) {
-				// 印合計
-				printTotal();
 			}
 		} else {
 
@@ -171,108 +175,60 @@ public class L9701Report3 extends MakeReport {
 		this.close();
 
 		// 測試用
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
-	/**
-	 * 印明細
-	 * 
-	 * @param tL9701Vo 單筆資料
-	 */
-	private void printDetail(Map<String, String> tL9701Vo) {
-		String htyp = "";
+	private void printDetail1(Map<String, String> tL9701Vo) {
+		//入帳日
+		this.print(1, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
+		//交易內容
+		this.print(0, 8, tL9701Vo.get("Desc"));
+		
+		//交易金額
+		this.print(0, 40, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
 
-		if (Integer.valueOf(tL9701Vo.get("F14")) > 0) {
-			htyp = "訂正";
-		}
-
-		this.print(1, 1, htyp);
-
-		this.print(0, 5, showRocDate(tL9701Vo.get("F0"), 1)); // 入帳日
-
-		String tmp = tL9701Vo.get("F1");
-
-		if (tmp.length() > 6) {
-			tmp = tmp.substring(0, 6);
-		}
-
-		this.print(0, 17, tmp); // 交易內容 txAmtTotal = txAmtTotal.add(new BigDecimal(tL9701Vo.get("F2")));
-
-		// 計算合計
-		// 該筆為"非訂正"時,累加該筆金額
-		// 該筆為"訂正"時,累減該筆金額
-		if (htyp.isEmpty()) {
-			tempAmtTotal = tempAmtTotal.add(new BigDecimal(tL9701Vo.get("F3")));
-			repaidPrinTotal = repaidPrinTotal.add(new BigDecimal(tL9701Vo.get("F4")));
-			repaidInterestTotal = repaidInterestTotal.add(new BigDecimal(tL9701Vo.get("F5")));
-			repaidExpTotal = repaidExpTotal.add(new BigDecimal(tL9701Vo.get("F6")));
-			tempDiffTotal = tempDiffTotal.add(new BigDecimal(tL9701Vo.get("F9")));
-		} else {
-			tempAmtTotal = tempAmtTotal.subtract(new BigDecimal(tL9701Vo.get("F3")));
-			repaidPrinTotal = repaidPrinTotal.subtract(new BigDecimal(tL9701Vo.get("F4")));
-			repaidInterestTotal = repaidInterestTotal.subtract(new BigDecimal(tL9701Vo.get("F5")));
-			repaidExpTotal = repaidExpTotal.subtract(new BigDecimal(tL9701Vo.get("F6")));
-			tempDiffTotal = tempDiffTotal.subtract(new BigDecimal(tL9701Vo.get("F9")));
-		}
-
-		this.print(0, 43, formatAmt(tL9701Vo.get("F2"), 0), "R"); // 交易金額
-
-		BigDecimal f3 = new BigDecimal(tL9701Vo.get("F3"));
-		this.print(0, 57, htyp.isEmpty() ? formatAmt(f3, 0) : formatAmt(BigDecimal.ZERO.subtract(f3), 0), "R"); // 暫收轉帳
-
-		BigDecimal f4 = new BigDecimal(tL9701Vo.get("F4"));
-		this.print(0, 71, htyp.isEmpty() ? formatAmt(f4, 0) : formatAmt(BigDecimal.ZERO.subtract(f4), 0), "R"); // 償還本金
-
-		BigDecimal f5 = new BigDecimal(tL9701Vo.get("F5"));
-		this.print(0, 85, htyp.isEmpty() ? formatAmt(f5, 0) : formatAmt(BigDecimal.ZERO.subtract(f5), 0), "R"); // 償還利息
-
-		BigDecimal f6 = new BigDecimal(tL9701Vo.get("F6"));
-		this.print(0, 99, htyp.isEmpty() ? formatAmt(f6, 0) : formatAmt(BigDecimal.ZERO.subtract(f6), 0), "R"); // 償還費用
-
-		BigDecimal tmpAmt = new BigDecimal(tL9701Vo.get("F7"));
-
-		if (tmpAmt.compareTo(BigDecimal.ZERO) < 0) {
-			tmp = "短收";
-			tmpAmt = tmpAmt.abs(); // 輸出時為絕對值
-		} else if (tmpAmt.compareTo(BigDecimal.ZERO) > 0) {
-			tmp = "溢收";
-		} else {
-			tmp = "";
-		}
-
-		this.print(0, 101, tmp);
-		this.print(0, 113, htyp.isEmpty() ? formatAmt(tmpAmt, 0) : formatAmt(BigDecimal.ZERO.subtract(tmpAmt), 0), "R"); // 溢短收
-
-		BigDecimal f9 = new BigDecimal(tL9701Vo.get("F9"));
-		this.print(0, 127, htyp.isEmpty() ? formatAmt(f9, 0) : formatAmt(BigDecimal.ZERO.subtract(f9), 0), "R"); // 暫收差額
+		//暫收借
+		BigDecimal tempAmt = new BigDecimal(tL9701Vo.get("TempAmt"));
+		BigDecimal tempDbAmt = tempAmt.compareTo(BigDecimal.ZERO) > 0 ? tempAmt : BigDecimal.ZERO;
+		BigDecimal tempCrAmt = tempAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO.subtract(tempAmt)
+				: BigDecimal.ZERO;
+		this.print(0, 57, formatAmt(tempDbAmt, 0), "R"); 
+		//本金
+		this.print(0, 72, formatAmt(tL9701Vo.get("Principal"), 0), "R");
+		//利息
+		this.print(0, 86, formatAmt(tL9701Vo.get("Interest"), 0), "R");
+		//違約金
+		this.print(0, 99, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
+		//費用
+		this.print(0, 112, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
+		//短繳
+		this.print(0, 125, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
+		//暫收貸
+//		this.print(0, 135, formatAmt(tL9701Vo.get("tempCrAmt"), 0), "R");
+		
+		principal = new BigDecimal(tL9701Vo.get("Principal"));
+		interest = new BigDecimal(tL9701Vo.get("Interest"));
+		breachAmt = new BigDecimal(tL9701Vo.get("BreachAmt"));
+		feeAmt = new BigDecimal(tL9701Vo.get("FeeAmt"));
+		principalTotal = principalTotal.add(principal);
+		interestTotal = interestTotal.add(interest);
+		breachAmtTotal = breachAmtTotal.add(breachAmt);
+		feeAmtTotal = feeAmtTotal.add(feeAmt);
 	}
 
-	/**
-	 * 印合計
-	 */
-	private void printTotal() {
+	private void reportTotal() {
 
-		// 若合計無法印在一起,先換頁
-		if (this.NowRow > maxDetailCnt - 2) {
-			this.newPage();
-		}
+		this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
+		this.print(0, 67, "小計：");
+		this.print(0, 82, formatAmt(principalTotal, 0), "R");
+		this.print(0, 96, formatAmt(interestTotal, 0), "R");
+		this.print(0, 109, formatAmt(breachAmtTotal, 0), "R");
+		this.print(0, 122, formatAmt(feeAmtTotal, 0), "R");
 
-		this.print(1, 5, "－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－");
-		this.print(1, 43, formatAmt(txAmtTotal, 0), "R"); // 交易金額合計
-		this.print(0, 57, formatAmt(tempAmtTotal, 0), "R"); // 暫收轉帳合計
-		this.print(0, 71, formatAmt(repaidPrinTotal, 0), "R"); // 償還本金合計
-		this.print(0, 85, formatAmt(repaidInterestTotal, 0), "R"); // 償還利息合計
-		this.print(0, 99, formatAmt(repaidExpTotal, 0), "R"); // 償還費用合計
-
-		this.print(0, 127, formatAmt(tempDiffTotal, 0), "R"); // 暫收差額
-
-		// 合計歸零
-		txAmtTotal = BigDecimal.ZERO;
-		tempAmtTotal = BigDecimal.ZERO;
-		repaidPrinTotal = BigDecimal.ZERO;
-		repaidInterestTotal = BigDecimal.ZERO;
-		repaidExpTotal = BigDecimal.ZERO;
-		tempDiffTotal = BigDecimal.ZERO;
+		principalTotal = BigDecimal.ZERO;
+		interestTotal = BigDecimal.ZERO;
+		breachAmtTotal = BigDecimal.ZERO;
+		feeAmtTotal = BigDecimal.ZERO;
 	}
 
 }

@@ -74,16 +74,17 @@ public class L6301 extends TradeBuffer {
 //		this.info("ActfgSuprele="+titaVo.isActfgSuprele());
 		if (titaVo.isActfgSuprele() && iFuncCode == 1) {
 			iFuncCode = 2;
-		} else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && !iItem.equals("")) {
-			this.info("放行後"+!(titaVo.isActfgSuprele()));
-			iFuncCode = 2;
-		}
-		this.info("產出FuncCode"+ iFuncCode);
-		this.info("產出code " + iCode );
-		
-		if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && iItem.equals("")) {
+		}else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && !iItem.equals("")) {
+			throw new LogicException(titaVo, "E0004", iCode);
+		}else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && iItem.equals("")) {
 			throw new LogicException(titaVo, "E0004", iCode);
 		}
+//		else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && !iItem.equals("")) {
+//			this.info("放行後"+!(titaVo.isActfgSuprele()));
+//			iFuncCode = 2;
+//		}
+		this.info("產出FuncCode"+ iFuncCode);
+		this.info("產出code " + iCode );
 		
 		
 		// BaseRate0的選單-商品用含99:自訂(執行L6604建立)
