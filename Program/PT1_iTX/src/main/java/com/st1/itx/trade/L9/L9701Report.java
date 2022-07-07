@@ -54,7 +54,7 @@ public class L9701Report extends MakeReport {
 	BigDecimal shortFall = BigDecimal.ZERO; // 累短收
 	BigDecimal excessive = BigDecimal.ZERO; // 累溢收
 
-	public String divider = "－－－－－　－－－－－－　－－－－－－－－　－－－－　  －－－－－－　   －－－－－－        －－－－－－－　 －－－－－－－　 －－－－－－　 －－－－－－";
+//	public String divider = "－－－－－　－－－－－－　－－－－－－－－　－－－－　  －－－－－－　   －－－－－－        －－－－－－－　 －－－－－－－　 －－－－－－　 －－－－－－";
 	
 	@Override
 	public void printHeader() {
@@ -84,7 +84,7 @@ public class L9701Report extends MakeReport {
 		if (this.facmNo.equals("")) {
 			this.print(-6, 1, "戶號　　  : " + iCUSTNO);
 		} else {
-			this.print(-6, 1, "戶號　　 :  " + iCUSTNO + " " + custName);
+			this.print(-6, 1, "戶號　　 : " + iCUSTNO + " " + custName);
 		}
 
 		this.setBeginRow(7);
@@ -93,6 +93,7 @@ public class L9701Report extends MakeReport {
 		this.setMaxRows(40);
 
 	}
+	
 
 	private void printFacHead() {
 		if (this.NowRow >= 35) {
@@ -105,13 +106,44 @@ public class L9701Report extends MakeReport {
 			this.print(1, 1, " ");
 			this.print(1, 1, "額度　　 : " + tmpFacmNo);
 			this.print(0, 22, "押品地址 : " + clAddr);
-			this.print(1, 7, divider);
-			this.print(1, 7,
-					"　入帳日　　　計息本金　　　　計息期間　　　　利率　　　　交易金額          本金                 利息　    　　　違約金　　　　　費用　　　　  溢短繳   ");
+//			this.print(1, 7, divider);
+			divider();
+			this.print(1,9,"入帳日");
+			this.print(0,20,"交易內容");
+			this.print(0,35,"計息本金");
+			this.print(0,50,"計息期間");
+			this.print(0,66,"利率");
+			this.print(0,78,"交易金額");
+			this.print(0,96,"本金");
+			this.print(0,111,"利息");
+			this.print(0,125,"違約金");
+			this.print(0,141,"費用");
+			this.print(0,155,"溢短繳");
+			divider();
+//			this.print(1, 7,
+//					"　入帳日　　　計息本金　　　　計息期間　　　　利率　　　　交易金額          本金                 利息　    　　　違約金　　　　　費用　　　　  溢短繳   ");
 //			this.print(1, 7, "－－－－－　－－－－－－　－－－－－－－－　－－－－　－－－－－－　－－－－－－  －－－－－－－　－－－－－－－　－－－－－－　－－－－－－");
-			this.print(1, 7, divider);
+//			this.print(1, 7, divider);
 		}
 
+	}
+	
+	/**
+	 * 分割線
+	 * 
+	 * */
+	public void divider() {
+		this.print(1,7,"－－－－－");
+		this.print(0,18,"－－－－－－");
+		this.print(0,33,"－－－－－－");
+		this.print(0,48,"－－－－－－");
+		this.print(0,64,"－－－－");
+		this.print(0,76,"－－－－－－");
+		this.print(0,92,"－－－－－－");
+		this.print(0,107,"－－－－－－");
+		this.print(0,122,"－－－－－－");
+		this.print(0,137,"－－－－－－");
+		this.print(0,152,"－－－－－－");
 	}
 
 	public void exec(TitaVo titaVo, List<BaTxVo> listBaTxVo) throws LogicException {
@@ -184,23 +216,36 @@ public class L9701Report extends MakeReport {
 
 	private void printDetail1(Map<String, String> tL9701Vo) {
 			
-		this.print(1, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
-		this.print(0, 8, tL9701Vo.get("Desc"));
-		if (!"0".equals(tL9701Vo.get("Amount"))) {
-			this.print(0, 30, formatAmt(tL9701Vo.get("Amount"), 0), "R"); // 計息本金
-		}
 		
-		this.print(0, 33,
-				showRocDate(tL9701Vo.get("IntStartDate"), 3) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 3)); // 計息期間
-		if (!"0".equals(tL9701Vo.get("Rate"))) {
-			this.print(0, 67, formatAmt(tL9701Vo.get("Rate"), 4), "R"); // 利率
+		
+		//入帳日
+		this.print(1, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
+		//交易內容
+		this.print(0, 20, tL9701Vo.get("Desc"));
+		// 計息本金
+		if (!"0".equals(tL9701Vo.get("Amount"))) {
+			this.print(0, 45, formatAmt(tL9701Vo.get("Amount"), 0), "R"); 
 		}
-		this.print(0, 75, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
-		this.print(0, 92, formatAmt(tL9701Vo.get("Principal"), 0), "R");
-		this.print(0, 115, formatAmt(tL9701Vo.get("Interest"), 0), "R");
-		this.print(0, 132, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
-		this.print(0, 147, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
-		this.print(0, 163, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
+		//計息期間
+		this.print(0, 48,
+				showRocDate(tL9701Vo.get("IntStartDate"), 3) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 3)); // 計息期間
+		// 利率
+		if (!"0".equals(tL9701Vo.get("Rate"))) {
+			this.print(0, 72, formatAmt(tL9701Vo.get("Rate"), 4), "R"); 
+		}
+		//交易金額
+		this.print(0, 88, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); 
+		//本金
+		this.print(0, 104, formatAmt(tL9701Vo.get("Principal"), 0), "R");
+		//利息
+		this.print(0, 119, formatAmt(tL9701Vo.get("Interest"), 0), "R");
+		//違約金
+		this.print(0, 134, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
+		//費用
+		this.print(0, 149, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
+		//溢短繳
+		this.print(0, 164, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
+		
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
 		breachAmt = new BigDecimal(tL9701Vo.get("BreachAmt"));
@@ -227,18 +272,18 @@ public class L9701Report extends MakeReport {
 				}
 			}
 		}
-
-		this.print(1, 7, divider);
+		divider();
+//		this.print(1, 7, divider);
 //		this.print(1, 7, "至" + showRocDate(entday, 1) + "未還本金餘額：");
 		this.print(1, 7, "至" + showRocDate(entday, 1) + "當日餘額：");
 		this.print(0, 41, formatAmt(loanBal, 0), "R"); // 放款餘額
-		this.print(0, 54, "累溢短收：");
-		this.print(0, 74, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
-		this.print(0, 76, "小計：");
-		this.print(0, 92, formatAmt(principalTotal, 0), "R");
-		this.print(0, 115, formatAmt(interestTotal, 0), "R");
-		this.print(0, 132, formatAmt(breachAmtTotal, 0), "R");
-		this.print(0, 147, formatAmt(feeAmtTotal, 0), "R");
+		this.print(0, 50, "累溢短收：");
+		this.print(0, 72, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
+		this.print(0, 83, "小計：");
+		this.print(0, 104, formatAmt(principalTotal, 0), "R");
+		this.print(0, 119, formatAmt(interestTotal, 0), "R");
+		this.print(0, 134, formatAmt(breachAmtTotal, 0), "R");
+		this.print(0, 149, formatAmt(feeAmtTotal, 0), "R");
 
 		principalTotal = BigDecimal.ZERO;
 		interestTotal = BigDecimal.ZERO;

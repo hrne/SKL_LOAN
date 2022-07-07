@@ -17,10 +17,13 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.JcicZ570;
+import com.st1.itx.db.domain.JcicZ570Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ575;
 import com.st1.itx.db.domain.JcicZ575Id;
 import com.st1.itx.db.domain.JcicZ575Log;
+import com.st1.itx.db.service.JcicZ570Service;
 import com.st1.itx.db.service.JcicZ575LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ575Service;
@@ -53,6 +56,8 @@ import com.st1.itx.util.data.DataLog;
 public class L8337 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ570Service sJcicZ570Service;
+	@Autowired
 	public L8337ServiceImpl sL8337ServiceImpl;
 	@Autowired
 	public JcicZ575Service sJcicZ575Service;
@@ -84,6 +89,8 @@ public class L8337 extends TradeBuffer {
 		iJcicZ575Id.setCustId(iCustId);
 		iJcicZ575Id.setSubmitKey(iSubmitKey);
 		JcicZ575 chJcicZ575 = new JcicZ575();
+		JcicZ570 iJcicZ570 = new JcicZ570();
+		JcicZ570Id iJcicZ570Id = new JcicZ570Id();
 		List<Map<String, String>> iL8337SqlReturn = new ArrayList<Map<String, String>>();
 
 		// 檢核項目(D-78)
@@ -100,10 +107,11 @@ public class L8337 extends TradeBuffer {
 					this.info("L5024 ErrorForSql=" + e);
 					throw new LogicException(titaVo, "E5004", "");
 				}
-				if (iL8337SqlReturn.size() == 0) {
-					throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
-				}
 				// 三end
+			}
+			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
+			if ("C".equals(iTranKey) && iJcicZ570 == null) {
+				throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
 			}
 		}
 		// 檢核項目end
