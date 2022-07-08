@@ -14,8 +14,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.BaTxVo;
-import com.st1.itx.util.format.FormatUtil;
 
 @Component
 @Scope("prototype")
@@ -31,9 +29,11 @@ public class L9701Report3 extends MakeReport {
 
 	private String custName;
 	private String facmNo;
+	
+	public int tempPage = 0;
 
 	// 最大明細筆數
-	private int maxDetailCnt = 50;
+//	private int maxDetailCnt = 50;
 
 	/**
 	 * 帳務日
@@ -57,50 +57,85 @@ public class L9701Report3 extends MakeReport {
 	public void printHeader() {
 
 		this.setFontSize(9);
-		this.info("L9701 exec" + this.titaVo.get("ENTDY"));
-		this.print(-2, 86, "客 戶 往 來 交 易 明 細 表", "C");
-		this.print(-3, 86, showRocDate(this.titaVo.get("ENTDY"), 0), "C");
-		this.print(-4, 130, "印表日期：" + showRocDate(this.nowDate, 1) + " " + showTime(this.nowTime));
+
+		this.print(-2, this.getMidXAxis(), "客 戶 往 來 本 息 明 細 表", "C");
+
+		this.print(-3, this.getMidXAxis(), showRocDate(this.titaVo.get("ENTDY"), 0), "C");
+
+		this.print(-4, 138, "印表日期：" + showRocDate(this.nowDate, 1) + " " + showTime(this.nowTime), "L");
+
 		String iTYPE = titaVo.get("DateType");
 		String iSDAY = showRocDate(titaVo.get("BeginDate"), 1);
 		String iEDAY = showRocDate(titaVo.get("EndDate"), 1);
+
 		if (iTYPE.equals("1")) {
 			this.print(-5, 1, "入帳日期 : " + iSDAY + " - " + iEDAY);
 		} else {
 			this.print(-5, 1, "會計日期 : " + iSDAY + " - " + iEDAY);
 		}
-		this.print(-5, 130, "頁　　次：" + Integer.toString(this.getNowPage()));
+
+		this.print(-5, 138, "頁　　次：" + Integer.toString(this.getNowPage()), "L");
+
 		String iCUSTNO = titaVo.get("CustNo");
+
 		if (this.facmNo.equals("")) {
-			this.print(-6, 1, "戶號     : " + iCUSTNO);
+			this.print(-6, 1, "戶號　　  : " + iCUSTNO);
 		} else {
-			this.print(-6, 1, "戶號     : " + iCUSTNO + " " + custName);
-		}
-		if (this.NowRow >= maxDetailCnt - 4) {
-			// 若剩餘行數不足四行,先換頁
-			this.newPage(); // 換頁時會印表頭
-		} else {
-			printDataHeader();
+			this.print(-6, 1, "戶號　　 : " + iCUSTNO + " " + custName);
 		}
 
-		// 明細起始列(自訂亦必須)
-		this.setBeginRow(11);
+		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(maxDetailCnt);
+		this.setMaxRows(40);
+
+	}
+
+	private void printDataHeader() {
+		if (this.NowRow >= 35) {
+			// 若剩餘行數不足5行,先換頁
+			this.newPage(); // 換頁時會印表頭
+//			tempPage = getNowPage();
+		} else {
+
+			String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
+
+			this.print(1, 1, " ");
+			this.print(1, 1, "額度　　 : " + tmpFacmNo);
+			divider();
+			this.print(1, 2, "撥款");
+			this.print(0, 10, "入帳日期");
+			this.print(0, 24, "交易內容");
+			this.print(0, 40, "交易金額");
+			this.print(0, 59, "暫收借");
+			this.print(0, 76, "本金");
+			this.print(0, 91, "利息");
+			this.print(0, 106, "違約金");
+			this.print(0, 123, "費用");
+			this.print(0, 139, "短繳");
+			this.print(0, 154, "暫收貸");
+			divider();
+
+		}
+
 	}
 
 	/**
-	 * 印資料表頭
+	 * 分割線
+	 * 
 	 */
-	private void printDataHeader() {
-
-		String tmpFacmNo = FormatUtil.pad9(facmNo, 3);
-
-		this.print(1, 1, "額度     : " + tmpFacmNo);
-		this.print(1, 5, "－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－");
-		this.print(1, 5, "　入帳日　　　交易內容　　交易金額(Ａ)　暫收轉帳(Ｂ)　償還本金(ａ)　償還利息(ｂ)　償還費用(ｃ)　溢短收(Ｘ)　　暫收差額(Ｍ)");
-		this.print(1, 5, "－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－");
+	public void divider() {
+		this.print(1, 2, "－－");
+		this.print(0, 9, "－－－－－");
+		this.print(0, 22, "－－－－－－");
+		this.print(0, 38, "－－－－－－");
+		this.print(0, 56, "－－－－－－");
+		this.print(0, 72, "－－－－－－");
+		this.print(0, 87, "－－－－－－");
+		this.print(0, 103, "－－－－－－");
+		this.print(0, 119, "－－－－－－");
+		this.print(0, 135, "－－－－－－");
+		this.print(0, 151, "－－－－－－");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -128,9 +163,14 @@ public class L9701Report3 extends MakeReport {
 
 		int detailCounts = 0;
 
-		if (listL9701 != null && listL9701.size() > 0) {
+		String tradeReportName = "客戶往來本息明細表";
 
-			this.open(titaVo, entday, titaVo.getKinbr(), "L9701_3", "客戶往來交易明細表", "", "A4", "L");
+		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", tradeReportName, "", "A4", "L");
+
+		
+
+
+		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
@@ -143,9 +183,9 @@ public class L9701Report3 extends MakeReport {
 							}
 						}
 					}
-					if (detailCounts > 0) {
-						reportTotal();
-					}
+//					if (detailCounts > 0) {
+//						reportTotal();
+//					}
 					this.custName = tL9701Vo.get("CustName");
 					this.facmNo = tL9701Vo.get("FacmNo");
 					if (isFirst) {
@@ -158,54 +198,63 @@ public class L9701Report3 extends MakeReport {
 						isFirst = true;
 					}
 				}
+//
+//				if (this.getNowPage() > tempPage && tempPage > 0) {
+//					this.print(1, 1, " ");
+//					tempPage = getNowPage();
+//				}
+//				this.info("tempPage=" +tempPage);
 
+				
+				
 				if (tL9701Vo.get("DB").equals("1")) {
 					printDetail1(tL9701Vo);
 					detailCounts++;
 				}
+				
+	
 
 			}
 		} else {
-
-			this.open(titaVo, entday, titaVo.getKinbr(), "L9701_3", "客戶往來交易明細表", "", "A4", "L");
 
 			this.print(1, 20, "*******    查無資料   ******");
 		}
 
 		this.close();
 
-		// 測試用
-		// this.toPdf(sno);
 	}
 
 	private void printDetail1(Map<String, String> tL9701Vo) {
-		//入帳日
-		this.print(1, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
-		//交易內容
-		this.print(0, 8, tL9701Vo.get("Desc"));
-		
-		//交易金額
-		this.print(0, 40, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
 
-		//暫收借
+		// 撥款
+		this.print(1, 2, tL9701Vo.get("BormNo"));
+		// 入帳日
+		this.print(0, 9, showRocDate(tL9701Vo.get("EntryDate"), 1));
+		// 交易內容
+		this.print(0, 28, tL9701Vo.get("Desc"), "C");
+		// 交易金額
+		this.print(0, 50, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
+
+		// 暫收借
 		BigDecimal tempAmt = new BigDecimal(tL9701Vo.get("TempAmt"));
 		BigDecimal tempDbAmt = tempAmt.compareTo(BigDecimal.ZERO) > 0 ? tempAmt : BigDecimal.ZERO;
 		BigDecimal tempCrAmt = tempAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO.subtract(tempAmt)
 				: BigDecimal.ZERO;
-		this.print(0, 57, formatAmt(tempDbAmt, 0), "R"); 
-		//本金
-		this.print(0, 72, formatAmt(tL9701Vo.get("Principal"), 0), "R");
-		//利息
-		this.print(0, 86, formatAmt(tL9701Vo.get("Interest"), 0), "R");
-		//違約金
-		this.print(0, 99, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
-		//費用
-		this.print(0, 112, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
-		//短繳
-		this.print(0, 125, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
-		//暫收貸
-//		this.print(0, 135, formatAmt(tL9701Vo.get("tempCrAmt"), 0), "R");
-		
+		this.print(0, 68, formatAmt(tempDbAmt, 0), "R");
+		// 本金
+		this.print(0, 83, formatAmt(tL9701Vo.get("Principal"), 0), "R");
+
+		// 利息
+		this.print(0, 99, formatAmt(tL9701Vo.get("Interest"), 0), "R");
+		// 違約金
+		this.print(0, 115, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
+		// 費用
+		this.print(0, 131, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
+		// 短繳
+		this.print(0, 147, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
+		// 暫收貸
+		this.print(0, 163, tempCrAmt.toString(), "R");
+
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
 		breachAmt = new BigDecimal(tL9701Vo.get("BreachAmt"));
@@ -218,12 +267,12 @@ public class L9701Report3 extends MakeReport {
 
 	private void reportTotal() {
 
-		this.print(1, 7, "－－－－－　－－－－－－－－　－－－－－－　－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－");
-		this.print(0, 67, "小計：");
-		this.print(0, 82, formatAmt(principalTotal, 0), "R");
-		this.print(0, 96, formatAmt(interestTotal, 0), "R");
-		this.print(0, 109, formatAmt(breachAmtTotal, 0), "R");
-		this.print(0, 122, formatAmt(feeAmtTotal, 0), "R");
+		divider();
+		this.print(1, 66, "小計：");
+		this.print(0, 83, formatAmt(principalTotal, 0), "R");
+		this.print(0, 99, formatAmt(interestTotal, 0), "R");
+		this.print(0, 115, formatAmt(breachAmtTotal, 0), "R");
+		this.print(0, 131, formatAmt(feeAmtTotal, 0), "R");
 
 		principalTotal = BigDecimal.ZERO;
 		interestTotal = BigDecimal.ZERO;

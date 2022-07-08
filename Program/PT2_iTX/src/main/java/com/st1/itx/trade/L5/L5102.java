@@ -92,7 +92,7 @@ public class L5102 extends TradeBuffer {
 			break;
 		case 2:
 			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer, titaVo, "0002", "");
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			
 			if (iInnLoanMeeting == null) {

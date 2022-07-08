@@ -213,12 +213,17 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ａ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountA, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalA, 0), "R"); // 金額
-		String totalA= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(0).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(1).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(2).get("F2")), 2)));
-		String fundsA= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(0).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(1).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(2).get("F2")), 2)));
+		BigDecimal t1A=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(0).get("F2")), 2));
+		BigDecimal t2A=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(1).get("F2")), 2));
+		BigDecimal t3A=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(2).get("F2")), 2));
+		
+		BigDecimal f1A=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(0).get("F2")), 2));
+		BigDecimal f2A=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(1).get("F2")), 2));
+		BigDecimal f3A=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(2).get("F2")), 2));
+		
+		String totalA= t1A.add(t2A).add(t3A).toString();
+		String fundsA= f1A.add(f2A).add(f3A).toString();
+		
 		print(0, 147, totalA, "R"); // 各項比率
 		print(0, 163, fundsA, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalA), 2), "R"); // 各項比率
@@ -245,12 +250,16 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｂ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountB, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalB, 0), "R"); // 金額
-		String totalB= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(3).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(4).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(5).get("F2")), 2)));
-		String fundsB= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(3).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(4).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(5).get("F2")), 2)));
+		BigDecimal t1B=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(3).get("F2")), 2));
+		BigDecimal t2B=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(4).get("F2")), 2));
+		BigDecimal t3B=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(5).get("F2")), 2));
+		
+		BigDecimal f1B=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(3).get("F2")), 2));
+		BigDecimal f2B=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(4).get("F2")), 2));
+		BigDecimal f3B=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(5).get("F2")), 2));
+		
+		String totalB= t1B.add(t2B).add(t3B).toString();
+		String fundsB= f1B.add(f2B).add(f3B).toString();
 		print(0, 147, totalB, "R"); // 各項比率
 		print(0, 163, fundsB, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
@@ -277,12 +286,16 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｃ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountC, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalC, 0), "R"); // 金額
-		String totalC= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(6).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(7).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008.get(8).get("F2")), 2)));
-		String fundsC= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(6).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(7).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008.get(8).get("F2")), 2)));
+		BigDecimal t1C=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(6).get("F2")), 2));
+		BigDecimal t2C=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(7).get("F2")), 2));
+		BigDecimal t3C=  new BigDecimal(formatAmt(percentOfTotal(listLD008.get(8).get("F2")), 2));
+		
+		BigDecimal f1C=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(6).get("F2")), 2));
+		BigDecimal f2C=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(7).get("F2")), 2));
+		BigDecimal f3C=  new BigDecimal(formatAmt(percentOfFunds(listLD008.get(8).get("F2")), 2));
+		
+		String totalC= t1C.add(t2C).add(t3C).toString();
+		String fundsC= f1C.add(f2C).add(f3C).toString();
 		print(0, 147, totalC, "R"); // 各項比率
 		print(0, 163, fundsC, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
@@ -377,10 +390,16 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ａ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountA, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalA, 0), "R"); // 金額
-		String totalA= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(1).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(2).get("F2")), 2)));
-		String fundsA= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(1).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(2).get("F2")), 2)));
+		
+		BigDecimal t1A=  new BigDecimal(formatAmt(percentOfTotal(listLD008r.get(1).get("F2")), 2));
+		BigDecimal t2A=  new BigDecimal(formatAmt(percentOfTotal(listLD008r.get(2).get("F2")), 2));
+		
+		BigDecimal f1A=  new BigDecimal(formatAmt(percentOfFunds(listLD008r.get(1).get("F2")), 2));
+		BigDecimal f2A=  new BigDecimal(formatAmt(percentOfFunds(listLD008r.get(2).get("F2")), 2));
+		
+		String totalA= t1A.add(t2A).toString();
+		String fundsA= f1A.add(f2A).toString();
+		
 		print(0, 147, totalA, "R"); // 各項比率
 		print(0, 163, fundsA, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalA), 2), "R"); // 各項比率
@@ -401,10 +420,14 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｂ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountB, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalB, 0), "R"); // 金額
-		String totalB= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(4).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(5).get("F2")), 2)));
-		String fundsB= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(4).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(5).get("F2")), 2)));
+		BigDecimal t1B=  new BigDecimal(formatAmt(percentOfTotal(listLD008r.get(4).get("F2")), 2));
+		BigDecimal t2B=  new BigDecimal(formatAmt(percentOfTotal(listLD008r.get(5).get("F2")), 2));
+		
+		BigDecimal f1B=  new BigDecimal(formatAmt(percentOfFunds(listLD008r.get(4).get("F2")), 2));
+		BigDecimal f2B=  new BigDecimal(formatAmt(percentOfFunds(listLD008r.get(5).get("F2")), 2));
+		
+		String totalB= t1B.add(t2B).toString();
+		String fundsB= f1B.add(f2B).toString();
 		print(0, 147, totalB, "R"); // 各項比率
 		print(0, 163, fundsB, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
@@ -425,10 +448,14 @@ public class LD008Report extends MakeReport {
 		print(1, 1, "│　　　　　　　　　　　　　　　　　｜　　　小　　　計　（Ｃ）│　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　│　　　　　　│　　　　　　　│");
 		print(0, 86, formatAmt(subTotalCountC, 0), "R"); // 戶數
 		print(0, 130, formatAmt(subTotalC, 0), "R"); // 金額
-		String totalC= String.valueOf(Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(7).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfTotal(listLD008r.get(8).get("F2")), 2)));
-		String fundsC= String.valueOf(Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(7).get("F2")), 2))
-				+Integer.valueOf(formatAmt(percentOfFunds(listLD008r.get(8).get("F2")), 2)));
+		BigDecimal t1C=  new BigDecimal(formatAmt(percentOfTotal(listLD008r.get(7).get("F2")), 2));
+		BigDecimal t2C=  new BigDecimal(formatAmt(percentOfTotal(listLD008r.get(8).get("F2")), 2));
+		
+		BigDecimal f1C=  new BigDecimal(formatAmt(percentOfFunds(listLD008r.get(7).get("F2")), 2));
+		BigDecimal f2C=  new BigDecimal(formatAmt(percentOfFunds(listLD008r.get(8).get("F2")), 2));
+		
+		String totalC= t1B.add(t2B).toString();
+		String fundsC= f1B.add(f2B).toString();
 		print(0, 147, totalC, "R"); // 各項比率
 		print(0, 163, fundsC, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
