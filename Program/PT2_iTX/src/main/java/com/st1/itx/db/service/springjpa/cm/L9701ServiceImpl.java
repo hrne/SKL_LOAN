@@ -306,7 +306,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "SELECT T.\"CustNo\"";
 		sql += "            ,T.\"FacmNo\"";
-		sql += "            ,T.\"BormNo\"";
+		sql += "            ,LPAD(T.\"BormNo\",3,0) AS \"BormNo\"";
 		sql += "            ,T.\"EntryDate\"";
 		sql += "            ,T.\"Principal\"";
 		sql += "            ,T.\"Interest\"";
@@ -346,7 +346,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				  ,\"Displayflag\" AS \"Displayflag\"";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
-//		sql += "             AND  NVL(\"BormNo\", 0) > 0 ";
+		sql += "             AND  NVL(\"BormNo\", 0) > 0 ";
 		if (iTYPE.equals("1")) {
 			sql += "          AND DECODE(\"EntryDate\", 0, \"AcDate\", \"EntryDate\") >= :isday";
 			sql += "          AND DECODE(\"EntryDate\", 0, \"AcDate\", \"EntryDate\") <= :ieday";

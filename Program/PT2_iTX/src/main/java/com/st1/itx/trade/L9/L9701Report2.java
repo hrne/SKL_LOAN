@@ -35,9 +35,8 @@ public class L9701Report2 extends MakeReport {
 	// 額度號碼
 	private String facmNo;
 
-	// 額度號碼
-	private String bormNo;
-	
+//	private String bormNo;
+
 	// 客戶主要擔保品地址
 	private String clAddr;
 
@@ -57,18 +56,16 @@ public class L9701Report2 extends MakeReport {
 	BigDecimal shortFall = BigDecimal.ZERO; // 累短收
 	BigDecimal excessive = BigDecimal.ZERO; // 累溢收
 
-//	public String divider = "－－－－－　－－－－－－　－－－－－－－－　－－－－　  －－－－－－　   －－－－－－        －－－－－－－　 －－－－－－－　 －－－－－－　 －－－－－－";
-	
 	@Override
 	public void printHeader() {
-		
+
 		this.setFontSize(9);
-		
+
 		this.print(-2, this.getMidXAxis(), "客 戶 往 來 本 息 明 細 表", "C");
 
 		this.print(-3, this.getMidXAxis(), showRocDate(this.titaVo.get("ENTDY"), 0), "C");
 
-		this.print(-4, 138, "印表日期：" + showRocDate(this.NowDate, 1) + " " + showTime(this.NowTime),"L");
+		this.print(-4, 138, "印表日期：" + showRocDate(this.NowDate, 1) + " " + showTime(this.NowTime), "L");
 
 		String iTYPE = titaVo.get("DateType");
 		String iSDAY = showRocDate(titaVo.get("BeginDate"), 1);
@@ -80,7 +77,7 @@ public class L9701Report2 extends MakeReport {
 			this.print(-5, 1, "會計日期 : " + iSDAY + " - " + iEDAY);
 		}
 
-		this.print(-5, 138, "頁　　次：" + Integer.toString(this.getNowPage()),"L");
+		this.print(-5, 138, "頁　　次：" + Integer.toString(this.getNowPage()), "L");
 
 		String iCUSTNO = titaVo.get("CustNo");
 
@@ -96,7 +93,6 @@ public class L9701Report2 extends MakeReport {
 		this.setMaxRows(40);
 
 	}
-	
 
 	private void printFacHead() {
 		if (this.NowRow >= 35) {
@@ -111,41 +107,41 @@ public class L9701Report2 extends MakeReport {
 			this.print(0, 22, "押品地址 : " + clAddr);
 //			this.print(1, 7, divider);
 			divider();
-			this.print(1,2,"撥款");
-			this.print(0,9,"入帳日");
-			this.print(0,20,"交易內容");
-			this.print(0,35,"計息本金");
-			this.print(0,52,"計息期間");
-			this.print(0,69,"利率");
-			this.print(0,79,"交易金額");
-			this.print(0,96,"本金");
-			this.print(0,111,"利息");
-			this.print(0,125,"違約金");
-			this.print(0,141,"費用");
-			this.print(0,155,"溢短繳");
+			this.print(1, 2, "撥款");
+			this.print(0, 8, "入帳日期");
+			this.print(0, 20, "交易內容");
+			this.print(0, 35, "計息本金");
+			this.print(0, 52, "計息期間");
+			this.print(0, 69, "利率");
+			this.print(0, 79, "交易金額");
+			this.print(0, 96, "本金");
+			this.print(0, 111, "利息");
+			this.print(0, 125, "違約金");
+			this.print(0, 141, "費用");
+			this.print(0, 155, "溢短繳");
 			divider();
 
 		}
 
 	}
-	
+
 	/**
 	 * 分割線
 	 * 
-	 * */
+	 */
 	public void divider() {
-		this.print(1,2,"－－");
-		this.print(0,7,"－－－－－");
-		this.print(0,18,"－－－－－－");
-		this.print(0,33,"－－－－－－");
-		this.print(0,48,"－－－－－－－－");
-		this.print(0,67,"－－－－");
-		this.print(0,77,"－－－－－－");
-		this.print(0,92,"－－－－－－");
-		this.print(0,107,"－－－－－－");
-		this.print(0,122,"－－－－－－");
-		this.print(0,137,"－－－－－－");
-		this.print(0,152,"－－－－－－");
+		this.print(1, 2, "－－");
+		this.print(0, 7, "－－－－－");
+		this.print(0, 18, "－－－－－－");
+		this.print(0, 33, "－－－－－－");
+		this.print(0, 48, "－－－－－－－－");
+		this.print(0, 67, "－－－－");
+		this.print(0, 77, "－－－－－－");
+		this.print(0, 92, "－－－－－－");
+		this.print(0, 107, "－－－－－－");
+		this.print(0, 122, "－－－－－－");
+		this.print(0, 137, "－－－－－－");
+		this.print(0, 152, "－－－－－－");
 	}
 
 	public void exec(TitaVo titaVo, List<BaTxVo> listBaTxVo) throws LogicException {
@@ -165,91 +161,92 @@ public class L9701Report2 extends MakeReport {
 			this.error("L9701ServiceImpl.LoanBorTx error = " + errors.toString());
 		}
 
-		String tradeReportName="客戶往來本息明細表（撥款）";
-		
-		this.info("tradeReportName="+titaVo.getParam("ReportType"));
-				
+		String tradeReportName = "客戶往來本息明細表（撥款）";
+
+		this.info("tradeReportName=" + titaVo.getParam("ReportType"));
+
 		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", tradeReportName, "", "A4", "L");
 
 		this.custName = "";
 		this.facmNo = "";
-		this.bormNo = "";
+//		this.bormNo = "";
 		this.clAddr = "";
 
 		boolean isFirst = true;
 
 		int detailCounts = 0;
-
-		for (Map<String, String> tL9701Vo : listL9701) {
-			if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
-				// 無交易明細且無餘額
-				if (detailCounts == 0) {
-					if (tL9701Vo.get("DB").equals("2")) {
-						BigDecimal unpaidLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
-						if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
-							continue;
+		if (listL9701 != null && listL9701.size() > 0) {
+			for (Map<String, String> tL9701Vo : listL9701) {
+				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
+					// 無交易明細且無餘額
+					if (detailCounts == 0) {
+						if (tL9701Vo.get("DB").equals("2")) {
+							BigDecimal unpaidLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
+							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
+								continue;
+							}
 						}
 					}
+					this.custName = tL9701Vo.get("CustName");
+					this.facmNo = tL9701Vo.get("FacmNo");
+//				this.bormNo = tL9701Vo.get("BormNo");
+					this.clAddr = tL9701Vo.get("Location");
+					if (isFirst) {
+						printFacHead();
+						isFirst = false;
+					}
+					if (tL9701Vo.get("DB").equals("2")) {
+						printFacEnd(tL9701Vo, listBaTxVo);
+						detailCounts = 0;
+						isFirst = true;
+					}
 				}
-				this.custName = tL9701Vo.get("CustName");
-				this.facmNo = tL9701Vo.get("FacmNo");
-				this.bormNo = tL9701Vo.get("BormNo");
-				this.clAddr = tL9701Vo.get("Location");
-				if (isFirst) {
-					printFacHead();
-					isFirst = false;
-				}
-				if (tL9701Vo.get("DB").equals("2")) {
-					printFacEnd(tL9701Vo, listBaTxVo);
-					detailCounts = 0;
-					isFirst = true;
-				}
-			}
 
-			if (tL9701Vo.get("DB").equals("1")) {
-				printDetail1(tL9701Vo);
-				detailCounts++;
+				if (tL9701Vo.get("DB").equals("1")) {
+					printDetail(tL9701Vo);
+					detailCounts++;
+				}
 			}
+		} else {
+			this.print(1, 20, "*******    查無資料   ******");
 		}
 
 		this.close();
 
-		// 測試用
-		// this.toPdf(sno);
 	}
 
-	private void printDetail1(Map<String, String> tL9701Vo) {
-			
-		//撥款
+	private void printDetail(Map<String, String> tL9701Vo) {
+
+		// 撥款
 		this.print(1, 2, tL9701Vo.get("BormNo"));
-		//入帳日
+		// 入帳日
 		this.print(0, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
-		//交易內容
+		// 交易內容
 		this.print(0, 20, tL9701Vo.get("Desc"));
 		// 計息本金
 		if (!"0".equals(tL9701Vo.get("Amount"))) {
-			this.print(0, 45, formatAmt(tL9701Vo.get("Amount"), 0), "R"); 
+			this.print(0, 45, formatAmt(tL9701Vo.get("Amount"), 0), "R");
 		}
-		//計息期間
+		// 計息期間
 		this.print(0, 48,
 				showRocDate(tL9701Vo.get("IntStartDate"), 3) + "-" + showRocDate(tL9701Vo.get("IntEndDate"), 3)); // 計息期間
 		// 利率
 		if (!"0".equals(tL9701Vo.get("Rate"))) {
-			this.print(0, 74, formatAmt(tL9701Vo.get("Rate"), 4), "R"); 
+			this.print(0, 74, formatAmt(tL9701Vo.get("Rate"), 4), "R");
 		}
-		//交易金額
-		this.print(0, 89, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); 
-		//本金
+		// 交易金額
+		this.print(0, 89, formatAmt(tL9701Vo.get("TxAmt"), 0), "R");
+		// 本金
 		this.print(0, 104, formatAmt(tL9701Vo.get("Principal"), 0), "R");
-		//利息
+		// 利息
 		this.print(0, 119, formatAmt(tL9701Vo.get("Interest"), 0), "R");
-		//違約金
+		// 違約金
 		this.print(0, 134, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
-		//費用
+		// 費用
 		this.print(0, 149, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
-		//溢短繳
+		// 溢短繳
 		this.print(0, 164, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
-		
+
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
 		breachAmt = new BigDecimal(tL9701Vo.get("BreachAmt"));

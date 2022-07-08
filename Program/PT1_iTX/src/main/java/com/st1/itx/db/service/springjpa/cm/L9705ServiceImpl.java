@@ -117,7 +117,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case "2": // 應繳日變更
 		case "3": // 利率變動
 		case "4": // 部份還款
-			sql += "    AND LBT.\"CustNo\" > 0 ";
+			sql += "    AND M.\"CustNo\" > 0 ";
 			dayFg = "1";
 			break;
 		case "5": // 償還方式變更
@@ -206,10 +206,41 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
+		if ("2".equals(condition1)) {
+			query.setParameter("sday", acctDateStart);
+			query.setParameter("eday", acctDateEnd);
+		}
+
+		if ("3".equals(condition1)) {
+			query.setParameter("sday", acctDateStart);
+			query.setParameter("eday", acctDateEnd);
+		}
+		if ("4".equals(condition1)) {
+			query.setParameter("sday", acctDateStart);
+			query.setParameter("eday", acctDateEnd);
+		}
 		if (Integer.valueOf(custNoStart) > 0) {
 			query.setParameter("custno1", custNoStart);
 			query.setParameter("custno2", custNoEnd);
 		}
+		
+
+		switch (condition1) {
+		case "1": // 新貸戶
+			query.setParameter("sday", acctDateStart);
+			query.setParameter("eday", acctDateEnd);
+			break;
+		case "2": // 應繳日變更
+		case "3": // 利率變動
+		case "4": // 部份還款
+			break;
+		case "5": // 償還方式變更
+			break;
+		default:
+			break;
+		}
+		
+		
 
 		query.setParameter("corpInd", corpInd);
 

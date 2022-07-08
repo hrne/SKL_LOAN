@@ -142,11 +142,14 @@ public class L8303 extends TradeBuffer {
 		iJcicZ045Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ045Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ045Id.setRcDate(iRcDate);
-
 		// Date計算
 		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
-		int iDays25 = Dealdate(txDate, -25);// 報送日前25天
-
+		int tDate = Integer.valueOf(titaVo.getCalDy()) + 19110000;// 日曆日
+		this.info("tDate  " + tDate); //20220707
+		this.info("iRcDate  " + iRcDate); //1110201
+		this.info("txDate  " + txDate); //20220105
+		//int iDays25 = Dealdate(txDate, -25);// 報送日前25天
+		int iDays25 = Dealdate(tDate, -25);// 報送日前25天
 		// 檢核項目(D-7)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退

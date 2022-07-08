@@ -526,7 +526,9 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setIntCalcCode(titaVo.getParam("IntCalcCode"));
 		String custTypeCode = titaVo.getParam("CustTypeCode");
 		if (isEloan) {
-			custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
+			if (!custTypeCode.isEmpty()) {
+				custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
+			}
 		}
 		tFacMain.setCustTypeCode(custTypeCode);
 		tFacMain.setRuleCode(titaVo.getParam("RuleCode"));

@@ -115,7 +115,7 @@ public class LM013Report extends MakeReport {
 				"          放款對象                                                核貸總值                                                                                  帳面總值");
 		print(-10, 0, "");
 		print(-11, 0,
-				"戶號 額度/名稱 統編　　     不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計      不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計");
+				"戶號 額度/名稱 統編　　       不動產抵押     動產抵押       有價證券       銀行保證       專案放款           合計      不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計");
 		print(-12, 0, newBorder);
 
 		// 明細起始列(自訂亦必須)
@@ -376,7 +376,7 @@ public class LM013Report extends MakeReport {
 							break;
 						case "2":
 							// 不動產抵押
-							this.print(0, 38, formatAmt(tLDVo.get("F7"), 0), "R");
+							this.print(0, 40, formatAmt(tLDVo.get("F7"), 0), "R");
 							this.print(0, 129, formatAmt(tLDVo.get("F8"), 0), "R");
 							break;
 						case "4":

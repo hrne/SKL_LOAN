@@ -60,7 +60,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WITH TotalData AS (  ";
 		sql += "      		SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\"  ";
 		sql += "                   ,R.\"IsRels\" AS \"IsRels\"  ";
-		sql += "                   ,TO_CHAR(D.\"CustNo\") AS \"CustNo\"  ";
+		sql += "                   ,LPAD(TO_CHAR(D.\"CustNo\"),7,'0') AS \"CustNo\"  ";
 		sql += "                   ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\"  ";
 		sql += "                   ,C.\"CustId\" AS \"CustId\"  ";
 		sql += "                   ,\"Fn_ParseEOL\"(C.\"CustName\", 0) AS \"CustName\"  ";
