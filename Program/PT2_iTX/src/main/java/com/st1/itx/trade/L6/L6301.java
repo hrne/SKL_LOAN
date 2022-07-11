@@ -83,7 +83,8 @@ public class L6301 extends TradeBuffer {
 		}
 		else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4 && !iItem.equals("")) {
 			this.info("放行後"+!(titaVo.isActfgSuprele()));
-			iFuncCode = 2;
+		//	iFuncCode = 2;
+			iFuncCode = 4;
 		}
 		this.info("產出FuncCode"+ iFuncCode);
 		this.info("產出code " + iCode );
@@ -161,7 +162,9 @@ public class L6301 extends TradeBuffer {
 
 		case 4: // 刪除
 			tCdCode = sCdCodeService.holdById(new CdCodeId(mDefCode, mCode));
-			
+			if (tCdCode == null) {
+				throw new LogicException(titaVo, "E0004", "刪除資料不存在"); //資料不存在
+			}
 			// 檢查CdBAseRate是否已建立指標利率，如已有請先刪除再刪除指標利率種類
 			tCdBaseRate = sCdBaseRateService.baseRateCodeEq("TWD", mCode, 00000000, 99999999, 0, 1, titaVo);
 			lCdBaseRate = tCdBaseRate == null ? null : tCdBaseRate.getContent();
