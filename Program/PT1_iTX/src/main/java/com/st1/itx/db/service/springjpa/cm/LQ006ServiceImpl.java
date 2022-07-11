@@ -90,7 +90,7 @@ public class LQ006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHERE \"YearMonth\" = TRUNC( :entdy / 100 ) ";
 		sql += "             GROUP BY \"CustNo\" ) M2 ON M2.\"CustNo\" = A.\"CustNo\" ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
-		sql += "                   ,SUM(\"Fee\") AS \"Fee\" ";
+		sql += "                   ,ABS(SUM(\"Fee\")) AS \"Fee\" ";
 		sql += "             FROM \"ForeclosureFee\" ";
 		sql += "             WHERE \"CloseDate\" = 0 ";
 		sql += "             GROUP BY \"CustNo\" ) FE ON FE.\"CustNo\" = A.\"CustNo\" ";

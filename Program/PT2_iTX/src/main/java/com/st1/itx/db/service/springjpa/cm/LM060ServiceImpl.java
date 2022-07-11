@@ -119,7 +119,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		     AND A.\"AcctCode\" IN('F07','F24')";
 		sql += "		   UNION ALL";
 		sql += "		   SELECT 0 F0";
-		sql += "				 ,FO.\"Fee\" F1";
+		sql += "				 ,ABS(FO.\"Fee\") F1";
 		sql += "				 ,0 F2";
 		sql += "				 ,0 F3";
 		sql += "				 ,0 F4";

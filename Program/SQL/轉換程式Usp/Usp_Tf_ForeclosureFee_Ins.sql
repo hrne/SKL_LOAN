@@ -83,7 +83,13 @@ BEGIN
              THEN 20061231
            ELSE NVL(S2."LastRCVDAT",0) END -- 其他 : 依 收件日期 排序,若後面筆數已有全額沖銷則本筆為已沖銷 (2021-03-05 舜雯提供)
                                           AS "CloseDate"           -- 銷號日期 DecimalD 8 
-          ,S1."LGFAMT"                    AS "Fee"                 -- 法拍費用 DECIMAL 16 2
+          -- 2022-07-11 Wei from Lai 口頭說明
+          -- 貸方轉負數
+          -- 借方轉正數
+          ,CASE
+             WHEN S1."TRXATP" = 1
+             THEN S1."LGFAMT"
+           ELSE 0 - S1."LGFAMT" END       AS "Fee"                 -- 法拍費用 DECIMAL 16 2
           ,CASE
              WHEN S1."ACTCOD" = '1' THEN '01' -- 郵費
              WHEN S1."ACTCOD" = '2' THEN '02' -- 支付命令
