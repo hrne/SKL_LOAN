@@ -84,13 +84,13 @@ E(0,1)ASGN(LOOP$)
 #OEmpName=x,20,S
 
 !戶號
-#OCustNo=A,7,S
+#OCustNo=X,7,S
 
 !額度
-#OFacmNo=A,3,S
+#OFacmNo=X,3,S
 
 !撥款序號
-#OBormNo=A,3,S
+#OBormNo=X,3,S
 
 !件數
 #OCnt=n,4,S

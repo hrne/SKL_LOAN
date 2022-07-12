@@ -858,7 +858,14 @@ BEGIN
          , NVL(M1."TotalLoanBal", 0)       AS  "TotalLoanBal"    -- 同額度本金餘額合計
          , NVL(LR."FitRate",0)             AS  "StoreRate"       -- 減損發生日月底 計息利率
          , NVL(ML."LoanBalance",0)         AS  "LoanBalance"     -- 減損發生日月底 放款餘額
-         , NVL(ML."IntAmt",0)              AS  "IntAmt"          -- 減損發生日月底 應收利息
+         -- 2022-7-12 Wei from Linda
+         -- 上述發生日期時之應收利息(台幣)=繳息迄日~發生日期間的利息
+         -- 若此區間無新利率則利息=發生日時餘額*發生日時利率*120/360/100
+         -- 若此區間有不同利率則以分段計算
+         , CASE
+             WHEN M."DerDate" != 0 -- 減損發生日
+             THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),JML."PrevPayIntDate",M."DerDate")
+           ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
          , CASE WHEN NVL(M1."TotalLoanBal", 0) = 0 THEN 0
                 ELSE ROUND((NVL(MF."FireFee",0) + NVL(MF."LawFee",0)) *
                             NVL(ML."LoanBalance",0) / M1."TotalLoanBal", 0)
@@ -905,6 +912,10 @@ BEGIN
 --         , NVL(AF."AvgLawFee5",0)
 --           + NVL(AF."AvgInsuFee5",0)       AS  "DerY5Fee"        -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
     FROM   "Ias34Dp" M
+      LEFT JOIN "JcicMonthlyLoanData" JML ON JML."DataYM" = YYYYMM
+                                         AND JML."CustNo" = M."CustNo"
+                                         AND JML."FacmNo" = M."FacmNo"
+                                         AND JML."BormNo" = M."BormNo"
       -- 同額度本金餘額合計
       LEFT JOIN ( SELECT M."DataYM"                 AS "DataYM"
                        , M."CustNo"                 AS "CustNo"
