@@ -70,18 +70,12 @@ BEGIN
            END                                   AS "EvaDate"           -- 鑑估日期
          , ROUND( NVL("ClMain"."EvaAmt",0) * NVL(C."LoanToValue",0) / 100 / 1000, 0)
                                                  AS "LoanLimitAmt"      -- 可放款值
+         , FLOOR(NVL("FacMain"."SettingDate",0) / 100) - 191100  
+                                                 AS "SettingDate"       -- 設定日期
          , CASE
-             WHEN FLOOR(NVL(C."SettingDate",0) / 100) < 191100 THEN FLOOR(NVL(C."SettingDate",0) / 100)
-             ELSE FLOOR(NVL(C."SettingDate",0) / 100) - 191100
-           END                                   AS "SettingDate"       -- 設定日期
-         , CASE
-             WHEN FLOOR(NVL(C."SettingDate",0) / 100) = YYYYMM THEN ROUND(NVL(C."SettingAmt",0) / 1000, 0)
+             WHEN FLOOR(NVL("FacMain"."SettingDate",0) / 100) = YYYYMM THEN ROUND(NVL(C."SettingAmt",0) / 1000, 0)
              ELSE 0
            END                                   AS "MonthSettingAmt"   -- 本行本月設定金額
---         , CASE
---             WHEN FLOOR(NVL(C."SettingDate",0) / 100) = YYYYMM THEN 1
---             ELSE 0
---           END                                   AS "SettingSeq"        -- 本月設定抵押順位
          , 1                                     AS "SettingSeq"        -- 本月設定抵押順位
          , ROUND(NVL(C."SettingAmt",0) / 1000,0) AS "SettingAmt"        -- 本行累計已設定總金額
          , ROUND(NVL(C."SettingAmt",0) / 1000,0) AS "PreSettingAmt"     -- 其他債權人前已設定金額
@@ -134,6 +128,9 @@ BEGIN
                                     AND InsuRenew."ClCode2"  = to_number(SUBSTR(M."ClActNo",2,2))
                                     AND InsuRenew."ClNo"     = to_number(SUBSTR(M."ClActNo",4,7))
                                     AND InsuRenew."RowNum"   = 1          -- 取第一筆
+        LEFT JOIN "FacMain"  ON "FacMain"."CustNo" = to_number(SUBSTR(M."FacmNo",1,7))  
+                            AND "FacMain"."FacmNo" = to_number(SUBSTR(M."FacmNo",8,3))
+
     WHERE  M."DataYM"   =   YYYYMM
       AND  SUBSTR(NVL("CdCl"."ClTypeJCIC",' '),1,1) IN ('3')     -- 動產 3x
 --    AND  to_number(SUBSTR(M."ClActNo",1,1)) IN (9)

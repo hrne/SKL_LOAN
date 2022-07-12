@@ -62,20 +62,32 @@ public class L6023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT";
 		sql += "  MIN(co.\"LandOfficeCode\") AS \"LandOfficeCode\", ";
 		sql += " 	    MIN(co.\"RecWord\") AS \"RecWord\", ";
-		sql += " 	    MIN(co.\"RecWordItem\") AS \"RecWordItem\" ";
+		sql += " 	    MIN(co.\"RecWordItem\") AS \"RecWordItem\", ";
+		sql += " 	    MIN(co.\"LastUpdate\") AS \"LastUpdate\", ";
+		sql += " 	    MIN(co.\"LastUpdateEmpNo\") AS \"LastUpdateEmpNo\" ";
 		sql += " 	FROM ";
 		sql += " 	    \"CdLandOffice\"    co ";
 		sql += " 	    LEFT JOIN \"CdLandSection\"   cs ON co.\"LandOfficeCode\" = cs.\"LandOfficeCode\" ";
 
-		if (!iCityCode.isEmpty()) {
+		if (!iCityCode.isEmpty() || !iLandOfficeCode.isEmpty() || !iRecWord.isEmpty()) {
 			sql += " 	WHERE ";
+		}
+		if (!iCityCode.isEmpty()) {
 			sql += " 	    cs.\"CityCode\" = :cityCode ";
+
+			if (!iLandOfficeCode.isEmpty()) {
+				sql += " 	AND ";
+			}
 		}
 		if (!iLandOfficeCode.isEmpty()) {
-			sql += " AND co.\"LandOfficeCode\" = :landOfficeCode ";
+			sql += "  co.\"LandOfficeCode\" = :landOfficeCode ";
 		}
 		if (!iRecWord.isEmpty()) {
-			sql += " AND co.\"RecWord\" = :recWord ";
+
+			if (!iCityCode.isEmpty() || !iLandOfficeCode.isEmpty()) {
+				sql += " 	AND ";
+			}
+			sql += "  co.\"RecWord\" = :recWord ";
 		}
 		sql += " 	GROUP BY co.\"LandOfficeCode\", ";
 		sql += " 	    co.\"RecWord\" ";
@@ -86,16 +98,15 @@ public class L6023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		
+
 		this.info("sql=" + sql);
 		Query query;
-		
-		
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		if (!iCityCode.isEmpty()) {
 			query.setParameter("cityCode", iCityCode);
 		}
@@ -105,7 +116,6 @@ public class L6023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iRecWord.isEmpty()) {
 			query.setParameter("recWord", iRecWord);
 		}
-
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);

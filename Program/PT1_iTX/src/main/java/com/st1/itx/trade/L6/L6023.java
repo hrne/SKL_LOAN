@@ -12,6 +12,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.springjpa.cm.L6023ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -29,6 +31,8 @@ public class L6023 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public L6023ServiceImpl l6023ServiceImpl;
+	@Autowired
+	public CdEmpService sCdEmpService;
 
 	@Autowired
 	Parse parse;
@@ -65,10 +69,17 @@ public class L6023 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 
 				OccursList occurslist = new OccursList();
+				int lastUpdate = parse.stringToInteger(result.get("LastUpdate"));
+				if (lastUpdate > 0) {
+					lastUpdate = lastUpdate - 19110000;
+				}
 
 				occurslist.putParam("OOLandOfficeCode", result.get("LandOfficeCode"));
 				occurslist.putParam("OORecWord", result.get("RecWord"));
 				occurslist.putParam("OORecWordItem", result.get("RecWordItem"));
+				occurslist.putParam("OOLastUpdate", lastUpdate);
+				occurslist.putParam("OOLastEmp",
+						result.get("LastUpdateEmpNo") + " " + empName(titaVo, result.get("LastUpdateEmpNo")));
 				/* 將每筆資料放入Tota的OcList */
 				wkCnt++;
 				this.totaVo.addOccursList(occurslist);
@@ -90,4 +101,13 @@ public class L6023 extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private String empName(TitaVo titaVo, String empNo) throws LogicException {
+		String rs = empNo;
+
+		CdEmp cdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (cdEmp != null) {
+			rs = cdEmp.getFullname();
+		}
+		return rs;
+	}
 }

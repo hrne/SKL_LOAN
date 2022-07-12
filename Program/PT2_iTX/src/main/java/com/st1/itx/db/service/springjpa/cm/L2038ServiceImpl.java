@@ -93,6 +93,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN MIN(cmv.\"ClStat\")";
 		sql += "            ELSE NULL END                       AS \"ClStat\"";
 		sql += "           ,MIN(cm.\"ShareTotal\")                   AS \"ShareTotal\"";
+		sql += "           ,COUNT(cor.\"ClCode1\")              AS \"OtherRightsCount\" ";
 		sql += "     FROM \"ClMain\" cm";
 
 		sql += "    LEFT JOIN (SELECT \"ClCode1\"";
@@ -191,6 +192,12 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ) cbl ON cbl.\"ClCode1\" = cm.\"ClCode1\"";
 		sql += "          AND cbl.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "          AND cbl.\"ClNo\"    = cm.\"ClNo\"";
+		
+		// 他項權利
+		
+		sql += "     LEFT JOIN \"ClOtherRights\" cor ON cor.\"ClCode1\" = cm.\"ClCode1\" ";
+		sql += "                                    AND cor.\"ClCode2\" = cm.\"ClCode2\" ";
+		sql += "                                    AND cor.\"ClNo\"    = cm.\"ClNo\"    ";
 
 		sql += conditionSql;
 		sql += "     GROUP BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
@@ -220,7 +227,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		size = result.size();
 		this.info("Total size ..." + size);
 
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
 	/**
