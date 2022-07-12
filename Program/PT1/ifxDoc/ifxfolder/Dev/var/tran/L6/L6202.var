@@ -1,0 +1,228 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L6202)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+[
+["[L6202]                                 企金費用代碼維護"],
+["#FdFunCd+功能",#FunCdX],
+["#FdSyndFeeCode+企金費用代碼",#SyndFeeCode],
+["#FdSyndFeeItem+企金費用說明",#SyndFeeItem],
+["#FdAcctCode+業務科目代號",#AcctCode,#AcctCodeX],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+! 必輸欄位
+
+! 永遠為必輸欄位
+#FdFunCd=X,2,L
+#FdSyndFeeCode=X,2,L
+#FdSyndFeeItem=X,2,L
+#FdAcctCode=X,2,L
+
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FunCd2(1:新增;2:修改;4:刪除)
+#CODE0001=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FunCd2Help=x,50,S     
+
+#CODE0002=x,1024,S
+T(3,CdCode.AcctCode)
+#AcctCodeHelp=x,1024,S
+
+#AcctCodeHelp2=x,1024,S
+T(3,F12:企金件;F27:聯貸管理費)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODE0001,#CODE0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FunCd2Help,#HelpDesc1)
+T(2,@AcctCodeHelp,#HelpDesc2)
+
+
+!YN
+#YNHelp=X,30,S
+T(3,Y:是;N:否)
+
+!RIM參數
+#RimTxCode=X,5,S
+#RimFunCd=A,1,S
+#RimSyndFeeCode=X,2,S
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6022企金費用代碼查詢]進入),$)
+
+#NTXBUF=X,66,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FunCd=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_SyndFeeCode=X,2,S
+T(1,#NTXBUF,2,2)
+
+#CHAIN_SyndFeeItem=x,60,S
+T(1,#NTXBUF,4,60)
+
+#CHAIN_AcctCode=X,3,S
+T(1,#NTXBUF,64,3)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FunCd,#CHAIN_FunCd)
+C(3,#FunCd,1,S,$)
+T(2,@SyndFeeCode,#CHAIN_SyndFeeCode)
+T(2,@SyndFeeItem,#CHAIN_SyndFeeItem)
+T(2,@AcctCode,#CHAIN_AcctCode)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FunCd=A,1,S
+C(3,#CHAIN,1,s,$)
+HELP(#FunCd2Help)
+@T(3,@FunCdX,)
+V(H,#FunCd2Help)
+
+#FunCdX=X,12,L
+T(H,#FunCd,#FunCd2Help)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+
+#FUNCIND=_,_,S
+E(0,#FunCd)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!FunCd=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FunCd==1 || #FunCd==2 ,T(F,@SyndFeeItem,1)T(F,@AcctCode,1),
+                                  T(F,@SyndFeeItem,0)T(F,@AcctCode,0))
+
+IF (#FunCd==1 ,T(F,@SyndFeeCode,1),T(F,@SyndFeeCode,0))
+
+#WKPSC=X,2,S
+
+#WKSTAR1=X,2,S
+C(2,#FunCd,S,T(3,*),S,S,S,S)
+
+#WKSTAR2=X,2,S
+C(2,#FunCd,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdSyndFeeCode,#WKSTAR1)
+T(2,@FdSyndFeeItem,#WKSTAR2)
+T(2,@FdAcctCode,#WKSTAR2)
+
+
+
+!企金費用代碼
+#SyndFeeCode=X,2,I
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+@V(7)V(NL)
+
+
+#SendL6R45=X,1,S
+E(0,@RimFunCd,#FunCd)
+T(2,@RimSyndFeeCode,#SyndFeeCode)
+RESET_RIM(#SendL6R45,L6R45)
+S(L6R45,1,#RimFunCd,#RimTxCode,#RimSyndFeeCode)
+R(1,L6R45)
+T(2,@SyndFeeItem,#L6R45SyndFeeItem)
+T(2,@AcctCode,#L6R45AcctCode)
+T(H,@AcctCodeX,#AcctCode,#AcctCodeHelp2)
+
+!企金費用說明
+#SyndFeeItem=x,60,I
+C(3,#FunCd,4,s,$)
+@V(7)
+
+!業務科目代號
+! T(HELP,@AcctCodeHelp,#AcctCodeHelp,-,310;320;330;340;990;IC1;IC2;IC3;IC4;T10;TAV;TCK;TLD;TMI;YOP;Z10;Z20;Z30;Z40)
+#AcctCode=X,3,I
+C(3,#FunCd,4,s,$)
+HELP(#AcctCodeHelp2)
+@T(3,@AcctCodeX,)
+V(H,#AcctCodeHelp2)
+
+#AcctCodeX=X,20,L
+T(3,)T(H,#AcctCode,#AcctCodeHelp2)
+
+
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+#AGAIN=X,1,S
+IF(#FunCd==4 || #FunCd==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+!<include src="ROM.icf::L0Rim.dec"/>
+!<include src="ROM.icf::L6R45Rim.dec"/>
+<include src="ROM.icf::L6R45.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6202 ----------
+<sub type="FORM" name="L6202">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6202,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6202] 企金費用代碼維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd#SyndFeeCode#SyndFeeItem#AcctCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6202
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L6R45.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

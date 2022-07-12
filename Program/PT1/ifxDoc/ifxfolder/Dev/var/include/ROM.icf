@@ -83,6 +83,7 @@
 !    L1R20 : 顯示顧客申請不通知警訊
 !    L5R38 : 依工作年月找起訖日
 !    L5R48 : 找檔案借閱檔
+!    L5R50 : 查詢建商名單檔
 !    L6R01 : 尋找行庫資料檔資料
 !    L6R02 : 尋找營業單位對照檔資料
 !    L6R03 : 取得縣市別/行政區/地段/路名的下拉選單資料
@@ -9687,6 +9688,33 @@ TXFORM=L5R49
 #L5R49FileNo
 ^
 </L5R49.tom>
+
+
+<L5R50.dec>
+#L5r50CustNo=A,7,S
+#L5r50CustName=X,100,S
+#L5r50DeleteFlag=X,1,S
+#L5r50CreateDate=X,9,S
+#L5r50CreateEmpNo=X,7,S
+#L5r50CreateEmpName=X,100,S
+#L5r50LastUpdate=X,9,S
+#L5r50LastUpdateEmpNo=X,7,S
+#L5r50LastUpdateEmpName=X,100,S
+</L5R50.dec>
+
+<L5R50.tom>
+TXFORM=L5R50
+#L5r50CustNo
+#L5r50CustName
+#L5r50DeleteFlag
+#L5r50CreateDate
+#L5r50CreateEmpNo
+#L5r50CreateEmpName
+#L5r50LastUpdate
+#L5r50LastUpdateEmpNo
+#L5r50LastUpdateEmpName
+^
+</L5R50.tom>
 
 <L9R01.dec>
 #L9R01WorkMonth=9,6,S

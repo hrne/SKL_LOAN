@@ -43,7 +43,7 @@ E(0,1)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L6989]                                 聯貸費用攤提入帳作業                                                            "],
+["[L6989]                                 企金費用攤提入帳                                                            "],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -129,7 +129,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 !C(5,#TXFORM,L6989,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L6989] 聯貸費用攤提入帳作業)
+T(3,[L6989] 企金費用攤提入帳)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 #O_FUNCD=X,1,L
@@ -324,13 +324,13 @@ TXFORM=L6989
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="O1" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];order=1">
 [
-["[L6989]                                 聯貸費用攤提入帳作業                                                                            "],
+["[L6989]                                 企金費用攤提入帳                                                                            "],
 [""],
 ]
 </sub>
 <sub type="PART" name="O2" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];order=1">
 [
-["[L6989]                                 聯貸費用攤提入帳作業                                                                            "],
+["[L6989]                                 企金費用攤提入帳                                                                            "],
 [""],
 ]
 </sub>

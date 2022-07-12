@@ -64,7 +64,7 @@ K(MODIFYBUTTON,查詢)
 #FdSyndFeeCode=X,2,L
 
 #AcctCodeHelp2=x,1024,S
-T(3,F12:企金件;F27:企金管理費)
+T(3,F12:企金件;F27:聯貸管理費)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
