@@ -84,7 +84,7 @@ public class L8336 extends TradeBuffer {
 			// 檢核是否重複，並寫入JcicZ574
 			chJcicZ574 = sJcicZ574Service.findById(iJcicZ574Id, titaVo);
 			if (chJcicZ574 != null) {
-				throw new LogicException("E0005", "已有相同資料存在");
+				throw new LogicException("E0002", "已有相同資料存在");
 			}
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			iJcicZ574.setJcicZ574Id(iJcicZ574Id);
@@ -108,12 +108,12 @@ public class L8336 extends TradeBuffer {
 			if (uJcicZ574 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ574 oldJcicZ574 = (JcicZ574) iDataLog.clone(uJcicZ574);
 			uJcicZ574.setCloseDate(iCloseDate);
 			uJcicZ574.setCloseMark(iCloseMark);
 			uJcicZ574.setPhoneNo(iPhoneNo);
 			uJcicZ574.setTranKey(iTranKey);
 			uJcicZ574.setOutJcicTxtDate(0);
-			JcicZ574 oldJcicZ574 = (JcicZ574) iDataLog.clone(uJcicZ574);
 			try {
 				sJcicZ574Service.update(uJcicZ574, titaVo);
 			} catch (DBException e) {

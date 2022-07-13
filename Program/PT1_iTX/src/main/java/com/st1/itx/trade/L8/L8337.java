@@ -81,6 +81,10 @@ public class L8337 extends TradeBuffer {
 		String iModifyType = titaVo.getParam("ModifyType");
 		String iBankId = titaVo.getParam("BankId");
 		String iKey = "";
+		this.info("iApplyDate"   + iApplyDate);
+		this.info("iBankId"     + iBankId);
+		this.info("iCustId"    + iCustId);
+		this.info("iSubmitKey"  +  iSubmitKey);
 		// JcicZ575
 		JcicZ575 iJcicZ575 = new JcicZ575();
 		JcicZ575Id iJcicZ575Id = new JcicZ575Id();
@@ -91,8 +95,11 @@ public class L8337 extends TradeBuffer {
 		JcicZ575 chJcicZ575 = new JcicZ575();
 		JcicZ570 iJcicZ570 = new JcicZ570();
 		JcicZ570Id iJcicZ570Id = new JcicZ570Id();
+		iJcicZ570Id.setApplyDate(iApplyDate);
+		iJcicZ570Id.setCustId(iCustId);
+		iJcicZ570Id.setSubmitKey(iSubmitKey);
 		List<Map<String, String>> iL8337SqlReturn = new ArrayList<Map<String, String>>();
-
+		this.info("iJcicZ570Id"   + iJcicZ570Id);
 		// 檢核項目(D-78)
 		if (!"4".equals(iTranKey_Tmp)) {
 
@@ -109,15 +116,17 @@ public class L8337 extends TradeBuffer {
 				}
 				// 三end
 			}
-			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
-			if ("C".equals(iTranKey) && iJcicZ570 == null) {
-				throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
-			}
+
 		}
 		// 檢核項目end
 
 		switch (iTranKey_Tmp) {
 		case "1":
+			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
+			this.info("iJcicZ570" + iJcicZ570);
+			if (iJcicZ570 == null) {
+				throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
+			}
 			// 檢核是否重複，並寫入JcicZ575
 			chJcicZ575 = sJcicZ575Service.findById(iJcicZ575Id, titaVo);
 			if (chJcicZ575 != null) {
@@ -136,6 +145,11 @@ public class L8337 extends TradeBuffer {
 
 			break;
 		case "2":
+			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
+			this.info("iJcicZ570" + iJcicZ570);
+			if (iJcicZ570 == null) {
+				throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
+			}
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ575 = sJcicZ575Service.ukeyFirst(iKey, titaVo);
 			JcicZ575 uJcicZ575 = new JcicZ575();
