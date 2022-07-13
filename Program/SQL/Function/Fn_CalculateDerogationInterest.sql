@@ -55,7 +55,8 @@ BEGIN
           AND LRC."EffectDate" < "InputDerogationDate"
           UNION
           SELECT "InputPrevPayIntDate" AS "EffectDate"
-               , "InputFitRate"        AS "FitRate"
+               , "Fn_GetFitRate"("InputCustNo", "InputFacmNo", "InputBormNo", "InputPrevPayIntDate")
+                                       AS "FitRate"
           FROM DUAL
           UNION
           SELECT "InputDerogationDate"
@@ -71,13 +72,15 @@ BEGIN
                , "FitRate" 
           FROM rawData
      )
-     SELECT ROUND(
-               "InputLoanBal"
-               * nowRow."FitRate"
-               * (TO_DATE(nextRow."EffectDate",'yyyymmdd') - TO_DATE(nowRow."EffectDate",'yyyymmdd'))
-               / 360
-               / 100
-               , 0)
+     SELECT SUM(
+               TRUNC(
+                    "InputLoanBal"
+                    * nowRow."FitRate"
+                    * (TO_DATE(nextRow."EffectDate",'yyyymmdd') - TO_DATE(nowRow."EffectDate",'yyyymmdd'))
+                    / 360
+                    / 100
+               )
+     )
      INTO "Interest"
      FROM orderedData nowRow
      LEFT JOIN orderedData nextRow ON nextRow."EffectDateSeq" = nowRow."EffectDateSeq" + 1

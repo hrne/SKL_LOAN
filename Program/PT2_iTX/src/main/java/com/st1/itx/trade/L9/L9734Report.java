@@ -1,18 +1,11 @@
 package com.st1.itx.trade.L9;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.springjpa.cm.L9731ServiceImpl;
 import com.st1.itx.trade.LM.LM062Report;
 import com.st1.itx.trade.LM.LM063Report;
 import com.st1.itx.trade.LM.LM064Report;
@@ -27,9 +20,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class L9734Report extends MakeReport {
-
-	@Autowired
-	L9731ServiceImpl l9734ServiceImpl;
 
 	@Autowired
 	DateUtil dateUtil;

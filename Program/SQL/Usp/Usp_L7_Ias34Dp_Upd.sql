@@ -852,6 +852,25 @@ BEGIN
              , B."FacmNo"
              , B."BormNo"
     )
+    , LT AS (                        -- 找最後一筆撥款計息迄日
+    	SELECT LT."CustNo"
+    	     , LT."FacmNo"
+    	     , LT."BormNo"
+    	     , LT."IntEndDate"
+    	     , ROW_NUMBER()
+    	       OVER (
+    	       		 PARTITION BY LT."CustNo"
+    	                      , LT."FacmNo"
+    	                      , LT."BormNo"
+    	           ORDER BY LT."AcDate" DESC
+    	       ) AS "Seq"
+    	FROM "ForeclosureFinished" FF
+      LEFT JOIN "LoanBorTx" LT      ON LT."CustNo"  = FF."CustNo"
+                                   AND LT."FacmNo"  = FF."FacmNo"
+      WHERE LT."TitaTxCd" = 'L3200'
+        AND LT."TitaHCode" = '0'
+        AND LT."Interest" > 0
+    )
     SELECT M."CustNo"                      AS  "CustNo"          -- 戶號
          , M."FacmNo"                      AS  "FacmNo"          -- 額度編號
          , M."BormNo"                      AS  "BormNo"          -- 撥款序號
@@ -864,12 +883,12 @@ BEGIN
          -- 若此區間有不同利率則以分段計算
          , CASE
              WHEN M."DerDate" != 0 -- 減損發生日
-             THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),JML."PrevPayIntDate",M."DerDate")
+             THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate")
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
-         , CASE WHEN NVL(M1."TotalLoanBal", 0) = 0 THEN 0
-                ELSE ROUND((NVL(MF."FireFee",0) + NVL(MF."LawFee",0)) *
-                            NVL(ML."LoanBalance",0) / M1."TotalLoanBal", 0)
-           END                             AS  "Fee"             -- 減損發生日月底 費用 (火險+法務)
+         -- 2022-07-13 Wei 新增 from Linda
+         , "Fn_GetUnpaidInsuFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate")
+           + "Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate")
+                                           AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
          , CASE WHEN ML."LoanBalance" IS NULL OR ML1."LoanBalance" IS NULL THEN 0
                 WHEN NVL(ML."LoanBalance",0) <  NVL(ML1."LoanBalance",0)  THEN 0
                 ELSE NVL(ML."LoanBalance",0) -  NVL(ML1."LoanBalance",0)
@@ -912,10 +931,11 @@ BEGIN
 --         , NVL(AF."AvgLawFee5",0)
 --           + NVL(AF."AvgInsuFee5",0)       AS  "DerY5Fee"        -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
     FROM   "Ias34Dp" M
-      LEFT JOIN "JcicMonthlyLoanData" JML ON JML."DataYM" = YYYYMM
-                                         AND JML."CustNo" = M."CustNo"
-                                         AND JML."FacmNo" = M."FacmNo"
-                                         AND JML."BormNo" = M."BormNo"
+      -- 法拍件回收登錄件的最後一筆計息迄日
+      LEFT JOIN LT ON LT."CustNo"  = M."CustNo"
+                  AND LT."FacmNo"  = M."FacmNo"
+                  AND LT."BormNo"  = M."BormNo"
+                  AND LT."Seq" = 1
       -- 同額度本金餘額合計
       LEFT JOIN ( SELECT M."DataYM"                 AS "DataYM"
                        , M."CustNo"                 AS "CustNo"
@@ -1078,7 +1098,7 @@ BEGIN
                  , W."StoreRate"            AS  "StoreRate"       -- 減損發生日月底 計息利率
                  , W."LoanBalance"          AS  "LoanBalance"     -- 減損發生日月底 放款餘額
                  , W."IntAmt"               AS  "IntAmt"          -- 減損發生日月底 應收利息
-                --  , W."Fee"                  AS  "Fee"             -- 減損發生日月底 費用
+                 , W."Fee"                  AS  "Fee"             -- 減損發生日月底 費用
                  , W."DerY1Amt"             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額
                  , W."DerY2Amt"             AS  "DerY2Amt"        -- 個案減損客觀證據發生後第二年本金回收金額
                  , W."DerY3Amt"             AS  "DerY3Amt"        -- 個案減損客觀證據發生後第三年本金回收金額
@@ -1105,7 +1125,7 @@ BEGIN
          M."DerRate"    =  T."StoreRate" / 100
        , M."DerLoanBal" =  T."LoanBalance"
        , M."DerIntAmt"  =  T."IntAmt"
-      --  , M."DerFee"     =  T."Fee"
+       , M."DerFee"     =  T."Fee"
        , M."DerY1Amt"   =  T."DerY1Amt"
        , M."DerY2Amt"   =  T."DerY2Amt"
        , M."DerY3Amt"   =  T."DerY3Amt"

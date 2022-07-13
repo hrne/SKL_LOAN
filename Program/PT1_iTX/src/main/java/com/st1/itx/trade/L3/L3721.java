@@ -41,23 +41,7 @@ import com.st1.itx.util.parse.Parse;
  * e.撥款件〈新撥件〉利率屬定期機動者，須輸入第一年、第二年、…利率及調整日期。
  * f.增貸件，動撥件，撥尾款等，若有下次調整利率，也要作調整。
  */
-/*
- * Tita
- * TimCustNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * RateCode2=9,1
- * EffectDate2=9,7
- * ProdNo2=X,5
- * ProdRate2=9,2.4
- * BaseRateCode2=9,2
- * BaseRate2=9,2.4
- * IncrFlag2=X,1
- * FitRate2=9,2.4
- * RateIncr2=9,2.4
- * IndividualIncr2=9,2.4
- * Remark=X,60
- */
+
 /**
  * L3721 借戶利率變更
  * 
@@ -357,7 +341,7 @@ public class L3721 extends TradeBuffer {
 		tTempVo.putParam("EffectDate", iEffectDate);
 		tTempVo.putParam("NextRateAdjDate", iNextRateAdjDate);
 		tTempVo.putParam("NextAdjRateDate", tLoanBorMain.getNextAdjRateDate());
-		tTempVo.putParam("Note",iRemark);
+		tTempVo.putParam("Note", iRemark);
 
 		if (wkInsertFlag.equals("N")) {
 			tTempVo.putParam("Status", tLoanRateChange.getStatus());
@@ -498,7 +482,7 @@ public class L3721 extends TradeBuffer {
 		tLoanRateChange.setTellerNo(titaVo.getTlrNo());
 		tLoanRateChange.setTxtNo(titaVo.getTxtNo());
 		try {
-			loanRateChangeService.update2(tLoanRateChange, titaVo);
+			tLoanRateChange = loanRateChangeService.update2(tLoanRateChange, titaVo);
 		} catch (DBException f) {
 			throw new LogicException(titaVo, "E0007", "放款利率變動檔"); // 更新資料時，發生錯誤
 		}

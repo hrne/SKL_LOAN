@@ -38,6 +38,8 @@ public class L9734p extends TradeBuffer {
 
 	String txCD = "L9734";
 	String txName = "覆審報表產製";
+	
+	int count = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -54,30 +56,24 @@ public class L9734p extends TradeBuffer {
 		this.info("iYearMonth= " + iYearMonth);
 
 		boolean isFinish = false;
-	
-		
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
-		if (totalItem == 0) {
-			throw new LogicException(titaVo, "E0010", "須勾選至少一項報表");
-		}
-		
-		
 		String tradeName = "";
 
+	
+
 		for (int i = 1; i <= totalItem; i++) {
+
 			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+				count++;
 				tradeName += (titaVo.getParam("ReportName" + i) + "、");
-				
-				isFinish = l9734Report.exec(titaVo, iYearMonth,titaVo.getParam("ReportCode" + i));
+				isFinish = l9734Report.exec(titaVo, iYearMonth, titaVo.getParam("ReportCode" + i));
 			}
 		}
 
-		tradeName = tradeName.substring(0, tradeName.length() - 1);
-
-
 		if (isFinish) {
+			tradeName = tradeName.substring(0, tradeName.length() - 1);
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 					titaVo.getParam("TLRNO"), txCD + txName + "(" + tradeName + ")已完成", titaVo);
 		} else {

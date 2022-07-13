@@ -936,10 +936,9 @@ BEGIN
              WHEN M."DerDate" != 0 -- 減損發生日
              THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),JML."PrevPayIntDate",M."DerDate")
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
-         , CASE WHEN NVL(M1."TotalLoanBal", 0) = 0 THEN 0
-                ELSE ROUND((NVL(MF."FireFee",0) + NVL(MF."LawFee",0)) *
-                            NVL(ML."LoanBalance",0) / M1."TotalLoanBal", 0)
-           END                             AS  "Fee"             -- 減損發生日月底 費用 (火險+法務)
+         , "Fn_GetUnpaidInsuFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate")
+           + "Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate")
+                                            AS  "Fee"             -- 減損發生日月底 費用 (火險+法務)
          , CASE WHEN TRUNC(M."DerDate" / 100) >  YYYYMM THEN 0   -- 減損發生日該月大於本月年月
                 WHEN ML."LoanBalance" IS NULL AND ML1."LoanBalance" IS NULL THEN
                      NVL(M."DrawdownAmt",0) - NVL(MLE."LoanBalance",0) -- 減損發生日該月與第一年該月無資料改用撥款金額減當月餘額
