@@ -200,7 +200,7 @@ T(H,#RepaySourceX,#RepaySource,#ApHelp)
 !訪談日期  
 !新增時自動代入當日
 #RecordDate=D,7,L
-C(3,#FuncCode,1,T(1,#DATE,2,7),$)
+C(2,#FuncCode,$,T(1,#DATE,2,7),$,T(1,#DATE,2,7),$,$)
 !C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 !C(3,#FuncCode,3,$,T(1,#DATE,2,7))
 !D(8)
@@ -229,7 +229,7 @@ C(3,#CHAIN,1,IF(#FuncCode==1 || #FuncCode==3,$,s),$)
 #SendL8R51B=X,1,S
 E(0,#RimLogNo,#LogNo)
 E(0,#RimCustNo,#CustNo)
-RESET_RIM(#SendL8R51,L8R51)
+RESET_RIM(#SendL8R51B,L8R51)
 S(L8R51,1,#RimLogNo,#RimCustNo)
 R(1,L8R51)
 
@@ -247,7 +247,7 @@ E(0,@ActualRepayAmt,#L8R51ActualRepayAmt)
 T(2,@Description,#L8R51Description)
 T(2,@CustName,#L8R51CustName)
 T(H,#RepaySourceX,#RepaySource,#ApHelp)
-)
+
 !戶名
 #CustName=x,80,L
 

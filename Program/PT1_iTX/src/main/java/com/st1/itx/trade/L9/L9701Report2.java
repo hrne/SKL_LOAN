@@ -181,7 +181,9 @@ public class L9701Report2 extends MakeReport {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
 						if (tL9701Vo.get("DB").equals("2")) {
-							BigDecimal unpaidLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
+							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty()
+									|| tL9701Vo.get("Amount") == null ? BigDecimal.ZERO
+											: new BigDecimal(tL9701Vo.get("Amount"));
 							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 								continue;
 							}

@@ -59,7 +59,7 @@ public class L3702 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// tita
-		// 功能 1新增 2修改 4刪除 5查詢
+		// 功能 1新增 2修改 3複製 4刪除 5查詢
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
@@ -79,7 +79,7 @@ public class L3702 extends TradeBuffer {
 		LoanCustRmkId.setAcDate(iAcDate);
 
 		// 新增
-		if (iFunCd == 1) {
+		if (iFunCd == 1 || iFunCd == 3) {
 
 			// 測試該戶號是否存在客戶主檔
 			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);

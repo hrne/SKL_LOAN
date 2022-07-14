@@ -29,7 +29,7 @@ public class L9701Report3 extends MakeReport {
 
 	private String custName;
 	private String facmNo;
-	
+
 	public int tempPage = 0;
 
 	// 最大明細筆數
@@ -167,9 +167,6 @@ public class L9701Report3 extends MakeReport {
 
 		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", tradeReportName, "", "A4", "L");
 
-		
-
-
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
@@ -177,7 +174,9 @@ public class L9701Report3 extends MakeReport {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
 						if (tL9701Vo.get("DB").equals("2")) {
-							BigDecimal unpaidLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
+							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty()
+									|| tL9701Vo.get("Amount") == null ? BigDecimal.ZERO
+											: new BigDecimal(tL9701Vo.get("Amount"));
 							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 								continue;
 							}
@@ -205,14 +204,10 @@ public class L9701Report3 extends MakeReport {
 //				}
 //				this.info("tempPage=" +tempPage);
 
-				
-				
 				if (tL9701Vo.get("DB").equals("1")) {
 					printDetail1(tL9701Vo);
 					detailCounts++;
 				}
-				
-	
 
 			}
 		} else {

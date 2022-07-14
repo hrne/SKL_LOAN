@@ -104,7 +104,7 @@ public class L9701Report extends MakeReport {
 			this.print(1, 1, "額度　　 : " + tmpFacmNo);
 			this.print(0, 22, "押品地址 : " + clAddr);
 			divider();
-			this.print(0, 8, "入帳日期");
+			this.print(1, 8, "入帳日期");
 			this.print(0, 20, "交易內容");
 			this.print(0, 35, "計息本金");
 			this.print(0, 52, "計息期間");
@@ -178,7 +178,9 @@ public class L9701Report extends MakeReport {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
 						if (tL9701Vo.get("DB").equals("2")) {
-							BigDecimal unpaidLoanBal = new BigDecimal(tL9701Vo.get("Amount"));
+							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty()
+									|| tL9701Vo.get("Amount") == null ? BigDecimal.ZERO
+											: new BigDecimal(tL9701Vo.get("Amount"));
 							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 								continue;
 							}
