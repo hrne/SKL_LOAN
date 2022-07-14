@@ -4355,6 +4355,22 @@ TXFORM=L3R16
 ^
 </L3R16.tom>
 
+!    L3R17 : 暫收款指定額度設定維護
+<L3R17.dec>
+#L3R17RmkNo=A,3,S
+#L3R17RmkCode=X,3,S
+#L3R17RmkDesc=c,120,S
+</L3R17.dec>
+
+<L3R17.tom>
+TXFORM=L3R17
+#L3R17RmkNo
+#L3R17RmkCode
+#L3R17RmkDesc
+^
+</L3R17.tom>
+
+
 --------------------------------------------------------------
 !尋找客戶檔資料
 <L1R01.dec>
@@ -9630,6 +9646,29 @@ TXFORM=L6R48
 ^
 </L6R48.tom>
 
+<L6R49.dec>
+#L6r49Result=x,50000,S
+</L6R49.dec>
+
+<L6R49.tom>
+TXFORM=L6R49
+#L6r49Result
+^
+</L6R49.tom>
+
+<L6R50.dec>
+#L6r50CityCode=X,2,S
+#L6r50LandOfficeCode=X,2,S
+#L6r50LandOfficeItem=X,60,S
+</L6R50.dec>
+
+<L6R50.tom>
+TXFORM=L6R50
+#L6r50CityCode
+#L6r50LandOfficeCode
+#L6r50LandOfficeItem
+</L6R50.tom>
+^
 
 <L5R47.dec>
 #L5R47CustName=x,100,S

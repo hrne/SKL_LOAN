@@ -186,9 +186,9 @@ INVOKEJS(SHOW,p1,02,02,1)
 
 <include src="ROM.icf::L5R48.dec"/> 
 
-#Rim5R48CustNo=A,2,S
+#Rim5R48CustNo=A,7,S
 E(0,#CustNo)
-#Rim5R48FacmNo=A,2,S
+#Rim5R48FacmNo=A,3,S
 E(0,#FacmNo)
 #Rim5R48ApplSeq=X,3,S
 T(2,#ApplSeq)

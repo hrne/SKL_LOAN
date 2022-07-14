@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -11,7 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CustTelNo;
+import com.st1.itx.db.domain.TxDataLog;
+import com.st1.itx.db.domain.TxDataLogId;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -26,6 +32,10 @@ public class L1103 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService iCustMainService;
+
+	/* DB服務注入 */
+	@Autowired
+	public CustTelNoService sCustTelNoService;
 
 	@Autowired
 	public TxDataLogService txDataLogService;
@@ -367,12 +377,42 @@ public class L1103 extends TradeBuffer {
 		try {
 			tCustMain = iCustMainService.update2(tCustMain, titaVo);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
 
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
 		iDataLog.exec("修改顧客資料", "CustUKey:" + tCustMain.getCustUKey());
+		
+		// 若修改戶名,則同步維護電話檔(只維護與顧客關係=00本人之資料)
+		if (titaVo.getParam("CustNameInd").equals("X")) {
+			String custUKey = tCustMain.getCustUKey().trim();
+			List<CustTelNo> lCustTelNo = new ArrayList<CustTelNo>();
+			Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(custUKey, this.index, this.limit, titaVo);
+			lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
+			/* 如有找到資料 */
+			if (lCustTelNo != null && lCustTelNo.size() > 0) {
+				for (CustTelNo tCustTelNo : lCustTelNo) {
+					if (tCustTelNo.getRelationCode().trim().equals("00")) {// 本人-更新聯絡人姓名
+						// 鎖定這筆
+						tCustTelNo = sCustTelNoService.holdById(tCustTelNo);
+						// 變更前
+						CustTelNo BefCustTelNo = (CustTelNo) iDataLog.clone(tCustTelNo);
+						tCustTelNo.setLiaisonName(titaVo.getParam("CustNameAft"));
+						try {
+							tCustTelNo = sCustTelNoService.update2(tCustTelNo, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "客戶聯絡電話檔" + e.getErrorMsg()); // 更新資料時，發生錯誤
+						}
+						// 紀錄變更前變更後
+						iDataLog.setEnv(titaVo, BefCustTelNo, tCustTelNo);
+						iDataLog.exec("修改戶名同步維護客戶聯絡電話檔聯絡人本人姓名", "統一編號:" + titaVo.get("CustId"));
+					}
+				}
+			}
+		}
+
+		
 	}
 	
 	// 原二段式交易
@@ -765,6 +805,31 @@ public class L1103 extends TradeBuffer {
 
 			iDataLog.delete(titaVo);
 
+			// 同步維護電話檔(只維護與顧客關係=00本人之資料)
+			if (titaVo.getParam("CustNameInd").equals("X")) {
+				String custUKey = tCustMain.getCustUKey().trim();
+				List<CustTelNo> lCustTelNo = new ArrayList<CustTelNo>();
+				Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(custUKey, this.index, this.limit, titaVo);
+				lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
+				/* 如有找到資料 */
+				if (lCustTelNo != null && lCustTelNo.size() > 0) {
+					for (CustTelNo tCustTelNo : lCustTelNo) {
+						if (tCustTelNo.getRelationCode().trim().equals("00")) {// 本人-更新聯絡人姓名
+							// 鎖定這筆
+							tCustTelNo = sCustTelNoService.holdById(tCustTelNo);
+							tCustTelNo.setLiaisonName(titaVo.getParam("CustNameBef"));
+							try {
+								tCustTelNo = sCustTelNoService.update2(tCustTelNo, titaVo);
+							} catch (DBException e) {
+								throw new LogicException(titaVo, "E0007", "客戶聯絡電話檔" + e.getErrorMsg()); // 更新資料時，發生錯誤
+							}
+							iDataLog.delete(titaVo);
+						}
+					}
+				}
+			}
+			
+			
 		}
 
 		this.addList(this.totaVo);

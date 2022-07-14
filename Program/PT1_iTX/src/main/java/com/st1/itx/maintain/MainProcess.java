@@ -544,7 +544,7 @@ public class MainProcess extends SysLogger {
 				if (tCustDataCtrl.getApplMark() == 2) {
 					if (titaVo.getReason().isEmpty()) {
 						throw new LogicException("EC998", "查詢結清滿五年客戶資料");
-					} else if (titaVo.getEmpNos().trim().isEmpty()) {
+					} else if (titaVo.getEmpNos().trim().isEmpty() && tTxTranCode.getCustDataCtrlFg() != 1) {
 						sendRsp.addvReason(this.txBuffer, titaVo, "0004", "查詢結清滿五年客戶資料,理由:" + titaVo.getReason());
 					}
 				} else if (tCustDataCtrl.getApplMark() == 1) {
