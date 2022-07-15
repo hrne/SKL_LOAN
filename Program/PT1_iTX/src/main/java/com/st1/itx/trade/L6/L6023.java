@@ -67,17 +67,20 @@ public class L6023 extends TradeBuffer {
 			this.info("Size =" + resultList.size());
 
 			for (Map<String, String> result : resultList) {
-
+//2022/7/15因查詢時會跳出最後更新日無法用int顯示，固有修改 Mata
 				OccursList occurslist = new OccursList();
-				int lastUpdate = parse.stringToInteger(result.get("LastUpdate"));
-				if (lastUpdate > 0) {
-					lastUpdate = lastUpdate - 19110000;
-				}
+//				int lastUpdate = parse.stringToInteger(result.get("LastUpdate"));			
+				
+//				if (lastUpdate > 0) {
+//					lastUpdate = lastUpdate - 19110000;
+//				}
+
 
 				occurslist.putParam("OOLandOfficeCode", result.get("LandOfficeCode"));
 				occurslist.putParam("OORecWord", result.get("RecWord"));
 				occurslist.putParam("OORecWordItem", result.get("RecWordItem"));
-				occurslist.putParam("OOLastUpdate", lastUpdate);
+//				occurslist.putParam("OOLastUpdate", lastUpdate);
+				occurslist.putParam("OOLastUpdate", this.parse.stringToStringDate(result.get("LastUpdate")));
 				occurslist.putParam("OOLastEmp",
 						result.get("LastUpdateEmpNo") + " " + empName(titaVo, result.get("LastUpdateEmpNo")));
 				/* 將每筆資料放入Tota的OcList */

@@ -782,9 +782,13 @@ public class L2411 extends TradeBuffer {
 //		"1.若""評估淨值""有值取""評估淨值""否則取""鑑估總值"")*貸放成數(四捨五入至個位數)
 //		2.若設定金額低於可分配金額則為設定金額
 //		3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
-
-		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
-				BigDecimal.ROUND_HALF_UP);
+//		若貸放成數為0則不乘貸放成數
+		if (loanToValue.compareTo(BigDecimal.ZERO) == 0) {
+			shareTotal = shareCompAmt;
+		} else {
+			shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
+					BigDecimal.ROUND_HALF_UP);
+		}
 		if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
 		}
@@ -1026,6 +1030,7 @@ public class L2411 extends TradeBuffer {
 				custMain = new CustMain();
 				custMain.setCustUKey(Ukey);
 				custMain.setCustId(iOwnerId);
+				custMain.setCuscCd(iOwnerId.length() == 8 ? "2" : "1");
 				custMain.setCustName(titaVo.getParam("OwnerName" + i));
 				custMain.setDataStatus(1);
 				custMain.setTypeCode(2);
