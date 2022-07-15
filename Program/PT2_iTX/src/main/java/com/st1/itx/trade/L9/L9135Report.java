@@ -207,8 +207,8 @@ public class L9135Report extends MakeReport {
 
 		// 全部合計
 		tmpCnt += 1;
-		tmpAmtDb += amtDb;
-		tmpAmtCr += amtCr;
+		tmpAmtDb += Integer.valueOf(r.get("DbTxAmt"));
+		tmpAmtCr += Integer.valueOf(r.get("CrTxAmt"));
 	}
 
 
