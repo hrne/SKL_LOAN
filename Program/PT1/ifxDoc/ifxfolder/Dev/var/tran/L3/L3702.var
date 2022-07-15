@@ -74,7 +74,7 @@ C(3,#FunCd,1,S,$)
 E(0,1)ASGN(AGAIN$)
 
 #FunCdHelp=x,50,S
-T(3,1:新增;2:修改;4:刪除;5:查詢)
+T(3,1:新增;2:修改;3:複製;4:刪除;5:查詢)
 
 !RmkCode
 #CDDEF0001=x,20,S
@@ -100,9 +100,22 @@ T(1,@CustNo,#NTXBUF,2,7)
 T(1,@RmkNo,#NTXBUF,9,3)
 T(1,@AcDate,#NTXBUF,12,7)
 
+
+#RimL3r30S=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimFunCd,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimRmkNo,#RmkNo)
+E(0,@RimAcDate,#AcDate)
+S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo,#RimAcDate)
+R(1,L3R30)
+T(2,@LoanRmkCode,#L3r30RmkCode)
+T(2,@RmkDesc,#L3r30RmkDesc)
+
 ![功能]
 !下拉式選單 1.新增 2.修改 4.刪除 5.查詢
 #FunCd=A,1,S
+C(3,#FunCd,3,E(0,1),$)
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
@@ -196,7 +209,6 @@ S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo,#RimAcDate)
 R(1,L3R30)
 E(0,@RmkNo,#L3r30RmkNo)
 
-
 ![備忘錄序號]
 !新增時由系統自動編流水號,其他則必須輸入
 #RmkNo=A,3,L
@@ -219,6 +231,7 @@ S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo,#RimAcDate)
 R(1,L3R30)
 T(2,@LoanRmkCode,#L3r30RmkCode)
 T(2,@RmkDesc,#L3r30RmkDesc)
+
 
 ![備忘錄代碼]
 !必須輸入
