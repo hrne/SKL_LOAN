@@ -17,7 +17,7 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ040;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ048;
 import com.st1.itx.db.domain.JcicZ048Id;
@@ -30,28 +30,6 @@ import com.st1.itx.db.service.JcicZ048Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
-
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8309")
 @Scope("prototype")
@@ -145,7 +123,12 @@ public class L8309 extends TradeBuffer {
 			iDataLog.setEnv(titaVo, oldJcicZ048, uJcicZ048);
 			iDataLog.exec();
 			break;
+			//2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ048 = sJcicZ048Service.ukeyFirst(iKey, titaVo);
+			JcicZ048 uJcicZ0482 = new JcicZ048();
+			uJcicZ0482 = sJcicZ048Service.holdById(iJcicZ048.getJcicZ048Id(), titaVo);
 			iJcicZ048 = sJcicZ048Service.findById(iJcicZ048Id);
 			if (iJcicZ048 == null) {
 				throw new LogicException("E0008", "");
@@ -153,6 +136,16 @@ public class L8309 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ048 oldJcicZ0482 = (JcicZ048) iDataLog.clone(uJcicZ0482);
+			uJcicZ0482.setTranKey(iTranKey);
+			uJcicZ0482.setCustRegAddr(iCustRegAddr);
+			uJcicZ0482.setCustComAddr(iCustComAddr);
+			uJcicZ0482.setCustRegTelNo(iCustRegTelNo);
+			uJcicZ0482.setCustComTelNo(iCustComTelNo);
+			uJcicZ0482.setCustMobilNo(iCustMobilNo);
+			uJcicZ0482.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ048Log> dJcicLogZ048 = null;
 			dJcicLogZ048 = sJcicZ048LogService.ukeyEq(iJcicZ048.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ048 == null) {
@@ -178,6 +171,8 @@ public class L8309 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0482, uJcicZ0482);
+			iDataLog.exec();
 		default:
 			break;
 		}

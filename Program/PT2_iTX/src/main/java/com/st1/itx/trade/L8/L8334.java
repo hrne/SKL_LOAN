@@ -122,12 +122,12 @@ public class L8334 extends TradeBuffer {
 			if (uJcicZ572 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ572 oldJcicZ572 = (JcicZ572) iDataLog.clone(uJcicZ572);
 			uJcicZ572.setStartDate(iStartDate);
 			uJcicZ572.setAllotAmt(iAllotAmt);
 			uJcicZ572.setOwnPercentage(iOwnPercentage);
 			uJcicZ572.setTranKey(iTranKey);
 			uJcicZ572.setOutJcicTxtDate(0);
-			JcicZ572 oldJcicZ572 = (JcicZ572) iDataLog.clone(uJcicZ572);
 			try {
 				sJcicZ572Service.update(uJcicZ572, titaVo);
 			} catch (DBException e) {
@@ -137,6 +137,10 @@ public class L8334 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ572 = sJcicZ572Service.ukeyFirst(iKey, titaVo);
+			JcicZ572 uJcicZ5722 = new JcicZ572();
+			uJcicZ5722 = sJcicZ572Service.holdById(iJcicZ572.getJcicZ572Id(), titaVo);
 			iJcicZ572 = sJcicZ572Service.findById(iJcicZ572Id);
 			if (iJcicZ572 == null) {
 				throw new LogicException("E0008", "");
@@ -144,6 +148,14 @@ public class L8334 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ572 oldJcicZ5722 = (JcicZ572) iDataLog.clone(uJcicZ5722);
+			uJcicZ5722.setStartDate(iStartDate);
+			uJcicZ5722.setAllotAmt(iAllotAmt);
+			uJcicZ5722.setOwnPercentage(iOwnPercentage);
+			uJcicZ5722.setTranKey(iTranKey);
+			uJcicZ5722.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ572Log> dJcicLogZ572 = null;
 			dJcicLogZ572 = sJcicZ572LogService.ukeyEq(iJcicZ572.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ572 == null) {
@@ -167,6 +179,8 @@ public class L8334 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ5722, uJcicZ5722);
+			iDataLog.exec();
 		default:
 			break;
 		}

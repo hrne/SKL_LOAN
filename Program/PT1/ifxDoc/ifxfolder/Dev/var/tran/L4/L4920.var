@@ -389,6 +389,8 @@ T(2,#AcDate+#BatchNo+#OODetailSeq+#OOCustNo+#OOFacmNo+#OORepayType+#OORepayAmtX+
 #OOBUF_L4210=X,20,S
 IF(#OOBTN_TXT == "查詢",T(2,5+#AcDate+#BatchNo+#OODetailSeq),T(2,2+#AcDate+#BatchNo+#OODetailSeq))
 
+
+!交易序號
 #OOBUF_B=x,50,S
 T(2,#AcDate+0000000+#OOTxSn)
 
@@ -418,8 +420,24 @@ SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxb
 ! 09:其他
 ! 11:匯款轉帳預先作業
 
-!送L4201
+!交易代號
+#OOTxCd=X,5,S
+IF(#OORepayType <= 3,T(2,L3200),T(2,L3210))
+#TxNo=X,18,S
+T(2,#OOTxSn)
+#Entdy=D,7,S
+E(0,#AcDate)
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo)
 
+!訂正按鈕
+!OOProcStsCode=5.6.7時才顯示按鈕
+#BTN=X,1,S
+IF(#OOProcStsCode==5||#OOProcStsCode==6||#OOProcStsCode==7,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
+
+
+
+!送L4201
 #DetailSeq=A,6,S
 E(0,#OODetailSeq)
 
@@ -519,6 +537,9 @@ TXFORM=L4920
 
 #RPTFG=0,QUERY.GRID,L4920
 #any={detail:true, header:'L4920.part', caption:'', rowNum:20, rowList:[20,40,60]}
+
+#BTN=訂正
+{width:40,search:false,formatter:'cust:bind-button:訂正',canExport:false,align:'center'}
 
 #OOEntryDate=入帳日期
 {width:95,align:'center'}

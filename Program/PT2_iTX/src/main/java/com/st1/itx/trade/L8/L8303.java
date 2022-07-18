@@ -19,6 +19,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.JcicZ040Id;
+import com.st1.itx.db.domain.JcicZ041;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ042;
 import com.st1.itx.db.domain.JcicZ042Id;
@@ -39,27 +40,6 @@ import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8303")
 @Scope("prototype")
@@ -307,7 +287,12 @@ public class L8303 extends TradeBuffer {
 			iDataLog.setEnv(titaVo, oldJcicZ042, uJcicZ042);
 			iDataLog.exec();
 			break;
+			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ042 = sJcicZ042Service.ukeyFirst(iKey, titaVo);
+			JcicZ042 uJcicZ0422 = new JcicZ042();
+			uJcicZ0422 = sJcicZ042Service.holdById(iJcicZ042.getJcicZ042Id(), titaVo);
 			iJcicZ042 = sJcicZ042Service.findById(iJcicZ042Id);
 			if (iJcicZ042 == null) {
 				throw new LogicException("E0006", "");
@@ -315,6 +300,34 @@ public class L8303 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ042 oldJcicZ0422 = (JcicZ042) iDataLog.clone(uJcicZ0422);
+			uJcicZ0422.setTranKey(iTranKey);
+			uJcicZ0422.setIsClaims(iIsClaims);
+			uJcicZ0422.setGuarLoanCnt(iGuarLoanCnt);
+			uJcicZ0422.setExpLoanAmt(iExpLoanAmt);
+			uJcicZ0422.setCivil323ExpAmt(iCivil323ExpAmt);
+			uJcicZ0422.setReceExpAmt(iReceExpAmt);
+			uJcicZ0422.setCashCardAmt(iCashCardAmt);
+			uJcicZ0422.setCivil323CashAmt(iCivil323CashAmt);
+			uJcicZ0422.setReceCashAmt(iReceCashAmt);
+			uJcicZ0422.setCreditCardAmt(iCreditCardAmt);
+			uJcicZ0422.setCivil323CreditAmt(iCivil323CreditAmt);
+			uJcicZ0422.setReceCreditAmt(iReceCreditAmt);
+			uJcicZ0422.setReceExpPrin(iReceExpPrin);
+			uJcicZ0422.setReceExpInte(iReceExpInte);
+			uJcicZ0422.setReceExpPena(iReceExpPena);
+			uJcicZ0422.setReceExpOther(iReceExpOther);
+			uJcicZ0422.setCashCardPrin(iCashCardPrin);
+			uJcicZ0422.setCashCardInte(iCashCardInte);
+			uJcicZ0422.setCashCardPena(iCashCardPena);
+			uJcicZ0422.setCashCardOther(iCashCardOther);
+			uJcicZ0422.setCreditCardPrin(iCreditCardPrin);
+			uJcicZ0422.setCreditCardInte(iCreditCardInte);
+			uJcicZ0422.setCreditCardPena(iCreditCardPena);
+			uJcicZ0422.setCreditCardOther(iCreditCardOther);
+			uJcicZ0422.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ042Log> dJcicLogZ042 = null;
 			dJcicLogZ042 = sJcicZ042LogService.ukeyEq(iJcicZ042.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ042 == null) {
@@ -358,6 +371,8 @@ public class L8303 extends TradeBuffer {
 					throw new LogicException("E0006", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0422, uJcicZ0422);
+			iDataLog.exec();
 		default:
 			break;
 		}

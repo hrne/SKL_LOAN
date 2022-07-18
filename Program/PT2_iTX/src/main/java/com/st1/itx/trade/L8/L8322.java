@@ -207,7 +207,7 @@ public class L8322 extends TradeBuffer {
 			uJcicZ440.setNotBankId3(iNotBankId3);
 			uJcicZ440.setNotBankId4(iNotBankId4);
 			uJcicZ440.setNotBankId5(iNotBankId5);
-			iJcicZ440.setNotBankId6(iNotBankId6);
+			uJcicZ440.setNotBankId6(iNotBankId6);
 			uJcicZ440.setTranKey(iTranKey);
 			uJcicZ440.setOutJcicTxtDate(0);
 			try {
@@ -219,6 +219,10 @@ public class L8322 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ440 = sJcicZ440Service.ukeyFirst(iKey, titaVo);
+			JcicZ440 uJcicZ4402 = new JcicZ440();
+			uJcicZ4402 = sJcicZ440Service.holdById(iJcicZ440.getJcicZ440Id(), titaVo);
 			iJcicZ440 = sJcicZ440Service.findById(iJcicZ440Id);
 			if (iJcicZ440 == null) {
 				throw new LogicException("E0008", "");
@@ -226,6 +230,22 @@ public class L8322 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ440 oldJcicZ4402 = (JcicZ440) iDataLog.clone(uJcicZ4402);
+			uJcicZ4402.setAgreeDate(iAgreeDate);
+			uJcicZ4402.setStartDate(iStartDate);
+			uJcicZ4402.setRemindDate(iRemindDate);
+			uJcicZ4402.setApplyType(iApplyType);
+			uJcicZ4402.setReportYn(iReportYn);
+			uJcicZ4402.setNotBankId1(iNotBankId1);
+			uJcicZ4402.setNotBankId2(iNotBankId2);
+			uJcicZ4402.setNotBankId3(iNotBankId3);
+			uJcicZ4402.setNotBankId4(iNotBankId4);
+			uJcicZ4402.setNotBankId5(iNotBankId5);
+			uJcicZ4402.setNotBankId6(iNotBankId6);
+			uJcicZ4402.setTranKey(iTranKey);
+			uJcicZ4402.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ440Log> dJcicLogZ440 = null;
 			dJcicLogZ440 = sJcicZ440LogService.ukeyEq(iJcicZ440.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ440 == null) {
@@ -257,6 +277,8 @@ public class L8322 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ4402, uJcicZ4402);
+			iDataLog.exec();
 		default:
 			break;
 		}

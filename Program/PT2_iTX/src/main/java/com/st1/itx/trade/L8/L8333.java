@@ -31,18 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8333")
 @Scope("prototype")
 /**
@@ -153,6 +141,7 @@ public class L8333 extends TradeBuffer {
 			if (uJcicZ571 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ571 oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
 			uJcicZ571.setTranKey(iTranKey);
 			uJcicZ571.setOwnerYn(iOwnerYn);
 			uJcicZ571.setPayYn(iPayYn);
@@ -160,7 +149,6 @@ public class L8333 extends TradeBuffer {
 			uJcicZ571.setAllotAmt(iAllotAmt);
 			uJcicZ571.setUnallotAmt(iUnallotAmt);
 			uJcicZ571.setOutJcicTxtDate(0);
-			JcicZ571 oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
 			try {
 				sJcicZ571Service.update(uJcicZ571, titaVo);
 			} catch (DBException e) {
@@ -170,6 +158,10 @@ public class L8333 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ571 = sJcicZ571Service.ukeyFirst(iKey, titaVo);
+			JcicZ571 uJcicZ5712 = new JcicZ571();
+			uJcicZ5712 = sJcicZ571Service.holdById(iJcicZ571.getJcicZ571Id(), titaVo);
 			iJcicZ571 = sJcicZ571Service.findById(iJcicZ571Id);
 			if (iJcicZ571 == null) {
 				throw new LogicException("E0008", "");
@@ -177,6 +169,16 @@ public class L8333 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ571 oldJcicZ5712 = (JcicZ571) iDataLog.clone(uJcicZ5712);
+			uJcicZ5712.setTranKey(iTranKey);
+			uJcicZ5712.setOwnerYn(iOwnerYn);
+			uJcicZ5712.setPayYn(iPayYn);
+			uJcicZ5712.setOwnerAmt(iOwnerAmt);
+			uJcicZ5712.setAllotAmt(iAllotAmt);
+			uJcicZ5712.setUnallotAmt(iUnallotAmt);
+			uJcicZ5712.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ571Log> dJcicLogZ571 = null;
 			dJcicLogZ571 = sJcicZ571LogService.ukeyEq(iJcicZ571.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ571 == null) {
@@ -202,6 +204,8 @@ public class L8333 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ5712, uJcicZ5712);
+			iDataLog.exec();
 		default:
 			break;
 		}

@@ -36,18 +36,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8323")
 @Scope("prototype")
 /**
@@ -273,6 +261,7 @@ public class L8323 extends TradeBuffer {
 			if (uJcicZ442 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ442 oldJcicZ442 = (JcicZ442) iDataLog.clone(uJcicZ442);
 			uJcicZ442.setTranKey(iTranKey);
 			uJcicZ442.setIsMaxMain(iIsMaxMain);
 			uJcicZ442.setIsClaims(iIsClaims);
@@ -298,7 +287,6 @@ public class L8323 extends TradeBuffer {
 			uJcicZ442.setGuarObliPena(iGuarObliPena);
 			uJcicZ442.setGuarObliOther(iGuarObliOther);
 			uJcicZ442.setOutJcicTxtDate(0);
-			JcicZ442 oldJcicZ442 = (JcicZ442) iDataLog.clone(uJcicZ442);
 			try {
 				sJcicZ442Service.update(uJcicZ442, titaVo);
 			} catch (DBException e) {
@@ -308,6 +296,10 @@ public class L8323 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ442 = sJcicZ442Service.ukeyFirst(iKey, titaVo);
+			JcicZ442 uJcicZ4422 = new JcicZ442();
+			uJcicZ4422 = sJcicZ442Service.holdById(iJcicZ442.getJcicZ442Id(), titaVo);
 			iJcicZ442 = sJcicZ442Service.findById(iJcicZ442Id);
 			if (iJcicZ442 == null) {
 				throw new LogicException("E0008", "");
@@ -315,6 +307,34 @@ public class L8323 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ442 oldJcicZ4422 = (JcicZ442) iDataLog.clone(uJcicZ4422);
+			uJcicZ4422.setTranKey(iTranKey);
+			uJcicZ4422.setIsMaxMain(iIsMaxMain);
+			uJcicZ4422.setIsClaims(iIsClaims);
+			uJcicZ4422.setGuarLoanCnt(iGuarLoanCnt);
+			uJcicZ4422.setCivil323ExpAmt(iCivil323ExpAmt);
+			uJcicZ4422.setCivil323CashAmt(iCivil323CashAmt);
+			uJcicZ4422.setCivil323CreditAmt(iCivil323CreditAmt);
+			uJcicZ4422.setCivil323GuarAmt(iCivil323GuarAmt);
+			uJcicZ4422.setReceExpPrin(iReceExpPrin);
+			uJcicZ4422.setReceExpInte(iReceExpInte);
+			uJcicZ4422.setReceExpPena(iReceExpPena);
+			uJcicZ4422.setReceExpOther(iReceExpOther);
+			uJcicZ4422.setCashCardPrin(iCashCardPrin);
+			uJcicZ4422.setCashCardInte(iCashCardInte);
+			uJcicZ4422.setCashCardPena(iCashCardPena);
+			uJcicZ4422.setCashCardOther(iCashCardOther);
+			uJcicZ4422.setCreditCardPrin(iCreditCardPrin);
+			uJcicZ4422.setCreditCardInte(iCreditCardInte);
+			uJcicZ4422.setCreditCardPena(iCreditCardPena);
+			uJcicZ4422.setCreditCardOther(iCreditCardOther);
+			uJcicZ4422.setGuarObliPrin(iGuarObliPrin);
+			uJcicZ4422.setGuarObliInte(iGuarObliInte);
+			uJcicZ4422.setGuarObliPena(iGuarObliPena);
+			uJcicZ4422.setGuarObliOther(iGuarObliOther);
+			uJcicZ4422.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ442Log> dJcicLogZ442 = null;
 			dJcicLogZ442 = sJcicZ442LogService.ukeyEq(iJcicZ442.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ442 == null) {
@@ -359,6 +379,8 @@ public class L8323 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ4422, uJcicZ4422);
+			iDataLog.exec();
 		default:
 			break;
 		}

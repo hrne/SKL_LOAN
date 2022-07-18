@@ -37,17 +37,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8326")
 @Scope("prototype")
@@ -204,11 +193,11 @@ public class L8326 extends TradeBuffer {
 			if (uJcicZ446 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ446 oldJcicZ446 = (JcicZ446) iDataLog.clone(uJcicZ446);
 			uJcicZ446.setTranKey(iTranKey);
 			uJcicZ446.setCloseCode(iCloseCode);
 			uJcicZ446.setCloseDate(iCloseDate);
 			uJcicZ446.setOutJcicTxtDate(0);
-			JcicZ446 oldJcicZ446 = (JcicZ446) iDataLog.clone(uJcicZ446);
 			try {
 				sJcicZ446Service.update(uJcicZ446, titaVo);
 			} catch (DBException e) {
@@ -218,6 +207,10 @@ public class L8326 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ446 = sJcicZ446Service.ukeyFirst(iKey, titaVo);
+			JcicZ446 uJcicZ4462 = new JcicZ446();
+			uJcicZ4462 = sJcicZ446Service.holdById(iJcicZ446.getJcicZ446Id(), titaVo);
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id);
 			if (iJcicZ446 == null) {
 				throw new LogicException("E0008", "");
@@ -225,6 +218,13 @@ public class L8326 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ446 oldJcicZ4462 = (JcicZ446) iDataLog.clone(uJcicZ4462);
+			uJcicZ4462.setTranKey(iTranKey);
+			uJcicZ4462.setCloseCode(iCloseCode);
+			uJcicZ4462.setCloseDate(iCloseDate);
+			uJcicZ4462.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ446Log> dJcicLogZ446 = null;
 			dJcicLogZ446 = sJcicZ446LogService.ukeyEq(iJcicZ446.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ446 == null) {
@@ -246,6 +246,8 @@ public class L8326 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ4462, uJcicZ4462);
+			iDataLog.exec();
 		default:
 			break;
 		}

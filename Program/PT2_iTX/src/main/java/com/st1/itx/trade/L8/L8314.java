@@ -32,27 +32,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8314")
 @Scope("prototype")
@@ -173,6 +152,10 @@ public class L8314 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ053 = sJcicZ053Service.ukeyFirst(iKey, titaVo);
+			JcicZ053 uJcicZ0532 = new JcicZ053();
+			uJcicZ0532 = sJcicZ053Service.holdById(iJcicZ053.getJcicZ053Id(), titaVo);
 			iJcicZ053 = sJcicZ053Service.findById(iJcicZ053Id);
 			if (iJcicZ053 == null) {
 				throw new LogicException("E0008", "");
@@ -180,6 +163,15 @@ public class L8314 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ053 oldJcicZ0532 = (JcicZ053) iDataLog.clone(uJcicZ0532);
+			uJcicZ0532.setTranKey(iTranKey);
+			uJcicZ0532.setAgreeSend(iAgreeSend);
+			uJcicZ0532.setAgreeSendData1(iAgreeSendData1);
+			uJcicZ0532.setAgreeSendData2(iAgreeSendData2);
+			uJcicZ0532.setChangePayDate(iChangePayDate);
+			uJcicZ0532.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ053Log> dJcicLogZ053 = null;
 			dJcicLogZ053 = sJcicZ053LogService.ukeyEq(iJcicZ053.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ053 == null) {
@@ -204,6 +196,8 @@ public class L8314 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0532, uJcicZ0532);
+			iDataLog.exec();
 		default:
 			break;
 		}

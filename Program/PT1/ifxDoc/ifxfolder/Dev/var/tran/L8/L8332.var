@@ -1,0 +1,531 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8332)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,900];printer.width=[20,20,20,20];order=1;">
+[
+["[L8332]                                 (570)受理更生款項統一收付通知"],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdApplyDate+申請日期",#ApplyDate],
+[#<->#,"#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
+[#<->#,"#FdBankCount+更生債權金融機構家數",#BankCount],
+[#<->#,"#FdBank1+債權金融機構代號1",#Bank1,#BankX1],[#<->#,"#FdBank2+債權金融機構代號2",#Bank2,#BankX2],
+[#<->#,"#FdBank3+債權金融機構代號3",#Bank3,#BankX3],[#<->#,"#FdBank4+債權金融機構代號4",#Bank4,#BankX4],
+[#<->#,"#FdBank5+債權金融機構代號5",#Bank5,#BankX5],[#<->#,"#FdBank6+債權金融機構代號6",#Bank6,#BankX6],
+[#<->#,"#FdBank7+債權金融機構代號7",#Bank7,#BankX7],[#<->#,"#FdBank8+債權金融機構代號8",#Bank8,#BankX8],
+[#<->#,"#FdBank9+債權金融機構代號9",#Bank9,#BankX9],[#<->#,"#FdBank10+債權金融機構代號10",#Bank10,#BankX10],
+[#<->#,"#FdBank11+債權金融機構代號11",#Bank11,#BankX11],[#<->#,"#FdBank12+債權金融機構代號12",#Bank12,#BankX12],
+[#<->#,"#FdBank13+債權金融機構代號13",#Bank13,#BankX13],[#<->#,"#FdBank14+債權金融機構代號14",#Bank14,#BankX14],
+[#<->#,"#FdBank15+債權金融機構代號15",#Bank15,#BankX15],[#<->#,"#FdBank16+債權金融機構代號16",#Bank16,#BankX16],
+[#<->#,"#FdBank17+債權金融機構代號17",#Bank17,#BankX17],[#<->#,"#FdBank18+債權金融機構代號18",#Bank18,#BankX18],
+[#<->#,"#FdBank19+債權金融機構代號19",#Bank19,#BankX19],[#<->#,"#FdBank20+債權金融機構代號20",#Bank20,#BankX20],
+[#<->#,"#FdBank21+債權金融機構代號21",#Bank21,#BankX21],[#<->#,"#FdBank22+債權金融機構代號22",#Bank22,#BankX22],
+[#<->#,"#FdBank23+債權金融機構代號23",#Bank23,#BankX23],[#<->#,"#FdBank24+債權金融機構代號24",#Bank24,#BankX24],
+[#<->#,"#FdBank25+債權金融機構代號25",#Bank25,#BankX25],[#<->#,"#FdBank26+債權金融機構代號26",#Bank26,#BankX26],
+[#<->#,"#FdBank27+債權金融機構代號27",#Bank27,#BankX27],[#<->#,"#FdBank28+債權金融機構代號28",#Bank28,#BankX28],
+[#<->#,"#FdBank29+債權金融機構代號29",#Bank29,#BankX29],[#<->#,"#FdBank30+債權金融機構代號30",#Bank30,#BankX30],
+[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+]
+
+#FdTranKey=X,2,L
+#FdCustId=X,2,L
+#FdSubmitKey=X,2,L
+#FdApplyDate=X,2,L
+#FdAdjudicateDate=X,2,L
+#FdBankCount=X,2,L
+#FdBank1=X,2,L
+#FdBank2=X,2,L
+#FdBank3=X,2,L
+#FdBank4=X,2,L
+#FdBank5=X,2,L
+#FdBank6=X,2,L
+#FdBank7=X,2,L
+#FdBank8=X,2,L
+#FdBank9=X,2,L
+#FdBank10=X,2,L
+#FdBank11=X,2,L
+#FdBank12=X,2,L
+#FdBank13=X,2,L
+#FdBank14=X,2,L
+#FdBank15=X,2,L
+#FdBank16=X,2,L
+#FdBank17=X,2,L
+#FdBank18=X,2,L
+#FdBank19=X,2,L
+#FdBank20=X,2,L
+#FdBank21=X,2,L
+#FdBank22=X,2,L
+#FdBank23=X,2,L
+#FdBank24=X,2,L
+#FdBank25=X,2,L
+#FdBank26=X,2,L
+#FdBank27=X,2,L
+#FdBank28=X,2,L
+#FdBank29=X,2,L
+#FdBank30=X,2,L
+#FdOutJcicTxtDate=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- 日期處理 ----------
+#VIEW_SYSDATE=X,8,S
+D(7,2,#SYSDATE,0,0)
+T(1,#VIEW_SYSDATE,2,7)
+E(0,1)ASGN(AGAIN$)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic570連動進入),$)
+T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@AdjudicateDate,0)T(F,@BankCount,0)T(F,@Bank1,0)T(F,@Bank2,0)
+T(F,@Bank3,0)T(F,@Bank4,0)T(F,@Bank5,0)T(F,@Bank6,0)T(F,@Bank7,0)T(F,@Bank8,0)T(F,@Bank9,0)T(F,@Bank10,0)
+T(F,@Bank11,0)T(F,@Bank12,0)T(F,@Bank13,0)T(F,@Bank14,0)T(F,@Bank15,0)T(F,@Bank16,0)T(F,@Bank17,0)T(F,@Bank18,0)
+T(F,@Bank19,0)T(F,@Bank20,0)T(F,@Bank21,0)T(F,@Bank22,0)T(F,@Bank23,0)T(F,@Bank24,0)T(F,@Bank25,0)T(F,@Bank26,0)
+T(F,@Bank27,0)T(F,@Bank28,0)T(F,@Bank29,0)T(F,@Bank30,0)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranKey,#NTXBUF,2,1)
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+T(1,@CustId,#NTXBUF,3,10)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@TranKey,1)T(F,@ApplyDate,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)T(F,@Bank1,1)T(F,@Bank2,1)
+T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
+T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
+T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
+T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)T(2,@FdBank1,*)
+K(MODIFYBUTTON,新增)
+T(2,@FdTranKey,*)
+T(2,@FdApplyDate,*)
+T(2,@FdAdjudicateDate,*)
+T(2,@FdBankCount,*)
+T(3,@TranKeyHelp,A:新增;X:補件))
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(F,@TranKey,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)T(2,@FdBank1,*)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
+T(2,@FdAdjudicateDate,*)
+T(2,@FdBankCount,*)
+T(3,@TranKeyHelp,C:異動;D:刪除))
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(NOBUTTON,CLOSEY)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,刪除)
+
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L8R33.dec"/>
+! 宣告Rim欲傳送的欄位1
+! 欄位名稱即為後端在titaVo get值時的KEY
+! 要注意欄為型態跟長度
+! 宣告Rim欲傳送的欄位
+#RimUkey=X,32,S
+! Rim L8R33.java
+#RimL8r33=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r33,L8R33)
+S(L8R33,1,#RimUkey)
+R(1,L8R33)
+T(2,@TranKey,#L8r33TranKey)
+T(2,@CustId,#L8r33CustId)
+T(2,@SubmitKey,#L8r33SubmitKey)
+E(0,@ApplyDate,#L8r33ApplyDate)
+E(0,@AdjudicateDate,#L8r33AdjudicateDate)
+E(0,@BankCount,#L8r33BankCount)
+T(2,@Bank1,#L8r33Bank1)
+T(2,@Bank2,#L8r33Bank2)
+T(2,@Bank3,#L8r33Bank3)
+T(2,@Bank4,#L8r33Bank4)
+T(2,@Bank5,#L8r33Bank5)
+T(2,@Bank6,#L8r33Bank6)
+T(2,@Bank7,#L8r33Bank7)
+T(2,@Bank8,#L8r33Bank8)
+T(2,@Bank9,#L8r33Bank9)
+T(2,@Bank10,#L8r33Bank10)
+T(2,@Bank11,#L8r33Bank11)
+T(2,@Bank12,#L8r33Bank12)
+T(2,@Bank13,#L8r33Bank13)
+T(2,@Bank14,#L8r33Bank14)
+T(2,@Bank15,#L8r33Bank15)
+T(2,@Bank16,#L8r33Bank16)
+T(2,@Bank17,#L8r33Bank17)
+T(2,@Bank18,#L8r33Bank18)
+T(2,@Bank19,#L8r33Bank19)
+T(2,@Bank20,#L8r33Bank20)
+T(2,@Bank21,#L8r33Bank21)
+T(2,@Bank22,#L8r33Bank22)
+T(2,@Bank23,#L8r33Bank23)
+T(2,@Bank24,#L8r33Bank24)
+T(2,@Bank25,#L8r33Bank25)
+T(2,@Bank26,#L8r33Bank26)
+T(2,@Bank27,#L8r33Bank27)
+T(2,@Bank28,#L8r33Bank28)
+T(2,@Bank29,#L8r33Bank29)
+T(2,@Bank30,#L8r33Bank30)
+T(2,@BankX1,#L8r33BankX1)
+T(2,@BankX2,#L8r33BankX2)
+T(2,@BankX3,#L8r33BankX3)
+T(2,@BankX4,#L8r33BankX4)
+T(2,@BankX5,#L8r33BankX5)
+T(2,@BankX6,#L8r33BankX6)
+T(2,@BankX7,#L8r33BankX7)
+T(2,@BankX8,#L8r33BankX8)
+T(2,@BankX9,#L8r33BankX9)
+T(2,@BankX10,#L8r33BankX10)
+T(2,@BankX11,#L8r33BankX11)
+T(2,@BankX12,#L8r33BankX12)
+T(2,@BankX13,#L8r33BankX13)
+T(2,@BankX14,#L8r33BankX14)
+T(2,@BankX15,#L8r33BankX15)
+T(2,@BankX16,#L8r33BankX16)
+T(2,@BankX17,#L8r33BankX17)
+T(2,@BankX18,#L8r33BankX18)
+T(2,@BankX19,#L8r33BankX19)
+T(2,@BankX20,#L8r33BankX20)
+T(2,@BankX21,#L8r33BankX21)
+T(2,@BankX22,#L8r33BankX22)
+T(2,@BankX23,#L8r33BankX23)
+T(2,@BankX24,#L8r33BankX24)
+T(2,@BankX25,#L8r33BankX25)
+T(2,@BankX26,#L8r33BankX26)
+T(2,@BankX27,#L8r33BankX27)
+T(2,@BankX28,#L8r33BankX28)
+T(2,@BankX29,#L8r33BankX29)
+T(2,@BankX30,#L8r33BankX30)
+E(0,@OutJcicTxtDate,#L8r33OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r33TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 調Rim相關 結束
+
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@T(3,@TranKeyX,)
+V(H,#TranKeyHelp)
+C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@ApplyDate,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
+T(F,@Bank1,1)T(F,@Bank2,1)T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
+T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
+T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
+T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)
+T(2,@FdApplyDate,*)T(2,@FdAdjudicateDate,*)T(2,@FdBankCount,*),$)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
+T(F,@Bank1,1)T(F,@Bank2,1)T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
+T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
+T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
+T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)
+T(2,@FdAdjudicateDate,*)T(2,@FdBankCount,*)T(2,@FdBank1,*),$)
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@AdjudicateDate,0)T(F,@BankCount,0)
+T(F,@Bank1,0)T(F,@Bank2,0)T(F,@Bank3,0)T(F,@Bank4,0)T(F,@Bank5,0)T(F,@Bank6,0)T(F,@Bank7,0)T(F,@Bank8,0)T(F,@Bank9,0)T(F,@Bank10,0)
+T(F,@Bank11,0)T(F,@Bank12,0)T(F,@Bank13,0)T(F,@Bank14,0)T(F,@Bank15,0)T(F,@Bank16,0)T(F,@Bank17,0)T(F,@Bank18,0)
+T(F,@Bank19,0)T(F,@Bank20,0)T(F,@Bank21,0)T(F,@Bank22,0)T(F,@Bank23,0)T(F,@Bank24,0)T(F,@Bank25,0)T(F,@Bank26,0)
+T(F,@Bank27,0)T(F,@Bank28,0)T(F,@Bank29,0)T(F,@Bank30,0)
+T(2,@FdAdjudicateDate, )T(2,@FdBankCount, )T(2,@FdBank1, ),$)
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@AdjudicateDate,0)T(F,@BankCount,0)
+T(F,@Bank1,0)T(F,@Bank2,0)T(F,@Bank3,0)T(F,@Bank4,0)T(F,@Bank5,0)T(F,@Bank6,0)T(F,@Bank7,0)T(F,@Bank8,0)T(F,@Bank9,0)T(F,@Bank10,0)
+T(F,@Bank11,0)T(F,@Bank12,0)T(F,@Bank13,0)T(F,@Bank14,0)T(F,@Bank15,0)T(F,@Bank16,0)T(F,@Bank17,0)T(F,@Bank18,0)
+T(F,@Bank19,0)T(F,@Bank20,0)T(F,@Bank21,0)T(F,@Bank22,0)T(F,@Bank23,0)T(F,@Bank24,0)T(F,@Bank25,0)T(F,@Bank26,0)
+T(F,@Bank27,0)T(F,@Bank28,0)T(F,@Bank29,0)T(F,@Bank30,0)
+T(2,@FdAdjudicateDate, )T(2,@FdBankCount, ),$)
+
+#TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
+
+![債務人IDN]
+#CustId=X,10,L
+
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
+
+#CustIdX=x,100,L
+
+![債權金融機構代號]
+#SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
+
+
+!調解申請日
+#ApplyDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey,D,T(2,@ApplyDate,#L8r33ApplyDate),$)
+D(8)
+@V(7)A(DATE,0,#ApplyDate)
+
+!更生方案認可裁定日
+#AdjudicateDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@AdjudicateDate,#L8r33AdjudicateDate),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,S,$)
+D(8)
+@V(7)A(DATE,0,#AdjudicateDate)
+
+!更生債權金融機構家數
+#BankCount=M,2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@BankCount,#L8r33BankCount),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,S,$)
+@V(5,1,30)
+
+
+!債權金融機構代號1~30
+#Bank0=x,3,L
+T(2,1)
+
+#Bank1=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Bank1,#L8r33Bank1),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,S,$)
+@T(3,@BankX1,)V(NL)V(7)
+#RimL8r011=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
+IF(#Bank1=="",S,$)
+T(2,@RimJcicBankCode,#Bank1)
+RESET_RIM(#RimL8r011,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankX1,#L8r01JcicBankName)
+
+!債權金融機構代號中文名稱
+#BankX1=X,80,L
+
+##loop{times:29,i:2,j:1}
+
+#Bank{i}=X,3,I
+IF(#Bank{j}!="",$,S)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Bank{i},#L8r33Bank{i}),$)
+C(5,#TranKey,D,T(2,@BankX{i},#L8r33BankX{i}),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,S,$)
+@T(3,@BankX{i},)V(NL)
+
+#RimL8r01{i}=X,1,S
+IF(#Bank{i}=="",S,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
+T(2,@RimJcicBankCode,#Bank{i})
+RESET_RIM(#RimL8r01{i},L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankX{i},#L8r01JcicBankName)
+
+!債權金融機構代號中文名稱
+#BankX{i}=X,80,L
+C(4,#Bank{i},S,s)
+##end
+
+!轉JCIC文字檔日期
+#OutJcicTxtDate=D,7,L
+
+! 流水號
+#Ukey=X,32,S
+
+#RPTFG=X,1,S
+E(0,0) 
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8332 ----------
+<sub type="FORM" name="L8332">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8332,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8332] 前置調解結案通知資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey
+#TranKey_Tmp
+#CustId
+#SubmitKey
+#ApplyDate
+#AdjudicateDate
+#BankCount
+#Bank1
+#Bank2
+#Bank3
+#Bank4
+#Bank5
+#Bank6
+#Bank7
+#Bank8
+#Bank9
+#Bank10
+#Bank11
+#Bank12
+#Bank13
+#Bank14
+#Bank15
+#Bank16
+#Bank17
+#Bank18
+#Bank19
+#Bank20
+#Bank21
+#Bank22
+#Bank23
+#Bank24
+#Bank25
+#Bank26
+#Bank27
+#Bank28
+#Bank29
+#Bank30
+#OutJcicTxtDate
+#Ukey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8332^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
+<include src="ROM.icf::L8R33.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
+</sub>
+
+<sub type="PART" name="L8332" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8332]                                 債務人繳款資料檔案"],
+[#<->#,"案件編號"],
+[#<->#,"統一編號"],
+["借款人戶號"],
+["核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

@@ -963,7 +963,7 @@ T(2,#CurrencyCode)
 
 !可使用額度
 #Available=+m,14.2,S
-E(0,#L2r05LineAmt-#L2r05UtilBal+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
+E(0,#L2r05AvailableAmt+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 
 
 #AvailableX=X,22,S

@@ -323,6 +323,10 @@ public class L8320 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ062 = sJcicZ062Service.ukeyFirst(iKey, titaVo);
+			JcicZ062 uJcicZ0622 = new JcicZ062();
+			uJcicZ0622 = sJcicZ062Service.holdById(iJcicZ062.getJcicZ062Id(), titaVo);
 			iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id);
 			if (iJcicZ062 == null) {
 				throw new LogicException("E0008", "");
@@ -330,6 +334,29 @@ public class L8320 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ062 oldJcicZ0622 = (JcicZ062) iDataLog.clone(uJcicZ0622);
+			uJcicZ0622.setCompletePeriod(iCompletePeriod);
+			uJcicZ0622.setPeriod(iPeriod);
+			uJcicZ0622.setRate(iRate);
+			uJcicZ0622.setExpBalanceAmt(iExpBalanceAmt);
+			uJcicZ0622.setCashBalanceAmt(iCashBalanceAmt);
+			uJcicZ0622.setCreditBalanceAmt(iCreditBalanceAmt);
+			uJcicZ0622.setChaRepayAmt(iChaRepayAmt);
+			uJcicZ0622.setChaRepayAgreeDate(iChaRepayAgreeDate);
+			uJcicZ0622.setChaRepayViewDate(iChaRepayViewDate);
+			uJcicZ0622.setChaRepayEndDate(iChaRepayEndDate);
+			uJcicZ0622.setChaRepayFirstDate(iChaRepayFirstDate);
+			uJcicZ0622.setPayAccount(iPayAccount);
+			uJcicZ0622.setPostAddr(iPostAddr);
+			uJcicZ0622.setMonthPayAmt(iMonthPayAmt);
+			uJcicZ0622.setGradeType(iGradeType);
+			uJcicZ0622.setPeriod2(iPeriod2);
+			uJcicZ0622.setRate2(iRate2);
+			uJcicZ0622.setMonthPayAmt2(iMonthPayAmt2);
+			uJcicZ0622.setTranKey(iTranKey);
+			uJcicZ0622.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ062Log> dJcicLogZ062 = null;
 			dJcicLogZ062 = sJcicZ062LogService.ukeyEq(iJcicZ062.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ062 == null) {
@@ -368,6 +395,8 @@ public class L8320 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0622, uJcicZ0622);
+			iDataLog.exec();
 		default:
 			break;
 		}

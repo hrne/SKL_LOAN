@@ -30,28 +30,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8317")
 @Scope("prototype")
 /**
@@ -289,6 +267,10 @@ public class L8317 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ056 = sJcicZ056Service.ukeyFirst(iKey, titaVo);
+			JcicZ056 uJcicZ0562 = new JcicZ056();
+			uJcicZ0562 = sJcicZ056Service.holdById(iJcicZ056.getJcicZ056Id(), titaVo);
 			iJcicZ056 = sJcicZ056Service.findById(iJcicZ056Id);
 			if (iJcicZ056 == null) {
 				throw new LogicException("E0008", "");
@@ -296,6 +278,22 @@ public class L8317 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ056 oldJcicZ0562 = (JcicZ056) iDataLog.clone(uJcicZ0562);
+			uJcicZ0562.setTranKey(iTranKey);
+			uJcicZ0562.setYear(iYear);
+			uJcicZ0562.setCourtDiv(iCourtDiv);
+			uJcicZ0562.setCourtCaseNo(iCourtCaseNo);
+			uJcicZ0562.setApprove(iApprove);
+			uJcicZ0562.setOutstandAmt(iOutstandAmt);
+			uJcicZ0562.setSubAmt(iSubAmt);
+			uJcicZ0562.setClaimStatus1(iClaimStatus1);
+			uJcicZ0562.setSaveDate(iSaveDate);
+			uJcicZ0562.setClaimStatus2(iClaimStatus2);
+			uJcicZ0562.setSaveEndDate(iSaveEndDate);
+			uJcicZ0562.setAdminName(iAdminName);
+			uJcicZ0562.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ056Log> dJcicLogZ056 = null;
 			dJcicLogZ056 = sJcicZ056LogService.ukeyEq(iJcicZ056.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ056 == null) {
@@ -328,6 +326,8 @@ public class L8317 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0562, uJcicZ0562);
+			iDataLog.exec();
 		default:
 			break;
 		}

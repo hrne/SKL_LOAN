@@ -31,17 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8318")
 @Scope("prototype")
@@ -195,6 +184,10 @@ public class L8318 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ060 = sJcicZ060Service.ukeyFirst(iKey, titaVo);
+			JcicZ060 uJcicZ0602 = new JcicZ060();
+			uJcicZ0602 = sJcicZ060Service.holdById(iJcicZ060.getJcicZ060Id(), titaVo);
 			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id);
 			if (iJcicZ060 == null) {
 				throw new LogicException("E0008", "");
@@ -202,6 +195,12 @@ public class L8318 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ060 oldJcicZ0602 = (JcicZ060) iDataLog.clone(uJcicZ0602);
+			uJcicZ0602.setTranKey(iTranKey);
+			uJcicZ0602.setYM(iYM);
+			uJcicZ0602.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ060Log> dJcicLogZ060 = null;
 			dJcicLogZ060 = sJcicZ060LogService.ukeyEq(iJcicZ060.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ060 == null) {
@@ -223,6 +222,8 @@ public class L8318 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0602, uJcicZ0602);
+			iDataLog.exec();
 		default:
 			break;
 		}

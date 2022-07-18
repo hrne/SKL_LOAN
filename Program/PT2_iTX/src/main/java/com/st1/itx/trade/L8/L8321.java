@@ -167,6 +167,10 @@ public class L8321 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ063 = sJcicZ063Service.ukeyFirst(iKey, titaVo);
+			JcicZ063 uJcicZ0632 = new JcicZ063();
+			uJcicZ0632 = sJcicZ063Service.holdById(iJcicZ063.getJcicZ063Id(), titaVo);
 			iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id);
 			if (iJcicZ063 == null) {
 				throw new LogicException("E0008", "");
@@ -174,6 +178,13 @@ public class L8321 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ063 oldJcicZ0632 = (JcicZ063) iDataLog.clone(uJcicZ0632);
+			uJcicZ0632.setClosedDate(iClosedDate);
+			uJcicZ0632.setClosedResult(iClosedResult);
+			uJcicZ0632.setTranKey(iTranKey);
+			uJcicZ0632.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ063Log> dJcicLogZ063 = null;
 			dJcicLogZ063 = sJcicZ063LogService.ukeyEq(iJcicZ063.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ063 == null) {
@@ -196,6 +207,8 @@ public class L8321 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0632, uJcicZ0632);
+			iDataLog.exec();
 		default:
 			break;
 		}

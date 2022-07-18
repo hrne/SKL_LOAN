@@ -33,18 +33,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8327")
 @Scope("prototype")
 /**
@@ -159,6 +147,7 @@ public class L8327 extends TradeBuffer {
 			if (uJcicZ447 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ447 oldJcicZ447 = (JcicZ447) iDataLog.clone(uJcicZ447);
 			uJcicZ447.setTranKey(iTranKey);
 			uJcicZ447.setCivil323Amt(iCivil323Amt);
 			uJcicZ447.setTotalAmt(iTotalAmt);
@@ -169,7 +158,6 @@ public class L8327 extends TradeBuffer {
 			uJcicZ447.setMonthPayAmt(iMonthPayAmt);
 			uJcicZ447.setPayAccount(iPayAccount);
 			uJcicZ447.setOutJcicTxtDate(0);
-			JcicZ447 oldJcicZ447 = (JcicZ447) iDataLog.clone(uJcicZ447);
 			try {
 				sJcicZ447Service.update(uJcicZ447, titaVo);
 			} catch (DBException e) {
@@ -179,6 +167,10 @@ public class L8327 extends TradeBuffer {
 			iDataLog.exec();
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ447 = sJcicZ447Service.ukeyFirst(iKey, titaVo);
+			JcicZ447 uJcicZ4472 = new JcicZ447();
+			uJcicZ4472 = sJcicZ447Service.holdById(iJcicZ447.getJcicZ447Id(), titaVo);
 			iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id);
 			if (iJcicZ447 == null) {
 				throw new LogicException("E0008", "");
@@ -186,6 +178,19 @@ public class L8327 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ447 oldJcicZ4472 = (JcicZ447) iDataLog.clone(uJcicZ4472);
+			uJcicZ4472.setTranKey(iTranKey);
+			uJcicZ4472.setCivil323Amt(iCivil323Amt);
+			uJcicZ4472.setTotalAmt(iTotalAmt);
+			uJcicZ4472.setSignDate(iSignDate);
+			uJcicZ4472.setFirstPayDate(iFirstPayDate);
+			uJcicZ4472.setPeriod(iPeriod);
+			uJcicZ4472.setRate(iRate);
+			uJcicZ4472.setMonthPayAmt(iMonthPayAmt);
+			uJcicZ4472.setPayAccount(iPayAccount);
+			uJcicZ4472.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ447Log> dJcicLogZ447 = null;
 			dJcicLogZ447 = sJcicZ447LogService.ukeyEq(iJcicZ447.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ447 == null) {
@@ -214,6 +219,8 @@ public class L8327 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ4472, uJcicZ4472);
+			iDataLog.exec();
 		default:
 			break;
 		}

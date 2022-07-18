@@ -68,6 +68,25 @@ BEGIN
       WHERE "TRXCRC" = 0
         AND "LMSACN" != 0
     )
+    , txRawData AS (
+      SELECT DISTINCT
+           , TRXDAT
+           , TRXNMT
+           , LMSACN
+      FROM LA$TRXP
+    )
+    , txData AS (
+      SELECT TRXDAT
+           , TRXNMT
+           , LMSACN
+           , ROW_NUMBER()
+             OVER (
+              PARTITION BY TRXDAT
+                         , TRXNMT
+              ORDER BY LMSACN
+             ) AS "Seq"
+      FROM txRawData
+    )
     SELECT S."TRXDAT"                     AS "RelDy"               -- 登放日期 Decimald 8 0
           ,'0000999999'
           -- 2021-11-30 修改 只紀錄TRXNMT
@@ -102,8 +121,10 @@ BEGIN
              WHEN 4 -- 被沖正
              THEN 2 -- 被沖正(隔日訂正)
            ELSE 0 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0
-          ,NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0)
-                                          AS "CustNo"              -- 戶號 DECIMAL 7 0
+          ,CASE
+             WHEN NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0) != 0
+             THEN NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0)
+           ELSE txData.LMSACN END         AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,NVL(S."LMSAPN",0)              AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,NVL(S."LMSASQ",0)              AS "BormNo"              -- 撥款序號 DECIMAL 3 0
           ,NVL(S."RecordNo",'')           AS "RvNo"                -- 銷帳編號 VARCHAR2 30 0
@@ -321,6 +342,9 @@ BEGIN
                       AND tempTRXP."TRXNMT" = S."TRXNMT"
                       AND tempTRXP."TxSeq" = 1
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S."TRXMEM"
+    LEFT JOIN txData ON txData.TRXDAT = S.TRXDAT
+                    AND txData.TRXNMT = S.TRXNMT
+                    AND txData."Seq" = 1
     ;
 
     -- 記錄寫入筆數

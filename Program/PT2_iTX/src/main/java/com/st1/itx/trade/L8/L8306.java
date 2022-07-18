@@ -33,28 +33,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8306")
 @Scope("prototype")
 /**
@@ -162,7 +140,12 @@ public class L8306 extends TradeBuffer {
 			iDataLog.setEnv(titaVo, oldJcicZ045, uJcicZ045);
 			iDataLog.exec();
 			break;
+			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ045 = sJcicZ045Service.ukeyFirst(iKey, titaVo);
+			JcicZ045 uJcicZ0452 = new JcicZ045();
+			uJcicZ0452 = sJcicZ045Service.holdById(iJcicZ045.getJcicZ045Id(), titaVo);
 			iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id);
 			if (iJcicZ045 == null) {
 				throw new LogicException("E0006", "");
@@ -170,6 +153,11 @@ public class L8306 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			JcicZ045 oldJcicZ0452 = (JcicZ045) iDataLog.clone(uJcicZ0452);
+			uJcicZ0452.setTranKey(iTranKey);
+			uJcicZ0452.setAgreeCode(iAgreeCode);
+			uJcicZ0452.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ045Log> dJcicLogZ045 = null;
 			dJcicLogZ045 = sJcicZ045LogService.ukeyEq(iJcicZ045.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ045 == null) {
@@ -191,6 +179,8 @@ public class L8306 extends TradeBuffer {
 					throw new LogicException("E0006", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0452, uJcicZ0452);
+			iDataLog.exec();
 		default:
 			break;
 		}
