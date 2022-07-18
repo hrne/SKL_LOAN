@@ -2,6 +2,8 @@ package com.st1.itx.trade.L9;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +72,7 @@ public class L9136Report extends MakeReport {
 		this.print(-7, 3, "主管卡使用日");
 		this.print(-7, 28, "戶  號");
 		this.print(-7, 43, "戶  名");
-		this.print(-7, 54, "核准號碼");
+		this.print(-7, 55, "核准號碼");
 		this.print(-7, 69, "押品別");
 		this.print(-7, 86, "押品號碼");
 		this.print(-7, 100, "更正項目");
@@ -96,12 +98,13 @@ public class L9136Report extends MakeReport {
 	 * @param iAcDate     會計日
 	 */
 
-	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9136Result, int isAcDate,
-			int ieAcDate) throws LogicException {
+	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9136Result,
+			List<Map<String, String>> l9136Result2, int isAcDate, int ieAcDate) throws LogicException {
 
 		this.info("L9136Report exec");
 
 		List<Map<String, String>> l9136List = l9136Result;
+		List<Map<String, String>> l9136List2 = l9136Result2;
 
 		this.isAcDate = String.valueOf(isAcDate);
 		this.ieAcDate = String.valueOf(ieAcDate);
@@ -125,12 +128,60 @@ public class L9136Report extends MakeReport {
 
 				String[] tmpNewContent = r.get("New").replaceAll("\\[", "").replaceAll("\\]", "")
 						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
+				
+				String[] word = { "最後更新日期時間","最後更新人員" };
+					
+				List<String> tmpWord = new ArrayList<String>(Arrays.asList(word));
+				List<String> tmp1 = new ArrayList<String>(Arrays.asList(tmpUpdateItem));
+				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
+				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
+								
+//				this.info("======"+tmp1.size());
+//				this.info("tmp1======"+tmp1.toString());
+//				this.info("tmp2======"+tmp2.toString());
+//				this.info("tmp3======"+tmp3.toString());
+				
+				for(int i = 0 ;i<tmp1.size();i++) {					
+					for(int j = 0 ;j<tmpWord.size();j++) {
+						//排除不需要的顯示的字串
+						if (tmp1.get(i).toString().indexOf(tmpWord.get(j).toString()) == 0) {
+						
+							tmp1.remove(i);
+							tmp2.remove(i);
+							tmp3.remove(i);
+							break;
+						}
+					}
+				}
+		
+				
 
-				for (int i = 0; i < tmpUpdateItem.length; i++) {
+				for (int i = 0; i < tmp1.size(); i++) {
 
-					report(r, tmpUpdateItem[i], tmpOldContent[i], tmpNewContent[i]);
+					report(r, tmp1.get(i), tmp2.get(i), tmp3.get(i), 1);
+
+					// 超過40行 換新頁
+					if (this.NowRow >= 40) {
+
+						this.print(2, this.getMidXAxis(), this.nextPageText, "C");
+						this.newPage();
+
+					}
 
 				}
+
+			}
+
+		}
+
+		// 找訂正
+		if (l9136List2 != null && l9136List2.size() != 0) {
+
+			for (Map<String, String> r : l9136List2) {
+
+				count++;
+
+				report(r, r.get("Item"), r.get("Old"), r.get("New"), 2);
 
 				// 超過40行 換新頁
 				if (this.NowRow >= 40) {
@@ -142,13 +193,15 @@ public class L9136Report extends MakeReport {
 
 			}
 
-			if (this.getNowPage() > 0 && count == l9136List.size()) {
-				ptfg = 9;
+		}
 
-				this.print(-45, this.getMidXAxis(), this.endText, "C");
-			}
+		if (this.getNowPage() > 0 && count == l9136List.size() + l9136List2.size()) {
+			ptfg = 9;
 
-		} else {
+			this.print(-45, this.getMidXAxis(), this.endText, "C");
+		}
+
+		if (l9136List == null && l9136List.size() == 0 && l9136List2 == null && l9136List2.size() == 0) {
 			this.print(1, 1, "本日無資料");
 		}
 
@@ -163,34 +216,34 @@ public class L9136Report extends MakeReport {
 	 * @param tmpUpdateItem 更改項目名稱
 	 * @param tmpOldContent 更改前內容
 	 * @param tmpNewContent 更改後內容
+	 * @param dataSource    資料來源
 	 */
-	private void report(Map<String, String> r, String tmpUpdateItem, String tmpOldContent, String tmpNewContent)
-			throws LogicException {
-
-//		this.print(-7, 3, "主管卡使用日");
-//		this.print(-7, 20, "戶  號");
-//		this.print(-7, 36, "戶  名");
-//		this.print(-7, 48, "核准號碼");
-//		this.print(-7, 64, "押品別");
-//		this.print(-7, 86, "押品號碼");
-//		this.print(-7, 100, "更正項目");
-//		this.print(-7, 115, "更  改  前  內  容");
-//		this.print(-7, 145, "更  改  後  內  容");
-//		this.print(-7, 175, "經辦");
-//		this.print(-7, 186, "授權主管");
-//		this.print(-7, 200, "備註");
-
-		List<Map<String, String>> l9136findSupNo = null;
-
-		try {
-			l9136findSupNo = l9136ServiceImpl.findSupNo(titaVo, r.get("TxSeq").toString());
-		} catch (Exception e) {
-			this.info("L9136ServiceImpl.findSupNo error = " + e.toString());
-		}
+	private void report(Map<String, String> r, String tmpUpdateItem, String tmpOldContent, String tmpNewContent,
+			int dataSource) throws LogicException {
 
 		// 授權主管
-		String supNoName = l9136findSupNo.get(0).get("SupNoName");
-		String txNo = String.valueOf(Integer.valueOf(l9136findSupNo.get(0).get("TxSeq")));
+		String supNoName = "";
+		// 交易序號
+		String txNo = "";
+
+		if (dataSource == 1) {
+
+			List<Map<String, String>> l9136findSupNo = null;
+
+			try {
+				l9136findSupNo = l9136ServiceImpl.findSupNo(titaVo, r.get("TxSeq").toString());
+			} catch (Exception e) {
+				this.info("L9136ServiceImpl.findSupNo error = " + e.toString());
+			}
+
+			supNoName = l9136findSupNo.get(0).get("SupNoName");
+			txNo = String.valueOf(Integer.valueOf(l9136findSupNo.get(0).get("TxSeq")));
+
+		} else {
+
+			supNoName = r.get("SupNoName");
+			txNo = String.valueOf(Integer.valueOf(r.get("TxSeq")));
+		}
 
 		// 主管卡使用日
 		this.print(1, 1, showRocDate(r.get("AcDate"), 1) + "-");
@@ -208,33 +261,35 @@ public class L9136Report extends MakeReport {
 		this.print(0, 43, r.get("CustName").length() > 5 ? r.get("CustName").substring(0, 6) : r.get("CustName"));
 
 		// 核准號碼
-		this.print(0, 55, "1122383");
-//		this.print(0, 55, r.get("ApproveNo"));
+//		this.print(0, 55, "1122383");
+		this.print(0, 56, r.get("ApproveNo"));
 
 		// 押品別
-		this.print(0, 66, 1 + "  " + 1 + "  " + "房地－住宅");
-//		this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
+//		this.print(0, 66, 1 + "  " + 1 + "  " + "房地－住宅");
+		this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 
 		// 押品號碼
-		this.print(0, 87, "1705394");
-//		this.print(0, 87, r.get("ClNo"));
+//		this.print(0, 87, "1705394");
+		this.print(0, 87, r.get("ClNo"));
 
 		// 更正項目
-		this.print(0, 98, fillUp(tmpUpdateItem, 16, ".", "R"));
+		this.print(0, 98, tmpUpdateItem.trim().length() == 0 ? " " : fillUp(tmpUpdateItem, 16, ".", "R"));
 
 		// 更改前內容
-		this.print(0, 119, String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
-				+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent);
+		this.print(0, 119,
+				tmpNewContent.trim().length() == 0 ? " "
+						: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
+								+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent);
 
 		// 更改後內容
-		this.print(0, 150, tmpNewContent);
+		this.print(0, 150, tmpNewContent.trim().length() == 0 ? " " : tmpNewContent);
 
 		// 經辦
 		this.print(0, 175, r.get("Name"));
 
 		// 授權主管
-//		this.print(0, 186, supNoName);
-		this.print(0, 186, "1234567");
+		this.print(0, 186, supNoName);
+//		this.print(0, 186, "1234567");
 
 	}
 

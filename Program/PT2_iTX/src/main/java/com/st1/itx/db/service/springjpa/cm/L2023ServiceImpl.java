@@ -112,9 +112,9 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            cdg.\"GuaRelItem\"";
 		sql += "        ELSE";
 		sql += "            n'**與授信戶關係未登錄**'";
-		sql += "    END AS \"Relation\",";
-		sql += "    null AS \"ClCode1\",";
-		sql += "    null AS \"ClCode2\",";
+		sql += "    END AS \"Relation\", ";
+		sql += "    null AS \"ClCode1\", ";
+		sql += "    null AS \"ClCode2\", ";
 		sql += "    null AS \"ClNo\",";
 		sql += "    CASE";
 		sql += "        WHEN nvl(fsr.\"RelCode\", ' ') != ' ' THEN";

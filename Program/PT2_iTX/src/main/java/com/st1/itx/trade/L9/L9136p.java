@@ -52,7 +52,8 @@ public class L9136p extends TradeBuffer {
 
 		L9136Report.setParentTranCode(parentTranCode);
 
-		List<Map<String, String>> L9136List = null;
+		List<Map<String, String>> l9136List = null;
+		List<Map<String, String>> l9136List2 = null;
 
 		// 帳務日(西元)
 //		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
@@ -64,7 +65,8 @@ public class L9136p extends TradeBuffer {
 
 		try {
 
-			L9136List = l9136ServiceImpl.findAll(titaVo);
+			l9136List = l9136ServiceImpl.findAll(titaVo);
+			l9136List2 = l9136ServiceImpl.findAll2(titaVo);
 
 		} catch (Exception e) {
 
@@ -72,10 +74,10 @@ public class L9136p extends TradeBuffer {
 
 		}
 
-		if (L9136List != null && !L9136List.isEmpty()) {
+		if ((l9136List != null && !l9136List.isEmpty()) || (l9136List2 != null && !l9136List2.isEmpty())) {
 
 			this.info("active L9136report data detail");
-			L9136Report.exec(titaVo,L9136List, acDateStart,acDateEnd);
+			L9136Report.exec(titaVo,l9136List,l9136List2, acDateStart,acDateEnd);
 			infoNotification = "L9136 檔案資料變更日報表";
 
 

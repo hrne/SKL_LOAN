@@ -35,7 +35,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		this.info("L9136 ServiceImpl");
+		this.info("L9136 ServiceImpl findAll");
 
 		int isAcDate = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
 		int ieAcDate = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
@@ -47,14 +47,14 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,T.\"FacmNo\" AS \"FacmNo\"";
 		sql += "		  ,T.\"BormNo\" AS \"BormNo\"";
 		sql += "		  ,SUBSTR(cm.\"CustName\",0,5) AS \"CustName\"";
-		sql += "		  ,Cl.\"ApproveNo\" AS \"ApproveNo\"";
-		sql += "		  ,Cl.\"ClCode1\" AS \"ClCode1\"";
-		sql += "		  ,Cl.\"ClCode2\" AS \"ClCode2\"";
-		sql += "		  ,CC.\"Item\" AS \"ClName\"";
-		sql += "		  ,Cl.\"ClNo\" AS \"ClNo\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ApproveNo\") AS \"ApproveNo\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ClCode1\") AS \"ClCode1\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ClCode2\") AS \"ClCode2\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',CC.\"Item\") AS \"ClName\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ClNo\") AS \"ClNo\"";
 		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) AS \"Item\"";
-		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) AS \"Old\"";
-		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].o' WITH WRAPPER) AS \"New\"";
+		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].o' WITH WRAPPER) AS \"Old\"";
+		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
 		sql += "	FROM \"TxDataLog\" T";
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
@@ -67,6 +67,75 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	WHERE T.\"TxDate\" BETWEEN :sAcDate AND :eAcDate";
 		sql += "	  AND JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) IS NOT NULL";
 		sql += "	  AND T.\"TlrNo\" <> 'E-LOAN'";
+		sql += "	  AND T.\"CustNo\" > 0";
+		sql += "	ORDER BY T.\"TxDate\" ASC";
+		sql += "			,T.\"TlrNo\" ASC";
+		sql += "			,T.\"TxSeq\" ASC";
+
+
+		this.info("L9136ServiceImpl sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("sAcDate", isAcDate);
+		query.setParameter("eAcDate", ieAcDate);
+		return this.convertToMap(query);
+	}
+
+	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
+		this.info("L9136 ServiceImpl findAll2");
+
+		int isAcDate = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
+		int ieAcDate = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
+
+		String sql = " "; 
+		sql += "	WITH \"tmpTxRecord\" AS(";
+		sql += "		SELECT T.\"Entdy\" AS \"TxDate\"";
+		sql += "			  ,T.\"TxSeq\"";
+		sql += "			  ,TO_NUMBER(SUBSTR(T.\"MrKey\",0,7)) AS \"CustNo\"";
+		sql += "		      ,TO_NUMBER(";
+		sql += "				DECODE( ";
+		sql += "				  SUBSTR(T.\"MrKey\",9,3),'   ','0',";
+		sql += "					NVL(SUBSTR(T.\"MrKey\",9,3),'   '))) AS \"FacmNo\"";
+		sql += "		      ,TO_NUMBER(";
+		sql += "				DECODE( ";
+		sql += "				  SUBSTR(T.\"MrKey\",13,3),'   ','0',";
+		sql += "					NVL(SUBSTR(T.\"MrKey\",13,3),'   '))) AS \"BormNo\"";
+		sql += "		      ,' ' AS \"Item\"";
+		sql += "			  ,' ' AS \"Old\"";
+		sql += "			  ,'訂正' AS \"New\"";
+		sql += "			  ,T.\"TlrNo\"";
+		sql += "			  ,T.\"SupNo\"";
+		sql += "		FROM \"TxRecord\" T";
+		sql += "		WHERE T.\"Hcode\" = 1";
+		sql += "		  AND T.\"Entdy\" BETWEEN :sAcDate AND :eAcDate";
+		sql += "		  AND SUBSTR(T.\"MrKey\",0,7) NOT IN ('0000000','       ')";
+		sql += "	)";
+		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
+		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
+		sql += "		  ,T.\"CustNo\" AS \"CustNo\"";
+		sql += "		  ,T.\"FacmNo\" AS \"FacmNo\"";
+		sql += "		  ,T.\"BormNo\" AS \"BormNo\"";
+		sql += "		  ,SUBSTR(cm.\"CustName\",0,5) AS \"CustName\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ApproveNo\") AS \"ApproveNo\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ClCode1\") AS \"ClCode1\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ClCode2\") AS \"ClCode2\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',CC.\"Item\") AS \"ClName\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',Cl.\"ClNo\") AS \"ClNo\"";
+		sql += "		  ,T.\"Item\" AS \"Item\"";
+		sql += "		  ,T.\"Old\" AS \"Old\"";
+		sql += "		  ,T.\"New\" AS \"New\"";
+		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
+		sql += "		  ,T.\"SupNo\" AS \"SupNoName\"";
+		sql += "	FROM \"tmpTxRecord\" T";
+		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
+		sql += "	LEFT JOIN \"ClFac\" Cl ON Cl.\"CustNo\" = T.\"CustNo\"";
+		sql += "						  AND Cl.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "						  AND Cl.\"MainFlag\" = 'Y'";
+		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'ClCode2' || Cl.\"ClCode1\"";
+		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
+		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
 		sql += "	ORDER BY T.\"TxDate\" ASC";
 		sql += "			,T.\"TlrNo\" ASC";
 		sql += "			,T.\"TxSeq\" ASC";
@@ -80,7 +149,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("eAcDate", ieAcDate);
 		return this.convertToMap(query);
 	}
-
+	
 	
 	public List<Map<String, String>> findSupNo(TitaVo titaVo,String TxNo) throws Exception {
 //		this.info("L9136 findSupNo =" + TxNo);

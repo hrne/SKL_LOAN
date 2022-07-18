@@ -40,7 +40,7 @@ BEGIN
           ;
 
           IF haveRateChange = 0 THEN
-              RETURN "InputLoanBal" * "InputFitRate" * 120 / 360 / 100;
+              RETURN TRUNC("InputLoanBal" * "InputFitRate" * 120 / 360 / 100);
           END IF;
      END;
 

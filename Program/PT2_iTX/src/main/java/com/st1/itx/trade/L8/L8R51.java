@@ -2,8 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -11,10 +9,10 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.MlaundryRecordService;
+import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -27,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L8R51 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8R51.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -39,7 +36,7 @@ public class L8R51 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L8R51 ");
+		this.info("active L8R51 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -47,12 +44,11 @@ public class L8R51 extends TradeBuffer {
 		Long iLogNo = Long.parseLong(titaVo.get("RimLogNo"));
 		// CustNo 非必須 - 純粹查戶名時用，如新增時
 		int iCustNo = parse.stringToInteger(titaVo.get("RimCustNo"));
-		
+
 		MlaundryRecord mMlaundryRecord = sMlaundryRecordService.findById(iLogNo, titaVo);
 		CustMain tCustMain = null;
-		
-		if (mMlaundryRecord != null)
-		{
+
+		if (mMlaundryRecord != null) {
 			this.totaVo.putParam("L8R51RecordDate", mMlaundryRecord.getRecordDate()); // 訪談日期
 			this.totaVo.putParam("L8R51CustNo", mMlaundryRecord.getCustNo()); // 戶號
 			this.totaVo.putParam("L8R51FacmNo", mMlaundryRecord.getFacmNo()); // 額度編號
@@ -67,16 +63,16 @@ public class L8R51 extends TradeBuffer {
 			this.totaVo.putParam("L8R51RepayBank", mMlaundryRecord.getRepayBank()); // 代償銀行
 			this.totaVo.putParam("L8R51Description", mMlaundryRecord.getDescription().replace("$n", "\n")); // 其他說明
 			tCustMain = sCustMainService.custNoFirst(mMlaundryRecord.getCustNo(), mMlaundryRecord.getCustNo(), titaVo);
-		} else if (iCustNo > 0){
+		}
+		if (iCustNo > 0) {
 			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		}
-		
-		if (tCustMain != null)
-		{
+
+		if (tCustMain != null) {
 			this.totaVo.putParam("L8R51CustName", tCustMain.getCustName()); // 戶名
-		} else
-		{
-			throw new LogicException("E0001", "客戶主檔（" + (mMlaundryRecord != null ? mMlaundryRecord.getCustNo() : iCustNo) + "）");
+		} else {
+			throw new LogicException("E0001",
+					"客戶主檔（" + (mMlaundryRecord != null ? mMlaundryRecord.getCustNo() : iCustNo) + "）");
 		}
 
 		this.addList(this.totaVo);

@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * L2018 共同借款人資料查詢
  */
 
-
 @Service("L2018")
 @Scope("prototype")
 /**
@@ -112,14 +111,17 @@ public class L2018 extends TradeBuffer {
 		int lastUpdate = 0;
 		DateFormat df = new SimpleDateFormat("yyyyMMdd");
 		for (FacShareAppl t : lFacShareAppl) {
-
+			String mainFg = "";
 			FacMain tFacMain = facMainService.facmApplNoFirst(t.getApplNo(), titaVo);
 			if (tFacMain == null) {
 				tFacMain = new FacMain();
 			}
 
 			/* 將每筆資料放入Tota的OcList */
-
+//			主核准號碼時顯示修改及刪除按鈕			
+			if (t.getMainApplNo() == t.getApplNo()) {
+				mainFg = "Y";
+			}
 			OccursList occurslist = new OccursList();
 			occurslist.putParam("OOCustNo", t.getCustNo());
 			occurslist.putParam("OOFacmNo", t.getFacmNo());
@@ -140,20 +142,20 @@ public class L2018 extends TradeBuffer {
 				occurslist.putParam("OOCreateDate", "");
 			}
 			occurslist.putParam("OOCreateEmpNo", t.getCreateEmpNo());
-			
+
 			String TlrNo = "";
 			String EmpName = "";
 			CdEmp tCdEmp = new CdEmp();
 
 			if (t.getCreateEmpNo() != null) {
-				TlrNo = t.getCreateEmpNo() ;
+				TlrNo = t.getCreateEmpNo();
 				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
 				if (tCdEmp != null) {
 					EmpName = tCdEmp.getFullname();
 				}
 			}
 			occurslist.putParam("OOCreateEmpName", EmpName);
-			
+
 			if (t.getLastUpdate() != null) {
 				lastUpdate = parse.stringToInteger(df.format(t.getLastUpdate())) - 19110000;
 				occurslist.putParam("OOLastUpdate", lastUpdate);
@@ -161,9 +163,9 @@ public class L2018 extends TradeBuffer {
 				occurslist.putParam("OOLastUpdate", "");
 			}
 			occurslist.putParam("OOLastUpdateEmpNo", t.getLastUpdateEmpNo());
-			
+
 			if (t.getLastUpdateEmpNo() != null) {
-				TlrNo = t.getLastUpdateEmpNo() ;
+				TlrNo = t.getLastUpdateEmpNo();
 				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
 				if (tCdEmp != null) {
 					EmpName = tCdEmp.getFullname();
@@ -171,6 +173,7 @@ public class L2018 extends TradeBuffer {
 			}
 			occurslist.putParam("OOLastUpdateEmpName", EmpName);
 			occurslist.putParam("OOMApplNo", t.getMainApplNo());
+			occurslist.putParam("OOMainFg", mainFg);
 
 			this.totaVo.addOccursList(occurslist);
 		}
