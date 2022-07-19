@@ -211,16 +211,15 @@ BEGIN
          , CM."ClNo"                             AS "ClNo"           -- 擔保品編號
          , NVL(CD2."ClTypeJCIC",' ')             AS "ClTypeJCIC"     -- 擔保品類別
          , CASE
+             WHEN CM."ClCode1" = 2
+                  AND OnlyLandOwner."OwnerId" IS NOT NULL
+             THEN OnlyLandOwner."OwnerId"
              WHEN BuildingOwner."OwnerId"  IS NOT NULL THEN BuildingOwner."OwnerId"
              WHEN LandOwner."OwnerId"      IS NOT NULL THEN LandOwner."OwnerId"
              WHEN BuPublicOwner."OwnerId"  IS NOT NULL THEN BuPublicOwner."OwnerId"
              ELSE ' '
            END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
-         , SUBSTR('00000000' || TRUNC(CASE
-                                        WHEN NVL(CM."EvaAmt",0) = 0 
---                                        THEN NVL(SCLAD."SameClLineAmt",0)
-                                        THEN NVL(CI."SettingAmt",0)     -- 改為使用設定金額
-                                      ELSE NVL(CM."EvaAmt",0) END / 1000), -8)
+         , SUBSTR('00000000' || TRUNC(NVL(CM."EvaAmt",0)  / 1000), -8)
                                                  AS "EvaAmt"            -- 鑑估(總市)值
          , CASE
              WHEN TRUNC(NVL(CM."EvaDate",0) / 100) < 191100 THEN TRUNC(NVL(CM."EvaDate",0) / 100)
@@ -294,6 +293,7 @@ BEGIN
              ELSE SUBSTR('00000000' || TRUNC(NVL(B."ContractPrice",0) / 1000), -8)
            END                                   AS "ContractPrice"     -- 買賣契約價格
          , CASE
+             WHEN TRUNC(NVL(B."ContractPrice",0) / 1000, 0) > 0 AND NVL(B."ContractDate",0) = 0 THEN '0960101'
              WHEN NVL(B."ContractDate",0) = 0 THEN '       '
              WHEN B."ContractDate" < 19110000 THEN SUBSTR('0000000' || B."ContractDate" , -7)
              ELSE SUBSTR('0000000' || (B."ContractDate" - 19110000) , -7)
@@ -417,6 +417,31 @@ BEGIN
                                   AND BuPublicOwner."ClNo"    = CM."ClNo"
                                   AND LandOwner."OwnerId"     IS NULL
                                   AND BuildingOwner."OwnerId" IS NULL
+      LEFT JOIN ( SELECT O."ClCode1"
+                       , O."ClCode2"
+                       , O."ClNo"
+                       , O."OwnerPart"
+                       , O."OwnerTotal"
+                       , C."CustId"  AS "OwnerId"
+                       , ROW_NUMBER()
+                         OVER (
+                          PARTITION BY O."ClCode1"
+                                     , O."ClCode2"
+                                     , O."ClNo"
+                          ORDER BY C."CustId" -- 統編排序取第一個
+                         ) AS "OwnerSeq"
+                  FROM "ClLandOwner" O
+                  LEFT JOIN "ClFac" CF ON CF."ClCode1" = O."ClCode1"
+                                      AND CF."ClCode2" = O."ClCode2"
+                                      AND CF."ClNo" = O."ClNo"
+                  LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
+                  WHERE O."ClCode1" = 2 -- 純土地持有人
+                    AND CF."MainFlag" = 'Y'
+                ) OnlyLandOwner    ON OnlyLandOwner."ClCode1" = CM."ClCode1"
+                                  AND OnlyLandOwner."ClCode2" = CM."ClCode2"
+                                  AND OnlyLandOwner."ClNo"    = CM."ClNo"
+                                  AND OnlyLandOwner."OwnerSeq" = 1 -- 多個持有人時只取一筆
+                                  AND CM."ClCode1" = 2
       LEFT JOIN ClcountData CLC ON CLC."FacmNo" = M."FacmNo"
       LEFT JOIN CllandData  CLL ON CLL."FacmNo" = M."FacmNo"
                                AND CASE
@@ -525,8 +550,8 @@ BEGIN
          , MAX(WK."SettingDate")                 AS "SettingDate"       -- 設定日期
          , MAX(WK."MonthSettingAmt")             AS "MonthSettingAmt"   -- 本行本月設定金額
          , MAX(WK."SettingSeq")                  AS "SettingSeq"        -- 本月設定抵押順位
---         , TRUNC(MAX(WK."LineAmt") * 1.2 / 1000) AS "SettingAmt"        -- 本行累計已設定總金額 = 核准額度 * 1.2 (ref:AS400 LN15M1)
-         , MAX(WK."CiSettingAmt")                AS "SettingAmt"        -- 本行累計已設定總金額
+         , TRUNC(MAX(WK."LineAmt") * 1.2 / 1000) AS "SettingAmt"        -- 本行累計已設定總金額 = 核准額度 * 1.2 (ref:AS400 LN15M1)
+--         , MAX(WK."CiSettingAmt")                AS "SettingAmt"        -- 本行累計已設定總金額
          , MAX(WK."PreSettingAmt")               AS "PreSettingAmt"     -- 其他債權人已設定金額
          , MAX(WK."DispPrice")                   AS "DispPrice"         -- 處分價格
          , MAX(WK."IssueEndDate")                AS "IssueEndDate"      -- 權利到期年月

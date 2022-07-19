@@ -543,7 +543,7 @@ C(5,#TranKey,D,s,$)
 #Ukey=X,32,S
 
 ! 修改時開啟
-IF(#TranKey_Tmp == 2,ALERT(需填寫簽約完成日期與面談日期),S) 
+IF(#TranKey_Tmp == 2,ALERT(需填寫簽約完成日期與面談日期),$) 
 
 
 ! !<儲存>

@@ -84,16 +84,11 @@ BEGIN
     SELECT M."ClActNo"                           AS "MainClActNo"       -- 主要擔保品控制編碼
          , M."LandNo1"                           AS "LandNo1"           -- 地號-前四碼
          , M."LandNo2"                           AS "LandNo2"           -- 地號-後四碼
-         , MAX(CASE
-                 WHEN CF1."MainFlag" = 'Y'
-                 THEN 0
-               ELSE NVL(WK2."Area",0) END)       AS "Area"              -- 土地面積
          , MIN(L."LandSeq")                      AS "LandSeq"
          , MAX(L."LandCode")                     AS "LandCode"
          , MAX(L."LandZoningCode")               AS "LandZoningCode"
          , MAX(L."PostedLandValue")              AS "PostedLandValue" 
          , MAX(L."PostedLandValueYearMonth")     AS "PostedLandValueYearMonth" 
-         , MIN(LandOwner."OwnerId")              AS "OwnerId"
     FROM   "Work_B096_Sum_rawData" M
       LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
                               AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
@@ -123,34 +118,6 @@ BEGIN
                                    AND to_number(SUBSTR(WK2."MainClActNo",4,7)) = CF2."ClNo" 
                                    AND WK2."LandNo1" = M."LandNo1"
                                    AND WK2."LandNo2" = M."LandNo2"
-      -- 土地檔擔保品所有權人ID
-      LEFT JOIN ( SELECT DISTINCT
-                         O."ClCode1"
-                       , O."ClCode2"
-                       , O."ClNo"
-                       , C."CustId"  AS "OwnerId"
-                  FROM "ClLandOwner" O
-                  LEFT JOIN (
-                    SELECT CF3."ClCode1"
-                         , CF3."ClCode2"
-                         , CF3."ClNo"
-                         , CLO."OwnerCustUKey"
-                    FROM "ClFac" CF3
-                    LEFT JOIN "ClFac" CF4 ON CF4."CustNo" = CF3."CustNo"
-                                         AND CF4."FacmNo" = CF3."FacmNo"
-                                         AND CF4."MainFlag" = 'Y'
-                    LEFT JOIN "ClLandOwner" CLO ON CLO."ClCode1" = CF4."ClCode1"
-                                               AND CLO."ClCode2" = CF4."ClCode2"
-                                               AND CLO."ClNo" = CF4."ClNo"
-                    WHERE CF3."MainFlag" != 'Y'
-                      AND CLO."OwnerPart" IS NOT NULL
-                  ) O2 ON O2."ClCode1" = O."ClCode1"
-                      AND O2."ClCode2" = O."ClCode2"
-                      AND O2."ClNo" = O."ClNo"
-                    LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
-                ) LandOwner        ON LandOwner."ClCode1" = CF2."ClCode1"
-                                  AND LandOwner."ClCode2" = CF2."ClCode2"
-                                  AND LandOwner."ClNo"    = CF2."ClNo"
     WHERE  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
       AND  ( M."LandNo1" > 0 OR M."LandNo2" > 0 )
       GROUP BY M."ClActNo" , M."LandNo1" , M."LandNo2"            
@@ -165,7 +132,7 @@ BEGIN
          , M."IrCode"                     AS "IrCode"            -- 段、小段號
          , M."LandNo1"                    AS "LandNo1"           -- 地號-前四碼
          , M."LandNo2"                    AS "LandNo2"           -- 地號-後四碼
-         , NVL(WK."Area",WK2."Area")      AS "Area"              -- 面積
+         , NVL(WK."Area",0)               AS "Area"              -- 面積
          , WK2."LandSeq"                  AS "LandSeq"
          , WK2."LandCode"                 AS "LandCode"
          , WK2."LandZoningCode"           AS "LandZoningCode"
@@ -175,6 +142,39 @@ BEGIN
       LEFT JOIN "ClImm"  CI    ON CI."ClCode1"    = to_number(SUBSTR(M."ClActNo",1,1))
                               AND CI."ClCode2"    = to_number(SUBSTR(M."ClActNo",2,2))
                               AND CI."ClNo"       = to_number(SUBSTR(M."ClActNo",4,7))
+      LEFT JOIN ( SELECT O."ClCode1"
+                       , O."ClCode2"
+                       , O."ClNo"
+                       , L."LandNo1"
+                       , L."LandNo2"
+                       , O."OwnerPart"
+                       , O."OwnerTotal"
+                       , C."CustId"  AS "OwnerId"
+                       , ROW_NUMBER()
+                         OVER (
+                          PARTITION BY O."ClCode1"
+                                     , O."ClCode2"
+                                     , O."ClNo"
+                                     , L."LandNo1"
+                                     , L."LandNo2"
+                          ORDER BY C."CustId" -- 統編排序取第一個
+                         ) AS "OwnerSeq"
+                  FROM "ClLandOwner" O
+                  LEFT JOIN "ClFac" CF ON CF."ClCode1" = O."ClCode1"
+                                      AND CF."ClCode2" = O."ClCode2"
+                                      AND CF."ClNo" = O."ClNo"
+                  LEFT JOIN "ClLand" L ON L."ClCode1" = O."ClCode1"
+                                      AND L."ClCode2" = O."ClCode2"
+                                      AND L."ClNo" = O."ClNo"
+                  LEFT JOIN "CustMain" C  ON  C."CustUKey"  = O."OwnerCustUKey"
+                  WHERE CF."MainFlag" = 'Y'
+                  -- 一個擔保品 && 一個地號 只取一個擔保品提供人
+                ) OnlyOneLandOwner ON OnlyOneLandOwner."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1))
+                                  AND OnlyOneLandOwner."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2))
+                                  AND OnlyOneLandOwner."ClNo"    = to_number(SUBSTR(M."ClActNo",4,7))
+                                  AND OnlyOneLandOwner."LandNo1" = M."LandNo2"
+                                  AND OnlyOneLandOwner."LandNo2" = M."LandNo2"
+                                  AND OnlyOneLandOwner."OwnerSeq" = 1
       LEFT JOIN "Work_B096_Sum" WK ON WK."MainClActNo" = M."ClActNo"
                                      AND WK."LandNo1" = M."LandNo1"
                                      AND WK."LandNo2" = M."LandNo2"
@@ -184,10 +184,7 @@ BEGIN
     WHERE  M."DataYM" =  YYYYMM
       AND  NVL(CI."SettingDate",0) >= 20070701        -- 押品設定日期在９６０７０１之後才要報送 (ref:AS400 LN15M1)
       AND  ( M."LandNo1" > 0 OR M."LandNo2" > 0 )
-
     )
-
-
     SELECT DISTINCT
            YYYYMM                                AS "DataYM"            -- 資料年月                      DECIMAL   6
          , '96'                                  AS "DataType"          -- 資料別                        VARCHAR2  2

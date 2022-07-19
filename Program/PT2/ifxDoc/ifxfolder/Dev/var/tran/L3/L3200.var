@@ -215,18 +215,22 @@ T(3,CdCode.CurrPrecision)
 #CDDEF03=x,26,S
 T(3,CdCode.PayMethod)
 
+#CDDEF04=x,26,S
+T(3,CdCode.RepayType)
+
 #RepayTypeHelpRim=X,1,S
 RESET_RIM(#RepayTypeHelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc)
-!T(2,@RepayTypeHelp,#HelpDesc1)
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2) 
 T(2,@PayMethodHelp,#HelpDesc3) 
+T(2,@RepayTypeHelp,#HelpDesc4)
+T(HELP,@RepayTypeHelp,#RepayTypeHelp,+,01;02;10;12)
 
 #RepayTypeHelp=x,1024,S
-T(3,01:期款;02:部分償還;09:清償違約金;12:催收收回)
+! T(3,01:期款;02:部分償還;09:清償違約金;12:催收收回)
 
 #CurrencyCodeHelp=x,1024,S
 
@@ -953,7 +957,6 @@ V(5,1,#SumRepayAmt)
 C(3,#Precision,0,E(0,#TwRepayAmt),E(0,#UsRepayAmt))
 
 
-
 !催收收回金額
 #FdOvduRepay=X,2,L
 
@@ -979,6 +982,11 @@ C(3,#RepayType,12,s,$)
 IF(#RepayType==1 ||#RepayType==2,$,s)
 HELP(#YNHelp)
 @V(H,#YNHelp)
+IF(#PayFeeFlag=="N",E(0,@SumRepayAmt,#L3r06RepayAmt+#L3r06Shortfall),E(0,@SumRepayAmt,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall))
+E(0,@TwRepayAmt,#SumRepayAmt)
+E(0,@UsRepayAmt,#SumRepayAmt)
+E(0,@TimRepayAmt,#SumRepayAmt)
+
 
 #PayFeeFlagX=X,2,L
 T(3,)T(H,#PayFeeFlag,#YNHelp)

@@ -215,18 +215,22 @@ T(3,CdCode.CurrPrecision)
 #CDDEF03=x,26,S
 T(3,CdCode.PayMethod)
 
+#CDDEF04=x,26,S
+T(3,CdCode.RepayType)
+
 #RepayTypeHelpRim=X,1,S
 RESET_RIM(#RepayTypeHelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc)
-!T(2,@RepayTypeHelp,#HelpDesc1)
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2) 
 T(2,@PayMethodHelp,#HelpDesc3) 
+T(2,@RepayTypeHelp,#HelpDesc4)
+T(HELP,@RepayTypeHelp,#RepayTypeHelp,+,01;02;10;12)
 
 #RepayTypeHelp=x,1024,S
-T(3,01:期款;02:部分償還;09:清償違約金;12:催收收回)
+! T(3,01:期款;02:部分償還;09:清償違約金;12:催收收回)
 
 #CurrencyCodeHelp=x,1024,S
 

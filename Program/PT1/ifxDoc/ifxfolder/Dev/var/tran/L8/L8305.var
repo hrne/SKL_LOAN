@@ -289,7 +289,7 @@ C(5,#TranKey,X,K(MODIFYBUTTON,補件),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,$,s)
-C(5,#TranKey_Tmp,2,s,$)
+!C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
@@ -519,7 +519,7 @@ C(5,#GradeType,2,$,S)
 ! T(2,1+A+#CustId)ASGN(NTXBUF$)
 
 ! 新增時開啟48
-IF(#TranKey_Tmp == 1,ALERT(需報送048檔案),S) 
+IF(#TranKey_Tmp == 1,ALERT(需報送048檔案),$) 
 
 ! #TmpNTXCD=X,5,S
 ! IF(#TranKey_Tmp == 1,$,S) 
@@ -621,3 +621,4 @@ TXFORM=L8305^
 
 <include src="PRT.icf::INQ01.sel"/>
 </sub>
+ㄉ
