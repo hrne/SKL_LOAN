@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
@@ -193,7 +194,16 @@ public class L4002 extends TradeBuffer {
 				tmpBatx grp2 = new tmpBatx();
 
 				tmpBatx grp3 = new tmpBatx();
-
+				//
+				TempVo tempVo = new TempVo();
+				tempVo = tempVo.getVo(tBatxDetail.getProcNote());
+				// 可入帳
+				boolean isEnterTx = false;
+				// 檢核成功、未曾訂正、還款來源(1~4)
+				if (tBatxDetail.getProcStsCode().equals("4") && tempVo.get("EraseCnt") == null
+						&& tBatxDetail.getRepayCode() >= 1 && tBatxDetail.getRepayCode() <= 4) {
+					isEnterTx = true;
+				}
 				switch (tBatxDetail.getRepayCode()) {
 				case 1:
 					grp1.setAcDate(tBatxDetail.getAcDate());
@@ -447,7 +457,8 @@ public class L4002 extends TradeBuffer {
 
 				if (labelRankFlag == 1) {
 					// 可檢核筆數
-					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("3")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
+							|| tBatxDetail.getProcStsCode().equals("3")) {
 						if (canCheckCnt.containsKey(grp1)) {
 							canCheckCnt.put(grp1, canCheckCnt.get(grp1) + 1);
 						} else {
@@ -455,7 +466,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("4")) {
+					if (isEnterTx) {
 						if (canEnterCnt.containsKey(grp1)) {
 							canEnterCnt.put(grp1, canEnterCnt.get(grp1) + 1);
 						} else {
@@ -482,7 +493,8 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可檢核筆數
-					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("3")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
+							|| tBatxDetail.getProcStsCode().equals("3")) {
 						if (canCheckCnt.containsKey(grp3)) {
 							canCheckCnt.put(grp3, canCheckCnt.get(grp3) + 1);
 						} else {
@@ -490,7 +502,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (tBatxDetail.getProcStsCode().equals("4")) {
+					if (isEnterTx) {
 						if (canEnterCnt.containsKey(grp3)) {
 							canEnterCnt.put(grp3, canEnterCnt.get(grp3) + 1);
 						} else {

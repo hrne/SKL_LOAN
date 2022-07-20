@@ -84,6 +84,7 @@ public class L3250 extends TradeBuffer {
 	private String iRvNo;
 	private String iAcctCode;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
+	private int wkRepayCode;
 
 	// work area
 	private AcDetail acDetail;
@@ -113,14 +114,14 @@ public class L3250 extends TradeBuffer {
 
 		// 沖正處理
 		repayEraseRoutine();
-		// 入帳金額轉暫收款-冲正產生
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
-			loanCom.addFacmBorTxNextDateErase(iCustNo, wkTxAmt, titaVo);
-		}
+		
+		titaVo.putParam("RpCode1", wkRepayCode);
+		titaVo.putParam("RpAmt1", wkTxAmt);
+
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 
-//			// 暫收可抵繳
+//			// 費用科目
 			acDetail = new AcDetail();
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(iAcctCode);
@@ -133,10 +134,20 @@ public class L3250 extends TradeBuffer {
 			}
 			lAcDetail.add(acDetail);
 
+			// THC 暫收款－沖正
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("THC");
+			acDetail.setTxAmt(wkTxAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			lAcDetail.add(acDetail);
+			
+			// TAV 暫收款可抵繳
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(iTxAmt);
+			acDetail.setTxAmt(iTxAmt.subtract(wkTxAmt));
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			lAcDetail.add(acDetail);
@@ -178,8 +189,9 @@ public class L3250 extends TradeBuffer {
 			if (tx.getEntryDate() != iEntryDate) {
 				continue;
 			}
+			wkRepayCode = tx.getRepayCode();
 			// 註記交易內容檔
-			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), titaVo);
+			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(),tx.getBorxNo(), titaVo);
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 		}
 	}

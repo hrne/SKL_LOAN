@@ -430,7 +430,7 @@ public class L3200 extends TradeBuffer {
 		// case 6: // 6.契變手續費
 		// case 7: // 7.法務費
 
-		case 9: // 9. 清償違約金
+		case 10: // 10. 清償違約金
 			if (titaVo.isHcodeNormal()) {
 				calcCloseBreachNormalRoutine();
 			} else {
@@ -1056,7 +1056,7 @@ public class L3200 extends TradeBuffer {
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
 			if (wkBormNo == 0) {
 				// 註記交易內容檔(費用)
-				loanCom.setFacmBorTxHcode(iCustNo, wkFacmNo, titaVo);
+				loanCom.setFacmBorTxHcode(iCustNo, wkFacmNo, wkBorxNo, titaVo);
 			} else {
 				// 還原金額處理
 				wkOvduNo = parse.stringToInteger(tTempVo.get("OvduNo"));
@@ -1145,7 +1145,7 @@ public class L3200 extends TradeBuffer {
 
 		// 銷帳檔全銷(減免導致與入帳金額不一致，需自行銷帳)
 		for (AcReceivable ac : slAcReceivable.getContent()) {
-			if (ac.getAcctCode().equals("YOP") && (ac.getRvBal().compareTo(BigDecimal.ZERO) > 0)
+			if (ac.getAcctCode().equals("IOP") && (ac.getRvBal().compareTo(BigDecimal.ZERO) > 0)
 					&& (iFacmNo == 0 || iFacmNo == ac.getFacmNo())
 					&& (iBormNo == 0 || iBormNo == this.parse.stringToInteger(ac.getRvNo()))) {
 				wkTotalCloseBreach = wkTotalCloseBreach.add(ac.getRvBal());
@@ -1197,15 +1197,15 @@ public class L3200 extends TradeBuffer {
 			wkReduceBreachAmt = parse.stringToBigDecimal(tTempVo.getParam("ReduceBreachAmt")); // 減免清償違約金+減免違約金+減免延滯息
 			// 還原銷帳檔
 			tAcReceivable = new AcReceivable();
-			tAcReceivable.setReceivableFlag(4); // 短繳期金
-			tAcReceivable.setAcctCode("YOP");
+			tAcReceivable.setReceivableFlag(4); // 4:短繳期金
+			tAcReceivable.setAcctCode("IOP");
 			tAcReceivable.setCustNo(wkCustNo);
 			tAcReceivable.setFacmNo(wkFacmNo);
 			tAcReceivable.setRvNo(tTempVo.get("RvNo"));
 			tAcReceivable.setRvAmt(wkCloseBreachAmt.add(wkReduceBreachAmt));
 			lAcReceivable.add(tAcReceivable);
 			// 註記交易內容檔(費用)
-			loanCom.setFacmBorTxHcode(iCustNo, wkFacmNo, titaVo);
+			loanCom.setFacmBorTxHcode(iCustNo, tx.getFacmNo(),tx.getBorxNo(), titaVo);
 
 		}
 		this.info("calcCloseBreachEraseRoutine end");
@@ -1826,7 +1826,7 @@ public class L3200 extends TradeBuffer {
 		// 違約金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
-		acDetail.setAcctCode("IOP");
+		acDetail.setAcctCode("IOV");
 		acDetail.setTxAmt(wkBreachAmt);
 		acDetail.setCustNo(wkCustNo);
 		acDetail.setFacmNo(wkFacmNo);
@@ -1995,7 +1995,7 @@ public class L3200 extends TradeBuffer {
 
 		// 短繳清償違約金處理, 新增銷帳檔
 		if (wkUnpaidCloseBreach.compareTo(BigDecimal.ZERO) > 0) {
-			acRvUnpaidAmt("YOP", wkUnpaidCloseBreach);
+			acRvUnpaidAmt("IOP", wkUnpaidCloseBreach);
 		}
 
 	}

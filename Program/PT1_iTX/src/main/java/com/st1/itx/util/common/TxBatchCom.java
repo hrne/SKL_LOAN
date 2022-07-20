@@ -361,14 +361,26 @@ public class TxBatchCom extends TradeBuffer {
 		this.info("TxBatchCom run ... " + titaVo);
 		// 以批號、明細檔序號更新整批入帳檔
 		if ("L32".equals(titaVo.getTxCode().substring(0, 3)) || "L34".equals(titaVo.getTxCode().substring(0, 3))) {
+			// 整批入帳
 			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
 					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4)) && titaVo.get("RpDetailSeq1") != null) {
-				// 隔日訂正，回沖至暫收可抵繳，不處理
+				// 隔日訂正，回沖至暫收款－沖正(RESV00)
 				if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
-					this.info("TxBatchCom run  隔日訂正不處理 " + titaVo);
+					insBatxResv(titaVo);
 				} else {
 					updBatxResult(titaVo.getParam("BATCHNO"), titaVo.getParam("RpDetailSeq1"), titaVo);
 				}
+			}
+			// 訂正AS400帳務，產生暫收沖正
+			if ("L3240".equals(titaVo.getTxCode()) || "L3250".equals(titaVo.getTxCode())) {
+				insBatxResv(titaVo);
+			}
+
+			// 暫收沖正入帳
+			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
+					&& "RESV".equals(titaVo.get("BATCHNO").substring(0, 4)) && titaVo.get("RpDetailSeq1") != null) {
+				// 隔日訂正回沖至暫收款－沖正，再執行交易
+				updBatxResult(titaVo.getParam("BATCHNO"), titaVo.getParam("RpDetailSeq1"), titaVo);
 			}
 		}
 		return null;
@@ -545,22 +557,23 @@ public class TxBatchCom extends TradeBuffer {
 		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
 
 // TXTNO = BatchNo[2] + TxtSeq [6]
-// TxtSeq = EraseAddNo * 10000 + mod (DetailSeq 
-// EraseAddNo = if EraseCnt = 0  then 0 else =  EraseCnt * 2  + TotalCnt / 10000 
-//		                          EraseAddNo  
-//		        EraseCnt     Normal      Erase
-// Normal          0           0                
-// Erase           0                       4       
-// Normal          1           5      
-// Erase           1                       6       
-// Normal          2           7 
-
+// BatchNo:Batx09, TotalCnt: 32321 
+//		        EraseCnt   eraseAddNo   TxtNo                eraseAddNo
+// Normal          0           0        09000001~09032321    cnt * (EraseCnt * 2)    
+// Erase           0           4        09040001~09072321    cnt * (EraseCnt * 2 + 1)           
+// Normal          1           8        09080001~09112321    cnt * (EraseCnt * 2)     
+// Erase           1          12        09120001~09152321    cnt * (EraseCnt * 2 + 1)
+// Normal          2          16        09160001~09192321    cnt * (EraseCnt * 2)
 		int eraseAddNo = 0;
+		int cnt = iTotalcnt / 10000 + 1;
+		int eraseCnt = 0;
 		if (this.tTempVo.get("EraseCnt") != null) {
-			eraseAddNo = ((parse.stringToInteger(tTempVo.get("EraseCnt")) * 2) + (iTotalcnt / 10000));
+			eraseCnt = parse.stringToInteger(tTempVo.get("EraseCnt"));
 		}
-		if (hcode == 1) {
-			eraseAddNo++;
+		if (hcode == 0) {
+			eraseAddNo = cnt * (eraseCnt * 2);
+		} else {
+			eraseAddNo = cnt * (eraseCnt * 2 + 1);
 		}
 		String txtNo = tDetail.getBatchNo().substring(4, 6)
 				+ parse.IntegerToString(tDetail.getDetailSeq() + eraseAddNo * 10000, 6);
@@ -650,8 +663,8 @@ public class TxBatchCom extends TradeBuffer {
 		if (functionCode == 2) {
 			txTitaVo = setL3210Tita(functionCode, txTitaVo, tDetail);
 		}
-		// 1:期款 2:部分償還 12:催收收回
-		else if (this.repayType == 1 || this.repayType == 2 || this.repayType == 12) {
+		// 1:期款 2:部分償還 10:清償違約金 12:催收收回
+		else if (this.repayType == 1 || this.repayType == 2 || this.repayType == 10 || this.repayType == 12) {
 			txTitaVo = setL3200Tita(txTitaVo, tDetail);
 		}
 		// 3:結案
@@ -866,7 +879,7 @@ public class TxBatchCom extends TradeBuffer {
 
 	/* L3200 回收登錄 */
 	private TitaVo setL3200Tita(TitaVo l3200TitaVo, BatxDetail tBatxDetail) throws LogicException {
-		// 1.期款 2.部分償還 12.催收收回
+		// 1.期款 2.部分償還 9.清償違約金 12.催收收回
 		l3200TitaVo.putParam("TXCD", "L3200");
 		l3200TitaVo.putParam("TXCODE", "L3200");
 		l3200TitaVo.putParam("CustNo", tBatxDetail.getCustNo());
@@ -887,7 +900,12 @@ public class TxBatchCom extends TradeBuffer {
 		l3200TitaVo.putParam("TimRepayAmt", tBatxDetail.getRepayAmt());
 		l3200TitaVo.putParam("TwRepayAmt", tBatxDetail.getRepayAmt());
 		l3200TitaVo.putParam("UsRepayAmt", tBatxDetail.getRepayAmt());
-		l3200TitaVo.putParam("TimCloseBreachAmt", "0"); // 清償違約金
+		// 清償違約金
+		if (tBatxDetail.getRepayType() == 10) {
+			l3200TitaVo.putParam("TimCloseBreachAmt", this.tTempVo.getParam("CloseBreachAmt"));
+		} else {
+			l3200TitaVo.putParam("TimCloseBreachAmt", "0");
+		}
 		l3200TitaVo.putParam("RqspFlag", ""); // 減免金額超過限額，Y.需主管核可
 		l3200TitaVo.putParam("ShortPrinPercent", "0"); // 短收本金比率
 		l3200TitaVo.putParam("ShortIntPercent", "0"); // 短收利息比率
@@ -917,10 +935,11 @@ public class TxBatchCom extends TradeBuffer {
 			l3200TitaVo.putParam("PayFeeFlag", "Y"); // 是否回收費用
 			l3200TitaVo.putParam("PayMethod", " ");
 		}
-		if (tBatxDetail.getRepayType() == 12)
+		if (tBatxDetail.getRepayType() == 12) {
 			l3200TitaVo.putParam("TimOvduRepay", tBatxDetail.getRepayAmt());
-		else
+		} else {
 			l3200TitaVo.putParam("TimOvduRepay", "0");
+		}
 		l3200TitaVo.putParam("TimReduceAmt", "0"); // 減免金額
 		l3200TitaVo.putParam("TotalRepayAmt", tBatxDetail.getAcquiredAmt()); // 應收付總金額 --> 還款總金額
 		l3200TitaVo.putParam("RealRepayAmt", tBatxDetail.getRepayAmt()); // 實際收付金額 --> 還款金額
@@ -968,6 +987,76 @@ public class TxBatchCom extends TradeBuffer {
 		l3420TitaVo.putParam("RealRepayAmt", tBatxDetail.getRepayAmt()); // 實際收付金額 --> 還款金額
 
 		return l3420TitaVo;
+	}
+
+	// 隔日訂正新增整批入帳明細檔(RESV00)
+	private void insBatxResv(TitaVo titaVo) throws LogicException {
+		// 交易失敗不處理
+		if (this.txBuffer.getTxCom().getTxRsut() != 0) { // 交易失敗
+			return;
+		}
+		BigDecimal repayAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt1"));
+		int repayCode = parse.stringToInteger(titaVo.getParam("RpCode1"));
+		// 暫收抵繳不處理
+		if (repayCode >= 90 || repayAmt.compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
+		BatxHeadId tBatxHeadId = new BatxHeadId();
+		tBatxHeadId.setAcDate(this.txBuffer.getTxCom().getTbsdyf());
+		tBatxHeadId.setBatchNo("RESV00");
+		BatxHead tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
+		if (tBatxHead == null) {
+			tBatxHead = new BatxHead();
+			tBatxHead.setBatxHeadId(tBatxHeadId);
+			tBatxHead.setBatxTotAmt(repayAmt);
+			tBatxHead.setBatxTotCnt(1);
+			tBatxHead.setUnfinishCnt(1);
+			tBatxHead.setBatxExeCode("3");
+			tBatxHead.setBatxStsCode("0");
+			try {
+				this.info("Insert BatxHead !!!");
+				batxHeadService.insert(tBatxHead, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "update BatxHead " + tBatxHead + e.getErrorMsg());
+			}
+		} else {
+			tBatxHead.setBatxTotAmt(tBatxHead.getBatxTotAmt().add(repayAmt));
+			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
+			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + 1);
+			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
+		}
+		try {
+			batxHeadService.update(tBatxHead, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "update BatxHead " + tBatxHead + e.getErrorMsg());
+		}
+		BatxDetailId tBatxDetailId = new BatxDetailId();
+		tBatxDetailId.setAcDate(tBatxHead.getAcDate());
+		tBatxDetailId.setBatchNo(tBatxHead.getBatchNo());
+		tBatxDetailId.setDetailSeq(tBatxHead.getBatxTotCnt());
+		BatxDetail tBatxDetail = new BatxDetail();
+		tBatxDetail.setRepayCode(repayCode);
+		tBatxDetail.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDate")));
+		tBatxDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpCustNo1")));
+		tBatxDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo1")));
+		tBatxDetail.setRvNo("");
+		tBatxDetail.setRepayType(0);
+		tBatxDetail.setReconCode("");
+		tBatxDetail.setRepayAcCode("");
+		tBatxDetail.setRepayAmt(repayAmt);
+		tBatxDetail.setAcquiredAmt(BigDecimal.ZERO);
+		tBatxDetail.setAcctAmt(BigDecimal.ZERO);
+		tBatxDetail.setDisacctAmt(BigDecimal.ZERO);
+		tBatxDetail.setProcStsCode("2");
+		tBatxDetail.setProcCode("");
+		tBatxDetail.setTitaTlrNo("");
+		tBatxDetail.setTitaTxtNo("");
+		try {
+			batxDetailService.insert(tBatxDetail, titaVo);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new LogicException("E0005", "BatxDetail Insert Fail");
+		}
 	}
 
 	// 交易結束更新整批入帳明細檔
@@ -1043,7 +1132,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 訂正交易
 				unfinishCnt = 1;
 				this.info("updBatxResult 訂正交易");
-				tDetail.setProcStsCode("0"); // 訂正後為 0:未檢核
+				tDetail.setProcStsCode("2"); // 訂正後為 2:人工處理
 				if (this.tTempVo.get("RepayType") != null) {
 					tDetail.setRepayType(parse.stringToInteger(this.tTempVo.get("RepayType"))); // 還原還款類別
 				}
@@ -1096,7 +1185,9 @@ public class TxBatchCom extends TradeBuffer {
 			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + unfinishCnt);
 
 			// 訂正成功後更新為入帳未完
-			if (titaVo.isHcodeErase()) {
+			if (tBatxHead.getUnfinishCnt() == 0) {
+				tBatxHead.setBatxExeCode("4");// 4.入帳完成
+			} else {
 				tBatxHead.setBatxExeCode("3");// 3.入帳未完
 			}
 
@@ -1107,7 +1198,8 @@ public class TxBatchCom extends TradeBuffer {
 			}
 
 			// 啟動背景作業－整批入帳完成(非整批入帳)
-			if (tBatxHead.getUnfinishCnt() == 0 && "0".equals(tBatxHead.getBatxStsCode())) {
+			if ("BATX".equals(tBatxHead.getBatchNo().substring(0, 4)) && tBatxHead.getUnfinishCnt() == 0
+					&& "0".equals(tBatxHead.getBatxStsCode())) {
 				TitaVo bs401TitaVo = new TitaVo();
 				bs401TitaVo = (TitaVo) titaVo.clone();
 				bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核

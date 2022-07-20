@@ -149,7 +149,7 @@ public class L618C extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 			addLoanBorTxRoutine(titaVo);
 		} else {
-			loanCom.setFacmBorTxHcode(iCustNo, iFacmNo, titaVo);
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
 		}
 
 		this.addList(this.totaVo);

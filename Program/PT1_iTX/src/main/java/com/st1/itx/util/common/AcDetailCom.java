@@ -373,7 +373,8 @@ public class AcDetailCom extends TradeBuffer {
 				throw new LogicException("E6001", "AcDetailCom 支票業務別需為02," + titaVo.getSecNo());
 			}
 			// 撥款匯款業務別 2xx ,201:整批匯款 202:單筆匯款 204:退款台新(存款憑條) 205:退款他行(整批匯款) 211:退款新光(存款憑條)
-			if (ac.getSumNo() != null && ac.getSumNo().length() == 3 && ac.getSumNo().startsWith("2") && !"01".equals(titaVo.getSecNo())) {
+			if (ac.getSumNo() != null && ac.getSumNo().length() == 3 && ac.getSumNo().startsWith("2")
+					&& !"01".equals(titaVo.getSecNo())) {
 				throw new LogicException("E6001", "AcDetailCom 撥款匯款業務別需為01," + titaVo.getSecNo());
 			}
 		}
@@ -396,11 +397,12 @@ public class AcDetailCom extends TradeBuffer {
 
 		// 2. StampTaxFreeAmt 免印花稅金額
 // 還款來源 = 4.支票兌現 && 業務科目 = 利息收入(Ixx)	
-		if (titaVo.get("RpCode1") != null && parse.stringToInteger(titaVo.getParam("RpCode1")) == 4 && "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
+		if (titaVo.get("RpCode1") != null && parse.stringToInteger(titaVo.getParam("RpCode1")) == 4
+				&& "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
 			tTempVo.putParam("StampTaxFreeAmt", tAcDetail.getTxAmt());
 		}
 		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
-			tTempVo.putParam("RvAcctCode", ac.getAcctCode());
+			tTempVo.putParam("RvAcctCode", ac.getAcctCode());			
 		}
 
 		tAcDetail.setJsonFields(tTempVo.getJsonString());
@@ -425,9 +427,7 @@ public class AcDetailCom extends TradeBuffer {
 // IC2	中擔息
 // IC3	長擔息
 // IC4	三十年房貸息
-// IOV	逾期息
 // IOP	違約金
-// YOP  清償違約金         IOP	違約金    
 // 銷帳科目記號ReceivableFlag = 5-另收欠款
 // F12聯貸件收入
 // F27聯貸管理費收入
@@ -442,9 +442,6 @@ public class AcDetailCom extends TradeBuffer {
 			if (acctCode.substring(0, 1).equals("Z")) {
 				acctCode = "3" + acctCode.substring(1, 3);
 			}
-		}
-		if (acctCode.equals("YOP")) {
-			acctCode = "IOP";
 		}
 
 		// 聯貸費攤提，未到期收入轉入TSL暫收款－聯貸費攤提

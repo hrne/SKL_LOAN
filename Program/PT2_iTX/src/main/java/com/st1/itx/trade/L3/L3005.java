@@ -173,9 +173,8 @@ public class L3005 extends TradeBuffer {
 		if (resultList != null && resultList.size() != 0) {
 
 			this.info("Size =" + resultList.size());
-			int i = 1;
-			String relNo = "";
-			String newRelNo = "";
+			String txNo = "";
+			String newTxNo = "";
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
 
@@ -208,24 +207,23 @@ public class L3005 extends TradeBuffer {
 						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
 				needPaidAmt = txAmt.subtract(tempAmt).add(unpaidAmt);
-				newRelNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				newTxNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
 				BigDecimal wkTempAmt = BigDecimal.ZERO;
 				BigDecimal wkShortfall = BigDecimal.ZERO;
-				if (!relNo.equals(newRelNo)) {
+				if (!txNo.equals(newTxNo)) {
 					if ("L3220".equals(titaTxCd) || totTxAmt.compareTo(BigDecimal.ZERO) == 0) {
 						occursList.putParam("OOTxMsg", ""); // 金額+還款類別
 					} else {
 						occursList.putParam("OOTxMsg", repayCodeX + " " + df.format(totTxAmt)); // 金額+還款類別
 					}
 				}
-				if ((titaHCode.equals("0") || titaHCode.equals("3") || titaHCode.equals("4"))
-						&& (displayflag.equals("A") || displayflag.equals("F"))) {
-					AcFg = "Y";
-				} else if (relNo.equals(newRelNo)) {
+				if (txNo.equals(newTxNo)) {
 					AcFg = "";
+				} else if (displayflag.equals("A") || displayflag.equals("F") || displayflag.equals("I")) {
+					AcFg = "Y";
 				} else {
 					AcFg = "N";
 				}
@@ -252,7 +250,7 @@ public class L3005 extends TradeBuffer {
 				if (unpaidAmt.compareTo(BigDecimal.ZERO) > 0) {
 					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);
 				}
-				relNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				txNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);
 
@@ -261,7 +259,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", facmNo);
 				occursList.putParam("OOBormNo", bormNo);
 				occursList.putParam("OOBorxNo", borxNo);
-				occursList.putParam("OORelNo", relNo); // 登放序號
+				occursList.putParam("OORelNo", txNo); // 交易
 				occursList.putParam("OOTellerNo", titaTlrNo);
 				occursList.putParam("OOTxtNo", titaTxtNo);
 				occursList.putParam("OOCurrencyCode", titaCurCd);

@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -107,9 +111,9 @@ public class L420C extends TradeBuffer {
 		}
 		boolean isUpdate = false;
 		String procStsCode = tBatxDetail.getProcStsCode();
-//		1.訂正
-		if (functionCode == 1 && "5".equals(tBatxDetail.getProcStsCode())) {
-			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "非整批入帳，請執行交易訂正"); // 檢查錯誤
+//		1.訂正功能<取消勾選功能>
+		if (functionCode == 1 ) {
+			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "請執行交易訂正"); // 檢查錯誤
 		}
 		// 2:轉暫收
 		if (functionCode == 2) {

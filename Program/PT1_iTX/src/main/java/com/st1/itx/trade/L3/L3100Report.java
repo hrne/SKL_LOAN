@@ -165,7 +165,7 @@ public class L3100Report extends MakeReport {
 
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-
+		int iCustNo = parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		reportCode = titaVo.getTxcd();
 
 		List<AcDetail> acDetailList = new ArrayList<AcDetail>();
@@ -177,15 +177,15 @@ public class L3100Report extends MakeReport {
 			List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 			AcDetail acDetail = new AcDetail();
 
-			FacMain tFacMain = facMainService.findById(new FacMainId(parse.stringToInteger(titaVo.getParam("CustNo")),
-					parse.stringToInteger(titaVo.getParam("FacmNo"))), titaVo);
+			FacMain tFacMain = facMainService
+					.findById(new FacMainId(iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo"))), titaVo);
 			if (tFacMain == null) {
 				throw new LogicException(titaVo, "E0001",
-						" 額度主檔 借款人戶號 = " + titaVo.getParam("CustNo") + " 額度編號 = " + titaVo.getParam("FacmNo")); // 查詢資料不存在
+						" 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + titaVo.getParam("FacmNo")); // 查詢資料不存在
 			}
-			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99),
-					parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")),
-					parse.stringToInteger(titaVo.getParam("FacmNo")), 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo,
+					parse.stringToInteger(titaVo.getParam("FacmNo")), parse.stringToInteger(titaVo.getParam("FacmNo")),
+					0, Integer.MAX_VALUE, titaVo);
 			if (slLoanBorMain != null) {
 				for (LoanBorMain rv : slLoanBorMain.getContent()) {
 					wkRvCnt++;
@@ -198,7 +198,7 @@ public class L3100Report extends MakeReport {
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(tFacMain.getAcctCode());
 			acDetail.setTxAmt(parse.stringToBigDecimal(titaVo.getParam("TimDrawdownAmt")));
-			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			acDetail.setBormNo(wkRvBormNo);
 			acDetailList.add(acDetail);
@@ -207,7 +207,7 @@ public class L3100Report extends MakeReport {
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("P02");
 			acDetail.setTxAmt(parse.stringToBigDecimal(titaVo.getParam("TimDrawdownAmt")));
-			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			acDetail.setBormNo(wkRvBormNo);
 			acDetailList.add(acDetail);
@@ -275,7 +275,7 @@ public class L3100Report extends MakeReport {
 			tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
 
 			LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(
-					parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")),
+					iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo")),
 					parse.stringToInteger(titaVo.getParam("BormNo"))), titaVo);
 			if (tLoanBorMain != null) {
 				acDate = tLoanBorMain.getDrawdownDate() + 19110000;

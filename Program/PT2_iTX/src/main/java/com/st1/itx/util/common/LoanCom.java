@@ -51,7 +51,6 @@ import com.st1.itx.util.parse.Parse;
  * addFeeBorTxRoutine 新增放款交易內容檔(收回費用)<BR>
  * setFacmBorTxHcode 訂正時註記放款交易內容檔(到額度)<BR>
  * setFacmBorTxHcodeByTx 訂正放款交易內容檔by交易 <BR>
- * addFacmBorTxNextDateErase 新增放款交易內容檔(入帳金額轉暫收款-冲正產生) call by AcEnter<BR>
  * setLoanBorTx 設定放款交易內容檔(到撥款)的共同資料<BR>
  * setLoanBorTxHcode 訂正時註記放款交易內容檔(到撥款)<BR>
  * setIntAcctCode 抓取本金科目對應的利息科目<BR>
@@ -159,10 +158,11 @@ public class LoanCom extends TradeBuffer {
 		this.info("setLastBorTx ... ");
 		int borxNo;
 		LoanBorTx tBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, 0, titaVo);
-		if (tBorTx == null)
+		if (tBorTx == null) {
 			borxNo = 1;
-		else
+		} else {
 			borxNo = tBorTx.getBorxNo() + 1;
+		}
 		setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, 0, borxNo, titaVo);
 		return borxNo;
 	}
@@ -172,25 +172,28 @@ public class LoanCom extends TradeBuffer {
 	 * 
 	 * @param iCustNo 戶號
 	 * @param iFacmNo 額度
+	 * @param iBorxNo 交易內容檔序號
 	 * @param titaVo  TitaVo
+	 * @return 交易內容檔序號
 	 * @throws LogicException LogicException
 	 */
-	public void setFacmBorTxHcode(int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {
+	public int setFacmBorTxHcode(int iCustNo, int iFacmNo, int iBorxNo, TitaVo titaVo) throws LogicException {
 		this.info("setFacmBorTxHcode ... ");
 		int oldBorxNo = 0;
 		int newBorxNo = 0;
 		LoanBorTx tBorTx;
-		tBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, 0, titaVo.getOrgEntdyI() + 19110000,
-				titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
-		if (tBorTx != null) {
-			oldBorxNo = tBorTx.getBorxNo();
+		tBorTx = loanBorTxService.findById(new LoanBorTxId(iCustNo, iFacmNo, 0, iBorxNo), titaVo);
+		if (tBorTx == null) {
+			throw new LogicException(titaVo, "E0006",
+					"放款交易內容檔 戶號 = " + iCustNo + "-" + iFacmNo + "-0  交易內容檔序號 = " + iBorxNo); // 鎖定資料時，發生錯誤
 		}
+		oldBorxNo = tBorTx.getBorxNo();
 		tBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, 0, titaVo);
 		if (tBorTx != null) {
 			newBorxNo = tBorTx.getBorxNo() + 1;
 		}
 		setLoanBorTxHcode(iCustNo, iFacmNo, 0, oldBorxNo, newBorxNo, BigDecimal.ZERO, titaVo);
-
+		return newBorxNo;
 	}
 
 	/**
@@ -273,6 +276,10 @@ public class LoanCom extends TradeBuffer {
 		setLoanBorTx(tLoanBorTx2, tLoanBorTx2Id, iCustNo, iFacmNo, iBormNo, iNewBorxNo, titaVo);
 		tLoanBorTx2.setTitaHCode(wkAcDate == titaVo.getEntDyI() ? "1" : "3"); // 0: 未訂正 1: 訂正 2: 被訂正 3: 沖正 4: 被沖正
 		tLoanBorTx.setCorrectSeq(parse.IntegerToString(titaVo.getOrgEntdyI() + 19110000, 8) + titaVo.getOrgTxSeq());
+		// 訂正轉換資料為帳務交易
+		if (!"Y".equals(tLoanBorTx.getDisplayflag())) {
+			tLoanBorTx2.setDisplayflag("A");
+		}
 		// 訂正轉換資料為帳務交易
 		if ("L3240".equals(titaVo.getTxcd()) || "L3250".equals(titaVo.getTxcd())) {
 			tLoanBorTx2.setDisplayflag("A");
@@ -1220,41 +1227,6 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
-	 * 新增放款交易內容檔(入帳金額轉暫收款-冲正產生)
-	 * 
-	 * @param iCustNo 戶號
-	 * @param iTxAmt  交易金額
-	 * @param titaVo  TitaVo
-	 * @return 額度編號
-	 * @throws LogicException ....
-	 */
-	public int addFacmBorTxNextDateErase(int iCustNo, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
-		this.info("addFacmBorTxNextDateErase ... ");
-		LoanBorTx tx = loanBorTxService.borxTxtNoFirst(titaVo.getEntDyI()+ 19110000, titaVo.getTlrNo(),
-				titaVo.getTxtNo(), titaVo);
-		if (tx == null || iCustNo != tx.getCustNo()) {
-			throw new LogicException(titaVo, "E0006", "放款交易內容檔 "); // 鎖定資料時，發生錯誤
-		}
-		LoanBorTx tLoanBorTx = new LoanBorTx();
-		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
-		setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, tx.getFacmNo(), titaVo);
-		tLoanBorTx.setCorrectSeq(tx.getCorrectSeq());
-		tLoanBorTx.setDesc("入帳金額轉暫收款-冲正產生");
-		tLoanBorTx.setRepayCode(tx.getRepayCode());
-		tLoanBorTx.setEntryDate(tx.getEntryDate());
-		tLoanBorTx.setDisplayflag("Y"); //
-		tLoanBorTx.setTxAmt(iTxAmt);
-		tLoanBorTx.setTempAmt(iTxAmt);
-		tLoanBorTx.setTitaHCode("0");
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
-		return tx.getFacmNo();
-	}
-
-	/**
 	 * 新增放款交易內容檔(收回費用)
 	 * 
 	 * @param ba         BaTxVo
@@ -1264,15 +1236,16 @@ public class LoanCom extends TradeBuffer {
 	 * @param iTempAmt   暫收抵繳金額(負值)
 	 * @param iDesc      交易別
 	 * @param titaVo     Tita
+	 * @return 交易內容檔序號
 	 * @throws LogicException ....
 	 */
-	public void addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, BigDecimal iTxAmt, BigDecimal iTempAmt,
+	public int addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, BigDecimal iTxAmt, BigDecimal iTempAmt,
 			String iDesc, TitaVo titaVo) throws LogicException {
 		this.info("addFeeBorTxRoutine ... ");
 
 		LoanBorTx tLoanBorTx = new LoanBorTx();
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
-		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
+		int borxNo = setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
 		String desc = iDesc;
 		if ("L3230".equals(titaVo.getTxcd())) {
 			desc = "暫收銷";
@@ -1294,7 +1267,7 @@ public class LoanCom extends TradeBuffer {
 		//
 		tLoanBorTx.setTxAmt(iTxAmt); // 本筆交易金額
 		tLoanBorTx.setTempAmt(iTempAmt); // 本筆暫收抵繳
-		tLoanBorTx.setDisplayflag("Y"); // 無繳息
+		tLoanBorTx.setDisplayflag("A"); // 無繳息
 		// 其他欄位
 		TempVo tTempVo = new TempVo();
 		tTempVo.clear();
@@ -1320,6 +1293,7 @@ public class LoanCom extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
+		return borxNo;
 	}
 
 	/**
@@ -1338,7 +1312,7 @@ public class LoanCom extends TradeBuffer {
 			return;
 		}
 		for (LoanBorTx tx : slLoanBortx.getContent()) {
-			setFacmBorTxHcode(iCustNo, tx.getFacmNo(), titaVo);
+			setFacmBorTxHcode(iCustNo, tx.getFacmNo(), tx.getBorxNo(), titaVo);
 		}
 	}
 

@@ -789,7 +789,7 @@ public class L3420 extends TradeBuffer {
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
 			if (wkBormNo == 0) {
 				// 註記交易內容檔(費用)
-				loanCom.setFacmBorTxHcode(iCustNo, wkFacmNo, titaVo);
+				loanCom.setFacmBorTxHcode(iCustNo, wkFacmNo, wkBorxNo, titaVo);
 			} else {
 				// 還原金額處理
 				wkPrincipal = this.parse.stringToBigDecimal(tTempVo.get("LoanBal"));
@@ -1699,7 +1699,7 @@ public class L3420 extends TradeBuffer {
 		// 貸: 違約金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
-		acDetail.setAcctCode("IOP");
+		acDetail.setAcctCode("IOV");
 		acDetail.setTxAmt(wkBreachAmt);
 		acDetail.setCustNo(wkCustNo);
 		acDetail.setFacmNo(wkFacmNo);
@@ -1783,7 +1783,7 @@ public class L3420 extends TradeBuffer {
 		// 貸: 違約金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
-		acDetail.setAcctCode("IOP");
+		acDetail.setAcctCode("IOV");
 		acDetail.setTxAmt(wkBreachAmt);
 		acDetail.setCustNo(wkCustNo);
 		acDetail.setFacmNo(wkFacmNo);

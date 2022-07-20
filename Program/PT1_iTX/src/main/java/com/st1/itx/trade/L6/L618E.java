@@ -19,10 +19,9 @@ import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
-import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
@@ -44,13 +43,9 @@ public class L618E extends TradeBuffer {
 	private static final Logger logger = LoggerFactory.getLogger(L618E.class);
 
 	@Autowired
-	public TxToDoDetailService txToDoDetailService;
-	@Autowired
 	public ForeclosureFeeService sForeclosureFeeService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
-	@Autowired
-	public AcReceivableService acReceivableService;
 
 	@Autowired
 	LoanCom loanCom;
@@ -96,7 +91,17 @@ public class L618E extends TradeBuffer {
 		iAcctCode = titaVo.getParam("AcctCode");
 		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
 //		update應處理清單
+		txToDoCom.setTxBuffer(this.txBuffer);
+		TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 
+		tTxToDoDetailId.setCustNo(iCustNo);
+		tTxToDoDetailId.setFacmNo(iFacmNo);
+		tTxToDoDetailId.setItemCode(iItemCode);
+		tTxToDoDetailId.setDtlValue(iRvNo);
+		txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
+
+		
+		
 		// 銷帳檔有資料時先銷銷帳檔
 		if (!"".equals(iAcctCode)) {
 			acReceivable = new AcReceivable();
@@ -158,7 +163,7 @@ public class L618E extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 			addLoanBorTxRoutine(titaVo);
 		} else {
-			loanCom.setFacmBorTxHcode(iCustNo, iFacmNo, titaVo);
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

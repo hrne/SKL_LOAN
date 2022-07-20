@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.domain.BatxHead;
@@ -23,6 +24,7 @@ import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.db.service.BatxHeadService;
@@ -56,43 +58,46 @@ public class L6101 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	AcCloseService sAcCloseService;
-	
+
 	@Autowired
 	TxToDoMainService sTxToDoMainService;
-	
+
 	@Autowired
 	BatxHeadService sBatxHeadService;
-	
+
 	@Autowired
 	TxFlowService sTxFlowService;
-	
+
 	@Autowired
 	CdWorkMonthService sCdWorkMonthService;
-	
+
 	@Autowired
 	BankRemitService bankRemitService;
-	
+
+	@Autowired
+	AcReceivableService sAcReceivableService;
+
 	@Autowired
 	DateUtil dDateUtil;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	L9130 tranL9130;
-	
+
 	@Autowired
 	L9131 tranL9131;
-	
+
 	@Autowired
 	L9132 tranL9132;
-	
+
 	@Autowired
 	L9133 tranL9133;
-	
+
 	@Autowired
 	L6101Excel l6101Excel;
-	
+
 	@Autowired
 	TxToDoCom txToDoCom;
 
@@ -177,15 +182,16 @@ public class L6101 extends TradeBuffer {
 		int clsFg = 0;
 		int unProcessCnt = 0;
 		int batxTotCnt = 0;
-		int TxFlowCnt = 0;
+		int txFlowCnt = 0;
+		int acReceivableCnt= 0;
 
 		switch (cSecNo) {
 		case "02": // 2-支票繳款
 
 			// MsgCode=06 檢查是否有未放行交易
 			if (cClsFg == 1) {
-				TxFlowCnt = findTxFlow(titaVo.getParam("SecNo"), TxFlowCnt, titaVo);
-				if (TxFlowCnt > 0) {
+				txFlowCnt = findTxFlow(titaVo.getParam("SecNo"), txFlowCnt, titaVo);
+				if (txFlowCnt > 0) {
 					cMsgCode = cMsgCode + 1;
 				}
 			}
@@ -246,17 +252,34 @@ public class L6101 extends TradeBuffer {
 
 			// MsgCode=06 檢查是否有未放行交易
 			if (cClsFg == 1) {
-				TxFlowCnt = findTxFlow(titaVo.getParam("SecNo"), TxFlowCnt, titaVo);
-				if (TxFlowCnt > 0) {
+				txFlowCnt = findTxFlow(titaVo.getParam("SecNo"), txFlowCnt, titaVo);
+				if (txFlowCnt > 0) {
 					cMsgCode = cMsgCode + 1;
 				}
 			}
 
 			// MsgCode=06 檢查是否有未放行交易 , 其他由9-放款檢查
-			TxFlowCnt = 0;
+			txFlowCnt = 0;
 			if (cClsFg == 1) {
-				TxFlowCnt = findTxFlow("  ", TxFlowCnt, titaVo);
-				if (TxFlowCnt > 0) {
+				txFlowCnt = findTxFlow("  ", txFlowCnt, titaVo);
+				if (txFlowCnt > 0) {
+					cMsgCode = cMsgCode + 1;
+				}
+			}
+
+			// MsgCode=06 檢查是否有未放行交易 , 其他由9-放款檢查
+			txFlowCnt = 0;
+			if (cClsFg == 1) {
+				txFlowCnt = findTxFlow("  ", txFlowCnt, titaVo);
+				if (txFlowCnt > 0) {
+					cMsgCode = cMsgCode + 1;
+				}
+			}
+			
+			// MsgCode=07 檢查會計銷帳檔是否有應銷未銷資料
+			if (cClsFg == 1) {
+				acReceivableCnt = findAcReceivable(acReceivableCnt, titaVo);
+				if (acReceivableCnt > 0) {
 					cMsgCode = cMsgCode + 1;
 				}
 			}
@@ -296,7 +319,7 @@ public class L6101 extends TradeBuffer {
 	private int findTxToDoMain(int fUnProcessCnt, TitaVo titaVo) throws LogicException {
 
 		Slice<TxToDoMain> slTxToDoMain;
-		slTxToDoMain = sTxToDoMainService.findAll(this.index, Integer.MAX_VALUE,titaVo);
+		slTxToDoMain = sTxToDoMainService.findAll(this.index, Integer.MAX_VALUE, titaVo);
 		List<TxToDoMain> lTxToDoMain = slTxToDoMain == null ? null : slTxToDoMain.getContent();
 
 		if (lTxToDoMain == null || lTxToDoMain.size() == 0) {
@@ -396,6 +419,38 @@ public class L6101 extends TradeBuffer {
 
 		this.info("L6101 findTxFlow fTxFlowCnt : " + fTxFlowCnt);
 		return fTxFlowCnt;
+	}
+
+	// 讀取會計銷帳檔
+	private int findAcReceivable(int fAcReceivableCnt, TitaVo titaVo) throws LogicException {
+
+		Slice<AcReceivable> slAcReceivable = sAcReceivableService.acctCodeEq(0, "TRO", 0, 9999999, 0, Integer.MAX_VALUE,
+				titaVo);
+		if (slAcReceivable != null) {
+			for (AcReceivable tAcReceivable : slAcReceivable.getContent()) {
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOMsgCode", "錯誤");
+				occursList.putParam("OOMessage", "暫收款－借新還舊，戶號：" + parse.IntegerToString(tAcReceivable.getCustNo(), 7)
+						+ "，有未銷餘額=" + tAcReceivable.getRvBal());
+				this.totaVo.addOccursList(occursList);
+				fAcReceivableCnt++;
+			}
+		}
+
+		slAcReceivable = sAcReceivableService.acctCodeEq(0, "THC", 0, 9999999, 0, Integer.MAX_VALUE, titaVo);
+		if (slAcReceivable != null) {
+			for (AcReceivable tAcReceivable : slAcReceivable.getContent()) {
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOMsgCode", "錯誤");
+				occursList.putParam("OOMessage", "暫收款－沖正，戶號：" + parse.IntegerToString(tAcReceivable.getCustNo(), 7)
+						+ "，有未銷餘額=" + tAcReceivable.getRvBal());
+				this.totaVo.addOccursList(occursList);
+				fAcReceivableCnt++;
+			}
+		}
+
+		this.info("L6101 findAcReceivable fUnProcessCnt : " + fAcReceivableCnt);
+		return fAcReceivableCnt;
 	}
 
 	// 更新會計業務關帳控制檔
@@ -532,11 +587,11 @@ public class L6101 extends TradeBuffer {
 		} else {
 			titaVo.putParam("DoL9133", "N");
 		}
-		
+
 		// 2021-12-15 智誠修改
 //		MySpring.newTask("L6101Report", this.txBuffer, titaVo);
 		l6101Excel.exec(titaVo);
-		
+
 		// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
 		MySpring.newTask("L9130", this.txBuffer, titaVo);
 

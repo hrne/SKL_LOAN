@@ -168,9 +168,6 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (acctCodeAc.substring(0, 1).equals("Z")) {
 			acctCodeAc = "3" + acctCodeAc.substring(1, 3);
 		}
-		if (acctCodeAc.equals("YOP")) {
-			acctCodeAc = "IOP";
-		}
 		query.setParameter("acctcodeac", acctCodeAc);
 		query.setParameter("acctcode", iAcctCode);
 		query.setParameter("custno", iCustNo);

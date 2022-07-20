@@ -38,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L618B extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L618B.class);
 
 	@Autowired
 	public Parse parse;
@@ -167,7 +166,7 @@ public class L618B extends TradeBuffer {
 		if (titaVo.isHcodeNormal()) {
 			addLoanBorTxRoutine(titaVo);
 		} else {
-			loanCom.setFacmBorTxHcode(iCustNo, iFacmNo, titaVo);
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
 		}
 
 		this.addList(this.totaVo);

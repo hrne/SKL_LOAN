@@ -15,6 +15,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
@@ -93,6 +95,7 @@ public class L3240 extends TradeBuffer {
 	private String iTxtNo;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
+	private int wkRepayCode;
 
 	private FacProd tFacProd;
 	private FacMain tFacMain;
@@ -149,24 +152,31 @@ public class L3240 extends TradeBuffer {
 
 		titaVo.setTxAmt(wkTxAmt);
 		titaVo.put("CURNM", "TWD");
+		titaVo.putParam("RpCode1", wkRepayCode);
+		titaVo.putParam("RpAmt1", wkTxAmt);
 		// Temp 200
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 3 被沖正
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 4 沖正
 		// L3240 TxAmt = 300 TempAmt = 300 Loan 0 ==> HCODE = 0 (入帳金額轉暫收款-冲正產生)
 		// Debit: Loan 500 Credit TAV 500(Tx 300, Temp 200)
-		// 入帳金額轉暫收款-冲正產生
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
-			loanCom.addFacmBorTxNextDateErase(iCustNo, wkTxAmt, titaVo);
-		}
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 
-//			// 暫收可抵繳
+			// THC 暫收款－沖正
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("THC");
+			acDetail.setTxAmt(wkTxAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			lAcDetail.add(acDetail);
+			
+			// TAV 暫收款可抵繳
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(wkTempAmt);
+			acDetail.setTxAmt(wkTempAmt.subtract(wkTxAmt));
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			lAcDetail.add(acDetail);
@@ -224,6 +234,8 @@ public class L3240 extends TradeBuffer {
 			if (!tx.getCreateEmpNo().equals("999999")) {
 				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
 			}
+			wkRepayCode = tx.getRepayCode();
+			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 			wkBorxNo = tx.getBorxNo();
 
 			// 更新額度檔
@@ -308,7 +320,7 @@ public class L3240 extends TradeBuffer {
 
 		// 短繳清償違約金處理, 新增銷帳檔
 		if (tx.getUnpaidCloseBreach().compareTo(BigDecimal.ZERO) > 0) {
-			acRvUnpaidAmt(isDelete, tx, "YOP", tx.getUnpaidCloseBreach());
+			acRvUnpaidAmt(isDelete, tx, "IOP", tx.getUnpaidCloseBreach());
 		}
 	}
 
@@ -432,7 +444,7 @@ public class L3240 extends TradeBuffer {
 		// 違約金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("D");
-		acDetail.setAcctCode("IOP");
+		acDetail.setAcctCode("IOV");
 		acDetail.setTxAmt(tx.getBreachAmt());
 		acDetail.setCustNo(tx.getCustNo());
 		acDetail.setFacmNo(tx.getFacmNo());
@@ -449,7 +461,6 @@ public class L3240 extends TradeBuffer {
 		lAcDetail.add(acDetail);
 		wkTempAmt = wkTempAmt.add(tx.getPrincipal().add(tx.getInterest()).add(tx.getDelayInt()).add(tx.getBreachAmt())
 				.add(tx.getCloseBreachAmt()));
-		wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 	}
 
 }

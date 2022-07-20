@@ -429,6 +429,7 @@ public class L3440 extends TradeBuffer {
 				nextAdjDate = tLoanBorMain.getMaturityDate();
 			}
 		}
+		this.info("NextAdjRateDateRoutine end nextAdjDate= " + nextAdjDate);
 		return nextAdjDate;
 	}
 
@@ -877,7 +878,7 @@ public class L3440 extends TradeBuffer {
 		// 違約金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
-		acDetail.setAcctCode("IOP");
+		acDetail.setAcctCode("IOV");
 		acDetail.setTxAmt(wkBreachAmt);
 		acDetail.setCustNo(wkCustNo);
 		acDetail.setFacmNo(wkFacmNo);

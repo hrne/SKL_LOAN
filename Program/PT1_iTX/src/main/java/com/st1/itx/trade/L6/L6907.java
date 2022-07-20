@@ -116,11 +116,11 @@ public class L6907 extends TradeBuffer {
 					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
 				l6908Flag = "";
 			}
-			// 交易序號 = 0不顯示按鈕 
+			// 交易序號 = 0不顯示按鈕
 			occursList.putParam("L6908Flag", l6908Flag);
-            if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
-				l6908Flag = "";         	
-            }
+			if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
+				l6908Flag = "";
+			}
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));
@@ -171,27 +171,15 @@ public class L6907 extends TradeBuffer {
 //		   Z30	長期擔保放款	330	長期擔保放款
 //		   Z40	三十年房貸	340	三十年房貸
 //
-//		   ZC1	短擔息	      IC1	短擔息
-//		   ZC2	中擔息	      IC2	中擔息
-//		   ZC3	長擔息	      IC3	長擔息
-//		   ZC4	三十年房貸息	  IC4	三十年房貸息
-//		   ZOV	逾期息              IOV	逾期息
-//		   ZOP	違約金              IOP	違約金       
+//		   IC1	短擔息
+//		   IC2	中擔息
+//	       IC3	長擔息
+//		   IC4	三十年房貸息
+//		   IOP	清償違約金       
 //
-//	 	   銷帳科目記號ReceivableFlag = 5-另收欠款
-//	       YOP 清償違約金         IOP	違約金              
 		if ("Z".equals(acctCode.substring(0, 1))) {
-			if ("ZC".equals(acctCode.substring(0, 2)))
-				acctItem = "短繳利息";
-			else if ("ZOV".equals(acctCode.substring(0, 2)))
-				acctItem = "短繳逾期息";
-			else if ("ZOP".equals(acctCode))
-				acctItem = "短繳違約金";
-			else
-				acctItem = "短繳本金";
+			acctItem = "短繳本金";
 		}
-		if ("YOP".equals(acctCode))
-			acctItem = "清償違約金";
 		if ("".equals(acctItem)) {
 			if (acctCode.trim().length() > 0) {
 				tCdAcCode = cdAcCodeService.acCodeAcctFirst(acctCode, titaVo);

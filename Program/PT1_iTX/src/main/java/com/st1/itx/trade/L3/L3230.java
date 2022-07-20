@@ -610,11 +610,7 @@ public class L3230 extends TradeBuffer {
 				addLoanBorTx06Routine(rpCustNo, rpFacmNo);
 			}
 		} else {
-			loanCom.setFacmBorTxHcode(iCustNo, iFacmNo, titaVo);
-			if ("06".equals(iTempItemCode)) {
-				loanCom.setFacmBorTxHcode(rpCustNo, rpFacmNo, titaVo);
-			}
-
+			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
 		}
 	}
 
@@ -643,7 +639,7 @@ public class L3230 extends TradeBuffer {
 		tTempVo.clear();
 
 		tTempVo.putParam("TempItemCode", iTempItemCode);
-		tTempVo.putParam("Description", titaVo.getParam("Description"));
+		tTempVo.putParam("Note", titaVo.getParam("Description"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -659,7 +655,7 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, rpCustNo, rpFacmNo, titaVo);
 		tLoanBorTx.setDesc("暫收款轉帳");
-		//
+		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(iTempAmt);
 		tTempVo.clear();

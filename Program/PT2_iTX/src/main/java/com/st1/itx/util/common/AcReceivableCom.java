@@ -105,15 +105,15 @@ public class AcReceivableCom extends TradeBuffer {
 		int AcHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
 		int idx = 0;
 
-//		帳務訂正記號  AcHCode   0.正常     1.當日訂正     2.隔日訂正   ；   訂正反序          
+//		帳務訂正記號  AcHCode   0.正常     1.訂正     2.沖正   ；   訂正反序          
 		// 1.業務科目記號 = 1 資負明細科目（放款、催收款項) 且非L6801:放款戶帳冊別轉換
 		// 2.銷帳科目記號 <> 0 0－非銷帳科目 1－會計銷帳科目 2－業務銷帳科目 3-未收款, 4-短繳期金,
 		// 5-另收欠款,8-核心銷帳碼科目(不寫銷帳檔)
 		for (int i = 0; i < this.txBuffer.getAcDetailList().size(); i++) {
-			if (AcHCode == 0) {
-				idx = i;
-			} else {
+			if (AcHCode == 1) {
 				idx = this.txBuffer.getAcDetailList().size() - 1 - i;
+			} else {
+				idx = i;
 			}
 
 			wkRvFg = 0;
@@ -405,18 +405,18 @@ public class AcReceivableCom extends TradeBuffer {
 	private void procSetting(int AcHcode) throws LogicException {
 
 		// 起銷帳金額wkTxAmt
-		// 起帳(+),銷帳(-)，當日訂正 +/- 相反 ※隔日訂正其借貸別已作相反處理
+		// 起帳(+),銷帳(-)，訂正 +/- 相反
+		// 沖正其借貸別已作相反處理
 		if (wkRvFg == 0)
 			wkTxAmt = ac.getTxAmt();
 		else
 			wkTxAmt = BigDecimal.ZERO.subtract(ac.getTxAmt());
 
-		// 當日訂正 +/- 相反 ※隔日訂正其借貸別已作相反處理
+		// 訂正 +/- 相反 ※隔日訂正其借貸別已作相反處理
 		if (AcHcode == 1) {
 			wkTxAmt = BigDecimal.ZERO.subtract(wkTxAmt);
 		}
 
-		// 起銷帳記號wkRvFg (0-起帳, 1-銷帳 2-訂正)
 		if (AcHcode > 0) {
 			wkRvFg = 2;
 		}

@@ -174,12 +174,13 @@ public class AcPaymentCom extends TradeBuffer {
 //		
 
 // 0-共用
-//      090.暫收抵繳    (額度)        TAV 暫收款－可抵繳
-//      091:借新還舊                   TRO 暫收款－借新還舊
+//      090.暫收抵繳    (額度)         TAV 暫收款－可抵繳
+//      091:借新還舊                              TRO 暫收款－借新還舊
 //      092:暫收轉帳     (戶號+額度)   TAV 暫收款－可抵繳
-//      093:繳抽退票                   TCK 暫收款－支票
+//      093:繳抽退票                              TCK 暫收款－支票
 //      094:轉債協暫收款  (戶號)      T1x 債協暫收款      
-//      095:轉債協退還款  (戶號)      T2x 債協退還款    
+//      095:轉債協退還款  (戶號)      T2x 債協退還款  
+//      096:暫收沖正(戶號)           THC 暫收款－沖正
 
 		if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
 			acDetail.setSumNo("0" + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
@@ -238,6 +239,10 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setFacmNo(0); // 額度不放
 			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)));
 			acDetail.setAcctCode(acNegCom.getReturnAcctCode(acDetail.getCustNo(), titaVo));
+			break;
+		case "096":
+			acDetail.setAcctCode("THC");
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
 			break;
 		case "101": // 101.匯款轉帳
 			acDetail.setAcctCode("P03");
@@ -310,7 +315,7 @@ public class AcPaymentCom extends TradeBuffer {
 	 * @param titaVo TitaVo
 	 * @return LoanCheque
 	 * @throws LogicException LogicException
-	 */	
+	 */
 	public LoanCheque loanCheque(TitaVo titaVo) throws LogicException {
 		this.info("AcPayment LoanCheque ...");
 		int iCustNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));

@@ -104,8 +104,9 @@ public class AcTxFormCom extends TradeBuffer {
 
 //			會計日期 
 			this.totaVo.putParam("FM101_AcDate", headAcDetail.getAcDate());
-//			登放序號 
-			this.totaVo.putParam("FM101_RelTxseq", headAcDetail.getAcDetailId().getRelTxseq());
+//			登放序號 -> 交易序號
+			this.totaVo.putParam("FM101_RelTxseq", headAcDetail.getTitaKinbr() + headAcDetail.getTitaTlrNo()
+					+ parse.IntegerToString(headAcDetail.getTitaTxtNo(), 8));
 //			交易代號 & 中文 
 			this.totaVo.putParam("FM101_TitaTxCd", headAcDetail.getTitaTxCd());
 			if (txTranCode == null) {
@@ -202,7 +203,7 @@ public class AcTxFormCom extends TradeBuffer {
 				} else {
 					throw new LogicException("E0001", "DbCr未定義");
 				}
-				//傳票號碼
+				// 傳票號碼
 				occursList.putParam("FM101_SlipNo", tAcDetail.getSlipNo());
 
 				this.totaVo.addOccursList(occursList);
