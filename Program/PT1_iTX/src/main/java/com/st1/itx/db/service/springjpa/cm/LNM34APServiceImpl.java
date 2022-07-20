@@ -50,8 +50,7 @@ public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBe
 				+ ", \"BadDebtDate\", \"BadDebtAmt\", \"DerCode\", \"GracePeriod\", \"ApproveRate\" "
 				+ ", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", \"IndustryCode\" "
 				+ ", \"ClTypeJCIC\", \"Zip3\" " + ", \"ProdNo\", \"CustKind\", \"AssetClass\" "
-				+ ", \"Ifrs9ProdCode\", \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\" "
-				+ ", \"AgreeBefFacmNo\", \"AgreeBefBormNo\" " + " FROM  \"Ias34Ap\" "
+				+ ", \"Ifrs9ProdCode\", \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\" " + " FROM  \"Ias34Ap\" "
 				+ " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);

@@ -126,7 +126,7 @@ BEGIN
 
     SELECT
            M."ClActNo"                    AS "MainClActNo"       -- 主要擔保品控制編碼
-         , WK2."OwnerId"                  AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
+         , OnlyOneLandOwner."OwnerId"     AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN
          , M."CityJCICCode"               AS "CityCode"          -- 縣市別
          , M."AreaJCICCode"               AS "AreaCode"          -- 鄉鎮市區別
          , M."IrCode"                     AS "IrCode"            -- 段、小段號

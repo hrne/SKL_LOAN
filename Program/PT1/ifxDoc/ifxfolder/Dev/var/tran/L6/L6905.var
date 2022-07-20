@@ -388,7 +388,7 @@ T(2,#OOTitaSupNo+ +#OOSupItem)
 
 !登放日期
 #OORelDy=D,7,S
-!登放序號
+!交易序號
 #OORelTxseq=X,18,S
 
 !傳票號碼
@@ -400,20 +400,21 @@ T(2,#OOTitaSupNo+ +#OOSupItem)
 #OOTitaTlrNoX=X,47,S
 T(2,#OOTitaTlrNo+ +#OOTlrItem)
 
-!登放序號
-#OORelSeqNo=X,8,S
-T(1,#OORelTxseq,11,8)
+!交易序號
+!#OORelSeqNo=X,8,S
+#OOTitaTxtNo=X,8,S
+!T(1,#OOTitaTxtNo,11,8)
 
 !分錄清單
 #OOBUF5=X,32,S
-T(2,#AcDate+0000000+#OORelTxseq)
+T(2,#AcDate+0000000+#OOTitaTxtNo)
 
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
 
 ! 最後修改日期
 #OOLastUpdate=x,20,S
-T(2,#OOLastDate+ +#OOLastTime)
+!T(2,#OOLastDate+ +#OOLastTime)
 
 ! 最後修改人員
 #OOLastEmp=x,47,S
@@ -459,6 +460,7 @@ TXFORM=L6905
 #OOLastDate
 #OOLastTime
 #OOSlipNote
+#OOTitaTxtNo
 #OOTitaTxCd
 #OOTranItem
 #OOSumNo
@@ -518,7 +520,7 @@ TXFORM=L6905
 {width:100,align:'center'}
 #OOTitaSupNoX=主管
 {width:100,align:'center'}
-#OORelSeqNo=登放序號
+#OOTitaTxtNo=交易序號
 {width:80,align:'center'}
 #OOAcNoItem=科子細目名稱
 {width:300,align:'left'}

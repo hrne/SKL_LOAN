@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * Ias34Ap IAS34欄位清單A檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class Ias34ApId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6399641142929718693L;
-
-// 年月份
+  // 年月份
   @Column(name = "`DataYM`")
   private int dataYM = 0;
 

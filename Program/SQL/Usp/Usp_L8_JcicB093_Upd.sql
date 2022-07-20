@@ -65,7 +65,7 @@ BEGIN
              WHEN FLOOR(NVL("ClMain"."EvaDate",0) / 100) < 191100       
                   AND FLOOR(NVL("ClMain"."EvaDate",0) / 100) > (YYYYMM - 191100)  THEN YYYYMM - 191100 -- 原日期為民國年月且大於申報年月則設為申報年月
              WHEN FLOOR(NVL("ClMain"."EvaDate",0) / 100) < 191100 THEN FLOOR(NVL("ClMain"."EvaDate",0) / 100)
-             WHEN LOOR(NVL("ClMain"."EvaDate",0) / 100) > YYYYMM  THEN YYYYMM - 191100  -- 原日期大於申報年月則設為申報年月
+             WHEN FLOOR(NVL("ClMain"."EvaDate",0) / 100) > YYYYMM  THEN YYYYMM - 191100  -- 原日期大於申報年月則設為申報年月
              ELSE FLOOR(NVL("ClMain"."EvaDate",0) / 100) - 191100
            END                                   AS "EvaDate"           -- 鑑估日期
          , ROUND( NVL("ClMain"."EvaAmt",0) * NVL(C."LoanToValue",0) / 100 / 1000, 0)
@@ -78,7 +78,8 @@ BEGIN
            END                                   AS "MonthSettingAmt"   -- 本行本月設定金額
          , 1                                     AS "SettingSeq"        -- 本月設定抵押順位
          , ROUND(NVL(C."SettingAmt",0) / 1000,0) AS "SettingAmt"        -- 本行累計已設定總金額
-         , ROUND(NVL(C."SettingAmt",0) / 1000,0) AS "PreSettingAmt"     -- 其他債權人前已設定金額
+--         , ROUND(NVL(C."SettingAmt",0) / 1000,0) AS "PreSettingAmt"     -- 其他債權人前已設定金額
+         , 0                                     AS "PreSettingAmt"     -- 其他債權人前已設定金額
          , ROUND(NVL("ClMain"."DispPrice",0) / 1000, 0)
                                                  AS "DispPrice"         -- 處分價格
          , CASE

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class Ias34Ap implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8353793754471558496L;
-
-@EmbeddedId
+  @EmbeddedId
   private Ias34ApId ias34ApId;
 
   // 年月份
@@ -213,14 +209,6 @@ public class Ias34Ap implements Serializable {
   // 總期數
   @Column(name = "`TotalPeriod`")
   private int totalPeriod = 0;
-
-  // 協議前之額度編號
-  @Column(name = "`AgreeBefFacmNo`")
-  private int agreeBefFacmNo = 0;
-
-  // 協議前之撥款序號
-  @Column(name = "`AgreeBefBormNo`")
-  private int agreeBefBormNo = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -1048,44 +1036,6 @@ public class Ias34Ap implements Serializable {
   }
 
 /**
-	* 協議前之額度編號<br>
-	* 
-	* @return Integer
-	*/
-  public int getAgreeBefFacmNo() {
-    return this.agreeBefFacmNo;
-  }
-
-/**
-	* 協議前之額度編號<br>
-	* 
-  *
-  * @param agreeBefFacmNo 協議前之額度編號
-	*/
-  public void setAgreeBefFacmNo(int agreeBefFacmNo) {
-    this.agreeBefFacmNo = agreeBefFacmNo;
-  }
-
-/**
-	* 協議前之撥款序號<br>
-	* 
-	* @return Integer
-	*/
-  public int getAgreeBefBormNo() {
-    return this.agreeBefBormNo;
-  }
-
-/**
-	* 協議前之撥款序號<br>
-	* 
-  *
-  * @param agreeBefBormNo 協議前之撥款序號
-	*/
-  public void setAgreeBefBormNo(int agreeBefBormNo) {
-    this.agreeBefBormNo = agreeBefBormNo;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1170,7 +1120,7 @@ public class Ias34Ap implements Serializable {
            + ", rate=" + rate + ", ovduDays=" + ovduDays + ", ovduDate=" + ovduDate + ", badDebtDate=" + badDebtDate + ", badDebtAmt=" + badDebtAmt + ", derCode=" + derCode
            + ", gracePeriod=" + gracePeriod + ", approveRate=" + approveRate + ", amortizedCode=" + amortizedCode + ", rateCode=" + rateCode + ", repayFreq=" + repayFreq + ", payIntFreq=" + payIntFreq
            + ", industryCode=" + industryCode + ", clTypeJCIC=" + clTypeJCIC + ", zip3=" + zip3 + ", prodNo=" + prodNo + ", custKind=" + custKind + ", assetClass=" + assetClass
-           + ", ifrs9ProdCode=" + ifrs9ProdCode + ", evaAmt=" + evaAmt + ", firstDueDate=" + firstDueDate + ", totalPeriod=" + totalPeriod + ", agreeBefFacmNo=" + agreeBefFacmNo + ", agreeBefBormNo=" + agreeBefBormNo
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", ifrs9ProdCode=" + ifrs9ProdCode + ", evaAmt=" + evaAmt + ", firstDueDate=" + firstDueDate + ", totalPeriod=" + totalPeriod + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
