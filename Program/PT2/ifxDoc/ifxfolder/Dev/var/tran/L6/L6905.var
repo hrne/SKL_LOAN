@@ -405,9 +405,15 @@ T(2,#OOTitaTlrNo+ +#OOTlrItem)
 #OOTitaTxtNo=X,8,S
 !T(1,#OOTitaTxtNo,11,8)
 
+#OOTxtNo=A,8,S
+T(2,#OOTitaTxtNo)
+
+#OOBranchNo = A,4,S
+T(2,#BranchNo)
+
 !分錄清單
 #OOBUF5=X,32,S
-T(2,#AcDate+0000000+#OOTitaTxtNo)
+T(2,#AcDate+0000000+#BranchNo+#OOTitaTlrNo+#OOTxtNo)
 
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
