@@ -708,7 +708,7 @@ T(2,@RmkCustNo,#TimCustNo)
 E(0,0)
 C(4,#CustNo,$,T(2,#CustNoX))
 C(4,#CustId,$,T(2,#CustIdX))
-C(4,#ApplNo,$,E(0,#ApplNoX))
+C(4,#ApplNo,$,T(2,#ApplNoX))
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
 T(2,@CompensateAcct,#TimCustNoX)
 

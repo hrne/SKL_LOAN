@@ -158,7 +158,7 @@ public class LB201Report extends MakeReport {
 				+ "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;"
 				+ "F40;F41;F42;F43;F44;F45;F46;F47;F48;F49;F50;F51;F52;F53;F54;F55;F56;F57;F58;F59;"
 				+ "F60;F61;F62;F63;F64;F65;F66;F67;F68;F69;F70;F71;F72;F73;F74;F75;F76;F77;F78;F79;"
-				+ "F80;F81;F82;F83;F84;F85;F86;F87;F88;F89;F90;F91;F92;F93;F94;F95;F96";
+				+ "F80;F81;F82;F83;F84;F85;F86;F87;F88;F89;F90;F91;F92;F93;F94;F95;F96;F97";
 		String txt1[] = txt.split(";");
 
 		int sumDrawdownAmt = 0; // 訂約金額(台幣)
@@ -183,7 +183,7 @@ public class LB201Report extends MakeReport {
 		} else {
 			for (Map<String, String> tLBVo : LBList) {
 				strContent = "";
-				for (int j = 1; j <= 97; j++) {
+				for (int j = 1; j <= 98; j++) {
 					String strField = "";
 					if (tLBVo.get(txt1[j - 1]) == null) {
 						strField = "";
@@ -412,14 +412,14 @@ public class LB201Report extends MakeReport {
 							strField = makeFile.fillStringL(strField, 4, '0');
 						}
 						break;
-					case 55:
+					case 55:// 購地貸款註記
+						strField = makeFile.fillStringR(strField, 1, ' ');
+						break;
+					case 56:// 約定動工之一定期間
 						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
-					case 56:
-						strField = makeFile.fillStringR(strField, 6, ' ');
-						break;
-					case 57:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+					case 57:// 實際興建年月
+						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
 					case 58:
 						strField = makeFile.fillStringR(strField, 1, ' ');
@@ -431,122 +431,125 @@ public class LB201Report extends MakeReport {
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 61:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 62:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
 					case 63:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 64:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 65:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 66:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
 					case 67:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 68:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 69:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 70:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
 					case 71:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 72:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 73:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 74:
-						strField = makeFile.fillStringR(strField, 1, ' ');
-						break;
-					case 75:
-						strField = makeFile.fillStringR(strField, 2, ' ');
-						break;
-					case 76:
-						strField = makeFile.fillStringR(strField, 1, ' ');
-						break;
-					case 77:
 						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
-					case 78:
+					case 75:
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 79:
+					case 76:
 						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
-					case 80:// 就學貸款逾期案件信保基金代償金額
+					case 77:
+						strField = makeFile.fillStringR(strField, 1, ' ');
+						break;
+					case 78:
+						strField = makeFile.fillStringR(strField, 10, ' ');
+						break;
+					case 79:
+						strField = makeFile.fillStringR(strField, 1, ' ');
+						break;
+					case 80:
+						strField = makeFile.fillStringR(strField, 2, ' ');
+						break;
+					case 81:// 就學貸款逾期案件信保基金代償金額
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 81:// 房貸寬限期起始年月(458~462)
+					case 82:// 房貸寬限期起始年月(458~462)
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 82:// 房貸寬限期截止年月(463~467)
+					case 83:// 房貸寬限期截止年月(463~467)
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 83:// 綠色授信註記(468)
+					case 84:// 綠色授信註記(468)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 84:// 綠色支出類別(469)
+					case 85:// 綠色支出類別(469)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 85:// 永續績效連結授信註記(470)
+					case 86:// 永續績效連結授信註記(470)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 86:// 永續績效連結授信類別(471)
+					case 87:// 永續績效連結授信類別(471)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 87:// 永續績效連結授信約定條件全部未達成通報(472)
+					case 88:// 永續績效連結授信約定條件全部未達成通報(472)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 88: // 呆帳轉銷年月(473~477)
+					case 89: // 呆帳轉銷年月(473~477)
 						if (strField.trim().equals("0")) {
 							strField = StringUtils.repeat(" ", 5);
 						} else {
 							strField = makeFile.fillStringL(strField, 5, '0');
 						}
 						break;
-					case 89:
+					case 90:
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 90: // 破產宣告日(或法院裁定開始清算日)(483~489)
+					case 91: // 破產宣告日(或法院裁定開始清算日)(483~489)
 						if (strField.trim().equals("0")) {
 							strField = StringUtils.repeat(" ", 7);
 						} else {
 							strField = makeFile.fillStringL(strField, 7, '0');
 						}
 						break;
-					case 91:
-						strField = makeFile.fillStringR(strField, 1, ' ');
-						break;
 					case 92:
-						strField = makeFile.fillStringL(strField, 4, '0');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 93:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringL(strField, 4, '0');
 						break;
 					case 94:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 95:
-						strField = makeFile.fillStringR(strField, 9, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 96:
-						strField = makeFile.fillStringL(strField, 5, '0');
+						strField = makeFile.fillStringR(strField, 9, ' ');
 						break;
 					case 97:
+						strField = makeFile.fillStringL(strField, 5, '0');
+						break;
+					case 98:
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					default:
@@ -603,8 +606,8 @@ public class LB201Report extends MakeReport {
 				+ "本月還款紀錄(254),本月（累計）應繳金額(255~267),本月收回本金(268~278),本月收取利息(279~289),本月收取其他費用(290~300),"
 				+ "甲類逾期放款分類(301~303),乙類逾期放款分類(304),不良債權處理註記(305~307),債權結束註記(308~310),債權處理後新債權人ID/債權轉讓後前手債權人ID/信保基金退理賠信用保證機構BAN(311~320),"
 				+ "債權處理案號(321~334),債權轉讓年月/債權轉讓後原債權機構買回年月(335~339),空白(340~345),擔保品組合型態(346),擔保品(合計)鑑估值(347~356),"
-				+ "擔保品類別(357~358),國內或國際聯貸(359),聯貸合約訂定日期(360~367),聯貸參貸比例(368~371),空白(372~373),"
-				+ "空白(374~379),代放款註記(380),債務協商註記(381),空白(382),共同債務人或債務關係人身份代號1(383),"
+				+ "擔保品類別(357~358),國內或國際聯貸(359),聯貸合約訂定日期(360~367),聯貸參貸比例(368~371),購地貸款註記(372),約定動工之一定期間(373~374),"
+				+ "實際興建年月(375~379),代放款註記(380),債務協商註記(381),空白(382),共同債務人或債務關係人身份代號1(383),"
 				+ "共同債務人或債務關係人身份統一編號1(384~393),上欄IDN或BAN錯誤註記(394),與主債務人關係1(395~396),共同債務人或債務關係人身份代號2(397),共同債務人或債務關係人身份統一編號2(398~407),"
 				+ "上欄IDN或BAN錯誤註記(408),與主債務人關係2(409~410),共同債務人或債務關係人身份代號3(411),共同債務人或債務關係人身份統一編號3(412~421),上欄IDN或BAN錯誤註記(422),"
 				+ "與主債務人關係3(423~424),共同債務人或債務關係人身份代號4(425),共同債務人或債務關係人身份統一編號4(426~435),上欄IDN或BAN錯誤註記(436),與主債務人關係4(437~438),"
@@ -617,7 +620,7 @@ public class LB201Report extends MakeReport {
 				+ "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;"
 				+ "F40;F41;F42;F43;F44;F45;F46;F47;F48;F49;F50;F51;F52;F53;F54;F55;F56;F57;F58;F59;"
 				+ "F60;F61;F62;F63;F64;F65;F66;F67;F68;F69;F70;F71;F72;F73;F74;F75;F76;F77;F78;F79;"
-				+ "F80;F81;F82;F83;F84;F85;F86;F87;F88;F89;F90;F91;F92;F93;F94;F95;F96";
+				+ "F80;F81;F82;F83;F84;F85;F86;F87;F88;F89;F90;F91;F92;F93;F94;F95;F96;F97";
 
 		String txt1[] = txt.split(";");
 
@@ -640,7 +643,7 @@ public class LB201Report extends MakeReport {
 		} else {
 			for (Map<String, String> tLBVo : LBList) {
 				strContent = "";
-				for (int j = 1; j <= 97; j++) {
+				for (int j = 1; j <= 98; j++) {
 					String strField = "";
 					if (tLBVo.get(txt1[j - 1]) == null) {
 						strField = "";
@@ -857,15 +860,16 @@ public class LB201Report extends MakeReport {
 							strField = makeFile.fillStringL(strField, 4, '0');
 						}
 						break;
-					case 55:
-						strField = makeFile.fillStringR(strField, 2, ' ');
-						break;
-					case 56:
-						strField = makeFile.fillStringR(strField, 6, ' ');
-						break;
-					case 57:
+					case 55:// 購地貸款註記
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
+					case 56:// 約定動工之一定期間
+						strField = makeFile.fillStringR(strField, 2, ' ');
+						break;
+					case 57:// 實際興建年月
+						strField = makeFile.fillStringR(strField, 5, ' ');
+						break;
+
 					case 58:
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
@@ -876,122 +880,125 @@ public class LB201Report extends MakeReport {
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 61:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 62:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
 					case 63:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 64:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 65:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 66:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
 					case 67:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 68:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 69:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 70:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
 					case 71:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 72:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 73:
-						strField = makeFile.fillStringR(strField, 10, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 74:
-						strField = makeFile.fillStringR(strField, 1, ' ');
-						break;
-					case 75:
-						strField = makeFile.fillStringR(strField, 2, ' ');
-						break;
-					case 76:
-						strField = makeFile.fillStringR(strField, 1, ' ');
-						break;
-					case 77:
 						strField = makeFile.fillStringR(strField, 10, ' ');
 						break;
-					case 78:
+					case 75:
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 79:
+					case 76:
 						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
-					case 80:// 就學貸款逾期案件信保基金代償金額
+					case 77:
+						strField = makeFile.fillStringR(strField, 1, ' ');
+						break;
+					case 78:
+						strField = makeFile.fillStringR(strField, 10, ' ');
+						break;
+					case 79:
+						strField = makeFile.fillStringR(strField, 1, ' ');
+						break;
+					case 80:
+						strField = makeFile.fillStringR(strField, 2, ' ');
+						break;
+					case 81:// 就學貸款逾期案件信保基金代償金額
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 81:// 房貸寬限期起始年月(458~462)
+					case 82:// 房貸寬限期起始年月(458~462)
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 82:// 房貸寬限期截止年月(463~467)
+					case 83:// 房貸寬限期截止年月(463~467)
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 83:// 綠色授信註記(468)
+					case 84:// 綠色授信註記(468)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 84:// 綠色支出類別(469)
+					case 85:// 綠色支出類別(469)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 85:// 永續績效連結授信註記(470)
+					case 86:// 永續績效連結授信註記(470)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 86:// 永續績效連結授信類別(471)
+					case 87:// 永續績效連結授信類別(471)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 87:// 永續績效連結授信約定條件全部未達成通報(472)
+					case 88:// 永續績效連結授信約定條件全部未達成通報(472)
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
-					case 88: // 呆帳轉銷年月(473~477)
+					case 89: // 呆帳轉銷年月(473~477)
 						if (strField.trim().equals("0")) {
 							strField = StringUtils.repeat(" ", 5);
 						} else {
 							strField = makeFile.fillStringL(strField, 5, '0');
 						}
 						break;
-					case 89:
+					case 90:
 						strField = makeFile.fillStringR(strField, 5, ' ');
 						break;
-					case 90: // 破產宣告日(或法院裁定開始清算日)(483~489)
+					case 91: // 破產宣告日(或法院裁定開始清算日)(483~489)
 						if (strField.trim().equals("0")) {
 							strField = StringUtils.repeat(" ", 7);
 						} else {
 							strField = makeFile.fillStringL(strField, 7, '0');
 						}
 						break;
-					case 91:
-						strField = makeFile.fillStringR(strField, 1, ' ');
-						break;
 					case 92:
-						strField = makeFile.fillStringL(strField, 4, '0');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 93:
-						strField = makeFile.fillStringR(strField, 1, ' ');
+						strField = makeFile.fillStringL(strField, 4, '0');
 						break;
 					case 94:
-						strField = makeFile.fillStringR(strField, 2, ' ');
+						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					case 95:
-						strField = makeFile.fillStringR(strField, 9, ' ');
+						strField = makeFile.fillStringR(strField, 2, ' ');
 						break;
 					case 96:
-						strField = makeFile.fillStringL(strField, 5, '0');
+						strField = makeFile.fillStringR(strField, 9, ' ');
 						break;
 					case 97:
+						strField = makeFile.fillStringL(strField, 5, '0');
+						break;
+					case 98:
 						strField = makeFile.fillStringR(strField, 1, ' ');
 						break;
 					default:
@@ -999,7 +1006,7 @@ public class LB201Report extends MakeReport {
 						break;
 					}
 					strContent = strContent + strField;
-					if (j != 97) {
+					if (j != 98) {
 						strContent = strContent + ",";
 					}
 				}

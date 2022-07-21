@@ -26,7 +26,8 @@ BEGIN
           ,S1."LGTSEQ"      AS "LGTSEQ"      -- 舊擔保品序號 decimal(2, 0) default 0 not null,
           ,S1."GDRNUM2"     AS "GDRNUM2"     -- 舊群組編號 decimal(10, 0) default 0 not null
           ,ROW_NUMBER() OVER (PARTITION BY S1."GDRID1",S1."GDRID2",S1."GDRNUM"
-                              ORDER BY CASE
+                              ORDER BY S1."LGTCIF"
+                                     , CASE
                                          WHEN S1."APLLAM" != 0
                                          THEN 0
                                        ELSE 1 END -- 2022-06-13 Wei 未結案者優先
@@ -45,6 +46,7 @@ BEGIN
                 ,S1."LGTSAM"
                 ,S1."GRTSTS"
                 ,APLP.APLLAM
+                ,S1."LGTCIF"
           FROM "LA$HGTP" S1
           LEFT JOIN "ClBuildingUnique" S2 ON S2."GDRID1" = S1."GDRID1"
                                          AND S2."GDRID2" = S1."GDRID2"
@@ -83,6 +85,7 @@ BEGIN
                 ,S1."LGTSAM"
                 ,S1."GRTSTS"
                 ,APLP.APLLAM
+                ,S1."LGTCIF"
           FROM "LA$LGTP" S1
           LEFT JOIN "ClLandUnique" S2 ON S2."GDRID1" = S1."GDRID1"
                                      AND S2."GDRID2" = S1."GDRID2"
@@ -121,6 +124,7 @@ BEGIN
                 ,"LN$CGTP"."CGT018" AS "LGTSAM"
                 ,"LN$CGTP"."GRTSTS"
                 ,APLP.APLLAM
+                ,0 AS "LGTCIF"
           FROM "LN$CGTP"
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LN$CGTP"."GDRID1"
                                 AND APLP."GDRID2" = "LN$CGTP"."GDRID2"
@@ -140,6 +144,7 @@ BEGIN
             --     ,'LA$SGTP' AS "SourceTable"
                 ,"LA$SGTP"."GRTSTS"
                 ,APLP.APLLAM
+                ,0 AS "LGTCIF"
           FROM "LA$SGTP"
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LA$SGTP"."GDRID1"
                                 AND APLP."GDRID2" = "LA$SGTP"."GDRID2"
@@ -159,6 +164,7 @@ BEGIN
                 ,"LA$BGTP"."BGTAMT" AS "LGTSAM"
                 ,"LA$BGTP"."GRTSTS"
                 ,APLP.APLLAM
+                ,0 AS "LGTCIF"
           FROM "LA$BGTP"
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LA$BGTP"."GDRID1"
                                 AND APLP."GDRID2" = "LA$BGTP"."GDRID2"

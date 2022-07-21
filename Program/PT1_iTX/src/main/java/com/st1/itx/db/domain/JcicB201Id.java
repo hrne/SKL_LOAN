@@ -2,8 +2,12 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * JcicB201 聯徵授信餘額月報資料檔<br>
@@ -16,12 +20,7 @@ import javax.persistence.Embeddable;
 public class JcicB201Id implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6803270984784236141L;
-
-// 資料年月
+  // 資料年月
   @Column(name = "`DataYM`")
   private int dataYM = 0;
 
@@ -36,12 +35,12 @@ public class JcicB201Id implements Serializable {
   private String branchItem = " ";
 
   // 交易代碼
-  /* A 新增 C 異動 D刪除 ;每月正常報送資料(尚未上線時)僅限填A 代碼;發函更正(已上線)授信資料時，依下列狀況填A C D代碼：1. 新增資料時填A;2. 修改非key值欄位值時填C; 3. 刪除原報送資料時填D;4. 若為更改Key欄位值，請先以一筆D刪除原報送資料，再以A代碼報送一筆新增(異動後)資料 */
+  /* A:新增C:異動D:刪除每月正常報送資料(尚未上線時)僅限填A 代碼;發函更正(已上線)授信資料時，依下列狀況填A C D代碼：1. 新增資料時填A;2. 修改非key值欄位值時填C; 3. 刪除原報送資料時填D;4. 若為更改Key欄位值，請先以一筆D刪除原報送資料，再以A代碼報送一筆新增(異動後)資料 */
   @Column(name = "`TranCode`", length = 1)
   private String tranCode = " ";
 
   // 帳號屬性註記
-  /* A 本月新增帳號(非上月轉換而來)C 本月轉換帳號(如填報C，請務必填報帳號轉換檔)X 舊有帳號 */
+  /* A:本月新增帳號(非上月轉換而來)C:本月轉換帳號(如填報C，請務必填報帳號轉換檔)X:舊有帳號 */
   @Column(name = "`SubTranCode`", length = 1)
   private String subTranCode = " ";
 
@@ -51,7 +50,7 @@ public class JcicB201Id implements Serializable {
   private String acctNo = " ";
 
   // 本筆撥款帳號序號
-  /* 1=關係人5位以內2=關係人5位以上記在第2筆 */
+  /* 1:關係人5位以內2:關係人5位以上記在第2筆 */
   @Column(name = "`SeqNo`")
   private int seqNo = 0;
 
@@ -127,7 +126,9 @@ public class JcicB201Id implements Serializable {
 
 /**
 	* 交易代碼<br>
-	* A 新增 C 異動 D刪除 ;
+	* A:新增
+C:異動
+D:刪除
 每月正常報送資料(尚未上線時)僅限填A 代碼;發函更正(已上線)授信資料時，依下列狀況填A C D代碼：
 1. 新增資料時填A;
 2. 修改非key值欄位值時填C; 
@@ -141,7 +142,9 @@ public class JcicB201Id implements Serializable {
 
 /**
 	* 交易代碼<br>
-	* A 新增 C 異動 D刪除 ;
+	* A:新增
+C:異動
+D:刪除
 每月正常報送資料(尚未上線時)僅限填A 代碼;發函更正(已上線)授信資料時，依下列狀況填A C D代碼：
 1. 新增資料時填A;
 2. 修改非key值欄位值時填C; 
@@ -156,9 +159,9 @@ public class JcicB201Id implements Serializable {
 
 /**
 	* 帳號屬性註記<br>
-	* A 本月新增帳號(非上月轉換而來)
-C 本月轉換帳號(如填報C，請務必填報帳號轉換檔)
-X 舊有帳號
+	* A:本月新增帳號(非上月轉換而來)
+C:本月轉換帳號(如填報C，請務必填報帳號轉換檔)
+X:舊有帳號
 	* @return String
 	*/
   public String getSubTranCode() {
@@ -167,9 +170,9 @@ X 舊有帳號
 
 /**
 	* 帳號屬性註記<br>
-	* A 本月新增帳號(非上月轉換而來)
-C 本月轉換帳號(如填報C，請務必填報帳號轉換檔)
-X 舊有帳號
+	* A:本月新增帳號(非上月轉換而來)
+C:本月轉換帳號(如填報C，請務必填報帳號轉換檔)
+X:舊有帳號
   *
   * @param subTranCode 帳號屬性註記
 	*/
@@ -198,8 +201,8 @@ X 舊有帳號
 
 /**
 	* 本筆撥款帳號序號<br>
-	* 1=關係人5位以內
-2=關係人5位以上記在第2筆
+	* 1:關係人5位以內
+2:關係人5位以上記在第2筆
 	* @return Integer
 	*/
   public int getSeqNo() {
@@ -208,8 +211,8 @@ X 舊有帳號
 
 /**
 	* 本筆撥款帳號序號<br>
-	* 1=關係人5位以內
-2=關係人5位以上記在第2筆
+	* 1:關係人5位以內
+2:關係人5位以上記在第2筆
   *
   * @param seqNo 本筆撥款帳號序號
 	*/

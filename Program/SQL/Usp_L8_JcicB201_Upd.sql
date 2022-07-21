@@ -590,9 +590,6 @@ BEGIN
                ELSE '1'
              END                                   AS "UsageCode"         -- 用途別 1:購置不動產 2:購置動產 3:企業投資 4:週轉金
            , NVL(M."StoreRate",0)                  AS "ApproveRate"       -- 本筆撥款利率
---         , CASE WHEN NVL(R."StoreRate",0) = 0 THEN L."StoreRate"
---                ELSE NVL(R."StoreRate",0)
---           END                                   AS "ApproveRate"       -- 本筆撥款利率
            , CASE
                WHEN FLOOR(NVL(M."DrawdownDate",0) / 100) < 191100 THEN FLOOR(NVL(M."DrawdownDate",0) / 100)
                ELSE FLOOR(NVL(M."DrawdownDate",0) / 100) - 191100
@@ -638,8 +635,6 @@ BEGIN
            , CASE WHEN M."BormNo" = 0 THEN 'X' -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額
                   ELSE '0'  
              END                                   AS "RepayCode"         -- 本月還款紀錄  (後面再更新)
---         , ROUND((NVL(M."PrevAmt",0) + NVL(M."IntAmt",0)) / 1000, 3)
---                                                 AS "PayAmt"            -- 本月（累計）應繳金額
            , CASE WHEN M."Status" IN (3, 5, 9) THEN 0   -- 結案:0
                   WHEN M."Status" IN (6)       THEN 0   -- 呆帳:0
                   WHEN M."Status" IN (2, 7)    THEN 0   -- 催收:轉催收本金+利息 (後面再更新)
@@ -698,8 +693,9 @@ BEGIN
                WHEN NVL(M."SyndAmt",0) = 0 THEN 0
                ELSE ROUND( NVL(M."PartAmt",0) / NVL(M."SyndAmt",0) * 100, 2)
              END                                   AS "SyndRatio"         -- 聯貸參貸比例
-           , ' '                                   AS "Filler51"          -- 空白
-           , ' '                                   AS "Filler52"          -- 空白
+           , ' '                                   AS "LandLoanFg"         -- 購地貸款註記
+           , '  '                                  AS "StarBuildingPeriod" -- 約定動工之一定期間
+           , '     '                               AS "StarBuildingYM"     -- 實際興建年月
            , 'N'                                   AS "PayablesFg"        -- 代放款註記
 --           , CASE
 --               WHEN N."CustNo" IS NULL THEN 'N'
@@ -768,13 +764,11 @@ BEGIN
            , ' '                                   AS "Filler741"         -- 空白
            , CASE WHEN M."FinCode" NOT IN ('L','M','2')    THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0            THEN '00000'
---                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
                   WHEN NVL(L."GraceFlag",0) = 0 THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."DrawdownDate",0) / 100) -191100 ) ),5,'0') 
              END                                   AS "GraceStartYM"      -- 房貸寬限期起始年月
            , CASE WHEN M."FinCode" NOT IN ('L','M','2') THEN ' '
                   WHEN NVL(L."GraceDate",0) = 0    THEN '00000'
---                  WHEN NVL(L."DrawdownDate",0) = NVL(L."GraceDate",0) THEN '00000'
                   WHEN NVL(L."GraceFlag",0) = 0 THEN '00000'
                   ELSE LPAD(LTRIM( TO_CHAR (TRUNC(NVL(L."GraceDate",0) / 100) - 191100 )  ) ,5,'0')   
              END                                   AS "GraceEndYM"        -- 房貸寬限期截止年月

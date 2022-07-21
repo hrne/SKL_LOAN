@@ -208,7 +208,8 @@ BEGIN
                                                  ,S1.GDRID2
                                                  ,S1.GDRNUM
                                                  ,S1.LGTSEQ
-                                     ORDER BY S2.GDRID1
+                                     ORDER BY S2.LGTCIF
+                                             ,S2.GDRID1
                                              ,S2.GDRID2
                                              ,S2.GDRNUM
                                              ,S2.LGTSEQ) AS SEQ
