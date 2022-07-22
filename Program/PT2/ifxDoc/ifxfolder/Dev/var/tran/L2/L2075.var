@@ -34,17 +34,19 @@ E(0,40)ASGN(INQPRT$)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
+INVOKEJS(SHOW,p1,5,5,0)
 
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];order=1;">
 [
 ["[L2075]                                 清償作業-整批列印"],
 ["#FdMain+查詢條件","@(入帳日期、申請日期，需擇一輸入)"],
 ["#FdEntryDate+入帳日期",#EntryDate],
 ["#FdApplDate+申請日期",#ApplDate],
 ["#FdType+類別",#Type,#TypeX],
+["#FdAgreeNo+塗銷同意書編號起號",#AgreeNo],
 ["#FdSearch+查詢",#Search,#SearchX],
 ]
 
@@ -55,6 +57,8 @@ T(3,．)
 #FdApplDate=X,2,L
 T(3,．)
 #FdType=X,2,L
+T(3,*)
+#FdAgreeNo=X,2,L
 T(3,*)
 #FdSearch=X,2,L
 T(3,*)
@@ -103,7 +107,6 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,$,S)
 T(4,NTXBUF$)
 
-
 #SysCDate=D,7,S
 E(0,#SYSCDATE)
 
@@ -114,13 +117,12 @@ D(8)
 @
 A(DATE,0,#EntryDate)
 
-
 !申請日期
 #ApplDate=D,7,I
 C(3,#EntryDate,0,$,S)
 C(3,#ApplDate,0,E(0,#SYSDATE),$)
 D(8)
-@V(7)
+@
 A(DATE,0,#ApplDate)
 C(3,#ApplDate,0,V(P,入帳日期、申請日期需擇一輸入),$)
 
@@ -129,9 +131,17 @@ C(3,#ApplDate,0,V(P,入帳日期、申請日期需擇一輸入),$)
 C(3,#CHAIN,1,s,$)
 HELP(#TypeHelp)
 @V(H,#TypeHelp)
+C(3,#Type,2,INVOKEJS(SHOW,p1,5,5,1),INVOKEJS(SHOW,p1,5,5,0))
+
 
 #TypeX=X,30,L
 T(H,#Type,#TypeHelp)
+
+!塗銷同意書編號起號
+#AgreeNo=A,10,I
+C(3,#Type,2,$,S)
+@V(2,0)
+
 
 #Search=A,1,I
 HELP(#SearchHelp)
@@ -220,7 +230,7 @@ T(H,#OORightsNote,#ClRightsNoteHelp)
 #OOAllClose=X,1,O
 
 #secret-no=x,1000,S
-T(6A,#EntryDate+#ApplDate+#Type+#OOCustNo+#OOCloseNo+#OOClCode1+#OOClCode2+#OOClNo+#OOSeq)
+T(6A,#EntryDate+#ApplDate+#Type+#OOCustNo+#OOCloseNo+#OOClCode1+#OOClCode2+#OOClNo+#OOSeq+#AgreeNo)
 
 
 
@@ -247,6 +257,7 @@ T(3,成功 請至LC009)
 #EntryDate
 #ApplDate
 #Type
+#AgreeNo
 #Search
 #END
 </sub>

@@ -29,7 +29,6 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.springjpa.cm.L2075ServiceImpl;
@@ -53,21 +52,17 @@ public class L2075 extends TradeBuffer {
 	@Autowired
 	public FacCloseService sFacCloseService;
 	@Autowired
-	public CustMainService sCustMainService;
-	@Autowired
 	public ClOtherRightsService ClOtherRightsService;
 	@Autowired
 	public ClFacService clFacService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-
 	@Autowired
 	public CdCodeService cdCodeService;
 	@Autowired
 	public CdCityService cdCityService;
 	@Autowired
 	public CdLandOfficeService cdLandOfficeService;
-
 	@Autowired
 	public L2075ServiceImpl l2075ServiceImpl;
 	@Autowired

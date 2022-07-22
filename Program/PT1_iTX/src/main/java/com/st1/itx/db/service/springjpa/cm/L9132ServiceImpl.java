@@ -106,15 +106,13 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		sql += " WITH rawData AS ( ";
 		sql += "     SELECT CASE ";
-		sql += "              WHEN B.\"AcDate\" IS NOT NULL ";
-		sql += "       		   AND B.\"ProcStsCode\" = '6' ";
+		sql += "              WHEN B.\"ProcStsCode\" = '6' ";
 		sql += "       	  	   AND LPAD(AC.\"TitaTxtNo\",8,0) = SUBSTR(AC.\"TitaBatchNo\",5,2) || AC.\"TitaBatchSeq\" ";
 		sql += "              THEN 0 ";
 		sql += "            ELSE AC.\"TitaTxtNo\" ";
 		sql += "            END                   AS \"TitaTxtNo\" ";
 		sql += "          , CASE ";
-		sql += "              WHEN B.\"AcDate\" IS NOT NULL ";
-		sql += "       		   AND B.\"ProcStsCode\" = '6' ";
+		sql += "              WHEN B.\"ProcStsCode\" = '6' ";
 		sql += "       	  	   AND LPAD(AC.\"TitaTxtNo\",8,0) = SUBSTR(AC.\"TitaBatchNo\",5,2) || AC.\"TitaBatchSeq\" ";
 		sql += "              THEN 0 ";
 		sql += "            ELSE AC.\"SlipNo\" ";
@@ -133,14 +131,14 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ELSE 0  ";
 		sql += "            END                   AS \"CrAmt\" ";
 		sql += "          , CASE ";
+		sql += "              WHEN AC.\"TitaBatchNo\" LIKE 'BATX%' ";
+		sql += "              THEN ' ' ";
 		sql += "              WHEN AC.\"CustNo\" != 0 ";
 		sql += "              THEN LPAD(AC.\"CustNo\",7,'0') ";
 		sql += "            ELSE ' ' ";
 		sql += "            END                   AS \"CustNo\" ";
 		sql += "          , CASE ";
-		sql += "              WHEN B.\"AcDate\" IS NOT NULL ";
-		sql += "       		   AND B.\"ProcStsCode\" = '6' ";
-		sql += "       	  	   AND LPAD(AC.\"TitaTxtNo\",8,0) = SUBSTR(AC.\"TitaBatchNo\",5,2) || AC.\"TitaBatchSeq\" ";
+		sql += "              WHEN AC.\"TitaBatchNo\" LIKE 'BATX%' ";
 		sql += "              THEN N' ' ";
 		sql += "            ELSE RPAD(NVL(CM.\"CustName\",' '),6,' ') ";
 		sql += "            END                   AS \"CustName\" ";

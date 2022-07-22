@@ -114,16 +114,21 @@ public class L2634ReportA extends MakeReport {
 		this.setFont(1, 36);
 		this.reportDate = Integer.valueOf(titaVo.getEntDy());
 		this.brno = titaVo.getBrno();
+		int iAgreeNo = parse.stringToInteger(titaVo.getParam("AgreeNo"));
 //		this.NowDate = dDateUtil.getNowStringRoc();
 //		this.pageSize = "A5";
 //		this.NowTime = dDateUtil.getNowStringTime();
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, "A4", pageOrientation);
-
+		int agreecnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 
 			iCustNo = t.getCustNo();
 			iCloseNo = t.getCloseNo();
+			int wkClCode1 = t.getClCode1();
+			int wkClCode2 = t.getClCode2();
+			int wkClNo = t.getClNo();
+			String wkClOtherSeq = t.getSeq();
 			reportItem = "抵押權塗銷同意書,戶號 :" + iCustNo;
 
 			// 自動取公文編號
@@ -136,7 +141,7 @@ public class L2634ReportA extends MakeReport {
 
 			this.setCharSpaces(0);
 
-			getSelecTotal(iCustNo, iCloseNo, lClOtherRights, titaVo);
+			getSelecTotal(iCustNo, iCloseNo, wkClCode1, wkClCode2, wkClNo, wkClOtherSeq, lClOtherRights, titaVo);
 			// 擔保品代號1
 			int iClCode1 = Integer.valueOf(titaVo.getParam("OOClCode1"));
 			// 擔保品代號2
@@ -159,6 +164,8 @@ public class L2634ReportA extends MakeReport {
 				} else {
 					updFacClose.setDocNoE(parse.stringToInteger(finalDocNo));
 				}
+				updFacClose.setAgreeNo(parse.IntegerToString((iAgreeNo + agreecnt), 10));
+				this.info("AgreeNo =" + updFacClose.getAgreeNo());
 				try {
 					sFacCloseService.update(updFacClose, titaVo);
 				} catch (DBException e) {
@@ -330,10 +337,10 @@ public class L2634ReportA extends MakeReport {
 			this.print(0, 68, date.substring(5, 7));
 			if (t.getReceiveFg() == 1) {
 
-				Point a = new Point(85, 124);
-				Point b = new Point(120, 124);
-				Point c = new Point(85, 144);
-				Point d = new Point(120, 144);
+				Point a = new Point(85, 119);
+				Point b = new Point(120, 119);
+				Point c = new Point(85, 139);
+				Point d = new Point(120, 139);
 
 				Line ab = new Line(a, b);
 				Line ac = new Line(a, c);
@@ -361,6 +368,7 @@ public class L2634ReportA extends MakeReport {
 //				throw new LogicException("E0007", "L2634A ClOtherRights update " + e.getErrorMsg());
 //			}
 			if (!isLast) {
+				agreecnt++;
 				this.newPage();
 			}
 		}
@@ -424,16 +432,20 @@ public class L2634ReportA extends MakeReport {
 		}
 	}
 
-	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo)
-			throws LogicException {
+	public int getSelecTotal(int custNo, int closeNo, int clCode1, int clCode2, int clNo, String seq,
+			List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
 			if (custNo == t.getCustNo() && closeNo == t.getCloseNo()) {
 				selecTotal++;
-				if (cnt == lClOtherRights.size()) {
-					isLast = true;
+				if (clCode1 == t.getClCode1() && clCode2 == t.getClCode2() && clNo == t.getClNo()
+						&& seq.equals(t.getSeq())) {
+					this.info("size =   " + cnt + "," + lClOtherRights.size());
+					if (cnt == lClOtherRights.size()) {
+						isLast = true;
+					}
 				}
 			}
 		}
