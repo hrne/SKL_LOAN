@@ -103,6 +103,7 @@ public class L2412 extends TradeBuffer {
 	private String finalClNo;
 
 	private boolean isEloan = false;
+	private FacMain tFacMain;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -144,6 +145,27 @@ public class L2412 extends TradeBuffer {
 				if (ClNo > 0) {
 					iFunCd = 2;
 					iClNo = ClNo;
+				}
+			}
+		}
+
+		if (iApplNo > 0) { // 核准編號大於0才去做
+			tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+			if (tFacMain == null) {
+				throw new LogicException("E2019", "核准號碼 = " + iApplNo);
+			} else {
+//				ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日期就是上送當下的日期
+				if (isEloan) {
+					FacMain updFacMain = sFacMainService.holdById(tFacMain, titaVo);
+					if (updFacMain != null) {
+						updFacMain.setSettingDate(this.txBuffer.getTxCom().getTbsdy());
+						try {
+							sFacMainService.update(updFacMain, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "額度主檔" + e.getErrorMsg());
+						}
+					}
+
 				}
 			}
 		}

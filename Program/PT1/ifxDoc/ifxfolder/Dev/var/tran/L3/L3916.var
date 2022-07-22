@@ -483,7 +483,7 @@ C(3,#CHAIN,1,s,$)
 HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
 @
 V(2,0)
-! IF(#BormNo>900,V(P,不可輸入預約撥款序號),$)
+IF(#BormNo>900,V(P,不可輸入預約撥款序號),$)
 
 
 #MRKEY=_,_,S

@@ -742,11 +742,10 @@ C(4,#ApplNo,SHOW(#BTN4),HIDE(#BTN4))
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
-C(4,#ApplNo,$,S)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
-E(0,@RimApplNo,#ApplNo)
+E(0,@RimApplNo,0)
 E(0,@RimCaseNo,0)
 RESET_RIM(#SendL2r05B,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
