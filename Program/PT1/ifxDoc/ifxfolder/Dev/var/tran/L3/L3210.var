@@ -205,6 +205,9 @@ T(3,@FdTempAmt,*)
 T(3,@FdTempReasonCode,*)
 HIDE(#EntryDate)
 
+#Flag=A,1,L
+E(0,0)
+
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
@@ -226,6 +229,8 @@ C(4,#CustNo,S,$)
 E(0,#CustNo)
 T(2,@CustNo,#CustNo2)
 T(3,#CustNoX,)
+E(0,@Flag,1)
+
 
 #SendL2r07A=X,1,S
 C(4,#CustNo,S,$)
@@ -234,10 +239,9 @@ E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07A,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
-T(2,@CustNoX,#L2r07CustName)
 
 #CustNoX=X,100,L
-C(4,#CustNo,S,$)
+C(4,#CustNo,S,T(2,#L2r07CustName))
 
 #WKBTN1=X,1,S
 E(0,@FacmNo,0)
@@ -252,7 +256,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<
 
 #CustId=X,10,I
 C(3,#CHAIN,1,s,$)
-C(4,#CustNo,$,S)
+C(3,#Flag,0,$,S)
 SHOW(#BTN2)
 HIDE(#BTN6,#BTN3)
 @C(4,#CustId,S,$)
@@ -260,6 +264,7 @@ A(ID_UNINO,0,#CustId)
 HIDE(#BTN2)
 V(7)
 T(3,#CustIdX,)
+E(0,@Flag,2)
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -278,10 +283,9 @@ E(0,@RimCustNo,0)
 RESET_RIM(#SendL2r07B,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
-T(2,@CustIdX,#L2r07CustName)
 
 #CustIdX=X,100,L
-C(4,#CustId,S,$)
+C(4,#CustId,S,T(2,#L2r07CustName)T(2,@CustNo,#L2r07CustNo))
 
 #WkStartDate=D,7,S
 E(0,#SYSDATE)
@@ -294,25 +298,23 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<
 
 ![核准編號]
 #FdApplNo=X,2,L
-C(3,#CHAIN,1,s,$)
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
-T(3,*)
 
 #ApplNo=X,7,I
 C(3,#CHAIN,1,s,$)
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
+C(3,#Flag,0,$,S)
+C(4,#CustNo,C(4,#CustId,T(3,@FdApplNo,*),T(3,@FdApplNo, )),T(3,@FdApplNo, ))
 SHOW(#BTN3)
 HIDE(#BTN6,#BTN2)
-@C(4,#ApplNo,V(P,需擇一輸入),$)
-HIDE(#BTN3)
+@
+C(4,#CustNo,0,C(4,#CustId,C(4,#ApplNo,V(P,需擇一輸入),$),$),$)
 
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
 T(2,@ApplNo,#ApplNo2)
 T(3,#ApplNoX,)
+E(0,@Flag,3)
+
 
 #WKBTN3=X,1,S
 C(4,#ApplNo,HIDE(#BTN3),SHOW(#BTN3))
@@ -321,9 +323,8 @@ C(4,#ApplNo,HIDE(#BTN3),SHOW(#BTN3))
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
 C(4,#ApplNo,S,$)
-E(0,@FacmNo,0)
 E(0,@RimFuncCode,5)
-E(0,@RimCustNo,0)
+E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,0)
 E(0,@RimApplNo,#ApplNo)
 E(0,@RimCaseNo,0)
@@ -333,17 +334,15 @@ R(1,L2R05)
 E(0,@FacmNo,#L2r05FacmNo)
 
 #SendL2r07C=X,1,S
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
+C(4,#ApplNo,S,$)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07C,L2R07)
-S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
 R(1,L2R07)
-T(2,@ApplNoX,#L2r07CustName)
 
 #ApplNoX=X,100,L
-C(4,#ApplNo,S,$)
+C(4,#ApplNo,S,T(2,#L2r07CustName)T(2,@CustId,#L2r07CustId)T(2,@CustNo,#L2r07CustNo))
 
 #TimCustNo=A,7,S
 E(0,0)
@@ -360,6 +359,7 @@ T(2,@RmkCustNo,#TimCustNo)
 T(3,*)
 
 #TempReasonCode=A,2,I
+E(0,@Flag,0)
 HELP(#TempReasonCodeHelp)
 @V(H,#TempReasonCodeHelp)
 E(0,@TwTempAmt,0)
@@ -621,8 +621,8 @@ C(3,#Precision,0,s,$)
 C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))
 
 #TempAmtX=X,22,L
-C(3,#ChequeFlag,1,$,s)
 CALL2(#ADJUSTDOT,#Precision,#TimTempAmt,#TempAmtX)
+C(3,#ChequeFlag,1,$,s)
 
 ![交易金額]
 #TXAMT=_,_,S

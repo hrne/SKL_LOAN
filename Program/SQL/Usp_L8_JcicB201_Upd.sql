@@ -691,10 +691,9 @@ BEGIN
              END                                   AS "SyndContractDate"  -- 聯貸合約訂定日期
            , CASE
                WHEN NVL(M."SyndAmt",0) = 0 THEN 0
-               ELSE ROUND( NVL(M."PartAmt",0) / NVL(M."SyndAmt",0) * 100, 2)
+               ELSE ROUND( NVL(M."PartAmt",0) / NVL(M."SyndAmt",0) * 100, 1)
              END                                   AS "SyndRatio"         -- 聯貸參貸比例
            , ' '                                   AS "LandLoanFg"         -- 購地貸款註記
-           , '  '                                  AS "StarBuildingPeriod" -- 約定動工之一定期間
            , '     '                               AS "StarBuildingYM"     -- 實際興建年月
            , 'N'                                   AS "PayablesFg"        -- 代放款註記
 --           , CASE
@@ -825,6 +824,7 @@ BEGIN
            , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
            , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
            , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
+           , '  '                                  AS "StarBuildingPeriod" -- 約定動工之一定期間
       FROM TmpMainData M
           LEFT JOIN "FacMain" F   ON F."CustNo"   = M."CustNo"
                                  AND F."FacmNo"   = M."FacmNo"
