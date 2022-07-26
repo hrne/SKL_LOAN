@@ -352,7 +352,7 @@ BEGIN
              WHEN NVL(M."AmortizedCode",'0') = '2' THEN '4'  -- 2.到期取息(到期繳息還本)
              WHEN NVL(M."AmortizedCode",'0') = '3' THEN '2'  -- 3.本息平均法(期金)
              WHEN NVL(M."AmortizedCode",'0') = '4' THEN '3'  -- 4.本金平均法
-             WHEN NVL(M."AmortizedCode",'0') = '5' THEN '4'  -- 5.按月撥款收息(逆向貸款)  --???
+             WHEN NVL(M."AmortizedCode",'0') = '5' THEN '4'  -- 5.按月撥款收息(逆向貸款)
              ELSE '3'
            END                                       AS "AmortizedCode"     -- 契約當時還款方式
          , CASE
@@ -381,8 +381,6 @@ BEGIN
          , NVL(F."EvaAmt", 0)                        AS "EvaAmt"            -- 原始鑑價金額
          , NVL(M."FirstDueDate", 0)                  AS "FirstDueDate"      -- 首次應繳日
          , NVL(M."TotalPeriod", 0)                   AS "TotalPeriod"       -- 總期數
-         , NVL(M."AgreeBefFacmNo", 0)                AS "AgreeBefFacmNo"    -- 協議前之額度編號
-         , NVL(M."AgreeBefBormNo", 0)                AS "AgreeBefBormNo"    -- 協議前之撥款序號
          , JOB_START_TIME                            AS "CreateDate"        -- 建檔日期時間
          , EmpNo                                     AS "CreateEmpNo"       -- 建檔人員
          , JOB_START_TIME                            AS "LastUpdate"        -- 最後更新日期時間
