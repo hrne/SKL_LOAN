@@ -142,7 +142,7 @@ public class LM027Report extends MakeReport {
 					custNo = String.format("%07d", Integer.parseInt(tLM027Vo.get("F0")));
 //					this.info("custNo=" + custNo); 65000 64000
 
-					makeExcel.setValue(row, 1, Integer.parseInt(tLM027Vo.get("F0")), "C");
+					makeExcel.setValue(row, 1, Integer.parseInt(tLM027Vo.get("F0")),"0000000", "C");
 
 					makeExcel.setValue(row, 2, tLM027Vo.get("F1"), "C");
 
