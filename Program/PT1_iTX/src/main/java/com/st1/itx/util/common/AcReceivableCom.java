@@ -85,7 +85,6 @@ public class AcReceivableCom extends TradeBuffer {
 	private List<String> debitsList = Arrays.asList(debits);
 	private int wkRvFg = 0; // 起銷帳記號 (0-起帳, 1-銷帳 2-訂正)
 	private int wkOpenAcDate = 0; // 起帳日期
-	private int wkRvAmt = 0; // 起帳金額
 	private BigDecimal wkTxAmt = BigDecimal.ZERO; // 起銷帳金額
 	private String wkRvNo = ""; // 銷帳編號
 	private String wkAcctCode = ""; // 業務科目
@@ -477,6 +476,7 @@ public class AcReceivableCom extends TradeBuffer {
 		tAcReceivableId.setFacmNo(ac.getFacmNo());
 		tAcReceivableId.setRvNo(wkRvNo);
 		tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+		// 短繳科目轉換資料銷帳編號只到撥款
 		if (tAcReceivable == null && ac.getReceivableFlag() == 4 && wkRvNo.length() > 3 && wkRvFg > 0) {
 			tAcReceivableId.setRvNo(wkRvNo.substring(0, 3));
 			tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
@@ -498,9 +498,14 @@ public class AcReceivableCom extends TradeBuffer {
 			} else
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
 		} else {
+			// 已銷帳再入帳視為起帳
+			if (tAcReceivable.getClsFlag() == 1) {
+				newAcReceivable(bizTbsdy);
+			}
+			// 更新資料
 			updAcReceivable(AcHCode, bizTbsdy);
 			// 同交易序號訂正後為已銷帳則刪除，否則更新
-			if (AcHCode == 1 && tAcReceivable.getClsFlag() == 1
+			if (AcHCode > 0 && tAcReceivable.getClsFlag() == 1
 					&& tAcReceivable.getTitaTlrNo().equals(this.titaVo.getOrgTlr())
 					&& tAcReceivable.getTitaTxtNo() == parse.stringToInteger(this.titaVo.getOrgTno())) {
 				try {
