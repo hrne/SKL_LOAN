@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -21,6 +22,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.springjpa.cm.L9132ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.FormatUtil;
 
@@ -40,6 +42,9 @@ public class L9132Report extends MakeReport {
 	@Autowired
 	CdAcCodeService sCdAcCodeService;
 
+	@Autowired
+	L9132ServiceImpl l9132ServiceImpl;
+
 	// ReportDate : 報表日期(帳務日)
 	// ReportCode : 報表編號
 	// ReportItem : 報表名稱
@@ -57,10 +62,27 @@ public class L9132Report extends MakeReport {
 
 	private String batchNo;
 
+	private String acNoCode;
+
+	private String acNoItem;
+
 	// 製表日期
 	private String nowDate;
 	// 製表時間
 	private String nowTime;
+
+	// 子目小計
+	int tempAcSubCodeCount = 0;
+	int tempAcSubCodeDbAmtTotal = 0;
+	int tempAcSubCodeCrAmtTotal = 0;
+	// 科目小計
+	int tempAcNoCodeCount = 0;
+	int tempAcNoCodeDbAmtTotal = 0;
+	int tempAcNoCodeCrAmtTotal = 0;
+	// 總計
+	int count = 0;
+	int dbAmtTotal = 0;
+	int crAmtTotal = 0;
 
 	// 自訂表頭
 	@Override
@@ -92,7 +114,210 @@ public class L9132Report extends MakeReport {
 		this.print(1, this.getMidXAxis(), "=====　續　　下　　頁　=====", "C");
 	}
 
+	/**
+	 * 表頭列印
+	 */
+	public void batchTitle() {
+		print(1, 1, "傳票批號：");
+		print(0, 13, batchNo);
+		print(1, 1, "會計科目：");
+		print(0, 13, acNoCode);
+		print(0, 26, acNoItem);
+		print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+
+	}
+
+	/**
+	 * 子目小計列印
+	 */
+	private void acSubCodeCalculate() {
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+		print(1, 1, "子目小計　　　　　　　　　　筆");
+		// 筆數
+		print(0, 26, String.valueOf(tempAcSubCodeCount), "R");
+		// 借方金額
+		print(0, 118, formatAmt(String.valueOf(tempAcSubCodeDbAmtTotal), 0), "R");
+		// 貸方金額
+		print(0, 144, formatAmt(String.valueOf(tempAcSubCodeCrAmtTotal), 0), "R");
+
+		tempAcSubCodeCount = 0;
+		tempAcSubCodeDbAmtTotal = 0;
+		tempAcSubCodeCrAmtTotal = 0;
+	}
+
+	/**
+	 * 科目小計列印
+	 */
+	private void acNoCodeCalculate() {
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+		print(1, 1, "科目小計　　　　　　　　　　筆");
+
+		// 筆數
+		print(0, 26, String.valueOf(tempAcNoCodeCount), "R");
+		// 借方金額
+		print(0, 118, formatAmt(String.valueOf(tempAcNoCodeDbAmtTotal), 0), "R");
+		// 貸方金額
+		print(0, 144, formatAmt(String.valueOf(tempAcNoCodeCrAmtTotal), 0), "R");
+
+		tempAcNoCodeCount = 0;
+		tempAcNoCodeDbAmtTotal = 0;
+		tempAcNoCodeCrAmtTotal = 0;
+
+	}
+
 	public void exec(TitaVo titaVo) throws LogicException {
+		this.info("L9132Report exec ...");
+		// 設定字體1:標楷體 字體大小12
+		this.setFont(1, 12);
+
+		this.reportDate = Integer.valueOf(titaVo.getParam("AcDate")) + 19110000;
+
+		this.brno = titaVo.getBrno();
+
+		this.nowDate = dDateUtil.getNowStringRoc();
+		this.nowTime = dDateUtil.getNowStringTime();
+
+		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+
+		this.setCharSpaces(0);
+
+		// 傳票批號篩選
+		int iBatchNo = Integer.parseInt(titaVo.getParam("BatchNo"));
+
+		this.batchNo = FormatUtil.pad9(titaVo.getParam("BatchNo"), 2);
+
+		List<Map<String, String>> resultList = null;
+
+		// 查資料庫
+		resultList = l9132ServiceImpl.doQueryL9132(this.reportDate, iBatchNo, titaVo);
+
+		if (resultList == null || resultList.size() == 0) {
+			// 本日無資料
+			batchTitle();
+			print(1, 1, "本日無資料");
+
+		} else {
+
+			int tempPage = 0;
+
+			int i = 0;
+
+//			String tempAcNoCode = "";
+			String tempAcSubCode = "";
+			for (Map<String, String> r : resultList) {
+				// 計算用
+				i++;
+
+				if (!r.get("AcNoCode").equals(acNoCode)) {
+					// 會計科目
+					acNoCode = r.get("AcNoCode");
+					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 11) : r.get("AcNoItem");
+
+					// 科目
+					if (i > 1) {
+						acSubCodeCalculate();
+						acNoCodeCalculate();
+						this.newPage();
+					}
+
+					batchTitle();
+
+				} else {
+
+					this.info("AcSubCode=" + tempAcSubCode + " === " + r.get("AcSubCode") + " : " + i);
+
+					// 子目
+					if (!r.get("AcSubCode").equals(tempAcSubCode) && i > 2) {
+						acSubCodeCalculate();
+					}
+
+					tempAcSubCode = r.get("AcSubCode");
+
+				}
+
+				// 子目
+				String acSubCode = r.get("AcSubCode");
+				// 傳票號碼
+				String titaTxtNo = "0".equals(r.get("TitaTxtNo")) ? " " : r.get("TitaTxtNo");
+
+				// 資金來源(帳冊別)
+//				String acSubBookCode = r.get("AcSubBookCode");
+				String acSubBookItem = r.get("AcSubBookItem");
+
+				// 戶號
+				String custNo = r.get("CustNo");
+
+				// 借貸方金額
+				BigDecimal dbAmt = "0".equals(r.get("DbAmt")) ? BigDecimal.ZERO : new BigDecimal(r.get("DbAmt"));
+				BigDecimal crAmt = "0".equals(r.get("CrAmt")) ? BigDecimal.ZERO : new BigDecimal(r.get("CrAmt"));
+
+				// 借貸方金額(計算用)
+				int tDbAmt = Integer.valueOf(r.get("DbAmt")) == 0 ? 0 : Integer.valueOf(r.get("DbAmt"));
+				int tCrAmt = Integer.valueOf(r.get("CrAmt")) == 0 ? 0 : Integer.valueOf(r.get("CrAmt"));
+
+				// 經辦
+				String empName = r.get("EmpName");
+
+				if (this.NowRow == 40) {
+					this.newPage();
+					tempPage = this.NowRow;
+					batchTitle();
+				}
+
+				print(1, 1, "　　");
+				// 子目
+				print(0, 1, acSubCode);
+				// 傳票號碼
+				print(0, 56, titaTxtNo, "R");
+				// 區隔帳冊
+				print(0, 64, acSubBookItem);
+				// 戶號
+				print(0, 81, custNo);
+				// 貸方金額
+				print(0, 118, formatAmt(dbAmt, 0), "R");
+				// 貸方金額
+				print(0, 144, formatAmt(crAmt, 0), "R");
+				// 經辦
+				print(0, 150, empName);
+
+				// 子目小計
+				tempAcSubCodeCount++;
+				tempAcSubCodeDbAmtTotal = tempAcSubCodeDbAmtTotal + tDbAmt;
+				tempAcSubCodeCrAmtTotal = tempAcSubCodeCrAmtTotal + tCrAmt;
+
+//				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+
+				// 科目小計
+				tempAcNoCodeCount++;
+				tempAcNoCodeDbAmtTotal = tempAcNoCodeDbAmtTotal + tDbAmt;
+				tempAcNoCodeCrAmtTotal = tempAcNoCodeCrAmtTotal + tCrAmt;
+
+				// 總計
+				count++;
+				dbAmtTotal = dbAmtTotal + tDbAmt;
+				crAmtTotal = crAmtTotal + tCrAmt;
+
+				if (resultList.size() == i) {
+					acSubCodeCalculate();
+					acNoCodeCalculate();
+				}
+
+			}
+			print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+			print(1, 1, "總　　計　　　　　　　　　　筆");
+			// 筆數
+			print(0, 26, String.valueOf(count), "R");
+			// 借方金額
+			print(0, 118, formatAmt(String.valueOf(dbAmtTotal), 0), "R");
+			// 貸方金額
+			print(0, 144, formatAmt(String.valueOf(crAmtTotal), 0), "R");
+
+		}
+
+	}
+
+	public void exec2(TitaVo titaVo) throws LogicException {
 		this.info("L9132Report exec ...");
 
 		// 設定字體1:標楷體 字體大小12

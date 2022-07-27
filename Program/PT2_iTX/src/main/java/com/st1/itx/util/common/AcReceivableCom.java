@@ -498,10 +498,6 @@ public class AcReceivableCom extends TradeBuffer {
 			} else
 				throw new LogicException(titaVo, "E6003", "AcReceivable Notfound " + tAcReceivableId);
 		} else {
-			// 已銷帳再入帳視為起帳
-			if (tAcReceivable.getClsFlag() == 1) {
-				newAcReceivable(bizTbsdy);
-			}
 			// 更新資料
 			updAcReceivable(AcHCode, bizTbsdy);
 			// 同交易序號訂正後為已銷帳則刪除，否則更新
@@ -532,6 +528,22 @@ public class AcReceivableCom extends TradeBuffer {
 	}
 
 	private void updAcReceivable(int AcHCode, int bizTbsdy) throws LogicException {
+		// 暫收可抵繳金額需全入全銷(反序訂正
+		if ("TAV".equals(tAcReceivable.getAcctCode())) {
+			if (("C".equals(ac.getDbCr()) && tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) != 0)
+					|| ("D".equals(ac.getDbCr())
+							&& tAcReceivable.getRvBal().compareTo(tAcReceivable.getRvBal()) != 0)) {
+				String str = "戶號 " + tAcReceivable.getCustNo() + "-"
+						+ parse.IntegerToString(tAcReceivable.getFacmNo(), 3) + " 暫收可抵繳金額不符 :"
+						+ ("D".equals(ac.getDbCr()) ? "借:" : "貸:") + ac.getTxAmt() + ", 暫收可抵繳="
+						+ tAcReceivable.getRvBal();
+				if (titaVo.isHcodeErase()) {
+					throw new LogicException(titaVo, "E6003", "暫收可抵繳需依序訂正  " + str);
+				} else {
+					throw new LogicException(titaVo, "E6003", "暫收可抵繳需全入全銷  " + str);
+				}
+			}
+		}
 
 		// 帳冊別、科子細目
 		if (tAcReceivable.getAcSubBookCode().trim().isEmpty()) {
@@ -592,7 +604,6 @@ public class AcReceivableCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E6003", "銷帳金額超過原入帳金額 " + str);
 			}
 		}
-
 		this.info("AcReceivable update End :" + tAcReceivable.toString());
 	}
 

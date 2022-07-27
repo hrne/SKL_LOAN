@@ -27,6 +27,86 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
+	 * L9132A 傳票媒體明細表（總帳）
+	 * 
+	 * @param acDate  會計日期
+	 * @param batchNo 傳票批號
+	 * @param titaVo  TitaVo
+	 * @return 查詢結果
+	 */
+	public List<Map<String, String>> doQueryL9132(int acDate, int batchNo, TitaVo titaVo) {
+	String sql = " ";
+		
+		sql += " WITH rawData AS ( ";
+		sql += "    SELECT AC.\"AcNoCode\" ";
+		sql += "     	  ,CDAC.\"AcNoItem\" ";
+		sql += "     	  ,AC.\"AcSubCode\" ";
+		sql += "     	  ,CASE ";
+		sql += "             WHEN B.\"ProcStsCode\" = '6' ";
+		sql += "       	     AND LPAD(AC.\"TitaTxtNo\",8,0) = SUBSTR(AC.\"TitaBatchNo\",5,2) || AC.\"TitaBatchSeq\" ";
+		sql += "             THEN 0 ";
+		sql += "           ELSE AC.\"TitaTxtNo\" ";
+		sql += "           END                   AS \"TitaTxtNo\" ";
+		sql += "     	  ,AC.\"AcSubBookCode\" ";
+		sql += "     	  ,CD.\"Item\" AS \"AcSubBookItem\"";
+		sql += "          , CASE ";
+		sql += "              WHEN AC.\"DbCr\" = 'D' ";
+		sql += "              THEN AC.\"TxAmt\" ";
+		sql += "            ELSE 0 END            AS \"DbAmt\" ";
+		sql += "          , CASE ";
+		sql += "              WHEN AC.\"DbCr\" = 'C' ";
+		sql += "              THEN AC.\"TxAmt\" ";
+		sql += "            ELSE 0  ";
+		sql += "            END                   AS \"CrAmt\" ";
+		sql += "          , CASE ";
+		sql += "              WHEN B.\"ProcStsCode\" = '6' ";
+		sql += "       	  	   AND LPAD(AC.\"TitaTxtNo\",8,0) = SUBSTR(AC.\"TitaBatchNo\",5,2) || AC.\"TitaBatchSeq\" ";
+		sql += "              THEN '0000000' ";
+		sql += "              ELSE LPAD(AC.\"CustNo\",7,'0') ";
+		sql += "            END                   AS \"CustNo\" ";
+		sql += "          , \"Fn_GetEmpName\"(AC.\"TitaTlrNo\",1) ";
+		sql += "                                  AS \"EmpName\" ";
+		sql += "     FROM \"AcDetail\" AC ";
+		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
+		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
+		sql += "                              AND CDAC.\"AcDtlCode\" = AC.\"AcDtlCode\" ";
+		sql += "     LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'AcSubBookCode' ";
+		sql += "                              AND CD.\"Code\" = AC.\"AcSubBookCode\" ";
+		sql += "     LEFT JOIN \"CustMain\" CM ON AC.\"CustNo\" != 0 ";
+		sql += "                            AND CM.\"CustNo\" = AC.\"CustNo\" ";
+		sql += "     LEFT JOIN \"BatxDetail\" B ON B.\"AcDate\" = AC.\"AcDate\" ";
+		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
+		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
+		sql += "                               AND B.\"ProcStsCode\" = '6' ";
+		sql += "     WHERE AC.\"AcDate\" = :acDate ";
+		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
+		sql += " ) ";
+		sql += " SELECT \"AcNoCode\" ";
+		sql += "      , \"AcNoItem\" ";
+		sql += "      , \"AcSubCode\" ";
+		sql += "      , DECODE(\"TitaTxtNo\",0,90000 + ROWNUM,\"TitaTxtNo\")  AS \"TitaTxtNo\" ";
+		sql += "      , \"AcSubBookCode\" ";
+		sql += "      , \"AcSubBookItem\" ";
+		sql += "      , \"CustNo\" ";
+		sql += "      , \"DbAmt\" ";
+		sql += "      , \"CrAmt\" ";
+		sql += "      , \"EmpName\" ";
+		sql += " FROM rawdata ";
+		sql += " ORDER BY \"AcNoCode\" ASC";
+		sql += "		 ,\"AcSubCode\" ASC";
+		sql += " 		 ,CASE WHEN \"TitaTxtNo\" LIKE '9%' AND LENGTH(\"TitaTxtNo\") = 5 THEN 9999999 ELSE \"TitaTxtNo\" END ASC";
+	
+		this.info("doQueryL9132 sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("acDate", acDate);
+		query.setParameter("batchNo", batchNo);
+		return this.convertToMap(query);
+	}	
+	
+	
+	/**
 	 * L9132A 傳票媒體總表（總帳）
 	 * 
 	 * @param acDate  會計日期

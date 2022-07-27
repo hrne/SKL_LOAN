@@ -1429,7 +1429,7 @@ public class MakeReport extends CommBuffer {
 							}
 						}
 						if (!"".equals(tTxFile.getSupNo())) {
-							CdEmp cdEmp = cdEmpService.findById(tTxFile.getTlrNo(), titaVo);
+							CdEmp cdEmp = cdEmpService.findById(tTxFile.getSupNo(), titaVo);
 
 							if (cdEmp != null) {
 								supna = cdEmp.getFullname();

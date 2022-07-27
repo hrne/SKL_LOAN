@@ -208,7 +208,7 @@ BEGIN
          , ' '                                   AS "Filler4"           -- 空白                          VARCHAR2  2 
          , WK."MainClActNo"                      AS "ClActNo"           -- 擔保品控制編碼 (主要擔保品)   VARCHAR2  50 
          , 1                                     AS "LandSeq"           -- 土地序號                      DECIMAL   3 
-         , WK."OwnerId"                          AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN 
+         , UPPER(WK."OwnerId")                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN 
          , WK."CityCode"                         AS "CityCode"          -- 縣市別 
          , WK."AreaCode"                         AS "AreaCode"          -- 鄉鎮市區別 
          , WK."IrCode"                           AS "IrCode"            -- 段、小段號 
