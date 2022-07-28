@@ -416,7 +416,7 @@ public class MakeFile extends CommBuffer {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
 							fw.write(astrMapper.getMapperChar(s.toCharArray()[0]));
 						else
-							fw.write(s);
+							fw.write(new String(s.getBytes(charsetName), charsetName.toUpperCase(Locale.getDefault())));
 					fw.write("\r\n");
 				} else
 					fw.write(map.get("d").toString() + "\r\n");

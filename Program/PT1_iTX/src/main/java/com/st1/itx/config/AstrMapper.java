@@ -2,7 +2,9 @@ package com.st1.itx.config;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -39,10 +41,14 @@ public class AstrMapper extends SysLogger {
 		File doc = new File(itxRf + "Astr.txt");
 
 		FileReader fileR = null;
+		FileInputStream fileI = null;
+		InputStreamReader isr = null;
 		BufferedReader bR = null;
 		try {
-			fileR = new FileReader(doc);
-			bR = new BufferedReader(fileR);
+//			fileR = new FileReader(doc);
+			fileI = new FileInputStream(doc);
+			isr = new InputStreamReader(fileI, "UTF-16");
+			bR = new BufferedReader(isr);
 			String s = "";
 			while (!Objects.isNull(s = bR.readLine())) {
 				String[] ss = s.split(",");
@@ -66,7 +72,7 @@ public class AstrMapper extends SysLogger {
 			return sChar;
 		else {
 			try {
-				byte[] ms950Byte = (c + "").getBytes("MS950");
+				byte[] ms950Byte = (c + "").getBytes("BIG5");
 				sChar = astrMapBig5.get(HexDump.toHexString(ms950Byte).trim());
 				if (!Objects.isNull(sChar))
 					return sChar;
@@ -74,10 +80,10 @@ public class AstrMapper extends SysLogger {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error(errors.toString());
-				return new String("　".getBytes("MS950"), "MS950");
+				return new String("　".getBytes("BIG5"), "BIG5");
 			}
 		}
-		return new String("　".getBytes("MS950"), "MS950");
+		return new String("　".getBytes("BIG5"), "BIG5");
 	}
 
 }
