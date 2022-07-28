@@ -395,39 +395,46 @@ public class MakeFile extends CommBuffer {
 
 		// 產製新檔
 		FileOutputStream fo = null;
-		OutputStreamWriter osw = null;
-		BufferedWriter fw = null;
+//		OutputStreamWriter osw = null;
+//		BufferedWriter fw = null;
+
+		BufferedOutputStream bos = null;
 		try {
 			this.info("MakeFile.toFile outfile=" + outfile + "/" + charsetName);
 			fo = new FileOutputStream(outfile, true);
-			osw = new OutputStreamWriter(fo, charsetName);
-			fw = new BufferedWriter(osw);
+			bos = new BufferedOutputStream(fo);
+//			osw = new OutputStreamWriter(fo, charsetName);
+//			fw = new BufferedWriter(osw);
 			this.info("MakeFile.toFile opened");
 
+			byte[] sl = new byte[2];
+			sl[0] = (byte) 0xA1;
+			sl[1] = (byte) 0xFE;
 			for (HashMap<String, Object> map : listMap) {
 				if (charsetName.toUpperCase(Locale.getDefault()).equals("BIG5")) {
 					String[] ss = map.get("d").toString().split("");
-					for (String s : ss)
+					for (String s : ss) {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
-							fw.write("　");
+							bos.write("　".getBytes("BIG5"));
 						else
-							fw.write(s);
-					fw.write("\r\n");
+							bos.write(s.equals("／") ? sl : s.getBytes(charsetName));
+					}
+					bos.write("\r\n".getBytes(charsetName));
 				} else
-					fw.write(map.get("d").toString() + "\r\n");
+					bos.write((map.get("d").toString() + "\r\n").getBytes(charsetName));
 			}
 
 			this.info("MakeFile.toFile listmap");
-			fw.flush();
+			bos.flush();
 			this.info("MakeFile.toFile flush");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("MakeFile  IOException error = " + e.toString());
 			throw new LogicException("EC009", "(MakeFile)輸出檔(TxFile)序號:" + fileno + ",產檔失敗");
 		} finally {
-			SafeClose.close(fw);
-			SafeClose.close(osw);
+			SafeClose.close(bos);
+//			SafeClose.close(osw);
 			SafeClose.close(fo);
 		}
 

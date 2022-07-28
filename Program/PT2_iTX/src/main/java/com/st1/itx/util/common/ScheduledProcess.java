@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.config.AstrMapper;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.JobMain;
 import com.st1.itx.db.domain.TxCruiser;
@@ -38,6 +39,15 @@ public class ScheduledProcess extends SysLogger {
 
 	@Autowired
 	private DateUtil dateUtil;
+	
+	@Autowired
+	private AstrMapper astrMapper;
+	
+	@Scheduled(cron = "0 0 2 * * ?")
+	public void reLoadAstar() {
+		this.mustInfo("reLoadAstrMapper >>>");
+		astrMapper.init();
+	}
 
 	@Scheduled(fixedDelay = 60000)
 	private void lookUpTxCruiser() {
