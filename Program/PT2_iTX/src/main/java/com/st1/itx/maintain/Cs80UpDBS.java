@@ -225,7 +225,10 @@ public class Cs80UpDBS extends CommBuffer {
 		this.info("CS80 updTxTeller....");
 		TxTeller tTxTeller = txTellerService.holdById(this.titaVo.getTlrNo());
 
-		tTxTeller.setTxtNo(Integer.valueOf(this.titaVo.getTxtNo()));
+		if (tTxTeller.getTxtNo() < Integer.valueOf(this.titaVo.getTxtNo()) && titaVo.getTxCode().toString().equals("L6880"))
+			;
+		else
+			tTxTeller.setTxtNo(Integer.valueOf(this.titaVo.getTxtNo()));
 		tTxTeller.setLtxDate(Integer.valueOf(this.titaVo.getCalDy()));
 		tTxTeller.setLtxTime(Integer.valueOf(this.titaVo.getCalTm()));
 		try {

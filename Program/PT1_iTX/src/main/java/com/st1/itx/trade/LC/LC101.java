@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 @Service("LC101")
 @Scope("prototype")
@@ -23,10 +24,12 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class LC101 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC101.class);
 
 	@Autowired
-	public TxTellerService sTxTellerService;
+	private TxTellerService sTxTellerService;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -37,6 +40,9 @@ public class LC101 extends TradeBuffer {
 
 		if (tTxTeller != null) {
 			tTxTeller.setLogonFg(0);
+
+//			if (tTxTeller.getTxtNo() < parse.stringToInteger(titaVo.getTxtNo()))
+//				titaVo.putParam(ContentName.txtno, tTxTeller.getTxtNo());
 
 			try {
 				sTxTellerService.update(tTxTeller);

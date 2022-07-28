@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.config.AstrMapper;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.tradeService.CommBuffer;
@@ -36,6 +37,9 @@ public class MakeFile extends CommBuffer {
 	/* DB服務注入 */
 	@Autowired
 	TxFileService sTxFileService;
+
+	@Autowired
+	private AstrMapper astrMapper;
 
 	// 檔案輸出路徑
 	@Value("${iTXOutFolder}")
@@ -410,7 +414,7 @@ public class MakeFile extends CommBuffer {
 					String[] ss = map.get("d").toString().split("");
 					for (String s : ss)
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
-							fw.write("　");
+							fw.write(astrMapper.getMapperChar(s.toCharArray()[0]));
 						else
 							fw.write(s);
 					fw.write("\r\n");
@@ -421,7 +425,7 @@ public class MakeFile extends CommBuffer {
 			this.info("MakeFile.toFile listmap");
 			fw.flush();
 			this.info("MakeFile.toFile flush");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("MakeFile  IOException error = " + e.toString());

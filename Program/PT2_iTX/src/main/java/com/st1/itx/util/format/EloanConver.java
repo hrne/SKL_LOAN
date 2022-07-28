@@ -65,6 +65,7 @@ public class EloanConver extends SysLogger {
 		TitaVo titaVo = (TitaVo) MySpring.getBean("titaVo");
 		titaVo = titaVo.getVo(new ObjectMapper().writeValueAsString(m));
 		titaVo.putParam(ContentName.txCode, titaVo.getTxcd());
+		titaVo.putParam(ContentName.empnot, titaVo.getTlrNo());
 		titaVo.seteBody(eBody);
 		titaVo.putParam(ContentName.kinbr, FormatUtil.padX(titaVo.getKinbr(), 4));
 		titaVo.putParam(ContentName.batchno, FormatUtil.padX(titaVo.getBacthNo(), 12));
