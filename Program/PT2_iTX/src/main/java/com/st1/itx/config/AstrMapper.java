@@ -21,7 +21,7 @@ import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.log.SysLogger;
 
 @Service("astrMapper")
-@Scope("prototype")
+@Scope("singleton")
 public class AstrMapper extends SysLogger {
 
 	@Value("${iTXResourceFolder}")
