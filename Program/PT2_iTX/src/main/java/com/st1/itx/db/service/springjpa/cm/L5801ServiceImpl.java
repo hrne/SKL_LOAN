@@ -32,6 +32,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl.findAll ");
+		boolean onLineMode = false;
 
 		this.info("thisMonth =" + thisMonth);
 		this.info("lastMonth =" + lastMonth);
@@ -156,8 +157,12 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("sql=" + sql);
 		Query query;
-
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em;
+		if (onLineMode) {
+			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
+		} else {
+			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 L5801.java 帶入資料庫環境
+		}
 		query = em.createNativeQuery(sql);
 		query.setParameter("lastMonth", lastMonth);
 		query.setParameter("thisMonth", thisMonth);
@@ -169,6 +174,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll2(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl2.findAll ");
+		boolean onLineMode = false;
 
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
@@ -265,7 +271,12 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em;
+		if (onLineMode) {
+			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
+		} else {
+			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 L5801.java 帶入資料庫環境
+		}
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("lastMonth", lastMonth);
@@ -277,6 +288,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll3(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl3.findAll ");
+		boolean onLineMode = false;
 
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
@@ -431,7 +443,12 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em;
+		if (onLineMode) {
+			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
+		} else {
+			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 L5801.java 帶入資料庫環境
+		}
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("lastMonth", lastMonth);
@@ -443,6 +460,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll4(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl4.findAll ");
+		boolean onLineMode = false;
 
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
@@ -567,7 +585,12 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em;
+		if (onLineMode) {
+			em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine); // onLine 資料庫
+		} else {
+			em = this.baseEntityManager.getCurrentEntityManager(titaVo); // 從 L5801.java 帶入資料庫環境
+		}
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("lastMonth", lastMonth);

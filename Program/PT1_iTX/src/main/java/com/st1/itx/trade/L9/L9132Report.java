@@ -198,7 +198,6 @@ public class L9132Report extends MakeReport {
 			print(1, 1, "本日無資料");
 
 		} else {
-
 			int tempPage = 0;
 
 			int i = 0;
@@ -212,7 +211,7 @@ public class L9132Report extends MakeReport {
 				if (!r.get("AcNoCode").equals(acNoCode)) {
 					// 會計科目
 					acNoCode = r.get("AcNoCode");
-					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 11) : r.get("AcNoItem");
+					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
 
 					// 科目
 					if (i > 1) {
@@ -232,10 +231,11 @@ public class L9132Report extends MakeReport {
 						acSubCodeCalculate();
 					}
 
-					tempAcSubCode = r.get("AcSubCode");
 
 				}
 
+				tempAcSubCode = r.get("AcSubCode");
+				
 				// 子目
 				String acSubCode = r.get("AcSubCode");
 				// 傳票號碼
@@ -255,7 +255,7 @@ public class L9132Report extends MakeReport {
 				// 借貸方金額(計算用)
 				int tDbAmt = Integer.valueOf(r.get("DbAmt")) == 0 ? 0 : Integer.valueOf(r.get("DbAmt"));
 				int tCrAmt = Integer.valueOf(r.get("CrAmt")) == 0 ? 0 : Integer.valueOf(r.get("CrAmt"));
-
+				
 				// 經辦
 				String empName = r.get("EmpName");
 
@@ -271,9 +271,9 @@ public class L9132Report extends MakeReport {
 				// 傳票號碼
 				print(0, 56, titaTxtNo, "R");
 				// 區隔帳冊
-				print(0, 64, acSubBookItem);
+				print(0, 66, acSubBookItem,"C");
 				// 戶號
-				print(0, 81, custNo);
+				print(0, 82, custNo);
 				// 貸方金額
 				print(0, 118, formatAmt(dbAmt, 0), "R");
 				// 貸方金額
@@ -286,7 +286,6 @@ public class L9132Report extends MakeReport {
 				tempAcSubCodeDbAmtTotal = tempAcSubCodeDbAmtTotal + tDbAmt;
 				tempAcSubCodeCrAmtTotal = tempAcSubCodeCrAmtTotal + tCrAmt;
 
-//				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
 				// 科目小計
 				tempAcNoCodeCount++;
