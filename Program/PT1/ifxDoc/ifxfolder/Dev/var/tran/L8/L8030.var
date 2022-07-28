@@ -341,6 +341,35 @@ T(2,#OOChainTxCd+#OOUkey)
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOHistoryTxCd; ntxbuf=#OOBUF6})
 IF(#OOHistoryFg==0,BIND(grid,cancel),$)
 
+!#OOBUF7=X,50,S
+
+
+!#OOBTN7=X,1,S
+!BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; text=修改; ntxbuf=#OOBUF7})
+!IF(#OOStatusFg==0,BIND(grid,cancel),$)
+!IF(#OODeleteFg==0,BIND(grid,cancel),$)
+!C(5,#OOTranKey,R,BIND(grid,cancel),$)
+!C(5,#OOTranKey,X,BIND(grid,cancel),$)
+
+#OOMrKey=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate)
+
+#50sp=X,20,S
+#20sp=X,20,S
+#18sp=X,18,S
+#7sp=X,7,S
+#5sp=X,5,S
+#3sp=X,3,S
+
+!查詢L6932
+#OOBUF18=X,150,S
+T(2,0010101+9991231+L8301+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
+#OOBTN18=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF18})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+
+
 </sub>
 
 !------ 上行電文 ------
@@ -635,6 +664,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+!#OOBTN7=修改
+!{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -651,6 +682,8 @@ TXFORM=L8030
 {width:250,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN18=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN18',align:'center',canExport:false}
 ^
 #RPTFG=M,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}

@@ -46,6 +46,7 @@ public class L8031 extends TradeBuffer {
 		rJcicZ040Log = iJcicZ040LogService.ukeyEq(iUkey, this.index, this.limit, titaVo);
 		JcicZ040 rJcicZ040 = new JcicZ040();
 		rJcicZ040 = iJcicZ040Service.ukeyFirst(iUkey, titaVo);
+	
 		if (rJcicZ040 == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
@@ -87,6 +88,11 @@ public class L8031 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ040.getOutJcicTxtDate());
+			JcicZ040Log rrJcicZ040Log = iJcicZ040LogService.ukeyFirst(rJcicZ040.getUkey(), titaVo);
+			this.info("OOTxSeq   = " + rrJcicZ040Log.getTxSeq());
+			occursListA.putParam("OOTxSeq", rrJcicZ040Log.getTxSeq());
+			this.info("OOUkey    = " + rrJcicZ040Log.getUkey());
+			occursListA.putParam("OOUkey", rrJcicZ040Log.getUkey());
 			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ040Log == null) {
@@ -130,12 +136,15 @@ public class L8031 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursList.putParam("OOOutJcicTxtDate", rrJcicZ040Log.getOutJcicTxtDate());
+			this.info("OOTxSeq   = " + rrJcicZ040Log.getTxSeq());
+			occursList.putParam("OOTxSeq", rrJcicZ040Log.getTxSeq());
+			this.info("OOUkey    = " + rrJcicZ040Log.getUkey());
+			occursList.putParam("OOUkey", rrJcicZ040Log.getUkey());
 			this.totaVo.addOccursList(occursList);
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 	public String dealBankName(String BankId, TitaVo titaVo) throws LogicException {
 		CdCode tCdCode = new CdCode();
 		tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", BankId, titaVo);

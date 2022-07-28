@@ -208,6 +208,9 @@ public class L9132Report extends MakeReport {
 				// 計算用
 				i++;
 
+				
+				tempAcSubCode = r.get("AcSubCode");
+				
 				if (!r.get("AcNoCode").equals(acNoCode)) {
 					// 會計科目
 					acNoCode = r.get("AcNoCode");
@@ -234,7 +237,7 @@ public class L9132Report extends MakeReport {
 
 				}
 
-				tempAcSubCode = r.get("AcSubCode");
+				
 				
 				// 子目
 				String acSubCode = r.get("AcSubCode");

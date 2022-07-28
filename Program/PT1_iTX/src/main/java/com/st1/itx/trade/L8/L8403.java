@@ -15,7 +15,10 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ040;
+import com.st1.itx.db.domain.JcicZ040Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ040LogService;
 import com.st1.itx.db.service.JcicZ040Service;
 /* 交易共用組件 */
@@ -31,14 +34,19 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8403 extends TradeBuffer {
+	
 	@Autowired
 	public DataLog iDataLog;
 
 	@Autowired
 	public L8403File iL8403File;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
+	
 	@Autowired
 	public JcicZ040LogService sJcicZ040LogService;
 
@@ -68,11 +76,10 @@ public class L8403 extends TradeBuffer {
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iReportDate = titaVo.getParam("ReportDate");
 		String iTranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
-
 		// 檔名
 		// BBBMMDDS.XXX 金融機構總行代號+月份+日期+次數.檔案類別
 		String fileNname = iSubmitKey + iReportDate.substring(3) + "." + iTranCode;
-
+		
 		iL8403File.exec(titaVo);
 		long fileNo = iL8403File.close();
 		iL8403File.toFile(fileNo, fileNname);
@@ -86,6 +93,7 @@ public class L8403 extends TradeBuffer {
 		JcicZ040 uJcicZ040 = new JcicZ040();
 		JcicZ040 oldJcicZ040 = new JcicZ040();
 		iJcicZ040 = sJcicZ040Service.findAll(0,Integer.MAX_VALUE, titaVo);
+		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		for (JcicZ040 iiJcicZ040 : iJcicZ040) {
 			if (iiJcicZ040.getOutJcicTxtDate() == iJcicDate) {
 				count++;
@@ -97,10 +105,16 @@ public class L8403 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 				}
+				CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+				titaVo.putParam("CustNo", iCustNo);
+				this.info("CustNo   = " + iCustNo);
+				JcicZ040Log iJcicZ040Log = sJcicZ040LogService.ukeyFirst(uJcicZ040.getUkey(), titaVo);
 				iDataLog.setEnv(titaVo, oldJcicZ040, uJcicZ040);
-				iDataLog.exec();
+				iDataLog.exec("L8301取消報送",iJcicZ040Log.getUkey()+iJcicZ040Log.getTxSeq());
 			}
 		}
+		
 		if (count == 0) {
 			throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 		}
