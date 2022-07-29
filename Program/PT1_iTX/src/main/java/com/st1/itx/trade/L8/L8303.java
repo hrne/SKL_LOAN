@@ -39,27 +39,6 @@ import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8303")
 @Scope("prototype")
@@ -93,35 +72,35 @@ public class L8303 extends TradeBuffer {
 		this.info("active L8303 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		String iIsClaims = titaVo.getParam("IsClaims");
-		int iGuarLoanCnt = Integer.valueOf(titaVo.getParam("GuarLoanCnt"));
-		int iExpLoanAmt = Integer.valueOf(titaVo.getParam("ExpLoanAmt"));
-		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt"));
-		int iReceExpAmt = Integer.valueOf(titaVo.getParam("ReceExpAmt"));
-		int iCashCardAmt = Integer.valueOf(titaVo.getParam("CashCardAmt"));
-		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt"));
-		int iReceCashAmt = Integer.valueOf(titaVo.getParam("ReceCashAmt"));
-		int iCreditCardAmt = Integer.valueOf(titaVo.getParam("CreditCardAmt"));
-		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt"));
-		int iReceCreditAmt = Integer.valueOf(titaVo.getParam("ReceCreditAmt"));
-		int iReceExpPrin = Integer.valueOf(titaVo.getParam("ReceExpPrin"));
-		int iReceExpInte = Integer.valueOf(titaVo.getParam("ReceExpInte"));
-		int iReceExpPena = Integer.valueOf(titaVo.getParam("ReceExpPena"));
-		int iReceExpOther = Integer.valueOf(titaVo.getParam("ReceExpOther"));
-		int iCashCardPrin = Integer.valueOf(titaVo.getParam("CashCardPrin"));
-		int iCashCardInte = Integer.valueOf(titaVo.getParam("CashCardInte"));
-		int iCashCardPena = Integer.valueOf(titaVo.getParam("CashCardPena"));
-		int iCashCardOther = Integer.valueOf(titaVo.getParam("CashCardOther"));
-		int iCreditCardPrin = Integer.valueOf(titaVo.getParam("CreditCardPrin"));
-		int iCreditCardInte = Integer.valueOf(titaVo.getParam("CreditCardInte"));
-		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena"));
-		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		String iIsClaims = titaVo.getParam("IsClaims").trim();
+		int iGuarLoanCnt = Integer.valueOf(titaVo.getParam("GuarLoanCnt").trim());
+		int iExpLoanAmt = Integer.valueOf(titaVo.getParam("ExpLoanAmt").trim());
+		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt").trim());
+		int iReceExpAmt = Integer.valueOf(titaVo.getParam("ReceExpAmt").trim());
+		int iCashCardAmt = Integer.valueOf(titaVo.getParam("CashCardAmt").trim());
+		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt").trim());
+		int iReceCashAmt = Integer.valueOf(titaVo.getParam("ReceCashAmt").trim());
+		int iCreditCardAmt = Integer.valueOf(titaVo.getParam("CreditCardAmt").trim());
+		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt").trim());
+		int iReceCreditAmt = Integer.valueOf(titaVo.getParam("ReceCreditAmt").trim());
+		int iReceExpPrin = Integer.valueOf(titaVo.getParam("ReceExpPrin").trim());
+		int iReceExpInte = Integer.valueOf(titaVo.getParam("ReceExpInte").trim());
+		int iReceExpPena = Integer.valueOf(titaVo.getParam("ReceExpPena").trim());
+		int iReceExpOther = Integer.valueOf(titaVo.getParam("ReceExpOther").trim());
+		int iCashCardPrin = Integer.valueOf(titaVo.getParam("CashCardPrin").trim());
+		int iCashCardInte = Integer.valueOf(titaVo.getParam("CashCardInte").trim());
+		int iCashCardPena = Integer.valueOf(titaVo.getParam("CashCardPena").trim());
+		int iCashCardOther = Integer.valueOf(titaVo.getParam("CashCardOther").trim());
+		int iCreditCardPrin = Integer.valueOf(titaVo.getParam("CreditCardPrin").trim());
+		int iCreditCardInte = Integer.valueOf(titaVo.getParam("CreditCardInte").trim());
+		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena").trim());
+		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther").trim());
 		String iKey = "";
 		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt + iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
 		// JcicZ042, JcicZ040, JcicZ043, JcicZ045
@@ -172,6 +151,7 @@ public class L8303 extends TradeBuffer {
 			// 4 start 本金融機構債務人必須填報'45':回報是否同意債務清償方案資料
 			if ("Y".equals(iIsClaims)) {
 				iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id, titaVo);
+				this.info("iJcicZ045   = " + iJcicZ045);
 //				if (iJcicZ045 == null) {
 //					if ("A".equals(iTranKey)) {
 //						throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
@@ -304,10 +284,18 @@ public class L8303 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
+			this.info("進入6932 ================ L8303");
+			this.info("UKey    ===== " + uJcicZ042.getUkey());
+
 			iDataLog.setEnv(titaVo, oldJcicZ042, uJcicZ042);
-			iDataLog.exec();
+			iDataLog.exec("L8301異動", uJcicZ042.getSubmitKey()+uJcicZ042.getCustId()+uJcicZ042.getRcDate());
 			break;
+			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ042 = sJcicZ042Service.ukeyFirst(iKey, titaVo);
+			JcicZ042 uJcicZ0422 = new JcicZ042();
+			uJcicZ0422 = sJcicZ042Service.holdById(iJcicZ042.getJcicZ042Id(), titaVo);
 			iJcicZ042 = sJcicZ042Service.findById(iJcicZ042Id);
 			if (iJcicZ042 == null) {
 				throw new LogicException("E0006", "");
@@ -315,6 +303,34 @@ public class L8303 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ042 oldJcicZ0422 = (JcicZ042) iDataLog.clone(uJcicZ0422);
+			uJcicZ0422.setTranKey(iTranKey);
+			uJcicZ0422.setIsClaims(iIsClaims);
+			uJcicZ0422.setGuarLoanCnt(iGuarLoanCnt);
+			uJcicZ0422.setExpLoanAmt(iExpLoanAmt);
+			uJcicZ0422.setCivil323ExpAmt(iCivil323ExpAmt);
+			uJcicZ0422.setReceExpAmt(iReceExpAmt);
+			uJcicZ0422.setCashCardAmt(iCashCardAmt);
+			uJcicZ0422.setCivil323CashAmt(iCivil323CashAmt);
+			uJcicZ0422.setReceCashAmt(iReceCashAmt);
+			uJcicZ0422.setCreditCardAmt(iCreditCardAmt);
+			uJcicZ0422.setCivil323CreditAmt(iCivil323CreditAmt);
+			uJcicZ0422.setReceCreditAmt(iReceCreditAmt);
+			uJcicZ0422.setReceExpPrin(iReceExpPrin);
+			uJcicZ0422.setReceExpInte(iReceExpInte);
+			uJcicZ0422.setReceExpPena(iReceExpPena);
+			uJcicZ0422.setReceExpOther(iReceExpOther);
+			uJcicZ0422.setCashCardPrin(iCashCardPrin);
+			uJcicZ0422.setCashCardInte(iCashCardInte);
+			uJcicZ0422.setCashCardPena(iCashCardPena);
+			uJcicZ0422.setCashCardOther(iCashCardOther);
+			uJcicZ0422.setCreditCardPrin(iCreditCardPrin);
+			uJcicZ0422.setCreditCardInte(iCreditCardInte);
+			uJcicZ0422.setCreditCardPena(iCreditCardPena);
+			uJcicZ0422.setCreditCardOther(iCreditCardOther);
+			uJcicZ0422.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ042Log> dJcicLogZ042 = null;
 			dJcicLogZ042 = sJcicZ042LogService.ukeyEq(iJcicZ042.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ042 == null) {
@@ -358,6 +374,8 @@ public class L8303 extends TradeBuffer {
 					throw new LogicException("E0006", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0422, uJcicZ0422);
+			iDataLog.exec("L8303刪除", uJcicZ0422.getSubmitKey()+uJcicZ0422.getCustId()+uJcicZ0422.getRcDate());
 		default:
 			break;
 		}

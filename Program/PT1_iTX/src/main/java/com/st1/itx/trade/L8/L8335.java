@@ -26,18 +26,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8335")
 @Scope("prototype")
 /**
@@ -62,14 +50,14 @@ public class L8335 extends TradeBuffer {
 		this.info("active L8335 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
-		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt"));
-		int iTotalPayAmt = Integer.valueOf(titaVo.getParam("TotalPayAmt"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate").trim());
+		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
+		int iTotalPayAmt = Integer.valueOf(titaVo.getParam("TotalPayAmt").trim());
 		String iKey = "";
 		// JcicZ573
 		JcicZ573 iJcicZ573 = new JcicZ573();
@@ -144,20 +132,24 @@ public class L8335 extends TradeBuffer {
 			if (uJcicZ573 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ573 oldJcicZ573 = (JcicZ573) iDataLog.clone(uJcicZ573);
 			uJcicZ573.setTranKey(iTranKey);
 			uJcicZ573.setPayAmt(iPayAmt);
 			uJcicZ573.setTotalPayAmt(iTotalPayAmt);
 			uJcicZ573.setOutJcicTxtDate(0);
-			JcicZ573 oldJcicZ573 = (JcicZ573) iDataLog.clone(uJcicZ573);
 			try {
 				sJcicZ573Service.update(uJcicZ573, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債務人繳款資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ573, uJcicZ573);
-			iDataLog.exec();
+			iDataLog.exec("L8335刪除",uJcicZ573.getSubmitKey()+uJcicZ573.getCustId()+uJcicZ573.getApplyDate()+uJcicZ573.getApplyDate()+uJcicZ573.getPayDate());
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ573 = sJcicZ573Service.ukeyFirst(iKey, titaVo);
+			JcicZ573 uJcicZ5732 = new JcicZ573();
+			uJcicZ5732 = sJcicZ573Service.holdById(iJcicZ573.getJcicZ573Id(), titaVo);
 			iJcicZ573 = sJcicZ573Service.findById(iJcicZ573Id);
 			if (iJcicZ573 == null) {
 				throw new LogicException("E0008", "");
@@ -165,6 +157,13 @@ public class L8335 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ573 oldJcicZ5732 = (JcicZ573) iDataLog.clone(uJcicZ5732);
+			uJcicZ5732.setTranKey(iTranKey);
+			uJcicZ5732.setPayAmt(iPayAmt);
+			uJcicZ5732.setTotalPayAmt(iTotalPayAmt);
+			uJcicZ5732.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ573Log> dJcicLogZ573 = null;
 			dJcicLogZ573 = sJcicZ573LogService.ukeyEq(iJcicZ573.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			// 最近一筆之資料
@@ -188,6 +187,9 @@ public class L8335 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			
+			iDataLog.setEnv(titaVo, oldJcicZ5732, uJcicZ5732);
+			iDataLog.exec("L8335刪除",uJcicZ5732.getSubmitKey()+uJcicZ5732.getCustId()+uJcicZ5732.getApplyDate()+uJcicZ5732.getApplyDate()+uJcicZ5732.getPayDate());
 		default:
 			break;
 		}

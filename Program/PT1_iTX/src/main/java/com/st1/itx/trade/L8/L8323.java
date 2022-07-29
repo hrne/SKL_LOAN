@@ -65,36 +65,36 @@ public class L8323 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8323 ");
 		this.totaVo.init(titaVo);
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iIsMaxMain = titaVo.getParam("IsMaxMain");
-		String iIsClaims = titaVo.getParam("IsClaims");
-		String iCourtCode = titaVo.getParam("CourtCode");
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		int iGuarLoanCnt = Integer.valueOf(titaVo.getParam("GuarLoanCnt"));
-		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt"));
-		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt"));
-		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt"));
-		int iCivil323GuarAmt = Integer.valueOf(titaVo.getParam("Civil323GuarAmt"));
-		int iReceExpPrin = Integer.valueOf(titaVo.getParam("ReceExpPrin"));
-		int iReceExpInte = Integer.valueOf(titaVo.getParam("ReceExpInte"));
-		int iReceExpPena = Integer.valueOf(titaVo.getParam("ReceExpPena"));
-		int iReceExpOther = Integer.valueOf(titaVo.getParam("ReceExpOther"));
-		int iCashCardPrin = Integer.valueOf(titaVo.getParam("CashCardPrin"));
-		int iCashCardInte = Integer.valueOf(titaVo.getParam("CashCardInte"));
-		int iCashCardPena = Integer.valueOf(titaVo.getParam("CashCardPena"));
-		int iCashCardOther = Integer.valueOf(titaVo.getParam("CashCardOther"));
-		int iCreditCardPrin = Integer.valueOf(titaVo.getParam("CreditCardPrin"));
-		int iCreditCardInte = Integer.valueOf(titaVo.getParam("CreditCardInte"));
-		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena"));
-		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther"));
-		int iGuarObliPrin = Integer.valueOf(titaVo.getParam("GuarObliPrin"));
-		int iGuarObliInte = Integer.valueOf(titaVo.getParam("GuarObliInte"));
-		int iGuarObliPena = Integer.valueOf(titaVo.getParam("GuarObliPena"));
-		int iGuarObliOther = Integer.valueOf(titaVo.getParam("GuarObliOther"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iIsMaxMain = titaVo.getParam("IsMaxMain").trim();
+		String iIsClaims = titaVo.getParam("IsClaims").trim();
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		int iGuarLoanCnt = Integer.valueOf(titaVo.getParam("GuarLoanCnt").trim());
+		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt").trim());
+		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt").trim());
+		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt").trim());
+		int iCivil323GuarAmt = Integer.valueOf(titaVo.getParam("Civil323GuarAmt").trim());
+		int iReceExpPrin = Integer.valueOf(titaVo.getParam("ReceExpPrin").trim());
+		int iReceExpInte = Integer.valueOf(titaVo.getParam("ReceExpInte").trim());
+		int iReceExpPena = Integer.valueOf(titaVo.getParam("ReceExpPena").trim());
+		int iReceExpOther = Integer.valueOf(titaVo.getParam("ReceExpOther").trim());
+		int iCashCardPrin = Integer.valueOf(titaVo.getParam("CashCardPrin").trim());
+		int iCashCardInte = Integer.valueOf(titaVo.getParam("CashCardInte").trim());
+		int iCashCardPena = Integer.valueOf(titaVo.getParam("CashCardPena").trim());
+		int iCashCardOther = Integer.valueOf(titaVo.getParam("CashCardOther").trim());
+		int iCreditCardPrin = Integer.valueOf(titaVo.getParam("CreditCardPrin").trim());
+		int iCreditCardInte = Integer.valueOf(titaVo.getParam("CreditCardInte").trim());
+		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena").trim());
+		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther").trim());
+		int iGuarObliPrin = Integer.valueOf(titaVo.getParam("GuarObliPrin").trim());
+		int iGuarObliInte = Integer.valueOf(titaVo.getParam("GuarObliInte").trim());
+		int iGuarObliPena = Integer.valueOf(titaVo.getParam("GuarObliPena").trim());
+		int iGuarObliOther = Integer.valueOf(titaVo.getParam("GuarObliOther").trim());
 		String iKey = "";
 		// JcicZ442, JcicZ446
 		JcicZ442 iJcicZ442 = new JcicZ442();
@@ -293,7 +293,7 @@ public class L8323 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ442, uJcicZ442);
-			iDataLog.exec();
+			iDataLog.exec("L8323異動",uJcicZ442.getSubmitKey()+uJcicZ442.getCustId()+uJcicZ442.getApplyDate()+uJcicZ442.getCourtCode()+uJcicZ442.getMaxMainCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -380,8 +380,8 @@ public class L8323 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4422, uJcicZ4422);
-			iDataLog.exec();
-		default:
+			iDataLog.exec("L8323刪除",uJcicZ4422.getSubmitKey()+uJcicZ4422.getCustId()+uJcicZ4422.getApplyDate()+uJcicZ4422.getCourtCode()+uJcicZ4422.getMaxMainCode());
+			default:
 			break;
 		}
 		this.addList(this.totaVo);

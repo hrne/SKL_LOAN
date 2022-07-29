@@ -56,16 +56,16 @@ public class L8334 extends TradeBuffer {
 		this.info("active L8334 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		int iStartDate = Integer.valueOf(titaVo.getParam("StartDate"));
-		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
-		String iBankId = titaVo.getParam("BankId");
-		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt"));
-		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		int iStartDate = Integer.valueOf(titaVo.getParam("StartDate").trim());
+		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate").trim());
+		String iBankId = titaVo.getParam("BankId").trim();
+		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt").trim());
+		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage").trim());
 		String iKey = "";
 		// JcicZ572
 		JcicZ572 iJcicZ572 = new JcicZ572();
@@ -134,7 +134,7 @@ public class L8334 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ572, uJcicZ572);
-			iDataLog.exec();
+			iDataLog.exec("L8334異動",uJcicZ572.getSubmitKey()+uJcicZ572.getCustId()+uJcicZ572.getApplyDate()+uJcicZ572.getPayDate()+uJcicZ572.getBankId());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -179,8 +179,9 @@ public class L8334 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			
 			iDataLog.setEnv(titaVo, oldJcicZ5722, uJcicZ5722);
-			iDataLog.exec();
+			iDataLog.exec("L8334刪除",uJcicZ5722.getSubmitKey()+uJcicZ5722.getCustId()+uJcicZ5722.getApplyDate()+uJcicZ5722.getPayDate()+uJcicZ5722.getBankId());
 		default:
 			break;
 		}

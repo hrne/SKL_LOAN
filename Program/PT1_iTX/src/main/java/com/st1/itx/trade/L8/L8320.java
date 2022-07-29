@@ -2,9 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 /* 套件 */
@@ -70,30 +67,30 @@ public class L8320 extends TradeBuffer {
 		this.info("active L8320 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
-		int iCompletePeriod = Integer.valueOf(titaVo.getParam("CompletePeriod"));
-		int iPeriod = Integer.valueOf(titaVo.getParam("Period"));
-		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate"));
-		int iExpBalanceAmt = Integer.valueOf(titaVo.getParam("ExpBalanceAmt"));
-		int iCashBalanceAmt = Integer.valueOf(titaVo.getParam("CashBalanceAmt"));
-		int iCreditBalanceAmt = Integer.valueOf(titaVo.getParam("CreditBalanceAmt"));
-		BigDecimal iChaRepayAmt = new BigDecimal(titaVo.getParam("ChaRepayAmt"));
-		int iChaRepayAgreeDate = Integer.valueOf(titaVo.getParam("ChaRepayAgreeDate"));
-		int iChaRepayViewDate = Integer.valueOf(titaVo.getParam("ChaRepayViewDate"));
-		int iChaRepayEndDate = Integer.valueOf(titaVo.getParam("ChaRepayEndDate"));
-		int iChaRepayFirstDate = Integer.valueOf(titaVo.getParam("ChaRepayFirstDate"));
-		String iPayAccount = titaVo.getParam("PayAccount");
-		String iPostAddr = titaVo.getParam("PostAddr");
-		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt"));
-		String iGradeType = titaVo.getParam("GradeType");
-		int iPeriod2 = Integer.valueOf(titaVo.getParam("Period2"));
-		BigDecimal iRate2 = new BigDecimal(titaVo.getParam("Rate2"));
-		int iMonthPayAmt2 = Integer.valueOf(titaVo.getParam("MonthPayAmt2"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate").trim());
+		int iCompletePeriod = Integer.valueOf(titaVo.getParam("CompletePeriod").trim());
+		int iPeriod = Integer.valueOf(titaVo.getParam("Period").trim());
+		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate").trim());
+		int iExpBalanceAmt = Integer.valueOf(titaVo.getParam("ExpBalanceAmt").trim());
+		int iCashBalanceAmt = Integer.valueOf(titaVo.getParam("CashBalanceAmt").trim());
+		int iCreditBalanceAmt = Integer.valueOf(titaVo.getParam("CreditBalanceAmt").trim());
+		BigDecimal iChaRepayAmt = new BigDecimal(titaVo.getParam("ChaRepayAmt").trim());
+		int iChaRepayAgreeDate = Integer.valueOf(titaVo.getParam("ChaRepayAgreeDate").trim());
+		int iChaRepayViewDate = Integer.valueOf(titaVo.getParam("ChaRepayViewDate").trim());
+		int iChaRepayEndDate = Integer.valueOf(titaVo.getParam("ChaRepayEndDate").trim());
+		int iChaRepayFirstDate = Integer.valueOf(titaVo.getParam("ChaRepayFirstDate").trim());
+		String iPayAccount = titaVo.getParam("PayAccount").trim();
+		String iPostAddr = titaVo.getParam("PostAddr").trim();
+		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt").trim());
+		String iGradeType = titaVo.getParam("GradeType").trim();
+		int iPeriod2 = Integer.valueOf(titaVo.getParam("Period2").trim());
+		BigDecimal iRate2 = new BigDecimal(titaVo.getParam("Rate2").trim());
+		int iMonthPayAmt2 = Integer.valueOf(titaVo.getParam("MonthPayAmt2").trim());
 		String iKey = "";
 		// JcicZ062, JcicZ060,
 		JcicZ062 iJcicZ062 = new JcicZ062();
@@ -320,9 +317,13 @@ public class L8320 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ062, uJcicZ062);
-			iDataLog.exec();
+			iDataLog.exec("L8320異動",uJcicZ062.getSubmitKey()+uJcicZ062.getCustId()+uJcicZ062.getRcDate()+uJcicZ062.getChangePayDate());
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ062 = sJcicZ062Service.ukeyFirst(iKey, titaVo);
+			JcicZ062 uJcicZ0622 = new JcicZ062();
+			uJcicZ0622 = sJcicZ062Service.holdById(iJcicZ062.getJcicZ062Id(), titaVo);
 			iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id);
 			if (iJcicZ062 == null) {
 				throw new LogicException("E0008", "");
@@ -330,6 +331,29 @@ public class L8320 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ062 oldJcicZ0622 = (JcicZ062) iDataLog.clone(uJcicZ0622);
+			uJcicZ0622.setCompletePeriod(iCompletePeriod);
+			uJcicZ0622.setPeriod(iPeriod);
+			uJcicZ0622.setRate(iRate);
+			uJcicZ0622.setExpBalanceAmt(iExpBalanceAmt);
+			uJcicZ0622.setCashBalanceAmt(iCashBalanceAmt);
+			uJcicZ0622.setCreditBalanceAmt(iCreditBalanceAmt);
+			uJcicZ0622.setChaRepayAmt(iChaRepayAmt);
+			uJcicZ0622.setChaRepayAgreeDate(iChaRepayAgreeDate);
+			uJcicZ0622.setChaRepayViewDate(iChaRepayViewDate);
+			uJcicZ0622.setChaRepayEndDate(iChaRepayEndDate);
+			uJcicZ0622.setChaRepayFirstDate(iChaRepayFirstDate);
+			uJcicZ0622.setPayAccount(iPayAccount);
+			uJcicZ0622.setPostAddr(iPostAddr);
+			uJcicZ0622.setMonthPayAmt(iMonthPayAmt);
+			uJcicZ0622.setGradeType(iGradeType);
+			uJcicZ0622.setPeriod2(iPeriod2);
+			uJcicZ0622.setRate2(iRate2);
+			uJcicZ0622.setMonthPayAmt2(iMonthPayAmt2);
+			uJcicZ0622.setTranKey(iTranKey);
+			uJcicZ0622.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ062Log> dJcicLogZ062 = null;
 			dJcicLogZ062 = sJcicZ062LogService.ukeyEq(iJcicZ062.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ062 == null) {
@@ -368,13 +392,15 @@ public class L8320 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0622, uJcicZ0622);
+			iDataLog.exec("L8320刪除",uJcicZ0622.getSubmitKey()+uJcicZ0622.getCustId()+uJcicZ0622.getRcDate()+uJcicZ0622.getChangePayDate());
 		default:
 			break;
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
+/*
 	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
 	private int TimestampToDate(Timestamp ts) throws LogicException {
 		int reTimestampToDate = 0;
@@ -402,7 +428,7 @@ public class L8320 extends TradeBuffer {
 
 		return Integer.valueOf(retxdateStr) - 19110000;// 轉成民國年YYYMMDD
 	}
-
+*/
 	// 計算月付金：1.10.一.(一):「屬階梯式還款註記」空白且第一階梯「利率」不等於0
 	private BigDecimal MonthPay1011(BigDecimal iChaRepayAmt, BigDecimal iRate, int iPeriod) {
 		BigDecimal xMonRate = iRate.divide(new BigDecimal(12 * 100), 10, BigDecimal.ROUND_HALF_UP);// 月利率=第一階梯利率/12

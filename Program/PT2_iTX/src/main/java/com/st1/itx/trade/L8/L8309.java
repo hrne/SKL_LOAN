@@ -17,7 +17,7 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.JcicZ040;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ048;
 import com.st1.itx.db.domain.JcicZ048Id;
@@ -55,16 +55,16 @@ public class L8309 extends TradeBuffer {
 		this.info("active L8309 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		String iCustRegAddr = titaVo.getParam("CustRegAddr");
-		String iCustComAddr = titaVo.getParam("CustComAddr");
-		String iCustRegTelNo = titaVo.getParam("CustRegTelNo");
-		String iCustComTelNo = titaVo.getParam("CustComTelNo");
-		String iCustMobilNo = titaVo.getParam("CustMobilNo");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		String iCustRegAddr = titaVo.getParam("CustRegAddr").trim();
+		String iCustComAddr = titaVo.getParam("CustComAddr").trim();
+		String iCustRegTelNo = titaVo.getParam("CustRegTelNo").trim();
+		String iCustComTelNo = titaVo.getParam("CustComTelNo").trim();
+		String iCustMobilNo = titaVo.getParam("CustMobilNo").trim();
 
 		String iKey = "";
 		// JcicZ048
@@ -121,7 +121,7 @@ public class L8309 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ048, uJcicZ048);
-			iDataLog.exec();
+			iDataLog.exec("L8309異動", uJcicZ048.getSubmitKey()+uJcicZ048.getCustId()+uJcicZ048.getRcDate());
 			break;
 			//2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -172,7 +172,7 @@ public class L8309 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0482, uJcicZ0482);
-			iDataLog.exec();
+			iDataLog.exec("L8309刪除", uJcicZ0482.getSubmitKey()+uJcicZ0482.getCustId()+uJcicZ0482.getRcDate());
 		default:
 			break;
 		}

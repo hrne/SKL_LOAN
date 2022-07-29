@@ -31,18 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8333")
 @Scope("prototype")
 /**
@@ -71,17 +59,17 @@ public class L8333 extends TradeBuffer {
 		this.info("active L8333 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iBankId = titaVo.getParam("BankId");
-		String iOwnerYn = titaVo.getParam("OwnerYn");
-		String iPayYn = titaVo.getParam("PayYn");
-		int iOwnerAmt = Integer.valueOf(titaVo.getParam("OwnerAmt"));
-		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt"));
-		int iUnallotAmt = Integer.valueOf(titaVo.getParam("UnallotAmt"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iBankId = titaVo.getParam("BankId").trim();
+		String iOwnerYn = titaVo.getParam("OwnerYn").trim();
+		String iPayYn = titaVo.getParam("PayYn").trim();
+		int iOwnerAmt = Integer.valueOf(titaVo.getParam("OwnerAmt").trim());
+		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt").trim());
+		int iUnallotAmt = Integer.valueOf(titaVo.getParam("UnallotAmt").trim());
 		String iKey = "";
 		// JcicZ571
 		JcicZ571 iJcicZ571 = new JcicZ571();
@@ -153,6 +141,7 @@ public class L8333 extends TradeBuffer {
 			if (uJcicZ571 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ571 oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
 			uJcicZ571.setTranKey(iTranKey);
 			uJcicZ571.setOwnerYn(iOwnerYn);
 			uJcicZ571.setPayYn(iPayYn);
@@ -160,16 +149,19 @@ public class L8333 extends TradeBuffer {
 			uJcicZ571.setAllotAmt(iAllotAmt);
 			uJcicZ571.setUnallotAmt(iUnallotAmt);
 			uJcicZ571.setOutJcicTxtDate(0);
-			JcicZ571 oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
 			try {
 				sJcicZ571Service.update(uJcicZ571, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ571, uJcicZ571);
-			iDataLog.exec();
+			iDataLog.exec("L8333異動",uJcicZ571.getSubmitKey()+uJcicZ571.getCustId()+uJcicZ571.getApplyDate()+uJcicZ571.getBankId());
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ571 = sJcicZ571Service.ukeyFirst(iKey, titaVo);
+			JcicZ571 uJcicZ5712 = new JcicZ571();
+			uJcicZ5712 = sJcicZ571Service.holdById(iJcicZ571.getJcicZ571Id(), titaVo);
 			iJcicZ571 = sJcicZ571Service.findById(iJcicZ571Id);
 			if (iJcicZ571 == null) {
 				throw new LogicException("E0008", "");
@@ -177,6 +169,16 @@ public class L8333 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ571 oldJcicZ5712 = (JcicZ571) iDataLog.clone(uJcicZ5712);
+			uJcicZ5712.setTranKey(iTranKey);
+			uJcicZ5712.setOwnerYn(iOwnerYn);
+			uJcicZ5712.setPayYn(iPayYn);
+			uJcicZ5712.setOwnerAmt(iOwnerAmt);
+			uJcicZ5712.setAllotAmt(iAllotAmt);
+			uJcicZ5712.setUnallotAmt(iUnallotAmt);
+			uJcicZ5712.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ571Log> dJcicLogZ571 = null;
 			dJcicLogZ571 = sJcicZ571LogService.ukeyEq(iJcicZ571.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ571 == null) {
@@ -202,6 +204,9 @@ public class L8333 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			
+			iDataLog.setEnv(titaVo, oldJcicZ5712, uJcicZ5712);
+			iDataLog.exec("L8333刪除",uJcicZ5712.getSubmitKey()+uJcicZ5712.getCustId()+uJcicZ5712.getApplyDate()+uJcicZ5712.getBankId());
 		default:
 			break;
 		}

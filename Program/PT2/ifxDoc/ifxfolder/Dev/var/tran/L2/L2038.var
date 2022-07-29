@@ -711,7 +711,7 @@ IF(#ClMainType== "",E(0,0),$)
 IF(#ClMainType==1 ,E(0,1),$)
 IF(#ClCode1 == 1,E(0,2),$)
 IF(#ClCode1 == 2,E(0,3),$)
-IF(#ClMainType==2 ,E(0,4),$)
+IF(#ClMainType==2 || #ClCode1 == 9,E(0,4),$)
 IF(#ClMainType==3 || #ClCode1 == 3 || #ClCode1 == 4,E(0,5),$)
 IF(#ClMainType==4 || #ClCode1 == 5,E(0,0),$)
 
@@ -720,7 +720,7 @@ C(4,#NTXBUF5,S,E(0,@RPTFG,6))
 IF(#ClMainType==1 ,E(0,@RPTFG,7),$)
 IF(#ClCode1 == 1,E(0,@RPTFG,8),$)
 IF(#ClCode1 == 2,E(0,@RPTFG,10),$)
-IF(#ClMainType==2 ,E(0,@RPTFG,11),$)
+IF(#ClMainType==2 || #ClCode1 == 9,E(0,@RPTFG,11),$)
 IF(#ClMainType==3 || #ClCode1 == 3 || #ClCode1 == 4,E(0,@RPTFG,12),$)
 IF(#ClMainType==4 || #ClCode1 == 5,E(0,@RPTFG,6),$)
 
@@ -1031,7 +1031,9 @@ T(2,#OOClCode1+#OOClCode2+#OOClNo)
 #OOHasOtherRights=X,1,S
 
 #OO_BTN5_COL=X,1,S
-IF(#OOHasOtherRights == "Y" && #OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3}),BIND(grid,cancel))
+IF(#OOHasOtherRights == "Y",IF(#OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3}), BIND(grid,cancel)),BIND(grid,cancel))
+
+!IF(#OOHasOtherRights == "Y" && #OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3}), BIND(grid,cancel))
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 

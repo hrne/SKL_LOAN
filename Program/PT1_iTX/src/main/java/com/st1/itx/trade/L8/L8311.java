@@ -35,28 +35,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,11<br>
- * SubmitKey=X,11<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8311")
 @Scope("prototype")
 /**
@@ -85,17 +63,17 @@ public class L8311 extends TradeBuffer {
 		this.info("active L8311 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
-		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt"));
-		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
-		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
-		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM"))+191100;
-		String iStatus = titaVo.getParam("Status");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate").trim());
+		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
+		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt").trim());
+		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt").trim());
+		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM").trim())+191100;
+		String iStatus = titaVo.getParam("Status").trim();
 		String iKey = "";
 		int sPayAmt = iPayAmt;// 該IDN所有已報送本檔案資料之第8欄繳款金額之合計
 
@@ -219,9 +197,13 @@ public class L8311 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ050, uJcicZ050);
-			iDataLog.exec();
+			iDataLog.exec("L8311異動", uJcicZ050.getSubmitKey()+uJcicZ050.getCustId()+uJcicZ050.getRcDate());
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ050 = sJcicZ050Service.ukeyFirst(iKey, titaVo);
+			JcicZ050 uJcicZ0502 = new JcicZ050();
+			uJcicZ0502 = sJcicZ050Service.holdById(iJcicZ050.getJcicZ050Id(), titaVo);
 			iJcicZ050 = sJcicZ050Service.findById(iJcicZ050Id);
 			if (iJcicZ050 == null) {
 				throw new LogicException("E0008", "");
@@ -229,6 +211,16 @@ public class L8311 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ050 oldJcicZ0502 = (JcicZ050) iDataLog.clone(uJcicZ0502);
+			uJcicZ0502.setTranKey(iTranKey);
+			uJcicZ0502.setPayAmt(iPayAmt);
+			uJcicZ0502.setSumRepayActualAmt(iSumRepayActualAmt);
+			uJcicZ0502.setSumRepayShouldAmt(iSumRepayShouldAmt);
+			uJcicZ0502.setSecondRepayYM(iSecondRepayYM);
+			uJcicZ0502.setStatus(iStatus);
+			uJcicZ0502.setOutJcicTxtDate(0);			
+			
 			Slice<JcicZ050Log> dJcicLogZ050 = null;
 			dJcicLogZ050 = sJcicZ050LogService.ukeyEq(iJcicZ050.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ050 == null) {
@@ -254,6 +246,8 @@ public class L8311 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0502, uJcicZ0502);
+			iDataLog.exec("L8311刪除", uJcicZ0502.getSubmitKey()+uJcicZ0502.getCustId()+uJcicZ0502.getRcDate());
 		default:
 			break;
 		}

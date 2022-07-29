@@ -57,17 +57,17 @@ public class L8328 extends TradeBuffer {
 		this.info("active L8328 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iCourtCode = titaVo.getParam("CourtCode");
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		int iSignPrin = Integer.valueOf(titaVo.getParam("SignPrin"));
-		int iSignOther = Integer.valueOf(titaVo.getParam("SignOther"));
-		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage"));
-		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		int iSignPrin = Integer.valueOf(titaVo.getParam("SignPrin").trim());
+		int iSignOther = Integer.valueOf(titaVo.getParam("SignOther").trim());
+		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage").trim());
+		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt").trim());
 		String iKey = "";
 		// JcicZ448
 		JcicZ448 iJcicZ448 = new JcicZ448();
@@ -140,22 +140,26 @@ public class L8328 extends TradeBuffer {
 			if (uJcicZ448 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ448 oldJcicZ448 = (JcicZ448) iDataLog.clone(uJcicZ448);
 			uJcicZ448.setSignPrin(iSignPrin);
 			uJcicZ448.setSignOther(iSignOther);
 			uJcicZ448.setOwnPercentage(iOwnPercentage);
 			uJcicZ448.setAcQuitAmt(iAcQuitAmt);
 			uJcicZ448.setTranKey(iTranKey);
 			uJcicZ448.setOutJcicTxtDate(0);
-			JcicZ448 oldJcicZ448 = (JcicZ448) iDataLog.clone(uJcicZ448);
 			try {
 				sJcicZ448Service.update(uJcicZ448, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ448, uJcicZ448);
-			iDataLog.exec();
+			iDataLog.exec("L8328異動",uJcicZ448.getSubmitKey()+uJcicZ448.getCustId()+uJcicZ448.getApplyDate()+uJcicZ448.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ448 = sJcicZ448Service.ukeyFirst(iKey, titaVo);
+			JcicZ448 uJcicZ4482 = new JcicZ448();
+			uJcicZ4482 = sJcicZ448Service.holdById(iJcicZ448.getJcicZ448Id(), titaVo);
 			iJcicZ448 = sJcicZ448Service.findById(iJcicZ448Id);
 			if (iJcicZ448 == null) {
 				throw new LogicException("E0008", "");
@@ -163,6 +167,15 @@ public class L8328 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ448 oldJcicZ4482 = (JcicZ448) iDataLog.clone(uJcicZ4482);
+			uJcicZ4482.setSignPrin(iSignPrin);
+			uJcicZ4482.setSignOther(iSignOther);
+			uJcicZ4482.setOwnPercentage(iOwnPercentage);
+			uJcicZ4482.setAcQuitAmt(iAcQuitAmt);
+			uJcicZ4482.setTranKey(iTranKey);
+			uJcicZ4482.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ448Log> dJcicLogZ448 = null;
 			dJcicLogZ448 = sJcicZ448LogService.ukeyEq(iJcicZ448.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ448 == null) {
@@ -187,6 +200,8 @@ public class L8328 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ4482, uJcicZ4482);
+			iDataLog.exec("L8328刪除",uJcicZ4482.getSubmitKey()+uJcicZ4482.getCustId()+uJcicZ4482.getApplyDate()+uJcicZ4482.getCourtCode());
 		default:
 			break;
 		}

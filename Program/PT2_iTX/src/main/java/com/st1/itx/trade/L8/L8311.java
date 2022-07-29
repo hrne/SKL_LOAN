@@ -63,17 +63,17 @@ public class L8311 extends TradeBuffer {
 		this.info("active L8311 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
-		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt"));
-		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
-		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
-		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM"))+191100;
-		String iStatus = titaVo.getParam("Status");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate").trim());
+		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
+		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt").trim());
+		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt").trim());
+		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM").trim())+191100;
+		String iStatus = titaVo.getParam("Status").trim();
 		String iKey = "";
 		int sPayAmt = iPayAmt;// 該IDN所有已報送本檔案資料之第8欄繳款金額之合計
 
@@ -197,7 +197,7 @@ public class L8311 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ050, uJcicZ050);
-			iDataLog.exec();
+			iDataLog.exec("L8311異動", uJcicZ050.getSubmitKey()+uJcicZ050.getCustId()+uJcicZ050.getRcDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -247,7 +247,7 @@ public class L8311 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0502, uJcicZ0502);
-			iDataLog.exec();
+			iDataLog.exec("L8311刪除", uJcicZ0502.getSubmitKey()+uJcicZ0502.getCustId()+uJcicZ0502.getRcDate());
 		default:
 			break;
 		}

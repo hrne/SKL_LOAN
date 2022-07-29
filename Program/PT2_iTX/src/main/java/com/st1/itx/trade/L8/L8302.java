@@ -59,14 +59,14 @@ public class L8302 extends TradeBuffer {
 		this.info("active L8302 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
 		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iScDate = Integer.valueOf(titaVo.getParam("ScDate"));
-		int iNegoStartDate = Integer.valueOf(titaVo.getParam("NegoStartDate"));
-		int iNonFinClaimAmt = Integer.valueOf(titaVo.getParam("NonFinClaimAmt"));
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iScDate = Integer.valueOf(titaVo.getParam("ScDate").trim());
+		int iNegoStartDate = Integer.valueOf(titaVo.getParam("NegoStartDate").trim());
+		int iNonFinClaimAmt = Integer.valueOf(titaVo.getParam("NonFinClaimAmt").trim());
 		String iKey = "";
 		// JcicZ041, JcicZ040
 		JcicZ041 iJcicZ041 = new JcicZ041();
@@ -148,8 +148,10 @@ public class L8302 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
+			this.info("進入6932 ================ L8302");
+			this.info("UKey    ===== " + uJcicZ041.getUkey());
 			iDataLog.setEnv(titaVo, oldJcicZ041, uJcicZ041);
-			iDataLog.exec();
+			iDataLog.exec("L8302異動", uJcicZ041.getSubmitKey()+uJcicZ041.getCustId()+uJcicZ041.getRcDate());
 			break;
 		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -201,7 +203,7 @@ public class L8302 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0412, uJcicZ0412);
-			iDataLog.exec();
+			iDataLog.exec("L8301刪除", uJcicZ0412.getSubmitKey()+uJcicZ0412.getCustId()+uJcicZ0412.getRcDate());
 		    default:
 			break;
 		}

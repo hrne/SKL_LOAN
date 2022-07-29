@@ -63,14 +63,14 @@ public class L8330 extends TradeBuffer {
 		this.info("active L8330 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
 		String iTranKey = titaVo.getParam("TranKey").trim();
 		String iCustId = titaVo.getParam("CustId").trim();
 		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
 		String iCourtCode = titaVo.getParam("CourtCode").trim();
-		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"))+191100;
-		String iDelayCode = titaVo.getParam("DelayCode");
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM").trim())+191100;
+		String iDelayCode = titaVo.getParam("DelayCode").trim();
 		String iKey = "";
 		int sCovDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款')
 		int sDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為非'L')
@@ -199,7 +199,7 @@ public class L8330 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ451, uJcicZ451);
-			iDataLog.exec();
+			iDataLog.exec("L8330異動",uJcicZ451.getSubmitKey()+uJcicZ451.getCustId()+uJcicZ451.getApplyDate()+uJcicZ451.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -240,9 +240,10 @@ public class L8330 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			
 			iDataLog.setEnv(titaVo, oldJcicZ4512, uJcicZ4512);
-			iDataLog.exec();
-		default:
+			iDataLog.exec("L8330刪除",uJcicZ4512.getSubmitKey()+uJcicZ4512.getCustId()+uJcicZ4512.getApplyDate()+uJcicZ4512.getCourtCode());
+			default:
 			break;
 		}
 

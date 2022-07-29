@@ -59,16 +59,16 @@ public class L8314 extends TradeBuffer {
 		this.info("active L8314 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		String iAgreeSend = titaVo.getParam("AgreeSend");
-		String iAgreeSendData1 = titaVo.getParam("AgreeSendData1");
-		String iAgreeSendData2 = titaVo.getParam("AgreeSendData2");
-		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		String iAgreeSend = titaVo.getParam("AgreeSend").trim();
+		String iAgreeSendData1 = titaVo.getParam("AgreeSendData1").trim();
+		String iAgreeSendData2 = titaVo.getParam("AgreeSendData2").trim();
+		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate").trim());
 		String iKey = "";
 
 		// JcicZ053
@@ -149,7 +149,7 @@ public class L8314 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ053, uJcicZ053);
-			iDataLog.exec();
+			iDataLog.exec("L8314異動", uJcicZ053.getSubmitKey()+uJcicZ053.getCustId()+uJcicZ053.getRcDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -197,7 +197,7 @@ public class L8314 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0532, uJcicZ0532);
-			iDataLog.exec();
+			iDataLog.exec("L8314刪除", uJcicZ0532.getSubmitKey()+uJcicZ0532.getCustId()+uJcicZ0532.getRcDate());
 		default:
 			break;
 		}

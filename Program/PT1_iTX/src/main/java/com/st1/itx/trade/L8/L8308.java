@@ -35,28 +35,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * CaseStatus=X,1<br>
- * ClaimDate=9,7<br>
- * CourtCode=X,3<br>
- * Year=9,3<br>
- * CourtDiv=X,8<br>
- * CourtCaseNo=X,80<br>
- * Approve=X,1<br>
- * OutstandAmt=9,9<br>
- * ClaimStatus1=X,1<br>
- * SaveDate=9,7<br>
- * ClaimStatus2=X,1<br>
- * SaveEndDate=9,7<br>
- * SubAmt=9,9<br>
- * AdminName=X,20<br>
- * OutJcicTxtDate=9,7<br>
- */
-
 @Service("L8308")
 @Scope("prototype")
 /**
@@ -85,37 +63,38 @@ public class L8308 extends TradeBuffer {
 		this.info("active L8308 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iPeriod = Integer.valueOf(titaVo.getParam("Period"));
-		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate"));
-		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt"));
-		int iExpLoanAmt = Integer.valueOf(titaVo.getParam("ExpLoanAmt"));
-		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt"));
-		int iCashCardAmt = Integer.valueOf(titaVo.getParam("CashCardAmt"));
-		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt"));
-		int iCreditCardAmt = Integer.valueOf(titaVo.getParam("CreditCardAmt"));
-		BigDecimal iCivil323Amt = new BigDecimal(titaVo.getParam("Civil323Amt"));
-		BigDecimal iTotalAmt = new BigDecimal(titaVo.getParam("TotalAmt"));
-		int iPassDate = Integer.valueOf(titaVo.getParam("PassDate"));
-		int iInterviewDate = Integer.valueOf(titaVo.getParam("InterviewDate"));
-		int iSignDate = Integer.valueOf(titaVo.getParam("SignDate"));
-		int iLimitDate = Integer.valueOf(titaVo.getParam("LimitDate"));
-		int iFirstPayDate = Integer.valueOf(titaVo.getParam("FirstPayDate"));
-		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt"));
-		String iPayAccount = String.valueOf(titaVo.getParam("PayAccount"));
-		String iPostAddr = String.valueOf(titaVo.getParam("PostAddr"));
-		String iGradeType = String.valueOf(titaVo.getParam("GradeType"));
-		int iPayLastAmt = Integer.valueOf(titaVo.getParam("PayLastAmt"));
-		int iPeriod2 = Integer.valueOf(titaVo.getParam("Period2"));
-		BigDecimal iRate2 = new BigDecimal(titaVo.getParam("Rate2"));
-		int iMonthPayAmt2 = Integer.valueOf(titaVo.getParam("MonthPayAmt2"));
-		int iPayLastAmt2 = Integer.valueOf(titaVo.getParam("PayLastAmt2"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iPeriod = Integer.valueOf(titaVo.getParam("Period").trim());
+		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate").trim());
+		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt").trim());
+		int iExpLoanAmt = Integer.valueOf(titaVo.getParam("ExpLoanAmt").trim());
+		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt").trim());
+		int iCashCardAmt = Integer.valueOf(titaVo.getParam("CashCardAmt").trim());
+		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt").trim());
+		int iCreditCardAmt = Integer.valueOf(titaVo.getParam("CreditCardAmt").trim());
+		BigDecimal iCivil323Amt = new BigDecimal(titaVo.getParam("Civil323Amt").trim());
+		BigDecimal iTotalAmt = new BigDecimal(titaVo.getParam("TotalAmt").trim());
+		int iPassDate = Integer.valueOf(titaVo.getParam("PassDate").trim());
+		int iInterviewDate = Integer.valueOf(titaVo.getParam("InterviewDate").trim());
+		int iSignDate = Integer.valueOf(titaVo.getParam("SignDate").trim());
+		int iLimitDate = Integer.valueOf(titaVo.getParam("LimitDate").trim());
+		int iFirstPayDate = Integer.valueOf(titaVo.getParam("FirstPayDate").trim());
+		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt").trim());
+		String iPayAccount = String.valueOf(titaVo.getParam("PayAccount").trim());
+		String iPostAddr = String.valueOf(titaVo.getParam("PostAddr").trim());
+		String iGradeType = String.valueOf(titaVo.getParam("GradeType").trim());
+		int iPayLastAmt = Integer.valueOf(titaVo.getParam("PayLastAmt").trim());
+		int iPeriod2 = Integer.valueOf(titaVo.getParam("Period2").trim());
+		BigDecimal iRate2 = new BigDecimal(titaVo.getParam("Rate2").trim());
+		int iMonthPayAmt2 = Integer.valueOf(titaVo.getParam("MonthPayAmt2").trim());
+		int iPayLastAmt2 = Integer.valueOf(titaVo.getParam("PayLastAmt2").trim());
 
 		String iKey = "";
+		
 		// JcicZ047, JcicZ044
 		JcicZ047 iJcicZ047 = new JcicZ047();
 		JcicZ047Id iJcicZ047Id = new JcicZ047Id();
@@ -254,6 +233,8 @@ public class L8308 extends TradeBuffer {
 			}
 			break;
 		case "2":
+			String iUkey = titaVo.getParam("Ukey");
+			this.info("iUkey     = " + iUkey);
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ047 = sJcicZ047Service.ukeyFirst(iKey, titaVo);
 			JcicZ047 uJcicZ047 = new JcicZ047();
@@ -293,10 +274,18 @@ public class L8308 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
+			this.info("進入6932 ================ L8301");
+			this.info("UKey    ===== " + uJcicZ047.getUkey());
+
 			iDataLog.setEnv(titaVo, oldJcicZ047, uJcicZ047);
-			iDataLog.exec();
+			iDataLog.exec("L8308異動", uJcicZ047.getSubmitKey()+uJcicZ047.getCustId()+uJcicZ047.getRcDate());
 			break;
+			//2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ047 = sJcicZ047Service.ukeyFirst(iKey, titaVo);
+			JcicZ047 uJcicZ0472 = new JcicZ047();
+			uJcicZ0472 = sJcicZ047Service.holdById(iJcicZ047.getJcicZ047Id(), titaVo);
 			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id);
 			if (iJcicZ047 == null) {
 				throw new LogicException("E0008", "");
@@ -304,6 +293,41 @@ public class L8308 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate2 = iJcicZ047.getOutJcicTxtDate();
+			this.info("JcicDate2    = " + JcicDate2);
+			if (JcicDate2 != 0) {
+				throw new LogicException("E0004", "刪除資料不存在");
+			}
+			
+			JcicZ047 oldJcicZ0472 = (JcicZ047) iDataLog.clone(uJcicZ0472);
+			uJcicZ0472.setTranKey(iTranKey);
+			uJcicZ0472.setPeriod(iPeriod);
+			uJcicZ0472.setRate(iRate);
+			uJcicZ0472.setCivil323ExpAmt(iCivil323ExpAmt);
+			uJcicZ0472.setExpLoanAmt(iExpLoanAmt);
+			uJcicZ0472.setCivil323CashAmt(iCivil323CashAmt);
+			uJcicZ0472.setCashCardAmt(iCashCardAmt);
+			uJcicZ0472.setCivil323CreditAmt(iCivil323CreditAmt);
+			uJcicZ0472.setCreditCardAmt(iCreditCardAmt);
+			uJcicZ0472.setCivil323Amt(iCivil323Amt);
+			uJcicZ0472.setTotalAmt(iTotalAmt);
+			uJcicZ0472.setPassDate(iPassDate);
+			uJcicZ0472.setInterviewDate(iInterviewDate);
+			uJcicZ0472.setSignDate(iSignDate);
+			uJcicZ0472.setLimitDate(iLimitDate);
+			uJcicZ0472.setFirstPayDate(iFirstPayDate);
+			uJcicZ0472.setMonthPayAmt(iMonthPayAmt);
+			uJcicZ0472.setPayAccount(iPayAccount);
+			uJcicZ0472.setPostAddr(iPostAddr);
+			uJcicZ0472.setGradeType(iGradeType);
+			uJcicZ0472.setPayLastAmt(iPayLastAmt);
+			uJcicZ0472.setPeriod2(iPeriod2);
+			uJcicZ0472.setRate2(iRate2);
+			uJcicZ0472.setMonthPayAmt2(iMonthPayAmt2);
+			uJcicZ0472.setPayLastAmt2(iPayLastAmt2);
+			uJcicZ0472.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ047Log> dJcicLogZ047 = null;
 			dJcicLogZ047 = sJcicZ047LogService.ukeyEq(iJcicZ047.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ047 == null) {
@@ -348,6 +372,8 @@ public class L8308 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			iDataLog.setEnv(titaVo, oldJcicZ0472, uJcicZ0472);
+			iDataLog.exec("L8308刪除", uJcicZ0472.getSubmitKey()+uJcicZ0472.getCustId()+uJcicZ0472.getRcDate());
 		default:
 			break;
 		}

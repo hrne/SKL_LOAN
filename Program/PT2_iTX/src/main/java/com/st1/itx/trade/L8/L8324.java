@@ -63,29 +63,29 @@ public class L8324 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8324 ");
 		this.totaVo.init(titaVo);
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iCourtCode = titaVo.getParam("CourtCode");
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		String iAccount = titaVo.getParam("Account");
-		String iIsMaxMain = titaVo.getParam("IsMaxMain");
-		String iGuarantyType = titaVo.getParam("GuarantyType");
-		BigDecimal iLoanAmt = new BigDecimal(titaVo.getParam("LoanAmt"));
-		BigDecimal iCreditAmt = new BigDecimal(titaVo.getParam("CreditAmt"));
-		BigDecimal iPrincipal = new BigDecimal(titaVo.getParam("Principal"));
-		BigDecimal iInterest = new BigDecimal(titaVo.getParam("Interest"));
-		BigDecimal iPenalty = new BigDecimal(titaVo.getParam("Penalty"));
-		BigDecimal iOther = new BigDecimal(titaVo.getParam("Other"));
-		BigDecimal iTerminalPayAmt = new BigDecimal(titaVo.getParam("TerminalPayAmt"));
-		BigDecimal iLatestPayAmt = new BigDecimal(titaVo.getParam("LatestPayAmt"));
-		int iFinalPayDay = Integer.valueOf(titaVo.getParam("FinalPayDay"));
-		BigDecimal iNotyetacQuit = new BigDecimal(titaVo.getParam("NotyetacQuit"));
-		int iMothPayDay = Integer.valueOf(titaVo.getParam("MothPayDay"));
-		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate"))+191100;
-		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate"))+191100;
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		String iAccount = titaVo.getParam("Account").trim();
+		String iIsMaxMain = titaVo.getParam("IsMaxMain").trim();
+		String iGuarantyType = titaVo.getParam("GuarantyType").trim();
+		BigDecimal iLoanAmt = new BigDecimal(titaVo.getParam("LoanAmt").trim());
+		BigDecimal iCreditAmt = new BigDecimal(titaVo.getParam("CreditAmt").trim());
+		BigDecimal iPrincipal = new BigDecimal(titaVo.getParam("Principal").trim());
+		BigDecimal iInterest = new BigDecimal(titaVo.getParam("Interest").trim());
+		BigDecimal iPenalty = new BigDecimal(titaVo.getParam("Penalty").trim());
+		BigDecimal iOther = new BigDecimal(titaVo.getParam("Other").trim());
+		BigDecimal iTerminalPayAmt = new BigDecimal(titaVo.getParam("TerminalPayAmt").trim());
+		BigDecimal iLatestPayAmt = new BigDecimal(titaVo.getParam("LatestPayAmt").trim());
+		int iFinalPayDay = Integer.valueOf(titaVo.getParam("FinalPayDay").trim());
+		BigDecimal iNotyetacQuit = new BigDecimal(titaVo.getParam("NotyetacQuit").trim());
+		int iMothPayDay = Integer.valueOf(titaVo.getParam("MothPayDay").trim());
+		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate").trim())+191100;
+		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate").trim())+191100;
 		String iKey = "";
 
 		// JcicZ443, JcicZ440, JcicZ446
@@ -224,7 +224,7 @@ public class L8324 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ443, uJcicZ443);
-			iDataLog.exec();
+			iDataLog.exec("L8324異動",uJcicZ443.getSubmitKey()+uJcicZ443.getCustId()+uJcicZ443.getApplyDate()+uJcicZ443.getCourtCode()+uJcicZ443.getMaxMainCode()+uJcicZ443.getAccount());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -295,8 +295,8 @@ public class L8324 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4432, uJcicZ4432);
-			iDataLog.exec();
-		default:
+			iDataLog.exec("L8324刪除",uJcicZ4432.getSubmitKey()+uJcicZ4432.getCustId()+uJcicZ4432.getApplyDate()+uJcicZ4432.getCourtCode()+uJcicZ4432.getMaxMainCode()+uJcicZ4432.getAccount());
+			default:
 			break;
 		}
 		this.addList(this.totaVo);

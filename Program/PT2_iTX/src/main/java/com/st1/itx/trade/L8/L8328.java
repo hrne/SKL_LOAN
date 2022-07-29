@@ -57,17 +57,17 @@ public class L8328 extends TradeBuffer {
 		this.info("active L8328 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iCourtCode = titaVo.getParam("CourtCode");
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		int iSignPrin = Integer.valueOf(titaVo.getParam("SignPrin"));
-		int iSignOther = Integer.valueOf(titaVo.getParam("SignOther"));
-		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage"));
-		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		int iSignPrin = Integer.valueOf(titaVo.getParam("SignPrin").trim());
+		int iSignOther = Integer.valueOf(titaVo.getParam("SignOther").trim());
+		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage").trim());
+		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt").trim());
 		String iKey = "";
 		// JcicZ448
 		JcicZ448 iJcicZ448 = new JcicZ448();
@@ -153,7 +153,7 @@ public class L8328 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ448, uJcicZ448);
-			iDataLog.exec();
+			iDataLog.exec("L8328異動",uJcicZ448.getSubmitKey()+uJcicZ448.getCustId()+uJcicZ448.getApplyDate()+uJcicZ448.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -201,7 +201,7 @@ public class L8328 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4482, uJcicZ4482);
-			iDataLog.exec();
+			iDataLog.exec("L8328刪除",uJcicZ4482.getSubmitKey()+uJcicZ4482.getCustId()+uJcicZ4482.getApplyDate()+uJcicZ4482.getCourtCode());
 		default:
 			break;
 		}

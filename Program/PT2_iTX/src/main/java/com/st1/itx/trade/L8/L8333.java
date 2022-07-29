@@ -59,17 +59,17 @@ public class L8333 extends TradeBuffer {
 		this.info("active L8333 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iBankId = titaVo.getParam("BankId");
-		String iOwnerYn = titaVo.getParam("OwnerYn");
-		String iPayYn = titaVo.getParam("PayYn");
-		int iOwnerAmt = Integer.valueOf(titaVo.getParam("OwnerAmt"));
-		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt"));
-		int iUnallotAmt = Integer.valueOf(titaVo.getParam("UnallotAmt"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iBankId = titaVo.getParam("BankId").trim();
+		String iOwnerYn = titaVo.getParam("OwnerYn").trim();
+		String iPayYn = titaVo.getParam("PayYn").trim();
+		int iOwnerAmt = Integer.valueOf(titaVo.getParam("OwnerAmt").trim());
+		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt").trim());
+		int iUnallotAmt = Integer.valueOf(titaVo.getParam("UnallotAmt").trim());
 		String iKey = "";
 		// JcicZ571
 		JcicZ571 iJcicZ571 = new JcicZ571();
@@ -155,7 +155,7 @@ public class L8333 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ571, uJcicZ571);
-			iDataLog.exec();
+			iDataLog.exec("L8333異動",uJcicZ571.getSubmitKey()+uJcicZ571.getCustId()+uJcicZ571.getApplyDate()+uJcicZ571.getBankId());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -204,8 +204,9 @@ public class L8333 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
+			
 			iDataLog.setEnv(titaVo, oldJcicZ5712, uJcicZ5712);
-			iDataLog.exec();
+			iDataLog.exec("L8333刪除",uJcicZ5712.getSubmitKey()+uJcicZ5712.getCustId()+uJcicZ5712.getApplyDate()+uJcicZ5712.getBankId());
 		default:
 			break;
 		}

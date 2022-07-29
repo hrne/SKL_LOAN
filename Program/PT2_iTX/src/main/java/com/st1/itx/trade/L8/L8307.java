@@ -19,7 +19,7 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.JcicZ045;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ046;
 import com.st1.itx.db.domain.JcicZ046Id;
@@ -69,14 +69,14 @@ public class L8307 extends TradeBuffer {
 		this.info("active L8307 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate"));
-		String iCloseCode = titaVo.getParam("CloseCode");
-		String iBreakCode = titaVo.getParam("BreakCode");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate").trim());
+		String iCloseCode = titaVo.getParam("CloseCode").trim();
+		String iBreakCode = titaVo.getParam("BreakCode").trim();
 		String iKey = "";
 
 		// JcicZ046, JcicZ040
@@ -202,8 +202,10 @@ public class L8307 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
+			this.info("進入6932 ================ L8301");
+			this.info("UKey    ===== " + uJcicZ046.getUkey());
 			iDataLog.setEnv(titaVo, oldJcicZ046, uJcicZ046);
-			iDataLog.exec();
+			iDataLog.exec("L8307異動", uJcicZ046.getSubmitKey()+uJcicZ046.getCustId()+uJcicZ046.getRcDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -247,7 +249,7 @@ public class L8307 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0462, uJcicZ0462);
-			iDataLog.exec();
+			iDataLog.exec("L8307刪除", uJcicZ0462.getSubmitKey()+uJcicZ0462.getCustId()+uJcicZ0462.getRcDate());
 		default:
 			break;
 		}

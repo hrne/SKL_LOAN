@@ -35,17 +35,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-/**
- * Tita<br>
- * TranKey=X,1<br>
- * CustId=X,10<br>
- * SubmitKey=X,10<br>
- * RcDate=9,7<br>
- * ChangePayDate=9,7<br>
- * ClosedDate=9,7<br>
- * ClosedResult=9,1<br>
- * OutJcicTxtDate=9,7<br>
- */
 
 @Service("L8324")
 @Scope("prototype")
@@ -74,29 +63,29 @@ public class L8324 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8324 ");
 		this.totaVo.init(titaVo);
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iCourtCode = titaVo.getParam("CourtCode");
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		String iAccount = titaVo.getParam("Account");
-		String iIsMaxMain = titaVo.getParam("IsMaxMain");
-		String iGuarantyType = titaVo.getParam("GuarantyType");
-		BigDecimal iLoanAmt = new BigDecimal(titaVo.getParam("LoanAmt"));
-		BigDecimal iCreditAmt = new BigDecimal(titaVo.getParam("CreditAmt"));
-		BigDecimal iPrincipal = new BigDecimal(titaVo.getParam("Principal"));
-		BigDecimal iInterest = new BigDecimal(titaVo.getParam("Interest"));
-		BigDecimal iPenalty = new BigDecimal(titaVo.getParam("Penalty"));
-		BigDecimal iOther = new BigDecimal(titaVo.getParam("Other"));
-		BigDecimal iTerminalPayAmt = new BigDecimal(titaVo.getParam("TerminalPayAmt"));
-		BigDecimal iLatestPayAmt = new BigDecimal(titaVo.getParam("LatestPayAmt"));
-		int iFinalPayDay = Integer.valueOf(titaVo.getParam("FinalPayDay"));
-		BigDecimal iNotyetacQuit = new BigDecimal(titaVo.getParam("NotyetacQuit"));
-		int iMothPayDay = Integer.valueOf(titaVo.getParam("MothPayDay"));
-		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate"))+191100;
-		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate"))+191100;
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		String iAccount = titaVo.getParam("Account").trim();
+		String iIsMaxMain = titaVo.getParam("IsMaxMain").trim();
+		String iGuarantyType = titaVo.getParam("GuarantyType").trim();
+		BigDecimal iLoanAmt = new BigDecimal(titaVo.getParam("LoanAmt").trim());
+		BigDecimal iCreditAmt = new BigDecimal(titaVo.getParam("CreditAmt").trim());
+		BigDecimal iPrincipal = new BigDecimal(titaVo.getParam("Principal").trim());
+		BigDecimal iInterest = new BigDecimal(titaVo.getParam("Interest").trim());
+		BigDecimal iPenalty = new BigDecimal(titaVo.getParam("Penalty").trim());
+		BigDecimal iOther = new BigDecimal(titaVo.getParam("Other").trim());
+		BigDecimal iTerminalPayAmt = new BigDecimal(titaVo.getParam("TerminalPayAmt").trim());
+		BigDecimal iLatestPayAmt = new BigDecimal(titaVo.getParam("LatestPayAmt").trim());
+		int iFinalPayDay = Integer.valueOf(titaVo.getParam("FinalPayDay").trim());
+		BigDecimal iNotyetacQuit = new BigDecimal(titaVo.getParam("NotyetacQuit").trim());
+		int iMothPayDay = Integer.valueOf(titaVo.getParam("MothPayDay").trim());
+		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate").trim())+191100;
+		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate").trim())+191100;
 		String iKey = "";
 
 		// JcicZ443, JcicZ440, JcicZ446
@@ -211,6 +200,7 @@ public class L8324 extends TradeBuffer {
 			if (uJcicZ443 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			JcicZ443 oldJcicZ443 = (JcicZ443) iDataLog.clone(uJcicZ443);
 			uJcicZ443.setTranKey(iTranKey);
 			uJcicZ443.setIsMaxMain(iIsMaxMain);
 			uJcicZ443.setGuarantyType(iGuarantyType);
@@ -228,16 +218,19 @@ public class L8324 extends TradeBuffer {
 			uJcicZ443.setBeginDate(iBeginDate);
 			uJcicZ443.setEndDate(iEndDate);
 			uJcicZ443.setOutJcicTxtDate(0);
-			JcicZ443 oldJcicZ443 = (JcicZ443) iDataLog.clone(uJcicZ443);
 			try {
 				sJcicZ443Service.update(uJcicZ443, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ443, uJcicZ443);
-			iDataLog.exec();
+			iDataLog.exec("L8324異動",uJcicZ443.getSubmitKey()+uJcicZ443.getCustId()+uJcicZ443.getApplyDate()+uJcicZ443.getCourtCode()+uJcicZ443.getMaxMainCode()+uJcicZ443.getAccount());
 			break;
 		case "4": // 需刷主管卡
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ443 = sJcicZ443Service.ukeyFirst(iKey, titaVo);
+			JcicZ443 uJcicZ4432 = new JcicZ443();
+			uJcicZ4432 = sJcicZ443Service.holdById(iJcicZ443.getJcicZ443Id(), titaVo);
 			iJcicZ443 = sJcicZ443Service.findById(iJcicZ443Id);
 			if (iJcicZ443 == null) {
 				throw new LogicException("E0008", "");
@@ -245,6 +238,26 @@ public class L8324 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
+			
+			JcicZ443 oldJcicZ4432 = (JcicZ443) iDataLog.clone(uJcicZ4432);
+			uJcicZ4432.setTranKey(iTranKey);
+			uJcicZ4432.setIsMaxMain(iIsMaxMain);
+			uJcicZ4432.setGuarantyType(iGuarantyType);
+			uJcicZ4432.setLoanAmt(iLoanAmt);
+			uJcicZ4432.setCreditAmt(iCreditAmt);
+			uJcicZ4432.setPrincipal(iPrincipal);
+			uJcicZ4432.setInterest(iInterest);
+			uJcicZ4432.setPenalty(iPenalty);
+			uJcicZ4432.setOther(iOther);
+			uJcicZ4432.setTerminalPayAmt(iTerminalPayAmt);
+			uJcicZ4432.setLatestPayAmt(iLatestPayAmt);
+			uJcicZ4432.setFinalPayDay(iFinalPayDay);
+			uJcicZ4432.setNotyetacQuit(iNotyetacQuit);
+			uJcicZ4432.setMothPayDay(iMothPayDay);
+			uJcicZ4432.setBeginDate(iBeginDate);
+			uJcicZ4432.setEndDate(iEndDate);
+			uJcicZ4432.setOutJcicTxtDate(0);
+			
 			Slice<JcicZ443Log> dJcicLogZ443 = null;
 			dJcicLogZ443 = sJcicZ443LogService.ukeyEq(iJcicZ443.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ443 == null) {
@@ -281,7 +294,9 @@ public class L8324 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-		default:
+			iDataLog.setEnv(titaVo, oldJcicZ4432, uJcicZ4432);
+			iDataLog.exec("L8324刪除",uJcicZ4432.getSubmitKey()+uJcicZ4432.getCustId()+uJcicZ4432.getApplyDate()+uJcicZ4432.getCourtCode()+uJcicZ4432.getMaxMainCode()+uJcicZ4432.getAccount());
+			default:
 			break;
 		}
 		this.addList(this.totaVo);

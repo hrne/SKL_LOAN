@@ -63,23 +63,23 @@ public class L8304 extends TradeBuffer {
 		this.info("active L8304 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		String iMaxMainCode = titaVo.getParam("MaxMainCode");
-		String iAccount = titaVo.getParam("Account");
-		String iCollateralType = titaVo.getParam("CollateralType");
-		BigDecimal iOriginLoanAmt = new BigDecimal(titaVo.getParam("OriginLoanAmt"));
-		BigDecimal iCreditBalance = new BigDecimal(titaVo.getParam("CreditBalance"));
-		BigDecimal iPerPeriordAmt = new BigDecimal(titaVo.getParam("PerPeriordAmt"));
-		BigDecimal iLastPayAmt = new BigDecimal(titaVo.getParam("LastPayAmt"));
-		int iLastPayDate = Integer.valueOf(titaVo.getParam("LastPayDate"));
-		BigDecimal iOutstandAmt = new BigDecimal(titaVo.getParam("OutstandAmt"));
-		int iRepayPerMonDay = Integer.valueOf(titaVo.getParam("RepayPerMonDay"));
-		int iContractStartYM = Integer.valueOf(titaVo.getParam("ContractStartYM"));
-		int iContractEndYM = Integer.valueOf(titaVo.getParam("ContractEndYM"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
+		String iAccount = titaVo.getParam("Account").trim();
+		String iCollateralType = titaVo.getParam("CollateralType").trim();
+		BigDecimal iOriginLoanAmt = new BigDecimal(titaVo.getParam("OriginLoanAmt").trim());
+		BigDecimal iCreditBalance = new BigDecimal(titaVo.getParam("CreditBalance").trim());
+		BigDecimal iPerPeriordAmt = new BigDecimal(titaVo.getParam("PerPeriordAmt").trim());
+		BigDecimal iLastPayAmt = new BigDecimal(titaVo.getParam("LastPayAmt").trim());
+		int iLastPayDate = Integer.valueOf(titaVo.getParam("LastPayDate").trim());
+		BigDecimal iOutstandAmt = new BigDecimal(titaVo.getParam("OutstandAmt").trim());
+		int iRepayPerMonDay = Integer.valueOf(titaVo.getParam("RepayPerMonDay").trim());
+		int iContractStartYM = Integer.valueOf(titaVo.getParam("ContractStartYM").trim());
+		int iContractEndYM = Integer.valueOf(titaVo.getParam("ContractEndYM").trim());
 		String iKey = "";
 		// JcicZ043, JcicZ040, JcicZ053
 		JcicZ043 iJcicZ043 = new JcicZ043();
@@ -180,8 +180,11 @@ public class L8304 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
+			this.info("進入6932 ================ L8301");
+			this.info("UKey    ===== " + uJcicZ043.getUkey());
+
 			iDataLog.setEnv(titaVo, oldJcicZ043, uJcicZ043);
-			iDataLog.exec();
+			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey()+uJcicZ043.getCustId()+uJcicZ043.getRcDate());
 			break;
 			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -242,7 +245,7 @@ public class L8304 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0432, uJcicZ0432);
-			iDataLog.exec();
+			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey()+uJcicZ0432.getCustId()+uJcicZ0432.getRcDate());
 		default:
 			break;
 		}

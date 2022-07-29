@@ -65,23 +65,23 @@ public class L8322 extends TradeBuffer {
 		this.info("active L8322 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
 		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iCourtCode = titaVo.getParam("CourtCode");
-		int iAgreeDate = Integer.valueOf(titaVo.getParam("AgreeDate"));
-		int iStartDate = Integer.valueOf(titaVo.getParam("StartDate"));
-		int iRemindDate = Integer.valueOf(titaVo.getParam("RemindDate"));
-		String iApplyType = titaVo.getParam("ApplyType");
-		String iReportYn = titaVo.getParam("ReportYn");
-		String iNotBankId1 = titaVo.getParam("NotBankId1");
-		String iNotBankId2 = titaVo.getParam("NotBankId2");
-		String iNotBankId3 = titaVo.getParam("NotBankId3");
-		String iNotBankId4 = titaVo.getParam("NotBankId4");
-		String iNotBankId5 = titaVo.getParam("NotBankId5");
-		String iNotBankId6 = titaVo.getParam("NotBankId6");
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		int iAgreeDate = Integer.valueOf(titaVo.getParam("AgreeDate").trim());
+		int iStartDate = Integer.valueOf(titaVo.getParam("StartDate").trim());
+		int iRemindDate = Integer.valueOf(titaVo.getParam("RemindDate").trim());
+		String iApplyType = titaVo.getParam("ApplyType").trim();
+		String iReportYn = titaVo.getParam("ReportYn").trim();
+		String iNotBankId1 = titaVo.getParam("NotBankId1").trim();
+		String iNotBankId2 = titaVo.getParam("NotBankId2").trim();
+		String iNotBankId3 = titaVo.getParam("NotBankId3").trim();
+		String iNotBankId4 = titaVo.getParam("NotBankId4").trim();
+		String iNotBankId5 = titaVo.getParam("NotBankId5").trim();
+		String iNotBankId6 = titaVo.getParam("NotBankId6").trim();
 		String iKey = "";
 		String[] sNotBankId = { iNotBankId1, iNotBankId2, iNotBankId3, iNotBankId4, iNotBankId5, iNotBankId6 };// 未揭露債權機構代號集合
 		List<String> iL8301SqlReturn = new ArrayList<>(); // NegFinAcct有效消債條例金融機構代號集合
@@ -216,7 +216,7 @@ public class L8322 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ440, uJcicZ440);
-			iDataLog.exec();
+			iDataLog.exec("L8322異動",uJcicZ440.getSubmitKey()+uJcicZ440.getCustId()+uJcicZ440.getApplyDate()+uJcicZ440.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -278,7 +278,7 @@ public class L8322 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4402, uJcicZ4402);
-			iDataLog.exec();
+			iDataLog.exec("L8322刪除",uJcicZ4402.getSubmitKey()+uJcicZ4402.getCustId()+uJcicZ4402.getApplyDate()+uJcicZ4402.getCourtCode());
 		default:
 			break;
 		}

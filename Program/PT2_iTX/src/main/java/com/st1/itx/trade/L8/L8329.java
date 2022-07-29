@@ -66,16 +66,16 @@ public class L8329 extends TradeBuffer {
 		this.info("active L8329 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		String iCourtCode = titaVo.getParam("CourtCode");
-		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt"));
-		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
-		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate").trim());
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
+		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt").trim());
+		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt").trim());
 		String iPayStatus = titaVo.getParam("PayStatus");
 		String iKey = "";
 
@@ -202,7 +202,7 @@ public class L8329 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ450, uJcicZ450);
-			iDataLog.exec();
+			iDataLog.exec("L8329異動",uJcicZ450.getSubmitKey()+uJcicZ450.getCustId()+uJcicZ450.getApplyDate()+uJcicZ450.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -250,7 +250,7 @@ public class L8329 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4502, uJcicZ4502);
-			iDataLog.exec();
+			iDataLog.exec("L8329刪除",uJcicZ4502.getSubmitKey()+uJcicZ4502.getCustId()+uJcicZ4502.getApplyDate()+uJcicZ4502.getCourtCode());
 		default:
 			break;
 		}

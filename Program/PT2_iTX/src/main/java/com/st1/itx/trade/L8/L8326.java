@@ -68,14 +68,14 @@ public class L8326 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8326 ");
 		this.totaVo.init(titaVo);
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
-		String iCourtCode = titaVo.getParam("CourtCode");
-		String iCloseCode = titaVo.getParam("CloseCode");
-		int iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate"));
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
+		String iCourtCode = titaVo.getParam("CourtCode").trim();
+		String iCloseCode = titaVo.getParam("CloseCode").trim();
+		int iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate").trim());
 		String iKey = "";
 		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
 		String[] acceptCloseCode = { "00", "01", "90", "99" };// 報送「'447':金融機構無擔保債務協議資料」後，可接受的「結案原因代號」
@@ -204,7 +204,7 @@ public class L8326 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ446, uJcicZ446);
-			iDataLog.exec();
+			iDataLog.exec("L8326異動",uJcicZ446.getSubmitKey()+uJcicZ446.getCustId()+uJcicZ446.getApplyDate()+uJcicZ446.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -247,7 +247,7 @@ public class L8326 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4462, uJcicZ4462);
-			iDataLog.exec();
+			iDataLog.exec("L8326刪除",uJcicZ4462.getSubmitKey()+uJcicZ4462.getCustId()+uJcicZ4462.getApplyDate()+uJcicZ4462.getCourtCode());
 		default:
 			break;
 		}

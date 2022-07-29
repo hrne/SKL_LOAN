@@ -56,28 +56,28 @@ public class L8316 extends TradeBuffer {
 		this.info("active L8316 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
 		String iCaseStatus = titaVo.getParam("CaseStatus");// 案件狀態
-		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate"));// 裁定日期
-		String iCourtCode = titaVo.getParam("CourtCode");// 承審法院代碼
-		int iYear = Integer.valueOf(titaVo.getParam("Year"))+1911;
-		String iCourtDiv = titaVo.getParam("CourtDiv");
-		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
-		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
-		int iPayEndDate = Integer.valueOf(titaVo.getParam("PayEndDate"));
-		int iPeriod = Integer.valueOf(titaVo.getParam("Period"));
-		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate"));
-		String iIsImplement = titaVo.getParam("IsImplement");
-		String iInspectName = titaVo.getParam("InspectName");
-		int iOutstandAmt = Integer.valueOf(titaVo.getParam("OutstandAmt"));
-		int iSubAmt = Integer.valueOf(titaVo.getParam("SubAmt"));
-		String iClaimStatus1 = titaVo.getParam("ClaimStatus1");
-		int iSaveDate = Integer.valueOf(titaVo.getParam("SaveDate"));
-		String iClaimStatus2 = titaVo.getParam("ClaimStatus2");
-		int iSaveEndDate = Integer.valueOf(titaVo.getParam("SaveEndDate"));
+		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate").trim());// 裁定日期
+		String iCourtCode = titaVo.getParam("CourtCode").trim();// 承審法院代碼
+		int iYear = Integer.valueOf(titaVo.getParam("Year").trim())+1911;
+		String iCourtDiv = titaVo.getParam("CourtDiv").trim();
+		String iCourtCaseNo = titaVo.getParam("CourtCaseNo").trim();
+		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate").trim());
+		int iPayEndDate = Integer.valueOf(titaVo.getParam("PayEndDate").trim());
+		int iPeriod = Integer.valueOf(titaVo.getParam("Period").trim());
+		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate").trim());
+		String iIsImplement = titaVo.getParam("IsImplement").trim();
+		String iInspectName = titaVo.getParam("InspectName").trim();
+		int iOutstandAmt = Integer.valueOf(titaVo.getParam("OutstandAmt").trim());
+		int iSubAmt = Integer.valueOf(titaVo.getParam("SubAmt").trim());
+		String iClaimStatus1 = titaVo.getParam("ClaimStatus1").trim();
+		int iSaveDate = Integer.valueOf(titaVo.getParam("SaveDate").trim());
+		String iClaimStatus2 = titaVo.getParam("ClaimStatus2").trim();
+		int iSaveEndDate = Integer.valueOf(titaVo.getParam("SaveEndDate").trim());
 		String iKey = "";
 
 		// JcicZ055
@@ -228,7 +228,7 @@ public class L8316 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ055, uJcicZ055);
-			iDataLog.exec();
+			iDataLog.exec("L8316異動", uJcicZ055.getSubmitKey()+uJcicZ055.getCustId()+uJcicZ055.getCaseStatus()+uJcicZ055.getClaimDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -302,8 +302,8 @@ public class L8316 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0552, uJcicZ0552);
-			iDataLog.exec();
-		default:
+			iDataLog.exec("L8316刪除", uJcicZ0552.getSubmitKey()+uJcicZ0552.getCustId()+uJcicZ0552.getCaseStatus()+uJcicZ0552.getClaimDate());
+			default:
 			break;
 		}
 

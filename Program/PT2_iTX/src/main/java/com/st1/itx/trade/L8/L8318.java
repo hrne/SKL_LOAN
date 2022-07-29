@@ -64,13 +64,13 @@ public class L8318 extends TradeBuffer {
 		this.info("active L8318 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey");
-		String iCustId = titaVo.getParam("CustId");
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
-		int iYM = Integer.valueOf(titaVo.getParam("YM"))+191100;
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim();
+		String iCustId = titaVo.getParam("CustId").trim();
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate").trim());
+		int iYM = Integer.valueOf(titaVo.getParam("YM").trim())+191100;
 		String iKey = "";
 		// JcicZ060, JcicZ046, JcicZ047, JcicZ062, JcicZ063
 		JcicZ060 iJcicZ060 = new JcicZ060();
@@ -181,7 +181,7 @@ public class L8318 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ060, uJcicZ060);
-			iDataLog.exec();
+			iDataLog.exec("L8318異動", uJcicZ060.getSubmitKey()+uJcicZ060.getCustId()+uJcicZ060.getRcDate()+uJcicZ060.getChangePayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -223,8 +223,8 @@ public class L8318 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0602, uJcicZ0602);
-			iDataLog.exec();
-		default:
+			iDataLog.exec("L8318刪除", uJcicZ0602.getSubmitKey()+uJcicZ0602.getCustId()+uJcicZ0602.getRcDate()+uJcicZ0602.getChangePayDate());
+			default:
 			break;
 		}
 		this.addList(this.totaVo);
