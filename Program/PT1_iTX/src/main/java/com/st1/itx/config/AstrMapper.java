@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +32,8 @@ public class AstrMapper extends SysLogger {
 
 	private Map<String, String> astrMapUni = new HashMap<String, String>();
 
+	private Map<String, String> astrMapUni2Big = new HashMap<String, String>();
+
 	public AstrMapper() {
 	}
 
@@ -51,9 +52,11 @@ public class AstrMapper extends SysLogger {
 			bR = new BufferedReader(isr);
 			String s = "";
 			while (!Objects.isNull(s = bR.readLine())) {
+				this.info(s);
 				String[] ss = s.split(",");
 				astrMapBig5.put(ss[0].trim(), ss[2].trim());
 				astrMapUni.put(ss[1].trim(), ss[2].trim());
+				astrMapUni2Big.put(ss[1].trim(), ss[0].trim());
 			}
 		} catch (Exception e) {
 			this.error("Read Astr Error!!");
@@ -66,24 +69,23 @@ public class AstrMapper extends SysLogger {
 		}
 	}
 
-	public String getMapperChar(char c) throws Exception {
-		String sChar = astrMapUni.get(Integer.toHexString(c));
-		if (!Objects.isNull(sChar))
-			return sChar;
-		else {
-			try {
-				byte[] ms950Byte = (c + "").getBytes("BIG5");
-				sChar = astrMapBig5.get(HexDump.toHexString(ms950Byte).trim());
-				if (!Objects.isNull(sChar))
-					return sChar;
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.error(errors.toString());
-				return new String("　".getBytes("BIG5"), "BIG5");
-			}
+	public byte[] getMapperChar(char c) throws Exception {
+		try {
+			byte[] uniByte = new byte[2];
+			uniByte[0] = (c + "").getBytes("UNICODE")[2];
+			uniByte[1] = (c + "").getBytes("UNICODE")[3];
+
+			String sChar = astrMapUni2Big.get(HexDump.toHexString(uniByte).trim());
+			if (!Objects.isNull(sChar))
+				return HexDump.hexStringToByteArray(sChar);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			return "　".getBytes("BIG5");
 		}
-		return new String("　".getBytes("BIG5"), "BIG5");
+
+		return "　".getBytes("BIG5");
 	}
 
 }

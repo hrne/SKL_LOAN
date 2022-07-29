@@ -420,7 +420,7 @@ public class MakeFile extends CommBuffer {
 					String[] ss = map.get("d").toString().split("");
 					for (String s : ss) {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
-							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]).getBytes(charsetName));
+							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]));
 						else
 							bos.write(s.equals("／") ? sl : s.getBytes(charsetName));
 					}
