@@ -128,24 +128,25 @@ public class L9136Report extends MakeReport {
 
 				String[] tmpNewContent = r.get("New").replaceAll("\\[", "").replaceAll("\\]", "")
 						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
-				
-				String[] word = { "最後更新日期時間","最後更新人員" };
-					
+
+				// 要排除的字段
+				String[] word = { "最後更新日期時間", "最後更新人員" };
+
 				List<String> tmpWord = new ArrayList<String>(Arrays.asList(word));
 				List<String> tmp1 = new ArrayList<String>(Arrays.asList(tmpUpdateItem));
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
-								
+
 //				this.info("======"+tmp1.size());
 //				this.info("tmp1======"+tmp1.toString());
 //				this.info("tmp2======"+tmp2.toString());
 //				this.info("tmp3======"+tmp3.toString());
-				
-				for(int i = 0 ;i<tmp1.size();i++) {					
-					for(int j = 0 ;j<tmpWord.size();j++) {
-						//排除不需要的顯示的字串
+
+				for (int i = 0; i < tmp1.size(); i++) {
+					for (int j = 0; j < tmpWord.size(); j++) {
+						// 排除不需要的顯示的字串
 						if (tmp1.get(i).toString().indexOf(tmpWord.get(j).toString()) == 0) {
-						
+
 							tmp1.remove(i);
 							tmp2.remove(i);
 							tmp3.remove(i);
@@ -153,8 +154,6 @@ public class L9136Report extends MakeReport {
 						}
 					}
 				}
-		
-				
 
 				for (int i = 0; i < tmp1.size(); i++) {
 
@@ -201,7 +200,7 @@ public class L9136Report extends MakeReport {
 			this.print(-45, this.getMidXAxis(), this.endText, "C");
 		}
 
-		if (l9136List == null && l9136List.size() == 0 && l9136List2 == null && l9136List2.size() == 0) {
+		if (l9136List == null  && l9136List2 == null ) {
 			this.print(1, 1, "本日無資料");
 		}
 
@@ -272,11 +271,14 @@ public class L9136Report extends MakeReport {
 //		this.print(0, 87, "1705394");
 		this.print(0, 87, r.get("ClNo"));
 
+		tmpUpdateItem = tmpUpdateItem.trim();
+		tmpUpdateItem = tmpUpdateItem.length() > 8 ? tmpUpdateItem.substring(0, 8) : tmpUpdateItem;
+
 		// 更正項目
-		this.print(0, 98, tmpUpdateItem.trim().length() == 0 ? " " : fillUp(tmpUpdateItem, 16, ".", "R"));
+		this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUp(tmpUpdateItem, 16, ".", "R"));
 
 		// 更改前內容
-		this.print(0, 119,
+		this.print(0, 120,
 				tmpNewContent.trim().length() == 0 ? " "
 						: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
 								+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent);

@@ -71,20 +71,20 @@ public class L8301 extends TradeBuffer {
 		this.info("active L8301 ");
 		this.totaVo.init(titaVo);
 
-		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey = titaVo.getParam("TranKey"); // 交易代碼
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
-		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
-		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		int iRbDate = Integer.valueOf(titaVo.getParam("RbDate"));
-		String iApplyType = titaVo.getParam("ApplyType");
-		String iRefBankId = titaVo.getParam("RefBankId");
-		String iNotBankId1 = titaVo.getParam("NotBankId1");
-		String iNotBankId2 = titaVo.getParam("NotBankId2");
-		String iNotBankId3 = titaVo.getParam("NotBankId3");
-		String iNotBankId4 = titaVo.getParam("NotBankId4");
-		String iNotBankId5 = titaVo.getParam("NotBankId5");
-		String iNotBankId6 = titaVo.getParam("NotBankId6");
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp").trim();
+		String iTranKey = titaVo.getParam("TranKey").trim(); // 交易代碼
+		String iCustId = titaVo.getParam("CustId").trim();// 債務人IDN
+		String iSubmitKey = titaVo.getParam("SubmitKey").trim();// 報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
+		int iRbDate = Integer.valueOf(titaVo.getParam("RbDate").trim());
+		String iApplyType = titaVo.getParam("ApplyType").trim();
+		String iRefBankId = titaVo.getParam("RefBankId").trim();
+		String iNotBankId1 = titaVo.getParam("NotBankId1").trim();
+		String iNotBankId2 = titaVo.getParam("NotBankId2").trim();
+		String iNotBankId3 = titaVo.getParam("NotBankId3").trim();
+		String iNotBankId4 = titaVo.getParam("NotBankId4").trim();
+		String iNotBankId5 = titaVo.getParam("NotBankId5").trim();
+		String iNotBankId6 = titaVo.getParam("NotBankId6").trim();
 		String iKey = "";
 
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
