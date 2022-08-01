@@ -111,7 +111,7 @@ public class L8403 extends TradeBuffer {
 				this.info("CustNo   = " + iCustNo);
 				JcicZ040Log iJcicZ040Log = sJcicZ040LogService.ukeyFirst(uJcicZ040.getUkey(), titaVo);
 				iDataLog.setEnv(titaVo, oldJcicZ040, uJcicZ040);
-				iDataLog.exec("L8401取消報送",iJcicZ040Log.getUkey()+iJcicZ040Log.getTxSeq());
+				iDataLog.exec("L8403取消報送",iJcicZ040Log.getUkey()+iJcicZ040Log.getTxSeq());
 			}
 		}
 		

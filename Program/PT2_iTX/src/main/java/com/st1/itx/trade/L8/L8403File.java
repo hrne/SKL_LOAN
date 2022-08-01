@@ -1265,6 +1265,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z041)");
 					}
+					this.info("準備寫入L6932 ===== L8302(041)");
+					JcicZ041Log uJcicZ041log = sJcicZ041LogService.ukeyFirst(iJcicZ041LogId.getUkey(), titaVo);
+					this.info("uJcicZ041log      = " + uJcicZ041log);
+					JcicZ041Log iJcicZ041Log2 = new JcicZ041Log();
+					iJcicZ041Log2 = (JcicZ041Log) iDataLog.clone(iJcicZ041Log);
+					this.info("iJcicZ041Log2     = " + iJcicZ041Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ041.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ041Log2, uJcicZ041log);
+					iDataLog.exec("L8302報送", iJcicZ041Log2.getUkey() + iJcicZ041Log2.getTxSeq());
 				}
 			}
 		}
@@ -1397,6 +1408,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z042)");
 					}
+					this.info("準備寫入L6932 ===== L8303(042)");
+					JcicZ042Log uJcicZ042log = sJcicZ042LogService.ukeyFirst(iJcicZ042LogId.getUkey(), titaVo);
+					this.info("uJcicZ042log      = " + uJcicZ042log);
+					JcicZ042Log iJcicZ042Log2 = new JcicZ042Log();
+					iJcicZ042Log2 = (JcicZ042Log) iDataLog.clone(iJcicZ042Log);
+					this.info("iJcicZ042Log2     = " + iJcicZ042Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ042.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ042Log2, uJcicZ042log);
+					iDataLog.exec("L8303報送", iJcicZ042Log2.getUkey() + iJcicZ042Log2.getTxSeq());
 				}
 			}
 		}
@@ -1488,6 +1510,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z043)");
 					}
+					this.info("準備寫入L6932 ===== L8304(043)");
+					JcicZ043Log uJcicZ043log = sJcicZ043LogService.ukeyFirst(iJcicZ043LogId.getUkey(), titaVo);
+					this.info("uJcicZ043log      = " + uJcicZ043log);
+					JcicZ043Log iJcicZ043Log2 = new JcicZ043Log();
+					iJcicZ043Log2 = (JcicZ043Log) iDataLog.clone(iJcicZ043Log);
+					this.info("iJcicZ043Log2     = " + iJcicZ043Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ043.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ043Log2, uJcicZ043log);
+					iDataLog.exec("L8304報送", iJcicZ043Log2.getUkey() + iJcicZ043Log2.getTxSeq());
 				}
 			}
 		}
@@ -1648,6 +1681,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z044)");
 					}
+					this.info("準備寫入L6932 ===== L8305(044)");
+					JcicZ044Log uJcicZ044log = sJcicZ044LogService.ukeyFirst(iJcicZ044LogId.getUkey(), titaVo);
+					this.info("uJcicZ044log      = " + uJcicZ044log);
+					JcicZ044Log iJcicZ044Log2 = new JcicZ044Log();
+					iJcicZ044Log2 = (JcicZ044Log) iDataLog.clone(iJcicZ044Log);
+					this.info("iJcicZ044Log2     = " + iJcicZ044Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ044.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ044Log2, uJcicZ044log);
+					iDataLog.exec("L8305報送", iJcicZ044Log2.getUkey() + iJcicZ044Log2.getTxSeq());
 				}
 			}
 		}
@@ -1701,6 +1745,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z045)");
 					}
+					this.info("準備寫入L6932 ===== L8306(045)");
+					JcicZ045Log uJcicZ045log = sJcicZ045LogService.ukeyFirst(iJcicZ045LogId.getUkey(), titaVo);
+					this.info("uJcicZ045log      = " + uJcicZ045log);
+					JcicZ045Log iJcicZ045Log2 = new JcicZ045Log();
+					iJcicZ045Log2 = (JcicZ045Log) iDataLog.clone(iJcicZ045Log);
+					this.info("iJcicZ045Log2     = " + iJcicZ045Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ045.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ045Log2, uJcicZ045log);
+					iDataLog.exec("L8306報送", iJcicZ045Log2.getUkey() + iJcicZ045Log2.getTxSeq());
 				}
 			}
 		}
@@ -1758,6 +1813,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z046)");
 					}
+					this.info("準備寫入L6932 ===== L8307(046)");
+					JcicZ046Log uJcicZ046log = sJcicZ046LogService.ukeyFirst(iJcicZ046LogId.getUkey(), titaVo);
+					this.info("uJcicZ046log      = " + uJcicZ046log);
+					JcicZ046Log iJcicZ046Log2 = new JcicZ046Log();
+					iJcicZ046Log2 = (JcicZ046Log) iDataLog.clone(iJcicZ046Log);
+					this.info("iJcicZ046Log2     = " + iJcicZ046Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ046.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ046Log2, uJcicZ046log);
+					iDataLog.exec("L8307報送", iJcicZ046Log2.getUkey() + iJcicZ046Log2.getTxSeq());
 				}
 			}
 		}
@@ -1913,6 +1979,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z047)");
 					}
+					this.info("準備寫入L6932 ===== L8308(047)");
+					JcicZ047Log uJcicZ047log = sJcicZ047LogService.ukeyFirst(iJcicZ047LogId.getUkey(), titaVo);
+					this.info("uJcicZ047log      = " + uJcicZ047log);
+					JcicZ047Log iJcicZ047Log2 = new JcicZ047Log();
+					iJcicZ047Log2 = (JcicZ047Log) iDataLog.clone(iJcicZ047Log);
+					this.info("iJcicZ047Log2     = " + iJcicZ047Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ047.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ047Log2, uJcicZ047log);
+					iDataLog.exec("L8308報送", iJcicZ047Log2.getUkey() + iJcicZ047Log2.getTxSeq());
 				}
 			}
 		}
@@ -1975,6 +2052,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z048)");
 					}
+					this.info("準備寫入L6932 ===== L8309(048)");
+					JcicZ048Log uJcicZ048log = sJcicZ048LogService.ukeyFirst(iJcicZ048LogId.getUkey(), titaVo);
+					this.info("uJcicZ048log      = " + uJcicZ048log);
+					JcicZ048Log iJcicZ048Log2 = new JcicZ048Log();
+					iJcicZ048Log2 = (JcicZ048Log) iDataLog.clone(iJcicZ048Log);
+					this.info("iJcicZ048Log2     = " + iJcicZ048Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ048.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ048Log2, uJcicZ048log);
+					iDataLog.exec("L8309報送", iJcicZ048Log2.getUkey() + iJcicZ048Log2.getTxSeq());
 				}
 			}
 		}
@@ -2062,6 +2150,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z049)");
 					}
+					this.info("準備寫入L6932 ===== L8310(049)");
+					JcicZ049Log uJcicZ049log = sJcicZ049LogService.ukeyFirst(iJcicZ049LogId.getUkey(), titaVo);
+					this.info("uJcicZ049log      = " + uJcicZ049log);
+					JcicZ049Log iJcicZ049Log2 = new JcicZ049Log();
+					iJcicZ049Log2 = (JcicZ049Log) iDataLog.clone(iJcicZ049Log);
+					this.info("iJcicZ049Log2     = " + iJcicZ049Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ049.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ049Log2, uJcicZ049log);
+					iDataLog.exec("L8310報送", iJcicZ049Log2.getUkey() + iJcicZ049Log2.getTxSeq());
 				}
 			}
 		}
@@ -2134,6 +2233,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z050)");
 					}
+					this.info("準備寫入L6932 ===== L8311(050)");
+					JcicZ050Log uJcicZ050log = sJcicZ050LogService.ukeyFirst(iJcicZ050LogId.getUkey(), titaVo);
+					this.info("uJcicZ050log      = " + uJcicZ050log);
+					JcicZ050Log iJcicZ050Log2 = new JcicZ050Log();
+					iJcicZ050Log2 = (JcicZ050Log) iDataLog.clone(iJcicZ050Log);
+					this.info("iJcicZ050Log2     = " + iJcicZ050Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ050.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ050Log2, uJcicZ050log);
+					iDataLog.exec("L8311報送", iJcicZ050Log2.getUkey() + iJcicZ050Log2.getTxSeq());
 				}
 			}
 		}
@@ -2183,12 +2293,22 @@ public class L8403File extends MakeFile {
 					iJcicZ051Log.setDelayDesc(iDelayDesc);
 					iJcicZ051Log.setTranKey(iTranKey);
 					iJcicZ051Log.setOutJcicTxtDate(iDate);
-
 					try {
 						sJcicZ051LogService.insert(iJcicZ051Log, titaVo);
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z051)");
 					}
+					this.info("準備寫入L6932 ===== L8312(051)");
+					JcicZ051Log uJcicZ051log = sJcicZ051LogService.ukeyFirst(iJcicZ051LogId.getUkey(), titaVo);
+					this.info("uJcicZ051log      = " + uJcicZ051log);
+					JcicZ051Log iJcicZ051Log2 = new JcicZ051Log();
+					iJcicZ051Log2 = (JcicZ051Log) iDataLog.clone(iJcicZ051Log);
+					this.info("iJcicZ051Log2     = " + iJcicZ051Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ051.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ051Log2, uJcicZ051log);
+					iDataLog.exec("L8312報送", iJcicZ051Log2.getUkey() + iJcicZ051Log2.getTxSeq());
 				}
 			}
 		}
@@ -2272,6 +2392,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z052)");
 					}
+					this.info("準備寫入L6932 ===== L8313(052)");
+					JcicZ052Log uJcicZ052log = sJcicZ052LogService.ukeyFirst(iJcicZ052LogId.getUkey(), titaVo);
+					this.info("uJcicZ052log      = " + uJcicZ052log);
+					JcicZ052Log iJcicZ052Log2 = new JcicZ052Log();
+					iJcicZ052Log2 = (JcicZ052Log) iDataLog.clone(iJcicZ052Log);
+					this.info("iJcicZ052Log2     = " + iJcicZ052Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ052.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ052Log2, uJcicZ052log);
+					iDataLog.exec("L8313報送", iJcicZ052Log2.getUkey() + iJcicZ052Log2.getTxSeq());
 				}
 			}
 		}
@@ -2336,6 +2467,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z053)");
 					}
+					this.info("準備寫入L6932 ===== L8314(053)");
+					JcicZ053Log uJcicZ053log = sJcicZ053LogService.ukeyFirst(iJcicZ053LogId.getUkey(), titaVo);
+					this.info("uJcicZ053log      = " + uJcicZ053log);
+					JcicZ053Log iJcicZ053Log2 = new JcicZ053Log();
+					iJcicZ053Log2 = (JcicZ053Log) iDataLog.clone(iJcicZ053Log);
+					this.info("iJcicZ053Log2     = " + iJcicZ053Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ053.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ053Log2, uJcicZ053log);
+					iDataLog.exec("L8314報送", iJcicZ053Log2.getUkey() + iJcicZ053Log2.getTxSeq());
 				}
 			}
 		}
@@ -2391,6 +2533,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z054)");
 					}
+					this.info("準備寫入L6932 ===== L8315(054)");
+					JcicZ054Log uJcicZ054log = sJcicZ054LogService.ukeyFirst(iJcicZ054LogId.getUkey(), titaVo);
+					this.info("uJcicZ054log      = " + uJcicZ054log);
+					JcicZ054Log iJcicZ054Log2 = new JcicZ054Log();
+					iJcicZ054Log2 = (JcicZ054Log) iDataLog.clone(iJcicZ054Log);
+					this.info("iJcicZ054Log2     = " + iJcicZ054Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ054.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ054Log2, uJcicZ054log);
+					iDataLog.exec("L8315報送", iJcicZ054Log2.getUkey() + iJcicZ054Log2.getTxSeq());
 				}
 			}
 		}
@@ -2500,6 +2653,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z055)");
 					}
+					this.info("準備寫入L6932 ===== L8316(055)");
+					JcicZ055Log uJcicZ055log = sJcicZ055LogService.ukeyFirst(iJcicZ055LogId.getUkey(), titaVo);
+					this.info("uJcicZ055log      = " + uJcicZ055log);
+					JcicZ055Log iJcicZ055Log2 = new JcicZ055Log();
+					iJcicZ055Log2 = (JcicZ055Log) iDataLog.clone(iJcicZ055Log);
+					this.info("iJcicZ055Log2     = " + iJcicZ055Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ055.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ055Log2, uJcicZ055log);
+					iDataLog.exec("L8316報送", iJcicZ055Log2.getUkey() + iJcicZ055Log2.getTxSeq());
 				}
 			}
 		}
@@ -2586,6 +2750,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z056)");
 					}
+					this.info("準備寫入L6932 ===== L8317(056)");
+					JcicZ056Log uJcicZ056log = sJcicZ056LogService.ukeyFirst(iJcicZ056LogId.getUkey(), titaVo);
+					this.info("uJcicZ056log      = " + uJcicZ056log);
+					JcicZ056Log iJcicZ056Log2 = new JcicZ056Log();
+					iJcicZ056Log2 = (JcicZ056Log) iDataLog.clone(iJcicZ056Log);
+					this.info("iJcicZ056Log2     = " + iJcicZ056Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ056.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ056Log2, uJcicZ056log);
+					iDataLog.exec("L8317報送", iJcicZ056Log2.getUkey() + iJcicZ056Log2.getTxSeq());
 				}
 			}
 		}
@@ -2638,6 +2813,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z060)");
 					}
+					this.info("準備寫入L6932 ===== L8318(060)");
+					JcicZ060Log uJcicZ060log = sJcicZ060LogService.ukeyFirst(iJcicZ060LogId.getUkey(), titaVo);
+					this.info("uJcicZ060log      = " + uJcicZ060log);
+					JcicZ060Log iJcicZ060Log2 = new JcicZ060Log();
+					iJcicZ060Log2 = (JcicZ060Log) iDataLog.clone(iJcicZ060Log);
+					this.info("iJcicZ060Log2     = " + iJcicZ060Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ060.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ060Log2, uJcicZ060log);
+					iDataLog.exec("L8318報送", iJcicZ060Log2.getUkey() + iJcicZ060Log2.getTxSeq());
 				}
 			}
 		}
@@ -2707,6 +2893,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z061)");
 					}
+					this.info("準備寫入L6932 ===== L8319(061)");
+					JcicZ061Log uJcicZ061log = sJcicZ061LogService.ukeyFirst(iJcicZ061LogId.getUkey(), titaVo);
+					this.info("uJcicZ061log      = " + uJcicZ061log);
+					JcicZ061Log iJcicZ061Log2 = new JcicZ061Log();
+					iJcicZ061Log2 = (JcicZ061Log) iDataLog.clone(iJcicZ061Log);
+					this.info("iJcicZ061Log2     = " + iJcicZ061Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ061.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ061Log2, uJcicZ061log);
+					iDataLog.exec("L8319報送", iJcicZ061Log2.getUkey() + iJcicZ061Log2.getTxSeq());
 				}
 			}
 		}
@@ -2834,6 +3031,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z062)");
 					}
+					this.info("準備寫入L6932 ===== L8320(062)");
+					JcicZ062Log uJcicZ062log = sJcicZ062LogService.ukeyFirst(iJcicZ062LogId.getUkey(), titaVo);
+					this.info("uJcicZ062log      = " + uJcicZ062log);
+					JcicZ062Log iJcicZ062Log2 = new JcicZ062Log();
+					iJcicZ062Log2 = (JcicZ062Log) iDataLog.clone(iJcicZ062Log);
+					this.info("iJcicZ062Log2     = " + iJcicZ062Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ062.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ062Log2, uJcicZ062log);
+					iDataLog.exec("L8320報送", iJcicZ062Log2.getUkey() + iJcicZ062Log2.getTxSeq());
 				}
 			}
 		}
@@ -2891,6 +3099,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z063)");
 					}
+					this.info("準備寫入L6932 ===== L8321(063)");
+					JcicZ063Log uJcicZ063log = sJcicZ063LogService.ukeyFirst(iJcicZ063LogId.getUkey(), titaVo);
+					this.info("uJcicZ063log      = " + uJcicZ063log);
+					JcicZ063Log iJcicZ063Log2 = new JcicZ063Log();
+					iJcicZ063Log2 = (JcicZ063Log) iDataLog.clone(iJcicZ063Log);
+					this.info("iJcicZ063Log2     = " + iJcicZ063Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ063.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ063Log2, uJcicZ063log);
+					iDataLog.exec("L8321報送", iJcicZ063Log2.getUkey() + iJcicZ063Log2.getTxSeq());
 				}
 			}
 		}
@@ -2977,6 +3196,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z440)");
 					}
+					this.info("準備寫入L6932 ===== L8322(440)");
+					JcicZ440Log uJcicZ440log = sJcicZ440LogService.ukeyFirst(iJcicZ440LogId.getUkey(), titaVo);
+					this.info("uJcicZ440log      = " + uJcicZ440log);
+					JcicZ440Log iJcicZ440Log2 = new JcicZ440Log();
+					iJcicZ440Log2 = (JcicZ440Log) iDataLog.clone(iJcicZ440Log);
+					this.info("iJcicZ440Log2     = " + iJcicZ440Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ440.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ440Log2, uJcicZ440log);
+					iDataLog.exec("L8322報送", iJcicZ440Log2.getUkey() + iJcicZ440Log2.getTxSeq());
 				}
 			}
 		}
@@ -3112,6 +3342,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z443)");
 					}
+					this.info("準備寫入L6932 ===== L8323(442)");
+					JcicZ442Log uJcicZ442log = sJcicZ442LogService.ukeyFirst(iJcicZ442LogId.getUkey(), titaVo);
+					this.info("uJcicZ442log      = " + uJcicZ442log);
+					JcicZ442Log iJcicZ442Log2 = new JcicZ442Log();
+					iJcicZ442Log2 = (JcicZ442Log) iDataLog.clone(iJcicZ442Log);
+					this.info("iJcicZ442Log2     = " + iJcicZ442Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ442.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ442Log2, uJcicZ442log);
+					iDataLog.exec("L8323報送", iJcicZ442Log2.getUkey() + iJcicZ442Log2.getTxSeq());
 				}
 			}
 		}
@@ -3218,6 +3459,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z443)");
 					}
+					this.info("準備寫入L6932 ===== L8324(443)");
+					JcicZ443Log uJcicZ443log = sJcicZ443LogService.ukeyFirst(iJcicZ443LogId.getUkey(), titaVo);
+					this.info("uJcicZ443log      = " + uJcicZ443log);
+					JcicZ443Log iJcicZ443Log2 = new JcicZ443Log();
+					iJcicZ443Log2 = (JcicZ443Log) iDataLog.clone(iJcicZ443Log);
+					this.info("iJcicZ443Log2     = " + iJcicZ443Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ443.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ443Log2, uJcicZ443log);
+					iDataLog.exec("L8324報送", iJcicZ443Log2.getUkey() + iJcicZ443Log2.getTxSeq());
 				}
 			}
 		}
@@ -3288,6 +3540,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z444)");
 					}
+					this.info("準備寫入L6932 ===== L8325(444)");
+					JcicZ444Log uJcicZ444log = sJcicZ444LogService.ukeyFirst(iJcicZ444LogId.getUkey(), titaVo);
+					this.info("uJcicZ444log      = " + uJcicZ444log);
+					JcicZ444Log iJcicZ444Log2 = new JcicZ444Log();
+					iJcicZ444Log2 = (JcicZ444Log) iDataLog.clone(iJcicZ444Log);
+					this.info("iJcicZ444Log2     = " + iJcicZ444Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ444.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ444Log2, uJcicZ444log);
+					iDataLog.exec("L8325報送", iJcicZ444Log2.getUkey() + iJcicZ444Log2.getTxSeq());
 				}
 			}
 		}
@@ -3344,6 +3607,17 @@ public class L8403File extends MakeFile {
 						} catch (Exception e) {
 							throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z447)");
 						}
+						this.info("準備寫入L6932 ===== L8326(446)");
+						JcicZ446Log uJcicZ446log = sJcicZ446LogService.ukeyFirst(iJcicZ446LogId.getUkey(), titaVo);
+						this.info("uJcicZ446log      = " + uJcicZ446log);
+						JcicZ446Log iJcicZ446Log2 = new JcicZ446Log();
+						iJcicZ446Log2 = (JcicZ446Log) iDataLog.clone(iJcicZ446Log);
+						this.info("iJcicZ446Log2     = " + iJcicZ446Log2);
+						CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ446.getCustId(), titaVo);
+						int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+						titaVo.putParam("CustNo", iCustNo);
+						iDataLog.setEnv(titaVo, iJcicZ446Log2, uJcicZ446log);
+						iDataLog.exec("L8326報送", iJcicZ446Log2.getUkey() + iJcicZ446Log2.getTxSeq());
 					}
 				}
 			}
@@ -3423,6 +3697,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z447)");
 					}
+					this.info("準備寫入L6932 ===== L8327(447)");
+					JcicZ447Log uJcicZ447log = sJcicZ447LogService.ukeyFirst(iJcicZ447LogId.getUkey(), titaVo);
+					this.info("uJcicZ447log      = " + uJcicZ447log);
+					JcicZ447Log iJcicZ447Log2 = new JcicZ447Log();
+					iJcicZ447Log2 = (JcicZ447Log) iDataLog.clone(iJcicZ447Log);
+					this.info("iJcicZ447Log2     = " + iJcicZ447Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ447.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ447Log2, uJcicZ447log);
+					iDataLog.exec("L8327報送", iJcicZ447Log2.getUkey() + iJcicZ447Log2.getTxSeq());
 				}
 			}
 		}
@@ -3490,6 +3775,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z448)");
 					}
+					this.info("準備寫入L6932 ===== L8328(448)");
+					JcicZ448Log uJcicZ448log = sJcicZ448LogService.ukeyFirst(iJcicZ448LogId.getUkey(), titaVo);
+					this.info("uJcicZ448log      = " + uJcicZ448log);
+					JcicZ448Log iJcicZ448Log2 = new JcicZ448Log();
+					iJcicZ448Log2 = (JcicZ448Log) iDataLog.clone(iJcicZ448Log);
+					this.info("iJcicZ448Log2     = " + iJcicZ448Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ448.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ448Log2, uJcicZ448log);
+					iDataLog.exec("L8328報送", iJcicZ448Log2.getUkey() + iJcicZ448Log2.getTxSeq());
 				}
 			}
 		}
@@ -3555,6 +3851,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z451)");
 					}
+					this.info("準備寫入L6932 ===== L8329(450)");
+					JcicZ450Log uJcicZ450log = sJcicZ450LogService.ukeyFirst(iJcicZ450LogId.getUkey(), titaVo);
+					this.info("uJcicZ450log      = " + uJcicZ450log);
+					JcicZ450Log iJcicZ450Log2 = new JcicZ450Log();
+					iJcicZ450Log2 = (JcicZ450Log) iDataLog.clone(iJcicZ450Log);
+					this.info("iJcicZ450Log2     = " + iJcicZ450Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ450.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ450Log2, uJcicZ450log);
+					iDataLog.exec("L8329報送", iJcicZ450Log2.getUkey() + iJcicZ450Log2.getTxSeq());
 				}
 			}
 		}
@@ -3609,6 +3916,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z451)");
 					}
+					this.info("準備寫入L6932 ===== L8330(451)");
+					JcicZ451Log uJcicZ451log = sJcicZ451LogService.ukeyFirst(iJcicZ451LogId.getUkey(), titaVo);
+					this.info("uJcicZ451log      = " + uJcicZ451log);
+					JcicZ451Log iJcicZ451Log2 = new JcicZ451Log();
+					iJcicZ451Log2 = (JcicZ451Log) iDataLog.clone(iJcicZ451Log);
+					this.info("iJcicZ451Log2     = " + iJcicZ451Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ451.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ451Log2, uJcicZ451log);
+					iDataLog.exec("L8330報送", iJcicZ451Log2.getUkey() + iJcicZ451Log2.getTxSeq());
 				}
 			}
 		}
@@ -3667,6 +3985,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z454)");
 					}
+					this.info("準備寫入L6932 ===== L8331(454)");
+					JcicZ454Log uJcicZ454log = sJcicZ454LogService.ukeyFirst(iJcicZ454LogId.getUkey(), titaVo);
+					this.info("uJcicZ454log      = " + uJcicZ454log);
+					JcicZ454Log iJcicZ454Log2 = new JcicZ454Log();
+					iJcicZ454Log2 = (JcicZ454Log) iDataLog.clone(iJcicZ454Log);
+					this.info("iJcicZ454Log2     = " + iJcicZ454Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ454.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ454Log2, uJcicZ454log);
+					iDataLog.exec("L8331報送", iJcicZ454Log2.getUkey() + iJcicZ454Log2.getTxSeq());
 				}
 			}
 		}
@@ -3796,6 +4125,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z570)");
 					}
+					this.info("準備寫入L6932 ===== L8332(570)");
+					JcicZ570Log uJcicZ570log = sJcicZ570LogService.ukeyFirst(iJcicZ570LogId.getUkey(), titaVo);
+					this.info("uJcicZ570log      = " + uJcicZ570log);
+					JcicZ570Log iJcicZ570Log2 = new JcicZ570Log();
+					iJcicZ570Log2 = (JcicZ570Log) iDataLog.clone(iJcicZ570Log);
+					this.info("iJcicZ570Log2     = " + iJcicZ570Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ570.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ570Log2, uJcicZ570log);
+					iDataLog.exec("L8332報送", iJcicZ570Log2.getUkey() + iJcicZ570Log2.getTxSeq());
 				}
 			}
 		}
@@ -3861,6 +4201,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z571)");
 					}
+					this.info("準備寫入L6932 ===== L8333(571)");
+					JcicZ571Log uJcicZ571log = sJcicZ571LogService.ukeyFirst(iJcicZ571LogId.getUkey(), titaVo);
+					this.info("uJcicZ571log      = " + uJcicZ571log);
+					JcicZ571Log iJcicZ571Log2 = new JcicZ571Log();
+					iJcicZ571Log2 = (JcicZ571Log) iDataLog.clone(iJcicZ571Log);
+					this.info("iJcicZ571Log2     = " + iJcicZ571Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ571.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ571Log2, uJcicZ571log);
+					iDataLog.exec("L8333報送", iJcicZ571Log2.getUkey() + iJcicZ571Log2.getTxSeq());
 				}
 			}
 		}
@@ -3923,6 +4274,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z572)");
 					}
+					this.info("準備寫入L6932 ===== L8334(572)");
+					JcicZ572Log uJcicZ572log = sJcicZ572LogService.ukeyFirst(iJcicZ572LogId.getUkey(), titaVo);
+					this.info("uJcicZ572log      = " + uJcicZ572log);
+					JcicZ572Log iJcicZ572Log2 = new JcicZ572Log();
+					iJcicZ572Log2 = (JcicZ572Log) iDataLog.clone(iJcicZ572Log);
+					this.info("iJcicZ572Log2     = " + iJcicZ572Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ572.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ572Log2, uJcicZ572log);
+					iDataLog.exec("L8334報送", iJcicZ572Log2.getUkey() + iJcicZ572Log2.getTxSeq());
 				}
 			}
 		}
@@ -3980,6 +4342,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z573)");
 					}
+					this.info("準備寫入L6932 ===== L8335(573)");
+					JcicZ573Log uJcicZ573log = sJcicZ573LogService.ukeyFirst(iJcicZ573LogId.getUkey(), titaVo);
+					this.info("uJcicZ573log      = " + uJcicZ573log);
+					JcicZ573Log iJcicZ573Log2 = new JcicZ573Log();
+					iJcicZ573Log2 = (JcicZ573Log) iDataLog.clone(iJcicZ573Log);
+					this.info("iJcicZ573Log2     = " + iJcicZ573Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ573.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ573Log2, uJcicZ573log);
+					iDataLog.exec("L8335報送", iJcicZ573Log2.getUkey() + iJcicZ573Log2.getTxSeq());
 				}
 			}
 		}
@@ -4037,6 +4410,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z574)");
 					}
+					this.info("準備寫入L6932 ===== L8336(574)");
+					JcicZ574Log uJcicZ574log = sJcicZ574LogService.ukeyFirst(iJcicZ574LogId.getUkey(), titaVo);
+					this.info("uJcicZ574log      = " + uJcicZ574log);
+					JcicZ574Log iJcicZ574Log2 = new JcicZ574Log();
+					iJcicZ574Log2 = (JcicZ574Log) iDataLog.clone(iJcicZ574Log);
+					this.info("iJcicZ574Log2     = " + iJcicZ574Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ574.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ574Log2, uJcicZ574log);
+					iDataLog.exec("L8336報送", iJcicZ574Log2.getUkey() + iJcicZ574Log2.getTxSeq());
 				}
 			}
 		}
@@ -4090,6 +4474,17 @@ public class L8403File extends MakeFile {
 					} catch (Exception e) {
 						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z575)");
 					}
+					this.info("準備寫入L6932 ===== L8337(575)");
+					JcicZ575Log uJcicZ575log = sJcicZ575LogService.ukeyFirst(iJcicZ575LogId.getUkey(), titaVo);
+					this.info("uJcicZ575log      = " + uJcicZ575log);
+					JcicZ575Log iJcicZ575Log2 = new JcicZ575Log();
+					iJcicZ575Log2 = (JcicZ575Log) iDataLog.clone(iJcicZ575Log);
+					this.info("iJcicZ575Log2     = " + iJcicZ575Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ575.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ575Log2, uJcicZ575log);
+					iDataLog.exec("L8337報送", iJcicZ575Log2.getUkey() + iJcicZ575Log2.getTxSeq());
 				}
 			}
 		}

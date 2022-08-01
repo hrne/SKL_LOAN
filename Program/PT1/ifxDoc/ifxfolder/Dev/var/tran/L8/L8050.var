@@ -180,6 +180,24 @@ C(3,#OOChaRepayFirstDate,0,S,$)
 T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoName)
 #OOOutJcicTxtDate=D,7,S
 C(3,#OOOutJcicTxtDate,0,S,$)
+
+#OOUkey=X,32,S
+#OOTxSeq=X,18,S
+
+#OOMrKey=X,50,S
+T(2,#OOUkey+#OOTxSeq)
+#20sp=X,20,S
+#18sp=X,18,S
+#7sp=X,7,S
+#5sp=X,5,S
+#3sp=X,3,S
+
+!查詢L6932
+#OOBUF18=X,150,S
+T(2,0010101+9991231+L8403+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
+#OOBTN18=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=紀錄; ntxbuf=#OOBUF18})
+
 </sub>
 
 !------ 上行電文 ------
@@ -213,6 +231,8 @@ TXFORM=L8050
 #OOLastUpdate
 #OOLastUpdateEmpNo
 #OOLastUpdateEmpNoName
+#OOTxSeq
+#OOUkey
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
@@ -277,6 +297,8 @@ TXFORM=L8050
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員
 {width:120,align:'center'}
+#OOBTN18=紀錄
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN18',align:'center',canExport:false}
 ^
 
 <include src="PRT.icf::INQ01.sel"/>

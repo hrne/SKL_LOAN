@@ -51,7 +51,7 @@ public class L8047 extends TradeBuffer {
 			String iLastUpdateEmpNo = rJcicZ056.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursListA.putParam("OOTranKey", rJcicZ056.getTranKey());
-			occursListA.putParam("OOYear", rJcicZ056.getYear() - 1911);
+			occursListA.putParam("OOYear", rJcicZ056.getYear()-1911);
 			occursListA.putParam("OOCourtDiv", rJcicZ056.getCourtDiv());
 			occursListA.putParam("OOCourtCaseNo", rJcicZ056.getCourtCaseNo());
 			occursListA.putParam("OOApprove", rJcicZ056.getApprove());
@@ -79,6 +79,9 @@ public class L8047 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ056.getOutJcicTxtDate());
+			JcicZ056Log rrJcicZ056Log = iJcicZ056LogService.ukeyFirst(rJcicZ056.getUkey(), titaVo);
+			occursListA.putParam("OOTxSeq", rrJcicZ056Log.getTxSeq());
+			occursListA.putParam("OOUkey", rrJcicZ056Log.getUkey());
 			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ056Log == null) {
@@ -89,7 +92,7 @@ public class L8047 extends TradeBuffer {
 			String iLastUpdateEmpNo = rrJcicZ056Log.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursList.putParam("OOTranKey", rrJcicZ056Log.getTranKey());
-			occursList.putParam("OOYear", rrJcicZ056Log.getYear() - 1911);
+			occursList.putParam("OOYear", rrJcicZ056Log.getYear()-1911);
 			occursList.putParam("OOCourtDiv", rrJcicZ056Log.getCourtDiv());
 			occursList.putParam("OOCourtCaseNo", rrJcicZ056Log.getCourtCaseNo());
 			occursList.putParam("OOApprove", rrJcicZ056Log.getApprove());
@@ -117,6 +120,8 @@ public class L8047 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursList.putParam("OOOutJcicTxtDate", rrJcicZ056Log.getOutJcicTxtDate());
+			occursList.putParam("OOTxSeq", rrJcicZ056Log.getTxSeq());
+			occursList.putParam("OOUkey", rrJcicZ056Log.getUkey());
 			this.totaVo.addOccursList(occursList);
 		}
 		this.addList(this.totaVo);

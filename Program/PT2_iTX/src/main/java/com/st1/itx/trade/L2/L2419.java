@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -697,6 +697,37 @@ public class L2419 extends TradeBuffer {
 		clMain.setEvaDate(evaDate);
 		// 鑑估總值
 		clMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
+		
+		// 2022/7/29新增
+		// 計算可分配金額
+		BigDecimal shareTotal = new BigDecimal(0);
+		BigDecimal shareCompAmt = BigDecimal.ZERO;
+		BigDecimal wkEvaAmt = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")); // 鑑估總值
+		BigDecimal wkEvaNetWorth = parse.stringToBigDecimal(titaVo.getParam("NetWorth")); // 評估淨值
+		// 評估淨值有值時擺評估淨值,否則擺鑑估總值.
+		if (wkEvaNetWorth.compareTo(BigDecimal.ZERO) > 0) {
+			shareCompAmt = wkEvaNetWorth;
+		} else {
+			shareCompAmt = wkEvaAmt;
+		}
+		BigDecimal loanToValue = new BigDecimal(titaVo.getParam("LoanToValue"));// 貸放成數
+		this.info("L2419 shareCompAmt = " + shareCompAmt.toString());
+		this.info("L2419 LoanToValue = " + loanToValue.toString());
+		this.info("L2419 SettingAmt = " + parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).toString());
+//		"1.若""評估淨值""有值取""評估淨值""否則取""鑑估總值"")*貸放成數(四捨五入至個位數)
+//		2.若設定金額低於可分配金額則為設定金額
+//		3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
+//		若貸放成數為0則不乘貸放成數
+		if (loanToValue.compareTo(BigDecimal.ZERO) == 0) {
+			shareTotal = shareCompAmt;
+		} else {
+			shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
+					BigDecimal.ROUND_HALF_UP);
+		}
+		if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
+			shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
+		}
+		clMain.setShareTotal(shareTotal);
 
 		if (newfg) {
 			try {
@@ -1001,6 +1032,7 @@ public class L2419 extends TradeBuffer {
 		clFac.setFacmNo(facMain.getFacmNo());
 
 		if (newfg) {
+			clFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
 			try {
 				sClFacService.insert(clFac, titaVo);
 			} catch (DBException e) {
@@ -1074,6 +1106,11 @@ public class L2419 extends TradeBuffer {
 			custMain.setCustName(ownerName);
 			custMain.setDataStatus(1);
 			custMain.setTypeCode(2);
+			if (ownerId.length() == 8) {
+				custMain.setCuscCd("2");
+			} else {
+				custMain.setCuscCd("1");
+			}
 			try {
 				sCustMainService.insert(custMain, titaVo);
 			} catch (DBException e) {

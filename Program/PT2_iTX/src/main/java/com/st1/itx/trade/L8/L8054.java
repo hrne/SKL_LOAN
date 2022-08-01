@@ -64,8 +64,8 @@ public class L8054 extends TradeBuffer {
 			occursListA.putParam("OOFinalPayDay", rJcicZ443.getFinalPayDay());
 			occursListA.putParam("OONotyetacQuit", rJcicZ443.getNotyetacQuit());
 			occursListA.putParam("OOMothPayDay", rJcicZ443.getMothPayDay());
-			occursListA.putParam("OOBeginDate", rJcicZ443.getBeginDate() - 191100);
-			occursListA.putParam("OOEndDate", rJcicZ443.getEndDate() - 191100);
+			occursListA.putParam("OOBeginDate", rJcicZ443.getBeginDate()-191100);
+			occursListA.putParam("OOEndDate", rJcicZ443.getEndDate()-191100);
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
 				occursListA.putParam("OOLastUpdateEmpNoName", "");
@@ -83,6 +83,10 @@ public class L8054 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ443.getOutJcicTxtDate());
+			JcicZ443Log rrJcicZ443Log = iJcicZ443LogService.ukeyFirst(rJcicZ443.getUkey(), titaVo);
+			occursListA.putParam("OOTxSeq", rrJcicZ443Log.getTxSeq());
+			occursListA.putParam("OOUkey", rrJcicZ443Log.getUkey());
+
 			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ443Log == null) {
@@ -106,8 +110,8 @@ public class L8054 extends TradeBuffer {
 			occursList.putParam("OOFinalPayDay", rrJcicZ443Log.getFinalPayDay());
 			occursList.putParam("OONotyetacQuit", rrJcicZ443Log.getNotyetacQuit());
 			occursList.putParam("OOMothPayDay", rrJcicZ443Log.getMothPayDay());
-			occursList.putParam("OOBeginDate", rrJcicZ443Log.getBeginDate() - 191100);
-			occursList.putParam("OOEndDate", rrJcicZ443Log.getEndDate() - 191100);
+			occursList.putParam("OOBeginDate", rrJcicZ443Log.getBeginDate()-191100);
+			occursList.putParam("OOEndDate", rrJcicZ443Log.getEndDate()-191100);
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
 				occursList.putParam("OOLastUpdateEmpNoName", "");
@@ -125,6 +129,8 @@ public class L8054 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursList.putParam("OOOutJcicTxtDate", rrJcicZ443Log.getOutJcicTxtDate());
+			occursList.putParam("OOTxSeq", rrJcicZ443Log.getTxSeq());
+			occursList.putParam("OOUkey", rrJcicZ443Log.getUkey());
 			this.totaVo.addOccursList(occursList);
 		}
 		this.addList(this.totaVo);

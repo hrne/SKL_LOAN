@@ -54,7 +54,7 @@ public class L8041 extends TradeBuffer {
 			occursListA.putParam("OOPayAmt", rJcicZ050.getPayAmt());
 			occursListA.putParam("OOSumRepayActualAmt", rJcicZ050.getSumRepayActualAmt());
 			occursListA.putParam("OOSumRepayShouldAmt", rJcicZ050.getSumRepayShouldAmt());
-			occursListA.putParam("OOSecondRepayYM", rJcicZ050.getSecondRepayYM() - 191100);
+			occursListA.putParam("OOSecondRepayYM", rJcicZ050.getSecondRepayYM()-191100);
 			occursListA.putParam("OOStatus", rJcicZ050.getStatus());
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
@@ -73,6 +73,10 @@ public class L8041 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ050.getOutJcicTxtDate());
+			JcicZ050Log rrJcicZ050Log = iJcicZ050LogService.ukeyFirst(rJcicZ050.getUkey(), titaVo);
+			occursListA.putParam("OOTxSeq", rrJcicZ050Log.getTxSeq());
+			occursListA.putParam("OOUkey", rrJcicZ050Log.getUkey());
+
 			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ050Log == null) {
@@ -86,7 +90,7 @@ public class L8041 extends TradeBuffer {
 			occursList.putParam("OOPayAmt", rrJcicZ050Log.getPayAmt());
 			occursList.putParam("OOSumRepayActualAmt", rrJcicZ050Log.getSumRepayActualAmt());
 			occursList.putParam("OOSumRepayShouldAmt", rrJcicZ050Log.getSumRepayShouldAmt());
-			occursList.putParam("OOSecondRepayYM", rrJcicZ050Log.getSecondRepayYM() - 191100);
+			occursList.putParam("OOSecondRepayYM", rrJcicZ050Log.getSecondRepayYM()-191100);
 			occursList.putParam("OOStatus", rrJcicZ050Log.getStatus());
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
@@ -105,6 +109,8 @@ public class L8041 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursList.putParam("OOOutJcicTxtDate", rrJcicZ050Log.getOutJcicTxtDate());
+			occursList.putParam("OOTxSeq", rrJcicZ050Log.getTxSeq());
+			occursList.putParam("OOUkey", rrJcicZ050Log.getUkey());
 			this.totaVo.addOccursList(occursList);
 		}
 		this.addList(this.totaVo);

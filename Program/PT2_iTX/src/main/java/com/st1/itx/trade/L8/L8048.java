@@ -51,7 +51,7 @@ public class L8048 extends TradeBuffer {
 			String iLastUpdateEmpNo = rJcicZ060.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursListA.putParam("OOTranKey", rJcicZ060.getTranKey());
-			occursListA.putParam("OOYM", rJcicZ060.getYM() - 191100);
+			occursListA.putParam("OOYM", rJcicZ060.getYM()-191100);
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
 				occursListA.putParam("OOLastUpdateEmpNoName", "");
@@ -69,6 +69,10 @@ public class L8048 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ060.getOutJcicTxtDate());
+			JcicZ060Log rrJcicZ060Log = iJcicZ060LogService.ukeyFirst(rJcicZ060.getUkey(), titaVo);
+			occursListA.putParam("OOTxSeq", rrJcicZ060Log.getTxSeq());
+			occursListA.putParam("OOUkey", rrJcicZ060Log.getUkey());
+
 			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ060Log == null) {
@@ -79,7 +83,7 @@ public class L8048 extends TradeBuffer {
 			String iLastUpdateEmpNo = rrJcicZ060Log.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursList.putParam("OOTranKey", rrJcicZ060Log.getTranKey());
-			occursList.putParam("OOYM", rrJcicZ060Log.getYM() - 191100);
+			occursList.putParam("OOYM", rrJcicZ060Log.getYM()-191100);
 			iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 			if (iLastUpdateEmpNo.equals("")) {
 				occursList.putParam("OOLastUpdateEmpNoName", "");
@@ -97,6 +101,8 @@ public class L8048 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursList.putParam("OOOutJcicTxtDate", rrJcicZ060Log.getOutJcicTxtDate());
+			occursList.putParam("OOTxSeq", rrJcicZ060Log.getTxSeq());
+			occursList.putParam("OOUkey", rrJcicZ060Log.getUkey());
 			this.totaVo.addOccursList(occursList);
 		}
 		this.addList(this.totaVo);

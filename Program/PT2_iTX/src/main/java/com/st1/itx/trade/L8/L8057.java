@@ -76,6 +76,9 @@ public class L8057 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ447.getOutJcicTxtDate());
+			JcicZ447Log rrJcicZ447Log = iJcicZ447LogService.ukeyFirst(rJcicZ447.getUkey(), titaVo);
+			occursListA.putParam("OOTxSeq", rrJcicZ447Log.getTxSeq());
+			occursListA.putParam("OOUkey", rrJcicZ447Log.getUkey());
 			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ447Log == null) {
@@ -111,6 +114,8 @@ public class L8057 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursList.putParam("OOOutJcicTxtDate", rrJcicZ447Log.getOutJcicTxtDate());
+			occursList.putParam("OOTxSeq", rrJcicZ447Log.getTxSeq());
+			occursList.putParam("OOUkey", rrJcicZ447Log.getUkey());
 			this.totaVo.addOccursList(occursList);
 		}
 		this.addList(this.totaVo);

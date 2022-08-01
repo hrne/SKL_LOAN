@@ -13,7 +13,10 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ061;
+import com.st1.itx.db.domain.JcicZ061Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ061LogService;
 import com.st1.itx.db.service.JcicZ061Service;
 /* 交易共用組件 */
@@ -31,10 +34,10 @@ import com.st1.itx.util.data.DataLog;
 public class L8421 extends TradeBuffer {
 	@Autowired
 	public DataLog iDataLog;
-
 	@Autowired
 	public L8403File iL8403File;
-
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ061Service sJcicZ061Service;
 	@Autowired
@@ -86,6 +89,7 @@ public class L8421 extends TradeBuffer {
 		JcicZ061 uJcicZ061 = new JcicZ061();
 		JcicZ061 oldJcicZ061 = new JcicZ061();
 		iJcicZ061 = sJcicZ061Service.findAll(0,Integer.MAX_VALUE, titaVo);
+		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		for (JcicZ061 iiJcicZ061 : iJcicZ061) {
 			if (iiJcicZ061.getOutJcicTxtDate() == iJcicDate) {
 				count++;
@@ -97,8 +101,12 @@ public class L8421 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 				}
+				CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+				titaVo.putParam("CustNo", iCustNo);
+				JcicZ061Log iJcicZ061Log = sJcicZ061LogService.ukeyFirst(uJcicZ061.getUkey(), titaVo);
 				iDataLog.setEnv(titaVo, oldJcicZ061, uJcicZ061);
-				iDataLog.exec();
+				iDataLog.exec("L8421取消報送",iJcicZ061Log.getUkey()+iJcicZ061Log.getTxSeq());
 			}
 		}
 		if (count == 0) {
