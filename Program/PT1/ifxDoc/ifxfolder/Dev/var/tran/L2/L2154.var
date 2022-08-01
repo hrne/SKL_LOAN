@@ -1546,6 +1546,8 @@ C(3,#BaseRateCode,99,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX)
 
 #SendL2r06B=X,1,S
 C(3,#FuncCode,5,S,$)
+C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,E(0,@BaseRate,#L2r05BaseRateCode),$)
+C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,s,$)
 T(2,@RimCurrencyCode,#L2r05CurrencyCode)
 T(2,@RimBaseRateCode,#BaseRateCode)
 E(0,@RimEffectDate,#EffectDate)
@@ -1553,6 +1555,8 @@ E(0,@RimEffectTime,0)
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r06B,L2R06),$)
 S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
 R(1,L2R06)
+E(0,@BaseRate,#L2r06Rate)
+
 
 #FdBaseRate=X,2,L
 

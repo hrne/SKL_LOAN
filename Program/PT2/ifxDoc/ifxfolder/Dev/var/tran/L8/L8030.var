@@ -256,6 +256,8 @@ T(2,#OOMaxMainCode+ +#OOMaxMainCodeX)
 
 #OODelayYM=X,6,S
 
+#OOApplyDate=X,7,S
+
 #OOUkey=X,32,S
 
 
@@ -343,7 +345,6 @@ IF(#OOHistoryFg==0,BIND(grid,cancel),$)
 
 !#OOBUF7=X,50,S
 
-
 !#OOBTN7=X,1,S
 !BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; text=修改; ntxbuf=#OOBUF7})
 !IF(#OOStatusFg==0,BIND(grid,cancel),$)
@@ -351,9 +352,7 @@ IF(#OOHistoryFg==0,BIND(grid,cancel),$)
 !C(5,#OOTranKey,R,BIND(grid,cancel),$)
 !C(5,#OOTranKey,X,BIND(grid,cancel),$)
 
-#OOMrKey=X,50,S
-T(2,#OOSubmitKey+#OOCustId+#OORcDate)
-
+!傳入L6932共用空白
 #50sp=X,20,S
 #20sp=X,20,S
 #18sp=X,18,S
@@ -361,13 +360,188 @@ T(2,#OOSubmitKey+#OOCustId+#OORcDate)
 #5sp=X,5,S
 #3sp=X,3,S
 
-!查詢L6932
+!查詢L6932(L)
+#OOMrKey=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate)
+
 #OOBUF18=X,150,S
-T(2,0010101+9991231+L8301+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
 #OOBTN18=X,1,S
 BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF18})
 IF(#OOStatusFg==0,BIND(grid,cancel),$)
 
+!查詢L6932(O)
+#OOMrKey2=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate+#OOMaxMainCode+#OOAccount)
+
+#OOBUF19=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey2)
+#OOBTN19=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF19})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(M)
+#OOMrKey3=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate+#OOMaxMainCode)
+
+#OOBUF20=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey3)
+#OOBTN20=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF20})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(N)
+#OOMrKey4=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate+#OOCloseDate)
+
+#OOBUF21=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey4)
+#OOBTN21=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF21})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(D)
+#OOMrKey5=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate+#OOPayDate)
+
+#OOBUF22=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey5)
+#OOBTN22=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF22})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(E)
+#OOMrKey6=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate+#OODelayYM)
+
+#OOBUF23=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey6)
+#OOBTN23=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF23})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(2)AND(6)
+#OOMrKey7=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOCaseStatus+#OOClaimDate+#OOCourtCode)
+
+#OOBUF24=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey7)
+#OOBTN24=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF24})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(6)
+!#OOMrKey8=X,50,S
+!T(2,#OOSubmitKey+#OOCustId+#OOCaseStatus+#OOClaimDate+#OOCourtCode)
+
+!#OOBUF25=X,150,S
+!T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey8)
+!#OOBTN25=X,1,S
+!BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF25})
+!IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!#OOBTN25=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN25',align:'center',canExport:false}
+
+!查詢L6932(P)
+#OOMrKey8=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OORcDate+#OOChangePayDate)
+
+#OOBUF26=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey8)
+#OOBTN26=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF26})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(S)
+#OOMrKey9=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOCourtCode)
+
+#OOBUF27=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey9)
+#OOBTN27=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF27})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(T)
+#OOMrKey10=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOCourtCode+#OOMaxMainCode)
+
+#OOBUF28=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey10)
+#OOBTN28=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF28})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(K)
+#OOMrKey11=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOCourtCode+#OOPayDate)
+
+#OOBUF29=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey11)
+#OOBTN29=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF29})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(G)
+#OOMrKey12=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOCourtCode+#OODelayYM)
+
+#OOBUF30=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey12)
+#OOBTN30=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF30})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(H)
+#OOMrKey13=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOCourtCode+#OOMaxMainCode)
+
+#OOBUF31=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey13)
+#OOBTN31=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF31})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(Q)
+#OOMrKey14=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate)
+
+#OOBUF32=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey14)
+#OOBTN32=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF32})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(R)
+#OOMrKey15=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOBankId)
+
+#OOBUF33=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey15)
+#OOBTN33=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF33})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(7)
+#OOMrKey16=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOPayDate+#OOBankId)
+
+#OOBUF34=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey16)
+#OOBTN34=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF34})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+
+!查詢L6932(8)
+#OOMrKey17=X,50,S
+T(2,#OOSubmitKey+#OOCustId+#OOApplyDate+#OOPayDate)
+
+#OOBUF35=X,150,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey17)
+#OOBTN35=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF35})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
 
 
 </sub>
@@ -439,6 +613,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
+#OOBTN24=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN24',align:'center',canExport:false}
 ^
 #RPTFG=5,QUERY.GRID,L8030
 #any={detail:true, header:'L8030C.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -489,6 +665,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
+#OOBTN24=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN24',align:'center',canExport:false}
 ^
 #RPTFG=7,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -514,6 +692,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
+#OOBTN34=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN34',align:'center',canExport:false}
 ^
 #RPTFG=8,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -537,6 +717,8 @@ TXFORM=L8030
 {width:150,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN35=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN35',align:'center',canExport:false}
 ^
 
 #RPTFG=D,QUERY.GRID,L8030
@@ -561,6 +743,8 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN22=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN22',align:'center',canExport:false}
 ^
 #RPTFG=E,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -584,6 +768,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
+#OOBTN23=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN23',align:'center',canExport:false}
 ^
 #RPTFG=G,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -609,6 +795,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
+#OOBTN30=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN30',align:'center',canExport:false}
 ^
 #RPTFG=H,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -634,6 +822,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:140,align:'center',hidden:false}
+#OOBTN31=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN31',align:'center',canExport:false}
 ^
 #RPTFG=K,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -659,6 +849,8 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
+#OOBTN29=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN29',align:'center',canExport:false}
 ^
 #RPTFG=L,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -707,6 +899,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN20=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN20',align:'center',canExport:false}
 ^
 #RPTFG=N,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -730,6 +924,8 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN21=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN21',align:'center',canExport:false}
 ^
 #RPTFG=O,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -755,6 +951,8 @@ TXFORM=L8030
 {width:400,align:'left',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN19=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN19',align:'center',canExport:false}
 ^
 #RPTFG=P,QUERY.GRID,L8030
 #any={detail:true, header:'L8030C.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -778,6 +976,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN26=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN26',align:'center',canExport:false}
 ^
 #RPTFG=Q,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -799,6 +999,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN32=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN32',align:'center',canExport:false}
 ^
 #RPTFG=R,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -822,6 +1024,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:170,align:'center',hidden:false}
+#OOBTN33=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN33',align:'center',canExport:false}
 ^
 #RPTFG=S,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -845,6 +1049,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN27=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN27',align:'center',canExport:false}
 ^
 #RPTFG=T,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -870,6 +1076,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
+#OOBTN28=當前異動紀錄
+{width:180,search:false,formatter:'cust:bind-button:#OOBTN28',align:'center',canExport:false}
 ^
 
 <include src="PRT.icf::INQ01.sel"/>

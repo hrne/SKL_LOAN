@@ -70,10 +70,10 @@ public class L8032 extends TradeBuffer {
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
 			occursListA.putParam("OOLastUpdateEmpNo", iLastUpdateEmpNo);
 			occursListA.putParam("OOOutJcicTxtDate", rJcicZ041.getOutJcicTxtDate());
-			this.totaVo.addOccursList(occursListA);
 			JcicZ041Log rrJcicZ041Log = iJcicZ041LogService.ukeyFirst(rJcicZ041.getUkey(), titaVo);
 			occursListA.putParam("OOTxSeq", rrJcicZ041Log.getTxSeq());
 			occursListA.putParam("OOUkey", rrJcicZ041Log.getUkey());
+			this.totaVo.addOccursList(occursListA);
 		}
 		if (rJcicZ041Log == null) {
 			throw new LogicException(titaVo, "E0001", "");

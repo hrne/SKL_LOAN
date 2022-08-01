@@ -100,9 +100,6 @@ R(1,L8R55)
 T(2,@CustId,#L8r55CustId)
 T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
-#ChainCd=X,5,S
-#Ukey=X,32,S
-#RPTFG=A,1,S
 
 #RimJcicBankCode=X,3,S
 #RimL8r01=X,1,S
@@ -121,6 +118,10 @@ RESET_RIM(#RimL8R57,L8R57)
 S(L8R57,1,#RimCustId)
 R(1,L8R57)
 T(2,@CustIdX,#L8R57CustName)
+
+#ChainCd=X,5,S
+#Ukey=X,32,S
+#RPTFG=A,1,S
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -171,7 +172,7 @@ T(2,#OOUkey+#OOTxSeq)
 
 !查詢L6932
 #OOBUF18=X,150,S
-T(2,0010101+9991231+L8403+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
+T(2,0010101+9991231+L8404+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
 #OOBTN18=X,1,S
 BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=紀錄; ntxbuf=#OOBUF18})
 

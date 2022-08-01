@@ -1206,7 +1206,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ040Log2, uJcicZ040log);
-					iDataLog.exec("L8301報送", iJcicZ040Log2.getUkey() + iJcicZ040Log2.getTxSeq());
+					iDataLog.exec("L8403報送", iJcicZ040Log2.getUkey() + iJcicZ040Log2.getTxSeq());
 				}
 			}
 		}
@@ -1254,6 +1254,8 @@ public class L8403File extends MakeFile {
 					JcicZ041LogId iJcicZ041LogId = new JcicZ041LogId();
 					iJcicZ041LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ041LogId.setUkey(iUkey);
+					iJcicZ041Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ041Log.setUkey(iUkey);
 					iJcicZ041Log.setJcicZ041LogId(iJcicZ041LogId);
 					iJcicZ041Log.setScDate(ixScDate);
 					iJcicZ041Log.setNegoStartDate(ixNegoStartDate);
@@ -1273,9 +1275,10 @@ public class L8403File extends MakeFile {
 					this.info("iJcicZ041Log2     = " + iJcicZ041Log2);
 					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ041.getCustId(), titaVo);
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					this.info("iCustNo   = " +iCustNo);
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ041Log2, uJcicZ041log);
-					iDataLog.exec("L8302報送", iJcicZ041Log2.getUkey() + iJcicZ041Log2.getTxSeq());
+					iDataLog.exec("L8404報送", iJcicZ041Log2.getUkey() + iJcicZ041Log2.getTxSeq());
 				}
 			}
 		}
@@ -1377,6 +1380,8 @@ public class L8403File extends MakeFile {
 					JcicZ042LogId iJcicZ042LogId = new JcicZ042LogId();
 					iJcicZ042LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ042LogId.setUkey(iUkey);
+					iJcicZ042Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ042Log.setUkey(iUkey);
 					iJcicZ042Log.setJcicZ042LogId(iJcicZ042LogId);
 					iJcicZ042Log.setIsClaims(iIsClaims);
 					iJcicZ042Log.setGuarLoanCnt(ixGuarLoanCnt);
@@ -1418,7 +1423,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ042Log2, uJcicZ042log);
-					iDataLog.exec("L8303報送", iJcicZ042Log2.getUkey() + iJcicZ042Log2.getTxSeq());
+					iDataLog.exec("L8405報送", iJcicZ042Log2.getUkey() + iJcicZ042Log2.getTxSeq());
 				}
 			}
 		}
@@ -1492,6 +1497,8 @@ public class L8403File extends MakeFile {
 					JcicZ043LogId iJcicZ043LogId = new JcicZ043LogId();
 					iJcicZ043LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ043LogId.setUkey(iUkey);
+					iJcicZ043Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ043Log.setUkey(iUkey);
 					iJcicZ043Log.setJcicZ043LogId(iJcicZ043LogId);
 					iJcicZ043Log.setCollateralType(iCollateralType);
 					iJcicZ043Log.setOriginLoanAmt(ixOriginLoanAmt);
@@ -1520,7 +1527,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ043Log2, uJcicZ043log);
-					iDataLog.exec("L8304報送", iJcicZ043Log2.getUkey() + iJcicZ043Log2.getTxSeq());
+					iDataLog.exec("L8406報送", iJcicZ043Log2.getUkey() + iJcicZ043Log2.getTxSeq());
 				}
 			}
 		}
@@ -1645,6 +1652,8 @@ public class L8403File extends MakeFile {
 					JcicZ044LogId iJcicZ044LogId = new JcicZ044LogId();
 					iJcicZ044LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ044LogId.setUkey(iUkey);
+					iJcicZ044Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ044Log.setUkey(iUkey);
 					iJcicZ044Log.setJcicZ044LogId(iJcicZ044LogId);
 					iJcicZ044Log.setDebtCode(iDebtCode);
 					iJcicZ044Log.setNonGageAmt(ixNonGageAmt);// int
@@ -1691,7 +1700,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ044Log2, uJcicZ044log);
-					iDataLog.exec("L8305報送", iJcicZ044Log2.getUkey() + iJcicZ044Log2.getTxSeq());
+					iDataLog.exec("L8407報送", iJcicZ044Log2.getUkey() + iJcicZ044Log2.getTxSeq());
 				}
 			}
 		}
@@ -1735,6 +1744,8 @@ public class L8403File extends MakeFile {
 					JcicZ045LogId iJcicZ045LogId = new JcicZ045LogId();
 					iJcicZ045LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ045LogId.setUkey(iUkey);
+					iJcicZ045Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ045Log.setUkey(iUkey);
 					iJcicZ045Log.setJcicZ045LogId(iJcicZ045LogId);
 					iJcicZ045Log.setAgreeCode(iAgreeCode);
 					iJcicZ045Log.setTranKey(iTranKey);
@@ -1755,7 +1766,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ045Log2, uJcicZ045log);
-					iDataLog.exec("L8306報送", iJcicZ045Log2.getUkey() + iJcicZ045Log2.getTxSeq());
+					iDataLog.exec("L8408報送", iJcicZ045Log2.getUkey() + iJcicZ045Log2.getTxSeq());
 				}
 			}
 		}
@@ -1802,6 +1813,8 @@ public class L8403File extends MakeFile {
 					JcicZ046LogId iJcicZ046LogId = new JcicZ046LogId();
 					iJcicZ046LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ046LogId.setUkey(iUkey);
+					iJcicZ046Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ046Log.setUkey(iUkey);
 					iJcicZ046Log.setJcicZ046LogId(iJcicZ046LogId);
 					iJcicZ046Log.setCloseCode(ixCloseCode);
 					iJcicZ046Log.setBreakCode(iBreakCode);
@@ -1823,7 +1836,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ046Log2, uJcicZ046log);
-					iDataLog.exec("L8307報送", iJcicZ046Log2.getUkey() + iJcicZ046Log2.getTxSeq());
+					iDataLog.exec("L8409報送", iJcicZ046Log2.getUkey() + iJcicZ046Log2.getTxSeq());
 				}
 			}
 		}
@@ -1948,6 +1961,8 @@ public class L8403File extends MakeFile {
 					JcicZ047LogId iJcicZ047LogId = new JcicZ047LogId();
 					iJcicZ047LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ047LogId.setUkey(iUkey);
+					iJcicZ047Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ047Log.setUkey(iUkey);
 					iJcicZ047Log.setJcicZ047LogId(iJcicZ047LogId);
 					iJcicZ047Log.setCivil323ExpAmt(ixCivil323ExpAmt);
 					iJcicZ047Log.setExpLoanAmt(ixExpLoanAmt);
@@ -1989,7 +2004,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ047Log2, uJcicZ047log);
-					iDataLog.exec("L8308報送", iJcicZ047Log2.getUkey() + iJcicZ047Log2.getTxSeq());
+					iDataLog.exec("L8410報送", iJcicZ047Log2.getUkey() + iJcicZ047Log2.getTxSeq());
 				}
 			}
 		}
@@ -2038,6 +2053,8 @@ public class L8403File extends MakeFile {
 					JcicZ048LogId iJcicZ048LogId = new JcicZ048LogId();
 					iJcicZ048LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ048LogId.setUkey(iUkey);
+					iJcicZ048Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ048Log.setUkey(iUkey);
 					iJcicZ048Log.setJcicZ048LogId(iJcicZ048LogId);
 					iJcicZ048Log.setCustRegAddr(iCustRegAddr);
 					iJcicZ048Log.setCustComAddr(iCustComAddr);
@@ -2062,7 +2079,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ048Log2, uJcicZ048log);
-					iDataLog.exec("L8309報送", iJcicZ048Log2.getUkey() + iJcicZ048Log2.getTxSeq());
+					iDataLog.exec("L8411報送", iJcicZ048Log2.getUkey() + iJcicZ048Log2.getTxSeq());
 				}
 			}
 		}
@@ -2133,6 +2150,8 @@ public class L8403File extends MakeFile {
 					JcicZ049LogId iJcicZ049LogId = new JcicZ049LogId();
 					iJcicZ049LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ049LogId.setUkey(iUkey);
+					iJcicZ049Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ049Log.setUkey(iUkey);
 					iJcicZ049Log.setJcicZ049LogId(iJcicZ049LogId);
 					iJcicZ049Log.setClaimStatus(ixClaimStatus);
 					iJcicZ049Log.setApplyDate(ixApplyDate);
@@ -2160,7 +2179,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ049Log2, uJcicZ049log);
-					iDataLog.exec("L8310報送", iJcicZ049Log2.getUkey() + iJcicZ049Log2.getTxSeq());
+					iDataLog.exec("L8412報送", iJcicZ049Log2.getUkey() + iJcicZ049Log2.getTxSeq());
 				}
 			}
 		}
@@ -2219,6 +2238,8 @@ public class L8403File extends MakeFile {
 					JcicZ050LogId iJcicZ050LogId = new JcicZ050LogId();
 					iJcicZ050LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ050LogId.setUkey(iUkey);
+					iJcicZ050Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ050Log.setUkey(iUkey);
 					iJcicZ050Log.setJcicZ050LogId(iJcicZ050LogId);
 					iJcicZ050Log.setPayAmt(ixPayAmt);
 					iJcicZ050Log.setSumRepayActualAmt(ixSumRepayActualAmt);
@@ -2243,7 +2264,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ050Log2, uJcicZ050log);
-					iDataLog.exec("L8311報送", iJcicZ050Log2.getUkey() + iJcicZ050Log2.getTxSeq());
+					iDataLog.exec("L8413報送", iJcicZ050Log2.getUkey() + iJcicZ050Log2.getTxSeq());
 				}
 			}
 		}
@@ -2288,6 +2309,8 @@ public class L8403File extends MakeFile {
 					JcicZ051LogId iJcicZ051LogId = new JcicZ051LogId();
 					iJcicZ051LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ051LogId.setUkey(iUkey);
+					iJcicZ051Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ051Log.setUkey(iUkey);
 					iJcicZ051Log.setJcicZ051LogId(iJcicZ051LogId);
 					iJcicZ051Log.setDelayCode(iDelayCode);
 					iJcicZ051Log.setDelayDesc(iDelayDesc);
@@ -2308,7 +2331,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ051Log2, uJcicZ051log);
-					iDataLog.exec("L8312報送", iJcicZ051Log2.getUkey() + iJcicZ051Log2.getTxSeq());
+					iDataLog.exec("L8414報送", iJcicZ051Log2.getUkey() + iJcicZ051Log2.getTxSeq());
 				}
 			}
 		}
@@ -2372,6 +2395,8 @@ public class L8403File extends MakeFile {
 					JcicZ052LogId iJcicZ052LogId = new JcicZ052LogId();
 					iJcicZ052LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ052LogId.setUkey(iUkey);
+					iJcicZ052Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ052Log.setUkey(iUkey);
 					iJcicZ052Log.setJcicZ052LogId(iJcicZ052LogId);
 					iJcicZ052Log.setBankCode1(iBankCode1);
 					iJcicZ052Log.setDataCode1(iDataCode1);
@@ -2402,7 +2427,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ052Log2, uJcicZ052log);
-					iDataLog.exec("L8313報送", iJcicZ052Log2.getUkey() + iJcicZ052Log2.getTxSeq());
+					iDataLog.exec("L8415報送", iJcicZ052Log2.getUkey() + iJcicZ052Log2.getTxSeq());
 				}
 			}
 		}
@@ -2454,6 +2479,8 @@ public class L8403File extends MakeFile {
 					JcicZ053LogId iJcicZ053LogId = new JcicZ053LogId();
 					iJcicZ053LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ053LogId.setUkey(iUkey);
+					iJcicZ053Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ053Log.setUkey(iUkey);
 					iJcicZ053Log.setJcicZ053LogId(iJcicZ053LogId);
 					iJcicZ053Log.setAgreeSend(iAgreeSend);
 					iJcicZ053Log.setAgreeSendData1(iAgreeSendData1);
@@ -2477,7 +2504,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ053Log2, uJcicZ053log);
-					iDataLog.exec("L8314報送", iJcicZ053Log2.getUkey() + iJcicZ053Log2.getTxSeq());
+					iDataLog.exec("L8416報送", iJcicZ053Log2.getUkey() + iJcicZ053Log2.getTxSeq());
 				}
 			}
 		}
@@ -2523,6 +2550,8 @@ public class L8403File extends MakeFile {
 					JcicZ054LogId iJcicZ054LogId = new JcicZ054LogId();
 					iJcicZ054LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ054LogId.setUkey(iUkey);
+					iJcicZ054Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ054Log.setUkey(iUkey);
 					iJcicZ054Log.setJcicZ054LogId(iJcicZ054LogId);
 					iJcicZ054Log.setPayOffResult(iPayOffResult);
 					iJcicZ054Log.setTranKey(iTranKey);
@@ -2543,7 +2572,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ054Log2, uJcicZ054log);
-					iDataLog.exec("L8315報送", iJcicZ054Log2.getUkey() + iJcicZ054Log2.getTxSeq());
+					iDataLog.exec("L8417報送", iJcicZ054Log2.getUkey() + iJcicZ054Log2.getTxSeq());
 				}
 			}
 		}
@@ -2630,6 +2659,8 @@ public class L8403File extends MakeFile {
 					JcicZ055LogId iJcicZ055LogId = new JcicZ055LogId();
 					iJcicZ055LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ055LogId.setUkey(iUkey);
+					iJcicZ055Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ055Log.setUkey(iUkey);
 					iJcicZ055Log.setJcicZ055LogId(iJcicZ055LogId);
 					iJcicZ055Log.setYear(iYear);
 					iJcicZ055Log.setCourtDiv(iCourtDiv);
@@ -2663,7 +2694,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ055Log2, uJcicZ055log);
-					iDataLog.exec("L8316報送", iJcicZ055Log2.getUkey() + iJcicZ055Log2.getTxSeq());
+					iDataLog.exec("L8418報送", iJcicZ055Log2.getUkey() + iJcicZ055Log2.getTxSeq());
 				}
 			}
 		}
@@ -2730,6 +2761,8 @@ public class L8403File extends MakeFile {
 					JcicZ056LogId iJcicZ056LogId = new JcicZ056LogId();
 					iJcicZ056LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ056LogId.setUkey(iUkey);
+					iJcicZ056Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ056Log.setUkey(iUkey);
 					iJcicZ056Log.setJcicZ056LogId(iJcicZ056LogId);
 					iJcicZ056Log.setYear(ixYear);
 					iJcicZ056Log.setCourtDiv(iCourtDiv);
@@ -2760,7 +2793,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ056Log2, uJcicZ056log);
-					iDataLog.exec("L8317報送", iJcicZ056Log2.getUkey() + iJcicZ056Log2.getTxSeq());
+					iDataLog.exec("L8419報送", iJcicZ056Log2.getUkey() + iJcicZ056Log2.getTxSeq());
 				}
 			}
 		}
@@ -2803,6 +2836,8 @@ public class L8403File extends MakeFile {
 					JcicZ060LogId iJcicZ060LogId = new JcicZ060LogId();
 					iJcicZ060LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ060LogId.setUkey(iUkey);
+					iJcicZ060Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ060Log.setUkey(iUkey);
 					iJcicZ060Log.setJcicZ060LogId(iJcicZ060LogId);
 					iJcicZ060Log.setYM(Integer.valueOf(iYM) + 191100);
 					iJcicZ060Log.setTranKey(iTranKey);
@@ -2823,7 +2858,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ060Log2, uJcicZ060log);
-					iDataLog.exec("L8318報送", iJcicZ060Log2.getUkey() + iJcicZ060Log2.getTxSeq());
+					iDataLog.exec("L8420報送", iJcicZ060Log2.getUkey() + iJcicZ060Log2.getTxSeq());
 				}
 			}
 		}
@@ -2879,6 +2914,8 @@ public class L8403File extends MakeFile {
 					JcicZ061LogId iJcicZ061LogId = new JcicZ061LogId();
 					iJcicZ061LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ061LogId.setUkey(iUkey);
+					iJcicZ061Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ061Log.setUkey(iUkey);
 					iJcicZ061Log.setJcicZ061LogId(iJcicZ061LogId);
 					iJcicZ061Log.setExpBalanceAmt(ixExpBalanceAmt);
 					iJcicZ061Log.setCashBalanceAmt(ixCashBalanceAmt);
@@ -2903,7 +2940,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ061Log2, uJcicZ061log);
-					iDataLog.exec("L8319報送", iJcicZ061Log2.getUkey() + iJcicZ061Log2.getTxSeq());
+					iDataLog.exec("L8421報送", iJcicZ061Log2.getUkey() + iJcicZ061Log2.getTxSeq());
 				}
 			}
 		}
@@ -3004,6 +3041,8 @@ public class L8403File extends MakeFile {
 					JcicZ062LogId iJcicZ062LogId = new JcicZ062LogId();
 					iJcicZ062LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ062LogId.setUkey(iUkey);
+					iJcicZ062Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ062Log.setUkey(iUkey);
 					iJcicZ062Log.setJcicZ062LogId(iJcicZ062LogId);
 					iJcicZ062Log.setCompletePeriod(ixCompletePeriod);
 					iJcicZ062Log.setPeriod(ixPeriod);
@@ -3041,7 +3080,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ062Log2, uJcicZ062log);
-					iDataLog.exec("L8320報送", iJcicZ062Log2.getUkey() + iJcicZ062Log2.getTxSeq());
+					iDataLog.exec("L8422報送", iJcicZ062Log2.getUkey() + iJcicZ062Log2.getTxSeq());
 				}
 			}
 		}
@@ -3088,6 +3127,8 @@ public class L8403File extends MakeFile {
 					JcicZ063LogId iJcicZ063LogId = new JcicZ063LogId();
 					iJcicZ063LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ063LogId.setUkey(iUkey);
+					iJcicZ063Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ063Log.setUkey(iUkey);
 					iJcicZ063Log.setJcicZ063LogId(iJcicZ063LogId);
 					iJcicZ063Log.setClosedDate(ixCloseDate);
 					iJcicZ063Log.setClosedResult(iClosedResult);
@@ -3109,7 +3150,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ063Log2, uJcicZ063log);
-					iDataLog.exec("L8321報送", iJcicZ063Log2.getUkey() + iJcicZ063Log2.getTxSeq());
+					iDataLog.exec("L8423報送", iJcicZ063Log2.getUkey() + iJcicZ063Log2.getTxSeq());
 				}
 			}
 		}
@@ -3176,6 +3217,8 @@ public class L8403File extends MakeFile {
 					JcicZ440LogId iJcicZ440LogId = new JcicZ440LogId();
 					iJcicZ440LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ440LogId.setUkey(iUkey);
+					iJcicZ440Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ440Log.setUkey(iUkey);
 					iJcicZ440Log.setJcicZ440LogId(iJcicZ440LogId);
 					iJcicZ440Log.setAgreeDate(ixAgreeDate);
 					iJcicZ440Log.setStartDate(ixStartDate);
@@ -3206,7 +3249,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ440Log2, uJcicZ440log);
-					iDataLog.exec("L8322報送", iJcicZ440Log2.getUkey() + iJcicZ440Log2.getTxSeq());
+					iDataLog.exec("L8424報送", iJcicZ440Log2.getUkey() + iJcicZ440Log2.getTxSeq());
 				}
 			}
 		}
@@ -3310,6 +3353,8 @@ public class L8403File extends MakeFile {
 					this.info("TxSeq===" + titaVo.getTxSeq());
 					iJcicZ442LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ442LogId.setUkey(iUkey);
+					iJcicZ442Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ442Log.setUkey(iUkey);
 					iJcicZ442Log.setJcicZ442LogId(iJcicZ442LogId);
 					iJcicZ442Log.setIsMaxMain(iIsMaxMain);
 					iJcicZ442Log.setIsClaims(iIsClaims);
@@ -3352,7 +3397,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ442Log2, uJcicZ442log);
-					iDataLog.exec("L8323報送", iJcicZ442Log2.getUkey() + iJcicZ442Log2.getTxSeq());
+					iDataLog.exec("L8425報送", iJcicZ442Log2.getUkey() + iJcicZ442Log2.getTxSeq());
 				}
 			}
 		}
@@ -3435,6 +3480,8 @@ public class L8403File extends MakeFile {
 					this.info("TxSeq===" + titaVo.getTxSeq());
 					iJcicZ443LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ443LogId.setUkey(iUkey);
+					iJcicZ443Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ443Log.setUkey(iUkey);
 					iJcicZ443Log.setJcicZ443LogId(iJcicZ443LogId);
 					iJcicZ443Log.setIsMaxMain(iIsMaxMain);
 					iJcicZ443Log.setGuarantyType(iGuarantyType);
@@ -3469,7 +3516,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ443Log2, uJcicZ443log);
-					iDataLog.exec("L8324報送", iJcicZ443Log2.getUkey() + iJcicZ443Log2.getTxSeq());
+					iDataLog.exec("L8426報送", iJcicZ443Log2.getUkey() + iJcicZ443Log2.getTxSeq());
 				}
 			}
 		}
@@ -3526,6 +3573,8 @@ public class L8403File extends MakeFile {
 					this.info("TxSeq===" + titaVo.getTxSeq());
 					iJcicZ444LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ444LogId.setUkey(iUkey);
+					iJcicZ444Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ444Log.setUkey(iUkey);
 					iJcicZ444Log.setJcicZ444LogId(iJcicZ444LogId);
 					iJcicZ444Log.setCustRegAddr(iCustRegAddr);
 					iJcicZ444Log.setCustComAddr(iCustComAddr);
@@ -3550,7 +3599,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ444Log2, uJcicZ444log);
-					iDataLog.exec("L8325報送", iJcicZ444Log2.getUkey() + iJcicZ444Log2.getTxSeq());
+					iDataLog.exec("L8427報送", iJcicZ444Log2.getUkey() + iJcicZ444Log2.getTxSeq());
 				}
 			}
 		}
@@ -3596,6 +3645,8 @@ public class L8403File extends MakeFile {
 						JcicZ446LogId iJcicZ446LogId = new JcicZ446LogId();
 						iJcicZ446LogId.setTxSeq(titaVo.getTxSeq());
 						iJcicZ446LogId.setUkey(iUkey);
+						iJcicZ446Log.setTxSeq(titaVo.getTxSeq());
+						iJcicZ446Log.setUkey(iUkey);
 						iJcicZ446Log.setJcicZ446LogId(iJcicZ446LogId);
 						iJcicZ446Log.setCloseCode(iCloseCode);
 						iJcicZ446Log.setCloseDate(ixCloseDate);
@@ -3617,7 +3668,7 @@ public class L8403File extends MakeFile {
 						int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 						titaVo.putParam("CustNo", iCustNo);
 						iDataLog.setEnv(titaVo, iJcicZ446Log2, uJcicZ446log);
-						iDataLog.exec("L8326報送", iJcicZ446Log2.getUkey() + iJcicZ446Log2.getTxSeq());
+						iDataLog.exec("L8428報送", iJcicZ446Log2.getUkey() + iJcicZ446Log2.getTxSeq());
 					}
 				}
 			}
@@ -3680,6 +3731,8 @@ public class L8403File extends MakeFile {
 					this.info("TxSeq===" + titaVo.getTxSeq());
 					iJcicZ447LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ447LogId.setUkey(iUkey);
+					iJcicZ447Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ447Log.setUkey(iUkey);
 					iJcicZ447Log.setJcicZ447LogId(iJcicZ447LogId);
 					iJcicZ447Log.setCivil323Amt(iCivil323Amt);
 					iJcicZ447Log.setTotalAmt(iTotalAmt);
@@ -3707,7 +3760,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ447Log2, uJcicZ447log);
-					iDataLog.exec("L8327報送", iJcicZ447Log2.getUkey() + iJcicZ447Log2.getTxSeq());
+					iDataLog.exec("L8429報送", iJcicZ447Log2.getUkey() + iJcicZ447Log2.getTxSeq());
 				}
 			}
 		}
@@ -3762,6 +3815,8 @@ public class L8403File extends MakeFile {
 					this.info("TxSeq===" + titaVo.getTxSeq());
 					iJcicZ448LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ448LogId.setUkey(iUkey);
+					iJcicZ448Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ448Log.setUkey(iUkey);
 					iJcicZ448Log.setJcicZ448LogId(iJcicZ448LogId);
 					iJcicZ448Log.setSignPrin(ixSignPrin);
 					iJcicZ448Log.setSignOther(ixSignOther);
@@ -3785,7 +3840,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ448Log2, uJcicZ448log);
-					iDataLog.exec("L8328報送", iJcicZ448Log2.getUkey() + iJcicZ448Log2.getTxSeq());
+					iDataLog.exec("L8430報送", iJcicZ448Log2.getUkey() + iJcicZ448Log2.getTxSeq());
 				}
 			}
 		}
@@ -3838,6 +3893,8 @@ public class L8403File extends MakeFile {
 					JcicZ450LogId iJcicZ450LogId = new JcicZ450LogId();
 					iJcicZ450LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ450LogId.setUkey(iUkey);
+					iJcicZ450Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ450Log.setUkey(iUkey);
 					iJcicZ450Log.setJcicZ450LogId(iJcicZ450LogId);
 					iJcicZ450Log.setPayAmt(ixPayAmt);
 					iJcicZ450Log.setSumRepayActualAmt(ixSumRepayActualAmt);
@@ -3861,7 +3918,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ450Log2, uJcicZ450log);
-					iDataLog.exec("L8329報送", iJcicZ450Log2.getUkey() + iJcicZ450Log2.getTxSeq());
+					iDataLog.exec("L8431報送", iJcicZ450Log2.getUkey() + iJcicZ450Log2.getTxSeq());
 				}
 			}
 		}
@@ -3906,6 +3963,8 @@ public class L8403File extends MakeFile {
 					JcicZ451LogId iJcicZ451LogId = new JcicZ451LogId();
 					iJcicZ451LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ451LogId.setUkey(iUkey);
+					iJcicZ451Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ451Log.setUkey(iUkey);
 					iJcicZ451Log.setJcicZ451LogId(iJcicZ451LogId);
 					iJcicZ451Log.setDelayCode(iDelayCode);
 					iJcicZ451Log.setTranKey(iTranKey);
@@ -3926,7 +3985,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ451Log2, uJcicZ451log);
-					iDataLog.exec("L8330報送", iJcicZ451Log2.getUkey() + iJcicZ451Log2.getTxSeq());
+					iDataLog.exec("L8432報送", iJcicZ451Log2.getUkey() + iJcicZ451Log2.getTxSeq());
 				}
 			}
 		}
@@ -3974,6 +4033,8 @@ public class L8403File extends MakeFile {
 					JcicZ454LogId iJcicZ454LogId = new JcicZ454LogId();
 					iJcicZ454LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ454LogId.setUkey(iUkey);
+					iJcicZ454Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ454Log.setUkey(iUkey);
 					iJcicZ454Log.setJcicZ454LogId(iJcicZ454LogId);
 					iJcicZ454Log.setPayOffResult(iPayOffResult);
 					iJcicZ454Log.setPayOffDate(ixPayOffDate);
@@ -3995,7 +4056,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ454Log2, uJcicZ454log);
-					iDataLog.exec("L8331報送", iJcicZ454Log2.getUkey() + iJcicZ454Log2.getTxSeq());
+					iDataLog.exec("L8433報送", iJcicZ454Log2.getUkey() + iJcicZ454Log2.getTxSeq());
 				}
 			}
 		}
@@ -4085,6 +4146,8 @@ public class L8403File extends MakeFile {
 					JcicZ570LogId iJcicZ570LogId = new JcicZ570LogId();
 					iJcicZ570LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ570LogId.setUkey(iUkey);
+					iJcicZ570Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ570Log.setUkey(iUkey);
 					iJcicZ570Log.setJcicZ570LogId(iJcicZ570LogId);
 					iJcicZ570Log.setAdjudicateDate(ixAdjudicateDate);
 					iJcicZ570Log.setBankCount(ixBankCount);
@@ -4135,7 +4198,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ570Log2, uJcicZ570log);
-					iDataLog.exec("L8332報送", iJcicZ570Log2.getUkey() + iJcicZ570Log2.getTxSeq());
+					iDataLog.exec("L8434報送", iJcicZ570Log2.getUkey() + iJcicZ570Log2.getTxSeq());
 				}
 			}
 		}
@@ -4188,6 +4251,8 @@ public class L8403File extends MakeFile {
 					JcicZ571LogId iJcicZ571LogId = new JcicZ571LogId();
 					iJcicZ571LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ571LogId.setUkey(iUkey);
+					iJcicZ571Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ571Log.setUkey(iUkey);
 					iJcicZ571Log.setJcicZ571LogId(iJcicZ571LogId);
 					iJcicZ571Log.setOwnerYn(iOwnerYn);
 					iJcicZ571Log.setPayYn(iPayYn);
@@ -4211,7 +4276,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ571Log2, uJcicZ571log);
-					iDataLog.exec("L8333報送", iJcicZ571Log2.getUkey() + iJcicZ571Log2.getTxSeq());
+					iDataLog.exec("L8435報送", iJcicZ571Log2.getUkey() + iJcicZ571Log2.getTxSeq());
 				}
 			}
 		}
@@ -4262,6 +4327,8 @@ public class L8403File extends MakeFile {
 					JcicZ572LogId iJcicZ572LogId = new JcicZ572LogId();
 					iJcicZ572LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ572LogId.setUkey(iUkey);
+					iJcicZ572Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ572Log.setUkey(iUkey);
 					iJcicZ572Log.setJcicZ572LogId(iJcicZ572LogId);
 					iJcicZ572Log.setStartDate(ixStartDate);
 					iJcicZ572Log.setAllotAmt(ixAllotAmt);
@@ -4284,7 +4351,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ572Log2, uJcicZ572log);
-					iDataLog.exec("L8334報送", iJcicZ572Log2.getUkey() + iJcicZ572Log2.getTxSeq());
+					iDataLog.exec("L8436報送", iJcicZ572Log2.getUkey() + iJcicZ572Log2.getTxSeq());
 				}
 			}
 		}
@@ -4331,6 +4398,8 @@ public class L8403File extends MakeFile {
 					JcicZ573LogId iJcicZ573LogId = new JcicZ573LogId();
 					iJcicZ573LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ573LogId.setUkey(iUkey);
+					iJcicZ573Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ573Log.setUkey(iUkey);
 					iJcicZ573Log.setJcicZ573LogId(iJcicZ573LogId);
 					iJcicZ573Log.setPayAmt(ixPayAmt);
 					iJcicZ573Log.setTotalPayAmt(ixTotalPayAmt);
@@ -4352,7 +4421,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ573Log2, uJcicZ573log);
-					iDataLog.exec("L8335報送", iJcicZ573Log2.getUkey() + iJcicZ573Log2.getTxSeq());
+					iDataLog.exec("L8437報送", iJcicZ573Log2.getUkey() + iJcicZ573Log2.getTxSeq());
 				}
 			}
 		}
@@ -4398,6 +4467,8 @@ public class L8403File extends MakeFile {
 					JcicZ574LogId iJcicZ574LogId = new JcicZ574LogId();
 					iJcicZ574LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ574LogId.setUkey(iUkey);
+					iJcicZ574Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ574Log.setUkey(iUkey);
 					iJcicZ574Log.setJcicZ574LogId(iJcicZ574LogId);
 					iJcicZ574Log.setCloseDate(ixCloseDate);
 					iJcicZ574Log.setCloseMark(iCloseMark);
@@ -4420,7 +4491,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ574Log2, uJcicZ574log);
-					iDataLog.exec("L8336報送", iJcicZ574Log2.getUkey() + iJcicZ574Log2.getTxSeq());
+					iDataLog.exec("L8438報送", iJcicZ574Log2.getUkey() + iJcicZ574Log2.getTxSeq());
 				}
 			}
 		}
@@ -4464,6 +4535,8 @@ public class L8403File extends MakeFile {
 					JcicZ575LogId iJcicZ575LogId = new JcicZ575LogId();
 					iJcicZ575LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ575LogId.setUkey(iUkey);
+					iJcicZ575Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ575Log.setUkey(iUkey);
 					iJcicZ575Log.setJcicZ575LogId(iJcicZ575LogId);
 					iJcicZ575Log.setModifyType(iModifyType);
 					iJcicZ575Log.setTranKey(iTranKey);
@@ -4484,7 +4557,7 @@ public class L8403File extends MakeFile {
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ575Log2, uJcicZ575log);
-					iDataLog.exec("L8337報送", iJcicZ575Log2.getUkey() + iJcicZ575Log2.getTxSeq());
+					iDataLog.exec("L8439報送", iJcicZ575Log2.getUkey() + iJcicZ575Log2.getTxSeq());
 				}
 			}
 		}
