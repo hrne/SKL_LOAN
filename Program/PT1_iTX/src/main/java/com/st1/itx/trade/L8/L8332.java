@@ -15,10 +15,12 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ570;
 import com.st1.itx.db.domain.JcicZ570Id;
 import com.st1.itx.db.domain.JcicZ570Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ570LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ570Service;
@@ -38,6 +40,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8332 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ570Service sJcicZ570Service;
 	@Autowired
@@ -91,6 +95,11 @@ public class L8332 extends TradeBuffer {
 		String iBank30 = titaVo.getParam("Bank30").trim();
 		String iKey = "";
 
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		JcicZ570 iJcicZ570 = new JcicZ570();
 		JcicZ570Id iJcicZ570Id = new JcicZ570Id();
 		iJcicZ570Id.setApplyDate(iApplyDate);

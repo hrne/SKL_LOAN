@@ -15,6 +15,7 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ446Id;
 import com.st1.itx.db.domain.JcicZ447;
@@ -23,6 +24,7 @@ import com.st1.itx.db.domain.JcicZ447Id;
 import com.st1.itx.db.domain.JcicZ451;
 import com.st1.itx.db.domain.JcicZ451Id;
 import com.st1.itx.db.domain.JcicZ451Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ446Service;
 import com.st1.itx.db.service.JcicZ447Service;
 import com.st1.itx.db.service.JcicZ451LogService;
@@ -45,6 +47,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8330 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ446Service sJcicZ446Service;
 	@Autowired
@@ -72,6 +76,12 @@ public class L8330 extends TradeBuffer {
 		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM").trim())+191100;
 		String iDelayCode = titaVo.getParam("DelayCode").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		int sCovDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款')
 		int sDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為非'L')
 

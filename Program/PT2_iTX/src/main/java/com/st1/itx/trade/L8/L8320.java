@@ -16,12 +16,14 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ060;
 import com.st1.itx.db.domain.JcicZ060Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ062;
 import com.st1.itx.db.domain.JcicZ062Id;
 import com.st1.itx.db.domain.JcicZ062Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ060Service;
 import com.st1.itx.db.service.JcicZ061Service;
@@ -45,6 +47,8 @@ import com.st1.itx.util.date.DateUtil;
 public class L8320 extends TradeBuffer {
 
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ047Service sJcicZ047Service;
 	@Autowired
@@ -92,6 +96,12 @@ public class L8320 extends TradeBuffer {
 		BigDecimal iRate2 = new BigDecimal(titaVo.getParam("Rate2").trim());
 		int iMonthPayAmt2 = Integer.valueOf(titaVo.getParam("MonthPayAmt2").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ062, JcicZ060,
 		JcicZ062 iJcicZ062 = new JcicZ062();
 		JcicZ062Id iJcicZ062Id = new JcicZ062Id();

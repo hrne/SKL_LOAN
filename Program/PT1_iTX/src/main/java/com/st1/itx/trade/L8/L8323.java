@@ -15,6 +15,7 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ440;
 import com.st1.itx.db.domain.JcicZ440Id;
 /* DB容器 */
@@ -24,6 +25,7 @@ import com.st1.itx.db.domain.JcicZ442Log;
 import com.st1.itx.db.domain.JcicZ443;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ446Id;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ442LogService;
 
@@ -46,6 +48,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8323 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ440Service sJcicZ440Service;
 	@Autowired
@@ -96,6 +100,12 @@ public class L8323 extends TradeBuffer {
 		int iGuarObliPena = Integer.valueOf(titaVo.getParam("GuarObliPena").trim());
 		int iGuarObliOther = Integer.valueOf(titaVo.getParam("GuarObliOther").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ442, JcicZ446
 		JcicZ442 iJcicZ442 = new JcicZ442();
 		JcicZ442Id iJcicZ442Id = new JcicZ442Id();

@@ -17,6 +17,7 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.JcicZ040Id;
 /* DB容器 */
@@ -26,6 +27,7 @@ import com.st1.itx.db.domain.JcicZ042Log;
 import com.st1.itx.db.domain.JcicZ043;
 import com.st1.itx.db.domain.JcicZ045;
 import com.st1.itx.db.domain.JcicZ045Id;
+import com.st1.itx.db.service.CustMainService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ042Service;
@@ -50,6 +52,8 @@ import com.st1.itx.util.date.DateUtil;
  */
 public class L8303 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
 	@Autowired
@@ -102,6 +106,12 @@ public class L8303 extends TradeBuffer {
 		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena").trim());
 		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt + iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
 		// JcicZ042, JcicZ040, JcicZ043, JcicZ045
 		JcicZ042 iJcicZ042 = new JcicZ042();
@@ -288,7 +298,7 @@ public class L8303 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ042.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ042, uJcicZ042);
-			iDataLog.exec("L8301異動", uJcicZ042.getSubmitKey()+uJcicZ042.getCustId()+uJcicZ042.getRcDate());
+			iDataLog.exec("L8303異動", uJcicZ042.getSubmitKey()+uJcicZ042.getCustId()+uJcicZ042.getRcDate());
 			break;
 			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡

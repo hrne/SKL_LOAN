@@ -17,11 +17,13 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ046;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ051;
 import com.st1.itx.db.domain.JcicZ051Id;
 import com.st1.itx.db.domain.JcicZ051Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ051LogService;
 /*DB服務*/
@@ -43,6 +45,8 @@ import com.st1.itx.util.date.DateUtil;
  */
 public class L8312 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ046Service sJcicZ046Service;
 	@Autowired
@@ -70,6 +74,12 @@ public class L8312 extends TradeBuffer {
 		String iDelayCode = titaVo.getParam("DelayCode").trim();
 		String iDelayDesc = titaVo.getParam("DelayDesc").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ051, JcicZ046
 		JcicZ051 iJcicZ051 = new JcicZ051();
 		JcicZ051Id iJcicZ051Id = new JcicZ051Id();

@@ -19,6 +19,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ440;
 import com.st1.itx.db.domain.JcicZ440Id;
@@ -26,6 +27,7 @@ import com.st1.itx.db.domain.JcicZ440Log;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ446Id;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ440LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ440Service;
@@ -45,6 +47,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8322 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public L8301ServiceImpl sL8301ServiceImpl;// 有效消債條例金融機構代號檢核
 	@Autowired
@@ -83,6 +87,12 @@ public class L8322 extends TradeBuffer {
 		String iNotBankId5 = titaVo.getParam("NotBankId5").trim();
 		String iNotBankId6 = titaVo.getParam("NotBankId6").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		String[] sNotBankId = { iNotBankId1, iNotBankId2, iNotBankId3, iNotBankId4, iNotBankId5, iNotBankId6 };// 未揭露債權機構代號集合
 		List<String> iL8301SqlReturn = new ArrayList<>(); // NegFinAcct有效消債條例金融機構代號集合
 

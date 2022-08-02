@@ -199,7 +199,7 @@ T(2,#OOUkey+#OOTxSeq)
 
 !查詢L6932
 #OOBUF18=X,150,S
-T(2,0010101+9991231+L8403+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
+T(2,0010101+9991231+L8431+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOMrKey)
 #OOBTN18=X,1,S
 BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=紀錄; ntxbuf=#OOBUF18})
 

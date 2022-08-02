@@ -17,13 +17,14 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.JcicZ040Id;
 import com.st1.itx.db.domain.JcicZ052;
 import com.st1.itx.db.domain.JcicZ052Id;
 import com.st1.itx.db.domain.JcicZ052Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ052LogService;
 /*DB服務*/
@@ -45,6 +46,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8313 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
 	@Autowired
@@ -79,6 +82,11 @@ public class L8313 extends TradeBuffer {
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		String iKey = "";
 
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ052, JcicZ040
 		JcicZ052 iJcicZ052 = new JcicZ052();
 		JcicZ052Id iJcicZ052Id = new JcicZ052Id();

@@ -274,7 +274,7 @@ public class L9132Report extends MakeReport {
 				// 傳票號碼
 				print(0, 56, titaTxtNo, "R");
 				// 區隔帳冊
-				print(0, 66, acSubBookItem,"C");
+				print(0, 67, acSubBookItem,"C");
 				// 戶號
 				print(0, 82, custNo);
 				// 貸方金額

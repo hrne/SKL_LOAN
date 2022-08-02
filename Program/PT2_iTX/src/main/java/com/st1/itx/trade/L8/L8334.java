@@ -15,11 +15,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.domain.JcicZ572Id;
 import com.st1.itx.db.domain.JcicZ572Log;
-
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ571Service;
 import com.st1.itx.db.service.JcicZ572LogService;
 /*DB服務*/
@@ -40,6 +41,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8334 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ571Service sJcicZ571Service;
 	@Autowired
@@ -67,6 +70,12 @@ public class L8334 extends TradeBuffer {
 		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt").trim());
 		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ572
 		JcicZ572 iJcicZ572 = new JcicZ572();
 		JcicZ572Id iJcicZ572Id = new JcicZ572Id();

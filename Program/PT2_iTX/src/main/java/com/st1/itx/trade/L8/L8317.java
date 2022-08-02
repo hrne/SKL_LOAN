@@ -17,10 +17,12 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ056;
 import com.st1.itx.db.domain.JcicZ056Id;
 import com.st1.itx.db.domain.JcicZ056Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ056LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ056Service;
@@ -40,6 +42,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8317 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ056Service sJcicZ056Service;
 	@Autowired
@@ -79,6 +83,11 @@ public class L8317 extends TradeBuffer {
 		String iAdminName = titaVo.getParam("AdminName");
 		String iKey = "";
 
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ056
 		JcicZ056 iJcicZ056 = new JcicZ056();
 		JcicZ056Id iJcicZ056Id = new JcicZ056Id();

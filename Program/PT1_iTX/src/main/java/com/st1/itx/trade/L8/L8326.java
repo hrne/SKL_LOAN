@@ -16,6 +16,7 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ440;
 import com.st1.itx.db.domain.JcicZ440Id;
 /* DB容器 */
@@ -25,6 +26,7 @@ import com.st1.itx.db.domain.JcicZ446Log;
 import com.st1.itx.db.domain.JcicZ447;
 import com.st1.itx.db.domain.JcicZ447Id;
 import com.st1.itx.db.domain.JcicZ451;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ446LogService;
 
@@ -48,6 +50,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8326 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ440Service sJcicZ440Service;
 	@Autowired
@@ -77,6 +81,12 @@ public class L8326 extends TradeBuffer {
 		String iCloseCode = titaVo.getParam("CloseCode").trim();
 		int iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
 		String[] acceptCloseCode = { "00", "01", "90", "99" };// 報送「'447':金融機構無擔保債務協議資料」後，可接受的「結案原因代號」
 

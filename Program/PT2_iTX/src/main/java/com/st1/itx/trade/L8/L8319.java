@@ -15,6 +15,7 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ042;
 import com.st1.itx.db.domain.JcicZ046;
 import com.st1.itx.db.domain.JcicZ054;
@@ -24,6 +25,7 @@ import com.st1.itx.db.domain.JcicZ060Id;
 import com.st1.itx.db.domain.JcicZ061;
 import com.st1.itx.db.domain.JcicZ061Id;
 import com.st1.itx.db.domain.JcicZ061Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ042Service;
 import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ054Service;
@@ -46,6 +48,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8319 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ042Service sJcicZ042Service;
 	@Autowired
@@ -81,6 +85,12 @@ public class L8319 extends TradeBuffer {
 		String iIsGuarantor = titaVo.getParam("IsGuarantor").trim();
 		String iIsChangePayment = titaVo.getParam("IsChangePayment").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ061, JcicZ042, JcicZ046, JcicZ052, JcicZ054, JcicZ060
 		JcicZ061 iJcicZ061 = new JcicZ061();
 		JcicZ061Id iJcicZ061Id = new JcicZ061Id();

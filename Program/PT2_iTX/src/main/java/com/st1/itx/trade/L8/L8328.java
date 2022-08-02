@@ -16,12 +16,14 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ446Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ448;
 import com.st1.itx.db.domain.JcicZ448Id;
 import com.st1.itx.db.domain.JcicZ448Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ446Service;
 import com.st1.itx.db.service.JcicZ448LogService;
 /*DB服務*/
@@ -41,6 +43,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8328 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ446Service sJcicZ446Service;
 	@Autowired
@@ -69,6 +73,12 @@ public class L8328 extends TradeBuffer {
 		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage").trim());
 		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ448
 		JcicZ448 iJcicZ448 = new JcicZ448();
 		JcicZ448Id iJcicZ448Id = new JcicZ448Id();

@@ -17,6 +17,7 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ047;
 import com.st1.itx.db.domain.JcicZ047Id;
 
@@ -24,6 +25,7 @@ import com.st1.itx.db.domain.JcicZ047Id;
 import com.st1.itx.db.domain.JcicZ049;
 import com.st1.itx.db.domain.JcicZ049Id;
 import com.st1.itx.db.domain.JcicZ049Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ049LogService;
 /*DB服務*/
@@ -44,6 +46,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8310 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ047Service sJcicZ047Service;
 	@Autowired
@@ -74,6 +78,12 @@ public class L8310 extends TradeBuffer {
 		String iApprove = titaVo.getParam("Approve").trim();
 		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ049, JcicZ047
 		JcicZ049 iJcicZ049 = new JcicZ049();
 		JcicZ049Id iJcicZ049Id = new JcicZ049Id();

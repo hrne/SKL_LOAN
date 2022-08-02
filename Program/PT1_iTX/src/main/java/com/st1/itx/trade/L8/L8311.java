@@ -17,6 +17,7 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ046;
 import com.st1.itx.db.domain.JcicZ047;
 import com.st1.itx.db.domain.JcicZ047Id;
@@ -24,6 +25,7 @@ import com.st1.itx.db.domain.JcicZ047Id;
 import com.st1.itx.db.domain.JcicZ050;
 import com.st1.itx.db.domain.JcicZ050Id;
 import com.st1.itx.db.domain.JcicZ050Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ050LogService;
@@ -45,6 +47,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8311 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ046Service sJcicZ046Service;
 	@Autowired
@@ -75,6 +79,12 @@ public class L8311 extends TradeBuffer {
 		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM").trim())+191100;
 		String iStatus = titaVo.getParam("Status").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		int sPayAmt = iPayAmt;// 該IDN所有已報送本檔案資料之第8欄繳款金額之合計
 
 		// JcicZ050, JcicZ046, JcicZ047

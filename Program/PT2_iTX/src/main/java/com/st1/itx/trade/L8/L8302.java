@@ -17,12 +17,14 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.JcicZ040Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ041;
 import com.st1.itx.db.domain.JcicZ041Id;
 import com.st1.itx.db.domain.JcicZ041Log;
+import com.st1.itx.db.service.CustMainService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ041Service;
@@ -43,6 +45,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8302 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
 	@Autowired
@@ -68,6 +72,12 @@ public class L8302 extends TradeBuffer {
 		int iNegoStartDate = Integer.valueOf(titaVo.getParam("NegoStartDate").trim());
 		int iNonFinClaimAmt = Integer.valueOf(titaVo.getParam("NonFinClaimAmt").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ041, JcicZ040
 		JcicZ041 iJcicZ041 = new JcicZ041();
 		JcicZ041Id iJcicZ041Id = new JcicZ041Id();
@@ -203,7 +213,7 @@ public class L8302 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0412, uJcicZ0412);
-			iDataLog.exec("L8301刪除", uJcicZ0412.getSubmitKey()+uJcicZ0412.getCustId()+uJcicZ0412.getRcDate());
+			iDataLog.exec("L8302刪除", uJcicZ0412.getSubmitKey()+uJcicZ0412.getCustId()+uJcicZ0412.getRcDate());
 		    default:
 			break;
 		}
