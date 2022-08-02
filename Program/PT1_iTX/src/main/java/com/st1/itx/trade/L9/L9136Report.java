@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L9;
 
-import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,8 +76,8 @@ public class L9136Report extends MakeReport {
 		this.print(-7, 86, "押品號碼");
 		this.print(-7, 100, "更正項目");
 		this.print(-7, 119, "更  改  前  內  容");
-		this.print(-7, 149, "更  改  後  內  容");
-		this.print(-7, 175, "經辦");
+		this.print(-7, 148, "更  改  後  內  容");
+		this.print(-7, 177, "經辦");
 		this.print(-7, 186, "授權主管");
 		this.print(-7, 200, "備註");
 		this.print(-8, 1, divider);
@@ -200,7 +199,7 @@ public class L9136Report extends MakeReport {
 			this.print(-45, this.getMidXAxis(), this.endText, "C");
 		}
 
-		if (l9136List == null  && l9136List2 == null ) {
+		if (l9136List == null && l9136List2 == null) {
 			this.print(1, 1, "本日無資料");
 		}
 
@@ -260,34 +259,33 @@ public class L9136Report extends MakeReport {
 		this.print(0, 43, r.get("CustName").length() > 5 ? r.get("CustName").substring(0, 6) : r.get("CustName"));
 
 		// 核准號碼
-//		this.print(0, 55, "1122383");
 		this.print(0, 56, r.get("ApproveNo"));
 
 		// 押品別
-//		this.print(0, 66, 1 + "  " + 1 + "  " + "房地－住宅");
 		this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
 
 		// 押品號碼
 //		this.print(0, 87, "1705394");
 		this.print(0, 87, r.get("ClNo"));
 
-		tmpUpdateItem = tmpUpdateItem.trim();
-		tmpUpdateItem = tmpUpdateItem.length() > 8 ? tmpUpdateItem.substring(0, 8) : tmpUpdateItem;
-
 		// 更正項目
-		this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUp(tmpUpdateItem, 16, ".", "R"));
+		tmpUpdateItem = tmpUpdateItem.trim();
+		this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 16, ".", "R"));
 
 		// 更改前內容
-		this.print(0, 120,
-				tmpNewContent.trim().length() == 0 ? " "
-						: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
-								+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent);
+		String bfContent = tmpNewContent.trim().length() == 0 ? " "
+				: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
+						+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent;
+
+		this.print(0, 120, bfContent.length() == 0 ? " " : fillUpWord(bfContent, 24, " ", "R"));
 
 		// 更改後內容
-		this.print(0, 150, tmpNewContent.trim().length() == 0 ? " " : tmpNewContent);
+		String afContent = tmpNewContent.trim();
+		
+		this.print(0, 149, afContent.length() == 0 ? " " : fillUpWord(afContent, 24, " ", "R"));
 
 		// 經辦
-		this.print(0, 175, r.get("Name"));
+		this.print(0, 177, r.get("Name"));
 
 		// 授權主管
 		this.print(0, 186, supNoName);
@@ -296,27 +294,59 @@ public class L9136Report extends MakeReport {
 	}
 
 	/**
+	 * 文字內容處理
+	 * 
 	 * @param text 文字
-	 * @param all  滿額字數
-	 * @param word 要補滿的
-	 * @param pos  向左補齊(L)/向右補齊(R)
+	 * @param all  上限位數
+	 * @param word 要補滿的符號或文字(單字佳)
+	 * @param pos  向左補齊(L)/向右補齊(R) 
+	 * 如果文字字數大於上限位數 自動截斷
+	 *
 	 */
 
-	private String fillUp(String text, int all, String word, String pos) {
+	private String fillUpWord(String text, int allCount, String word, String pos) {
 
-		String str = text;
-		int num = 0;
-		int allnum = all;
-		try {
+		int[] num = new int[text.length()];
+		
+		String tmpText = "";
+		
+		for (int i = 0; i < num.length; i++) {
 
-			num = allnum - str.getBytes("gbk").length;
-//			System.out.println(str.getBytes("gbk").length);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			tmpText = text.substring(i, i + 1);
+			// 中文字數為2，非中文為1
+			if (tmpText.matches("[\\u4E00-\\u9FA5]+")) {
+				num[i] = 2;
+			} else {
+				num[i] = 1;
+			}
+
 		}
+
+		//計算用
+		int tmpAllCount = 0;
+		//截斷位置用
+		int tmpI = 0;
+		//最終文字數
+		int tmpHaveCount = 0;
+		
+		for (int i = 0; i < num.length; i++) {
+			tmpAllCount = tmpAllCount + num[i];
+			if (allCount >= tmpAllCount) {
+				tmpI = i;
+				tmpHaveCount = tmpAllCount;
+			}
+		}
+
+		
+		String str =  text.substring(0, tmpI + 1);
 		String lstr = "";
-		for (int i = 0; i < num; i++) {
+
+		// 總字數 減去 目前有的字數 = 空的字數
+		int emptyCount = 0;
+		emptyCount = allCount - tmpHaveCount;
+		
+		// 重新組合
+		for (int i = 0; i < emptyCount; i++) {
 			if (pos == "L") {
 				lstr += word;
 			} else {
@@ -324,11 +354,11 @@ public class L9136Report extends MakeReport {
 			}
 		}
 		if (pos == "L") {
-			lstr += text;
-			str = lstr;
+			str = lstr + text;
 		}
 
 		return str;
 	}
+
 
 }

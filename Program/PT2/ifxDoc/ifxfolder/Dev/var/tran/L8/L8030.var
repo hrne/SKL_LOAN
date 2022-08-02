@@ -232,6 +232,8 @@ T(3,1)ASGN(LOOP$)
 #OOCustId=X,10,L
 #OORcDate=D,7,S
 C(3,#OORcDate,0,S,$)
+E(0,#OOApplyDate,#OORcDate)
+
 
 #OOSubmitKey=X,3,S
 #OOSubmitKeyX=X,50,S
@@ -256,7 +258,7 @@ T(2,#OOMaxMainCode+ +#OOMaxMainCodeX)
 
 #OODelayYM=X,6,S
 
-#OOApplyDate=X,7,S
+#OOApplyDate=D,7,S
 
 #OOUkey=X,32,S
 
@@ -1051,6 +1053,8 @@ TXFORM=L8030
 {width:180,align:'center',hidden:false}
 #OOBTN27=當前異動紀錄
 {width:180,search:false,formatter:'cust:bind-button:#OOBTN27',align:'center',canExport:false}
+
+
 ^
 #RPTFG=T,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}

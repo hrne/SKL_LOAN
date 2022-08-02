@@ -1,0 +1,1 @@
+alter table "LoanBorTx" add "FeeAmt" DECIMAL(16,2) DEFAULT 0 NOT NULL;
