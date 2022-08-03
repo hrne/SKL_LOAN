@@ -149,7 +149,7 @@ BEGIN
                          , T.TRXNMT
               ORDER BY T.TRXAMT
              ) AS "Seq"
-      FROM TRXP_3037
+      FROM TRXP_3037 T
       LEFT JOIN LA$JLNP J ON J.TRXDAT = T.TRXDAT
                          AND J.TRXNMT = T.TRXNMT
       LEFT JOIN TB$LCDP L ON L.ACNACC = J.ACNACC
@@ -366,6 +366,11 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+             THEN 0 - JL."JLNAMT"
+           ELSE JL."JLNAMT"
+           END                            AS "FeeAmt"
     FROM TR
     LEFT JOIN "LA$TRXP" TR1 ON TR1."CUSBRH" = TR."CUSBRH"
                            AND TR1."TRXDAT" = TR."TRXDAT"

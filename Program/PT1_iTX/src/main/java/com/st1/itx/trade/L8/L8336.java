@@ -17,10 +17,12 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ574;
 import com.st1.itx.db.domain.JcicZ574Id;
 import com.st1.itx.db.domain.JcicZ574Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ574LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ574Service;
@@ -41,6 +43,8 @@ import com.st1.itx.util.data.DataLog;
 
 public class L8336 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ574Service sJcicZ574Service;
 	@Autowired
@@ -64,6 +68,12 @@ public class L8336 extends TradeBuffer {
 		String iCloseMark = titaVo.getParam("CloseMark").trim();
 		String iPhoneNo = titaVo.getParam("PhoneNo").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ574
 		JcicZ574 iJcicZ574 = new JcicZ574();
 		JcicZ574Id iJcicZ574Id = new JcicZ574Id();
@@ -121,7 +131,7 @@ public class L8336 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ574, uJcicZ574);
-			iDataLog.exec("L8336異動",uJcicZ574.getCustId()+uJcicZ574.getSubmitKey()+uJcicZ574.getApplyDate());
+			iDataLog.exec("L8336異動",uJcicZ574.getSubmitKey()+uJcicZ574.getCustId()+uJcicZ574.getApplyDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -168,7 +178,7 @@ public class L8336 extends TradeBuffer {
 			}
 			
 			iDataLog.setEnv(titaVo, oldJcicZ5742, uJcicZ5742);
-			iDataLog.exec("L8336刪除",uJcicZ5742.getCustId()+uJcicZ5742.getSubmitKey()+uJcicZ5742.getApplyDate());
+			iDataLog.exec("L8336刪除",uJcicZ5742.getSubmitKey()+uJcicZ5742.getCustId()+uJcicZ5742.getApplyDate());
 		default:
 			break;
 		}

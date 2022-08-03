@@ -14,10 +14,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
 import com.st1.itx.db.domain.JcicZ573Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ573LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ573Service;
@@ -36,6 +38,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8335 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ573Service sJcicZ573Service;
 	@Autowired
@@ -59,6 +63,12 @@ public class L8335 extends TradeBuffer {
 		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
 		int iTotalPayAmt = Integer.valueOf(titaVo.getParam("TotalPayAmt").trim());
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		// JcicZ573
 		JcicZ573 iJcicZ573 = new JcicZ573();
 		JcicZ573Id iJcicZ573Id = new JcicZ573Id();
@@ -143,7 +153,7 @@ public class L8335 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債務人繳款資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ573, uJcicZ573);
-			iDataLog.exec("L8335刪除",uJcicZ573.getSubmitKey()+uJcicZ573.getCustId()+uJcicZ573.getApplyDate()+uJcicZ573.getApplyDate()+uJcicZ573.getPayDate());
+			iDataLog.exec("L8335異動",uJcicZ573.getSubmitKey()+uJcicZ573.getCustId()+uJcicZ573.getApplyDate()+uJcicZ573.getPayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -189,7 +199,7 @@ public class L8335 extends TradeBuffer {
 			}
 			
 			iDataLog.setEnv(titaVo, oldJcicZ5732, uJcicZ5732);
-			iDataLog.exec("L8335刪除",uJcicZ5732.getSubmitKey()+uJcicZ5732.getCustId()+uJcicZ5732.getApplyDate()+uJcicZ5732.getApplyDate()+uJcicZ5732.getPayDate());
+			iDataLog.exec("L8335刪除",uJcicZ5732.getSubmitKey()+uJcicZ5732.getCustId()+uJcicZ5732.getApplyDate()+uJcicZ5732.getPayDate());
 		default:
 			break;
 		}

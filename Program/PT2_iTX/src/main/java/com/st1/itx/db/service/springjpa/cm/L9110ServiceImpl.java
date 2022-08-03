@@ -403,11 +403,13 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       || '-' ";
 		sql += "       || LPAD(L.\"LandNo2\",4,'0') ";
 		sql += "                               AS LandNo "; // -- F5 地號
-		sql += "     , L.\"Area\"              AS Area "; // -- F6 面積
+		sql += "     , NVL(L.\"Area\",0)              AS Area "; // -- F6 面積
 		sql += "     , L.\"TransferedYear\"    AS TransferedYear "; // -- F7 年度
 		sql += "     , L.\"LastTransferedAmt\" AS LastTransferedAmt "; // -- F8 前次移轉
 		sql += "     , L.\"EvaUnitPrice\"      AS EvaUnitPrice "; // -- F9 鑑定單價
 		sql += "     , CLI.\"SettingAmt\"      AS SettingAmt "; // -- F10設定
+		sql += "     , NVL(LO.\"OwnerPart\",0)            AS OwnerPart "; // -- F11 持份比例
+		sql += "     , NVL(LO.\"OwnerTotal\",0)            AS OwnerTotal "; // -- F12 持份總比例
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
@@ -417,6 +419,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 , LO.\"ClCode2\"";
 		sql += "                 , LO.\"ClNo\"";
 		sql += "                 , LO.\"LandSeq\"";
+		sql += "                 , LO.\"OwnerPart\"";
+		sql += "                 , LO.\"OwnerTotal\"";
 		sql += "            FROM \"ClLandOwner\" LO ";
 		sql += "            LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = LO.\"OwnerCustUKey\"";
 		sql += "           ) LO ON LO.\"ClCode1\" = L.\"ClCode1\"";
@@ -534,7 +538,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
 //		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
 		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',PROD.\"BreachCode\")) ";
-		sql += "        ELSE FAC.\"BreachDescription\" ";
+		sql += "        ELSE TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',FAC.\"BreachCode\")) ";
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F42違約適用方式 ";
 		sql += "      , \"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0)           AS F43團體戶名 "; // 法人不出
@@ -564,6 +568,18 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , NVL(LBM.\"LoanBal\",0)         AS F55本戶目前總額 ";
 		sql += "      , \"Fn_GetCdCode\"('RuleCode',FAC.\"RuleCode\") ";
 		sql += "                                       AS F56規定管制代碼 ";
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
+		sql += "          THEN TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',PROD.\"BreachGetCode\")) ";
+		sql += "        ELSE TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',FAC.\"BreachGetCode\")) ";
+		sql += "        END                            AS F57違約金收取方式 ";
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
+//		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
+		sql += "          THEN PROD.\"BreachCode\" ";
+		sql += "        ELSE FAC.\"BreachCode\" ";
+//		sql += "        ELSE NULL ";
+		sql += "        END                            AS F58違約適用方式 ";
 		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // 客戶資料主檔
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // 額度主檔
@@ -594,7 +610,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 Query(股票)
 		String sql = "";
-		sql += " SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(\"Fn_ParseEOL\"(CM.\"CustName\", 0),0,15),' ') AS \"Owner\" "; // F0 股票持有人
+		sql += " SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(\"Fn_ParseEOL\"(CM.\"CustName\", 0),0,15),' ') AS \"Owner\" "; // F0
+																															// 股票持有人
 		sql += "      , CS.\"SettingBalance\" "; // F1 設質股數餘額
 		sql += "      , CS.\"SettingBalance\" ";
 		sql += "        * CS.\"ParValue\" AS \"TotalParValue\" "; // F2 面額合計
