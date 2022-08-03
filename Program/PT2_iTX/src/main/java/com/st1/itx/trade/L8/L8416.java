@@ -91,7 +91,6 @@ public class L8416 extends TradeBuffer {
 		JcicZ053 uJcicZ053 = new JcicZ053();
 		JcicZ053 oldJcicZ053 = new JcicZ053();
 		iJcicZ053 = sJcicZ053Service.findAll(0,Integer.MAX_VALUE, titaVo);
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		for (JcicZ053 iiJcicZ053 : iJcicZ053) {
 			if (iiJcicZ053.getOutJcicTxtDate() == iJcicDate) {
 				count++;
@@ -103,10 +102,11 @@ public class L8416 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 				}
-				CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+                JcicZ053Log iJcicZ053Log = sJcicZ053LogService.ukeyFirst(uJcicZ053.getUkey(), titaVo);
+				JcicZ053 cJcicZ053 = sJcicZ053Service.ukeyFirst(uJcicZ053.getUkey(), titaVo);
+				CustMain tCustMain = sCustMainService.custIdFirst(cJcicZ053.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
-				titaVo.putParam("CustNo", iCustNo);
-				JcicZ053Log iJcicZ053Log = sJcicZ053LogService.ukeyFirst(uJcicZ053.getUkey(), titaVo);
+				titaVo.putParam("CustNo", iCustNo);			
 				iDataLog.setEnv(titaVo, oldJcicZ053, uJcicZ053);
 				iDataLog.exec("L8416取消報送",iJcicZ053Log.getUkey()+iJcicZ053Log.getTxSeq());
 			}

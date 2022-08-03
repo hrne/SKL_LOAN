@@ -538,7 +538,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
 //		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
 		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',PROD.\"BreachCode\")) ";
-		sql += "        ELSE TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',FAC.\"BreachCode\")) ";
+		sql += "        ELSE FAC.\"BreachDescription\" ";
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F42違約適用方式 ";
 		sql += "      , \"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0)           AS F43團體戶名 "; // 法人不出
@@ -571,13 +571,13 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
 		sql += "          THEN TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',PROD.\"BreachGetCode\")) ";
-		sql += "        ELSE TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',FAC.\"BreachGetCode\")) ";
+		sql += "        ELSE '' ";
 		sql += "        END                            AS F57違約金收取方式 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
 //		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
 		sql += "          THEN PROD.\"BreachCode\" ";
-		sql += "        ELSE FAC.\"BreachCode\" ";
+		sql += "        ELSE '' ";
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F58違約適用方式 ";
 		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";

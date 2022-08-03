@@ -3,6 +3,7 @@ package com.st1.itx.trade.LY;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,9 @@ public class LY003Report extends MakeReport {
 			
 			lY003List = lY003ServiceImpl.findAll2(titaVo, endOfYearMonth);
 			reportExcel14_2(lY003List);
+			
+			lY003List = lY003ServiceImpl.findAll3(titaVo, endOfYearMonth);
+			reportExcelA142(lY003List);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -247,5 +251,58 @@ public class LY003Report extends MakeReport {
 		makeExcel.formulaCaculate(77, 4);
 	}
 
+	private void reportExcelA142(List<Map<String, String>> listData) throws LogicException {
+
+		this.info("reportExcelA142 ");
+
+		makeExcel.setSheet("A142放款餘額彙總表");
+
+		
+		int col = 0;
+		int row = 0;
+
+		String type = "";
+		int kind = 0;
+		BigDecimal amount = BigDecimal.ZERO;
+
+		for (Map<String, String> r : listData) {
+			type = r.get("F0");
+			kind = Integer.valueOf(r.get("F1"));
+			amount = new BigDecimal(r.get("F2"));
+			this.info("type=" + type);
+			this.info("kind=" + kind);
+			this.info("amount=" + amount);
+			switch (type) {
+			case "A":
+				row = 8;
+				break;
+			case "B":
+				row = 9;
+				break;
+			case "C":
+				row = 10;
+				break;
+			case "D":
+				row = 11;
+				break;
+			case "Z":
+				row = 12;
+				break;
+			case "ZZ":
+				row = 13;
+				break;
+			default:
+				break;
+			}
+
+		col = kind + 5;
+
+
+		makeExcel.setValue(row, col, amount, "#,##0");
+		}
+		
+		
+
+	}
 
 }

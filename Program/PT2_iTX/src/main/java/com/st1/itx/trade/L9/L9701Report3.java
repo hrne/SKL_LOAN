@@ -58,7 +58,7 @@ public class L9701Report3 extends MakeReport {
 
 		this.setFontSize(9);
 
-		this.print(-2, this.getMidXAxis(), "客 戶 往 來 本 息 明 細 表", "C");
+		this.print(-2, this.getMidXAxis(), "客 戶 往 來 交 易 明 細 表", "C");
 
 		this.print(-3, this.getMidXAxis(), showRocDate(this.titaVo.get("ENTDY"), 0), "C");
 
@@ -163,7 +163,7 @@ public class L9701Report3 extends MakeReport {
 
 		int detailCounts = 0;
 
-		String tradeReportName = "客戶往來本息明細表";
+		String tradeReportName = "客戶往來交易明細表";
 
 		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", tradeReportName, "", "A4", "L");
 

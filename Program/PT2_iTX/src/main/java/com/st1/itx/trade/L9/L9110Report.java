@@ -564,10 +564,8 @@ public class L9110Report extends MakeReport {
 			CdEmp tCdEmp = sCdEmpService.findById(tL9110.get("F9"), titaVo);
 			if (tCdEmp != null) {
 				if (employeeCom.isDay15Salary(tCdEmp, titaVo)) {
-
 					this.print(0, 50, "15 日薪 ...... " + "十五日薪");
 				} else {
-
 					this.print(0, 50, "15 日薪 ...... " + "非十五日薪");
 				}
 			} else {
@@ -649,7 +647,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 105, "徵信姓名 ..... " + tL9110.get("F52"));
 			this.print(0, 135, "授信姓名 ..... " + tL9110.get("F53"));
 			// 違約適用方式
-			if (tL9110.get("F58").isEmpty()) {
+			if (tL9110.get("F42").isEmpty()) {
 				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
 				this.print(1, 5, "違約適用方式 . " + tL9110.get("F58") + " " + tL9110.get("F42"));

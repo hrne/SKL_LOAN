@@ -34,22 +34,16 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8403 extends TradeBuffer {
-	
 	@Autowired
 	public DataLog iDataLog;
-
 	@Autowired
 	public L8403File iL8403File;
-	
 	@Autowired
 	public CustMainService sCustMainService;
-
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
-	
 	@Autowired
 	public JcicZ040LogService sJcicZ040LogService;
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
@@ -93,7 +87,6 @@ public class L8403 extends TradeBuffer {
 		JcicZ040 uJcicZ040 = new JcicZ040();
 		JcicZ040 oldJcicZ040 = new JcicZ040();
 		iJcicZ040 = sJcicZ040Service.findAll(0,Integer.MAX_VALUE, titaVo);
-		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		for (JcicZ040 iiJcicZ040 : iJcicZ040) {
 			if (iiJcicZ040.getOutJcicTxtDate() == iJcicDate) {
 				count++;
@@ -105,16 +98,15 @@ public class L8403 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 				}
-				CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+				JcicZ040Log iJcicZ040Log = sJcicZ040LogService.ukeyFirst(uJcicZ040.getUkey(), titaVo);
+				JcicZ040 cJcicZ040 = sJcicZ040Service.ukeyFirst(uJcicZ040.getUkey(), titaVo);
+				CustMain tCustMain = sCustMainService.custIdFirst(cJcicZ040.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
-				this.info("CustNo   = " + iCustNo);
-				JcicZ040Log iJcicZ040Log = sJcicZ040LogService.ukeyFirst(uJcicZ040.getUkey(), titaVo);
 				iDataLog.setEnv(titaVo, oldJcicZ040, uJcicZ040);
 				iDataLog.exec("L8403取消報送",iJcicZ040Log.getUkey()+iJcicZ040Log.getTxSeq());
 			}
-		}
-		
+		}	
 		if (count == 0) {
 			throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 		}
