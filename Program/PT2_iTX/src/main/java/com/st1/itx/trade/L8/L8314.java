@@ -38,8 +38,6 @@ import com.st1.itx.util.data.DataLog;
 @Service("L8314")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Mata
  * @version 1.0.0
  */

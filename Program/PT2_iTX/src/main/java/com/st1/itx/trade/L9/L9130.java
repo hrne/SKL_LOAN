@@ -38,6 +38,10 @@ public class L9130 extends TradeBuffer {
 	L9133 tranL9133;
 	@Autowired
 	L9134 tranL9134;
+	@Autowired
+	L9135 tranL9135;
+	@Autowired
+	L9136 tranL9136;
 
 	@Autowired
 	WebClient webClient;
@@ -168,6 +172,8 @@ public class L9130 extends TradeBuffer {
 
 		titaVo.putParam("StartDate", iAcDate);
 		titaVo.putParam("EndDate", iAcDate);
+		
+		
 		try {
 			tranL9134.run(titaVo);
 		} catch (Exception e) {
@@ -175,6 +181,23 @@ public class L9130 extends TradeBuffer {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9130產生L9134暫收款傳票金額表時發生錯誤 = " + errors.toString());
 		}
+		//2022/08/03 Ted新增 L9135 L9136
+		try {
+			tranL9135.run(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130產生L9135銀行存款媒體明細表(總帳)時發生錯誤 = " + errors.toString());
+		}
+		
+		try {
+			tranL9136.run(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("L9130產生L9136檔案資料變更日報表時發生錯誤 = " + errors.toString());
+		}
+
 
 		this.addList(this.totaVo);
 		return this.sendList();

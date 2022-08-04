@@ -17,12 +17,14 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ570;
 import com.st1.itx.db.domain.JcicZ570Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ575;
 import com.st1.itx.db.domain.JcicZ575Id;
 import com.st1.itx.db.domain.JcicZ575Log;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ570Service;
 import com.st1.itx.db.service.JcicZ575LogService;
 /*DB服務*/
@@ -37,13 +39,13 @@ import com.st1.itx.util.data.DataLog;
 @Service("L8337")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Fegie
  * @version 1.0.0
  */
 public class L8337 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
 	@Autowired
 	public JcicZ570Service sJcicZ570Service;
 	@Autowired
@@ -70,6 +72,12 @@ public class L8337 extends TradeBuffer {
 		String iModifyType = titaVo.getParam("ModifyType").trim();
 		String iBankId = titaVo.getParam("BankId").trim();
 		String iKey = "";
+		
+		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+		titaVo.putParam("CustNo", iCustNo);
+		this.info("CustNo   = " + iCustNo);
+		
 		this.info("iApplyDate"   + iApplyDate);
 		this.info("iBankId"     + iBankId);
 		this.info("iCustId"    + iCustId);

@@ -43,8 +43,6 @@ import com.st1.itx.util.date.DateUtil;
 @Service("L8307")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Mata
  * @version 1.0.0
  */

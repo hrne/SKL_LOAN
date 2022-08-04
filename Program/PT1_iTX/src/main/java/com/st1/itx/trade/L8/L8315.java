@@ -35,8 +35,6 @@ import com.st1.itx.util.data.DataLog;
 @Service("L8315")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Mata
  * @version 1.0.0
  */
@@ -173,7 +171,6 @@ public class L8315 extends TradeBuffer {
 		default:
 			break;
 		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -31,8 +31,6 @@ import com.st1.itx.util.data.DataLog;
 @Service("L8335")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Fegie / Mata
  * @version 1.0.0
  */

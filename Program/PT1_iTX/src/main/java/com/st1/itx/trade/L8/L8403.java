@@ -34,6 +34,7 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8403 extends TradeBuffer {
+	
 	@Autowired
 	public DataLog iDataLog;
 	@Autowired

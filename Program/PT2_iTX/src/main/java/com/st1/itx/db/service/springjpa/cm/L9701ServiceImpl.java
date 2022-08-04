@@ -26,6 +26,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	
+	/**
+	 * 客戶往來本息明細表（撥款）
+	 * 
+	 * */
 	public List<Map<String, String>> doQuery1(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
@@ -37,7 +42,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT T.\"CustNo\"";
 		sql += "            ,T.\"FacmNo\"";
 		sql += "            ,T.\"EntryDate\"";
-		sql += "            ,T.\"Amount\"";
+		sql += "            ,NVL(T.\"Amount\",0) AS \"Amount\"";
 		sql += "            ,T.\"IntStartDate\"";
 		sql += "            ,T.\"IntEndDate\"";
 		sql += "            ,T.\"Rate\"";
@@ -157,6 +162,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	
+	/**
+	 * 客戶往來本息明細表（額度）
+	 * 
+	 * */
 	public List<Map<String, String>> doQuery2(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
@@ -169,7 +179,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"FacmNo\"";
 		sql += "            ,LPAD(T.\"BormNo\",3,0) AS \"BormNo\"";
 		sql += "            ,T.\"EntryDate\"";
-		sql += "            ,T.\"Amount\"";
+		sql += "            ,NVL(T.\"Amount\",0) AS \"Amount\"";
 		sql += "            ,T.\"IntStartDate\"";
 		sql += "            ,T.\"IntEndDate\"";
 		sql += "            ,T.\"Rate\"";
@@ -298,6 +308,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	
+	/**
+	 * 客戶往來交易細表
+	 * 
+	 * */
 	public List<Map<String, String>> doQuery3(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
@@ -309,7 +324,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT T.\"CustNo\"";
 		sql += "            ,T.\"FacmNo\"";
 		sql += "            ,LPAD(T.\"BormNo\",3,0) AS \"BormNo\"";
-		sql += "            ,T.\"Amount\"";
+		sql += "            ,NVL(T.\"Amount\",0) AS \"Amount\"";
 		sql += "            ,T.\"EntryDate\"";
 		sql += "            ,T.\"Principal\"";
 		sql += "            ,T.\"Interest\"";

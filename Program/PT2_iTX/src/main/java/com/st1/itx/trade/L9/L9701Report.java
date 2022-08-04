@@ -57,7 +57,7 @@ public class L9701Report extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.setFontSize(9);
+		this.setFontSize(8);
 
 		this.print(-2, this.getMidXAxis(), "客 戶 往 來 本 息 明 細 表", "C");
 
@@ -96,6 +96,7 @@ public class L9701Report extends MakeReport {
 		if (this.NowRow >= 35) {
 			// 若剩餘行數不足5行,先換頁
 			this.newPage(); // 換頁時會印表頭
+			this.print(1, 1, " ");
 		} else {
 
 			String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));

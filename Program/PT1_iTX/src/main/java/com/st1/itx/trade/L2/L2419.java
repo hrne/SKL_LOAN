@@ -63,6 +63,7 @@ import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.StaticTool;
+import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.MakeExcel;
@@ -139,6 +140,8 @@ public class L2419 extends TradeBuffer {
 	CdLandSectionService sCdLandSectionService;
 	@Autowired
 	public InsuOrignalService insuOrignalService;
+	@Autowired
+	public ClFacCom clFacCom;
 
 	private HashMap<String, String> ownerids = new HashMap<String, String>();
 	private HashMap<String, String> items = new HashMap<String, String>();
@@ -426,7 +429,8 @@ public class L2419 extends TradeBuffer {
 //					+ Math.round(toNumeric(makeExcel.getValue(row, 15).toString()) * 100) + "/"
 //					+ (float) (Math.round(toNumeric(makeExcel.getValue(row, 15).toString()) * 100) / 100));
 			// 面積
-			//double floorArea = Math.round(toNumeric(makeExcel.getValue(row, 20).toString()) * 100);
+			// double floorArea = Math.round(toNumeric(makeExcel.getValue(row,
+			// 20).toString()) * 100);
 			String value20 = makeExcel.getValue(row, 20).toString();
 			BigDecimal floorArea = new BigDecimal(value20);
 			floorArea = floorArea.multiply(new BigDecimal(100));
@@ -435,7 +439,8 @@ public class L2419 extends TradeBuffer {
 			}
 			occursList.putParam("FloorArea", floorArea.divide(new BigDecimal(100)));
 			// 鑑估單價
-			//double unitPrice = Math.round(toNumeric(makeExcel.getValue(row, 21).toString()));
+			// double unitPrice = Math.round(toNumeric(makeExcel.getValue(row,
+			// 21).toString()));
 			String value21 = makeExcel.getValue(row, 21).toString();
 			BigDecimal unitPrice = new BigDecimal(value21);
 			unitPrice = unitPrice.setScale(0, RoundingMode.HALF_UP);
@@ -444,7 +449,8 @@ public class L2419 extends TradeBuffer {
 			}
 			occursList.putParam("UnitPrice", unitPrice);
 			// 鑑估總價
-			//double evaAmt = Math.round(toNumeric(makeExcel.getValue(row, 22).toString()));
+			// double evaAmt = Math.round(toNumeric(makeExcel.getValue(row,
+			// 22).toString()));
 			String value22 = makeExcel.getValue(row, 22).toString();
 			BigDecimal evaAmt = new BigDecimal(value22);
 			evaAmt = evaAmt.setScale(0, RoundingMode.HALF_UP);
@@ -453,19 +459,22 @@ public class L2419 extends TradeBuffer {
 			}
 			occursList.putParam("EvaAmt", evaAmt);
 			// 增值稅
-			//occursList.putParam("Tax", Math.round(toNumeric(makeExcel.getValue(row, 23).toString())));
+			// occursList.putParam("Tax", Math.round(toNumeric(makeExcel.getValue(row,
+			// 23).toString())));
 			String value23 = makeExcel.getValue(row, 23).toString();
 			BigDecimal tax = new BigDecimal(value23);
 			tax = tax.setScale(0, RoundingMode.HALF_UP);
-			occursList.putParam("Tax",tax);
+			occursList.putParam("Tax", tax);
 			// 淨值
-			//occursList.putParam("NetWorth", Math.round(toNumeric(makeExcel.getValue(row, 24).toString())));
+			// occursList.putParam("NetWorth", Math.round(toNumeric(makeExcel.getValue(row,
+			// 24).toString())));
 			String value24 = makeExcel.getValue(row, 24).toString();
 			BigDecimal netWorth = new BigDecimal(value24);
 			netWorth = netWorth.setScale(0, RoundingMode.HALF_UP);
 			occursList.putParam("NetWorth", netWorth);
 			// 貸放成數
-			//double c = Math.round(toNumeric(makeExcel.getValue(row, 27).toString()) * 10000);
+			// double c = Math.round(toNumeric(makeExcel.getValue(row, 27).toString()) *
+			// 10000);
 			String value27 = makeExcel.getValue(row, 27).toString();
 			BigDecimal loanToValue = new BigDecimal(value27);
 			loanToValue = loanToValue.multiply(new BigDecimal(10000));
@@ -499,11 +508,12 @@ public class L2419 extends TradeBuffer {
 							}
 							BigDecimal part = new BigDecimal(s[3]);
 							BigDecimal total = new BigDecimal(s[4]);
-							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0 || part.compareTo(total) > 0) {
+							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0
+									|| part.compareTo(total) > 0) {
 								throw new LogicException("E0015",
 										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
-							rate = part.divide(total,4,RoundingMode.HALF_UP).add(rate);  //rate += part / total;
+							rate = part.divide(total, 4, RoundingMode.HALF_UP).add(rate); // rate += part / total;
 						}
 					} else {
 						if (s.length < 3) {
@@ -522,16 +532,17 @@ public class L2419 extends TradeBuffer {
 								throw new LogicException("E0015",
 										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
-							//double part = toNumeric(s[3]);
-							//double total = toNumeric(s[4]);
-							//if (part == 0 || total == 0 || part > total) {
+							// double part = toNumeric(s[3]);
+							// double total = toNumeric(s[4]);
+							// if (part == 0 || total == 0 || part > total) {
 							BigDecimal part = new BigDecimal(s[3]);
 							BigDecimal total = new BigDecimal(s[4]);
-							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0 || part.compareTo(total) > 0) {
-							throw new LogicException("E0015",
+							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0
+									|| part.compareTo(total) > 0) {
+								throw new LogicException("E0015",
 										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
-							rate = part.divide(total,4,RoundingMode.HALF_UP).add(rate);  //rate += part / total;
+							rate = part.divide(total, 4, RoundingMode.HALF_UP).add(rate); // rate += part / total;
 						}
 					}
 				}
@@ -1067,6 +1078,9 @@ public class L2419 extends TradeBuffer {
 				throw new LogicException("E0007", "擔保品與額度關聯檔(ClFac)" + e.getErrorMsg());
 			}
 		}
+
+		// 額度與擔保品關聯檔變動處理
+		clFacCom.changeClFac(applNo, titaVo);
 
 		this.totaVo.putParam("ClCode1", clCode1);
 		this.totaVo.putParam("ClCode2", clCode2);

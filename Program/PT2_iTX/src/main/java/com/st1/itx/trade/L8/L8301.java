@@ -102,9 +102,7 @@ public class L8301 extends TradeBuffer {
 		iJcicZ040Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ040Id.setRcDate(iRcDate);
 		JcicZ040 chJcicZ040 = new JcicZ040();
-
-		
-		
+	
 		// 檢核項目(D-3)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.3 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退

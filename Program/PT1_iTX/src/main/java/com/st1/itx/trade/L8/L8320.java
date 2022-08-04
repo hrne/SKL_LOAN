@@ -39,8 +39,6 @@ import com.st1.itx.util.date.DateUtil;
 @Service("L8320")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Luisito
  * @version 1.0.0
  */

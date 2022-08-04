@@ -37,8 +37,6 @@ import com.st1.itx.util.data.DataLog;
 @Service("L8318")
 @Scope("prototype")
 /**
- * 
- * 
  * @author Luisito
  * @version 1.0.0
  */

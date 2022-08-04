@@ -32,6 +32,7 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8439 extends TradeBuffer {
+	
 	@Autowired
 	public DataLog iDataLog;
 	@Autowired
@@ -42,6 +43,7 @@ public class L8439 extends TradeBuffer {
 	public JcicZ575Service sJcicZ575Service;
 	@Autowired
 	public JcicZ575LogService sJcicZ575LogService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");

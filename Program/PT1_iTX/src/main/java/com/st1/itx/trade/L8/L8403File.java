@@ -95,7 +95,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Scope("prototype")
 
 public class L8403File extends MakeFile {
-
 	@Autowired
 	public DataLog iDataLog;
 	@Autowired
