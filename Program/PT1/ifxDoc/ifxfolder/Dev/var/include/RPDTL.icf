@@ -66,6 +66,10 @@
 ! 回收金額(8:抽退票 第一筆)
 #RPAMTZ=m,14,S
 
+! 累溢收
+#RP_EXCESSIVE=m,14.2,S
+
+
 ! 可短收金額
 ! #RPSHORTAMT=m,14,S
 
@@ -167,6 +171,15 @@
 
 ! 附言
 #RP_MEMO=X,100,S
+
+! 指定暫收額度
+#RP_TMPFACMNO=A,3,S
+
+! 暫收指定額度
+#RP_TMPFACMNOX=X,50,S
+
+!交易代號
+#RP_TXCD=X,5,S
 
 #RPTOTBAL=m,14,S
 ! ----------7:暫收轉帳，需輸入----------
@@ -374,6 +387,8 @@ IF(#RPFG==4||#RPFG==5||#RPFG==7||#RPFG==8,CALL(#RPTOT_CAL{i}),s)
 ! RPTOTF=0 隱藏
 #RPTOT_CAL{i}=@,1,S
 C(3,#RP_IND,0,s,$)
+IF({z}==0,E(3,@RPTOTF0,#RPTOT),$)
+IF({z}==0,E(0,@RPTOTF{z},#RPTOTF0-#RP_EXCESSIVE),$)
 E(3,@RPTOTF{i},#RPTOTF{z}-#RpAmt{i})
 E(3,@RPTOTF,#RPTOTF{i})
 ! E(3,@RPTOTS{i},#RPTOTF{i}-#RpShortAmts)
@@ -418,6 +433,7 @@ E(0,@OverRpAmt,#RPTOTF)
 ! 計算金額
 #RPTOTBALX{i}=@,1,S
 E(0,@RPTOTBAL,#RPTOT)
+E(0,@RPTOTBAL,#RPTOTBAL-#RP_EXCESSIVE)
 IF({i}==1,E(0,@RPTOTF,#RPTOTBAL),$)
 IF({i}==2,E(0,@RPTOTF,#RPTOTBAL-#RpAmt1),$)
 IF({i}==3,E(0,@RPTOTF,#RPTOTBAL-#RpAmt1-#RpAmt2),$)
@@ -531,12 +547,12 @@ IF(#RPFG==7,IF(#RPTOTF{z}>0,INVOKEJS(SHOW,grd9_{i},1)CALL(#COL_DIS_CALL{i}),INVO
 V(1,90,91))
 
 ! #BIND_GRD_A瀏覽按鈕帶入值
-#BUF_GRD_A{i}=X,44,S
+#BUF_GRD_A{i}=X,97,S
 SWITCH(#RpCode{i},
 91,
 T(2,10H+   +0000+TWD+                  +#RpCustNo1+000+TRO),
 90,
-T(2,10H+   +0000+TWD+                  +#RpCustNo1+000+TAV))
+T(2,10H+   +0000+TWD+                  +#RpCustNo1+000+TAV+#RP_TXCD+#RP_TMPFACMNO+#RP_TMPFACMNOX))
 
 #BIND_GRD_A{i}=X,1,S
 BIND(#BTN_GRD_A{i},click, {cmd=CHAIN; ntxcd=L6907; ntxbuf=#BUF_GRD_A{i};ntxbuf5=type<-1:RpFacmNo{i}<-OOFacmNo:RpAmt{i}<-OORvBal1})
@@ -629,7 +645,9 @@ T(2,金額不可高於+#RpXtypeRpTotF{i})
 ! 90不可溢繳款
 #RpAmt{i}=m,14,I
 C(3,#RP_IND,0,s,$)
-C(3,#RpCode{i},90,IF(#RpAmt{i}>#RPTOTF{z},E(0,@RpAmt{i},#RPTOTF{z}),$),$)
+C(3,#RpCode{i},90,C(1,#RpAmt{i},CALL(#RPTOT_CAL{i}),CALL(#RPTOT_CAL{i}),INVOKEJS(SHOW,grd9_1,1)),$)
+C(3,#RpCode{i},90,C(1,#RPTOTF{i},s,s,$),$)
+C(3,#RpCode{i},90,C(1,#RpAmt{i},E(0,0),E(0,0),$),$)
 IF(#DF1=={i},INVOKEJS(SHOW,grd9_{i},1),
 IF(#GRD_SKFG{i}==1&&#RpAmt{z}>0&&#RPTOTF{z}>0,
      IF(#RPFG==1,E(0,@RpCode{i},90),$)

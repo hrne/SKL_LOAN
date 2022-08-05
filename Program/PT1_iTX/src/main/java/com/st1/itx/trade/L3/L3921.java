@@ -16,7 +16,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
@@ -34,19 +36,6 @@ import com.st1.itx.util.parse.Parse;
  * a.此功能供回收期款前試算其應回收之本金，利息及違約金等。
  * b.撥款序號如未輸入，則該額度下各筆撥款均列入計算;額度編號如未輸入，則該戶號下各筆撥款均列入計算。
  */
-/*
- * Tita
- * TimCustNo=9,7
- * CustId=X,10
- * ApplNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * CurrencyCode=X,3
- * TimExtraRepay=9,14.2
- * IncludeIntFlag=X,1
- * RepayTerms=9,2
- * EntryDate=9,7
- */
 
 /**
  * L3921 回收試算
@@ -61,6 +50,8 @@ public class L3921 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	public LoanFacTmpService loanFacTmpService;
 
 	@Autowired
 	Parse parse;
@@ -142,7 +133,8 @@ public class L3921 extends TradeBuffer {
 		}
 		// 各項費用
 		this.baTxList = new ArrayList<BaTxVo>();
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
+		// 已到期全部 : 98-全費用類別
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 98, BigDecimal.ZERO, titaVo);
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -337,11 +329,25 @@ public class L3921 extends TradeBuffer {
 				}
 			}
 		}
+
+		Slice<LoanFacTmp> slLoanFacTmp = loanFacTmpService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+		String tmpFacmNoX = "";
+		if (slLoanFacTmp != null) {
+			List<LoanFacTmp> lLoanFacTmp = slLoanFacTmp == null ? null
+					: new ArrayList<LoanFacTmp>(slLoanFacTmp.getContent());
+			String x = "";
+			for (LoanFacTmp t : lLoanFacTmp) {
+				tmpFacmNoX += x + parse.IntegerToString(t.getFacmNo(), 3);
+				x = ",";
+			}
+		}
+
 		this.totaVo.putParam("OLoanBal", oLoanBal);
 		this.totaVo.putParam("OIntStartDate", oIntStartDate == 9991231 ? 0 : oIntStartDate);
 		this.totaVo.putParam("OIntEndDate", oIntEndDate);
 		this.totaVo.putParam("ORate", oRate);
 		this.totaVo.putParam("OCurrencyCode", oCurrencyCode);
+		this.totaVo.putParam("OTmpFacmNoX", tmpFacmNoX);
 		this.totaVo.putParam("OPrincipal", oPrincipal);
 		this.totaVo.putParam("OInterest", oInterest);
 		this.totaVo.putParam("ODelayInt", oDelayInt);
@@ -352,6 +358,7 @@ public class L3921 extends TradeBuffer {
 		this.totaVo.putParam("OShortfallPrin", baTxCom.getShortfallPrincipal());
 		this.totaVo.putParam("OShortCloseBreach", baTxCom.getShortCloseBreach());
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
+		this.totaVo.putParam("OExcessiveAll", baTxCom.getExcessive().add(baTxCom.getExcessiveOther()));
 		this.totaVo.putParam("OTempTax", baTxCom.getTempTax());
 		this.totaVo.putParam("OModifyFee", baTxCom.getModifyFee());
 		this.totaVo.putParam("OAcctFee", baTxCom.getAcctFee());
@@ -369,6 +376,7 @@ public class L3921 extends TradeBuffer {
 		}
 		return this.sendList();
 	}
+
 	//
 	private BigDecimal getPrincipal(LoanBorMain ln, BigDecimal principal) throws LogicException {
 		BigDecimal wkPrincipal = principal;
@@ -408,4 +416,5 @@ public class L3921 extends TradeBuffer {
 			wkTotaCount++;
 		}
 	}
+
 }

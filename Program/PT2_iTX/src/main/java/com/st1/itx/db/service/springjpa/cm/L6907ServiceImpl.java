@@ -50,7 +50,13 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iClsFlag = Integer.parseInt(titaVo.get("ClsFlag").toString());
 		int iCustNo = Integer.parseInt(titaVo.get("CustNo").toString());
 		int iFacmNo = Integer.parseInt(titaVo.get("FacmNo").toString());
-
+//		String[] iTmpFacmNoX = titaVo.get("TmpFacmNoX").toString(); // 指定額度
+//
+//		String[] thisColumn = thisLine.split("[,]");
+//		String iTmpTxCode = titaVo.get("TmpTxCode").toString(); // 連動交易代號
+//		if ("L3200".equals(iTmpTxCode)) {
+//
+//		}
 		this.info("iAcSubBookCode   = " + iAcSubBookCode); //
 		this.info("iAcNoCode   = " + iAcNoCode); //
 		this.info("iAcSubCode  = " + iAcSubCode); //

@@ -26,12 +26,7 @@ import com.st1.itx.Exception.LogicException;
 public class BatxDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1844054636253293318L;
-
-@EmbeddedId
+  @EmbeddedId
   private BatxDetailId batxDetailId;
 
   // 會計日期
@@ -39,6 +34,7 @@ public class BatxDetail implements Serializable {
   private int acDate = 0;
 
   // 整批批號
+  /* 暫收冲正固定為RESV00 */
   @Column(name = "`BatchNo`", length = 6, insertable = false, updatable = false)
   private String batchNo;
 
@@ -48,7 +44,7 @@ public class BatxDetail implements Serializable {
   private int detailSeq = 0;
 
   // 還款來源
-  /* CdCode.BatchRepayCode01:匯款轉帳02:銀行扣款03:員工扣款04:支票兌現05:法院扣薪06:理賠金07:代收款-債權協商09:其他11:匯款轉帳預先作業90:暫收抵繳 */
+  /* CdCode.BatchRepayCode01:匯款轉帳02:銀行扣款03:員工扣款04:支票兌現05:法院扣薪06:理賠金07:代收款-債權協商09:其他11:匯款轉帳預先作業90:暫收抵繳99:暫收沖正 */
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
@@ -120,6 +116,11 @@ public class BatxDetail implements Serializable {
   @Column(name = "`ProcNote`", length = 2000)
   private String procNote;
 
+  // 其他說明
+  /* jsonformat */
+  @Column(name = "`OtherNote`", length = 2000)
+  private String otherNote;
+
   // 經辦
   @Column(name = "`TitaTlrNo`", length = 6)
   private String titaTlrNo;
@@ -190,7 +191,7 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 整批批號<br>
-	* 
+	* 暫收冲正固定為RESV00
 	* @return String
 	*/
   public String getBatchNo() {
@@ -199,7 +200,7 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 整批批號<br>
-	* 
+	* 暫收冲正固定為RESV00
   *
   * @param batchNo 整批批號
 	*/
@@ -239,6 +240,7 @@ public class BatxDetail implements Serializable {
 09:其他
 11:匯款轉帳預先作業
 90:暫收抵繳
+99:暫收沖正
 	* @return Integer
 	*/
   public int getRepayCode() {
@@ -258,6 +260,7 @@ public class BatxDetail implements Serializable {
 09:其他
 11:匯款轉帳預先作業
 90:暫收抵繳
+99:暫收沖正
   *
   * @param repayCode 還款來源
 	*/
@@ -705,6 +708,25 @@ D:刪除
   }
 
 /**
+	* 其他說明<br>
+	* jsonformat
+	* @return String
+	*/
+  public String getOtherNote() {
+    return this.otherNote == null ? "" : this.otherNote;
+  }
+
+/**
+	* 其他說明<br>
+	* jsonformat
+  *
+  * @param otherNote 其他說明
+	*/
+  public void setOtherNote(String otherNote) {
+    this.otherNote = otherNote;
+  }
+
+/**
 	* 經辦<br>
 	* 
 	* @return String
@@ -889,7 +911,7 @@ D:刪除
     return "BatxDetail [batxDetailId=" + batxDetailId + ", repayCode=" + repayCode + ", fileName=" + fileName + ", entryDate=" + entryDate
            + ", custNo=" + custNo + ", facmNo=" + facmNo + ", rvNo=" + rvNo + ", repayType=" + repayType + ", reconCode=" + reconCode + ", repayAcCode=" + repayAcCode
            + ", acquiredAmt=" + acquiredAmt + ", repayAmt=" + repayAmt + ", acctAmt=" + acctAmt + ", disacctAmt=" + disacctAmt + ", procStsCode=" + procStsCode + ", procCode=" + procCode
-           + ", procNote=" + procNote + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", procNote=" + procNote + ", otherNote=" + otherNote + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind
+           + ", mediaSeq=" + mediaSeq + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

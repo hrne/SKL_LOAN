@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -401,6 +400,16 @@ public class FacMain implements Serializable {
   /* 企金:額度核准時將申請檔內准駁日期寫入[額度設定日ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日期就是上送當下的日期 */
   @Column(name = "`SettingDate`")
   private int settingDate = 0;
+
+  // 約定動工之一定期間
+  /* 2022.8.3新增:規定管制代碼RuleCode=08:購地貸款(央行管制)才需寫入 */
+  @Column(name = "`StarBuildingPeriod`")
+  private int starBuildingPeriod = 0;
+
+  // 實際興建年月
+  /* 2022.8.3新增:規定管制代碼RuleCode=08:購地貸款(央行管制)才需寫入 */
+  @Column(name = "`StarBuildingYM`")
+  private int starBuildingYM = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -2272,6 +2281,44 @@ ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日�
   }
 
 /**
+	* 約定動工之一定期間<br>
+	* 2022.8.3新增:規定管制代碼RuleCode=08:購地貸款(央行管制)才需寫入
+	* @return Integer
+	*/
+  public int getStarBuildingPeriod() {
+    return this.starBuildingPeriod;
+  }
+
+/**
+	* 約定動工之一定期間<br>
+	* 2022.8.3新增:規定管制代碼RuleCode=08:購地貸款(央行管制)才需寫入
+  *
+  * @param starBuildingPeriod 約定動工之一定期間
+	*/
+  public void setStarBuildingPeriod(int starBuildingPeriod) {
+    this.starBuildingPeriod = starBuildingPeriod;
+  }
+
+/**
+	* 實際興建年月<br>
+	* 2022.8.3新增:規定管制代碼RuleCode=08:購地貸款(央行管制)才需寫入
+	* @return Integer
+	*/
+  public int getStarBuildingYM() {
+    return this.starBuildingYM;
+  }
+
+/**
+	* 實際興建年月<br>
+	* 2022.8.3新增:規定管制代碼RuleCode=08:購地貸款(央行管制)才需寫入
+  *
+  * @param starBuildingYM 實際興建年月
+	*/
+  public void setStarBuildingYM(int starBuildingYM) {
+    this.starBuildingYM = starBuildingYM;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -2364,6 +2411,7 @@ ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日�
            + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
            + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", grcd=" + grcd + ", grKind=" + grKind
            + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", renewCnt=" + renewCnt + ", oldFacmNo=" + oldFacmNo + ", settingDate=" + settingDate
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", starBuildingPeriod=" + starBuildingPeriod + ", starBuildingYM=" + starBuildingYM + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

@@ -120,10 +120,10 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTitaHCode == 0) {
 			sql += "      AND ln3.\"TitaHCode\" = '0'											";
 		}
-		sql += " ORDER BY ln2.\"AcDate\" ASC ";
-		sql += "         ,ln2.\"TitaCalDy\" ASC	                    ";
-		sql += "         ,ln2.\"TitaCalTm\"	ASC                    	";
-		sql += "         ,ln2.\"CreateDate\" ASC                    ";
+		sql += " ORDER BY ln3.\"AcDate\" ASC ";
+		sql += "         ,ln3.\"TitaCalDy\" ASC	                    ";
+		sql += "         ,ln3.\"TitaCalTm\"	ASC                    	";
+		sql += "         ,ln3.\"CreateDate\" ASC                    ";
 		sql += "         ,ln3.\"Displayflag\" ASC                   ";
 		sql += "         ,CASE WHEN ln3.\"TxAmt\" > 0  THEN 1 ELSE 0 END DESC ";
 		sql += "         ,ln3.\"IntStartDate\" ASC                  ";

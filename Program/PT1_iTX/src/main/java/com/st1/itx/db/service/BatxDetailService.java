@@ -38,138 +38,17 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND RepayCode = 
+   * CustNo = ,AND AcDate = ,AND ProcStsCode ^i
    *
    * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param repayCode_2 repayCode_2
+   * @param acDate_1 acDate_1
+   * @param procStsCode_2 procStsCode_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice BatxDetail BatxDetail of List
    */
-  public Slice<BatxDetail> findL492AAEq(int custNo_0, int facmNo_1, int repayCode_2, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND FacmNo = 
-   *
-   * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492ABEq(int custNo_0, int facmNo_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = 
-   *
-   * @param custNo_0 custNo_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492ACEq(int custNo_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * RepayCode = 
-   *
-   * @param repayCode_0 repayCode_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492ADEq(int repayCode_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND RepayCode = 
-   *
-   * @param custNo_0 custNo_0
-   * @param repayCode_1 repayCode_1
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AEEq(int custNo_0, int repayCode_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND FacmNo = ,AND RepayCode = ,AND RepayType = 
-   *
-   * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param repayCode_2 repayCode_2
-   * @param repayType_3 repayType_3
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AFEq(int custNo_0, int facmNo_1, int repayCode_2, int repayType_3, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND FacmNo = ,AND RepayType = 
-   *
-   * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param repayType_2 repayType_2
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AGEq(int custNo_0, int facmNo_1, int repayType_2, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND RepayType = 
-   *
-   * @param custNo_0 custNo_0
-   * @param repayType_1 repayType_1
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AHEq(int custNo_0, int repayType_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * RepayCode = ,AND RepayType = 
-   *
-   * @param repayCode_0 repayCode_0
-   * @param repayType_1 repayType_1
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AIEq(int repayCode_0, int repayType_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND RepayCode = ,AND RepayType = 
-   *
-   * @param custNo_0 custNo_0
-   * @param repayCode_1 repayCode_1
-   * @param repayType_2 repayType_2
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AJEq(int custNo_0, int repayCode_1, int repayType_2, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * RepayType = 
-   *
-   * @param repayType_0 repayType_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL492AKEq(int repayType_0, int index, int limit, TitaVo... titaVo);
+  public Slice<BatxDetail> findL492AEq(int custNo_0, int acDate_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate = ,AND BatchNo = 

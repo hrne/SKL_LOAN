@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -17,6 +15,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -28,18 +27,19 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R05")
 @Scope("prototype")
 public class L3R05 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3R05.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public AcReceivableService acReceivableService;
+	@Autowired
+	BaTxCom baTxCom;
 
 	@Autowired
 	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L3R05 ");
+		this.info("active L3R05 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -51,30 +51,30 @@ public class L3R05 extends TradeBuffer {
 
 		// work area
 		BigDecimal wkTempAmt = new BigDecimal(0);
+		String wkTmpFacmNoX = "";
+		// 暫收可抵繳
+		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 
-//		放款部專戶 
-		if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-			wkTempAmt = new BigDecimal("99999999999999");
+// 是否額度可抵繳
+// 按指定額度：00-全費用類別
+//  1.iFacmNo >0 該額度為指定額度則只有該額度可抵繳,如該額度為非指定額度則全部非指定額度可抵繳
+//  2.iFacmNo =0 全部非指定額度可抵繳
+
+			baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo);
+			wkTempAmt = baTxCom.getExcessive();
+			wkTmpFacmNoX = baTxCom.getTmpFacmNoX();
 		} else {
-
 			// 查詢會計銷帳檔
 			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0,
 					Integer.MAX_VALUE, titaVo);
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			if (lAcReceivable != null && lAcReceivable.size() > 0) {
 				for (AcReceivable tAcReceivable : lAcReceivable) {
-					if ((iTempItemCode == 06)) {
-						if (iFacmNo != tAcReceivable.getFacmNo()) {
-							continue;
-						}
-					} else {
-						if (iFacmNo > 0 && iFacmNo != tAcReceivable.getFacmNo()) {
-							continue;
-						}
-					}
+
 					switch (iTempReasonCode) {
 					case 1: // 放款暫收款
-						if (tAcReceivable.getAcctCode().equals("TAV")) {
+						// 放款專戶
+						if (tAcReceivable.getAcctCode().equals("TLD")) {
 							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
 						}
 						break;
@@ -93,7 +93,7 @@ public class L3R05 extends TradeBuffer {
 							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
 						}
 						break;
-					case 5: // 聯貸費攤提暫收款	
+					case 5: // 聯貸費攤提暫收款
 						if (tAcReceivable.getAcctCode().equals("TSL")) {
 							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
 						}
@@ -109,6 +109,7 @@ public class L3R05 extends TradeBuffer {
 		}
 
 		this.totaVo.putParam("L3r05TempAmt", wkTempAmt);
+		this.totaVo.putParam("L3r05TmpFacmNoX", wkTmpFacmNoX);
 
 		this.addList(this.totaVo);
 		return this.sendList();

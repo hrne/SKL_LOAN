@@ -64,6 +64,7 @@ public class LoanBorTx implements Serializable {
   private String titaTlrNo;
 
   // 交易序號
+  /* BatchNo(5:2)+DetailSeq(6) = TitaTxtNo 時列 */
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
 
@@ -121,6 +122,7 @@ public class LoanBorTx implements Serializable {
   private int dueDate = 0;
 
   // 交易金額
+  /* 轉帳金額 */
   @Column(name = "`TxAmt`")
   private BigDecimal txAmt = new BigDecimal("0");
 
@@ -169,7 +171,12 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`CloseBreachAmt`")
   private BigDecimal closeBreachAmt = new BigDecimal("0");
 
-  // 暫收抵繳金額
+  // 實收費用金額
+  /* 轉入金額(正值)、轉出金額(負值)TxAmt+TempAmt=Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow */
+  @Column(name = "`FeeAmt`")
+  private BigDecimal feeAmt = new BigDecimal("0");
+
+  // 暫收抵繳(暫收借)
   /* 正值 */
   @Column(name = "`TempAmt`")
   private BigDecimal tempAmt = new BigDecimal("0");
@@ -193,12 +200,12 @@ public class LoanBorTx implements Serializable {
   private BigDecimal unpaidCloseBreach = new BigDecimal("0");
 
   // 收回短收金額
-  /* 新增欄位(轉換資料無) */
+  /* 註記欄位(轉換資料無)，本金、利息已含 */
   @Column(name = "`Shortfall`")
   private BigDecimal shortfall = new BigDecimal("0");
 
-  // 累溢收金額
-  /* 全戶 */
+  // 累溢收金額(暫收貸)
+  /* 正值 */
   @Column(name = "`Overflow`")
   private BigDecimal overflow = new BigDecimal("0");
 
@@ -388,7 +395,7 @@ public class LoanBorTx implements Serializable {
 
 /**
 	* 交易序號<br>
-	* 
+	* BatchNo(5:2)+DetailSeq(6) = TitaTxtNo 時列
 	* @return String
 	*/
   public String getTitaTxtNo() {
@@ -397,7 +404,7 @@ public class LoanBorTx implements Serializable {
 
 /**
 	* 交易序號<br>
-	* 
+	* BatchNo(5:2)+DetailSeq(6) = TitaTxtNo 時列
   *
   * @param titaTxtNo 交易序號
 	*/
@@ -673,7 +680,7 @@ N:否
 
 /**
 	* 交易金額<br>
-	* 
+	* 轉帳金額
 	* @return BigDecimal
 	*/
   public BigDecimal getTxAmt() {
@@ -682,7 +689,7 @@ N:否
 
 /**
 	* 交易金額<br>
-	* 
+	* 轉帳金額
   *
   * @param txAmt 交易金額
 	*/
@@ -883,7 +890,30 @@ N:否
   }
 
 /**
-	* 暫收抵繳金額<br>
+	* 實收費用金額<br>
+	* 轉入金額(正值)、轉出金額(負值)
+TxAmt+TempAmt
+=Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow
+	* @return BigDecimal
+	*/
+  public BigDecimal getFeeAmt() {
+    return this.feeAmt;
+  }
+
+/**
+	* 實收費用金額<br>
+	* 轉入金額(正值)、轉出金額(負值)
+TxAmt+TempAmt
+=Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow
+  *
+  * @param feeAmt 實收費用金額
+	*/
+  public void setFeeAmt(BigDecimal feeAmt) {
+    this.feeAmt = feeAmt;
+  }
+
+/**
+	* 暫收抵繳(暫收借)<br>
 	* 正值
 	* @return BigDecimal
 	*/
@@ -892,10 +922,10 @@ N:否
   }
 
 /**
-	* 暫收抵繳金額<br>
+	* 暫收抵繳(暫收借)<br>
 	* 正值
   *
-  * @param tempAmt 暫收抵繳金額
+  * @param tempAmt 暫收抵繳(暫收借)
 	*/
   public void setTempAmt(BigDecimal tempAmt) {
     this.tempAmt = tempAmt;
@@ -979,7 +1009,7 @@ N:否
 
 /**
 	* 收回短收金額<br>
-	* 新增欄位(轉換資料無)
+	* 註記欄位(轉換資料無)，本金、利息已含
 	* @return BigDecimal
 	*/
   public BigDecimal getShortfall() {
@@ -988,7 +1018,7 @@ N:否
 
 /**
 	* 收回短收金額<br>
-	* 新增欄位(轉換資料無)
+	* 註記欄位(轉換資料無)，本金、利息已含
   *
   * @param shortfall 收回短收金額
 	*/
@@ -997,8 +1027,8 @@ N:否
   }
 
 /**
-	* 累溢收金額<br>
-	* 全戶
+	* 累溢收金額(暫收貸)<br>
+	* 正值
 	* @return BigDecimal
 	*/
   public BigDecimal getOverflow() {
@@ -1006,10 +1036,10 @@ N:否
   }
 
 /**
-	* 累溢收金額<br>
-	* 全戶
+	* 累溢收金額(暫收貸)<br>
+	* 正值
   *
-  * @param overflow 累溢收金額
+  * @param overflow 累溢收金額(暫收貸)
 	*/
   public void setOverflow(BigDecimal overflow) {
     this.overflow = overflow;
@@ -1122,8 +1152,8 @@ N:否
            + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", desc=" + desc + ", acDate=" + acDate + ", correctSeq=" + correctSeq
            + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", txAmt=" + txAmt + ", loanBal=" + loanBal + ", intStartDate=" + intStartDate
            + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt
-           + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal
-           + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow + ", otherFields=" + otherFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest
+           + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow + ", otherFields=" + otherFields + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -14,8 +14,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustTelNo;
-import com.st1.itx.db.domain.TxDataLog;
-import com.st1.itx.db.domain.TxDataLogId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.TxDataLogService;

@@ -404,10 +404,16 @@ E(0,#EntryDate)
 #OExcessiveX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OExcessive,#OExcessiveX)
 
+#OTmpFacmNoX=X,50,S
+#OTmpFacmNoXX=X,60,L
+C(4,#OTmpFacmNoX,T(3,),T(B,暫收指定額度：+#OTmpFacmNoX))
+
+
 #OShortfall=+m,14.2,S
 
 #OShortfallX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OShortfall,#OShortfallX)
+
 
 !查詢
 #FUNC5=A,1,S
@@ -448,7 +454,7 @@ T(2,#OOKinbr+#OOTellerNo+#OOTxtNo)
 #OOAcDtRelNo=X,25,L
 T(2,#OOAcDate+#OORelNo)
 
-#OODesc=X,20,O
+#OODesc=X,40,O
 
 #OONote=X,60,O
 
@@ -482,11 +488,11 @@ CALL2(#ADJUSTDOT,#OOPrecision,#OONeedPaidAmt,#OONeedPaidAmtX)
 P(R,#OONeedPaidAmtX)
 
 
-#OOShortfall=+m,14.2,S
+#OOOverShort=+m,14.2,S
 
-#OOShortfallX=X,22,O
-CALL2(#ADJUSTDOT,#OOPrecision,#OOShortfall,#OOShortfallX)
-P(R,#OOShortfallX)
+#OOOverShortX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOOverShort,#OOOverShortX)
+P(R,#OOOverShortX)
 
 #OOLoanBal=m,14.2,S
 
@@ -535,8 +541,8 @@ IF(#OOAcFg=="",BIND(grid,cancel),IF(#OOTxCd=="L3100"||#OOTxCd=="L3240"||#OOTxCd=
 C(5,#OOCreateEmpNo,999999,BIND(grid,cancel),$)
 C(5,#OODisplayFlag,Y,BIND(grid,cancel),$)
 !查詢
-#OOBUF1=X,61,S
-IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo+#OOTotTxAmt))
+#OOBUF1=X,80,S
+IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo+#OOTotTxAmt+#OOBorxNo))
 
 #OOchain=X,5,S
 IF(#OOTxCd=="L3701",T(3,L6932),T(3,L3912))
@@ -589,6 +595,7 @@ TXFORM=L3005
 #OCurrencyCode
 #OLoanCustFlag
 #OLoanCustRmkX
+#OTmpFacmNoX
 #OOEntryDate
 #OOAcDate
 #OOFacmNo
@@ -601,7 +608,7 @@ TXFORM=L3005
 #OODesc
 #OOCurrencyCode
 #OOTxAmt
-#OOShortfall
+#OOOverShort
 #OOLoanBal
 #OORate
 #OOTitaHCode
@@ -628,7 +635,7 @@ TXFORM=L3005
 ["[L3005]                                 交易明細資料查詢"],
 ["@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX,],
 !["@會計日期",#OAcDate],
-["@本戶累溢收",#OExcessiveX],
+["@本戶累溢收",#OExcessiveX,"@",#OTmpFacmNoXX],
 ["@本戶累短收",#OShortfallX],
 ["@",#OLoanCustRmkX],
 ]
@@ -670,13 +677,13 @@ TXFORM=L3005
 #OOTxAmtX=交易金額 
 {width:180}
 
-#OOTempAmtX=暫收抵繳 
+#OOTempAmtX=暫收借金額
 {width:180}
 
 #OONeedPaidAmtX=應收金額
 {width:180}
 
-#OOShortfallX=溢短收
+#OOOverShortX=溢短收
 {width:180}
 
 #OOLoanBalX=放款餘額
@@ -702,12 +709,15 @@ TXFORM=L3005
 
 #OOBTN4=計息
 {width:40,search:true,formatter:'cust:bind-button:計息;L3913 計息',align:'center',canExport:false,}
+
+#OOBorxNo=明細序號
+{width:100,align:'center'}
 ^
 
 <include src="PRT.icf::INQ01.sel" map="i=L3005;cpi=15"/>
 #OCustNo#OFacmNo#OBormNo#OCustNoX#OAcDate#OExcessiveX#OShortfallX
 %
-#OOEntryDate#OOAcDate#OOFacmNoX#OODesc#OOCurrencyCode#OOTxAmtX#OOTempAmtX#OOShortfallX#OOLoanBalX
+#OOEntryDate#OOAcDate#OOFacmNoX#OODesc#OOCurrencyCode#OOTxAmtX#OOTempAmtX#OOOverShortX#OOLoanBalX
 #OORateX#OOTitaHCodeX#OOTxMsg#OOAcDtRelNo
 @^
 </sub>

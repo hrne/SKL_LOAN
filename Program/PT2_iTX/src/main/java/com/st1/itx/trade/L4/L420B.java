@@ -67,6 +67,11 @@ public class L420B extends TradeBuffer {
 				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
 			}
 		}
+		if (functionCode == 5) {
+			if (!titaVo.getHsupCode().equals("1")) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+		}
 
 // BatxStsCode 整批作業狀態 0.正常 1.整批處理中
 		if ("1".equals(tBatxHead.getBatxStsCode()) && titaVo.getHsupCode().equals("1")) {

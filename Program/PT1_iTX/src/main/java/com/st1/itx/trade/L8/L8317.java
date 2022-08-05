@@ -334,7 +334,7 @@ public class L8317 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0562, uJcicZ0562);
-			iDataLog.exec("L8317異動", uJcicZ0562.getSubmitKey()+uJcicZ0562.getCustId()+uJcicZ0562.getCaseStatus()+iClaimDate+uJcicZ0562.getCourtCode());
+			iDataLog.exec("L8317刪除", uJcicZ0562.getSubmitKey()+uJcicZ0562.getCustId()+uJcicZ0562.getCaseStatus()+iClaimDate+uJcicZ0562.getCourtCode());
 			default:
 			break;
 		}

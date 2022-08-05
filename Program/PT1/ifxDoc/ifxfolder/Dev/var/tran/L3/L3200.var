@@ -26,7 +26,7 @@ INVOKEJS(SHOW,grd9_4,0)
 INVOKEJS(SHOW,grd9_5,0)
 INVOKEJS(SHOW,p1,9,14,0)
 C(3,#RepayType,2,INVOKEJS(SHOW,p1,13,14,1),$)
-C(3,#RepayType,1,INVOKEJS(SHOW,p1,9,10,1),$)
+C(3,#RepayType,1,INVOKEJS(SHOW,p1,9,10,1)INVOKEJS(SHOW,p1,14,14,1),$)
 C(3,#RepayType,9,INVOKEJS(SHOW,p1,12,12,1),$)
 C(3,#RepayType,9,INVOKEJS(SHOW,p1,15,21,0),$)
 C(3,#RepayType,12
@@ -108,6 +108,7 @@ E(0,@L3r06TotalFee,0)
 E(0,@L3r06CloseBreachAmtUnpaid,0)
 E(0,@L492aRepayType,0)
 E(0,@L492aRepayAmt,0)
+E(0,@L492aFacmNo,0)
 T(F,@FacmNo,1)
 T(F,@TwCloseBreachAmt,1)
 T(F,@UsCloseBreachAmt,1)
@@ -131,7 +132,7 @@ INVOKEJS(SHOW,p1,13,19,0)
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,"@",#BTN4],
 [#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX],
-[#<->#,"#FdFacmNo+額度編號",#FacmNo,"@",#BTN1,#BTN8],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,"@",#BTN1,#BTN8,#TmpFacmNoXX],
 [#<->#,"#FdBormNo+撥款序號",#BormNo,"@",#BTN7],
 [#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
 [#<->#,"#FdRepayTerms+回收期數",#RepayTerms,"@@",#BTN5],
@@ -144,7 +145,7 @@ INVOKEJS(SHOW,p1,13,19,0)
 ["#FdInterest+利息",#TwInterest,#UsInterest],["#FdModifyFee+契變手續費",#TwModifyFee,#UsModifyFee],
 ["#FdDelayInt+延遲息",#TwDelayInt,#UsDelayInt],["#FdFireFee+火險費",#TwFireFee,#UsFireFee],
 ["#FdBreachAmt+違約金",#TwBreachAmt,#UsBreachAmt],["#FdLawFee+法務費",#TwLawFee,#UsLawFee],
-["#FdShortfall+累短收",#ShortfallX,#ShortfallXX],["#FdExcessive+累溢收",#ExcessiveX],
+["#FdShortfall+累短收",#ShortfallX,#ShortfallXX],["#FdExcessive+累溢收",#ExcessiveXX],
 [#<->#,"#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
 [#<->#,"#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],
 ["#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
@@ -453,6 +454,7 @@ T(2,#TimCustNo+000+#RepayCode)
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF5A;ntxbuf5=type<-1
 :EntryDate<-OOEntryDate
 :FacmNo<-OOFacmNo
+:L492aFacmNo<-OOFacmNo
 :DetailSeq<-OODetailSeq
 :DetailNote<-OOProcNote
 :L492aRepayAmt<-OORepayAmt
@@ -470,6 +472,8 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF5A;ntxbuf5=type<-1
 :RP_ACNO<-OOAcNo})
 
 #BTN4=X,20,I,ui:button;value:已入帳未還款查詢;enable:1;tabbable:0;title:L492A 已入帳未還款查詢
+
+#L492aFacmNo=A,3,S
 
 #L492aRepayCode=A,2,S
 
@@ -513,6 +517,7 @@ C(5,#CHAINTXCD,L2631,E(0,9),$)
 C(5,#CHAINTXCD,L2631,s,$)
 @
 V(H,#RepayTypeHelp)
+C(4,#L492aRepayType,$,T(2,@L492aRepayType,#RepayType))
 C(3,#RepayType,2,$,E(0,@TimExtraRepay,0))
 
 #RepayTypeX=X,10,L
@@ -591,7 +596,10 @@ T(2,@ShortCloseBreachXX,#WKCBX+#ShortCloseBreachXX)
 T(B,@ShortfallXX,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
 P(L,#ShortfallXX)
 E(0,@Excessive,#L3r06Excessive)
+E(0,@ExcessiveAll,#L3r06ExcessiveAll)
 CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+T(B,@ExcessiveXX,#ExcessiveX)
 
 !6/23 end
 !-------------------------------------------------------------
@@ -625,6 +633,10 @@ C(4,#ApplNo,T(F,@FacmNo,1),T(F,@FacmNo,0))
 C(4,#ApplNo,$,s)
 C(3,#L492aRepayType,0,$,$)
 SHOW(#BTN1,#BTN8)HIDE(#BTN3,#BTN6,#BTN2,#BTN7)
+
+#TmpFacmNoX=X,50,S
+
+#TmpFacmNoXX=X,60,L
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
@@ -757,6 +769,8 @@ E(0,@RimCloseBreachAmt,#TimCloseBreachAmt)
 RESET_RIM(#SendL3r06A,L3R06)
 S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
 R(1,L3R06)
+
+
 
 #ShowPrincipal=X,1,S
 !改
@@ -918,6 +932,26 @@ S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#Ri
 R(1,L3R06)
 C(3,#L3r06CloseBreachAmtUnpaid,0,T(3,@BreachCodeX,),T(3,@BreachCodeX,領清償證明時收取))
 E(0,@PayMethodFg,#L3r06PayMethodFg)
+T(2,@TmpFacmNoX,#L3r06tmpFacmNoX)
+C(4,#TmpFacmNoX,T(3,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#TmpFacmNoX))
+E(0,@Excessive,#L3r06Excessive)
+E(0,@ExcessiveAll,#L3r06ExcessiveAll)
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
+##loop{times:20,l:0,n:1,m:2}
+C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+T(2,@FacmBormNo{n},#L3r06FacmNo{n}+-+#L3r06BormNo{n})
+T(2,@IntStartDate{n},#L3r06IntStartDate{n})
+T(2,@IntEndDate{n},#L3r06IntEndDate{n})
+T(2,@IntSEDate{n},#IntStartDate{n}+-+#IntEndDate{n})
+E(0,@Principal{n},#L3r06Principal{n})
+E(0,@Interest{n},#L3r06Interest{n})
+E(0,@DelayInt{n},#L3r06DelayInt{n})
+E(0,@BreachAmt{n},#L3r06BreachAmt{n})
+E(0,@Total{n},#L3r06Total{n})
+##end
+
 
 !還款類別為[02.部分償還]且[是否內含費用]為[Y.是]時加費用
 #SumRepayAmt=m,14.2,S
@@ -1189,10 +1223,14 @@ P(L,#ShortfallXX)
 
 #Excessive=m,14.2,S
 E(0,#L3r06Excessive)
+#ExcessiveAll=m,14.2,S
+E(0,#L3r06ExcessiveAll)
 
 #ExcessiveX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
-
+#ExcessiveAllX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+#ExcessiveXX=X,50,L
 
 
 
@@ -1317,6 +1355,7 @@ C(3,#TimRepayAmt,0,$,E(0,#WkRepayAmt))
 C(5,#L2r01CharCode,2,E(0,0),$)
 E(3,@RPTOT,#SumRepayAmt-#TimReduceAmt)
 C(3,#RepayType,12,E(3,@RPTOT,#TimOvduRepay),$)
+E(0,@RP_EXCESSIVE,#Excessive)
 
 !實際收付金額
 #RealRepayAmt=m,14.2,L
@@ -1347,14 +1386,30 @@ E(0,@RP_CUSTNO,#TimCustNo)
 
 ! 額度
 #TmpFacmNo=X,1,S
-E(0,@RP_FACMNO,#L3r06RpFacmNo)
+C(3,#L492aFacmNo,0,E(0,@RP_FACMNO,0),E(0,@RP_FACMNO,#L492aFacmNo))
 E(0,@SHORT_FACMNO,#L3r06ShortFacmNo)
+E(0,@RP_TMPFACMNO,#L3r06tmpFacmNo)
+T(2,@RP_TMPFACMNOX,#L3r06tmpFacmNoX)
+T(2,@RP_TXCD,#TXCD)
 
 
 !類別   摘要
 #TmpNote=X,1,S
 T(2,@RP_NOTE,#DetailNote)
+!----------------額度撥款試算表----------------
 
+##loop{times:20,l:0,n:1,m:2}
+#FacmBormNo{n}=X,7,L
+#IntStartDate{n}=D,7,L
+#IntEndDate{n}=D,7,L
+#IntSEDate{n}=X,20,L
+#Principal{n}=+m,14.2,L
+#Interest{n}=+m,14.2,L
+#DelayInt{n}=+m,14.2,L
+#BreachAmt{n}=+m,14.2,L
+#Total{n}=+m,14.2,L
+
+##end
 
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
@@ -1366,6 +1421,18 @@ T(2,@RP_NOTE,#DetailNote)
 <include src="ROM.icf::L3R02.dec"/>
 <include src="ROM.icf::L3R06.dec"/>
 <include src="ROM.icf::L6R28.dec"/>
+
+</sub>
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+[
+["<font color=red>@本息計算表"],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[70,70,120,120,120,120,120,], p_cols:[5,15,15,15,15,15,15]}","","",
+["額度撥款","計息起訖日","本金","利息","延遲息","違約金","小計"],
+[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#BreachAmt1],[#DelayInt1],[#Total1]],
+],
+]
+
 
 </sub>
 !--------- 收付欄 -----------------------
@@ -1423,6 +1490,15 @@ T(3,[L3200] 回收登錄)
 #TwExtraCloseBreachAmt#UsExtraCloseBreachAmt
 #TwReduceAmt#UsReduceAmt
 #TwExtraCloseBreachAmt#UsExtraCloseBreachAmt
+##loop{times:20,n:1}
+#FacmBormNo{n}
+#IntSEDate{n}
+#Principal{n}
+#Interest{n}
+#DelayInt{n}
+#BreachAmt{n}
+#Total{n}
+##end
 </sub>
 
 

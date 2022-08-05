@@ -4032,11 +4032,13 @@ TXFORM=L3R04
 !尋找暫收款餘額
 <L3R05.dec>
 #L3r05TempAmt=m,14.2,S
+#L3r05TmpFacmNoX=X,50,S
 </L3R05.dec>
 
 <L3R05.tom>
 TXFORM=L3R05
 #L3r05TempAmt
+#L3r05TmpFacmNoX
 ^
 </L3R05.tom>
 
@@ -4057,6 +4059,7 @@ TXFORM=L3R05
 #L3r06ShortfallPrin=m,14.2,S
 #L3r06ShortCloseBreach=m,14.2,S
 #L3r06Excessive=m,14.2,S
+#L3r06ExcessiveAll=m,14.2,S
 #L3r06TempTax=m,14.2,S
 #L3r06ModifyFee=m,14.2,S
 #L3r06AcctFee=m,14.2,S
@@ -4070,6 +4073,19 @@ TXFORM=L3R05
 #L3r06ShortFacmNo=A,3,S
 #L3r06CloseBreachAmtUnpaid=m,14.2,S
 #L3r06PayMethodFg=A,1,S
+#L3r06tmpFacmNoX=X,50,S
+#L3r06tmpFacmNo=A,3,S
+##loop{times:50,n:1}
+#L3r06FacmNo{n}=A,3,S
+#L3r06BormNo{n}=A,3,S
+#L3r06IntStartDate{n}=D,7,S
+#L3r06IntEndDate{n}=D,7,S
+#L3r06Principal{n}=+m,14.2,S
+#L3r06Interest{n}=+m,14.2,S
+#L3r06DelayInt{n}=+m,14.2,S
+#L3r06BreachAmt{n}=+m,14.2,S
+#L3r06Total{n}=+m,14.2,S
+##end
 </L3R06.dec>
 
 <L3R06.tom>
@@ -4089,6 +4105,7 @@ TXFORM=L3R06
 #L3r06ShortfallPrin
 #L3r06ShortCloseBreach
 #L3r06Excessive
+#L3r06ExcessiveAll
 #L3r06TempTax
 #L3r06ModifyFee
 #L3r06AcctFee
@@ -4102,6 +4119,19 @@ TXFORM=L3R06
 #L3r06ShortFacmNo
 #L3r06CloseBreachAmtUnpaid
 #L3r06PayMethodFg
+#L3r06tmpFacmNoX
+#L3r06tmpFacmNo
+##loop{times:50,n:1}
+#L3r06FacmNo{n}
+#L3r06BormNo{n}
+#L3r06IntStartDate{n}
+#L3r06IntEndDate{n}
+#L3r06Principal{n}
+#L3r06Interest{n}
+#L3r06DelayInt{n}
+#L3r06BreachAmt{n}
+#L3r06Total{n}
+##end
 ^
 </L3R06.tom>
 
@@ -4357,16 +4387,12 @@ TXFORM=L3R16
 
 !    L3R17 : 暫收款指定額度設定維護
 <L3R17.dec>
-#L3R17RmkNo=A,3,S
-#L3R17RmkCode=X,3,S
-#L3R17RmkDesc=c,120,S
+#L3R17RmkDescribe=c,120,S
 </L3R17.dec>
 
 <L3R17.tom>
 TXFORM=L3R17
-#L3R17RmkNo
-#L3R17RmkCode
-#L3R17RmkDesc
+#L3R17RmkDescribe
 ^
 </L3R17.tom>
 

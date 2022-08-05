@@ -33,6 +33,7 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.TxAmlLogService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.RemitFormVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -61,12 +62,17 @@ public class AcPaymentCom extends TradeBuffer {
 
 	@Autowired
 	public BankRemitService bankRemitService;
-
 	@Autowired
 	public LoanChequeService loanChequeService;
+	@Autowired
+	public TxAmlLogService txAmlLogService;
 
 	@Autowired
 	public AcNegCom acNegCom;
+	@Autowired
+	public BaTxCom baTxCom;
+	@Autowired
+	public LoanCom loanCom;
 
 	@Autowired
 	public RemitForm remitForm;
@@ -76,9 +82,6 @@ public class AcPaymentCom extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
-
-	@Autowired
-	public TxAmlLogService txAmlLogService;
 
 	private List<AcDetail> acDetailList;
 	private AcDetail acDetail;
@@ -106,9 +109,11 @@ public class AcPaymentCom extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("AcPayment run ...");
 		acNegCom.setTxBuffer(this.txBuffer);
+		loanCom.setTxBuffer(this.txBuffer);
+		baTxCom.setTxBuffer(this.txBuffer);
 		acDate = this.txBuffer.getTxCom().getTbsdy();
 
-		acDetailList = new ArrayList<AcDetail>();
+		this.acDetailList = new ArrayList<AcDetail>();
 
 		/* 1:應收 2:應付 */
 		RpFlag = titaVo.getParam("RpFlag"); /* 收付記號 DECIMAL(1) */
@@ -118,14 +123,6 @@ public class AcPaymentCom extends TradeBuffer {
 			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
 				break;
 			addAcDetail(i, titaVo);
-		}
-
-		// 1->短收->此交易不處理(由各交易寫入短收記號資料)
-		// 2->溢收->再加一筆溢收記號資料
-		// 3->溢收(整批入帳、部分繳款)->再加一筆溢收記號資料
-		if (titaVo.getParam("OverRpFg").equals("2") || titaVo.getParam("OverRpFg").equals("3")) {
-			/* 寫入溢收 */
-			addOverRp(titaVo);
 		}
 
 		/* 將處理完的AcDetail List 放回txBuffer */
@@ -206,6 +203,11 @@ public class AcPaymentCom extends TradeBuffer {
 		case "090":
 			acDetail.setAcctCode("TAV");
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+			// 暫收款入帳(暫收借)
+			BigDecimal excessive = addAcDetail90(acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
+			// 累溢收入帳(暫收貸)
+			acDetail.setTxAmt(excessive.subtract(acDetail.getTxAmt()));
+
 			break;
 		case "091":
 			acDetail.setAcctCode("TRO");
@@ -285,17 +287,18 @@ public class AcPaymentCom extends TradeBuffer {
 		acDetailList.add(acDetail);
 	}
 
-	/* 寫入溢收 */
-	private void addOverRp(TitaVo titaVo) throws LogicException {
-		this.info("AcPayment addOverRp ..." + titaVo.getParam("OverRpAmt"));
-		acDetail = new AcDetail();
-		acDetail.setDbCr("C");
-		acDetail.setAcctCode("TAV");
-		acDetail.setTxAmt(parse.stringToBigDecimal(titaVo.getParam("OverRpAmt")));
-		acDetail.setCustNo(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
-		acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("OverRpFacmNo")));
+	private BigDecimal addAcDetail90(int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {
+		ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+		try {
+			baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 96, BigDecimal.ZERO, titaVo);
+		} catch (LogicException e) {
+			throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
+		}
+		// 暫收款金額 (暫收借)
+		loanCom.settleTempAmt(baTxList, this.acDetailList, titaVo);
 
-		acDetailList.add(acDetail);
+		return baTxCom.getExcessive();
+
 	}
 
 	/* 匯款內容 */

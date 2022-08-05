@@ -220,10 +220,10 @@ public class L9701Report extends MakeReport {
 		// 入帳日
 		this.print(1, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
 		// 交易內容
-		this.print(0, 24, tL9701Vo.get("Desc"), "C");
+		this.print(0, 23, tL9701Vo.get("Desc"), "C");
 		// 計息本金
 		if (!"0".equals(tL9701Vo.get("Amount"))) {
-			this.print(0, 45, formatAmt(tL9701Vo.get("Amount"), 0), "R");
+			this.print(0, 44, formatAmt(tL9701Vo.get("Amount"), 0), "R");
 		}
 		// 計息期間
 		this.print(0, 48,
@@ -235,15 +235,15 @@ public class L9701Report extends MakeReport {
 		// 交易金額
 		this.print(0, 89, formatAmt(tL9701Vo.get("TxAmt"), 0), "R");
 		// 本金
-		this.print(0, 104, formatAmt(tL9701Vo.get("Principal"), 0), "R");
+		this.print(0, 103, formatAmt(tL9701Vo.get("Principal"), 0), "R");
 		// 利息
-		this.print(0, 119, formatAmt(tL9701Vo.get("Interest"), 0), "R");
+		this.print(0, 118, formatAmt(tL9701Vo.get("Interest"), 0), "R");
 		// 違約金
-		this.print(0, 134, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
+		this.print(0, 133, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
 		// 費用
-		this.print(0, 149, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
+		this.print(0, 148, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
 		// 溢短繳
-		this.print(0, 164, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
+		this.print(0, 163, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
 
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));

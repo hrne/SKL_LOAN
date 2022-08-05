@@ -259,7 +259,7 @@ H,T(2,整批訂正))
 ! LabelFgC 轉暫收(T)
 #OOBTNDISPLAYC=X,10,O
 SWITCH(#OOLabelFgC,
-T,T(2,轉暫收),)
+T,T(2,單筆入帳),)
 ! C(3,#OOStatusCode,0,T(2,),$)
 ! C(3,#OOStatusCode,1,T(2,轉暫收),$)
 ! C(3,#OOStatusCode,2,T(2,轉暫收),$)
@@ -340,18 +340,20 @@ T(2,0+#AcDate+#OOBatchNo+#OOReconCode)
 T(2,3+#AcDate+#OOBatchNo+#OOReconCode)
 #OOBUF_E=X,18,S
 T(2,4+#AcDate+#OOBatchNo+#OOReconCode)
+#OOBUF_F=X,18,S
+T(2,5+#AcDate+#OOBatchNo+#OOReconCode)
 
 ! IF(#OOFileName=="",BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_L4920A}),
 !                                  BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_L4920B}))
 ! 0.待檢核1.檢核有誤2.檢核正常3.入帳未完4.入帳完成8.已刪除9.處理中
 ! 若待處理=0&虛擬轉暫收>0 不出現[入帳]
 
-! LabelFgA 整批訂正(H)L4930、整批刪除(D)L420B、刪除回復(R)L420B、整批入帳(E)L420B
+! LabelFgA 整批訂正(H)L420B、整批刪除(D)L420B、刪除回復(R)L420B、整批入帳(E)L420B
 #OOBTN_A=A,2,O
 C(4,#OOLabelFgA,BIND(grid,cancel),$)
 C(4,#OOLabelFgA,s,$)
 SWITCH(#OOLabelFgA,
-H,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_A}),
+H,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_F}),
 D,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_A}),
 R,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_E}),
 E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_C}))
@@ -534,7 +536,7 @@ TXFORM=L4002
 #OOBTN_B=
 {search:false,formatter:'cust:bind-button:#OOBTNDISPLAYB',align:'center',canExport:false,width:65}
 #OOBTN_C=
-{search:false,formatter:'cust:bind-button:#OOBTNDISPLAYC',align:'center',canExport:false,width:55}
+{search:false,formatter:'cust:bind-button:#OOBTNDISPLAYC',align:'center',canExport:false,width:65}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4002;cpi=15"/>
 #AcDate#TlrNo

@@ -54,12 +54,12 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE I.\"YearMonth\" = :yymm ";
 		sql += "		  AND MLB.\"AcctCode\" <> 990 ";
 		sql += "	),\"tempTotal\" AS (";
-		sql += "		SELECT DECODE(M.\"EntCode\",'1','G6','G7') AS \"Column\"";
+		sql += "		SELECT DECODE(M.\"EntCode\",'1','G7','G6') AS \"Column\"";
 		sql += "			  ,SUM(M.\"PrinBalance\") AS \"Value\"";
 		sql += "		FROM \"MonthlyFacBal\" M";
 		sql += "		WHERE M.\"YearMonth\" = :yymm ";
 		sql += "		  AND M.\"PrinBalance\" > 0 ";
-		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G6','G7')";
+		sql += "		GROUP BY DECODE(M.\"EntCode\",'1','G7','G6')";
 		sql += "		UNION";
 		sql += "		SELECT 'E9' AS \"Column\"";
 		sql += "			  ,\"LoanBal\" AS \"Value\"";
@@ -148,18 +148,30 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findPart2_1(TitaVo titaVo, int yearMonth) throws Exception {
+	/**
+	 * 
+	 * 產製資料
+	 * 
+	 * @param titaVo
+	 * @param lYearMonth 上個西元年月
+	 * @param unitCode    金額單位
+	 * 
+	 */
+	public List<Map<String, String>> findPart2_1(TitaVo titaVo, int lYearMonth) throws Exception {
 		this.info("LM085ServiceImpl findPart2_1 ");
 
 		String sql = " ";
-		sql += "	";
+		sql += "	SELECT \"LegalLoss\" AS \"LegalLoss\"";
+		sql += "	FROM \"MonthlyLM052Loss\"";
+		sql += "	WHERE \"YearMonth\" = :lyymm";
+
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yearMonth);
+		query.setParameter("lyymm", lYearMonth);
 
 		return this.convertToMap(query);
 	}
@@ -236,7 +248,7 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		FROM \"tempCollection\"";
 		sql += "	)";
 		sql += "	SELECT A.\"Code\" AS \"Code\"";
-		sql += "		  ,ROUND(NVL(B.\"Value\" , 0)/A.\"Value\",5) * 100 AS \"Value\"";
+		sql += "		  ,ROUND(NVL(B.\"Value\" , 0)/A.\"Value\",5) AS \"Value\"";
 		sql += "	FROM(";
 		sql += "		SELECT \"EntCode\" AS \"Code\"";
 		sql += "			  ,SUM(\"Value\") AS \"Value\"";
@@ -275,7 +287,8 @@ public class LM085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int lyeatMonth = ymd(yearMonth,-1) / 100;
 		//下月1號
 		int nDate = (ymd(yearMonth,1)  / 100 ) * 100 + 1;
-		
+		this.info("lyeatMonth="+lyeatMonth);
+		this.info("nDate="+nDate);
 		String sql = " ";
 		sql += "	SELECT COUNT(*) AS \"F0\"";
 		sql += "	      ,SUM(NVL(\"PrinBalance\",0) + NVL(LT.\"Interest\",0)) AS \"F1\"";

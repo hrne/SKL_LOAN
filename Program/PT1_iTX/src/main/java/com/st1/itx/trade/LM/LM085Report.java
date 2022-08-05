@@ -74,29 +74,36 @@ public class LM085Report extends MakeReport {
 
 			fnAllList = lm085ServiceImpl.findPart1(titaVo, yearMonth, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			// B6~G10
 			exportPart1(fnAllList);
 
 			// SQL未完成 待確認
-//			fnAllList = lm085ServiceImpl.findPart2_1(titaVo, yearMonth);
-//			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-//			exportPart2(fnAllList,1);
+			fnAllList = lm085ServiceImpl.findPart2_1(titaVo, lastYearMonth);
+			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			//B16~B23
+			exportPart2(fnAllList, 1);
 			fnAllList = lm085ServiceImpl.findPart2_2(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			// F15~G20
 			exportPart2(fnAllList, 2);
 			fnAllList = lm085ServiceImpl.findPart2_3(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			exportPart2(fnAllList,3);
+			//F24~G25
+			exportPart2(fnAllList, 3);
 			// 上月資料
 			fnAllList = lm085ServiceImpl.findPart3(titaVo, lastYearMonth, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			//B29~D38
 			exportPart3(fnAllList, lastYearMonth, 1);
 			// 去年同期資料
 			fnAllList = lm085ServiceImpl.findPart3(titaVo, yearMonth - 100, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			//F29~D38
 			exportPart3(fnAllList, yearMonth - 100, 2);
 
 			fnAllList = lm085ServiceImpl.findPart4(titaVo, tranAllYearData(yearMonth, lastYearMonth), unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
+			//A45~
 			exportPart4(fnAllList, tranAllYearData(yearMonth, lastYearMonth).size());
 
 		} catch (Exception e) {
@@ -117,6 +124,9 @@ public class LM085Report extends MakeReport {
 
 	}
 
+	/**
+	 * B6~G10列
+	 */
 	private void exportPart1(List<Map<String, String>> dataList) throws LogicException {
 
 		int col = 0;
@@ -135,7 +145,6 @@ public class LM085Report extends MakeReport {
 
 			this.info("col=" + col + ",row=" + row);
 
-
 			makeExcel.setValue(row, col, amt, "#,##0", "R");
 
 		}
@@ -144,9 +153,6 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(7, 6);
 		makeExcel.formulaCalculate(8, 6);
 		makeExcel.formulaCalculate(9, 6);
-		
-		makeExcel.formulaCalculate(8, 7);
-		makeExcel.formulaCalculate(9, 7);
 
 		makeExcel.formulaCalculate(10, 2);
 		makeExcel.formulaCalculate(10, 3);
@@ -155,8 +161,14 @@ public class LM085Report extends MakeReport {
 		makeExcel.formulaCalculate(10, 6);
 		makeExcel.formulaCalculate(10, 7);
 
+		makeExcel.formulaCalculate(8, 7);
+		makeExcel.formulaCalculate(9, 7);
+
 	}
 
+	/**
+	 * B16~G25
+	 */
 	private void exportPart2(List<Map<String, String>> dataList, int form) throws LogicException {
 		int row = 0;
 
@@ -166,6 +178,8 @@ public class LM085Report extends MakeReport {
 			makeExcel.formulaCalculate(16, 2);
 			// B18
 			makeExcel.formulaCalculate(18, 2);
+
+			makeExcel.setValue(20, 2, dataList.get(0).get("LegalLoss"), "#,000", "C");
 
 			break;
 		case 2:
@@ -182,22 +196,27 @@ public class LM085Report extends MakeReport {
 			makeExcel.formulaCalculate(15, 6);
 			break;
 		case 3:
-			
+
 			row = 24;
 			for (Map<String, String> r : dataList) {
 				int count = Integer.valueOf(r.get("F0"));
 				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
 						: new BigDecimal(r.get("F1"));
 
-				makeExcel.setValue(row , 6, count,"R");
-				makeExcel.setValue(row , 7, amt, "#,##0","R");
+				this.info("count=" + count);
+				this.info("amt=" + amt);
+				makeExcel.setValue(row, 6, count, "R");
+				makeExcel.setValue(row, 7, amt, "#,##0", "R");
 				row++;
 			}
 			break;
 		}
 
 	}
-
+	/**
+	 * B29~G38
+	 * 	
+	 * */
 	private void exportPart3(List<Map<String, String>> dataList, int yearMonth, int form) throws LogicException {
 
 		int col = 0;
@@ -223,7 +242,6 @@ public class LM085Report extends MakeReport {
 				amt = getBigDecimal(r.get("F1").toString());
 
 //				this.info("col=" + col + ",row=" + row);
-
 
 				makeExcel.setValue(row, col, amt, "#,##0", "R");
 
@@ -260,7 +278,6 @@ public class LM085Report extends MakeReport {
 
 //				this.info("col=" + col + ",row=" + row);
 
-
 				makeExcel.setValue(row, col, amt, "#,##0", "R");
 
 			}
@@ -282,7 +299,9 @@ public class LM085Report extends MakeReport {
 		}
 
 	}
-
+	/**
+	 * A45~
+	 * */
 	private void exportPart4(List<Map<String, String>> dataList, int dataSize) throws LogicException {
 
 		int col = 0;
@@ -360,14 +379,13 @@ public class LM085Report extends MakeReport {
 //			makeExcel.formulaCalculate(56, c);
 //			makeExcel.formulaCalculate(57, c);
 //		}
-		
+
 		makeExcel.formulaCalculate(vaRow, 2);
 		makeExcel.formulaCalculate(vaRow, 4);
 		makeExcel.formulaCalculate(vaRow, 6);
-		makeExcel.formulaCalculate(vaRow+1, 2);
-		makeExcel.formulaCalculate(vaRow+1, 4);
-		makeExcel.formulaCalculate(vaRow+1, 6);
-		
+		makeExcel.formulaCalculate(vaRow + 1, 2);
+		makeExcel.formulaCalculate(vaRow + 1, 4);
+		makeExcel.formulaCalculate(vaRow + 1, 6);
 
 	}
 

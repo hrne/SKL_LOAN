@@ -46,62 +46,45 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 取得變數
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.get("FacmNo"));
+		int iEntryDateS = parse.stringToInteger(titaVo.get("EntryDateS").trim());
+		int iEntryDateE = parse.stringToInteger(titaVo.get("EntryDateE").trim());
+		String iSortCode = titaVo.get("SortCode").trim();
 
 		String sql = "  SELECT  ";
-		sql += "    ac.\"RvAmt\"         AS \"TxAmt\",";
-		sql += "    ac.\"FacmNo\"         AS \"FacmNo\",";
-		sql += "    ac.\"OpenTlrNo\"    AS \"TitaTlrNo\",";
-		sql += "    ac.\"OpenTxtNo\"    AS \"TitaTxtNo\",";
-		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
-		sql += "    ac.\"OpenTxCd\"     AS \"TitaTxCd\",";
-		sql += "    ac.\"SlipNote\"     AS \"SlipNote\",";
-		sql += "    ac.\"OpenAcDate\"   AS \"AcDate\",";
-		sql += "    ac.\"CreateDate\"   AS \"CreateDate\",";
-		sql += "    'C'                   AS \"DbCr\",";
-		sql += "    0                    AS \"DB\"";
-		sql += "  FROM";
-		sql += "    \"AcReceivable\"   ac";
-		sql += "    LEFT JOIN \"TxTranCode\"     tc ON tc.\"TranNo\" = ac.\"OpenTxCd\"";
-		sql += "  WHERE";
-		sql += "    ac.\"AcctCode\" = 'TAV' ";
-		sql += "    AND ac.\"CustNo\" = :custno";
-		if (iFacmNo > 0) {
-			sql += "    AND ac.\"FacmNo\" = :facmno";
-		}
 
-		sql += "  UNION";
-		sql += "  SELECT";
 		sql += "    ad.\"TxAmt\"        AS \"TxAmt\",";
-		sql += "    ad.\"FacmNo\"        AS \"FacmNo\",";
+		sql += "    ad.\"FacmNo\"       AS \"FacmNo\",";
 		sql += "    ad.\"TitaTlrNo\"    AS \"TitaTlrNo\",";
 		sql += "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
 		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
-		sql += "    ad.\"SlipNote\"     AS \"SlipNote\",";
+		sql += "  	lx.\"Desc\"  		AS \"Desc\", ";
+		sql += "  	lx.\"EntryDate\"  	AS \"EntryDate\", ";
 		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
 		sql += "    ad.\"CreateDate\"   AS \"CreateDate\",";
-		sql += "    Ad.\"DbCr\"         AS \"DbCr\",";
-		sql += "    1                   AS \"DB\"";
+		sql += "    ad.\"DbCr\"         AS \"DbCr\",";
+		sql += "    1                   AS \"DB\" ";
 		sql += "  FROM";
-		sql += "    \"AcReceivable\"   ar";
-		sql += "  LEFT JOIN  \"AcDetail\"     ad";
-		sql += "     ON ad.\"AcctCode\" = ar.\"AcctCode\" ";
-		sql += "    AND ad.\"CustNo\" = :custno";
-		sql += "    AND ad.\"FacmNo\" = ar.\"FacmNo\" ";
-		sql += "    AND ad.\"AcDate\" >= ar.\"OpenAcDate\" ";
-		sql += "    AND ad.\"AcDate\" <= ar.\"LastAcDate\" ";
-		sql += "    AND CASE WHEN  ad.\"AcDate\" = ar.\"OpenAcDate\"";
-		sql += "              AND  ad.\"TitaTlrNo\"= ar.\"OpenTlrNo\" ";
-		sql += "              AND  ad.\"TitaTxtNo\"= ar.\"OpenTxtNo\" ";
-		sql += "             THEN 1 ELSE 0 END = 0 ";
+		sql += "    \"AcDetail\"   ad";
+		sql += "  LEFT JOIN  \"LoanBorTx\"     lx";
+		sql += "    ON  lx.\"CustNo\" = ad.\"CustNo\" ";
+		sql += "    AND lx.\"FacmNo\" = NVL(JSON_VALUE(ad.\"JsonFields\",  '$.FacmNo'),ad.\"FacmNo\") ";
+		sql += "    AND lx.\"BormNo\" = NVL(JSON_VALUE(ad.\"JsonFields\",  '$.BormNo'),ad.\"BormNo\") ";
+		sql += "    AND lx.\"BorxNo\" = JSON_VALUE  (ad.\"JsonFields\",  '$.BorxNo') ";
 		sql += "  LEFT JOIN \"TxTranCode\"   tc ON tc.\"TranNo\" = ad.\"TitaTxCd\"";
 		sql += "  WHERE";
-		sql += "    ar.\"AcctCode\" = 'TAV' ";
-		sql += "    AND ar.\"CustNo\" = :custno";
+		sql += "    ad.\"AcctCode\" = 'TAV' ";
+		sql += "    AND JSON_VALUE  (ad.\"JsonFields\",  '$.EntryDate') >= :entryDateS ";
+		sql += "    AND JSON_VALUE  (ad.\"JsonFields\",  '$.EntryDate') <= :entryDateE ";
+		sql += "    AND ad.\"CustNo\" = :custno";
 		if (iFacmNo > 0) {
-			sql += "    AND ar.\"FacmNo\" = :facmno";
+			sql += "    AND ad.\"FacmNo\" = :facmno";
 		}
-		sql += " ORDER BY \"DB\", \"FacmNo\", \"AcDate\", \"CreateDate\"";
+		if ("1".equals(iSortCode)) {
+			sql += " ORDER BY  lx.\"EntryDate\",ad.\"CreateDate\", ad.\"FacmNo\" ,ad.\"AcSeq\" ";
+		} else {
+			sql += " ORDER BY   ad.\"FacmNo\" ,lx.\"EntryDate\",ad.\"CreateDate\",ad.\"AcSeq\" ";
+		}
 
 		sql += " " + sqlRow;
 
@@ -112,7 +95,11 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 		// 如果沒取得變數則不會傳入query
+		this.info("entryDateS" + iEntryDateS);
+		this.info("entryDateE" + iEntryDateE);
 		query.setParameter("custno", iCustNo);
+		query.setParameter("entryDateS", iEntryDateS + 19110000);
+		query.setParameter("entryDateE", iEntryDateE + 19110000);
 		if (iFacmNo > 0) {
 			query.setParameter("facmno", iFacmNo);
 		}

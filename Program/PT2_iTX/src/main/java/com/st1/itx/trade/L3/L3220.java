@@ -409,7 +409,6 @@ public class L3220 extends TradeBuffer {
 		// 其他欄位
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);
-		tTempVo.putParam("Temp2ReasonCode", iTempReasonCode);
 		tTempVo.putParam("Description", titaVo.getParam("Description"));
 		tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank1") + titaVo.getParam("RpRemitBranch1"));
 		tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo1"));

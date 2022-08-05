@@ -192,7 +192,7 @@ public class L8304 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ043.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ043, uJcicZ043);
-			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey()+uJcicZ043.getCustId()+uJcicZ043.getRcDate());
+			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey()+uJcicZ043.getCustId()+uJcicZ043.getRcDate()+uJcicZ043.getAccount());
 			break;
 			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -253,7 +253,7 @@ public class L8304 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0432, uJcicZ0432);
-			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey()+uJcicZ0432.getCustId()+uJcicZ0432.getRcDate());
+			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey()+uJcicZ0432.getCustId()+uJcicZ0432.getRcDate()+uJcicZ0432.getAccount());
 		default:
 			break;
 		}

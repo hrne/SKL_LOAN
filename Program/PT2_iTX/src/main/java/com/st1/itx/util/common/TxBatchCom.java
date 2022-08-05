@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -279,6 +280,8 @@ public class TxBatchCom extends TradeBuffer {
 //  額度還款應繳日
 	private String repayIntDateByFacmNoVo = null;
 
+//	L3200本息計算表
+	private TempVo l3200IntTempVo = new TempVo();
 //	溢短收記號
 	private int overRpFg = 0; // 1->溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 
@@ -350,6 +353,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.errorMsg = "";
 		this.procStsCode = "";
 		this.tTempVo = new TempVo();
+		this.l3200IntTempVo = new TempVo();
 	}
 
 	@Override
@@ -946,6 +950,23 @@ public class TxBatchCom extends TradeBuffer {
 		l3200TitaVo.putParam("RepayIntDate", this.tTempVo.getParam("RepayIntDate"));// 應繳日
 		l3200TitaVo.putParam("RepayIntDateByFacmNoVo", this.tTempVo.getParam("RepayIntDateByFacmNoVo"));// 額度應繳日
 		l3200TitaVo.putParam("RepayLoan", this.tTempVo.getParam("RepayLoan"));// 償還本利
+
+		if (this.tTempVo.get("l3200IntTempVo") != null) {
+			this.l3200IntTempVo = tTempVo.getVo("l3200IntTempVo");
+			for (int i = 1; i <= 20; i++) {
+				if (this.l3200IntTempVo.get("FacmBormNo" + i) != null) {
+					l3200TitaVo.putParam("FacmBormNo" + i, this.l3200IntTempVo.getParam("FacmBormNo" + i));
+					l3200TitaVo.putParam("IntSEDate" + i, this.l3200IntTempVo.getParam("IntSEDate" + i));
+					l3200TitaVo.putParam("Principal" + i, this.l3200IntTempVo.getParam("Principal" + i));
+					l3200TitaVo.putParam("Interest" + i, this.l3200IntTempVo.getParam("Interest" + i));
+					l3200TitaVo.putParam("DelayInt" + i, this.l3200IntTempVo.getParam("DelayInt" + i));
+					l3200TitaVo.putParam("BreachAmt" + i, this.l3200IntTempVo.getParam("BreachAmt" + i));
+					l3200TitaVo.putParam("Total" + i, this.l3200IntTempVo.getParam("Total" + i));
+					i++;
+				}
+			}
+		}
+
 		return l3200TitaVo;
 	}
 
@@ -1035,6 +1056,7 @@ public class TxBatchCom extends TradeBuffer {
 		tBatxDetailId.setBatchNo(tBatxHead.getBatchNo());
 		tBatxDetailId.setDetailSeq(tBatxHead.getBatxTotCnt());
 		BatxDetail tBatxDetail = new BatxDetail();
+		tBatxDetail.setBatxDetailId(tBatxDetailId);
 		tBatxDetail.setRepayCode(repayCode);
 		tBatxDetail.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDate")));
 		tBatxDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpCustNo1")));
@@ -1760,6 +1782,10 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0) {
 			this.tTempVo.putParam("RepayLoan", this.repayLoan);
 		}
+		// L3200本息計算表
+		if (this.l3200IntTempVo != null) {
+			this.tTempVo.putParam("l3200IntTempVo", this.l3200IntTempVo);
+		}
 
 	}
 
@@ -1844,6 +1870,7 @@ public class TxBatchCom extends TradeBuffer {
 		}
 
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
+			int i = 0;
 			for (BaTxVo baTxVo : baTxList) {
 				if (baTxVo.getDataKind() == 1) {
 					// 應繳費用 = 1.應收費用+未收費用
@@ -1894,6 +1921,7 @@ public class TxBatchCom extends TradeBuffer {
 					if (this.prePayintDate == 0 || baTxVo.getIntStartDate() < this.prePayintDate) {
 						this.prePayintDate = baTxVo.getIntStartDate();
 					}
+
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 						this.principal = this.principal.add(baTxVo.getPrincipal());
@@ -1906,6 +1934,19 @@ public class TxBatchCom extends TradeBuffer {
 						if (baTxVo.getIntEndDate() > this.intEndDate) {
 							this.intEndDate = baTxVo.getIntEndDate();
 						}
+					}
+					if (this.repayType <= 2) {
+						i++;
+						this.l3200IntTempVo.put("FacmBormNo" + i, parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-"
+								+ parse.IntegerToString(baTxVo.getBormNo(), 3));
+						this.l3200IntTempVo.put("IntSEDate" + i,
+								"" + baTxVo.getIntStartDate() + "-" + baTxVo.getIntEndDate());
+						this.l3200IntTempVo.put("Principal" + i, "" + baTxVo.getPrincipal());
+						this.l3200IntTempVo.put("Interest" + i, "" + baTxVo.getInterest());
+						this.l3200IntTempVo.put("DelayInt" + i, "" + baTxVo.getDelayInt());
+						this.l3200IntTempVo.put("BreachAmt" + i, "" + baTxVo.getBreachAmt());
+						this.l3200IntTempVo.put("Total" + i, "" + baTxVo.getAcctAmt());
+
 					}
 				}
 

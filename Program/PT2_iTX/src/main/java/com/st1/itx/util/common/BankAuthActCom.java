@@ -740,12 +740,13 @@ public class BankAuthActCom extends TradeBuffer {
 		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.facmNoEq(iCustNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slBankAuthAct == null) {
 			this.isNewAct = true;
-		} else {
-			tBankAuthAct = slBankAuthAct.getContent().get(0);
-			if ("".equals(tBankAuthAct.getStatus().trim())) {
-				throw new LogicException("E0015", "該額度扣款帳號尚未提出授權 " + tBankAuthAct.getRepayAcct());
-			}
-		}
+		} 
+//		else {
+//			tBankAuthAct = slBankAuthAct.getContent().get(0);
+//			if ("".equals(tBankAuthAct.getStatus().trim())) {
+//				throw new LogicException("E0015", "該額度扣款帳號尚未提出授權 " + tBankAuthAct.getRepayAcct());
+//			}
+//		}
 		// 同戶扣款帳號
 		tBankAuthAct = getRepayAcct(titaVo);
 		String acctSeq = "  ";

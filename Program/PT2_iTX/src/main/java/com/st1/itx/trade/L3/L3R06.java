@@ -11,10 +11,13 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
@@ -22,6 +25,7 @@ import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -39,6 +43,8 @@ public class L3R06 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	public LoanFacTmpService loanFacTmpService;
 
 	@Autowired
 	Parse parse;
@@ -60,6 +66,7 @@ public class L3R06 extends TradeBuffer {
 	private int iFKey;
 	private int iCustNo;
 	private int iFacmNo;
+	private int wkFacmNo;
 	private int iBormNo;
 	private int oIntStartDate = 9991231;
 	private int oIntEndDate = 0;
@@ -67,6 +74,8 @@ public class L3R06 extends TradeBuffer {
 	private int iRepayType;
 	private int iEntryDate;
 	private int payMethodFg = 0;
+	private int tmpFacmNo = 0;
+	private String tmpFacmNoX = "";
 
 	private String iExtraRepayFlag;
 	private String iTxCode = "";
@@ -84,6 +93,9 @@ public class L3R06 extends TradeBuffer {
 	private BigDecimal oShortfallPrin = BigDecimal.ZERO;
 	private BigDecimal oShortCloseBreach = BigDecimal.ZERO;
 	private BigDecimal oExcessive = BigDecimal.ZERO;
+	private BigDecimal oExcessiveAll = BigDecimal.ZERO;
+	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
+
 	private BigDecimal oTempTax = BigDecimal.ZERO;
 	private BigDecimal oModifyFee = BigDecimal.ZERO;
 	private BigDecimal oAcctFee = BigDecimal.ZERO;
@@ -100,6 +112,7 @@ public class L3R06 extends TradeBuffer {
 	private ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<BaTxVo> baTxList;
+	private ArrayList<LoanFacTmp> lLoanFacTmp = new ArrayList<LoanFacTmp>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -128,9 +141,11 @@ public class L3R06 extends TradeBuffer {
 			CloseBreachAmtRoutine();
 			break;
 		case 2:
+			loadBorMainRoutine();
 			RepayAmtRoutine();
 			break;
 		case 3:
+			loadBorMainRoutine();
 			EachFeeRoutine();
 			break;
 		default:
@@ -152,6 +167,7 @@ public class L3R06 extends TradeBuffer {
 		this.totaVo.putParam("L3r06ShortfallPrin", oShortfallPrin);
 		this.totaVo.putParam("L3r06ShortCloseBreach", oShortCloseBreach);
 		this.totaVo.putParam("L3r06Excessive", oExcessive);
+		this.totaVo.putParam("L3r06ExcessiveAll", oExcessiveAll);
 		this.totaVo.putParam("L3r06TempTax", oTempTax);
 		this.totaVo.putParam("L3r06ModifyFee", oModifyFee);
 		this.totaVo.putParam("L3r06AcctFee", oAcctFee);
@@ -165,9 +181,98 @@ public class L3R06 extends TradeBuffer {
 		this.totaVo.putParam("L3r06ShortFacmNo", oShortFacmNo);
 		this.totaVo.putParam("L3r06CloseBreachAmtUnpaid", oCloseBreachAmtUnpaid);
 		this.totaVo.putParam("L3r06PayMethodFg", payMethodFg);
+		this.totaVo.putParam("L3r06tmpFacmNoX", tmpFacmNoX);
+		this.totaVo.putParam("L3r06tmpFacmNo", this.tmpFacmNo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void loadBorMainRoutine() throws LogicException {
+
+		int wkFacmNoStart = 1;
+		int wkFacmNoEnd = 999;
+		int wkBormNoStart = 1;
+		int wkBormNoEnd = 900;
+		this.info("RepayAmtRoutine ... ");
+
+		if (iFacmNo > 0) {
+			wkFacmNoStart = iFacmNo;
+			wkFacmNoEnd = iFacmNo;
+			oRpFacmNo = iFacmNo;
+		}
+
+		if (iBormNo > 0) {
+			wkBormNoStart = iBormNo;
+			wkBormNoEnd = iBormNo;
+		}
+
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
+		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
+		}
+//	檢核
+		this.info("iTxCode.substring = " + iTxCode.substring(0, 2));
+		if (!"L6".equals(iTxCode.substring(0, 2))) {
+			for (LoanBorMain ln : lLoanBorMain) {
+				if ((iTxCode.equals("L3440") && ln.getStatus() == 2)
+						|| (!iTxCode.equals("L3440") && (ln.getStatus() == 0 || ln.getStatus() == 4))) {
+					if (ln.getActFg() == 1 && iFKey == 0) {
+						throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  "
+								+ ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
+					}
+					if ("5".equals(ln.getAmortizedCode())) { // 攤還方式 = 5.按月撥款收息(逆向貸款)
+						continue;
+					}
+					if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
+						if (ln.getNextPayIntDate() <= iEntryDate) {
+							throw new LogicException(titaVo, "E3072", "應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有其款未回收
+						}
+					}
+				}
+			}
+		}
+
+//	TODO: Sorting 部分償還時 需要繳費用的額度才需要檢查攤還方式是否為3
+		if (iRepayType == 2) {
+			Sorting();
+		}
+		if (iRepayType == 1) {
+
+			Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
+				public int compare(LoanBorMain c1, LoanBorMain c2) {
+					// status
+					if (c1.getStatus() != c2.getStatus()) {
+						return c1.getStatus() - c2.getStatus();
+					}
+
+					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
+						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
+					}
+					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
+					}
+					if (c1.getFacmNo() != c2.getFacmNo()) {
+						return c2.getFacmNo() - c1.getFacmNo();
+					}
+					if (c1.getDueAmt().compareTo(c2.getDueAmt()) != 0) {
+						return c2.getDueAmt().compareTo(c1.getDueAmt());
+					}
+
+					return 0;
+				}
+			});
+		}
+
+		Slice<LoanFacTmp> slLoanFacTmp = loanFacTmpService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+		if (slLoanFacTmp != null) {
+			lLoanFacTmp = slLoanFacTmp == null ? null : new ArrayList<LoanFacTmp>(slLoanFacTmp.getContent());
+		}
+		// 抓取第一筆的計算額度
+		this.tmpFacmNo = getTmpFacmNo(iFacmNo, lLoanBorMain.get(0).getFacmNo());
+
 	}
 
 	private void CloseBreachAmtRoutine() throws LogicException {
@@ -181,22 +286,19 @@ public class L3R06 extends TradeBuffer {
 	}
 
 	private void RepayAmtRoutine() throws LogicException {
-		int wkFacmNoStart = 1;
-		int wkFacmNoEnd = 999;
-		int wkBormNoStart = 1;
-		int wkBormNoEnd = 900;
 		int wkTerms = 0;
 		int wkTotaCount = 0;
 		int wkPreRepayTermNo = 0;
 		int wkTermNo = 0;
 		int wkPreRepayDate = 0;
 		int wkPrevTermNo = 0;
-
-		this.info("RepayAmtRoutine ... ");
+		BigDecimal wkExtraRepay = iExtraRepay;
 
 		// 查詢各項費用
 		this.baTxList = new ArrayList<BaTxVo>();
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, this.tmpFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
+
+		oExcessiveAll = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
 
 		oAcctFee = baTxCom.getAcctFee();
 		oFireFee = baTxCom.getFireFee();
@@ -208,57 +310,18 @@ public class L3R06 extends TradeBuffer {
 		oShortfallInt = baTxCom.getShortfallInterest();
 		oShortfallPrin = baTxCom.getShortfallPrincipal();
 		oShortCloseBreach = baTxCom.getShortCloseBreach();
-		oExcessive = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
+		oExcessive = baTxCom.getExcessive();
 
 		oTotalFee = oTotalFee.add(oModifyFee).add(oAcctFee).add(oFireFee).add(oCollFireFee).add(oLawFee)
 				.add(oCollLawFee);
 
-		if (iFacmNo > 0) {
-			wkFacmNoStart = iFacmNo;
-			wkFacmNoEnd = iFacmNo;
-			oRpFacmNo = iFacmNo;
-		}
-
-		if (iBormNo > 0) {
-			wkBormNoStart = iBormNo;
-			wkBormNoEnd = iBormNo;
-		}
-
-		BigDecimal wkExtraRepay = iExtraRepay;
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
-		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
-		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
-		}
-//		檢核
 		for (LoanBorMain ln : lLoanBorMain) {
 			if ((iTxCode.equals("L3440") && ln.getStatus() == 2)
 					|| (!iTxCode.equals("L3440") && (ln.getStatus() == 0 || ln.getStatus() == 4))) {
-				if (ln.getActFg() == 1 && iFKey == 0) {
-					throw new LogicException(titaVo, "E0021",
-							"放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
-				}
 				if ("5".equals(ln.getAmortizedCode())) { // 攤還方式 = 5.按月撥款收息(逆向貸款)
 					continue;
 				}
-				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
-					if (ln.getNextPayIntDate() <= iEntryDate) {
-						throw new LogicException(titaVo, "E3072", "應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有其款未回收
-					}
-				}
-			}
-		}
-
-//		TODO: Sorting 部分償還時 需要繳費用的額度才需要檢查攤還方式是否為3
-		if (iRepayType == 2) {
-			Sorting();
-		}
-		int test = 0;
-		for (LoanBorMain ln : lLoanBorMain) {
-			if ((iTxCode.equals("L3440") && ln.getStatus() == 2)
-					|| (!iTxCode.equals("L3440") && (ln.getStatus() == 0 || ln.getStatus() == 4))) {
-				if ("5".equals(ln.getAmortizedCode())) { // 攤還方式 = 5.按月撥款收息(逆向貸款)
+				if (!isCalcFacmNo(tmpFacmNo, ln.getFacmNo())) {
 					continue;
 				}
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
@@ -314,24 +377,44 @@ public class L3R06 extends TradeBuffer {
 					}
 				}
 //				TODO:UI控制 繳納方式: 攤還方式為3時記號為1否則為0 1.顯示可輸入 2.不顯示不可輸入 
-				test++;
-				this.info("L3R06 test = " + lLoanBorMain.size() + test);
 				this.info("L3R06 ln攤還方式 = " + ln.getAmortizedCode());
 				if ("3".equals(ln.getAmortizedCode()) || "4".equals(ln.getAmortizedCode())) {
 					payMethodFg = 1;
 				}
-				loanCalcRepayIntCom.getRepayInt(titaVo);
+				lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 				oLoanBal = oLoanBal.add(ln.getLoanBal());
 				oRate = ln.getStoreRate();
 				oCurrencyCode = ln.getCurrencyCode();
-				oPrincipal = oPrincipal.add(getPrincipal(ln, loanCalcRepayIntCom.getPrincipal()));
+				oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal());
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
+
 				if (oRpFacmNo == 0) {
 					oRpFacmNo = ln.getFacmNo();
 				}
 				oShortFacmNo = ln.getFacmNo();
+
+				int wkIntStartDate = 99991231;
+				int wkIntEndDate = 0;
+				for (CalcRepayIntVo c : lCalcRepayIntVo) {
+
+					wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
+					wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
+				}
+				OccursList occursList = new OccursList();
+				occursList.putParam("L3r06FacmNo", ln.getFacmNo());
+				occursList.putParam("L3r06BormNo", ln.getBormNo());
+				occursList.putParam("L3r06IntStartDate", wkIntStartDate);
+				occursList.putParam("L3r06IntEndDate", wkIntEndDate);
+				occursList.putParam("L3r06Principal", loanCalcRepayIntCom.getPrincipal());
+				occursList.putParam("L3r06Interest", loanCalcRepayIntCom.getInterest());
+				occursList.putParam("L3r06DelayInt", loanCalcRepayIntCom.getDelayInt());
+				occursList.putParam("L3r06BreachAmt", loanCalcRepayIntCom.getBreachAmt());
+				occursList.putParam("L3r06Total", loanCalcRepayIntCom.getPrincipal().add(loanCalcRepayIntCom
+						.getInterest().add(loanCalcRepayIntCom.getDelayInt().add(loanCalcRepayIntCom.getBreachAmt()))));
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
 				wkTotaCount++;
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
@@ -348,6 +431,7 @@ public class L3R06 extends TradeBuffer {
 					}
 				}
 			}
+
 		}
 		if (oShortfall.compareTo(BigDecimal.ZERO) == 0 && wkTotaCount == 0
 				&& iExtraRepay.compareTo(BigDecimal.ZERO) == 0 && !iTxCode.equals("L3440")) {
@@ -379,21 +463,6 @@ public class L3R06 extends TradeBuffer {
 		}
 
 		this.info("RepayAmtRoutine end ");
-	}
-
-	private BigDecimal getPrincipal(LoanBorMain ln, BigDecimal principal) throws LogicException {
-		BigDecimal wkPrincipal = principal;
-		for (BaTxVo ba : baTxList) {
-			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo()
-					&& ln.getBormNo() == ba.getBormNo()) {
-				if (wkPrincipal.add(ba.getUnPaidAmt()).compareTo(ln.getLoanBal()) > 0) {
-					wkPrincipal = ln.getLoanBal().subtract(ba.getUnPaidAmt());
-					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 "
-							+ ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
-				}
-			}
-		}
-		return wkPrincipal;
 	}
 
 	private void Sorting() throws LogicException {
@@ -459,7 +528,7 @@ public class L3R06 extends TradeBuffer {
 		this.info("EachFeeRoutine ... ");
 
 		// 查詢各項費用
-		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo);
+		baTxCom.settingUnPaid(iEntryDate, iCustNo, this.tmpFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo);
 
 		oAcctFee = baTxCom.getAcctFee();
 		oFireFee = baTxCom.getFireFee();
@@ -480,4 +549,53 @@ public class L3R06 extends TradeBuffer {
 		this.info("   oShortfall      = " + oShortfall);
 		this.info("EachFeeRoutine end ");
 	}
+
+	// 是否為計算額度
+	private Boolean isCalcFacmNo(int tmpFacmNo, int facmNo) {
+		// tmpFacmNo >0 為單一額度
+		// tmpFacmNo =0 為全部非指定額度
+		Boolean isCalcFacmNo = false;
+		if (tmpFacmNo > 0 && tmpFacmNo == facmNo) {
+			isCalcFacmNo = true;
+		}
+		if (tmpFacmNo == 0) {
+			isCalcFacmNo = true;
+			for (LoanFacTmp t : lLoanFacTmp) {
+				if (facmNo == t.getFacmNo()) {
+					isCalcFacmNo = false;
+				}
+			}
+		}
+		this.info("isCalcFacmNo END " + "tmpFacmNo = " + tmpFacmNo + " facmNo = " + facmNo + " " + isCalcFacmNo);
+		return isCalcFacmNo;
+	}
+
+	// 取暫收計算額度(第一筆)
+	private int getTmpFacmNo(int iFacmNo, int firstFacmNo) {
+
+		// facmNotmp >0 為單一額度
+		// facmNotmp =0 為全部非指定額度
+		int facmNotmp = 0;
+		Boolean isLoanFacTmp = false;
+		String x = "";
+		for (LoanFacTmp t : lLoanFacTmp) {
+			tmpFacmNoX += x + parse.IntegerToString(t.getFacmNo(), 3);
+			x = ",";
+			if (firstFacmNo == t.getFacmNo()) {
+				isLoanFacTmp = true;
+			}
+		}
+		if (iFacmNo > 0) {
+			return iFacmNo;
+		}
+		if (isLoanFacTmp) {
+			facmNotmp = firstFacmNo;
+		} else {
+			facmNotmp = 0;
+		}
+		this.info("getTmpFacmNo END " + " iFacmNo = " + iFacmNo + " firstFacmNo =" + firstFacmNo + " facmNotmp = "
+				+ facmNotmp);
+		return facmNotmp;
+	}
+
 }

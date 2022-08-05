@@ -86,7 +86,7 @@ C(3,#ChequeFlag,1,INVOKEJS(SHOW,p1,12,12,0),$)
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdTempReasonCode+暫收原因",#TempReasonCode,#TempReasonCodeX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,#BTN4],
-[#<->#,"#FdFacmNo+額度編號",#FacmNo,#BTN1],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,#BTN1,#TmpFacmNoXX],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdTempAmt+轉暫收金額",#TwTempAmt,#UsTempAmt,#TempAmtX],
 ["#FdTempSourceCode+暫收來源",#TempSourceCodeX],
@@ -558,7 +558,18 @@ C(3,#ChequeFlag,1
 #FacmNo=A,3,I
 C(4,#ApplNo,$,s)
 
+#RimTempItemCode=A,2,S
+#SendL3r05=X,1,S
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimTempReasonCode,1)
+E(0,@RimTempItemCode,0)
+RESET_RIM(#SendL3r05,L3R05)
+S(L3R05,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimTempReasonCode,#RimTempItemCode)
+R(1,L3R05)
+C(4,#L3r05TmpFacmNoX,T(2,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#L3r05TmpFacmNoX))
 
+#TmpFacmNoXX=X,60,L
 
 ![已入帳未還款-明細序號]
 #DetailSeq=A,6,S
@@ -967,6 +978,7 @@ E(0,@RP_CHQUEAMT,#TimTempAmt)
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L2R09.dec"/>
+<include src="ROM.icf::L3R05.dec"/>
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L3R04.dec"/>
 </sub>
@@ -1025,6 +1037,7 @@ TXFORM=L3210^
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L2R09.tom"/>
 <include src="ROM.icf::L3R04.tom"/>
+<include src="ROM.icf::L3R05.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

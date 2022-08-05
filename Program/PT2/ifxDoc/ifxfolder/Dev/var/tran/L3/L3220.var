@@ -658,8 +658,7 @@ IF(#RP_AmlCheckName==#TimCustNoX,T(2,@RemitIdKind,#L2r07RemitIdKind)
 
 
 !匯款戶名=銀扣戶名
-IF(#RP_AmlCheckName==#RelationName,T(2,@RemitIdKind,#CheckRelationIdKind)
-                                   T(2,@RpRemitIdKind,#CheckRelationIdKind)
+IF(#RP_AmlCheckName==#RelationName,
                                    T(H,@RpRemitIdKindX,#RpRemitIdKind,#CustTypeHelp)
                                    T(2,@RemitId,#RelationId)
                                    T(2,@RpRemitId,#RelationId)

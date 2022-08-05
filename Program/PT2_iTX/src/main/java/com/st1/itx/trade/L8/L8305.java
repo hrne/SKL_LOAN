@@ -250,7 +250,7 @@ public class L8305 extends TradeBuffer {
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ044 = sJcicZ044Service.ukeyFirst(iKey, titaVo);
 			JcicZ044 uJcicZ0442 = new JcicZ044();
-			uJcicZ044 = sJcicZ044Service.holdById(iJcicZ044.getJcicZ044Id(), titaVo);
+			uJcicZ0442 = sJcicZ044Service.holdById(iJcicZ044.getJcicZ044Id(), titaVo);
 			
 			iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id);
 			if (iJcicZ044 == null) {

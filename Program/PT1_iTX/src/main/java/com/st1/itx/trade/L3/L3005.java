@@ -140,9 +140,11 @@ public class L3005 extends TradeBuffer {
 
 		this.totaVo.putParam("OCustNo", iCustNo);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
-		this.totaVo.putParam("OShortfall", BigDecimal.ZERO.subtract(baTxCom.getShortfall()));
+		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 		this.totaVo.putParam("OLoanCustFlag", oLoanCustRmkFlag);
+		this.totaVo.putParam("OTmpFacmNoX", baTxCom.getTmpFacmNoX());
+
 		if (lLoanCustRmkSize > 5) {
 			this.totaVo.putParam("OLoanCustRmkX", loanCustRmkX + "...未完"); // 帳務備忘錄
 		} else {
@@ -201,18 +203,18 @@ public class L3005 extends TradeBuffer {
 				int borxNo = parse.stringToInteger(result.get("BorxNo"));
 				BigDecimal txAmt = parse.stringToBigDecimal(result.get("TxAmt"));
 				BigDecimal tempAmt = parse.stringToBigDecimal(result.get("TempAmt"));
+				BigDecimal overflow = parse.stringToBigDecimal(result.get("Overflow"));
 				BigDecimal loanBal = parse.stringToBigDecimal(result.get("LoanBal"));
 				BigDecimal rate = parse.stringToBigDecimal(result.get("Rate"));
 				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest"))
 						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
-				needPaidAmt = txAmt.subtract(tempAmt).add(unpaidAmt);
+				needPaidAmt = txAmt.add(tempAmt).subtract(overflow).add(unpaidAmt);
 				newTxNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
-				BigDecimal wkTempAmt = BigDecimal.ZERO;
-				BigDecimal wkShortfall = BigDecimal.ZERO;
+				BigDecimal wkOverShort = BigDecimal.ZERO;
 				if (!txNo.equals(newTxNo)) {
 					if ("L3220".equals(titaTxCd) || totTxAmt.compareTo(BigDecimal.ZERO) == 0) {
 						occursList.putParam("OOTxMsg", ""); // 金額+還款類別
@@ -238,17 +240,12 @@ public class L3005 extends TradeBuffer {
 					wkCurrencyCode = titaCurCd;
 				}
 				this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
-				wkShortfall = BigDecimal.ZERO;
-				// 暫收款金額，負為暫收抵繳，正為溢收
-				if (tempAmt.compareTo(BigDecimal.ZERO) <= 0) {
-					wkTempAmt = BigDecimal.ZERO.subtract(tempAmt);
-				} else {
-					wkTempAmt = BigDecimal.ZERO;
-					wkShortfall = tempAmt;
-				}
-				// 有短收金額時為短收
+				wkOverShort = BigDecimal.ZERO;
+				// 溢短收 有短收金額時為短收否則為溢收
 				if (unpaidAmt.compareTo(BigDecimal.ZERO) > 0) {
-					wkShortfall = BigDecimal.ZERO.subtract(unpaidAmt);
+					wkOverShort = BigDecimal.ZERO.subtract(unpaidAmt);
+				} else {
+					wkOverShort = overflow;
 				}
 				txNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
@@ -265,14 +262,12 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOCurrencyCode", titaCurCd);
 				if (titaHCode.equals("1") || titaHCode.equals("3")) {
 					occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(txAmt));
-					occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(wkTempAmt));
-					occursList.putParam("OOShortfall", BigDecimal.ZERO.subtract(wkShortfall));
-
+					occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(tempAmt));
+					occursList.putParam("OOOverShort", BigDecimal.ZERO.subtract(wkOverShort));
 				} else {
 					occursList.putParam("OOTxAmt", txAmt);
-					occursList.putParam("OOTempAmt", wkTempAmt);
-					occursList.putParam("OOShortfall", wkShortfall);
-
+					occursList.putParam("OOTempAmt", tempAmt);
+					occursList.putParam("OOOverShort", wkOverShort);
 				}
 
 				occursList.putParam("OOLoanBal", loanBal);

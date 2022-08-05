@@ -486,8 +486,8 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 T(3,[L3921] 回收試算)
 
 
-#BUF3=X,44,S
-T(2,000+   +0000+TWD+           +     +  +#TimCustNo+#FacmNo+   )
+#BUF3=X,102,S
+T(2,000+   +0000+TWD+           +     +  +#TimCustNo+#FacmNo+   +#TXCD+000+#OTmpFacmNoX)
 #BUF2=X,40,S
 T(2,#TimCustNo+#FacmNo+#BormNo+1+#EntryDate+#TimExtraRepay+#IncludeIntFlag)
 
@@ -550,6 +550,8 @@ P(L,#ORateX)
 
 #OCurrencyCodeX=X,10,S
 T(3,)T(H,#OCurrencyCode,#CurrencyCodeHelp) 
+
+#OTmpFacmNoX=X,50,L
 
 #OPrincipal=m,14.2,S
 
@@ -636,7 +638,10 @@ P(L,#OShortfallXX)
 
 #OExcessiveX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OExcessive,#OExcessiveX)
+#OExcessiveAll=m,14.2,S
 
+#OExcessiveAllX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OExcessiveAll,#OExcessiveAllX)
 #OTempTax=m,14.2,S
 
 #OTempTaxX=X,22,L
@@ -771,9 +776,9 @@ P(R,#OOLoanBalX)
 <sub type="TOM">
 
 TXFORM=L3921
-#OLoanBal#OIntStartDate#OIntEndDate#ORate#OCurrencyCode#OPrincipal
+#OLoanBal#OIntStartDate#OIntEndDate#ORate#OCurrencyCode#OTmpFacmNoX#OPrincipal
 #OInterest#ODelayInt#OBreachAmt#OCloseBreachAmt
-#OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach#OExcessive#OTempTax
+#OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach#OExcessive#OExcessiveAll#OTempTax
 #OModifyFee#OAcctFee#OFireFee#OOvduFireFee#OLawFee#OOvduLawFee
 #OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmount#OORate
 #OOPrincipal#OOInterest#OODelayInt#OOBreachAmt#OOCloseBreachAmt
@@ -791,17 +796,17 @@ TXFORM=L3921
 [
 ["[L3921]                                 回 收 試 算"],
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
+[#<->#,"@幣別",#OCurrencyCode,"@@指定額度",#OTmpFacmNoX],
 ["@入帳日期",#OEntryDate],
 ["@放款餘額",#OLoanBalX],
 ["@計息期間",#OIntStartDate,"@-",#OIntEndDate],
 ["@利率",#ORateX],
-[#<->#,"@幣別",#OCurrencyCode],
 ["@本金",#OPrincipalX],["@契變手續費",#OModifyFeeX],
 ["@利息",#OInterestX],["@帳管費用",#OAcctFeeX],
 ["@延遲息",#ODelayIntX],["@火險費用",#OFireFeeX],
 ["@違約金",#OBreachAmtX],["@催收火險費",#OOvduFireFeeX], 
 ["@累短收",#OShortfallX,#OShortfallXX],["@法務費用",#OLawFeeX],
-["@累溢收",#OExcessiveX],["@催收法務費",#OOvduLawFeeX],
+["@累溢收",#OExcessiveX,"@全戶",#OExcessiveAllX],["@催收法務費",#OOvduLawFeeX],
 ["@暫付所得稅",#OTempTaxX],["@<font color=red>清償違約金",#OCloseBreachAmtX,"（即時收取）"],
 ["<font color=red>@小計",#OSumX],["<font color=red>@總計 ",#OCloseTotalX],
 ]

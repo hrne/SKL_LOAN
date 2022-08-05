@@ -267,6 +267,9 @@ C(3,#CustNo,0,S,T(2,#CustNo))
 
 #RPTFG=A,1,S
 
+#CtrlSearch=X,4,S
+T(1,#BatchNo,1,4)
+
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -395,9 +398,10 @@ IF(#OOBTN_TXT == "查詢",T(2,5+#AcDate+#BatchNo+#OODetailSeq),T(2,2+#AcDate+#Ba
 T(2,#AcDate+0000000+#OOTxSn)
 
 #OOBTN_A=A,2,O
+
 SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxbuf=#OOBUF_B}),
                       6,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxbuf=#OOBUF_B}),
-                      7,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxbuf=#OOBUF_B}),
+                      7,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxbuf=#OOBUF_B}),C(5,#CtrlSearch,RESV,BIND(grid,cancel),$)C(5,#CtrlSearch,RESV,s,$)
                         SWITCH(#OORepayCode,01,BIND(grid,{ cmd=CHAIN; ntxcd=L4201; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4201}),
                                             02,C(5,#OOReconCode,P01,BIND(grid,{ cmd=CHAIN; ntxcd=L4203; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4203}),
                                                                   BIND(grid,{ cmd=CHAIN; ntxcd=L4202; text=#OOBTN_TXT; ntxbuf=#OOBUF_L4202})),

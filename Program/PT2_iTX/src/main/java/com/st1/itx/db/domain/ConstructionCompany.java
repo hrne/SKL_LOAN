@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * ConstructionCompany 建商名單檔<br>

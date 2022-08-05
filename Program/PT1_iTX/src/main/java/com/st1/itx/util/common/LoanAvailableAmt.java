@@ -2,6 +2,7 @@ package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,12 @@ import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacShareLimit;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareLimitService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 
 /**
@@ -44,11 +47,17 @@ public class LoanAvailableAmt extends TradeBuffer {
 	public ClFacService clFacService;
 	@Autowired
 	public FacShareLimitService facShareLimitService;
+	@Autowired
+	public LoanBorMainService loanBorMainService;
+	
 
 	BigDecimal availableAmt = BigDecimal.ZERO; // 可用額度
 	BigDecimal availableFac = BigDecimal.ZERO; // 可用額度(額度)
 	BigDecimal availableCl = BigDecimal.ZERO; // 可用額度(擔保品)
 	BigDecimal availableShare = BigDecimal.ZERO; // 可用額度(合併額度控管)
+	BigDecimal shareAmtCl = BigDecimal.ZERO; // 擔保品可分配金額
+	BigDecimal utilAmtFac = BigDecimal.ZERO; // 額度放款餘額
+
 	String clShareFlag = ""; // Y-擔保品可分配金額小於額度核准金額
 	String facShareFlag = ""; // Y-有合併額度控管
 	String limitFlag = ""; // 限額計算方式 F-額度, C-擔保品 S-合併額度控管
@@ -114,8 +123,6 @@ public class LoanAvailableAmt extends TradeBuffer {
 			} else {
 				this.clShareFlag = "1";
 			}
-			// TEMP this.limitFlag = "C"; // C-擔保品
-			// TEMP this.availableAmt = this.availableCl;
 		}
 
 		this.info("caculate end ");
@@ -126,10 +133,26 @@ public class LoanAvailableAmt extends TradeBuffer {
 		this.info("可用額度(合併額度控管)= " + this.availableShare);
 		this.info("擔保品共用記號 1-擔保品可使用小於額度可使用金額, 2-無關聯擔保品 = " + this.clShareFlag);
 		this.info("可用額度(擔保品)= " + this.availableCl);
-		this.info("限額計算方式 F-核准額度, C-擔保品 S-合併額度控管 = " + this.limitFlag);
+		this.info("限額計算方式 F-核准額度, S-合併額度控管 = " + this.limitFlag);
 		this.info("可用額度 = " + this.availableAmt);
 
 		return this.availableAmt;
+	}
+
+	// 取得預約撥款金額
+	private BigDecimal compRVClAvailable(FacMain tFacMain, TitaVo titaVo) throws LogicException {
+		BigDecimal wkRvDrawdownAmt = BigDecimal.ZERO;
+		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), tFacMain.getCustNo(),
+				tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, Integer.MAX_VALUE, titaVo);
+		if (slLoanBorMain != null) {
+			for (LoanBorMain rv : slLoanBorMain.getContent()) {
+
+				wkRvDrawdownAmt = wkRvDrawdownAmt.add(rv.getDrawdownAmt());
+			}
+		}
+
+		return wkRvDrawdownAmt;
 	}
 
 	// 取得擔保品限額的可使用額度
@@ -156,13 +179,15 @@ public class LoanAvailableAmt extends TradeBuffer {
 		// 擔保品的可分配金額
 		for (ClFac t : lClFac) {
 			if (t.getFacShareFlag() == 0) {
-				ClMain tClMain = clMainService.findById(new ClMainId(t.getClCode1(), t.getClCode2(), t.getClNo()), titaVo);
+				ClMain tClMain = clMainService.findById(new ClMainId(t.getClCode1(), t.getClCode2(), t.getClNo()),
+						titaVo);
 				if (tClMain != null) {
 					t.setShareAmt(tClMain.getShareTotal());
 				}
 				t.setFacShareFlag(1);
 				for (ClFac c : lClFac) {
-					if (c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2() && c.getClNo() == t.getClNo()) {
+					if (c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2()
+							&& c.getClNo() == t.getClNo()) {
 						c.setFacShareFlag(1);
 					}
 				}
@@ -180,12 +205,16 @@ public class LoanAvailableAmt extends TradeBuffer {
 			if (t.getFacShareFlag() == 1 && t.getApproveNo() != tFacMain.getApplNo()) {
 				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 				wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
+				this.utilAmtFac = this.utilAmtFac.add(t1FacMain.getUtilAmt());// 撥款餘額
 				this.info("wkUtilAmt 1 = " + wkUtilAmt + ", " + t.toString());
+				this.info("***ClFac 1 utilAmtFac=" + utilAmtFac);
 				for (ClFac c : lClFac) {
 					if (c.getApproveNo() == t1FacMain.getApplNo()) {
 						c.setFacShareFlag(2);
 					}
 					if (c.getApproveNo() != tFacMain.getApplNo()) {
+						this.shareAmtCl = this.shareAmtCl.add(c.getShareAmt());
+						this.info("***ClFac 1 shareAmtCl=" + shareAmtCl);
 						if (wkUtilAmt.compareTo(t.getShareAmt()) > 0) {
 							t.setShareAmt(BigDecimal.ZERO);
 							wkUtilAmt = wkUtilAmt.subtract(t.getShareAmt());
@@ -204,12 +233,16 @@ public class LoanAvailableAmt extends TradeBuffer {
 			if (t.getFacShareFlag() == 1 && t.getApproveNo() == tFacMain.getApplNo()) {
 				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 				wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
+				this.utilAmtFac = this.utilAmtFac.add(t1FacMain.getUtilAmt());// 撥款餘額
 				this.info("wkUtilAmt 2 = " + wkUtilAmt + ", " + t.toString());
+				this.info("***ClFac 2 utilAmtFac=" + utilAmtFac);
 				for (ClFac c : lClFac) {
 					if (c.getApproveNo() == t1FacMain.getApplNo()) {
 						c.setFacShareFlag(2);
 					}
 					if (c.getApproveNo() == tFacMain.getApplNo()) {
+						this.shareAmtCl = this.shareAmtCl.add(c.getShareAmt());
+						this.info("***ClFac 2 shareAmtCl=" + shareAmtCl);
 						if (wkUtilAmt.compareTo(t.getShareAmt()) > 0) {
 							t.setShareAmt(BigDecimal.ZERO);
 							wkUtilAmt = wkUtilAmt.subtract(t.getShareAmt());
@@ -238,12 +271,14 @@ public class LoanAvailableAmt extends TradeBuffer {
 		this.info("getShareFac = " + tClFac.toString());
 		boolean newFac = true;
 		List<ClFac> lClFacTmp = new ArrayList<ClFac>();
-		Slice<ClFac> slClFac = clFacService.clNoEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClFac> slClFac = clFacService.clNoEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slClFac != null) {
 			for (ClFac t : slClFac.getContent()) {
 				newFac = true;
 				for (ClFac c : lClFac) {
-					if (c.getApproveNo() == t.getApproveNo() && c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2() && c.getClNo() == t.getClNo()) {
+					if (c.getApproveNo() == t.getApproveNo() && c.getClCode1() == t.getClCode1()
+							&& c.getClCode2() == t.getClCode2() && c.getClNo() == t.getClNo()) {
 						newFac = false;
 					}
 				}
@@ -272,7 +307,8 @@ public class LoanAvailableAmt extends TradeBuffer {
 			for (ClFac t : slClFac.getContent()) {
 				newCl = true;
 				for (ClFac c : lClFac) {
-					if (c.getApproveNo() == t.getApproveNo() && c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2() && c.getClNo() == t.getClNo()) {
+					if (c.getApproveNo() == t.getApproveNo() && c.getClCode1() == t.getClCode1()
+							&& c.getClCode2() == t.getClCode2() && c.getClNo() == t.getClNo()) {
 						newCl = false;
 					}
 				}
@@ -290,10 +326,12 @@ public class LoanAvailableAmt extends TradeBuffer {
 	}
 
 	// 取得合併額度控管的可使用額度
-	private BigDecimal compShareAvailable(String iRecycleCode, FacShareLimit tFacShareLimit, TitaVo titaVo) throws LogicException {
+	private BigDecimal compShareAvailable(String iRecycleCode, FacShareLimit tFacShareLimit, TitaVo titaVo)
+			throws LogicException {
 		BigDecimal wkAvailable = BigDecimal.ZERO;
 		BigDecimal wkUtilBal = BigDecimal.ZERO;
-		Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(tFacShareLimit.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(tFacShareLimit.getMainApplNo(), 0,
+				Integer.MAX_VALUE, titaVo);
 		List<FacShareLimit> lFacShareLimit = slFacShareLimit == null ? null : slFacShareLimit.getContent();
 		if (lFacShareLimit != null) {
 			for (FacShareLimit t : lFacShareLimit) {
@@ -302,6 +340,7 @@ public class LoanAvailableAmt extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "額度主檔" + t.getCustNo() + "-" + t.getFacmNo()); // 查詢資料不存在
 				}
 				wkUtilBal = wkUtilBal.add(tFacMain.getUtilBal());
+
 			}
 		}
 
@@ -316,7 +355,8 @@ public class LoanAvailableAmt extends TradeBuffer {
 	}
 
 	// 取得擔保品限額的可使用額度
-	public BigDecimal checkClAvailable(int iClCode1, int iClCode2, int iClNo, BigDecimal iShareTotal, TitaVo titaVo) throws LogicException {
+	public BigDecimal checkClAvailable(int iClCode1, int iClCode2, int iClNo, BigDecimal iShareTotal, TitaVo titaVo)
+			throws LogicException {
 		this.info("checkClAvailable ... ");
 		// 擔保品可使用額度 = 可分配金額 - 撥款餘額
 		BigDecimal wkAvailable = BigDecimal.ZERO;
@@ -342,12 +382,14 @@ public class LoanAvailableAmt extends TradeBuffer {
 				if (iClCode1 == t.getClCode1() && iClCode2 == t.getClCode2() && iClNo == t.getClNo()) {
 					t.setShareAmt(iShareTotal);
 				} else {
-					ClMain tClMain1 = clMainService.findById(new ClMainId(t.getClCode1(), t.getClCode2(), t.getClNo()), titaVo);
+					ClMain tClMain1 = clMainService.findById(new ClMainId(t.getClCode1(), t.getClCode2(), t.getClNo()),
+							titaVo);
 					t.setShareAmt(tClMain1.getShareTotal());
 					t.setFacShareFlag(1);
 				}
 				for (ClFac c : lClFac) {
-					if (c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2() && c.getClNo() == t.getClNo()) {
+					if (c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2()
+							&& c.getClNo() == t.getClNo()) {
 						c.setFacShareFlag(1);
 					}
 				}
@@ -362,20 +404,30 @@ public class LoanAvailableAmt extends TradeBuffer {
 
 		// 計算其他擔保品、非本擔保品額度的占用
 		for (ClFac t : lClFac) {
-			if (t.getFacShareFlag() == 1 && (t.getClCode1() != iClCode1 || t.getClCode2() != iClCode2 || t.getClNo() != iClNo)) {
+			this.info("***1 FacShareFlag=" + t.getFacShareFlag() + ",t.getCl=" + t.getClCode1() + "-" + t.getClCode2()
+					+ "-" + t.getClNo() + ",iCl=" + iClCode1 + "-" + iClCode2 + "-" + iClNo + ",t.getShareAmt="
+					+ t.getShareAmt());
+			if (t.getFacShareFlag() == 1
+					&& (t.getClCode1() != iClCode1 || t.getClCode2() != iClCode2 || t.getClNo() != iClNo)) {
 				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 				wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
+				this.utilAmtFac = this.utilAmtFac.add(t1FacMain.getUtilAmt());// 撥款餘額
 				this.info("wkUtilAmt 1 = " + wkUtilAmt + ", " + t.toString());
+				this.info("***ClFac 1 utilAmtFac=" + utilAmtFac);
 				for (ClFac c : lClFac) {
+					this.info("***ApproveNo=" + c.getApproveNo() + ",FacMain=" + t1FacMain.getApplNo());
+					this.info("***t.ClNo=" + t.getClNo() + ",c.ClNo=" + c.getClNo());
 					if (c.getApproveNo() == t1FacMain.getApplNo()) {
 						c.setFacShareFlag(2);
 					}
-					if (t.getClCode1() != iClCode1 || t.getClCode2() != iClCode2 || t.getClNo() != iClNo) {
-						if (wkUtilAmt.compareTo(t.getShareAmt()) > 0) {
-							t.setShareAmt(BigDecimal.ZERO);
-							wkUtilAmt = wkUtilAmt.subtract(t.getShareAmt());
+					if (c.getClCode1() != iClCode1 || c.getClCode2() != iClCode2 || c.getClNo() != iClNo) {
+						this.shareAmtCl = this.shareAmtCl.add(c.getShareAmt());
+						this.info("***ClFac 1 shareAmtCl=" + shareAmtCl + ",c.getShareAmt()=" + c.getShareAmt());
+						if (wkUtilAmt.compareTo(c.getShareAmt()) > 0) {
+							c.setShareAmt(BigDecimal.ZERO);
+							wkUtilAmt = wkUtilAmt.subtract(c.getShareAmt());
 						} else {
-							t.setShareAmt(t.getShareAmt().subtract(wkUtilAmt));
+							c.setShareAmt(c.getShareAmt().subtract(wkUtilAmt));
 							wkUtilAmt = BigDecimal.ZERO;
 						}
 					}
@@ -385,26 +437,32 @@ public class LoanAvailableAmt extends TradeBuffer {
 		}
 		// 計算本擔保品、本擔保品額度的占用
 		for (ClFac t : lClFac) {
-			if (t.getFacShareFlag() == 1 && (t.getClCode1() == iClCode1 && t.getClCode2() == iClCode2 && t.getClNo() == iClNo)) {
+			if (t.getFacShareFlag() == 1
+					&& (t.getClCode1() == iClCode1 && t.getClCode2() == iClCode2 && t.getClNo() == iClNo)) {
 				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 				wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
+				this.utilAmtFac = this.utilAmtFac.add(t1FacMain.getUtilAmt());// 撥款餘額
 				this.info("wkUtilAmt 2 = " + wkUtilAmt + ", " + t.toString());
+				this.info("***ClFac 2 utilAmtFac=" + utilAmtFac);
 				for (ClFac c : lClFac) {
 					if (c.getApproveNo() == t1FacMain.getApplNo()) {
 						c.setFacShareFlag(2);
 					}
-					if (t.getClCode1() == iClCode1 && t.getClCode2() == iClCode2 && t.getClNo() == iClNo) {
-						if (wkUtilAmt.compareTo(t.getShareAmt()) > 0) {
-							wkUtilAmt = wkUtilAmt.subtract(t.getShareAmt());
-							t.setShareAmt(BigDecimal.ZERO);
+					if (c.getClCode1() == iClCode1 && c.getClCode2() == iClCode2 && c.getClNo() == iClNo) {
+						this.shareAmtCl = this.shareAmtCl.add(c.getShareAmt());
+						this.info("***ClFac 2 shareAmtCl=" + shareAmtCl + ",c.getShareAmt()=" + c.getShareAmt());
+						if (wkUtilAmt.compareTo(c.getShareAmt()) > 0) {
+							wkUtilAmt = wkUtilAmt.subtract(c.getShareAmt());
+							c.setShareAmt(BigDecimal.ZERO);
 						} else {
-							t.setShareAmt(t.getShareAmt().subtract(wkUtilAmt));
+							c.setShareAmt(c.getShareAmt().subtract(wkUtilAmt));
 							wkUtilAmt = BigDecimal.ZERO;
 						}
 					}
 				}
 			}
 			this.info("wkUtilAmt 2 end = " + wkUtilAmt + ", " + t.toString());
+			this.info("***ClFac 2 end shareAmtCl=" + shareAmtCl);
 		}
 
 		wkAvailable = BigDecimal.ZERO.subtract(wkUtilAmt);
@@ -480,6 +538,24 @@ public class LoanAvailableAmt extends TradeBuffer {
 	 */
 	public String getLimitFlag() {
 		return this.limitFlag;
+	}
+
+	/**
+	 * 擔保品可分配金額
+	 * 
+	 * @return 擔保品可分配金額
+	 */
+	public BigDecimal getShareAmtCl() {
+		return shareAmtCl;
+	}
+
+	/**
+	 * 額度放款餘額
+	 * 
+	 * @return 額度放款餘額
+	 */
+	public BigDecimal getUtilAmtFac() {
+		return utilAmtFac;
 	}
 
 }

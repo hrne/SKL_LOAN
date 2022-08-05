@@ -227,29 +227,29 @@ public class L9701Report3 extends MakeReport {
 		// 入帳日
 		this.print(0, 9, showRocDate(tL9701Vo.get("EntryDate"), 1));
 		// 交易內容
-		this.print(0, 28, tL9701Vo.get("Desc"), "C");
+		this.print(0, 27, tL9701Vo.get("Desc"), "C");
 		// 交易金額
-		this.print(0, 50, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
+		this.print(0, 49, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
 
 		// 暫收借
 		BigDecimal tempAmt = new BigDecimal(tL9701Vo.get("TempAmt"));
 		BigDecimal tempDbAmt = tempAmt.compareTo(BigDecimal.ZERO) > 0 ? tempAmt : BigDecimal.ZERO;
 		BigDecimal tempCrAmt = tempAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO.subtract(tempAmt)
 				: BigDecimal.ZERO;
-		this.print(0, 68, formatAmt(tempDbAmt, 0), "R");
+		this.print(0, 67, formatAmt(tempDbAmt, 0), "R");
 		// 本金
 		this.print(0, 83, formatAmt(tL9701Vo.get("Principal"), 0), "R");
 
 		// 利息
-		this.print(0, 99, formatAmt(tL9701Vo.get("Interest"), 0), "R");
+		this.print(0, 98, formatAmt(tL9701Vo.get("Interest"), 0), "R");
 		// 違約金
-		this.print(0, 115, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
+		this.print(0, 114, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
 		// 費用
-		this.print(0, 131, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
+		this.print(0, 130, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
 		// 短繳
-		this.print(0, 147, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
+		this.print(0, 146, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
 		// 暫收貸
-		this.print(0, 163, tempCrAmt.toString(), "R");
+		this.print(0, 162, tempCrAmt.toString(), "R");
 
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
@@ -266,7 +266,7 @@ public class L9701Report3 extends MakeReport {
 		divider();
 		this.print(1, 66, "小計：");
 		this.print(0, 83, formatAmt(principalTotal, 0), "R");
-		this.print(0, 99, formatAmt(interestTotal, 0), "R");
+		this.print(0, 98, formatAmt(interestTotal, 0), "R");
 		this.print(0, 115, formatAmt(breachAmtTotal, 0), "R");
 		this.print(0, 131, formatAmt(feeAmtTotal, 0), "R");
 

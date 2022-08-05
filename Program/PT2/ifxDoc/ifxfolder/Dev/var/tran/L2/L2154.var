@@ -1546,7 +1546,7 @@ C(3,#BaseRateCode,99,SHOW(#ApproveRate,#ApproveRateX)HIDE(#LbApproveRateX)
 
 #SendL2r06B=X,1,S
 C(3,#FuncCode,5,S,$)
-C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,E(0,@BaseRate,#L2r05BaseRateCode),$)
+C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,E(0,@BaseRateCode,#L2r05BaseRateCode),$)
 C(3,#L2r05BaseRateCode,#L2r01BaseRateCode,s,$)
 T(2,@RimCurrencyCode,#L2r05CurrencyCode)
 T(2,@RimBaseRateCode,#BaseRateCode)

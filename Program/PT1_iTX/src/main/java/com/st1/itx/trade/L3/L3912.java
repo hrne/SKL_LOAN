@@ -12,6 +12,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -59,22 +60,26 @@ public class L3912 extends TradeBuffer {
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
+		int iBorxNo = this.parse.stringToInteger(titaVo.get("BorxNo"));
 
 		// work area
 		LoanBorTx tLoanBorTx;
 		TempVo tTempVo = new TempVo();
 		int RPTFG = 8;
 		BigDecimal wkReduceAmt = BigDecimal.ZERO;
-
-		// 查詢放款交易內容檔
-		if (iCustNo == 0) {
-			tLoanBorTx = loanBorTxService.borxTxtNoFirst(iAcctDate + 19110000, iTellerNo, iTxtNo, titaVo);
+		if (iBorxNo > 0) {
+			tLoanBorTx = loanBorTxService.findById(new LoanBorTxId(iCustNo, iFacmNo, iBormNo, iBorxNo), titaVo);
 		} else {
-			tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, iAcctDate + 19110000, iTellerNo,
-					iTxtNo, titaVo);
-		}
-		if (tLoanBorTx == null) {
-			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
+			// 查詢放款交易內容檔
+			if (iCustNo == 0) {
+				tLoanBorTx = loanBorTxService.borxTxtNoFirst(iAcctDate + 19110000, iTellerNo, iTxtNo, titaVo);
+			} else {
+				tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, iAcctDate + 19110000,
+						iTellerNo, iTxtNo, titaVo);
+			}
+			if (tLoanBorTx == null) {
+				throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
+			}
 		}
 
 		tTempVo = tTempVo.getVo(tLoanBorTx.getOtherFields());
@@ -162,7 +167,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OHCode", tLoanBorTx.getTitaHCode());
 		this.totaVo.putParam("OEntryDate", tLoanBorTx.getEntryDate());
 		this.totaVo.putParam("OCurrencyCode", tLoanBorTx.getTitaCurCd());
-		this.totaVo.putParam("OTxAmt", wkRepayAmt.add(tLoanBorTx.getTempAmt()));
+		this.totaVo.putParam("OTxAmt", tLoanBorTx.getTxAmt());
 		this.totaVo.putParam("OLoanBal", tLoanBorTx.getLoanBal());
 		this.totaVo.putParam("ORemitAmt", tTempVo.getParam("RemitAmt"));
 		this.totaVo.putParam("OPrinciPal", tLoanBorTx.getPrincipal());
@@ -171,15 +176,14 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ODelayInt", tLoanBorTx.getDelayInt());
 		this.totaVo.putParam("OBreachAmt", tLoanBorTx.getBreachAmt());
 		this.totaVo.putParam("OTempTax", tTempVo.getParam("TempTax"));
-		if (tLoanBorTx.getTempAmt().compareTo(BigDecimal.ZERO) > 0) {
-			this.totaVo.putParam("OTempAmt", tLoanBorTx.getTempAmt());
-			this.totaVo.putParam("OTempRepay", BigDecimal.ZERO);
-			this.totaVo.putParam("OOverflow", tLoanBorTx.getTempAmt());
+		if ("L3230".equals(tLoanBorTx.getTitaTxCd()) && tLoanBorTx.getTxAmt().compareTo(BigDecimal.ZERO) != 0) {
+			this.totaVo.putParam("OTempRepay", tLoanBorTx.getTxAmt());// 暫收款金額
 		} else {
-			this.totaVo.putParam("OTempAmt", BigDecimal.ZERO);
-			this.totaVo.putParam("OTempRepay", BigDecimal.ZERO.subtract(tLoanBorTx.getTempAmt()));
-			this.totaVo.putParam("OOverflow", BigDecimal.ZERO);
+			this.totaVo.putParam("OTempRepay", tLoanBorTx.getTempAmt().subtract(tLoanBorTx.getOverflow()));// 暫收款金額
 		}
+		this.totaVo.putParam("OOverflow", tLoanBorTx.getOverflow()); // 累溢收
+		this.totaVo.putParam("OTempAmt", tLoanBorTx.getTempAmt()); // 暫收借
+
 		this.totaVo.putParam("OIntStartDate", tLoanBorTx.getIntStartDate());
 		this.totaVo.putParam("OIntEndDate", tLoanBorTx.getIntEndDate());
 		this.totaVo.putParam("OUnpaidInterest", tLoanBorTx.getUnpaidInterest());
@@ -247,7 +251,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OTempReasonCode", tTempVo.getParam("TempReasonCode"));
 		this.totaVo.putParam("OTempSourceCode", tTempVo.getParam("TempSourceCode"));
 		this.totaVo.putParam("OTempItemCode", tTempVo.getParam("TempItemCode"));
-		this.totaVo.putParam("ODescription", tTempVo.getParam("Description"));
+		this.totaVo.putParam("ODescription", tTempVo.getParam("Note"));
 		this.totaVo.putParam("ORemitCustName", tTempVo.getParam("RemitCustName"));
 		this.totaVo.putParam("ORemitRemark", tTempVo.getParam("RemitRemark"));
 		// 聯貸案

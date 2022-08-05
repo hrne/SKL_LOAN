@@ -205,7 +205,6 @@ T(3,#CustIdX,)
 A(ID_UNINO,0,#CustId)
 HIDE(#BTN2)
 
-
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
 

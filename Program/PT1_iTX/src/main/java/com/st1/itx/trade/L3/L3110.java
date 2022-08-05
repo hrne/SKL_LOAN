@@ -52,56 +52,7 @@ import com.st1.itx.util.parse.Parse;
  * c.會先佔用額度，不做會計帳。
  * d.此交易為2段式交易
  */
-/*
- * Tita
- * TimCustNo=9,7
- * FacmNo=9,3
- * BormNo=9,3
- * RateIncr=+9,2.4
- * ApproveRate=9,2.4
- * RateCode=9,1
- * RateAdjFreq=9,2
- * DrawdownCode=9,1
- * CurrencyCode=X,3
- * TimDrawdownAmt=9,14.2
- * DrawdownDate=9,7
- * LoanTermYy=9,2
- * LoanTermMm=9,2
- * LoanTermDd=9,3
- * MaturityDate=9,7
- * AmortizedCode=9,1
- * FreqBase=9,1
- * PayIntFreq=9,2
- * RepayFreq=9,2
- * GracePeriod=9,3
- * GraceDate=9,7
- * SpecificDd=9,2
- * SpecificDate=9,8
- * FirstDueDate=9,7
- * FirstAdjRateDate=9,7
- * NextIntDate=9,8
- * NextRepayDate=9,8
- * TotalPeriod=9,3
- * TimAcctFee=9,14.2
- * TimFinalBal=9,14.2
- * NotYetFlag=X,1
- * PieceCode=X,1
- * UsageCode=9,1
- * SyndNo=9,3
- * RenewFlag=X,1
- * OLDFacmNo=9,3
- * OLDBormNo=9,3
- * RelationCode=X,2
- * RelationName=X,100
- * RelationId=X,10
- * RelationBirthday=9,7
- * RelationGender=X,1
- * RemitBank=9,3
- * RemitBranch=9,4
- * RemitAcctNo=9,14
- * CompensateAcct=X,60
- * Remark=X,40
- */
+
 /**
  * L3110 預約撥款
  * 
@@ -701,7 +652,7 @@ public class L3110 extends TradeBuffer {
 	}
 
 	public void doRptA(TitaVo titaVo) throws LogicException {
-		this.info("L4701 doRpt started.");
+		this.info("L3110 doRpt started.");
 		l3100Report.setTxBuffer(txBuffer);
 		String parentTranCode = titaVo.getTxcd();
 		l3100Report.setParentTranCode(parentTranCode);

@@ -18,6 +18,12 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
+/*
+ * Tita
+ * RimCustNo=9,7
+ * RimFacmNo=9,3
+ * RimBormNo=9,3
+ */
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -42,7 +48,7 @@ public class L3R07 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L3R07 ");
+		this.info("active L3R07 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料

@@ -18,16 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class BatxDetailId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4164854825790661700L;
-
-// 會計日期
+  // 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
   // 整批批號
+  /* 暫收冲正固定為RESV00 */
   @Column(name = "`BatchNo`", length = 6)
   private String batchNo = " ";
 
@@ -66,7 +62,7 @@ public class BatxDetailId implements Serializable {
 
 /**
 	* 整批批號<br>
-	* 
+	* 暫收冲正固定為RESV00
 	* @return String
 	*/
   public String getBatchNo() {
@@ -75,7 +71,7 @@ public class BatxDetailId implements Serializable {
 
 /**
 	* 整批批號<br>
-	* 
+	* 暫收冲正固定為RESV00
   *
   * @param batchNo 整批批號
 	*/
