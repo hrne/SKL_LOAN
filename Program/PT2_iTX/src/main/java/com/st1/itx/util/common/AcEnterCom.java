@@ -604,6 +604,7 @@ public class AcEnterCom extends TradeBuffer {
 					moveAcDetail(ac, acDetail);
 					acDetail.setDbCr("C");
 					acDetail.setAcctCode("THC");
+					acDetail.setSumNo("099");
 					acDetail.setAcSeq(i);
 					acList2.add(acDetail);
 				}

@@ -55,6 +55,10 @@ public class L9701Report2 extends MakeReport {
 	BigDecimal loanBal = BigDecimal.ZERO; // 放款餘額
 	BigDecimal shortFall = BigDecimal.ZERO; // 累短收
 	BigDecimal excessive = BigDecimal.ZERO; // 累溢收
+	
+
+	String nextPageText = "=====  續下頁  =====";
+	String endText = "=====  報  表  結  束  =====";
 
 	@Override
 	public void printHeader() {
@@ -90,7 +94,7 @@ public class L9701Report2 extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(40);
+		this.setMaxRows(45);
 
 	}
 
@@ -178,6 +182,11 @@ public class L9701Report2 extends MakeReport {
 		int detailCounts = 0;
 		if (listL9701 != null && listL9701.size() > 0) {
 			for (Map<String, String> tL9701Vo : listL9701) {
+				if (this.NowRow - 7 >= 40) {
+					this.print(1, this.getMidXAxis(), nextPageText,"C"); 
+					this.newPage();
+					this.print(1, 1, " "); 
+				}
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
@@ -278,14 +287,14 @@ public class L9701Report2 extends MakeReport {
 		}
 		divider();
 		this.print(1, 9, "至" + showRocDate(entday, 1) + "當日餘額：");
-		this.print(0, 45, formatAmt(loanBal, 0), "R"); // 放款餘額
+		this.print(0, 44, formatAmt(loanBal, 0), "R"); // 放款餘額
 		this.print(0, 52, "累溢短收：");
 		this.print(0, 74, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收
 		this.print(0, 84, "小計：");
-		this.print(0, 104, formatAmt(principalTotal, 0), "R");
-		this.print(0, 119, formatAmt(interestTotal, 0), "R");
-		this.print(0, 134, formatAmt(breachAmtTotal, 0), "R");
-		this.print(0, 149, formatAmt(feeAmtTotal, 0), "R");
+		this.print(0, 103, formatAmt(principalTotal, 0), "R");
+		this.print(0, 118, formatAmt(interestTotal, 0), "R");
+		this.print(0, 133, formatAmt(breachAmtTotal, 0), "R");
+		this.print(0, 148, formatAmt(feeAmtTotal, 0), "R");
 
 		principalTotal = BigDecimal.ZERO;
 		interestTotal = BigDecimal.ZERO;

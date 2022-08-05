@@ -528,7 +528,7 @@ public class AcReceivableCom extends TradeBuffer {
 	}
 
 	private void updAcReceivable(int AcHCode, int bizTbsdy) throws LogicException {
-		// 暫收可抵繳金額需全入全銷(反序訂正
+		// 暫收可抵繳金額需全入全銷(反序訂正)
 		if ("TAV".equals(tAcReceivable.getAcctCode())) {
 			if (("C".equals(ac.getDbCr()) && tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) != 0)
 					|| ("D".equals(ac.getDbCr())
@@ -657,7 +657,10 @@ public class AcReceivableCom extends TradeBuffer {
 //	    26. CreateDate  建檔日期           DATE                       SYSTEM 
 //	    27. LastUpdateEmpNo 最後維護人員   VARCHAR2  6              AcDetail
 //	    28  LastUpdate  最後維護日期       DATE                       SYSTEM 
-
+		tAcReceivable.setAcctCode(tAcReceivableId.getAcctCode());
+		tAcReceivable.setCustNo(tAcReceivableId.getCustNo());
+		tAcReceivable.setFacmNo(tAcReceivableId.getFacmNo());
+		tAcReceivable.setRvNo(tAcReceivableId.getRvNo());
 		tAcReceivable.setBranchNo(ac.getBranchNo());
 		tAcReceivable.setCurrencyCode(ac.getCurrencyCode());
 		tAcReceivable.setAcctFlag(ac.getAcctFlag());

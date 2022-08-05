@@ -80,7 +80,7 @@ public class LM085Report extends MakeReport {
 			// SQL未完成 待確認
 			fnAllList = lm085ServiceImpl.findPart2_1(titaVo, lastYearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			//B16~B23
+			// B16~B23
 			exportPart2(fnAllList, 1);
 			fnAllList = lm085ServiceImpl.findPart2_2(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
@@ -88,22 +88,22 @@ public class LM085Report extends MakeReport {
 			exportPart2(fnAllList, 2);
 			fnAllList = lm085ServiceImpl.findPart2_3(titaVo, yearMonth);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			//F24~G25
+			// F24~G25
 			exportPart2(fnAllList, 3);
 			// 上月資料
 			fnAllList = lm085ServiceImpl.findPart3(titaVo, lastYearMonth, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			//B29~D38
+			// B29~D38
 			exportPart3(fnAllList, lastYearMonth, 1);
 			// 去年同期資料
 			fnAllList = lm085ServiceImpl.findPart3(titaVo, yearMonth - 100, unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			//F29~D38
+			// F29~D38
 			exportPart3(fnAllList, yearMonth - 100, 2);
 
 			fnAllList = lm085ServiceImpl.findPart4(titaVo, tranAllYearData(yearMonth, lastYearMonth), unitCode);
 			isEmpty = fnAllList.size() == 0 ? isEmpty : true;
-			//A45~
+			// A45~
 			exportPart4(fnAllList, tranAllYearData(yearMonth, lastYearMonth).size());
 
 		} catch (Exception e) {
@@ -179,7 +179,8 @@ public class LM085Report extends MakeReport {
 			// B18
 			makeExcel.formulaCalculate(18, 2);
 
-			makeExcel.setValue(20, 2, dataList.get(0).get("LegalLoss"), "#,000", "C");
+			BigDecimal legalLoss =  dataList.get(0).get("LegalLoss")==null ||  dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO:new BigDecimal(dataList.get(0).get("LegalLoss"));
+			makeExcel.setValue(20, 2, legalLoss, "#,000", "C");
 
 			break;
 		case 2:
@@ -213,10 +214,11 @@ public class LM085Report extends MakeReport {
 		}
 
 	}
+
 	/**
 	 * B29~G38
-	 * 	
-	 * */
+	 * 
+	 */
 	private void exportPart3(List<Map<String, String>> dataList, int yearMonth, int form) throws LogicException {
 
 		int col = 0;
@@ -299,9 +301,10 @@ public class LM085Report extends MakeReport {
 		}
 
 	}
+
 	/**
 	 * A45~
-	 * */
+	 */
 	private void exportPart4(List<Map<String, String>> dataList, int dataSize) throws LogicException {
 
 		int col = 0;

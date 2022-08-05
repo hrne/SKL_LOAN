@@ -290,7 +290,7 @@ public class L8202Batch extends TradeBuffer {
 				// F8 洗錢樣態三累計筆數
 				// F9 洗錢樣態三累計金額
 				// F10 洗錢樣態三資料重複 (1.是)
-				custNo = parse.stringToInteger(s.get("F4"));
+				custNo = parse.stringToInteger(s.get("F0"));
 				// 專戶不寫
 				if (custNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
 						|| custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {

@@ -516,6 +516,25 @@ BEGIN
     FROM RecycleData JM
     WHERE JM."RecycleSeq" = 1
     )
+    -- 土地貸款資料 110/12/17以前購地貸款註記LandLoanFg=N
+--    , LandLoanData AS (
+--      SELECT TD."CustNo"
+--           , TD."FacmNo"
+--           , TD."BormNo"
+--           , ROW_NUMBER()
+--             OVER (
+--               PARTITION BY TD."CustNo"
+--                          , TD."FacmNo"
+--                          , TD."BormNo"
+--               ORDER BY TD."BormNo"
+--             ) AS "Seq"
+--      FROM TmpMainData  TD
+--      LEFT JOIN "FacMain" FM ON FM."CustNo" = TD."CustNo"
+--                            AND FM."FacmNo" = TD."FacmNo"
+--      WHERE TD."DataYM" = YYYYMM
+--        AND FM."RuleCode" = '08'  -- 規定管制代碼08:購地貸款(央行管制)
+--    )
+
       SELECT
              YYYYMM                                AS "DataYM"            -- 資料年月
            , '458'                                 AS "BankItem"          -- 總行代號
@@ -693,8 +712,18 @@ BEGIN
                WHEN NVL(M."SyndAmt",0) = 0 THEN 0
                ELSE ROUND( NVL(M."PartAmt",0) / NVL(M."SyndAmt",0) * 100, 1)
              END                                   AS "SyndRatio"         -- 聯貸參貸比例
-           , ' '                                   AS "LandLoanFg"         -- 購地貸款註記
-           , '     '                               AS "StarBuildingYM"     -- 實際興建年月
+           , CASE WHEN F."RuleCode" = '08' THEN                           -- 規定管制代碼08:購地貸款(央行管制)
+                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN 'N'
+                         ELSE 'Y'
+                    END     
+                  ELSE ' '    
+             END                                   AS "LandLoanFg"        -- 購地貸款註記
+           , CASE WHEN F."RuleCode" = '08' THEN
+                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN ' '
+                         ELSE to_char(NVL(F."StarBuildingYM",' '),'00000')
+                    END     
+                  ELSE ' '    
+             END                                   AS "StarBuildingYM"    -- 實際興建年月
            , 'N'                                   AS "PayablesFg"        -- 代放款註記
 --           , CASE
 --               WHEN N."CustNo" IS NULL THEN 'N'
@@ -824,7 +853,12 @@ BEGIN
            , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
            , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
            , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
-           , '  '                                  AS "StarBuildingPeriod" -- 約定動工之一定期間
+           , CASE WHEN F."RuleCode" = '08' THEN
+                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN ' '
+                         ELSE to_char(NVL(F."StarBuildingPeriod",' '),'00')
+                    END     
+                  ELSE ' '    
+             END                                   AS "StarBuildingPeriod" -- 約定動工之一定期間
       FROM TmpMainData M
           LEFT JOIN "FacMain" F   ON F."CustNo"   = M."CustNo"
                                  AND F."FacmNo"   = M."FacmNo"
@@ -893,6 +927,10 @@ BEGIN
           LEFT JOIN "Work_B201_Guarantor" WK5  ON WK5."DataYM"   = M."DataYM"
                                               AND WK5."ROW_NUM"  = OccursNum * 5 - 0
                                               AND WK5."ApplNo"   = F."ApplNo"
+--          LEFT JOIN "LandLoanData" LD ON LD."CustNo" = M."CustNo"  -- 土地貸款
+--                                     AND LD."FacmNo" = M."FacmNo"
+--                                     AND LD."BormNo" = M."BormNo"
+--                                     AND LD."Seq"    = 1
       WHERE NVL(M."BadDebtSkipFg",' ') NOT IN ('Y')  -- 呆帳不報送記號
         AND CASE
               WHEN OccursNum = 1

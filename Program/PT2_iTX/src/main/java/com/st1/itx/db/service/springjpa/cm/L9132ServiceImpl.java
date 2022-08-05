@@ -47,6 +47,12 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             THEN 0 ";
 		sql += "           ELSE AC.\"TitaTxtNo\" ";
 		sql += "           END                   AS \"TitaTxtNo\" ";
+		sql += "     	  ,CASE ";
+		sql += "             WHEN B.\"ProcStsCode\" = '6' ";
+		sql += "       	     AND LPAD(AC.\"TitaTxtNo\",8,0) = SUBSTR(AC.\"TitaBatchNo\",5,2) || AC.\"TitaBatchSeq\" ";
+		sql += "             THEN 0 ";
+		sql += "           ELSE AC.\"SlipNo\" ";
+		sql += "           END                   AS \"SlipNo\" ";
 		sql += "     	  ,AC.\"AcSubBookCode\" ";
 		sql += "     	  ,CD.\"Item\" AS \"AcSubBookItem\"";
 		sql += "          , CASE ";
@@ -84,7 +90,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT \"AcNoCode\" ";
 		sql += "      , \"AcNoItem\" ";
 		sql += "      , \"AcSubCode\" ";
-		sql += "      , DECODE(\"TitaTxtNo\",0,90000 + ROWNUM,\"TitaTxtNo\")  AS \"TitaTxtNo\" ";
+		sql += "      , DECODE(\"SlipNo\",0,90000 + ROWNUM,\"SlipNo\")  AS \"SlipNo\" ";
 		sql += "      , \"AcSubBookCode\" ";
 		sql += "      , \"AcSubBookItem\" ";
 		sql += "      , \"CustNo\" ";

@@ -171,15 +171,17 @@ public class AcPaymentCom extends TradeBuffer {
 //		
 
 // 0-共用
-//      090.暫收抵繳    (額度)         TAV 暫收款－可抵繳
-//      091:借新還舊                              TRO 暫收款－借新還舊
-//      092:暫收轉帳     (戶號+額度)   TAV 暫收款－可抵繳
-//      093:繳抽退票                              TCK 暫收款－支票
-//      094:轉債協暫收款  (戶號)      T1x 債協暫收款      
-//      095:轉債協退還款  (戶號)      T2x 債協退還款  
-//      096:暫收沖正(戶號)           THC 暫收款－沖正
-
-		if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
+//      090.暫收抵繳     (額度)       TAV 暫收款－可抵繳
+//      091:借新還舊                  TRO 暫收款－借新還舊
+//      092:暫收轉帳     (戶號+額度)  TAV 暫收款－可抵繳
+//      093:繳抽退票                  TCK 暫收款－支票
+//      094:轉債協暫收款 (戶號)       T1x 債協暫收款      
+//      095:轉債協退還款 (戶號)       T2x 債協退還款  
+//      099:暫收沖正     (戶號)       THC 暫收款－沖正
+		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
+				&& "RESV".equals(titaVo.get("BATCHNO").substring(0, 4))) {
+			acDetail.setSumNo("099");
+		} else if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
 			acDetail.setSumNo("0" + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
 		} else {
 			acDetail.setSumNo(RpFlag + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
@@ -242,7 +244,7 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)));
 			acDetail.setAcctCode(acNegCom.getReturnAcctCode(acDetail.getCustNo(), titaVo));
 			break;
-		case "096":
+		case "099":
 			acDetail.setAcctCode("THC");
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
 			break;

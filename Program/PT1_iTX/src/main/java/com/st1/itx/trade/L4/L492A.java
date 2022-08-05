@@ -76,6 +76,12 @@ public class L492A extends TradeBuffer {
 
 		if (lBatxDetail != null && lBatxDetail.size() != 0) {
 			for (BatxDetail tBatxDetail : lBatxDetail) {
+				if (repayCode > 0 && tBatxDetail.getRepayCode() != repayCode) {
+					continue;
+				}
+				if (repayType > 0 && tBatxDetail.getRepayType() != repayType) {
+					continue;
+				}
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(tBatxDetail.getProcNote());
 

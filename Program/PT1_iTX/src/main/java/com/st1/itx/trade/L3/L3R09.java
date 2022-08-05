@@ -80,6 +80,7 @@ public class L3R09 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001",
 					" 放款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
 		}
+		wkNextEffectDate = tLoanBorMain.getNextAdjRateDate();
 		// 額度主檔
 		FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
 		if (tFacMain == null) {

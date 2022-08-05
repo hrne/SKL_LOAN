@@ -1292,7 +1292,7 @@ public class LoanCom extends TradeBuffer {
 		iTempVo.putParam("AcctCode", ba.getAcctCode()); // 業務科目銷
 		iTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
 		tLoanBorTx.setOtherFields(iTempVo.getJsonString());
-		
+
 		// 更新放款明細檔及帳務明細檔關聯欄
 		this.updBorTxAcDetail(tLoanBorTx, lAcDatail);
 
@@ -1518,16 +1518,16 @@ public class LoanCom extends TradeBuffer {
 	/**
 	 * 更新放款明細檔及帳務明細檔關聯欄
 	 * 
-	 * @param iLoanBorTx LoanBorTx
+	 * @param tLoanBorTx LoanBorTx
 	 * @param lAcDetail  List<AcDetail>
 	 * @throws LogicException ....
 	 */
 
-	public void updBorTxAcDetail(LoanBorTx iLoanBorTx, List<AcDetail> lAcDetail) throws LogicException {
+	public void updBorTxAcDetail(LoanBorTx tLoanBorTx, List<AcDetail> lAcDetail) throws LogicException {
 		this.info("updAcDetailBorxNo ..." + lAcDetail.size());
-// TempAmt 暫收借 = SumNo90~99 借方
-// OverAmt 暫收貸 = SumNo90~99 貸方 
-// PaidAmt 還款金額 = [SumNo<>90~99]貸方
+// TempAmt 暫收借 = SumNo90~98 借方
+// OverAmt 暫收貸 = SumNo90~98 貸方 
+// PaidAmt 還款金額 = [SumNo==0]貸方
 // TxAmt 交易金額 = 還款金額 +  暫收貸 -  暫收借 
 //
 // case 1: 額度 001 轉 額度 002 $100
@@ -1543,41 +1543,49 @@ public class LoanCom extends TradeBuffer {
 		BigDecimal tempAmt = BigDecimal.ZERO;
 		BigDecimal overAmt = BigDecimal.ZERO;
 		BigDecimal paidAmt = BigDecimal.ZERO; // 還款金額
-
+        int acSeq = 0;
 		for (AcDetail ac : lAcDetail) {
-
-			TempVo tTempVo = new TempVo();
+	        acSeq++;
+			TempVo acTempVo = new TempVo();
 			if (ac.getJsonFields() != null) {
-				tTempVo = tTempVo.getVo(ac.getJsonFields());
+				acTempVo = acTempVo.getVo(ac.getJsonFields());
 			}
-			if (tTempVo.get("BorxNo") == null) {
-				if (parse.isNumeric(ac.getSumNo()) && parse.stringToInteger(ac.getSumNo()) >= 90
-						&& parse.stringToInteger(ac.getSumNo()) <= 99) {
+			if (acTempVo.get("BorxNo") == null) {
+				int sumNo = 0;
+				if (parse.isNumeric(ac.getSumNo())) {
+					sumNo = parse.stringToInteger(ac.getSumNo());
+				}
+				if (sumNo >= 90 && sumNo <= 98) {
 					if ("D".equals(ac.getDbCr())) {
 						tempAmt = tempAmt.add(ac.getTxAmt());
 					} else {
 						overAmt = overAmt.add(ac.getTxAmt());
 					}
-				} else {
+				}
+				if (sumNo == 0) {
 					if ("C".equals(ac.getDbCr())) {
 						paidAmt = paidAmt.add(ac.getTxAmt());
-
 					}
 				}
 				txAmt = paidAmt.add(overAmt).subtract(tempAmt);
-
-				tTempVo.putParam("BorxNo", iLoanBorTx.getBorxNo());
-				if (ac.getFacmNo() != iLoanBorTx.getFacmNo()) {
-					tTempVo.putParam("FacmNo", iLoanBorTx.getFacmNo());
+				acTempVo.putParam("BorxNo", tLoanBorTx.getBorxNo());
+				if (ac.getFacmNo() != tLoanBorTx.getFacmNo()) {
+					acTempVo.putParam("FacmNo", tLoanBorTx.getFacmNo());
 				}
-				if (ac.getBormNo() != iLoanBorTx.getBormNo()) {
-					tTempVo.putParam("BormNo", iLoanBorTx.getBormNo());
+				if (ac.getBormNo() != tLoanBorTx.getBormNo()) {
+					acTempVo.putParam("BormNo", tLoanBorTx.getBormNo());
 				}
-				tTempVo.putParam("EntryDate", iLoanBorTx.getEntryDate() + 19110000);
-				ac.setJsonFields(tTempVo.getJsonString());
-				iLoanBorTx.setTxAmt(txAmt);
-				iLoanBorTx.setTempAmt(tempAmt);
-				iLoanBorTx.setOverflow(overAmt);
+				acTempVo.putParam("EntryDate", tLoanBorTx.getEntryDate() + 19110000);
+				ac.setJsonFields(acTempVo.getJsonString());
+				tLoanBorTx.setTxAmt(txAmt);
+				tLoanBorTx.setTempAmt(tempAmt);
+				tLoanBorTx.setOverflow(overAmt);
+				TempVo txTempVo = new TempVo();
+				if (tLoanBorTx.getOtherFields() != null) {
+					txTempVo = txTempVo.getVo(tLoanBorTx.getOtherFields());
+				}
+				txTempVo.putParam("AcSeq", parse.IntegerToString(acSeq,4));
+				tLoanBorTx.setOtherFields(txTempVo.getJsonString());
 			}
 		}
 		this.info("updAcDetailBorxNo end txAmt=" + txAmt + ", tempAmt=" + tempAmt + ", overAmt=" + overAmt);

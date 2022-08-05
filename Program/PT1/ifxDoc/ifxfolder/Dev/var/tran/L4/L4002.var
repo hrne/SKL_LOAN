@@ -225,6 +225,7 @@ X(#OOVirCnt)
 #OOLabelFgA=X,1,O
 #OOLabelFgB=X,1,O
 #OOLabelFgC=X,1,O
+#OOLabelFgD=X,1,O
 
 ! 按鈕A 整批訂正;整批刪除;整批入帳;刪除回復
 ! LabelFgA 整批訂正(H)、整批刪除(D)、刪除回復(R)、整批入帳(E)
@@ -259,6 +260,12 @@ H,T(2,整批訂正))
 ! LabelFgC 轉暫收(T)
 #OOBTNDISPLAYC=X,10,O
 SWITCH(#OOLabelFgC,
+C,T(2,整批檢核),
+E,T(2,整批入帳),
+H,T(2,整批訂正))
+! LabelFgD 轉暫收(T)
+#OOBTNDISPLAYD=X,10,O
+SWITCH(#OOLabelFgD,
 T,T(2,單筆入帳),)
 ! C(3,#OOStatusCode,0,T(2,),$)
 ! C(3,#OOStatusCode,1,T(2,轉暫收),$)
@@ -355,8 +362,7 @@ C(4,#OOLabelFgA,s,$)
 SWITCH(#OOLabelFgA,
 H,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_F}),
 D,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_A}),
-R,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_E}),
-E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_C}))
+R,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_E}),)
 
 ! 明細查詢
 ! LabelFgB 整批檢核(C)L420A 整批入帳(E)L420B 整批訂正(H)L4930
@@ -364,17 +370,22 @@ E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYA; ntxbuf=#OOBUF_C}))
 C(4,#OOLabelFgB,BIND(grid,cancel),$)
 C(4,#OOLabelFgB,s,$)
 SWITCH(#OOLabelFgB,
-C,BIND(grid,{ cmd=CHAIN;ntxcd=L420A; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_D}),
-E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_C}),
-H,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_A}))
+C,BIND(grid,{ cmd=CHAIN;ntxcd=L420A; text=#OOBTNDISPLAYB; ntxbuf=#OOBUF_D}),)
 
 
-! LabelFgC 轉暫收(T)L4930
+! LabelFgC 整批入帳(E)L420B
 #OOBTN_C=A,2,O
 C(4,#OOLabelFgC,BIND(grid,cancel),$)
 C(4,#OOLabelFgC,s,$)
 SWITCH(#OOLabelFgC,
-T,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYC; ntxbuf=#OOBUF_B}),)
+E,BIND(grid,{ cmd=CHAIN;ntxcd=L420B; text=#OOBTNDISPLAYC; ntxbuf=#OOBUF_C}),)
+
+! LabelFgD 轉暫收(T)L4930
+#OOBTN_D=A,2,O
+C(4,#OOLabelFgD,BIND(grid,cancel),$)
+C(4,#OOLabelFgD,s,$)
+SWITCH(#OOLabelFgD,
+T,BIND(grid,{ cmd=CHAIN;ntxcd=L4930; text=#OOBTNDISPLAYD; ntxbuf=#OOBUF_B}),)
 
 
 ! 筆數
@@ -385,7 +396,7 @@ C(3,#OORankFlag,3,BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOFileCntX; ntxbuf=#O
                   BIND(grid,cancel)
                   )
 )! 已入帳
-#OOBTN_D=A,2,O
+#OOBTN_I=A,2,O
 C(3,#OOAlrCnt,0,BIND(grid,cancel),
                 C(3,#OORankFlag,3,BIND(grid,{ cmd=CHAIN;ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D3}),
                 C(3,#OORankFlag,2,BIND(grid,{ cmd=CHAIN; ntxcd=L4920; text=#OOAlrCntX; ntxbuf=#OOBUF_L4920D2}),
@@ -489,6 +500,7 @@ TXFORM=L4002
 #OOLabelFgA
 #OOLabelFgB
 #OOLabelFgC
+#OOLabelFgD
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -525,7 +537,7 @@ TXFORM=L4002
 {width:105,align:'right'}
 #OOToDoRepayAmtX=需處理金額
 {width:105,align:'right'}
-#OOBTN_D=已入帳
+#OOBTN_I=已入帳
 {search:false,formatter:'cust:bind-button:#OOAlrCntX',align:'right',canExport:false,width:65}
 #OOBTN_E=待處理
 {search:false,formatter:'cust:bind-button:#OOWatCntX',align:'right',canExport:false,width:65}
@@ -537,6 +549,8 @@ TXFORM=L4002
 {search:false,formatter:'cust:bind-button:#OOBTNDISPLAYB',align:'center',canExport:false,width:65}
 #OOBTN_C=
 {search:false,formatter:'cust:bind-button:#OOBTNDISPLAYC',align:'center',canExport:false,width:65}
+#OOBTN_D=
+{search:false,formatter:'cust:bind-button:#OOBTNDISPLAYD',align:'center',canExport:false,width:65}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4002;cpi=15"/>
 #AcDate#TlrNo

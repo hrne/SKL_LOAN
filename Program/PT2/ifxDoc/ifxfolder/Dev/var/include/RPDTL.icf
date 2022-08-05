@@ -533,6 +533,7 @@ SHOW(#GRD_COLL{i},#RpCustNo{i})),$)
 #RpCode{i}=A,2,I
 C(3,#RP_IND,0,s,$)
 C(3,#RPTOTF,0,CALL(#SKFG_CAL{i}),$)
+C(3,#RPTOTF,0,s,$)
 C(3,#RP_IND,1,$,C(3,#RP_IND,5,$,C(3,#RP_IND,3,$,s)))
 ! IF(#DF1=={i},C(3,#RPFG,7,$,s),C(3,#RPFG,7,s,$))
 IF(#RPFG==2,s,$)
@@ -646,6 +647,7 @@ T(2,金額不可高於+#RpXtypeRpTotF{i})
 #RpAmt{i}=m,14,I
 C(3,#RP_IND,0,s,$)
 C(3,#RpCode{i},90,C(1,#RpAmt{i},CALL(#RPTOT_CAL{i}),CALL(#RPTOT_CAL{i}),INVOKEJS(SHOW,grd9_1,1)),$)
+C(3,#RpCode{i},91,IF(#RpAmt{i}>#RPTOTF{z},E(0,@RpAmt{i},#RPTOTF{z}),$),$)
 C(3,#RpCode{i},90,C(1,#RPTOTF{i},s,s,$),$)
 C(3,#RpCode{i},90,C(1,#RpAmt{i},E(0,0),E(0,0),$),$)
 IF(#DF1=={i},INVOKEJS(SHOW,grd9_{i},1),

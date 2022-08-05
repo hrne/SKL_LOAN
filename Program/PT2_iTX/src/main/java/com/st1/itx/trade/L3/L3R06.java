@@ -111,7 +111,6 @@ public class L3R06 extends TradeBuffer {
 	private ArrayList<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
-	private ArrayList<BaTxVo> baTxList;
 	private ArrayList<LoanFacTmp> lLoanFacTmp = new ArrayList<LoanFacTmp>();
 
 	@Override
@@ -289,14 +288,12 @@ public class L3R06 extends TradeBuffer {
 		int wkTerms = 0;
 		int wkTotaCount = 0;
 		int wkPreRepayTermNo = 0;
-		int wkTermNo = 0;
 		int wkPreRepayDate = 0;
 		int wkPrevTermNo = 0;
 		BigDecimal wkExtraRepay = iExtraRepay;
 
 		// 查詢各項費用
-		this.baTxList = new ArrayList<BaTxVo>();
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, this.tmpFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
+		baTxCom.settingUnPaid(iEntryDate, iCustNo, this.tmpFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
 
 		oExcessiveAll = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
 

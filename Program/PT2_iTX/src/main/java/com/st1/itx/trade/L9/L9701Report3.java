@@ -32,6 +32,9 @@ public class L9701Report3 extends MakeReport {
 
 	public int tempPage = 0;
 
+	String nextPageText = "=====  續下頁  =====";
+	String endText = "=====  報  表  結  束  =====";
+
 	// 最大明細筆數
 //	private int maxDetailCnt = 50;
 
@@ -87,37 +90,37 @@ public class L9701Report3 extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(40);
+		this.setMaxRows(45);
 
 	}
 
 	private void printDataHeader() {
-		if (this.NowRow >= 35) {
-			// 若剩餘行數不足5行,先換頁
-			this.newPage(); // 換頁時會印表頭
-			this.print(1, 1, " ");
+//		if (this.NowRow >= 35) {
+		// 若剩餘行數不足5行,先換頁
+//			this.newPage(); // 換頁時會印表頭
+//			this.print(1, 1, " ");
 //			tempPage = getNowPage();
-		} else {
+//		} else {
 
-			String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
+		String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
-			this.print(1, 1, " ");
-			this.print(1, 1, "額度　　 : " + tmpFacmNo);
-			divider();
-			this.print(1, 2, "撥款");
-			this.print(0, 10, "入帳日期");
-			this.print(0, 24, "交易內容");
-			this.print(0, 40, "交易金額");
-			this.print(0, 59, "暫收借");
-			this.print(0, 76, "本金");
-			this.print(0, 91, "利息");
-			this.print(0, 106, "違約金");
-			this.print(0, 123, "費用");
-			this.print(0, 139, "短繳");
-			this.print(0, 154, "暫收貸");
-			divider();
+		this.print(1, 1, " ");
+		this.print(1, 1, "額度　　 : " + tmpFacmNo);
+		divider();
+		this.print(1, 2, "撥款");
+		this.print(0, 10, "入帳日期");
+		this.print(0, 24, "交易內容");
+		this.print(0, 40, "交易金額");
+		this.print(0, 59, "暫收借");
+		this.print(0, 76, "本金");
+		this.print(0, 91, "利息");
+		this.print(0, 106, "違約金");
+		this.print(0, 123, "費用");
+		this.print(0, 139, "短繳");
+		this.print(0, 154, "暫收貸");
+		divider();
 
-		}
+//		}
 
 	}
 
@@ -171,6 +174,13 @@ public class L9701Report3 extends MakeReport {
 		if (listL9701 != null && listL9701.size() > 0) {
 
 			for (Map<String, String> tL9701Vo : listL9701) {
+//				this.info("nowrow=" + this.NowRow);
+				if (this.NowRow - 7 >= 40) {
+					this.print(1, this.getMidXAxis(), nextPageText,"C"); 
+					this.newPage();
+					this.print(1, 1, " "); 
+				}
+
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
@@ -267,8 +277,8 @@ public class L9701Report3 extends MakeReport {
 		this.print(1, 66, "小計：");
 		this.print(0, 83, formatAmt(principalTotal, 0), "R");
 		this.print(0, 98, formatAmt(interestTotal, 0), "R");
-		this.print(0, 115, formatAmt(breachAmtTotal, 0), "R");
-		this.print(0, 131, formatAmt(feeAmtTotal, 0), "R");
+		this.print(0, 114, formatAmt(breachAmtTotal, 0), "R");
+		this.print(0, 130, formatAmt(feeAmtTotal, 0), "R");
 
 		principalTotal = BigDecimal.ZERO;
 		interestTotal = BigDecimal.ZERO;

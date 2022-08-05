@@ -23,7 +23,9 @@ import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -72,6 +74,8 @@ public class L3250 extends TradeBuffer {
 	AcDetailCom acDetailCom;
 	@Autowired
 	AcReceivableCom acReceivableCom;
+	@Autowired
+	BaTxCom baTxCom;
 
 	private TitaVo titaVo;
 	private int iCustNo;
@@ -89,6 +93,7 @@ public class L3250 extends TradeBuffer {
 	// work area
 	private AcDetail acDetail;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -97,6 +102,7 @@ public class L3250 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		loanCom.setTxBuffer(this.txBuffer);
+		baTxCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
@@ -115,12 +121,22 @@ public class L3250 extends TradeBuffer {
 		// 沖正處理
 		repayEraseRoutine();
 		
+		if (wkRepayCode == 0) {
+			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+				wkRepayCode = 9; // 其他
+			} else {
+				wkRepayCode = 90; // 暫收抵繳
+			}
+		}
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo,0,0,99,BigDecimal.ZERO,titaVo); // 99-費用全部
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
-
+			// 暫收款金額 (暫收借)
+			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+			
 //			// 費用科目
 			acDetail = new AcDetail();
 			acDetail.setDbCr("D");
@@ -133,24 +149,9 @@ public class L3250 extends TradeBuffer {
 				checkInsuRenew(acDetail, titaVo);
 			}
 			lAcDetail.add(acDetail);
-
-			// THC 暫收款－沖正
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("THC");
-			acDetail.setTxAmt(wkTxAmt);
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(iFacmNo);
-			lAcDetail.add(acDetail);
 			
-			// TAV 暫收款可抵繳
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(iTxAmt.subtract(wkTxAmt));
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(iFacmNo);
-			lAcDetail.add(acDetail);
+			// 累溢收入帳(暫收貸)
+			loanCom.settleOverflow(lAcDetail, titaVo);
 
 			// 借： 本金利息、貸：暫收可抵繳
 			this.txBuffer.addAllAcDetailList(lAcDetail);

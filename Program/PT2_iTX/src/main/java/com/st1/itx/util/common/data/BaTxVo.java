@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 
 import javax.persistence.Entity;
 
+/**
+ * @author st1
+ *
+ */
 @Entity
 public class BaTxVo implements Comparable<BaTxVo> {
 
@@ -14,7 +18,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 3.暫收抵繳 <BR>
 	 * 4.溢(C)短(D)繳 <BR>
 	 * 5.其他額度暫收可抵繳 <BR>
-	 * 6.另收欠款(清償違約金、未到期火險費用、費用收取之短繳期金、繳本息之聯貸費用) <BR>
+	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金、繳本息之聯貸費用) <BR>
 	 */
 	private int dataKind = 0;
 
@@ -144,16 +148,6 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	private BigDecimal breachAmt = BigDecimal.ZERO;
 
 	/**
-	 * 短繳本金
-	 */
-	private BigDecimal unpaidPrin = BigDecimal.ZERO;
-
-	/**
-	 * 短繳利息
-	 */
-	private BigDecimal unpaidInt = BigDecimal.ZERO;
-
-	/**
 	 * 短繳清償違約金
 	 */
 	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
@@ -163,21 +157,16 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 */
 	private BigDecimal feeAmt = BigDecimal.ZERO;
 
+	/* ------------------- 備註欄 ---------------- */
 	/**
-	 * 暫收款金額(暫收借(-)、暫收貸(+)) (檢核表計算用)
+	 * 短繳本金(備註於本金利息該筆)
 	 */
-	private BigDecimal tempAmt = BigDecimal.ZERO;
+	private BigDecimal unpaidPrin = BigDecimal.ZERO;
 
 	/**
-	 * 交易金額) (檢核表計算用)
+	 * 短繳利息(備註於 資料類型: 2.本金利息)
 	 */
-	private BigDecimal TxAmt = BigDecimal.ZERO;
-
-	/**
-	 * 作帳金額) (檢核表計算用)
-	 */
-	private BigDecimal AcAmt = BigDecimal.ZERO;
-
+	private BigDecimal unpaidInt = BigDecimal.ZERO;
 	/**
 	 * 還款後餘額
 	 */
@@ -198,6 +187,51 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 */
 	private int closeFg = 0;
 
+	/* ------------------- 檢核表計算用 ---------------- */
+	/**
+	 * 累短收本金(檢核表計算用)
+	 */
+	private BigDecimal shortFallPrin = BigDecimal.ZERO;
+
+	/**
+	 * 累短收利息(檢核表計算用)
+	 */
+	private BigDecimal shortFallInt = BigDecimal.ZERO;
+
+	/**
+	 * 累短收清償違約金(檢核表計算用)
+	 */
+	private BigDecimal shortFallCloseBreach = BigDecimal.ZERO;
+
+	/**
+	 * 暫收款金額(暫收借) (檢核表計算用)
+	 */
+	private BigDecimal tempAmt = BigDecimal.ZERO;
+
+	/**
+	 * 溢收金額(暫收貸) (檢核表計算用)
+	 */
+	private BigDecimal overflow = BigDecimal.ZERO;
+	/**
+	 * 交易金額 (檢核表計算用)
+	 */
+	private BigDecimal txAmt = BigDecimal.ZERO;
+
+	/**
+	 * 作帳金額  (檢核表計算用)
+	 */
+	private BigDecimal acAmt = BigDecimal.ZERO;
+	
+	/**
+	 * 分錄序號 (檢核表計算用)
+	 */
+	private int acSeq = 0;
+	
+	/**
+	 * 額度科目 (檢核表計算用)
+	 */
+	private String facAcctCode = " ";
+
 	@Override
 	public String toString() {
 		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo
@@ -206,10 +240,12 @@ public class BaTxVo implements Comparable<BaTxVo> {
 				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
 				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
 				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
-				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", unpaidPrin=" + unpaidPrin + ", unpaidInt="
-				+ unpaidInt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt
-				+ ", TxAmt=" + TxAmt + ", AcAmt=" + AcAmt + ", loanBalPaid=" + loanBalPaid + ", rateIncr=" + rateIncr
-				+ ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
+				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
+				+ ", feeAmt=" + feeAmt + ", unpaidPrin=" + unpaidPrin + ", unpaidInt=" + unpaidInt + ", loanBalPaid="
+				+ loanBalPaid + ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg
+				+ ", shortFallPrin=" + shortFallPrin + ", shortFallInt=" + shortFallInt + ", shortFallCloseBreach="
+				+ shortFallCloseBreach + ", tempAmt=" + tempAmt + ", overflow=" + overflow + ", txAmt=" + txAmt
+				+ ", acAmt=" + acAmt + ", acSeq=" + acSeq + ", facAcctCode=" + facAcctCode + "]";
 	}
 
 	public int getDataKind() {
@@ -404,6 +440,14 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.breachAmt = breachAmt;
 	}
 
+	public BigDecimal getCloseBreachAmt() {
+		return closeBreachAmt;
+	}
+
+	public void setCloseBreachAmt(BigDecimal closeBreachAmt) {
+		this.closeBreachAmt = closeBreachAmt;
+	}
+
 	public BigDecimal getUnpaidPrin() {
 		return unpaidPrin;
 	}
@@ -420,14 +464,30 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.unpaidInt = unpaidInt;
 	}
 
-	public BigDecimal getCloseBreachAmt() {
-		return closeBreachAmt;
+	public BigDecimal getShortFallPrin() {
+		return shortFallPrin;
 	}
 
-	public void setCloseBreachAmt(BigDecimal closeBreachAmt) {
-		this.closeBreachAmt = closeBreachAmt;
+	public void setShortFallPrin(BigDecimal shortFallPrin) {
+		this.shortFallPrin = shortFallPrin;
 	}
-	
+
+	public BigDecimal getShortFallInt() {
+		return shortFallInt;
+	}
+
+	public BigDecimal getShortFallCloseBreach() {
+		return shortFallCloseBreach;
+	}
+
+	public void setShortFallCloseBreach(BigDecimal shortFallCloseBreach) {
+		this.shortFallCloseBreach = shortFallCloseBreach;
+	}
+
+	public void setShortFallInt(BigDecimal shortFallInt) {
+		this.shortFallInt = shortFallInt;
+	}
+
 	public BigDecimal getFeeAmt() {
 		return feeAmt;
 	}
@@ -444,20 +504,37 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.tempAmt = tempAmt;
 	}
 
+	public BigDecimal getOverflow() {
+		return overflow;
+	}
+
+	public void setOverflow(BigDecimal overFlow) {
+		this.overflow = overFlow;
+	}
+
+
 	public BigDecimal getTxAmt() {
-		return TxAmt;
+		return txAmt;
 	}
 
 	public void setTxAmt(BigDecimal txAmt) {
-		TxAmt = txAmt;
+		this.txAmt = txAmt;
 	}
 
 	public BigDecimal getAcAmt() {
-		return AcAmt;
+		return acAmt;
 	}
 
 	public void setAcAmt(BigDecimal acAmt) {
-		AcAmt = acAmt;
+		this.acAmt = acAmt;
+	}
+
+	public String getFacAcctCode() {
+		return facAcctCode;
+	}
+
+	public void setFacAcctCode(String facAcctCode) {
+		this.facAcctCode = facAcctCode;
 	}
 
 	public BigDecimal getLoanBalPaid() {
@@ -490,6 +567,14 @@ public class BaTxVo implements Comparable<BaTxVo> {
 
 	public void setCloseFg(int closeFg) {
 		this.closeFg = closeFg;
+	}
+
+	public int getAcSeq() {
+		return acSeq;
+	}
+
+	public void setAcSeq(int acSeq) {
+		this.acSeq = acSeq;
 	}
 
 	@Override

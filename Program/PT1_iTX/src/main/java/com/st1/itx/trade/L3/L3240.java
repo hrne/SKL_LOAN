@@ -15,6 +15,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
@@ -31,9 +33,11 @@ import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
 import com.st1.itx.util.common.SendRsp;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -66,6 +70,8 @@ public class L3240 extends TradeBuffer {
 	public LoanRateChangeService loanRateChangeService;
 	@Autowired
 	public LoanDueAmtCom loanDueAmtCom;
+	@Autowired
+	BaTxCom baTxCom;
 
 	@Autowired
 	Parse parse;
@@ -104,6 +110,7 @@ public class L3240 extends TradeBuffer {
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private List<AcReceivable> lAcReceivableDelete = new ArrayList<AcReceivable>();
 	private List<AcReceivable> lAcReceivableInsert = new ArrayList<AcReceivable>();
+	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -125,6 +132,7 @@ public class L3240 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		loanCom.setTxBuffer(this.txBuffer);
+		baTxCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
@@ -144,9 +152,17 @@ public class L3240 extends TradeBuffer {
 
 		// Check Input
 		checkInputRoutine();
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo,0,0,99,BigDecimal.ZERO,titaVo); // 99-費用全部
 
 		// 沖正處理
 		repayEraseRoutine();
+		if (wkRepayCode == 0) {
+			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+				wkRepayCode = 9; // 其他
+			} else {
+				wkRepayCode = 90; // 暫收抵繳
+			}
+		}
 
 		titaVo.setTxAmt(wkTxAmt);
 		titaVo.put("CURNM", "TWD");
@@ -160,25 +176,22 @@ public class L3240 extends TradeBuffer {
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
-
+			// 暫收款金額 (暫收借)
+			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+			
 			// THC 暫收款－沖正
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("THC");
+			acDetail.setSumNo("099");
 			acDetail.setTxAmt(wkTxAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			lAcDetail.add(acDetail);
 			
-			// TAV 暫收款可抵繳
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(wkTempAmt.subtract(wkTxAmt));
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(iFacmNo);
-			lAcDetail.add(acDetail);
-
+			// 累溢收入帳(暫收貸)
+			loanCom.settleOverflow(lAcDetail, titaVo);
+			
 			// 借： 本金利息、貸：暫收可抵繳
 			this.txBuffer.addAllAcDetailList(lAcDetail);
 

@@ -761,10 +761,10 @@ C(3,#NewApplNo,0,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,0)
-E(0,@RimApplNo,#NewApplNo)
+E(0,@RimApplNo,0)
 E(0,@RimCaseNo,0)
 RESET_RIM(#SendL2r05C,L2R05)
-S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo,#NewApplNo)
 R(1,L2R05)
 
 #NewFacmNo=A,3,S

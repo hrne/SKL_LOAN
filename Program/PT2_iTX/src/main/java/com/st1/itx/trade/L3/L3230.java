@@ -39,6 +39,7 @@ import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.parse.Parse;
@@ -83,6 +84,8 @@ public class L3230 extends TradeBuffer {
 	TxToDoCom txToDoCom;
 	@Autowired
 	BaTxCom baTxCom;
+	@Autowired
+	SendRsp sendRsp;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -697,6 +700,12 @@ public class L3230 extends TradeBuffer {
 //	2.專戶可轉專戶 其他戶號可轉專戶 專戶可轉其他戶號
 //	3.同戶號可轉其他額度
 	private void Checktransfer() throws LogicException {
+		// 放款暫收款轉帳時需主管授權
+		if (iTempReasonCode == 1) {
+			if (titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "放款暫收款轉帳");
+			}
+		}
 
 		boolean wkCustSpecial = false;
 		for (int i = 1; i <= 50; i++) {

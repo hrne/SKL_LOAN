@@ -147,6 +147,7 @@ public class L4002 extends TradeBuffer {
 			occursList.putParam("OOLabelFgA", "D");
 			occursList.putParam("OOLabelFgB", "");
 			occursList.putParam("OOLabelFgC", "");
+			occursList.putParam("OOLabelFgD", "");
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -458,7 +459,7 @@ public class L4002 extends TradeBuffer {
 				if (labelRankFlag == 1) {
 					// 可檢核筆數
 					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-							|| tBatxDetail.getProcStsCode().equals("3")) {
+							|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (canCheckCnt.containsKey(grp1)) {
 							canCheckCnt.put(grp1, canCheckCnt.get(grp1) + 1);
 						} else {
@@ -494,7 +495,7 @@ public class L4002 extends TradeBuffer {
 					}
 					// 可檢核筆數
 					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-							|| tBatxDetail.getProcStsCode().equals("3")) {
+							|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (canCheckCnt.containsKey(grp3)) {
 							canCheckCnt.put(grp3, canCheckCnt.get(grp3) + 1);
 						} else {
@@ -557,50 +558,54 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOTotalRepayAmt", totalAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOToDoRepayAmt", toDoAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOUnDoRepayAmt", unDoAmtSum.get(tempL4002Vo));
+				
 // LabelFgA 整批刪除(D)、刪除回復(R)、整批訂正(H)
-// LabelFgB 整批檢核(C)、整批入帳(E)
-// LabelFgC 轉暫收(T) 待處理筆數  > 0 & head
+// LabelFgB 整批檢核(C)
+// LabelFgC 整批入帳(E)
+// LabelFgD 轉暫收(T) 待處理筆數  > 0 & head
 
 				String labelFgA = "";
 				String labelFgB = "";
 				String labelFgC = "";
-				if (tempL4002Vo.getRankFlag() == 1) {
-					if ("8".equals(batxStatus)) {
-						labelFgA = "R";
-					} else {
-						if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
-							labelFgA = "D";
+				String labelFgD = "";
+				if (acDate != titaVo.getEntDyI() + 19110000
+						|| "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))) {
+
+				} else {
+					if (tempL4002Vo.getRankFlag() == 1) {
+						if ("8".equals(batxStatus)) {
+							labelFgA = "R";
+						} else {
+							if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
+								labelFgA = "D";
+							}
 						}
 					}
-				}
-				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-					if (canEraseCnt.get(tempL4002Vo) != null && canEraseCnt.get(tempL4002Vo) > 0) {
-						labelFgA = "H";
+					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+						if (canEraseCnt.get(tempL4002Vo) != null && canEraseCnt.get(tempL4002Vo) > 0) {
+							labelFgA = "H";
+						}
 					}
-				}
-				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-					if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
-						labelFgB = "E";
-					} else {
+					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
 						if (canCheckCnt.get(tempL4002Vo) != null && canCheckCnt.get(tempL4002Vo) > 0) {
 							labelFgB = "C";
 						}
 					}
-				}
-				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-					if (canTempCnt.get(tempL4002Vo) != null && canTempCnt.get(tempL4002Vo) > 0) {
-						labelFgC = "T";
+					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+						if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
+							labelFgC = "E";
+						}
+					}
+					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+						if (canTempCnt.get(tempL4002Vo) != null && canTempCnt.get(tempL4002Vo) > 0) {
+							labelFgD = "T";
+						}
 					}
 				}
-				if (acDate != titaVo.getEntDyI() + 19110000) {
-					occursList.putParam("OOLabelFgA", "");
-					occursList.putParam("OOLabelFgB", "");
-					occursList.putParam("OOLabelFgC", "");
-				} else {
-					occursList.putParam("OOLabelFgA", labelFgA);
-					occursList.putParam("OOLabelFgB", labelFgB);
-					occursList.putParam("OOLabelFgC", labelFgC);
-				}
+				occursList.putParam("OOLabelFgA", labelFgA);
+				occursList.putParam("OOLabelFgB", labelFgB);
+				occursList.putParam("OOLabelFgC", labelFgC);
+				occursList.putParam("OOLabelFgD", labelFgD);
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

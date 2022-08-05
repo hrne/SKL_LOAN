@@ -88,7 +88,6 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ,ln.\"TitaTxtNo\"		    AS	\"TitaTxtNo\"														";
 		sql += "     ,MIN(ln.\"TitaCalDy\")     AS 	\"TitaCalDy\"						";
 		sql += "     ,MIN(ln.\"TitaCalTm\")	  	AS	\"TitaCalTm\"               	";
-		sql += "     ,MIN(ln.\"CreateDate\")	AS  \"CreateDate\"					";
 		sql += "     ,SUM(ln.\"TxAmt\")         AS  \"TotTxAmt\"			     	";
 		sql += "    FROM																			";
 		sql += "      \"LoanBorTx\"	ln															";
@@ -120,14 +119,12 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTitaHCode == 0) {
 			sql += "      AND ln3.\"TitaHCode\" = '0'											";
 		}
-		sql += " ORDER BY ln3.\"AcDate\" ASC ";
-		sql += "         ,ln3.\"TitaCalDy\" ASC	                    ";
-		sql += "         ,ln3.\"TitaCalTm\"	ASC                    	";
+		sql += " ORDER BY ln2.\"AcDate\" ASC ";
+		sql += "         ,ln2.\"TitaCalDy\" ASC	                    ";
+		sql += "         ,ln2.\"TitaCalTm\"	ASC                    	";
+		sql += "         ,NVL(JSON_VALUE(\"OtherFields\", '$.AcSeq'),'0000') ASC";
 		sql += "         ,ln3.\"CreateDate\" ASC                    ";
 		sql += "         ,ln3.\"Displayflag\" ASC                   ";
-		sql += "         ,CASE WHEN ln3.\"TxAmt\" > 0  THEN 1 ELSE 0 END DESC ";
-		sql += "         ,ln3.\"IntStartDate\" ASC                  ";
-		sql += "         ,ln3.\"Rate\" DESC                  ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);

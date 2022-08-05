@@ -204,7 +204,6 @@ public class L3200 extends TradeBuffer {
 	private int wkBormNoStart = 1;
 	private int wkBormNoEnd = 900;
 	private int wkTmpFacmNo = 0; // 暫收款額度
-	private int wkOverflowFacmNo = 0; // 累溢收額度
 
 	private int wkTerms = 0;
 	private int wkTotaCount = 0;
@@ -237,7 +236,6 @@ public class L3200 extends TradeBuffer {
 	private BigDecimal wkUnpaidInt = BigDecimal.ZERO; // 短繳利息
 	private BigDecimal wkUnpaidCloseBreach = BigDecimal.ZERO; // 短繳清償違約金
 	private BigDecimal wkUnpaidAmtRemaind = BigDecimal.ZERO;
-	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkNewDueAmt = BigDecimal.ZERO;
 	private BigDecimal wkOvduRepayRemaind = BigDecimal.ZERO;
 	private BigDecimal wkOvduAmt = BigDecimal.ZERO;
@@ -248,7 +246,6 @@ public class L3200 extends TradeBuffer {
 	private BigDecimal wkModifyFee = BigDecimal.ZERO;
 	private BigDecimal wkFireFee = BigDecimal.ZERO;
 	private BigDecimal wkLawFee = BigDecimal.ZERO;
-	private BigDecimal wkTotalRepay = BigDecimal.ZERO; // 總還款金額
 	private BigDecimal wkTotalShortAmtLimit = BigDecimal.ZERO; // 總短繳限額
 	private BigDecimal wkShortfall = BigDecimal.ZERO; // 累短繳金額
 	private String checkMsg = "";
@@ -265,7 +262,6 @@ public class L3200 extends TradeBuffer {
 	private ArrayList<BaTxVo> baTxList;
 	private boolean isFirstBorm = true;
 	private boolean isCalcRepayInt = false;
-	private boolean isFirstSettletTmp = true;
 	private boolean isSettleUnpaid = false;
 	private boolean isRepayPrincipal = false; // 回收本金
 	private TempVo tTempVo = new TempVo();
@@ -1952,11 +1948,10 @@ public class L3200 extends TradeBuffer {
 					} else if (ba.getRepayType() == 7) {
 						this.wkLawFee = this.wkLawFee.add(ba.getAcctAmt());
 					}
-					ba.setAcctAmt(BigDecimal.ZERO);
 					// 新增放款交易內容檔(收回費用)
-
-					LoanBorTx t = loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail,
+					loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail,
 							titaVo);
+					ba.setAcctAmt(BigDecimal.ZERO);
 				}
 			}
 			this.info("wkAcctFee=" + wkAcctFee + ", wkModifyFee=" + wkModifyFee + ", wkFireFee=" + wkFireFee

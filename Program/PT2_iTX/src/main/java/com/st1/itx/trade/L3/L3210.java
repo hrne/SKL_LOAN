@@ -402,8 +402,7 @@ public class L3210 extends TradeBuffer {
 					// 累溢收入帳(暫收貸)
 					loanCom.settleOverflow(lAcDetail, titaVo);
 					// 新增放款交易內容檔(收回費用)
-					LoanBorTx t = loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail,
-							titaVo);
+					loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail, titaVo);
 
 					ba.setAcctAmt(BigDecimal.ZERO);
 				}
@@ -418,7 +417,11 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-		tLoanBorTx.setDesc("暫收款登錄");
+		if (iTempReasonCode == 0) {
+			tLoanBorTx.setDesc("債協暫收款登錄");
+		} else {
+			tLoanBorTx.setDesc("暫收款登錄");
+		}
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		//
