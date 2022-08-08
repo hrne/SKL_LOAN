@@ -212,7 +212,7 @@ public class L3220 extends TradeBuffer {
 		} else {
 			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);// 訂正放款交易內容檔by交易
 		}
-		
+
 		// 產生會計分錄
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 			this.txBuffer.setAcDetailList(lAcDetail);
@@ -250,7 +250,7 @@ public class L3220 extends TradeBuffer {
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			if (lAcReceivable != null && lAcReceivable.size() > 0) {
 				for (AcReceivable ac : lAcReceivable) {
-					if ((iTempReasonCode == 1 && (ac.getAcctCode().equals("TAV") || ac.getAcctCode().equals("TLD")))
+					if (iTempReasonCode == 1 && ac.getAcctCode().equals("TLD")
 							|| (iTempReasonCode == 2 && ac.getAcctCode().substring(0, 2).equals("T1"))
 							|| (iTempReasonCode == 3 && ac.getAcctCode().substring(0, 2).equals("T2"))
 							|| (iTempReasonCode == 4 && ac.getAcctCode().equals("TAM"))) {
@@ -396,16 +396,14 @@ public class L3220 extends TradeBuffer {
 		logger.info("AcDetailRoutine ... ");
 		logger.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
 
-		// 累溢收入帳(暫收貸)
-		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-			loanCom.settleOverflow(lAcDetail, titaVo);
-		}
-
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
-			this.txBuffer.addAllAcDetailList(lAcDetail);
 			// 貸方 收付欄
 			acPaymentCom.run(titaVo);
 			lAcDetail.addAll(this.txBuffer.getAcDetailList());
+		}
+		// 累溢收入帳(暫收貸)
+		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+			loanCom.settleOverflow(lAcDetail, titaVo);
 		}
 	}
 

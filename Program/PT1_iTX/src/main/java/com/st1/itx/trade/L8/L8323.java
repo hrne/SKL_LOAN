@@ -160,13 +160,13 @@ public class L8323 extends TradeBuffer {
 			// 6 最大債權金融機構報送自行債權資料時，第9欄「是否為最大債權金融機構報送」需填報Y.***J
 
 			// 7
-			// 第10欄「是否為本金融機構債務人」填報'Y',且第11欄「有擔保債權筆數」填報'0'者，檢核本檔案格式[第12+13+14+15欄'依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額]之值需大於0，否則予以剔退.
+			// 第10欄「是否為本金融機構債務人」填報'Y',且第11欄「有擔保債權筆數」填報'0'者，檢核本檔案格式[第12+13+14+15欄'依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額]之值需大於0，否則予以剔退.
 			if ("Y".equals(iIsClaims) && iGuarLoanCnt == 0) {
 				if ((iCivil323ExpAmt + iCivil323CashAmt + iCivil323CreditAmt + iCivil323GuarAmt) <= 0) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005", "「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額」之合計值需大於0.");
+						throw new LogicException("E0005", "「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
 					} else {
-						throw new LogicException("E0007", "「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額」之合計值需大於0.");
+						throw new LogicException("E0007", "「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
 					}
 				}
 			} // 7 end
@@ -225,7 +225,7 @@ public class L8323 extends TradeBuffer {
 			chJcicZ442 = sJcicZ442Service.findById(iJcicZ442Id, titaVo);
 			this.info("TEST===" + chJcicZ442);
 			if (chJcicZ442 != null) {
-				throw new LogicException("E0005", "已有相同資料");
+				throw new LogicException("E0002", "已有相同資料");
 			}
 
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");

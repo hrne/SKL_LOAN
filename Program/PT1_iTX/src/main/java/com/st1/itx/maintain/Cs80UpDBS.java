@@ -138,7 +138,7 @@ public class Cs80UpDBS extends CommBuffer {
 				}
 			}
 
-			if (!this.titaVo.isTrmtypBatch() && !this.titaVo.isTxtNoHasBatch()) 
+			if (!this.titaVo.isTxtNoHasBatch()) 
 				this.updTxTeller();
 			
 

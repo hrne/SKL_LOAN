@@ -785,8 +785,4 @@ public class L3230 extends TradeBuffer {
 
 	}
 
-	// 暫收款金額 (暫收借)
-	private void settleTempAmt() throws LogicException {
-		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-	}
 }
