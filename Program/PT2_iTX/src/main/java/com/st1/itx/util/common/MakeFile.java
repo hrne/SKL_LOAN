@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.config.AstrMapper;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.tradeService.CommBuffer;
@@ -26,15 +27,16 @@ import java.nio.file.Files;
  * @author eric chang
  *
  */
-
 @Component("makeFile")
 @Scope("prototype")
-
 public class MakeFile extends CommBuffer {
 
 	/* DB服務注入 */
 	@Autowired
 	TxFileService sTxFileService;
+
+	@Autowired
+	private AstrMapper astrMapper;
 
 	// 檔案輸出路徑
 	@Value("${iTXOutFolder}")
@@ -43,8 +45,8 @@ public class MakeFile extends CommBuffer {
 	// 資料明細
 	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 
-	// 檔案日期
-	private String BrNo;
+	// 單位別
+	private String rptBrNo;
 
 	// 檔案日期
 	private int fileDate;
@@ -73,13 +75,12 @@ public class MakeFile extends CommBuffer {
 	 * @param format   輸出檔案格式 1.UTF8 2.BIG5
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, int format) throws LogicException {
-
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
+			int format) throws LogicException {
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, format);
 
 		listMap = new ArrayList<HashMap<String, Object>>();
-
 	}
 
 	/**
@@ -93,17 +94,18 @@ public class MakeFile extends CommBuffer {
 	 * @param fileName 輸出檔案名稱
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
-
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
+			throws LogicException {
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, 1);
 	}
 
-	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format) throws LogicException {
+	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format)
+			throws LogicException {
 		if ("".equals(brno)) {
 			throw new LogicException("EC007", "(MakeFile)取檔單位不可為空白");
 		}
-		this.BrNo = brno;
+		this.rptBrNo = brno;
 
 		if (date == 0) {
 			throw new LogicException("EC007", "(MakeFile)檔案日期不可為０");
@@ -134,7 +136,6 @@ public class MakeFile extends CommBuffer {
 			throw new LogicException("EC007", "(MakeFile)輸出檔案格式不可為" + format);
 		}
 		this.fileFormat = format;
-
 	}
 
 	/**
@@ -157,7 +158,6 @@ public class MakeFile extends CommBuffer {
 	 * @return String 字串
 	 */
 	public String cutString(String string, int length) {
-
 		String rs = "";
 		int tlen = 0;
 		int clen = 0;
@@ -178,11 +178,8 @@ public class MakeFile extends CommBuffer {
 				rs += c;
 				tlen += clen;
 			}
-
 		}
-
 		return rs;
-
 	}
 
 	/**
@@ -194,7 +191,6 @@ public class MakeFile extends CommBuffer {
 	 * @return String 字串
 	 */
 	public String fillStringR(String string, int length, char fillchar) {
-
 		return this.fillString(string, length, fillchar, true);
 	}
 
@@ -206,7 +202,6 @@ public class MakeFile extends CommBuffer {
 	 * @return String 字串
 	 */
 	public String fillStringR(String string, int length) {
-
 		return this.fillString(string, length, ' ', true);
 	}
 
@@ -219,7 +214,6 @@ public class MakeFile extends CommBuffer {
 	 * @return String 字串
 	 */
 	public String fillStringL(String string, int length, char fillchar) {
-
 		return this.fillString(string, length, fillchar, false);
 	}
 
@@ -231,7 +225,6 @@ public class MakeFile extends CommBuffer {
 	 * @return String 字串
 	 */
 	public String fillStringL(String string, int length) {
-
 		return this.fillString(string, length, ' ', false);
 	}
 
@@ -256,7 +249,6 @@ public class MakeFile extends CommBuffer {
 				rs += c;
 				tlen += clen;
 			}
-
 		}
 
 		if (length > tlen) {
@@ -266,12 +258,10 @@ public class MakeFile extends CommBuffer {
 				} else {
 					rs = fillchar + rs;
 				}
-
 			}
 		}
 
 		return rs;
-
 	}
 
 	/**
@@ -281,10 +271,9 @@ public class MakeFile extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public long close() throws LogicException {
-
 		TxFile tTxFile = new TxFile();
 
-		tTxFile.setBrNo(this.BrNo);
+		tTxFile.setBrNo(this.rptBrNo);
 		tTxFile.setFileDate(this.fileDate);
 		tTxFile.setFileCode(this.fileCode);
 		tTxFile.setFileItem(this.fileItem);
@@ -328,7 +317,6 @@ public class MakeFile extends CommBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "EC002", "(MakeFile)輸出檔(TxFile):" + e.getErrorMsg());
 		}
-
 		return tTxFile.getFileNo();
 	}
 
@@ -364,9 +352,6 @@ public class MakeFile extends CommBuffer {
 			throw new LogicException(titaVo, "EC002", "(MakeFile)輸出檔(TxFile)序號:" + fileno);
 		}
 
-		// 2021-01-18 會大量顯示，所以先關閉 (陳志嵩)
-//		this.info("MakeFile.toFile.filedata=" + tTxFile.getFileData());
-
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
 		} catch (IOException e) {
@@ -395,16 +380,11 @@ public class MakeFile extends CommBuffer {
 
 		// 產製新檔
 		FileOutputStream fo = null;
-//		OutputStreamWriter osw = null;
-//		BufferedWriter fw = null;
-
 		BufferedOutputStream bos = null;
 		try {
 			this.info("MakeFile.toFile outfile=" + outfile + "/" + charsetName);
 			fo = new FileOutputStream(outfile, true);
 			bos = new BufferedOutputStream(fo);
-//			osw = new OutputStreamWriter(fo, charsetName);
-//			fw = new BufferedWriter(osw);
 			this.info("MakeFile.toFile opened");
 
 			byte[] sl = new byte[2];
@@ -415,7 +395,7 @@ public class MakeFile extends CommBuffer {
 					String[] ss = map.get("d").toString().split("");
 					for (String s : ss) {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
-							bos.write("　".getBytes("BIG5"));
+							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]));
 						else
 							bos.write(s.equals("／") ? sl : s.getBytes(charsetName));
 					}
@@ -423,7 +403,6 @@ public class MakeFile extends CommBuffer {
 				} else
 					bos.write((map.get("d").toString() + "\r\n").getBytes(charsetName));
 			}
-
 			this.info("MakeFile.toFile listmap");
 			bos.flush();
 			this.info("MakeFile.toFile flush");
@@ -434,13 +413,8 @@ public class MakeFile extends CommBuffer {
 			throw new LogicException("EC009", "(MakeFile)輸出檔(TxFile)序號:" + fileno + ",產檔失敗");
 		} finally {
 			SafeClose.close(bos);
-//			SafeClose.close(osw);
 			SafeClose.close(fo);
 		}
-
-//		if (this.listMap != null) {
-//			showListMap(this.listMap);
-//		}
 	}
 
 	private boolean haveChinese(String string) {
@@ -450,15 +424,11 @@ public class MakeFile extends CommBuffer {
 				return true;
 			}
 		}
-
 		return false;
-
 	}
 
 	@Override
 	public void exec() throws LogicException {
 		// override this
-
 	}
-
 }

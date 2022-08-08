@@ -60,19 +60,17 @@ import com.st1.itx.util.filter.SafeClose;
  * @author eric chang
  *
  */
-
 @Component("makeExcel")
 @Scope("prototype")
-
 public class MakeExcel extends CommBuffer {
 
-	private String brno = "";
+	private String rptBrNo = "";
 
 	private Cell cell = null;
 
 	private boolean cellHasStyle = true;
 
-	private int date = 0;
+	private int rptAcDate = 0;
 
 	private DataFormat df = null;
 
@@ -167,12 +165,12 @@ public class MakeExcel extends CommBuffer {
 		if (date == 0) {
 			throw new LogicException("EC004", "(MakeExcel)日期(date)必須有值(MakeExcel)");
 		}
-		this.date = date;
+		this.rptAcDate = date;
 
 		if ("".equals(brno)) {
 			throw new LogicException("EC004", "(MakeExcel)單位(brno)必須有值(MakeExcel)");
 		}
-		this.brno = brno;
+		this.rptBrNo = brno;
 
 		if ("".equals(fileCode)) {
 			throw new LogicException("EC004", "(MakeExcel)檔案編號(fileCode)必須有值(MakeExcel)");
@@ -216,8 +214,8 @@ public class MakeExcel extends CommBuffer {
 		tTxFile.setFileCode(this.fileCode);
 		tTxFile.setFileItem(this.fileItem);
 		tTxFile.setFileOutput(this.fileName);
-		tTxFile.setBrNo(this.brno);
-		tTxFile.setFileDate(this.date);
+		tTxFile.setBrNo(this.rptBrNo);
+		tTxFile.setFileDate(this.rptAcDate);
 		tTxFile.setCreateEmpNo(this.titaVo.getTlrNo());
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -334,7 +332,6 @@ public class MakeExcel extends CommBuffer {
 
 	private void doNewSheet(String sheetName) {
 		this.sheet = this.wb.createSheet(sheetName);
-
 	}
 
 	private void doOpen(String fileName) throws LogicException {
@@ -347,7 +344,6 @@ public class MakeExcel extends CommBuffer {
 			isDefaultExcel = true;
 		}
 		this.df = this.wb.createDataFormat();
-
 	}
 
 	private void doSetHeight(int row, int height) {
@@ -395,13 +391,11 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	private void doSetWidth(int col, int width) {
-
 		if (width == 0) {
 			sheet.autoSizeColumn(col - 1);
 		} else {
 			this.sheet.setColumnWidth(col - 1, width * 256);
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -582,10 +576,10 @@ public class MakeExcel extends CommBuffer {
 				copyLastRowCellStyle(shiftRowFrom, shiftCounts);
 
 			} else if ("9".equals(type)) {
-				int caculateRow = Integer.parseInt(map.get("r").toString());
-				int caculateColumn = Integer.parseInt(map.get("c").toString());
+				int calculateRow = Integer.parseInt(map.get("r").toString());
+				int calculateColumn = Integer.parseInt(map.get("c").toString());
 
-				formulaCaculateToExcel(caculateRow, caculateColumn);
+				formulaCalculateToExcel(calculateRow, calculateColumn);
 			}
 		}
 
@@ -609,22 +603,16 @@ public class MakeExcel extends CommBuffer {
 	@Override
 	public void exec() throws LogicException {
 		// override this
-
 	}
 
 	/**
 	 * 公式儲存格重新計算
 	 * 
-	 * @param caculateRow    第幾列, 1-based
-	 * @param caculateColumn 第幾欄, 1-based
+	 * @param calculateRow    第幾列, 1-based
+	 * @param calculateColumn 第幾欄, 1-based
 	 */
-	public void formulaCaculate(int caculateRow, int caculateColumn) {
-
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("t", "9");
-		map.put("r", caculateRow);
-		map.put("c", caculateColumn);
-		listMap.add(map);
+	public void formulaCaculate(int calculateRow, int calculateColumn) {
+		formulaCalculate(calculateRow, calculateColumn);
 	}
 
 	/**
@@ -634,8 +622,11 @@ public class MakeExcel extends CommBuffer {
 	 * @param calculateColumn 第幾欄, 1-based
 	 */
 	public void formulaCalculate(int calculateRow, int calculateColumn) {
-		// xwh: 原本用的formulaCaculate為typo, 這裡加一個api
-		formulaCaculate(calculateRow, calculateColumn);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", "9");
+		map.put("r", calculateRow);
+		map.put("c", calculateColumn);
+		listMap.add(map);
 	}
 
 	/**
@@ -650,7 +641,7 @@ public class MakeExcel extends CommBuffer {
 			int calculateColumnRight) {
 		for (; calculateRowTop <= calculateRowBottom; calculateRowTop++) {
 			for (; calculateColumnLeft <= calculateColumnRight; calculateColumnLeft++)
-				formulaCaculate(calculateRowTop, calculateColumnLeft);
+				formulaCalculate(calculateRowTop, calculateColumnLeft);
 		}
 	}
 
@@ -661,12 +652,10 @@ public class MakeExcel extends CommBuffer {
 	 * @param caculateRow    第幾列
 	 * @param caculateColumn 第幾欄
 	 */
-	private void formulaCaculateToExcel(int caculateRow, int caculateColumn) {
-
-		Row pRow = this.sheet.getRow(caculateRow - 1);
+	private void formulaCalculateToExcel(int calculateRow, int calculateColumn) {
+		Row pRow = this.sheet.getRow(calculateRow - 1);
 		if (pRow != null) {
-			Cell tmpCell = pRow.getCell(caculateColumn - 1);
-
+			Cell tmpCell = pRow.getCell(calculateColumn - 1);
 			if (tmpCell != null && tmpCell.getCellType() == CellType.FORMULA) {
 				this.wb.getCreationHelper().createFormulaEvaluator().evaluateFormulaCell(tmpCell);
 			}
@@ -674,7 +663,7 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	public int getDate() {
-		return date;
+		return rptAcDate;
 	}
 
 	public String getFileCode() {
@@ -765,7 +754,6 @@ public class MakeExcel extends CommBuffer {
 			outputFontStyleVo.setAlign("R");
 			break;
 		default:
-
 			break;
 		}
 
@@ -849,8 +837,6 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void newSheet(String sheetName) throws LogicException {
-
-//		this.sheet = this.wb.createSheet(sheetName);
 		this.doNewSheet(sheetName);
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -872,7 +858,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
 			throws LogicException {
-
 		// 未指定sheetnanme時,預設以檔案編號為sheetnanme
 		this.open(titaVo, date, brno, fileCode, fileItem, fileName, fileCode);
 	}
@@ -891,7 +876,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String sheetName) throws LogicException {
-
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -903,7 +887,6 @@ public class MakeExcel extends CommBuffer {
 		listMap.add(map);
 
 		this.newSheet(sheetName);
-
 	}
 
 	/**
@@ -920,7 +903,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String defaultExcel, Object defaultSheet) throws LogicException {
-
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -932,7 +914,6 @@ public class MakeExcel extends CommBuffer {
 		listMap.add(map);
 
 		this.setSheet(defaultSheet);
-
 	}
 
 	/**
@@ -951,7 +932,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
-
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -963,7 +943,6 @@ public class MakeExcel extends CommBuffer {
 		listMap.add(map);
 
 		this.setSheet(defaultSheet, newSheetName);
-
 	}
 
 	/**
@@ -994,7 +973,6 @@ public class MakeExcel extends CommBuffer {
 		} catch (IOException e) {
 			throw new LogicException(titaVo, "EC009", "(MakeExcel)");
 		}
-
 	}
 
 	/**
@@ -1006,14 +984,10 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void openExcel(String fileName, Object sheetname) throws LogicException {
 		this.openFile(fileName, false);
-
 		this.doSetSheet(sheetname, "");
 	}
 
 	private void openFile(String fileName, boolean excelfolder) throws LogicException {
-		// 讀取既有的
-//		System.out.println("file type = " + fileName.substring(l-4, l));
-
 		String fna = "";
 
 		if (excelfolder) {
@@ -1024,9 +998,7 @@ public class MakeExcel extends CommBuffer {
 
 		int l = fileName.length();
 
-		InputStream is = null;
-		try {
-			is = new FileInputStream(fna);
+		try (InputStream is = new FileInputStream(fna)) {
 			if (".xls".equals(fileName.substring(l - 4, l))) {
 				this.xls = true;
 				this.wb = new HSSFWorkbook(is);
@@ -1036,10 +1008,9 @@ public class MakeExcel extends CommBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "，非預設EXCEL檔案格式");
 			}
+			SafeClose.close(is);
 		} catch (IOException e) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "檔案不存在");
-		} finally {
-			SafeClose.close(is);
 		}
 	}
 
@@ -1054,7 +1025,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param point     框線粗細
 	 */
 	public void setAddRengionBorder(String firstCell, int firstRow, String lastCell, int lastRow, int point) {
-//		String[] range=new String[5];
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("t", "6");
 		map.put("firstcell", firstCell);
@@ -1071,11 +1041,8 @@ public class MakeExcel extends CommBuffer {
 	 * @param bgColor 顏色(英文字，大小寫皆可) <br>
 	 *                直接打顏色英文字或使用IndexedColors呼叫顏色代號
 	 */
-
 	public void setBackGroundColor(String bgColor) {
-
 		inputFontStyleVo.setBgColor(bgColor);
-
 	}
 
 	/**
@@ -1085,9 +1052,7 @@ public class MakeExcel extends CommBuffer {
 	 *                  1=一般粗點 <br>
 	 */
 	public void setBorder(int borderAll) {
-
 		inputFontStyleVo.setBorderAll((short) borderAll);
-
 	}
 
 	/**
@@ -1096,15 +1061,12 @@ public class MakeExcel extends CommBuffer {
 	 * @param color 顏色(英文字，大小寫皆可) <br>
 	 *              直接打顏色英文字或使用IndexedColors呼叫顏色代號
 	 */
-
 	public void setColor(String color) {
-
 		this.inputFontStyleVo.setColor(color);
-
 	}
 
 	public void setDate(int date) {
-		this.date = date;
+		this.rptAcDate = date;
 	}
 
 	public void setFileCode(String fileCode) {
@@ -1120,7 +1082,6 @@ public class MakeExcel extends CommBuffer {
 	 * @throws CloneNotSupportedException
 	 */
 	private CellStyle setFontStyle(boolean readStyle) {
-
 		// 預計要回傳的 CellStyle
 		CellStyle resultCellStyle = null;
 
@@ -1135,9 +1096,6 @@ public class MakeExcel extends CommBuffer {
 				readStyle = true;
 				resultCellStyle = this.wb.getCellStyleAt(originalCellStyleIndex);
 			}
-
-//			this.info("讀底稿 originalCellStyleIndex = " + originalCellStyleIndex);
-//			this.info("讀底稿 resultCellStyle.getIndex = " + resultCellStyle.getIndex());
 		}
 
 		// 若需讀原格式設定,先讀取原格式設定寫進outputFontStyleVo
@@ -1164,22 +1122,14 @@ public class MakeExcel extends CommBuffer {
 		// 並 回傳該CellStyle
 		for (Iterator<Entry<ExcelFontStyleVo, Integer>> it = fontStyleMap.entrySet().iterator(); it.hasNext();) {
 			Entry<ExcelFontStyleVo, Integer> tmpEntry = it.next();
-
-//			this.info("tmpEntry.getKey() = " + tmpEntry.getKey().toString());
-//			this.info("outputFontStyleVo = " + outputFontStyleVo.toString());
-
 			if (tmpEntry.getKey().equals(outputFontStyleVo)) {
-//				this.info("equals.");
-
 				indexOfCellStyle = tmpEntry.getValue();
 
 				resultCellStyle = this.wb.getCellStyleAt(indexOfCellStyle);
 
-//				this.info("indexOfCellStyle = " + indexOfCellStyle);
 				return resultCellStyle;
 			}
 		}
-//		this.info("no equals.");
 
 		// 若 ExcelFontStyleVo 不存在於 Map
 		// 且 目前CellStyle數量 <= CellStyle數量限制
@@ -1199,10 +1149,6 @@ public class MakeExcel extends CommBuffer {
 				this.error("MakeExcel clone error = " + e.getMessage());
 			}
 
-//			this.info("fontStyleMap put outputFontStyleVo = " + outputFontStyleVo.toString());
-//			this.info("fontStyleMap put outputFontStyleVo hashCode = " + outputFontStyleVo.hashCode());
-//			this.info("fontStyleMap put indexOfCellStyle = " + indexOfCellStyle);
-
 			// 若 ExcelFontStyleVo 不存在於 Map
 			// 且 目前CellStyle數量 <= CellStyle數量限制
 			// 且 是讀取底稿
@@ -1217,8 +1163,6 @@ public class MakeExcel extends CommBuffer {
 
 			indexOfCellStyle = resultCellStyle.getIndex();
 
-//			this.info("fontStyleMap put value = " + indexOfCellStyle);
-
 			try {
 				fontStyleMap.put(outputFontStyleVo.clone(), indexOfCellStyle);
 			} catch (CloneNotSupportedException e) {
@@ -1226,10 +1170,8 @@ public class MakeExcel extends CommBuffer {
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("MakeExcel clone error = " + e.getMessage());
 			}
-
-			// 否則,寫this.error,回傳第一個CellStyle
 		} else {
-
+			// 否則,寫this.error,回傳第一個CellStyle
 			if (isFirstTimeToStyleLimit) {
 				this.error("setFontStyle error : CellStyle已超過" + limitOfCellStyle + ",不做Style設定,目前CellStyle數量為"
 						+ numOfCellStyle);
@@ -1375,9 +1317,7 @@ public class MakeExcel extends CommBuffer {
 	 *                 5=新細明體
 	 */
 	public void setFontType(int fontType) {
-
 		this.inputFontStyleVo.setFont((short) fontType);
-
 	}
 
 	/**
@@ -1439,14 +1379,12 @@ public class MakeExcel extends CommBuffer {
 	 * @param lcol 結束欄
 	 */
 	public void setMergedRegion(int frow, int lrow, int fcol, int lcol) {
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("t", 5);
 		map.put("fr", frow);
 		map.put("lr", lrow);
 		map.put("fc", fcol);
 		map.put("lc", lcol);
-
 		listMap.add(map);
 	}
 
@@ -1461,7 +1399,6 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val) throws LogicException {
-
 		setValueToMap(row, lrow, col, lcol, val);
 	}
 
@@ -1489,7 +1426,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String formatOrAlign)
 			throws LogicException {
-
 		switch (formatOrAlign) {
 		case "L":
 		case "C":
@@ -1500,7 +1436,6 @@ public class MakeExcel extends CommBuffer {
 			inputFontStyleVo.setFormat(formatOrAlign);
 			break;
 		}
-
 		setValueToMap(row, lrow, col, lcol, val);
 	}
 
@@ -1521,7 +1456,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String format, String align)
 			throws LogicException {
-
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);
 		}
@@ -1535,12 +1469,9 @@ public class MakeExcel extends CommBuffer {
 
 	public void setNeedStyle(boolean needStyle) {
 		this.needStyle = needStyle;
-
 		if (!this.needStyle) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
-
 			map.put("t", 7);
-
 			listMap.add(map);
 		}
 	}
@@ -1552,9 +1483,7 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void setSheet(Object sheet) throws LogicException {
-
 		this.setSheetToMap(sheet, "");
-
 	}
 
 	/**
@@ -1565,12 +1494,10 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void setSheet(Object sheet, String newSheetName) throws LogicException {
-
 		this.setSheetToMap(sheet, newSheetName);
 	}
 
 	private void setSheetToMap(Object sheet, String newSheetName) throws LogicException {
-
 		String sheetname = this.doSetSheet(sheet, newSheetName);
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -1578,7 +1505,6 @@ public class MakeExcel extends CommBuffer {
 		map.put("s", sheetname);
 		map.put("n", newSheetName);
 		listMap.add(map);
-
 	}
 
 	/**
@@ -1588,7 +1514,6 @@ public class MakeExcel extends CommBuffer {
 	 * @param shiftCounts  搬移幾列
 	 */
 	public void setShiftRow(int shiftRowFrom, int shiftCounts) {
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("t", 8);
 		map.put("srf", shiftRowFrom);
@@ -1602,9 +1527,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param size 字體大小
 	 */
 	public void setSize(int size) {
-
 		this.inputFontStyleVo.setSize((short) size);
-
 	}
 
 	/**
@@ -1617,7 +1540,6 @@ public class MakeExcel extends CommBuffer {
 	 */
 
 	public void setValue(int row, int col, Object val) throws LogicException {
-
 		setValueToMap(row, 0, col, 0, val);
 	}
 
@@ -1632,9 +1554,7 @@ public class MakeExcel extends CommBuffer {
 	 */
 
 	public void setValue(int row, int col, Object val, ExcelFontStyleVo tmpFontStyleVo) throws LogicException {
-
 		this.setFontStyleVo(tmpFontStyleVo);
-
 		setValueToMap(row, 0, col, 0, val);
 	}
 
@@ -1659,7 +1579,6 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void setValue(int row, int col, Object val, String formatOrAlign) throws LogicException {
-
 		switch (formatOrAlign) {
 		case "L":
 		case "C":
@@ -1670,7 +1589,6 @@ public class MakeExcel extends CommBuffer {
 			inputFontStyleVo.setFormat(formatOrAlign);
 			break;
 		}
-
 		setValueToMap(row, 0, col, 0, val);
 	}
 
@@ -1697,9 +1615,7 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void setValue(int row, int col, Object val, String formatOrAlign, ExcelFontStyleVo tmpFontStyleVo)
 			throws LogicException {
-
 		this.setFontStyleVo(tmpFontStyleVo);
-
 		switch (formatOrAlign) {
 		case "L":
 		case "C":
@@ -1710,7 +1626,6 @@ public class MakeExcel extends CommBuffer {
 			inputFontStyleVo.setFormat(formatOrAlign);
 			break;
 		}
-
 		setValueToMap(row, 0, col, 0, val);
 	}
 
@@ -1728,15 +1643,12 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void setValue(int row, int col, Object val, String format, String align) throws LogicException {
-
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);
 		}
-
 		if (align != null && !align.isEmpty()) {
 			inputFontStyleVo.setAlign(align);
 		}
-
 		setValueToMap(row, 0, col, 0, val);
 	}
 
@@ -1756,22 +1668,17 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void setValue(int row, int col, Object val, String format, String align, ExcelFontStyleVo tmpFontStyleVo)
 			throws LogicException {
-
 		this.setFontStyleVo(tmpFontStyleVo);
-
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);
 		}
-
 		if (align != null && !align.isEmpty()) {
 			inputFontStyleVo.setAlign(align);
 		}
-
 		setValueToMap(row, 0, col, 0, val);
 	}
 
 	private void setValueToExcel(int row, int col, int lastRow, int lastCol, Object val) throws LogicException {
-
 		if (this.sheet == null) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel)setValue sheet is null");
 		}
@@ -1781,7 +1688,7 @@ public class MakeExcel extends CommBuffer {
 		if (prow == null) {
 			prow = this.sheet.createRow(row - 1);
 		}
-		// -------------------
+
 		Row nowRow = prow;
 
 		if (val == null) {
@@ -1798,43 +1705,27 @@ public class MakeExcel extends CommBuffer {
 			fontWrap = checkVal.length;
 		}
 
-		// -------------------
 		if (lastRow > 0 && lastCol > 0) {
 			CellRangeAddress cra = new CellRangeAddress(row - 1, lastRow - 1, col - 1, lastCol - 1);
 			this.sheet.addMergedRegion(cra);
 		}
 
 		if (val instanceof String) {
-
 			cell = prow.getCell(col - 1);
-
 			if (cell == null) {
 				cell = prow.createCell(col - 1, CellType.STRING);
 			}
-
 			outputFontStyleVo.setWrapText(true);
-
 			cellHasStyle = true;
-
 			cell.setCellValue(val.toString());
-
 		} else {
-
 			cell = prow.getCell(col - 1);
-
 			if (cell == null) {
 				cell = prow.createCell(col - 1, CellType.NUMERIC);
 			}
-
 			BigDecimal bigDecValue = new BigDecimal(val.toString());
-
 			cell.setCellValue(bigDecValue.doubleValue());
-
 		}
-
-//		this.info("val = " + val.toString());
-//		this.info("needStyle = " + needStyle);
-//		this.info("cellHasStyle = " + cellHasStyle);
 		if (needStyle && cellHasStyle) {
 			cell.setCellStyle(setFontStyle(false));
 		}
@@ -1857,7 +1748,6 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	private void setValueToMap(int row, int lrow, int col, int lcol, Object val) {
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
 
 		if (inputFontStyleVo.getSize() != 0) {
@@ -1919,7 +1809,6 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void setWidth(int col, int width) throws LogicException {
-
 		if (col <= 0 || width < 0) {
 			return;
 		}
@@ -1930,7 +1819,6 @@ public class MakeExcel extends CommBuffer {
 		map.put("t", 4);
 		map.put("c", col);
 		map.put("w", width);
-
 		listMap.add(map);
 	}
 
@@ -1965,16 +1853,13 @@ public class MakeExcel extends CommBuffer {
 
 		if (prow != null) {
 			Cell tmpCell = prow.getCell(col - 1);
-
 			tmpCell.setCellValue(val);
 		} else {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel) setValueInt error = " + row + "/" + col + "/" + val);
 		}
-
 	}
 
 	public void saveExcel(String outfile) throws LogicException {
-
 		try (FileOutputStream fos = new FileOutputStream(new File(outfile))) {
 			this.wb.write(fos);
 			this.wb.close();
@@ -1982,5 +1867,4 @@ public class MakeExcel extends CommBuffer {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel) close excel ");
 		}
 	}
-
 }

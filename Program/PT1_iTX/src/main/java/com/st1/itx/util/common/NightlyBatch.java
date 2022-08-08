@@ -42,8 +42,8 @@ public class NightlyBatch extends ScheduledBase {
 		try {
 			titaVo.init();
 			titaVo.putParam(ContentName.kinbr, "0000");
-			titaVo.putParam(ContentName.tlrno, "BAT001");
-			titaVo.putParam(ContentName.empnot, "BAT001");
+			titaVo.putParam(ContentName.tlrno, "999999");
+			titaVo.putParam(ContentName.empnot, "999999");
 
 			TxBuffer txBuffer = MySpring.getBean("txBuffer", TxBuffer.class);
 			txBuffer.init(titaVo);
@@ -121,6 +121,5 @@ public class NightlyBatch extends ScheduledBase {
 			titaVo = null;
 			this.mustInfo("nightlyBatch finished.");
 		}
-
 	}
 }
