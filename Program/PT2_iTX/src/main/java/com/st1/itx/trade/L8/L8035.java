@@ -57,9 +57,9 @@ public class L8035 extends TradeBuffer {
 			occursListA.putParam("OORate", rJcicZ044.getRate());
 			occursListA.putParam("OOMonthPayAmt", rJcicZ044.getMonthPayAmt());
 			occursListA.putParam("OOReceYearIncome", rJcicZ044.getReceYearIncome());
-			occursListA.putParam("OOReceYear", rJcicZ044.getReceYear()-191100);
+			occursListA.putParam("OOReceYear", rJcicZ044.getReceYear()-1911);
 			occursListA.putParam("OOReceYear2Income", rJcicZ044.getReceYear2Income());
-			occursListA.putParam("OOReceYear2", rJcicZ044.getReceYear2()-191100);
+			occursListA.putParam("OOReceYear2", rJcicZ044.getReceYear2()-1911);
 			occursListA.putParam("OOCurrentMonthIncome", rJcicZ044.getCurrentMonthIncome());
 			occursListA.putParam("OOLivingCost", rJcicZ044.getLivingCost());
 			occursListA.putParam("OOCompName", rJcicZ044.getCompName());
