@@ -171,6 +171,9 @@ public class TxBatchCom extends TradeBuffer {
 	public TxAmlCom txAmlCom;
 
 	@Autowired
+	LoanCom loanCom;
+
+	@Autowired
 	public LoanBookService loanBookService;
 
 	@Autowired
@@ -199,9 +202,6 @@ public class TxBatchCom extends TradeBuffer {
 
 	@Autowired
 	public LoanCustRmkService loanCustRmkService;
-
-	@Autowired
-	public CdCodeService cdCodeService;
 
 	private ArrayList<BaTxVo> baTxList;
 
@@ -411,6 +411,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.info("TxBatchCom txCheck .... iRepayType=" + iRepayType + ", BatxDetail=" + tDetail.toString());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 		acNegCom.setTxBuffer(this.getTxBuffer());
+		loanCom.setTxBuffer(this.txBuffer);
 
 // RepayCode 還款來源 01.匯款轉帳 02.銀行扣款 03.員工扣款 04.支票兌現
 //                    05.法院扣薪 06.理賠金 07.代收款-債權協商 09.其他 11.匯款轉帳預先作業 90.暫收抵繳
@@ -545,11 +546,8 @@ public class TxBatchCom extends TradeBuffer {
 
 	// 催呆、結案戶轉暫收
 	public void checkFacStatus(TitaVo titaVo) throws LogicException {
-		CdCode tCdCode = cdCodeService.findById(new CdCodeId("Status", "" + parse.IntegerToString(this.facStatus, 2)),
-				titaVo);
-		if (tCdCode != null) {
-			this.checkMsg += tCdCode.getItem() + "";
-		}
+
+		this.checkMsg += loanCom.getCdCodeX("Status", parse.IntegerToString(this.facStatus, 2), titaVo);
 		// 催呆戶、結案戶須轉暫收，有可還費用整批檢核時需人工處理
 		this.repayType = 9;
 		if ("L420A".equals(titaVo.getTxcd()) && this.repayFee.compareTo(BigDecimal.ZERO) > 0) {
@@ -650,6 +648,10 @@ public class TxBatchCom extends TradeBuffer {
 		// 整批批號、整批明細序號
 		txTitaVo.putParam("BATCHNO", tDetail.getBatchNo());
 		txTitaVo.putParam("BATCHSEQ", parse.IntegerToString(tDetail.getDetailSeq(), 6));
+		
+		// 彙總傳票
+		
+		
 
 		// 交易戶號
 		String MRKEY = parse.IntegerToString(tDetail.getCustNo(), 7);
@@ -672,8 +674,8 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("SECNO", "09"); // 業務別 09-放款
 
 		// 還款額度
-		if (this.tTempVo.get("FacmNo") != null) {
-			this.repayFacmNo = parse.stringToInteger(this.tTempVo.get("FacmNo"));
+		if (this.tTempVo.get("RepayFacmNo") != null) {
+			this.repayFacmNo = parse.stringToInteger(this.tTempVo.get("RepayFacmNo"));
 		} else {
 			this.repayFacmNo = tDetail.getFacmNo();
 		}
@@ -720,11 +722,8 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("RpType1", tDetail.getRepayType());
 		int i = 1;
 		txTitaVo.putParam("RpCode1", tDetail.getRepayCode());
-		CdCode tCdCode = cdCodeService
-				.findById(new CdCodeId("BatchRepayCode", parse.IntegerToString(tDetail.getRepayCode(), 2)), txTitaVo);
-		if (tCdCode != null) {
-			txTitaVo.putParam("RpCodeX1", tCdCode.getItem());
-		}
+		txTitaVo.putParam("RpCodeX1",
+				loanCom.getCdCodeX("BatchRepayCode", parse.IntegerToString(tDetail.getRepayCode(), 2), txTitaVo));
 		txTitaVo.putParam("RpAmt1", tDetail.getRepayAmt());
 		txTitaVo.putParam("RpAcctCode1", tDetail.getReconCode());
 		txTitaVo.putParam("RpAcCode1", tDetail.getRepayAcCode());
@@ -875,8 +874,8 @@ public class TxBatchCom extends TradeBuffer {
 		l3210TitaVo.putParam("TimCustNo", tBatxDetail.getCustNo());
 		l3210TitaVo.putParam("FacmNo", tBatxDetail.getFacmNo());
 		if (tBatxDetail.getFacmNo() == 0) {
-			if (!"".equals(this.tTempVo.getParam("FacmNo"))) {
-				l3210TitaVo.putParam("FacmNo", this.tTempVo.getParam("FacmNo"));
+			if (!"".equals(this.tTempVo.getParam("RepayFacmNo"))) {
+				l3210TitaVo.putParam("FacmNo", this.tTempVo.getParam("RepayFacmNo"));
 			}
 		}
 		l3210TitaVo.putParam("EntryDate", tBatxDetail.getEntryDate());
@@ -884,6 +883,8 @@ public class TxBatchCom extends TradeBuffer {
 		l3210TitaVo.putParam("TimTempAmt", tBatxDetail.getRepayAmt());
 		l3210TitaVo.putParam("TwTempAmt", tBatxDetail.getRepayAmt());
 		l3210TitaVo.putParam("TempReasonCode", iReasonCode);
+		l3210TitaVo.putParam("TempReasonCodeX",
+				loanCom.getCdCodeX("TempReasonCode", parse.IntegerToString(iReasonCode, 2), l3210TitaVo));
 		l3210TitaVo.putParam("TempSourceCode", iSourceCode);
 		l3210TitaVo.putParam("AreaCode", "");
 		l3210TitaVo.putParam("BankCode", "");
@@ -917,13 +918,13 @@ public class TxBatchCom extends TradeBuffer {
 		l3200TitaVo.putParam("TXCODE", "L3200");
 		l3200TitaVo.putParam("CustNo", tBatxDetail.getCustNo());
 		l3200TitaVo.putParam("TimCustNo", tBatxDetail.getCustNo());
-		if (!"".equals(this.tTempVo.getParam("FacmNo"))) {
-			l3200TitaVo.putParam("FacmNo", this.tTempVo.getParam("FacmNo"));
+		if (!"".equals(this.tTempVo.getParam("RepayFacmNo"))) {
+			l3200TitaVo.putParam("FacmNo", this.tTempVo.getParam("RepayFacmNo"));
 		} else {
 			l3200TitaVo.putParam("FacmNo", tBatxDetail.getFacmNo());
 		}
-		if (!"".equals(this.tTempVo.getParam("BormNo"))) {
-			l3200TitaVo.putParam("BormNo", this.tTempVo.getParam("BormNo"));
+		if (!"".equals(this.tTempVo.getParam("RepayBormNo"))) {
+			l3200TitaVo.putParam("BormNo", this.tTempVo.getParam("RepayBormNo"));
 		} else {
 			l3200TitaVo.putParam("BormNo", "0");
 		}
@@ -1006,8 +1007,8 @@ public class TxBatchCom extends TradeBuffer {
 		l3420TitaVo.putParam("TXCODE", "L3420");
 		l3420TitaVo.putParam("CustNo", tBatxDetail.getCustNo());
 		l3420TitaVo.putParam("TimCustNo", tBatxDetail.getCustNo());
-		if (!"".equals(this.tTempVo.getParam("FacmNo"))) {
-			l3420TitaVo.putParam("FacmNo", this.tTempVo.getParam("FacmNo"));
+		if (!"".equals(this.tTempVo.getParam("RepayFacmNo"))) {
+			l3420TitaVo.putParam("FacmNo", this.tTempVo.getParam("RepayFacmNo"));
 		} else {
 			l3420TitaVo.putParam("FacmNo", tBatxDetail.getFacmNo());
 		}
@@ -1155,7 +1156,7 @@ public class TxBatchCom extends TradeBuffer {
 							acctAmt = acctAmt.add(ac.getTxAmt());
 					}
 				}
-				tDetail.setAcctAmt(acctAmt); //  已作帳金額
+				tDetail.setAcctAmt(acctAmt); // 已作帳金額
 				tDetail.setDisacctAmt(tDetail.getRepayAmt().subtract(acctAmt));
 				unfinishCnt = -1;
 				if ("L3210".equals(titaVo.getTxcd())) {
@@ -1767,9 +1768,9 @@ public class TxBatchCom extends TradeBuffer {
 		this.tTempVo.putParam("ErrorMsg", this.errorMsg);
 		this.tTempVo.putParam("RepayType", this.repayType);
 		if (tDetail.getFacmNo() == 0 && this.repayFacmNo > 0)
-			this.tTempVo.putParam("FacmNo", this.repayFacmNo);
+			this.tTempVo.putParam("RepayFacmNo", this.repayFacmNo);
 		if (this.repayBormNo > 0)
-			this.tTempVo.putParam("BormNo", this.repayBormNo);
+			this.tTempVo.putParam("RepayBormNo", this.repayBormNo);
 		if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0)
 			this.tTempVo.putParam("ShortAmt", this.shortAmt);
 		if (this.overAmt.compareTo(BigDecimal.ZERO) > 0)

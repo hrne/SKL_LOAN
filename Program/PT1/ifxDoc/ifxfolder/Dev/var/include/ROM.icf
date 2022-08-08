@@ -4251,6 +4251,17 @@ TXFORM=L3R10
 #L3r11CloseAmt=+n,14.2,S
 #L3r11CloseReasonCode=X,2,S
 #L3r11RpFacmNo=A,3,S
+##loop{times:50,n:1}
+#L3r11FacmNo{n}=A,3,S
+#L3r11BormNo{n}=A,3,S
+#L3r11IntStartDate{n}=D,7,S
+#L3r11IntEndDate{n}=D,7,S
+#L3r11Principal{n}=+m,14.2,S
+#L3r11Interest{n}=+m,14.2,S
+#L3r11DelayInt{n}=+m,14.2,S
+#L3r11BreachAmt{n}=+m,14.2,S
+#L3r11Total{n}=+m,14.2,S
+##end
 </L3R11.dec>
 
 <L3R11.tom>
@@ -4274,6 +4285,17 @@ TXFORM=L3R11
 #L3r11CloseAmt
 #L3r11CloseReasonCode
 #L3r11RpFacmNo
+##loop{times:50,n:1}
+#L3r11FacmNo{n}
+#L3r11BormNo{n}
+#L3r11IntStartDate{n}
+#L3r11IntEndDate{n}
+#L3r11Principal{n}
+#L3r11Interest{n}
+#L3r11DelayInt{n}
+#L3r11BreachAmt{n}
+#L3r11Total{n}
+##end
 ^
 </L3R11.tom>
 
@@ -4387,12 +4409,12 @@ TXFORM=L3R16
 
 !    L3R17 : 暫收款指定額度設定維護
 <L3R17.dec>
-#L3R17RmkDescribe=c,120,S
+#L3r17RmkDescribe=c,120,S
 </L3R17.dec>
 
 <L3R17.tom>
 TXFORM=L3R17
-#L3R17RmkDescribe
+#L3r17RmkDescribe
 ^
 </L3R17.tom>
 

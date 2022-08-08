@@ -48,16 +48,18 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",C.\"CustName\" 				as F3							\n"; // 戶名
 		sql += ",M.\"TotalAmt\" 				as F4							\n"; // 累積金額
 		sql += ",M.\"TotalCnt\" 				as F5							\n"; // 次數
-		sql += ",CD.\"GroupItem\" 				as F6							\n"; // 課組別
+//		sql += ",CD.\"GroupItem\" 				as F6							\n"; // 課組別
+		sql += ",E.\"Fullname\" 		        as F6							\n"; // 經辦
 		sql += ",M.\"Rational\" 				as F7							\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F9							\n"; // 經辦說明
 		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核
 		sql += "from \"MlaundryDetail\" M										\n";
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
-		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
-		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
-		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
+//		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
+//		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
+//		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
+		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
 		sql += "order by M.\"EntryDate\" ";
 
@@ -132,7 +134,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",C.\"CustName\" 				as F3							\n"; // 戶名
 		sql += ",M.\"TotalAmt\" 				as F4							\n"; // 累積金額
 		sql += ",M.\"TotalCnt\" 				as F5							\n"; // 次數
-		sql += ",CD.\"GroupItem\" 				as F6							\n"; // 課組別
+//		sql += ",CD.\"GroupItem\" 				as F6							\n"; // 課組別
+		sql += ",E.\"Fullname\" 		        as F6							\n"; // 經辦
 		sql += ",M.\"Rational\" 				as F7							\n"; // 合理性
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F9							\n"; // 經辦說明
@@ -140,9 +143,10 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"ManagerDate\" 			    as F11  					    \n"; // 主管覆核日期
 		sql += "from \"MlaundryDetail\" M										\n";
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
-		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
-		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
-		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
+//		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
+//		sql += "left join \"CdBranchGroup\" CD ON CD.\"BranchNo\" = T.\"BrNo\"	\n";
+//		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
+		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
 		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
 		sql += "order by M.\"EntryDate\" ";

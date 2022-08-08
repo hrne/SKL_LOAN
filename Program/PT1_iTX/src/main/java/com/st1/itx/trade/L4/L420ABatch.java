@@ -396,7 +396,7 @@ public class L420ABatch extends TradeBuffer {
 		String facAcctCode = "999";
 		String facAcctItem = "暫收款 ";
 		for (BaTxVo baTxVo : iBatxList) {
-			if (baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0) {
+			if (baTxVo.getTxAmt().compareTo(BigDecimal.ZERO) == 0 && baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
 			facAcctCode = baTxVo.getFacAcctCode().trim();

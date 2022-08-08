@@ -552,6 +552,8 @@ P(L,#ORateX)
 T(3,)T(H,#OCurrencyCode,#CurrencyCodeHelp) 
 
 #OTmpFacmNoX=X,50,L
+#OTmpFacmNoXX=X,50,L
+C(4,#OTmpFacmNoX,S,T(2,指定額度:+#OTmpFacmNoX))
 
 #OPrincipal=m,14.2,S
 
@@ -796,7 +798,7 @@ TXFORM=L3921
 [
 ["[L3921]                                 回 收 試 算"],
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
-[#<->#,"@幣別",#OCurrencyCode,"@@指定額度",#OTmpFacmNoX],
+[#<->#,"@幣別",#OCurrencyCode,"@@指定額度",#OTmpFacmNoXX],
 ["@入帳日期",#OEntryDate],
 ["@放款餘額",#OLoanBalX],
 ["@計息期間",#OIntStartDate,"@-",#OIntEndDate],

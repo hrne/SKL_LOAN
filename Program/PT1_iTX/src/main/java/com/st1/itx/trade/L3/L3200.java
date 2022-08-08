@@ -242,10 +242,6 @@ public class L3200 extends TradeBuffer {
 	private BigDecimal wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 	private BigDecimal wkShortfallInterest = BigDecimal.ZERO; // 累短收-利息
 	private BigDecimal wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
-	private BigDecimal wkAcctFee = BigDecimal.ZERO;
-	private BigDecimal wkModifyFee = BigDecimal.ZERO;
-	private BigDecimal wkFireFee = BigDecimal.ZERO;
-	private BigDecimal wkLawFee = BigDecimal.ZERO;
 	private BigDecimal wkTotalShortAmtLimit = BigDecimal.ZERO; // 總短繳限額
 	private BigDecimal wkShortfall = BigDecimal.ZERO; // 累短繳金額
 	private String checkMsg = "";
@@ -342,7 +338,7 @@ public class L3200 extends TradeBuffer {
 		// 放款交易明細檔的交易金額為實際支付金額
 		iTxAmt = iRealRepayAmt;
 
-		// 系統交易記錄檔的金額為實際支付金額或暫收款金額
+		// 系統交易記錄檔的金額為實際支付金額或支付總金額
 		if (iTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 			titaVo.setTxAmt(iTxAmt);
 		} else {
@@ -1585,7 +1581,6 @@ public class L3200 extends TradeBuffer {
 	private void addRepayBorTxRoutine() throws LogicException {
 		this.info("addLoanBorTxRoutine ... ");
 
-
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
@@ -1627,7 +1622,7 @@ public class L3200 extends TradeBuffer {
 		}
 
 		/* OtherFields */
-		// 還款總金額
+		// 交易總金額
 		if (iTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("TxAmt", iTxAmt);
 		}
@@ -1731,7 +1726,7 @@ public class L3200 extends TradeBuffer {
 
 		// 更新放款明細檔及帳務明細檔關聯欄
 		loanCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
-		
+
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
@@ -1788,10 +1783,10 @@ public class L3200 extends TradeBuffer {
 		}
 		// 暫收款金額 (暫收借)
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-		
+
 		// 累短收回收
 		lAcDetail.addAll(this.lAcDetailShortfall);
-		
+
 		// 本金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
@@ -1828,7 +1823,7 @@ public class L3200 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
-		
+
 		// 清償違約金掛短繳不出帳
 
 		// 累溢收入帳(暫收貸)
@@ -1866,7 +1861,7 @@ public class L3200 extends TradeBuffer {
 		}
 		// 暫收款金額 (暫收借)
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-		
+
 		// 貸:催收款項
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
@@ -1876,7 +1871,7 @@ public class L3200 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
-		
+
 		// 累溢收入帳(暫收貸)
 		loanCom.settleOverflow(lAcDetail, titaVo);
 
@@ -1891,7 +1886,6 @@ public class L3200 extends TradeBuffer {
 				this.wkTmpFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
 
 		if (this.baTxList != null) {
-
 			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
 			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {
 				for (BaTxVo ba : this.baTxList) {
@@ -1912,60 +1906,18 @@ public class L3200 extends TradeBuffer {
 					}
 				}
 			}
+			
 			// 是否回收費用
-			if ("N".equals(iPayFeeFlag)) {
-				for (BaTxVo ba : this.baTxList) {
-					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4) {
-						ba.setAcctAmt(BigDecimal.ZERO);
-					}
-				}
+			if ("Y".equals(iPayFeeFlag)) {
+				// 收回費用處理(新增帳務及放款交易內容檔)
+				loanCom.settleFeeRoutine(this.baTxList, iRpCode, iEntryDate, new TempVo(), lAcDetail, titaVo);
 			}
-			// 費用、短繳期金
-			for (BaTxVo ba : this.baTxList) {
-
-				if (ba.getDataKind() == 1 && ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					// 暫收款金額 (暫收借)
-					loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setTxAmt(ba.getAcctAmt());
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setBormNo(ba.getBormNo());
-					acDetail.setRvNo(ba.getRvNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					lAcDetail.add(acDetail);
-					// 累溢收入帳(暫收貸)
-					loanCom.settleOverflow(lAcDetail, titaVo);
-
-					if (ba.getRepayType() == 4) {
-						this.wkAcctFee = this.wkAcctFee.add(ba.getAcctAmt());
-					} else if (ba.getRepayType() == 5) {
-						this.wkFireFee = this.wkFireFee.add(ba.getAcctAmt());
-					} else if (ba.getRepayType() == 6) {
-						this.wkModifyFee = this.wkModifyFee.add(ba.getAcctAmt());
-					} else if (ba.getRepayType() == 7) {
-						this.wkLawFee = this.wkLawFee.add(ba.getAcctAmt());
-					}
-					// 新增放款交易內容檔(收回費用)
-					loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail,
-							titaVo);
-					ba.setAcctAmt(BigDecimal.ZERO);
-				}
-			}
-			this.info("wkAcctFee=" + wkAcctFee + ", wkModifyFee=" + wkModifyFee + ", wkFireFee=" + wkFireFee
-					+ ", wkLawFee=" + wkLawFee);
 		}
 	}
 
 	// 累短收回收
 	private void settleShortfall() throws LogicException {
 		isSettleUnpaid = false;
-		this.wkAcctFee = BigDecimal.ZERO;
-		this.wkModifyFee = BigDecimal.ZERO;
-		this.wkFireFee = BigDecimal.ZERO;
-		this.wkLawFee = BigDecimal.ZERO;
 		this.wkShortfall = BigDecimal.ZERO;// 累短收
 		this.wkShortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
 		this.wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金

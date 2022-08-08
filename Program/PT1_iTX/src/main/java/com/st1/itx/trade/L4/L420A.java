@@ -20,7 +20,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L420A")
 @Scope("prototype")
 /**
- * 啟動整批檢核作業(BS400)
+ * 啟動整批檢核作業
  * 
  * @author Zi-Jun,Huang
  * @version 1.0.0
@@ -56,6 +56,7 @@ public class L420A extends TradeBuffer {
 		if ("8".equals(tBatxHead.getBatxExeCode())) {
 			throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
 		}
+		
 		// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
 		if ("1".equals(tBatxHead.getBatxStsCode()) && !titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");

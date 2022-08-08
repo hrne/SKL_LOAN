@@ -668,6 +668,24 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isEloan() {
 		return "E-LOAN".equals(this.getTlrNo()) || "E-TEST".equals(this.getTlrNo());
 	}
+	
+	/**
+	 * TxtNo 是否為空白或0
+	 * 
+	 * @return true when txtno is empty or 0
+	 */
+	public boolean isTxtNoZero() {
+		return this.getTxNo().isEmpty() || Integer.parseInt(this.getTxNo()) == 0;
+	}
+	
+	/**
+	 * TxtNo 判斷前兩碼是否為0
+	 * 
+	 * @return true when txtno is empty or 0
+	 */
+	public boolean isTxtNoHasBatch() {
+		return  !this.getTxNo().isEmpty() && Integer.parseInt(this.getTxNo()) > 999999;
+	}
 
 	/**
 	 * 

@@ -16,7 +16,6 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBorMain;
-import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -330,24 +329,12 @@ public class L3921 extends TradeBuffer {
 			}
 		}
 
-		Slice<LoanFacTmp> slLoanFacTmp = loanFacTmpService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
-		String tmpFacmNoX = "";
-		if (slLoanFacTmp != null) {
-			List<LoanFacTmp> lLoanFacTmp = slLoanFacTmp == null ? null
-					: new ArrayList<LoanFacTmp>(slLoanFacTmp.getContent());
-			String x = "";
-			for (LoanFacTmp t : lLoanFacTmp) {
-				tmpFacmNoX += x + parse.IntegerToString(t.getFacmNo(), 3);
-				x = ",";
-			}
-		}
-
 		this.totaVo.putParam("OLoanBal", oLoanBal);
 		this.totaVo.putParam("OIntStartDate", oIntStartDate == 9991231 ? 0 : oIntStartDate);
 		this.totaVo.putParam("OIntEndDate", oIntEndDate);
 		this.totaVo.putParam("ORate", oRate);
 		this.totaVo.putParam("OCurrencyCode", oCurrencyCode);
-		this.totaVo.putParam("OTmpFacmNoX", tmpFacmNoX);
+		this.totaVo.putParam("OTmpFacmNoX", baTxCom.getTmpFacmNoX());
 		this.totaVo.putParam("OPrincipal", oPrincipal);
 		this.totaVo.putParam("OInterest", oInterest);
 		this.totaVo.putParam("ODelayInt", oDelayInt);

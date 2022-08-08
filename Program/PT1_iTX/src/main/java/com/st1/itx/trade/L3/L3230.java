@@ -18,8 +18,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
@@ -29,7 +27,6 @@ import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -37,6 +34,7 @@ import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
+import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.SendRsp;
@@ -69,8 +67,6 @@ public class L3230 extends TradeBuffer {
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public CustMainService custMainService;
-	@Autowired
-	public CdCodeService cdCodeService;
 
 	@Autowired
 	Parse parse;
@@ -85,11 +81,17 @@ public class L3230 extends TradeBuffer {
 	@Autowired
 	BaTxCom baTxCom;
 	@Autowired
+	AcPaymentCom acPaymentCom;
+	@Autowired
 	SendRsp sendRsp;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
 	private int iFacmNo;
+	private int iRpCustNo = 0;
+	private int iRpFacmNo = 0;
+	private int iRpCode = 0;
+	private String iRpCodeX;
 	private String iTempItemCode;
 	private String iRemoveNo;
 	private int iTempReasonCode;
@@ -104,8 +106,7 @@ public class L3230 extends TradeBuffer {
 	private int wkFacmNo = 0;
 	private int wkBormNo = 0;
 	private int wkOvduNo = 0;
-	private int iRpCustNo = 0;
-	private int iRpFacmNo = 0;
+
 	private int wkRepayType = 0;
 	private String wkAcctCode;
 	private String iAcSubBookCode;
@@ -120,7 +121,6 @@ public class L3230 extends TradeBuffer {
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
-	private List<LoanBorTx> lLoanBorTx;
 
 	// initialize variable
 	@PostConstruct
@@ -157,6 +157,8 @@ public class L3230 extends TradeBuffer {
 		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
 		iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo1"));
 		iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo1"));
+		iRpCode = parse.stringToInteger(titaVo.getParam("RpCode1"));
+		iRpCodeX = titaVo.getParam("RpCodeX1");
 
 		wkTempBal = iTempAmt;
 
@@ -272,7 +274,6 @@ public class L3230 extends TradeBuffer {
 		this.info("   iFacmNo         = " + iFacmNo);
 
 		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-
 			// 是否額度可抵繳
 			// 按指定額度：00-全費用類別
 			// 1.iFacmNo >0 該額度為指定額度則只有該額度可抵繳,如該額度為非指定額度則全部非指定額度可抵繳
@@ -290,17 +291,16 @@ public class L3230 extends TradeBuffer {
 			// 暫收款金額 (暫收借)
 			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
-			// 轉帳金額 =>交易金額
+			// 累溢收(暫收貸)
 			if ("06".equals(iTempItemCode)) {
 				acDetail = new AcDetail();
 				acDetail.setDbCr("C");
 				acDetail.setAcctCode("TAV");
 				acDetail.setSumNo("090");
-				acDetail.setTxAmt(wkCustTempBal.subtract(iTempAmt));
+				acDetail.setTxAmt(baTxCom.getExcessive().subtract(iTempAmt));
 				acDetail.setCustNo(iCustNo);
 				acDetail.setFacmNo(iFacmNo);
 				acDetail.setBormNo(0);
-
 				lAcDetail.add(acDetail);
 
 			}
@@ -328,7 +328,7 @@ public class L3230 extends TradeBuffer {
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
 							acDetail.setAcctCode(ac.getAcctCode());
-							acDetail.setSumNo("099");
+							acDetail.setSumNo("090");
 							acDetail.setCurrencyCode(iCurrencyCode);
 							acDetail.setCustNo(iCustNo);
 							acDetail.setFacmNo(ac.getFacmNo());
@@ -408,10 +408,7 @@ public class L3230 extends TradeBuffer {
 	}
 
 	private void settingUnPaid06() throws LogicException {
-		// 累溢收(交易後 )
-		BigDecimal wkOverflow = iTempAmt;
-
-		if (iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+		if (iRpCode == 92) {
 			try {
 				this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iRpCustNo, iRpFacmNo, 0, this.wkRepayType,
 						iTempAmt, titaVo);
@@ -421,22 +418,23 @@ public class L3230 extends TradeBuffer {
 
 			// 暫收款金額 (暫收借)
 			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-			wkOverflow = wkOverflow.add(baTxCom.getExcessive());
-		}
-		if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
+			// 累溢收(暫收貸)
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
-			acDetail.setSumNo("090");
-			acDetail.setTxAmt(wkOverflow);
+			acDetail.setSumNo("092");
+			acDetail.setTxAmt(iTempAmt.add(baTxCom.getExcessive()));
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setFacmNo(iRpFacmNo);
 			acDetail.setBormNo(0);
-
 			lAcDetail.add(acDetail);
+		} else {
+			// 貸方 收付欄
+			acPaymentCom.setTxBuffer(this.getTxBuffer());
+			acPaymentCom.run(titaVo);
+			lAcDetail.addAll(this.txBuffer.getAcDetailList());
 		}
 		addLoanBorTx06Routine(iRpCustNo, iRpFacmNo);
-
 	}
 
 	// 借:暫收可抵繳 貸:利息收入(3200億專案息)
@@ -467,14 +465,16 @@ public class L3230 extends TradeBuffer {
 		lAcDetail.add(acDetail);
 
 		// 累溢收入帳(暫收貸)
-		loanCom.settleOverflow(lAcDetail, titaVo);
+		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+			loanCom.settleOverflow(lAcDetail, titaVo);
+		}
 		// 新增放款交易內容檔(收回費用)
 		tTempVo.clear();
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("RemoveNo", iRemoveNo);
 		tTempVo.putParam("Note", titaVo.getParam("Description"));
-		LoanBorTx t = loanCom.addFeeBorTxRoutine(ba, 0, titaVo.getEntDyI(), "", tTempVo, lAcDetail, titaVo);
+		LoanBorTx t = loanCom.addFeeBorTxRoutine(ba, 0, titaVo.getEntDyI(), tTempVo, lAcDetail, titaVo);
 		// 更新帳務明細的放款交易內容檔鍵值
 		loanCom.updBorTxAcDetail(t, lAcDetail);
 		ba.setAcctAmt(BigDecimal.ZERO);
@@ -639,16 +639,39 @@ public class L3230 extends TradeBuffer {
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
-
+// Temp2ReasonCode
+//		1	放款暫收款
+//		2	債協暫收款
+//		3	債協退還款
+//		4	AML暫收款
+//      5	聯貸費攤提暫收款
+// Temp2ItemCode
+//		06	轉帳
+//		07	沖執行費
+//		08	收回呆帳
+//		09	沖火險費
+//		10	沖帳管費/手續費
+//		12	企金件
+//		13	沖什項收入
+//		14	NPL-銷項稅額
+//		15	921貸款戶
+//		16	3200億專案
+//		17	3200億-利變
+//		18	沖備抵呆帳
+//		19	轉債協暫收款
+//		20	轉應付代收
+//		21	88風災
+//		22	88風災-保費
+//		23	3200億傳統A
+//		24	沖催收法務費
+//		25	沖催收火險費
+//		27	沖聯貸費用
+//		29	貸後契變手續費
+//		30	呆帳戶法務費墊付
 		if ("06".equals(iTempItemCode)) {
-			tLoanBorTx.setDesc("暫收款轉帳");
+			tLoanBorTx.setDesc(loanCom.getCdCodeX("Temp2ReasonCode", iTempItemCode, titaVo) + "轉帳");
 		} else {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("Temp2ItemCode", iTempItemCode), titaVo);
-			if (tCdCode == null) {
-				tLoanBorTx.setDesc("暫收款銷帳");
-			} else {
-				tLoanBorTx.setDesc("暫收款" + tCdCode.getItem());
-			}
+			tLoanBorTx.setDesc("暫收銷" + loanCom.getCdCodeX("Temp2ItemCode", iTempItemCode, titaVo));
 		}
 
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
@@ -674,7 +697,10 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, rpCustNo, rpFacmNo, titaVo);
-		tLoanBorTx.setDesc("暫收款轉帳");
+//      092:暫收轉帳     (戶號+額度)  TAV 暫收款－可抵繳
+//      094:轉債協暫收款 (戶號)       T1x 債協暫收款      
+//      095:轉債協退還款 (戶號)       T2x 債協退還款  
+		tLoanBorTx.setDesc(iRpCodeX);
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 

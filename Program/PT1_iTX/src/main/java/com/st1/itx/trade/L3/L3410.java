@@ -782,7 +782,7 @@ public class L3410 extends TradeBuffer {
 
 		// 更新放款明細檔及帳務明細檔關聯欄
 		loanCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
-		
+
 		try {
 			loanBorTxService.insert(tLoanBorTx);
 		} catch (DBException e) {
@@ -843,46 +843,9 @@ public class L3410 extends TradeBuffer {
 			throw new LogicException(titaVo, "E3071", "暫收金額=" + baTxCom.getExcessive() + ",未收費用 = " + wkTotalFee); // 金額不足
 		}
 
-		this.wkAcctFee = BigDecimal.ZERO;
-		this.wkModifyFee = BigDecimal.ZERO;
-		this.wkFireFee = BigDecimal.ZERO;
-		this.wkLawFee = BigDecimal.ZERO;
-		if (this.baTxList != null) {
-			for (BaTxVo ba : this.baTxList) {
-				if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					// 暫收款金額 (暫收借)
-					loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setTxAmt(ba.getAcctAmt());
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setBormNo(ba.getBormNo());
-					acDetail.setRvNo(ba.getRvNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					lAcDetail.add(acDetail);
-					// 累溢收入帳(暫收貸)
-					loanCom.settleOverflow(lAcDetail, titaVo);
-					if (ba.getRepayType() == 4) {
-						this.wkAcctFee = this.wkAcctFee.add(ba.getAcctAmt());
-					} else if (ba.getRepayType() == 5) {
-						this.wkFireFee = this.wkFireFee.add(ba.getAcctAmt());
-					} else if (ba.getRepayType() == 6) {
-						this.wkModifyFee = this.wkModifyFee.add(ba.getAcctAmt());
-					} else if (ba.getRepayType() == 7) {
-						this.wkLawFee = this.wkLawFee.add(ba.getAcctAmt());
-					}
-					ba.setAcctAmt(BigDecimal.ZERO);
-					// 新增放款交易內容檔(收回費用)
-
-					LoanBorTx t = loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail,
-							titaVo);
-				}
-			}
-		}
-		this.info("wkAcctFee=" + wkAcctFee + ", wkModifyFee=" + wkModifyFee + ", wkFireFee=" + wkFireFee + ", wkLawFee="
-				+ wkLawFee);
+		// 收回費用處理(新增帳務及放款交易內容檔)
+		loanCom.settleFeeRoutine(this.baTxList, iRpCode, iEntryDate, new TempVo(), lAcDetail, titaVo);
+		
 	}
 
 	// 貸方：短繳期金

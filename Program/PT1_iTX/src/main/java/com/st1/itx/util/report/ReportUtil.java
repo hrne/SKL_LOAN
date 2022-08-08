@@ -221,7 +221,7 @@ public class ReportUtil extends CommBuffer {
 			amt = computeDivide(amt, formatAmtTemplates.get(unitPow), n);
 		} else {
 			// Math.Pow(a,b) -> a 的 b 次方
-			amt = computeDivide(amt, new BigDecimal(Math.pow(10, unitPow)), n);
+			amt = computeDivide(amt, BigDecimal.valueOf(Math.pow(10, unitPow)), n);
 		}
 
 		return formatAmt(amt, n);
@@ -485,80 +485,66 @@ public class ReportUtil extends CommBuffer {
 			break;
 		case 4:
 			// 2020-12-29 Mata增加 取得中文年月
-			char[] cc = { '零', '一', '二', '三', '四', '五', '六', '七', '八', '九' };
-			char[] dd = { '百', '拾' };
-			char[] ff = { ' ', '一', '二', '三', '四', '五', '六', '七', '八', '九' };
-			char[] gg = { ' ', '十' };
-			String bb = "";
-			String aa = "";
-			int ee;
-			int zz;
-			int zero = 0;
-			int s = 0;
+			char[] yearNumbers = { '零', '一', '二', '三', '四', '五', '六', '七', '八', '九' };
+			char[] yearDigit = { '百', '拾' }; // 年份的數位
+			char[] monthNumbers = { ' ', '一', '二', '三', '四', '五', '六', '七', '八', '九' };
+			char[] monthDigit = { ' ', '十' }; // 月份的數位
+			StringBuilder yearInChinese = new StringBuilder(); // 年份數值的國字
+			StringBuilder monthInChinese = new StringBuilder(); // 月份數值的國字
+			int nowYear; // 當前年份數字
+			int nowMonth; // 當前月份數字
+			int zero = 0; // 是否要補零 (待確認)
+			int s = 0; // 判斷處理到第幾位 (待確認)
 
 			for (int i = 0; i < rocYear.length(); i++) {
-				ee = Character.getNumericValue(rocYear.charAt(i));
-				if (ee == 0) {
+				nowYear = Character.getNumericValue(rocYear.charAt(i));
+				if (nowYear == 0) {
 					zero++;
 				} else {
 					zero = 0;
 				}
-				if (ee == 0 && zero > 1) {
+				if (nowYear == 0 && zero > 1) {
 					;
-				} else if (ee == 0 && i == rocYear.length() - 1) {
+				} else if (nowYear == 0 && i == rocYear.length() - 1) {
 					;
 				} else {
-					bb = bb + cc[ee];
-					if (s < 1) {
-						if (bb.length() != 0) {
-							bb += dd[0];
-						}
+					yearInChinese.append(yearNumbers[nowYear]);
+					if (s < 1 && yearInChinese.length() != 0) {
+						yearInChinese.append(yearDigit[0]);
 					}
-					if (ee != 0) {
-						if (s != 0 && s != 2) {
-							if (bb.length() != 0) {
-								bb += dd[1];
-							}
-						}
+					if (nowYear != 0 && s != 0 && s != 2 && yearInChinese.length() != 0) {
+						yearInChinese.append(yearDigit[1]);
 					}
 					s++;
 				}
 			}
 
 			for (int i = 0; i < rocMonth.length(); i++) {
-				zz = Character.getNumericValue(rocMonth.charAt(i));
-				if (zz == 0) {
+				nowMonth = Character.getNumericValue(rocMonth.charAt(i));
+				if (nowMonth == 0) {
 					zero++;
 				} else {
 					zero = 0;
 				}
 
-				if (zz == 0 && zero > 1) {
+				if (nowMonth == 0 && zero > 1) {
 					;
-				} else if (zz == 0 && i == rocMonth.length() - 1) {
+				} else if (nowMonth == 0 && i == rocMonth.length() - 1) {
 					;
 				} else {
-					aa = aa + ff[zz];
+					monthInChinese.append(monthNumbers[nowMonth]);
 
-					if (s < 1) {
-						if (aa.length() != 0) {
-							if (aa.length() != -1) {
-								aa += gg[0];
-							}
-						}
+					if (s < 1 && monthInChinese.length() != 0 && monthInChinese.length() != -1) {
+						monthInChinese.append(monthDigit[0]);
 					}
-					if (zz != 0) {
-						if (s != 0 && s != 2 && s != 4) {
-							if (aa.length() != 0) {
-								aa += gg[1];
-							}
-						}
+					if (nowMonth != 0 && s != 0 && s != 2 && s != 4 && monthInChinese.length() != 0) {
+						monthInChinese.append(monthDigit[1]);
 					}
 					s++;
 				}
 			}
 
-			result = bb + "年" + aa + "月份";
+			result = yearInChinese.append("年").append(monthInChinese).append("月份").toString();
 			break;
 		case 5:
 			result = rocYear + "年" + rocMonth + "月";

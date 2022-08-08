@@ -225,7 +225,7 @@ public class AcPaymentCom extends TradeBuffer {
 						"新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));
 			}
 			break;
-		case "092":
+		case "092": // 已由L3230程式處理
 			acDetail.setAcctCode("TAV");
 			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)));
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));

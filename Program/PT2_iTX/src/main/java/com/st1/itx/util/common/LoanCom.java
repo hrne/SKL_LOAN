@@ -52,7 +52,6 @@ import com.st1.itx.util.parse.Parse;
  * 放款公用程式<BR>
  * setTxTemp 設定交易暫存檔(TxTemp)的共同資料<BR>
  * setFacmBorTx 設定放款交易內容檔(到額度)的共同資料<BR>
- * addFeeBorTxRoutine 新增放款交易內容檔(收回費用)<BR>
  * setFacmBorTxHcode 訂正時註記放款交易內容檔(到額度)<BR>
  * setFacmBorTxHcodeByTx 訂正放款交易內容檔by交易 <BR>
  * setLoanBorTx 設定放款交易內容檔(到撥款)的共同資料<BR>
@@ -74,9 +73,17 @@ import com.st1.itx.util.parse.Parse;
  * getTotalPeriod 計算總期數<BR>
  * getGracePeriod 依寬限期到期日計算寬限期數<BR>
  * getSpecificDate 依首次應繳日推算指定基準日期<BR>
+ * getCdCodeX 取得代碼說明<BR>
  * checkEraseBormTxSeqNo 檢查到撥款的放款交易訂正須由最近一筆交易開始訂正<BR>
  * checkEraseFacmTxSeqNo 檢查到額度的的放款交易訂正須由最近一筆交易開始訂正<BR>
- * updateMlaundryRecord更新疑似洗錢交易訪談記錄檔<BR>
+ * updateMlaundryRecord 更新疑似洗錢交易訪談記錄檔<BR>
+ * getTmpFacmNo 取得暫收款額度<BR>
+ * isLoanFacTmp 檢查額度是否為暫收指定額度<BR>
+ * addFeeBorTxRoutine 新增放款交易內容檔(收回費用)<BR>
+ * settleFeeRoutine 收回費用處理(新增帳務及放款交易內容檔)<BR>
+ * settleOverflow 累溢收(暫收貸)帳務處理<BR>
+ * settleTempAmt 暫收款金額(暫收借)帳務處理 <BR>
+ * updBorTxAcDetail 更新放款明細檔及帳務明細檔關聯欄<BR>
  * 
  * @author st1
  *
@@ -1234,38 +1241,66 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
+	 * 收回費用處理(新增帳務及放款交易內容檔)
+	 * 
+	 * @param baTxList   還款明細
+	 * @param iRpCode    還款來源
+	 * @param iEntryDate 入帳日
+	 * @param iTempVo    OtherFields
+	 * @param lAcDetail  帳務明細
+	 * @param titaVo     TitaVo
+	 * @throws LogicException ....
+	 */
+	public void settleFeeRoutine(ArrayList<BaTxVo> baTxList, int iRpCode, int iEntryDate, TempVo iTempVo,
+			List<AcDetail> lAcDetail, TitaVo titaVo) throws LogicException {
+		for (BaTxVo ba : baTxList) {
+			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				// 暫收款金額 (暫收借)
+				settleTempAmt(baTxList, lAcDetail, titaVo);
+				AcDetail acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode(ba.getAcctCode());
+				acDetail.setTxAmt(ba.getAcctAmt());
+				acDetail.setCustNo(ba.getCustNo());
+				acDetail.setFacmNo(ba.getFacmNo());
+				acDetail.setBormNo(ba.getBormNo());
+				acDetail.setRvNo(ba.getRvNo());
+				acDetail.setReceivableFlag(ba.getReceivableFlag());
+				lAcDetail.add(acDetail);
+				// 累溢收入帳(暫收貸)
+				settleOverflow(lAcDetail, titaVo);
+				// 新增放款交易內容檔(收回費用)
+				addFeeBorTxRoutine(ba, iRpCode, iEntryDate, iTempVo, lAcDetail, titaVo);
+				ba.setAcctAmt(BigDecimal.ZERO);
+			}
+		}
+	}
+
+	/**
 	 * 新增放款交易內容檔(收回費用)
 	 * 
 	 * @param ba         BaTxVo
 	 * @param iRpCode    還款來源
 	 * @param iEntryDate 入帳日
-	 * @param iDesc      交易別
 	 * @param iTempVo    TempVo
-	 * @param lAcDatail  List<AcDetail>
+	 * @param lAcDatail  List of AcDetail
 	 * @param titaVo     TitaVo
 	 * @return LoanBorTx
 	 * @throws LogicException ....
 	 */
-	public LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, String iDesc, TempVo iTempVo,
+	public LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, TempVo iTempVo,
 			List<AcDetail> lAcDatail, TitaVo titaVo) throws LogicException {
 		this.info("addFeeBorTxRoutine ... ");
 
 		LoanBorTx tLoanBorTx = new LoanBorTx();
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
 		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
-		String desc = iDesc;
+		String desc = "";
 		if ("L3230".equals(titaVo.getTxcd())) {
 			desc = "暫收銷";
 		}
-		if (iRpCode == 97) {
-			desc = "轉催收";
-		}
-		if (iRpCode == 98) {
-			desc = "轉呆帳";
-		}
-
-		CdCode tCdCode = cdCodeService.findById(new CdCodeId("AcctCode", ba.getAcctCode()), titaVo);
-		desc += tCdCode == null ? ba.getAcctCode() : tCdCode.getItem();
+		// 費用科目代碼
+		desc += getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
 
 		tLoanBorTx.setDesc(desc);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
@@ -1421,7 +1456,7 @@ public class LoanCom extends TradeBuffer {
 	/**
 	 * 累溢收(暫收貸)帳務處理
 	 * 
-	 * @param lAcDetail List<AcDetail>
+	 * @param lAcDetail List of AcDetail
 	 * @param titaVo    titaVo
 	 * @throws LogicException ....
 	 */
@@ -1465,8 +1500,8 @@ public class LoanCom extends TradeBuffer {
 	/**
 	 * 暫收款金額 (暫收借) 帳務處理
 	 * 
-	 * @param baTxList  ArrayList<BaTxVo>
-	 * @param lAcDetail List<AcDetail>
+	 * @param baTxList  ArrayList of BaTxVo
+	 * @param lAcDetail List of AcDetail
 	 * @param titaVo    TitaVo
 	 * @throws LogicException ....
 	 */
@@ -1519,77 +1554,95 @@ public class LoanCom extends TradeBuffer {
 	 * 更新放款明細檔及帳務明細檔關聯欄
 	 * 
 	 * @param tLoanBorTx LoanBorTx
-	 * @param lAcDetail  List<AcDetail>
+	 * @param lAcDetail  List of AcDetail
 	 * @throws LogicException ....
 	 */
 
 	public void updBorTxAcDetail(LoanBorTx tLoanBorTx, List<AcDetail> lAcDetail) throws LogicException {
 		this.info("updAcDetailBorxNo ..." + lAcDetail.size());
-// TempAmt 暫收借 = SumNo90~98 借方
-// OverAmt 暫收貸 = SumNo90~98 貸方 
-// PaidAmt 還款金額 = [SumNo==0]貸方
-// TxAmt 交易金額 = 還款金額 +  暫收貸 -  暫收借 
-//
-// case 1: 額度 001 轉 額度 002 $100
-//         額度 001 Db: TAV $550(SumNo=90) Cr: TAV $450(SumNo=90) => TxAmt = -$100
-//         額度 002 Db: TAV $210(SumNo=90) Cr: TAV $310(SumNo=90) => TxAmt = $100
-// case 2: 匯款轉帳 $100,  費用 $80
-//         額度 001 Db: 匯款轉帳 $ 100 , TAV $550(SumNo=90) TAV $650(SumNo=90) => TxAmt = 0 + 650 - 550 = $100
-//         額度 001 Db: TAV $650(SumNo=90) Cr: Fee $80 TAV $570(SumNo=90) => TxAmt = 80 + 570 - 650 = 0 
-// case 3: 催收轉銷呆帳 $100
-//         額度 001 Db: TAV $550(SumNo=90), 備抵呆帳 $ 100  Cr:催收款項 $100(SumNo=90) TAV $550(SumNo=90) => TxAmt = 100 + 550 - 550 = $100
+// 交易金額 + 暫收借 = 還款金額 + 暫收貸
+// TempAmt  暫收借 = SumNo90~98 借方
+// OverAmt  暫收貸 = SumNo90~98 貸方 
+// RepayAmt 還款金額 = [SumNo==0]貸方-借方
+// TxAmt    交易金額 = 還款金額 + 暫收貸 - 暫收借 
+// 交易金額在暫收款轉帳時需運算
+//  額度 001 轉 額度 002 $100
+//     額度 001 TxAmt = -$100
+//          Db: TAV $550 
+//                 Cr: TAV $450
+//     額度 002 TxAmt = $100
+//          Db: TAV $210
+//                 Cr: TAV $310
 
 		BigDecimal txAmt = BigDecimal.ZERO;
 		BigDecimal tempAmt = BigDecimal.ZERO;
 		BigDecimal overAmt = BigDecimal.ZERO;
-		BigDecimal paidAmt = BigDecimal.ZERO; // 還款金額
-        int acSeq = 0;
+		BigDecimal repayAmt = BigDecimal.ZERO;
+		int acSeq = 0;
+		int ii = 0;
 		for (AcDetail ac : lAcDetail) {
-	        acSeq++;
+			ii++;
 			TempVo acTempVo = new TempVo();
 			if (ac.getJsonFields() != null) {
 				acTempVo = acTempVo.getVo(ac.getJsonFields());
 			}
 			if (acTempVo.get("BorxNo") == null) {
+				acSeq = ii;
 				int sumNo = 0;
 				if (parse.isNumeric(ac.getSumNo())) {
 					sumNo = parse.stringToInteger(ac.getSumNo());
 				}
-				if (sumNo >= 90 && sumNo <= 98) {
+				if (sumNo == 0) {
+					if ("C".equals(ac.getDbCr())) {
+						repayAmt = repayAmt.add(ac.getTxAmt());
+					} else {
+						repayAmt = repayAmt.subtract(ac.getTxAmt());
+					}
+				} else if (sumNo >= 90 && sumNo <= 98) {
 					if ("D".equals(ac.getDbCr())) {
 						tempAmt = tempAmt.add(ac.getTxAmt());
 					} else {
 						overAmt = overAmt.add(ac.getTxAmt());
 					}
 				}
-				if (sumNo == 0) {
-					if ("C".equals(ac.getDbCr())) {
-						paidAmt = paidAmt.add(ac.getTxAmt());
-					}
-				}
-				txAmt = paidAmt.add(overAmt).subtract(tempAmt);
-				acTempVo.putParam("BorxNo", tLoanBorTx.getBorxNo());
-				if (ac.getFacmNo() != tLoanBorTx.getFacmNo()) {
-					acTempVo.putParam("FacmNo", tLoanBorTx.getFacmNo());
-				}
-				if (ac.getBormNo() != tLoanBorTx.getBormNo()) {
-					acTempVo.putParam("BormNo", tLoanBorTx.getBormNo());
-				}
-				acTempVo.putParam("EntryDate", tLoanBorTx.getEntryDate() + 19110000);
-				ac.setJsonFields(acTempVo.getJsonString());
-				tLoanBorTx.setTxAmt(txAmt);
-				tLoanBorTx.setTempAmt(tempAmt);
-				tLoanBorTx.setOverflow(overAmt);
-				TempVo txTempVo = new TempVo();
-				if (tLoanBorTx.getOtherFields() != null) {
-					txTempVo = txTempVo.getVo(tLoanBorTx.getOtherFields());
-				}
-				txTempVo.putParam("AcSeq", parse.IntegerToString(acSeq,4));
-				tLoanBorTx.setOtherFields(txTempVo.getJsonString());
 			}
+			acTempVo.putParam("BorxNo", tLoanBorTx.getBorxNo());
+			if (ac.getFacmNo() != tLoanBorTx.getFacmNo()) {
+				acTempVo.putParam("FacmNo", tLoanBorTx.getFacmNo());
+			}
+			if (ac.getBormNo() != tLoanBorTx.getBormNo()) {
+				acTempVo.putParam("BormNo", tLoanBorTx.getBormNo());
+			}
+			acTempVo.putParam("EntryDate", tLoanBorTx.getEntryDate() + 19110000);
+			ac.setJsonFields(acTempVo.getJsonString());
 		}
-		this.info("updAcDetailBorxNo end txAmt=" + txAmt + ", tempAmt=" + tempAmt + ", overAmt=" + overAmt);
+		txAmt = repayAmt.add(overAmt).subtract(tempAmt);
+		tLoanBorTx.setTxAmt(txAmt);
+		tLoanBorTx.setTempAmt(tempAmt);
+		tLoanBorTx.setOverflow(overAmt);
+		TempVo txTempVo = new TempVo();
+		if (tLoanBorTx.getOtherFields() != null) {
+			txTempVo = txTempVo.getVo(tLoanBorTx.getOtherFields());
+		}
+		txTempVo.putParam("AcSeq", parse.IntegerToString(acSeq, 4));
+		tLoanBorTx.setOtherFields(txTempVo.getJsonString());
+		this.info("updAcDetailBorxNo end txAmt=" + txAmt + ", tempAmt=" + tempAmt + ", repayAmt=" + repayAmt
+				+ ", overAmt=" + overAmt);
 
+	}
+
+	/**
+	 * 取得代碼說明
+	 * 
+	 * @param defCode 代碼檔代號
+	 * @param cdCode  代碼
+	 * @param titaVo  TitaVo
+	 * @return 代碼說明
+	 * @throws LogicException ....
+	 */
+	public String getCdCodeX(String defCode, String cdCode, TitaVo titaVo) throws LogicException {
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId("defCode", cdCode), titaVo);
+		return tCdCode == null ? "" : tCdCode.getItem();
 	}
 
 	@Override

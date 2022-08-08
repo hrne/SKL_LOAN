@@ -587,6 +587,9 @@ public class L4200Batch extends TradeBuffer {
 						reconCode = "A3";
 						break;
 					}
+					if (custNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+						repayType = 9;
+					}
 				} else {
 					reconCode = "A3";
 					if (tempOccursList.get("OccVirAcctNo").indexOf("地院") >= 0) {

@@ -52,6 +52,7 @@ public class L4002 extends TradeBuffer {
 	private BigDecimal ooRpAmt = new BigDecimal("0");
 	private int totalCnt = 0;
 	private String batxStatus = "";
+	private boolean isAllReverse = false;
 	int acDate;
 
 //	private BigDecimal bgZero = new BigDecimal("0");
@@ -91,6 +92,11 @@ public class L4002 extends TradeBuffer {
 					batxStatus = "9";
 				} else {
 					batxStatus = tBatxHead.getBatxExeCode();
+				}
+				if ("2".equals(tBatxHead.getBatxStsCode())) {
+					isAllReverse = true;
+				} else {
+					isAllReverse = false;
 				}
 
 //				0.待處理 ->0123
@@ -201,8 +207,8 @@ public class L4002 extends TradeBuffer {
 				// 可入帳
 				boolean isEnterTx = false;
 				// 檢核成功、未曾訂正、還款來源(1~4)
-				if (tBatxDetail.getProcStsCode().equals("4") && tempVo.get("EraseCnt") == null
-						&& tBatxDetail.getRepayCode() >= 1 && tBatxDetail.getRepayCode() <= 4) {
+				if (tBatxDetail.getProcStsCode().equals("4") && tBatxDetail.getRepayCode() >= 1
+						&& tBatxDetail.getRepayCode() <= 4) {
 					isEnterTx = true;
 				}
 				switch (tBatxDetail.getRepayCode()) {
@@ -558,19 +564,21 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOTotalRepayAmt", totalAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOToDoRepayAmt", toDoAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOUnDoRepayAmt", unDoAmtSum.get(tempL4002Vo));
-				
-// LabelFgA 整批刪除(D)、刪除回復(R)、整批訂正(H)
+
+// LabelFgA 整批刪除(D)、整批訂正(H)、刪除回復(R)
 // LabelFgB 整批檢核(C)
 // LabelFgC 整批入帳(E)
 // LabelFgD 轉暫收(T) 待處理筆數  > 0 & head
+
+// 執行整批訂正後只可刪除
 
 				String labelFgA = "";
 				String labelFgB = "";
 				String labelFgC = "";
 				String labelFgD = "";
-				if (acDate != titaVo.getEntDyI() + 19110000
-						|| "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))) {
 
+				if (acDate != titaVo.getEntDyI() + 19110000 || "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))
+						|| isAllReverse) {
 				} else {
 					if (tempL4002Vo.getRankFlag() == 1) {
 						if ("8".equals(batxStatus)) {
@@ -578,12 +586,9 @@ public class L4002 extends TradeBuffer {
 						} else {
 							if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
 								labelFgA = "D";
+							} else {
+								labelFgA = "H";
 							}
-						}
-					}
-					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-						if (canEraseCnt.get(tempL4002Vo) != null && canEraseCnt.get(tempL4002Vo) > 0) {
-							labelFgA = "H";
 						}
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {

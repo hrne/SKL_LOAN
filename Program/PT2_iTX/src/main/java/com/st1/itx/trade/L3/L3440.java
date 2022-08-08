@@ -133,7 +133,6 @@ public class L3440 extends TradeBuffer {
 	private BigDecimal iShortfall;
 	private int iOverRpFg; // 1.短收 2.溢收
 	private BigDecimal iOverAmt; // 短溢收金額
-	private BigDecimal iTmpAmt = BigDecimal.ZERO; // 暫收抵繳金額
 
 	// work area
 	private int wkCustNo;
@@ -156,7 +155,6 @@ public class L3440 extends TradeBuffer {
 	private BigDecimal wkDelayInt = BigDecimal.ZERO;
 	private BigDecimal wkBreachAmt = BigDecimal.ZERO;
 	private BigDecimal wkCloseBreachAmt = BigDecimal.ZERO;
-	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkReduceAmt = BigDecimal.ZERO;
 	private BigDecimal wkReduceAmtRemaind = BigDecimal.ZERO;
 	private BigDecimal wkReduceBreachAmt = BigDecimal.ZERO; // 減免違約金+減免延滯息
@@ -171,12 +169,6 @@ public class L3440 extends TradeBuffer {
 	private BigDecimal wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 	private BigDecimal wkShortfallInterest = BigDecimal.ZERO; // 累短收-利息
 	private BigDecimal wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
-	private BigDecimal wkTxAmtRemaind = BigDecimal.ZERO; // 交易還款餘額
-	private BigDecimal wkTotalRepay = BigDecimal.ZERO; // 總還款金額
-	private BigDecimal wkAcctFee = BigDecimal.ZERO;
-	private BigDecimal wkModifyFee = BigDecimal.ZERO;
-	private BigDecimal wkFireFee = BigDecimal.ZERO;
-	private BigDecimal wkLawFee = BigDecimal.ZERO;
 	private BigDecimal wkTotalFee = BigDecimal.ZERO;
 	private TxTemp tTxTemp;
 	private TxTempId tTxTempId;
@@ -252,6 +244,12 @@ public class L3440 extends TradeBuffer {
 		if (iOverRpFg == 1 && iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
 			throw new LogicException(titaVo, "E3094", "短繳金額 = " + iOverAmt); // 不可有短繳金額
 		}
+		// 系統交易記錄檔的金額為實際支付金額或支付總金額
+		if (iTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+			titaVo.setTxAmt(iTxAmt);
+		} else {
+			titaVo.setTxAmt(iTotalRepayAmt);
+		}
 		// 按違約金、 延滯息、利息順序減免
 		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
 			wkReduceAmtRemaind = iReduceAmt;
@@ -281,17 +279,6 @@ public class L3440 extends TradeBuffer {
 					wkReduceInterestRemaind = wkReduceAmtRemaind;
 					wkReduceAmtRemaind = BigDecimal.ZERO;
 				}
-			}
-		}
-		// 暫收抵繳金額
-		for (int i = 1; i <= 50; i++) {
-			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
-				break;
-			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) != 90) {
-				wkTxAmtRemaind = wkTxAmtRemaind.add(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 交易還款餘額
-			}
-			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 90) {
-				iTmpAmt = iTmpAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 暫收抵繳金額
 			}
 		}
 
@@ -756,11 +743,9 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx.setDelayInt(wkDelayInt);
 		tLoanBorTx.setBreachAmt(wkBreachAmt);
 		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);
-		tLoanBorTx.setTempAmt(wkTempAmt); // 暫收抵繳金額
 		// 繳息首筆、繳息次筆
 		if (isFirstOvdu) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
-			tLoanBorTx.setTxAmt(iTxAmt);
 		} else {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		}
@@ -787,21 +772,13 @@ public class L3440 extends TradeBuffer {
 		if (wkShortCloseBreach.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ShortCloseBreach", wkShortCloseBreach);
 		}
-		if (wkAcctFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("AcctFee", wkAcctFee);
-		}
-		if (wkModifyFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("ModifyFee", wkModifyFee);
-		}
-		if (wkFireFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("FireFee", wkFireFee);
-		}
-		if (wkLawFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("LawFee", wkLawFee);
-		}
 		tTempVo.putParam("BeforeLoanBal", wkBeforeLoanBal); // 交易前放款餘額
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+
+		// 更新放款明細檔及帳務明細檔關聯欄
+		loanCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
+
 		try {
 			loanBorTxService.insert(tLoanBorTx);
 		} catch (DBException e) {
@@ -817,6 +794,9 @@ public class L3440 extends TradeBuffer {
 		if (!this.txBuffer.getTxCom().isBookAcYes()) {
 			return;
 		}
+		// 暫收款金額 (暫收借)
+		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+		
 		// 借:放款
 		acDetail = new AcDetail();
 		acDetail.setDbCr("D");
@@ -846,6 +826,7 @@ public class L3440 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
+		
 		// 本金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
@@ -884,7 +865,9 @@ public class L3440 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
-
+		
+		// 累溢收入帳(暫收貸)
+		loanCom.settleOverflow(lAcDetail, titaVo);
 	}
 
 	// 貸方：費用、短繳期金
@@ -897,23 +880,22 @@ public class L3440 extends TradeBuffer {
 				.add(baTxCom.getFireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollFireFee())
 				.add(baTxCom.getCollLawFee());
 		this.info("未收費用 =" + wkTotalFee);
+
+		// 收回費用處理(新增帳務及放款交易內容檔)
+		loanCom.settleFeeRoutine(this.baTxList, iRpCode, iEntryDate, new TempVo(), lAcDetail, titaVo);
 	}
 
 	// 貸方：費用、短繳期金
 	private void getSettleUnpaid() throws LogicException {
-		this.wkAcctFee = BigDecimal.ZERO;
-		this.wkModifyFee = BigDecimal.ZERO;
-		this.wkFireFee = BigDecimal.ZERO;
-		this.wkLawFee = BigDecimal.ZERO;
 		this.wkShortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
 		this.wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 		this.wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
 		// RepayType 同撥款：01-期款, 第一筆：04-帳管費, 05-火險費, 06-契變手續費, 07-法務費
 		if (this.baTxList != null) {
 			for (BaTxVo ba : this.baTxList) {
-				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					if ((ba.getRepayType() == 1 && (ba.getFacmNo() == wkFacmNo || ba.getFacmNo() == 0)
-							&& (ba.getBormNo() == wkBormNo || ba.getBormNo() == 0)) || ba.getRepayType() > 1) {
+				if (ba.getDataKind() == 1 && ba.getRepayType() <= 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					if ((ba.getFacmNo() == wkFacmNo || ba.getFacmNo() == 0)
+							&& (ba.getBormNo() == wkBormNo || ba.getBormNo() == 0)) {
 						acDetail = new AcDetail();
 						acDetail.setDbCr("C");
 						acDetail.setAcctCode(ba.getAcctCode());
@@ -924,20 +906,9 @@ public class L3440 extends TradeBuffer {
 						acDetail.setRvNo(ba.getRvNo());
 						acDetail.setReceivableFlag(ba.getReceivableFlag());
 						lAcDetail.add(acDetail);
-						// 短繳
-						if (ba.getRepayType() == 1) {
-							this.wkShortfallPrincipal = ba.getPrincipal();
-							this.wkShortfallInterest = ba.getInterest();
-							this.wkShortCloseBreach = ba.getCloseBreachAmt();
-						} else if (ba.getRepayType() == 4) {
-							this.wkAcctFee = this.wkAcctFee.add(ba.getAcctAmt());
-						} else if (ba.getRepayType() == 5) {
-							this.wkFireFee = this.wkFireFee.add(ba.getAcctAmt());
-						} else if (ba.getRepayType() == 6) {
-							this.wkModifyFee = this.wkModifyFee.add(ba.getAcctAmt());
-						} else if (ba.getRepayType() == 7) {
-							this.wkLawFee = this.wkLawFee.add(ba.getAcctAmt());
-						}
+						this.wkShortfallPrincipal = ba.getPrincipal();
+						this.wkShortfallInterest = ba.getInterest();
+						this.wkShortCloseBreach = ba.getCloseBreachAmt();
 						ba.setAcctAmt(BigDecimal.ZERO);
 					}
 				}
@@ -1030,41 +1001,5 @@ public class L3440 extends TradeBuffer {
 
 	// 計算暫收款金額
 	private void compTempAmt() throws LogicException {
-		// 還款總金額
-		BigDecimal wkAcTotal = BigDecimal.ZERO;
-		for (AcDetail ac : lAcDetail) {
-			if ("C".equals(ac.getDbCr())) {
-				wkAcTotal = wkAcTotal.add(ac.getTxAmt());
-			} else {
-				wkAcTotal = wkAcTotal.subtract((ac.getTxAmt()));
-			}
-		}
-		// 本筆還款金額 、累計還款總金額
-		BigDecimal wkRepayAmt = wkAcTotal.subtract(this.wkTotalRepay);
-		this.wkTotalRepay = wkAcTotal;
-
-		// 本筆暫收款金額
-		this.wkTempAmt = BigDecimal.ZERO;
-
-		if (iOverAmt.compareTo(BigDecimal.ZERO) == 0 && iTmpAmt.compareTo(BigDecimal.ZERO) == 0) {
-			return;
-		}
-
-		// 有溢繳款放第一筆(暫收款金額為正值)
-		if (iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
-			if (isFirstOvdu) {
-				this.wkTempAmt = iOverAmt;
-			}
-			return;
-		}
-
-		// 暫收抵繳金額(暫收款金額為負值) = 交易還款餘額 - 本筆還款金額
-		if (wkRepayAmt.compareTo(this.wkTxAmtRemaind) < 0) {
-			wkTempAmt = BigDecimal.ZERO;
-			this.wkTxAmtRemaind = this.wkTxAmtRemaind.subtract(wkRepayAmt);
-		} else {
-			wkTempAmt = this.wkTxAmtRemaind.subtract(wkRepayAmt);
-			this.wkTxAmtRemaind = BigDecimal.ZERO;
-		}
 	}
 }

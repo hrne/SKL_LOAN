@@ -63,9 +63,7 @@ public class L3210 extends TradeBuffer {
 	@Autowired
 	public FacMainService facMainService;
 	@Autowired
-	public LoanBorTxService loanBorTxService;
-	@Autowired
-	private CdCodeService cdCodeService;
+	public LoanBorTxService loanBorTxService;;
 
 	@Autowired
 	Parse parse;
@@ -89,6 +87,7 @@ public class L3210 extends TradeBuffer {
 	private int iChequeAcct;
 	private int iChequeNo;
 	private int iTempReasonCode;
+	private int iTempReasonCodeX;
 	private int iTempSourceCode;
 	private int iOverRpFacmNo;
 	private int iRpCode = 0; // 還款來源
@@ -137,6 +136,7 @@ public class L3210 extends TradeBuffer {
 		iChequeAcct = this.parse.stringToInteger(titaVo.getParam("ChequeAcct"));
 		iChequeNo = this.parse.stringToInteger(titaVo.getParam("ChequeNo"));
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
+		iTempReasonCodeX = this.parse.stringToInteger(titaVo.getParam("TempReasonCodeX"));
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
@@ -374,53 +374,48 @@ public class L3210 extends TradeBuffer {
 		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, this.repayFacmNo, 0, iRepayType, iTempAmt,
 				titaVo);
 
-		// 暫收款金額 (暫收借)
+		// 借方：交易金額(已出)
+
+		// 借方：暫收款金額 (暫收借)
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
-		// 累溢收入帳(暫收貸)
+		// 貸方：累溢收入帳(暫收貸)
 		loanCom.settleOverflow(lAcDetail, titaVo);
+
 		// 新增放款交易內容檔
 		addLoanBorTxRoutine();
 		// 費用
-		if (isRepaidFee && this.baTxList != null) {
-
-			for (BaTxVo ba : this.baTxList) {
-				if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					// 暫收款金額 (暫收借)
-					loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-					// 費用
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setTxAmt(ba.getAcctAmt());
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setBormNo(ba.getBormNo());
-					acDetail.setRvNo(ba.getRvNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					lAcDetail.add(acDetail);
-					// 累溢收入帳(暫收貸)
-					loanCom.settleOverflow(lAcDetail, titaVo);
-					// 新增放款交易內容檔(收回費用)
-					loanCom.addFeeBorTxRoutine(ba, iRpCode, iEntryDate, "", new TempVo(), lAcDetail, titaVo);
-
-					ba.setAcctAmt(BigDecimal.ZERO);
-				}
-			}
+		if (isRepaidFee) {
+			// 收回費用處理(新增帳務及放款交易內容檔)
+			loanCom.settleFeeRoutine(this.baTxList, iRpCode, iEntryDate, new TempVo(), lAcDetail, titaVo);
 		}
 	}
 
 	// 新增放款交易內容檔
 	private void addLoanBorTxRoutine() throws LogicException {
 		this.info("addLoanBorTxRoutine ... ");
-
+		tTempVo.clear();
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-		if (iTempReasonCode == 0) {
-			tLoanBorTx.setDesc("債協暫收款登錄");
+// TempReasonCodeX
+//		00	債協暫收款
+//		01	溢繳
+//		02	不足利息
+//		03	期票
+//		04	本金異動
+//		05	積欠期款
+//		06	即期票現金
+//		07	火險、帳管
+//		08	兌現票入帳
+//		09	其他
+//		10	AML凍結／未確定
+		
+		if (iTempReasonCode == 0 || iTempReasonCode == 3 || iTempReasonCode == 6 || iTempReasonCode == 10) {
+			tLoanBorTx.setDesc(iTempReasonCodeX + "登錄");
 		} else {
 			tLoanBorTx.setDesc("暫收款登錄");
+			tTempVo.putParam("Note", iTempReasonCodeX);
 		}
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
@@ -428,7 +423,6 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 
 		// 其他欄位
-		tTempVo.clear();
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
 		tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 
@@ -438,11 +432,6 @@ public class L3210 extends TradeBuffer {
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
-		}
-		// 新增摘要
-		CdCode cdCode = cdCodeService.getItemFirst(3, "TempReasonCode", titaVo.getParam("TempReasonCode"), titaVo);
-		if (cdCode != null) {
-			tTempVo.putParam("Note", cdCode.getItem());
 		}
 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
