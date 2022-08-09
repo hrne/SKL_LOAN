@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ444Id implements Serializable {
 
 
-  // 報送單位代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7906050829166240814L;
+
+// 報送單位代號
   /* 三位文數字 */
   @Column(name = "`SubmitKey`", length = 3)
   private String submitKey = " ";

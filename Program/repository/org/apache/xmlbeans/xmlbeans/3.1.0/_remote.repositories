@@ -1,5 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 02 19:16:34 CST 2020
+#Tue Aug 09 17:47:52 CST 2022
 xmlbeans-3.1.0.pom>central=
+xmlbeans-3.1.0-javadoc.jar>central=
 xmlbeans-3.1.0-sources.jar>central=
 xmlbeans-3.1.0.jar>central=

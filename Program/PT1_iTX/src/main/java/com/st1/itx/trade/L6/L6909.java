@@ -14,8 +14,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.springjpa.cm.L6909ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SortMapListCom;
@@ -34,8 +32,6 @@ public class L6909 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public LoanBorTxService sLoanBorTxService;
-	@Autowired
 	Parse parse;
 	@Autowired
 	SortMapListCom sortMapListCom;
@@ -44,6 +40,12 @@ public class L6909 extends TradeBuffer {
 	public L6909ServiceImpl l6909ServiceImpl;
 
 	private List<Map<String, String>> oList2 = new ArrayList<Map<String, String>>();
+	// 額度小計
+	private HashMap<Integer, BigDecimal> facmBal = new HashMap<>();
+	private HashMap<Integer, Integer> facmEntryDate = new HashMap<>();
+	private HashMap<Integer, Integer> facmAcDate = new HashMap<>();
+	private int entryDate = 0;
+	private int acdate = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -77,22 +79,33 @@ public class L6909 extends TradeBuffer {
 
 		if (L6909List != null) {
 
-			BigDecimal tavBal = BigDecimal.ZERO;
-			BigDecimal tavDb = BigDecimal.ZERO;
-			BigDecimal tavCr = BigDecimal.ZERO;
+			String newTxNo = "";
+			int seq = 0;
 			for (Map<String, String> t : L6909List) {
 				this.info("L6909List t = " + t.toString());
 				Map<String, String> da = new HashMap<>();
-				int acdate = parse.stringToInteger(t.get("AcDate")) - 19110000;
+				acdate = parse.stringToInteger(t.get("AcDate")) - 19110000;
+				int facmNo = parse.stringToInteger(t.get("FacmNo"));
 				int entrydate = 0;
+				BigDecimal tavDb = BigDecimal.ZERO;
+				BigDecimal tavCr = BigDecimal.ZERO;
+				String txNo = "0000" + t.get("TitaTlrNo")
+						+ parse.IntegerToString(parse.stringToInteger(t.get("TitaTxtNo")), 8);
+				String AcFg = "";
+				// 畫面按鈕控制 第一筆為主要次筆為副
+				this.info("newtxno = " + newTxNo);
+				this.info("txNo = " + txNo);
+				if (txNo.equals(newTxNo)) {
+					AcFg = "";
+				} else {
+					AcFg = "Y";
+					newTxNo = txNo;
+				}
+
 				int txtNo = parse.stringToInteger(t.get("TitaTxtNo"));
-				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(acdate + 19110000, t.get("TitaTlrNo"),
-						parse.IntegerToString(txtNo, 8), titaVo);
-				int entryDate = 0;
-				String OODesc = "";
-				if (tLoanBorTx != null) {
-					OODesc = tLoanBorTx.getDesc(); // 交易別
-					entrydate = tLoanBorTx.getEntryDate();
+				String OODesc = t.get("Desc"); // 交易別
+				if (parse.stringToInteger(t.get("EntryDate")) != 0) {
+					entrydate = parse.stringToInteger(t.get("EntryDate")) - 19110000;
 				}
 				if ("D".equals(t.get("DbCr"))) {
 					tavDb = parse.stringToBigDecimal(t.get("TxAmt"));
@@ -102,42 +115,36 @@ public class L6909 extends TradeBuffer {
 					tavDb = BigDecimal.ZERO;
 				}
 
-				int seq = 0;
-				if (parse.stringToInteger(t.get("DB")) == 0) {
-
-					tavBal = parse.stringToBigDecimal(t.get("TxAmt"));
+				if (facmBal.containsKey(facmNo)) {
+					facmBal.put(facmNo, facmBal.get(facmNo).add(tavCr.subtract(tavDb)));
 				} else {
-					tavBal = tavBal.subtract(tavDb).add(tavCr);
+					facmBal.put(facmNo, tavCr.subtract(tavDb));
+				}
+				if (facmEntryDate.containsKey(facmNo)) {
+					facmEntryDate.put(facmNo, entrydate);
+				}
+				if (facmAcDate.containsKey(facmNo)) {
+					facmAcDate.put(facmNo, acdate);
 				}
 
 				seq++;
 
-				da.put("OOSeq", "" + seq);// 入帳日期
+				da.put("OOSeq", "" + seq);
 				da.put("OOEntryDate", "" + entrydate);// 入帳日期
 				da.put("OOAcDate", "" + acdate);// 會計日期
-				da.put("OOTAVFacmNo", t.get("FacmNo"));// 暫收款額度
+				da.put("OOTAVFacmNo", parse.IntegerToString(facmNo, 3));// 暫收款額度
 				da.put("OODesc", OODesc); // 交易別
 				da.put("OOTAVDb", "" + tavDb);// 暫收借
 				da.put("OOTAVCr", "" + tavCr);// 暫收貸
-				da.put("OOTAVBal", "" + tavBal);// 暫收餘額
+				da.put("OOTAVBal", "" + facmBal.get(facmNo));// 暫收餘額
+				da.put("OOAcFg", "" + AcFg);// 畫面控制
+				da.put("OOTxNo", "" + txNo);// 畫面控制
 
-				if (parse.stringToInteger(t.get("DB")) == 0) {
-					AddList2(da);
-				}
-				if (entrydate >= iEntryDateS && entrydate <= iEntryDateE) {
-					oList.add(da);
-					this.info("oList = " + da.toString());
-					AddList2(da);
-				}
+				oList.add(da);
 
 			}
 
-			if ("1".equals(iSortCode)) {
-				oList1 = sortMapListCom.beginSort(oList).ascString("OOSeq").ascString("OOTAVFacmNo").getList();
-			} else {
-				oList1 = sortMapListCom.beginSort(oList).ascString("OOTAVFacmNo").ascString("OOSeq").getList();
-			}
-			for (Map<String, String> da : oList1) {
+			for (Map<String, String> da : oList) {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOEntryDate", da.get("OOEntryDate"));// 入帳日期
 				occursList.putParam("OOAcDate", da.get("OOAcDate"));// 會計日期
@@ -146,24 +153,32 @@ public class L6909 extends TradeBuffer {
 				occursList.putParam("OOTAVDb", da.get("OOTAVDb"));// 暫收借
 				occursList.putParam("OOTAVCr", da.get("OOTAVCr"));// 暫收貸
 				occursList.putParam("OOTAVBal", da.get("OOTAVBal"));// 暫收餘額
+				occursList.putParam("OOAcFg", da.get("OOAcFg"));// 畫面控制
+				occursList.putParam("OOTxNo", da.get("OOTxNo"));// 畫面控制
 
 				this.totaVo.addOccursList(occursList);
 			}
 
 //			額度
+
 			BigDecimal custBal = BigDecimal.ZERO;
-			for (Map<String, String> da : oList2) {
+			for (Integer facmNo : facmBal.keySet()) {
+
 				OccursList occursList = new OccursList();
-				occursList.putParam("OOEntryDate", da.get("OOEntryDate"));// 入帳日期
-				occursList.putParam("OOAcDate", da.get("OOAcDate"));// 會計日期
-				occursList.putParam("OOTAVFacmNo", da.get("OOTAVFacmNo"));// 暫收款額度
+				occursList.putParam("OOEntryDate", facmEntryDate.get(facmNo));// 入帳日期
+				occursList.putParam("OOAcDate", facmAcDate.get(facmNo));// 會計日期
+				occursList.putParam("OOTAVFacmNo", parse.IntegerToString(facmNo, 3));// 暫收款額度
 				occursList.putParam("OODesc", "額度"); // 交易別
 				occursList.putParam("OOTAVDb", "");// 暫收借
 				occursList.putParam("OOTAVCr", "");// 暫收貸
-				occursList.putParam("OOTAVBal", da.get("OOTAVBal"));// 暫收餘額
-				custBal = custBal.add(parse.stringToBigDecimal(da.get("OOTAVBal")));
+				occursList.putParam("OOTAVBal", facmBal.get(facmNo));// 暫收餘額
+				occursList.putParam("OOAcFg", "N");// 畫面控制
+				occursList.putParam("OOTxNo", "");// 畫面控制
+				custBal = custBal.add(facmBal.get(facmNo));
 				this.totaVo.addOccursList(occursList);
+
 			}
+
 //			全戶
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOEntryDate", "");// 入帳日期
@@ -173,33 +188,14 @@ public class L6909 extends TradeBuffer {
 			occursList.putParam("OOTAVDb", "");// 暫收借
 			occursList.putParam("OOTAVCr", "");// 暫收貸
 			occursList.putParam("OOTAVBal", custBal);// 暫收餘額
+			occursList.putParam("OOAcFg", "N");// 畫面控制
+			occursList.putParam("OOTxNo", "");// 畫面控制
 			this.totaVo.addOccursList(occursList);
 
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	private void AddList2(Map<String, String> da) {
-		boolean isfind = false;
-		for (Map<String, String> da2 : oList2) {
-			if (da.get("OOTAVFacmNo").equals(da2.get("OOTAVFacmNo"))) {
-				isfind = true;
-				da2.put("OOTAVBal", da.get("OOTAVBal"));
-				da2.put("OOEntryDate", da.get("OOEntryDate"));
-				da2.put("OOAcDate", da.get("OOAcDate"));
-			}
-		}
-		if (!isfind) {
-			Map<String, String> da2 = new HashMap<>();
-			da2.put("OOTAVBal", da.get("OOTAVBal"));
-			da2.put("OOTAVFacmNo", da.get("OOTAVFacmNo"));
-			da2.put("OOEntryDate", da.get("OOEntryDate"));
-			da2.put("OOAcDate", da.get("OOAcDate"));
-			oList2.add(da2);
-		}
-
 	}
 
 }

@@ -23,7 +23,12 @@ import javax.persistence.Column;
 public class ConstructionCompany implements Serializable {
 
 
-  // 戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3417110289951144686L;
+
+// 戶號
   @Id
   @Column(name = "`CustNo`")
   private int custNo = 0;

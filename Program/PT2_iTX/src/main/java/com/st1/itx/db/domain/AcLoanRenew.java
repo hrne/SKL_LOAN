@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class AcLoanRenew implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8067053747456000169L;
+
+@EmbeddedId
   private AcLoanRenewId acLoanRenewId;
 
   // 戶號

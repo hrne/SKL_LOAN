@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class BatxDetail implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5532489009951153305L;
+
+@EmbeddedId
   private BatxDetailId batxDetailId;
 
   // 會計日期

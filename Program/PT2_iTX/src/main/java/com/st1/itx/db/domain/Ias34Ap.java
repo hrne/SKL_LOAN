@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class Ias34Ap implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3782984255407094039L;
+
+@EmbeddedId
   private Ias34ApId ias34ApId;
 
   // 年月份

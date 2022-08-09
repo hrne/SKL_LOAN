@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicMonthlyLoanData implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5551683677741341026L;
+
+@EmbeddedId
   private JcicMonthlyLoanDataId jcicMonthlyLoanDataId;
 
   // 資料年月

@@ -1,5 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 02 19:16:14 CST 2020
-poi-4.1.2-sources.jar>central=
+#Tue Aug 09 17:47:34 CST 2022
 poi-4.1.2.jar>central=
+poi-4.1.2-sources.jar>central=
+poi-4.1.2-javadoc.jar>central=
 poi-4.1.2.pom>central=

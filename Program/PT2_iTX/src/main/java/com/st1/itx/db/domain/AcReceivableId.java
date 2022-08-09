@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class AcReceivableId implements Serializable {
 
 
-  // 業務科目代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8626321893687912764L;
+
+// 業務科目代號
   /* CdAcCode會計科子細目設定檔 */
   @Column(name = "`AcctCode`", length = 3)
   private String acctCode = " ";

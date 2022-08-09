@@ -1,5 +1,6 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Mon Dec 30 18:10:56 CST 2019
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Tue Aug 09 17:51:54 CST 2022
 commons-text-1.8.pom>central=
+commons-text-1.8-javadoc.jar>central=
 commons-text-1.8-sources.jar>central=
 commons-text-1.8.jar>central=

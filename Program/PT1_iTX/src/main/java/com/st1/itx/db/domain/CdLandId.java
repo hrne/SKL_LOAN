@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class CdLandId implements Serializable {
 
 
-  // 縣市代碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2777547867708394620L;
+
+// 縣市代碼
   @Column(name = "`CityCode`", length = 2)
   private String cityCode = " ";
 

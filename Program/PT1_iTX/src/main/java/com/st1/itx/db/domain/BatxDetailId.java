@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class BatxDetailId implements Serializable {
 
 
-  // 會計日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4164854825790661700L;
+
+// 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 

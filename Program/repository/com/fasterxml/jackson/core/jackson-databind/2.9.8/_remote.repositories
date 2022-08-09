@@ -1,5 +1,6 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Mon Dec 30 18:10:53 CST 2019
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Tue Aug 09 17:51:46 CST 2022
+jackson-databind-2.9.8-javadoc.jar>central=
 jackson-databind-2.9.8-sources.jar>central=
 jackson-databind-2.9.8.pom>central=
 jackson-databind-2.9.8.jar>central=

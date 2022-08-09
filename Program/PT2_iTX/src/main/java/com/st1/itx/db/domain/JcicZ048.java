@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ048 implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 887929049045682211L;
+
+@EmbeddedId
   private JcicZ048Id jcicZ048Id;
 
   // 交易代碼

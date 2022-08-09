@@ -132,7 +132,6 @@ public class L3704 extends TradeBuffer {
 			LoanFacTmp beforeLoanFacTmp = (LoanFacTmp) dataLog.clone(tLoanFacTmp);
 
 			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-
 			tLoanFacTmp.setLoanFacTmpId(LoanFacTmpId);
 			tLoanFacTmp.setCustNo(iCustNo);
 			tLoanFacTmp.setFacmNo(iFacmNo);

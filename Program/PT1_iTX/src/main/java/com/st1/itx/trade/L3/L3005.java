@@ -216,11 +216,15 @@ public class L3005 extends TradeBuffer {
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
 				BigDecimal wkOverShort = BigDecimal.ZERO;
 				if (!txNo.equals(newTxNo)) {
-					if ("L3220".equals(titaTxCd) || totTxAmt.compareTo(BigDecimal.ZERO) == 0) {
-						occursList.putParam("OOTxMsg", ""); // 金額+還款類別
-					} else {
-						occursList.putParam("OOTxMsg", repayCodeX + " " + df.format(totTxAmt)); // 金額+還款類別
+					String txMsg = "";
+					if (repayCodeX != null) {
+						txMsg += repayCodeX;
 					}
+					if (totTxAmt.compareTo(BigDecimal.ZERO) != 0) {
+						txMsg += df.format(totTxAmt);
+
+					}
+					occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
 				}
 				if (txNo.equals(newTxNo)) {
 					AcFg = "";

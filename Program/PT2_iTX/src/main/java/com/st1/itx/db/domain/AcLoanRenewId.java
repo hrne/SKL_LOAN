@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class AcLoanRenewId implements Serializable {
 
 
-  // 戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6231942058425002646L;
+
+// 戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 

@@ -1639,7 +1639,9 @@ public class L3420 extends TradeBuffer {
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 		// 貸方：短繳期金
-		lAcDetail.addAll(lAcDetailShortfall);
+		for (AcDetail ac :lAcDetailShortfall) {
+			lAcDetail.add(ac);		
+		}
 
 		// 貸: 放款 = 還款本金
 		acDetail = new AcDetail();
@@ -1871,7 +1873,7 @@ public class L3420 extends TradeBuffer {
 		// RepayType 同撥款：01-期款, 第一筆：04-帳管費, 05-火險費, 06-契變手續費, 07-法務費
 		if (this.baTxList != null) {
 			for (BaTxVo ba : this.baTxList) {
-				if (ba.getRepayType() <= 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				if (ba.getDataKind() == 1 && ba.getRepayType() <= 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					if ((ba.getFacmNo() == wkFacmNo || ba.getFacmNo() == 0)
 							&& (ba.getBormNo() == wkBormNo || ba.getBormNo() == 0)) {
 						acDetail = new AcDetail();

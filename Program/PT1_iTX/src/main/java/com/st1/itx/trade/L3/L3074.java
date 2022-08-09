@@ -103,8 +103,10 @@ public class L3074 extends TradeBuffer {
 			occurslist.putParam("OOFacmNo", tLoanFacTmp.getFacmNo());
 			occurslist.putParam("OODescribe", tLoanFacTmp.getDescribe());
 
-			String tempEmpNo = tLoanFacTmp.getCreateEmpNo() == "" ? tLoanFacTmp.getLastUpdateEmpNo() : tLoanFacTmp.getCreateEmpNo();
-			String updateEmpNo = tLoanFacTmp.getLastUpdateEmpNo() == "" ? tLoanFacTmp.getCreateEmpNo() : tLoanFacTmp.getLastUpdateEmpNo();
+			String tempEmpNo = tLoanFacTmp.getCreateEmpNo() == "" ? tLoanFacTmp.getLastUpdateEmpNo()
+					: tLoanFacTmp.getCreateEmpNo();
+			String updateEmpNo = tLoanFacTmp.getLastUpdateEmpNo() == "" ? tLoanFacTmp.getCreateEmpNo()
+					: tLoanFacTmp.getLastUpdateEmpNo();
 
 			occurslist.putParam("OOEmpNo", tempEmpNo);
 
@@ -130,19 +132,16 @@ public class L3074 extends TradeBuffer {
 			this.info("ts = " + ts);
 			this.info("uts = " + uts);
 			DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
-			if(ts != null && uts != null) {
-			createDate = sdfdate.format(ts);
-			updateDate = sdfdate.format(uts);
+			if (ts != null && uts != null) {
+				createDate = sdfdate.format(ts);
+				updateDate = sdfdate.format(uts);
 
-			createDate = parse.timeStampToStringDate(tLoanFacTmp.getCreateDate()).replace("/", "");
-			updateDate = parse.timeStampToStringDate(tLoanFacTmp.getLastUpdate()).replace("/", "");
-			this.info("createDate = " + createDate);
-			this.info("updateDate = " + updateDate);
-			
-			
-			occurslist.putParam("OOCreateDate", createDate);
-			occurslist.putParam("OOLastUpdate", updateDate);
-			}else {
+				createDate = parse.timeStampToStringDate(tLoanFacTmp.getCreateDate()).replace("/", "");
+				updateDate = parse.timeStampToStringDate(tLoanFacTmp.getLastUpdate()).replace("/", "");
+
+				occurslist.putParam("OOCreateDate", createDate);
+				occurslist.putParam("OOLastUpdate", updateDate);
+			} else {
 				occurslist.putParam("OOCreateDate", "");
 				occurslist.putParam("OOLastUpdate", "");
 			}

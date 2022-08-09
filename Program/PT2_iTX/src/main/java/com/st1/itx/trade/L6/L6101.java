@@ -31,9 +31,18 @@ import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.trade.L9.L9130;
+import com.st1.itx.trade.L9.L9130Report;
 import com.st1.itx.trade.L9.L9131;
+import com.st1.itx.trade.L9.L9131Report;
 import com.st1.itx.trade.L9.L9132;
+import com.st1.itx.trade.L9.L9132Report;
+import com.st1.itx.trade.L9.L9132ReportA;
+import com.st1.itx.trade.L9.L9132ReportB;
+import com.st1.itx.trade.L9.L9132ReportC;
+import com.st1.itx.trade.L9.L9132ReportD;
 import com.st1.itx.trade.L9.L9133;
+import com.st1.itx.trade.L9.L9133Report;
+import com.st1.itx.trade.L9.L9134Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.TxToDoCom;
@@ -94,6 +103,35 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	L9133 tranL9133;
+	
+	@Autowired
+	L9130Report l9130Report;
+
+	@Autowired
+	L9131Report l9131Report;
+
+	@Autowired
+	L9132Report l9132Report;
+	
+	@Autowired
+	L9132ReportA l9132ReportA;
+	
+	@Autowired
+	L9132ReportB l9132ReportB;
+	
+	@Autowired
+	L9132ReportC l9132ReportC;
+	
+	@Autowired
+	L9132ReportD l9132ReportD;
+
+	@Autowired
+	L9133Report l9133Report;
+	
+	@Autowired
+	L9134Report l9134Report;
+	
+
 
 	@Autowired
 	L6101Excel l6101Excel;
@@ -183,7 +221,7 @@ public class L6101 extends TradeBuffer {
 		int unProcessCnt = 0;
 		int batxTotCnt = 0;
 		int txFlowCnt = 0;
-		int acReceivableCnt= 0;
+		int acReceivableCnt = 0;
 
 		switch (cSecNo) {
 		case "02": // 2-支票繳款
@@ -275,7 +313,7 @@ public class L6101 extends TradeBuffer {
 					cMsgCode = cMsgCode + 1;
 				}
 			}
-			
+
 			// MsgCode=07 檢查會計銷帳檔是否有應銷未銷資料
 			if (cClsFg == 1) {
 				acReceivableCnt = findAcReceivable(acReceivableCnt, titaVo);
@@ -591,10 +629,21 @@ public class L6101 extends TradeBuffer {
 		// 2021-12-15 智誠修改
 //		MySpring.newTask("L6101Report", this.txBuffer, titaVo);
 		l6101Excel.exec(titaVo);
+		
+		if ("09".equals(uSecNo)) {
+			this.info("09=MySpring.newTask L9130");
+			// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
+			MySpring.newTask("L9130", this.txBuffer, titaVo);
+		}else if ("02".equals(uSecNo)) {
+			this.info("02=exec L9130、L9131、L9132A、L9132B、L9132C");
+			
+			l9130Report.exec(titaVo);
+			l9131Report.exec(titaVo);
+			l9132ReportA.exec(titaVo);
+			l9132ReportB.exec(titaVo);
+			l9132ReportC.exec(titaVo);
 
-		// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
-		MySpring.newTask("L9130", this.txBuffer, titaVo);
-
+		}
 	}
 
 	// 寫入應處理清單-業績工作月結算啟動通知(工作月結束，放款關帳)

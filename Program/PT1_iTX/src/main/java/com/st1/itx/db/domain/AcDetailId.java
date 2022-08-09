@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class AcDetailId implements Serializable {
 
 
-  // 登放日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3930350034284121452L;
+
+// 登放日期
   @Column(name = "`RelDy`")
   private int relDy = 0;
 

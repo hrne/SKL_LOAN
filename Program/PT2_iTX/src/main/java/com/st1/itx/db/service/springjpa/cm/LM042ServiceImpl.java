@@ -36,8 +36,9 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
+	 * @param lYearMonth 上西元年月
 	 */
-	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth) throws Exception {
+	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth,int lYearMonth) throws Exception {
 		this.info("lM042.findStatistics1");
 
 		this.info("yearMonth=" + yearMonth);
@@ -87,6 +88,14 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,SUBSTR(\"AssetClass\",0,1) ";
 		sql += "           ,\"KIND\"";
 		sql += "           ,\"RPTID\"";
+		sql += "	UNION";
+		sql += "	SELECT \"YearMonth\" AS \"YearMonth\"";
+		sql += "		  ,'999' AS \"AssetClass\"";
+		sql += "		  ,'L' AS \"KIND\"";
+		sql += "		  ,'N' AS \"RPTID\"";
+		sql += "		  ,\"LegalLoss\" AS \"AMT\"";
+		sql += "	FROM \"MonthlyLM052Loss\"";
+		sql += "	WHERE \"YearMonth\" = :lyymm";
 		sql += "   ORDER BY \"KIND\" ASC";
 		sql += "           ,\"RPTID\" DESC";
 
@@ -96,6 +105,7 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", yearMonth);
+		query.setParameter("lyymm", lYearMonth);
 		return this.convertToMap(query);
 	}
 

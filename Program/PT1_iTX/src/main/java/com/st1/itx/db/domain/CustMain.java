@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class CustMain implements Serializable {
 
 
-  // 客戶識別碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4978593393417917685L;
+
+// 客戶識別碼
   @Id
   @Column(name = "`CustUKey`", length = 32)
   private String custUKey = " ";

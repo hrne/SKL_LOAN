@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class AcDetail implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2074956841333392659L;
+
+@EmbeddedId
   private AcDetailId acDetailId;
 
   // 登放日期

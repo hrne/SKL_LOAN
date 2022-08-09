@@ -25,6 +25,8 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 放款計息<BR>
  * getRepayInt 按指定的計算止日或回收期數，計算利息 call by LXXXX, BaTxCom<BR>
+ * <BR>
+ * 透過LoanSetRepayIntCom.setRepayInt() 設定輸入參數
  * 
  * @author st1
  *
@@ -170,7 +172,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 
 	/**
-	 * 按指定的計算止日或回收期數，計算利息
+	 * 按指定的計算止日或回收期數，計算利息<BR>
+	 * 應先透過LoanSetRepayIntCom.setRepayInt(...)<BR>
+	 * 設定輸入參數
 	 * 
 	 * @param titaVo TitaVo
 	 * @return 按期數及利率變動的分段計息明細
@@ -248,7 +252,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if (!iBreachReliefFlag.equals("Y")) { // 減免違約金 Y:是 N:否
 			wkDuraInt = BigDecimal.ZERO;
 			for (int i = 0; i <= wkCalcVoCount; i++) {
-				i = fillBreachRoutine(i);
+				fillBreachRoutine(i);
 			}
 		}
 
@@ -257,7 +261,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if ("Y".equals(iCaseCloseFlag) || wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 			wkTotalExtraRepay = BigDecimal.ZERO;
 			for (int i = 0; i <= wkCalcVoCount; i++) {
-				if (extraRepayRoutine(i, titaVo) == true) {
+				if (extraRepayRoutine(i, titaVo)) {
 					break;
 				}
 			}
@@ -333,7 +337,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	private void initWorkRoutine() {
 		this.info("   initWorkRoutine ");
 
-		lCalcRepayIntVo = new ArrayList<CalcRepayIntVo>();
+		lCalcRepayIntVo = new ArrayList<>();
 		// output
 		oNextAdjRateDate = iNextAdjRateDate;
 		oRateAdjFreq = iRateAdjFreq;
@@ -379,7 +383,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkNextEffectDate = 0;
 		wkNextFitRate = BigDecimal.ZERO;
 		wkProcessCode = 0;
-		isRateChange = false;
 		wkInterestFlag = "1".equals(iIntCalcCode) ? 1 : 2; // 1:按日計息 2:按月計息
 		wkExtraRepay = iExtraRepay;
 		wkTotalExtraRepay = BigDecimal.ZERO;
@@ -453,6 +456,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			if (iRepayFreq == 0) {
 				throw new LogicException(titaVo, "E3920", "戶號 = " + iCustNo + " 額度 = " + iFacmNo + " 撥款 = " + iBormNo); // 計算利息錯誤，還本週期為零
 			}
+			// TODO: 請賴桑確認此檢核
 			if ((iRepayFreq > 0 && iPayIntFreq == 0) || (iRepayFreq == 0 && iPayIntFreq > 0)) {
 				throw new LogicException(titaVo, "E3921", "戶號 = " + iCustNo + " 額度 = " + iFacmNo + " 撥款 = " + iBormNo); // 計算利息錯誤，繳息週期及還本週期錯誤
 			}
@@ -561,6 +565,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		case 3:
 			specifyPayIntDateWeekRoutine();
 			break;
+		default:
+			// nothing
+			break;
 		}
 		this.info("specifyPayIntDateRoutine end ");
 	}
@@ -574,7 +581,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		int wkMons = 0;
 		int wkdays = 0;
-		int wkDate = 0;
+		int workDate = 0;
 
 		// ------ 計算一天利息 ---------------
 		if (wkIntStartDate == wkIntEndDate) {
@@ -603,9 +610,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			dDateUtil.init();
 			dDateUtil.setDate_1(wkIntStartDate);
 			dDateUtil.setMons(iPayIntFreq); // 月數=一期
-			wkDate = dDateUtil.getCalenderDay();
+			workDate = dDateUtil.getCalenderDay();
 			// 起日至止日不滿一期
-			if (wkIntEndDate < wkDate) {
+			if (wkIntEndDate < workDate) {
 				wkTerms = 1;
 				wkProcessCode = 1;
 				wkIntEndDate = iIntEndDate;
@@ -648,10 +655,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				dDateUtil.init();
 				dDateUtil.setDate_1(wkSpecificDate);
 				dDateUtil.setMons(wkMons + 1); // 相當月數 + 1
-				wkDate = dDateUtil.getCalenderDay();
+				workDate = dDateUtil.getCalenderDay();
 				wkTerms = 1;
 				wkProcessCode = 1;
-				wkIntEndDate = wkDate > iIntEndDate ? iIntEndDate : wkDate;
+				wkIntEndDate = workDate > iIntEndDate ? iIntEndDate : workDate;
 				this.info("specifyPayIntDateMonth0-3");
 				specifyTermsRoutine();
 				// 止日小於相當日
@@ -662,8 +669,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 		}
 		// ----------------- 計算中段 ---------------
-		isFirstTermMonth = false;
-		; // 是否為首月
+		isFirstTermMonth = false; // 是否為首月
 		dDateUtil.init();
 		dDateUtil.setDate_1(wkSpecificDate);
 		dDateUtil.setDate_2(wkIntEndDate);
@@ -695,10 +701,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			dDateUtil.init();
 			dDateUtil.setDate_1(wkSpecificDate);
 			dDateUtil.setMons(wkMonRemainder + wkMons); // 月數
-			wkDate = dDateUtil.getCalenderDay();
+			workDate = dDateUtil.getCalenderDay();
 			wkTerms = 1;
 			wkProcessCode = 1;
-			wkIntEndDate = wkDate;
+			wkIntEndDate = workDate;
 			this.info("specifyPayIntDateMonth-4");
 			specifyTermsRoutine();
 			wkIntEndDate = iIntEndDate;
@@ -722,8 +728,8 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   wkIntStartDate = " + wkIntStartDate);
 		this.info("   wkIntEndDate   = " + wkIntEndDate);
 
-		int wkDays = 0;
-		int wkDate = 0;
+		int workDays = 0;
+		int workDate = 0;
 		int wkQuotient = 0;
 		int wkRemainder = 0;
 
@@ -735,17 +741,17 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 		dDateUtil.setDate_2(wkIntStartDate);
 		dDateUtil.dateDiff();
-		wkDays = dDateUtil.getDays();
-		wkQuotient = wkDays / (iPayIntFreq * 7);
-		wkRemainder = wkDays % (iPayIntFreq * 7);
-		this.info("1.wkDays=" + wkDays + ", wkQuotient=" + wkQuotient + ", wkRemainder=" + wkRemainder);
+		workDays = dDateUtil.getDays();
+		wkQuotient = workDays / (iPayIntFreq * 7);
+		wkRemainder = workDays % (iPayIntFreq * 7);
+		this.info("1.wkDays=" + workDays + ", wkQuotient=" + wkQuotient + ", wkRemainder=" + wkRemainder);
 
 		if (wkRemainder > 0) {
 			dDateUtil.init();
 			dDateUtil.setDate_1(iSpecificDate);
 			dDateUtil.setDays((wkQuotient + 1) * iPayIntFreq * 7);
-			wkDate = dDateUtil.getCalenderDay();
-			if (wkIntEndDate < wkDate) {
+			workDate = dDateUtil.getCalenderDay();
+			if (wkIntEndDate < workDate) {
 				wkTerms = 1;
 				wkProcessCode = 1;
 				specifyTermsRoutine();
@@ -753,7 +759,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			}
 			wkTerms = 1;
 			wkProcessCode = 1;
-			wkIntEndDate = wkDate;
+			wkIntEndDate = workDate;
 			specifyTermsRoutine();
 		}
 		wkIntEndDate = iIntEndDate;
@@ -761,10 +767,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		dDateUtil.setDate_1(wkIntStartDate);
 		dDateUtil.setDate_2(wkIntEndDate);
 		dDateUtil.dateDiff();
-		wkDays = dDateUtil.getDays();
-		wkQuotient = wkDays / (iPayIntFreq * 7);
-		wkRemainder = wkDays % (iPayIntFreq * 7);
-		this.info("2.wkDays=" + wkDays + ", wkQuotient=" + wkQuotient + ", wkRemainder=" + wkRemainder);
+		workDays = dDateUtil.getDays();
+		wkQuotient = workDays / (iPayIntFreq * 7);
+		wkRemainder = workDays % (iPayIntFreq * 7);
+		this.info("2.wkDays=" + workDays + ", wkQuotient=" + wkQuotient + ", wkRemainder=" + wkRemainder);
 		if (wkQuotient == 0) {
 			wkTerms = 1;
 			wkProcessCode = 1;
@@ -834,8 +840,13 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		case 3: // 3:週期為週
 			wkMonthLimit = iPayIntFreq * 7;
 			wkIntEndDate = freqWeekRoutine();
+			break;
+		default:
+			// nothing
+			break;
 		}
 		this.info("   wkIntEndDate    = " + wkIntEndDate);
+		
 		do {
 			wkIntEndDateX = 0;
 			findRateChangeRoutine(titaVo);
@@ -922,7 +933,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   iPayIntFreq = " + iPayIntFreq);
 
 		int wkEndDate = 0;
-		int wkDays = 0;
+		int workDays = 0;
 		int wkQuotient = 0;
 		int wkRemainder = 0;
 
@@ -936,9 +947,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			dDateUtil.setDate_1(iSpecificDate);
 			dDateUtil.setDate_2(wkIntStartDate);
 			dDateUtil.dateDiff();
-			wkDays = dDateUtil.getDays();
-			wkQuotient = wkDays / (iPayIntFreq * 7);
-			wkRemainder = wkDays % (iPayIntFreq * 7);
+			workDays = dDateUtil.getDays();
+			wkQuotient = workDays / (iPayIntFreq * 7);
+			wkRemainder = workDays % (iPayIntFreq * 7);
 			dDateUtil.init();
 			if (wkRemainder == 0) {
 				dDateUtil.setDate_1(wkIntStartDate);
@@ -966,6 +977,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   wkIntStartDate = " + wkIntStartDate);
 		this.info("   wkIntEndDate   = " + wkIntEndDate);
 
+		// TODO: 與賴桑確認: wkIntEndDateY 不會被set值,這個do-while永遠都只會走一次
 		do {
 			wkIntEndDateY = 0;
 			// if (iUnpaidFlag > 0) {
@@ -992,6 +1004,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if (wkIntStartDate < iMaturityDate && iMaturityDate < wkIntEndDate) {
 			wkFlag = 1;
 			if (wkTermIndex >= wkTerms) {
+				// nothing
 			}
 			if (wkFlag == 1) {
 				wkDate = wkIntEndDate;
@@ -1099,14 +1112,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("findRateChangeRoutine end");
 	}
 
-	private int CalcTermNo() throws LogicException {
-		this.info("CalcTermNo ... ");
+	private int calculateTermNo() throws LogicException {
+		this.info("calculateTermNo ... ");
 		this.info("   iFreqBase      = " + iFreqBase);
 		this.info("   iSpecificDate  = " + iSpecificDate + "/" + wkSpecificDate + "/" + wkSpecificMons);
 		this.info("   wkIntStartDate = " + wkIntStartDate);
 
 		int wkMons = 0;
-		int wkDays = 0;
+		int workDays = 0;
 		int wkTermNo = 0;
 
 		if (wkIntStartDate <= iSpecificDate) {
@@ -1124,8 +1137,11 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				break;
 			case 3:
 				dDateUtil.dateDiff();
-				wkDays = dDateUtil.getDays();
-				wkTermNo = (wkDays / (iPayIntFreq * 7)) + 1;
+				workDays = dDateUtil.getDays();
+				wkTermNo = (workDays / (iPayIntFreq * 7)) + 1;
+				break;
+			default:
+				// nothing
 				break;
 			}
 		}
@@ -1137,7 +1153,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("moveCalcDataRoutine ... ");
 
 		wkCalcVoIndex++;
-		oPaidTerms = CalcTermNo();
+		oPaidTerms = calculateTermNo();
 		vCalcRepayIntVo = new CalcRepayIntVo();
 		vCalcRepayIntVo.setCustNo(iCustNo);
 		vCalcRepayIntVo.setFacmNo(iFacmNo);
@@ -1400,7 +1416,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 	// 計算利息
 	private BigDecimal calcInterestRoutine() {
-		BigDecimal wkInterest = BigDecimal.ZERO;
+		BigDecimal wkInterest;
 
 		this.info("calcInterestRoutine ... ");
 		this.info("   iPayIntFreq     = " + iPayIntFreq);
@@ -1487,7 +1503,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 	// (2) 中短期擔保放款，到期仍未還清或辦理展期者，應按契約約定收取違約金。
 	// (3) 逾期6個月內罰欠繳金額之一成；逾期6個月以上罰欠繳金之二成，最高收9個月。
 
-	private int fillBreachRoutine(int wkIndex) throws LogicException {
+	private void fillBreachRoutine(int wkIndex) throws LogicException {
 		this.info("fillBreachRoutine ... ");
 		this.info("   wkIndex = " + wkIndex);
 		this.info("   iBreachValidDate = " + iBreachValidDate);
@@ -1505,7 +1521,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if (vCalcRepayIntVo.getEndDate() >= iBreachValidDate && vCalcRepayIntVo.getEndDate() <= iMaturityDate) {
 			lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
 			this.info("fillBreachRoutine end A");
-			return wkIndex;
 		}
 		// 利率變動、且有還本，設定應繳日為區段止日
 		if (vCalcRepayIntVo.getDuraFlag() == 1 && vCalcRepayIntVo.getPrincipal().compareTo(BigDecimal.ZERO) > 0) {
@@ -1517,14 +1532,12 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				&& iNextPayIntDate <= iMaturityDate) {
 			lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
 			this.info("fillBreachRoutine end B");
-			return wkIndex;
 		}
 		lCalcRepayIntVo.set(wkIndex, vCalcRepayIntVo);
 
 		fillBreachInterestRoutine(wkIndex, titaVo); // 計算延遲息違約金
 
 		this.info("fillBreachRoutine end ");
-		return wkIndex;
 	}
 
 	// 計算違約金, 遲延息
@@ -1546,7 +1559,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		AcReceivable acReceivable;
 		BigDecimal shortPrincipal = BigDecimal.ZERO;
 
-		int wkDays = 0;
+		int workDays = 0;
 		int wkOdDays = 0; // 逾期日數
 		int wkDaysA = 0; // 逾期6個月內
 		int wkDaysB = 0; // 逾期6個月~ 9個月內
@@ -1559,9 +1572,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		BigDecimal wkBreachAmtA = BigDecimal.ZERO;
 		BigDecimal wkBreachAmtB = BigDecimal.ZERO;
 		BigDecimal wkBreachAmtC = BigDecimal.ZERO;
-		BigDecimal wkDelayInt = BigDecimal.ZERO;
-		BigDecimal wkDelayBase = BigDecimal.ZERO;
-		BigDecimal wkBreachBase = BigDecimal.ZERO;
+		BigDecimal wkDelayInt;
+		BigDecimal wkDelayBase;
+		BigDecimal wkBreachBase;
 
 		vCalcRepayIntVo = lCalcRepayIntVo.get(wkIndex);
 		// 計算違約金起算日，計算起日>=到期日，為計算起日，否則為計算止日
@@ -1607,12 +1620,12 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkBreachGraceDays = 0;
 		if (iBreachGraceDays > 0) {
 			wkCount = 0;
-			wkDays = 0;
+			workDays = 0;
 			do {
-				wkDays++;
+				workDays++;
 				dDateUtil.init();
 				dDateUtil.setDate_1(wkBreachStartDate);
-				dDateUtil.setDays(wkDays);
+				dDateUtil.setDays(workDays);
 				wkDate = dDateUtil.getCalenderDay();
 				dDateUtil.init();
 				dDateUtil.setDate_2(wkDate);
@@ -1659,7 +1672,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkDaysLimitB = dDateUtil.getDays();
 
 		// 逾期日數 wkDays
-		wkDays = vCalcRepayIntVo.getOdDays();
+		workDays = vCalcRepayIntVo.getOdDays();
 // 延遲息計算公式
 // 購置不動產                         非購置不動產
 // 本金*年利率/365*逾期日數延遲息)   (本金+利息)*年利率/365*逾期日數	
@@ -1682,7 +1695,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		// 2022-03-11 智偉: 模仿AS400 運算過程中，最多到小數點後第九位，超過之位數，無條件捨去
 //		BigDecimal wkDaysDenominator = new BigDecimal(wkDays).divide(new BigDecimal(36500), 9, RoundingMode.DOWN);
 
-		wkDelayInt = wkDelayBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(wkDays))
+		wkDelayInt = wkDelayBase.multiply(vCalcRepayIntVo.getStoreRate()).multiply(new BigDecimal(workDays))
 				.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(9, RoundingMode.DOWN);
 
 // 違約金計算公式 
@@ -1713,35 +1726,34 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			wkBreachBase = vCalcRepayIntVo.getPrincipal().add(vCalcRepayIntVo.getInterest().add(wkDuraInt));
 		}
 		// 若為最後一筆，且此戶已到期
-		if (wkIndex == wkCalcVoCount && iMaturityDate == vCalcRepayIntVo.getEndDate()) {
-			if (shortPrincipal.compareTo(BigDecimal.ZERO) != 0) {
-				wkBreachBase = wkBreachBase.subtract(shortPrincipal);
-				this.info("已到期且為最後一筆,違約金計算本金減去短收本金");
-			}
+		if (wkIndex == wkCalcVoCount && iMaturityDate == vCalcRepayIntVo.getEndDate()
+				&& shortPrincipal.compareTo(BigDecimal.ZERO) != 0) {
+			wkBreachBase = wkBreachBase.subtract(shortPrincipal);
+			this.info("已到期且為最後一筆,違約金計算本金減去短收本金");
 		}
 
 		this.info("違約金當期計算基礎結果：wkBreachBase = " + wkBreachBase);
 
 		this.info("違約金當期計算天數判斷： iUsageCode = " + iUsageCode);
-		this.info("違約金當期計算天數判斷： wkDays = " + wkDays);
+		this.info("違約金當期計算天數判斷： wkDays = " + workDays);
 		this.info("違約金當期計算天數判斷： wkDaysLimitA = " + wkDaysLimitA);
 		this.info("違約金當期計算天數判斷： wkDaysLimitB = " + wkDaysLimitB);
 		// 逾期6個月內
-		if (wkDays <= wkDaysLimitA) {
+		if (workDays <= wkDaysLimitA) {
 			this.info("違約金當期計算天數判斷：逾期６個月內");
 			// 6個月內的天數用A段算
-			wkDaysA = wkDays;
+			wkDaysA = workDays;
 			wkDaysB = 0;
 			wkDaysC = 0;
 		} else {
 			// 逾期6個月~9個月內
-			if (wkDays <= wkDaysLimitB) {
+			if (workDays <= wkDaysLimitB) {
 				this.info("違約金當期計算天數判斷：逾期６～９個月");
 				// 2022-04-21 智偉修改:逾期6~9個月時
 				// 6個月內的天數用A段算
 				// 6~9個月的天數用B段算
 				wkDaysA = wkDaysLimitA;
-				wkDaysB = wkDays - wkDaysLimitA;
+				wkDaysB = workDays - wkDaysLimitA;
 				wkDaysC = 0;
 			} else {
 				this.info("違約金當期計算天數判斷：超過９個月");
@@ -1765,7 +1777,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					// 超過9個月的天數用C段算
 					wkDaysA = wkDaysLimitA;
 					wkDaysB = wkDaysLimitB - wkDaysLimitA;
-					wkDaysC = wkDays - wkDaysLimitB;
+					wkDaysC = workDays - wkDaysLimitB;
 				}
 			}
 		}
@@ -1780,18 +1792,18 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		this.info("違約金與延遲息判斷： wkDelayBase = " + wkDelayBase);
 		this.info("違約金與延遲息判斷： wkBreachBase = " + wkBreachBase);
-		this.info("違約金與延遲息判斷： wkDays = " + wkDays);
+		this.info("違約金與延遲息判斷： wkDays = " + workDays);
 		this.info("違約金與延遲息判斷： wkDaysA = " + wkDaysA);
 		this.info("違約金與延遲息判斷： wkDaysB = " + wkDaysB);
 		this.info("違約金與延遲息判斷： wkDaysC = " + wkDaysC);
-		if (wkDelayBase.compareTo(wkBreachBase) == 0 && wkDays == wkDaysA + wkDaysB + wkDaysC) {
+		if (wkDelayBase.compareTo(wkBreachBase) == 0 && workDays == wkDaysA + wkDaysB + wkDaysC) {
 			this.info("延遲息與違約金計算基礎及計算天數皆相同");
 			// 2022-04-13 智偉增加
 			// 計息止日 至 入帳日期 之間若有利率變動，需分段計算違約金與延遲息
 			int tempEndDate = vCalcRepayIntVo.getEndDate();
 			dDateUtil.init();
 			dDateUtil.setDate_1(tempEndDate);
-			dDateUtil.setDays(wkDays);
+			dDateUtil.setDays(workDays);
 			int tempEntryDate = dDateUtil.getCalenderDay();
 //			iCustNo + "-" + iFacmNo + "-" + iBormNo
 			Slice<LoanRateChange> sLoanRateChange = loanRateChangeService.rateChangeEffectDateRange(iCustNo, iFacmNo,
@@ -2121,7 +2133,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkDelayInt = wkDelayInt.setScale(0, RoundingMode.HALF_UP);
 		this.info("延遲息 (四捨五入後) = " + wkDelayInt);
 
-		if (wkDelayBase.compareTo(wkBreachBase) == 0 && wkDays == wkDaysA + wkDaysB + wkDaysC) {
+		if (wkDelayBase.compareTo(wkBreachBase) == 0 && workDays == wkDaysA + wkDaysB + wkDaysC) {
 			// 2022-03-14 智偉增加
 			// 因為原系統延遲息及違約金為一個欄位運算及顯示
 			// 然而，新系統需求是要拆分為兩個欄位顯示
@@ -2234,6 +2246,11 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				}
 				if (iCaseCloseFlag.equals("Y") || wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 					wkCalcVoCount++;
+
+					// TODO: 參透這個w的真義
+					// 最後一筆 且 按週/月計息(整期)時
+					// 新增一筆計息明細
+					// TODO: 為什麼要新增這筆?
 					CalcRepayIntVo w = new CalcRepayIntVo();
 					w.setCustNo(iCustNo);
 					w.setFacmNo(iFacmNo);
@@ -2270,6 +2287,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					return true;
 				}
 				break;
+			default:
+				// nothing
+				break;
 			}
 		}
 		this.info("   wkExtraRepay      = " + wkExtraRepay);
@@ -2304,6 +2324,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					|| (vCalcRepayIntVo.getDuraFlag() != 1 && vCalcRepayIntVo.getExtraRepayFlag() == 0)) {
 				oPrevPaidIntDate = vCalcRepayIntVo.getEndDate(); // 上次收息日
 			}
+			break;
+		default:
+			// nothing
 			break;
 		}
 		oRateIncr = vCalcRepayIntVo.getRateIncr(); // 加碼利率
@@ -2343,10 +2366,10 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("iSpecificDate   = " + iSpecificDate + "/" + wkSpecificDate + "/" + wkSpecificMons);
 		this.info("oPrevPaidIntDate= " + oPrevPaidIntDate);
 
-		int wkDate = 0;
-		int wkMons = 0;
-		int wkDays = 0;
-		int wkTerms = 0;
+		int workDate = 0;
+		int workMons = 0;
+		int workDays = 0;
+		int workTerms = 0;
 
 		if (iAmortizedCode == 2) { // 2.到期取息(到期繳息還本)
 			oNextPayIntDate = iMaturityDate;
@@ -2366,34 +2389,37 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		switch (iFreqBase) { // 週期基準 1:日 2:月 3:週
 		case 2:
 			dDateUtil.dateDiff();
-			wkMons = dDateUtil.getMons();
-			wkTerms = wkMons / iPayIntFreq;
-			wkTerms += 1;
-			wkMons = wkTerms * iPayIntFreq;
+			workMons = dDateUtil.getMons();
+			workTerms = workMons / iPayIntFreq;
+			workTerms += 1;
+			workMons = workTerms * iPayIntFreq;
 			dDateUtil.init();
 			dDateUtil.setDate_1(wkSpecificDate);
-			dDateUtil.setMons(wkMons + wkSpecificMons);
-			wkDate = dDateUtil.getCalenderDay();
+			dDateUtil.setMons(workMons + wkSpecificMons);
+			workDate = dDateUtil.getCalenderDay();
 			break;
 		case 3:
 			dDateUtil.dateDiff();
-			wkDays = dDateUtil.getDays();
-			wkDays = wkDays + (iPayIntFreq * 7);
+			workDays = dDateUtil.getDays();
+			workDays = workDays + (iPayIntFreq * 7);
 			dDateUtil.init();
 			dDateUtil.setDate_1(iSpecificDate);
-			dDateUtil.setDays(wkDays);
-			wkDate = dDateUtil.getCalenderDay();
+			dDateUtil.setDays(workDays);
+			workDate = dDateUtil.getCalenderDay();
+			break;
+		default:
+			// nothing
 			break;
 		}
 		// 預定收息日是否已超過到期日放到期日；按月繳息者最後一期按應繳日計算
-		if (oPrevPaidIntDate < iMaturityDate && wkDate > iMaturityDate) {
+		if (oPrevPaidIntDate < iMaturityDate && workDate > iMaturityDate) {
 			if (iFreqBase == 2) {
-				oNextPayIntDate = wkDate;
+				oNextPayIntDate = workDate;
 			} else {
 				oNextPayIntDate = iMaturityDate;
 			}
 		} else {
-			oNextPayIntDate = wkDate;
+			oNextPayIntDate = workDate;
 		}
 		this.info("   oNextPayIntDate = " + oNextPayIntDate);
 		this.info("nextPayIntDateRoutine end ");
@@ -2424,18 +2450,18 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			return;
 		}
 
-		int wkDate = iNextPayIntDate;
+		int workNextPayIntDate = iNextPayIntDate;
 		do {
 			dDateUtil.init();
-			dDateUtil.setDate_1(wkDate);
+			dDateUtil.setDate_1(workNextPayIntDate);
 			dDateUtil.setDays(1);
-			wkDate = dDateUtil.getCalenderDay();
+			workNextPayIntDate = dDateUtil.getCalenderDay();
 			dDateUtil.init();
-			dDateUtil.setDate_2(wkDate);
+			dDateUtil.setDate_2(workNextPayIntDate);
 		} while (dDateUtil.isHoliDay());
 
 		// 入帳日(違約金生效日)在下次應繳日(遇假日順延)前，則違約金生效日為下次應繳日
-		if (iBreachValidDate <= wkDate) {
+		if (iBreachValidDate <= workNextPayIntDate) {
 			iBreachValidDate = iNextPayIntDate;
 		}
 		this.info("adjustBreachValidDateRoutine end, iBreachValidDate= " + iBreachValidDate);
@@ -2487,228 +2513,228 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 	}
 
-	public void setCustNo(int CustNo) {
-		this.iCustNo = CustNo;
+	public void setCustNo(int custNo) {
+		this.iCustNo = custNo;
 	}
 
-	public void setFacmNo(int FacmNo) {
-		this.iFacmNo = FacmNo;
+	public void setFacmNo(int facmNo) {
+		this.iFacmNo = facmNo;
 	}
 
-	public void setBormNo(int BormNo) {
-		this.iBormNo = BormNo;
+	public void setBormNo(int bormNo) {
+		this.iBormNo = bormNo;
 	}
 
-	public void setProdNo(String ProdNo) {
-		this.iProdNo = ProdNo;
+	public void setProdNo(String prodNo) {
+		this.iProdNo = prodNo;
 	}
 
-	public void setAcctCode(String AcctCode) {
-		this.iAcctCode = AcctCode;
+	public void setAcctCode(String acctCode) {
+		this.iAcctCode = acctCode;
 	}
 
-	public void setCurrencyCode(String CurrencyCode) {
-		this.iCurrencyCode = CurrencyCode;
+	public void setCurrencyCode(String currencyCode) {
+		this.iCurrencyCode = currencyCode;
 	}
 
-	public void setBaseRateCode(String BaseRateCode) {
-		this.iBaseRateCode = BaseRateCode;
+	public void setBaseRateCode(String baseRateCode) {
+		this.iBaseRateCode = baseRateCode;
 	}
 
-	public void setRateCode(String RateCode) {
-		this.iRateCode = RateCode;
+	public void setRateCode(String rateCode) {
+		this.iRateCode = rateCode;
 	}
 
-	public void setRateAdjFreq(int RateAdjFreq) {
-		this.iRateAdjFreq = RateAdjFreq;
+	public void setRateAdjFreq(int rateAdjFreq) {
+		this.iRateAdjFreq = rateAdjFreq;
 	}
 
-	public void setNextAdjRateDate(int NextAdjRateDate) {
-		this.iNextAdjRateDate = NextAdjRateDate;
+	public void setNextAdjRateDate(int nextAdjRateDate) {
+		this.iNextAdjRateDate = nextAdjRateDate;
 	}
 
-	public void setPrincipal(BigDecimal Principal) {
-		this.iPrincipal = Principal;
+	public void setPrincipal(BigDecimal principal) {
+		this.iPrincipal = principal;
 	}
 
-	public void setIncrFlag(String IncrFlag) {
-		this.iIncrFlag = IncrFlag;
+	public void setIncrFlag(String incrFlag) {
+		this.iIncrFlag = incrFlag;
 	}
 
-	public void setStoreRate(BigDecimal StoreRate) {
-		this.iStoreRate = StoreRate;
+	public void setStoreRate(BigDecimal storeRate) {
+		this.iStoreRate = storeRate;
 	}
 
-	public void setRateIncr(BigDecimal RateIncr) {
-		this.iRateIncr = RateIncr;
+	public void setRateIncr(BigDecimal rateIncr) {
+		this.iRateIncr = rateIncr;
 	}
 
-	public void setIndividualIncr(BigDecimal IndividualIncr) {
-		this.iIndividualIncr = IndividualIncr;
+	public void setIndividualIncr(BigDecimal individualIncr) {
+		this.iIndividualIncr = individualIncr;
 	}
 
-	public void setFreqBase(int FreqBase) {
-		this.iFreqBase = FreqBase;
+	public void setFreqBase(int freqBase) {
+		this.iFreqBase = freqBase;
 	}
 
-	public void setPayIntFreq(int PayIntFreq) {
-		this.iPayIntFreq = PayIntFreq;
+	public void setPayIntFreq(int payIntFreq) {
+		this.iPayIntFreq = payIntFreq;
 	}
 
-	public void setRepayFreq(int RepayFreq) {
-		this.iRepayFreq = RepayFreq;
+	public void setRepayFreq(int repayFreq) {
+		this.iRepayFreq = repayFreq;
 	}
 
-	public void setTerms(int Terms) {
-		this.iTerms = Terms;
+	public void setTerms(int terms) {
+		this.iTerms = terms;
 	}
 
-	public void setPaidTerms(int PaidTerms) {
-		this.iPaidTerms = PaidTerms;
+	public void setPaidTerms(int paidTerms) {
+		this.iPaidTerms = paidTerms;
 	}
 
-	public void setIntStartDate(int IntStartDate) {
-		this.iIntStartDate = IntStartDate;
+	public void setIntStartDate(int intStartDate) {
+		this.iIntStartDate = intStartDate;
 	}
 
-	public void setIntEndDate(int IntEndDate) {
-		this.iIntEndDate = IntEndDate;
+	public void setIntEndDate(int intEndDate) {
+		this.iIntEndDate = intEndDate;
 	}
 
-	public void setIntEndCode(int IntEndCode) {
-		this.iIntEndCode = IntEndCode;
+	public void setIntEndCode(int intEndCode) {
+		this.iIntEndCode = intEndCode;
 	}
 
-	public void setFirstDrawdownDate(int FirstDrawdownDate) {
-		this.iFirstDrawdownDate = FirstDrawdownDate;
+	public void setFirstDrawdownDate(int firstDrawdownDate) {
+		this.iFirstDrawdownDate = firstDrawdownDate;
 	}
 
-	public void setDrawdownDate(int DrawdownDate) {
-		this.iDrawdownDate = DrawdownDate;
+	public void setDrawdownDate(int drawdownDate) {
+		this.iDrawdownDate = drawdownDate;
 	}
 
-	public void setMaturityDate(int MaturityDate) {
-		this.iMaturityDate = MaturityDate;
+	public void setMaturityDate(int maturityDate) {
+		this.iMaturityDate = maturityDate;
 	}
 
-	public void setBreachValidDate(int BreachValidDate) {
-		this.iBreachValidDate = BreachValidDate;
+	public void setBreachValidDate(int breachValidDate) {
+		this.iBreachValidDate = breachValidDate;
 	}
 
-	public void setPrevPaidIntDate(int PrevPaidIntDate) {
-		this.iPrevPaidIntDate = PrevPaidIntDate;
+	public void setPrevPaidIntDate(int prevPaidIntDate) {
+		this.iPrevPaidIntDate = prevPaidIntDate;
 	}
 
-	public void setPrevRepaidDate(int PrevRepaidDate) {
-		this.iPrevRepaidDate = PrevRepaidDate;
+	public void setPrevRepaidDate(int prevRepaidDate) {
+		this.iPrevRepaidDate = prevRepaidDate;
 	}
 
-	public void setNextPayIntDate(int NextPayIntDate) {
-		this.iNextPayIntDate = NextPayIntDate;
+	public void setNextPayIntDate(int nextPayIntDate) {
+		this.iNextPayIntDate = nextPayIntDate;
 	}
 
-	public void setNextRepayDate(int NextRepayDate) {
-		this.iNextRepayDate = NextRepayDate;
+	public void setNextRepayDate(int nextRepayDate) {
+		this.iNextRepayDate = nextRepayDate;
 	}
 
-	public void setSpecificDate(int SpecificDate) {
-		this.iSpecificDate = SpecificDate;
+	public void setSpecificDate(int specificDate) {
+		this.iSpecificDate = specificDate;
 	}
 
-	public void setSpecificDd(int SpecificDd) {
-		this.iSpecificDd = SpecificDd;
+	public void setSpecificDd(int specificDd) {
+		this.iSpecificDd = specificDd;
 	}
 
-	public void setFirstDueDate(int FirstDueDate) {
-		this.iFirstDueDate = FirstDueDate;
+	public void setFirstDueDate(int firstDueDate) {
+		this.iFirstDueDate = firstDueDate;
 	}
 
-	public void setGraceDate(int GraceDate) {
-		this.iGraceDate = GraceDate;
+	public void setGraceDate(int graceDate) {
+		this.iGraceDate = graceDate;
 	}
 
-	public void setBreachGraceDays(int BreachGraceDays) {
-		this.iBreachGraceDays = BreachGraceDays;
+	public void setBreachGraceDays(int breachGraceDays) {
+		this.iBreachGraceDays = breachGraceDays;
 	}
 
-	public void setExtraRepayCode(String ExtraRepayCode) {
-		this.iExtraRepayCode = ExtraRepayCode;
+	public void setExtraRepayCode(String extraRepayCode) {
+		this.iExtraRepayCode = extraRepayCode;
 	}
 
-	public void setDueAmt(BigDecimal DueAmt) {
-		this.iDueAmt = DueAmt;
+	public void setDueAmt(BigDecimal dueAmt) {
+		this.iDueAmt = dueAmt;
 	}
 
-	public void setBreachRate(BigDecimal BreachRate) {
-		this.iBreachRate = BreachRate;
+	public void setBreachRate(BigDecimal breachRate) {
+		this.iBreachRate = breachRate;
 	}
 
-	public void setDelayRate(BigDecimal DelayRate) {
-		this.iDelayRate = DelayRate;
+	public void setDelayRate(BigDecimal delayRate) {
+		this.iDelayRate = delayRate;
 	}
 
-	public void setUnpaidFlag(int UnpaidFlag) {
-		this.iUnpaidFlag = UnpaidFlag;
+	public void setUnpaidFlag(int unpaidFlag) {
+		this.iUnpaidFlag = unpaidFlag;
 	}
 
-	public void setIntCalcCode(String IntCalcCode) {
-		this.iIntCalcCode = IntCalcCode;
+	public void setIntCalcCode(String intCalcCode) {
+		this.iIntCalcCode = intCalcCode;
 	}
 
-	public void setAmortizedCode(int AmortizedCode) {
-		this.iAmortizedCode = AmortizedCode;
+	public void setAmortizedCode(int amortizedCode) {
+		this.iAmortizedCode = amortizedCode;
 	}
 
-	public void setDelayFlag(int DelayFlag) {
-		this.iDelayFlag = DelayFlag;
+	public void setDelayFlag(int delayFlag) {
+		this.iDelayFlag = delayFlag;
 	}
 
-	public void setNonePrincipalFlag(int NonePrincipalFlag) {
-		this.iNonePrincipalFlag = NonePrincipalFlag;
+	public void setNonePrincipalFlag(int nonePrincipalFlag) {
+		this.iNonePrincipalFlag = nonePrincipalFlag;
 	}
 
-	public void setExtraRepay(BigDecimal ExtraRepay) {
-		this.iExtraRepay = ExtraRepay;
+	public void setExtraRepay(BigDecimal extraRepay) {
+		this.iExtraRepay = extraRepay;
 	}
 
-	public void setExtraRepayFlag(String ExtraRepayFlag) {
-		this.iExtraRepayFlag = ExtraRepayFlag;
+	public void setExtraRepayFlag(String extraRepayFlag) {
+		this.iExtraRepayFlag = extraRepayFlag;
 	}
 
-	public void setTbsDy(int TbsDy) {
-		this.iTbsDy = TbsDy;
+	public void setTbsDy(int tbsDy) {
+		this.iTbsDy = tbsDy;
 	}
 
-	public void setEntryDate(int EntryDate) {
-		this.iEntryDate = EntryDate;
+	public void setEntryDate(int entryDate) {
+		this.iEntryDate = entryDate;
 	}
 
-	public void setUsageCode(String UsageCode) {
-		this.iUsageCode = UsageCode;
+	public void setUsageCode(String usageCode) {
+		this.iUsageCode = usageCode;
 	}
 
-	public void setCaseCloseFlag(String CaseCloseFlag) {
-		this.iCaseCloseFlag = CaseCloseFlag;
+	public void setCaseCloseFlag(String caseCloseFlag) {
+		this.iCaseCloseFlag = caseCloseFlag;
 	}
 
-	public void setBreachReliefFlag(String BreachReliefFlag) {
-		this.iBreachReliefFlag = BreachReliefFlag;
+	public void setBreachReliefFlag(String breachReliefFlag) {
+		this.iBreachReliefFlag = breachReliefFlag;
 	}
 
-	public void setSyndFlag(String SyndFlag) {
-		this.iSyndFlag = SyndFlag;
+	public void setSyndFlag(String syndFlag) {
+		this.iSyndFlag = syndFlag;
 	}
 
-	public void setFinalBal(BigDecimal FinalBal) {
-		this.iFinalBal = FinalBal;
+	public void setFinalBal(BigDecimal finalBal) {
+		this.iFinalBal = finalBal;
 	}
 
-	public void setGracePeriod(int GracePeriod) {
-		this.iGracePeriod = GracePeriod;
+	public void setGracePeriod(int gracePeriod) {
+		this.iGracePeriod = gracePeriod;
 	}
 
-	public void setTotalPeriod(int TotalPeriod) {
-		this.iTotalPeriod = TotalPeriod;
+	public void setTotalPeriod(int totalPeriod) {
+		this.iTotalPeriod = totalPeriod;
 	}
 	// ----------------------------------------------------------------------------
 
@@ -2802,7 +2828,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 	@Override
 	public void exec() throws LogicException {
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 }

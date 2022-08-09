@@ -62,7 +62,7 @@ E(0,0)
 ["#FdBreachPercent+違約率-金額",#BreachPercent],
 ["#FdStoreRate+目前利率",#StoreRate,"@%",#DrawdownDate],
 ["#FdRateIncr+利率加減碼",#RateIncr,"@%"],
-["#FdNextAdjRate+下次調整利率",#NextAdjRate,#NextAdjRateX","@%",#NextAdjRateDate],
+["#FdNextAdjRate+下次調整利率",#NextAdjRate,#NextAdjRateX,"@%",#NextAdjRateDate],
 [#<->#,"#FdBdLocation+門牌號碼",#BdLocation],
 [#<->#,"#FdBdLocation",#OwnerName,"@@",#OwnerId],
 [#<->#,"#FdFloorArea+主建物",#FloorArea,"@坪"],
@@ -511,7 +511,7 @@ E(0,#L3r09NextFitRate)
 #NextAdjRateX=X,7,L
 
 #NextAdjRateDate=D,7,L
-C(3,#L3r09NextFitRate,0,S,$)
+! C(3,#L3r09NextFitRate,0,S,$)
 E(0,#L3r09NextEffectDate)
 
 

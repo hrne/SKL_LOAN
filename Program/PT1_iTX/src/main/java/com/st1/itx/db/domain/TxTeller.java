@@ -25,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxTeller implements Serializable {
 
 
-  // 使用者代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6770893774295646442L;
+
+// 使用者代號
   @Id
   @Column(name = "`TlrNo`", length = 6)
   private String tlrNo = " ";

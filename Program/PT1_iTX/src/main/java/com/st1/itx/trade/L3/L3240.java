@@ -15,8 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;

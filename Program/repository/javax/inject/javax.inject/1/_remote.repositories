@@ -1,5 +1,6 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Mon Dec 30 17:46:50 CST 2019
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Tue Aug 09 17:48:14 CST 2022
 javax.inject-1.jar>central=
 javax.inject-1.pom>central=
 javax.inject-1-sources.jar>central=
+javax.inject-1-javadoc.jar>central=

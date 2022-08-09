@@ -44,12 +44,12 @@ public class L3R17 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// tita
-		// 功能 1新增 2修改  3查詢 4刪除 
+		// 功能 1新增 2修改 3查詢 4刪除
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		// 額度編號
-		int iFacmNo	= parse.stringToInteger(titaVo.getParam("RimFacmNo"));
+		int iFacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 
 		// new table
 		LoanFacTmp tLoanFacTmp = new LoanFacTmp();
@@ -60,26 +60,25 @@ public class L3R17 extends TradeBuffer {
 		LoanFacTmpId.setFacmNo(iFacmNo);
 		// FunCd 1新增
 		tLoanFacTmp = sLoanFacTmpService.findById(LoanFacTmpId, titaVo);
-		this.info("iFunCd    = " + iFunCd );
+		this.info("iFunCd    = " + iFunCd);
 		if (iFunCd == 1) {
-			
-			if(tLoanFacTmp != null) {
-				throw new LogicException(titaVo, "E0001", " 該額度存在暫收款指定額度設定查詢檔。"); 
+
+			if (tLoanFacTmp != null) {
+				throw new LogicException(titaVo, "E0001", " 該額度存在暫收款指定額度設定查詢檔。");
 			}
 			this.info("回傳空的處理說明");
 			this.totaVo.putParam("L3r17RmkDescribe", "");
-			
-		}else{
+
+		} else {
 
 			this.info("iFunCdelse   = " + iFunCd);
 			// 該戶號查不到資料 拋錯
 			if (tLoanFacTmp == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo +"不存在暫收款指定額度設定查詢。"); //查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "不存在暫收款指定額度設定查詢。"); // 查詢資料不存在
 			}
 			this.totaVo.putParam("L3r17RmkDescribe", tLoanFacTmp.getDescribe());
 
 		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

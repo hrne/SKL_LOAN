@@ -16,7 +16,12 @@ import javax.persistence.Embeddable;
 public class Ias34ApId implements Serializable {
 
 
-  // 年月份
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6399641142929718693L;
+
+// 年月份
   @Column(name = "`DataYM`")
   private int dataYM = 0;
 

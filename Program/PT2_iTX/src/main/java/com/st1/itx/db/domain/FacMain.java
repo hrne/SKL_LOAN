@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class FacMain implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6631456993002561516L;
+
+@EmbeddedId
   private FacMainId facMainId;
 
   // 借款人戶號

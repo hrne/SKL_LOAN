@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class NegAppr01 implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5525079924631880640L;
+
+@EmbeddedId
   private NegAppr01Id negAppr01Id;
 
   // 會計日期

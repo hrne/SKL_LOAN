@@ -1,5 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 02 19:16:40 CST 2020
+#Tue Aug 09 17:47:58 CST 2022
 curvesapi-1.06.jar>central=
+curvesapi-1.06-javadoc.jar>central=
 curvesapi-1.06-sources.jar>central=
 curvesapi-1.06.pom>central=

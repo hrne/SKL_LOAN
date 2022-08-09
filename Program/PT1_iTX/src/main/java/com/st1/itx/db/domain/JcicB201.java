@@ -24,7 +24,12 @@ import javax.persistence.Column;
 public class JcicB201 implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8100558926842021512L;
+
+@EmbeddedId
   private JcicB201Id jcicB201Id;
 
   // 資料年月

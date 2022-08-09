@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class AcReceivable implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1805293039174189924L;
+
+@EmbeddedId
   private AcReceivableId acReceivableId;
 
   // 業務科目代號

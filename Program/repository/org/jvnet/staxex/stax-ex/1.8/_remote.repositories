@@ -1,5 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu May 28 14:12:39 CST 2020
+#Tue Aug 09 17:51:17 CST 2022
 stax-ex-1.8.jar>central=
 stax-ex-1.8.pom>central=
+stax-ex-1.8-javadoc.jar>central=
 stax-ex-1.8-sources.jar>central=

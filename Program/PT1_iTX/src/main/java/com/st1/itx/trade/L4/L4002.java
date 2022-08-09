@@ -52,7 +52,6 @@ public class L4002 extends TradeBuffer {
 	private BigDecimal ooRpAmt = new BigDecimal("0");
 	private int totalCnt = 0;
 	private String batxStatus = "";
-	private boolean isAllReverse = false;
 	int acDate;
 
 //	private BigDecimal bgZero = new BigDecimal("0");
@@ -93,11 +92,6 @@ public class L4002 extends TradeBuffer {
 				} else {
 					batxStatus = tBatxHead.getBatxExeCode();
 				}
-				if ("2".equals(tBatxHead.getBatxStsCode())) {
-					isAllReverse = true;
-				} else {
-					isAllReverse = false;
-				}
 
 //				0.待處理 ->0123
 //				9.已完成 ->ALL
@@ -118,9 +112,7 @@ public class L4002 extends TradeBuffer {
 			if (totalCnt == 0) {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
-		} else
-
-		{
+		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 
@@ -193,7 +185,11 @@ public class L4002 extends TradeBuffer {
 			HashMap<tmpBatx, Integer> canTempCnt = new HashMap<>();
 			// 可訂正筆數
 			HashMap<tmpBatx, Integer> canEraseCnt = new HashMap<>();
-
+			// 可刪除回復 => 刪除且未曾入過
+			boolean isDeleteRecovery = true;
+			if ("8".equals(batxStatus)) {
+				isDeleteRecovery = true;
+			}
 			for (BatxDetail tBatxDetail : lBatxDetail) {
 
 				tmpBatx grp1 = new tmpBatx();
@@ -204,13 +200,17 @@ public class L4002 extends TradeBuffer {
 				//
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(tBatxDetail.getProcNote());
-				// 可入帳
+				// 可入帳 => 檢核成功、還款來源(1~4)
 				boolean isEnterTx = false;
-				// 檢核成功、未曾訂正、還款來源(1~4)
 				if (tBatxDetail.getProcStsCode().equals("4") && tBatxDetail.getRepayCode() >= 1
 						&& tBatxDetail.getRepayCode() <= 4) {
 					isEnterTx = true;
 				}
+				// 可刪除回復 => 刪除且未曾入過
+				if (isDeleteRecovery && tempVo.get("EraseCnt") != null) {
+					isDeleteRecovery = false;
+				}
+
 				switch (tBatxDetail.getRepayCode()) {
 				case 1:
 					grp1.setAcDate(tBatxDetail.getAcDate());
@@ -577,12 +577,14 @@ public class L4002 extends TradeBuffer {
 				String labelFgC = "";
 				String labelFgD = "";
 
-				if (acDate != titaVo.getEntDyI() + 19110000 || "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))
-						|| isAllReverse) {
+				if (acDate != titaVo.getEntDyI() + 19110000
+						|| "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))) {
 				} else {
 					if (tempL4002Vo.getRankFlag() == 1) {
 						if ("8".equals(batxStatus)) {
-							labelFgA = "R";
+							if (isDeleteRecovery) {
+								labelFgA = "R";
+							}
 						} else {
 							if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
 								labelFgA = "D";

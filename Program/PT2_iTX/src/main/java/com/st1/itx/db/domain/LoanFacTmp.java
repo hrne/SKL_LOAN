@@ -23,7 +23,12 @@ import javax.persistence.Column;
 public class LoanFacTmp implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7965397412280355663L;
+
+@EmbeddedId
   private LoanFacTmpId loanFacTmpId;
 
   // 借款人戶號

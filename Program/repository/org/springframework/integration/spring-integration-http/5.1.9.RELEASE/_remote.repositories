@@ -1,5 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu May 28 14:10:57 CST 2020
+#Tue Aug 09 17:49:47 CST 2022
 spring-integration-http-5.1.9.RELEASE-sources.jar>central=
 spring-integration-http-5.1.9.RELEASE.jar>central=
+spring-integration-http-5.1.9.RELEASE-javadoc.jar>central=
 spring-integration-http-5.1.9.RELEASE.pom>central=

@@ -23,7 +23,12 @@ import javax.persistence.Column;
 public class CdLand implements Serializable {
 
 
-  // 地政所代碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1192721679498071551L;
+
+// 地政所代碼
   @Id
   @Column(name = "`LandOfficeCode`", length = 2)
   private String landOfficeCode = " ";
