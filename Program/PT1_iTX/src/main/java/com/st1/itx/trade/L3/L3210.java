@@ -87,7 +87,7 @@ public class L3210 extends TradeBuffer {
 	private int iChequeAcct;
 	private int iChequeNo;
 	private int iTempReasonCode;
-	private int iTempReasonCodeX;
+	private String iTempReasonCodeX;
 	private int iTempSourceCode;
 	private int iOverRpFacmNo;
 	private int iRpCode = 0; // 還款來源
@@ -136,7 +136,7 @@ public class L3210 extends TradeBuffer {
 		iChequeAcct = this.parse.stringToInteger(titaVo.getParam("ChequeAcct"));
 		iChequeNo = this.parse.stringToInteger(titaVo.getParam("ChequeNo"));
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
-		iTempReasonCodeX = this.parse.stringToInteger(titaVo.getParam("TempReasonCodeX"));
+		iTempReasonCodeX = titaVo.getParam("TempReasonCodeX");
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));

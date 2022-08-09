@@ -40,18 +40,15 @@ public class EbsCom extends CommBuffer {
 	@Autowired
 	private SlipEbsRecordService sSlipEbsRecordService;
 
+	private String ebsFg = "";
+	private String slipMediaUrl = "";
+	private String ebsAuth = "";
+
 	public boolean sendSlipMediaToEbs(JSONArray summaryTbl, JSONArray journalTbl, TitaVo titaVo) throws LogicException {
 		this.info("EbsCom sendSlipMediaToEbs.");
 
-		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
-
-		if (tSystemParas == null) {
-			throw new LogicException("E0001", "EbsCom,SystemParas");
-		}
-
-		String ebsFg = tSystemParas.getEbsFg();
-
-		this.info("EbsCom ebsFg = " + (ebsFg == null ? "" : ebsFg));
+		// 設定連線資訊
+		setConnection(titaVo);
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
 			// 訊息通知 SystemParas.EbsFg != Y
@@ -60,19 +57,14 @@ public class EbsCom extends CommBuffer {
 			return true;
 		}
 
-		// 取得Url
-		String slipMediaUrl = tSystemParas.getEbsUrl();
-		// 取得帳密
-		String ebsAuth = tSystemParas.getEbsAuth();
-
 		// 組合上傳資料
 		JSONObject requestJO = setEbsRequestJo(summaryTbl, journalTbl);
 
-		// 上傳及接收資料
-		String result = post(slipMediaUrl, ebsAuth, requestJO, titaVo);
+		// 交換資料並記錄交換結果
+		String result = postAndInsertRecord(requestJO, titaVo);
 
 		// 分析回傳資料
-		String returnStatus = analyzeResult(requestJO, result, titaVo);
+		String returnStatus = analyzeResult(result);
 
 		if (returnStatus != null && returnStatus.equals("S")) {
 			// 發送成功訊息
@@ -84,19 +76,21 @@ public class EbsCom extends CommBuffer {
 		}
 	}
 
-	private String analyzeResult(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
-		JSONObject outputParameters = null;
-		String returnStatus = null;
-		try {
-			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
-			returnStatus = outputParameters.getString("X_RETURN_STATUS");
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("EbsCom Exception = " + e.getMessage());
-			throw new LogicException("E9004", "EbsCom分析回傳資料時有誤");
+	private void setConnection(TitaVo titaVo) throws LogicException {
+		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
+
+		if (tSystemParas == null) {
+			throw new LogicException("E0001", "EbsCom,SystemParas");
 		}
-		return returnStatus;
+
+		ebsFg = tSystemParas.getEbsFg();
+
+		this.info("EbsCom ebsFg = " + (ebsFg == null ? "" : ebsFg));
+
+		// 取得Url
+		slipMediaUrl = tSystemParas.getEbsUrl();
+		// 取得帳密
+		ebsAuth = tSystemParas.getEbsAuth();
 	}
 
 	private JSONObject setEbsRequestJo(JSONArray summaryTbl, JSONArray journalTbl) throws LogicException {
@@ -121,10 +115,9 @@ public class EbsCom extends CommBuffer {
 		return requestJO;
 	}
 
-	private String post(String slipMediaUrl, String ebsAuth, JSONObject requestJo, TitaVo titaVo)
-			throws LogicException {
+	private String postAndInsertRecord(JSONObject requestJo, TitaVo titaVo) throws LogicException {
 		String jsonString = requestJo.toString();
-		HttpHeaders headers = setEbsHeader(ebsAuth);
+		HttpHeaders headers = setEbsHeader();
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
 		RestTemplate restTemplate = new RestTemplate();
 		String result = null;
@@ -135,8 +128,8 @@ public class EbsCom extends CommBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("EbsCom Exception = " + e.getMessage());
-			insertSlipEbsRecord(requestJo, "EbsCom上傳及接收資料時發生錯誤,Exception = " + e.getMessage(), titaVo);
-			throw new LogicException("E9004", "EbsCom上傳及接收資料時發生錯誤");
+			insertSlipEbsRecord(requestJo, "EbsCom交換資料時發生錯誤,Exception = " + e.getMessage(), titaVo);
+			throw new LogicException("E9004", "EbsCom交換資料時發生錯誤");
 		}
 		this.info("EbsCom result = " + result);
 		insertSlipEbsRecord(requestJo, result, titaVo);
@@ -144,18 +137,13 @@ public class EbsCom extends CommBuffer {
 		return result;
 	}
 
-	private HttpHeaders setEbsHeader(String ebsAuth) {
+	private HttpHeaders setEbsHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8); // 指定編碼方式
 		String[] ebsAuthArray = ebsAuth.split(":");
 		headers.setBasicAuth(ebsAuthArray[0], ebsAuthArray[1], StandardCharsets.UTF_8); // 指定帳密編碼方式
 		headers.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)); // 指定傳送/接收資料時可接受編碼方式
 		return headers;
-	}
-
-	@Override
-	public void exec() throws LogicException {
-		this.info("EbsCom exec .");
 	}
 
 	private void insertSlipEbsRecord(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
@@ -179,5 +167,25 @@ public class EbsCom extends CommBuffer {
 		} catch (DBException e1) {
 			throw new LogicException("E0001", "EbsCom,SlipEbsRecord");
 		}
+	}
+
+	private String analyzeResult(String result) throws LogicException {
+		JSONObject outputParameters = null;
+		String returnStatus = null;
+		try {
+			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
+			returnStatus = outputParameters.getString("X_RETURN_STATUS");
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("EbsCom Exception = " + e.getMessage());
+			throw new LogicException("E9004", "EbsCom分析回傳資料時有誤");
+		}
+		return returnStatus;
+	}
+
+	@Override
+	public void exec() throws LogicException {
+		// nothing
 	}
 }

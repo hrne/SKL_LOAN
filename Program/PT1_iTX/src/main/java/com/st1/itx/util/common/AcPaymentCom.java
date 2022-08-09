@@ -203,12 +203,14 @@ public class AcPaymentCom extends TradeBuffer {
 
 		switch (acDetail.getSumNo()) {
 		case "090":
-			acDetail.setAcctCode("TAV");
-			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-			// 暫收款入帳(暫收借)
-			BigDecimal excessive = addAcDetail90(acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
-			// 累溢收入帳(暫收貸)
-			acDetail.setTxAmt(excessive.subtract(acDetail.getTxAmt()));
+			if (acDetail.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+				acDetail.setAcctCode("TAV");
+				acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+				// 暫收款入帳(暫收借)
+				BigDecimal excessive = addAcDetail90(acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
+				// 累溢收入帳(暫收貸)
+				acDetail.setTxAmt(excessive.subtract(acDetail.getTxAmt()));
+			}
 
 			break;
 		case "091":

@@ -1477,8 +1477,13 @@ public class LoanCom extends TradeBuffer {
 			} else {
 				wkOverflow = wkOverflow.subtract((ac.getTxAmt()));
 			}
-
-			wkFacmNo = ac.getFacmNo();
+			int sumNo = 0;
+			if (parse.isNumeric(ac.getSumNo())) {
+				sumNo = parse.stringToInteger(ac.getSumNo());
+			}
+			if (sumNo <= 90) {
+				wkFacmNo = ac.getFacmNo();
+			}
 		}
 
 		if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
@@ -1641,7 +1646,7 @@ public class LoanCom extends TradeBuffer {
 	 * @throws LogicException ....
 	 */
 	public String getCdCodeX(String defCode, String cdCode, TitaVo titaVo) throws LogicException {
-		CdCode tCdCode = cdCodeService.findById(new CdCodeId("defCode", cdCode), titaVo);
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId(defCode, cdCode), titaVo);
 		return tCdCode == null ? "" : tCdCode.getItem();
 	}
 

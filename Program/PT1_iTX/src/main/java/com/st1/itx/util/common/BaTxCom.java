@@ -357,9 +357,10 @@ public class BaTxCom extends TradeBuffer {
 		this.txBal = iTxAmt; // 回收金額
 		this.xxBal = this.txBal; // 可償還餘額
 		// 加可抵繳至可償還餘額(費用類別不抵繳)
-		if (iRepayType <= 3 && iRepayType >= 9) {
+		if (iRepayType <= 3 || iRepayType >= 9) {
 			this.xxBal = this.xxBal.add(this.tavAmt);
 		}
+		this.info("xxBal=" + this.xxBal);
 		// STEP 5: 設定還款順序
 		// 1.還款類別、金額相同 > 2.還款類別相同 > 3:未收費用 > 4:短繳期金 > 5:應繳本利 > 6:另收欠款
 		settlePriority(iPayIntDate, iRepayType); // 還款順序
@@ -1809,7 +1810,7 @@ public class BaTxCom extends TradeBuffer {
 		if (this.overRpFacmNo == 0) {
 			this.overRpFacmNo = gettingRpFacmNo(iCustNo, titaVo);
 		}
-		this.info("overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt);
+		this.info("settleOverAmt ... overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt);
 
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(4); // 4.本期溢(+)短(-)繳

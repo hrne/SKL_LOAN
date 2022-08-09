@@ -174,17 +174,17 @@ public class BS020 extends TradeBuffer {
 		for (Map<String, String> result : resultList) {
 			// 期款款試算
 			ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
-			int custNo = parse.stringToInteger(result.get("F0"));
-			int repayType = parse.stringToInteger(result.get("F2"));
-			int repayCode = parse.stringToInteger(result.get("F3"));
+			int custNo = parse.stringToInteger(result.get("CustNo"));
+			int facmNo = parse.stringToInteger(result.get("FacmNo"));
+			int repayType = parse.stringToInteger(result.get("RepayType"));
+			int repayCode = parse.stringToInteger(result.get("RepayCode"));
 			// 銀扣檔產生只處理還款來源 02.銀行扣款
 			if ("L4450".equals(txCode) && repayCode == 0) {
 				continue;
 			}
 			TempVo tTempVo = new TempVo();
-			tTempVo.putParam("Note", repayType == 01 ? "暫收抵繳期款" : "暫收抵繳費用");
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, 0, 0, repayCode, repayType, BigDecimal.ZERO,
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, facmNo, 0, repayCode, repayType, BigDecimal.ZERO,
 						tTempVo, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
@@ -202,7 +202,8 @@ public class BS020 extends TradeBuffer {
 			if (listBaTxVo != null && listBaTxVo.size() != 0) {
 				for (BaTxVo ba : listBaTxVo) {
 					// 累溢收 > 費用
-					if (ba.getRepayType() >= 4 && baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
+					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4
+							&& baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
 						isRecvPay = true;
 					}
 					// 期款
@@ -217,9 +218,11 @@ public class BS020 extends TradeBuffer {
 				}
 			}
 			if (isTermPay) {
+				tTempVo.putParam("Note","暫收抵繳期款");
 				addDetail(custNo, 1, tTempVo, titaVo);
 			} else {
 				if (isRecvPay) {
+					tTempVo.putParam("Note", "暫收抵繳費用");
 					addDetail(custNo, 9, tTempVo, titaVo); // 其他
 				}
 			}
@@ -261,7 +264,7 @@ public class BS020 extends TradeBuffer {
 
 	}
 
-	private void addDetail(int custNo, int repayType,TempVo tTempVo, TitaVo titaVo) throws LogicException {
+	private void addDetail(int custNo, int repayType, TempVo tTempVo, TitaVo titaVo) throws LogicException {
 		tBatxDetail = new BatxDetail();
 		tBatxDetailId = new BatxDetailId();
 		tBatxDetailId.setAcDate(this.tbsdy);

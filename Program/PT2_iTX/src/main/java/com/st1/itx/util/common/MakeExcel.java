@@ -103,7 +103,7 @@ public class MakeExcel extends CommBuffer {
 
 	private int rowNum = -1;
 
-	public Sheet sheet = null;
+	private Sheet sheet = null;
 
 	/* DB服務注入 */
 	@Autowired
@@ -1866,5 +1866,9 @@ public class MakeExcel extends CommBuffer {
 		} catch (IOException e) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel) close excel ");
 		}
+	}
+
+	public int getSheetLastRowNum() {
+		return this.sheet.getLastRowNum();
 	}
 }

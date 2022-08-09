@@ -648,10 +648,8 @@ public class TxBatchCom extends TradeBuffer {
 		// 整批批號、整批明細序號
 		txTitaVo.putParam("BATCHNO", tDetail.getBatchNo());
 		txTitaVo.putParam("BATCHSEQ", parse.IntegerToString(tDetail.getDetailSeq(), 6));
-		
+
 		// 彙總傳票
-		
-		
 
 		// 交易戶號
 		String MRKEY = parse.IntegerToString(tDetail.getCustNo(), 7);
@@ -728,7 +726,7 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("RpAcctCode1", tDetail.getReconCode());
 		txTitaVo.putParam("RpAcCode1", tDetail.getRepayAcCode());
 		txTitaVo.putParam("RpCustNo1", tDetail.getCustNo());
-		txTitaVo.putParam("RpFacmNo1", repayFacmNo);
+		txTitaVo.putParam("RpFacmNo1", this.repayFacmNo);
 		txTitaVo.putParam("RpDetailSeq1", tDetail.getDetailSeq());
 		txTitaVo.putParam("RpEntryDate1", tDetail.getEntryDate());
 		txTitaVo.putParam("RpRvno1", tDetail.getRvNo());
@@ -741,25 +739,6 @@ public class TxBatchCom extends TradeBuffer {
 		// 溢繳金額
 		String overAmt = null;
 		if ("L3420".equals(txTitaVo.getTxcd()) || "L3200".equals(txTitaVo.getTxcd())) {
-			// 來源金額為零(暫收抵繳還期款)時，第一欄是暫收抵繳欄
-			if (tDetail.getRepayAmt().compareTo(BigDecimal.ZERO) > 0) {
-				i++;
-			}
-			// 暫收抵繳欄
-			String amt = null;
-			for (int j = 1; j <= 50; j++) {
-				amt = this.tTempVo.get("TmpAmt" + j);
-				if (amt == null)
-					break;
-				txTitaVo.putParam("RpCode" + i, "90");
-				txTitaVo.putParam("RpCodeX" + i, "暫收抵繳");
-				txTitaVo.putParam("RpAmt" + i, amt);
-				txTitaVo.putParam("RpFacmNo" + i, this.tTempVo.get("TmpFacmNo" + j));
-				this.info("RpAmt:" + amt);
-
-				i++;
-			}
-
 			// 本金、利息
 			txTitaVo.putParam("TimPrincipal", this.tTempVo.get("Principal"));
 			txTitaVo.putParam("TimInterest", this.tTempVo.get("Interest"));
@@ -992,7 +971,6 @@ public class TxBatchCom extends TradeBuffer {
 					l3200TitaVo.putParam("DelayInt" + i, this.l3200IntTempVo.getParam("DelayInt" + i));
 					l3200TitaVo.putParam("BreachAmt" + i, this.l3200IntTempVo.getParam("BreachAmt" + i));
 					l3200TitaVo.putParam("Total" + i, this.l3200IntTempVo.getParam("Total" + i));
-					i++;
 				}
 			}
 		}

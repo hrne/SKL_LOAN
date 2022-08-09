@@ -281,7 +281,7 @@ public class L7205 extends TradeBuffer {
 	public void setValueFromFileExcelNew(TitaVo titaVo, int YearMonth) throws LogicException {
 
 		// 取得工作表資料的最後一列
-		int lastRowNum = makeExcel.sheet.getLastRowNum() + 1;
+		int lastRowNum = makeExcel.getSheetLastRowNum() + 1;
 
 		this.info("lastRowNum=" + lastRowNum);
 
@@ -345,7 +345,7 @@ public class L7205 extends TradeBuffer {
 	public void setValueFromFileExcelOld(TitaVo titaVo, int YearMonth) throws LogicException {
 
 		// 取得工作表資料的最後一列
-		int lastRowNum = makeExcel.sheet.getLastRowNum() + 1;
+		int lastRowNum = makeExcel.getSheetLastRowNum() + 1;
 
 		this.info("lastRowNum=" + lastRowNum);
 
