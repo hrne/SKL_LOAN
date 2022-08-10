@@ -596,13 +596,12 @@ public class BaTxCom extends TradeBuffer {
 				tempVo.putParam("NextPayIntDate", this.nextPayIntDate); // 下次應繳日
 			}
 			this.extraRepay = repayAmt; // 部分還款金額
-			this.payFeeFlag = "N"; // 是否回收費用
 			// 有約定還本按約定設定
 			if (tempVo.get("IncludeIntFlag)") != null) {
-				this.includeIntFlag = tempVo.getParam("IncludeIntFlag"); // 是否內含利息
-				this.includeFeeFlag = tempVo.getParam("IncludeIntFlag"); // 是否內含費用
-				this.unpaidIntFlag = tempVo.getParam("UnpaidIntFlag");// 利息是否可欠繳
-				this.payMethod = tempVo.getParam("PayMethod");// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
+				this.includeIntFlag = tempVo.getParam("IncludeIntFlag"); // 是否內含利息 default=N
+				this.includeFeeFlag = tempVo.getParam("IncludeIntFlag"); // 是否內含費用 default=N
+				this.unpaidIntFlag = tempVo.getParam("UnpaidIntFlag");// 利息是否可欠繳 default=Y
+				this.payMethod = tempVo.getParam("PayMethod");// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數 default=1
 				// 是否內含費用
 				if ("Y".equals(this.includeFeeFlag)) {
 					this.extraRepay = this.extraRepay.subtract(this.totalFee);
@@ -731,7 +730,7 @@ public class BaTxCom extends TradeBuffer {
 		addByBormNoBaTxList();
 
 		// 計算作帳金額(檢核報表)
-		settleAcAmtBatxList(iTxAmt);
+		settleAcAmtBatxList(iRepayType, iTxAmt, this.shortAmt);
 
 		this.info("TempVo=" + tempVo.toString());
 
@@ -1455,7 +1454,8 @@ public class BaTxCom extends TradeBuffer {
 			this.ovduDays = dDateUtil.getDays();
 		}
 
-		if (this.baTxList != null && this.baTxList.size() > 0) {
+		// 期款依應繳日排序
+		if (iRepayType == 1 && this.baTxList != null && this.baTxList.size() > 0) {
 			this.baTxList.sort((c1, c2) -> {
 				return c1.compareTo(c2);
 			});
@@ -1879,13 +1879,44 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	// 計算作帳金額(檢核報表)
-	private void settleAcAmtBatxList(BigDecimal iTxAmt) {
-		// 計算金額
+	private void settleAcAmtBatxList(int iRepayType, BigDecimal iTxAmt, BigDecimal iShortAmt) {
+		// 計算短繳金額，期款在計算可回收時已計算
+		// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息，期款部分已計算
+		if (iRepayType == 2) {
+			BigDecimal wkUnpaidAmtRemaind = iShortAmt;
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 1 && ba.getRepayType() <= 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					if (wkUnpaidAmtRemaind.compareTo(ba.getInterest()) > 0) {
+						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(ba.getInterest());
+						ba.setUnpaidInt(ba.getInterest());
+					} else {
+						ba.setUnpaidInt(wkUnpaidAmtRemaind);
+						wkUnpaidAmtRemaind = BigDecimal.ZERO;
+					}
+					this.info(" 2-1 UnpaidInt=" + ba.getUnpaidInt() + ", wkUnpaidAmtRemaind =" + wkUnpaidAmtRemaind);
+				}
+			}
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+					if (wkUnpaidAmtRemaind.compareTo(ba.getInterest()) > 0) {
+						wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(ba.getInterest());
+						ba.setUnpaidInt(ba.getInterest());
+					} else {
+						ba.setUnpaidInt(wkUnpaidAmtRemaind);
+						wkUnpaidAmtRemaind = BigDecimal.ZERO;
+					}
+					this.info(" 2-2 UnpaidInt=" + ba.getUnpaidInt() + ", wkUnpaidAmtRemaind =" + wkUnpaidAmtRemaind);
+				}
+			}
+		}
+
+	    // 計算作帳金額
 		BigDecimal wkTxBal = iTxAmt;
 		BigDecimal wkOverBal = BigDecimal.ZERO;
 		BigDecimal wkTempBal = BigDecimal.ZERO;
 		BigDecimal wkAcBal = BigDecimal.ZERO;
 		BigDecimal wkRepayLoan = BigDecimal.ZERO;
+
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 3) {
 				// 計算暫收抵繳
@@ -1908,6 +1939,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 			this.info("settleAcAmt= " + ba.toString());
 		}
+
 		BigDecimal wkDiff = wkTxBal.add(wkTempBal).subtract(wkAcBal).subtract(wkOverBal);
 		this.info("settleAcAmt" + ", wkTxBal=" + wkTxBal + ", wkTempBal=" + wkTempBal + ", wkAcBal=" + wkAcBal
 				+ ", wkOverBal=" + wkOverBal + ", diff=" + wkDiff);
@@ -1941,11 +1973,11 @@ public class BaTxCom extends TradeBuffer {
 						da.setShortFallCloseBreach(ba.getCloseBreachAmt());
 						da.setAcAmt(da.getAcAmt().add(ba.getAcAmt()));
 						ba.setAcAmt(BigDecimal.ZERO);
-						break;
 					}
 				}
 			}
 		}
+
 		// 另收清償違約金=>放在償還本利那筆
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 6 && ba.getRepayType() <= 3 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -2008,7 +2040,14 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-
+		// 無作帳金額
+		for (BaTxVo ba : this.baTxList) {
+			if (ba.getRepayType() >= 1 && ba.getAcAmt().compareTo(BigDecimal.ZERO) == 0) {
+				acSeq++;
+				ba.setAcSeq(acSeq);
+			}
+		}
+	
 		this.info("settleAcAmt end" + ", wkTxBal=" + wkTxBal + ", wkTempBal=" + wkTempBal + ", wkOverBal=" + wkOverBal);
 
 	}

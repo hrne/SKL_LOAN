@@ -15,6 +15,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD003ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component
@@ -26,10 +27,10 @@ public class LD003Report extends MakeReport {
 	@Autowired
 	// 在Spring管理的Bean，能夠找到，可允許找不到時設定為null，也可以指定required=fails
 	LD003ServiceImpl lD003ServiceImpl;
- 
+
 	@Autowired
 	DateUtil dateUtil;
- 
+
 	// 自訂明細標題
 	@Override
 	public void printHeader() {
@@ -66,10 +67,13 @@ public class LD003Report extends MakeReport {
 
 	public void exportResult(TitaVo titaVo, List<Map<String, String>> LD003List) throws LogicException {
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD003", "放款明細餘額總表(日)", "機密", "A4", "P");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("LD003").setRptItem("放款明細餘額總表(日)").setSecurity("機密").setRptSize("A4")
+				.setPageOrientation("P").build();
+
+		this.open(titaVo, reportVo);
 
 		this.print(1, 1, "");
-
 
 		int i = 0;
 
@@ -194,7 +198,7 @@ public class LD003Report extends MakeReport {
 
 			this.print(-51, 83, df1.format(totalSC.add(totalMC).add(totalLC).add(totalTC)), "R");
 			this.print(-51, 115, df1.format(totalSA.add(totalMA).add(totalLA).add(totalTA)), "R");
-			
+
 			this.print(-53, 0, ""); // 把 cursor 移動到最後一行以後，避免簽核歪掉
 
 		} else {
@@ -203,7 +207,7 @@ public class LD003Report extends MakeReport {
 
 		this.close();
 
-		//this.toPdf(sno);
-		
+		// this.toPdf(sno);
+
 	}
 }

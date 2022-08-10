@@ -120,6 +120,9 @@ T(F,@UsExtraRepay,1)
 SHOW(#RepayType,#TwCloseBreachAmt)
 INVOKEJS(SHOW,p1,9,20,1)
 INVOKEJS(SHOW,p1,13,19,0)
+##loop{times:20,l:0,n:1,m:2}
+C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+##end
 
 <include src="COM.icf::TITLE-RUN.pre"/>
 </sub>
@@ -243,6 +246,7 @@ T(HELP,@RepayTypeHelp,#RepayTypeHelp,+,01;02;10;12)
 T(3,Y:是;N:否)
 
 #InitA=X,1,S
+INVOKEJS(SHOW,p2,0)
 T(3,@FdEntryDate,*)
 T(3,@FdPayMethod,)
 T(3,@FdRepayType,*)
@@ -529,7 +533,7 @@ T(H,#RepayType,#RepayTypeHelp)
 
 #RepayTypeMsgErr=X,1,S
 C(3,#L492aRepayType,3,V(P,[已入帳未還款查詢]，還款類別請勿選擇[結案]),$)
-IF(#L492aRepayType >= 0 &&#L492aRepayType <= 2 ,$,V(P,還款類別選擇錯誤))
+! IF(#L492aRepayType >= 0 &&#L492aRepayType <= 2 ,$,V(P,還款類別選擇錯誤))
 
 !V(P,請按[已入帳未還款查詢]，選擇回收資料)
 
@@ -940,6 +944,7 @@ CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
 CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
 T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 ##loop{times:20,l:0,n:1,m:2}
+IF({n}==1,C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1)),$)
 C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 T(2,@FacmBormNo{n},#L3r06FacmNo{n}+-+#L3r06BormNo{n})
 T(2,@IntStartDate{n},#L3r06IntStartDate{n})
@@ -951,6 +956,22 @@ E(0,@DelayInt{n},#L3r06DelayInt{n})
 E(0,@BreachAmt{n},#L3r06BreachAmt{n})
 E(0,@Total{n},#L3r06Total{n})
 ##end
+
+!----------------額度撥款試算表----------------
+
+##loop{times:20,l:0,n:1,m:2}
+#FacmBormNo{n}=X,7,L
+#IntStartDate{n}=D,7,L
+#IntEndDate{n}=D,7,L
+#IntSEDate{n}=X,20,L
+#Principal{n}=+m,14,L
+#Interest{n}=+m,14,L
+#DelayInt{n}=+m,14,L
+#BreachAmt{n}=+m,14,L
+#Total{n}=+m,14,L
+
+##end
+!---------------------------------------------
 
 
 !還款類別為[02.部分償還]且[是否內含費用]為[Y.是]時加費用
@@ -1392,25 +1413,9 @@ E(0,@RP_TMPFACMNO,#L3r06tmpFacmNo)
 T(2,@RP_TMPFACMNOX,#L3r06tmpFacmNoX)
 T(2,@RP_TXCD,#TXCD)
 
-
 !類別   摘要
 #TmpNote=X,1,S
 T(2,@RP_NOTE,#DetailNote)
-!----------------額度撥款試算表----------------
-
-##loop{times:20,l:0,n:1,m:2}
-#FacmBormNo{n}=X,7,L
-#IntStartDate{n}=D,7,L
-#IntEndDate{n}=D,7,L
-#IntSEDate{n}=X,20,L
-#Principal{n}=+m,14.2,L
-#Interest{n}=+m,14.2,L
-#DelayInt{n}=+m,14.2,L
-#BreachAmt{n}=+m,14.2,L
-#Total{n}=+m,14.2,L
-
-##end
-
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

@@ -192,7 +192,7 @@ public class AcReceivableCom extends TradeBuffer {
 
 				// TMI 暫收款－火險保費 F09 暫付款－火險保費 F25 催收款項－火險費用
 				// 收款不含L618B 火險保費催收作業
-				if (!titaVo.getTxcd().equals("L618B") && ac.getDbCr().equals("C")) {
+				if (!titaVo.getTxcd().equals("L618B")) {
 					if (ac.getAcctCode().equals("TMI") || ac.getAcctCode().equals("F09")
 							|| ac.getAcctCode().equals("F25")) {
 						updInsuRenew(AcHCode, bizTbsdy, ac);
@@ -202,7 +202,7 @@ public class AcReceivableCom extends TradeBuffer {
 				// 更新法務費檔 AcDate
 				// F07 暫付法務費 F24 催收款項－法務費用
 				// 收款不含L618C 法務費轉列催收作業
-				if (!titaVo.getTxcd().equals("L618C") && ac.getDbCr().equals("C")) {
+				if (!titaVo.getTxcd().equals("L618C")) {
 					if (ac.getAcctCode().equals("F07") || ac.getAcctCode().equals("F24")) {
 						updForeclosureFee(AcHCode, bizTbsdy, ac);
 

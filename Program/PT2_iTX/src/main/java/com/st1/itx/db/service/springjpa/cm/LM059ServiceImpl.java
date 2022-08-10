@@ -32,9 +32,9 @@ public class LM059ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * 
+	 * @param ilYearMonth 上西元年月
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth,int ilYearMonth) throws Exception {
 
 		
 
@@ -59,7 +59,7 @@ public class LM059ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 ,0 AS \"LoanBalance\"";
 		sql += "                 ,\"LegalLoss\" AS \"TdbBal\"";
 		sql += "           FROM \"MonthlyLM052Loss\" ";
-		sql += "           WHERE \"YearMonth\" = :yymm";
+		sql += "           WHERE \"YearMonth\" = :lyymm";
 //		sql += "           UNION ALL";
 //		sql += "           SELECT 1 AS \"Group\"";
 //		sql += "                 ,0 AS \"LoanBalance\"";
@@ -75,6 +75,7 @@ public class LM059ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", iYearMonth);
+		query.setParameter("lyymm", ilYearMonth);
 
 		return this.convertToMap(query);
 	}

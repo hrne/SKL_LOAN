@@ -15,6 +15,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD004ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.ConvertUpMoney;
 import com.st1.itx.util.format.StringCut;
 
@@ -25,9 +26,6 @@ public class LD004Report extends MakeReport {
 
 	@Autowired
 	LD004ServiceImpl lD004ServiceImpl;
-
-	@Autowired
-	MakeReport makeReport;
 
 	// 自訂表頭
 	@Override
@@ -45,29 +43,32 @@ public class LD004Report extends MakeReport {
 		// 讀取VAR參數
 		this.setFontSize(16);
 		this.setCharSpaces(0);
-		List<Map<String, String>> LD004List = null;
+		List<Map<String, String>> listLD004 = null;
 		try {
-			LD004List = lD004ServiceImpl.findAll(titaVo);
+			listLD004 = lD004ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			this.info("lD004ServiceImpl.findAll error = " + e.toString());
 			return false;
 		}
-		makeReport(titaVo, LD004List);
+		makeReport(titaVo, listLD004);
 
 		return true;
 	}
 
-	public void makeReport(TitaVo titaVo, List<Map<String, String>> LD004List) throws LogicException {
+	public void makeReport(TitaVo titaVo, List<Map<String, String>> listLD004) throws LogicException {
 
 		String formName = "1".equals(titaVo.getParam("inputOption")) ? "還本收據" : "繳息收據";
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD004", "企金戶還本收據及繳息收據(" + formName + ")", "", "A4",
-				"L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("LD004").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
 
-		if (LD004List != null && !LD004List.isEmpty()) {
+		this.open(titaVo, reportVo);
+
+		if (listLD004 != null && !listLD004.isEmpty()) {
 
 			Boolean firstPage = true;
-			for (Map<String, String> LD4Vo : LD004List) {
+			for (Map<String, String> rowLD004 : listLD004) {
 
 				if (firstPage) {
 					newPage();
@@ -79,15 +80,15 @@ public class LD004Report extends MakeReport {
 				 * F0 = 傳票號碼 F1 = 登錄交易序號 F2 = 科目代號 F3 = 業務科目名稱 F4 = 彙總別 F5 = 入帳日期 F6 = 戶號 F7 =
 				 * 額度編號 F8 = 撥款序號 F9 = 戶名/公司名稱 F10 = 記帳金額 F11 = 計息起日 F12 = 計息迄日
 				 */
-				String txtNo = LD4Vo.get("F2").substring(0, 1);
+				String txtNo = rowLD004.get("F2").substring(0, 1);
 
-				this.info("EntryDate ... = " + LD4Vo.get("F5"));
-				this.info("IntStartDate ... = " + LD4Vo.get("F11"));
-				this.info("IntEndDate ... = " + LD4Vo.get("F12"));
+				this.info("EntryDate ... = " + rowLD004.get("F5"));
+				this.info("IntStartDate ... = " + rowLD004.get("F11"));
+				this.info("IntEndDate ... = " + rowLD004.get("F12"));
 
 				this.print(1, 33, "新光人壽保險股份有限公司");
 				this.print(1, 2, "傳票號碼　.....　");
-				this.print(0, 19, LD4Vo.get("F0"), "L");
+				this.print(0, 19, rowLD004.get("F0"), "L");
 
 				if (titaVo.getParam("inputOption").equals("1")) {
 					this.print(0, 41, "還本收據");
@@ -96,11 +97,11 @@ public class LD004Report extends MakeReport {
 				}
 
 				this.print(1, 2, "交易序號　.....　");
-				this.print(0, 26, padStart(LD4Vo.get("F1").toString(), 7, "0"), "R");
+				this.print(0, 26, padStart(rowLD004.get("F1").toString(), 7, "0"), "R");
 
 				this.print(0, 56, "科目：　");
-				this.print(0, 64, LD4Vo.get("F2"));
-				this.print(1, 40, showDate(LD4Vo.get("F14").toString(), 1));
+				this.print(0, 64, rowLD004.get("F2"));
+				this.print(1, 40, showDate(rowLD004.get("F14").toString(), 1));
 
 				// 輸出用的業務科目中文名稱要做 wrap
 				// 此外, 如果前面沒有相關關鍵字, 加上標註
@@ -110,7 +111,7 @@ public class LD004Report extends MakeReport {
 				// 如果未來有需求, 再修改這部分
 				// xiangwei 20211027
 
-				String acChineseName = LD4Vo.get("F3");
+				String acChineseName = rowLD004.get("F3");
 				String prefix = "1".equals(txtNo) ? "擔保放款－" : "利息收入－";
 
 				if (!acChineseName.contains(prefix)) {
@@ -134,30 +135,30 @@ public class LD004Report extends MakeReport {
 
 				this.print(1, 1, "┌──────────┬──────────────────┬─────────┐");
 				this.print(1, 1, "│　　　　子目　　　　│　　摘（　　　　　　入帳）要　　　　│　　　 金額 　　　│");
-				this.print(0, 39, showDate(LD4Vo.get("F5").toString(), 1), "C");
+				this.print(0, 39, showDate(rowLD004.get("F5").toString(), 1), "C");
 				this.print(1, 1, "├──────────┼──────────────────┼─────────┤");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-				if (!LD4Vo.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) // 20210916 從現有樣張上推測
+				if (!rowLD004.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) // 20210916 從現有樣張上推測
 																									// 還本收據不出此字樣
 				{
 					this.print(0, 55, "非支票");
 				}
 				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 13, LD4Vo.get("F15"), "C");
+				this.print(0, 13, rowLD004.get("F15"), "C");
 				this.print(0, 34,
-						padStart(LD4Vo.get("F6").toString(), 7, "0") + "-"
-								+ padStart(LD4Vo.get("F7").toString(), 3, "0") + "-"
-								+ padStart(LD4Vo.get("F8").toString(), 3, "0"));
+						padStart(rowLD004.get("F6").toString(), 7, "0") + "-"
+								+ padStart(rowLD004.get("F7").toString(), 3, "0") + "-"
+								+ padStart(rowLD004.get("F8").toString(), 3, "0"));
 
 				this.print(0, 63, "$");
 
-				BigDecimal f10 = new BigDecimal(LD4Vo.get("F10").toString());
+				BigDecimal f10 = new BigDecimal(rowLD004.get("F10").toString());
 				DecimalFormat df1 = new DecimalFormat("#,##0");
 				this.print(0, 80, df1.format(f10), "R");
 
 				// 戶名固定做wrap
 
-				ArrayList<String> custNameWrap = longStringWrap(LD4Vo.get("F9"), 20);
+				ArrayList<String> custNameWrap = longStringWrap(rowLD004.get("F9"), 20);
 
 				this.print(1, 1, "│　　　　　　　　　　│　戶名：　　　　　　　　　　　　　　│　　　　　　　　　│");
 				if (custNameWrap.size() >= 1) {
@@ -176,14 +177,14 @@ public class LD004Report extends MakeReport {
 
 				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 37,
-						showDate(LD4Vo.get("F11").toString(), 1) + " - " + showDate(LD4Vo.get("F12").toString(), 1));
+						showDate(rowLD004.get("F11").toString(), 1) + " - " + showDate(rowLD004.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");
-				this.print(1, 52, "新台幣　" + ConvertUpMoney.toChinese(LD4Vo.get("F10")), "R");
-				String tmp = LD4Vo.get("F13");
+				this.print(1, 52, "新台幣　" + ConvertUpMoney.toChinese(rowLD004.get("F10")), "R");
+				String tmp = rowLD004.get("F13");
 				String TLRNO = titaVo.getParam("TLRNO");
-				if (LD4Vo.get("F13") == null || LD4Vo.get("F13") == "") {
+				if (rowLD004.get("F13") == null || rowLD004.get("F13") == "") {
 					tmp = TLRNO;
 				}
 				this.print(0, 66, "製票：　" + tmp);

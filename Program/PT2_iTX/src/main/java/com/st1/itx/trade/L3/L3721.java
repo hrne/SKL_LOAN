@@ -28,6 +28,7 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -70,6 +71,8 @@ public class L3721 extends TradeBuffer {
 	public DateUtil dateUtil;
 	@Autowired
 	DataLog datalog;
+	@Autowired
+	SendRsp sendRsp;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -150,6 +153,7 @@ public class L3721 extends TradeBuffer {
 			iIndividualIncr = BigDecimal.ZERO;
 			iRateIncr = BigDecimal.ZERO;
 		}
+
 		// 指標利率
 		else {
 			// 輸入加碼利率
@@ -181,6 +185,16 @@ public class L3721 extends TradeBuffer {
 		iRemark = titaVo.getParam("Remark");
 		iNextRateAdjDate = this.parse.stringToInteger(titaVo.getParam("NextRateAdjDate2")); // 下次利率調整日
 		iDeleteFg = titaVo.getParam("DeleteFg"); // 是否刪除 Y/N
+		
+		//刪除為1段式需主管刷卡
+		if ("Y".equals(iDeleteFg)) {
+			titaVo.putParam("RELCD", "0");
+			titaVo.putParam("ACTFG", "0");
+			// 交易需主管核可
+			if (!titaVo.getHsupCode().equals("1")) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+		}
 
 		// 登錄
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
@@ -324,7 +338,6 @@ public class L3721 extends TradeBuffer {
 				this.addList(this.totaVo);
 			} else {
 				try {
-
 					batxRateChangeService.delete(tBatxRateChange, titaVo);
 				} catch (DBException f) {
 					throw new LogicException(titaVo, "E0007", "整批利率調整檔"); // 更新資料時，發生錯誤

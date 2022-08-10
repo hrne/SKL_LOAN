@@ -631,7 +631,7 @@ T(F,#ProdNo2,0)
 T(F,#BaseRateCode2,0)
 T(F,#FitRate2,0)
 T(F,#RateIncr2,0)
-T(F,#NextRateAdjDate2,0)
+T(F,#NextRateAdjDate2,1)
 
 ![生效日期]
 !必須輸入
@@ -847,12 +847,12 @@ C(5,#effFg,Y,IF(#BaseRateCode2<99,$,S),S)
 #FdNextRateAdjDate2=X,2,L
 
 #NextRateAdjDate2=D,7,I
-C(5,#DeleteFg,Y,s,$)
 C(4,#EffectDate2,S,$)
 C(3,#RateCode2,1,C(3,#BaseRateCode2,99,$,S),$)
 C(3,#RateCode2,2,S,$)
 @A(DATE,0,#NextRateAdjDate2)
-IF(#NextRateAdjDate2<=#EffectDate2,V(P,下次利率調整日不可小於等於生效日期),$)
+C(5,#DeleteFg,Y,IF(#NextRateAdjDate2<#SYSDATE,V(P,下次利率調整日不可小於日曆日),$),IF(#NextRateAdjDate2<=#EffectDate2,V(P,下次利率調整日不可小於等於生效日期),$))
+
 
 
 

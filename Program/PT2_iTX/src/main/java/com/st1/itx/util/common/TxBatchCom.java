@@ -1872,7 +1872,7 @@ public class TxBatchCom extends TradeBuffer {
 				if (baTxVo.getDataKind() == 2) {
 					this.loanBal = loanBal.add(baTxVo.getLoanBal());
 					// 應繳本利
-					if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+					if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy() || baTxVo.getRepayType() >= 2) {
 						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt());
 						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
 					}
@@ -1894,7 +1894,7 @@ public class TxBatchCom extends TradeBuffer {
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			int i = 0;
 			for (BaTxVo baTxVo : baTxList) {
-				if (baTxVo.getDataKind() == 1) {
+				if (baTxVo.getDataKind() == 1 && baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					// 應繳費用 = 1.應收費用+未收費用
 					// +短繳期金
 					// 全部應繳
@@ -1911,27 +1911,25 @@ public class TxBatchCom extends TradeBuffer {
 						// 短繳清償違約金(提前償還有即時清償違約金時寫入)
 						this.shortCloseBreach = this.shortCloseBreach.add(baTxVo.getCloseBreachAmt());
 					}
-					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-						switch (baTxVo.getRepayType()) {
-						case 4: // 04-帳管費
-							this.acctFee = this.acctFee.add(baTxVo.getAcctAmt());
-							break;
-						case 5: // 05-火險費
-							this.fireFee = this.fireFee.add(baTxVo.getAcctAmt());
-							if (this.fireFeeDate == 0 || baTxVo.getPayIntDate() < this.fireFeeDate) {
-								this.fireFeeDate = baTxVo.getPayIntDate();
-							}
-							break;
-						case 6: // 06-契變手續費
-							this.modifyFee = this.modifyFee.add(baTxVo.getAcctAmt());
-							break;
-						case 7: // 07-法務費
-							this.unPayFee = this.unPayFee.add(baTxVo.getUnPaidAmt());
-							this.lawFee = this.lawFee.add(baTxVo.getAcctAmt());
-							break;
-						default:
-							break;
+					switch (baTxVo.getRepayType()) {
+					case 4: // 04-帳管費
+						this.acctFee = this.acctFee.add(baTxVo.getAcctAmt());
+						break;
+					case 5: // 05-火險費
+						this.fireFee = this.fireFee.add(baTxVo.getAcctAmt());
+						if (this.fireFeeDate == 0 || baTxVo.getPayIntDate() < this.fireFeeDate) {
+							this.fireFeeDate = baTxVo.getPayIntDate();
 						}
+						break;
+					case 6: // 06-契變手續費
+						this.modifyFee = this.modifyFee.add(baTxVo.getAcctAmt());
+						break;
+					case 7: // 07-法務費
+						this.unPayFee = this.unPayFee.add(baTxVo.getUnPaidAmt());
+						this.lawFee = this.lawFee.add(baTxVo.getAcctAmt());
+						break;
+					default:
+						break;
 					}
 					// 未收還款類別費用、回收還款類別費用
 					if (baTxVo.getRepayType() == this.repayType) {

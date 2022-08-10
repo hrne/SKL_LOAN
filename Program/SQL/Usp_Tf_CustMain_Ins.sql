@@ -37,15 +37,15 @@ BEGIN
                                           AS "CustName"            -- 戶名/公司名稱 NVARCHAR2 100 
           ,CUSP."CUSBDT"                  AS "Birthday"            -- 出生年月日/設立日期 decimald 8 
           ,CASE
-             WHEN TRIM(CUSP."CUSSEX") IN ('1','2') THEN TRIM(CUSP."CUSSEX")
-             WHEN TRIM(CUSP."CUSSEX") IN ('0','6') THEN '0'
-           ELSE CASE
-                  WHEN LENGTHB(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')) = 10
-                       AND SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),0,1) IN ('1','2')
-                  THEN SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),0,1)
-                ELSE '0'
-                END
-           END                            AS "Sex"                 -- 性別 VARCHAR2 1 
+             -- 2022-08-10 from Linda & SKL 珮琪 
+             -- 都是個人戶怎麼會有沒性別的時候，資料轉換應該要清理資料
+             WHEN TRIM(CUSP."CUSSEX") IN ('1','2')
+             THEN TRIM(CUSP."CUSSEX")
+             WHEN LENGTHB(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')) = 10
+                  AND SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),2,1) IN ('1','2')
+             THEN SUBSTR(REPLACE(TRIM(CUSP."CUSID1"),CHR(26),''),2,1)
+           ELSE '0'
+           END                           AS "Sex"                 -- 性別 VARCHAR2 1 
           ,CASE
              WHEN TRIM(CUSP."CUSECD") IN ('@','0','8','A','B','C','D','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y')
              THEN '00'
@@ -55,7 +55,15 @@ BEGIN
              THEN '01'
            ELSE TRIM(CUSP."CUSECD") END
                                           AS "CustTypeCode"        -- 客戶別 VARCHAR2 2 
-          ,LPAD(CUSP."CUSOCD",6,'0')      AS "IndustryCode"        -- 行業別 VARCHAR2 6 -- 2021-07-22修改: 位數不足6碼者，前補零
+          ,CASE
+             -- 2022-08-10 from Linda & SKL 珮琪 
+             -- 職業類別:資料轉換經過清理後，會有自然人不是060000？如果不會為什麼不是直接取客戶檔的職業類別
+             WHEN NVL(ENPP."ENPUSE",' ') = 'Y' -- 在企金自然人檔有值者，且啟用記號為Y者，為企金自然人
+             THEN '060000'
+             WHEN TRIM(CUSP."CUSENT") IN ('0','2')
+             THEN '060000'
+           ELSE LPAD(CUSP."CUSOCD",6,'0')
+           END                            AS "IndustryCode"        -- 行業別 VARCHAR2 6 -- 2021-07-22修改: 位數不足6碼者，前補零
           -- 2022-01-19 智偉一併修改:null時擺TW,有請清河確認此邏輯是否正確
           ,NVL(CUAP."CUSNAT",'TW')        AS "NationalityCode"     -- 自然人:出生地國籍 / 法人:註冊地國籍 VARCHAR2 2 
           -- 2022-01-19 新壽IT清河:目前轉入客戶主檔(CustMain)的居住地國籍是空的，因該欄位為新增欄位且必填，轉換時直接將該欄位寫入TW(中華民國)，謝謝。

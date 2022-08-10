@@ -2,6 +2,7 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -244,6 +245,7 @@ public class L3200 extends TradeBuffer {
 	private BigDecimal wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
 	private BigDecimal wkTotalShortAmtLimit = BigDecimal.ZERO; // 總短繳限額
 	private BigDecimal wkShortfall = BigDecimal.ZERO; // 累短繳金額
+	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
 	private String checkMsg = "";
 	private AcReceivable tAcReceivable = new AcReceivable();
 	private AcDetail acDetail;
@@ -318,7 +320,6 @@ public class L3200 extends TradeBuffer {
 		iShortfallPrin = this.parse.stringToBigDecimal(titaVo.getParam("TimShortfallPrin"));
 		iShortfallInt = this.parse.stringToBigDecimal(titaVo.getParam("TimShortfallInt"));
 		iShortCloseBreach = this.parse.stringToBigDecimal(titaVo.getParam("TimShortCloseBreach"));
-		//
 		iPayMethod = this.parse.stringToInteger(titaVo.getParam("PayMethod"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
@@ -397,6 +398,11 @@ public class L3200 extends TradeBuffer {
 				batxSettleUnpaid();
 			}
 		}
+		// put Batch Tita
+		if (titaVo.isHcodeNormal() && titaVo.isTrmtypBatch()) {
+			putBatchTita();
+		}
+
 		// 兌現票入帳處理
 		loanChequeRoutine();
 
@@ -1906,7 +1912,7 @@ public class L3200 extends TradeBuffer {
 					}
 				}
 			}
-			
+
 			// 是否回收費用
 			if ("Y".equals(iPayFeeFlag)) {
 				// 收回費用處理(新增帳務及放款交易內容檔)
@@ -2083,6 +2089,30 @@ public class L3200 extends TradeBuffer {
 		}
 		this.info("isCalcFacmNo END " + facmNo + " " + isCalcFacmNo);
 		return isCalcFacmNo;
+	}
+
+	// put Batch Tita
+	private void putBatchTita() throws LogicException {
+
+		titaVo.put("TwPrincipal", df.format(titaVo.getParam("TimPrincipal"))); // 本金
+		titaVo.put("TwInterest", df.format(titaVo.getParam("TimInterest")));// 利息
+		titaVo.put("TwDelayInt", df.format(titaVo.getParam("TimDelayInt")));// 延遲息
+		titaVo.put("TwBreachAmt", df.format(titaVo.getParam("TimBreachAmt")));// 違約金
+		titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
+		titaVo.put("ShortfallXX",
+				"[利息；" + df.format(titaVo.getParam("TimShortfallInt")) + "本金；"
+						+ df.format(titaVo.getParam("TimShortfallPrin")) + "違約金；"
+						+ df.format(titaVo.getParam("TimShortCloseBreach")) + "]");// 累短收
+		titaVo.put("TwAcctFee", df.format(titaVo.getParam("TimAcctFee")));// 帳管費
+		titaVo.put("TwModifyFee", df.format(titaVo.getParam("TimModifyFee")));// 契變手續費
+		titaVo.put("TwFireFee", df.format(titaVo.getParam("TimFireFee")));// 火險費
+		titaVo.put("TwLawFee", df.format(titaVo.getParam("TimLawFee")));// 法務費
+		titaVo.put("ExcessiveXX", df.format(baTxCom.getExcessive()) + "(全戶；"
+				+ df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())) + ")");// 累溢收(本戶)
+		titaVo.put("TwExtraCloseBreachAmt", df.format(baTxCom.getShortCloseBreach()));// 清償違約金
+		titaVo.put("BreachCodeX", "");// 清償違約金
+		titaVo.put("TwReduceAmt", "0");// 減免金額
+
 	}
 
 }

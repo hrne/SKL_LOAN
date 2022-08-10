@@ -16,6 +16,7 @@ import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -33,20 +34,7 @@ public class L9131Report extends MakeReport {
 	@Autowired
 	CdAcCodeService sCdAcCodeService;
 
-	// ReportDate : 報表日期(帳務日)
-	// ReportCode : 報表編號
-	// ReportItem : 報表名稱
-	// Security : 報表機密等級(中文敍述)
-	// PageSize : 紙張大小;
-	// PageOrientation : 紙張方向
-	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
-	private int reportDate = 0;
-	private String brno = "";
-	private String reportCode = "L9131";
-	private String reportItem = "總帳日結單代傳票列印";
-	private String security = "機密";
-	private String pageSize = "A4";
-	private String pageOrientation = "L";
+	private ReportVo reportVo;
 
 	// 帳冊別
 	private String nowAcBookCode = "000";
@@ -70,15 +58,15 @@ public class L9131Report extends MakeReport {
 
 		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
-		this.print(-2, 2, "報　表：" + this.reportCode);
-		this.print(-2, 85, this.reportItem, "C");
+		this.print(-1, 145, "機密等級：" + reportVo.getSecurity());
+		this.print(-2, 2, "報　表：" + reportVo.getRptCode());
+		this.print(-2, 85, reportVo.getRptItem(), "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 2, "來源別：放款服務課");
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 2, "帳冊別：");
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
-		this.print(-4, 85, "傳 票 日 期：" + showRocDate(this.reportDate), "C");
+		this.print(-4, 85, "傳 票 日 期：" + showRocDate(reportVo.getRptDate()), "C");
 		this.print(-5, 2, "區隔帳冊：");
 		// 頁首帳冊別判斷
 		print(-4, 10, this.nowAcBookCode);
@@ -113,15 +101,22 @@ public class L9131Report extends MakeReport {
 		this.print(-44, 1, "　　　　　　　　　　理　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　協理　　　　經理　　　　經辦");
 	}
 
+	private void setReportVo() throws LogicException {
+		this.reportVo = ReportVo.builder().setRptDate(Integer.valueOf(titaVo.getParam("AcDate")) + 19110000)
+				.setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印").setSecurity("機密")
+				.setRptSize("A4").setPageOrientation("L").build();
+	}
+
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9131Report exec ...");
 
+		// setting titaVo
+		this.titaVo = titaVo;
+
+		setReportVo();
+
 		// 設定字體1:標楷體 字體大小12
 		this.setFont(1, 12);
-
-		this.reportDate = Integer.valueOf(titaVo.getParam("AcDate")) + 19110000;
-
-		this.brno = titaVo.getBrno();
 
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
@@ -132,13 +127,13 @@ public class L9131Report extends MakeReport {
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(this.reportDate, iBatchNo, iMediaSeq,
-				"Y", 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(reportVo.getRptDate(), iBatchNo,
+				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 		List<SlipMedia2022> lSlipMedia2022 = sSlipMedia2022 == null ? null : sSlipMedia2022.getContent();
 
 		if (lSlipMedia2022 == null || lSlipMedia2022.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			this.open(titaVo, reportVo);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
@@ -163,8 +158,9 @@ public class L9131Report extends MakeReport {
 
 		int thisMediaSeq = tFirstSlipMedia2022.getMediaSeq();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem + "_" + FormatUtil.pad9("" + thisMediaSeq, 3),
-				security, pageSize, pageOrientation);
+		reportVo.setRptItem(reportVo.getRptItem() + "_" + FormatUtil.pad9("" + thisMediaSeq, 3));
+
+		this.open(titaVo, reportVo);
 
 		this.setCharSpaces(0);
 

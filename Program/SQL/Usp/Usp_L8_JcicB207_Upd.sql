@@ -62,7 +62,7 @@ BEGIN
     SELECT DISTINCT
            B."CustId"                    AS "CustId"            -- ID
          , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" ASC)
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最早貸放的那一筆)
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
     FROM   "JcicB201" B
       LEFT JOIN "JcicMonthlyLoanData" M ON M."DataYM" = YYYYMM 
                                        AND M."CustNo" = to_number(SUBSTR(B."AcctNo",1, 7))
@@ -163,7 +163,7 @@ BEGIN
          , CASE WHEN TRIM(NVL(C."CurrCompId",'0')) = '0' THEN '00000000'
                   ELSE LPAD(C."CurrCompId",8,'0')
            END                                   AS "CurrCompId"        -- 任職機構統一編號
-         , '060000'                              AS "JobCode"           -- 職業類別  (ref:LN15J1 (#M4019 1))
+         , NVL(C."IndustryCode",'060000')        AS "JobCode"           -- 職業類別  (ref:LN15J1 (#M4019 1))
          , NVL(C."CurrCompTel",' ')              AS "CurrCompTel"       -- 任職機構電話
          , CASE 
              WHEN TRIM(NVL(C."JobTitle", ' ')) = ''  THEN TO_NCHAR('　　　　')

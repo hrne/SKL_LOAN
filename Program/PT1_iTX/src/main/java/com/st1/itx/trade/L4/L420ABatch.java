@@ -155,7 +155,7 @@ public class L420ABatch extends TradeBuffer {
 			l4211Report.setParentTranCode("L420A");
 			l4211Report.execWithBatchMapList(l4211MapList, titaVo);
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L420A", "L4211-匯款轉帳檢核明細表", titaVo);
+					titaVo.getTlrNo() + "L420A", "L420A-匯款轉帳檢核明細表", titaVo);
 		}
 		return null;
 
@@ -392,7 +392,8 @@ public class L420ABatch extends TradeBuffer {
 		String facAcctCode = "999";
 		String facAcctItem = "暫收款 ";
 		for (BaTxVo baTxVo : iBatxList) {
-			if (baTxVo.getTxAmt().compareTo(BigDecimal.ZERO) == 0 && baTxVo.getAcAmt().compareTo(BigDecimal.ZERO) == 0) {
+			if (baTxVo.getTxAmt().add(baTxVo.getAcAmt()).add(baTxVo.getUnpaidInt()).add(baTxVo.getUnpaidPrin())
+					.compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
 			facAcctCode = baTxVo.getFacAcctCode().trim();
@@ -426,7 +427,9 @@ public class L420ABatch extends TradeBuffer {
 			da.put("CloseReasonCode", tTempVo.getParam("CloseReasonCode"));
 			da.put("IntStartDate", "" + baTxVo.getIntStartDate());
 			da.put("IntEndDate", "" + baTxVo.getIntEndDate());
-			da.put("Principal", "" + baTxVo.getPrincipal().add(baTxVo.getShortFallPrin()).subtract(baTxVo.getUnpaidPrin())); // // 本金(A)
+			da.put("Principal",
+					"" + baTxVo.getPrincipal().add(baTxVo.getShortFallPrin()).subtract(baTxVo.getUnpaidPrin())); // //
+																													// 本金(A)
 			da.put("Interest", "" + baTxVo.getInterest().add(baTxVo.getShortFallInt()).subtract(baTxVo.getUnpaidInt())); // 利息(B)
 			da.put("TempPayAmt", "0"); // 暫付款(C)
 			da.put("BreachAmt", "" + baTxVo.getDelayInt().add(baTxVo.getBreachAmt()).add(baTxVo.getCloseBreachAmt())
