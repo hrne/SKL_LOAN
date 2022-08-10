@@ -66,6 +66,7 @@ public class L8301 extends TradeBuffer {
 	SendRsp iSendRsp;
 	@Autowired
 	public DataLog iDataLog;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8301 ");
@@ -91,7 +92,7 @@ public class L8301 extends TradeBuffer {
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		String[] sNotBankId = { iNotBankId1, iNotBankId2, iNotBankId3, iNotBankId4, iNotBankId5, iNotBankId6 }; // 未揭露債權機構代號
 		List<String> iL8301SqlReturn = new ArrayList<>(); // NegFinAcct有效消債條例金融機構代號集合
 
@@ -102,7 +103,7 @@ public class L8301 extends TradeBuffer {
 		iJcicZ040Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ040Id.setRcDate(iRcDate);
 		JcicZ040 chJcicZ040 = new JcicZ040();
-	
+
 		// 檢核項目(D-3)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.3 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
@@ -151,9 +152,11 @@ public class L8301 extends TradeBuffer {
 							}
 							if (flagFind == 0) {
 								if ("A".equals(iTranKey)) {
-									throw new LogicException(titaVo, "E0005", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+									throw new LogicException(titaVo, "E0005",
+											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
 								} else {
-									throw new LogicException(titaVo, "E0007", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+									throw new LogicException(titaVo, "E0007",
+											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
 								}
 							}
 						}
@@ -203,10 +206,10 @@ public class L8301 extends TradeBuffer {
 			if (uJcicZ040 == null) {
 				throw new LogicException("E0007", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料");
 			}
-			//2022/7/6新增錯誤判斷
+			// 2022/7/6新增錯誤判斷
 			int JcicDate = iJcicZ040.getOutJcicTxtDate();
 			this.info("JcicDate    = " + JcicDate);
-			if(JcicDate == 0) {
+			if (JcicDate == 0) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
 
@@ -236,9 +239,9 @@ public class L8301 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ040.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ040, uJcicZ040);
-			iDataLog.exec("L8301異動", uJcicZ040.getSubmitKey()+uJcicZ040.getCustId()+uJcicZ040.getRcDate());
+			iDataLog.exec("L8301異動", uJcicZ040.getSubmitKey() + uJcicZ040.getCustId() + uJcicZ040.getRcDate());
 			break;
-		//2022/7/14 新增刪除必須也要在記錄檔l6932裡面
+		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ040 = sJcicZ040Service.ukeyFirst(iKey, titaVo);
@@ -251,10 +254,10 @@ public class L8301 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			//2022/7/6新增錯誤判斷
+			// 2022/7/6新增錯誤判斷
 			int JcicDate2 = iJcicZ040.getOutJcicTxtDate();
 			this.info("JcicDate2    = " + JcicDate2);
-			if(JcicDate2 != 0) {
+			if (JcicDate2 != 0) {
 				throw new LogicException("E0004", "刪除資料不存在");
 			}
 			JcicZ040 oldJcicZ0402 = (JcicZ040) iDataLog.clone(uJcicZ0402);
@@ -269,10 +272,10 @@ public class L8301 extends TradeBuffer {
 			uJcicZ0402.setNotBankId5(iNotBankId5);
 			uJcicZ0402.setNotBankId6(iNotBankId6);
 			uJcicZ0402.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ040Log> dJcicLogZ040 = null;
 			dJcicLogZ040 = sJcicZ040LogService.ukeyEq(iJcicZ040.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ040 == null || "A".equals(iTranKey)) {
+			if (dJcicLogZ040 == null || ("A".equals(iTranKey) && dJcicLogZ040 == null) ) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ040Service.delete(iJcicZ040, titaVo);
@@ -298,14 +301,57 @@ public class L8301 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-			
+
 			iDataLog.setEnv(titaVo, oldJcicZ0402, uJcicZ0402);
-			iDataLog.exec("L8301刪除", uJcicZ0402.getSubmitKey()+uJcicZ0402.getCustId()+uJcicZ0402.getRcDate());
+			iDataLog.exec("L8301刪除", uJcicZ0402.getSubmitKey() + uJcicZ0402.getCustId() + uJcicZ0402.getRcDate());
 //			List<Map<String,String>> list2 = sL6932Service.findDataLog(uJcicZ0402.getSubmitKey()+uJcicZ0402.getCustId()+uJcicZ0402.getRcDate(),titaVo);
 //			int number2 =list2.size();
 //			iDataLog.exec("L8301刪除", uJcicZ0402.getSubmitKey()+uJcicZ0402.getCustId()+uJcicZ0402.getRcDate()+number2);
-			
-		    default:
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ040 = sJcicZ040Service.ukeyFirst(iKey, titaVo);
+			JcicZ040 uJcicZ0403 = new JcicZ040();
+			uJcicZ0403 = sJcicZ040Service.holdById(iJcicZ040.getJcicZ040Id(), titaVo);
+			if (uJcicZ0403 == null) {
+				throw new LogicException("E0007", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ040.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+			if ("R".equals(iTranKey)) {
+				chJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+				if (chJcicZ040 != null) {
+					throw new LogicException("E0002", "已有相同資料");
+				}
+			}
+
+			JcicZ040 oldJcicZ0403 = (JcicZ040) iDataLog.clone(uJcicZ0403);
+			uJcicZ0403.setJcicZ040Id(iJcicZ040Id);
+			uJcicZ0403.setTranKey(iTranKey);
+			uJcicZ0403.setRbDate(iRbDate);
+			uJcicZ0403.setApplyType(iApplyType);
+			uJcicZ0403.setRefBankId(iRefBankId);
+			uJcicZ0403.setNotBankId1(iNotBankId1);
+			uJcicZ0403.setNotBankId2(iNotBankId2);
+			uJcicZ0403.setNotBankId3(iNotBankId3);
+			uJcicZ0403.setNotBankId4(iNotBankId4);
+			uJcicZ0403.setNotBankId5(iNotBankId5);
+			uJcicZ0403.setNotBankId6(iNotBankId6);
+			uJcicZ0403.setOutJcicTxtDate(0);
+			try {
+				sJcicZ040Service.update(uJcicZ0403, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "前置協商受理申請暨請求回報債權通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0403, uJcicZ0403);
+			iDataLog.exec("L8301修改", uJcicZ0403.getSubmitKey() + uJcicZ0403.getCustId() + uJcicZ0403.getRcDate());
+		default:
 			break;
 		}
 

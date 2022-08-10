@@ -52,6 +52,7 @@ import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxPrinterService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.format.FormatUtil;
@@ -122,6 +123,9 @@ public class MakeReport extends CommBuffer {
 
 	// 報表名稱
 	private String rptItem;
+
+	private ReportVo reportVo;
+
 	// 是否需要浮水印
 	private boolean watermarkFlag;
 	// 報表機密等級(中文敍述)
@@ -188,6 +192,25 @@ public class MakeReport extends CommBuffer {
 	private String rptTlrNo = "";
 
 	private Timestamp rptCreateDate = null;
+
+	private void checkParm(ReportVo reportVo) throws LogicException {
+		if (reportVo.getRptDate() <= 0) {
+			throw new LogicException("EC004", "(MakeReport)日期(date)參數必須有值");
+		}
+
+		if (reportVo.getBrno() == null || reportVo.getBrno().isEmpty()) {
+			throw new LogicException("EC004", "(MakeReport)單位(brno)參數必須有值");
+		}
+		if (reportVo.getRptCode() == null || reportVo.getRptCode().isEmpty()) {
+			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數必須有值");
+		}
+		if (haveChinese(reportVo.getRptCode())) {
+			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數不可有全形字");
+		}
+		if (reportVo.getRptItem() == null || "".equals(reportVo.getRptItem())) {
+			throw new LogicException("EC004", "(MakeReport)報表說明(rptItem)參數必須有值");
+		}
+	}
 
 	private void checkParm(int date, String brno, String rptCode, String rptItem) throws LogicException {
 		if (date <= 0) {
@@ -989,6 +1012,22 @@ public class MakeReport extends CommBuffer {
 	// 一般模式
 	private void init() {
 
+		// 使新舊方法可同時使用
+		if (this.reportVo == null) {
+			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
+					.setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
+					.setPageOrientation(this.pageOrientation).setUseDefault(this.useDefault).build();
+		} else {
+			this.brno = this.reportVo.getBrno();
+			this.date = this.reportVo.getRptDate();
+			this.rptCode = this.reportVo.getRptCode();
+			this.rptItem = this.reportVo.getRptItem();
+			this.rptSize = this.reportVo.getRptSize();
+			this.rptSecurity = this.reportVo.getSecurity();
+			this.pageOrientation = this.reportVo.getPageOrientation();
+			this.useDefault = this.reportVo.isUseDefault();
+		}
+
 		this.font = 1;
 		this.fontSize = 10;
 
@@ -1003,8 +1042,8 @@ public class MakeReport extends CommBuffer {
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 0);
-		map.put("paper", this.rptSize.toUpperCase());
-		map.put("paper.orientation", this.pageOrientation);
+		map.put("paper", reportVo.getRptSize().toUpperCase());
+		map.put("paper.orientation", reportVo.getPageOrientation());
 		map.put("font", this.font);
 		map.put("font.size", this.fontSize);
 		map.put("p", this.rptPassword);
@@ -1151,8 +1190,28 @@ public class MakeReport extends CommBuffer {
 		newPage();
 	}
 
+	public void open(TitaVo titaVo, ReportVo reportVo) throws LogicException {
+
+		this.reportVo = reportVo;
+
+		this.checkParm(reportVo);
+
+		this.titaVo = titaVo;
+
+		if (reportVo.getRptSize() == null || reportVo.getRptSize().isEmpty()) {
+			reportVo.setRptSize("A4"); // 若未設定紙張大小，預設為A4
+		}
+
+		if (reportVo.getPageOrientation() == null || reportVo.getPageOrientation().isEmpty()
+				|| !reportVo.getPageOrientation().equals("P")) {
+			reportVo.setPageOrientation("L"); // 若未設定紙張方向 或者 不為P:直印，則預設為L:橫印
+		}
+
+		init();
+	}
+
 	/**
-	 * 
+	 * @deprecated use {@link #open(TitaVo titaVo, ReportVo reportVo)} instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -1161,7 +1220,7 @@ public class MakeReport extends CommBuffer {
 	 * @param Security 報表機密等級(中文敍述)
 	 * @throws LogicException LogicException
 	 */
-
+	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
 			throws LogicException {
 
@@ -1229,6 +1288,7 @@ public class MakeReport extends CommBuffer {
 	/**
 	 * 開始製作報表<br>
 	 * 
+	 * @deprecated use {@link #open(TitaVo titaVo, ReportVo reportVo)} instead.
 	 * @param titaVo          titaVo
 	 * @param date            日期
 	 * @param brno            單位
@@ -1239,6 +1299,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
+	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
 			String PageSize, String pageOrientation) throws LogicException {
 

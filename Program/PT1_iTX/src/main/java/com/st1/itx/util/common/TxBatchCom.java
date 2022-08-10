@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -27,24 +26,21 @@ import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
-import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.LoanBook;
+import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
-import com.st1.itx.db.service.CdCodeService;
-import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
+import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -280,8 +276,8 @@ public class TxBatchCom extends TradeBuffer {
 //  額度還款應繳日
 	private String repayIntDateByFacmNoVo = null;
 
-//	L3200本息計算表
-	private TempVo l3200IntTempVo = new TempVo();
+//	本息計算表
+	private TempVo intListTempVo = new TempVo();
 //	溢短收記號
 	private int overRpFg = 0; // 1->溢短收記號 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 
@@ -361,7 +357,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.tmpFacmNoX = "";
 		this.tTempVo = new TempVo();
 		this.otherTempVo = new TempVo();
-		this.l3200IntTempVo = new TempVo();
+		this.intListTempVo = new TempVo();
 	}
 
 	@Override
@@ -718,7 +714,6 @@ public class TxBatchCom extends TradeBuffer {
 		// 收付欄
 		txTitaVo.putParam("RpFlag", "1"); // 1:應收
 		txTitaVo.putParam("RpType1", tDetail.getRepayType());
-		int i = 1;
 		txTitaVo.putParam("RpCode1", tDetail.getRepayCode());
 		txTitaVo.putParam("RpCodeX1",
 				loanCom.getCdCodeX("BatchRepayCode", parse.IntegerToString(tDetail.getRepayCode(), 2), txTitaVo));
@@ -791,6 +786,25 @@ public class TxBatchCom extends TradeBuffer {
 			putAmt("FireFee", "FireFee", txTitaVo);
 			putAmt("LawFee", "LawFee", txTitaVo);
 		}
+
+		// 本息計算表
+		if ("L3200".equals(txTitaVo.getTxcd()) || "L3420".equals(txTitaVo.getTxcd())) {
+			if (this.otherTempVo.get("IntListTempVo") != null) {
+				this.intListTempVo = this.intListTempVo.getVo(this.otherTempVo.get("IntListTempVo"));
+				for (int i = 1; i <= 20; i++) {
+					if (this.intListTempVo.get("FacmBormNo" + i) != null) {
+						txTitaVo.putParam("FacmBormNo" + i, this.intListTempVo.getParam("FacmBormNo" + i));
+						txTitaVo.putParam("IntSEDate" + i, this.intListTempVo.getParam("IntSEDate" + i));
+						txTitaVo.putParam("Principal" + i, this.intListTempVo.getParam("Principal" + i));
+						txTitaVo.putParam("Interest" + i, this.intListTempVo.getParam("Interest" + i));
+						txTitaVo.putParam("DelayInt" + i, this.intListTempVo.getParam("DelayInt" + i));
+						txTitaVo.putParam("BreachAmt" + i, this.intListTempVo.getParam("BreachAmt" + i));
+						txTitaVo.putParam("Total" + i, this.intListTempVo.getParam("Total" + i));
+					}
+				}
+			}
+		}
+
 		return txTitaVo;
 	}
 
@@ -959,21 +973,6 @@ public class TxBatchCom extends TradeBuffer {
 		l3200TitaVo.putParam("RepayIntDate", this.tTempVo.getParam("RepayIntDate"));// 應繳日
 		l3200TitaVo.putParam("RepayIntDateByFacmNoVo", this.tTempVo.getParam("RepayIntDateByFacmNoVo"));// 額度應繳日
 		l3200TitaVo.putParam("RepayLoan", this.tTempVo.getParam("RepayLoan"));// 償還本利
-
-		if (this.otherTempVo.get("l3200IntTempVo") != null) {
-			this.l3200IntTempVo = this.l3200IntTempVo.getVo(this.otherTempVo.get("l3200IntTempVo"));
-			for (int i = 1; i <= 20; i++) {
-				if (this.l3200IntTempVo.get("FacmBormNo" + i) != null) {
-					l3200TitaVo.putParam("FacmBormNo" + i, this.l3200IntTempVo.getParam("FacmBormNo" + i));
-					l3200TitaVo.putParam("IntSEDate" + i, this.l3200IntTempVo.getParam("IntSEDate" + i));
-					l3200TitaVo.putParam("Principal" + i, this.l3200IntTempVo.getParam("Principal" + i));
-					l3200TitaVo.putParam("Interest" + i, this.l3200IntTempVo.getParam("Interest" + i));
-					l3200TitaVo.putParam("DelayInt" + i, this.l3200IntTempVo.getParam("DelayInt" + i));
-					l3200TitaVo.putParam("BreachAmt" + i, this.l3200IntTempVo.getParam("BreachAmt" + i));
-					l3200TitaVo.putParam("Total" + i, this.l3200IntTempVo.getParam("Total" + i));
-				}
-			}
-		}
 
 		return l3200TitaVo;
 	}
@@ -1694,7 +1693,7 @@ public class TxBatchCom extends TradeBuffer {
 					if (tDetail.getFacmNo() == 0) {
 						this.repayFacmNo = tFacClose.getFacmNo(); // 還款額度
 					}
-					this.tTempVo.putParam("CollectFlag", tFacClose.getCollectFlag());
+					this.tTempVo.putParam("CollectFlag", tFacClose.getCollectFlag()); // 是否領取清償證明(Y/N/)
 					this.tTempVo.putParam("CloseReasonCode", tFacClose.getCloseReasonCode()); // CloseReasonCode 清償原因
 				}
 			}
@@ -1799,9 +1798,9 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0) {
 			this.tTempVo.putParam("RepayLoan", this.repayLoan);
 		}
-		// L3200本息計算表
-		if (this.l3200IntTempVo != null) {
-			this.otherTempVo.putParam("l3200IntTempVo", this.l3200IntTempVo.getJsonString());
+		// 本息計算表
+		if (this.intListTempVo != null) {
+			this.otherTempVo.putParam("IntListTempVo", this.intListTempVo.getJsonString());
 		}
 
 	}
@@ -1958,19 +1957,18 @@ public class TxBatchCom extends TradeBuffer {
 							this.intEndDate = baTxVo.getIntEndDate();
 						}
 					}
-					if (this.repayType <= 2) {
-						i++;
-						this.l3200IntTempVo.put("FacmBormNo" + i, parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-"
-								+ parse.IntegerToString(baTxVo.getBormNo(), 3));
-						this.l3200IntTempVo.put("IntSEDate" + i,
-								"" + baTxVo.getIntStartDate() + "-" + baTxVo.getIntEndDate());
-						this.l3200IntTempVo.put("Principal" + i, "" + baTxVo.getPrincipal());
-						this.l3200IntTempVo.put("Interest" + i, "" + baTxVo.getInterest());
-						this.l3200IntTempVo.put("DelayInt" + i, "" + baTxVo.getDelayInt());
-						this.l3200IntTempVo.put("BreachAmt" + i, "" + baTxVo.getBreachAmt());
-						this.l3200IntTempVo.put("Total" + i, "" + baTxVo.getAcctAmt());
+					// 本息計算表
+					i++;
+					this.intListTempVo.put("FacmBormNo" + i, parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-"
+							+ parse.IntegerToString(baTxVo.getBormNo(), 3));
+					this.intListTempVo.put("IntSEDate" + i,
+							"" + baTxVo.getIntStartDate() + "-" + baTxVo.getIntEndDate());
+					this.intListTempVo.put("Principal" + i, "" + baTxVo.getPrincipal());
+					this.intListTempVo.put("Interest" + i, "" + baTxVo.getInterest());
+					this.intListTempVo.put("DelayInt" + i, "" + baTxVo.getDelayInt());
+					this.intListTempVo.put("BreachAmt" + i, "" + baTxVo.getBreachAmt());
+					this.intListTempVo.put("Total" + i, "" + baTxVo.getAcctAmt());
 
-					}
 				}
 
 				if (baTxVo.getDataKind() == 3) {

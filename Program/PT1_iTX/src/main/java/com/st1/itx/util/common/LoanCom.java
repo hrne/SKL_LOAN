@@ -1477,11 +1477,14 @@ public class LoanCom extends TradeBuffer {
 			} else {
 				wkOverflow = wkOverflow.subtract((ac.getTxAmt()));
 			}
+//			this.info(ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " "
+//					+ wkOverflow + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " "
+//					+ ac.getRvNo());
 			int sumNo = 0;
 			if (parse.isNumeric(ac.getSumNo())) {
 				sumNo = parse.stringToInteger(ac.getSumNo());
 			}
-			if (sumNo <= 90) {
+			if (sumNo <= 90 && ac.getFacmNo() > 0) {
 				wkFacmNo = ac.getFacmNo();
 			}
 		}
@@ -1533,6 +1536,7 @@ public class LoanCom extends TradeBuffer {
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					lAcDetail.add(acDetail);
+					this.info("settleTempAmt ba " + acDetail.toString());
 				}
 			}
 
@@ -1549,6 +1553,7 @@ public class LoanCom extends TradeBuffer {
 				acDetail.setFacmNo(tAc.getFacmNo());
 				acDetail.setBormNo(tAc.getBormNo());
 				lAcDetail.add(acDetail);
+				this.info("settleTempAmt Last-090  " + acDetail.toString());
 			}
 		}
 		this.info("settleTempAmt end " + lAcDetail.size());
@@ -1610,16 +1615,16 @@ public class LoanCom extends TradeBuffer {
 						overAmt = overAmt.add(ac.getTxAmt());
 					}
 				}
+				acTempVo.putParam("BorxNo", tLoanBorTx.getBorxNo());
+				if (ac.getFacmNo() != tLoanBorTx.getFacmNo()) {
+					acTempVo.putParam("FacmNo", tLoanBorTx.getFacmNo());
+				}
+				if (ac.getBormNo() != tLoanBorTx.getBormNo()) {
+					acTempVo.putParam("BormNo", tLoanBorTx.getBormNo());
+				}
+				acTempVo.putParam("EntryDate", tLoanBorTx.getEntryDate() + 19110000);
+				ac.setJsonFields(acTempVo.getJsonString());
 			}
-			acTempVo.putParam("BorxNo", tLoanBorTx.getBorxNo());
-			if (ac.getFacmNo() != tLoanBorTx.getFacmNo()) {
-				acTempVo.putParam("FacmNo", tLoanBorTx.getFacmNo());
-			}
-			if (ac.getBormNo() != tLoanBorTx.getBormNo()) {
-				acTempVo.putParam("BormNo", tLoanBorTx.getBormNo());
-			}
-			acTempVo.putParam("EntryDate", tLoanBorTx.getEntryDate() + 19110000);
-			ac.setJsonFields(acTempVo.getJsonString());
 		}
 		txAmt = repayAmt.add(overAmt).subtract(tempAmt);
 		tLoanBorTx.setTxAmt(txAmt);

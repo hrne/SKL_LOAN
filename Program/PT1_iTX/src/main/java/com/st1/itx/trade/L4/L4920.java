@@ -2,6 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,6 +137,7 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOProcCode", result.get("F11"));
 
 				String procNote = "";
+				String txcd = "";
 				String fileSeq = result.get("F0");
 
 				if (result.get("F12") != null) {
@@ -168,6 +170,9 @@ public class L4920 extends TradeBuffer {
 					if (tempVo.get("FileSeq") != null && tempVo.get("FileSeq").length() > 0) {
 						fileSeq = tempVo.get("FileSeq");
 					}
+					if (tempVo.get("Txcd") != null && tempVo.get("Txcd").length() > 0) {
+						txcd = tempVo.get("Txcd");
+					}
 				}
 
 				occursList.putParam("OOProcNote", procNote);
@@ -175,6 +180,8 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOTxSn", titaVo.getKinbr() + result.get("F13") + result.get("F14"));
 				occursList.putParam("OOFileName", result.get("F16"));
 				occursList.putParam("OOFileSeq", fileSeq);
+				occursList.putParam("OOTxCd", txcd);
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

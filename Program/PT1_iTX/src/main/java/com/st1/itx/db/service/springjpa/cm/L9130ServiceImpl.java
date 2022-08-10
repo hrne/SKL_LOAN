@@ -105,7 +105,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
-		sql += "           AND ACD.\" \"  = '8' ";
+		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";

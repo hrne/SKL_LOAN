@@ -116,7 +116,8 @@ public class L4201 extends TradeBuffer {
 				break;
 			}
 		}
-		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA
+		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA 
+				&& tBatxDetail.getFacmNo() == iFacmNoA
 				&& iProcStsCode.equals(tBatxDetail.getProcStsCode()) && oldPreRepayTerms == newPreRepayTerms) {
 			throw new LogicException(titaVo, "E0012", "修改值與現有資料相同");
 		}

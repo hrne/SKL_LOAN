@@ -187,7 +187,7 @@ public class L8337 extends TradeBuffer {
 			
 			Slice<JcicZ575Log> dJcicLogZ575 = null;
 			dJcicLogZ575 = sJcicZ575LogService.ukeyEq(iJcicZ575.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ575 == null|| "A".equals(iTranKey)) {
+			if (dJcicLogZ575 == null|| ("A".equals(iTranKey) && dJcicLogZ575 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ575Service.delete(iJcicZ575, titaVo);
@@ -208,6 +208,33 @@ public class L8337 extends TradeBuffer {
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ5752, uJcicZ5752);
 			iDataLog.exec("L8337異動",uJcicZ5752.getSubmitKey()+uJcicZ5752.getCustId()+uJcicZ5752.getApplyDate()+uJcicZ5752.getBankId());
+			break;		
+			//修改
+		case "7":	
+			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
+			this.info("iJcicZ570" + iJcicZ570);
+			if (iJcicZ570 == null) {
+				throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
+			}
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ575 = sJcicZ575Service.ukeyFirst(iKey, titaVo);
+			JcicZ575 uJcicZ5753 = new JcicZ575();
+			uJcicZ5753 = sJcicZ575Service.holdById(iJcicZ575.getJcicZ575Id(), titaVo);
+			if (uJcicZ5753 == null) {
+				throw new LogicException("E0007", "無此更新資料");
+			}
+			JcicZ575 oldJcicZ5753 = (JcicZ575) iDataLog.clone(uJcicZ5753);
+			uJcicZ5753.setJcicZ575Id(iJcicZ575Id);
+			uJcicZ5753.setModifyType(iModifyType);
+			uJcicZ5753.setTranKey(iTranKey);
+			uJcicZ5753.setOutJcicTxtDate(0);
+			try {
+				sJcicZ575Service.update(uJcicZ5753, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+			iDataLog.setEnv(titaVo, oldJcicZ5753, uJcicZ5753);
+			iDataLog.exec("L8337修改",uJcicZ5753.getSubmitKey()+uJcicZ5753.getCustId()+uJcicZ5753.getApplyDate()+uJcicZ5753.getBankId());	
 		default:
 			break;
 		}

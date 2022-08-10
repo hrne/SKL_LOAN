@@ -637,7 +637,7 @@ public class BaTxCom extends TradeBuffer {
 		// 合併檢核轉暫收金額加入暫收可抵繳
 		if ("L420A".equals(titaVo.getTxcd()) && tempVo.get("MergeAmt") != null) {
 			if (tempVo.getParam("MergeSeq").equals(tempVo.getParam("MergeCnt"))) {
-				this.tavAmt = addMergeAmt(iCustNo, this.getOverRpFacmNo(),
+				this.tavAmt = addMergeTempAmt(iCustNo, this.getOverRpFacmNo(),
 						parse.stringToBigDecimal(tempVo.getParam("MergeTempAmt")));
 			}
 		}
@@ -728,10 +728,10 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		// 本金利息(加總至撥款)
-		addBaTxListByBormNo();
+		addByBormNoBaTxList();
 
 		// 計算作帳金額(檢核報表)
-		settleBatxListAcAmt(iTxAmt);
+		settleAcAmtBatxList(iTxAmt);
 
 		this.info("TempVo=" + tempVo.toString());
 
@@ -1560,7 +1560,7 @@ public class BaTxCom extends TradeBuffer {
 	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, int iRepayType, TitaVo titaVo)
 			throws LogicException {
 		this.info("getCloseBreachAmt...");
-		String collectFlag = this.tempVo.getParam("CollectFlag");
+		String collectFlag = this.tempVo.getParam("CollectFlag"); // 是否領取清償證明(Y/N/)
 
 		loanCloseBreachCom.setTxBuffer(this.txBuffer);
 		ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
@@ -1810,7 +1810,8 @@ public class BaTxCom extends TradeBuffer {
 		if (this.overRpFacmNo == 0) {
 			this.overRpFacmNo = gettingRpFacmNo(iCustNo, titaVo);
 		}
-		this.info("settleOverAmt ... overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt);
+		this.info("settleOverAmt ... overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt="
+				+ this.tempAmt);
 
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(4); // 4.本期溢(+)短(-)繳
@@ -1878,7 +1879,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	// 計算作帳金額(檢核報表)
-	private void settleBatxListAcAmt(BigDecimal iTxAmt) {
+	private void settleAcAmtBatxList(BigDecimal iTxAmt) {
 		// 計算金額
 		BigDecimal wkTxBal = iTxAmt;
 		BigDecimal wkOverBal = BigDecimal.ZERO;
@@ -1886,7 +1887,6 @@ public class BaTxCom extends TradeBuffer {
 		BigDecimal wkAcBal = BigDecimal.ZERO;
 		BigDecimal wkRepayLoan = BigDecimal.ZERO;
 		for (BaTxVo ba : this.baTxList) {
-			this.info("settleAcAmt= " + ba.toString());
 			if (ba.getDataKind() == 3) {
 				// 計算暫收抵繳
 				wkTempBal = wkTempBal.add(ba.getAcctAmt());
@@ -1897,7 +1897,7 @@ public class BaTxCom extends TradeBuffer {
 				}
 			} else {
 				// 計算作帳金額(扣除短繳)
-				ba.setAcAmt(ba.getAcctAmt().subtract(ba.getUnpaidPrin().subtract(ba.getUnpaidInt())));
+				ba.setAcAmt(ba.getAcctAmt().subtract(ba.getUnpaidPrin()).subtract(ba.getUnpaidInt()));
 				// 計算作帳金額
 				wkAcBal = wkAcBal.add(ba.getAcAmt());
 
@@ -1906,6 +1906,7 @@ public class BaTxCom extends TradeBuffer {
 					wkRepayLoan = wkRepayLoan.add(ba.getAcAmt());
 				}
 			}
+			this.info("settleAcAmt= " + ba.toString());
 		}
 		BigDecimal wkDiff = wkTxBal.add(wkTempBal).subtract(wkAcBal).subtract(wkOverBal);
 		this.info("settleAcAmt" + ", wkTxBal=" + wkTxBal + ", wkTempBal=" + wkTempBal + ", wkAcBal=" + wkAcBal
@@ -1920,7 +1921,7 @@ public class BaTxCom extends TradeBuffer {
 				ba.setFacAcctCode("999");
 			} else {
 				for (BaTxVo da : this.baTxList) {
-					if (ba.getDataKind() == 2 && da.getFacmNo() == ba.getFacmNo()) {
+					if (da.getDataKind() == 2 && da.getFacmNo() == ba.getFacmNo()) {
 						ba.setFacAcctCode(da.getAcctCode());
 						break;
 					}
@@ -1932,12 +1933,27 @@ public class BaTxCom extends TradeBuffer {
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 1 && ba.getRepayType() <= 3 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
 				for (BaTxVo da : this.baTxList) {
-					if (ba.getDataKind() == 2 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0
+					if (da.getDataKind() == 2 && da.getAcAmt().compareTo(BigDecimal.ZERO) > 0
 							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
 							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
 						da.setShortFallPrin(ba.getPrincipal());
 						da.setShortFallInt(ba.getInterest());
 						da.setShortFallCloseBreach(ba.getCloseBreachAmt());
+						da.setAcAmt(da.getAcAmt().add(ba.getAcAmt()));
+						ba.setAcAmt(BigDecimal.ZERO);
+						break;
+					}
+				}
+			}
+		}
+		// 另收清償違約金=>放在償還本利那筆
+		for (BaTxVo ba : this.baTxList) {
+			if (ba.getDataKind() == 6 && ba.getRepayType() <= 3 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
+				for (BaTxVo da : this.baTxList) {
+					if (da.getDataKind() == 2 && da.getAcAmt().compareTo(BigDecimal.ZERO) > 0
+							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
+							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
+						da.setCloseBreachAmt(ba.getCloseBreachAmt());
 						da.setAcAmt(da.getAcAmt().add(ba.getAcAmt()));
 						ba.setAcAmt(BigDecimal.ZERO);
 						break;
@@ -1998,7 +2014,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	// 本金利息(加總至撥款)
-	private void addBaTxListByBormNo() {
+	private void addByBormNoBaTxList() {
 		this.info(" addByBormNo .... ");
 		ArrayList<BaTxVo> listbaTxVo = new ArrayList<BaTxVo>();
 		for (BaTxVo ba : this.baTxList) {
@@ -2035,8 +2051,9 @@ public class BaTxCom extends TradeBuffer {
 			if (ba.getDataKind() == 1 && ba.getRepayType() <= 3) {
 				boolean isNew = true;
 				for (BaTxVo da : this.baTxList) {
-					if (ba.getDataKind() == 1 && ba.getRepayType() <= 3 && da.getFacmNo() == ba.getFacmNo()
-							&& da.getBormNo() == ba.getBormNo()) {
+					if (da.getDataKind() == 1 && da.getRepayType() <= 3
+							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
+							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
 						addBaTxList(ba, da);
 						isNew = false;
 						break;
@@ -2049,6 +2066,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 	}
 
+	// 加總
 	private void addBaTxList(BaTxVo ba, BaTxVo baTxVo) {
 		baTxVo.setPrincipal(baTxVo.getPrincipal().add(ba.getPrincipal())); // 本金
 		baTxVo.setInterest(baTxVo.getInterest().add(ba.getInterest())); // // 利息
@@ -2080,7 +2098,8 @@ public class BaTxCom extends TradeBuffer {
 		}
 	}
 
-	private BigDecimal addMergeAmt(int iCustNo, int iFacmNo, BigDecimal iMergeTempAmt) {
+	// 合併檢核暫收金額
+	private BigDecimal addMergeTempAmt(int iCustNo, int iFacmNo, BigDecimal iMergeTempAmt) {
 		this.info("addMergeAmt this.tavAmt=" + this.tavAmt);
 		this.tavAmt = this.tavAmt.add(iMergeTempAmt);
 		this.excessive = this.excessive.add(iMergeTempAmt); // 累溢收

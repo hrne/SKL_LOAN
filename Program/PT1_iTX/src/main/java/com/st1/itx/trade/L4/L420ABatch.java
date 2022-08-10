@@ -379,11 +379,7 @@ public class L420ABatch extends TradeBuffer {
 			this.info("addL4211MapList iBatxList.size = 0 return ");
 			return;
 		}
-		// 已入帳不出表
-		if (doneCnt > 0) {
-			this.info("addL4211MapList doneCnt > 0 return ");
-			return;
-		}
+
 		String custName = " ";
 		CustMain tCustMain = custMainService.custNoFirst(tDetail.getCustNo(), tDetail.getCustNo(), titaVo);
 		if (tCustMain != null) {

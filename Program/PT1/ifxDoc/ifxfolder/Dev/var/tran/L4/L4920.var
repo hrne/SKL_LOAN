@@ -426,7 +426,7 @@ SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxb
 
 !交易代號
 #OOTxCd=X,5,S
-IF(#OORepayType <= 3,T(2,L3200),T(2,L3210))
+
 #TxNo=X,18,S
 T(2,#OOTxSn)
 #Entdy=D,7,S
@@ -452,11 +452,14 @@ C(5,#ReconCode,A3,E(0,2),$)
 #CustNoA=A,7,S
 E(0,#OOCustNo)
 
+#FacmNoA=A,3,S
+E(0,#OOFacmNo)
+
 #ProcStsCode=X,1,S
 T(2,0)
 
 #secret-no=x,1000,S
-T(6A,#AcDate+#BatchNo+#DetailSeq+#RepayTypeA+#CustNoA+#ProcStsCode)
+T(6A,#AcDate+#BatchNo+#DetailSeq+#RepayTypeA+#CustNoA+#ProcStsCode+#FacmNoA)
 
 
 #batch-detail=x,100000,S
@@ -517,6 +520,7 @@ TXFORM=L4920
 #OOTxSn
 #OOFileSeq
 #OOFileName
+#OOTxCd
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
