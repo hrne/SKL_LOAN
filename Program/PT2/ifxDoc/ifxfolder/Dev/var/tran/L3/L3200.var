@@ -152,9 +152,9 @@ C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 [#<->#,"#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
 [#<->#,"#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],
 ["#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
-["@","@",], 
-["@","@",], 
-["@","@",],       
+["@","@",],
+["@","@",],
+["@","@",],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]

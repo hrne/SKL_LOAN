@@ -62,7 +62,7 @@ K(MODIFYBUTTON,查詢)
 
 
 #SortCodeHELP=x,1024,S
-T(3,1:入帳日期+額度; 2:額度+入帳日期)
+T(3,1:入帳日期+額度;2:額度+入帳日期)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -121,7 +121,7 @@ E(0,@RimCloseBreachAmt,0)
 RESET_RIM(#SendL3r06S,L3R06)
 S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
 R(1,L3R06)
-E(0,@Shortfall,0-#L3r06Shortfall)
+E(0,@Shortfall,#L3r06Shortfall)
 E(0,@Overflow,#L3r06Excessive)
 
 
@@ -129,9 +129,9 @@ E(0,@Overflow,#L3r06Excessive)
 #FacmNo=A,3,I
 
 !全戶累溢收(rim)
-#Overflow=+m,14,L
+#Overflow=m,14,L
 !全戶累短收
-#Shortfall=+m,14,L
+#Shortfall=m,14,L
 
 !入帳日期 本月1日~本日
 #EntryDateS=D,7,I
@@ -141,6 +141,9 @@ E(0,#EntryDateS*100+1)
 
 #EntryDateE=D,7,I
 E(0,#SYSDATE)
+@
+V(7)
+A(DATE,0,#EntryDateE)
 
 !資料排序:1.入帳日期+額度(預設)
 !         2.額度+入帳日期
@@ -213,13 +216,17 @@ C(3,#OOTAVCr,0,S,$)
 #OOTAVBalX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OOTAVBal,#OOTAVBalX)
 P(R,#OOTAVBalX)
-C(3,#OOTAVBal,0,S,$)
+! C(3,#OOTAVBal,0,S,$)
 
+#OOAcFg=X,1,S
+
+#OOTxNo=X,18,S
 !交易明細
 #OOBUF1=X,32,S
 T(2,#CustNo+000+000+#OOAcDate)
 #OOBTN1=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易明細;ntxbuf=#OOBUF1})
+C(5,#OOAcFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易明細;ntxbuf=#OOBUF1}),BIND(grid,cancel))
+
 
 </sub>
 
@@ -246,6 +253,8 @@ TXFORM=L6909
 #OOTAVDb
 #OOTAVCr
 #OOTAVBal
+#OOAcFg
+#OOTxNo
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
@@ -268,8 +277,8 @@ TXFORM=L6909
 #RPTFG=0,QUERY.GRID,L6909
 #any={detail:true, header:'L6909.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN1=交易明細
-{width:80,search:false,formatter:'cust:bind-button:交易明細',canExport:false,align:'center'}
+#OOBTN1=
+{width:80,search:false,formatter:'cust:bind-button:',canExport:false,align:'center'}
 
 #OOEntryDate=入帳日期
 {width:80,align:'center'}
@@ -290,6 +299,8 @@ TXFORM=L6909
 {width:170}
 
 #OOTAVBalX=餘額
+{width:170}
+#OOTxNo=交易序號
 {width:170}
 
 ^

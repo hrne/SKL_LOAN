@@ -3,7 +3,6 @@ package com.st1.itx.trade.LD;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -218,8 +217,8 @@ public class LD008Report extends MakeReport {
 		BigDecimal f2A = percentOfFunds(listLD008.get(1).get("F2"));
 		BigDecimal f3A = percentOfFunds(listLD008.get(2).get("F2"));
 
-		String totalA = t1A.add(t2A).add(t3A).toString();
-		String fundsA = f1A.add(f2A).add(f3A).toString();
+		String totalA = formatAmt(t1A.add(t2A).add(t3A), 2);
+		String fundsA = formatAmt(f1A.add(f2A).add(f3A), 2);
 
 		print(0, 147, totalA, "R"); // 各項比率
 		print(0, 163, fundsA, "R"); // 占資金比率
@@ -255,8 +254,8 @@ public class LD008Report extends MakeReport {
 		BigDecimal f2B = percentOfFunds(listLD008.get(4).get("F2"));
 		BigDecimal f3B = percentOfFunds(listLD008.get(5).get("F2"));
 
-		String totalB = t1B.add(t2B).add(t3B).toString();
-		String fundsB = f1B.add(f2B).add(f3B).toString();
+		String totalB = formatAmt(t1B.add(t2B).add(t3B), 2);
+		String fundsB = formatAmt(f1B.add(f2B).add(f3B), 2);
 		print(0, 147, totalB, "R"); // 各項比率
 		print(0, 163, fundsB, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
@@ -291,8 +290,8 @@ public class LD008Report extends MakeReport {
 		BigDecimal f2C = percentOfFunds(listLD008.get(7).get("F2"));
 		BigDecimal f3C = percentOfFunds(listLD008.get(8).get("F2"));
 
-		String totalC = t1C.add(t2C).add(t3C).toString();
-		String fundsC = f1C.add(f2C).add(f3C).toString();
+		String totalC = formatAmt(t1C.add(t2C).add(t3C), 2);
+		String fundsC = formatAmt(f1C.add(f2C).add(f3C), 2);
 		print(0, 147, totalC, "R"); // 各項比率
 		print(0, 163, fundsC, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
@@ -394,8 +393,8 @@ public class LD008Report extends MakeReport {
 		BigDecimal f1A = percentOfFunds(listLD008r.get(1).get("F2"));
 		BigDecimal f2A = percentOfFunds(listLD008r.get(2).get("F2"));
 
-		String totalA = t1A.add(t2A).toString();
-		String fundsA = f1A.add(f2A).toString();
+		String totalA = formatAmt(t1A.add(t2A), 2);
+		String fundsA = formatAmt(f1A.add(f2A), 2);
 
 		print(0, 147, totalA, "R"); // 各項比率
 		print(0, 163, fundsA, "R"); // 占資金比率
@@ -423,8 +422,8 @@ public class LD008Report extends MakeReport {
 		BigDecimal f1B = percentOfFunds(listLD008r.get(4).get("F2"));
 		BigDecimal f2B = percentOfFunds(listLD008r.get(5).get("F2"));
 
-		String totalB = t1B.add(t2B).toString();
-		String fundsB = f1B.add(f2B).toString();
+		String totalB = formatAmt(t1B.add(t2B), 2);
+		String fundsB = formatAmt(f1B.add(f2B), 2);
 		print(0, 147, totalB, "R"); // 各項比率
 		print(0, 163, fundsB, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalB), 2), "R"); // 各項比率
@@ -451,8 +450,8 @@ public class LD008Report extends MakeReport {
 		BigDecimal f1C = percentOfFunds(listLD008r.get(7).get("F2"));
 		BigDecimal f2C = percentOfFunds(listLD008r.get(8).get("F2"));
 
-		String totalC = t1C.add(t2C).toString();
-		String fundsC = f1C.add(f2C).toString();
+		String totalC = formatAmt(t1C.add(t2C), 2);
+		String fundsC = formatAmt(f1C.add(f2C), 2);
 		print(0, 147, totalC, "R"); // 各項比率
 		print(0, 163, fundsC, "R"); // 占資金比率
 //		print(0, 147, formatAmt(percentOfTotal(subTotalC), 2), "R"); // 各項比率
@@ -473,7 +472,7 @@ public class LD008Report extends MakeReport {
 	}
 
 	private BigDecimal percentOfTotal(BigDecimal amt) {
-		return computeDivide(amt, total, 4).multiply(hundred).setScale(2, RoundingMode.HALF_UP);
+		return computeDivide(amt, total, 4).multiply(hundred);
 	}
 
 	private BigDecimal percentOfFunds(String input) {
@@ -482,7 +481,7 @@ public class LD008Report extends MakeReport {
 	}
 
 	private BigDecimal percentOfFunds(BigDecimal amt) {
-		return computeDivide(amt, availableFunds, 4).multiply(hundred).setScale(2, RoundingMode.HALF_UP);
+		return computeDivide(amt, availableFunds, 4).multiply(hundred);
 	}
 
 	private void computeTotal(List<Map<String, String>> listLD008) {

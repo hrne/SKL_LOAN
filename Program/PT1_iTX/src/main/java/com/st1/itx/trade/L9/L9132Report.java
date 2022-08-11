@@ -242,7 +242,7 @@ public class L9132Report extends MakeReport {
 				// 子目
 				String acSubCode = r.get("AcSubCode");
 				// 傳票號碼
-				String titaTxtNo = "0".equals(r.get("TitaTxtNo")) ? " " : r.get("TitaTxtNo");
+				String slipNo = "0".equals(r.get("SlipNo")) ? " " : r.get("SlipNo");
 
 				// 資金來源(帳冊別)
 //				String acSubBookCode = r.get("AcSubBookCode");
@@ -272,7 +272,7 @@ public class L9132Report extends MakeReport {
 				// 子目
 				print(0, 1, acSubCode);
 				// 傳票號碼
-				print(0, 56, titaTxtNo, "R");
+				print(0, 56, slipNo, "R");
 				// 區隔帳冊
 				print(0, 67, acSubBookItem,"C");
 				// 戶號

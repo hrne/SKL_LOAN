@@ -52,8 +52,9 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "  SELECT  ";
 
-		sql += "    ad.\"TxAmt\"        AS \"TxAmt\",";
 		sql += "    ad.\"FacmNo\"       AS \"FacmNo\",";
+		sql += "    SUM(CASE WHEN ad.\"DbCr\" = 'D' then ad.\"TxAmt\" ELSE 0 END)  AS \"DbAmt\",";
+		sql += "    SUM(CASE WHEN ad.\"DbCr\" = 'C' then ad.\"TxAmt\" ELSE 0 END)  AS \"CrAmt\",";
 		sql += "    ad.\"TitaTlrNo\"    AS \"TitaTlrNo\",";
 		sql += "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
@@ -61,9 +62,8 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  	lx.\"Desc\"  		AS \"Desc\", ";
 		sql += "  	lx.\"EntryDate\"  	AS \"EntryDate\", ";
 		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
-		sql += "    ad.\"CreateDate\"   AS \"CreateDate\",";
-		sql += "    ad.\"DbCr\"         AS \"DbCr\",";
-		sql += "    1                   AS \"DB\" ";
+		sql += "    MIN(ad.\"CreateDate\")   AS \"CreateDate\",";
+		sql += "    ad.\"AcSeq\"        AS \"AcSeq\" ";
 		sql += "  FROM";
 		sql += "    \"AcDetail\"   ad";
 		sql += "  LEFT JOIN  \"LoanBorTx\"     lx";
@@ -80,10 +80,19 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iFacmNo > 0) {
 			sql += "    AND ad.\"FacmNo\" = :facmno";
 		}
+		sql += "  GROUP BY ad.\"FacmNo\" ";
+		sql += "          ,ad.\"AcDate\"    ";
+		sql += "          ,ad.\"TitaTlrNo\" ";
+		sql += "          ,ad.\"TitaTxtNo\" ";
+		sql += "          ,ad.\"TitaTxCd\"  ";
+		sql += "          ,ad.\"AcSeq\"  ";
+		sql += "          ,tc.\"TranItem\"  ";
+		sql += "          ,lx.\"Desc\"      ";
+		sql += "  	      ,lx.\"EntryDate\" ";
 		if ("1".equals(iSortCode)) {
-			sql += " ORDER BY  lx.\"EntryDate\",ad.\"CreateDate\", ad.\"FacmNo\" ,ad.\"AcSeq\" ";
+			sql += " ORDER BY  \"EntryDate\", \"CreateDate\", \"FacmNo\" ,\"AcSeq\" ";
 		} else {
-			sql += " ORDER BY   ad.\"FacmNo\" ,lx.\"EntryDate\",ad.\"CreateDate\",ad.\"AcSeq\" ";
+			sql += " ORDER BY  \"FacmNo\", \"EntryDate\", \"CreateDate\", \"AcSeq\" ";
 		}
 
 		sql += " " + sqlRow;

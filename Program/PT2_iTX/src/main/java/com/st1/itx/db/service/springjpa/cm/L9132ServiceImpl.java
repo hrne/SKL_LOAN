@@ -100,7 +100,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM rawdata ";
 		sql += " ORDER BY \"AcNoCode\" ASC";
 		sql += "		 ,\"AcSubCode\" ASC";
-		sql += " 		 ,CASE WHEN \"TitaTxtNo\" LIKE '9%' AND LENGTH(\"TitaTxtNo\") = 5 THEN \"TitaTxtNo\" * 100 ELSE \"TitaTxtNo\" END ASC";
+		sql += " 		 ,CASE WHEN \"SlipNo\" LIKE '9%' AND LENGTH(\"SlipNo\") = 5 THEN \"TitaTxtNo\" * 100 ELSE \"SlipNo\" END ASC";
 	
 		this.info("doQueryL9132 sql=" + sql);
 		Query query;
@@ -644,41 +644,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , B.\"CustName\" ";
 		sql += "      , B.\"EmpName\" ";
 		sql += " FROM groupData2 B ";
-		
-//		sql += " SELECT AC.\"TitaTlrNo\" ";
-//		sql += "      , AC.\"TitaTxtNo\" ";
-//		sql += "      , AC.\"SlipNo\" ";
-//		sql += "      , AC.\"AcNoCode\" || ' ' || CDAC.\"AcNoItem\" ";
-//		sql += "                                AS \"AcNo\" ";
-//		sql += "      , \"Fn_GetCdCode\"('AcSubBookCode',AC.\"AcSubBookCode\") ";
-//		sql += "                                AS \"AcSubBookItem\" ";
-//		sql += "      , CASE ";
-//		sql += "          WHEN AC.\"DbCr\" = 'D' ";
-//		sql += "          THEN AC.\"TxAmt\" ";
-//		sql += "        ELSE 0 END              AS \"DbAmt\" ";
-//		sql += "      , CASE ";
-//		sql += "          WHEN AC.\"DbCr\" = 'C' ";
-//		sql += "          THEN AC.\"TxAmt\" ";
-//		sql += "        ELSE 0 END              AS \"CrAmt\" ";
-//		sql += "      , CASE ";
-//		sql += "          WHEN AC.\"CustNo\" != 0 ";
-//		sql += "          THEN LPAD(AC.\"CustNo\",7,'0') ";
-//		sql += "        ELSE ' ' END            AS \"CustNo\" ";
-//		sql += "      , RPAD(NVL(CM.\"CustName\",' '),6,' ') ";
-//		sql += "                                AS \"CustName\" ";
-//		sql += "      , \"Fn_GetEmpName\"(AC.\"TitaTlrNo\",1) ";
-//		sql += "                                AS \"EmpName\" ";
-//		sql += " FROM \"AcDetail\" AC ";
-//		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
-//		sql += "                          AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
-//		sql += "                          AND CDAC.\"AcDtlCode\" = AC.\"AcDtlCode\" ";
-//		sql += " LEFT JOIN \"CustMain\" CM ON AC.\"CustNo\" != 0 ";
-//		sql += "                        AND CM.\"CustNo\" = AC.\"CustNo\" ";
-//		sql += " WHERE AC.\"AcDate\" = :acDate ";
-//		sql += "   AND AC.\"SlipBatNo\" = :batchNo ";
-//		sql += " ORDER BY AC.\"TitaTlrNo\" ";
-//		sql += "        , AC.\"SlipNo\" ";
-//		sql += "        , AC.\"TitaTxtNo\" ";
+
 		this.info("doQueryL9132C sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

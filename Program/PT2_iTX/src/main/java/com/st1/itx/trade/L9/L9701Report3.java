@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -22,6 +23,8 @@ public class L9701Report3 extends MakeReport {
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
 
+
+	
 	// 製表日期
 	private String nowDate;
 	// 製表時間
@@ -31,6 +34,8 @@ public class L9701Report3 extends MakeReport {
 	private String facmNo;
 
 	public int tempPage = 0;
+	
+	
 
 	String nextPageText = "=====  續下頁  =====";
 	String endText = "=====  報  表  結  束  =====";
@@ -95,12 +100,7 @@ public class L9701Report3 extends MakeReport {
 	}
 
 	private void printDataHeader() {
-//		if (this.NowRow >= 35) {
-		// 若剩餘行數不足5行,先換頁
-//			this.newPage(); // 換頁時會印表頭
-//			this.print(1, 1, " ");
-//			tempPage = getNowPage();
-//		} else {
+
 
 		String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
@@ -176,9 +176,9 @@ public class L9701Report3 extends MakeReport {
 			for (Map<String, String> tL9701Vo : listL9701) {
 //				this.info("nowrow=" + this.NowRow);
 				if (this.NowRow - 7 >= 40) {
-					this.print(1, this.getMidXAxis(), nextPageText,"C"); 
+					this.print(1, this.getMidXAxis(), nextPageText, "C");
 					this.newPage();
-					this.print(1, 1, " "); 
+					this.print(1, 1, " ");
 				}
 
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
@@ -242,11 +242,11 @@ public class L9701Report3 extends MakeReport {
 		this.print(0, 49, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
 
 		// 暫收借
-		BigDecimal tempAmt = new BigDecimal(tL9701Vo.get("TempAmt"));
-		BigDecimal tempDbAmt = tempAmt.compareTo(BigDecimal.ZERO) > 0 ? tempAmt : BigDecimal.ZERO;
-		BigDecimal tempCrAmt = tempAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO.subtract(tempAmt)
-				: BigDecimal.ZERO;
-		this.print(0, 67, formatAmt(tempDbAmt, 0), "R");
+//		BigDecimal tempAmt = new BigDecimal(tL9701Vo.get("TempAmt"));
+//		BigDecimal tempDbAmt = tempAmt.compareTo(BigDecimal.ZERO) > 0 ? tempAmt : BigDecimal.ZERO;
+//		BigDecimal tempCrAmt = tempAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO.subtract(tempAmt)
+//				: BigDecimal.ZERO;
+		this.print(0, 67, formatAmt(tL9701Vo.get("TempAmt"), 0), "R");
 		// 本金
 		this.print(0, 83, formatAmt(tL9701Vo.get("Principal"), 0), "R");
 
@@ -259,7 +259,7 @@ public class L9701Report3 extends MakeReport {
 		// 短繳
 		this.print(0, 146, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
 		// 暫收貸
-		this.print(0, 162, tempCrAmt.toString(), "R");
+		this.print(0, 162, formatAmt(tL9701Vo.get("Overflow"), 0), "R");
 
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));

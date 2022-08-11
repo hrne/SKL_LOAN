@@ -1847,6 +1847,7 @@ TXFORM=L2R04
 #L2r05RvBormNo=A,3,S
 #L2r05NextRvBormNo=A,3,S
 #L2r05RvDrawdownAmt=m,14.2,S
+#L2r05RenewFlag=X,1,S
 #L2r05Grcd=X,1,S
 #L2r05GrKind=X,1,S
 #L2r05EsGcd=X,1,S
@@ -1965,6 +1966,7 @@ TXFORM=L2R05
 #L2r05RvBormNo
 #L2r05NextRvBormNo
 #L2r05RvDrawdownAmt
+#L2r05RenewFlag
 #L2r05Grcd
 #L2r05GrKind
 #L2r05EsGcd

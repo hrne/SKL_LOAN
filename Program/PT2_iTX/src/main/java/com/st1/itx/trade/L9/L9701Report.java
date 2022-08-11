@@ -97,11 +97,6 @@ public class L9701Report extends MakeReport {
 	}
 
 	private void printFacHead() {
-//		if (this.NowRow >= 35) {
-//			// 若剩餘行數不足5行,先換頁
-//			this.newPage(); // 換頁時會印表頭
-//			this.print(1, 1, " ");
-//		} else {
 
 			String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
@@ -119,7 +114,7 @@ public class L9701Report extends MakeReport {
 			this.print(0, 111, "利息");
 			this.print(0, 125, "違約金");
 			this.print(0, 141, "費用");
-			this.print(0, 155, "溢短繳");
+			this.print(0, 155, "短繳");
 			divider();
 //			this.print(1, 7,
 //					"　入帳日　　　計息本金　　　　計息期間　　　　利率　　　　交易金額          本金                 利息　    　　　違約金　　　　　費用　　　　  溢短繳   ");
@@ -243,6 +238,7 @@ public class L9701Report extends MakeReport {
 		if (!"0".equals(tL9701Vo.get("Rate"))) {
 			this.print(0, 74, formatAmt(tL9701Vo.get("Rate"), 4), "R");
 		}
+
 		// 交易金額
 		this.print(0, 89, formatAmt(tL9701Vo.get("TxAmt"), 0), "R");
 		// 本金
@@ -253,8 +249,8 @@ public class L9701Report extends MakeReport {
 		this.print(0, 133, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
 		// 費用
 		this.print(0, 148, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
-		// 溢短繳
-		this.print(0, 163, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
+		// 短繳
+		this.print(0, 163, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
 
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
@@ -267,7 +263,9 @@ public class L9701Report extends MakeReport {
 	}
 
 	private void printFacEnd(Map<String, String> tL9701Vo, List<BaTxVo> listBaTxVo) {
-
+		shortFall = BigDecimal.ZERO;
+		excessive = BigDecimal.ZERO;
+		
 		int tmpFacmNo = Integer.parseInt(tL9701Vo.get("FacmNo"));
 		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {

@@ -55,7 +55,6 @@ public class L9701Report2 extends MakeReport {
 	BigDecimal loanBal = BigDecimal.ZERO; // 放款餘額
 	BigDecimal shortFall = BigDecimal.ZERO; // 累短收
 	BigDecimal excessive = BigDecimal.ZERO; // 累溢收
-	
 
 	String nextPageText = "=====  續下頁  =====";
 	String endText = "=====  報  表  結  束  =====";
@@ -123,7 +122,7 @@ public class L9701Report2 extends MakeReport {
 			this.print(0, 111, "利息");
 			this.print(0, 125, "違約金");
 			this.print(0, 141, "費用");
-			this.print(0, 155, "溢短繳");
+			this.print(0, 155, "短繳");
 			divider();
 
 		}
@@ -183,9 +182,9 @@ public class L9701Report2 extends MakeReport {
 		if (listL9701 != null && listL9701.size() > 0) {
 			for (Map<String, String> tL9701Vo : listL9701) {
 				if (this.NowRow - 7 >= 40) {
-					this.print(1, this.getMidXAxis(), nextPageText,"C"); 
+					this.print(1, this.getMidXAxis(), nextPageText, "C");
 					this.newPage();
-					this.print(1, 1, " "); 
+					this.print(1, 1, " ");
 				}
 				if (!this.facmNo.equals(tL9701Vo.get("FacmNo")) || tL9701Vo.get("DB").equals("2")) {
 					// 無交易明細且無餘額
@@ -256,8 +255,8 @@ public class L9701Report2 extends MakeReport {
 		this.print(0, 133, formatAmt(tL9701Vo.get("BreachAmt"), 0), "R");
 		// 費用
 		this.print(0, 148, formatAmt(tL9701Vo.get("FeeAmt"), 0), "R");
-		// 溢短繳
-		this.print(0, 163, formatAmt(tL9701Vo.get("OverShortAmt"), 0), "R");
+		// 短繳
+		this.print(0, 163, formatAmt(tL9701Vo.get("ShortAmt"), 0), "R");
 
 		principal = new BigDecimal(tL9701Vo.get("Principal"));
 		interest = new BigDecimal(tL9701Vo.get("Interest"));
@@ -270,7 +269,9 @@ public class L9701Report2 extends MakeReport {
 	}
 
 	private void printFacEnd(Map<String, String> tL9701Vo, List<BaTxVo> listBaTxVo) {
-
+		shortFall = BigDecimal.ZERO;
+		excessive = BigDecimal.ZERO;
+		
 		int tmpFacmNo = Integer.parseInt(tL9701Vo.get("FacmNo"));
 		loanBal = new BigDecimal(tL9701Vo.get("Amount"));
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {

@@ -39,12 +39,10 @@ public class L6909 extends TradeBuffer {
 	@Autowired
 	public L6909ServiceImpl l6909ServiceImpl;
 
-	private List<Map<String, String>> oList2 = new ArrayList<Map<String, String>>();
 	// 額度小計
 	private HashMap<Integer, BigDecimal> facmBal = new HashMap<>();
 	private HashMap<Integer, Integer> facmEntryDate = new HashMap<>();
 	private HashMap<Integer, Integer> facmAcDate = new HashMap<>();
-	private int entryDate = 0;
 	private int acdate = 0;
 
 	@Override
@@ -58,13 +56,8 @@ public class L6909 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
 
-		int iEntryDateS = parse.stringToInteger(titaVo.get("EntryDateS").trim());
-		int iEntryDateE = parse.stringToInteger(titaVo.get("EntryDateE").trim());
-		String iSortCode = titaVo.get("SortCode").trim();
-
 		List<Map<String, String>> L6909List = null;
 		List<Map<String, String>> oList = new ArrayList<Map<String, String>>();
-		List<Map<String, String>> oList1 = new ArrayList<Map<String, String>>();
 
 		try {
 			L6909List = l6909ServiceImpl.FindAll(titaVo, this.index, this.limit);
@@ -82,7 +75,6 @@ public class L6909 extends TradeBuffer {
 			String newTxNo = "";
 			int seq = 0;
 			for (Map<String, String> t : L6909List) {
-				this.info("L6909List t = " + t.toString());
 				Map<String, String> da = new HashMap<>();
 				acdate = parse.stringToInteger(t.get("AcDate")) - 19110000;
 				int facmNo = parse.stringToInteger(t.get("FacmNo"));
@@ -93,8 +85,6 @@ public class L6909 extends TradeBuffer {
 						+ parse.IntegerToString(parse.stringToInteger(t.get("TitaTxtNo")), 8);
 				String AcFg = "";
 				// 畫面按鈕控制 第一筆為主要次筆為副
-				this.info("newtxno = " + newTxNo);
-				this.info("txNo = " + txNo);
 				if (txNo.equals(newTxNo)) {
 					AcFg = "";
 				} else {
@@ -102,23 +92,21 @@ public class L6909 extends TradeBuffer {
 					newTxNo = txNo;
 				}
 
-				int txtNo = parse.stringToInteger(t.get("TitaTxtNo"));
 				String OODesc = t.get("Desc"); // 交易別
 				if (parse.stringToInteger(t.get("EntryDate")) != 0) {
 					entrydate = parse.stringToInteger(t.get("EntryDate")) - 19110000;
 				}
-				if ("D".equals(t.get("DbCr"))) {
-					tavDb = parse.stringToBigDecimal(t.get("TxAmt"));
-					tavCr = BigDecimal.ZERO;
-				} else {
-					tavCr = parse.stringToBigDecimal(t.get("TxAmt"));
-					tavDb = BigDecimal.ZERO;
-				}
+				tavDb = parse.stringToBigDecimal(t.get("DbAmt"));
+				tavCr = parse.stringToBigDecimal(t.get("CrAmt"));
 
 				if (facmBal.containsKey(facmNo)) {
 					facmBal.put(facmNo, facmBal.get(facmNo).add(tavCr.subtract(tavDb)));
 				} else {
-					facmBal.put(facmNo, tavCr.subtract(tavDb));
+					if (tavCr.compareTo(BigDecimal.ZERO) > 0) {
+						facmBal.put(facmNo, tavCr);
+					} else {
+						facmBal.put(facmNo, BigDecimal.ZERO);
+					}
 				}
 				if (facmEntryDate.containsKey(facmNo)) {
 					facmEntryDate.put(facmNo, entrydate);

@@ -1056,15 +1056,20 @@ C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#WkBeginMm,0),D(7,2,#L2r05Firs
 #WkMaturityDate=D,8,S
 C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#WkYyMm,#LoanTermDd),E(0,#L2r05MaturityDate))
 
+!重算額度貸款期間
+#WkFacMaturityDate=D,8,S
+D(7,2,#DrawdownDate,#WkYyMm,#LoanTermDd)
 ![到期日]
 !自動顯示
 #FdMaturityDate=X,2,L
 
-#MaturityDate=D,7,L
+#MaturityDate=D,7,I
 E(0,#WkMaturityDate)
+C(5,#L2r05RenewFlag,Y,$,s)
 !C(3,#MaturityDate,0,E(0,#WkMaturityDate),$)
-!@A(DATE,0,#MaturityDate)
-!V(5,#WkBeginDate,#WkMaturityDate)
+D(8)
+@A(DATE,0,#MaturityDate)
+V(5,#WkBeginDate,#WkFacMaturityDate)
 
 #WkDifferenceDate=A,8,S
 D(7,1,#DrawdownDate,#MaturityDate,0)

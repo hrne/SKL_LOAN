@@ -237,7 +237,11 @@ public class L2R05 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3083", "額度主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 撥款審核資料表尚未列印，請先作L9110交易
 			}
 			if (iFKey != 7) {
-				if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) <= 0) {
+				if ((tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) <= 0)
+						|| (tFacMain.getRecycleCode().equals("0")
+								&& tFacMain.getUtilDeadline() < this.txBuffer.getTxCom().getTbsdy())
+						|| (tFacMain.getRecycleCode().equals("1")
+								&& tFacMain.getRecycleDeadline() < this.txBuffer.getTxCom().getTbsdy())) {
 					// TODO:檢查此額度是否為借新還舊
 					tAcReceivable = acReceivableService.findById(new AcReceivableId("TRO", iCustNo, iFacmNo,
 							"FacmNo" + StringUtils.leftPad(String.valueOf(iFacmNo), 3, "0")), titaVo);
@@ -476,6 +480,7 @@ public class L2R05 extends TradeBuffer {
 		String wkLimitFlag = loanAvailableAmt.getLimitFlag();
 		// 借新還舊處理
 		this.totaVo.putParam("L2r05AvailableAmt", tAcReceivable == null ? wkAvailableAmt : tAcReceivable.getAcBal());
+		this.totaVo.putParam("L2r05RenewFlag", tAcReceivable == null ? "N" : "Y");
 		this.totaVo.putParam("L2r05LimitFlag", wkLimitFlag);
 
 		// 綠色授信
@@ -661,6 +666,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05RvBormNo", 0);
 		this.totaVo.putParam("L2r05NextRvBormNo", 0); // 預定撥款序號
 		this.totaVo.putParam("L2r05RvDrawdownAmt", 0);
+		this.totaVo.putParam("L2r05RenewFlag", "N");
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("L2r05StepRateMonths" + i, 0);
 			this.totaVo.putParam("L2r05StepRateMonthE" + i, 0);
