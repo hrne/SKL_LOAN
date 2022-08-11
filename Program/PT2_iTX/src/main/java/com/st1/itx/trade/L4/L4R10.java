@@ -33,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R10 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R10.class);
 	@Autowired
 	public BatxHeadService batxHeadService;
 
@@ -50,58 +49,27 @@ public class L4R10 extends TradeBuffer {
 
 		int iAcDate = parse.stringToInteger(titaVo.getParam("RimAcDate").trim()) + 19110000;
 		String txCode = titaVo.getParam("RimTxCode");
-
-		BatxHeadId tBatxHeadId = new BatxHeadId();
-		tBatxHeadId.setAcDate(iAcDate);
-		tBatxHeadId.setBatchNo("BATX01");
-
-		BatxHead tBatxHead = new BatxHead();
-		List<BatxHead> lBatxHead = new ArrayList<BatxHead>();
-		tBatxHead = batxHeadService.findById(tBatxHeadId);
-
-//		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-//		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 500;
-
-		Slice<BatxHead> sBatxHead = null;
-
-		String batchno = "";
-
 		this.info("txCode : " + txCode);
-
-//		1.整批入帳 L4200 > 抓取目前最大的批號+1
-//		2.其他來源 L4210 > 如果有4210&非刪除者，則抓取該批號，否則抓取目前最大的批號+1
-		if (tBatxHead == null) {
-			this.totaVo.putParam("L4r10BatchNo", "BATX01");
-		} else {
-			sBatxHead = batxHeadService.acDateRange(iAcDate, iAcDate, this.index, this.limit);
-
-			lBatxHead = sBatxHead == null ? null : sBatxHead.getContent();
-
-			int listSize = lBatxHead.size() + 1;
-			if ("L4200".equals(txCode)) {
-				batchno = "BATX" + FormatUtil.pad9("" + listSize, 2);
-
-				this.totaVo.putParam("L4r10BatchNo", batchno);
-			} else if ("L4210".equals(txCode)) {
-				for (BatxHead t2BatxHead : lBatxHead) {
-					if (txCode.equals(t2BatxHead.getTitaTxCd())) {
-//						20210414 不同櫃員建立不同批號 by 賴桑
-						if (!"8".equals(t2BatxHead.getBatxExeCode()) && t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
-							batchno = t2BatxHead.getBatchNo();
-							break;
-						} else {
-							batchno = "BATX" + FormatUtil.pad9("" + listSize, 2);
-						}
-					} else {
-						batchno = "BATX" + FormatUtil.pad9("" + listSize, 2);
-					}
-				}
+		String batchNo = "";
+//		2.其他來源建檔 L4210 > 如果有L4210&非刪除者，同經辦則抓取該批號，否則抓取目前最大的批號+1
+		if ("L4210".equals(txCode)) {
+			BatxHead tBatxHead = batxHeadService.titaTxCdFirst(iAcDate, "L4450", "8");
+			if (tBatxHead != null && tBatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
+				batchNo = tBatxHead.getBatchNo();
 			}
-
-			this.totaVo.putParam("L4r10BatchNo", batchno);
 		}
+		
+		// 抓取目前最大的批號+1
+		if (batchNo.isEmpty()) {
+			BatxHead tBatxHead = batxHeadService.batchNoDescFirst(iAcDate, "BATX%", titaVo);
+			if (tBatxHead == null)
+				batchNo = "BATX01";
+			else
+				batchNo = "BATX"
+						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+		}
+
+		this.totaVo.putParam("L4r10BatchNo", batchNo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

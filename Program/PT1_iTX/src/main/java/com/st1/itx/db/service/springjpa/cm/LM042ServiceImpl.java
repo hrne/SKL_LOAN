@@ -37,6 +37,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
 	 * @param lYearMonth 上西元年月
+	 * @return 
+	 * @throws Exception 
 	 */
 	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth,int lYearMonth) throws Exception {
 		this.info("lM042.findStatistics1");
@@ -114,6 +116,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
+	 * @return 
+	 * @throws Exception 
 	 */
 	public List<Map<String, String>> findStatistics2(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics2");
@@ -196,6 +200,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
+	 * @return 
+	 * @throws Exception 
 	 */
 	public List<Map<String, String>> findStatistics3(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics3 ");
@@ -252,6 +258,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth     當西元年月
 	 * @param lastYearMonth 上西元年月
+	 * @return 
+	 * @throws Exception 
 	 */
 	public List<Map<String, String>> findRBC(TitaVo titaVo, int yearMonth, int lastYearMonth) throws Exception {
 		this.info("lM042.findRBC ");

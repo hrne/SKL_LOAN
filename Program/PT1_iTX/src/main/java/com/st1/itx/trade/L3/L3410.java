@@ -165,12 +165,7 @@ public class L3410 extends TradeBuffer {
 	private BigDecimal wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 	private BigDecimal wkShortfallInterest = BigDecimal.ZERO; // 累短收-利息
 	private BigDecimal wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
-	private BigDecimal wkAcctFee = BigDecimal.ZERO;
-	private BigDecimal wkModifyFee = BigDecimal.ZERO;
-	private BigDecimal wkFireFee = BigDecimal.ZERO;
-	private BigDecimal wkLawFee = BigDecimal.ZERO;
 	private BigDecimal wkRolloverAmt = BigDecimal.ZERO;
-	private BigDecimal wkTotalRepay = BigDecimal.ZERO; // 總還款金額
 	private AcDetail acDetail;
 	private TempVo tTempVo = new TempVo();
 	private FacMain tFacMain;
@@ -720,16 +715,7 @@ public class L3410 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		switch (iCaseCloseCode) {
-		case 1:
-			tLoanBorTx.setDesc("展期");
-			break;
-		case 2:
-			tLoanBorTx.setDesc("借新還舊");
-			break;
-		default:
-			tLoanBorTx.setDesc("結案登錄-可欠繳");
-		}
+		tLoanBorTx.setDesc("結案登錄-可欠繳");
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(0);
 		tLoanBorTx.setDueDate(wkDueDate);
@@ -746,7 +732,6 @@ public class L3410 extends TradeBuffer {
 		tLoanBorTx.setCloseBreachAmt(wkShortCloseBreach); // 短繳收回
 		tLoanBorTx.setExtraRepay(BigDecimal.ZERO);
 		tLoanBorTx.setUnpaidInterest(wkInterest.add(wkDelayInt).add(wkBreachAmt));
-
 		tLoanBorTx.setShortfall(wkShortfall); // 短收收回金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {

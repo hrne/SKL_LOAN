@@ -33,6 +33,8 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param yearMonth 西元年月
 	 * @param lastYM 上西元年月
 	 * @param formNum 表格次序
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	

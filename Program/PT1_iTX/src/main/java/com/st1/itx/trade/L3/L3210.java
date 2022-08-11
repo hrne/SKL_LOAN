@@ -16,12 +16,14 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
@@ -379,7 +381,15 @@ public class L3210 extends TradeBuffer {
 			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 			// 貸方：累溢收入帳(暫收貸)
-			loanCom.settleOverflow(lAcDetail, titaVo);
+			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("TAV");
+			acDetail.setTxAmt(baTxCom.getExcessive().add(iTempAmt));
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setBormNo(0);
+			acDetail.setSumNo("090"); // 暫收可抵繳
+			lAcDetail.add(acDetail);
 
 			// 新增放款交易內容檔
 			addLoanBorTxRoutine();
@@ -394,7 +404,7 @@ public class L3210 extends TradeBuffer {
 		if (iRpCode == 90 && lAcDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0010", "無費用項目可抵繳，請執行<轉暫收> "); // 功能選擇錯誤
 		}
-		
+
 	}
 
 	// 新增放款交易內容檔
@@ -404,7 +414,7 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-// TempReasonCodeX
+// TempReasonCode
 //		00	債協暫收款
 //		01	溢繳
 //		02	不足利息
@@ -421,7 +431,6 @@ public class L3210 extends TradeBuffer {
 			tLoanBorTx.setDesc(iTempReasonCodeX + "登錄");
 		} else {
 			tLoanBorTx.setDesc("暫收款登錄");
-			tTempVo.putParam("Note", iTempReasonCodeX);
 		}
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源

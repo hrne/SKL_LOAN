@@ -701,6 +701,7 @@ T(3,[L3410] 結案登錄-可欠繳)
 #NewApplNo#NewFacmNo#TimReduceAmt#LawFee#RqspFlag
 #TimShortAmt
 #TimInterest#TimDelayInt#TimBreachAmt#TimPrincipal
+#CaseCloseCodeX
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustId#ApplNo
 #TwReduceAmt#UsReduceAmt

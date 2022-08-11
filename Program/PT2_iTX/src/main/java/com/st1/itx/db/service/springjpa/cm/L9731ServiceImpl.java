@@ -30,9 +30,10 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出(放款餘額明細表)
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
-	*/
+	 * @param yearMonth
+	 * @return
+	 * @throws Exception
+	 */
 	public List<Map<String, String>> findSheet1(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("l9731.findLA$W30P ");
 
@@ -108,8 +109,9 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出(放款總歸戶明細表)
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
+	 * @param yearMonth
+	 * @return
+	 * @throws Exception
 	 */
 	public List<Map<String, String>> findSheet2(TitaVo titaVo, int yearMonth) throws Exception {
 		// 年
@@ -177,8 +179,9 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出(五類資產檢核表、放款額度明細表)
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
+	 * @param yearMonth
+	 * @return
+	 * @throws Exception
 	 */
 	public List<Map<String, String>> findSheet3_1(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("l9731.findSheet3_1 ");
@@ -251,8 +254,9 @@ public class L9731ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
-	 * 
+	 * @param yearMonth
+	 * @return
+	 * @throws Exception
 	 */
 	public List<Map<String, String>> findSheet3_2(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("l9731.findSheet3_2 ");

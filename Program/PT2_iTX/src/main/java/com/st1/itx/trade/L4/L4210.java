@@ -2,12 +2,13 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -117,7 +118,8 @@ public class L4210 extends TradeBuffer {
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 		iRepayType = parse.stringToInteger(titaVo.getParam("RepayType"));
-		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5) + FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
+		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5)
+				+ FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
 		iRepayAmt = parse.stringToBigDecimal(titaVo.getParam("RepayAmt"));
 		iRepayId = titaVo.getParam("RepayId");
 		iRepayName = titaVo.getParam("RepayName");
@@ -241,7 +243,7 @@ public class L4210 extends TradeBuffer {
 		tBatxHeadId.setAcDate(iAcDate);
 		tBatxHeadId.setBatchNo(iBatchNo);
 		Boolean isInsert = false;
-		tBatxHead = batxHeadService.holdById(tBatxHeadId);
+		tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
 		if (tBatxHead == null) {
 			isInsert = true;
 			tBatxHead = new BatxHead();
@@ -270,7 +272,7 @@ public class L4210 extends TradeBuffer {
 			}
 		} else {
 			try {
-				batxHeadService.update(tBatxHead);
+				batxHeadService.update(tBatxHead, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "L4210 BatxHead update : " + e.getErrorMsg());
 			}
@@ -284,12 +286,13 @@ public class L4210 extends TradeBuffer {
 		tBatxDetailId.setAcDate(iAcDate);
 		tBatxDetailId.setBatchNo(iBatchNo);
 		tBatxDetailId.setDetailSeq(iDetailSeq);
-		tBatxDetail = batxDetailService.holdById(tBatxDetailId);
+		tBatxDetail = batxDetailService.holdById(tBatxDetailId, titaVo);
 		if (tBatxDetail == null) {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxDetail 無此資料");
 		}
 
-		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
+		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode())
+				|| "7".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException(titaVo, "E0010", "已入帳，請先訂正該筆資料"); // E0010 功能選擇錯誤
 		}
 
@@ -323,7 +326,7 @@ public class L4210 extends TradeBuffer {
 		tempVo.putParam("Remark", wkRemark);
 		tBatxDetail.setProcNote(tempVo.getJsonString());
 		try {
-			batxDetailService.update(tBatxDetail);
+			batxDetailService.update(tBatxDetail, titaVo);
 		} catch (DBException e) {
 			if (e.getErrorId() == 2)
 				throw new LogicException(titaVo, "E0007", "L4210 BatxDetail update " + e.getErrorMsg());
@@ -335,7 +338,7 @@ public class L4210 extends TradeBuffer {
 		tBatxOthersId.setBatchNo(iBatchNo);
 		tBatxOthersId.setDetailSeq(iDetailSeq);
 
-		tBatxOthers = batxOthersService.holdById(tBatxOthersId);
+		tBatxOthers = batxOthersService.holdById(tBatxOthersId, titaVo);
 
 		if (tBatxOthers == null) {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxOthers 無此資料");
@@ -353,7 +356,7 @@ public class L4210 extends TradeBuffer {
 		tBatxOthers.setRvNo(iRvNo);
 		tBatxOthers.setNote(iNote);
 		try {
-			batxOthersService.update(tBatxOthers);
+			batxOthersService.update(tBatxOthers, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "L4210 BatxOthers update " + e.getErrorMsg());
 		}
@@ -371,13 +374,13 @@ public class L4210 extends TradeBuffer {
 		tBatxOthersId.setAcDate(iAcDate);
 		tBatxOthersId.setBatchNo(iBatchNo);
 		tBatxOthersId.setDetailSeq(iDetailSeq);
-		tBatxOthers = batxOthersService.holdById(tBatxOthersId);
+		tBatxOthers = batxOthersService.holdById(tBatxOthersId, titaVo);
 		if (tBatxOthers == null) {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxOthers 無此資料");
 		}
 
 		try {
-			batxOthersService.delete(tBatxOthers);
+			batxOthersService.delete(tBatxOthers, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", "L4210 BatxOthers delete " + e.getErrorMsg());
 		}
@@ -388,11 +391,11 @@ public class L4210 extends TradeBuffer {
 		tBatxDetailId.setBatchNo(iBatchNo);
 		tBatxDetailId.setDetailSeq(iDetailSeq);
 
-		tBatxDetail = batxDetailService.holdById(tBatxDetailId);
+		tBatxDetail = batxDetailService.holdById(tBatxDetailId, titaVo);
 
 		if (tBatxDetail != null) {
 			try {
-				batxDetailService.delete(tBatxDetail);
+				batxDetailService.delete(tBatxDetail, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2)
 					throw new LogicException(titaVo, "E0008", "L4210 BatxDetail delete " + e.getErrorMsg());

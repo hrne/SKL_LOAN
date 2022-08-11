@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -105,7 +106,7 @@ public class L9701Report extends MakeReport {
 			this.print(0, 22, "押品地址 : " + clAddr);
 			divider();
 			this.print(1, 8, "入帳日期");
-			this.print(0, 20, "交易內容");
+			this.print(0, 24, "交易內容","C");
 			this.print(0, 35, "計息本金");
 			this.print(0, 52, "計息期間");
 			this.print(0, 69, "利率");
@@ -129,7 +130,7 @@ public class L9701Report extends MakeReport {
 	 */
 	public void divider() {
 		this.print(1, 7, "－－－－－");
-		this.print(0, 18, "－－－－－－");
+		this.print(0, 24, "－－－－－－","C");
 		this.print(0, 33, "－－－－－－");
 		this.print(0, 48, "－－－－－－－－");
 		this.print(0, 67, "－－－－");
@@ -160,10 +161,19 @@ public class L9701Report extends MakeReport {
 
 		String tradeReportName = "客戶往來本息明細表（額度）";
 
-		this.info("tradeReportName=" + titaVo.getParam("ReportType"));
+		this.info("entday="+entday);
+		this.info("titaVo.getEntDyI()=" + titaVo.getEntDyI());
+		this.info("getBrno="+titaVo.getBrno());
+		this.info("getKinbr="+titaVo.getKinbr());
 
-		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", tradeReportName, "", "A4", "L");
-
+	
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity("")
+				.setRptSize("A4").setPageOrientation("L").build();
+		
+		
+		this.open(titaVo, reportVo);
+		
 		this.custName = "";
 		this.facmNo = "";
 		this.clAddr = "";
@@ -226,7 +236,7 @@ public class L9701Report extends MakeReport {
 		// 入帳日
 		this.print(1, 7, showRocDate(tL9701Vo.get("EntryDate"), 1));
 		// 交易內容
-		this.print(0, 23, tL9701Vo.get("Desc"), "C");
+		this.print(0, 24, tL9701Vo.get("Desc"), "C");
 		// 計息本金
 		if (!"0".equals(tL9701Vo.get("Amount"))) {
 			this.print(0, 44, formatAmt(tL9701Vo.get("Amount"), 0), "R");
@@ -282,7 +292,7 @@ public class L9701Report extends MakeReport {
 		}
 
 		divider();
-		this.print(1, 9, "至" + showRocDate(entday, 1) + "當日餘額：");
+		this.print(1, 9, "至" + showRocDate(entday, 1) + " 當日餘額：");
 		this.print(0, 44, formatAmt(loanBal, 0), "R"); // 放款餘額
 		this.print(0, 52, "累溢短收：");
 		this.print(0, 74, formatAmt(excessive.subtract(shortFall), 0), "R"); // 累溢短收

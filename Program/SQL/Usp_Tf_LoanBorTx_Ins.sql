@@ -85,7 +85,8 @@ BEGIN
             ,S0."TRXNM2"
             ,S0."TRXTRN"
             ,SUM(CASE
-                   WHEN S1."TRXTRN" IN ('3037','3083') THEN 0 - S1."TRXAMT" -- 2021-03-24 修改: 暫收款退還、轉出時,暫收金額改為負
+                   WHEN S1."TRXTRN" IN ('3037','3083')
+                   THEN 0 - S1."TRXAMT" -- 2022-04-11 修改: 暫收款退還、轉出時,交易金額改為負
                    WHEN S1."TRXTRN" IN '3025'
                         AND S1."TRXTCT" = '2'
                    THEN 0 - S1."TRXAMT" -- 2022-04-11 修改: 轉催金額
@@ -224,6 +225,13 @@ BEGIN
              WHEN TR1."TRXCRC" IN ('1','3')
              THEN 0 - TR."TRXAMT"
            ELSE TR."TRXAMT"
+           END
+           -- 2022-08-11 智偉增加 from 賴桑 : 交易金額不含費用
+           +
+           CASE
+             WHEN TR1."TRXCRC" IN ('1','3')
+             THEN 0 - NVL(JL."JLNAMT",0)
+           ELSE NVL(JL."JLNAMT",0)
            END                            AS "TxAmt"               -- 交易金額 DECIMAL 16 2
           ,TR1."LMSLBL"                   AS "LoanBal"             -- 放款餘額 DECIMAL 16 2
           ,TR1."TRXISD"                   AS "IntStartDate"        -- 計息起日 DECIMALD 8 
@@ -368,8 +376,8 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,CASE
              WHEN TR1."TRXCRC" IN ('1','3')
-             THEN 0 - JL."JLNAMT"
-           ELSE JL."JLNAMT"
+             THEN 0 - NVL(JL."JLNAMT",0)
+           ELSE NVL(JL."JLNAMT",0)
            END                            AS "FeeAmt"
     FROM TR
     LEFT JOIN "LA$TRXP" TR1 ON TR1."CUSBRH" = TR."CUSBRH"

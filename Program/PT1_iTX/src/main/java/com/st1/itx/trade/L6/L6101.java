@@ -131,8 +131,6 @@ public class L6101 extends TradeBuffer {
 	@Autowired
 	L9134Report l9134Report;
 	
-
-
 	@Autowired
 	L6101Excel l6101Excel;
 
@@ -639,9 +637,13 @@ public class L6101 extends TradeBuffer {
 			
 			l9130Report.exec(titaVo);
 			l9131Report.exec(titaVo);
+			l9131Report.close();
 			l9132ReportA.exec(titaVo);
+			l9132ReportA.close();
 			l9132ReportB.exec(titaVo);
+			l9132ReportB.close();
 			l9132ReportC.exec(titaVo);
+			l9132ReportC.close();
 
 		}
 	}

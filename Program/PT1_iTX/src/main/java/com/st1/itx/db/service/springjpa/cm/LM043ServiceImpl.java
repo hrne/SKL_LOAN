@@ -31,9 +31,11 @@ public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 	/**
 	 * 執行報表輸出
-	 * 
+	 * @param type 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(int type, TitaVo titaVo, int yearMonth) throws Exception {

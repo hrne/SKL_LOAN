@@ -58,7 +58,7 @@ INVOKEJS(SHOW,p7,0)
 ["#FdChequeNo+支票號碼",#ChequeNo],
 ["#FdChequeAmt+支票金額",#ChequeAmtX],
 !["#FdTempDrawCode+代收抽退票",#TempDrawCode,#TempDrawCodeX],
-["#FdFacmNo+額度編號",#FacmNo],
+["#FdFacmNo+額度編號",#FacmNo,#TmpFacmNoXX],
 ["#FdDescription+摘要內容",#Description],
 ]
 !---------- AP Button AREA ----------
@@ -357,6 +357,9 @@ E(0,@RimTempReasonCode,#TempReasonCode)
 RESET_RIM(#SendL3r05,L3R05)
 S(L3R05,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimTempReasonCode)
 R(1,L3R05)
+C(4,#L3r05TmpFacmNoX,T(2,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#L3r05TmpFacmNoX))
+
+#TmpFacmNoXX=X,60,L
 
 ![幣別]
 #FdCurrencyCode=X,2,L

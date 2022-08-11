@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -14,11 +15,14 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.db.service.springjpa.cm.L6907ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -41,9 +45,13 @@ public class L6907 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
+	@Autowired
+	public LoanFacTmpService loanFacTmpService;
 
 	@Autowired
 	public L6907ServiceImpl l6907ServiceImpl;
+	@Autowired
+	public LoanCom loanCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -61,6 +69,9 @@ public class L6907 extends TradeBuffer {
 		this.info("active L6907 ");
 		this.totaVo.init(titaVo);
 
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		String iTmpTxCode = titaVo.getParam("TmpTxCode");
+		int iTmpFacmNo = parse.stringToInteger(titaVo.getParam("TmpFacmNo"));
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -80,28 +91,50 @@ public class L6907 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "會計銷帳檔");
 		}
 
-//		BigDecimal rvBal = BigDecimal.ZERO;
-//		BigDecimal iRvBal0 = BigDecimal.ZERO;
-//		BigDecimal iRvBal = BigDecimal.ZERO;
+
+		boolean istmpfacmno = false;
+		Slice<LoanFacTmp> slLoanFacTmp = null;
+		// 檢查由L3200連動時的額度是否為指定額度
+		if ("L3200".equals(iTmpTxCode)) {
+			slLoanFacTmp = loanFacTmpService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+			if (slLoanFacTmp != null) {
+				if (iTmpFacmNo != 0) {
+					for (LoanFacTmp t : slLoanFacTmp.getContent()) {
+						if (iTmpFacmNo == t.getFacmNo()) {
+							istmpfacmno = true;
+						}
+					}
+				}
+			}
+		}
 		for (Map<String, String> tAcReceivable : L6907List) {
 			OccursList occursList = new OccursList();
-//			rvBal = BigDecimal.ZERO;
-//			iRvBal0 = BigDecimal.ZERO;
-//			iRvBal = BigDecimal.ZERO;
-//			// 同戶號、業務代號金額累加全部(同戶號、業務代號戶號合計需相同)
-//			
-//			for(Map<String, String> tAcReceivable2 : L6907List) {
-//				if(tAcReceivable2.get("CustNo").equals(tAcReceivable.get("CustNo"))
-//						&&tAcReceivable2.get("AcctCode").equals(tAcReceivable.get("AcctCode"))){
-//					if(tAcReceivable2.get("rvBal") == null) {
-//						 iRvBal0 = new BigDecimal(0);
-//					}else {						
-//						 iRvBal = new BigDecimal(tAcReceivable2.get("rvBal")); 
-//					}
-//					rvBal = rvBal.add(iRvBal);
-//				}
-//			}
 
+			// 由L3200連動時處理
+			if ("L3200".equals(iTmpTxCode)) {
+				// 無指定額度全部為累溢收，全部不顯示
+				if (slLoanFacTmp == null) {
+					continue;
+				} else if (istmpfacmno) {
+					// 指定額度只有該額度為溢收款，其他皆顯示
+					if (iTmpFacmNo == parse.stringToInteger(tAcReceivable.get("FacmNo"))) {
+						continue;
+					}
+				} else {
+					// 非指定額度該全部非指定額度為溢收款，指定額度顯示
+					boolean isDataFacmNoTmp = false;
+					for (LoanFacTmp t : slLoanFacTmp.getContent()) {
+						if (parse.stringToInteger(tAcReceivable.get("FacmNo")) == t.getFacmNo()) {
+							isDataFacmNoTmp = true;
+							break;
+						}
+					}
+					if (!isDataFacmNoTmp) {
+						continue;
+					}
+				}
+
+			}
 			// new occurs
 			// 科子項目
 			occursList.putParam("OOAcNoCode", tAcReceivable.get("AcNoCode"));

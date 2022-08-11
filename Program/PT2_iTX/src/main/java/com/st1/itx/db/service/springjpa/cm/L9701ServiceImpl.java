@@ -29,8 +29,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	
 	/**
 	 * 客戶往來本息明細表（撥款）
-	 * 
-	 * */
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 */
 	public List<Map<String, String>> doQuery1(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
@@ -170,8 +172,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	
 	/**
 	 * 客戶往來本息明細表（額度）
-	 * 
-	 * */
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 */
 	public List<Map<String, String>> doQuery2(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");
@@ -318,11 +322,12 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	
 	/**
-	 * 客戶往來交易細表
-	 * 
-	 * */
+	 * 客戶往來本息明細表（額度）
+	 * @param titaVo
+	 * @return
+	 * @throws Exception
+	 */
 	public List<Map<String, String>> doQuery3(TitaVo titaVo) throws Exception {
 
 		String iCUSTNO = titaVo.get("CustNo");

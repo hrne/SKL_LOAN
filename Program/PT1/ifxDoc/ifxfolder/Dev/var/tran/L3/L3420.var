@@ -1259,6 +1259,7 @@ T(3,[L3420] 結案登錄-不可欠繳)
 #FireFg#CollFireFg#LawFg#CollLawFg#TimTrfOvDuAmt
 #TimInterest#TimDelayInt#TimBreachAmt#TimPrincipal
 #BadDebtDateN#BadDebtCnt1#BadDebtCnt2#Description
+#CaseCloseCodeX
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustId#ApplNo
 #TwReduceAmt#UsReduceAmt#TwTrfBadAmt#UsTrfBadAmt

@@ -46,7 +46,7 @@ E(0,0)
 ["#FdBranchNo+單位別",#BranchNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAccountType+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
-["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
+["#FdCustNo+戶號",#CustNo,"-",#FacmNo,"@@",#TmpFacmNoXX],
 ["#FdAcctCode+業務科目",#AcctCode,#AcctCodeX],
 ["#FdClsFlag+銷帳記號",#ClsFlag,#ClsFlagX],
 ]
@@ -91,7 +91,7 @@ T(2,@RimTxCode,#TXCD)
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 
-#NTXBUF=X,44,S
+#NTXBUF=X,102,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@AcBookCode,#NTXBUF,1,3)
 T(1,@AcSubBookCode,#NTXBUF,4,3)
@@ -103,6 +103,9 @@ T(1,@AcDtlCode,#NTXBUF,30,2)
 T(1,@CustNo,#NTXBUF,32,7)
 T(1,@FacmNo,#NTXBUF,39,3)
 T(1,@AcctCode,#NTXBUF,42,3)
+T(1,@TmpTxCode,#NTXBUF,45,5)
+T(1,@TmpFacmNo,#NTXBUF,50,3)
+T(1,@TmpFacmNoX,#NTXBUF,53,50)
 
 #INIT=X,1,S
 T(3,@FdAcBookCode,*)
@@ -200,6 +203,14 @@ C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,S,$)
 @C(4,#CustNo,s,$)
 V(9)E(0,@TEMP_FACM_NO,#FacmNo)T(2,#TEMP_FACM_NO)
+
+#TmpTxCode=X,5,S
+
+#TmpFacmNo=A,3,S
+
+#TmpFacmNoX=X,50,L
+#TmpFacmNoXX=X,60,L
+C(4,#TmpFacmNoX,$,T(2,指定額度：+#TmpFacmNoX))
 
 
 #MRKEY=_,_,S
@@ -375,6 +386,8 @@ C(4,#L6908Flag,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOB
 #FacmNo
 #AcctCode
 #ClsFlag
+#TmpTxCode
+#TmpFacmNo
 #END
 </sub>
 

@@ -32,6 +32,8 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param monthDate 西元年月底日
 	 * @param isAcctCode 是否為會計科目項目
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int monthDate, String isAcctCode) throws Exception {
@@ -321,6 +323,8 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/**
 	 * 查詢資料 Ias34Ap
 	 * @param titaVo
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> ias34Ap(TitaVo titaVo) throws Exception {

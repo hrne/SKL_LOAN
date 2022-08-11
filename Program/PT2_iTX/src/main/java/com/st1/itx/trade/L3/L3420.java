@@ -1347,28 +1347,10 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		switch (iCaseCloseCode) {
-		case 0:
-			tLoanBorTx.setDesc("正常結案");
-			break;
-		case 1:
-			tLoanBorTx.setDesc("展期");
-			break;
-		case 2:
-			tLoanBorTx.setDesc("借新還舊");
-			break;
-		case 3:
-			tLoanBorTx.setDesc("轉催收");
-			break;
-		case 4:
-			tLoanBorTx.setDesc("催收戶本人清償 ");
-			break;
-		case 5:
-			tLoanBorTx.setDesc("催收戶保證人代償");
-			break;
-		case 6:
-			tLoanBorTx.setDesc("催收戶強制執行");
-			break;
+		if (iCaseCloseCode == 0) {
+			tLoanBorTx.setDesc("結案登錄");
+		} else {
+			tLoanBorTx.setDesc(titaVo.getParam("CaseCloseCodeX"));
 		}
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
@@ -1464,7 +1446,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc("催收轉列呆帳");
+		tLoanBorTx.setDesc(titaVo.getParam("CaseCloseCodeX"));
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
@@ -1543,7 +1525,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc("催收部分轉呆");
+		tLoanBorTx.setDesc(titaVo.getParam("CaseCloseCodeX"));
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());

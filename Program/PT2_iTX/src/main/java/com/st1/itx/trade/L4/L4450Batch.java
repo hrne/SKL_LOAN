@@ -38,6 +38,7 @@ import com.st1.itx.trade.BS.BS020;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CheckAmlVo;
@@ -66,6 +67,8 @@ public class L4450Batch extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public BaTxCom baTxCom;
+	@Autowired
+	LoanCom loanCom;
 	@Autowired
 	public PostAuthLogService postAuthLogService;
 	@Autowired
@@ -133,7 +136,7 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, BigDecimal> repAmtMap = new HashMap<>();
 //	短欠繳金額
 	private HashMap<tmpBorm, BigDecimal> shortAmtMap = new HashMap<>();
-//	暫收款占用金額 = 未到期約定還本金額 + 法務費金額 
+//	暫收款占用金額 = 未到期約定還本金額 + 法務費金額  + 已出檔未入帳
 	private HashMap<tmpBorm, BigDecimal> bookAmtMap = new HashMap<>();
 //  火險單號碼
 	private HashMap<tmpBorm, String> insuNoMap = new HashMap<>();
@@ -146,7 +149,6 @@ public class L4450Batch extends TradeBuffer {
 	private String checkMsg = " ";
 //  是否有還款資料
 	private boolean isLoanRepay = false;
-
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 
@@ -164,21 +166,25 @@ public class L4450Batch extends TradeBuffer {
 		if (tBatxHead == null) {
 			tBatxHead = bs020.exec(titaVo, this.txBuffer);
 			this.info("BatchNo = " + tBatxHead.getBatchNo());
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(),
 					"請完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
 		}
 		if ("4".equals(tBatxHead.getBatxExeCode()) || "8".equals(tBatxHead.getBatxExeCode())) {
 			exec(titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(),
 					"請先完成或刪除暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
 		}
+
 		return this.sendList();
 	}
 
 	private void exec(TitaVo titaVo) throws LogicException {
 		this.info("active L4450Batch  Call by " + titaVo.getTxcd());
 		baTxCom.setTxBuffer(this.getTxBuffer());
+		loanCom.setTxBuffer(this.getTxBuffer());
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -283,7 +289,7 @@ public class L4450Batch extends TradeBuffer {
 
 			if (checkFlag) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo()+"L4450", checkMsg, titaVo);
+						titaVo.getTlrNo(), checkMsg, titaVo);
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
 						titaVo.getTlrNo(), checkMsg, titaVo);
@@ -374,9 +380,14 @@ public class L4450Batch extends TradeBuffer {
 		} catch (Exception e) {
 			this.info("Error : " + e.getMessage());
 		}
+		// 取得暫收指定額度：000-全部非指定額度，或 > 0 => 單一額度
+		int wkTmpFacmNo = loanCom.getTmpFacmNo(custNo, 0, facmNo, titaVo);
+		tmpBorm tmpAmtFacmNo = new tmpBorm(custNo, wkTmpFacmNo, 0, 0, 0);
 
-//		預設暫收款=0
-		tmpAmtMap.put(tmp2, BigDecimal.ZERO);
+		// 取得暫收款餘額，暫收指定額度不同時寫入
+		if (!tmpAmtMap.containsKey(tmpAmtFacmNo)) {
+			tmpAmtMap.put(tmpAmtFacmNo, baTxCom.getExcessive());
+		}
 
 //		期款占用未到期約定還本金額
 		if (iRepayType == 1) {
@@ -506,21 +517,21 @@ public class L4450Batch extends TradeBuffer {
 				if (tBaTxVo.getDataKind() == 3) {
 					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
 					if (tBaTxVo.getUnPaidAmt().compareTo(bookAmtMap.get(tmp2)) > 0) {
-						if (tmpAmtMap.containsKey(tmp2)) {
-							tmpAmtMap.put(tmp2,
-									tmpAmtMap.get(tmp2).add(tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2))));
+						if (tmpAmtMap.containsKey(tmpAmtFacmNo)) {
+							tmpAmtMap.put(tmpAmtFacmNo, tmpAmtMap.get(tmpAmtFacmNo)
+									.add(tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2))));
 						} else {
-							tmpAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2)));
+							tmpAmtMap.put(tmpAmtFacmNo, tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2)));
 						}
 						bookAmtMap.put(tmp2, BigDecimal.ZERO);
 					} else {
-						if (tmpAmtMap.containsKey(tmp2)) {
+						if (tmpAmtMap.containsKey(tmpAmtFacmNo)) {
 							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
 						} else {
 							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
 						}
 					}
-					this.info("tmpAmtMap : " + tmpAmtMap.get(tmp2));
+					this.info("tmpAmtMap : " + tmpAmtMap.get(tmpAmtFacmNo));
 					continue;
 				}
 
@@ -581,24 +592,24 @@ public class L4450Batch extends TradeBuffer {
 						repAmtFacMap.put(tmp2, unPaidAmt);
 					}
 				} else {
-					if (unPaidAmt.compareTo(tmpAmtMap.get(tmp2)) <= 0) {
+					if (unPaidAmt.compareTo(tmpAmtMap.get(tmpAmtFacmNo)) <= 0) {
 						if (repAmtMap.containsKey(tmp)) {
 						} else {
 							repAmtMap.put(tmp, BigDecimal.ZERO);
 						}
-						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(unPaidAmt));
+						tmpAmtMap.put(tmpAmtFacmNo, tmpAmtMap.get(tmpAmtFacmNo).subtract(unPaidAmt));
 					} else {
 //				若應扣金額>暫收款
 //				扣款金額=應扣金額-暫收款
 //				暫收款(該扣款代碼) = 暫收款(目前額度下)
 //				暫收款(目前額度下)
-						BigDecimal repayAmt = unPaidAmt.subtract(tmpAmtMap.get(tmp2));
+						BigDecimal repayAmt = unPaidAmt.subtract(tmpAmtMap.get(tmpAmtFacmNo));
 						if (repAmtMap.containsKey(tmp)) {
 							repAmtMap.put(tmp, repAmtMap.get(tmp).add(repayAmt));
 						} else {
 							repAmtMap.put(tmp, repayAmt);
 						}
-						tmpAmtMap.put(tmp2, BigDecimal.ZERO);
+						tmpAmtMap.put(tmpAmtFacmNo, BigDecimal.ZERO);
 //					合計至額度，限額計算用
 						if (repAmtFacMap.containsKey(tmp2)) {
 							repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(repayAmt));
@@ -634,7 +645,7 @@ public class L4450Batch extends TradeBuffer {
 				this.info("repAmtMap : " + repAmtMap.get(tmp));
 				this.info("tmpAmt : " + shPayAmtMap.get(tmp).subtract(repAmtMap.get(tmp)));
 				this.info("repAmtFacMap : " + repAmtFacMap.get(tmp2));
-				this.info("tmpAmtMap :: " + tmpAmtMap.get(tmp2));
+				this.info("tmpAmtMap :: " + tmpAmtMap.get(tmpAmtFacmNo));
 			}
 		}
 

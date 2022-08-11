@@ -10,6 +10,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.FacClose;
@@ -24,6 +25,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -60,6 +62,7 @@ public class L3R11 extends TradeBuffer {
 	private LoanCloseBreachCom loanCloseBreachCom;
 
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 	private String iTxCode;
 	private int iFKey;
 	private int iCustNo;
@@ -95,7 +98,6 @@ public class L3R11 extends TradeBuffer {
 		if ("L2631".equals(iTxCode) || "L2632".equals(iTxCode)) {
 			this.wkCollectFlag = titaVo.getParam("CollectFlag");
 		}
-
 		// work area
 		if (iFacmNo > 0) {
 			wkFacmNoStart = iFacmNo;
@@ -208,8 +210,29 @@ public class L3R11 extends TradeBuffer {
 			loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
 			loanCalcRepayIntCom.setCaseCloseFlag("Y");
 
-			loanCalcRepayIntCom.getRepayInt(titaVo);
+			lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 
+			int wkIntStartDate = 99991231;
+			int wkIntEndDate = 0;
+			for (CalcRepayIntVo c : lCalcRepayIntVo) {
+
+				wkIntStartDate = c.getStartDate() < wkIntStartDate ? c.getStartDate() : wkIntStartDate;
+				wkIntEndDate = c.getEndDate() > wkIntEndDate ? c.getEndDate() : wkIntEndDate;
+			}
+			OccursList occursList = new OccursList();
+			occursList.putParam("L3r11FacmNo", ln.getFacmNo());
+			occursList.putParam("L3r11BormNo", ln.getBormNo());
+			occursList.putParam("L3r11IntStartDate", wkIntStartDate);
+			occursList.putParam("L3r11IntEndDate", wkIntEndDate);
+			occursList.putParam("L3r11Principal", loanCalcRepayIntCom.getPrincipal());
+			occursList.putParam("L3r11Interest", loanCalcRepayIntCom.getInterest());
+			occursList.putParam("L3r11DelayInt", loanCalcRepayIntCom.getDelayInt());
+			occursList.putParam("L3r11BreachAmt", loanCalcRepayIntCom.getBreachAmt());
+			occursList.putParam("L3r11Total", loanCalcRepayIntCom.getPrincipal().add(loanCalcRepayIntCom
+					.getInterest().add(loanCalcRepayIntCom.getDelayInt().add(loanCalcRepayIntCom.getBreachAmt()))));
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
+			
 			// 自本金利息內扣除催收還款金額
 			oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal()).subtract(wkOvduPaidPrin);
 			oInterest = oInterest.add(loanCalcRepayIntCom.getInterest()).subtract(wkOvduPaidInt);

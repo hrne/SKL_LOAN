@@ -19,6 +19,7 @@ import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211AServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.SortMapListCom;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -194,12 +195,11 @@ public class L4211Report extends MakeReport {
 		List<Map<String, String>> fnAllList3 = new ArrayList<Map<String, String>>();
 
 		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascNumber("DetailSeq").ascString("CustNo")
-				.getList();
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascNumber("DetailSeq")
+				.ascString("CustNo").getList();
 
 		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
-				.getList();
+				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").getList();
@@ -890,6 +890,10 @@ public class L4211Report extends MakeReport {
 
 			}
 
+			if(!"L4211".equals(txCode)) {
+				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
+			}
+			
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";
@@ -1240,6 +1244,10 @@ public class L4211Report extends MakeReport {
 
 			}
 
+			if(!"L4211".equals(txCode)) {
+				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
+			}
+			
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";

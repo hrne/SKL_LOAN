@@ -28,12 +28,14 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * Query for LM036 表二 Bad Rate - 房貸(件數)
-	 * 
 	 * @param startMonth 資料範圍年月-起(西元)
 	 * @param endMonth   資料範圍年月-迄(西元)
-	 * @param titaVo     titaVo
+	 * @param num
+	 * @param titaVo
 	 * @return 查詢結果
+
 	 */
+
 	public List<Map<String, String>> queryBadRateCounts(int startMonth, int endMonth, int num, TitaVo titaVo) {
 		this.info("LM036ServiceImpl queryBadRateCount ");
 
@@ -123,6 +125,7 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param startMonth 資料範圍年月-起(西元)
 	 * @param endMonth   資料範圍年月-迄(西元)
+	 * @param num 
 	 * @param titaVo     titaVo
 	 * @return 查詢結果
 	 */

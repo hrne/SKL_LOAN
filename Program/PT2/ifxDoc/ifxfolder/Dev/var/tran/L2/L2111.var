@@ -211,7 +211,7 @@ C(2,#FuncCode,S,T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 
 #WkFdName=X,1,S
 IF(#FuncCode==1 || #FuncCode==3,T(3,@FdApplNo, )T(2,@FdCustId,*),T(2,@FdApplNo,#WkStar)T(2,@FdCustId,))
-T(2,@FdCreditSysNo,#WkStar)
+T(2,@FdCreditSysNo,)
 T(2,@FdApplDate,#WkStar)
 T(2,@FdDepartmentCode,#WkStar)
 T(2,@FdProdNo,#WkStar)
@@ -634,8 +634,6 @@ T(F,#IsSuspectedCheckType,0)
 #CreditSysNo=A,7,I
 C(3,#ApproveFlag,1,s,$)
 C(2,#FuncCode,S,$,$,$,s,s,S)
-@
-V(2,0)
 
 #BUF2=X,17,S
 T(2,L2111+000001999999)
@@ -646,7 +644,9 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2060; ntxbuf=#BUF2;ntxbuf5=type<-1:SyndNo<-
 ! 6/17 駁時鎖住不可更改
 ![聯貸案編號]
 #SyndNo=A,6,I
+C(2,#FuncCode,HIDE(#BTN2),$,$,$,HIDE(#BTN2),HIDE(#BTN2),HIDE(#BTN2))
 C(2,#FuncCode,S,$,$,$,s,s,S)
+C(3,#L2r02ProcessCode,2,HIDE(#BTN2),$)
 C(3,#L2r02ProcessCode,2,s,$)
 
 #BUF2B=X,17,S

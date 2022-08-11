@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -108,7 +109,7 @@ public class L9701Report3 extends MakeReport {
 		divider();
 		this.print(1, 2, "撥款");
 		this.print(0, 10, "入帳日期");
-		this.print(0, 24, "交易內容");
+		this.print(0, 28, "交易內容","C");
 		this.print(0, 40, "交易金額");
 		this.print(0, 59, "暫收借");
 		this.print(0, 76, "本金");
@@ -130,7 +131,7 @@ public class L9701Report3 extends MakeReport {
 	public void divider() {
 		this.print(1, 2, "－－");
 		this.print(0, 9, "－－－－－");
-		this.print(0, 22, "－－－－－－");
+		this.print(0, 28, "－－－－－－","C");
 		this.print(0, 38, "－－－－－－");
 		this.print(0, 56, "－－－－－－");
 		this.print(0, 72, "－－－－－－");
@@ -168,7 +169,11 @@ public class L9701Report3 extends MakeReport {
 
 		String tradeReportName = "客戶往來交易明細表";
 
-		this.open(titaVo, entday, titaVo.getKinbr(), "L9701", tradeReportName, "", "A4", "L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity("")
+				.setRptSize("A4").setPageOrientation("L").build();
+		
+		this.open(titaVo, reportVo);
 
 		if (listL9701 != null && listL9701.size() > 0) {
 
@@ -236,7 +241,7 @@ public class L9701Report3 extends MakeReport {
 		// 入帳日
 		this.print(0, 9, showRocDate(tL9701Vo.get("EntryDate"), 1));
 		// 交易內容
-		this.print(0, 27, tL9701Vo.get("Desc"), "C");
+		this.print(0, 28, tL9701Vo.get("Desc"), "C");
 		// 交易金額
 		this.print(0, 49, formatAmt(tL9701Vo.get("TxAmt"), 0), "R"); //
 
