@@ -43,8 +43,8 @@ public class Cs70UpDBS extends CommBuffer {
 			return;
 
 		/* 更正&放行跳過 */
-		if (this.titaVo.getActFgI() == 2 || this.titaVo.isHcodeErase())
-			return;
+//		if (this.titaVo.getActFgI() == 2 || this.titaVo.isHcodeErase())
+//			return;
 
 		String supNo = this.titaVo.getSupNo().trim().isEmpty() ? this.titaVo.getEmpNos().trim() : this.titaVo.getSupNo().trim();
 		String tlrNo = this.titaVo.getTlrNo().trim().isEmpty() ? this.titaVo.getEmpNot().trim() : this.titaVo.getTlrNo().trim();

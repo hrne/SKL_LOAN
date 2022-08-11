@@ -26,6 +26,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcMainCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6880")
@@ -191,10 +192,14 @@ public class L6880 extends TradeBuffer {
 			return;
 
 		for (TxTeller te : txTellerLi)
-			te.setTxtNo(0);
+			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim()))
+				te.setTxtNo(1);
+			else
+				te.setTxtNo(0);
 
 		try {
 			txTellerService.updateAll(txTellerLi, titaVo);
+			titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
 		} catch (DBException e) {
 			this.error("TxTeller update all TxNo False!!!");
 		}

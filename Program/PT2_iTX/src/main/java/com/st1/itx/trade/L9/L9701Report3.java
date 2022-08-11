@@ -14,7 +14,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")

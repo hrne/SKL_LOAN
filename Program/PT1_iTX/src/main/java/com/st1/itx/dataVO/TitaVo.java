@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -243,7 +244,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public void getBodyLenAndAdd() {
 		if (!this.getTxCode().equals("XXR99"))
 			return;
-		
+
 		int i = 1;
 		List<String> bodyNameList = new ArrayList<String>();
 		for (Map.Entry<String, String> entry : this.entrySet()) {
@@ -668,7 +669,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isEloan() {
 		return "E-LOAN".equals(this.getTlrNo()) || "E-TEST".equals(this.getTlrNo());
 	}
-	
+
 	/**
 	 * TxtNo 是否為空白或0
 	 * 
@@ -677,14 +678,14 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public boolean isTxtNoZero() {
 		return this.getTxNo().isEmpty() || Integer.parseInt(this.getTxNo()) == 0;
 	}
-	
+
 	/**
 	 * TxtNo 判斷前兩碼是否為0
 	 * 
 	 * @return true when txtno is empty or 0
 	 */
 	public boolean isTxtNoHasBatch() {
-		return  !this.getTxNo().isEmpty() && Integer.parseInt(this.getTxNo()) > 999999;
+		return !this.getTxNo().isEmpty() && Integer.parseInt(this.getTxNo()) > 999999;
 	}
 
 	/**
@@ -891,7 +892,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getHsupCode() {
 		return this.get(ContentName.hsupcd) == null ? "" : this.get(ContentName.hsupcd);
 	}
-	
+
 	/**
 	 * 
 	 * @return boolean 授權記號 1 return true
@@ -1383,7 +1384,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getBtnIndex() throws LogicException {
 		return this.getParam("btnIndex");
 	}
-	
+
 	/**
 	 * when trade is not gridBatch or value is null return 0
 	 * 
@@ -1401,7 +1402,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public int getSelectIndex() {
 		return Objects.isNull(this.get("selectIndex")) ? 0 : Integer.parseInt(this.get("selectIndex"));
 	}
-	
+
 	/**
 	 * when trade is not gridBatch or value is null or previous gridBatch not
 	 * Success return 0

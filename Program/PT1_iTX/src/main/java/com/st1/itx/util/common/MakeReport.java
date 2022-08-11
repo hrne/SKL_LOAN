@@ -1,15 +1,8 @@
 package com.st1.itx.util.common;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,31 +15,13 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfGState;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfSmartCopy;
-import com.itextpdf.text.pdf.PdfStamper;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.domain.TxPrinter;
 import com.st1.itx.db.domain.TxPrinterId;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxPrinterService;
@@ -54,8 +29,6 @@ import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.filter.SafeClose;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.report.ReportUtil;
 
 /**
@@ -77,45 +50,35 @@ public class MakeReport extends CommBuffer {
 	// 29.7 cm / 2.54 = 11.6929 inch
 	// 11.6929 * 72 = 842 points
 
-	/* DB服務注入 */
-	@Autowired
-	TxFileService txFileService;
-
-	@Autowired
-	CdReportService cdReportService;
-
-	@Autowired
-	TxPrinterService txPrinterService;
-
-	@Autowired
-	CdEmpService cdEmpService;
-
-	@Autowired
-	public DateUtil dDateUtil;
-
 	// pdf底稿路徑
 	@Value("${iTXPdfFolder}")
 	private String pdfFolder = "";
 
-	// 檔案輸出路徑
-	@Value("${iTXOutFolder}")
-	private String outputFolder = "";
+	/* DB服務注入 */
+	@Autowired
+	private TxFileService txFileService;
 
-	// 字型放置路徑
-	@Value("${iTXFontFolder}")
-	private String fontFolder = "";
+	@Autowired
+	private CdReportService cdReportService;
 
-	// 資源路徑
-	@Value("${iTXResourceFolder}")
-	private String resourceFolder = "";
+	@Autowired
+	private TxPrinterService txPrinterService;
 
-	private int date = 0;
+	@Autowired
+	public DateUtil dDateUtil;
+
+	@Autowired
+	private PdfGenerator pdfGenerator;
 
 	@Autowired
 	private ReportUtil rptUtil;
 
+	private int date = 0;
+
+	// 單位別
 	private String brno = "";
-	// 程式ID
+
+	// 源頭程式ID
 	private String parentTranCode = "";
 
 	// 報表代碼
@@ -124,31 +87,37 @@ public class MakeReport extends CommBuffer {
 	// 報表名稱
 	private String rptItem;
 
-	private ReportVo reportVo;
-
-	// 是否需要浮水印
-	private boolean watermarkFlag;
 	// 報表機密等級(中文敍述)
 	private String rptSecurity;
+
 	// 紙張大小
 	private String rptSize;
+
 	// 紙張方向 P:Portrait Orientation (直印) , L:Landscape Orientation (橫印)
 	private String pageOrientation;
 
+	private ReportVo reportVo;
+
 	// 預設PDF底稿
 	private String defaultPdf = "";
+
 	private boolean useDefault = false;
+
 	// 字型 1.標楷體 2.細明體
 	private int font;
+
 	// 字型大小
 	private int fontSize;
 
 	// 報表明細起始列數
 	private int rptBeginRow;
+
 	// 報表明細可印列數
 	private int rptTotalRows;
+
 	// 製表日期
 	private String nowDate;
+
 	// 製表時間
 	private String nowTime;
 
@@ -160,12 +129,6 @@ public class MakeReport extends CommBuffer {
 
 	// header,footer處理記號
 	private boolean hfProcess = false;
-
-	// 寬度點數
-	private double xPoints = 0;
-
-	// 高度點數
-	private double yPoints = 0;
 
 	// 輸出內容
 	private int printCnt = 0;
@@ -189,15 +152,10 @@ public class MakeReport extends CommBuffer {
 	// 列印明細
 	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 
-	private String rptTlrNo = "";
-
-	private Timestamp rptCreateDate = null;
-
 	private void checkParm(ReportVo reportVo) throws LogicException {
 		if (reportVo.getRptDate() <= 0) {
 			throw new LogicException("EC004", "(MakeReport)日期(date)參數必須有值");
 		}
-
 		if (reportVo.getBrno() == null || reportVo.getBrno().isEmpty()) {
 			throw new LogicException("EC004", "(MakeReport)單位(brno)參數必須有值");
 		}
@@ -216,7 +174,6 @@ public class MakeReport extends CommBuffer {
 		if (date <= 0) {
 			throw new LogicException("EC004", "(MakeReport)日期(date)參數必須有值");
 		}
-
 		if (brno == null || "".equals(brno)) {
 			throw new LogicException("EC004", "(MakeReport)單位(brno)參數必須有值");
 		}
@@ -228,7 +185,6 @@ public class MakeReport extends CommBuffer {
 		}
 		if (rptItem == null || "".equals(rptItem)) {
 			throw new LogicException("EC004", "(MakeReport)報表說明(rptItem)參數必須有值");
-
 		}
 	}
 
@@ -239,15 +195,12 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public long close() throws LogicException {
-
-		if (!useDefault && printCnt == 0) {
+		if (!reportVo.isUseDefault() && printCnt == 0) {
 			this.print(1, 1, "無資料!!!");
 		}
-
-		if (this.nowPage > 0 && !useDefault) {
+		if (this.nowPage > 0 && !reportVo.isUseDefault()) {
 			this.printFooter();
 		}
-
 		if (this.batchNo.isEmpty()) {
 			return newFile();
 		} else {
@@ -287,539 +240,6 @@ public class MakeReport extends CommBuffer {
 		return rptUtil.convertAmtToChinese(amt);
 	}
 
-	@SuppressWarnings("unchecked")
-	private void doToPdf(long pdfno, String filename) throws LogicException {
-
-		this.info("MakeReport.toPdf = " + pdfno);
-
-		TxFile tTxFile = txFileService.findById(pdfno);
-
-		if (tTxFile == null) {
-			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
-		}
-
-		if (tTxFile.getFileType() != 1) {
-			throw new LogicException(titaVo, "E0015", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + "，不為PDF格式");
-		}
-
-		if (tTxFile.getFileCode() != null) {
-			this.rptCode = tTxFile.getFileCode();
-		}
-
-		rptTlrNo = tTxFile.getCreateEmpNo();
-
-		rptCreateDate = tTxFile.getCreateDate();
-
-		this.info("MakeRepor doToPdf rptTlrNo = " + rptTlrNo);
-
-		try {
-			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
-		} catch (IOException e) {
-			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料格式 " + e.getMessage());
-		}
-
-		String outfile = outputFolder + tTxFile.getFileOutput() + ".pdf";
-
-		if (!"".equals(filename)) {
-			outfile = outputFolder + filename + ".pdf";
-		}
-
-		this.info("MakeReport.toPdf.filename =" + outfile);
-
-		watermarkFlag = true;
-
-		// 檢查是否需浮水印
-		CdReport tCdReport = cdReportService.findById(tTxFile.getFileCode());
-
-		if (tCdReport != null && tCdReport.getWatermarkFlag() != 1) {
-			watermarkFlag = false;
-		}
-
-		// 先刪除舊檔
-		File file = new File(outfile);
-
-		try {
-			Files.delete(file.toPath());
-		} catch (IOException e) {
-			this.info("MakeReport Files.delete error =" + e.getMessage());
-		}
-
-		// 輸出檔名
-		FileOutputStream fos = null;
-
-		// 建立一個Document物件，並設定頁面大小及左、右、上、下的邊界，rotate()橫印
-		Document document = null;
-		// 設定要輸出的Stream
-		PdfWriter writer = null;
-
-		// 套底稿用
-		PdfStamper stamper = null;
-		AcroFields fields = null;
-		PdfReader reader = null;
-		ByteArrayOutputStream baos = null;
-		PdfCopy copy = null;
-		String defaultname = null;
-
-		// 讀取頁的長寛
-		Rectangle page = null;
-
-		// 設定要輸出的Stream
-		PdfContentByte cb = null;
-
-		try {
-
-			int frameX = 5;
-			int frameY = -5;
-
-			// 預設字型
-			BaseFont baseFont = setBaseFont("1");
-			int fontsize = 10;
-			int charSpaces = 1;
-			int lineSpaces = 0;
-			int fontwidth = fontsize / 2 + charSpaces;
-			int fonthigh = fontsize + lineSpaces + 2;
-
-			this.reportVo = ReportVo.builder().build();
-
-			for (HashMap<String, Object> map : this.listMap) {
-
-				String type = map.get("type").toString();
-
-				if ("0".equals(type)) {
-					reportVo.setUseDefault(false);
-
-					// 輸出檔名
-					fos = new FileOutputStream(new File(outfile));
-					// 報表啟始
-					String papersize = map.get("paper").toString();
-
-//					int i = papersize.indexOf(',');
-					String[] ss = papersize.split(",");
-
-					Rectangle pagesize = PageSize.A4;
-
-					// this.info("B pagesize.getWidth() = " + pagesize.getWidth());
-					// this.info("B pagesize.getHeight() = " + pagesize.getHeight());
-
-					if ("LETTER".equals(papersize)) {
-						pagesize = PageSize.LETTER;
-					} else if ("A5".equals(papersize)) {
-						pagesize = PageSize.A5;
-//自訂尺寸,以inch為單位						
-//					} else if (i != -1) {
-					} else if (ss.length == 2) {
-
-//						String s1 = papersize.substring(0, 2);
-//						String s2 = papersize.substring(i+1);
-
-						long n1 = (long) Math.ceil((Double.parseDouble(ss[0]) * 72));
-						long n2 = (long) Math.ceil((Double.parseDouble(ss[1]) * 72));
-
-						// this.info("compute width / height = " + n1 + "/" + n2);
-						pagesize = new Rectangle(n1, n2);
-
-						// this.info("MakeReport pagesize =" + papersize);
-						// this.info("C pagesize.getWidth() = " + pagesize.getWidth());
-						// this.info("C pagesize.getHeight() = " + pagesize.getHeight());
-					}
-
-					// this.info("A pagesize.getWidth() = " + pagesize.getWidth());
-					// this.info("A pagesize.getHeight() = " + pagesize.getHeight());
-
-					String paperorientaton = map.get("paper.orientation").toString();
-
-					// 建立一個Document物件，並設定頁面大小及左、右、上、下的邊界，rotate()橫印
-					if ("P".equals(paperorientaton)) {
-//						document = new Document(PageSize.A4, 0, 0, 0, 0);
-						document = new Document(pagesize, 0, 0, 0, 0);
-					} else {
-//						document = new Document(PageSize.A4.rotate(), 0, 0, 0, 0);
-						document = new Document(pagesize.rotate(), 0, 0, 0, 0);
-					}
-
-					// 設定要輸出的Stream
-					writer = PdfWriter.getInstance(document, fos);
-
-					// 加密
-					String password = map.get("p") == null ? "" : map.get("p").toString();
-
-					if (!password.isEmpty()) {
-
-						byte[] p = password.getBytes();
-
-						String r = "" + (int) (Math.random() * 10e8);
-
-						writer.setEncryption(p, r.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
-
-					}
-
-					if ("P".equals(paperorientaton)) {
-						this.xPoints = writer.getPageSize().getWidth();
-						this.yPoints = writer.getPageSize().getHeight();
-					} else {
-						this.xPoints = writer.getPageSize().getHeight();
-						this.yPoints = writer.getPageSize().getWidth();
-					}
-
-					this.info("Page Width , xPoints = " + xPoints);
-					this.info("Page Height , yPoints = " + yPoints);
-
-					document.open();
-
-					// 讀取頁的長寛
-					page = writer.getPageSize();
-
-					// 設定要輸出的Stream
-
-					cb = writer.getDirectContent();
-//
-					String font = map.get("font").toString();
-					baseFont = setBaseFont(font);
-					fontsize = Integer.valueOf(map.get("font.size").toString());
-					fontwidth = fontsize / 2 + charSpaces;
-					fonthigh = fontsize + lineSpaces + 2;
-
-					if (watermarkFlag) {
-						this.setWatermark(writer.getDirectContentUnder(), document);
-					}
-				} else if ("9".equals(type)) {
-					reportVo.setUseDefault(true);
-
-					this.defaultPdf = map.get("default").toString();
-
-					defaultname = pdfFolder + this.defaultPdf;
-
-					File tempFile = new File(defaultname);
-					if (!tempFile.exists()) {
-						throw new LogicException("EC004", "(MakeReport)預設PDF底稿:" + defaultname + "不存在");
-					}
-
-					document = new Document();
-					copy = new PdfSmartCopy(document, new FileOutputStream(outfile));
-
-					// 加密
-					String password = map.get("p") == null ? "" : map.get("p").toString();
-
-					if (password != null && !password.isEmpty()) {
-						byte[] p = password.getBytes();
-
-						String r = "" + (int) (Math.random() * 10e8);
-
-						copy.setEncryption(p, r.getBytes(), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
-					}
-
-					document.open();
-
-					// 讀取頁的長寛
-					page = copy.getPageSize();
-
-					// 設定要輸出的Stream
-
-					baos = new ByteArrayOutputStream();
-					reader = new PdfReader(defaultname);
-					stamper = new PdfStamper(reader, baos);
-					fields = stamper.getAcroFields();
-					cb = stamper.getOverContent(1);
-//
-					String font = map.get("font").toString();
-					baseFont = setBaseFont(font);
-					fontsize = Integer.valueOf(map.get("font.size").toString());
-					fontwidth = fontsize / 2 + charSpaces;
-					fonthigh = fontsize + lineSpaces + 2;
-
-					this.nowPage = 1;
-					this.info("open = " + this.nowPage);
-
-					this.xPoints = stamper.getWriter().getPageSize().getWidth();
-					this.yPoints = stamper.getWriter().getPageSize().getHeight();
-
-				} else if ("1".equals(type)) {
-					// 新頁
-					if (reportVo.isUseDefault()) {
-						if (this.nowPage > 0) {
-							stamper.setFormFlattening(true);
-							stamper.close();
-							reader.close();
-							reader = new PdfReader(baos.toByteArray());
-							copy.addDocument(reader);
-//							reader.close();
-						}
-						this.nowPage++;
-						// new
-						baos = new ByteArrayOutputStream();
-						reader = new PdfReader(defaultname);
-						stamper = new PdfStamper(reader, baos);
-						fields = stamper.getAcroFields();
-						cb = stamper.getOverContent(this.nowPage - 1);
-					} else {
-						document.newPage();
-					}
-
-					if (watermarkFlag) {
-						this.setWatermark(writer.getDirectContentUnder(), document);
-					}
-				} else if ("2".equals(type)) {
-					// 設定字型
-					String font = map.get("font").toString();
-					baseFont = setBaseFont(font);
-					fontsize = Integer.parseInt(map.get("size").toString());
-					fontwidth = fontsize / 2 + charSpaces;
-					fonthigh = fontsize + lineSpaces + 2;
-				} else if ("3".equals(type)) {
-					// 指定行列,列印字串
-					int row = Integer.parseInt(map.get("row").toString());
-					int col = Integer.parseInt(map.get("col").toString());
-					String txt = map.get("txt").toString();
-
-					if (signOff0.equals(txt)) {
-						txt = "=====　報　表　結　束　=====";
-					}
-					// 簽核
-					if (signOff1.equals(txt)) {
-						String tlrna = "";
-						String supna = "";
-
-						if (!"".equals(tTxFile.getTlrNo())) {
-							CdEmp cdEmp = cdEmpService.findById(tTxFile.getTlrNo(), titaVo);
-
-							if (cdEmp != null) {
-								tlrna = cdEmp.getFullname();
-							}
-						}
-						if (!"".equals(tTxFile.getSupNo())) {
-							CdEmp cdEmp = cdEmpService.findById(tTxFile.getSupNo(), titaVo);
-
-							if (cdEmp != null) {
-								supna = cdEmp.getFullname();
-							}
-						}
-						txt = FormatUtil.padX(" ", 60);
-						txt += "經辦：";
-						txt += FormatUtil.padX(tlrna, 40);
-						txt += "主管：";
-						txt += FormatUtil.padX(supna, 40);
-					}
-
-					String align = map.get("align").toString();
-					int x = (col - 1) * fontwidth;
-					int y = (int) page.getHeight() - (row * fonthigh);
-					cb.beginText();
-
-					cb.setFontAndSize(baseFont, fontsize);
-					cb.setCharacterSpacing(charSpaces);
-					if ("L".equals(align)) {
-						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, frameX + x, frameY + y, 0);
-					} else if ("C".equals(align)) {
-						cb.showTextAligned(PdfContentByte.ALIGN_CENTER, txt, frameX + x, frameY + y, 0);
-					} else if ("R".equals(align)) {
-						cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, txt, frameX + x, frameY + y, 0);
-					}
-					cb.endText();
-
-					// this.info("lastrow = " + lastrow);
-				} else if ("4".equals(type)) {
-					// 指定XY軸列印字串
-					int x = Integer.parseInt(map.get("x").toString());
-					int y = Integer.parseInt(map.get("y").toString());
-
-					int yy = (int) (this.yPoints - y);
-
-					String txt = map.get("txt").toString();
-					String align = map.get("align").toString();
-					cb.beginText();
-					cb.setFontAndSize(baseFont, fontsize);
-					cb.setCharacterSpacing(charSpaces);
-					if ("L".equals(align)) {
-						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, frameX + x, frameY + yy, 0);
-					} else if ("C".equals(align)) {
-						cb.showTextAligned(PdfContentByte.ALIGN_CENTER, txt, frameX + x, frameY + yy, 0);
-					} else if ("R".equals(align)) {
-						cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, txt, frameX + x, frameY + yy, 0);
-
-					}
-					cb.endText();
-				} else if ("5".equals(type)) {
-					// 畫線
-					int x1 = Integer.parseInt(map.get("x1").toString());
-					int y1 = Integer.parseInt(map.get("y1").toString());
-					int x2 = Integer.parseInt(map.get("x2").toString());
-					int y2 = Integer.parseInt(map.get("y2").toString());
-					double w = Double.parseDouble(map.get("w").toString());
-
-//					int py1 = (int) page.getHeight() - y1;
-//					int py2 = (int) page.getHeight() - y2;
-
-					int py1 = (int) (this.yPoints - y1);
-					int py2 = (int) (this.yPoints - y2);
-
-					cb.saveState();
-					// 設定線條寬度
-//					cb.setLineWidth(1f);
-					cb.setLineWidth(w);
-					// 设置画线的颜色
-					cb.setColorStroke(BaseColor.BLACK);
-					// 绘制起点坐标
-					cb.moveTo(x1, frameY + py1);
-					// 绘制终点坐标
-					cb.lineTo(x2, frameY + py2);
-					// 确认直线的绘制
-					cb.stroke();
-					cb.restoreState();
-
-				} else if ("6".equals(type)) {
-					// 設定字距
-
-					String xx = map.get("x").toString();
-
-					if (!"".equals(xx)) {
-						int x = Integer.parseInt(xx);
-						charSpaces = x;
-						fontwidth = fontsize / 2 + charSpaces;
-					}
-
-				} else if ("7".equals(type)) {
-					if (!this.useDefault) {
-						break;
-					}
-					// 預設底稿套form用,設欄位值
-
-					String field = map.get("f").toString();
-					String value = map.get("v").toString();
-
-					fields.setFieldProperty(field, "textfont", baseFont, null); // 設定字型
-					fields.setField(field, value);
-				} else if ("8".equals(type)) {
-					// 設定行距
-
-					String yy = map.get("y").toString();
-
-					if (!"".equals(yy)) {
-						int y = Integer.parseInt(yy);
-						lineSpaces = y;
-						fonthigh = fontsize + lineSpaces + 2;
-					}
-				} else if ("A".equals(type)) {
-					// 列印圖片
-
-					String fna = map.get("f").toString();
-					int x = Integer.parseInt(map.get("x").toString());
-					int y = Integer.parseInt(map.get("y").toString());
-					int yy = (int) this.yPoints - y;
-					float percent = Float.parseFloat(map.get("p").toString());
-
-					String imagename = resourceFolder + fna;
-
-					this.info("MakeReport imagename = " + imagename);
-
-					File tempFile = new File(imagename);
-					if (!tempFile.exists()) {
-						continue;
-					}
-
-					this.info("MakeReport percent = " + percent);
-
-					Image image = Image.getInstance(imagename);
-
-					this.info("MakeReport image b = " + image.getWidth() + "/" + image.getHeight());
-
-					double imageH = Math.ceil(image.getHeight());
-
-					if (percent != 0) {
-						image.scalePercent(percent);
-						imageH = Math.ceil(image.getHeight() * percent / 100);
-					}
-
-					this.info("MakeReport image a = " + image.getWidth() + "/" + image.getHeight());
-
-					yy -= imageH;
-
-					// 新增圖片
-					image.setAbsolutePosition(x, yy);
-					cb.addImage(image);
-
-				} else if ("B".equals(type)) {
-					// 指定區間列印字串
-					int x = Integer.parseInt(map.get("x").toString());
-					int y = Integer.parseInt(map.get("y").toString());
-					int w = Integer.parseInt(map.get("w").toString());
-					int w2 = Integer.parseInt(map.get("w2").toString());
-					int h = Integer.parseInt(map.get("h").toString());
-					int yy = (int) this.yPoints - y;
-					String s = map.get("s").toString();
-
-					String ps = "";
-					int pw = 0;
-
-					String prefix = "";
-					for (int i = 0; i < w2; i++) {
-						prefix += " ";
-					}
-
-					for (int i = 0; i < s.length(); i++) {
-						String ss = s.substring(i, i + 1);
-
-						ps += ss;
-
-						int ww = 1;
-						if (haveChinese(ss)) {
-							ww = 2;
-						}
-						pw += ww;
-						if (pw >= w) {
-							cb.beginText();
-
-							cb.setFontAndSize(baseFont, fontsize);
-							cb.setCharacterSpacing(charSpaces);
-							cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
-							cb.endText();
-
-							ps = prefix;
-							pw = w2;
-							yy -= h;
-						}
-					}
-					if (pw > 0) {
-						cb.beginText();
-						this.info("MakeReport basefont = " + BaseFont.TIMES_BOLD);
-						cb.setFontAndSize(baseFont, fontsize);
-						cb.setCharacterSpacing(charSpaces);
-						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
-
-						cb.endText();
-					}
-				}
-			}
-
-			if (reportVo.isUseDefault()) {
-				stamper.setFormFlattening(true);
-				stamper.close();
-				reader.close();
-				reader = new PdfReader(baos.toByteArray());
-				copy.addDocument(reader);
-				reader.close();
-
-				document.close();
-			} else {
-				document.close();
-				fos.close();
-			}
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error(errors.toString());
-			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",輸出PDF " + e.getMessage());
-		} finally {
-			SafeClose.close(document);
-			SafeClose.close(writer);
-			SafeClose.close(reader);
-			SafeClose.close(copy);
-			SafeClose.close(stamper);
-			SafeClose.close(baos);
-			SafeClose.close(fos);
-		}
-
-	}
-
 	/**
 	 * 繪製線條(寬度1點)<br>
 	 * 
@@ -842,7 +262,6 @@ public class MakeReport extends CommBuffer {
 	 * @param width 線條寛度點數
 	 */
 	public void drawLine(int x1, int y1, int x2, int y2, double width) {
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 5);
 		map.put("x1", x1);
@@ -853,7 +272,6 @@ public class MakeReport extends CommBuffer {
 		listMap.add(map);
 
 		this.printCnt++;
-
 	}
 
 	@Override
@@ -1007,7 +425,6 @@ public class MakeReport extends CommBuffer {
 
 	// 一般模式
 	private void init() {
-
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
 			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
@@ -1048,7 +465,6 @@ public class MakeReport extends CommBuffer {
 
 	// 套form模式
 	private void init9() {
-
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
 			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
@@ -1102,10 +518,8 @@ public class MakeReport extends CommBuffer {
 			tTxFile.setSignCode("0");
 		} else {
 			tTxFile.setSignCode(String.valueOf(tCdReport.getSignCode()));
-
 			// 2021-1-5 增加判斷 SignCode == 1 才印
 			if (tCdReport.getSignCode() == 1 && !reportVo.isUseDefault()) {
-
 				if ("P".equals(reportVo.getPageOrientation())) {
 					this.print(1, this.getMidXAxis(), signOff0, "C");
 					this.print(2, this.getMidXAxis(), "");
@@ -1238,11 +652,11 @@ public class MakeReport extends CommBuffer {
 	 * @param brno     單位
 	 * @param rptCode  報表編號
 	 * @param rptItem  報表說明
-	 * @param Security 報表機密等級(中文敍述)
+	 * @param security 報表機密等級(中文敍述)
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security)
 			throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
@@ -1253,7 +667,7 @@ public class MakeReport extends CommBuffer {
 		this.brno = brno;
 		this.rptCode = rptCode;
 		this.rptItem = rptItem;
-		this.rptSecurity = Security;
+		this.rptSecurity = security;
 
 		this.rptSize = "A4"; // 紙張大小
 		this.pageOrientation = "L"; // 紙張方向 P:Portrait Orientation (直印) , L:Landscape Orientation (橫印)
@@ -1308,12 +722,12 @@ public class MakeReport extends CommBuffer {
 	 * @param brno       單位
 	 * @param rptCode    報表編號
 	 * @param rptItem    報表說明
-	 * @param Security   報表機密等級(中文敍述)
+	 * @param security   報表機密等級(中文敍述)
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security,
 			String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
@@ -1336,7 +750,7 @@ public class MakeReport extends CommBuffer {
 		this.brno = brno;
 		this.rptCode = rptCode;
 		this.rptItem = rptItem;
-		this.rptSecurity = Security;
+		this.rptSecurity = security;
 		this.defaultPdf = defaultPdf;
 		this.useDefault = true;
 
@@ -1353,13 +767,13 @@ public class MakeReport extends CommBuffer {
 	 * @param rptCode         報表編號
 	 * @param rptItem         報表說明
 	 * @param Security        報表機密等級(中文敍述)
-	 * @param PageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(寛,長)(單位:吋),例:8.5,5.5
+	 * @param pageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(寛,長)(單位:吋),例:8.5,5.5
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String PageSize, String pageOrientation) throws LogicException {
+			String pageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -1371,7 +785,7 @@ public class MakeReport extends CommBuffer {
 		this.rptItem = rptItem;
 		this.rptSecurity = Security;
 
-		this.rptSize = PageSize.toUpperCase();
+		this.rptSize = pageSize.toUpperCase();
 
 		pageOrientation = pageOrientation.toUpperCase();
 		if ("P".equals(pageOrientation)) {
@@ -1430,12 +844,12 @@ public class MakeReport extends CommBuffer {
 	 * @param brno            單位
 	 * @param rptCode         報表編號
 	 * @param rptItem         報表說明
-	 * @param PageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(單位,寛,長)(單位:mm,cm,inch),例:cm,8.5,5.5
+	 * @param pageSize        報表尺寸,例A4,A5,LETTER;自訂尺寸(單位,寛,長)(單位:mm,cm,inch),例:cm,8.5,5.5
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String PageSize,
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String pageSize,
 			String pageOrientation) throws LogicException {
 
 		formMode = true;
@@ -1449,14 +863,14 @@ public class MakeReport extends CommBuffer {
 		this.rptCode = rptCode;
 		this.rptItem = rptItem;
 
-		this.rptSize = PageSize.toUpperCase();
+		this.rptSize = pageSize.toUpperCase();
 
-		String[] ss = PageSize.split(",");
+		String[] ss = pageSize.split(",");
 
 		this.info("PageSize length = " + ss.length);
 
 		if (ss.length != 1 && ss.length != 3) {
-			throw new LogicException("EC004", "(MakeReport)報表尺寸錯誤=" + PageSize);
+			throw new LogicException("EC004", "(MakeReport)報表尺寸錯誤=" + pageSize);
 		}
 
 		pageOrientation = pageOrientation.toUpperCase();
@@ -1482,8 +896,7 @@ public class MakeReport extends CommBuffer {
 		// row : 列 < 0 表指定位置 , =0表目前列 , >0表跳行數
 		// col : 行
 		// string : 列印字串
-
-		toprint(row, column, string, "L"); // 預設左靠
+		toPrint(row, column, string, "L"); // 預設左靠
 	}
 
 	/**
@@ -1494,22 +907,18 @@ public class MakeReport extends CommBuffer {
 	 * @param string 字串
 	 * @param align  L:左靠 , C:置中 , R:右靠
 	 */
-
 	public void print(int row, int column, String string, String align) {
 		// row : 列 < 0 表指定位置 , =0表目前列 , >0表跳行數
 		// col : 行
 		// string : 列印字串
 		// align : L:左靠 , C:置中 , R:右靠
-
-		toprint(row, column, string, align);
+		toPrint(row, column, string, align);
 	}
 
 	public void printCm(double x, double y, String string) {
-
 		int xx = (int) Math.ceil(x / 2.54 * 72);
 		int yy = (int) Math.ceil(y / 2.54 * 72);
 		printXY(xx, yy, string, "L");
-
 	}
 
 	public void printCm(double x, double y, String string, String align) {
@@ -1522,7 +931,7 @@ public class MakeReport extends CommBuffer {
 	 * 預設續下頁
 	 */
 	public void printContinueNext() {
-
+		// nothing
 	}
 
 	/**
@@ -1530,7 +939,7 @@ public class MakeReport extends CommBuffer {
 	 * 
 	 */
 	public void printFooter() {
-
+		// nothing
 	}
 
 	/**
@@ -1550,7 +959,6 @@ public class MakeReport extends CommBuffer {
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(35);
-
 	}
 
 	// 預設表頭 - 橫印
@@ -1559,7 +967,7 @@ public class MakeReport extends CommBuffer {
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 120, "機密等級：" + this.reportVo.getSecurity());
 		this.print(-2, 1, "報　表：" + this.reportVo.getRptCode());
-		this.print(-2, 70, this.rptItem, "C");
+		this.print(-2, 70, this.reportVo.getRptItem(), "C");
 		this.print(-2, 120, "日　　期：" + showDate(this.nowDate));
 		this.print(-3, 120, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 120, "頁　　次：" + this.nowPage);
@@ -1572,7 +980,7 @@ public class MakeReport extends CommBuffer {
 		this.print(-1, 50, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 80, "機密等級：" + this.reportVo.getSecurity());
 		this.print(-2, 1, "報　表：" + this.reportVo.getRptCode());
-		this.print(-2, 50, this.rptItem, "C");
+		this.print(-2, 50, this.reportVo.getRptItem(), "C");
 		this.print(-2, 80, "日　　期：" + showDate(this.nowDate));
 		this.print(-3, 80, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 80, "頁　　次：" + this.nowPage);
@@ -1598,7 +1006,6 @@ public class MakeReport extends CommBuffer {
 		listMap.add(map);
 
 		this.printCnt++;
-
 	}
 
 	/**
@@ -1632,9 +1039,8 @@ public class MakeReport extends CommBuffer {
 		// 換頁處理,排除
 		// 1.表頭(header)及表尾(footer)
 		// 2.指定列
-
 		if (hfProcess || row <= 0) {
-
+			// nothing
 		} else if (this.nowPage == 0 || this.NowRow > (this.rptBeginRow + this.rptTotalRows - 1)) {
 			newPage();
 			this.NowRow += row;
@@ -1714,6 +1120,7 @@ public class MakeReport extends CommBuffer {
 	}
 
 	public void printRptFooter() {
+		// nothing
 	}
 
 	/**
@@ -1721,6 +1128,7 @@ public class MakeReport extends CommBuffer {
 	 * 
 	 */
 	public void printTitle() {
+		// nothing
 	}
 
 	/**
@@ -1766,13 +1174,10 @@ public class MakeReport extends CommBuffer {
 	}
 
 	private void putFont() {
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
-
 		map.put("type", 2);
 		map.put("font", this.font);
 		map.put("size", this.fontSize);
-
 		listMap.add(map);
 	}
 
@@ -1821,19 +1226,6 @@ public class MakeReport extends CommBuffer {
 		return tTxFile.getFileNo();
 	}
 
-	private BaseFont setBaseFont(String type) throws IOException, DocumentException {
-		// 標楷體
-		String fontname = fontFolder + "kaiu.ttf";
-		// 細明體
-		if ("2".equals(type)) {
-			fontname = fontFolder + "mingliu.ttc,0";
-			// 微軟正黑體
-		} else if ("3".equals(type)) {
-			fontname = fontFolder + "msjh.ttc,0";
-		}
-		return BaseFont.createFont(fontname, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED); // 標楷體
-	}
-
 	public void setBatchNo(String batchNo) {
 		this.batchNo = batchNo;
 	}
@@ -1871,7 +1263,6 @@ public class MakeReport extends CommBuffer {
 	public void setField(String field, String value) {
 		if (field == null || "".equals(field) || value == null || "".equals(value))
 			return;
-
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 7);
 		map.put("f", field);
@@ -1953,7 +1344,6 @@ public class MakeReport extends CommBuffer {
 	 * @param value 值
 	 */
 	public void setPassword(String value) {
-
 		this.rptPassword = value;
 	}
 
@@ -1967,62 +1357,6 @@ public class MakeReport extends CommBuffer {
 
 	public void setRptSecurity(String rptSecurity) {
 		this.reportVo.setSecurity(rptSecurity);
-	}
-
-	/**
-	 * 浮水印
-	 * 
-	 * @param cb       PdfContentByte
-	 * @param document Document
-	 * @throws IOException       IOException
-	 * @throws DocumentException DocumentException
-	 */
-	private void setWatermark(PdfContentByte cb, Document document) throws IOException, DocumentException {
-
-		PdfGState graphicState = new PdfGState();
-		graphicState.setFillOpacity(0.7f);
-		graphicState.setStrokeOpacity(1f);
-
-		BaseFont tmpBaseFont = this.setBaseFont("1");
-
-		StringBuilder watermark = new StringBuilder();
-
-		watermark.append(rptTlrNo).append(" ");
-
-		CdEmp tCdEmp = cdEmpService.findById(rptTlrNo);
-
-		String empNm = "";
-		if (tCdEmp != null) {
-			empNm = tCdEmp.getFullname();
-		}
-
-		this.info("MakeReport setWatermark empNm = " + empNm);
-
-		watermark.append(empNm).append(" ");
-
-		String rptDate = new SimpleDateFormat("yyyyMMdd").format(rptCreateDate);
-		String rptTime = new SimpleDateFormat("HHmmss").format(rptCreateDate);
-		watermark.append(this.showRocDate(rptDate, 2)).append(" ").append(this.showTime(rptTime));
-
-		cb.setGState(graphicState);
-		cb.beginText();
-		cb.setFontAndSize(tmpBaseFont, 12);
-		cb.setColorFill(BaseColor.LIGHT_GRAY);
-
-		float widthMax = document.getPageSize().getWidth();
-		float heightMax = document.getPageSize().getHeight();
-
-		// this.info("widthMax = " + widthMax);
-		// this.info("heightMax = " + heightMax);
-
-		for (float w = 0; w < widthMax + 150f; w += 150f) {
-			// this.info("w = " + w);
-			for (float h = 0; h < heightMax + 80f; h += 80f) {
-				// this.info("h = " + h);
-				cb.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);
-			}
-		}
-		cb.endText();
 	}
 
 	/**
@@ -2128,7 +1462,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void toPdf(long pdfno) throws LogicException {
-		doToPdf(pdfno, "");
+		pdfGenerator.generatePdf(pdfno, "");
 	}
 
 	/**
@@ -2139,10 +1473,10 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void toPdf(long pdfno, String filename) throws LogicException {
-		doToPdf(pdfno, filename);
+		pdfGenerator.generatePdf(pdfno, filename);
 	}
 
-	private void toprint(int row, int column, String string, String align) {
+	private void toPrint(int row, int column, String string, String align) {
 		// row : 列 < 0 表指定位置 , =0表目前列 , >0表跳行數
 		// col : 行
 		// string : 列印字串
@@ -2152,9 +1486,8 @@ public class MakeReport extends CommBuffer {
 
 		align = align.toUpperCase();
 
-		if ("L".equals(align) || "C".equals(align) || "R".equals(align)) {
-
-		} else {
+		// 若非L、C、R，改為L
+		if (!("L".equals(align) || "C".equals(align) || "R".equals(align))) {
 			align = "L";
 		}
 
@@ -2169,7 +1502,6 @@ public class MakeReport extends CommBuffer {
 
 			this.printCnt++;
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2194,13 +1526,13 @@ public class MakeReport extends CommBuffer {
 		txPrinterId.setStanIp(localIp);
 		txPrinterId.setFileCode(tTxFile.getFileCode());
 
-		String ServerIp = "";
-		String Printer = "";
+		String serverIp = "";
+		String printer = "";
 
 		TxPrinter txPrinter = txPrinterService.findById(txPrinterId);
 		if (txPrinter != null) {
-			ServerIp = txPrinter.getServerIp();
-			Printer = txPrinter.getPrinter();
+			serverIp = txPrinter.getServerIp();
+			printer = txPrinter.getPrinter();
 		}
 
 		List<HashMap<String, Object>> pMap = new ArrayList<HashMap<String, Object>>();
@@ -2213,30 +1545,26 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料格式 " + e.getMessage());
 		}
 
-		int nowPage = 0;
+		int printNowPage = 0;
 
 		int morePage = 0;
-
-//		this.info("MakeReport.toPrint listMap.size = " + listMap.size());
 
 		boolean type0 = true;
 		for (HashMap<String, Object> map : this.listMap) {
 
 			String type = map.get("type").toString();
 
-//			this.info("MakeReport.toPrint type = " + type);
-
 			if ("0".equals(type) && type0) {
 				type0 = false;
 				// mew report
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("Action", 2);
-				map2.put("Printer", Printer);
+				map2.put("Printer", printer);
 				map2.put("ReportNo", tTxFile.getFileCode());
 				map2.put("ReportNm", tTxFile.getFileItem());
 				pMap.add(map2);
 
-				nowPage++;
+				printNowPage++;
 
 				String papersize = map.get("paper").toString();
 				String paperorientaton = map.get("paper.orientation").toString();
@@ -2258,21 +1586,13 @@ public class MakeReport extends CommBuffer {
 				}
 				pMap.add(map2);
 			} else if ("0".equals(type) || "1".equals(type)) {
-				nowPage++;
+				printNowPage++;
 
-				if (nowPage > pageno) {
+				if (printNowPage > pageno) {
 					morePage = 1;
 					break;
 				}
-
-//				if (nowPage == pageno) {
-//					// new page
-//					HashMap<String, Object> map2 = new HashMap<String, Object>();
-//					map2.put("Action", 6);
-//					pMap.add(map2);
-//				}
-
-			} else if ("2".equals(type) && nowPage == pageno) {
+			} else if ("2".equals(type) && printNowPage == pageno) {
 				// set font
 //				String font = map.get("font").toString();
 				int fontsize = Integer.parseInt(map.get("size").toString());
@@ -2287,8 +1607,7 @@ public class MakeReport extends CommBuffer {
 			} else if ("3".equals(type)) {
 				// 指定行列,列印字串
 //				throw new LogicException("E0014", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料格式錯誤(type=3)");
-
-			} else if ("4".equals(type) && nowPage == pageno) {
+			} else if ("4".equals(type) && printNowPage == pageno) {
 				// 指定XY軸列印字串
 
 				int x = Integer.parseInt(map.get("x").toString());
@@ -2317,29 +1636,16 @@ public class MakeReport extends CommBuffer {
 		if (pMap.size() > 0) {
 			HashMap<String, Object> map2 = new HashMap<String, Object>();
 			map2.put("Action", 9);
-
 			pMap.add(map2);
 		}
 
 		HashMap<String, Object> rmap = new HashMap<String, Object>();
 
-		rmap.put("ServerIp", ServerIp);
-		rmap.put("Printer", Printer);
+		rmap.put("ServerIp", serverIp);
+		rmap.put("Printer", printer);
 		rmap.put("morePage", morePage);
 		rmap.put("printJson", pMap);
-//		try {
-//			ObjectMapper mapper = new ObjectMapper();
-//			rmap.put("printJson", mapper.writeValueAsString(pMap));
-//		} catch (IOException e) {
-//			throw new LogicException("EC009", "(MakeReport)資料格式 " + e.getMessage());
-//		}
-
-//		for (Map.Entry<String, Object> entry : rmap.entrySet()) {
-//			this.info("key:" + entry.getKey() + ",value:" + entry.getValue());
-//		}
 
 		return rmap;
-
 	}
-
 }

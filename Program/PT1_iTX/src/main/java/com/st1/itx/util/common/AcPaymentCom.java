@@ -288,7 +288,9 @@ public class AcPaymentCom extends TradeBuffer {
 		default:
 			break;
 		}
-		acDetailList.add(acDetail);
+		if (acDetail.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+			acDetailList.add(acDetail);
+		}
 	}
 
 	private BigDecimal addAcDetail90(int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {

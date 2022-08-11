@@ -30,6 +30,11 @@ E(0,2)
 #ORGFG=_,_,S
 E(0,0)
 K(MODIFYBUTTON,登錄)
+##loop{times:20,l:0,n:1,m:2}
+C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+##end
+
+
 </sub>
 <sub type="DC" name="BFRP">
 <include src="RPDTL.icf::BFRP.dec"/>
@@ -148,6 +153,7 @@ E(0,@RimFKey,#FKEY)
 #WKINIT=X,1,S
 INVOKEJS(SHOW,p1,1)
 INVOKEJS(SHOW,p1,18,24,0)
+INVOKEJS(SHOW,p2,0)
 
 #InitValue=@,1,S
 T(F,@FacmNo,1)
@@ -549,6 +555,19 @@ E(0,@RimCaseCloseCode,#CaseCloseCode)
 RESET_RIM(#SendL3r11,L3R11)
 S(L3R11,1,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimCaseCloseCode)
 R(1,L3R11)
+##loop{times:20,l:0,n:1,m:2}
+IF({n}==1,C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0)),$)
+C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+T(2,@FacmBormNo{n},#L3r11FacmNo{n}+-+#L3r11BormNo{n})
+T(2,@IntStartDate{n},#L3r11IntStartDate{n})
+T(2,@IntEndDate{n},#L3r11IntEndDate{n})
+T(2,@IntSEDate{n},#IntStartDate{n}+-+#IntEndDate{n})
+E(0,@Principal{n},#L3r11Principal{n})
+E(0,@Interest{n},#L3r11Interest{n})
+E(0,@DelayInt{n},#L3r11DelayInt{n})
+E(0,@BreachAmt{n},#L3r11BreachAmt{n})
+E(0,@Total{n},#L3r11Total{n})
+##end
 
 !查詢催收呆帳檔金額
 #SendL3r12=X,1,S
@@ -1114,7 +1133,7 @@ IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),$)
 !應收付總金額
 #TotalRepayAmt=m,14.2,S
 E(0,0)
-E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt)
+E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt+#Shortfall-#Excessive)
 ! C(3,#CaseCloseCode,0,E(0,#Principal+#Interest+#Shortfall-#TimReduceAmt),$,)
 ! C(3,#CaseCloseCode,0,E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt),$)
 ! C(3,#CaseCloseCode,1,E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt),$)
@@ -1164,6 +1183,20 @@ E(0,@RP_FACMNO,#L3r11RpFacmNo)
 #TmpNote=X,1,S
 T(2,@RP_NOTE,#DetailNote)
 
+!----------------額度撥款試算表----------------
+
+##loop{times:20,l:0,n:1,m:2}
+#FacmBormNo{n}=X,7,L
+#IntStartDate{n}=D,7,L
+#IntEndDate{n}=D,7,L
+#IntSEDate{n}=X,20,L
+#Principal{n}=+m,14,L
+#Interest{n}=+m,14,L
+#DelayInt{n}=+m,14,L
+#BreachAmt{n}=+m,14,L
+#Total{n}=+m,14,L
+
+##end
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
@@ -1176,6 +1209,18 @@ T(2,@RP_NOTE,#DetailNote)
 <include src="ROM.icf::L3R12.dec"/>
 <include src="ROM.icf::L6R28.dec"/>
 </sub>
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+[
+["<font color=red>@本息計算表"],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[70,70,120,120,120,120,120,], p_cols:[5,15,15,15,15,15,15]}","","",
+["額度撥款","計息起訖日","本金","利息","延遲息","違約金","小計"],
+[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#BreachAmt1],[#DelayInt1],[#Total1]],
+],
+]
+</sub>
+
+
 !--------- 收付欄 -----------------------
 <sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
 [
@@ -1217,6 +1262,15 @@ T(3,[L3420] 結案登錄-不可欠繳)
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustId#ApplNo
 #TwReduceAmt#UsReduceAmt#TwTrfBadAmt#UsTrfBadAmt
+##loop{times:20,n:1}
+#FacmBormNo{n}
+#IntSEDate{n}
+#Principal{n}
+#Interest{n}
+#DelayInt{n}
+#BreachAmt{n}
+#Total{n}
+##end
 </sub>
 
 

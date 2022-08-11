@@ -82,6 +82,7 @@ public class BS020 extends TradeBuffer {
 
 	/* 設定暫收抵繳款批號 */
 	public BatxHead exec(TitaVo titaVo, TxBuffer txBuffer) throws LogicException {
+		this.info("active BS020 exec ");
 		txCode = "L4450".equals(titaVo.getTxcd()) ? "L4450" : "BS020";
 		baTxCom.setTxBuffer(txBuffer);
 
@@ -100,7 +101,7 @@ public class BS020 extends TradeBuffer {
 		// step 3.insert BatxDetail
 		if (this.lBatxDetail.size() > 0) {
 			try {
-				batxDetailService.insertAll(lBatxDetail);
+				batxDetailService.insertAll(lBatxDetail,titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "BS020 insertAll : " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -115,7 +116,7 @@ public class BS020 extends TradeBuffer {
 	/* 設定暫收抵繳款批號 */
 	private void settingBatchNo(TitaVo titaVo) throws LogicException {
 		// call by BS020-日始作業, or L4450-產出銀行扣帳檔
-		tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, txCode, "8"); // <> 8-已刪除
+		tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, txCode, "8", titaVo); // <> 8-已刪除
 		// 保留成功的整批入帳明細，其餘刪除(程式可重複執行)
 		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.轉暫收
 		if (tBatxHead != null) {
@@ -127,13 +128,13 @@ public class BS020 extends TradeBuffer {
 			dStatusCode.add("3");
 			dStatusCode.add("4");
 			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode,
-					this.index, Integer.MAX_VALUE);
+					this.index, Integer.MAX_VALUE, titaVo);
 			lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 			if (lBatxDetail != null) {
 				detailSeq = lBatxDetail.size();
 				this.info("settingBatchNo delete size =" + lBatxDetail.size());
 				try {
-					batxDetailService.deleteAll(lBatxDetail);
+					batxDetailService.deleteAll(lBatxDetail, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", "BatxDetail deleteAll " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}
@@ -141,7 +142,7 @@ public class BS020 extends TradeBuffer {
 		}
 		// 批號為"BATX" + NN(01起，續編)
 		if (this.batchNo == null) {
-			tBatxHead = batxHeadService.batchNoFirst(tbsdyf);
+			tBatxHead = batxHeadService.batchNoDescFirst(tbsdyf,"BATX%", titaVo);
 			if (tBatxHead == null)
 				this.batchNo = "BATX01";
 			else
@@ -234,7 +235,7 @@ public class BS020 extends TradeBuffer {
 		tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(this.tbsdyf);
 		tBatxHeadId.setBatchNo(this.batchNo);
-		tBatxHead = batxHeadService.holdById(tBatxHeadId);
+		tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
 		if (tBatxHead == null) {
 			insertfg = true;
 			tBatxHead = new BatxHead();
@@ -250,13 +251,13 @@ public class BS020 extends TradeBuffer {
 		tBatxHead.setTitaTxCd(txCode);
 		if (insertfg)
 			try {
-				batxHeadService.insert(tBatxHead);
+				batxHeadService.insert(tBatxHead, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "L4210 BatxHead insert : " + e.getErrorMsg()); // E0005 新增資料時，發生錯誤
 			}
 		else
 			try {
-				batxHeadService.update(tBatxHead);
+				batxHeadService.update(tBatxHead, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "L4210 BatxHead Update : " + e.getErrorMsg()); // E0007 更新資料時，發生錯誤
 

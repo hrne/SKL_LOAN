@@ -80,7 +80,7 @@ T(3,@FdBookAmt,*)
 #BTN5=X,15,I,ui:button;value:回收試算;enable:1;tabbable:0;title:L3921 回收試算;
 
 #BUF1=X,42,S
-HIDE(#BTN2,#UsBookAmt,#BookAmtX)
+HIDE(#BTN2,#UsBookAmt,#BookAmtX,#BTN5)
 !---------- AP TEXT AREA Variables ----------
 ! #ReNew=A,1,S
 
@@ -270,6 +270,7 @@ T(3,*)
 
 #CustNo=A,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+HIDE(#BTN5)
 @V(2,0)
 T(2,@LockCustNo,#CustNo)
 <include src="COM.icf::LockControl.rtn"/>
@@ -318,6 +319,7 @@ T(3,*)
 
 #FacmNo=A,3,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+HIDE(#BTN5)
 @V(2,0)
 
 !用CustNo,FacmNo調L2R05
@@ -347,6 +349,7 @@ T(2,@CurrencyCode,#L2r05CurrencyCode)
 
 #BormNo=A,3,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+HIDE(#BTN5)
 @
 
 ! #BUF3D=X,21,S
@@ -411,6 +414,7 @@ T(3,*)
 #BookDate=D,7,I
 C(3,#CHAIN,1,C(3,#UpdateCode,1,$,s),$)
 C(3,#BookDate,0,E(0,#SYSNDATE),$)
+HIDE(#BTN5)
 D(8)
 @V(7)
 V(5,#SysDate,#MaturityDate)
@@ -478,9 +482,16 @@ C(3,#UpdateCode,1,$,S)
 C(3,#Precision,0,$,S)
 T(3,*)
 
+#BUF5A=X,50,S
+T(2,#TXCD+#CustNo+#FacmNo+#BormNo+#CurrencyCode+#TimBookAmt+#BookDate)
+
+#BIND5A=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF5A})
+
 #TwBookAmt=m,14,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,$,s)
+SHOW(#BTN5)
 @V(2,0)
 IF(#TwBookAmt>#LoanBal,V(P,不可大於放款餘額),$)
 ! V(5,1,#LoanBal)
@@ -488,6 +499,7 @@ IF(#TwBookAmt>#LoanBal,V(P,不可大於放款餘額),$)
 #UsBookAmt=m,14.2,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,s,$)
+SHOW(#BTN5)
 @V(2,0)
 IF(#UsBookAmt>#LoanBal,V(P,不可大於放款餘額),$)
 ! V(5,1,#LoanBal)
@@ -498,6 +510,11 @@ C(3,#Precision,0,E(0,#TwBookAmt),E(0,#UsBookAmt))
 #BookAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#TimBookAmt,#BookAmtX)
 
+#BUF5B=X,50,S
+T(2,#TXCD+#CustNo+#FacmNo+#BormNo+#CurrencyCode+#TimBookAmt+#BookDate)
+
+#BIND5B=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF5B})
 ![交易金額]
 #TXAMT=_,_,S
 E(0,#TimBookAmt)
@@ -505,11 +522,6 @@ E(0,#TimBookAmt)
 #WKSHOW=X,1,S
 !SHOW(#BTN3)
 
-#BUF5=X,50,S
-T(2,#TXCD+#CustNo+#FacmNo+#BormNo+#CurrencyCode+#TimBookAmt+#BookDate)
-
-#BIND3=X,1,S
-BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF5})
 
 ![繳納方式]
 !依額度[攤還額異動碼]為1時預設1.減少每期攤還金額
@@ -545,14 +557,16 @@ T(H,#BookStatus,#BookStatusHelp)
 
 !新增修改複製送出後自動連動L8204疑似洗錢交易訪談記錄維護
 #NTXBUF1=X,62,S
-C(3,#UpdateCode,1,$,S)
-T(2,1+#SysDate+#CustNo+#FacmNo+#BormNo+#BookDate+#LogNo+#TimBookAmt)ASGN(NTXBUF$)
+C(3,#FuncCode,1,T(2,1+#SysDate+#CustNo+#FacmNo+#BormNo+#BookDate+#LogNo+#TimBookAmt)ASGN(NTXBUF$),$)
+C(3,#FuncCode,2,T(2,#OldBookDate+#OldBookDate+#CustNo)ASGN(NTXBUF$),$)
+C(3,#FuncCode,4,T(2,#OldBookDate+#OldBookDate+#CustNo)ASGN(NTXBUF$),$)
+
 
 #TmpNTXCD=X,5,S
-C(3,#UpdateCode,1,$,S)
-T(3,L8204)
-IF(#UpdateCode == 1,ASGN(NTXCD$),$)
-
+C(3,#FuncCode,1,T(3,L8204),$)
+C(3,#FuncCode,2,T(3,L8923),$)
+C(3,#FuncCode,4,T(3,L8923),$)
+IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==4,ASGN(NTXCD$),$)
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#CustNo+-+#FacmNo+-+#BormNo)))

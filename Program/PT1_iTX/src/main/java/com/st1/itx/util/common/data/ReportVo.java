@@ -2,6 +2,9 @@ package com.st1.itx.util.common.data;
 
 import java.util.Objects;
 
+import javax.persistence.Entity;
+
+@Entity
 public class ReportVo {
 
 	public static class ReportVoBuilder {

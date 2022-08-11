@@ -637,6 +637,13 @@ IF(#RPFG>0,$,s)
 E(0,@RP_FACMNO,#FacmNo)
 
 
+! ! 0004 
+! #RQSP=X,4,S
+! T(3,0004)
+! C(3,#TempReasonCode,1,$,s)
+! C(3,#TempItemCode,6,ASGN(RQSP$),s)
+
+
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
@@ -658,7 +665,6 @@ E(0,@RP_FACMNO,#FacmNo)
 <include src="PRT.icf::PRTHEAD.rtn"/>
 <include src="PRT.icf::FM101.rtn"/>
 </sub>
-
 
 !---------- TXFORM = L3230 ----------
 <sub type="FORM" name="L3230">

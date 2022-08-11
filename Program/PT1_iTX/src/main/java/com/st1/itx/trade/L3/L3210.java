@@ -16,14 +16,12 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
-import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
@@ -374,21 +372,29 @@ public class L3210 extends TradeBuffer {
 		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, this.repayFacmNo, 0, iRepayType, iTempAmt,
 				titaVo);
 
-		// 借方：交易金額(已出)
+		if (iTempAmt.compareTo(BigDecimal.ZERO) > 0) {
+			// 借方：交易金額(已出)
 
-		// 借方：暫收款金額 (暫收借)
-		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+			// 借方：暫收款金額 (暫收借)
+			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
-		// 貸方：累溢收入帳(暫收貸)
-		loanCom.settleOverflow(lAcDetail, titaVo);
+			// 貸方：累溢收入帳(暫收貸)
+			loanCom.settleOverflow(lAcDetail, titaVo);
 
-		// 新增放款交易內容檔
-		addLoanBorTxRoutine();
+			// 新增放款交易內容檔
+			addLoanBorTxRoutine();
+
+		}
 		// 費用
 		if (isRepaidFee) {
 			// 收回費用處理(新增帳務及放款交易內容檔)
 			loanCom.settleFeeRoutine(this.baTxList, iRpCode, iEntryDate, new TempVo(), lAcDetail, titaVo);
 		}
+		// 無費用項目可抵繳
+		if (iRpCode == 90 && lAcDetail.size() == 0) {
+			throw new LogicException(titaVo, "E0010", "無費用項目可抵繳，請執行<轉暫收> "); // 功能選擇錯誤
+		}
+		
 	}
 
 	// 新增放款交易內容檔
@@ -410,7 +416,7 @@ public class L3210 extends TradeBuffer {
 //		08	兌現票入帳
 //		09	其他
 //		10	AML凍結／未確定
-		
+
 		if (iTempReasonCode == 0 || iTempReasonCode == 3 || iTempReasonCode == 6 || iTempReasonCode == 10) {
 			tLoanBorTx.setDesc(iTempReasonCodeX + "登錄");
 		} else {
