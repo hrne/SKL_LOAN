@@ -92,38 +92,6 @@ public class L9710Report extends MakeReport {
 		this.setMaxRows(45);
 	}
 
-	// 直式規格
-//	public void printHeader() {
-//
-//		this.setFontSize(8);
-//		this.setCharSpaces(0);
-//		this.print(-1, 149, "機密等級：普通");
-//		this.print(-2, 3, "　程式ID：" + this.getParentTranCode());
-//		this.print(-2, 64, "新光人壽保險股份有限公司");
-//		this.print(-3, 3, "　報　表：" + this.getRptCode());
-//		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
-//		this.print(-2, 149, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/"
-//				+ dateUtil.getNowStringBc().substring(2, 4));
-//		this.print(-3, 69, "寬限到期明細表");
-//		this.print(-3, 149, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-//				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
-//		this.print(-4, 149, "頁　  次：");
-//		this.print(0, 164, Integer.toString(this.getNowPage()), "R");
-//		this.print(-5, 75,
-//				showRocDate(titaVo.get("ACCTDATE_ST"), 2) + " － " + showRocDate(titaVo.get("ACCTDATE_ED"), 2), "C");
-//		this.print(0, 149, "單　  位：元");
-//
-//		this.print(-7, 1,
-//				" 站別  押品地區別  經辦          戶號       戶名      核准號碼  寬限到期日       核准額度       貸放餘額 首次撥款日  上次繳息日 計息利率  聯絡電話        聯絡人　   下次還本日");
-//		this.print(-8, 1,
-//				"-------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-//
-//		// 明細起始列(自訂亦必須)
-//		this.setBeginRow(9);
-//
-//		// 設定明細列數(自訂亦必須)
-//		this.setMaxRows(45);
-//	}
 
 	public List<Map<String, String>> exec(TitaVo titaVo, int iAcDate) throws LogicException {
 
@@ -148,6 +116,7 @@ public class L9710Report extends MakeReport {
 		int divderCount = 0;
 		String tempCity = "";
 
+
 		if (l9710List != null && l9710List.size() != 0) {
 
 			// 輸出Excel
@@ -167,11 +136,11 @@ public class L9710Report extends MakeReport {
 						reportTot(tempCity);
 						
 						//地區別結束段落與換頁同時
-						if (tempCount >= 40) {
-							this.newPage();
-							tempCount = tempCount % 40;
-							divderCount = 0;
-						}
+//						if (tempCount >= 40) {
+//							this.newPage();
+//							tempCount = tempCount % 40;
+//							divderCount = 0;
+//						}
 						
 						// 每一次小計 會加3行
 						tempCount = (tempCount % 40) + (3 * divderCount);

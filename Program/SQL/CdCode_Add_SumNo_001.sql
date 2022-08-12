@@ -1,0 +1,1 @@
+INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") VALUES ('SumNo','6','001','催呆轉帳','Y','0','0','0');

@@ -982,14 +982,12 @@ IF(#L2r05LimitFlag=="S",T(2,S：合併額度控管限額：+#AvailableX),$)
 C(3,#PRECISION,0,$,S)
 C(5,#L2r01CharCode,2,s,$)
 @V(2,0)
-! V(5,#L2r01LowAmt,#Available)
 IF(#TwDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
 #UsDrawdownAmt=m,14.2,I
 C(3,#PRECISION,0,S,$)
 C(5,#L2r01CharCode,2,s,$)
 @V(2,0)
-! V(5,#L2r01LowAmt,#Available)
 IF(#UsDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
 #TimDrawdownAmt=m,14.2,S
@@ -2021,7 +2019,7 @@ C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 
 !檢查銀扣身分別
 #CheckRelationIdKind=X,1,S
-IF(#RelationGender==""||#checkcustidlen==8,E(0,2),E(0,1))
+IF(#RelationGender==""&&#checkcustidlen==8,E(0,2),E(0,1))
 ! SWITCH(#checkcustidlen,8,E(0,2),
 !                       10,E(0,1),
 !                        ,T(3,))
@@ -2063,9 +2061,11 @@ E(0,@RP_CUSTNO,#TimCustNo)
 <include src="RPDTL.icf::RPCOL.dec"/>
 
 #checkAMLName=X,1,S
+C(4,#RP_AmlCheckName,s,$)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,INVOKEJS(SHOW,p7,1),INVOKEJS(SHOW,p7,0))
 
 #RPTITLEtt=X,26,L
+C(4,#RP_AmlCheckName,s,$)
 IF(#RP_AmlCheckName==#TimCustNoX,T(3,匯款人資料（本人）)
                                  T(3,@INITp7, ),$)
 IF(#RP_AmlCheckName==#RelationName,T(3,匯款人資料（同銀扣第三人）)
@@ -2084,20 +2084,24 @@ C(4,#INITp7,T(3,@RpRemitIdKind, )
 
 !匯款人身份別
 #RpRemitIdKind=X,1,I
+C(4,#RP_AmlCheckName,s,$)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 HELP(#CustTypeHelp)
 @V(H,#CustTypeHelp)
 
 #RpRemitIdKindX=X,6,L
+C(4,#RP_AmlCheckName,s,$)
 T(3,)T(H,#RpRemitIdKind,#CustTypeHelp)
 !身份證/居留證號碼
 #RpRemitId=X,10,I
+C(4,#RP_AmlCheckName,s,$)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 @C(4,#RpRemitId,s,$)
 IF(#RpRemitIdKind=="1",A(ID,0,#RpRemitId),A(ID_UNINO,0,#RpRemitId))
 
 !性別
 #RpRemitGender=X,1,I
+C(4,#RP_AmlCheckName,s,$)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 C(3,#RpRemitIdKind,1,$,S)
 HELP(#SexHelp)
@@ -2111,6 +2115,7 @@ T(H,#RpRemitGender,#SexHelp)
 
 !出生日期
 #RpRemitBirthday=D,7,I
+C(4,#RP_AmlCheckName,s,$)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 C(4,#RpRemitGender,S,$)
 @A(DATE,0,#RpRemitBirthday)
@@ -2126,6 +2131,7 @@ IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於日曆日),$)
 #RemitBirthday=D,7,S
 
 #checkaml=X,1,S
+C(4,#RP_AmlCheckName,s,$)
 !匯款戶名=借款人戶名
 IF(#RP_AmlCheckName==#TimCustNoX,T(2,@RemitIdKind,#L2r07RemitIdKind)
                                  T(2,@RpRemitIdKind,#L2r07RemitIdKind)
@@ -2137,8 +2143,6 @@ IF(#RP_AmlCheckName==#TimCustNoX,T(2,@RemitIdKind,#L2r07RemitIdKind)
                                  T(H,@RpRemitGenderX,#RpRemitGender,#SexHelp)
                                  E(0,@RemitBirthday,#L2r07RemitBirthday)
                                  E(0,@RpRemitBirthday,#L2r07RemitBirthday),$)
-
-
 !匯款戶名=銀扣戶名
 IF(#RP_AmlCheckName==#RelationName,T(2,@RemitIdKind,#CheckRelationIdKind)
                                    T(2,@RpRemitIdKind,#CheckRelationIdKind)

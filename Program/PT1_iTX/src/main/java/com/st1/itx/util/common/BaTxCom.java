@@ -446,7 +446,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		// Load 還款主檔清單
-		if (iRepayType != 11 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+		if (iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 			loadRepayLoan(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
 			// Load 暫收指定額度清單
 			loadFacTmpList(iCustNo, titaVo);
@@ -1130,7 +1130,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd,
 				this.index, Integer.MAX_VALUE, titaVo);
-		if (slLoanBorMain != null) {
+		if (slLoanBorMain == null) {
 			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
 		}
 		boolean isStautsNormal = false;

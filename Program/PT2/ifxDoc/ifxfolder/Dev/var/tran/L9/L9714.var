@@ -1,0 +1,213 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L9714)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L9714]                                 繳息證明單"],
+["#R1+@戶    號",#CustNo],
+["#R2+@額    度",#FacmNo, " 0:全部 "],
+["#R3+@用    途",#UsageCode,#UsageCodeX],
+["#R4+@資料年月區間",#sYearMonth,"～",#eYearMonth],
+["#FdMsg+@注意事項",#Msg],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+! 必輸欄位
+##loop{times:4,i:1}
+#R{i}=X,1,L
+INVOKEJS(SHOW,#R{i},0)
+K(LIGHT,#R{i},TXTRED,0)
+##end
+
+! 永遠為必輸欄位
+#ALWAYS_HIGHLIGHT=@,1,S
+T(3,@R1,*)
+T(3,@R2,)
+T(3,@R3,)
+T(3,@R4,*)
+
+#FdMsg=X,1,L
+#Msg=x,20.100,L
+K(LIGHT,#Msg,TXTRED,0)
+INVOKEJS(SHOW,p1,5,5,0)
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#CDCODEUsageCode=x,20,S
+T(3,CdCode.UsageCode)
+
+#UsageCodeHelpRim=X,1,S
+RESET_RIM(#UsageCodeHelpRim,XXR99)
+S(XXR99,01,#CDCODEUsageCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@UsageCodeHelp,00:全部;+#HelpDesc1)
+
+#UsageCodeHelp=x,300,S
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#INIT=X,1,S
+CALL(#ALWAYS_HIGHLIGHT)
+
+#DT1=D,8,S
+T(4,DATE$)
+
+#DT2=A,5,S
+T(1,#DT1,2,5)
+
+!戶號 必須輸入
+#CustNo=A,7,I
+@V(2,0)
+
+!戶號 必須輸入
+#FacmNo=A,3,I 
+
+! 用途
+#UsageCode=A,2,I 
+HELP(#UsageCodeHelp)
+@T(3,@UsageCodeX,)
+V(H,#UsageCodeHelp)
+
+#UsageCodeX=X,20,L
+T(H,#UsageCode,#UsageCodeHelp)   
+
+
+!會計日期 必須輸入，不可大於本營業日
+#sYearMonth=A,5,I
+T(2,#DT2)
+@V(7)
+V(5,0,#DT2)
+A(YM,1,#sYearMonth)
+
+#eYearMonth=A,5,I
+T(2,#DT2)
+@V(7)
+V(5,#sYearMonth,#DT2)
+A(YM,1,#eYearMonth)
+
+<include src="ROM.icf::L1R20.dec"/>
+
+#FormNo=x,10,S
+T(3,L9714)
+
+#RimFlag=A,1,S
+
+!#L1R20Rim=X,1,S
+!RESET_RIM(#L1R20Rim,L1R20)
+!E(0,@RimFlag,1)
+!S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
+!R(1,L1R20)
+
+#L1R20Rim2=X,1,S
+C(3,#CustNo,0,S,$)
+RESET_RIM(#L1R20Rim2,L1R20)
+E(0,@RimFlag,0)
+S(L1R20,01,#CustNo,#FacmNo,#FormNo,#RimFlag)
+R(1,L1R20)
+T(2,@Msg,#L1R20Msg)
+
+#ShowMsg=A,1,S
+C(3,#CustNo,0,E(0,0),C(4,#Msg,E(0,0),E(0,1)))
+INVOKEJS(SHOW,p1,5,5,#ShowMsg)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+<include src="COM.icf::RPTFG.dec"/>
+</sub>
+
+
+!---------- TXFORM = L9714 ----------
+<sub type="FORM" name="L9714">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L9714,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L9714] 繳息證明單)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustNo
+#FacmNo
+#UsageCode
+#sYearMonth
+#eYearMonth
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L9714^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L1R20.tom"/>
+
+</sub>
+
+<sub type="PART" name="L9714" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L9714]                                 繳息證明單"], 
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

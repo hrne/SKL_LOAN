@@ -624,6 +624,8 @@ public class TxBatchCom extends TradeBuffer {
 			txTitaVo.putParam("ORGTLR", tDetail.getTitaTlrNo()); // 原經辦
 			txTitaVo.putParam("ORGTNO", tDetail.getTitaTxtNo()); // 原交易序號
 			txTitaVo.putParam("HCODE", "1"); // 訂正交易
+			txTitaVo.putParam("SUPNO", titaVo.getParam("SUPNO")); // 主管授權
+			txTitaVo.putParam("RQSP", titaVo.getParam("RQSP")); // 主管授權理由
 		}
 
 		return txTitaVo;
