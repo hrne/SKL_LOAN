@@ -1605,6 +1605,8 @@ public class LoanCom extends TradeBuffer {
 				if (sumNo == 0) {
 					if ("C".equals(ac.getDbCr())) {
 						repayAmt = repayAmt.add(ac.getTxAmt());
+					} else {
+						repayAmt = repayAmt.subtract(ac.getTxAmt());
 					}
 				} else if (sumNo >= 90 && sumNo <= 98) {
 					if ("D".equals(ac.getDbCr())) {
