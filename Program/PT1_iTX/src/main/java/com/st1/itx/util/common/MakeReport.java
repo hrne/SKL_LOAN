@@ -162,7 +162,7 @@ public class MakeReport extends CommBuffer {
 		if (reportVo.getRptCode() == null || reportVo.getRptCode().isEmpty()) {
 			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數必須有值");
 		}
-		if (haveChinese(reportVo.getRptCode())) {
+		if (rptUtil.haveChinese(reportVo.getRptCode())) {
 			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數不可有全形字");
 		}
 		if (reportVo.getRptItem() == null || "".equals(reportVo.getRptItem())) {
@@ -180,7 +180,7 @@ public class MakeReport extends CommBuffer {
 		if (rptCode == null || "".equals(rptCode)) {
 			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數必須有值");
 		}
-		if (haveChinese(rptCode)) {
+		if (rptUtil.haveChinese(rptCode)) {
 			throw new LogicException("EC004", "(MakeReport)報表編號(rptCode)參數不可有全形字");
 		}
 		if (rptItem == null || "".equals(rptItem)) {
@@ -411,16 +411,6 @@ public class MakeReport extends CommBuffer {
 	 */
 	public String getshowRocDate(int date) {
 		return rptUtil.getChineseRocDate(date);
-	}
-
-	private boolean haveChinese(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			String c = string.substring(i, i + 1);
-			if (c.matches("[\\u0391-\\uFFE5]+")) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	// 一般模式

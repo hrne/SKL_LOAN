@@ -136,6 +136,7 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 	private BigDecimal repayTotal = BigDecimal.ZERO; // 還款總金額
 	private BigDecimal shortAmtLimit = BigDecimal.ZERO;// 短繳限額
+	private BigDecimal unPayLoan = BigDecimal.ZERO;// 應繳本利
 	private int rateEffectDate = 0; // 目前利率生效日
 	private BigDecimal fitRate = BigDecimal.ZERO; // 目前利率
 	private int repayIntDate = 0; // 還款應繳日
@@ -185,6 +186,7 @@ public class BaTxCom extends TradeBuffer {
 		this.breachAmt = BigDecimal.ZERO; // 違約金
 		this.closeBreachAmt = BigDecimal.ZERO; // 清償違約金
 		this.shortAmtLimit = BigDecimal.ZERO;// 短繳限額計算
+		this.unPayLoan = BigDecimal.ZERO;// 應繳本利
 
 		// 還款金額、日期、其他
 		this.tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
@@ -444,13 +446,15 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		// Load 還款主檔清單
-		loadRepayLoan(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
-
-		// Load 暫收指定額度清單
-		loadFacTmpList(iCustNo, titaVo);
-
+		if (iRepayType != 11 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+			loadRepayLoan(iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, titaVo);
+			// Load 暫收指定額度清單
+			loadFacTmpList(iCustNo, titaVo);
+		}
 		// 取得期款還款額度(期金是否相同)
-		if (iRepayType == 1 && iFacmNo == 0) {
+		if (iRepayType == 1 && iFacmNo == 0)
+
+		{
 			iFacmNo = getDueAmtFacmNo(repayAmt);
 		}
 
@@ -507,7 +511,7 @@ public class BaTxCom extends TradeBuffer {
 // 4).應繳日   >= 到期日 -> 3.結案
 			if (iRepayType == 0) {
 				for (LoanBorMain ln : lLoanBorMain) {
-					if (iPayIntDate >= ln.getMaturityDate()) {
+					if (ln.getStatus() == 0 && iPayIntDate >= ln.getMaturityDate()) {
 						iRepayType = 3;
 						break;
 					}
@@ -1126,7 +1130,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd,
 				this.index, Integer.MAX_VALUE, titaVo);
-		if (slLoanBorMain == null) {
+		if (slLoanBorMain != null) {
 			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
 		}
 		boolean isStautsNormal = false;
@@ -1533,7 +1537,10 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-
+		// 應繳本利
+		if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy() || baTxVo.getRepayType() >= 2) {
+			this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
+		}
 		this.baTxList.add(baTxVo);
 	}
 
@@ -1910,7 +1917,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 
-	    // 計算作帳金額
+		// 計算作帳金額
 		BigDecimal wkTxBal = iTxAmt;
 		BigDecimal wkOverBal = BigDecimal.ZERO;
 		BigDecimal wkTempBal = BigDecimal.ZERO;
@@ -2047,7 +2054,7 @@ public class BaTxCom extends TradeBuffer {
 				ba.setAcSeq(acSeq);
 			}
 		}
-	
+
 		this.info("settleAcAmt end" + ", wkTxBal=" + wkTxBal + ", wkTempBal=" + wkTempBal + ", wkOverBal=" + wkOverBal);
 
 	}
@@ -2928,6 +2935,15 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public int getNextPayIntDate() {
 		return nextPayIntDate;
+	}
+
+	/**
+	 * 應繳本利
+	 * 
+	 * @return 應繳本利
+	 */
+	public BigDecimal getUnPayLoan() {
+		return unPayLoan;
 	}
 
 	/**

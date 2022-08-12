@@ -275,7 +275,8 @@ public class ReportUtil extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble
+					+ "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -296,7 +297,8 @@ public class ReportUtil extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString
+						+ "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -509,7 +511,7 @@ public class ReportUtil extends CommBuffer {
 					yearInChinese.append(yearNumbers[nowYear]);
 					if (s < 1 && yearInChinese.length() != 0) {
 						yearInChinese.append(yearDigit[0]);
-						}
+					}
 					if (nowYear != 0 && s != 0 && s != 2 && yearInChinese.length() != 0) {
 						yearInChinese.append(yearDigit[1]);
 					}
@@ -534,7 +536,7 @@ public class ReportUtil extends CommBuffer {
 
 					if (s < 1 && monthInChinese.length() != 0 && monthInChinese.length() != -1) {
 						monthInChinese.append(monthDigit[0]);
-						}
+					}
 					if (nowMonth != 0 && s != 0 && s != 2 && s != 4 && monthInChinese.length() != 0) {
 						monthInChinese.append(monthDigit[1]);
 					}
@@ -591,4 +593,13 @@ public class ReportUtil extends CommBuffer {
 		return time.substring(0, 2) + ":" + time.substring(2, 4) + ":" + time.substring(4, 6);
 	}
 
+	public boolean haveChinese(String string) {
+		for (int i = 0; i < string.length(); i++) {
+			String c = string.substring(i, i + 1);
+			if (c.matches("[\\u0391-\\uFFE5]+")) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

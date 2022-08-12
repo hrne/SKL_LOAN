@@ -1296,7 +1296,7 @@ public class LoanCom extends TradeBuffer {
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
 		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
 		String desc = "";
-		if ("L3230".equals(titaVo.getTxcd())) {
+		if ("L3210".equals(titaVo.getTxcd())) {
 			desc = "暫收銷";
 		}
 		// 費用科目代碼
@@ -1403,12 +1403,12 @@ public class LoanCom extends TradeBuffer {
 	 * @param iFacmNo      額度
 	 * @param iFirstFacmNo 資料首筆額度
 	 * @param titaVo       TitaVo
-	 * @return 暫收款額度
+	 * @return 暫收款額度     
 	 * @throws LogicException ....
 	 */
 	public int getTmpFacmNo(int iCustNo, int iFacmNo, int iFirstFacmNo, TitaVo titaVo) throws LogicException {
-		// facmNotmp >0 為單一額度
-		// facmNotmp =0 為全部非指定額度
+//  暫收款額度 > 0 => 單一額度
+//  暫收款額度 = 0 => 全部非指定額度
 		if (iFacmNo > 0) {
 			return iFacmNo;
 		}
@@ -1605,8 +1605,6 @@ public class LoanCom extends TradeBuffer {
 				if (sumNo == 0) {
 					if ("C".equals(ac.getDbCr())) {
 						repayAmt = repayAmt.add(ac.getTxAmt());
-					} else {
-						repayAmt = repayAmt.subtract(ac.getTxAmt());
 					}
 				} else if (sumNo >= 90 && sumNo <= 98) {
 					if ("D".equals(ac.getDbCr())) {

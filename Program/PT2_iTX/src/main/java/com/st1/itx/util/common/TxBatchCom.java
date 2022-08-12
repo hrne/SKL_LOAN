@@ -271,7 +271,7 @@ public class TxBatchCom extends TradeBuffer {
 //  計息迄日
 	private int intEndDate = 0;
 //  上次繳息日
-	private int prePayintDate = 0;
+	private int prevPayintDate = 0;
 
 //  額度還款應繳日
 	private String repayIntDateByFacmNoVo = null;
@@ -348,7 +348,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.repayIntDateByFacmNoVo = null;
 		this.intStartDate = 0;
 		this.intEndDate = 0;
-		this.prePayintDate = 0;
+		this.prevPayintDate = 0;
 		this.facStatus = 0;
 		this.closeFg = 0;
 		this.checkMsg = "";
@@ -1366,7 +1366,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 處理狀態:2.人工處理
 				// 處理說明:繳息迄日:999999
 				if (this.repayLoan.compareTo(BigDecimal.ZERO) == 0) {
-					this.checkMsg += " 繳息迄日:" + this.prePayintDate;
+					this.checkMsg += " 繳息迄日:" + this.prevPayintDate;
 					apendcheckMsgAmounts(tBatxDetail, titaVo);
 					this.procStsCode = "2"; // 2.人工處理
 					break;
@@ -1428,7 +1428,6 @@ public class TxBatchCom extends TradeBuffer {
 				this.checkMsg += " 部分償還金額 :" + df.format(parse.stringToBigDecimal(this.tTempVo.get("ExtraRepay")));
 
 				// 檢核正常
-				this.procStsCode = "4"; // 4.檢核正常
 				if (this.overAmt.compareTo(BigDecimal.ZERO) > 0) {
 					this.checkMsg += " 有溢繳款:" + df.format(this.overAmt);
 				}
@@ -1436,6 +1435,15 @@ public class TxBatchCom extends TradeBuffer {
 				if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
 					this.checkMsg += " 有短繳款:" + df.format(this.shortAmt);
 				}
+
+				// 短繳金額超過利息(有本金累短收)
+				if (this.shortAmt.compareTo(this.shortfallInt.add(this.interest)) > 0) {
+					this.checkMsg += " 短繳金額超過利息(有本金累短收)";
+					apendcheckMsgAmounts(tBatxDetail, titaVo);
+					this.procStsCode = "2"; // 3.檢核錯誤
+					break;
+				}
+				this.procStsCode = "4"; // 4.檢核正常
 				apendcheckMsgAmounts(tBatxDetail, titaVo);
 				break;
 			// 03-結案
@@ -1651,6 +1659,7 @@ public class TxBatchCom extends TradeBuffer {
 			}
 			break;
 		case "A6":
+		case "A7": // 債協專戶
 			// 11-債協匯入款
 			this.repayType = 11;
 			break;
@@ -1859,23 +1868,22 @@ public class TxBatchCom extends TradeBuffer {
 			this.repayIntDate = parse.stringToInteger(this.tTempVo.get("RepayIntDate")); // 還款應繳日
 			this.repayIntDateByFacmNoVo = this.tTempVo.get("RepayIntDateByFacmNoVo"); // 還款額度
 		}
+		// 上次繳息日
+		if (this.repayType == 1) {
+			this.prevPayintDate = baTxCom.getPrevPayIntDate();
+		}
 
 		// 戶況
 		if (this.tTempVo.get("FacStatus") != null) {
 			this.facStatus = parse.stringToInteger(this.tTempVo.get("FacStatus"));
 
 		}
-		// 結案記號、應繳本利
+		// 結案記號
 		boolean isCloseFg = true;
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			for (BaTxVo baTxVo : baTxList) {
 				if (baTxVo.getDataKind() == 2) {
 					this.loanBal = loanBal.add(baTxVo.getLoanBal());
-					// 應繳本利
-					if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy() || baTxVo.getRepayType() >= 2) {
-						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt());
-						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
-					}
 					// 結案記號 1.正常結案 2.提前結案
 					if (baTxVo.getCloseFg() > this.closeFg) {
 						this.closeFg = baTxVo.getCloseFg();
@@ -1890,6 +1898,10 @@ public class TxBatchCom extends TradeBuffer {
 				this.closeFg = 0;
 			}
 		}
+
+		// 應繳本利
+		this.unPayLoan = baTxCom.getUnPayLoan();
+		this.unPayTotal = this.unPayLoan;
 
 		if ("0".equals(this.procStsCode) && baTxList != null && baTxList.size() != 0) {
 			int i = 0;
@@ -1937,11 +1949,6 @@ public class TxBatchCom extends TradeBuffer {
 					}
 				}
 				if (baTxVo.getDataKind() == 2) {
-					// 上次繳息日
-					if (this.prePayintDate == 0 || baTxVo.getIntStartDate() < this.prePayintDate) {
-						this.prePayintDate = baTxVo.getIntStartDate();
-					}
-
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 						this.principal = this.principal.add(baTxVo.getPrincipal());
@@ -1983,6 +1990,7 @@ public class TxBatchCom extends TradeBuffer {
 					}
 					// 清償違約金、費用
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt()); // 全部應繳
 						if (baTxVo.getRepayType() <= 3) {
 							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());
 							this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());

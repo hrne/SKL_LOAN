@@ -83,7 +83,7 @@ public class PdfGenerator extends CommBuffer {
 	private CdEmpService cdEmpService;
 
 	@Autowired
-	private ReportUtil reportUtil;
+	private ReportUtil rptUtil;
 
 	private long pdfNo;
 
@@ -278,16 +278,6 @@ public class PdfGenerator extends CommBuffer {
 			SafeClose.close(baos);
 			SafeClose.close(fos);
 		}
-	}
-
-	private boolean haveChinese(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			String c = string.substring(i, i + 1);
-			if (c.matches("[\\u0391-\\uFFE5]+")) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private void init() throws LogicException {
@@ -524,7 +514,7 @@ public class PdfGenerator extends CommBuffer {
 			ps.append(ss);
 
 			int ww = 1;
-			if (haveChinese(ss)) {
+			if (rptUtil.haveChinese(ss)) {
 				ww = 2;
 			}
 			pw += ww;
@@ -764,7 +754,7 @@ public class PdfGenerator extends CommBuffer {
 
 		String rptDate = new SimpleDateFormat("yyyyMMdd").format(rptCreateDate);
 		String rptTime = new SimpleDateFormat("HHmmss").format(rptCreateDate);
-		watermark.append(reportUtil.showRocDate(rptDate, 2)).append(" ").append(reportUtil.showTime(rptTime));
+		watermark.append(rptUtil.showRocDate(rptDate, 2)).append(" ").append(rptUtil.showTime(rptTime));
 
 		cb.setGState(graphicState);
 		cb.beginText();
