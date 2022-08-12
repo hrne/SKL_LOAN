@@ -296,7 +296,7 @@ C(4,#ApplNo,$,T(2,#ApplNoX))
 
 !支票查詢按鈕
 #BUF4=X,45,S
-T(2,0000000+#TimCustNo+          +0000000)
+T(2,0000000+#TimCustNo+          +0000000+0)
 #BIND4=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3007; ntxbuf=#BUF4;ntxbuf5=type<-1:ChequeAcct<-OOChequeAcct:ChequeNo<-OOChequeNo})
 
@@ -542,7 +542,6 @@ C(3,#TempItemCode,4,E(0,@RPTYPZ,4),$)
 C(3,#TempItemCode,5,E(0,@RPTYPZ,5),$)
 C(3,#TempItemCode,6,E(0,@RPTYPZ,92),$)
 C(3,#TempItemCode,11,E(0,@RPTYPZ,11),$)
-
 !應收付總金額,轉暫收金額
 #TempRPTOT=X,1,S
 E(3,@RPTOT,#TimTempAmt+#ChequeAmt)
@@ -586,6 +585,7 @@ C(3,#RPFG,0,$,T(3,@BATCHNO,LN01))
 
 
 #checkAMLName=X,1,S
+IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,INVOKEJS(SHOW,p7,1),INVOKEJS(SHOW,p7,0))
 
 
@@ -602,6 +602,7 @@ C(4,#INITp7,T(3,@RpRemitIdKind, )
 
 !匯款人身份別
 #RpRemitIdKind=X,1,I
+IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 HELP(#CustTypeHelp)
 @
@@ -612,12 +613,14 @@ V(H,#CustTypeHelp)
 T(3,)T(H,#RpRemitIdKind,#CustTypeHelp)
 !身份證/居留證號碼
 #RpRemitId=X,10,I
+IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 @C(4,#RpRemitId,s,$)
 IF(#RpRemitIdKind=="1",A(ID,0,#RpRemitId),A(ID_UNINO,0,#RpRemitId))
 
 !性別
 #RpRemitGender=X,1,I
+IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 HELP(#SexHelp)
 @
@@ -634,6 +637,7 @@ T(H,#RpRemitGender,#SexHelp)
 E(0,#SYSCDATE)
 !出生日期
 #RpRemitBirthday=D,7,I
+IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 @A(DATE,0,#RpRemitBirthday)
 IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於日曆日),$)
@@ -648,6 +652,7 @@ IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於日曆日),$)
 
 #checkaml=X,1,S
 !匯款戶名=借款人戶名
+IF(#TempItemCode==4||#TempItemCode==5||#TempItemCode==11,$,S)
 IF(#RP_AmlCheckName==#TimCustNoX,T(2,@RemitIdKind,#L2r07RemitIdKind)
                                  T(2,@RpRemitIdKind,#L2r07RemitIdKind)
                                  T(H,@RpRemitIdKindX,#RpRemitIdKind,#CustTypeHelp)

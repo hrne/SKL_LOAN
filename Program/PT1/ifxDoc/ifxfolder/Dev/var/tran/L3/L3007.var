@@ -98,7 +98,7 @@ T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
 
-#NTXBUF=X,31,S
+#NTXBUF=X,32,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #FdInit=X,1,S
@@ -315,6 +315,7 @@ V(7)V(5,#ChequeDateStart,9991231)A(DATE,0,#ChequeDateEnd)
 ![支票狀況]
 
 #StatusCode=X,1,I
+C(3,#CHAIN,1,T(1,#NTXBUF,32,1),$)
 C(3,#CHAIN,1,s,$)
 HELP(#ChequeStatusCodeHelp)
 @C(4,#StatusCode,S,$)
