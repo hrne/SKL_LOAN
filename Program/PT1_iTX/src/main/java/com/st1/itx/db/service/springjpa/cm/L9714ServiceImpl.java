@@ -69,7 +69,8 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdCode\" CC2 ON CC2.\"DefCode\" = 'UsageCode' ";
 		sql += "                         AND CC2.\"Code\" = F.\"UsageCode\" ";
 		sql += " WHERE YHLI.\"YearlyInt\" > 0 ";
-		sql += "   AND YHLI.\"YearMonth\" = :iyearmonth";
+		sql += "   AND YHLI.\"YearMonth\" >= :syearmonth";
+		sql += "   AND YHLI.\"YearMonth\" <= :iyearmonth";
 		sql += "   AND YHLI.\"CustNo\" = :icustno ";
 		if (useFacmNo)
 			sql += "   AND YHLI.\"FacmNo\" = :ifacmno ";

@@ -1,24 +1,25 @@
 package com.st1.itx.util.common;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.st1.itx.Exception.LogicException;
-import com.st1.itx.config.AstrMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.tradeService.CommBuffer;
-import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.eum.ContentName;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.*;
-import java.io.*;
-import java.nio.file.Files;
+import com.st1.itx.tradeService.CommBuffer;
+import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.report.ReportUtil;
 
 /**
  * 
@@ -33,29 +34,16 @@ public class MakeFile extends CommBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	TxFileService sTxFileService;
+	private TxFileService sTxFileService;
 
 	@Autowired
-	private AstrMapper astrMapper;
+	private ReportUtil reportUtil;
 
-	// 檔案輸出路徑
-	@Value("${iTXOutFolder}")
-	private String outputFolder = "";
+	@Autowired
+	private FileGenerator fileGenerator;
 
 	// 資料明細
-	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
-
-	// 單位別
-	private String rptBrNo;
-
-	// 檔案日期
-	private int fileDate;
-
-	// 檔案編號
-	private String fileCode;
-
-	// 檔案說明
-	private String fileItem;
+	private List<Map<String, Object>> listMap;
 
 	// 輸出檔案名稱
 	private String fileName;
@@ -63,9 +51,41 @@ public class MakeFile extends CommBuffer {
 	// 輸出檔案格式
 	private int fileFormat;
 
+	private ReportVo reportVo;
+
 	/**
 	 * 開始製檔<br>
 	 * 
+	 * @param titaVo   titaVo
+	 * @param reportVo reportVo
+	 * @param fileName 輸出檔案名稱
+	 * @param format   輸出檔案格式 1.UTF8 2.BIG5
+	 * @throws LogicException LogicException
+	 */
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, int format) throws LogicException {
+		this.titaVo = titaVo;
+		this.init(reportVo, fileName, format);
+	}
+
+	/**
+	 * 開始製檔<br>
+	 * 
+	 * @param titaVo   titaVo
+	 * @param reportVo reportVo
+	 * @param fileName 輸出檔案名稱
+	 * @throws LogicException LogicException
+	 */
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName) throws LogicException {
+		this.titaVo = titaVo;
+		this.init(reportVo, fileName, 1);
+	}
+
+	/**
+	 * 開始製檔<br>
+	 * 
+	 * @deprecated use
+	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName, int format)}
+	 *             instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -75,17 +95,19 @@ public class MakeFile extends CommBuffer {
 	 * @param format   輸出檔案格式 1.UTF8 2.BIG5
 	 * @throws LogicException LogicException
 	 */
+	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
 			int format) throws LogicException {
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, format);
-
-		listMap = new ArrayList<HashMap<String, Object>>();
 	}
 
 	/**
 	 * 開始製檔<br>
 	 * 
+	 * @deprecated use
+	 *             {@link #open(TitaVo titaVo, ReportVo reportVo, String fileName)}
+	 *             instead.
 	 * @param titaVo   titaVo
 	 * @param date     日期
 	 * @param brno     單位
@@ -94,10 +116,39 @@ public class MakeFile extends CommBuffer {
 	 * @param fileName 輸出檔案名稱
 	 * @throws LogicException LogicException
 	 */
+	@Deprecated
 	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
 			throws LogicException {
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, 1);
+	}
+
+	private void init(ReportVo reportVo, String fileName, int format) throws LogicException {
+		if ("".equals(reportVo.getBrno())) {
+			throw new LogicException("EC007", "(MakeFile)取檔單位不可為空白");
+		}
+		if (reportVo.getRptDate() == 0) {
+			throw new LogicException("EC007", "(MakeFile)檔案日期不可為０");
+		}
+		if ("".equals(reportVo.getRptCode())) {
+			throw new LogicException("EC007", "(MakeFile)檔案編號不可空白");
+		}
+		if (reportUtil.haveChinese(reportVo.getRptCode())) {
+			throw new LogicException("EC007", "(MakeFile)檔案編號不可有全形字");
+		}
+		if ("".equals(reportVo.getRptItem())) {
+			throw new LogicException("EC007", "(MakeFile)檔案說明不可空白");
+		}
+		if ("".equals(fileName)) {
+			throw new LogicException("EC007", "(MakeFile)輸出檔案名稱不可空白");
+		}
+		if (format != 1 && format != 2) {
+			throw new LogicException("EC007", "(MakeFile)輸出檔案格式不可為" + format);
+		}
+		this.fileName = fileName;
+		this.fileFormat = format;
+		this.reportVo = reportVo;
+		listMap = new ArrayList<Map<String, Object>>();
 	}
 
 	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format)
@@ -105,37 +156,28 @@ public class MakeFile extends CommBuffer {
 		if ("".equals(brno)) {
 			throw new LogicException("EC007", "(MakeFile)取檔單位不可為空白");
 		}
-		this.rptBrNo = brno;
-
 		if (date == 0) {
 			throw new LogicException("EC007", "(MakeFile)檔案日期不可為０");
 		}
-		this.fileDate = date;
-
 		if ("".equals(fileCode)) {
 			throw new LogicException("EC007", "(MakeFile)檔案編號不可空白");
 		}
-
-		if (haveChinese(fileCode)) {
+		if (reportUtil.haveChinese(fileCode)) {
 			throw new LogicException("EC007", "(MakeFile)檔案編號不可有全形字");
 		}
-
-		this.fileCode = fileCode;
-
 		if ("".equals(fileItem)) {
 			throw new LogicException("EC007", "(MakeFile)檔案說明不可空白");
 		}
-		this.fileItem = fileItem;
-
 		if ("".equals(fileName)) {
 			throw new LogicException("EC007", "(MakeFile)輸出檔案名稱不可空白");
 		}
-		this.fileName = fileName;
-
 		if (format != 1 && format != 2) {
 			throw new LogicException("EC007", "(MakeFile)輸出檔案格式不可為" + format);
 		}
+		this.fileName = fileName;
 		this.fileFormat = format;
+		listMap = new ArrayList<Map<String, Object>>();
+		reportVo = ReportVo.builder().setRptDate(date).setBrno(brno).setRptCode(fileCode).setRptItem(fileItem).build();
 	}
 
 	/**
@@ -145,7 +187,7 @@ public class MakeFile extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void put(String data) throws LogicException {
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("d", data);
 		listMap.add(map);
 	}
@@ -273,10 +315,10 @@ public class MakeFile extends CommBuffer {
 	public long close() throws LogicException {
 		TxFile tTxFile = new TxFile();
 
-		tTxFile.setBrNo(this.rptBrNo);
-		tTxFile.setFileDate(this.fileDate);
-		tTxFile.setFileCode(this.fileCode);
-		tTxFile.setFileItem(this.fileItem);
+		tTxFile.setBrNo(reportVo.getBrno());
+		tTxFile.setFileDate(reportVo.getRptDate());
+		tTxFile.setFileCode(reportVo.getRptCode());
+		tTxFile.setFileItem(reportVo.getRptItem());
 		tTxFile.setFileFormat(this.fileFormat);
 		tTxFile.setFileOutput(this.fileName);
 
@@ -327,7 +369,7 @@ public class MakeFile extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void toFile(long fileno) throws LogicException {
-		doToFile(fileno, "");
+		fileGenerator.generateFile(fileno, "");
 	}
 
 	/**
@@ -337,94 +379,8 @@ public class MakeFile extends CommBuffer {
 	 * @param fileName 指定輸出檔名
 	 * @throws LogicException LogicException
 	 */
-
 	public void toFile(long fileno, String fileName) throws LogicException {
-		doToFile(fileno, fileName);
-	}
-
-	@SuppressWarnings("unchecked")
-	private void doToFile(long fileno, String fileName) throws LogicException {
-		this.info("MakeFile.toFile=" + fileno);
-
-		TxFile tTxFile = sTxFileService.findById(fileno);
-
-		if (tTxFile == null) {
-			throw new LogicException(titaVo, "EC002", "(MakeFile)輸出檔(TxFile)序號:" + fileno);
-		}
-
-		try {
-			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
-		} catch (IOException e) {
-			throw new LogicException("EC009", "(MakeFile)輸出檔(TxFile)序號:" + fileno + ",資料格式");
-		}
-
-		String outfile = outputFolder + tTxFile.getFileOutput();
-		if (!"".equals(fileName)) {
-			outfile = outputFolder + fileName;
-		}
-		// 先刪除舊檔
-		File file = new File(outfile);
-
-		try {
-			Files.delete(file.toPath());
-		} catch (IOException e) {
-			this.info("MakeFile Files.delete error =" + e.getMessage());
-		}
-
-		String charsetName = "";
-		if (tTxFile.getFileFormat() == 2) {
-			charsetName = "big5";
-		} else {
-			charsetName = "utf-8";
-		}
-
-		// 產製新檔
-		FileOutputStream fo = null;
-		BufferedOutputStream bos = null;
-		try {
-			this.info("MakeFile.toFile outfile=" + outfile + "/" + charsetName);
-			fo = new FileOutputStream(outfile, true);
-			bos = new BufferedOutputStream(fo);
-			this.info("MakeFile.toFile opened");
-
-			byte[] sl = new byte[2];
-			sl[0] = (byte) 0xA1;
-			sl[1] = (byte) 0xFE;
-			for (HashMap<String, Object> map : listMap) {
-				if (charsetName.toUpperCase(Locale.getDefault()).equals("BIG5")) {
-					String[] ss = map.get("d").toString().split("");
-					for (String s : ss) {
-						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
-							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]));
-						else
-							bos.write(s.equals("／") ? sl : s.getBytes(charsetName));
-					}
-					bos.write("\r\n".getBytes(charsetName));
-				} else
-					bos.write((map.get("d").toString() + "\r\n").getBytes(charsetName));
-			}
-			this.info("MakeFile.toFile listmap");
-			bos.flush();
-			this.info("MakeFile.toFile flush");
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("MakeFile  IOException error = " + e.toString());
-			throw new LogicException("EC009", "(MakeFile)輸出檔(TxFile)序號:" + fileno + ",產檔失敗");
-		} finally {
-			SafeClose.close(bos);
-			SafeClose.close(fo);
-		}
-	}
-
-	private boolean haveChinese(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			String c = string.substring(i, i + 1);
-			if (c.matches("[\\u0391-\\uFFE5]+")) {
-				return true;
-			}
-		}
-		return false;
+		fileGenerator.generateFile(fileno, fileName);
 	}
 
 	@Override

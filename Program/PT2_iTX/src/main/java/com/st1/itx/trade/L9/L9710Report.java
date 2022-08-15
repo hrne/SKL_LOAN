@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L9;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9710ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component("L9710Report")
@@ -28,11 +31,6 @@ public class L9710Report extends MakeReport {
 	@Autowired
 	DateUtil dateUtil;
 
-	// 製表日期
-//	private String nowDate;
-	// 製表時間
-//	private String nowTime;
-
 	String f0 = "";
 	String f1 = "";
 	int ptfg = 0;
@@ -40,8 +38,8 @@ public class L9710Report extends MakeReport {
 	int tcnt = 0;
 	int amt = 0;
 	int tamt = 0;
-	
-	//計算當前列數
+
+	// 計算當前列數
 	int tempCount = 0;
 
 	// 橫式規格
@@ -92,12 +90,11 @@ public class L9710Report extends MakeReport {
 		this.setMaxRows(45);
 	}
 
-
 	public List<Map<String, String>> exec(TitaVo titaVo, int iAcDate) throws LogicException {
 
 		this.info("L9710Report exec");
 
-		List<Map<String, String>> l9710List = null;
+		List<Map<String, String>> l9710List = new ArrayList<Map<String, String>>();
 
 		try {
 
@@ -109,13 +106,22 @@ public class L9710Report extends MakeReport {
 
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "寬限到期明細表", "", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "寬限到期明細表", "", "A4", "L");
+		String txcd = titaVo.getTxcd();
+		String reportName = "寬限到期明細表";
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(txcd).setRptItem(reportName).setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.build();
+
+		this.open(titaVo, reportVo);
+
+		this.info("l9710List=" + l9710List.toString());
 
 		// 記錄筆數
 		int count = 0;
-		int divderCount = 0;
-		String tempCity = "";
 
+		String tempCity = "";
 
 		if (l9710List != null && l9710List.size() != 0) {
 
@@ -125,45 +131,28 @@ public class L9710Report extends MakeReport {
 
 				count++;
 
-
-				
-//				if (!f0.equals(tL9710Vo.get("F0")) || (f0.equals("總公司") && !f1.equals(tL9710Vo.get("CityCode")))) {
 				// 不同地區別
 				if (!f1.equals(tL9710Vo.get("CityCode"))) {
 
-					if (tempCount % 40 >= 0 && count > 1) {
-						divderCount++;
+					if (count > 1) {
+
 						reportTot(tempCity);
-						
-						//地區別結束段落與換頁同時
-//						if (tempCount >= 40) {
-//							this.newPage();
-//							tempCount = tempCount % 40;
-//							divderCount = 0;
-//						}
-						
-						// 每一次小計 會加3行
-						tempCount = (tempCount % 40) + (3 * divderCount);
+
 					}
 					if (f0.equals(tL9710Vo.get("F0"))) {
 						ptfg = 0;
 					}
-					info("tempCount" + count + "=" + tempCount);
+
 					tempCity = tL9710Vo.get("CityItem");
 				}
-				
-				// 超過40行 換新頁
-				if (tempCount >= 40) {
+
+				// 超過45行 換新頁
+				if (this.NowRow == 45) {
 					this.newPage();
-					// 超過40行重新算(從餘數開始計)
-					tempCount = tempCount % 40;
 
 				}
 
-//				f0 = tL9710Vo.get("F0");
 				f1 = tL9710Vo.get("CityCode");
-
-		
 
 				report(tL9710Vo);
 			}
@@ -178,15 +167,14 @@ public class L9710Report extends MakeReport {
 		}
 
 		this.close();
-		// this.toPdf(sno);
+
 		return l9710List;
 
 	}
 
 	private void report(Map<String, String> tL9710Vo) throws LogicException {
 		String tmp = "";
-		tempCount++;
-		info("tempCount=" + tempCount);
+
 		// 押品地區別 (地區代號+地區名字)
 		if (ptfg == 0) {
 			this.print(1, 2, f0);
@@ -240,6 +228,7 @@ public class L9710Report extends MakeReport {
 
 		cnt += 1;
 		amt += Integer.valueOf(tL9710Vo.get("LoanBal"));
+
 	}
 
 	/**

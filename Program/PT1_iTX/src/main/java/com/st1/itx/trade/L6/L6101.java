@@ -624,20 +624,23 @@ public class L6101 extends TradeBuffer {
 			titaVo.putParam("DoL9133", "N");
 		}
 
-		// 2021-12-15 智誠修改
-//		MySpring.newTask("L6101Report", this.txBuffer, titaVo);
-		l6101Excel.exec(titaVo);
 		
 		if ("09".equals(uSecNo)) {
+
+			// 2021-12-15 智誠修改
+//			MySpring.newTask("L6101Report", this.txBuffer, titaVo);
+			l6101Excel.exec(titaVo);
 			this.info("09=MySpring.newTask L9130");
 			// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
 			MySpring.newTask("L9130", this.txBuffer, titaVo);
 		}else if ("02".equals(uSecNo)) {
-			this.info("02=exec L9130、L9131、L9132A、L9132B、L9132C");
+			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
 			
 			l9130Report.exec(titaVo);
 			l9131Report.exec(titaVo);
 			l9131Report.close();
+			l9132Report.exec(titaVo);
+			l9132Report.close();
 			l9132ReportA.exec(titaVo);
 			l9132ReportA.close();
 			l9132ReportB.exec(titaVo);

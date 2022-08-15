@@ -343,7 +343,7 @@ IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
 #FacmNo=A,3,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
-@C(1,#FacmNo,s,V(P,額度不可為0),s)
+!@C(1,#FacmNo,s,V(P,額度不可為0),s)
 
 ! 借款人戶名---調RIM
 #CustName=X,100,L

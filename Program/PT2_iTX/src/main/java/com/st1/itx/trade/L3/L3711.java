@@ -173,7 +173,7 @@ public class L3711 extends TradeBuffer {
 		iNewPayIntDate = this.parse.stringToInteger(titaVo.getParam("NewPayIntDate"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
-		iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
+		iRpCode = 90;
 		wkReduceAmt = iReduceAmt;
 		if (titaVo.isHcodeNormal()) {
 			// call 應繳試算
@@ -184,9 +184,8 @@ public class L3711 extends TradeBuffer {
 			SpecificEraseRoutine();
 		}
 
-		// 借方收付欄帳務處理
+		// 產生會計分錄
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
-			// 產生會計分錄
 			this.txBuffer.setAcDetailList(lAcDetail);
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
@@ -364,7 +363,6 @@ public class L3711 extends TradeBuffer {
 		tTempVo.putParam("PrevRepaidDate", tLoanBorMain.getPrevRepaidDate());
 		tTempVo.putParam("NextPayIntDate", tLoanBorMain.getNextPayIntDate());
 		tTempVo.putParam("NextRepayDate", tLoanBorMain.getNextRepayDate());
-		tTempVo.putParam("Interest", wkInterest);
 		tTempVo.putParam("DueAmt", tLoanBorMain.getDueAmt());
 		tTempVo.putParam("LastEntDy", tLoanBorMain.getLastEntDy());
 		tTempVo.putParam("LastKinbr", tLoanBorMain.getLastKinbr());

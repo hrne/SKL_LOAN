@@ -93,7 +93,8 @@ V(7)A(DATE,0,#AcDate)
 
 ! 處理批號
 #BatchNo=X,6,I
-T(2,BATX01)
+! T(2,)
+! T(2,BATX01)
 
 ! 還款來源
 #RepayCode=A,2,I

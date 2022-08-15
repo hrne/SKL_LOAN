@@ -620,10 +620,13 @@ public class TxBatchCom extends TradeBuffer {
 				this.error(errors.toString());
 				throw new LogicException("E0013", "txExecute 轉換交易記錄檔電文"); // E0013 程式邏輯有誤
 			}
+			txTitaVo.putParam("TLRNO", titaVo.getParam("TLRNO"));
 			txTitaVo.putParam("TXTNO", txtNo);
 			txTitaVo.putParam("ORGTLR", tDetail.getTitaTlrNo()); // 原經辦
 			txTitaVo.putParam("ORGTNO", tDetail.getTitaTxtNo()); // 原交易序號
 			txTitaVo.putParam("HCODE", "1"); // 訂正交易
+			txTitaVo.putParam("EMPNOS", titaVo.getParam("EMPNOS")); // 主管
+			txTitaVo.putParam("EMPNOT", titaVo.getParam("EMPNOT")); // 經辦
 			txTitaVo.putParam("SUPNO", titaVo.getParam("SUPNO")); // 主管授權
 			txTitaVo.putParam("RQSP", titaVo.getParam("RQSP")); // 主管授權理由
 		}
@@ -1239,7 +1242,7 @@ public class TxBatchCom extends TradeBuffer {
 				TitaVo bs401TitaVo = new TitaVo();
 				bs401TitaVo = (TitaVo) titaVo.clone();
 				bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核
-				bs401TitaVo.putParam("AcDate", tBatxHead.getAcDate() - 19110000); // 會計日期
+				bs401TitaVo.putParam("AcDate", tBatxHead.getAcDate()); // 會計日期
 				bs401TitaVo.putParam("BatchNo", tBatxHead.getBatchNo());// 批號
 				MySpring.newTask("BS401", this.txBuffer, bs401TitaVo);
 			}

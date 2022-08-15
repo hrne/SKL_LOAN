@@ -76,7 +76,6 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      WHEN 'IE' THEN 4";
 		sql += "      WHEN 'IF' THEN 5";
 		sql += "      WHEN 'IG' THEN 5";
-		sql += "      WHEN 'IF' THEN 6";
 		sql += "      ELSE           6";
 		sql += "      END)                                     AS \"ProjectKind\"";
 		sql += "      , MAX(FA.\"LoanTermYy\")                 AS \"LoanTermYy\"";
@@ -140,6 +139,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     AND T.\"ProdNo\" <= 'II'";
 		sql += "     AND (   (TRUNC(FA.\"FirstDrawdownDate\" / 100) = :thisMonth) ";
 		sql += "          OR (T.\"AcctCode\" <> '990' AND B.\"AcctCode\" = '990'))";
+		
 		sql += "   GROUP BY T.\"CustNo\", T.\"FacmNo\"";
 		sql += "   ) N";
 
@@ -187,11 +187,9 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
-		sql += " SELECT CASE WHEN N.\"AcctCode\" = '990'";
-		sql += "                  THEN '結清名冊'";
-		sql += "             WHEN N.\"LoanBalance\" = 0";
-		sql += "                  THEN '結清名冊'";
-		sql += "             ELSE      '終止名冊'";
+		sql += " SELECT CASE WHEN N.\"Type\" = 2";
+		sql += "                  THEN '終止名冊'";
+		sql += "             ELSE      '結清名冊'";
 		sql += "        END   AS \"F0\"                                                  "; // -- F0 種類
 		sql += "      , N.\"CustNo\"                                                     "; // -- F1 戶號
 		sql += "      , N.\"FacmNo\"                                                     "; // -- F2 額度
@@ -202,12 +200,13 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"DrawdownAmt\"                                                "; // -- F7 原核撥優惠貸款金額"
 		sql += "      , N.\"CloseDate\"                                                  "; // -- F8 銷戶/終止補貼日期
 
-		sql += "      , CASE WHEN N.\"AcctCode\" = '990'";
-		sql += "                  THEN '轉催收'";
-		sql += "             WHEN N.\"LoanBalance\" = 0";
+		sql += "      , CASE WHEN N.\"Type\" = 1";
 		sql += "                  THEN '正常'";
-		sql += "             ELSE      ''";
+		sql += "             WHEN N.\"Type\" = 2";
+		sql += "                  THEN ''";
+		sql += "             ELSE      '轉催收' ";
 		sql += "        END     AS \"F9\"                                                         "; // -- F9 註記
+		sql += "      , N.\"LastMonthBal\"                                                "; // -- F10 上月貸款餘額"
 
 		sql += "      FROM (";
 		sql += "      SELECT T.\"CustNo\"                           AS \"CustNo\"";
@@ -222,25 +221,27 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      WHEN 'IE' THEN 4";
 		sql += "                      WHEN 'IF' THEN 5";
 		sql += "                      WHEN 'IG' THEN 5";
-		sql += "                      WHEN 'IF' THEN 6";
 		sql += "                      ELSE           6";
-		sql += "            END)                               AS \"ProjectKind\"";
-		sql += "      , SUM(LN.\"DrawdownAmt\")                AS \"DrawdownAmt\"";
+		sql += "            END)                               AS \"ProjectKind\" ";
+		sql += "      , SUM(LN.\"DrawdownAmt\")                AS \"DrawdownAmt\" ";
 
-		sql += "      , SUM(T.\"LoanBalance\")                 AS \"LoanBalance\"";
-		sql += "      , MAX(T.\"AcctCode\")                    AS \"AcctCode\"   ";
-		sql += "      , MAX(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth";
-		sql += "                      THEN LN.\"MaturityDate\"";
-		sql += "                 ELSE LN.\"AcDate\"";
-		sql += "            END)                               AS \"CloseDate\"  ";
+		sql += "      , SUM(T.\"LoanBalance\")                 AS \"LoanBalance\" ";
+		sql += "      , MAX(T.\"AcctCode\")                    AS \"AcctCode\"    ";
+		sql += "      , MAX(CASE WHEN T.\"LoanBalance\" = 0   THEN LN.\"AcDate\"  ";
+		sql += "                 WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12";
+		sql += "		                + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "		              )  = 240                THEN LN.\"MaturityDate\"";// 屆滿20年
+		sql += "                 ELSE LN.\"AcDate\"  ";
+		sql += "            END)                               AS \"CloseDate\"   ";// (淑微:終止名冊時使用到期日)
 
-		sql += "      , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth ";
-		sql += "                      THEN 0";
-		sql += "                 WHEN T.\"AcctCode\" = '990'";
-		sql += "                      THEN 0";
-		sql += "                 ELSE T.\"LoanBalance\"";
-		sql += "            END)                             AS \"ThisMonthBal\" ";
-
+		sql += "      , SUM(B.\"LoanBalance\")                 AS \"LastMonthBal\" ";
+		sql += "      , MAX(CASE WHEN T.\"LoanBalance\" = 0   THEN 1 ";// 結清
+		sql += "                 WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12";
+		sql += "		                + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "		              )  = 240                THEN 2 ";// 屆滿20年
+		sql += "                 ELSE 3";// 轉催
+		sql += "            END)                               AS \"Type\" ";
+		
 		sql += "   FROM \"MonthlyLoanBal\" T";
 		sql += "   LEFT JOIN \"MonthlyLoanBal\" B";
 		sql += "          ON B.\"YearMonth\" = :lastMonth ";
@@ -251,21 +252,32 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ON LN.\"CustNo\" = T.\"CustNo\"";
 		sql += "         AND LN.\"FacmNo\" = T.\"FacmNo\"";
 		sql += "         AND LN.\"BormNo\" = T.\"BormNo\"";
-
+		sql += "   LEFT JOIN \"FacMain\" FA";
+		sql += "          ON FA.\"CustNo\" = T.\"CustNo\"";
+		sql += "         AND FA.\"FacmNo\" = T.\"FacmNo\"";
+		
 		sql += "   WHERE T.\"YearMonth\" = :thisMonth ";
 		sql += "         AND T.\"ProdNo\" >= 'IA'";
 		sql += "         AND T.\"ProdNo\" <= 'II'";
-		sql += "         AND NOT (T.\"AcctCode\" = '990' AND B.\"AcctCode\" = '990')";
-		sql += "         AND TRUNC(LN.\"MaturityDate\" / 100) >= :thisMonth ";
+
+		sql += "         AND ( ( T.\"LoanBalance\" = 0)     ";// 本月結清
+		sql += "               OR ( ( T.\"LoanBalance\" > 0)     ";
+		sql += "                    AND ( (T.\"AcctCode\" = '990' AND B.\"AcctCode\" NOT IN '990')";// 本月轉催
+		sql += "                          OR ( ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		sql += "                                 + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "                               )  = 240 ) ) ))";// 本月屆滿20年
+
+		sql += "         AND ( ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12"; 
+		sql +=	"		         + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) "; 
+		sql +=	"		       )  <= 240 )" ;//排除已屆滿20年
+		
+		sql += "         AND B.\"LoanBalance\" > 0";// 排除上個月餘額已是0
+		sql += "         AND LN.\"Status\" NOT IN 1 ";// 排除展期
+		
 		sql += "   GROUP BY T.\"CustNo\", T.\"FacmNo\"";
 		sql += "   ) N";
 		sql += "   LEFT JOIN \"CustMain\" CU";
 		sql += "          ON CU.\"CustNo\" = N.\"CustNo\"";
-		sql += "   WHERE N.\"ThisMonthBal\" = 0";
-		sql += "  AND CASE WHEN N.\"LoanBalance\" = 0 "; 
-		sql += "      THEN trunc(n.\"CloseDate\" / 100)  ";
-		sql += "      ELSE trunc(:thisMonth)  ";
-		sql += "           END = :thisMonth ";
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 
 		this.info("sql=" + sql);
@@ -301,6 +313,36 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
+
+		sql += " WITH TMPDATA AS ("; // 同戶號額度的筆數只計1筆
+		sql += "      SELECT T.\"CustNo\" , T.\"FacmNo\" , T.\"BormNo\" , T.\"ProdNo\" ";
+		sql += "           , ROW_NUMBER ()  ";
+		sql += "             OVER ( PARTITION BY  T.\"CustNo\" , T.\"FacmNo\" ";
+		sql += "                    ORDER BY T.\"CustNo\" , T.\"FacmNo\" ";
+		sql += "                  ) AS \"DetailSeq\" ";
+		sql += "             FROM \"MonthlyLoanBal\" T";
+		sql += "             LEFT JOIN \"MonthlyLoanBal\" B";
+		sql += "                    ON B.\"YearMonth\" = :lastMonth ";
+		sql += "                   AND B.\"CustNo\" = T.\"CustNo\"";
+		sql += "                   AND B.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "                   AND B.\"BormNo\" = T.\"BormNo\"";
+		sql += "             LEFT JOIN \"LoanBorMain\" LN";
+		sql += "                    ON LN.\"CustNo\" = T.\"CustNo\"";
+		sql += "                   AND LN.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "                   AND LN.\"BormNo\" = T.\"BormNo\"";
+		sql += "             LEFT JOIN \"FacMain\" FA";
+		sql += "                    ON FA.\"CustNo\" = T.\"CustNo\"";
+		sql += "                   AND FA.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "             WHERE T.\"YearMonth\" = :thisMonth ";
+		sql += "               AND T.\"ProdNo\" >= 'IA'";
+		sql += "               AND T.\"ProdNo\" <= 'II'";
+		sql += "               AND NOT (NVL(T.\"AcctCode\",'*') = '990' AND NVL(B.\"AcctCode\",'*') = '990')";
+		sql += "               AND NOT (NVL(T.\"LoanBalance\",0) = 0 AND NVL(B.\"LoanBalance\",0) = 0 ) ";
+		sql += "               AND (  ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		sql += "                          + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "                      )  <= 240 )    ";// 排除本月超過屆滿20年
+		sql += " )";
+		
 		sql += " SELECT N.\"ProjectKind\"                                                         "; // -- F0 專案融資種類
 		sql += "      , N.\"LastMonthBalCount\"                                                   "; // -- F1 A.上月貸款餘額(次數)
 		sql += "      , N.\"LastMonthBal\"                                                        "; // -- F2 A.上月貸款餘額
@@ -322,7 +364,6 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            WHEN 'IE' THEN 4";
 		sql += "                            WHEN 'IF' THEN 5";
 		sql += "                            WHEN 'IG' THEN 5";
-		sql += "                            WHEN 'IF' THEN 6";
 		sql += "                            ELSE           6";
 		sql += "                       END)                           AS \"ProjectKind\"";
 
@@ -334,11 +375,11 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            WHEN 'IE' THEN 0.25";
 		sql += "                            WHEN 'IF' THEN 0.125";
 		sql += "                            WHEN 'IG' THEN 0.125";
-		sql += "                            WHEN 'IF' THEN 0.7";
 		sql += "                            ELSE           0.7";
 		sql += "                       END)                           AS \"SubsidyRate\"";
 
-		sql += "                 , SUM(CASE WHEN NVL(B.\"AcctCode\",'*') != '990' AND NVL(B.\"LoanBalance\",0) != 0";
+		sql += "                 , SUM(CASE WHEN NVL(TP.\"DetailSeq\",0) > 1 THEN 0";
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') != '990' AND NVL(B.\"LoanBalance\",0) != 0";
 		sql += "                                 THEN 1";
 		sql += "                            ELSE  0";
 		sql += "                       END)                           AS \"LastMonthBalCount\"";
@@ -347,63 +388,78 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE NVL(B.\"LoanBalance\",0)";
 		sql += "                       END)                           AS \"LastMonthBal\"";
 
-		sql += "                 , SUM(CASE  WHEN t.\"AcctCode\" != '990' AND (nvl(b.\"AcctCode\", '*') = '*' OR ";
-		sql += "                    nvl(b.\"AcctCode\", '*') = '990') THEN 1";
-		sql += "                    ELSE 0 ";
+		sql += "                 , SUM(CASE WHEN NVL(TP.\"DetailSeq\",0) > 1 THEN 0";
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' AND LN.\"RenewFlag\" = '0'   ";
+		sql += "                                 THEN 1";// -- 新貸
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990' THEN 1";// -- 催收轉正
+		sql += "                            ELSE 0 ";
 		sql += "                       END)                            AS \"OpenAmountCount\"";
-		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*'";
+
+		sql += "                 , SUM(CASE WHEN NVL(B.\"AcctCode\",'*') = '*' AND LN.\"RenewFlag\" = '0' ";
 		sql += "                                 THEN T.\"LoanBalance\"               "; // -- 新貸
 		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
 		sql += "                                 THEN T.\"LoanBalance\"               "; // -- 催收轉正
 		sql += "                            ELSE 0";
 		sql += "                       END)                            AS \"OpenAmount\"";
 
-		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990' AND NVL(B.\"LoanBalance\",0) != 0";
-		sql += "                                 THEN 1        ";
-		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth  ";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN NVL(B.\"LoanBalance\",0) > 0         ";
+		sql += "                 , SUM(CASE WHEN NVL(TP.\"DetailSeq\",0) > 1 THEN 0";
+		sql += "                            WHEN LN.\"Status\" = 1   THEN 0 ";//展期不計
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' AND LN.\"RenewFlag\" IN ('1','2') THEN 0 ";//展期不計
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' THEN  0 ";
+		sql += "                            WHEN NVL(T.\"LoanBalance\",0) = 0         ";//結清
+		sql += "                                 THEN 1";
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                 )  = 240    THEN 0";
+		sql += "                            WHEN NVL(T.\"AcctCode\",'*') = '990'";// -- 轉催收
 		sql += "                                 THEN 1";
 		sql += "                            ELSE 0";
-		sql += "                       END)                             AS \"CloseAmountCount\"   "; // --還款+結清+轉催收
-		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
+		sql += "                       END)                             AS \"CloseAmountCount\"   "; // --結清+轉催收(不含還款)
+
+		sql += "                 , SUM(CASE WHEN LN.\"Status\" = 1   THEN  NVL(B.\"LoanBalance\",0) ";//展期
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' AND LN.\"RenewFlag\" IN ('1','2')";
+		sql += "                                 THEN 0 - NVL(T.\"LoanBalance\",0)        "; // -- 展期+借新還舊:展期新舊需計算差額,但不計筆數 
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' THEN  0 ";
+		sql += "                            WHEN NVL(T.\"LoanBalance\",0) = 0  THEN NVL(B.\"LoanBalance\",0) "; // -- 結清
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                 )  = 240    THEN  NVL(B.\"LoanBalance\",0) - NVL(T.\"LoanBalance\",0) ";//--屆期需計算差額
+		sql += "                            WHEN T.\"AcctCode\" = '990'";
 		sql += "                                 THEN NVL(B.\"LoanBalance\",0)        "; // -- 轉催收
-		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth  ";
-		sql += "                                 THEN 0";
 		sql += "                            WHEN NVL(B.\"LoanBalance\",0) > 0         "; // -- 還款+結清
 		sql += "                                 THEN B.\"LoanBalance\" - T.\"LoanBalance\"";
 		sql += "                            ELSE 0";
 		sql += "                       END)                             AS \"CloseAmount\"   "; // --還款+結清+轉催收
 
-		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth ";
-		sql += "                             AND T.\"AcctCode\" <> '990'";
-		sql += "                             AND T.\"LoanBalance\" > 0";
-		sql += "                                 THEN 1";
+		sql += "                 , SUM(CASE WHEN NVL(TP.\"DetailSeq\",0) > 1 THEN 0";
+		sql += "                            WHEN T.\"LoanBalance\" = 0   THEN 0 " ; 
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                 )  = 240    THEN 1";
 		sql += "                            ELSE 0";
-		sql += "                       END)                             AS \"MaturityAmountCount\" "; // --超過到期日
-		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth ";
-		sql += "                             AND T.\"AcctCode\" <> '990'";
-		sql += "                             AND T.\"LoanBalance\" > 0";
-		sql += "                                 THEN T.\"LoanBalance\"";
-		sql += "                            ELSE 0";
-		sql += "                       END)                             AS \"MaturityAmount\" "; // --超過到期日
+		sql += "                       END)                             AS \"MaturityAmountCount\" "; // --借款期限至本月為止屆滿20年
 
-		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth ";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN T.\"AcctCode\" = '990'";
-		sql += "                                 THEN 0";
+		sql += "                 , SUM(CASE WHEN T.\"LoanBalance\" = 0   THEN 0 " ; 
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                  )  = 240   THEN T.\"LoanBalance\"";
+		sql += "                            ELSE 0";
+		sql += "                       END)                             AS \"MaturityAmount\" "; // --借款期限至本月為止屆滿20年
+
+		sql += "                 , SUM(CASE WHEN NVL(TP.\"DetailSeq\",0) > 1 THEN 0";
+		sql += "                            WHEN LN.\"Status\" = 1   THEN 1 ";//展期
+		sql += "                            WHEN T.\"AcctCode\" = '990'  THEN 0";
+		sql += "                            WHEN T.\"LoanBalance\" = 0   THEN 0";
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                  )  = 240              THEN 0";
 		sql += "                            ELSE 1";
 		sql += "                       END)                             AS \"ThisMonthBalCount\"";
-		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth ";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN T.\"AcctCode\" = '990'";
-		sql += "                                 THEN 0";
+
+		sql += "                 , SUM(CASE WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                  )  = 240              THEN 0";
+		sql += "                            WHEN T.\"AcctCode\" = '990'  THEN 0";
 		sql += "                            ELSE T.\"LoanBalance\"";
 		sql += "                       END)                             AS \"ThisMonthBal\"";
 
@@ -420,12 +476,19 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             LEFT JOIN \"FacMain\" FA";
 		sql += "                    ON FA.\"CustNo\" = T.\"CustNo\"";
 		sql += "                   AND FA.\"FacmNo\" = T.\"FacmNo\"";
-
+		sql += "             LEFT JOIN TMPDATA TP";
+		sql += "                    ON TP.\"CustNo\" = T.\"CustNo\"";
+		sql += "                   AND TP.\"FacmNo\" = T.\"FacmNo\"";
+		sql += "                   AND TP.\"BormNo\" = T.\"BormNo\"";
+		
 		sql += "             WHERE T.\"YearMonth\" = :thisMonth ";
 		sql += "               AND T.\"ProdNo\" >= 'IA'";
 		sql += "               AND T.\"ProdNo\" <= 'II'";
-		sql += "               AND NOT (T.\"AcctCode\" = '990' AND B.\"AcctCode\" = '990')";
-		sql += "               AND TRUNC(LN.\"MaturityDate\" / 100) >= :thisMonth ";
+		sql += "               AND NOT (NVL(T.\"AcctCode\",'*') = '990' AND NVL(B.\"AcctCode\",'*') = '990')";
+		sql += "               AND NOT (NVL(T.\"LoanBalance\",0) = 0 AND NVL(B.\"LoanBalance\",0) = 0 ) ";
+		sql += "               AND (  ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		sql += "                          + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "                      )  <= 240 )    ";// 排除本月超過屆滿20年
 
 		sql += "             GROUP BY  CASE T.\"ProdNo\"";
 		sql += "                            WHEN 'IA' THEN 1";
@@ -435,7 +498,6 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            WHEN 'IE' THEN 4";
 		sql += "                            WHEN 'IF' THEN 5";
 		sql += "                            WHEN 'IG' THEN 5";
-		sql += "                            WHEN 'IF' THEN 6";
 		sql += "                            ELSE           6";
 		sql += "                        END";
 		sql += "             ) N";
@@ -479,12 +541,11 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"ProjectKind\"                                                "; // -- F3 專案融資種類
 		sql += "      , N.\"SubsidyRate\"                                                "; // -- F4 補貼利率
 		sql += "      , CASE WHEN NVL(N.\"AcBookCode\", '')  = N.\"AcBookCode\" AND NVL(N.\"AcSubBookCode\", '')  = N.\"AcSubBookCode\" "
-				+ "THEN N.\"AcBookCode\" || '/' || N.\"AcSubBookCode\" ELSE '' END AS \"F5\" "    ;                              
-//		sql += "      , N.\"AcBookCode\" || '/' || N.\"AcSubBookCode\"              AS \"F5\" "; // -- F5 帳冊別
+				+ "THEN N.\"AcBookCode\" || '/' || N.\"AcSubBookCode\" ELSE '' END AS \"F5\" "    ;   // -- F5 帳冊別                           
 		sql += "      , N.\"LastMonthBal\"                                               "; // -- F6 A.上月貸款餘額
 		sql += "      , N.\"OpenAmount\"                                                 "; // -- F7 B.本月貸出數
 		sql += "      , N.\"CloseAmount\"                                                "; // -- F8 C1.本月收回數 --還款+結清+轉催收
-		sql += "      , N.\"MaturityAmount\"                                             "; // -- F9 C2.屆期不再申撥補貼息 --超過到期日
+		sql += "      , N.\"MaturityAmount\"                                             "; // -- F9 C2.屆期不再申撥補貼息 --借款期限至本月為止屆滿20年
 		sql += "      , N.\"ThisMonthBal\"                                               "; // -- F10 D.本月貸款餘額
 		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)   AS \"F11\" "; // -- F11 補貼息
 
@@ -500,7 +561,6 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            WHEN 'IE' THEN 4";
 		sql += "                            WHEN 'IF' THEN 5";
 		sql += "                            WHEN 'IG' THEN 5";
-		sql += "                            WHEN 'IF' THEN 6";
 		sql += "                            ELSE           6";
 		sql += "                       END)                           AS \"ProjectKind\"";
 
@@ -512,7 +572,6 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            WHEN 'IE' THEN 0.25";
 		sql += "                            WHEN 'IF' THEN 0.125";
 		sql += "                            WHEN 'IG' THEN 0.125";
-		sql += "                            WHEN 'IF' THEN 0.7";
 		sql += "                            ELSE           0.7";
 		sql += "                       END)                           AS \"SubsidyRate\"";
 
@@ -524,35 +583,38 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE NVL(B.\"LoanBalance\",0)";
 		sql += "                       END)                             AS \"LastMonthBal\"";
 
-		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*'";
+		sql += "                 , SUM(CASE WHEN NVL(B.\"AcctCode\",'*') = '*' AND LN.\"RenewFlag\" = '0' ";
 		sql += "                                 THEN T.\"LoanBalance\"               "; // -- 新貸
 		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
 		sql += "                                 THEN T.\"LoanBalance\"               "; // -- 催收轉正
 		sql += "                            ELSE 0";
 		sql += "                       END)                            AS \"OpenAmount\"";
 
-		sql += "                 , SUM(CASE WHEN T.\"AcctCode\" = '990'";
+		sql += "                 , SUM(CASE WHEN LN.\"Status\" = 1   THEN  NVL(B.\"LoanBalance\",0) ";//展期
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' AND LN.\"RenewFlag\" IN ('1','2')";
+		sql += "                                 THEN 0 - NVL(T.\"LoanBalance\",0)        "; // -- 展期+借新還舊:展期新舊需計算差額,但不計筆數 
+		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '*' THEN  0 ";
+		sql += "                            WHEN NVL(T.\"LoanBalance\",0) = 0  THEN NVL(B.\"LoanBalance\",0) "; // -- 結清
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                 )  = 240    THEN  NVL(B.\"LoanBalance\",0) - NVL(T.\"LoanBalance\",0) ";//--屆期需計算差額
+		sql += "                            WHEN T.\"AcctCode\" = '990'";
 		sql += "                                 THEN NVL(B.\"LoanBalance\",0)        "; // -- 轉催收
-		sql += "                            WHEN NVL(B.\"AcctCode\",'*') = '990'";
-		sql += "                                 THEN 0";
-		sql += "                            WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth  ";
-		sql += "                                 THEN 0";
 		sql += "                            WHEN NVL(B.\"LoanBalance\",0) > 0         "; // -- 還款+結清
 		sql += "                                 THEN B.\"LoanBalance\" - T.\"LoanBalance\"";
 		sql += "                            ELSE 0";
 		sql += "                       END)                             AS \"CloseAmount\"   "; // --還款+結清+轉催收
 
-		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) = :thisMonth ";
-		sql += "                             AND T.\"AcctCode\" <> '990'";
-		sql += "                             AND T.\"LoanBalance\" > 0";
-		sql += "                                 THEN T.\"LoanBalance\"";
+		sql += "                 , SUM(CASE WHEN T.\"LoanBalance\" = 0   THEN 0 " ; 
+		sql += "                            WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ; 
+		sql += "		                            + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                  )  = 240   THEN T.\"LoanBalance\"";
 		sql += "                            ELSE 0";
-		sql += "                       END)                             AS \"MaturityAmount\" "; // --超過到期日
+		sql += "                       END)                             AS \"MaturityAmount\" "; // --借款期限至本月為止屆滿20年
 
-		sql += "                 , SUM(CASE WHEN TRUNC(LN.\"MaturityDate\" / 100) <= :thisMonth ";
-		sql += "                                 THEN 0";
+		sql += "                 , SUM(CASE WHEN ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 " ;  
+		sql +=	"	                               + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) " ; 
+		sql += "                                 )  = 240   THEN 0";
 		sql += "                            WHEN T.\"AcctCode\" = '990'";
 		sql += "                                 THEN 0";
 		sql += "                            ELSE T.\"LoanBalance\"";
@@ -575,8 +637,11 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHERE T.\"YearMonth\" = :thisMonth ";
 		sql += "               AND T.\"ProdNo\" >= 'IA'";
 		sql += "               AND T.\"ProdNo\" <= 'II'";
-		sql += "               AND NOT (T.\"AcctCode\" = '990' AND B.\"AcctCode\" = '990')";
-		sql += "               AND TRUNC(LN.\"MaturityDate\" / 100) >= :thisMonth ";
+		sql += "               AND NOT (NVL(T.\"AcctCode\",'*') = '990' AND NVL(B.\"AcctCode\",'*') = '990')";
+		sql += "               AND NOT (NVL(T.\"LoanBalance\",0) = 0 AND NVL(B.\"LoanBalance\",0) = 0 ) ";
+		sql += "               AND (  ( (TRUNC(:thisMonth / 100) - TRUNC(FA.\"FirstDrawdownDate\" / 10000) ) * 12 ";
+		sql += "                          + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) ";
+		sql += "                      )  <= 240 )    ";// 排除本月超過屆滿20年
 
 		sql += "             GROUP BY T.\"CustNo\", T.\"FacmNo\"";
 		sql += "             ) N";

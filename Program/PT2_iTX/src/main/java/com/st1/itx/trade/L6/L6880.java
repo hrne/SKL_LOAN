@@ -2,6 +2,7 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,14 +16,17 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.domain.TxBizDate;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxBizDateService;
+import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AcMainCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6880")
@@ -35,19 +39,26 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L6880 extends TradeBuffer {
 	@Autowired
-	DateUtil dDateUtil;
-	@Autowired
-	Parse parse;
+	private DateUtil dDateUtil;
 
 	@Autowired
-	public TxBizDateService sTxBizDateService;
+	private Parse parse;
+
 	@Autowired
-	public SystemParasService systemParasService;
+	private TxTellerService txTellerService;
+
 	@Autowired
-	public AcMainService acMainService;
+	private TxBizDateService sTxBizDateService;
+
 	@Autowired
-	public AcMainCom acMainCom;
-	
+	private SystemParasService systemParasService;
+
+	@Autowired
+	private AcMainService acMainService;
+
+	@Autowired
+	private AcMainCom acMainCom;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6880 ");
@@ -62,12 +73,10 @@ public class L6880 extends TradeBuffer {
 			proc(titaVo, "BATCH", iEntday);
 			// 往前跳開批次日期需過總帳(測試時)，連線日期 -> 批次日期
 			if (parse.stringToInteger(iEntday) > this.txBuffer.getTxBizDate().getTbsDy()) {
-				Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(),
-						this.index, Integer.MAX_VALUE);
+				Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(this.txBuffer.getTxBizDate().getTbsDyf(), this.index, Integer.MAX_VALUE);
 				List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 				if (lAcMain != null) {
-					acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday),
-							lAcMain, titaVo);
+					acMainCom.changeDate(this.txBuffer.getTxBizDate().getTbsDy(), parse.stringToInteger(iEntday), lAcMain, titaVo);
 				}
 			}
 		} else {
@@ -96,6 +105,8 @@ public class L6880 extends TradeBuffer {
 			this.info("LC800 Call BS001 Finished.");
 
 		}
+
+		this.chgTxnoTo0(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -171,6 +182,27 @@ public class L6880 extends TradeBuffer {
 
 		this.info("LC800 proc finished.");
 		return tTxBizDate;
+	}
+
+	private void chgTxnoTo0(TitaVo titaVo) {
+		Slice<TxTeller> txTellerSlice = txTellerService.findAll(0, Integer.MAX_VALUE);
+		List<TxTeller> txTellerLi = txTellerSlice.hasContent() ? txTellerSlice.getContent() : null;
+
+		if (Objects.isNull(txTellerLi))
+			return;
+
+		for (TxTeller te : txTellerLi)
+			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim()))
+				te.setTxtNo(1);
+			else
+				te.setTxtNo(0);
+
+		try {
+			txTellerService.updateAll(txTellerLi, titaVo);
+			titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
+		} catch (DBException e) {
+			this.error("TxTeller update all TxNo False!!!");
+		}
 	}
 
 }

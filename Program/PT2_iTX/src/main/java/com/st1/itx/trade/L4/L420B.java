@@ -70,7 +70,7 @@ public class L420B extends TradeBuffer {
 
 		if ((functionCode == 5 || "1".equals(tBatxHead.getBatxStsCode())) && !titaVo.getHsupCode().equals("1")) {
 			if ((functionCode == 5)) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批訂正");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0005", "整批訂正");
 			} else {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");
 			}

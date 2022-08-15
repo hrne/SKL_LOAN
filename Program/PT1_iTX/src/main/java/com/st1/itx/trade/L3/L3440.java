@@ -96,13 +96,15 @@ public class L3440 extends TradeBuffer {
 	LoanDueAmtCom loanDueAmtCom;
 	@Autowired
 	AcDetailCom acDetailCom;
-	
+
 	@Autowired
 	LoanCom loanCom;
 	@Autowired
 	LoanSetRepayIntCom loanSetRepayIntCom;
 	@Autowired
 	LoanCalcRepayIntCom loanCalcRepayIntCom;
+	@Autowired
+	AcPaymentCom acPaymentCom;
 	@Autowired
 	BaTxCom baTxCom;
 
@@ -277,6 +279,10 @@ public class L3440 extends TradeBuffer {
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
+			// 借方：收付欄
+			acPaymentCom.setTxBuffer(this.getTxBuffer());
+			acPaymentCom.run(titaVo);
+			lAcDetail.addAll(this.txBuffer.getAcDetailList());
 			// 貸方：費用、短繳期金
 			batxSettleUnpaid();
 		}
@@ -746,15 +752,15 @@ public class L3440 extends TradeBuffer {
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		
+
 		// 更新放款明細檔及帳務明細檔關聯欄
 		loanCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
-		
+
 		// 暫收款金額含催收還款金額
 		BigDecimal ovDuRepaid = od.getOvduAmt().subtract(parse.stringToBigDecimal(tTempVo.get("OvduBal")));
 		tLoanBorTx.setTempAmt(tLoanBorTx.getTempAmt().add(ovDuRepaid));
 		tLoanBorTx.setTxAmt(tLoanBorTx.getTxAmt().subtract(ovDuRepaid));
-		
+
 		try {
 			loanBorTxService.insert(tLoanBorTx);
 		} catch (DBException e) {
@@ -866,7 +872,7 @@ public class L3440 extends TradeBuffer {
 	private void batxSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算
-		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 00, BigDecimal.ZERO, titaVo); 
+		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 00, BigDecimal.ZERO, titaVo);
 		// 99-費用全部(含未到期)
 		wkTotalFee = baTxCom.getShortfall().add(baTxCom.getModifyFee()).add(baTxCom.getAcctFee())
 				.add(baTxCom.getFireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollFireFee())
