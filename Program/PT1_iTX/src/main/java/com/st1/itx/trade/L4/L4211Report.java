@@ -19,7 +19,6 @@ import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211AServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.SortMapListCom;
-import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -246,15 +245,16 @@ public class L4211Report extends MakeReport {
 		// facmno, bormno 已經在 query 裡面 concat 到 custno，所以不在這裡加sort
 
 		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascNumber("DetailSeq").ascString("CustNo")
-				.getList();
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("AcSeq")
+				.ascString("CustNo").getList();
 
 		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
-				.getList();
+				.ascString("DetailSeq").ascString("AcSeq").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").getList();
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
+				.ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
 	}
@@ -350,6 +350,8 @@ public class L4211Report extends MakeReport {
 			String dfCollection = formatAmt(tfnAllList.get("TempCr"), 0);
 			String dfShortPayment = formatAmt(tfnAllList.get("Shortfall"), 0);
 			String dfOthers = formatAmt(tfnAllList.get("Fee"), 0);
+//			String dfTransferAmt = formatAmt("12894000", 0);
+//			String dfMakeferAmt = formatAmt("12894000", 0);
 //			String dfPrincipal = formatAmt("20846000", 0);
 //			String dfInterest = formatAmt("2816142", 0);
 //			String dfPayment = formatAmt("2650271", 0);
@@ -523,10 +525,7 @@ public class L4211Report extends MakeReport {
 					if (TxAmtMap.get(tmp) != null) {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
-				} else {
-					this.print(0, c3, dfTransferAmt, "R");// 匯款金額
-				}
-
+				} 
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
@@ -882,10 +881,7 @@ public class L4211Report extends MakeReport {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
 
-				} else {
-					this.print(0, c3, dfTransferAmt, "R");// 匯款金額
-				}
-
+				} 
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
@@ -1236,8 +1232,6 @@ public class L4211Report extends MakeReport {
 					if (TxAmtMap.get(tmp) != null) {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
-				} else {
-					this.print(0, c3, dfTransferAmt, "R");// 匯款金額
 				}
 
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);

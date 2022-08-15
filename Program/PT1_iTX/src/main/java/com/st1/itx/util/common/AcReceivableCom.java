@@ -125,7 +125,7 @@ public class AcReceivableCom extends TradeBuffer {
 			tTempVo = tTempVo.getVo(ac.getJsonFields());
 			if ((ac.getAcctFlag() == 1 && !"L6801".equals(titaVo.getTxcd()))
 					|| (ac.getReceivableFlag() > 0 && ac.getReceivableFlag() < 8)) {
-				// 銷帳記號 0-起帳 1-銷帳
+				// 銷帳記號 0-起帳, 1-銷帳
 				// 1.ReceivableFlag >= 3 貸方銷帳
 				// 2.借方科目借方 ("1", "5","6","9") or 貸方科目貸方 -> 0-起帳, else 1-銷帳
 				// 3.TRO借新還舊->相反(貸方科目，先借後貸)

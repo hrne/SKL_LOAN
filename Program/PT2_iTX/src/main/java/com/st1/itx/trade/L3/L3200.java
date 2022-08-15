@@ -323,6 +323,12 @@ public class L3200 extends TradeBuffer {
 		iPayMethod = this.parse.stringToInteger(titaVo.getParam("PayMethod"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
+	    if (iRepayType == 10) {
+	    	iTotalRepayAmt = iCloseBreachAmt.subtract(iReduceAmt); // 10. 清償違約金
+	    }
+	    if (iRepayType == 12) {
+	    	iTotalRepayAmt = iOvduRepay.subtract(iReduceAmt); // 12.催收收回
+	    }
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 		iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
@@ -390,13 +396,14 @@ public class L3200 extends TradeBuffer {
 			acPaymentCom.setTxBuffer(this.getTxBuffer());
 			acPaymentCom.run(titaVo);
 			lAcDetail.addAll(this.txBuffer.getAcDetailList());
-
-			// 貸方：費用、短繳期金
+            // 暫收款額度 
 			if (iRepayType <= 2) { // 還款類別 1.期款 2.部分償還
 				calcRepayLoadRoutine();
-
-				batxSettleUnpaid();
+			} else {
+				this.wkTmpFacmNo = iFacmNo;
 			}
+			// 貸方：費用
+			batxSettleUnpaid();
 		}
 		// put Batch Tita
 		if (titaVo.isHcodeNormal() && titaVo.isTrmtypBatch()) {
@@ -1154,6 +1161,8 @@ public class L3200 extends TradeBuffer {
 				}
 				wkReduceAmt = ac.getRvBal().subtract(wkCloseBreachAmt); // 減免金額
 				wkReduceBreachAmt = ac.getRvBal().subtract(wkCloseBreachAmt); // 違約金減免金額
+				// initialize tTempVo
+				tTempVo.clear();
 				// 貸方帳務處理
 				acDetailBreachRoutine();
 				// 新增放款交易內容檔
@@ -1221,6 +1230,7 @@ public class L3200 extends TradeBuffer {
 		List<LoanOverdue> listOvdu = new ArrayList<LoanOverdue>();
 		for (LoanOverdue od : lLoanOverdue) {
 			tLoanOverdue = new LoanOverdue();
+			tLoanOverdue.setOvduNo(od.getOvduNo());
 			tLoanOverdue.setOvduPrinBal(od.getOvduPrinBal());
 			tLoanOverdue.setOvduIntBal(od.getOvduIntBal());
 			tLoanOverdue.setOvduBreachBal(od.getOvduBreachBal());
@@ -1301,7 +1311,7 @@ public class L3200 extends TradeBuffer {
 				AddTxTempOvduRoutine(listOvdu.get(i)); // old
 
 				// 更新撥款主檔
-				updateLoanBorMainRoutine();
+				updOvDuLoanBorMainRoutine();
 				// 帳務處理
 				acDetailOvduRoutine();
 
@@ -1472,7 +1482,7 @@ public class L3200 extends TradeBuffer {
 	}
 
 	// 更新撥款主檔(催收收回、清償違約金)
-	private void updateLoanBorMainRoutine() throws LogicException {
+	private void updOvDuLoanBorMainRoutine() throws LogicException {
 		this.info("updateLoanBorMainRoutine ... ");
 		tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, wkFacmNo, wkBormNo), titaVo);
 		if (tLoanBorMain == null) {
@@ -1483,6 +1493,11 @@ public class L3200 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 =  "
 					+ tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo()); // 該筆資料待放行中
 		}
+		tTempVo.putParam("LastEntDy", tLoanBorMain.getLastEntDy());
+		tTempVo.putParam("LastKinbr", tLoanBorMain.getLastKinbr());
+		tTempVo.putParam("LastTlrNo", tLoanBorMain.getLastTlrNo());
+		tTempVo.putParam("LastTxtNo", tLoanBorMain.getLastTxtNo());
+		
 		wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
@@ -1617,7 +1632,7 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTx.setUnpaidInterest(wkUnpaidInt); // 短繳利息
 		tLoanBorTx.setUnpaidPrincipal(wkUnpaidPrin); // 短繳本金
 		tLoanBorTx.setUnpaidCloseBreach(wkUnpaidCloseBreach);// 短繳清償違約金
-		tLoanBorTx.setShortfall(wkShortfall); // 全戶累短收金額
+		tLoanBorTx.setShortfall(wkShortfall); // 累短收金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
@@ -1717,8 +1732,6 @@ public class L3200 extends TradeBuffer {
 		//
 		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);
 		tLoanBorTx.setDisplayflag("A");
-		// 其他欄位
-		tTempVo.clear();
 		tTempVo.putParam("RvNo", ac.getRvNo()); // 銷帳編號
 		tTempVo.putParam("AcctCode", ac.getAcctCode()); // 業務科目
 		// 減免金額
@@ -1770,7 +1783,7 @@ public class L3200 extends TradeBuffer {
 
 	// 新增交易暫存(催收收回)
 	private void AddTxTempOvduRoutine(LoanOverdue od) throws LogicException {
-		this.info("AddTxTempOvduRoutine ... ");
+		this.info("AddTxTempOvduRoutine ... " + od.toString());
 		tTempVo.putParam("OvduNo", od.getOvduNo());
 		tTempVo.putParam("OvduPrinBal", od.getOvduPrinBal());
 		tTempVo.putParam("OvduIntBal", od.getOvduIntBal());
@@ -1889,8 +1902,10 @@ public class L3200 extends TradeBuffer {
 		this.baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算(整批入帳應繳日為會計入、連線用入帳日)
 		this.baTxList = baTxCom.settingUnPaid(titaVo.isTrmtypBatch() ? titaVo.getEntDyI() : iEntryDate, iCustNo,
-				this.wkTmpFacmNo, iBormNo, 0, iTxAmt, titaVo); // 00-費用全部(已到期)
-
+				this.wkTmpFacmNo, iBormNo, iRepayType <= 2 ? 0 : 9, iTxAmt, titaVo); // 00-費用全部(已到期)
+		if (iRepayType > 2) { 
+			return;
+		}
 		if (this.baTxList != null) {
 			// 部分償還有短繳金額時，短繳金額先扣除累短收-利息，再短繳本次利息
 			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -2094,24 +2109,24 @@ public class L3200 extends TradeBuffer {
 	// put Batch Tita
 	private void putBatchTita() throws LogicException {
 
-		titaVo.put("TwPrincipal", df.format(titaVo.getParam("TimPrincipal"))); // 本金
-		titaVo.put("TwInterest", df.format(titaVo.getParam("TimInterest")));// 利息
-		titaVo.put("TwDelayInt", df.format(titaVo.getParam("TimDelayInt")));// 延遲息
-		titaVo.put("TwBreachAmt", df.format(titaVo.getParam("TimBreachAmt")));// 違約金
+		titaVo.put("TwPrincipal", df.format(iPrincipal)); // 本金
+		titaVo.put("TwInterest", df.format(iInterest));// 利息
+		titaVo.put("TwDelayInt", df.format(iDelayInt));// 延遲息
+		titaVo.put("TwBreachAmt", df.format(iBreachAmt));// 違約金
 		titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
 		titaVo.put("ShortfallXX",
-				"[利息；" + df.format(titaVo.getParam("TimShortfallInt")) + "本金；"
-						+ df.format(titaVo.getParam("TimShortfallPrin")) + "違約金；"
-						+ df.format(titaVo.getParam("TimShortCloseBreach")) + "]");// 累短收
-		titaVo.put("TwAcctFee", df.format(titaVo.getParam("TimAcctFee")));// 帳管費
-		titaVo.put("TwModifyFee", df.format(titaVo.getParam("TimModifyFee")));// 契變手續費
-		titaVo.put("TwFireFee", df.format(titaVo.getParam("TimFireFee")));// 火險費
-		titaVo.put("TwLawFee", df.format(titaVo.getParam("TimLawFee")));// 法務費
+				"[利息；" + df.format(iShortfallInt) + "本金；"
+						+ df.format(iShortfallPrin) + "違約金；"
+						+ df.format(iShortCloseBreach) + "]");// 累短收
+		titaVo.put("TwAcctFee", df.format(iAcctFee));// 帳管費
+		titaVo.put("TwModifyFee", df.format(iModifyFee));// 契變手續費
+		titaVo.put("TwFireFee", df.format(iFireFee));// 火險費
+		titaVo.put("TwLawFee", df.format(iLawFee));// 法務費
 		titaVo.put("ExcessiveXX", df.format(baTxCom.getExcessive()) + "(全戶；"
 				+ df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())) + ")");// 累溢收(本戶)
 		titaVo.put("TwExtraCloseBreachAmt", df.format(baTxCom.getShortCloseBreach()));// 清償違約金
 		titaVo.put("BreachCodeX", "");// 清償違約金
-		titaVo.put("TwReduceAmt", "0");// 減免金額
+		titaVo.put("TwReduceAmt", df.format(iReduceAmt));// 減免金額
 
 	}
 

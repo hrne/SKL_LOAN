@@ -1684,13 +1684,14 @@ public class L3420 extends TradeBuffer {
 
 	// 3:轉催收 帳務處理
 	private void AcDetailClose3() throws LogicException {
+
 		// 暫收款金額 (暫收借)
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
 		// 借: 催收款項 = 本金 + 利息
 		acDetail = new AcDetail();
 		acDetail.setDbCr("D");
 		acDetail.setAcctCode("990");
+		acDetail.setSumNo("001"); // 催呆轉帳
 		acDetail.setTxAmt(wkPrincipal.add(wkInterest));
 		acDetail.setCustNo(wkCustNo);
 		acDetail.setFacmNo(wkFacmNo);
@@ -1714,8 +1715,10 @@ public class L3420 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
+		// 累溢收入帳(暫收貸)
+		loanCom.settleOverflow(lAcDetail, titaVo);		
 	}
-
+		
 	// 4:催收戶本人清償 5:催收戶保證人代償 6:催收戶強制執行 帳務處理
 	private void AcDetailClose4() throws LogicException {
 		this.info("AcDetailDbCr4Routine ... ");
@@ -1752,6 +1755,7 @@ public class L3420 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
+		
 		// 貸: 違約金
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
@@ -1775,11 +1779,11 @@ public class L3420 extends TradeBuffer {
 		}
 		// 暫收款金額 (暫收借)
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
 		// 借:備抵呆帳
 		acDetail = new AcDetail();
 		acDetail.setDbCr("D");
 		acDetail.setAcctCode("F18");
+		acDetail.setSumNo("001"); // 催呆轉帳
 		acDetail.setTxAmt(od.getOvduBal());
 		acDetail.setCustNo(iCustNo);
 		acDetail.setFacmNo(wkFacmNo);
@@ -1795,7 +1799,6 @@ public class L3420 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
-
 		// 累溢收入帳(暫收貸)
 		loanCom.settleOverflow(lAcDetail, titaVo);
 
@@ -1808,14 +1811,14 @@ public class L3420 extends TradeBuffer {
 		if (!this.txBuffer.getTxCom().isBookAcYes()) {
 			return;
 		}
-
 		// 暫收款金額 (暫收借)
 		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
 		// 借:備抵呆帳
 		acDetail = new AcDetail();
 		acDetail.setDbCr("D");
 		acDetail.setAcctCode("F18");
+		acDetail.setSumNo("001"); // 催呆轉帳
+	
 		acDetail.setTxAmt(wkTrfPrin.add(wkTrfInt).add(wkTrfBreach));
 		acDetail.setCustNo(iCustNo);
 		acDetail.setFacmNo(wkFacmNo);
@@ -1831,10 +1834,8 @@ public class L3420 extends TradeBuffer {
 		acDetail.setFacmNo(wkFacmNo);
 		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
-
 		// 累溢收入帳(暫收貸)
 		loanCom.settleOverflow(lAcDetail, titaVo);
-
 	}
 
 	// 費用、短繳期金
@@ -1901,13 +1902,11 @@ public class L3420 extends TradeBuffer {
 							|| ("Y".equals(iLawFg) && ba.getRepayType() == 7 && !"F24".equals(ba.getAcctCode()))
 							|| ("Y".equals(iCollLawFg) && ba.getRepayType() == 7 && "F24".equals(ba.getAcctCode()))) {
 
-						// 暫收款金額 (暫收借)
-						loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
 						// 借:備抵呆帳
 						acDetail = new AcDetail();
 						acDetail.setDbCr("D");
 						acDetail.setAcctCode("F18");
+						acDetail.setSumNo("001"); // 催呆轉帳
 						acDetail.setTxAmt(ba.getAcctAmt());
 						acDetail.setCustNo(ba.getCustNo());
 						acDetail.setFacmNo(ba.getFacmNo());
@@ -1924,8 +1923,6 @@ public class L3420 extends TradeBuffer {
 						acDetail.setRvNo(ba.getRvNo());
 						acDetail.setReceivableFlag(ba.getReceivableFlag());
 						lAcDetail.add(acDetail);
-						// 累溢收入帳(暫收貸)
-						loanCom.settleOverflow(lAcDetail, titaVo);
 
 						// 新增放款交易內容檔(收回費用)
 						tTempVo.clear();
@@ -2104,23 +2101,23 @@ public class L3420 extends TradeBuffer {
 	// put批次Tita
 	private void putBatchTita() throws LogicException {
 
-		titaVo.put("PrincipalX", df.format(titaVo.getParam("TimPrincipal")));// 本金
-		titaVo.put("InterestX", df.format(titaVo.getParam("TimInterest")));// 利息
-		titaVo.put("DelayIntX", df.format(titaVo.getParam("TimDelayInt")));// 延遲息
-		titaVo.put("BreachAmtX", df.format(titaVo.getParam("TimBreachAmt")));// 違約金
-		titaVo.put("AcctFee1X", df.format(titaVo.getParam("AcctFee1")));// 帳管費
-		titaVo.put("ModifyFee1X", df.format(titaVo.getParam("ModifyFee1")));// 契變手續費
-		titaVo.put("FireFee1X", df.format(titaVo.getParam("FireFee1")));// 火險費
-		titaVo.put("LawFee1X", df.format(titaVo.getParam("LawFee1")));// 法務費
+		titaVo.put("PrincipalX", df.format(iPrincipal));// 本金
+		titaVo.put("InterestX", df.format(iInterest));// 利息
+		titaVo.put("DelayIntX", df.format(iDelayInt));// 延遲息
+		titaVo.put("BreachAmtX", df.format(iBreachAmt));// 違約金
+		titaVo.put("AcctFee1X", df.format(iAcctFee1));// 帳管費
+		titaVo.put("ModifyFee1X", df.format(iModifyFee1));// 契變手續費
+		titaVo.put("FireFee1X", df.format(iFireFee1));// 火險費
+		titaVo.put("LawFee1X", df.format(iLawFee1));// 法務費
 		if (iCaseCloseCode == 7) {
 			titaVo.put("ShortfallX", df.format("0"));// 累短收
 		} else {
 			titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
 		}
 		titaVo.put("ShortfallXX", "");// 累短收(本戶)
-		titaVo.put("CloseBreachAmtX", df.format(titaVo.getParam("CloseBreachAmt")));// 清償違約金
+		titaVo.put("CloseBreachAmtX", df.format(iCloseBreachAmt));// 清償違約金
 		titaVo.put("ExcessiveX", df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())));// 累溢收
-		titaVo.put("TwReduceAmt", df.format(titaVo.getParam("TimReduceAmt")));// 減免金額
+		titaVo.put("TwReduceAmt", df.format(iReduceAmt));// 減免金額
 
 	}
 }

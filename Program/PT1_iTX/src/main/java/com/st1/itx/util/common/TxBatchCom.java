@@ -1744,6 +1744,7 @@ public class TxBatchCom extends TradeBuffer {
 			this.tTempVo.putParam("MergeCnt", t.get("MergeCnt")); // 合併總筆數
 			this.tTempVo.putParam("MergeAmt", t.get("MergeAmt")); // 合併總金額
 			this.tTempVo.putParam("MergeSeq", t.get("MergeSeq")); // 合併序號
+			this.tTempVo.putParam("MergeTempAmt", t.get("MergeTempAmt")); // 合併轉暫收金額
 		}
 		if (t.get("PreRepayTerms") != null) {
 			tTempVo.putParam("PreRepayTerms", t.get("PreRepayTerms")); // 批次預收期數

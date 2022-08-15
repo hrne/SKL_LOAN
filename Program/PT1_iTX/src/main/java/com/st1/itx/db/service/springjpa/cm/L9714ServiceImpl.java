@@ -40,8 +40,8 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iCUSTNO = titaVo.get("CustNo");
 		String iFACMNO = titaVo.get("FacmNo");
 		String iUSEFG = titaVo.get("UsageCode");
-		String iYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("YearMonth")) + 191100);
-		String sYEARMONTH = String.valueOf((Integer.valueOf(titaVo.get("YearMonth"))+ 191100) /100) + "01";
+		String iYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("eYearMonth")) + 191100);
+		String sYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("sYearMonth"))+ 191100);
 		boolean useUsageCode = !"00".equals(iUSEFG);
 		boolean useFacmNo = !"000".equals(iFACMNO);
 

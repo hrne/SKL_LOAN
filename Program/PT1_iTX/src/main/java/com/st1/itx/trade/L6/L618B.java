@@ -23,8 +23,10 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -65,6 +67,9 @@ public class L618B extends TradeBuffer {
 	LoanCom loanCom;
 
 	@Autowired
+	BaTxCom baTxCom;
+
+	@Autowired
 	public DataLog dataLog;
 
 	private String iItemCode;
@@ -75,12 +80,16 @@ public class L618B extends TradeBuffer {
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo = new TempVo();
+	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L618B ");
 		this.totaVo.init(titaVo);
 
+		baTxCom.setTxBuffer(this.txBuffer);
+		loanCom.setTxBuffer(this.txBuffer);
 		txToDoCom.setTxBuffer(this.txBuffer);
 
 		this.info("Txamt : " + titaVo.getTxAmt());
@@ -103,33 +112,40 @@ public class L618B extends TradeBuffer {
 
 //		帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
-			List<AcDetail> acDetailList = new ArrayList<AcDetail>();
+
+			lAcDetail = new ArrayList<AcDetail>();
+			// call 應繳試算
+			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 9, BigDecimal.ZERO, titaVo); //
+
+			// 暫收款金額 (暫收借)
+			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 			// 借: F25 催收款項－火險費用
+
+			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("D");
+			acDetail.setAcctCode("F25");
+			acDetail.setSumNo("001"); // 催呆轉帳
+			acDetail.setTxAmt(iTxAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setRvNo(iRvNo);
+			lAcDetail.add(acDetail);
+
 			// 貸: F09 暫付火險保費 原保險單號碼
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("F09");
+			acDetail.setTxAmt(iTxAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setRvNo(iRvNo);
 
-			AcDetail tacDetail = new AcDetail();
+			// 累溢收入帳(暫收貸)
+			loanCom.settleOverflow(lAcDetail, titaVo);
 
-			tacDetail.setDbCr("D");
-			tacDetail.setAcctCode("F25");
-			tacDetail.setTxAmt(iTxAmt);
-			tacDetail.setCustNo(iCustNo);
-			tacDetail.setFacmNo(iFacmNo);
-			tacDetail.setRvNo(iRvNo);
-
-			acDetailList.add(tacDetail);
-
-			tacDetail = new AcDetail();
-
-			tacDetail.setDbCr("C");
-			tacDetail.setAcctCode("F09");
-			tacDetail.setTxAmt(iTxAmt);
-			tacDetail.setCustNo(iCustNo);
-			tacDetail.setFacmNo(iFacmNo);
-			tacDetail.setRvNo(iRvNo);
-
-			acDetailList.add(tacDetail);
-			this.txBuffer.addAllAcDetailList(acDetailList);
+			lAcDetail.add(acDetail);
+			this.txBuffer.addAllAcDetailList(lAcDetail);
 		}
 		/* 產生會計分錄 */
 		acDetailCom.setTxBuffer(this.txBuffer);
@@ -184,10 +200,11 @@ public class L618B extends TradeBuffer {
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
-		tLoanBorTx.setTxAmt(iTxAmt);
 		tTempVo.clear();
 		tTempVo.putParam("RvNo", iRvNo);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+		// 更新放款明細檔及帳務明細檔關聯欄
+		loanCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {

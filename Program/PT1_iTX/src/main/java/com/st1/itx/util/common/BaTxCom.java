@@ -451,10 +451,9 @@ public class BaTxCom extends TradeBuffer {
 			// Load 暫收指定額度清單
 			loadFacTmpList(iCustNo, titaVo);
 		}
-		// 取得期款還款額度(期金是否相同)
-		if (iRepayType == 1 && iFacmNo == 0)
 
-		{
+		// 取得期款還款額度(期金是否相同)
+		if (iRepayType == 1 && iFacmNo == 0) {
 			iFacmNo = getDueAmtFacmNo(repayAmt);
 		}
 
@@ -469,8 +468,9 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		// Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
-		loadUnPaid(iPayIntDate, iCustNo, iFacmNo, iBormNo, iRepayType == 0 ? 99 : iRepayType, titaVo);
-
+		if (iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+			loadUnPaid(iPayIntDate, iCustNo, iFacmNo, iBormNo, iRepayType == 0 ? 99 : iRepayType, titaVo);
+		}
 // STEP 2:  設定還款類別(還款類別 = 0)
 		if (iRepayType == 0) {
 // 1).回收金額 = 費用金額 -> 4~9.費用類別

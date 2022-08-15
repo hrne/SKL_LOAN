@@ -14,6 +14,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
@@ -31,10 +32,12 @@ import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
@@ -87,6 +90,8 @@ public class L3712 extends TradeBuffer {
 	@Autowired
 	LoanCom loanCom;
 	@Autowired
+	BaTxCom baTxCom;
+	@Autowired
 	LoanDueAmtCom loanDueAmtCom;
 	@Autowired
 	LoanSetRepayIntCom loanSetRepayIntCom;
@@ -115,8 +120,7 @@ public class L3712 extends TradeBuffer {
 	private int wkOldSpecificDd;
 	private int wkOldSpecificDate;
 	private int wkOldPrevRepaidDate;
-	private int wkOldNextPayIntDate;
-	private int wkOldNextRepayDate;
+
 	private int wkNewSpecificDate;
 	private BigDecimal wkInterest;
 	private BigDecimal wkLoanBal;
@@ -133,7 +137,9 @@ public class L3712 extends TradeBuffer {
 	private List<LoanBorTx> lLoanBorTx;
 	private List<LoanBorMain> lLoanBorMain;
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
+	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo = new ArrayList<CalcRepayIntVo>();
+	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private boolean isFirstBorm = true;
 
 	@Override
@@ -155,7 +161,9 @@ public class L3712 extends TradeBuffer {
 		iInterest = this.parse.stringToBigDecimal(titaVo.getParam("Interest"));
 		//
 		if (titaVo.isHcodeNormal()) {
+			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo);
 			SpecificNormalRoutine();
+			titaVo.setTxAmt(wkTotalInterest);
 		} else {
 			SpecificEraseRoutine();
 		}
@@ -188,7 +196,8 @@ public class L3712 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -210,11 +219,13 @@ public class L3712 extends TradeBuffer {
 			}
 
 			if (iNewPayIntDate < wkLoanPrevIntDate || iNewPayIntDate >= ln.getNextPayIntDate()) {
-				throw new LogicException(titaVo, "E3075", wkCustNo + "-" + wkFacmNo + "-" + wkBormNo + " 上次繳息迄日 = " + ln.getPrevPayIntDate() + " 下次應繳息日 = " + ln.getNextPayIntDate()); // 變更應繳日需落在上次繳息迄日與下次應繳息日之內
+				throw new LogicException(titaVo, "E3075", wkCustNo + "-" + wkFacmNo + "-" + wkBormNo + " 上次繳息迄日 = "
+						+ ln.getPrevPayIntDate() + " 下次應繳息日 = " + ln.getNextPayIntDate()); // 變更應繳日需落在上次繳息迄日與下次應繳息日之內
 			}
 
 			if (ln.getActFg() == 1) {
-				throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021",
+						"放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo()); // 該筆資料待放行中
 			}
 			wkTotaCount++;
 			// 計息
@@ -228,12 +239,14 @@ public class L3712 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo); // 查詢資料不存在
 			}
 			if (tFacMain.getActFg() == 1) {
-				throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021",
+						"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 			}
 			// 鎖定撥款主檔
 			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, wkFacmNo, wkBormNo));
 			if (tLoanBorMain == null) {
-				throw new LogicException(titaVo, "E0006", "撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006",
+						"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
 			}
 			tTempVo.clear();
 			// 新增交易暫存檔(放款資料)
@@ -242,6 +255,8 @@ public class L3712 extends TradeBuffer {
 			UpdLoanBorMainRoutine();
 			// 新增計息明細
 			AddLoanIntDetailRoutine();
+			// 帳務處理
+			AcDetailRoutine();
 			// 新增放款交易內容檔
 			AddLoanBorTxRoutine();
 			// 利息可欠繳時, 新增銷帳檔
@@ -254,15 +269,31 @@ public class L3712 extends TradeBuffer {
 		}
 	}
 
+	// 帳務處理
+	private void AcDetailRoutine() throws LogicException {
+		this.info("AcDetailCrRoutine ... ");
+		this.info("   isBookAcYes = " + this.txBuffer.getTxCom().isBookAcYes());
+
+		if (!this.txBuffer.getTxCom().isBookAcYes()) {
+			return;
+		}
+		// 暫收款金額 (暫收借)
+		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+
+		// 累溢收入帳(暫收貸)
+		loanCom.settleOverflow(lAcDetail, titaVo);
+	}
+
 	// 訂正
 	private void SpecificEraseRoutine() throws LogicException {
 		this.info("SpecificEraseRoutine ... ");
 
-		Slice<LoanBorTx> slLoanBortx = loanBorTxService.custNoTxtNoEq(iCustNo, titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<LoanBorTx> slLoanBortx = loanBorTxService.custNoTxtNoEq(iCustNo, titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorTx = slLoanBortx == null ? null : slLoanBortx.getContent();
 		if (lLoanBorTx == null || lLoanBorTx.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易明細檔 交易序號=" + titaVo.getOrgKin() + titaVo.getOrgTlr() + titaVo.getOrgTno()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001",
+					"交易明細檔 交易序號=" + titaVo.getOrgKin() + titaVo.getOrgTlr() + titaVo.getOrgTno()); // 查詢資料不存在
 		}
 		for (LoanBorTx tx : lLoanBorTx) {
 			wkCustNo = tx.getCustNo();
@@ -281,12 +312,14 @@ public class L3712 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 查詢資料不存在
 			}
 			if (tFacMain.getActFg() == 1) {
-				throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+				throw new LogicException(titaVo, "E0021",
+						"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 			}
 			// 還原撥款主檔
 			RestoredLoanBorMainRoutine();
 			// 註記交易內容檔
-			loanCom.setLoanBorTxHcode(wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, wkNewBorxNo, tLoanBorMain.getLoanBal(), titaVo);
+			loanCom.setLoanBorTxHcode(wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, wkNewBorxNo, tLoanBorMain.getLoanBal(),
+					titaVo);
 			// 利息可欠繳時, 新增銷帳檔
 			AcReceivableRoutine();
 			// FirstBorm
@@ -311,8 +344,6 @@ public class L3712 extends TradeBuffer {
 		} else {
 			wkOldPrevRepaidDate = tLoanBorMain.getPrevRepaidDate();
 		}
-		wkOldNextPayIntDate = tLoanBorMain.getNextPayIntDate();
-		wkOldNextRepayDate = tLoanBorMain.getNextRepayDate();
 
 		tTempVo.putParam("SpecificDd", tLoanBorMain.getSpecificDd());
 		tTempVo.putParam("SpecificDate", tLoanBorMain.getSpecificDate());
@@ -346,24 +377,29 @@ public class L3712 extends TradeBuffer {
 		int wkMons = 0;
 
 		// 新下次繳息日 = 應收息迄日 + 1 期
-		wkNextPayIntDate = loanCom.getPayIntEndDate(tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), iNewPayIntDate, iNewSpecificDd, 1, tLoanBorMain.getMaturityDate());
+		wkNextPayIntDate = loanCom.getPayIntEndDate(tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
+				iNewPayIntDate, iNewSpecificDd, 1, tLoanBorMain.getMaturityDate());
 
 		// 重算新指定基準日期
-		wkNewSpecificDate = loanCom.getSpecificDate(iNewSpecificDd, tLoanBorMain.getFirstDueDate(), tLoanBorMain.getPayIntFreq());
+		wkNewSpecificDate = loanCom.getSpecificDate(iNewSpecificDd, tLoanBorMain.getFirstDueDate(),
+				tLoanBorMain.getPayIntFreq());
 		this.info("wkNewSpecificDate = " + tLoanBorMain.getBormNo() + " " + wkNewSpecificDate);
 
 		// 新上次還本日
 		wkNewPrevRepaidDate = iNewPayIntDate;
 
 		// 新下次還本日
-		wkNextRepayDate = loanCom.getNextRepayDate(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getRepayFreq(), tLoanBorMain.getFreqBase(), wkNewSpecificDate, iNewSpecificDd, wkNewPrevRepaidDate,
+		wkNextRepayDate = loanCom.getNextRepayDate(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getRepayFreq(),
+				tLoanBorMain.getFreqBase(), wkNewSpecificDate, iNewSpecificDd, wkNewPrevRepaidDate,
 				tLoanBorMain.getMaturityDate(), tLoanBorMain.getGraceDate());
 
 		// 過了寬限到期日重算期金，剩餘期數 = 總期數減已繳期數
 		if (wkNewPrevRepaidDate > 0 && wkNextRepayDate > tLoanBorMain.getGraceDate()) {
-			wkRestPeriod = tLoanBorMain.getTotalPeriod() - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getRepayFreq(), wkNewSpecificDate, iNewSpecificDd, wkNewPrevRepaidDate);
+			wkRestPeriod = tLoanBorMain.getTotalPeriod() - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(),
+					tLoanBorMain.getRepayFreq(), wkNewSpecificDate, iNewSpecificDd, wkNewPrevRepaidDate);
 			if (wkRestPeriod > 0) {
-				wkDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(), tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkRestPeriod, 0,
+				wkDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
+						tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkRestPeriod, 0,
 						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
 			}
 		}
@@ -384,7 +420,8 @@ public class L3712 extends TradeBuffer {
 		try {
 			loanBorMainService.update(tLoanBorMain);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007",
+					"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
 		}
 
 		this.info("   wkNextPayIntDate = " + wkNextPayIntDate);
@@ -461,7 +498,6 @@ public class L3712 extends TradeBuffer {
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("應繳日變更-可欠繳");
 		tLoanBorTx.setEntryDate(0);
-		tLoanBorTx.setTxAmt(BigDecimal.ZERO);
 		tLoanBorTx.setLoanBal(wkLoanBal);
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
@@ -472,7 +508,6 @@ public class L3712 extends TradeBuffer {
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
 			tLoanBorTx.setShortfall(iInterest); // 短收
-			tLoanBorTx.setOverflow(BigDecimal.ZERO); // 溢收
 		} else {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		}
@@ -507,7 +542,8 @@ public class L3712 extends TradeBuffer {
 
 		tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(wkCustNo, wkFacmNo, wkBormNo));
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0006", "撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006",
+					"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
 		}
 		wkNewBorxNo = tLoanBorMain.getLastBorxNo() + 1;
 		// 放款交易訂正交易須由最後一筆交易開始訂正
@@ -527,7 +563,8 @@ public class L3712 extends TradeBuffer {
 		try {
 			loanBorMainService.update(tLoanBorMain);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "撥款主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
+			throw new LogicException(titaVo, "E0007",
+					"撥款主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
 		}
 	}
 

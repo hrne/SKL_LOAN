@@ -150,6 +150,10 @@ public class L3210 extends TradeBuffer {
 			iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
 			iFacmNo = iOverRpFacmNo;
 		}
+		if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+			iFacmNo = 0;		
+			this.repayFacmNo = 0;
+		}
 
 		// 系統交易記錄檔的金額為實際支付金額或暫收款金額
 		titaVo.setTxAmt(iTempAmt);
