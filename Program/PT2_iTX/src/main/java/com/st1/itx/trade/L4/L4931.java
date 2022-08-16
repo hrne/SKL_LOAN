@@ -99,9 +99,9 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", result.get("FacmNo"));
 				occursList.putParam("OOBormNo", result.get("BormNo"));
 				occursList.putParam("OOCustName", result.get("CustName"));
-				occursList.putParam("OOTotalLoanBal", result.get("TotalLoanBal"));
+				occursList.putParam("OOTotalLoanBal", result.get("TotBalance"));
 				occursList.putParam("OODrawdownAmt", result.get("DrawdownAmt"));
-				occursList.putParam("OOLoanBal", result.get("LoanBal"));
+				occursList.putParam("OOLoanBal", result.get("LoanBalance"));
 				occursList.putParam("OOPresEffDate", presEffDate);
 				occursList.putParam("OOCurtEffDate", curtEffDate);
 				occursList.putParam("OOPrevIntDate", prevIntDate);

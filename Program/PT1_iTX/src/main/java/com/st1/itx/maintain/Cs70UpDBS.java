@@ -55,7 +55,10 @@ public class Cs70UpDBS extends CommBuffer {
 		String reason = Objects.isNull(this.titaVo.getRqsp()) ? "" : this.titaVo.getRqsp();
 		List<Map<String, String>> reasonLi = new ArrayList<Map<String, String>>();
 
+		this.info(reason);
 		for (String s : reason.split(";")) {
+			if (s.trim().isEmpty())
+				continue;
 			String no = s.substring(0, 5).trim();
 			String msg = s.substring(5).trim();
 

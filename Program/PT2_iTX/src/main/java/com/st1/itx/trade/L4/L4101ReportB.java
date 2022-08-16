@@ -154,11 +154,13 @@ public class L4101ReportB extends MakeReport {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
-		reportCode = reportCode + "-" + batchNo + "-B";
+		reportCode = reportCode + "-B";
 		if (batchNo.length() > 2)
 			if ("RT".equals(batchNo.substring(0, 2))) {
 				reportItem = "整批退款單";
 			}
+
+		reportItem = reportItem + "-" + batchNo;
 		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
@@ -205,15 +207,14 @@ public class L4101ReportB extends MakeReport {
 			this.info("oldFacmNo =" + oldFacmNo);
 			this.info("getFacmNo =" + tBankRemit.getFacmNo());
 
-			if (tBankRemit.getCustNo() != oldCustNo ) {
-				cnt++;
-			}
 			if (tBankRemit.getCustNo() != oldCustNo || tBankRemit.getFacmNo() != oldFacmNo) {
+				if (tBankRemit.getCustNo() != oldCustNo) {
+					cnt++;
+				}
 				oldCustNo = tBankRemit.getCustNo();
 				oldFacmNo = tBankRemit.getFacmNo();
 				subTotal = BigDecimal.ZERO;
 			}
-			
 
 //			if (!this.nowAcBookCode.equals(tAcDetail.getAcBookCode())) {
 //				// 修改表頭的帳冊別欄位
@@ -311,7 +312,7 @@ public class L4101ReportB extends MakeReport {
 			print(0, 7, custNo + "-" + facmNo + "-" + bormNo);// 戶號
 			print(0, 29, wkBankItem);// 銀行別
 			print(0, 52, remitAcctNo);// 匯款帳號
-			print(0, 69, FormatUtil.padX("" + wkCustName, 20) );// 收款戶名
+			print(0, 69, FormatUtil.padX("" + wkCustName, 20));// 收款戶名
 			print(0, 91, wkAmlRspItem);// AML回應碼
 			print(0, 131, formatAmt(remitAmt, 0), "R");// 匯款金額
 			print(0, 154, FormatUtil.padX("" + wkFullName, 20));// 專辦

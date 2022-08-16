@@ -20,9 +20,12 @@ import com.st1.itx.db.domain.BatxBaseRateChange;
 import com.st1.itx.db.domain.BatxBaseRateChangeId;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
+import com.st1.itx.db.domain.CdBaseRate;
+import com.st1.itx.db.domain.CdBaseRateId;
 import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.BatxBaseRateChangeService;
 import com.st1.itx.db.service.BatxRateChangeService;
+import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
@@ -78,6 +81,9 @@ public class L4320Batch extends TradeBuffer {
 
 	@Autowired
 	private LoanRateChangeService sLoanRateChangeService;
+
+	@Autowired
+	public CdBaseRateService cdBaseRateService;
 
 	@Autowired
 	public L4320ServiceImpl l4320BatchServiceImpl;
@@ -186,6 +192,25 @@ public class L4320Batch extends TradeBuffer {
 			} catch (LogicException e) {
 				sendMsg = e.getErrorMsg();
 				flag = false;
+			}
+		}
+
+		// 指標利率檔生效記號
+		if (!iBaseRateCode.trim().isEmpty()) {
+			CdBaseRate tCdBaseRate = new CdBaseRate();
+			CdBaseRateId tCdBaseRateId = new CdBaseRateId();
+			tCdBaseRateId.setBaseRateCode(iBaseRateCode);
+			tCdBaseRateId.setCurrencyCode("TWD");
+			tCdBaseRateId.setEffectDate(iEffectDate);
+			tCdBaseRate = cdBaseRateService.findById(tCdBaseRateId, titaVo);
+			if (tCdBaseRate != null) {
+				if (titaVo.isHcodeNormal()) {
+					tCdBaseRate.setEffectFlag(1); // 1:已生效
+				} else {
+					if (titaVo.get("EffectFlag") != null) {
+						tCdBaseRate.setEffectFlag(parse.stringToInteger(titaVo.getParam("EffectFlag")));
+					}
+				}
 			}
 		}
 		// 產出清單
@@ -455,12 +480,16 @@ public class L4320Batch extends TradeBuffer {
 		// 預定下次利率調整日期
 		int preNextAdjDate = 0;
 		if (iTxKind == 1) {
-			dateUtil.init();
-			dateUtil.setDate_1(nextAdjRateDate);
-			dateUtil.setMons(rateAdjFreq); // 調整周期(單位固定為月)
-			preNextAdjDate = dateUtil.getCalenderDay();
-			if (preNextAdjDate > maturityDate) {
-				preNextAdjDate = maturityDate;
+			if (iAdjCode == 4) {
+				preNextAdjDate = nextAdjRateDate;
+			} else {
+				dateUtil.init();
+				dateUtil.setDate_1(nextAdjRateDate);
+				dateUtil.setMons(rateAdjFreq); // 調整周期(單位固定為月)
+				preNextAdjDate = dateUtil.getCalenderDay();
+				if (preNextAdjDate > maturityDate) {
+					preNextAdjDate = maturityDate;
+				}
 			}
 		}
 		b.setPreNextAdjDate(preNextAdjDate);
@@ -529,15 +558,15 @@ public class L4320Batch extends TradeBuffer {
 				// 依地區別利率上、下限調整
 				if (rateProp.compareTo(cityRateCeiling) > 0) {
 					rateProp = cityRateCeiling;
-					warn += ", 達地區別上限, 地區別加減碼:" + cityRateIncr;
+					warn = ", 達地區別上限, 地區別加減碼:" + cityRateIncr;
 				}
 				if (rateProp.compareTo(cityRateFloor) < 0) {
 					rateProp = cityRateFloor;
-					warn += ", 達地區別下限, 地區別加減碼:" + cityRateIncr;
+					warn = ", 達地區別下限, 地區別加減碼:" + cityRateIncr;
 				}
 				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
 					rateProp = contractRate;
-					warn += ", 達合約利率上限, 地區別加減碼:" + cityRateIncr;
+					warn = ", 達合約利率上限, 地區別加減碼:" + cityRateIncr;
 				}
 				warnMsg += warn;
 			}

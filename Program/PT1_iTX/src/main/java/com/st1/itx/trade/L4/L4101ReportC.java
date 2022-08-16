@@ -150,13 +150,14 @@ public class L4101ReportC extends MakeReport {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
-		reportCode = reportCode + "-" + batchNo + "-C";
+		reportCode = reportCode + "-C";
 		// 退款名稱
 		if ("BCK".equals(batchNo)) {
 			reportItem = "抽退票傳票明細表";
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
 		}
+		reportItem = reportItem + "-" + batchNo;
 		String wkName = "";
 		String wkBankCode = "";
 		String wkBranchCode = "";

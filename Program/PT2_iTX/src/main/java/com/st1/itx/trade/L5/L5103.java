@@ -6,38 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TxCom;
+import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.InnDocRecord;
 import com.st1.itx.db.domain.InnDocRecordId;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.InnDocRecordService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-
-/**
- * Tita<br>
- * CustNo=9,7<br>
- * FacmNo=9,3<br>
- * ApplCode=9,1<br>
- * ApplSeq=9,3<br>
- * ApplEmpNo=X,6<br>
- * KeeperEmpNo=X,6<br>
- * UsageCode=9,2<br>
- * CopyCode=9,1<br>
- * ApplDate=9,7<br>
- * ReturnDate=9,7<br>
- * ReturnEmpNo=X,6<br>
- * Remark=X,60<br>
- * ApplObj=9,1<br>
- * END=X,1<br>
- */
 
 @Service("L5103")
 @Scope("prototype")
@@ -58,6 +42,8 @@ public class L5103 extends TradeBuffer {
 
 	@Autowired
 	public InnDocRecordService innDocRecordService;
+	@Autowired
+	public FacCloseService facCloseService;
 
 	@Autowired
 	public TxTellerService txTellerService;
@@ -72,14 +58,13 @@ public class L5103 extends TradeBuffer {
 		this.info("active L5103 ");
 		this.totaVo.init(titaVo);
 
-//		#L5103ConfirmBrNo
-//		#L5103ConfirmGroupNo
-
 		String cfBrNo = titaVo.getParam("L5103ConfirmBrNo");
 		String cfGroupNo = titaVo.getParam("L5103ConfirmGroupNo");
 
 		int rdate = parse.stringToInteger(titaVo.getParam("ReturnDate"));
 		String rEmpNo = titaVo.getParam("ReturnEmpNo");
+		String applCode = titaVo.getParam("ApplCode");
+		String usageCode = titaVo.getParam("UsageCode");
 
 		TxCom txCom = this.txBuffer.getTxCom();
 		txCom.setConfirmBrNo(cfBrNo);
@@ -139,8 +124,31 @@ public class L5103 extends TradeBuffer {
 						try {
 							innDocRecordService.update(tInnDocRecord);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", "L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+							throw new LogicException(titaVo, "E0007",
+									"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
 						}
+//						清償歸檔需更新清償作業檔的銷號欄
+						if ("2".equals(applCode) && "01".equals(usageCode)) {
+							FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(
+									parse.stringToInteger(titaVo.getParam("CustNo")),
+									parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
+							if (mFacClose != null) {
+								FacClose tFacClose = facCloseService.holdById(mFacClose, titaVo);
+
+								int wkYy = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(0, 3)); // 年
+								int wkMm = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(3, 5)); // 月
+								int wkDd = parse.stringToInteger(titaVo.getParam("ReturnDate").substring(5, 7)); // 日
+								String clsDate = wkYy + "/" + wkMm + "/" + wkDd;
+								tFacClose.setClsNo(clsDate);
+								try {
+									facCloseService.update(tFacClose, titaVo);
+								} catch (DBException e) {
+									throw new LogicException(titaVo, "E0007",
+											"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+								}
+							}
+						}
+
 					} else {
 						throw new LogicException(titaVo, "E0003", "L5103 isHcodeNormal 2");
 					}
@@ -354,21 +362,21 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
 
-			for (int i = 0; i <= 25; i++) {
+			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
 					tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
 					tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
 				}
 			}
 
-			for (int i = 0; i <= 25; i++) {
+			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
 					tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
 					tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
 				}
 			}
 
-			for (int i = 0; i <= 25; i++) {
+			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
 					tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
 					tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));

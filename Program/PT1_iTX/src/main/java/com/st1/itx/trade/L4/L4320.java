@@ -30,20 +30,8 @@ public class L4320 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4320 ");
 		this.totaVo.init(titaVo);
-		String iGroupId = titaVo.getParam("GroupId").trim(); // 團體戶統編
-		if ("".equals(iGroupId)) {
-			titaVo.putParam("GroupUKey", "");
-		} else {
-			CustMain tCustMain = custMainService.custIdFirst(iGroupId, titaVo);
-			if (tCustMain == null) {
-				throw new LogicException("E0001", " 客戶資料主檔無該團體戶統編"); // 查詢無資料
-			}
-			titaVo.putParam("GroupUKey", tCustMain.getCustUKey());
-		}
-
 		// 執行交易
 		MySpring.newTask("L4320Batch", this.txBuffer, titaVo);
-
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		
 		this.addList(this.totaVo);

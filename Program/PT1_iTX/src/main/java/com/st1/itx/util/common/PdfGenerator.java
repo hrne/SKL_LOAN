@@ -629,6 +629,7 @@ public class PdfGenerator extends CommBuffer {
 	}
 
 	private void setNewPage() throws DocumentException, IOException {
+		PdfContentByte underContent;
 		// 新頁
 		if (reportVo.isUseDefault()) {
 			if (this.nowPage > 0) {
@@ -646,12 +647,13 @@ public class PdfGenerator extends CommBuffer {
 			stamper = new PdfStamper(reader, baos);
 			fields = stamper.getAcroFields();
 			cb = stamper.getOverContent(this.nowPage - 1);
+			underContent = stamper.getUnderContent(this.nowPage - 1);
 		} else {
 			document.newPage();
+			underContent = writer.getDirectContentUnder();
 		}
-
 		if (watermarkFlag) {
-			this.setWatermark(writer.getDirectContentUnder(), document);
+			this.setWatermark(underContent, document);
 		}
 	}
 
@@ -724,12 +726,12 @@ public class PdfGenerator extends CommBuffer {
 	/**
 	 * 浮水印
 	 * 
-	 * @param cb       PdfContentByte
-	 * @param document Document
+	 * @param pdfContentByte PdfContentByte
+	 * @param document       Document
 	 * @throws IOException       IOException
 	 * @throws DocumentException DocumentException
 	 */
-	private void setWatermark(PdfContentByte cb, Document document) throws IOException, DocumentException {
+	private void setWatermark(PdfContentByte pdfContentByte, Document document) throws IOException, DocumentException {
 
 		PdfGState graphicState = new PdfGState();
 		graphicState.setFillOpacity(0.7f);
@@ -756,20 +758,20 @@ public class PdfGenerator extends CommBuffer {
 		String rptTime = new SimpleDateFormat("HHmmss").format(rptCreateDate);
 		watermark.append(rptUtil.showRocDate(rptDate, 2)).append(" ").append(rptUtil.showTime(rptTime));
 
-		cb.setGState(graphicState);
-		cb.beginText();
-		cb.setFontAndSize(tmpBaseFont, 12);
-		cb.setColorFill(BaseColor.LIGHT_GRAY);
+		pdfContentByte.setGState(graphicState);
+		pdfContentByte.beginText();
+		pdfContentByte.setFontAndSize(tmpBaseFont, 12);
+		pdfContentByte.setColorFill(BaseColor.LIGHT_GRAY);
 
 		float widthMax = document.getPageSize().getWidth();
 		float heightMax = document.getPageSize().getHeight();
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
-				cb.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);
+				pdfContentByte.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);
 			}
 		}
-		cb.endText();
+		pdfContentByte.endText();
 	}
 
 	private void setWatermarkFlag(String fileCode) {

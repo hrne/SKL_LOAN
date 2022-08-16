@@ -15,6 +15,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
@@ -145,7 +147,7 @@ public class L3240 extends TradeBuffer {
 		this.info("titaVo.getHsupCode() =" + titaVo.getHsupCode());
 		this.info("titaVo.getEmpNos().trim() =" + titaVo.getEmpNos().trim());
 		if (!titaVo.getHsupCode().equals("1")) {
-			sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
+			sendRsp.addvReason(this.txBuffer, titaVo, "0005", ""); // 訂正需主管核可
 		}
 
 		// Check Input
@@ -154,6 +156,7 @@ public class L3240 extends TradeBuffer {
 
 		// 沖正處理
 		repayEraseRoutine();
+		this.txBuffer.setAcDetailList(lAcDetail);
 		if (wkRepayCode == 0) {
 			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 				wkRepayCode = 9; // 其他
@@ -190,10 +193,8 @@ public class L3240 extends TradeBuffer {
 			// 累溢收入帳(暫收貸)
 			loanCom.settleOverflow(lAcDetail, titaVo);
 			
-			// 借： 本金利息、貸：暫收可抵繳
-			this.txBuffer.addAllAcDetailList(lAcDetail);
-
 			// 產生會計分錄
+			this.txBuffer.setAcDetailList(lAcDetail);
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
 

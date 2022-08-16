@@ -154,11 +154,13 @@ public class L4101ReportB extends MakeReport {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
-		reportCode = reportCode + "-" + batchNo + "-B";
+		reportCode = reportCode + "-B";
 		if (batchNo.length() > 2)
 			if ("RT".equals(batchNo.substring(0, 2))) {
 				reportItem = "整批退款單";
 			}
+
+		reportItem = reportItem + "-" + batchNo;
 		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,

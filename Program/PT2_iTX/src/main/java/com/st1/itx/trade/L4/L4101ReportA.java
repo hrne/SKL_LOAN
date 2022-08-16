@@ -110,8 +110,8 @@ public class L4101ReportA extends MakeReport {
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
+		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
 
 	}
 
@@ -145,7 +145,8 @@ public class L4101ReportA extends MakeReport {
 				reportItem = "退款傳票總表";
 			}
 		reportCode = titaVo.getTxcd();
-		reportCode = reportCode + "-" + batchNo + "-A";
+		reportCode = reportCode + "-A";
+		reportItem = reportItem + "-" + batchNo;
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		this.info("L4101ReportA BatchNo = " + batchNo);
@@ -189,7 +190,7 @@ public class L4101ReportA extends MakeReport {
 
 		}
 
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
 		print(1, 1, "　　　　　　           ");
 
 		print(0, 61, "　　　　　　　　共　" + cnt + "　戶　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
@@ -211,7 +212,7 @@ public class L4101ReportA extends MakeReport {
 		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
 
-				if (tAcDetail.getCustNo() != oldCustNo ) {
+				if (tAcDetail.getCustNo() != oldCustNo) {
 					oldCustNo = tAcDetail.getCustNo();
 					oldFacmNo = tAcDetail.getFacmNo();
 					cnt++;

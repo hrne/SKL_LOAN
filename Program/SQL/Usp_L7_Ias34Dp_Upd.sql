@@ -111,6 +111,7 @@ BEGIN
            , SUM("Fee") AS "Fee"
       FROM "ForeclosureFee"
       WHERE TRUNC("OpenAcDate" / 100) <= YYYYMM
+        AND "Fee" > 0
         AND CASE
               WHEN "CloseDate" = 0 -- 未銷直接計入
               THEN 1
@@ -126,7 +127,8 @@ BEGIN
            , "FacmNo"
            , SUM("TotInsuPrem") AS "Fee"
       FROM "InsuRenew"
-      WHERE 
+      WHERE "TotInsuPrem" > 0
+        AND
             CASE
               WHEN "AcDate" = 0 AND "RenewCode" = 2 
                    AND  "InsuYearMonth" <= YYYYMM  -- 未銷直接計入
@@ -470,11 +472,11 @@ BEGIN
            , "FacmNo"
            , "BormNo"
            , "IssueMonth"
-           , (TRUNC("IssueMonth" / 100) + 1) * 100 + MOD("IssueMonth", 100) AS "StartMonth2" -- 第二年起月
-           , (TRUNC("IssueMonth" / 100) + 2) * 100 + MOD("IssueMonth", 100) AS "StartMonth3" -- 第三年起月
-           , (TRUNC("IssueMonth" / 100) + 3) * 100 + MOD("IssueMonth", 100) AS "StartMonth4" -- 第四年起月
-           , (TRUNC("IssueMonth" / 100) + 4) * 100 + MOD("IssueMonth", 100) AS "StartMonth5" -- 第五年起月
-           , (TRUNC("IssueMonth" / 100) + 5) * 100 + MOD("IssueMonth", 100) AS "StartMonth6" -- 第六年起月
+           , (TRUNC("IssueMonth" / 100) + 1) * 100 + MOD("IssueMonth", 100) AS "EndMonth1" -- 第一年止月
+           , (TRUNC("IssueMonth" / 100) + 2) * 100 + MOD("IssueMonth", 100) AS "EndMonth2" -- 第二年止月
+           , (TRUNC("IssueMonth" / 100) + 3) * 100 + MOD("IssueMonth", 100) AS "EndMonth3" -- 第三年止月
+           , (TRUNC("IssueMonth" / 100) + 4) * 100 + MOD("IssueMonth", 100) AS "EndMonth4" -- 第四年止月
+           , (TRUNC("IssueMonth" / 100) + 5) * 100 + MOD("IssueMonth", 100) AS "EndMonth5" -- 第五年止月
            , ROW_NUMBER()
              OVER (
                PARTITION BY "CustNo"
@@ -496,7 +498,8 @@ BEGIN
            , SUM("Fee")                AS "LawFee"
       FROM "ForeclosureFee"
       WHERE "CloseDate" > 0
-        AND "FeeCode" NOT IN ('11','15') -- 排除全額沖銷、催收沖銷資料
+        AND "Fee" > 0
+        --AND "FeeCode" NOT IN ('11','15') -- 排除全額沖銷、催收沖銷資料
       GROUP BY "CustNo"
              , TRUNC("CloseDate" / 100)
     )
@@ -508,6 +511,7 @@ BEGIN
            , SUM("TotInsuPrem")    AS "InsuFee"
       FROM "InsuRenew"
       WHERE "AcDate" > 0
+        AND "TotInsuPrem" > 0
       GROUP BY "CustNo"
              , "FacmNo"
              , TRUNC("AcDate" / 100)
@@ -518,32 +522,32 @@ BEGIN
            , M."BormNo"
            , SUM(
               CASE
-                WHEN L."Month" >= M."IssueMonth"
-                     AND L."Month" < M."StartMonth2"
+                WHEN L."Month" > M."IssueMonth"
+                     AND L."Month" <= M."EndMonth1"
                 THEN L."LawFee"
               ELSE 0 END ) AS "LawFee1" -- 第一年法務費用
            , SUM(
               CASE
-                WHEN L."Month" >= M."StartMonth2"
-                     AND L."Month" < M."StartMonth3"
+                WHEN L."Month" > M."EndMonth1"
+                     AND L."Month" <= M."EndMonth2"
                 THEN L."LawFee"
               ELSE 0 END ) AS "LawFee2" -- 第二年法務費用
            , SUM(
               CASE
-                WHEN L."Month" >= M."StartMonth3"
-                     AND L."Month" < M."StartMonth4"
+                WHEN L."Month" > M."EndMonth2"
+                     AND L."Month" <= M."EndMonth3"
                 THEN L."LawFee"
               ELSE 0 END ) AS "LawFee3" -- 第三年法務費用
            , SUM(
               CASE
-                WHEN L."Month" >= M."StartMonth4"
-                     AND L."Month" < M."StartMonth5"
+                WHEN L."Month" > M."EndMonth3"
+                     AND L."Month" <= M."EndMonth4"
                 THEN L."LawFee"
               ELSE 0 END ) AS "LawFee4" -- 第四年法務費用
            , SUM(
               CASE
-                WHEN L."Month" >= M."StartMonth5"
-                     AND L."Month" < M."StartMonth6"
+                WHEN L."Month" > M."EndMonth4"
+                     AND L."Month" <= M."EndMonth5"
                 THEN L."LawFee"
               ELSE 0 END ) AS "LawFee5" -- 第五年法務費用
       FROM MonthData M
@@ -558,32 +562,32 @@ BEGIN
            , M."BormNo"
            , SUM(
               CASE
-                WHEN I."Month" >= M."IssueMonth"
-                     AND I."Month" < M."StartMonth2"
+                WHEN I."Month" > M."IssueMonth"
+                     AND I."Month" <= M."EndMonth1"
                 THEN I."InsuFee"
               ELSE 0 END ) AS "InsuFee1" -- 第一年火險費用
            , SUM(
               CASE
-                WHEN I."Month" >= M."StartMonth2"
-                     AND I."Month" < M."StartMonth3"
+                WHEN I."Month" > M."EndMonth1"
+                     AND I."Month" <= M."EndMonth2"
                 THEN I."InsuFee"
               ELSE 0 END ) AS "InsuFee2" -- 第二年火險費用
            , SUM(
               CASE
-                WHEN I."Month" >= M."StartMonth3"
-                     AND I."Month" < M."StartMonth4"
+                WHEN I."Month" > M."EndMonth2"
+                     AND I."Month" <= M."EndMonth3"
                 THEN I."InsuFee"
               ELSE 0 END ) AS "InsuFee3" -- 第三年火險費用
            , SUM(
               CASE
-                WHEN I."Month" >= M."StartMonth4"
-                     AND I."Month" < M."StartMonth5"
+                WHEN I."Month" > M."EndMonth3"
+                     AND I."Month" <= M."EndMonth4"
                 THEN I."InsuFee"
               ELSE 0 END ) AS "InsuFee4" -- 第四年火險費用
            , SUM(
               CASE
-                WHEN I."Month" >= M."StartMonth5"
-                     AND I."Month" < M."StartMonth6"
+                WHEN I."Month" > M."EndMonth4"
+                     AND I."Month" <= M."EndMonth5"
                 THEN I."InsuFee"
               ELSE 0 END ) AS "InsuFee5" -- 第五年火險費用
       FROM MonthData M
@@ -599,31 +603,31 @@ BEGIN
            , M."BormNo"
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."StartMonth2"
+                 WHEN MLB."YearMonth" = M."EndMonth1"
                  THEN MLB."LoanBalance"
                ELSE 0 END
              )                       AS "LoanBal1" -- 發生日後第一年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."StartMonth3"
+                 WHEN MLB."YearMonth" = M."EndMonth2"
                  THEN MLB."LoanBalance"
                ELSE 0 END
              )                       AS "LoanBal2" -- 發生日後第二年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."StartMonth4"
+                 WHEN MLB."YearMonth" = M."EndMonth3"
                  THEN MLB."LoanBalance"
                ELSE 0 END
              )                       AS "LoanBal3" -- 發生日後第三年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."StartMonth5"
+                 WHEN MLB."YearMonth" = M."EndMonth4"
                  THEN MLB."LoanBalance"
                ELSE 0 END
              )                       AS "LoanBal4" -- 發生日後第四年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."StartMonth6"
+                 WHEN MLB."YearMonth" = M."EndMonth5"
                  THEN MLB."LoanBalance"
                ELSE 0 END
              )                       AS "LoanBal5" -- 發生日後第五年餘額
@@ -634,11 +638,11 @@ BEGIN
                                     AND MLB."FacmNo" = M."FacmNo"
                                     AND MLB."BormNo" = M."FacmNo"
                                     AND MLB."YearMonth" IN (
-                                            M."StartMonth2"
-                                          , M."StartMonth3"
-                                          , M."StartMonth4"
-                                          , M."StartMonth5"
-                                          , M."StartMonth6"
+                                            M."EndMonth1"
+                                          , M."EndMonth2"
+                                          , M."EndMonth3"
+                                          , M."EndMonth4"
+                                          , M."EndMonth5"
                                         )
       GROUP BY M."CustNo"
              , M."FacmNo"

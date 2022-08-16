@@ -107,7 +107,8 @@ public class L4101ReportD extends MakeReport {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
-		reportCode = reportCode + "-" + batchNo + "-D";
+		reportCode = reportCode + "-D";
+		reportItem = reportItem + "-" + batchNo;
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		try {
@@ -118,7 +119,7 @@ public class L4101ReportD extends MakeReport {
 			this.info("L4101ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, "撥款未齊件明細表", "", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, "", "A4", "L");
 		// 統一大小
 		this.setFont(1, 10);
 
@@ -128,13 +129,11 @@ public class L4101ReportD extends MakeReport {
 
 			for (Map<String, String> result : resultList) {
 
-				
-				
 				int lengthCustName = 20;
 				if (result.get("CustName").length() < 20) {
 					lengthCustName = result.get("CustName").length();
 				}
-				
+
 				// 明細資料第一行
 				print(1, 1, "　　");
 				print(0, 17, FormatUtil.pad9(result.get("CustNo"), 7), "R");
@@ -148,7 +147,8 @@ public class L4101ReportD extends MakeReport {
 
 //				每頁第25筆 跳頁 
 				if (pageCnt == 25) {
-					print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+					print(1, 1,
+							"－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 					print(1, 1, "小計");
 					print(0, 16, "" + pageCnt);
 					this.print(1, 85, "=====續下頁=====", "C");

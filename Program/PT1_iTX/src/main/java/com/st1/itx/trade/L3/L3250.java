@@ -25,6 +25,7 @@ import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -76,7 +77,9 @@ public class L3250 extends TradeBuffer {
 	AcReceivableCom acReceivableCom;
 	@Autowired
 	BaTxCom baTxCom;
-
+	@Autowired
+	public SendRsp sendRsp;
+	
 	private TitaVo titaVo;
 	private int iCustNo;
 	private int iFacmNo;
@@ -115,12 +118,15 @@ public class L3250 extends TradeBuffer {
 		iRvNo = titaVo.getParam("RvNo");
 		iAcctCode = titaVo.getParam("AcctCode");
 		// Check Input
+		if (!titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0005", ""); // 訂正需主管核可
+		}
 
 		checkInputRoutine();
 
 		// 沖正處理
 		repayEraseRoutine();
-		
+
 		if (wkRepayCode == 0) {
 			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 				wkRepayCode = 9; // 其他
@@ -130,13 +136,13 @@ public class L3250 extends TradeBuffer {
 		}
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo,0,0,99,BigDecimal.ZERO,titaVo); // 99-費用全部
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 			// 暫收款金額 (暫收借)
 			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-			
+
 //			// 費用科目
 			acDetail = new AcDetail();
 			acDetail.setDbCr("D");
@@ -149,14 +155,12 @@ public class L3250 extends TradeBuffer {
 				checkInsuRenew(acDetail, titaVo);
 			}
 			lAcDetail.add(acDetail);
-			
+
 			// 累溢收入帳(暫收貸)
 			loanCom.settleOverflow(lAcDetail, titaVo);
 
-			// 借： 本金利息、貸：暫收可抵繳
-			this.txBuffer.addAllAcDetailList(lAcDetail);
-
 			// 產生會計分錄
+			this.txBuffer.setAcDetailList(lAcDetail);
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
 
@@ -178,7 +182,7 @@ public class L3250 extends TradeBuffer {
 		// 查詢放款交易內容檔
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990, 0, ltitaHCode,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 0, 990, 0, ltitaHCode,
 				iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
@@ -190,9 +194,11 @@ public class L3250 extends TradeBuffer {
 			if (tx.getEntryDate() != iEntryDate) {
 				continue;
 			}
-			wkRepayCode = tx.getRepayCode();
+//			if (!tx.getCreateEmpNo().equals("999999")) {
+//			throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
+//		}			wkRepayCode = tx.getRepayCode();
 			// 註記交易內容檔
-			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(),tx.getBorxNo(), titaVo);
+			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 		}
 	}

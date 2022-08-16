@@ -122,26 +122,16 @@ public class BS401 extends TradeBuffer {
 		if (titaVo.get("ReconCode") != null) {
 			iReconCode = titaVo.getParam("ReconCode").trim();
 		}
-
+		String errorMsg = "";
 		if (iFunctionCode != 3) {
 			// hold 整批入帳總數檔
 			BatxHeadId tBatxHeadId = new BatxHeadId();
 			tBatxHeadId.setAcDate(iAcDate);
 			tBatxHeadId.setBatchNo(iBatchNo);
-			tBatxHead = batxHeadService.holdById(tBatxHeadId);
+			tBatxHead = batxHeadService.findById(tBatxHeadId);
 			if (tBatxHead == null) {
 				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
 			}
-			// update BatxStsCode 整批作業狀態
-			tBatxHead.setBatxStsCode("1"); // 0.正常 1.整批處理中
-			try {
-				batxHeadService.update(tBatxHead);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "BS401 update BatxHead " + tBatxHeadId + e.getErrorMsg());
-			}
-
-			this.batchTransaction.commit();
-
 			// findAll 整批入帳明細檔
 			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
 					Integer.MAX_VALUE);
@@ -156,7 +146,7 @@ public class BS401 extends TradeBuffer {
 				if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
 						|| "7".equals(t.getProcStsCode())) {
 					if (iFunctionCode == 1) {
-						throw new LogicException("E0010", "刪除時已有入帳成功資料，請執行<整批訂正>"); // E0010 功能選擇錯誤
+						errorMsg = "刪除時有入帳成功資料";
 					}
 					if (iFunctionCode == 5) {
 						lBatxDetail.add(t);
@@ -167,6 +157,26 @@ public class BS401 extends TradeBuffer {
 					}
 				}
 			}
+
+			if (!errorMsg.isEmpty()) {
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+						titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + errorMsg, titaVo);
+				return this.sendList();
+			}
+			
+			tBatxHead = batxHeadService.holdById(tBatxHeadId);
+			if (tBatxHead == null) {
+				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
+			}
+			// update BatxStsCode 整批作業狀態
+			tBatxHead.setBatxStsCode("1"); // 0.正常 1.整批處理中
+			try {
+				batxHeadService.update(tBatxHead);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "BS401 update BatxHead " + tBatxHeadId + e.getErrorMsg());
+			}
+
+			this.batchTransaction.commit();
 
 			if (iFunctionCode == 0) {
 				// 員工扣薪費用先入帳

@@ -362,21 +362,21 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
 
-			for (int i = 0; i <= 25; i++) {
+			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
 					tTempVo.putParam("OPTA" + i, titaVo.getParam("OPTA" + i));
 					tTempVo.putParam("AMTA" + i, titaVo.getParam("AMTA" + i));
 				}
 			}
 
-			for (int i = 0; i <= 25; i++) {
+			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTB" + i)) != 0) {
 					tTempVo.putParam("OPTB" + i, titaVo.getParam("OPTB" + i));
 					tTempVo.putParam("AMTB" + i, titaVo.getParam("AMTB" + i));
 				}
 			}
 
-			for (int i = 0; i <= 25; i++) {
+			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTC" + i)) != 0) {
 					tTempVo.putParam("OPTC" + i, titaVo.getParam("OPTC" + i));
 					tTempVo.putParam("AMTC" + i, titaVo.getParam("AMTC" + i));
