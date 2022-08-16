@@ -18,6 +18,29 @@ BEGIN
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
 
+    -- 固定CustUKey
+    MERGE INTO "TfCust" T
+    USING (
+      SELECT CASE
+               WHEN CUSP."LMSACN" = 601776 -- 2021-12-10 智偉修改 from Linda
+               THEN 'A111111131'
+             ELSE REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')
+             END             AS "CustId"
+      FROM "CU$CUSP" CUSP
+    ) S
+    ON (
+      S."CustId" = T."CustId"
+    )
+    WHEN NOT MATCHED THEN 
+    INSERT (
+        "CustId"
+      , "CustUKey"
+    ) VALUES (
+        S."CustId"
+      , SYS_GUID()
+    )
+    ;
+
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "CustMain" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "CustMain" DROP STORAGE';
@@ -25,7 +48,7 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "CustMain"
-    SELECT SYS_GUID()                     AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
+    SELECT TF."CustUKey"                  AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
           ,CASE
              WHEN CUSP."LMSACN" = 601776 -- 2021-12-10 智偉修改 from Linda
              THEN 'A111111131'
@@ -185,6 +208,11 @@ BEGIN
                FROM "LA$APLP"
                GROUP BY "LMSACN"
               ) APLP ON APLP."LMSACN" = CUSP."LMSACN"
+    LEFT JOIN "TfCust" TF ON TF."CustId" = CASE
+                                             WHEN CUSP."LMSACN" = 601776 -- 2021-12-10 智偉修改 from Linda
+                                             THEN 'A111111131'
+                                           ELSE REPLACE(TRIM(CUSP."CUSID1"),CHR(26),'')
+                                           END
     ;
 
     -- 記錄寫入筆數

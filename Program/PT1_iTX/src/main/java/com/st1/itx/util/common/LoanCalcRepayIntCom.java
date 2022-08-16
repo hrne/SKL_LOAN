@@ -386,6 +386,15 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		wkInterestFlag = "1".equals(iIntCalcCode) ? 1 : 2; // 1:按日計息 2:按月計息
 		wkExtraRepay = iExtraRepay;
 		wkTotalExtraRepay = BigDecimal.ZERO;
+
+		wkRateIncr = BigDecimal.ZERO; // 加碼利率
+		wkIndividualIncr = BigDecimal.ZERO; // 個別加碼利率
+		wkTermEndDate = 0; // 期款止日
+		wkCalcVoCount = 0; // 計息明細總筆數(從0開始)
+		wkSpecificDate = 0; // 指定基準日期
+		wkSpecificMons = 0; // 指定基準月數
+		wkDuraInt = BigDecimal.ZERO;
+
 		// 結案記號 = Y 時，部分償還本金是否內含利息 Y:是
 		if ("Y".equals(iCaseCloseFlag)) {
 			iExtraRepayFlag = "Y";
@@ -846,7 +855,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			break;
 		}
 		this.info("   wkIntEndDate    = " + wkIntEndDate);
-		
+
 		do {
 			wkIntEndDateX = 0;
 			findRateChangeRoutine(titaVo);

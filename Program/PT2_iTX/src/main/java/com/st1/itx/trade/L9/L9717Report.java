@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9717ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9717ServiceImpl.OutputSortBy;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("L9717Report")
 @Scope("prototype")
@@ -598,8 +599,16 @@ public class L9717Report extends MakeReport {
 	}
 
 	public boolean makePdf(TitaVo titaVo) throws LogicException {
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+//		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno)
+				.setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
+				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
+		
+		
+		this.open(titaVo, reportVo);
+		
 		this.setCharSpaces(0);
 
 		boolean result = fillData(titaVo);

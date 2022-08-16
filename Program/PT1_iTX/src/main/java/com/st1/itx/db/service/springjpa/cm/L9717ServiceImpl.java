@@ -102,7 +102,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " 			SELECT \"CustNo\" ";
 			sql += " 		  		  ,\"FacmNo\" ";
 			sql += " 		  		  ,CASE ";
-			sql += " 		   	 		 WHEN \"AcctCode\" = 990 THEN 9";
+			sql += " 		   	 		 WHEN \"AcctCode\" = '990' THEN 9";
 			sql += " 		   	 		 WHEN \"OvduTerm\" IN (1,2,3,4,5) THEN \"OvduTerm\" ";
 			sql += " 		   		   ELSE 0 END AS \"OvduTerm\" ";
 //			sql += " 		  		  ,\"OvduDays\" ";
@@ -256,7 +256,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " 	SELECT \"CustNo\" ";
 			sql += " 		  ,\"FacmNo\" ";
 			sql += " 		  ,CASE ";
-			sql += " 		   	 WHEN \"AcctCode\" = 990 THEN 9";
+			sql += " 		   	 WHEN \"AcctCode\" = '990' THEN 9";
 			sql += " 		   	 WHEN \"OvduTerm\" IN (1,2,3,4,5) THEN \"OvduTerm\" ";
 			sql += " 		   ELSE 0 END AS \"OvduTerm\" ";
 			sql += " 		  ,\"OvduDays\" ";

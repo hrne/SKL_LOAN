@@ -70,7 +70,7 @@ BEGIN
     )
     , txRawData AS (
       SELECT DISTINCT
-           , TRXDAT
+             TRXDAT
            , TRXNMT
            , LMSACN
       FROM LA$TRXP
