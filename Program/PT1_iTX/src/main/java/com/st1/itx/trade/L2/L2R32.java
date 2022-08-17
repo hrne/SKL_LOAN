@@ -35,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R32 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R32.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -110,7 +109,7 @@ public class L2R32 extends TradeBuffer {
 	}
 
 	private void getCloseBreachAmt(TitaVo titaVo) throws LogicException {
-		oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, 0, null, titaVo);
+		oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iTranDate,iCustNo, iFacmNo, 0, null, titaVo);
 		// 輸出清償違約金
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 			for (LoanCloseBreachVo v : oListCloseBreach) {

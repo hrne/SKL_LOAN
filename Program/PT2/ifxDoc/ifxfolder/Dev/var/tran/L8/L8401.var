@@ -170,9 +170,11 @@ C(3,#CHAIN,0,E(0,#DT2),s)
 D(8)
 @V(7)A(4,0,#AcDateEnd)V(5,#AcDateStart,#DT2)
 
-
-
-#FileDay=D,7,L
+!報送日期開放可輸入
+#FileDay=D,7,I
+C(3,#CHAIN,0,E(0,#DT2),s)
+D(8)	
+@V(7)A(4,0,#FileDay)V(5,#DT2,9999999)
 
 #FileNo=A,2,I
 E(0,1)

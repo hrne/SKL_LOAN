@@ -32,6 +32,7 @@ import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.trade.L9.L9130;
 import com.st1.itx.trade.L9.L9130Report;
+import com.st1.itx.trade.L9.L9130Report2022;
 import com.st1.itx.trade.L9.L9131;
 import com.st1.itx.trade.L9.L9131Report;
 import com.st1.itx.trade.L9.L9132;
@@ -107,6 +108,9 @@ public class L6101 extends TradeBuffer {
 	@Autowired
 	L9130Report l9130Report;
 
+	@Autowired
+	L9130Report2022 l9130Report2022;
+	
 	@Autowired
 	L9131Report l9131Report;
 
@@ -637,6 +641,7 @@ public class L6101 extends TradeBuffer {
 			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
 			
 			l9130Report.exec(titaVo);
+			l9130Report2022.exec(titaVo);
 			l9131Report.exec(titaVo);
 			l9131Report.close();
 			l9132Report.exec(titaVo);

@@ -414,9 +414,9 @@ public class L4101Batch extends TradeBuffer {
 		if (lBankRemit.size() > 0) {
 			RemitFormVo remitformVo = new RemitFormVo();
 			// 報表代號(交易代號)
-			remitformVo.setReportCode(titaVo.getTxCode());
+			remitformVo.setReportCode(titaVo.getTxCode() + "-F");
 			// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
-			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_整批");
+			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_整批" + "-" + batchNo);
 
 			remitForm.open(titaVo, remitformVo);
 
@@ -616,11 +616,10 @@ public class L4101Batch extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 //		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 
-		
 		l4101ReportE.setParentTranCode(parentTranCode);
 
 		// 撈資料組報表
-		l4101ReportE.exec(titaVo,acDate);
+		l4101ReportE.exec(titaVo, acDate);
 
 		// 寫產檔記錄到TxReport
 		long rptNod = l4101ReportE.close();

@@ -52,32 +52,16 @@ public class LM052 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void run() throws LogicException {
-		
-		// 帳務日(西元)
-		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
-		// 月底日(西元)
-		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
-		// 年
-		int iYear = mfbsdy / 10000;
-		// 月
-		int iMonth = (mfbsdy / 100) % 100;
-		// 當年月
-		int thisYM = 0;
 
-		// 判斷帳務日與月底日是否同一天 
-		if (tbsdy < mfbsdy) {
-			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
-			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
-		}
+		// 帳務日(民國)
+		int tbsdy = this.txBuffer.getTxCom().getTbsdy();
+		// 月底日(民國)
+		int mfbsdy = this.txBuffer.getTxCom().getMfbsdy();
+		// 上個月底日(民國)
+//		int lmndy = this.txBuffer.getTxCom().getLmndy();
 
-		thisYM = iYear * 100 + iMonth;
-
-		this.info("exec updLM052SP");
-//		updLM052ReportSP(thisYM);
-
-		this.info("active LM052 ");
-		
-		lM052report.exec(titaVo,thisYM);
+		lM052report.exec(titaVo, tbsdy, mfbsdy);
+	
 	}
 
 //	private void updLM052ReportSP(int yearMonth) {

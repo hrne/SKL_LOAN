@@ -82,8 +82,8 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 				searchstatus = " in (' ')";
 				searchMediaCode = " is null ";
 				break;
-			case 2: // 2.終止
-				searchstatus = " not in  (' ', '00')";
+			case 2: 
+				searchstatus = " not in  ('00')  AND \"StampCode\" IS NOT NULL ";
 				searchMediaCode = " = 'Y' ";
 				break;
 			case 3:

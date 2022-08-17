@@ -228,11 +228,11 @@ public class L3R11 extends TradeBuffer {
 			occursList.putParam("L3r11Interest", loanCalcRepayIntCom.getInterest());
 			occursList.putParam("L3r11DelayInt", loanCalcRepayIntCom.getDelayInt());
 			occursList.putParam("L3r11BreachAmt", loanCalcRepayIntCom.getBreachAmt());
-			occursList.putParam("L3r11Total", loanCalcRepayIntCom.getPrincipal().add(loanCalcRepayIntCom
-					.getInterest().add(loanCalcRepayIntCom.getDelayInt().add(loanCalcRepayIntCom.getBreachAmt()))));
+			occursList.putParam("L3r11Total", loanCalcRepayIntCom.getPrincipal().add(loanCalcRepayIntCom.getInterest()
+					.add(loanCalcRepayIntCom.getDelayInt().add(loanCalcRepayIntCom.getBreachAmt()))));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
-			
+
 			// 自本金利息內扣除催收還款金額
 			oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal()).subtract(wkOvduPaidPrin);
 			oInterest = oInterest.add(loanCalcRepayIntCom.getInterest()).subtract(wkOvduPaidInt);
@@ -276,8 +276,8 @@ public class L3R11 extends TradeBuffer {
 			}
 			// 計算清償違約金
 			if ("Y".equals(wkCollectFlag)) {
-				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, iBormNo, iListCloseBreach,
-						titaVo);
+				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, iBormNo,
+						iListCloseBreach, titaVo);
 			} else {
 				oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, iBormNo, iListCloseBreach,
 						titaVo);

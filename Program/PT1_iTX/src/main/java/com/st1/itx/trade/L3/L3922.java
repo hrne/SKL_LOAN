@@ -260,8 +260,8 @@ public class L3922 extends TradeBuffer {
 		// 結案區分 0:正常 1:展期 2:借新還舊 3:轉催收 4:催收戶本人清償 5:催收戶保證人代償 6:催收戶強制執行 7:轉列呆帳
 		// 8:催收部分轉呆 9:債權轉讓戶
 		if (iCaseCloseCode == 0 || iCaseCloseCode == 4 || iCaseCloseCode == 5 || iCaseCloseCode == 6) {
-			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, iBormNo, iListCloseBreach,
-					titaVo);
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, iBormNo,
+					iListCloseBreach, titaVo);
 		}
 		// 清償違約金
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {

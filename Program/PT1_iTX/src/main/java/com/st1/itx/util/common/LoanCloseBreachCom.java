@@ -139,17 +139,67 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	}
 
 	/**
-	 * 計算全部清償違約金 1.當期未繳(收取方式"1":即時收取 "2":領清償證明時收取) 2.交易明細(收取方式"2":領清償證明時收取)
+	 * 取得限制清償日期
 	 * 
 	 * @param iCustNo 戶號
 	 * @param iFacmNo 額度
-	 * @param iBormNo 撥款
-	 * @param iListVo 清償違約金當期明細
-	 * @param titaVo  TitaV
+	 * @param titaVo  TitaVo
+	 * @return prohibitDate 限制清償日期
+	 * @throws LogicException ....
+	 */
+	public int getProhibitDate(int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {
+		int prohibitDate = 0;
+
+		int wkFacmNoStart = 1;
+		int wkFacmNoEnd = 999;
+		if (iFacmNo > 0) {
+			wkFacmNoStart = iFacmNo;
+			wkFacmNoEnd = iFacmNo;
+		}
+		// 查詢額度主檔
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
+		if (lFacMain == null) {
+			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
+		}
+		// 依額度的清償違約條件計算清償違約金
+		for (FacMain tFacMain : lFacMain) {
+			// 查詢商品參數檔
+			FacProd tFacProd = facProdService.findById(tFacMain.getProdNo(), titaVo);
+			if (tFacProd == null) {
+				throw new LogicException(titaVo, "E0001", "商品參數檔 商品代碼 = " + tFacMain.getProdNo()); // 查詢資料不存在
+			}
+			// 是否限制清償 Y:是 N:否
+			if (!"Y".equals(tFacProd.getBreachFlag())) {
+				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
+				continue;
+			}
+			dDateUtil.init();
+			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
+			dDateUtil.setMons(tFacProd.getProhibitMonth());
+			if (prohibitDate == 0 || prohibitDate < dDateUtil.getCalenderDay()) {
+				prohibitDate = dDateUtil.getCalenderDay();
+			}
+		}
+
+		this.info("getProhibitDate  end" + prohibitDate);
+		return prohibitDate;
+	}
+
+	/**
+	 * 計算全部清償違約金 1.當期未繳(收取方式"1":即時收取 "2":領清償證明時收取) 2.交易明細(收取方式"2":領清償證明時收取)
+	 * 
+	 * @param iEntryDate 入帳日期(申請日期)
+	 * @param iCustNo    戶號
+	 * @param iFacmNo    額度
+	 * @param iBormNo    撥款
+	 * @param iListVo    清償違約金當期明細
+	 * @param titaVo     TitaV
 	 * @return 清償違約金計算明細
 	 * @throws LogicException LogicException
 	 */
-	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iCustNo, int iFacmNo, int iBormNo,
+	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo,
 			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmtAll  ");
 
@@ -180,24 +230,38 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				continue;
 			}
 
-			// 前期、本期
-			if (iListVo != null && iListVo.size() > 0) {
-				int facmNo = 0;
-				for (LoanCloseBreachVo iVo : iListVo) {
-					if (iVo.getFacmNo() == tFacMain.getFacmNo()) {
-						if (facmNo == 0 || facmNo != iVo.getFacmNo()) {
-							this.info("facmNo == 0 || facmNo != iVo.getFacmNo() ");
-							loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), 0, titaVo);
-							facmNo = iVo.getFacmNo();
-						}
-						if (iVo.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
-							addListVoRoutine(iVo, titaVo);
+			dDateUtil.init();
+			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
+			dDateUtil.setMons(tFacProd.getProhibitMonth());
+			dDateUtil.getCalenderDay();
+//			限制清償期間內
+			if (dDateUtil.getCalenderDay() >= iEntryDate) {
+				this.info("skip" + dDateUtil.getCalenderDay() + "," + iEntryDate);
+			} else {
+				// 前期、本期
+				if (iListVo != null && iListVo.size() > 0) {
+					int facmNo = 0;
+					for (LoanCloseBreachVo iVo : iListVo) {
+						if (iVo.getFacmNo() == tFacMain.getFacmNo()) {
+							//同額度只load一次BorTx
+							if (facmNo == 0 || facmNo != iVo.getFacmNo()) {
+								this.info("facmNo == 0 || facmNo != iVo.getFacmNo() ");
+								loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), 0, titaVo);
+								facmNo = iVo.getFacmNo();
+							}
+							if (iVo.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
+								addListVoRoutine(iVo, titaVo);
+							}
 						}
 					}
+
+				} else {
+					this.info("iListVo = null");
+					//貸出金額(放款餘額)為0
+					if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
+						loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
+					}
 				}
-			} else {
-				this.info("iListVo = null");
-				loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
 			}
 			// 計算清償違約金 By 額度
 			calculateRoutine(tFacMain, tFacProd, titaVo);

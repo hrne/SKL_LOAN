@@ -1584,7 +1584,8 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		if ("Y".equals(collectFlag)) {
-			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, 0, iListCloseBreach, titaVo);
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, 0,
+					iListCloseBreach, titaVo);
 		} else {
 			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, 0, iListCloseBreach, titaVo);
 		}
@@ -1712,13 +1713,11 @@ public class BaTxCom extends TradeBuffer {
 		if (repayIntDate == 0) {
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getRepayPriority() == 5 && ba.getPayIntDate() > 0) {
-					if (payIntDate != ba.getPayIntDate() || facmNo != ba.getFacmNo()) {
-						payIntDate = ba.getPayIntDate();
-						facmNo = ba.getFacmNo();
-						payintDateAmt = getPayintDateAmt(payIntDate, facmNo);
-						settlePayintDateAmt(payIntDate, facmNo);
-						break;
-					}
+					payIntDate = ba.getPayIntDate();
+					facmNo = ba.getFacmNo();
+					payintDateAmt = getPayintDateAmt(payIntDate, facmNo);
+					settlePayintDateAmt(payIntDate, facmNo);
+					break;
 				}
 			}
 		}

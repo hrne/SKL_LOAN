@@ -5,7 +5,7 @@
 <sub type="SYS" name="label">
 
 !#TXCD
-!T(3,L8401)
+!T(3,L8402)
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
@@ -38,17 +38,29 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,80];">
+!---------- ["@",#Btn5, "@B087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔"],
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,120];">
 [
-["[L8401]                                 產生JCIC日報媒體檔"],
-["#FdAcDate+會計日期",#AcDateStart,"~",#AcDateEnd],
+["[L8402]                                 產生JCIC月報媒體檔"],
+["#R1+@會計日期",#ACCTDATE],
 ["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
 ["#FdJcicEmpName+審查聯絡人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
 
 ["@"],
 ["@",#BtnAll,"@全選"],
-["@",#Btn1,"@B204 聯徵授信餘額日報檔"],
-["@",#Btn2,"@B211 聯徵每日授信餘額變動資料檔"],
+["@",#Btn1, "@B201 聯徵授信餘額月報檔"],
+["@",#Btn2, "@B207 授信戶基本資料檔"],
+["@",#Btn3, "@B080 授信額度資料檔"],
+["@",#Btn4, "@B085 帳號轉換資料檔"],
+["@",#Btn5, "@B087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔"],
+["@",#Btn6, "@B090 擔保品關聯檔資料檔"],
+["@",#Btn7, "@B092 不動產擔保品明細檔"],
+["@",#Btn8, "@B093 動產及貴重物品擔保品明細檔"],
+["@",#Btn9, "@B094 股票擔保品明細檔"],
+["@",#Btn10, "@B095 不動產擔保品明細-建號附加檔"],
+["@",#Btn11,"@B096 不動產擔保品明細-地號附加檔"],
+["@",#Btn12,"@B680 「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔"],
+["@",#Btn13,"@BRel 聯徵授信「同一關係企業及集團企業」資料報送檔"],
 ["@"],
 ]
 !---------- AP Button AREA ----------
@@ -60,8 +72,6 @@ E(0,5)
 
 
 !---------- Required Input Setting ----------
-#FdAcDate=X,2,L
-T(3,*)
 #FdFileDay=X,2,L
 T(3,*)
 #FdFileNo=X,2,L
@@ -74,7 +84,7 @@ T(3, )
 ! 業務類型
 #BusinessType=X,2,S
 T(3,LN)
-
+!調出JCIC放款報送人員資料
 #SendL6R28=X,1,S
 E(0,@RimFuncCode,5)
 T(2,@RimTxCode,L8401)
@@ -87,7 +97,7 @@ T(2,@JcicEmpTel,#L6R28JcicEmpTel)
 
 
 ! 必輸欄位
-##loop{times:1,i:1}
+##loop{times:13,i:1}
 #R{i}=X,1,L
 INVOKEJS(SHOW,#R{i},0)
 K(LIGHT,#R{i},TXTRED,0)
@@ -100,26 +110,26 @@ T(3,@R1,*)
 
 #BtnAll=X,1,I,ui:button;value: ;enable:1;tabbable:0
 
-##loop {times:2,i:1}
+##loop {times:13,i:1}
 #Btn{i}=X,1,I,ui:button;value: ;enable:1;tabbable:0
 ##end
 
 #BtnBind=X,1,S
 BIND(#BtnAll,click, {cmd=CALLSEND;DOCODE=BtnAllProc})
-##loop {times:2,i:1}
+##loop {times:13,i:1}
 BIND(#Btn{i},click, {cmd=CALLSEND;DOCODE=Btn{i}Proc})
 ##end
 
 #BtnAllProc=@,1,S
 C(5,#BtnAll,V,T(3,@BtnAll, ),T(3,@BtnAll,V))
-##loop {times:2,i:1}
+##loop {times:13,i:1}
 T(2,@Btn{i},#BtnAll)
-C(5,#Btn{i},V,T(3,@DAILY{i},Y),T(3,@DAILY{i}, )) 
+C(5,#Btn{i},V,T(3,@MONTHLY{i},Y),T(3,@MONTHLY{i}, )) 
 ##end
 
-##loop {times:2,i:1}
+##loop {times:13,i:1}
 #Btn{i}Proc=@,1,S
-C(5,#Btn{i},V,T(3,@Btn{i}, )T(3,@DAILY{i}, )T(3,@BtnAll, ),T(3,@DAILY{i},Y)T(3,@Btn{i},V)) 
+C(5,#Btn{i},V,T(3,@Btn{i}, )T(3,@MONTHLY{i}, )T(3,@BtnAll, ),T(3,@MONTHLY{i},Y)T(3,@Btn{i},V)) 
 ##end
 
 !---------- AP TEXT AREA Variables ----------
@@ -132,49 +142,29 @@ T(4,DATE$)
 #DT2=D,7,S
 T(1,#DT1,2,7)
 
-
 #DT_YM=A,5,S
 T(1,#DT1,2,5)
 
 ! #DT_MM_LAST=A,2,S
 ! E(0,#DT_MM-1)
 
-!會計日期
-!#ACCTDATE=D,7,L
-!T(2,#DT2)
-!!@V(7)A(DATE,0,#ACCTDATE)
-!!V(5,0,#DT2)
-
-![上營業日期C1200-LTXDY]民國年
-#DT3=D,8,S
-T(4,LBSDY$)
-#DT4=D,7,S
-T(1,#DT3,2,7)
-
 !日曆日
 #DT5=X,8,S
 T(4,#SYSCDATE)
 
 #Day=D,7,L
-T(1,#DT1,2,7)
+T(1,#DT5,2,7)
 E(0,@FileDay,#Day)
 
-!會計日期起迄
-#AcDateStart=D,7,I
-C(3,#CHAIN,0,E(0,#DT2),s)
-D(8)	
-@V(7)A(4,0,#AcDateStart)V(5,0010101,#DT2)
+!會計日期
+#ACCTDATE=D,7,L
+T(2,#DT2)
+@V(7)A(DATE,0,#ACCTDATE)
+V(5,0,#DT2)
 
-#AcDateEnd=D,7,I
-C(3,#CHAIN,0,E(0,#DT2),s)
-D(8)
-@V(7)A(4,0,#AcDateEnd)V(5,#AcDateStart,#DT2)
-
-!報送日期開放可輸入
 #FileDay=D,7,I
-C(3,#CHAIN,0,E(0,#DT2),s)
-D(8)	
-@V(7)A(4,0,#FileDay)V(5,#DT2,9999999)
+@V(7)A(4,0,#FileDay)V(5,#Day,9999999)
+
 
 #FileNo=A,2,I
 E(0,1)
@@ -183,8 +173,8 @@ E(0,1)
 #JcicEmpTel=x,16,L
 
 
-##loop {times:2,i:1} 
-#DAILY{i}=X,1,S
+##loop {times:13,i:1} 
+#MONTHLY{i}=X,1,S
 ##end
 
 ! [調Rim相關]
@@ -200,15 +190,15 @@ E(0,1)
 </sub>
 
 
-!---------- TXFORM = L8401 ----------1個TOTA要印多張單據,要tota-mode="1"
-!<sub type="FORM" name="L8401" tota-mode="1">
-<sub type="FORM" name="L8401">
+!---------- TXFORM = L8402 ----------1個TOTA要印多張單據,要tota-mode="1"
+!<sub type="FORM" name="L8402" tota-mode="1">
+<sub type="FORM" name="L8402">
 
 !#SCRPRT=_,_,S
-!C(5,#TXFORM,L8401,$,S)
+!C(5,#TXFORM,L8402,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L8401] 產生JCIC日報媒體檔)
+T(3,[L8402] 產生JCIC月報媒體檔)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -220,11 +210,9 @@ T(3,[L8401] 產生JCIC日報媒體檔)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#AcDateStart
-#AcDateEnd
 #FileNo
-##loop {times:2,i:1}
-#DAILY{i}
+##loop {times:13,i:1}
+#MONTHLY{i}
 ##end
 
 </sub>
@@ -232,15 +220,14 @@ T(3,[L8401] 產生JCIC日報媒體檔)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L8401^
+TXFORM=L8402^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
 </sub>
 
-<sub type="PART" name="L8401" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+<sub type="PART" name="L8402" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
 [
-["[L8401]                                 產生JCIC日報媒體檔"],
-[""],
+["[L8402]                                 產生JCIC月報媒體檔"],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

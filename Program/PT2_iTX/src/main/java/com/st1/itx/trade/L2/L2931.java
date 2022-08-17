@@ -112,7 +112,8 @@ public class L2931 extends TradeBuffer {
 			caculate(titaVo);
 		}
 		// 計算清償違約金
-		oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iCustNo, iFacmNo, iBormNo, iListCloseBreach, titaVo);
+		oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, iBormNo,
+				iListCloseBreach, titaVo);
 		if (oListCloseBreach == null || oListCloseBreach.size() == 0) {
 			throw new LogicException(titaVo, "E2003", ""); // 查無資料
 		}

@@ -547,7 +547,7 @@ public class L9717Report extends MakeReport {
 				break;
 			}
 
-			if (currentSort != OutputSortBy.LargeAmt_Customer) {
+			if (currentSort != OutputSortBy.LargeAmt_Customer || currentSort != OutputSortBy.Year) {
 	
 				this.print(1, 1, newBorder);
 				// F2 一期件數 26 C

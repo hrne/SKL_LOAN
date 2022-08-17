@@ -29,6 +29,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.springjpa.cm.L2077ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -55,6 +56,9 @@ public class L2077 extends TradeBuffer {
 	public ClFacService clFacService;
 	@Autowired
 	public L2077ServiceImpl l2077ServiceImpl;
+
+	@Autowired
+	public LoanCloseBreachCom loanCloseBreachCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -191,6 +195,7 @@ public class L2077 extends TradeBuffer {
 				if (receiveDate > 0) {
 					receiveDate = receiveDate - 19110000;
 				}
+
 
 				occursList.putParam("OOTranDate", entryDate);
 				occursList.putParam("OOFunCode", result.get("FunCode"));

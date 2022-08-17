@@ -79,7 +79,7 @@ public class L3250 extends TradeBuffer {
 	BaTxCom baTxCom;
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	private TitaVo titaVo;
 	private int iCustNo;
 	private int iFacmNo;
@@ -194,9 +194,10 @@ public class L3250 extends TradeBuffer {
 			if (tx.getEntryDate() != iEntryDate) {
 				continue;
 			}
-//			if (!tx.getCreateEmpNo().equals("999999")) {
-//			throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
-//		}			wkRepayCode = tx.getRepayCode();
+			if (!tx.getCreateEmpNo().equals("999999")) {
+				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
+			}
+			wkRepayCode = tx.getRepayCode();
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());

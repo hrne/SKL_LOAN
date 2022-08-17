@@ -808,8 +808,12 @@ HIDE(#BTN1,#FuncCode,#LbBreach)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 
+#BaseRateX=X,2,L
+T(3, %)
+
 #init=X,1,S
 HIDE(#what)
+HIDE(#BaseRate,#BaseRateX,#LbBaseRateX)
 
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -846,6 +850,7 @@ C(3,#FuncCode,2,K(MODIFYBUTTON,修改)E(0,@RELCD,2)E(0,@ACTFG,1),$)
 C(3,#FuncCode,4,K(MODIFYBUTTON,刪除)E(0,@RELCD,2)E(0,@ACTFG,1),$)
 C(3,#FuncCode,5,K(MODIFYBUTTON,查詢)E(0,@RELCD,0)E(0,@ACTFG,0),$)
 C(3,#FuncCode,5,K(NOBUTTON,CLOSEY),$)
+C(3,#FuncCode,5,SHOW(#LbBaseRateX),SHOW(#BaseRate,#BaseRateX))
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S
@@ -1331,7 +1336,7 @@ T(2,@CoorgnizerX,#L2r13FullName)
 
 #WKSHOWLB=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX
+    SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX
     ,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#TwHandlingFee
     ,#CreditSysNo,#AmortizedCode,#AmortizedCodeX,#TwApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq
     ,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate
@@ -1347,7 +1352,7 @@ C(3,#UpdateCode,1,
     ,#LbRelationName,#LbRelationId,#LbRelationBirthday,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb
     ,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb,#LbBreach)
     C(3,#DepartmentCode,0,HIDE(#BreachFlag,#ProdBreachFlag,#Breach)SHOW(#LbBreach),SHOW(#BreachFlag,#ProdBreachFlag,#Breach)HIDE(#LbBreach))
-   ,SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX
+   ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX
    ,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbHandlingFee,#LbCreditSysNo,#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX
    ,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline
    ,#RepayCodeX,#RepayBankX,#LbRepayAcctNo,#PostCodeX,#RelationCodeX,#LbRelationName,#LbRelationId,#LbRelationBirthday
@@ -1461,9 +1466,9 @@ T(2,@FdIntCalcCode,#WkStar)
 
 #ShowP2=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#RateIncr,#RateIncrX,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#CreditSysNo)
+    SHOW(#BaseRateCodeX,#LbProdRateX,#RateIncr,#RateIncrX,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#CreditSysNo)
     HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo)
-   ,SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo)
+   ,SHOW(#BaseRateCodeX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo)
     HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#CreditSysNo))
 C(3,#UpdateCode,1,$,s)
 C(5,#L2r01IncrFlag,Y,T(F,@RateIncr,1)T(F,@IndividualIncr,0)
@@ -1560,10 +1565,10 @@ E(0,@BaseRate,#L2r06Rate)
 
 #FdBaseRate=X,2,L
 
-#BaseRate=n,2.4,L
+!8/17 配合少玄開放可修正
+#BaseRate=n,2.4,I
 C(3,#FuncCode,5,s,$)
 ! E(0,#L2r06Rate)
-
 !#Wk_BaseRate=X,8,S
 !X(#BaseRate)
 !P(R,#Wk_BaseRate)
@@ -1822,6 +1827,7 @@ C(3,#Precision,0,E(0,#TwApplAmt),E(0,#UsApplAmt))
 
 #AcctCode=A,3,I
 C(3,#UpdateCode,1,$,s)
+C(3,#L2r05UtilAmt,0,$,s)
 HELP(#FacmAcctCodeHelp)
 @
 C(4,#L2r05AcctCode,$,C(5,#AcctCode,#L2r05AcctCode,s,$))
@@ -3711,7 +3717,7 @@ C(3,#CheckCode,0,$,S)
 ["<font color=red>@利率"],
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#BTN2,#ProdNoX],
 ["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
-["#FdBaseRate+指標利率",#LbBaseRateX],
+["#FdBaseRate+指標利率",#BaseRate,#BaseRateX,#LbBaseRateX],
 ["#FdProdRate+商品利率",#LbProdRateX],
 ["#FdRateIncr+加碼利率",#RateIncr,#LbRateIncrX,#RateIncrX],
 ["#FdIndividualIncr+個別加碼利率",#IndividualIncr,#LbIndividualIncrX,#IndividualIncrX],
@@ -3852,7 +3858,7 @@ T(3,[L2154] 額度資料維護)
 <sub type="TIM">
 
 #FuncCode#CustNo#FacmNo#CustId#ProdNo#BaseRateCode#RateIncr#IndividualIncr
-#ApproveRate#RateCode#FirstRateAdjFreq#RateAdjFreq#CurrencyCode#TimApplAmt
+#ApproveRate#RateCode#FirstRateAdjFreq#RateAdjFreq#CurrencyCode#TimApplAmt#BaseRate
 #AcctCode#LoanTermYy#LoanTermMm#LoanTermDd#AmortizedCode#FreqBase
 #PayIntFreq#RepayFreq#UtilDeadline#GracePeriod
 #TimAcctFee#TimHandlingFee#GuaranteeDate
