@@ -871,6 +871,14 @@ E(0,@ProdRate,#BaseRate+#L2r01ProdIncr)
 E(0,@ApproveRate,#BaseRate+#RateIncr)
 C(3,#BaseRateCode,99,E(0,@ApproveRate,#L2r05ApproveRate),$)
 
+#SendL2r09A=X,1,S
+C(3,#RepayCode,2,$,S)
+C(4,#RepayBank,S,$)
+T(2,@RimBankCode,#RepayBank)
+RESET_RIM(#SendL2r09A,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+T(2,@RepayBankX,#L2r09BankItem)
 
 !---- P4 金額日期
 #INVK4=X,1,S
@@ -1740,22 +1748,24 @@ C(3,#RateCode,3,$,S)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 ! @V(2,0)
 
+!首次利率調整週期
+#FirstRateAdjFreq=X,2,S
+
 ![首次利率調整日期]
 !自動顯示可修改 L2R05
 #FdFirstAdjRateDate=X,2,L
 
-#FirstAdjRateDate=D,7,L
+#FirstAdjRateDate=D,7,I
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 C(3,#RateCode,3,$,S)
-E(0,#L2r05FirstAdjRateDate)
-C(3,#L2r05FirstAdjRateDate,0,E(0,#WKFADJ),$)
-! @A(DATE,0,#FirstAdjRateDate)
+C(3,#L2r05FirstAdjRateDate,0,E(0,#WKFADJ),E(0,#L2r05FirstAdjRateDate))
+D(8)
+@
+A(DATE,0,#FirstAdjRateDate)
 ! V(6,010101,#DrawdownDate)
 ! V(6,#MaturityDate,9991231)
 
 
-!首次利率調整週期
-#FirstRateAdjFreq=X,2,S
 
 #Wait1=X,1,I 
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
@@ -1833,14 +1843,6 @@ T(3,)T(H,#RepayCode,#RepayCodeHelp)
 
 #RepayBank=X,3,S
 
-#SendL2r09A=X,1,S
-C(3,#RepayCode,2,$,S)
-C(4,#RepayBank,S,$)
-T(2,@RimBankCode,#RepayBank)
-RESET_RIM(#SendL2r09A,L2R09)
-S(L2R09,1,#RimTxCode,#RimBankCode)
-R(1,L2R09)
-T(2,@RepayBankX,#L2r09BankItem)
 
 #RepayBankX=X,20,L
 

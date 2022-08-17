@@ -153,10 +153,11 @@ public class L3240 extends TradeBuffer {
 		// Check Input
 		checkInputRoutine();
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo,0,0,99,BigDecimal.ZERO,titaVo); // 99-費用全部
-
+		// 暫收款金額 (暫收借)
+		loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+		
 		// 沖正處理
 		repayEraseRoutine();
-		this.txBuffer.setAcDetailList(lAcDetail);
 		if (wkRepayCode == 0) {
 			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 				wkRepayCode = 9; // 其他
@@ -177,9 +178,6 @@ public class L3240 extends TradeBuffer {
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
-			// 暫收款金額 (暫收借)
-			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-			
 			// THC 暫收款－沖正
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
@@ -188,8 +186,7 @@ public class L3240 extends TradeBuffer {
 			acDetail.setTxAmt(wkTxAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
-			lAcDetail.add(acDetail);
-			
+			lAcDetail.add(acDetail);			
 			// 累溢收入帳(暫收貸)
 			loanCom.settleOverflow(lAcDetail, titaVo);
 			

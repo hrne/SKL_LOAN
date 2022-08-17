@@ -135,6 +135,9 @@ public class PdfGenerator extends CommBuffer {
 
 	// 設定要輸出的Stream
 	private PdfContentByte cb = null;
+
+	private PdfContentByte underContent;
+
 	private ReportVo reportVo;
 
 	private BaseFont baseFont;
@@ -355,6 +358,10 @@ public class PdfGenerator extends CommBuffer {
 
 		this.xPoints = stamper.getWriter().getPageSize().getWidth();
 		this.yPoints = stamper.getWriter().getPageSize().getHeight();
+
+		underContent = stamper.getUnderContent(1);
+
+		setWatermark();
 	}
 
 	private void openWithNewPdf(String outfile, Map<String, Object> map) throws DocumentException, IOException {
@@ -423,9 +430,8 @@ public class PdfGenerator extends CommBuffer {
 		baseFont = setBaseFont(mapFont);
 		adjPdfFontSize(mapFontSize);
 
-		if (watermarkFlag) {
-			this.setWatermark(writer.getDirectContentUnder(), document);
-		}
+		underContent = writer.getDirectContentUnder();
+		setWatermark();
 	}
 
 	private void printPicture(HashMap<String, Object> map) throws DocumentException, IOException, LogicException {
@@ -629,7 +635,6 @@ public class PdfGenerator extends CommBuffer {
 	}
 
 	private void setNewPage() throws DocumentException, IOException {
-		PdfContentByte underContent;
 		// 新頁
 		if (reportVo.isUseDefault()) {
 			if (this.nowPage > 0) {
@@ -652,9 +657,7 @@ public class PdfGenerator extends CommBuffer {
 			document.newPage();
 			underContent = writer.getDirectContentUnder();
 		}
-		if (watermarkFlag) {
-			this.setWatermark(underContent, document);
-		}
+		setWatermark();
 	}
 
 	private String setOutputFile(String fileName, String fileOutput) {
@@ -726,12 +729,14 @@ public class PdfGenerator extends CommBuffer {
 	/**
 	 * 浮水印
 	 * 
-	 * @param pdfContentByte PdfContentByte
-	 * @param document       Document
 	 * @throws IOException       IOException
 	 * @throws DocumentException DocumentException
 	 */
-	private void setWatermark(PdfContentByte pdfContentByte, Document document) throws IOException, DocumentException {
+	private void setWatermark() throws IOException, DocumentException {
+
+		if (!watermarkFlag) {
+			return;
+		}
 
 		PdfGState graphicState = new PdfGState();
 		graphicState.setFillOpacity(0.7f);
@@ -758,20 +763,20 @@ public class PdfGenerator extends CommBuffer {
 		String rptTime = new SimpleDateFormat("HHmmss").format(rptCreateDate);
 		watermark.append(rptUtil.showRocDate(rptDate, 2)).append(" ").append(rptUtil.showTime(rptTime));
 
-		pdfContentByte.setGState(graphicState);
-		pdfContentByte.beginText();
-		pdfContentByte.setFontAndSize(tmpBaseFont, 12);
-		pdfContentByte.setColorFill(BaseColor.LIGHT_GRAY);
+		underContent.setGState(graphicState);
+		underContent.beginText();
+		underContent.setFontAndSize(tmpBaseFont, 12);
+		underContent.setColorFill(BaseColor.LIGHT_GRAY);
 
 		float widthMax = document.getPageSize().getWidth();
 		float heightMax = document.getPageSize().getHeight();
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
-				pdfContentByte.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);
+				underContent.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);
 			}
 		}
-		pdfContentByte.endText();
+		underContent.endText();
 	}
 
 	private void setWatermarkFlag(String fileCode) {

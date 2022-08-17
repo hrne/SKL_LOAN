@@ -1583,7 +1583,7 @@ public class LoanCom extends TradeBuffer {
 //     額度 002 TxAmt = $100
 //          Db: TAV $210
 //                 Cr: TAV $310
-
+// 
 		BigDecimal txAmt = BigDecimal.ZERO;
 		BigDecimal tempAmt = BigDecimal.ZERO;
 		BigDecimal overAmt = BigDecimal.ZERO;
