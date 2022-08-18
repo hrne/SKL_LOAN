@@ -1263,6 +1263,7 @@ T(3,[L3420] 結案登錄-不可欠繳)
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustId#ApplNo
 #TwReduceAmt#UsReduceAmt#TwTrfBadAmt#UsTrfBadAmt
+#TwTrfOvDuAmt#UsTrfOvDuAmt
 ##loop{times:20,n:1}
 #FacmBormNo{n}
 #IntSEDate{n}

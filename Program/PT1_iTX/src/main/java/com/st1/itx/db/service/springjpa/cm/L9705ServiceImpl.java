@@ -66,8 +66,8 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      from \"LoanBorTx\"                      ";
 			sql += "      where \"TitaTxCd\" in ('L3711','L3712') ";
 			sql += "        and \"TitaHCode\" = 0                 ";
-			sql += "        and \"TitaCalDy\" >= :sday            ";
-			sql += "        and \"TitaCalDy\" <= :eday            ";
+			sql += "        and \"AcDate\" >= :sday            ";
+			sql += "        and \"AcDate\" <= :eday            ";
 			sql += " ) LBT on LBT.\"CustNo\" = M.\"CustNo\"       ";
 			sql += "      and LBT.\"FacmNo\" = M.\"FacmNo\"       ";
 			sql += "      and LBT.\"BormNo\" = M.\"BormNo\"       ";
@@ -96,8 +96,8 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      where \"TitaTxCd\" in ('L3200')         ";
 			sql += "        and \"TitaHCode\" = 0                 ";
 			sql += "        and \"ExtraRepay\" > 0                ";
-			sql += "        and \"TitaCalDy\" >= :sday            ";
-			sql += "        and \"TitaCalDy\" <= :eday            ";
+			sql += "        and \"AcDate\" >= :sday            ";
+			sql += "        and \"AcDate\" <= :eday            ";
 			sql += " ) LBT on LBT.\"CustNo\" = M.\"CustNo\"       ";
 			sql += "      and LBT.\"FacmNo\" = M.\"FacmNo\"       ";
 			sql += "      and LBT.\"BormNo\" = M.\"BormNo\"       ";
@@ -118,6 +118,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case "3": // 利率變動
 		case "4": // 部份還款
 			sql += "    AND M.\"CustNo\" > 0 ";
+			sql += "    AND LBT.\"CustNo\" IS NOT NULL";
 			dayFg = "1";
 			break;
 		case "5": // 償還方式變更

@@ -26,16 +26,21 @@ public class LM029Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
+	public int iYearMonth;
+
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @throws LogicException
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 
 		List<Map<String, String>> listLM029 = null;
+
+		iYearMonth = yearMonth;
 
 		try {
 			listLM029 = lM029ServiceImpl.findAll(titaVo, yearMonth);
@@ -46,6 +51,18 @@ public class LM029Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LM029ServiceImpl findAll error = " + errors.toString());
 		}
+
+		try {
+			listLM029 = lM029ServiceImpl.findAll2(titaVo, yearMonth);
+			exportExcel2(titaVo, listLM029);
+
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LM029ServiceImpl findAll error = " + errors.toString());
+		}
+
+		makeExcel.close();
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM029) throws LogicException {
@@ -53,30 +70,27 @@ public class LM029Report extends MakeReport {
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表",
 				"LM029_底稿_放款餘額明細表.xlsx", "la$w30p");
-		
+
 		String today = dDateUtil.getNowStringBc();
-		
+
 		// 表頭
 		makeExcel.setValue(2, 20, "日　　期：" + this.showBcDate(today, 1));
 		makeExcel.setValue(3, 20, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
-		
-		
 		if (listLM029 == null || listLM029.isEmpty()) {
 
 			makeExcel.setValue(6, 1, "本日無資料", "L");
 
 		} else {
-			
 
 			int row = 6;
 
-			for (Map<String, String> tLDVo : listLM029) {
+			for (Map<String, String> r : listLM029) {
 
 				for (int i = 0; i <= 25; i++) {
 
-					String fieldValue = tLDVo.get("F" + i);
+					String fieldValue = r.get("F" + i);
 
 					int col = i + 1;
 
@@ -128,7 +142,64 @@ public class LM029Report extends MakeReport {
 			makeExcel.formulaCaculate(5, 17);
 		}
 
-		makeExcel.close();
+	}
+
+	private void exportExcel2(TitaVo titaVo, List<Map<String, String>> listLM029) throws LogicException {
+		this.info("LM029Report exportExcel2");
+
+		makeExcel.setSheet("Deliquency");
+
+		// 單位元位置
+		int unitCol = iYearMonth / 100 + 1;
+		makeExcel.setValue(2, unitCol, "單位：元", "R");
+
+		if (listLM029 == null || listLM029.isEmpty()) {
+
+			makeExcel.setValue(3, 2, "本日無資料", "L");
+
+		} else {
+			// 起始欄
+			int col = 2;
+
+
+			for (Map<String, String> r : listLM029) {
+
+				//項目(年月日)
+				int yearMonth = Integer.valueOf(r.get("YearMonth"));
+				int year = yearMonth / 100;
+				int month = yearMonth % 100;
+				makeExcel.setValue(col, 2, year + "/" + month, "C");
+				
+				//逾1-2期金額
+				BigDecimal onetwoAmt = r.get("12Amt").isEmpty() || r.get("12Amt") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("12Amt"));
+				makeExcel.setValue(col, 3, onetwoAmt, "#,##0", "R");
+				
+				//放款總餘額
+				BigDecimal totalAmt = r.get("totalAmt").isEmpty() || r.get("totalAmt") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("totalAmt"));
+				makeExcel.setValue(col, 4, totalAmt, "#,##0", "R");
+				
+				//逾1~2期佔總額比
+				BigDecimal onetwoRate = r.get("12Rate").isEmpty() || r.get("12Rate") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("12Rate"));
+				makeExcel.setValue(col, 5, onetwoRate, "R");
+								
+				//逾放總額
+				BigDecimal threeAmt = r.get("oAmt").isEmpty() || r.get("oAmt") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("oAmt"));
+				makeExcel.setValue(col, 6, threeAmt, "#,##0", "R");
+								
+				//放款逾放比
+				BigDecimal threeRate = r.get("oRate").isEmpty() || r.get("oRate") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("oRate"));
+				makeExcel.setValue(col, 7, threeRate, "R");
+				
+				col++;
+
+			} // for
+
+		}
 
 	}
 

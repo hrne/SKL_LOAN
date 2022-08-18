@@ -21,6 +21,7 @@ import com.st1.itx.db.service.springjpa.cm.L4455ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -55,9 +56,9 @@ public class L4455Report extends MakeReport {
 	public TxBuffer txBuffer;
 
 	// 自訂表頭
-	
+
 	private String irepaybank = "";
-	
+
 	private int acdate = 0;
 	private String year = "";
 	private String month = "";
@@ -80,7 +81,7 @@ public class L4455Report extends MakeReport {
 	private BigDecimal totBreachAmt = new BigDecimal("0");
 	private BigDecimal totTempDr = new BigDecimal("0");
 	private BigDecimal totTempCr = new BigDecimal("0");
-	private BigDecimal totShortfall = new BigDecimal("0");			
+	private BigDecimal totShortfall = new BigDecimal("0");
 	// 業務科目 合計
 
 	private BigDecimal RepayAmt = new BigDecimal("0");
@@ -130,8 +131,8 @@ public class L4455Report extends MakeReport {
 //		} else {
 //			this.print(-3, 95, "扣款總傳票明細表", "C");
 //		}
-		
-		if("999".equals(irepaybank)) {
+
+		if ("999".equals(irepaybank)) {
 			this.print(-3, 95, "銀行扣款總傳票明細表", "C");
 		} else {
 			this.print(-3, 95, "ACH 扣款總傳票明細表", "C");
@@ -200,7 +201,7 @@ public class L4455Report extends MakeReport {
 		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
 
 		irepaybank = titaVo.getParam("RepayBank");
-		
+
 		List<Map<String, String>> L4455List = new ArrayList<Map<String, String>>();
 
 		this.info("L4455Report All");
@@ -247,22 +248,33 @@ public class L4455Report extends MakeReport {
 
 	private void Report(TitaVo titaVo, List<Map<String, String>> L4455List, int function) throws LogicException {
 
+		String tradeReportName = "";
 		switch (function) {
 		case 1:
-			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表", "", "A4", "L");
+			tradeReportName="銀行扣款總傳票明細表";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表", "", "A4", "L");
 			break;
 		case 2:
-			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(帳管費)", "", "A4", "L");
+			tradeReportName="銀行扣款總傳票明細表(帳管費)";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(帳管費)", "", "A4", "L");
 			break;
 		case 3:
-			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(契變手續費)", "", "A4", "L");
+			tradeReportName="銀行扣款總傳票明細表(契變手續費)";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(契變手續費)", "", "A4", "L");
 			break;
 		case 4:
-			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(火險費)", "", "A4", "L");
+			tradeReportName="銀行扣款總傳票明細表(火險費)";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(火險費)", "", "A4", "L");
 			break;
 		default:
 			break;
 		}
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
+		
+		this.open(titaVo, reportVo);
 
 		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
 
@@ -295,12 +307,12 @@ public class L4455Report extends MakeReport {
 						"                                                                                                                                                                               ");
 				this.print(0, 1, L4455List.get(i).get("CustNo"));// 戶號
 
-				if(!tCustName.equals(limitLength(L4455List.get(i).get("CustName"), 20))) {					
+				if (!tCustName.equals(limitLength(L4455List.get(i).get("CustName"), 20))) {
 					this.print(0, 19, limitLength(L4455List.get(i).get("CustName"), 20));// 戶名
 				}
 
 				tCustName = limitLength(L4455List.get(i).get("CustName"), 20);
-				
+
 				if (parse.stringToInteger(L4455List.get(i).get("TxSeq")) == 1) {
 					if (parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt"))
 							.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
@@ -370,8 +382,6 @@ public class L4455Report extends MakeReport {
 					this.print(0, 198, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall"))), "R");// 短繳
 				}
 
-
-
 				if (parse.stringToInteger(L4455List.get(i).get("TxSeq")) == 1) {
 					RepayAmt = RepayAmt.add(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt")));
 				}
@@ -383,7 +393,6 @@ public class L4455Report extends MakeReport {
 				TempDr = TempDr.add(parse.stringToBigDecimal(L4455List.get(i).get("TempDr")));
 				TempCr = TempCr.add(parse.stringToBigDecimal(L4455List.get(i).get("TempCr")));
 				Shortfall = Shortfall.add(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall")));
-
 
 				if (j != L4455List.size()) {
 //					批次號碼/扣款日期/扣款銀行 不同則跳頁，並且累計歸零
@@ -639,7 +648,7 @@ public class L4455Report extends MakeReport {
 		totTempCr = new BigDecimal("0");
 		totShortfall = new BigDecimal("0");
 	}
-	
+
 	private void amttototal() {
 		totRepayAmt = totRepayAmt.add(RepayAmt);
 		totAcctAmt = totAcctAmt.add(AcctAmt);

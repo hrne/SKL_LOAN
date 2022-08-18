@@ -77,14 +77,16 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , \"TitaTxCd\"";
 		sql += "         , \"TitaTlrNo\"";
 		sql += "         , \"TitaTxtNo\"";
-		sql += "         , SUM(\"TxAmt\")           AS \"TxAmt\"";
-		sql += "         , SUM(\"Principal\")       AS \"Principal\"";
-		sql += "         , SUM(\"Interest\")        AS \"Interest\"";
-		sql += "         , SUM(\"DelayInt\")        AS \"DelayInt\"";
-		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";
-		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";
-		sql += "         , SUM(\"TempAmt\")         AS \"TempAmt\"";
-		sql += "         , SUM(\"Shortfall\")       AS \"Shortfall\"";
+		sql += "         , SUM(\"TxAmt\")           AS \"TxAmt\"";//交易金額
+		sql += "         , SUM(\"Principal\")       AS \"Principal\"";//本金
+		sql += "         , SUM(\"Interest\")        AS \"Interest\"";//利息
+		sql += "         , SUM(\"DelayInt\")        AS \"DelayInt\"";//延遲息
+		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";//違約金
+		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";//清償違約金
+		sql += "         , SUM(\"TempAmt\")         AS \"TempAmt\"";//暫收借
+		sql += "         , SUM(\"Overflow\")         AS \"Overflow\"";//暫收貸
+//		sql += "         , SUM(\"Shortfall\")       AS \"Shortfall\"";
+		sql += "    	 , SUM(\"UnpaidPrincipal\" + \"UnpaidInterest\") AS \"Shortfall\" "; // 短繳(G)
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))";
 		sql += "                                  AS \"AcctFee\"";
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.ModifyFee'),0))";
@@ -171,18 +173,20 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , TX2.\"DelayInt\"";
 		sql += "       + TX2.\"BreachAmt\"";
 		sql += "       + TX2.\"CloseBreachAmt\" AS \"BreachAmt\" ";
-		sql += "     , CASE";
-		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
-		sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\"";
-		sql += "         WHEN TX2.\"TempAmt\" < 0";
-		sql += "         THEN ABS(TX2.\"TempAmt\")";
-		sql += "       ELSE 0 END AS \"TempDr\" ";
-		sql += "     , CASE";
-		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
-		sql += "         THEN TX2.\"TxAmt\"";
-		sql += "         WHEN TX2.\"TempAmt\" > 0";
-		sql += "         THEN TX2.\"TempAmt\"";
-		sql += "       ELSE 0 END AS \"TempCr\" ";
+		sql += "    , TX2.\"TempAmt\"   AS \"TempDr\""; // 暫收借(E)
+		sql += " 	, TX2.\"Overflow\"  AS \"TempCr\" ";// 暫收貸(F)
+//		sql += "     , CASE";
+//		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
+//		sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\"";
+//		sql += "         WHEN TX2.\"TempAmt\" < 0";
+//		sql += "         THEN ABS(TX2.\"TempAmt\")";
+//		sql += "       ELSE 0 END AS \"TempDr\" ";
+//		sql += "     , CASE";
+//		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
+//		sql += "         THEN TX2.\"TxAmt\"";
+//		sql += "         WHEN TX2.\"TempAmt\" > 0";
+//		sql += "         THEN TX2.\"TempAmt\"";
+//		sql += "       ELSE 0 END AS \"TempCr\" ";
 		sql += "     , TX2.\"Shortfall\" ";
 //		sql += "     , TX2.\"AcctFee\"";
 //		sql += "       + TX2.\"ModifyFee\"";

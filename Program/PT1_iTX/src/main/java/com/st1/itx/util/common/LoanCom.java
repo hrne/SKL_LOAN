@@ -1270,7 +1270,13 @@ public class LoanCom extends TradeBuffer {
 				// 累溢收入帳(暫收貸)
 				settleOverflow(lAcDetail, titaVo);
 				// 新增放款交易內容檔(收回費用)
-				addFeeBorTxRoutine(ba, iRpCode, iEntryDate, iTempVo, lAcDetail, titaVo);
+				String desc = "";
+				if ("L3210".equals(titaVo.getTxcd())) {
+					desc = "暫收銷";
+				}
+				// 費用科目代碼
+				desc += getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
+				addFeeBorTxRoutine(ba, iRpCode, desc, iEntryDate, iTempVo, lAcDetail, titaVo);
 				ba.setAcctAmt(BigDecimal.ZERO);
 			}
 		}
@@ -1281,6 +1287,7 @@ public class LoanCom extends TradeBuffer {
 	 * 
 	 * @param ba         BaTxVo
 	 * @param iRpCode    還款來源
+	 * @param iDesc      交易別
 	 * @param iEntryDate 入帳日
 	 * @param iTempVo    TempVo
 	 * @param lAcDatail  List of AcDetail
@@ -1288,21 +1295,14 @@ public class LoanCom extends TradeBuffer {
 	 * @return LoanBorTx
 	 * @throws LogicException ....
 	 */
-	public LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, TempVo iTempVo,
+	public LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, String iDesc, int iEntryDate, TempVo iTempVo,
 			List<AcDetail> lAcDatail, TitaVo titaVo) throws LogicException {
 		this.info("addFeeBorTxRoutine ... ");
 
 		LoanBorTx tLoanBorTx = new LoanBorTx();
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
 		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
-		String desc = "";
-		if ("L3210".equals(titaVo.getTxcd())) {
-			desc = "暫收銷";
-		}
-		// 費用科目代碼
-		desc += getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
-
-		tLoanBorTx.setDesc(desc);
+		tLoanBorTx.setDesc(iDesc);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(ba.getPayIntDate());
@@ -1403,7 +1403,7 @@ public class LoanCom extends TradeBuffer {
 	 * @param iFacmNo      額度
 	 * @param iFirstFacmNo 資料首筆額度
 	 * @param titaVo       TitaVo
-	 * @return 暫收款額度     
+	 * @return 暫收款額度
 	 * @throws LogicException ....
 	 */
 	public int getTmpFacmNo(int iCustNo, int iFacmNo, int iFirstFacmNo, TitaVo titaVo) throws LogicException {

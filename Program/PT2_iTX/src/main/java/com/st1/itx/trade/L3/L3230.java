@@ -240,6 +240,7 @@ public class L3230 extends TradeBuffer {
 
 			case "16": // 16.3200億專案
 				subsidyInterest();
+				addLoanBorTxRoutine();
 				break;
 
 			case "22": // 22.88風災-保費 ???
@@ -474,9 +475,9 @@ public class L3230 extends TradeBuffer {
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("RemoveNo", iRemoveNo);
 		tTempVo.putParam("Note", titaVo.getParam("Description"));
-		LoanBorTx t = loanCom.addFeeBorTxRoutine(ba, 0, titaVo.getEntDyI(), tTempVo, lAcDetail, titaVo);
-		// 更新帳務明細的放款交易內容檔鍵值
-		loanCom.updBorTxAcDetail(t, lAcDetail);
+		String desc = "暫收退" + loanCom.getCdCodeX("AcctCode", ba.getAcctCode(), titaVo) ;
+		loanCom.addFeeBorTxRoutine(ba, 0, desc, titaVo.getEntDyI(), tTempVo, lAcDetail, titaVo);
+		
 		ba.setAcctAmt(BigDecimal.ZERO);
 
 	}

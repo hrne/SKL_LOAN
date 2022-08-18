@@ -113,11 +113,11 @@ R(1,L4R32)
 C(3,#CHAIN,0,E(0,1),s)
 HELP(#FunctionHelp)
 @V(H,#FunctionHelp)
-E(0,@UnpaidDaySt,7)
-E(0,@UnpaidDayEd,30)
 
 #FunctionCodeX=X,8,L
 T(3,)T(H,#FunctionCode,#FunctionHelp)
+E(0,@UnpaidDaySt,7)
+E(0,@UnpaidDayEd,30)
 !SWITCH(#FunctionCode,1,T(2,個別列印),
 !                   2,T(2,整批列印))
 

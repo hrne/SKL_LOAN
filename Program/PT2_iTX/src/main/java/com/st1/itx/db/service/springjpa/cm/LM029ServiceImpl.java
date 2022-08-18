@@ -31,7 +31,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	/**
-	 * 執行報表輸出
+	 * 執行報表輸出(明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
@@ -134,6 +134,103 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("entdy", entdy);
+
+		return this.convertToMap(query);
+	}
+
+	/**
+	 * 執行報表輸出(Deliquency)
+	 * 
+	 * @param titaVo
+	 * @param yearMonth 西元年月
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {
+		this.info("LM029ServiceImpl findAll2 ");
+
+		this.info("yearMonth=" + yearMonth);
+
+		int sYearMonth = (yearMonth / 100) * 100 + 1;
+		int eYearMonth = yearMonth;
+
+		String sql = "";
+		sql += "	WITH dpAmt AS (";
+		sql += "		SELECT I.\"YearMonth\" AS \"YearMonth\"";
+		sql += "			  ,ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"Amt\"";
+		sql += "		FROM \"Ias39IntMethod\" I";
+		sql += "		LEFT JOIN \"MonthlyLoanBal\" MLB ON MLB.\"YearMonth\" = I.\"YearMonth\"";
+		sql += "										AND MLB.\"CustNo\" = I.\"CustNo\"";
+		sql += "										AND MLB.\"FacmNo\" = I.\"FacmNo\"";
+		sql += "										AND MLB.\"BormNo\" = I.\"BormNo\"";
+		sql += "		WHERE I.\"YearMonth\" = :yymm ";
+		sql += "		  AND MLB.\"AcctCode\" <> 990 ";
+		sql += "		GROUP BY I.\"YearMonth\"";
+		sql += "				,DECODE(NVL(MLB.\"AcctCode\",' '),'990','990','OTHER')";
+		sql += "	),pAmt AS (";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,SUM(\"PrinBalance\") AS \"Amt\"";
+		sql += "		FROM \"MonthlyFacBal\"";
+		sql += "		WHERE \"YearMonth\" BETWEEN :syearmonth AND :eyearmonth ";
+		sql += "		  AND \"OvduTerm\" IN (1,2)";
+		sql += "		  AND \"PrinBalance\" > 0";
+		sql += "		GROUP BY \"YearMonth\"";
+		sql += "	),aAmt AS (";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,SUM(\"PrinBalance\") AS \"Amt\"";
+		sql += "		FROM \"MonthlyFacBal\"";
+		sql += "		WHERE \"YearMonth\" BETWEEN :syearmonth AND :eyearmonth ";
+		sql += "		  AND \"PrinBalance\" > 0";
+		sql += "		GROUP BY \"YearMonth\"";
+		sql += "	),oAmt AS (";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,SUM(\"Amt\") AS \"Amt\"";
+		sql += "		FROM(";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,SUM(\"PrinBalance\") AS \"Amt\"";
+		sql += "		FROM \"MonthlyFacBal\"";
+		sql += "		WHERE \"YearMonth\" BETWEEN :syearmonth AND :eyearmonth ";
+		sql += "		  AND \"OvduTerm\" >= 3 ";
+		sql += "		  AND \"AcctCode\" <> '990' ";
+		sql += "		  AND \"PrinBalance\" > 0";
+		sql += "		GROUP BY \"YearMonth\"";
+		sql += "		UNION";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,SUM(\"PrinBalance\") AS \"Amt\"";
+		sql += "		FROM \"MonthlyFacBal\"";
+		sql += "		WHERE \"YearMonth\" BETWEEN :syearmonth AND :eyearmonth ";
+		sql += "		  AND \"AcctCode\" = '990' ";
+		sql += "		  AND \"PrinBalance\" > 0";
+		sql += "		GROUP BY \"YearMonth\"";
+		sql += "		UNION";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,\"LoanBal\" AS \"Amt\"";
+		sql += "		FROM \"MonthlyLM052AssetClass\"";
+		sql += "		WHERE \"YearMonth\" BETWEEN :syearmonth AND :eyearmonth ";
+		sql += "		  AND \"AssetClassNo\" = 62 ";
+		sql += "		)";
+		sql += "		GROUP BY \"YearMonth\"";
+		sql += "	)";
+		sql += "	SELECT aAmt.\"YearMonth\"";
+		sql += "		  ,pAmt.\"Amt\" AS \"12Amt\"";
+		sql += "		  ,aAmt.\"Amt\" + dpAmt.\"Amt\" AS \"totalAmt\"";
+		sql += "		  ,ROUND(pAmt.\"Amt\" / (aAmt.\"Amt\" + dpAmt.\"Amt\"),15) AS \"12Rate\"";
+		sql += "		  ,oAmt.\"Amt\" AS \"oAmt\"";
+		sql += "		  ,ROUND(oAmt.\"Amt\" / (aAmt.\"Amt\" + dpAmt.\"Amt\"),15) AS \"oRate\"";
+		sql += "	FROM pAmt";
+		sql += "	LEFT JOIN aAmt ON aAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
+		sql += "	LEFT JOIN dpAmt ON dpAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
+		sql += "	LEFT JOIN oAmt ON oAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
+		sql += " ORDER BY  aAmt.\"YearMonth\" ASC ";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		query.setParameter("syearmonth", sYearMonth);
+		query.setParameter("eyearmonth", eYearMonth);
 
 		return this.convertToMap(query);
 	}

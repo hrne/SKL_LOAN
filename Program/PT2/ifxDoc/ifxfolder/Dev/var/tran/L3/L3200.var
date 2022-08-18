@@ -896,7 +896,7 @@ C(3,#TimExtraRepay,0,INVOKEJS(SHOW,p1,20,20,0),INVOKEJS(SHOW,p1,20,20,1))
 #IncludeIntFlag=X,1,I
 C(3,#CHAIN,1,s,$)
 C(3,#RepayType,12,S,$)
-T(3,Y)
+T(3,N)
 C(3,#TimExtraRepay,0,s,$)
 HELP(#YNHelp)
 @V(H,#YNHelp)
@@ -906,7 +906,7 @@ T(3,)T(H,#IncludeIntFlag,#YNHelp)
 
 ![利息是否可欠繳]
 #UnpaidIntFlag=X,1,I
-T(3,N)
+T(3,Y)
 C(3,#RepayType,12,s,$)
 C(3,#TimExtraRepay,0,s,$)
 C(5,#IncludeIntFlag,Y,s,$)
@@ -1495,6 +1495,7 @@ T(3,[L3200] 回收登錄)
 #TwExtraCloseBreachAmt#UsExtraCloseBreachAmt
 #TwReduceAmt#UsReduceAmt
 #TwExtraCloseBreachAmt#UsExtraCloseBreachAmt
+#TwOvduRepay#UsOvduRepay
 ##loop{times:20,n:1}
 #FacmBormNo{n}
 #IntSEDate{n}
