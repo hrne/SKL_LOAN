@@ -45,12 +45,6 @@ public class L9717Report extends MakeReport {
 	// 製表時間
 	private String nowTime;
 
-
-
-
-	
-
-
 	String rocYear;
 	String rocMonth;
 
@@ -94,7 +88,7 @@ public class L9717Report extends MakeReport {
 
 		this.setFont(1, 10);
 
-//		this.info("L9717Report.printHeader");
+		// this.info("L9717Report.printHeader");
 
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-2, 1, "報  表：" + this.getRptCode());
@@ -211,10 +205,10 @@ public class L9717Report extends MakeReport {
 	}
 
 	// 自訂表尾
-//	@Override
-//	public void printFooter() {
-//		this.print(-46, 88, "===== 報　表　結　束 =====", "C");
-//	}
+	// @Override
+	// public void printFooter() {
+	// this.print(-46, 88, "===== 報 表 結 束 =====", "C");
+	// }
 
 	private boolean fillData(TitaVo titaVo) {
 		this.newPage();
@@ -230,8 +224,7 @@ public class L9717Report extends MakeReport {
 		}
 
 		if (lL9717 != null && !lL9717.isEmpty()) {
-			
-			
+
 			List<BigDecimal> list = new ArrayList<BigDecimal>(14);
 
 			BigDecimal totalCount = BigDecimal.ZERO;
@@ -416,8 +409,7 @@ public class L9717Report extends MakeReport {
 							columnList.get(i).getSort());
 				}
 
-			
-				//合計以上所有件數及金額的各期小計處理
+				// 合計以上所有件數及金額的各期小計處理
 				switch (currentSort) {
 				case Year:
 					// F1 一期件數 26 C
@@ -434,13 +426,12 @@ public class L9717Report extends MakeReport {
 					// F12 六期金額 129 R
 					// F13 轉催收件數 134 C
 					// F14 轉催收金額 147 R
-					
-					
-					for (int i = 1,k = 0; i < 15; i++,k++) {
+
+					for (int i = 1, k = 0; i < 15; i++, k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
-							
+
 							if (list.size() == 14) {
 								amt = list.get(k).add(new BigDecimal(tLDVo.get("F" + i)));
 								list.set(i - 1, amt);
@@ -480,9 +471,8 @@ public class L9717Report extends MakeReport {
 					// F13 六期金額 129 R
 					// F14 轉催收件數 134 C
 					// F15 轉催收金額 147 R
-					
-					
-					for (int i = 2, k = 0; i < 16; i++,k++) {
+
+					for (int i = 2, k = 0; i < 16; i++, k++) {
 						BigDecimal ovdu = BigDecimal.ZERO;
 						BigDecimal amt = BigDecimal.ZERO;
 						if (columnList.get(i).getIsAmount()) {
@@ -526,29 +516,36 @@ public class L9717Report extends MakeReport {
 			int countX = 0;
 			int amtX = 0;
 
+			//是否需要加入各期小計
+			boolean isAddCal = false;
 			switch (currentSort) {
 			case Agent:
 				countX = 151;
 				amtX = 167;
+				isAddCal = true;
 				break;
 			case Year:
 				countX = 151;
 				amtX = 167;
+				isAddCal = false;
 				break;
 			case LargeAmt_Agent:
 				countX = 151;
 				amtX = 167;
+				isAddCal = true;
 				break;
 			case LargeAmt_Customer:
 				countX = 47;
 				amtX = 68;
+				isAddCal = false;
 				break;
 			default:
 				break;
 			}
 
-			if (currentSort != OutputSortBy.LargeAmt_Customer || currentSort != OutputSortBy.Year) {
-	
+			//是否需要加入各期小計
+			if (isAddCal) {
+
 				this.print(1, 1, newBorder);
 				// F2 一期件數 26 C
 				// F3 一期金額 39 R
@@ -565,9 +562,8 @@ public class L9717Report extends MakeReport {
 				// F14 轉催收件數 134 C
 				// F15 轉催收金額 147 R
 
-				
 				this.print(1, 1, "各期小計");
-				//印出各期小計
+				// 印出各期小計
 				for (int i = 0, space = 0; i < list.size(); i = i + 2, space++) {
 
 					this.print(0, 26 + (18 * space), formatAmt(list.get(i), 0), "C");
@@ -578,7 +574,7 @@ public class L9717Report extends MakeReport {
 				}
 
 				this.print(1, 1, newBorder);
-				
+
 			}
 			this.print(1, 1, " ");
 			this.print(0, countX, "總計：　　" + formatAmt(totalCount, 0) + " 筆", "R");
@@ -599,16 +595,15 @@ public class L9717Report extends MakeReport {
 	}
 
 	public boolean makePdf(TitaVo titaVo) throws LogicException {
-//		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		// this.open(titaVo, reportDate, brno, reportCode, reportItem, security,
+		// pageSize, pageOrientation);
 
-		
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno)
-				.setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
-				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
-		
-		
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+
 		this.open(titaVo, reportVo);
-		
+
 		this.setCharSpaces(0);
 
 		boolean result = fillData(titaVo);

@@ -163,7 +163,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "										AND MLB.\"CustNo\" = I.\"CustNo\"";
 		sql += "										AND MLB.\"FacmNo\" = I.\"FacmNo\"";
 		sql += "										AND MLB.\"BormNo\" = I.\"BormNo\"";
-		sql += "		WHERE I.\"YearMonth\" = :yymm ";
+		sql += "		WHERE I.\"YearMonth\" BETWEEN :syearmonth AND :eyearmonth  ";
 		sql += "		  AND MLB.\"AcctCode\" <> 990 ";
 		sql += "		GROUP BY I.\"YearMonth\"";
 		sql += "				,DECODE(NVL(MLB.\"AcctCode\",' '),'990','990','OTHER')";

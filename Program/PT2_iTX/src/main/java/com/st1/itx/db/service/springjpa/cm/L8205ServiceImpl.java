@@ -255,7 +255,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if(useCustNo) {
 			sql += " and M.\"CustNo\" = :custNo";
 		}
-		sql += " order by M.\"RecordDate\" ";
+		sql += " order by M.\"CustNo\"  ";
 
 		this.info("sql=" + sql);
 		Query query;

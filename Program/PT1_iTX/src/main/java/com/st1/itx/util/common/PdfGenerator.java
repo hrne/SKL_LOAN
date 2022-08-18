@@ -651,8 +651,11 @@ public class PdfGenerator extends CommBuffer {
 			reader = new PdfReader(defaultname);
 			stamper = new PdfStamper(reader, baos);
 			fields = stamper.getAcroFields();
-			cb = stamper.getOverContent(this.nowPage - 1);
-			underContent = stamper.getUnderContent(this.nowPage - 1);
+			this.info("nowPage = " + nowPage);
+			cb = stamper.getOverContent(1);
+			underContent = stamper.getUnderContent(1);
+			this.info("cb is null ? " + (cb == null));
+			this.info("underContent is null ? " + (underContent == null));
 		} else {
 			document.newPage();
 			underContent = writer.getDirectContentUnder();
@@ -734,7 +737,7 @@ public class PdfGenerator extends CommBuffer {
 	 */
 	private void setWatermark() throws IOException, DocumentException {
 
-		if (!watermarkFlag) {
+		if (underContent == null || !watermarkFlag) {
 			return;
 		}
 

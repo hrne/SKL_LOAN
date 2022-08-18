@@ -15,8 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
@@ -170,6 +168,10 @@ public class L3240 extends TradeBuffer {
 		titaVo.put("CURNM", "TWD");
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
+		titaVo.putParam("RpType1",9);
+		titaVo.putParam("RpCustNo1", iCustNo);
+		titaVo.putParam("RpFacmNo1", iFacmNo);
+
 		// Temp 200
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 3 被沖正
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 4 沖正

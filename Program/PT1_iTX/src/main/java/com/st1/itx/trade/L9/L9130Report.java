@@ -158,7 +158,7 @@ public class L9130Report extends MakeReport {
 
 		// format 輸出檔案格式 1.UTF8 2.BIG5
 		int format = 2;
-		desc = name;
+		desc =  "核心傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) ;
 		makeFile.open(titaVo, date, brno, no, desc, name, format);
 
 		Slice<SlipMedia> sSlipMedia = sSlipMediaService.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, 0,

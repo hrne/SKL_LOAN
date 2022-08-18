@@ -46,7 +46,8 @@ public class L4031 extends TradeBuffer {
 	private HashMap<tmpBatx, Integer> totCnt = new HashMap<>();// 總筆數
 	private HashMap<tmpBatx, Integer> conCnt = new HashMap<>();// 已確認筆數
 	private HashMap<tmpBatx, Integer> relCnt = new HashMap<>();// 已放行筆數
-	private HashMap<tmpBatx, Integer> keyinCnt = new HashMap<>();// 已處理筆數
+	private HashMap<tmpBatx, Integer> keyinCnt = new HashMap<>();// 已輸入筆數
+	private HashMap<tmpBatx, Integer> needConCnt = new HashMap<>();// 需確認筆數
 // 	狀態
 	private HashMap<tmpBatx, Integer> CheckFlag = new HashMap<>();
 
@@ -149,6 +150,7 @@ public class L4031 extends TradeBuffer {
 							status = 0; // 0.未確認
 							checkFlag = 0; // 0-確認
 						}
+
 					}
 				}
 				if (tempL4031Vo.getRank() == 1) {
@@ -256,6 +258,7 @@ public class L4031 extends TradeBuffer {
 				occursList.putParam("OOCheckFlag", checkFlag); // 檢核記號 0-確認 1-已確認報表 2-輸入利率
 				occursList.putParam("OOStatus", status); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
 				occursList.putParam("OORptFg", rptFg);
+				occursList.putParam("OONeedConCnt", needConCnt);
 
 				this.info("L4031 occursList : " + occursList.toString());
 				/* 將每筆資料放入Tota的OcList */
@@ -395,6 +398,9 @@ public class L4031 extends TradeBuffer {
 		if (!keyinCnt.containsKey(grp)) {
 			keyinCnt.put(grp, 0);
 		}
+		if (!needConCnt.containsKey(grp)) {
+			needConCnt.put(grp, 0);
+		}
 
 		// 提醒件不累計
 		if (tBatxRateChange.getAdjCode() == 4) {
@@ -420,6 +426,9 @@ public class L4031 extends TradeBuffer {
 
 		if (tBatxRateChange.getRateKeyInCode() == 1) {
 			keyinCnt.put(grp, keyinCnt.get(grp) + 1);
+		}
+		if (tBatxRateChange.getRateKeyInCode() == 1 && tBatxRateChange.getConfirmFlag() == 0) {
+			needConCnt.put(grp, needConCnt.get(grp) + 1);
 		}
 
 	}
