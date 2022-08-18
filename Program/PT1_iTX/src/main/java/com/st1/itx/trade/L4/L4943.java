@@ -140,7 +140,8 @@ public class L4943 extends TradeBuffer {
 					if (functionCode == 7 && entryDate == 0) {
 						int maturityDate = parse.stringToInteger(result.get("MaturityDate"));
 						int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate"));
-						BigDecimal loanBal = result.get("LoanBal") == null ? BigDecimal.ZERO:new BigDecimal(result.get("LoanBal"));
+						BigDecimal loanBal = result.get("LoanBal") == null ? BigDecimal.ZERO
+								: new BigDecimal(result.get("LoanBal"));
 						if (maturityDate > 19110000) {
 							maturityDate = maturityDate - 19110000;
 						}
@@ -161,6 +162,10 @@ public class L4943 extends TradeBuffer {
 					occursList.putParam("OORepayAmt", result.get("RepayAmt"));
 					occursList.putParam("OOMediaCode", result.get("MediaCode"));
 					occursList.putParam("OOAcDate", acDate);
+					if (functionCode == 10) { // 入帳後裔短收
+						occursList.putParam("OOTempAmt", result.get("TxTempAmt"));
+						occursList.putParam("OOOverShort", result.get("verShort"));
+					}
 					String procNote = "";
 					TempVo tempVo = new TempVo();
 					tempVo = tempVo.getVo(result.get("JsonFields"));

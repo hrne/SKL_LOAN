@@ -104,7 +104,14 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,BDD.\"ReturnCode\"  AS \"ReturnCode\"                   ";
 			sql += " ,BDD.\"MediaKind\"   AS \"MediaKind\"                    ";
 			sql += " ,BDD.\"AmlRsp\"      AS \"AmlRsp\"                       ";
+			if (functionCode == 2) {
+				sql += " ,TX.\"TempAmt\"  AS \"TxTempAmt\"                    ";
+				sql += " ,case when TX.\"ShortAmt\" > 0 then 0 - \"ShortAmt\" ";
+				sql += " ,     else TX.\"OverAmt\"  end AS \"OverShort\"      ";
+				sql += " ,     end        AS \"OverShort\"                    ";
+			}
 			sql += " from \"BankDeductDtl\" BDD                               ";
+
 		} else {
 			sql += " select                                                   ";
 			sql += "  SUM(BDD.\"UnpaidAmt\")   AS \"UnpaidAmt\"               ";
@@ -125,17 +132,31 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
-
-		// BatxDetail 處理狀態 ProcStsCode 不為 刪除 'D' 2022/1/25
-//		sql += " left join \"BatxDetail\" BTL on BTL.\"CustNo\" = BDD.\"CustNo\"";
-//		sql += "                             and BTL.\"FacmNo\" = BDD.\"FacmNo\"";
-//		sql += "                             and BTL.\"EntryDate\" = BDD.\"EntryDate\"";
-//		sql += "                             and BTL.\"MediaSeq\" = BDD.\"MediaSeq\"";
+		if (functionCode == 10) {
+			sql += " left join (                                              ";
+			sql += "     select                                               ";
+			sql += "      \"AcDate\"                                          ";
+			sql += "     ,\"TitaTlrNo\"                                       ";
+			sql += "     ,\"TitaTxtNo\"                                       ";
+			sql += "     ,SUM(Case when JSON_VALUE(\"OtherFields\",'$.AcSeq') = '0002' then \"TempAmt\" else 0 end) as  \"TempAmt\"  ";
+			sql += "     ,SUM(\"Overflow\"-\"TempAmt\") as \"OverAmt\"        ";
+			sql += "     ,SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\" + \"UnpaidCloseBreach\") as \"ShortAmt\" ";
+			sql += "     from \"LoanBorTx\"                                   ";
+			sql += "     where \"RepayCode\" = 2                              ";
+			sql += "       and \"EntryDate\" >= :entryDateFm";
+			sql += "       and \"EntryDate\" <= :entryDateTo";
+			sql += "       and \"TitaHCode\" = '0'                            ";
+			sql += "     group by \"AcDate\"                                  ";
+			sql += "             ,\"TitaTlrNo\"                               ";
+			sql += "             ,\"TitaTxtNo\"                               ";
+			sql += "     ) TX  on TX.\"AcDate\" = BDD.\"AcDate\"              ";
+			sql += "          and TX.\"TitaTlrNo\" = BDD.\"TitaTlrNo\"        ";
+			sql += "          and TX.\"TitaTxtNo\" = BDD.\"TitaTxtNo\"        ";
+		}
 
 		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
 		sql += "   and BDD.\"EntryDate\" <= :entryDateTo";
-		// 2022/1/25
-//		sql += "   and BTL.\"ProcStsCode\" <> 'D'";
+
 		switch (repayBank) {
 		case "": // none
 			break;
@@ -193,6 +214,10 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and BDD.\"MediaCode\" = 'Y' ";
 			break;
 		case 9: // 整批
+			break;
+		case 10: // 溢短收
+			sql += "   and (   NVL(TX.\"OverAmt\",0)  > 0 ";
+			sql += "        or NVL(TX.\"ShortAmt\",0) > 0 )";
 			break;
 		}
 
@@ -266,7 +291,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 		int bankCode = Integer.parseInt(titaVo.getParam("BankCode"));
-		
+
 		String sql = " ";
 		sql += " WITH loanData AS ( ";
 		sql += "     SELECT L.\"CustNo\" ";

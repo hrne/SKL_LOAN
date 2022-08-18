@@ -638,6 +638,7 @@ public class PdfGenerator extends CommBuffer {
 		// 新頁
 		if (reportVo.isUseDefault()) {
 			if (this.nowPage > 0) {
+				this.info("setNewPage close page, nowPage = " + nowPage);
 				stamper.setFormFlattening(true);
 				stamper.close();
 				reader.close();
@@ -646,18 +647,17 @@ public class PdfGenerator extends CommBuffer {
 //				reader.close();
 			}
 			this.nowPage++;
+			this.info("setNewPage open new page, nowPage = " + nowPage);
 			// new
 			baos = new ByteArrayOutputStream();
 			reader = new PdfReader(defaultname);
 			stamper = new PdfStamper(reader, baos);
 			fields = stamper.getAcroFields();
-			this.info("nowPage = " + nowPage);
 			cb = stamper.getOverContent(1);
 			underContent = stamper.getUnderContent(1);
-			this.info("cb is null ? " + (cb == null));
-			this.info("underContent is null ? " + (underContent == null));
 		} else {
 			document.newPage();
+			cb = writer.getDirectContent();
 			underContent = writer.getDirectContentUnder();
 		}
 		setWatermark();
@@ -737,7 +737,7 @@ public class PdfGenerator extends CommBuffer {
 	 */
 	private void setWatermark() throws IOException, DocumentException {
 
-		if (underContent == null || !watermarkFlag) {
+		if (!watermarkFlag) {
 			return;
 		}
 

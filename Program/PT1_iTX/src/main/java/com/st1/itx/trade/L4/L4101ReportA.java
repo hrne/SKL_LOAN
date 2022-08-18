@@ -110,8 +110,8 @@ public class L4101ReportA extends MakeReport {
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
+		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
 
 	}
 
@@ -120,8 +120,8 @@ public class L4101ReportA extends MakeReport {
 	public void printFooter() {
 		this.print(-41, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		this.print(-42, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		this.print(-43, 1, "　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
-		this.print(-47, 1, "　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+		this.print(-43, 1, "　　　　　　　　　　放 款 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
+		this.print(-47, 1, "　　　　　　　　　　財 務 部　　　協理：　　　　　　　　經理：　　　　　　　　襄理：　　　　　　　　　　　　　　製表人：　　　　　　　　　　　　　　　　　");
 //		this.print(-44, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 	}
 
@@ -178,8 +178,8 @@ public class L4101ReportA extends MakeReport {
 			print(0, 1, this.showRocDate(acDate, 1)); // 日期
 			print(0, 11, acNoCode + " " + tCdAcCode.getAcNoItem()); // 科子細目+科子細目名稱
 
-			print(0, 105, formatAmt(dbAmt.get(tempL4101Vo), 0), "R"); // 借方金額
-			print(0, 125, formatAmt(crAmt.get(tempL4101Vo), 0), "R");// 貸方金額
+			print(0, 145, formatAmt(dbAmt.get(tempL4101Vo), 0), "R"); // 借方金額
+			print(0, 165, formatAmt(crAmt.get(tempL4101Vo), 0), "R");// 貸方金額
 
 			if (dbAmt.get(tempL4101Vo) != null) {
 				sumDbAmt = sumDbAmt.add(dbAmt.get(tempL4101Vo));
@@ -190,12 +190,12 @@ public class L4101ReportA extends MakeReport {
 
 		}
 
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
 		print(1, 1, "　　　　　　           ");
 
-		print(0, 61, "　　　　　　　　共　" + cnt + "　戶　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(0, 105, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
-		print(0, 125, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
+		print(0, 101, "　　　　　　　　共　" + cnt + "　戶　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		print(0, 145, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
+		print(0, 165, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
 
 	}
 
