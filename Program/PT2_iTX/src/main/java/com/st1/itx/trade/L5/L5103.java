@@ -287,6 +287,7 @@ public class L5103 extends TradeBuffer {
 			nInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			nInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			nInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+			nInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
 
 			try {
 				innDocRecordService.update(nInnDocRecord);
@@ -308,6 +309,7 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+			tInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
 
 			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {
@@ -361,6 +363,7 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+			tInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
 
 			for (int i = 1; i <= 25; i++) {
 				if (Integer.parseInt(titaVo.getParam("OPTA" + i)) != 0) {

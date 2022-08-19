@@ -68,6 +68,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "      + TX2.\"DelayInt\"";
 		sql += "      + TX2.\"BreachAmt\"";
 		sql += "      + TX2.\"CloseBreachAmt\"";
+		sql += "      + (TX2.\"Overflow\"";
+		sql += "      - TX2.\"TempAmt\")";
 		sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
 		sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
 		sql += "      || '-'";
@@ -84,8 +86,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "      + TX2.\"BreachAmt\"";
 		sql += "      + TX2.\"CloseBreachAmt\" AS \"BreachAmt\""; // 違約金(D)
 		sql += "    , TX2.\"TempAmt\"   AS \"TempDr\""; // 暫收借(E)
-		sql += " 	, TX2.\"Overflow\"  AS \"TempCr\" ";// 暫收貸(F)
-		sql += "    , TX2.\"UnpaidPrincipal\" + TX2.\"UnpaidInterest\" AS \"Shortfall\" "; // 短繳(G)\
+		sql += " 	, TX2.\"Overflow\" AS \"TempCr\" ";// 暫收貸(F)
+		sql += "    , TX2.\"UnpaidPrincipal\" + TX2.\"UnpaidInterest\" AS \"Shortfall\" "; // 短繳(G)
 		sql += "    , TX2.\"FeeAmt\" AS \"Fee\""; // 帳管費及其他(H)
 		sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
 		sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位

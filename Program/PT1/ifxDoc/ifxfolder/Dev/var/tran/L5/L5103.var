@@ -46,6 +46,7 @@ HIDE(#BTNA,#BTNB,#BTNC,#BTND)
 ["[L5103]                                 檔案借閱維護"],
 ["#FdACTFGX+登放記號",#ACTFGX],["#FdApplCodeX+申請或歸還",#ApplCodeX],
 [#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#BTND,#CustName],
+[#<->#,"#FdFacmNoMemo+額度備註",#FacmNoMemo],
 ["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#BTNA,#ApplEmpNoX],
 ["#FdUsageCode+用途",#UsageCode,#UsageCodeX],["#FdCopyCode+正本+/+影本",#CopyCode,#CopyCodeX],
 ["#FdApplDate+借閱日期",#ApplDate],["#FdKeeperEmpNo+管理人",#KeeperEmpNo,#BTNB,#KeeperEmpNoX],
@@ -165,7 +166,7 @@ HIDE(#BTND,#BTNA,#BTNB)
 ! 新增按鈕會帶入1 ??? 防呆
 #NTXBUF=X,280,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@ApplCode,#NTXBUF,208,1)
+T(1,@ApplCode,#NTXBUF,248,1)
 C(3,#ApplCode,0,s,$)
 T(1,@CustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
@@ -177,9 +178,10 @@ T(1,@ApplDate,#NTXBUF,126,7)
 T(1,@ReturnDate,#NTXBUF,133,7)
 T(1,@ReturnEmpNo,#NTXBUF,140,6)
 T(1,@UsageCode,#NTXBUF,146,2)
-T(1,@Remark,#NTXBUF,148,60)
-T(1,@CopyCode,#NTXBUF,209,1)
-T(1,@ApplObj,#NTXBUF,210,1)
+T(1,@Remark,#NTXBUF,148,100)
+T(1,@CopyCode,#NTXBUF,249,1)
+T(1,@ApplObj,#NTXBUF,250,1)
+T(1,@FacmNoMemo,#NTXBUF,251,20)
 INVOKEJS(SHOW,p1,02,02,1)
 
 
@@ -209,7 +211,7 @@ E(0,@AMTC{i},#L5r48AMTC{i})
 
 #Trol=X,1,S
 IF(#ApplObj==4&&#ApplCode==2,$,s)
-INVOKEJS(SHOW,L5103,9,11,1)
+INVOKEJS(SHOW,L5103,10,12,1)
 ##loop {times:25,i:1}
 C(3,#OPTA{i},0,$,T(H,@FILENMA{i},#OPTA{i},#ApplicationCodeHelp))
 C(3,#OPTB{i},0,$,T(H,@FILENMB{i},#OPTB{i},#SettingCodeHelp))
@@ -218,14 +220,14 @@ C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
 C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2_{i},0),INVOKEJS(SHOW,grd2_{i},1))
 C(3,#OPTC{i},0,INVOKEJS(SHOW,grd3_{i},0),INVOKEJS(SHOW,grd3_{i},1))
 ##end
-C(3,#OPTA1,0,INVOKEJS(SHOW,L5103_9,0),$)
-C(3,#OPTB1,0,INVOKEJS(SHOW,L5103_10,0),$)
-C(3,#OPTC1,0,INVOKEJS(SHOW,L5103_11,0),$)
+C(3,#OPTA1,0,INVOKEJS(SHOW,L5103_10,0),$)
+C(3,#OPTB1,0,INVOKEJS(SHOW,L5103_11,0),$)
+C(3,#OPTC1,0,INVOKEJS(SHOW,L5103_12,0),$)
 
 ! 藏欄位
 ! ApplCode 若=0預設1
 #PRE_GRDDIS=A,1,S
-IF(#ApplObj==4&&#ApplCode==2 ||#ACTFG==3,$,INVOKEJS(SHOW,L5103,9,13,0))
+IF(#ApplObj==4&&#ApplCode==2 ||#ACTFG==3,$,INVOKEJS(SHOW,L5103,10,14,0))
 C(3,#ApplCode,0,E(0,@ApplCode,1),$)
 ! 登放記號
 #ACTFGX=X,8,L
@@ -258,8 +260,8 @@ T(2,@L5103ConfirmGroupNo,)
 #ApplCodeX=X,4,L
 SWITCH(#ApplCode
 ,1,
-INVOKEJS(SHOW,L5103_5,1)
-INVOKEJS(SHOW,L5103_6,0)
+INVOKEJS(SHOW,L5103_6,1)
+INVOKEJS(SHOW,L5103_7,0)
 T(F,@CustNo,1)
 T(F,@FacmNo,1)
 T(F,@ApplSeq,1)
@@ -269,10 +271,11 @@ T(F,@CopyCode,1)
 T(F,@KeeperEmpNo,1)
 T(F,@Remark,1)
 T(F,@ApplObj,1)
+T(F,@FacmNoMemo,1)
 SHOW(#UsageCode,#CopyCode,#ApplObj)
 ,2,
-INVOKEJS(SHOW,L5103_5,0)
-INVOKEJS(SHOW,L5103_6,1)
+INVOKEJS(SHOW,L5103_6,0)
+INVOKEJS(SHOW,L5103_7,1)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 T(F,@ApplSeq,0)
@@ -282,6 +285,7 @@ T(F,@CopyCode,0)
 T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
 T(F,@ApplObj,0)
+T(F,@FacmNoMemo,0)
 ##loop {times:25,i:1}
 T(F,@OPTA{i},0)
 T(F,@AMTA{i},0)
@@ -305,6 +309,7 @@ T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
 T(F,@ApplObj,0)
 T(F,@ApplDate,0)
+T(F,@FacmNoMemo,0)
 ##loop {times:25,i:1}
 T(F,@OPTA{i},0)
 T(F,@AMTA{i},0)
@@ -343,11 +348,25 @@ IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
 #FacmNo=A,3,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
+@
+C(3,#FacmNo,0,T(F,@FacmNoMemo,1),T(F,@FacmNoMemo,0))
 !@C(1,#FacmNo,s,V(P,額度不可為0),s)
 
 ! 借款人戶名---調RIM
 #CustName=X,100,L
 C(3,#ApplCode,0,$,s)
+
+
+!額度若輸入0則必須輸入額度備註不可空白,額度>0則不需輸入
+#FdFacmNoMemo=X,2,L
+IF(#FacmNo == 0,T(3,*),T(3,))
+
+#FacmNoMemo=X,20,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+C(3,#FacmNo,0,$,S)
+@V(7)
+
 
 ! 申請序號
 #ApplSeq=A,3,L
@@ -386,8 +405,6 @@ ApplEmpNo<-OTlrNo:
 ApplEmpNoX<-OTlrItem:
 L5103ConfirmGroupNo<-OGroupNo})
 IF(#InitApplCode == 1,BIND(grid,cancel),$)
-
-
 
 ! 借閱人
 #ApplEmpNo=X,6,I
@@ -563,7 +580,7 @@ T(2,@L5103ConfirmBrNo,#L2r08Brno)
 #ReturnEmpNoX=X,8,L
 
 ! 備註
-#Remark=X,60,I
+#Remark=X,100,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 
@@ -576,7 +593,7 @@ HELP(#ApplObjHelp)
 @T(3,@ApplObjX,)
 V(H,#ApplObjHelp)
 IF(#ApplObj==4&&#ApplCode==1,$,s)
-C(3,#ApplObj,4,INVOKEJS(SHOW,L5103_10,1)INVOKEJS(SHOW,grd1,2,17,0),INVOKEJS(SHOW,L5103_10,0))
+C(3,#ApplObj,4,INVOKEJS(SHOW,L5103_11,1)INVOKEJS(SHOW,grd1,2,17,0),INVOKEJS(SHOW,L5103_11,0))
 
 #ApplObjX=X,16,L
 T(H,#ApplObj,#ApplObjHelp)
@@ -600,11 +617,11 @@ E(0,0)
 C(3,#ApplCode,2,s,$)
 C(3,#ACTFG,3,s,$)
 IF(#ApplObj==4&&#ApplCode==1,
-INVOKEJS(SHOW,L5103,9,11,1)
+INVOKEJS(SHOW,L5103,10,12,1)
 INVOKEJS(SHOW,grd1,2,25,0)
 INVOKEJS(SHOW,grd2,2,25,0)
 INVOKEJS(SHOW,grd3,2,25,0),
-INVOKEJS(SHOW,L5103,9,11,0)
+INVOKEJS(SHOW,L5103,10,12,0)
 )
 
 
@@ -615,7 +632,7 @@ INVOKEJS(SHOW,L5103,9,11,0)
 #OPTA{i}=A,2,I
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-INVOKEJS(SHOW,L5103_9,1)
+INVOKEJS(SHOW,L5103_10,1)
 INVOKEJS(SHOW,grd1,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTA{j},0,S,$))
 HELP(#ApplicationCodeHelp)
@@ -672,7 +689,7 @@ C(3,#OPTA{i},0,INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{k},{k},1))
 #OPTB{i}=A,2,I
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-INVOKEJS(SHOW,L5103_10,1)
+INVOKEJS(SHOW,L5103_11,1)
 INVOKEJS(SHOW,grd2,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTB{j},0,S,$))
 HELP(#SettingCodeHelp)
@@ -730,7 +747,7 @@ C(3,#OPTB{i},0,INVOKEJS(SHOW,grd2,{i},{i},0),INVOKEJS(SHOW,grd2,{k},{k},1))
 #OPTC{i}=A,2,I
 C(3,#ApplObj,4,$,S)
 IF(#ApplCode==1&&#ACTFG==1,$,s)
-INVOKEJS(SHOW,L5103_11,1)
+INVOKEJS(SHOW,L5103_12,1)
 INVOKEJS(SHOW,grd3,{i},{i},1)
 C(3,{j},0,$,C(3,#OPTC{j},0,S,$))
 HELP(#GuaranteedCodeHelp)
@@ -791,7 +808,6 @@ V(P,申請、設定、對保資料需至少借閱一項)
 #MRKEY=_,_,S
 T(2,#CustNo+-+#FacmNo+-+#ApplSeq)
 
-
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -818,6 +834,7 @@ T(2,#CustNo+-+#FacmNo+-+#ApplSeq)
 #ReturnEmpNo
 #Remark
 #ApplObj
+#FacmNoMemo
 #L5103ConfirmBrNo
 #L5103ConfirmGroupNo
 ##loop {times:25,i:1}

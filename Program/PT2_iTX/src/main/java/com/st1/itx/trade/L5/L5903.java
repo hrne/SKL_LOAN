@@ -142,6 +142,7 @@ public class L5903 extends TradeBuffer {
 				occursList.putParam("OOKeeperEmpNo", result.get("F13"));
 				occursList.putParam("OOApplEmpNo", result.get("F14"));
 				occursList.putParam("OOReturnEmpNo", result.get("F15"));
+				occursList.putParam("OOFacmNoMemo", result.get("F17"));
 				
 				// 判斷是否應顯示【附件查詢】按鈕
 				

@@ -163,6 +163,8 @@ E(0,1)ASGN(LOOP$)
 #OOCustNo=A,7,O
 ! 額度
 #OOFacmNo=A,3,O
+!額度備註
+#OOFacmNoMemo=X,20,O
 ! 申請序號
 #OOApplSeq=A,3,O
 ! 戶名
@@ -190,7 +192,7 @@ T(H,#OOUsageCode,#UsageCodeHelp)
 #OOCopyCode=A,1,O
 
 ! 備註
-#OORemark=X,60,O
+#OORemark=X,100,O
 ! 備註
 #OOApplObj=A,1,O
 
@@ -215,7 +217,7 @@ T(2,#OOApplEmpNo+ +#OOApplEmpName)
 #OOBUF_RETURN=X,280,S
 T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
    +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
-   +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj)
+   +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj+#OOFacmNoMemo)
 
 #OOBTN_RETURN=A,2,O
 IF(#OOReturnDate>0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
@@ -273,6 +275,7 @@ TXFORM=L5903
 #OOApplEmpNo
 #OOReturnEmpNo
 #OOHasAttachment
+#OOFacmNoMemo
 ^
 </sub>
 
@@ -303,6 +306,8 @@ TXFORM=L5903
 ! 額度
 #OOFacmNo=額度
 {width:65,align:'center'}
+#OOFacmNoMemo=額度備註
+{width:85,align:'center'}
 ! 申請序號
 #OOApplSeq=申請序號
 {width:85,align:'center'}
@@ -350,5 +355,6 @@ TXFORM=L5903
 #OOReturnEmpNo
 #OOUsageCode
 #OORemark
+#OOFacmNoMemo
 @^
 </sub>

@@ -91,7 +91,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAdjustDateC = parse.stringToInteger(titaVo.getParam("AdjustDateC")); // 可為 0
 
 		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
-		String iGroupUKey = titaVo.getParam("GroupUKey"); // 可為空白
+		String iGroupId = titaVo.getParam("GroupId"); // 可為空白
 
 		// 超過 2 年調為 99.9999 % ??????
 
@@ -217,7 +217,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTxKind == 4) {
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
-		if (iTxKind == 5 && !iGroupUKey.isEmpty()) {
+		if (iTxKind == 5 && !iGroupId.isEmpty()) {
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
 		}
 		sql += " where b.\"Status\" = 0                                        ";
@@ -312,8 +312,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
-		if (iTxKind == 5 && !iGroupUKey.isEmpty()) {
-			sql += "   and a.\"GroupUKey\" = '" + iGroupUKey + "' ";
+		if (iTxKind == 5 && !iGroupId.isEmpty()) {
+			sql += "   and a.\"GroupUKey\" = '" + iGroupId + "' ";
 		}
 		this.info("sql=" + sql);
 

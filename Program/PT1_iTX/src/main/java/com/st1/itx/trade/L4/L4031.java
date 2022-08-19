@@ -258,7 +258,7 @@ public class L4031 extends TradeBuffer {
 				occursList.putParam("OOCheckFlag", checkFlag); // 檢核記號 0-確認 1-已確認報表 2-輸入利率
 				occursList.putParam("OOStatus", status); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
 				occursList.putParam("OORptFg", rptFg);
-				occursList.putParam("OONeedConCnt", needConCnt);
+				occursList.putParam("OONeedConCnt", needConCnt.get(tempL4031Vo));
 
 				this.info("L4031 occursList : " + occursList.toString());
 				/* 將每筆資料放入Tota的OcList */

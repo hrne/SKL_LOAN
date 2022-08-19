@@ -83,10 +83,14 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , SUM(\"DelayInt\")        AS \"DelayInt\"";//延遲息
 		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";//違約金
 		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";//清償違約金
-		sql += "         , SUM(\"TempAmt\")         AS \"TempAmt\"";//暫收借
+		sql += "         , SUM(\"FeeAmt\")  AS \"FeeAmt\"";//費用
+//		sql += "         , SUM(CASE        ";
+//		sql += "         		 WHEN JSON_VALUE(\"OtherFields\",'$.AcSeq') = '0002' THEN \"TempAmt\"";
+//		sql += "         		 ELSE 0 END )         AS \"TempAmt\"";//暫收借
+		sql += "         , SUM( \"TempAmt\" )         AS \"TempAmt\"";//暫收借
 		sql += "         , SUM(\"Overflow\")         AS \"Overflow\"";//暫收貸
 //		sql += "         , SUM(\"Shortfall\")       AS \"Shortfall\"";
-		sql += "    	 , SUM(\"UnpaidPrincipal\" + \"UnpaidInterest\") AS \"Shortfall\" "; // 短繳(G)
+		sql += "    	 , SUM(\"UnpaidPrincipal\" + \"UnpaidInterest\" + \"UnpaidCloseBreach\") AS \"Shortfall\" "; // 短繳(G)
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))";
 		sql += "                                  AS \"AcctFee\"";
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.ModifyFee'),0))";
@@ -125,22 +129,25 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       + TX2.\"DelayInt\"";
 			sql += "       + TX2.\"BreachAmt\"";
 			sql += "       + TX2.\"CloseBreachAmt\"";
-			sql += "       + TX2.\"AcctFee\"";
-			sql += "       + TX2.\"ModifyFee\"";
-			sql += "       + TX2.\"FireFee\"";
-			sql += "       + TX2.\"LawFee\"";
-			sql += "       - CASE "; 
-			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' "; 
-			sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\""; 
-			sql += "         WHEN TX2.\"TempAmt\" < 0"; 
-			sql += "         THEN ABS(TX2.\"TempAmt\")"; 
-			sql += "         ELSE 0 END";
-			sql += "       + CASE";
-			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
-			sql += "         THEN TX2.\"TxAmt\"";
-			sql += "         WHEN TX2.\"TempAmt\" > 0";
-			sql += "         THEN TX2.\"TempAmt\"";
-			sql += "         ELSE 0 END AS \"AcctAmt\" ";
+//			sql += "       + TX2.\"AcctFee\"";
+//			sql += "       + TX2.\"ModifyFee\"";
+//			sql += "       + TX2.\"FireFee\"";
+//			sql += "       + TX2.\"LawFee\"";
+//			sql += "       - CASE "; 
+//			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' "; 
+//			sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\""; 
+//			sql += "         WHEN TX2.\"TempAmt\" < 0"; 
+//			sql += "         THEN ABS(TX2.\"TempAmt\")"; 
+//			sql += "         ELSE 0 END";
+//			sql += "       + CASE";
+//			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
+//			sql += "         THEN TX2.\"TxAmt\"";
+//			sql += "         WHEN TX2.\"TempAmt\" > 0";
+//			sql += "         THEN TX2.\"TempAmt\"";
+//			sql += "         ELSE 0 END AS \"AcctAmt\" ";
+			sql += "       + TX2.\"Overflow\"";
+			sql += "       - TX2.\"TempAmt\"";
+			sql += "       + TX2.\"FeeAmt\"";
 		} else if (funcd == 2) { // 帳管 + 法拍
 			sql += "     , TX2.\"Principal\"";
 			sql += "       + TX2.\"Interest\"";
@@ -323,6 +330,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         THEN NVL(BKD.\"RelCustName\",N' ')";
 		sql += "       ELSE N' ' END";
 		sql += "        AS \"RelCustName\"  ";
+		sql += "     , CM.\"Email\" AS \"Email\" ";
 		sql += "  FROM \"BankDeductDtl\" BKD";
 		sql += "  LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BKD.\"CustNo\"";
 		sql += "  LEFT JOIN (SELECT TMP.\"CustUKey\"";
