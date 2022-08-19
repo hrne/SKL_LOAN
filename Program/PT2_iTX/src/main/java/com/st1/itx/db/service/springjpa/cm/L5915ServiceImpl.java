@@ -18,8 +18,8 @@ import javax.persistence.Query;
 @Service("l5915ServiceImpl")
 public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean {
 	@Autowired
-	public Parse parse;
-	
+	private Parse parse;
+
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
@@ -34,12 +34,12 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
-	public List<Map<String, String>> FindData(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findData(TitaVo titaVo) throws Exception {
 		int workMonth = parse.stringToInteger(titaVo.getParam("Ym")) + 191100;
-		
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		String sql = "select a.\"Coorgnizer\",b.\"Fullname\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\",a.\"DrawdownAmt\",a.\"ComputeCoBonusAmt\",a.\"CoorgnizerBonus\" ";
 		sql += "from \"PfDetail\" a ";
 		sql += "left join \"CdEmp\" b on b.\"EmployeeNo\"=a.\"Coorgnizer\" ";
@@ -48,7 +48,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("workmonth", workMonth);
 
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可

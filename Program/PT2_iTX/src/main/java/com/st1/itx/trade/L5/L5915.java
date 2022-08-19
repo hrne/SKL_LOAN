@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L5915ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L5915")
@@ -28,7 +29,7 @@ import com.st1.itx.util.parse.Parse;
 public class L5915 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
+	private Parse parse;
 
 	@Autowired
 	private L5915ServiceImpl l5915ServiceImpl;
@@ -38,10 +39,13 @@ public class L5915 extends TradeBuffer {
 		this.info("active L5915 ");
 		this.totaVo.init(titaVo);
 
+		// 2022-08-19 智偉增加: SKL user 珮君要求照AS400把協辦人員件數、金額輸出為Excel
+		MySpring.newTask("L5915Batch", this.txBuffer, titaVo);
+
 		List<Map<String, String>> dList = null;
 
 		try {
-			dList = l5915ServiceImpl.FindData(titaVo);
+			dList = l5915ServiceImpl.findData(titaVo);
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			this.info("L5915 ErrorForDB=" + e);
@@ -69,7 +73,7 @@ public class L5915 extends TradeBuffer {
 
 			occursList.putParam("OEmpNo", d.get("Coorgnizer"));
 			occursList.putParam("OEmpName", d.get("Fullname"));
-			occursList.putParam("OCustNo", String.format("%07d", parse.stringToInteger(d.get("CustNo").toString())));
+			occursList.putParam("OCustNo", String.format("%07d", parse.stringToInteger(d.get("CustNo"))));
 			occursList.putParam("OFacmNo", String.format("%03d", parse.stringToInteger(d.get("FacmNo"))));
 			occursList.putParam("OBormNo", String.format("%03d", parse.stringToInteger(d.get("BormNo"))));
 			occursList.putParam("OAmt", d.get("DrawdownAmt"));
