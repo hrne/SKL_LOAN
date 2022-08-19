@@ -147,7 +147,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 //			sql += "         ELSE 0 END AS \"AcctAmt\" ";
 			sql += "       + TX2.\"Overflow\"";
 			sql += "       - TX2.\"TempAmt\"";
-			sql += "       + TX2.\"FeeAmt\"";
+			sql += "       + TX2.\"FeeAmt\" AS \"AcctAmt\"";
 		} else if (funcd == 2) { // 帳管 + 法拍
 			sql += "     , TX2.\"Principal\"";
 			sql += "       + TX2.\"Interest\"";
@@ -330,6 +330,8 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         THEN NVL(BKD.\"RelCustName\",N' ')";
 		sql += "       ELSE N' ' END";
 		sql += "        AS \"RelCustName\"  ";
+		sql += "     , \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1)";
+		sql += "          AS \"CustCell\"    ";
 		sql += "     , CM.\"Email\" AS \"Email\" ";
 		sql += "  FROM \"BankDeductDtl\" BKD";
 		sql += "  LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BKD.\"CustNo\"";

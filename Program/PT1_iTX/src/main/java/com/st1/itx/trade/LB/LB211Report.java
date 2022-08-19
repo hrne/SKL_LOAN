@@ -55,7 +55,8 @@ public class LB211Report extends MakeReport {
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		// LB211 聯徵每日授信餘額變動資料檔
 
-		strToday = String.valueOf(parse.stringToInteger(titaVo.getEntDy())); // 7位 民國年
+//		strToday = String.valueOf(parse.stringToInteger(titaVo.getEntDy())); // 7位 民國年
+		strToday = String.valueOf(Integer.parseInt(titaVo.getParam("FileDay"))); // 7位 民國年 -畫面輸入報送日期
 		strTodayMM = strToday.substring(3, 5); // 月
 		strTodaydd = strToday.substring(5, 7); // 日
 

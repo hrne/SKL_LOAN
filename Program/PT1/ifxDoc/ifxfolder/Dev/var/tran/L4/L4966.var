@@ -25,7 +25,7 @@ E(0,1)ASGN(LOOPHEIGHT$)
 
 ![每張印錄單列印的筆數]
 #INQPRT=n,2,S
-E(0,40)ASGN(INQPRT$)
+E(0,100)ASGN(INQPRT$)
 
 #button=x,1,S
 K(MODIFYBUTTON,查詢)
@@ -172,6 +172,7 @@ TXFORM=L4966
 #OODueAmt
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R47.tom"/>
 </sub>
 
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L4966" layout="cols=3;screen.width=[100,900];order=1;">

@@ -304,7 +304,7 @@ T(2,#OOPayCode+-+#OOPayCodeX)
 #OORelNo=X,18,L
 #OOBankCode=X,7,L
 #OOBUF_A=X,52,S
-T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OOCustNo+#OOFacmNo+#OOBormNo+#OORemitAmt)
+T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+0000000+000+000+#OORemitAmt)
 
 #OOBTN_A=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L3912; ntxbuf=#OOBUF_A})

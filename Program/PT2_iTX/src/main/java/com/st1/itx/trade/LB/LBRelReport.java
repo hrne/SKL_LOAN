@@ -114,6 +114,12 @@ public class LBRelReport extends MakeReport {
 	private void genFile(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
 		this.info("=========== LBRel genFile : ");
 
+		int fileday = Integer.parseInt(titaVo.getParam("FileDay")); // 民國年月日 -畫面輸入報送日期
+		if (fileday > 0) {
+			strToday = String.valueOf(fileday); // 7位 民國年
+			strTodayMM = strToday.substring(3, 5); // 月
+			strTodaydd = strToday.substring(5, 7); // 日
+		}
 		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
@@ -194,7 +200,7 @@ public class LBRelReport extends MakeReport {
 				}
 			}
 
-			// 末筆 無 ???
+			// 末筆 無 
 			// strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
 			// + StringUtils.repeat(" ",116);
 			// makeFile.put(strContent);
@@ -212,6 +218,12 @@ public class LBRelReport extends MakeReport {
 		this.info("=========== LBRel genExcel: ");
 		this.info("LBRel genExcel TitaVo=" + titaVo);
 
+		int fileday = Integer.parseInt(titaVo.getParam("FileDay")); // 民國年月日 -畫面輸入報送日期
+		if (fileday > 0) {
+			strToday = String.valueOf(fileday); // 7位 民國年
+			strTodayMM = strToday.substring(3, 5); // 月
+			strTodaydd = strToday.substring(5, 7); // 日
+		}
 		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {

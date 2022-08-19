@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -24,457 +26,495 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`JcicZ061`")
 public class JcicZ061 implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4540155970999650036L;
 
-	@EmbeddedId
-	private JcicZ061Id jcicZ061Id;
+  @EmbeddedId
+  private JcicZ061Id jcicZ061Id;
 
-	// 交易代碼
-	/* A:新增;C:異動 */
-	@Column(name = "`TranKey`", length = 1)
-	private String tranKey;
+  // 交易代碼
+  /* A:新增C:異動 */
+  @Column(name = "`TranKey`", length = 1)
+  private String tranKey;
 
-	// 債權金融機構代號
-	/* 三位文數字 */
-	@Column(name = "`SubmitKey`", length = 3, insertable = false, updatable = false)
-	private String submitKey;
+  // 債權金融機構代號
+  /* 三位文數字 */
+  @Column(name = "`SubmitKey`", length = 3, insertable = false, updatable = false)
+  private String submitKey;
 
-	// 債務人IDN
-	@Column(name = "`CustId`", length = 10, insertable = false, updatable = false)
-	private String custId;
+  // 債務人IDN
+  @Column(name = "`CustId`", length = 10, insertable = false, updatable = false)
+  private String custId;
 
-	// 原前置協商申請日
-	@Column(name = "`RcDate`", insertable = false, updatable = false)
-	private int rcDate = 0;
+  // 原前置協商申請日
+  @Column(name = "`RcDate`", insertable = false, updatable = false)
+  private int rcDate = 0;
 
-	// 申請變更還款條件日
-	@Column(name = "`ChangePayDate`", insertable = false, updatable = false)
-	private int changePayDate = 0;
+  // 申請變更還款條件日
+  @Column(name = "`ChangePayDate`", insertable = false, updatable = false)
+  private int changePayDate = 0;
 
-	// 最大債權金融機構代號
-	/* 三位文數字 */
-	@Column(name = "`MaxMainCode`", length = 3, insertable = false, updatable = false)
-	private String maxMainCode;
+  // 最大債權金融機構代號
+  /* 三位文數字 */
+  @Column(name = "`MaxMainCode`", length = 3, insertable = false, updatable = false)
+  private String maxMainCode;
 
-	// 信用貸款協商剩餘債權餘額
-	@Column(name = "`ExpBalanceAmt`")
-	private int expBalanceAmt = 0;
+  // 信用貸款協商剩餘債權餘額
+  @Column(name = "`ExpBalanceAmt`")
+  private int expBalanceAmt = 0;
 
-	// 現金卡協商剩餘債權餘額
-	@Column(name = "`CashBalanceAmt`")
-	private int cashBalanceAmt = 0;
+  // 現金卡協商剩餘債權餘額
+  @Column(name = "`CashBalanceAmt`")
+  private int cashBalanceAmt = 0;
 
-	// 信用卡協商剩餘債權餘額
-	@Column(name = "`CreditBalanceAmt`")
-	private int creditBalanceAmt = 0;
+  // 信用卡協商剩餘債權餘額
+  @Column(name = "`CreditBalanceAmt`")
+  private int creditBalanceAmt = 0;
 
-	// 最大債權金融機構報送註記
-	/* Y;N */
-	@Column(name = "`MaxMainNote`", length = 1)
-	private String maxMainNote;
+  // 最大債權金融機構報送註記
+  /* Y;N */
+  @Column(name = "`MaxMainNote`", length = 1)
+  private String maxMainNote;
 
-	// 是否有保證人
-	/* Y;N */
-	@Column(name = "`IsGuarantor`", length = 1)
-	private String isGuarantor;
+  // 是否有保證人
+  /* Y;N */
+  @Column(name = "`IsGuarantor`", length = 1)
+  private String isGuarantor;
 
-	// 是否同意債務人申請變更還款條件方案
-	/* Y;N */
-	@Column(name = "`IsChangePayment`", length = 1)
-	private String isChangePayment;
+  // 是否同意債務人申請變更還款條件方案
+  /* Y;N */
+  @Column(name = "`IsChangePayment`", length = 1)
+  private String isChangePayment;
 
-	// 轉出JCIC文字檔日期
-	@Column(name = "`OutJcicTxtDate`")
-	private int outJcicTxtDate = 0;
+  // 轉出JCIC文字檔日期
+  @Column(name = "`OutJcicTxtDate`")
+  private int outJcicTxtDate = 0;
 
-	// 流水號
-	@Column(name = "`Ukey`", length = 32)
-	private String ukey;
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	public JcicZ061Id getJcicZ061Id() {
-		return this.jcicZ061Id;
-	}
+  // 實際報送日期
+  @Column(name = "`ActualFilingDate`")
+  private int actualFilingDate = 0;
 
-	public void setJcicZ061Id(JcicZ061Id jcicZ061Id) {
-		this.jcicZ061Id = jcicZ061Id;
-	}
+  // 實際報送記號
+  @Column(name = "`ActualFilingMark`", length = 3)
+  private String actualFilingMark;
 
-	/**
-	 * 交易代碼<br>
-	 * A:新增;C:異動
-	 * 
-	 * @return String
-	 */
-	public String getTranKey() {
-		return this.tranKey == null ? "" : this.tranKey;
-	}
 
-	/**
-	 * 交易代碼<br>
-	 * A:新增;C:異動
-	 *
-	 * @param tranKey 交易代碼
-	 */
-	public void setTranKey(String tranKey) {
-		this.tranKey = tranKey;
-	}
+  public JcicZ061Id getJcicZ061Id() {
+    return this.jcicZ061Id;
+  }
 
-	/**
-	 * 債權金融機構代號<br>
-	 * 三位文數字
-	 * 
-	 * @return String
-	 */
-	public String getSubmitKey() {
-		return this.submitKey == null ? "" : this.submitKey;
-	}
+  public void setJcicZ061Id(JcicZ061Id jcicZ061Id) {
+    this.jcicZ061Id = jcicZ061Id;
+  }
 
-	/**
-	 * 債權金融機構代號<br>
-	 * 三位文數字
-	 *
-	 * @param submitKey 債權金融機構代號
-	 */
-	public void setSubmitKey(String submitKey) {
-		this.submitKey = submitKey;
-	}
+/**
+	* 交易代碼<br>
+	* A:新增
+C:異動
+	* @return String
+	*/
+  public String getTranKey() {
+    return this.tranKey == null ? "" : this.tranKey;
+  }
 
-	/**
-	 * 債務人IDN<br>
-	 * 
-	 * @return String
-	 */
-	public String getCustId() {
-		return this.custId == null ? "" : this.custId;
-	}
+/**
+	* 交易代碼<br>
+	* A:新增
+C:異動
+  *
+  * @param tranKey 交易代碼
+	*/
+  public void setTranKey(String tranKey) {
+    this.tranKey = tranKey;
+  }
 
-	/**
-	 * 債務人IDN<br>
-	 * 
-	 *
-	 * @param custId 債務人IDN
-	 */
-	public void setCustId(String custId) {
-		this.custId = custId;
-	}
+/**
+	* 債權金融機構代號<br>
+	* 三位文數字
+	* @return String
+	*/
+  public String getSubmitKey() {
+    return this.submitKey == null ? "" : this.submitKey;
+  }
 
-	/**
-	 * 原前置協商申請日<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getRcDate() {
-		return StaticTool.bcToRoc(this.rcDate);
-	}
+/**
+	* 債權金融機構代號<br>
+	* 三位文數字
+  *
+  * @param submitKey 債權金融機構代號
+	*/
+  public void setSubmitKey(String submitKey) {
+    this.submitKey = submitKey;
+  }
 
-	/**
-	 * 原前置協商申請日<br>
-	 * 
-	 *
-	 * @param rcDate 原前置協商申請日
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setRcDate(int rcDate) throws LogicException {
-		this.rcDate = StaticTool.rocToBc(rcDate);
-	}
+/**
+	* 債務人IDN<br>
+	* 
+	* @return String
+	*/
+  public String getCustId() {
+    return this.custId == null ? "" : this.custId;
+  }
 
-	/**
-	 * 申請變更還款條件日<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getChangePayDate() {
-		return StaticTool.bcToRoc(this.changePayDate);
-	}
+/**
+	* 債務人IDN<br>
+	* 
+  *
+  * @param custId 債務人IDN
+	*/
+  public void setCustId(String custId) {
+    this.custId = custId;
+  }
 
-	/**
-	 * 申請變更還款條件日<br>
-	 * 
-	 *
-	 * @param changePayDate 申請變更還款條件日
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setChangePayDate(int changePayDate) throws LogicException {
-		this.changePayDate = StaticTool.rocToBc(changePayDate);
-	}
+/**
+	* 原前置協商申請日<br>
+	* 
+	* @return Integer
+	*/
+  public int getRcDate() {
+    return StaticTool.bcToRoc(this.rcDate);
+  }
 
-	/**
-	 * 最大債權金融機構代號<br>
-	 * 三位文數字
-	 * 
-	 * @return String
-	 */
-	public String getMaxMainCode() {
-		return this.maxMainCode == null ? "" : this.maxMainCode;
-	}
+/**
+	* 原前置協商申請日<br>
+	* 
+  *
+  * @param rcDate 原前置協商申請日
+  * @throws LogicException when Date Is Warn	*/
+  public void setRcDate(int rcDate) throws LogicException {
+    this.rcDate = StaticTool.rocToBc(rcDate);
+  }
 
-	/**
-	 * 最大債權金融機構代號<br>
-	 * 三位文數字
-	 *
-	 * @param maxMainCode 最大債權金融機構代號
-	 */
-	public void setMaxMainCode(String maxMainCode) {
-		this.maxMainCode = maxMainCode;
-	}
+/**
+	* 申請變更還款條件日<br>
+	* 
+	* @return Integer
+	*/
+  public int getChangePayDate() {
+    return StaticTool.bcToRoc(this.changePayDate);
+  }
 
-	/**
-	 * 信用貸款協商剩餘債權餘額<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getExpBalanceAmt() {
-		return this.expBalanceAmt;
-	}
+/**
+	* 申請變更還款條件日<br>
+	* 
+  *
+  * @param changePayDate 申請變更還款條件日
+  * @throws LogicException when Date Is Warn	*/
+  public void setChangePayDate(int changePayDate) throws LogicException {
+    this.changePayDate = StaticTool.rocToBc(changePayDate);
+  }
 
-	/**
-	 * 信用貸款協商剩餘債權餘額<br>
-	 * 
-	 *
-	 * @param expBalanceAmt 信用貸款協商剩餘債權餘額
-	 */
-	public void setExpBalanceAmt(int expBalanceAmt) {
-		this.expBalanceAmt = expBalanceAmt;
-	}
+/**
+	* 最大債權金融機構代號<br>
+	* 三位文數字
+	* @return String
+	*/
+  public String getMaxMainCode() {
+    return this.maxMainCode == null ? "" : this.maxMainCode;
+  }
 
-	/**
-	 * 現金卡協商剩餘債權餘額<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getCashBalanceAmt() {
-		return this.cashBalanceAmt;
-	}
+/**
+	* 最大債權金融機構代號<br>
+	* 三位文數字
+  *
+  * @param maxMainCode 最大債權金融機構代號
+	*/
+  public void setMaxMainCode(String maxMainCode) {
+    this.maxMainCode = maxMainCode;
+  }
 
-	/**
-	 * 現金卡協商剩餘債權餘額<br>
-	 * 
-	 *
-	 * @param cashBalanceAmt 現金卡協商剩餘債權餘額
-	 */
-	public void setCashBalanceAmt(int cashBalanceAmt) {
-		this.cashBalanceAmt = cashBalanceAmt;
-	}
+/**
+	* 信用貸款協商剩餘債權餘額<br>
+	* 
+	* @return Integer
+	*/
+  public int getExpBalanceAmt() {
+    return this.expBalanceAmt;
+  }
 
-	/**
-	 * 信用卡協商剩餘債權餘額<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getCreditBalanceAmt() {
-		return this.creditBalanceAmt;
-	}
+/**
+	* 信用貸款協商剩餘債權餘額<br>
+	* 
+  *
+  * @param expBalanceAmt 信用貸款協商剩餘債權餘額
+	*/
+  public void setExpBalanceAmt(int expBalanceAmt) {
+    this.expBalanceAmt = expBalanceAmt;
+  }
 
-	/**
-	 * 信用卡協商剩餘債權餘額<br>
-	 * 
-	 *
-	 * @param creditBalanceAmt 信用卡協商剩餘債權餘額
-	 */
-	public void setCreditBalanceAmt(int creditBalanceAmt) {
-		this.creditBalanceAmt = creditBalanceAmt;
-	}
+/**
+	* 現金卡協商剩餘債權餘額<br>
+	* 
+	* @return Integer
+	*/
+  public int getCashBalanceAmt() {
+    return this.cashBalanceAmt;
+  }
 
-	/**
-	 * 最大債權金融機構報送註記<br>
-	 * Y;N
-	 * 
-	 * @return String
-	 */
-	public String getMaxMainNote() {
-		return this.maxMainNote == null ? "" : this.maxMainNote;
-	}
+/**
+	* 現金卡協商剩餘債權餘額<br>
+	* 
+  *
+  * @param cashBalanceAmt 現金卡協商剩餘債權餘額
+	*/
+  public void setCashBalanceAmt(int cashBalanceAmt) {
+    this.cashBalanceAmt = cashBalanceAmt;
+  }
 
-	/**
-	 * 最大債權金融機構報送註記<br>
-	 * Y;N
-	 *
-	 * @param maxMainNote 最大債權金融機構報送註記
-	 */
-	public void setMaxMainNote(String maxMainNote) {
-		this.maxMainNote = maxMainNote;
-	}
+/**
+	* 信用卡協商剩餘債權餘額<br>
+	* 
+	* @return Integer
+	*/
+  public int getCreditBalanceAmt() {
+    return this.creditBalanceAmt;
+  }
 
-	/**
-	 * 是否有保證人<br>
-	 * Y;N
-	 * 
-	 * @return String
-	 */
-	public String getIsGuarantor() {
-		return this.isGuarantor == null ? "" : this.isGuarantor;
-	}
+/**
+	* 信用卡協商剩餘債權餘額<br>
+	* 
+  *
+  * @param creditBalanceAmt 信用卡協商剩餘債權餘額
+	*/
+  public void setCreditBalanceAmt(int creditBalanceAmt) {
+    this.creditBalanceAmt = creditBalanceAmt;
+  }
 
-	/**
-	 * 是否有保證人<br>
-	 * Y;N
-	 *
-	 * @param isGuarantor 是否有保證人
-	 */
-	public void setIsGuarantor(String isGuarantor) {
-		this.isGuarantor = isGuarantor;
-	}
+/**
+	* 最大債權金融機構報送註記<br>
+	* Y;N
+	* @return String
+	*/
+  public String getMaxMainNote() {
+    return this.maxMainNote == null ? "" : this.maxMainNote;
+  }
 
-	/**
-	 * 是否同意債務人申請變更還款條件方案<br>
-	 * Y;N
-	 * 
-	 * @return String
-	 */
-	public String getIsChangePayment() {
-		return this.isChangePayment == null ? "" : this.isChangePayment;
-	}
+/**
+	* 最大債權金融機構報送註記<br>
+	* Y;N
+  *
+  * @param maxMainNote 最大債權金融機構報送註記
+	*/
+  public void setMaxMainNote(String maxMainNote) {
+    this.maxMainNote = maxMainNote;
+  }
 
-	/**
-	 * 是否同意債務人申請變更還款條件方案<br>
-	 * Y;N
-	 *
-	 * @param isChangePayment 是否同意債務人申請變更還款條件方案
-	 */
-	public void setIsChangePayment(String isChangePayment) {
-		this.isChangePayment = isChangePayment;
-	}
+/**
+	* 是否有保證人<br>
+	* Y;N
+	* @return String
+	*/
+  public String getIsGuarantor() {
+    return this.isGuarantor == null ? "" : this.isGuarantor;
+  }
 
-	/**
-	 * 轉出JCIC文字檔日期<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getOutJcicTxtDate() {
-		return StaticTool.bcToRoc(this.outJcicTxtDate);
-	}
+/**
+	* 是否有保證人<br>
+	* Y;N
+  *
+  * @param isGuarantor 是否有保證人
+	*/
+  public void setIsGuarantor(String isGuarantor) {
+    this.isGuarantor = isGuarantor;
+  }
 
-	/**
-	 * 轉出JCIC文字檔日期<br>
-	 * 
-	 *
-	 * @param outJcicTxtDate 轉出JCIC文字檔日期
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
-		this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
-	}
+/**
+	* 是否同意債務人申請變更還款條件方案<br>
+	* Y;N
+	* @return String
+	*/
+  public String getIsChangePayment() {
+    return this.isChangePayment == null ? "" : this.isChangePayment;
+  }
 
-	/**
-	 * 流水號<br>
-	 * 
-	 * @return String
-	 */
-	public String getUkey() {
-		return this.ukey == null ? "" : this.ukey;
-	}
+/**
+	* 是否同意債務人申請變更還款條件方案<br>
+	* Y;N
+  *
+  * @param isChangePayment 是否同意債務人申請變更還款條件方案
+	*/
+  public void setIsChangePayment(String isChangePayment) {
+    this.isChangePayment = isChangePayment;
+  }
 
-	/**
-	 * 流水號<br>
-	 * 
-	 *
-	 * @param ukey 流水號
-	 */
-	public void setUkey(String ukey) {
-		this.ukey = ukey;
-	}
+/**
+	* 轉出JCIC文字檔日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getOutJcicTxtDate() {
+    return StaticTool.bcToRoc(this.outJcicTxtDate);
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 轉出JCIC文字檔日期<br>
+	* 
+  *
+  * @param outJcicTxtDate 轉出JCIC文字檔日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
+    this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
 
-	@Override
-	public String toString() {
-		return "JcicZ061 [jcicZ061Id=" + jcicZ061Id + ", tranKey=" + tranKey + ", expBalanceAmt=" + expBalanceAmt + ", cashBalanceAmt=" + cashBalanceAmt + ", creditBalanceAmt=" + creditBalanceAmt
-				+ ", maxMainNote=" + maxMainNote + ", isGuarantor=" + isGuarantor + ", isChangePayment=" + isChangePayment + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate="
-				+ createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+/**
+	* 實際報送日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getActualFilingDate() {
+    return StaticTool.bcToRoc(this.actualFilingDate);
+  }
+
+/**
+	* 實際報送日期<br>
+	* 
+  *
+  * @param actualFilingDate 實際報送日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setActualFilingDate(int actualFilingDate) throws LogicException {
+    this.actualFilingDate = StaticTool.rocToBc(actualFilingDate);
+  }
+
+/**
+	* 實際報送記號<br>
+	* 
+	* @return String
+	*/
+  public String getActualFilingMark() {
+    return this.actualFilingMark == null ? "" : this.actualFilingMark;
+  }
+
+/**
+	* 實際報送記號<br>
+	* 
+  *
+  * @param actualFilingMark 實際報送記號
+	*/
+  public void setActualFilingMark(String actualFilingMark) {
+    this.actualFilingMark = actualFilingMark;
+  }
+
+
+  @Override
+  public String toString() {
+    return "JcicZ061 [jcicZ061Id=" + jcicZ061Id + ", tranKey=" + tranKey
+           + ", expBalanceAmt=" + expBalanceAmt + ", cashBalanceAmt=" + cashBalanceAmt + ", creditBalanceAmt=" + creditBalanceAmt + ", maxMainNote=" + maxMainNote + ", isGuarantor=" + isGuarantor + ", isChangePayment=" + isChangePayment
+           + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + ", actualFilingDate=" + actualFilingDate + ", actualFilingMark=" + actualFilingMark + "]";
+  }
 }

@@ -56,6 +56,7 @@ public class LB204 extends BatchBase implements Tasklet, InitializingBean {
 		titaVo.putParam("AcDateStart", Integer.parseInt(titaVo.getEntDy()));
 		titaVo.putParam("AcDateEnd", Integer.parseInt(titaVo.getEntDy()));
 		titaVo.putParam("FileNo", sFileNo);
+		titaVo.putParam("FileDay", Integer.parseInt(titaVo.getEntDy()));
 		
 		boolean isFinish = lB204Report.exec(titaVo);
 

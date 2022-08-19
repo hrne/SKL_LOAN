@@ -243,12 +243,11 @@ public class L4455Report2 extends MakeReport {
 				}
 
 				this.print(0, 168, L4455List.get(i).get("ReturnCode"));// 原因
+				this.print(0, 172, L4455List.get(i).get("Remark"));// 備註
 
-				if ("".equals(L4455List.get(i).get("CustTel")) || "".equals(L4455List.get(i).get("Email"))) {
-					this.print(0, 172, L4455List.get(i).get("Remark") + "無手機及E-MAIL");// 備註
-				} else {
-					this.print(0, 172, L4455List.get(i).get("Remark"));// 備註
-				}
+				if ("".equals(L4455List.get(i).get("CustCell")) && "".equals(L4455List.get(i).get("Email"))) {
+					this.print(0, 186, "無手機號碼及E-MAIL");// 備註
+				} 
 
 				pagetime++;
 

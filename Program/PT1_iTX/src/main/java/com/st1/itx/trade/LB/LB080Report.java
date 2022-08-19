@@ -124,6 +124,13 @@ public class LB080Report extends MakeReport {
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19";
 		String txt1[] = txt.split(";");
 
+		int fileday = Integer.parseInt(titaVo.getParam("FileDay")); // 民國年月日 -畫面輸入報送日期
+		if (fileday > 0) {
+			strToday = String.valueOf(fileday); // 7位 民國年
+			strTodayMM = strToday.substring(3, 5); // 月
+			strTodaydd = strToday.substring(5, 7); // 日
+		}
+		
 		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
@@ -272,6 +279,13 @@ public class LB080Report extends MakeReport {
 	private void genExcel(TitaVo titaVo, List<Map<String, String>> LBList) throws LogicException {
 		this.info("=========== LB080 genExcel: ");
 		this.info("LB080 genExcel TitaVo=" + titaVo);
+
+		int fileday = Integer.parseInt(titaVo.getParam("FileDay")); // 民國年月日 -畫面輸入報送日期
+		if (fileday > 0) {
+			strToday = String.valueOf(fileday); // 7位 民國年
+			strTodayMM = strToday.substring(3, 5); // 月
+			strTodaydd = strToday.substring(5, 7); // 日
+		}
 
 		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);

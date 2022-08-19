@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,384 +26,423 @@ import com.st1.itx.Exception.LogicException;
 @Table(name = "`JcicZ572`")
 public class JcicZ572 implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2738442814254437372L;
 
-	@EmbeddedId
-	private JcicZ572Id jcicZ572Id;
+  @EmbeddedId
+  private JcicZ572Id jcicZ572Id;
 
-	// 交易代碼
-	/* A:新增;C:異動 */
-	@Column(name = "`TranKey`", length = 1)
-	private String tranKey;
+  // 交易代碼
+  /* A:新增C:異動 */
+  @Column(name = "`TranKey`", length = 1)
+  private String tranKey;
 
-	// 報送單位代號
-	/* 3位文數字 */
-	@Column(name = "`SubmitKey`", length = 3, insertable = false, updatable = false)
-	private String submitKey;
+  // 報送單位代號
+  /* 3位文數字 */
+  @Column(name = "`SubmitKey`", length = 3, insertable = false, updatable = false)
+  private String submitKey;
 
-	// 債務人IDN
-	@Column(name = "`CustId`", length = 10, insertable = false, updatable = false)
-	private String custId;
+  // 債務人IDN
+  @Column(name = "`CustId`", length = 10, insertable = false, updatable = false)
+  private String custId;
 
-	// 申請日期
-	@Column(name = "`ApplyDate`", insertable = false, updatable = false)
-	private int applyDate = 0;
+  // 申請日期
+  @Column(name = "`ApplyDate`", insertable = false, updatable = false)
+  private int applyDate = 0;
 
-	// 生效日期
-	@Column(name = "`StartDate`")
-	private int startDate = 0;
+  // 生效日期
+  @Column(name = "`StartDate`")
+  private int startDate = 0;
 
-	// 本分配表首繳日
-	@Column(name = "`PayDate`", insertable = false, updatable = false)
-	private int payDate = 0;
+  // 本分配表首繳日
+  @Column(name = "`PayDate`", insertable = false, updatable = false)
+  private int payDate = 0;
 
-	// 債權金融機構代號
-	/* 3位文數字 */
-	@Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
-	private String bankId;
+  // 債權金融機構代號
+  /* 3位文數字 */
+  @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
+  private String bankId;
 
-	// 參與分配債權金額
-	@Column(name = "`AllotAmt`")
-	private int allotAmt = 0;
+  // 參與分配債權金額
+  @Column(name = "`AllotAmt`")
+  private int allotAmt = 0;
 
-	// 債權比例
-	/* XXX.XX */
-	@Column(name = "`OwnPercentage`")
-	private BigDecimal ownPercentage = new BigDecimal("0");
+  // 債權比例
+  /* XXX.XX */
+  @Column(name = "`OwnPercentage`")
+  private BigDecimal ownPercentage = new BigDecimal("0");
 
-	// 轉JCIC文字檔日期
-	@Column(name = "`OutJcicTxtDate`")
-	private int outJcicTxtDate = 0;
+  // 轉JCIC文字檔日期
+  @Column(name = "`OutJcicTxtDate`")
+  private int outJcicTxtDate = 0;
 
-	// 流水號
-	@Column(name = "`Ukey`", length = 32)
-	private String ukey;
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	public JcicZ572Id getJcicZ572Id() {
-		return this.jcicZ572Id;
-	}
+  // 實際報送日期
+  @Column(name = "`ActualFilingDate`")
+  private int actualFilingDate = 0;
 
-	public void setJcicZ572Id(JcicZ572Id jcicZ572Id) {
-		this.jcicZ572Id = jcicZ572Id;
-	}
+  // 實際報送記號
+  @Column(name = "`ActualFilingMark`", length = 3)
+  private String actualFilingMark;
 
-	/**
-	 * 交易代碼<br>
-	 * A:新增;C:異動
-	 * 
-	 * @return String
-	 */
-	public String getTranKey() {
-		return this.tranKey == null ? "" : this.tranKey;
-	}
 
-	/**
-	 * 交易代碼<br>
-	 * A:新增;C:異動
-	 *
-	 * @param tranKey 交易代碼
-	 */
-	public void setTranKey(String tranKey) {
-		this.tranKey = tranKey;
-	}
+  public JcicZ572Id getJcicZ572Id() {
+    return this.jcicZ572Id;
+  }
 
-	/**
-	 * 報送單位代號<br>
-	 * 3位文數字
-	 * 
-	 * @return String
-	 */
-	public String getSubmitKey() {
-		return this.submitKey == null ? "" : this.submitKey;
-	}
+  public void setJcicZ572Id(JcicZ572Id jcicZ572Id) {
+    this.jcicZ572Id = jcicZ572Id;
+  }
 
-	/**
-	 * 報送單位代號<br>
-	 * 3位文數字
-	 *
-	 * @param submitKey 報送單位代號
-	 */
-	public void setSubmitKey(String submitKey) {
-		this.submitKey = submitKey;
-	}
+/**
+	* 交易代碼<br>
+	* A:新增
+C:異動
+	* @return String
+	*/
+  public String getTranKey() {
+    return this.tranKey == null ? "" : this.tranKey;
+  }
 
-	/**
-	 * 債務人IDN<br>
-	 * 
-	 * @return String
-	 */
-	public String getCustId() {
-		return this.custId == null ? "" : this.custId;
-	}
+/**
+	* 交易代碼<br>
+	* A:新增
+C:異動
+  *
+  * @param tranKey 交易代碼
+	*/
+  public void setTranKey(String tranKey) {
+    this.tranKey = tranKey;
+  }
 
-	/**
-	 * 債務人IDN<br>
-	 * 
-	 *
-	 * @param custId 債務人IDN
-	 */
-	public void setCustId(String custId) {
-		this.custId = custId;
-	}
+/**
+	* 報送單位代號<br>
+	* 3位文數字
+	* @return String
+	*/
+  public String getSubmitKey() {
+    return this.submitKey == null ? "" : this.submitKey;
+  }
 
-	/**
-	 * 申請日期<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getApplyDate() {
-		return StaticTool.bcToRoc(this.applyDate);
-	}
+/**
+	* 報送單位代號<br>
+	* 3位文數字
+  *
+  * @param submitKey 報送單位代號
+	*/
+  public void setSubmitKey(String submitKey) {
+    this.submitKey = submitKey;
+  }
 
-	/**
-	 * 申請日期<br>
-	 * 
-	 *
-	 * @param applyDate 申請日期
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setApplyDate(int applyDate) throws LogicException {
-		this.applyDate = StaticTool.rocToBc(applyDate);
-	}
+/**
+	* 債務人IDN<br>
+	* 
+	* @return String
+	*/
+  public String getCustId() {
+    return this.custId == null ? "" : this.custId;
+  }
 
-	/**
-	 * 生效日期<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getStartDate() {
-		return StaticTool.bcToRoc(this.startDate);
-	}
+/**
+	* 債務人IDN<br>
+	* 
+  *
+  * @param custId 債務人IDN
+	*/
+  public void setCustId(String custId) {
+    this.custId = custId;
+  }
 
-	/**
-	 * 生效日期<br>
-	 * 
-	 *
-	 * @param startDate 生效日期
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setStartDate(int startDate) throws LogicException {
-		this.startDate = StaticTool.rocToBc(startDate);
-	}
+/**
+	* 申請日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getApplyDate() {
+    return StaticTool.bcToRoc(this.applyDate);
+  }
 
-	/**
-	 * 本分配表首繳日<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getPayDate() {
-		return StaticTool.bcToRoc(this.payDate);
-	}
+/**
+	* 申請日期<br>
+	* 
+  *
+  * @param applyDate 申請日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setApplyDate(int applyDate) throws LogicException {
+    this.applyDate = StaticTool.rocToBc(applyDate);
+  }
 
-	/**
-	 * 本分配表首繳日<br>
-	 * 
-	 *
-	 * @param payDate 本分配表首繳日
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setPayDate(int payDate) throws LogicException {
-		this.payDate = StaticTool.rocToBc(payDate);
-	}
+/**
+	* 生效日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getStartDate() {
+    return StaticTool.bcToRoc(this.startDate);
+  }
 
-	/**
-	 * 債權金融機構代號<br>
-	 * 3位文數字
-	 * 
-	 * @return String
-	 */
-	public String getBankId() {
-		return this.bankId == null ? "" : this.bankId;
-	}
+/**
+	* 生效日期<br>
+	* 
+  *
+  * @param startDate 生效日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setStartDate(int startDate) throws LogicException {
+    this.startDate = StaticTool.rocToBc(startDate);
+  }
 
-	/**
-	 * 債權金融機構代號<br>
-	 * 3位文數字
-	 *
-	 * @param bankId 債權金融機構代號
-	 */
-	public void setBankId(String bankId) {
-		this.bankId = bankId;
-	}
+/**
+	* 本分配表首繳日<br>
+	* 
+	* @return Integer
+	*/
+  public int getPayDate() {
+    return StaticTool.bcToRoc(this.payDate);
+  }
 
-	/**
-	 * 參與分配債權金額<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getAllotAmt() {
-		return this.allotAmt;
-	}
+/**
+	* 本分配表首繳日<br>
+	* 
+  *
+  * @param payDate 本分配表首繳日
+  * @throws LogicException when Date Is Warn	*/
+  public void setPayDate(int payDate) throws LogicException {
+    this.payDate = StaticTool.rocToBc(payDate);
+  }
 
-	/**
-	 * 參與分配債權金額<br>
-	 * 
-	 *
-	 * @param allotAmt 參與分配債權金額
-	 */
-	public void setAllotAmt(int allotAmt) {
-		this.allotAmt = allotAmt;
-	}
+/**
+	* 債權金融機構代號<br>
+	* 3位文數字
+	* @return String
+	*/
+  public String getBankId() {
+    return this.bankId == null ? "" : this.bankId;
+  }
 
-	/**
-	 * 債權比例<br>
-	 * XXX.XX
-	 * 
-	 * @return BigDecimal
-	 */
-	public BigDecimal getOwnPercentage() {
-		return this.ownPercentage;
-	}
+/**
+	* 債權金融機構代號<br>
+	* 3位文數字
+  *
+  * @param bankId 債權金融機構代號
+	*/
+  public void setBankId(String bankId) {
+    this.bankId = bankId;
+  }
 
-	/**
-	 * 債權比例<br>
-	 * XXX.XX
-	 *
-	 * @param ownPercentage 債權比例
-	 */
-	public void setOwnPercentage(BigDecimal ownPercentage) {
-		this.ownPercentage = ownPercentage;
-	}
+/**
+	* 參與分配債權金額<br>
+	* 
+	* @return Integer
+	*/
+  public int getAllotAmt() {
+    return this.allotAmt;
+  }
 
-	/**
-	 * 轉JCIC文字檔日期<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getOutJcicTxtDate() {
-		return StaticTool.bcToRoc(this.outJcicTxtDate);
-	}
+/**
+	* 參與分配債權金額<br>
+	* 
+  *
+  * @param allotAmt 參與分配債權金額
+	*/
+  public void setAllotAmt(int allotAmt) {
+    this.allotAmt = allotAmt;
+  }
 
-	/**
-	 * 轉JCIC文字檔日期<br>
-	 * 
-	 *
-	 * @param outJcicTxtDate 轉JCIC文字檔日期
-	 * @throws LogicException when Date Is Warn
-	 */
-	public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
-		this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
-	}
+/**
+	* 債權比例<br>
+	* XXX.XX
+	* @return BigDecimal
+	*/
+  public BigDecimal getOwnPercentage() {
+    return this.ownPercentage;
+  }
 
-	/**
-	 * 流水號<br>
-	 * 
-	 * @return String
-	 */
-	public String getUkey() {
-		return this.ukey == null ? "" : this.ukey;
-	}
+/**
+	* 債權比例<br>
+	* XXX.XX
+  *
+  * @param ownPercentage 債權比例
+	*/
+  public void setOwnPercentage(BigDecimal ownPercentage) {
+    this.ownPercentage = ownPercentage;
+  }
 
-	/**
-	 * 流水號<br>
-	 * 
-	 *
-	 * @param ukey 流水號
-	 */
-	public void setUkey(String ukey) {
-		this.ukey = ukey;
-	}
+/**
+	* 轉JCIC文字檔日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getOutJcicTxtDate() {
+    return StaticTool.bcToRoc(this.outJcicTxtDate);
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 轉JCIC文字檔日期<br>
+	* 
+  *
+  * @param outJcicTxtDate 轉JCIC文字檔日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setOutJcicTxtDate(int outJcicTxtDate) throws LogicException {
+    this.outJcicTxtDate = StaticTool.rocToBc(outJcicTxtDate);
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
 
-	@Override
-	public String toString() {
-		return "JcicZ572 [jcicZ572Id=" + jcicZ572Id + ", tranKey=" + tranKey + ", startDate=" + startDate + ", allotAmt=" + allotAmt + ", ownPercentage=" + ownPercentage + ", outJcicTxtDate="
-				+ outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+/**
+	* 實際報送日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getActualFilingDate() {
+    return StaticTool.bcToRoc(this.actualFilingDate);
+  }
+
+/**
+	* 實際報送日期<br>
+	* 
+  *
+  * @param actualFilingDate 實際報送日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setActualFilingDate(int actualFilingDate) throws LogicException {
+    this.actualFilingDate = StaticTool.rocToBc(actualFilingDate);
+  }
+
+/**
+	* 實際報送記號<br>
+	* 
+	* @return String
+	*/
+  public String getActualFilingMark() {
+    return this.actualFilingMark == null ? "" : this.actualFilingMark;
+  }
+
+/**
+	* 實際報送記號<br>
+	* 
+  *
+  * @param actualFilingMark 實際報送記號
+	*/
+  public void setActualFilingMark(String actualFilingMark) {
+    this.actualFilingMark = actualFilingMark;
+  }
+
+
+  @Override
+  public String toString() {
+    return "JcicZ572 [jcicZ572Id=" + jcicZ572Id + ", tranKey=" + tranKey + ", startDate=" + startDate
+           + ", allotAmt=" + allotAmt + ", ownPercentage=" + ownPercentage + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", actualFilingDate=" + actualFilingDate + ", actualFilingMark=" + actualFilingMark + "]";
+  }
 }

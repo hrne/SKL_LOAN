@@ -218,9 +218,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
+			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + iGroupId;
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
-		}
-		sql += " where b.\"Status\" = 0                                        ";
+		}		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
@@ -310,10 +310,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iAdjustDate > 0 && iAdjustDateC == 2) {
 			sql += "   and r.\"EffectDate\"  >= " + iAdjustDate;
 		}
-
 		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
-			sql += "   and a.\"GroupUKey\" = '" + iGroupId + "' ";
+			sql += "   and a.\"GroupUKey\" = nvl(cg.\"CustUKey\",' ') ";
 		}
 		this.info("sql=" + sql);
 
@@ -426,6 +425,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , LRC.\"BormNo\" ";
 		sql += "         , LRC.\"EffectDate\" ";
 		sql += "         , LRC.\"ProdNo\" ";
+		sql += "         , LRC.\"IncrFlag\" ";
 		sql += "         , LRC.\"RateIncr\" ";
 		sql += "         , LRC.\"IndividualIncr\" ";
 		sql += "         , LRC.\"FitRate\" ";
@@ -459,6 +459,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , \"BormNo\" ";
 		sql += "     , \"EffectDate\" ";
 		sql += "     , \"ProdNo\" ";
+		sql += "     , \"IncrFlag\" ";
 		sql += "     , \"RateIncr\" ";
 		sql += "     , \"IndividualIncr\" ";
 		sql += "     , \"FitRate\" ";

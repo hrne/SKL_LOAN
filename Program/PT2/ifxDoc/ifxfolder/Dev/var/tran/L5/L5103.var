@@ -46,7 +46,7 @@ HIDE(#BTNA,#BTNB,#BTNC,#BTND)
 ["[L5103]                                 檔案借閱維護"],
 ["#FdACTFGX+登放記號",#ACTFGX],["#FdApplCodeX+申請或歸還",#ApplCodeX],
 [#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#BTND,#CustName],
-[#<->#,"#FdFacmNoMemo+額度備註",#FacmNoMemo],
+[#<->#,"#FdFacmNoMemo+同押品額度",#FacmNoMemo],
 ["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#BTNA,#ApplEmpNoX],
 ["#FdUsageCode+用途",#UsageCode,#UsageCodeX],["#FdCopyCode+正本+/+影本",#CopyCode,#CopyCodeX],
 ["#FdApplDate+借閱日期",#ApplDate],["#FdKeeperEmpNo+管理人",#KeeperEmpNo,#BTNB,#KeeperEmpNoX],
@@ -348,8 +348,8 @@ IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
 #FacmNo=A,3,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
-@
-C(3,#FacmNo,0,T(F,@FacmNoMemo,1),T(F,@FacmNoMemo,0))
+!@
+!C(3,#FacmNo,0,T(F,@FacmNoMemo,1),T(F,@FacmNoMemo,0))
 !@C(1,#FacmNo,s,V(P,額度不可為0),s)
 
 ! 借款人戶名---調RIM
@@ -357,15 +357,15 @@ C(3,#FacmNo,0,T(F,@FacmNoMemo,1),T(F,@FacmNoMemo,0))
 C(3,#ApplCode,0,$,s)
 
 
-!額度若輸入0則必須輸入額度備註不可空白,額度>0則不需輸入
+!額度若輸入0則必須輸入同押品額度不可空白,額度>0則不檢查
 #FdFacmNoMemo=X,2,L
 IF(#FacmNo == 0,T(3,*),T(3,))
 
 #FacmNoMemo=X,20,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
-C(3,#FacmNo,0,$,S)
-@V(7)
+@C(3,#FacmNo,0,$,s)
+V(7)
 
 
 ! 申請序號

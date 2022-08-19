@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ444 implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3365195105817253045L;
-
-@EmbeddedId
+  @EmbeddedId
   private JcicZ444Id jcicZ444Id;
 
   // 交易代碼
@@ -103,6 +100,14 @@ public class JcicZ444 implements Serializable {
   // 最後更新人員
   @Column(name = "`LastUpdateEmpNo`", length = 6)
   private String lastUpdateEmpNo;
+
+  // 實際報送日期
+  @Column(name = "`ActualFilingDate`")
+  private int actualFilingDate = 0;
+
+  // 實際報送記號
+  @Column(name = "`ActualFilingMark`", length = 3)
+  private String actualFilingMark;
 
 
   public JcicZ444Id getJcicZ444Id() {
@@ -425,11 +430,50 @@ X:補件
     this.lastUpdateEmpNo = lastUpdateEmpNo;
   }
 
+/**
+	* 實際報送日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getActualFilingDate() {
+    return StaticTool.bcToRoc(this.actualFilingDate);
+  }
+
+/**
+	* 實際報送日期<br>
+	* 
+  *
+  * @param actualFilingDate 實際報送日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setActualFilingDate(int actualFilingDate) throws LogicException {
+    this.actualFilingDate = StaticTool.rocToBc(actualFilingDate);
+  }
+
+/**
+	* 實際報送記號<br>
+	* 
+	* @return String
+	*/
+  public String getActualFilingMark() {
+    return this.actualFilingMark == null ? "" : this.actualFilingMark;
+  }
+
+/**
+	* 實際報送記號<br>
+	* 
+  *
+  * @param actualFilingMark 實際報送記號
+	*/
+  public void setActualFilingMark(String actualFilingMark) {
+    this.actualFilingMark = actualFilingMark;
+  }
+
 
   @Override
   public String toString() {
     return "JcicZ444 [jcicZ444Id=" + jcicZ444Id + ", tranKey=" + tranKey + ", custRegAddr=" + custRegAddr
            + ", custComAddr=" + custComAddr + ", custRegTelNo=" + custRegTelNo + ", custComTelNo=" + custComTelNo + ", custMobilNo=" + custMobilNo + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", actualFilingDate=" + actualFilingDate + ", actualFilingMark=" + actualFilingMark
+           + "]";
   }
 }

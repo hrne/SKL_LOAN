@@ -134,7 +134,7 @@ public class PdfGenerator extends CommBuffer {
 	private Rectangle page = null;
 
 	// 設定要輸出的Stream
-	private PdfContentByte cb = null;
+	private PdfContentByte content = null;
 
 	private PdfContentByte underContent;
 
@@ -174,18 +174,18 @@ public class PdfGenerator extends CommBuffer {
 		int py1 = (int) (this.yPoints - y1);
 		int py2 = (int) (this.yPoints - y2);
 
-		cb.saveState();
+		content.saveState();
 		// 設定線條寬度
-		cb.setLineWidth(w);
+		content.setLineWidth(w);
 		// 设置画线的颜色
-		cb.setColorStroke(BaseColor.BLACK);
+		content.setColorStroke(BaseColor.BLACK);
 		// 绘制起点坐标
-		cb.moveTo(x1, (float) (FRAME_Y + py1));
+		content.moveTo(x1, (float) (FRAME_Y + py1));
 		// 绘制终点坐标
-		cb.lineTo(x2, (float) (FRAME_Y + py2));
+		content.lineTo(x2, (float) (FRAME_Y + py2));
 		// 确认直线的绘制
-		cb.stroke();
-		cb.restoreState();
+		content.stroke();
+		content.restoreState();
 	}
 
 	@Override
@@ -203,7 +203,6 @@ public class PdfGenerator extends CommBuffer {
 		init();
 
 		try {
-
 			for (HashMap<String, Object> map : this.listMap) {
 
 				String type = map.get("type").toString();
@@ -267,7 +266,7 @@ public class PdfGenerator extends CommBuffer {
 				document.close();
 				fos.close();
 			}
-		} catch (Exception e) {
+		} catch (DocumentException | IOException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
@@ -295,7 +294,7 @@ public class PdfGenerator extends CommBuffer {
 		copy = null;
 		defaultname = null;
 		page = null;
-		cb = null;
+		content = null;
 		// 預設字型
 		try {
 			baseFont = setBaseFont("1");
@@ -346,7 +345,7 @@ public class PdfGenerator extends CommBuffer {
 		reader = new PdfReader(defaultname);
 		stamper = new PdfStamper(reader, baos);
 		fields = stamper.getAcroFields();
-		cb = stamper.getOverContent(1);
+		content = stamper.getOverContent(1);
 
 		String doToPdfFont = map.get("font").toString();
 		baseFont = setBaseFont(doToPdfFont);
@@ -423,7 +422,7 @@ public class PdfGenerator extends CommBuffer {
 		page = writer.getPageSize();
 
 		// 設定要輸出的Stream
-		cb = writer.getDirectContent();
+		content = writer.getDirectContent();
 
 		String mapFont = map.get("font").toString();
 		int mapFontSize = Integer.parseInt(map.get("font.size").toString());
@@ -470,7 +469,7 @@ public class PdfGenerator extends CommBuffer {
 
 		// 新增圖片
 		image.setAbsolutePosition(x, yy);
-		cb.addImage(image);
+		content.addImage(image);
 	}
 
 	private void printStringByPoint(HashMap<String, Object> map) {
@@ -482,18 +481,18 @@ public class PdfGenerator extends CommBuffer {
 
 		String txt = map.get("txt").toString();
 		String align = map.get("align").toString();
-		cb.beginText();
-		cb.setFontAndSize(baseFont, pdfFontSize);
-		cb.setCharacterSpacing(charSpaces);
+		content.beginText();
+		content.setFontAndSize(baseFont, pdfFontSize);
+		content.setCharacterSpacing(charSpaces);
 		if ("L".equals(align)) {
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
 		} else if ("C".equals(align)) {
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, txt, (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_CENTER, txt, (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
 		} else if ("R".equals(align)) {
-			cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_RIGHT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
 
 		}
-		cb.endText();
+		content.endText();
 	}
 
 	private void printStringByRange(HashMap<String, Object> map) {
@@ -525,13 +524,13 @@ public class PdfGenerator extends CommBuffer {
 			}
 			pw += ww;
 			if (pw >= w) {
-				cb.beginText();
+				content.beginText();
 
-				cb.setFontAndSize(baseFont, pdfFontSize);
-				cb.setCharacterSpacing(charSpaces);
-				cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
+				content.setFontAndSize(baseFont, pdfFontSize);
+				content.setCharacterSpacing(charSpaces);
+				content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
 						(float) (FRAME_Y + yy), 0);
-				cb.endText();
+				content.endText();
 
 				ps = prefix;
 				pw = w2;
@@ -539,13 +538,13 @@ public class PdfGenerator extends CommBuffer {
 			}
 		}
 		if (pw > 0) {
-			cb.beginText();
+			content.beginText();
 			this.info("PdfGenerator basefont = " + BaseFont.TIMES_BOLD);
-			cb.setFontAndSize(baseFont, pdfFontSize);
-			cb.setCharacterSpacing(charSpaces);
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x), (float) (FRAME_Y + yy),
-					0);
-			cb.endText();
+			content.setFontAndSize(baseFont, pdfFontSize);
+			content.setCharacterSpacing(charSpaces);
+			content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
+					(float) (FRAME_Y + yy), 0);
+			content.endText();
 		}
 	}
 
@@ -570,18 +569,18 @@ public class PdfGenerator extends CommBuffer {
 		String align = map.get("align").toString();
 		int x = (col - 1) * fontWidth;
 		int y = (int) page.getHeight() - (row * fontHeight);
-		cb.beginText();
+		content.beginText();
 
-		cb.setFontAndSize(baseFont, pdfFontSize);
-		cb.setCharacterSpacing(charSpaces);
+		content.setFontAndSize(baseFont, pdfFontSize);
+		content.setCharacterSpacing(charSpaces);
 		if ("L".equals(align)) {
-			cb.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + y), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + y), 0);
 		} else if ("C".equals(align)) {
-			cb.showTextAligned(PdfContentByte.ALIGN_CENTER, txt, (float) (FRAME_X + x), (float) (FRAME_Y + y), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_CENTER, txt, (float) (FRAME_X + x), (float) (FRAME_Y + y), 0);
 		} else if ("R".equals(align)) {
-			cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + y), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_RIGHT, txt, (float) (FRAME_X + x), (float) (FRAME_Y + y), 0);
 		}
-		cb.endText();
+		content.endText();
 	}
 
 	private BaseFont setBaseFont(String type) throws IOException, DocumentException {
@@ -653,11 +652,11 @@ public class PdfGenerator extends CommBuffer {
 			reader = new PdfReader(defaultname);
 			stamper = new PdfStamper(reader, baos);
 			fields = stamper.getAcroFields();
-			cb = stamper.getOverContent(1);
+			content = stamper.getOverContent(1);
 			underContent = stamper.getUnderContent(1);
 		} else {
 			document.newPage();
-			cb = writer.getDirectContent();
+			content = writer.getDirectContent();
 			underContent = writer.getDirectContentUnder();
 		}
 		setWatermark();

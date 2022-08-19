@@ -222,6 +222,7 @@ T(3,[L8401] 產生JCIC日報媒體檔)
 <sub type="TIM">
 #AcDateStart
 #AcDateEnd
+#FileDay
 #FileNo
 ##loop {times:2,i:1}
 #DAILY{i}

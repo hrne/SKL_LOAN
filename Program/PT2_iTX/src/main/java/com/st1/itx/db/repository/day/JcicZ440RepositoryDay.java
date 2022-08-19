@@ -1,12 +1,16 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,28 +25,28 @@ import com.st1.itx.db.domain.JcicZ440Id;
  */
 public interface JcicZ440RepositoryDay extends JpaRepository<JcicZ440, JcicZ440Id> {
 
-	// CustId=
-	public Slice<JcicZ440> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
+  // CustId=
+  public Slice<JcicZ440> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
 
-	// ApplyDate=
-	public Slice<JcicZ440> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
+  // ApplyDate=
+  public Slice<JcicZ440> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
 
-	// CustId= , AND ApplyDate=
-	public Slice<JcicZ440> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
+  // CustId= , AND ApplyDate=
+  public Slice<JcicZ440> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
 
-	// SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
-	public Slice<JcicZ440> findAllBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3,
-			Pageable pageable);
+  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
+  public Slice<JcicZ440> findAllBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, Pageable pageable);
 
-	// Ukey=
-	public Optional<JcicZ440> findTopByUkeyIs(String ukey_0);
+  // Ukey=
+  public Optional<JcicZ440> findTopByUkeyIs(String ukey_0);
 
-	// SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
-	public Optional<JcicZ440> findTopBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3);
+  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode=
+  public Optional<JcicZ440> findTopBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<JcicZ440> findByJcicZ440Id(JcicZ440Id jcicZ440Id);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<JcicZ440> findByJcicZ440Id(JcicZ440Id jcicZ440Id);
 
 }
+

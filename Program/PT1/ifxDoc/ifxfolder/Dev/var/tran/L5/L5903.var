@@ -163,7 +163,7 @@ E(0,1)ASGN(LOOP$)
 #OOCustNo=A,7,O
 ! 額度
 #OOFacmNo=A,3,O
-!額度備註
+!同押品額度
 #OOFacmNoMemo=X,20,O
 ! 申請序號
 #OOApplSeq=A,3,O
@@ -306,7 +306,7 @@ TXFORM=L5903
 ! 額度
 #OOFacmNo=額度
 {width:65,align:'center'}
-#OOFacmNoMemo=額度備註
+#OOFacmNoMemo=同押品額度
 {width:85,align:'center'}
 ! 申請序號
 #OOApplSeq=申請序號
