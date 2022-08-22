@@ -266,7 +266,7 @@ T(3,1)ASGN(LOOP$)
 #OOClNo=A,7,S
 #OOCl=X,12,L
 T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
-#OOClSeq=X,8,S
+#OOClSeq=X,7,S
 !縣市
 #OOCityItem=x,20,L
 !地政

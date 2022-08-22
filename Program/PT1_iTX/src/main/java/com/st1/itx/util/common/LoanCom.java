@@ -1597,7 +1597,9 @@ public class LoanCom extends TradeBuffer {
 				acTempVo = acTempVo.getVo(ac.getJsonFields());
 			}
 			if (acTempVo.get("BorxNo") == null) {
-				acSeq = ii;
+				if (acSeq == 0) {
+					acSeq = ii;
+				}
 				int sumNo = 0;
 				if (parse.isNumeric(ac.getSumNo())) {
 					sumNo = parse.stringToInteger(ac.getSumNo());

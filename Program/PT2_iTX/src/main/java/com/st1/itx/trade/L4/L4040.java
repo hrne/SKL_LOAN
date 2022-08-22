@@ -173,7 +173,7 @@ public class L4040 extends TradeBuffer {
 		resultList = new ArrayList<Map<String, String>>();
 		try {
 			// *** 折返控制相關 ***
-			resultList = l4040ServiceImpl.findAll(nPropDate, this.index, this.limit, titaVo);
+			resultList = l4040ServiceImpl.findAll(0, this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -391,7 +391,7 @@ public class L4040 extends TradeBuffer {
 						occursListOutput.putParam("OOProcessDate", processDate);
 						occursListOutput.putParam("OORetrDate", retrDate);
 						occursListOutput.putParam("OOAuthStatus", result.get("F9"));
-						occursListOutput.putParam("OOStampFinishDate", stampFinishDate); 
+						occursListOutput.putParam("OOStampFinishDate", stampFinishDate);
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursListOutput);
 

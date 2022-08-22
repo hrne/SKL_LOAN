@@ -42,7 +42,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品編號",#ClNo],
-["#FdSeq+他項權利序號",#SeqS,"-",#SeqE],
+["#FdSeq+序號",#ClSeq],
 ["#FdCity+縣市",#City,#CityX,#InCityX],
 ["#FdLandAdm+地政",#LandAdm,#LandAdmX,#InLandAdmX],
 ["#FdRecYear+收件年",#RecYear],
@@ -53,7 +53,7 @@ E(0,40)ASGN(INQPRT$)
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:瀏覽;enable:1;tabbable:0;title:L2038 擔保品明細資料查詢;
+#BTN1=X,15,I,ui:button;value:擔保品查詢;enable:1;tabbable:0;title:L2038 擔保品明細資料查詢;
 !---------- AP TEXT AREA Variables ----------
 #SetSysPar=X,1,S
 E(0,1)ASGN(AGAIN$)
@@ -118,8 +118,7 @@ E(0,@FUNCIND,#FunCd)
 T(1,@ClCode1,#NTXBUF,2,1)
 T(1,@ClCode2,#NTXBUF,3,2)
 T(1,@ClNo,#NTXBUF,5,7)
-T(1,@SeqS,#NTXBUF,12,4)
-T(1,@SeqE,#NTXBUF,17,3)
+T(1,@ClSeq,#NTXBUF,12,7)
 
 
 !    L2R46 : 依擔保品編號取他項權利資料
@@ -128,7 +127,7 @@ C(3,#FunCd,1,S,$)
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
 E(0,@RimClNo,#ClNo)
-T(2,@RimClSeq,#SeqS+-+#SeqE)
+T(2,@RimClSeq,#ClSeq)
 RESET_RIM(#RimL2r46A,L2R46)
 S(L2R46,1,#RimClCode1,#RimClCode2,#RimClNo,#RimClSeq)
 R(1,L2R46)
@@ -179,12 +178,11 @@ T(H,@RecWordX,#RecWord,#RecWordHelp)
 
 #Init=X,1,S
 HIDE(#UsSecuredTotal)
-HIDE(#BTN1)
 HIDE(#InCityX,#InLandAdmX,#InRecWordX)
 T(2,@FdClCode1,*)
 T(2,@FdClCode2,*)
 T(2,@FdClNo,*)
-T(2,@FdSeq,*)
+T(2,@FdSeq,)
 T(2,@FdCity,*)
 T(2,@FdLandAdm,*)
 T(2,@FdRecYear,*)
@@ -213,6 +211,7 @@ T(F,@LandAdmX,0)
 
 #FunCdX=X,10,L
 E(0,@FUNCIND,#FunCd)
+C(3,#FunCd,1,INVOKEJS(SHOW,p1_2,1),INVOKEJS(SHOW,p1_2,0))
 T(H,#FunCd,#FuncCodeHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 
@@ -221,8 +220,7 @@ C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
 T(F,@ClCode1,0)
 T(F,@ClCode2,0)
 T(F,@ClNo,0)
-T(F,@SeqS,0)
-T(F,@SeqE,0)
+T(F,@ClSeq,0)
 T(2,@FdClCode1,)
 T(2,@FdClCode2,)
 T(2,@FdClNo,)
@@ -267,9 +265,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClNo<-O
 #FdCustNo=X,2,L
 
 #CustNo=A,7,I
-SHOW(#BTN1)
-@
-HIDE(#BTN1)
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
 
 #BUF1B=X,40,S
 T(2, +0+00+       +   +       +          +#CustNo)
@@ -277,11 +273,11 @@ T(2, +0+00+       +   +       +          +#CustNo)
 #BIND1B=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1B;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1:CustNo<-OOCustNo})
 
+
 ! [擔保品代號1]
 #ClCode1=A,1,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-HELP(#ClCode1Help)
-@V(H,#ClCode1Help)
+@V(2,0)
 
 
 #ClCode1X=X,20,L
@@ -304,10 +300,8 @@ R(1,L2R48)
 
 ! [擔保品代號2]
 #ClCode2=A,2,I
-HIDE(#BTN1)
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-HELP(#L2r48Help1)
-@V(H,#L2r48Help1)
+@V(2,0)
 
 #ClCode2X=X,30,L
 T(H,#ClCode2,#L2r48Help1)
@@ -316,7 +310,6 @@ T(H,#ClCode2,#L2r48Help1)
 
 #ClNo=A,7,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-HIDE(#BTN1)
 @V(2,0)
 
 ! 調RIM查擔保品主檔(ClMain)資料
@@ -329,19 +322,11 @@ RESET_RIM(#RimL2r22,L2R22)
 S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
 R(1,L2R22)
 
-!登記次序0000-000
-#SeqS=A,4,I
-C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-@V(2,0)
+!登記次序0000000
+#ClSeq=X,7,L
 
-#SeqE=A,3,I
-C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-
-#ClSeq=X,8,S
-T(2,#SeqS+-+#SeqE)
-
-#RimClSeq=X,8,S
-!    L2R46 : 依擔保品編號取他項權利資料
+#RimClSeq=X,7,S
+!L2R46 : 依擔保品編號取他項權利資料
 #RimL2r46B=X,1,S
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
@@ -350,6 +335,9 @@ T(2,@RimClSeq,#ClSeq)
 RESET_RIM(#RimL2r46B,L2R46)
 S(L2R46,1,#RimClCode1,#RimClCode2,#RimClNo,#RimClSeq)
 R(1,L2R46)
+
+#CHECKL2R46=X,1,S
+T(2,@ClSeq,#L2r46Seq)
 C(3,#FunCd,1,S,$)
 T(2,@City,#L2r46City)
 C(4,#L2r46OtherCity,$,SHOW(#InCityX))

@@ -314,6 +314,8 @@ public class L3420 extends TradeBuffer {
 		// 系統交易記錄檔的金額為實際支付金額或支付總金額
 		if (iTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 			titaVo.setTxAmt(iTxAmt);
+		} else if (iTrfBadAmt.compareTo(BigDecimal.ZERO) > 0) {
+			titaVo.setTxAmt(iTrfBadAmt);
 		} else {
 			titaVo.setTxAmt(iTotalRepayAmt);
 		}

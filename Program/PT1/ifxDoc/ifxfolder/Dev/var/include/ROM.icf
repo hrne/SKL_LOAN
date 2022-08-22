@@ -3086,6 +3086,7 @@ TXFORM=L2R35
 #L2r36CloseAmt=+m,14.2,S
 #L2r36CollectFlag=X,1,S
 #L2r36CollectWayCode=X,2,S
+#L2r36PostAddress=x,200,S
 #L2r36ReceiveDate=D,7,S
 #L2r36AgreeNo=X,10,S
 #L2r36DocNo=A,7,S
@@ -3112,6 +3113,7 @@ TXFORM=L2R36
 #L2r36CloseAmt
 #L2r36CollectFlag
 #L2r36CollectWayCode
+#L2r36PostAddress
 #L2r36ReceiveDate
 #L2r36AgreeNo
 #L2r36DocNo
@@ -3310,6 +3312,7 @@ TXFORM=L2R45
 
 !    L2R46 : 依擔保品編號取他項權利資料
 <L2R46.dec>
+#L2r46Seq=X,7,S
 #L2r46City=X,2,S
 #L2r46OtherCity=x,20,S
 #L2r46LandAdm=X,2,S
@@ -3324,6 +3327,7 @@ TXFORM=L2R45
 
 <L2R46.tom>
 TXFORM=L2R46
+#L2r46Seq
 #L2r46City
 #L2r46OtherCity
 #L2r46LandAdm

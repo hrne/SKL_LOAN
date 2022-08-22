@@ -147,7 +147,7 @@ HELP(#FunctionHelp)
 !9:整批;
 !10:入帳後溢短收)
 !@V(1,1,2,3,4,9,10)
-E(0,@FUNCIND,#FunctionCode)
+E(0,@FUNCIND,5)
 
 #FunctionCodeX=x,30,L
 C(3,#CHAIN,1,s,$)
@@ -296,9 +296,9 @@ V(7)A(DATE,0,#EntryDate)
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #CHECKFunction=A,1,S
-C(3,#FUNCIND,6,E(0,@RPTFG,1),E(0,@RPTFG,0))
-C(3,#FUNCIND,7,E(0,@RPTFG,7),$)
-C(3,#FUNCIND,10,E(0,@RPTFG,2),$)
+C(3,#FunctionCode,6,E(0,@RPTFG,1),E(0,@RPTFG,0))
+C(3,#FunctionCode,7,E(0,@RPTFG,7),$)
+C(3,#FunctionCode,10,E(0,@RPTFG,2),$)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

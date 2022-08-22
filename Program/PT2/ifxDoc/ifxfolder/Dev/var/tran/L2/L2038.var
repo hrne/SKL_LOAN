@@ -725,7 +725,7 @@ IF(#ClMainType==3 || #ClCode1 == 3 || #ClCode1 == 4,E(0,@RPTFG,12),$)
 IF(#ClMainType==4 || #ClCode1 == 5,E(0,@RPTFG,6),$)
 
 #CHAINXMT=X,1,S
-C(3,#CHAIN,1,C(4,#NTXBUF5,E(0,@CHAIN,0)XMT(),XMT()),$)
+C(3,#CHAIN,1,C(4,#NTXBUF5,E(0,@CHAIN,0)XMT(),E(0,@CHAIN,0)XMT()),$)
 
 </sub>
 

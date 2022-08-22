@@ -65,13 +65,13 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCreateFlag = parse.stringToInteger(titaVo.getParam("CreateFlag"));
 		int iDataCreateDate = parse.stringToInteger(titaVo.getParam("DataCreateDate"));
 		int iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
-		
+
 		if (iPropDate > 0) {
 			iPropDate = iPropDate + 19110000;
 		}
-		
-		if(iDataCreateDate>0) {
-			iDataCreateDate = iDataCreateDate+19110000;
+
+		if (iDataCreateDate > 0) {
+			iDataCreateDate = iDataCreateDate + 19110000;
 		}
 
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
@@ -179,7 +179,11 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and a.\"PropDate\" >= " + iPropDate;
 			}
 			if (iPropDate == 0 && iCustNo == 0) {
-				sql += "   and a.\"PropDate\" = 0 " ;
+				sql += "   and a.\"PropDate\" = 0 ";
+			}
+			if (propDate != 0) {
+				sql += "   and a.\"PropDate\" =  " + propDate;
+
 			}
 			if (iCreateFlag == 3) {
 				sql += "   and a.\"CreateFlag\" = 'A'";
@@ -187,27 +191,27 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 2:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
-			if(iDataCreateDate>0) {
+			if (iDataCreateDate > 0) {
 				sql += "   and a.\"PropDate\" =" + iDataCreateDate;
 			}
-			if(iRepayBank==1) {
-				sql += "   and a.\"RepayBank\" = '103'" ;
+			if (iRepayBank == 1) {
+				sql += "   and a.\"RepayBank\" = '103'";
 			}
-			if(iRepayBank==2) {
-				sql += "   and a.\"RepayBank\" <> '103'" ;
+			if (iRepayBank == 2) {
+				sql += "   and a.\"RepayBank\" <> '103'";
 			}
-			
+
 			break;
 		case 3:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
-			if(iDataCreateDate>0) {
+			if (iDataCreateDate > 0) {
 				sql += "   and a.\"PropDate\" =" + iDataCreateDate;
 			}
-			if(iRepayBank==1) {
-				sql += "   and a.\"RepayBank\" = '103'" ;
+			if (iRepayBank == 1) {
+				sql += "   and a.\"RepayBank\" = '103'";
 			}
-			if(iRepayBank==2) {
-				sql += "   and a.\"RepayBank\" <> '103'" ;
+			if (iRepayBank == 2) {
+				sql += "   and a.\"RepayBank\" <> '103'";
 			}
 			break;
 		}

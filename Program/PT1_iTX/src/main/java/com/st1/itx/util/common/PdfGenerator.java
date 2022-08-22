@@ -679,11 +679,11 @@ public class PdfGenerator extends CommBuffer {
 		TxFile tTxFile = txFileService.findById(this.pdfNo);
 
 		if (tTxFile == null) {
-			throw new LogicException(titaVo, "EC001", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo);
+			throw new LogicException("EC001", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo);
 		}
 
 		if (tTxFile.getFileType() != 1) {
-			throw new LogicException(titaVo, "E0015", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo + "，不為PDF格式");
+			throw new LogicException("E0015", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo + "，不為PDF格式");
 		}
 
 		rptTlrNo = tTxFile.getCreateEmpNo();
@@ -705,14 +705,14 @@ public class PdfGenerator extends CommBuffer {
 		signOffSupervisor = "";
 
 		if (!"".equals(tTxFile.getTlrNo())) {
-			CdEmp cdEmp = cdEmpService.findById(tTxFile.getTlrNo(), titaVo);
+			CdEmp cdEmp = cdEmpService.findById(tTxFile.getTlrNo());
 
 			if (cdEmp != null) {
 				signOffTeller = cdEmp.getFullname();
 			}
 		}
 		if (!"".equals(tTxFile.getSupNo())) {
-			CdEmp cdEmp = cdEmpService.findById(tTxFile.getSupNo(), titaVo);
+			CdEmp cdEmp = cdEmpService.findById(tTxFile.getSupNo());
 
 			if (cdEmp != null) {
 				signOffSupervisor = cdEmp.getFullname();

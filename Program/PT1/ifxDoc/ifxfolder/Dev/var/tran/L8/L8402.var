@@ -210,6 +210,7 @@ T(3,[L8402] 產生JCIC月報媒體檔)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#FileDay
 #FileNo
 ##loop {times:13,i:1}
 #MONTHLY{i}
