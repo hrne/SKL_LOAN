@@ -228,7 +228,7 @@ public class L2634ReportA extends MakeReport {
 			BigDecimal wkSecuredTotal = BigDecimal.ZERO;
 			wkSecuredTotal = t.getSecuredTotal();
 			// 金額轉中文大寫
-			String amtChinese = this.convertAmtToChinese(wkSecuredTotal) + "元整";
+			String amtChinese = this.convertAmtToChinese(wkSecuredTotal) + "萬元整";
 
 			this.info("Doc = " + DocNo);
 			this.info("DocNoyy = " + DocNoyy);

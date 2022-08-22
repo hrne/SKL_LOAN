@@ -109,23 +109,23 @@ T(2,@BankDeductCdHelp,#HelpDesc1)
 T(B,@RepayTypeHelp,#HelpDesc2+;99:全部)
 T(B,@AmlRspHelp,#HelpDesc3)
 
-#FunctionHelp=x,100,S
-T(3,1:戶號;2:上限金額;3:下限金額;4:檢核不正常;5:扣款金額為0;6:媒體檔總金額;7:已到期未至應繳日;9:整批)
+#FunctionHelp=x,140,S
+T(3,01:戶號;02:上限金額;03:下限金額;04:檢核不正常;05:扣款金額為0;06:媒體檔總金額;07:已到期未至應繳日;09:整批;10:入帳後溢短收)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
-#NTXBUF=x,70,S
+#NTXBUF=x,71,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@FunctionCode,#NTXBUF,1,1)
-T(1,@CustNo,#NTXBUF,2,7)
-T(1,@BankCode,#NTXBUF,9,3)
-T(1,@RepayType,#NTXBUF,12,2)
-T(1,@EntryDateFm,#NTXBUF,14,7)
-T(1,@EntryDateTo,#NTXBUF,21,7)
-T(1,@PostLimitAmt,#NTXBUF,28,14)
-T(1,@SingleLimit,#NTXBUF,42,14)
-T(1,@LowLimit,#NTXBUF,56,14)
+T(1,@FunctionCode,#NTXBUF,1,2)
+T(1,@CustNo,#NTXBUF,3,7)
+T(1,@BankCode,#NTXBUF,10,3)
+T(1,@RepayType,#NTXBUF,13,2)
+T(1,@EntryDateFm,#NTXBUF,15,7)
+T(1,@EntryDateTo,#NTXBUF,22,7)
+T(1,@PostLimitAmt,#NTXBUF,29,14)
+T(1,@SingleLimit,#NTXBUF,43,14)
+T(1,@LowLimit,#NTXBUF,57,14)
 
 ! 功能-預設 9.整批
 ! 1.戶號 = 戶號+入帳日
@@ -133,7 +133,8 @@ T(1,@LowLimit,#NTXBUF,56,14)
 ! 3.下限金額 = 入帳日+限額
 ! 4.檢核不正常(Aml) = 入帳日+銀行別
 ! 9.整批 = 銀行別+還款別+入帳日
-#FunctionCode=A,1,I
+!10.入帳後溢短收
+#FunctionCode=A,2,I
 INVOKEJS(SHOW,L4943,2,10,0)
 C(3,#CHAIN,1,s,$)
 HELP(#FunctionHelp)
@@ -143,8 +144,9 @@ HELP(#FunctionHelp)
 !2:上限金額;
 !3:下限金額;
 !4:檢核不正常;
-!9:整批)
-!@V(1,1,2,3,4,9)
+!9:整批;
+!10:入帳後溢短收)
+!@V(1,1,2,3,4,9,10)
 E(0,@FUNCIND,#FunctionCode)
 
 #FunctionCodeX=x,30,L
@@ -155,7 +157,8 @@ T(3,)T(H,#FunctionCode,#FunctionHelp)
 !,2,T(2,上限金額)
 !,3,T(2,下限金額)
 !,4,T(2,檢核不正常)
-!,9,T(2,整批))
+!,9,T(2,整批)
+!,10,T(2,入帳後溢短收))
 
 #ColValue=A,1,S
 T(2,@BankCode,999)
@@ -193,6 +196,10 @@ C(3,#FunctionCode,9,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_4,1)
 INVOKEJS(SHOW,L4943_5,1),$)
+C(3,#FunctionCode,10,
+INVOKEJS(SHOW,L4943_3,1)
+INVOKEJS(SHOW,L4943_4,1)
+INVOKEJS(SHOW,L4943_5,1),$)
 
 ! 戶號
 #CustNo=A,7,I
@@ -214,7 +221,7 @@ T(2,)
 ! 銀行別
 #BankCode=A,3,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==9,$,s)
+IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==9 || #FunctionCode==10,$,s)
 HELP(#BankDeductCdHelp,cols:4)
 @V(H,#BankDeductCdHelp)
 
@@ -227,12 +234,12 @@ T(HELP,@RepayTypeHelp1,#RepayTypeHelp,+,01;05;99)
 ! 還款類別
 #RepayType=A,2,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9,$,s)
+IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9 || #FunctionCode==10,$,s)
 IF(#FunctionCode==6,HELP(#RepayTypeHelp1),HELP(#RepayTypeHelp))
 @IF(#FunctionCode==6,V(H,#RepayTypeHelp1),V(H,#RepayTypeHelp))
 
 #RepayTypeX=x,10,L
-IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9,$,s)
+IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9 || #FunctionCode==10,$,s)
 IF(#FunctionCode==6,T(H,#RepayType,#RepayTypeHelp1),T(H,#RepayType,#RepayTypeHelp))
 
 
@@ -291,6 +298,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 #CHECKFunction=A,1,S
 C(3,#FUNCIND,6,E(0,@RPTFG,1),E(0,@RPTFG,0))
 C(3,#FUNCIND,7,E(0,@RPTFG,7),$)
+C(3,#FUNCIND,10,E(0,@RPTFG,2),$)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -347,6 +355,9 @@ X(#OOUnpaidAmt)
 
 #OOTempAmtX=X,20,O
 X(#OOTempAmt)
+
+!溢短收
+#OOOverShort=m,14,O
 
 ! 會計日期
 #OOAcDate=D,7,O
@@ -437,6 +448,7 @@ TXFORM=L4943
 #OOAcDate
 #OOAmlRsp
 #OOProcNote
+#OOOverShort
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -499,6 +511,41 @@ TXFORM=L4943
 
 #RPTFG=1,QUERY.GRID,L4943
 #any={detail:false, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
+^
+
+#RPTFG=2,QUERY.GRID,L4943
+#any={detail:true, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_A=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
+#OOBTN_B=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
+#OOBTN_C=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
+#OOEntryDate=入帳日期
+{width:95}
+#OOCustNo=戶號　
+{width:95}
+#OOFacmNo=額度
+{width:95}
+#OOPrevIntDate=繳息迄日
+{width:95}
+#OOPayIntDate=應繳日
+{width:95}
+#OORepayTypeX=還款類別
+{width:95}
+#OORepayAmt=扣款金額
+{width:95,sum:true}
+#OOTempAmt=暫收抵繳金額
+{width:125,sum:true}
+#OOOverShort=溢短收
+{width:95,sum:true}
+#OOMediaCode=媒體碼
+{width:80}
+#OOAcDateX=會計日期
+{width:95}
+#OOProcNote=檢核結果
+{width:150}
 ^
 
 #RPTFG=7,QUERY.GRID,L4943

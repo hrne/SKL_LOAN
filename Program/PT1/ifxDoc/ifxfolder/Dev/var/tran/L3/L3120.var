@@ -1011,7 +1011,7 @@ T(2,#L2r09BankItem)
 ![郵局存款別]
 #FdPostCode=X,2,L
 
-#PostCode=X,A,S
+#PostCode=X,1,S
 T(2,#L2r05PostCode)
 
 #PostCodeX=X,4,L

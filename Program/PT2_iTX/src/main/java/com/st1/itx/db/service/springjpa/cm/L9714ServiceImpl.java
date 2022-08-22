@@ -75,7 +75,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useFacmNo)
 			sql += "   AND YHLI.\"FacmNo\" = :ifacmno ";
 		if (useUsageCode)
-			sql += "   AND YHLI.\"UsageCode\" = :iusefg ";
+			sql += "   AND NVL(CC.\"Code\",CC2.\"Code\") = :iusefg ";
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

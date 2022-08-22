@@ -218,7 +218,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
-			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + iGroupId;
+			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" +iGroupId +"'";
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
 		}		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;

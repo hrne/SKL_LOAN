@@ -1,7 +1,7 @@
 package com.st1.itx.trade.L4;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -29,6 +29,9 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
+import com.st1.itx.db.service.InsuRenewService;
+import com.st1.itx.trade.L4.L4606Report1;
+import com.st1.itx.trade.L4.L4606Report2;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
@@ -148,6 +151,7 @@ public class L4606Batch extends TradeBuffer {
 		int zeroDueAmtCnt = 0;
 		int paidCnt = 0;
 		int unPaidCnt = 0;
+		int custErrorCnt = 0;
 		deleinsuComm(titaVo);
 
 //		PC上傳媒體檔轉入佣金媒體檔
@@ -247,7 +251,9 @@ public class L4606Batch extends TradeBuffer {
 
 					if (tFacMain == null || tFacMain.getFireOfficer().isEmpty()) {
 						tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
-						if (tCustMain != null) {
+						if (tCustMain == null) {
+							custErrorCnt++;
+						} else {
 							empNo = tCustMain.getIntroducer();
 						}
 					} else {
@@ -303,7 +309,7 @@ public class L4606Batch extends TradeBuffer {
 			// int unPaidCnt = 0;
 
 			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
-					+ ", 剔除佣金為負筆數：" + minusCnt;
+					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
 		}
 
 //		產生下傳媒體
@@ -321,22 +327,7 @@ public class L4606Batch extends TradeBuffer {
 
 			sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit, titaVo);
 
-			lInsuComm = sInsuComm == null ? null : new ArrayList<InsuComm>(sInsuComm.getContent());
-
-			// 排序依 統編 序號 險種
-			lInsuComm.sort((c1, c2) -> {
-				int result = 0;
-				if (c1.getEmpId().compareTo(c2.getEmpId()) != 0) {
-					result = c1.getEmpId().compareTo(c2.getEmpId());
-				} else if (c1.getNowInsuNo().compareTo(c2.getNowInsuNo()) != 0) {
-					result = c1.getNowInsuNo().compareTo(c2.getNowInsuNo());
-				} else if (c1.getInsuCate() - c2.getInsuCate() != 0) {
-					result = c1.getInsuCate() - c2.getInsuCate();
-				} else {
-					result = 0;
-				}
-				return result;
-			});
+			lInsuComm = sInsuComm == null ? null : sInsuComm.getContent();
 
 			if (lInsuComm != null && lInsuComm.size() != 0) {
 
@@ -350,9 +341,9 @@ public class L4606Batch extends TradeBuffer {
 						String empId = tInsuComm.getEmpId();
 
 						if (sumComm.containsKey(empId)) {
-							sumComm.put(empId, sumComm.get(empId).add(tInsuComm.getDueAmt())); // 修改為應繳金額
+							sumComm.put(empId, sumComm.get(empId).add(tInsuComm.getCommision()));
 						} else {
-							sumComm.put(empId, tInsuComm.getDueAmt());
+							sumComm.put(empId, tInsuComm.getCommision());
 						}
 
 						if (sumPrem.containsKey(empId)) {
@@ -375,43 +366,41 @@ public class L4606Batch extends TradeBuffer {
 				int seq = 0;
 
 				for (InsuComm tInsuComm : lInsuComm) {
-					if ("Y".equals(tInsuComm.getMediaCode())) {
-						if (!"".equals(tInsuComm.getFireOfficer())) {
-							OccursList occursList = new OccursList();
+					if (!"".equals(tInsuComm.getFireOfficer())) {
+						OccursList occursList = new OccursList();
 
-							this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
+						this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
 
-							String empId = tInsuComm.getEmpId();
+						String empId = tInsuComm.getEmpId();
 
-							if (flagComm.containsKey(empId)) {
-								continue;
-							} else {
-								flagComm.put(empId, 1);
-							}
-							seq = seq + 1;
-
-							if (seq % commitCnt == 0) {
-								this.batchTransaction.commit();
-							}
-
-							occursList.putParam("SalesId", FormatUtil.padX(empId, 10));
-							occursList.putParam("FireInsuMonth", iInsuEndMonth);
-							occursList.putParam("ColumnA", 0);
-							occursList.putParam("TotCommA", FormatUtil.pad9("" + sumComm.get(empId), 9));
-							occursList.putParam("TotCommB", FormatUtil.pad9("" + sumComm.get(empId), 9));
-							occursList.putParam("ColumnB", 0);
-							occursList.putParam("ColumnC", 0);
-							occursList.putParam("ColumnD", 0);
-							occursList.putParam("ColumnE", 0);
-							occursList.putParam("Count", FormatUtil.pad9("" + cntComm.get(empId), 5));
-							occursList.putParam("TotFee", FormatUtil.pad9("" + sumPrem.get(empId), 9));
-							occursList.putParam("TotCommC", FormatUtil.pad9("" + sumComm.get(empId), 9));
-							occursList.putParam("ColumnF", 0);
-							occursList.putParam("ColumnG", 0);
-							occursList.putParam("ColumnH", 0);
-
-							tmp.add(occursList);
+						if (flagComm.containsKey(empId)) {
+							continue;
+						} else {
+							flagComm.put(empId, 1);
 						}
+						seq = seq + 1;
+
+						if (seq % commitCnt == 0) {
+							this.batchTransaction.commit();
+						}
+
+						occursList.putParam("SalesId", FormatUtil.padX(empId, 10));
+						occursList.putParam("FireInsuMonth", iInsuEndMonth);
+						occursList.putParam("ColumnA", 0);
+						occursList.putParam("TotCommA", FormatUtil.pad9("" + sumComm.get(empId), 9));
+						occursList.putParam("TotCommB", FormatUtil.pad9("" + sumComm.get(empId), 9));
+						occursList.putParam("ColumnB", 0);
+						occursList.putParam("ColumnC", 0);
+						occursList.putParam("ColumnD", 0);
+						occursList.putParam("ColumnE", 0);
+						occursList.putParam("Count", FormatUtil.pad9("" + cntComm.get(empId), 5));
+						occursList.putParam("TotFee", FormatUtil.pad9("" + sumPrem.get(empId), 9));
+						occursList.putParam("TotCommC", FormatUtil.pad9("" + sumComm.get(empId), 9));
+						occursList.putParam("ColumnF", 0);
+						occursList.putParam("ColumnG", 0);
+						occursList.putParam("ColumnH", 0);
+
+						tmp.add(occursList);
 					}
 				}
 				// 把明細資料容器裝到檔案資料容器內

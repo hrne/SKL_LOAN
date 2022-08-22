@@ -79,6 +79,7 @@ public class L4966 extends TradeBuffer {
 		}
 		
 		for (InsuComm tnsuComm : lInsuComm) {
+			if(tnsuComm.getInsuYearMonth()<299912) {
 			OccursList occursList = new OccursList();
 			int custno = tnsuComm.getCustNo();
 			occursList.putParam("OOInsuYearMonth", tnsuComm.getInsuYearMonth());
@@ -101,6 +102,7 @@ public class L4966 extends TradeBuffer {
 			occursList.putParam("OODueAmt", tnsuComm.getDueAmt());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
+			}
 		}
 		
 		if (slInsuComm != null && slInsuComm.hasNext()) {

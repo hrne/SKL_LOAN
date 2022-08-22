@@ -16,6 +16,8 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 
 @Component
 @Scope("prototype")
@@ -34,6 +36,9 @@ public class L8205Report5 extends MakeReport {
 	
 	@Autowired
 	MakeExcel makeExcel;
+
+	@Autowired
+	CdEmpService cdEmpService;
 	
 	private List<Map<String, String>> L8205List = null;
 	private DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -42,7 +47,7 @@ public class L8205Report5 extends MakeReport {
 	private String description2 ="";
 	private String description3 ="";
 	private String description4 ="";
-	
+	private String cdEmpFullname = "";
 //	自訂表頭
 	@Override
 	public void printHeader() {
@@ -73,9 +78,11 @@ public class L8205Report5 extends MakeReport {
 	// 自訂表頭
 		@Override
 		public void printFooter() {
-			String bcDate = dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8);
-		print(-47, 1, "　　經辦:　　　　　　　　　　　　　　　　　　　　　　　　　　　　　課主管:　　　　　　　　　　　　　　                    "+bcDate+"製作:放款服務課", "L");
-		
+
+		String bcDate = dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6)
+				+ "/" + dDateUtil.getNowStringBc().substring(6, 8);
+		print(-47, 1, "　　經辦:　　　　　　　　　　　　　　　　　　　　課主管:　　　　　　　　　　　　　　　　　　　　" + bcDate + "製作:放款服務課　" + cdEmpFullname, "L");		
+
 		}
 	public boolean exec(TitaVo titaVo) throws LogicException {
 
@@ -210,7 +217,12 @@ public class L8205Report5 extends MakeReport {
 
 
 		}
-
+		// 表尾:製表人經辦名稱
+		CdEmp tCdEmp = new CdEmp();
+		tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
+		if (tCdEmp != null) {
+			cdEmpFullname = tCdEmp.getFullname();
+		}
 		long sno = this.close();
 		this.toPdf(sno);
 

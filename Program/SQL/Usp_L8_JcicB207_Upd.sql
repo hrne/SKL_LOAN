@@ -62,13 +62,14 @@ BEGIN
     SELECT DISTINCT
            B."CustId"                    AS "CustId"            -- ID
          , first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" ASC)
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最近貸放的那一筆)
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (最早貸放的那一筆)
     FROM   "JcicB201" B
       LEFT JOIN "JcicMonthlyLoanData" M ON M."DataYM" = YYYYMM 
                                        AND M."CustNo" = to_number(SUBSTR(B."AcctNo",1, 7))
     WHERE  B."DataYM"   =  YYYYMM
       AND  B."CustId"   IS NOT NULL
       AND  M."DrawdownDate" <= TMNDYF
+      AND  M."DrawdownDate" >= 20050101   -- 比照AS400輸入畫面:撥款日期需>=940101   
       AND  M."LoanBal"  >  0 -- 有餘額
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
       )
@@ -78,9 +79,9 @@ BEGIN
            B."CustId"                    AS "CustId"            -- ID
          , CASE
              WHEN NVL(WK."DrawdownDate",0) = 0
-             THEN first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" DESC)
+             THEN first_value(M."DrawdownDate") Over (Partition By M."CustId" Order By M."DrawdownDate" ASC)
            ELSE NVL(WK."DrawdownDate",0) END
-                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (若該戶全部已結清則為最近貸放的那一筆)
+                                         AS "DrawdownDate"      -- 本筆撥款開始年月 (若該戶全部已結清則為最早貸放的那一筆)
     FROM   "JcicB201" B
       LEFT JOIN "Work_B207" WK          ON B."CustId" = WK."CustId"
       LEFT JOIN "JcicMonthlyLoanData" M ON M."DataYM" = YYYYMM 
@@ -88,6 +89,7 @@ BEGIN
     WHERE  B."DataYM"   =  YYYYMM
       AND  B."CustId"   IS NOT NULL
       AND  M."DrawdownDate" <= TMNDYF
+      AND  M."DrawdownDate" >= 20050101   -- 比照AS400輸入畫面:撥款日期需>=940101   
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
       )
 

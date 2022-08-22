@@ -1130,6 +1130,8 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOCustNo
+
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1164,6 +1166,8 @@ TXFORM=L2038
 {width:70,search:false,formatter:'cust:bind-button:額度關聯',align:'center',canExport:false}
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
+
+#OOCustNo
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -1204,6 +1208,7 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1241,6 +1246,7 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1277,6 +1283,7 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1313,6 +1320,7 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1343,6 +1351,7 @@ TXFORM=L2038
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1369,6 +1378,7 @@ TXFORM=L2038
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1401,6 +1411,7 @@ TXFORM=L2038
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1429,6 +1440,7 @@ TXFORM=L2038
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1457,6 +1469,7 @@ TXFORM=L2038
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1485,6 +1498,7 @@ TXFORM=L2038
 #OOClCode1
 #OOClCode2
 #OOClNo
+#OOCustNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 

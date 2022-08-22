@@ -140,7 +140,7 @@ T(3,)T(H,#AuthApplCode,#AuthApplCodeHelp)
 ! 戶號
 #CustNo=A,7,I
 C(3,#FunctionCode,1,$,s)
-C(3,#AuthApplCode,1,s,$)
+C(3,#AuthApplCode,1,S,$)
 
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,T(2,#CustNo)) 
@@ -159,6 +159,7 @@ A(DATE,0,#PropDate)
 
 #AuthCreateDate=D,7,I
 C(3,#FunctionCode,1,S,$)
+C(3,#AuthApplCode,1,S,$)
 T(1,#SYSCDATE,2,7)
 @C(3,#AuthCreateDate,0,$,A(DATE,0,#AuthCreateDate))
 

@@ -185,7 +185,7 @@ public class L9705Form extends MakeReport {
 
 						String sPayIntDate = FormatUtil.pad9("" + payIntDate, 7);
 						// 違約金
-						// 本金
+						// 本金a
 						// 利息
 						// 未還本金餘額
 						// -溢短繳

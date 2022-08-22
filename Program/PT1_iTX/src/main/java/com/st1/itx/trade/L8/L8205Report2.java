@@ -16,6 +16,8 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.service.CdEmpService;
 
 @Component
 @Scope("prototype")
@@ -34,7 +36,11 @@ public class L8205Report2 extends MakeReport {
 	
 	@Autowired
 	MakeExcel makeExcel;
-	
+
+	@Autowired
+	CdEmpService cdEmpService;
+
+	private String cdEmpFullname = "";
 	private List<Map<String, String>> L8205List = null;
 //	自訂表頭
 	@Override
@@ -66,7 +72,9 @@ public class L8205Report2 extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		print(-68, 1, "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "P");
+		String bcDate = dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6)
+				+ "/" + dDateUtil.getNowStringBc().substring(6, 8);
+		print(-68, 1, "　　協理:　　　　　　　經理:　　　　　　　經辦:　　　　　　　" + bcDate + "製作:放款服務課　" + cdEmpFullname, "P");
 			
 		}
 			
@@ -177,6 +185,12 @@ public class L8205Report2 extends MakeReport {
 		}
 
 		this.print(-65, 50, "===== 報　表　結　束 =====", "C");
+		// 表尾:製表人經辦名稱
+		CdEmp tCdEmp = new CdEmp();
+		tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
+		if (tCdEmp != null) {
+			cdEmpFullname = tCdEmp.getFullname();
+		}
 		long sno = this.close();
 		this.toPdf(sno);
 	}

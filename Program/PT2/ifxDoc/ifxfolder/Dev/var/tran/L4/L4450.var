@@ -88,7 +88,7 @@ E(0,@AchSecondSpecificDdFrom,#L4r11AchSecondSpecificDdFrom)
 E(0,@AchSecondSpecificDdTo,#L4r11AchSecondSpecificDdTo)
 
 #BUF=x,500,S
-T(2,9+0000000+999+99+#EntryDate+#EntryDate+00000000000000+00000000000000+00000000000000)
+T(2,09+0000000+999+99+#EntryDate+#EntryDate+00000000000000+00000000000000+00000000000000)
 
 #BINDBTN=X,1,S
 BIND(#BTN,click, {cmd=CHAIN; ntxcd=L4943; ntxbuf=#BUF})

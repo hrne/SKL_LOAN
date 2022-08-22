@@ -38,9 +38,10 @@ E(0,40)ASGN(INQPRT$)
 [
 ["[L2418]                                 擔保品他項權利登錄"],
 ["#FdFunCd+功能",#FunCdX],
+["#FdCustNo+戶號",#CustNo,#BTN1],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
-["#FdClNo+擔保品編號",#ClNo,#BTN1],
+["#FdClNo+擔保品編號",#ClNo],
 ["#FdSeq+他項權利序號",#SeqS,"-",#SeqE],
 ["#FdCity+縣市",#City,#CityX,#InCityX],
 ["#FdLandAdm+地政",#LandAdm,#LandAdmX,#InLandAdmX],
@@ -48,7 +49,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdRecWord+收件字",#RecWord,#RecWordX,#InRecWordX],
 ["#FdRecNumber+收件號",#RecNumber],
 ["#FdRightsNote+權利價值說明",#RightsNote,#RightsNoteX],
-["#FdSecuredTotal+擔保債權總金額",#TwSecuredTotal,#UsSecuredTotal],
+["#FdSecuredTotal+擔保債權總金額",#TwSecuredTotal,#UsSecuredTotal,"@萬元"],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -256,6 +257,25 @@ T(2,@FdSecuredTotal,)
 C(3,#FunCd,1,$,S)
 E(0,0)ASGN(AGAIN$)
 
+#BUF1A=X,18,S
+T(2, +0+00+       +   +       +          +       )
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1})
+
+!戶號
+#FdCustNo=X,2,L
+
+#CustNo=A,7,I
+SHOW(#BTN1)
+@
+HIDE(#BTN1)
+
+#BUF1B=X,40,S
+T(2, +0+00+       +   +       +          +#CustNo)
+
+#BIND1B=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1B;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1:CustNo<-OOCustNo})
 
 ! [擔保品代號1]
 #ClCode1=A,1,I
@@ -294,17 +314,10 @@ T(H,#ClCode2,#L2r48Help1)
 
 ! [擔保品編號]
 
-#BUF1A=X,18,S
-T(2, +#ClCode1+#ClCode2+       +   +       +)
-
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1})
-
 #ClNo=A,7,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-SHOW(#BTN1)
-@V(2,0)
 HIDE(#BTN1)
+@V(2,0)
 
 ! 調RIM查擔保品主檔(ClMain)資料
 #RimL2r22=X,1,S
@@ -337,6 +350,7 @@ T(2,@RimClSeq,#ClSeq)
 RESET_RIM(#RimL2r46B,L2R46)
 S(L2R46,1,#RimClCode1,#RimClCode2,#RimClNo,#RimClSeq)
 R(1,L2R46)
+C(3,#FunCd,1,S,$)
 T(2,@City,#L2r46City)
 C(4,#L2r46OtherCity,$,SHOW(#InCityX))
 T(2,@InCityX,#L2r46OtherCity)

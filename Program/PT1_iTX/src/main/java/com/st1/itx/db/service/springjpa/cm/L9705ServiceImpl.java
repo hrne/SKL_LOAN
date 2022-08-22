@@ -53,6 +53,9 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,C.\"CustName\"           AS \"CustName\"  ";
 		sql += "            ,F.\"RepayCode\"          AS \"RepayCode\" ";
 		sql += "            ,C.\"EntCode\"            AS \"EntCode\"   ";
+		if ("4".equals(condition1)) {
+			sql += "            ,BATX.\"ReconCode\"            AS \"ReconCode\"   ";
+		}
 		sql += "      FROM \"LoanBorMain\" M";
 		sql += "      LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                             AND F.\"FacmNo\" = M.\"FacmNo\"";
@@ -92,6 +95,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       \"CustNo\"                             ";
 			sql += "      ,\"FacmNo\"                             ";
 			sql += "      ,\"BormNo\"                             ";
+			sql += "      ,\"TitaTxtNo\"                             ";
 			sql += "      from \"LoanBorTx\"                      ";
 			sql += "      where \"TitaTxCd\" in ('L3200')         ";
 			sql += "        and \"TitaHCode\" = 0                 ";
@@ -101,6 +105,8 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ) LBT on LBT.\"CustNo\" = M.\"CustNo\"       ";
 			sql += "      and LBT.\"FacmNo\" = M.\"FacmNo\"       ";
 			sql += "      and LBT.\"BormNo\" = M.\"BormNo\"       ";
+			sql += " left join \"BatxDetail\" BATX";
+			sql += " 		on BATX.\"TitaTxtNo\" = LBT.\"TitaTxtNo\"";
 		}
 		sql += "      WHERE F.\"DepartmentCode\" = :corpInd ";
 		if (Integer.valueOf(custNoStart) > 0) {
@@ -171,9 +177,11 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		default:
 			break;
 		}
-
-		sql += " order by M.\"CustNo\", M.\"FacmNo\"                     ";
-
+		if ("4".equals(condition1)) {
+			sql += " order by DECODE(BATX.\"ReconCode\",'A3','0',BATX.\"ReconCode\"),M.\"CustNo\", M.\"FacmNo\"                     ";
+		} else {
+			sql += " order by M.\"CustNo\", M.\"FacmNo\"                     ";
+		}
 		/*
 		 * SELECT DISTINCT M."FacmNo" , C."CustName" FROM "LoanBorMain" M LEFT JOIN
 		 * "FacMain" F ON F."CustNo" = M."CustNo" AND F."FacmNo" = M."FacmNo" LEFT JOIN
@@ -224,7 +232,6 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("custno1", custNoStart);
 			query.setParameter("custno2", custNoEnd);
 		}
-		
 
 		switch (condition1) {
 		case "1": // 新貸戶
@@ -240,8 +247,6 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		default:
 			break;
 		}
-		
-		
 
 		query.setParameter("corpInd", corpInd);
 
