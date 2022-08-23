@@ -173,7 +173,6 @@ public class L4606Report2 extends MakeReport {
 			System.arraycopy(input, 0, resultBytes, 0, resultLength);
 			result = new String(resultBytes);
 		}
-
 		return result;
 	}
 

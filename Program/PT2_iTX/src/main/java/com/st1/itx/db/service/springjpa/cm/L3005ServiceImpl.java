@@ -122,7 +122,8 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY ln2.\"AcDate\" ASC ";
 		sql += "         ,ln2.\"TitaCalDy\" ASC	                    ";
 		sql += "         ,ln2.\"TitaCalTm\"	ASC                    	";
-		sql += "         ,NVL(JSON_VALUE(\"OtherFields\", '$.AcSeq'),'0000') ASC";
+		sql += "         ,ln3.\"TitaTxtNo\" ASC             	    ";
+		sql += "         ,NVL(JSON_VALUE(ln3.\"OtherFields\", '$.AcSeq'),'0000') ASC";
 		sql += "         ,ln3.\"CreateDate\" ASC                    ";
 		sql += "         ,ln3.\"Displayflag\" ASC                   ";
 		sql += " " + sqlRow;

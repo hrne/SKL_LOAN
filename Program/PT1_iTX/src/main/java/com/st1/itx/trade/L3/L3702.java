@@ -86,13 +86,13 @@ public class L3702 extends TradeBuffer {
 			this.info("tCustMain = " + tCustMain);
 			// 該戶號部存在客戶主檔 拋錯
 			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0005", "L3702 該戶號" + iCustNo + "不存在客戶主檔。");
+				throw new LogicException(titaVo, "E0005", "該戶號不存在客戶主檔。");
 			}
 
 			tLoanCustRmk = sLoanCustRmkService.findById(LoanCustRmkId);
 			// 新增時 該戶號,備忘錄序號查有資料 拋錯
 			if (tLoanCustRmk != null) {
-				throw new LogicException(titaVo, "E0002", "L3702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "已存在於帳務備忘錄明細資料檔。");
+				throw new LogicException(titaVo, "E0002", "該戶號,備忘錄序號已存在於帳務備忘錄明細資料檔。");
 			}
 
 			tLoanCustRmk = new LoanCustRmk();
@@ -120,7 +120,7 @@ public class L3702 extends TradeBuffer {
 			tLoanCustRmk = sLoanCustRmkService.holdById(LoanCustRmkId);
 
 			if (tLoanCustRmk == null) {
-				throw new LogicException(titaVo, "E0003", "L3702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在帳務備忘錄明細資料檔。");
+				throw new LogicException(titaVo, "E0003", "該戶號,備忘錄序號不存在帳務備忘錄明細資料檔。");
 			}
 			// 變更前
 			LoanCustRmk beforeLoanCustRmk = (LoanCustRmk) dataLog.clone(tLoanCustRmk);
@@ -159,7 +159,7 @@ public class L3702 extends TradeBuffer {
 
 			tLoanCustRmk = sLoanCustRmkService.holdById(LoanCustRmkId);
 			if (tLoanCustRmk == null) {
-				throw new LogicException(titaVo, "E0004", "L3702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於帳務備忘錄明細資料檔。");
+				throw new LogicException(titaVo, "E0004", "該戶號,備忘錄序號不存在於帳務備忘錄明細資料檔。");
 			}
 
 			// 刪除須刷主管卡

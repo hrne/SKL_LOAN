@@ -69,7 +69,7 @@ BEGIN
     WHERE  B."DataYM"   =  YYYYMM
       AND  B."CustId"   IS NOT NULL
       AND  M."DrawdownDate" <= TMNDYF
-      AND  M."DrawdownDate" >= 20050101   -- 比照AS400輸入畫面:撥款日期需>=940101   
+      AND  M."DrawdownDate" >= 20050901   -- 比照AS400輸入畫面:撥款日期需>=940901   
       AND  M."LoanBal"  >  0 -- 有餘額
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
       )
@@ -89,8 +89,11 @@ BEGIN
     WHERE  B."DataYM"   =  YYYYMM
       AND  B."CustId"   IS NOT NULL
       AND  M."DrawdownDate" <= TMNDYF
-      AND  M."DrawdownDate" >= 20050101   -- 比照AS400輸入畫面:撥款日期需>=940101   
+      AND  M."DrawdownDate" >= 20050901   -- 比照AS400輸入畫面:撥款日期需>=940901   
       AND  M."EntCode"  IN ('0', '2')  -- 自然人
+      AND  CASE WHEN M."Status" IN ( 0 , 2) THEN 1 -- 戶況正常或催收戶
+                WHEN to_number(SUBSTR(B."AcctNo",11, 3)) = 0 THEN 1 -- 撥款序號=0為 循環動用 且 未至循環動用期限
+                ELSE 0 END = 1 
       )
 
     SELECT

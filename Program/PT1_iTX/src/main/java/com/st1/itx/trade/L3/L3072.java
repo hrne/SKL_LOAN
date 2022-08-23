@@ -88,7 +88,7 @@ public class L3072 extends TradeBuffer {
 		}
 
 		if (lLoanCustRmk == null) {
-			throw new LogicException(titaVo, "E2003", "L3072 該戶號" + iCustNo + "不存在帳戶備忘錄明細資料檔。");
+			throw new LogicException(titaVo, "E2003", "該戶號不存在帳戶備忘錄明細資料檔。");
 		}
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slLoanCustRmk != null && slLoanCustRmk.hasNext()) {

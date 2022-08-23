@@ -474,18 +474,47 @@ public class L4320Batch extends TradeBuffer {
 		// 利率調整週期
 		int rateAdjFreq = parse.stringToInteger(s.get("RateAdjFreq"));
 		b.setPreNextAdjFreq(rateAdjFreq);
-		// 下次利率調整日期
+		// 主檔下次利率調整日期
 		int nextAdjRateDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextAdjRateDate")));
 
 		// 預定下次利率調整日期
 		int preNextAdjDate = 0;
 		if (iTxKind == 1) {
-			if (iAdjCode == 4) {
+			if (iAdjCode == 4 || nextAdjRateDate == maturityDate) {
 				preNextAdjDate = nextAdjRateDate;
 			} else {
+				// 基準日設為首次利率調整日
+				int sDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("FirstAdjRateDate")));
+				// 基準日為首撥日=>首次利率調整日為月底日且首撥日為月底日則取首撥日的相對日為下次利率調整日
 				dateUtil.init();
-				dateUtil.setDate_1(nextAdjRateDate);
-				dateUtil.setMons(rateAdjFreq); // 調整周期(單位固定為月)
+				dateUtil.setDate_1(sDate);
+				this.info("sDate" + sDate % 100 + " " + dateUtil.getMonLimit());
+
+				if (sDate % 100 == dateUtil.getMonLimit()) {
+					int firstDrawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("FirstDrawdownDate")));
+					dateUtil.init();
+					dateUtil.setDate_1(firstDrawdownDate);
+					this.info("firstDrawdownDate" + firstDrawdownDate % 100 + " " + dateUtil.getMonLimit());
+					if (firstDrawdownDate % 100 == dateUtil.getMonLimit()) {
+						sDate = firstDrawdownDate;
+					}
+				}
+				// 調整月差 = 調整周期 + (基準日 ~ 下次利率調整)月差
+				int month = rateAdjFreq;
+				this.info("sDate=" + sDate + " nextAdjRateDate=" + nextAdjRateDate);
+				if (nextAdjRateDate / 100 > sDate / 100) {
+					dateUtil.init();
+					dateUtil.setDate_1(sDate);
+					dateUtil.setDate_2(nextAdjRateDate);
+					dateUtil.dateDiff();
+					month += dateUtil.getMons();
+					this.info("sDate=" + sDate + " nextAdjRateDate=" + nextAdjRateDate + ", month=" + month
+							+ " rateAdjFreq=" + rateAdjFreq);
+				}
+				// 預定下次利率調整日
+				dateUtil.init();
+				dateUtil.setDate_1(sDate);
+				dateUtil.setMons(month); // 調整周期(單位固定為月)
 				preNextAdjDate = dateUtil.getCalenderDay();
 				if (preNextAdjDate > maturityDate) {
 					preNextAdjDate = maturityDate;
@@ -537,15 +566,17 @@ public class L4320Batch extends TradeBuffer {
 				rateProp = iBaseRate.add(individualIncr);
 			}
 
-			// MaturityDate 到期日期
-			// int maturityDate =
-			// StaticTool.bcToRoc(parse.stringToInteger(s.get("MaturityDate")));
 			// 定期機動指標利率變動調整合約利率
 			if (iAdjCode == 4) {
+				// 下次利率調整日小於調整月份列入[檢核提醒件]
 				adjCode = 4;
 				if (nextAdjRateDate < wkLastMonthDateS && nextAdjRateDate < maturityDate) {
 					warnMsg += ", 下次利率調整日小於調整月份";
 				}
+			} else if (effDateCurt == maturityDate) {
+				// 下次利率調整日為到期日者於整批利率調整時列入[檢核提醒件],不調整利率
+				adjCode = 4;
+				warnMsg += ", 下次利率調整日為到期日";
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1;
 			} else if ("".equals(cityCode.trim())) {
@@ -674,10 +705,12 @@ public class L4320Batch extends TradeBuffer {
 		}
 
 		// 若利率變動且大於利率生效日
-		if (adjCode == 1) {
-			if (rateProp.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
+		if (rateProp.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
+			if (adjCode == 1) {
 				errorFlag = 1;
 				checkMsg += ", 上次繳息日大於利率生效日, 入帳日:" + entryDate;
+			} else {
+				warnMsg += ", 上次繳息日大於利率生效日, 入帳日:" + entryDate;
 			}
 		}
 
@@ -974,7 +1007,11 @@ public class L4320Batch extends TradeBuffer {
 			fitRate = parse.stringToBigDecimal(baseRateChangeCust.get("FitRate"));
 
 			// 運算新的適用利率
-			newFitRate = baseRate.add(rateIncr).add(individualIncr);
+			if ("Y".equals(baseRateChangeCust.get("IncrFlag"))) { // 加減碼是否依合約
+				newFitRate = iBaseRate.add(rateIncr);
+			} else {
+				newFitRate = iBaseRate.add(individualIncr);
+			}
 			batxBaseRateChange.setFitRate(newFitRate);
 
 			if (fitRate.compareTo(newFitRate) == 0) {
@@ -1007,6 +1044,7 @@ public class L4320Batch extends TradeBuffer {
 				}
 			}
 		}
+
 	}
 
 	private void updateLoanRateChangeAll(BigDecimal iBaseRate, List<Map<String, String>> baseRateChangeCustList,

@@ -72,9 +72,8 @@ public class L8205Report2 extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		String bcDate = dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6)
-				+ "/" + dDateUtil.getNowStringBc().substring(6, 8);
-		print(-68, 1, "　　協理:　　　　　　　經理:　　　　　　　經辦:　　　　　　　" + bcDate + "製作:放款服務課　" + cdEmpFullname, "P");
+
+		print(-68, 1, "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "P");
 			
 		}
 			

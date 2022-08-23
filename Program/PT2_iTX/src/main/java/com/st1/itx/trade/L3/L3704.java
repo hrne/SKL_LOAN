@@ -91,14 +91,13 @@ public class L3704 extends TradeBuffer {
 			this.info("tCustMain = " + tCustMain);
 			// 該戶號不存在客戶主檔 拋錯
 			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0005", "L3704 該戶號" + iCustNo + "不存在客戶主檔。");
+				throw new LogicException(titaVo, "E0005", "該戶號不存在客戶主檔。");
 			}
 
 			tLoanFacTmp = sLoanFacTmpService.findById(LoanFacTmpId, titaVo);
 			if (tLoanFacTmp != null) {
 				if (tLoanFacTmp.getCustNo() == iCustNo && tLoanFacTmp.getFacmNo() == iFacmNo) {
-					throw new LogicException(titaVo, "E0002",
-							"L3704 該戶號" + iCustNo + "與額度編號" + iFacmNo + "已存在於暫收款指定額度設定查詢檔。");
+					throw new LogicException(titaVo, "E0002","該戶號、與額度編號已存在於暫收款指定額度設定查詢檔。");
 				}
 			}
 
@@ -125,7 +124,7 @@ public class L3704 extends TradeBuffer {
 
 			if (tLoanFacTmp == null) {
 				throw new LogicException(titaVo, "E0003",
-						"L3704 該戶號" + iCustNo + "與額度編號" + iFacmNo + ",不存在暫收款指定額度設定查詢檔。");
+						"該戶號、與額度編號,不存在暫收款指定額度設定查詢檔。");
 			}
 
 			// 變更前

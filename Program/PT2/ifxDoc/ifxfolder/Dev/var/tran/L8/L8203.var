@@ -25,14 +25,6 @@ E(0,1)
 #ORGFG=_,_,S
 E(0,0)
 
-!YesNo
-#YesNoHelp=x,50,S
-T(3,Y:是;N:否)
-
-!同意不同意
-#AgreeHelp=x,50,S
-T(3,Y:同意;N:退回)
-
 </sub>
 <sub type="PREDC" name="PreDC">
 <include src="COM.icf::TITLE-RUN.pre"/>
@@ -99,6 +91,14 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@FactorHelp,#HelpDesc2)
+
+!YesNo
+#YesNoHelp=x,50,S
+T(3,Y:是;N:否)
+
+!同意不同意
+#AgreeHelp=x,50,S
+T(3,Y:同意;N:退回)
 
 
 #CHAIN=A,1,S
@@ -317,6 +317,7 @@ T(4,@CDATE,CDATE$)
 C(3,#FuncCode,4,s,$)
 C(3,#FuncCode,5,s,$)
 C(3,#Level,1,$,s)
+T(3,@AgreeHelp,Y:同意;N:退回)
 HELP(#AgreeHelp)
 @T(3,@ManagerCheckX,)
 V(H,#AgreeHelp)

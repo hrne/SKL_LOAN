@@ -121,6 +121,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(f.\"ApproveRate\", 0)                    as \"FacApproveRate\"  "; // 額度核准利率
 		sql += "   ,NVL(f.\"RateIncr\", 0)                       as \"FacRateIncr\"  "; // 額度加碼利率
 		sql += "   ,NVL(f.\"IndividualIncr\" , 0)                as \"FacIndividualIncr\" "; // 額度個人加碼利率
+		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日 
 		sql += "   ,NVL(p.\"EmpFlag\", ' ')                      as \"EmpFlag\" "; // 員工利率記號
 		sql += "   ,NVL(r.\"IncrFlag\", ' ')                     as \"IncrFlag\" "; // 借戶利率檔是否依合約記號
 		sql += "   ,NVL(r.\"BaseRateCode\", ' ')                 as \"BaseRateCode\" "; // 借戶利率檔商品指標利率代碼

@@ -60,7 +60,6 @@ public class L3074 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500; // 29 * 500 = 14500
 
-		// tita
 		// 戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
@@ -83,7 +82,7 @@ public class L3074 extends TradeBuffer {
 		}
 
 		if (lLoanFacTmp == null) {
-			throw new LogicException(titaVo, "E2003", "L3072 該戶號" + iCustNo + "不存在暫收款指定額度設定查詢檔。");
+			throw new LogicException(titaVo, "E2003", "該戶號不存在暫收款指定額度設定查詢檔。");
 		}
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (sLoanFacTmp != null && sLoanFacTmp.hasNext()) {

@@ -101,7 +101,7 @@ public class L2633ReportA extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(80);
+		this.setMaxRows(20);
 
 		this.setFontSize(8);
 		/**
@@ -186,8 +186,6 @@ public class L2633ReportA extends MakeReport {
 				msAmt = msAmt.add(msFacClose.getCloseAmt());
 			}
 		}
-		slFacClose = sFacCloseService.findEntryDate(iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
-		lFacClose = slFacClose == null ? null : slFacClose.getContent();
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 

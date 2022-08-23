@@ -74,7 +74,7 @@ public class L3R17 extends TradeBuffer {
 			this.info("iFunCdelse   = " + iFunCd);
 			// 該戶號查不到資料 拋錯
 			if (tLoanFacTmp == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "不存在暫收款指定額度設定查詢。"); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "  該戶號不存在暫收款指定額度設定查詢。"); // 查詢資料不存在
 			}
 			this.totaVo.putParam("L3r17RmkDescribe", tLoanFacTmp.getDescribe());
 

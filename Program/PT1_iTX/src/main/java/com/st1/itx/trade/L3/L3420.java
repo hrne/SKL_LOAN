@@ -1183,8 +1183,8 @@ public class L3420 extends TradeBuffer {
 
 		// tLoanOverdue.setBadDebtDate(wkTbsDy);
 		tLoanOverdue.setBadDebtDate(parse.stringToInteger(titaVo.getParam("BadDebtDateN")));// 改放轉呆時畫面輸入的董事會通過核定日期
-		tLoanOverdue.setBadDebtAmt(od.getOvduBal());
-		tLoanOverdue.setBadDebtBal(od.getOvduBal());
+		tLoanOverdue.setBadDebtAmt(od.getBadDebtAmt().add(od.getOvduBal()));
+		tLoanOverdue.setBadDebtBal(od.getBadDebtBal().add(od.getOvduBal()));
 		tLoanOverdue.setOvduPrinBal(BigDecimal.ZERO);
 		tLoanOverdue.setOvduIntBal(BigDecimal.ZERO);
 		tLoanOverdue.setOvduBreachBal(BigDecimal.ZERO);

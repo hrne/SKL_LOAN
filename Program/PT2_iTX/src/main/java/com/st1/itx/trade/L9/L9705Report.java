@@ -161,19 +161,24 @@ public class L9705Report extends MakeReport {
 				}
 				count++;
 			}
+		}else {
+			this.info("isOpen ... no data");
+			this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12",
+					"P");
+			
 		}
 
-		// 關閉報表
-		this.info("isClose");
-		long sno = this.close();
 
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 					titaVo.getParam("TLRNO"),
 					titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
 		}
-		return sno;
+		// 關閉報表
+		this.info("isClose");
+		long sno = this.close();
 
+		return sno;
 	}
 
 	private void exportData(List<Map<String, String>> r, TitaVo titaVo, TxBuffer txbuffer, String reconcode, int c)

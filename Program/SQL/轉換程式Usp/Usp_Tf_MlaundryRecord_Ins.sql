@@ -48,9 +48,12 @@ BEGIN
           ,CASE
              WHEN IV."CHGDAT" > 0
              THEN TO_DATE(IV."CHGDAT",'YYYYMMDD')
+             WHEN IV."IVWDAT" > 0
+             THEN TO_DATE(IV."IVWDAT",'YYYYMMDD')
            ELSE JOB_START_TIME
            END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,NVL(AEM2."EmpNo",NVL(AEM1."EmpNo",'999999'))
+                                          AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM "LN$IVWP" IV 
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = IV."CRTEMP"
     LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = IV."CHGEMP"
