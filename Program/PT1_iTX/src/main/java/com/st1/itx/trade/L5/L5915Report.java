@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.springjpa.cm.LP005ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L5915ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
@@ -23,7 +23,7 @@ public class L5915Report extends MakeReport {
 	private Parse parse;
 
 	@Autowired
-	private LP005ServiceImpl lp005ServiceImpl;
+	private L5915ServiceImpl l5915ServiceImpl;
 
 	@Autowired
 	private MakeExcel makeExcel;
@@ -63,7 +63,7 @@ public class L5915Report extends MakeReport {
 	private void setAmt() throws LogicException {
 		this.info("setAmt ... ");
 
-		List<Map<String, String>> listAmt = lp005ServiceImpl.queryAmt(workMonth, titaVo);
+		List<Map<String, String>> listAmt = l5915ServiceImpl.queryAmt(workMonth, titaVo);
 
 		if (listAmt == null || listAmt.isEmpty()) {
 			return;
@@ -73,26 +73,29 @@ public class L5915Report extends MakeReport {
 
 		int rowCursor = 2;
 
+		// 2022-08-23 ST1-智偉修改
+		// SKL User 李珮君 要求跟AS400產一樣的檔案
+		// 協辦人員業績金額的檔案要產出不只有協辦人員業績金額的檔案
 		for (Map<String, String> m : listAmt) {
 
 			// 戶號
-			makeExcel.setValue(rowCursor, 1, Integer.valueOf(m.get("F0")));
+			makeExcel.setValue(rowCursor, 1, Integer.valueOf(m.get("CustNo")));
 			// 額度
-			makeExcel.setValue(rowCursor, 2, Integer.valueOf(m.get("F1")));
+			makeExcel.setValue(rowCursor, 2, Integer.valueOf(m.get("FacmNo")));
 			// 撥款金額
-			makeExcel.setValue(rowCursor, 3, getBigDecimal(m.get("F2")), "#,##0");
+			makeExcel.setValue(rowCursor, 3, getBigDecimal(m.get("DrawdownAmt")), "#,##0");
 			// 計件代碼
-			makeExcel.setValue(rowCursor, 4, m.get("F3"), "L");
+			makeExcel.setValue(rowCursor, 4, m.get("PieceCode"), "L");
 			// 員工代碼
-			makeExcel.setValue(rowCursor, 5, m.get("F4"), "L");
+			makeExcel.setValue(rowCursor, 5, m.get("EmpNo"), "L");
 			// 員工姓名
-			makeExcel.setValue(rowCursor, 6, m.get("F5"), "L");
+			makeExcel.setValue(rowCursor, 6, m.get("EmpName"), "L");
 			// 部室
-			makeExcel.setValue(rowCursor, 7, m.get("F6"), "L");
+			makeExcel.setValue(rowCursor, 7, m.get("Dept"), "L");
 			// 區部
-			makeExcel.setValue(rowCursor, 8, m.get("F7"), "L");
+			makeExcel.setValue(rowCursor, 8, m.get("Dist"), "L");
 			// 單位
-			makeExcel.setValue(rowCursor, 9, m.get("F8"), "L");
+			makeExcel.setValue(rowCursor, 9, m.get("Unit"), "L");
 
 			rowCursor++;
 		}
@@ -101,7 +104,7 @@ public class L5915Report extends MakeReport {
 	private void setCounts() throws LogicException {
 		this.info("setCounts ... ");
 
-		List<Map<String, String>> listCnt = lp005ServiceImpl.queryCounts(workMonth, titaVo);
+		List<Map<String, String>> listCnt = l5915ServiceImpl.queryCounts(workMonth, titaVo);
 
 		if (listCnt == null || listCnt.isEmpty()) {
 			return;
@@ -111,26 +114,41 @@ public class L5915Report extends MakeReport {
 
 		int rowCursor = 2;
 
+		// 2022-08-23 ST1-智偉修改
+		// SKL User 李珮君 要求跟AS400產一樣的檔案
+		// 協辦人員業績件數的檔案要產出不只有協辦人員業績件數的檔案
 		for (Map<String, String> m : listCnt) {
 
 			// 獎金類別
-			makeExcel.setValue(rowCursor, 1, Integer.valueOf(m.get("F0")));
+			makeExcel.setValue(rowCursor, 1, Integer.valueOf(m.get("RewardType")));
+			// 計件代碼
+			makeExcel.setValue(rowCursor, 2, m.get("PieceCode"), "L");
+			// 撥款金額
+			makeExcel.setValue(rowCursor, 3, getBigDecimal(m.get("DrawdownAmt")), "#,##0");
+			// 車馬費發放日期
+			makeExcel.setValue(rowCursor, 4, this.showBcDate(m.get("BonusDate"), 2));
 			// 戶號
-			makeExcel.setValue(rowCursor, 2, Integer.valueOf(m.get("F1")));
+			makeExcel.setValue(rowCursor, 5, Integer.valueOf(m.get("CustNo")));
 			// 戶名
-			makeExcel.setValue(rowCursor, 3, m.get("F2"), "L");
+			makeExcel.setValue(rowCursor, 6, m.get("CustName"), "L");
+			// 額度號碼
+			makeExcel.setValue(rowCursor, 7, Integer.valueOf(m.get("FacmNo")));
+			// 統一編號
+			makeExcel.setValue(rowCursor, 8, m.get("CustId"), "L");
+			// 已用額度
+			makeExcel.setValue(rowCursor, 9, getBigDecimal(m.get("UtilBal")), "#,##0");
 			// 車馬費發放額
-			makeExcel.setValue(rowCursor, 4, getBigDecimal(m.get("F3")), "#,##0");
-			// 介紹人
-			makeExcel.setValue(rowCursor, 5, m.get("F4"), "L");
+			makeExcel.setValue(rowCursor, 10, getBigDecimal(m.get("Bonus")), "#,##0");
+			// 員工代號
+			makeExcel.setValue(rowCursor, 11, m.get("EmpNo"), "L");
 			// 員工姓名
-			makeExcel.setValue(rowCursor, 6, m.get("F5"), "L");
+			makeExcel.setValue(rowCursor, 12, m.get("EmpName"), "L");
 			// 部室
-			makeExcel.setValue(rowCursor, 7, m.get("F6"), "L");
+			makeExcel.setValue(rowCursor, 13, m.get("Dept"), "L");
 			// 區部
-			makeExcel.setValue(rowCursor, 8, m.get("F7"), "L");
+			makeExcel.setValue(rowCursor, 14, m.get("Dist"), "L");
 			// 單位
-			makeExcel.setValue(rowCursor, 9, m.get("F8"), "L");
+			makeExcel.setValue(rowCursor, 15, m.get("Unit"), "L");
 
 			rowCursor++;
 		}

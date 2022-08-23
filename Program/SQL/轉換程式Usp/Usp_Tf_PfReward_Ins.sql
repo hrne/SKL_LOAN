@@ -25,40 +25,64 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "PfReward"
-    WITH IB AS (
+    WITH rawData AS (
+      SELECT DISTINCT
+             QTAP."PRZCMD"
+           , CASE
+               WHEN QTAP."LMSLLD" = 0
+               THEN APLP."APLFSD"
+             ELSE QTAP."LMSLLD" END AS "LMSLLD"
+           , QTAP."LMSACN"
+           , QTAP."LMSAPN"
+           , QTAP."LMSASQ"
+      FROM "LA$QTAP" QTAP
+      LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = QTAP."LMSACN"
+                              AND APLP."LMSAPN" = QTAP."LMSAPN"
+      WHERE QTAP."PRZTYP" IN ('1','5')
+        AND QTAP."PRZCMD" >= 20211201
+    )
+    , keyData AS (
+      SELECT r."PRZCMD"
+           , r."LMSLLD"
+           , r."LMSACN"
+           , r."LMSAPN"
+           , r."LMSASQ"
+           , ROW_NUMBER()
+             OVER (
+                 PARTITION BY r."PRZCMD"
+                            , r."LMSLLD"
+                            , r."LMSACN"
+                            , r."LMSAPN"
+                 ORDER BY "LMSASQ"
+             ) AS "FacSeq"
+      FROM rawData r
+    )
+    , QI AS (
         SELECT QTAP."PRZCMD"
              , QTAP."LMSLLD"
              , QTAP."LMSACN"
              , QTAP."LMSAPN"
              , QTAP."LMSASQ"
              , QTAP."CUSEM3"
-             , LSEP."EMPCOD"
-             , QTAP."PRZCMT" AS "IntroducerBonus" -- 介紹人介紹獎金
-             , QTAP."PRZCMD" AS "IntroducerBonusDate" -- 介紹獎金發放日
-             , ROW_NUMBER()
-               OVER (
-                   PARTITION BY QTAP."PRZCMD"
-                              , QTAP."LMSLLD"
-                              , QTAP."LMSACN"
-                              , QTAP."LMSAPN"
-                   ORDER BY QTAP."LMSASQ"
-               ) AS "IbSeq"
+             , LSEP."EMPCOD" -- 協辦人員員編
+             , QTAP."PRZCMT" -- 介紹人介紹獎金
+             , QTAP."PRZCMD" -- 介紹獎金發放日
         FROM "LA$QTAP" QTAP
-        LEFT JOIN "LN$LSEP" LSEP ON LSEP."LMSACN" = QTAP."LMSACN"
-                                AND LSEP."LMSAPN" = QTAP."LMSAPN"
         WHERE QTAP."PRZTYP" = '1' -- 介紹獎金
           AND QTAP."PRZCMD" >= 20211201
     )
-    , CB AS (
+    , QC AS (
         SELECT QTAP."PRZCMD"
-             , QTAP."LMSLLD" -- *** 協辦獎金的撥款日期會放0
-             , APLP."APLFSD"
+             , CASE
+                 WHEN QTAP."LMSLLD" = 0
+                 THEN APLP."APLFSD"
+               ELSE QTAP."LMSLLD" END AS "LMSLLD" -- *** 協辦獎金的撥款日期會放0
              , QTAP."LMSACN"
              , QTAP."LMSAPN"
              , QTAP."LMSASQ" -- *** 協辦獎金的撥款序號會放0
              , QTAP."CUSEM3" -- *** 協辦獎金的CUSEM3 是協辦人員
-             , QTAP."PRZCMT" AS "CoorgnizerBonus" -- 協辦人員協辦獎金
-             , QTAP."PRZCMD" AS "CoorgnizerBonusDate" -- 協辦獎金發放日
+             , QTAP."PRZCMT" -- 協辦人員協辦獎金
+             , QTAP."PRZCMD" -- 協辦獎金發放日
         FROM "LA$QTAP" QTAP
         LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = QTAP."LMSACN"
                                 AND APLP."LMSAPN" = QTAP."LMSAPN"
@@ -66,25 +90,30 @@ BEGIN
           AND QTAP."PRZCMD" >= 20211201
     )
     , joinedData AS (
-        SELECT NVL(IB."PRZCMD",CB."PRZCMD") AS "PRZCMD"
-             , NVL(IB."LMSLLD",CASE
-                                 WHEN CB."LMSLLD" = 0
-                                 THEN CB."APLFSD"
-                               ELSE CB."LMSLLD" END ) AS "LMSLLD"
-             , NVL(IB."LMSACN",CB."LMSACN") AS "LMSACN"
-             , NVL(IB."LMSAPN",CB."LMSAPN") AS "LMSAPN"
-             , NVL(IB."LMSASQ",CB."LMSASQ") AS "LMSASQ"
-             , IB."CUSEM3"
-             , NVL(IB."EMPCOD",CB."CUSEM3")    AS "EMPCOD" -- 協辦人員員編
-             , NVL(IB."IntroducerBonus",0)     AS "IntroducerBonus"     -- 介紹人介紹獎金
-             , NVL(IB."IntroducerBonusDate",0) AS "IntroducerBonusDate" -- 介紹獎金發放日
-             , NVL(CB."CoorgnizerBonus",0)     AS "CoorgnizerBonus"     -- 協辦人員協辦獎金
-             , NVL(CB."CoorgnizerBonusDate",0) AS "CoorgnizerBonusDate" -- 協辦獎金發放日
-        FROM CB
-        FULL OUTER JOIN IB ON CB."PRZCMD" = IB."PRZCMD"
-                          AND CB."LMSACN" = IB."LMSACN"
-                          AND CB."LMSAPN" = IB."LMSAPN"
-                          AND IB."IbSeq" = 1
+      SELECT K."PRZCMD"                     AS "PRZCMD"
+           , K."LMSLLD"                     AS "LMSLLD"
+           , K."LMSACN"                     AS "LMSACN"
+           , K."LMSAPN"                     AS "LMSAPN"
+           , K."LMSASQ"                     AS "LMSASQ"
+           , QI."CUSEM3"                    AS "CUSEM3" -- 介紹人
+           , NVL(QC."CUSEM3",LSEP."EMPCOD") AS "EMPCOD" -- 協辦人員員編
+           , NVL(QI."PRZCMT",0)             AS "IntroducerBonus"     -- 介紹人介紹獎金
+           , NVL(QI."PRZCMD",0)             AS "IntroducerBonusDate" -- 介紹獎金發放日
+           , NVL(QC."PRZCMT",0)             AS "CoorgnizerBonus"     -- 協辦人員協辦獎金
+           , NVL(QC."PRZCMD",0)             AS "CoorgnizerBonusDate" -- 協辦獎金發放日
+      FROM keyData K
+      LEFT JOIN QI ON QI."PRZCMD" = K."PRZCMD" -- 介紹人
+                  AND QI."LMSLLD" = K."LMSLLD"
+                  AND QI."LMSACN" = K."LMSACN"
+                  AND QI."LMSAPN" = K."LMSAPN"
+                  AND QI."LMSASQ" = K."LMSASQ"
+      LEFT JOIN QC ON QC."PRZCMD" = K."PRZCMD" -- 協辦人員
+                  AND QC."LMSLLD" = K."LMSLLD"
+                  AND QC."LMSACN" = K."LMSACN"
+                  AND QC."LMSAPN" = K."LMSAPN"
+                  AND K."FacSeq" = 1
+      LEFT JOIN "LN$LSEP" LSEP ON LSEP."LMSACN" = K."LMSACN"
+                              AND LSEP."LMSAPN" = K."LMSAPN"
     )
     SELECT "PfReward_SEQ".nextval         AS "LogNo"
          , S1."LMSLLD"                    AS "PerfDate"            -- 業績日期 DecimalD 8 0

@@ -392,8 +392,8 @@ TXFORM=L2918
 {width:80,align:'center'}
 #OORightsNoteX=權利價值說明
 {width:150,align:'center'}
-#OOSecuredTotalX=擔保債權總金額
-{width:180,align:'center'}
+#OOSecuredTotalX=擔保債權總金額（萬元）
+{width:200,align:'center'}
 
 
 ^

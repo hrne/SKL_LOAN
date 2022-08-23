@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ041 implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3452524542301819788L;
+
+@EmbeddedId
   private JcicZ041Id jcicZ041Id;
 
   // 交易代碼

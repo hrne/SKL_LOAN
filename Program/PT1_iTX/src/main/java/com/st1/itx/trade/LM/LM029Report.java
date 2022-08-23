@@ -148,7 +148,10 @@ public class LM029Report extends MakeReport {
 		this.info("LM029Report exportExcel2");
 
 		makeExcel.setSheet("Deliquency");
-
+		
+		// 起始欄
+		int col = 2;
+		
 		// 單位元位置
 		int unitCol = iYearMonth / 100 + 1;
 		makeExcel.setValue(2, unitCol, "單位：元", "R");
@@ -158,48 +161,48 @@ public class LM029Report extends MakeReport {
 			makeExcel.setValue(3, 2, "本日無資料", "L");
 
 		} else {
-			// 起始欄
-			int col = 2;
 
 
 			for (Map<String, String> r : listLM029) {
 
-				//項目(年月日)
+				// 項目(年月日)
 				int yearMonth = Integer.valueOf(r.get("YearMonth"));
 				int year = yearMonth / 100;
 				int month = yearMonth % 100;
-				makeExcel.setValue(col, 2, year + "/" + month, "C");
-				
-				//逾1-2期金額
+				makeExcel.setValue(2, col, year + "/" + month, "C");
+
+				// 逾1-2期金額
 				BigDecimal onetwoAmt = r.get("12Amt").isEmpty() || r.get("12Amt") == null ? BigDecimal.ZERO
 						: new BigDecimal(r.get("12Amt"));
-				makeExcel.setValue(col, 3, onetwoAmt, "#,##0", "R");
-				
-				//放款總餘額
+				makeExcel.setValue(3, col, onetwoAmt, "#,##0", "R");
+
+				// 放款總餘額
 				BigDecimal totalAmt = r.get("totalAmt").isEmpty() || r.get("totalAmt") == null ? BigDecimal.ZERO
 						: new BigDecimal(r.get("totalAmt"));
-				makeExcel.setValue(col, 4, totalAmt, "#,##0", "R");
-				
-				//逾1~2期佔總額比
+				makeExcel.setValue(4, col, totalAmt, "#,##0", "R");
+
+				// 逾1~2期佔總額比
 				BigDecimal onetwoRate = r.get("12Rate").isEmpty() || r.get("12Rate") == null ? BigDecimal.ZERO
 						: new BigDecimal(r.get("12Rate"));
-				makeExcel.setValue(col, 5, onetwoRate, "R");
-								
-				//逾放總額
+				makeExcel.setValue(5, col, onetwoRate, "R");
+
+				// 逾放總額
 				BigDecimal threeAmt = r.get("oAmt").isEmpty() || r.get("oAmt") == null ? BigDecimal.ZERO
 						: new BigDecimal(r.get("oAmt"));
-				makeExcel.setValue(col, 6, threeAmt, "#,##0", "R");
-								
-				//放款逾放比
+				makeExcel.setValue(6, col, threeAmt, "#,##0", "R");
+
+				// 放款逾放比
 				BigDecimal threeRate = r.get("oRate").isEmpty() || r.get("oRate") == null ? BigDecimal.ZERO
 						: new BigDecimal(r.get("oRate"));
-				makeExcel.setValue(col, 7, threeRate, "R");
-				
+				makeExcel.setValue(7, col, threeRate, "R");
+
 				col++;
 
 			} // for
 
 		}
+
+		
 
 	}
 

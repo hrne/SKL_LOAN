@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -27,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class InnDocRecord implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8424760447478424872L;
+
+@EmbeddedId
   private InnDocRecordId innDocRecordId;
 
   // 借款人戶號

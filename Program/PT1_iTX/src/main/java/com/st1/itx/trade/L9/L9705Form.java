@@ -104,8 +104,8 @@ public class L9705Form extends MakeReport {
 					this.info("listBaTxVo ErrorMsg :" + e.getMessage());
 				}
 
+				this.info("L9705Form = " + custNo + "-" + facmNo);
 				if (listBaTxVo.size() > 0) {
-					this.info("L9705Form = " + custNo + "-" + facmNo);
 					HashMap<Integer, BigDecimal> principal = new HashMap<>();
 					HashMap<Integer, BigDecimal> interest = new HashMap<>();
 					HashMap<Integer, BigDecimal> breachAmt = new HashMap<>();

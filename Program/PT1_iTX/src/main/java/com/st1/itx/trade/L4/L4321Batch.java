@@ -27,6 +27,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.trade.L4.L4321Report;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -52,6 +53,9 @@ public class L4321Batch extends TradeBuffer {
 	@Autowired
 	public LoanBorMainService loanBorMainService;
 
+	@Autowired
+	LoanCom loanCom;
+	
 	@Autowired
 	public WebClient webClient;
 
@@ -89,6 +93,7 @@ public class L4321Batch extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4321Batch ");
+		loanCom.setTxBuffer(this.txBuffer);
 		this.totaVo.init(titaVo);
 		this.iAdjDate = parse.stringToInteger(titaVo.getParam("AdjDate")) + 19110000;
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
@@ -248,28 +253,25 @@ public class L4321Batch extends TradeBuffer {
 				if (this.processCnt % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
-				BigDecimal fitRate = tBatxRateChange.getPresentRate();
-				if (tTempVo.get("FitRate") != null) {
-					fitRate = parse.stringToBigDecimal(tTempVo.get("FitRate"));
-				}
+				// get tempVo
+				tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
+
 				// 放款利率變動檔生效日，利率未變動為零
 				int txEffectDate = 0;
-				if (tBatxRateChange.getAdjustedRate().compareTo(fitRate) != 0) {
+				if (tBatxRateChange.getAdjustedRate().compareTo(tBatxRateChange.getPresentRate()) != 0) {
 					txEffectDate = tBatxRateChange.getCurtEffDate();
 				}
 				// 經辦更新
 				if (titaVo.isActfgEntry()) {
-					// get tempVo
-					TempVo tTempVo = new TempVo();
-					tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
-
-					// 更新撥款主檔
-					updateBorm(tBatxRateChange, titaVo);
 
 					// 處理本次生效日
 					if (txEffectDate > 0) {
 						setLoanRateChange(tBatxRateChange, titaVo);
 					}
+					// 更新撥款主檔
+					updateBorm(tBatxRateChange, titaVo);
+
 					// 處理預調利率
 					setNextAdjRateChange(tBatxRateChange, titaVo);
 
@@ -310,6 +312,7 @@ public class L4321Batch extends TradeBuffer {
 						tBatxRateChange.setTxEffectDate(txEffectDate);
 					}
 					tBatxRateChange.setConfirmFlag(this.iConfirmFlag);
+					tBatxRateChange.setJsonFields(tTempVo.getJsonString());
 					try {
 						batxRateChangeService.update(tBatxRateChange, titaVo);
 					} catch (DBException e) {
@@ -332,7 +335,6 @@ public class L4321Batch extends TradeBuffer {
 			return;
 		}
 
-		int nextAdjDate = 0; // 下次利率調整日期
 		LoanBorMain tLoanBorMain = new LoanBorMain();
 		LoanBorMainId tLoanBorMainId = new LoanBorMainId();
 		tLoanBorMainId.setCustNo(tBatxRateChange.getCustNo());
@@ -342,21 +344,17 @@ public class L4321Batch extends TradeBuffer {
 		if (tLoanBorMain == null) {
 			throw new LogicException("E0006", "BS430 LoanBorMain " + tLoanBorMainId);
 		}
-		// 下次利率調整日期超過到期日放到期日
 		if (titaVo.isHcodeNormal()) {
-			dateUtil.init();
-			dateUtil.setDate_1(tBatxRateChange.getCurtEffDate());
-			dateUtil.setMons(tLoanBorMain.getRateAdjFreq()); // 調整周期(單位固定為月)
-			nextAdjDate = dateUtil.getCalenderDay();
-			if (nextAdjDate > tLoanBorMain.getMaturityDate()) {
-				nextAdjDate = tLoanBorMain.getMaturityDate();
-			}
+			tLoanBorMain.setNextAdjRateDate(tBatxRateChange.getPreNextAdjDate());
+			// 更新實際計息利率，重算期金
+			tTempVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
+			tTempVo.putParam("DueAmt", tLoanBorMain.getDueAmt());
+			tLoanBorMain = loanCom.updStoreRateAndDueAmt(tLoanBorMain, titaVo);
 		} else {
-			nextAdjDate = tBatxRateChange.getCurtEffDate();
+			tLoanBorMain.setNextAdjRateDate(tBatxRateChange.getCurtEffDate());
+			tLoanBorMain.setStoreRate(this.parse.stringToBigDecimal(tTempVo.get("StoreRate")));
+			tLoanBorMain.setDueAmt(this.parse.stringToBigDecimal(tTempVo.get("DueAmt")));
 		}
-
-		tLoanBorMain.setNextAdjRateDate(nextAdjDate);
-
 		try {
 			loanBorMainService.update(tLoanBorMain, titaVo);
 		} catch (DBException e) {
@@ -433,12 +431,8 @@ public class L4321Batch extends TradeBuffer {
 				tLoanRateChange.setRateIncr(rateIncr);
 				tLoanRateChange.setIndividualIncr(individualIncr);
 				tLoanRateChange.setFitRate(tBatxRateChange.getAdjustedRate());
-				tBatxRateChange.setJsonFields(tTempVo.getJsonString());
 				tLoanRateChange.setRemark("");
 			} else {
-				this.info("JsonFields ... " + tBatxRateChange.getJsonFields());
-
-				tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
 				tLoanRateChange.setRateIncr(parse.stringToBigDecimal(this.tTempVo.getParam("RateIncr")));
 				tLoanRateChange.setIndividualIncr(parse.stringToBigDecimal(this.tTempVo.getParam("IndividualIncr")));
 				tLoanRateChange.setFitRate(parse.stringToBigDecimal(this.tTempVo.getParam("FitRate")));

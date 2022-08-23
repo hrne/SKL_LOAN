@@ -354,6 +354,8 @@ public class L3721 extends TradeBuffer {
 		tTempVo.putParam("EffectDate", iEffectDate);
 		tTempVo.putParam("NextRateAdjDate", iNextRateAdjDate);
 		tTempVo.putParam("NextAdjRateDate", tLoanBorMain.getNextAdjRateDate());
+		tTempVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
+		tTempVo.putParam("DueAmt", tLoanBorMain.getDueAmt());
 		tTempVo.putParam("Note", iRemark);
 
 		if (wkInsertFlag.equals("N")) {
@@ -387,6 +389,9 @@ public class L3721 extends TradeBuffer {
 			if (tLoanBorMain.getNextAdjRateDate() == iNextRateAdjDate + 19110000)
 				changeAdjDate = true;
 		}
+		// 更新實際計息利率，重算期金
+		tLoanBorMain = loanCom.updStoreRateAndDueAmt(tLoanBorMain, titaVo);
+		
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setActFg(titaVo.getActFgI());
 		try {
@@ -568,6 +573,9 @@ public class L3721 extends TradeBuffer {
 			tLoanBorMain.setLastBorxNo(wkBorxNo - 1);
 		}
 		tLoanBorMain.setNextAdjRateDate(this.parse.stringToInteger(tTempVo.get("NextAdjRateDate")));
+		tLoanBorMain.setStoreRate(this.parse.stringToBigDecimal(tTempVo.get("StoreRate")));
+		tLoanBorMain.setDueAmt(this.parse.stringToBigDecimal(tTempVo.get("DueAmt")));
+	    
 		try {
 			loanBorMainService.update(tLoanBorMain, titaVo);
 		} catch (DBException e) {

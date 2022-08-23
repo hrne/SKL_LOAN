@@ -161,13 +161,11 @@ public class L9705Report extends MakeReport {
 				}
 				count++;
 			}
-		}else {
+		} else {
 			this.info("isOpen ... no data");
-			this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12",
-					"P");
-			
-		}
+			this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12", "P");
 
+		}
 
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
@@ -270,6 +268,8 @@ public class L9705Report extends MakeReport {
 		} catch (LogicException e) {
 			this.error("listBaTxVo ErrorMsg :" + e.getMessage());
 		}
+
+		this.info("listBaTxVo.size()=" + listBaTxVo.size());
 
 		if (listBaTxVo.size() > 0) {
 

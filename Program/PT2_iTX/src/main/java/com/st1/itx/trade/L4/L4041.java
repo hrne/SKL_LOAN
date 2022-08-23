@@ -24,6 +24,7 @@ import com.st1.itx.db.service.springjpa.cm.L4041ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.PostAuthFileVo;
 import com.st1.itx.util.date.DateUtil;
@@ -68,6 +69,8 @@ public class L4041 extends TradeBuffer {
 
 	@Autowired
 	public BankAuthActService bankAuthActService;
+	@Autowired
+	SortMapListCom sortMapListCom;
 
 	@Autowired
 	L4041Report l4041Report;
@@ -120,6 +123,7 @@ public class L4041 extends TradeBuffer {
 		int nPropDate = dateUtil.getNowIntegerForBC();
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> resultList1 = new ArrayList<Map<String, String>>();
 
 		switch (iFunctionCode) {
 		case 1:
@@ -449,12 +453,13 @@ public class L4041 extends TradeBuffer {
 
 				this.info("sno : " + sno);
 
+				resultList1 = sortMapListCom.beginSort(resultList).ascString("F5").ascString("F2").getList();
 				makeFile.toFile(sno);
 				totaVo.put("PdfSno53N", "" + sno);
 
 				l4041Report.setParentTranCode(titaVo.getTxcd());
 
-				l4041Report.exec(resultList, titaVo);
+				l4041Report.exec(resultList1, titaVo);
 				sno = l4041Report.close();
 				l4041Report.toPdf(sno);
 
@@ -486,7 +491,7 @@ public class L4041 extends TradeBuffer {
 						occursListOutput.putParam("OOAuthCode", result.get("F5"));
 						occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
 						occursListOutput.putParam("OOStampFinishDate", stampFinishDate);
-						
+
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursListOutput);
 						PostAuthLogId tPostAuthLogId = new PostAuthLogId();

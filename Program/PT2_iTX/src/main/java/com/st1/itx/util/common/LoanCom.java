@@ -22,10 +22,12 @@ import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanFacTmp;
+import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
@@ -39,6 +41,7 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanFacTmpService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -84,6 +87,7 @@ import com.st1.itx.util.parse.Parse;
  * settleOverflow 累溢收(暫收貸)帳務處理<BR>
  * settleTempAmt 暫收款金額(暫收借)帳務處理 <BR>
  * updBorTxAcDetail 更新放款明細檔及帳務明細檔關聯欄<BR>
+ * updStoreRateAndDueAmt 更新放款主檔計息利率與期金<BR>
  * 
  * @author st1
  *
@@ -112,13 +116,16 @@ public class LoanCom extends TradeBuffer {
 	public CdCodeService cdCodeService;
 	@Autowired
 	public LoanFacTmpService loanFacTmpService;
-
+	@Autowired
+	public LoanRateChangeService loanRateChangeService;
 	@Autowired
 	Parse parse;
 	@Autowired
 	DataLog datalog;
 	@Autowired
 	DateUtil dDateUtil;
+	@Autowired
+	LoanDueAmtCom loanDueAmtCom;
 
 	/**
 	 * 設定交易暫存檔(TxTemp)的共同資料
@@ -1655,6 +1662,56 @@ public class LoanCom extends TradeBuffer {
 	public String getCdCodeX(String defCode, String cdCode, TitaVo titaVo) throws LogicException {
 		CdCode tCdCode = cdCodeService.findById(new CdCodeId(defCode, cdCode), titaVo);
 		return tCdCode == null ? "" : tCdCode.getItem();
+	}
+
+	/**
+	 * 更新放款主檔計息利率與期金
+	 * 
+	 * @param tLoanBorMain
+	 * @param titaVo       TitaVo
+	 * @return LoanBorMain
+	 * @throws LogicException ...
+	 */
+	public LoanBorMain updStoreRateAndDueAmt(LoanBorMain tLoanBorMain, TitaVo titaVo) throws LogicException {
+
+		String custNox = tLoanBorMain.getCustNo() + "-" + tLoanBorMain.getFacmNo() + "-" + tLoanBorMain.getBormNo();
+
+		int wkIntStartDate = (tLoanBorMain.getPrevPayIntDate() == 0 ? tLoanBorMain.getDrawdownDate()
+				: tLoanBorMain.getPrevPayIntDate()) + 19110000;
+		this.info("updStoreRateAndDueAmt ... " + custNox + ", IntStartDate = " + wkIntStartDate + ", StoreRate = "
+				+ tLoanBorMain.getStoreRate() + ", DueAmt=" + tLoanBorMain.getDueAmt());
+
+		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(tLoanBorMain.getCustNo(),
+				tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
+				(tLoanBorMain.getPrevPayIntDate() == 0 ? tLoanBorMain.getDrawdownDate()
+						: tLoanBorMain.getPrevPayIntDate()) + 19110000,
+				titaVo);
+		if (tLoanRateChange == null) {
+			throw new LogicException(titaVo, "E0001", "戶號=" + custNox + " 無放款利率變動資料 = " + wkIntStartDate); // 查無資料
+		}
+		BigDecimal storeRate = tLoanRateChange.getFitRate();
+		// 上次繳息日利率與收息利率不同需重算期金
+		if ("3".equals(tLoanBorMain.getAmortizedCode()) && tLoanBorMain.getStoreRate().compareTo(storeRate) != 0) {
+			tLoanBorMain.setStoreRate(storeRate);
+			FacMain tFacMain = facMainService
+					.findById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()), titaVo);
+			if ("1".equals(tFacMain.getExtraRepayCode())) {
+				int wkGracePeriod = getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
+						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+						tLoanBorMain.getGraceDate());
+				// 剩餘還本期數
+				int wkDueTerms = tLoanBorMain.getPaidTerms() > wkGracePeriod
+						? tLoanBorMain.getTotalPeriod() - tLoanBorMain.getPaidTerms()
+						: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
+				BigDecimal wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
+						tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
+						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
+				tLoanBorMain.setDueAmt(wkNewDueAmt);
+			}
+		}
+		this.info("updStoreRateAndDueAmt end " + custNox + ", IntStartDate = " + wkIntStartDate + ", StoreRate = "
+				+ tLoanBorMain.getStoreRate() + ", DueAmt=" + tLoanBorMain.getDueAmt());
+		return tLoanBorMain;
 	}
 
 	@Override

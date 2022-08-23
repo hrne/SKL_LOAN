@@ -1,7 +1,6 @@
 package com.st1.itx.util.common.data;
 
 import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -160,7 +159,14 @@ public class PostAuthFileVo extends FileVo {
 			// 頁首的欄位組合
 			// 無首筆
 		}
-
+		//sort 帳號排序
+		occursList.sort((c1, c2) -> {
+			int resultA = 0;
+			if (c1.get("OccRepayAcct").compareTo(c2.get("OccRepayAcct")) != 0) {
+				resultA = c2.get("OccRepayAcct").compareTo(c1.get("OccRepayAcct"));
+			}
+			return resultA;
+		});
 		// 組明細
 		for (OccursList occursList : occursList) {
 			// 明細資料的單筆資料的欄位組合

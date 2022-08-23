@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ061Id implements Serializable {
 
 
-  // 債權金融機構代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6387741934877112842L;
+
+// 債權金融機構代號
   /* 三位文數字 */
   @Column(name = "`SubmitKey`", length = 3)
   private String submitKey = " ";

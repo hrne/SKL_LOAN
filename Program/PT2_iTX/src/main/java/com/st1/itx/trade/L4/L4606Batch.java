@@ -29,7 +29,6 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
-import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
 import com.st1.itx.tradeService.TradeBuffer;

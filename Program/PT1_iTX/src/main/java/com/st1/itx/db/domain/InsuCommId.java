@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * InsuComm 火險佣金檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class InsuCommId implements Serializable {
 
 
-  // 年月份
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1922062829970285455L;
+
+// 年月份
   @Column(name = "`InsuYearMonth`")
   private int insuYearMonth = 0;
 
