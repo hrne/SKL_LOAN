@@ -101,13 +101,13 @@ public class L4606Report2 extends MakeReport {
 			this.print(0, 27, String.format("%,d", Integer.parseInt(tL4606Vo.get("F2").toString())), "R");
 			this.print(0, 36, tL4606Vo.get("F3"), "R");
 			this.print(0, 45, tL4606Vo.get("F4"), "R");
-			this.print(0, 46, limitLength(tL4606Vo.get("F5"), 40));
+			this.print(0, 46, tL4606Vo.get("F5"));
 			this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
 			this.print(0, 90, "-");
 			this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-			this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
+			this.print(0, 95, tL4606Vo.get("F8"));
 			this.print(0, 109, tL4606Vo.get("F9"));
-			this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
+			this.print(0, 120, tL4606Vo.get("F10"));
 			this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
 			totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 			cnt++;

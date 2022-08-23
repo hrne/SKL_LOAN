@@ -117,7 +117,7 @@ public class L4103Batch extends TradeBuffer {
 //		傳票明細表
 		doRptC(titaVo);
 
-		String checkMsg = "撥款匯款產檔已完成。   批號 = " + wkbatchNo;
+		String checkMsg = "抽退票傳票明細表產檔已完成。   批號 = " + wkbatchNo;
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4103",
 				checkMsg, titaVo);

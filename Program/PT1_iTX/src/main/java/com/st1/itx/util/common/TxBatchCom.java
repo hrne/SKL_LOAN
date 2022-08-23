@@ -1367,6 +1367,13 @@ public class TxBatchCom extends TradeBuffer {
 				break;
 			// 01-期款
 			case 1:
+				// A3-還本帳戶，有期款未回收，人工處理
+				if ("A3".equals(tBatxDetail.getReconCode())) {
+					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
+					this.repayType = 2;
+					this.procStsCode = "2"; // 2.人工處理
+					break;
+				}
 				// 無償還本利
 				// 處理狀態:2.人工處理
 				// 處理說明:繳息迄日:999999
@@ -1404,10 +1411,10 @@ public class TxBatchCom extends TradeBuffer {
 				break;
 			// 02-部分償還
 			case 2:
-				// 有期款未回收，變更還款類別為期款
+				// 有期款未回收，人工處理
 				if ("1".equals(tTempVo.getParam("RepayTypeChange"))) {
 					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
-					this.procStsCode = "3"; // 3.檢核錯誤
+					this.procStsCode = "2"; // 2.人工處理
 					break;
 				}
 				// 有即時收取清償違約金

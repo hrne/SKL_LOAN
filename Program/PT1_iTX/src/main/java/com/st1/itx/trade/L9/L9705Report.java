@@ -105,12 +105,18 @@ public class L9705Report extends MakeReport {
 			conditionCode = titaVo.get("CONDITION1");
 		}
 
+		this.info("titaVo.getTxCode() ="+titaVo.getTxCode());
+		
 		if (l9705List.size() > 0) {
 			boolean isOpenA3 = true;
 			boolean isOpen = true;
 			int count = 0;
 			for (Map<String, String> r : l9705List) {
-				String reconCode = r.get("ReconCode");
+				String reconCode = "";
+				
+				if(!"L4454".equals(titaVo.getTxCode())) {
+					reconCode = r.get("ReconCode");
+				}
 
 				// 分開兩張報表出，query已經有排序A3先
 				switch (reconCode) {
@@ -161,11 +167,13 @@ public class L9705Report extends MakeReport {
 				}
 				count++;
 			}
-		} else {
+		}else {
 			this.info("isOpen ... no data");
-			this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12", "P");
-
+			this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12",
+					"P");
+			
 		}
+
 
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
@@ -181,6 +189,9 @@ public class L9705Report extends MakeReport {
 
 	private void exportData(List<Map<String, String>> r, TitaVo titaVo, TxBuffer txbuffer, String reconcode, int c)
 			throws LogicException {
+
+	
+
 		// 設定試算期數 2021-12-24 智偉新增
 		int terms = 6; // 預設印6期
 
@@ -475,14 +486,23 @@ public class L9705Report extends MakeReport {
 
 			if ("C".equals(conditionCode)) {
 
-				String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
-				BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
+//				String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
+//				BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
+//
+//				if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
+////							y = top + yy + (++l) * h;
+//					this.printCm(1, 29.5,
+//							"◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
+//				}
+			}
 
-				if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
-//							y = top + yy + (++l) * h;
-					this.printCm(1, 29.5,
-							"◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
-				}
+			String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
+			BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
+
+			if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
+//						y = top + yy + (++l) * h;
+				this.printCm(1, 29.5,
+						"◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
 			}
 
 		} else {
