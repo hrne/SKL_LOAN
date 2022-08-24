@@ -237,6 +237,17 @@ T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
 !                      2,T(2,催收),
 !                      3,T(2,呆帳))
 
+!地震險保險金額
+#OOEthqInsuCovrg=m,14,L
+
+!地震險保費
+#OOEthqInsuPrem=m,14,L
+
+!備註
+#OORemark=X,50,L
+
+
+
 #OOBtnAText=X,4,L
 T(3,自保)
 
@@ -302,7 +313,9 @@ TXFORM=L4960
 #OOStatusCode
 #OOAcDate
 #OOBtnFlag
-
+#OOEthqInsuCovrg
+#OOEthqInsuPrem
+#OORemark
 ^
 <include src="ROM.icf::L4R02.tom"/>
 <include src="ROM.icf::L2R47.tom"/>
@@ -335,6 +348,12 @@ TXFORM=L4960
 #OOFireInsuPrem=火險保費
 {width:95}
 
+#OOEthqInsuCovrg=地震險保險金額
+{width:95}
+
+#OOEthqInsuPrem=地震險保費
+{width:95}
+
 #OOInsuStartDate=保險起日
 {width:95}
 
@@ -349,6 +368,9 @@ TXFORM=L4960
 
 #OOStatusCodeX=處理代碼
 {width:95,align:'center'}
+
+#OORemark=備註
+{width:150}
 
 ^
 
@@ -373,6 +395,12 @@ TXFORM=L4960
 {width:95}
 ! 火險保費
 #OOFireInsuPrem=火險保費
+#OOEthqInsuCovrg=地震險保險金額
+{width:95}
+
+#OOEthqInsuPrem=地震險保費
+{width:95}
+
 {width:95}
 ! 保險起日
 #OOInsuStartDate=保險起日
@@ -389,6 +417,10 @@ TXFORM=L4960
 ! 轉催
 #OOStatusCodeX=處理代碼
 {width:95,align:'center'}
+
+#OORemark=備註
+{width:150}
+
 
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4960;cpi=15"/>

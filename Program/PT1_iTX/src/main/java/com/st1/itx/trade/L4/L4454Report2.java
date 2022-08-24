@@ -82,8 +82,8 @@ public class L4454Report2 extends MakeReport {
 
 //					設定每欄之Format
 					switch (i) {
-//	0	1	2	3	4	5	6	7		8		9		10
-//	 帳號	戶號	額度	戶名	金額	電話	戶名	已繳月份	撥款日	地區別	專員
+//	0	1	2	3	4	5	6	    7		8		9		
+//	 帳號	戶號	戶名	金額	電話	戶名	已繳月份	撥款日	地區別	專員
 					case 4:
 						// 金額
 //						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#,##0");

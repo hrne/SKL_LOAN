@@ -56,18 +56,19 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("lastYearEntryDate = " + lastYearEntryDate);
 
 		String sql = " select                                                                ";
-		sql += "     MIN(bd.\"RepayAcctNo\")                        AS F0                         ";
-		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS F1                         ";
-		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS F2                         ";
-		sql += "   , MIN(cm.\"CustName\")                           AS F3                         ";
-		sql += "   , MIN(bd.\"RepayAmt\")                           AS F4                         ";
+		sql += "     MIN(bd.\"RepayAcctNo\")                        AS \"RepayAcctNo\"                         ";
+		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS \"CustNo\"                         ";
+		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS \"FacmNo\"                         ";
+		sql += "   , lbm.\"BormNo\"						            AS \"BormNo\"                         ";
+		sql += "   , MIN(cm.\"CustName\")                           AS \"CustName\"                         ";
+		sql += "   , MIN(bd.\"RepayAmt\")                           AS \"RepayAmt\"                         ";
 		sql += "   , MIN(NVL(ctl.\"PhoneNo\", ''))                  AS F5                         ";
 		sql += "   , MIN(NVL(bd.\"RelCustName\", cm.\"CustName\"))  AS F6                         ";
 		sql += "   , case when lbm.\"PrevPayIntDate\" < 19110000 then lbm.\"PrevPayIntDate\" ";
-		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end     AS F7               ";
+		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end     AS \"PrevPayIntDate\"               ";
 		sql += "   , case when fm.\"FirstDrawdownDate\" < 19110000 then fm.\"FirstDrawdownDate\" ";
-		sql += "          else fm.\"FirstDrawdownDate\" - 19110000 end  AS F8               ";
-		sql += "   , ce.\"Fullname\"                           AS F9                         ";
+		sql += "          else fm.\"FirstDrawdownDate\" - 19110000 end  AS \"FirstDrawdownDate\"               ";
+		sql += "   , ce.\"Fullname\"                           AS \"Fullname\"                         ";
 		sql += "   from \"BankDeductDtl\" bd                                                    ";
 		sql += "   left join \"LoanBorMain\" lbm   on lbm.\"CustNo\"    = bd.\"CustNo\"     ";
 		sql += "                                and lbm.\"FacmNo\"    = bd.\"FacmNo\"       ";
@@ -104,6 +105,7 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "                 THEN fm.\"FirstDrawdownDate\" ";
 		sql += "                 ELSE fm.\"FirstDrawdownDate\" - 19110000 ";
 		sql += "            END, ";
+		sql += "          , lbm.\"BormNo\"";
 		sql += "ce.\"Fullname\"";
 		sql += "   order by \"F0\",\"F1\", \"F2\"                                           ";
 		this.info("sql=" + sql);

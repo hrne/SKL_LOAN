@@ -72,7 +72,7 @@ T(3,@RemoveNo, )
 ["#FdCustId+統一編號",#CustId,"@@@",#BTN2,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 ["#FdTempReasonCode+暫收帳戶",#TempReasonCode,#TempReasonCodeX],
-["#FdTempItemCode+作業項目",#TempItemCode,#TempItemCodeX],
+["#FdTempItemCode+作業項目",#TempItemCode,#BTN9,#TempItemCodeX],
 ["#FdFacmNo+額度編號",#FacmNo,#BTN4,#BTN5,#BTN6,#TmpFacmNoXX],
 ["#FdRemoveNo+銷帳編號",#RemoveNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
@@ -92,10 +92,11 @@ T(3,@RemoveNo, )
 #BTN5=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
 #BTN6=X,15,I,ui:button;value:法拍費用查詢;enable:1;tabbable:0;title: L2078 法拍費用明細資料查詢
 #BTN7=X,15,I,ui:button;value:貸後契變手續費查詢;enable:1;tabbable:0;title: L2061 貸後契變手續費明細資料查詢
+#BTN9=X,15,I,ui:button;value:火險保費資料查詢;enable:1;tabbable:0;title: L4690 火險保費資料查詢
 ! #BTN6=X,15,I,ui:button;value:撥款明細查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
 
 #BUF1=X,42,S
-HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5,#BTN6,#BTN7)
+HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5,#BTN6,#BTN7,#BTN9)
 INVOKEJS(SHOW,p1,11,13,0)
 INVOKEJS(SHOW,p1,9,9,0)
 ! HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5,#BTN6)
@@ -377,6 +378,15 @@ C(4,#ApplNo,T(F,@FacmNo,1),INVOKEJS(SHOW,p1,6,6,1)T(F,@FacmNo,0))
 IF(#TempReasonCode==2 || #TempReasonCode==3,INVOKEJS(SHOW,p1,6,6,0),INVOKEJS(SHOW,p1,6,6,1)T(3,@FdFacmNo,*))
 ! INVOKEJS(SHOW,p1,7,7,0)
 
+!作業項目為9時顯示
+#ShowTempItemCode=X,3,S
+C(3,#TempItemCode,09,SHOW(#BTN9),HIDE(#BTN9))
+
+#BUF9A=X,35,S
+T(2,1+#CustNo)
+ 
+#BIND9A=X,1,S
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L4960; ntxbuf=#BUF9A;ntxbuf5=type<-1:TwTempAmt<-OOFireInsuPrem:UsTempAmt<-OOFireInsuPrem:FacmNo<-OOFacmNo})
 
 ![額度編號]
 !作業項目=9,10,25,29必須輸入,其他不可輸入

@@ -29,6 +29,7 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -93,6 +94,12 @@ public class L4606Batch extends TradeBuffer {
 	@Autowired
 	public L4606Report2 l4606Report2;
 
+	@Autowired
+	public L4606Report3 l4606Report3;
+
+	@Autowired
+	public L4606Report4 l4606Report4;
+
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
@@ -152,6 +159,8 @@ public class L4606Batch extends TradeBuffer {
 		int unPaidCnt = 0;
 		int custErrorCnt = 0;
 		deleinsuComm(titaVo);
+		ArrayList<OccursList> successList = new ArrayList<>();
+		ArrayList<OccursList> errorList = new ArrayList<>();
 
 //		PC上傳媒體檔轉入佣金媒體檔
 		if (!"".equals(flagA)) {
@@ -168,7 +177,7 @@ public class L4606Batch extends TradeBuffer {
 			try {
 				dataLineList = fileCom.intputTxt(filePath1, "big5");
 			} catch (IOException e) {
-				throw new LogicException("E0014", "L4601(" + filePath1 + ") is error : " + e.getMessage());
+				throw new LogicException("E0014", "L4606(" + filePath1 + ") is error : " + e.getMessage());
 			}
 
 //			 使用資料容器內定義的方法切資料
@@ -182,7 +191,8 @@ public class L4606Batch extends TradeBuffer {
 				for (OccursList tempOccursList : uploadFile) {
 					this.info(tempOccursList.toString());
 
-					seq = seq + 1;
+					seq++;
+					tempOccursList.putParam("Seq", seq);
 
 					if (seq % commitCnt == 0) {
 						this.info("Seq : " + seq);
@@ -192,6 +202,8 @@ public class L4606Batch extends TradeBuffer {
 					// 佣金為負不寫入、僅顯示筆數
 					if (parse.stringToBigDecimal(tempOccursList.get("InsuComm")).compareTo(BigDecimal.ZERO) < 0) {
 						minusCnt++;
+						tempOccursList.putParam("ErrorMsg", "佣金為負:" + tempOccursList.get("InsuComm"));
+						errorList.add(tempOccursList);
 						continue;
 					}
 					InsuComm tInsuComm = new InsuComm();
@@ -252,6 +264,9 @@ public class L4606Batch extends TradeBuffer {
 						tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 						if (tCustMain == null) {
 							custErrorCnt++;
+							tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+							errorList.add(tempOccursList);
+							continue;
 						} else {
 							empNo = tCustMain.getIntroducer();
 						}
@@ -280,7 +295,8 @@ public class L4606Batch extends TradeBuffer {
 					} else {
 						unPaidCnt++;
 					}
-
+					tempOccursList.putParam("Seq", seq);
+					successList.add(tempOccursList);
 					try {
 						insuCommService.insert(tInsuComm, titaVo);
 					} catch (DBException e) {
@@ -294,18 +310,12 @@ public class L4606Batch extends TradeBuffer {
 //		火險佣金發放報表(未發放 = '佣金日期=0?')
 //		未發放 -> 火險服務(FireOfficer) = 空白(null)
 
-		if (!"".equals(flagB))
-
-		{
+		if (!"".equals(flagB)) {
 			this.info("flagB Start ...");
-
 			l4606Report1.exec(titaVo);
-
 			l4606Report2.exec(titaVo);
-			// int minusCnt = 0;
-			// int zeroDueAmtCnt = 0;
-			// int paidCnt = 0;
-			// int unPaidCnt = 0;
+			l4606Report3.exec(titaVo, successList);
+			l4606Report4.exec(titaVo, errorList);
 
 			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
 					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;

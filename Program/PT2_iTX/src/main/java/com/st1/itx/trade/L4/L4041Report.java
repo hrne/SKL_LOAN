@@ -14,9 +14,11 @@ import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -35,11 +37,14 @@ public class L4041Report extends MakeReport {
 
 	@Autowired
 	DateUtil dDateUtil;
+	@Autowired
+	LoanCom loanCom;
 
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
 	int propDate = 0;
+	private List<Map<String, String>> L8205List = null;
 
 //	自訂表頭
 	@Override
@@ -70,6 +75,13 @@ public class L4041Report extends MakeReport {
 		this.print(-6, 80, "頁　　數：　	　" + this.getNowPage());
 	}
 
+	// 自訂表尾
+//	@Override
+//	public void printFooter() {
+//		print(-68, 1, "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "P");
+//			
+//		}
+
 	public void exec(List<Map<String, String>> ListResult, TitaVo titaVo) throws LogicException {
 
 		this.info("L4041Report Start, size=" + ListResult.size());
@@ -84,8 +96,8 @@ public class L4041Report extends MakeReport {
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4041", "授權資料明細表", "", "A4", "P");
 
-		this.print(-9, 3, "戶號     扣款人ID 　   郵局存款別　　扣款帳號　　　　　授權方式　　授權類別　 建檔人員　　建檔日期");
-		this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		this.print(-9, 3, "　　戶號　　　　　　　　　　　　扣款人ID　　　　扣款帳號　　 　授權方式　授權類別　異動人員　　異動日期");
+		this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		for (Map<String, String> result : ListResult) {
 			propDate = parse.stringToInteger(result.get("F16"));
@@ -93,19 +105,18 @@ public class L4041Report extends MakeReport {
 			if (!"Y".equals(result.get("F13")) && propDate > 0) {
 
 				// 戶號
-				print(1, 3, padStart(result.get("F2"), 7, "0"));
+//				print(1, 3, padStart(result.get("F2"), 7, "0") + " "
+//						+ FormatUtil.padX(loanCom.getCustNameByNo(parse.stringToInteger(result.get("F2"))), 20));
+				print(1, 3, padStart(result.get("F2"), 7, "0") + " " + FormatUtil.padX("一二三四五六七八九十一十二時三時四十五十六", 20));
 
 				// 扣款人ID
-				print(0, 12, result.get("F7"), "L");
+				print(0, 31, result.get("F7"), "L");
 
-				// 郵局存款別
-				print(0, 29, result.get("F3"));
-
-				// 扣款帳號
-				print(0, 38, result.get("F4"));
+				// 郵局存款別+扣款帳號
+				print(0, 43, result.get("F3") + " " + result.get("F4"));
 
 				// 授權方式
-				print(0, 56, "紙本");
+				print(0, 62, "紙本");
 
 				// 授權類別
 				String iAuthCode = result.get("F5");
@@ -115,23 +126,17 @@ public class L4041Report extends MakeReport {
 				} else {
 					iAuthCode = "";
 				}
-				print(0, 67, iAuthCode);
+				print(0, 70, iAuthCode);
 
-				// 建檔人員
-				String iEmp = result.get("F25");
+				// 異動人員
+				String iEmp = titaVo.getTlrNo();
 				CdEmp tCdEmp = cdEmpService.findById(iEmp, titaVo);
 				if (tCdEmp != null) {
 					iEmp = tCdEmp.getFullname();
-				} else {
-					iEmp = "";
 				}
-				print(0, 76, iEmp);
-
-				// 建檔日期
-				String iAuthCreatDate = result.get("F0");
-				this.info("iAuthCreatDate=" + iAuthCreatDate);
-				iAuthCreatDate = showDate(iAuthCreatDate, 1);
-				print(0, 87, iAuthCreatDate);
+				print(0, 80, iEmp);
+				// 異動日期
+				print(0, 90, "" + this.showRocDate(titaVo.getEntDyI(), 1));
 
 				// 檢查列數
 				checkRow();
@@ -167,6 +172,7 @@ public class L4041Report extends MakeReport {
 	}
 
 	private String showDate(String date, int iType) {
+//		this.info("MakeReport.toPdf showRocDate1 = " + date);
 		if (date == null || date.equals("") || date.equals("0") || date.equals(" ")) {
 			return " ";
 		}
@@ -175,6 +181,8 @@ public class L4041Report extends MakeReport {
 			rocdate -= 19110000;
 		}
 		String rocdatex = String.valueOf(rocdate);
+//		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
+
 		if (rocdatex.length() == 7) {
 			return rocdatex.substring(0, 3) + "/" + rocdatex.substring(3, 5) + "/" + rocdatex.substring(5, 7);
 		} else {
