@@ -123,7 +123,7 @@ public class L2634ReportA extends MakeReport {
 		int agreecnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 
-			iCustNo = t.getCustNo();
+			iCustNo = t.getReceiveCustNo();
 			iCloseNo = t.getCloseNo();
 			int wkClCode1 = t.getClCode1();
 			int wkClCode2 = t.getClCode2();
@@ -438,7 +438,7 @@ public class L2634ReportA extends MakeReport {
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
-			if (custNo == t.getCustNo() && closeNo == t.getCloseNo()) {
+			if (custNo == t.getReceiveCustNo() && closeNo == t.getCloseNo()) {
 				selecTotal++;
 				if (clCode1 == t.getClCode1() && clCode2 == t.getClCode2() && clNo == t.getClNo()
 						&& seq.equals(t.getSeq())) {

@@ -190,8 +190,10 @@ public class L4101Batch extends TradeBuffer {
 					titaVo);
 			if (slAcDetail != null) {
 				for (AcDetail tAcDetail : slAcDetail.getContent()) {
-					tAcDetail.setTitaBatchNo(batchNo);
-					lAcDetail.add(tAcDetail);
+					if (tAcDetail.getEntAc() == 1) {
+						tAcDetail.setTitaBatchNo(batchNo);
+						lAcDetail.add(tAcDetail);
+					}
 				}
 			}
 		}

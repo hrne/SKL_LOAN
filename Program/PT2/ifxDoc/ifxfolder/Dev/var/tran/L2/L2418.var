@@ -38,10 +38,10 @@ E(0,40)ASGN(INQPRT$)
 [
 ["[L2418]                                 擔保品他項權利登錄"],
 ["#FdFunCd+功能",#FunCdX],
-["#FdCustNo+戶號",#CustNo,#BTN1],
+["#FdCustNo+戶號",#CustNo,#BTN1,#CustNoX],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
-["#FdClNo+擔保品編號",#ClNo],
+["#FdClNo+擔保品編號",#ClNo,#Other],
 ["#FdSeq+序號",#ClSeq],
 ["#FdCity+縣市",#City,#CityX,#InCityX],
 ["#FdLandAdm+地政",#LandAdm,#LandAdmX,#InLandAdmX],
@@ -109,6 +109,7 @@ T(2,@ClRightsNoteHelp,#HelpDesc1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2918擔保品他項權利查詢]進入),$)
+T(2,@RimTxCode,#TXCD)
 
 
 #NTXBUF=X,200,S
@@ -255,11 +256,11 @@ T(2,@FdSecuredTotal,)
 C(3,#FunCd,1,$,S)
 E(0,0)ASGN(AGAIN$)
 
-#BUF1A=X,18,S
-T(2, +0+00+       +   +       +          +       )
+#BUF1A=X,55,S
+T(2, +0+00+       +   +       +          +       +            +#TXCD)
 
 #BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClCode2<-OOClCode2:ClCode1<-OOClCode1:CustNo<-OOCustNo:Other<-OOL2418Other:ClNo<-OOClNo})
 
 !戶號
 #FdCustNo=X,2,L
@@ -267,17 +268,34 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClNo<-O
 #CustNo=A,7,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
 
-#BUF1B=X,40,S
-T(2, +0+00+       +   +       +          +#CustNo)
+#BUF1B=X,55,S
+T(2, +0+00+       +   +       +          +#CustNo+            +#TXCD)
 
 #BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1B;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1:CustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1B;ntxbuf5=type<-1:ClCode2<-OOClCode2:ClCode1<-OOClCode1:CustNo<-OOCustNo:Other<-OOL2418Other:ClNo<-OOClNo})
+
+#RimCustId=X,10,S
+#RimTxCode=X,5,S
+#RimCustNo=A,7,S
+
+#SendL2r07B=X,1,S
+T(3,#CustNoX,)
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustNoX=X,2.50,L
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
 
 
 ! [擔保品代號1]
 #ClCode1=A,1,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-@V(2,0)
+HELP(#ClCode1Help)
+@V(H,#ClCode1Help)
 
 
 #ClCode1X=X,20,L
@@ -301,7 +319,8 @@ R(1,L2R48)
 ! [擔保品代號2]
 #ClCode2=A,2,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
-@V(2,0)
+HELP(#L2r48Help1)
+@V(H,#L2r48Help1)
 
 #ClCode2X=X,30,L
 T(H,#ClCode2,#L2r48Help1)
@@ -318,12 +337,18 @@ E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
 E(0,@RimClNo,#ClNo)
 E(0,@RimFunCd,5)
+T(2,@Other,)
 RESET_RIM(#RimL2r22,L2R22)
 S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
 R(1,L2R22)
+T(2,@Other,#L2r22Other)
+
+#Other=x,100,L
 
 !登記次序0000000
 #ClSeq=X,7,L
+C(3,#FunCd,1,T(3,),$)
+
 
 #RimClSeq=X,7,S
 !L2R46 : 依擔保品編號取他項權利資料
@@ -353,6 +378,7 @@ T(2,@RecNumber,#L2r46RecNumber)
 T(2,@RightsNote,#L2r46RightsNote)
 E(0,@TwSecuredTotal,#L2r46SecuredTotal)
 E(0,@UsSecuredTotal,#L2r46SecuredTotal)
+E(0,@CustNo,#L2r46CustNo)
 
 
 
@@ -501,6 +527,7 @@ C(3,#Precision,0,E(0,#TwSecuredTotal),E(0,#UsSecuredTotal))
 <include src="ROM.icf::L2R59.dec"/>
 <include src="ROM.icf::L6R49.dec"/>
 <include src="ROM.icf::L2R60.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L6R03.dec"/>
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 </sub>
@@ -548,6 +575,7 @@ T(3,[L2418] 他項權利資料登錄)
 #RecNumber
 #RightsNote
 #TimSecuredTotal
+#CustNo
 #END
 #InCityX
 #InLandAdmX
@@ -568,6 +596,7 @@ TXFORM=L2418
 <include src="ROM.icf::L2R59.tom"/>
 <include src="ROM.icf::L6R49.tom"/>
 <include src="ROM.icf::L2R60.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

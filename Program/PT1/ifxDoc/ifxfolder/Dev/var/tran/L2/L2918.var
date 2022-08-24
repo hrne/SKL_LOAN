@@ -293,6 +293,8 @@ T(H,#OORightsNote,#ClRightsNoteHelp)
 CALL2(#ADJUSTDOT,#Precision,#OOSecuredTotal,#OOSecuredTotalX)
 P(R,#OOSecuredTotalX)
 
+#OOCustNo=A,7,L
+
 #FUNC2=A,1,S
 E(0,2)
 #FUNC4=A,1,S
@@ -348,6 +350,7 @@ TXFORM=L2918
 #OORecNumber
 #OORightsNote
 #OOSecuredTotal
+#OOCustNo
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L1R09.tom"/>
@@ -394,7 +397,7 @@ TXFORM=L2918
 {width:150,align:'center'}
 #OOSecuredTotalX=擔保債權總金額（萬元）
 {width:200,align:'center'}
-
+#OOCustNo
 
 ^
 

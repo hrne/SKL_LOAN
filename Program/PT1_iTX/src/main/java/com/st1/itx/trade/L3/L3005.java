@@ -215,17 +215,14 @@ public class L3005 extends TradeBuffer {
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
 				BigDecimal wkOverShort = BigDecimal.ZERO;
-				if (!txNo.equals(newTxNo)) {
-					String txMsg = "";
-					if (repayCodeX != null) {
-						txMsg += repayCodeX;
-					}
+				String txMsg = "";
+				if (repayCodeX != null && !repayCodeX.isEmpty()) {
+					txMsg += repayCodeX;
 					if (totTxAmt.compareTo(BigDecimal.ZERO) != 0) {
 						txMsg += df.format(totTxAmt);
-
 					}
-					occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
 				}
+				occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
 				if (txNo.equals(newTxNo)) {
 					AcFg = "";
 				} else if (displayflag.equals("A") || displayflag.equals("F") || displayflag.equals("I")) {
@@ -268,10 +265,12 @@ public class L3005 extends TradeBuffer {
 					occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(txAmt));
 					occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(tempAmt));
 					occursList.putParam("OOOverShort", BigDecimal.ZERO.subtract(wkOverShort));
+					occursList.putParam("OONeedPaidAmt", BigDecimal.ZERO.subtract(needPaidAmt)); // 應收金額
 				} else {
 					occursList.putParam("OOTxAmt", txAmt);
 					occursList.putParam("OOTempAmt", tempAmt);
 					occursList.putParam("OOOverShort", wkOverShort);
+					occursList.putParam("OONeedPaidAmt", needPaidAmt); // 應收金額
 				}
 
 				occursList.putParam("OOLoanBal", loanBal);
@@ -285,7 +284,6 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOTotTxAmt", totTxAmt); // 交易總金額
 				occursList.putParam("OOCreateEmpNo", createEmpNo); // 建檔人員
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號
-				occursList.putParam("OONeedPaidAmt", needPaidAmt); // 應收金額
 
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);

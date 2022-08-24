@@ -101,6 +101,8 @@ T(3,)T(H,#SearchFlag,#SearchFlagHelp)
 
 
 
+
+
 ! 借款人戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,2,7),$)
@@ -177,7 +179,7 @@ C(3,#CHAIN,1,XMT(),$)
 <include src="PRT.icf::PRTHEAD.rtn"/>
 </sub>
 
-!------------ TXFORM = L4960 -----------
+!------------ TXFORM = L4960 -----------OOFireInsuPre
 <sub type="FORM" name="L4960">
 #SCRTIL=_,_,S
 T(3,[L4960] 火險保費資料By客戶)
@@ -246,6 +248,8 @@ T(3,)T(H,#OOStatusCode,#StatusCodeHelp)
 !備註
 #OORemark=X,50,L
 
+#OOTotalPrem=m,14,S
+E(0,#OOFireInsuPrem+#OOEthqInsuPrem)
 
 
 #OOBtnAText=X,4,L
@@ -332,6 +336,7 @@ TXFORM=L4960
 {width:35,search:false,formatter:'cust:bind-button:#OOBtnAText;L4611 ',align:'center',canExport:false}
 #OOBTNB=
 {width:35,search:false,formatter:'cust:bind-button:維護;L4611 ',align:'center',canExport:false}
+#OOTotalPrem
 
 #OOInsuYearMonth=火險到期年月
 {width:120,align:'center'}
@@ -380,6 +385,7 @@ TXFORM=L4960
 {width:35,search:false,formatter:'cust:bind-button:#OOBtnAText;L4611 ',align:'center',canExport:false}
 #OOBTNB=
 {width:35,search:false,formatter:'cust:bind-button:維護;L4611 ',align:'center',canExport:false}
+#OOTotalPrem
 
 ! 年月份
 #OOInsuYearMonth=年月份
@@ -395,13 +401,15 @@ TXFORM=L4960
 {width:95}
 ! 火險保費
 #OOFireInsuPrem=火險保費
+{width:95}
+
 #OOEthqInsuCovrg=地震險保險金額
 {width:95}
 
 #OOEthqInsuPrem=地震險保費
 {width:95}
 
-{width:95}
+
 ! 保險起日
 #OOInsuStartDate=保險起日
 {width:95}

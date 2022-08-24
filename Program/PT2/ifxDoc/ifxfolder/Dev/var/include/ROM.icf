@@ -2347,6 +2347,7 @@ TXFORM=L2R21
 #L2r22SyndCode=X,1,S
 #L2r22DispPrice=m,14,S
 #L2r22DispDate=D,7,S
+#L2r22Other=x,100,S
 
 </L2R22.dec>
 
@@ -2364,6 +2365,7 @@ TXFORM=L2R22
 #L2r22SyndCode
 #L2r22DispPrice
 #L2r22DispDate
+#L2r22Other
 ^
 </L2R22.tom>
 
@@ -3323,6 +3325,7 @@ TXFORM=L2R45
 #L2r46RecNumber=c,6,S
 #L2r46RightsNote=X,2,S
 #L2r46SecuredTotal=m,14.2,S
+#L2r46CustNo=A,7,S
 </L2R46.dec>
 
 <L2R46.tom>
@@ -3338,6 +3341,7 @@ TXFORM=L2R46
 #L2r46RecNumber
 #L2r46RightsNote
 #L2r46SecuredTotal
+#L2r46CustNo
 ^
 </L2R46.tom>
 

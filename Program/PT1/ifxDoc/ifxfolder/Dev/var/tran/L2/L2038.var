@@ -272,7 +272,7 @@ INVOKEJS(SHOW,p2,0)
 INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
 
-#NTXBUF=X,50,S
+#NTXBUF=X,55,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ClMainType,#NTXBUF,1,1)
 T(1,@ClCode1,#NTXBUF,2,1)
@@ -285,6 +285,9 @@ T(1,@CustNo,#NTXBUF,32,7)
 T(1,@OwnerId,#NTXBUF,39,10)
 T(1,@SettingStat,#NTXBUF,49,1)
 T(1,@ClStat,#NTXBUF,50,1)
+T(1,@ChainTxCd,#NTXBUF,51,5)
+
+#ChainTxCd=X,5,S
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -916,8 +919,9 @@ X(#OOShareTotal)
 
 #OOOther=x,100,L
 #OOOther1=x,100,L
-
-
+#OOL2418Other=x,100,L
+SWITCH(#OOClCode1,1,T(2,#OOOther),
+                  2,T(2,#OOOther1),T(3,))
 #OOStock=x,10,L
 IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
 T(1,#OOOther,1,10)
@@ -1075,6 +1079,7 @@ IF(#OOHasOtherRights == "Y",IF(#OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cm
 #SettingStat
 #ClStat
 #CompanyId
+#ChainTxCd
 #END
 </sub>
 
@@ -1130,7 +1135,11 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOClCode1
+#OOClCode2
+#OOClNo
 #OOCustNo
+#OOL2418Other
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -1167,7 +1176,11 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOClCode1
+#OOClCode2
+#OOClNo
 #OOCustNo
+#OOL2418Other
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -1208,7 +1221,11 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOClCode1
+#OOClCode2
+#OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1246,7 +1263,11 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOClCode1
+#OOClCode2
+#OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1283,7 +1304,11 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOClCode1
+#OOClCode2
+#OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1320,7 +1345,11 @@ TXFORM=L2038
 #OO_BTN5_COL=他項權利
 {width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
+#OOClCode1
+#OOClCode2
+#OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1352,6 +1381,11 @@ TXFORM=L2038
 #OOClCode2
 #OOClNo
 #OOCustNo
+#OOFacmNo
+
+#OOCustNo2=戶號
+{width:80,align:'center'}
+
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1369,7 +1403,8 @@ TXFORM=L2038
 
 #Amt1=可分配金額
 {width:120,align:'right'}
-
+#OOL2418Other=
+{width:300,align:'left'}
 ^
 
 #RPTFG=7,QUERY.GRID,L2038
@@ -1379,6 +1414,7 @@ TXFORM=L2038
 #OOClCode2
 #OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1412,6 +1448,7 @@ TXFORM=L2038
 #OOClCode2
 #OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1441,6 +1478,7 @@ TXFORM=L2038
 #OOClCode2
 #OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1470,6 +1508,7 @@ TXFORM=L2038
 #OOClCode2
 #OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
@@ -1499,6 +1538,7 @@ TXFORM=L2038
 #OOClCode2
 #OOClNo
 #OOCustNo
+#OOL2418Other
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 

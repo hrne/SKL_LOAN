@@ -295,7 +295,7 @@ public class AcDetailCom extends TradeBuffer {
 				tAcDetailId.setRelDy(this.txBuffer.getTxCom().getReldy()); // 登放日期
 				tAcDetailId.setRelTxseq(this.txBuffer.getTxCom().getRelNo()); // 登放序號
 
-				// 分錄序號，0則自動續編(+1)
+				// 分錄序號，由AcEnterComt重編
 				if (ac.getAcSeq() > 0)
 					tAcDetailId.setAcSeq(ac.getAcSeq());
 				else

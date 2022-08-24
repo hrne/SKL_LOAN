@@ -94,10 +94,11 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " MIN(clor.\"RecYear\") AS \"RecYear\", ";
 		sql += " MIN(clor.\"RecNumber\") AS \"RecNumber\", ";
 		sql += " MIN(clor.\"RightsNote\") AS \"RightsNote\", ";
-		sql += "  MIN(clor.\"SecuredTotal\") AS \"SecuredTotal\", ";
+		sql += " MIN(clor.\"SecuredTotal\") AS \"SecuredTotal\", ";
 		sql += " nvl(MIN(clor.\"OtherCity\"), MIN(ccity.\"CityItem\")) AS \"CityItem\", ";
 		sql += " nvl(MIN(clor.\"OtherLandAdm\"), MIN(ccode.\"Item\")) AS \"LandAdm\", ";
-		sql += " nvl(MIN(clor.\"OtherRecWord\"), MIN(clo.\"RecWordItem\")) AS \"RecWordItem\" ";
+		sql += " nvl(MIN(clor.\"OtherRecWord\"), MIN(clo.\"RecWordItem\")) AS \"RecWordItem\", ";
+		sql += " MIN(clor.\"CustNo\") AS \"CustNo\" ";
 		sql += " FROM ";
 		sql += " ( ";
 		sql += " SELECT ";

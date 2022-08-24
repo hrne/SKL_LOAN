@@ -1,19 +1,23 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.ClOtherRightsId;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -34,6 +38,8 @@ public class L2418 extends TradeBuffer {
 	public ClOtherRightsService sClOtherRightsService;
 	@Autowired
 	public ClMainService sClMainService;
+	@Autowired
+	public ClFacService sClFacService;
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
@@ -48,6 +54,8 @@ public class L2418 extends TradeBuffer {
 	private int iClCode2;
 	// 擔保品編號
 	private int iClNo;
+	// 戶號
+	private int iCustNo = 0;
 	// 他項權利序號
 	private String iClSeq;
 
@@ -76,6 +84,8 @@ public class L2418 extends TradeBuffer {
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		// 他項權利序號
 		iClSeq = titaVo.getParam("ClSeq");
+		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		titaVo.putParam("MRKEY", iCustNo);
 
 		ClMainId ClMainId = new ClMainId();
 		ClMain tClMain = new ClMain();
@@ -104,9 +114,29 @@ public class L2418 extends TradeBuffer {
 
 		if (tClOtherRights == null) {
 			if (iFunCd == 1) {
+				//輸入戶號下，檢查此擔保品是否與額度關聯
+				
+				Boolean clfacFg = false;
+				if (iCustNo != 0) {
+					Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
+							titaVo);
+					if (slClFac == null) {
+						throw new LogicException(titaVo, "E0015", "此擔保品查無額度與擔保品關聯檔資料"); // 檢查錯誤
+					}
+
+					for (ClFac t : slClFac.getContent()) {
+						if (t.getCustNo() == iCustNo) {
+							clfacFg = true;
+							break;
+						}
+					}
+					if (!clfacFg) {
+						throw new LogicException(titaVo, "E0015", "此戶號與擔保品非關聯資料"); // 檢查錯誤
+					}
+				}
+
 				tClOtherRights = new ClOtherRights();
 				tClOtherRights.setClOtherRightsId(tClOtherRightsId);
-
 
 				setClOtherRights(titaVo);
 
@@ -116,18 +146,18 @@ public class L2418 extends TradeBuffer {
 					throw new LogicException("E0005", "擔保品他項權利檔" + e.getErrorMsg());
 				}
 			} else {
-				throw new LogicException(titaVo, "E0001", "擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 查無資料
+				throw new LogicException(titaVo, "E0001",
+						"擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 查無資料
 			}
 
 		} else {
 			if (iFunCd == 1) { // 新增
-				throw new LogicException(titaVo, "E0002", "擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002",
+						"擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
 			} else if (iFunCd == 2) { // 修改
-
 
 				// 變更前
 				ClOtherRights beforeClOtherRights = (ClOtherRights) dataLog.clone(tClOtherRights);
-
 
 				setClOtherRights(titaVo);
 
@@ -139,7 +169,7 @@ public class L2418 extends TradeBuffer {
 
 				// 紀錄變更前變更後
 				dataLog.setEnv(titaVo, beforeClOtherRights, tClOtherRights);
-				dataLog.exec("修改擔保品他項權利資料");
+				dataLog.exec();
 			} else if (iFunCd == 4) { // 刪除
 //				tClOtherRights = sClOtherRightsService.holdById(tClOtherRightsId, titaVo);
 				try {
@@ -172,6 +202,7 @@ public class L2418 extends TradeBuffer {
 		tClOtherRights.setRecNumber(titaVo.getParam("RecNumber"));
 		tClOtherRights.setRightsNote(titaVo.getParam("RightsNote"));
 		tClOtherRights.setSecuredTotal(parse.stringToBigDecimal(titaVo.getParam("TimSecuredTotal")));
+		tClOtherRights.setCustNo(iCustNo);
 
 	}
 }

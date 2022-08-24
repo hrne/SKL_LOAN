@@ -67,6 +67,8 @@ public class L4101 extends TradeBuffer {
 
 	@Autowired
 	public TotaVo totaB; // 未放行清單
+	@Autowired
+	public TotaVo totaWarnMsg; // 未放行清單
 
 	@Autowired
 	public BankRemitService bankRemitService;
@@ -118,6 +120,8 @@ public class L4101 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4101 ");
 		this.totaVo.init(titaVo);
+		
+		totaWarnMsg.putParam("MSGID", "L410W");
 		totaB.putParam("MSGID", "L410B");
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
@@ -183,7 +187,7 @@ public class L4101 extends TradeBuffer {
 				this.info("titaVo = " + titaVo.toString());
 				MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
 
-				this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+				this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
 			}
 		} else {
 
@@ -194,8 +198,9 @@ public class L4101 extends TradeBuffer {
 			this.info("titaVo = " + titaVo.toString());
 			MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
 
-			this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
+			this.totaWarnMsg.setWarnMsg("背景作業中,待處理完畢訊息通知");
 		}
+		this.addList(this.totaWarnMsg);
 		totaVo.put("OBatchNo", newBatchNo);
 		this.info("totaB = " + totaB.toString());
 		this.addList(this.totaVo);

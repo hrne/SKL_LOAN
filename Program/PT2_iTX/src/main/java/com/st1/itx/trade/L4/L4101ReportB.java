@@ -160,7 +160,7 @@ public class L4101ReportB extends MakeReport {
 				reportItem = "整批退款單";
 			}
 
-		reportItem = reportItem + "-" + batchNo;
+		reportItem = reportItem ;
 		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
@@ -172,7 +172,7 @@ public class L4101ReportB extends MakeReport {
 
 		if (lBankRemit == null || lBankRemit.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
@@ -191,7 +191,7 @@ public class L4101ReportB extends MakeReport {
 //		this.nowAcBookItem = lAcDetail.get(0).getAcBookItem();
 //		this.slipNo = lAcDetail.get(0).getSlipMediaId().getMediaSlipNo();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 		this.setFont(1, 10);

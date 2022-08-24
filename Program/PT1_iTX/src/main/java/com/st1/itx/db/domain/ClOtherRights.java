@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class ClOtherRights implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8389966471515237631L;
-
-@EmbeddedId
+  @EmbeddedId
   private ClOtherRightsId clOtherRightsId;
 
   // 擔保品代號1
@@ -106,15 +102,23 @@ public class ClOtherRights implements Serializable {
   @Column(name = "`ChoiceDate`")
   private int choiceDate = 0;
 
-  // 戶號
+  // 篩選戶號
   /* 篩選資料時upd */
-  @Column(name = "`CustNo`")
-  private int custNo = 0;
+  @Column(name = "`ReceiveCustNo`")
+  private int receiveCustNo = 0;
 
   // 清償序號
   /* 篩選資料時upd */
   @Column(name = "`CloseNo`")
   private int closeNo = 0;
+
+  // 戶號
+  @Column(name = "`CustNo`")
+  private int custNo = 0;
+
+  // jason格式紀錄欄
+  @Column(name = "`JsonFields`", length = 300)
+  private String jsonFields;
 
   // 建檔日期時間
   @CreatedDate
@@ -450,22 +454,22 @@ public class ClOtherRights implements Serializable {
   }
 
 /**
-	* 戶號<br>
+	* 篩選戶號<br>
 	* 篩選資料時upd
 	* @return Integer
 	*/
-  public int getCustNo() {
-    return this.custNo;
+  public int getReceiveCustNo() {
+    return this.receiveCustNo;
   }
 
 /**
-	* 戶號<br>
+	* 篩選戶號<br>
 	* 篩選資料時upd
   *
-  * @param custNo 戶號
+  * @param receiveCustNo 篩選戶號
 	*/
-  public void setCustNo(int custNo) {
-    this.custNo = custNo;
+  public void setReceiveCustNo(int receiveCustNo) {
+    this.receiveCustNo = receiveCustNo;
   }
 
 /**
@@ -485,6 +489,44 @@ public class ClOtherRights implements Serializable {
 	*/
   public void setCloseNo(int closeNo) {
     this.closeNo = closeNo;
+  }
+
+/**
+	* 戶號<br>
+	* 
+	* @return Integer
+	*/
+  public int getCustNo() {
+    return this.custNo;
+  }
+
+/**
+	* 戶號<br>
+	* 
+  *
+  * @param custNo 戶號
+	*/
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
+  }
+
+/**
+	* jason格式紀錄欄<br>
+	* 
+	* @return String
+	*/
+  public String getJsonFields() {
+    return this.jsonFields == null ? "" : this.jsonFields;
+  }
+
+/**
+	* jason格式紀錄欄<br>
+	* 
+  *
+  * @param jsonFields jason格式紀錄欄
+	*/
+  public void setJsonFields(String jsonFields) {
+    this.jsonFields = jsonFields;
   }
 
 /**
@@ -568,7 +610,8 @@ public class ClOtherRights implements Serializable {
   public String toString() {
     return "ClOtherRights [clOtherRightsId=" + clOtherRightsId + ", city=" + city + ", otherCity=" + otherCity
            + ", landAdm=" + landAdm + ", otherLandAdm=" + otherLandAdm + ", recYear=" + recYear + ", recWord=" + recWord + ", otherRecWord=" + otherRecWord + ", recNumber=" + recNumber
-           + ", rightsNote=" + rightsNote + ", securedTotal=" + securedTotal + ", receiveFg=" + receiveFg + ", choiceDate=" + choiceDate + ", custNo=" + custNo + ", closeNo=" + closeNo
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", rightsNote=" + rightsNote + ", securedTotal=" + securedTotal + ", receiveFg=" + receiveFg + ", choiceDate=" + choiceDate + ", receiveCustNo=" + receiveCustNo + ", closeNo=" + closeNo
+           + ", custNo=" + custNo + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

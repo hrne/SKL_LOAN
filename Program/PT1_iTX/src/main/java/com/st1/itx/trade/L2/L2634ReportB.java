@@ -141,9 +141,9 @@ public class L2634ReportB extends MakeReport {
 			int custNo = 0;
 			int closeNo = 0;
 			int selectCnt = 0;
-			if (custNo != t.getCustNo() || closeNo != t.getCloseNo()) {
+			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 
-				custNo = t.getCustNo();
+				custNo = t.getReceiveCustNo();
 				closeNo = t.getCloseNo();
 				FacClose tFacClose = sFacCloseService.findById(new FacCloseId(custNo, closeNo), titaVo);
 				if (tFacClose == null) {
@@ -227,7 +227,7 @@ public class L2634ReportB extends MakeReport {
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
-			if (custNo == t.getCustNo() && closeNo == t.getCloseNo()) {
+			if (custNo == t.getReceiveCustNo() && closeNo == t.getCloseNo()) {
 				selecTotal++;
 				if (cnt == lClOtherRights.size()) {
 					isLast = true;

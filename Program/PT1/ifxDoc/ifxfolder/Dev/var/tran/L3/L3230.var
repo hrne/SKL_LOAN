@@ -386,7 +386,7 @@ C(3,#TempItemCode,09,SHOW(#BTN9),HIDE(#BTN9))
 T(2,1+#CustNo)
  
 #BIND9A=X,1,S
-BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L4960; ntxbuf=#BUF9A;ntxbuf5=type<-1:TwTempAmt<-OOFireInsuPrem:UsTempAmt<-OOFireInsuPrem:FacmNo<-OOFacmNo})
+BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L4960; ntxbuf=#BUF9A;ntxbuf5=type<-1:TwTempAmt<-OOTotalPrem:UsTempAmt<-OOTotalPrem:FacmNo<-OOFacmNo})
 
 ![額度編號]
 !作業項目=9,10,25,29必須輸入,其他不可輸入

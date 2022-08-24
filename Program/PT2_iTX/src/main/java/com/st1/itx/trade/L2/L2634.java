@@ -180,7 +180,7 @@ public class L2634 extends TradeBuffer {
 		if (tClOtherRights != null) {
 			if (tClOtherRights.getChoiceDate() == 0) {
 				tClOtherRights.setChoiceDate(choiceDate);
-				tClOtherRights.setCustNo(custNo);
+				tClOtherRights.setReceiveCustNo(custNo);
 				tClOtherRights.setCloseNo(closeNo);
 				try {
 					ClOtherRightsService.update(tClOtherRights, titaVo);
@@ -199,7 +199,7 @@ public class L2634 extends TradeBuffer {
 			ClOtherRights tClOtherRights = ClOtherRightsService.holdById(t, titaVo);
 			if (tClOtherRights != null) {
 				tClOtherRights.setChoiceDate(0);
-				tClOtherRights.setCustNo(0);
+				tClOtherRights.setReceiveCustNo(0);
 				tClOtherRights.setCloseNo(0);
 				if (iType == 2) {
 //					更新他項權利領取記號 1已領取

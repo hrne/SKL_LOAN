@@ -146,29 +146,30 @@ public class L4101ReportA extends MakeReport {
 			}
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-A";
-		reportItem = reportItem + "-" + batchNo;
+		reportItem = reportItem ;
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		this.info("L4101ReportA BatchNo = " + batchNo);
 		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
 				batchNo, 0, Integer.MAX_VALUE, titaVo);
+		this.info("slAcDetail.getContent() = " + slAcDetail.getContent());
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+			this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 		tempList = procReportA(lAcDetail, titaVo);
 		for (String tempL4101Vo : tempList) {
 			print(1, 1, "　　　　　　           ");
-
+			this.info("tempL4101Vo =" + tempL4101Vo);
 			String acNoCode = tempL4101Vo.substring(0, 11);
 			String acSubCode = tempL4101Vo.substring(11, 16);
 			String acDtlCode = "  ";
@@ -211,6 +212,7 @@ public class L4101ReportA extends MakeReport {
 		String wkRelTxSeq = "";
 		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
+				this.info("tAcDetail = " + tAcDetail);
 
 				if (tAcDetail.getCustNo() != oldCustNo) {
 					oldCustNo = tAcDetail.getCustNo();
@@ -227,13 +229,11 @@ public class L4101ReportA extends MakeReport {
 				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2)
 						+ parse.IntegerToString(tAcDetail.getSlipNo(), 6);
 
-				if (dbAmt.containsKey(acNo) || crAmt.containsKey(acNo)) {
-					if ("D".equals(tAcDetail.getDbCr())) {
-						dbAmt.put(acNo, dbAmt.get(acNo).add(tAcDetail.getTxAmt()));
-					}
-					if ("C".equals(tAcDetail.getDbCr())) {
-						crAmt.put(acNo, crAmt.get(acNo).add(tAcDetail.getTxAmt()));
-					}
+				if (dbAmt.containsKey(acNo) && "D".equals(tAcDetail.getDbCr())) {
+					dbAmt.put(acNo, dbAmt.get(acNo).add(tAcDetail.getTxAmt()));
+				} else if (crAmt.containsKey(acNo) && "C".equals(tAcDetail.getDbCr())) {
+					this.info("crAmt.get(acNo) = " + crAmt.get(acNo));
+					crAmt.put(acNo, crAmt.get(acNo).add(tAcDetail.getTxAmt()));
 				} else {
 					if ("D".equals(tAcDetail.getDbCr())) {
 						dbAmt.put(acNo, tAcDetail.getTxAmt());

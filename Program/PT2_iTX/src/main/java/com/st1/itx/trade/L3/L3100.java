@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -134,10 +135,12 @@ public class L3100 extends TradeBuffer {
 	private int wkBorxNo = 0;
 	private int wkTbsDy;
 	private String sProdStepNo = "";
+	private String isReleaseErase = "";
 	private int wkStartDate = 0;
 	private boolean wkReserve = false;
+	private TempVo authLogTempVo = new TempVo();
+	private TempVo facTempVo = new TempVo();
 	private TempVo tTempVo = new TempVo();
-	private TempVo tempVo = new TempVo();
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
@@ -300,12 +303,11 @@ public class L3100 extends TradeBuffer {
 			}
 			if (tFacMain.getRepayCode() == 2 && tFacMain.getFreqBase().equals("2")
 					&& !tFacMain.getAmortizedCode().equals("2")) {
-
-				TempVo tempVo = authLogCom.exec(iCustNo, iFacmNo, titaVo);
-				if (tempVo == null) {
-					throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+				authLogTempVo = authLogCom.exec(iCustNo, iFacmNo, titaVo);
+				if (authLogTempVo == null) {
+					throw new LogicException(titaVo, "E0001", "銀扣授權檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 				}
-				String wkRepayBank = tempVo.getParam("RepayBank");
+				String wkRepayBank = authLogTempVo.getParam("RepayBank");
 				int iSpecificDd = this.parse.stringToInteger(titaVo.getParam("SpecificDd"));
 //				檢查ACH扣款特定日
 				if (!wkRepayBank.equals("700") && this.txBuffer.getSystemParas().getAchDeductFlag() == 1
@@ -446,13 +448,13 @@ public class L3100 extends TradeBuffer {
 			tTxTemp = new TxTemp();
 			tTxTempId = new TxTempId();
 			loanCom.setTxTemp(tTxTempId, tTxTemp, iCustNo, iFacmNo, 0, 0, titaVo);
-			tTempVo.clear();
-			tTempVo.putParam("DrawdownAmt", iDrawdownAmt);
-			tTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
-			tTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
-			tTempVo.putParam("BormNo", wkBormNo);
+			facTempVo.clear();
+			facTempVo.putParam("DrawdownAmt", iDrawdownAmt);
+			facTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
+			facTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
+			facTempVo.putParam("BormNo", wkBormNo);
 
-			tTxTemp.setText(tTempVo.getJsonString());
+			tTxTemp.setText(facTempVo.getJsonString());
 
 			try {
 				txTempService.insert(tTxTemp, titaVo);
@@ -478,12 +480,12 @@ public class L3100 extends TradeBuffer {
 			if (tTxTemp == null) {
 				throw new LogicException(titaVo, "E0001", "交易暫存檔"); // 查詢資料不存在
 			}
-			tTempVo = tTempVo.getVo(tTxTemp.getText());
-			wkDrawdownAmt = this.parse.stringToBigDecimal(tTempVo.get("DrawdownAmt"));
-			wkFirstDrawdownDate = this.parse.stringToInteger(tTempVo.get("FirstDrawdownDate"));
-			wkMaturityDate = this.parse.stringToInteger(tTempVo.get("MaturityDate"));
+			facTempVo = facTempVo.getVo(tTxTemp.getText());
+			wkDrawdownAmt = this.parse.stringToBigDecimal(facTempVo.get("DrawdownAmt"));
+			wkFirstDrawdownDate = this.parse.stringToInteger(facTempVo.get("FirstDrawdownDate"));
+			wkMaturityDate = this.parse.stringToInteger(facTempVo.get("MaturityDate"));
 
-			wkBormNo = this.parse.stringToInteger(tTempVo.get("BormNo"));
+			wkBormNo = this.parse.stringToInteger(facTempVo.get("BormNo"));
 
 			// 準備更新額度資料
 			tFacMain.setUtilAmt(tFacMain.getUtilAmt().subtract(wkDrawdownAmt));
@@ -513,13 +515,13 @@ public class L3100 extends TradeBuffer {
 			tTxTemp = new TxTemp();
 			tTxTempId = new TxTempId();
 			loanCom.setTxTemp(tTxTempId, tTxTemp, iCustNo, iFacmNo, 0, 0, titaVo);
-			tTempVo.clear();
-			tTempVo.putParam("DrawdownAmt", iDrawdownAmt);
-			tTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
-			tTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
-			tTempVo.putParam("BormNo", wkBormNo);
-			tTempVo.putParam("CompensateFlag", tFacMain.getCompensateFlag());
-			tTxTemp.setText(tTempVo.getJsonString());
+			facTempVo.clear();
+			facTempVo.putParam("DrawdownAmt", iDrawdownAmt);
+			facTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
+			facTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
+			facTempVo.putParam("BormNo", wkBormNo);
+			facTempVo.putParam("CompensateFlag", tFacMain.getCompensateFlag());
+			tTxTemp.setText(facTempVo.getJsonString());
 			this.info("test 5 =" + tFacMain.getCompensateFlag());
 			try {
 				txTempService.insert(tTxTemp, titaVo);
@@ -560,7 +562,7 @@ public class L3100 extends TradeBuffer {
 			if (tLoanBorTx != null) {
 				wkBorxNo = tLoanBorTx.getBorxNo() + 1;
 			} else {
-				wkBorxNo = 1;				
+				wkBorxNo = 1;
 			}
 			// 新增撥款檔
 			tLoanBorMain = new LoanBorMain();
@@ -583,7 +585,7 @@ public class L3100 extends TradeBuffer {
 			if (tLoanBorMain == null) {
 				throw new LogicException(titaVo, "E0006", "撥款主檔"); // 鎖定資料時，發生錯誤
 			}
-			wkBorxNo = tLoanBorMain.getLastBorxNo();			
+			wkBorxNo = tLoanBorMain.getLastBorxNo();
 			// 放款交易訂正交易須由最後一筆交易開始訂正
 			loanCom.checkEraseBormTxSeqNo(tLoanBorMain, titaVo);
 			try {
@@ -596,13 +598,22 @@ public class L3100 extends TradeBuffer {
 		if (titaVo.isActfgEntry() && titaVo.isHcodeModify()) {
 			// 修改撥款檔
 			tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(iCustNo, iFacmNo, wkBormNo));
-			tempVo = authLogCom.exec(iCustNo, iFacmNo, titaVo);
-			if (tLoanBorMain == null || tempVo == null) {
+			if (tLoanBorMain == null) {
 				throw new LogicException(titaVo, "E0006", "撥款主檔"); // 鎖定資料時，發生錯誤
 			}
-			wkBorxNo = tLoanBorMain.getLastBorxNo();			
+			authLogTempVo = authLogCom.exec(iCustNo, iFacmNo, titaVo);
+			if (authLogTempVo == null) {
+				throw new LogicException(titaVo, "E0001", "銀扣授權檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
+			}
+			wkBorxNo = tLoanBorMain.getLastBorxNo();
 			tLoanBorMain = new LoanBorMain();
 			moveLoanBorMain();
+			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
+			// 主管訂正後修正，交易序號+2(訂正、修正)
+			if (tLoanBorTx != null && "2".equals(tLoanBorTx.getTitaHCode())) {
+				tLoanBorMain.setLastBorxNo(wkBorxNo + 2);
+				titaVo.putParam("EMPNOS",tLoanBorTx.getCorrectSeq().substring(12, 18) ); // 主管放訂正主管
+		}
 			try {
 				loanBorMainService.update(tLoanBorMain, titaVo);
 			} catch (DBException e) {
@@ -619,7 +630,7 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0017",
 						"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo); // 該筆交易狀態非待放行，不可做交易放行
 			}
-			wkBorxNo = tLoanBorMain.getLastBorxNo();			
+			wkBorxNo = tLoanBorMain.getLastBorxNo();
 			// 新增交易暫存檔
 			tTxTemp = new TxTemp();
 			tTxTempId = new TxTempId();
@@ -655,7 +666,7 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0006",
 						"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
 			}
-			wkBorxNo = tLoanBorMain.getLastBorxNo();			
+			wkBorxNo = tLoanBorMain.getLastBorxNo();
 			// 放款交易訂正交易須由最後一筆交易開始訂正
 			loanCom.checkEraseBormTxSeqNo(tLoanBorMain, titaVo);
 			// 查詢交易暫存檔
@@ -819,7 +830,13 @@ public class L3100 extends TradeBuffer {
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 			}
-			tLoanBorTx.setTitaEmpNoS(titaVo.getTlrNo());
+			if (titaVo.isHcodeNormal()) {
+				tLoanBorTx.setTitaEmpNoS(titaVo.getTlrNo());
+			} else {
+				// 放行訂正先記錄被沖正，經辦修改或訂正時再覆蓋
+				tLoanBorTx.setTitaHCode("2"); // 被沖正
+				tLoanBorTx.setCorrectSeq(parse.IntegerToString(titaVo.getEntDyI() + 19110000, 8) + titaVo.getTxSeq());
+			}
 			try {
 				loanBorTxService.update(tLoanBorTx, titaVo);
 			} catch (DBException e) {
@@ -834,7 +851,6 @@ public class L3100 extends TradeBuffer {
 			tLoanBorTx = new LoanBorTx();
 			tLoanBorTxId = new LoanBorTxId();
 			loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
-
 			moveLoanBorTx();
 			try {
 				loanBorTxService.insert(tLoanBorTx, titaVo);
@@ -842,18 +858,34 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 		}
-
+		// 修正時，如為訂正後修正則需新增沖正交易明細、否則修改交易內容
 		if (titaVo.isHcodeModify()) {
 			// 修正 更新放款交易內容檔
 			tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, wkBormNo, wkBorxNo));
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
 			}
-			moveLoanBorTx();
-			try {
-				loanBorTxService.update(tLoanBorTx);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "放款交易內容檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			if ("2".equals(tLoanBorTx.getTitaHCode())) {
+				// 放行後訂正
+				loanCom.setLoanBorTxHcode(iCustNo, iFacmNo, wkBormNo, wkBorxNo, wkBorxNo + 1, iDrawdownAmt, titaVo);
+				// 新增放款交易內容檔
+				tLoanBorTx = new LoanBorTx();
+				tLoanBorTxId = new LoanBorTxId();
+				loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo + 2, titaVo);
+				moveLoanBorTx();
+				try {
+					loanBorTxService.insert(tLoanBorTx, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+				}
+
+			} else {
+				moveLoanBorTx();
+				try {
+					loanBorTxService.update(tLoanBorTx);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "放款交易內容檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
 			}
 		}
 
@@ -1028,11 +1060,11 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setUsageCode(titaVo.getParam("UsageCode"));
 		tLoanBorMain.setSyndNo(this.parse.stringToInteger(titaVo.getParam("SyndNo")));
 
-		tLoanBorMain.setRelationCode(tempVo.getParam("RelationCode"));
-		tLoanBorMain.setRelationName(tempVo.getParam("RelationName"));
-		tLoanBorMain.setRelationId(tempVo.getParam("RelationId"));
-		tLoanBorMain.setRelationBirthday(parse.stringToInteger(tempVo.getParam("RelationBirthday")));
-		tLoanBorMain.setRelationGender(tempVo.getParam("RelationGender"));
+		tLoanBorMain.setRelationCode(authLogTempVo.getParam("RelationCode"));
+		tLoanBorMain.setRelationName(authLogTempVo.getParam("RelationName"));
+		tLoanBorMain.setRelationId(authLogTempVo.getParam("RelationId"));
+		tLoanBorMain.setRelationBirthday(parse.stringToInteger(authLogTempVo.getParam("RelationBirthday")));
+		tLoanBorMain.setRelationGender(authLogTempVo.getParam("RelationGender"));
 		tLoanBorMain.setActFg(titaVo.getActFgI());
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
 		tLoanBorMain.setLastKinbr(titaVo.getKinbr());

@@ -104,10 +104,10 @@ public class L4101ReportE extends MakeReport {
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-E";
-		reportItem = reportItem + "-" + batchNo;
+		reportItem = reportItem ;
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9708", "貸款自動轉帳申請書明細表", "", "A4", "L");
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, "", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem+ "-" + batchNo, "", "A4", "L");
 
 		List<Map<String, String>> l9708List = null;
 		try {
