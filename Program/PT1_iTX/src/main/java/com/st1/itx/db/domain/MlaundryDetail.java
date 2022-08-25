@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class MlaundryDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -619580125979051449L;
-
-@EmbeddedId
+  @EmbeddedId
   private MlaundryDetailId mlaundryDetailId;
 
   // 入帳日期
@@ -60,7 +56,8 @@ public class MlaundryDetail implements Serializable {
   private String rational;
 
   // 經辦合理性說明
-  @Column(name = "`EmpNoDesc`", length = 50)
+  /* 2022/8/24長度放大100 */
+  @Column(name = "`EmpNoDesc`", length = 100)
   private String empNoDesc;
 
   // 主管覆核
@@ -228,7 +225,7 @@ N:否
 
 /**
 	* 經辦合理性說明<br>
-	* 
+	* 2022/8/24長度放大100
 	* @return String
 	*/
   public String getEmpNoDesc() {
@@ -237,7 +234,7 @@ N:否
 
 /**
 	* 經辦合理性說明<br>
-	* 
+	* 2022/8/24長度放大100
   *
   * @param empNoDesc 經辦合理性說明
 	*/

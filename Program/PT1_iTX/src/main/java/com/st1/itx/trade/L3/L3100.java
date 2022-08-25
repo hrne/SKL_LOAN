@@ -612,8 +612,8 @@ public class L3100 extends TradeBuffer {
 			// 主管訂正後修正，交易序號+2(訂正、修正)
 			if (tLoanBorTx != null && "2".equals(tLoanBorTx.getTitaHCode())) {
 				tLoanBorMain.setLastBorxNo(wkBorxNo + 2);
-				titaVo.putParam("EMPNOS",tLoanBorTx.getCorrectSeq().substring(12, 18) ); // 主管放訂正主管
-		}
+				titaVo.putParam("EraseSupNo", tLoanBorTx.getCorrectSeq().substring(12, 18)); // 主管放訂正主管
+			}
 			try {
 				loanBorMainService.update(tLoanBorMain, titaVo);
 			} catch (DBException e) {

@@ -305,10 +305,17 @@ V(H,#YesNoHelp)
 T(H,#Rational,#YesNoHelp)
 
 !經辦合理性說明
-#EmpNoDesc=X,2.50,I
+!#EmpNoDesc=X,2.50,I
+!C(3,#FuncCode,4,s)
+!C(3,#FuncCode,5,s)
+!C(3,#Level,3,$,s)
+
+#EmpNoDesc=x,4.50,I
+TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FuncCode,4,s)
 C(3,#FuncCode,5,s)
 C(3,#Level,3,$,s)
+
 
 !主管覆核
 #ManagerCheck=X,1,H
@@ -331,7 +338,8 @@ IF(#FuncCode==5,T(2,@FdManagerDesc,),T(2,@FdManagerDesc,#WKSTAR3))
 T(H,@ManagerCheckX,#ManagerCheck,#AgreeHelp)
 T(4,@CDATE,CDATE$)
 C(5,#ManagerCheck,"Y",E(0,@ManagerDate,#CDATE)INVOKEJS(SHOW,p1,10,10,1)INVOKEJS(SHOW,p1,11,11,0),E(0,@ManagerDate,0))
-C(5,#ManagerCheck,"N",E(0,@ManagerCheckDate,#CDATE)INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1),E(0,@ManagerCheckDate,0))
+!C(5,#ManagerCheck,"N",E(0,@ManagerCheckDate,#CDATE)INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1),E(0,@ManagerCheckDate,0))
+C(5,#ManagerCheck,"N",E(0,@ManagerCheckDate,#CDATE)INVOKEJS(SHOW,p1,10,10,0)INVOKEJS(SHOW,p1,11,11,1),E(0,@ManagerCheckDate,#CDATE))
 T(2,@MRKEY,#AcDate+-+#Factor+-+#CustNo)
 
 #ManagerDateCopy=D,7,S
@@ -350,7 +358,7 @@ T(H,#ManagerCheck,#AgreeHelp)
 !覆核日期欄位其實應該是放退回日期...
 !欄位名字先維持這樣
 !但機制改成 
-! 1. 主管同意時，同意日期代當天，覆核日期清空
+! 1. 主管同意時，同意日期代當天，覆核日期清空=>2022/8/24珮瑜調整:此時覆核日期=同意日期
 ! 2. 主管退回時，同意日期清空，覆核日期代當天
 !xiangwei 修改
 

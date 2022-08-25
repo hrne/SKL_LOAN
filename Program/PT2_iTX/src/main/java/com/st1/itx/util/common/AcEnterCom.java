@@ -315,17 +315,23 @@ public class AcEnterCom extends TradeBuffer {
 
 		// 11.交易分錄清單 AcTxFormCom 登帳
 		// 整批入帳及修改交易之訂正修改前，不印交易分錄清單
-		// 印錄含沖正分錄
+		// 印錄含修正的沖正分錄
 		if (!(titaVo.isTrmtypBatch() || (titaVo.isHcodeModify() && AcHCode == 1))) {
 			List<AcDetail> acListAll = new ArrayList<AcDetail>();
-			if (slAcList != null) {
+			if (slAcList != null && titaVo.isHcodeModify()) {
 				for (AcDetail ac : slAcList.getContent()) {
-					this.info("Load acfor " + ac.getTitaTlrNo() + "," + titaVo.getTlrNo() + ","
-							+ parse.IntegerToString(ac.getTitaTxtNo(), 8) + "," + titaVo.getTxtNo());
-
+					// 修正的沖正分錄紀錄主管
 					if (ac.getTitaTlrNo().equals(titaVo.getTlrNo())
 							&& parse.IntegerToString(ac.getTitaTxtNo(), 8).equals(titaVo.getTxtNo())) {
+						ac.setTitaSupNo(titaVo.getParam("EraseSupNo"));
 						acListAll.add(ac);
+					}
+				}
+				if (acListAll.size() > 0) {
+					try {
+						acDetailService.updateAll(acListAll, titaVo); // update AcDetail
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E6003", "AcDetail update " + e.getErrorMsg());
 					}
 				}
 			}
@@ -336,7 +342,9 @@ public class AcEnterCom extends TradeBuffer {
 		}
 
 		// 修正交易的訂正正需清空，放修改後的分錄
-		if (titaVo.isHcodeModify() && AcHCode > 0) {
+		if (titaVo.isHcodeModify() && AcHCode > 0)
+
+		{
 			this.txBuffer.setAcDetailList(new ArrayList<AcDetail>());
 		}
 

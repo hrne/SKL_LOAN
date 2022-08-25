@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -422,6 +423,22 @@ public class L4101Batch extends TradeBuffer {
 
 			remitForm.open(titaVo, remitformVo);
 
+			BankRemit lastTalBankRemit = new BankRemit();
+			BigDecimal talAmt = BigDecimal.ZERO;
+			String fReceiveName = "";
+			for (BankRemit t : lBankRemit) {
+				talAmt = talAmt.add(t.getRemitAmt());
+				if (fReceiveName.isEmpty()) {
+					fReceiveName = t.getCustName();
+				}
+			}
+			fReceiveName += "，等共" + lBankRemit.size() + "筆";
+
+			lastTalBankRemit.setCustName(fReceiveName);
+			lastTalBankRemit.setDrawdownCode(1);
+			lastTalBankRemit.setRemitAmt(talAmt);
+
+			lBankRemit.add(lastTalBankRemit);
 			this.info("lBankRemit.size =" + lBankRemit.size());
 			for (BankRemit tBankRemit : lBankRemit) {
 

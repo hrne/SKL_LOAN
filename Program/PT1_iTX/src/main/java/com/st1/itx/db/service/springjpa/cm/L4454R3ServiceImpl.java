@@ -104,10 +104,10 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "            CASE WHEN fm.\"FirstDrawdownDate\" < 19110000 ";
 		sql += "                 THEN fm.\"FirstDrawdownDate\" ";
 		sql += "                 ELSE fm.\"FirstDrawdownDate\" - 19110000 ";
-		sql += "            END, ";
+		sql += "            END ";
 		sql += "          , lbm.\"BormNo\"";
-		sql += "ce.\"Fullname\"";
-		sql += "   order by \"F0\",\"F1\", \"F2\"                                           ";
+		sql += "		  ,ce.\"Fullname\"";
+		sql += "   order by \"RepayAcctNo\",\"CustNo\", \"FacmNo\"                                           ";
 		this.info("sql=" + sql);
 		Query query;
 //

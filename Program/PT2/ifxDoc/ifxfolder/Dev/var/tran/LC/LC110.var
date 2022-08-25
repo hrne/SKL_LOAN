@@ -1,0 +1,124 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,LC110)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+
+#button=x,100,S
+K(MODIFYBUTTON,解除鎖定)
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[100,800];printer.width=[20,20];">
+[
+["[LC110]                                 解除戶號鎖定"],
+["鎖定序號",#iLockNo],
+["鎖定戶號",#iCustNo],
+["鎖定交易",#iTranNo],
+["鎖定單位",#iBrNo],
+["鎖定經辦",#iTlrNo],
+["鎖定日期",#iTxDate],
+["鎖定時間",#iTxTime],
+["@","<font color=red><font face=微軟正黑體>※注意：解除後，將造成鎖定的交易無法成功儲存；請確認後，再進行解除鎖定※"],
+]
+!---------- AP Button AREA ----------
+
+! 必輸欄位
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@iLockNo,#NTXBUF,1,11)
+T(1,@iCustNo,#NTXBUF,12,7)
+T(1,@iTranNo,#NTXBUF,19,30)
+T(1,@iBrNo,#NTXBUF,49,30)
+T(1,@iTlrNo,#NTXBUF,79,20)
+T(1,@iTxDate,#NTXBUF,99,9)
+T(1,@iTxTime,#NTXBUF,108,8)
+
+! 序號
+#iLockNo=A,11,L
+
+! 戶號
+#iCustNo=A,7,L
+
+! 鎖定交易
+#iTranNo=x,30,L
+
+! 鎖定單位
+#iBrNo=x,30,L
+
+! 鎖定使用者
+#iTlrNo=x,20,L
+
+! 鎖定日期
+#iTxDate=X,9,L
+
+! 鎖定時間
+#iTxTime=X,8,L
+
+
+#MRKEY=_,_,S
+T(2,#iCustNo)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = LC110 ----------
+<sub type="FORM" name="LC110">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LC110,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LC110] 解除戶號鎖定)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#iLockNo
+#iCustNo
+#iTranNo
+#iBrNo
+#iTlrNo
+#iTxDate
+#iTxTime
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+
+TXFORM=LC110
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -230,7 +230,7 @@ C(5,#OORational,Y,T(2,是),C(5,#OORational,N,T(2,否),T(2,#OORational)))
 #OOUpdate=X,9,L
 
 !經辦合理性說明(TOTA)
-#OOEmpNoDesc=x,100,L
+#OOEmpNoDesc=x,200,L
 
 !主管覆核說明(TOTA)
 #OOManagerDesc=x,100,L
@@ -261,7 +261,7 @@ C(3,#Level,1,BIND(grid,cancel),$)
 T(2,4+#OOAcDate+#OOFactor+#OOCustNo)
 
 #OOBTN4=X,4,S
-C(3,#Level,1,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=刪除;ntxbuf=#OOBUF4}))
+C(3,#Level,1,BIND(grid,cancel),C(5,#OOManagerCheck,Y,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=刪除;ntxbuf=#OOBUF4})))
 
 
 

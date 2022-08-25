@@ -305,6 +305,10 @@ public class LoanCom extends TradeBuffer {
 		if ("L3240".equals(titaVo.getTxcd()) || "L3250".equals(titaVo.getTxcd())) {
 			tLoanBorTx2.setDisplayflag("A");
 		}
+		// 修正時放主管放訂正主管
+		if (titaVo.isHcodeModify()) {
+			tLoanBorTx2.setTitaEmpNoS(titaVo.getParam("EraseSupNo"));
+		}		
 		tLoanBorTx2.setLoanBal(iLoanBal);
 		try {
 			loanBorTxService.insert(tLoanBorTx2);

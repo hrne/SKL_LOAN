@@ -56,6 +56,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].o' WITH WRAPPER) AS \"Old\"";
 		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
+		sql += "		  ,CE2.\"Fullname\" AS \"SupNoName\"";
 		sql += "	FROM \"TxDataLog\" T";
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
 		sql += "	LEFT JOIN \"ClFac\" Cl ON Cl.\"CustNo\" = T.\"CustNo\"";
@@ -64,6 +65,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'ClCode2' || Cl.\"ClCode1\"";
 		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
 		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
+		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"AgentCode\" = CE.\"AdministratId\"";
 		sql += "	WHERE T.\"TxDate\" BETWEEN :sAcDate AND :eAcDate";
 		sql += "	  AND JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) IS NOT NULL";
 		sql += "	  AND T.\"TlrNo\" <> 'E-LOAN'";
@@ -127,7 +129,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,T.\"Old\" AS \"Old\"";
 		sql += "		  ,T.\"New\" AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
-		sql += "		  ,T.\"SupNo\" AS \"SupNoName\"";
+		sql += "		  ,NVL(T.\"SupNo\",CE2.\"Fullname\") AS \"SupNoName\"";
 		sql += "	FROM \"tmpTxRecord\" T";
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
 		sql += "	LEFT JOIN \"ClFac\" Cl ON Cl.\"CustNo\" = T.\"CustNo\"";
@@ -136,6 +138,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'ClCode2' || Cl.\"ClCode1\"";
 		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
 		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
+		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"AgentCode\" = CE.\"AdministratId\"";
 		sql += "	ORDER BY T.\"TxDate\" ASC";
 		sql += "			,T.\"TlrNo\" ASC";
 		sql += "			,T.\"TxSeq\" ASC";
