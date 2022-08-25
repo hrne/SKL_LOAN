@@ -72,9 +72,9 @@ public class L8305 extends TradeBuffer {
 		BigDecimal iRate = new BigDecimal(titaVo.getParam("Rate").trim());
 		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt").trim());
 		int iReceYearIncome = Integer.valueOf(titaVo.getParam("ReceYearIncome").trim());
-		int iReceYear = Integer.valueOf(titaVo.getParam("ReceYear").trim())+1911;
+		int iReceYear = Integer.valueOf(titaVo.getParam("ReceYear").trim()) + 1911;
 		int iReceYear2Income = Integer.valueOf(titaVo.getParam("ReceYear2Income").trim());
-		int iReceYear2 = Integer.valueOf(titaVo.getParam("ReceYear2").trim())+1911;
+		int iReceYear2 = Integer.valueOf(titaVo.getParam("ReceYear2").trim()) + 1911;
 		int iCurrentMonthIncome = Integer.valueOf(titaVo.getParam("CurrentMonthIncome").trim());
 		int iLivingCost = Integer.valueOf(titaVo.getParam("LivingCost").trim());
 		String iCompName = titaVo.getParam("CompName").trim();
@@ -95,12 +95,12 @@ public class L8305 extends TradeBuffer {
 		int iMonthPayAmt2 = Integer.valueOf(titaVo.getParam("MonthPayAmt2").trim());
 		int iPayLastAmt2 = Integer.valueOf(titaVo.getParam("PayLastAmt2").trim());
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		this.info("Keyyyyyy = " + titaVo.getParam("Ukey"));
 		// JcicZ044, JcicZ040, JcicZ047, JcicZ048, JcicZ052
 		JcicZ044 iJcicZ044 = new JcicZ044();
@@ -142,7 +142,7 @@ public class L8305 extends TradeBuffer {
 			// 3.因協商不成立致須回報本資料檔案格式時，則須以交易代碼「'X'補件」報送之，本中心即可接受金融機構報送之前已因協商不成立而結案之案件資料.***J
 			// 4.當本資料檔案格式交易代碼為「'X'補件」時，則第11欄「協商方案估計月付金」、第25~30欄「扶養人」相關，為非必要填報欄位.***J
 
-			// extra項'消費者債務清理條例資料報送作業要點'(P169-(三)-(3)  --->相關欄位均為數字，1029謙和通知不必檢核
+			// extra項'消費者債務清理條例資料報送作業要點'(P169-(三)-(3) --->相關欄位均為數字，1029謙和通知不必檢核
 			// 當本資料檔案格式交易代碼為「'X'補件」時,第9欄「期數」和第10欄「利率」為必要欄位(「'46':結案通知資料」之「結案原因」為「'21':資產大於負債者除外」)
 			// 檢核項目 end
 		}
@@ -242,7 +242,7 @@ public class L8305 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ044.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ044, uJcicZ044);
-			iDataLog.exec("L8305異動", uJcicZ044.getSubmitKey()+uJcicZ044.getCustId()+uJcicZ044.getRcDate());
+			iDataLog.exec("L8305異動", uJcicZ044.getSubmitKey() + uJcicZ044.getCustId() + uJcicZ044.getRcDate());
 			break;
 		case "4": // 需刷主管卡
 			String iOUkey = titaVo.getParam("Ukey");
@@ -251,7 +251,7 @@ public class L8305 extends TradeBuffer {
 			iJcicZ044 = sJcicZ044Service.ukeyFirst(iKey, titaVo);
 			JcicZ044 uJcicZ0442 = new JcicZ044();
 			uJcicZ0442 = sJcicZ044Service.holdById(iJcicZ044.getJcicZ044Id(), titaVo);
-			
+
 			iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id);
 			if (iJcicZ044 == null) {
 				throw new LogicException("E0006", "");
@@ -266,7 +266,6 @@ public class L8305 extends TradeBuffer {
 				throw new LogicException("E0004", "刪除資料不存在");
 			}
 
-			
 			JcicZ044 oldJcicZ0442 = (JcicZ044) iDataLog.clone(uJcicZ0442);
 			uJcicZ0442.setTranKey(iTranKey);
 			uJcicZ0442.setDebtCode(iDebtCode);
@@ -298,10 +297,10 @@ public class L8305 extends TradeBuffer {
 			uJcicZ0442.setMonthPayAmt2(iMonthPayAmt2);
 			uJcicZ0442.setPayLastAmt2(iPayLastAmt2);
 			uJcicZ0442.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ044Log> dJcicLogZ044 = null;
 			dJcicLogZ044 = sJcicZ044LogService.ukeyEq(iJcicZ044.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ044 == null|| ("A".equals(iTranKey) && dJcicLogZ044 == null )) {
+			if (dJcicLogZ044 == null || ("A".equals(iTranKey) && dJcicLogZ044 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ044Service.delete(iJcicZ044, titaVo);
@@ -341,6 +340,7 @@ public class L8305 extends TradeBuffer {
 				iJcicZ044.setPayLastAmt2(iJcicZ044Log.getPayLastAmt2());
 				iJcicZ044.setTranKey(iJcicZ044Log.getTranKey());
 				iJcicZ044.setOutJcicTxtDate(iJcicZ044Log.getOutJcicTxtDate());
+				
 				try {
 					sJcicZ044Service.update(iJcicZ044, titaVo);
 				} catch (DBException e) {
@@ -348,7 +348,59 @@ public class L8305 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0442, uJcicZ0442);
-			iDataLog.exec("L8305刪除", uJcicZ0442.getSubmitKey()+uJcicZ0442.getCustId()+uJcicZ0442.getRcDate());
+			iDataLog.exec("L8305刪除", uJcicZ0442.getSubmitKey() + uJcicZ0442.getCustId() + uJcicZ0442.getRcDate());
+			break;
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ044 = sJcicZ044Service.ukeyFirst(iKey, titaVo);
+			JcicZ044 uJcicZ0443 = new JcicZ044();
+			uJcicZ0443 = sJcicZ044Service.holdById(iJcicZ044.getJcicZ044Id(), titaVo);
+			if (uJcicZ0443 == null) {
+				throw new LogicException("E0007", "無此更新資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ044.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+			JcicZ044 oldJcicZ0443 = (JcicZ044) iDataLog.clone(uJcicZ0443);
+			
+			uJcicZ0443.setJcicZ044Id(iJcicZ044Id);
+			uJcicZ0443.setTranKey(iTranKey);
+			uJcicZ0443.setDebtCode(iDebtCode);
+			uJcicZ0443.setNonGageAmt(iNonGageAmt);
+			uJcicZ0443.setPeriod(iPeriod);
+			uJcicZ0443.setRate(iRate);
+			uJcicZ0443.setMonthPayAmt(iMonthPayAmt);
+			uJcicZ0443.setReceYearIncome(iReceYearIncome);
+			uJcicZ0443.setReceYear(iReceYear);
+			uJcicZ0443.setReceYear2Income(iReceYear2Income);
+			uJcicZ0443.setReceYear2(iReceYear2);
+			uJcicZ0443.setCurrentMonthIncome(iCurrentMonthIncome);
+			uJcicZ0443.setLivingCost(iLivingCost);
+			uJcicZ0443.setCompName(iCompName);
+			uJcicZ0443.setCompId(iCompId);
+			uJcicZ0443.setCarCnt(iCarCnt);
+			uJcicZ0443.setHouseCnt(iHouseCnt);
+			uJcicZ0443.setLandCnt(iLandCnt);
+			uJcicZ0443.setChildCnt(iChildCnt);
+			uJcicZ0443.setChildRate(iChildRate);
+			uJcicZ0443.setParentCnt(iParentCnt);
+			uJcicZ0443.setParentRate(iParentRate);
+			uJcicZ0443.setMouthCnt(iMouthCnt);
+			uJcicZ0443.setMouthRate(iMouthRate);
+			uJcicZ0443.setGradeType(iGradeType);
+			uJcicZ0443.setPayLastAmt(iPayLastAmt);
+			uJcicZ0443.setPeriod2(iPeriod2);
+			uJcicZ0443.setRate2(iRate2);
+			uJcicZ0443.setMonthPayAmt2(iMonthPayAmt2);
+			uJcicZ0443.setPayLastAmt2(iPayLastAmt2);
+			uJcicZ0443.setUkey(iKey);
+			
+			iDataLog.setEnv(titaVo, oldJcicZ0443, uJcicZ0443);
+			iDataLog.exec("L8305修改", uJcicZ0443.getSubmitKey() + uJcicZ0443.getCustId() + uJcicZ0443.getRcDate());
+
 		default:
 			break;
 		}

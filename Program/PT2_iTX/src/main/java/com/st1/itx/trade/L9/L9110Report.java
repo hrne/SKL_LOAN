@@ -652,10 +652,9 @@ public class L9110Report extends MakeReport {
 			} else {
 				this.print(1, 5, "違約適用方式 . " + tL9110.get("F58") + " " + tL9110.get("F42"));
 			}
-			if (!tL9110.get("F58").isEmpty()) {
-				this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
-				this.print(0, 105, "違約金收取方式 " + tL9110.get("F57"));
-			}
+			this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+			this.print(0, 105, "違約金收取方式 " + tL9110.get("F57"));
+
 			this.info(" 違約金收取方式 = " + tL9110.get("F57"));
 
 			// 4

@@ -34,7 +34,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-
 @Service("L8314")
 @Scope("prototype")
 /**
@@ -77,7 +76,7 @@ public class L8314 extends TradeBuffer {
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ053
 		JcicZ053 iJcicZ053 = new JcicZ053();
 		JcicZ053Id iJcicZ053Id = new JcicZ053Id();
@@ -90,8 +89,9 @@ public class L8314 extends TradeBuffer {
 		// 檢核項目(D-29)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start KEY值(IDN+報送單位代號+協商申請日)未曾報送過'52':前置協商相關資料報送例外處理則予以剔退
-			//：@@@function 要改为：custRcSubEq
-			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+			// ：@@@function 要改为：custRcSubEq
+			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
+					Integer.MAX_VALUE, titaVo);
 			if (sJcicZ052 == null) {
 				if ("A".equals(iTranKey)) {
 					throw new LogicException("E0005", "未曾報送過(52)前置協商相關資料報送例外處理.");
@@ -156,7 +156,8 @@ public class L8314 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ053, uJcicZ053);
-			iDataLog.exec("L8314異動", uJcicZ053.getSubmitKey()+uJcicZ053.getCustId()+uJcicZ053.getRcDate()+uJcicZ053.getMaxMainCode());
+			iDataLog.exec("L8314異動", uJcicZ053.getSubmitKey() + uJcicZ053.getCustId() + uJcicZ053.getRcDate()
+					+ uJcicZ053.getMaxMainCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -170,7 +171,7 @@ public class L8314 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ053 oldJcicZ0532 = (JcicZ053) iDataLog.clone(uJcicZ0532);
 			uJcicZ0532.setTranKey(iTranKey);
 			uJcicZ0532.setAgreeSend(iAgreeSend);
@@ -178,10 +179,10 @@ public class L8314 extends TradeBuffer {
 			uJcicZ0532.setAgreeSendData2(iAgreeSendData2);
 			uJcicZ0532.setChangePayDate(iChangePayDate);
 			uJcicZ0532.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ053Log> dJcicLogZ053 = null;
 			dJcicLogZ053 = sJcicZ053LogService.ukeyEq(iJcicZ053.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ053 == null|| ("A".equals(iTranKey) && dJcicLogZ053 == null )) {
+			if (dJcicLogZ053 == null || ("A".equals(iTranKey) && dJcicLogZ053 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ053Service.delete(iJcicZ053, titaVo);
@@ -204,7 +205,43 @@ public class L8314 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0532, uJcicZ0532);
-			iDataLog.exec("L8314刪除", uJcicZ0532.getSubmitKey()+uJcicZ0532.getCustId()+uJcicZ0532.getRcDate()+uJcicZ0532.getMaxMainCode());
+			iDataLog.exec("L8314刪除", uJcicZ0532.getSubmitKey() + uJcicZ0532.getCustId() + uJcicZ0532.getRcDate()
+					+ uJcicZ0532.getMaxMainCode());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ053 = sJcicZ053Service.ukeyFirst(iKey, titaVo);
+			JcicZ053 uJcicZ0533 = new JcicZ053();
+			uJcicZ0533 = sJcicZ053Service.holdById(iJcicZ053.getJcicZ053Id(), titaVo);
+			if (uJcicZ0533 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ053.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ053 oldJcicZ0533 = (JcicZ053) iDataLog.clone(uJcicZ0533);
+			uJcicZ0533.setJcicZ053Id(iJcicZ053Id);
+			uJcicZ0533.setTranKey(iTranKey);
+			uJcicZ0533.setAgreeSend(iAgreeSend);
+			uJcicZ0533.setAgreeSendData1(iAgreeSendData1);
+			uJcicZ0533.setAgreeSendData2(iAgreeSendData2);
+			uJcicZ0533.setChangePayDate(iChangePayDate);
+			uJcicZ0533.setUkey(iKey);
+
+			try {
+				sJcicZ053Service.update(uJcicZ0533, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0533, uJcicZ0533);
+			iDataLog.exec("L8314修改", uJcicZ0533.getSubmitKey() + uJcicZ0533.getCustId() + uJcicZ0533.getRcDate()
+					+ uJcicZ0533.getMaxMainCode());
 		default:
 			break;
 		}

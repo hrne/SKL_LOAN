@@ -18,6 +18,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ574;
 import com.st1.itx.db.domain.JcicZ574Id;
@@ -66,12 +67,12 @@ public class L8336 extends TradeBuffer {
 		String iCloseMark = titaVo.getParam("CloseMark").trim();
 		String iPhoneNo = titaVo.getParam("PhoneNo").trim();
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ574
 		JcicZ574 iJcicZ574 = new JcicZ574();
 		JcicZ574Id iJcicZ574Id = new JcicZ574Id();
@@ -129,7 +130,7 @@ public class L8336 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ574, uJcicZ574);
-			iDataLog.exec("L8336異動",uJcicZ574.getSubmitKey()+uJcicZ574.getCustId()+uJcicZ574.getApplyDate());
+			iDataLog.exec("L8336異動", uJcicZ574.getSubmitKey() + uJcicZ574.getCustId() + uJcicZ574.getApplyDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -143,17 +144,17 @@ public class L8336 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ574 oldJcicZ5742 = (JcicZ574) iDataLog.clone(uJcicZ5742);
 			uJcicZ5742.setCloseDate(iCloseDate);
 			uJcicZ5742.setCloseMark(iCloseMark);
 			uJcicZ5742.setPhoneNo(iPhoneNo);
 			uJcicZ5742.setTranKey(iTranKey);
 			uJcicZ5742.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ574Log> dJcicLogZ574 = null;
 			dJcicLogZ574 = sJcicZ574LogService.ukeyEq(iJcicZ574.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ574 == null|| ("A".equals(iTranKey) && dJcicLogZ574 == null )) {
+			if (dJcicLogZ574 == null || ("A".equals(iTranKey) && dJcicLogZ574 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ574Service.delete(iJcicZ574, titaVo);
@@ -174,9 +175,42 @@ public class L8336 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-			
+
 			iDataLog.setEnv(titaVo, oldJcicZ5742, uJcicZ5742);
-			iDataLog.exec("L8336刪除",uJcicZ5742.getSubmitKey()+uJcicZ5742.getCustId()+uJcicZ5742.getApplyDate());
+			iDataLog.exec("L8336刪除", uJcicZ5742.getSubmitKey() + uJcicZ5742.getCustId() + uJcicZ5742.getApplyDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ574 = sJcicZ574Service.ukeyFirst(iKey, titaVo);
+			JcicZ574 uJcicZ5743 = new JcicZ574();
+			uJcicZ5743 = sJcicZ574Service.holdById(iJcicZ574.getJcicZ574Id(), titaVo);
+			if (uJcicZ5743 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ574.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ574 oldJcicZ5743 = (JcicZ574) iDataLog.clone(uJcicZ5743);
+			uJcicZ5743.setJcicZ574Id(iJcicZ574Id);
+			uJcicZ5743.setTranKey(iTranKey);
+			uJcicZ5743.setCloseDate(iCloseDate);
+			uJcicZ5743.setCloseMark(iCloseMark);
+			uJcicZ5743.setPhoneNo(iPhoneNo);
+			uJcicZ5743.setUkey(iKey);
+
+			try {
+				sJcicZ574Service.update(uJcicZ5743, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ5743, uJcicZ5743);
+			iDataLog.exec("L8336修改", uJcicZ5743.getSubmitKey() + uJcicZ5743.getCustId() + uJcicZ5743.getApplyDate());
 		default:
 			break;
 		}

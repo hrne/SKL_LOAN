@@ -223,11 +223,18 @@ public class L8337 extends TradeBuffer {
 			if (uJcicZ5753 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ575.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
 			JcicZ575 oldJcicZ5753 = (JcicZ575) iDataLog.clone(uJcicZ5753);
 			uJcicZ5753.setJcicZ575Id(iJcicZ575Id);
 			uJcicZ5753.setModifyType(iModifyType);
 			uJcicZ5753.setTranKey(iTranKey);
-			uJcicZ5753.setOutJcicTxtDate(0);
+			uJcicZ5753.setUkey(iKey);
+			
 			try {
 				sJcicZ575Service.update(uJcicZ5753, titaVo);
 			} catch (DBException e) {

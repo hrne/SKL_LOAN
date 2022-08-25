@@ -20,6 +20,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.JcicZ040Id;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ042;
 import com.st1.itx.db.domain.JcicZ042Id;
@@ -40,7 +41,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
-
 
 @Service("L8303")
 @Scope("prototype")
@@ -104,13 +104,14 @@ public class L8303 extends TradeBuffer {
 		int iCreditCardPena = Integer.valueOf(titaVo.getParam("CreditCardPena").trim());
 		int iCreditCardOther = Integer.valueOf(titaVo.getParam("CreditCardOther").trim());
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
-		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt + iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
+
+		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt
+				+ iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
 		// JcicZ042, JcicZ040, JcicZ043, JcicZ045
 		JcicZ042 iJcicZ042 = new JcicZ042();
 		JcicZ042Id iJcicZ042Id = new JcicZ042Id();
@@ -132,10 +133,10 @@ public class L8303 extends TradeBuffer {
 		// Date計算
 		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
 		int tDate = Integer.valueOf(titaVo.getCalDy()) + 19110000;// 日曆日
-		this.info("tDate  " + tDate); //20220707
-		this.info("iRcDate  " + iRcDate); //1110201
-		this.info("txDate  " + txDate); //20220105
-		//int iDays25 = Dealdate(txDate, -25);// 報送日前25天
+		this.info("tDate  " + tDate); // 20220707
+		this.info("iRcDate  " + iRcDate); // 1110201
+		this.info("txDate  " + txDate); // 20220105
+		// int iDays25 = Dealdate(txDate, -25);// 報送日前25天
 		int iDays25 = Dealdate(tDate, -25);// 報送日前25天
 		// 檢核項目(D-7)
 		if (!"4".equals(iTranKey_Tmp)) {
@@ -181,7 +182,8 @@ public class L8303 extends TradeBuffer {
 			// 5 end-->(前端已有檢核，但錯誤信息提示不明確)
 
 			// 6 start 有擔保債權筆數需等於報送'43':回報有擔保債權金額資料之筆數
-			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey, iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey,
+					iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ043 == null) {
 				if (iGuarLoanCnt != 0) {
 					if ("A".equals(iTranKey)) {
@@ -296,9 +298,9 @@ public class L8303 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ042.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ042, uJcicZ042);
-			iDataLog.exec("L8303異動", uJcicZ042.getSubmitKey()+uJcicZ042.getCustId()+uJcicZ042.getRcDate());
+			iDataLog.exec("L8303異動", uJcicZ042.getSubmitKey() + uJcicZ042.getCustId() + uJcicZ042.getRcDate());
 			break;
-			// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
+		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ042 = sJcicZ042Service.ukeyFirst(iKey, titaVo);
@@ -311,7 +313,7 @@ public class L8303 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ042 oldJcicZ0422 = (JcicZ042) iDataLog.clone(uJcicZ0422);
 			uJcicZ0422.setTranKey(iTranKey);
 			uJcicZ0422.setIsClaims(iIsClaims);
@@ -338,10 +340,10 @@ public class L8303 extends TradeBuffer {
 			uJcicZ0422.setCreditCardPena(iCreditCardPena);
 			uJcicZ0422.setCreditCardOther(iCreditCardOther);
 			uJcicZ0422.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ042Log> dJcicLogZ042 = null;
 			dJcicLogZ042 = sJcicZ042LogService.ukeyEq(iJcicZ042.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ042 == null||("A".equals(iTranKey) && dJcicLogZ042 == null)) {
+			if (dJcicLogZ042 == null || "A".equals(iTranKey)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ042Service.delete(iJcicZ042, titaVo);
@@ -383,7 +385,59 @@ public class L8303 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0422, uJcicZ0422);
-			iDataLog.exec("L8303刪除", uJcicZ0422.getSubmitKey()+uJcicZ0422.getCustId()+uJcicZ0422.getRcDate());
+			iDataLog.exec("L8303刪除", uJcicZ0422.getSubmitKey() + uJcicZ0422.getCustId() + uJcicZ0422.getRcDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ042 = sJcicZ042Service.ukeyFirst(iKey, titaVo);
+			JcicZ042 uJcicZ0423 = new JcicZ042();
+			uJcicZ0423 = sJcicZ042Service.holdById(iJcicZ042.getJcicZ042Id(), titaVo);
+			if (uJcicZ0423 == null) {
+				throw new LogicException("E0007", "無此更新資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ042.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ042 oldJcicZ0423 = (JcicZ042) iDataLog.clone(uJcicZ0423);
+			uJcicZ0423.setJcicZ042Id(iJcicZ042Id);
+			uJcicZ0423.setTranKey(iTranKey);
+			uJcicZ0423.setIsClaims(iIsClaims);
+			uJcicZ0423.setGuarLoanCnt(iGuarLoanCnt);
+			uJcicZ0423.setExpLoanAmt(iExpLoanAmt);
+			uJcicZ0423.setCivil323ExpAmt(iCivil323ExpAmt);
+			uJcicZ0423.setReceExpAmt(iReceExpAmt);
+			uJcicZ0423.setCashCardAmt(iCashCardAmt);
+			uJcicZ0423.setCivil323CashAmt(iCivil323CashAmt);
+			uJcicZ0423.setReceCashAmt(iReceCashAmt);
+			uJcicZ0423.setCreditCardAmt(iCreditCardAmt);
+			uJcicZ0423.setCivil323CreditAmt(iCivil323CreditAmt);
+			uJcicZ0423.setReceCreditAmt(iReceCreditAmt);
+			uJcicZ0423.setReceExpPrin(iReceExpPrin);
+			uJcicZ0423.setReceExpInte(iReceExpInte);
+			uJcicZ0423.setReceExpPena(iReceExpPena);
+			uJcicZ0423.setReceExpOther(iReceExpOther);
+			uJcicZ0423.setCashCardPrin(iCashCardPrin);
+			uJcicZ0423.setCashCardInte(iCashCardInte);
+			uJcicZ0423.setCashCardPena(iCashCardPena);
+			uJcicZ0423.setCashCardOther(iCashCardOther);
+			uJcicZ0423.setCreditCardPrin(iCreditCardPrin);
+			uJcicZ0423.setCreditCardInte(iCreditCardInte);
+			uJcicZ0423.setCreditCardPena(iCreditCardPena);
+			uJcicZ0423.setCreditCardOther(iCreditCardOther);
+			uJcicZ0423.setUkey(iKey);
+			try {
+				sJcicZ042Service.update(uJcicZ0423, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0423, uJcicZ0423);
+			iDataLog.exec("L8303修改", uJcicZ0423.getSubmitKey() + uJcicZ0423.getCustId() + uJcicZ0423.getRcDate());
 		default:
 			break;
 		}

@@ -11,11 +11,17 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClLand;
+import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -39,6 +45,10 @@ public class L2R22 extends TradeBuffer {
 	public ClFacService sClFacService;
 	@Autowired
 	public CustMainService sCustMainService;
+	@Autowired
+	public ClBuildingService sClBuildingService;
+	@Autowired
+	public ClLandService sClLandService;
 
 	/* 日期工具 */
 	@Autowired
@@ -61,6 +71,7 @@ public class L2R22 extends TradeBuffer {
 
 		int wkCustNo = 0;
 		String wkCustId = "";
+		String other = "";
 		// new table ClMain
 		ClMain tClMain = new ClMain();
 		// new pk
@@ -83,29 +94,54 @@ public class L2R22 extends TradeBuffer {
 			}
 			case 2:
 				// 若為修改，但資料不存在，拋錯
-				throw new LogicException("E0003", ""); //修改資料不存在
+				throw new LogicException("E0003", ""); // 修改資料不存在
 			case 4:
 				// 若為刪除，但資料不存在，拋錯
 				throw new LogicException("E0004", ""); // 刪除資料不存在
 			case 5:
 				// 若為查詢，但資料不存在，拋錯
-				throw new LogicException("E0001", "擔保品號碼不存在擔保品主檔"); //查詢資料不存在
+				throw new LogicException("E0001", "擔保品號碼不存在擔保品主檔"); // 查詢資料不存在
 			default:
 				// funch不在以上範圍，拋錯
-				throw new LogicException("E0010", ""); //功能選擇錯誤
+				throw new LogicException("E0010", ""); // 功能選擇錯誤
 			}
 
 		} else {
 			if (iFunCd == 1) {
 				// 若為新增，但資料已存在，拋錯
-				throw new LogicException("E0002", ""); //新增資料已存在
+				throw new LogicException("E0002", ""); // 新增資料已存在
 			} else if (iFunCd == 4) {
 				// 若為刪除,額度與關聯檔有資料不可刪除,拋錯
 				Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 				List<ClFac> lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
 				if (lClFac != null && lClFac.size() > 0) {
-					throw new LogicException("E2035", ""); //額度與擔保品關聯不可刪除
+					throw new LogicException("E2035", ""); // 額度與擔保品關聯不可刪除
 				}
+			}
+			if (tClMain.getClCode1() == 1) {
+				ClBuildingId clBuildingId = new ClBuildingId();
+				clBuildingId.setClCode1(tClMain.getClCode1());
+				clBuildingId.setClCode2(tClMain.getClCode2());
+				clBuildingId.setClNo(tClMain.getClNo());
+				ClBuilding tClBuilding = new ClBuilding();
+				tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
+
+				if (tClBuilding != null) {
+					other = tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2();
+				}
+
+			} else if (tClMain.getClCode1() == 2) {
+				ClLandId clLandId = new ClLandId();
+				clLandId.setClCode1(tClMain.getClCode1());
+				clLandId.setClCode2(tClMain.getClCode2());
+				clLandId.setClNo(tClMain.getClNo());
+				clLandId.setLandSeq(0);
+				ClLand tClLand = new ClLand();
+				tClLand = sClLandService.findById(clLandId, titaVo);
+				if (tClLand != null) {
+					other = tClLand.getLandLocation();
+				}
+
 			}
 		}
 		CustMain tCustMain = sCustMainService.findById(tClMain.getCustUKey(), titaVo);
@@ -113,6 +149,7 @@ public class L2R22 extends TradeBuffer {
 			wkCustId = tCustMain.getCustId();
 			wkCustNo = tCustMain.getCustNo();
 		}
+
 		this.totaVo.putParam("L2r22CustId", wkCustId);
 		this.totaVo.putParam("L2r22CustNo", wkCustNo);
 		this.totaVo.putParam("L2r22ClCode1", tClMain.getClCode1());
@@ -127,6 +164,7 @@ public class L2R22 extends TradeBuffer {
 		this.totaVo.putParam("L2r22SyndCode", tClMain.getSyndCode());
 		this.totaVo.putParam("L2r22DispPrice", tClMain.getDispPrice());
 		this.totaVo.putParam("L2r22DispDate", tClMain.getDispDate());
+		this.totaVo.putParam("L2r22Other", other);
 
 		this.addList(this.totaVo);
 		return this.sendList();

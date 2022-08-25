@@ -43,7 +43,7 @@ public class L8401 extends TradeBuffer {
 			}
 		}
 
-		// B204 聯徵授信餘額日報檔
+		// B204 聯徵每日新增授信及清償資料檔
 		if (titaVo.get("DAILY1").equals("Y")) {
 			this.info("L8401 active LB204 ");
 			MySpring.newTask("LB204p", this.txBuffer, titaVo);

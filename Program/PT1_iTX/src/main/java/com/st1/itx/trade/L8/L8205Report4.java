@@ -16,8 +16,6 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.service.CdEmpService;
 
 @Component
 @Scope("prototype")
@@ -40,10 +38,6 @@ public class L8205Report4 extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	@Autowired
-	CdEmpService cdEmpService;
-
-	private String cdEmpFullname = "";
 	private List<Map<String, String>> L8205List = null;
 //	自訂表頭
 	@Override
@@ -113,6 +107,8 @@ public class L8205Report4 extends MakeReport {
 		// 入帳日區間  Max
 		String edEntryDate = titaVo.getParam("DateEnd");
 		edEntryDate = edEntryDate.substring(0, 3)+"/"+edEntryDate.substring(3, 5)+"/"+edEntryDate.substring(5, 7);
+		//筆數計算
+		int icount = 0;
 		
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態1、2未完成交易確認報表", "", "A4", "P");
 		
@@ -176,10 +172,38 @@ public class L8205Report4 extends MakeReport {
 
 				//經辦說明
 				String EmpNoDesc = tL8205Vo.get("F8");
+				String EmpNoDesc1 = "";//總長100個字,接1-45個
+				String EmpNoDesc2 = "";//接46-90個
+				String EmpNoDesc3 = "";//剩餘10個
+				int ilength = 0;
 				if(!EmpNoDesc.isEmpty()) {
 					EmpNoDesc = EmpNoDesc.replace("$n", "");
+					ilength = EmpNoDesc.length();
 				}
-				print(1, 4, "經辦說明:"+EmpNoDesc);
+
+				if (ilength > 45) {
+					if (ilength > 90) {
+						EmpNoDesc1 = EmpNoDesc.substring(0,45);
+						EmpNoDesc2 = EmpNoDesc.substring(45,90);
+						EmpNoDesc3 = EmpNoDesc.substring(90,ilength);
+					}else {
+						EmpNoDesc1 = EmpNoDesc.substring(0,45);
+						EmpNoDesc2 = EmpNoDesc.substring(45,ilength);
+					}
+				}else {
+					EmpNoDesc1 = EmpNoDesc.substring(0,ilength);
+				}
+
+				if(!EmpNoDesc1.isEmpty()) {
+					print(1, 4, "經辦說明:"+EmpNoDesc1);
+				}
+				if(!EmpNoDesc2.isEmpty()) {
+					print(1, 4, "　　　　 "+EmpNoDesc2);
+				}
+				if(!EmpNoDesc3.isEmpty()) {
+					print(1, 4, "　　　　 "+EmpNoDesc3);
+				}
+
 				print(1, 4,"");
 				
 				//主管覆核
@@ -189,6 +213,8 @@ public class L8205Report4 extends MakeReport {
 				}
 				print(1, 4, "主管覆核: "+check);
 				print(1, 4, "");
+
+				icount = icount + 1;
 			}
 
 		} else {
@@ -199,13 +225,12 @@ public class L8205Report4 extends MakeReport {
 
 		}
 
-		this.print(-65, 50, "===== 報　表　結　束 =====", "C");
-		// 表尾:製表人經辦名稱
-		CdEmp tCdEmp = new CdEmp();
-		tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
-		if (tCdEmp != null) {
-			cdEmpFullname = tCdEmp.getFullname();
+		if (icount > 0) {
+			this.print(-65, 50, "===== 報　表　結　束 =====" + "　　　【合　計：　" + icount + "　筆】", "C");
+		} else {
+			this.print(-65, 50, "===== 報　表　結　束 =====", "C");
 		}
+		
 		long sno = this.close();
 		this.toPdf(sno);
 	}

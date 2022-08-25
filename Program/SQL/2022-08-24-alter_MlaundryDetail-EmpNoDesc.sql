@@ -1,2 +1,2 @@
-ALTER TABLE "MlaundryDetail" MODIFY "EmpNoDesc" nvarchar2(100);
+ALTER TABLE "MlaundryDetail" MODIFY "EmpNoDesc" nvarchar2(150);
 COMMIT;

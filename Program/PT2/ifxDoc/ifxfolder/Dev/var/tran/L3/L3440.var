@@ -74,7 +74,7 @@ HIDE(#UsReduceAmt)
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,#BTN5],
-[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,#TmpFacmNoXX],
 [#<->#,"#FdOvduDate+催收開始日",#OvduDate],
 [#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdOvduBalX+催收餘額",#OvduBalX],["轉催收本金",#OvduPrinAmtX],
@@ -85,6 +85,7 @@ HIDE(#UsReduceAmt)
 ["#FdDelayIntX+延遲息",#DelayIntX],["火險費",#FireFeeX],
 ["#FdBreachAmtX+違約金",#BreachAmtX],["法務費",#LawFeeX],
 [#<->#,"#FdShortfall+累短收",#ShortfallX],
+[#<->#,"#FdExcessive+累溢收",#ExcessiveXX],
 [#<->#,"#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt,#BTN6],
 ]
 !---------- AP Button AREA ----------
@@ -353,6 +354,12 @@ C(3,#ApplNo,0,T(3,*)T(F,@FacmNo,1),T(3, )T(F,@FacmNo,0))
 C(3,#ApplNo,0,$,s)
 @V(2,0)
 
+
+
+#TmpFacmNoX=X,50,S
+
+#TmpFacmNoXX=X,60,L
+
 ! #CheckFacmNo=X,1,S
 ! C(3,#FacmNo,0,$,S)
 ! @
@@ -461,6 +468,13 @@ E(0,@RimCloseBreachAmt,0)
 RESET_RIM(#SendL3r06A,L3R06)
 S(L3R06,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
 R(1,L3R06)
+T(2,@TmpFacmNoX,#L3r06tmpFacmNoX)
+C(4,#TmpFacmNoX,T(3,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#TmpFacmNoX))
+E(0,@Excessive,#L3r06Excessive)
+E(0,@ExcessiveAll,#L3r06ExcessiveAll)
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 
 #WkReduceAmt=m,14.2,S
 E(0,#L3r06Interest+#L3r06DelayInt+#L3r06BreachAmt)
@@ -496,6 +510,7 @@ E(0,#L3r06DelayInt)
 CALL2(#ADJUSTDOT,#Precision,#DelayInt,#DelayIntX)
 #TimDelayInt=m,14.2,L
 E(0,#DelayInt)
+
 ![違約金]
 #FdBreachAmtX=X,2,L
 
@@ -524,7 +539,6 @@ CALL2(#ADJUSTDOT,#Precision,#ModifyFee,#ModifyFeeX)
 #FireFee=m,14.2,S
 E(0,#L3r06FireFee+#L3r06CollFireFee)
 
-
 #FireFeeX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#FireFee,#FireFeeX)
 
@@ -543,6 +557,22 @@ E(0,#L3r06Shortfall)
 
 #ShortfallX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#Shortfall,#ShortfallX)
+
+!累溢收
+#FdExcessive=X,2,L
+
+#Excessive=m,14.2,S
+E(0,#L3r06Excessive)
+#ExcessiveAll=m,14.2,S
+E(0,#L3r06ExcessiveAll)
+
+#ExcessiveX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+#ExcessiveAllX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+#ExcessiveXX=X,50,L
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
+
 
 ![減免金額]
 !減免違約金或利息之金額.輸入減免金額時,需刷主管卡.
@@ -588,6 +618,7 @@ E(0,@RPTYPZ,90)
 #TotalRepayAmt=m,14.2,S
 E(0,#L3r06Principal+#L3r06Interest+#L3r06DelayInt+#L3r06BreachAmt+#L3r06AcctFee+#L3r06ModifyFee+#L3r06FireFee+#L3r06CollFireFee+#L3r06LawFee+#L3r06CollLawFee+#Shortfall-#TimReduceAmt-#OvduRepaid)
 E(0,@RPTOT,#TotalRepayAmt)
+E(0,@RP_EXCESSIVE,#Excessive)
 ! C(1,#TotalRepayAmt,E(0,@RPTOT,0)E(0,@TotalRepayAmt,0),$,$)
 
 !實際收付金額,轉暫收金額
@@ -626,6 +657,9 @@ E(0,@RP_CUSTNO,#TimCustNo)
 ! 額度
 #TmpFacmNo=X,1,S
 E(0,@RP_FACMNO,#FacmNo)
+E(0,@RP_TMPFACMNO,#L3r06tmpFacmNo)
+T(2,@RP_TMPFACMNOX,#L3r06tmpFacmNoX)
+T(2,@RP_TXCD,#TXCD)
 
 !類別   摘要
 #TMPNOTE=X,1,S

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
@@ -252,9 +254,32 @@ public class L8403File extends MakeFile {
 
 	@Autowired
 	DateUtil dDateUtil;
+	String brno;
+	String fileCode;
+	String fileItem;
+	String fileName;
+	int date;
+	String headText;
+	String tranCode;
+	int iCount;
+	String iCustId;
+	String iSubmitKey;
+	int iRcDate;
+	String iMaxMainCode;
+	String iAccount;
+	int iCloseDate;
+	int iPayDate;
+	String iCaseStatus;
+	int iClaimDate;
+	String iCourtCode;
+	int iChangePayDate;
+	int iApplyDate;
+	int iDelayYM;
+	String iBankId;
+	String itranCode;
 
-	public void exec(TitaVo titaVo) throws LogicException {
-
+	public long exec(TitaVo titaVo) throws LogicException {
+		this.titaVo = titaVo;
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -262,21 +287,147 @@ public class L8403File extends MakeFile {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
+		tranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
+		this.info("tranCode    = " + tranCode);
+		setFileCode();
+		openAndPut();
+		totalCount();
+		putDetailData();
+		finalData();
+		// 末筆資料
 
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		String iReportDate = titaVo.getParam("ReportDate");
-		String iTranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
-		String iReportTime = titaVo.getParam("ReportTime");
-		// 檔名
-		// 金融機構總行代號+月份+日期+次數.檔案類別
-		String fileName = iSubmitKey + iReportDate.substring(3) + iReportTime + "." + iTranCode;
+		return this.close();
+		// return sno;
 
-		int date = Integer.valueOf(titaVo.getEntDy());
-		String brno = titaVo.getBrno();
-		String fileCode = "L8403";
-		String fileItem = "暫定每月產檔";
+	}
 
-		switch (iTranCode) {
+	private void finalData() throws LogicException {
+		if (iCount == 0) {
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+		}
+		String sCount = String.valueOf(iCount);
+		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
+		this.put(footText);
+	}
+
+	private void putDetailData() throws LogicException {
+		switch (tranCode) {
+		case "040":
+			doZ040File(titaVo);
+			break;
+		case "041":
+			doZ041File(titaVo);
+			break;
+		case "042":
+			doZ042File(titaVo);
+			break;
+		case "043":
+			doZ043File(titaVo);
+			break;
+		case "044":
+			doZ044File(titaVo);
+			break;
+		case "045":
+			doZ045File(titaVo);
+			break;
+		case "046":
+			doZ046File(titaVo);
+			break;
+		case "047":
+			doZ047File(titaVo);
+			break;
+		case "048":
+			doZ048File(titaVo);
+			break;
+		case "049":
+			doZ049File(titaVo);
+			break;
+		case "050":
+			doZ050File(titaVo);
+			break;
+		case "051":
+			doZ051File(titaVo);
+			break;
+		case "052":
+			doZ052File(titaVo);
+			break;
+		case "053":
+			doZ053File(titaVo);
+			break;
+		case "054":
+			doZ054File(titaVo);
+			break;
+		case "055":
+			doZ055File(titaVo);
+			break;
+		case "056":
+			doZ056File(titaVo);
+			break;
+		case "060":
+			doZ060File(titaVo);
+			break;
+		case "061":
+			doZ061File(titaVo);
+			break;
+		case "062":
+			doZ062File(titaVo);
+			break;
+		case "063":
+			doZ063File(titaVo);
+			break;
+		case "440":
+			doZ440File(titaVo);
+			break;
+		case "442":
+			doZ442File(titaVo);
+			break;
+		case "443":
+			doZ443File(titaVo);
+			break;
+		case "444":
+			doZ444File(titaVo);
+			break;
+		case "446":
+			doZ446File(titaVo);
+			break;
+		case "447":
+			doZ447File(titaVo);
+			break;
+		case "448":
+			doZ448File(titaVo);
+			break;
+		case "450":
+			doZ450File(titaVo);
+			break;
+		case "451":
+			doZ451File(titaVo);
+			break;
+		case "454":
+			doZ454File(titaVo);
+			break;
+		case "570":
+			doZ570File(titaVo);
+			break;
+		case "571":
+			doZ571File(titaVo);
+			break;
+		case "572":
+			doZ572File(titaVo);
+			break;
+		case "573":
+			doZ573File(titaVo);
+			break;
+		case "574":
+			doZ574File(titaVo);
+			break;
+		case "575":
+			doZ575File(titaVo);
+			break;
+		}
+	}
+
+	private void setFileCode() {
+		switch (tranCode) {
 		case "040":
 			fileCode = "L8403-040";
 			fileItem = "前置協商受理申請暨請求回報債權通知資料";
@@ -426,711 +577,566 @@ public class L8403File extends MakeFile {
 			fileItem = "債權金額異動通知資料";
 			break;
 		}
+	}
 
-		this.open(titaVo, date, brno, fileCode, fileItem, fileName, 2);
-		// 用String.format()
-
+	private void openAndPut() throws LogicException {
+		tranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
+		date = Integer.valueOf(titaVo.getEntDy());
+		brno = titaVo.getBrno();
+		String iReportDate = titaVo.getParam("ReportDate");
+		String iSubmitKey = titaVo.getParam("SubmitKey");
+		String iReportTime = titaVo.getParam("ReportTime");
 		// 頭筆資料
 		// JCIC-DAT-Z040-V01
 		String iContactX = FormatUtil.padX("放款部聯絡人-邱怡婷", 80);
-		String headText = "JCIC-DAT-Z" + iTranCode + "-V01-458     " + iReportDate + "01          02-23895858#7076"
-				+ iContactX;
+		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + "01          02-23895858#7076" + iContactX;
+		// 檔名
+		// 金融機構總行代號+月份+日期+次數.檔案類別
+		fileName = iSubmitKey + iReportDate.substring(3) + iReportTime + "." + tranCode;
+
+		this.open(titaVo, date, brno, fileCode, fileItem, fileName, 2);
 		this.put(headText);
-
-		int iCount = 0; // 總筆數
-
-		switch (iTranCode) {
-		case "040":
-			iCount = totalCount("040");
-			doZ040File(titaVo);
-			break;
-		case "041":
-			iCount = totalCount("041");
-			doZ041File(titaVo);
-			break;
-		case "042":
-			iCount = totalCount("042");
-			doZ042File(titaVo);
-			break;
-		case "043":
-			iCount = totalCount("043");
-			doZ043File(titaVo);
-			break;
-		case "044":
-			iCount = totalCount("044");
-			doZ044File(titaVo);
-			break;
-		case "045":
-			iCount = totalCount("045");
-			doZ045File(titaVo);
-			break;
-		case "046":
-			iCount = totalCount("046");
-			doZ046File(titaVo);
-			break;
-		case "047":
-			iCount = totalCount("047");
-			doZ047File(titaVo);
-			break;
-		case "048":
-			iCount = totalCount("048");
-			doZ048File(titaVo);
-			break;
-		case "049":
-			iCount = totalCount("049");
-			doZ049File(titaVo);
-			break;
-		case "050":
-			iCount = totalCount("050");
-			doZ050File(titaVo);
-			break;
-		case "051":
-			iCount = totalCount("051");
-			doZ051File(titaVo);
-			break;
-		case "052":
-			iCount = totalCount("052");
-			doZ052File(titaVo);
-			break;
-		case "053":
-			iCount = totalCount("053");
-			doZ053File(titaVo);
-			break;
-		case "054":
-			iCount = totalCount("054");
-			doZ054File(titaVo);
-			break;
-		case "055":
-			iCount = totalCount("055");
-			doZ055File(titaVo);
-			break;
-		case "056":
-			iCount = totalCount("056");
-			doZ056File(titaVo);
-			break;
-		case "060":
-			iCount = totalCount("060");
-			doZ060File(titaVo);
-			break;
-		case "061":
-			iCount = totalCount("061");
-			doZ061File(titaVo);
-			break;
-		case "062":
-			iCount = totalCount("062");
-			doZ062File(titaVo);
-			break;
-		case "063":
-			iCount = totalCount("063");
-			doZ063File(titaVo);
-			break;
-		case "440":
-			iCount = totalCount("440");
-			doZ440File(titaVo);
-			break;
-		case "442":
-			iCount = totalCount("442");
-			doZ442File(titaVo);
-			break;
-		case "443":
-			iCount = totalCount("443");
-			doZ443File(titaVo);
-			break;
-		case "444":
-			iCount = totalCount("444");
-			doZ444File(titaVo);
-			break;
-		case "446":
-			iCount = totalCount("446");
-			doZ446File(titaVo);
-			break;
-		case "447":
-			iCount = totalCount("447");
-			doZ447File(titaVo);
-			break;
-		case "448":
-			iCount = totalCount("448");
-			doZ448File(titaVo);
-			break;
-		case "450":
-			iCount = totalCount("450");
-			doZ450File(titaVo);
-			break;
-		case "451":
-			iCount = totalCount("451");
-			doZ451File(titaVo);
-			break;
-		case "454":
-			iCount = totalCount("454");
-			doZ454File(titaVo);
-			break;
-		case "570":
-			iCount = totalCount("570");
-			doZ570File(titaVo);
-			break;
-		case "571":
-			iCount = totalCount("571");
-			doZ571File(titaVo);
-			break;
-		case "572":
-			iCount = totalCount("572");
-			doZ572File(titaVo);
-			break;
-		case "573":
-			iCount = totalCount("573");
-			doZ573File(titaVo);
-			break;
-		case "574":
-			iCount = totalCount("574");
-			doZ574File(titaVo);
-			break;
-		case "575":
-			iCount = totalCount("575");
-			doZ575File(titaVo);
-			break;
-		}
-		// 末筆資料
-		String sCount = String.valueOf(iCount);
-		String footText = "TRLR" + StringUtils.leftPad(sCount, 8, '0') + StringUtils.rightPad("", 129);
-		this.put(footText);
-		// long sno = this.close();
-		// return sno;
-
 	}
 
-	private int totalCount(String trancode) throws LogicException {
-		int iTotalCount = 0;
-		switch (trancode) {
+	private void totalCount() throws LogicException {
+		int jcicdate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		switch (tranCode) {
 		case "040":
 			Slice<JcicZ040> xJcicZ040 = sJcicZ040Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ040 == null) {
+			if (xJcicZ040.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ040 iJcicZ040 : xJcicZ040) {
-				if (iJcicZ040.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ040.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
-				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
-			}
+
 			break;
 		case "041":
 			Slice<JcicZ041> xJcicZ041 = sJcicZ041Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ041 == null) {
+			this.info(" z041yu = " + xJcicZ041.getContent());
+			if (xJcicZ041.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
-			for (JcicZ041 iJcicZ041 : xJcicZ041) {
-				if (iJcicZ041.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+			for (JcicZ041 iJcicZ041 : xJcicZ041.getContent()) {
+				if (iJcicZ041.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "042":
 			Slice<JcicZ042> xJcicZ042 = sJcicZ042Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ042 == null) {
+			if (xJcicZ042.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ042 iJcicZ042 : xJcicZ042) {
-				if (iJcicZ042.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ042.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "043":
 			Slice<JcicZ043> xJcicZ043 = sJcicZ043Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ043 == null) {
+			if (xJcicZ043.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ043 iJcicZ043 : xJcicZ043) {
-				if (iJcicZ043.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ043.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "044":
 			Slice<JcicZ044> xJcicZ044 = sJcicZ044Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ044 == null) {
+			if (xJcicZ044.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ044 iJcicZ044 : xJcicZ044) {
-				if (iJcicZ044.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ044.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "045":
 			Slice<JcicZ045> xJcicZ045 = sJcicZ045Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ045 == null) {
+			if (xJcicZ045.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ045 iJcicZ045 : xJcicZ045) {
-				if (iJcicZ045.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ045.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "046":
 			Slice<JcicZ046> xJcicZ046 = sJcicZ046Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ046 == null) {
+			if (xJcicZ046.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ046 iJcicZ046 : xJcicZ046) {
-				if (iJcicZ046.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ046.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "047":
 			Slice<JcicZ047> xJcicZ047 = sJcicZ047Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ047 == null) {
+			if (xJcicZ047.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ047 iJcicZ047 : xJcicZ047) {
-				if (iJcicZ047.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ047.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "048":
 			Slice<JcicZ048> xJcicZ048 = sJcicZ048Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ048 == null) {
+			if (xJcicZ048.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ048 iJcicZ048 : xJcicZ048) {
-				if (iJcicZ048.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ048.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "049":
 			Slice<JcicZ049> xJcicZ049 = sJcicZ049Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ049 == null) {
+			if (xJcicZ049.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ049 iJcicZ049 : xJcicZ049) {
-				if (iJcicZ049.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ049.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "050":
 			Slice<JcicZ050> xJcicZ050 = sJcicZ050Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ050 == null) {
+			if (xJcicZ050.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ050 iJcicZ050 : xJcicZ050) {
-				if (iJcicZ050.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ050.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "051":
 			Slice<JcicZ051> xJcicZ051 = sJcicZ051Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ051 == null) {
+			if (xJcicZ051.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ051 iJcicZ051 : xJcicZ051) {
-				if (iJcicZ051.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ051.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "052":
 			Slice<JcicZ052> xJcicZ052 = sJcicZ052Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ052 == null) {
+			if (xJcicZ052.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ052 iJcicZ052 : xJcicZ052) {
-				if (iJcicZ052.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ052.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "053":
 			Slice<JcicZ053> xJcicZ053 = sJcicZ053Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ053 == null) {
+			if (xJcicZ053.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ053 iJcicZ053 : xJcicZ053) {
-				if (iJcicZ053.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ053.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "054":
 			Slice<JcicZ054> xJcicZ054 = sJcicZ054Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ054 == null) {
+			if (xJcicZ054.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ054 iJcicZ054 : xJcicZ054) {
-				if (iJcicZ054.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ054.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "055":
 			Slice<JcicZ055> xJcicZ055 = sJcicZ055Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ055 == null) {
+			if (xJcicZ055.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ055 iJcicZ055 : xJcicZ055) {
-				if (iJcicZ055.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ055.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "056":
 			Slice<JcicZ056> xJcicZ056 = sJcicZ056Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ056 == null) {
+			if (xJcicZ056.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ056 iJcicZ056 : xJcicZ056) {
-				if (iJcicZ056.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ056.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "060":
 			Slice<JcicZ060> xJcicZ060 = sJcicZ060Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ060 == null) {
+			if (xJcicZ060.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ060 iJcicZ060 : xJcicZ060) {
-				if (iJcicZ060.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ060.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "061":
 			Slice<JcicZ061> xJcicZ061 = sJcicZ061Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ061 == null) {
+			if (xJcicZ061.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ061 iJcicZ061 : xJcicZ061) {
-				if (iJcicZ061.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ061.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "062":
 			Slice<JcicZ062> xJcicZ062 = sJcicZ062Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ062 == null) {
+			if (xJcicZ062.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ062 iJcicZ062 : xJcicZ062) {
-				if (iJcicZ062.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ062.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "063":
 			Slice<JcicZ063> xJcicZ063 = sJcicZ063Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ063 == null) {
+			if (xJcicZ063.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ063 iJcicZ063 : xJcicZ063) {
-				if (iJcicZ063.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ063.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "440":
 			Slice<JcicZ440> xJcicZ440 = sJcicZ440Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ440 == null) {
+			if (xJcicZ440.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ440 iJcicZ440 : xJcicZ440) {
-				if (iJcicZ440.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ440.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "442":
 			Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ442 == null) {
+			if (xJcicZ442.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ442 iJcicZ442 : xJcicZ442) {
-				if (iJcicZ442.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ442.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "443":
 			Slice<JcicZ443> xJcicZ443 = sJcicZ443Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ443 == null) {
+			if (xJcicZ443.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ443 iJcicZ443 : xJcicZ443) {
-				if (iJcicZ443.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ443.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "444":
 			Slice<JcicZ444> xJcicZ444 = sJcicZ444Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ444 == null) {
+			if (xJcicZ444.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ444 iJcicZ444 : xJcicZ444) {
-				if (iJcicZ444.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ444.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "446":
 			Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ446 == null) {
+			if (xJcicZ446.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ446 iJcicZ446 : xJcicZ446) {
-				if (iJcicZ446.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ446.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "447":
 			Slice<JcicZ447> xJcicZ447 = sJcicZ447Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ447 == null) {
+			if (xJcicZ447.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ447 iJcicZ447 : xJcicZ447) {
-				if (iJcicZ447.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ447.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "448":
 			Slice<JcicZ448> xJcicZ448 = sJcicZ448Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ448 == null) {
+			if (xJcicZ448.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ448 iJcicZ448 : xJcicZ448) {
-				if (iJcicZ448.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ448.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "450":
 			Slice<JcicZ450> xJcicZ450 = sJcicZ450Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ450 == null) {
+			if (xJcicZ450.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ450 iJcicZ450 : xJcicZ450) {
-				if (iJcicZ450.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ450.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "451":
 			Slice<JcicZ451> xJcicZ451 = sJcicZ451Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ451 == null) {
+			if (xJcicZ451.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ451 iJcicZ451 : xJcicZ451) {
-				if (iJcicZ451.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ451.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "454":
 			Slice<JcicZ454> xJcicZ454 = sJcicZ454Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ454 == null) {
+			if (xJcicZ454.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ454 iJcicZ454 : xJcicZ454) {
-				if (iJcicZ454.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ454.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "570":
 			Slice<JcicZ570> xJcicZ570 = sJcicZ570Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ570 == null) {
+			if (xJcicZ570.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ570 iJcicZ570 : xJcicZ570) {
-				if (iJcicZ570.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ570.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "571":
 			Slice<JcicZ571> xJcicZ571 = sJcicZ571Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ571 == null) {
+			if (xJcicZ571.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ571 iJcicZ571 : xJcicZ571) {
-				if (iJcicZ571.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ571.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "572":
 			Slice<JcicZ572> xJcicZ572 = sJcicZ572Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ572 == null) {
+			if (xJcicZ572.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ572 iJcicZ572 : xJcicZ572) {
-				if (iJcicZ572.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ572.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "573":
 			Slice<JcicZ573> xJcicZ573 = sJcicZ573Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ573 == null) {
+			if (xJcicZ573.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ573 iJcicZ573 : xJcicZ573) {
-				if (iJcicZ573.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ573.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "574":
 			Slice<JcicZ574> xJcicZ574 = sJcicZ574Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ574 == null) {
+			if (xJcicZ574.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ574 iJcicZ574 : xJcicZ574) {
-				if (iJcicZ574.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ574.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		case "575":
 			Slice<JcicZ575> xJcicZ575 = sJcicZ575Service.findAll(0, Integer.MAX_VALUE, titaVo);
-			if (xJcicZ575 == null) {
+			if (xJcicZ575.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ575 iJcicZ575 : xJcicZ575) {
-				if (iJcicZ575.getOutJcicTxtDate() == 0) {
-					iTotalCount += 1;
+				if (iJcicZ575.getOutJcicTxtDate() == jcicdate) {
+					iCount += 1;
 				}
 			}
-			if (iTotalCount == 0) {
+			if (iCount == 0) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			break;
 		}
-		return iTotalCount;
 	}
 
+//jcic-040
 	public void doZ040File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ040> rJcicZ040 = null;
+		List<JcicZ040> zJcicZ040 = new ArrayList<JcicZ040>();
 		rJcicZ040 = sJcicZ040Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ040 = rJcicZ040 == null ? null : rJcicZ040.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
+		// rJcicZ040 = zJcicZ040.get
 		if (rJcicZ040 == null) {
-			throw new LogicException(titaVo, "E0001", ""); // 資料新建錯誤
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+			// TODO:每個File都要改
+			// throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ040 sJcicZ040 : rJcicZ040) {
-				if (sJcicZ040.getOutJcicTxtDate() == 0) {
+			for (JcicZ040 sJcicZ040 : zJcicZ040) {
+				if (sJcicZ040.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ040.getTranKey();
 					iTranKey = FormatUtil.padX(iTranKey, 1);
 					String iSubmitKey = sJcicZ040.getSubmitKey();
@@ -1166,6 +1172,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ040.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ040.setActualFilingDate(iDate);
+						sJcicZ040.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ040Service.update(sJcicZ040, titaVo);
 					} catch (Exception e) {
@@ -1206,19 +1216,26 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ040Log2, uJcicZ040log);
 					iDataLog.exec("L8403報送", iJcicZ040Log2.getUkey() + iJcicZ040Log2.getTxSeq());
+					// TODO:每個File都要加
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-041
 	public void doZ041File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ041> rJcicZ041 = null;
+		List<JcicZ041> zJcicZ041 = new ArrayList<JcicZ041>();
 		rJcicZ041 = sJcicZ041Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ041 = rJcicZ041 == null ? null : rJcicZ041.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ041 == null) {
-			throw new LogicException(titaVo, "E0001", ""); // 資料新建錯誤
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ041 sJcicZ041 : rJcicZ041) {
-				if (sJcicZ041.getOutJcicTxtDate() == 0) {
+			for (JcicZ041 sJcicZ041 : zJcicZ041) {
+				if (sJcicZ041.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ041.getTranKey();
 					String iSubmitKey = sJcicZ041.getSubmitKey();
 					String iCustId = sJcicZ041.getCustId();
@@ -1242,6 +1259,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ041.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ041.setActualFilingDate(iDate);
+						sJcicZ041.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ041Service.update(sJcicZ041, titaVo);
 					} catch (Exception e) {
@@ -1274,23 +1295,29 @@ public class L8403File extends MakeFile {
 					this.info("iJcicZ041Log2     = " + iJcicZ041Log2);
 					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ041.getCustId(), titaVo);
 					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
-					this.info("iCustNo   = " +iCustNo);
+					this.info("iCustNo   = " + iCustNo);
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ041Log2, uJcicZ041log);
 					iDataLog.exec("L8404報送", iJcicZ041Log2.getUkey() + iJcicZ041Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-042
 	public void doZ042File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ042> rJcicZ042 = null;
+		List<JcicZ042> zJcicZ042 = new ArrayList<JcicZ042>();
 		rJcicZ042 = sJcicZ042Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ042 = rJcicZ042 == null ? null : rJcicZ042.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ042 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ042 sJcicZ042 : rJcicZ042) {
-				if (sJcicZ042.getOutJcicTxtDate() == 0) {
+			for (JcicZ042 sJcicZ042 : zJcicZ042) {
+				if (sJcicZ042.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ042.getTranKey();
 					String iSubmitKey = sJcicZ042.getSubmitKey();
 					String iCustId = sJcicZ042.getCustId();
@@ -1368,6 +1395,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ042.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ042.setActualFilingDate(iDate);
+						sJcicZ042.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ042Service.update(sJcicZ042, titaVo);
 					} catch (Exception e) {
@@ -1423,19 +1454,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ042Log2, uJcicZ042log);
 					iDataLog.exec("L8405報送", iJcicZ042Log2.getUkey() + iJcicZ042Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-043
 	public void doZ043File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ043> rJcicZ043 = null;
+		List<JcicZ043> zJcicZ043 = new ArrayList<JcicZ043>();
 		rJcicZ043 = sJcicZ043Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ043 = rJcicZ043 == null ? null : rJcicZ043.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ043 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ043 sJcicZ043 : rJcicZ043) {
-				if (sJcicZ043.getOutJcicTxtDate() == 0) {
+			for (JcicZ043 sJcicZ043 : zJcicZ043) {
+				if (sJcicZ043.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ043.getTranKey();
 					String iSubmitKey = sJcicZ043.getSubmitKey();
 					String iCustId = sJcicZ043.getCustId();
@@ -1485,6 +1522,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ043.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ043.setActualFilingDate(iDate);
+						sJcicZ043.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ043Service.update(sJcicZ043, titaVo);
 					} catch (Exception e) {
@@ -1527,19 +1568,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ043Log2, uJcicZ043log);
 					iDataLog.exec("L8406報送", iJcicZ043Log2.getUkey() + iJcicZ043Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-044
 	public void doZ044File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ044> rJcicZ044 = null;
+		List<JcicZ044> zJcicZ044 = new ArrayList<JcicZ044>();
 		rJcicZ044 = sJcicZ044Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ044 = rJcicZ044 == null ? null : rJcicZ044.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ044 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ044 sJcicZ044 : rJcicZ044) {
-				if (sJcicZ044.getOutJcicTxtDate() == 0) {
+			for (JcicZ044 sJcicZ044 : zJcicZ044) {
+				if (sJcicZ044.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ044.getTranKey();
 					String iSubmitKey = sJcicZ044.getSubmitKey();
 					String iCustId = sJcicZ044.getCustId();
@@ -1640,6 +1687,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ044.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ044.setActualFilingDate(iDate);
+						sJcicZ044.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ044Service.update(sJcicZ044, titaVo);
 					} catch (Exception e) {
@@ -1700,19 +1751,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ044Log2, uJcicZ044log);
 					iDataLog.exec("L8407報送", iJcicZ044Log2.getUkey() + iJcicZ044Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-045
 	public void doZ045File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ045> rJcicZ045 = null;
+		List<JcicZ045> zJcicZ045 = new ArrayList<JcicZ045>();
 		rJcicZ045 = sJcicZ045Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ045 = rJcicZ045 == null ? null : rJcicZ045.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ045 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ045 sJcicZ045 : rJcicZ045) {
-				if (sJcicZ045.getOutJcicTxtDate() == 0) {
+			for (JcicZ045 sJcicZ045 : zJcicZ045) {
+				if (sJcicZ045.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ045.getTranKey();
 					String iSubmitKey = sJcicZ045.getSubmitKey();
 					String iCustId = sJcicZ045.getCustId();
@@ -1732,6 +1789,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ045.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ045.setActualFilingDate(iDate);
+						sJcicZ045.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ045Service.update(sJcicZ045, titaVo);
 					} catch (Exception e) {
@@ -1766,19 +1827,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ045Log2, uJcicZ045log);
 					iDataLog.exec("L8408報送", iJcicZ045Log2.getUkey() + iJcicZ045Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//Jcic-046
 	public void doZ046File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ046> rJcicZ046 = null;
+		List<JcicZ046> zJcicZ046 = new ArrayList<JcicZ046>();
 		rJcicZ046 = sJcicZ046Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ046 = rJcicZ046 == null ? null : rJcicZ046.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ046 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ046 sJcicZ046 : rJcicZ046) {
-				if (sJcicZ046.getOutJcicTxtDate() == 0) {
+			for (JcicZ046 sJcicZ046 : zJcicZ046) {
+				if (sJcicZ046.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ046.getTranKey();
 					String iSubmitKey = sJcicZ046.getSubmitKey();
 					String iCustId = sJcicZ046.getCustId();
@@ -1801,6 +1868,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ046.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ046.setActualFilingDate(iDate);
+						sJcicZ046.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ046Service.update(sJcicZ046, titaVo);
 					} catch (Exception e) {
@@ -1836,19 +1907,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ046Log2, uJcicZ046log);
 					iDataLog.exec("L8409報送", iJcicZ046Log2.getUkey() + iJcicZ046Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//Jcic-047
 	public void doZ047File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ047> rJcicZ047 = null;
+		List<JcicZ047> zJcicZ047 = new ArrayList<JcicZ047>();
 		rJcicZ047 = sJcicZ047Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ047 = rJcicZ047 == null ? null : rJcicZ047.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ047 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ047 sJcicZ047 : rJcicZ047) {
-				if (sJcicZ047.getOutJcicTxtDate() == 0) {
+			for (JcicZ047 sJcicZ047 : zJcicZ047) {
+				if (sJcicZ047.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ047.getTranKey();
 					String iSubmitKey = sJcicZ047.getSubmitKey();
 					String iCustId = sJcicZ047.getCustId();
@@ -1949,6 +2026,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ047.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ047.setActualFilingDate(iDate);
+						sJcicZ047.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ047Service.update(sJcicZ047, titaVo);
 					} catch (Exception e) {
@@ -2004,19 +2085,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ047Log2, uJcicZ047log);
 					iDataLog.exec("L8410報送", iJcicZ047Log2.getUkey() + iJcicZ047Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//Jcic-048
 	public void doZ048File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ048> rJcicZ048 = null;
+		List<JcicZ048> zJcicZ048 = new ArrayList<JcicZ048>();
 		rJcicZ048 = sJcicZ048Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ048 = rJcicZ048 == null ? null : rJcicZ048.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ048 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ048 sJcicZ048 : rJcicZ048) {
-				if (sJcicZ048.getOutJcicTxtDate() == 0) {
+			for (JcicZ048 sJcicZ048 : zJcicZ048) {
+				if (sJcicZ048.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ048.getTranKey();
 					String iSubmitKey = sJcicZ048.getSubmitKey();
 					String iCustId = sJcicZ048.getCustId();
@@ -2041,6 +2128,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ048.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ048.setActualFilingDate(iDate);
+						sJcicZ048.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ048Service.update(sJcicZ048, titaVo);
 					} catch (Exception e) {
@@ -2079,19 +2170,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ048Log2, uJcicZ048log);
 					iDataLog.exec("L8411報送", iJcicZ048Log2.getUkey() + iJcicZ048Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//Jcic-049
 	public void doZ049File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ049> rJcicZ049 = null;
+		List<JcicZ049> zJcicZ049 = new ArrayList<JcicZ049>();
 		rJcicZ049 = sJcicZ049Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ049 = rJcicZ049 == null ? null : rJcicZ049.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ049 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ049 sJcicZ049 : rJcicZ049) {
-				if (sJcicZ049.getOutJcicTxtDate() == 0) {
+			for (JcicZ049 sJcicZ049 : zJcicZ049) {
+				if (sJcicZ049.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ049.getTranKey();
 					String iSubmitKey = sJcicZ049.getSubmitKey();
 					String iCustId = sJcicZ049.getCustId();
@@ -2138,6 +2235,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ049.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ049.setActualFilingDate(iDate);
+						sJcicZ049.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ049Service.update(sJcicZ049, titaVo);
 					} catch (Exception e) {
@@ -2179,19 +2280,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ049Log2, uJcicZ049log);
 					iDataLog.exec("L8412報送", iJcicZ049Log2.getUkey() + iJcicZ049Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-050
 	public void doZ050File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ050> rJcicZ050 = null;
+		List<JcicZ050> zJcicZ050 = new ArrayList<JcicZ050>();
 		rJcicZ050 = sJcicZ050Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ050 = rJcicZ050 == null ? null : rJcicZ050.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ050 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ050 sJcicZ050 : rJcicZ050) {
-				if (sJcicZ050.getOutJcicTxtDate() == 0) {
+			for (JcicZ050 sJcicZ050 : zJcicZ050) {
+				if (sJcicZ050.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ050.getTranKey();
 					String iSubmitKey = sJcicZ050.getSubmitKey();
 					String iCustId = sJcicZ050.getCustId();
@@ -2226,6 +2333,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ050.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ050.setActualFilingDate(iDate);
+						sJcicZ050.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ050Service.update(sJcicZ050, titaVo);
 					} catch (Exception e) {
@@ -2264,19 +2375,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ050Log2, uJcicZ050log);
 					iDataLog.exec("L8413報送", iJcicZ050Log2.getUkey() + iJcicZ050Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-051
 	public void doZ051File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ051> rJcicZ051 = null;
+		List<JcicZ051> zJcicZ051 = new ArrayList<JcicZ051>();
 		rJcicZ051 = sJcicZ051Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ051 = rJcicZ051 == null ? null : rJcicZ051.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ051 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ051 sJcicZ051 : rJcicZ051) {
-				if (sJcicZ051.getOutJcicTxtDate() == 0) {
+			for (JcicZ051 sJcicZ051 : zJcicZ051) {
+				if (sJcicZ051.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ051.getTranKey();
 					String iSubmitKey = sJcicZ051.getSubmitKey();
 					String iCustId = sJcicZ051.getCustId();
@@ -2297,6 +2414,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ051.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ051.setActualFilingDate(iDate);
+						sJcicZ051.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ051Service.update(sJcicZ051, titaVo);
 					} catch (Exception e) {
@@ -2331,19 +2452,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ051Log2, uJcicZ051log);
 					iDataLog.exec("L8414報送", iJcicZ051Log2.getUkey() + iJcicZ051Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-052
 	public void doZ052File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ052> rJcicZ052 = null;
+		List<JcicZ052> zJcicZ052 = new ArrayList<JcicZ052>();
 		rJcicZ052 = sJcicZ052Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ052 = rJcicZ052 == null ? null : rJcicZ052.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ052 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ052 sJcicZ052 : rJcicZ052) {
-				if (sJcicZ052.getOutJcicTxtDate() == 0) {
+			for (JcicZ052 sJcicZ052 : zJcicZ052) {
+				if (sJcicZ052.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ052.getTranKey();
 					String iSubmitKey = sJcicZ052.getSubmitKey();
 					String iCustId = sJcicZ052.getCustId();
@@ -2383,6 +2510,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ052.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ052.setActualFilingDate(iDate);
+						sJcicZ052.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ052Service.update(sJcicZ052, titaVo);
 					} catch (Exception e) {
@@ -2427,19 +2558,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ052Log2, uJcicZ052log);
 					iDataLog.exec("L8415報送", iJcicZ052Log2.getUkey() + iJcicZ052Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//Jcic-053
 	public void doZ053File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ053> rJcicZ053 = null;
+		List<JcicZ053> zJcicZ053 = new ArrayList<JcicZ053>();
 		rJcicZ053 = sJcicZ053Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ053 = rJcicZ053 == null ? null : rJcicZ053.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ053 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ053 sJcicZ053 : rJcicZ053) {
-				if (sJcicZ053.getOutJcicTxtDate() == 0) {
+			for (JcicZ053 sJcicZ053 : zJcicZ053) {
+				if (sJcicZ053.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ053.getTranKey();
 					String iSubmitKey = sJcicZ053.getSubmitKey();
 					String iCustId = sJcicZ053.getCustId();
@@ -2467,6 +2604,11 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ053.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ053.setActualFilingDate(iDate);
+						sJcicZ053.setActualFilingMark("Y");
+					}
+
 					try {
 						sJcicZ053Service.update(sJcicZ053, titaVo);
 					} catch (Exception e) {
@@ -2504,19 +2646,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ053Log2, uJcicZ053log);
 					iDataLog.exec("L8416報送", iJcicZ053Log2.getUkey() + iJcicZ053Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-054
 	public void doZ054File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ054> rJcicZ054 = null;
+		List<JcicZ054> zJcicZ054 = new ArrayList<JcicZ054>();
 		rJcicZ054 = sJcicZ054Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ054 = rJcicZ054 == null ? null : rJcicZ054.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ054 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ054 sJcicZ054 : rJcicZ054) {
-				if (sJcicZ054.getOutJcicTxtDate() == 0) {
+			for (JcicZ054 sJcicZ054 : zJcicZ054) {
+				if (sJcicZ054.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ054.getTranKey();
 					String iSubmitKey = sJcicZ054.getSubmitKey();
 					String iCustId = sJcicZ054.getCustId();
@@ -2538,6 +2686,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ054.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ054.setActualFilingDate(iDate);
+						sJcicZ054.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ054Service.update(sJcicZ054, titaVo);
 					} catch (Exception e) {
@@ -2572,19 +2724,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ054Log2, uJcicZ054log);
 					iDataLog.exec("L8417報送", iJcicZ054Log2.getUkey() + iJcicZ054Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-055
 	public void doZ055File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ055> rJcicZ055 = null;
+		List<JcicZ055> zJcicZ055 = new ArrayList<JcicZ055>();
 		rJcicZ055 = sJcicZ055Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ055 = rJcicZ055 == null ? null : rJcicZ055.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ055 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ055 sJcicZ055 : rJcicZ055) {
-				if (sJcicZ055.getOutJcicTxtDate() == 0) {
+			for (JcicZ055 sJcicZ055 : zJcicZ055) {
+				if (sJcicZ055.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ055.getTranKey();
 					String iSubmitKey = sJcicZ055.getSubmitKey();
 					String iCustId = sJcicZ055.getCustId();
@@ -2648,6 +2806,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ055.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ055.setActualFilingDate(iDate);
+						sJcicZ055.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ055Service.update(sJcicZ055, titaVo);
 					} catch (Exception e) {
@@ -2694,19 +2856,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ055Log2, uJcicZ055log);
 					iDataLog.exec("L8418報送", iJcicZ055Log2.getUkey() + iJcicZ055Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-056
 	public void doZ056File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ056> rJcicZ056 = null;
+		List<JcicZ056> zJcicZ056 = new ArrayList<JcicZ056>();
 		rJcicZ056 = sJcicZ056Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ056 = rJcicZ056 == null ? null : rJcicZ056.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ056 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ056 sJcicZ056 : rJcicZ056) {
-				if (sJcicZ056.getOutJcicTxtDate() == 0) {
+			for (JcicZ056 sJcicZ056 : zJcicZ056) {
+				if (sJcicZ056.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ056.getTranKey();
 					String iSubmitKey = sJcicZ056.getSubmitKey();
 					String iCustId = sJcicZ056.getCustId();
@@ -2749,6 +2917,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ056.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ056.setActualFilingDate(iDate);
+						sJcicZ056.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ056Service.update(sJcicZ056, titaVo);
 					} catch (Exception e) {
@@ -2793,19 +2965,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ056Log2, uJcicZ056log);
 					iDataLog.exec("L8419報送", iJcicZ056Log2.getUkey() + iJcicZ056Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-060
 	public void doZ060File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ060> rJcicZ060 = null;
+		List<JcicZ060> zJcicZ060 = new ArrayList<JcicZ060>();
 		rJcicZ060 = sJcicZ060Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ060 = rJcicZ060 == null ? null : rJcicZ060.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ060 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ060 sJcicZ060 : rJcicZ060) {
-				if (sJcicZ060.getOutJcicTxtDate() == 0) {
+			for (JcicZ060 sJcicZ060 : zJcicZ060) {
+				if (sJcicZ060.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ060.getTranKey();
 					String iSubmitKey = sJcicZ060.getSubmitKey();
 					String iCustId = sJcicZ060.getCustId();
@@ -2823,6 +3001,10 @@ public class L8403File extends MakeFile {
 					this.put(text);
 
 					// 檔案產生後，回填JcicDate
+					if (iSubmitType == 3) {
+						sJcicZ060.setActualFilingDate(iDate);
+						sJcicZ060.setActualFilingMark("Y");
+					}
 					sJcicZ060.setOutJcicTxtDate(iDate);
 					try {
 						sJcicZ060Service.update(sJcicZ060, titaVo);
@@ -2858,19 +3040,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ060Log2, uJcicZ060log);
 					iDataLog.exec("L8420報送", iJcicZ060Log2.getUkey() + iJcicZ060Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-061
 	public void doZ061File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ061> rJcicZ061 = null;
+		List<JcicZ061> zJcicZ061 = new ArrayList<JcicZ061>();
 		rJcicZ061 = sJcicZ061Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ061 = rJcicZ061 == null ? null : rJcicZ061.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ061 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ061 sJcicZ061 : rJcicZ061) {
-				if (sJcicZ061.getOutJcicTxtDate() == 0) {
+			for (JcicZ061 sJcicZ061 : zJcicZ061) {
+				if (sJcicZ061.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ061.getTranKey();
 					String iSubmitKey = sJcicZ061.getSubmitKey();
 					String iCustId = sJcicZ061.getCustId();
@@ -2902,6 +3090,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ061.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ061.setActualFilingDate(iDate);
+						sJcicZ061.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ061Service.update(sJcicZ061, titaVo);
 					} catch (Exception e) {
@@ -2940,19 +3132,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ061Log2, uJcicZ061log);
 					iDataLog.exec("L8421報送", iJcicZ061Log2.getUkey() + iJcicZ061Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-062
 	public void doZ062File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ062> rJcicZ062 = null;
+		List<JcicZ062> zJcicZ062 = new ArrayList<JcicZ062>();
 		rJcicZ062 = sJcicZ062Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ062 = rJcicZ062 == null ? null : rJcicZ062.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ062 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ062 sJcicZ062 : rJcicZ062) {
-				if (sJcicZ062.getOutJcicTxtDate() == 0) {
+			for (JcicZ062 sJcicZ062 : zJcicZ062) {
+				if (sJcicZ062.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ062.getTranKey();
 					String iSubmitKey = sJcicZ062.getSubmitKey();
 					String iCustId = sJcicZ062.getCustId();
@@ -3029,6 +3227,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ062.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ062.setActualFilingDate(iDate);
+						sJcicZ062.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ062Service.update(sJcicZ062, titaVo);
 					} catch (Exception e) {
@@ -3080,19 +3282,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ062Log2, uJcicZ062log);
 					iDataLog.exec("L8422報送", iJcicZ062Log2.getUkey() + iJcicZ062Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-063
 	public void doZ063File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ063> rJcicZ063 = null;
+		List<JcicZ063> zJcicZ063 = new ArrayList<JcicZ063>();
 		rJcicZ063 = sJcicZ063Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ063 = rJcicZ063 == null ? null : rJcicZ063.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ063 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ063 sJcicZ063 : rJcicZ063) {
-				if (sJcicZ063.getOutJcicTxtDate() == 0) {
+			for (JcicZ063 sJcicZ063 : zJcicZ063) {
+				if (sJcicZ063.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ063.getTranKey();
 					String iSubmitKey = sJcicZ063.getSubmitKey();
 					String iCustId = sJcicZ063.getCustId();
@@ -3115,6 +3323,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ063.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ063.setActualFilingDate(iDate);
+						sJcicZ063.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ063Service.update(sJcicZ063, titaVo);
 					} catch (Exception e) {
@@ -3150,19 +3362,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ063Log2, uJcicZ063log);
 					iDataLog.exec("L8423報送", iJcicZ063Log2.getUkey() + iJcicZ063Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-440
 	public void doZ440File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ440> rJcicZ440 = null;
+		List<JcicZ440> zJcicZ440 = new ArrayList<JcicZ440>();
 		rJcicZ440 = sJcicZ440Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ440 = rJcicZ440 == null ? null : rJcicZ440.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ440 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ440 sJcicZ440 : rJcicZ440) {
-				if (sJcicZ440.getOutJcicTxtDate() == 0) {
+			for (JcicZ440 sJcicZ440 : zJcicZ440) {
+				if (sJcicZ440.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ440.getTranKey();
 					String iSubmitKey = sJcicZ440.getSubmitKey();
 					String iCustId = sJcicZ440.getCustId();
@@ -3205,6 +3423,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ440.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ440.setActualFilingDate(iDate);
+						sJcicZ440.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ440Service.update(sJcicZ440, titaVo);
 					} catch (Exception e) {
@@ -3249,19 +3471,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ440Log2, uJcicZ440log);
 					iDataLog.exec("L8424報送", iJcicZ440Log2.getUkey() + iJcicZ440Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-442
 	public void doZ442File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ442> rJcicZ442 = null;
+		List<JcicZ442> zJcicZ442 = new ArrayList<JcicZ442>();
 		rJcicZ442 = sJcicZ442Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ442 = rJcicZ442 == null ? null : rJcicZ442.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ442 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ442 sJcicZ442 : rJcicZ442) {
-				if (sJcicZ442.getOutJcicTxtDate() == 0) {
+			for (JcicZ442 sJcicZ442 : zJcicZ442) {
+				if (sJcicZ442.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ442.getTranKey();
 					String iSubmitKey = sJcicZ442.getSubmitKey();
 					String iCustId = sJcicZ442.getCustId();
@@ -3340,6 +3568,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ442.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ442.setActualFilingDate(iDate);
+						sJcicZ442.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ442Service.update(sJcicZ442, titaVo);
 					} catch (Exception e) {
@@ -3397,19 +3629,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ442Log2, uJcicZ442log);
 					iDataLog.exec("L8425報送", iJcicZ442Log2.getUkey() + iJcicZ442Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-443
 	public void doZ443File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ443> rJcicZ443 = null;
+		List<JcicZ443> zJcicZ443 = new ArrayList<JcicZ443>();
 		rJcicZ443 = sJcicZ443Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ443 = rJcicZ443 == null ? null : rJcicZ443.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ443 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ443 sJcicZ443 : rJcicZ443) {
-				if (sJcicZ443.getOutJcicTxtDate() == 0) {
+			for (JcicZ443 sJcicZ443 : zJcicZ443) {
+				if (sJcicZ443.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ443.getTranKey();
 					String iSubmitKey = sJcicZ443.getSubmitKey();
 					String iCustId = sJcicZ443.getCustId();
@@ -3467,6 +3705,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ443.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ443.setActualFilingDate(iDate);
+						sJcicZ443.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ443Service.update(sJcicZ443, titaVo);
 					} catch (Exception e) {
@@ -3516,6 +3758,7 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ443Log2, uJcicZ443log);
 					iDataLog.exec("L8426報送", iJcicZ443Log2.getUkey() + iJcicZ443Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
@@ -3523,12 +3766,16 @@ public class L8403File extends MakeFile {
 
 	public void doZ444File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ444> rJcicZ444 = null;
+		List<JcicZ444> zJcicZ444 = new ArrayList<JcicZ444>();
 		rJcicZ444 = sJcicZ444Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ444 = rJcicZ444 == null ? null : rJcicZ444.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ444 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ444 sJcicZ444 : rJcicZ444) {
-				if (sJcicZ444.getOutJcicTxtDate() == 0) {
+			for (JcicZ444 sJcicZ444 : zJcicZ444) {
+				if (sJcicZ444.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ444.getTranKey();
 					String iSubmitKey = sJcicZ444.getSubmitKey();
 					String iCustId = sJcicZ444.getCustId();
@@ -3560,6 +3807,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ444.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ444.setActualFilingDate(iDate);
+						sJcicZ444.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ444Service.update(sJcicZ444, titaVo);
 					} catch (Exception e) {
@@ -3599,89 +3850,103 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ444Log2, uJcicZ444log);
 					iDataLog.exec("L8427報送", iJcicZ444Log2.getUkey() + iJcicZ444Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-446
 	public void doZ446File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ446> rJcicZ446 = null;
+		List<JcicZ446> zJcicZ446 = new ArrayList<JcicZ446>();
 		rJcicZ446 = sJcicZ446Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ446 = rJcicZ446 == null ? null : rJcicZ446.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ446 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ446 sJcicZ446 : rJcicZ446) {
-				if (sJcicZ446.getOutJcicTxtDate() == 0) {
-					if (sJcicZ446.getOutJcicTxtDate() == 0) {
-						String iTranKey = sJcicZ446.getTranKey();
-						String iSubmitKey = sJcicZ446.getSubmitKey();
-						String iCustId = sJcicZ446.getCustId();
-						iTranKey = FormatUtil.padX(iTranKey, 1);
-						iSubmitKey = FormatUtil.padX(iSubmitKey, 3);
-						iCustId = FormatUtil.padX(iCustId, 10);
-						String iApplyDate = String.valueOf(sJcicZ446.getApplyDate());
-						String iCourtCode = sJcicZ446.getCourtCode();
-						String iCloseCode = sJcicZ446.getCloseCode();
-						String iCloseDate = String.valueOf(sJcicZ446.getCloseDate());
-						int ixCloseDate = Integer.valueOf(sJcicZ446.getCloseDate());
-						String iUkey = sJcicZ446.getUkey();
-						int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-						String text = "446" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0')
-								+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.rightPad("", 5)
-								+ StringUtils.rightPad(iCloseCode, 2, "") + StringUtils.leftPad(iCloseDate, 7, '0')
-								+ StringUtils.rightPad("", 39);
-						this.put(text);
-						// 檔案產生後，回填JcicDate
-						sJcicZ446.setOutJcicTxtDate(iDate);
-						try {
-							sJcicZ446Service.update(sJcicZ446, titaVo);
-						} catch (Exception e) {
-							throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
-						}
-
-						// 回填JcicDate後寫入Log檔
-						JcicZ446Log iJcicZ446Log = new JcicZ446Log();
-						JcicZ446LogId iJcicZ446LogId = new JcicZ446LogId();
-						iJcicZ446LogId.setTxSeq(titaVo.getTxSeq());
-						iJcicZ446LogId.setUkey(iUkey);
-						iJcicZ446Log.setTxSeq(titaVo.getTxSeq());
-						iJcicZ446Log.setUkey(iUkey);
-						iJcicZ446Log.setJcicZ446LogId(iJcicZ446LogId);
-						iJcicZ446Log.setCloseCode(iCloseCode);
-						iJcicZ446Log.setCloseDate(ixCloseDate);
-						iJcicZ446Log.setTranKey(iTranKey);
-						iJcicZ446Log.setOutJcicTxtDate(iDate);
-
-						try {
-							sJcicZ446LogService.insert(iJcicZ446Log, titaVo);
-						} catch (Exception e) {
-							throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z447)");
-						}
-						this.info("準備寫入L6932 ===== L8326(446)");
-						JcicZ446Log uJcicZ446log = sJcicZ446LogService.ukeyFirst(iJcicZ446LogId.getUkey(), titaVo);
-						this.info("uJcicZ446log      = " + uJcicZ446log);
-						JcicZ446Log iJcicZ446Log2 = new JcicZ446Log();
-						iJcicZ446Log2 = (JcicZ446Log) iDataLog.clone(iJcicZ446Log);
-						this.info("iJcicZ446Log2     = " + iJcicZ446Log2);
-						CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ446.getCustId(), titaVo);
-						int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
-						titaVo.putParam("CustNo", iCustNo);
-						iDataLog.setEnv(titaVo, iJcicZ446Log2, uJcicZ446log);
-						iDataLog.exec("L8428報送", iJcicZ446Log2.getUkey() + iJcicZ446Log2.getTxSeq());
+			for (JcicZ446 sJcicZ446 : zJcicZ446) {
+				if (sJcicZ446.getOutJcicTxtDate() == iJcicDate) {
+					String iTranKey = sJcicZ446.getTranKey();
+					String iSubmitKey = sJcicZ446.getSubmitKey();
+					String iCustId = sJcicZ446.getCustId();
+					iTranKey = FormatUtil.padX(iTranKey, 1);
+					iSubmitKey = FormatUtil.padX(iSubmitKey, 3);
+					iCustId = FormatUtil.padX(iCustId, 10);
+					String iApplyDate = String.valueOf(sJcicZ446.getApplyDate());
+					String iCourtCode = sJcicZ446.getCourtCode();
+					String iCloseCode = sJcicZ446.getCloseCode();
+					String iCloseDate = String.valueOf(sJcicZ446.getCloseDate());
+					int ixCloseDate = Integer.valueOf(sJcicZ446.getCloseDate());
+					String iUkey = sJcicZ446.getUkey();
+					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+					String text = "446" + iTranKey + iSubmitKey + iCustId + StringUtils.leftPad(iApplyDate, 7, '0')
+							+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.rightPad("", 5)
+							+ StringUtils.rightPad(iCloseCode, 2, "") + StringUtils.leftPad(iCloseDate, 7, '0')
+							+ StringUtils.rightPad("", 39);
+					this.put(text);
+					// 檔案產生後，回填JcicDate
+					sJcicZ446.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ446.setActualFilingDate(iDate);
+						sJcicZ446.setActualFilingMark("Y");
 					}
+					try {
+						sJcicZ446Service.update(sJcicZ446, titaVo);
+					} catch (Exception e) {
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+
+					// 回填JcicDate後寫入Log檔
+					JcicZ446Log iJcicZ446Log = new JcicZ446Log();
+					JcicZ446LogId iJcicZ446LogId = new JcicZ446LogId();
+					iJcicZ446LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ446LogId.setUkey(iUkey);
+					iJcicZ446Log.setTxSeq(titaVo.getTxSeq());
+					iJcicZ446Log.setUkey(iUkey);
+					iJcicZ446Log.setJcicZ446LogId(iJcicZ446LogId);
+					iJcicZ446Log.setCloseCode(iCloseCode);
+					iJcicZ446Log.setCloseDate(ixCloseDate);
+					iJcicZ446Log.setTranKey(iTranKey);
+					iJcicZ446Log.setOutJcicTxtDate(iDate);
+
+					try {
+						sJcicZ446LogService.insert(iJcicZ446Log, titaVo);
+					} catch (Exception e) {
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z447)");
+					}
+					this.info("準備寫入L6932 ===== L8326(446)");
+					JcicZ446Log uJcicZ446log = sJcicZ446LogService.ukeyFirst(iJcicZ446LogId.getUkey(), titaVo);
+					this.info("uJcicZ446log      = " + uJcicZ446log);
+					JcicZ446Log iJcicZ446Log2 = new JcicZ446Log();
+					iJcicZ446Log2 = (JcicZ446Log) iDataLog.clone(iJcicZ446Log);
+					this.info("iJcicZ446Log2     = " + iJcicZ446Log2);
+					CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ446.getCustId(), titaVo);
+					int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
+					titaVo.putParam("CustNo", iCustNo);
+					iDataLog.setEnv(titaVo, iJcicZ446Log2, uJcicZ446log);
+					iDataLog.exec("L8428報送", iJcicZ446Log2.getUkey() + iJcicZ446Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-447
 	public void doZ447File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ447> rJcicZ447 = null;
+		List<JcicZ447> zJcicZ447 = new ArrayList<JcicZ447>();
 		rJcicZ447 = sJcicZ447Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ447 = rJcicZ447 == null ? null : rJcicZ447.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ447 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ447 sJcicZ447 : rJcicZ447) {
-				if (sJcicZ447.getOutJcicTxtDate() == 0) {
+			for (JcicZ447 sJcicZ447 : zJcicZ447) {
+				if (sJcicZ447.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ447.getTranKey();
 					String iSubmitKey = sJcicZ447.getSubmitKey();
 					String iCustId = sJcicZ447.getCustId();
@@ -3718,6 +3983,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ447.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ447.setActualFilingDate(iDate);
+						sJcicZ447.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ447Service.update(sJcicZ447, titaVo);
 					} catch (Exception e) {
@@ -3760,19 +4029,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ447Log2, uJcicZ447log);
 					iDataLog.exec("L8429報送", iJcicZ447Log2.getUkey() + iJcicZ447Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-448
 	public void doZ448File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ448> rJcicZ448 = null;
+		List<JcicZ448> zJcicZ448 = new ArrayList<JcicZ448>();
 		rJcicZ448 = sJcicZ448Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ448 = rJcicZ448 == null ? null : rJcicZ448.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ448 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ448 sJcicZ448 : rJcicZ448) {
-				if (sJcicZ448.getOutJcicTxtDate() == 0) {
+			for (JcicZ448 sJcicZ448 : zJcicZ448) {
+				if (sJcicZ448.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ448.getTranKey();
 					String iSubmitKey = sJcicZ448.getSubmitKey();
 					String iCustId = sJcicZ448.getCustId();
@@ -3802,6 +4077,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ448.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ448.setActualFilingDate(iDate);
+						sJcicZ448.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ448Service.update(sJcicZ448, titaVo);
 					} catch (Exception e) {
@@ -3840,19 +4119,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ448Log2, uJcicZ448log);
 					iDataLog.exec("L8430報送", iJcicZ448Log2.getUkey() + iJcicZ448Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-450
 	public void doZ450File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ450> rJcicZ450 = null;
+		List<JcicZ450> zJcicZ450 = new ArrayList<JcicZ450>();
 		rJcicZ450 = sJcicZ450Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ450 = rJcicZ450 == null ? null : rJcicZ450.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ450 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ450 sJcicZ450 : rJcicZ450) {
-				if (sJcicZ450.getOutJcicTxtDate() == 0) {
+			for (JcicZ450 sJcicZ450 : zJcicZ450) {
+				if (sJcicZ450.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ450.getTranKey();
 					String iSubmitKey = sJcicZ450.getSubmitKey();
 					String iCustId = sJcicZ450.getCustId();
@@ -3881,6 +4166,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ450.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ450.setActualFilingDate(iDate);
+						sJcicZ450.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ450Service.update(sJcicZ450, titaVo);
 					} catch (Exception e) {
@@ -3918,19 +4207,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ450Log2, uJcicZ450log);
 					iDataLog.exec("L8431報送", iJcicZ450Log2.getUkey() + iJcicZ450Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-451
 	public void doZ451File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ451> rJcicZ451 = null;
+		List<JcicZ451> zJcicZ451 = new ArrayList<JcicZ451>();
 		rJcicZ451 = sJcicZ451Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ451 = rJcicZ451 == null ? null : rJcicZ451.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ451 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ451 sJcicZ451 : rJcicZ451) {
-				if (sJcicZ451.getOutJcicTxtDate() == 0) {
+			for (JcicZ451 sJcicZ451 : zJcicZ451) {
+				if (sJcicZ451.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ451.getTranKey();
 					String iSubmitKey = sJcicZ451.getSubmitKey();
 					String iCustId = sJcicZ451.getCustId();
@@ -3951,6 +4246,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ451.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ451.setActualFilingDate(iDate);
+						sJcicZ451.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ451Service.update(sJcicZ451, titaVo);
 					} catch (Exception e) {
@@ -3985,19 +4284,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ451Log2, uJcicZ451log);
 					iDataLog.exec("L8432報送", iJcicZ451Log2.getUkey() + iJcicZ451Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-454
 	public void doZ454File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ454> rJcicZ454 = null;
+		List<JcicZ454> zJcicZ454 = new ArrayList<JcicZ454>();
 		rJcicZ454 = sJcicZ454Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ454 = rJcicZ454 == null ? null : rJcicZ454.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ454 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ454 sJcicZ454 : rJcicZ454) {
-				if (sJcicZ454.getOutJcicTxtDate() == 0) {
+			for (JcicZ454 sJcicZ454 : zJcicZ454) {
+				if (sJcicZ454.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ454.getTranKey();
 					String iSubmitKey = sJcicZ454.getSubmitKey();
 					String iCustId = sJcicZ454.getCustId();
@@ -4021,6 +4326,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ454.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ454.setActualFilingDate(iDate);
+						sJcicZ454.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ454Service.update(sJcicZ454, titaVo);
 					} catch (Exception e) {
@@ -4056,19 +4365,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ454Log2, uJcicZ454log);
 					iDataLog.exec("L8433報送", iJcicZ454Log2.getUkey() + iJcicZ454Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-570
 	public void doZ570File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ570> rJcicZ570 = null;
+		List<JcicZ570> zJcicZ570 = new ArrayList<JcicZ570>();
 		rJcicZ570 = sJcicZ570Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ570 = rJcicZ570 == null ? null : rJcicZ570.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ570 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ570 sJcicZ570 : rJcicZ570) {
-				if (sJcicZ570.getOutJcicTxtDate() == 0) {
+			for (JcicZ570 sJcicZ570 : zJcicZ570) {
+				if (sJcicZ570.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ570.getTranKey();
 					String iSubmitKey = sJcicZ570.getSubmitKey();
 					String iCustId = sJcicZ570.getCustId();
@@ -4134,6 +4449,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ570.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ570.setActualFilingDate(iDate);
+						sJcicZ570.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ570Service.update(sJcicZ570, titaVo);
 					} catch (Exception e) {
@@ -4198,19 +4517,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ570Log2, uJcicZ570log);
 					iDataLog.exec("L8434報送", iJcicZ570Log2.getUkey() + iJcicZ570Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-571
 	public void doZ571File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ571> rJcicZ571 = null;
+		List<JcicZ571> zJcicZ571 = new ArrayList<JcicZ571>();
 		rJcicZ571 = sJcicZ571Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ571 = rJcicZ571 == null ? null : rJcicZ571.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ571 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ571 sJcicZ571 : rJcicZ571) {
-				if (sJcicZ571.getOutJcicTxtDate() == 0) {
+			for (JcicZ571 sJcicZ571 : zJcicZ571) {
+				if (sJcicZ571.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ571.getTranKey();
 					String iSubmitKey = sJcicZ571.getSubmitKey();
 					String iCustId = sJcicZ571.getCustId();
@@ -4239,6 +4564,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ571.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ571.setActualFilingDate(iDate);
+						sJcicZ571.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ571Service.update(sJcicZ571, titaVo);
 					} catch (Exception e) {
@@ -4276,19 +4605,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ571Log2, uJcicZ571log);
 					iDataLog.exec("L8435報送", iJcicZ571Log2.getUkey() + iJcicZ571Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-572
 	public void doZ572File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ572> rJcicZ572 = null;
+		List<JcicZ572> zJcicZ572 = new ArrayList<JcicZ572>();
 		rJcicZ572 = sJcicZ572Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ572 = rJcicZ572 == null ? null : rJcicZ572.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ572 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ572 sJcicZ572 : rJcicZ572) {
-				if (sJcicZ572.getOutJcicTxtDate() == 0) {
+			for (JcicZ572 sJcicZ572 : zJcicZ572) {
+				if (sJcicZ572.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ572.getTranKey();
 					String iSubmitKey = sJcicZ572.getSubmitKey();
 					String iCustId = sJcicZ572.getCustId();
@@ -4315,6 +4650,11 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ572.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ572.setActualFilingDate(iDate);
+						sJcicZ572.setActualFilingMark("Y");
+					}
+
 					try {
 						sJcicZ572Service.update(sJcicZ572, titaVo);
 					} catch (Exception e) {
@@ -4351,19 +4691,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ572Log2, uJcicZ572log);
 					iDataLog.exec("L8436報送", iJcicZ572Log2.getUkey() + iJcicZ572Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-573
 	public void doZ573File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ573> rJcicZ573 = null;
+		List<JcicZ573> zJcicZ573 = new ArrayList<JcicZ573>();
 		rJcicZ573 = sJcicZ573Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ573 = rJcicZ573 == null ? null : rJcicZ573.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ573 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ573 sJcicZ573 : rJcicZ573) {
-				if (sJcicZ573.getOutJcicTxtDate() == 0) {
+			for (JcicZ573 sJcicZ573 : zJcicZ573) {
+				if (sJcicZ573.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ573.getTranKey();
 					String iSubmitKey = sJcicZ573.getSubmitKey();
 					String iCustId = sJcicZ573.getCustId();
@@ -4386,6 +4732,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ573.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ573.setActualFilingDate(iDate);
+						sJcicZ573.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ573Service.update(sJcicZ573, titaVo);
 					} catch (Exception e) {
@@ -4421,19 +4771,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ573Log2, uJcicZ573log);
 					iDataLog.exec("L8437報送", iJcicZ573Log2.getUkey() + iJcicZ573Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-574
 	public void doZ574File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ574> rJcicZ574 = null;
+		List<JcicZ574> zJcicZ574 = new ArrayList<JcicZ574>();
 		rJcicZ574 = sJcicZ574Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ574 = rJcicZ574 == null ? null : rJcicZ574.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ574 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ574 sJcicZ574 : rJcicZ574) {
-				if (sJcicZ574.getOutJcicTxtDate() == 0) {
+			for (JcicZ574 sJcicZ574 : zJcicZ574) {
+				if (sJcicZ574.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ574.getTranKey();
 					String iSubmitKey = sJcicZ574.getSubmitKey();
 					String iCustId = sJcicZ574.getCustId();
@@ -4455,6 +4811,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ574.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ574.setActualFilingDate(iDate);
+						sJcicZ574.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ574Service.update(sJcicZ574, titaVo);
 					} catch (Exception e) {
@@ -4491,19 +4851,25 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ574Log2, uJcicZ574log);
 					iDataLog.exec("L8438報送", iJcicZ574Log2.getUkey() + iJcicZ574Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}
 	}
 
+//jcic-575
 	public void doZ575File(TitaVo titaVo) throws LogicException {
 		Slice<JcicZ575> rJcicZ575 = null;
+		List<JcicZ575> zJcicZ575 = new ArrayList<JcicZ575>();
 		rJcicZ575 = sJcicZ575Service.findAll(0, Integer.MAX_VALUE, titaVo);
+		zJcicZ575 = rJcicZ575 == null ? null : rJcicZ575.getContent();
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		if (rJcicZ575 == null) {
-			throw new LogicException(titaVo, "E0001", "");
+			throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 		} else {
-			for (JcicZ575 sJcicZ575 : rJcicZ575) {
-				if (sJcicZ575.getOutJcicTxtDate() == 0) {
+			for (JcicZ575 sJcicZ575 : zJcicZ575) {
+				if (sJcicZ575.getOutJcicTxtDate() == iJcicDate) {
 					String iTranKey = sJcicZ575.getTranKey();
 					String iSubmitKey = sJcicZ575.getSubmitKey();
 					String iCustId = sJcicZ575.getCustId();
@@ -4523,6 +4889,10 @@ public class L8403File extends MakeFile {
 
 					// 檔案產生後，回填JcicDate
 					sJcicZ575.setOutJcicTxtDate(iDate);
+					if (iSubmitType == 3) {
+						sJcicZ575.setActualFilingDate(iDate);
+						sJcicZ575.setActualFilingMark("Y");
+					}
 					try {
 						sJcicZ575Service.update(sJcicZ575, titaVo);
 					} catch (Exception e) {
@@ -4557,6 +4927,7 @@ public class L8403File extends MakeFile {
 					titaVo.putParam("CustNo", iCustNo);
 					iDataLog.setEnv(titaVo, iJcicZ575Log2, uJcicZ575log);
 					iDataLog.exec("L8439報送", iJcicZ575Log2.getUkey() + iJcicZ575Log2.getTxSeq());
+					iCount++;
 				}
 			}
 		}

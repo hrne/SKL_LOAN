@@ -330,6 +330,8 @@ T(H,#ClCode2,#L2r48Help1)
 #ClNo=A,7,I
 C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
 @V(2,0)
+IF(#ClCode1==1||#ClCode1==2,$,V(P,僅可輸入房地土地資料))
+
 
 ! 調RIM查擔保品主檔(ClMain)資料
 #RimL2r22=X,1,S
@@ -410,7 +412,8 @@ T(2,@RimCityCode,#City)
 RESET_RIM(#RimL6r49CityB,L6R49)
 S(L6R49,1,#RimFunCd,#RimCityCode)
 R(1,L6R49)
-T(2,@LoanOfficeHelp,:自行輸入;+#L6r49Result)
+C(4,#L6r49Result,T(2,@LoanOfficeHelp,:自行輸入),T(2,@LoanOfficeHelp,:自行輸入;+#L6r49Result))
+
 
 #CHECKRIML6r49=X,1,S
 C(4,#City,$,S)
@@ -447,8 +450,7 @@ T(2,@RimLandOfficeCode,#LandAdm)
 RESET_RIM(#RimL2r60B,L2R60)
 S(L2R60,1,#RimLandOfficeCode)
 R(1,L2R60)
-T(2,@RecWordHelp,:自行輸入;+#L2r60Help1)
-C(4,#L2r60Help1,T(3,@RecWordHelp,:自行輸入),$)
+C(4,#L2r60Help1,T(3,@RecWordHelp,:自行輸入),T(2,@RecWordHelp,:自行輸入;+#L2r60Help1))
 
 
 

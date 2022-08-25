@@ -19,6 +19,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ046;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ051;
 import com.st1.itx.db.domain.JcicZ051Id;
@@ -247,8 +248,40 @@ public class L8312 extends TradeBuffer {
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0512, uJcicZ0512);
 			iDataLog.exec("L8312刪除", uJcicZ0512.getSubmitKey()+uJcicZ0512.getCustId()+uJcicZ0512.getRcDate()+(uJcicZ0512.getDelayYM()-191100));
-		default:
 			break;
+			// 修改
+			case "7":
+				iKey = titaVo.getParam("Ukey");
+				iJcicZ051 = sJcicZ051Service.ukeyFirst(iKey, titaVo);
+				JcicZ051 uJcicZ0513 = new JcicZ051();
+				uJcicZ0513 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
+				if (uJcicZ0513 == null) {
+					throw new LogicException("E0007", "更生債權金額異動通知資料");
+				}
+				// 2022/7/6新增錯誤判斷
+				int JcicDate3 = iJcicZ051.getOutJcicTxtDate();
+				this.info("JcicDate    = " + JcicDate3);
+				if (JcicDate3 != 0) {
+					throw new LogicException("E0007", "無此修改資料");
+				}
+
+				JcicZ051 oldJcicZ0513 = (JcicZ051) iDataLog.clone(uJcicZ0513);
+				uJcicZ0513.setJcicZ051Id(iJcicZ051Id);
+				uJcicZ0513.setTranKey(iTranKey);
+				uJcicZ0513.setDelayCode(iDelayCode);
+				uJcicZ0513.setDelayDesc(iDelayDesc);
+				uJcicZ0513.setUkey(iKey);
+
+				try {
+					sJcicZ051Service.update(uJcicZ0513, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "更生債權金額異動通知資料");
+				}
+
+				iDataLog.setEnv(titaVo, oldJcicZ0513, uJcicZ0513);
+				iDataLog.exec("L8312修改", uJcicZ0513.getSubmitKey()+uJcicZ0513.getCustId()+uJcicZ0513.getRcDate()+(uJcicZ0513.getDelayYM()-191100));
+			default:
+				break;
 		}
 
 		this.addList(this.totaVo);

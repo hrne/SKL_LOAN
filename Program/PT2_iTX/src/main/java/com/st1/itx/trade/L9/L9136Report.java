@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9136ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component("L9136Report")
@@ -90,13 +91,15 @@ public class L9136Report extends MakeReport {
 	}
 
 	/**
-	 * 執行報表產製
 	 * 
 	 * @param titaVo
-	 * @param L9136Result 資料串
-	 * @param iAcDate     會計日
+	 * @param l9136Result
+	 * @param l9136Result2
+	 * @param isAcDate
+	 * @param ieAcDate
+	 * @return
+	 * @throws LogicException
 	 */
-
 	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9136Result,
 			List<Map<String, String>> l9136Result2, int isAcDate, int ieAcDate) throws LogicException {
 
@@ -108,7 +111,12 @@ public class L9136Report extends MakeReport {
 		this.isAcDate = String.valueOf(isAcDate);
 		this.ieAcDate = String.valueOf(ieAcDate);
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.build();
+
+		this.open(titaVo, reportVo);
 
 		// 記錄筆數
 		int count = 0;
@@ -119,27 +127,30 @@ public class L9136Report extends MakeReport {
 
 				count++;
 
-				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[", "").replaceAll("\\]", "")
-						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
+//				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[", "").replaceAll("\\]", "")
+//						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
+				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
+						.replaceAll("\"\\,\"", "#").split("#");
 
-				String[] tmpOldContent = r.get("Old").replaceAll("\\[", "").replaceAll("\\]", "")
-						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
+				String[] tmpOldContent = r.get("Old").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
+						.replaceAll("\"\\,\"", "#").split("#");
 
-				String[] tmpNewContent = r.get("New").replaceAll("\\[", "").replaceAll("\\]", "")
-						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
+				String[] tmpNewContent = r.get("New").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
+						.replaceAll("\"\\,\"", "#").split("#");
 
 				// 要排除的字段
-				String[] word = { "最後更新日期時間", "最後更新人員" };
+				String[] word = { "最後更新日期時間", "最後更新人員", "建檔日期時間" };
 
 				List<String> tmpWord = new ArrayList<String>(Arrays.asList(word));
 				List<String> tmp1 = new ArrayList<String>(Arrays.asList(tmpUpdateItem));
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
 
-//				this.info("======"+tmp1.size());
-//				this.info("tmp1======"+tmp1.toString());
-//				this.info("tmp2======"+tmp2.toString());
-//				this.info("tmp3======"+tmp3.toString());
+
+				//避免有空白
+				if (tmp1.size() == 0 || tmp2.size() == 0 || tmp3.size() == 0) {
+					break;
+				}
 
 				for (int i = 0; i < tmp1.size(); i++) {
 					for (int j = 0; j < tmpWord.size(); j++) {
@@ -153,6 +164,8 @@ public class L9136Report extends MakeReport {
 						}
 					}
 				}
+
+			
 
 				for (int i = 0; i < tmp1.size(); i++) {
 
@@ -226,16 +239,18 @@ public class L9136Report extends MakeReport {
 
 		if (dataSource == 1) {
 
-			List<Map<String, String>> l9136findSupNo = null;
-
-			try {
-				l9136findSupNo = l9136ServiceImpl.findSupNo(titaVo, r.get("TxSeq").toString());
-			} catch (Exception e) {
-				this.info("L9136ServiceImpl.findSupNo error = " + e.toString());
-			}
-
-			supNoName = l9136findSupNo.get(0).get("SupNoName");
-			txNo = String.valueOf(Integer.valueOf(l9136findSupNo.get(0).get("TxSeq")));
+//			List<Map<String, String>> l9136findSupNo = null;
+//
+//			try {
+//				l9136findSupNo = l9136ServiceImpl.findSupNo(titaVo, r.get("TxSeq").toString());
+//			} catch (Exception e) {
+//				this.info("L9136ServiceImpl.findSupNo error = " + e.toString());
+//			}
+//
+//			supNoName = l9136findSupNo.get(0).get("SupNoName");
+//			txNo = String.valueOf(Integer.valueOf(l9136findSupNo.get(0).get("TxSeq")));
+			supNoName = r.get("SupNoName");
+			txNo = String.valueOf(Integer.valueOf(r.get("TxSeq").substring(10, 18)));
 
 		} else {
 
@@ -281,7 +296,7 @@ public class L9136Report extends MakeReport {
 
 		// 更改後內容
 		String afContent = tmpNewContent.trim();
-		
+
 		this.print(0, 149, afContent.length() == 0 ? " " : fillUpWord(afContent, 24, " ", "R"));
 
 		// 經辦
@@ -299,17 +314,16 @@ public class L9136Report extends MakeReport {
 	 * @param text 文字
 	 * @param all  上限位數
 	 * @param word 要補滿的符號或文字(單字佳)
-	 * @param pos  向左補齊(L)/向右補齊(R) 
-	 * 如果文字字數大於上限位數 自動截斷
+	 * @param pos  向左補齊(L)/向右補齊(R) 如果文字字數大於上限位數 自動截斷
 	 *
 	 */
 
 	private String fillUpWord(String text, int allCount, String word, String pos) {
 
 		int[] num = new int[text.length()];
-		
+
 		String tmpText = "";
-		
+
 		for (int i = 0; i < num.length; i++) {
 
 			tmpText = text.substring(i, i + 1);
@@ -322,13 +336,13 @@ public class L9136Report extends MakeReport {
 
 		}
 
-		//計算用
+		// 計算用
 		int tmpAllCount = 0;
-		//截斷位置用
+		// 截斷位置用
 		int tmpI = 0;
-		//最終文字數
+		// 最終文字數
 		int tmpHaveCount = 0;
-		
+
 		for (int i = 0; i < num.length; i++) {
 			tmpAllCount = tmpAllCount + num[i];
 			if (allCount >= tmpAllCount) {
@@ -337,14 +351,13 @@ public class L9136Report extends MakeReport {
 			}
 		}
 
-		
-		String str =  text.substring(0, tmpI + 1);
+		String str = text.substring(0, tmpI + 1);
 		String lstr = "";
 
 		// 總字數 減去 目前有的字數 = 空的字數
 		int emptyCount = 0;
 		emptyCount = allCount - tmpHaveCount;
-		
+
 		// 重新組合
 		for (int i = 0; i < emptyCount; i++) {
 			if (pos == "L") {
@@ -359,6 +372,5 @@ public class L9136Report extends MakeReport {
 
 		return str;
 	}
-
 
 }

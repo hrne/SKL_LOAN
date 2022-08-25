@@ -1,0 +1,156 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L5810)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,40];">
+[
+["[L5810]                                 個別產生國稅局申報檢核檔"],
+["#FdMonth+年月",#StartMonth,"~",#EndMonth],
+["#FdCustNo+戶號",#CustNo],
+["#FdAcct+科目",#Acct,#AcctX],
+
+]
+!---------- AP Button AREA ----------
+#FdMonth=X,2,L
+T(3,*)
+#FdCustNo=X,2,L
+T(3,*)
+#FdAcct=X,2,L
+T(3, )
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+! 選單代碼
+#CdCodeAcctCode=x,30,S
+T(3,CdCode.L5810AcctCode)
+
+! 選單內容
+#CdCodeAcctCodeH=x,100,S
+
+! 根據選單代碼取得選單內容
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CdCodeAcctCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CdCodeAcctCodeH,#HelpDesc1)
+
+!本營業日是否為月底營業日
+#IsMonthEnd=A,1,S
+IF(D(6,1,#SYSDATE,#MFBSDY)==0,E(0,1),E(0,0))
+
+#NowMonth=A,5,S
+T(1,#SYSDATE,2,5)
+
+#DefaultDate=A,8,S
+IF(#IsMonthEnd==1,E(0,#SYSDATE),D(7,3,#MFBSDY,1,0))
+
+#DefaultStartMonth=A,5,S
+T(1,#SYSDATE,2,3)
+E(0,#DefaultStartMonth*100)
+E(0,#DefaultStartMonth+1)
+E(0,@StartMonth,#DefaultStartMonth)
+
+#DefaultEndMonth=A,5,S
+T(1,#DefaultDate,2,5)
+E(0,@EndMonth,#DefaultEndMonth)
+
+#StartMonth=A,5,I
+@V(2,0)
+A(YM,0,#StartMonth)
+V(5,00101,#NowMonth)
+
+#EndMonth=A,5,I
+@V(2,0)
+A(YM,0,#EndMonth)
+V(5,#StartMonth,#NowMonth)
+
+! 戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+@C(3,#CustNo,0,V(P,請輸入戶號),$)
+
+#Acct=X,3,I
+HELP(#CdCodeAcctCodeH)
+@T(3,@AcctX,)
+C(4,#Acct,$,V(H,#CdCodeAcctCodeH))
+
+#AcctX=X,20,L
+C(4,#Acct,S,T(H,#Acct,#CdCodeAcctCodeH))
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L5810 ----------
+<sub type="FORM" name="L5810">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L5810,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L5810] 產生國稅局申報檢核檔)
+
+#ExcelSnoM=X,8,S
+E(2,@SnoF,#ExcelSnoM)
+#SnoF=A,8,S
+
+#ExcelPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
+
+</sub>
+
+!------ 上行電文 ------
+<sub type="TIM">
+#StartMonth
+#EndMonth
+#CustNo
+#Acct
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5810
+#ExcelSnoM
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+!<include src="PRT.icf::UPD01.sel"/>
+!#ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,個別產生國稅局申報檢核檔
+</sub>

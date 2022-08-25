@@ -36,7 +36,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-
 @Service("L8325")
 @Scope("prototype")
 /**
@@ -76,12 +75,12 @@ public class L8325 extends TradeBuffer {
 		String iCustComTelNo = titaVo.getParam("CustComTelNo").trim();
 		String iCustMobilNo = titaVo.getParam("CustMobilNo").trim();
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ444, JcicZ440, JcicZ446
 		JcicZ444 iJcicZ444 = new JcicZ444();
 		JcicZ444Id iJcicZ444Id = new JcicZ444Id();
@@ -126,9 +125,11 @@ public class L8325 extends TradeBuffer {
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
 				if ("A".equals(iTranKey) || "X".equals(iTranKey)) {
-					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+					throw new LogicException(titaVo, "E0005",
+							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
 				} else {
-					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+					throw new LogicException(titaVo, "E0007",
+							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
 				}
 			} // 4 end
 		}
@@ -180,7 +181,8 @@ public class L8325 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ444, uJcicZ444);
-			iDataLog.exec("L8325異動",uJcicZ444.getSubmitKey()+uJcicZ444.getCustId()+uJcicZ444.getApplyDate()+uJcicZ444.getCourtCode());
+			iDataLog.exec("L8325異動", uJcicZ444.getSubmitKey() + uJcicZ444.getCustId() + uJcicZ444.getApplyDate()
+					+ uJcicZ444.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -194,7 +196,7 @@ public class L8325 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ444 oldJcicZ4442 = (JcicZ444) iDataLog.clone(uJcicZ4442);
 			uJcicZ4442.setTranKey(iTranKey);
 			uJcicZ4442.setCustRegAddr(iCustRegAddr);
@@ -203,10 +205,10 @@ public class L8325 extends TradeBuffer {
 			uJcicZ4442.setCustComTelNo(iCustComTelNo);
 			uJcicZ4442.setCustMobilNo(iCustMobilNo);
 			uJcicZ4442.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ444Log> dJcicLogZ444 = null;
 			dJcicLogZ444 = sJcicZ444LogService.ukeyEq(iJcicZ444.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ444 == null|| ("A".equals(iTranKey) && dJcicLogZ444 == null )) {
+			if (dJcicLogZ444 == null || ("A".equals(iTranKey) && dJcicLogZ444 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ444Service.delete(iJcicZ444, titaVo);
@@ -229,7 +231,44 @@ public class L8325 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4442, uJcicZ4442);
-			iDataLog.exec("L8325刪除",uJcicZ4442.getSubmitKey()+uJcicZ4442.getCustId()+uJcicZ4442.getApplyDate()+uJcicZ4442.getCourtCode());
+			iDataLog.exec("L8325刪除", uJcicZ4442.getSubmitKey() + uJcicZ4442.getCustId() + uJcicZ4442.getApplyDate()
+					+ uJcicZ4442.getCourtCode());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ444 = sJcicZ444Service.ukeyFirst(iKey, titaVo);
+			JcicZ444 uJcicZ4443 = new JcicZ444();
+			uJcicZ4443 = sJcicZ444Service.holdById(iJcicZ444.getJcicZ444Id(), titaVo);
+			if (uJcicZ4443 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ444.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ444 oldJcicZ4443 = (JcicZ444) iDataLog.clone(uJcicZ4443);
+			uJcicZ4443.setJcicZ444Id(iJcicZ444Id);
+			uJcicZ4443.setTranKey(iTranKey);
+			uJcicZ4443.setCustRegAddr(iCustRegAddr);
+			uJcicZ4443.setCustComAddr(iCustComAddr);
+			uJcicZ4443.setCustRegTelNo(iCustRegTelNo);
+			uJcicZ4443.setCustComTelNo(iCustComTelNo);
+			uJcicZ4443.setCustMobilNo(iCustMobilNo);
+			uJcicZ4443.setUkey(iKey);
+
+			try {
+				sJcicZ444Service.update(uJcicZ4443, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ4443, uJcicZ4443);
+			iDataLog.exec("L8325修改", uJcicZ4443.getSubmitKey() + uJcicZ4443.getCustId() + uJcicZ4443.getApplyDate()
+					+ uJcicZ4443.getCourtCode());
 		default:
 			break;
 		}

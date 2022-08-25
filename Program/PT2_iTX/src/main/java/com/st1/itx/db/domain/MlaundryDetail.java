@@ -56,8 +56,8 @@ public class MlaundryDetail implements Serializable {
   private String rational;
 
   // 經辦合理性說明
-  /* 2022/8/24長度放大100 */
-  @Column(name = "`EmpNoDesc`", length = 100)
+  /* 2022/8/25長度放大150 */
+  @Column(name = "`EmpNoDesc`", length = 150)
   private String empNoDesc;
 
   // 主管覆核
@@ -225,7 +225,7 @@ N:否
 
 /**
 	* 經辦合理性說明<br>
-	* 2022/8/24長度放大100
+	* 2022/8/25長度放大150
 	* @return String
 	*/
   public String getEmpNoDesc() {
@@ -234,7 +234,7 @@ N:否
 
 /**
 	* 經辦合理性說明<br>
-	* 2022/8/24長度放大100
+	* 2022/8/25長度放大150
   *
   * @param empNoDesc 經辦合理性說明
 	*/

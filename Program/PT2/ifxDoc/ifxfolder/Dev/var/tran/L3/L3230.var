@@ -646,6 +646,9 @@ E(0,@RPAMTZ,#TimTempAmt)
 IF(#RPFG>0,$,s)
 E(0,@RP_FACMNO,#FacmNo)
 
+#TempCustNo2=X,1,S
+IF(#RPFG>0,$,s)
+E(0,@RP_CUSTNO,#CustNo)
 
 ! ! 0004 
 ! #RQSP=X,4,S

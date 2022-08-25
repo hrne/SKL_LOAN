@@ -21,6 +21,7 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicZ046;
 import com.st1.itx.db.domain.JcicZ047;
 import com.st1.itx.db.domain.JcicZ047Id;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ050;
 import com.st1.itx.db.domain.JcicZ050Id;
@@ -39,7 +40,7 @@ import com.st1.itx.util.data.DataLog;
 
 @Service("L8311")
 @Scope("prototype")
-/** 
+/**
  * @author Mata
  * @version 1.0.0
  */
@@ -74,15 +75,15 @@ public class L8311 extends TradeBuffer {
 		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
 		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt").trim());
 		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt").trim());
-		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM").trim())+191100;
+		int iSecondRepayYM = Integer.valueOf(titaVo.getParam("SecondRepayYM").trim()) + 191100;
 		String iStatus = titaVo.getParam("Status").trim();
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		int sPayAmt = iPayAmt;// 該IDN所有已報送本檔案資料之第8欄繳款金額之合計
 
 		// JcicZ050, JcicZ046, JcicZ047
@@ -104,7 +105,8 @@ public class L8311 extends TradeBuffer {
 			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***不能為空
 			// 2.2 start 完整key值已報送結案則予以剔退
 			if ("A".equals(iTranKey)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
 					int sTranKey = 0;
 					for (JcicZ046 xJcicZ046 : sJcicZ046) {
@@ -139,7 +141,8 @@ public class L8311 extends TradeBuffer {
 				Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ050 != null) {
 					for (JcicZ050 xJcicZ050 : sJcicZ050) {
-						if (!"D".equals(xJcicZ050.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
+						if (!"D".equals(xJcicZ050.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
 							sPayAmt += xJcicZ050.getPayAmt();
 						}
 					}
@@ -205,7 +208,8 @@ public class L8311 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ050, uJcicZ050);
-			iDataLog.exec("L8311異動", uJcicZ050.getSubmitKey()+uJcicZ050.getCustId()+uJcicZ050.getRcDate()+uJcicZ050.getPayDate());
+			iDataLog.exec("L8311異動",
+					uJcicZ050.getSubmitKey() + uJcicZ050.getCustId() + uJcicZ050.getRcDate() + uJcicZ050.getPayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -219,7 +223,7 @@ public class L8311 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ050 oldJcicZ0502 = (JcicZ050) iDataLog.clone(uJcicZ0502);
 			uJcicZ0502.setTranKey(iTranKey);
 			uJcicZ0502.setPayAmt(iPayAmt);
@@ -227,11 +231,11 @@ public class L8311 extends TradeBuffer {
 			uJcicZ0502.setSumRepayShouldAmt(iSumRepayShouldAmt);
 			uJcicZ0502.setSecondRepayYM(iSecondRepayYM);
 			uJcicZ0502.setStatus(iStatus);
-			uJcicZ0502.setOutJcicTxtDate(0);			
-			
+			uJcicZ0502.setOutJcicTxtDate(0);
+
 			Slice<JcicZ050Log> dJcicLogZ050 = null;
 			dJcicLogZ050 = sJcicZ050LogService.ukeyEq(iJcicZ050.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ050 == null|| ("A".equals(iTranKey) && dJcicLogZ050 == null )) {
+			if (dJcicLogZ050 == null || ("A".equals(iTranKey) && dJcicLogZ050 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ050Service.delete(iJcicZ050, titaVo);
@@ -255,7 +259,44 @@ public class L8311 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0502, uJcicZ0502);
-			iDataLog.exec("L8311刪除", uJcicZ0502.getSubmitKey()+uJcicZ0502.getCustId()+uJcicZ0502.getRcDate()+uJcicZ0502.getPayDate());
+			iDataLog.exec("L8311刪除", uJcicZ0502.getSubmitKey() + uJcicZ0502.getCustId() + uJcicZ0502.getRcDate()
+					+ uJcicZ0502.getPayDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ050 = sJcicZ050Service.ukeyFirst(iKey, titaVo);
+			JcicZ050 uJcicZ0503 = new JcicZ050();
+			uJcicZ0503 = sJcicZ050Service.holdById(iJcicZ050.getJcicZ050Id(), titaVo);
+			if (uJcicZ0503 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ050.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ050 oldJcicZ0503 = (JcicZ050) iDataLog.clone(uJcicZ0503);
+			uJcicZ0503.setJcicZ050Id(iJcicZ050Id);
+			uJcicZ0503.setTranKey(iTranKey);
+			uJcicZ0503.setPayAmt(iPayAmt);
+			uJcicZ0503.setSumRepayActualAmt(iSumRepayActualAmt);
+			uJcicZ0503.setSumRepayShouldAmt(iSumRepayShouldAmt);
+			uJcicZ0503.setStatus(iStatus);
+			uJcicZ0503.setSecondRepayYM(iSecondRepayYM);
+			uJcicZ0503.setUkey(iKey);
+
+			try {
+				sJcicZ050Service.update(uJcicZ0503, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0503, uJcicZ0503);
+			iDataLog.exec("L8311修改", uJcicZ0503.getSubmitKey() + uJcicZ0503.getCustId() + uJcicZ0503.getRcDate()
+					+ uJcicZ0503.getPayDate());
 		default:
 			break;
 		}

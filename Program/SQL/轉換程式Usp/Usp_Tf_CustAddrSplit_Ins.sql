@@ -44,13 +44,13 @@ BEGIN
              WHEN NVL(S2."CityCode",' ') <> ' '
              THEN 'Y'
            ELSE 'N' END          AS "SplitFg"      -- 切割是否成功 VARCHAR2 1
-          ,''                    AS "Section"      -- 段 VARCHAR2 5 
-          ,''                    AS "Alley"        -- 巷 VARCHAR2 5 
-          ,''                    AS "Lane"         -- 弄 VARCHAR2 5 
-          ,''                    AS "Num"          -- 號 VARCHAR2 5 
-          ,''                    AS "NumDash"      -- 號之 VARCHAR2 5 
-          ,''                    AS "Floor"        -- 樓 VARCHAR2 5 
-          ,''                    AS "FloorDash"    -- 樓之 VARCHAR2 5 
+          ,u''                   AS "Section"      -- 段 NVARCHAR2 5 
+          ,u''                   AS "Alley"        -- 巷 NVARCHAR2 5 
+          ,u''                   AS "Lane"         -- 弄 NVARCHAR2 5 
+          ,u''                   AS "Num"          -- 號 NVARCHAR2 5 
+          ,u''                   AS "NumDash"      -- 號之 NVARCHAR2 5 
+          ,u''                   AS "Floor"        -- 樓 NVARCHAR2 5 
+          ,u''                   AS "FloorDash"    -- 樓之 NVARCHAR2 5 
     FROM "CustMain" S1
     LEFT JOIN "CdCity" S2 ON S2."CityItem" = SUBSTR(S1."RegRoad",0,3)
     LEFT JOIN "CdArea" S3 ON S3."CityCode" = S2."CityCode"
@@ -66,26 +66,20 @@ BEGIN
     SET "SplitRoad" = CASE
                         WHEN INSTR("SplitRoad",'(路)') > 0
                         THEN "Fn_Split"("SplitRoad",'(路)',1) || '路'
-                        -- THEN SUBSTR("SplitRoad",0,INSTR("SplitRoad",'(路)')+2)
                         WHEN INSTR("SplitRoad",'路') > 0
                         THEN "Fn_Split"("SplitRoad",'路',1) || '路'
-                        -- THEN SUBSTR("SplitRoad",0,INSTR("SplitRoad",'路'))
                         WHEN INSTR("SplitRoad",'街') > 0
                         THEN "Fn_Split"("SplitRoad",'街',1) || '街'
-                        -- THEN SUBSTR("SplitRoad",0,INSTR("SplitRoad",'街'))
                         WHEN INSTR("SplitRoad",'大道') > 0
                         THEN "Fn_Split"("SplitRoad",'大道',1) || '大道'
                       ELSE "SplitRoad" END 
        ,"SplitOther" = CASE
                          WHEN INSTR("SplitRoad",'(路)') > 0
                          THEN "Fn_Split"("SplitRoad",'(路)',2)
-                         -- THEN SUBSTR("SplitRoad",INSTR("SplitRoad",'(路)')+3)
                          WHEN INSTR("SplitRoad",'路') > 0
                          THEN "Fn_Split"("SplitRoad",'路',2)
-                         -- THEN SUBSTR("SplitRoad",INSTR("SplitRoad",'路')+1)
                          WHEN INSTR("SplitRoad",'街') > 0
                          THEN "Fn_Split"("SplitRoad",'街',2)
-                         -- THEN SUBSTR("SplitRoad",INSTR("SplitRoad",'街')+1)
                          WHEN INSTR("SplitRoad",'大道') > 0
                          THEN "Fn_Split"("SplitRoad",'大道',2)
                        ELSE u'' END
@@ -105,15 +99,13 @@ BEGIN
     UPDATE "RegAddrSplit"
     SET "Section" = CASE
                       WHEN INSTR("SplitOther",'段') > 0
-                           AND LENGTHB("Fn_Split"("SplitOther",'段',1)) <= 5
+                           AND LENGTH("Fn_Split"("SplitOther",'段',1)) <= 5
                       THEN "Fn_Split"("SplitOther",'段',1)
-                      -- THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'段')-1)
                     ELSE u'' END 
        ,"SplitOther" = CASE
                          WHEN INSTR("SplitOther",'段') > 0
-                              AND LENGTHB("Fn_Split"("SplitOther",'段',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'段',1)) <= 5
                          THEN "Fn_Split"("SplitOther",'段',2)
-                         -- THEN SUBSTR("SplitOther",INSTR("SplitOther",'段')+1)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
@@ -121,15 +113,13 @@ BEGIN
     UPDATE "RegAddrSplit"
     SET "Alley" = CASE
                     WHEN INSTR("SplitOther",'巷') > 0 
-                         AND LENGTHB("Fn_Split"("SplitOther",'巷',1)) <= 5
+                         AND LENGTH("Fn_Split"("SplitOther",'巷',1)) <= 5
                     THEN "Fn_Split"("SplitOther",'巷',1)
-                    -- THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'巷')-1)
                   ELSE u'' END
        ,"SplitOther" = CASE
                          WHEN INSTR("SplitOther",'巷') > 0
-                              AND LENGTHB("Fn_Split"("SplitOther",'巷',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'巷',1)) <= 5
                          THEN "Fn_Split"("SplitOther",'巷',2)
-                         -- THEN SUBSTR("SplitOther",INSTR("SplitOther",'巷')+1)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
@@ -137,15 +127,13 @@ BEGIN
     UPDATE "RegAddrSplit"
     SET "Lane" = CASE
                    WHEN INSTR("SplitOther",'弄') > 0
-                        AND LENGTHB("Fn_Split"("SplitOther",'弄',1)) <= 5
+                        AND LENGTH("Fn_Split"("SplitOther",'弄',1)) <= 5
                    THEN "Fn_Split"("SplitOther",'弄',1)
-                   -- THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'弄')-1)
                  ELSE u'' END 
        ,"SplitOther" = CASE
                          WHEN INSTR("SplitOther",'弄') > 0
-                              AND LENGTHB("Fn_Split"("SplitOther",'弄',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'弄',1)) <= 5
                          THEN "Fn_Split"("SplitOther",'弄',2)
-                         -- THEN SUBSTR("SplitOther",INSTR("SplitOther",'弄')+1)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
@@ -153,128 +141,155 @@ BEGIN
     UPDATE "RegAddrSplit"
     SET "Num" = CASE
                   WHEN INSTR("SplitOther",'號之') > 0
-                       AND LENGTHB("Fn_Split"("SplitOther",'號之',1)) <= 5
-                       AND LENGTHB("Fn_Split"("SplitOther",'號之',2)) <= 5
-                       AND INSTR("SplitOther",'樓') < 0
+                       AND LENGTH("Fn_Split"("SplitOther",'號之',1)) <= 5
+                       AND LENGTH("Fn_Split"("SplitOther",'號之',2)) <= 5
+                       AND INSTR("SplitOther",'樓') <= 0
                   THEN "Fn_Split"("SplitOther",'號之',1)
-                  -- THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'號之')-1)
                   WHEN INSTR("SplitOther",'號之') > 0
                   THEN u''
                   WHEN INSTR("SplitOther",'號') > 0 
                        AND INSTR("SplitOther",'之') > 0 
                        AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
-                       AND LENGTHB("Fn_Split"("SplitOther",'之',1)) <= 5
-                       AND LENGTHB("Fn_Split"("SplitOther",'之',2)) <= 5
+                       AND LENGTH("Fn_Split"("SplitOther",'之',1)) <= 5
+                       AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)) <= 5
                   THEN "Fn_Split"("SplitOther",'之',1)
-                  -- THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'之')-1)
                   WHEN INSTR("SplitOther",'號') > 0 
                        AND INSTR("SplitOther",'之') > 0 
                        AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
                   THEN u''
                   WHEN INSTR("SplitOther",'號') > 0 
-                       AND LENGTHB("Fn_Split"("SplitOther",'號',1)) <= 5
+                       AND INSTR("SplitOther",'-') > 0 
+                       AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                       AND LENGTH("Fn_Split"("SplitOther",'-',1)) <= 5
+                       AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)) <= 5
+                  THEN "Fn_Split"("SplitOther",'-',1)
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND INSTR("SplitOther",'-') > 0 
+                       AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                  THEN u''
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND LENGTH("Fn_Split"("SplitOther",'號',1)) <= 5
                   THEN "Fn_Split"("SplitOther",'號',1)
-                  -- THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'號')-1)
                   WHEN INSTR("SplitOther",'號') > 0 
                   THEN u''
                 ELSE u'' END
        ,"NumDash" = CASE
                       WHEN INSTR("SplitOther",'號之') > 0
-                           AND LENGTHB("Fn_Split"("SplitOther",'號之',1)) <= 5
-                           AND LENGTHB("Fn_Split"("SplitOther",'號之',2)) <= 5
-                           AND INSTR("SplitOther",'樓') < 0
+                           AND LENGTH("Fn_Split"("SplitOther",'號之',1)) <= 5
+                           AND LENGTH("Fn_Split"("SplitOther",'號之',2)) <= 5
+                           AND INSTR("SplitOther",'樓') <= 0
                       THEN "Fn_Split"("SplitOther",'號之',2)
-                      -- THEN SUBSTR("SplitOther",INSTR("SplitOther",'號之')+2)
                       WHEN INSTR("SplitOther",'號之') > 0 
+                      THEN u''
+                      WHEN INSTR("SplitOther",'號-') > 0
+                           AND LENGTH("Fn_Split"("SplitOther",'號-',1)) <= 5
+                           AND LENGTH("Fn_Split"("SplitOther",'號-',2)) <= 5
+                           AND INSTR("SplitOther",'樓') <= 0
+                      THEN "Fn_Split"("SplitOther",'號-',2)
+                      WHEN INSTR("SplitOther",'號-') > 0 
                       THEN u''
                       WHEN INSTR("SplitOther",'號') > 0 
                            AND INSTR("SplitOther",'之') > 0 
                            AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
-                           AND LENGTHB("Fn_Split"("SplitOther",'之',1)) <= 5
-                           AND LENGTHB("Fn_Split"("SplitOther",'之',2)) <= 5
-                      THEN "Fn_Split"("SplitOther",'之',2)
-                      -- THEN SUBSTR("SplitOther",INSTR("SplitOther",'之')+1,INSTR("SplitOther",'號')-INSTR("SplitOther",'之')-1)
+                           AND LENGTH("Fn_Split"("SplitOther",'之',1)) <= 5
+                           AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)) <= 5
+                      THEN "Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)
+                      WHEN INSTR("SplitOther",'號') > 0 
+                           AND INSTR("SplitOther",'-') > 0 
+                           AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                           AND LENGTH("Fn_Split"("SplitOther",'-',1)) <= 5
+                           AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)) <= 5
+                      THEN "Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)
                     ELSE u'' END
-       ,"SplitOther" = CASE WHEN INSTR("SplitOther",'號之') > 0
-                                 AND LENGTHB("Fn_Split"("SplitOther",'號之',1)) <= 5
-                                 AND LENGTHB("Fn_Split"("SplitOther",'號之',2)) <= 5
-                                 AND INSTR("SplitOther",'樓') < 0
-                            THEN u''
-                            WHEN INSTR("SplitOther",'號之') > 0 
-                            THEN "SplitOther"
-                            WHEN INSTR("SplitOther",'號') > 0 
-                                 AND INSTR("SplitOther",'之') > 0
-                                 AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
-                                 AND LENGTHB("Fn_Split"("SplitOther",'之',1)) <= 5
-                                 AND LENGTHB("Fn_Split"("SplitOther",'之',2)) <= 5
-                            THEN "Fn_Split"("SplitOther",'號',2)
-                            -- THEN SUBSTR("SplitOther",INSTR("SplitOther",'號')+1)
-                            WHEN INSTR("SplitOther",'號') > 0 
-                                 AND LENGTHB("Fn_Split"("SplitOther",'號',1)) <= 5
-                            THEN "Fn_Split"("SplitOther",'號',2)
+       ,"SplitOther" = CASE 
+                         WHEN INSTR("SplitOther",'號之') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'號之',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'號之',2)) <= 5
+                              AND INSTR("SplitOther",'樓') <= 0
+                         THEN u''
+                         WHEN INSTR("SplitOther",'號之') > 0 
+                         THEN "SplitOther"
+                         WHEN INSTR("SplitOther",'號-') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'號-',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'號-',2)) <= 5
+                              AND INSTR("SplitOther",'樓') <= 0
+                         THEN u''
+                         WHEN INSTR("SplitOther",'號-') > 0 
+                         THEN "SplitOther"
+                         WHEN INSTR("SplitOther",'號') > 0 
+                              AND INSTR("SplitOther",'之') > 0
+                              AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
+                              AND LENGTH("Fn_Split"("SplitOther",'之',1)) <= 5
+                              AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'號',2)
+                         WHEN INSTR("SplitOther",'號') > 0 
+                              AND INSTR("SplitOther",'-') > 0
+                              AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                              AND LENGTH("Fn_Split"("SplitOther",'-',1)) <= 5
+                              AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'號',2)
+                         WHEN INSTR("SplitOther",'號') > 0 
+                              AND LENGTH("Fn_Split"("SplitOther",'號',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'號',2)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
-
-    -- 切割'號'、'號之'，處理'-'
-    UPDATE "RegAddrSplit"
-    SET "Num" = CASE
-                  WHEN LENGTHB("Fn_Split"("Num",'-',1)) <= 5
-                       AND LENGTHB("Fn_Split"("Num",'-',2)) <= 5
-                  THEN "Fn_Split"("Num",'-',1)
-                  -- THEN SUBSTR("Num",0,INSTR("Num",'-')-1)
-                ELSE "Num" END 
-       ,"NumDash" = CASE
-                      WHEN LENGTHB("Fn_Split"("Num",'-',1)) <= 5
-                           AND LENGTHB("Fn_Split"("Num",'-',2)) <= 5
-                      THEN "Fn_Split"("Num",'-',2)
-                      -- THEN SUBSTR("Num",INSTR("Num",'-')+1)
-                    ELSE "NumDash" END
-    WHERE "SplitFg" = 'Y'
-      AND INSTR("Num",'-') > 0 ;
 
     -- 切割'樓'、'樓之'
     UPDATE "RegAddrSplit"
     SET "Floor" = CASE
                     WHEN INSTR("SplitOther",'樓') > 0
-                         AND LENGTHB("Fn_Split"("SplitOther",'樓',1)) <= 5
+                         AND LENGTH("Fn_Split"("SplitOther",'樓',1)) <= 5
                     THEN "Fn_Split"("SplitOther",'樓',1)
                     WHEN INSTR("SplitOther",'F') > 0
-                         AND LENGTHB("Fn_Split"("SplitOther",'F',1)) <= 5
+                         AND LENGTH("Fn_Split"("SplitOther",'F',1)) <= 5
                     THEN "Fn_Split"("SplitOther",'F',1)
                   ELSE u'' END
        ,"FloorDash" = CASE
                         WHEN INSTR("SplitOther",'樓之') > 0 
-                             AND LENGTHB("Fn_Split"("SplitOther",'樓之',2)) <= 5
+                             AND LENGTH("Fn_Split"("SplitOther",'樓之',2)) <= 5
                         THEN "Fn_Split"("SplitOther",'樓之',2)
                         WHEN INSTR("SplitOther",'樓之') > 0 
                         THEN u''
+                        WHEN INSTR("SplitOther",'樓-') > 0 
+                             AND LENGTH("Fn_Split"("SplitOther",'樓-',2)) <= 5
+                        THEN "Fn_Split"("SplitOther",'樓-',2)
+                        WHEN INSTR("SplitOther",'樓-') > 0 
+                        THEN u''
+                        WHEN INSTR("SplitOther",'F之') > 0 
+                             AND LENGTH("Fn_Split"("SplitOther",'F之',2)) <= 5
+                        THEN "Fn_Split"("SplitOther",'F之',2)
+                        WHEN INSTR("SplitOther",'F之') > 0 
+                        THEN u''
                         WHEN INSTR("SplitOther",'F-') > 0 
-                             AND LENGTHB("Fn_Split"("SplitOther",'F-',2)) <= 5
+                             AND LENGTH("Fn_Split"("SplitOther",'F-',2)) <= 5
                         THEN "Fn_Split"("SplitOther",'F-',2)
                         WHEN INSTR("SplitOther",'F-') > 0 
-                        THEN u''
-                        WHEN INSTR("SplitOther",'F') > 0 
-                             AND LENGTHB("Fn_Split"("SplitOther",'F',2)) <= 5
-                        THEN "Fn_Split"("SplitOther",'F',2)
-                        WHEN INSTR("SplitOther",'F') > 0 
                         THEN u''
                       ELSE u'' END
        ,"SplitOther" = CASE
                          WHEN INSTR("SplitOther",'樓之') > 0 
-                              AND LENGTHB("Fn_Split"("SplitOther",'樓之',1)) <= 5
-                              AND LENGTHB("Fn_Split"("SplitOther",'樓之',2)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'樓之',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'樓之',2)) <= 5
+                         THEN u''
+                         WHEN INSTR("SplitOther",'樓-') > 0 
+                              AND LENGTH("Fn_Split"("SplitOther",'樓-',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'樓-',2)) <= 5
                          THEN u''
                          WHEN INSTR("SplitOther",'樓') > 0
-                              AND LENGTHB("Fn_Split"("SplitOther",'樓',1)) <= 5
-                              AND LENGTHB("Fn_Split"("SplitOther",'樓',2)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'樓',1)) <= 5
+                              AND NVL(LENGTH("Fn_Split"("SplitOther",'樓',2)),0) <= 0
+                         THEN u''
+                         WHEN INSTR("SplitOther",'F之') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'F之',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'F之',2)) <= 5
                          THEN u''
                          WHEN INSTR("SplitOther",'F-') > 0
-                              AND LENGTHB("Fn_Split"("SplitOther",'F-',1)) <= 5
-                              AND LENGTHB("Fn_Split"("SplitOther",'F-',2)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'F-',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'F-',2)) <= 5
                          THEN u''
                          WHEN INSTR("SplitOther",'F') > 0
-                              AND LENGTHB("Fn_Split"("SplitOther",'F',1)) <= 5
-                              AND LENGTHB("Fn_Split"("SplitOther",'F',2)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'F',1)) <= 5
+                              AND NVL(LENGTH("Fn_Split"("SplitOther",'F',2)),0) <= 0
                          THEN u''
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
@@ -320,31 +335,31 @@ BEGIN
     ,C1."RegSection"   = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."Section"    -- 段 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ,C1."RegAlley"     = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."Alley"      -- 巷 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ,C1."RegLane"      = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."Lane"       -- 弄 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ,C1."RegNum"       = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."Num"        -- 號 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ,C1."RegNumDash"   = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."NumDash"    -- 號之 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ,C1."RegFloor"     = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."Floor"      -- 樓 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ,C1."RegFloorDash" = CASE
                            WHEN C2."SplitFg" = 'Y'
                            THEN C2."FloorDash"  -- 樓之 VARCHAR2 5 
-                         ELSE '' END
+                         ELSE u'' END
     ;
 
     -- 刪除舊資料
@@ -373,13 +388,13 @@ BEGIN
              WHEN NVL(S2."CityCode",' ') <> ' '
              THEN 'Y'
            ELSE 'N' END          AS "SplitFg"      -- 切割是否成功 VARCHAR2 1
-          ,''                    AS "Section"      -- 段 VARCHAR2 5 
-          ,''                    AS "Alley"        -- 巷 VARCHAR2 5 
-          ,''                    AS "Lane"         -- 弄 VARCHAR2 5 
-          ,''                    AS "Num"          -- 號 VARCHAR2 5 
-          ,''                    AS "NumDash"      -- 號之 VARCHAR2 5 
-          ,''                    AS "Floor"        -- 樓 VARCHAR2 5 
-          ,''                    AS "FloorDash"    -- 樓之 VARCHAR2 5 
+          ,u''                   AS "Section"      -- 段 NVARCHAR2 5 
+          ,u''                   AS "Alley"        -- 巷 NVARCHAR2 5 
+          ,u''                   AS "Lane"         -- 弄 NVARCHAR2 5 
+          ,u''                   AS "Num"          -- 號 NVARCHAR2 5 
+          ,u''                   AS "NumDash"      -- 號之 NVARCHAR2 5 
+          ,u''                   AS "Floor"        -- 樓 NVARCHAR2 5 
+          ,u''                   AS "FloorDash"    -- 樓之 NVARCHAR2 5 
     FROM "CustMain" S1
     LEFT JOIN "CdCity" S2 ON S2."CityItem" = SUBSTR(S1."CurrRoad",0,3)
     LEFT JOIN "CdArea" S3 ON S3."CityCode" = S2."CityCode"
@@ -394,19 +409,23 @@ BEGIN
     UPDATE "CurrAddrSplit"
     SET "SplitRoad" = CASE
                         WHEN INSTR("SplitRoad",'(路)') > 0
-                        THEN SUBSTR("SplitRoad",0,INSTR("SplitRoad",'(路)')+2)
+                        THEN "Fn_Split"("SplitRoad",'(路)',1) || '路'
                         WHEN INSTR("SplitRoad",'路') > 0
-                        THEN SUBSTR("SplitRoad",0,INSTR("SplitRoad",'路'))
+                        THEN "Fn_Split"("SplitRoad",'路',1) || '路'
                         WHEN INSTR("SplitRoad",'街') > 0
-                        THEN SUBSTR("SplitRoad",0,INSTR("SplitRoad",'街'))
+                        THEN "Fn_Split"("SplitRoad",'街',1) || '街'
+                        WHEN INSTR("SplitRoad",'大道') > 0
+                        THEN "Fn_Split"("SplitRoad",'大道',1) || '大道'
                       ELSE "SplitRoad" END 
        ,"SplitOther" = CASE
                          WHEN INSTR("SplitRoad",'(路)') > 0
-                         THEN SUBSTR("SplitRoad",INSTR("SplitRoad",'(路)')+3)
+                         THEN "Fn_Split"("SplitRoad",'(路)',2)
                          WHEN INSTR("SplitRoad",'路') > 0
-                         THEN SUBSTR("SplitRoad",INSTR("SplitRoad",'路')+1)
+                         THEN "Fn_Split"("SplitRoad",'路',2)
                          WHEN INSTR("SplitRoad",'街') > 0
-                         THEN SUBSTR("SplitRoad",INSTR("SplitRoad",'街')+1)
+                         THEN "Fn_Split"("SplitRoad",'街',2)
+                         WHEN INSTR("SplitRoad",'大道') > 0
+                         THEN "Fn_Split"("SplitRoad",'大道',2)
                        ELSE u'' END
        ,"SplitFg" = CASE
                       WHEN INSTR("SplitRoad",'(路)') > 0
@@ -415,111 +434,207 @@ BEGIN
                       THEN 'Y'
                       WHEN INSTR("SplitRoad",'街') > 0
                       THEN 'Y'
+                      WHEN INSTR("SplitRoad",'大道') > 0
+                      THEN 'Y'
                     ELSE 'N' END 
     WHERE "SplitFg" = 'Y';
 
     -- 切割'段'
     UPDATE "CurrAddrSplit"
-    SET "Section" = TO_CHAR(CASE WHEN INSTR("SplitOther",'段') = 2
-                                 THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'段')-1)
-                            ELSE u'' END )
-       ,"SplitOther" = CASE WHEN INSTR("SplitOther",'段') = 2
-                            THEN SUBSTR("SplitOther",INSTR("SplitOther",'段')+1)
+    SET "Section" = CASE
+                      WHEN INSTR("SplitOther",'段') > 0
+                           AND LENGTH("Fn_Split"("SplitOther",'段',1)) <= 5
+                      THEN "Fn_Split"("SplitOther",'段',1)
+                    ELSE u'' END 
+       ,"SplitOther" = CASE
+                         WHEN INSTR("SplitOther",'段') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'段',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'段',2)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
     -- 切割'巷'
     UPDATE "CurrAddrSplit"
-    SET "Alley" = TO_CHAR(CASE WHEN INSTR("SplitOther",'巷') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'巷')-1)))<=5
-                                 THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'巷')-1)
-                            ELSE u'' END )
-       ,"SplitOther" = CASE WHEN INSTR("SplitOther",'巷') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'巷')-1))) <= 5
-                            THEN SUBSTR("SplitOther",INSTR("SplitOther",'巷')+1)
+    SET "Alley" = CASE
+                    WHEN INSTR("SplitOther",'巷') > 0 
+                         AND LENGTH("Fn_Split"("SplitOther",'巷',1)) <= 5
+                    THEN "Fn_Split"("SplitOther",'巷',1)
+                  ELSE u'' END
+       ,"SplitOther" = CASE
+                         WHEN INSTR("SplitOther",'巷') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'巷',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'巷',2)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
     -- 切割'弄'
     UPDATE "CurrAddrSplit"
-    SET "Lane" = TO_CHAR(CASE WHEN INSTR("SplitOther",'弄') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'弄')-1)))<=5
-                                 THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'弄')-1)
-                            ELSE u'' END )
-       ,"SplitOther" = CASE WHEN INSTR("SplitOther",'弄') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'弄')-1))) <= 5
-                            THEN SUBSTR("SplitOther",INSTR("SplitOther",'弄')+1)
+    SET "Lane" = CASE
+                   WHEN INSTR("SplitOther",'弄') > 0
+                        AND LENGTH("Fn_Split"("SplitOther",'弄',1)) <= 5
+                   THEN "Fn_Split"("SplitOther",'弄',1)
+                 ELSE u'' END 
+       ,"SplitOther" = CASE
+                         WHEN INSTR("SplitOther",'弄') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'弄',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'弄',2)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
     -- 切割'號'、'號之'
     UPDATE "CurrAddrSplit"
-    SET "Num" = TO_CHAR(CASE WHEN INSTR("SplitOther",'號之') > 0
-                                  AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'號之')-1))) <= 5
-                                  AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'號之')+2))) <= 5
-                             THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'號之')-1)
-                             WHEN INSTR("SplitOther",'號') > 0 
-                                  AND INSTR("SplitOther",'之') > 0 
-                                  AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
-                                  AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'之')-1))) <= 5
-                             THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'之')-1)
-                             WHEN INSTR("SplitOther",'號') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'號')-1))) <= 5
-                             THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'號')-1)
-                        ELSE u'' END )
-       ,"NumDash" = TO_CHAR(CASE WHEN INSTR("SplitOther",'號之') > 0
-                                      AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'號之')-1))) <= 5
-                                      AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'號之')+2))) <= 5
-                                 THEN SUBSTR("SplitOther",INSTR("SplitOther",'號之')+2)
-                                 WHEN INSTR("SplitOther",'號') > 0 
-                                      AND INSTR("SplitOther",'之') > 0 
-                                      AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
-                                      AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'之')+1,INSTR("SplitOther",'號')-INSTR("SplitOther",'之')-1))) <= 5
-                                 THEN SUBSTR("SplitOther",INSTR("SplitOther",'之')+1,INSTR("SplitOther",'號')-INSTR("SplitOther",'之')-1)
-                            ELSE u'' END )
-       ,"SplitOther" = CASE WHEN INSTR("SplitOther",'號之') > 0
-                                  AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'號之')-1))) <= 5
-                                  AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'號之')+2))) <= 5
-                            THEN u''
-                            WHEN INSTR("SplitOther",'號之') > 0 
-                            THEN "SplitOther"
-                            WHEN INSTR("SplitOther",'號') > 0 AND INSTR("SplitOther",'之') > 0 AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
-                            THEN SUBSTR("SplitOther",INSTR("SplitOther",'號')+1)
-                            WHEN INSTR("SplitOther",'號') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'號')-1))) <= 5
-                            THEN SUBSTR("SplitOther",INSTR("SplitOther",'號')+1)
+    SET "Num" = CASE
+                  WHEN INSTR("SplitOther",'號之') > 0
+                       AND LENGTH("Fn_Split"("SplitOther",'號之',1)) <= 5
+                       AND LENGTH("Fn_Split"("SplitOther",'號之',2)) <= 5
+                       AND INSTR("SplitOther",'樓') <= 0
+                  THEN "Fn_Split"("SplitOther",'號之',1)
+                  WHEN INSTR("SplitOther",'號之') > 0
+                  THEN u''
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND INSTR("SplitOther",'之') > 0 
+                       AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
+                       AND LENGTH("Fn_Split"("SplitOther",'之',1)) <= 5
+                       AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)) <= 5
+                  THEN "Fn_Split"("SplitOther",'之',1)
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND INSTR("SplitOther",'之') > 0 
+                       AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
+                  THEN u''
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND INSTR("SplitOther",'-') > 0 
+                       AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                       AND LENGTH("Fn_Split"("SplitOther",'-',1)) <= 5
+                       AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)) <= 5
+                  THEN "Fn_Split"("SplitOther",'-',1)
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND INSTR("SplitOther",'-') > 0 
+                       AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                  THEN u''
+                  WHEN INSTR("SplitOther",'號') > 0 
+                       AND LENGTH("Fn_Split"("SplitOther",'號',1)) <= 5
+                  THEN "Fn_Split"("SplitOther",'號',1)
+                  WHEN INSTR("SplitOther",'號') > 0 
+                  THEN u''
+                ELSE u'' END
+       ,"NumDash" = CASE
+                      WHEN INSTR("SplitOther",'號之') > 0
+                           AND LENGTH("Fn_Split"("SplitOther",'號之',1)) <= 5
+                           AND LENGTH("Fn_Split"("SplitOther",'號之',2)) <= 5
+                           AND INSTR("SplitOther",'樓') <= 0
+                      THEN "Fn_Split"("SplitOther",'號之',2)
+                      WHEN INSTR("SplitOther",'號之') > 0 
+                      THEN u''
+                      WHEN INSTR("SplitOther",'號-') > 0
+                           AND LENGTH("Fn_Split"("SplitOther",'號-',1)) <= 5
+                           AND LENGTH("Fn_Split"("SplitOther",'號-',2)) <= 5
+                           AND INSTR("SplitOther",'樓') <= 0
+                      THEN "Fn_Split"("SplitOther",'號-',2)
+                      WHEN INSTR("SplitOther",'號-') > 0 
+                      THEN u''
+                      WHEN INSTR("SplitOther",'號') > 0 
+                           AND INSTR("SplitOther",'之') > 0 
+                           AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
+                           AND LENGTH("Fn_Split"("SplitOther",'之',1)) <= 5
+                           AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)) <= 5
+                      THEN "Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)
+                      WHEN INSTR("SplitOther",'號') > 0 
+                           AND INSTR("SplitOther",'-') > 0 
+                           AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                           AND LENGTH("Fn_Split"("SplitOther",'-',1)) <= 5
+                           AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)) <= 5
+                      THEN "Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)
+                    ELSE u'' END
+       ,"SplitOther" = CASE 
+                         WHEN INSTR("SplitOther",'號之') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'號之',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'號之',2)) <= 5
+                              AND INSTR("SplitOther",'樓') <= 0
+                         THEN u''
+                         WHEN INSTR("SplitOther",'號之') > 0 
+                         THEN "SplitOther"
+                         WHEN INSTR("SplitOther",'號-') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'號-',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'號-',2)) <= 5
+                              AND INSTR("SplitOther",'樓') <= 0
+                         THEN u''
+                         WHEN INSTR("SplitOther",'號-') > 0 
+                         THEN "SplitOther"
+                         WHEN INSTR("SplitOther",'號') > 0 
+                              AND INSTR("SplitOther",'之') > 0
+                              AND INSTR("SplitOther",'之') < INSTR("SplitOther",'號')
+                              AND LENGTH("Fn_Split"("SplitOther",'之',1)) <= 5
+                              AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'之',2),'號',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'號',2)
+                         WHEN INSTR("SplitOther",'號') > 0 
+                              AND INSTR("SplitOther",'-') > 0
+                              AND INSTR("SplitOther",'-') < INSTR("SplitOther",'號')
+                              AND LENGTH("Fn_Split"("SplitOther",'-',1)) <= 5
+                              AND LENGTH("Fn_Split"("Fn_Split"("SplitOther",'-',2),'號',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'號',2)
+                         WHEN INSTR("SplitOther",'號') > 0 
+                              AND LENGTH("Fn_Split"("SplitOther",'號',1)) <= 5
+                         THEN "Fn_Split"("SplitOther",'號',2)
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
-    -- 切割'號'、'號之'，處理'-'
-    UPDATE "CurrAddrSplit"
-    SET "Num" = CASE WHEN LENGTHB(SUBSTR("Num",0,INSTR("Num",'-')-1)) <= 5
-                     THEN SUBSTR("Num",0,INSTR("Num",'-')-1)
-                ELSE "Num" END 
-       ,"NumDash" = CASE WHEN LENGTHB(SUBSTR("Num",INSTR("Num",'-')+1)) <= 5
-                         THEN SUBSTR("Num",INSTR("Num",'-')+1)
-                    ELSE "NumDash" END
-    WHERE "SplitFg" = 'Y'
-      AND INSTR("Num",'-') > 0 ;
-
     -- 切割'樓'、'樓之'
     UPDATE "CurrAddrSplit"
-    SET "Floor" = TO_CHAR(CASE WHEN INSTR("SplitOther",'樓') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'樓')-1))) <= 5
-                               THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'樓')-1)
-                               WHEN INSTR("SplitOther",'F') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'F')-1))) <= 5
-                               THEN SUBSTR("SplitOther",0,INSTR("SplitOther",'F')-1)
-                        ELSE u'' END )
-       ,"FloorDash" = TO_CHAR(CASE WHEN INSTR("SplitOther",'樓之') > 0 
-                                        AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'樓之')+2))) <= 5
-                                   THEN SUBSTR("SplitOther",INSTR("SplitOther",'樓之')+2)
-                                   WHEN INSTR("SplitOther",'F-') > 0 
-                                        AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'F-')+2))) <= 5
-                                   THEN SUBSTR("SplitOther",INSTR("SplitOther",'F-')+2)
-                                   WHEN INSTR("SplitOther",'F') > 0 
-                                        AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'F')+1))) <= 5
-                                   THEN SUBSTR("SplitOther",INSTR("SplitOther",'F')+1)
-                            ELSE u'' END )
-       ,"SplitOther" = CASE WHEN INSTR("SplitOther",'樓之') > 0 
-                                 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",INSTR("SplitOther",'樓之')+2))) <= 5
-                             THEN u''
-                             WHEN INSTR("SplitOther",'樓') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'樓')-1))) <= 5
-                             THEN u''
-                             WHEN INSTR("SplitOther",'F') > 0 AND LENGTHB(TO_CHAR(SUBSTR("SplitOther",0,INSTR("SplitOther",'F')-1))) <= 5
-                             THEN u''
+    SET "Floor" = CASE
+                    WHEN INSTR("SplitOther",'樓') > 0
+                         AND LENGTH("Fn_Split"("SplitOther",'樓',1)) <= 5
+                    THEN "Fn_Split"("SplitOther",'樓',1)
+                    WHEN INSTR("SplitOther",'F') > 0
+                         AND LENGTH("Fn_Split"("SplitOther",'F',1)) <= 5
+                    THEN "Fn_Split"("SplitOther",'F',1)
+                  ELSE u'' END
+       ,"FloorDash" = CASE
+                        WHEN INSTR("SplitOther",'樓之') > 0 
+                             AND LENGTH("Fn_Split"("SplitOther",'樓之',2)) <= 5
+                        THEN "Fn_Split"("SplitOther",'樓之',2)
+                        WHEN INSTR("SplitOther",'樓之') > 0 
+                        THEN u''
+                        WHEN INSTR("SplitOther",'樓-') > 0 
+                             AND LENGTH("Fn_Split"("SplitOther",'樓-',2)) <= 5
+                        THEN "Fn_Split"("SplitOther",'樓-',2)
+                        WHEN INSTR("SplitOther",'樓-') > 0 
+                        THEN u''
+                        WHEN INSTR("SplitOther",'F之') > 0 
+                             AND LENGTH("Fn_Split"("SplitOther",'F之',2)) <= 5
+                        THEN "Fn_Split"("SplitOther",'F之',2)
+                        WHEN INSTR("SplitOther",'F之') > 0 
+                        THEN u''
+                        WHEN INSTR("SplitOther",'F-') > 0 
+                             AND LENGTH("Fn_Split"("SplitOther",'F-',2)) <= 5
+                        THEN "Fn_Split"("SplitOther",'F-',2)
+                        WHEN INSTR("SplitOther",'F-') > 0 
+                        THEN u''
+                      ELSE u'' END
+       ,"SplitOther" = CASE
+                         WHEN INSTR("SplitOther",'樓之') > 0 
+                              AND LENGTH("Fn_Split"("SplitOther",'樓之',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'樓之',2)) <= 5
+                         THEN u''
+                         WHEN INSTR("SplitOther",'樓-') > 0 
+                              AND LENGTH("Fn_Split"("SplitOther",'樓-',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'樓-',2)) <= 5
+                         THEN u''
+                         WHEN INSTR("SplitOther",'樓') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'樓',1)) <= 5
+                              AND NVL(LENGTH("Fn_Split"("SplitOther",'樓',2)),0) <= 0
+                         THEN u''
+                         WHEN INSTR("SplitOther",'F之') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'F之',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'F之',2)) <= 5
+                         THEN u''
+                         WHEN INSTR("SplitOther",'F-') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'F-',1)) <= 5
+                              AND LENGTH("Fn_Split"("SplitOther",'F-',2)) <= 5
+                         THEN u''
+                         WHEN INSTR("SplitOther",'F') > 0
+                              AND LENGTH("Fn_Split"("SplitOther",'F',1)) <= 5
+                              AND NVL(LENGTH("Fn_Split"("SplitOther",'F',2)),0) <= 0
+                         THEN u''
                        ELSE "SplitOther" END
     WHERE "SplitFg" = 'Y';
 
@@ -563,31 +678,31 @@ BEGIN
     ,C1."CurrSection"   = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."Section"    -- 段 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ,C1."CurrAlley"     = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."Alley"      -- 巷 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ,C1."CurrLane"      = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."Lane"       -- 弄 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ,C1."CurrNum"       = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."Num"        -- 號 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ,C1."CurrNumDash"   = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."NumDash"    -- 號之 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ,C1."CurrFloor"     = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."Floor"      -- 樓 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ,C1."CurrFloorDash" = CASE
                             WHEN C2."SplitFg" = 'Y'
                             THEN C2."FloorDash" -- 樓之 VARCHAR2 5 
-                          ELSE '' END
+                          ELSE u'' END
     ;
 
     -- 記錄程式結束時間

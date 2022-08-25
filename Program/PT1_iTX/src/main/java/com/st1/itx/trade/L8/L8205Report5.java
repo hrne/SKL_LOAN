@@ -81,7 +81,7 @@ public class L8205Report5 extends MakeReport {
 
 		String bcDate = dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6)
 				+ "/" + dDateUtil.getNowStringBc().substring(6, 8);
-		print(-47, 1, "　　經辦:　　　　　　　　　　　　　　　　　　　　課主管:　　　　　　　　　　　　　　　　　　　　" + bcDate + "製作:放款服務課　" + cdEmpFullname, "L");		
+		print(-47, 1, "　　經辦:　　　　　　　　　　　　　　　　　　　　課主管:　　　　　　　　　　　　　　　　　　　　" + bcDate + "製作:　" + cdEmpFullname, "L");		
 
 		}
 	public boolean exec(TitaVo titaVo) throws LogicException {

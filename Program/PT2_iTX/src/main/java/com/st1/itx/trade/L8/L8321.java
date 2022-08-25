@@ -73,7 +73,7 @@ public class L8321 extends TradeBuffer {
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ063, JcicZ062
 		JcicZ063 iJcicZ063 = new JcicZ063();
 		JcicZ063Id iJcicZ063Id = new JcicZ063Id();
@@ -93,8 +93,8 @@ public class L8321 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.2 KEY值為IDN+報送單位wakg+dr前置協商申請日+申請變更還款條件日.***J
 
-			// 1.3  同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，也不可晚於本檔案資料報送日期--->(前端檢核)
-			
+			// 1.3 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，也不可晚於本檔案資料報送日期--->(前端檢核)
+
 			// 1.4 報送本結案檔案後，同一KEY值不可再報送相關檔案之異動.***J
 
 			// 1.5 start 第9欄「結案原因」為'C'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須有值.
@@ -120,9 +120,11 @@ public class L8321 extends TradeBuffer {
 				// 第9欄「結案原因」為'A'及'B'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須空白.
 				if (("A".equals(iClosedResult) || "B".equals(iClosedResult)) && (iJcicZ062.getChaRepayEndDate() != 0)) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005", "「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+						throw new LogicException("E0005",
+								"「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
 					} else {
-						throw new LogicException("E0007", "「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+						throw new LogicException("E0007",
+								"「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
 					}
 				} // 1.6 end
 			}
@@ -170,7 +172,8 @@ public class L8321 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ063, uJcicZ063);
-			iDataLog.exec("L8321異動",uJcicZ063.getSubmitKey()+uJcicZ063.getCustId()+uJcicZ063.getRcDate()+uJcicZ063.getChangePayDate());
+			iDataLog.exec("L8321異動", uJcicZ063.getSubmitKey() + uJcicZ063.getCustId() + uJcicZ063.getRcDate()
+					+ uJcicZ063.getChangePayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -184,16 +187,16 @@ public class L8321 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ063 oldJcicZ0632 = (JcicZ063) iDataLog.clone(uJcicZ0632);
 			uJcicZ0632.setClosedDate(iClosedDate);
 			uJcicZ0632.setClosedResult(iClosedResult);
 			uJcicZ0632.setTranKey(iTranKey);
 			uJcicZ0632.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ063Log> dJcicLogZ063 = null;
 			dJcicLogZ063 = sJcicZ063LogService.ukeyEq(iJcicZ063.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ063 == null|| ("A".equals(iTranKey) && dJcicLogZ063 == null )) {
+			if (dJcicLogZ063 == null || ("A".equals(iTranKey) && dJcicLogZ063 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ063Service.delete(iJcicZ063, titaVo);
@@ -214,8 +217,42 @@ public class L8321 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0632, uJcicZ0632);
-			iDataLog.exec("L8321刪除",uJcicZ0632.getSubmitKey()+uJcicZ0632.getCustId()+uJcicZ0632.getRcDate()+uJcicZ0632.getChangePayDate());
-			default:
+			iDataLog.exec("L8321刪除", uJcicZ0632.getSubmitKey() + uJcicZ0632.getCustId() + uJcicZ0632.getRcDate()
+					+ uJcicZ0632.getChangePayDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ063 = sJcicZ063Service.ukeyFirst(iKey, titaVo);
+			JcicZ063 uJcicZ0633 = new JcicZ063();
+			uJcicZ0633 = sJcicZ063Service.holdById(iJcicZ063.getJcicZ063Id(), titaVo);
+			if (uJcicZ0633 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ063.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ063 oldJcicZ0633 = (JcicZ063) iDataLog.clone(uJcicZ0633);
+			uJcicZ0633.setJcicZ063Id(iJcicZ063Id);
+			uJcicZ0633.setTranKey(iTranKey);
+			iJcicZ063.setClosedDate(iClosedDate);
+			iJcicZ063.setClosedResult(iClosedResult);
+			uJcicZ0633.setUkey(iKey);
+
+			try {
+				sJcicZ063Service.update(uJcicZ0633, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0633, uJcicZ0633);
+			iDataLog.exec("L8321修改", uJcicZ0633.getSubmitKey() + uJcicZ0633.getCustId() + uJcicZ0633.getRcDate()
+					+ uJcicZ0633.getChangePayDate());
+		default:
 			break;
 		}
 		this.addList(this.totaVo);

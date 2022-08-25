@@ -33,7 +33,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-
 @Service("L8318")
 @Scope("prototype")
 /**
@@ -72,14 +71,14 @@ public class L8318 extends TradeBuffer {
 		String iSubmitKey = titaVo.getParam("SubmitKey").trim();
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate").trim());
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate").trim());
-		int iYM = Integer.valueOf(titaVo.getParam("YM").trim())+191100;
+		int iYM = Integer.valueOf(titaVo.getParam("YM").trim()) + 191100;
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ060, JcicZ046, JcicZ047, JcicZ062, JcicZ063
 		JcicZ060 iJcicZ060 = new JcicZ060();
 		JcicZ060Id iJcicZ060Id = new JcicZ060Id();
@@ -189,7 +188,8 @@ public class L8318 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ060, uJcicZ060);
-			iDataLog.exec("L8318異動", uJcicZ060.getSubmitKey()+uJcicZ060.getCustId()+uJcicZ060.getRcDate()+uJcicZ060.getChangePayDate());
+			iDataLog.exec("L8318異動", uJcicZ060.getSubmitKey() + uJcicZ060.getCustId() + uJcicZ060.getRcDate()
+					+ uJcicZ060.getChangePayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -203,15 +203,15 @@ public class L8318 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ060 oldJcicZ0602 = (JcicZ060) iDataLog.clone(uJcicZ0602);
 			uJcicZ0602.setTranKey(iTranKey);
 			uJcicZ0602.setYM(iYM);
 			uJcicZ0602.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ060Log> dJcicLogZ060 = null;
 			dJcicLogZ060 = sJcicZ060LogService.ukeyEq(iJcicZ060.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ060 == null|| ("A".equals(iTranKey) && dJcicLogZ060 == null )) {
+			if (dJcicLogZ060 == null || ("A".equals(iTranKey) && dJcicLogZ060 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ060Service.delete(iJcicZ060, titaVo);
@@ -231,8 +231,46 @@ public class L8318 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0602, uJcicZ0602);
-			iDataLog.exec("L8318刪除", uJcicZ0602.getSubmitKey()+uJcicZ0602.getCustId()+uJcicZ0602.getRcDate()+uJcicZ0602.getChangePayDate());
-			default:
+			iDataLog.exec("L8318刪除", uJcicZ0602.getSubmitKey() + uJcicZ0602.getCustId() + uJcicZ0602.getRcDate()
+					+ uJcicZ0602.getChangePayDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ060 = sJcicZ060Service.ukeyFirst(iKey, titaVo);
+			JcicZ060 uJcicZ0603 = new JcicZ060();
+			uJcicZ0603 = sJcicZ060Service.holdById(iJcicZ060.getJcicZ060Id(), titaVo);
+			if (uJcicZ0603 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ060.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ060 oldJcicZ0603 = (JcicZ060) iDataLog.clone(uJcicZ0603);
+			uJcicZ0603.setJcicZ060Id(iJcicZ060Id);
+			uJcicZ0603.setTranKey(iTranKey);
+			uJcicZ0603.setRcDate(iRcDate);
+			uJcicZ0603.setTranKey(iTranKey);
+			uJcicZ0603.setSubmitKey(iSubmitKey);
+			uJcicZ0603.setCustId(iCustId);
+			uJcicZ0603.setChangePayDate(iChangePayDate);
+			uJcicZ0603.setYM(iYM);
+			uJcicZ0603.setUkey(iKey);
+
+			try {
+				sJcicZ060Service.update(uJcicZ0603, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0603, uJcicZ0603);
+			iDataLog.exec("L8318修改", uJcicZ0603.getSubmitKey() + uJcicZ0603.getCustId() + uJcicZ0603.getRcDate()
+					+ uJcicZ0603.getChangePayDate());
+		default:
 			break;
 		}
 		this.addList(this.totaVo);

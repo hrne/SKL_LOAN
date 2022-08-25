@@ -80,7 +80,7 @@ public class L8327 extends TradeBuffer {
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ447, JcicZ446
 		JcicZ447 iJcicZ447 = new JcicZ447();
 		JcicZ447Id iJcicZ447Id = new JcicZ447Id();
@@ -171,7 +171,8 @@ public class L8327 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ447, uJcicZ447);
-			iDataLog.exec("L8327異動",uJcicZ447.getSubmitKey()+uJcicZ447.getCustId()+uJcicZ447.getApplyDate()+uJcicZ447.getCourtCode());
+			iDataLog.exec("L8327異動", uJcicZ447.getSubmitKey() + uJcicZ447.getCustId() + uJcicZ447.getApplyDate()
+					+ uJcicZ447.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -185,7 +186,7 @@ public class L8327 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ447 oldJcicZ4472 = (JcicZ447) iDataLog.clone(uJcicZ4472);
 			uJcicZ4472.setTranKey(iTranKey);
 			uJcicZ4472.setCivil323Amt(iCivil323Amt);
@@ -197,10 +198,10 @@ public class L8327 extends TradeBuffer {
 			uJcicZ4472.setMonthPayAmt(iMonthPayAmt);
 			uJcicZ4472.setPayAccount(iPayAccount);
 			uJcicZ4472.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ447Log> dJcicLogZ447 = null;
 			dJcicLogZ447 = sJcicZ447LogService.ukeyEq(iJcicZ447.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ447 == null|| ("A".equals(iTranKey) && dJcicLogZ447 == null )) {
+			if (dJcicLogZ447 == null || ("A".equals(iTranKey) && dJcicLogZ447 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ447Service.delete(iJcicZ447, titaVo);
@@ -227,7 +228,47 @@ public class L8327 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4472, uJcicZ4472);
-			iDataLog.exec("L8327刪除",uJcicZ4472.getSubmitKey()+uJcicZ4472.getCustId()+uJcicZ4472.getApplyDate()+uJcicZ4472.getCourtCode());
+			iDataLog.exec("L8327刪除", uJcicZ4472.getSubmitKey() + uJcicZ4472.getCustId() + uJcicZ4472.getApplyDate()
+					+ uJcicZ4472.getCourtCode());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ447 = sJcicZ447Service.ukeyFirst(iKey, titaVo);
+			JcicZ447 uJcicZ4473 = new JcicZ447();
+			uJcicZ4473 = sJcicZ447Service.holdById(iJcicZ447.getJcicZ447Id(), titaVo);
+			if (uJcicZ4473 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ447.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ447 oldJcicZ4473 = (JcicZ447) iDataLog.clone(uJcicZ4473);
+			uJcicZ4473.setJcicZ447Id(iJcicZ447Id);
+			uJcicZ4473.setTranKey(iTranKey);
+			uJcicZ4473.setCivil323Amt(iCivil323Amt);
+			uJcicZ4473.setTotalAmt(iTotalAmt);
+			uJcicZ4473.setSignDate(iSignDate);
+			uJcicZ4473.setFirstPayDate(iFirstPayDate);
+			uJcicZ4473.setPeriod(iPeriod);
+			uJcicZ4473.setRate(iRate);
+			uJcicZ4473.setMonthPayAmt(iMonthPayAmt);
+			uJcicZ4473.setPayAccount(iPayAccount);
+			uJcicZ4473.setUkey(iKey);
+
+			try {
+				sJcicZ447Service.update(uJcicZ4473, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ4473, uJcicZ4473);
+			iDataLog.exec("L8327修改", uJcicZ4473.getSubmitKey() + uJcicZ4473.getCustId() + uJcicZ4473.getApplyDate()
+					+ uJcicZ4473.getCourtCode());
 		default:
 			break;
 		}

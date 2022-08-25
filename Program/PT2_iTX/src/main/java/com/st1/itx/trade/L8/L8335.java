@@ -15,6 +15,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
@@ -61,12 +62,12 @@ public class L8335 extends TradeBuffer {
 		int iPayAmt = Integer.valueOf(titaVo.getParam("PayAmt").trim());
 		int iTotalPayAmt = Integer.valueOf(titaVo.getParam("TotalPayAmt").trim());
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ573
 		JcicZ573 iJcicZ573 = new JcicZ573();
 		JcicZ573Id iJcicZ573Id = new JcicZ573Id();
@@ -96,7 +97,8 @@ public class L8335 extends TradeBuffer {
 					}
 				} else {
 					for (JcicZ573 xJcicZ573 : sJcicZ573) {
-						if (!"D".equals(xJcicZ573.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ573.getUkey())) {
+						if (!"D".equals(xJcicZ573.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ573.getUkey())) {
 							sPayAmt += xJcicZ573.getPayAmt();
 						}
 					}
@@ -151,7 +153,8 @@ public class L8335 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債務人繳款資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ573, uJcicZ573);
-			iDataLog.exec("L8335異動",uJcicZ573.getSubmitKey()+uJcicZ573.getCustId()+uJcicZ573.getApplyDate()+uJcicZ573.getPayDate());
+			iDataLog.exec("L8335異動", uJcicZ573.getSubmitKey() + uJcicZ573.getCustId() + uJcicZ573.getApplyDate()
+					+ uJcicZ573.getPayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -165,17 +168,17 @@ public class L8335 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ573 oldJcicZ5732 = (JcicZ573) iDataLog.clone(uJcicZ5732);
 			uJcicZ5732.setTranKey(iTranKey);
 			uJcicZ5732.setPayAmt(iPayAmt);
 			uJcicZ5732.setTotalPayAmt(iTotalPayAmt);
 			uJcicZ5732.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ573Log> dJcicLogZ573 = null;
 			dJcicLogZ573 = sJcicZ573LogService.ukeyEq(iJcicZ573.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			// 最近一筆之資料
-			if (dJcicLogZ573 == null|| ("A".equals(iTranKey) && dJcicLogZ573 == null )) {
+			if (dJcicLogZ573 == null || ("A".equals(iTranKey) && dJcicLogZ573 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ573Service.delete(iJcicZ573, titaVo);
@@ -195,9 +198,43 @@ public class L8335 extends TradeBuffer {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-			
+
 			iDataLog.setEnv(titaVo, oldJcicZ5732, uJcicZ5732);
-			iDataLog.exec("L8335刪除",uJcicZ5732.getSubmitKey()+uJcicZ5732.getCustId()+uJcicZ5732.getApplyDate()+uJcicZ5732.getPayDate());
+			iDataLog.exec("L8335刪除", uJcicZ5732.getSubmitKey() + uJcicZ5732.getCustId() + uJcicZ5732.getApplyDate()
+					+ uJcicZ5732.getPayDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ573 = sJcicZ573Service.ukeyFirst(iKey, titaVo);
+			JcicZ573 uJcicZ5733 = new JcicZ573();
+			uJcicZ5733 = sJcicZ573Service.holdById(iJcicZ573.getJcicZ573Id(), titaVo);
+			if (uJcicZ5733 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ573.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ573 oldJcicZ5733 = (JcicZ573) iDataLog.clone(uJcicZ5733);
+			uJcicZ5733.setJcicZ573Id(iJcicZ573Id);
+			uJcicZ5733.setTranKey(iTranKey);
+			uJcicZ5733.setPayAmt(iPayAmt);
+			uJcicZ5733.setTotalPayAmt(iTotalPayAmt);
+			uJcicZ5733.setUkey(iKey);
+
+			try {
+				sJcicZ573Service.update(uJcicZ5733, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ5733, uJcicZ5733);
+			iDataLog.exec("L8335修改", uJcicZ5733.getSubmitKey() + uJcicZ5733.getCustId() + uJcicZ5733.getApplyDate()
+					+ uJcicZ5733.getPayDate());
 		default:
 			break;
 		}

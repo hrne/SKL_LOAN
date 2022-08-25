@@ -70,18 +70,18 @@ public class L8310 extends TradeBuffer {
 		int iClaimStatus = Integer.valueOf(titaVo.getParam("ClaimStatus").trim());
 		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate").trim());
 		String iCourtCode = titaVo.getParam("CourtCode").trim();
-		int iYear = Integer.valueOf(titaVo.getParam("Year").trim())+1911;
+		int iYear = Integer.valueOf(titaVo.getParam("Year").trim()) + 1911;
 		String iCourtDiv = titaVo.getParam("CourtDiv").trim();
 		String iCourtCaseNo = titaVo.getParam("CourtCaseNo").trim();
 		String iApprove = titaVo.getParam("Approve").trim();
 		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate").trim());
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		// JcicZ049, JcicZ047
 		JcicZ049 iJcicZ049 = new JcicZ049();
 		JcicZ049Id iJcicZ049Id = new JcicZ049Id();
@@ -183,9 +183,9 @@ public class L8310 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ049, uJcicZ049);
-			iDataLog.exec("L8310異動", uJcicZ049.getSubmitKey()+uJcicZ049.getCustId()+uJcicZ049.getRcDate());
+			iDataLog.exec("L8310異動", uJcicZ049.getSubmitKey() + uJcicZ049.getCustId() + uJcicZ049.getRcDate());
 			break;
-			//2022/7/14 新增刪除必須也要在記錄檔l6932裡面
+		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ049 = sJcicZ049Service.ukeyFirst(iKey, titaVo);
@@ -198,7 +198,7 @@ public class L8310 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ049 oldJcicZ0492 = (JcicZ049) iDataLog.clone(uJcicZ0492);
 			uJcicZ0492.setTranKey(iTranKey);
 			uJcicZ0492.setClaimStatus(iClaimStatus);
@@ -210,10 +210,10 @@ public class L8310 extends TradeBuffer {
 			uJcicZ0492.setApprove(iApprove);
 			uJcicZ0492.setClaimDate(iClaimDate);
 			uJcicZ0492.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ049Log> dJcicLogZ049 = null;
 			dJcicLogZ049 = sJcicZ049LogService.ukeyEq(iJcicZ049.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ049 == null|| ("A".equals(iTranKey) && dJcicLogZ049 == null)) {
+			if (dJcicLogZ049 == null || ("A".equals(iTranKey) && dJcicLogZ049 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ049Service.delete(iJcicZ049, titaVo);
@@ -240,7 +240,45 @@ public class L8310 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0492, uJcicZ0492);
-			iDataLog.exec("L8310刪除", uJcicZ0492.getSubmitKey()+uJcicZ0492.getCustId()+uJcicZ0492.getRcDate());
+			iDataLog.exec("L8310刪除", uJcicZ0492.getSubmitKey() + uJcicZ0492.getCustId() + uJcicZ0492.getRcDate());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ049 = sJcicZ049Service.ukeyFirst(iKey, titaVo);
+			JcicZ049 uJcicZ0493 = new JcicZ049();
+			uJcicZ0493 = sJcicZ049Service.holdById(iJcicZ049.getJcicZ049Id(), titaVo);
+			if (uJcicZ0493 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ049.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ049 oldJcicZ0493 = (JcicZ049) iDataLog.clone(uJcicZ0493);
+			uJcicZ0493.setJcicZ049Id(iJcicZ049Id);
+			uJcicZ0493.setTranKey(iTranKey);
+			uJcicZ0493.setClaimStatus(iClaimStatus);
+			uJcicZ0493.setApplyDate(iApplyDate);
+			uJcicZ0493.setCourtCode(iCourtCode);
+			uJcicZ0493.setYear(iYear);
+			uJcicZ0493.setCourtDiv(iCourtDiv);
+			uJcicZ0493.setCourtCaseNo(iCourtCaseNo);
+			uJcicZ0493.setApprove(iApprove);
+			uJcicZ0493.setClaimDate(iClaimDate);
+			uJcicZ0493.setUkey(iKey);
+
+			try {
+				sJcicZ049Service.update(uJcicZ0493, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ0493, uJcicZ0493);
+			iDataLog.exec("L8310修改", uJcicZ0493.getSubmitKey() + uJcicZ0493.getCustId() + uJcicZ0493.getRcDate());
 		default:
 			break;
 		}

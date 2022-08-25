@@ -16,8 +16,6 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.service.CdEmpService;
 
 @Component
 @Scope("prototype")
@@ -37,11 +35,6 @@ public class L8205Report1 extends MakeReport {
 	@Autowired
 	public Parse parse;
 
-	@Autowired
-	CdEmpService cdEmpService;
-
-	private String cdEmpFullname = "";
-	
 	private List<Map<String, String>> L8205List = null;
 	
 //	自訂表頭
@@ -109,14 +102,17 @@ public class L8205Report1 extends MakeReport {
 		// 入帳日區間  Max
 		String edEntryDate = titaVo.getParam("DateEnd");
 		edEntryDate = edEntryDate.substring(0, 3)+"/"+edEntryDate.substring(3, 5)+"/"+edEntryDate.substring(5, 7);
-				
+
+		//筆數計算
+		int icount = 0;
+
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢樣態3合理性報表", "", "A4", "P");
 				
 		if (L8205List != null && L8205List.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-			this.print(-9, 3, "樣態 入帳日 　戶號　　戶名　　　　　累積金額　　　　總筆數　　經辦　　　合理性　　　　異動日期");
+			this.print(-9, 3, "樣態 入帳日 　戶號　　戶名　　　　　累積金額　　　　總筆數　　經辦　　　合理性　　　　同意日期");
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 			for (Map<String, String> tL8205Vo : L8205List) {
@@ -154,17 +150,44 @@ public class L8205Report1 extends MakeReport {
 				//合理性
 				print(0, 72, tL8205Vo.get("F7"));
 				
-				//異動日
+				//同意日
 				print(0, 81, tL8205Vo.get("F8") == "0" || tL8205Vo.get("F8") == null || tL8205Vo.get("F8").length() == 0 || tL8205Vo.get("F8").equals(" ") ? " " : showDate(tL8205Vo.get("F8"), 1));
 	
 				
 
 				//經辦說明
 				String EmpNoDesc = tL8205Vo.get("F9");
+				String EmpNoDesc1 = "";//總長100個字,接1-45個
+				String EmpNoDesc2 = "";//接46-90個
+				String EmpNoDesc3 = "";//剩餘10個
+				int ilength = 0;
 				if(!EmpNoDesc.isEmpty()) {
 					EmpNoDesc = EmpNoDesc.replace("$n", "");
+					ilength = EmpNoDesc.length();
 				}
-				print(1, 4, "經辦說明:"+EmpNoDesc);
+
+				if (ilength > 45) {
+					if (ilength > 90) {
+						EmpNoDesc1 = EmpNoDesc.substring(0,45);
+						EmpNoDesc2 = EmpNoDesc.substring(45,90);
+						EmpNoDesc3 = EmpNoDesc.substring(90,ilength);
+					}else {
+						EmpNoDesc1 = EmpNoDesc.substring(0,45);
+						EmpNoDesc2 = EmpNoDesc.substring(45,ilength);
+					}
+				}else {
+					EmpNoDesc1 = EmpNoDesc.substring(0,ilength);
+				}
+					
+				if(!EmpNoDesc1.isEmpty()) {
+					print(1, 4, "經辦說明:"+EmpNoDesc1);
+				}
+				if(!EmpNoDesc2.isEmpty()) {
+					print(1, 4, "　　　　 "+EmpNoDesc2);
+				}
+				if(!EmpNoDesc3.isEmpty()) {
+					print(1, 4, "　　　　 "+EmpNoDesc3);
+				}
 				print(1, 4,"");
 				//主管覆核
 				String check = tL8205Vo.get("F10");
@@ -174,22 +197,22 @@ public class L8205Report1 extends MakeReport {
 				print(1, 4, "主管覆核: "+check);
 				print(1, 4, "");
 				
+				icount = icount + 1;
+				
 			}
 
 		} else {
 			this.print(1, 3, "本日無資料");
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-			this.print(-9, 3, "樣態 入帳日 　戶號　　戶名　　　　　累積金額　　　　總筆數　　經辦　　　合理性　　　　異動日期");
+			this.print(-9, 3, "樣態 入帳日 　戶號　　戶名　　　　　累積金額　　　　總筆數　　經辦　　　合理性　　　　同意日期");
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		}
 
-		this.print(-64, 50, "===== 報　表　結　束 =====", "C");
-		// 表尾:製表人經辦名稱
-		CdEmp tCdEmp = new CdEmp();
-		tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
-		if (tCdEmp != null) {
-			cdEmpFullname = tCdEmp.getFullname();
+		if (icount > 0) {
+			this.print(-64, 50, "===== 報　表　結　束 ====="+"　　　【合　計：　"+icount+"　筆】", "C");
+		} else {
+			this.print(-64, 50, "===== 報　表　結　束 =====", "C");
 		}
 
 		long sno = this.close();
@@ -274,7 +297,7 @@ public class L8205Report1 extends MakeReport {
 
 			newPage();
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-			this.print(-9, 3, "樣態 入帳日 　戶號　　戶名　　　　　累積金額　　　　總筆數　　經辦　　　合理性　　　　異動日期");
+			this.print(-9, 3, "樣態 入帳日 　戶號　　戶名　　　　　累積金額　　　　總筆數　　經辦　　　合理性　　　　同意日期");
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 }
 
@@ -324,7 +347,7 @@ public class L8205Report1 extends MakeReport {
 		
 		makeExcel.setValue(1, 8, "合理性");
 		
-		makeExcel.setValue(1, 9, "異動日期");
+		makeExcel.setValue(1, 9, "同意日期");
 		makeExcel.setWidth(9, 14);
 		
 		makeExcel.setValue(1, 10, "經辦說明");

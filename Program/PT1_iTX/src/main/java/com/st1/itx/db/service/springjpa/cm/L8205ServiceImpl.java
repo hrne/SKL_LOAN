@@ -51,7 +51,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += ",CD.\"GroupItem\" 				as F6							\n"; // 課組別
 		sql += ",E.\"Fullname\" 		        as F6							\n"; // 經辦
 		sql += ",M.\"Rational\" 				as F7							\n"; // 合理性
-		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動時間
+//		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動日期
+		sql += ",M.\"ManagerDate\"              as F8				        	\n"; // 主管同意日期
 		sql += ",M.\"EmpNoDesc\" 				as F9							\n"; // 經辦說明
 		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核
 		sql += "from \"MlaundryDetail\" M										\n";
@@ -95,7 +96,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"TotalAmt\" 				as F4							\n"; // 累積金額
 		sql += ",E.\"Fullname\" 		        as F5							\n"; // 經辦
 		sql += ",M.\"Rational\" 				as F6							\n"; // 合理性
-		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F7					\n"; // 異動時間
+//		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F7					\n"; // 異動時間
+		sql += ",M.\"ManagerDate\"              as F7				        	\n"; // 主管同意日期
 		sql += ",M.\"EmpNoDesc\" 				as F8							\n"; // 經辦說明
 		sql += ",M.\"ManagerCheck\" 			as F9  						\n"; // 主管覆核
 		sql += "from \"MlaundryDetail\" M										\n";

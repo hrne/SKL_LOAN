@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -35,7 +36,7 @@ public class L9705Form extends MakeReport {
 
 	@Autowired
 	private Parse parse;
-	
+
 	@Autowired
 	WebClient webClient;
 
@@ -47,11 +48,10 @@ public class L9705Form extends MakeReport {
 	public void printHeader() {
 	}
 
-	public long exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
-		
+	public void exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+
 		String tran = "L9705".equals(titaVo.getTxcd()) ? "L9705" : titaVo.getTxcd();
-		
-		
+
 		int terms = 6; // 預設印6期
 
 		if (titaVo.containsKey("Terms") && titaVo.getParam("Terms") != null) {
@@ -61,18 +61,39 @@ public class L9705Form extends MakeReport {
 				terms = 6; // 若無法轉為數值,改為預設6
 			}
 		}
-		
-		
+
 		this.info("titaVo = " + titaVo);
-		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C", "存入憑條", "cm,20,9.31333", "P");
+
+		this.info("txbuffer = " + txbuffer.toString());
+
+		this.info("l9705List.size() = " + l9705List.size());
+
+		dBaTxCom.setTxBuffer(txbuffer);
+
+		long sno = 0;
 
 		if (l9705List.size() > 0) {
-
+			int count = 0;
 			int cnt = 0;
 			for (Map<String, String> tL9Vo : l9705List) {
-				if (!"2".equals(tL9Vo.get("RepayCode"))) {
-					continue;
-				}
+
+//				this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C", "存入憑條", "cm,20,9.31333", "P");
+				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+						.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
+						.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
+
+				this.openForm(titaVo, reportVo);
+
+				count++;
+				this.info("count=" + count);
+				this.info("CustNo = " + tL9Vo.get("CustNo"));
+				this.info("FacmNo = " + tL9Vo.get("FacmNo"));
+				this.info("ENTDY = " + tL9Vo.get("ENTDY"));
+				this.info("CustName = " + tL9Vo.get("CustName"));
+				this.info("RepayCode = " + tL9Vo.get("RepayCode"));
+//				if (!"2".equals(tL9Vo.get("RepayCode"))) {
+//					continue;
+//				}
 
 				int custNo = 0;
 				int facmNo = 0;
@@ -94,12 +115,19 @@ public class L9705Form extends MakeReport {
 					custName = tL9Vo.get("CustName");
 				}
 
-				List<BaTxVo> listBaTxVo = new ArrayList<>();
+				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
+				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 
 				dBaTxCom.setTxBuffer(txbuffer);
 
 				try {
-					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 1, titaVo);
+//
+					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
+					this.info("lBaTxVo = " + listBaTxVo.toString());
+					this.info("lBaTxVo.size = " + listBaTxVo.size());
+//					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
+//					this.info("listBaTxVo = " + listBaTxVo.toString());
+//					this.info("listBaTxVo.size = " + listBaTxVo.size());
 				} catch (LogicException e) {
 					this.info("listBaTxVo ErrorMsg :" + e.getMessage());
 				}
@@ -168,6 +196,14 @@ public class L9705Form extends MakeReport {
 					cnt++;
 
 					for (BaTxVo ba : listBaTxVo) {
+						this.info("getCustNo=" + ba.getCustNo());
+
+						this.info("getFacmNo=" + ba.getFacmNo());
+
+						this.info("getPayIntDate=" + payIntDate);
+
+						this.info("getDataKind=" + ba.getDataKind());
+
 						// 本金、利息
 						if (ba.getDataKind() != 2) {
 							continue;
@@ -198,7 +234,7 @@ public class L9705Form extends MakeReport {
 						this.info("bPrincipal ..." + bPrincipal);
 						this.info("bInterest ..." + bInterest);
 						this.info("bSummry ..." + bSummry);
-						
+
 						loanBal = loanBal.subtract(bPrincipal);
 
 //						this.print(1, 1,
@@ -221,7 +257,7 @@ public class L9705Form extends MakeReport {
 						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/"
 								+ sPayIntDate.substring(5, 7));
 
-						printCm(4,4.8,custName);
+						printCm(4, 4.8, custName);
 						String custnoX = String.format("%07d", custNo);
 
 						for (int i = 0; i < 7; i++) {
@@ -241,22 +277,27 @@ public class L9705Form extends MakeReport {
 						}
 
 						printCm(16, 6.2, titaVo.getTlrNo());
-						
+
 						break;
 					} // loop -- batxCom
 				}
 
 			}
 		} else {
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
+					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
+
+			this.openForm(titaVo, reportVo);
 			this.setRptItem("存入憑條(無符合資料)");
 			printCm(1, 4, "【無符合資料】");
 		}
-		
-		long sno = this.close();
-		
+		this.close();
+
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成", titaVo);
-		return sno;
+				titaVo.getParam("TLRNO"), titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成",
+				titaVo);
+
 	}
 
 	private String toChinese(String s) {
@@ -285,7 +326,7 @@ public class L9705Form extends MakeReport {
 		}
 		return rs;
 	}
-	
+
 	private String toChinese2(String s) {
 		String rs = "";
 

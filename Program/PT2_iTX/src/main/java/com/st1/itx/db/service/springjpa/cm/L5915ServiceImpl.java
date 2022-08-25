@@ -91,7 +91,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
 		sql += " WHERE PR.\"CoorgnizerBonus\" > 0 ";
 		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
-		sql += " UNION";
+		sql += " UNION ALL";
 		sql += " SELECT 1                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
 		sql += "      , PI.\"DrawdownAmt\"      AS \"DrawdownAmt\" "; // 撥款金額

@@ -288,6 +288,47 @@ public class L8322 extends TradeBuffer {
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4402, uJcicZ4402);
 			iDataLog.exec("L8322刪除",uJcicZ4402.getSubmitKey()+uJcicZ4402.getCustId()+uJcicZ4402.getApplyDate()+uJcicZ4402.getCourtCode());
+			break;
+		// 修改
+		case "7":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ440 = sJcicZ440Service.ukeyFirst(iKey, titaVo);
+			JcicZ440 uJcicZ4403 = new JcicZ440();
+			uJcicZ4403 = sJcicZ440Service.holdById(iJcicZ440.getJcicZ440Id(), titaVo);
+			if (uJcicZ4403 == null) {
+				throw new LogicException("E0007", "更生債權金額異動通知資料");
+			}
+			// 2022/7/6新增錯誤判斷
+			int JcicDate3 = iJcicZ440.getOutJcicTxtDate();
+			this.info("JcicDate    = " + JcicDate3);
+			if (JcicDate3 != 0) {
+				throw new LogicException("E0007", "無此修改資料");
+			}
+
+			JcicZ440 oldJcicZ4403 = (JcicZ440) iDataLog.clone(uJcicZ4403);
+			uJcicZ4403.setJcicZ440Id(iJcicZ440Id);
+			uJcicZ4403.setTranKey(iTranKey);
+			uJcicZ4403.setAgreeDate(iAgreeDate);
+			uJcicZ4403.setStartDate(iStartDate);
+			uJcicZ4403.setRemindDate(iRemindDate);
+			uJcicZ4403.setApplyType(iApplyType);
+			uJcicZ4403.setReportYn(iReportYn);
+			uJcicZ4403.setNotBankId1(iNotBankId1);
+			uJcicZ4403.setNotBankId2(iNotBankId2);
+			uJcicZ4403.setNotBankId3(iNotBankId3);
+			uJcicZ4403.setNotBankId4(iNotBankId4);
+			uJcicZ4403.setNotBankId5(iNotBankId5);
+			uJcicZ4403.setNotBankId6(iNotBankId6);
+			uJcicZ4403.setUkey(iKey);
+
+			try {
+				sJcicZ440Service.update(uJcicZ4403, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+
+			iDataLog.setEnv(titaVo, oldJcicZ4403, uJcicZ4403);
+			iDataLog.exec("L8322修改",uJcicZ4403.getSubmitKey()+uJcicZ4403.getCustId()+uJcicZ4403.getApplyDate()+uJcicZ4403.getCourtCode());
 		default:
 			break;
 		}

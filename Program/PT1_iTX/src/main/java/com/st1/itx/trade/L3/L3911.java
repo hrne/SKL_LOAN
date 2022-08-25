@@ -176,15 +176,22 @@ public class L3911 extends TradeBuffer {
 		String TempTitaTxtNo = "";
 		Object repayCode = "";
 
+		BigDecimal TempShortFall = new BigDecimal("0");
 		BigDecimal TempPrincipal = new BigDecimal("0"); // 本金
 		BigDecimal TempInterest = new BigDecimal("0"); // 利息
 		BigDecimal TempBreachAmt = new BigDecimal("0"); // 違約金
-		BigDecimal TempTxAmt = new BigDecimal("0");// 交易金額
-		BigDecimal TempTmpAmt = new BigDecimal("0");// 暫收款金額
-		BigDecimal TempShortAmt = new BigDecimal("0"); // 短繳金額
+		BigDecimal wkTempAmt = new BigDecimal("0");// 暫收抵繳
+		BigDecimal wkRepayAmt = new BigDecimal("0");// 回收金額
+		BigDecimal acctFee = new BigDecimal("0");
+		BigDecimal modifyFee = new BigDecimal("0");
+		BigDecimal fireFee = new BigDecimal("0");
+		BigDecimal lawFee = new BigDecimal("0");
+		BigDecimal repayAmt = new BigDecimal("0");
+		BigDecimal wkTempRepay = new BigDecimal("0");// 暫收金額
 
 		OccursList occursList = new OccursList();
 
+		Boolean sumfg = false;
 		int count = 0;
 		for (LoanBorTx ln : lLoanBorTx) {
 			if (!ln.getTitaHCode().equals("0")) {
@@ -219,19 +226,35 @@ public class L3911 extends TradeBuffer {
 
 				TempPrincipal = TempPrincipal.add(ln.getPrincipal());
 				TempInterest = TempInterest.add(ln.getInterest());
+				TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
 				TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt()).add(ln.getCloseBreachAmt()).add(ln.getDelayInt()); // 違約金+延遲息+清償違約金
-				TempShortAmt = TempShortAmt.add(ln.getUnpaidPrincipal()).add(ln.getUnpaidInterest())
-						.add(ln.getUnpaidCloseBreach());
-				TempTxAmt = TempTxAmt.add(ln.getTxAmt());
-				TempTmpAmt = TempTmpAmt.add(ln.getOverflow().subtract(ln.getTempAmt()));
+
+				TempVo tTempVo = new TempVo();
+
+				tTempVo = tTempVo.getVo(ln.getOtherFields());
+
+				acctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
+				modifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
+				fireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
+				lawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
+
+				repayAmt = ln.getPrincipal().add(ln.getInterest()).add(ln.getDelayInt()).add(ln.getBreachAmt())
+						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee).add(lawFee);
+
+				wkRepayAmt = wkRepayAmt.add(repayAmt); // 回收金額
+				wkTempAmt = wkTempAmt.add(ln.getTempAmt());
+
+				if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
+					wkTempRepay = wkTempRepay.subtract(ln.getTempAmt());
+				}
 				// 資料相同合併撥款 顯示0
-				count ++;
+				sumfg = true;
 			} else { // 資料不同 先拿temp資料塞occurs再更新temp資料
 
 				/* 資料不同 先拿temp資料塞occurs */
 				occursList.putParam("OOFacmNo", TempFacmNo);
 
-				if (count > 1) { 
+				if (sumfg && count != 1) { // 不為第一筆
 					occursList.putParam("OOBormNo", 0);
 				} else {
 					occursList.putParam("OOBormNo", TempBormNo);
@@ -240,20 +263,10 @@ public class L3911 extends TradeBuffer {
 				occursList.putParam("OOIntStartDate", TempIntStartDate);
 				occursList.putParam("OOIntEndDate", TempIntEndDate);
 				occursList.putParam("OOCurrencyCode", TempCurrencyCode);
-				occursList.putParam("OOTxAmt", TempTxAmt); // 交易金額
-				// 溢短繳，暫收抵繳
-				if (TempShortAmt.compareTo(BigDecimal.ZERO) > 0) {
-					// 有短繳，則只會有暫收抵繳
-					occursList.putParam("OOShortFall", BigDecimal.ZERO.subtract(TempShortAmt));
-					occursList.putParam("OOTempRepay", TempTmpAmt);
-				} else {
-					// 暫收款正值為溢繳，負值為暫收抵繳
-					if (TempTmpAmt.compareTo(BigDecimal.ZERO) > 0) {
-						occursList.putParam("OOShortFall", TempTmpAmt);
-					} else {
-						occursList.putParam("OOTempRepay", BigDecimal.ZERO.subtract(TempTmpAmt));
-					}
-				}
+
+				occursList.putParam("OOTxAmt", wkRepayAmt.add(wkTempAmt)); // 交易金額
+				occursList.putParam("OOTempRepay", wkTempRepay);
+				occursList.putParam("OOShortFall", TempShortFall);
 				occursList.putParam("OOPrincipal", TempPrincipal);
 				occursList.putParam("OOInterest", TempInterest);
 				occursList.putParam("OOBreachAmt", TempBreachAmt);
@@ -267,19 +280,54 @@ public class L3911 extends TradeBuffer {
 				occursList.putParam("OOTellerNo", TempTitaTlrNo);
 				occursList.putParam("OOTxtNo", TempTitaTxtNo);
 
-				TempPrincipal = ln.getPrincipal();
-				TempInterest = ln.getInterest();
-				TempBreachAmt = ln.getBreachAmt().add(ln.getCloseBreachAmt()).add(ln.getDelayInt()); // 違約金+延遲息+清償違約金
-				TempShortAmt = ln.getUnpaidPrincipal().add(ln.getUnpaidInterest()).add(ln.getUnpaidCloseBreach());
-				TempTxAmt = ln.getTxAmt();
-				TempTmpAmt = ln.getOverflow().subtract(ln.getTempAmt());
+				sumfg = false;
+
+				/* 更新temp資料 */
+				TempFacmNo = ln.getFacmNo();
+				TempBormNo = ln.getBormNo();
+				TempEntryDate = ln.getEntryDate();
+				TempIntStartDate = ln.getIntStartDate();
+				TempIntEndDate = ln.getIntEndDate();
+				TempCurrencyCode = ln.getTitaCurCd();
+
+				TempShortFall = new BigDecimal("0");
+				TempPrincipal = new BigDecimal("0");
+				TempInterest = new BigDecimal("0");
+				TempBreachAmt = new BigDecimal("0");
+				wkTempAmt = new BigDecimal("0");
+				wkRepayAmt = new BigDecimal("0");
+
+				TempPrincipal = TempPrincipal.add(ln.getPrincipal());
+				TempInterest = TempInterest.add(ln.getInterest());
+				TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
+				TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt()).add(ln.getCloseBreachAmt()).add(ln.getDelayInt()); // 違約金+延遲息+清償違約金
+
 				TempVo tTempVo = new TempVo();
 				repayCode = ln.getRepayCode();
+
+				tTempVo = tTempVo.getVo(ln.getOtherFields());
+
+				acctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
+				modifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
+				fireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
+				lawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
+
+				repayAmt = ln.getPrincipal().add(ln.getInterest()).add(ln.getDelayInt()).add(ln.getBreachAmt())
+						.add(ln.getCloseBreachAmt()).add(acctFee).add(modifyFee).add(fireFee).add(lawFee);
+
+				wkRepayAmt = wkRepayAmt.add(repayAmt); // 回收金額
+				wkTempAmt = wkTempAmt.add(ln.getTempAmt()); // 暫收金額
 				TempAcDate = ln.getAcDate();
 				TempTitaTlrNo = ln.getTitaTlrNo();
 				TempTitaTxtNo = ln.getTitaTxtNo();
+
+				if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
+					wkTempRepay = wkTempRepay.subtract(ln.getTempAmt()); // 暫收抵繳
+				}
 				this.totaVo.addOccursList(occursList);
-				count = 1;
+				
+				count++;
+				
 				occursList = new OccursList();
 			}
 
@@ -287,28 +335,18 @@ public class L3911 extends TradeBuffer {
 
 		if (!firstFg) { // 只有一筆資料 或是 最後一筆
 			occursList.putParam("OOFacmNo", TempFacmNo);
-			if (count > 1) { 
-				occursList.putParam("OOBormNo", 0);
-			} else {
-				occursList.putParam("OOBormNo", TempBormNo);
-			}
+			occursList.putParam("OOBormNo", TempBormNo);
 			occursList.putParam("OOEntryDate", TempEntryDate);
 			occursList.putParam("OOIntStartDate", TempIntStartDate);
 			occursList.putParam("OOIntEndDate", TempIntEndDate);
 			occursList.putParam("OOCurrencyCode", TempCurrencyCode);
-			// 溢短繳，暫收抵繳
-			if (TempShortAmt.compareTo(BigDecimal.ZERO) > 0) {
-				// 有短繳，則只會有暫收抵繳
-				occursList.putParam("OOShortFall", BigDecimal.ZERO.subtract(TempShortAmt));
-				occursList.putParam("OOTempRepay", TempTmpAmt);
-			} else {
-				// 暫收款正值為溢繳，負值為暫收抵繳
-				if (TempTmpAmt.compareTo(BigDecimal.ZERO) > 0) {
-					occursList.putParam("OOShortFall", TempTmpAmt);
-				} else {
-					occursList.putParam("OOTempRepay", BigDecimal.ZERO.subtract(TempTmpAmt));
-				}
-			}
+
+			occursList.putParam("OOTxAmt", wkRepayAmt.add(wkTempAmt));
+			occursList.putParam("OOTempRepay", wkTempRepay);
+			occursList.putParam("OOShortFall", TempShortFall);
+			occursList.putParam("OOPrincipal", TempPrincipal);
+			occursList.putParam("OOInterest", TempInterest);
+			occursList.putParam("OOBreachAmt", TempBreachAmt);
 
 			if (repayCode.toString().length() == 2) {
 				occursList.putParam("OORepayCode", repayCode);

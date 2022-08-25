@@ -49,7 +49,7 @@ public class LB204Report extends MakeReport {
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
-		// LB204 聯徵授信餘額日報檔
+		// LB204 聯徵每日新增授信及清償資料檔
 
 //		strToday = String.valueOf(parse.stringToInteger(titaVo.getEntDy())); // 7位 民國年
 		strToday = String.valueOf(Integer.parseInt(titaVo.getParam("FileDay"))); // 7位 民國年 -畫面輸入報送日期
@@ -125,7 +125,7 @@ public class LB204Report extends MakeReport {
 			DecimalFormat formatter = new DecimalFormat("0");
 
 			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".204"; // 458+月日+序號.204
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵授信餘額日報檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵每日新增授信及清償資料檔", strFileName, 2);
 
 			// 首筆
 			strContent = "JCIC-DAT-B204-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
@@ -241,7 +241,7 @@ public class LB204Report extends MakeReport {
 		String inf = "";
 		String txt = "";
 
-		// B204 聯徵授信餘額日報檔
+		// B204 聯徵每日新增授信及清償資料檔
 		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64),"
 				+ "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
 				+ "本筆新增核准額度應計入DBR22倍規範之金額(98~107),1~7欄資料值相同之交易序號(108),空白(109~128)";
@@ -257,7 +257,7 @@ public class LB204Report extends MakeReport {
 			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".204.CSV"; // 458+月日+序號+.204.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵授信餘額日報檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵每日新增授信及清償資料檔", strFileName, 2);
 
 			// 標題列
 			strContent = inf;

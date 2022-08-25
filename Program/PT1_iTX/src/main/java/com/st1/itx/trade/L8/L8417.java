@@ -2,22 +2,20 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.StringUtils;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.JcicZ054;
-import com.st1.itx.db.domain.JcicZ054Log;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.JcicZ054LogService;
 import com.st1.itx.db.service.JcicZ054Service;
@@ -44,73 +42,85 @@ public class L8417 extends TradeBuffer {
 	public JcicZ054Service sJcicZ054Service;
 	@Autowired
 	public JcicZ054LogService sJcicZ054LogService;
-
+	@Autowired
+	public CdCodeService iCdCodeService;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
 		this.totaVo.init(titaVo);
-
+		this.index = titaVo.getReturnIndex();
+		this.limit = 500;
+		Slice<JcicZ054> sJcicZ054 = null;
+		sJcicZ054 = sJcicZ054Service.findAll(index, limit, titaVo);
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
-		long sno1 = 0;
-		switch (iSubmitType) {
-		case 1:
-			sno1 = doFile(titaVo);
-			break;
-		case 2:
-			doRemoveJcicDate(titaVo);
-			break;
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		// 取值顯示
+		this.info("sJcicZ054     = " + sJcicZ054.getSize());
+		if (sJcicZ054 != null) {
+			for (JcicZ054 xJcicZ054 : sJcicZ054) {
+				if ((iSubmitType == 1 && xJcicZ054.getOutJcicTxtDate() == 0)
+						|| (iSubmitType == 3 && xJcicZ054.getActualFilingDate() == 0)) {
+					OccursList occursListB = new OccursList();
+					occursListB.putParam("OOChainTxCd", "L8315");
+					occursListB.putParam("OOHistoryTxCd", "L8045");
+					occursListB.putParam("OOCustId", xJcicZ054.getCustId());
+					occursListB.putParam("OOSubmitKey", xJcicZ054.getSubmitKey());
+					occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ054.getSubmitKey(), titaVo));
+					occursListB.putParam("OORcDate", xJcicZ054.getRcDate());
+                    occursListB.putParam("OOMaxMainCode",xJcicZ054.getMaxMainCode());
+                    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ054.getMaxMainCode(), titaVo));
+                    occursListB.putParam("OOPayOffDate", xJcicZ054.getPayOffDate());
+                    occursListB.putParam("OOTranKey", xJcicZ054.getTranKey());
+					// occursListB.putParam("OOTranCode", xJcicZ054.getTranCode());
+					occursListB.putParam("OOTranCode", "054");
+					int iActualFilingDate = 0;
+					iActualFilingDate = xJcicZ054.getActualFilingDate();
+					if (iActualFilingDate == 0) {
+						occursListB.putParam("OOActualFilingDate", "");
+					} else {
+						occursListB.putParam("OOActualFilingDate", iActualFilingDate);
+					}
+					occursListB.putParam("OOActualFilingMark", xJcicZ054.getActualFilingMark());
+					this.totaVo.addOccursList(occursListB);
+				} else if (iSubmitType == 2) {
+					if (xJcicZ054.getOutJcicTxtDate() == iJcicDate && xJcicZ054.getActualFilingDate() == 0) {
+						OccursList occursListB = new OccursList();
+						occursListB.putParam("OOChainTxCd", "L8315");
+						occursListB.putParam("OOHistoryTxCd", "L8045d");
+						occursListB.putParam("OOCustId", xJcicZ054.getCustId());
+						occursListB.putParam("OOSubmitKey", xJcicZ054.getSubmitKey());
+						occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ054.getSubmitKey(), titaVo));
+						occursListB.putParam("OORcDate", xJcicZ054.getRcDate());
+                        occursListB.putParam("OOMaxMainCode",xJcicZ054.getMaxMainCode());
+                        occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ054.getMaxMainCode(), titaVo));
+                        occursListB.putParam("OOPayOffDate", xJcicZ054.getPayOffDate());
+                        occursListB.putParam("OOTranKey", xJcicZ054.getTranKey());
+//					occursListB.putParam("OOTranCode", xJcicZ054.getTranCode());
+						occursListB.putParam("OOTranCode", "054");
+						int iActualFilingDate = 0;
+						iActualFilingDate = xJcicZ054.getActualFilingDate();
+						if (iActualFilingDate == 0) {
+							occursListB.putParam("OOActualFilingDate", "");
+						} else {
+							occursListB.putParam("OOActualFilingDate", iActualFilingDate);
+						}
+						occursListB.putParam("OOActualFilingMark", xJcicZ054.getActualFilingMark());
+						this.totaVo.addOccursList(occursListB);
+					}
+				}
+			}
 		}
-		totaVo.put("ExcelSnoM", "" + sno1);
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	public long doFile(TitaVo titaVo) throws LogicException {
-
-		String iSubmitKey = titaVo.getParam("SubmitKey");
-		String iReportDate = titaVo.getParam("ReportDate");
-		String iTranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
-
-		// 檔名
-		// BBBMMDDS.XXX 金融機構總行代號+月份+日期+次數.檔案類別
-		String fileNname = iSubmitKey + iReportDate.substring(3) + "." + iTranCode;
-
-		iL8403File.exec(titaVo);
-		long fileNo = iL8403File.close();
-		iL8403File.toFile(fileNo, fileNname);
-		return fileNo;
-	}
-
-	public void doRemoveJcicDate(TitaVo titaVo) throws LogicException {
-		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-		int count = 0;
-		Slice<JcicZ054> iJcicZ054 = null;
-		JcicZ054 uJcicZ054 = new JcicZ054();
-		JcicZ054 oldJcicZ054 = new JcicZ054();
-		iJcicZ054 = sJcicZ054Service.findAll(0,Integer.MAX_VALUE, titaVo);
-		for (JcicZ054 iiJcicZ054 : iJcicZ054) {
-			if (iiJcicZ054.getOutJcicTxtDate() == iJcicDate) {
-				count++;
-				uJcicZ054 = sJcicZ054Service.holdById(iiJcicZ054.getJcicZ054Id(), titaVo);
-				oldJcicZ054 = (JcicZ054) iDataLog.clone(uJcicZ054);
-				uJcicZ054.setOutJcicTxtDate(0);
-				try {
-					sJcicZ054Service.update(uJcicZ054, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-				}
-                JcicZ054Log iJcicZ054Log = sJcicZ054LogService.ukeyFirst(uJcicZ054.getUkey(), titaVo);
-				JcicZ054 cJcicZ054 = sJcicZ054Service.ukeyFirst(uJcicZ054.getUkey(), titaVo);
-				CustMain tCustMain = sCustMainService.custIdFirst(cJcicZ054.getCustId(), titaVo);
-				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
-				titaVo.putParam("CustNo", iCustNo);			
-				iDataLog.setEnv(titaVo, oldJcicZ054, uJcicZ054);
-				iDataLog.exec("L8417取消報送",iJcicZ054Log.getUkey()+iJcicZ054Log.getTxSeq());
-			}
+	public String dealBankName(String BankId, TitaVo titaVo) throws LogicException {
+		CdCode tCdCode = new CdCode();
+		tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", BankId, titaVo);
+		String JcicBankName = "";// 80碼長度
+		if (tCdCode != null) {
+			JcicBankName = tCdCode.getItem();
 		}
-		if (count == 0) {
-			throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
-		}
+		return JcicBankName;
 	}
 }

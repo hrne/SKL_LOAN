@@ -379,6 +379,7 @@ TXFORM=L2918
 {width:40,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
 
+#OOCustNo
 #OOCl=擔保品號碼
 {width:100,align:'center'}
 #OOClSeq=他項權利序號
@@ -395,9 +396,8 @@ TXFORM=L2918
 {width:80,align:'center'}
 #OORightsNoteX=權利價值說明
 {width:150,align:'center'}
-#OOSecuredTotalX=擔保債權總金額（萬元）
+#OOSecuredTotalX=擔保債權總金額(萬元)
 {width:200,align:'center'}
-#OOCustNo
 
 ^
 

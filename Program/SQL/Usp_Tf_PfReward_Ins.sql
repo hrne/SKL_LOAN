@@ -53,7 +53,10 @@ BEGIN
                             , r."LMSLLD"
                             , r."LMSACN"
                             , r."LMSAPN"
-                 ORDER BY "LMSASQ"
+                 ORDER BY CASE 
+                            WHEN "LMSASQ" = 0
+                            THEN 1000 + "LMSASQ"
+                          ELSE "LMSASQ" END
              ) AS "FacSeq"
       FROM rawData r
     )
@@ -66,7 +69,6 @@ BEGIN
              , QTAP."CUSEM3"
              , LSEP."EMPCOD" -- 協辦人員員編
              , QTAP."PRZCMT" -- 介紹人介紹獎金
-             , QTAP."PRZCMD" -- 介紹獎金發放日
         FROM "LA$QTAP" QTAP
         WHERE QTAP."PRZTYP" = '1' -- 介紹獎金
           AND QTAP."PRZCMD" >= 20211201
@@ -82,7 +84,6 @@ BEGIN
              , QTAP."LMSASQ" -- *** 協辦獎金的撥款序號會放0
              , QTAP."CUSEM3" -- *** 協辦獎金的CUSEM3 是協辦人員
              , QTAP."PRZCMT" -- 協辦人員協辦獎金
-             , QTAP."PRZCMD" -- 協辦獎金發放日
         FROM "LA$QTAP" QTAP
         LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = QTAP."LMSACN"
                                 AND APLP."LMSAPN" = QTAP."LMSAPN"
