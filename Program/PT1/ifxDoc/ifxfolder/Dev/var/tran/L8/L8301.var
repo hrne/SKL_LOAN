@@ -153,6 +153,23 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@ApplyType,1)T(F,@RefBankId,1)
+T(F,@RcDate,1)T(F,@ApplyType,1)T(F,@RefBankId,1)T(F,@SubmitKey,1)T(F,@TranKey,1)
+T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
+T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdRcDate,*)
+T(2,@FdApplyType,*)
+T(2,@FdRefBankId,*)
+T(2,@FdSubmitKey,*)
+T(2,@FdTranKey,*)
+T(3,@TranKeyHelp,A:新增;R:請求提供債權人清冊;C:異動))
+
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -210,12 +227,13 @@ T(2,@RefBankIdX,#L8r01JcicBankName)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-C(5,#TranKey_Tmp,1,$,s)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,4,s,$) 
 C(5,#TranKey_Tmp,2,s,$)
 HELP(#TranKeyHelp)
-@V(H,#TranKeyHelp)
+@T(3,@TranKeyX,)
+V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@ApplyType,1)T(F,@RefBankId,1)T(F,@RcDate,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
 T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
@@ -227,11 +245,20 @@ T(2,@FdApplyType, )T(2,@FdRefBankId, )
 T(2,@FdRcDate, )T(2,@FdRefBankId, )
 ,$))
 
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyType,1)T(F,@RefBankId,1)T(F,@RcDate,1)
+T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
+T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
+T(2,@FdApplyType,*)T(2,@FdRefBankId,*)T(2,@FdRcDate,*)T(2,@FdRefBankId,*),$)
+
+
+
+
 #TranKeyX=X,20,L
-C(5,#TranKey_Tmp,1,$,s)
-C(5,#TranKey_Tmp,2,s,$)
+!T(3,)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,4,s,$) 
+C(5,#TranKey_Tmp,2,s,$)
 T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
@@ -253,7 +280,8 @@ T(2,@CustIdX,#L8R57CustName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@T(3,@SubmitKeyX,)
+V(7)
 
 #SubmitKeyX=X,80,L
 T(2,@RimJcicBankCode,#SubmitKey)
@@ -288,7 +316,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,R,S,$)
 HELP(#ApplyTypeDscp)
-@V(H,#ApplyTypeDscp)
+@T(3,@ApplyTypeX,)
+V(H,#ApplyTypeDscp)
 
 #ApplyTypeX=X,20,L
 C(5,#TranKey,R,S,$)
@@ -307,12 +336,14 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,R,S,$)
 IF(#ApplyType=="A",S,$)
-@V(7)V(NL)
+@T(3,@RefBankIdX,)
+V(7)V(NL)
 
 #RefBankIdRim=X,1,S
 C(5,#TranKey,R,S,$)
 C(5,#ApplyType,A,S,$)
 T(2,@RimJcicBankCode,#RefBankId)
+RESET_RIM(#RefBankIdRim,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@RefBankIdX,#L8r01JcicBankName)
@@ -333,7 +364,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,R,S,$)
 IF(#NotBankId{j}!="",$,s)
-@V(NL)
+@T(3,@NotBankIdX{i},)V(NL)
 
 #CheckNotBankId{i}=X,1,S
 IF(#NotBankId{i}=="",$,S)
@@ -342,6 +373,7 @@ T(2,@NotBankIdX{i},)
 #RimL8r01C{i}=X,1,S
 IF(#NotBankId{i}=="",S,$)
 T(2,@RimJcicBankCode,#NotBankId{i})
+RESET_RIM(#RimL8r01C{i},L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@NotBankIdX{i},#L8r01JcicBankName)
@@ -357,6 +389,9 @@ T(2,@NotBankIdX{i},#L8r01JcicBankName)
 
 ! 流水號
 #Ukey=X,32,S
+
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
 
 ! ![列印用系統變數]
 #RPTFG=A,1,S

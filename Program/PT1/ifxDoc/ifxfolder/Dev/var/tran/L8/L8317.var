@@ -357,7 +357,7 @@ C(5,#TranKey,D,T(2,@Approve,#L8r28Approve),$)
 C(5,#TranKey,D,s,$)
 C(5,#CaseStatus,B,$,C(5,#CaseStatus,C,$,s))
 HELP(#YesNoHelp)
-@T(3,ApproveX,)
+!@T(3,ApproveX,)
 V(H,#YesNoHelp)
 
 #ApproveX=X,2,L
@@ -434,6 +434,9 @@ C(5,#TranKey,D,s,$)
 
 ! 流水號
 #Ukey=X,32,S
+
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
 
 ! !<儲存>
 ! #BUF1=X,10,S

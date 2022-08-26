@@ -75,8 +75,11 @@ public class L9132ReportB extends MakeReport {
 	private void printDetailHeader() {
 		print(1, 1, "傳票批號：　" + this.batchNo);
 		print(1, 1, "");
-		print(1, 1, "交易序號　傳票號碼　會計科目／名稱　　　　　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　戶名　　　經辦");
-		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
+//		print(1, 1, "交易序號　傳票號碼　會計科目／名稱　　　　　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　戶名　　　經辦");
+//		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
+		
+		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　 戶名　　　經辦");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－");
 		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		// ----------12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
 	}
@@ -124,15 +127,15 @@ public class L9132ReportB extends MakeReport {
 				String custName = result.get("CustName") == null ? "" : result.get("CustName");
 				String empName = result.get("EmpName") == null ? "" : result.get("EmpName");
 
-				print(1, 9, titaTxtNo, "R");
-				print(0, 19, slipNo, "R");
-				print(0, 21, acNo);
-				print(0, 83, acSubBookItem);
-				print(0, 113, formatAmt(dbAmt, 0), "R");
-				print(0, 135, formatAmt(crAmt, 0), "R");
-				print(0, 145, custNo, "R");
-				print(0, 147, custName);
-				print(0, 157, empName);
+				print(1, 19, titaTxtNo, "R");
+				print(0, 29, slipNo, "R");
+				print(0, 31, acNo);
+				print(0, 85, acSubBookItem);
+				print(0, 115, formatAmt(dbAmt, 0), "R");
+				print(0, 137, formatAmt(crAmt, 0), "R");
+				print(0, 147, custNo, "R");
+				print(0, 149, custName);
+				print(0, 159, empName);
 
 				// 加總
 				cnt = cnt.add(BigDecimal.ONE);

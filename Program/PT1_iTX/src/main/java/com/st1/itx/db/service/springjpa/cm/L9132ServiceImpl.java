@@ -335,6 +335,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       		 THEN 0 ";
 		sql += "       		 ELSE AC.\"TitaTxtNo\"";
 		sql += "            END   AS \"TitaTxtNo\" ";
+		sql += "          ,AC.\"RelTxseq\" AS \"RelTxseq\" ";
 		sql += "       	  ,CASE ";
 		sql += "		  	 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       	 	  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
@@ -459,7 +460,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ORDER BY \"ReconCode\" ASC";
 		sql += " ) ";
 		sql += " , groupData2 AS ( ";
-		sql += "     SELECT \"TitaTxtNo\" ";
+		sql += "     SELECT \"RelTxseq\" AS \"TitaTxtNo\"";
 		sql += "          , \"SlipNo\" ";
 		sql += "          , \"AcNo\" ";
 		sql += "          , \"AcSubBookItem\" ";
@@ -470,7 +471,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"EmpName\" ";
 		sql += "     FROM rawData ";
 		sql += "     WHERE \"EntAcCode\" = 0";
-		sql += "     GROUP BY \"TitaTxtNo\" ";
+		sql += "     GROUP BY \"RelTxseq\" ";
 		sql += "            , \"SlipNo\" ";
 		sql += "            , \"AcNo\" ";
 		sql += "            , \"AcSubBookItem\" ";
@@ -481,7 +482,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     		 ,\"SlipNo\" ASC";
 		sql += " ) ";
 		sql += " SELECT * FROM ( ";
-		sql += " SELECT A.\"TitaTxtNo\" ";
+		sql += " SELECT TO_CHAR(A.\"TitaTxtNo\") AS \"TitaTxtNo\"";
 		sql += "       , 90000 + ROWNUM  AS \"SlipNo\" ";
 		sql += "      , A.\"AcNo\" ";
 		sql += "      , A.\"AcSubBookItem\" ";
@@ -492,7 +493,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , A.\"EmpName\" ";
 		sql += " FROM groupData A ";
 		sql += " UNION ";
-		sql += " SELECT B.\"TitaTxtNo\" ";
+		sql += " SELECT TO_CHAR(B.\"TitaTxtNo\") AS \"TitaTxtNo\"";
 		sql += "       ,B.\"SlipNo\" ";
 		sql += "      , B.\"AcNo\" ";
 		sql += "      , B.\"AcSubBookItem\" ";

@@ -291,7 +291,7 @@ C(5,#OwnerYn,N,S,$)
 C(5,#PayYn,Y,s,$)
 @E(0,@OwnerAmt,#AllotAmt+#UnallotAmt)
 !本金融機構更生債權總金額
-#OwnerAmt=M,9,L
+#OwnerAmt=M,10,L
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#OwnerYn,N,S,$)
@@ -302,6 +302,10 @@ C(5,#OwnerYn,N,S,$)
 
 ! 流水號
 #Ukey=X,32,S
+
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
+
 
 #RPTFG=X,1,S
 E(0,0) 

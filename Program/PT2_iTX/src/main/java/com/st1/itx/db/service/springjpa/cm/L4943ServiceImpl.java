@@ -138,7 +138,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      \"AcDate\"                                          ";
 			sql += "     ,\"TitaTlrNo\"                                       ";
 			sql += "     ,\"TitaTxtNo\"                                       ";
-			sql += "     ,SUM(Case when JSON_VALUE(\"OtherFields\",'$.AcSeq') = '0001' then \"TempAmt\" else 0 end) as  \"TempAmt\"  ";
+			sql += "     ,SUM(Case when \"AcSeq\" = 1 then \"TempAmt\" else 0 end) as  \"TempAmt\"  ";
 			sql += "     ,SUM(\"Overflow\"-\"TempAmt\") as \"OverAmt\"        ";
 			sql += "     ,SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\" + \"UnpaidCloseBreach\") as \"ShortAmt\" ";
 			sql += "     from \"LoanBorTx\"                                   ";

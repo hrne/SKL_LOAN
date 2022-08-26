@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
 import com.st1.itx.db.service.InsuRenewService;
+import com.st1.itx.db.service.springjpa.cm.L4606ServiceImpl;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -55,56 +57,61 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L4606Batch extends TradeBuffer {
 
-	@Autowired
-	public Parse parse;
+	private TitaVo titaVo;
 
 	@Autowired
-	public DateUtil dateUtil;
+	private Parse parse;
 
 	@Autowired
-	public FileCom fileCom;
+	private DateUtil dateUtil;
 
 	@Autowired
-	public InsuCommFileVo insuCommFileVo;
+	private FileCom fileCom;
 
 	@Autowired
-	public InsuCommService insuCommService;
+	private InsuCommFileVo insuCommFileVo;
 
 	@Autowired
-	public FacMainService facMainService;
+	private InsuCommService insuCommService;
 
 	@Autowired
-	public CustMainService custMainService;
+	private FacMainService facMainService;
 
 	@Autowired
-	public CdEmpService cdEmpService;
+	private CustMainService custMainService;
 
 	@Autowired
-	public TotaVo totaA;
+	private CdEmpService cdEmpService;
 
 	@Autowired
-	public TotaVo totaB;
+	private L4606ServiceImpl l4606ServiceImpl;
 
 	@Autowired
-	public WebClient webClient;
+	private TotaVo totaA;
 
 	@Autowired
-	public L4606Report1 l4606Report1;
+	private TotaVo totaB;
 
 	@Autowired
-	public L4606Report2 l4606Report2;
+	private WebClient webClient;
 
 	@Autowired
-	public L4606Report3 l4606Report3;
+	private L4606Report1 l4606Report1;
 
 	@Autowired
-	public L4606Report4 l4606Report4;
+	private L4606Report2 l4606Report2;
+
+	@Autowired
+	private L4606Report3 l4606Report3;
+
+	@Autowired
+	private L4606Report4 l4606Report4;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
 	@Autowired
-	public MakeFile makeFile;
+	private MakeFile makeFile;
 
 	// 上傳預設目錄
 	@Value("${iTXInFolder}")
@@ -115,12 +122,24 @@ public class L4606Batch extends TradeBuffer {
 //	寄送筆數
 	private int commitCnt = 500;
 	private String sendMsg = "";
-	private Boolean flag = true;
+	private Boolean isFinished = true;
+
+	private long sno = 0;
+	private int totCnt = 0;
+	private int minusCnt = 0;
+	private int zeroDueAmtCnt = 0;
+	private int paidCnt = 0;
+	private int unPaidCnt = 0;
+	private int custErrorCnt = 0;
+
+	private List<OccursList> successList = new ArrayList<>();
+	private List<OccursList> errorList = new ArrayList<>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4606Batch ");
 		this.totaVo.init(titaVo);
+		this.titaVo = titaVo;
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -132,11 +151,11 @@ public class L4606Batch extends TradeBuffer {
 			execute(titaVo);
 		} catch (LogicException e) {
 			sendMsg = e.getErrorMsg();
-			flag = false;
+			isFinished = false;
 		}
 
 //		執行成功者，指向查詢畫面
-		if (flag) {
+		if (isFinished) {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
 					sendMsg, titaVo);
 		} else {
@@ -147,169 +166,34 @@ public class L4606Batch extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private void init() {
+		sno = 0;
+		totCnt = 0;
+		minusCnt = 0;
+		zeroDueAmtCnt = 0;
+		paidCnt = 0;
+		unPaidCnt = 0;
+		custErrorCnt = 0;
+		successList = new ArrayList<>();
+		errorList = new ArrayList<>();
+	}
+
 	private void execute(TitaVo titaVo) throws LogicException {
 		String flagA = titaVo.getParam("FlagA");
 		String flagB = titaVo.getParam("FlagB");
 		String flagC = titaVo.getParam("FlagC");
-		long sno = 0;
-		int totCnt = 0;
-		int minusCnt = 0;
-		int zeroDueAmtCnt = 0;
-		int paidCnt = 0;
-		int unPaidCnt = 0;
-		int custErrorCnt = 0;
-		deleinsuComm(titaVo);
-		ArrayList<OccursList> successList = new ArrayList<>();
-		ArrayList<OccursList> errorList = new ArrayList<>();
+
+		init();
+
+		deleteInsuComm(titaVo);
 
 //		PC上傳媒體檔轉入佣金媒體檔
 		if (!"".equals(flagA)) {
-
-			this.info("flagA Start ...");
-
-//			String fileName = "874-B1.txt";
-			String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-					+ File.separatorChar + titaVo.getParam("FILENA");
-
-			ArrayList<String> dataLineList = new ArrayList<>();
-
-//			 編碼參數，設定為UTF-8 || big5
-			try {
-				dataLineList = fileCom.intputTxt(filePath1, "big5");
-			} catch (IOException e) {
-				throw new LogicException("E0014", "L4606(" + filePath1 + ") is error : " + e.getMessage());
-			}
-
-//			 使用資料容器內定義的方法切資料
-			insuCommFileVo.setValueFromFile(dataLineList);
-
-			ArrayList<OccursList> uploadFile = insuCommFileVo.getOccursList();
-
-			int seq = 0;
-			if (uploadFile != null && uploadFile.size() != 0) {
-				this.info("tInsuCommId Start");
-				for (OccursList tempOccursList : uploadFile) {
-					this.info(tempOccursList.toString());
-
-					seq++;
-					tempOccursList.putParam("Seq", seq);
-
-					if (seq % commitCnt == 0) {
-						this.info("Seq : " + seq);
-						this.batchTransaction.commit();
-					}
-					totCnt++;
-					// 佣金為負不寫入、僅顯示筆數
-					if (parse.stringToBigDecimal(tempOccursList.get("InsuComm")).compareTo(BigDecimal.ZERO) < 0) {
-						minusCnt++;
-						tempOccursList.putParam("ErrorMsg", "佣金為負:" + tempOccursList.get("InsuComm"));
-						errorList.add(tempOccursList);
-						continue;
-					}
-					InsuComm tInsuComm = new InsuComm();
-					InsuCommId tInsuCommId = new InsuCommId();
-					FacMain tFacMain = new FacMain();
-					FacMainId tFacMainId = new FacMainId();
-					CustMain tCustMain = new CustMain();
-
-					CdEmp tCdEmp = new CdEmp();
-					String empNo = "";
-					String empId = "";
-					String empName = "";
-					String agStatusCode = "";
-					String mediaCode = "";
-					int custNo = parse.stringToInteger(tempOccursList.get("CustNo"));
-					int facmNo = parse.stringToInteger(tempOccursList.get("FacmNo"));
-
-					tInsuCommId.setInsuYearMonth(iInsuEndMonth);
-					tInsuCommId.setInsuCommSeq(seq);
-
-					tInsuComm.setInsuCommId(tInsuCommId);
-					tInsuComm.setNowInsuNo(tempOccursList.get("InsuNo"));
-					tInsuComm.setInsuType(parse.stringToInteger(tempOccursList.get("InsuKind")));
-					tInsuComm.setManagerCode(tempOccursList.get("IndexCode"));
-					tInsuComm.setBatchNo(tempOccursList.get("BatxNo"));
-					tInsuComm.setInsuSignDate(parse.stringToInteger(tempOccursList.get("SignDate")));
-					tInsuComm.setInsuredName(tempOccursList.get("InsuredName"));
-					tInsuComm.setInsuredAddr(tempOccursList.get("InsuredAddress"));
-					tInsuComm.setInsuredTeleph(tempOccursList.get("InsuredTeleNo"));
-					tInsuComm.setInsuStartDate(parse.stringToInteger(tempOccursList.get("InsuStartDate")));
-					tInsuComm.setInsuEndDate(parse.stringToInteger(tempOccursList.get("InsuEndDate")));
-					tInsuComm.setInsuCate(parse.stringToInteger(tempOccursList.get("InsuType")));
-					tInsuComm.setInsuPrem(parse.stringToBigDecimal(tempOccursList.get("InsuFee")));
-					tInsuComm.setCommRate(parse.stringToBigDecimal(tempOccursList.get("InsuCommRate")));
-					tInsuComm.setCommision(parse.stringToBigDecimal(tempOccursList.get("InsuComm")));
-					tInsuComm.setTotInsuPrem(parse.stringToBigDecimal(tempOccursList.get("TotalFee")));
-					tInsuComm.setTotComm(parse.stringToBigDecimal(tempOccursList.get("TotalComm")));
-					tInsuComm.setRecvSeq(tempOccursList.get("CaseNo"));
-					tInsuComm.setChargeDate(parse.stringToInteger(tempOccursList.get("AcDate")));
-					tInsuComm.setCommDate(parse.stringToInteger(tempOccursList.get("CommDate")));
-					tInsuComm.setCustNo(custNo);
-					tInsuComm.setFacmNo(facmNo);
-					BigDecimal commBase = parse.stringToBigDecimal(tempOccursList.get("CommBase"));
-					BigDecimal commRate = parse.stringToBigDecimal(tempOccursList.get("CommRate"));
-					;
-					this.info("commBase=" + commBase + ", commRate = " + commRate);
-					BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
-					tInsuComm.setDueAmt(dueAmt);
-
-//					By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
-//					業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
-
-					tFacMainId.setCustNo(custNo);
-					tFacMainId.setFacmNo(facmNo);
-					tFacMain = facMainService.findById(tFacMainId, titaVo);
-
-					if (tFacMain == null || tFacMain.getFireOfficer().isEmpty()) {
-						tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
-						if (tCustMain == null) {
-							custErrorCnt++;
-							tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
-							errorList.add(tempOccursList);
-							continue;
-						} else {
-							empNo = tCustMain.getIntroducer();
-						}
-					} else {
-						empNo = tFacMain.getFireOfficer();
-					}
-
-					tCdEmp = cdEmpService.findById(empNo, titaVo);
-					if (tCdEmp != null) {
-						empId = tCdEmp.getAgentId();
-						empName = tCdEmp.getFullname();
-						agStatusCode = tCdEmp.getAgStatusCode();
-					}
-
-					tInsuComm.setFireOfficer(empNo);
-					tInsuComm.setEmpId(empId);
-					tInsuComm.setEmpName(empName);
-					if ("1".equals(agStatusCode)) {
-						mediaCode = "Y";
-					}
-					tInsuComm.setMediaCode(mediaCode);
-					if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
-						zeroDueAmtCnt++;
-					} else if ("Y".equals(mediaCode)) {
-						paidCnt++;
-					} else {
-						unPaidCnt++;
-					}
-					tempOccursList.putParam("Seq", seq);
-					successList.add(tempOccursList);
-					try {
-						insuCommService.insert(tInsuComm, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0005", "InsuComm insert Error : " + e.getErrorMsg());
-					}
-				}
-				this.info("InsuComm insert end");
-			}
+			insertIntoInsuComm();
 		}
 
 //		火險佣金發放報表(未發放 = '佣金日期=0?')
 //		未發放 -> 火險服務(FireOfficer) = 空白(null)
-
 		if (!"".equals(flagB)) {
 			this.info("flagB Start ...");
 			l4606Report1.exec(titaVo);
@@ -323,136 +207,274 @@ public class L4606Batch extends TradeBuffer {
 
 //		產生下傳媒體
 		if (!"".equals(flagC)) {
-			this.info("flagC Start ...");
-
-			List<InsuComm> lInsuComm = new ArrayList<InsuComm>();
-
-//			暫定 : D:\\temp\\LNM23P.TXT
-//			String path = outFolder + "LNM23P.TXT";
-
-			ArrayList<OccursList> tmp = new ArrayList<>();
-
-			Slice<InsuComm> sInsuComm = null;
-
-			sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit, titaVo);
-
-			lInsuComm = sInsuComm == null ? null : sInsuComm.getContent();
-
-			if (lInsuComm != null && lInsuComm.size() != 0) {
-
-//				1.Group by ID
-				HashMap<String, BigDecimal> sumComm = new HashMap<>();
-				HashMap<String, BigDecimal> sumPrem = new HashMap<>();
-				HashMap<String, Integer> cntComm = new HashMap<>();
-
-				for (InsuComm tInsuComm : lInsuComm) {
-					if ("Y".equals(tInsuComm.getMediaCode())) {
-						String empId = tInsuComm.getEmpId();
-
-						if (sumComm.containsKey(empId)) {
-							sumComm.put(empId, sumComm.get(empId).add(tInsuComm.getCommision()));
-						} else {
-							sumComm.put(empId, tInsuComm.getCommision());
-						}
-
-						if (sumPrem.containsKey(empId)) {
-							sumPrem.put(empId, sumPrem.get(empId).add(tInsuComm.getInsuPrem()));
-						} else {
-							sumPrem.put(empId, tInsuComm.getInsuPrem());
-						}
-
-						if (cntComm.containsKey(empId)) {
-							cntComm.put(empId, cntComm.get(empId) + 1);
-						} else {
-							cntComm.put(empId, 1);
-						}
-					}
-				}
-
-//				2.if already output -> continue
-				HashMap<String, Integer> flagComm = new HashMap<>();
-
-				int seq = 0;
-
-				for (InsuComm tInsuComm : lInsuComm) {
-					if (!"".equals(tInsuComm.getFireOfficer())) {
-						OccursList occursList = new OccursList();
-
-						this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
-
-						String empId = tInsuComm.getEmpId();
-
-						if (flagComm.containsKey(empId)) {
-							continue;
-						} else {
-							flagComm.put(empId, 1);
-						}
-						seq = seq + 1;
-
-						if (seq % commitCnt == 0) {
-							this.batchTransaction.commit();
-						}
-
-						occursList.putParam("SalesId", FormatUtil.padX(empId, 10));
-						occursList.putParam("FireInsuMonth", iInsuEndMonth);
-						occursList.putParam("ColumnA", 0);
-						occursList.putParam("TotCommA", FormatUtil.pad9("" + sumComm.get(empId), 9));
-						occursList.putParam("TotCommB", FormatUtil.pad9("" + sumComm.get(empId), 9));
-						occursList.putParam("ColumnB", 0);
-						occursList.putParam("ColumnC", 0);
-						occursList.putParam("ColumnD", 0);
-						occursList.putParam("ColumnE", 0);
-						occursList.putParam("Count", FormatUtil.pad9("" + cntComm.get(empId), 5));
-						occursList.putParam("TotFee", FormatUtil.pad9("" + sumPrem.get(empId), 9));
-						occursList.putParam("TotCommC", FormatUtil.pad9("" + sumComm.get(empId), 9));
-						occursList.putParam("ColumnF", 0);
-						occursList.putParam("ColumnG", 0);
-						occursList.putParam("ColumnH", 0);
-
-						tmp.add(occursList);
-					}
-				}
-				// 把明細資料容器裝到檔案資料容器內
-				ArrayList<OccursList> occursList = new ArrayList<OccursList>();
-				insuCommFileVo.setOccursList(occursList);
-
-				insuCommFileVo.setOccursList(tmp);
-				// 轉換資料格式
-				ArrayList<String> file = insuCommFileVo.toFile();
-
-//				try {
-//					// 用共用工具寫入檔案
-//					fileCom.outputTxt(file, path);
-//				} catch (IOException e) {
-//					throw new LogicException("XXXXX", "LNM23P output error : " + e.getMessage());
-//				}
-
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-火險佣金媒體檔", "LNM23P.txt", 2);
-
-				for (String line : file) {
-					makeFile.put(line);
-				}
-
-				sno = makeFile.close();
-
-				this.info("sno : " + sno);
-
-				makeFile.toFile(sno);
-			}
+			generateMediaFile();
 		}
 	}
 
-	private void deleinsuComm(TitaVo titaVo) throws LogicException {
-		List<InsuComm> deleinsuComm = new ArrayList<InsuComm>();
+	private void generateMediaFile() throws LogicException {
+
+		this.info("generateMediaFile Start ...");
+
+		List<InsuComm> lInsuComm = new ArrayList<InsuComm>();
+
+//		暫定 : D:\\temp\\LNM23P.TXT
+//		String path = outFolder + "LNM23P.TXT";
+
+		ArrayList<OccursList> tmp = new ArrayList<>();
 
 		Slice<InsuComm> sInsuComm = null;
 
 		sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit, titaVo);
 
-		deleinsuComm = sInsuComm == null ? null : sInsuComm.getContent();
+		lInsuComm = sInsuComm == null ? null : sInsuComm.getContent();
 
-		if (deleinsuComm != null && deleinsuComm.size() != 0) {
+		if (lInsuComm != null && lInsuComm.size() != 0) {
+
+//			1.Group by ID
+			HashMap<String, BigDecimal> sumComm = new HashMap<>();
+			HashMap<String, BigDecimal> sumPrem = new HashMap<>();
+			HashMap<String, Integer> cntComm = new HashMap<>();
+
+			for (InsuComm tInsuComm : lInsuComm) {
+				if ("Y".equals(tInsuComm.getMediaCode())) {
+					String empId = tInsuComm.getEmpId();
+
+					if (sumComm.containsKey(empId)) {
+						sumComm.put(empId, sumComm.get(empId).add(tInsuComm.getCommision()));
+					} else {
+						sumComm.put(empId, tInsuComm.getCommision());
+					}
+
+					if (sumPrem.containsKey(empId)) {
+						sumPrem.put(empId, sumPrem.get(empId).add(tInsuComm.getInsuPrem()));
+					} else {
+						sumPrem.put(empId, tInsuComm.getInsuPrem());
+					}
+
+					if (cntComm.containsKey(empId)) {
+						cntComm.put(empId, cntComm.get(empId) + 1);
+					} else {
+						cntComm.put(empId, 1);
+					}
+				}
+			}
+
+//			2.if already output -> continue
+			Map<String, Integer> flagComm = new HashMap<>();
+
+			int seq = 0;
+
+			for (InsuComm tInsuComm : lInsuComm) {
+				if (!"".equals(tInsuComm.getFireOfficer())) {
+					OccursList occursList = new OccursList();
+
+					this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
+
+					String empId = tInsuComm.getEmpId();
+
+					if (flagComm.containsKey(empId)) {
+						continue;
+					} else {
+						flagComm.put(empId, 1);
+					}
+					seq = seq + 1;
+
+					if (seq % commitCnt == 0) {
+						this.batchTransaction.commit(); // TODO: 確認用途? 這個for迴圈並沒有寫DB
+					}
+
+					occursList.putParam("SalesId", FormatUtil.padX(empId, 10));
+					occursList.putParam("FireInsuMonth", iInsuEndMonth);
+					occursList.putParam("ColumnA", 0);
+					occursList.putParam("TotCommA", FormatUtil.pad9("" + sumComm.get(empId), 9));
+					occursList.putParam("TotCommB", FormatUtil.pad9("" + sumComm.get(empId), 9));
+					occursList.putParam("ColumnB", 0);
+					occursList.putParam("ColumnC", 0);
+					occursList.putParam("ColumnD", 0);
+					occursList.putParam("ColumnE", 0);
+					occursList.putParam("Count", FormatUtil.pad9("" + cntComm.get(empId), 5));
+					occursList.putParam("TotFee", FormatUtil.pad9("" + sumPrem.get(empId), 9));
+					occursList.putParam("TotCommC", FormatUtil.pad9("" + sumComm.get(empId), 9));
+					occursList.putParam("ColumnF", 0);
+					occursList.putParam("ColumnG", 0);
+					occursList.putParam("ColumnH", 0);
+
+					tmp.add(occursList);
+				}
+			}
+			// 把明細資料容器裝到檔案資料容器內
+			ArrayList<OccursList> occursList = new ArrayList<OccursList>();
+			insuCommFileVo.setOccursList(occursList);
+
+			insuCommFileVo.setOccursList(tmp);
+
+			// 轉換資料格式
+			List<String> file = insuCommFileVo.toFile();
+
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-火險佣金媒體檔", "LNM23P.txt", 2);
+
+			for (String line : file) {
+				makeFile.put(line);
+			}
+
+			sno = makeFile.close();
+
+			this.info("sno : " + sno);
+
+//			makeFile.toFile(sno);
+		}
+	}
+
+	private void insertIntoInsuComm() throws LogicException {
+		this.info("insertIntoInsuComm Start ...");
+
+//		String fileName = "874-B1.txt";
+		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA");
+
+		ArrayList<String> dataLineList = new ArrayList<>();
+
+//		 編碼參數，設定為UTF-8 || big5
+		try {
+			dataLineList = fileCom.intputTxt(filePath1, "big5");
+		} catch (IOException e) {
+			throw new LogicException("E0014", "L4606(" + filePath1 + ") is error : " + e.getMessage());
+		}
+
+//		 使用資料容器內定義的方法切資料
+		insuCommFileVo.setValueFromFile(dataLineList);
+
+		List<OccursList> uploadFile = insuCommFileVo.getOccursList();
+
+		int seq = 0;
+		if (uploadFile != null && !uploadFile.isEmpty()) {
+			this.info("tInsuCommId Start");
+			InsuComm tInsuComm;
+			InsuCommId tInsuCommId;
+			for (OccursList tempOccursList : uploadFile) {
+//				this.info(tempOccursList.toString());
+
+				seq++;
+				tempOccursList.putParam("Seq", seq);
+
+				if (seq % commitCnt == 0) {
+					this.info("Seq : " + seq);
+					this.batchTransaction.commit();
+				}
+				totCnt++;
+				// 佣金為負不寫入、僅顯示筆數
+				if (parse.stringToBigDecimal(tempOccursList.get("InsuComm")).compareTo(BigDecimal.ZERO) < 0) {
+					minusCnt++;
+					tempOccursList.putParam("ErrorMsg", "佣金為負:" + tempOccursList.get("InsuComm"));
+					errorList.add(tempOccursList);
+					continue;
+				}
+				tInsuComm = new InsuComm();
+				tInsuCommId = new InsuCommId();
+
+				String empNo = "";
+				String empId = "";
+				String empName = "";
+				String agStatusCode = "";
+				String mediaCode = "";
+				int custNo = parse.stringToInteger(tempOccursList.get("CustNo"));
+				int facmNo = parse.stringToInteger(tempOccursList.get("FacmNo"));
+
+				if (custNo == 0) {
+					custErrorCnt++;
+					tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+					errorList.add(tempOccursList);
+					continue;
+				}
+
+				tInsuCommId.setInsuYearMonth(iInsuEndMonth);
+				tInsuCommId.setInsuCommSeq(seq);
+
+				tInsuComm.setInsuCommId(tInsuCommId);
+				tInsuComm.setNowInsuNo(tempOccursList.get("InsuNo"));
+				tInsuComm.setInsuType(parse.stringToInteger(tempOccursList.get("InsuKind")));
+				tInsuComm.setManagerCode(tempOccursList.get("IndexCode"));
+				tInsuComm.setBatchNo(tempOccursList.get("BatxNo"));
+				tInsuComm.setInsuSignDate(parse.stringToInteger(tempOccursList.get("SignDate")));
+				tInsuComm.setInsuredName(tempOccursList.get("InsuredName"));
+				tInsuComm.setInsuredAddr(tempOccursList.get("InsuredAddress"));
+				tInsuComm.setInsuredTeleph(tempOccursList.get("InsuredTeleNo"));
+				tInsuComm.setInsuStartDate(parse.stringToInteger(tempOccursList.get("InsuStartDate")));
+				tInsuComm.setInsuEndDate(parse.stringToInteger(tempOccursList.get("InsuEndDate")));
+				tInsuComm.setInsuCate(parse.stringToInteger(tempOccursList.get("InsuType")));
+				tInsuComm.setInsuPrem(parse.stringToBigDecimal(tempOccursList.get("InsuFee")));
+				tInsuComm.setCommRate(parse.stringToBigDecimal(tempOccursList.get("InsuCommRate")));
+				tInsuComm.setCommision(parse.stringToBigDecimal(tempOccursList.get("InsuComm")));
+				tInsuComm.setTotInsuPrem(parse.stringToBigDecimal(tempOccursList.get("TotalFee")));
+				tInsuComm.setTotComm(parse.stringToBigDecimal(tempOccursList.get("TotalComm")));
+				tInsuComm.setRecvSeq(tempOccursList.get("CaseNo"));
+				tInsuComm.setChargeDate(parse.stringToInteger(tempOccursList.get("AcDate")));
+				tInsuComm.setCommDate(parse.stringToInteger(tempOccursList.get("CommDate")));
+				tInsuComm.setCustNo(custNo);
+				tInsuComm.setFacmNo(facmNo);
+				BigDecimal commBase = parse.stringToBigDecimal(tempOccursList.get("CommBase"));
+				BigDecimal commRate = parse.stringToBigDecimal(tempOccursList.get("CommRate"));
+				;
+				this.info("commBase=" + commBase + ", commRate = " + commRate);
+				BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
+				tInsuComm.setDueAmt(dueAmt);
+
+//				By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
+//				業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
+
+				List<Map<String, String>> resultList = l4606ServiceImpl.findEmployee(custNo, facmNo);
+
+				if (resultList != null && !resultList.isEmpty()) {
+					Map<String, String> result = resultList.get(0);
+					int checkCustNo = parse.stringToInteger(result.get("CustNo") == null ? "" : result.get("CustNo"));
+					if (checkCustNo == 0) {
+						custErrorCnt++;
+						tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+						errorList.add(tempOccursList);
+						continue;
+					}
+					empNo = result.get("EmployeeNo") == null ? "" : result.get("EmployeeNo");
+					empId = result.get("AgentId") == null ? "" : result.get("AgentId");
+					empName = result.get("Fullname") == null ? "" : result.get("Fullname");
+					agStatusCode = result.get("AgStatusCode") == null ? "" : result.get("AgStatusCode");
+				}
+
+				tInsuComm.setFireOfficer(empNo);
+				tInsuComm.setEmpId(empId);
+				tInsuComm.setEmpName(empName);
+				if ("1".equals(agStatusCode)) {
+					mediaCode = "Y";
+				}
+				tInsuComm.setMediaCode(mediaCode);
+				if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
+					zeroDueAmtCnt++;
+				} else if ("Y".equals(mediaCode)) {
+					paidCnt++;
+				} else {
+					unPaidCnt++;
+				}
+				tempOccursList.putParam("Seq", seq);
+				successList.add(tempOccursList);
+				try {
+					insuCommService.insert(tInsuComm, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "InsuComm insert Error : " + e.getErrorMsg());
+				}
+			}
+			this.info("InsuComm insert end");
+		}
+	}
+
+	private void deleteInsuComm(TitaVo titaVo) throws LogicException {
+
+		Slice<InsuComm> sInsuComm = null;
+
+		sInsuComm = insuCommService.insuYearMonthRng(iInsuEndMonth, iInsuEndMonth, this.index, this.limit, titaVo);
+
+		List<InsuComm> deleinsuComm = sInsuComm == null ? null : sInsuComm.getContent();
+
+		if (deleinsuComm != null && !deleinsuComm.isEmpty()) {
 			int seq = 0;
 			for (InsuComm tInsuComm : deleinsuComm) {
 				seq = seq + 1;
@@ -468,6 +490,7 @@ public class L4606Batch extends TradeBuffer {
 					throw new LogicException("XXXXX", "InsuComm delete Error : " + e.getErrorMsg());
 				}
 			}
+			this.batchTransaction.commit();
 		}
 	}
 }

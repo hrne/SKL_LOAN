@@ -389,6 +389,9 @@ T(2,@NotBankIdX{i},#L8r01JcicBankName)
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L
 
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
+
 
 ! !<儲存>
 ! #BUF1=X,10,S

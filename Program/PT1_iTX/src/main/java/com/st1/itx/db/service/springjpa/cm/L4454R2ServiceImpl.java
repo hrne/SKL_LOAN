@@ -78,7 +78,6 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "	SELECT R.* FROM (";
 		sql += "	SELECT \"RepayAcctNo\"";
 		sql += "		   ,\"CustNo\"";
-		sql += "		   ,\"FacmNo\"";
 		sql += "		   ,\"CustName\"";
 		sql += "		   ,SUM(\"RepayAmt\") AS \"RepayAmt\"";
 		sql += "		   ,\"PhoneNo\"";
@@ -90,7 +89,6 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "	FROM \"data\"";
 		sql += "	GROUP　BY \"RepayAcctNo\"";
 		sql += "		    ,\"CustNo\"";
-		sql += "		    ,\"FacmNo\"";
 		sql += "		    ,\"CustName\"";
 		sql += "		    ,\"PhoneNo\"";
 		sql += "		    ,\"PhoneNo\"";

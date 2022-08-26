@@ -41,6 +41,7 @@ import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.FtpClient;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.BankRemitFileVo;
+import com.st1.itx.util.common.data.L4101OldVo;
 import com.st1.itx.util.common.data.L4101Vo;
 import com.st1.itx.util.common.data.RemitFormVo;
 import com.st1.itx.util.date.DateUtil;
@@ -121,6 +122,8 @@ public class L4101Batch extends TradeBuffer {
 	L4101ReportE l4101ReportE;
 	@Autowired
 	L4101Vo l4101Vo;
+	@Autowired
+	L4101OldVo l4101OldVo;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -142,6 +145,8 @@ public class L4101Batch extends TradeBuffer {
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		List<BankRemit> lBankRemit2 = new ArrayList<BankRemit>();
+		List<BankRemit> lBankRemit3 = new ArrayList<BankRemit>();
+		List<BankRemit> lBankRemit4 = new ArrayList<BankRemit>();
 
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
 				titaVo);
@@ -213,6 +218,8 @@ public class L4101Batch extends TradeBuffer {
 		// 批號查全部
 		lBankRemit = new ArrayList<BankRemit>();
 		lBankRemit2 = new ArrayList<BankRemit>();
+		lBankRemit3 = new ArrayList<BankRemit>();
+		lBankRemit4 = new ArrayList<BankRemit>();
 		slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
@@ -224,6 +231,12 @@ public class L4101Batch extends TradeBuffer {
 				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
 					continue;
 				}
+				if (t.getRemitAmt().compareTo(new BigDecimal(15000000)) > 0) {
+					lBankRemit3.add(t);
+				} else {
+					lBankRemit4.add(t);
+				}
+
 			}
 
 			// 作業項目為2.退款時把撥款篩選掉
@@ -238,9 +251,25 @@ public class L4101Batch extends TradeBuffer {
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
 
+		if (iItemCode == 1) {
 //			step1.產出媒體檔
-		procBankRemitMedia(lBankRemit2, titaVo);
+			procBankRemitMedia(lBankRemit4, titaVo);
+//		1500萬以上需產舊格式
+			if (lBankRemit3.size() != 0) {
+				String reportItem = "-撥款匯款媒體檔(舊格式1500萬)";
+				procBankRemitMediaOld(lBankRemit3, reportItem, titaVo);
+			}
+		} else {
+//			step1.產出媒體檔
+			procBankRemitMedia(lBankRemit2, titaVo);
+		}
 
+		if (batchNo.length() > 2) {
+			String reportItem = "-撥款匯款媒體檔(舊格式)";
+			if ("LN".equals(batchNo.substring(0, 2))) {
+				procBankRemitMediaOld(lBankRemit2, reportItem, titaVo);
+			}
+		}
 //			step2產出撥款傳票
 //		totaA.init(titaVo);
 		doRptA(titaVo);
@@ -279,48 +308,7 @@ public class L4101Batch extends TradeBuffer {
 //		String path = outFolder + "LNM24p.txt";
 
 		l4101Vo.setOccursList(lBankRemit, titaVo);
-//		ArrayList<OccursList> tmp = new ArrayList<>();
-//
-//		int seq = 0;
-//
-//		for (BankRemit tBankRemit : lBankRemit) {
-//
-//			if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4
-//					|| tBankRemit.getDrawdownCode() == 11) {
-//				this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
-//				continue;
-//			}
-//			seq = seq + 1;
-//
-//			OccursList occursList = new OccursList();
-//
-////			DataSeq		序號			4	0	4
-////			AcctNo		帳號			X	14	4	18
-////			Amount		金額			X	13	18	31
-////			UnitCode	解付單位代號	X	7	31	38
-////			RemitName	代償專戶		X	59	38	97
-////			ColumnA	新光人壽保險股份有限公司─放款服務課	X	35	97	132
-////			ColumnB		space		X	59	132	191
-////			ColumnC		00174		X	5	191	196
-////			RemitDate	匯款日期		X	8	196	204
-////			BatchNo		批號			X	2	204	206
-//
-//			occursList.putParam("DataSeq", FormatUtil.pad9("" + seq, 4));
-//			occursList.putParam("AcctNo", FormatUtil.padX(tBankRemit.getRemitAcctNo(), 14));
-//			occursList.putParam("Amount", FormatUtil.pad9("" + tBankRemit.getRemitAmt(), 13));
-//			occursList.putParam("UnitCode", "" + FormatUtil.pad9("" + tBankRemit.getRemitBank(), 3)
-//					+ FormatUtil.pad9("" + tBankRemit.getRemitBranch(), 4));
-//			occursList.putParam("RemitName", FormatUtil.padX(tBankRemit.getCustName(), 59));
-//			occursList.putParam("ColumnA", "新光人壽保險股份有限公司─放款服務課");
-//			occursList.putParam("ColumnB", FormatUtil.padX("", 59));
-//			occursList.putParam("ColumnC", "00174");
-//			occursList.putParam("RemitDate", tBankRemit.getAcDate() + 19110000);
-//			occursList.putParam("BatchNo", tBankRemit.getBatchNo().substring(4, 6));
-//
-//			tmp.add(occursList);
-//		}
-//		// 把明細資料容器裝到檔案資料容器內
-//		bankRemitFileVo.setOccursList(tmp);
+
 		// 轉換資料格式
 		ArrayList<String> file = l4101Vo.toFile();
 // 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
@@ -348,6 +336,27 @@ public class L4101Batch extends TradeBuffer {
 		sendToFTP(snoM, titaVo);
 
 		totaVo.put("PdfSnoM", "" + snoM);
+
+	}
+
+	private void procBankRemitMediaOld(List<BankRemit> lBankRemit, String reportItem, TitaVo titaVo)
+			throws LogicException {
+		this.info("procBankRemitMediaOld ...");
+
+		l4101OldVo.setOccursList(lBankRemit, titaVo);
+
+		// 轉換資料格式
+		ArrayList<String> file = l4101OldVo.toFile();
+// 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
+
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+				titaVo.getTxCode() + reportItem, "LNM24p.txt", 2);
+
+		for (String line : file) {
+			makeFile.put(line);
+		}
+
+		makeFile.close();
 
 	}
 

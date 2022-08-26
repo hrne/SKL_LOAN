@@ -120,7 +120,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> L8205Rpt3(TitaVo titaVo) throws Exception {
 
-		this.info("L8205Rpt1");
+		this.info("L8205Rpt3");
 		String iEntryDateStart = titaVo.getParam("DateStart");
 		String iEntryDateEnd = titaVo.getParam("DateEnd");
 
@@ -142,7 +142,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F8					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F9							\n"; // 經辦說明
 		sql += ",M.\"ManagerCheck\" 			as F10  						\n"; // 主管覆核
-		sql += ",M.\"ManagerDate\" 			    as F11  					    \n"; // 主管覆核日期
+		sql += ",M.\"ManagerDate\" 			    as F11  					    \n"; // 主管同意日期
 		sql += "from \"MlaundryDetail\" M										\n";
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
 //		sql += "left join \"TxTeller\" T ON T.\"TlrNo\" = M.\"LastUpdateEmpNo\"	\n";
@@ -150,7 +150,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
-		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
+//		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
 		sql += "order by M.\"EntryDate\" ";
 
 		this.info("sql=" + sql);
@@ -187,12 +187,12 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",to_char(M.\"LastUpdate\", 'yyyymmdd') as F7					\n"; // 異動時間
 		sql += ",M.\"EmpNoDesc\" 				as F8							\n"; // 經辦說明
 		sql += ",M.\"ManagerCheck\" 			as F9  							\n"; // 主管覆核
-		sql += ",M.\"ManagerDate\" 			    as F10  					    \n"; // 主管覆核日期
+		sql += ",M.\"ManagerDate\" 			    as F10  					    \n"; // 主管同意日期
 		sql += "from \"MlaundryDetail\" M										\n";
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd and M.\"Factor\" <> '3'  \n";
-		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
+//		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
 		sql += "order by M.\"EntryDate\" ";
 
 		this.info("sql=" + sql);

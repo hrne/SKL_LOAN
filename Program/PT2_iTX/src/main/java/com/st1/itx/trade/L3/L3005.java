@@ -242,12 +242,8 @@ public class L3005 extends TradeBuffer {
 				}
 				this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 				wkOverShort = BigDecimal.ZERO;
-				// 溢短收 有短收金額時為短收否則為溢收
-				if (unpaidAmt.compareTo(BigDecimal.ZERO) > 0) {
-					wkOverShort = BigDecimal.ZERO.subtract(unpaidAmt);
-				} else {
-					wkOverShort = overflow;
-				}
+				// 溢短收
+				wkOverShort = overflow.subtract(unpaidAmt);
 				txNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);

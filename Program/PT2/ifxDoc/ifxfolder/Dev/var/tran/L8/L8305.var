@@ -521,6 +521,9 @@ C(5,#GradeType,2,$,S)
 ! 新增時開啟48
 IF(#TranKey_Tmp == 1,ALERT(需報送048檔案),$) 
 
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
+
 ! #TmpNTXCD=X,5,S
 ! IF(#TranKey_Tmp == 1,$,S) 
 ! T(3,L8309)

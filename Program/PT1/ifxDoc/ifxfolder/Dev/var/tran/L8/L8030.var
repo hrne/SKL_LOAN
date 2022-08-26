@@ -345,14 +345,13 @@ T(2,#OOChainTxCd+#OOUkey)
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOHistoryTxCd; ntxbuf=#OOBUF6})
 IF(#OOHistoryFg==0,BIND(grid,cancel),$)
 
-!#OOBUF7=X,50,S
+#OOBUF7=X,50,S
+T(2,7+ +#OOUkey)
 
-!#OOBTN7=X,1,S
-!BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; text=修改; ntxbuf=#OOBUF7})
-!IF(#OOStatusFg==0,BIND(grid,cancel),$)
-!IF(#OODeleteFg==0,BIND(grid,cancel),$)
-!C(5,#OOTranKey,R,BIND(grid,cancel),$)
-!C(5,#OOTranKey,X,BIND(grid,cancel),$)
+#OOBTN7=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; text=修改; ntxbuf=#OOBUF7})
+IF(#OOStatusFg==0,BIND(grid,cancel),$)
+IF(#OODeleteFg==0,BIND(grid,cancel),$)
 
 !傳入L6932共用空白
 #50sp=X,20,S
@@ -595,6 +594,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030B.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -622,6 +623,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030C.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -647,6 +650,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030B.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -674,6 +679,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -701,6 +708,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -727,6 +736,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -752,6 +763,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -777,6 +790,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -804,6 +819,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -831,6 +848,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -858,8 +877,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
-!#OOBTN7=修改
-!{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -883,6 +902,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -908,6 +929,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -933,6 +956,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -960,6 +985,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030C.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -985,6 +1012,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -1008,6 +1037,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -1033,6 +1064,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除
@@ -1060,6 +1093,8 @@ TXFORM=L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN7=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 #OOBTN2=狀態
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 #OOBTN4=刪除

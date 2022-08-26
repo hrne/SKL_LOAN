@@ -373,7 +373,8 @@ T(H,#ManagerCheck,#AgreeHelp)
 #ManagerCheckDate=D,7,L
 
 !主管覆核說明
-#ManagerDesc=X,2.50,H
+#ManagerDesc=X,4.50,H
+TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FuncCode,4,s,$)
 C(3,#FuncCode,5,s,$)
 C(3,#Level,1,$,s)

@@ -111,12 +111,14 @@ public class L8205Report4 extends MakeReport {
 		int icount = 0;
 		
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態1、2未完成交易確認報表", "", "A4", "P");
+		//未完成:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
 		
 		if (L8205List != null && L8205List.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
+//			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
+			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 			for (Map<String, String> tL8205Vo : L8205List) {
@@ -165,8 +167,11 @@ public class L8205Report4 extends MakeReport {
 				//合理性
 				print(0, 64, tL8205Vo.get("F6"));
 				
+				//同意日
+				print(0, 72, tL8205Vo.get("F10") == "0" || tL8205Vo.get("F10") == null || tL8205Vo.get("F10").length() == 0 || tL8205Vo.get("F10").equals(" ") ? " " : showDate(tL8205Vo.get("F10"), 1));
+
 				//異動日
-				print(0, 74, tL8205Vo.get("F7") == "0" || tL8205Vo.get("F7") == null || tL8205Vo.get("F7").length() == 0 || tL8205Vo.get("F7").equals(" ") ? " " : showDate(tL8205Vo.get("F7"), 1));
+				print(0, 83, tL8205Vo.get("F7") == "0" || tL8205Vo.get("F7") == null || tL8205Vo.get("F7").length() == 0 || tL8205Vo.get("F7").equals(" ") ? " " : showDate(tL8205Vo.get("F7"), 1));
 	
 				
 
@@ -211,6 +216,9 @@ public class L8205Report4 extends MakeReport {
 				if(("Y").equals(check)) {
 					check = "同意";
 				}
+				if(("N").equals(check)) {
+					check = "退回";
+				}
 				print(1, 4, "主管覆核: "+check);
 				print(1, 4, "");
 
@@ -220,7 +228,8 @@ public class L8205Report4 extends MakeReport {
 		} else {
 			this.print(1, 3, "本日無資料");
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
+//			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
+			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		}
@@ -274,20 +283,25 @@ public class L8205Report4 extends MakeReport {
 				
 				makeExcel.setValue(rowCursor, 7, tL8205Vo.get("F6"));
 				
-				makeExcel.setValue(rowCursor, 8, tL8205Vo.get("F7") == "0" || tL8205Vo.get("F7") == null || tL8205Vo.get("F7").length() == 0 || tL8205Vo.get("F7").equals(" ") ? " " : showDate(tL8205Vo.get("F7"), 1));
+				makeExcel.setValue(rowCursor, 8, tL8205Vo.get("F10") == "0" || tL8205Vo.get("F10") == null || tL8205Vo.get("F10").length() == 0 || tL8205Vo.get("F10").equals(" ") ? " " : showDate(tL8205Vo.get("F10"), 1));
+
+				makeExcel.setValue(rowCursor, 9, tL8205Vo.get("F7") == "0" || tL8205Vo.get("F7") == null || tL8205Vo.get("F7").length() == 0 || tL8205Vo.get("F7").equals(" ") ? " " : showDate(tL8205Vo.get("F7"), 1));
 				
 				//經辦說明
 				String EmpNoDesc = tL8205Vo.get("F8");
 				if(!EmpNoDesc.isEmpty()) {
 					EmpNoDesc = EmpNoDesc.replace("$n", "");
 				}
-				makeExcel.setValue(rowCursor, 9, EmpNoDesc);
+				makeExcel.setValue(rowCursor, 10, EmpNoDesc);
 				
 				String check = tL8205Vo.get("F9");
 				if(("Y").equals(check)) {
 					check = "同意";
 				}
-				makeExcel.setValue(rowCursor, 10, check);
+				if(("N").equals(check)) {
+					check = "退回";
+				}
+				makeExcel.setValue(rowCursor, 11, check);
 				
 				
 				
@@ -324,7 +338,8 @@ public class L8205Report4 extends MakeReport {
 			this.info("into NowRow");
 			newPage();
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
+//			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
+			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
 			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 }
 
@@ -372,14 +387,17 @@ public class L8205Report4 extends MakeReport {
 		
 		makeExcel.setValue(1, 7, "合理性");
 		
-		makeExcel.setValue(1, 8, "異動日期");
+		makeExcel.setValue(1, 8, "同意日");
 		makeExcel.setWidth(8, 14);
+
+		makeExcel.setValue(1, 9, "異動日期");
+		makeExcel.setWidth(9, 14);
 		
-		makeExcel.setValue(1, 9, "經辦說明");
-		makeExcel.setWidth(9, 30);
+		makeExcel.setValue(1, 10, "經辦說明");
+		makeExcel.setWidth(10, 30);
 		
-		makeExcel.setValue(1, 10, "主管覆核");
-		makeExcel.setWidth(10, 20);
+		makeExcel.setValue(1, 11, "主管覆核");
+		makeExcel.setWidth(11, 20);
 		
 		
 	}

@@ -61,7 +61,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    , BATX.\"EntryDate\" ";// 匯款日
 		sql += "    , BATX.\"DetailSeq\""; // 匯款序號
 		sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
-		sql += "     ,NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AcSeq'),'0000') AS \"AcSeq\" ";
+		sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
 		sql += "    , TX2.\"TxAmt\""; // 匯款金額
 		sql += "    , TX2.\"Principal\"";
 		sql += "      + TX2.\"Interest\"";

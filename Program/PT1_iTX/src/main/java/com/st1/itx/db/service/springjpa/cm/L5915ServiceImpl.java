@@ -65,6 +65,30 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// SKL User 李珮君 要求跟AS400產一樣的檔案
 		// 協辦人員業績件數的檔案要產出不只有協辦人員業績件數的檔案
 		String sql = " ";
+		sql += " WITH rawData AS ( ";
+		sql += "     SELECT \"CustNo\" ";
+		sql += "          , \"FacmNo\" ";
+		sql += "          , \"DrawdownDate\" ";
+		sql += "          , SUM(\"DrawdownAmt\") AS \"UtilBal\" ";
+		sql += "     FROM \"LoanBorMain\" ";
+		sql += "     GROUP BY \"CustNo\" ";
+		sql += "            , \"FacmNo\" ";
+		sql += "            , \"DrawdownDate\" ";
+		sql += " ) ";
+		sql += " , utilData AS ( ";
+		sql += "     SELECT r.\"CustNo\" ";
+		sql += "          , r.\"FacmNo\" ";
+		sql += "          , r.\"DrawdownDate\" ";
+		sql += "          , r.\"UtilBal\" + SUM(NVL(ro.\"UtilBal\",0)) AS \"UtilBal\" ";
+		sql += "     FROM rawData r ";
+		sql += "     LEFT JOIN rawData ro ON ro.\"CustNo\" = r.\"CustNo\" ";
+		sql += "                         AND ro.\"FacmNo\" = r.\"FacmNo\" ";
+		sql += "                         AND ro.\"DrawdownDate\" < r.\"DrawdownDate\" ";
+		sql += "     GROUP BY r.\"CustNo\" ";
+		sql += "            , r.\"FacmNo\" ";
+		sql += "            , r.\"DrawdownDate\" ";
+		sql += "            , r.\"UtilBal\" ";
+		sql += " ) ";
 		sql += " SELECT 5                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
 		sql += "      , 0                       AS \"DrawdownAmt\" "; // 撥款金額
@@ -74,7 +98,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
 		sql += "      , CM.\"CustId\"           AS \"CustId\" "; // 統一編號
-		sql += "      , FM.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
+		sql += "      , ud.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
 		sql += "      , PR.\"CoorgnizerBonus\"  AS \"Bonus\" "; // 車馬費發放額
 		sql += "      , PR.\"Coorgnizer\"       AS \"EmpNo\" "; // 介紹人
 		sql += "      , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
@@ -84,8 +108,9 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , PCO.\"AreaItem\"        AS \"Unit\" "; // 單位
 		sql += " FROM \"PfReward\" PR ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = PR.\"CustNo\" ";
-		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = PR.\"CustNo\" ";
-		sql += "                         AND FM.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += " LEFT JOIN utilData ud ON ud.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                      AND ud.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += "                      AND ud.\"DrawdownDate\" = PR.\"PerfDate\" ";
 		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"Coorgnizer\" ";
 		sql += "                              AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth ";
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
@@ -101,7 +126,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
 		sql += "      , CM.\"CustId\"           AS \"CustId\" "; // 統一編號
-		sql += "      , FM.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
+		sql += "      , ud.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
 		sql += "      , PR.\"IntroducerBonus\"  AS \"Bonus\" "; // 車馬費發放額
 		sql += "      , PR.\"Introducer\"       AS \"EmpNo\" "; // 介紹人
 		sql += "      , \"Fn_GetEmpName\"(PR.\"Introducer\",0) ";
@@ -111,8 +136,9 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , B3.\"UnitItem\"         AS \"Unit\" "; // 單位
 		sql += " FROM \"PfReward\" PR ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = PR.\"CustNo\" ";
-		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = PR.\"CustNo\" ";
-		sql += "                         AND FM.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += " LEFT JOIN utilData ud ON ud.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                      AND ud.\"FacmNo\" = PR.\"FacmNo\" ";
+		sql += "                      AND ud.\"DrawdownDate\" = PR.\"PerfDate\" ";
 		sql += " LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
 		sql += "                            AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
 		sql += "                            AND PI.\"BormNo\" = PR.\"BormNo\" ";

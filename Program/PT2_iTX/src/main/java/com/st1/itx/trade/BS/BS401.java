@@ -595,9 +595,6 @@ public class BS401 extends TradeBuffer {
 	// 更新支票檔狀態
 	private void updateLoanCheque(BatxDetail tBatxDetail, String StsCode, TitaVo titaVo) throws LogicException {
 		// 狀態為正常才會更新支票檔
-		if ("D".equals(tBatxDetail.getProcStsCode()) && !"0".equals(StsCode)) {
-			return;
-		}
 		int chequeAcct = parse.stringToInteger(tBatxDetail.getRvNo().substring(0, 9));
 		int chequeNo = parse.stringToInteger(tBatxDetail.getRvNo().substring(10, 17));
 		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(chequeAcct, chequeNo), titaVo);

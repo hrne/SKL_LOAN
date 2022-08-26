@@ -1,0 +1,381 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8311)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,400,200,300];printer.width=[20,20,20,20];order=1;">
+[
+["[L8311]                                 (50)債務人繳款資料"],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdRcDate+協商申請日",#RcDate],["#FdPayDate+繳款日期",#PayDate],
+["#FdPayAmt+本次繳款金額",#PayAmt],["#FdSumRepayActualAmt+累計實際還款金額",#SumRepayActualAmt],
+["#FdSumRepayShouldAmt+累計應還款金額",#SumRepayShouldAmt],["#FdStatus+債權結案註記",#Status,#StatusX],
+["#FdSecondRepayYM+進入第二階梯還款年月",#SecondRepayYM],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+]
+
+#FdTranKey=X,2,L
+#FdCustId=X,2,L
+#FdSubmitKey=X,2,L
+#FdRcDate=X,2,L
+#FdPayDate=X,2,L
+#FdPayAmt=X,2,L
+#FdSumRepayActualAmt=X,2,L
+#FdSumRepayShouldAmt=X,2,L
+#FdStatus=X,2,L
+#FdSecondRepayYM=X,2,L
+#FdOutJcicTxtDate=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- 日期處理 ----------
+#VIEW_SYSDATE=X,8,S
+D(7,2,#SYSDATE,0,0)
+T(1,#VIEW_SYSDATE,2,7)
+E(0,1)ASGN(AGAIN$)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+#CDDEF0002=x,20,S
+T(3,CdCode.Status50)
+#Status50Help=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+T(2,@Status50Help,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic050連動進入),$)
+T(F,@TranKey,0)T(F,@RcDate,0)T(F,@PayDate,0)T(F,@PayAmt,0)
+T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0)T(F,@SubmitKey,0)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranKey,#NTXBUF,2,1)
+! 連動傳值處理
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+! T(2,@TranKey,A)
+T(1,@CustId,#NTXBUF,3,10)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@RcDate,1)T(F,@PayDate,1)
+T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)T(F,@SubmitKey,1)
+K(MODIFYBUTTON,新增)
+T(2,@FdRcDate,*)
+T(2,@FdPayDate,*)
+T(2,@FdStatus,*)
+T(2,@FdSecondRepayYM,*)
+T(2,@FdSubmitKey,*)
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(F,@TranKey,1)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
+T(2,@FdStatus,*)
+T(2,@FdSecondRepayYM,*)
+T(3,@TranKeyHelp,C:異動;D:刪除))
+
+
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(NOBUTTON,CLOSEY)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,刪除)
+
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L8R22.dec"/>
+#RimUkey=X,32,S
+#RimL8r22=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r22,L8R22)
+S(L8R22,1,#RimUkey)
+R(1,L8R22)
+T(2,@TranKey,#L8r22TranKey)
+T(2,@CustId,#L8r22CustId)
+T(2,@SubmitKey,#L8r22SubmitKey)
+E(0,@RcDate,#L8r22RcDate)
+E(0,@PayDate,#L8r22PayDate)
+E(0,@PayAmt,#L8r22PayAmt)
+E(0,@SumRepayActualAmt,#L8r22SumRepayActualAmt)
+E(0,@SumRepayShouldAmt,#L8r22SumRepayShouldAmt)
+T(2,@Status,#L8r22Status)
+E(0,@SecondRepayYM,#L8r22SecondRepayYM)
+E(0,@OutJcicTxtDate,#L8r22OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@StatusX,#Status,#Status50Help)
+
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r22TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 調Rim相關 結束
+
+
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,I
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@T(3,@TranKeyX,)
+V(H,#TranKeyHelp)
+C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
+T(2,@FdStatus,*)T(2,@FdSecondRepayYM,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0)
+T(2,@FdStatus, )T(2,@FdSecondRepayYM, ),$))
+
+#TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
+
+![債務人IDN]
+#CustId=X,10,L
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
+
+#CustIdX=x,100,L
+
+![報送單位代號]
+#SubmitKey=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@T(3,@SubmitKeyX,)
+V(7)
+#SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
+![協商申請日]
+#RcDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)A(DATE,0,#RcDate)
+
+!繳款日期
+#PayDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)A(DATE,0,#PayDate)
+
+
+
+!本次繳款金額
+#PayAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@PayAmt,#L8r22PayAmt),$)
+C(5,#TranKey,D,s,$)
+
+!累計實際還款金額
+#SumRepayActualAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@SumRepayActualAmt,#L8r22SumRepayActualAmt),$)
+C(5,#TranKey,D,s,$)
+
+!累計應還款金額
+#SumRepayShouldAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@SumRepayShouldAmt,#L8r22SumRepayShouldAmt),$)
+C(5,#TranKey,D,s,$)
+
+!債權結案註記
+#Status=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Status,#L8r22Status),$)
+C(5,#TranKey,D,s,$)
+HELP(#Status50Help)
+@T(3,@StatusX,)
+V(H,#Status50Help)
+
+#StatusX=X,24,L
+T(H,#Status,#Status50Help)
+
+!進入第二階梯還款年月
+#SecondRepayYM=A,5,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@SecondRepayYM,#L8r22SecondRepayYM),$)
+C(5,#TranKey,D,s,$)
+@A(YM13,1,#SecondRepayYM)
+
+![轉JCIC文字檔日期]
+#OutJcicTxtDate=D,7,L
+
+! 流水號
+#Ukey=X,32,S
+
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
+
+#Alter=X,1,S
+IF(#TranKey_Tmp == 1,$,S)
+ALERT(此交易需隨同填報046)
+
+#RPTFG=X,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8311 ----------
+<sub type="FORM" name="L8311">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8311,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8311] 債務人繳款資料檔案)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#TranKey
+#SubmitKey
+#CustId
+#RcDate
+#PayDate
+#PayAmt
+#SumRepayActualAmt
+#SumRepayShouldAmt
+#Status
+#SecondRepayYM
+#OutJcicTxtDate
+#Ukey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8311^
+<include src="ROM.icf::L8R01.tom"/>
+<include src="ROM.icf::L8R22.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L8311" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8311]                                 債務人繳款資料檔案"],
+[#<->#,"案件編號"],
+[#<->#,"統一編號"],
+["借款人戶號"],
+["核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

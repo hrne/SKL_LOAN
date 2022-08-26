@@ -293,6 +293,10 @@ IF(#tDelayYM<=#DelayYM,$,V(P,延期繳款年月不得小於調解申請日))
 ! 流水號
 #Ukey=X,32,S
 
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
+
+
 ! !<儲存>
 ! #BUF1=X,10,S
 ! T(2,#CUSTID)

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class LoanBorTx implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7147920013514886064L;
-
-@EmbeddedId
+  @EmbeddedId
   private LoanBorTxId loanBorTxId;
 
   // 借款人戶號
@@ -71,6 +67,10 @@ public class LoanBorTx implements Serializable {
   /* BatchNo(5:2)+DetailSeq(6) = TitaTxtNo 時列 */
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
+
+  // 帳務分錄起號
+  @Column(name = "`AcSeq`")
+  private int acSeq = 0;
 
   // 交易代號
   @Column(name = "`TitaTxCd`", length = 5)
@@ -126,7 +126,7 @@ public class LoanBorTx implements Serializable {
   private int dueDate = 0;
 
   // 交易金額
-  /* 轉帳金額 */
+  /* 1.回收金額2.轉出金額(負值)轉入金額(正值)3.催呆轉帳金額 */
   @Column(name = "`TxAmt`")
   private BigDecimal txAmt = new BigDecimal("0");
 
@@ -176,12 +176,12 @@ public class LoanBorTx implements Serializable {
   private BigDecimal closeBreachAmt = new BigDecimal("0");
 
   // 實收費用金額
-  /* 轉入金額(正值)、轉出金額(負值)TxAmt+TempAmt=Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow */
+  /* TxAmt+TempAmt=Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow */
   @Column(name = "`FeeAmt`")
   private BigDecimal feeAmt = new BigDecimal("0");
 
   // 暫收抵繳(暫收借)
-  /* 正值 */
+  /* 含催收回復時的催收收回金額 */
   @Column(name = "`TempAmt`")
   private BigDecimal tempAmt = new BigDecimal("0");
 
@@ -209,7 +209,6 @@ public class LoanBorTx implements Serializable {
   private BigDecimal shortfall = new BigDecimal("0");
 
   // 累溢收金額(暫收貸)
-  /* 正值 */
   @Column(name = "`Overflow`")
   private BigDecimal overflow = new BigDecimal("0");
 
@@ -414,6 +413,25 @@ public class LoanBorTx implements Serializable {
 	*/
   public void setTitaTxtNo(String titaTxtNo) {
     this.titaTxtNo = titaTxtNo;
+  }
+
+/**
+	* 帳務分錄起號<br>
+	* 
+	* @return Integer
+	*/
+  public int getAcSeq() {
+    return this.acSeq;
+  }
+
+/**
+	* 帳務分錄起號<br>
+	* 
+  *
+  * @param acSeq 帳務分錄起號
+	*/
+  public void setAcSeq(int acSeq) {
+    this.acSeq = acSeq;
   }
 
 /**
@@ -684,7 +702,9 @@ N:否
 
 /**
 	* 交易金額<br>
-	* 轉帳金額
+	* 1.回收金額
+2.轉出金額(負值)轉入金額(正值)
+3.催呆轉帳金額
 	* @return BigDecimal
 	*/
   public BigDecimal getTxAmt() {
@@ -693,7 +713,9 @@ N:否
 
 /**
 	* 交易金額<br>
-	* 轉帳金額
+	* 1.回收金額
+2.轉出金額(負值)轉入金額(正值)
+3.催呆轉帳金額
   *
   * @param txAmt 交易金額
 	*/
@@ -895,8 +917,7 @@ N:否
 
 /**
 	* 實收費用金額<br>
-	* 轉入金額(正值)、轉出金額(負值)
-TxAmt+TempAmt
+	* TxAmt+TempAmt
 =Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow
 	* @return BigDecimal
 	*/
@@ -906,8 +927,7 @@ TxAmt+TempAmt
 
 /**
 	* 實收費用金額<br>
-	* 轉入金額(正值)、轉出金額(負值)
-TxAmt+TempAmt
+	* TxAmt+TempAmt
 =Principal+Interest+DelayInt+CloseBreachAmt+FeeAmt+Overflow
   *
   * @param feeAmt 實收費用金額
@@ -918,7 +938,7 @@ TxAmt+TempAmt
 
 /**
 	* 暫收抵繳(暫收借)<br>
-	* 正值
+	* 含催收回復時的催收收回金額
 	* @return BigDecimal
 	*/
   public BigDecimal getTempAmt() {
@@ -927,7 +947,7 @@ TxAmt+TempAmt
 
 /**
 	* 暫收抵繳(暫收借)<br>
-	* 正值
+	* 含催收回復時的催收收回金額
   *
   * @param tempAmt 暫收抵繳(暫收借)
 	*/
@@ -1032,7 +1052,7 @@ TxAmt+TempAmt
 
 /**
 	* 累溢收金額(暫收貸)<br>
-	* 正值
+	* 
 	* @return BigDecimal
 	*/
   public BigDecimal getOverflow() {
@@ -1041,7 +1061,7 @@ TxAmt+TempAmt
 
 /**
 	* 累溢收金額(暫收貸)<br>
-	* 正值
+	* 
   *
   * @param overflow 累溢收金額(暫收貸)
 	*/
@@ -1152,12 +1172,12 @@ TxAmt+TempAmt
   @Override
   public String toString() {
     return "LoanBorTx [loanBorTxId=" + loanBorTxId + ", titaCalDy=" + titaCalDy + ", titaCalTm=" + titaCalTm
-           + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", titaTxCd=" + titaTxCd + ", titaCrDb=" + titaCrDb + ", titaHCode=" + titaHCode
-           + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", desc=" + desc + ", acDate=" + acDate + ", correctSeq=" + correctSeq
-           + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", txAmt=" + txAmt + ", loanBal=" + loanBal + ", intStartDate=" + intStartDate
-           + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt
-           + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest
-           + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow + ", otherFields=" + otherFields + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", acSeq=" + acSeq + ", titaTxCd=" + titaTxCd + ", titaCrDb=" + titaCrDb
+           + ", titaHCode=" + titaHCode + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", desc=" + desc + ", acDate=" + acDate
+           + ", correctSeq=" + correctSeq + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", txAmt=" + txAmt + ", loanBal=" + loanBal
+           + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate + ", principal=" + principal + ", interest=" + interest
+           + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay
+           + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow + ", otherFields=" + otherFields
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

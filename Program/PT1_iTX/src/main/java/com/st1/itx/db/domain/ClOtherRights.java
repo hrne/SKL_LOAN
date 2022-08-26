@@ -116,10 +116,6 @@ public class ClOtherRights implements Serializable {
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
-  // jason格式紀錄欄
-  @Column(name = "`JsonFields`", length = 300)
-  private String jsonFields;
-
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -511,25 +507,6 @@ public class ClOtherRights implements Serializable {
   }
 
 /**
-	* jason格式紀錄欄<br>
-	* 
-	* @return String
-	*/
-  public String getJsonFields() {
-    return this.jsonFields == null ? "" : this.jsonFields;
-  }
-
-/**
-	* jason格式紀錄欄<br>
-	* 
-  *
-  * @param jsonFields jason格式紀錄欄
-	*/
-  public void setJsonFields(String jsonFields) {
-    this.jsonFields = jsonFields;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -611,7 +588,6 @@ public class ClOtherRights implements Serializable {
     return "ClOtherRights [clOtherRightsId=" + clOtherRightsId + ", city=" + city + ", otherCity=" + otherCity
            + ", landAdm=" + landAdm + ", otherLandAdm=" + otherLandAdm + ", recYear=" + recYear + ", recWord=" + recWord + ", otherRecWord=" + otherRecWord + ", recNumber=" + recNumber
            + ", rightsNote=" + rightsNote + ", securedTotal=" + securedTotal + ", receiveFg=" + receiveFg + ", choiceDate=" + choiceDate + ", receiveCustNo=" + receiveCustNo + ", closeNo=" + closeNo
-           + ", custNo=" + custNo + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", custNo=" + custNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
