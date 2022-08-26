@@ -169,21 +169,26 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and  nvl(a.\"AuthStatus\", ' ') " + searchstatus;
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
 		// iCreateFlag 1.新增授權 2.再次授權 3.取消授權
+		this.info("iFunctionCode = " + iFunctionCode);
 		switch (iFunctionCode) {
 		case 1:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
 			if (iCustNo > 0) {
 				sql += "   and a.\"CustNo\" = " + iCustNo;
 			}
-			if (iPropDate > 0) {
-				sql += "   and a.\"PropDate\" >= " + iPropDate;
-			}
-			if (iPropDate == 0 && iCustNo == 0) {
-				sql += "   and a.\"PropDate\" = 0 ";
-			}
-			if (propDate != 0) {
-				sql += "   and a.\"PropDate\" =  " + propDate;
 
+			this.info("propDate = " + propDate);
+			if (propDate != 0) {
+				sql += "   and a.\"MediaCode\" ='Y' ";
+				sql += "   and a.\"PropDate\" =  " + propDate;
+			} else {
+				sql += "   and a.\"MediaCode\" " + searchMediaCode;
+				if (iPropDate > 0) {
+					sql += "   and a.\"PropDate\" >= " + iPropDate;
+				}
+				if (iPropDate == 0 && iCustNo == 0) {
+					sql += "   and a.\"PropDate\" = 0 ";
+				}
 			}
 			if (iCreateFlag == 3) {
 				sql += "   and a.\"CreateFlag\" = 'A'";

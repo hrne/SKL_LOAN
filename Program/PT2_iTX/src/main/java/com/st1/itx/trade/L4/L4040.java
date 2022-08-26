@@ -155,7 +155,7 @@ public class L4040 extends TradeBuffer {
 			if ("Y".equals(this.getTxBuffer().getSystemParas().getAchAuthOneTime())) {
 				txtitaVo = new TitaVo();
 				txtitaVo = (TitaVo) titaVo.clone();
-				txtitaVo.putParam("FunctionCode", "3");
+				txtitaVo.putParam("FunctionCode", "1");
 				try {
 					// *** 折返控制相關 ***
 					resultList = l4040ServiceImpl.findAll(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
@@ -368,7 +368,7 @@ public class L4040 extends TradeBuffer {
 						occursList.putParam("OccLimitAmt", limitAmt);
 //							15.OccNote				備用			X	4	120	
 						occursList.putParam("OccNote", FormatUtil.padX("", 4));
-
+						
 						if (("103").equals(BankNo3)) {
 							// 裝進明細資料容器
 							aTmp.add(occursList);
@@ -378,9 +378,9 @@ public class L4040 extends TradeBuffer {
 							// 裝進明細資料容器
 							bTmp.add(occursList);
 						}
-
+						
 						OccursList occursListOutput = new OccursList();
-
+						
 						occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
 						occursListOutput.putParam("OOCustNo", result.get("F2"));
 						occursListOutput.putParam("OORepayBank", result.get("F3"));
@@ -394,16 +394,16 @@ public class L4040 extends TradeBuffer {
 						occursListOutput.putParam("OOStampFinishDate", stampFinishDate);
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursListOutput);
-
+						
 						AchAuthLogId tAchAuthLogId = new AchAuthLogId();
 						tAchAuthLogId.setAuthCreateDate(parse.stringToInteger(result.get("F1")));
 						tAchAuthLogId.setCustNo(parse.stringToInteger(result.get("F2")));
 						tAchAuthLogId.setRepayBank(result.get("F3"));
 						tAchAuthLogId.setRepayAcct(result.get("F4"));
 						tAchAuthLogId.setCreateFlag(result.get("F5"));
-
+						
 						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
-
+						
 						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
 						tAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 						tAchAuthLog.setBatchNo("Au" + batchNo + AuthSeq);

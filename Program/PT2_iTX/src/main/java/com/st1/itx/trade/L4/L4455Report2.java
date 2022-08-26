@@ -21,6 +21,7 @@ import com.st1.itx.db.service.springjpa.cm.L4455ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -153,8 +154,17 @@ public class L4455Report2 extends MakeReport {
 			throw new LogicException("E0013", "L4455");
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款失敗報表", "", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款失敗報表", "", "A4", "L");
+		
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L4455").setRptItem("銀行扣款失敗報表").setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
 
+		this.open(titaVo, reportVo);
+
+		
+		
 		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
 
 		lCdCode = slCdCode == null ? null : slCdCode.getContent();
@@ -184,9 +194,8 @@ public class L4455Report2 extends MakeReport {
 //				1.每筆先印出明細
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
-				String tmpAcctcodex= L4455List.get(i).get("AcctCode").equals("900")? "990":L4455List.get(i).get("AcctCode");
 				for (CdCode tCdCode : lCdCode2) {
-					if (tmpAcctcodex.equals(tCdCode.getCode())) {
+					if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
 						acctcodex = tCdCode.getItem();
 					}
 				}

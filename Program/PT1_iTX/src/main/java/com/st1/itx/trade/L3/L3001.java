@@ -14,10 +14,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
@@ -53,6 +55,8 @@ public class L3001 extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	public AcReceivableService acReceivableService;
 	@Autowired
 	LoanBorTxService sLoanBorTxService;
 	@Autowired
@@ -193,6 +197,10 @@ public class L3001 extends TradeBuffer {
 		if (lFacMain == null || lFacMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
 		}
+		
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index,
+				Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
+		
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
 			int deadline = 0;
@@ -262,6 +270,22 @@ public class L3001 extends TradeBuffer {
 			
 			occursList.putParam("OOHasL3932", lLoanRateChange != null && !lLoanRateChange.isEmpty() ? "Y" : "N");
 			
+			BigDecimal tavAmt = BigDecimal.ZERO; 
+			BigDecimal tamAmt = BigDecimal.ZERO; 
+			if (slAcReceivable !=null) {
+				for (AcReceivable rv : slAcReceivable.getContent()) {
+					if ("TAV".equals(rv.getAcctCode())) {
+						tavAmt = tavAmt.add(rv.getRvBal());
+					}
+					if ("TAM".equals(rv.getAcctCode())) {
+						tamAmt = tamAmt.add(rv.getRvBal());
+					}
+				}
+			}
+			
+			occursList.putParam("OOTavAmt", tavAmt); // 暫收可抵繳
+			occursList.putParam("OOTamAmt", tamAmt);  // 暫收款AML戶
+		
 			this.totaVo.addOccursList(occursList);
 		}
 

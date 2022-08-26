@@ -524,7 +524,7 @@ T(2,#OOWkSpc14+#OOApplNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L2038; ntxbuf=#OOBUF6})
 
 #OOBUF7=X,100,S
-T(2,#OOCustNo+#OOFacmNo+000+#EntryDate+#EntryDate)
+T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#EntryDate+#EntryDate)
 
 !用於判定下列三個按鈕是否該顯示, Y/N
 #OOHasL3005=X,1,S

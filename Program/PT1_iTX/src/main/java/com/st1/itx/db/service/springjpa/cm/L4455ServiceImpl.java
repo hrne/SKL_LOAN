@@ -84,12 +84,8 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";//違約金
 		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";//清償違約金
 		sql += "         , SUM(\"FeeAmt\")  AS \"FeeAmt\"";//費用
-//		sql += "         , SUM(CASE        ";
-//		sql += "         		 WHEN JSON_VALUE(\"OtherFields\",'$.AcSeq') = '0002' THEN \"TempAmt\"";
-//		sql += "         		 ELSE 0 END )         AS \"TempAmt\"";//暫收借
 		sql += "         , SUM( \"TempAmt\" )         AS \"TempAmt\"";//暫收借
 		sql += "         , SUM(\"Overflow\")         AS \"Overflow\"";//暫收貸
-//		sql += "         , SUM(\"Shortfall\")       AS \"Shortfall\"";
 		sql += "    	 , SUM(\"UnpaidPrincipal\" + \"UnpaidInterest\" + \"UnpaidCloseBreach\") AS \"Shortfall\" "; // 短繳(G)
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))";
 		sql += "                                  AS \"AcctFee\"";
@@ -129,22 +125,6 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       + TX2.\"DelayInt\"";
 			sql += "       + TX2.\"BreachAmt\"";
 			sql += "       + TX2.\"CloseBreachAmt\"";
-//			sql += "       + TX2.\"AcctFee\"";
-//			sql += "       + TX2.\"ModifyFee\"";
-//			sql += "       + TX2.\"FireFee\"";
-//			sql += "       + TX2.\"LawFee\"";
-//			sql += "       - CASE "; 
-//			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' "; 
-//			sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\""; 
-//			sql += "         WHEN TX2.\"TempAmt\" < 0"; 
-//			sql += "         THEN ABS(TX2.\"TempAmt\")"; 
-//			sql += "         ELSE 0 END";
-//			sql += "       + CASE";
-//			sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
-//			sql += "         THEN TX2.\"TxAmt\"";
-//			sql += "         WHEN TX2.\"TempAmt\" > 0";
-//			sql += "         THEN TX2.\"TempAmt\"";
-//			sql += "         ELSE 0 END AS \"AcctAmt\" ";
 			sql += "       + TX2.\"Overflow\"";
 			sql += "       - TX2.\"TempAmt\"";
 			sql += "       + TX2.\"FeeAmt\" AS \"AcctAmt\"";
@@ -182,23 +162,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       + TX2.\"CloseBreachAmt\" AS \"BreachAmt\" ";
 		sql += "    , TX2.\"TempAmt\"   AS \"TempDr\""; // 暫收借(E)
 		sql += " 	, TX2.\"Overflow\"  AS \"TempCr\" ";// 暫收貸(F)
-//		sql += "     , CASE";
-//		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
-//		sql += "         THEN TX2.\"TxAmt\" - TX2.\"TempAmt\"";
-//		sql += "         WHEN TX2.\"TempAmt\" < 0";
-//		sql += "         THEN ABS(TX2.\"TempAmt\")";
-//		sql += "       ELSE 0 END AS \"TempDr\" ";
-//		sql += "     , CASE";
-//		sql += "         WHEN TX2.\"TitaTxCd\" = 'L3210' ";
-//		sql += "         THEN TX2.\"TxAmt\"";
-//		sql += "         WHEN TX2.\"TempAmt\" > 0";
-//		sql += "         THEN TX2.\"TempAmt\"";
-//		sql += "       ELSE 0 END AS \"TempCr\" ";
 		sql += "     , TX2.\"Shortfall\" ";
-//		sql += "     , TX2.\"AcctFee\"";
-//		sql += "       + TX2.\"ModifyFee\"";
-//		sql += "       + TX2.\"FireFee\"";
-//		sql += "       + TX2.\"LawFee\" AS \"Fee\" ";
 		sql += "     , TX2.\"AcDate\" ";
 		sql += "     , TX2.\"TitaTlrNo\" ";
 		sql += "     , TX2.\"TitaTxtNo\" ";
@@ -296,7 +260,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 
 		String sql = "SELECT BKD.\"RepayBank\"   ";
-		sql += "     , BKD.\"AcctCode\"     ";
+		sql += "     , CASE WHEN BKD.\"RepayType\" = 5 THEN '990' ELSE BKD.\"AcctCode\" END AS \"AcctCode\"";
 		sql += "     , BKD.\"RepayAcctNo\"  ";
 		sql += "     , BKD.\"CustNo\"       ";
 		sql += "     , CM.\"CustName\"      ";
@@ -406,6 +370,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     SELECT COUNT(1) AS \"Counts\"";
 		sql += "     FROM (";
 		sql += "          SELECT \"CustNo\"";
+		sql += "          		,\"RepayBank\"";
 		sql += "          FROM \"BankDeductDtl\" BKD";
 		sql += "          WHERE BKD.\"EntryDate\" = :inputEntryDate";
 		sql += "          AND BKD.\"MediaCode\" = 'Y' ";
@@ -416,6 +381,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "          GROUP BY \"CustNo\"";
+		sql += "          		,\"RepayBank\"";
 		sql += "     )";
 		sql += "  )";
 		sql += "  , FailedBKDCustNo AS (";

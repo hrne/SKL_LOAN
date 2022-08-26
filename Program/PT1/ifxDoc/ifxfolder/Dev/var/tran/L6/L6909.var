@@ -222,8 +222,8 @@ P(R,#OOTAVBalX)
 
 #OOTxNo=X,18,S
 !交易明細
-#OOBUF1=X,32,S
-T(2,#CustNo+000+000+#OOAcDate)
+#OOBUF1=X,37,S
+T(2,#TXCD+#CustNo+000+000+#OOAcDate)
 #OOBTN1=X,1,S
 C(5,#OOAcFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易明細;ntxbuf=#OOBUF1}),BIND(grid,cancel))
 

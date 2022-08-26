@@ -19,6 +19,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -75,8 +76,21 @@ public class L9711Report2 extends MakeReport {
 		int count = 0;
 		// 製表人
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
-		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-				titaVo.getTxCode().isEmpty() ? "L9711" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
+//		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
+//				titaVo.getTxCode().isEmpty() ? "L9711" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
+
+		String txcd = titaVo.getTxcd();
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String reportItem = "放款本息攤還表暨繳息通知單";
+		String security = "密";
+		String pageSize = "A4";
+		String pageOrientation = "P";
+
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
 
 		if (L9711List.size() > 0) {
 
@@ -86,15 +100,21 @@ public class L9711Report2 extends MakeReport {
 				// inputCustNo: #CUSTNO
 				// CustNo: Query.F4
 				// FacmNo: Query.F5
+				
+		
+				this.openForm(titaVo, reportVo);
 
 				String inputCustNo = titaVo.get("CustNo");
 				String recordCustNoString = tL9711Vo.get("F4");
 				String recordFacmNoString = tL9711Vo.get("F5");
 				int recordCustNo = parse.stringToInteger(recordCustNoString);
 				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
-				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo))
+				this.info("recordCustNoString="+recordCustNoString);
+				this.info("recordFacmNo="+recordFacmNo);
+//				this.info("custNoticeCom="+!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo));
+				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo)) {
 					continue;
-
+				}
 				// 有一樣戶號額度的話 用同一張
 				if (f4.equals(tL9711Vo.get("F4")) && f5.equals(tL9711Vo.get("F5"))) {
 
@@ -136,37 +156,6 @@ public class L9711Report2 extends MakeReport {
 
 	private void reportEmpty() throws LogicException {
 
-//		this.print(-4, 10, "【限定本人拆閱，若無此人，請寄回本公司】");
-//
-//		this.setFontSize(14);
-//		this.print(-15, 37, "放款本息攤還表暨繳息通知單", "C");
-//
-//		this.setFontSize(10);
-//
-//		this.print(-22, 10, "製發日期：");
-//		this.print(-22, 20, ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
-//		this.print(-23, 10, "戶號：　　　　　　　目前利率：　　　　%");
-//
-//		this.print(-24, 10, "客戶名稱：　　　　　　　　　　　　　　　　　　　　　溢短繳：");
-//
-//		this.print(-25, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　管帳費：");
-//
-//		this.print(-26, 10, "　　　　　　　　　　　　　每期應攤還　　　　　　　　　　　　未　　還　　暫　付");
-//		this.print(-27, 10, "應繳日　　違約金　　　　本金　　　　　利息　　　應繳合計　　本金餘額　　所得稅　　應繳淨額");
-//		this.print(-28, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-//		this.print(-29, 7, "本日無資料");
-//
-//		this.print(-31, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
-//		this.print(-32, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-//
-//		this.print(-33, 8, "＊＊本額度自　　　年　　月　　日起本利均攤");
-//		this.print(-34, 8, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
-//
-//		this.print(-35, 8, "＊＊新光銀行　　分行代號：");
-//
-//		this.print(-36, 82, "製表人 ");
-//		this.print(1, 1, " ");
-
 		this.setRptItem("放款本息攤還表暨繳息通知單(查無資料)");
 
 		this.printCm(1, 4, "*******    查無資料   ******");
@@ -175,7 +164,7 @@ public class L9711Report2 extends MakeReport {
 	private void report(Map<String, String> tL9711Vo, TxBuffer txbuffer) throws LogicException {
 		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
-	
+
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
 			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),

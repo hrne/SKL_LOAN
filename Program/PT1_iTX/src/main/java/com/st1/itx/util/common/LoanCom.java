@@ -1643,14 +1643,9 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setTxAmt(txAmt);
 		tLoanBorTx.setTempAmt(tempAmt);
 		tLoanBorTx.setOverflow(overAmt);
-		TempVo txTempVo = new TempVo();
-		if (tLoanBorTx.getOtherFields() != null) {
-			txTempVo = txTempVo.getVo(tLoanBorTx.getOtherFields());
-		}
-		txTempVo.putParam("AcSeq", parse.IntegerToString(acSeq, 4));
-		tLoanBorTx.setOtherFields(txTempVo.getJsonString());
+		tLoanBorTx.setAcSeq(acSeq);
 		this.info("updAcDetailBorxNo end txAmt=" + txAmt + ", tempAmt=" + tempAmt + ", repayAmt=" + repayAmt
-				+ ", overAmt=" + overAmt);
+				+ ", overAmt=" + overAmt + ", acSeq=" + acSeq);
 
 	}
 

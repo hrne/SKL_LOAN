@@ -396,12 +396,12 @@ C(3,#FunctionCode,7,BIND(grid,cancel),$)
 C(3,#FunctionCode,7,s,$)
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}),BIND(grid,cancel))
 
-
-! <連動查詢>
+! <查詢>
 #OOBUF_D=X,390,S
-T(2,#OOCustNo+#OOFacmNo)
+T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOEntryDate)
 #OOBTN_D=A,2,O
-C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo}),BIND(grid,cancel))
+C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
+!C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:EntryDate<-OOEntryDate}),BIND(grid,cancel))
 
 #OOMediaCode=X,1,O
 
@@ -483,8 +483,8 @@ TXFORM=L4943
 
 #RPTFG=0,QUERY.GRID,L4943
 #any={detail:true, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
-#OOBTN_D=連動查詢
-{search:false,formatter:'cust:bind-button:連動查詢',align:'center',canExport:false,width:70}
+#OOBTN_D=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOBTN_A=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
 #OOBTN_B=刪除
@@ -523,8 +523,8 @@ TXFORM=L4943
 
 #RPTFG=2,QUERY.GRID,L4943
 #any={detail:true, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
-#OOBTN_D=連動查詢
-{search:false,formatter:'cust:bind-button:連動查詢',align:'center',canExport:false,width:70}
+#OOBTN_D=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOBTN_A=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
 #OOBTN_B=刪除

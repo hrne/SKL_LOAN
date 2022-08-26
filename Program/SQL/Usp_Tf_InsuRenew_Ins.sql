@@ -138,7 +138,7 @@ BEGIN
            , NVL(FR1P."INSTOT",0)           AS "TotInsuPrem"         -- 總保費 DECIMAL 14 0
            , NVL(FR1P."TRXDAT",0)           AS "AcDate"              -- 會計日期 Decimald 8 0
            , NVL(TX."TitaTlrNo",'999999')   AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
-           , FR1P."TRXNMT"                  AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
+           , LPAD(FR1P."TRXNMT" ,8,0)       AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
            , FR1P."CHKPRT"                  AS "NotiTempFg"          -- 入通知檔 VARCHAR2 1 0
            , CASE
                WHEN FR1P."CHKPRO" = 1 -- 不處理

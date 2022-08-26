@@ -98,6 +98,14 @@ E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,31,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ChainTxCd,#NTXBUF,1,5)
+T(1,@CustNo,#NTXBUF,6,7)
+T(1,@FacmNo,#NTXBUF,13,3)
+T(1,@BormNo,#NTXBUF,16,3)
+C(5,#ChainTxCd,L4943,T(1,@EntryDate,#NTXBUF,19,7),T(1,@AcDate,#NTXBUF,19,7))
+
+
+#ChainTxCd=X,5,S
 
 #BUF1A=X,18,S
 T(3,00000009999999000)
@@ -113,7 +121,6 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<
 CALL(#InitValue)
 ! INVOKEJS(SHOW,p1,1,3,1)
 SHOW(#BTN1)
-C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
 C(3,#CHAIN,1,s,$)
 
 #WKBTN1=X,1,S
@@ -263,7 +270,6 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<
 #FdFacmNo=X,2,L
 
 #FacmNo=A,3,I
-C(3,#CHAIN,1,T(1,#NTXBUF,8,3),$)
 C(3,#CHAIN,1,s,$)
 C(3,#ApplNo,0,SHOW(#BTN4),HIDE(#BTN4))
 C(3,#ApplNo,0,$,s)
@@ -280,7 +286,6 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF5;ntxbuf5=type<-1:BormNo<-
 C(3,#FacmNo,0,T(F,@BormNo,0),T(F,@BormNo,1))
 
 #BormNo=A,3,I
-C(3,#CHAIN,1,T(1,#NTXBUF,11,3),$)
 C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,HIDE(#BTN5),SHOW(#BTN5))
 C(3,#FacmNo,0,S,$)
@@ -292,7 +297,6 @@ C(3,#FacmNo,0,S,$)
 #FdAcDate=X,2,L
 
 #AcDate=D,7,I
-C(3,#CHAIN,1,T(1,#NTXBUF,14,7),$)
 C(3,#CHAIN,1,s,$)
 E(0,#SYSDATE/100)
 E(0,#AcDate*100+1)
@@ -304,7 +308,6 @@ E(0,#AcDate*100+1)
 
 #EntryDate=D,7,I
 C(3,#AcDate,0,$,S)
-C(3,#CHAIN,1,T(1,#NTXBUF,14,7),$)
 C(3,#CHAIN,1,s,$)
 E(0,#SYSDATE/100)
 E(0,#EntryDate*100+1)

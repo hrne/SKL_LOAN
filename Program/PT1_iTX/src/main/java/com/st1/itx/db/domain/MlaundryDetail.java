@@ -75,7 +75,8 @@ public class MlaundryDetail implements Serializable {
   private int managerCheckDate = 0;
 
   // 主管覆核說明
-  @Column(name = "`ManagerDesc`", length = 50)
+  /* 2022/8/25長度放大150 */
+  @Column(name = "`ManagerDesc`", length = 150)
   private String managerDesc;
 
   // 建檔日期時間
@@ -305,7 +306,7 @@ N:不同意
 
 /**
 	* 主管覆核說明<br>
-	* 
+	* 2022/8/25長度放大150
 	* @return String
 	*/
   public String getManagerDesc() {
@@ -314,7 +315,7 @@ N:不同意
 
 /**
 	* 主管覆核說明<br>
-	* 
+	* 2022/8/25長度放大150
   *
   * @param managerDesc 主管覆核說明
 	*/

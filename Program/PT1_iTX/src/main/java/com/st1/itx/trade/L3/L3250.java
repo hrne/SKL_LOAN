@@ -208,7 +208,7 @@ public class L3250 extends TradeBuffer {
 		Slice<InsuRenew> slInsuRenew = insuRenewService.findCustEq(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
-				if (tInsuRenew.getAcDate() > 0 && tInsuRenew.getTitaTxtNo().equalsIgnoreCase(iTxtNo)
+				if (tInsuRenew.getAcDate() > 0 && tInsuRenew.getTitaTxtNo().equals(iTxtNo)
 						&& tInsuRenew.getTotInsuPrem().equals(iTxAmt)) {
 					switch (tInsuRenew.getStatusCode()) {
 					case 0:

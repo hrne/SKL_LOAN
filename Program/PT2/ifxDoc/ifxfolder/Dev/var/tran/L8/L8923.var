@@ -107,8 +107,6 @@ T(2,{cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF0; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增記錄)
 K(MODIFYBUTTON,查詢)
 
-
-
 #button1=x,100,S
 T(2,{cmd=CHAIN; ntxcd=L8205; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
 K(MODIFYBUTTON,2,產生疑似洗錢報表)
@@ -154,7 +152,6 @@ C(3,#RecordDateStart,0,$,S)
 C(3,#RecordDateEnd,0,$,S)
 @V(7)A(DATE,0,#ActualRepayDateEnd)
 V(5,#ActualRepayDateStart,#CDATEX)
-
 
 #CustNo=A,7,I
 #CustName=X,50,I
@@ -253,8 +250,8 @@ T(2,2+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepay
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=修改;ntxbuf=#OOBUF2})
 
 ! 明細的按鈕
-#OOBUF3=X,20,S
-T(2,#OOCustNo+#OOFacmNo+#OOBormNo+#OOActualRepayDate)
+#OOBUF3=X,50,S
+T(2,#TXCD+#OOCustNo+#OOFacmNo+#OOBormNo+#OOActualRepayDate)
 
 #OOBTN3=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L3005;text=明細;ntxbuf=#OOBUF3})

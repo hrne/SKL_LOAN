@@ -67,7 +67,6 @@ BEGIN
              , QTAP."LMSAPN"
              , QTAP."LMSASQ"
              , QTAP."CUSEM3"
-             , LSEP."EMPCOD" -- 協辦人員員編
              , QTAP."PRZCMT" -- 介紹人介紹獎金
         FROM "LA$QTAP" QTAP
         WHERE QTAP."PRZTYP" = '1' -- 介紹獎金

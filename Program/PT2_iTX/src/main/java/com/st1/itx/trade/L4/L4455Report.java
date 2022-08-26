@@ -430,7 +430,7 @@ public class L4455Report extends MakeReport {
 							}
 						}
 						pageCnt = pageCnt + 2;
-						this.print(0, 1, acctcodex);
+						this.print(0, 1, funcd != 1 ? "暫收款" : acctcodex);
 						this.print(0, 19, "小計");
 
 						amt();
@@ -460,7 +460,7 @@ public class L4455Report extends MakeReport {
 								acctcodex = tCdCode.getItem();
 							}
 						}
-						this.print(0, 1, acctcodex);
+						this.print(0, 1, funcd != 1 ? "暫收款" : acctcodex);
 						this.print(0, 19, "小計");
 
 						amt();
@@ -494,7 +494,9 @@ public class L4455Report extends MakeReport {
 							acctcodex = tCdCode.getItem();
 						}
 					}
-					this.print(0, 1, acctcodex);
+			
+
+					this.print(0, 1, funcd != 1 ? "暫收款" : acctcodex);
 					this.print(0, 19, "小計");
 
 					amt();
