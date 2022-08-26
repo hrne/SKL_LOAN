@@ -185,16 +185,21 @@ public class L4606Batch extends TradeBuffer {
 
 		init();
 
+		setTimer();
 		deleteInsuComm(titaVo);
+		printUsedTime("deleteInsuComm");
 
 //		PC上傳媒體檔轉入佣金媒體檔
 		if (!"".equals(flagA)) {
+			setTimer();
 			insertIntoInsuComm();
+			printUsedTime("insertIntoInsuComm");
 		}
 
 //		火險佣金發放報表(未發放 = '佣金日期=0?')
 //		未發放 -> 火險服務(FireOfficer) = 空白(null)
 		if (!"".equals(flagB)) {
+			setTimer();
 			this.info("flagB Start ...");
 			l4606Report1.exec(titaVo);
 			l4606Report2.exec(titaVo);
@@ -203,12 +208,26 @@ public class L4606Batch extends TradeBuffer {
 
 			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
 					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
+			printUsedTime("flagB");
 		}
 
 //		產生下傳媒體
 		if (!"".equals(flagC)) {
+			setTimer();
 			generateMediaFile();
+			printUsedTime("generateMediaFil'");
 		}
+	}
+
+	private void printUsedTime(String title) {
+		String usedTime = title + " 耗時 " + (double) ((double) (System.currentTimeMillis() - starttime) / 1000.0) + " 秒";
+		this.info(usedTime);
+	}
+
+	Long starttime;
+
+	private void setTimer() {
+		starttime = System.currentTimeMillis();
 	}
 
 	private void generateMediaFile() throws LogicException {
@@ -416,7 +435,7 @@ public class L4606Batch extends TradeBuffer {
 				BigDecimal commBase = parse.stringToBigDecimal(tempOccursList.get("CommBase"));
 				BigDecimal commRate = parse.stringToBigDecimal(tempOccursList.get("CommRate"));
 				;
-				this.info("commBase=" + commBase + ", commRate = " + commRate);
+//				this.info("commBase=" + commBase + ", commRate = " + commRate);
 				BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 				tInsuComm.setDueAmt(dueAmt);
 
@@ -475,22 +494,11 @@ public class L4606Batch extends TradeBuffer {
 		List<InsuComm> deleinsuComm = sInsuComm == null ? null : sInsuComm.getContent();
 
 		if (deleinsuComm != null && !deleinsuComm.isEmpty()) {
-			int seq = 0;
-			for (InsuComm tInsuComm : deleinsuComm) {
-				seq = seq + 1;
-				if (seq % commitCnt == 0) {
-					this.info("seq : " + seq);
-					this.batchTransaction.commit();
-				}
-
-				tInsuComm = insuCommService.holdById(tInsuComm.getInsuCommId(), titaVo);
-				try {
-					insuCommService.delete(tInsuComm, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("XXXXX", "InsuComm delete Error : " + e.getErrorMsg());
-				}
+			try {
+				insuCommService.deleteAll(deleinsuComm, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("XXXXX", "InsuComm delete Error : " + e.getErrorMsg());
 			}
-			this.batchTransaction.commit();
 		}
 	}
 }

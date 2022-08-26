@@ -184,9 +184,9 @@ public class L4455Report2 extends MakeReport {
 //				1.每筆先印出明細
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
-
+				String tmpAcctcodex= L4455List.get(i).get("AcctCode").equals("900")? "990":L4455List.get(i).get("AcctCode");
 				for (CdCode tCdCode : lCdCode2) {
-					if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
+					if (tmpAcctcodex.equals(tCdCode.getCode())) {
 						acctcodex = tCdCode.getItem();
 					}
 				}

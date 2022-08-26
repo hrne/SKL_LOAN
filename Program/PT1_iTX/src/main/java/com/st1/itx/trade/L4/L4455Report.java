@@ -100,6 +100,8 @@ public class L4455Report extends MakeReport {
 	private int pageIndex = 38;
 	private int funcd = 0;
 
+	private int dataSize = 0;
+
 	@Override
 	public void printHeader() {
 
@@ -188,7 +190,12 @@ public class L4455Report extends MakeReport {
 				bank = tCdCode.getItem();
 			}
 		}
+		if (dataSize == 0) {
+			repaybank = "";
+			bank = "";
+		}
 		this.print(-6, 35, "扣款銀行：" + repaybank + "  " + bank);
+
 		this.print(-8, 1,
 				"戶號              戶名           扣款金額    作帳金額        計息起迄日                本金          利息        暫付款        違約金        暫收借        暫收貸          短繳        ");
 		this.print(-9, 1,
@@ -248,22 +255,24 @@ public class L4455Report extends MakeReport {
 
 	private void Report(TitaVo titaVo, List<Map<String, String>> L4455List, int function) throws LogicException {
 
+		dataSize = L4455List.size() > 0 && !L4455List.isEmpty() ? L4455List.size() : 0;
+
 		String tradeReportName = "";
 		switch (function) {
 		case 1:
-			tradeReportName="銀行扣款總傳票明細表";
+			tradeReportName = "銀行扣款總傳票明細表";
 //			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表", "", "A4", "L");
 			break;
 		case 2:
-			tradeReportName="銀行扣款總傳票明細表(帳管費)";
+			tradeReportName = "銀行扣款總傳票明細表(帳管費)";
 //			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(帳管費)", "", "A4", "L");
 			break;
 		case 3:
-			tradeReportName="銀行扣款總傳票明細表(契變手續費)";
+			tradeReportName = "銀行扣款總傳票明細表(契變手續費)";
 //			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(契變手續費)", "", "A4", "L");
 			break;
 		case 4:
-			tradeReportName="銀行扣款總傳票明細表(火險費)";
+			tradeReportName = "銀行扣款總傳票明細表(火險費)";
 //			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(火險費)", "", "A4", "L");
 			break;
 		default:
@@ -273,7 +282,7 @@ public class L4455Report extends MakeReport {
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
 				.setPageOrientation("L").build();
-		
+
 		this.open(titaVo, reportVo);
 
 		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
@@ -292,7 +301,7 @@ public class L4455Report extends MakeReport {
 			batchno = L4455List.get(0).get("BatchNo");
 			entrydate = String.valueOf(parse.stringToInteger(L4455List.get(0).get("EntryDate")) - 19110000);
 			repaybank = L4455List.get(0).get("RepayBank");
-			acctcode = L4455List.get(0).get("AcctCode");
+			acctcode = L4455List.get(0).get("AcctCode").equals("900") ? "990" : L4455List.get(0).get("AcctCode");
 
 			for (int j = 1; j <= L4455List.size(); j++) {
 				i = j - 1;
@@ -395,11 +404,13 @@ public class L4455Report extends MakeReport {
 				Shortfall = Shortfall.add(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall")));
 
 				if (j != L4455List.size()) {
+
 //					批次號碼/扣款日期/扣款銀行 不同則跳頁，並且累計歸零
 					batchno = L4455List.get(j).get("BatchNo");
 					entrydate = String.valueOf(parse.stringToInteger(L4455List.get(j).get("EntryDate")) - 19110000);
 					repaybank = L4455List.get(j).get("RepayBank");
-					acctcode = L4455List.get(j).get("AcctCode");
+					acctcode = L4455List.get(j).get("AcctCode").equals("900") ? "990"
+							: L4455List.get(j).get("AcctCode");
 
 					if (!L4455List.get(i).get("BatchNo").equals(batchno)
 							|| !String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000)
@@ -411,8 +422,10 @@ public class L4455Report extends MakeReport {
 								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1,
 								"                                                                                                                                                                               ");
+						String tmpAcctcodex = L4455List.get(i).get("AcctCode").equals("900") ? "990"
+								: L4455List.get(i).get("AcctCode");
 						for (CdCode tCdCode : lCdCode2) {
-							if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
+							if (tmpAcctcodex.equals(tCdCode.getCode())) {
 								acctcodex = tCdCode.getItem();
 							}
 						}
