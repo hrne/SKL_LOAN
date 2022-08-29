@@ -1566,7 +1566,6 @@ public class BaTxCom extends TradeBuffer {
 	// 計算清償違約金
 	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, int iRepayType, TitaVo titaVo)
 			throws LogicException {
-		this.info("getCloseBreachAmt...");
 		String collectFlag = this.tempVo.getParam("CollectFlag"); // 是否領取清償證明(Y/N/)
 
 		loanCloseBreachCom.setTxBuffer(this.txBuffer);
@@ -1592,25 +1591,25 @@ public class BaTxCom extends TradeBuffer {
 
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 			for (LoanCloseBreachVo v : oListCloseBreach) {
-				this.closeBreachAmt = this.closeBreachAmt.add(v.getCloseBreachAmt());
+				if (v.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0) {
+					this.closeBreachAmt = this.closeBreachAmt.add(v.getCloseBreachAmt());
+					baTxVo = new BaTxVo();
+					baTxVo.setDataKind(6); // 6.另收欠款
+					baTxVo.setRepayType(iRepayType);
+					baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
+					baTxVo.setCustNo(v.getCustNo()); // 借款人戶號
+					baTxVo.setFacmNo(v.getFacmNo()); // 額度編號
+					baTxVo.setBormNo(v.getBormNo()); // 撥款序號
+					baTxVo.setRvNo(" "); // 銷帳編號
+					baTxVo.setCloseBreachAmt(v.getCloseBreachAmt()); // 違約金
+					baTxVo.setUnPaidAmt(v.getCloseBreachAmt()); // 未收金額
+					baTxVo.setDbCr("C"); // 借貸別
+					baTxVo.setAcctAmt(BigDecimal.ZERO); // 出帳金額
+					this.baTxList.add(baTxVo);
+				}
 			}
 		}
-		//
-		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
-			baTxVo = new BaTxVo();
-			baTxVo.setDataKind(6); // 6.另收欠款
-			baTxVo.setRepayType(iRepayType);
-			baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
-			baTxVo.setCustNo(iCustNo); // 借款人戶號
-			baTxVo.setFacmNo(iFacmNo); // 額度編號
-			baTxVo.setBormNo(0); // 撥款序號
-			baTxVo.setRvNo(" "); // 銷帳編號
-			baTxVo.setCloseBreachAmt(this.closeBreachAmt); // 違約金
-			baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(this.closeBreachAmt)); // 未收金額
-			baTxVo.setDbCr("C"); // 借貸別
-			baTxVo.setAcctAmt(BigDecimal.ZERO); // 出帳金額
-			this.baTxList.add(baTxVo);
-		}
+		this.info("getCloseBreachAmt end collectFlag=" + collectFlag + ", CloseBreachAmt=" + this.closeBreachAmt);
 	}
 
 	/* 設定費用還款順序 */

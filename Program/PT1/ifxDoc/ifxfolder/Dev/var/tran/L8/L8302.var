@@ -267,12 +267,15 @@ C(4,#NegoStartDate,$,IF(#ScDate > #NegoStartDate,V(P,停催日不可大於協商
 ! 流水號
 #Ukey=X,32,S
 
+!刪除提醒
+IF(#TranKey_Tmp == 4,ALERT(交易代碼為"A"時，刪除資料視為實際刪除),$) 
 
 ! !<儲存>
 ! #BUF1=X,10,S
 ! T(2,#CUSTID)
 ! #BIND1=X,1,S
 ! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=#CHAINCD; ntxbuf=#BUF1})
+
 
 ![列印用系統變數]
 #RPTFG=X,1,S

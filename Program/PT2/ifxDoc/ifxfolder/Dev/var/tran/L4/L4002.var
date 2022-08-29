@@ -266,7 +266,7 @@ H,T(2,整批訂正))
 ! LabelFgD 轉暫收(T)
 #OOBTNDISPLAYD=X,10,O
 SWITCH(#OOLabelFgD,
-T,T(2,單筆入帳),)
+T,T(2,勾選入帳),)
 ! C(3,#OOStatusCode,0,T(2,),$)
 ! C(3,#OOStatusCode,1,T(2,轉暫收),$)
 ! C(3,#OOStatusCode,2,T(2,轉暫收),$)

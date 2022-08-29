@@ -59,10 +59,10 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "     MIN(bd.\"RepayAcctNo\")                        AS \"RepayAcctNo\"                         ";
 		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS \"CustNo\"                         ";
 		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS \"FacmNo\"                         ";
-		sql += "   , LPAD(lbm.\"BormNo\",3,'0')						            AS \"BormNo\"                         ";
+		sql += "   , MIN(LPAD(lbm.\"BormNo\",3,'0'))	            AS \"BormNo\"                         ";
 		sql += "   , MIN(cm.\"CustName\")                           AS \"CustName\"                         ";
 		sql += "   , MIN(bd.\"RepayAmt\")                           AS \"RepayAmt\"                         ";
-		sql += "   , MIN(NVL(\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1),\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)))     AS \"PhoneNo\"                         ";
+		sql += "   , MIN(NVL(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1),NVL(\"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1),\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1))))     AS \"PhoneNo\"                         ";
 		sql += "   , MIN(NVL(bd.\"RelCustName\", cm.\"CustName\"))  AS \"RelCustName\"                         ";
 		sql += "   , case when lbm.\"PrevPayIntDate\" < 19110000 then lbm.\"PrevPayIntDate\" ";
 		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end     AS \"PrevPayIntDate\"               ";
@@ -92,7 +92,6 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "                 THEN lbm.\"DrawdownDate\" ";
 		sql += "                 ELSE lbm.\"DrawdownDate\" - 19110000 ";
 		sql += "            END ";
-		sql += "          , LPAD(lbm.\"BormNo\",3,'0')";
 		sql += "		  ,ce.\"Fullname\"";
 		sql += "   order by \"RepayAcctNo\",\"CustNo\", \"FacmNo\"                                           ";
 		this.info("sql=" + sql);

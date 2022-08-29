@@ -24,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R04 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R04.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -43,6 +42,9 @@ public class L4R04 extends TradeBuffer {
 //		#RimDetailSeq=A,6,L
 		int iAcDate = parse.stringToInteger(titaVo.getParam("RimAcDate").trim()) + 19110000;
 		String iBatchNo = titaVo.getParam("RimBatchNo").trim();
+		if ("RESV".equals(iBatchNo.substring(0, 4))) {
+			iBatchNo = "BATX" + iBatchNo.substring(4, 6);
+		}
 		int iDetailSeq = parse.stringToInteger(titaVo.getParam("RimDetailSeq").trim());
 
 		BankRmtf tBankRmtf = new BankRmtf();

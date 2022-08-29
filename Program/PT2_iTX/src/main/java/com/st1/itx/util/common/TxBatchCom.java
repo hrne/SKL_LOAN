@@ -1143,7 +1143,7 @@ public class TxBatchCom extends TradeBuffer {
 				unfinishCnt = -1;
 				if ("L3210".equals(titaVo.getTxcd())) {
 					if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3) {
-						tDetail.setRepayType(9); // 9.其他
+						tDetail.setRepayType(9); // 9.暫收
 					}
 				}
 				if (titaVo.isTrmtypBatch()) { // 批次入帳
@@ -1151,17 +1151,18 @@ public class TxBatchCom extends TradeBuffer {
 					if (titaVo.get("CheckMsg") != null) {
 						tTempVo.putParam("CheckMsg", titaVo.get("CheckMsg"));
 					}
-					// 轉暫收功能
-					if ("2".equals(titaVo.get("FunctionCode"))) {
-						tDetail.setProcStsCode("7"); // 7.轉暫收
-					} else {
+					// 批次入帳(repayCode 1~4) 出彙總，其他:單張
+					if (tDetail.getRepayCode() >= 1 && tDetail.getRepayCode() <= 4) {
 						tDetail.setProcStsCode("6"); // 6.批次入帳
+						this.tTempVo.putParam("BatchProcStsCode", "6");
+					} else {
+						tDetail.setProcStsCode("5"); // 5:單筆入帳
 					}
 				} else {
-					if ("L3210".equals(titaVo.getTxcd())) {
-						tDetail.setProcStsCode("7"); // 7.轉暫收
+					if ("6".equals(this.tTempVo.getParam("BatchProcStsCode"))) {
+						tDetail.setProcStsCode("7"); // 7.批次入帳後人工
 					} else {
-						tDetail.setProcStsCode("5");
+						tDetail.setProcStsCode("5"); // 5:單筆入帳
 					}
 				}
 				acDate = this.txBuffer.getTxCom().getTbsdy();
@@ -1175,7 +1176,6 @@ public class TxBatchCom extends TradeBuffer {
 				if (this.tTempVo.get("RepayType") != null) {
 					tDetail.setRepayType(parse.stringToInteger(this.tTempVo.get("RepayType"))); // 還原還款類別
 				}
-
 				tDetail.setDisacctAmt(BigDecimal.ZERO);
 				tDetail.setAcctAmt(BigDecimal.ZERO); // 還款金額 - 入暫收金額
 				if (this.tTempVo.get("EraseCnt") != null) {

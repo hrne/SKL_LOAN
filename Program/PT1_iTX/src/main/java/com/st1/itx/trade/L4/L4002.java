@@ -122,6 +122,7 @@ public class L4002 extends TradeBuffer {
 
 	private void setL4002Tota(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
 		String batchNo = tBatxHead.getBatchNo();
+		boolean isRepayCode1To4 = false;
 		int labelRankFlag = 1;
 		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
@@ -201,10 +202,8 @@ public class L4002 extends TradeBuffer {
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(tBatxDetail.getProcNote());
 				// 可入帳 => 檢核成功、還款來源(1~4)
-				boolean isEnterTx = false;
-				if (tBatxDetail.getProcStsCode().equals("4") && tBatxDetail.getRepayCode() >= 1
-						&& tBatxDetail.getRepayCode() <= 4) {
-					isEnterTx = true;
+				if (tBatxDetail.getRepayCode() >= 1 && tBatxDetail.getRepayCode() <= 4) {
+					isRepayCode1To4 = true;
 				}
 				// 可刪除回復 => 刪除且未曾入過
 				if (isDeleteRecovery && tempVo.get("EraseCnt") != null) {
@@ -297,7 +296,7 @@ public class L4002 extends TradeBuffer {
 				this.info("L4002  - grp2 : " + grp2.toString());
 				this.info("L4002  - grp3 : " + grp3.toString());
 
-// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
+// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.批次入帳後人工
 				// grp1 總筆數合計
 				if (totalCnt.containsKey(grp1)) {
 					totalCnt.put(grp1, totalCnt.get(grp1) + 1);
@@ -349,7 +348,7 @@ public class L4002 extends TradeBuffer {
 						watCnt.put(grp2, 1);
 					}
 				}
-				// grp2轉暫收
+				// grp2批次入帳後人工
 				if (tBatxDetail.getProcStsCode().equals("7")) {
 					if (virCnt.containsKey(grp2)) {
 						virCnt.put(grp2, virCnt.get(grp2) + 1);
@@ -390,7 +389,7 @@ public class L4002 extends TradeBuffer {
 							watCnt.put(grp3, 1);
 						}
 					}
-					// grp3轉暫收
+					// grp3批次入帳後人工
 					if (tBatxDetail.getProcStsCode().equals("7")) {
 						if (virCnt.containsKey(grp3)) {
 							virCnt.put(grp3, virCnt.get(grp3) + 1);
@@ -473,20 +472,22 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (isEnterTx) {
+					if (tBatxDetail.getProcStsCode().equals("4")) {
 						if (canEnterCnt.containsKey(grp1)) {
 							canEnterCnt.put(grp1, canEnterCnt.get(grp1) + 1);
 						} else {
 							canEnterCnt.put(grp1, 1);
 						}
 					}
-					// 可暫收筆數
-					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-							|| tBatxDetail.getProcStsCode().equals("4")) {
-						if (canTempCnt.containsKey(grp1)) {
-							canTempCnt.put(grp1, canTempCnt.get(grp1) + 1);
-						} else {
-							canTempCnt.put(grp1, 1);
+					// 可暫收筆數、未執行訂正
+					if (tempVo.get("EraseCnt") != null) {
+						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+								|| tBatxDetail.getProcStsCode().equals("4")) {
+							if (canTempCnt.containsKey(grp1)) {
+								canTempCnt.put(grp1, canTempCnt.get(grp1) + 1);
+							} else {
+								canTempCnt.put(grp1, 1);
+							}
 						}
 					}
 				} else {
@@ -509,20 +510,22 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (isEnterTx) {
+					if (tBatxDetail.getProcStsCode().equals("4")) {
 						if (canEnterCnt.containsKey(grp3)) {
 							canEnterCnt.put(grp3, canEnterCnt.get(grp3) + 1);
 						} else {
 							canEnterCnt.put(grp3, 1);
 						}
 					}
-					// 可暫收筆數
-					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-							|| tBatxDetail.getProcStsCode().equals("4")) {
-						if (canTempCnt.containsKey(grp3)) {
-							canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
-						} else {
-							canTempCnt.put(grp3, 1);
+					// 可暫收筆數、未執行訂正
+					if (tempVo.get("EraseCnt") != null) {
+						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+								|| tBatxDetail.getProcStsCode().equals("4")) {
+							if (canTempCnt.containsKey(grp3)) {
+								canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
+							} else {
+								canTempCnt.put(grp3, 1);
+							}
 						}
 					}
 				}
@@ -571,7 +574,7 @@ public class L4002 extends TradeBuffer {
 // LabelFgD 轉暫收(T) 待處理筆數  > 0 & head
 
 // 執行整批訂正後只可刪除
-
+// repaycode 1~4 整批入帳(E)、整批訂正(H)
 				String labelFgA = "";
 				String labelFgB = "";
 				String labelFgC = "";
@@ -589,7 +592,9 @@ public class L4002 extends TradeBuffer {
 							if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
 								labelFgA = "D";
 							} else {
-								labelFgA = "H";
+								if (isRepayCode1To4) {
+									labelFgA = "H";
+								}
 							}
 						}
 					}
@@ -600,7 +605,9 @@ public class L4002 extends TradeBuffer {
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
 						if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
-							labelFgC = "E";
+							if (isRepayCode1To4) {
+								labelFgC = "E";
+							}
 						}
 					}
 					if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
@@ -609,6 +616,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 				}
+
 				occursList.putParam("OOLabelFgA", labelFgA);
 				occursList.putParam("OOLabelFgB", labelFgB);
 				occursList.putParam("OOLabelFgC", labelFgC);

@@ -287,7 +287,7 @@ public class L4606Batch extends TradeBuffer {
 				if (!"".equals(tInsuComm.getFireOfficer())) {
 					OccursList occursList = new OccursList();
 
-					this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
+					// this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
 
 					String empId = tInsuComm.getEmpId();
 

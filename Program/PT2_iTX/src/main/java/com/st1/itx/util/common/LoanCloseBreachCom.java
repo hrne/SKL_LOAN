@@ -235,8 +235,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			dDateUtil.setMons(tFacProd.getProhibitMonth());
 			dDateUtil.getCalenderDay();
 //			限制清償期間內
-			if (dDateUtil.getCalenderDay() >= iEntryDate) {
-				this.info("skip" + dDateUtil.getCalenderDay() + "," + iEntryDate);
+			if (iEntryDate > 0 && dDateUtil.getCalenderDay() >= iEntryDate) {
+				this.info("skip ProhibitDate = " + dDateUtil.getCalenderDay() + ", iEntryDate=" + iEntryDate);
 			} else {
 				// 前期、本期
 				if (iListVo != null && iListVo.size() > 0) {

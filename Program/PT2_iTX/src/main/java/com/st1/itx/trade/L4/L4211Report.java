@@ -19,6 +19,7 @@ import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211AServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.SortMapListCom;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -179,6 +180,8 @@ public class L4211Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
+		this.info("titaVo.get(\"ReportNo\")=" + titaVo.get("ReportNo"));
+
 		List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -267,9 +270,9 @@ public class L4211Report extends MakeReport {
 		if (txCode == null || txCode.trim().isEmpty()) {
 			txCode = titaVo.getTxcd();
 		}
+		int reportNo = Integer.valueOf(titaVo.get("ReportNo"));
 
-		
-		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表" : "匯款總傳票明細表";
+		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表" : (reportNo == 1 ? "匯款總傳票明細表" : "入帳後檢核明細表");
 		acdate = titaVo.get("AcDate");
 
 		if (fnAllList1.size() == 0) {
@@ -279,18 +282,20 @@ public class L4211Report extends MakeReport {
 		this.info("titaVo.getEntDyI()=" + titaVo.getEntDyI());
 		this.info("txCode=" + txCode);
 
-//		this.reportVo = ReportVo.builder().setRptDate(Integer.valueOf(titaVo.getEntDyI()) + 19110000)
-//				.setBrno(titaVo.getBrno()).setRptCode(txCode).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
+				.setRptCode(txCode).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
+
+		this.open(titaVo, reportVo);
+
 		this.setFont(1, 7);
-		
+
 		this.info("fnAllList1=" + fnAllList1);
 		this.info("fnAllList2=" + fnAllList2);
 		this.info("fnAllList3=" + fnAllList3);
 		this.info("isBatchMapList=" + isBatchMapList);
 
-		
 		reportkind = 1;
 		report1(fnAllList1, isBatchMapList);
 
@@ -301,8 +306,6 @@ public class L4211Report extends MakeReport {
 		reportkind = 3;
 		newPage();
 		report3(fnAllList3, isBatchMapList);
-
-	
 
 //        long sno = 
 		this.close();
@@ -525,17 +528,17 @@ public class L4211Report extends MakeReport {
 					if (TxAmtMap.get(tmp) != null) {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
-				} 
+				}
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
 
 			}
 
-			if(!"L4211".equals(txCode)) {
+			if (!"L4211".equals(txCode)) {
 				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
 			}
-			
+
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";
@@ -726,7 +729,6 @@ public class L4211Report extends MakeReport {
 			others = getBigDecimal(tfnAllList.get("Fee"));
 			count++;
 
-
 			// 判斷當前的批號與批次號碼不同
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
@@ -881,17 +883,17 @@ public class L4211Report extends MakeReport {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
 
-				} 
+				}
 				allsumTransferAmt = allsumTransferAmt.add(transferamt);
 
 				scode = tfnAllList.get("DetailSeq");
 
 			}
 
-			if(!"L4211".equals(txCode)) {
+			if (!"L4211".equals(txCode)) {
 				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
 			}
-			
+
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";
@@ -1240,10 +1242,10 @@ public class L4211Report extends MakeReport {
 
 			}
 
-			if(!"L4211".equals(txCode)) {
+			if (!"L4211".equals(txCode)) {
 				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
 			}
-			
+
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
 			custNo += isBatchMapList ? "-" : " ";

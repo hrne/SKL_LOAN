@@ -78,17 +78,21 @@ public class L4930 extends TradeBuffer {
 
 		if (iFunctionCode == 2) {
 			if (iCustNo > 0) {
-				sBatxDetail = batxDetailService.findL4930CAEq(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930CAEq(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit,
+						titaVo);
 			} else if (!"".equals(iReconCode)) {
-				sBatxDetail = batxDetailService.findL4930RAEq(iAcDate, iBatchNo, iReconCode, func2, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930RAEq(iAcDate, iBatchNo, iReconCode, func2, this.index,
+						this.limit, titaVo);
 			} else {
 				sBatxDetail = batxDetailService.findL4930BAEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
 			}
 		} else if (iFunctionCode == 1) {
 			if (iCustNo > 0) {
-				sBatxDetail = batxDetailService.findL4930CHEq(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930CHEq(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit,
+						titaVo);
 			} else if (!"".equals(iReconCode)) {
-				sBatxDetail = batxDetailService.findL4930RHEq(iAcDate, iBatchNo, iReconCode, func1, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930RHEq(iAcDate, iBatchNo, iReconCode, func1, this.index,
+						this.limit, titaVo);
 			} else {
 				sBatxDetail = batxDetailService.findL4930BHEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
 			}
@@ -106,7 +110,15 @@ public class L4930 extends TradeBuffer {
 
 			int cnt = 0;
 			for (BatxDetail tBatxDetail : lBatxDetail) {
-// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
+				TempVo tempVo = new TempVo();
+				if (tBatxDetail.getProcNote() != null) {
+					tempVo = tempVo.getVo(tBatxDetail.getProcNote());
+				}
+				// 訂正後不可勾選入帳
+				if (tempVo.get("EraseCnt") != null) {
+					continue;
+				}
+				// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.批次人工
 				cnt = cnt + 1;
 
 //					傳回AcDate BatchNo Seq 勾選傳值
@@ -127,28 +139,24 @@ public class L4930 extends TradeBuffer {
 				occursList.putParam("OOEntryDate", tBatxDetail.getEntryDate());
 
 				String procNote = "";
-				if (tBatxDetail.getProcNote() != null) {
 
-					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(tBatxDetail.getProcNote());
-
-					if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {
-						procNote = "檢核訊息:" + tempVo.get("CheckMsg") + " ";
-					}
-					if (tempVo.get("ErrorMsg") != null && tempVo.get("ErrorMsg").length() > 0) {
-						procNote = procNote + "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
-					}
-					if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
-						procNote = procNote + "摘要:" + tempVo.get("Note");
-					}
-					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
-						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
-					}
+				if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {
+					procNote = "檢核訊息:" + tempVo.get("CheckMsg") + " ";
+				}
+				if (tempVo.get("ErrorMsg") != null && tempVo.get("ErrorMsg").length() > 0) {
+					procNote = procNote + "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
+				}
+				if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
+					procNote = procNote + "摘要:" + tempVo.get("Note");
+				}
+				if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
+					procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
+				}
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
 //					若該筆無還款類別且為數字型態，顯示虛擬帳號
-					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0 && isNumeric(tempVo.get("VirtualAcctNo"))) {
-						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
-					}
+				if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0
+						&& isNumeric(tempVo.get("VirtualAcctNo"))) {
+					procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
 				}
 
 				occursList.putParam("OOProcNote", procNote);
@@ -156,7 +164,8 @@ public class L4930 extends TradeBuffer {
 				if ("".equals(tBatxDetail.getTitaTxtNo())) {
 					occursList.putParam("OOTxSn", "");
 				} else {
-					occursList.putParam("OOTxSn", titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
+					occursList.putParam("OOTxSn",
+							titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
 				}
 
 				this.totaVo.addOccursList(occursList);

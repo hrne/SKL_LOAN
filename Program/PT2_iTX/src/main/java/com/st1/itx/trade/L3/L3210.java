@@ -271,6 +271,7 @@ public class L3210 extends TradeBuffer {
 				acDetail = new AcDetail();
 				acDetail.setDbCr("C");
 				acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
+				acDetail.setSumNo("094"); // 轉債協暫收款
 				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
@@ -285,6 +286,7 @@ public class L3210 extends TradeBuffer {
 						acDetail = new AcDetail();
 						acDetail.setDbCr("D");
 						acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
+						acDetail.setSumNo("094"); // 轉債協暫收款
 						acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 						acDetail.setTxAmt(iTempAmt);
 						acDetail.setCustNo(iCustNo);
@@ -342,6 +344,7 @@ public class L3210 extends TradeBuffer {
 				acDetail = new AcDetail();
 				acDetail.setDbCr("C");
 				acDetail.setAcctCode("TAM");
+				acDetail.setSumNo("090"); // 暫收款
 				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);

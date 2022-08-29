@@ -139,14 +139,14 @@ T(2,樣態+#OFactor1)
 #ORationalX=X,2,L
 C(5,#ORational,Y,T(2,是),$)
 C(5,#ORational,N,T(2,否),$)
-#OEmpNoDesc=x,2.50,H
+#OEmpNoDesc=x,4.50,L
 #OManagerCheck=X,1,L
 #OManagerCheckX=X,4,L
 C(5,#OManagerCheck,Y,T(2,同意),$)
 C(5,#OManagerCheck,N,T(2,退回),$)
 #OManagerCheckDate=D,7,L
 #OManagerDate=D,7,L
-#OManagerDesc=x,2.50,H
+#OManagerDesc=x,4.50,L
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S

@@ -27,10 +27,14 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		;
 	}
 
-	String inputReconCode;
-	int inputAcDate;
+	private String inputReconCode;
+	private int inputAcDate;
+	private int reportNo = 0;
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+
+		reportNo = Integer.valueOf(titaVo.get("ReportNo"));
+
 		inputReconCode = String.valueOf(titaVo.get("ReconCode")).trim();
 		if (inputReconCode.equals("A7")) {
 			inputReconCode = "P03";
@@ -104,7 +108,18 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
 		sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
 		sql += "            AND SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";
-		sql += "            AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
+		
+		//總傳票
+		if (reportNo == 1) {
+			
+			sql += "            AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
+
+		} else {
+
+			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";
+
+		}
+
 		sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
 		sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
 		sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
@@ -123,7 +138,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 		sql += "                           , '6' "; // 批次入帳
 		sql += "                           , '7') ";// 轉暫收
-
 
 		this.info("sql=" + sql);
 		Query query;

@@ -194,6 +194,9 @@ public class L8205Report1 extends MakeReport {
 				if(("Y").equals(check)) {
 					check = "同意";
 				}
+				if(("N").equals(check)) {
+					check = "退回";
+				}
 				print(1, 4, "主管覆核: "+check);
 				print(1, 4, "");
 				
@@ -260,6 +263,9 @@ public class L8205Report1 extends MakeReport {
 				String check = tL8205Vo.get("F10");
 				if(("Y").equals(check)) {
 					check = "同意";
+				}
+				if(("N").equals(check)) {
+					check = "退回";
 				}
 				makeExcel.setValue(rowCursor, 11, check);
 				

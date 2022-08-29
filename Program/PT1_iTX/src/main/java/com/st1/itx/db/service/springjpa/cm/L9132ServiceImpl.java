@@ -136,6 +136,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
+		sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 		sql += " ) ";	
@@ -416,6 +417,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
+		sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 //		sql += "       AND (CASE WHEN AC.\"EntAc\" IN (1) ";//--正常,批次(整批、單筆)入帳
@@ -658,6 +660,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
+		sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 		sql += " ) ";

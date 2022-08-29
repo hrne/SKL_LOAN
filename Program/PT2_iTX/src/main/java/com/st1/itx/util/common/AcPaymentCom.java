@@ -145,17 +145,20 @@ public class AcPaymentCom extends TradeBuffer {
 		// 戶號 0123456-890-234
 		acDetail.setCustNo(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
 		// 額度
-		if (titaVo.getMrKey().length() >= 11 && titaVo.getMrKey().substring(7, 8).equals("-"))
-			acDetail.setFacmNo(parse.stringToInteger(titaVo.getMrKey().substring(8, 11)));
-		// 撥款序號
-		if (titaVo.getMrKey().length() >= 15 && titaVo.getMrKey().substring(11, 12).equals("-"))
-			acDetail.setBormNo(parse.stringToInteger(titaVo.getMrKey().substring(12, 15)));
-
 		// 借貸別 應收-D 應付-C
-		if ("1".equals(RpFlag))
+		if ("1".equals(RpFlag)) {
 			acDetail.setDbCr("D");
-		else
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+		} else {
 			acDetail.setDbCr("C");
+			if (titaVo.getMrKey().length() >= 11 && titaVo.getMrKey().substring(7, 8).equals("-")) {
+				acDetail.setFacmNo(parse.stringToInteger(titaVo.getMrKey().substring(8, 11)));
+			}
+			// 撥款序號
+			if (titaVo.getMrKey().length() >= 15 && titaVo.getMrKey().substring(11, 12).equals("-")) {
+				acDetail.setBormNo(parse.stringToInteger(titaVo.getMrKey().substring(12, 15)));
+			}
+		}
 
 		// 彙總別：撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx) 、業務科目對應表
 // 1-應收  RpAcctCode (整批入帳檔帶入)
@@ -179,7 +182,7 @@ public class AcPaymentCom extends TradeBuffer {
 //      095:轉債協退還款 (戶號)       T2x 債協退還款  
 //      099:暫收沖正     (戶號)       THC 暫收款－沖正
 		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
-				&& "RESV".equals(titaVo.get("BATCHNO").substring(0, 4))) {
+				&& "RESV00".equals(titaVo.get("BATCHNO"))) {
 			acDetail.setSumNo("099");
 		} else if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
 			acDetail.setSumNo("0" + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
@@ -203,15 +206,18 @@ public class AcPaymentCom extends TradeBuffer {
 
 		switch (acDetail.getSumNo()) {
 		case "090":
-			if (acDetail.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
-				acDetail.setAcctCode("TAV");
-				acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-				// 暫收款入帳(暫收借)
-				BigDecimal excessive = addAcDetail90(acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
-				// 累溢收入帳(暫收貸)
-				acDetail.setTxAmt(excessive.subtract(acDetail.getTxAmt()));
+			acDetail.setAcctCode("TAV");
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+			if (acDetail.getCustNo() != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+				if (acDetail.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+					// 暫收款入帳(暫收借)
+					BigDecimal excessive = addAcDetail90(acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
+					// 累溢收入帳(暫收貸)
+					acDetail.setDbCr("C");
+					acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+					acDetail.setTxAmt(excessive.subtract(acDetail.getTxAmt()));
+				}
 			}
-
 			break;
 		case "091":
 			acDetail.setAcctCode("TRO");

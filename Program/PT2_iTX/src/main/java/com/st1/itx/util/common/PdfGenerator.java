@@ -757,7 +757,7 @@ public class PdfGenerator extends CommBuffer {
 			empNm = tCdEmp.getFullname();
 		}
 
-		this.info("PdfGenerator setWatermark empNm = " + empNm);
+		// this.info("PdfGenerator setWatermark empNm = " + empNm);
 
 		watermark.append(empNm).append(" ");
 
