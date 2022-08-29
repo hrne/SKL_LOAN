@@ -84,13 +84,13 @@ public class L4454Report2 extends MakeReport {
 					switch (i) {
 //	0	1	2	3	4	5	6	    7		8		9		
 //	 帳號	戶號	戶名	金額	電話	戶名	已繳月份	撥款日	地區別	專員
-					case 4:
+					case 3:
 						// 金額
 //						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#,##0");
 						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "R");
 						break;
+					case 6:
 					case 7:
-					case 8:
 						// 戶號(數字右靠)
 						if ("".equals(tLDVo.get(fdnm))) {
 							makeExcel.setValue(row, i + 1, 0);

@@ -119,6 +119,7 @@ public class L4455Report extends MakeReport {
 	}
 
 	public void printHeaderP() {
+			
 		this.setFont(1, 9);
 		this.print(-1, 185, "機密等級：密");
 		this.print(-2, 1, "程式ID：" + "L4455Report");
@@ -186,8 +187,10 @@ public class L4455Report extends MakeReport {
 		}
 
 		for (CdCode tCdCode : lCdCode) {
-			if (repaybank.equals(tCdCode.getCode())) {
+			this.info("RepayBank" +  titaVo.get("RepayBank"));
+			if (titaVo.get("RepayBank").equals(tCdCode.getCode())) {
 				bank = tCdCode.getItem();
+				repaybank = titaVo.get("RepayBank");
 			}
 		}
 		if (dataSize == 0) {
@@ -206,7 +209,12 @@ public class L4455Report extends MakeReport {
 
 		this.info("L4455Report exec");
 		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
-
+		this.info("acdate   = " + acdate);
+		
+		entrydate = titaVo.getParam("EntryDate");
+		this.info("entrydate   = " + entrydate);
+		
+		this.info("");
 		irepaybank = titaVo.getParam("RepayBank");
 
 		List<Map<String, String>> L4455List = new ArrayList<Map<String, String>>();
@@ -295,6 +303,17 @@ public class L4455Report extends MakeReport {
 
 		this.info("L4455List = " + L4455List.toString());
 		this.info("size = " + L4455List.size());
+		if(titaVo.getParam("BatchNo") != null){
+			this.info("BatchNo   = " + titaVo.getParam("BatchNo"));
+		}
+		if(L4455List.size() <= 0 && L4455List.isEmpty()) {
+			batchno = "BATX"+titaVo.getParam("BatchNo");
+			entrydate = String.valueOf(parse.stringToInteger(titaVo.getParam("EntryDate")));
+			repaybank = titaVo.getParam("RepayBank");
+			this.info("batchno  = " + batchno);
+			this.info("entrydate = " + entrydate);
+			this.info("repaybank = " + repaybank);
+		}
 		if (L4455List.size() > 0 && !L4455List.isEmpty()) {
 			int i = 0, pageCnt = 0;
 
@@ -302,7 +321,7 @@ public class L4455Report extends MakeReport {
 			entrydate = String.valueOf(parse.stringToInteger(L4455List.get(0).get("EntryDate")) - 19110000);
 			repaybank = L4455List.get(0).get("RepayBank");
 			acctcode = L4455List.get(0).get("AcctCode").equals("900") ? "990" : L4455List.get(0).get("AcctCode");
-
+			
 			for (int j = 1; j <= L4455List.size(); j++) {
 				i = j - 1;
 
@@ -429,8 +448,12 @@ public class L4455Report extends MakeReport {
 								acctcodex = tCdCode.getItem();
 							}
 						}
+						if(L4455List.get(i).get("AcctCode").equals("456")) {
+							acctcodex = "暫收款";
+						}
+
 						pageCnt = pageCnt + 2;
-						this.print(0, 1, funcd != 1 ? "暫收款" : acctcodex);
+						this.print(0, 1, acctcodex);
 						this.print(0, 19, "小計");
 
 						amt();
@@ -460,7 +483,11 @@ public class L4455Report extends MakeReport {
 								acctcodex = tCdCode.getItem();
 							}
 						}
-						this.print(0, 1, funcd != 1 ? "暫收款" : acctcodex);
+						if(L4455List.get(i).get("AcctCode").equals("456")) {
+							acctcodex = "暫收款";
+						}
+
+						this.print(0, 1, acctcodex);
 						this.print(0, 19, "小計");
 
 						amt();
@@ -494,9 +521,11 @@ public class L4455Report extends MakeReport {
 							acctcodex = tCdCode.getItem();
 						}
 					}
-			
+					if(L4455List.get(i).get("AcctCode").equals("456")) {
+						acctcodex = "暫收款";
+					}
 
-					this.print(0, 1, funcd != 1 ? "暫收款" : acctcodex);
+					this.print(0, 1, acctcodex);
 					this.print(0, 19, "小計");
 
 					amt();
@@ -523,6 +552,7 @@ public class L4455Report extends MakeReport {
 			} // for
 
 		} else {
+
 			this.print(1, 20, "*******    查無資料   ******");
 		}
 

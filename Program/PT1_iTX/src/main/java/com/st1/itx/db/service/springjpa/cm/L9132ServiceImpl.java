@@ -35,8 +35,8 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @return 查詢結果
 	 */
 	public List<Map<String, String>> doQueryL9132(int acDate, int batchNo, TitaVo titaVo) {
-	String sql = " ";
-		
+		String sql = " ";
+
 		sql += " WITH rawData AS ( ";
 		sql += "    SELECT AC.\"AcNoCode\" ";
 		sql += "     	  ,CDAC.\"AcNoItem\" ";
@@ -45,7 +45,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 1";	
+		sql += "       		 THEN 1";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -62,7 +62,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";	
+		sql += "       		 THEN 0";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -79,7 +79,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  	 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       	 	  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";	
+		sql += "       		 THEN 0";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -107,7 +107,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  THEN ' '";	
+		sql += "       		  THEN ' '";
 		sql += "       		  WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -136,10 +136,15 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
-		sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
+		if (acDate == 20220407) {
+			sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
+		} else {
+
+			sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
+		}
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
-		sql += " ) ";	
+		sql += " ) ";
 		sql += " , groupData AS ( ";
 		sql += "     SELECT \"AcNoCode\" ";
 		sql += "          , \"AcNoItem\" ";
@@ -220,9 +225,8 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("acDate", acDate);
 		query.setParameter("batchNo", batchNo);
 		return this.convertToMap(query);
-	}	
-	
-	
+	}
+
 	/**
 	 * L9132A 傳票媒體總表（總帳）
 	 * 
@@ -300,13 +304,13 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> doQueryL9132B(int acDate, int batchNo, TitaVo titaVo) {
 
 		String sql = " ";
-		
+
 		sql += " WITH rawData AS ( ";
 		sql += "	SELECT CASE ";
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 1";	
+		sql += "       		 THEN 1";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -323,7 +327,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";	
+		sql += "       		 THEN 0";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -341,7 +345,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  	 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       	 	  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";	
+		sql += "       		 THEN 0";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -371,7 +375,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  THEN ' '";	
+		sql += "       		  THEN ' '";
 		sql += "       		  WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -390,7 +394,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  THEN N' '";	
+		sql += "       		  THEN N' '";
 		sql += "       		  WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -417,7 +421,12 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
-		sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
+		if (acDate == 20220407) {
+			sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
+		} else {
+
+			sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
+		}
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 //		sql += "       AND (CASE WHEN AC.\"EntAc\" IN (1) ";//--正常,批次(整批、單筆)入帳
@@ -528,13 +537,13 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> doQueryL9132C(int acDate, int batchNo, TitaVo titaVo) {
 
 		String sql = " ";
-		
+
 		sql += " WITH rawData AS ( ";
 		sql += "	SELECT CASE ";
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 1";	
+		sql += "       		 THEN 1";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -551,7 +560,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN '000000'";	
+		sql += "       		 THEN '000000'";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -568,7 +577,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";	
+		sql += "       		 THEN 0";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -585,7 +594,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  	 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       	 	  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";	
+		sql += "       		 THEN 0";
 		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -615,7 +624,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  THEN ' '";	
+		sql += "       		  THEN ' '";
 		sql += "       		  WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -634,7 +643,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  THEN N' '";	
+		sql += "       		  THEN N' '";
 		sql += "       		  WHEN AC.\"EntAc\" IN (2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		   AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
@@ -660,7 +669,12 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
-		sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
+		if (acDate == 20220407) {
+			sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
+		} else {
+
+			sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
+		}
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 		sql += " ) ";

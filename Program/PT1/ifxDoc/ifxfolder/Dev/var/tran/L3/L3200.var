@@ -150,7 +150,7 @@ C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 ["#FdBreachAmt+違約金",#TwBreachAmt,#UsBreachAmt],["#FdLawFee+法務費",#TwLawFee,#UsLawFee],
 ["#FdShortfall+累短收",#ShortfallX,#ShortfallXX],["#FdExcessive+累溢收",#ExcessiveXX],
 [#<->#,"#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
-[#<->#,"#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],
+["#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],["#FdTmpAmt+暫收抵繳金額",#TmpAmt],
 ["#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
 ["@","@",],
 ["@","@",],
@@ -603,7 +603,7 @@ E(0,@Excessive,#L3r06Excessive)
 E(0,@ExcessiveAll,#L3r06ExcessiveAll)
 CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
 CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
-T(B,@ExcessiveXX,#ExcessiveX)
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 
 !6/23 end
 !-------------------------------------------------------------
@@ -955,6 +955,7 @@ E(0,@Interest{n},#L3r06Interest{n})
 E(0,@DelayInt{n},#L3r06DelayInt{n})
 E(0,@BreachAmt{n},#L3r06BreachAmt{n})
 E(0,@Total{n},#L3r06Total{n})
+E(0,@CloseBreachAmt{n},#L3r06CloseBreachAmt{n})
 ##end
 
 !----------------額度撥款試算表----------------
@@ -969,7 +970,7 @@ E(0,@Total{n},#L3r06Total{n})
 #DelayInt{n}=+m,14,L
 #BreachAmt{n}=+m,14,L
 #Total{n}=+m,14,L
-
+#CloseBreachAmt{n}=+m,14,L
 ##end
 !---------------------------------------------
 
@@ -1294,6 +1295,16 @@ C(3,#L3r06CloseBreachAmtUnpaid,0,E(0,#L3r06CloseBreachAmt),E(0,#L3r06CloseBreach
 #TimExtraCloseBreachAmt=m,14.2,L
 C(3,#Precision,0,E(0,#TwExtraCloseBreachAmt),E(0,#UsExtraCloseBreachAmt))
 
+#errmsg=X,100,S
+T(2,@errmsg,不可超過累溢收金額)
+!暫收抵繳金額
+#FdTmpAmt=X,2,L
+
+#TmpAmt=m,14,I
+E(0,#L3r06Excessive)
+@
+IF(#TmpAmt>#L3r06Excessive,V(P,#errmsg),$)
+
 
 #TotalReduceAmt=m,14.2,S
 ! C(3,#TimCloseBreachAmt,0,$,S)
@@ -1371,12 +1382,10 @@ E(0,#TimRepayAmt-#TimReduceAmt)
 #TotalRepayAmt=m,14.2,S
 E(0,#RealTxAmt)
 C(3,#TimRepayAmt,0,$,E(0,#WkRepayAmt))
-! C(3,#TimCloseBreachAmt,0,$,E(0,#TimCloseBreachAmt))
-! C(3,#TimExtraRepay,0,$,E(0,#RealTxAmt))
 C(5,#L2r01CharCode,2,E(0,0),$)
 E(3,@RPTOT,#SumRepayAmt-#TimReduceAmt)
 C(3,#RepayType,12,E(3,@RPTOT,#TimOvduRepay),$)
-E(0,@RP_EXCESSIVE,#Excessive)
+E(0,@RP_EXCESSIVE,#TmpAmt)
 
 !實際收付金額
 #RealRepayAmt=m,14.2,L
@@ -1480,6 +1489,7 @@ T(3,[L3200] 回收登錄)
 #TimShortfallInt#TimShortfallPrin#TimShortCloseBreach
 #TimInterest#TimDelayInt#TimBreachAmt#TimPrincipal
 #TimExtraCloseBreachAmt
+#TmpAmt
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#TwRepayAmt#UsRepayAmt
 #TwCloseBreachAmt#UsCloseBreachAmt
@@ -1504,6 +1514,7 @@ T(3,[L3200] 回收登錄)
 #DelayInt{n}
 #BreachAmt{n}
 #Total{n}
+#CloseBreachAmt{n}
 ##end
 </sub>
 

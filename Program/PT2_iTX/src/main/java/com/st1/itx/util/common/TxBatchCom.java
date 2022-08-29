@@ -805,6 +805,7 @@ public class TxBatchCom extends TradeBuffer {
 						txTitaVo.putParam("DelayInt" + i, this.intListTempVo.getParam("DelayInt" + i));
 						txTitaVo.putParam("BreachAmt" + i, this.intListTempVo.getParam("BreachAmt" + i));
 						txTitaVo.putParam("Total" + i, this.intListTempVo.getParam("Total" + i));
+						txTitaVo.putParam("CloseBreachAmt" + i, this.intListTempVo.getParam("CloseBreachAmt" + i));
 					}
 				}
 			}
@@ -1968,7 +1969,8 @@ public class TxBatchCom extends TradeBuffer {
 						this.interest = this.interest.add(baTxVo.getInterest());
 						this.delayInt = this.delayInt.add(baTxVo.getDelayInt());
 						this.breachAmt = this.breachAmt.add(baTxVo.getBreachAmt());
-						if (this.intStartDate == 0 || baTxVo.getIntStartDate() < this.intStartDate) {
+						this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());
+						if (baTxVo.getIntStartDate() > 0 && baTxVo.getIntStartDate() < this.intStartDate) {
 							this.intStartDate = baTxVo.getIntStartDate();
 						}
 						if (baTxVo.getIntEndDate() > this.intEndDate) {
@@ -1985,8 +1987,8 @@ public class TxBatchCom extends TradeBuffer {
 					this.intListTempVo.put("Interest" + i, "" + baTxVo.getInterest());
 					this.intListTempVo.put("DelayInt" + i, "" + baTxVo.getDelayInt());
 					this.intListTempVo.put("BreachAmt" + i, "" + baTxVo.getBreachAmt());
+					this.intListTempVo.put("CloseBreachAmt" + i, "" + baTxVo.getCloseBreachAmt());
 					this.intListTempVo.put("Total" + i, "" + baTxVo.getAcctAmt());
-
 				}
 
 				if (baTxVo.getDataKind() == 3) {
@@ -2001,16 +2003,11 @@ public class TxBatchCom extends TradeBuffer {
 					if (baTxVo.getRepayType() == 5) {
 						this.unOpenfireFee = this.unOpenfireFee.add(baTxVo.getUnPaidAmt());
 					}
-					// 清償違約金、費用
+					// 另收費用
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt()); // 全部應繳
-						if (baTxVo.getRepayType() <= 3) {
-							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());
-							this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
-						} else {
-							this.unPayFee = this.unPayFee.add(baTxVo.getFeeAmt());
-							this.repayFee = this.repayFee.add(baTxVo.getAcctAmt());
-						}
+						this.unPayFee = this.unPayFee.add(baTxVo.getFeeAmt());
+						this.repayFee = this.repayFee.add(baTxVo.getAcctAmt());
 					}
 				}
 			}

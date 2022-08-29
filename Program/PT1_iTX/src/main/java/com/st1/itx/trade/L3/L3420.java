@@ -591,11 +591,18 @@ public class L3420 extends TradeBuffer {
 			wkDelayInt = loanCalcRepayIntCom.getDelayInt();
 			wkBreachAmt = loanCalcRepayIntCom.getBreachAmt();
 
-			// 清償違約金放首筆
-			if (isFirstBorm) {
-				wkCloseBreachAmt = iCloseBreachAmt;
-			} else {
-				wkCloseBreachAmt = BigDecimal.ZERO;
+			// 清償違約金
+			wkCloseBreachAmt = BigDecimal.ZERO;
+			if (iCloseBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
+				for (int i = 1; i <= 50; i++) {
+					if (titaVo.get("FacmNo" + i) != null) {
+						if (parse.stringToInteger(titaVo.get("FacmNo" + i)) == wkFacmNo
+								&& parse.stringToInteger(titaVo.get("BormNo" + i)) == wkBormNo) {
+							wkCloseBreachAmt = parse.stringToBigDecimal(titaVo.get("CloseBreachAmt" + i));
+							break;
+						}
+					}
+				}
 			}
 
 			// 轉催收，限本金、利息

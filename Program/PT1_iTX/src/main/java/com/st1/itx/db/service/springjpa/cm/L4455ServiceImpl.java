@@ -202,7 +202,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE BKD.\"ReturnCode\" = '00'";
 		sql += "  AND CASE ";
 		sql += "        WHEN LPAD(:inputBatchNo,2,'0') != '00' ";
-		sql += "        THEN LPAD(:inputBatchNo,2,'0')";
+		sql += "        THEN 'BATX'||LPAD(:inputBatchNo,2,'0')";
 		sql += "      ELSE BD.\"BatchNo\"";
 		sql += "      END = BD.\"BatchNo\"";
 
@@ -260,7 +260,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 
 		String sql = "SELECT BKD.\"RepayBank\"   ";
-		sql += "     , CASE WHEN BKD.\"RepayType\" = 5 THEN '990' ELSE BKD.\"AcctCode\" END AS \"AcctCode\"";
+		sql += "     , CASE WHEN BKD.\"RepayType\" IN (4,5,6) THEN '456' ELSE BKD.\"AcctCode\" END AS \"AcctCode\"";
 		sql += "     , BKD.\"RepayAcctNo\"  ";
 		sql += "     , BKD.\"CustNo\"       ";
 		sql += "     , CM.\"CustName\"      ";

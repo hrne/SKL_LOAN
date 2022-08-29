@@ -474,6 +474,25 @@ E(0,#OOAvailable)
 CALL2(#ADJUSTDOT,#Precision,#OOAvailable,#OOAvailableX)
 P(R,#OOAvailableX)
 
+#OOTavAmt=+m,14.2,S
+
+#OOTavAmt14=m,14,S
+E(0,#OOTavAmt)
+
+#OOTavAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOTavAmt,#OOTavAmtX)
+P(R,#OOTavAmtX)
+
+#OOTamAmt=+m,14.2,S
+
+#OOTamAmt14=m,14,S
+E(0,#OOTamAmt)
+
+#OOTamAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOTamAmt,#OOTamAmtX)
+P(R,#OOTamAmtX)
+
+
 !合併額度控管額度記號
 #OOShareFacFg=X,1,S
 
@@ -591,7 +610,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2017;text=#BTN11NAME; ntxbuf=#OOBUF11})
 TXFORM=L3001
 #OValidFacm#OLineAmt#OUtilAmt#OUtilBal#OAvailable
 #OOCaseNo#OOCustNo#OOFacmNo#OOApplNo#OODeadline#OOCurrencyCode#OOLineAmt
-#OOUtilAmt#OOUtilBal#OOAvailable#OOShareFacFg#OOClShareFg#OOLastBormNo
+#OOUtilAmt#OOUtilBal#OOAvailable#OOTavAmt#OOTamAmt
+#OOShareFacFg#OOClShareFg#OOLastBormNo
 #OOHasL3005
 #OOHasL3911
 #OOHasL3932
@@ -673,6 +693,11 @@ TXFORM=L3001
 #OOBTN11=額度</br>擔保品
 {width:100,search:false,formatter:'cust:bind-button:;L2017 額度與擔保品關聯查詢',align:'center',canExport:false}
 
+#OOTavAmt14=暫收可抵繳
+{width:100}
+
+#OOTamAmtX=
+{width:100}
 
 ^
 #RPTFG2=2,QUERY.GRID,L3001
@@ -705,6 +730,11 @@ TXFORM=L3001
 #OOAvailable14=可用額度
 {width:100,sum:true}
 
+#OOTavAmt14=暫收可抵繳
+{width:100}
+
+#OOTamAmtX=
+{width:100}
 
 
 

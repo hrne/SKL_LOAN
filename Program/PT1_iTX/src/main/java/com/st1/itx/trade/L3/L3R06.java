@@ -24,6 +24,7 @@ import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
@@ -111,6 +112,7 @@ public class L3R06 extends TradeBuffer {
 	private ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 	private ArrayList<LoanFacTmp> lLoanFacTmp = new ArrayList<LoanFacTmp>();
+	private ArrayList<OccursList> lOccursList = new ArrayList<OccursList>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -182,6 +184,10 @@ public class L3R06 extends TradeBuffer {
 		this.totaVo.putParam("L3r06tmpFacmNoX", tmpFacmNoX);
 		this.totaVo.putParam("L3r06tmpFacmNo", this.tmpFacmNo);
 
+		/* 將每筆資料放入Tota的OcList */
+		for (OccursList t : lOccursList) {
+			this.totaVo.addOccursList(t);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -372,7 +378,7 @@ public class L3R06 extends TradeBuffer {
 						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
 					}
 				}
-//				TODO:UI控制 繳納方式: 攤還方式為3時記號為1否則為0 1.顯示可輸入 2.不顯示不可輸入 
+//				UI控制 繳納方式: 攤還方式為3時記號為1否則為0 1.顯示可輸入 2.不顯示不可輸入 
 				this.info("L3R06 ln攤還方式 = " + ln.getAmortizedCode());
 				if ("3".equals(ln.getAmortizedCode()) || "4".equals(ln.getAmortizedCode())) {
 					payMethodFg = 1;
@@ -409,8 +415,7 @@ public class L3R06 extends TradeBuffer {
 				occursList.putParam("L3r06BreachAmt", loanCalcRepayIntCom.getBreachAmt());
 				occursList.putParam("L3r06Total", loanCalcRepayIntCom.getPrincipal().add(loanCalcRepayIntCom
 						.getInterest().add(loanCalcRepayIntCom.getDelayInt().add(loanCalcRepayIntCom.getBreachAmt()))));
-				/* 將每筆資料放入Tota的OcList */
-				this.totaVo.addOccursList(occursList);
+				this.lOccursList.add(occursList);
 				wkTotaCount++;
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
@@ -452,7 +457,29 @@ public class L3R06 extends TradeBuffer {
 			if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 				for (LoanCloseBreachVo v : oListCloseBreach) {
 					if (v.getCloseBreachAmtPaid().compareTo(BigDecimal.ZERO) > 0) {
-						oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmtPaid());
+						oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmtPaid()); // 總數
+						boolean isfind = false;
+						for (OccursList t : lOccursList) {
+							if (parse.stringToInteger(t.get("L3r06FacmNo")) == v.getFacmNo()
+									&& parse.stringToInteger(t.get("L3r06BormNo")) == v.getBormNo()) {
+								isfind = true;
+								if (t.get("L3r06CloseBreachAmt") == null) {
+									t.putParam("L3r06CloseBreachAmt", v.getCloseBreachAmtPaid());
+								} else {
+									t.putParam("L3r06CloseBreachAmt",
+											parse.stringToBigDecimal(t.get("L3r06CloseBreachAmt"))
+													.add(v.getCloseBreachAmtPaid()));
+								}
+							}
+						}
+						if (!isfind) {
+							OccursList occursList = new OccursList();
+							occursList.putParam("L3r06FacmNo", v.getFacmNo());
+							occursList.putParam("L3r06BormNo", v.getBormNo());
+							occursList.putParam("L3r06CloseBreachAmt", v.getCloseBreachAmtPaid());
+
+							this.lOccursList.add(occursList);
+						}
 					}
 				}
 			}

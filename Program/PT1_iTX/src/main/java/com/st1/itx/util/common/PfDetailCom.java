@@ -76,63 +76,64 @@ import com.st1.itx.util.parse.Parse;
 public class PfDetailCom extends TradeBuffer {
 
 	@Autowired
-	CdWorkMonthService cdWorkMonthService;
+	private CdWorkMonthService cdWorkMonthService;
 
 	@Autowired
-	CdPfParmsService cdPfParmsService;
+	private CdPfParmsService cdPfParmsService;
 
 	@Autowired
-	CdPerformanceService cdPerformanceService;
+	private CdPerformanceService cdPerformanceService;
 
 	@Autowired
-	CdBonusService cdBonusService;
+	private CdBonusService cdBonusService;
 
 	@Autowired
-	CdBonusCoService cdBonusCoService;
+	private CdBonusCoService cdBonusCoService;
 
 	@Autowired
-	PfDetailService pfDetailService;
+	private PfDetailService pfDetailService;
 
 	@Autowired
-	PfItDetailService pfItDetailService;
+	private PfItDetailService pfItDetailService;
 
 	@Autowired
-	PfBsDetailService pfBsDetailService;
+	private PfBsDetailService pfBsDetailService;
 
 	@Autowired
-	PfBsOfficerService pfBsOfficerService;
+	private PfBsOfficerService pfBsOfficerService;
 
 	@Autowired
-	PfCoOfficerService pfCoOfficerService;
+	private PfCoOfficerService pfCoOfficerService;
 
 	@Autowired
-	PfRewardService pfRewardService;
+	private PfRewardService pfRewardService;
 
 	@Autowired
-	public FacProdService facProdService;
+	private FacProdService facProdService;
 
 	@Autowired
-	public FacMainService facMainService;
+	private FacMainService facMainService;
 
 	@Autowired
-	public FacCaseApplService facCaseApplService;
+	private FacCaseApplService facCaseApplService;
 
 	@Autowired
-	CdEmpService cdEmpService;
-	@Autowired
-	TxTellerService txTellerService;
+	private CdEmpService cdEmpService;
 
 	@Autowired
-	CdBcmService cdBcmService;
+	private TxTellerService txTellerService;
 
 	@Autowired
-	Parse parse;
+	private CdBcmService cdBcmService;
 
 	@Autowired
-	EmployeeCom employeeCom;
+	private Parse parse;
 
 	@Autowired
-	DateUtil dDateUtil;
+	private EmployeeCom employeeCom;
+
+	@Autowired
+	private DateUtil dDateUtil;
 
 	@Autowired
 	private MailService mailService;
@@ -157,11 +158,10 @@ public class PfDetailCom extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>();
 	}
 
-	public void init(TitaVo titaVo) throws LogicException {
+	public void init() {
 		lPfDetail = new ArrayList<PfDetail>();
 		lPfDetailProcess = new ArrayList<PfDetail>();
 		lPfDetailCntingCode = new ArrayList<PfDetail>();
@@ -192,7 +192,7 @@ public class PfDetailCom extends TradeBuffer {
 
 		this.titaVo = titaVo;
 
-		this.init(titaVo);
+		this.init();
 
 		// 輸入檢核
 		inputCheck(iPf);
@@ -376,7 +376,7 @@ public class PfDetailCom extends TradeBuffer {
 
 		case 0:// 撥款
 			if (titaVo.isHcodeNormal()) {
-				processDrawDown(iPf); // 計算撥款業績
+				processDrawdown(iPf); // 計算撥款業績
 			} else {
 				processReverse(iPf); // 沖回業績資料
 			}
@@ -384,7 +384,7 @@ public class PfDetailCom extends TradeBuffer {
 
 		case 1:// 計件代碼變更
 			processReverse(iPf); // 沖回業績資料
-			processDrawDown(iPf); // 計算新計件代碼業績
+			processDrawdown(iPf); // 計算新計件代碼業績
 			processReDrawDown(iPf); // 重算沖回業績資料(之後撥款者)
 			break;
 
@@ -411,8 +411,8 @@ public class PfDetailCom extends TradeBuffer {
 	}
 
 	// 撥款交易
-	private void processDrawDown(PfDetailVo iPf) throws LogicException {
-		this.info("processDrawDown..." + iPf.toString());
+	private void processDrawdown(PfDetailVo iPf) throws LogicException {
+		this.info("processDrawdown..." + iPf.toString());
 		if (iPf.getPieceCodeSecondAmt().compareTo(BigDecimal.ZERO) > 0) {
 			procPfDetail(iPf, iPf.getPieceCodeSecond(), iPf.getPieceCodeSecondAmt());
 		}
@@ -1077,6 +1077,8 @@ public class PfDetailCom extends TradeBuffer {
 		BigDecimal drawDownBonusFac = BigDecimal.ZERO;
 		BigDecimal repayBonusFac = BigDecimal.ZERO;
 		for (PfDetail it : lPfDetail) {
+			// TODO: 2022-08-24 智偉: SKL User 珮君說 協辦獎金計算是:同一額度，不同撥款工作月，累計計算
+			// TODO: 若確認要修改,這邊把 "it.getWorkMonth() == workMonthDrawdown" 刪除即可
 			if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 				if (isAddBonus(it.getPieceCode(), lCdBonus)) {
 					if (it.getRepayType() == 0) {
@@ -1162,11 +1164,11 @@ public class PfDetailCom extends TradeBuffer {
 		}
 		// CdBonusCo 協辦獎金標準設定
 		int workMonthCd; // 適用工作年月
-		CdBonusCo TCdBonusCo = cdBonusCoService.findWorkMonthFirst(workMonthDrawdown, titaVo);
-		if (TCdBonusCo == null) {
+		CdBonusCo tempCdBonusCo = cdBonusCoService.findWorkMonthFirst(workMonthDrawdown, titaVo);
+		if (tempCdBonusCo == null) {
 			throw new LogicException(titaVo, "E0001", "CdBonusCo 協辦獎金標準設定" + workMonthDrawdown); // 查詢資料不存在
 		}
-		workMonthCd = TCdBonusCo.getWorkMonth();
+		workMonthCd = tempCdBonusCo.getWorkMonth();
 		Slice<CdBonusCo> slCdBonusCo = cdBonusCoService.findYearMonth(workMonthCd, workMonthCd, this.index,
 				Integer.MAX_VALUE, titaVo); // 全部
 		List<CdBonusCo> lCdBonusCo = slCdBonusCo == null ? null : slCdBonusCo.getContent();
@@ -1203,6 +1205,8 @@ public class PfDetailCom extends TradeBuffer {
 		if (lPfDetail != null) {
 			for (PfDetail it : lPfDetail) {
 				if (isCoBonusPieceCode(it.getPieceCode(), lCdBonusCo)) {
+					// TODO: 2022-08-24 智偉: SKL User 珮君說 協辦獎金計算是:同一額度，不同撥款工作月，累計計算
+					// TODO: 若確認要修改,這邊把 "it.getWorkMonth() == workMonthDrawdown" 刪除即可
 					if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 						if (it.getRepayType() == 0) {
 							drawDownBonusFac = drawDownBonusFac.add(it.getCoorgnizerBonus());

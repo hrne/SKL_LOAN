@@ -229,7 +229,9 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
 				continue;
 			}
-
+			if (tFacMain.getFirstDrawdownDate() == 0) {
+				this.info("skip FirstDrawdownDate = 0");
+			}
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
 			dDateUtil.setMons(tFacProd.getProhibitMonth());

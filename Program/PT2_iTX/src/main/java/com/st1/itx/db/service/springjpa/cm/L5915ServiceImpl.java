@@ -65,29 +65,20 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// SKL User 李珮君 要求跟AS400產一樣的檔案
 		// 協辦人員業績件數的檔案要產出不只有協辦人員業績件數的檔案
 		String sql = " ";
-		sql += " WITH rawData AS ( ";
-		sql += "     SELECT \"CustNo\" ";
-		sql += "          , \"FacmNo\" ";
-		sql += "          , \"DrawdownDate\" ";
-		sql += "          , SUM(\"DrawdownAmt\") AS \"UtilBal\" ";
-		sql += "     FROM \"LoanBorMain\" ";
-		sql += "     GROUP BY \"CustNo\" ";
-		sql += "            , \"FacmNo\" ";
-		sql += "            , \"DrawdownDate\" ";
+		sql += " WITH workMonthData AS ( ";
+		sql += "     SELECT \"EndDate\" ";
+		sql += "     FROM \"CdWorkMonth\" ";
+		sql += "     WHERE ( \"Year\" * 100 + \"Month\" ) = :inputWorkMonth ";
 		sql += " ) ";
-		sql += " , utilData AS ( ";
-		sql += "     SELECT r.\"CustNo\" ";
-		sql += "          , r.\"FacmNo\" ";
-		sql += "          , r.\"DrawdownDate\" ";
-		sql += "          , r.\"UtilBal\" + SUM(NVL(ro.\"UtilBal\",0)) AS \"UtilBal\" ";
-		sql += "     FROM rawData r ";
-		sql += "     LEFT JOIN rawData ro ON ro.\"CustNo\" = r.\"CustNo\" ";
-		sql += "                         AND ro.\"FacmNo\" = r.\"FacmNo\" ";
-		sql += "                         AND ro.\"DrawdownDate\" < r.\"DrawdownDate\" ";
-		sql += "     GROUP BY r.\"CustNo\" ";
-		sql += "            , r.\"FacmNo\" ";
-		sql += "            , r.\"DrawdownDate\" ";
-		sql += "            , r.\"UtilBal\" ";
+		sql += " , rawData AS ( ";
+		sql += "     SELECT L.\"CustNo\" ";
+		sql += "          , L.\"FacmNo\" ";
+		sql += "          , SUM(L.\"DrawdownAmt\") AS \"UtilBal\" ";
+		sql += "     FROM \"LoanBorMain\" L ";
+		sql += "     LEFT JOIN workMonthData D ON D.\"EndDate\" >= L.\"DrawdownDate\" ";
+		sql += "     WHERE NVL(D.\"EndDate\",0) > 0 ";
+		sql += "     GROUP BY L.\"CustNo\" ";
+		sql += "            , L.\"FacmNo\" ";
 		sql += " ) ";
 		sql += " SELECT 5                       AS \"RewardType\" "; // 獎金類別
 		sql += "      , PR.\"PieceCode\"        AS \"PieceCode\" "; // 計件代碼
@@ -189,6 +180,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth ";
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
 		sql += " WHERE PD.\"PieceCode\" IN ('1','2','A','B','8','9') ";
+		sql += "   AND PD.\"ProdCode\" NOT IN ('TB') ";
 		sql += "   AND PD.\"WorkMonth\" = :inputWorkMonth ";
 		sql += " GROUP BY PD.\"CustNo\" ";
 		sql += "        , PD.\"FacmNo\" ";

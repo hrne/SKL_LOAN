@@ -199,7 +199,7 @@ public class L3200 extends TradeBuffer {
 	private int wkRepaykindCode = 0; // 1:部分償還本金 2:回收期數>0 3:回收期數=0 4:清償違約金 5:催收款
 	private int wkPaidTerms = 0;
 	private int wkDueDate = 0;
-	//
+
 	private int wkFacmNoStart = 1;
 	private int wkFacmNoEnd = 999;
 	private int wkBormNoStart = 1;
@@ -323,12 +323,12 @@ public class L3200 extends TradeBuffer {
 		iPayMethod = this.parse.stringToInteger(titaVo.getParam("PayMethod"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
-	    if (iRepayType == 10) {
-	    	iTotalRepayAmt = iCloseBreachAmt.subtract(iReduceAmt); // 10. 清償違約金
-	    }
-	    if (iRepayType == 12) {
-	    	iTotalRepayAmt = iOvduRepay.subtract(iReduceAmt); // 12.催收收回
-	    }
+		if (iRepayType == 10) {
+			iTotalRepayAmt = iCloseBreachAmt.subtract(iReduceAmt); // 10. 清償違約金
+		}
+		if (iRepayType == 12) {
+			iTotalRepayAmt = iOvduRepay.subtract(iReduceAmt); // 12.催收收回
+		}
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
 		iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
@@ -396,7 +396,7 @@ public class L3200 extends TradeBuffer {
 			acPaymentCom.setTxBuffer(this.getTxBuffer());
 			acPaymentCom.run(titaVo);
 			lAcDetail.addAll(this.txBuffer.getAcDetailList());
-            // 暫收款額度 
+			// 暫收款額度
 			if (iRepayType <= 2) { // 還款類別 1.期款 2.部分償還
 				calcRepayLoadRoutine();
 			} else {
@@ -681,11 +681,18 @@ public class L3200 extends TradeBuffer {
 			// 計算利息
 			calcRepayInt(ln);
 
-			// 清償違約金(部分償還)放首筆
-			if (isFirstBorm) {
-				wkCloseBreachAmt = iCloseBreachAmt;
-			} else {
-				wkCloseBreachAmt = BigDecimal.ZERO;
+			// 清償違約金(部分償還)
+			wkCloseBreachAmt = BigDecimal.ZERO;
+			if (iCloseBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
+				for (int i = 1; i <= 50; i++) {
+					if (titaVo.get("FacmNo" + i) != null) {
+						if (parse.stringToInteger(titaVo.get("FacmNo" + i)) == wkFacmNo
+								&& parse.stringToInteger(titaVo.get("BormNo" + i)) == wkBormNo) {
+							wkCloseBreachAmt = parse.stringToBigDecimal(titaVo.get("CloseBreachAmt" + i));
+							break;
+						}
+					}
+				}
 			}
 
 			// 計算減免
@@ -1497,7 +1504,7 @@ public class L3200 extends TradeBuffer {
 		tTempVo.putParam("LastKinbr", tLoanBorMain.getLastKinbr());
 		tTempVo.putParam("LastTlrNo", tLoanBorMain.getLastTlrNo());
 		tTempVo.putParam("LastTxtNo", tLoanBorMain.getLastTxtNo());
-		
+
 		wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
@@ -1903,7 +1910,7 @@ public class L3200 extends TradeBuffer {
 		// call 應繳試算(整批入帳應繳日為會計入、連線用入帳日)
 		this.baTxList = baTxCom.settingUnPaid(titaVo.isTrmtypBatch() ? titaVo.getEntDyI() : iEntryDate, iCustNo,
 				this.wkTmpFacmNo, iBormNo, iRepayType <= 2 ? 0 : 9, iTxAmt, titaVo); // 00-費用全部(已到期)
-		if (iRepayType > 2) { 
+		if (iRepayType > 2) {
 			return;
 		}
 		if (this.baTxList != null) {
@@ -2114,10 +2121,8 @@ public class L3200 extends TradeBuffer {
 		titaVo.put("TwDelayInt", df.format(iDelayInt));// 延遲息
 		titaVo.put("TwBreachAmt", df.format(iBreachAmt));// 違約金
 		titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
-		titaVo.put("ShortfallXX",
-				"[利息；" + df.format(iShortfallInt) + "本金；"
-						+ df.format(iShortfallPrin) + "違約金；"
-						+ df.format(iShortCloseBreach) + "]");// 累短收
+		titaVo.put("ShortfallXX", "[利息；" + df.format(iShortfallInt) + "本金；" + df.format(iShortfallPrin) + "違約金；"
+				+ df.format(iShortCloseBreach) + "]");// 累短收
 		titaVo.put("TwAcctFee", df.format(iAcctFee));// 帳管費
 		titaVo.put("TwModifyFee", df.format(iModifyFee));// 契變手續費
 		titaVo.put("TwFireFee", df.format(iFireFee));// 火險費

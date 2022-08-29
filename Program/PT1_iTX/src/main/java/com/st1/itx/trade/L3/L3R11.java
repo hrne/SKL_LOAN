@@ -78,6 +78,7 @@ public class L3R11 extends TradeBuffer {
 	private int wkBormNoEnd = 900;
 	private int wkTotaCount = 0;
 	private int oRpFacmNo = 0;
+	private ArrayList<OccursList> lOccursList = new ArrayList<OccursList>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -230,9 +231,8 @@ public class L3R11 extends TradeBuffer {
 			occursList.putParam("L3r11BreachAmt", loanCalcRepayIntCom.getBreachAmt());
 			occursList.putParam("L3r11Total", loanCalcRepayIntCom.getPrincipal().add(loanCalcRepayIntCom.getInterest()
 					.add(loanCalcRepayIntCom.getDelayInt().add(loanCalcRepayIntCom.getBreachAmt()))));
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
 
+			lOccursList.add(occursList);
 			// 自本金利息內扣除催收還款金額
 			oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal()).subtract(wkOvduPaidPrin);
 			oInterest = oInterest.add(loanCalcRepayIntCom.getInterest()).subtract(wkOvduPaidInt);
@@ -283,12 +283,35 @@ public class L3R11 extends TradeBuffer {
 						titaVo);
 			}
 			// 輸出清償違約金
+
 			if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 				for (LoanCloseBreachVo v : oListCloseBreach) {
 					oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmt());
+					boolean isfind = false;
+					for (OccursList t : lOccursList) {
+						if (parse.stringToInteger(t.get("L3r11FacmNo")) == v.getFacmNo()
+								&& parse.stringToInteger(t.get("L3r11BormNo")) == v.getBormNo()) {
+							isfind = true;
+							if (t.get("L3r11CloseBreachAmt") == null) {
+								t.putParam("L3r11CloseBreachAmt", v.getCloseBreachAmtPaid());
+							} else {
+								t.putParam("L3r11CloseBreachAmt", parse.stringToBigDecimal(t.get("L3r11CloseBreachAmt"))
+										.add(v.getCloseBreachAmtPaid()));
+							}
+						}
+					}
+					if (!isfind) {
+						OccursList occursList = new OccursList();
+						occursList.putParam("L3r11FacmNo", v.getFacmNo());
+						occursList.putParam("L3r11BormNo", v.getBormNo());
+						occursList.putParam("L3r11CloseBreachAmt", v.getCloseBreachAmtPaid());
+
+						this.lOccursList.add(occursList);
+					}
 				}
 			}
 		}
+
 		// 還款本金已含短繳本金回收金額，須扣除
 		this.totaVo.putParam("L3r11Principal", oPrincipal.subtract(baTxCom.getShortfallPrincipal()));
 		this.totaVo.putParam("L3r11Interest", oInterest);
@@ -313,13 +336,19 @@ public class L3R11 extends TradeBuffer {
 				.add(oCloseBreachAmt);
 
 		// 清償要扣除未到期火險費、溢收款
-		if ("L2631".equals(iTxCode) || "L2632".equals(iTxCode)) {
+		if ("L2631".equals(iTxCode) || "L2632".equals(iTxCode))
+
+		{
 			oCloseAmt = oCloseAmt.subtract(baTxCom.getUnOpenfireFee()).subtract(baTxCom.getExcessive());
 		}
 		this.totaVo.putParam("L3r11CloseAmt", oCloseAmt);
 		this.totaVo.putParam("L3r11CloseReasonCode", wkCloseReasonCode);
 		this.totaVo.putParam("L3r11RpFacmNo", oRpFacmNo);
 
+		for (OccursList t : lOccursList) {
+			this.totaVo.addOccursList(t);
+		}
+		/* 將每筆資料放入Tota的OcList */
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

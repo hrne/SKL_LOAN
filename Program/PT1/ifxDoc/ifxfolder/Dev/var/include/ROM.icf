@@ -4095,6 +4095,7 @@ TXFORM=L3R05
 #L3r06DelayInt{n}=+m,14.2,S
 #L3r06BreachAmt{n}=+m,14.2,S
 #L3r06Total{n}=+m,14.2,S
+#L3r06CloseBreachAmt{n}=+m,14.2,S
 ##end
 </L3R06.dec>
 
@@ -4141,6 +4142,7 @@ TXFORM=L3R06
 #L3r06DelayInt{n}
 #L3r06BreachAmt{n}
 #L3r06Total{n}
+#L3r06CloseBreachAmt{n}
 ##end
 ^
 </L3R06.tom>
@@ -4271,6 +4273,7 @@ TXFORM=L3R10
 #L3r11DelayInt{n}=+m,14.2,S
 #L3r11BreachAmt{n}=+m,14.2,S
 #L3r11Total{n}=+m,14.2,S
+#L3r11CloseBreachAmt{n}=+m,14.2,S
 ##end
 </L3R11.dec>
 
@@ -4305,6 +4308,7 @@ TXFORM=L3R11
 #L3r11DelayInt{n}
 #L3r11BreachAmt{n}
 #L3r11Total{n}
+#L3r11CloseBreachAmt{n}
 ##end
 ^
 </L3R11.tom>

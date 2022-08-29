@@ -567,6 +567,7 @@ E(0,@Interest{n},#L3r11Interest{n})
 E(0,@DelayInt{n},#L3r11DelayInt{n})
 E(0,@BreachAmt{n},#L3r11BreachAmt{n})
 E(0,@Total{n},#L3r11Total{n})
+E(0,@CloseBreachAmt{n},#L3r11CloseBreachAmt{n})
 ##end
 
 !查詢催收呆帳檔金額
@@ -1195,6 +1196,7 @@ T(2,@RP_NOTE,#DetailNote)
 #DelayInt{n}=+m,14,L
 #BreachAmt{n}=+m,14,L
 #Total{n}=+m,14,L
+#CloseBreachAmt{n}=+m,14,L
 
 ##end
 <include src="RPDTL.icf::RPCOL.dec"/>
@@ -1272,6 +1274,7 @@ T(3,[L3420] 結案登錄-不可欠繳)
 #DelayInt{n}
 #BreachAmt{n}
 #Total{n}
+#CloseBreachAmt{n}
 ##end
 </sub>
 

@@ -1566,6 +1566,7 @@ public class BaTxCom extends TradeBuffer {
 	// 計算清償違約金
 	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, int iRepayType, TitaVo titaVo)
 			throws LogicException {
+		this.info("getCloseBreachAmt...");
 		String collectFlag = this.tempVo.getParam("CollectFlag"); // 是否領取清償證明(Y/N/)
 
 		loanCloseBreachCom.setTxBuffer(this.txBuffer);
@@ -1594,10 +1595,10 @@ public class BaTxCom extends TradeBuffer {
 				if (v.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0) {
 					this.closeBreachAmt = this.closeBreachAmt.add(v.getCloseBreachAmt());
 					baTxVo = new BaTxVo();
-					baTxVo.setDataKind(6); // 6.另收欠款
+					baTxVo.setDataKind(2); // 2.本金利息=>提前償還有即時清償違約金列短繳(TxBatchCom:人工處理)
 					baTxVo.setRepayType(iRepayType);
 					baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
-					baTxVo.setCustNo(v.getCustNo()); // 借款人戶號
+					baTxVo.setCustNo(iCustNo); // 借款人戶號
 					baTxVo.setFacmNo(v.getFacmNo()); // 額度編號
 					baTxVo.setBormNo(v.getBormNo()); // 撥款序號
 					baTxVo.setRvNo(" "); // 銷帳編號
@@ -1610,6 +1611,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		this.info("getCloseBreachAmt end collectFlag=" + collectFlag + ", CloseBreachAmt=" + this.closeBreachAmt);
+
 	}
 
 	/* 設定費用還款順序 */
@@ -1983,22 +1985,6 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 
-		// 另收清償違約金=>放在償還本利那筆
-		for (BaTxVo ba : this.baTxList) {
-			if (ba.getDataKind() == 6 && ba.getRepayType() <= 3 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
-				for (BaTxVo da : this.baTxList) {
-					if (da.getDataKind() == 2 && da.getAcAmt().compareTo(BigDecimal.ZERO) > 0
-							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
-							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
-						da.setCloseBreachAmt(ba.getCloseBreachAmt());
-						da.setAcAmt(da.getAcAmt().add(ba.getAcAmt()));
-						ba.setAcAmt(BigDecimal.ZERO);
-						break;
-					}
-				}
-			}
-		}
-
 		// 交易金額、暫收借、暫收貸
 		// 無還放款還款金額
 		if (wkRepayLoan.compareTo(BigDecimal.ZERO) == 0) {
@@ -2090,12 +2076,13 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-		// 加總短繳
+
+		// 加總短繳、清償違約金
 		for (BaTxVo ba : listbaTxVo) {
-			if (ba.getDataKind() == 1 && ba.getRepayType() <= 3) {
+			if ((ba.getDataKind() == 1 || ba.getDataKind() == 6) && ba.getRepayType() <= 3) {
 				boolean isNew = true;
 				for (BaTxVo da : this.baTxList) {
-					if (da.getDataKind() == 1 && da.getRepayType() <= 3
+					if (da.getDataKind() == ba.getDataKind() && da.getRepayType() == ba.getRepayType()
 							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
 							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
 						addBaTxList(ba, da);
