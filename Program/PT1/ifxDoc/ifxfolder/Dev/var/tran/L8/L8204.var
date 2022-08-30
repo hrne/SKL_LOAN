@@ -197,6 +197,14 @@ T(2,@Description,#L8R51Description)
 T(2,@CustName,#L8R51CustName)
 T(H,#RepaySourceX,#RepaySource,#ApHelp)
 
+!訪談事後新增-由L8922帶入還款日期與金額,預定與實際帶相同值
+#SendFromL8922=X,1,S
+C(3,#FuncCode,1,$,s)
+C(1,#CustNo,s,s,$)
+E(0,@ActualRepayDate,#RepayDate)
+E(0,@ActualRepayAmt,#RepayAmt)
+
+
 !訪談日期  
 !新增時自動代入當日
 #RecordDate=D,7,L

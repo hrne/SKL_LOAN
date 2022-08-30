@@ -177,7 +177,7 @@ T(2,@FdCollateralType,*)
 T(2,@FdRepayPerMonDay,*)
 T(2,@FdContractStartYM,*)
 T(2,@FdContractEndYM,*)
-T(3,@TranKeyHelp,C:異動;D:刪除))
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 ! 預設值
 #Default=X,1,S
@@ -239,7 +239,7 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
@@ -264,7 +264,7 @@ T(F,@OutstandAmt,1)T(F,@RepayPerMonDay,1)T(F,@ContractStartYM,1)T(F,@ContractEnd
 
 
 #TranKeyX=X,4,L
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)

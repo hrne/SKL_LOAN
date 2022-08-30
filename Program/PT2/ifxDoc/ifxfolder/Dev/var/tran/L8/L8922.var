@@ -291,9 +291,14 @@ E(0,#SYSCDATE)
 
 #OOBUFL8923=X,100,S
 T(2,#OOAcDate+#TodayCDate+#OOCustNo)
+!事後新增訪談L8204-帶入畫面[戶號]+[入帳日期]+[累積金額]
+#OOBUFL8204=X,100,S
+T(2,1+#TodayCDate+#OOCustNo+000000+#OOAcDate+00000000000000000000+#OOTotalAmt)
+
 
 #OOBTNL8923=X,4,S
-C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,cancel))
+C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=登錄;ntxbuf=#OOBUFL8204}))
+!C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,cancel))
 
 
 </sub>

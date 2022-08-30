@@ -74,7 +74,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iDeductDateStart = 0; // 追繳
 		int iDeductDateEnd = 0; // 追繳
 		int iOpItem = Integer.parseInt(titaVo.getParam("OpItem"));
-		
+
 		String iRepayBank = titaVo.getParam("RepayBank");
 		boolean useRepayBank = iRepayBank != null && !iRepayBank.trim().isEmpty();
 
@@ -229,9 +229,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"RelAcctBirthday\" ";
 		sql += "   ,\"RelAcctGender\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
-		sql += "   from \"PostAuthLog\") p   on  ba.\"RepayBank\"   = '700' ";
+		sql += "   from \"PostAuthLog\"           ";
+		sql += "   where \"AuthCode\"     = '1' ";
+		sql += "   ) p   on  ba.\"RepayBank\"   = '700' ";
 		sql += "                            and  p.\"CustNo\"       = ba.\"CustNo\" ";
-		sql += "                            and  p.\"AuthCode\"     = '1' ";
 		sql += "                            and  p.\"PostDepCode\"  = ba.\"PostDepCode\" ";
 		sql += "                            and  p.\"RepayAcct\"    = ba.\"RepayAcct\" ";
 		sql += "                            and  p.seq = 1 ";
@@ -363,7 +364,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("iPostSecondSpecificDd", iPostSecondSpecificDd);
 		query.setParameter("iPostSecondSpecificDay", iPostSecondSpecificDay);
-		
+
 		if (useRepayBank)
 			query.setParameter("iRepayBank", iRepayBank);
 
@@ -402,10 +403,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int facmNo = Integer.parseInt(titaVo.getParam("FacmNo").trim());
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 		int repayType = Integer.parseInt(titaVo.getParam("RepayType")); // 還款類別
-		
+
 		String iRepayBank = titaVo.getParam("RepayBank");
 		boolean useRepayBank = iRepayBank != null && !iRepayBank.trim().isEmpty();
-		
+
 		String sql = "  select                                                          ";
 		sql += "  b.\"CustNo\"                                               AS \"CustNo\"          ";
 		sql += " ,b.\"FacmNo\"                                               AS \"FacmNo\"          ";
@@ -508,10 +509,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		if (useRepayBank)
 			query.setParameter("iRepayBank", iRepayBank);
-		
+
 		return this.convertToMap(query);
 	}
 

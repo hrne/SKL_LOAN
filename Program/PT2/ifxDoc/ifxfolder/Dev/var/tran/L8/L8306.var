@@ -144,6 +144,17 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@AgreeCode,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdRcDate,*)
+T(2,@FdMaxMainCode,*)
+T(2,@FdAgreeCode,*)
+T(3,@TranKeyHelp,A:新增;C:異動))
+
 ! [調Rim相關]
 ! 定義Rom欄位名稱、型態、長度
 <include src="ROM.icf::L8R16.dec"/>
@@ -179,15 +190,21 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 ![交易代碼]
 #TranKey_Tmp=X,1,S
-#TranKey=X,1,L
-C(5,#TranKey_Tmp,1,s,$)
+#TranKey=X,1,I
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)
+T(F,@AgreeCode,1)
+T(2,@FdAgreeCode,*)
+
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)
+T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@AgreeCode,1),$)
 
 #TranKeyX=X,4,L
-
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
 
 ![債務人IDN]
 #CustId=X,10,L

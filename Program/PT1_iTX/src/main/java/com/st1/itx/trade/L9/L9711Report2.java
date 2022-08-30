@@ -52,6 +52,7 @@ public class L9711Report2 extends MakeReport {
 
 	String ENTDY = "";
 	Boolean printtimes = false;
+	int calaulateCount = 0;
 
 	@Override
 	public void printHeader() {
@@ -60,7 +61,7 @@ public class L9711Report2 extends MakeReport {
 		this.setCharSpaces(0);
 
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(3);
+		this.setBeginRow(0);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(60);
@@ -87,7 +88,6 @@ public class L9711Report2 extends MakeReport {
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
@@ -100,18 +100,17 @@ public class L9711Report2 extends MakeReport {
 				// inputCustNo: #CUSTNO
 				// CustNo: Query.F4
 				// FacmNo: Query.F5
-				
-		
+
 				this.openForm(titaVo, reportVo);
+//				this.open(titaVo, reportVo);
 
 				String inputCustNo = titaVo.get("CustNo");
 				String recordCustNoString = tL9711Vo.get("F4");
 				String recordFacmNoString = tL9711Vo.get("F5");
 				int recordCustNo = parse.stringToInteger(recordCustNoString);
 				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
-				this.info("recordCustNoString="+recordCustNoString);
-				this.info("recordFacmNo="+recordFacmNo);
-//				this.info("custNoticeCom="+!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo));
+				this.info("recordCustNoString=" + recordCustNoString);
+				this.info("recordFacmNo=" + recordFacmNo);
 				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo)) {
 					continue;
 				}
@@ -165,10 +164,12 @@ public class L9711Report2 extends MakeReport {
 		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 
+		this.info("筆數calaulateCount=" + calaulateCount);
+
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
 			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 2, 0,
+					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, 0,
 					titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
@@ -190,28 +191,30 @@ public class L9711Report2 extends MakeReport {
 
 		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 
-		setFont(1, 14);
+		setFont(1, 11);
 
-		printCm(1, 4, "【限定本人拆閱，若無此人，請寄回本公司】");
+		printCm(1, 2.5, "【限定本人拆閱，若無此人，請寄回本公司】");
 
-		printCm(2, 5, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
+		printCm(2, 3.5, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
 
 		String addr = custNoticeCom.getCurrAddress(custMain, titaVo);
-		printCm(2, 6, addr);
+		printCm(2, 4.5, addr);
 
-		printCm(2, 7, String.format("%07d", custNo) + "   " + tL9711Vo.get("F6"));
-
-//		this.setFontSize(14);
-//		this.print(-15, 37, "放款本息攤還表暨繳息通知單", "C");
-
-		this.setFontSize(11);
+		printCm(2, 5.5, String.format("%07d", custNo) + "   " + tL9711Vo.get("F6"));
 
 		int top = 0;// 上下微調用
-		double yy = 21;// 開始Y軸
+		double yy = 20;// 開始Y軸
 		double h = 0.4;// 列高
 		double l = 0;// 列數
 
 		double y = top + yy;
+
+		setFont(1, 14);
+
+		printCm(9, 19, "放款本息攤還表暨繳息通知單", "C");
+
+		setFont(1, 11);
+
 		printCm(1.5, y, "製發日期：" + ENTDY.substring(0, 3) + "/" + ENTDY.substring(3, 5) + "/" + ENTDY.substring(5, 7));
 
 		printCm(16, y, tL9711Vo.get("F20"));
@@ -263,7 +266,15 @@ public class L9711Report2 extends MakeReport {
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
 		excessive = excessive - acctFee;
+
+		int tmpCount = 0;
+
 		for (BaTxVo baTxVo : listBaTxVo) {
+			tmpCount++;
+			if (tmpCount == 7) {
+				break;
+			}
+
 			if (baTxVo.getDataKind() != 2) {
 				continue;
 			}
@@ -415,12 +426,12 @@ public class L9711Report2 extends MakeReport {
 	}
 
 	private String tranNum(String data) {
-		this.info("tranDate1 = " + data);
+//		this.info("tranDate1 = " + data);
 		if (data == null || data.equals("")) {
 			return "";
 		}
 		String tmp1 = data;
-		this.info("tranData = " + tmp1);
+//		this.info("tranData = " + tmp1);
 		String tmp2 = "";
 
 		int tranTemp = 0;
@@ -429,15 +440,15 @@ public class L9711Report2 extends MakeReport {
 
 		for (i = 0; i < tmp1.length(); i++) {
 
-			this.info("tranDate i = " + i);
-			this.info("tranDate X = " + tmp1.substring(i, i + 1));
+//			this.info("tranDate i = " + i);
+//			this.info("tranDate X = " + tmp1.substring(i, i + 1));
 			tmp = tmp1.charAt(i);
 
 			tranTemp = (int) tmp;
 
 			tranTemp += 65248; // 此數字是 Unicode編碼轉為十進位 和 ASCII碼的 差
 
-			this.info("tranDate XX= " + (char) tranTemp);
+//			this.info("tranDate XX= " + (char) tranTemp);
 			tmp2 += (char) tranTemp;
 		}
 
@@ -453,81 +464,3 @@ public class L9711Report2 extends MakeReport {
 		return input;
 	}
 }
-
-//if (PayIntDate.equals(tempDate) && i != listBaTxVo.size() - 1) {
-//
-//	// 正常
-//	// 違約金
-//	// 本金
-//	// 利息
-//	// 未還本金餘額
-//	BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-//	Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-//	Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-//	LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
-//
-//} else if (i == listBaTxVo.size() - 1) { // 最後一筆
-//	
-//	BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-//	Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-//	Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-//	LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
-//	// 應繳日
-////	if (!PayIntDate.equals(tempDate)) {
-//		this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
-//				+ tempDate.substring(5, 7));
-////	}
-//	// 違約金
-//	this.print(dataRow, 26, String.format("%,d", BreachAmt), "R");
-//	// 本金
-//	this.print(dataRow, 38, String.format("%,d", Principal), "R");
-//	// 利息
-//	this.print(dataRow, 52, String.format("%,d", Interest), "R");
-//	// 應繳合計
-//	this.print(dataRow, 66, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-//	// 未還 本金餘額
-//	this.print(dataRow, 78, String.format("%,d", LoanBal), "R");
-//	// 暫付 所得稅
-//	this.print(dataRow, 88, "0", "R");
-//	// 應繳淨額
-//	this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-//
-//} else { // 當筆日期與之前不同
-//	
-//	tempDate = PayIntDate;
-//	
-//	BreachAmt = 0;
-//	Principal = 0;
-//	Interest = 0;
-//	LoanBal = 0;
-//	
-//	BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-//	Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-//	Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-//	LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
-//	
-//	// 應繳日
-//	if (!PayIntDate.equals(tempDate)) {
-//		this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
-//				+ tempDate.substring(5, 7));
-//	}
-//	// 違約金
-//	this.print(dataRow, 26, String.format("%,d", BreachAmt), "R");
-//	// 本金
-//	this.print(dataRow, 38, String.format("%,d", Principal), "R");
-//	// 利息
-//	this.print(dataRow, 52, String.format("%,d", Interest), "R");
-//	// 應繳合計
-//	this.print(dataRow, 66, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-//	// 未還 本金餘額
-//	this.print(dataRow, 78, String.format("%,d", LoanBal), "R");
-//	// 暫付 所得稅
-//	this.print(dataRow, 88, "0", "R");
-//	// 應繳淨額
-//	this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-//
-//	
-//
-//
-//
-//}

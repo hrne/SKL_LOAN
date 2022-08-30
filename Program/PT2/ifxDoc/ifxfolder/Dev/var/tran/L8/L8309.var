@@ -154,6 +154,22 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)
+T(F,@TranKey,1)T(F,@RcDate,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
+T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(F,@SubmitKey,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdTranKey,*)
+T(2,@FdRcDate,*)
+T(2,@FdCustRegAddr,*)
+T(2,@FdCustComAddr,*)
+T(2,@FdMain,*)
+T(2,@FdSubmitKey,*)
+T(3,@TranKeyHelp,A:新增;C:異動;X:補件))
+
 ! [調Rim相關]
 ! 定義Rom欄位名稱、型態、長度
 <include src="ROM.icf::L8R20.dec"/>
@@ -186,7 +202,7 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-C(5,#TranKey_Tmp,1,$,s)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -199,8 +215,14 @@ T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdMain,*)INVOKEJS(SHOW,p1,5,5,1),
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)
 T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdMain, )INVOKEJS(SHOW,p1,5,5,0),$))
 
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@RcDate,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
+T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(F,@SubmitKey,1)
+,$)
+
+
+
 #TranKeyX=X,4,L
-C(5,#TranKey_Tmp,1,$,s)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

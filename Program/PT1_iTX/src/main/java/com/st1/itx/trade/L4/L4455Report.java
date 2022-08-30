@@ -129,11 +129,6 @@ public class L4455Report extends MakeReport {
 		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 1, "報　表：" + "L4455Report");
-//		if (!"700".equals(repaybank)) {
-//		this.print(-3, 95, "扣款總傳票明細表", "C");
-//		} else {
-//			this.print(-3, 95, "扣款總傳票明細表", "C");
-//		}
 
 		if ("999".equals(irepaybank)) {
 			this.print(-3, 95, "銀行扣款總傳票明細表", "C");
@@ -193,10 +188,7 @@ public class L4455Report extends MakeReport {
 				repaybank = titaVo.get("RepayBank");
 			}
 		}
-		if (dataSize == 0) {
-			repaybank = "";
-			bank = "";
-		}
+
 		this.print(-6, 35, "扣款銀行：" + repaybank + "  " + bank);
 
 		this.print(-8, 1,
@@ -208,13 +200,9 @@ public class L4455Report extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L4455Report exec");
+		
 		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
-		this.info("acdate   = " + acdate);
-		
 		entrydate = titaVo.getParam("EntryDate");
-		this.info("entrydate   = " + entrydate);
-		
-		this.info("");
 		irepaybank = titaVo.getParam("RepayBank");
 
 		List<Map<String, String>> L4455List = new ArrayList<Map<String, String>>();
@@ -303,9 +291,11 @@ public class L4455Report extends MakeReport {
 
 		this.info("L4455List = " + L4455List.toString());
 		this.info("size = " + L4455List.size());
+		
 		if(titaVo.getParam("BatchNo") != null){
 			this.info("BatchNo   = " + titaVo.getParam("BatchNo"));
 		}
+		
 		if(L4455List.size() <= 0 && L4455List.isEmpty()) {
 			batchno = "BATX"+titaVo.getParam("BatchNo");
 			entrydate = String.valueOf(parse.stringToInteger(titaVo.getParam("EntryDate")));
@@ -320,7 +310,7 @@ public class L4455Report extends MakeReport {
 			batchno = L4455List.get(0).get("BatchNo");
 			entrydate = String.valueOf(parse.stringToInteger(L4455List.get(0).get("EntryDate")) - 19110000);
 			repaybank = L4455List.get(0).get("RepayBank");
-			acctcode = L4455List.get(0).get("AcctCode").equals("900") ? "990" : L4455List.get(0).get("AcctCode");
+			acctcode = L4455List.get(0).get("AcctCode");
 			
 			for (int j = 1; j <= L4455List.size(); j++) {
 				i = j - 1;
@@ -428,8 +418,7 @@ public class L4455Report extends MakeReport {
 					batchno = L4455List.get(j).get("BatchNo");
 					entrydate = String.valueOf(parse.stringToInteger(L4455List.get(j).get("EntryDate")) - 19110000);
 					repaybank = L4455List.get(j).get("RepayBank");
-					acctcode = L4455List.get(j).get("AcctCode").equals("900") ? "990"
-							: L4455List.get(j).get("AcctCode");
+					acctcode = L4455List.get(j).get("AcctCode");
 
 					if (!L4455List.get(i).get("BatchNo").equals(batchno)
 							|| !String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000)
@@ -441,14 +430,13 @@ public class L4455Report extends MakeReport {
 								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1,
 								"                                                                                                                                                                               ");
-						String tmpAcctcodex = L4455List.get(i).get("AcctCode").equals("900") ? "990"
-								: L4455List.get(i).get("AcctCode");
+						String tmpAcctcodex = L4455List.get(i).get("AcctCode");
 						for (CdCode tCdCode : lCdCode2) {
 							if (tmpAcctcodex.equals(tCdCode.getCode())) {
 								acctcodex = tCdCode.getItem();
 							}
 						}
-						if(L4455List.get(i).get("AcctCode").equals("456")) {
+						if(funcd != 1) {
 							acctcodex = "暫收款";
 						}
 
@@ -483,10 +471,9 @@ public class L4455Report extends MakeReport {
 								acctcodex = tCdCode.getItem();
 							}
 						}
-						if(L4455List.get(i).get("AcctCode").equals("456")) {
+						if(funcd != 1) {
 							acctcodex = "暫收款";
 						}
-
 						this.print(0, 1, acctcodex);
 						this.print(0, 19, "小計");
 
@@ -521,10 +508,10 @@ public class L4455Report extends MakeReport {
 							acctcodex = tCdCode.getItem();
 						}
 					}
-					if(L4455List.get(i).get("AcctCode").equals("456")) {
+					if(funcd != 1) {
 						acctcodex = "暫收款";
 					}
-
+					
 					this.print(0, 1, acctcodex);
 					this.print(0, 19, "小計");
 

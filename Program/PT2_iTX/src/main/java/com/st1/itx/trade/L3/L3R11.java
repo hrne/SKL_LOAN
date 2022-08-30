@@ -288,23 +288,33 @@ public class L3R11 extends TradeBuffer {
 				for (LoanCloseBreachVo v : oListCloseBreach) {
 					oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmt());
 					boolean isfind = false;
+					this.info("S CloseBreachAmt =" + v.getCloseBreachAmt());
+					this.info("S FacmNo =" + v.getFacmNo());
+					this.info("S BormNo =" + v.getBormNo());
 					for (OccursList t : lOccursList) {
+						this.info("L3r11FacmNo =" + parse.stringToInteger(t.get("L3r11FacmNo")));
+						this.info("L3r11BormNo =" + parse.stringToInteger(t.get("L3r11BormNo")));
 						if (parse.stringToInteger(t.get("L3r11FacmNo")) == v.getFacmNo()
 								&& parse.stringToInteger(t.get("L3r11BormNo")) == v.getBormNo()) {
+							this.info("L3r11CloseBreachAmt =" + parse.stringToInteger(t.get("L3r11CloseBreachAmt"))
+									+ "," + v.getCloseBreachAmt());
 							isfind = true;
 							if (t.get("L3r11CloseBreachAmt") == null) {
-								t.putParam("L3r11CloseBreachAmt", v.getCloseBreachAmtPaid());
+								t.putParam("L3r11CloseBreachAmt", v.getCloseBreachAmt());
 							} else {
 								t.putParam("L3r11CloseBreachAmt", parse.stringToBigDecimal(t.get("L3r11CloseBreachAmt"))
-										.add(v.getCloseBreachAmtPaid()));
+										.add(v.getCloseBreachAmt()));
 							}
+							t.putParam("L3r11Total",
+									parse.stringToBigDecimal(t.get("L3r11Total")).add(v.getCloseBreachAmt()));
 						}
 					}
 					if (!isfind) {
 						OccursList occursList = new OccursList();
 						occursList.putParam("L3r11FacmNo", v.getFacmNo());
 						occursList.putParam("L3r11BormNo", v.getBormNo());
-						occursList.putParam("L3r11CloseBreachAmt", v.getCloseBreachAmtPaid());
+						occursList.putParam("L3r11CloseBreachAmt", v.getCloseBreachAmt());
+						occursList.putParam("L3r11Total", v.getCloseBreachAmt());
 
 						this.lOccursList.add(occursList);
 					}

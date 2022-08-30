@@ -180,7 +180,7 @@ BEGIN
          , CASE
              WHEN B."BdDate" IS NULL    THEN '0880109'  -- (erf:AS400 LN15M1)
              WHEN B."BdDate" = 0        THEN '0880109'
-             WHEN B."BdDate" < 19810101 THEN '0700101'
+             WHEN B."BdDate" < 19810101 THEN '070' || LPAD(LTRIM(TO_CHAR(MOD( B."BdDate" , 10000))),4,'0') -- 小於70/01/01則報70年+原建物完成月日
              WHEN B."BdDate" < 19110000 THEN LPAD(B."BdDate",7,'0')
              ELSE LPAD(B."BdDate" - 19110000, 7, '0')
            END                                   AS "BdDate"            -- 建築完成日期(屋齡)            VARCHAR2 7

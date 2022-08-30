@@ -453,7 +453,7 @@ public class L4450Batch extends TradeBuffer {
 					isLoanRepay = true;
 				}
 
-				if (tBaTxVo.getDataKind() > 3) {
+				if (tBaTxVo.getDataKind() >= 4) {
 					this.info("continue... getDataKind : " + tBaTxVo.getDataKind());
 					continue;
 				}
@@ -514,22 +514,14 @@ public class L4450Batch extends TradeBuffer {
 					}
 				}
 				// 暫收款
-				if (tBaTxVo.getDataKind() == 3) {
+				if (tBaTxVo.getDataKind() == 3 && bookAmtMap.get(tmp2).compareTo(BigDecimal.ZERO) > 0) {
 					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
-					if (tBaTxVo.getUnPaidAmt().compareTo(bookAmtMap.get(tmp2)) > 0) {
-						if (tmpAmtMap.containsKey(tmpAmtFacmNo)) {
-							tmpAmtMap.put(tmpAmtFacmNo, tmpAmtMap.get(tmpAmtFacmNo)
-									.add(tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2))));
-						} else {
-							tmpAmtMap.put(tmpAmtFacmNo, tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2)));
-						}
+					if (tmpAmtMap.get(tmpAmtFacmNo).compareTo(bookAmtMap.get(tmp2)) > 0) {
+						tmpAmtMap.put(tmpAmtFacmNo, tmpAmtMap.get(tmpAmtFacmNo).subtract(bookAmtMap.get(tmp2)));
 						bookAmtMap.put(tmp2, BigDecimal.ZERO);
 					} else {
-						if (tmpAmtMap.containsKey(tmpAmtFacmNo)) {
-							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
-						} else {
-							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
-						}
+						bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tmpAmtMap.get(tmpAmtFacmNo)));
+						tmpAmtMap.put(tmpAmtFacmNo, BigDecimal.ZERO);
 					}
 					this.info("tmpAmtMap : " + tmpAmtMap.get(tmpAmtFacmNo));
 					continue;

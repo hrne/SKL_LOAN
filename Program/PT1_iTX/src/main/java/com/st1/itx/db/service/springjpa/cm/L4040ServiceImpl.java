@@ -76,6 +76,8 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
 		// iCreateFlag 1.新增授權 2.再次授權 3.取消授權
+		this.info("iFunctionCode = " + iFunctionCode);
+		this.info("iCreateFlag = " + iCreateFlag);
 		switch (iFunctionCode) {
 		case 1: // 篩選資料
 			switch (iCreateFlag) {
@@ -172,7 +174,6 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iFunctionCode = " + iFunctionCode);
 		switch (iFunctionCode) {
 		case 1:
-			sql += "   and a.\"MediaCode\" " + searchMediaCode;
 			if (iCustNo > 0) {
 				sql += "   and a.\"CustNo\" = " + iCustNo;
 			}

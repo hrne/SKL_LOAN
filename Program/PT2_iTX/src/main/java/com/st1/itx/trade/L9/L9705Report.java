@@ -127,8 +127,8 @@ public class L9705Report extends MakeReport {
 						this.info("titaVo = " + titaVo);
 
 						ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-								.setRptCode(tran + "A (A3)").setRptItem(rptitem).setRptSize("A4")
-								.setSecurity("").setPageOrientation("P").build();
+								.setRptCode(tran + "A (A3)").setRptItem(rptitem).setRptSize("A4").setSecurity("")
+								.setPageOrientation("P").build();
 
 						this.openForm(titaVo, reportVo);
 
@@ -322,29 +322,34 @@ public class L9705Report extends MakeReport {
 
 		// 列印地址
 
-		setFont(1, 14);
-		printCm(1, 4, "【限定本人拆閱，若無此人，請寄回本公司】");
-		printCm(2, 5, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
+		setFont(1, 11);
+		printCm(1, 2.5, "【限定本人拆閱，若無此人，請寄回本公司】");
+		printCm(2, 3.5, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
 		if ("A3".equals(reconcode)) {
-			printCm(0, 100, "限  時  專  送");
+			printCm(30, 3.5, "限  時  專  送");
 		}
-		printCm(2, 6, currAddress);
+		printCm(2, 4.5, currAddress);
 
 		int nameLength = 20;
 		if (custMain.getCustName().length() < 20) {
 			nameLength = custMain.getCustName().length();
 		}
 
-		printCm(2, 7, String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
-
-		setFont(1, 11);
+		printCm(2, 5.5, String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
 
 		int top = 0;// 上下微調用
-		double yy = 21;// 開始Y軸
+		double yy = 20;// 開始Y軸
 		double h = 0.4;// 列高
 		double l = 0;// 列數
 
 		double y = top + yy;
+
+		setFont(1, 14);
+
+		printCm(9, 19, "放款本息攤還表暨繳息通知單", "C");
+
+		setFont(1, 11);
+
 		printCm(1.5, y, "製發日期：" + this.showRocDate(entdy, 1));
 		printCm(16, y, repayCodeX(repayCode));
 
@@ -386,8 +391,14 @@ public class L9705Report extends MakeReport {
 		int BreachAmt = 0;
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
+		int tmpCount = 0;
 
 		for (BaTxVo baTxVo : listBaTxVo) {
+
+			if (tmpCount == 7) {
+				break;
+			}
+
 			// 本金、利息
 			if (baTxVo.getDataKind() != 2) {
 				continue;
@@ -438,8 +449,6 @@ public class L9705Report extends MakeReport {
 			printCm(19, y, String.format("%,d", UnPaidAmt), "R");
 
 		} // loop -- batxCom
-
-
 
 		l++;
 

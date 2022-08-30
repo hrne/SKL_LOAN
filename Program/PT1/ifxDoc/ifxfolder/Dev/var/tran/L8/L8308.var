@@ -164,6 +164,7 @@ T(2,@FdPayLastAmt,*)
 T(2,@FdPayAccount,*)
 T(2,@FdPostAddr,*)
 T(2,@FdSubmitKey,*)
+
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
@@ -210,6 +211,30 @@ RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
+T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
+T(F,@SignDate,1)
+T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdRcDate,*)
+T(2,@FdPassDate,*)
+T(2,@FdLimitDate,*)
+!T(2,@FdSignDate,*)
+T(2,@FdMonthPayAmt,*)
+T(2,@FdFirstPayDate,*)
+T(2,@FdGradeType,*)
+T(2,@FdPayLastAmt,*)
+T(2,@FdPayAccount,*)
+T(2,@FdPostAddr,*)
+T(2,@FdSubmitKey,*)
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 ! [調Rim相關]
 ! 定義Rom欄位名稱、型態、長度
@@ -262,6 +287,7 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
+IF(#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -282,9 +308,19 @@ T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@PayLastAmt2,0)T(F,@PayAccou
 T(2,@FdPassDate, )T(2,@FdLimitDate, )T(2,@FdSignDate, )
 T(2,@FdMonthPayAmt, )T(2,@FdFirstPayDate, )T(2,@FdGradeType, )T(2,@FdPayLastAmt, )T(2,@FdPayAccount, )T(2,@FdPostAddr, ),$))
 
+
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
+T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
+T(F,@SignDate,1)
+T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
+,$)
+
+
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,1,s,$)
-C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
 

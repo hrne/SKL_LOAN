@@ -101,7 +101,7 @@ public class BS020 extends TradeBuffer {
 		// step 3.insert BatxDetail
 		if (this.lBatxDetail.size() > 0) {
 			try {
-				batxDetailService.insertAll(lBatxDetail,titaVo);
+				batxDetailService.insertAll(lBatxDetail, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "BS020 insertAll : " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -118,7 +118,7 @@ public class BS020 extends TradeBuffer {
 		// call by BS020-日始作業, or L4450-產出銀行扣帳檔
 		tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, txCode, "8", titaVo); // <> 8-已刪除
 		// 保留成功的整批入帳明細，其餘刪除(程式可重複執行)
-		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.轉暫收
+		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.批次入帳後人工
 		if (tBatxHead != null) {
 			this.batchNo = tBatxHead.getBatchNo();
 			List<String> dStatusCode = new ArrayList<String>();
@@ -142,7 +142,7 @@ public class BS020 extends TradeBuffer {
 		}
 		// 批號為"BATX" + NN(01起，續編)
 		if (this.batchNo == null) {
-			tBatxHead = batxHeadService.batchNoDescFirst(tbsdyf,"BATX%", titaVo);
+			tBatxHead = batxHeadService.batchNoDescFirst(tbsdyf, "BATX%", titaVo);
 			if (tBatxHead == null)
 				this.batchNo = "BATX01";
 			else
@@ -179,9 +179,11 @@ public class BS020 extends TradeBuffer {
 			int facmNo = parse.stringToInteger(result.get("FacmNo"));
 			int repayType = parse.stringToInteger(result.get("RepayType"));
 			int repayCode = parse.stringToInteger(result.get("RepayCode"));
-			// 銀扣檔產生只處理還款來源 02.銀行扣款
-			if ("L4450".equals(txCode) && repayCode == 0) {
-				continue;
+			// 銀扣檔產生只處理還款來源 02.銀行扣款 及 還款類別 1.期款
+			if ("L4450".equals(txCode)) {
+				if (repayCode != 2 || repayType != 1) {
+					continue;
+				}
 			}
 			TempVo tTempVo = new TempVo();
 			try {
@@ -219,7 +221,7 @@ public class BS020 extends TradeBuffer {
 				}
 			}
 			if (isTermPay) {
-				tTempVo.putParam("Note","暫收抵繳期款");
+				tTempVo.putParam("Note", "暫收抵繳期款");
 				addDetail(custNo, 1, tTempVo, titaVo);
 			} else {
 				if (isRecvPay) {

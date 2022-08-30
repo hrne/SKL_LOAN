@@ -556,7 +556,7 @@ RESET_RIM(#SendL3r11,L3R11)
 S(L3R11,1,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimCaseCloseCode)
 R(1,L3R11)
 ##loop{times:20,l:0,n:1,m:2}
-IF({n}==1,C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0)),$)
+IF({n}==1,C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1)),$)
 C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 T(2,@FacmBormNo{n},#L3r11FacmNo{n}+-+#L3r11BormNo{n})
 T(2,@IntStartDate{n},#L3r11IntStartDate{n})
@@ -1195,8 +1195,8 @@ T(2,@RP_NOTE,#DetailNote)
 #Interest{n}=+m,14,L
 #DelayInt{n}=+m,14,L
 #BreachAmt{n}=+m,14,L
-#Total{n}=+m,14,L
 #CloseBreachAmt{n}=+m,14,L
+#Total{n}=+m,14,L
 
 ##end
 <include src="RPDTL.icf::RPCOL.dec"/>
@@ -1216,8 +1216,8 @@ T(2,@RP_NOTE,#DetailNote)
 [
 ["<font color=red>@本息計算表"],
 ["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[70,70,120,120,120,120,120,], p_cols:[5,15,15,15,15,15,15]}","","",
-["額度撥款","計息起訖日","本金","利息","延遲息","違約金","小計"],
-[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#BreachAmt1],[#DelayInt1],[#Total1]],
+["額度撥款","計息起訖日","本金","利息","延遲息","違約金","清償違約金","小計"],
+[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#DelayInt1],[#BreachAmt1],[#CloseBreachAmt1],[#Total1]],
 ],
 ]
 </sub>
@@ -1273,8 +1273,8 @@ T(3,[L3420] 結案登錄-不可欠繳)
 #Interest{n}
 #DelayInt{n}
 #BreachAmt{n}
-#Total{n}
 #CloseBreachAmt{n}
+#Total{n}
 ##end
 </sub>
 
