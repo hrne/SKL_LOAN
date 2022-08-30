@@ -514,14 +514,16 @@ public class L4450Batch extends TradeBuffer {
 					}
 				}
 				// 暫收款
-				if (tBaTxVo.getDataKind() == 3 && bookAmtMap.get(tmp2).compareTo(BigDecimal.ZERO) > 0) {
-					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
-					if (tmpAmtMap.get(tmpAmtFacmNo).compareTo(bookAmtMap.get(tmp2)) > 0) {
-						tmpAmtMap.put(tmpAmtFacmNo, tmpAmtMap.get(tmpAmtFacmNo).subtract(bookAmtMap.get(tmp2)));
-						bookAmtMap.put(tmp2, BigDecimal.ZERO);
-					} else {
-						bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tmpAmtMap.get(tmpAmtFacmNo)));
-						tmpAmtMap.put(tmpAmtFacmNo, BigDecimal.ZERO);
+				if (tBaTxVo.getDataKind() == 3) {
+					if (bookAmtMap.get(tmp2).compareTo(BigDecimal.ZERO) > 0) {
+						this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
+						if (tmpAmtMap.get(tmpAmtFacmNo).compareTo(bookAmtMap.get(tmp2)) > 0) {
+							tmpAmtMap.put(tmpAmtFacmNo, tmpAmtMap.get(tmpAmtFacmNo).subtract(bookAmtMap.get(tmp2)));
+							bookAmtMap.put(tmp2, BigDecimal.ZERO);
+						} else {
+							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tmpAmtMap.get(tmpAmtFacmNo)));
+							tmpAmtMap.put(tmpAmtFacmNo, BigDecimal.ZERO);
+						}
 					}
 					this.info("tmpAmtMap : " + tmpAmtMap.get(tmpAmtFacmNo));
 					continue;
@@ -672,6 +674,7 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtlId.setFacmNo(tmp.getFacmNo());
 			tBankDeductDtlId.setPayIntDate(tmp.getPayIntDate());
 			tBankDeductDtlId.setRepayType(tmp.getRepayType());
+			this.info("tBankDeductDtlId = " + tBankDeductDtlId.toString());
 
 			tBankDeductDtl.setBankDeductDtlId(tBankDeductDtlId);
 			tBankDeductDtl.setEntryDate(iEntryDate);
