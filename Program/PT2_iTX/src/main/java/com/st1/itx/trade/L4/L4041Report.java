@@ -105,9 +105,8 @@ public class L4041Report extends MakeReport {
 			if (!"Y".equals(result.get("F13")) && propDate > 0) {
 
 				// 戶號
-//				print(1, 3, padStart(result.get("F2"), 7, "0") + " "
-//						+ FormatUtil.padX(loanCom.getCustNameByNo(parse.stringToInteger(result.get("F2"))), 20));
-				print(1, 3, padStart(result.get("F2"), 7, "0") + " " + FormatUtil.padX("一二三四五六七八九十一十二時三時四十五十六", 20));
+				print(1, 3, padStart(result.get("F2"), 7, "0") + " "
+						+ FormatUtil.padX(loanCom.getCustNameByNo(parse.stringToInteger(result.get("F2"))), 20));
 
 				// 扣款人ID
 				print(0, 31, result.get("F7"), "L");

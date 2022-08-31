@@ -18,6 +18,7 @@ public class L4606Report3 extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
+		
 		this.print(-1, 1, "程式ID：" + "L4606");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));

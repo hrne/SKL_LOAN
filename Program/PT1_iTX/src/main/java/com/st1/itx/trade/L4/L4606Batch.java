@@ -201,10 +201,16 @@ public class L4606Batch extends TradeBuffer {
 		if (!"".equals(flagB)) {
 			setTimer();
 			this.info("flagB Start ...");
-			l4606Report1.exec(titaVo);
-			l4606Report2.exec(titaVo);
-			l4606Report3.exec(titaVo, successList);
-			l4606Report4.exec(titaVo, errorList);
+			
+			if(custErrorCnt>0) {
+				l4606Report4.exec(titaVo, errorList);
+			}else {
+				l4606Report1.exec(titaVo);
+				l4606Report2.exec(titaVo);
+				l4606Report3.exec(titaVo, successList);
+				l4606Report4.exec(titaVo, errorList);
+			}
+
 
 			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
 					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
@@ -213,9 +219,11 @@ public class L4606Batch extends TradeBuffer {
 
 //		產生下傳媒體
 		if (!"".equals(flagC)) {
-			setTimer();
-			generateMediaFile();
-			printUsedTime("generateMediaFil'");
+			if(custErrorCnt==0) {
+				setTimer();
+				generateMediaFile();
+				printUsedTime("generateMediaFil'");				
+			}
 		}
 	}
 
@@ -287,7 +295,7 @@ public class L4606Batch extends TradeBuffer {
 				if (!"".equals(tInsuComm.getFireOfficer())) {
 					OccursList occursList = new OccursList();
 
-					// this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
+					this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
 
 					String empId = tInsuComm.getEmpId();
 

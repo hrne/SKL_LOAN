@@ -270,7 +270,12 @@ public class L4211Report extends MakeReport {
 		if (txCode == null || txCode.trim().isEmpty()) {
 			txCode = titaVo.getTxcd();
 		}
-		int reportNo = Integer.valueOf(titaVo.get("ReportNo"));
+		int reportNo = 0;
+		if (!"L420A".equals(txCode)) {
+			if (titaVo.get("ReportNo") != null) {
+				reportNo = Integer.valueOf(titaVo.get("ReportNo"));
+			}
+		}
 
 		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表" : (reportNo == 1 ? "匯款總傳票明細表" : "入帳後檢核明細表");
 		acdate = titaVo.get("AcDate");

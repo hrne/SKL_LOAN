@@ -404,6 +404,7 @@ public class L4041 extends TradeBuffer {
 				postAuthFileVo846.put("FootNoteB", FormatUtil.padX("", 54));
 
 				// 把明細資料容器裝到檔案資料容器內
+				
 				postAuthFileVo846.setOccursList(aTmp);
 				// 轉換資料格式
 				ArrayList<String> aFile = postAuthFileVo846.toFile();
@@ -453,12 +454,13 @@ public class L4041 extends TradeBuffer {
 
 				this.info("sno : " + sno);
 
-				resultList1 = sortMapListCom.beginSort(resultList).ascString("F5").ascString("F2").getList();
+				resultList1 = sortMapListCom.beginSort(resultList).ascString("F5").ascNumber("F2").getList();
 				makeFile.toFile(sno);
 				totaVo.put("PdfSno53N", "" + sno);
 
 				l4041Report.setParentTranCode(titaVo.getTxcd());
 
+//				l4041Report.exec(resultList, titaVo);
 				l4041Report.exec(resultList1, titaVo);
 				sno = l4041Report.close();
 				l4041Report.toPdf(sno);

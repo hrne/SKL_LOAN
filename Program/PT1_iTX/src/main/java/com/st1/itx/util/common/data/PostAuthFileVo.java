@@ -83,7 +83,7 @@ public class PostAuthFileVo extends FileVo {
 //				 戶號(7)
 				occursList.putParam("CustNo", thisLine.substring(54, 61));
 //				郵局存款別(1)
-				occursList.putParam("PostDepCode", thisLine.substring(26, 27));			
+				occursList.putParam("PostDepCode", thisLine.substring(26, 27));
 //				儲金帳號(14)
 				occursList.putParam("RepayAcct", thisLine.substring(27, 41));
 
@@ -162,13 +162,14 @@ public class PostAuthFileVo extends FileVo {
 			// 頁首的欄位組合
 			// 無首筆
 		}
-		//sort 帳號排序
+		// sort 帳號排序
 		occursList.sort((c1, c2) -> {
 			int resultA = 0;
 			if (c1.get("OccRepayAcct").compareTo(c2.get("OccRepayAcct")) != 0) {
-				resultA = c2.get("OccRepayAcct").compareTo(c1.get("OccRepayAcct"));
+				return resultA = c1.get("OccRepayAcct").compareTo(c2.get("OccRepayAcct"));
+			} else {
+				return 0;
 			}
-			return resultA;
 		});
 		// 組明細
 		for (OccursList occursList : occursList) {

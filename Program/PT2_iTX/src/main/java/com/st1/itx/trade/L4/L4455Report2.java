@@ -91,7 +91,7 @@ public class L4455Report2 extends MakeReport {
 		this.setFont(1, 9);
 		this.print(-1, 185, "機密等級：密");
 		this.print(-2, 1, "程式ID：" + "L4455Report2");
-		this.print(-2, 95, "新光人壽保險股份有限公司", "C");
+		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
 		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
@@ -103,26 +103,23 @@ public class L4455Report2 extends MakeReport {
 				bank = tCdCode.getItem();
 			}
 		}
-		this.print(-3, 95, "ACH 扣款失敗報表 -- " + bank, "C");
+		this.print(-3, this.getMidXAxis(), "ACH 扣款失敗報表 -- " + bank, "C");
 		this.print(-3, 203, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 185, "頁　數：");
 		this.print(-4, 200, "" + this.getNowPage(), "R");
-		this.print(-5, 95, "入帳日期 ：    年    月    日", "C");
-
+		
 		if (String.valueOf(entrydate).length() == 7) {
 			year = String.valueOf(entrydate).substring(0, 3);
 			month = String.valueOf(entrydate).substring(3, 5);
 			date = String.valueOf(entrydate).substring(5, 7);
-		} else if (String.valueOf(entrydate).length() == 6) {
+		} else {
 			year = String.valueOf(entrydate).substring(0, 2);
 			month = String.valueOf(entrydate).substring(2, 4);
 			date = String.valueOf(entrydate).substring(4, 6);
 		}
 
-		this.print(-5, 91, year);
-		this.print(-5, 99, month);
-		this.print(-5, 106, date);
+		this.print(-5, this.getMidXAxis(), "入帳日期 ： " + year + " 年 " + month + " 月 " + date + " 日", "C");
 
 		this.print(-5, 185, "單　位：元");
 		this.print(-7, 1,
@@ -154,31 +151,29 @@ public class L4455Report2 extends MakeReport {
 			throw new LogicException("E0013", "L4455");
 		}
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款失敗報表", "", "A4", "L");
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode("L4455").setRptItem("銀行扣款失敗報表").setSecurity("").setRptSize("A4").setPageOrientation("L")
 				.build();
 
 		this.open(titaVo, reportVo);
 
+		//找銀行代碼
 		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
-
 		lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
+		//找業務科目代碼
 		Slice<CdCode> slCdCode2 = sCdCodeDefService.defItemEq("AcctCode", "%", this.index, this.limit, titaVo);
-
 		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
 
+		//找關係代碼
 		Slice<CdCode> slCdCode3 = sCdCodeDefService.defItemEq("RelationCode", "%", this.index, this.limit, titaVo);
-
 		lCdCode3 = slCdCode3 == null ? null : slCdCode3.getContent();
 
 		if (L4455List.size() > 0 && !L4455List.isEmpty()) {
 			int i = 0, pageCnt = 0;
 			int pagetime = 0;
 			BigDecimal Amt = new BigDecimal("0");
-			repaybank = L4455List.get(0).get("RepayBank");
+			repaybank = L4455List.get(i).get("RepayBank");
 
 			for (int j = 1; j <= L4455List.size(); j++) {
 				i = j - 1;
@@ -299,7 +294,7 @@ public class L4455Report2 extends MakeReport {
 						Amt = new BigDecimal("0");
 
 						pageCnt = pageCnt + 2;
-						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 						pagetime = 0;
 						pageCnt = 0;
 						this.newPage();
@@ -308,7 +303,7 @@ public class L4455Report2 extends MakeReport {
 
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 34) {
-						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 
 						pageCnt = 0;
 						this.newPage();
@@ -335,7 +330,7 @@ public class L4455Report2 extends MakeReport {
 
 					// 每頁第38筆 跳頁
 					if (pageCnt >= 34) {
-						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
+						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
 
 						pageCnt = 0;
 						this.newPage();
@@ -353,14 +348,14 @@ public class L4455Report2 extends MakeReport {
 					this.print(0, 160, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F2"))), "R");
 					this.print(0, 184, df1.format(parse.stringToBigDecimal(L4455ListSum.get(0).get("F3"))), "R");
 					pageCnt = pageCnt + 2;
-					this.print(pageIndex - pageCnt - 2, 95, "=====報表結束=====", "C");
-					this.print(2, 95, "協理：　　　　　　　　　　　　　　　襄理：　　　　　　　　　　　　　　　製表人：", "C");
+					this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
+					this.print(2, this.getMidXAxis(), "協理：　　　　　　　　　　　　　　　襄理：　　　　　　　　　　　　　　　製表人：", "C");
 				}
 
 			} // for
 
 		} else {
-			this.print(1, 20, "*******    查無資料   ******");
+			this.print(1, 20, "*******    查無資料    ******");
 		}
 
 		long sno = this.close();
