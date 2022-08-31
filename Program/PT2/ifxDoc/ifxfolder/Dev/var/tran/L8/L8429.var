@@ -171,7 +171,7 @@ E(0,#OOActualFilingDate)
 T(2,#OOActualFilingMark)
 
 #secret-no=x,1000,S
-T(6A,#SubmitKey+#ReportDate+#SubmitType+#TranCode+#ReportTime+#ApplyDate+#ActualFilingMark+#ActualFilingDate+#CustId+#CourtCode)
+T(6A,#OOSubmitKey+#ReportDate+#SubmitType+#TranCode+#ReportTime+#ApplyDate+#ActualFilingMark+#ActualFilingDate+#CustId+#CourtCode)
 
 #SubmitKeyX2=X,50,O
 T(2,#OOSubmitKey+#OOSubmitKeyX)

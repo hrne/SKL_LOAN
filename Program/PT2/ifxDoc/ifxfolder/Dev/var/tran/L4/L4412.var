@@ -377,6 +377,8 @@ T(F,@LimitAmt,1))
 #RimAuthApplCode=A,1,S
 #RimAuthCreateDate=D,7,S
 
+
+
 ! 4R24 檢核刪除/修改PostAuthLog存在與否
 #SendL4R24A=X,1,S
 C(3,#FuncCode,1,s,$)
@@ -388,8 +390,9 @@ E(0,@RimAcctNo,#RepayAcct)
 E(0,@RimBankNo,700)
 E(0,@RimAuthApplCode,#AuthApplCode)
 T(2,@RimPostDepCode,#PostDepCode)
+T(2,@RimAuthCode,#AuthCode)
 RESET_RIM(#SendL4R24A,L4R24)
-S(L4R24,1,#RimFuncCode,#RimLogNo,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimAuthApplCode,#RimPostDepCode)
+S(L4R24,1,#RimFuncCode,#RimLogNo,#RimAuthCreateDate,#RimCustNo,#RimAcctNo,#RimBankNo,#RimAuthApplCode,#RimPostDepCode,#RimAuthCode)
 R(1,L4R24)
 
 ! 戶號
@@ -564,8 +567,8 @@ E(0,@LimitAmt,#L4r22LimitAmt)
 C(3,#RelationCode,0,HIDE(#RelAcctGender),SHOW(#RelAcctGender))
 
 #RimL4r03=X,1,S
+IF(#FuncCode==4 || #FuncCode==5,s,$)
 E(0,@RimCustNo,#CustNo)
-!RimType=1找尋客戶主檔，=2找郵局授權主檔
 E(0,@RimType,1)
 RESET_RIM(#RimL4r03,L4R03)
 S(L4R03,1,#RimType,#RimCustNo)

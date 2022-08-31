@@ -96,8 +96,6 @@ public class L9705Report extends MakeReport {
 
 		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
 
-//		this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran + "A", rptitem, "inch,8.5,12", "P");
-
 		String entdy = titaVo.getEntDy();
 
 		String conditionCode = "";
@@ -326,7 +324,7 @@ public class L9705Report extends MakeReport {
 		printCm(1, 2.5, "【限定本人拆閱，若無此人，請寄回本公司】");
 		printCm(2, 3.5, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
 		if ("A3".equals(reconcode)) {
-			printCm(30, 3.5, "限  時  專  送");
+			printCm(15, 3.5, "限  時  專  送");
 		}
 		printCm(2, 4.5, currAddress);
 
@@ -346,7 +344,7 @@ public class L9705Report extends MakeReport {
 
 		setFont(1, 14);
 
-		printCm(9, 21, "放款本息攤還表暨繳息通知單", "C");
+		printCm(11, 19, "放款本息攤還表暨繳息通知單", "C");
 
 		setFont(1, 11);
 
@@ -532,9 +530,10 @@ public class L9705Report extends MakeReport {
 		String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
 		BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
 
-		if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
+//		if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
+		if ("A3".equals(reconcode)) {
 //						y = top + yy + (++l) * h;
-			this.printCm(1, 29, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
+			this.printCm(3, 29, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + "業已入帳無誤。");
 		}
 
 	}

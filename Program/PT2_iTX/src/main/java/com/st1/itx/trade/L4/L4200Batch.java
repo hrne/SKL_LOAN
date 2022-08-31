@@ -164,6 +164,7 @@ public class L4200Batch extends TradeBuffer {
 
 	private int iAcDate = 0;
 	private String iBatchNo = "";
+	private int iEntryDate = 0;
 
 	private int tableSize = 0;
 	private BigDecimal bigDe100 = new BigDecimal("100");
@@ -262,7 +263,7 @@ public class L4200Batch extends TradeBuffer {
 //			D.寫VO入各個扣款明細檔 (Detail不為異常者) 
 //	      }
 //		E.回寫Head檔 總金額與總筆數(if與前兩天相同，則丟Warning)
-
+		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
 		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		iBatchNo = titaVo.getParam("BatchNo");
 
@@ -550,7 +551,10 @@ public class L4200Batch extends TradeBuffer {
 				} else {
 					custNo = 0;
 				}
-
+				// 檢核入帳日期是否有誤
+				if (parse.stringToInteger(tempOccursList.get("OccEntryDate")) - 19110000 != iEntryDate) {
+					throw new LogicException("E0015", "資料入帳日期不為" + iEntryDate); // 檢查錯誤
+				}
 //				B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
 //				轉帳匯款檔並無寫入檔
 //				1.存款為負數 :  101-正負對沖 (一正一負) 

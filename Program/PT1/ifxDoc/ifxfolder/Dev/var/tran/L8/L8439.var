@@ -1,0 +1,368 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8439)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+INVOKEJS(SHOW,p1,5,5,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];order=1;">
+[
+["[L8439]                                 JCIC檔案匯出作業（575）"],
+["#FdSubmitType+功能,"#SubmitType,#SubmitTypeX],
+["#FdSubmitKey+報送金融機構代號",#SubmitKey,#ShowSubmitKey],
+["#FdReportDate+報送日期",#ReportDate],
+["#FdReportTime+報送次數",#ReportTime],
+]
+
+#FdSubmitType=X,2,L
+T(3,*)
+#FdSubmitKey=X,2,L
+#FdReportDate=X,2,L
+#FdReportTime=X,2,L
+#Space=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+
+
+! ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- Required Input Setting ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,20,S
+T(3,CdCode.TranCode)
+#TranCodeHelp=x,2024,S
+
+#CDDEF0002=x,20,S
+T(3,CdCode.SubmitType)
+#SubmitTypeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranCodeHelp,#HelpDesc1)
+T(2,@SubmitTypeHelp,#HelpDesc2)
+T(2,@SubmitKey,458)
+
+#DateX=X,8,S
+T(4,#SYSCDATE)
+T(1,@ReportDate,#DateX,2,7)
+
+! 報送類別
+#SubmitType=A,1,I
+HELP(#SubmitTypeHelp)
+@T(3,@SubmitTypeX,)
+V(H,#SubmitTypeHelp)
+#SubmitTypeX=X,10,L
+T(H,#SubmitType,#SubmitTypeHelp)
+
+! 報送次數暫定為1，有需要再改
+T(2,@ReportTime,1)
+
+
+!報送金融機構代號
+#SubmitKey=X,3,L
+
+
+#ShowSubmitKey=X,10,L
+
+!報送日期
+#ReportDate=D,7,L
+
+!報送次數
+#ReportTime=X,3,I
+
+! 交易代號
+#TranCode=X,3,L
+T(2,575)
+#RPTFG=X,1,S
+E(0,0) 
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8439 ----------
+<sub type="FORM" name="L8439">
+
+#SCRTIL=_,_,S
+T(3,[L8439] JCIC檔案匯出作業（575）)
+
+#SCRTIL=_,_,S
+T(3,[L8439] JCIC檔案匯出作業)
+
+#ExcelSnoM=X,8,S
+E(2,@SnoM,#ExcelSnoM)
+#SnoM=A,8,S
+
+#ExcelPrtF=A,1,S
+C(3,#SnoM,0,E(0,0),E(0,1))
+
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOChainTxCd=X,7,O
+#OOHistoryTxCd=X,7,O
+#OOCustId=X,10,O
+#OOSubmitKey=X,3,O
+#OOSubmitKeyX=X,50,O
+#OOApplyDate=D,7,O
+#OOTranKey=X,1,O
+#OOActualFilingDate=D,7,O
+#OOActualFilingMark=X,3,O
+
+#OOBankId=X,3,O
+#BankId=X,3,O
+T(2,#OOBankId)
+
+
+#CustId=X,10,O
+T(2,#OOCustId)
+#OOTranCode=X,3,O
+E(0,@TranCode,#OOTranCode)
+#ApplyDate=D,7,O
+E(0,#OOApplyDate)
+#TranKey=X,1,O
+T(2,#OOTranKey)
+#ActualFilingDate=D,7,O
+E(0,#OOActualFilingDate)
+#ActualFilingMark=X,3,O
+T(2,#OOActualFilingMark)
+
+#secret-no=x,1000,S
+T(6A,#OOSubmitKey+#ReportDate+#SubmitType+#TranCode+#ReportTime+#ApplyDate+#ActualFilingMark+#ActualFilingDate+#CustId+#BankId)
+
+#SubmitKeyX2=X,50,O
+T(2,#OOSubmitKey+#OOSubmitKeyX)
+
+
+#batch-detail=x,100000,S
+#batch-print=A,1,S
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+T(3,成功 請至LC009)
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranCode
+#SubmitType
+#SubmitKey
+#ReportDate
+#ReportTime
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8439
+#OOTranCode
+#OOChainTxCd
+#OOHistoryTxCd
+#OOCustId
+#OOSubmitKey
+#OOSubmitKeyX
+#OOApplyDate
+#OOTranKey
+#OOActualFilingDate
+#OOActualFilingMark
+#OOBankId
+
+#ExcelSnoM
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L8439" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
+[
+["[L8439]                                 JCIC檔案匯出作業（575）                                "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#batch-print=1,L8439.PFNX,NA,,,,,,1169:827
+^
+#RPTFG=0,QUERY.GRID,L8439
+#any={detail:true, header:'L8439.part', caption:'[L8439]JCIC檔案匯出作業（575）', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'列印',
+	type:'5',
+	rim:'L840A',
+	txtno:'#secret-no',
+	pfnx:"L8439.PFNX",
+	col_captions:["戶號","報送金融機構代號","申請日期","異動債權金機構代號","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OOApplyDate","#OOBankId","#batch-row-status"]
+	}
+}
+
+#secret-no
+#batch-row-status
+
+#OOCustId=戶號
+{width:100,align:'center'}
+#SubmitKeyX2=報送金融機構代號
+{width:100,align:'center'}
+#OOApplyDate=申請日期
+{width:100,align:'center'}
+#OOBankId=異動債權金機構代號
+{width:100,align:'center'}
+#OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOActualFilingDate=實際報送日
+{width:100,align:'center'}
+#OOActualFilingMark=實際報送記號
+{width:100,align:'center'}
+^
+
+#RPTFG=1,QUERY.GRID,L8439
+#any={detail:true, header:'L8439.part', caption:'[L8439]JCIC檔案匯出作業（575）', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'列印',
+	type:'5',
+	rim:'L840A',
+	txtno:'#secret-no',
+	pfnx:"L8439.PFNX",
+	col_captions:["戶號","報送金融機構代號","申請日期","異動債權金機構代號","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OOApplyDate","#OOBankId","#batch-row-status"]
+	}
+}
+
+#secret-no
+#batch-row-status
+
+#OOCustId=戶號
+{width:100,align:'center'}
+#SubmitKeyX2=報送金融機構代號
+{width:100,align:'center'}
+#OOApplyDate=申請日期
+{width:100,align:'center'}
+#OOBankId=異動債權金機構代號
+{width:100,align:'center'}
+#OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOActualFilingDate=實際報送日
+{width:100,align:'center'}
+#OOActualFilingMark=實際報送記號
+{width:100,align:'center'}
+^
+
+#RPTFG=2,QUERY.GRID,L8439
+#any={detail:true, header:'L8439.part', caption:'[L8439]JCIC檔案匯出作業（575）', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'列印',
+	type:'5',
+	rim:'L840A',
+	txtno:'#secret-no',
+	pfnx:"L8439.PFNX",
+	col_captions:["戶號","報送金融機構代號","申請日期","異動債權金機構代號","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OOApplyDate","#OOBankId","#batch-row-status"]
+	}
+}
+
+#secret-no
+#batch-row-status
+
+#OOCustId=戶號
+{width:100,align:'center'}
+#SubmitKeyX2=報送金融機構代號
+{width:100,align:'center'}
+#OOApplyDate=申請日期
+{width:100,align:'center'}
+#OOBankId=異動債權金機構代號
+{width:100,align:'center'}
+#OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOActualFilingDate=實際報送日
+{width:100,align:'center'}
+#OOActualFilingMark=實際報送記號
+{width:100,align:'center'}
+^
+
+#RPTFG=3,QUERY.GRID,L8439
+#any={detail:true, header:'L8439.part', caption:'[L8439]JCIC檔案匯出作業（575）', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'列印',
+	type:'5',
+	rim:'L840A',
+	txtno:'#secret-no',
+	pfnx:"L8439.PFNX",
+	col_captions:["戶號","報送金融機構代號","申請日期","異動債權金機構代號","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OOApplyDate","#OOBankId","#batch-row-status"]
+	}
+}
+
+#secret-no
+#batch-row-status
+
+#OOCustId=戶號
+{width:100,align:'center'}
+#SubmitKeyX2=報送金融機構代號
+{width:100,align:'center'}
+#OOApplyDate=申請日期
+{width:100,align:'center'}
+#OOBankId=異動債權金機構代號
+{width:100,align:'center'}
+#OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOActualFilingDate=實際報送日
+{width:100,align:'center'}
+#OOActualFilingMark=實際報送記號
+{width:100,align:'center'}
+^
+</sub>
+

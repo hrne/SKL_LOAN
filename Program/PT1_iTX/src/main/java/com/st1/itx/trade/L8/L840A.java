@@ -289,6 +289,7 @@ public class L840A extends TradeBuffer {
 	String iBankId;
 	String itranCode;
 	int iPayOffDate;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L840A");
@@ -297,6 +298,10 @@ public class L840A extends TradeBuffer {
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		itranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
 		long sno1 = 0;
+
+		if (titaVo.get("OOSubmitKey") != null) {
+			titaVo.put("SubmitKey", titaVo.get("OOSubmitKey"));
+		}
 		if (iSubmitType == 1 || iSubmitType == 3) {
 //			更新篩選資料日期
 			setJcicDate(titaVo);
@@ -1247,8 +1252,7 @@ public class L840A extends TradeBuffer {
 						&& iiJcicZ440.getCustId().equals(sJcicZ440.getCustId())
 						&& iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey())
 						&& iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate()
-						&& iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode())
-						) {
+						&& iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode())) {
 					count++;
 					uJcicZ440 = sJcicZ440Service.holdById(sJcicZ440.getJcicZ440Id(), titaVo);
 					uJcicZ440.setOutJcicTxtDate(iJcicDate);
@@ -1342,8 +1346,7 @@ public class L840A extends TradeBuffer {
 						&& iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey())
 						&& iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate()
 						&& iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode())
-						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())
-						) {
+						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())) {
 					count++;
 					uJcicZ443 = sJcicZ443Service.holdById(sJcicZ443.getJcicZ443Id(), titaVo);
 					uJcicZ443.setOutJcicTxtDate(iJcicDate);

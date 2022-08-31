@@ -10,14 +10,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
-import com.st1.itx.db.domain.AchAuthLogHistory;
 import com.st1.itx.db.domain.AchAuthLogId;
 import com.st1.itx.db.domain.PostAuthLog;
-import com.st1.itx.db.domain.PostAuthLogHistory;
 import com.st1.itx.db.domain.PostAuthLogId;
-import com.st1.itx.db.service.AchAuthLogHistoryService;
 import com.st1.itx.db.service.AchAuthLogService;
-import com.st1.itx.db.service.PostAuthLogHistoryService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.format.FormatUtil;
@@ -40,20 +36,13 @@ public class L4R24 extends TradeBuffer {
 	public AchAuthLogService achAuthLogService;
 
 	@Autowired
-	public AchAuthLogHistoryService achAuthLogHistoryService;
-
-	@Autowired
 	public PostAuthLogService postAuthLogService;
-
-	@Autowired
-	public PostAuthLogHistoryService postAuthLogHistoryService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4R24 ");
 		this.totaVo.init(titaVo);
 
-		Long logNo = Long.parseLong(titaVo.getParam("RimLogNo"));
 		int funcCode = parse.stringToInteger(titaVo.get("RimFuncCode"));
 		int authCreateDate = 19110000 + parse.stringToInteger(titaVo.get("RimAuthCreateDate"));
 		int custNo = parse.stringToInteger(titaVo.get("RimCustNo"));
@@ -61,109 +50,74 @@ public class L4R24 extends TradeBuffer {
 		String acctNo = FormatUtil.pad9(titaVo.getParam("RimAcctNo"), 14);
 		int result = 1;
 
-		if (logNo != 0) { // 抓歷史檔
-			if ("700".equals(bankNo)) {
+		if ("700".equals(bankNo)) {
+			String postDepCode = titaVo.getParam("RimPostDepCode");
+			String authApplCode = titaVo.getParam("RimAuthApplCode");
+			String authCode = "1";
+			if (titaVo.get("RimAuthCode") != null) {
+				authCode = titaVo.get("RimAuthCode");
+			}
 
-				PostAuthLogHistory tPostAuthLogHistory = postAuthLogHistoryService.findById(logNo, titaVo);
+			PostAuthLogId tPostAuthLogId = new PostAuthLogId();
+			tPostAuthLogId.setAuthCreateDate(authCreateDate);
+			tPostAuthLogId.setCustNo(custNo);
+			tPostAuthLogId.setRepayAcct(acctNo);
+			tPostAuthLogId.setPostDepCode(postDepCode);
+			if ("9".equals(authApplCode)) {
+				authApplCode = "1";
+			}
+			tPostAuthLogId.setAuthApplCode(authApplCode);
+			tPostAuthLogId.setAuthCode(authCode);
 
-				if (tPostAuthLogHistory == null) {
-					this.info("funcCode ... " + funcCode);
-					switch (funcCode) {
-					case 2:
-						throw new LogicException(titaVo, "E0003", "");
-					case 4:
-						throw new LogicException(titaVo, "E0004", "");
-					case 5:
-						throw new LogicException(titaVo, "E0001", "");
-					default:
-						break;
-					}
-				}
-			} else {
+			PostAuthLog tPostAuthLog = postAuthLogService.findById(tPostAuthLogId, titaVo);
 
-				AchAuthLogHistory tAchAuthLogHistory = achAuthLogHistoryService.findById(logNo, titaVo);
-
-				if (tAchAuthLogHistory == null) {
-					this.info("funcCode ... " + funcCode);
-
-					switch (funcCode) {
-					case 2:
-						throw new LogicException(titaVo, "E0003", "");
-					case 4:
-						throw new LogicException(titaVo, "E0004", "");
-					case 5:
-						throw new LogicException(titaVo, "E0001", "");
-					default:
-						break;
-					}
+			if (tPostAuthLog == null) {
+				this.info("funcCode ... " + funcCode);
+				switch (funcCode) {
+				case 2:
+					throw new LogicException(titaVo, "E0003", "");
+				case 4:
+					throw new LogicException(titaVo, "E0004", "");
+				case 5:
+					throw new LogicException(titaVo, "E0001", "");
+				default:
+					break;
 				}
 			}
 		} else {
-			if ("700".equals(bankNo)) {
-				String postDepCode = titaVo.getParam("RimPostDepCode");
-				String authApplCode = titaVo.getParam("RimAuthApplCode");
 
-				PostAuthLogId tPostAuthLogId = new PostAuthLogId();
-				tPostAuthLogId.setAuthCreateDate(authCreateDate);
-				tPostAuthLogId.setCustNo(custNo);
-				tPostAuthLogId.setRepayAcct(acctNo);
-				tPostAuthLogId.setPostDepCode(postDepCode);
-				if ("9".equals(authApplCode)) {
-					authApplCode = "1";
-				}
-				tPostAuthLogId.setAuthApplCode(authApplCode);
-				tPostAuthLogId.setAuthCode("1");
-
-				PostAuthLog tPostAuthLog = postAuthLogService.findById(tPostAuthLogId, titaVo);
-
-				if (tPostAuthLog == null) {
-					this.info("funcCode ... " + funcCode);
-					switch (funcCode) {
-					case 2:
-						throw new LogicException(titaVo, "E0003", "");
-					case 4:
-						throw new LogicException(titaVo, "E0004", "");
-					case 5:
-						throw new LogicException(titaVo, "E0001", "");
-					default:
-						break;
-					}
-				}
-			} else {
-
-				String createFlag = titaVo.getParam("RimCreateFlag");
-				if ("Z".equals(createFlag)) {
-					createFlag = "A";
-				} else if ("Y".equals(createFlag)) {
-					createFlag = "A";
-				}
-
-				AchAuthLogId tAchAuthLogId = new AchAuthLogId();
-				tAchAuthLogId.setAuthCreateDate(authCreateDate);
-				tAchAuthLogId.setCustNo(custNo);
-				tAchAuthLogId.setRepayAcct(acctNo);
-				tAchAuthLogId.setRepayBank(bankNo);
-				tAchAuthLogId.setCreateFlag(createFlag);
-
-				AchAuthLog tAchAuthLog = achAuthLogService.findById(tAchAuthLogId, titaVo);
-
-				if (tAchAuthLog == null) {
-					this.info("funcCode ... " + funcCode);
-
-					switch (funcCode) {
-					case 2:
-						throw new LogicException(titaVo, "E0003", "");
-					case 4:
-						throw new LogicException(titaVo, "E0004", "");
-					case 5:
-						throw new LogicException(titaVo, "E0001", "");
-					default:
-						break;
-					}
-				}
+			String createFlag = titaVo.getParam("RimCreateFlag");
+			if ("Z".equals(createFlag)) {
+				createFlag = "A";
+			} else if ("Y".equals(createFlag)) {
+				createFlag = "A";
 			}
 
-		} // else
+			AchAuthLogId tAchAuthLogId = new AchAuthLogId();
+			tAchAuthLogId.setAuthCreateDate(authCreateDate);
+			tAchAuthLogId.setCustNo(custNo);
+			tAchAuthLogId.setRepayAcct(acctNo);
+			tAchAuthLogId.setRepayBank(bankNo);
+			tAchAuthLogId.setCreateFlag(createFlag);
+
+			AchAuthLog tAchAuthLog = achAuthLogService.findById(tAchAuthLogId, titaVo);
+
+			if (tAchAuthLog == null) {
+				this.info("funcCode ... " + funcCode);
+
+				switch (funcCode) {
+				case 2:
+					throw new LogicException(titaVo, "E0003", "");
+				case 4:
+					throw new LogicException(titaVo, "E0004", "");
+				case 5:
+					throw new LogicException(titaVo, "E0001", "");
+				default:
+					break;
+				}
+			}
+		}
+
 		totaVo.putParam("L4r24CheckCode", result);
 
 		this.addList(this.totaVo);
