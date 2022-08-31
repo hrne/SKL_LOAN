@@ -167,6 +167,24 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)
+T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@CompletePeriod,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpBalanceAmt,1)
+T(F,@CashBalanceAmt,1)T(F,@CreditBalanceAmt,1)T(F,@ChaRepayAmt,1)T(F,@ChaRepayAgreeDate,1)T(F,@ChaRepayViewDate,1)
+T(F,@ChaRepayEndDate,1)T(F,@ChaRepayFirstDate,1)T(F,@PayAccount,1)T(F,@PostAddr,1)T(F,@MonthPayAmt,1)T(F,@GradeType,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@SubmitKey,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdRcDate,*)
+T(2,@FdChangePayDate,*)
+T(2,@FdChaRepayAgreeDate,*)
+T(2,@FdChaRepayFirstDate,*)
+T(2,@FdPayAccount,*)
+T(2,@FdMonthPayAmt,*)
+T(2,@FdSubmitKey,*)
+T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
 #Default=X,1,S
@@ -224,14 +242,24 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 !---------- AP TEXT AREA Variables ----------
 ![交易代碼]
 #TranKey_Tmp=X,1,S
-#TranKey=X,1,L
+#TranKey=X,1,I
+IF(#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 
+
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7,$,s)
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$) 
+C(5,#TranKey_Tmp,2,s,$)
+T(H,#TranKey,#TranKeyHelp)
+
 
 ![債務人IDN]
 #CustId=X,10,L

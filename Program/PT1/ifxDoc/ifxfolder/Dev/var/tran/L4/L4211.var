@@ -21,6 +21,7 @@ E(0,0)
 [#<->#,"#FdAcDate+會計日期",#AcDate],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 [#<->#,"#FdReconCode+存摺代號",#ReconCode,#ReconCodeX],
+[#<->#,"#FdReportNo+報表項目",#ReportNo,#ReportNoX],
 ]
 
 #FdFunctionCodeX=X,2,L
@@ -30,6 +31,9 @@ T(3,*)
 #FdEntryDate=X,2,L
 T(3,*)
 #FdReconCode=X,2,L
+T(3,*)
+#FdReportNo=X,2,L
+T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -52,6 +56,7 @@ T(H,#FunctionCode,#FunctionCodeHelp)
 #CheckHide=X,1,S
 IF(#FunctionCode == 1,INVOKEJS(SHOW,L4211,3,3,0),INVOKEJS(SHOW,L4211,3,3,1))
 IF(#FunctionCode == 2,INVOKEJS(SHOW,L4211,2,2,0),INVOKEJS(SHOW,L4211,2,2,1))
+IF(#FunctionCode == 2,INVOKEJS(SHOW,L4211,5,5,0),INVOKEJS(SHOW,L4211,5,5,1))
 
 ! 會計日期
 #AcDate=D,7,I
@@ -75,6 +80,18 @@ C(4,#ReconCode,$,V(H,#ReconCodeHelp))
 
 #ReconCodeX=X,20,L
 T(H,#ReconCode,#ReconCodeHelp)
+
+#ReportNoHelp=X,100,S
+T(3,1:總傳票明細表;2:入帳後撿核明細表)
+
+#ReportNo=X,1,I
+HELP(#ReportNoHelp)
+@
+C(4,#ReportNo,$,V(H,#ReportNoHelp))
+
+#ReportNoX=X,20,L
+T(H,#ReportNo,#ReportNoHelp)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -89,6 +106,7 @@ T(H,#ReconCode,#ReconCodeHelp)
 #AcDate
 #EntryDate
 #ReconCode
+#ReportNo
 </sub>
 
 !------ 下行電文TOM ------

@@ -191,6 +191,25 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)
+T(F,@ApplyDate,1)T(F,@CourtCode,1)
+T(F,@MaxMainCode,1)T(F,@IsMaxMain,1)T(F,@IsClaims,1)T(F,@GuarLoanCnt,1)
+T(F,@ReceExpPrin,1)T(F,@ReceExpInte,1)T(F,@ReceExpPena,1)T(F,@ReceExpOther,1)
+T(F,@CashCardPrin,1)T(F,@CashCardInte,1)T(F,@CashCardPena,1)T(F,@CashCardOther,1)
+T(F,@CreditCardPrin,1)T(F,@CreditCardInte,1)T(F,@CreditCardPena,1)T(F,@CreditCardOther,1)
+T(F,@GuarObliPrin,1)T(F,@GuarObliInte,1)T(F,@GuarObliPena,1)T(F,@GuarObliOther,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdApplyDate,*)
+T(2,@FdCourtCode,*)
+T(2,@FdMaxMainCode,*)
+T(2,@FdIsMaxMain,*)
+T(2,@FdIsClaims,*)
+T(3,@TranKeyHelp,A:新增;C:異動))
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -254,14 +273,22 @@ T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 
 ![交易代碼]
 #TranKey_Tmp=X,1,S
-#TranKey=X,1,L
+#TranKey=X,1,I
+IF(#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7,$,s)
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$) 
+C(5,#TranKey_Tmp,2,s,$)
+T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
 #CustId=X,10,L

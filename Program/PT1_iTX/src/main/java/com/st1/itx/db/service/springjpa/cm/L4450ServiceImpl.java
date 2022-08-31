@@ -74,6 +74,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iDeductDateStart = 0; // 追繳
 		int iDeductDateEnd = 0; // 追繳
 		int iOpItem = Integer.parseInt(titaVo.getParam("OpItem"));
+		int iEntryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 
 		String iRepayBank = titaVo.getParam("RepayBank");
 		boolean useRepayBank = iRepayBank != null && !iRepayBank.trim().isEmpty();
@@ -275,23 +276,21 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "    and case ";
 		// RepayBank = 700 = 郵局
-		// 郵局-條件1: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
+		// 郵局-條件1: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 郵局扣款應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", 'null') = '700' ";
 		sql += "               and b.\"NextPayIntDate\" <= :iPostSpecificDd  ";
 		sql += "               and b.\"SpecificDd\" = :iPostSpecificDay ";
 		sql += "          then 1 ";
-		// 郵局-條件2: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
+		// 郵局-條件2: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 郵局二扣應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", 'null') = '700' ";
 		sql += "               and b.\"NextPayIntDate\" <= :iPostSecondSpecificDd ";
 		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
-		// 郵局-條件3: 下繳日(8碼yyyymmdd) = 郵局扣款應繳日(8碼yyyymmdd) 或 有短繳期金
-		// ___________ 且 指定應繳日(2碼dd) = 0
-//		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
-//		sql += "               and b.\"NextPayIntDate\" = :iPostSpecificDd ";
-//		sql += "               and b.\"SpecificDd\" = 0 ";
+		// 郵局-條件3: 到期日(8碼yyyymmdd) <= 入帳日(8碼yyyymmdd)
+		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
+		sql += "               and b.\"MaturityDate\" <= :iEntryDate ";
 //		sql += "          then 1 ";
 		// 郵局-條件4: 下繳日(8碼yyyymmdd) = 郵局二扣應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 0
@@ -312,8 +311,9 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               and b.\"NextPayIntDate\" <= :iAchSecondSpecificDdTo ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSecondSpecificDays ";
 		sql += "          then 1 ";
-		// ACH-條件3: 下繳日(8碼yyyymmdd) 在 ACH扣款應繳日的起日與止日之間
-		// __________ 且 指定應繳日(2碼dd) = 0
+		// ACH-條件3: 到期日(8碼yyyymmdd) <= 入帳日(8碼yyyymmdd)
+		sql += "          when nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
+		sql += "               and b.\"MaturityDate\" <= :iEntryDate ";
 //		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
 //		sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
 //		sql += "               and b.\"SpecificDd\" = 0 ";
@@ -340,14 +340,14 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          then 1 ";
 		sql += "        else 0 ";
 		sql += "        end = 1 ";
-		// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
-		sql += "   order by b.\"CustNo\" ASC, b.\"NextPayIntDate\" ASC, b.\"StoreRate\" DESC, b.\"FacmNo\" ASC, b.\"BormNo\" ASC ";
+		// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由大到小
+		sql += "   order by b.\"CustNo\" ASC, b.\"NextPayIntDate\" ASC, b.\"FacmNo\" ASC, b.\"BormNo\" ASC ";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
+		query.setParameter("iEntryDate", iEntryDate);
 		query.setParameter("iDeductDateStart", iDeductDateStart);
 		query.setParameter("iDeductDateEnd", iDeductDateEnd);
 

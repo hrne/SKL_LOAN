@@ -74,6 +74,8 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "     and bd.\"RepayType\" = 1                                                ";
 		sql += "     and bd.\"MediaCode\" = 'Y'                                              ";
 		sql += "     and NVL(bd.\"ReturnCode\",'  ') not in ('  ','00')                      ";
+		sql += "     and lbm.\"Status\" = 0                      ";
+		sql += "     and lbm.\"PrevPayIntDate\" <= bd.\"IntStartDate\"                      ";
 		sql += "	)                                        ";
 		sql += "	SELECT R.* FROM (";
 		sql += "	SELECT \"RepayAcctNo\"";

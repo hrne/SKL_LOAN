@@ -107,7 +107,6 @@ public class L3230 extends TradeBuffer {
 	private int wkBormNo = 0;
 	private int wkOvduNo = 0;
 
-	private int wkRepayType = 0;
 	private String wkAcctCode;
 	private String iAcSubBookCode;
 	private LoanOverdue tLoanOverdue;
@@ -282,8 +281,7 @@ public class L3230 extends TradeBuffer {
 			// 暫收可抵繳轉帳；96-轉帳
 //				1.iFacmNo >0 限該額度可抵繳
 			try {
-				this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, this.wkRepayType,
-						iTempAmt, titaVo);
+				this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, iTempAmt, titaVo);
 			} catch (LogicException e) {
 				throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
 			}
@@ -409,31 +407,56 @@ public class L3230 extends TradeBuffer {
 	}
 
 	private void settingUnPaid06() throws LogicException {
-		if (iRpCode == 92) {
-			try {
-				this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iRpCustNo, iRpFacmNo, 0, this.wkRepayType,
-						iTempAmt, titaVo);
-			} catch (LogicException e) {
-				throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
+		switch (iRpCode) {
+		case 92: // 放款暫收款
+			BigDecimal excessive = BigDecimal.ZERO;
+			// 轉入為暫收指定額度處理累溢收 96 : 單一額度轉帳
+			if (loanCom.isLoanFacTmp(iCustNo, iRpFacmNo, titaVo)) {
+				try {
+					this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iRpCustNo, iRpFacmNo, 0, 96, iTempAmt,
+							titaVo);
+				} catch (LogicException e) {
+					throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
+				}
+				excessive = baTxCom.getExcessive();
+				// 暫收借
+				acDetail = new AcDetail();
+				acDetail.setDbCr("D");
+				acDetail.setAcctCode("TAV");
+				acDetail.setSumNo("090");
+				acDetail.setTxAmt(excessive);
+				acDetail.setCustNo(iRpCustNo);
+				acDetail.setFacmNo(iRpFacmNo);
+				lAcDetail.add(acDetail);
 			}
-
-			// 暫收款金額 (暫收借)
-			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 			// 累溢收(暫收貸)
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
 			acDetail.setSumNo("092");
-			acDetail.setTxAmt(iTempAmt.add(baTxCom.getExcessive()));
+			acDetail.setTxAmt(iTempAmt.add(excessive));
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setFacmNo(iRpFacmNo);
-			acDetail.setBormNo(0);
 			lAcDetail.add(acDetail);
-		} else {
-			// 貸方 收付欄
-			acPaymentCom.setTxBuffer(this.getTxBuffer());
-			acPaymentCom.run(titaVo);
-			lAcDetail.addAll(this.txBuffer.getAcDetailList());
+			break;
+		case 94: // 轉債協暫收款
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setCustNo(iRpCustNo);
+			acDetail.setAcctCode(acNegCom.getAcctCode(iRpCustNo, titaVo));
+			acDetail.setSumNo("094");
+			acDetail.setTxAmt(iTempAmt);
+			lAcDetail.add(acDetail);
+			break;
+		case 95: // 轉債協退還款
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setCustNo(iRpCustNo);
+			acDetail.setAcctCode(acNegCom.getReturnAcctCode(iRpCustNo, titaVo));
+			acDetail.setSumNo("095");
+			acDetail.setTxAmt(iTempAmt);
+			lAcDetail.add(acDetail);
+			break;
 		}
 		addLoanBorTx06Routine(iRpCustNo, iRpFacmNo);
 	}
@@ -475,9 +498,9 @@ public class L3230 extends TradeBuffer {
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("RemoveNo", iRemoveNo);
 		tTempVo.putParam("Note", titaVo.getParam("Description"));
-		String desc = "暫收退" + loanCom.getCdCodeX("AcctCode", ba.getAcctCode(), titaVo) ;
+		String desc = "暫收退" + loanCom.getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
 		loanCom.addFeeBorTxRoutine(ba, 0, desc, titaVo.getEntDyI(), tTempVo, lAcDetail, titaVo);
-		
+
 		ba.setAcctAmt(BigDecimal.ZERO);
 
 	}
@@ -775,15 +798,10 @@ public class L3230 extends TradeBuffer {
 					throw new LogicException(titaVo, "E6002", "不可轉至不同戶號"); // E6002 收付欄檢核有誤
 				}
 			}
-			// 轉入轉出額度皆為非指定額度時為單一額度轉帳
-			if (iCustNo == iRpCustNo && iFacmNo > 0 && iRpFacmNo > 0) {
-				if (!loanCom.isLoanFacTmp(iCustNo, iFacmNo, titaVo)
-						&& !loanCom.isLoanFacTmp(iCustNo, iRpFacmNo, titaVo)) {
-					this.wkRepayType = 96;
-				}
+			if (iFacmNo > 0 && iRpFacmNo > 0 && iFacmNo == iRpFacmNo) {
+				throw new LogicException(titaVo, "E6002", "不可轉至同額度"); // E6002 收付欄檢核有誤
 			}
 		}
-
 	}
 
 }

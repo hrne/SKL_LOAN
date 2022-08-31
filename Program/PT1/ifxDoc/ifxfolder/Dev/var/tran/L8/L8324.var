@@ -190,6 +190,30 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
+
+
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@IsMaxMain,1)
+T(F,@Account,1)T(F,@GuarantyType,1)T(F,@LoanAmt,1)
+T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)
+T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)
+T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)
+T(F,@BeginDate,1)T(F,@EndDate,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdApplyDate,*)
+T(2,@FdCourtCode,*)
+T(2,@FdMaxMainCode,*)
+T(2,@FdIsMaxMain,*)
+T(2,@FdGuarantyType,*)
+T(2,@FdAccount,*)
+T(2,@FdMothPayDay,*)
+T(2,@FdBeginDate,*)
+T(2,@FdEndDate,*)
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -262,8 +286,16 @@ C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@GuarantyType,0)T(F,@LoanAmt,0)T(F,@Pri
 T(2,@FdGuarantyType, )T(2,@FdMothPayDay, )T(2,@FdBeginDate, )T(2,@FdEndDate, )
 ,$))
 
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@IsMaxMain,1)
+T(F,@Account,1)T(F,@GuarantyType,1)T(F,@LoanAmt,1)
+T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)
+T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)
+T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)
+T(F,@BeginDate,1)T(F,@EndDate,1),$)
+
 
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

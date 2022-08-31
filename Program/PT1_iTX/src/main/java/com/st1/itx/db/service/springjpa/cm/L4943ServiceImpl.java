@@ -202,7 +202,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 4: // 檢核不正常
 			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";
-			sql += "            when NVL(JSON_VALUE(BDD.\"JsonFields\", '$.Auth'),' ') <> ' ' then 1 ";
+			sql += "            when NVL(JSON_VALUE(BDD.\"JsonFields\", '$.Auth'),'A') <> 'A' then 1 ";
 			sql += "            when NVL(JSON_VALUE(BDD.\"JsonFields\", '$.Deduct'),' ') <> ' ' then 1 ";
 			sql += "            else 0 end = 1 ";
 			sql += "   and BDD.\"AcDate\" = 0                     ";

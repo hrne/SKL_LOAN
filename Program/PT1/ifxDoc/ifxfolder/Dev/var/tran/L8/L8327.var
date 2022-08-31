@@ -151,6 +151,21 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)   
+K(MODIFYBUTTON,修改)
+T(2,@FdTranKey,*)
+T(2,@FdApplyDate,*)
+T(2,@FdCourtCode,*)
+T(2,@FdFirstPayDate,*)
+T(2,@FdSignDate,*)
+T(2,@FdPayAccount,*)
+T(2,@FdSubmitKey,*)
+T(3,@TranKeyHelp,A:新增;X:補件;C:異動;D:刪除))
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -211,7 +226,11 @@ C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@Sig
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPayAccount,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPayAccount, ),$))
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPayAccount, ),$))
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1),$)
+
+
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)

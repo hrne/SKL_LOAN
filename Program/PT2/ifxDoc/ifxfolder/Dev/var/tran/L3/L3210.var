@@ -501,6 +501,7 @@ T(2,#TimCustNo+#FacmNo+#RepayCode)
 #BIND4A=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
 :FacmNo<-OOFacmNo
+:L492aFacmNo<-OOFacmNo
 :EntryDate<-OOEntryDate
 :DetailSeq<-OODetailSeq
 :DetailNote<-OOProcNote
@@ -522,6 +523,7 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
 !backNext=true 當值帶回原本畫面將會自動往下執行
 #BTN4=X,16,I,ui:button;value:已入帳未還款查詢;enable:0;tabbable:1;backNext:true;title:L492A 已入帳未還款查詢
 
+#L492aFacmNo=A,3,S
 
 ![入帳日期]
 #FdEntryDate=X,2,L
@@ -945,7 +947,7 @@ E(0,@RP_REPCAT,1)
 
 ! 額度
 #TempFacmNo1=X,1,S
-E(0,@RP_FACMNO,#FacmNo)
+E(0,@RP_FACMNO,#L492aFacmNo)
 
 !類別   摘要
 #TempNOTE=X,1,S

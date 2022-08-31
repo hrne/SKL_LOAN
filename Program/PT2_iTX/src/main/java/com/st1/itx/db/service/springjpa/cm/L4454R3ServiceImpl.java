@@ -60,10 +60,15 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS \"CustNo\"                         ";
 		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS \"FacmNo\"                         ";
 		sql += "   , MIN(LPAD(lbm.\"BormNo\",3,'0'))	            AS \"BormNo\"                         ";
-		sql += "   , MIN(cm.\"CustName\")                           AS \"CustName\"                         ";
+		sql += "   , cm.\"CustName\"                           AS \"CustName\"                         ";
 		sql += "   , MIN(bd.\"RepayAmt\")                           AS \"RepayAmt\"                         ";
+		sql += "   , MIN(case ";
+		sql += "		   when LENGTH(TRIM(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1))) >=7 then \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)";
+		sql += "		   when LENGTH(TRIM(\"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1))) >=7 then \"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1)";
+		sql += "		   when LENGTH(TRIM(\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1))) >=7 then \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1)";
+		sql += " 		 end)     AS \"PhoneNo\"";
 		sql += "   , MIN(NVL(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1),NVL(\"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1),\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1))))     AS \"PhoneNo\"                         ";
-		sql += "   , MIN(NVL(bd.\"RelCustName\", cm.\"CustName\"))  AS \"RelCustName\"                         ";
+		sql += "   , NVL(bd.\"RelCustName\", cm.\"CustName\")  AS \"RelCustName\"                         ";
 		sql += "   , MIN(case when lbm.\"PrevPayIntDate\" < 19110000 then lbm.\"PrevPayIntDate\" ";
 		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end)     AS \"PrevPayIntDate\"               ";
 		sql += "   , MIN(case when lbm.\"DrawdownDate\" < 19110000 then lbm.\"DrawdownDate\" ";
@@ -83,7 +88,9 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "     and (lbm.\"DrawdownDate\" >= :lastYearEntryDate";
 		sql += "           and  lbm.\"DrawdownDate\" <= :entryDate";
 		sql += "           )                                                                 ";
-		sql += "   group by ce.\"Fullname\"";
+		sql += "   group by cm.\"CustName\"";
+		sql += "           ,NVL(bd.\"RelCustName\", cm.\"CustName\") ";
+		sql += "           ,ce.\"Fullname\"";
 		sql += "   order by \"RepayAcctNo\",\"CustNo\", \"FacmNo\"                                           ";
 		this.info("sql=" + sql);
 		Query query;

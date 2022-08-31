@@ -145,6 +145,20 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@DelayCode,1)T(F,@DelayYM,1)T(F,@SubmitKey,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdApplyDate,*)
+T(2,@FdCourtCode,*)
+T(2,@FdDelayCode,*)
+T(2,@FdDelayYM,*)
+T(2,@FdSubmitKey,*)
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
+
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -195,7 +209,10 @@ HELP(#TranKeyHelp)
 V(H,#TranKeyHelp)
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@DelayCode,1)T(2,@FdDelayCode,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@DelayCode,0)T(2,@FdDelayCode, ),$))
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@DelayCode,1)T(F,@DelayYM,1)T(F,@SubmitKey,1),$)
+
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

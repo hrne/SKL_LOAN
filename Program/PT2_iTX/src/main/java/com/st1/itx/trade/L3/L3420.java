@@ -595,9 +595,9 @@ public class L3420 extends TradeBuffer {
 			wkCloseBreachAmt = BigDecimal.ZERO;
 			if (iCloseBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
 				for (int i = 1; i <= 50; i++) {
-					if (titaVo.get("FacmNo" + i) != null) {
-						if (parse.stringToInteger(titaVo.get("FacmNo" + i)) == wkFacmNo
-								&& parse.stringToInteger(titaVo.get("BormNo" + i)) == wkBormNo) {
+					if (titaVo.get("FacmBormNo" + i) != null) {
+						if (titaVo.get("FacmBormNo" + i).equals(
+								parse.IntegerToString(wkFacmNo, 3) + "-" + parse.IntegerToString(wkBormNo, 3))) {
 							wkCloseBreachAmt = parse.stringToBigDecimal(titaVo.get("CloseBreachAmt" + i));
 							break;
 						}

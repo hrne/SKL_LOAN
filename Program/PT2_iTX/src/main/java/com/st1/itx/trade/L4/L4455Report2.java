@@ -155,16 +155,13 @@ public class L4455Report2 extends MakeReport {
 		}
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款失敗報表", "", "A4", "L");
-		
-		
+
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L4455").setRptItem("銀行扣款失敗報表").setSecurity("").setRptSize("A4")
-				.setPageOrientation("L").build();
+				.setRptCode("L4455").setRptItem("銀行扣款失敗報表").setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.build();
 
 		this.open(titaVo, reportVo);
 
-		
-		
 		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
 
 		lCdCode = slCdCode == null ? null : slCdCode.getContent();
@@ -198,6 +195,10 @@ public class L4455Report2 extends MakeReport {
 					if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
 						acctcodex = tCdCode.getItem();
 					}
+				}
+
+				if ("456".equals(L4455List.get(i).get("AcctCode"))) {
+					acctcodex = "暫收款";
 				}
 
 				this.print(0, 1, acctcodex);// 業務科目
@@ -256,7 +257,7 @@ public class L4455Report2 extends MakeReport {
 
 				if ("".equals(L4455List.get(i).get("CustCell")) && "".equals(L4455List.get(i).get("Email"))) {
 					this.print(0, 186, "無手機號碼及E-MAIL");// 備註
-				} 
+				}
 
 				pagetime++;
 

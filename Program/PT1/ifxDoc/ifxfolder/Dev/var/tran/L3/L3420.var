@@ -404,6 +404,7 @@ T(2,#TimCustNo+#FacmNo+#RepayCode+#RepayType)
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF5A;ntxbuf5=type<-1
 :EntryDate<-OOEntryDate
 :FacmNo<-OOFacmNo
+:L492aFacmNo<-OOFacmNo
 :DetailSeq<-OODetailSeq
 :DetailNote<-OOProcNote
 :L492aRepayAmt<-OORepayAmt
@@ -434,6 +435,8 @@ C(3,#EntryDate,0,E(0,#SYSDATE),$)
 V(7)
 V(2,0)
 A(DATE,0,#EntryDate)
+
+#L492aFacmNo=A,3,S
 
 #L492aRepayCode=A,2,S
 
@@ -1178,7 +1181,8 @@ E(0,@RP_CUSTNO,#CustNo)
 
 ! 額度
 #TmpFacmNo=X,1,S
-E(0,@RP_FACMNO,#L3r11RpFacmNo)
+C(3,#L492aRepayType,0,E(0,@RP_FACMNO,#L3r11RpFacmNo),E(0,@RP_FACMNO,#L492aFacmNo))
+
 
 !類別   摘要
 #TmpNote=X,1,S

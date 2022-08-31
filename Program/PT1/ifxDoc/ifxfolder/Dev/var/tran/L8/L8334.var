@@ -134,6 +134,18 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)
+T(F,@ApplyDate,1)T(F,@StartDate,1)T(F,@PayDate,1)T(F,@BankId,1)T(F,@AllotAmt,1)T(F,@OwnPercentage,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdApplyDate,*)
+T(2,@FdStartDate,*)
+T(2,@FdPayDate,*)
+T(2,@FdBankId,*)
+T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
 #Default=X,1,S
@@ -183,15 +195,22 @@ T(2,@BankIdX,#L8r01JcicBankName)
 
 ![交易代碼]
 #TranKey_Tmp=X,1,S
-#TranKey=X,1,L
+#TranKey=X,1,I
+IF(#TranKey_Tmp==7,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 
 #TranKeyX=X,4,L
-
+IF(#TranKey_Tmp==7,$,s)
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$) 
+C(5,#TranKey_Tmp,2,s,$)
+T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
 #CustId=X,10,L

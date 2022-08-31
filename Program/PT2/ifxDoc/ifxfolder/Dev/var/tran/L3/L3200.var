@@ -1416,7 +1416,7 @@ E(0,@RP_CUSTNO,#TimCustNo)
 
 ! 額度
 #TmpFacmNo=X,1,S
-C(3,#L492aFacmNo,0,E(0,@RP_FACMNO,0),E(0,@RP_FACMNO,#L492aFacmNo))
+C(3,#L492aRepayType,0,E(0,@RP_FACMNO,0),E(0,@RP_FACMNO,#L492aFacmNo))
 E(0,@SHORT_FACMNO,#L3r06ShortFacmNo)
 E(0,@RP_TMPFACMNO,#L3r06tmpFacmNo)
 T(2,@RP_TMPFACMNOX,#L3r06tmpFacmNoX)

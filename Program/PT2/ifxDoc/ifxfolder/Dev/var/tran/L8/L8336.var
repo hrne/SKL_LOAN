@@ -132,6 +132,17 @@ K(NOBUTTON,CLOSEY)
 C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@ApplyDate,1)T(F,@CloseDate,1)T(F,@CloseMark,1)T(F,@PhoneNo,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdApplyDate,*)
+T(2,@FdCloseDate,*)
+T(2,@FdCloseMark,*)
+T(2,@FdPhoneNo,*)
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -177,10 +188,12 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
-!C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@CloseDate,1)T(F,@CloseMark,1)T(F,@PhoneNo,1)T(2,@FdCloseDate,*)T(2,@FdCloseMark,*)T(2,@FdPhoneNo,*),C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CloseDate,0)T(F,@CloseMark,0)T(F,@PhoneNo,0)T(2,@FdCloseDate, )T(2,@FdCloseMark, )T(2,@FdPhoneNo, ),$))
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CloseDate,1)T(F,@CloseMark,1)T(F,@PhoneNo,1)T(2,@FdCloseDate,*)T(2,@FdCloseMark,*)T(2,@FdPhoneNo,*), )
-C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CloseDate,0)T(F,@CloseMark,0)T(F,@PhoneNo,0)T(2,@FdCloseDate, )T(2,@FdCloseMark, )T(2,@FdPhoneNo, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CloseDate,1)T(F,@CloseMark,1)T(F,@PhoneNo,1)T(2,@FdCloseDate,*)T(2,@FdCloseMark,*)T(2,@FdPhoneNo,*),$)
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CloseDate,0)T(F,@CloseMark,0)T(F,@PhoneNo,0)T(2,@FdCloseDate, )T(2,@FdCloseMark, )T(2,@FdPhoneNo, ),$)
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyDate,1)T(F,@CloseDate,1)T(F,@CloseMark,1)T(F,@PhoneNo,1),$)
+
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

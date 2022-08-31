@@ -118,6 +118,16 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@ApplyDate,1)T(F,@PayDate,1)T(F,@PayAmt,1)T(F,@TotalPayAmt,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdApplyDate,*)
+T(2,@FdPayDate,*)
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -170,14 +180,16 @@ HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
 !C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@TotalPayAmt,1),C(5,#TranKey,D,K(MODIFYBUTTON,異動)T(F,@PayAmt,0)T(F,@TotalPayAmt,0),$))
-C(5,#TranKey,C,T(F,@PayAmt,1)K(MODIFYBUTTON,異動)T(F,@TotalPayAmt,1), )
+C(5,#TranKey,C,T(F,@PayAmt,1)K(MODIFYBUTTON,異動)T(F,@TotalPayAmt,1),$)
 C(5,#TranKey,D,T(F,@PayAmt,0)K(MODIFYBUTTON,刪除)T(F,@TotalPayAmt,0),$)
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyDate,1)T(F,@PayDate,1)T(F,@PayAmt,1)T(F,@TotalPayAmt,1),$)
+
 #TranKeyX=X,4,L
+IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
-
 ![債務人IDN]
 #CustId=X,10,L
 
