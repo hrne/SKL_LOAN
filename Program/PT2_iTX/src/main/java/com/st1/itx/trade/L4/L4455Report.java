@@ -184,22 +184,6 @@ public class L4455Report extends MakeReport {
 		if (dataSize == 0) {
 			bank = "";
 			repaybank = "";
-		} else {
-//			this.info("RepayBank = " + titaVo.get("RepayBank"));
-
-//			for (CdCode tCdCode : lCdCode) {
-//
-//				if (titaVo.get("RepayBank").equals(tCdCode.getCode())) {
-//					bank = tCdCode.getItem();
-//					repaybank = titaVo.get("RepayBank");
-//				}
-//			}
-
-//			if ("999".equals(titaVo.get("RepayBank"))) {
-//				bank = "";
-//				repaybank = "";
-//			}
-
 		}
 
 		this.print(-6, 35, "扣款銀行：" + repaybank + "  " + bank);
@@ -306,20 +290,15 @@ public class L4455Report extends MakeReport {
 			this.info("BatchNo   = " + titaVo.getParam("BatchNo"));
 		}
 
-		if (L4455List.size() <= 0 && L4455List.isEmpty()) {
+		if (L4455List.size() == 0) {
 			batchno = "BATX" + titaVo.getParam("BatchNo");
 			entrydate = String.valueOf(parse.stringToInteger(titaVo.getParam("EntryDate")));
 			repaybank = titaVo.getParam("RepayBank");
-			this.info("batchno  = " + batchno);
-			this.info("entrydate = " + entrydate);
-			this.info("repaybank = " + repaybank);
-		}
-		
 
-		
-		if (L4455List.size() > 0 && !L4455List.isEmpty()) {
+		}
+
+		if (L4455List.size() > 0) {
 			int i = 0, pageCnt = 0;
-			
 
 			if (!batchno.equals(L4455List.get(i).get("BatchNo"))) {
 				batchno = L4455List.get(i).get("BatchNo");
@@ -330,21 +309,25 @@ public class L4455Report extends MakeReport {
 				entrydate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000);
 			}
 
+			this.info("repaybank old = " + L4455List.get(i).get("RepayBank"));
 			if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
 
-				if(this.getNowPage() > 1) {
+				repaybank = L4455List.get(i).get("RepayBank");
+				for (CdCode tCdCode : lCdCode) {
+					if (repaybank.equals(tCdCode.getCode())) {
+						bank = tCdCode.getItem();
+
+					}
+				}
+				this.info("repaybank new  = " + repaybank);
+				this.info("bank  = " + bank);
+				if (this.getNowPage() > 1) {
 					this.info("getNowPage  = " + this.getNowPage());
 					this.info("NowRow  = " + this.NowRow);
 					this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
 					this.newPage();
 				}
-				
-				repaybank = L4455List.get(i).get("RepayBank");			
-				for (CdCode tCdCode : lCdCode) {
-					if (repaybank.equals(tCdCode.getCode())) {
-						bank = tCdCode.getItem();
-					}
-				}				
+
 			}
 
 			if (!acctcode.equals(L4455List.get(i).get("AcctCode"))) {
@@ -457,7 +440,18 @@ public class L4455Report extends MakeReport {
 					entrydate = String.valueOf(parse.stringToInteger(L4455List.get(j).get("EntryDate")) - 19110000);
 					repaybank = L4455List.get(j).get("RepayBank");
 					acctcode = L4455List.get(j).get("AcctCode");
+					
+					for (CdCode tCdCode : lCdCode) {
+						if (repaybank.equals(tCdCode.getCode())) {
+							bank = tCdCode.getItem();
 
+						}
+					}
+					this.info("repaybank new  = " + repaybank);
+					
+					this.info("bank  = " + bank);
+					
+					
 					if (!L4455List.get(i).get("BatchNo").equals(batchno)
 							|| !String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000)
 									.equals(entrydate)

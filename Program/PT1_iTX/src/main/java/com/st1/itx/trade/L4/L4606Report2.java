@@ -93,9 +93,9 @@ public class L4606Report2 extends MakeReport {
 			this.print(0, 104, padStart(7, tL4606Vo.get("F6")));
 			this.print(0, 112, "-");
 			this.print(0, 116, padStart(3, tL4606Vo.get("F7")), "R");
-			this.print(0, 122, tL4606Vo.get("F8"));
-			this.print(0, 135, tL4606Vo.get("F9"));
-			this.print(0, 146, tL4606Vo.get("F10"));
+			this.print(0, 117, tL4606Vo.get("F8"));
+			this.print(0, 132, tL4606Vo.get("F9"));
+			this.print(0, 145, tL4606Vo.get("F10"));
 			this.print(0, 164, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11"))), "R");
 			totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 			cnt++;
@@ -126,9 +126,9 @@ public class L4606Report2 extends MakeReport {
 				"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 		this.print(1, 1,
 				"                                                                總　計：           筆              火險服務人：           人 ");
-		this.print(0, 105, String.format("%,d", times), "R");
+		this.print(0, 91, String.format("%,d", times), "R");
 //		this.print(0, 129, String.format("%,d", people), "R");
-		this.print(0, 162, String.format("%,d", totamt.intValue()), "R");
+		this.print(0, 164, String.format("%,d", totamt.intValue()), "R");
 		long sno = this.close();
 //		this.toPdf(sno);
 	}

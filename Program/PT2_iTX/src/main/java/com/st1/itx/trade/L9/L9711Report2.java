@@ -75,10 +75,6 @@ public class L9711Report2 extends MakeReport {
 		String f4 = "";
 		String f5 = "";
 		int count = 0;
-		// 製表人
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
-//		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
-//				titaVo.getTxCode().isEmpty() ? "L9711" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "inch,8.5,12", "P");
 
 		String txcd = titaVo.getTxcd();
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -91,18 +87,24 @@ public class L9711Report2 extends MakeReport {
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
-
+		this.openForm(titaVo, reportVo);
+		
 		if (L9711List.size() > 0) {
 
 			for (Map<String, String> tL9711Vo : L9711List) {
+				
+				try {
+					Thread.sleep(1 * 500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
 
 				// inputCustNo: #CUSTNO
 				// CustNo: Query.F4
 				// FacmNo: Query.F5
-
-				this.openForm(titaVo, reportVo);
-//				this.open(titaVo, reportVo);
 
 				String inputCustNo = titaVo.get("CustNo");
 				String recordCustNoString = tL9711Vo.get("F4");
@@ -111,36 +113,23 @@ public class L9711Report2 extends MakeReport {
 				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
 				this.info("recordCustNoString=" + recordCustNoString);
 				this.info("recordFacmNo=" + recordFacmNo);
+				
 				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo)) {
 					continue;
 				}
-				// 有一樣戶號額度的話 用同一張
-				if (f4.equals(tL9711Vo.get("F4")) && f5.equals(tL9711Vo.get("F5"))) {
 
-					report(tL9711Vo, txbuffer);
-					if (printtimes) {
-						count++;
-					}
+				this.info("recordCustNoString2=" + recordCustNoString);
+				this.info("recordFacmNo2=" + recordFacmNo);
+				//每次戶號額度都不一樣
+				report(tL9711Vo, txbuffer);
 
-				} else {
-					if (count != 0) {
-						this.newPage();
-						count = 0;
-					}
-					printtimes = false;
-					report(tL9711Vo, txbuffer);
-					if (printtimes) {
-						count++;
-					}
+				//
+				if (count > 0) {
+					this.newPage();
 				}
-				f4 = tL9711Vo.get("F4");
-				f5 = tL9711Vo.get("F5");
-
+				
+				count++;
 			} // for
-
-			if (count == 0) {
-				this.printCm(1, 4, "*******    查無資料   ******");
-			}
 
 		} else {
 			this.info("L9711List.reportEmpty");
@@ -150,7 +139,6 @@ public class L9711Report2 extends MakeReport {
 		long sno = this.close();
 
 		return sno;
-//		 this.toPdf(sno);
 	}
 
 	private void reportEmpty() throws LogicException {
@@ -163,8 +151,10 @@ public class L9711Report2 extends MakeReport {
 	private void report(Map<String, String> tL9711Vo, TxBuffer txbuffer) throws LogicException {
 		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
+		calaulateCount++;
 
-		this.info("筆數calaulateCount=" + calaulateCount);
+		this.info("report.count = 第" + calaulateCount + "筆");
+		this.info("report.List = " + tL9711Vo.toString());
 
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
@@ -177,13 +167,11 @@ public class L9711Report2 extends MakeReport {
 		}
 
 		this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
-		this.info("listBaTxVo-------->" + listBaTxVo.toString());
 		if (listBaTxVo.size() == 0) {
 			return;
 		}
 		// 溢短繳
 		int excessive = dBaTxCom.getExcessive().intValue() - dBaTxCom.getShortfall().intValue();
-		;
 		// 帳管費 + 契變手續費
 		int acctFee = dBaTxCom.getAcctFee().intValue() + dBaTxCom.getModifyFee().intValue();
 		double IntRate = dBaTxCom.getFitRate().doubleValue();
@@ -211,7 +199,7 @@ public class L9711Report2 extends MakeReport {
 
 		setFont(1, 14);
 
-		printCm(11, 19, "放款本息攤還表暨繳息通知單", "C");
+		printCm(10, 19, "放款本息攤還表暨繳息通知單", "C");
 
 		setFont(1, 11);
 
@@ -274,10 +262,10 @@ public class L9711Report2 extends MakeReport {
 			if (tmpCount == 7) {
 				break;
 			}
-
-			if (baTxVo.getDataKind() != 2) {
-				continue;
-			}
+			this.info("baTxVo.getDataKind()=" + baTxVo.getDataKind());
+//			if (baTxVo.getDataKind() != 2) {
+//				continue;
+//			}
 			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 
 			// 違約金
@@ -290,6 +278,18 @@ public class L9711Report2 extends MakeReport {
 			LoanBal = baTxVo.getLoanBalPaid().intValue();
 
 			UnPaidAmt = BreachAmt + Principal + Interest;
+			
+			
+			this.info("tempDateX=" + tempDate);
+			this.info("BreachAmtX=" + BreachAmt);
+			this.info("PrincipalX=" + Principal);
+			this.info("InterestX=" + Interest);
+			this.info("LoanBalX=" + LoanBal);
+			this.info("UnPaidAmtX=" + UnPaidAmt);
+			this.info("excessiveX=" + excessive);
+			this.info("acctFeeX=" + acctFee);
+
+			
 			if (UnPaidAmt == 0) {
 				continue;
 			}
@@ -389,8 +389,6 @@ public class L9711Report2 extends MakeReport {
 		}
 		printCm(4, 28, payIntAcct);
 		printCm(14, 28, payPriAcct);
-
-//		this.newPage();
 
 	}
 

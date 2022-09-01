@@ -32,7 +32,9 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("l9705.findAll");
 
 		String acctDateStart = titaVo.getParam("ACCTDATE_ST");
+		acctDateStart = acctDateStart.length() == 7 ? String.valueOf(Integer.valueOf(acctDateStart) + 19110000) : acctDateStart;
 		String acctDateEnd = titaVo.getParam("ACCTDATE_ED");
+		acctDateEnd = acctDateEnd.length() == 7 ? String.valueOf(Integer.valueOf(acctDateEnd) + 19110000) : acctDateEnd;
 		String custNoStart = titaVo.getParam("CUSTNO");
 		String custNoEnd = titaVo.getParam("CUSTNOB");
 		String condition1 = titaVo.getParam("CONDITION1");
@@ -54,8 +56,10 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,F.\"RepayCode\"          AS \"RepayCode\" ";
 		sql += "            ,C.\"EntCode\"            AS \"EntCode\"   ";
 		if ("4".equals(condition1)) {
-			sql += "            ,BATX.\"ReconCode\"            AS \"ReconCode\"   ";
-		}else {
+			sql += "            ,BATX.\"ReconCode\"             AS \"ReconCode\"   ";
+			sql += "            ,BATX.\"EntryDate\" - 19110000  AS \"EntryDate\"   ";
+			sql += "            ,BATX.\"RepayAmt\"              AS \"RepayAmt\"   ";
+		} else {
 			sql += "            ,'N'            AS \"ReconCode\"   ";
 		}
 		sql += "      FROM \"LoanBorMain\" M";

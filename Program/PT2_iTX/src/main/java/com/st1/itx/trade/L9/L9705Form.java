@@ -70,22 +70,19 @@ public class L9705Form extends MakeReport {
 
 		dBaTxCom.setTxBuffer(txbuffer);
 
-		long sno = 0;
-
 		if (l9705List.size() > 0) {
 			int count = 0;
 			int cnt = 0;
-			for (Map<String, String> tL9Vo : l9705List) {
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
+					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
 
-//				this.openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C", "存入憑條", "cm,20,9.31333", "P");
-				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-						.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
-						.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
+			for (Map<String, String> tL9Vo : l9705List) {
 
 				this.openForm(titaVo, reportVo);
 
 				count++;
-				this.info("count=" + count);
+				this.info("tran = " + tran + ",count = " + count);
 				this.info("CustNo = " + tL9Vo.get("CustNo"));
 				this.info("FacmNo = " + tL9Vo.get("FacmNo"));
 				this.info("ENTDY = " + tL9Vo.get("ENTDY"));
@@ -115,16 +112,17 @@ public class L9705Form extends MakeReport {
 					custName = tL9Vo.get("CustName");
 				}
 
-				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
+//				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
 				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 
 				dBaTxCom.setTxBuffer(txbuffer);
 
+				this.info("CustName = " + tL9Vo.get("CustName"));
+				this.info("RepayCode = " + tL9Vo.get("RepayCode"));
+
 				try {
 //
 					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
-					this.info("lBaTxVo = " + listBaTxVo.toString());
-					this.info("lBaTxVo.size = " + listBaTxVo.size());
 //					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 //					this.info("listBaTxVo = " + listBaTxVo.toString());
 //					this.info("listBaTxVo.size = " + listBaTxVo.size());
@@ -133,6 +131,8 @@ public class L9705Form extends MakeReport {
 				}
 
 				this.info("L9705Form = " + custNo + "-" + facmNo);
+				this.info("listBaTxVo.size = " + listBaTxVo.size());
+				this.info("listBaTxVo = " + listBaTxVo.toString());
 				if (listBaTxVo.size() > 0) {
 					HashMap<Integer, BigDecimal> principal = new HashMap<>();
 					HashMap<Integer, BigDecimal> interest = new HashMap<>();
@@ -191,8 +191,9 @@ public class L9705Form extends MakeReport {
 						continue;
 					}
 
-					if (cnt > 0)
-						this.newPage(true);
+					if (cnt > 0) {
+						this.newPage();
+					}
 					cnt++;
 
 					for (BaTxVo ba : listBaTxVo) {
@@ -204,11 +205,13 @@ public class L9705Form extends MakeReport {
 
 						this.info("getDataKind=" + ba.getDataKind());
 
-						// 本金、利息
-						if (ba.getDataKind() != 2) {
-							continue;
-						}
+		
 						payIntDate = ba.getPayIntDate();
+						// 本金、利息
+//						if (ba.getDataKind() != 2) {
+//							continue;
+//						}
+						
 
 //					同一日期者金額加總只顯示一筆
 						if (!flag.containsKey(payIntDate)) {
@@ -227,8 +230,11 @@ public class L9705Form extends MakeReport {
 						// -溢短繳
 						// +帳管費
 						BigDecimal bBreachAmt = breachAmt.get(payIntDate);
+						bBreachAmt = bBreachAmt == null? BigDecimal.ZERO: bBreachAmt;
 						BigDecimal bPrincipal = principal.get(payIntDate);
+						bPrincipal = bPrincipal == null? BigDecimal.ZERO: bPrincipal;
 						BigDecimal bInterest = interest.get(payIntDate);
+						bInterest = bInterest == null? BigDecimal.ZERO: bInterest;
 						BigDecimal bSummry = bBreachAmt.add(bPrincipal).add(bInterest).subtract(unPaidAmt).add(acctFee);
 						this.info("bBreachAmt ..." + bBreachAmt);
 						this.info("bPrincipal ..." + bPrincipal);
