@@ -60,10 +60,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Integer> iAchSecondSpecificDays = new ArrayList<>();
 
 		// 郵局扣款應繳日
-		int iPostSpecificDd = 0;
+		int iPostSpecificDate = 0;
 
 		// 郵局二扣應繳日
-		int iPostSecondSpecificDd = 0;
+		int iPostSecondSpecificDate = 0;
 
 		// 郵局扣款應繳日的應繳日(2碼)
 		int iPostSpecificDay = 0;
@@ -164,12 +164,12 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (Integer.parseInt(titaVo.getParam("PostSpecificDd")) > 0) {
-			iPostSpecificDd = Integer.parseInt(titaVo.getParam("PostSpecificDd")) + 19110000;
-			iPostSpecificDay = iPostSpecificDd % 100;
+			iPostSpecificDate = Integer.parseInt(titaVo.getParam("PostSpecificDd")) + 19110000;
+			iPostSpecificDay = iPostSpecificDate % 100;
 		}
 		if (Integer.parseInt(titaVo.getParam("PostSecondSpecificDd")) > 0) {
-			iPostSecondSpecificDd = Integer.parseInt(titaVo.getParam("PostSecondSpecificDd")) + 19110000;
-			iPostSecondSpecificDay = iPostSecondSpecificDd % 100;
+			iPostSecondSpecificDate = Integer.parseInt(titaVo.getParam("PostSecondSpecificDd")) + 19110000;
+			iPostSecondSpecificDay = iPostSecondSpecificDate % 100;
 		}
 		if (Integer.parseInt(titaVo.getParam("DeductDateStart")) > 0) {
 			iDeductDateStart = Integer.parseInt(titaVo.getParam("DeductDateStart")) + 19110000;
@@ -195,10 +195,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(ba.\"Status\",' ')                                     AS \"Status\" ";
 		sql += "  from \"LoanBorMain\" b ";
 		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\" ";
-		sql += "                      and f.\"FacmNo\" = b.\"FacmNo\" ";
+		sql += "                         and f.\"FacmNo\" = b.\"FacmNo\" ";
 		sql += "  left join \"BankAuthAct\" ba on ba.\"CustNo\" = b.\"CustNo\" ";
-		sql += "                      and ba.\"FacmNo\" = b.\"FacmNo\" ";
-		sql += "                  and ba.\"AuthType\" in ('00','01') ";
+		sql += "                              and ba.\"FacmNo\" = b.\"FacmNo\" ";
+		sql += "                              and ba.\"AuthType\" in ('00','01') ";
 		sql += "  left join ( ";
 		sql += "   select ";
 		sql += "    \"CustNo\" ";
@@ -208,7 +208,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"AcctCode\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"RvNo\" ASC) as seq ";
 		sql += "   from \"AcReceivable\" ";
-		sql += "   where \"RvBal\"          > 0 ";
+		sql += "   where \"RvBal\" > 0 ";
 		sql += "     and case ";
 		sql += "           when \"ReceivableFlag\" in (3, 4) "; // 銷帳科目記號 3:未收費用 4:短繳期金
 		sql += "           then 1 ";
@@ -221,6 +221,24 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  left join ( ";
 		sql += "   select ";
 		sql += "    \"CustNo\" ";
+		sql += "   ,\"FacmNo\" ";
+		sql += "   ,\"ReceivableFlag\" ";
+		sql += "   ,\"RvBal\" ";
+		sql += "   ,\"AcctCode\" ";
+		sql += "   ,NVL(JSON_VALUE(\"JsonFields\",  '$.InsuYearMonth'),0) AS \"InsuYearMonth\" ";
+		sql += "   ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by NVL(JSON_VALUE(\"JsonFields\",  '$.InsuYearMonth'),0),\"RvNo\" ASC) as seq ";
+		sql += "   from \"AcReceivable\" ";
+		sql += "   where \"RvBal\" > 0 ";
+		sql += "     and case ";
+		sql += "           when NVL(JSON_VALUE(\"JsonFields\",  '$.InsuYearMonth'),0) > 0 "; 
+		sql += "           then 1 ";
+		sql += "         else 0 end = 1 ";
+		sql += "  ) rv2 on rv2.\"CustNo\" = b.\"CustNo\" ";
+		sql += "       and rv2.\"FacmNo\" = b.\"FacmNo\" ";
+		sql += "       and rv2.seq = 1 ";
+		sql += "  left join ( ";
+		sql += "   select ";
+		sql += "    \"CustNo\" ";
 		sql += "   ,\"AuthCode\" ";
 		sql += "   ,\"PostDepCode\" ";
 		sql += "   ,\"RepayAcct\" ";
@@ -230,13 +248,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"RelAcctBirthday\" ";
 		sql += "   ,\"RelAcctGender\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
-		sql += "   from \"PostAuthLog\"           ";
-		sql += "   where \"AuthCode\"     = '1' ";
-		sql += "   ) p   on  ba.\"RepayBank\"   = '700' ";
-		sql += "                            and  p.\"CustNo\"       = ba.\"CustNo\" ";
-		sql += "                            and  p.\"PostDepCode\"  = ba.\"PostDepCode\" ";
-		sql += "                            and  p.\"RepayAcct\"    = ba.\"RepayAcct\" ";
-		sql += "                            and  p.seq = 1 ";
+		sql += "   from \"PostAuthLog\" ";
+		sql += "   where \"AuthCode\" = '1' ";
+		sql += "   ) p on ba.\"RepayBank\"   = '700' ";
+		sql += "      and  p.\"CustNo\"       = ba.\"CustNo\" ";
+		sql += "      and  p.\"PostDepCode\"  = ba.\"PostDepCode\" ";
+		sql += "      and  p.\"RepayAcct\"    = ba.\"RepayAcct\" ";
+		sql += "      and  p.seq = 1 ";
 		sql += "  left join ( ";
 		sql += "   select ";
 		sql += "    \"RepayBank\" ";
@@ -248,11 +266,12 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,\"RelAcctBirthday\" ";
 		sql += "   ,\"RelAcctGender\" ";
 		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
-		sql += "   from \"AchAuthLog\") a    on  ba.\"RepayBank\"   <> 700               ";
-		sql += "                            and  a.\"RepayBank\"    = ba.\"RepayBank\" ";
-		sql += "                            and  a.\"CustNo\"       = ba.\"CustNo\"      ";
-		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
-		sql += "                            and  a.seq = 1 ";
+		sql += "   from \"AchAuthLog\" ";
+		sql += "  ) a on ba.\"RepayBank\"   <> 700               ";
+		sql += "     and  a.\"RepayBank\"    = ba.\"RepayBank\" ";
+		sql += "     and  a.\"CustNo\"       = ba.\"CustNo\"      ";
+		sql += "     and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
+		sql += "     and  a.seq = 1 ";
 		sql += "  where b.\"Status\"= 0 ";
 		sql += "    and f.\"RepayCode\" = 2 ";
 		sql += "    and case ";
@@ -279,25 +298,25 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 郵局-條件1: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 郵局扣款應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", 'null') = '700' ";
-		sql += "               and b.\"NextPayIntDate\" <= :iPostSpecificDd  ";
+		sql += "               and b.\"NextPayIntDate\" <= :iPostSpecificDate  ";
 		sql += "               and b.\"SpecificDd\" = :iPostSpecificDay ";
 		sql += "          then 1 ";
 		// 郵局-條件2: 下繳日(8碼yyyymmdd) <= 郵局扣款應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 郵局二扣應繳日的應繳日(2碼dd)
 		sql += "          when nvl(ba.\"RepayBank\", 'null') = '700' ";
-		sql += "               and b.\"NextPayIntDate\" <= :iPostSecondSpecificDd ";
+		sql += "               and b.\"NextPayIntDate\" <= :iPostSecondSpecificDate ";
 		sql += "               and b.\"SpecificDd\" = :iPostSecondSpecificDay ";
 		sql += "          then 1 ";
 		// 郵局-條件3: 到期日(8碼yyyymmdd) <= 入帳日(8碼yyyymmdd)
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and b.\"MaturityDate\" <= :iEntryDate ";
-//		sql += "          then 1 ";
+		sql += "          then 1 ";
 		// 郵局-條件4: 下繳日(8碼yyyymmdd) = 郵局二扣應繳日(8碼yyyymmdd)
 		// ___________ 且 指定應繳日(2碼dd) = 0
-//		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
-//		sql += "               and b.\"NextPayIntDate\" = :iPostSecondSpecificDd ";
-//		sql += "               and b.\"SpecificDd\" = 0 ";
-//		sql += "          then 1 ";
+//        sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
+//        sql += "               and b.\"NextPayIntDate\" = :iPostSecondSpecificDate ";
+//        sql += "               and b.\"SpecificDd\" = 0 ";
+//        sql += "          then 1 ";
 		// RepayBank not in (null,700) = ACH
 		// ACH-條件1: 下繳日(8碼yyyymmdd) <= ACH扣款應繳日止日(8碼yyyymmdd)
 		// __________ 且 指定應繳日(2碼dd) IN ACH扣款應繳日的應繳日(2碼dd)
@@ -314,16 +333,16 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// ACH-條件3: 到期日(8碼yyyymmdd) <= 入帳日(8碼yyyymmdd)
 		sql += "          when nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"MaturityDate\" <= :iEntryDate ";
-//		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-//		sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
-//		sql += "               and b.\"SpecificDd\" = 0 ";
-//		sql += "          then 1 ";
+//        sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+//        sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
+//        sql += "               and b.\"SpecificDd\" = 0 ";
+		sql += "          then 1 ";
 		// ACH-條件4: 下繳日(8碼yyyymmdd) 在 ACH二扣應繳日的起日與止日之間
 		// __________ 且 指定應繳日(2碼dd) = 0
-//		sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-//		sql += "               and b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
-//		sql += "               and b.\"SpecificDd\" = 0 ";
-//		sql += "          then 1 ";
+//        sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
+//        sql += "               and b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
+//        sql += "               and b.\"SpecificDd\" = 0 ";
+//        sql += "          then 1 ";
 		// 郵局-費用: 費用檔有撈到就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
 		sql += "               and nvl(ba.\"RepayBank\", 'null') = '700' ";
@@ -333,6 +352,11 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
 		sql += "               and nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
+		sql += "          then 1 ";
+		// 郵局-火險: 火險到期年月等於應繳日所屬月份 且 下繳日的月份大於火險到期年月
+		sql += "          when NVL(rv2.\"InsuYearMonth\",0) > 0 ";
+		sql += "               and NVL(rv2.\"InsuYearMonth\",0) = TRUNC( :iPostSpecificDate / 100 ) ";
+		sql += "               and TRUNC( b.\"NextPayIntDate\" / 100 ) > NVL(rv2.\"InsuYearMonth\",0) ";
 		sql += "          then 1 ";
 		// 追加逾期期數
 		sql += "          when b.\"NextPayIntDate\" >= :iDeductDateStart ";
@@ -351,18 +375,18 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iDeductDateStart", iDeductDateStart);
 		query.setParameter("iDeductDateEnd", iDeductDateEnd);
 
-//		query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
+//        query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
 		query.setParameter("iAchSpecificDdTo", iAchSpecificDdTo);
 		query.setParameter("iAchSpecificDays", iAchSpecificDays);
 
-//		query.setParameter("iAchSecondSpecificDdFrom", iAchSecondSpecificDdFrom);
+//        query.setParameter("iAchSecondSpecificDdFrom", iAchSecondSpecificDdFrom);
 		query.setParameter("iAchSecondSpecificDdTo", iAchSecondSpecificDdTo);
 		query.setParameter("iAchSecondSpecificDays", iAchSecondSpecificDays);
 
-		query.setParameter("iPostSpecificDd", iPostSpecificDd);
+		query.setParameter("iPostSpecificDate", iPostSpecificDate);
 		query.setParameter("iPostSpecificDay", iPostSpecificDay);
 
-		query.setParameter("iPostSecondSpecificDd", iPostSecondSpecificDd);
+		query.setParameter("iPostSecondSpecificDate", iPostSecondSpecificDate);
 		query.setParameter("iPostSecondSpecificDay", iPostSecondSpecificDay);
 
 		if (useRepayBank)

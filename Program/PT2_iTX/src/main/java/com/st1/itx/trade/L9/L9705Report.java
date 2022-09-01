@@ -209,7 +209,7 @@ public class L9705Report extends MakeReport {
 				if (!isOpen && isOpenA3 && count == l9705List.size()) {
 					this.info("isClose");
 					isOpen = true;
-					this.close();
+					cls = this.close();
 				}
 
 			}
@@ -237,8 +237,7 @@ public class L9705Report extends MakeReport {
 					titaVo.getParam("TLRNO"),
 					titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
 		}
-		// 關閉報表
-		this.info("isClose");
+
 		
 		return cls;
 

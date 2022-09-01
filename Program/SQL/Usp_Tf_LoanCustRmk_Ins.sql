@@ -24,7 +24,17 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "LoanCustRmk" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "LoanCustRmk"
+    INSERT INTO "LoanCustRmk" (
+        "CustNo" -- 借款人戶號 DECIMAL 7 
+      , "AcDate" -- 會計日期 DECIMALD 8
+      , "RmkNo" -- 備忘錄序號 DECIMAL 3 
+      , "RmkCode" -- 備忘錄代碼 VARCHAR2 3
+      , "RmkDesc" -- 備忘錄說明 NVARCHAR2 120 
+      , "CreateDate" -- 建檔日期時間 DATE  
+      , "CreateEmpNo" -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate" -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
          , S1."TRXDAT"                    AS "AcDate"              -- 會計日期 DECIMALD 8
          , S1."DOCSEQ"                    AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 

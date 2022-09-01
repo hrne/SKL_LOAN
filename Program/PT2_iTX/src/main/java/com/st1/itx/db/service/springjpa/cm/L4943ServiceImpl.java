@@ -104,11 +104,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,BDD.\"ReturnCode\"  AS \"ReturnCode\"                   ";
 			sql += " ,BDD.\"MediaKind\"   AS \"MediaKind\"                    ";
 			sql += " ,BDD.\"AmlRsp\"      AS \"AmlRsp\"                       ";
-			if (functionCode == 2) {
+			if (functionCode == 10) {
 				sql += " ,TX.\"TempAmt\"  AS \"TxTempAmt\"                    ";
-				sql += " ,case when TX.\"ShortAmt\" > 0 then 0 - \"ShortAmt\" ";
-				sql += " ,     else TX.\"OverAmt\"  end AS \"OverShort\"      ";
-				sql += " ,     end        AS \"OverShort\"                    ";
+				sql += " ,TX.\"OverAmt\"  - \"ShortAmt\"   AS \"OverShort\"   " ;
 			}
 			sql += " from \"BankDeductDtl\" BDD                               ";
 
@@ -139,7 +137,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ,\"TitaTlrNo\"                                       ";
 			sql += "     ,\"TitaTxtNo\"                                       ";
 			sql += "     ,SUM(Case when \"AcSeq\" = 1 then \"TempAmt\" else 0 end) as  \"TempAmt\"  ";
-			sql += "     ,SUM(\"Overflow\"-\"TempAmt\") as \"OverAmt\"        ";
+			sql += "     ,SUM(Case when \"AcSeq\" = 1 then \"Overflow\" else \"Overflow\"-\"TempAmt\" end) as \"OverAmt\" ";
 			sql += "     ,SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\" + \"UnpaidCloseBreach\") as \"ShortAmt\" ";
 			sql += "     from \"LoanBorTx\"                                   ";
 			sql += "     where \"RepayCode\" = 2                              ";

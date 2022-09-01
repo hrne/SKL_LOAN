@@ -19,7 +19,31 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "InnDocRecord" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "InnDocRecord"
+    INSERT INTO "InnDocRecord"(
+        "CustNo" -- 借款人戶號 DECIMAL 7 0
+      , "FacmNo" -- 額度號碼 DECIMAL 3 0
+      , "ApplSeq" -- 申請序號 VARCHAR2 3 0
+      , "TitaActFg" -- 登放記號 VARCHAR2 1 0
+      , "ApplCode" -- 申請或歸還 VARCHAR2 1 0
+      , "ApplEmpNo" -- 借閱人 VARCHAR2 6 0
+      , "KeeperEmpNo" -- 管理人 VARCHAR2 6 0
+      , "UsageCode" -- 用途 VARCHAR2 2 0
+      , "CopyCode" -- 正本/影本 VARCHAR2 1 0
+      , "ApplDate" -- 借閱日期 DecimalD 8 0
+      , "ReturnDate" -- 歸還日期 DecimalD 8 0
+      , "ReturnEmpNo" -- 歸還人 VARCHAR2 6 0
+      , "Remark" -- 備註 NVARCHAR2 60 0
+      , "ApplObj" -- 借閱項目 VARCHAR2 1 0
+      , "TitaEntDy" -- 登錄日期 DecimalD 8 0
+      , "TitaTlrNo" -- 登錄經辦 VARCHAR2 6 0
+      , "TitaTxtNo" -- 登錄交易序號 DECIMAL 8 0
+      , "JsonFields" -- JsonFields
+      , "FacmNoMemo" -- 額度備註 NVARCHAR2 20
+      , "CreateDate" -- 建檔日期時間 DATE  
+      , "CreateEmpNo" -- 建檔人員 VARCHAR2 6 
+      , "LastUpdate" -- 最後更新日期時間 DATE  
+      , "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT "LN$DOCP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LN$DOCP"."LMSAPN"             AS "FacmNo"              -- 額度號碼 DECIMAL 3 0
           ,LPAD(
@@ -65,8 +89,9 @@ BEGIN
           ,''                             AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
           ,0                              AS "TitaTxtNo"           -- 登錄交易序號 DECIMAL 8 0
           ,'{"DOCEMN":"'
-          || TRIM("LN$DOCP"."DOCEMN")
-          ||'"}'                           AS "JsonFields"          -- JsonFields
+           || TRIM("LN$DOCP"."DOCEMN")
+           ||'"}'                         AS "JsonFields"          -- JsonFields
+          ,''                             AS "FacmNoMemo"          -- 額度備註 NVARCHAR2 20
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
