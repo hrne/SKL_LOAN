@@ -72,14 +72,16 @@ public class L9705Form extends MakeReport {
 
 		if (l9705List.size() > 0) {
 			int count = 0;
-			int cnt = 0;
+//			int cnt = 0;
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
 					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
+			this.openForm(titaVo, reportVo);
 
 			for (Map<String, String> tL9Vo : l9705List) {
-
-				this.openForm(titaVo, reportVo);
+				if (count > 0) {
+					this.newPage();
+				}
 
 				count++;
 				this.info("tran = " + tran + ",count = " + count);
@@ -116,9 +118,6 @@ public class L9705Form extends MakeReport {
 				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 
 				dBaTxCom.setTxBuffer(txbuffer);
-
-				this.info("CustName = " + tL9Vo.get("CustName"));
-				this.info("RepayCode = " + tL9Vo.get("RepayCode"));
 
 				try {
 //
@@ -186,15 +185,17 @@ public class L9705Form extends MakeReport {
 							acctFee = acctFee.add(ba.getUnPaidAmt());
 						}
 					}
-					// 無計息資料
-					if (payIntDate == 0) {
-						continue;
-					}
 
-					if (cnt > 0) {
-						this.newPage();
-					}
-					cnt++;
+					this.info("ba.payIntDate before = " + payIntDate);
+					// 無計息資料
+//					if (payIntDate == 0) {
+//						continue;
+//					}
+//					this.info("ba.payIntDate after = " + payIntDate);
+//					if (cnt > 0) {
+//						this.newPage();
+//					}
+//					cnt++;
 
 					for (BaTxVo ba : listBaTxVo) {
 						this.info("getCustNo=" + ba.getCustNo());
@@ -205,13 +206,11 @@ public class L9705Form extends MakeReport {
 
 						this.info("getDataKind=" + ba.getDataKind());
 
-		
 						payIntDate = ba.getPayIntDate();
 						// 本金、利息
 //						if (ba.getDataKind() != 2) {
 //							continue;
 //						}
-						
 
 //					同一日期者金額加總只顯示一筆
 						if (!flag.containsKey(payIntDate)) {
@@ -230,11 +229,11 @@ public class L9705Form extends MakeReport {
 						// -溢短繳
 						// +帳管費
 						BigDecimal bBreachAmt = breachAmt.get(payIntDate);
-						bBreachAmt = bBreachAmt == null? BigDecimal.ZERO: bBreachAmt;
+						bBreachAmt = bBreachAmt == null ? BigDecimal.ZERO : bBreachAmt;
 						BigDecimal bPrincipal = principal.get(payIntDate);
-						bPrincipal = bPrincipal == null? BigDecimal.ZERO: bPrincipal;
+						bPrincipal = bPrincipal == null ? BigDecimal.ZERO : bPrincipal;
 						BigDecimal bInterest = interest.get(payIntDate);
-						bInterest = bInterest == null? BigDecimal.ZERO: bInterest;
+						bInterest = bInterest == null ? BigDecimal.ZERO : bInterest;
 						BigDecimal bSummry = bBreachAmt.add(bPrincipal).add(bInterest).subtract(unPaidAmt).add(acctFee);
 						this.info("bBreachAmt ..." + bBreachAmt);
 						this.info("bPrincipal ..." + bPrincipal);
@@ -286,6 +285,7 @@ public class L9705Form extends MakeReport {
 
 						break;
 					} // loop -- batxCom
+
 				}
 
 			}

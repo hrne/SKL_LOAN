@@ -72,8 +72,6 @@ public class L9711Report2 extends MakeReport {
 
 		this.info("L9711Report2 exec");
 		ENTDY = String.valueOf(Integer.parseInt(titaVo.getParam("ENTDY").toString()));
-		String f4 = "";
-		String f5 = "";
 		int count = 0;
 
 		String txcd = titaVo.getTxcd();
@@ -92,6 +90,10 @@ public class L9711Report2 extends MakeReport {
 		if (L9711List.size() > 0) {
 
 			for (Map<String, String> tL9711Vo : L9711List) {
+				
+				if (count > 0) {
+					this.newPage();
+				}
 				
 				try {
 					Thread.sleep(1 * 500);
@@ -124,9 +126,7 @@ public class L9711Report2 extends MakeReport {
 				report(tL9711Vo, txbuffer);
 
 				//
-				if (count > 0) {
-					this.newPage();
-				}
+
 				
 				count++;
 			} // for

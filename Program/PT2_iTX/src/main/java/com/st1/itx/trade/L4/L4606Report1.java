@@ -179,8 +179,8 @@ public class L4606Report1 extends MakeReport {
 			i++;
 			if (i == listL4606.size()) {
 				this.print(1, 1, "                                                                小　計：           筆");
-				this.print(0, 81, String.format("%,d", times), "R");
-				this.print(0, 138, String.format("%,d", amt.intValue()), "R");
+				this.print(0, 91, String.format("%,d", times), "R");
+				this.print(0, 164, String.format("%,d", amt.intValue()), "R");
 				this.print(1, 1,
 						"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 				total = total + times;
