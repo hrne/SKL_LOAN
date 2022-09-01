@@ -1694,9 +1694,9 @@ public class L3420 extends TradeBuffer {
 		acDetail.setDbCr("C");
 		acDetail.setAcctCode("IOP");
 		acDetail.setTxAmt(wkCloseBreachAmt.subtract(wkShortCloseBreach));// 回收短繳另外出帳
-		acDetail.setCustNo(iCustNo);
-		acDetail.setFacmNo(iFacmNo);
-		acDetail.setBormNo(iBormNo);
+		acDetail.setCustNo(wkCustNo);
+		acDetail.setFacmNo(wkFacmNo);
+		acDetail.setBormNo(wkBormNo);
 		lAcDetail.add(acDetail);
 
 		// 累溢收入帳(暫收貸)

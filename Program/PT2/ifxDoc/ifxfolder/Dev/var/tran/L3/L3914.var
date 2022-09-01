@@ -219,7 +219,7 @@ C(4,#ApplNo,$,T(2,#ApplNoX))
 #AcDate=D,7,I
 E(0,#SYSDATE/100)
 E(0,#AcDate*100+1)
-C(3,#CHAIN,1,s,$)
+!C(3,#CHAIN,1,s,$)
 @A(DATE,0,#AcDate)
 
 
@@ -238,9 +238,9 @@ E(0,#EntryDate*100+1)
 C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
 
-
-#CHAINXMT=X,1,S
-C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+!點掉,被連動時不要自動送出交易
+!#CHAINXMT=X,1,S
+!C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

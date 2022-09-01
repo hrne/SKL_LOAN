@@ -53,6 +53,7 @@ public class L9711Report2 extends MakeReport {
 	String ENTDY = "";
 	Boolean printtimes = false;
 	int calaulateCount = 0;
+	String txcdW = "";
 
 	@Override
 	public void printHeader() {
@@ -75,6 +76,7 @@ public class L9711Report2 extends MakeReport {
 		int count = 0;
 
 		String txcd = titaVo.getTxcd();
+		txcdW = txcd;
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String reportItem = "放款本息攤還表暨繳息通知單";
@@ -86,22 +88,22 @@ public class L9711Report2 extends MakeReport {
 				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 		this.openForm(titaVo, reportVo);
-		
+
 		if (L9711List.size() > 0) {
 
 			for (Map<String, String> tL9711Vo : L9711List) {
-				
+
 				if (count > 0) {
 					this.newPage();
 				}
-				
+
 				try {
 					Thread.sleep(1 * 500);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 				// 確認 CustNoticeCom 檢查是否能產出郵寄通知
 
 				// inputCustNo: #CUSTNO
@@ -115,19 +117,18 @@ public class L9711Report2 extends MakeReport {
 				int recordFacmNo = parse.stringToInteger(recordFacmNoString);
 				this.info("recordCustNoString=" + recordCustNoString);
 				this.info("recordFacmNo=" + recordFacmNo);
-				
+
 				if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L9711", titaVo)) {
 					continue;
 				}
 
 				this.info("recordCustNoString2=" + recordCustNoString);
 				this.info("recordFacmNo2=" + recordFacmNo);
-				//每次戶號額度都不一樣
+				// 每次戶號額度都不一樣
 				report(tL9711Vo, txbuffer);
 
 				//
 
-				
 				count++;
 			} // for
 
@@ -278,8 +279,7 @@ public class L9711Report2 extends MakeReport {
 			LoanBal = baTxVo.getLoanBalPaid().intValue();
 
 			UnPaidAmt = BreachAmt + Principal + Interest;
-			
-			
+
 			this.info("tempDateX=" + tempDate);
 			this.info("BreachAmtX=" + BreachAmt);
 			this.info("PrincipalX=" + Principal);
@@ -289,7 +289,6 @@ public class L9711Report2 extends MakeReport {
 			this.info("excessiveX=" + excessive);
 			this.info("acctFeeX=" + acctFee);
 
-			
 			if (UnPaidAmt == 0) {
 				continue;
 			}
@@ -334,22 +333,36 @@ public class L9711Report2 extends MakeReport {
 		l++;
 		y = top + yy + (++l) * h;
 
-		printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
-		y = top + yy + (++l) * h;
-		printCm(1, y, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
-		if (tL9711Vo.get("F8").equals("0")) {
+		if ("L9710".equals(txcdW)) {
+			printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
+
 			y = top + yy + (++l) * h;
-			printCm(1, y, "＊＊本額度自　　　年　　月　　日起本利均攤");
+
+			printCm(1, y, "＊＊本額度自  " + showDate(tL9711Vo.get("F8"), 2) + "起本利均攤");
+
 			y = top + yy + (++l) * h;
-			printCm(1, y, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
-		} else {
+			printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
+
+		} else if ("L9711".equals(txcdW)) {
+
+			printCm(1, y, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 			y = top + yy + (++l) * h;
-			printCm(1, y, "　　貴戶所貸上列款項。於　" + showDate(tL9711Vo.get("F8"), 2) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+			printCm(1, y, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
+			if (tL9711Vo.get("F8").equals("0")) {
+				y = top + yy + (++l) * h;
+				printCm(1, y, "＊＊本額度自　　　年　　月　　日起本利均攤");
+				y = top + yy + (++l) * h;
+				printCm(1, y, "　　貴戶所貸上列款項。於　　　年　　月　　日到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+			} else {
+				y = top + yy + (++l) * h;
+				printCm(1, y, "　　貴戶所貸上列款項。於　" + showDate(tL9711Vo.get("F8"), 2) + "到期，請依約到本公司辦理清償或展期手續，請勿延誤");
+			}
+
+			// SQL尚缺分行代號
+			y = top + yy + (++l) * h;
+			printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 		}
 
-		// SQL尚缺分行代號
-		y = top + yy + (++l) * h;
-		printCm(1, y, "＊＊新光銀行城內分行代號： 1030116");
 //		tmp = tL9711Vo.get("F3");
 //		if (tmp == null) {
 //			tmp = "";

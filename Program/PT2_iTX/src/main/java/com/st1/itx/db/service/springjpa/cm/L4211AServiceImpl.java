@@ -43,102 +43,186 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 		this.info("ReconCode     = " + inputReconCode);
 		this.info("DATEENTDY     = " + inputAcDate);
 		// 匯款總傳票明細表
-		String sql = " WITH TX1 AS (";
-		sql += "   SELECT \"AcDate\"";
-		sql += "        , \"TitaTlrNo\"";
-		sql += "        , \"TitaTxtNo\"";
-		sql += "        , \"TitaTxCd\" ";
-		sql += "        , \"CustNo\" ";
-		sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
-		sql += "   FROM \"LoanBorTx\"";
-		sql += "   WHERE \"AcDate\" = :inputAcDate";
-		sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
-		sql += "    AND TO_NUMBER(SUBSTR(\"TitaTxtNo\",1,2)) > 0"; // 整批入帳(交易序號前兩碼為批號後兩碼)
-		sql += "   GROUP BY \"CustNo\"";
-		sql += "          , \"AcDate\"";
-		sql += "          , \"TitaTlrNo\"";
-		sql += "          , \"TitaTxtNo\"";
-		sql += "          , \"TitaTxCd\" ";
-		sql += " )";
-		sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
-		sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
-		sql += "    , BATX.\"EntryDate\" ";// 匯款日
-		sql += "    , BATX.\"DetailSeq\""; // 匯款序號
-		sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
-		sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
-		sql += "    , TX2.\"TxAmt\""; // 匯款金額
-		sql += "    , TX2.\"Principal\"";
-		sql += "      + TX2.\"Interest\"";
-		sql += "      + TX2.\"DelayInt\"";
-		sql += "      + TX2.\"BreachAmt\"";
-		sql += "      + TX2.\"CloseBreachAmt\"";
-		sql += "      + (TX2.\"Overflow\"";
-		sql += "      - TX2.\"TempAmt\")";
-		sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-		sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
-		sql += "      || '-'";
-		sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
-		sql += "      || '-'";
-		sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustNo\"";// 戶號
-		sql += "    , CM.\"CustName\""; // 戶名
-		sql += "    , TX2.\"IntStartDate\""; // 計息起日
-		sql += "    , TX2.\"IntEndDate\""; // 計息迄日
-		sql += "    , TX2.\"Principal\""; // 本金(A) 需扣短繳(JSON)
-		sql += "    , TX2.\"Interest\""; // 利息(B) 需扣短繳(JSON)
-		sql += "    , 0 AS \"TempPayAmt\" ";// 暫付款(C) TODO:待確認來源
-		sql += "    , TX2.\"DelayInt\"";
-		sql += "      + TX2.\"BreachAmt\"";
-		sql += "      + TX2.\"CloseBreachAmt\" AS \"BreachAmt\""; // 違約金(D)
-		sql += "    , TX2.\"TempAmt\"   AS \"TempDr\""; // 暫收借(E)
-		sql += " 	, TX2.\"Overflow\" AS \"TempCr\" ";// 暫收貸(F)
-		sql += "    , TX2.\"UnpaidPrincipal\" + TX2.\"UnpaidInterest\" AS \"Shortfall\" "; // 短繳(G)
-		sql += "    , TX2.\"FeeAmt\" AS \"Fee\""; // 帳管費及其他(H)
-		sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
-		sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
-		sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
-		sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
-		sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
-		sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
-		sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
-		sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
-		sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-		sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),fac.\"AdvanceCloseCode\"),2,0) AS \"CloseReasonCode\" ";
-		sql += " FROM \"BatxDetail\" BATX";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
-		sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
-		sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
-		sql += "            AND SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";
-		
-		//總傳票
+		String sql = " ";
+
+		// 總傳票
 		if (reportNo == 1) {
-			
+
+			sql += " WITH TX1 AS (";
+			sql += "   SELECT \"AcDate\"";
+			sql += "        , \"TitaTlrNo\"";
+			sql += "        , \"TitaTxtNo\"";
+			sql += "        , \"TitaTxCd\" ";
+			sql += "        , \"CustNo\" ";
+			sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
+			sql += "   FROM \"LoanBorTx\"";
+			sql += "   WHERE \"AcDate\" = :inputAcDate";
+			sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
+			sql += "    AND TO_NUMBER(SUBSTR(\"TitaTxtNo\",1,2)) > 0"; // 整批入帳(交易序號前兩碼為批號後兩碼)
+			sql += "   GROUP BY \"CustNo\"";
+			sql += "          , \"AcDate\"";
+			sql += "          , \"TitaTlrNo\"";
+			sql += "          , \"TitaTxtNo\"";
+			sql += "          , \"TitaTxCd\" ";
+			sql += " )";
+			sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+			sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
+			sql += "    , BATX.\"EntryDate\" ";// 匯款日
+			sql += "    , BATX.\"DetailSeq\""; // 匯款序號
+			sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
+			sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
+			sql += "    , TX2.\"TxAmt\""; // 匯款金額
+			sql += "    , TX2.\"Principal\"";
+			sql += "      + TX2.\"Interest\"";
+			sql += "      + TX2.\"DelayInt\"";
+			sql += "      + TX2.\"BreachAmt\"";
+			sql += "      + TX2.\"CloseBreachAmt\"";
+			sql += "      + (TX2.\"Overflow\"";
+			sql += "      - TX2.\"TempAmt\")";
+			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
+			sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
+			sql += "      || '-'";
+			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
+			sql += "      || '-'";
+			sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustNo\"";// 戶號
+			sql += "    , CM.\"CustName\""; // 戶名
+			sql += "    , TX2.\"IntStartDate\""; // 計息起日
+			sql += "    , TX2.\"IntEndDate\""; // 計息迄日
+			sql += "    , TX2.\"Principal\""; // 本金(A) 需扣短繳(JSON)
+			sql += "    , TX2.\"Interest\""; // 利息(B) 需扣短繳(JSON)
+			sql += "    , 0 AS \"TempPayAmt\" ";// 暫付款(C) TODO:待確認來源
+			sql += "    , TX2.\"DelayInt\"";
+			sql += "      + TX2.\"BreachAmt\"";
+			sql += "      + TX2.\"CloseBreachAmt\" AS \"BreachAmt\""; // 違約金(D)
+			sql += "    , TX2.\"TempAmt\"   AS \"TempDr\""; // 暫收借(E)
+			sql += " 	, TX2.\"Overflow\" AS \"TempCr\" ";// 暫收貸(F)
+			sql += "    , TX2.\"UnpaidPrincipal\" + TX2.\"UnpaidInterest\" AS \"Shortfall\" "; // 短繳(G)
+			sql += "    , TX2.\"FeeAmt\" AS \"Fee\""; // 帳管費及其他(H)
+			sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
+			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
+			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
+			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
+			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
+			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
+			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
+			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
+			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
+			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),fac.\"AdvanceCloseCode\"),2,0) AS \"CloseReasonCode\" ";
+			sql += " FROM \"BatxDetail\" BATX";
+			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
+			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
+			sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
+			sql += "            AND SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";
 			sql += "            AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
+			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
+			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
+			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
+			sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
+			sql += "            AND TX2.\"TxAmt\" > 0";
+			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
+			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
+			sql += "                      AND TX2.\"FacmNo\" > 0";
+			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
+			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
+			sql += " AND CASE";
+			sql += "       WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
+			sql += "       THEN :inputReconCode";
+			sql += "     ELSE BATX.\"ReconCode\" ";
+			sql += "     END = BATX.\"ReconCode\"";
+			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
+			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
+			sql += "                           , '6' "; // 批次入帳
+			sql += "                           , '7') ";// 轉暫收
 
 		} else {
-
+			//入帳後檢核明細表
+			sql += " WITH TX1 AS (";
+			sql += "   SELECT \"AcDate\"";
+			sql += "        , \"TitaTlrNo\"";
+			sql += "        , \"TitaTxtNo\"";
+			sql += "        , \"TitaTxCd\" ";
+			sql += "        , \"CustNo\" ";
+			sql += "        , Max(\"FacmNo\")           AS \"FacmNo\"";
+			sql += "   FROM \"LoanBorTx\"";
+			sql += "   WHERE \"AcDate\" = :inputAcDate";
+			sql += "    AND \"RepayCode\" = '01'"; // 匯款轉帳
+			sql += "   GROUP BY \"CustNo\"";
+			sql += "          , \"AcDate\"";
+			sql += "          , \"TitaTlrNo\"";
+			sql += "          , \"TitaTxtNo\"";
+			sql += "          , \"TitaTxCd\" ";
+			sql += " )";
+			sql += " SELECT BATX.\"ReconCode\" ";// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
+			sql += "    , BATX.\"BatchNo\""; // 批次號碼(表頭)
+			sql += "    , BATX.\"EntryDate\" ";// 匯款日
+			sql += "    , BATX.\"DetailSeq\""; // 匯款序號
+			sql += "    , BATX.\"RepayAmt\" "; // 匯款金額（排序用）
+			sql += "    , TX2.\"AcSeq\" AS \"AcSeq\" ";
+			sql += "    , TX2.\"TxAmt\""; // 匯款金額
+			sql += "    , TX2.\"Principal\"";
+			sql += "      + TX2.\"Interest\"";
+			sql += "      + TX2.\"DelayInt\"";
+			sql += "      + TX2.\"BreachAmt\"";
+			sql += "      + TX2.\"CloseBreachAmt\"";
+			sql += "      + (TX2.\"Overflow\"";
+			sql += "      - TX2.\"TempAmt\")";
+			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
+			sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
+			sql += "      || '-'";
+			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
+			sql += "      || '-'";
+			sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustNo\"";// 戶號
+			sql += "    , CM.\"CustName\""; // 戶名
+			sql += "    , TX2.\"IntStartDate\""; // 計息起日
+			sql += "    , TX2.\"IntEndDate\""; // 計息迄日
+			sql += "    , TX2.\"Principal\""; // 本金(A) 需扣短繳(JSON)
+			sql += "    , TX2.\"Interest\""; // 利息(B) 需扣短繳(JSON)
+			sql += "    , 0 AS \"TempPayAmt\" ";// 暫付款(C) TODO:待確認來源
+			sql += "    , TX2.\"DelayInt\"";
+			sql += "      + TX2.\"BreachAmt\"";
+			sql += "      + TX2.\"CloseBreachAmt\" AS \"BreachAmt\""; // 違約金(D)
+			sql += "    , TX2.\"TempAmt\"   AS \"TempDr\""; // 暫收借(E)
+			sql += " 	, TX2.\"Overflow\" AS \"TempCr\" ";// 暫收貸(F)
+			sql += "    , TX2.\"UnpaidPrincipal\" + TX2.\"UnpaidInterest\" AS \"Shortfall\" "; // 短繳(G)
+			sql += "    , TX2.\"FeeAmt\" AS \"Fee\""; // 帳管費及其他(H)
+			sql += "    , TX2.\"AcDate\" ";// 除錯時查資料用欄位
+			sql += "    , TX2.\"TitaTlrNo\" ";// 除錯時查資料用欄位
+			sql += "    , TX2.\"TitaTxtNo\""; // 除錯時查資料用欄位
+			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
+			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
+			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
+			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
+			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
+			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
+			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),fac.\"AdvanceCloseCode\"),2,0) AS \"CloseReasonCode\" ";
+			sql += " FROM \"BatxDetail\" BATX";
+			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
+			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
+			sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
+			sql += "            AND TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
 			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";
+			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
+			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
+			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
+			sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
+			sql += "            AND TX2.\"TxAmt\" > 0";
+			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
+			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
+			sql += "                      AND TX2.\"FacmNo\" > 0";
+			sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
+			sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
+			sql += " AND CASE";
+			sql += "       WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
+			sql += "       THEN :inputReconCode";
+			sql += "     ELSE BATX.\"ReconCode\" ";
+			sql += "     END = BATX.\"ReconCode\"";
+			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
+			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
+			sql += "                           , '6' "; // 批次入帳
+			sql += "                           , '7') ";// 轉暫收
+
 
 		}
-
-		sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
-		sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
-		sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
-		sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
-		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
-		sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
-		sql += "                      AND TX2.\"FacmNo\" > 0";
-		sql += " WHERE BATX.\"AcDate\" = :inputAcDate";
-		sql += " AND SUBSTR(BATX.\"BatchNo\",1,4) = 'BATX'     ";
-		sql += " AND CASE";
-		sql += "       WHEN NVL(TRIM( :inputReconCode ),' ') != ' ' ";// 輸入空白時查全部
-		sql += "       THEN :inputReconCode";
-		sql += "     ELSE BATX.\"ReconCode\" ";
-		sql += "     END = BATX.\"ReconCode\"";
-		sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
-		sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
-		sql += "                           , '6' "; // 批次入帳
-		sql += "                           , '7') ";// 轉暫收
-
 		this.info("sql=" + sql);
 		Query query;
 

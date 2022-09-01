@@ -18,6 +18,10 @@ BEGIN
     -- 記錄程式起始時間
     JOB_START_TIME := SYSTIMESTAMP;
 
+    DECLARE
+      "DateStart" DECIMAL(8) := 201901;
+    BEGIN
+
     -- 刪除舊資料
     EXECUTE IMMEDIATE 'ALTER TABLE "BankDeductDtl" DISABLE PRIMARY KEY CASCADE';
     EXECUTE IMMEDIATE 'TRUNCATE TABLE "BankDeductDtl" DROP STORAGE';
@@ -183,6 +187,7 @@ BEGIN
                  AND MBK."MBKTRX" = '1' -- 火險費
             THEN 0
           ELSE 1 END = 1
+      AND MBK."TRXIDT" > = "DateStart"
     ;
 
     -- 記錄寫入筆數
@@ -352,6 +357,7 @@ BEGIN
                        AND ADM."IntEndDate" = MBK."TRXIED"
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = MBK."CHGEMP"
     -- WHERE NVL(MBK.MBKCDE,' ') = 'Y'
+    WHERE MBK."TRXIDT" > = "DateStart"
     ;
 
     -- 記錄寫入筆數
@@ -360,6 +366,8 @@ BEGIN
     JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
+
+    END;
 
     -- 例外處理
     Exception

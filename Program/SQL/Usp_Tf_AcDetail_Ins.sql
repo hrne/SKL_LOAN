@@ -87,18 +87,203 @@ BEGIN
              ) AS "Seq"
       FROM txRawData
     )
+    , F1 AS (
+      SELECT "OverdueDate"
+           , SUM("Fee") AS "DailyFeeTotal"
+      FROM "ForeclosureFee"
+      WHERE "OverdueDate" > 0
+      GROUP BY "OverdueDate"
+    )
+    , FF AS (
+      SELECT F0."CustNo"
+           , F0."FacmNo"
+           , F0."RecordNo"
+           , F0."OverdueDate"
+           , F0."Fee"
+           , F1."DailyFeeTotal"
+      FROM "ForeclosureFee" F0
+      LEFT JOIN F1 ON F1."OverdueDate" = F0."OverdueDate"
+      WHERE F0."OverdueDate" > 0
+    )
+    , ACN AS (
+      SELECT "LMSACN"
+            ,"LMSAPN1"
+            ,"LMSASQ1"
+            ,MAX(CASE
+                   WHEN "LMSAPN" = "LMSAPN1" THEN 1
+                 ELSE 0 END) AS "IsSameFac"
+      FROM "LNACNP"
+      GROUP BY "LMSACN"
+              ,"LMSAPN1"
+              ,"LMSASQ1"
+    )
+    , TR AS (
+      SELECT TR1."TRXDAT"
+            ,TR1."TRXNMT"
+            ,TR1."TRXTRN"
+            ,TR1."ACTACT"
+            ,TR1."LMSACN"
+            ,TR1."LMSAPN"
+            ,TR1."LMSASQ"
+            ,TR1."TRXAMT"
+            ,TR1."TRXMEM"
+            ,MAX(CASE
+                   WHEN TR1."TRXTCT" IS NOT NULL
+                   THEN CASE
+                         --  WHEN TR1."TRXTCT" = '1' AND NVL(NOD."LMSACN",0) <> 0 THEN '2'
+                          WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1
+                                                  THEN '2'
+                          WHEN TR1."TRXTCT" = '1' THEN '1'
+                          WHEN TR1."TRXTCT" = '2' THEN '3'
+                          WHEN TR1."TRXTCT" = '3' THEN '4'
+                          WHEN TR1."TRXTCT" = '4' THEN '5'
+                          WHEN TR1."TRXTCT" = '5' THEN '6'
+                          WHEN TR1."TRXTCT" = '6' THEN '7'
+                        ELSE TR1."TRXTCT" END
+                 ELSE '' END) AS "TRXTCT"
+      FROM "LA$TRXP" TR1
+      LEFT JOIN ACN ON ACN."LMSACN" = TR1."LMSACN"
+                   AND ACN."LMSAPN1" = TR1."LMSAPN"
+                   AND ACN."LMSASQ1" = TR1."LMSASQ"
+      WHERE TR1."LMSACN" <> 0
+        AND TR1."TRXDAT" > 20190101
+      GROUP BY TR1."TRXDAT"
+              ,TR1."TRXNMT"
+              ,TR1."TRXTRN"
+              ,TR1."ACTACT"
+              ,TR1."LMSACN"
+              ,TR1."LMSAPN"
+              ,TR1."LMSASQ"
+              ,TR1."TRXAMT"
+              ,TR1."TRXMEM"
+    )
+    , S4 AS (
+      SELECT TR."TRXDAT"
+             ,TR."TRXNMT"
+             ,TR."TRXTRN"
+             ,TR."ACTACT"
+             ,TR."LMSACN"
+             ,TR."LMSAPN"
+             ,TR."LMSASQ"
+             ,TR."TRXAMT"
+             ,TR."TRXTCT"
+             ,TR."TRXMEM"
+             ,CASE
+                WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'D' THEN 'C'
+                WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'C' THEN 'D'
+              ELSE ATF."DbCr" END AS "DbCr"
+             ,ATF."DbCr"  AS "OriDbCr"
+             ,ATF."ACNACC"
+             ,ATF."ACNACS"
+             ,ATF."ACNASS"
+      FROM  TR
+      LEFT JOIN ATF ON ATF."TRXTRN" = TR."TRXTRN"
+                   AND ATF."ACTACT" = TR."ACTACT"
+    )
+    , S AS (
+      SELECT DISTINCT
+             S1."TRXDAT"
+            ,S1."TRXNMT"
+            ,S1."JLNVNO"
+            ,S1."CUSBRH"
+            ,S1."TRXATP"
+            ,S1."JLNAMT"
+            ,S1."JLNCRC"
+            ,S1."BSTBTN"
+            ,S1."TRXTRN"
+            ,S1."TRXNTX"
+            ,S5."AcNoCode"
+            ,S5."AcSubCode"
+            ,S5."AcDtlCode"
+            ,S5."AcctCode"
+            ,S5."AcctFlag"
+            ,S5."ReceivableFlag"
+            ,S5."AcBookFlag"
+            ,S4."TRXTCT"
+            ,S4."TRXMEM"
+            ,NVL(S4."LMSACN",FF."CustNo") AS "LMSACN"
+            ,NVL(S4."LMSAPN",FF."FacmNo") AS "LMSAPN"
+            ,NVL(S4."LMSASQ",0) AS "LMSASQ"
+            ,NVL(S4."TRXAMT",FF."Fee") AS "TRXAMT"
+            ,FF."RecordNo"
+      FROM "LA$JLNP" S1
+      LEFT JOIN "LA$JLNP" S2 ON S2."TRXDAT" = S1."TRXDAT"
+                            AND S2."JLNOVN" = S1."JLNVNO" -- 串取訂正資料
+                            AND S2."JLNVNO" = 0
+      LEFT JOIN "TB$LCDP" S3 ON S3."ACNACC" = S1."ACNACC"
+                            AND NVL(S3."ACNACS",' ') = NVL(S1."ACNACS",' ')
+                            AND NVL(S3."ACNASS",' ') = NVL(S1."ACNASS",' ')
+      LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = S3."CORACC"
+                             AND S5."AcSubCode" = NVL(S3."CORACS",'     ')
+                             AND S5."AcDtlCode" = CASE
+                                                    WHEN S3."CORACC" = '40903300'
+                                                         AND NVL(S3."CORACS",'     ') = '     '
+                                                    THEN '01' -- 放款帳管費
+                                                    -- 2022-06-30 Wei From Lai Email:
+                                                    -- AcNoCode = 20222020000
+                                                    -- 轉 AcDtlCode = 01
+                                                    --    and AcctCode = TAV
+                                                    WHEN S3."CORACC" = '20232020'
+                                                         AND NVL(S3."CORACS",'     ') = '     '
+                                                    THEN '01'
+                                                  ELSE '  ' END
+      LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC"
+                   AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ')
+                   AND NVL(ATF."ACNASS",' ') = NVL(S1."ACNASS",' ')
+      LEFT JOIN S4 ON S4."TRXDAT"  = S1."TRXDAT"
+                  AND S4."TRXNMT"  = S1."TRXNMT"
+                  AND S4."TRXTRN"  = CASE
+                                       WHEN S1."TRXTRN" IS NOT NULL THEN S1."TRXTRN"
+                                     ELSE ATF."TRXTRN" END
+                  AND S4."ACTACT"  = ATF."ACTACT"
+                  AND S4."DbCr"    = S1."TRXATP"
+                  AND S4."OriDbCr" = ATF."DbCr"
+                  AND S4."ACNACC"  = ATF."ACNACC"
+                  AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNACS",' ')
+                  AND NVL(S4."ACNASS",' ') = NVL(ATF."ACNASS",' ')
+      LEFT JOIN FF ON FF."OverdueDate" = S1."TRXDAT"
+                  AND FF."DailyFeeTotal" = S1."JLNAMT"
+                  AND NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990')
+                  AND NVL(S4."LMSACN",0) = 0
+      WHERE NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除
+        AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除
+        AND NVL(S2."TRXDAT",0) = 0      -- 若在S2有資料,表示S1此筆為被訂正資料,則排除
+        AND NVL(S3."CORACC",' ') != ' ' -- 有串到新會科才寫入
+        AND NVL(S3."AGLACC",' ') != ' ' -- 2021-12-08 新增判斷 有串到最新的11碼會科才寫入
+        AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
+        AND S1."JLNCRC" = '0'
+        AND S1."TRXDAT" >= 20190101
+        AND S1."TRXDAT" <= "TbsDyF"
+        AND CASE
+              WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
+                   AND NVL(S4."TRXTRN",' ') <> ' '
+              THEN 1
+              WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
+                   AND NVL(S4."LMSACN",0) = 0
+              THEN 1
+            ELSE 0 
+            END = 1
+    )
+    , ACT AS (
+      SELECT "LMSACN"
+           , "ACTFSC"
+      FROM "LA$ACTP"
+      WHERE "ACTFSC" IS NOT NULL
+    )
     SELECT S."TRXDAT"                     AS "RelDy"               -- 登放日期 Decimald 8 0
           ,'0000999999'
           -- 2021-11-30 修改 只紀錄TRXNMT
            || LPAD(S."TRXNMT",8,'0')      AS "RelTxseq"            -- 登放序號 VARCHAR2 18 0
-          ,ROW_NUMBER() OVER (PARTITION BY S."TRXDAT"
-                                          ,S."TRXNMT"
-                              ORDER BY S."JLNVNO"
-                                      ,ABS(NVL(S."TRXAMT",S."JLNAMT"))
-                                      ,NVL(S."LMSACN",0)
-                                      ,NVL(S."LMSAPN",0)
-                                      ,NVL(S."LMSASQ",0)
-                             )            AS "AcSeq"               -- 分錄序號 DECIMAL 4 0
+          ,ROW_NUMBER()
+           OVER (
+            PARTITION BY S."TRXDAT"
+                        ,S."TRXNMT"
+            ORDER BY S."JLNVNO"
+                    ,ABS(NVL(S."TRXAMT",S."JLNAMT"))
+                    ,NVL(S."LMSACN",0)
+                    ,NVL(S."LMSAPN",0)
+                    ,NVL(S."LMSASQ",0)
+           )                              AS "AcSeq"               -- 分錄序號 DECIMAL 4 0
           ,S."TRXDAT"                     AS "AcDate"              -- 會計日期 Decimald 8 0
           ,S."CUSBRH"                     AS "BranchNo"            -- 單位別 VARCHAR2 4 0
           ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 0
@@ -166,178 +351,9 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM (SELECT DISTINCT
-                 S1."TRXDAT"
-                ,S1."TRXNMT"
-                ,S1."JLNVNO"
-                ,S1."CUSBRH"
-                ,S1."TRXATP"
-                ,S1."JLNAMT"
-                ,S1."JLNCRC"
-                ,S1."BSTBTN"
-                ,S1."TRXTRN"
-                ,S1."TRXNTX"
-                ,S5."AcNoCode"
-                ,S5."AcSubCode"
-                ,S5."AcDtlCode"
-                ,S5."AcctCode"
-                ,S5."AcctFlag"
-                ,S5."ReceivableFlag"
-                ,S5."AcBookFlag"
-                ,S4."TRXTCT"
-                ,S4."TRXMEM"
-                ,NVL(S4."LMSACN",FF."CustNo") AS "LMSACN"
-                ,NVL(S4."LMSAPN",FF."FacmNo") AS "LMSAPN"
-                ,NVL(S4."LMSASQ",0) AS "LMSASQ"
-                ,NVL(S4."TRXAMT",FF."Fee") AS "TRXAMT"
-                ,FF."RecordNo"
-          FROM "LA$JLNP" S1
-          LEFT JOIN "LA$JLNP" S2 ON S2."TRXDAT" = S1."TRXDAT"
-                                AND S2."JLNOVN" = S1."JLNVNO" -- 串取訂正資料
-                                AND S2."JLNVNO" = 0
-          LEFT JOIN "TB$LCDP" S3 ON S3."ACNACC" = S1."ACNACC"
-                                AND NVL(S3."ACNACS",' ') = NVL(S1."ACNACS",' ')
-                                AND NVL(S3."ACNASS",' ') = NVL(S1."ACNASS",' ')
-          LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = S3."CORACC"
-                                 AND S5."AcSubCode" = NVL(S3."CORACS",'     ')
-                                 AND S5."AcDtlCode" = CASE
-                                                        WHEN S3."CORACC" = '40903300'
-                                                             AND NVL(S3."CORACS",'     ') = '     '
-                                                        THEN '01' -- 放款帳管費
-                                                        -- 2022-06-30 Wei From Lai Email:
-                                                        -- AcNoCode = 20222020000
-                                                        -- 轉 AcDtlCode = 01
-                                                        --    and AcctCode = TAV
-                                                        WHEN S3."CORACC" = '20232020'
-                                                             AND NVL(S3."CORACS",'     ') = '     '
-                                                        THEN '01'
-                                                      ELSE '  ' END
-          LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC"
-                       AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ')
-                       AND NVL(ATF."ACNASS",' ') = NVL(S1."ACNASS",' ')
-          LEFT JOIN (SELECT TR."TRXDAT"
-                           ,TR."TRXNMT"
-                           ,TR."TRXTRN"
-                           ,TR."ACTACT"
-                           ,TR."LMSACN"
-                           ,TR."LMSAPN"
-                           ,TR."LMSASQ"
-                           ,TR."TRXAMT"
-                           ,TR."TRXTCT"
-                           ,TR."TRXMEM"
-                           ,CASE
-                              WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'D' THEN 'C'
-                              WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'C' THEN 'D'
-                            ELSE ATF."DbCr" END AS "DbCr"
-                           ,ATF."DbCr"  AS "OriDbCr"
-                           ,ATF."ACNACC"
-                           ,ATF."ACNACS"
-                           ,ATF."ACNASS"
-                     FROM (SELECT TR1."TRXDAT"
-                                 ,TR1."TRXNMT"
-                                 ,TR1."TRXTRN"
-                                 ,TR1."ACTACT"
-                                 ,TR1."LMSACN"
-                                 ,TR1."LMSAPN"
-                                 ,TR1."LMSASQ"
-                                 ,TR1."TRXAMT"
-                                 ,TR1."TRXMEM"
-                                 ,MAX(CASE
-                                        WHEN TR1."TRXTCT" IS NOT NULL
-                                        THEN CASE
-                                              --  WHEN TR1."TRXTCT" = '1' AND NVL(NOD."LMSACN",0) <> 0 THEN '2'
-                                               WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1
-                                                                       THEN '2'
-                                               WHEN TR1."TRXTCT" = '1' THEN '1'
-                                               WHEN TR1."TRXTCT" = '2' THEN '3'
-                                               WHEN TR1."TRXTCT" = '3' THEN '4'
-                                               WHEN TR1."TRXTCT" = '4' THEN '5'
-                                               WHEN TR1."TRXTCT" = '5' THEN '6'
-                                               WHEN TR1."TRXTCT" = '6' THEN '7'
-                                             ELSE TR1."TRXTCT" END
-                                      ELSE '' END) AS "TRXTCT"
-                           FROM "LA$TRXP" TR1
-                           LEFT JOIN (SELECT "LMSACN"
-                                            ,"LMSAPN1"
-                                            ,"LMSASQ1"
-                                            ,MAX(CASE
-                                                   WHEN "LMSAPN" = "LMSAPN1" THEN 1
-                                                 ELSE 0 END) AS "IsSameFac"
-                                      FROM "LNACNP"
-                                      GROUP BY "LMSACN"
-                                              ,"LMSAPN1"
-                                              ,"LMSASQ1") ACN ON ACN."LMSACN" = TR1."LMSACN"
-                                                              AND ACN."LMSAPN1" = TR1."LMSAPN"
-                                                              AND ACN."LMSASQ1" = TR1."LMSASQ"
-
-                           WHERE TR1."LMSACN" <> 0
-                             AND TR1."TRXDAT" > 20190101
-                           GROUP BY TR1."TRXDAT"
-                                   ,TR1."TRXNMT"
-                                   ,TR1."TRXTRN"
-                                   ,TR1."ACTACT"
-                                   ,TR1."LMSACN"
-                                   ,TR1."LMSAPN"
-                                   ,TR1."LMSASQ"
-                                   ,TR1."TRXAMT"
-                                   ,TR1."TRXMEM"
-                          ) TR
-                    LEFT JOIN ATF ON ATF."TRXTRN" = TR."TRXTRN"
-                                 AND ATF."ACTACT" = TR."ACTACT"
-                    ) S4 ON S4."TRXDAT"          = S1."TRXDAT"
-                        AND S4."TRXNMT"          = S1."TRXNMT"
-                        AND S4."TRXTRN"          = CASE
-                                                     WHEN S1."TRXTRN" IS NOT NULL THEN S1."TRXTRN"
-                                                   ELSE ATF."TRXTRN" END
-                        AND S4."ACTACT"          = ATF."ACTACT"
-                        AND S4."DbCr"            = S1."TRXATP"
-                        AND S4."OriDbCr"         = ATF."DbCr"
-                        AND S4."ACNACC"          = ATF."ACNACC"
-                        AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNACS",' ')
-                        AND NVL(S4."ACNASS",' ') = NVL(ATF."ACNASS",' ')
-          LEFT JOIN ( SELECT F0."CustNo"
-                           , F0."FacmNo"
-                           , F0."RecordNo"
-                           , F0."OverdueDate"
-                           , F0."Fee"
-                           , F1."DailyFeeTotal"
-                      FROM "ForeclosureFee" F0
-                      LEFT JOIN ( SELECT "OverdueDate"
-                                       , SUM("Fee") AS "DailyFeeTotal"
-                                  FROM "ForeclosureFee"
-                                  WHERE "OverdueDate" > 0
-                                  GROUP BY "OverdueDate"
-                      ) F1 ON F1."OverdueDate" = F0."OverdueDate"
-                      WHERE F0."OverdueDate" > 0
-                    ) FF ON FF."OverdueDate" = S1."TRXDAT"
-                        AND FF."DailyFeeTotal" = S1."JLNAMT"
-                        AND NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990')
-                        AND NVL(S4."LMSACN",0) = 0
-          WHERE NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除
-            AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除
-            AND NVL(S2."TRXDAT",0) = 0      -- 若在S2有資料,表示S1此筆為被訂正資料,則排除
-            AND NVL(S3."CORACC",' ') != ' ' -- 有串到新會科才寫入
-            AND NVL(S3."AGLACC",' ') != ' ' -- 2021-12-08 新增判斷 有串到最新的11碼會科才寫入
-            AND NVL(S5."AcNoCode",' ') != ' ' -- 2021-07-15 新增判斷 有串到最新的11碼會科才寫入
-            AND S1."JLNCRC" = '0'
-            AND S1."TRXDAT" >= 20190101
-            AND S1."TRXDAT" <= "TbsDyF"
-            AND CASE
-                  WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
-                       AND NVL(S4."TRXTRN",' ') <> ' '
-                  THEN 1
-                  WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
-                       AND NVL(S4."LMSACN",0) = 0
-                  THEN 1
-                ELSE 0 
-                END = 1
-         ) S
-    LEFT JOIN (SELECT "LMSACN"
-                    , "ACTFSC"
-               FROM "LA$ACTP"
-               WHERE "ACTFSC" IS NOT NULL
-              ) ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
-                   AND NVL(S."LMSACN",0) > 0
+    FROM S
+    LEFT JOIN ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
+                 AND NVL(S."LMSACN",0) > 0
     LEFT JOIN tempTRXP ON tempTRXP."TRXDAT" = S."TRXDAT"
                       AND tempTRXP."TRXNMT" = S."TRXNMT"
                       AND tempTRXP."TxSeq" = 1

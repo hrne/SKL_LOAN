@@ -61,8 +61,11 @@ public class L4211BServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "     , BATX.\"CustNo\""; // 戶號 6
 		sql += "     , CASE WHEN BATX.\"CustNo\" <> 0 THEN CM.\"CustName\"";
 		sql += "            ELSE N''  END AS \"CustName\""; // 戶名 7
-		sql += "     , CASE WHEN BATX.\"CustNo\" <> 0 THEN \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)";
-		sql += "            ELSE null  END AS \"CustTel\""; // 聯絡電話 8
+		sql += "     ,CASE ";
+		sql += "		WHEN BATX.\"CustNo\" <> 0 AND LENGTH(TRIM(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1))) >=7 then \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)";
+		sql += "		WHEN BATX.\"CustNo\" <> 0 AND LENGTH(TRIM(\"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1))) >=7 then \"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1)";
+		sql += "		WHEN BATX.\"CustNo\" <> 0 AND LENGTH(TRIM(\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1))) >=7 then \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1)";
+		sql += " 	    END AS \"CustTel\"";// 聯絡電話 8
 		sql += "     , BATX.\"AcDate\""; // 會計日期 9
 		sql += "     , BATX.\"TitaTxtNo\""; // 交易序號 10
 		sql += "     , BATX.\"ProcCode\""; // 備註 11

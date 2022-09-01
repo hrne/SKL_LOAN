@@ -62,15 +62,12 @@ public class L3917 extends TradeBuffer {
 		BigDecimal wkInterext = new BigDecimal("0");// 利息
 		BigDecimal wkDelayInt = new BigDecimal("0");// 延遲息
 		BigDecimal wkBreachAmt = new BigDecimal("0");// 違約金
+		BigDecimal wkCloseBreachAmt = new BigDecimal("0");// 清償違約金
 		BigDecimal wkShortfall = new BigDecimal("0");// 短收
 		BigDecimal wkOverflow = new BigDecimal("0");// 溢收
-		BigDecimal wkLawFee = new BigDecimal("0");// 法務費
-		BigDecimal wkAcctFee = new BigDecimal("0");// 帳管費
-		BigDecimal wkModifyFee = new BigDecimal("0");// 契變手續費
-		BigDecimal wkFireFee = new BigDecimal("0");// 火險費
-		BigDecimal wkCloseBreachAmt = new BigDecimal("0");// 清償違約金
 		BigDecimal wkTempAmt = new BigDecimal("0");// 暫收金額
 		BigDecimal wkTempRepay = new BigDecimal("0");// 暫收抵繳
+		BigDecimal wkTxAmt = new BigDecimal("0");// 交易金額
 		int entryDate = 0;
 		int intStartDate = 0;
 
@@ -79,57 +76,47 @@ public class L3917 extends TradeBuffer {
 
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990, iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990,
+				iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
 				titaVo);
 
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
 		if (lLoanBorTx == null || lLoanBorTx.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
 		}
-
+		// 暫收金額(第一筆)
+		wkTempAmt = lLoanBorTx.get(0).getTempAmt();
 		for (LoanBorTx t : lLoanBorTx) {
-
-			TempVo tTempVo = new TempVo();
-
-			tTempVo = tTempVo.getVo(t.getOtherFields());
-
 			// Tota
-			BigDecimal TempReduceAmt = this.parse.stringToBigDecimal(tTempVo.getParam("ReduceAmt"));
-			BigDecimal TempAcctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
-			BigDecimal TempModifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
-			BigDecimal TempFireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
-			BigDecimal TempLawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
 			wkCurrencyCode = t.getTitaCurCd();
-
-			BigDecimal TempRepayAmt = t.getPrincipal().add(t.getInterest()).add(t.getDelayInt()).add(t.getBreachAmt()).add(t.getCloseBreachAmt()).add(TempAcctFee).add(TempModifyFee).add(TempFireFee)
-					.add(TempLawFee);
-
-			wkRepayAmt = wkRepayAmt.add(TempRepayAmt); // 回收金額
-			wkTempRepayAmt = wkTempRepayAmt.add(t.getTempAmt());
 			entryDate = t.getEntryDate();
 			if (intStartDate == 0 || intStartDate > t.getIntStartDate()) {
 				intStartDate = t.getIntStartDate();
 			}
-			if (t.getTempAmt().compareTo(BigDecimal.ZERO) > 0) {
-				wkTempAmt = wkTempAmt.add(t.getTempAmt());
-				wkOverflow = wkOverflow.add(t.getTempAmt()); // 溢收金額
-			} else {
-				wkTempRepay = wkTempRepay.subtract(t.getTempAmt());
-			}
-			wkReduceAmt = wkReduceAmt.add(TempReduceAmt); // 減免金額
+			TempVo tTempVo = new TempVo();
+
+			tTempVo = tTempVo.getVo(t.getOtherFields());
+			wkOverflow = t.getOverflow(); // 最後一筆
+			wkReduceAmt = wkReduceAmt.add(this.parse.stringToBigDecimal(tTempVo.getParam("ReduceAmt"))); // 減免金額
 			wkPrinciPal = wkPrinciPal.add(t.getPrincipal()); // 本金
 			wkInterext = wkInterext.add(t.getInterest()); // 利息
 			wkDelayInt = wkDelayInt.add(t.getDelayInt()); // 延遲息
 			wkBreachAmt = wkBreachAmt.add(t.getBreachAmt()); // 違約金
-			wkShortfall = wkShortfall.add(t.getUnpaidInterest().add(t.getUnpaidPrincipal())); // 短收金額
-			wkLawFee = wkLawFee.add(TempLawFee); // 法務費
-			wkAcctFee = wkAcctFee.add(TempAcctFee); // 帳管費
-			wkModifyFee = wkModifyFee.add(TempModifyFee); // 契變手續費
-			wkFireFee = wkFireFee.add(TempFireFee); // 火險費
 			wkCloseBreachAmt = wkCloseBreachAmt.add(t.getCloseBreachAmt()); // 清償違約金
-
+			// 回收金額
+			BigDecimal repayAmt = t.getPrincipal().add(t.getInterest()).add(t.getDelayInt()).add(t.getBreachAmt())
+					.add(t.getCloseBreachAmt()); // 回收金額
+			wkRepayAmt = wkRepayAmt.add(repayAmt);
+			wkShortfall = wkShortfall
+					.add(t.getUnpaidInterest().add(t.getUnpaidPrincipal()).add(t.getUnpaidCloseBreach())); // 短收金額
+			// 交易金額
+			wkTxAmt = wkTxAmt.add(t.getTxAmt());
 		}
-
+		// 交易金額(100) + 暫收借(900) = 回收金額(300) + 暫收貸(700)
+		// 暫收抵繳 = (回收金額(300) - 交易金額(100) > 0
+		if (wkRepayAmt.compareTo(wkTxAmt) > 0) {
+			wkTempRepay = wkRepayAmt.subtract(wkTxAmt);
+		}
 		this.totaVo.putParam("OCustNo", iCustNo); // 戶號
 		this.totaVo.putParam("OFacmNo", iFacmNo); // 額度編號
 		this.totaVo.putParam("OCustName", loanCom.getCustNameByNo(iCustNo)); // 戶名
@@ -144,7 +131,7 @@ public class L3917 extends TradeBuffer {
 		this.totaVo.putParam("OTellerName", loanCom.getEmpFullnameByEmpNo(iTellerNo)); // 經辦姓名
 		this.totaVo.putParam("OTxtNo", iTxtNo); // 交易序號
 
-		this.totaVo.putParam("OTxAmt", wkRepayAmt.add(wkTempRepayAmt)); // 交易金額
+		this.totaVo.putParam("OTxAmt", wkTxAmt); // 交易金額
 		this.totaVo.putParam("ORepayAmt", wkRepayAmt); // 回收金額
 
 		this.totaVo.putParam("OTempAmt", wkTempAmt); // 暫收金額
@@ -155,13 +142,9 @@ public class L3917 extends TradeBuffer {
 		this.totaVo.putParam("OInterext", wkInterext); // 利息
 		this.totaVo.putParam("ODelayInt", wkDelayInt); // 延遲息
 		this.totaVo.putParam("OBreachAmt", wkBreachAmt); // 違約金
+		this.totaVo.putParam("OCloseBreachAmt", wkCloseBreachAmt); // 清償違約金
 		this.totaVo.putParam("OShortFall", wkShortfall);// 短收金額
 		this.totaVo.putParam("OOverflow", wkOverflow);// 溢收金額
-		this.totaVo.putParam("OLawFee", wkLawFee); // 法務費
-		this.totaVo.putParam("OAcctFee", wkAcctFee); // 帳管費
-		this.totaVo.putParam("OModifyFee", wkModifyFee); // 契變手續費
-		this.totaVo.putParam("OFireFee", wkFireFee); // 火險費
-		this.totaVo.putParam("OCloseBreachAmt", wkCloseBreachAmt); // 清償違約金
 
 		this.addList(this.totaVo);
 		return this.sendList();

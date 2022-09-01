@@ -314,7 +314,7 @@ BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L3914; ntxbuf=#BUF8;ntxbuf5=type<-1:
 CustNo<-OCustNo:
 AcctCode<-OOAcctCode:
 AcctCodeX<-OOAcctItem:
-FacmNo<-OOFacmNo:
+FacmNoR<-OOFacmNo:
 RvNo<-OORvNo:
 EntryDate<-OOEntryDate:
 AcDate<-OOAcDate:
@@ -342,8 +342,14 @@ T(3,)T(H,#AcctCode,#AcctCodeHelp)
 !作業項目=9,10,25,29必須輸入,其他不可輸入
 #FdFacmNo=X,2,L
 
-#FacmNo=A,3,L
-
+!由L3914帶入的值若為0則必須輸入
+!#FacmNo=A,3,L
+#FacmNoR=A,3,L
+#FacmNo=A,3,I
+T(2,@FacmNo,#FacmNoR)
+C(3,#FacmNo,0,T(F,@FacmNo,1),T(F,@FacmNo,0))
+C(3,#FacmNo,0,$,s)
+@V(2,0)
 
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))

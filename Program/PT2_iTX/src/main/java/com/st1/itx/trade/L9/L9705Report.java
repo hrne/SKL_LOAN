@@ -205,12 +205,17 @@ public class L9705Report extends MakeReport {
 				//筆數
 				count++;
 				
-				// 關閉非A3的報表
+				// 關閉非A3的報表 或 關閉只有A3資料的報表
 				if (!isOpen && isOpenA3 && count == l9705List.size()) {
 					this.info("isClose");
 					isOpen = true;
 					cls = this.close();
+				} else if (!isOpenA3 && count == l9705List.size()) {
+					this.info("isCloseA3 ... only A3 data");
+					isOpenA3 = true;
+					cls = this.close();
 				}
+				
 
 			}
 
