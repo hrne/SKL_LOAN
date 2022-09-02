@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.MlaundryRecord;
@@ -122,6 +124,17 @@ public interface MlaundryRecordService {
    * @return Slice MlaundryRecord MlaundryRecord of List
    */
   public MlaundryRecord findCustNoAndRecordDateFirst(int custNo_0, int recordDate_1, int recordDate_2, TitaVo... titaVo);
+
+  /**
+   * CustNo = ,AND ActualRepayDate &gt;= ,AND ActualRepayDate &lt;=
+   *
+   * @param custNo_0 custNo_0
+   * @param actualRepayDate_1 actualRepayDate_1
+   * @param actualRepayDate_2 actualRepayDate_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice MlaundryRecord MlaundryRecord of List
+   */
+  public MlaundryRecord findCustNoAndActualRepayDateFirst(int custNo_0, int actualRepayDate_1, int actualRepayDate_2, TitaVo... titaVo);
 
   /**
    * hold By MlaundryRecord

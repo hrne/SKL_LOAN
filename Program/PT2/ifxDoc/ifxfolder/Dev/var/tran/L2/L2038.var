@@ -1403,7 +1403,7 @@ TXFORM=L2038
 
 #Amt1=可分配金額
 {width:120,align:'right'}
-#OOL2418Other=
+#OOL2418Other=門牌地址／土地座落
 {width:300,align:'left'}
 ^
 

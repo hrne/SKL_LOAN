@@ -28,6 +28,7 @@ E(0,0)
 [#<->#,"#FdRelAcctName+帳戶戶名",#RelAcctName],
 ["#FdRelationId+身份證字號",#RelationId],["#FdRelAcctBirthday+出生日期",#RelAcctBirthday],
 ["#FdRelAcctGender+性別",#RelAcctGender,#RelAcctGenderX],["#FdStampCodeX+核印註記",#StampCodeX],
+[#<->#,"#FdCustCode+用戶編碼",#CustCode],
 [#<->#,"#FdCalDy+處理日期時間",#CalDate," ",#CalTime],
 ["#FdAuthErrorCodeX+授權狀態",#AuthErrorCodeX],["#FdPostMediaCodeX+媒體碼",#PostMediaCodeX],
 [#<->#,"#FdAuthType+授權方式",#AuthType,#AuthTypeX],
@@ -88,6 +89,9 @@ T(3,*)
 #FdCreateDateX=X,2,L
 #FdLastUpdateX=X,2,L
 #FdAuthType=X,2,L
+
+!用戶編碼啟動記號 1啟動
+#CustCodeFg=A,1,S
 
 #RepayCode=A,2,S
 E(0,2)
@@ -399,6 +403,7 @@ R(1,L4R24)
 #CustNo=A,7,I
 C(3,#FuncCode,1,$,s)
 @V(2,0)
+C(3,#CustCodeFg,1,CALL(#wkCustCode),$)
 
 ! 4R21
 #SendL4R21A=X,1,S
@@ -467,6 +472,7 @@ T(2,Y+#SysDateRoc7+1+2+#CustNo)
 C(3,#FuncCode,1,$,s)
 HELP(#PostDepCodeHelp)
 @V(H,#PostDepCodeHelp)
+C(3,#CustCodeFg,1,CALL(#wkCustCode),$)
 #PostDepCodeX=X,4,L
 T(H,#PostDepCode,#PostDepCodeHelp)
 
@@ -512,6 +518,7 @@ T(2,@RepayAcctSeq,#L4r01RepayAcctSeq)
 ! 帳號碼-- 同id 同存款別 同戶號者 由空白開始+1續編
 ! 用戶編號-調RIM=最新編號+1
 #RepayAcctSeq=X,2,L
+C(3,#CustCodeFg,1,CALL(#wkCustCode),$)
 
 #SendL4R23=X,1,S
 E(0,@RimCustNo,#CustNo)
@@ -684,6 +691,8 @@ C(3,#checkFlag,1,s,$)
 @
 V(7)
 A(ID_UNINO,0,#CustId)
+E(0,@CustCodeFg,1)
+C(3,#CustCodeFg,1,CALL(#wkCustCode),$)
 C(5,#RelationCode,#OldRelationCode,s,$)
 ! IF(#RelationCode==00,$,T(2,@RelationId,#CustId))
 T(2,@RelationId,#CustId)
@@ -787,6 +796,16 @@ HELP(#SexHelp)
 @V(H,#SexHelp)
 #RelAcctGenderX=X,2,L
 C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4,#RelAcctGender,T(2,),T(H,#RelAcctGender,#SexHelp)))
+
+
+!用戶編碼
+#wkCustCode=@,1,S
+T(2,@CustCode,#RepayAcctSeq+#CustId+#PostDepCode+#CustNo)
+
+#FdCustCode=X,2,L
+
+#CustCode=X,20,L
+
 
 
 #StampCode=X,1,S

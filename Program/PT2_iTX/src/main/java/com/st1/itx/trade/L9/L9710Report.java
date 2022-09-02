@@ -86,7 +86,7 @@ public class L9710Report extends MakeReport {
 		this.setBeginRow(9);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(45);
+		this.setMaxRows(40);
 	}
 
 	public List<Map<String, String>> exec(TitaVo titaVo, int iAcDate) throws LogicException {
@@ -145,8 +145,8 @@ public class L9710Report extends MakeReport {
 					tempCity = tL9710Vo.get("CityItem");
 				}
 
-				// 超過45行 換新頁
-				if (this.NowRow == 45) {
+				// 超過40行 換新頁
+				if (this.NowRow >= 40) {
 					this.newPage();
 
 				}

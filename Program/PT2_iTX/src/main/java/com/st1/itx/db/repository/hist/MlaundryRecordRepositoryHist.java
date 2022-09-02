@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.hist;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,9 @@ public interface MlaundryRecordRepositoryHist extends JpaRepository<MlaundryReco
 
   // CustNo = ,AND RecordDate >= ,AND RecordDate <=
   public Optional<MlaundryRecord> findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(int custNo_0, int recordDate_1, int recordDate_2);
+
+  // CustNo = ,AND ActualRepayDate >= ,AND ActualRepayDate <=
+  public Optional<MlaundryRecord> findTopByCustNoIsAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByActualRepayDateDescLogNoDesc(int custNo_0, int actualRepayDate_1, int actualRepayDate_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

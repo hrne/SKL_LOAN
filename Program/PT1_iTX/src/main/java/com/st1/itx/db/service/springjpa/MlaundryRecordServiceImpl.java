@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -274,6 +277,25 @@ em = null;
       mlaundryRecordT = mlaundryRecordReposHist.findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(custNo_0, recordDate_1, recordDate_2);
     else 
       mlaundryRecordT = mlaundryRecordRepos.findTopByCustNoIsAndRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAsc(custNo_0, recordDate_1, recordDate_2);
+
+    return mlaundryRecordT.isPresent() ? mlaundryRecordT.get() : null;
+  }
+
+  @Override
+  public MlaundryRecord findCustNoAndActualRepayDateFirst(int custNo_0, int actualRepayDate_1, int actualRepayDate_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findCustNoAndActualRepayDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " actualRepayDate_1 : " +  actualRepayDate_1 + " actualRepayDate_2 : " +  actualRepayDate_2);
+    Optional<MlaundryRecord> mlaundryRecordT = null;
+    if (dbName.equals(ContentName.onDay))
+      mlaundryRecordT = mlaundryRecordReposDay.findTopByCustNoIsAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByActualRepayDateDescLogNoDesc(custNo_0, actualRepayDate_1, actualRepayDate_2);
+    else if (dbName.equals(ContentName.onMon))
+      mlaundryRecordT = mlaundryRecordReposMon.findTopByCustNoIsAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByActualRepayDateDescLogNoDesc(custNo_0, actualRepayDate_1, actualRepayDate_2);
+    else if (dbName.equals(ContentName.onHist))
+      mlaundryRecordT = mlaundryRecordReposHist.findTopByCustNoIsAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByActualRepayDateDescLogNoDesc(custNo_0, actualRepayDate_1, actualRepayDate_2);
+    else 
+      mlaundryRecordT = mlaundryRecordRepos.findTopByCustNoIsAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByActualRepayDateDescLogNoDesc(custNo_0, actualRepayDate_1, actualRepayDate_2);
 
     return mlaundryRecordT.isPresent() ? mlaundryRecordT.get() : null;
   }
