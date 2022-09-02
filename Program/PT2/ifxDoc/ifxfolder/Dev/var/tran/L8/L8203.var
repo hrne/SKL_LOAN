@@ -324,7 +324,6 @@ T(H,#Rational,#YesNoHelp)
 #SendL8R60=X,1,S
 C(3,#FuncCode,2,$,s)
 C(4,#L8R50Rational,$,s)
-!C(3,#DescR,1,$,s)
 !T(2,@RimAcDate,#AcDate)
 !E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL8R60,L8R60)
@@ -351,8 +350,7 @@ TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FuncCode,4,s)
 C(3,#FuncCode,5,s)
 C(3,#Level,3,$,s)
-C(4,L8R50Rational,T(2,@EmpNoDesc,#DescX),$)
-
+C(4,#EmpNoDesc,C(4,#L8R50Rational,T(2,@EmpNoDesc,#DescX),$),$)
 
 !主管覆核
 #ManagerCheck=X,1,H

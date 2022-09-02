@@ -210,13 +210,18 @@ public class L3230 extends TradeBuffer {
 			TempAcDetailRoutine(); // 借: 暫收款科目
 			switch (iTempItemCode) {
 			case "06": // 06.轉帳
-				this.txBuffer.setAcDetailList(lAcDetail);
 				addLoanBorTxRoutine();
+				this.txBuffer.setAcDetailList(lAcDetail);
 				for (int i = 1; i <= 50; i++) {
 					/* 還款來源／撥款方式為 0 者跳出 */
 					if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
 						break;
-					settingUnPaid06(i);
+					iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
+					iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo" + i));
+					iRpCode = parse.stringToInteger(titaVo.getParam("RpCode" + i));
+					iRpCodeX = titaVo.getParam("RpCodeX1");
+					iRpAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i));
+					settingUnPaid06();
 					this.txBuffer.setAcDetailList(lAcDetail);
 				}
 				break;
@@ -263,8 +268,15 @@ public class L3230 extends TradeBuffer {
 		// 訂正放款交易內容檔by交易
 		if (titaVo.isHcodeErase()) {
 			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
-			if ("06".equals(iTempItemCode) && iRpCustNo != iCustNo) {
-				loanCom.setFacmBorTxHcodeByTx(iRpCustNo, titaVo);
+			if ("06".equals(iTempItemCode)) {
+				for (int i = 1; i <= 50; i++) {
+					if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
+						break;
+					iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
+					if (iRpCustNo != iCustNo) {
+						loanCom.setFacmBorTxHcodeByTx(iRpCustNo, titaVo);
+					}
+				}
 			}
 		}
 		this.addList(this.totaVo);
@@ -410,12 +422,7 @@ public class L3230 extends TradeBuffer {
 		}
 	}
 
-	private void settingUnPaid06(int i) throws LogicException {
-		iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
-		iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo" + i));
-		iRpCode = parse.stringToInteger(titaVo.getParam("RpCode" + i));
-		iRpCodeX = titaVo.getParam("RpCodeX1");
-		iRpAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i));
+	private void settingUnPaid06() throws LogicException {
 
 		switch (iRpCode) {
 		case 92: // 放款暫收款
