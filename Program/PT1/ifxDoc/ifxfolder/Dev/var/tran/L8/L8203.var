@@ -84,13 +84,21 @@ T(4,LEVEL$)
 #mkg=X,1,S
 INVOKEJS(SHOW,p1,11,11,0)
 
+!AP
+#CDCODEAp=x,20,S                  
+T(3,CdCode.RepaySource)
+
+#ApHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CODEFuncCode2,#CODEFactor)
+S(XXR99,01,#CODEFuncCode2,#CODEFactor,#CDCODEAp)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@FactorHelp,#HelpDesc2)
+T(2,@ApHelp,#HelpDesc3)
 
 !YesNo
 #YesNoHelp=x,50,S
@@ -128,6 +136,7 @@ T(2,@FuncCode,#CHAIN_FuncCode)
 C(3,#FuncCode,1,S,$)
 E(0,@AcDate,#CHAIN_AcDate)
 E(0,@Factor,#CHAIN_Factor)
+E(0,@CustNo,#CHAIN_CustNo)
 E(0,@CustNo,#CHAIN_CustNo)
 
 
@@ -235,6 +244,7 @@ V(H,#FactorHelp)
 #FactorX=X,6,L
 T(H,#Factor,#FactorHelp)
 
+
 #RimAcDate=9,7,S
 E(0,#AcDate)
 #RimFactor=9,2,S
@@ -310,11 +320,38 @@ T(H,#Rational,#YesNoHelp)
 !C(3,#FuncCode,5,s)
 !C(3,#Level,3,$,s)
 
+!調RIM的L8R50Rational資料空白=代表經辦合理性說明須帶入預設值
+#SendL8R60=X,1,S
+C(3,#FuncCode,2,$,s)
+C(4,#L8R50Rational,$,s)
+!C(3,#DescR,1,$,s)
+!T(2,@RimAcDate,#AcDate)
+!E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL8R60,L8R60)
+S(L8R60,1,#RimAcDate,#RimCustNo)
+R(1,L8R60)
+E(0,@RepaySource,#L8R60RepaySource)
+T(2,@RepayBank,#L8R60RepayBank)
+T(2,@Description,#L8R60Description)
+
+#RepaySource=A,2,L
+#RepayBank=X,20,L
+#Description=X,500,L
+
+#RepaySourceX=X,20,L
+T(H,#RepaySource,#ApHelp)
+!調RIM合理性為空白代表要帶預設值
+#DescX=X,200,L
+C(4,#L8R50Rational,$,s)
+C(3,#RepaySource,1,T(B,依據電話訪問還款資金來源為+#RepayBank+#RepaySourceX),T(B,依據電話訪問還款資金來源為+#RepaySourceX+#Description))
+
+
 #EmpNoDesc=x,4.50,I
 TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FuncCode,4,s)
 C(3,#FuncCode,5,s)
 C(3,#Level,3,$,s)
+C(4,L8R50Rational,T(2,@EmpNoDesc,#DescX),$)
 
 
 !主管覆核
@@ -390,6 +427,7 @@ E(0,0)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L8R50.dec"/>
+<include src="ROM.icf::L8R60.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -450,6 +488,7 @@ K(MODIFYBUTTON,1,提交)
 TXFORM=L8203^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L8R50.tom"/>
+<include src="ROM.icf::L8R60.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

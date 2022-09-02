@@ -63,18 +63,23 @@ public class L4450Report extends MakeReport {
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-2, 1, "報　表：" + "L4450");
 		this.print(-2, 70, "銀行扣款明細表", "C");
-		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 1, "扣款銀行：" + repayBank + " " + bankCodeX(repayBank));
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 		if (RepayType == 5) {
-			this.print(-4, 1, "入帳日期   戶號   額度         到期年月   保險迄日 還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");
+			this.print(-4, 1,
+					"入帳日期   戶號   額度         到期年月   保險迄日 還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");
 		} else {
-			this.print(-4, 1, "入帳日期   戶號   額度         繳息迄日   應繳日   還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");
+			this.print(-4, 1,
+					"入帳日期   戶號   額度         繳息迄日   應繳日   還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");
 		}
-		this.print(-5, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-5, 1,
+				"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void doReport(List<BankDeductDtl> lBankDeductDtl, TitaVo titaVo) throws LogicException {
@@ -181,7 +186,8 @@ public class L4450Report extends MakeReport {
 						Boolean firstflg = false;
 						for (int k = 0; k < tInsuNo.length; k++) {
 							InsuRenew tInsuRenew = new InsuRenew();
-							tInsuRenew = insuRenewService.prevInsuNoFirst(lBankDeductDtl.get(i).getCustNo(), lBankDeductDtl.get(i).getFacmNo(), tInsuNo[k], titaVo);
+							tInsuRenew = insuRenewService.prevInsuNoFirst(lBankDeductDtl.get(i).getCustNo(),
+									lBankDeductDtl.get(i).getFacmNo(), tInsuNo[k], titaVo);
 
 							if (tInsuRenew != null) {
 
@@ -223,15 +229,14 @@ public class L4450Report extends MakeReport {
 
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(lBankDeductDtl.get(i).getJsonFields());
+				String amlRsp = lBankDeductDtl.get(i).getAmlRsp();
 
 				String procNote = "";
 //				欄位不夠長，順序為帳號、AML、扣帳金額為零
 				if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
 					procNote = procNote + "帳號授權檢核:" + authX(tempVo.get("Auth")) + "。";
-
-				} else if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-					procNote = "Aml檢核:" + amlRspX(tempVo.get("Aml")) + "。";
-
+				} else if (!"0".equals(amlRsp)) {
+					procNote = "Aml檢核:" + amlRspX(amlRsp) + "。";
 				} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
 					procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
 				}
@@ -272,19 +277,23 @@ public class L4450Report extends MakeReport {
 					if (!lBankDeductDtl.get(i).getRepayBank().equals(lBankDeductDtl.get(j).getRepayBank())) {
 						this.info("RepayBank Not Match...");
 
-						this.print(1, 1, "         小　計：           筆                                                                                                  ");
+						this.print(1, 1,
+								"         小　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
 						this.print(0, 75, df1.format(sumA1), "R");
 						this.print(0, 94, df1.format(sumA2), "R");
 						this.print(0, 112, df1.format(sumA3), "R");
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-						this.print(1, 1, "         總　計：           筆                                                                                                  ");
+						this.print(1, 1,
+								"         總　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeBs), "R");
 						this.print(0, 75, df1.format(sumB1), "R");
 						this.print(0, 94, df1.format(sumB2), "R");
 						this.print(0, 112, df1.format(sumB3), "R");
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 70, "=====續下頁=====", "C");
 
 						timeAs = 0;
@@ -308,12 +317,14 @@ public class L4450Report extends MakeReport {
 					if (!repayTypei.equals(repayTypej)) {
 						this.info("RepayType Not Match...");
 
-						this.print(1, 1, "         小　計：           筆                                                                                                  ");
+						this.print(1, 1,
+								"         小　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
 						this.print(0, 75, df1.format(sumA1), "R");
 						this.print(0, 94, df1.format(sumA2), "R");
 						this.print(0, 112, df1.format(sumA3), "R");
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 70, "=====續下頁=====", "C");
 
 						timeAs = 0;
@@ -337,26 +348,32 @@ public class L4450Report extends MakeReport {
 				} else {
 //				3.若為最後一筆，則固定產出小計、總計、報表合計
 					if (total == lBankDeductDtl.size()) {
-						this.print(1, 1, "         小　計：           筆                                                                                                  ");
+						this.print(1, 1,
+								"         小　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
 						this.print(0, 75, df1.format(sumA1), "R");
 						this.print(0, 94, df1.format(sumA2), "R");
 						this.print(0, 112, df1.format(sumA3), "R");
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-						this.print(1, 1, "         總　計：           筆                                                                                                  ");
+						this.print(1, 1,
+								"         總　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeBs), "R");
 						this.print(0, 75, df1.format(sumB1), "R");
 						this.print(0, 94, df1.format(sumB2), "R");
 						this.print(0, 112, df1.format(sumB3), "R");
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-						this.print(1, 1, " 報　表　合　計：           筆                                                                                                  ");
+						this.print(1, 1,
+								" 報　表　合　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", total), "R");
 						this.print(0, 75, df1.format(sumC1), "R");
 						this.print(0, 94, df1.format(sumC2), "R");
 						this.print(0, 112, df1.format(sumC3), "R");
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 					}
 				}
 			}

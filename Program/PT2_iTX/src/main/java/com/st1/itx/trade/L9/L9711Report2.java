@@ -392,7 +392,7 @@ public class L9711Report2 extends MakeReport {
 
 		if (tL9711Vo.get("F4") != null) {
 //			共用代碼檔0:個金1:企金2:企金自然人
-			if ("0".equals(tL9711Vo.get("F23"))) {
+			if ("0".equals(tL9711Vo.get("EntCode"))) {
 				payIntAcct = "9510200" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
 				payPriAcct = "9510300" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4")));
 			} else {

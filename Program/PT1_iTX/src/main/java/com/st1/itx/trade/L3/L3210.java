@@ -446,14 +446,12 @@ public class L3210 extends TradeBuffer {
 
 		// 其他欄位
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
-		tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 
-		if (titaVo.get("RpDscpt1") != null) {
-			tTempVo.putParam("DscptCode", titaVo.getParam("RpDscpt1")); // 摘要代碼
-		}
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
+			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1")); // 對帳類別
+			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
 		}
 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());

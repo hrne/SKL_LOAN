@@ -83,6 +83,18 @@ T(2,#HelpDesc1)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+!日曆日
+#CDATE=D,8,S
+T(4,CDATE$)
+
+#CDATEX=D,7,S
+T(1,#CDATE,2,7)
+
+!本營業日
+#DATE=D,8,S
+T(4,DATE$)
+
+
 !接收此格式: RecordDateStart-RecordDateEnd-CustNo 7-7-7
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -93,6 +105,7 @@ E(0,@RecordDateStart,#CHAIN_DateStart)
 E(0,@RecordDateEnd,#CHAIN_DateEnd)
 E(0,@CustNo,#CHAIN_CustNo)
 XMT()
+
 
 ! 7+7+7
 #CHAIN_DateStart=X,7,S
@@ -111,16 +124,6 @@ K(MODIFYBUTTON,查詢)
 T(2,{cmd=CHAIN; ntxcd=L8205; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
 K(MODIFYBUTTON,2,產生疑似洗錢報表)
 
-!日曆日
-#CDATE=D,8,S
-T(4,CDATE$)
-
-#CDATEX=D,7,S
-T(1,#CDATE,2,7)
-
-!本營業日
-#DATE=D,8,S
-T(4,DATE$)
 
 !訪談日期  起止
 #RecordDateStart=D,7,I

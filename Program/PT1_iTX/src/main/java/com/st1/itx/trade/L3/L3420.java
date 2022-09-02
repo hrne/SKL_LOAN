@@ -1440,13 +1440,13 @@ public class L3420 extends TradeBuffer {
 			tTempVo.putParam("StampFreeAmt", wkInterest.add(wkDelayInt).add(wkBreachAmt).add(wkCloseBreachAmt));
 		}
 
-		if (titaVo.get("RpDscpt1") != null) {
-			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
-		}
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
+			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1")); // 對帳類別
+			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
 		}
+		
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 

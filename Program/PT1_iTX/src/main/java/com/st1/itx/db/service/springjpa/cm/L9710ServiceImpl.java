@@ -69,8 +69,10 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        			 ,C.\"CurrZip2\"       AS \"CurrZip2\"";
 		sql += "        			 ,CB.\"BdLocation\" AS \"BdLocation\"";
 		sql += "        			 ,CC.\"Item\" AS \"Item\"";
+		sql += "        			 ,C.\"EntCode\" AS \"EntCode\"";
 		sql += "                     , ROW_NUMBER() OVER ( PARTITION BY M.\"CustNo\", M.\"FacmNo\"";
 		sql += "                                               ORDER BY T.\"TelTypeCode\") AS SEQ";
+		sql += "                     , F.\"RepayCode\"   AS \"RepayCode\"";
 		sql += "              FROM ( SELECT  M.\"CustNo\"";
 		sql += "                           , M.\"FacmNo\"";
 		sql += "                           , M.\"BormNo\"";

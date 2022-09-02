@@ -68,16 +68,8 @@ public class L3005 extends TradeBuffer {
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
-		int iTitaHCode = this.parse.stringToInteger(titaVo.getParam("TitaHCode"));
 
 		// work area
-		int wkFacmNoStart = 0;
-		int wkFacmNoEnd = 999;
-		int wkBormNoStart = 0;
-		int wkBormNoEnd = 900;
-		int wkAcDateStart = iAcDate + 19110000;
-		int wkEntryDateStart = iEntryDate + 19110000;
-		int wkDateEnd = 99991231;
 		String loanCustRmkX = "";
 		String oLoanCustRmkFlag = "N";
 
@@ -85,15 +77,6 @@ public class L3005 extends TradeBuffer {
 		String AcFg;
 		String wkCurrencyCode = "";
 		List<LoanCustRmk> lLoanCustRmk = new ArrayList<LoanCustRmk>();
-
-		if (iFacmNo != 0) {
-			wkFacmNoStart = iFacmNo;
-			wkFacmNoEnd = iFacmNo;
-		}
-		if (iBormNo != 0) {
-			wkBormNoStart = iBormNo;
-			wkBormNoEnd = iBormNo;
-		}
 
 		// 查詢各項費用 全戶
 		baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
@@ -218,8 +201,11 @@ public class L3005 extends TradeBuffer {
 				String txMsg = "";
 				if (repayCodeX != null && !repayCodeX.isEmpty()) {
 					txMsg += repayCodeX;
+					if ("1".equals(result.get("RepayCode"))) {
+						txMsg += tTempVo.getParam("ReconCode");			
+					}
 					if (totTxAmt.compareTo(BigDecimal.ZERO) != 0) {
-						txMsg += df.format(totTxAmt);
+						txMsg += ":"+df.format(totTxAmt);
 					}
 				}
 				occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
@@ -276,7 +262,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOLoanIntDetailFg", loanIntDetailFg); // 計息明細Fg
 				occursList.putParam("OOTxCd", titaTxCd); // 交易代號
 				// 新增摘要 跟費用明細
-				occursList.putParam("OONote", tTempVo.get("Note")); // 摘要
+				occursList.putParam("OONote", tTempVo.getParam("Note")); // 摘要
 				occursList.putParam("OOTotTxAmt", totTxAmt); // 交易總金額
 				occursList.putParam("OOCreateEmpNo", createEmpNo); // 建檔人員
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號

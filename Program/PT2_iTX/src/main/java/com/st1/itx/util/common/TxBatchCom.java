@@ -956,6 +956,7 @@ public class TxBatchCom extends TradeBuffer {
 			l3200TitaVo.putParam("UnpaidIntFlag", this.tTempVo.getParam("UnpaidIntFlag")); // 利息是否可欠繳
 			l3200TitaVo.putParam("PayFeeFlag", this.tTempVo.getParam("PayFeeFlag")); // 是否回收費用
 			l3200TitaVo.putParam("PayMethod", this.tTempVo.getParam("PayMethod"));// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
+			l3200TitaVo.putParam("PayMethodX", loanCom.getCdCodeX("PayMethod",  this.tTempVo.getParam("PayMethod"), l3200TitaVo));
 			if ("".equals(this.tTempVo.getParam("CloseBreachAmt"))) {
 				l3200TitaVo.putParam("TimExtraCloseBreachAmt", "0");
 			} else {

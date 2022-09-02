@@ -410,7 +410,7 @@ public class L4041 extends TradeBuffer {
 				ArrayList<String> aFile = postAuthFileVo846.toFile();
 
 				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權.txt", 2);
+						titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權出.txt", 2);
 
 				for (String line : aFile) {
 					makeFile.put(line);

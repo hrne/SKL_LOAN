@@ -8422,6 +8422,21 @@ TXFORM=L8R59
 ^
 </L8R59.tom>
 
+!尋找疑似洗錢交易訪談記錄檔資料
+<L8R60.dec>
+#L8R60RepaySource=N,2,S
+#L8R60RepayBank=x,20,S
+#L8R60Description=x,500,S
+</L8R60.dec>
+
+<L8R60.tom>
+TXFORM=L8R60
+#L8R60RepaySource
+#L8R60RepayBank
+#L8R60Description
+^
+</L8R60.tom>
+
 
 <L5R38.rtn>
 #L5R38iCode=A,1,S

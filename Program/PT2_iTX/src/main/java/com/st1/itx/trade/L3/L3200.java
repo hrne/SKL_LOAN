@@ -148,7 +148,6 @@ public class L3200 extends TradeBuffer {
 	private int iPayMethod;
 	private int iOverRpFg; // 1.短收 2.溢收 3->溢收(整批入帳、部分繳款)
 	private int iRpCode; // 還款來源
-	private String iDscptCode; // 摘要代碼
 	private String iRqspFlag;
 	private BigDecimal iTxAmt;
 	private BigDecimal iRepayAmt;
@@ -340,7 +339,6 @@ public class L3200 extends TradeBuffer {
 			iOverAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
 		}
 		iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));
-		iDscptCode = this.titaVo.getParam("RpDscpt1"); // 摘要代碼
 
 		// 放款交易明細檔的交易金額為實際支付金額
 		iTxAmt = iRealRepayAmt;
@@ -1679,10 +1677,11 @@ public class L3200 extends TradeBuffer {
 			tTempVo.putParam("TotalPeriod", wkNewTotalPeriod);
 		}
 		tTempVo.putParam("RepayKindCode", wkRepaykindCode);
-		tTempVo.putParam("DscptCode", iDscptCode); // 摘要代碼
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
+			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1")); // 對帳類別
+			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
 		}
 		// 支票繳款
 		if (iRpCode == 4) {

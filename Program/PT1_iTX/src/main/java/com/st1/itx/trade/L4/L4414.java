@@ -191,7 +191,9 @@ public class L4414 extends TradeBuffer {
 				postAuthFileVo.setValueFromFile(dataLineList);
 
 				postsize = dataLineList.size() - 1;
-				PostCreateDate = Integer.parseInt(dataLineList.get(postsize).substring(26, 34));
+				if (!dataLineList.get(postsize).substring(26, 34).toString().isEmpty()) {
+					PostCreateDate = Integer.parseInt(dataLineList.get(postsize).substring(26, 34));
+				}
 
 				setPostAuthLog(postAuthFileVo, titaVo);
 			} else {

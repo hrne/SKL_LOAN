@@ -274,10 +274,10 @@ public class L3001 extends TradeBuffer {
 			BigDecimal tamAmt = BigDecimal.ZERO; 
 			if (slAcReceivable !=null) {
 				for (AcReceivable rv : slAcReceivable.getContent()) {
-					if ("TAV".equals(rv.getAcctCode())) {
+					if ("TAV".equals(rv.getAcctCode()) && rv.getFacmNo() == tFacMain.getFacmNo()) {
 						tavAmt = tavAmt.add(rv.getRvBal());
 					}
-					if ("TAM".equals(rv.getAcctCode())) {
+					if ("TAM".equals(rv.getAcctCode()) && rv.getFacmNo() == tFacMain.getFacmNo()) {
 						tamAmt = tamAmt.add(rv.getRvBal());
 					}
 				}

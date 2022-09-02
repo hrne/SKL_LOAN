@@ -92,6 +92,7 @@ public class L3230 extends TradeBuffer {
 	private int iRpFacmNo = 0;
 	private int iRpCode = 0;
 	private String iRpCodeX;
+	private BigDecimal iRpAmt = BigDecimal.ZERO;
 	private String iTempItemCode;
 	private String iRemoveNo;
 	private int iTempReasonCode;
@@ -154,10 +155,6 @@ public class L3230 extends TradeBuffer {
 		iCurrencyCode = titaVo.getParam("CurrencyCode");
 		iRemoveNo = titaVo.getParam("RemoveNo").trim(); // 銷帳編號
 		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
-		iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo1"));
-		iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo1"));
-		iRpCode = parse.stringToInteger(titaVo.getParam("RpCode1"));
-		iRpCodeX = titaVo.getParam("RpCodeX1");
 
 		wkTempBal = iTempAmt;
 
@@ -215,7 +212,13 @@ public class L3230 extends TradeBuffer {
 			case "06": // 06.轉帳
 				this.txBuffer.setAcDetailList(lAcDetail);
 				addLoanBorTxRoutine();
-				settingUnPaid06();
+				for (int i = 1; i <= 50; i++) {
+					/* 還款來源／撥款方式為 0 者跳出 */
+					if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
+						break;
+					settingUnPaid06(i);
+					this.txBuffer.setAcDetailList(lAcDetail);
+				}
 				break;
 			case "07": // 07.沖執行費
 			case "09": // 09.沖火險費
@@ -281,7 +284,8 @@ public class L3230 extends TradeBuffer {
 			// 暫收可抵繳轉帳；96-轉帳
 //				1.iFacmNo >0 限該額度可抵繳
 			try {
-				this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, iTempAmt, titaVo);
+				this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0,
+						"06".equals(iTempItemCode) ? 96 : 0, iTempAmt, titaVo);
 			} catch (LogicException e) {
 				throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
 			}
@@ -406,14 +410,20 @@ public class L3230 extends TradeBuffer {
 		}
 	}
 
-	private void settingUnPaid06() throws LogicException {
+	private void settingUnPaid06(int i) throws LogicException {
+		iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
+		iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo" + i));
+		iRpCode = parse.stringToInteger(titaVo.getParam("RpCode" + i));
+		iRpCodeX = titaVo.getParam("RpCodeX1");
+		iRpAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i));
+
 		switch (iRpCode) {
 		case 92: // 放款暫收款
 			BigDecimal excessive = BigDecimal.ZERO;
-			// 轉入為暫收指定額度處理累溢收 96 : 單一額度轉帳
-			if (loanCom.isLoanFacTmp(iCustNo, iRpFacmNo, titaVo)) {
+			// 96 : 單一額度轉帳
+			if (iRpCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 				try {
-					this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iRpCustNo, iRpFacmNo, 0, 96, iTempAmt,
+					this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iRpCustNo, iRpFacmNo, 0, 96, iRpAmt,
 							titaVo);
 				} catch (LogicException e) {
 					throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
@@ -434,7 +444,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
 			acDetail.setSumNo("092");
-			acDetail.setTxAmt(iTempAmt.add(excessive));
+			acDetail.setTxAmt(iRpAmt.add(excessive));
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setFacmNo(iRpFacmNo);
 			lAcDetail.add(acDetail);
