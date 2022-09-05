@@ -54,7 +54,8 @@ public class L4943 extends TradeBuffer {
 		BigDecimal totUnpaidAmt = BigDecimal.ZERO;
 		BigDecimal totTempAmt = BigDecimal.ZERO;
 		BigDecimal totRepayAmt = BigDecimal.ZERO;
-
+		String returnCode ="";
+		
 		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode").trim());
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -169,7 +170,7 @@ public class L4943 extends TradeBuffer {
 					String procNote = "";
 					TempVo tempVo = new TempVo();
 					tempVo = tempVo.getVo(result.get("JsonFields"));
-					String returnCode = result.get("ReturnCode");
+					returnCode = result.get("ReturnCode");
 					String mediaKind = result.get("MediaKind");
 					String amlRsp = result.get("AmlRsp");
 					if (functionCode == 7) {
@@ -200,6 +201,9 @@ public class L4943 extends TradeBuffer {
 					occursList.putParam("OOAmlRsp", " ");
 
 					occursList.putParam("OOProcNote", procNote);
+					occursList.putParam("OReturnCode", returnCode);
+					//totaVo.putParam("OReturnCode", returnCode);
+					this.info("returnCode    = " + returnCode);
 //					 將每筆資料放入Tota的OcList 
 					this.totaVo.addOccursList(occursList);
 				}

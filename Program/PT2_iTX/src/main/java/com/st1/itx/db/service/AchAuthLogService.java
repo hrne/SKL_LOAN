@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AchAuthLog;
@@ -294,6 +296,16 @@ public interface AchAuthLogService {
    * @return Slice AchAuthLog AchAuthLog of List
    */
   public Slice<AchAuthLog> propBatchNoEq(int propDate_0, String batchNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * PropDate &lt;= ,AND BatchNo %
+   *
+   * @param propDate_0 propDate_0
+   * @param batchNo_1 batchNo_1
+   * @param titaVo Variable-Length Argument
+   * @return Slice AchAuthLog AchAuthLog of List
+   */
+  public AchAuthLog propDescBatchNoFirst(int propDate_0, String batchNo_1, TitaVo... titaVo);
 
   /**
    * hold By AchAuthLog

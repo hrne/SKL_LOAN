@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -670,6 +673,25 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public AchAuthLog propDescBatchNoFirst(int propDate_0, String batchNo_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("propDescBatchNoFirst " + dbName + " : " + "propDate_0 : " + propDate_0 + " batchNo_1 : " +  batchNo_1);
+    Optional<AchAuthLog> achAuthLogT = null;
+    if (dbName.equals(ContentName.onDay))
+      achAuthLogT = achAuthLogReposDay.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+    else if (dbName.equals(ContentName.onMon))
+      achAuthLogT = achAuthLogReposMon.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+    else if (dbName.equals(ContentName.onHist))
+      achAuthLogT = achAuthLogReposHist.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+    else 
+      achAuthLogT = achAuthLogRepos.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+
+    return achAuthLogT.isPresent() ? achAuthLogT.get() : null;
   }
 
   @Override

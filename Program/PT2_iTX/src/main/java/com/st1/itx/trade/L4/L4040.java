@@ -198,10 +198,10 @@ public class L4040 extends TradeBuffer {
 				// 找BATCHNO最大的
 				if (iFunctionCode == 3) {
 
-					Slice<AchAuthLog> slAchAuthLog = achAuthLogService.propBatchNoEq(nPropDate, "Au" + batchNo + "%", 0,
-							Integer.MAX_VALUE, titaVo);
-					if (slAchAuthLog != null && slAchAuthLog.getContent().get(0).getBatchNo().length() >= 6) {
-						lastAuthSeq = slAchAuthLog.getContent().get(0).getBatchNo();
+					AchAuthLog tAchAuthLog = achAuthLogService.propDescBatchNoFirst(99991231, "Au" + batchNo + "%",
+							titaVo);
+					if (tAchAuthLog != null && tAchAuthLog.getBatchNo().length() >= 6) {
+						lastAuthSeq = tAchAuthLog.getBatchNo();
 					}
 				}
 				for (Map<String, String> result : resultList) {

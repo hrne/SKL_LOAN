@@ -62,7 +62,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "and CD.\"GroupNo\" = T.\"GroupNo\"								\n";
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
-		sql += "order by M.\"EntryDate\" ";
+		sql += "order by M.\"EntryDate\" , M.\"CustNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -104,7 +104,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd   and M.\"Factor\" <> '3'\n";
-		sql += "order by M.\"EntryDate\" ";
+		sql += "order by M.\"EntryDate\" , M.\"CustNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -151,7 +151,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd  and M.\"Factor\"='3'   \n";
 //		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
-		sql += "order by M.\"EntryDate\" ";
+		sql += "order by M.\"EntryDate\" , M.\"CustNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -193,7 +193,7 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += "where M.\"EntryDate\" >= :entryStart and M.\"EntryDate\" <= :entrydEnd and M.\"Factor\" <> '3'  \n";
 //		sql += "and NVL(M.\"ManagerCheck\", 'N') != 'Y'      \n     ";
-		sql += "order by M.\"EntryDate\" ";
+		sql += "order by M.\"EntryDate\" , M.\"CustNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -231,7 +231,8 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"ActualRepayDate\"		as F2				    \n"; // 實際還款日
 		sql += ",M.\"CustNo\" 				as F3					\n"; // 戶號
 		sql += ",C.\"CustName\" 				as F4					\n"; // 戶號
-		sql += ",M.\"RepayAmt\" 				as F5					\n"; // 還款金額
+		sql += ", CASE WHEN NVL(M.\"ActualRepayDate\", 0) > 0 THEN M.\"ActualRepayAmt\"  ";
+		sql += "	   ELSE	M.\"RepayAmt\"  END				as F5	\n"; // 還款金額
 		sql += ",M.\"Career\" 				as F6					\n"; // 職業
 		sql += ",M.\"Income\" 				as F7					\n"; // 年收入
 		sql += ",M.\"RepaySource\" 			as F8					\n"; // 還款來源

@@ -195,9 +195,10 @@ BEGIN
           ,''                  AS "SlipNote"         -- 傳票摘要
           ,'000'               AS "AcBookCode"       -- 帳冊別 -- 2021-07-15 修改 000:全公司
           ,'00A'               AS "AcSubBookCode"       -- 區隔帳冊 -- 2021-07-15 新增00A:傳統帳冊、201:利變帳冊
+          -- 2022-09-05 Wei 修改 from Lai line訊息 OpenAcDate原來固定1日,改為保險單起日
           ,CASE
-             WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0  THEN S1."InsuYearMonth" * 100 + 1
-             WHEN S1."StatusCode" = 1 THEN S1."InsuYearMonth" * 100 + 1
+             WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0  THEN S1."InsuStartDate"
+             WHEN S1."StatusCode" = 1 THEN S1."InsuStartDate"
              WHEN S1."StatusCode" = 2 THEN S1."OvduDate"
            ELSE 0 END          AS "OpenAcDate"       -- 起帳日期
           ,0                   AS "LastAcDate"       -- 最後作帳日
@@ -209,7 +210,7 @@ BEGIN
           -- 2022-07-04 Wei From Lai email
           -- 麻煩幫我轉入JsonFields InsuYearMonth 火險單年月 DECIMAL 6 EX.202006
           ,'{'
-           || ',' || '"InsuYearMonth":"' || LPAD(NVL(S1."InsuYearMonth",0),6,'0') || '"' -- 火險單年月
+           || '"InsuYearMonth":"' || LPAD(NVL(S1."InsuYearMonth",0),6,'0') || '"' -- 火險單年月
            || '}'              AS "JsonFields"       -- jason格式紀錄
           ,'999999'            AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME      AS "CreateDate"          -- 建檔日期時間 DATE 8 

@@ -359,6 +359,9 @@ X(#OOTempAmt)
 !溢短收
 #OOOverShort=m,14,O
 
+!回應代碼
+#OReturnCode=X,2,O
+
 ! 會計日期
 #OOAcDate=D,7,O
 #OOAcDateA=A,3,O
@@ -377,24 +380,29 @@ T(2,2+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType
 #OOBTN_A=A,2,O
 C(3,#FunctionCode,7,BIND(grid,cancel),$)
 C(3,#FunctionCode,7,s,$)
-IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_A}),BIND(grid,cancel))
+IF(#OOAcDate=="0000000"&&#OReturnCode=="",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_A}),BIND(grid,cancel))
+
+
 
 ! <刪除> 6+7+7+3+7+1+16+7=54
 #OOBUF_B=X,390,S
 T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
+#OOBTN_B=A,2,O
+C(3,#FunctionCode,7,BIND(grid,cancel),$)
+C(3,#FunctionCode,7,s,$)
+IF(#OOAcDate=="0000000"&&#OReturnCode=="",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
+
+
 
 ! <查詢> 6+7+7+3+7+1+16+7=54
 #OOBUF_C=X,390,S
 T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
-#OOBTN_B=A,2,O
-C(3,#FunctionCode,7,BIND(grid,cancel),$)
-C(3,#FunctionCode,7,s,$)
-IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
 
 #OOBTN_C=A,2,O
-C(3,#FunctionCode,7,BIND(grid,cancel),$)
-C(3,#FunctionCode,7,s,$)
-IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}),BIND(grid,cancel))
+!C(3,#FunctionCode,7,BIND(grid,cancel),$)
+!C(3,#FunctionCode,7,s,$)
+!IF(#OOAcDate!="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}),BIND(grid,cancel))
+BIND(#OOBTN_C,BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}))
 
 ! <交易>
 #OOBUF_D=X,390,S
@@ -456,6 +464,7 @@ TXFORM=L4943
 #OOAmlRsp
 #OOProcNote
 #OOOverShort
+#OReturnCode
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

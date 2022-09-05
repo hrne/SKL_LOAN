@@ -694,7 +694,7 @@ TXFORM=L3001
 {width:100,search:false,formatter:'cust:bind-button:;L2017 額度與擔保品關聯查詢',align:'center',canExport:false}
 
 #OOTavAmt14=暫收可抵繳
-{width:100}
+{width:100,sum:true}
 
 #OOTamAmtX=
 {width:100}

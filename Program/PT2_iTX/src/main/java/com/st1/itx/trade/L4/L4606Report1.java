@@ -129,8 +129,10 @@ public class L4606Report1 extends MakeReport {
 					}
 					this.print(1, 1,
 							"                                                                小　計：           筆");
-					this.print(0, 81, String.format("%,d", times), "R");
-					this.print(0, 138, String.format("%,d", amt.intValue()), "R");
+//					this.print(0, 119, String.format("%,d", times), "R");
+//					this.print(0, 181, String.format("%,d", amt.intValue()), "R");
+					this.print(0, 119, String.format("%,d", times));
+					this.print(0, 181, String.format("%,d", amt.intValue()));
 					this.print(1, 1,
 							"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 					amt = new BigDecimal("0");
@@ -179,8 +181,8 @@ public class L4606Report1 extends MakeReport {
 			i++;
 			if (i == listL4606.size()) {
 				this.print(1, 1, "                                                                小　計：           筆");
-				this.print(0, 91, String.format("%,d", times), "R");
-				this.print(0, 164, String.format("%,d", amt.intValue()), "R");
+				this.print(0, 119, String.format("%,d", times), "R");
+				this.print(0, 181, String.format("%,d", amt.intValue()), "R");
 				this.print(1, 1,
 						"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 				total = total + times;
@@ -201,7 +203,7 @@ public class L4606Report1 extends MakeReport {
 				"                                                                總　計：           筆              火險服務人：           人 ");
 		this.print(0, 91, String.format("%,d", total), "R");
 		this.print(0, 129, String.format("%,d", tfire.size()), "R");
-		this.print(0, 164, String.format("%,d", totamt.intValue()), "R");
+		this.print(0, 181, String.format("%,d", totamt.intValue()), "R");
 		long sno = this.close();
 		this.toPdf(sno);
 	}

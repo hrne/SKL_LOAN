@@ -3,12 +3,14 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +90,9 @@ public interface AchAuthLogRepository extends JpaRepository<AchAuthLog, AchAuthL
 
   // PropDate = ,AND BatchNo %
   public Slice<AchAuthLog> findAllByPropDateIsAndBatchNoLikeOrderByBatchNoDesc(int propDate_0, String batchNo_1, Pageable pageable);
+
+  // PropDate <= ,AND BatchNo %
+  public Optional<AchAuthLog> findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(int propDate_0, String batchNo_1);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
