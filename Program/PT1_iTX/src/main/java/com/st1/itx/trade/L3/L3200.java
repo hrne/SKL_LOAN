@@ -1408,7 +1408,7 @@ public class L3200 extends TradeBuffer {
 			tLoanBorMain.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
 			tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
 			// 部分償還重算期金
-			if (wkRepaykindCode == 1 && iPayMethod == 2) {
+			if (wkRepaykindCode == 1) {
 				int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
 						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
 						tLoanBorMain.getGraceDate());
@@ -1417,22 +1417,23 @@ public class L3200 extends TradeBuffer {
 						? tLoanBorMain.getTotalPeriod() - tLoanBorMain.getPaidTerms()
 						: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
 
-				// 重算期數 ==> 繳納方式 = 2 (1.減少每期攤還金額 2.縮短應繳期數)
 				if (iPayMethod == 2) {
+					// 重算期數 ==> 繳納方式 = 2 (1.減少每期攤還金額 2.縮短應繳期數)
 					wkDueTerms = loanDueAmtCom.getDueTerms(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
 							tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
 							tLoanBorMain.getFinalBal(), tLoanBorMain.getDueAmt(), titaVo);
 					// 寬限期 + 剩餘還本期數(寬限期內)；已繳期數 + 剩餘還本期數(超過寬限期)
-					int wkTotalPeriod = tLoanBorMain.getPaidTerms() > wkGracePeriod
+					wkNewTotalPeriod = tLoanBorMain.getPaidTerms() > wkGracePeriod
 							? wkDueTerms + tLoanBorMain.getPaidTerms()
 							: wkDueTerms + wkGracePeriod;
-					tLoanBorMain.setTotalPeriod(wkTotalPeriod);
+					tLoanBorMain.setTotalPeriod(wkNewTotalPeriod);
+				} else {
+					// 重算期金
+					wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
+							tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
+							tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
+					tLoanBorMain.setDueAmt(wkNewDueAmt);
 				}
-				// 重算期金
-				wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
-						tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
-						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
-				tLoanBorMain.setDueAmt(wkNewDueAmt);
 			}
 		}
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
@@ -1474,6 +1475,7 @@ public class L3200 extends TradeBuffer {
 		tLoanBorMain.setNextPayIntDate(this.parse.stringToInteger(tTempVo.get("NextPayIntDate")));
 		tLoanBorMain.setNextRepayDate(this.parse.stringToInteger(tTempVo.get("NextRepayDate")));
 		tLoanBorMain.setDueAmt(this.parse.stringToBigDecimal(tTempVo.get("DueAmt")));
+		tLoanBorMain.setTotalPeriod(this.parse.stringToInteger(tTempVo.getParam("TotalPeriod")));
 		tLoanBorMain.setLastEntDy(this.parse.stringToInteger(tTempVo.get("LastEntDy")));
 		tLoanBorMain.setLastKinbr(tTempVo.get("LastKinbr"));
 		tLoanBorMain.setLastTlrNo(tTempVo.get("LastTlrNo"));
@@ -1719,6 +1721,7 @@ public class L3200 extends TradeBuffer {
 		tTempVo.putParam("PrevRepaidDate", tLoanBorMain.getPrevRepaidDate());
 		tTempVo.putParam("NextPayIntDate", tLoanBorMain.getNextPayIntDate());
 		tTempVo.putParam("NextRepayDate", tLoanBorMain.getNextRepayDate());
+		tTempVo.putParam("TotalPeriod", tLoanBorMain.getTotalPeriod());
 		tTempVo.putParam("DueAmt", tLoanBorMain.getDueAmt());
 		tTempVo.putParam("LastEntDy", tLoanBorMain.getLastEntDy());
 		tTempVo.putParam("LastKinbr", tLoanBorMain.getLastKinbr());
