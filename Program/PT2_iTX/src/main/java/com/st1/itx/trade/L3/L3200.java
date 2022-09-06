@@ -1395,13 +1395,6 @@ public class L3200 extends TradeBuffer {
 			tLoanBorMain.setStatus(3);
 		}
 		if (isCalcRepayInt) {
-			tLoanBorMain.setStoreRate(loanCalcRepayIntCom.getStoreRate());
-			if (tLoanBorMain.getAmortizedCode().equals("3")
-					&& !loanCalcRepayIntCom.getDueAmt().equals(tLoanBorMain.getDueAmt())) {
-				wkNewDueAmt = loanCalcRepayIntCom.getDueAmt();
-				tLoanBorMain.setDueAmt(wkNewDueAmt);
-			}
-
 			// 部分償還重算期金
 			if (wkRepaykindCode == 1) {
 				int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
@@ -1430,12 +1423,18 @@ public class L3200 extends TradeBuffer {
 					tLoanBorMain.setDueAmt(wkNewDueAmt);
 				}
 			} else {
+				tLoanBorMain.setStoreRate(loanCalcRepayIntCom.getStoreRate());
 				tLoanBorMain.setRepaidPeriod(tLoanBorMain.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
 				tLoanBorMain.setPaidTerms(loanCalcRepayIntCom.getPaidTerms());
 				tLoanBorMain.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
 				tLoanBorMain.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
 				tLoanBorMain.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
 				tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());				
+				if (tLoanBorMain.getAmortizedCode().equals("3")
+						&& !loanCalcRepayIntCom.getDueAmt().equals(tLoanBorMain.getDueAmt())) {
+					wkNewDueAmt = loanCalcRepayIntCom.getDueAmt();
+					tLoanBorMain.setDueAmt(wkNewDueAmt);
+				}
 			}
 		}
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());

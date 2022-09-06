@@ -194,6 +194,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
 		sql += " WHERE PD.\"PieceCode\" IN ('1','2','A','B','8','9') ";
 		sql += "   AND PD.\"ProdCode\" NOT IN ('TB') ";
+		sql += "   AND PD.\"DrawdownAmt\" > 0 ";
 		sql += "   AND PD.\"WorkMonth\" = :inputWorkMonth ";
 		sql += " GROUP BY PD.\"CustNo\" ";
 		sql += "        , PD.\"FacmNo\" ";

@@ -231,12 +231,15 @@ public class L9740Report extends MakeReport {
 		int[] num = new int[text.length()];
 
 		String tmpText = "";
+		int strCode = 0;
 
 		for (int i = 0; i < num.length; i++) {
-
+			strCode = text.charAt(i);
 			tmpText = text.substring(i, i + 1);
-			// 中文字數為2，非中文為1
+			// 中文字數為2，全形為2，非中文為1
 			if (tmpText.matches("[\\u4E00-\\u9FA5]+")) {
+				num[i] = 2;
+			} else if ((strCode > 65248) || (strCode == 12288)) {
 				num[i] = 2;
 			} else {
 				num[i] = 1;

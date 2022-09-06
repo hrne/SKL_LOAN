@@ -18,7 +18,6 @@ import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 /**
  * L9739Report
  * 
@@ -44,25 +43,24 @@ public class L9739Report extends MakeReport {
 	String txcd = "L9739";
 	String txname = "檢核政府優惠房貸利率脫鉤";
 
-	
 	@Override
 	public void printHeader() {
-		this.print(1, 0," ");
+		this.print(1, 0, " ");
 		this.setBeginRow(1);
 		this.setMaxRows(45);
 	}
-	
+
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param iYearMonth 西元年月
-	 * @return 
+	 * @return
 	 * @throws LogicException
 	 *
 	 * 
 	 */
-	public boolean exec(TitaVo titaVo,int iYearMonth) throws LogicException {
+	public boolean exec(TitaVo titaVo, int iYearMonth) throws LogicException {
 		this.info("L9739 exec");
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -75,7 +73,7 @@ public class L9739Report extends MakeReport {
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
-		//開啟報表
+		// 開啟報表
 		this.open(titaVo, reportVo);
 
 		List<Map<String, String>> listL9739Title = null;
@@ -93,9 +91,9 @@ public class L9739Report extends MakeReport {
 			this.error(txcd + "ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		//關閉報表
+		// 關閉報表
 		this.close();
-		
+
 		boolean result = false;
 
 		if (listL9739Detail.size() > 0) {
@@ -109,15 +107,14 @@ public class L9739Report extends MakeReport {
 	private void exportData(List<Map<String, String>> listL9739Title, List<Map<String, String>> listL9739Detail)
 			throws LogicException {
 
-	
-
 		this.setFont(1, 18);
 		this.print(1, this.getMidXAxis(), "逐項檢核政府優惠房貸利率不符當時利率", "C");
 
 		this.setFont(1, 12);
+		this.print(1, 1, " ");
 		// 標題
 		for (Map<String, String> t : listL9739Title) {
-			String text = t.get("ProdNo") + "     " + fillUpWord(t.get("ProdName"), 23, " ", "R")
+			String text = t.get("ProdNo") + "     " + fillUpWord(t.get("ProdName"), 22, " ", "R")
 					+ this.showRocDate(t.get("EffectDate"), 1) + "     " + fillUpWord(t.get("FitRate"), 6, "0", "R");
 
 			this.print(1, this.getMidXAxis(), text, "C");
@@ -152,7 +149,6 @@ public class L9739Report extends MakeReport {
 
 		this.print(1, 3, "＊＊＊＊＊＊＊＊    End of report    ＊＊＊＊＊＊＊＊ ");
 
-
 	}
 
 	/**
@@ -170,12 +166,15 @@ public class L9739Report extends MakeReport {
 		int[] num = new int[text.length()];
 
 		String tmpText = "";
+		int strCode = 0;
 
 		for (int i = 0; i < num.length; i++) {
-
+			strCode = text.charAt(i);
 			tmpText = text.substring(i, i + 1);
-			// 中文字數為2，非中文為1
+			// 中文字數為2，全形為2，非中文為1
 			if (tmpText.matches("[\\u4E00-\\u9FA5]+")) {
+				num[i] = 2;
+			} else if ((strCode > 65248) || (strCode == 12288)) {
 				num[i] = 2;
 			} else {
 				num[i] = 1;
