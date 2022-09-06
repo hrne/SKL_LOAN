@@ -363,7 +363,7 @@ public class L2R05 extends TradeBuffer {
 		// 查詢階梯式利率
 		slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(sProdNo, 0, 999, this.index, this.limit, titaVo);
 
-		if (slFacProdStepRate != null) {
+		if (slFacProdStepRate != null && slFacProdStepRate.getContent().size() > 1) {
 			SetTotaStepRated();
 		}
 

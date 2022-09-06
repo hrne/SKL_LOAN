@@ -161,7 +161,7 @@ public class L9705Report extends MakeReport {
 						this.info("titaVo = " + titaVo);
 
 						ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-								.setRptCode(tran + "A (A3)").setRptItem(rptitem).setRptSize("A4").setSecurity("")
+								.setRptCode(tran + "A (A3)").setRptItem(rptitem+"(A3)").setRptSize("A4").setSecurity("")
 								.setPageOrientation("P").build();
 
 						this.openForm(titaVo, reportVo);
@@ -560,7 +560,7 @@ public class L9705Report extends MakeReport {
 			String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
 			BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
 
-			this.printCm(10, 29, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + " 業已入帳無誤。",
+			this.printCm(10, 28.5, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + " 業已入帳無誤。",
 					"C");
 		}
 

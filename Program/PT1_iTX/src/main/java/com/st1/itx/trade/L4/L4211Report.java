@@ -388,8 +388,7 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-							|| lastSortingForSubTotal.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, lastAcctItem);
@@ -450,8 +449,7 @@ public class L4211Report extends MakeReport {
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-								|| lastSortingForSubTotal.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999")) {
 							this.print(1, 2, "暫收款");
 						} else {
 							this.print(1, 2, lastAcctItem);
@@ -554,7 +552,13 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, c6, name);
-			this.print(0, c6 + 9, tfnAllList.get("CloseReasonCode"));
+			
+			String CloseReasonCodeText = "";
+			if(!"00".equals(tfnAllList.get("CloseReasonCode"))) {
+				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
+			}
+			
+			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, c7, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
@@ -619,8 +623,7 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-						|| lastSortingForSubTotal.equals(" ")) {
+				if (lastSortingForSubTotal.equals("999")) {
 					this.print(1, 2, "暫收款");
 				} else {
 					this.print(1, 2, lastAcctItem);
@@ -741,8 +744,7 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-							|| lastSortingForSubTotal.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, lastAcctItem);
@@ -804,8 +806,7 @@ public class L4211Report extends MakeReport {
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-								|| lastSortingForSubTotal.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999")) {
 							this.print(1, 2, "暫收款");
 						} else {
 							this.print(1, 2, lastAcctItem);
@@ -909,8 +910,14 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, c6, name);
-			this.print(0, c6 + 9, tfnAllList.get("CloseReasonCode"));
-
+			
+			String CloseReasonCodeText = "";
+			if(!"00".equals(tfnAllList.get("CloseReasonCode"))) {
+				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
+			}
+			
+			this.print(0, c6 + 9, CloseReasonCodeText);
+			
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, c7, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
@@ -974,8 +981,7 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-						|| lastSortingForSubTotal.equals(" ")) {
+				if (lastSortingForSubTotal.equals("999") ) {
 					this.print(1, 2, "暫收款");
 				} else {
 					this.print(1, 2, lastAcctItem);
@@ -1094,8 +1100,7 @@ public class L4211Report extends MakeReport {
 					this.print(1, 0,
 							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-							|| lastSortingForSubTotal.equals(" ")) {
+					if (lastSortingForSubTotal.equals("999")) {
 						this.print(1, 2, "暫收款");
 					} else {
 						this.print(1, 2, lastAcctItem);
@@ -1157,8 +1162,7 @@ public class L4211Report extends MakeReport {
 
 						this.print(1, 0,
 								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-								|| lastSortingForSubTotal.equals(" ")) {
+						if (lastSortingForSubTotal.equals("999")) {
 							this.print(1, 2, "暫收款");
 						} else {
 							this.print(1, 2, lastAcctItem);
@@ -1261,7 +1265,12 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, c6, name);
-			this.print(0, c6 + 9, tfnAllList.get("CloseReasonCode"));
+			String CloseReasonCodeText = "";
+			if(!"00".equals(tfnAllList.get("CloseReasonCode"))) {
+				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
+			}
+			
+			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, c7, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
@@ -1326,8 +1335,7 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (lastSortingForSubTotal.equals("999") || lastSortingForSubTotal.equals("")
-						|| lastSortingForSubTotal.equals(" ")) {
+				if (lastSortingForSubTotal.equals("999")) {
 					this.print(1, 2, "暫收款");
 				} else {
 					this.print(1, 2, lastAcctItem);

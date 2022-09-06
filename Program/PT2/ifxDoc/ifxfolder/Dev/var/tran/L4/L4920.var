@@ -372,11 +372,14 @@ SWITCH(#OOProcStsCode,5,T(2,分錄),
 				   )
 
 ! KEY=會計日 批號 明細序號
-#OOBUF_L4201=X,416,S
+#OOBUF_L4201=X,500,S
 T(2,#AcDate+#BatchNo+#OODetailSeq+#OOCustNo+#OORepayType
    +#OORepayAmtX+#OOAcctAmtX+#OODisacctAmtX+#OOProcStsCode
    +#OOProcCode+#OOProcNote+#OOTxSn+#OOFacmNo)
 IF(#OOProcStsCode==5||#OOProcStsCode==6||#OOProcStsCode==7,$,s)
+T(2,5+#AcDate+#BatchNo+#OODetailSeq+#OOCustNo+#OORepayType
+   +#OORepayAmtX+#OOAcctAmtX+#OODisacctAmtX+#OOProcStsCode
+   +#OOProcCode+#OOProcNote+#OOTxSn+#OOFacmNo)
 
 #OOBUF_L4202=X,418,S
 T(2,#AcDate+#BatchNo+#OODetailSeq+#OOCustNo+#OOFacmNo+#OORepayType

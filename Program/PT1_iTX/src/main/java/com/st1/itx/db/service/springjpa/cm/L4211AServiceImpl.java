@@ -104,10 +104,12 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
-			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
+			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
+			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '暫收款' ";
+			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\""; 
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),fac.\"AdvanceCloseCode\"),2,0) AS \"CloseReasonCode\" ";
+			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
@@ -191,10 +193,13 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '999' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '999' ";
 			sql += "           ELSE NVL(FAC.\"AcctCode\",'999') END AS \"SortingForSubTotal\""; // 配合小計產生的排序
-			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
+			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
+			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '暫收款' ";
+			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\""; 
+//			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
-			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),fac.\"AdvanceCloseCode\"),2,0) AS \"CloseReasonCode\" ";
+			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
 			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";

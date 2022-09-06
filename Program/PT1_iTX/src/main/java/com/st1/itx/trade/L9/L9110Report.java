@@ -1132,6 +1132,7 @@ public class L9110Report extends MakeReport {
 //			this.print(0, 101, formatAmt(mLand.get("F6"), 2), "R"); // 面積
 			this.print(0, 101, "" + new BigDecimal(mLand.get("F6")).multiply(ownerPart.divide(ownerTotal)), "R"); // 面積
 
+			BigDecimal Area = new BigDecimal(mLand.get("F6")).multiply(ownerPart.divide(ownerTotal));
 			String f7 = "";
 
 			try {
@@ -1146,7 +1147,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 149, formatAmt(computeDivide(getBigDecimal(lineAmt), thousand, 0), 0), "R"); // 核貸
 			this.print(0, 163, formatAmt(computeDivide(getBigDecimal(mLand.get("F10")), thousand, 0), 0), "R"); // 設定
 
-			totalArea = totalArea.add(getBigDecimal(mLand.get("F6")));
+			totalArea = totalArea.add(Area);
 			totalLastTransferred = totalLastTransferred.add(getBigDecimal(mLand.get("F8")));
 //			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mLand.get("F10")));
 

@@ -1401,12 +1401,7 @@ public class L3200 extends TradeBuffer {
 				wkNewDueAmt = loanCalcRepayIntCom.getDueAmt();
 				tLoanBorMain.setDueAmt(wkNewDueAmt);
 			}
-			tLoanBorMain.setRepaidPeriod(tLoanBorMain.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
-			tLoanBorMain.setPaidTerms(loanCalcRepayIntCom.getPaidTerms());
-			tLoanBorMain.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
-			tLoanBorMain.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
-			tLoanBorMain.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
-			tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
+
 			// 部分償還重算期金
 			if (wkRepaykindCode == 1) {
 				int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
@@ -1434,6 +1429,13 @@ public class L3200 extends TradeBuffer {
 							tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
 					tLoanBorMain.setDueAmt(wkNewDueAmt);
 				}
+			} else {
+				tLoanBorMain.setRepaidPeriod(tLoanBorMain.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
+				tLoanBorMain.setPaidTerms(loanCalcRepayIntCom.getPaidTerms());
+				tLoanBorMain.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
+				tLoanBorMain.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
+				tLoanBorMain.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
+				tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());				
 			}
 		}
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
@@ -1475,7 +1477,9 @@ public class L3200 extends TradeBuffer {
 		tLoanBorMain.setNextPayIntDate(this.parse.stringToInteger(tTempVo.get("NextPayIntDate")));
 		tLoanBorMain.setNextRepayDate(this.parse.stringToInteger(tTempVo.get("NextRepayDate")));
 		tLoanBorMain.setDueAmt(this.parse.stringToBigDecimal(tTempVo.get("DueAmt")));
-		tLoanBorMain.setTotalPeriod(this.parse.stringToInteger(tTempVo.getParam("TotalPeriod")));
+		if (this.parse.stringToInteger(tTempVo.getParam("TotalPeriod")) > 0) {
+			tLoanBorMain.setTotalPeriod(this.parse.stringToInteger(tTempVo.getParam("TotalPeriod")));
+		}
 		tLoanBorMain.setLastEntDy(this.parse.stringToInteger(tTempVo.get("LastEntDy")));
 		tLoanBorMain.setLastKinbr(tTempVo.get("LastKinbr"));
 		tLoanBorMain.setLastTlrNo(tTempVo.get("LastTlrNo"));

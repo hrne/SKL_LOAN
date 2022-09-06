@@ -82,20 +82,35 @@ IF(#CHAIN!=1,V(P,此為連動交易),$)
 
 #NTXBUF=X,500,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@AcDate,#NTXBUF,1,7)
-T(1,@BatchNo,#NTXBUF,8,6)
-T(1,@DetailSeq,#NTXBUF,14,6)
-T(1,@CustNo,#NTXBUF,20,7)
-T(1,@RepayType,#NTXBUF,27,2)
-T(1,@RepayAmtX,#NTXBUF,29,18)
-T(1,@AcctAmtX,#NTXBUF,47,18)
-T(1,@DisacctAmtX,#NTXBUF,65,18)
-T(1,@ProcStsCode,#NTXBUF,83,1)
-T(1,@ProcStsCodeTemp,#NTXBUF,83,1)
-T(1,@ProcCode,#NTXBUF,84,5)
-T(1,@ProcDscptCode,#NTXBUF,89,300)
-T(1,@TxSn,#NTXBUF,393,14)
-T(1,@FacmNoA,#NTXBUF,407,3)
+T(1,@FuncCode,#NTXBUF,1,1)
+T(1,@AcDate,#NTXBUF,2,7)
+T(1,@BatchNo,#NTXBUF,9,6)
+T(1,@DetailSeq,#NTXBUF,15,6)
+T(1,@CustNo,#NTXBUF,21,7)
+T(1,@RepayType,#NTXBUF,28,2)
+T(1,@RepayAmtX,#NTXBUF,30,18)
+T(1,@AcctAmtX,#NTXBUF,48,18)
+T(1,@DisacctAmtX,#NTXBUF,66,18)
+T(1,@ProcStsCode,#NTXBUF,84,1)
+T(1,@ProcStsCodeTemp,#NTXBUF,84,1)
+T(1,@ProcCode,#NTXBUF,85,5)
+T(1,@ProcDscptCode,#NTXBUF,90,300)
+T(1,@TxSn,#NTXBUF,394,14)
+T(1,@FacmNoA,#NTXBUF,408,3)
+! T(1,@AcDate,#NTXBUF,1,7)
+! T(1,@BatchNo,#NTXBUF,8,6)
+! T(1,@DetailSeq,#NTXBUF,14,6)
+! T(1,@CustNo,#NTXBUF,20,7)
+! T(1,@RepayType,#NTXBUF,27,2)
+! T(1,@RepayAmtX,#NTXBUF,29,18)
+! T(1,@AcctAmtX,#NTXBUF,47,18)
+! T(1,@DisacctAmtX,#NTXBUF,65,18)
+! T(1,@ProcStsCode,#NTXBUF,83,1)
+! T(1,@ProcStsCodeTemp,#NTXBUF,83,1)
+! T(1,@ProcCode,#NTXBUF,84,5)
+! T(1,@ProcDscptCode,#NTXBUF,89,300)
+! T(1,@TxSn,#NTXBUF,393,14)
+! T(1,@FacmNoA,#NTXBUF,407,3)
 
 INVOKEJS(SHOW,p1,02,02,1)
 IF(#ProcStsCodeTemp == 4 || #ProcStsCodeTemp == 3 || #ProcStsCodeTemp == 2 || #ProcStsCodeTemp == 1 || #ProcStsCodeTemp == 0,T(F,@ProcStsCode,1),T(F,@ProcStsCode,0))
@@ -106,6 +121,13 @@ IF(#ProcStsCodeTemp == 4 || #ProcStsCodeTemp == 3 || #ProcStsCodeTemp == 2 || #P
 E(0,@RepayAmt,#RepayAmtX)
 E(0,@AcctAmt,#AcctAmtX)
 E(0,@DisacctAmt,#DisacctAmtX)
+
+!功能 2修改5查詢
+#FuncCode=A,1,S
+C(3,#FuncCode,5,K(NOBUTTON,CLOSEY)T(F,@RepayTypeA,0)T(F,@CustNoA,0)T(F,@FacmNoA,0),$)
+
+#UpdateCode=N,1,S
+IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 
 ! 會計日期
 #AcDate=D,7,L
@@ -197,6 +219,7 @@ T(3,)T(H,#RepayType,#RepayTypeHelp)
 #ProcStsCode=X,1,I
 HELP(#ProcStsCodeHelp)
 IF(#RepayAmt < 0,T(F,@ProcStsCode,0),$)
+C(3,#UpdateCode,1,$,s)
 IF(#RepayAmt >= 0,$,s)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
@@ -283,6 +306,7 @@ T(3,)T(H,#RemintBank,#BankCdHelp)
 
 #RepayTypeA=A,2,I
 E(0,#RepayType)
+C(3,#UpdateCode,1,$,s)
 C(3,#ProcStsCode,1,s,$)
 HELP(#RepayTypeHelp)
 @V(H,#RepayTypeHelp)
@@ -308,9 +332,11 @@ T(3,)T(H,#RepayTypeA,#RepayTypeHelp)
 !戶號
 #CustNoA=A,7,I
 E(0,#CustNo)
+C(3,#UpdateCode,1,$,s)
 C(3,#ProcStsCode,1,s,$)
 
 #FacmNoA=A,3,I
+C(3,#UpdateCode,1,$,s)
 C(3,#ProcStsCode,1,s,$)
 
 

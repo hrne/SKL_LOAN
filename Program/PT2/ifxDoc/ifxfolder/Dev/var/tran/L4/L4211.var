@@ -71,7 +71,7 @@ E(0,@EntryDate,#SYSDATE)
 @V(7)A(DATE,0,#EntryDate)
 
 #ReconCodeHelp=X,100,S
-T(3,A1:企金;A2:期款;A3:還本;A6:債協;A7:前置協商收款專戶)
+T(3,A1:企金;A2:期款;A3:還本;A6:債協;A7:前置協商收款專戶; :查全部)
 
 #ReconCode=X,3,I
 HELP(#ReconCodeHelp)
@@ -86,7 +86,7 @@ T(3,1:總傳票明細表;2:入帳後撿核明細表)
 
 #ReportNo=X,1,I
 HELP(#ReportNoHelp)
-@
+@V(7)
 C(4,#ReportNo,$,V(H,#ReportNoHelp))
 
 #ReportNoX=X,20,L

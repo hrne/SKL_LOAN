@@ -156,8 +156,8 @@ public class L4452Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4452",
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4452", sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", sendMsg, titaVo);
 		}
@@ -555,15 +555,16 @@ public class L4452Batch extends TradeBuffer {
 
 //					銀扣用
 //					1.火險費 
-//					2.帳管費、貸後契變手續費
+//					2.帳管費
 //					3.期款 
-				if (tBankDeductDtl.getRepayType() == 1 || tBankDeductDtl.getRepayType() == 3) {
+//                  4.貸後契變手續費
+				if (tBankDeductDtl.getRepayType() >= 1 && tBankDeductDtl.getRepayType() <= 3) {
 					tAchDeductMedia.setAchRepayCode("3");
-				} else if (tBankDeductDtl.getRepayType() == 4) {
-					tAchDeductMedia.setAchRepayCode("2");
 				} else if (tBankDeductDtl.getRepayType() == 5) {
 					tAchDeductMedia.setAchRepayCode("1");
 				} else if (tBankDeductDtl.getRepayType() == 6) {
+					tAchDeductMedia.setAchRepayCode("4");
+				} else {
 					tAchDeductMedia.setAchRepayCode("2");
 				}
 				tAchDeductMedia.setAcctCode(tBankDeductDtl.getAcctCode());
@@ -1065,7 +1066,7 @@ public class L4452Batch extends TradeBuffer {
 				} else {
 					occursList.putParam("OccAbstract", FormatUtil.padX(" ", 10));
 				}
-				
+
 				occursList.putParam("OccNote", FormatUtil.padX("", 2));
 
 				tmp.add(occursList);

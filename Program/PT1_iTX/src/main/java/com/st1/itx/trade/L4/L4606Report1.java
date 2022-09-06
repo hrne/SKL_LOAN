@@ -129,10 +129,8 @@ public class L4606Report1 extends MakeReport {
 					}
 					this.print(1, 1,
 							"                                                                小　計：           筆");
-//					this.print(0, 119, String.format("%,d", times), "R");
-//					this.print(0, 181, String.format("%,d", amt.intValue()), "R");
-					this.print(0, 119, String.format("%,d", times));
-					this.print(0, 181, String.format("%,d", amt.intValue()));
+					this.print(0, 119, String.format("%,d", times), "R");
+					this.print(0, 181, String.format("%,d", amt.intValue()), "R");
 					this.print(1, 1,
 							"--------------------------------------------------------------------------------------------------------------------------------------------------------");
 					amt = new BigDecimal("0");
@@ -142,7 +140,7 @@ public class L4606Report1 extends MakeReport {
 
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 35) {
-						this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
+						this.print(pageIndex - pageCnt - 2, 84, "=====續下頁=====", "C");
 
 						pageCnt = 0;
 						this.newPage();
@@ -172,7 +170,7 @@ public class L4606Report1 extends MakeReport {
 
 //			每頁第38筆 跳頁 
 			if (pageCnt >= 35) {
-				this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
+				this.print(pageIndex - pageCnt - 2, 84, "=====續下頁=====", "C");
 
 				pageCnt = 0;
 				this.newPage();
@@ -192,7 +190,7 @@ public class L4606Report1 extends MakeReport {
 
 //			每頁第35筆 跳頁 
 			if (pageCnt >= 35) {
-				this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
+				this.print(pageIndex - pageCnt - 2, 84, "=====續下頁=====", "C");
 
 				pageCnt = 0;
 				this.newPage();

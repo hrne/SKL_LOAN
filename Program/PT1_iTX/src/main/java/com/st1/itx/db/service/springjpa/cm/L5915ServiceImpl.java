@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -34,17 +35,31 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
-	public List<Map<String, String>> findData(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findData(TitaVo titaVo) throws LogicException {
 		int workMonth = parse.stringToInteger(titaVo.getParam("Ym")) + 191100;
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
-		String sql = "select a.\"Coorgnizer\",b.\"Fullname\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\",a.\"DrawdownAmt\",a.\"ComputeCoBonusAmt\",a.\"CoorgnizerBonus\" ";
-		sql += "from \"PfDetail\" a ";
-		sql += "left join \"CdEmp\" b on b.\"EmployeeNo\"=a.\"Coorgnizer\" ";
-		sql += "where a.\"WorkMonth\"=:workmonth and a.\"Coorgnizer\" is not null and a.\"ComputeCoBonusAmt\">0 and a.\"RepayType\"=0 ";
-		sql += "order by a.\"Coorgnizer\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
+		String sql = " ";
+		sql += " SELECT a.\"Coorgnizer\" ";
+		sql += "      , b.\"Fullname\" ";
+		sql += "      , a.\"CustNo\" ";
+		sql += "      , a.\"FacmNo\" ";
+		sql += "      , a.\"BormNo\" ";
+		sql += "      , a.\"DrawdownAmt\" ";
+		sql += "      , a.\"ComputeCoBonusAmt\" ";
+		sql += "      , a.\"CoorgnizerBonus\" ";
+		sql += " FROM \"PfDetail\" a ";
+		sql += " LEFT JOIN \"CdEmp\" b ON b.\"EmployeeNo\" = a.\"Coorgnizer\" ";
+		sql += " WHERE a.\"WorkMonth\" = :workmonth ";
+		sql += "   AND a.\"Coorgnizer\" IS NOT NULL ";
+		sql += "   AND a.\"ComputeCoBonusAmt\" > 0 ";
+		sql += "   AND a.\"RepayType\" = 0 ";
+		sql += " ORDER BY a.\"Coorgnizer\" ";
+		sql += "        , a.\"CustNo\" ";
+		sql += "        , a.\"FacmNo\" ";
+		sql += "        , a.\"BormNo\" ";
 		this.info("sql = " + sql);
 
 		query = em.createNativeQuery(sql);
@@ -89,7 +104,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
 		sql += "      , CM.\"CustId\"           AS \"CustId\" "; // 統一編號
-		sql += "      , ud.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
+		sql += "      , rd.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
 		sql += "      , PR.\"CoorgnizerBonus\"  AS \"Bonus\" "; // 車馬費發放額
 		sql += "      , PR.\"Coorgnizer\"       AS \"EmpNo\" "; // 介紹人
 		sql += "      , \"Fn_GetEmpName\"(PR.\"Coorgnizer\",0) ";
@@ -99,9 +114,8 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , PCO.\"AreaItem\"        AS \"Unit\" "; // 單位
 		sql += " FROM \"PfReward\" PR ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = PR.\"CustNo\" ";
-		sql += " LEFT JOIN utilData ud ON ud.\"CustNo\" = PR.\"CustNo\" ";
-		sql += "                      AND ud.\"FacmNo\" = PR.\"FacmNo\" ";
-		sql += "                      AND ud.\"DrawdownDate\" = PR.\"PerfDate\" ";
+		sql += " LEFT JOIN rawData rd ON rd.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                     AND rd.\"FacmNo\" = PR.\"FacmNo\" ";
 		sql += " LEFT JOIN \"PfCoOfficer\" PCO ON PCO.\"EmpNo\" = PR.\"Coorgnizer\" ";
 		sql += "                              AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth ";
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
@@ -117,7 +131,7 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CM.\"CustName\"         AS \"CustName\" "; // 戶名
 		sql += "      , PR.\"FacmNo\"           AS \"FacmNo\" "; // 額度號碼
 		sql += "      , CM.\"CustId\"           AS \"CustId\" "; // 統一編號
-		sql += "      , ud.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
+		sql += "      , rd.\"UtilBal\"          AS \"UtilBal\" "; // 已用額度
 		sql += "      , PR.\"IntroducerBonus\"  AS \"Bonus\" "; // 車馬費發放額
 		sql += "      , PR.\"Introducer\"       AS \"EmpNo\" "; // 介紹人
 		sql += "      , \"Fn_GetEmpName\"(PR.\"Introducer\",0) ";
@@ -127,9 +141,8 @@ public class L5915ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , B3.\"UnitItem\"         AS \"Unit\" "; // 單位
 		sql += " FROM \"PfReward\" PR ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = PR.\"CustNo\" ";
-		sql += " LEFT JOIN utilData ud ON ud.\"CustNo\" = PR.\"CustNo\" ";
-		sql += "                      AND ud.\"FacmNo\" = PR.\"FacmNo\" ";
-		sql += "                      AND ud.\"DrawdownDate\" = PR.\"PerfDate\" ";
+		sql += " LEFT JOIN rawData rd ON rd.\"CustNo\" = PR.\"CustNo\" ";
+		sql += "                     AND rd.\"FacmNo\" = PR.\"FacmNo\" ";
 		sql += " LEFT JOIN \"PfItDetail\" PI ON PI.\"CustNo\" = PR.\"CustNo\" ";
 		sql += "                            AND PI.\"FacmNo\" = PR.\"FacmNo\" ";
 		sql += "                            AND PI.\"BormNo\" = PR.\"BormNo\" ";

@@ -309,7 +309,7 @@ BEGIN
           ,CASE
              WHEN NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0) != 0
              THEN NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0)
-           ELSE txData.LMSACN END         AS "CustNo"              -- 戶號 DECIMAL 7 0
+           ELSE NVL(txData.LMSACN,0) END  AS "CustNo"              -- 戶號 DECIMAL 7 0
           ,NVL(S."LMSAPN",0)              AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,NVL(S."LMSASQ",0)              AS "BormNo"              -- 撥款序號 DECIMAL 3 0
           ,NVL(S."RecordNo",'')           AS "RvNo"                -- 銷帳編號 VARCHAR2 30 0
