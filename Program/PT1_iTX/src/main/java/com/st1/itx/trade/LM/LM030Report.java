@@ -56,8 +56,7 @@ public class LM030Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM030) throws LogicException {
 		this.info("LM030Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表",
-				"LM030轉催收案件明細_核定總表.xlsx", "11005");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表", "LM030轉催收案件明細_核定總表.xlsx", "11005");
 		String yy = titaVo.get("ENTDY").substring(1, 4);
 		String mm = titaVo.get("ENTDY").substring(4, 6);
 		makeExcel.setSheet("11005", yy + mm);
@@ -81,8 +80,7 @@ public class LM030Report extends MakeReport {
 					case 5:
 					case 10:
 					case 11:
-						makeExcel.setValue(row, col,
-								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
 						break;
 					case 6:
 					case 7:
@@ -96,8 +94,7 @@ public class LM030Report extends MakeReport {
 						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000");
 						break;
 					case 9:
-						makeExcel.setValue(row, col,
-								parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
 						break;
 					default:
 						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value);
@@ -130,8 +127,7 @@ public class LM030Report extends MakeReport {
 		if (listLM030 == null || listLM030.isEmpty()) {
 			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款，無清償期屆滿六個\r\n" + "    月需轉列催收款之案件。\r\n" + "二、陳核。 ");
 		} else {
-			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款清償期屆滿六個月案件\r\n" + "    ，依規將本金及應收利息轉列催收款項，\r\n" + "    金額共計 $"
-					+ FormatUtil.formatAmt(total, 0) + "元。");
+			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款清償期屆滿六個月案件\r\n" + "    ，依規將本金及應收利息轉列催收款項，\r\n" + "    金額共計 $" + FormatUtil.formatAmt(total, 0) + "元。");
 			makeExcel.setValue(row + 2, 1, "二、本月轉入催收款案件未發生『撥款後繳款\r\n" + "    期數未滿18個月即轉入催收戶』之情事。\r\n" + "三、陳核。 ");
 		}
 		makeExcel.setColor("RED");

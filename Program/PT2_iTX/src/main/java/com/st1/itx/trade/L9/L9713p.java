@@ -49,7 +49,7 @@ public class L9713p extends TradeBuffer {
 
 //		this.info("L9713p content = " + content);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9713", content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9713", content, titaVo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

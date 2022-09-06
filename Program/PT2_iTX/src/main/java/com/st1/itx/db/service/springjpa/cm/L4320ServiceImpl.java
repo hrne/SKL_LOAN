@@ -121,7 +121,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(f.\"ApproveRate\", 0)                    as \"FacApproveRate\"  "; // 額度核准利率
 		sql += "   ,NVL(f.\"RateIncr\", 0)                       as \"FacRateIncr\"  "; // 額度加碼利率
 		sql += "   ,NVL(f.\"IndividualIncr\" , 0)                as \"FacIndividualIncr\" "; // 額度個人加碼利率
-		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日 
+		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日
 		sql += "   ,NVL(p.\"EmpFlag\", ' ')                      as \"EmpFlag\" "; // 員工利率記號
 		sql += "   ,NVL(r.\"IncrFlag\", ' ')                     as \"IncrFlag\" "; // 借戶利率檔是否依合約記號
 		sql += "   ,NVL(r.\"BaseRateCode\", ' ')                 as \"BaseRateCode\" "; // 借戶利率檔商品指標利率代碼
@@ -219,9 +219,10 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
-			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" +iGroupId +"'";
+			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" + iGroupId + "'";
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
-		}		sql += " where b.\"Status\" = 0                                        ";
+		}
+		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
@@ -412,8 +413,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo        TitaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate,
-			TitaVo titaVo) {
+	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate, TitaVo titaVo) {
 
 		if (iEffectDate <= 19110000) {
 			iEffectDate += 19110000;

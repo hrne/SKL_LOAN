@@ -1,4 +1,4 @@
-	package com.st1.itx.trade.L5;
+package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ public class L5R35 extends TradeBuffer {
 	public GraceConditionService iGraceConditionService;
 	@Autowired
 	public FacMainService facMainService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
@@ -52,14 +53,14 @@ public class L5R35 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		if(iRimFunCd ==1) {
+		if (iRimFunCd == 1) {
 			iFacMainId.setCustNo(iCustNo);
 			iFacMainId.setFacmNo(iFacmNo);
 			iFacMain = facMainService.findById(iFacMainId, titaVo);
-			if(iFacMain == null) {
+			if (iFacMain == null) {
 				throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 			}
-		}else {
+		} else {
 			iGraceConditionId.setCustNo(iCustNo);
 			iGraceConditionId.setFacmNo(iFacmNo);
 			iGraceCondition = iGraceConditionService.findById(iGraceConditionId, titaVo);
@@ -70,7 +71,7 @@ public class L5R35 extends TradeBuffer {
 				totaVo.putParam("L5R35ActUse", iGraceCondition.getActUse());
 			}
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -57,7 +57,7 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("active StartBS996 ");
 
 		TitaVo titaVo = new TitaVo();
-		
+
 		try {
 			titaVo.init();
 			titaVo.putParam(ContentName.kinbr, "0000");

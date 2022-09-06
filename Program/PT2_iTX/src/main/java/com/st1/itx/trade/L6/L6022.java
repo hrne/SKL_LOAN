@@ -35,7 +35,7 @@ public class L6022 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdSyndFeeService cdSyndFeeService;
-    @Autowired 
+	@Autowired
 	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
@@ -72,8 +72,8 @@ public class L6022 extends TradeBuffer {
 			occursList.putParam("OOSyndFeeCode", tCdSyndFee.getSyndFeeCode());
 			occursList.putParam("OOSyndFeeItem", tCdSyndFee.getSyndFeeItem());
 			occursList.putParam("OOAcctCode", tCdSyndFee.getAcctCode());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdSyndFee.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdSyndFee.getLastUpdate()));
-			occursList.putParam("OOLastEmp",tCdSyndFee.getLastUpdateEmpNo() + " " + empName(titaVo, tCdSyndFee.getLastUpdateEmpNo()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdSyndFee.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdSyndFee.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdSyndFee.getLastUpdateEmpNo() + " " + empName(titaVo, tCdSyndFee.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -87,6 +87,7 @@ public class L6022 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

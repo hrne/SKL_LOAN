@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.TxErrCode;
  */
 public interface TxErrCodeRepositoryHist extends JpaRepository<TxErrCode, String> {
 
-  // ErrCode %
-  public Slice<TxErrCode> findAllByErrCodeLike(String errCode_0, Pageable pageable);
+	// ErrCode %
+	public Slice<TxErrCode> findAllByErrCodeLike(String errCode_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxErrCode> findByErrCode(String errCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxErrCode> findByErrCode(String errCode);
 
 }
-

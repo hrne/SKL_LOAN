@@ -33,7 +33,7 @@ import com.st1.itx.db.service.springjpa.cm.L5056ServiceImpl;
  * @version 1.0.0
  */
 public class L5056 extends TradeBuffer {
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -44,16 +44,16 @@ public class L5056 extends TradeBuffer {
 
 	@Autowired
 	private L5056ServiceImpl l5056ServiceImpl;
-	
+
 	@Autowired
 	InsuRenewService sInsuRenewService;
-	
+
 	@Autowired
 	InsuOrignalService sInsuOrignalService;
-	
+
 	@Autowired
 	TxDataLogService sTxDataLogService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5056 ");
@@ -64,9 +64,9 @@ public class L5056 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		// this.limit=Integer.MAX_VALUE;//查全部
 		this.limit = 50;// 查全部
-		
-		List<Map<String,String>> L5056List = null;
-		
+
+		List<Map<String, String>> L5056List = null;
+
 		try {
 			L5056List = l5056ServiceImpl.FindData(titaVo, this.index, this.limit);
 		} catch (Exception e) {
@@ -74,51 +74,50 @@ public class L5056 extends TradeBuffer {
 			this.info("L5056 ErrorForDB=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
-		
-		if (L5056List==null || L5056List.size() == 0) {
+
+		if (L5056List == null || L5056List.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-		
-		for (Map<String,String> d : L5056List) {
+
+		for (Map<String, String> d : L5056List) {
 			OccursList occursList = new OccursList();
-			
-			occursList.putParam("OOLogNo", d.get("LogNo")); 
-			occursList.putParam("OOCustNo", d.get("CustNo")); 
-			occursList.putParam("OOFacmNo", d.get("FacmNo")); 
-			occursList.putParam("OOBormNo", d.get("BormNo")); 
-			occursList.putParam("OOCustName", d.get("CustName")); 
-			
-			occursList.putParam("OOWorkMonth", d.get("YM")); 
-			
+
+			occursList.putParam("OOLogNo", d.get("LogNo"));
+			occursList.putParam("OOCustNo", d.get("CustNo"));
+			occursList.putParam("OOFacmNo", d.get("FacmNo"));
+			occursList.putParam("OOBormNo", d.get("BormNo"));
+			occursList.putParam("OOCustName", d.get("CustName"));
+
+			occursList.putParam("OOWorkMonth", d.get("YM"));
+
 			BigDecimal amt = new BigDecimal(d.get("SumAmt"));
-			BigDecimal cnt = new BigDecimal(d.get("SumCnt"))
-					;
+			BigDecimal cnt = new BigDecimal(d.get("SumCnt"));
 			if (amt.compareTo(BigDecimal.ZERO) == 0 && cnt.compareTo(BigDecimal.ZERO) == 0) {
-				occursList.putParam("OOCanDelete",0);
+				occursList.putParam("OOCanDelete", 0);
 			} else {
-				occursList.putParam("OOCanDelete",1);
+				occursList.putParam("OOCanDelete", 1);
 			}
-			
-			occursList.putParam("OOCreateEmp", d.get("CreateEmpNo") + " " +d.get("CreateEmpName")); 
-			occursList.putParam("OOCreateDate", parse.stringToStringDateTime(d.get("CreateDate"))); 
-			occursList.putParam("OOLastUpdateEmp", d.get("LastUpdateEmpNo")+ " " + d.get("LastUpdateEmpName")); 
-			occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
-			
-			//若有歷程就顯示，無則不顯示
-			Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5506", FormatUtil.pad9(d.get("CustNo"), 7) + "-" + FormatUtil.pad9(d.get("FacmNo"), 3) + "-" + FormatUtil.pad9(d.get("BormNo"), 3), 0,
-					1, titaVo);
+
+			occursList.putParam("OOCreateEmp", d.get("CreateEmpNo") + " " + d.get("CreateEmpName"));
+			occursList.putParam("OOCreateDate", parse.stringToStringDateTime(d.get("CreateDate")));
+			occursList.putParam("OOLastUpdateEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
+			occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
+
+			// 若有歷程就顯示，無則不顯示
+			Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5506",
+					FormatUtil.pad9(d.get("CustNo"), 7) + "-" + FormatUtil.pad9(d.get("FacmNo"), 3) + "-" + FormatUtil.pad9(d.get("BormNo"), 3), 0, 1, titaVo);
 			List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
 			occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
 			this.totaVo.addOccursList(occursList);
 		}
-		
+
 		if (L5056List != null && L5056List.size() >= this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(this.setIndexNext());
 			// this.totaVo.setMsgEndToAuto();// 自動折返
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

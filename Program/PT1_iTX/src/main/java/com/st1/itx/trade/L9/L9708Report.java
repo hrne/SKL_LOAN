@@ -26,7 +26,7 @@ public class L9708Report extends MakeReport {
 
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	private String reportCode = "L9708";
 	private String reportItem = "貸款自動轉帳申請書明細表";
 	private String security = "機密";
@@ -42,7 +42,7 @@ public class L9708Report extends MakeReport {
 
 	@Override
 	public void printHeader() {
-		
+
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 68, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 123, "機密等級：" + this.security);
@@ -52,7 +52,7 @@ public class L9708Report extends MakeReport {
 		this.print(-3, 1, "來源別：放款服務課");
 		this.print(-3, 123, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 123, "頁　　次：" + this.getNowPage());
-		
+
 		/**
 		 * ---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -61,13 +61,13 @@ public class L9708Report extends MakeReport {
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 		print(1, 1, "扣款銀行　　　　              撥款日期　　　　　　　　戶 號　　　　　　額度　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-		   
+
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(10);
 
 		// 設定明細列數(自訂亦必須)
 		this.setMaxRows(45);
-		
+
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class L9708Report extends MakeReport {
 	public boolean exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L9708Report exec");
-		
+
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
@@ -88,7 +88,7 @@ public class L9708Report extends MakeReport {
 
 		List<Map<String, String>> l9708List = null;
 		try {
-			l9708List = l9708ServiceImpl.findAll(titaVo,0);
+			l9708List = l9708ServiceImpl.findAll(titaVo, 0);
 			this.info("L9708Report findAll =" + l9708List.toString());
 		} catch (Exception e) {
 			this.info("L9708ServiceImpl.LoanBorTx error = " + e.toString());
@@ -132,7 +132,7 @@ public class L9708Report extends MakeReport {
 				}
 
 				this.print(0, 30, showRocDate(Integer.valueOf(l9708Vo.get("F2")), 1));
-				this.print(0, 52, String.format("%07d",Integer.valueOf(l9708Vo.get("F3"))));
+				this.print(0, 52, String.format("%07d", Integer.valueOf(l9708Vo.get("F3"))));
 				this.print(0, 68, String.format("%03d", Integer.valueOf(l9708Vo.get("F4"))));
 				this.print(0, 82, showRocDate(Integer.valueOf(l9708Vo.get("F5")), 1));
 				this.print(0, 100, l9708Vo.get("F6"));
@@ -157,6 +157,5 @@ public class L9708Report extends MakeReport {
 		}
 		this.close();
 	}
-
 
 }

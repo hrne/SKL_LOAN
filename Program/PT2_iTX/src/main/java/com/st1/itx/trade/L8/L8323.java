@@ -143,20 +143,16 @@ public class L8323 extends TradeBuffer {
 				if ("Y".equals(iJcicZ440.getReportYn())) {
 					if (!"N".equals(iIsMaxMain)) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005",
-									"(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+							throw new LogicException("E0005", "(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
 						} else {
-							throw new LogicException("E0007",
-									"(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+							throw new LogicException("E0007", "(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
 						}
 					}
 				} else if (!"Y".equals(iIsMaxMain)) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005",
-								"(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+						throw new LogicException("E0005", "(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
 					} else {
-						throw new LogicException("E0007",
-								"(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+						throw new LogicException("E0007", "(440)前置調解受理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
 					}
 				}
 			}
@@ -168,18 +164,15 @@ public class L8323 extends TradeBuffer {
 			if ("Y".equals(iIsClaims) && iGuarLoanCnt == 0) {
 				if ((iCivil323ExpAmt + iCivil323CashAmt + iCivil323CreditAmt + iCivil323GuarAmt) <= 0) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005",
-								"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
+						throw new LogicException("E0005", "「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
 					} else {
-						throw new LogicException("E0007",
-								"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
+						throw new LogicException("E0007", "「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
 					}
 				}
 			} // 7 end
 
 			// 8 start檢核第11欄「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數.
-			Slice<JcicZ443> sJcicZ443 = sJcicZ443Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000, iCourtCode,
-					iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ443> sJcicZ443 = sJcicZ443Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000, iCourtCode, iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ443 == null) {
 				if (iGuarLoanCnt != 0) {
 					if ("A".equals(iTranKey)) {
@@ -308,8 +301,7 @@ public class L8323 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ442, uJcicZ442);
-			iDataLog.exec("L8323異動", uJcicZ442.getSubmitKey() + uJcicZ442.getCustId() + uJcicZ442.getApplyDate()
-					+ uJcicZ442.getCourtCode() + uJcicZ442.getMaxMainCode());
+			iDataLog.exec("L8323異動", uJcicZ442.getSubmitKey() + uJcicZ442.getCustId() + uJcicZ442.getApplyDate() + uJcicZ442.getCourtCode() + uJcicZ442.getMaxMainCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -396,8 +388,7 @@ public class L8323 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4422, uJcicZ4422);
-			iDataLog.exec("L8323刪除", uJcicZ4422.getSubmitKey() + uJcicZ4422.getCustId() + uJcicZ4422.getApplyDate()
-					+ uJcicZ4422.getCourtCode() + uJcicZ4422.getMaxMainCode());
+			iDataLog.exec("L8323刪除", uJcicZ4422.getSubmitKey() + uJcicZ4422.getCustId() + uJcicZ4422.getApplyDate() + uJcicZ4422.getCourtCode() + uJcicZ4422.getMaxMainCode());
 			break;
 		// 修改
 		case "7":
@@ -450,8 +441,7 @@ public class L8323 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4423, uJcicZ4423);
-			iDataLog.exec("L8323修改", uJcicZ4423.getSubmitKey() + uJcicZ4423.getCustId() + uJcicZ4423.getApplyDate()
-					+ uJcicZ4423.getCourtCode() + uJcicZ4423.getMaxMainCode());
+			iDataLog.exec("L8323修改", uJcicZ4423.getSubmitKey() + uJcicZ4423.getCustId() + uJcicZ4423.getApplyDate() + uJcicZ4423.getCourtCode() + uJcicZ4423.getMaxMainCode());
 		default:
 			break;
 		}

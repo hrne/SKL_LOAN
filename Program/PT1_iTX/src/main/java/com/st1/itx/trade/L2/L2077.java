@@ -108,8 +108,7 @@ public class L2077 extends TradeBuffer {
 
 				int wkCloseDate = 0;
 //				只找同戶號額度最後一筆序號
-				if (i < resultList.size() && result.get("CustNo") == resultList.get(i).get("CustNo")
-						&& result.get("FacmNo") == resultList.get(i).get("FacmNo")) {
+				if (i < resultList.size() && result.get("CustNo") == resultList.get(i).get("CustNo") && result.get("FacmNo") == resultList.get(i).get("FacmNo")) {
 					i++;
 					continue;
 				}
@@ -137,13 +136,11 @@ public class L2077 extends TradeBuffer {
 				}
 				// 查詢各項費用
 				baTxCom.setTxBuffer(txBuffer);
-				baTxCom.settingUnPaid(parse.stringToInteger(result.get("EntryDate")),
-						parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 000,
-						0, BigDecimal.ZERO, titaVo);
+				baTxCom.settingUnPaid(parse.stringToInteger(result.get("EntryDate")), parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 000, 0, BigDecimal.ZERO,
+						titaVo);
 				this.info("CloseBreach = " + baTxCom.getShortCloseBreach());
 				this.info("FunCode = " + result.get("FunCode"));
-				if (("2".equals(result.get("FunCode")) || "3".equals(result.get("FunCode")))
-						&& baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
+				if (("2".equals(result.get("FunCode")) || "3".equals(result.get("FunCode"))) && baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
 					this.info("wkRepayFg = \"Y\"");
 					wkRepayFg = "Y";
 				}
@@ -151,9 +148,8 @@ public class L2077 extends TradeBuffer {
 				// 全部結案
 
 				// 擔保品與額度關聯檔
-				Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(custno,
-						parse.stringToInteger(result.get("FacmNo")), parse.stringToInteger(result.get("FacmNo")), 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(custno, parse.stringToInteger(result.get("FacmNo")), parse.stringToInteger(result.get("FacmNo")), 0, Integer.MAX_VALUE,
+						titaVo);
 				lClFac = slClFac == null ? null : slClFac.getContent();
 				boolean isAllClose = true;
 				if (lClFac != null) {
@@ -162,19 +158,16 @@ public class L2077 extends TradeBuffer {
 
 						// 全部結案
 						List<ClFac> l2ClFac = new ArrayList<ClFac>(); // 擔保品與額度關聯檔
-						Slice<ClFac> slClFac2 = clFacService.clNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), 0,
-								Integer.MAX_VALUE, titaVo);
+						Slice<ClFac> slClFac2 = clFacService.clNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 						l2ClFac = slClFac2 == null ? null : slClFac2.getContent();
 						for (ClFac c : l2ClFac) {
 
 							// 撥款主檔
-							Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(),
-									c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+							Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 							if (slLoanBorMain != null) {
 								for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
 									// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-									if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2
-											|| tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6
+									if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6
 											|| tLoanBorMain.getStatus() == 8) {
 										isAllClose = false;
 										break;
@@ -195,7 +188,6 @@ public class L2077 extends TradeBuffer {
 				if (receiveDate > 0) {
 					receiveDate = receiveDate - 19110000;
 				}
-
 
 				occursList.putParam("OOTranDate", entryDate);
 				occursList.putParam("OOFunCode", result.get("FunCode"));

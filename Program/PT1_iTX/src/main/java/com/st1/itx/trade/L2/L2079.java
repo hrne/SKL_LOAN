@@ -104,7 +104,7 @@ public class L2079 extends TradeBuffer {
 
 		// 裝入Tota OccursList
 		for (AcLoanRenew tAcLoanRenew : lAcLoanRenew) {
-			//協議件編號
+			// 協議件編號
 			tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tAcLoanRenew.getOtherFields());
 			int iNegNo = 0;

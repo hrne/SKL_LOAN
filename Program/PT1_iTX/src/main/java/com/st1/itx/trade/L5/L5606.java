@@ -52,7 +52,7 @@ public class L5606 extends TradeBuffer {
 		String iLegalArea = titaVo.getParam("LegalArea");
 		String iLegalNo = titaVo.getParam("LegalNo");
 		String iLegalExt = titaVo.getParam("LegalExt");
-		
+
 		CdCity iCdCity = new CdCity();
 		CdCity uCdCity = new CdCity();
 		iCdCity = iCdCityService.holdById(iCityCode, titaVo);
@@ -72,21 +72,21 @@ public class L5606 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-		
+
 		Slice<CollList> tCollist = iCollListService.findCityCode(iCityCode, 0, Integer.MAX_VALUE, titaVo);
-		
+
 		List<CollList> cCollist = tCollist == null ? null : tCollist.getContent();
 		CollList tCollList = new CollList();
-		
-		if(cCollist!=null) {
-			for(CollList iCollList : cCollist) {
+
+		if (cCollist != null) {
+			for (CollList iCollList : cCollist) {
 
 				if (iCollList.getIsSpecify().equals("Y")) {// 若為個案指派則不同步維護
 					continue;
 				}
-				
+
 				tCollList = new CollList();
-				tCollList = iCollListService.holdById(new CollListId(iCollList.getCustNo(),iCollList.getFacmNo()), titaVo);
+				tCollList = iCollListService.holdById(new CollListId(iCollList.getCustNo(), iCollList.getFacmNo()), titaVo);
 				tCollList.setAccCollPsn(iAccCollPsn);
 				tCollList.setLegalPsn(iLegalPsn);
 				try {

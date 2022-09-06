@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,34 +21,33 @@ import com.st1.itx.db.domain.JcicZ051Id;
  */
 public interface JcicZ051RepositoryMon extends JpaRepository<JcicZ051, JcicZ051Id> {
 
-  // CustId=
-  public Slice<JcicZ051> findAllByCustIdIsOrderByCustIdAscRcDateDescDelayYMDesc(String custId_0, Pageable pageable);
+	// CustId=
+	public Slice<JcicZ051> findAllByCustIdIsOrderByCustIdAscRcDateDescDelayYMDesc(String custId_0, Pageable pageable);
 
-  // RcDate=
-  public Slice<JcicZ051> findAllByRcDateIsOrderByCustIdAscRcDateDescDelayYMDesc(int rcDate_0, Pageable pageable);
+	// RcDate=
+	public Slice<JcicZ051> findAllByRcDateIsOrderByCustIdAscRcDateDescDelayYMDesc(int rcDate_0, Pageable pageable);
 
-  // CustId= , AND RcDate=
-  public Slice<JcicZ051> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDescDelayYMDesc(String custId_0, int rcDate_1, Pageable pageable);
+	// CustId= , AND RcDate=
+	public Slice<JcicZ051> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDescDelayYMDesc(String custId_0, int rcDate_1, Pageable pageable);
 
-  // SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM= 
-  public Slice<JcicZ051> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndDelayYMIs(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3, Pageable pageable);
+	// SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM=
+	public Slice<JcicZ051> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndDelayYMIs(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3, Pageable pageable);
 
-  // CustId= , AND RcDate= , AND SubmitKey=
-  public Slice<JcicZ051> findAllByCustIdIsAndRcDateIsAndSubmitKeyIsOrderByDelayYMDesc(String custId_0, int rcDate_1, String submitKey_2, Pageable pageable);
+	// CustId= , AND RcDate= , AND SubmitKey=
+	public Slice<JcicZ051> findAllByCustIdIsAndRcDateIsAndSubmitKeyIsOrderByDelayYMDesc(String custId_0, int rcDate_1, String submitKey_2, Pageable pageable);
 
-  // SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM= 
-  public Slice<JcicZ051> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3, Pageable pageable);
+	// SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM=
+	public Slice<JcicZ051> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3, Pageable pageable);
 
-  // Ukey=
-  public Optional<JcicZ051> findTopByUkeyIs(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ051> findTopByUkeyIs(String ukey_0);
 
-  // SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM= 
-  public Optional<JcicZ051> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3);
+	// SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM=
+	public Optional<JcicZ051> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ051> findByJcicZ051Id(JcicZ051Id jcicZ051Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ051> findByJcicZ051Id(JcicZ051Id jcicZ051Id);
 
 }
-

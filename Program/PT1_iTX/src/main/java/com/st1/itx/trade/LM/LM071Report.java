@@ -31,6 +31,7 @@ public class LM071Report extends MakeReport {
 	public void printTitle() {
 
 	}
+
 	/**
 	 * 執行報表輸出
 	 * 
@@ -39,12 +40,12 @@ public class LM071Report extends MakeReport {
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
-		
+
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM071", "推展_退休員工利率名單", "LM071_推展_退休員工利率名單", "LM071_底稿_推展_退休員工利率名單.xls", "退休員工利率");
 
 		try {
-			fnAllList = lm071ServiceImpl.findAll(titaVo,yearMonth);
+			fnAllList = lm071ServiceImpl.findAll(titaVo, yearMonth);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -112,7 +113,7 @@ public class LM071Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 
 	}
 }

@@ -49,8 +49,7 @@ public class LM054Report extends MakeReport {
 
 		this.info("LM054Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表",
-				"LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表", "LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
 		makeExcel.setValue(2, 3, monthDate / 100);
 		try {
 			fnAllList = lM054ServiceImpl.findAll(titaVo, monthDate, "N");
@@ -70,13 +69,13 @@ public class LM054Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM054ServiceImpl.findAll error = " + errors.toString());
 		}
-				
+
 		if (fnAllList.size() == 0) {
-	
+
 			makeExcel.setValue(7, 3, "本日無資料");
 
 		}
-		
+
 		makeExcel.close();
 
 	}
@@ -196,8 +195,7 @@ public class LM054Report extends MakeReport {
 			mark = null;
 
 			// 逾期天數
-			makeExcel.setValue(row, 25,
-					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
+			makeExcel.setValue(row, 25, Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
 
 		}
 

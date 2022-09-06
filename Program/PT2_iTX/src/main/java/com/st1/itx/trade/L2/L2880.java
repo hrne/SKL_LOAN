@@ -63,18 +63,16 @@ public class L2880 extends TradeBuffer {
 
 		TempVo tTempVo = new TempVo();
 
-		TxToDoDetailReserve tTxToDoDetailReserve = txToDoDetailReserveService.FindL2880First("L2880", custno, facmno,
-				bormno, titaVo);
+		TxToDoDetailReserve tTxToDoDetailReserve = txToDoDetailReserveService.FindL2880First("L2880", custno, facmno, bormno, titaVo);
 
 		if (tTxToDoDetailReserve != null) {
 
 			// 抓舊資訊
 			tTempVo = tTempVo.getVo(tTxToDoDetailReserve.getProcessNote());
-			
+
 			// 刪除舊的
-			txToDoCom.delReserveByTxNo("L2880", tTxToDoDetailReserve.getTitaEntdy(),
-					tTxToDoDetailReserve.getTitaKinbr(), tTxToDoDetailReserve.getTitaTlrNo(),
-					"" + tTxToDoDetailReserve.getTitaTxtNo(), titaVo);
+			txToDoCom.delReserveByTxNo("L2880", tTxToDoDetailReserve.getTitaEntdy(), tTxToDoDetailReserve.getTitaKinbr(), tTxToDoDetailReserve.getTitaTlrNo(), "" + tTxToDoDetailReserve.getTitaTxtNo(),
+					titaVo);
 		}
 		// 寫檔入TxToDoDetailReserve
 		tTxToDoDetailReserve = new TxToDoDetailReserve();
@@ -105,8 +103,7 @@ public class L2880 extends TradeBuffer {
 
 		l2880report.exec(titaVo, this.getTxBuffer());
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO") + "L2880", "L2880個人房貸調整案已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L2880", "L2880個人房貸調整案已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

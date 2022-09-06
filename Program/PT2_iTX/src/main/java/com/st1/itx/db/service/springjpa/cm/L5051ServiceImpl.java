@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
-import com.st1.itx.db.transaction.BaseEntityManager;
-;
+import com.st1.itx.db.transaction.BaseEntityManager;;
 
 @Service("l5051ServiceImpl")
 @Repository
@@ -112,7 +111,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CdEmp\" F6 ON F6.\"EmployeeNo\"=D.\"LastUpdateEmpNo\" ";
 		sql += "LEFT JOIN \"TxControl\" G ON G.\"Code\"= CONCAT(CONCAT('L5510.',A.\"WorkMonth\"),'.2') ";
 		sql += "LEFT JOIN (SELECT \"CustNo\",\"FacmNo\",\"BormNo\",COUNT(*) AS LOGCNT FROM \"TxDataLog\" WHERE \"TranNo\"='L5501' OR \"TranNo\"='L5505' GROUP BY \"CustNo\",\"FacmNo\",\"BormNo\") H ON H.\"CustNo\"=A.\"CustNo\" AND H.\"FacmNo\"=A.\"FacmNo\" AND H.\"BormNo\"=A.\"BormNo\" ";
-		//sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
+		// sql += "WHERE （A.\"DrawdownAmt\" > 0 OR D.\"AdjRange\" > 0) ";
 		sql += "WHERE A.\"DrawdownAmt\" > 0 ";
 		sql += "AND A.\"RepayType\" = 0 ";
 		if (WorkMonthFm > 0) {
@@ -182,7 +181,7 @@ public class L5051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("FacmNo", Integer.parseInt(FacmNo));
 		}
 		if (!"".equals(Introducer)) {
-			query.setParameter("Introducer",Introducer);
+			query.setParameter("Introducer", Introducer);
 		}
 
 		this.info("L5051Service FindData=" + query);

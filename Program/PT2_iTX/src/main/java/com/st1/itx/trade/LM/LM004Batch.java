@@ -13,11 +13,10 @@ import com.st1.itx.Exception.LogicException;
 
 import com.st1.itx.tradeService.BatchBase;
 
-
 /**
  * LM004Batch
  * 
- * @author 
+ * @author
  * @version 1.0.0
  */
 @Service("LM004Batch")
@@ -26,7 +25,6 @@ public class LM004Batch extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LM004Report LM004Report;
-
 
 	String tranCode = "LM004";
 	String tranName = "長中短期放款到其明細表";

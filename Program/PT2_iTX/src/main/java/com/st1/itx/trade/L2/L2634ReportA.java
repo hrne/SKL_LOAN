@@ -204,8 +204,7 @@ public class L2634ReportA extends MakeReport {
 			// 收件字
 			String wkRecWord = "";
 			if ("".equals(t.getOtherRecWord())) {
-				CdLandOffice tCdLandOffice = cdLandOfficeService
-						.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
+				CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
 				if (tCdLandOffice != null) {
 					wkRecWord = tCdLandOffice.getRecWordItem();
 				}
@@ -432,16 +431,14 @@ public class L2634ReportA extends MakeReport {
 		}
 	}
 
-	public int getSelecTotal(int custNo, int closeNo, int clCode1, int clCode2, int clNo, String seq,
-			List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	public int getSelecTotal(int custNo, int closeNo, int clCode1, int clCode2, int clNo, String seq, List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
 			if (custNo == t.getReceiveCustNo() && closeNo == t.getCloseNo()) {
 				selecTotal++;
-				if (clCode1 == t.getClCode1() && clCode2 == t.getClCode2() && clNo == t.getClNo()
-						&& seq.equals(t.getSeq())) {
+				if (clCode1 == t.getClCode1() && clCode2 == t.getClCode2() && clNo == t.getClNo() && seq.equals(t.getSeq())) {
 					this.info("size =   " + cnt + "," + lClOtherRights.size());
 					if (cnt == lClOtherRights.size()) {
 						isLast = true;

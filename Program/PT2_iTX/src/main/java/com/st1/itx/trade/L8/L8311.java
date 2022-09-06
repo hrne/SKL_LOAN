@@ -105,8 +105,7 @@ public class L8311 extends TradeBuffer {
 			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***不能為空
 			// 2.2 start 完整key值已報送結案則予以剔退
 			if ("A".equals(iTranKey)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
 					int sTranKey = 0;
 					for (JcicZ046 xJcicZ046 : sJcicZ046) {
@@ -141,8 +140,7 @@ public class L8311 extends TradeBuffer {
 				Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ050 != null) {
 					for (JcicZ050 xJcicZ050 : sJcicZ050) {
-						if (!"D".equals(xJcicZ050.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
+						if (!"D".equals(xJcicZ050.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
 							sPayAmt += xJcicZ050.getPayAmt();
 						}
 					}
@@ -208,8 +206,7 @@ public class L8311 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ050, uJcicZ050);
-			iDataLog.exec("L8311異動",
-					uJcicZ050.getSubmitKey() + uJcicZ050.getCustId() + uJcicZ050.getRcDate() + uJcicZ050.getPayDate());
+			iDataLog.exec("L8311異動", uJcicZ050.getSubmitKey() + uJcicZ050.getCustId() + uJcicZ050.getRcDate() + uJcicZ050.getPayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -259,8 +256,7 @@ public class L8311 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0502, uJcicZ0502);
-			iDataLog.exec("L8311刪除", uJcicZ0502.getSubmitKey() + uJcicZ0502.getCustId() + uJcicZ0502.getRcDate()
-					+ uJcicZ0502.getPayDate());
+			iDataLog.exec("L8311刪除", uJcicZ0502.getSubmitKey() + uJcicZ0502.getCustId() + uJcicZ0502.getRcDate() + uJcicZ0502.getPayDate());
 			break;
 		// 修改
 		case "7":
@@ -295,8 +291,7 @@ public class L8311 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0503, uJcicZ0503);
-			iDataLog.exec("L8311修改", uJcicZ0503.getSubmitKey() + uJcicZ0503.getCustId() + uJcicZ0503.getRcDate()
-					+ uJcicZ0503.getPayDate());
+			iDataLog.exec("L8311修改", uJcicZ0503.getSubmitKey() + uJcicZ0503.getCustId() + uJcicZ0503.getRcDate() + uJcicZ0503.getPayDate());
 		default:
 			break;
 		}

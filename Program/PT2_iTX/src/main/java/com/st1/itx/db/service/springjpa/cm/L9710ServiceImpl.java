@@ -32,20 +32,16 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-
-	public List<Map<String, String>> findAll(TitaVo titaVo,int iAcDate) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int iAcDate) throws Exception {
 
 		this.info("L9710.findAll");
 
 		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
 		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000);
 		String iCUSTNO = titaVo.get("CustNo");
-	 
-		
-		
-		
+
 		this.info("iSDAY:" + iSDAY + ",iEDAY:" + iEDAY + ",iCUSTNO:" + iCUSTNO);
-		this.info("iAcDate:" + iAcDate );
+		this.info("iAcDate:" + iAcDate);
 
 		String sql = " SELECT * ";
 		sql += "       FROM ( SELECT   ' ' F0";
@@ -152,7 +148,7 @@ public class L9710ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("isday", iSDAY);
 		query.setParameter("ieday", iEDAY);
 		query.setParameter("iDate", iAcDate);
-		
+
 		if (!iCUSTNO.equals("0000000")) {
 			query.setParameter("icustno", iCUSTNO);
 		}

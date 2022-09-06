@@ -44,6 +44,7 @@ public class L8427 extends TradeBuffer {
 	public JcicZ444LogService sJcicZ444LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
@@ -58,8 +59,7 @@ public class L8427 extends TradeBuffer {
 		this.info("sJcicZ444     = " + sJcicZ444.getSize());
 		if (sJcicZ444 != null) {
 			for (JcicZ444 xJcicZ444 : sJcicZ444) {
-				if ((iSubmitType == 1 && xJcicZ444.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ444.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ444.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ444.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8325");
 					occursListB.putParam("OOHistoryTxCd", "L8055");

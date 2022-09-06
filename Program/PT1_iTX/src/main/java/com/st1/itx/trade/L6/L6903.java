@@ -94,9 +94,8 @@ public class L6903 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; 
+		this.limit = 100;
 
-		
 		// 查詢會計科子細目設定檔
 		if (!(iAcNoCode.isEmpty())) {
 			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(iAcNoCode, iAcSubCode, iAcDtlCode), titaVo);
@@ -106,30 +105,29 @@ public class L6903 extends TradeBuffer {
 				classcode = tCdAcCode.getClassCode(); // 1:下編子細目
 			}
 		}
-				
+
 		// 查詢會計總帳檔
 		AcMain tAcMain = sAcMainService.findById(new AcMainId(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt), titaVo);
 		if (tAcMain == null) {
 			// throw new LogicException(titaVo, "E0001", "會計總帳檔"); // 查無資料
 			wkBal = new BigDecimal(0);
-			this.info("wkBal 1=="+wkBal);
+			this.info("wkBal 1==" + wkBal);
 		} else {
 			wkBal = tAcMain.getYdBal();
-			this.info("wkBal 2=="+wkBal+",==="+tAcMain.getYdBal());
+			this.info("wkBal 2==" + wkBal + ",===" + tAcMain.getYdBal());
 		}
-		
+
 		// 查詢會計帳務明細檔
 		Slice<AcDetail> slAcDetail;
-		if(classcode == 1) {
-			slAcDetail = sAcDetailService.acdtlAcDateRange2(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
-					titaVo);
+		if (classcode == 1) {
+			slAcDetail = sAcDetailService.acdtlAcDateRange2(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
 		} else {
-			slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
-					titaVo);
+			slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index,
+					this.limit, titaVo);
 		}
-		
+
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
-		
+
 		if (lAcDetail == null || lAcDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
@@ -146,7 +144,6 @@ public class L6903 extends TradeBuffer {
 				continue;
 			}
 
-
 			if (!(titaVo.getParam("AcNoCode").trim().isEmpty())) {
 				if (!(iAcSubCode.equals(tAcDetail.getAcSubCode()))) {
 					this.info("L6903 2 ");
@@ -156,7 +153,6 @@ public class L6903 extends TradeBuffer {
 					continue;
 				}
 			}
-
 
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOAcDate", tAcDetail.getAcDate());
@@ -169,7 +165,7 @@ public class L6903 extends TradeBuffer {
 			occursList.putParam("OODbCr", tAcDetail.getDbCr());
 			occursList.putParam("OOTxAmt", tAcDetail.getTxAmt());
 			occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate()) + " " + parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
 
 			// 餘額
@@ -185,10 +181,10 @@ public class L6903 extends TradeBuffer {
 			} else {
 				if (tAcDetail.getDbCr().equals("D")) {
 					wkBal = wkBal.subtract(tAcDetail.getTxAmt());
-					this.info("wkBal d=="+wkBal);
+					this.info("wkBal d==" + wkBal);
 				} else {
 					wkBal = wkBal.add(tAcDetail.getTxAmt());
-					this.info("wkBal c=="+wkBal);
+					this.info("wkBal c==" + wkBal);
 				}
 			}
 
@@ -236,6 +232,7 @@ public class L6903 extends TradeBuffer {
 		return uTranItem;
 
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

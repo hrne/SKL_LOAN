@@ -83,7 +83,7 @@ public class L6086 extends TradeBuffer {
 				result = c1.getDistCode().compareTo(c2.getDistCode());
 			} else if (c1.getDeptCode().compareTo(c2.getDeptCode()) != 0) {
 				result = c1.getDeptCode().compareTo(c2.getDeptCode());
-			}  else {
+			} else {
 				result = 0;
 			}
 			return result;
@@ -99,10 +99,8 @@ public class L6086 extends TradeBuffer {
 				occursList.putParam("OODeptItem", tCdBcm.getDeptItem());
 				occursList.putParam("OODistCode", tCdBcm.getDistCode());
 				occursList.putParam("OODistItem", tCdBcm.getDistItem());
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " "
-						+ parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
-				occursList.putParam("OOLastEmp",
-						tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
+				occursList.putParam("OOLastEmp", tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

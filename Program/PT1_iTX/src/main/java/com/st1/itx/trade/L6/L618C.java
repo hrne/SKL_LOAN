@@ -104,7 +104,7 @@ public class L618C extends TradeBuffer {
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 
 			lAcDetail = new ArrayList<AcDetail>();
-			
+
 			// call 應繳試算
 			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 9, BigDecimal.ZERO, titaVo); //
 
@@ -131,11 +131,10 @@ public class L618C extends TradeBuffer {
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setRvNo(iRvNo);
 			lAcDetail.add(acDetail);
-			
+
 			// 累溢收入帳(暫收貸)
-			loanCom.settleOverflow(lAcDetail, titaVo);			
-			
-			
+			loanCom.settleOverflow(lAcDetail, titaVo);
+
 			this.txBuffer.addAllAcDetailList(lAcDetail);
 
 			/* 產生會計分錄 */

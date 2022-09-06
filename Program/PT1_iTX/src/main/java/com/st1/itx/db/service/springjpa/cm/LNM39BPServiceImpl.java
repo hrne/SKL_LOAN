@@ -43,8 +43,7 @@ public class LNM39BPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單2：台幣放款-計算原始有效利率用
-		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"LoanRate\", \"RateCode\", \"EffectDate\""
-				+ " FROM  \"LoanIfrs9Bp\"" + " WHERE \"DataYM\"  = :dataMonth "
+		sql = "SELECT \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\", \"LoanRate\", \"RateCode\", \"EffectDate\"" + " FROM  \"LoanIfrs9Bp\"" + " WHERE \"DataYM\"  = :dataMonth "
 				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\", \"EffectDate\" DESC";
 
 		this.info("sql=" + sql);

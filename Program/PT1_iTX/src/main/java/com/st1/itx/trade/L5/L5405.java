@@ -87,7 +87,7 @@ public class L5405 extends TradeBuffer {
 				iPfDeparment.setEmpName(iEmpName);
 				iPfDeparment.setDepartOfficer(iDepartOfficer);
 				iPfDeparment.setGoalCnt(iGoalCnt);
-				iPfDeparment.setSumGoalCnt(iSumGoalCnt); 
+				iPfDeparment.setSumGoalCnt(iSumGoalCnt);
 				iPfDeparment.setGoalAmt(iGoalAmt);
 				iPfDeparment.setSumGoalAmt(iSumGoalAmt);
 				try {
@@ -115,14 +115,14 @@ public class L5405 extends TradeBuffer {
 					hPfDeparment.setEmpName(iEmpName);
 					hPfDeparment.setDepartOfficer(iDepartOfficer);
 					hPfDeparment.setGoalCnt(iGoalCnt);
-					hPfDeparment.setSumGoalCnt(iSumGoalCnt); 
+					hPfDeparment.setSumGoalCnt(iSumGoalCnt);
 					hPfDeparment.setGoalAmt(iGoalAmt);
 					hPfDeparment.setSumGoalAmt(iSumGoalAmt);
 					iPfDeparmentService.update(hPfDeparment, titaVo);
 					// 紀錄變更前變更後
 					iDataLog.setEnv(titaVo, oldPfDeparment, hPfDeparment);
 					iDataLog.exec();
-					iBcmCom.checkDiff(oldPfDeparment,hPfDeparment,titaVo);
+					iBcmCom.checkDiff(oldPfDeparment, hPfDeparment, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料更新錯誤
 				}

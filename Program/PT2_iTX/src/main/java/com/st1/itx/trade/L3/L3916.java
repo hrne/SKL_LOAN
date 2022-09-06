@@ -34,7 +34,6 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 /**
  * L3916 撥款內容查詢
  * 
@@ -117,8 +116,7 @@ public class L3916 extends TradeBuffer {
 		// 查詢放款主檔
 		LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(wkCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0001",
-					"放款主檔  借款人戶號 = " + wkCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "放款主檔  借款人戶號 = " + wkCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 查詢資料不存在
 		}
 
 		tempVo = authLogCom.exec(wkCustNo, iFacmNo, titaVo);
@@ -138,22 +136,17 @@ public class L3916 extends TradeBuffer {
 		}
 
 		// 查詢各項費用
-		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO,
-				titaVo); // 99-費用全部(含未到期)
+		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 		// 2: 催收戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶 9: 呆帳結案戶
-		if (tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 5 || tLoanBorMain.getStatus() == 6
-				|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 9) {
-			tLoanOverdue = loanOverdueService.findById(new LoanOverdueId(tLoanBorMain.getCustNo(),
-					tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), tLoanBorMain.getLastOvduNo()), titaVo);
+		if (tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 5 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 9) {
+			tLoanOverdue = loanOverdueService.findById(new LoanOverdueId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), tLoanBorMain.getLastOvduNo()), titaVo);
 			if (tLoanOverdue == null) {
 				throw new LogicException(titaVo, "E0001",
-						"催收呆帳檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 = " + tLoanBorMain.getFacmNo() + " 撥款序號 = "
-								+ tLoanBorMain.getBormNo() + " 催收序號 = " + tLoanBorMain.getLastOvduNo()); // 查詢資料不存在
+						"催收呆帳檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 = " + tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo() + " 催收序號 = " + tLoanBorMain.getLastOvduNo()); // 查詢資料不存在
 			}
 			wkOvduDate = tLoanOverdue.getOvduDate(); // 催收開始日
 			wkOvduAmt = tLoanOverdue.getOvduAmt(); // 轉催收金額
-			wkNplRepay = tLoanOverdue.getOvduAmt()
-					.subtract(tLoanOverdue.getOvduBal()).subtract(tLoanOverdue.getBadDebtAmt()); // 催收還款金額
+			wkNplRepay = tLoanOverdue.getOvduAmt().subtract(tLoanOverdue.getOvduBal()).subtract(tLoanOverdue.getBadDebtAmt()); // 催收還款金額
 			wkBadDebtAmt = wkBadDebtAmt.add(tLoanOverdue.getBadDebtAmt()); // 轉呆帳金額
 			wkBadDebtBal = wkBadDebtBal.add(tLoanOverdue.getBadDebtBal());// 呆帳餘額
 			wkOvduSituaction = tLoanOverdue.getOvduSituaction(); // 催收處理情形
@@ -169,8 +162,7 @@ public class L3916 extends TradeBuffer {
 			Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
 		}
 //		目前利率
-		LoanRateChange tloanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(
-				tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
+		LoanRateChange tloanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(),
 				dDateUtil.getNowIntegerForBC(), titaVo);
 		BigDecimal storeRate = BigDecimal.ZERO;
 		if (tloanRateChange != null) {

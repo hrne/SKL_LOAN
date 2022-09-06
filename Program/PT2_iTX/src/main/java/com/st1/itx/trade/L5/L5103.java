@@ -124,14 +124,11 @@ public class L5103 extends TradeBuffer {
 						try {
 							innDocRecordService.update(tInnDocRecord);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007",
-									"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+							throw new LogicException(titaVo, "E0007", "L5103 isHcodeNormal 2 update " + e.getErrorMsg());
 						}
 //						清償歸檔需更新清償作業檔的銷號欄
 						if ("2".equals(applCode) && "01".equals(usageCode)) {
-							FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(
-									parse.stringToInteger(titaVo.getParam("CustNo")),
-									parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
+							FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
 							if (mFacClose != null) {
 								FacClose tFacClose = facCloseService.holdById(mFacClose, titaVo);
 
@@ -143,8 +140,7 @@ public class L5103 extends TradeBuffer {
 								try {
 									facCloseService.update(tFacClose, titaVo);
 								} catch (DBException e) {
-									throw new LogicException(titaVo, "E0007",
-											"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+									throw new LogicException(titaVo, "E0007", "L5103 isHcodeNormal 2 update " + e.getErrorMsg());
 								}
 							}
 						}

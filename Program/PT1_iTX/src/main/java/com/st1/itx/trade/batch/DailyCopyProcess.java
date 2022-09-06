@@ -1080,11 +1080,11 @@ public class DailyCopyProcess extends TradeBuffer {
 		this.batchTransaction.commit();
 		sJobMainService.Usp_Cp_TxUnLock_Ins(tlrNo, titaVo);
 		this.batchTransaction.commit();
-		
+
 		this.info("DailyCopyProcess Usp_Cp_UspErrorLog_Ins ...");
 		sJobMainService.Usp_Cp_UspErrorLog_Ins(tlrNo, titaVo);
 		this.batchTransaction.commit();
-		
+
 		this.info("DailyCopyProcess Usp_Cp_YearlyHouseLoanInt_Ins ...");
 		sJobMainService.Usp_Cp_YearlyHouseLoanInt_Ins(tlrNo, titaVo);
 		this.batchTransaction.commit();
@@ -1096,7 +1096,7 @@ public class DailyCopyProcess extends TradeBuffer {
 		this.info("DailyCopyProcess 開啟全部ForeignKey ...");
 		sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 1, titaVo);
 		this.batchTransaction.commit();
-		
+
 		this.info("DailyCopyProcess Finished.");
 		return null;
 	}

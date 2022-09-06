@@ -28,7 +28,7 @@ public class LB096 extends BatchBase implements Tasklet, InitializingBean {
 	public LB096Report lb096Report;
 
 	@Autowired
-	DateUtil dDateUtil; 
+	DateUtil dDateUtil;
 
 	@Autowired
 	WebClient webClient;
@@ -49,17 +49,18 @@ public class LB096 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("LB096 active LB096 ");
 		this.info("LB096 titaVo.getEntDyI() =" + this.titaVo.getEntDyI());
 
-		//String tranCode = "LB096";
-		//String tranName = "不動產擔保品明細－地號附加檔";
+		// String tranCode = "LB096";
+		// String tranName = "不動產擔保品明細－地號附加檔";
 
 		lb096Report.setTxBuffer(this.txBuffer);
 
 		// this.titaVo.setDataBaseOnMon(); // 月報資料庫
 		boolean isFinish = lb096Report.exec(titaVo); // 使用月報資料庫
 
-		//webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-		//		tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
-		
+		// webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(),
+		// "Y", "LC009", titaVo.getTlrNo(),
+		// tranCode + tranName + (isFinish ? "已完成" : "查無資料"), titaVo);
+
 	}
 
 }

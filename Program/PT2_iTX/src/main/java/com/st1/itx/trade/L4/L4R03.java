@@ -32,7 +32,7 @@ public class L4R03 extends TradeBuffer {
 	public CustMainService custMainService;
 	@Autowired
 	public PostAuthLogService postAuthLogService;
-	
+
 	@Autowired
 	public Parse parse;
 
@@ -44,11 +44,11 @@ public class L4R03 extends TradeBuffer {
 		// RimCustNo=9,7
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo").trim());
 		int iType = parse.stringToInteger(titaVo.getParam("RimType").trim());
-		
+
 		CustMain tCustMain = new CustMain();
-		
-		if(iType == 1) {
-		
+
+		if (iType == 1) {
+
 			tCustMain = custMainService.custNoFirst(iCustNo, iCustNo);
 
 			if (tCustMain != null) {
@@ -60,28 +60,27 @@ public class L4R03 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0001", " 此戶號不存在");
 			}
-		} else if(iType == 2){//先找授權檔若無資料則帶入客戶主檔
-			
+		} else if (iType == 2) {// 先找授權檔若無資料則帶入客戶主檔
+
 			Slice<PostAuthLog> tPostAuthLog = postAuthLogService.custNoEq(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 			List<PostAuthLog> lPostAuthLog = tPostAuthLog == null ? null : tPostAuthLog.getContent();
-			if(lPostAuthLog!=null) {
+			if (lPostAuthLog != null) {
 				this.totaVo.putParam("L4r03CustId", lPostAuthLog.get(0).getCustId());
 				this.totaVo.putParam("L4r03Type", "2");
-			
+
 			} else {
 				tCustMain = custMainService.custNoFirst(iCustNo, iCustNo);
-				
+
 				if (tCustMain != null) {
 					this.totaVo.putParam("L4r03CustId", tCustMain.getCustId());
 					this.totaVo.putParam("L4r03Type", "1");
 				} else {
 					throw new LogicException(titaVo, "E0001", " 此戶號不存在");
 				}
-				
+
 			}
-			
+
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

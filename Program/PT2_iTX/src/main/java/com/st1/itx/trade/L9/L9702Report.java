@@ -78,9 +78,7 @@ public class L9702Report extends MakeReport {
 			this.print(-2, 60, "放款餘額及財收統計表－非企金", "C");
 		}
 
-		this.print(-3, 120, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6),
-				"R");
+		this.print(-3, 120, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6), "R");
 
 		this.print(-4, 115, "頁　　次：　" + this.getNowPage(), "R");
 
@@ -160,8 +158,7 @@ public class L9702Report extends MakeReport {
 
 			this.print(1, 2, "會計日期：　" + this.showRocDate(startDate, 1) + " － " + this.showRocDate(endDate, 1));
 			this.print(2, 2, "類別　　　　　　期初餘額　　　　 撥款金額　　　　 催收回復　　　　 還款金額　　　　　 轉催收　　　　　　期末餘額");
-			this.print(1, 0,
-					"----------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 0, "----------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 2, "企金");
 
 			Map<String, String> tL9702 = null;
@@ -244,8 +241,7 @@ public class L9702Report extends MakeReport {
 			this.print(0, 106, formatAmt(endBal, 0), "R"); // 期末餘額
 
 			this.print(1, 2, "車貸");
-			this.print(1, 0,
-					"----------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 0, "----------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 2, "合計：");
 			this.print(0, 25, formatAmt(totalOfBeginBal, 0), "R"); // 期初餘額
 			this.print(0, 40, formatAmt(totalOfDrawdownAmt, 0), "R"); // 撥款金額
@@ -270,18 +266,13 @@ public class L9702Report extends MakeReport {
 			// 期末催收餘額先累加
 			if (listL9702 != null) {
 				if (listL9702.size() >= 1) {
-					totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(0).get("F6") == null ? BigDecimal.ZERO
-							: new BigDecimal(listL9702.get(0).get("F6"))); // 期末催收餘額
+					totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(0).get("F6") == null ? BigDecimal.ZERO : new BigDecimal(listL9702.get(0).get("F6"))); // 期末催收餘額
 					if (listL9702.size() >= 2) {
-						totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(1).get("F6") == null ? BigDecimal.ZERO
-								: new BigDecimal(listL9702.get(1).get("F6"))); // 期末催收餘額
+						totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(1).get("F6") == null ? BigDecimal.ZERO : new BigDecimal(listL9702.get(1).get("F6"))); // 期末催收餘額
 						if (listL9702.size() >= 3) {
-							totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(2).get("F6") == null ? BigDecimal.ZERO
-									: new BigDecimal(listL9702.get(2).get("F6"))); // 期末催收餘額
+							totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(2).get("F6") == null ? BigDecimal.ZERO : new BigDecimal(listL9702.get(2).get("F6"))); // 期末催收餘額
 							if (listL9702.size() >= 4) {
-								totalOfEndvduBal = totalOfEndvduBal
-										.add(listL9702.get(3).get("F6") == null ? BigDecimal.ZERO
-												: new BigDecimal(listL9702.get(3).get("F6"))); // 期末催收餘額
+								totalOfEndvduBal = totalOfEndvduBal.add(listL9702.get(3).get("F6") == null ? BigDecimal.ZERO : new BigDecimal(listL9702.get(3).get("F6"))); // 期末催收餘額
 							}
 						}
 					}
@@ -293,8 +284,7 @@ public class L9702Report extends MakeReport {
 
 			this.print(1, 2, "會計日期：　" + this.showRocDate(startDate, 1) + " － " + this.showRocDate(endDate, 1));
 			this.print(2, 2, "類別　　　　　　期初餘額　　　　 撥款金額　　　　 催收回復　　　　 還款金額　　　　　 轉催收　　　　　　期末餘額");
-			this.print(1, 0,
-					"----------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 0, "----------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 2, "企金");
 
 			Map<String, String> tL9702 = null;
@@ -372,8 +362,7 @@ public class L9702Report extends MakeReport {
 			this.print(0, 106, formatAmt(endBal, 0), "R"); // 期末餘額
 
 			this.print(1, 2, "車貸");
-			this.print(1, 0,
-					"----------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 0, "----------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 2, "合計：");
 			this.print(0, 25, formatAmt(totalOfBeginBal, 0), "R"); // 期初餘額
 			this.print(0, 40, formatAmt(totalOfDrawdownAmt, 0), "R"); // 撥款金額
@@ -403,8 +392,7 @@ public class L9702Report extends MakeReport {
 
 			this.print(1, 2, "會計日期：　" + this.showRocDate(startDate, 1) + " － " + this.showRocDate(endDate, 1));
 			this.print(2, 2, "類別　　　　　　期初餘額　　　　 撥款金額　　　　 催收回復　　　　 還款金額　　　　　 轉催收　　　　　　期末餘額");
-			this.print(1, 0,
-					"----------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 0, "----------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 2, "企金");
 
 			tL9702 = null;
@@ -482,8 +470,7 @@ public class L9702Report extends MakeReport {
 			this.print(0, 106, formatAmt(endBal, 0), "R"); // 期末餘額
 
 			this.print(1, 2, "車貸");
-			this.print(1, 0,
-					"----------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 0, "----------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 2, "合計：");
 			this.print(0, 25, formatAmt(totalOfBeginBal, 0), "R"); // 期初餘額
 			this.print(0, 40, formatAmt(totalOfDrawdownAmt, 0), "R"); // 撥款金額
@@ -521,8 +508,7 @@ public class L9702Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9702", "利息收入明細檔LNW63A3P", "LNW63A3P",
-				"LNW63A3P.xlsx", "LNW63A3P");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9702", "利息收入明細檔LNW63A3P", "LNW63A3P", "LNW63A3P.xlsx", "LNW63A3P");
 
 		this.info("-----------------" + LDList);
 		if (LDList.size() == 0) {

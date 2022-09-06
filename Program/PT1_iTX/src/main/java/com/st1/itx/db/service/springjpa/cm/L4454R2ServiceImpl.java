@@ -101,7 +101,7 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "	 WHERE R.\"RepayAmt\" > 50000";
 		sql += "   order by R.\"RepayAcctNo\"";
 		sql += "		   ,R.\"CustNo\"";
-		
+
 //		String sql = "                                                                 ";
 //		sql += "	WITH \"data\" AS (";
 //		sql += "   select                       ";

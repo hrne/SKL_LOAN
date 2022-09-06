@@ -44,12 +44,10 @@ public class L9735Report extends MakeReport {
 		// 取得輸入值
 		int inputDrawdownDate = parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 
-		List<Map<String, String>> resultList = l9735ServiceImpl.getConstructionCompanyLoanData(inputDrawdownDate,
-				titaVo);
+		List<Map<String, String>> resultList = l9735ServiceImpl.getConstructionCompanyLoanData(inputDrawdownDate, titaVo);
 
 		// open excel
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName,
-				"L9735_底稿_建商餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName, "L9735_底稿_建商餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
 
 		int row = 2;
 

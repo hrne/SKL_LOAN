@@ -86,13 +86,11 @@ public class L3003 extends TradeBuffer {
 		lBormStatus.add(98); // 98:預約撥款已撥款
 		lBormStatus.add(99); // 99:預約撥款
 		if (iRvStartDate > 0) {
-			slLoanBorMain = loanBorMainService.bormDrawdownDateRange(iRvStartDate + 19110000, iRvEndDate + 19110000,
-					901, 999, lBormStatus, this.index, this.limit, titaVo);
+			slLoanBorMain = loanBorMainService.bormDrawdownDateRange(iRvStartDate + 19110000, iRvEndDate + 19110000, 901, 999, lBormStatus, this.index, this.limit, titaVo);
 			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		} else {
 			if (iCaseNo > 0) {
-				Slice<FacMain> slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<FacMain> slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, 0, Integer.MAX_VALUE, titaVo);
 				List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 				if (lFacMain == null || lFacMain.size() == 0) {
 					throw new LogicException(titaVo, "E0001", "額度主檔 案件編號 = " + iCaseNo); // 查詢資料不存在
@@ -101,16 +99,14 @@ public class L3003 extends TradeBuffer {
 				for (FacMain xFacMain : lFacMain) {
 					lFacmNo.add(xFacMain.getFacmNo());
 				}
-				slLoanBorMain = loanBorMainService.bormFacmNoIn(iCustNo, lFacmNo, 901, 999, this.index, this.limit,
-						titaVo);
+				slLoanBorMain = loanBorMainService.bormFacmNoIn(iCustNo, lFacmNo, 901, 999, this.index, this.limit, titaVo);
 				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			} else {
 				if (iFacmNo > 0) {
 					wkFacmNo1 = iFacmNo;
 					wkFacmNo2 = iFacmNo;
 				}
-				slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNo1, wkFacmNo2, 901, 999, this.index,
-						this.limit, titaVo);
+				slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNo1, wkFacmNo2, 901, 999, this.index, this.limit, titaVo);
 				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			}
 
@@ -142,11 +138,9 @@ public class L3003 extends TradeBuffer {
 				continue;
 			}
 
-			tFacMain = facMainService.findById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()),
-					titaVo);
+			tFacMain = facMainService.findById(new FacMainId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo()), titaVo);
 			if (tFacMain == null) {
-				throw new LogicException(titaVo, "E0001",
-						"額度主檔 借款人戶號 = " + tLoanBorMain.getCustNo() + "額度編號 = " + tLoanBorMain.getFacmNo()); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + tLoanBorMain.getCustNo() + "額度編號 = " + tLoanBorMain.getFacmNo()); // 查詢資料不存在
 			}
 			OccursList occursList = new OccursList();
 			occursList.putParam("OODrawdownDate", tLoanBorMain.getDrawdownDate());
@@ -162,7 +156,7 @@ public class L3003 extends TradeBuffer {
 			occursList.putParam("OOActFlag", tLoanBorMain.getActFg());
 
 			// if (iCustDataCtrl == 1) {
-			// 	occursList.putParam("OOCustNo", "");
+			// occursList.putParam("OOCustNo", "");
 			// }
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);

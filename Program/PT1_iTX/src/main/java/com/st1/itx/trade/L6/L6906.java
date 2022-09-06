@@ -96,30 +96,29 @@ public class L6906 extends TradeBuffer {
 		}
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
-		
 		// 排序依 交易序號 戶號 由小到大
 		lAcDetail.sort((c1, c2) -> {
 			int result = 0;
-			if(c1.getRelTxseq().compareTo(c2.getRelTxseq()) != 0) {
+			if (c1.getRelTxseq().compareTo(c2.getRelTxseq()) != 0) {
 				result = c1.getRelTxseq().compareTo(c2.getRelTxseq());
-		    } else if (c1.getCustNo() - c2.getCustNo() != 0) {
+			} else if (c1.getCustNo() - c2.getCustNo() != 0) {
 				result = c1.getCustNo() - c2.getCustNo();
 			} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
 				result = c1.getFacmNo() - c2.getFacmNo();
-			}  else if (c1.getBormNo() - c2.getBormNo() != 0) {
+			} else if (c1.getBormNo() - c2.getBormNo() != 0) {
 				result = c1.getBormNo() - c2.getBormNo();
 			} else if (c1.getAcNoCode().compareTo(c2.getAcNoCode()) != 0) {
 				result = c1.getAcNoCode().compareTo(c2.getAcNoCode());
 			} else if (c1.getAcSubCode().compareTo(c2.getAcSubCode()) != 0) {
-				result = c1.getAcSubCode().compareTo(c2.getAcSubCode());	
+				result = c1.getAcSubCode().compareTo(c2.getAcSubCode());
 			} else if (c1.getAcDtlCode().compareTo(c2.getAcDtlCode()) != 0) {
-				result = c1.getAcDtlCode().compareTo(c2.getAcDtlCode());	
+				result = c1.getAcDtlCode().compareTo(c2.getAcDtlCode());
 			} else {
 				result = 0;
 			}
 			return result;
 		});
-		
+
 		for (AcDetail tAcDetail : lAcDetail) {
 
 			this.info("L6906 RelTxseq : " + iRelTxseq);
@@ -169,7 +168,7 @@ public class L6906 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
@@ -222,6 +221,7 @@ public class L6906 extends TradeBuffer {
 		return uTlrItem;
 
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

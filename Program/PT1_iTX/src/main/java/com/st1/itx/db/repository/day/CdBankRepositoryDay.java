@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.CdBankId;
  */
 public interface CdBankRepositoryDay extends JpaRepository<CdBank, CdBankId> {
 
-  // BankCode %
-  public Slice<CdBank> findAllByBankCodeLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, Pageable pageable);
+	// BankCode %
+	public Slice<CdBank> findAllByBankCodeLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, Pageable pageable);
 
-  // BankCode % ,AND BranchCode %
-  public Slice<CdBank> findAllByBankCodeLikeAndBranchCodeLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, String branchCode_1, Pageable pageable);
+	// BankCode % ,AND BranchCode %
+	public Slice<CdBank> findAllByBankCodeLikeAndBranchCodeLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, String branchCode_1, Pageable pageable);
 
-  // BankCode % ,AND BranchCode % ,AND BankItem %
-  public Slice<CdBank> findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, String branchCode_1, String bankItem_2, Pageable pageable);
+	// BankCode % ,AND BranchCode % ,AND BankItem %
+	public Slice<CdBank> findAllByBankCodeLikeAndBranchCodeLikeAndBankItemLikeOrderByBankCodeAscBranchCodeAsc(String bankCode_0, String branchCode_1, String bankItem_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdBank> findByCdBankId(CdBankId cdBankId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdBank> findByCdBankId(CdBankId cdBankId);
 
 }
-

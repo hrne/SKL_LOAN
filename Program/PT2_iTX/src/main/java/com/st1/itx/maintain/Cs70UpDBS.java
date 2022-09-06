@@ -37,7 +37,8 @@ public class Cs70UpDBS extends CommBuffer {
 		this.info("Cs70UpDBS authorizeRecord..");
 
 		/* 主管授權 */
-		if ((this.titaVo.getSupNo() != null && !this.titaVo.getSupNo().isEmpty() && this.titaVo.getEmpNos() != null && !this.titaVo.getEmpNos().isEmpty()))
+		if ((this.titaVo.getSupNo() != null && !this.titaVo.getSupNo().isEmpty() && this.titaVo.getEmpNos() != null && !this.titaVo.getEmpNos().isEmpty())
+				|| (this.titaVo.isActfgSuprele() && this.titaVo.isHcodeNormal()))
 			;
 		else
 			return;
@@ -46,10 +47,13 @@ public class Cs70UpDBS extends CommBuffer {
 //		if (this.titaVo.getActFgI() == 2 || this.titaVo.isHcodeErase())
 //			return;
 
+		if (this.titaVo.isActfgSuprele() && (Objects.isNull(this.titaVo.getRqsp()) || this.titaVo.getRqsp().trim().isEmpty()))
+			this.titaVo.putParam(ContentName.rqsp, "0004 交易需主管核可放行");
+
 		String supNo = this.titaVo.getSupNo().trim().isEmpty() ? this.titaVo.getEmpNos().trim() : this.titaVo.getSupNo().trim();
 		String tlrNo = this.titaVo.getTlrNo().trim().isEmpty() ? this.titaVo.getEmpNot().trim() : this.titaVo.getTlrNo().trim();
 
-		if (supNo.equals(tlrNo) || supNo.isEmpty() || tlrNo.isEmpty())
+		if ((supNo.equals(tlrNo) || supNo.isEmpty() || tlrNo.isEmpty()) && !this.titaVo.isActfgSuprele())
 			throw new LogicException("EC000", supNo.equals(tlrNo) ? "授權記錄檔錯誤,交易與授權人員一致" : "授權記錄檔錯誤,交易或授權人員錯誤");
 
 		String reason = Objects.isNull(this.titaVo.getRqsp()) ? "" : this.titaVo.getRqsp();
@@ -59,6 +63,7 @@ public class Cs70UpDBS extends CommBuffer {
 		for (String s : reason.split(";")) {
 			if (s.trim().isEmpty())
 				continue;
+
 			String no = s.substring(0, 5).trim();
 			String msg = s.substring(5).trim();
 
@@ -76,7 +81,7 @@ public class Cs70UpDBS extends CommBuffer {
 		this.titaVo.setDataBaseOnLine();
 
 		TxAuthorize txAuthorize = new TxAuthorize();
-		txAuthorize.setSupNo(supNo);
+		txAuthorize.setSupNo(supNo.isEmpty() && this.titaVo.isActfgSuprele() ? tlrNo : supNo);
 		txAuthorize.setTlrNo(tlrNo);
 		if (!titaVo.getReason().isEmpty())
 			txAuthorize.setTradeReason(titaVo.getReason());

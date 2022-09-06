@@ -71,8 +71,7 @@ public class L8R51 extends TradeBuffer {
 		if (tCustMain != null) {
 			this.totaVo.putParam("L8R51CustName", tCustMain.getCustName()); // 戶名
 		} else {
-			throw new LogicException("E0001",
-					"客戶主檔（" + (mMlaundryRecord != null ? mMlaundryRecord.getCustNo() : iCustNo) + "）");
+			throw new LogicException("E0001", "客戶主檔（" + (mMlaundryRecord != null ? mMlaundryRecord.getCustNo() : iCustNo) + "）");
 		}
 
 		this.addList(this.totaVo);

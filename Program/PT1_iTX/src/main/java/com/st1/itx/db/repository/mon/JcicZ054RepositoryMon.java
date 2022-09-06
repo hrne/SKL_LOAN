@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,31 +21,32 @@ import com.st1.itx.db.domain.JcicZ054Id;
  */
 public interface JcicZ054RepositoryMon extends JpaRepository<JcicZ054, JcicZ054Id> {
 
-  // CustId=
-  public Slice<JcicZ054> findAllByCustIdIsOrderByCustIdAscRcDateDesc(String custId_0, Pageable pageable);
+	// CustId=
+	public Slice<JcicZ054> findAllByCustIdIsOrderByCustIdAscRcDateDesc(String custId_0, Pageable pageable);
 
-  // RcDate=
-  public Slice<JcicZ054> findAllByRcDateIsOrderByCustIdAscRcDateDesc(int rcDate_0, Pageable pageable);
+	// RcDate=
+	public Slice<JcicZ054> findAllByRcDateIsOrderByCustIdAscRcDateDesc(int rcDate_0, Pageable pageable);
 
-  // CustId= , AND RcDate=
-  public Slice<JcicZ054> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDesc(String custId_0, int rcDate_1, Pageable pageable);
+	// CustId= , AND RcDate=
+	public Slice<JcicZ054> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDesc(String custId_0, int rcDate_1, Pageable pageable);
 
-  // SubmitKey= , AND CustId= , AND RcDate= , AND MaxMainCode= , AND PayOffDate=
-  public Slice<JcicZ054> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int payOffDate_4, Pageable pageable);
+	// SubmitKey= , AND CustId= , AND RcDate= , AND MaxMainCode= , AND PayOffDate=
+	public Slice<JcicZ054> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3,
+			int payOffDate_4, Pageable pageable);
 
-  // Ukey=
-  public Optional<JcicZ054> findTopByUkeyIs(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ054> findTopByUkeyIs(String ukey_0);
 
-  // SubmitKey= , AND CustId= , AND RcDate= , AND MaxMainCode= , AND PayOffDate=
-  public Optional<JcicZ054> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int payOffDate_4);
+	// SubmitKey= , AND CustId= , AND RcDate= , AND MaxMainCode= , AND PayOffDate=
+	public Optional<JcicZ054> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3,
+			int payOffDate_4);
 
-  // SubmitKey= , AND CustId= , AND RcDate= 
-  public Slice<JcicZ054> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, Pageable pageable);
+	// SubmitKey= , AND CustId= , AND RcDate=
+	public Slice<JcicZ054> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ054> findByJcicZ054Id(JcicZ054Id jcicZ054Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ054> findByJcicZ054Id(JcicZ054Id jcicZ054Id);
 
 }
-

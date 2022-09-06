@@ -45,7 +45,7 @@ public class CustRmkCom extends TradeBuffer {
 
 	@Autowired
 	public CustRmkService custRmkService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -61,7 +61,7 @@ public class CustRmkCom extends TradeBuffer {
 		this.info("CustRmkCom.getCustRmk = " + iCustNo);
 
 		this.totaVo.init(titaVo);
-		
+
 		// 查詢顧客控管警訊檔
 
 		Slice<CustRmk> slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
@@ -74,7 +74,7 @@ public class CustRmkCom extends TradeBuffer {
 				if (cdEmp != null) {
 					emp += " " + cdEmp.getFullname();
 				}
-				s += custRmk.getRmkDesc() + " ("+ emp + " " + parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
+				s += custRmk.getRmkDesc() + " (" + emp + " " + parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
 			}
 
 			this.totaVo.init(titaVo);

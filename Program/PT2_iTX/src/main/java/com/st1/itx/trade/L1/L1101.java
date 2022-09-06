@@ -231,8 +231,7 @@ public class L1101 extends TradeBuffer {
 			break;
 		case "5": // 查詢
 
-			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000")
-					&& !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
 
@@ -276,8 +275,7 @@ public class L1101 extends TradeBuffer {
 	private void setTota(TitaVo titaVo) throws LogicException {
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, this.limit,
-				titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, this.limit, titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -505,8 +503,7 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setAMLJobCode(titaVo.getParam("AMLJobCode"));
 		tCustMain.setAMLGroup(titaVo.getParam("AMLGroup"));
 		tCustMain.setIndigenousName(titaVo.getParam("IndigenousName"));
-		if (beforeCustMain == null
-				& (beforeCustMain.getIntroducer() == null || "".equals(beforeCustMain.getIntroducer()))) {
+		if (beforeCustMain == null & (beforeCustMain.getIntroducer() == null || "".equals(beforeCustMain.getIntroducer()))) {
 			tCustMain.setIntroducer("");
 		} else {
 			tCustMain.setIntroducer(beforeCustMain.getIntroducer());

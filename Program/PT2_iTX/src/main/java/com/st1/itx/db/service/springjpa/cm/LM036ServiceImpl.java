@@ -28,12 +28,13 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * Query for LM036 表二 Bad Rate - 房貸(件數)
+	 * 
 	 * @param startMonth 資料範圍年月-起(西元)
 	 * @param endMonth   資料範圍年月-迄(西元)
 	 * @param num
 	 * @param titaVo
 	 * @return 查詢結果
-
+	 * 
 	 */
 
 	public List<Map<String, String>> queryBadRateCounts(int startMonth, int endMonth, int num, TitaVo titaVo) {
@@ -125,7 +126,7 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param startMonth 資料範圍年月-起(西元)
 	 * @param endMonth   資料範圍年月-迄(西元)
-	 * @param num 
+	 * @param num
 	 * @param titaVo     titaVo
 	 * @return 查詢結果
 	 */
@@ -246,7 +247,7 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(R.\"Ovdue1To2\")        AS \"Ovdue1To2\" "; // --F12 總額逾1~2期
 		sql += "      , SUM(R.\"Ovdue3To6\")        AS \"Ovdue3To6\" "; // --F13 總額逾3~6期
 		sql += "      , SUM(R.\"Coll\")             AS \"Coll\" "; // --F14 總額催收
-		sql += "      , SUM(R.\"BadLaon\")          AS \"BadLaon\" "; // --F15  轉銷損失(呆帳)
+		sql += "      , SUM(R.\"BadLaon\")          AS \"BadLaon\" "; // --F15 轉銷損失(呆帳)
 		sql += "      , SUM(R.\"Fee\")            AS \"Fee\" "; // --F16 折溢價與催收費用
 		sql += "      , SUM(R.\"Total\")            AS \"Total\" "; // --F17 放款總餘額
 		sql += " FROM ( ";
@@ -538,7 +539,7 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 			  ,\"PrinBalance\" ";
 		sql += " 		FROM \"MonthlyFacBal\" ";
 		sql += " 		WHERE \"YearMonth\" >= :startMonth ";
-		sql += " 		  AND \"YearMonth\" <= :endMonth )R " ;
+		sql += " 		  AND \"YearMonth\" <= :endMonth )R ";
 		sql += " WHERE R.\"Type\" = 9 ";
 		sql += " GROUP BY R.\"YearMonth\"";
 		sql += " 		 ,R.\"Type\"";
@@ -614,7 +615,7 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 			  ,\"PrinBalance\" ";
 		sql += " 		FROM \"MonthlyFacBal\" ";
 		sql += " 		WHERE \"YearMonth\" >= :startMonth ";
-		sql += " 		  AND \"YearMonth\" <= :endMonth )R " ;
+		sql += " 		  AND \"YearMonth\" <= :endMonth )R ";
 		sql += " WHERE R.\"Type\" = 9 ";
 		sql += " GROUP BY R.\"YearMonth\"";
 		sql += " 		 ,R.\"Type\"";

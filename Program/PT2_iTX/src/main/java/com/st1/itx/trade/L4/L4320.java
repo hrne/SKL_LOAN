@@ -32,7 +32,7 @@ public class L4320 extends TradeBuffer {
 		// 執行交易
 		MySpring.newTask("L4320Batch", this.txBuffer, titaVo);
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

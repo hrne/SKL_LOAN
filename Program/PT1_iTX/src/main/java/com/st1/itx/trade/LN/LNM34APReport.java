@@ -94,8 +94,7 @@ public class LNM34APReport extends MakeReport {
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM34AP genFile : ");
 		boolean isNewForm = false; // 格式:false舊格式,true新格式
-		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;"
-				+ "F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38";
+		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;" + "F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38";
 		String txt1[] = txt.split(";");
 
 		try {
@@ -195,8 +194,7 @@ public class LNM34APReport extends MakeReport {
 							break; // 法拍及火險費用
 						case 18:
 							formatter.applyPattern("0.000000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 利率(撥款)
 						case 19:
@@ -225,8 +223,7 @@ public class LNM34APReport extends MakeReport {
 							break; // 初貸時約定還本寬限期
 						case 25:
 							formatter.applyPattern("0.000000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 核准利率
 						case 26:

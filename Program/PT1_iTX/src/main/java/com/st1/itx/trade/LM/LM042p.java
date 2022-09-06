@@ -64,7 +64,7 @@ public class LM042p extends TradeBuffer {
 		// 當年月
 		int thisYM = 0;
 
-		// 判斷帳務日與月底日是否同一天 
+		// 判斷帳務日與月底日是否同一天
 		if (tbsdy < mfbsdy) {
 			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
 			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
@@ -72,16 +72,12 @@ public class LM042p extends TradeBuffer {
 
 		thisYM = iYear * 100 + iMonth;
 
-		
-		
 //		int yearMonth = thisYM;
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
-		int tYMD = ymd(yearMonth, 0);//本月底日
-		int lYMD = ymd(yearMonth, -1);//上月底日
+		int tYMD = ymd(yearMonth, 0);// 本月底日
+		int lYMD = ymd(yearMonth, -1);// 上月底日
 
-		
-		
 		checkAndUpdateData(titaVo, yearMonth);
 
 		this.info("LM042p titaVo.getTxcd() = " + titaVo.getTxcd());
@@ -95,14 +91,11 @@ public class LM042p extends TradeBuffer {
 
 		this.info("ntxbuf = " + ntxbuf);
 
-		
 		boolean isFinish = LM042Report.exec(titaVo, lYMD, tYMD);
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-					"LM042RBC表_會計部報表 已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "LM042RBC表_會計部報表 已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-					"LM042RBC表_會計部報表 查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "LM042RBC表_會計部報表 查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -114,7 +107,7 @@ public class LM042p extends TradeBuffer {
 		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
 
 		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
-		
+
 		// 判斷有無當月資料
 		if (sMonthlyLM042RBC == null) {
 			this.info("insert data");
@@ -124,8 +117,7 @@ public class LM042p extends TradeBuffer {
 			// 新增後再次搜尋
 			sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
 		}
-		
-		
+
 		List<MonthlyLM042RBC> lMonthlyLM042RBC = sMonthlyLM042RBC == null ? null : sMonthlyLM042RBC.getContent();
 
 		this.info("lMonthlyLM042RBC=" + lMonthlyLM042RBC.toString());
@@ -254,25 +246,25 @@ public class LM042p extends TradeBuffer {
 
 	/**
 	 * 取得月底日
+	 * 
 	 * @param yearMonth 西元年月(YYYYMM)
 	 * @paran num 單位(0=本月底日,1=下月底日,-1=上月底日)
-	 * */
-	private Integer ymd(int yearMonth,int num) {
-		
+	 */
+	private Integer ymd(int yearMonth, int num) {
+
 		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		Calendar calendar = Calendar.getInstance();
 
-		int iYear = yearMonth/100;
-		int iMonth = yearMonth%100;
-		
+		int iYear = yearMonth / 100;
+		int iMonth = yearMonth % 100;
+
 		int number = num - 1;
 		// 設月底日
 		calendar.set(Calendar.YEAR, iYear);
 		calendar.set(Calendar.MONTH, iMonth + number);
 		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 
-		
 		return Integer.valueOf(dateFormat.format(calendar.getTime()));
 	}
 }

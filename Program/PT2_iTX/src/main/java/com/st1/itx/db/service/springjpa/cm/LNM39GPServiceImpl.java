@@ -43,12 +43,9 @@ public class LNM39GPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單7
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", "
-				+ " \"CustKind\", \"Status\", \"OvduDate\", "
-				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", "
-				+ " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" "
-				+ " FROM  \"LoanIfrs9Gp\" " + " WHERE \"DataYM\"   = :dataMonth "
-				+ " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\", " + " \"CustKind\", \"Status\", \"OvduDate\", "
+				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"OvduDays\", " + " \"Stage1\", \"Stage2\", \"Stage3\", \"Stage4\", \"Stage5\", \"PdFlagToD\" " + " FROM  \"LoanIfrs9Gp\" "
+				+ " WHERE \"DataYM\"   = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 

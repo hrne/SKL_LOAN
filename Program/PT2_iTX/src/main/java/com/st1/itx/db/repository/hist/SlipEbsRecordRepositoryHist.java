@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -19,10 +18,9 @@ import com.st1.itx.db.domain.SlipEbsRecord;
  */
 public interface SlipEbsRecordRepositoryHist extends JpaRepository<SlipEbsRecord, Long> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<SlipEbsRecord> findByUploadNo(Long uploadNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<SlipEbsRecord> findByUploadNo(Long uploadNo);
 
 }
-

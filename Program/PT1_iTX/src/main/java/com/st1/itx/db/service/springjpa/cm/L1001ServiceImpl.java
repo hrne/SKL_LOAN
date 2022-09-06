@@ -15,8 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.parse.Parse;
-;
+import com.st1.itx.util.parse.Parse;;
 
 @Service("l1001ServiceImpl")
 @Repository
@@ -28,7 +27,7 @@ public class L1001ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 創建程式碼後,檢查初始值
@@ -68,11 +67,11 @@ public class L1001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iKind == 5) {
 			sql += "where \"IndustryCode\"=:industrycode ";
 		}
-		
+
 		if (!"0".equals(iCuscCd)) {
 			sql += "and \"CuscCd\" = :cuscCd ";
 		}
-		
+
 		sql += "ORDER BY A.\"CustNo\",A.\"CustId\" ";
 
 		sql += sqlRow;
@@ -92,20 +91,20 @@ public class L1001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ThisLimit", limit);
 
 		if (iKind == 1) {
-			query.setParameter("custno1",iCustNoSt);
-			query.setParameter("custno2",iCustNoEd);
+			query.setParameter("custno1", iCustNoSt);
+			query.setParameter("custno2", iCustNoEd);
 		} else if (iKind == 2) {
-			query.setParameter("custid",iCustId);
+			query.setParameter("custid", iCustId);
 		} else if (iKind == 3) {
-			query.setParameter("custname",iCustNm+"%");
+			query.setParameter("custname", iCustNm + "%");
 		} else if (iKind == 4) {
-			query.setParameter("telno",iMobile+"%");
+			query.setParameter("telno", iMobile + "%");
 		} else if (iKind == 5) {
-			query.setParameter("industrycode",iIndustryCode);
+			query.setParameter("industrycode", iIndustryCode);
 		}
-		
+
 		if (!"0".equals(iCuscCd)) {
-			query.setParameter("cuscCd",iCuscCd);
+			query.setParameter("cuscCd", iCuscCd);
 		}
 
 		this.info("L1001Service FindData=" + query);

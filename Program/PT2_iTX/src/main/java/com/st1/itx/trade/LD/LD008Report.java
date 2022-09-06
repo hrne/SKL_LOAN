@@ -97,8 +97,7 @@ public class LD008Report extends MakeReport {
 			this.error("lD008ServiceImpl.findAll error = " + e.getMessage());
 		}
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("LD008").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity("機密")
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("LD008").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity("機密")
 				.setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

@@ -44,6 +44,7 @@ public class L8419 extends TradeBuffer {
 	public JcicZ056LogService sJcicZ056LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
@@ -58,17 +59,16 @@ public class L8419 extends TradeBuffer {
 		this.info("sJcicZ056     = " + sJcicZ056.getSize());
 		if (sJcicZ056 != null) {
 			for (JcicZ056 xJcicZ056 : sJcicZ056) {
-				if ((iSubmitType == 1 && xJcicZ056.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ056.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ056.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ056.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8317");
 					occursListB.putParam("OOHistoryTxCd", "L8047");
 					occursListB.putParam("OOCustId", xJcicZ056.getCustId());
 					occursListB.putParam("OOSubmitKey", xJcicZ056.getSubmitKey());
 					occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ056.getSubmitKey(), titaVo));
-                    occursListB.putParam("OOCaseStatus", xJcicZ056.getCaseStatus());
-                    occursListB.putParam("OOClaimDate", xJcicZ056.getClaimDate());
-                    occursListB.putParam("OOCourtCode", xJcicZ056.getCourtCode());
+					occursListB.putParam("OOCaseStatus", xJcicZ056.getCaseStatus());
+					occursListB.putParam("OOClaimDate", xJcicZ056.getClaimDate());
+					occursListB.putParam("OOCourtCode", xJcicZ056.getCourtCode());
 					occursListB.putParam("OOTranKey", xJcicZ056.getTranKey());
 					// occursListB.putParam("OOTranCode", xJcicZ056.getTranCode());
 					occursListB.putParam("OOTranCode", "056");
@@ -90,8 +90,8 @@ public class L8419 extends TradeBuffer {
 						occursListB.putParam("OOSubmitKey", xJcicZ056.getSubmitKey());
 						occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ056.getSubmitKey(), titaVo));
 						occursListB.putParam("OOCaseStatus", xJcicZ056.getCaseStatus());
-                        occursListB.putParam("OOClaimDate", xJcicZ056.getClaimDate());
-                        occursListB.putParam("OOCourtCode", xJcicZ056.getCourtCode());
+						occursListB.putParam("OOClaimDate", xJcicZ056.getClaimDate());
+						occursListB.putParam("OOCourtCode", xJcicZ056.getCourtCode());
 						occursListB.putParam("OOTranKey", xJcicZ056.getTranKey());
 //					occursListB.putParam("OOTranCode", xJcicZ056.getTranCode());
 						occursListB.putParam("OOTranCode", "056");

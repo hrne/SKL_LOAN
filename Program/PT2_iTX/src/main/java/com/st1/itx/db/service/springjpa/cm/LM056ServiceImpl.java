@@ -165,7 +165,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	      ,SUM(\"Value\") AS \"Value\" ";
 		sql += "	FROM \"tempTotal\"";
 		sql += "	GROUP BY \"Column\" ";
-	
+
 		this.info("sql=" + sql);
 
 		Query query;

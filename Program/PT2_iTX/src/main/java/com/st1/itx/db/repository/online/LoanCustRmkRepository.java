@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.LoanCustRmkId;
  */
 public interface LoanCustRmkRepository extends JpaRepository<LoanCustRmk, LoanCustRmkId> {
 
-  // CustNo = 
-  public Slice<LoanCustRmk> findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<LoanCustRmk> findAllByCustNoIsOrderByCustNoAscAcDateAscRmkNoAsc(int custNo_0, Pageable pageable);
 
-  // RmkCode =
-  public Slice<LoanCustRmk> findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(String rmkCode_0, Pageable pageable);
+	// RmkCode =
+	public Slice<LoanCustRmk> findAllByRmkCodeIsOrderByCustNoAscAcDateAscRmkNoAsc(String rmkCode_0, Pageable pageable);
 
-  // CustNo = 
-  public Optional<LoanCustRmk> findTopByCustNoIsOrderByRmkNoDesc(int custNo_0);
+	// CustNo =
+	public Optional<LoanCustRmk> findTopByCustNoIsOrderByRmkNoDesc(int custNo_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<LoanCustRmk> findByLoanCustRmkId(LoanCustRmkId loanCustRmkId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<LoanCustRmk> findByLoanCustRmkId(LoanCustRmkId loanCustRmkId);
 
 }
-

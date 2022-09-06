@@ -172,12 +172,9 @@ public class InsuCommFileVo extends FileVo {
 //			ColumnG			G		X	1	0
 //			ColumnH			H		X	1	0
 
-			String thisLine = occursList.get("SalesId") + "," + occursList.get("FireInsuMonth") + ","
-					+ occursList.get("ColumnA") + "," + occursList.get("TotCommA") + "," + occursList.get("TotCommB")
-					+ "," + occursList.get("ColumnB") + "," + occursList.get("ColumnC") + ","
-					+ occursList.get("ColumnD") + "," + occursList.get("ColumnE") + "," + occursList.get("Count") + ","
-					+ occursList.get("TotFee") + "," + occursList.get("TotCommC") + "," + occursList.get("ColumnF")
-					+ "," + occursList.get("ColumnG") + "," + occursList.get("ColumnH");
+			String thisLine = occursList.get("SalesId") + "," + occursList.get("FireInsuMonth") + "," + occursList.get("ColumnA") + "," + occursList.get("TotCommA") + "," + occursList.get("TotCommB")
+					+ "," + occursList.get("ColumnB") + "," + occursList.get("ColumnC") + "," + occursList.get("ColumnD") + "," + occursList.get("ColumnE") + "," + occursList.get("Count") + ","
+					+ occursList.get("TotFee") + "," + occursList.get("TotCommC") + "," + occursList.get("ColumnF") + "," + occursList.get("ColumnG") + "," + occursList.get("ColumnH");
 			result.add(thisLine);
 		}
 		return result;

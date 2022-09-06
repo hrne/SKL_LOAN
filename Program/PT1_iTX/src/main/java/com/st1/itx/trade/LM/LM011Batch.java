@@ -38,14 +38,14 @@ public class LM011Batch extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM011Batch ");
-		
+
 		// 年月: 當日YYY / MM
 		titaVo.putParam("Year", titaVo.getEntDyI() / 10000);
-		titaVo.putParam("Month", titaVo.getEntDyI() / 100 % 100);		
-		
+		titaVo.putParam("Month", titaVo.getEntDyI() / 100 % 100);
+
 		// 是否重新產生: N
-		//titaVo.putParam("RemakeYN", "N");
-		
+		// titaVo.putParam("RemakeYN", "N");
+
 		lM011Report.exec(titaVo);
 	}
 }

@@ -27,7 +27,7 @@ public class LM043Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -37,6 +37,7 @@ public class LM043Report extends MakeReport {
 	}
 
 	int type = 0;// 種類，0: 正常戶，1: 催收戶。2: 逾期戶
+
 	/**
 	 * 執行報表輸出
 	 * 
@@ -48,28 +49,28 @@ public class LM043Report extends MakeReport {
 //		int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
 //		int year = entdy / 10000;
 //		int month = entdy / 100 % 100;
-		
+
 //		int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
 		int year = yearMonth / 100;
 		int month = yearMonth % 100;
-		
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM043", "地區放款數_內部控管", "LM043地區放款數_內部控管", "LM043地區放款數_內部控管.xlsx", "N總額");
-		makeExcel.setValue(1, 1, year  + "." + parse.IntegerToString(month, 2));
+		makeExcel.setValue(1, 1, year + "." + parse.IntegerToString(month, 2));
 		List<Map<String, String>> LM043List = null;
 		for (int i = 0; i < 3; i++) {// 3次，分別是正常戶，催收戶跟逾期戶
 			type = i;
 			try {
-				LM043List = lM043ServiceImpl.findAll(i, titaVo,yearMonth);
+				LM043List = lM043ServiceImpl.findAll(i, titaVo, yearMonth);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.info("LM043ServiceImpl.testExcel error = " + errors.toString());
 			}
-			exportExcel(titaVo, LM043List,yearMonth);
+			exportExcel(titaVo, LM043List, yearMonth);
 		}
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList, int yearMonth) throws LogicException {

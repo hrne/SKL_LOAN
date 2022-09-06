@@ -87,8 +87,7 @@ public class L6908 extends TradeBuffer {
 				int acdate = parse.stringToInteger(t.get("AcDate"));
 				int entrydate = parse.stringToInteger(t.get("EntryDate"));
 				int txtNo = parse.stringToInteger(t.get("TitaTxtNo"));
-				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(acdate, t.get("TitaTlrNo"),
-						parse.IntegerToString(txtNo, 8), titaVo);
+				LoanBorTx tLoanBorTx = sLoanBorTxService.borxTxtNoFirst(acdate, t.get("TitaTlrNo"), parse.IntegerToString(txtNo, 8), titaVo);
 				if (tLoanBorTx != null) {
 					entrydate = tLoanBorTx.getEntryDate();
 				}

@@ -34,7 +34,7 @@ public class L4703p extends TradeBuffer {
 
 	@Autowired
 	L9705Form l9705Form;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -55,10 +55,9 @@ public class L4703p extends TradeBuffer {
 			this.error("l9703ServiceImpl.findAll error = " + errors.toString());
 		}
 
-
-		//by eric 2021.12.10
+		// by eric 2021.12.10
 		l9705Form.exec(l4703List, titaVo, txbuffer);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -44,7 +44,7 @@ public class L8409 extends TradeBuffer {
 	public JcicZ046LogService sJcicZ046LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8409 ");
@@ -59,8 +59,7 @@ public class L8409 extends TradeBuffer {
 		this.info("sJcicZ046     = " + sJcicZ046.getSize());
 		if (sJcicZ046 != null) {
 			for (JcicZ046 xJcicZ046 : sJcicZ046) {
-				if ((iSubmitType == 1 && xJcicZ046.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ046.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ046.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ046.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8307");
 					occursListB.putParam("OOHistoryTxCd", "L8037");
@@ -68,7 +67,7 @@ public class L8409 extends TradeBuffer {
 					occursListB.putParam("OOSubmitKey", xJcicZ046.getSubmitKey());
 					occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ046.getSubmitKey(), titaVo));
 					occursListB.putParam("OORcDate", xJcicZ046.getRcDate());
-                    occursListB.putParam("OOCloseDate",xJcicZ046.getCloseDate());
+					occursListB.putParam("OOCloseDate", xJcicZ046.getCloseDate());
 					occursListB.putParam("OOTranKey", xJcicZ046.getTranKey());
 					// occursListB.putParam("OOTranCode", xJcicZ046.getTranCode());
 					occursListB.putParam("OOTranCode", "046");
@@ -90,7 +89,7 @@ public class L8409 extends TradeBuffer {
 						occursListB.putParam("OOSubmitKey", xJcicZ046.getSubmitKey());
 						occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ046.getSubmitKey(), titaVo));
 						occursListB.putParam("OORcDate", xJcicZ046.getRcDate());
-                        occursListB.putParam("OOCloseDate",xJcicZ046.getCloseDate());
+						occursListB.putParam("OOCloseDate", xJcicZ046.getCloseDate());
 						occursListB.putParam("OOTranKey", xJcicZ046.getTranKey());
 //					occursListB.putParam("OOTranCode", xJcicZ046.getTranCode());
 						occursListB.putParam("OOTranCode", "046");

@@ -21,7 +21,6 @@ import com.st1.itx.util.MySpring;
 @Scope("prototype")
 public class L5810 extends TradeBuffer {
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5810 ");
@@ -29,9 +28,9 @@ public class L5810 extends TradeBuffer {
 
 		// 執行交易
 		MySpring.newTask("L5810p", this.txBuffer, titaVo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 }

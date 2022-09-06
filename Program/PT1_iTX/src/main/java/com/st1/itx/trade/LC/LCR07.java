@@ -27,7 +27,7 @@ public class LCR07 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService sTxTellerService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -44,9 +44,9 @@ public class LCR07 extends TradeBuffer {
 		} else {
 			throw new LogicException("EC001", "員編:" + titaVo.getParam("SUPID"));
 		}
-		
+
 		CdEmp cdEmp = cdEmpService.findById(tTxTeller.getTlrNo());
-		
+
 		if (cdEmp == null) {
 			throw new LogicException("EC001", "員工資料檔員編不存在::" + tTxTeller.getTlrNo());
 		}

@@ -69,8 +69,8 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iPropDate > 0) {
 			iPropDate = iPropDate + 19110000;
 		}
-		if(iAuthCreateDate>0) {
-			iAuthCreateDate = iAuthCreateDate+19110000;
+		if (iAuthCreateDate > 0) {
+			iAuthCreateDate = iAuthCreateDate + 19110000;
 		}
 		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
 		// iAuthApplCode 1.新增授權 2.再次授權 3.取消授權
@@ -82,7 +82,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 				searchstatus = " in (' ')";
 				searchMediaCode = " is null ";
 				break;
-			case 2: 
+			case 2:
 				searchstatus = " not in  ('00')  AND \"StampCode\" IS NOT NULL ";
 				searchMediaCode = " = 'Y' ";
 				break;
@@ -189,27 +189,26 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 2:
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
-			
-			if(iAuthCreateDate>0) {
+
+			if (iAuthCreateDate > 0) {
 				sql += "   and \"AuthCreateDate\" =" + iAuthCreateDate;
 			}
-			
-			if(iAuthCode>0) {
-				sql += "   and \"AuthCode\" = "+iAuthCode ;
+
+			if (iAuthCode > 0) {
+				sql += "   and \"AuthCode\" = " + iAuthCode;
 			}
-			
-		
+
 			break;
 		case 3:
 			sql += "   and \"PropDate\" = " + propDate;
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
-			
-			if(iAuthCreateDate>0) {
+
+			if (iAuthCreateDate > 0) {
 				sql += "   and \"AuthCreateDate\" =" + iAuthCreateDate;
-				}
-				
-			if(iAuthCode>0) {
-				sql += "   and \"AuthCode\" = "+iAuthCode ;
+			}
+
+			if (iAuthCode > 0) {
+				sql += "   and \"AuthCode\" = " + iAuthCode;
 			}
 			break;
 		}

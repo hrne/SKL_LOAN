@@ -100,7 +100,7 @@ public class L6061 extends TradeBuffer {
 			occursList.putParam("OOReceivableFlag", tCdAcCode.getReceivableFlag());
 			occursList.putParam("OOClsChkFlag", tCdAcCode.getClsChkFlag());
 			occursList.putParam("OOInuseFlag", tCdAcCode.getInuseFlag());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
@@ -116,6 +116,7 @@ public class L6061 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

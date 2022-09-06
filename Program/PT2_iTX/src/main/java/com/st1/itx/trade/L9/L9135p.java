@@ -75,17 +75,15 @@ public class L9135p extends TradeBuffer {
 		if (l9135List != null && !l9135List.isEmpty()) {
 
 			this.info("active L9135report data detail");
-			l9135Report.exec(titaVo,l9135List, acDate);
+			l9135Report.exec(titaVo, l9135List, acDate);
 			infoNotification = "L9135 銀行存款媒體明細表(總帳)";
-			
 
 		} else {
 
 			infoNotification = "L9135 查無資料";
 
 		}
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO") + "L9135", infoNotification, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9135", infoNotification, titaVo);
 
 		this.addList(this.totaVo);
 

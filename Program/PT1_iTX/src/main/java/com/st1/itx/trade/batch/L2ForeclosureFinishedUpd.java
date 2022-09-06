@@ -52,12 +52,11 @@ public class L2ForeclosureFinishedUpd extends BatchBase implements Tasklet, Init
 
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
-
 		String empNo = titaVo.getTlrNo();
 
 		this.info("L2ForeclosureFinishedUpd tbsdyf = " + tbsdyf);
 		this.info("L2ForeclosureFinishedUpd empNo = " + empNo);
-	
+
 		sJobMainService.Usp_L2_ForeclosureFinished_Upd(tbsdyf, empNo, titaVo);
 	}
 

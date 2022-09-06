@@ -49,14 +49,12 @@ public class LM016p extends TradeBuffer {
 		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("LM016", 60) + iAcDate;
 
 		this.info("ntxbuf = " + ntxbuf);
-		
+
 		boolean isFinish = lM016Report.exec(titaVo);
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-					"LM016寬限條件控管繳息表 已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "LM016寬限條件控管繳息表 已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-					"LM016寬限條件控管繳息表 查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "LM016寬限條件控管繳息表 查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

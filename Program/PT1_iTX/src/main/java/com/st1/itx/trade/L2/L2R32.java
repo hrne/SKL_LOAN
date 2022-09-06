@@ -109,7 +109,7 @@ public class L2R32 extends TradeBuffer {
 	}
 
 	private void getCloseBreachAmt(TitaVo titaVo) throws LogicException {
-		oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iTranDate,iCustNo, iFacmNo, 0, null, titaVo);
+		oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iTranDate, iCustNo, iFacmNo, 0, null, titaVo);
 		// 輸出清償違約金
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 			for (LoanCloseBreachVo v : oListCloseBreach) {

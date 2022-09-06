@@ -67,7 +67,7 @@ public class L4042 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
 				int authCreateDate = parse.stringToInteger(result.get("F8"));
-				this.info("authCreateDate 1=="+authCreateDate);
+				this.info("authCreateDate 1==" + authCreateDate);
 				int propDate = parse.stringToInteger(result.get("F9"));
 				int retrDate = parse.stringToInteger(result.get("F10"));
 				int stampFinishDate = parse.stringToInteger(result.get("F16"));
@@ -76,10 +76,10 @@ public class L4042 extends TradeBuffer {
 				String wkCreateFlag = result.get("F7");
 				int processdate = parse.stringToInteger(result.get("F21"));
 				String authMeth = result.get("F23");
-				
+
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
-					this.info("authCreateDate 2=="+authCreateDate);
+					this.info("authCreateDate 2==" + authCreateDate);
 				}
 				if (propDate > 19110000) {
 					propDate = propDate - 19110000;
@@ -107,12 +107,12 @@ public class L4042 extends TradeBuffer {
 				}
 
 				CdEmp tCdEmp = tCdEmpService.findById(empno, titaVo);
-				if(tCdEmp!=null) {
+				if (tCdEmp != null) {
 					empno = tCdEmp.getFullname();
 				} else {
-					empno="";
+					empno = "";
 				}
-				
+
 				occursList.putParam("OOCustNo", result.get("F0"));
 				occursList.putParam("OOFacmNo", result.get("F1"));
 				occursList.putParam("OOAuthType", result.get("F2"));

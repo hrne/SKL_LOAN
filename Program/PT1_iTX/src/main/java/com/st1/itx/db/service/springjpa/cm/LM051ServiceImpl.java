@@ -32,16 +32,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-
-
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
 	 * @param formNum   表格次序
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 
@@ -238,20 +236,20 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-	
+
 	/**
 	 * 執行報表輸出(備呆總帳)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param lastYM 上西元年月
-	 * @param formNum 表格次序
-	 * @return 
-	 * @throws Exception 
+	 * @param lastYM    上西元年月
+	 * @param formNum   表格次序
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth,int lastYM, int formNum) throws Exception {
+
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int lastYM, int formNum) throws Exception {
 		this.info("lM051.findAll");
 
 		String iYearMonth = String.valueOf(yearMonth);
@@ -259,7 +257,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("yymm=" + iYearMonth + ",lyymm=" + lastYM);
 
 		String sql = " ";
-		
+
 		if (formNum == 1) {
 
 			sql += "WITH rawData AS ( ";
@@ -299,7 +297,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "          ,\"LoanBal\"";
 			sql += "    FROM \"MonthlyLM052AssetClass\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
-			sql += "    UNION ";			
+			sql += "    UNION ";
 			sql += "    SELECT '61' AS \"AssetClassNo\" ";
 			sql += "      	  ,'999' AS \"AcSubBookCode\" ";
 			sql += "          ,CASE WHEN R.\"LnAmt\" >= 0 ";
@@ -307,7 +305,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                ELSE ABS(R.\"LnAmt\") END AS \"LoanBal\"";
 			sql += "    FROM roundData R";
 
-			
 		} else if (formNum == 2) {
 
 			// 此年月為上個月
@@ -340,11 +337,11 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    ORDER BY \"LoanAssetCode\"";
 
 		} else if (formNum == 5) {
-			
+
 			sql += "	SELECT \"YearMonth\" ";
-			sql += "          ,\"AssetEvaTotal\" "; //--五類資產評估合計
-			sql += "          ,\"LegalLoss\"";		//--法定備抵損失提撥
-			sql += "          ,\"ApprovedLoss\"";   //--會計部核定備抵損失
+			sql += "          ,\"AssetEvaTotal\" "; // --五類資產評估合計
+			sql += "          ,\"LegalLoss\""; // --法定備抵損失提撥
+			sql += "          ,\"ApprovedLoss\""; // --會計部核定備抵損失
 			sql += "    FROM \"MonthlyLM052Loss\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
 
@@ -361,14 +358,14 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yymm", iYearMonth);
 		return this.convertToMap(query);
 	}
-	
+
 	/**
 	 * 執行報表輸出(明細表)
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {

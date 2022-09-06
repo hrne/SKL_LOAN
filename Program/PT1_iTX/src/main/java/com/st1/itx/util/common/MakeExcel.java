@@ -79,8 +79,7 @@ public class MakeExcel extends CommBuffer {
 
 	private boolean isXls = false;
 
-	private void checkParameters(int date, String brno, String fileCode, String fileItem, String fileName)
-			throws LogicException {
+	private void checkParameters(int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
 		if (date == 0) {
 			throw new LogicException("EC004", "(MakeExcel)日期(date)必須有值(MakeExcel)");
 		}
@@ -273,8 +272,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param calculateColumnLeft  範圍最左欄, 1-based
 	 * @param calculateColumnRight 範圍最右欄, 1-based
 	 */
-	public void formulaRangeCalculate(int calculateRowTop, int calculateRowBottom, int calculateColumnLeft,
-			int calculateColumnRight) {
+	public void formulaRangeCalculate(int calculateRowTop, int calculateRowBottom, int calculateColumnLeft, int calculateColumnRight) {
 		for (; calculateRowTop <= calculateRowBottom; calculateRowTop++)
 			for (; calculateColumnLeft <= calculateColumnRight; calculateColumnLeft++)
 				formulaCalculate(calculateRowTop, calculateColumnLeft);
@@ -376,8 +374,7 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
-			throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
 		// 未指定sheetnanme時,預設以檔案編號為sheetnanme
 		this.open(titaVo, date, brno, fileCode, fileItem, fileName, fileCode);
 	}
@@ -398,8 +395,7 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
-			String sheetName) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, String sheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -429,8 +425,7 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
-			String defaultExcel, Object defaultSheet) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, String defaultExcel, Object defaultSheet) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -462,8 +457,7 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
-			String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -524,8 +518,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param defaultSheet 底稿頁籤名稱
 	 * @throws LogicException
 	 */
-	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet)
-			throws LogicException {
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
 
@@ -551,8 +544,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param newSheetName 修改頁籤名稱
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet,
-			String newSheetName) throws LogicException {
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
 
@@ -832,8 +824,7 @@ public class MakeExcel extends CommBuffer {
 	 *                      R 靠右對齊<br>
 	 * @throws LogicException LogicException
 	 */
-	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String formatOrAlign)
-			throws LogicException {
+	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String formatOrAlign) throws LogicException {
 		switch (formatOrAlign) {
 		case "L":
 		case "C":
@@ -862,8 +853,7 @@ public class MakeExcel extends CommBuffer {
 	 *               R 靠右對齊<br>
 	 * @throws LogicException LogicException
 	 */
-	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String format, String align)
-			throws LogicException {
+	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String format, String align) throws LogicException {
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);
 		}
@@ -1018,8 +1008,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param tmpFontStyleVo 格式設定
 	 * @throws LogicException LogicException
 	 */
-	public void setValue(int row, int col, Object val, String formatOrAlign, ExcelFontStyleVo tmpFontStyleVo)
-			throws LogicException {
+	public void setValue(int row, int col, Object val, String formatOrAlign, ExcelFontStyleVo tmpFontStyleVo) throws LogicException {
 		this.setFontStyleVo(tmpFontStyleVo);
 		switch (formatOrAlign) {
 		case "L":
@@ -1071,8 +1060,7 @@ public class MakeExcel extends CommBuffer {
 	 * @param tmpFontStyleVo 格式設定
 	 * @throws LogicException LogicException
 	 */
-	public void setValue(int row, int col, Object val, String format, String align, ExcelFontStyleVo tmpFontStyleVo)
-			throws LogicException {
+	public void setValue(int row, int col, Object val, String format, String align, ExcelFontStyleVo tmpFontStyleVo) throws LogicException {
 		this.setFontStyleVo(tmpFontStyleVo);
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);

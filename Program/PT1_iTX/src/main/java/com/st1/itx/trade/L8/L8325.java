@@ -125,11 +125,9 @@ public class L8325 extends TradeBuffer {
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
 				if ("A".equals(iTranKey) || "X".equals(iTranKey)) {
-					throw new LogicException(titaVo, "E0005",
-							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
 				} else {
-					throw new LogicException(titaVo, "E0007",
-							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
 				}
 			} // 4 end
 		}
@@ -181,8 +179,7 @@ public class L8325 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ444, uJcicZ444);
-			iDataLog.exec("L8325異動", uJcicZ444.getSubmitKey() + uJcicZ444.getCustId() + uJcicZ444.getApplyDate()
-					+ uJcicZ444.getCourtCode());
+			iDataLog.exec("L8325異動", uJcicZ444.getSubmitKey() + uJcicZ444.getCustId() + uJcicZ444.getApplyDate() + uJcicZ444.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -231,8 +228,7 @@ public class L8325 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4442, uJcicZ4442);
-			iDataLog.exec("L8325刪除", uJcicZ4442.getSubmitKey() + uJcicZ4442.getCustId() + uJcicZ4442.getApplyDate()
-					+ uJcicZ4442.getCourtCode());
+			iDataLog.exec("L8325刪除", uJcicZ4442.getSubmitKey() + uJcicZ4442.getCustId() + uJcicZ4442.getApplyDate() + uJcicZ4442.getCourtCode());
 			break;
 		// 修改
 		case "7":
@@ -267,8 +263,7 @@ public class L8325 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4443, uJcicZ4443);
-			iDataLog.exec("L8325修改", uJcicZ4443.getSubmitKey() + uJcicZ4443.getCustId() + uJcicZ4443.getApplyDate()
-					+ uJcicZ4443.getCourtCode());
+			iDataLog.exec("L8325修改", uJcicZ4443.getSubmitKey() + uJcicZ4443.getCustId() + uJcicZ4443.getApplyDate() + uJcicZ4443.getCourtCode());
 		default:
 			break;
 		}

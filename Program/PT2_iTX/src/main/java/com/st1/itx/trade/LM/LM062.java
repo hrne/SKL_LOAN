@@ -38,13 +38,12 @@ public class LM062 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LM062 ");
 		lm062report.setTxBuffer(this.getTxBuffer());
-		
+
 		// 帳務日(西元)
 		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日(西元)
 		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
-		
-	
+
 		// 年
 		int iYear = mfbsdy / 10000;
 		// 月
@@ -52,7 +51,7 @@ public class LM062 extends BatchBase implements Tasklet, InitializingBean {
 		// 當年月
 		int thisYM = 0;
 
-		// 判斷帳務日與月底日是否同一天 
+		// 判斷帳務日與月底日是否同一天
 		if (tbsdy < mfbsdy) {
 			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
 			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
@@ -60,8 +59,7 @@ public class LM062 extends BatchBase implements Tasklet, InitializingBean {
 
 		thisYM = iYear * 100 + iMonth;
 
-		
-		lm062report.exec(titaVo,thisYM);
-		
+		lm062report.exec(titaVo, thisYM);
+
 	}
 }

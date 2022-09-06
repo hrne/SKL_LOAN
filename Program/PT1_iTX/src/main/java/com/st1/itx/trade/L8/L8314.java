@@ -90,8 +90,7 @@ public class L8314 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start KEY值(IDN+報送單位代號+協商申請日)未曾報送過'52':前置協商相關資料報送例外處理則予以剔退
 			// ：@@@function 要改为：custRcSubEq
-			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ052 == null) {
 				if ("A".equals(iTranKey)) {
 					throw new LogicException("E0005", "未曾報送過(52)前置協商相關資料報送例外處理.");
@@ -156,8 +155,7 @@ public class L8314 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ053, uJcicZ053);
-			iDataLog.exec("L8314異動", uJcicZ053.getSubmitKey() + uJcicZ053.getCustId() + uJcicZ053.getRcDate()
-					+ uJcicZ053.getMaxMainCode());
+			iDataLog.exec("L8314異動", uJcicZ053.getSubmitKey() + uJcicZ053.getCustId() + uJcicZ053.getRcDate() + uJcicZ053.getMaxMainCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -205,8 +203,7 @@ public class L8314 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0532, uJcicZ0532);
-			iDataLog.exec("L8314刪除", uJcicZ0532.getSubmitKey() + uJcicZ0532.getCustId() + uJcicZ0532.getRcDate()
-					+ uJcicZ0532.getMaxMainCode());
+			iDataLog.exec("L8314刪除", uJcicZ0532.getSubmitKey() + uJcicZ0532.getCustId() + uJcicZ0532.getRcDate() + uJcicZ0532.getMaxMainCode());
 			break;
 		// 修改
 		case "7":
@@ -240,8 +237,7 @@ public class L8314 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0533, uJcicZ0533);
-			iDataLog.exec("L8314修改", uJcicZ0533.getSubmitKey() + uJcicZ0533.getCustId() + uJcicZ0533.getRcDate()
-					+ uJcicZ0533.getMaxMainCode());
+			iDataLog.exec("L8314修改", uJcicZ0533.getSubmitKey() + uJcicZ0533.getCustId() + uJcicZ0533.getRcDate() + uJcicZ0533.getMaxMainCode());
 		default:
 			break;
 		}

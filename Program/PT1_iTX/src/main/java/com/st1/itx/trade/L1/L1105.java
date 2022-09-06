@@ -64,12 +64,12 @@ public class L1105 extends TradeBuffer {
 
 		if (iCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
-		} 
+		}
 
 		String iCustUKey = iCustMain.getCustUKey();
-		
+
 		titaVo.putParam("CustNo", iCustMain.getCustNo());
-		
+
 		// start deal with data
 		CustTelNo tCustTelNo = new CustTelNo();
 //		CustTelNo hCustTelNo = new CustTelNo();
@@ -152,21 +152,21 @@ public class L1105 extends TradeBuffer {
 				throw new LogicException("E0007", "客戶聯絡電話檔");
 			}
 			// 紀錄變更前變更後
-			
+
 			CustTelNo nCustTelNo = (CustTelNo) iDataLog.clone(tCustTelNo);
-			
+
 			String oTelNo = showTelNo(oCustTelNo);
 			String nTelNo = showTelNo(nCustTelNo);
-			
+
 			oCustTelNo.setTelArea("");
 			oCustTelNo.setTelNo(oTelNo);
 			oCustTelNo.setTelExt("");
 			nCustTelNo.setTelArea("");
 			nCustTelNo.setTelNo(nTelNo);
 			nCustTelNo.setTelExt("");
-			
+
 			iDataLog.setEnv(titaVo, oCustTelNo, nCustTelNo);
-			iDataLog.exec("修改顧客電話資料/"+oCustTelNo.getTelArea()+oCustTelNo.getTelNo()+oCustTelNo.getTelExt(), "CustUKey:" + iCustMain.getCustUKey());
+			iDataLog.exec("修改顧客電話資料/" + oCustTelNo.getTelArea() + oCustTelNo.getTelNo() + oCustTelNo.getTelExt(), "CustUKey:" + iCustMain.getCustUKey());
 		}
 
 		this.totaVo.putParam("OResult", "Y");
@@ -174,17 +174,17 @@ public class L1105 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String showTelNo(CustTelNo custTelNo) {
 		String telno = "";
-		
+
 		if ("03".equals(custTelNo.getTelTypeCode()) || "05".equals(custTelNo.getTelTypeCode())) {
 			telno = custTelNo.getTelNo();
 		} else if ("09".equals(custTelNo.getTelTypeCode())) {
 			telno = custTelNo.getTelArea() + custTelNo.getTelNo() + custTelNo.getTelExt();
 		} else {
 			if (!custTelNo.getTelArea().isEmpty()) {
-				telno = custTelNo.getTelArea()+ " ";
+				telno = custTelNo.getTelArea() + " ";
 			}
 			telno += custTelNo.getTelNo();
 			if (!custTelNo.getTelExt().isEmpty()) {

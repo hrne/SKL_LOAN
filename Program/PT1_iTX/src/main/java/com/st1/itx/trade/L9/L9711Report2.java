@@ -84,9 +84,8 @@ public class L9711Report2 extends MakeReport {
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
-				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
-				.build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd).setRptItem(reportItem).setSecurity(security).setRptSize(pageSize)
+				.setPageOrientation(pageOrientation).build();
 		this.openForm(titaVo, reportVo);
 
 		if (L9711List.size() > 0) {
@@ -159,9 +158,7 @@ public class L9711Report2 extends MakeReport {
 
 		try {
 			dBaTxCom.setTxBuffer(txbuffer);
-			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-					parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, 0,
-					titaVo);
+			lBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9711Vo.get("F4")), parse.stringToInteger(tL9711Vo.get("F5")), 0, 6, 0, titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
 			this.info("baTxCom.setTxBuffer ErrorMsg :" + e.getMessage());
@@ -209,10 +206,8 @@ public class L9711Report2 extends MakeReport {
 		printCm(16, y, tL9711Vo.get("F20"));
 
 		y = top + yy + (++l) * h;
-		printCm(1.5, y,
-				"戶    號：" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-"
-						+ String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))) + "  目前利率："
-						+ padStart(6, "" + IntRate) + "%");
+		printCm(1.5, y, "戶    號：" + String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "-" + String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))) + "  目前利率："
+				+ padStart(6, "" + IntRate) + "%");
 
 		y = top + yy + (++l) * h;
 
@@ -425,11 +420,9 @@ public class L9711Report2 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
-						+ " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
-						+ " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
 			}
 		} else {
 			return rocdatex;

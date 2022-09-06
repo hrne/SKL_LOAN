@@ -151,8 +151,7 @@ public class L4606Batch extends TradeBuffer {
 
 //		執行成功者，指向查詢畫面
 		if (isFinished) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4606", "", sendMsg, titaVo);
 		}
@@ -196,28 +195,26 @@ public class L4606Batch extends TradeBuffer {
 		if (!"".equals(flagB)) {
 			setTimer();
 			this.info("flagB Start ...");
-			
-			if(custErrorCnt>0) {
+
+			if (custErrorCnt > 0) {
 				l4606Report4.exec(titaVo, errorList);
-			}else {
+			} else {
 				l4606Report1.exec(titaVo);
 				l4606Report2.exec(titaVo);
 				l4606Report3.exec(titaVo, successList);
 				l4606Report4.exec(titaVo, errorList);
 			}
 
-
-			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
-					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
+			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt + ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
 			printUsedTime("flagB");
 		}
 
 //		產生下傳媒體
 		if (!"".equals(flagC)) {
-			if(custErrorCnt==0) {
+			if (custErrorCnt == 0) {
 				setTimer();
 				generateMediaFile();
-				printUsedTime("generateMediaFil'");				
+				printUsedTime("generateMediaFil'");
 			}
 		}
 	}
@@ -333,8 +330,7 @@ public class L4606Batch extends TradeBuffer {
 			// 轉換資料格式
 			List<String> file = insuCommFileVo.toFile();
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-火險佣金媒體檔", "LNM23P.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險佣金媒體檔", "LNM23P.txt", 2);
 
 			for (String line : file) {
 				makeFile.put(line);
@@ -352,8 +348,7 @@ public class L4606Batch extends TradeBuffer {
 		this.info("insertIntoInsuComm Start ...");
 
 //		String fileName = "874-B1.txt";
-		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-				+ File.separatorChar + titaVo.getParam("FILENA");
+		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA");
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 

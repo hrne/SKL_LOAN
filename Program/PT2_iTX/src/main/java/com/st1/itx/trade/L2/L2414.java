@@ -164,8 +164,7 @@ public class L2414 extends TradeBuffer {
 		if (iFunCd == 1) {
 
 			// 取號使用參數
-			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0")
-					+ StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
+			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
 			this.info("Colind4s=" + Colind4s);
 			iClNo = gGSeqCom.getSeqNo(0, 0, "L2", Colind4s, 9999999, titaVo);
@@ -509,8 +508,7 @@ public class L2414 extends TradeBuffer {
 		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
 		if (custMain != null) {
 
-			Slice<ClOther> sClOther = sClOtherService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(),
-					custMain.getCustId(), 0, Integer.MAX_VALUE);
+			Slice<ClOther> sClOther = sClOtherService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(), custMain.getCustId(), 0, Integer.MAX_VALUE);
 			List<ClOther> lClOther = sClOther == null ? null : sClOther.getContent();
 			if (lClOther != null) {
 				for (ClOther clOther : lClOther) {

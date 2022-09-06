@@ -37,39 +37,31 @@ public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "　";
 		int iYYYYMM = Integer.parseInt(iYear + 12) + 191100;
 
-		
-		this.info("iYYYYMM=="+iYYYYMM);
+		this.info("iYYYYMM==" + iYYYYMM);
 
-		
-		
 		sql += "select \r\n";
-		sql +="	\"CustNo\"\r\n" ; 
-		sql +="	,\"FacmNo\"\r\n" ; 
-		sql +="	,\"HouseBuyDate\"\r\n" ; 
-		sql +="	,\"LoanAmt\"\r\n" ; 
-		sql +="	,\"FirstDrawdownDate\"\r\n" ; 
-		sql +="	,\"MaturityDate\"\r\n"; 
-		sql +="	,\"LoanBal\"\r\n" ;
-		sql +="	,\"YearMonth\"\r\n" ; 
-		sql +="	,\"JsonFields\"\r\n" ;
-		sql +="	,\"UsageCode\"\r\n" ; 
-		sql +="	,\"YearlyInt\"\r\n" ; 
-		sql +="	from  \"YearlyHouseLoanInt\"\r\n" ; 
-		sql +="	where \"YearMonth\"= :iYYYYMM ";
-		sql +="	order by \"CustNo\",\"FacmNo\" ";
-		
-		
-		
-		
+		sql += "	\"CustNo\"\r\n";
+		sql += "	,\"FacmNo\"\r\n";
+		sql += "	,\"HouseBuyDate\"\r\n";
+		sql += "	,\"LoanAmt\"\r\n";
+		sql += "	,\"FirstDrawdownDate\"\r\n";
+		sql += "	,\"MaturityDate\"\r\n";
+		sql += "	,\"LoanBal\"\r\n";
+		sql += "	,\"YearMonth\"\r\n";
+		sql += "	,\"JsonFields\"\r\n";
+		sql += "	,\"UsageCode\"\r\n";
+		sql += "	,\"YearlyInt\"\r\n";
+		sql += "	from  \"YearlyHouseLoanInt\"\r\n";
+		sql += "	where \"YearMonth\"= :iYYYYMM ";
+		sql += "	order by \"CustNo\",\"FacmNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iYYYYMM", iYYYYMM);
-		
+
 		return this.convertToMap(query);
 	}
-
 
 }

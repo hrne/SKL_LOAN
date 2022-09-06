@@ -39,8 +39,8 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		//must set to true
-		return this.convertToMap(query,true);
+		// must set to true
+		return this.convertToMap(query, true);
 	}
 
 	public List<Map<String, String>> insertAll(int iDate, int iDate3Y, int iDate5Y, int iAmt, TitaVo titaVo) throws Exception {
@@ -85,8 +85,8 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		       ,\"FacmNo\"                                     ";
 		sql += "		       FROM \"LoanBorMain\"                            ";
 		sql += "		       WHERE \"Status\" IN (0,2,4,7)                   "; // 00: 正常戶 02: 催收戶 03: 結案戶 04:逾期戶
-																						// 05:催收結案戶 06:呆帳戶 07:部分轉呆戶
-																						// 08:債權轉讓戶 09:呆帳結案戶
+																					// 05:催收結案戶 06:呆帳戶 07:部分轉呆戶
+																					// 08:債權轉讓戶 09:呆帳結案戶
 		sql += "		       GROUP BY \"CustNo\",\"FacmNo\"                  ";
 		sql += "		      ) L                                              ";
 		sql += "	  LEFT JOIN \"FacMain\" F                                  ";

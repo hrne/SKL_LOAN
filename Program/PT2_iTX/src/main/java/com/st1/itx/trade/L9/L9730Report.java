@@ -45,7 +45,7 @@ public class L9730Report extends MakeReport {
 		int inputEndDateFirst = parse.stringToInteger(titaVo.get("InputEndDateFirst")) + 19110000;
 		int inputStartDateNext = parse.stringToInteger(titaVo.get("InputStartDateNext")) + 19110000;
 		int inputEndDateNext = parse.stringToInteger(titaVo.get("InputEndDateNext")) + 19110000;
-		
+
 		try {
 			listL9730 = l9730ServiceImpl.findAll(inputStartDateFirst, inputEndDateFirst, inputStartDateNext, inputEndDateNext, titaVo);
 		} catch (Exception e) {
@@ -61,28 +61,23 @@ public class L9730Report extends MakeReport {
 		if (listL9730 == null || listL9730.isEmpty())
 			return false;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName,
-				txcd + "_" + txName + ".xlsx", "X800");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, txcd + "_" + txName + ".xlsx", "X800");
 
 		int row = 2;
-		
+
 		String lastCustNo = "";
 		String lastFacmNo = "";
 		String lastBormNo = "";
 		String lastLRCRateIncr = "";
 
 		for (Map<String, String> l9730Vo : listL9730) {
-			
+
 			String thisCustNo = l9730Vo.get("CustNo");
 			String thisFacmNo = l9730Vo.get("FacmNo");
 			String thisBormNo = l9730Vo.get("BormNo");
 			String thisLRCRateIncr = l9730Vo.get("LRCRateIncr");
-			
-			if (lastCustNo.equals(thisCustNo) 
-				&& lastFacmNo.equals(thisFacmNo)
-				&& lastBormNo.equals(thisBormNo)
-				&& lastLRCRateIncr.equals(thisLRCRateIncr))
-			{
+
+			if (lastCustNo.equals(thisCustNo) && lastFacmNo.equals(thisFacmNo) && lastBormNo.equals(thisBormNo) && lastLRCRateIncr.equals(thisLRCRateIncr)) {
 				// 賴桑指示: 連續相同 RateIncr 時，不重覆出
 				continue;
 			} else {
@@ -91,7 +86,7 @@ public class L9730Report extends MakeReport {
 				lastBormNo = thisBormNo;
 				lastLRCRateIncr = thisLRCRateIncr;
 			}
-			
+
 			for (int i = 0; i < 10; i++) {
 				String valueStr = l9730Vo.get("F" + i);
 				switch (i) {

@@ -116,8 +116,7 @@ public class L4102Batch extends TradeBuffer {
 
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + wkbatchNo;
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4102",
-				checkMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4102", checkMsg, titaVo);
 
 		return this.sendList();
 	}
@@ -132,9 +131,9 @@ public class L4102Batch extends TradeBuffer {
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
 		}
-		if(iItemCode==1) {
+		if (iItemCode == 1) {
 			batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
-		}else {
+		} else {
 			batchNo = "RT" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
 		}
 		return batchNo;

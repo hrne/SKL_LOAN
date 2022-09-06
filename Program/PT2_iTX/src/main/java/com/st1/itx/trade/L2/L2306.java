@@ -25,7 +25,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2306")
 @Scope("prototype")
 /**
@@ -102,18 +101,18 @@ public class L2306 extends TradeBuffer {
 				tReltMain.setApplDate(parse.stringToInteger(titaVo.getEntDy()));
 				/* 存入DB */
 
-				if("02".equals(titaVo.getParam("PosInd"))) {  // 判斷同一戶號案件編號只能有一個配偶
+				if ("02".equals(titaVo.getParam("PosInd"))) { // 判斷同一戶號案件編號只能有一個配偶
 					Slice<ReltMain> slReltMain = sReltMainService.findByBoth(iCaseNo, iCustNo, index, limit, titaVo);
 					tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
 					if (tmplReltMain != null) {
 						for (ReltMain ttReltMain : tmplReltMain) {
-							if("02".equals(ttReltMain.getReltCode())) {
+							if ("02".equals(ttReltMain.getReltCode())) {
 								throw new LogicException("E0010", "同一戶號案件只能有一個配偶");
 							}
 						}
 					} // if
 				}
-				
+
 				try {
 					sReltMainService.insert(tReltMain);
 				} catch (DBException e) {
@@ -157,20 +156,19 @@ public class L2306 extends TradeBuffer {
 				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 				tReltMain.setReltmark(titaVo.getParam("Remark"));
 				tReltMain.setApplDate(parse.stringToInteger(titaVo.getEntDy()));
-				
-				
-				if("02".equals(titaVo.getParam("PosInd"))) {  // 判斷同一戶號案件編號只能有一個配偶
+
+				if ("02".equals(titaVo.getParam("PosInd"))) { // 判斷同一戶號案件編號只能有一個配偶
 					Slice<ReltMain> slReltMain = sReltMainService.findByBoth(iCaseNo, iCustNo, index, limit, titaVo);
 					tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
 					if (tmplReltMain != null) {
 						for (ReltMain ttReltMain : tmplReltMain) {
-							if("02".equals(ttReltMain.getReltCode())) {
+							if ("02".equals(ttReltMain.getReltCode())) {
 								throw new LogicException("E0010", "同一戶號案件只能有一個配偶");
 							}
 						}
 					} // if
 				}
-				
+
 				/* 存入DB */
 
 				try {
@@ -180,7 +178,7 @@ public class L2306 extends TradeBuffer {
 				}
 
 			} // else
-			
+
 			// 修改
 		} else if (iFunCd == 2) {
 
@@ -203,18 +201,18 @@ public class L2306 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", "關係人主檔");
 			}
 
-			if("02".equals(titaVo.getParam("PosInd"))) {  // 判斷同一戶號案件編號只能有一個配偶
+			if ("02".equals(titaVo.getParam("PosInd"))) { // 判斷同一戶號案件編號只能有一個配偶
 				Slice<ReltMain> slReltMain = sReltMainService.findByBoth(iCaseNo, iCustNo, index, limit, titaVo);
 				tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
 				if (tmplReltMain != null) {
 					for (ReltMain ttReltMain : tmplReltMain) {
-						if("02".equals(ttReltMain.getReltCode())) {
+						if ("02".equals(ttReltMain.getReltCode())) {
 							throw new LogicException("E0010", "同一戶號案件只能有一個配偶");
 						}
 					}
 				} // if
 			}
-			
+
 			// 變更前
 			ReltMain beforeReltMain = (ReltMain) dataLog.clone(tReltMain);
 			tReltMain.setCaseNo(iCaseNo);
@@ -223,7 +221,7 @@ public class L2306 extends TradeBuffer {
 			tReltMain.setReltCode(titaVo.getParam("PosInd"));
 			tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 			tReltMain.setReltmark(titaVo.getParam("Remark"));
-			
+
 			try {
 				// 修改
 				tReltMain = sReltMainService.update2(tReltMain);
@@ -264,7 +262,7 @@ public class L2306 extends TradeBuffer {
 			}
 
 		}
-		
+
 		// 抓該戶號所有資料更新Finalfg
 
 		int CreatDate = 0;

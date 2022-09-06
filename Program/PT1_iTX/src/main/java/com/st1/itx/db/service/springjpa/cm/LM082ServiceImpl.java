@@ -108,7 +108,7 @@ public class LM082ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ApplDateStart", ApplDateStart); // YYYYMMDD
 		query.setParameter("ApplDateEnd", ApplDateEnd); // YYYYMMDD
 		for (int i = 0; i < RuleCode.length; i++)
-			query.setParameter("RuleCode"+i, RuleCode[i]);
+			query.setParameter("RuleCode" + i, RuleCode[i]);
 
 		return this.convertToMap(query);
 	}

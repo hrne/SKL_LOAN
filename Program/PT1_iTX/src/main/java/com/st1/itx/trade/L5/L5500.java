@@ -44,7 +44,7 @@ public class L5500 extends TradeBuffer {
 		MySpring.newTask("L5500Batch", this.txBuffer, titaVo);
 
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

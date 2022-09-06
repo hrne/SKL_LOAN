@@ -43,7 +43,6 @@ public class L2076ReportC extends MakeReport {
 	@Autowired
 	public CdEmpService cdEmpService;
 
-
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -129,8 +128,7 @@ public class L2076ReportC extends MakeReport {
 		int wkCloseMm = parse.stringToInteger(closeDate.substring(3, 5)); // 月
 		int wkCloseDd = parse.stringToInteger(closeDate.substring(5, 7)); // 日
 		this.print(-4, 13, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
-		this.print(-4, 39, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-"
-				+ StringUtils.leftPad(String.valueOf(tFacClose.getFacmNo()), 3, "0")); // 戶號額度
+		this.print(-4, 39, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + StringUtils.leftPad(String.valueOf(tFacClose.getFacmNo()), 3, "0")); // 戶號額度
 		this.print(-4, 74, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
 		this.print(-12, 66, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
 		this.print(-10, 32, selectTotal); // 份數

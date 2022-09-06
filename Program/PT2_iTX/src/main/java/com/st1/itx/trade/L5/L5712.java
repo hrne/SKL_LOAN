@@ -79,8 +79,8 @@ public class L5712 extends TradeBuffer {
 		if (tNegAppr02 == null) {
 			throw new LogicException(titaVo, "E0001", "一般債權撥付資料檔 ");
 		}
-		NegAppr02 bNegAppr02 = (NegAppr02) dataLog.clone(tNegAppr02); 
-		
+		NegAppr02 bNegAppr02 = (NegAppr02) dataLog.clone(tNegAppr02);
+
 		BigDecimal OOPayAmt = tNegAppr02.getTxAmt();
 		titaVo.setTxAmt(OOPayAmt);
 		NegTransId tNegTransId = new NegTransId();

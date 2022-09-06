@@ -61,8 +61,7 @@ public class L2703 extends TradeBuffer {
 	@Autowired
 	DataLog dataLog;
 
-	private CustMain updateCustMain(CustMain tCustMainBefore, CustMain tCustMainAfter, String reason, TitaVo titaVo)
-			throws LogicException {
+	private CustMain updateCustMain(CustMain tCustMainBefore, CustMain tCustMainAfter, String reason, TitaVo titaVo) throws LogicException {
 		this.info("L2703 updateCustMain");
 		try {
 			tCustMainAfter = sCustMainService.update2(tCustMainAfter, titaVo);
@@ -77,8 +76,7 @@ public class L2703 extends TradeBuffer {
 		return tCustMainAfter;
 	}
 
-	private CustDataCtrl updateCustDataCtrl(CustDataCtrl tCustDataCtrlBefore, CustDataCtrl tCustDataCtrlAfter,
-			String reason, TitaVo titaVo) throws LogicException {
+	private CustDataCtrl updateCustDataCtrl(CustDataCtrl tCustDataCtrlBefore, CustDataCtrl tCustDataCtrlAfter, String reason, TitaVo titaVo) throws LogicException {
 		this.info("L2703 updateCustDataCtrl");
 		try {
 			tCustDataCtrlAfter = sCustDataCtrlService.update2(tCustDataCtrlAfter, titaVo);
@@ -142,13 +140,11 @@ public class L2703 extends TradeBuffer {
 			CustDataCtrl tCustDataCtrlBefore = (CustDataCtrl) dataLog.clone(tCustDataCtrl);
 
 			// 檢查是否結清
-			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 999, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 999, 0, Integer.MAX_VALUE, titaVo);
 			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			if (lLoanBorMain != null) {
 				for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-					if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
-							|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 99) {
+					if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 99) {
 						throw new LogicException(titaVo, "E2003", "該戶號非結清戶");
 					}
 				}
@@ -156,8 +152,7 @@ public class L2703 extends TradeBuffer {
 
 			tCustDataCtrl.setApplMark(1);
 			tCustDataCtrl.setSetEmpNo(titaVo.getTlrNo());
-			tCustDataCtrl
-					.setSetDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+			tCustDataCtrl.setSetDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 
 			String custName = tCustMain.getCustName();
 			String custId = tCustMain.getCustId();
@@ -228,12 +223,12 @@ public class L2703 extends TradeBuffer {
 			String custId = tCustDataCtrl.getCustId();
 
 			CustMain tCustMainBefore = (CustMain) dataLog.clone(tCustMain);
-			
-			//測試舊資料防
+
+			// 測試舊資料防
 			if (custName != null && !custName.isEmpty()) {
 				tCustMain.setCustName(custName);
 			}
-			
+
 			if (custId != null && !custId.isEmpty()) {
 				tCustMain.setCustId(custId);
 			}

@@ -43,9 +43,9 @@ public class L9738ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		this.info("inputDrawdownDate = " + inputDrawdownDate);
-		
+
 		int entdy = titaVo.getEntDyI();
-		
+
 		// 轉西元年
 		if (entdy <= 19110000) {
 			entdy += 19110000;

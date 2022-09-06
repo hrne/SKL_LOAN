@@ -16,116 +16,116 @@ import com.st1.itx.db.domain.FinReportProfitId;
  */
 public interface FinReportProfitService {
 
-  /**
-   * findByPrimaryKey
-   *
-   * @param finReportProfitId PK
-   * @param titaVo Variable-Length Argument
-   * @return FinReportProfit FinReportProfit
-   */
-  public FinReportProfit findById(FinReportProfitId finReportProfitId, TitaVo... titaVo);
+	/**
+	 * findByPrimaryKey
+	 *
+	 * @param finReportProfitId PK
+	 * @param titaVo            Variable-Length Argument
+	 * @return FinReportProfit FinReportProfit
+	 */
+	public FinReportProfit findById(FinReportProfitId finReportProfitId, TitaVo... titaVo);
 
-  /**
-   * findAll
-   *
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice FinReportProfit FinReportProfit of List
-   */
-  public Slice<FinReportProfit> findAll(int index, int limit, TitaVo... titaVo);
+	/**
+	 * findAll
+	 *
+	 * @param index  Page Index
+	 * @param limit  Page Data Limit
+	 * @param titaVo Variable-Length Argument
+	 * @return Slice FinReportProfit FinReportProfit of List
+	 */
+	public Slice<FinReportProfit> findAll(int index, int limit, TitaVo... titaVo);
 
-  /**
-   * Ukey =
-   *
-   * @param ukey_0 ukey_0
-   * @param titaVo Variable-Length Argument
-   * @return Slice FinReportProfit FinReportProfit of List
-   */
-  public FinReportProfit findByUkeyFirst(String ukey_0, TitaVo... titaVo);
+	/**
+	 * Ukey =
+	 *
+	 * @param ukey_0 ukey_0
+	 * @param titaVo Variable-Length Argument
+	 * @return Slice FinReportProfit FinReportProfit of List
+	 */
+	public FinReportProfit findByUkeyFirst(String ukey_0, TitaVo... titaVo);
 
-  /**
-   * hold By FinReportProfit
-   * 
-   * @param finReportProfitId key
-   * @param titaVo Variable-Length Argument
-   * @return FinReportProfit FinReportProfit
-   */
-  public FinReportProfit holdById(FinReportProfitId finReportProfitId, TitaVo... titaVo);
+	/**
+	 * hold By FinReportProfit
+	 * 
+	 * @param finReportProfitId key
+	 * @param titaVo            Variable-Length Argument
+	 * @return FinReportProfit FinReportProfit
+	 */
+	public FinReportProfit holdById(FinReportProfitId finReportProfitId, TitaVo... titaVo);
 
-  /**
-   * hold By FinReportProfit
-   * 
-   * @param finReportProfit key
-   * @param titaVo Variable-Length Argument
-   * @return FinReportProfit FinReportProfit
-   */
-  public FinReportProfit holdById(FinReportProfit finReportProfit, TitaVo... titaVo);
+	/**
+	 * hold By FinReportProfit
+	 * 
+	 * @param finReportProfit key
+	 * @param titaVo          Variable-Length Argument
+	 * @return FinReportProfit FinReportProfit
+	 */
+	public FinReportProfit holdById(FinReportProfit finReportProfit, TitaVo... titaVo);
 
-  /**
-   * Insert
-   * 
-   * @param finReportProfit Entity
-   * @param titaVo Variable-Length Argument
-   * @return FinReportProfit Entity
-   * @throws DBException exception
-   */
-  public FinReportProfit insert(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Insert
+	 * 
+	 * @param finReportProfit Entity
+	 * @param titaVo          Variable-Length Argument
+	 * @return FinReportProfit Entity
+	 * @throws DBException exception
+	 */
+	public FinReportProfit insert(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update
-   * 
-   * @param finReportProfit Entity
-   * @param titaVo Variable-Length Argument
-   * @return FinReportProfit Entity
-   * @throws DBException exception
-   */
-  public FinReportProfit update(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update
+	 * 
+	 * @param finReportProfit Entity
+	 * @param titaVo          Variable-Length Argument
+	 * @return FinReportProfit Entity
+	 * @throws DBException exception
+	 */
+	public FinReportProfit update(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update2
-   * 
-   * @param finReportProfit Entity
-   * @param titaVo Variable-Length Argument
-   * @return FinReportProfit Entity
-   * @throws DBException exception
-   */
-  public FinReportProfit update2(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update2
+	 * 
+	 * @param finReportProfit Entity
+	 * @param titaVo          Variable-Length Argument
+	 * @return FinReportProfit Entity
+	 * @throws DBException exception
+	 */
+	public FinReportProfit update2(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Delete
-   * 
-   * @param finReportProfit Entity
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void delete(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Delete
+	 * 
+	 * @param finReportProfit Entity
+	 * @param titaVo          Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void delete(FinReportProfit finReportProfit, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Insert All For List
-   * 
-   * @param finReportProfit Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void insertAll(List<FinReportProfit> finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Insert All For List
+	 * 
+	 * @param finReportProfit Entity of List
+	 * @param titaVo          Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void insertAll(List<FinReportProfit> finReportProfit, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update All For List
-   * 
-   * @param finReportProfit Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void updateAll(List<FinReportProfit> finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update All For List
+	 * 
+	 * @param finReportProfit Entity of List
+	 * @param titaVo          Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void updateAll(List<FinReportProfit> finReportProfit, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Delete All For List
-   * 
-   * @param finReportProfit Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void deleteAll(List<FinReportProfit> finReportProfit, TitaVo... titaVo) throws DBException;
+	/**
+	 * Delete All For List
+	 * 
+	 * @param finReportProfit Entity of List
+	 * @param titaVo          Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void deleteAll(List<FinReportProfit> finReportProfit, TitaVo... titaVo) throws DBException;
 
 }

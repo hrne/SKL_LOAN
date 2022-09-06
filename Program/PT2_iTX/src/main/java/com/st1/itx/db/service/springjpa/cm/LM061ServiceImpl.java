@@ -35,11 +35,10 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param ymEnd 月底日(依yearMonth的月份)
+	 * @param ymEnd     月底日(依yearMonth的月份)
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int ymEnd) throws Exception {
-
 
 		// 年
 		int iYear = yearMonth / 100;
@@ -52,7 +51,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Calendar calendar = Calendar.getInstance();
 
 		String iYearMonth = String.valueOf(yearMonth);
-		
+
 		// 月底日
 		int iDay = ymEnd % 100;
 

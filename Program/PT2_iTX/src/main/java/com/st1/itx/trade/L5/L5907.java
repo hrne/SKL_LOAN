@@ -33,13 +33,13 @@ public class L5907 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public SpecInnReCheckService iSpecInnReCheckService;
-	
+
 	@Autowired
 	public CustMainService iCustMainService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
-	
+
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -88,13 +88,13 @@ public class L5907 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOReChkYearMonth", rSpecInnReCheck.getReChkYearMonth() - 191100);
 			}
-			
+
 			String emp = rSpecInnReCheck.getLastUpdateEmpNo();
 			CdEmp cdEmp = cdEmpService.findById(rSpecInnReCheck.getLastUpdateEmpNo(), titaVo);
 			if (cdEmp != null) {
 				emp += " " + cdEmp.getFullname();
 			}
-			
+
 			occursList.putParam("OOLastEmp", emp);
 			occursList.putParam("OOLastDate", parse.timeStampToString(rSpecInnReCheck.getLastUpdate()));
 

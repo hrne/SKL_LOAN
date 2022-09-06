@@ -55,7 +55,7 @@ public class L5511ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CustMain\" e on e.\"CustNo\"=a.\"CustNo\" and a.\"BonusType\" != 6 ";
 		sql += "left join (select distinct \"CustNo\",first_value(\"AcSubBookCode\") over (partition by \"CustNo\" order by \"LastUpdate\" desc) \"AcSubBookCode\" from \"AcReceivable\") f on f.\"CustNo\"=a.\"CustNo\" and a.\"BonusType\" != 6 ";
 //				"left join \"FacProd\" f on f.\"ProdNo\"=a.\"ProdCode\" " +
-		sql +=	"where a.\"WorkMonth\"=:workMonth and a.\"BonusType\" != 7 " + "order by a.\"EmployeeNo\",a.\"PieceCode\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
+		sql += "where a.\"WorkMonth\"=:workMonth and a.\"BonusType\" != 7 " + "order by a.\"EmployeeNo\",a.\"PieceCode\",a.\"CustNo\",a.\"FacmNo\",a.\"BormNo\" ";
 
 		query = em.createNativeQuery(sql);
 		query.setParameter("workMonth", workYM);

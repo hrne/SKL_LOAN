@@ -73,8 +73,7 @@ public class L9705Form extends MakeReport {
 		if (l9705List.size() > 0) {
 			int count = 0;
 //			int cnt = 0;
-			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
 					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
 			this.openForm(titaVo, reportVo);
 
@@ -259,8 +258,7 @@ public class L9705Form extends MakeReport {
 
 						setFont(1, 14);
 
-						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/"
-								+ sPayIntDate.substring(5, 7));
+						printCm(4, 4, sPayIntDate.substring(0, 3) + "/" + sPayIntDate.substring(3, 5) + "/" + sPayIntDate.substring(5, 7));
 
 						printCm(4, 4.8, custName);
 						String custnoX = String.format("%07d", custNo);
@@ -290,8 +288,7 @@ public class L9705Form extends MakeReport {
 
 			}
 		} else {
-			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-					.setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode("L9705".equals(titaVo.getTxcd()) ? "L9705B" : tran + "C").setRptItem("存入憑條")
 					.setRptSize("cm,20,9.31333").setSecurity("").setPageOrientation("P").build();
 
 			this.openForm(titaVo, reportVo);
@@ -300,9 +297,8 @@ public class L9705Form extends MakeReport {
 		}
 		this.close();
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成",
-				titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"),
+				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "存入憑條已完成", titaVo);
 
 	}
 

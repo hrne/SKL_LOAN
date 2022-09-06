@@ -55,11 +55,11 @@ public class L2036 extends TradeBuffer {
 		String Ukey = "";
 
 		Slice<ReltMain> iReltMain = null;
-		
-		if(iCaseNo == 0) { // L1001連進來查該戶號全部
-			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);		
+
+		if (iCaseNo == 0) { // L1001連進來查該戶號全部
+			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 		} else {
-			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);			
+			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);
 		}
 
 //		if (iReltMain == null) {
@@ -71,11 +71,11 @@ public class L2036 extends TradeBuffer {
 			if (iReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 			}
-		}else{
+		} else {
 			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);
-				if (iReltMain == null) {
-					throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
-				}
+			if (iReltMain == null) {
+				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
+			}
 		}
 		for (ReltMain rReltMain : iReltMain) {
 			OccursList occursList = new OccursList();

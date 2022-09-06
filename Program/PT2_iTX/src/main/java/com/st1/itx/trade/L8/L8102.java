@@ -188,14 +188,14 @@ public class L8102 extends TradeBuffer {
 					txAmlCredit.setIsStatus(isStatus);
 					txAmlCredit.setWlfConfirmStatus(ConfirmStatus);
 
-					processDetail(titaVo, txAmlCredit,true);
+					processDetail(titaVo, txAmlCredit, true);
 				}
 			}
 		} else {
-			if (lTxAmlCredit != null && lTxAmlCredit.size()>0) {
+			if (lTxAmlCredit != null && lTxAmlCredit.size() > 0) {
 				this.info("L8102 lTxAmlCredit.size = " + lTxAmlCredit.size());
 				for (TxAmlCredit txAmlCredit : lTxAmlCredit) {
-					processDetail(titaVo, txAmlCredit,false);
+					processDetail(titaVo, txAmlCredit, false);
 				}
 			}
 		}
@@ -218,7 +218,7 @@ public class L8102 extends TradeBuffer {
 		}
 
 		txAmlCredit = checkProcessType(titaVo, txAmlCredit.getCustKey(), txAmlCredit);
-		
+
 		this.info("TxAmlCredit.ProcessType = " + txAmlCredit.getProcessType());
 		txAmlCredit.setProcessCount(0);
 
@@ -247,7 +247,8 @@ public class L8102 extends TradeBuffer {
 			tTxToDoDetail.setDtlValue("<AML定審簡訊通知>");
 			tTxToDoDetail.setItemCode("TEXT00");
 			tTxToDoDetail.setStatus(0);
-			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(messagePhone, "房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。", this.getTxBuffer().getTxCom().getTbsdy()));
+			tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(messagePhone, "房貸客戶提醒：為維護您的權益，戶籍或通訊地址、電子信箱及連絡電話，或姓名、身分證統一編號等重要資訊有異動時，敬請洽詢公司服務人員或客戶服務部（０８００—０３１１１５）辦理變更。",
+					this.getTxBuffer().getTxCom().getTbsdy()));
 
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 		}
@@ -392,9 +393,8 @@ public class L8102 extends TradeBuffer {
 		Slice<TxToDoDetail> sTxToDoDetail = null;
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 //		刪除未處理且為今天的
-		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0,
-				this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index,
-				this.limit, titaVo);
+		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0, this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index, this.limit,
+				titaVo);
 
 		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
 

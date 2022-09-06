@@ -124,10 +124,8 @@ public class L6085 extends TradeBuffer {
 			occursList.putParam("OODeptManager", tCdBcm.getDeptManager());
 			occursList.putParam("OODistManager", tCdBcm.getDistManager());
 			occursList.putParam("OOEnable", tCdBcm.getEnable());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " "
-					+ parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
-			occursList.putParam("OOLastEmp",
-					tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdBcm.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdBcm.getLastUpdate())); // 最後修改日期
+			occursList.putParam("OOLastEmp", tCdBcm.getLastUpdateEmpNo() + " " + empName(titaVo, tCdBcm.getLastUpdateEmpNo())); // 最後修改人員
 			unitManagerNm = "";
 			deptManagerNm = "";
 			distManagerNm = "";

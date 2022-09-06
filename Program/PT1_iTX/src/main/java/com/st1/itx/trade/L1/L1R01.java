@@ -36,7 +36,7 @@ public class L1R01 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdEmpService cdEmpService;
-	
+
 	@Autowired
 	public CustNoticeCom custNoticeCom;
 
@@ -183,9 +183,9 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01AMLGroup", tCustMain.getAMLGroup());
 		this.totaVo.putParam("L1r01IndigenousName", tCustMain.getIndigenousName());
 		this.totaVo.putParam("L1r01Introducer", tCustMain.getIntroducer());
-		this.totaVo.putParam("L1r01IntroducerX", getCdEmp(titaVo,tCustMain.getIntroducer()));
+		this.totaVo.putParam("L1r01IntroducerX", getCdEmp(titaVo, tCustMain.getIntroducer()));
 		this.totaVo.putParam("L1r01BusinessOfficer", tCustMain.getBusinessOfficer());
-		this.totaVo.putParam("L1r01BusinessOfficerX", getCdEmp(titaVo,tCustMain.getBusinessOfficer()));
+		this.totaVo.putParam("L1r01BusinessOfficerX", getCdEmp(titaVo, tCustMain.getBusinessOfficer()));
 		this.totaVo.putParam("L1r01TypeCode", tCustMain.getTypeCode());
 		this.totaVo.putParam("L1r01AllowInquire", tCustMain.getAllowInquire());
 		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain, titaVo));
@@ -195,16 +195,16 @@ public class L1R01 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String getCdEmp(TitaVo titaVo, String employee) {
 		String fullname = "";
-		
+
 		CdEmp cdEmp = cdEmpService.findById(employee, titaVo);
-		
+
 		if (cdEmp != null) {
 			fullname = cdEmp.getFullname();
 		}
-		
+
 		return fullname;
 	}
 }

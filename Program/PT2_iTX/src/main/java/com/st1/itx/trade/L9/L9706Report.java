@@ -163,8 +163,7 @@ public class L9706Report extends MakeReport {
 		int loanTermMm = parse.stringToInteger(tL9706Vo.get("LoanTermMm"));
 		int loanTermDd = parse.stringToInteger(tL9706Vo.get("LoanTermDd"));
 
-		String loanTermString = (loanTermYy > 0 ? loanTermYy + " 年 " : "") + (loanTermMm > 0 ? loanTermMm + " 月 " : "")
-				+ (loanTermDd > 0 ? loanTermDd + " 日" : "");
+		String loanTermString = (loanTermYy > 0 ? loanTermYy + " 年 " : "") + (loanTermMm > 0 ? loanTermMm + " 月 " : "") + (loanTermDd > 0 ? loanTermDd + " 日" : "");
 
 		loanTermString = loanTermString.trim();
 
@@ -176,9 +175,7 @@ public class L9706Report extends MakeReport {
 		} else {
 			cuscCdX = "身分證字號";
 		}
-		String basicInfo = String.format(
-				"　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款餘額為 %s整。",
-				tL9706Vo.get("CustName") // 戶名
+		String basicInfo = String.format("　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款餘額為 %s整。", tL9706Vo.get("CustName") // 戶名
 				, cuscCdX, tL9706Vo.get("CustId") // 身分證字號
 				, this.showRocDate(tL9706Vo.get("FirstDrawdownDate"), 0) // 首撥日
 				, loanTermString // 辦理 %s期
@@ -202,8 +199,7 @@ public class L9706Report extends MakeReport {
 		List<CustMain> shareList = new ArrayList<CustMain>();
 		FacShareAppl tfacShareAppl = facShareApplService.findById(applNo, titaVo);
 		if (tfacShareAppl != null) {
-			Slice<FacShareAppl> slFacShareApp = facShareApplService.findMainApplNo(tfacShareAppl.getMainApplNo(), 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<FacShareAppl> slFacShareApp = facShareApplService.findMainApplNo(tfacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
 			for (FacShareAppl t : slFacShareApp.getContent()) {
 				CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
 				if (tCustMain != null && !tCustMain.getCustId().equals(tL9706Vo.get("CustId"))) {
@@ -257,8 +253,7 @@ public class L9706Report extends MakeReport {
 
 			for (ClFac f : slClFac.getContent()) {
 
-				ClBuilding tClBuilding = clBuildingService
-						.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
+				ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
 				if (tClBuilding != null) {
 					addressList.add(tClBuilding);
 				}
@@ -278,7 +273,6 @@ public class L9706Report extends MakeReport {
 					result.add(tempBdLocation);
 				}
 			}
-	
 
 			for (String bdLocation : result) {
 				this.print(1, 8, bdLocation); // 每個地址的輸出位置：8
@@ -400,13 +394,9 @@ public class L9706Report extends MakeReport {
 	// copied from StringCut
 	private static boolean isChinese(char c) {
 		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
-		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
-				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
-				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
-				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
-				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
-				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
-				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
 			return true;
 		}
 		return false;

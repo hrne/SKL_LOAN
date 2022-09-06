@@ -43,9 +43,7 @@ public class LNM39JPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單7
-		sql = "SELECT " + "  \"AcDateYM\", \"CustNo\", "
-				+ " \"NewFacmNo\", \"NewBormNo\", \"OldFacmNo\", \"OldBormNo\" " + " FROM  \"LoanIfrs9Jp\" "
-				+ " WHERE \"DataYM\"  = :dataMonth "
+		sql = "SELECT " + "  \"AcDateYM\", \"CustNo\", " + " \"NewFacmNo\", \"NewBormNo\", \"OldFacmNo\", \"OldBormNo\" " + " FROM  \"LoanIfrs9Jp\" " + " WHERE \"DataYM\"  = :dataMonth "
 				+ " ORDER BY \"AcDateYM\", \"CustNo\", \"NewFacmNo\", \"NewBormNo\", \"OldFacmNo\", \"OldBormNo\" ";
 
 		this.info("sql=" + sql);

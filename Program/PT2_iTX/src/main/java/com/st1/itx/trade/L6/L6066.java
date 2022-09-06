@@ -76,7 +76,7 @@ public class L6066 extends TradeBuffer {
 			occursList.putParam("OOSupvReasonCode", tCdSupv.getSupvReasonCode());
 			occursList.putParam("OOSupvReasonItem", tCdSupv.getSupvReasonItem());
 			occursList.putParam("OOSupvReasonLevel", tCdSupv.getSupvReasonLevel());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdSupv.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdSupv.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdSupv.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdSupv.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdSupv.getLastUpdateEmpNo() + " " + empName(titaVo, tCdSupv.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
@@ -92,6 +92,7 @@ public class L6066 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

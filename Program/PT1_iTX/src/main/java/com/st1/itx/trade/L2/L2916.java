@@ -132,8 +132,7 @@ public class L2916 extends TradeBuffer {
 		this.totaVo.putParam("LandRentEndDate", tClLand.getLandRentEndDate());
 
 		// tita擔保品編號取建物所有權人檔資料list
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
 
 		if (lClLandOwner == null || lClLandOwner.size() == 0) {
@@ -175,7 +174,7 @@ public class L2916 extends TradeBuffer {
 		}
 
 		// tita擔保品編號取建物修改原因檔資料list
-		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq,titaVo);
+		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq, titaVo);
 
 		// 資料筆數
 		if (lClLandReason == null || lClLandReason.size() == 0) {

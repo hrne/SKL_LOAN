@@ -45,22 +45,22 @@ public class L8R60 extends TradeBuffer {
 		int iRimCustNo = this.parse.stringToInteger(titaVo.getParam("RimCustNo"));
 
 		// 檢查輸入資料
-		if ( !(iRimCustNo > 0) ) {
+		if (!(iRimCustNo > 0)) {
 			throw new LogicException(titaVo, "E0009", "L8R60"); // 戶號應有值
 		}
-		if ( !(iAcDate > 0) ) {
+		if (!(iAcDate > 0)) {
 			throw new LogicException(titaVo, "E0009", "L8R60"); // 實際償還日期應有值
 		}
 
 		// 查詢疑似洗錢交易訪談記錄檔-for交易L8203登錄[經辦合理性說明]預設值
-		MlaundryRecord tMlaundryRecord = sMlaundryRecordService.findCustNoAndActualRepayDateFirst(iRimCustNo,iFAcDate, iFAcDate,  titaVo);
+		MlaundryRecord tMlaundryRecord = sMlaundryRecordService.findCustNoAndActualRepayDateFirst(iRimCustNo, iFAcDate, iFAcDate, titaVo);
 
 		/* 如有找到資料 */
 		if (tMlaundryRecord != null) {
 			this.totaVo.putParam("L8R60RepaySource", tMlaundryRecord.getRepaySource()); // 還款來源
 			this.totaVo.putParam("L8R60RepayBank", tMlaundryRecord.getRepayBank()); // 代償銀行
 			this.totaVo.putParam("L8R60Description", tMlaundryRecord.getDescription().replace("$n", "\n")); // 其他說明
-		} 
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

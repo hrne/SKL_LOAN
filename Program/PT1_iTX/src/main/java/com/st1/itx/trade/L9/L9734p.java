@@ -38,7 +38,7 @@ public class L9734p extends TradeBuffer {
 
 	String txCD = "L9734";
 	String txName = "覆審報表產製";
-	
+
 	int count = 0;
 
 	@Override
@@ -61,8 +61,6 @@ public class L9734p extends TradeBuffer {
 
 		String tradeName = "";
 
-	
-
 		for (int i = 1; i <= totalItem; i++) {
 
 			if (titaVo.getParam("BtnShell" + i).equals("V")) {
@@ -74,11 +72,9 @@ public class L9734p extends TradeBuffer {
 
 		if (isFinish) {
 			tradeName = tradeName.substring(0, tradeName.length() - 1);
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + "(" + tradeName + ")已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), txCD + txName + "(" + tradeName + ")已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), txCD + txName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

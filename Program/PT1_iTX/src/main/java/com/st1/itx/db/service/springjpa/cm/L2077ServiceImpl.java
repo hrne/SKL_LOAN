@@ -79,7 +79,6 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "order by f.\"CustNo\" ASC,f.\"FacmNo\"					";
 
-
 		this.info("sql=" + sql);
 		Query query;
 

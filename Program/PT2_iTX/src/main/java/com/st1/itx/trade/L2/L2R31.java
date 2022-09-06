@@ -55,54 +55,51 @@ public class L2R31 extends TradeBuffer {
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		// 客戶統編
 		String iCustId = titaVo.getParam("RimCustId");
-		
+
 		// new table
 		CustMain tCustMain = new CustMain();
 		// 客戶統編找客戶主檔戶號
 		tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-		
+
 		CustDataCtrl tCustDataCtrl;
 		int custNo = 0;
-		
+
 		if (tCustMain == null) {
 			// 如果抓不到 CustMain, 搜尋控管檔, 如果還是沒有再throw exception
-			
+
 			Slice<CustDataCtrl> sCustDataCtrl = sCustDataCtrlService.findCustId(iCustId, 0, 1, titaVo);
 			if (sCustDataCtrl == null)
 				throw new LogicException(titaVo, "E2003", "該統編不存在客戶主檔或結清戶個資控管檔");
-			
+
 			List<CustDataCtrl> lCustDataCtrl = sCustDataCtrl.getContent();
-			
+
 			if (lCustDataCtrl.isEmpty())
 				throw new LogicException(titaVo, "E2003", "該統編不存在客戶主檔或結清戶個資控管檔");
-						
+
 			tCustDataCtrl = lCustDataCtrl.get(0);
 			tCustMain = sCustMainService.custNoFirst(tCustDataCtrl.getCustNo(), tCustDataCtrl.getCustNo(), titaVo);
 			custNo = tCustMain.getCustNo();
-		} else
-		{
+		} else {
 			// 於客戶主檔有
 			custNo = tCustMain.getCustNo();
 			parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime());
-		    tCustDataCtrl = sCustDataCtrlService.findById(custNo, titaVo);
+			tCustDataCtrl = sCustDataCtrlService.findById(custNo, titaVo);
 		}
 
-
 		if (iFunCd == 1) {
-			
-			if (tCustDataCtrl == null)
-			{
+
+			if (tCustDataCtrl == null) {
 				// 此為新增
 				tCustDataCtrl = new CustDataCtrl();
 			}
-			
+
 			this.totaVo.putParam("L2r31CustNo", custNo);
 			this.totaVo.putParam("L2r31CustName", tCustMain.getCustName());
 			this.totaVo.putParam("L2r31Reason", tCustDataCtrl.getReason());
 			this.totaVo.putParam("L2r31CuscCd", tCustMain.getCuscCd());
 			this.totaVo.putParam("L2r31SetEmpNo", tCustDataCtrl.getSetEmpNo());
 			this.totaVo.putParam("L2r31ReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
-			
+
 			this.info("tlrno = " + titaVo.getTlrNo());
 
 		} else {
@@ -115,16 +112,16 @@ public class L2R31 extends TradeBuffer {
 			this.totaVo.putParam("L2r31CustName", tCustMain.getCustName());
 			this.totaVo.putParam("L2r31Reason", tCustDataCtrl.getReason());
 			this.totaVo.putParam("L2r31CuscCd", tCustMain.getCuscCd());
-			this.totaVo.putParam("L2r31SetEmpNo", tCustDataCtrl.getSetEmpNo());			
+			this.totaVo.putParam("L2r31SetEmpNo", tCustDataCtrl.getSetEmpNo());
 			this.totaVo.putParam("L2r31ReSetEmpNo", tCustDataCtrl.getReSetEmpNo());
-		
+
 		}
-		
+
 		this.totaVo.putParam("L2r31ApplMark", tCustDataCtrl.getApplMark());
 		this.totaVo.putParam("L2r31CreateEmpNo", titaVo.getTlrNo());
 		this.totaVo.putParam("L2r31CreateDate", dateUtil.getNowIntegerForBC() - 19110000);
 		this.totaVo.putParam("L2r31CreateTime", dateUtil.getNowIntegerTime());
-		
+
 		this.totaVo.putParam("L2r31SetDate", parse.timeStampToString(tCustDataCtrl.getSetDate()));
 		this.totaVo.putParam("L2r31ReSetDate", parse.timeStampToString(tCustDataCtrl.getReSetDate()));
 		this.addList(this.totaVo);

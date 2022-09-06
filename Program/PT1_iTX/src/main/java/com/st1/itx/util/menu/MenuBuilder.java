@@ -100,7 +100,7 @@ public class MenuBuilder extends SysLogger {
 		}
 		return res;
 	}
-	
+
 	@CacheEvict(value = { "rootMenu", "menu", "autoCp" }, allEntries = true)
 	public void evict() {
 		this.mustInfo("evict menuBuilder");

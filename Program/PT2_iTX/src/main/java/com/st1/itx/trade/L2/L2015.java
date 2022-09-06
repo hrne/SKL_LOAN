@@ -135,19 +135,19 @@ public class L2015 extends TradeBuffer {
 			occursList.putParam("OOUtilBal", tFacMain.getUtilBal());
 			occursList.putParam("OOAcctCode", tFacMain.getAcctCode());
 			occursList.putParam("OOLoanFg", dShow);
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tFacMain.getLastUpdate())+ " " +parse.timeStampToStringTime(tFacMain.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tFacMain.getLastUpdate()) + " " + parse.timeStampToStringTime(tFacMain.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tFacMain.getLastUpdateEmpNo() + " " + empName(titaVo, tFacMain.getLastUpdateEmpNo()));
-			
+
 			List<String> txcds = Arrays.asList("L2154");
 
-			TxDataLog txDataLog = txDataLogService.findByMrKeyFirst(String.format("%07d-%03d-%07d", tFacMain.getCustNo(),tFacMain.getFacmNo(),tFacMain.getApplNo()), txcds, titaVo);
+			TxDataLog txDataLog = txDataLogService.findByMrKeyFirst(String.format("%07d-%03d-%07d", tFacMain.getCustNo(), tFacMain.getFacmNo(), tFacMain.getApplNo()), txcds, titaVo);
 
 			int logFg = 0;
 			if (txDataLog != null) {
 				logFg = 1;
 			}
 			occursList.putParam("OOLogFg", logFg);
-			
+
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);
 		}

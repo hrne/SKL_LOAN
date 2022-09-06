@@ -27,7 +27,7 @@ public class LM037Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -35,6 +35,7 @@ public class LM037Report extends MakeReport {
 	public void printTitle() {
 
 	}
+
 	/**
 	 * 執行報表輸出
 	 * 
@@ -47,7 +48,7 @@ public class LM037Report extends MakeReport {
 		List<Map<String, String>> LM037List = null;
 
 		try {
-			LM037List = lM037ServiceImpl.findAll(titaVo,yearMonth);
+			LM037List = lM037ServiceImpl.findAll(titaVo, yearMonth);
 			exportExcel(titaVo, LM037List);
 
 		} catch (Exception e) {
@@ -140,7 +141,7 @@ public class LM037Report extends MakeReport {
 		makeExcel.setValue(row, 3, thirdTotal.add(secondTotal.add(firstTotal)), "#,##0");
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 }

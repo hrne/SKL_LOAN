@@ -35,7 +35,7 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
+
 	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
 
 		this.info("L6069FindData1");
@@ -47,11 +47,9 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iDefCode = titaVo.getParam("Code"); // 代碼類別名稱
 		String iItem = titaVo.getParam("Item"); // 代碼類別說明
 
-
 		this.info("iDefType     = " + iDefType); // 09
 		this.info("iCode        = " + iDefCode); // DateType
 		this.info("iItem        = " + iItem); // 日期類別
-
 
 		String sql = "select  ";
 		sql += " a.\"DefCode\" as \"ADEFCODE\","; // 代碼檔代號
@@ -66,7 +64,7 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join (select * from \"CdCode\"  where \"DefCode\" = 'CodeType') b ";
 		sql += " on a.\"DefCode\" = b.\"Code\"  ";
 		sql += " where b.\"DefCode\" = 'CodeType' ";
-			
+
 		if (!"".equals(iDefType)) {
 			sql += "  and   a.\"DefType\" = :iDefType";
 		}
@@ -80,17 +78,17 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " order by \"ADEFTYPE\", \"ADEFCODE\", a.\"Code\" ";
 
 		sql += " " + sqlRow;
-		
+
 		this.info("L6069Service SQL=" + sql);
 
 		Query query;
 //		query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		if (!"".equals(iDefType)) {
 			query.setParameter("iDefType", iDefType);
 		}
@@ -98,7 +96,7 @@ public class L6069ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("iDefCode", "%" + iDefCode + "%");
 		}
 		if (!"".equals(iItem)) {
-			query.setParameter("iItem", "%" +iItem + "%");
+			query.setParameter("iItem", "%" + iItem + "%");
 		}
 
 		this.info("L6069Service FindData=" + query);

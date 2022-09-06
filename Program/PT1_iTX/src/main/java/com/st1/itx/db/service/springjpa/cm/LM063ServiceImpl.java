@@ -28,14 +28,13 @@ public class LM063ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
 //		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
-		int iYear = yearMonth/ 100;
+		int iYear = yearMonth / 100;
 		// 月
 		int iMonth = yearMonth % 100;
 

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.HlThreeDetailId;
  */
 public interface HlThreeDetailRepositoryDay extends JpaRepository<HlThreeDetail, HlThreeDetailId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<HlThreeDetail> findByHlThreeDetailId(HlThreeDetailId hlThreeDetailId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<HlThreeDetail> findByHlThreeDetailId(HlThreeDetailId hlThreeDetailId);
 
 }
-

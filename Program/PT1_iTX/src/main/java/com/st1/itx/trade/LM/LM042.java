@@ -35,7 +35,7 @@ public class LM042 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LM042 ");
 		this.totaVo.init(titaVo);
-		
+
 		MySpring.newTask("LM042p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);

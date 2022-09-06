@@ -218,15 +218,15 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	private BigDecimal txAmt = BigDecimal.ZERO;
 
 	/**
-	 * 作帳金額  (檢核表計算用)
+	 * 作帳金額 (檢核表計算用)
 	 */
 	private BigDecimal acAmt = BigDecimal.ZERO;
-	
+
 	/**
 	 * 分錄序號 (檢核表計算用)
 	 */
 	private int acSeq = 0;
-	
+
 	/**
 	 * 額度科目 (檢核表計算用)
 	 */
@@ -234,18 +234,13 @@ public class BaTxVo implements Comparable<BaTxVo> {
 
 	@Override
 	public String toString() {
-		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo
-				+ ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo=" + rvNo + ", payIntDate="
-				+ payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority="
-				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
-				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
-				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
-				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
-				+ ", feeAmt=" + feeAmt + ", unpaidPrin=" + unpaidPrin + ", unpaidInt=" + unpaidInt + ", loanBalPaid="
-				+ loanBalPaid + ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg
-				+ ", shortFallPrin=" + shortFallPrin + ", shortFallInt=" + shortFallInt + ", shortFallCloseBreach="
-				+ shortFallCloseBreach + ", tempAmt=" + tempAmt + ", overflow=" + overflow + ", txAmt=" + txAmt
-				+ ", acAmt=" + acAmt + ", acSeq=" + acSeq + ", facAcctCode=" + facAcctCode + "]";
+		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo="
+				+ rvNo + ", payIntDate=" + payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority=" + repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr
+				+ ", acctAmt=" + acctAmt + ", loanBal=" + loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", amount=" + amount + ", intRate="
+				+ intRate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt
+				+ ", unpaidPrin=" + unpaidPrin + ", unpaidInt=" + unpaidInt + ", loanBalPaid=" + loanBalPaid + ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg
+				+ ", shortFallPrin=" + shortFallPrin + ", shortFallInt=" + shortFallInt + ", shortFallCloseBreach=" + shortFallCloseBreach + ", tempAmt=" + tempAmt + ", overflow=" + overflow
+				+ ", txAmt=" + txAmt + ", acAmt=" + acAmt + ", acSeq=" + acSeq + ", facAcctCode=" + facAcctCode + "]";
 	}
 
 	public int getDataKind() {
@@ -511,7 +506,6 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	public void setOverflow(BigDecimal overFlow) {
 		this.overflow = overFlow;
 	}
-
 
 	public BigDecimal getTxAmt() {
 		return txAmt;

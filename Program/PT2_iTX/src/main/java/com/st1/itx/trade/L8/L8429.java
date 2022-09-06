@@ -59,8 +59,7 @@ public class L8429 extends TradeBuffer {
 		this.info("sJcicZ447     = " + sJcicZ447.getSize());
 		if (sJcicZ447 != null) {
 			for (JcicZ447 xJcicZ447 : sJcicZ447) {
-				if ((iSubmitType == 1 && xJcicZ447.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ447.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ447.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ447.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8327");
 					occursListB.putParam("OOHistoryTxCd", "L8057");

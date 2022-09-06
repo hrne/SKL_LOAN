@@ -154,8 +154,7 @@ public class L4701Report extends MakeReport {
 
 		ArrayList<OccursList> tmp = new ArrayList<>();
 
-		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
+		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
@@ -228,10 +227,8 @@ public class L4701Report extends MakeReport {
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		print(1, 1, "　　　　　　           ");
 
-		print(0, 1,
-				"支票 ： 共  " + FormatUtil.pad9("" + chequeCnt, 3) + "  張　　本埠 ： " + FormatUtil.pad9("" + chequeInCnt, 3)
-						+ "  張　　外埠 ： " + FormatUtil.pad9("" + chequeOutCnt, 3) + "  張　　總計 ： "
-						+ df.format(chequeTotAmt));
+		print(0, 1, "支票 ： 共  " + FormatUtil.pad9("" + chequeCnt, 3) + "  張　　本埠 ： " + FormatUtil.pad9("" + chequeInCnt, 3) + "  張　　外埠 ： " + FormatUtil.pad9("" + chequeOutCnt, 3) + "  張　　總計 ： "
+				+ df.format(chequeTotAmt));
 
 	}
 

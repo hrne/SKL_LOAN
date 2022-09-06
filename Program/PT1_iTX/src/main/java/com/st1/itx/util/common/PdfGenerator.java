@@ -312,8 +312,7 @@ public class PdfGenerator extends CommBuffer {
 		this.adjPdfFontSize(10);
 	}
 
-	private void openWithDefaultPdf(String outfile, HashMap<String, Object> map)
-			throws LogicException, DocumentException, IOException {
+	private void openWithDefaultPdf(String outfile, HashMap<String, Object> map) throws LogicException, DocumentException, IOException {
 		reportVo.setUseDefault(true);
 
 		defaultname = pdfFolder + map.get("default").toString();
@@ -528,8 +527,7 @@ public class PdfGenerator extends CommBuffer {
 
 				content.setFontAndSize(baseFont, pdfFontSize);
 				content.setCharacterSpacing(charSpaces);
-				content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
-						(float) (FRAME_Y + yy), 0);
+				content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
 				content.endText();
 
 				ps = prefix;
@@ -542,8 +540,7 @@ public class PdfGenerator extends CommBuffer {
 			this.info("PdfGenerator basefont = " + BaseFont.TIMES_BOLD);
 			content.setFontAndSize(baseFont, pdfFontSize);
 			content.setCharacterSpacing(charSpaces);
-			content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
-					(float) (FRAME_Y + yy), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
 			content.endText();
 		}
 	}

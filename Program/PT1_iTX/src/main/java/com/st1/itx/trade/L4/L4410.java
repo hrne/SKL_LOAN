@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 
-
 @Service("L4410")
 @Scope("prototype")
 public class L4410 extends TradeBuffer {

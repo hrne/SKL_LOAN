@@ -135,8 +135,7 @@ public class L6989 extends TradeBuffer {
 				tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
 				wkAcctCode = tTempVo.get("AcctCode");
 				wkTempItemCode = wkAcctCode.substring(1, 3);
-				tAcReceivable = acReceivableService.findById(new AcReceivableId(wkAcctCode, tTxToDoDetail.getCustNo(),
-						tTxToDoDetail.getFacmNo(), tTxToDoDetail.getDtlValue()), titaVo);
+				tAcReceivable = acReceivableService.findById(new AcReceivableId(wkAcctCode, tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getDtlValue()), titaVo);
 				if (tAcReceivable != null) {
 					wkSyndFeeYYMM = parse.stringToInteger(tAcReceivable.getRvNo().substring(10, 15));// SL-XX-XXX-YYYMM
 					wkSyndFee = tAcReceivable.getRvAmt();
@@ -152,8 +151,7 @@ public class L6989 extends TradeBuffer {
 				occursList.putParam("OOFeeCode", wkAcctCode); // 科目名稱代號
 				occursList.putParam("OOTitaCrDb", 1); // 借貸
 				occursList.putParam("OOAcDate", wkOpenAcDate); // 起帳日
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
 				occursList.putParam("OOTempItemCode", wkTempItemCode);

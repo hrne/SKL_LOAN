@@ -29,6 +29,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
+
 	/**
 	 * 執行報表輸出
 	 * 
@@ -63,16 +64,15 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("thisMonthEndDate=" + thisMonthEndDate);
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
-		
+
 		// 設上個月底日
 		calendar.set(iYear, iMonth - 1, 0);
 
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
 		this.info("lastMonthEndDate=" + lastMonthEndDate);
-		
-		this.info("lM060.findAll YYMM=" +iYearMonth + ",LYYMM=" + lastMonthEndDate / 100
-				+ ",lday" + lastMonthEndDate);
+
+		this.info("lM060.findAll YYMM=" + iYearMonth + ",LYYMM=" + lastMonthEndDate / 100 + ",lday" + lastMonthEndDate);
 
 //		F0 : 前期餘額               
 //		F1 : 借方暫付款項--法務費用   

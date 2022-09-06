@@ -238,8 +238,7 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		if (useRepayBank)
-		{
+		if (useRepayBank) {
 			query.setParameter("repayBank", repayBank);
 		}
 

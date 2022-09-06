@@ -105,7 +105,7 @@ public class L9712Report extends MakeReport {
 
 		this.close();
 
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 	}
 
 	private void report1(Map<String, String> tL9712Vo) throws LogicException {
@@ -137,9 +137,9 @@ public class L9712Report extends MakeReport {
 		totalBreachAmtReceive += Integer.parseInt((tL9712Vo.get("F5")));
 
 //		double amt = Double.parseDouble(tL9712Vo.get("F7"));
-		//減免 利息
+		// 減免 利息
 		int amt1 = Integer.valueOf(tL9712Vo.get("F6"));
-		//減免 違約金
+		// 減免 違約金
 		int amt2 = Integer.valueOf(tL9712Vo.get("F7"));
 //
 //		if (amt > amt2) {
@@ -168,7 +168,7 @@ public class L9712Report extends MakeReport {
 		}
 
 //		 tL9712Vo.get("F8")
-		String txtNo =tL9712Vo.get("F8");
+		String txtNo = tL9712Vo.get("F8");
 		// 授權主管
 		this.print(0, 147, txtNo);
 	}

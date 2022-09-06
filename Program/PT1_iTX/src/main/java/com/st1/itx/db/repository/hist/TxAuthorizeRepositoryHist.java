@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,22 +20,22 @@ import com.st1.itx.db.domain.TxAuthorize;
  */
 public interface TxAuthorizeRepositoryHist extends JpaRepository<TxAuthorize, Long> {
 
-  // Entdy = ,AND SupNo =
-  public Slice<TxAuthorize> findAllByEntdyIsAndSupNoIsOrderBySupNoAsc(int entdy_0, String supNo_1, Pageable pageable);
+	// Entdy = ,AND SupNo =
+	public Slice<TxAuthorize> findAllByEntdyIsAndSupNoIsOrderBySupNoAsc(int entdy_0, String supNo_1, Pageable pageable);
 
-  // Entdy >= ,AND Entdy <=,AND SupNo %
-  public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
+	// Entdy >= ,AND Entdy <=,AND SupNo %
+	public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
 
-  // CreateDate>=, AND CreateDate<= ,AND SupNo %
-  public Slice<TxAuthorize> findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1, String supNo_2, Pageable pageable);
+	// CreateDate>=, AND CreateDate<= ,AND SupNo %
+	public Slice<TxAuthorize> findAllByCreateDateGreaterThanEqualAndCreateDateLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(java.sql.Timestamp createDate_0, java.sql.Timestamp createDate_1,
+			String supNo_2, Pageable pageable);
 
-  // Entdy >= ,AND Entdy <=,AND SupNo %
-  public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
+	// Entdy >= ,AND Entdy <=,AND SupNo %
+	public Slice<TxAuthorize> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndSupNoLikeOrderByEntdyAscSupNoAsc(int entdy_0, int entdy_1, String supNo_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxAuthorize> findByAutoSeq(Long autoSeq);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxAuthorize> findByAutoSeq(Long autoSeq);
 
 }
-

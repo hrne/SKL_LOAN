@@ -533,8 +533,7 @@ public class L5706 extends TradeBuffer {
 			if (tNegFinAcct != null) {
 
 			} else {
-				throw new LogicException(titaVo, "E0001",
-						"債權金融機構=" + fincode + ",身分證字號=" + id + ",識別碼=" + code + ",請先由入口交易L5974新增債權金融機構");
+				throw new LogicException(titaVo, "E0001", "債權金融機構=" + fincode + ",身分證字號=" + id + ",識別碼=" + code + ",請先由入口交易L5974新增債權金融機構");
 			}
 		} else {
 			throw new LogicException(titaVo, "E0015", "債權金融機構不可空白" + ":身分證字號=" + id + ",識別碼=" + code);

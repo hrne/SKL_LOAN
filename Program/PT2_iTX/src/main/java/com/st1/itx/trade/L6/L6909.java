@@ -81,8 +81,7 @@ public class L6909 extends TradeBuffer {
 				int entrydate = 0;
 				BigDecimal tavDb = BigDecimal.ZERO;
 				BigDecimal tavCr = BigDecimal.ZERO;
-				String txNo = "0000" + t.get("TitaTlrNo")
-						+ parse.IntegerToString(parse.stringToInteger(t.get("TitaTxtNo")), 8);
+				String txNo = "0000" + t.get("TitaTlrNo") + parse.IntegerToString(parse.stringToInteger(t.get("TitaTxtNo")), 8);
 				String AcFg = "";
 				// 畫面按鈕控制 第一筆為主要次筆為副
 				if (txNo.equals(newTxNo)) {

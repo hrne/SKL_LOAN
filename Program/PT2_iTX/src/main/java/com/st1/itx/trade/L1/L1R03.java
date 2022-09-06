@@ -225,7 +225,7 @@ public class L1R03 extends TradeBuffer {
 				// 成長率算法 (新-舊)/舊
 				BigDecimal iHundred = new BigDecimal("100");
 				BigDecimal iGap = finReportProfit.getBusIncome().subtract(lastBusIncome);
-				growRate = iGap.divide(lastBusIncome,4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
+				growRate = iGap.divide(lastBusIncome, 4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
 			}
 			this.info("L1R03 GrowRate  = " + growRate);
 			this.totaVo.putParam("GrowRate", growRate);

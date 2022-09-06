@@ -83,27 +83,22 @@ public class L4601Report extends MakeReport {
 		this.print(-2, 3, "程式 ID：" + txCode);
 		this.print(-2, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
-		this.print(-2, 120, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
-				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim);
+		this.print(-2, 120, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim);
 		this.print(-3, 3, "報  表 ：" + txCode);
 		this.print(-3, 70, reportName, "C");
-		this.print(-3, 120, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 120, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 120, "頁    數：" + this.getNowPage());
 		this.print(-5, 58, sInsuEndMonth.substring(0, 3) + "/" + sInsuEndMonth.substring(3, 5));
 		this.print(-5, 68, "同年月重複投保");
-		this.print(-7, 1,
-				"  戶號       額度    借款人                     擔保品號碼　　　   新保險起日      新保險迄日    原有保單號碼             保險起日     保險迄日  ");
-		this.print(-8, 0,
-				"------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-7, 1, "  戶號       額度    借款人                     擔保品號碼　　　   新保險起日      新保險迄日    原有保單號碼             保險起日     保險迄日  ");
+		this.print(-8, 0, "------------------------------------------------------------------------------------------------------------------------------------------------");
 
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		sInsuEndMonth = titaVo.getParam("InsuEndMonth");
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(iInsuEndMonth + "",
-				iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(iInsuEndMonth + "", iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
 		// 同戶號額度才show
 		reporttype = 1;
 		reportName = "火險詢價重複投保報表";
@@ -153,8 +148,7 @@ public class L4601Report extends MakeReport {
 				if (!"".equals(l.getCheckResultB())) {
 
 					if (reporttype == 1) {
-						tmpCF tmp = new tmpCF(parse.stringToInteger(l.getCustNo()),
-								parse.stringToInteger(l.getFacmNo()));
+						tmpCF tmp = new tmpCF(parse.stringToInteger(l.getCustNo()), parse.stringToInteger(l.getFacmNo()));
 
 						this.info("tmp ... " + tmp);
 
@@ -183,8 +177,7 @@ public class L4601Report extends MakeReport {
 					if (rowcount != 0) { // 換頁第一筆不判斷
 
 						if (!tempcustno.equals(t.getCustNo()) || !tempseq.equals(t.getSeq())) {
-							this.print(1, 0,
-									"------------------------------------------------------------------------------------------------------------------------------------------------");
+							this.print(1, 0, "------------------------------------------------------------------------------------------------------------------------------------------------");
 							rowcount = rowcount + 1;
 						}
 
@@ -206,8 +199,7 @@ public class L4601Report extends MakeReport {
 					int ClCode1 = 0, ClCode2 = 0, ClNo = 0;
 					// ClNoMap 與 InsuRenewMediaTemp 擔保品編號2 差補0
 					if (tClNoMap != null) {
-						this.print(0, 48, tClNoMap.getClCode1() + "-" + FormatUtil.pad9("" + tClNoMap.getClCode2(), 2)
-								+ "-" + tClNoMap.getClNo());
+						this.print(0, 48, tClNoMap.getClCode1() + "-" + FormatUtil.pad9("" + tClNoMap.getClCode2(), 2) + "-" + tClNoMap.getClNo());
 
 						ClCode1 = tClNoMap.getClCode1();
 						ClCode2 = tClNoMap.getClCode2();
@@ -256,8 +248,7 @@ public class L4601Report extends MakeReport {
 					count++;
 
 					if (listsize == count) { // 最後一筆
-						this.print(1, 0,
-								"------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 0, "------------------------------------------------------------------------------------------------------------------------------------------------");
 						rowcount++;
 						this.print(pageIndex - rowcount - 2, this.getMidXAxis(), "=====報表結束=====", "C");
 					}

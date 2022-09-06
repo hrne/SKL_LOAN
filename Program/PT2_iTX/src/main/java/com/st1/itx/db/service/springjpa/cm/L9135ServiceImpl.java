@@ -32,14 +32,12 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-
-
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("L9135 ServiceImpl");
 
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 
-		String sql = " "; 
+		String sql = " ";
 		sql += "	SELECT A.\"AcNoCode\" AS \"AcNoCode\"";
 		sql += "		  ,E2.\"AcNoItem\" AS \"AcNoItem\"";
 //		sql += "		  ,'銀行存款－活期存款' AS \"AcNoItem\"";
@@ -67,17 +65,13 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,A.\"AcDtlCode\" ASC";
 		sql += "			,A.\"SlipNo\" ASC";
 
-
 		this.info("L9135ServiceImpl sql=" + sql);
 
-	
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("AcDate", iAcDate);
 		return this.convertToMap(query);
 	}
-
-
 
 }

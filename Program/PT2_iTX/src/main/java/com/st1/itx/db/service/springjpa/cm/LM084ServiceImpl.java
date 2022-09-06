@@ -74,7 +74,6 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         ,\"CustName\" ";
 		sql += "         ,\"IntStartDate\" ";
 		sql += "         ,\"PayIntDate\" ";
-		
 
 		this.info("sql=" + sql);
 

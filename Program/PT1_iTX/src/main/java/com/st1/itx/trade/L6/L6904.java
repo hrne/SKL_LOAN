@@ -249,7 +249,7 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OOSlipNote", slipNote);
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate())+ " " +parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate()) + " " + parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
 			switch (iInqType) {
 			case 0: // 全部彙計方式
@@ -378,6 +378,7 @@ public class L6904 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

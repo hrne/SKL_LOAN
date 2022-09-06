@@ -158,7 +158,7 @@ public class L1108 extends TradeBuffer {
 
 				// FormNo報表代號
 				iFormNo = titaVo.getParam("FormNo" + i);
-				
+
 				// 這邊的邏輯因為前端 VAR 是設定「不通知申請」，所以Paper{i}, Msg{i}, EMail{i}為 Y 時對應DB的 N
 				if (titaVo.getParam("Paper" + i).trim().isEmpty()) {
 					VarPaper = "Y";
@@ -214,13 +214,12 @@ public class L1108 extends TradeBuffer {
 					}
 				} else {
 					// 變更前
-					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice())
-							|| !VarEMail.equals(tCustNotice.getEmailNotice())) {
-						
+					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice()) || !VarEMail.equals(tCustNotice.getEmailNotice())) {
+
 						// 只在有修改選項時，才實際更新
 						log = true;
 						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
-						
+
 						tCustNotice.setPaperNotice(VarPaper);
 						tCustNotice.setMsgNotice(VarMsg);
 						tCustNotice.setEmailNotice(VarEMail);
@@ -247,8 +246,7 @@ public class L1108 extends TradeBuffer {
 					CustNotice nCustNotice = tranDesc(tCustNotice);
 
 					iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
-					iDataLog.exec("修改顧客/" + oCustNotice.getFormNo() + " " + formx + " 通知設定",
-							"CustUKey:" + custMain.getCustUKey());
+					iDataLog.exec("修改顧客/" + oCustNotice.getFormNo() + " " + formx + " 通知設定", "CustUKey:" + custMain.getCustUKey());
 				}
 			}
 		}

@@ -84,7 +84,7 @@ public class L9701p extends TradeBuffer {
 		String nowBc = dDateUtil.getNowStringBc();
 		String tlrNo = titaVo.getTlrNo();
 
-		webClient.sendPost(nowBc, "1800", tlrNo, "Y", "LC009", tlrNo+"L9701", "L9701客戶往來交易明細表已完成", titaVo);
+		webClient.sendPost(nowBc, "1800", tlrNo, "Y", "LC009", tlrNo + "L9701", "L9701客戶往來交易明細表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -54,13 +54,13 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
 		int prinBalance = titaVo.containsKey("PrinBalance") ? parse.stringToInteger(titaVo.getParam("PrinBalance")) : 0;
-		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) +19110000;
+		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int payIntDateSt = parse.stringToInteger(titaVo.getParam("PayIntDateSt"));
-		if (payIntDateSt> 0) {
+		if (payIntDateSt > 0) {
 			payIntDateSt = payIntDateSt + 19110000;
 		}
 		int payIntDateEd = parse.stringToInteger(titaVo.getParam("PayIntDateEd"));
-		if (payIntDateEd> 0) {
+		if (payIntDateEd > 0) {
 			payIntDateEd = payIntDateEd + 19110000;
 		}
 
@@ -107,8 +107,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "            WHERE L.\"Status\" = 0";
 		sql += "             AND  L.\"SpecificDd\" > 0";
-		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd,
-				acdate);
+		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd, acdate);
 		sql += "            GROUP BY L.\"CustNo\", L.\"FacmNo\", ";
 		sql += "                     F.\"FirstDrawdownDate\", F.\"UtilAmt\", F.\"RepayCode\", C.\"CustName\", C.\"CustUKey\" ";
 		sql += "           ) D";
@@ -157,8 +156,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	private String queryCondition(int icustno, int ifacmno, String unpay, String repay, String custType,
-			int prinBalance, int payIntDateSt, int payIntDateEd, int acdate) throws LogicException {
+	private String queryCondition(int icustno, int ifacmno, String unpay, String repay, String custType, int prinBalance, int payIntDateSt, int payIntDateEd, int acdate) throws LogicException {
 
 		String condition = " ";
 
@@ -291,13 +289,13 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
 		int prinBalance = titaVo.containsKey("PrinBalance") ? parse.stringToInteger(titaVo.getParam("PrinBalance")) : 0;
-		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) +19110000;
+		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int payIntDateSt = parse.stringToInteger(titaVo.getParam("PayIntDateSt"));
-		if (payIntDateSt> 0) {
+		if (payIntDateSt > 0) {
 			payIntDateSt = payIntDateSt + 19110000;
 		}
 		int payIntDateEd = parse.stringToInteger(titaVo.getParam("PayIntDateEd"));
-		if (payIntDateEd> 0) {
+		if (payIntDateEd > 0) {
 			payIntDateEd = payIntDateEd + 19110000;
 		}
 
@@ -353,7 +351,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       ORDER BY T.\"SEQ\") AS SEQ";
 		sql += "                   ,C.\"EntCode\"             AS \"EntCode\"";
 		sql += "             FROM (SELECT L.\"CustNo\"              AS \"CustNo\"";
-		sql += "                         ,L.\"FacmNo\"              AS \"FacmNo\"";		
+		sql += "                         ,L.\"FacmNo\"              AS \"FacmNo\"";
 		sql += "                         ,MAX(L.\"MaturityDate\")   AS　\"MaturityDate\"";
 		sql += "                         ,SUM(L.\"LoanBal\")        AS \"LoanBal\"";
 		sql += "                         ,MIN(L.\"PrevPayIntDate\") AS \"PrevPayIntDate\"　";
@@ -366,8 +364,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                          AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "                   WHERE L.\"Status\" = 0";
 		sql += "                    AND  L.\"SpecificDd\" > 0";
-		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd,
-				acdate);
+		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd, acdate);
 		sql += "                   GROUP BY L.\"CustNo\", L.\"FacmNo\" ";
 		sql += "                  ) M";
 		sql += "             LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";

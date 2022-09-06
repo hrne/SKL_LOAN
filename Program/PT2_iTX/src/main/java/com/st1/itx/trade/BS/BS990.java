@@ -52,8 +52,7 @@ public class BS990 extends TradeBuffer {
 
 	private ArrayList<String> getKeys(TitaVo titaVo) {
 		// 營業日\櫃員編號\BS990TestFile.txt
-		pathToFile = parse.IntegerToString(this.txBuffer.getTxBizDate().getTbsDyf(), 8) + File.separatorChar
-				+ titaVo.getTlrNo() + File.separatorChar + "BS990TestData.txt";
+		pathToFile = parse.IntegerToString(this.txBuffer.getTxBizDate().getTbsDyf(), 8) + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + "BS990TestData.txt";
 
 		try {
 			// 輸入例 (txt):
@@ -95,8 +94,7 @@ public class BS990 extends TradeBuffer {
 				{
 					this.info("doAcLoanInt: " + key[0] + "," + key[1] + "," + key[2]);
 
-					baTxCom.acLoanInt(iEntryDate, intDate, parse.stringToInteger(key[0]), parse.stringToInteger(key[1]),
-							parse.stringToInteger(key[2]), titaVo);
+					baTxCom.acLoanInt(iEntryDate, intDate, parse.stringToInteger(key[0]), parse.stringToInteger(key[1]), parse.stringToInteger(key[2]), titaVo);
 				}
 			}
 		} catch (Exception e) {

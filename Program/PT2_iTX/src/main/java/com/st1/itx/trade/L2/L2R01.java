@@ -181,7 +181,6 @@ public class L2R01 extends TradeBuffer {
 			SetTotaHandingFee();
 		}
 
-
 		FacMain tFacMain = facMainService.findProdNoFirst(iRimProdNo, titaVo);
 		if (!(tFacMain == null)) {
 			wkUseProdFg = "Y";

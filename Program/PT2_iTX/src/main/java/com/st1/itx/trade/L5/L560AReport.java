@@ -44,7 +44,7 @@ import com.st1.itx.db.service.springjpa.cm.L560AServiceImpl;
  * @version 1.0.0
  */
 public class L560AReport extends MakeReport {
-	
+
 	@Autowired
 	public CustMainService iCustMainService;
 	@Autowired
@@ -61,7 +61,7 @@ public class L560AReport extends MakeReport {
 	public GuarantorService iGuarantorService;
 	@Autowired
 	public CdEmpService iCdEmpService;
-	
+
 	@Autowired
 	WarningLetterForm iWarningLetterForm;
 	@Autowired
@@ -69,10 +69,10 @@ public class L560AReport extends MakeReport {
 
 	@Autowired
 	public MakeFile makeFile;
-	
+
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	L560AServiceImpl l560AServiceImpl;
 
@@ -85,7 +85,7 @@ public class L560AReport extends MakeReport {
 	@Override
 	public void printHeader() {
 	}
-	
+
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		String adjFlag = titaVo.getBtnIndex(); // 0-存證信函;1-延遲繳款通知函
 		String iCustNo = titaVo.getParam("OOCustNo");
@@ -111,7 +111,7 @@ public class L560AReport extends MakeReport {
 			throw new LogicException(titaVo, "E0001", "客戶主檔無此戶號:" + iCustNo);
 		}
 		iaddress = findaddr(iCustMain, titaVo);// 借款人通訊地
-		
+
 		FacMain aFacMain = new FacMain();
 		FacMainId aFacMainId = new FacMainId();
 		aFacMainId.setCustNo(rCustNo);
@@ -126,12 +126,11 @@ public class L560AReport extends MakeReport {
 		int iIntStartDate = 0;
 		int terms = 0;
 		BigDecimal unpaidAmt = BigDecimal.ZERO; // 未收本息
-		
+
 		ArrayList<BaTxVo> listBaTxVo = new ArrayList<BaTxVo>();
 		baTxCom.setTxBuffer(txbuffer);
 		try {
-			listBaTxVo = baTxCom.settingUnPaid(txbuffer.getTxBizDate().getTbsDy(), rCustNo, rFacmNo, 0, 1,
-					BigDecimal.ZERO, titaVo);// 日期為會計日
+			listBaTxVo = baTxCom.settingUnPaid(txbuffer.getTxBizDate().getTbsDy(), rCustNo, rFacmNo, 0, 1, BigDecimal.ZERO, titaVo);// 日期為會計日
 		} catch (LogicException e) {
 			this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
 		}
@@ -202,7 +201,7 @@ public class L560AReport extends MakeReport {
 					iAccCollPsnX = iCdEmp.getFullname();
 				}
 			}
-			if (iCollList.getIsSpecify().equals("Y")) {//個案人員指派則使用CollList電話資料
+			if (iCollList.getIsSpecify().equals("Y")) {// 個案人員指派則使用CollList電話資料
 				if (!iCollList.getAccTelArea().trim().isEmpty() || !iCollList.getAccTelArea().equals("")) {
 					iAccTel = iCollList.getAccTelArea().trim() + "-";
 				}
@@ -212,7 +211,7 @@ public class L560AReport extends MakeReport {
 				if (!iCollList.getAccTelExt().trim().isEmpty() || !iCollList.getAccTelExt().equals("")) {
 					iAccTel = iAccTel + "-" + iCollList.getAccTelExt().trim();
 				}
-				
+
 			} else {
 
 				iCityCode = iCollList.getCityCode();// 法催地區
@@ -235,7 +234,7 @@ public class L560AReport extends MakeReport {
 				}
 			}
 		}
-		
+
 		switch (adjFlag) {
 		case "0": // 列印存證信函
 			strFileName = "催收存證信函" + iCustNo + "-" + iFacmNo;
@@ -259,8 +258,7 @@ public class L560AReport extends MakeReport {
 			strContent = "";
 			makeFile.put(strContent);
 
-			strContent = "一、台端前向本公司辦理房屋抵押貸款新台幣" + aLineAmt + "元整，約定於每月" + iPrDd + "日繳交應攤還之本息；惟　台端僅繳至" + iPrYyy + "年"
-					+ iPrMm + "月" + iPrDd + "日，共計積欠" + sterms + "期未繳付。";
+			strContent = "一、台端前向本公司辦理房屋抵押貸款新台幣" + aLineAmt + "元整，約定於每月" + iPrDd + "日繳交應攤還之本息；惟　台端僅繳至" + iPrYyy + "年" + iPrMm + "月" + iPrDd + "日，共計積欠" + sterms + "期未繳付。";
 			makeFile.put(strContent);
 			strContent = "二、依約定借款人如有一期未繳付應攤還本金或利息時，全部借款視為到期，借款人應即償還全部借款餘額，為此特通知　台端三日內繳清所積欠之本金、利息、違約金，否則將聲請法院查封拍賣抵押物追償，事涉　台端權益，請速處理，祈勿自誤為禱。";
 			makeFile.put(strContent);
@@ -295,11 +293,9 @@ public class L560AReport extends MakeReport {
 			makeFile.put(strContent);
 			strContent = "";
 			makeFile.put(strContent);
-			strContent = "一、台端前向本公司辦理房屋抵押貸款，約定於每月" + iPrDd + "日繳交應攤還之本息；惟　台端僅繳至" + iPrYyy + "年" + iPrMm + "月" + iPrDd
-					+ "日止，積欠計" + sterms + "期。為此特此函知　台端，請於五天內繳清積欠逾期之本息及違約金。";
+			strContent = "一、台端前向本公司辦理房屋抵押貸款，約定於每月" + iPrDd + "日繳交應攤還之本息；惟　台端僅繳至" + iPrYyy + "年" + iPrMm + "月" + iPrDd + "日止，積欠計" + sterms + "期。為此特此函知　台端，請於五天內繳清積欠逾期之本息及違約金。";
 			makeFile.put(strContent);
-			strContent = "    額度" + iFacmNo + "：計息期間 " + iPrYyy + "/" + iPrMm + "/" + iPrDd + " - " + iPrYyy1 + "/"
-					+ iPrMm1 + "/" + iPrDd1 + " 總計" + iPrinBalance + "元";
+			strContent = "    額度" + iFacmNo + "：計息期間 " + iPrYyy + "/" + iPrMm + "/" + iPrDd + " - " + iPrYyy1 + "/" + iPrMm1 + "/" + iPrDd1 + " 總計" + iPrinBalance + "元";
 			makeFile.put(strContent);
 			strContent = "";
 			makeFile.put(strContent);
@@ -315,7 +311,7 @@ public class L560AReport extends MakeReport {
 			makeFile.put(strContent);
 			strContent = "";
 			makeFile.put(strContent);
-			// 列出最近6筆繳款明細   ,2022/1/17取消下列明細內容,USER自行列印L9701報表:客戶往來本息明細表
+			// 列出最近6筆繳款明細 ,2022/1/17取消下列明細內容,USER自行列印L9701報表:客戶往來本息明細表
 //			List<Map<String, String>> listL560A = null;
 //			try {
 //				listL560A = l560AServiceImpl.findLoanBorTx(titaVo, this.index, this.limit);
@@ -606,7 +602,7 @@ public class L560AReport extends MakeReport {
 
 			makeFile.close();
 
-			//產pdf寫法,已改為txt故點掉
+			// 產pdf寫法,已改為txt故點掉
 			// open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "延遲繳款通知函" +
 			// iCustNo + "-" + iFacmNo, "Normal",
 			// "A4", "P");
@@ -648,7 +644,7 @@ public class L560AReport extends MakeReport {
 			break;
 		}
 	}
-	
+
 	public String findaddr(CustMain tCustMain, TitaVo titaVo) throws LogicException {
 		String iCityCode = tCustMain.getCurrCityCode();
 		String iAreaCode = tCustMain.getCurrAreaCode();
@@ -698,10 +694,9 @@ public class L560AReport extends MakeReport {
 		if (!iCurrFloorDash.trim().isEmpty()) {
 			iCurrFloorDash = "之" + iCurrFloorDash;
 		}
-		iAddress = iCity + iArea + iRoad + iSection + iAlley + iLane + iCurrNum + iCurrNumDash + iCurrFloor
-				+ iCurrFloorDash;
+		iAddress = iCity + iArea + iRoad + iSection + iAlley + iLane + iCurrNum + iCurrNumDash + iCurrFloor + iCurrFloorDash;
 
 		return iAddress;
 	}
-		
+
 }

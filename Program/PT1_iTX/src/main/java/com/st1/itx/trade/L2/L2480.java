@@ -62,8 +62,8 @@ public class L2480 extends TradeBuffer {
 	public CdInsurerService sCdInsurerService;
 
 	@Autowired
-	public CheckClEva sCheckClEva ;
-	
+	public CheckClEva sCheckClEva;
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -133,7 +133,7 @@ public class L2480 extends TradeBuffer {
 				oEvaNo = newEvaNo;
 			} else { // 新增一筆00原始的資料 再新增一筆新的
 
-				sCheckClEva.setOriginalClEva(titaVo,iClNo);
+				sCheckClEva.setOriginalClEva(titaVo, iClNo);
 			} // 新增一筆00原始的資料 再新增一筆新的
 
 			tClEvaId = new ClEvaId();
@@ -158,7 +158,7 @@ public class L2480 extends TradeBuffer {
 			tClEva.setEvaReason(parse.stringToInteger(titaVo.getParam("EvaReason")));
 			tClEva.setOtherReason(titaVo.getParam("EvaReasonX").trim());
 
-			sCheckClEva.checkAmt(titaVo,iClNo);
+			sCheckClEva.checkAmt(titaVo, iClNo);
 
 			try {
 				sClEvaService.insert(tClEva);
@@ -173,19 +173,17 @@ public class L2480 extends TradeBuffer {
 			ClImm tClImm = new ClImm();
 
 			tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
-					
+
 			if (tClImm == null) {
 				throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 			}
-			
-			
+
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-			
+
 			tClMain.setShareTotal(shareTotal);
 			tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 			tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 
-			
 			if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())) {
 				tClMain.setShareTotal(BigDecimal.ZERO);
 			} else {
@@ -255,27 +253,27 @@ public class L2480 extends TradeBuffer {
 			// 最新的序號 == 目前序號
 			if (tClEva.getEvaNo() == iEvaNo) {
 
-				sCheckClEva.checkAmt(titaVo,iClNo);
+				sCheckClEva.checkAmt(titaVo, iClNo);
 
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				// 變更前
 				ClMain beforeClMain = (ClMain) dataLog.clone(tClMain);
-				
+
 				// ClImm
 				ClImm tClImm = new ClImm();
 
 				tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
-						
+
 				if (tClImm == null) {
 					throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 				}
-				
+
 				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-				
+
 				tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 				tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 				tClMain.setShareTotal(shareTotal);
-				
+
 				if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
 				} else {
@@ -325,26 +323,25 @@ public class L2480 extends TradeBuffer {
 
 			if (tClEva == null) { // 沒資料抓正刪除的這一筆資料更新
 
-				sCheckClEva.checkAmt(titaVo,iClNo);
+				sCheckClEva.checkAmt(titaVo, iClNo);
 
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
-				
+
 				ClImm tClImm = new ClImm();
 
 				tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
-				
+
 				if (tClImm == null) {
 					throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 				}
-				
+
 				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-				
+
 				// 變更前
 				ClMain beforeClMain = (ClMain) dataLog.clone(tClMain);
 				tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 				tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 				tClMain.setShareTotal(shareTotal);
-				
 
 				if ("1".equals(tClImm.getClStat()) || "2".equals(tClImm.getSettingStat())) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
@@ -382,7 +379,7 @@ public class L2480 extends TradeBuffer {
 				dataLog.exec("修改擔保品不動產檔資料");
 			} else {
 
-				sCheckClEva.checkAmt(titaVo,iClNo);
+				sCheckClEva.checkAmt(titaVo, iClNo);
 
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				// 變更前

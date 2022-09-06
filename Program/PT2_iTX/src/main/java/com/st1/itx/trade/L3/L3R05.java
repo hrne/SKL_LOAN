@@ -59,8 +59,8 @@ public class L3R05 extends TradeBuffer {
 // 按指定額度：00-全費用類別
 //  1.iFacmNo >0 該額度為指定額度則只有該額度可抵繳,如該額度為非指定額度則全部非指定額度可抵繳
 //  2.iFacmNo =0 全部非指定額度可抵繳
-
-			baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo);
+//	96 : 單一額度轉帳
+			baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, iTempItemCode == 6 ? 96 : 0, BigDecimal.ZERO, titaVo);
 			wkTempAmt = baTxCom.getExcessive();
 			wkTmpFacmNoX = baTxCom.getTmpFacmNoX();
 		} else {

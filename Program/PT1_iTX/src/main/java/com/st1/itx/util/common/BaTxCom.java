@@ -259,10 +259,8 @@ public class BaTxCom extends TradeBuffer {
 	 * @throws LogicException ...
 	 */
 
-	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
-			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
-		this.baTxList = settingPayintDate(iEntryDate, iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt,
-				titaVo);
+	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
+		this.baTxList = settingPayintDate(iEntryDate, iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, titaVo);
 		return this.baTxList;
 	}
 
@@ -280,8 +278,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> settingPayintDate(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo,
-			int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
+	public ArrayList<BaTxVo> settingPayintDate(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom settingUnPaid ...");
 		this.info("BaTxCom settingUnPaid EntryDate  入帳日=" + iEntryDate);
 		this.info("BaTxCom settingUnPaid PayIntDate 應繳日=" + iPayIntDate);
@@ -305,8 +302,7 @@ public class BaTxCom extends TradeBuffer {
 		if (iRepayType == 2) {
 			this.payFeeFlag = "N";
 			this.extraRepay = iTxAmt; // 部分還款金額
-			Slice<LoanBook> slLoanBook = loanBookService.bookCustNoRange(iCustNo, iCustNo, iFacmNo,
-					iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
+			Slice<LoanBook> slLoanBook = loanBookService.bookCustNoRange(iCustNo, iCustNo, iFacmNo, iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
 					Integer.MAX_VALUE, titaVo);
 			if (slLoanBook != null) {
 				for (LoanBook tLoanBook : slLoanBook.getContent()) {
@@ -417,8 +413,8 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> settleUnPaid(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo,
-			int iRepayCode, int iRepayType, BigDecimal iTxAmt, TempVo iTempVo, TitaVo titaVo) throws LogicException {
+	public ArrayList<BaTxVo> settleUnPaid(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayCode, int iRepayType, BigDecimal iTxAmt, TempVo iTempVo, TitaVo titaVo)
+			throws LogicException {
 
 		this.info("BaTxCom settleUnPaid ...");
 		this.info("BaTxCom settleUnPaid EntryDate  入帳日=" + iEntryDate);
@@ -503,8 +499,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 
 // 3).回收金額 + 暫收款金額  > 放款餘額 -> 3.結案 
-			if (iRepayType == 0 && this.loanBal.compareTo(BigDecimal.ZERO) > 0
-					&& (repayAmt.add(this.tavAmt)).compareTo(this.loanBal) >= 0) {
+			if (iRepayType == 0 && this.loanBal.compareTo(BigDecimal.ZERO) > 0 && (repayAmt.add(this.tavAmt)).compareTo(this.loanBal) >= 0) {
 				iRepayType = 3;
 			}
 
@@ -640,8 +635,7 @@ public class BaTxCom extends TradeBuffer {
 		// 合併檢核轉暫收金額加入暫收可抵繳
 		if ("L420A".equals(titaVo.getTxcd()) && tempVo.get("MergeAmt") != null) {
 			if (tempVo.getParam("MergeSeq").equals(tempVo.getParam("MergeCnt"))) {
-				this.tavAmt = addMergeTempAmt(iCustNo, this.getOverRpFacmNo(),
-						parse.stringToBigDecimal(tempVo.getParam("MergeTempAmt")));
+				this.tavAmt = addMergeTempAmt(iCustNo, this.getOverRpFacmNo(), parse.stringToBigDecimal(tempVo.getParam("MergeTempAmt")));
 			}
 		}
 
@@ -864,10 +858,8 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> acLoanInt(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
-			TitaVo titaVo) throws LogicException {
-		this.info("BaTxCom acLoanInt ..." + iEntryDate + "/" + iPayintDate + " " + iCustNo + "-" + iFacmNo + "-"
-				+ iBormNo);
+	public ArrayList<BaTxVo> acLoanInt(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo) throws LogicException {
+		this.info("BaTxCom acLoanInt ..." + iEntryDate + "/" + iPayintDate + " " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		init();
 		// iEntryDate 入帳日 ==> 月底日曆日
 		// iPayintDate 利息計算止日 ==> 次月月初日
@@ -907,8 +899,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, int iEndFlag,
-			TitaVo titaVo) throws LogicException {
+	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, int iEndFlag, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom termsPay ..." + iEntryDate + "/ " + iCustNo + "-" + iFacmNo + "-" + iBormNo + "/ " + iTerms);
 		init();
 		// 0:正常 1.至下次利率調整日
@@ -949,8 +940,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> getDueAmt(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
-			throws LogicException {
+	public ArrayList<BaTxVo> getDueAmt(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom getDueAmt ..." + iEntryDate + "/ " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		init();
 
@@ -986,8 +976,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @return ArrayList of BaTxVo
 	 * @throws LogicException ...
 	 */
-	public ArrayList<BaTxVo> cashFlow(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
-			throws LogicException {
+	public ArrayList<BaTxVo> cashFlow(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom cashFlow ...");
 		init();
 
@@ -1041,8 +1030,7 @@ public class BaTxCom extends TradeBuffer {
 		int payIntDate = 0;
 
 		for (BaTxVo ba : iBatxList) {
-			if (ba.getFacmNo() != facmNo || ba.getDataKind() != dataKind || ba.getRepayType() != repayTyp
-					|| ba.getPayIntDate() != payIntDate) {
+			if (ba.getFacmNo() != facmNo || ba.getDataKind() != dataKind || ba.getRepayType() != repayTyp || ba.getPayIntDate() != payIntDate) {
 				baTxVo = new BaTxVo();
 				baTxVo.setDataKind(ba.getDataKind());
 				baTxVo.setRepayType(ba.getRepayType());
@@ -1107,8 +1095,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/* 讀取還款主檔清單 */
-	private void loadRepayLoan(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
-			throws LogicException {
+	private void loadRepayLoan(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo) throws LogicException {
 		this.info(" loadRepayLoan ...");
 		this.info("   EntryDate = " + iEntryDate);
 		this.info("   CustNo    = " + iCustNo);
@@ -1128,8 +1115,7 @@ public class BaTxCom extends TradeBuffer {
 			wkBormNoStart = iBormNo;
 			wkBormNoEnd = iBormNo;
 		}
-		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd,
-				this.index, Integer.MAX_VALUE, titaVo);
+		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain == null) {
 			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
 		}
@@ -1154,8 +1140,7 @@ public class BaTxCom extends TradeBuffer {
 			this.overRpFacmNo = facStatusCom.getFacmNo(); // 溢繳額度;
 			this.info("FacStatus =" + this.facStatus + ", overRpFacmNo=" + this.overRpFacmNo);
 		}
-		this.info("loadRepayLoan end FacStatus =" + this.facStatus + ", overRpFacmNo=" + this.overRpFacmNo + ", size="
-				+ this.lLoanBorMain.size());
+		this.info("loadRepayLoan end FacStatus =" + this.facStatus + ", overRpFacmNo=" + this.overRpFacmNo + ", size=" + this.lLoanBorMain.size());
 	}
 
 	/* 還款主檔清單排序 */
@@ -1234,8 +1219,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	/* 計算放款還款金額 */
-	private void calcRepayLoan(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
-			BigDecimal iTxAmt, int iTerms, TitaVo titaVo) throws LogicException {
+	private void calcRepayLoan(int iEntryDate, int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, BigDecimal iTxAmt, int iTerms, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom calcRepayLoan ...");
 		this.info("   EntryDate = " + iEntryDate);
 		this.info("   IntPayDate = " + iPayIntDate);
@@ -1262,12 +1246,10 @@ public class BaTxCom extends TradeBuffer {
 				continue;
 			}
 			if (iRepayType == 1) {
-				this.info("order1 = " + ln.getLoanBorMainId() + " NextPayIntDate=" + ln.getNextPayIntDate()
-						+ ", StoreRate=" + ln.getStoreRate() + ", FacmNo" + ln.getFacmNo() + ", DueAmt="
+				this.info("order1 = " + ln.getLoanBorMainId() + " NextPayIntDate=" + ln.getNextPayIntDate() + ", StoreRate=" + ln.getStoreRate() + ", FacmNo" + ln.getFacmNo() + ", DueAmt="
 						+ ln.getDueAmt());
 			} else if (iRepayType == 2) {
-				this.info("order2 = " + ln.getLoanBorMainId() + " StoreRate=" + ln.getStoreRate() + ", UsageCode="
-						+ ln.getUsageCode() + ", FacmNo" + ln.getFacmNo() + ", BormNo=" + ln.getBormNo());
+				this.info("order2 = " + ln.getLoanBorMainId() + " StoreRate=" + ln.getStoreRate() + ", UsageCode=" + ln.getUsageCode() + ", FacmNo" + ln.getFacmNo() + ", BormNo=" + ln.getBormNo());
 			} else {
 				this.info("order3 = " + ln.getLoanBorMainId());
 			}
@@ -1280,12 +1262,10 @@ public class BaTxCom extends TradeBuffer {
 					int wkRepayTermNo = 0;
 					// 計算至上次繳息日之期數
 					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-						wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-								ln.getSpecificDd(), ln.getPrevPayIntDate());
+						wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 					}
 					// 可回收期數 = 計算至應繳日的應繳期數 + 批次預收期數
-					wkRepayTermNo = loanCom.getTermNo(iPayIntDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
-							ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iPayIntDate)
+					wkRepayTermNo = loanCom.getTermNo(iPayIntDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iPayIntDate)
 							+ this.preRepayTerms;
 
 					wkTerms = wkRepayTermNo - wkPrevTermNo;
@@ -1330,8 +1310,7 @@ public class BaTxCom extends TradeBuffer {
 				break;
 			case 2: // 部分償還金額
 				if (ln.getNextPayIntDate() <= iEntryDate) {
-					throw new LogicException(titaVo, "E3072", "額度=" + parse.IntegerToString(ln.getFacmNo(), 3)
-							+ ", 部分償還前應先償還期款, 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
+					throw new LogicException(titaVo, "E3072", "額度=" + parse.IntegerToString(ln.getFacmNo(), 3) + ", 部分償還前應先償還期款, 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
 				}
 				if (wkExtraRepayRemaind.compareTo(BigDecimal.ZERO) <= 0) {
 					break;
@@ -1346,8 +1325,7 @@ public class BaTxCom extends TradeBuffer {
 				}
 				lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 				// 部分還本金額
-				wkExtraRepayRemaind = wkExtraRepayRemaind.subtract(loanCalcRepayIntCom.getPrincipal())
-						.subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
+				wkExtraRepayRemaind = wkExtraRepayRemaind.subtract(loanCalcRepayIntCom.getPrincipal()).subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
 						.subtract(loanCalcRepayIntCom.getBreachAmt());
 				repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, 0);
 
@@ -1364,12 +1342,10 @@ public class BaTxCom extends TradeBuffer {
 				int wkRepayTermNo = 0;
 				// 計算至上次繳息日之期數
 				if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-					wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), ln.getPrevPayIntDate());
+					wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 				}
 				// 可回收期數 = 計算至入帳日/應繳日的當期期數
-				wkRepayTermNo = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-						ln.getSpecificDd(), iPayIntDate);
+				wkRepayTermNo = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iPayIntDate);
 				wkTerms = wkRepayTermNo - wkPrevTermNo;
 				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
 				if (wkTerms > 0) {
@@ -1404,12 +1380,10 @@ public class BaTxCom extends TradeBuffer {
 					continue;
 				}
 				// 計算到利息計算止日之繳息期數 1:指定日期之當期數
-				wkTerms = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-						ln.getSpecificDd(), iPayIntDate);
+				wkTerms = loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iPayIntDate);
 				// 減去計算至上次繳息日之期數
 				if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-					wkTerms = wkTerms - loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), ln.getPrevPayIntDate());
+					wkTerms = wkTerms - loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 				}
 
 				// 每次計算一期，最後一期計算到利息計算止日
@@ -1438,8 +1412,7 @@ public class BaTxCom extends TradeBuffer {
 						break;
 					}
 				}
-				this.info("Caculate log Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
-						+ ", principal=" + this.principal + ", interest=" + this.interest + ", delayInt="
+				this.info("Caculate log Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo() + ", principal=" + this.principal + ", interest=" + this.interest + ", delayInt="
 						+ this.delayInt + " ,breachAmt=" + this.breachAmt);
 				break;
 			}
@@ -1466,8 +1439,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 	}
 
-	private void repayLoanBaTxVo(int iEntryDate, int iPayIntDate, int iRepayType, int iCustNo, LoanBorMain ln,
-			ArrayList<CalcRepayIntVo> lCalcRepayIntVo, int terms) {
+	private void repayLoanBaTxVo(int iEntryDate, int iPayIntDate, int iRepayType, int iCustNo, LoanBorMain ln, ArrayList<CalcRepayIntVo> lCalcRepayIntVo, int terms) {
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(2); // 2.本金利息
 		// 還款類別
@@ -1483,12 +1455,10 @@ public class BaTxCom extends TradeBuffer {
 		// 含短繳本金之還款本金超過餘額，回收本金須扣除
 		BigDecimal wkPrincipal = loanCalcRepayIntCom.getPrincipal();
 		for (BaTxVo ba : baTxList) {
-			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo()
-					&& ln.getBormNo() == ba.getBormNo()) {
+			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo() && ln.getBormNo() == ba.getBormNo()) {
 				if (wkPrincipal.add(ba.getUnPaidAmt()).compareTo(ln.getLoanBal()) > 0) {
 					wkPrincipal = ln.getLoanBal().subtract(ba.getUnPaidAmt());
-					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 "
-							+ ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
+					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 " + ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
 				}
 			}
 		}
@@ -1501,8 +1471,7 @@ public class BaTxCom extends TradeBuffer {
 		this.interest = this.interest.add(loanCalcRepayIntCom.getInterest());
 		this.delayInt = this.delayInt.add(loanCalcRepayIntCom.getDelayInt());
 		this.breachAmt = this.breachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-		baTxVo.setUnPaidAmt(
-				baTxVo.getPrincipal().add(baTxVo.getInterest()).add(baTxVo.getDelayInt()).add(baTxVo.getBreachAmt())); // 未收金額
+		baTxVo.setUnPaidAmt(baTxVo.getPrincipal().add(baTxVo.getInterest()).add(baTxVo.getDelayInt()).add(baTxVo.getBreachAmt())); // 未收金額
 		baTxVo.setDbCr("C"); // 借貸別
 		baTxVo.setAcctAmt(BigDecimal.ZERO); // 出帳金額
 		baTxVo.setLoanBal(this.calcLoanBal); // 放款餘額(還款前、只放第一期)
@@ -1523,8 +1492,7 @@ public class BaTxCom extends TradeBuffer {
 					this.rateEffectDate = baTxVo.getIntStartDate();
 					this.fitRate = ca.getStoreRate();
 				}
-				if (baTxVo.getIntStartDate() > rateEffectDate
-						&& baTxVo.getIntStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+				if (baTxVo.getIntStartDate() > rateEffectDate && baTxVo.getIntStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 					this.rateEffectDate = baTxVo.getIntStartDate();
 					this.fitRate = ca.getStoreRate();
 				}
@@ -1564,8 +1532,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	// 計算清償違約金
-	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, int iRepayType, TitaVo titaVo)
-			throws LogicException {
+	private void getCloseBreachAmt(int iEntryDate, int iCustNo, int iFacmNo, int iRepayType, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmt...");
 		String collectFlag = this.tempVo.getParam("CollectFlag"); // 是否領取清償證明(Y/N/)
 
@@ -1584,8 +1551,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		if ("Y".equals(collectFlag)) {
-			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, 0,
-					iListCloseBreach, titaVo);
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, 0, iListCloseBreach, titaVo);
 		} else {
 			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, 0, iListCloseBreach, titaVo);
 		}
@@ -1618,8 +1584,7 @@ public class BaTxCom extends TradeBuffer {
 	private void settlePriority(int EntryDate, int iRepayType) {
 		// 1.還款類別、金額相同 > 2.還款類別相同 > 3:未收費用 > 4:短繳期金 > 5:應繳本利 > 6:另收欠款
 		for (BaTxVo ba : this.baTxList) {
-			if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType
-					&& this.txBal.compareTo(ba.getUnPaidAmt()) == 0) {
+			if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType && this.txBal.compareTo(ba.getUnPaidAmt()) == 0) {
 				ba.setRepayPriority(1);
 			} else if (ba.getDataKind() == 1) {
 				if (ba.getRepayType() == iRepayType) {
@@ -1693,8 +1658,7 @@ public class BaTxCom extends TradeBuffer {
 						repayIntDate = payIntDate;
 					} else {
 						for (BaTxVo b : this.baTxList) {
-							if (b.getRepayPriority() == 5 && b.getFacmNo() == facmNo
-									&& b.getAcctAmt().equals(BigDecimal.ZERO)) {
+							if (b.getRepayPriority() == 5 && b.getFacmNo() == facmNo && b.getAcctAmt().equals(BigDecimal.ZERO)) {
 								b.setRepayPriority(9);
 							}
 						}
@@ -1741,11 +1705,9 @@ public class BaTxCom extends TradeBuffer {
 					if (this.unpaidFlag.equals("Y") && this.xxBal.compareTo(BigDecimal.ZERO) > 0) {
 						// 依短繳限額 1.還本金額 2.還息金額
 						if (ba.getPrincipal().compareTo(BigDecimal.ZERO) > 0) {
-							wkShortAmtLimit = ba.getPrincipal()
-									.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent()))
-									.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-							if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit.compareTo(
-									new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
+							wkShortAmtLimit = ba.getPrincipal().multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinPercent())).divide(new BigDecimal(100)).setScale(0,
+									RoundingMode.HALF_UP);
+							if (this.txBuffer.getSystemParas().getShortPrinLimit() > 0 && wkShortAmtLimit.compareTo(new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit())) > 0) {
 								wkShortAmtLimit = new BigDecimal(this.txBuffer.getSystemParas().getShortPrinLimit());
 							}
 							// 短繳金額= 負餘額(取正值)-已短繳餘額
@@ -1755,9 +1717,8 @@ public class BaTxCom extends TradeBuffer {
 								wkUnpaidAmt = wkUnpaidAmt.add(ba.getUnpaidPrin());
 							}
 						} else {
-							wkShortAmtLimit = ba.getInterest()
-									.multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent()))
-									.divide(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+							wkShortAmtLimit = ba.getInterest().multiply(new BigDecimal(this.txBuffer.getSystemParas().getShortIntPercent())).divide(new BigDecimal(100)).setScale(0,
+									RoundingMode.HALF_UP);
 							// 短繳金額= 負餘額(取正值)-已短繳餘額
 							wkNowBal = wkNowBal.subtract(ba.getUnPaidAmt());
 							if (wkNowBal.compareTo(BigDecimal.ZERO) < 0) {
@@ -1770,9 +1731,8 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-		this.info("getPayintDateAmt end xxBal=" + this.xxBal + ", FacmNo= " + facmNo + ", rePayIntDate=" + payIntDate
-				+ ", payintDateAmt=" + wkPayintDateAmt + ", wkUnpaidAmt=" + wkUnpaidAmt + ", shortAmtLimit="
-				+ shortAmtLimit);
+		this.info("getPayintDateAmt end xxBal=" + this.xxBal + ", FacmNo= " + facmNo + ", rePayIntDate=" + payIntDate + ", payintDateAmt=" + wkPayintDateAmt + ", wkUnpaidAmt=" + wkUnpaidAmt
+				+ ", shortAmtLimit=" + shortAmtLimit);
 
 		return wkPayintDateAmt;
 
@@ -1817,8 +1777,7 @@ public class BaTxCom extends TradeBuffer {
 		if (this.overRpFacmNo == 0) {
 			this.overRpFacmNo = gettingRpFacmNo(iCustNo, titaVo);
 		}
-		this.info("settleOverAmt ... overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt="
-				+ this.tempAmt);
+		this.info("settleOverAmt ... overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt);
 
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(4); // 4.本期溢(+)短(-)繳
@@ -1835,8 +1794,7 @@ public class BaTxCom extends TradeBuffer {
 			baTxVo.setUnPaidAmt(this.xxBal);
 			baTxVo.setAcctAmt(this.xxBal);
 			this.overAmt = baTxVo.getAcctAmt();
-			this.info("overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt
-					+ ", 溢繳金額= " + this.overAmt);
+			this.info("overRpFacmNo= " + this.overRpFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt + ", 溢繳金額= " + this.overAmt);
 		}
 		if (this.xxBal.compareTo(BigDecimal.ZERO) < 0) {
 			baTxVo.setDbCr("D");
@@ -1844,8 +1802,7 @@ public class BaTxCom extends TradeBuffer {
 			this.shortAmt = baTxVo.getUnPaidAmt();
 			this.overRpFacmNo = this.shortFacmNo;
 			baTxVo.setFacmNo(this.shortFacmNo);
-			this.info("shortRpFacmNo= " + this.shortFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt
-					+ ", 短繳金額= " + this.shortAmt);
+			this.info("shortRpFacmNo= " + this.shortFacmNo + ", xxBal=" + this.xxBal + ", tempAmt=" + this.tempAmt + ", 短繳金額= " + this.shortAmt);
 		}
 		this.baTxList.add(baTxVo);
 	}
@@ -1872,8 +1829,7 @@ public class BaTxCom extends TradeBuffer {
 		if (rpFacmNo == 0) {
 			// 資負明細科目，額度最大，先找未銷
 			// 0-未銷
-			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, 0, 999, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, CustNo, 1, 0, 999, 0, Integer.MAX_VALUE, titaVo);
 			// 1-已銷
 			if (srvList == null) {
 				srvList = acReceivableService.acrvFacmNoRange(1, CustNo, 1, 0, 999, 0, Integer.MAX_VALUE, titaVo);
@@ -1948,8 +1904,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		BigDecimal wkDiff = wkTxBal.add(wkTempBal).subtract(wkAcBal).subtract(wkOverBal);
-		this.info("settleAcAmt" + ", wkTxBal=" + wkTxBal + ", wkTempBal=" + wkTempBal + ", wkAcBal=" + wkAcBal
-				+ ", wkOverBal=" + wkOverBal + ", diff=" + wkDiff);
+		this.info("settleAcAmt" + ", wkTxBal=" + wkTxBal + ", wkTempBal=" + wkTempBal + ", wkAcBal=" + wkAcBal + ", wkOverBal=" + wkOverBal + ", diff=" + wkDiff);
 		// 額度科目
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 2) {
@@ -1972,8 +1927,7 @@ public class BaTxCom extends TradeBuffer {
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 1 && ba.getRepayType() <= 3 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
 				for (BaTxVo da : this.baTxList) {
-					if (da.getDataKind() == 2 && da.getAcAmt().compareTo(BigDecimal.ZERO) > 0
-							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
+					if (da.getDataKind() == 2 && da.getAcAmt().compareTo(BigDecimal.ZERO) > 0 && (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
 							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
 						da.setShortFallPrin(ba.getPrincipal());
 						da.setShortFallInt(ba.getInterest());
@@ -2017,8 +1971,7 @@ public class BaTxCom extends TradeBuffer {
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getRepayType() <= 3 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
 					if (ba.getAcSeq() == 0) {
-						if ((ba.getFacmNo() == ln.getFacmNo() || ba.getFacmNo() == 0)
-								&& (ba.getBormNo() == ln.getBormNo() || ba.getBormNo() == 0)) {
+						if ((ba.getFacmNo() == ln.getFacmNo() || ba.getFacmNo() == 0) && (ba.getBormNo() == ln.getBormNo() || ba.getBormNo() == 0)) {
 							acSeq++;
 							ba.setAcSeq(acSeq);
 							ba.setTxAmt(wkTxBal);
@@ -2082,8 +2035,7 @@ public class BaTxCom extends TradeBuffer {
 			if ((ba.getDataKind() == 1 || ba.getDataKind() == 6) && ba.getRepayType() <= 3) {
 				boolean isNew = true;
 				for (BaTxVo da : this.baTxList) {
-					if (da.getDataKind() == ba.getDataKind() && da.getRepayType() == ba.getRepayType()
-							&& (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
+					if (da.getDataKind() == ba.getDataKind() && da.getRepayType() == ba.getRepayType() && (da.getFacmNo() == ba.getFacmNo() || ba.getFacmNo() == 0)
 							&& (da.getBormNo() == ba.getBormNo() || ba.getBormNo() == 0)) {
 						addBaTxList(ba, da);
 						isNew = false;
@@ -2226,8 +2178,7 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 
-		this.info("isTmpFacmNo end " + isTmpFacmNo + ", iRepayType = " + iRepayType + ", iFacmNo = " + iFacmNo
-				+ ", facmNo = " + facmNo);
+		this.info("isTmpFacmNo end " + isTmpFacmNo + ", iRepayType = " + iRepayType + ", iFacmNo = " + iFacmNo + ", facmNo = " + facmNo);
 		return isTmpFacmNo;
 	}
 
@@ -2294,10 +2245,8 @@ public class BaTxCom extends TradeBuffer {
 	 * @param titaVo      tita
 	 * @throws LogicException ....
 	 */
-	public void loadUnPaid(int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo)
-			throws LogicException {
-		this.info("loadUnPaid ... " + " iPayIntDate=" + iPayIntDate + ", iFacmNo=" + iFacmNo + ", iRepayType="
-				+ iRepayType);
+	public void loadUnPaid(int iPayIntDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType, TitaVo titaVo) throws LogicException {
+		this.info("loadUnPaid ... " + " iPayIntDate=" + iPayIntDate + ", iFacmNo=" + iFacmNo + ", iRepayType=" + iRepayType);
 
 // 銷帳科目記號ReceivableFlag = 1,2
 		// F09 暫付款－火險保費
@@ -2328,8 +2277,7 @@ public class BaTxCom extends TradeBuffer {
 
 		initRv();
 		if (this.isLoadRvList) {
-			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index,
-					Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
+			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index, Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
 			rvList = srvList == null ? null : srvList.getContent();
 			this.isLoadRvList = false;
 		}
@@ -2346,8 +2294,7 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setAcctAmt(BigDecimal.ZERO);
 				// 利息提存只列欠繳利息
 				if (isAcLoanInt) {
-					if ("I".equals(rv.getAcctCode().substring(0, 1)) && iFacmNo == rv.getFacmNo()
-							&& parse.IntegerToString(iBormNo, 3).equals(rv.getRvNo().substring(0, 3))) {
+					if ("I".equals(rv.getAcctCode().substring(0, 1)) && iFacmNo == rv.getFacmNo() && parse.IntegerToString(iBormNo, 3).equals(rv.getRvNo().substring(0, 3))) {
 						baTxVo.setBormNo(iBormNo);
 						baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 						baTxVo.setRepayType(1); // 01-期款
@@ -2470,8 +2417,7 @@ public class BaTxCom extends TradeBuffer {
 
 										tTempVo = tTempVo.getVo(rv.getJsonFields());
 										if (tTempVo.get("InsuYearMonth") != null) {
-											insuYearMonth = parse.stringToInteger(tTempVo.get("InsuYearMonth"))
-													- 191100;
+											insuYearMonth = parse.stringToInteger(tTempVo.get("InsuYearMonth")) - 191100;
 										}
 										if (insuYearMonth <= (iPayIntDate / 100)) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金

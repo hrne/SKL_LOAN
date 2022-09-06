@@ -27,16 +27,15 @@ public class LM059ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
+
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param yearMonth   西元年月
 	 * @param ilYearMonth 上西元年月
 	 */
-	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth,int ilYearMonth) throws Exception {
-
-		
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int ilYearMonth) throws Exception {
 
 		String iYearMonth = String.valueOf(yearMonth);
 

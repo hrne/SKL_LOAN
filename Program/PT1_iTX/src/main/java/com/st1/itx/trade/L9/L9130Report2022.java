@@ -205,8 +205,7 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130Report2022 iMediaSeq = " + iMediaSeq);
 		this.info("L9130Report2022 slipNo = " + slipNo);
 
-		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
-				.add(new BigDecimal(iMediaSeq));
+		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000)).add(new BigDecimal(iMediaSeq));
 
 		groupId = tmpGroupId.toBigInteger();
 
@@ -231,8 +230,7 @@ public class L9130Report2022 extends MakeReport {
 
 		makeFile.open(titaVo, date, brno, no, desc, name, format);
 
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
-				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 
 		SlipMedia2022 tempTableSlipMedia2022;
 
@@ -428,8 +426,7 @@ public class L9130Report2022 extends MakeReport {
 		if (sendEbsOK && iBatchNo >= 90) {
 			// iAcDate + 19110000
 			// iBatchNo
-			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 
 			if (slAcDetail == null || slAcDetail.isEmpty()) {
 				return;

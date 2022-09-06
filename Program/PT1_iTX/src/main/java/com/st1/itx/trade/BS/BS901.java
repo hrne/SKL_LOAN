@@ -96,13 +96,12 @@ public class BS901 extends TradeBuffer {
 				txToDoCom.addByDetailList(false, 0, lTxToDoDetail, titaVo); // DupSkip = false ->重複 error
 			}
 		}
-		
+
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		if (iAcDateReverse > 0) {
 			// 3.迴轉上月
 			this.info("3.bs901 last month ACCL02");
-			Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 95, this.index,
-					Integer.MAX_VALUE, titaVo);
+			Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 95, this.index, Integer.MAX_VALUE, titaVo);
 			if (slAcDetail != null) {
 				for (AcDetail t : slAcDetail.getContent()) {
 					if ("ORI".equals(t.getAcctCode()) && t.getEntAc() == 1) {
@@ -144,11 +143,8 @@ public class BS901 extends TradeBuffer {
 
 	private String getRvNo(TitaVo titaVo) throws LogicException {
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC"
-				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(
-						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
-						6);
+		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		return rvNo;
 	}
 
@@ -168,8 +164,7 @@ public class BS901 extends TradeBuffer {
 		int insuYearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100;
 		// 計入已收，未收不計
 		// 本月到期未繳火險保費
-		Slice<InsuRenew> slInsuRenew = insuRenewService.findL4604A(insuYearMonth, 2, 0, 0, this.index,
-				Integer.MAX_VALUE);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.findL4604A(insuYearMonth, 2, 0, 0, this.index, Integer.MAX_VALUE);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
 				if (tInsuRenew.getStatusCode() == 0) {
@@ -190,8 +185,7 @@ public class BS901 extends TradeBuffer {
 			tTempVo.putParam("AcBookCode", this.txBuffer.getSystemParas().getAcBookCode()); // 帳冊別 000
 			tTempVo.putParam("AcSubBookCode", this.txBuffer.getSystemParas().getAcSubBookCode()); // 區隔帳冊 00A
 			tTempVo.putParam("AcctCode", "ORI");
-			tTempVo.putParam("SlipNote",
-					parse.IntegerToString(yyy, 3) + "年" + parse.IntegerToString(mm, 2) + "月" + "其它應收款火險保費");
+			tTempVo.putParam("SlipNote", parse.IntegerToString(yyy, 3) + "年" + parse.IntegerToString(mm, 2) + "月" + "其它應收款火險保費");
 			tTempVo.putParam("DbAcctCode1", "ORI");
 			tTempVo.putParam("DbRvNo1", rvNo);
 			tTempVo.putParam("DbTxAmt1", txAmt);

@@ -37,10 +37,10 @@ public class L6030 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public TxHolidayService sTxHolidayService;
-	
+
 	@Autowired
 	CdEmpService cdEmpService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -85,12 +85,12 @@ public class L6030 extends TradeBuffer {
 			occursList.putParam("OOTypeCode", tTxHoliday.getTypeCode());
 			String DateTime = this.parse.timeStampToString(tTxHoliday.getLastUpdate());
 			occursList.putParam("OOLastUpdate", DateTime);
-			
+
 			String iEmpNo = tTxHoliday.getLastUpdateEmpNo();
-			if(!iEmpNo.isEmpty() || iEmpNo.length()>0) {
+			if (!iEmpNo.isEmpty() || iEmpNo.length() > 0) {
 				CdEmp tCdEmp = cdEmpService.findById(iEmpNo, titaVo);
-				if(tCdEmp!=null) {
-					iEmpNo = iEmpNo+" "+tCdEmp.getFullname();
+				if (tCdEmp != null) {
+					iEmpNo = iEmpNo + " " + tCdEmp.getFullname();
 				}
 			}
 			occursList.putParam("OOLastUpdateEmpNo", iEmpNo);

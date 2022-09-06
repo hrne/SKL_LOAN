@@ -68,7 +68,7 @@ public class L9718Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, typeText+TXName, TXCD + "_" + typeText + TXName, TXCD + "_底稿_" + typeText + "成果統計表" + ".xlsx", 1,
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, typeText + TXName, TXCD + "_" + typeText + TXName, TXCD + "_底稿_" + typeText + "成果統計表" + ".xlsx", 1,
 				titaVo.getParam("inputYearMonth").substring(0, 3) + "年" + titaVo.getParam("inputYearMonth").substring(3) + "月" + typeText);
 
 		if (lList != null && lList.size() != 0) {
@@ -187,6 +187,6 @@ public class L9718Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 }

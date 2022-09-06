@@ -159,8 +159,7 @@ public class L4920 extends TradeBuffer {
 					if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
 						procNote += "摘要:" + tempVo.get("Note");
 					}
-					if (tempVo.get("VirtualAcctNo") != null && parse.stringToInteger(result.get("F4")) == 0
-							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
+					if (tempVo.get("VirtualAcctNo") != null && parse.stringToInteger(result.get("F4")) == 0 && isNumeric(tempVo.get("VirtualAcctNo"))) {
 						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
 					}
 					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
@@ -180,7 +179,7 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOFileName", result.get("F16"));
 				occursList.putParam("OOFileSeq", fileSeq);
 				occursList.putParam("OOTxCd", txcd);
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

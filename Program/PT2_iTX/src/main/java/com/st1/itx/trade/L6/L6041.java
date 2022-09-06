@@ -49,7 +49,7 @@ public class L6041 extends TradeBuffer {
 
 	@Autowired
 	CdEmpService cdEmpService;
-	
+
 	@Autowired
 	TxDataLogService sTxDataLogService;
 
@@ -94,8 +94,7 @@ public class L6041 extends TradeBuffer {
 		} else if (!iTlrNo.isEmpty()) {
 			slTxTeller = txTellerService.findByL6041(iBrNo, iTlrNo + "%", this.index, this.limit, titaVo);
 		} else {
-			slTxTeller = txTellerService.findByGroupNo(iBrNo, iGroupNoS, iGroupNoE, iLevelFgS, iLevelFgE, this.index,
-					this.limit, titaVo);
+			slTxTeller = txTellerService.findByGroupNo(iBrNo, iGroupNoS, iGroupNoE, iLevelFgS, iLevelFgE, this.index, this.limit, titaVo);
 		}
 
 		List<TxTeller> lTxTeller = slTxTeller == null ? null : slTxTeller.getContent();
@@ -135,8 +134,7 @@ public class L6041 extends TradeBuffer {
 				}
 				occursList.putParam("OLastUpdateEmpNo", iEmpNo);
 
-				cdBranchGroup = cdBranchGroupService.findById(new CdBranchGroupId(cdBranch.getBranchNo(), tTxTeller.getGroupNo()),
-						titaVo);
+				cdBranchGroup = cdBranchGroupService.findById(new CdBranchGroupId(cdBranch.getBranchNo(), tTxTeller.getGroupNo()), titaVo);
 
 				if (cdBranchGroup != null) {
 					occursList.putParam("OGroupItem", cdBranchGroup.getGroupItem());
@@ -144,10 +142,9 @@ public class L6041 extends TradeBuffer {
 				} else {
 					occursList.putParam("OGroupItem", "");
 				}
-				
-				//若有歷程就顯示，無則不顯示
-				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L6401", "CODE:" +  tTxTeller.getTlrNo(), 0,
-						1, titaVo);
+
+				// 若有歷程就顯示，無則不顯示
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L6401", "CODE:" + tTxTeller.getTlrNo(), 0, 1, titaVo);
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
 				occursList.putParam("OHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());

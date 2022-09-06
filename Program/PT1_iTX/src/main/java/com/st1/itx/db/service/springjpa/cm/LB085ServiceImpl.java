@@ -43,10 +43,8 @@ public class LB085ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB085 帳號轉換資料檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"RenewYM\"" + "     , M.\"CustId\"" + "     , M.\"BefBankItem\""
-				+ "     , M.\"BefBranchItem\"" + "     , M.\"Filler6\"" + "     , M.\"BefAcctNo\""
-				+ "     , M.\"AftBankItem\"" + "     , M.\"AftBranchItem\"" + "     , M.\"Filler10\""
-				+ "     , M.\"AftAcctNo\"" + "     , M.\"Filler12\"" + " FROM  \"JcicB085\" M"
+		sql = "SELECT M.\"DataType\"" + "     , M.\"RenewYM\"" + "     , M.\"CustId\"" + "     , M.\"BefBankItem\"" + "     , M.\"BefBranchItem\"" + "     , M.\"Filler6\"" + "     , M.\"BefAcctNo\""
+				+ "     , M.\"AftBankItem\"" + "     , M.\"AftBranchItem\"" + "     , M.\"Filler10\"" + "     , M.\"AftAcctNo\"" + "     , M.\"Filler12\"" + " FROM  \"JcicB085\" M"
 				+ " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"BefAcctNo\", M.\"AftAcctNo\" ";
 //				+ " ORDER BY M.\"RenewYM\", M.\"CustId\", M.\"BefAcctNo\", M.\"AftAcctNo\" ";
 

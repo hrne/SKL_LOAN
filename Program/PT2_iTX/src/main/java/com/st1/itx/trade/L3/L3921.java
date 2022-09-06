@@ -140,8 +140,7 @@ public class L3921 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 300; // 295 + 122 * 300 = 41695
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -218,8 +217,7 @@ public class L3921 extends TradeBuffer {
 			this.info("ln.額度" + ln.getFacmNo());
 			wkPreRepayTermNo = 0;
 			if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-				wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-						ln.getSpecificDd(), ln.getPrevPayIntDate());
+				wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 			}
 			if (iRepayTerms > 0) { // 回收期數 > 0
 				wkTerms = iRepayTerms;
@@ -228,8 +226,7 @@ public class L3921 extends TradeBuffer {
 					continue;
 				}
 				// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-				wkTerms = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
-						ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
+				wkTerms = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
 				wkTerms = wkTerms - wkPreRepayTermNo;
 			}
 
@@ -251,8 +248,7 @@ public class L3921 extends TradeBuffer {
 			oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 			oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 			oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-			wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
-					.subtract(oBreachAmt);
+			wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt).subtract(oBreachAmt);
 			addOccurs(ln, titaVo);
 			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 				ln.setStoreRate(loanCalcRepayIntCom.getStoreRate());
@@ -302,8 +298,7 @@ public class L3921 extends TradeBuffer {
 				v.setExtraRepay(loanCalcRepayIntCom.getExtraAmt());
 				v.setEndDate(iEntryDate);
 				iListCloseBreach.add(v);
-				wkExtraRepay = wkExtraRepayRmd.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
-						.subtract(oBreachAmt);
+				wkExtraRepay = wkExtraRepayRmd.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt).subtract(oBreachAmt);
 				if (wkExtraRepay.compareTo(BigDecimal.ZERO) <= 0) {
 					break;
 				}
@@ -317,8 +312,7 @@ public class L3921 extends TradeBuffer {
 
 		// 計算清償違約金，收取方式 "1":即時收取
 		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, iBormNo, iListCloseBreach,
-					titaVo);
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, iBormNo, iListCloseBreach, titaVo);
 			// 輸出清償違約金
 			if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 				for (LoanCloseBreachVo v : oListCloseBreach) {
@@ -368,12 +362,10 @@ public class L3921 extends TradeBuffer {
 	private BigDecimal getPrincipal(LoanBorMain ln, BigDecimal principal) throws LogicException {
 		BigDecimal wkPrincipal = principal;
 		for (BaTxVo ba : baTxList) {
-			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo()
-					&& ln.getBormNo() == ba.getBormNo()) {
+			if ("Z".equals(ba.getAcctCode().substring(0, 1)) && ln.getFacmNo() == ba.getFacmNo() && ln.getBormNo() == ba.getBormNo()) {
 				if (wkPrincipal.add(ba.getUnPaidAmt()).compareTo(ln.getLoanBal()) > 0) {
 					wkPrincipal = ln.getLoanBal().subtract(ba.getUnPaidAmt());
-					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 "
-							+ ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
+					this.info("短繳本金" + ba.getUnPaidAmt() + " 回收本金" + loanCalcRepayIntCom.getPrincipal() + " 超過餘額 " + ln.getLoanBal() + ", 還款本金= " + wkPrincipal);
 				}
 			}
 		}

@@ -121,8 +121,7 @@ public class L2040 extends TradeBuffer {
 					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
 					if (tClBuilding != null) {
-						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1()
-								+ "-" + tClBuilding.getBdNo2());
+						occurslist.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
 					} else {
 						occurslist.putParam("OOAddress", "");
 					}

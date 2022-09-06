@@ -140,8 +140,7 @@ public class L3926 extends TradeBuffer {
 			baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); // 00-費用全部(已到期)
 
 			// 計算至入帳日應繳之期數
-			int wkTermNo = loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
-					tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(), iEntryDate);
+			int wkTermNo = loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(), iEntryDate);
 
 			oLeftTerms = tLoanBorMain.getTotalPeriod() - wkTermNo;
 
@@ -149,8 +148,8 @@ public class L3926 extends TradeBuffer {
 			wkStoreRate = tLoanBorMain.getStoreRate();
 			// 計算至上次繳息日之期數
 			if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getDrawdownDate()) {
-				wkTermNo = wkTermNo - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
-						tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(), tLoanBorMain.getPrevPayIntDate());
+				wkTermNo = wkTermNo - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+						tLoanBorMain.getPrevPayIntDate());
 			}
 			if (wkTermNo > 0) {
 				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(tLoanBorMain, wkTermNo, 0, 0, iEntryDate, titaVo);
@@ -164,9 +163,8 @@ public class L3926 extends TradeBuffer {
 			}
 			switch (tLoanBorMain.getAmortizedCode()) {
 			case "3": // 3.本息平均法(期金)
-				wkRate = wkStoreRate
-						.divide(new BigDecimal(tLoanBorMain.getFreqBase() == 2 ? 1200 : 5200), 15, RoundingMode.HALF_UP)
-						.multiply(new BigDecimal(tLoanBorMain.getPayIntFreq())).setScale(15, RoundingMode.HALF_UP);
+				wkRate = wkStoreRate.divide(new BigDecimal(tLoanBorMain.getFreqBase() == 2 ? 1200 : 5200), 15, RoundingMode.HALF_UP).multiply(new BigDecimal(tLoanBorMain.getPayIntFreq())).setScale(15,
+						RoundingMode.HALF_UP);
 				wkRateA = wkRate.add(new BigDecimal(1)).pow(oLeftTerms).setScale(15, RoundingMode.HALF_UP);
 				wkRateB = wkRateA.subtract(new BigDecimal(1)).setScale(15, RoundingMode.HALF_UP);
 				wkRateC = wkRate.multiply(wkRateA).divide(wkRateB, 15, RoundingMode.HALF_UP);
@@ -179,8 +177,7 @@ public class L3926 extends TradeBuffer {
 				if (iNewDueAmt.compareTo(BigDecimal.ZERO) > 0 && iNewDueAmt.compareTo(wkFinalInterest) <= 0) {
 					throw new LogicException(titaVo, "E3067", " 最後本金餘額的利息 = " + wkFinalInterest); // 因該筆放款有最後本金餘額，新攤還金額不足以繳息
 				}
-				wkNewLoanBal = iNewDueAmt.subtract(wkFinalInterest).divide(wkRateC, 15, RoundingMode.HALF_UP)
-						.setScale(0, RoundingMode.HALF_UP);
+				wkNewLoanBal = iNewDueAmt.subtract(wkFinalInterest).divide(wkRateC, 15, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
 				break;
 			case "4": // 4.本金平均法
 				wkNewLoanBal = iNewDueAmt.multiply(new BigDecimal(oLeftTerms)).add(tLoanBorMain.getFinalBal());
@@ -243,8 +240,7 @@ public class L3926 extends TradeBuffer {
 		// 輸入部分償還金額
 		else {
 
-			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, wkBormNoStart,
-					wkBormNoEnd, this.index, this.limit, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 			lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 			if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 				throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -312,8 +308,7 @@ public class L3926 extends TradeBuffer {
 						if (wkExtraRepay.compareTo(BigDecimal.ZERO) <= 0) {
 							break;
 						} else {
-							loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate,
-									titaVo);
+							loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
 							this.info("wkExtraRepay= " + wkExtraRepay + ", LoanBal=" + ln.getLoanBal());
 							if (wkExtraRepay.compareTo(ln.getLoanBal()) >= 0) {
 								loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案試算
@@ -330,8 +325,7 @@ public class L3926 extends TradeBuffer {
 							oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 							oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 							oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-							wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
-									.subtract(oBreachAmt);
+							wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt).subtract(oBreachAmt);
 							addOccurs(ln, titaVo);
 							LoanCloseBreachVo v = new LoanCloseBreachVo();
 							// 放入清償違約金計算List
@@ -344,8 +338,7 @@ public class L3926 extends TradeBuffer {
 						}
 					}
 
-					oLeftTerms = loanDueAmtCom.getDueTerms(loanCalcRepayIntCom.getLoanBal(), ln.getStoreRate(),
-							ln.getAmortizedCode(), ln.getFreqBase(), ln.getPayIntFreq(), ln.getFinalBal(),
+					oLeftTerms = loanDueAmtCom.getDueTerms(loanCalcRepayIntCom.getLoanBal(), ln.getStoreRate(), ln.getAmortizedCode(), ln.getFreqBase(), ln.getPayIntFreq(), ln.getFinalBal(),
 							ln.getDueAmt(), titaVo);
 
 					this.info("期數 oLeftTerms=" + oLeftTerms);

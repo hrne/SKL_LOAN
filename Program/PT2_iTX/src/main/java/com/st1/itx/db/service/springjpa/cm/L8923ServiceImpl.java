@@ -81,7 +81,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"RepayBank\" as F9					\n"; // 代償銀行
 		sql += ",\"LastUpdateEmpNo\" as F10				\n"; // 更新人員
 		sql += ",CASE WHEN \"LastUpdate\" IS NOT NULL   \n";
-		sql += "      THEN TO_CHAR(\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n"; 
+		sql += "      THEN TO_CHAR(\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n";
 		sql += "      END as F11                        \n"; // 更新時間 yyy/MM/dd HH:mm:ss
 		sql += ",\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",\"Description\" as F13					\n"; // 其他說明
@@ -173,7 +173,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"RepayBank\" as F9					\n"; // 代償銀行
 		sql += ",M.\"LastUpdateEmpNo\" as F10				\n"; // 更新人員
 		sql += ",CASE WHEN M.\"LastUpdate\" IS NOT NULL   \n";
-		sql += "      THEN TO_CHAR(M.\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n"; 
+		sql += "      THEN TO_CHAR(M.\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n";
 		sql += "      END as F11                        \n"; // 更新時間 yyy/MM/dd HH:mm:ss
 		sql += ",M.\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",M.\"Description\" as F13					\n"; // 其他說明

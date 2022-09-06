@@ -83,8 +83,7 @@ public class L5811Batch extends TradeBuffer {
 		}
 
 		// 發動產生檢核檔的StoredProcedure
-		sJobMainService.Usp_L9_YearlyHouseLoanIntCheck_Upd(titaVo.getEntDyI(), titaVo.getTlrNo(), iYYYYMM, iStartMonth,
-				iEndMonth, iCustNo, iAcctCode, titaVo);
+		sJobMainService.Usp_L9_YearlyHouseLoanIntCheck_Upd(titaVo.getEntDyI(), titaVo.getTlrNo(), iYYYYMM, iStartMonth, iEndMonth, iCustNo, iAcctCode, titaVo);
 
 		try {
 			makeExcel(iYear, iYYYYMM, iCustNo, iAcctCode, iStartMonth, iEndMonth, titaVo);
@@ -94,11 +93,9 @@ public class L5811Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L5811",
-					"L5811國稅局申報檢核檔已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L5811", "L5811國稅局申報檢核檔已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5811", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5811", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -106,8 +103,7 @@ public class L5811Batch extends TradeBuffer {
 
 	}
 
-	public void makeExcel(String iYear, int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth,
-			TitaVo titaVo) throws LogicException {
+	public void makeExcel(String iYear, int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth, TitaVo titaVo) throws LogicException {
 
 		int excelYear = Integer.parseInt(iYear) + 1;
 		List<Map<String, String>> resultList = null;
@@ -123,8 +119,7 @@ public class L5811Batch extends TradeBuffer {
 			sendMsg = "每年房屋擔保借款繳息檔無資料";
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5811", "每年房屋擔保借款繳息檢核檔" + excelYear + "年度",
-				"每年房屋擔保借款繳息檢核檔" + excelYear + "年度", "L5811_每年房屋擔保借款繳息檢核檔.xls", "Sheet1");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5811", "每年房屋擔保借款繳息檢核檔" + excelYear + "年度", "每年房屋擔保借款繳息檢核檔" + excelYear + "年度", "L5811_每年房屋擔保借款繳息檢核檔.xls", "Sheet1");
 		int i = 3;
 
 		this.info("resultList size==" + resultList.size());

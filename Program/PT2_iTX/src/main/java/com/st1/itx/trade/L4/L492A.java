@@ -69,8 +69,7 @@ public class L492A extends TradeBuffer {
 		procStsCode.add("2");
 		procStsCode.add("3");
 		procStsCode.add("4");
-		sBatxDetail = batxDetailService.findL492AEq(custNo, titaVo.getEntDyI() + 19110000, procStsCode, this.index,
-				this.limit);
+		sBatxDetail = batxDetailService.findL492AEq(custNo, titaVo.getEntDyI() + 19110000, procStsCode, this.index, this.limit);
 
 		lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -86,8 +85,7 @@ public class L492A extends TradeBuffer {
 				tempVo = tempVo.getVo(tBatxDetail.getProcNote());
 
 //				aml為1.需審查/確認  or 2.為凍結名單/未確定名單者     跳過
-				if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2"))
-						|| "2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
+				if ("1".equals(tempVo.get("AmlRsp1")) || "1".equals(tempVo.get("AmlRsp2")) || "2".equals(tempVo.get("AmlRsp1")) || "2".equals(tempVo.get("AmlRsp2"))) {
 					continue;
 				}
 

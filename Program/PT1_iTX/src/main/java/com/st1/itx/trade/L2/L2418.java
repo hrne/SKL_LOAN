@@ -117,8 +117,7 @@ public class L2418 extends TradeBuffer {
 
 				Boolean clfacFg = false;
 				if (iCustNo != 0) {
-					Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
-							titaVo);
+					Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 					if (slClFac == null) {
 						throw new LogicException(titaVo, "E0015", "此擔保品查無額度與擔保品關聯檔資料"); // 檢查錯誤
 					}
@@ -145,13 +144,11 @@ public class L2418 extends TradeBuffer {
 					throw new LogicException("E0005", "擔保品他項權利檔" + e.getErrorMsg());
 				}
 			} else {
-				throw new LogicException(titaVo, "E0001",
-						"擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 查無資料
+				throw new LogicException(titaVo, "E0001", "擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 查無資料
 			}
 		} else {
 			if (iFunCd == 1) { // 新增
-				throw new LogicException(titaVo, "E0002",
-						"擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002", "擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
 			} else if (iFunCd == 2) { // 修改
 				// 變更前
 				ClOtherRights beforeClOtherRights = (ClOtherRights) dataLog.clone(tClOtherRights);
@@ -168,8 +165,7 @@ public class L2418 extends TradeBuffer {
 //				tClOtherRights = sClOtherRightsService.holdById(tClOtherRightsId, titaVo);
 				try {
 					dataLog.setEnv(titaVo, tClOtherRights, tClOtherRights);
-					dataLog.exec("刪除擔保品他項權利資料" + iClCode1 + "-" + parse.IntegerToString(iClCode2, 2) + "-"
-							+ parse.IntegerToString(iClNo, 7));
+					dataLog.exec("刪除擔保品他項權利資料" + iClCode1 + "-" + parse.IntegerToString(iClCode2, 2) + "-" + parse.IntegerToString(iClNo, 7));
 					sClOtherRightsService.delete(tClOtherRights, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0008", "擔保品他項權利檔" + e.getErrorMsg());

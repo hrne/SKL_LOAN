@@ -230,7 +230,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   from \"AcReceivable\" ";
 		sql += "   where \"RvBal\" > 0 ";
 		sql += "     and case ";
-		sql += "           when NVL(JSON_VALUE(\"JsonFields\",  '$.InsuYearMonth'),0) > 0 "; 
+		sql += "           when NVL(JSON_VALUE(\"JsonFields\",  '$.InsuYearMonth'),0) > 0 ";
 		sql += "           then 1 ";
 		sql += "         else 0 end = 1 ";
 		sql += "  ) rv2 on rv2.\"CustNo\" = b.\"CustNo\" ";

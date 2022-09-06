@@ -108,7 +108,7 @@ public class L5061AllReport extends MakeReport {
 		if (t5061SqlReturn.isEmpty()) {
 //			throw new LogicException(titaVo, "E0001","查無資料");
 		} else {
-			makeExcel.setSheet("L5061","電催資料");
+			makeExcel.setSheet("L5061", "電催資料");
 			// 表頭
 			for (String content : telHeader) {
 				makeExcel.setValue(row, hcol + 1, content);
@@ -211,11 +211,11 @@ public class L5061AllReport extends MakeReport {
 //			throw new LogicException(titaVo, "E0001","查無資料");
 		} else {
 			if (t5061SqlReturn.isEmpty()) {
-				makeExcel.setSheet("L5061","面催資料");
+				makeExcel.setSheet("L5061", "面催資料");
 			} else {
 				makeExcel.newSheet("面催資料");
 			}
-			
+
 			hcol = 0;
 			row++;
 			for (String content : meetHeader) {
@@ -317,12 +317,11 @@ public class L5061AllReport extends MakeReport {
 //			throw new LogicException(titaVo, "E0001","查無資料");
 		} else {
 			if (t5061SqlReturn.isEmpty() && m5061SqlReturn.isEmpty()) {
-				makeExcel.setSheet("L5061","函催資料");
+				makeExcel.setSheet("L5061", "函催資料");
 			} else {
 				makeExcel.newSheet("函催資料");
 			}
-			
-			
+
 			hcol = 0;
 			row++;
 			for (String content : letterHeader) {

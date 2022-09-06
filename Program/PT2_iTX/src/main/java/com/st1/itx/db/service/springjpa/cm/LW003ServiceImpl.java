@@ -30,11 +30,12 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 查詢工作月
+	 * 
 	 * @param titaVo
-	 * @param tbsdy 帳務日
+	 * @param tbsdy  帳務日
 	 * 
 	 */
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findWorkMonth(TitaVo titaVo, int tbsdy) throws Exception {
 
@@ -61,8 +62,9 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 個金總業績
+	 * 
 	 * @param titaVo
-	 * @param wkYear 工作年
+	 * @param wkYear  工作年
 	 * @param wkMonth 工作月
 	 */
 	@SuppressWarnings("unchecked")
@@ -98,6 +100,7 @@ public class LW003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 區部
+	 * 
 	 * @param titaVo
 	 * @param wkYear  工作年
 	 * @param wkMonth 工作月

@@ -34,12 +34,12 @@ public class L6024 extends TradeBuffer {
 	@Autowired
 	TxErrCodeService sTxErrCodeService;
 
-    @Autowired 
+	@Autowired
 	public CdEmpService cdEmpService;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	boolean first = true;
 
 	@Override
@@ -49,8 +49,6 @@ public class L6024 extends TradeBuffer {
 
 		String iErrCode = titaVo.getParam("ErrCode");
 
-			
-		
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -59,29 +57,25 @@ public class L6024 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 		Slice<TxErrCode> sTxErrCode = null;
-		
-		if(iErrCode.isEmpty()) {
+
+		if (iErrCode.isEmpty()) {
 			sTxErrCode = sTxErrCodeService.findAll(this.index, this.limit, titaVo);
 		} else {
-			sTxErrCode = sTxErrCodeService.findbyErrCode("%"+iErrCode+"%", this.index, this.limit, titaVo);
+			sTxErrCode = sTxErrCodeService.findbyErrCode("%" + iErrCode + "%", this.index, this.limit, titaVo);
 		}
-		
-		
+
 		List<TxErrCode> lTxErrCode = sTxErrCode == null ? null : sTxErrCode.getContent();
 
 		if (lTxErrCode == null) {
 			throw new LogicException("E0001", "");
 		} else {
 			for (TxErrCode tTxErrCode : lTxErrCode) {
-	
-				
+
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOErrCode", tTxErrCode.getErrCode());
 				occursList.putParam("OOErrContent", tTxErrCode.getErrContent());
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxErrCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxErrCode.getLastUpdate()));
-				occursList.putParam("OOLastEmp",tTxErrCode.getLastUpdateEmpNo() + " " + empName(titaVo, tTxErrCode.getLastUpdateEmpNo()));
-				
-
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxErrCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tTxErrCode.getLastUpdate()));
+				occursList.putParam("OOLastEmp", tTxErrCode.getLastUpdateEmpNo() + " " + empName(titaVo, tTxErrCode.getLastUpdateEmpNo()));
 
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
@@ -98,6 +92,7 @@ public class L6024 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

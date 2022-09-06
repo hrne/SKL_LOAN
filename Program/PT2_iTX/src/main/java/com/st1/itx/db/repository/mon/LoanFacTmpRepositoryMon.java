@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.LoanFacTmpId;
  */
 public interface LoanFacTmpRepositoryMon extends JpaRepository<LoanFacTmp, LoanFacTmpId> {
 
-  // CustNo = 
-  public Slice<LoanFacTmp> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<LoanFacTmp> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<LoanFacTmp> findByLoanFacTmpId(LoanFacTmpId loanFacTmpId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<LoanFacTmp> findByLoanFacTmpId(LoanFacTmpId loanFacTmpId);
 
 }
-

@@ -108,7 +108,7 @@ public class L4101ReportD extends MakeReport {
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-D";
-		reportItem = reportItem ;
+		reportItem = reportItem;
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 		try {
@@ -119,7 +119,7 @@ public class L4101ReportD extends MakeReport {
 			this.info("L4101ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem+ "-" + batchNo, "", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
 		// 統一大小
 		this.setFont(1, 10);
 
@@ -147,8 +147,7 @@ public class L4101ReportD extends MakeReport {
 
 //				每頁第25筆 跳頁 
 				if (pageCnt == 25) {
-					print(1, 1,
-							"－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+					print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 					print(1, 1, "小計");
 					print(0, 16, "" + pageCnt);
 					this.print(1, 85, "=====續下頁=====", "C");

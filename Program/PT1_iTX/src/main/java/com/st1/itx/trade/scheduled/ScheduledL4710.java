@@ -118,8 +118,7 @@ public class ScheduledL4710 extends SysLogger {
 //			temp path = D:\\tmp\\LNM56OP.txt
 
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
-			makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", "L4710", "L4710" + "-簡訊媒體檔", "LNM56OP.txt",
-					2);
+			makeFile.open(titaVo, txBuffer.getTxCom().getTbsdy(), "0000", "L4710", "L4710" + "-簡訊媒體檔", "LNM56OP.txt", 2);
 
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 //					1.產出

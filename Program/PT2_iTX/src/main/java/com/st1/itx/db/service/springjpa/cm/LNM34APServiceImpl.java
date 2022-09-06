@@ -43,14 +43,10 @@ public class LNM34APServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM34AP 資料欄位清單A
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\" "
-				+ ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\" "
-				+ ", \"MaturityDate\", \"LineAmt\", \"DrawdownAmt\", \"AcctFee\", \"LoanBal\" "
-				+ ", \"IntAmt\", \"Fee\", \"Rate\", \"OvduDays\", \"OvduDate\" "
-				+ ", \"BadDebtDate\", \"BadDebtAmt\", \"DerCode\", \"GracePeriod\", \"ApproveRate\" "
-				+ ", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", \"IndustryCode\" "
-				+ ", \"ClTypeJCIC\", \"Zip3\" " + ", \"ProdNo\", \"CustKind\", \"AssetClass\" "
-				+ ", \"Ifrs9ProdCode\", \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\" " + " FROM  \"Ias34Ap\" "
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"FirstDrawdownDate\", \"DrawdownDate\", \"FacLineDate\" "
+				+ ", \"MaturityDate\", \"LineAmt\", \"DrawdownAmt\", \"AcctFee\", \"LoanBal\" " + ", \"IntAmt\", \"Fee\", \"Rate\", \"OvduDays\", \"OvduDate\" "
+				+ ", \"BadDebtDate\", \"BadDebtAmt\", \"DerCode\", \"GracePeriod\", \"ApproveRate\" " + ", \"AmortizedCode\", \"RateCode\", \"RepayFreq\", \"PayIntFreq\", \"IndustryCode\" "
+				+ ", \"ClTypeJCIC\", \"Zip3\" " + ", \"ProdNo\", \"CustKind\", \"AssetClass\" " + ", \"Ifrs9ProdCode\", \"EvaAmt\", \"FirstDueDate\", \"TotalPeriod\" " + " FROM  \"Ias34Ap\" "
 				+ " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);

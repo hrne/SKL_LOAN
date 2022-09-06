@@ -39,13 +39,13 @@ public class L9714p extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info("L9714p titaVo.getTxcd() = " + titaVo.getTxcd());
-		
+
 		int iAcDate = Integer.parseInt(titaVo.getEntDy());
-		
+
 		String parentTranCode = titaVo.getTxcd();
-		
+
 		String content = "";
-		
+
 		lL9714Report.setParentTranCode(parentTranCode);
 
 		boolean isFinish = lL9714Report.exec(titaVo);
@@ -54,13 +54,12 @@ public class L9714p extends TradeBuffer {
 		} else {
 			content = "L9714繳息證明單查無資料";
 		}
-		
+
 		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9714", 60) + iAcDate;
 
 		this.info("ntxbuf = " + ntxbuf);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-				content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, content, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

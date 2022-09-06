@@ -119,11 +119,11 @@ public class L4511 extends TradeBuffer {
 //						titaVo);
 ////				1.15日薪 2.非15日薪
 //
-				if (iOpItem == 1) {
-					deleEmpDeductMedia("4", MediaDate, titaVo);
-				} else {
-					deleEmpDeductMedia("5", MediaDate, titaVo);
-				}
+		if (iOpItem == 1) {
+			deleEmpDeductMedia("4", MediaDate, titaVo);
+		} else {
+			deleEmpDeductMedia("5", MediaDate, titaVo);
+		}
 //			}
 //		}
 
@@ -134,8 +134,7 @@ public class L4511 extends TradeBuffer {
 			type.add("4");
 			type.add("5");
 
-			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type,
-					this.index, this.limit, titaVo);
+			Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit, titaVo);
 			List<EmpDeductDtl> is15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 			is15EmpDeductDtl = sis15EmpDeductDtl == null ? null : sis15EmpDeductDtl.getContent();
 			this.info("Is15 Dtl Start...");
@@ -165,8 +164,7 @@ public class L4511 extends TradeBuffer {
 			type.add("8");
 			type.add("9");
 
-			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type,
-					this.index, this.limit, titaVo);
+			Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit, titaVo);
 
 			List<EmpDeductDtl> un15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 			un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
@@ -187,8 +185,7 @@ public class L4511 extends TradeBuffer {
 			sendMsg += "非15日薪媒體檔已完成，筆數：" + cntN + "。";
 		}
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4511",
-				sendMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4511", sendMsg, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -213,11 +210,9 @@ public class L4511 extends TradeBuffer {
 
 			fileName = centerCodeAcc + "_" + empNo + "_" + empName + "_" + entryDate + ".txt";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-產出員工扣薪媒體檔-15日薪", fileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-產出員工扣薪媒體檔-15日薪", fileName, 2);
 		} else if (flag == 2) {
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-產出員工扣薪媒體檔-非15日", "LNM617P.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-產出員工扣薪媒體檔-非15日", "LNM617P.txt", 2);
 		}
 
 		if (lEmpDeductMedia != null && lEmpDeductMedia.size() != 0) {
@@ -242,7 +237,7 @@ public class L4511 extends TradeBuffer {
 				}
 
 				OccursList occursList = new OccursList();
-				occursList.putParam("OccYearMonthA", setFormatMonth(parse.stringToInteger(titaVo.getCalDy())+19110000));
+				occursList.putParam("OccYearMonthA", setFormatMonth(parse.stringToInteger(titaVo.getCalDy()) + 19110000));
 				occursList.putParam("OccUnit", FormatUtil.padX(centerCodeAcc, 6));
 //				occursList.putParam("OccUnit", "10H400");
 				if (flag == 1) {
@@ -268,8 +263,7 @@ public class L4511 extends TradeBuffer {
 				occursList.putParam("OccRepayCode", tEmpDeductMedia.getPerfRepayCode());
 
 				occursList.putParam("OccUnknowC", FormatUtil.padX("", 11));
-				occursList.putParam("OccRepayAmt",
-						FormatUtil.padX("-" + FormatUtil.pad9("" + tEmpDeductMedia.getRepayAmt(), 9), 10));
+				occursList.putParam("OccRepayAmt", FormatUtil.padX("-" + FormatUtil.pad9("" + tEmpDeductMedia.getRepayAmt(), 9), 10));
 				occursList.putParam("OccUnknowD", FormatUtil.padX("", 40));
 				occursList.putParam("OccUnknowE", "Y");
 				occursList.putParam("OccEntryDate", tEmpDeductMedia.getEntryDate() + 19110000);
@@ -301,8 +295,7 @@ public class L4511 extends TradeBuffer {
 
 	private void deleEmpDeductMedia(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
 
-		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.mediaDateRng(iMediaDate, iMediaDate, MediaKind,
-				this.index, this.limit, titaVo);
+		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.mediaDateRng(iMediaDate, iMediaDate, MediaKind, this.index, this.limit, titaVo);
 
 		if (slEmpDeductMedia != null) {
 			for (EmpDeductMedia tEmpDeductMedia : slEmpDeductMedia.getContent()) {
@@ -318,8 +311,7 @@ public class L4511 extends TradeBuffer {
 	}
 
 //	[flag = 4:15日 ; 5:非15日]
-	private ArrayList<EmpDeductMedia> setEmpDeductMedia(List<EmpDeductDtl> lEmpDeductDtl, int flag, TitaVo titaVo)
-			throws LogicException {
+	private ArrayList<EmpDeductMedia> setEmpDeductMedia(List<EmpDeductDtl> lEmpDeductDtl, int flag, TitaVo titaVo) throws LogicException {
 
 		if (lEmpDeductDtl == null || lEmpDeductDtl.size() == 0) {
 			return null;
@@ -379,8 +371,7 @@ public class L4511 extends TradeBuffer {
 
 		Slice<EmpDeductMedia> delesEmpDeductMedia = null;
 
-		delesEmpDeductMedia = empDeductMediaService.mediaDateRng(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), "" + flag, this.index, this.limit, titaVo);
+		delesEmpDeductMedia = empDeductMediaService.mediaDateRng(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), "" + flag, this.index, this.limit, titaVo);
 
 		deleEmpDeductMedia = delesEmpDeductMedia == null ? null : delesEmpDeductMedia.getContent();
 

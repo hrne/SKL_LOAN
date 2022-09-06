@@ -258,10 +258,10 @@ public class L2038 extends TradeBuffer {
 				} else {
 					occurslist.putParam("OOFlag", " ");
 				}
-				
-				// 是否有他項權利資料，Y/N				
+
+				// 是否有他項權利資料，Y/N
 				occurslist.putParam("OOHasOtherRights", parse.stringToInteger(result.get("OtherRightsCount")) > 0 ? "Y" : "N");
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
 

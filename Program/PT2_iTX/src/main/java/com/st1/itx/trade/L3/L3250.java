@@ -182,8 +182,7 @@ public class L3250 extends TradeBuffer {
 		// 查詢放款交易內容檔
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 0, 990, 0, ltitaHCode,
-				iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 0, 990, 0, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
 		}
@@ -208,8 +207,7 @@ public class L3250 extends TradeBuffer {
 		Slice<InsuRenew> slInsuRenew = insuRenewService.findCustEq(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
-				if (tInsuRenew.getAcDate() > 0 && tInsuRenew.getTitaTxtNo().equals(iTxtNo)
-						&& tInsuRenew.getTotInsuPrem().equals(iTxAmt)) {
+				if (tInsuRenew.getAcDate() > 0 && tInsuRenew.getTitaTxtNo().equals(iTxtNo) && tInsuRenew.getTotInsuPrem().equals(iTxAmt)) {
 					switch (tInsuRenew.getStatusCode()) {
 					case 0:
 						ac.setReceivableFlag(3);

@@ -34,28 +34,27 @@ public class L5906ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// *** 折返控制相關 ***
 	private int size;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(int index, int limit,TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
 		this.info("lM016.findAll ");
 
 		// 戶號區間 Min
 		int custNoMin = Integer.parseInt(titaVo.getParam("CustNoS"));
-		
+
 		// 戶號區間 Max
 		int custNoMax = Integer.parseInt(titaVo.getParam("CustNoE"));
-		if(custNoMin==0 && custNoMax==0) {
-			custNoMax =9999999;
+		if (custNoMin == 0 && custNoMax == 0) {
+			custNoMax = 9999999;
 		}
-		
-		
+
 		this.index = index;
 		this.limit = limit;
-		
+
 		String sql = "SELECT GC.\"CustNo\" AS F0";
 		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F1";
 		sql += "            ,GC.\"FacmNo\" AS F2";
@@ -105,7 +104,7 @@ public class L5906ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-		
+
 		List<Object> result = query.getResultList();
 
 		size = result.size();
@@ -113,6 +112,7 @@ public class L5906ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(result);
 	}
+
 	public int getSize() {
 		return cnt;
 	}

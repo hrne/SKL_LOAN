@@ -43,8 +43,7 @@ public class L5080 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 50; // 150 * 50 = 7500
 
-		Slice<ConstructionCompany> sliceConstructionCompany = constructionCompanyService
-				.findAll(titaVo.getReturnIndex(), this.limit, titaVo);
+		Slice<ConstructionCompany> sliceConstructionCompany = constructionCompanyService.findAll(titaVo.getReturnIndex(), this.limit, titaVo);
 
 		if (sliceConstructionCompany != null && !sliceConstructionCompany.isEmpty()) {
 

@@ -82,8 +82,7 @@ public class ReportVo {
 	private String pageOrientation;
 	private boolean useDefault;
 
-	ReportVo(int rptDate, String brno, String rptCode, String rptItem, String security, String rptSize,
-			String pageOrientation, boolean useDefault) {
+	ReportVo(int rptDate, String brno, String rptCode, String rptItem, String security, String rptSize, String pageOrientation, boolean useDefault) {
 		this.rptDate = rptDate;
 		this.brno = brno;
 		this.rptCode = rptCode;
@@ -103,10 +102,8 @@ public class ReportVo {
 			return false;
 		}
 		ReportVo other = (ReportVo) obj;
-		return Objects.equals(brno, other.brno) && Objects.equals(pageOrientation, other.pageOrientation)
-				&& Objects.equals(rptCode, other.rptCode) && rptDate == other.rptDate
-				&& Objects.equals(rptItem, other.rptItem) && Objects.equals(rptSize, other.rptSize)
-				&& Objects.equals(security, other.security) && useDefault == other.useDefault;
+		return Objects.equals(brno, other.brno) && Objects.equals(pageOrientation, other.pageOrientation) && Objects.equals(rptCode, other.rptCode) && rptDate == other.rptDate
+				&& Objects.equals(rptItem, other.rptItem) && Objects.equals(rptSize, other.rptSize) && Objects.equals(security, other.security) && useDefault == other.useDefault;
 	}
 
 	/**
@@ -229,8 +226,7 @@ public class ReportVo {
 
 	@Override
 	public String toString() {
-		return "ReportVo [rptDate=" + rptDate + ", brno=" + brno + ", rptCode=" + rptCode + ", rptItem=" + rptItem
-				+ ", security=" + security + ", rptSize=" + rptSize + ", pageOrientation=" + pageOrientation
-				+ ", useDefault=" + useDefault + "]";
+		return "ReportVo [rptDate=" + rptDate + ", brno=" + brno + ", rptCode=" + rptCode + ", rptItem=" + rptItem + ", security=" + security + ", rptSize=" + rptSize + ", pageOrientation="
+				+ pageOrientation + ", useDefault=" + useDefault + "]";
 	}
 }

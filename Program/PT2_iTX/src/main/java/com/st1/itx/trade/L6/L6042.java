@@ -67,9 +67,9 @@ public class L6042 extends TradeBuffer {
 				occursList.putParam("OTranNo", tTxTranCode.getTranNo());
 				occursList.putParam("OTranItem", tTxTranCode.getTranItem());
 				occursList.putParam("ODesc", tTxTranCode.getDesc());
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxTranCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxTranCode.getLastUpdate()));
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxTranCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tTxTranCode.getLastUpdate()));
 				occursList.putParam("OOLastEmp", tTxTranCode.getLastUpdateEmpNo() + " " + empName(titaVo, tTxTranCode.getLastUpdateEmpNo()));
-				
+
 				// 新增：歷程查詢按鈕，如果查無資料就不顯示按鈕
 				Slice<TxDataLog> slTxDataLog = null;
 				try {
@@ -79,12 +79,11 @@ public class L6042 extends TradeBuffer {
 					throw new LogicException("E0013", "txDataLogService");
 				}
 				List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
-				if(lTxDataLog == null || lTxDataLog.isEmpty())
+				if (lTxDataLog == null || lTxDataLog.isEmpty())
 					occursList.putParam("OOHasL6933", "N");
 				else
 					occursList.putParam("OOHasL6933", "Y");
-					
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -99,6 +98,7 @@ public class L6042 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

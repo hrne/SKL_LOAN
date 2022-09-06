@@ -85,7 +85,7 @@ public class L6075 extends TradeBuffer {
 			occursList.putParam("OOAreaItem", tCdArea.getAreaItem());
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdArea.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdArea.getLastUpdate())); // 最後修改日期
 			occursList.putParam("OOLastEmp", tCdArea.getLastUpdateEmpNo() + " " + empName(titaVo, tCdArea.getLastUpdateEmpNo())); // 最後修改人員
-			
+
 			// 查詢地區別代碼檔
 			CdCity tCdCity = new CdCity();
 			tCdCity = sCdCityService.findById(tCdArea.getCityCode(), titaVo);

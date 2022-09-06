@@ -143,11 +143,9 @@ public class L2076ReportB extends MakeReport {
 		this.print(-20, 87, "" + wkMm); // 月
 		this.print(-23, 87, "" + wkDd); // 日
 		if (tFacClose.getFacmNo() > 0) {
-			this.print(-31, 42,
-					StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + tFacClose.getFacmNo()); // 戶號額度
+			this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + tFacClose.getFacmNo()); // 戶號額度
 		} else {
-			Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(), 0,
-					999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
 			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			String facms = "";
 			String x = "";
@@ -194,7 +192,7 @@ public class L2076ReportB extends MakeReport {
 					this.print(-40, 42, amtChinese + " 元整"); // 設定金額
 					break;
 				}
-			}else {
+			} else {
 				this.print(-39, 42, amtChinese + " 元整"); // 設定金額
 			}
 		}

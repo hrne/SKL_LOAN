@@ -47,8 +47,7 @@ public class L9736Report extends MakeReport {
 		List<Map<String, String>> resultList = l9736ServiceImpl.getNormalCustomerLoanData(inputDrawdownDate, titaVo);
 
 		// open excel
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName,
-				"L9736_底稿_正常戶餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName, "L9736_底稿_正常戶餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
 
 		int row = 2;
 

@@ -81,21 +81,14 @@ public class BankRelationCom extends TradeBuffer {
 	public BankRelationVo getBankRelation(String iCustId, String iCustName, TitaVo titaVo) throws LogicException {
 		logger.info("getBankRelation  ... ");
 		BankRelationVo vo = new BankRelationVo();
-		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0,
-				Integer.MAX_VALUE, titaVo);
-		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null
-				: slBankRelationCompany.getContent();
-		Slice<BankRelationSelf> slBankRelationSelf = bankRelationSelfService.findCustIdEq(iCustId, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null : slBankRelationCompany.getContent();
+		Slice<BankRelationSelf> slBankRelationSelf = bankRelationSelfService.findCustIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 		List<BankRelationSelf> lBankRelationSelf = slBankRelationSelf == null ? null : slBankRelationSelf.getContent();
-		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0,
-				Integer.MAX_VALUE, titaVo);
-		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null
-				: slBankRelationFamily.getContent();
-		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0,
-				Integer.MAX_VALUE, titaVo);
-		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null
-				: slBankRelationSuspected.getContent();
+		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null : slBankRelationFamily.getContent();
+		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0, Integer.MAX_VALUE, titaVo);
+		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null : slBankRelationSuspected.getContent();
 		if (lBankRelationCompany != null) {
 			for (BankRelationCompany t : lBankRelationCompany) {
 				if ("".equals(vo.getDataDate())) {
@@ -237,7 +230,7 @@ public class BankRelationCom extends TradeBuffer {
 			}
 		}
 
-		//無資料時放系統日
+		// 無資料時放系統日
 		if (vo.getDataDate().trim().isEmpty()) {
 			vo.setDataDate(titaVo.getCalDy());
 		} else {

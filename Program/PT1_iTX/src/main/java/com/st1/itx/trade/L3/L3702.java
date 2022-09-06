@@ -136,8 +136,7 @@ public class L3702 extends TradeBuffer {
 			tLoanCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
 			// 非建檔者修改須刷主管卡
-			if (!tLoanCustRmk.getCreateEmpNo().equals(tLoanCustRmk.getLastUpdateEmpNo())
-					&& titaVo.getEmpNos().trim().isEmpty()) {
+			if (!tLoanCustRmk.getCreateEmpNo().equals(tLoanCustRmk.getLastUpdateEmpNo()) && titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
 			}
 

@@ -29,7 +29,7 @@ public class L9736 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		MySpring.newTask(txcd + "p", this.txBuffer, titaVo);
-	
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

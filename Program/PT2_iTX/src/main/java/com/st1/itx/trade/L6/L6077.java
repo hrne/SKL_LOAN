@@ -96,9 +96,9 @@ public class L6077 extends TradeBuffer {
 			BigDecimal wkExpend = new BigDecimal(0);
 			wkExpend = wkExpend.add(tCdCashFlow.getExtendAmt()).add(tCdCashFlow.getLoanAmt());
 			occursList.putParam("OOExpend", wkExpend);
-			
+
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdCashFlow.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdCashFlow.getLastUpdate())); // 最後修改日期
-			
+
 			occursList.putParam("OOLastEmp", tCdCashFlow.getLastUpdateEmpNo() + " " + empName(titaVo, tCdCashFlow.getLastUpdateEmpNo())); // 最後修改人員
 
 			/* 將每筆資料放入Tota的OcList */
@@ -114,7 +114,7 @@ public class L6077 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

@@ -78,8 +78,7 @@ public class L2613 extends TradeBuffer {
 		// new table
 		CustMain tCustMain = new CustMain();
 
-		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDateStart,
-				iOverdueDateEnd, this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDateStart, iOverdueDateEnd, this.index, this.limit);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		if (lForeclosureFee == null) {
 			// 法拍費用檔無資料

@@ -106,8 +106,7 @@ public class L3001 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0001", "額度主檔 案件編號 = " + iCaseNo); // 查詢資料不存在
 				}
 				tFacMain.getCustNo();
-				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit,
-						titaVo);
+				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit, titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			} else {
 				if (iFacmNo > 0) {
@@ -117,8 +116,7 @@ public class L3001 extends TradeBuffer {
 					wkFacmNoStart = 1;
 					wkFacmNoEnd = 999;
 				}
-				slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index,
-						this.limit, titaVo);
+				slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index, this.limit, titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			}
 			if (lFacMain == null || lFacMain.size() == 0) {
@@ -189,18 +187,16 @@ public class L3001 extends TradeBuffer {
 				wkFacmNoStart = 1;
 				wkFacmNoEnd = 999;
 			}
-			slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index,
-					this.limit, titaVo);
+			slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, this.index, this.limit, titaVo);
 			lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		}
 
 		if (lFacMain == null || lFacMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
 		}
-		
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index,
-				Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
-		
+
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index, Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
+
 		// 如有有找到資料
 		for (FacMain tFacMain : lFacMain) {
 			int deadline = 0;
@@ -236,43 +232,41 @@ public class L3001 extends TradeBuffer {
 			occursList.putParam("OOShareFacFg", wkFacShareFg); // 合併額度控管記號
 			occursList.putParam("OOClShareFg", wkClShareFg); // 擔保品配額記號
 			occursList.putParam("OOLastBormNo", tFacMain.getLastBormNo()); // 已撥款序號
-			
+
 			// 檢查是否有【交易】按鈕
 			// 邏輯同 L3005
-			
+
 			// acdate: 本月第一天
 			int acDate = (titaVo.getEntDyI() + 19110000) / 100 * 100 + 1;
-			
-			Slice<LoanBorTx> slLoanBorTx = sLoanBorTxService.borxAcDateRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0,
-					999, acDate, 99991231, Arrays.asList("Y", "I", "A", "F"), this.index, 1, titaVo);
+
+			Slice<LoanBorTx> slLoanBorTx = sLoanBorTxService.borxAcDateRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, acDate, 99991231, Arrays.asList("Y", "I", "A", "F"),
+					this.index, 1, titaVo);
 			List<LoanBorTx> lLoanBorTx = slLoanBorTx != null ? slLoanBorTx.getContent() : null;
-			
+
 			occursList.putParam("OOHasL3005", lLoanBorTx != null && !lLoanBorTx.isEmpty() ? "Y" : "N");
-			
+
 			// 檢查是否有【繳息】按鈕
 			// 邏輯同 L3911
-			
-			slLoanBorTx = sLoanBorTxService.borxIntEndDateDescRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(),
-					0, 999, 19110101, titaVo.getEntDyI() + 19110000, Arrays.asList("Y", "I", "F"),
+
+			slLoanBorTx = sLoanBorTxService.borxIntEndDateDescRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 19110101, titaVo.getEntDyI() + 19110000, Arrays.asList("Y", "I", "F"),
 					this.index, this.limit, titaVo);
-			
+
 			lLoanBorTx = slLoanBorTx != null ? slLoanBorTx.getContent() : null;
-			
+
 			occursList.putParam("OOHasL3911", lLoanBorTx != null && !lLoanBorTx.isEmpty() ? "Y" : "N");
-			
+
 			// 檢查是否有【利率】按鈕
 			// 邏輯同 L3932
-			
-			Slice<LoanRateChange> slLoanRateChange = sLoanRateChangeService.rateChangeFacmNoRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 0, 99991231, this.index,
-					1, titaVo);
-			
+
+			Slice<LoanRateChange> slLoanRateChange = sLoanRateChangeService.rateChangeFacmNoRange(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 999, 0, 99991231, this.index, 1, titaVo);
+
 			List<LoanRateChange> lLoanRateChange = slLoanRateChange != null ? slLoanRateChange.getContent() : null;
-			
+
 			occursList.putParam("OOHasL3932", lLoanRateChange != null && !lLoanRateChange.isEmpty() ? "Y" : "N");
-			
-			BigDecimal tavAmt = BigDecimal.ZERO; 
-			BigDecimal tamAmt = BigDecimal.ZERO; 
-			if (slAcReceivable !=null) {
+
+			BigDecimal tavAmt = BigDecimal.ZERO;
+			BigDecimal tamAmt = BigDecimal.ZERO;
+			if (slAcReceivable != null) {
 				for (AcReceivable rv : slAcReceivable.getContent()) {
 					if ("TAV".equals(rv.getAcctCode()) && rv.getFacmNo() == tFacMain.getFacmNo()) {
 						tavAmt = tavAmt.add(rv.getRvBal());
@@ -282,10 +276,10 @@ public class L3001 extends TradeBuffer {
 					}
 				}
 			}
-			
+
 			occursList.putParam("OOTavAmt", tavAmt); // 暫收可抵繳
-			occursList.putParam("OOTamAmt", tamAmt);  // 暫收款AML戶
-		
+			occursList.putParam("OOTamAmt", tamAmt); // 暫收款AML戶
+
 			this.totaVo.addOccursList(occursList);
 		}
 

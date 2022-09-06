@@ -57,7 +57,7 @@ public class L6R38 extends TradeBuffer {
 					totaVo.putParam("L6R38ProdNoXA" + r, iFacProd.getProdName());
 				}
 				totaVo.putParam("L6R38WorkMonthSA" + r, Math.max(aaCdPfParms.getWorkMonthStart() - 191100, 0)); // 工作月欄位接受輸入0, 避免-191100的情況,
-				totaVo.putParam("L6R38WorkMonthEA" + r, Math.max(aaCdPfParms.getWorkMonthEnd() - 191100, 0));   // 用 Math.max(wm, 0) 做斜坡修正
+				totaVo.putParam("L6R38WorkMonthEA" + r, Math.max(aaCdPfParms.getWorkMonthEnd() - 191100, 0)); // 用 Math.max(wm, 0) 做斜坡修正
 				r++;
 			}
 		}

@@ -74,7 +74,7 @@ public class L1R04 extends TradeBuffer {
 							applyDt = applyDt2;
 						}
 					}
-					
+
 					i++;
 					this.totaVo.putParam("L1r04FormNo" + i, dVo.get("FormNo"));
 					this.totaVo.putParam("L1r04FormName" + i, dVo.get("FormName"));

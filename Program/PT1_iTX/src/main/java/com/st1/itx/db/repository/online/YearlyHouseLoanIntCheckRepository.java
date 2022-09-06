@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.YearlyHouseLoanIntCheckId;
  */
 public interface YearlyHouseLoanIntCheckRepository extends JpaRepository<YearlyHouseLoanIntCheck, YearlyHouseLoanIntCheckId> {
 
-  // YearMonth=
-  public Slice<YearlyHouseLoanIntCheck> findAllByYearMonthIsOrderByYearMonthAscCustNoAscFacmNoAsc(int yearMonth_0, Pageable pageable);
+	// YearMonth=
+	public Slice<YearlyHouseLoanIntCheck> findAllByYearMonthIsOrderByYearMonthAscCustNoAscFacmNoAsc(int yearMonth_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<YearlyHouseLoanIntCheck> findByYearlyHouseLoanIntCheckId(YearlyHouseLoanIntCheckId yearlyHouseLoanIntCheckId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<YearlyHouseLoanIntCheck> findByYearlyHouseLoanIntCheckId(YearlyHouseLoanIntCheckId yearlyHouseLoanIntCheckId);
 
 }
-

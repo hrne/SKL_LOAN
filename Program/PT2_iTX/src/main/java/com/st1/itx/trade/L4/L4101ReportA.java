@@ -146,24 +146,23 @@ public class L4101ReportA extends MakeReport {
 			}
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-A";
-		reportItem = reportItem ;
+		reportItem = reportItem;
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		this.info("L4101ReportA BatchNo = " + batchNo);
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
-				batchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
 		this.info("slAcDetail.getContent() = " + slAcDetail.getContent());
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
+			this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
+		this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
 		tempList = procReportA(lAcDetail, titaVo);
@@ -224,10 +223,8 @@ public class L4101ReportA extends MakeReport {
 //					cnt++;
 //				}
 
-				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11)
-						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
-				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2)
-						+ parse.IntegerToString(tAcDetail.getSlipNo(), 6);
+				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
+				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2) + parse.IntegerToString(tAcDetail.getSlipNo(), 6);
 
 				if (dbAmt.containsKey(acNo) && "D".equals(tAcDetail.getDbCr())) {
 					dbAmt.put(acNo, dbAmt.get(acNo).add(tAcDetail.getTxAmt()));
@@ -282,10 +279,8 @@ public class L4101ReportA extends MakeReport {
 //								.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)));
 //					}
 //					借方金額在前排序
-					if ((dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2))
-							.compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1)) != 0) {
-						result = (dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2))
-								.compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1));
+					if ((dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)).compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1)) != 0) {
+						result = (dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)).compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1));
 					}
 					return result;
 				});

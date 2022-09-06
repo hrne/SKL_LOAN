@@ -27,7 +27,6 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("l9719.findAll ");
 

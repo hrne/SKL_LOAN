@@ -19,8 +19,7 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.common.SendRsp;
 
 /**
- * Tita FuncCode=9,1 BusinessType=X,2 
- * JcicEmpName=x,8 JcicEmpTel=x,16  END=X,1
+ * Tita FuncCode=9,1 BusinessType=X,2 JcicEmpName=x,8 JcicEmpTel=x,16 END=X,1
  */
 
 @Service("L8501")

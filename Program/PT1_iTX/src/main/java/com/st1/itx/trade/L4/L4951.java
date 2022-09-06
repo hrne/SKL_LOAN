@@ -80,7 +80,7 @@ public class L4951 extends TradeBuffer {
 			type.add("6");
 			type.add("7");
 			type.add("8");
-			type.add("9");			
+			type.add("9");
 			sEmpDeductDtl = empDeductDtlService.entryDateRng(entryDate, entryDate, type, this.index, this.limit);
 		}
 

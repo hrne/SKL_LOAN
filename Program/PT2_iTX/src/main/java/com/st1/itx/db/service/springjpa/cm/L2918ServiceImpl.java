@@ -38,7 +38,6 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int limit;
 
-
 	// *** 折返控制相關 ***
 	private int cnt;
 
@@ -144,7 +143,7 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		
+
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -186,7 +185,6 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
 		List<Object> result = query.getResultList();
-
 
 		return this.convertToMap(query);
 	}

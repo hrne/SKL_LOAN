@@ -56,7 +56,7 @@ public class LM051Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @throws LogicException 
+	 * @throws LogicException
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
@@ -72,9 +72,8 @@ public class LM051Report extends MakeReport {
 		this.info("yymm=" + yearMonth + ",lyymm=" + lastYM);
 		this.info("LM052Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管",
-				"LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "備呆總表");
-		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管", "LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "備呆總表");
+
 		String formTitle = "";
 
 		formTitle = ((yearMonth / 100) - 1911) + "年 " + String.format("%02d", yearMonth % 100) + "月底   放款資產品質分類";
@@ -167,18 +166,14 @@ public class LM051Report extends MakeReport {
 
 		if (lastMonthlyLM052Loss != null && last2MonthlyLM052Loss != null) {
 			// 前兩個月的備抵損失 減去 上個月的備抵損失 = 本月預期損失金額
-			approvedLossDiff = formatAmt(
-					(last2MonthlyLM052Loss.getApprovedLoss().subtract(lastMonthlyLM052Loss.getApprovedLoss()))
-							.toString(),
-					2, 6);
+			approvedLossDiff = formatAmt((last2MonthlyLM052Loss.getApprovedLoss().subtract(lastMonthlyLM052Loss.getApprovedLoss())).toString(), 2, 6);
 		}
 
 		makeExcel.setFontType(1);
-		makeExcel.setValue(31, 2, "一、依放款資產評估辦法三項標準評估後，以五類資產評估 (Ａ)金額 " + assetClass + " 百萬元為高。\n"
-				+ "二、依金管會104年07月24日金管保財字第10402506096號令備抵損失提存比率為放款餘額\n" + "1.5%評估金額為 " + legalLoss + " 百萬元。\n"
-				+ "三、IFRS 9預期損失金額依據放款各相關權責單位：PD違約機率（放款審查課）、LGD違約損失率\n"
-				+ " （放款管理課）、EAD曝險額（放款服務課）提供相關數據，並由放款服務課 於預期損失計算系\n" + "統完成核帳。本月預期損失金額為 " + approvedLossDiff + " 百萬元。\n"
-				+ "四、公司備抵損失至108 年03月實際提列 " + approvedLoss + " 百萬元，較最高『IFRS9預期\n" + " 損失金額』相比，提列金額尚足。\n" + "五、陳核。");
+		makeExcel.setValue(31, 2,
+				"一、依放款資產評估辦法三項標準評估後，以五類資產評估 (Ａ)金額 " + assetClass + " 百萬元為高。\n" + "二、依金管會104年07月24日金管保財字第10402506096號令備抵損失提存比率為放款餘額\n" + "1.5%評估金額為 " + legalLoss + " 百萬元。\n"
+						+ "三、IFRS 9預期損失金額依據放款各相關權責單位：PD違約機率（放款審查課）、LGD違約損失率\n" + " （放款管理課）、EAD曝險額（放款服務課）提供相關數據，並由放款服務課 於預期損失計算系\n" + "統完成核帳。本月預期損失金額為 " + approvedLossDiff + " 百萬元。\n"
+						+ "四、公司備抵損失至108 年03月實際提列 " + approvedLoss + " 百萬元，較最高『IFRS9預期\n" + " 損失金額』相比，提列金額尚足。\n" + "五、陳核。");
 
 	}
 
@@ -194,8 +189,7 @@ public class LM051Report extends MakeReport {
 	 * 
 	 * 
 	 */
-	private void exportExcel(List<Map<String, String>> LDList, int formNum, TitaVo titaVo, int yearMonth)
-			throws LogicException {
+	private void exportExcel(List<Map<String, String>> LDList, int formNum, TitaVo titaVo, int yearMonth) throws LogicException {
 
 		BigDecimal amt = BigDecimal.ZERO;
 
@@ -464,11 +458,9 @@ public class LM051Report extends MakeReport {
 			insMonthlyLM052Loss.setApprovedLoss(lossTotal);
 			insMonthlyLM052Loss.setAssetEvaTotal(assetClassTotal);
 			insMonthlyLM052Loss.setLegalLoss(lossTotal);
-			insMonthlyLM052Loss.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			insMonthlyLM052Loss.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			insMonthlyLM052Loss.setCreateEmpNo("999999");
-			insMonthlyLM052Loss.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			insMonthlyLM052Loss.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			insMonthlyLM052Loss.setLastUpdateEmpNo("999999");
 
 			try {
@@ -492,11 +484,9 @@ public class LM051Report extends MakeReport {
 			fMonthlyLM052Loss.setAssetEvaTotal(assetClassTotal);
 			fMonthlyLM052Loss.setLegalLoss(lossTotal);
 
-			fMonthlyLM052Loss.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			fMonthlyLM052Loss.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			fMonthlyLM052Loss.setCreateEmpNo("999999");
-			fMonthlyLM052Loss.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			fMonthlyLM052Loss.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			fMonthlyLM052Loss.setLastUpdateEmpNo("999999");
 
 			try {
@@ -541,8 +531,7 @@ public class LM051Report extends MakeReport {
 			// F1 額度：3
 			makeExcel.setValue(row, 3, Integer.valueOf(tLDVo.get("F1")), "C");
 			// F2 利變；4
-			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"),
-					"C");
+			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"), "C");
 			// F3 戶名；5
 			makeExcel.setValue(row, 5, tLDVo.get("F3"), "L");
 			// F4 本金餘額；6
@@ -560,13 +549,9 @@ public class LM051Report extends MakeReport {
 
 			makeExcel.setValue(row, 8, ovduText, "C");
 			// F7 地區別；9
-			makeExcel.setValue(row, 9,
-					tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")),
-					"C");
+			makeExcel.setValue(row, 9, tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")), "C");
 			// F8 繳息日期；10
-			makeExcel.setValue(row, 10,
-					tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")),
-					"C");
+			makeExcel.setValue(row, 10, tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")), "C");
 			// F9分類項目:11
 			makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
 			// F4 五類金額(用F16區分F4)=；12~17
@@ -592,8 +577,7 @@ public class LM051Report extends MakeReport {
 
 			// F17 無擔保金額
 			// 本身資產分類不是5 且 金額不等於0 時，放入值
-			BigDecimal class5 = tLDVo.get("F15").isEmpty() || tLDVo.get("F15") == null ? BigDecimal.ZERO
-					: new BigDecimal(tLDVo.get("F15"));
+			BigDecimal class5 = tLDVo.get("F15").isEmpty() || tLDVo.get("F15") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F15"));
 			if (tLDVo.get("F16") != "5" && !BigDecimal.ZERO.equals(class5)) {
 				makeExcel.setValue(row, 17, class5, "#,##0");
 
@@ -644,5 +628,5 @@ public class LM051Report extends MakeReport {
 			makeExcel.setValue(row, col, Float.valueOf(prinBalance), "#,##0");
 		}
 	}
-	
+
 }

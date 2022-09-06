@@ -170,8 +170,7 @@ public class L2073 extends TradeBuffer {
 			searchTXCDs.add("L2703");
 			searchTXCDs.add("L2073");
 
-			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:" + tCustMain.getCustUKey(), searchTXCDs,
-					titaVo);
+			TxDataLog txDataLog = sTxDataLogService.findByMrKeyFirst("CustUKey:" + tCustMain.getCustUKey(), searchTXCDs, titaVo);
 
 			Boolean hasLog = txDataLog != null;
 

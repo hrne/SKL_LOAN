@@ -52,8 +52,7 @@ public class L4R10 extends TradeBuffer {
 			Slice<BatxHead> slBatxHead = batxHeadService.acDateRange(iAcDate, iAcDate, 0, Integer.MAX_VALUE);
 			for (BatxHead t2BatxHead : slBatxHead.getContent()) {
 				if (txCode.equals(t2BatxHead.getTitaTxCd())) {
-					if (!"8".equals(t2BatxHead.getBatxExeCode())
-							&& t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
+					if (!"8".equals(t2BatxHead.getBatxExeCode()) && t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
 						batchNo = t2BatxHead.getBatchNo();
 					}
 				}
@@ -66,8 +65,7 @@ public class L4R10 extends TradeBuffer {
 			if (tBatxHead == null)
 				batchNo = "BATX01";
 			else
-				batchNo = "BATX"
-						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+				batchNo = "BATX" + parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
 		}
 
 		this.totaVo.putParam("L4r10BatchNo", batchNo);

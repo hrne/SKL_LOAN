@@ -127,8 +127,7 @@ public class L2915 extends TradeBuffer {
 		}
 		// 該擔保品編號存在擔保品不動產建物檔
 
-		this.totaVo.putParam("BdLocation",
-				tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
+		this.totaVo.putParam("BdLocation", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
 		this.totaVo.putParam("BdMainUseCode", tClBuilding.getBdMainUseCode());
 		this.totaVo.putParam("BdMtrlCode", tClBuilding.getBdMtrlCode());
 		this.totaVo.putParam("BdTypeCode", tClBuilding.getBdTypeCode());
@@ -153,10 +152,8 @@ public class L2915 extends TradeBuffer {
 		this.totaVo.putParam("ClStatus", tClMain.getClStatus());
 
 		// TITA擔保品編號取建物公設建號檔資料list
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingPublic = slClBuildingPublic == null ? null
-				: new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingPublic = slClBuildingPublic == null ? null : new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
 		// 資料筆數
 		if (lClBuildingPublic == null) {
 			lClBuildingPublic = new ArrayList<ClBuildingPublic>();
@@ -195,10 +192,8 @@ public class L2915 extends TradeBuffer {
 		}
 
 		// TITA擔保品編號取建物所有權人檔資料list
-		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingOwner = slClBuildingOwner == null ? null
-				: new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
 		if (lClBuildingOwner == null) {
 			lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 			// 資料筆數
@@ -274,8 +269,7 @@ public class L2915 extends TradeBuffer {
 		this.totaVo.putParam("CreateDate1", createDate);
 
 		// 車位
-		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		List<ClParking> lClParking = slClParking == null ? null : new ArrayList<ClParking>(slClParking.getContent());
 
 		int j = 1;

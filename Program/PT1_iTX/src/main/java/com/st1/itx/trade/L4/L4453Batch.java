@@ -136,7 +136,7 @@ public class L4453Batch extends TradeBuffer {
 
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
-		
+
 //		條件 : 入帳日 or 銀行代號
 		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 		if (iRepayBank == 999) {
@@ -235,7 +235,7 @@ public class L4453Batch extends TradeBuffer {
 //				轉全形
 				String sInsuAmt = toFullWidth("" + insuFee.get(tmp));
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuMonth.get(tmp)), 5).substring(3, 5);
-				
+
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());

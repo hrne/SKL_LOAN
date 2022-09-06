@@ -89,7 +89,6 @@ public class L3007 extends TradeBuffer {
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
 
-
 		if (iChequeDateStart > 0) {
 			wkChequeDateStart = iChequeDateStart + 19110000;
 		}
@@ -118,8 +117,7 @@ public class L3007 extends TradeBuffer {
 		this.limit = 100; // 113 * 500 = 56500
 
 		// 查詢放款主檔
-		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt,
-				wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
+		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt, wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
 
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();
 		if (lLoanCheque == null || lLoanCheque.size() == 0) {
@@ -159,15 +157,15 @@ public class L3007 extends TradeBuffer {
 		String branchCode = FormatUtil.right(wkBankCode, 4);
 		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
 		if (tCdBank == null) {
-			CdBankOld tCdBankOld = cdBankOldService.findById(new CdBankOldId(bankCode, branchCode), titaVo);//找已裁撤銀行
-			if(tCdBankOld == null) {
+			CdBankOld tCdBankOld = cdBankOldService.findById(new CdBankOldId(bankCode, branchCode), titaVo);// 找已裁撤銀行
+			if (tCdBankOld == null) {
 				occursList.putParam("OOChequeBank", "");
 				occursList.putParam("OOChequeBranch", "");
 			} else {
 				occursList.putParam("OOChequeBank", tCdBankOld.getBankItem());
 				occursList.putParam("OOChequeBranch", tCdBankOld.getBranchItem());
 			}
-			
+
 		} else {
 			occursList.putParam("OOChequeBank", tCdBank.getBankItem());
 			occursList.putParam("OOChequeBranch", tCdBank.getBranchItem());

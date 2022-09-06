@@ -85,8 +85,7 @@ public class L3130 extends TradeBuffer {
 			wkBormNoE = iBormNo;
 		}
 		// 入帳日或會計日小於等於約定部分償還日期，同日僅能一筆
-		LoanBook lastLoanBook = loanBookService.facmNoLastBookDateFirst(iCustNo, iFacmNo, iFacmNo, wkBormNoS, wkBormNoE,
-				titaVo);
+		LoanBook lastLoanBook = loanBookService.facmNoLastBookDateFirst(iCustNo, iFacmNo, iFacmNo, wkBormNoS, wkBormNoE, titaVo);
 
 		if (lastLoanBook != null && iBookDate <= lastLoanBook.getBookDate()) {
 			existence = true;

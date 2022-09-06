@@ -79,7 +79,7 @@ public class L4721Report extends MakeReport {
 
 		print(-4, 1, "客戶名稱：" + headerCustName, "L");
 		if (first) {
-			print(-4, 57, "戶　　號：" + headerCustNo , "L");
+			print(-4, 57, "戶　　號：" + headerCustNo, "L");
 		} else {
 			print(-4, 57, "戶　　號：" + headerCustNo + "-" + headerFacmNo, "L");
 		}
@@ -174,8 +174,7 @@ public class L4721Report extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -199,12 +198,12 @@ public class L4721Report extends MakeReport {
 			if (custNo == tBatxRateChange.getCustNo()) {
 				continue;
 			}
-			
+
 			// 不同戶號額度相同跳過(也可能換戶號時額度相同)
-			if( custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
+			if (custNo == tBatxRateChange.getCustNo() && facmNo == tBatxRateChange.getFacmNo()) {
 				continue;
 			}
-			
+
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
 
@@ -230,8 +229,7 @@ public class L4721Report extends MakeReport {
 			// 印出有 暫收款額度000的資料 下方帶出利率變動額度
 
 			Boolean HeadFlag = false;
-			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null
-					&& !listL4721Head.isEmpty()) {
+			if (listL4721Temp != null && !listL4721Temp.isEmpty() && listL4721Head != null && !listL4721Head.isEmpty()) {
 
 				HeadFlag = true;
 				first = true;
@@ -240,9 +238,7 @@ public class L4721Report extends MakeReport {
 				Map<String, String> mapL4721Temp = listL4721Temp.get(0);
 
 				// 先更新表頭資料
-				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
-						parse.stringToInteger(mapL4721Head.get("FacmNo")),
-						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
+				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")), parse.stringToInteger(mapL4721Head.get("FacmNo")), parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 
 				if (!Firstfg) { // 第一筆戶號不先換頁
 					Firstfg = true;
@@ -284,13 +280,10 @@ public class L4721Report extends MakeReport {
 
 				first = false;
 				// 先更新表頭資料
-				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")),
-						parse.stringToInteger(mapL4721Head.get("FacmNo")),
-						parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
+				setHead(mapL4721Head, parse.stringToInteger(mapL4721Head.get("CustNo")), parse.stringToInteger(mapL4721Head.get("FacmNo")), parse.stringToInteger(mapL4721Head.get("TxEffectDate")));
 				this.newPage();
 			}
-			
-			
+
 			first = false;
 			List<Map<String, String>> listL4721Detail = new ArrayList<Map<String, String>>();
 
@@ -318,10 +311,8 @@ public class L4721Report extends MakeReport {
 				int tempfacmno = parse.stringToInteger(listL4721Detail.get(0).get("FacmNo"));
 				int tempcustno = parse.stringToInteger(listL4721Detail.get(0).get("CustNo"));
 
-				
 				// 先更新表頭資料
-				setHead(listL4721Detail.get(0), tempcustno, tempfacmno,
-						parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")));
+				setHead(listL4721Detail.get(0), tempcustno, tempfacmno, parse.stringToInteger(listL4721Detail.get(0).get("TxEffectDate")));
 
 				if (!HeadFlag) { // 下一筆資料沒有第一張時的換頁
 					this.newPage();
@@ -357,8 +348,7 @@ public class L4721Report extends MakeReport {
 								print(0, 55, newRate, "R");
 							}
 
-							setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")),
-									parse.stringToInteger(mapL4721Detail.get("FacmNo")),
+							setHead(mapL4721Detail, parse.stringToInteger(mapL4721Detail.get("CustNo")), parse.stringToInteger(mapL4721Detail.get("FacmNo")),
 									parse.stringToInteger(mapL4721Detail.get("TxEffectDate")));
 
 							this.newPage();
@@ -375,8 +365,7 @@ public class L4721Report extends MakeReport {
 						if (sameFlg) { // 所有額度都同一天 印同一張
 							for (Integer key : sameMap.keySet()) {
 								this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
-								writeLastdetail(key, sameMap.get(key).getTxEffectDate(),
-										sameMap.get(key).getPresentRate(), sameMap.get(key).getAdjustedRate());
+								writeLastdetail(key, sameMap.get(key).getTxEffectDate(), sameMap.get(key).getPresentRate(), sameMap.get(key).getAdjustedRate());
 							} // for
 						} else {
 							this.print(1, 1, "額度　　　利率自　　　　　　　起，　由　　　　調整為　　　　。");
@@ -388,10 +377,8 @@ public class L4721Report extends MakeReport {
 						break;
 					}
 
-					tmpFacm tmp = new tmpFacm(parse.stringToInteger(mapL4721Detail.get("FacmNo")),
-							parse.stringToInteger(mapL4721Detail.get("TxEffectDate")),
-							new BigDecimal(mapL4721Detail.get("PresentRate")),
-							new BigDecimal(mapL4721Detail.get("AdjustedRate")));
+					tmpFacm tmp = new tmpFacm(parse.stringToInteger(mapL4721Detail.get("FacmNo")), parse.stringToInteger(mapL4721Detail.get("TxEffectDate")),
+							new BigDecimal(mapL4721Detail.get("PresentRate")), new BigDecimal(mapL4721Detail.get("AdjustedRate")));
 
 					if (!sameMap.containsKey(parse.stringToInteger(mapL4721Detail.get("FacmNo")))) {
 						sameMap.put(parse.stringToInteger(mapL4721Detail.get("FacmNo")), tmp);
@@ -409,8 +396,7 @@ public class L4721Report extends MakeReport {
 		this.toPdf(sno);
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
-			throws NumberFormatException, LogicException {
+	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate) throws NumberFormatException, LogicException {
 		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
 		headerCustName = headerBankStatement.get("CustName");
 		headerCustNo = String.format("%07d", Integer.valueOf(headerBankStatement.get("CustNo")));
@@ -451,8 +437,7 @@ public class L4721Report extends MakeReport {
 
 		@Override
 		public String toString() {
-			return "tmpFacm [facmNo=" + facmNo + ", TxEffectDate=" + txeffectdate + ", PresentRate=" + presentrate
-					+ ", AdjustedRate=" + adjustedrate + "]";
+			return "tmpFacm [facmNo=" + facmNo + ", TxEffectDate=" + txeffectdate + ", PresentRate=" + presentrate + ", AdjustedRate=" + adjustedrate + "]";
 		}
 
 		@Override

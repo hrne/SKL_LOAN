@@ -52,8 +52,7 @@ public class L2633Batch extends TradeBuffer {
 		}
 
 		String checkMsg = "清償日報表產檔已完成。";
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo() + "L2633", checkMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L2633", checkMsg, titaVo);
 
 		return this.sendList();
 	}

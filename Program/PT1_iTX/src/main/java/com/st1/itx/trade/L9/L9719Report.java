@@ -164,8 +164,7 @@ public class L9719Report extends MakeReport {
 				F13 = formatAmt(tLDVo.get("F13"), 0);
 			}
 
-		} else
-		{
+		} else {
 			print(-2, 4, "本月無資料!!");
 		}
 

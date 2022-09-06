@@ -106,8 +106,7 @@ public class AcCollListCom extends TradeBuffer {
 	}
 
 	private void updByLoanBorMain(int bizTbsdy, CollList tCollList, TitaVo titaVo) throws LogicException {
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(tCollList.getCustNo(), tCollList.getFacmNo(),
-				tCollList.getFacmNo(), 1, 900, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(tCollList.getCustNo(), tCollList.getFacmNo(), tCollList.getFacmNo(), 1, 900, this.index, Integer.MAX_VALUE, titaVo);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain != null) {
 			// 戶況
@@ -150,9 +149,8 @@ public class AcCollListCom extends TradeBuffer {
 	private void updByLoanOverdue(int bizTbsdy, CollList tCollList, TitaVo titaVo) throws LogicException {
 		Integer statuss[] = { 1, 2, 3 }; // 1: 催收 2. 部分轉呆 3: 呆帳 4: 催收回復 5.催收收回
 		List<Integer> lStatus = Arrays.asList(statuss);
-		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(tCollList.getCustNo(),
-				tCollList.getFacmNo(), tCollList.getFacmNo(), 1, 999, 1, 999, lStatus, this.index, Integer.MAX_VALUE,
-				titaVo);
+		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(tCollList.getCustNo(), tCollList.getFacmNo(), tCollList.getFacmNo(), 1, 999, 1, 999, lStatus, this.index,
+				Integer.MAX_VALUE, titaVo);
 		List<LoanOverdue> lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
 		if (lLoanOverdue != null) {
 			for (LoanOverdue tLoanOverdue : lLoanOverdue) {

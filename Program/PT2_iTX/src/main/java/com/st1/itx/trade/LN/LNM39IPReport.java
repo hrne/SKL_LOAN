@@ -100,8 +100,7 @@ public class LNM39IPReport extends MakeReport {
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM39IP genFile : ");
 		boolean isNewForm = false; // 格式:false舊格式,true新格式
-		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;"
-				+ "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33";
+		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;" + "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33";
 
 		String txt1[] = txt.split(";");
 		DecimalFormat formatter = new DecimalFormat("0");
@@ -111,8 +110,7 @@ public class LNM39IPReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFIP", "LNM39IP 欄位清單９", "LNFIP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFIPIDX", "LNM39IP 欄位清單９控制檔", "LNFIP.IDX",
-					1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFIPIDX", "LNM39IP 欄位清單９控制檔", "LNFIP.IDX", 1); // UTF-8
 
 			// 標題列
 			// strContent = "";
@@ -175,8 +173,7 @@ public class LNM39IPReport extends MakeReport {
 							break; // 法拍及火險費用
 						case 10:
 							formatter.applyPattern("0.000000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 核准利率
 						case 11:
@@ -242,7 +239,7 @@ public class LNM39IPReport extends MakeReport {
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 合約期限
 						case 27:
-							//strField = makeFile.fillStringL(strField, 8, '0');
+							// strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 備忘分錄會計科目(舊:8碼/新:11碼) (直接搬值)
 						case 28:
 							strField = makeFile.fillStringL(strField, 1, '0');
@@ -255,8 +252,7 @@ public class LNM39IPReport extends MakeReport {
 							break; // 交易幣別
 						case 31:
 							formatter.applyPattern("00.00000000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 11, '0');
 							break; // 報導日匯率
 						case 32:
@@ -289,8 +285,7 @@ public class LNM39IPReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
-					+ String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39IP genFile close === ");

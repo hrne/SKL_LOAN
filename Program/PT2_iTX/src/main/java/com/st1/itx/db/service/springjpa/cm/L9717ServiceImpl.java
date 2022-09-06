@@ -122,109 +122,105 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ORDER BY \"FirstDrawdownYear\" ";
 
 			/*
-			 * 	sql += " WITH \"allData\" AS ( ";
-			sql += " SELECT \"FirstDrawdownYear\"-1911 || ' 年撥款件' \"FirstDrawdownYearShow\" ";
-			sql += "       ,SUM(\"1TermCount\") \"1TermCount\" ";
-			sql += "       ,SUM(\"1TermAmount\") \"1TermAmount\" ";
-			sql += "       ,SUM(\"2TermCount\") \"2TermCount\" ";
-			sql += "       ,SUM(\"2TermAmount\") \"2TermAmount\" ";
-			sql += "       ,SUM(\"3TermCount\") \"3TermCount\" ";
-			sql += "       ,SUM(\"3TermAmount\") \"3TermAmount\" ";
-			sql += "       ,SUM(\"4TermCount\") \"4TermCount\" ";
-			sql += "       ,SUM(\"4TermAmount\") \"4TermAmount\" ";
-			sql += "       ,SUM(\"5TermCount\") \"5TermCount\" ";
-			sql += "       ,SUM(\"5TermAmount\") \"5TermAmount\" ";
-			sql += "       ,SUM(\"6TermCount\") \"6TermCount\" ";
-			sql += "       ,SUM(\"6TermAmount\") \"6TermAmount\" ";
-			sql += "       ,SUM(\"TurnOvduCount\") \"TurnOvduCount\" ";
-			sql += "       ,SUM(\"TurnOvduAmount\") \"TurnOvduAmount\" ";
-			sql += "       ,SUM(\"TotalCount\") \"TotalCount\" ";
-			sql += "       ,SUM(\"TotalAmount\") \"TotalAmount\" ";
-			sql += " FROM ( SELECT LEVEL \"FirstDrawdownYear\" ";
-			sql += "              ,0 \"1TermCount\" ";
-			sql += "              ,0 \"1TermAmount\" ";
-			sql += "              ,0 \"2TermCount\" ";
-			sql += "              ,0 \"2TermAmount\" ";
-			sql += "              ,0 \"3TermCount\" ";
-			sql += "              ,0 \"3TermAmount\" ";
-			sql += "              ,0 \"4TermCount\" ";
-			sql += "              ,0 \"4TermAmount\" ";
-			sql += "              ,0 \"5TermCount\" ";
-			sql += "              ,0 \"5TermAmount\" ";
-			sql += "              ,0 \"6TermCount\" ";
-			sql += "              ,0 \"6TermAmount\" ";
-			sql += "              ,0 \"TurnOvduCount\" ";
-			sql += "              ,0 \"TurnOvduAmount\" ";
-			sql += "              ,0 \"TotalCount\" ";
-			sql += "              ,0 \"TotalAmount\" ";
-			sql += "        FROM DUAL ";
-			sql += "        WHERE LEVEL >= 1994 ";
-			sql += "        CONNECT BY LEVEL <= SUBSTR(\"Fn_GetLastMonth\"(:entYear), 1, 4) ";
-			sql += "  ";
-			sql += "        UNION ";
-			sql += "  ";
-			sql += "        SELECT TO_NUMBER(SUBSTR(FM.\"FirstDrawdownDate\", 1, 4)) \"FirstDrawdownYear\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 1, 1, 0) \"1TermCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 1, MFB.\"PrinBalance\", 0) \"1TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 2, 1, 0) \"2TermCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 2, MFB.\"PrinBalance\", 0) \"2TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 3, 1, 0) \"3TermCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 3, MFB.\"PrinBalance\", 0) \"3TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 4, 1, 0) \"4TermCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 4, MFB.\"PrinBalance\", 0) \"4TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 5, 1, 0) \"5TermCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 5, MFB.\"PrinBalance\", 0) \"5TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 6, 1, 0) \"6TermCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 6, MFB.\"PrinBalance\", 0) \"6TermAmount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 9, 1, 0) \"TurnOvduCount\" ";
-			sql += "              ,DECODE(MFB.\"OvduTerm\", 9, MFB.\"PrinBalance\", 0) \"TurnOvduAmount\" ";
-			sql += "              ,1 \"TotalCount\" ";
-			sql += "              ,MFB.\"PrinBalance\" \"TotalAmount\" ";
-			sql += " 		FROM ( ";
-			sql += " 			SELECT \"CustNo\" ";
-			sql += " 		  		  ,\"FacmNo\" ";
-			sql += " 		  		  ,CASE ";
-			sql += " 		   	 		 WHEN \"AcctCode\" = 990 THEN 9";
-			sql += " 		   	 		 WHEN \"OvduTerm\" IN (1,2,3,4,5) THEN \"OvduTerm\" ";
-			sql += " 		   		   ELSE 0 END AS \"OvduTerm\" ";
-			sql += " 		  		  ,\"PrinBalance\" ";
-			sql += " 			FROM \"MonthlyFacBal\"";
-			sql += " 			WHERE \"YearMonth\" = :entYearMonth ";
-			sql += " 	  		  AND \"PrinBalance\" > 0 ";
-			sql += " 		) MFB ";
-			sql += "        LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MFB.\"CustNo\" ";
-			sql += "                              AND FM.\"FacmNo\" = MFB.\"FacmNo\" ";
-			sql += "        WHERE  FM.\"FirstDrawdownDate\" >= 19810101 ";
-			sql += "          AND (NVL(:businessOfficer, ' ') = ' ' OR :businessOfficer = FM.\"BusinessOfficer\") ";
-			sql += "   		  AND MFB.\"OvduTerm\" <> 0 ";
-			sql += "      ) ";
-			sql += " GROUP BY \"FirstDrawdownYear\" ";
-			sql += " )";
-			sql += " SELECT * FROM (";
-			sql += " SELECT * FROM \"allData\"";
-			sql += " UNION";
-			sql += " SELECT '999 各期小計' AS \"FirstDrawdownYearShow\"";
-			sql += "       ,SUM(\"1TermCount\") \"1TermCount\" ";
-			sql += "       ,SUM(\"1TermAmount\") \"1TermAmount\" ";
-			sql += "       ,SUM(\"2TermCount\") \"2TermCount\" ";
-			sql += "       ,SUM(\"2TermAmount\") \"2TermAmount\" ";
-			sql += "       ,SUM(\"3TermCount\") \"3TermCount\" ";
-			sql += "       ,SUM(\"3TermAmount\") \"3TermAmount\" ";
-			sql += "       ,SUM(\"4TermCount\") \"4TermCount\" ";
-			sql += "       ,SUM(\"4TermAmount\") \"4TermAmount\" ";
-			sql += "       ,SUM(\"5TermCount\") \"5TermCount\" ";
-			sql += "       ,SUM(\"5TermAmount\") \"5TermAmount\" ";
-			sql += "       ,SUM(\"6TermCount\") \"6TermCount\" ";
-			sql += "       ,SUM(\"6TermAmount\") \"6TermAmount\" ";
-			sql += "       ,SUM(\"TurnOvduCount\") \"TurnOvduCount\" ";
-			sql += "       ,SUM(\"TurnOvduAmount\") \"TurnOvduAmount\" ";
-			sql += "       ,SUM(\"TotalCount\") \"TotalCount\" ";
-			sql += "       ,SUM(\"TotalAmount\") \"TotalAmount\" ";
-			sql += " FROM \"allData\"";
-			sql += " ) R";
-			sql += " ORDER BY TO_NUMBER(SUBSTE(R.\"FirstDrawdownYearShow\" , 0 , 3 )) ASC";
-			 * */
-			
+			 * sql += " WITH \"allData\" AS ( "; sql +=
+			 * " SELECT \"FirstDrawdownYear\"-1911 || ' 年撥款件' \"FirstDrawdownYearShow\" ";
+			 * sql += "       ,SUM(\"1TermCount\") \"1TermCount\" "; sql +=
+			 * "       ,SUM(\"1TermAmount\") \"1TermAmount\" "; sql +=
+			 * "       ,SUM(\"2TermCount\") \"2TermCount\" "; sql +=
+			 * "       ,SUM(\"2TermAmount\") \"2TermAmount\" "; sql +=
+			 * "       ,SUM(\"3TermCount\") \"3TermCount\" "; sql +=
+			 * "       ,SUM(\"3TermAmount\") \"3TermAmount\" "; sql +=
+			 * "       ,SUM(\"4TermCount\") \"4TermCount\" "; sql +=
+			 * "       ,SUM(\"4TermAmount\") \"4TermAmount\" "; sql +=
+			 * "       ,SUM(\"5TermCount\") \"5TermCount\" "; sql +=
+			 * "       ,SUM(\"5TermAmount\") \"5TermAmount\" "; sql +=
+			 * "       ,SUM(\"6TermCount\") \"6TermCount\" "; sql +=
+			 * "       ,SUM(\"6TermAmount\") \"6TermAmount\" "; sql +=
+			 * "       ,SUM(\"TurnOvduCount\") \"TurnOvduCount\" "; sql +=
+			 * "       ,SUM(\"TurnOvduAmount\") \"TurnOvduAmount\" "; sql +=
+			 * "       ,SUM(\"TotalCount\") \"TotalCount\" "; sql +=
+			 * "       ,SUM(\"TotalAmount\") \"TotalAmount\" "; sql +=
+			 * " FROM ( SELECT LEVEL \"FirstDrawdownYear\" "; sql +=
+			 * "              ,0 \"1TermCount\" "; sql +=
+			 * "              ,0 \"1TermAmount\" "; sql +=
+			 * "              ,0 \"2TermCount\" "; sql +=
+			 * "              ,0 \"2TermAmount\" "; sql +=
+			 * "              ,0 \"3TermCount\" "; sql +=
+			 * "              ,0 \"3TermAmount\" "; sql +=
+			 * "              ,0 \"4TermCount\" "; sql +=
+			 * "              ,0 \"4TermAmount\" "; sql +=
+			 * "              ,0 \"5TermCount\" "; sql +=
+			 * "              ,0 \"5TermAmount\" "; sql +=
+			 * "              ,0 \"6TermCount\" "; sql +=
+			 * "              ,0 \"6TermAmount\" "; sql +=
+			 * "              ,0 \"TurnOvduCount\" "; sql +=
+			 * "              ,0 \"TurnOvduAmount\" "; sql +=
+			 * "              ,0 \"TotalCount\" "; sql +=
+			 * "              ,0 \"TotalAmount\" "; sql += "        FROM DUAL "; sql +=
+			 * "        WHERE LEVEL >= 1994 "; sql +=
+			 * "        CONNECT BY LEVEL <= SUBSTR(\"Fn_GetLastMonth\"(:entYear), 1, 4) ";
+			 * sql += "  "; sql += "        UNION "; sql += "  "; sql +=
+			 * "        SELECT TO_NUMBER(SUBSTR(FM.\"FirstDrawdownDate\", 1, 4)) \"FirstDrawdownYear\" "
+			 * ; sql += "              ,DECODE(MFB.\"OvduTerm\", 1, 1, 0) \"1TermCount\" ";
+			 * sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 1, MFB.\"PrinBalance\", 0) \"1TermAmount\" "
+			 * ; sql += "              ,DECODE(MFB.\"OvduTerm\", 2, 1, 0) \"2TermCount\" ";
+			 * sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 2, MFB.\"PrinBalance\", 0) \"2TermAmount\" "
+			 * ; sql += "              ,DECODE(MFB.\"OvduTerm\", 3, 1, 0) \"3TermCount\" ";
+			 * sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 3, MFB.\"PrinBalance\", 0) \"3TermAmount\" "
+			 * ; sql += "              ,DECODE(MFB.\"OvduTerm\", 4, 1, 0) \"4TermCount\" ";
+			 * sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 4, MFB.\"PrinBalance\", 0) \"4TermAmount\" "
+			 * ; sql += "              ,DECODE(MFB.\"OvduTerm\", 5, 1, 0) \"5TermCount\" ";
+			 * sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 5, MFB.\"PrinBalance\", 0) \"5TermAmount\" "
+			 * ; sql += "              ,DECODE(MFB.\"OvduTerm\", 6, 1, 0) \"6TermCount\" ";
+			 * sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 6, MFB.\"PrinBalance\", 0) \"6TermAmount\" "
+			 * ; sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 9, 1, 0) \"TurnOvduCount\" "; sql +=
+			 * "              ,DECODE(MFB.\"OvduTerm\", 9, MFB.\"PrinBalance\", 0) \"TurnOvduAmount\" "
+			 * ; sql += "              ,1 \"TotalCount\" "; sql +=
+			 * "              ,MFB.\"PrinBalance\" \"TotalAmount\" "; sql +=
+			 * " 		FROM ( "; sql += " 			SELECT \"CustNo\" "; sql +=
+			 * " 		  		  ,\"FacmNo\" "; sql += " 		  		  ,CASE "; sql +=
+			 * " 		   	 		 WHEN \"AcctCode\" = 990 THEN 9"; sql +=
+			 * " 		   	 		 WHEN \"OvduTerm\" IN (1,2,3,4,5) THEN \"OvduTerm\" ";
+			 * sql += " 		   		   ELSE 0 END AS \"OvduTerm\" "; sql +=
+			 * " 		  		  ,\"PrinBalance\" "; sql +=
+			 * " 			FROM \"MonthlyFacBal\""; sql +=
+			 * " 			WHERE \"YearMonth\" = :entYearMonth "; sql +=
+			 * " 	  		  AND \"PrinBalance\" > 0 "; sql += " 		) MFB "; sql +=
+			 * "        LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = MFB.\"CustNo\" "; sql +=
+			 * "                              AND FM.\"FacmNo\" = MFB.\"FacmNo\" "; sql +=
+			 * "        WHERE  FM.\"FirstDrawdownDate\" >= 19810101 "; sql +=
+			 * "          AND (NVL(:businessOfficer, ' ') = ' ' OR :businessOfficer = FM.\"BusinessOfficer\") "
+			 * ; sql += "   		  AND MFB.\"OvduTerm\" <> 0 "; sql += "      ) "; sql +=
+			 * " GROUP BY \"FirstDrawdownYear\" "; sql += " )"; sql += " SELECT * FROM (";
+			 * sql += " SELECT * FROM \"allData\""; sql += " UNION"; sql +=
+			 * " SELECT '999 各期小計' AS \"FirstDrawdownYearShow\""; sql +=
+			 * "       ,SUM(\"1TermCount\") \"1TermCount\" "; sql +=
+			 * "       ,SUM(\"1TermAmount\") \"1TermAmount\" "; sql +=
+			 * "       ,SUM(\"2TermCount\") \"2TermCount\" "; sql +=
+			 * "       ,SUM(\"2TermAmount\") \"2TermAmount\" "; sql +=
+			 * "       ,SUM(\"3TermCount\") \"3TermCount\" "; sql +=
+			 * "       ,SUM(\"3TermAmount\") \"3TermAmount\" "; sql +=
+			 * "       ,SUM(\"4TermCount\") \"4TermCount\" "; sql +=
+			 * "       ,SUM(\"4TermAmount\") \"4TermAmount\" "; sql +=
+			 * "       ,SUM(\"5TermCount\") \"5TermCount\" "; sql +=
+			 * "       ,SUM(\"5TermAmount\") \"5TermAmount\" "; sql +=
+			 * "       ,SUM(\"6TermCount\") \"6TermCount\" "; sql +=
+			 * "       ,SUM(\"6TermAmount\") \"6TermAmount\" "; sql +=
+			 * "       ,SUM(\"TurnOvduCount\") \"TurnOvduCount\" "; sql +=
+			 * "       ,SUM(\"TurnOvduAmount\") \"TurnOvduAmount\" "; sql +=
+			 * "       ,SUM(\"TotalCount\") \"TotalCount\" "; sql +=
+			 * "       ,SUM(\"TotalAmount\") \"TotalAmount\" "; sql += " FROM \"allData\"";
+			 * sql += " ) R"; sql +=
+			 * " ORDER BY TO_NUMBER(SUBSTE(R.\"FirstDrawdownYearShow\" , 0 , 3 )) ASC";
+			 */
+
 			break;
 
 		case Agent:
@@ -364,8 +360,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 表中實際要查lastYearMonth
 		// 利用 DB 的 Function 做, 簡短一些
-		String entYearMonth = (parse.stringToInteger(titaVo.getParam("inputYear")) + 1911)
-				+ titaVo.getParam("inputMonth");
+		String entYearMonth = (parse.stringToInteger(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
@@ -373,15 +368,13 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("entYearMonth", entYearMonth);
 
-		if (kind == OutputSortBy.LargeAmt_Agent ||kind == OutputSortBy.LargeAmt_Customer) {
+		if (kind == OutputSortBy.LargeAmt_Agent || kind == OutputSortBy.LargeAmt_Customer) {
 			query.setParameter("ovduTermMin", titaVo.getParam("inputOverdueTermMin"));
 			query.setParameter("ovduTermMax", titaVo.getParam("inputOverdueTermMax"));
 		}
 
-
 		// 員編輸入空白代表所有員編
-		query.setParameter("businessOfficer", titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " "
-				: titaVo.getParam("inputBusinessOfficer"));
+		query.setParameter("businessOfficer", titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " " : titaVo.getParam("inputBusinessOfficer"));
 
 //		if (kind == OutputSortBy.Year) {
 //			query.setParameter("entYear", entYearMonth);
@@ -391,8 +384,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("entYearMonth: " + entYearMonth);
 		this.info("ovduTermMin: " + titaVo.getParam("inputOverdueTermMin"));
 		this.info("ovduTermMax: " + titaVo.getParam("inputOverdueTermMax"));
-		this.info("businessOfficer: '" + (titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " "
-				: titaVo.getParam("inputBusinessOfficer")) + "'");
+		this.info("businessOfficer: '" + (titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " " : titaVo.getParam("inputBusinessOfficer")) + "'");
 		this.info("entYear: " + entYearMonth);
 
 		return this.convertToMap(query);

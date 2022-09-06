@@ -116,9 +116,8 @@ public class L4201 extends TradeBuffer {
 				break;
 			}
 		}
-		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA 
-				&& tBatxDetail.getFacmNo() == iFacmNoA
-				&& iProcStsCode.equals(tBatxDetail.getProcStsCode()) && oldPreRepayTerms == newPreRepayTerms) {
+		if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA && tBatxDetail.getFacmNo() == iFacmNoA && iProcStsCode.equals(tBatxDetail.getProcStsCode())
+				&& oldPreRepayTerms == newPreRepayTerms) {
 			throw new LogicException(titaVo, "E0012", "修改值與現有資料相同");
 		}
 		tBatxDetail.setRepayType(iRepayTypeA);
@@ -151,8 +150,8 @@ public class L4201 extends TradeBuffer {
 		iProcStsCode.add("2");
 		iProcStsCode.add("3");
 		iProcStsCode.add("4");
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930CAEq(tBatxDetail.getAcDate() + 19110000,
-				tBatxDetail.getBatchNo(), tBatxDetail.getCustNo(), iProcStsCode, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930CAEq(tBatxDetail.getAcDate() + 19110000, tBatxDetail.getBatchNo(), tBatxDetail.getCustNo(), iProcStsCode, 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slBatxDetail != null) {
 			l420ABatch.setTxBuffer(this.txBuffer);
 			l420ABatch.doCheckAll(false, tBatxDetail.getReconCode(), slBatxDetail, titaVo);

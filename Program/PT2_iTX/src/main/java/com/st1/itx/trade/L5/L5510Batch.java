@@ -110,8 +110,7 @@ public class L5510Batch extends TradeBuffer {
 		this.info("active L5510Batch.toCheck ");
 
 		// 刪除本月保費檢核追回資料(重新執行用)
-		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, 0, Integer.MAX_VALUE, titaVo);
 		if (slPfItDetail != null) {
 			for (PfItDetail pfIt : slPfItDetail.getContent()) {
 				if (pfIt.getWorkMonth() == iWorkMonth && pfIt.getRepayType() == 5) {
@@ -144,8 +143,7 @@ public class L5510Batch extends TradeBuffer {
 		if (slPfItDetail != null) {
 			for (PfItDetail pfIt : slPfItDetail.getContent()) {
 				// 排除業績金額為零
-				if (pfIt.getPerfEqAmt().compareTo(BigDecimal.ZERO) == 0
-						&& pfIt.getPerfReward().compareTo(BigDecimal.ZERO) == 0) {
+				if (pfIt.getPerfEqAmt().compareTo(BigDecimal.ZERO) == 0 && pfIt.getPerfReward().compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
 				lPfItDetail.add(pfIt);
@@ -177,8 +175,7 @@ public class L5510Batch extends TradeBuffer {
 
 		this.info("lPfInsCheck size=" + lPfInsCheck.size());
 		if (lPfInsCheck.size() > 0) {
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.1", "房貸獎勵保費檢核檔(業績報酬)",
-					"房貸獎勵保費檢核檔(業績報酬)", "業績報酬");
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.1", "房貸獎勵保費檢核檔(業績報酬)", "房貸獎勵保費檢核檔(業績報酬)", "業績報酬");
 
 			int row = 1;
 			makeExcel.setValue(row, 1, "戶號");
@@ -219,13 +216,11 @@ public class L5510Batch extends TradeBuffer {
 
 		this.info("L5510Batch end = " + msg);
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				String.format("%-8s", titaVo.getTlrNo().trim()) + "L5510.1", msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", String.format("%-8s", titaVo.getTlrNo().trim()) + "L5510.1", msg, titaVo);
 	}
 
 	// 執行房貸獎勵保費檢核、產生發放資料
-	private void calculate(int iCustNo, int iFacmNo, ArrayList<PfItDetail> lPfItDetail, TitaVo titaVo)
-			throws LogicException {
+	private void calculate(int iCustNo, int iFacmNo, ArrayList<PfItDetail> lPfItDetail, TitaVo titaVo) throws LogicException {
 		this.info("calculate  " + iCustNo + "-" + iFacmNo + ", size=" + lPfItDetail.size());
 
 		// 至前月累計業績
@@ -274,8 +269,7 @@ public class L5510Batch extends TradeBuffer {
 		}
 
 		// 無本月正業績，無本月負業績、無累計業績，則結束
-		if (eqAmtPlus.compareTo(BigDecimal.ZERO) == 0 && rewardPlus.compareTo(BigDecimal.ZERO) == 0
-				&& eqAmtMinus.compareTo(BigDecimal.ZERO) == 0 && rewardMinus.compareTo(BigDecimal.ZERO) == 0
+		if (eqAmtPlus.compareTo(BigDecimal.ZERO) == 0 && rewardPlus.compareTo(BigDecimal.ZERO) == 0 && eqAmtMinus.compareTo(BigDecimal.ZERO) == 0 && rewardMinus.compareTo(BigDecimal.ZERO) == 0
 				&& eqAmtLM.compareTo(BigDecimal.ZERO) == 0 && rewardLM.compareTo(BigDecimal.ZERO) == 0) {
 			return;
 		}
@@ -295,8 +289,7 @@ public class L5510Batch extends TradeBuffer {
 		// 寫入本月正業績
 		for (PfItDetail pf : lPfItDetail) {
 			if (pf.getWorkMonth() == iWorkMonth) {
-				if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) > 0
-						|| pf.getPerfReward().compareTo(BigDecimal.ZERO) > 0) {
+				if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) > 0 || pf.getPerfReward().compareTo(BigDecimal.ZERO) > 0) {
 					updatePfItDetail(pf, titaVo);
 				}
 			}
@@ -318,8 +311,7 @@ public class L5510Batch extends TradeBuffer {
 		if ("N".equals(tPfInsCheck.getCheckResult())) {
 			for (PfItDetail pf : lPfItDetail) {
 				if (pf.getWorkMonth() == iWorkMonth) {
-					if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) < 0
-							|| pf.getPerfReward().compareTo(BigDecimal.ZERO) < 0) {
+					if (pf.getPerfEqAmt().compareTo(BigDecimal.ZERO) < 0 || pf.getPerfReward().compareTo(BigDecimal.ZERO) < 0) {
 						updatePfItDetail(pf, titaVo);
 						minusCnt++;
 					}
@@ -337,8 +329,7 @@ public class L5510Batch extends TradeBuffer {
 	}
 
 	// 寫入負業績，3.檢核結果為Y且檢核工作月為本月，追回金額
-	private void reverseUpdate(BigDecimal eqAmt, BigDecimal reward, BigDecimal drawdownAmt,
-			List<PfItDetail> lPfItDetail, TitaVo titaVo) throws LogicException {
+	private void reverseUpdate(BigDecimal eqAmt, BigDecimal reward, BigDecimal drawdownAmt, List<PfItDetail> lPfItDetail, TitaVo titaVo) throws LogicException {
 		this.info("reverseLM EqAmt=" + eqAmt + ", Reward=" + reward);
 		minusCnt++;
 		eqAmt = BigDecimal.ZERO.subtract(eqAmt);
@@ -347,8 +338,7 @@ public class L5510Batch extends TradeBuffer {
 
 		PfItDetail pfIt = lPfItDetail.get(lPfItDetail.size() - 1); // 最新一筆
 		// 工作月(西曆)
-		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100),
-				titaVo);
+		CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(iWorkMonth / 100, iWorkMonth % 100), titaVo);
 		if (tCdWorkMonth == null) {
 			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，工作年月=" + iWorkMonth); // 查詢資料不存在
 		}
@@ -485,8 +475,7 @@ public class L5510Batch extends TradeBuffer {
 			throw new LogicException(titaVo, "E5004", "");
 		}
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.2", "業績報酬媒體檔(LNQQQP2NEW)", "LNQQQP2NEW.txt",
-				2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.2", "業績報酬媒體檔(LNQQQP2NEW)", "LNQQQP2NEW.txt", 2);
 		int cnt = 0;
 
 		Map<String, String> dd = new HashMap<String, String>();
@@ -506,8 +495,7 @@ public class L5510Batch extends TradeBuffer {
 				BigDecimal drawdownAmt2 = new BigDecimal(d.get("DrawdownAmt").trim());
 				BigDecimal perfReward2 = new BigDecimal(d.get("PerfReward").trim());
 				BigDecimal perfEqAmt2 = new BigDecimal(d.get("PerfEqAmt").trim());
-				if (first || !introducer.equals(d.get("Introducer").toString().trim()) || custNo != custNo2
-						|| facmNo != facmNo2 || drawdownAmt2.compareTo(BigDecimal.ZERO) < 0) {
+				if (first || !introducer.equals(d.get("Introducer").toString().trim()) || custNo != custNo2 || facmNo != facmNo2 || drawdownAmt2.compareTo(BigDecimal.ZERO) < 0) {
 					if (!first) {
 						writeMedia(titaVo, dd, drawdownAmt, perfReward, perfEqAmt);
 						drawdownAmt = BigDecimal.ZERO;
@@ -638,8 +626,7 @@ public class L5510Batch extends TradeBuffer {
 		if (cnt > 0) {
 			makeFile.close();
 			String msg = "共產製 " + cnt + "筆媒體檔資料,請至【報表及製檔】作業,下傳【媒體檔】";
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					String.format("%-8s", titaVo.getTlrNo().trim()) + "L5510.2", msg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", String.format("%-8s", titaVo.getTlrNo().trim()) + "L5510.2", msg, titaVo);
 		} else {
 			String msg = "共產製 " + cnt + "筆媒體檔資料";
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", msg, titaVo);
@@ -651,8 +638,7 @@ public class L5510Batch extends TradeBuffer {
 		logTxControl(titaVo, controlCode);
 	}
 
-	private void writeMedia(TitaVo titaVo, Map<String, String> d, BigDecimal drawdownAmt, BigDecimal perfReward,
-			BigDecimal perfEqAmt) throws LogicException {
+	private void writeMedia(TitaVo titaVo, Map<String, String> d, BigDecimal drawdownAmt, BigDecimal perfReward, BigDecimal perfEqAmt) throws LogicException {
 		this.info("L5510Batch writeMedia=" + d.get("CustNo" + "/" + d.get("FacmNo") + "/" + d.get("WorkMonth")));
 
 		String s = "";
@@ -697,8 +683,7 @@ public class L5510Batch extends TradeBuffer {
 
 		//
 
-		s += String.format("%07d%03d", Integer.valueOf(d.get("CustNo").trim()),
-				Integer.valueOf(d.get("FacmNo").trim()));
+		s += String.format("%07d%03d", Integer.valueOf(d.get("CustNo").trim()), Integer.valueOf(d.get("FacmNo").trim()));
 		s += "000                           ";// 轉發明細(40)
 
 		// 撥款金額/追回金額

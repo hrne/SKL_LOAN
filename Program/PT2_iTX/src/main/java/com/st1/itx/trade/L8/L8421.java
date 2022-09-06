@@ -32,7 +32,7 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8421 extends TradeBuffer {
-	
+
 	@Autowired
 	public DataLog iDataLog;
 	@Autowired
@@ -45,11 +45,12 @@ public class L8421 extends TradeBuffer {
 	public JcicZ061LogService sJcicZ061LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
 		this.totaVo.init(titaVo);
-        this.index = titaVo.getReturnIndex();
+		this.index = titaVo.getReturnIndex();
 		this.limit = 500;
 		Slice<JcicZ061> sJcicZ061 = null;
 		sJcicZ061 = sJcicZ061Service.findAll(index, limit, titaVo);
@@ -59,19 +60,18 @@ public class L8421 extends TradeBuffer {
 		this.info("sJcicZ061     = " + sJcicZ061.getSize());
 		if (sJcicZ061 != null) {
 			for (JcicZ061 xJcicZ061 : sJcicZ061) {
-				if ((iSubmitType == 1 && xJcicZ061.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ061.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ061.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ061.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8319");
 					occursListB.putParam("OOHistoryTxCd", "L8049");
 					occursListB.putParam("OOCustId", xJcicZ061.getCustId());
 					occursListB.putParam("OOSubmitKey", xJcicZ061.getSubmitKey());
 					occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ061.getSubmitKey(), titaVo));
-                    occursListB.putParam("OORcDate", xJcicZ061.getRcDate());
-                    occursListB.putParam("OOMaxMainCode",xJcicZ061.getMaxMainCode());
-                    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ061.getMaxMainCode(), titaVo));
-                    occursListB.putParam("OOTranKey", xJcicZ061.getTranKey());
-                    occursListB.putParam("OOChangePayDate", xJcicZ061.getChangePayDate());
+					occursListB.putParam("OORcDate", xJcicZ061.getRcDate());
+					occursListB.putParam("OOMaxMainCode", xJcicZ061.getMaxMainCode());
+					occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ061.getMaxMainCode(), titaVo));
+					occursListB.putParam("OOTranKey", xJcicZ061.getTranKey());
+					occursListB.putParam("OOChangePayDate", xJcicZ061.getChangePayDate());
 					// occursListB.putParam("OOTranCode", xJcicZ061.getTranCode());
 					occursListB.putParam("OOTranCode", "061");
 					int iActualFilingDate = 0;
@@ -91,11 +91,11 @@ public class L8421 extends TradeBuffer {
 						occursListB.putParam("OOCustId", xJcicZ061.getCustId());
 						occursListB.putParam("OOSubmitKey", xJcicZ061.getSubmitKey());
 						occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ061.getSubmitKey(), titaVo));
-                        occursListB.putParam("OORcDate", xJcicZ061.getRcDate());
-                        occursListB.putParam("OOMaxMainCode",xJcicZ061.getMaxMainCode());
-                        occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ061.getMaxMainCode(), titaVo));
-                        occursListB.putParam("OOTranKey", xJcicZ061.getTranKey());
-                        occursListB.putParam("OOChangePayDate", xJcicZ061.getChangePayDate());
+						occursListB.putParam("OORcDate", xJcicZ061.getRcDate());
+						occursListB.putParam("OOMaxMainCode", xJcicZ061.getMaxMainCode());
+						occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ061.getMaxMainCode(), titaVo));
+						occursListB.putParam("OOTranKey", xJcicZ061.getTranKey());
+						occursListB.putParam("OOChangePayDate", xJcicZ061.getChangePayDate());
 //					occursListB.putParam("OOTranCode", xJcicZ061.getTranCode());
 						occursListB.putParam("OOTranCode", "061");
 						int iActualFilingDate = 0;

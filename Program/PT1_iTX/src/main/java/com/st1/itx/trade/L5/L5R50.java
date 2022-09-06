@@ -84,15 +84,12 @@ public class L5R50 extends TradeBuffer {
 				this.totaVo.putParam("L5r50CustNo", constructionCompany.getCustNo());
 				this.totaVo.putParam("L5r50CustName", custName);
 				this.totaVo.putParam("L5r50DeleteFlag", constructionCompany.getDeleteFlag());
-				this.totaVo.putParam("L5r50CreateDate",
-						parse.timeStampToStringDate(constructionCompany.getCreateDate()));
+				this.totaVo.putParam("L5r50CreateDate", parse.timeStampToStringDate(constructionCompany.getCreateDate()));
 				this.totaVo.putParam("L5r50CreateEmpNo", constructionCompany.getCreateEmpNo());
 				this.totaVo.putParam("L5r50CreateEmpName", getEmpName(titaVo, constructionCompany.getCreateEmpNo()));
-				this.totaVo.putParam("L5r50LastUpdate",
-						parse.timeStampToStringDate(constructionCompany.getLastUpdate()));
+				this.totaVo.putParam("L5r50LastUpdate", parse.timeStampToStringDate(constructionCompany.getLastUpdate()));
 				this.totaVo.putParam("L5r50LastUpdateEmpNo", constructionCompany.getLastUpdateEmpNo());
-				this.totaVo.putParam("L5r50LastUpdateEmpName",
-						getEmpName(titaVo, constructionCompany.getLastUpdateEmpNo()));
+				this.totaVo.putParam("L5r50LastUpdateEmpName", getEmpName(titaVo, constructionCompany.getLastUpdateEmpNo()));
 			}
 		}
 		this.addList(this.totaVo);

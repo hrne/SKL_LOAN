@@ -124,8 +124,7 @@ public class L2076Report extends MakeReport {
 		FacCloseId FacCloseId = new FacCloseId();
 		FacCloseId.setCustNo(iCustNo);
 		FacCloseId.setCloseNo(iCloseNo);
-		ClOtherRights tClOtherRights = sClOtherRightsService
-				.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
+		ClOtherRights tClOtherRights = sClOtherRightsService.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
 		if (tClOtherRights == null) {
 			throw new LogicException(titaVo, "E2003", "擔保品他項權利檔"); // 查無資料
 		}
@@ -148,8 +147,7 @@ public class L2076Report extends MakeReport {
 		// 地政
 		String wkLandAdm = "";
 		if ("".equals(tClOtherRights.getOtherLandAdm())) {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
-					titaVo);
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()), titaVo);
 			if (tCdCode != null) {
 				wkLandAdm = tCdCode.getItem();
 			}
@@ -162,8 +160,7 @@ public class L2076Report extends MakeReport {
 		// 收件字
 		String wkRecWord = "";
 		if ("".equals(tClOtherRights.getOtherRecWord())) {
-			CdLandOffice tCdLandOffice = cdLandOfficeService
-					.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+			CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
 			if (tCdLandOffice != null) {
 				wkRecWord = tCdLandOffice.getRecWordItem();
 			}
@@ -221,7 +218,6 @@ public class L2076Report extends MakeReport {
 			this.print(-9, 1, " ");
 		}
 		this.print(1, 1, "　　");
-
 
 		// 設定字體1:標楷體 字體大小14
 		this.setFont(1, 14);

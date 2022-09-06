@@ -117,23 +117,17 @@ public class L2R27 extends TradeBuffer {
 
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 		tClBuilding = sClBuildingService.findById(ClBuildingId, titaVo);
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingPublic = slClBuildingPublic == null ? null
-				: new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingPublic = slClBuildingPublic == null ? null : new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
 
-		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClParking = slClParking == null ? null : new ArrayList<ClParking>(slClParking.getContent());
 
-		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClParkingType = slClParkingType == null ? null : new ArrayList<ClParkingType>(slClParkingType.getContent());
 
-		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingOwner = slClBuildingOwner == null ? null
-				: new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
 
 		ClBuildingReason tClBuildingReason = sClBuildingReasonService.clNoFirst(iClCode1, iClCode2, iClNo, titaVo);
 
@@ -273,8 +267,7 @@ public class L2R27 extends TradeBuffer {
 				}
 				this.info("tClBuildingPublic L2r27 " + tClBuildingPublic);
 
-				this.totaVo.putParam("L2r27PublicBdNoA" + i,
-						tClBuildingPublic.getPublicBdNo1() == 0 ? "" : tClBuildingPublic.getPublicBdNo1());
+				this.totaVo.putParam("L2r27PublicBdNoA" + i, tClBuildingPublic.getPublicBdNo1() == 0 ? "" : tClBuildingPublic.getPublicBdNo1());
 				this.totaVo.putParam("L2r27PublicBdNoB" + i, tClBuildingPublic.getPublicBdNo2());
 				this.totaVo.putParam("L2r27Area" + i, tClBuildingPublic.getArea());
 				this.totaVo.putParam("L2r27PublicBdOwnerId" + i, tClBuildingPublic.getOwnerId());

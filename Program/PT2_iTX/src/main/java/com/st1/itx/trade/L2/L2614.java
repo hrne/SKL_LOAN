@@ -56,7 +56,7 @@ public class L2614 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public L2614ServiceImpl sL2614ServiceImpl;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2614 ");
@@ -71,7 +71,7 @@ public class L2614 extends TradeBuffer {
 		this.limit = 100;
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-		
+
 		try {
 			// *** 折返控制相關 ***
 			resultList = sL2614ServiceImpl.findAll(this.index, this.limit, titaVo);
@@ -80,13 +80,12 @@ public class L2614 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查無資料
 
 		}
-		
-		
+
 		List<LinkedHashMap<String, String>> chkOccursList = null;
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
-				
+
 				occursList.putParam("OOTxtNo", result.get("TitaTxtNo")); // 交易序號
 				occursList.putParam("OOSlipNo", result.get("SlipNo")); // 傳票號碼
 				occursList.putParam("OOacNoCode", result.get("AcNoCode")); // 科目代號
@@ -101,24 +100,22 @@ public class L2614 extends TradeBuffer {
 				this.info("occursList L2614" + occursList);
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
-				
+
 			} // for
-			
+
 			chkOccursList = this.totaVo.getOccursList();
 
-			if (resultList.size() >= this.limit ) {
+			if (resultList.size() >= this.limit) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
 		}
-		
-		
+
 		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
 			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查無資料
 		}
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

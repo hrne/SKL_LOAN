@@ -51,12 +51,11 @@ public class L6983 extends TradeBuffer {
 
 	@Autowired
 	private CdEmpService cdEmpService;
-	
+
 	private int selectCode = 0;
 	private int custNo = 0;
 	private int trasCollDate = 0;
 	private int cnt = 0;
-
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

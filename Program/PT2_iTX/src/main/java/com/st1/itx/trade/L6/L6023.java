@@ -76,9 +76,8 @@ public class L6023 extends TradeBuffer {
 				occurslist.putParam("OOLandOfficeCode", result.get("LandOfficeCode"));
 				occurslist.putParam("OORecWord", result.get("RecWord"));
 				occurslist.putParam("OORecWordItem", result.get("RecWordItem"));
-				occurslist.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime)+ " " +parse.timeStampToStringTime(lastUpdateTime));
-				occurslist.putParam("OOLastEmp",
-						result.get("LastUpdateEmpNo") + " " + empName(titaVo, result.get("LastUpdateEmpNo")));
+				occurslist.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
+				occurslist.putParam("OOLastEmp", result.get("LastUpdateEmpNo") + " " + empName(titaVo, result.get("LastUpdateEmpNo")));
 				/* 將每筆資料放入Tota的OcList */
 				wkCnt++;
 				this.totaVo.addOccursList(occurslist);

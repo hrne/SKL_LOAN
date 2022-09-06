@@ -55,7 +55,7 @@ public class L4321Batch extends TradeBuffer {
 
 	@Autowired
 	LoanCom loanCom;
-	
+
 	@Autowired
 	public WebClient webClient;
 
@@ -203,13 +203,11 @@ public class L4321Batch extends TradeBuffer {
 			}
 
 			if (titaVo.isHcodeNormal()) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
 //				主管放行提醒原櫃員執行列印對帳單交易			
 				if (titaVo.isActfgSuprele() && isComplete(titaVo)) {
 					this.info("OrgTlr ..." + titaVo.getOrgTlr());
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "",
-							sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "", sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
 				}
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
@@ -220,11 +218,9 @@ public class L4321Batch extends TradeBuffer {
 	private boolean isComplete(TitaVo titaVo) throws LogicException {
 		this.info("checkComplete...");
 		boolean isComplete = false;
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
-				custType1, custType2, iTxKind, 1, 3, 0, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2, iTxKind, 1, 3, 0, this.index, this.limit, titaVo);
 		if (sBatxRateChange == null) {
-			sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2,
-					iTxKind, 1, 3, 1, this.index, this.limit, titaVo);
+			sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2, iTxKind, 1, 3, 1, this.index, this.limit, titaVo);
 			if (sBatxRateChange == null) {
 				isComplete = true;
 			}
@@ -235,8 +231,8 @@ public class L4321Batch extends TradeBuffer {
 	private void processUpdate(TitaVo titaVo) throws LogicException {
 		this.info("processUpdate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
-				custType1, custType2, iTxKind, iAdjCode, iAdjCode, this.wkConfirmFlag, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2, iTxKind, iAdjCode, iAdjCode, this.wkConfirmFlag, this.index,
+				this.limit, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
@@ -530,9 +526,8 @@ public class L4321Batch extends TradeBuffer {
 		}
 
 		// 讀取生效日之後的利率變動檔
-		Slice<LoanRateChange> sLoanRateChange = loanRateChangeService.rateChangeBormNoEq(tBatxRateChange.getCustNo(),
-				tBatxRateChange.getFacmNo(), tBatxRateChange.getBormNo(), effectDateS + 19110000 + 1, this.index,
-				this.limit);
+		Slice<LoanRateChange> sLoanRateChange = loanRateChangeService.rateChangeBormNoEq(tBatxRateChange.getCustNo(), tBatxRateChange.getFacmNo(), tBatxRateChange.getBormNo(),
+				effectDateS + 19110000 + 1, this.index, this.limit);
 		List<LoanRateChange> lLoanRateChange = sLoanRateChange == null ? null : sLoanRateChange.getContent();
 
 		if (lLoanRateChange != null && lLoanRateChange.size() != 0) {

@@ -137,8 +137,8 @@ public class L2412 extends TradeBuffer {
 		if (isEloan && iFunCd == 1) {
 			if (iClNo > 0) {
 				tClMovables = sClMovablesService.findById(clMovablesId, titaVo);
-				if(tClMovables != null) {
-					iFunCd = 2;					
+				if (tClMovables != null) {
+					iFunCd = 2;
 				}
 			} else {
 				int ClNo = uniqueCheck(titaVo);
@@ -182,8 +182,7 @@ public class L2412 extends TradeBuffer {
 
 				this.info("新增時取號");
 
-				String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0")
-						+ StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
+				String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
 				iClNo = gGSeqCom.getSeqNo(0, 0, "L2", clCode, 9999999, titaVo);
 
@@ -319,18 +318,18 @@ public class L2412 extends TradeBuffer {
 
 					} // if
 
-					if(this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
+					if (this.isEloan) { // eloan 檢核不同核准號碼要新增額度關聯 2022.3.10
 						ClFacId clFacId = new ClFacId();
 						clFacId.setClCode1(iClCode1);
 						clFacId.setClCode2(iClCode2);
 						clFacId.setClNo(iClNo);
-						clFacId.setApproveNo(iApplNo);	
+						clFacId.setApproveNo(iApplNo);
 						ClFac clFac = sClFacService.findById(clFacId, titaVo);
 						if (clFac == null) {
 							clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
 						}
-					} 
-					
+					}
+
 				} // if
 
 			} else if (iFunCd == 4) {
@@ -383,8 +382,7 @@ public class L2412 extends TradeBuffer {
 		String clTypeCode = titaVo.getParam("ClTypeCode");
 
 		if ("300".equals(clTypeCode) || "350".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique1(titaVo.getParam("ProductBrand"),
-					titaVo.getParam("ProductSpec"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique1(titaVo.getParam("ProductBrand"), titaVo.getParam("ProductSpec"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -397,8 +395,7 @@ public class L2412 extends TradeBuffer {
 				}
 			}
 		} else if ("320".equals(clTypeCode) || "330".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique2(titaVo.getParam("ProductBrand"), 0,
-					Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique2(titaVo.getParam("ProductBrand"), 0, Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -412,8 +409,7 @@ public class L2412 extends TradeBuffer {
 			}
 
 		} else if ("310".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique3(titaVo.getParam("LicenseNo"), 0,
-					Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique3(titaVo.getParam("LicenseNo"), 0, Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {
@@ -427,8 +423,7 @@ public class L2412 extends TradeBuffer {
 			}
 
 		} else if ("340".equals(clTypeCode)) {
-			Slice<ClMovables> sClMovables = sClMovablesService.findUnique4(titaVo.getParam("EngineSN"), 0,
-					Integer.MAX_VALUE);
+			Slice<ClMovables> sClMovables = sClMovablesService.findUnique4(titaVo.getParam("EngineSN"), 0, Integer.MAX_VALUE);
 			List<ClMovables> lClMovables = sClMovables == null ? null : sClMovables.getContent();
 			if (lClMovables != null) {
 				for (ClMovables clMovables : lClMovables) {

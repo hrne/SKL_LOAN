@@ -101,7 +101,7 @@ public class L4941 extends TradeBuffer {
 
 				}
 				this.info("updateTime = " + updateTime);
-				
+
 				occursList.putParam("OOLogNo", tAchAuthLogHistory.getLogNo());
 				occursList.putParam("OOCustNo", tAchAuthLogHistory.getCustNo());
 				occursList.putParam("OOFacmNo", tAchAuthLogHistory.getFacmNo());

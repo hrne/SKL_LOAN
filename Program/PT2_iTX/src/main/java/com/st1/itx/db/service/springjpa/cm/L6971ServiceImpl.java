@@ -64,7 +64,7 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHERE \"DataFrom\" = 'ONLINE' ";
 		sql += "         AND \"DataTo\" = 'HISTORY' "; // 本程式只處理 ONLINE to HISTORY
 		sql += "         AND \"Records\"   > 0 "; // 此筆明細有操作資料
-		
+
 		// Condition by WorkType
 		switch (workType) {
 		case FiveYearsTX:
@@ -73,21 +73,19 @@ public class L6971ServiceImpl extends ASpringJpaParm implements InitializingBean
 		default:
 			break;
 		}
-		
+
 		sql += "       GROUP BY \"CustNo\" ";
 		sql += "               ,\"FacmNo\" ";
 		sql += "               ,\"BormNo\" ";
 		sql += "               ,\"ExecuteDate\" ";
 		sql += "               ,\"BatchNo\" ";
-		sql += "     ) TATL "; 
+		sql += "     ) TATL ";
 
 		// Joining table corresponding to workType
 		switch (workType) {
 		case FiveYearsTX:
-			sql += " LEFT JOIN (SELECT COUNT(*) \"Count\"" + "               ,\"CustNo\" "
-					+ "               ,\"FacmNo\" " + "               ,\"BormNo\" " + "         FROM \"LoanBorTx\" "
-					+ "         GROUP BY \"CustNo\" " + "                 ,\"FacmNo\" "
-					+ "                 ,\"BormNo\" " + "        ) LBTX ON LBTX.\"CustNo\" = TATL.\"CustNo\" ";
+			sql += " LEFT JOIN (SELECT COUNT(*) \"Count\"" + "               ,\"CustNo\" " + "               ,\"FacmNo\" " + "               ,\"BormNo\" " + "         FROM \"LoanBorTx\" "
+					+ "         GROUP BY \"CustNo\" " + "                 ,\"FacmNo\" " + "                 ,\"BormNo\" " + "        ) LBTX ON LBTX.\"CustNo\" = TATL.\"CustNo\" ";
 			sql += "                 AND LBTX.\"FacmNo\" = TATL.\"FacmNo\" ";
 			sql += "                 AND LBTX.\"BormNo\" = TATL.\"BormNo\" ";
 			break;

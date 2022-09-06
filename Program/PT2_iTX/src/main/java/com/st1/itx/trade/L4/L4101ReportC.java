@@ -157,7 +157,7 @@ public class L4101ReportC extends MakeReport {
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
 		}
-		reportItem = reportItem ;
+		reportItem = reportItem;
 		String wkName = "";
 		String wkBankCode = "";
 		String wkBranchCode = "";
@@ -167,19 +167,18 @@ public class L4101ReportC extends MakeReport {
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNoSlipNo(titaVo.getAcbrNo(), titaVo.getCurName(),
-				acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNoSlipNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
+			this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize, pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
+		this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize, pageOrientation);
 		// 統一大小
 		this.setFont(1, 10);
 

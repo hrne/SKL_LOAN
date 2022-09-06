@@ -40,10 +40,10 @@ public class L6073 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdInsurerService sCdInsurerService;
-	
+
 	@Autowired
 	private CdEmpService cdEmpService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -110,7 +110,7 @@ public class L6073 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

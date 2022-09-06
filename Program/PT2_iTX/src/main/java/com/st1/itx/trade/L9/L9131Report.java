@@ -102,8 +102,7 @@ public class L9131Report extends MakeReport {
 	}
 
 	private void setReportVo() throws LogicException {
-		this.reportVo = ReportVo.builder().setRptDate(Integer.valueOf(titaVo.getParam("AcDate")) + 19110000)
-				.setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印").setSecurity("機密")
+		this.reportVo = ReportVo.builder().setRptDate(Integer.valueOf(titaVo.getParam("AcDate")) + 19110000).setBrno(titaVo.getBrno()).setRptCode("L9131").setRptItem("總帳日結單代傳票列印").setSecurity("機密")
 				.setRptSize("A4").setPageOrientation("L").build();
 	}
 
@@ -127,8 +126,7 @@ public class L9131Report extends MakeReport {
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(reportVo.getRptDate(), iBatchNo,
-				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(reportVo.getRptDate(), iBatchNo, iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 		List<SlipMedia2022> lSlipMedia2022 = sSlipMedia2022 == null ? null : sSlipMedia2022.getContent();
 
 		if (lSlipMedia2022 == null || lSlipMedia2022.isEmpty()) {
@@ -166,8 +164,7 @@ public class L9131Report extends MakeReport {
 
 		for (SlipMedia2022 tSlipMedia2022 : lSlipMedia2022) {
 
-			if (!this.nowAcBookCode.equals(tSlipMedia2022.getAcBookCode())
-					|| !this.nowAcSubBookCode.equals(tSlipMedia2022.getAcSubBookCode())) {
+			if (!this.nowAcBookCode.equals(tSlipMedia2022.getAcBookCode()) || !this.nowAcSubBookCode.equals(tSlipMedia2022.getAcSubBookCode())) {
 
 				print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－－－－－－－－　－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－－－－－　－－－－－－－－－－－－");
 				print(1, 1, "　　　合計　TOTAL ：");

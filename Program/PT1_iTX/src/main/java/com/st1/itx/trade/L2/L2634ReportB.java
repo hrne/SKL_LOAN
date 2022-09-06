@@ -173,11 +173,9 @@ public class L2634ReportB extends MakeReport {
 				this.print(-20, 87, "" + wkMm); // 月
 				this.print(-23, 87, "" + wkDd); // 日
 				if (tFacClose.getFacmNo() > 0) {
-					this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-"
-							+ tFacClose.getFacmNo()); // 戶號額度
+					this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + tFacClose.getFacmNo()); // 戶號額度
 				} else {
-					Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(),
-							tFacClose.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+					Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
 					List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 					String facms = "";
 					String x = "";
@@ -186,8 +184,7 @@ public class L2634ReportB extends MakeReport {
 						x = ".";
 					}
 
-					this.print(-31, 42,
-							StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + facms); // 戶號額度
+					this.print(-31, 42, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + facms); // 戶號額度
 				}
 				this.print(-33, 42, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
 				this.print(-36, 42, custId); // 統編
@@ -221,8 +218,7 @@ public class L2634ReportB extends MakeReport {
 
 	}
 
-	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo)
-			throws LogicException {
+	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {

@@ -44,7 +44,7 @@ public class LCR03 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService txTellerService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -100,13 +100,13 @@ public class LCR03 extends TradeBuffer {
 				tita2.put("ACTFG", actfg);
 
 //				TxTeller txTeller = txTellerService.findById(tTxRecord.getTlrNo());
-				
+
 				CdEmp cdEmp = cdEmpService.findById(tTxRecord.getTlrNo());
-				
+
 				if (cdEmp == null) {
 					throw new LogicException("EC001", "員工資料檔員編不存在::" + tTxRecord.getTlrNo());
 				}
-				
+
 				tita2.put("ORGEMPNM", cdEmp.getFullname().trim());
 
 				this.info("txtranCode == " + tTxTranCode.getSubmitFg());

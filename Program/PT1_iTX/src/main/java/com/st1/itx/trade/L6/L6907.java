@@ -91,7 +91,6 @@ public class L6907 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "會計銷帳檔");
 		}
 
-
 		boolean istmpfacmno = false;
 		Slice<LoanFacTmp> slLoanFacTmp = null;
 		// 檢查由L3200連動時的額度是否為指定額度
@@ -145,8 +144,7 @@ public class L6907 extends TradeBuffer {
 			// Y-顯示[明細]按鈕
 			String l6908Flag = "Y";
 			// 未收費用未變動不顯示按鈕
-			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
-					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
+			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3 && tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
 				l6908Flag = "";
 			}
 			// 交易序號 = 0不顯示按鈕

@@ -88,11 +88,11 @@ public class L4950 extends TradeBuffer {
 								if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1()) && !"3".equals(tCdEmp.getAgType1()) && !"5".equals(tCdEmp.getAgType1())) {
 									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 2);
-								} 
+								}
 								if (!"0".equals(tCdEmp.getAgType1()) && !"2".equals(tCdEmp.getAgType1())) {
 									errCnt = errCnt + 1;
 									setreport(tFacMain, tCustMain, 3);
-								} 
+								}
 
 							} else {
 								errCnt = errCnt + 1;

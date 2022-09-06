@@ -81,8 +81,7 @@ public class L4002 extends TradeBuffer {
 		// 未輸入經辦 or 經辦相同 or BS020
 		if (lBatxHead != null && lBatxHead.size() != 0) {
 			for (BatxHead tBatxHead : lBatxHead) {
-				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo)
-						|| "BS020".equals(tBatxHead.getTitaTxCd())) {
+				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo) || "BS020".equals(tBatxHead.getTitaTxCd())) {
 				} else {
 					continue;
 				}
@@ -96,13 +95,11 @@ public class L4002 extends TradeBuffer {
 //				0.待處理 ->0123
 //				9.已完成 ->ALL
 				if ("0".equals(procExeCode)) {
-					if ("0".equals(tBatxHead.getBatxExeCode()) || "1".equals(tBatxHead.getBatxExeCode())
-							|| "2".equals(tBatxHead.getBatxExeCode()) || "3".equals(tBatxHead.getBatxExeCode())) {
+					if ("0".equals(tBatxHead.getBatxExeCode()) || "1".equals(tBatxHead.getBatxExeCode()) || "2".equals(tBatxHead.getBatxExeCode()) || "3".equals(tBatxHead.getBatxExeCode())) {
 
 						setL4002Tota(tBatxHead, titaVo);
 					} else {
-						this.info("continue... ，procExeCode = " + procExeCode + "， BatxHead狀態 != 0~3 ，狀態 = "
-								+ tBatxHead.getBatxExeCode());
+						this.info("continue... ，procExeCode = " + procExeCode + "， BatxHead狀態 != 0~3 ，狀態 = " + tBatxHead.getBatxExeCode());
 						continue;
 					}
 				} else {
@@ -340,8 +337,7 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 				// grp2待處理
-				if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-						|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
+				if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 					if (watCnt.containsKey(grp2)) {
 						watCnt.put(grp2, watCnt.get(grp2) + 1);
 					} else {
@@ -381,8 +377,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// grp3待處理
-					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-							|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (watCnt.containsKey(grp3)) {
 							watCnt.put(grp3, watCnt.get(grp3) + 1);
 						} else {
@@ -452,8 +447,7 @@ public class L4002 extends TradeBuffer {
 				}
 
 				// 可訂正筆數
-				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-						|| tBatxDetail.getProcStsCode().equals("7")) {
+				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6") || tBatxDetail.getProcStsCode().equals("7")) {
 					if (canEraseCnt.containsKey(grp1)) {
 						canEraseCnt.put(grp1, canEraseCnt.get(grp1) + 1);
 					} else {
@@ -463,8 +457,7 @@ public class L4002 extends TradeBuffer {
 
 				if (labelRankFlag == 1) {
 					// 可檢核筆數
-					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-							|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (canCheckCnt.containsKey(grp1)) {
 							canCheckCnt.put(grp1, canCheckCnt.get(grp1) + 1);
 						} else {
@@ -481,8 +474,7 @@ public class L4002 extends TradeBuffer {
 					}
 					// 可暫收筆數、未執行訂正
 					if (tempVo.get("EraseCnt") != null) {
-						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-								|| tBatxDetail.getProcStsCode().equals("4")) {
+						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 							if (canTempCnt.containsKey(grp1)) {
 								canTempCnt.put(grp1, canTempCnt.get(grp1) + 1);
 							} else {
@@ -492,8 +484,7 @@ public class L4002 extends TradeBuffer {
 					}
 				} else {
 					// 可訂正筆數
-					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-							|| tBatxDetail.getProcStsCode().equals("7")) {
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6") || tBatxDetail.getProcStsCode().equals("7")) {
 						if (canEraseCnt.containsKey(grp3)) {
 							canEraseCnt.put(grp3, canEraseCnt.get(grp3) + 1);
 						} else {
@@ -501,8 +492,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可檢核筆數
-					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-							|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (canCheckCnt.containsKey(grp3)) {
 							canCheckCnt.put(grp3, canCheckCnt.get(grp3) + 1);
 						} else {
@@ -519,8 +509,7 @@ public class L4002 extends TradeBuffer {
 					}
 					// 可暫收筆數、未執行訂正
 					if (tempVo.get("EraseCnt") != null) {
-						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-								|| tBatxDetail.getProcStsCode().equals("4")) {
+						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
 							if (canTempCnt.containsKey(grp3)) {
 								canTempCnt.put(grp3, canTempCnt.get(grp3) + 1);
 							} else {
@@ -580,8 +569,7 @@ public class L4002 extends TradeBuffer {
 				String labelFgC = "";
 				String labelFgD = "";
 
-				if (acDate != titaVo.getEntDyI() + 19110000
-						|| "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))) {
+				if (acDate != titaVo.getEntDyI() + 19110000 || "RESV".equals(tempL4002Vo.getBatchNo().substring(0, 4))) {
 				} else {
 					if (tempL4002Vo.getRankFlag() == 1) {
 						if ("8".equals(batxStatus)) {
@@ -648,8 +636,7 @@ class tmpBatx implements Comparable<tmpBatx> {
 
 	@Override
 	public String toString() {
-		return "tmpBatx [acDate=" + acDate + ", batchNo=" + batchNo + ", repayCode=" + repayCode + ", reconCode="
-				+ reconCode + ", fileName=" + fileName + ", rankFlag=" + rankFlag + "]";
+		return "tmpBatx [acDate=" + acDate + ", batchNo=" + batchNo + ", repayCode=" + repayCode + ", reconCode=" + reconCode + ", fileName=" + fileName + ", rankFlag=" + rankFlag + "]";
 	}
 
 	@Override

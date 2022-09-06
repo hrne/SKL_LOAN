@@ -23,10 +23,10 @@ import com.st1.itx.util.parse.Parse;
 @Service("L6972")
 @Scope("prototype")
 public class L6972 extends TradeBuffer {
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	TxArchiveTableService txArchiveTableService;
 
@@ -46,8 +46,7 @@ public class L6972 extends TradeBuffer {
 		int custNo = parse.stringToInteger(titaVo.getParam("InputCustNo"));
 		int facmNo = parse.stringToInteger(titaVo.getParam("InputFacmNo"));
 		int bormNo = parse.stringToInteger(titaVo.getParam("InputBormNo"));
-		
-		
+
 		// pass the exceptions of USPs to upper levels
 		switch (workType) {
 		case FiveYearsTX:
@@ -55,8 +54,7 @@ public class L6972 extends TradeBuffer {
 			{
 				this.info("L6972 execute ArchiveFiveYearTx");
 				txArchiveTableService.Usp_L6_ArchiveFiveYearTx_Copy(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
-			} else
-			{
+			} else {
 				this.info("L6972 execute UnarchiveFiveYearTx: " + custNo + "-" + facmNo + "-" + bormNo);
 				txArchiveTableService.Usp_L6_UnarchiveFiveYearTx_Copy(custNo, facmNo, bormNo, titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), titaVo);
 			}

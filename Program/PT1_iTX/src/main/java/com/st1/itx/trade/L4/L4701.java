@@ -97,8 +97,7 @@ public class L4701 extends TradeBuffer {
 
 		ArrayList<OccursList> tmp = new ArrayList<>();
 
-		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
+		sLoanCheque = loanChequeService.receiveDateRange(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), lStatus, this.index, this.limit);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
@@ -133,9 +132,7 @@ public class L4701 extends TradeBuffer {
 				int entryDate = 0;
 				int slipNo = 0;
 				tAcDetail = acDetailService.findL4701First("RCK", tLoanCheque.getCustNo(),
-						FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9) + " "
-								+ FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7),
-						this.getTxBuffer().getTxCom().getTbsdyf(), titaVo);
+						FormatUtil.pad9("" + tLoanCheque.getChequeAcct(), 9) + " " + FormatUtil.pad9("" + tLoanCheque.getChequeNo(), 7), this.getTxBuffer().getTxCom().getTbsdyf(), titaVo);
 				if (tAcDetail != null) {
 					slipNo = tAcDetail.getSlipNo();
 					entryDate = tAcDetail.getAcDate();
@@ -165,8 +162,7 @@ public class L4701 extends TradeBuffer {
 
 //			String path = "D:\\temp\\pdcm.csv";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-票據媒體檔", "pdcm.csv", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-票據媒體檔", "pdcm.csv", 2);
 
 			for (String line : file) {
 				makeFile.put(line);
@@ -185,8 +181,7 @@ public class L4701 extends TradeBuffer {
 
 			String checkMsg = "票據明細表已完成。 ";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L4701", checkMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4701", checkMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);

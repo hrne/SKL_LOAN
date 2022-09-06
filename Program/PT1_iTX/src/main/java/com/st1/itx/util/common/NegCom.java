@@ -1765,7 +1765,7 @@ public class NegCom extends CommBuffer {
 	 * 
 	 * @param payIntDate   繳息迄日
 	 * @param repaidPeriod 繳期數
-	 * @param titaVo TitaVo
+	 * @param titaVo       TitaVo
 	 * @return 應繳日
 	 * @throws LogicException ..
 	 */

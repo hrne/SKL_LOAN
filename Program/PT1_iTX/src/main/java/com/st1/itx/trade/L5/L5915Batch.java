@@ -42,8 +42,7 @@ public class L5915Batch extends TradeBuffer {
 
 		boolean isFinish = l5915Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", (isFinish ? "LC009" : "L5915"),
-				titaVo.getTlrNo(), TRAN_CODE + TRAN_NAME + (isFinish ? "已完成" : "查無資料"), titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", (isFinish ? "LC009" : "L5915"), titaVo.getTlrNo(), TRAN_CODE + TRAN_NAME + (isFinish ? "已完成" : "查無資料"), titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

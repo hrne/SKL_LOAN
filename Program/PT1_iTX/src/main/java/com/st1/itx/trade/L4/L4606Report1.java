@@ -129,7 +129,7 @@ public class L4606Report1 extends MakeReport {
 					}
 					this.print(1, 1,
 							"                                                                小　計：           筆");
-					this.print(0, 119, String.format("%,d", times), "R");
+					this.print(0, 91, String.format("%,d", times), "R");
 					this.print(0, 181, String.format("%,d", amt.intValue()), "R");
 					this.print(1, 1,
 							"--------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -179,7 +179,7 @@ public class L4606Report1 extends MakeReport {
 			i++;
 			if (i == listL4606.size()) {
 				this.print(1, 1, "                                                                小　計：           筆");
-				this.print(0, 119, String.format("%,d", times), "R");
+				this.print(0, 91, String.format("%,d", times), "R");
 				this.print(0, 181, String.format("%,d", amt.intValue()), "R");
 				this.print(1, 1,
 						"--------------------------------------------------------------------------------------------------------------------------------------------------------");

@@ -105,8 +105,7 @@ public class LNM39FPReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFFP", "LNM39FP 欄位清單６", "LNFFP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFFPIDX", "LNM39FP 欄位清單６控制檔", "LNFFP.IDX",
-					1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFFPIDX", "LNM39FP 欄位清單６控制檔", "LNFFP.IDX", 1); // UTF-8
 
 			// 標題列
 			// strContent = "";
@@ -162,8 +161,7 @@ public class LNM39FPReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
-					+ String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39FP genFile close === ");

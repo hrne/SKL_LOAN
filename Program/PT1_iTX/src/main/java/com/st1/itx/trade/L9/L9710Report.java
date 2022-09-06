@@ -53,15 +53,12 @@ public class L9710Report extends MakeReport {
 		this.print(-3, 3, "　報　表：" + this.getRptCode());
 		String tim = String.format("%02d", Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
 
-		this.print(-2, 146, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/"
-				+ dateUtil.getNowStringBc().substring(2, 4));
+		this.print(-2, 146, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + dateUtil.getNowStringBc().substring(2, 4));
 		this.print(-3, 80, "寬限到期明細表", "C");
-		this.print(-3, 146, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 146, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 146, "頁　  次：");
 		this.print(0, 160, Integer.toString(this.getNowPage()), "R");
-		this.print(-5, 80,
-				showRocDate(titaVo.get("ACCTDATE_ST"), 0) + " － " + showRocDate(titaVo.get("ACCTDATE_ED"), 0), "C");
+		this.print(-5, 80, showRocDate(titaVo.get("ACCTDATE_ST"), 0) + " － " + showRocDate(titaVo.get("ACCTDATE_ED"), 0), "C");
 		this.print(0, 146, "單　  位：元");
 
 //		this.print(-7, 1, "地區別  經辦      戶號       戶名      核准號碼  寬限到期日     核准額度     貸放餘額 首次撥款日  上次繳息日 計息利率  聯絡電話      聯絡人　   下次還本日");
@@ -79,8 +76,7 @@ public class L9710Report extends MakeReport {
 		this.print(-7, 133, "連絡電話");
 		this.print(-7, 145, "聯絡人");
 		this.print(-7, 154, "下次還本日");
-		this.print(-8, 1,
-				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-8, 1, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(9);
@@ -108,10 +104,9 @@ public class L9710Report extends MakeReport {
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9710", "寬限到期明細表", "", "A4", "L");
 		String txcd = titaVo.getTxcd();
 		String reportName = "寬限到期明細表";
-		
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode(txcd).setRptItem(reportName).setSecurity("").setRptSize("A4").setPageOrientation("L")
-				.build();
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode(txcd).setRptItem(reportName).setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
@@ -188,8 +183,7 @@ public class L9710Report extends MakeReport {
 		this.print(0, 15, substr(tL9710Vo.get("Fullname"), 5));
 
 		// 戶號(戶號+額度)
-		tmp = String.format("%07d", Integer.valueOf(tL9710Vo.get("CustNo"))) + "-"
-				+ String.format("%03d", Integer.valueOf(tL9710Vo.get("FacmNo")));
+		tmp = String.format("%07d", Integer.valueOf(tL9710Vo.get("CustNo"))) + "-" + String.format("%03d", Integer.valueOf(tL9710Vo.get("FacmNo")));
 		this.print(0, 22, tmp);
 
 		// 戶名
@@ -236,8 +230,7 @@ public class L9710Report extends MakeReport {
 	 */
 	private void reportTot(String cityName) {
 //		tempCount = tempCount + 3;
-		this.print(1, 1,
-				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(1, 1, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		this.print(1, 1, cityName, "L");
 		this.print(0, 12, "小　計");
 		this.print(0, 24, String.valueOf(cnt), "R");
@@ -251,8 +244,7 @@ public class L9710Report extends MakeReport {
 		if (ptfg != 9) {
 			return;
 		}
-		this.print(1, 1,
-				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(1, 1, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		this.print(1, 12, "總　計");
 		this.print(0, 24, String.valueOf(tcnt), "R");
 		this.print(0, 25, "筆");

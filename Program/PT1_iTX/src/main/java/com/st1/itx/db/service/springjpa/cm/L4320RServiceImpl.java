@@ -71,16 +71,11 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "      , BR.\"PreNextAdjFreq\"  " // F19 利率調整週期
 				+ "      , BR.\"PreNextAdjDate\"  " // F20 預定下次利率調整日
 				+ "      , BR.\"JsonFields\"  " // F21 jason格式紀錄欄
-				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
-				+ " LEFT JOIN \"LoanBorMain\" LN ON LN.\"CustNo\"   = BR.\"CustNo\" "
-				+ "                             AND LN.\"FacmNo\" = BR.\"FacmNo\" "
-				+ "                             AND LN.\"BormNo\" = BR.\"BormNo\" "
-				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
-				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
-				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
-				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
-				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
-				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
+				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" " + " LEFT JOIN \"LoanBorMain\" LN ON LN.\"CustNo\"   = BR.\"CustNo\" "
+				+ "                             AND LN.\"FacmNo\" = BR.\"FacmNo\" " + "                             AND LN.\"BormNo\" = BR.\"BormNo\" "
+				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" " + "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
+				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" " + " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = " + iAdjDate
+				+ "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1 + "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
 		this.info("sql=" + sql);
 
 		Query query;

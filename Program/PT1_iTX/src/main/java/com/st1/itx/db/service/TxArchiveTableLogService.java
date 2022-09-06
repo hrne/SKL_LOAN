@@ -16,107 +16,107 @@ import com.st1.itx.db.domain.TxArchiveTableLogId;
  */
 public interface TxArchiveTableLogService {
 
-  /**
-   * findByPrimaryKey
-   *
-   * @param txArchiveTableLogId PK
-   * @param titaVo Variable-Length Argument
-   * @return TxArchiveTableLog TxArchiveTableLog
-   */
-  public TxArchiveTableLog findById(TxArchiveTableLogId txArchiveTableLogId, TitaVo... titaVo);
+	/**
+	 * findByPrimaryKey
+	 *
+	 * @param txArchiveTableLogId PK
+	 * @param titaVo              Variable-Length Argument
+	 * @return TxArchiveTableLog TxArchiveTableLog
+	 */
+	public TxArchiveTableLog findById(TxArchiveTableLogId txArchiveTableLogId, TitaVo... titaVo);
 
-  /**
-   * findAll
-   *
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice TxArchiveTableLog TxArchiveTableLog of List
-   */
-  public Slice<TxArchiveTableLog> findAll(int index, int limit, TitaVo... titaVo);
+	/**
+	 * findAll
+	 *
+	 * @param index  Page Index
+	 * @param limit  Page Data Limit
+	 * @param titaVo Variable-Length Argument
+	 * @return Slice TxArchiveTableLog TxArchiveTableLog of List
+	 */
+	public Slice<TxArchiveTableLog> findAll(int index, int limit, TitaVo... titaVo);
 
-  /**
-   * hold By TxArchiveTableLog
-   * 
-   * @param txArchiveTableLogId key
-   * @param titaVo Variable-Length Argument
-   * @return TxArchiveTableLog TxArchiveTableLog
-   */
-  public TxArchiveTableLog holdById(TxArchiveTableLogId txArchiveTableLogId, TitaVo... titaVo);
+	/**
+	 * hold By TxArchiveTableLog
+	 * 
+	 * @param txArchiveTableLogId key
+	 * @param titaVo              Variable-Length Argument
+	 * @return TxArchiveTableLog TxArchiveTableLog
+	 */
+	public TxArchiveTableLog holdById(TxArchiveTableLogId txArchiveTableLogId, TitaVo... titaVo);
 
-  /**
-   * hold By TxArchiveTableLog
-   * 
-   * @param txArchiveTableLog key
-   * @param titaVo Variable-Length Argument
-   * @return TxArchiveTableLog TxArchiveTableLog
-   */
-  public TxArchiveTableLog holdById(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo);
+	/**
+	 * hold By TxArchiveTableLog
+	 * 
+	 * @param txArchiveTableLog key
+	 * @param titaVo            Variable-Length Argument
+	 * @return TxArchiveTableLog TxArchiveTableLog
+	 */
+	public TxArchiveTableLog holdById(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo);
 
-  /**
-   * Insert
-   * 
-   * @param txArchiveTableLog Entity
-   * @param titaVo Variable-Length Argument
-   * @return TxArchiveTableLog Entity
-   * @throws DBException exception
-   */
-  public TxArchiveTableLog insert(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Insert
+	 * 
+	 * @param txArchiveTableLog Entity
+	 * @param titaVo            Variable-Length Argument
+	 * @return TxArchiveTableLog Entity
+	 * @throws DBException exception
+	 */
+	public TxArchiveTableLog insert(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update
-   * 
-   * @param txArchiveTableLog Entity
-   * @param titaVo Variable-Length Argument
-   * @return TxArchiveTableLog Entity
-   * @throws DBException exception
-   */
-  public TxArchiveTableLog update(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update
+	 * 
+	 * @param txArchiveTableLog Entity
+	 * @param titaVo            Variable-Length Argument
+	 * @return TxArchiveTableLog Entity
+	 * @throws DBException exception
+	 */
+	public TxArchiveTableLog update(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update2
-   * 
-   * @param txArchiveTableLog Entity
-   * @param titaVo Variable-Length Argument
-   * @return TxArchiveTableLog Entity
-   * @throws DBException exception
-   */
-  public TxArchiveTableLog update2(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update2
+	 * 
+	 * @param txArchiveTableLog Entity
+	 * @param titaVo            Variable-Length Argument
+	 * @return TxArchiveTableLog Entity
+	 * @throws DBException exception
+	 */
+	public TxArchiveTableLog update2(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Delete
-   * 
-   * @param txArchiveTableLog Entity
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void delete(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Delete
+	 * 
+	 * @param txArchiveTableLog Entity
+	 * @param titaVo            Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void delete(TxArchiveTableLog txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Insert All For List
-   * 
-   * @param txArchiveTableLog Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void insertAll(List<TxArchiveTableLog> txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Insert All For List
+	 * 
+	 * @param txArchiveTableLog Entity of List
+	 * @param titaVo            Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void insertAll(List<TxArchiveTableLog> txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Update All For List
-   * 
-   * @param txArchiveTableLog Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void updateAll(List<TxArchiveTableLog> txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Update All For List
+	 * 
+	 * @param txArchiveTableLog Entity of List
+	 * @param titaVo            Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void updateAll(List<TxArchiveTableLog> txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
-  /**
-   * Delete All For List
-   * 
-   * @param txArchiveTableLog Entity of List
-   * @param titaVo Variable-Length Argument
-   * @throws DBException exception
-   */
-  public void deleteAll(List<TxArchiveTableLog> txArchiveTableLog, TitaVo... titaVo) throws DBException;
+	/**
+	 * Delete All For List
+	 * 
+	 * @param txArchiveTableLog Entity of List
+	 * @param titaVo            Variable-Length Argument
+	 * @throws DBException exception
+	 */
+	public void deleteAll(List<TxArchiveTableLog> txArchiveTableLog, TitaVo... titaVo) throws DBException;
 
 }

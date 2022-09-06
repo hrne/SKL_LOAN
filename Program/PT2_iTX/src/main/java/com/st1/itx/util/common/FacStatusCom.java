@@ -167,8 +167,7 @@ public class FacStatusCom {
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 		Slice<LoanBorMain> slLoanBorMain = null;
 
-		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE,
-				titaVo);
+		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 900, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 

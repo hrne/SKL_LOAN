@@ -38,7 +38,7 @@ public class LM058 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM058 ");
-		
+
 		// 帳務日(西元)
 		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日(西元)
@@ -52,24 +52,23 @@ public class LM058 extends BatchBase implements Tasklet, InitializingBean {
 		int iMonth = (mfbsdy / 100) % 100;
 		// 當年月
 		int thisYM = 0;
-		
-		//月底日
+
+		// 月底日
 		int ymEnd = mfbsdy;
-		
-		// 月底日是否大於帳務日 判斷取哪個年月 
+
+		// 月底日是否大於帳務日 判斷取哪個年月
 		if (tbsdy < mfbsdy) {
 			iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
 			iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
-			ymEnd =lmndy;
-			
+			ymEnd = lmndy;
+
 		}
 
 		thisYM = iYear * 100 + iMonth;
 
-		lm058report.exec(titaVo,thisYM,ymEnd);
+		lm058report.exec(titaVo, thisYM, ymEnd);
 //		lm058report.setTxBuffer(this.getTxBuffer());
 //		lm058report.exec(titaVo, tbsdy, mfbsdy);
-
 
 	}
 }

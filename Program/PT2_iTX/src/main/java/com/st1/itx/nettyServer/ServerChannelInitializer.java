@@ -30,6 +30,6 @@ public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> 
 		socketChannel.pipeline().addLast(new StringEncoder(CharsetUtil.UTF_8));
 //		socketChannel.pipeline().addLast(new ByteArrayEncoder());		
 		socketChannel.pipeline().addLast(new ReadTimeoutHandler(90));
-//		socketChannel.pipeline().addLast(new ServerHandler());
+		socketChannel.pipeline().addLast(new ServerHandler());
 	}
 }

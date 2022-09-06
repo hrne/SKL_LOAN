@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.TxArchiveTableLogId;
  */
 public interface TxArchiveTableLogRepositoryDay extends JpaRepository<TxArchiveTableLog, TxArchiveTableLogId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxArchiveTableLog> findByTxArchiveTableLogId(TxArchiveTableLogId txArchiveTableLogId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxArchiveTableLog> findByTxArchiveTableLogId(TxArchiveTableLogId txArchiveTableLogId);
 
 }
-

@@ -60,38 +60,35 @@ public class L650B extends TradeBuffer {
 
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
-		
-		String[] types = new String[] {"業績全部", "換算業績、業務報酬", "換算業績、業務報酬", "加碼獎勵津貼", "協辦獎金"};
-		
-		for (int t = 0; t < types.length; t++)
-		{
-			char code = (char)((int)'A' + t); // A B C D E
+
+		String[] types = new String[] { "業績全部", "換算業績、業務報酬", "換算業績、業務報酬", "加碼獎勵津貼", "協辦獎金" };
+
+		for (int t = 0; t < types.length; t++) {
+			char code = (char) ((int) 'A' + t); // A B C D E
 			this.info("code: " + code);
-			
-			for (int i = 1; i <= 30; i++)
-			{
+
+			for (int i = 1; i <= 30; i++) {
 				String deptCode = titaVo.getParam("DeptCode" + code + i);
-				
-				if (deptCode == null || deptCode.trim().isEmpty())
-				{
+
+				if (deptCode == null || deptCode.trim().isEmpty()) {
 					break;
 				}
-				
+
 				int workMonthStart = parse.stringToInteger(titaVo.getParam("WorkMonthS" + code + i));
 				int workMonthEnd = parse.stringToInteger(titaVo.getParam("WorkMonthE" + code + i));
-				
+
 				workMonthStart += workMonthStart > 0 ? 191100 : 0;
 				workMonthEnd += workMonthEnd > 0 ? 191100 : 0;
-				
+
 				this.info("deptCode: " + deptCode + " workMonthStart: " + workMonthStart + " workMonthEnd: " + workMonthEnd);
-				
+
 				iCdPfParamsId.setConditionCode1("2");
-				iCdPfParamsId.setConditionCode2(parse.IntegerToString(t+1, 1));
+				iCdPfParamsId.setConditionCode2(parse.IntegerToString(t + 1, 1));
 				iCdPfParamsId.setCondition(deptCode);
 				iCdPfParams.setCdPfParmsId(iCdPfParamsId);
 				iCdPfParams.setWorkMonthStart(workMonthStart);
 				iCdPfParams.setWorkMonthEnd(workMonthEnd);
-				
+
 				try {
 					iCdPfParmsService.insert(iCdPfParams, titaVo);
 				} catch (DBException e) {

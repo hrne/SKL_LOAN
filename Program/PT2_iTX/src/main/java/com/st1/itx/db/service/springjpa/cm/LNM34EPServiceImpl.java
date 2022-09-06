@@ -43,10 +43,8 @@ public class LNM34EPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// LNM34EP 資料欄位清單E
-		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" "
-				+ ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
-				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" "
-				+ " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
+		sql = "SELECT " + "  \"DataYM\", \"CustNo\", \"CustId\", \"FacmNo\", \"BormNo\" " + ", \"AcCode\", \"Status\", \"IndustryCode\", \"ClTypeJCIC\", \"Zip3\" "
+				+ ", \"ProdNo\", \"CustKind\", \"DerFg\", \"Ifrs9ProdCode\" " + " FROM  \"Ias34Ep\" " + " WHERE \"DataYM\"  = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\", \"BormNo\" ";
 
 		this.info("sql=" + sql);
 

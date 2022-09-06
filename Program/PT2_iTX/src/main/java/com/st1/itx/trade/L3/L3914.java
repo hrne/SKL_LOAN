@@ -84,11 +84,9 @@ public class L3914 extends TradeBuffer {
 		lDisplayFlag.add("F"); // 繳息首筆
 
 		if (iAcDate == 0) {
-			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, 0, 999, 0, 900, wkEntryDateStart, wkDateEnd,
-					lDisplayFlag, this.index, this.limit, titaVo);
+			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, 0, 999, 0, 900, wkEntryDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
 		} else {
-			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, 0, 999, 0, 900, wkAcDateStart, wkDateEnd,
-					lDisplayFlag, this.index, this.limit, titaVo);
+			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, 0, 999, 0, 900, wkAcDateStart, wkDateEnd, lDisplayFlag, this.index, this.limit, titaVo);
 		}
 
 		lLoanBorTx = slLoanBorTx == null ? null : new ArrayList<LoanBorTx>(slLoanBorTx.getContent());
@@ -109,8 +107,7 @@ public class L3914 extends TradeBuffer {
 			if (!ln.getTitaTxCd().equals("L3230")) {
 				continue;
 			}
-			slAcDetail = acDetailService.findTxtNoEq(ln.getAcDate() + 19110000, ln.getTitaKinBr(), ln.getTitaTlrNo(),
-					parse.stringToInteger(ln.getTitaTxtNo()), 0, Integer.MAX_VALUE, titaVo);
+			slAcDetail = acDetailService.findTxtNoEq(ln.getAcDate() + 19110000, ln.getTitaKinBr(), ln.getTitaTlrNo(), parse.stringToInteger(ln.getTitaTxtNo()), 0, Integer.MAX_VALUE, titaVo);
 			if (slAcDetail == null) {
 				this.info("slAcDetail = " + slAcDetail);
 				continue;
@@ -122,8 +119,7 @@ public class L3914 extends TradeBuffer {
 				this.info("ac.getDbCr() = " + ac.getDbCr());
 				this.info("ac.getAcctCode() = " + ac.getAcctCode());
 				if ("C".equals(ac.getDbCr())) {
-					if (ac.getAcctCode().equals("F10") || ac.getAcctCode().equals("F27")
-							|| ac.getAcctCode().equals("TMI")) {
+					if (ac.getAcctCode().equals("F10") || ac.getAcctCode().equals("F27") || ac.getAcctCode().equals("TMI")) {
 						occursList.putParam("OOEntryDate", ln.getEntryDate());
 						occursList.putParam("OOAcDate", ln.getAcDate());
 						occursList.putParam("OODesc", ln.getDesc());

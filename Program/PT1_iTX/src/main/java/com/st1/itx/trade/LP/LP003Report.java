@@ -59,7 +59,7 @@ public class LP003Report extends MakeReport {
 		String rocYear;
 		// 當前工作月
 		int wkMonth;
-		
+
 		// 找上個工作月
 		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
 			rocYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);

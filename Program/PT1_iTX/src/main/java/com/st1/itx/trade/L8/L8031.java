@@ -46,7 +46,7 @@ public class L8031 extends TradeBuffer {
 		rJcicZ040Log = iJcicZ040LogService.ukeyEq(iUkey, this.index, this.limit, titaVo);
 		JcicZ040 rJcicZ040 = new JcicZ040();
 		rJcicZ040 = iJcicZ040Service.ukeyFirst(iUkey, titaVo);
-	
+
 		if (rJcicZ040 == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
@@ -145,6 +145,7 @@ public class L8031 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	public String dealBankName(String BankId, TitaVo titaVo) throws LogicException {
 		CdCode tCdCode = new CdCode();
 		tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", BankId, titaVo);

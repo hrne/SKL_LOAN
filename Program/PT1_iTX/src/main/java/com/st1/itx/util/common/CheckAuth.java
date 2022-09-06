@@ -297,7 +297,7 @@ public class CheckAuth extends CommBuffer {
 	/**
 	 * 回覆全部或指定使用者的交易權限
 	 * 
-	 * @param brno brno
+	 * @param brno   brno
 	 * @param tlrno  指定使用者
 	 * @param tranno tranno
 	 * @return 有權限交易清單

@@ -230,23 +230,19 @@ public class L2631 extends TradeBuffer {
 				wkFacmNoEd = iFacmNo;
 			}
 			// 擔保品與額度關聯檔
-			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE, titaVo);
 			lClFac = slClFac == null ? null : slClFac.getContent();
 			// 全部結案
 			boolean isAllClose = true;
 			for (ClFac c : lClFac) {
-				if ((c.getCustNo() == iCustNo && iFacmNo == 0)
-						|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+				if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 					// 撥款主檔
-					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
-							c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 					if (slLoanBorMain != null) {
 						for (LoanBorMain t : slLoanBorMain.getContent()) {
 							// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
-									|| t.getStatus() == 8) {
+							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
 								isAllClose = false;
 								break;
 							}
@@ -288,7 +284,6 @@ public class L2631 extends TradeBuffer {
 
 		if ("7".equals(titaVo.getParam("RpFg"))) {
 
-
 			try {
 				sFacCloseService.update(BeforeFacClose, titaVo);
 			} catch (DBException e) {
@@ -321,18 +316,15 @@ public class L2631 extends TradeBuffer {
 				if (t3TxTemp != null) {
 					t3txtNo = t3TxTemp.getTxtNo();
 				}
-				Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getEntDyI() + 19110000, titaVo.getKinbr(),
-						titaVo.getTlrNo(), t3txtNo, this.index, Integer.MAX_VALUE, titaVo);
+				Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getEntDyI() + 19110000, titaVo.getKinbr(), titaVo.getTlrNo(), t3txtNo, this.index, Integer.MAX_VALUE, titaVo);
 				lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
 				if (lTxTemp == null || lTxTemp.size() == 0) {
 					throw new LogicException(titaVo, "E0001",
-							"交易暫存檔 會計日期 = " + parse.stringToInteger(titaVo.getEntDy()) + 19110000 + "分行別 = "
-									+ titaVo.getKinbr() + " 交易員代號 = " + titaVo.getTlrNo() + " 交易序號 = " + t3txtNo); // 查詢資料不存在
+							"交易暫存檔 會計日期 = " + parse.stringToInteger(titaVo.getEntDy()) + 19110000 + "分行別 = " + titaVo.getKinbr() + " 交易員代號 = " + titaVo.getTlrNo() + " 交易序號 = " + t3txtNo); // 查詢資料不存在
 				}
 
 				String checkMsg = "抵押權塗銷同意書已完成。";
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo() + "L2631", checkMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L2631", checkMsg, titaVo);
 			}
 		}
 

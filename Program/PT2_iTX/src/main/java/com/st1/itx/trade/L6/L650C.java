@@ -68,7 +68,7 @@ public class L650C extends TradeBuffer {
 			String yesNo = titaVo.getParam("YesNo" + code);
 
 			this.info("code: " + code);
-			
+
 			if (yesNo == null || yesNo.trim().isEmpty()) {
 				continue;
 			}

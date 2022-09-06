@@ -56,8 +56,6 @@ public class L9731p extends TradeBuffer {
 		this.info("iYearMonth= " + iYearMonth);
 
 		boolean isFinish = l9731Report.exec(titaVo, iYearMonth);
-		
-		
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
@@ -71,13 +69,10 @@ public class L9731p extends TradeBuffer {
 
 		tradeName = tradeName.substring(0, tradeName.length() - 1);
 
-
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "(" + tradeName + ")已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "(" + tradeName + ")已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

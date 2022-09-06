@@ -24,30 +24,29 @@ public class L9729Report extends MakeReport {
 
 	@Autowired
 	L9729ServiceImpl l9729ServiceImpl;
-	
+
 	@Autowired
 	DateUtil dateUtil;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	String txcd = "L9729";
 	String txname = "歷史封存資料搬運結果明細";
-	
+
 	WorkType workType;
 	int inputDate;
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9729Report exec start ...");
 
-		
 		workType = WorkType.getWorkTypeByHelp(titaVo.getParam("InputType"));
-		
+
 		// 存取 inputDate
 		inputDate = parse.stringToInteger(titaVo.getParam("InputDate"));
 
 		List<Map<String, String>> listL9729 = null;
-		
+
 		try {
 			listL9729 = l9729ServiceImpl.findAll(workType.getCode(), titaVo);
 		} catch (Exception e) {
@@ -55,13 +54,13 @@ public class L9729Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9729ServiceImpl.findAll error = " + errors.toString());
 		}
-		
+
 		return exportPdf(titaVo, listL9729);
 	}
-	
+
 	@Override
 	public void printHeader() {
-		
+
 		this.setCharSpaces(0);
 		this.setFontSize(12);
 
@@ -78,42 +77,37 @@ public class L9729Report extends MakeReport {
 		 * ------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ---------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		this.print(-7, 1,"   執行批次  封存／復原　資料表名              戶號     額度  撥款編號  結果  搬運結果說明");
-		this.print(-8, 1,"  ========================================================================================================================================");
-		
+		this.print(-7, 1, "   執行批次  封存／復原　資料表名              戶號     額度  撥款編號  結果  搬運結果說明");
+		this.print(-8, 1, "  ========================================================================================================================================");
+
 		this.setBeginRow(9);
 
 		this.setMaxRows(29);
 	}
 
 	private Boolean exportPdf(TitaVo titaVo, List<Map<String, String>> list) throws LogicException {
-		
+
 		Boolean isSuccess = true;
 
 		this.info("L9729Report exportPdf");
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txname, "", "A4", "L");
-	
-		if (list == null || list.isEmpty())
-		{
+
+		if (list == null || list.isEmpty()) {
 			// 本日無資料
 			this.print(1, 1, "  本日無資料!");
 			isSuccess = false;
 		} else {
-			for (Map<String, String> l9728Vo : list)
-			{
+			for (Map<String, String> l9728Vo : list) {
 				String route;
 				String dataFrom = l9728Vo.get("DataFrom");
 				String dataTo = l9728Vo.get("DataTo");
-				
-				if ("HISTORY".equals(dataFrom) && "ONLINE".equals(dataTo))
-				{
+
+				if ("HISTORY".equals(dataFrom) && "ONLINE".equals(dataTo)) {
 					route = "復原";
-				} else if ("ONLINE".equals(dataFrom) && "HISTORY".equals(dataTo))
-				{
+				} else if ("ONLINE".equals(dataFrom) && "HISTORY".equals(dataTo)) {
 					route = "封存";
-				} else
-				{
+				} else {
 					route = "紀錄錯誤";
 				}
 				this.print(1, 8, l9728Vo.get("BatchNo"), "C");
@@ -126,12 +120,12 @@ public class L9729Report extends MakeReport {
 				this.print(0, 79, StringCut.stringCut(l9728Vo.get("Description"), 0, 59));
 			}
 		}
-		
+
 		// close as pdf
-		// long sno = 
+		// long sno =
 		this.close();
 		// this.toPdf(sno);
-		
+
 		return isSuccess;
 	}
 }

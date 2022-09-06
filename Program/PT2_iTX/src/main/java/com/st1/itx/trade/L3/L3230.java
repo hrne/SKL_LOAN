@@ -307,18 +307,15 @@ public class L3230 extends TradeBuffer {
 			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 			// 累溢收(暫收貸)
-			if ("06".equals(iTempItemCode)) {
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode("TAV");
-				acDetail.setSumNo("090");
-				acDetail.setTxAmt(baTxCom.getExcessive().subtract(iTempAmt));
-				acDetail.setCustNo(iCustNo);
-				acDetail.setFacmNo(iFacmNo);
-				acDetail.setBormNo(0);
-				lAcDetail.add(acDetail);
-
-			}
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("TAV");
+			acDetail.setSumNo("090");
+			acDetail.setTxAmt(baTxCom.getExcessive().subtract(iTempAmt));
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setBormNo(0);
+			lAcDetail.add(acDetail);
 		} else {
 			// 查詢會計銷帳檔
 			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, wkFacmNoStart,
@@ -462,7 +459,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setAcctCode(acNegCom.getAcctCode(iRpCustNo, titaVo));
 			acDetail.setSumNo("094");
-			acDetail.setTxAmt(iTempAmt);
+			acDetail.setTxAmt(iRpAmt);
 			lAcDetail.add(acDetail);
 			break;
 		case 95: // 轉債協退還款
@@ -471,7 +468,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setAcctCode(acNegCom.getReturnAcctCode(iRpCustNo, titaVo));
 			acDetail.setSumNo("095");
-			acDetail.setTxAmt(iTempAmt);
+			acDetail.setTxAmt(iRpAmt);
 			lAcDetail.add(acDetail);
 			break;
 		}

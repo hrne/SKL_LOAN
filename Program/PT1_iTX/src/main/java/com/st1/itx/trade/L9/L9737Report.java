@@ -44,12 +44,10 @@ public class L9737Report extends MakeReport {
 		// 取得輸入值
 		int inputDrawdownDate = parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 
-		List<Map<String, String>> resultList = l9737ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate,
-				titaVo);
+		List<Map<String, String>> resultList = l9737ServiceImpl.getOverdueCustomerLoanData(inputDrawdownDate, titaVo);
 
 		// open excel
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName,
-				"L9737_底稿_催收戶餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, txName, txCD + "_" + txName, "L9737_底稿_催收戶餘額明細.xlsx", "yyymmdd", titaVo.getParam("DrawdownDate"));
 
 		int row = 2;
 

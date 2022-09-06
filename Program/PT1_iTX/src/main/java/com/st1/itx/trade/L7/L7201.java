@@ -60,8 +60,7 @@ public class L7201 extends TradeBuffer {
 			lM011Report.setParentTranCode(parentTranCode);
 			lM011Report.exec(titaVo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM011表外放款承諾資料產出已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM011表外放款承諾資料產出已完成", titaVo);
 		}
 		// 整批處理：月底放款承諾提存
 		MySpring.newTask("BS910", this.txBuffer, titaVo);

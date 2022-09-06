@@ -118,10 +118,10 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      WHERE fm.\"BusinessOfficer\" = :TELLER";
 		}
 
-		if(iFacmNo > 0) {
+		if (iFacmNo > 0) {
 			sql += "      AND lo.\"FacmNo\" = :FacmNo ";
 		}
-		
+
 		if (iCloseCode == 1) {
 			sql += "      AND lo.\"CloseDate\" > 0 ";
 		} else if (iCloseCode == 2) {
@@ -157,11 +157,11 @@ public class L2921ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (!iTELLER.isEmpty()) {
 			query.setParameter("TELLER", iTELLER);
 		}
-		
-		if(iFacmNo > 0){
+
+		if (iFacmNo > 0) {
 			query.setParameter("FacmNo", iFacmNo);
 		}
-		
+
 		if (YetDate1 != 0) {
 			query.setParameter("YetDate1", YetDate1);
 			query.setParameter("YetDate2", YetDate2);

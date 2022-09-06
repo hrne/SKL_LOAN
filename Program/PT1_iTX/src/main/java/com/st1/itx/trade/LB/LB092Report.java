@@ -126,12 +126,12 @@ public class LB092Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01"; 
+			sfileNo2 = "01";
 		}
 
 		// 查詢系統參數設定檔-JCIC放款報送人員資料
@@ -149,9 +149,8 @@ public class LB092Report extends MakeReport {
 		} else {
 			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
 		}
-		
-		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;"
-				+ "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35";
+
+		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;" + "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35";
 		String txt1[] = txt.split(";");
 
 		try {
@@ -161,8 +160,7 @@ public class LB092Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B092", "不動產擔保品明細檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B092-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
+			strContent = "JCIC-DAT-B092-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + jcicEmpName, 189, ' ');
 			makeFile.put(strContent);
 
@@ -340,8 +338,7 @@ public class LB092Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
-					+ StringUtils.repeat(" ", 238);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 238);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -363,7 +360,7 @@ public class LB092Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
@@ -373,14 +370,11 @@ public class LB092Report extends MakeReport {
 		String txt = "";
 
 		// B092 不動產擔保品明細檔
-		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品類別(62~63),擔保品所有權人或代表人IDN/BAN(64~73),"
-				+ "鑑估(總市)值(74~81),鑑估日期(82~86),可放款值(87~94),設定日期(95~99),本行本月設定金額(100~107),本行設定抵押順位(108),"
-				+ "本行累計已設定總金額(109~116),其他債權人已設定金額(117~124),處分價格(125~132),權利到期年月(133~137),縣市別(138),"
-				+ "鄉鎮市區別(139~140),段、小段號(141~144),地號-前四碼(145~148),地號-後四碼(149~152),建號-前五碼(153~157),建號-後三碼(158~160),"
+		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品類別(62~63),擔保品所有權人或代表人IDN/BAN(64~73)," + "鑑估(總市)值(74~81),鑑估日期(82~86),可放款值(87~94),設定日期(95~99),本行本月設定金額(100~107),本行設定抵押順位(108),"
+				+ "本行累計已設定總金額(109~116),其他債權人已設定金額(117~124),處分價格(125~132),權利到期年月(133~137),縣市別(138)," + "鄉鎮市區別(139~140),段、小段號(141~144),地號-前四碼(145~148),地號-後四碼(149~152),建號-前五碼(153~157),建號-後三碼(158~160),"
 				+ "郵遞區號(161~165),是否有保險(166),預估應計土地增值稅(167~174),應計土地增值稅之預估年月(175~179),買賣契約價格(180~187),"
 				+ "買賣契約日期(188~194),停車位形式(195),車位單獨登記面積(196~204),土地持份面積(205~214),建物類別(215~216),空白(217~245),資料所屬年月(246~250)";
-		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;"
-				+ "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35";
+		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;" + "F20;F21;F22;F23;F24;F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35";
 
 		String txt1[] = txt.split(";");
 

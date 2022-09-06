@@ -41,7 +41,7 @@ public class L4721Report extends MakeReport {
 
 	@Autowired
 	public BaTxCom baTxCom;
-	
+
 	@Autowired
 	CustNoticeCom custNoticeCom;
 
@@ -123,7 +123,7 @@ public class L4721Report extends MakeReport {
 		print(-42, 3, "銀行匯款");
 		print(-43, 3, "戶名：新光人壽保險股份有限公司");
 		print(-44, 3, "解款行：新光銀行城內分行　新光銀行城內分行代號：1030116");
-		print(-45, 3, "期款專用帳號：9510200"+headerCustNo+"　　還本專用帳號：9510300"+headerCustNo);
+		print(-45, 3, "期款專用帳號：9510200" + headerCustNo + "　　還本專用帳號：9510300" + headerCustNo);
 
 		this.setFontSize(10);
 	}
@@ -164,8 +164,7 @@ public class L4721Report extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -187,12 +186,12 @@ public class L4721Report extends MakeReport {
 
 			custNo = tBatxRateChange.getCustNo();
 			facmNo = tBatxRateChange.getFacmNo();
-			
+
 			// 檢查 CustNotice 確認這份表是否能出
-			
+
 			if (!custNoticeCom.checkIsLetterSendable(null, custNo, facmNo, "L4721", titaVo))
 				continue;
-			
+
 //				每張表有該戶號額度對應之Header，所以必須有兩個迴圈
 //				第一層為應產出list，第二層為產出客戶之列印內容
 			try {
@@ -247,8 +246,8 @@ public class L4721Report extends MakeReport {
 					if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 						dateRange = showRocDate(startDate, 3) + "-" + showRocDate(endDate, 3);
 					}
-					
-					if("-".equals(dateRange.trim())) {
+
+					if ("-".equals(dateRange.trim())) {
 						dateRange = "";
 					}
 					print(0, 10, dateRange);
@@ -304,11 +303,10 @@ public class L4721Report extends MakeReport {
 		this.toPdf(sno);
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate)
-			throws NumberFormatException, LogicException {
+	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo, int effectDate) throws NumberFormatException, LogicException {
 		this.info("L4721Report.setHead" + custNo + "-" + facmNo + "" + effectDate);
 		headerCustName = headerBankStatement.get("CustName");
-		headerCustNo = String.format("%07d",Integer.valueOf(headerBankStatement.get("CustNo")));
+		headerCustNo = String.format("%07d", Integer.valueOf(headerBankStatement.get("CustNo")));
 		headerPrintDate = showRocDate(titaVo.getCalDy(), 1);
 		headerRepayDate = headerBankStatement.get("SpecificDd") + "日";
 		headerRepayTypeDesc = headerBankStatement.get("RepayCodeX");
@@ -316,7 +314,6 @@ public class L4721Report extends MakeReport {
 		baTxCom.getDueAmt(effectDate, custNo, facmNo, 0, titaVo);
 		headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 		headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
-
 
 	}
 

@@ -77,7 +77,6 @@ public class L4512 extends TradeBuffer {
 
 	private String iMediaKind;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4512 ");
@@ -93,16 +92,16 @@ public class L4512 extends TradeBuffer {
 		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iBormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
-		
+
 		CustMain tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		if (tCustMain == null) {
 			throw new LogicException("E0001", "CustMain");
 		}
-		
-		// 15日薪放5  非15日薪放1
+
+		// 15日薪放5 非15日薪放1
 		String AgType1 = "";
-		
-		switch(iProcCode) {
+
+		switch (iProcCode) {
 		case "4":
 		case "5":
 			AgType1 = "5";
@@ -118,9 +117,9 @@ public class L4512 extends TradeBuffer {
 			break;
 		default:
 			break;
-			
+
 		}
-		
+
 		CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", AgType1, titaVo);
 //			4.15日薪 5.非15日薪 CdCode 4 5 15日薪
 		if ("4".equals(tCdCode.getCode().substring(0, 1)) || "5".equals(tCdCode.getCode().substring(0, 1))) {
@@ -128,22 +127,22 @@ public class L4512 extends TradeBuffer {
 		} else {
 			iMediaKind = "5";
 		}
-		
+
 		switch (iFunctionCode) {
 		case 1:
 
 			// 新增明細檔
-			maintainEmpDeductDtl(1, tCustMain,  titaVo);
+			maintainEmpDeductDtl(1, tCustMain, titaVo);
 			break;
 		case 2:
 
 			// 修改明細檔
-			maintainEmpDeductDtl(2, tCustMain,  titaVo);
-			
+			maintainEmpDeductDtl(2, tCustMain, titaVo);
+
 			break;
 		case 4:
 			// 刪除明細檔
-			maintainEmpDeductDtl(4, tCustMain,  titaVo);
+			maintainEmpDeductDtl(4, tCustMain, titaVo);
 			break;
 		}
 
@@ -152,11 +151,10 @@ public class L4512 extends TradeBuffer {
 
 	}
 
-	private void maintainEmpDeductDtl(int FunctionCode, CustMain tCustMain, TitaVo titaVo)
-			throws LogicException {
-		
-		if(FunctionCode == 1) {  // 新增
-			
+	private void maintainEmpDeductDtl(int FunctionCode, CustMain tCustMain, TitaVo titaVo) throws LogicException {
+
+		if (FunctionCode == 1) { // 新增
+
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 			tEmpDeductDtlId.setEntryDate(iEntryDate);
@@ -169,7 +167,7 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductDtlId.setFacmNo(iFacmNo);
 			tEmpDeductDtlId.setBormNo(iBormNo);
 			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
-			
+
 			tEmpDeductDtl.setEmpNo(tCustMain.getEmpNo());
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());
 			tEmpDeductDtl.setRepayAmt(parse.stringToBigDecimal(titaVo.get("RepayAmt")));
@@ -178,14 +176,14 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductDtl.setSumOvpayAmt(parse.stringToBigDecimal(titaVo.get("SumOvpayAmt")));
 			tEmpDeductDtl.setMediaDate(0);
 			tEmpDeductDtl.setMediaKind(iMediaKind);
-			
+
 			try {
 				empDeductDtlService.insert(tEmpDeductDtl, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "員工扣薪明細檔新增失敗 :" + e.getErrorMsg());
 			}
-		} else if(FunctionCode == 2){
-			
+		} else if (FunctionCode == 2) {
+
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 			tEmpDeductDtlId.setEntryDate(iEntryDate);
@@ -198,25 +196,25 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductDtlId.setFacmNo(iFacmNo);
 			tEmpDeductDtlId.setBormNo(iBormNo);
 			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
-			
+
 			tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtlId, titaVo);
-			
-			if(tEmpDeductDtl == null ) {
-				
+
+			if (tEmpDeductDtl == null) {
+
 			}
 			tEmpDeductDtl.setRepayAmt(parse.stringToBigDecimal(titaVo.get("RepayAmt")));
 			tEmpDeductDtl.setPrincipal(parse.stringToBigDecimal(titaVo.get("Principal")));
 			tEmpDeductDtl.setInterest(parse.stringToBigDecimal(titaVo.get("Interest")));
 			tEmpDeductDtl.setSumOvpayAmt(parse.stringToBigDecimal(titaVo.get("SumOvpayAmt")));
-			
+
 			try {
 				empDeductDtlService.update(tEmpDeductDtl, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "員工扣薪明細檔修改失敗 : " + e.getErrorMsg());
 			}
-			
+
 		} else if (FunctionCode == 4) {
-			
+
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 			tEmpDeductDtlId.setEntryDate(iEntryDate);
@@ -229,9 +227,9 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductDtlId.setFacmNo(iFacmNo);
 			tEmpDeductDtlId.setBormNo(iBormNo);
 			tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
-			
+
 			tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtlId, titaVo);
-			
+
 			try {
 				empDeductDtlService.delete(tEmpDeductDtl, titaVo);
 			} catch (DBException e) {
@@ -240,5 +238,4 @@ public class L4512 extends TradeBuffer {
 		}
 	}
 
-	
 }

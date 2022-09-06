@@ -27,7 +27,6 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 //		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);

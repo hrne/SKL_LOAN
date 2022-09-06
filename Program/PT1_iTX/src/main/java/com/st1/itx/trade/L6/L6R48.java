@@ -33,18 +33,18 @@ public class L6R48 extends TradeBuffer {
 
 		int iFunCode = Integer.parseInt(titaVo.getParam("RimFunCode"));
 		String iErrCode = titaVo.getParam("RimErrCode");
-		
+
 		TxErrCode iTxErrCode = tTxErrCodeService.findById(iErrCode, titaVo);
-		
+
 		if (iTxErrCode == null) {
-			if(iFunCode != 1) {
-				throw new LogicException(titaVo, "E0001", "查詢資料不存在,代碼"+iErrCode );
+			if (iFunCode != 1) {
+				throw new LogicException(titaVo, "E0001", "查詢資料不存在,代碼" + iErrCode);
 			}
-			
+
 		} else {
-			if(iFunCode == 1) {//新增資料已存在
-				throw new LogicException(titaVo, "E0002", "新增資料已存在,代碼:"+iErrCode );
-			} 
+			if (iFunCode == 1) {// 新增資料已存在
+				throw new LogicException(titaVo, "E0002", "新增資料已存在,代碼:" + iErrCode);
+			}
 			totaVo.putParam("L6R48ErrContent", iTxErrCode.getErrContent());
 		}
 

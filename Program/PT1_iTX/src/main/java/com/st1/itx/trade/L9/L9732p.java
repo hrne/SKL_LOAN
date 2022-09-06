@@ -21,7 +21,7 @@ import com.st1.itx.util.http.WebClient;
  * @author Mata Wang
  * @version 1.0.0
  */
-public class L9732p extends TradeBuffer{
+public class L9732p extends TradeBuffer {
 
 	@Autowired
 	L9732Report L9732Report;
@@ -50,7 +50,7 @@ public class L9732p extends TradeBuffer{
 			content = "L9732質押股票明細表查無資料";
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9732", content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9732", content, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

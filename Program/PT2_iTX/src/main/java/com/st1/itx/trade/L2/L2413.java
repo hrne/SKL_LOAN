@@ -154,8 +154,7 @@ public class L2413 extends TradeBuffer {
 		if (iFunCd == 1) {
 
 			// 取號使用參數
-			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0")
-					+ StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
+			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
 			this.info("FOR Colind4s = " + Colind4s);
 			// 新增時取號 進擔保品代號檔取最後使用碼+1
@@ -334,8 +333,7 @@ public class L2413 extends TradeBuffer {
 //				2.若設定金額低於可分配金額則為設定金額
 //				3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
 
-				shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
-						BigDecimal.ROUND_HALF_UP);
+				shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
 				if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
@@ -485,8 +483,7 @@ public class L2413 extends TradeBuffer {
 
 		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
 		if (custMain != null) {
-			Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(), 0,
-					Integer.MAX_VALUE);
+			Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(), 0, Integer.MAX_VALUE);
 			List<ClStock> lClStock = sClStock == null ? null : sClStock.getContent();
 			if (lClStock != null) {
 				for (ClStock clStock : lClStock) {

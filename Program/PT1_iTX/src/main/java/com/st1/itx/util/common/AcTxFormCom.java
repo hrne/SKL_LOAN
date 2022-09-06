@@ -71,8 +71,7 @@ public class AcTxFormCom extends TradeBuffer {
 			headAcDetail = acDetailList.get(0);
 
 //			業務類別 01.撥款匯款 02.支票繳款 03.債協 09.放款
-			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2),
-					titaVo);
+			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2), titaVo);
 
 			String secNoX = "";
 
@@ -105,8 +104,7 @@ public class AcTxFormCom extends TradeBuffer {
 //			會計日期 
 			this.totaVo.putParam("FM101_AcDate", headAcDetail.getAcDate());
 //			登放序號 -> 交易序號
-			this.totaVo.putParam("FM101_RelTxseq", headAcDetail.getTitaKinbr() + headAcDetail.getTitaTlrNo()
-					+ parse.IntegerToString(headAcDetail.getTitaTxtNo(), 8));
+			this.totaVo.putParam("FM101_RelTxseq", headAcDetail.getTitaKinbr() + headAcDetail.getTitaTlrNo() + parse.IntegerToString(headAcDetail.getTitaTxtNo(), 8));
 //			交易代號 & 中文 
 			this.totaVo.putParam("FM101_TitaTxCd", headAcDetail.getTitaTxCd());
 			if (txTranCode == null) {
@@ -183,8 +181,7 @@ public class AcTxFormCom extends TradeBuffer {
 				occursList.putParam("FM101_FacmNo", tAcDetail.getFacmNo());
 				occursList.putParam("FM101_BormNo", tAcDetail.getBormNo());
 //				科子目
-				occursList.putParam("FM101_AcNoCode", FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + "-"
-						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5));
+				occursList.putParam("FM101_AcNoCode", FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + "-" + FormatUtil.padX(tAcDetail.getAcSubCode(), 5));
 				occursList.putParam("FM101_AcDtlCode", tAcDetail.getAcDtlCode());
 //				科子細目中文
 				occursList.putParam("FM101_AcNoCodeX", acNoCodeX);

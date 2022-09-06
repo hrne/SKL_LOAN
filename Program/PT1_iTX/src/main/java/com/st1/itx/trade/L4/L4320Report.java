@@ -123,11 +123,9 @@ public class L4320Report extends MakeReport {
 			if (fnAllList.size() > 0) {
 //				設定工作表名稱
 				if (this.iTxKind == 1) {
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-							"L4320_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E", "L4320_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 				} else {
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E",
-							"L4320_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E", "L4320_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 				}
 				String fdnm = "";
 //					從第幾列開始(表頭位置)

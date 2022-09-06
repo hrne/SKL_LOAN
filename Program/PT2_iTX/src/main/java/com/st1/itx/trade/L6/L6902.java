@@ -101,12 +101,11 @@ public class L6902 extends TradeBuffer {
 		// 查詢會計總帳檔
 		Slice<AcMain> slAcMain;
 		if (classcode == 1) {
-			slAcMain = sAcMainService.acmainAcBookCodeRange2(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-					iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
-		} else {
-			slAcMain = sAcMainService.acmainAcBookCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
-					iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
+			slAcMain = sAcMainService.acmainAcBookCodeRange2(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
 					titaVo);
+		} else {
+			slAcMain = sAcMainService.acmainAcBookCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index,
+					this.limit, titaVo);
 		}
 
 		List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
@@ -128,17 +127,14 @@ public class L6902 extends TradeBuffer {
 				occursList.putParam("OODbCr", dbcr);
 				occursList.putParam("OOTdBal", tAcMain.getTdBal());
 				Timestamp lastUpdateTime = tAcMain.getLastUpdate();
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " "
-						+ parse.timeStampToStringTime(lastUpdateTime));
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
 				String lastUpdateEmpNo = tAcMain.getLastUpdateEmpNo();
 				occursList.putParam("OOLastEmp", findEmpNoAndName(lastUpdateEmpNo, titaVo));
 
 				// 檢查是否有明細，以判斷是否需顯示按鈕
 
-				Slice<AcDetail> slAcDetail = sAcDetailService.acdtlAcDateRange(tAcMain.getAcBookCode(),
-						tAcMain.getAcSubBookCode() + "%", tAcMain.getBranchNo(), tAcMain.getCurrencyCode(),
-						tAcMain.getAcNoCode(), tAcMain.getAcSubCode(), tAcMain.getAcDtlCode(), tAcMain.getAcDate() + 19110000, tAcMain.getAcDate() + 19110000,
-						0, 1, titaVo);
+				Slice<AcDetail> slAcDetail = sAcDetailService.acdtlAcDateRange(tAcMain.getAcBookCode(), tAcMain.getAcSubBookCode() + "%", tAcMain.getBranchNo(), tAcMain.getCurrencyCode(),
+						tAcMain.getAcNoCode(), tAcMain.getAcSubCode(), tAcMain.getAcDtlCode(), tAcMain.getAcDate() + 19110000, tAcMain.getAcDate() + 19110000, 0, 1, titaVo);
 				List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 				occursList.putParam("OOHasDetail", lAcDetail != null && !lAcDetail.isEmpty() ? "Y" : "N");
@@ -193,8 +189,7 @@ public class L6902 extends TradeBuffer {
 				occursList.putParam("OOCrAmt", crAmt);
 				occursList.putParam("OODbCr", dbcr);
 				occursList.putParam("OOTdBal", tdbal);
-				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " "
-						+ parse.timeStampToStringTime(lastUpdateTime));
+				occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
 				occursList.putParam("OOLastEmp", findEmpNoAndName(lastUpdateEmpNo, titaVo));
 
 				/* 將每筆資料放入Tota的OcList */
@@ -223,8 +218,7 @@ public class L6902 extends TradeBuffer {
 			occursList.putParam("OOCrAmt", crAmt);
 			occursList.putParam("OODbCr", dbcr);
 			occursList.putParam("OOTdBal", tdbal);
-			occursList.putParam("OOLastUpdate",
-					parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(lastUpdateTime) + " " + parse.timeStampToStringTime(lastUpdateTime));
 			occursList.putParam("OOLastEmp", findEmpNoAndName(lastUpdateEmpNo, titaVo));
 
 			/* 將每筆資料放入Tota的OcList */

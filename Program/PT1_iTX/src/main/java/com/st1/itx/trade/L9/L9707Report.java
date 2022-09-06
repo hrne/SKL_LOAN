@@ -126,7 +126,7 @@ public class L9707Report extends MakeReport {
 			makeExcel.setValue(3, 1, "無資料");
 		}
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	public int calculateTimeDifferenceBySimpleDateFormat(String date1, String date2) throws ParseException {

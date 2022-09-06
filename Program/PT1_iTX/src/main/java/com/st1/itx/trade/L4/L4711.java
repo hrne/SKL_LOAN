@@ -73,8 +73,7 @@ public class L4711 extends TradeBuffer {
 
 //		temp path = D:\\tmp\\LNM56OP.txt
 //		檔名暫定
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-電子郵件媒體檔", "LNM56OP_eMail.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-電子郵件媒體檔", "LNM56OP_eMail.txt", 2);
 
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 

@@ -98,10 +98,8 @@ public class L6R20 extends TradeBuffer {
 		TxTeller tTxTeller2 = sTxTellerService.findById(titaVo.getTlrNo(), titaVo);
 		this.totaVo.putParam("IsAdmin", tTxTeller2.getAdminFg());
 
-		if ("8".equals(iFunCode) && !titaVo.get("BrNo").trim().isEmpty()
-				&& !tTxTeller.getBrNo().equals(titaVo.get("BrNo").trim())) {
-			throw new LogicException(titaVo, "E0015",
-					"使用者 " + tTxTeller.getTlrNo() + " 非隸屬單位 " + titaVo.get("BrNo").trim());
+		if ("8".equals(iFunCode) && !titaVo.get("BrNo").trim().isEmpty() && !tTxTeller.getBrNo().equals(titaVo.get("BrNo").trim())) {
+			throw new LogicException(titaVo, "E0015", "使用者 " + tTxTeller.getTlrNo() + " 非隸屬單位 " + titaVo.get("BrNo").trim());
 		}
 
 		/*-
@@ -141,8 +139,7 @@ public class L6R20 extends TradeBuffer {
 
 		this.totaVo.putParam("Station", tTxTeller.getStation());
 		this.totaVo.putParam("AdminFg", tTxTeller.getAdminFg());
-		this.totaVo.putParam("EmailAddress", tTxTeller.getEmail()); //6/23新增電子信箱
-		
+		this.totaVo.putParam("EmailAddress", tTxTeller.getEmail()); // 6/23新增電子信箱
 
 		this.totaVo.putParam("LastDate", tTxTeller.getLastDate());
 		this.totaVo.putParam("LastTime", tTxTeller.getLastTime());
@@ -158,7 +155,7 @@ public class L6R20 extends TradeBuffer {
 		}
 
 		this.info("L6R20 mntEmpNo = " + LastUpdateEmpNo + "/" + name);
-		
+
 		this.totaVo.putParam("LastUpdateEmpNoX", name);
 
 	}

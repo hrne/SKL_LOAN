@@ -79,7 +79,7 @@ public class L3R30 extends TradeBuffer {
 			tLoanCustRmk = sLoanCustRmkService.findById(LoanCustRmkId, titaVo);
 			// 該戶號 備忘錄序號查不到資料 拋錯
 			if (tLoanCustRmk == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號、備忘錄序號不存在帳務備忘錄明細資料檔。"); //查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "  該戶號、備忘錄序號不存在帳務備忘錄明細資料檔。"); // 查詢資料不存在
 			}
 
 			this.totaVo.putParam("L3r30RmkNo", tLoanCustRmk.getRmkNo());

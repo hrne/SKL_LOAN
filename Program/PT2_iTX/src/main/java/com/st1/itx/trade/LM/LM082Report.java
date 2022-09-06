@@ -28,12 +28,12 @@ public class LM082Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	private static BigDecimal hundredMillion = new BigDecimal("100000000");
-	
+
 	boolean hasOutputted = false;
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -45,9 +45,9 @@ public class LM082Report extends MakeReport {
 		List<List<Map<String, String>>> lLM082List = new ArrayList<List<Map<String, String>>>();
 
 		try {
-			lLM082List.add(lM082ServiceImpl.findAll(titaVo, iAcDate/100, 20210319, 20211216, "05"));
-			lLM082List.add(lM082ServiceImpl.findAll(titaVo, iAcDate/100, 20210319, 20211216, "02", "04"));
-			lLM082List.add(lM082ServiceImpl.findAll(titaVo, iAcDate/100, 20211217, 99999999, "05"));
+			lLM082List.add(lM082ServiceImpl.findAll(titaVo, iAcDate / 100, 20210319, 20211216, "05"));
+			lLM082List.add(lM082ServiceImpl.findAll(titaVo, iAcDate / 100, 20210319, 20211216, "02", "04"));
+			lLM082List.add(lM082ServiceImpl.findAll(titaVo, iAcDate / 100, 20211217, 99999999, "05"));
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -64,8 +64,8 @@ public class LM082Report extends MakeReport {
 
 		this.info("LM082Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", date/100%100) + " 月";
-		
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", date / 100 % 100) + " 月";
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM082", "B048金融機構承作「自然人購置高價住宅貸款」統計表(110.3.19(含)起辦理案件)",
 				"LM082_B048金融機構承作「自然人購置高價住宅貸款」統計表(110.3.19(含)起辦理案件)" + showRocDate(entdy, 0).substring(0, 7), "LM082_底稿_B048金融機構承作「自然人購置高價住宅貸款」統計表(110.3.19(含)起辦理案件).xlsx", 1, "FOA");
 
@@ -73,35 +73,32 @@ public class LM082Report extends MakeReport {
 		makeExcel.setValue(3, 7, "民國 " + YearMonth, "R");
 
 		if (foundList != null && !foundList.isEmpty()) {
-			
-			for (int i = 0; i < foundList.size(); i++)
-			{
+
+			for (int i = 0; i < foundList.size(); i++) {
 				doOutput(foundList.get(i), 3 + i * 4);
 			}
-
 
 			for (int i = 3; i < 3 + (foundList.size()) * 4; i++) {
 				makeExcel.formulaCaculate(15, i);
 			}
-		} 
-		
+		}
+
 		if (!hasOutputted)
 			makeExcel.setValue(4, 1, "本月無資料");
 		else
-			makeExcel.formulaRangeCalculate(8,15,15,41);
-		
-		// long sno = 
+			makeExcel.formulaRangeCalculate(8, 15, 15, 41);
+
+		// long sno =
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
-	
-	private void doOutput(List<Map<String, String>> lList, int startColumn) throws LogicException 
-	{
+
+	private void doOutput(List<Map<String, String>> lList, int startColumn) throws LogicException {
 		if (lList == null || lList.isEmpty())
 			return;
-		
+
 		hasOutputted = true;
-		
+
 		for (Map<String, String> tLDVo : lList) {
 			int colShift = 0;
 			int rowShift = 0;

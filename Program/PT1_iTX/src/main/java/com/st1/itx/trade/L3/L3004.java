@@ -80,8 +80,7 @@ public class L3004 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		slLoanBook = loanBookService.bookCustNoRange(wkCustNoStart, wkCustNoEnd, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, 0, this.index, this.limit, titaVo);
+		slLoanBook = loanBookService.bookCustNoRange(wkCustNoStart, wkCustNoEnd, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, this.index, this.limit, titaVo);
 		lLoanBook = slLoanBook == null ? null : slLoanBook.getContent();
 		if (lLoanBook == null || lLoanBook.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款約定還本檔"); // 查詢資料不存在

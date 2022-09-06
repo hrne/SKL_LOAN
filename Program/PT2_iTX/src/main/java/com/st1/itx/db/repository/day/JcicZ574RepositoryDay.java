@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,28 +21,27 @@ import com.st1.itx.db.domain.JcicZ574Id;
  */
 public interface JcicZ574RepositoryDay extends JpaRepository<JcicZ574, JcicZ574Id> {
 
-  // CustId=
-  public Slice<JcicZ574> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
+	// CustId=
+	public Slice<JcicZ574> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
 
-  // ApplyDate=
-  public Slice<JcicZ574> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
+	// ApplyDate=
+	public Slice<JcicZ574> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
 
-  // CustId= , AND ApplyDate=
-  public Slice<JcicZ574> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
+	// CustId= , AND ApplyDate=
+	public Slice<JcicZ574> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
 
-  // Ukey=
-  public Optional<JcicZ574> findTopByUkeyIs(String ukey_0);
+	// Ukey=
+	public Optional<JcicZ574> findTopByUkeyIs(String ukey_0);
 
-  // CustId=, AND ApplyDate = ,AND SubmitKey = 
-  public Slice<JcicZ574> findAllByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, Pageable pageable);
+	// CustId=, AND ApplyDate = ,AND SubmitKey =
+	public Slice<JcicZ574> findAllByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, Pageable pageable);
 
-  // CustId=, AND ApplyDate = ,AND SubmitKey = 
-  public Optional<JcicZ574> findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2);
+	// CustId=, AND ApplyDate = ,AND SubmitKey =
+	public Optional<JcicZ574> findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<JcicZ574> findByJcicZ574Id(JcicZ574Id jcicZ574Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<JcicZ574> findByJcicZ574Id(JcicZ574Id jcicZ574Id);
 
 }
-

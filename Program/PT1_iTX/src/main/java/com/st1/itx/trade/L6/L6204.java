@@ -40,7 +40,6 @@ public class L6204 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6204 ");
@@ -92,8 +91,6 @@ public class L6204 extends TradeBuffer {
 			}
 		}
 
-		
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -102,7 +99,7 @@ public class L6204 extends TradeBuffer {
 
 		tTxErrCode.setErrCode(ErrCode);
 		tTxErrCode.setErrContent(titaVo.get("ErrContent").trim());
-		
+
 		return tTxErrCode;
 
 	}

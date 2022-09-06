@@ -82,7 +82,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param startDate 查詢區間起日
 	 * @param endDate   查詢區間迄日
-	 * @param titaVo  TitaVo
+	 * @param titaVo    TitaVo
 	 * @return 查詢結果
 	 */
 	public List<Map<String, String>> doDetailQuery(int startDate, int endDate, TitaVo titaVo) {
@@ -112,7 +112,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , \"AcNoCode\" ";
 		sql += "            , \"SlipNo\" ";
 		sql += "            , \"TitaTxtNo\" ";
-		
+
 		this.info("doDetailQuery sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

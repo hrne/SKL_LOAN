@@ -135,7 +135,7 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ThisLimit", limit);
 
 		query.setParameter("AcDate", iAcDate);
-		
+
 		if (!iAcBookCode.isEmpty()) {
 			query.setParameter("AcBookCode", iAcBookCode);
 			this.info("L6905Service 1");
@@ -179,7 +179,7 @@ public class L6905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iInqType == 6) {
 			query.setParameter("TitaSecNo", FormatUtil.padX(iInqData, 2));
 		}
-		
+
 		this.info("L6905Service FindData=" + query);
 
 		// *** 折返控制相關 ***

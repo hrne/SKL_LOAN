@@ -104,7 +104,7 @@ public class L1R19 extends TradeBuffer {
 			// 成長率算法 (新-舊)/舊
 			BigDecimal iHundred = new BigDecimal("100");
 			BigDecimal iGap = iThisBusIncome.subtract(iLastBusIncome);
-			iPercent = iGap.divide(iLastBusIncome,4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
+			iPercent = iGap.divide(iLastBusIncome, 4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
 		}
 
 		totaVo.putParam("L1R19GrowRate", iPercent);

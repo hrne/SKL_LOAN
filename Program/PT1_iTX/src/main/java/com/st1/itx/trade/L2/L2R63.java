@@ -64,8 +64,7 @@ public class L2R63 extends TradeBuffer {
 		this.info("FacmNo = " + iFacmNo);
 		this.info("BormNo = " + iBormNo);
 
-		TxToDoDetailReserve tTxToDoDetailReserve = txToDoDetailReserveService.FindL2880First("L2880", iCustNo, iFacmNo,
-				iBormNo, titaVo);
+		TxToDoDetailReserve tTxToDoDetailReserve = txToDoDetailReserveService.FindL2880First("L2880", iCustNo, iFacmNo, iBormNo, titaVo);
 
 		this.totaVo.putParam("L2r63PrintDate", "");
 		this.totaVo.putParam("L2r63TlrNo", "");

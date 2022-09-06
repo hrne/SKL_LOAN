@@ -133,8 +133,7 @@ public class BS401 extends TradeBuffer {
 				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
 			}
 			// findAll 整批入帳明細檔
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
-					Integer.MAX_VALUE);
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
 			if (slBatxDetail == null) {
 				throw new LogicException("E0014", "整批入帳明細檔= null"); // E0014 檔案錯誤
 			}
@@ -143,8 +142,7 @@ public class BS401 extends TradeBuffer {
 				if (!"".equals(iReconCode) && !t.getReconCode().equals(iReconCode)) {
 					continue;
 				}
-				if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
-						|| "7".equals(t.getProcStsCode())) {
+				if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode()) || "7".equals(t.getProcStsCode())) {
 					if (iFunctionCode == 1) {
 						errorMsg = "刪除時有入帳成功資料";
 					}
@@ -159,11 +157,10 @@ public class BS401 extends TradeBuffer {
 			}
 
 			if (!errorMsg.isEmpty()) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
-						titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + errorMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + errorMsg, titaVo);
 				return this.sendList();
 			}
-			
+
 			tBatxHead = batxHeadService.holdById(tBatxHeadId);
 			if (tBatxHead == null) {
 				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
@@ -234,8 +231,7 @@ public class BS401 extends TradeBuffer {
 						try {
 							batxDetailService.update(tDetail);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007",
-									"BS401 update batxDetail " + tDetail + e.getErrorMsg());
+							throw new LogicException(titaVo, "E0007", "BS401 update batxDetail " + tDetail + e.getErrorMsg());
 						}
 						this.batchTransaction.commitEnd();
 						this.batchTransaction.init();
@@ -243,8 +239,7 @@ public class BS401 extends TradeBuffer {
 
 					if ("4".equals(tDetail.getProcStsCode())) {
 						ProcessCnt++;
-						if (tTempVo.get("MergeCnt") != null
-								&& !tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
+						if (tTempVo.get("MergeCnt") != null && !tTempVo.get("MergeSeq").equals(tTempVo.get("MergeCnt"))) {
 							excuteTx(2, tDetail, tBatxHead, titaVo); // 轉暫收
 						} else {
 							excuteTx(0, tDetail, tBatxHead, titaVo); // 正常交易
@@ -261,8 +256,7 @@ public class BS401 extends TradeBuffer {
 					try {
 						batxDetailService.update(tDetail);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007",
-								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
+						throw new LogicException(titaVo, "E0007", "BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
 					cancelUpdate(tDetail, tTempVo.getParam("StsCode"), titaVo);
@@ -271,8 +265,7 @@ public class BS401 extends TradeBuffer {
 				case 2: // 2.轉暫收
 					ProcessCnt++;
 					// 暫收抵繳 ， 轉暫收時直接更新、不送交易
-					if ("2".equals(tDetail.getProcStsCode()) || "3".equals(tDetail.getProcStsCode())
-							|| "4".equals(tDetail.getProcStsCode())) {
+					if ("2".equals(tDetail.getProcStsCode()) || "3".equals(tDetail.getProcStsCode()) || "4".equals(tDetail.getProcStsCode())) {
 						ProcessCnt++;
 						// 暫收抵繳 ， 轉暫收時直接更新、不送交易
 						if (tDetail.getRepayCode() == 90) {
@@ -280,8 +273,7 @@ public class BS401 extends TradeBuffer {
 							try {
 								batxDetailService.update(tDetail);
 							} catch (DBException e) {
-								throw new LogicException(titaVo, "E0007",
-										"BS401 update batxDetail " + tDetail + e.getErrorMsg());
+								throw new LogicException(titaVo, "E0007", "BS401 update batxDetail " + tDetail + e.getErrorMsg());
 							}
 							isUpdate = true;
 						} else {
@@ -296,8 +288,7 @@ public class BS401 extends TradeBuffer {
 					try {
 						batxDetailService.update(tDetail);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007",
-								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
+						throw new LogicException(titaVo, "E0007", "BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
 					cancelUpdate(tDetail, tTempVo.getParam("StsCode"), titaVo);
@@ -341,8 +332,7 @@ public class BS401 extends TradeBuffer {
 			break;
 		}
 		if (!sendMsg.isEmpty()) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
-					titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + sendMsg, titaVo);
 		}
 		return this.sendList();
 	}
@@ -351,8 +341,7 @@ public class BS401 extends TradeBuffer {
 	private String updateHead(int iFunctionCode, TitaVo titaVo) throws LogicException {
 
 		// findAll 整批入帳明細檔
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
-				Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
 		List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 // ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳  7.虛擬轉暫收
 
@@ -473,9 +462,8 @@ public class BS401 extends TradeBuffer {
 			else
 				batxExeCode = "4";
 		}
-		this.info("BS401 updateHead batxExeCode = " + batxExeCode + ", unCheckTotalCnt=" + unCheckTotalCnt
-				+ ", checkErrorTotalCnt=" + checkErrorTotalCnt + ", toDoTotalCnt=" + toDoTotalCnt + ", doneTotalCnt="
-				+ doneTotalCnt);
+		this.info("BS401 updateHead batxExeCode = " + batxExeCode + ", unCheckTotalCnt=" + unCheckTotalCnt + ", checkErrorTotalCnt=" + checkErrorTotalCnt + ", toDoTotalCnt=" + toDoTotalCnt
+				+ ", doneTotalCnt=" + doneTotalCnt);
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(iAcDate);
 		tBatxHeadId.setBatchNo(iBatchNo);
@@ -529,8 +517,7 @@ public class BS401 extends TradeBuffer {
 		return msg;
 	}
 
-	private void excuteTx(int functionCode, BatxDetail tDetail, BatxHead tBatxHead, TitaVo titaVo)
-			throws LogicException {
+	private void excuteTx(int functionCode, BatxDetail tDetail, BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
 		// 組入帳交易電文
 		TitaVo txTitaVo = new TitaVo();
 		txTitaVo = txBatchCom.txTita(functionCode, tDetail, tBatxHead.getBatxTotCnt(), titaVo); // 正常交易電文
@@ -568,8 +555,7 @@ public class BS401 extends TradeBuffer {
 	// 回寫員工扣薪媒體檔
 	private void updateEmpDeduct(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 
-		EmpDeductMedia tEmpDeductMedia = empDeductMediaService.holdById(new EmpDeductMediaId(
-				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
+		EmpDeductMedia tEmpDeductMedia = empDeductMediaService.holdById(new EmpDeductMediaId(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
 		if (tEmpDeductMedia == null || !tEmpDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
 			return;
 		}
@@ -622,8 +608,7 @@ public class BS401 extends TradeBuffer {
 		if (tBatxDetail.getProcCode().isEmpty() || !"0".equals(tBatxDetail.getProcCode().substring(0, 1))) {
 			return;
 		}
-		AchDeductMedia tAchDeductMedia = achDeductMediaService.holdById(new AchDeductMediaId(
-				tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
+		AchDeductMedia tAchDeductMedia = achDeductMediaService.holdById(new AchDeductMediaId(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq()), titaVo);
 		if (tAchDeductMedia == null || !tAchDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
 			return;
 		}
@@ -638,8 +623,8 @@ public class BS401 extends TradeBuffer {
 			throw new LogicException("E0007", "AchDeductMedia update Fail");
 		}
 
-		Slice<BankDeductDtl> sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
-				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankDeductDtl> sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), 0, Integer.MAX_VALUE,
+				titaVo);
 		List<BankDeductDtl> lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
@@ -666,8 +651,7 @@ public class BS401 extends TradeBuffer {
 		if (tBatxDetail.getProcCode().isEmpty() || !"0".equals(tBatxDetail.getProcCode().substring(0, 1))) {
 			return;
 		}
-		PostDeductMedia tPostDeductMedia = postDeductMediaService.holdById(
-				new PostDeductMediaId(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaSeq()), titaVo);
+		PostDeductMedia tPostDeductMedia = postDeductMediaService.holdById(new PostDeductMediaId(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaSeq()), titaVo);
 		if (tPostDeductMedia == null || !tPostDeductMedia.getBatchNo().equals(tBatxDetail.getBatchNo())) {
 			return;
 		}
@@ -683,8 +667,8 @@ public class BS401 extends TradeBuffer {
 			throw new LogicException("E0007", "PostDeductMedia update Fail");
 		}
 
-		Slice<BankDeductDtl> sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
-				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankDeductDtl> sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), 0, Integer.MAX_VALUE,
+				titaVo);
 		List<BankDeductDtl> lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
@@ -707,8 +691,7 @@ public class BS401 extends TradeBuffer {
 
 	// 更新匯款轉帳檔 AML回應碼
 	private void updateBankRmtf(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
-		BankRmtf tBankRmtf = bankRmtfService.holdById(new BankRmtfId(tBatxDetail.getAcDate() + 19110000,
-				tBatxDetail.getBatchNo(), tBatxDetail.getDetailSeq()), titaVo);
+		BankRmtf tBankRmtf = bankRmtfService.holdById(new BankRmtfId(tBatxDetail.getAcDate() + 19110000, tBatxDetail.getBatchNo(), tBatxDetail.getDetailSeq()), titaVo);
 		if (tBankRmtf != null) {
 			if ("D".equals(tBatxDetail.getProcStsCode())) {
 				tBankRmtf.setAmlRsp("D");

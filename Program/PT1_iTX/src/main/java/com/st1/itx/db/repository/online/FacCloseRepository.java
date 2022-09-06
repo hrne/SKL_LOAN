@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import java.util.List;
@@ -23,43 +22,43 @@ import com.st1.itx.db.domain.FacCloseId;
  */
 public interface FacCloseRepository extends JpaRepository<FacClose, FacCloseId> {
 
-  // CustNo = 
-  public Slice<FacClose> findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, Pageable pageable);
+	// CustNo =
+	public Slice<FacClose> findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = 
-  public Slice<FacClose> findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
+	// CustNo = ,AND FacmNo =
+	public Slice<FacClose> findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
 
-  // CloseDate >= ,AND CloseDate <= 
-  public Slice<FacClose> findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(int closeDate_0, int closeDate_1, Pageable pageable);
+	// CloseDate >= ,AND CloseDate <=
+	public Slice<FacClose> findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(int closeDate_0, int closeDate_1, Pageable pageable);
 
-  // CustNo =
-  public Optional<FacClose> findTopByCustNoIsOrderByCloseNoDesc(int custNo_0);
+	// CustNo =
+	public Optional<FacClose> findTopByCustNoIsOrderByCloseNoDesc(int custNo_0);
 
-  // EntryDate =
-  public Slice<FacClose> findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int entryDate_0, Pageable pageable);
+	// EntryDate =
+	public Slice<FacClose> findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int entryDate_0, Pageable pageable);
 
-  // CloseDate = ,AND CloseNo >= ,AND CloseNo <= ,AND CarLoan >= ,AND CarLoan <=
-  public Slice<FacClose> findAllByCloseDateIsAndCloseNoGreaterThanEqualAndCloseNoLessThanEqualAndCarLoanGreaterThanEqualAndCarLoanLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(int closeDate_0, int closeNo_1, int closeNo_2, int carLoan_3, int carLoan_4, Pageable pageable);
+	// CloseDate = ,AND CloseNo >= ,AND CloseNo <= ,AND CarLoan >= ,AND CarLoan <=
+	public Slice<FacClose> findAllByCloseDateIsAndCloseNoGreaterThanEqualAndCloseNoLessThanEqualAndCarLoanGreaterThanEqualAndCarLoanLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(int closeDate_0,
+			int closeNo_1, int closeNo_2, int carLoan_3, int carLoan_4, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND FunCode ^i
-  public Optional<FacClose> findTopByCustNoIsAndFacmNoIsAndFunCodeInOrderByCloseNoDesc(int custNo_0, int facmNo_1, List<String> funCode_2);
+	// CustNo = ,AND FacmNo = ,AND FunCode ^i
+	public Optional<FacClose> findTopByCustNoIsAndFacmNoIsAndFunCodeInOrderByCloseNoDesc(int custNo_0, int facmNo_1, List<String> funCode_2);
 
-  // ApplDate >= ,AND ApplDate <=
-  public Slice<FacClose> findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int applDate_0, int applDate_1, Pageable pageable);
+	// ApplDate >= ,AND ApplDate <=
+	public Slice<FacClose> findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int applDate_0, int applDate_1, Pageable pageable);
 
-  // CustNo >= ,AND CustNo <= 
-  public Slice<FacClose> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, int custNo_1, Pageable pageable);
+	// CustNo >= ,AND CustNo <=
+	public Slice<FacClose> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, int custNo_1, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = 
-  public Optional<FacClose> findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(int custNo_0, int facmNo_1);
+	// CustNo = ,AND FacmNo =
+	public Optional<FacClose> findTopByCustNoIsAndFacmNoIsOrderByCloseNoDesc(int custNo_0, int facmNo_1);
 
-  // EntryDate >= ,AND EntryDate <= 
-  public Slice<FacClose> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int entryDate_0, int entryDate_1, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <=
+	public Slice<FacClose> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int entryDate_0, int entryDate_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacClose> findByFacCloseId(FacCloseId facCloseId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacClose> findByFacCloseId(FacCloseId facCloseId);
 
 }
-

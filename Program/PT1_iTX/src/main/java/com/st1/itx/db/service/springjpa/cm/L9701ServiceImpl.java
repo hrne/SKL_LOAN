@@ -26,9 +26,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	
 	/**
 	 * 客戶往來本息明細表（撥款）
+	 * 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
@@ -52,10 +52,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Interest\"";
 		sql += "            ,T.\"BreachAmt\"";
 		sql += "            ,T.\"TxAmt\"";
-		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";//--短繳
-		sql += "            ,T.\"TempAmt\"";//--暫收借
-		sql += "            ,T.\"Overflow\"";//--暫收貸
-		sql += "            ,T.\"ShortAmt\"";//--短繳
+		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --短繳
+		sql += "            ,T.\"TempAmt\"";// --暫收借
+		sql += "            ,T.\"Overflow\"";// --暫收貸
+		sql += "            ,T.\"ShortAmt\"";// --短繳
 		sql += "            ,T.\"Desc\"";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
@@ -92,7 +92,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,1                 AS \"DB\"   ";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
-		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";//--03期票 06即期票現金
+		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";// --03期票 06即期票現金
 		sql += "             AND ( \"TxAmt\" <> 0";
 		sql += "               OR  \"TempAmt\" <> 0)";
 
@@ -154,7 +154,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND CL.\"LandSeq\" = 0 ";	
+		sql += "                             AND CL.\"LandSeq\" = 0 ";
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\", T.\"DB\" ,T.\"TitaCalDy\", T.\"TitaCalTm\"";
 
@@ -169,9 +169,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	
 	/**
 	 * 客戶往來本息明細表（額度）
+	 * 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
@@ -196,10 +196,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Interest\"";
 		sql += "            ,T.\"BreachAmt\"";
 		sql += "            ,T.\"TxAmt\"";
-		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";//--費用
-		sql += "            ,T.\"TempAmt\"";//--暫收借
-		sql += "            ,T.\"Overflow\"";//--暫收貸
-		sql += "            ,T.\"ShortAmt\"";//--短繳
+		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --費用
+		sql += "            ,T.\"TempAmt\"";// --暫收借
+		sql += "            ,T.\"Overflow\"";// --暫收貸
+		sql += "            ,T.\"ShortAmt\"";// --短繳
 		sql += "            ,T.\"Desc\"";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
@@ -239,7 +239,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				  ,\"Displayflag\" AS \"Displayflag\"";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
-		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";//--03期票 06即期票現金
+		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";// --03期票 06即期票現金
 		sql += "             AND ( \"TxAmt\" <> 0";
 		sql += "               OR  \"TempAmt\" <> 0)";
 		sql += "             AND  NVL(\"BormNo\", 0) > 0 ";
@@ -305,7 +305,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND CL.\"LandSeq\" = 0 ";	
+		sql += "                             AND CL.\"LandSeq\" = 0 ";
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
 		sql += "              ,T.\"Displayflag\" ";
@@ -324,6 +324,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 客戶往來本息明細表（額度）
+	 * 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
@@ -344,10 +345,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Principal\"";
 		sql += "            ,T.\"Interest\"";
 		sql += "            ,T.\"BreachAmt\"";
-		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";//--費用
-		sql += "            ,T.\"TempAmt\"";//--暫收借
-		sql += "            ,T.\"Overflow\"";//--暫收貸
-		sql += "            ,T.\"ShortAmt\"";//--短繳
+		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --費用
+		sql += "            ,T.\"TempAmt\"";// --暫收借
+		sql += "            ,T.\"Overflow\"";// --暫收貸
+		sql += "            ,T.\"ShortAmt\"";// --短繳
 		sql += "            ,T.\"Desc\"";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
@@ -445,7 +446,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND CL.\"LandSeq\" = 0 ";	
+		sql += "                             AND CL.\"LandSeq\" = 0 ";
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
 		sql += "              ,T.\"Displayflag\" ";

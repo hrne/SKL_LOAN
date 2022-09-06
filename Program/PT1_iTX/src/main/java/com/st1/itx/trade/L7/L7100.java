@@ -28,10 +28,9 @@ public class L7100 extends TradeBuffer {
 
 	private final String[] tranCode = { "L1109", "L2153", "L2411", "L2416", "L2415", "L2417", "L2101" };
 
-	private final String[][] occursName = { { "L1109Occurs" }, { "L2153StepOccurs" },
-			{ "L2411FirstOccurs", "L2411Occurs" }, { "L2416OwnerOccurs", "L2416ReasonOccurs" },
-			{ "L2415PublicOccurs", "L2415ReasonOccurs", "L2415ParkingTotalOccurs", "L2415ParkingDetailOccurs" },
-			{ "L2417Occurs" }, { "L2101StepOccurs", "L2101PremiumOccurs", "L2101AcctFeeOccurs" ,"L2101HandlingFeeOccurs"} };
+	private final String[][] occursName = { { "L1109Occurs" }, { "L2153StepOccurs" }, { "L2411FirstOccurs", "L2411Occurs" }, { "L2416OwnerOccurs", "L2416ReasonOccurs" },
+			{ "L2415PublicOccurs", "L2415ReasonOccurs", "L2415ParkingTotalOccurs", "L2415ParkingDetailOccurs" }, { "L2417Occurs" },
+			{ "L2101StepOccurs", "L2101PremiumOccurs", "L2101AcctFeeOccurs", "L2101HandlingFeeOccurs" } };
 
 //	private static final String[][] occursfld = { { "StepMonths", "StepMonthE", "StepRateCode", "StepRateIncr", "BreachbMmB", "BreachbPercent" },
 //	{ "OwnerId_", "OwnerName_", "OwnerRelCode_", "OwnerPart_", "OwnerTotal_" },
@@ -62,8 +61,7 @@ public class L7100 extends TradeBuffer {
 					tempVo.put(fld.getKey(), (String) fld.getValue());
 
 			TradeBuffer x = (TradeBuffer) MySpring.getBean((String) m.get("TranCode"));
-			x.setLoggerFg("1",
-					"com.st1.itx.trade." + ((String) m.get("TranCode")).substring(0, 2) + "." + m.get("TranCode"));
+			x.setLoggerFg("1", "com.st1.itx.trade." + ((String) m.get("TranCode")).substring(0, 2) + "." + m.get("TranCode"));
 			x.setTxBuffer(this.txBuffer);
 			tempVo.put(ContentName.txcd, (String) m.get("TranCode"));
 			tempVo.put(ContentName.txCode, (String) m.get("TranCode"));
@@ -96,8 +94,7 @@ public class L7100 extends TradeBuffer {
 
 				count++;
 			} catch (LogicException e) {
-				throw new LogicException(e.getErrorMsgId(), "Body coun : " + count + "TranCode : " + m.get("TranCode")
-						+ " " + e.getErrorMsgId() + " " + e.getErrorMsg());
+				throw new LogicException(e.getErrorMsgId(), "Body coun : " + count + "TranCode : " + m.get("TranCode") + " " + e.getErrorMsgId() + " " + e.getErrorMsg());
 			}
 		}
 		this.totaVo.putParam("statuts", "S");

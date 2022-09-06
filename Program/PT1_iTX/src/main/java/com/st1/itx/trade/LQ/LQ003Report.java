@@ -31,6 +31,7 @@ public class LQ003Report extends MakeReport {
 	public void printTitle() {
 
 	}
+
 	/**
 	 * 執行報表輸出
 	 * 
@@ -43,7 +44,7 @@ public class LQ003Report extends MakeReport {
 		this.info("===========in exportExcel");
 
 		int iYear = thisYM / 100;
-		int iMonth =thisYM % 100;
+		int iMonth = thisYM % 100;
 
 		// 年
 		String rocYear = String.valueOf(iYear - 1911);
@@ -52,7 +53,7 @@ public class LQ003Report extends MakeReport {
 
 		// 上一季
 		String lastQ = "";
-		
+
 		// 上一季
 		String thisQ = "";
 
@@ -117,8 +118,7 @@ public class LQ003Report extends MakeReport {
 			this.error("LQP003ServiceImpl findAll error = " + errors.toString());
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ003", "住宅違約統計季報_服務課申報表", "LQ003住宅違約統計季報" + thisQ,
-				"LQ003_底稿_放款管理課_住宅違約統計季報_服務課申報表.xlsx", "填報");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LQ003", "住宅違約統計季報_服務課申報表", "LQ003住宅違約統計季報" + thisQ, "LQ003_底稿_放款管理課_住宅違約統計季報_服務課申報表.xlsx", "填報");
 
 		makeExcel.setValue(1, 9, lastQ, "C");
 
@@ -155,8 +155,7 @@ public class LQ003Report extends MakeReport {
 				Map<String, String> tLDVo2 = findList2.get(loopPointer);
 
 				// 縣市名稱
-				int f0 = tLDVo.get("F0") == null || tLDVo.get("F0").length() == 0 ? 0
-						: Integer.parseInt(tLDVo.get("F0"));
+				int f0 = tLDVo.get("F0") == null || tLDVo.get("F0").length() == 0 ? 0 : Integer.parseInt(tLDVo.get("F0"));
 				makeExcel.setValue(rowCursor, 1, f0, "C");
 
 				// 縣市代號

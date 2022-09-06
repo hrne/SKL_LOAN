@@ -77,15 +77,15 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         , \"TitaTxCd\"";
 		sql += "         , \"TitaTlrNo\"";
 		sql += "         , \"TitaTxtNo\"";
-		sql += "         , SUM(\"TxAmt\")           AS \"TxAmt\"";//交易金額
-		sql += "         , SUM(\"Principal\")       AS \"Principal\"";//本金
-		sql += "         , SUM(\"Interest\")        AS \"Interest\"";//利息
-		sql += "         , SUM(\"DelayInt\")        AS \"DelayInt\"";//延遲息
-		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";//違約金
-		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";//清償違約金
-		sql += "         , SUM(\"FeeAmt\")  AS \"FeeAmt\"";//費用
-		sql += "         , SUM( \"TempAmt\" )         AS \"TempAmt\"";//暫收借
-		sql += "         , SUM(\"Overflow\")         AS \"Overflow\"";//暫收貸
+		sql += "         , SUM(\"TxAmt\")           AS \"TxAmt\"";// 交易金額
+		sql += "         , SUM(\"Principal\")       AS \"Principal\"";// 本金
+		sql += "         , SUM(\"Interest\")        AS \"Interest\"";// 利息
+		sql += "         , SUM(\"DelayInt\")        AS \"DelayInt\"";// 延遲息
+		sql += "         , SUM(\"BreachAmt\")       AS \"BreachAmt\"";// 違約金
+		sql += "         , SUM(\"CloseBreachAmt\")  AS \"CloseBreachAmt\"";// 清償違約金
+		sql += "         , SUM(\"FeeAmt\")  AS \"FeeAmt\"";// 費用
+		sql += "         , SUM( \"TempAmt\" )         AS \"TempAmt\"";// 暫收借
+		sql += "         , SUM(\"Overflow\")         AS \"Overflow\"";// 暫收貸
 		sql += "    	 , SUM(\"UnpaidPrincipal\" + \"UnpaidInterest\" + \"UnpaidCloseBreach\") AS \"Shortfall\" "; // 短繳(G)
 		sql += "         , SUM(NVL(JSON_VALUE(\"OtherFields\", '$.AcctFee'),0))";
 		sql += "                                  AS \"AcctFee\"";
@@ -184,8 +184,8 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         ) AS \"TxSeq\" ";
 		sql += "  FROM \"BankDeductDtl\" BKD";
 		sql += "  LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BKD.\"CustNo\"";
-		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = BKD.\"AcDate\"" ;
-		sql += "                              AND BD.\"TitaTlrNo\" = BKD.\"TitaTlrNo\""; 
+		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = BKD.\"AcDate\"";
+		sql += "                              AND BD.\"TitaTlrNo\" = BKD.\"TitaTlrNo\"";
 		sql += "                              AND BD.\"TitaTxtNo\" = BKD.\"TitaTxtNo\"";
 		sql += "  LEFT JOIN TX1 ON TX1.\"CustNo\" = BKD.\"CustNo\"";
 		sql += "             AND TX1.\"AcDate\" = BKD.\"AcDate\"";
@@ -211,7 +211,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " AND bkd.\"RepayType\" NOT IN (4,5,6,7) ";
 			break;
 		case 2:
-			sql += " AND ( bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7 )" ;
+			sql += " AND ( bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7 )";
 			break;
 		case 3:
 			sql += " AND bkd.\"RepayType\" = 6 ";

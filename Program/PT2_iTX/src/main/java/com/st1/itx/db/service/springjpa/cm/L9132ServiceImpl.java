@@ -471,7 +471,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ORDER BY \"ReconCode\" ASC";
 		sql += " ) ";
 		sql += " , groupData2 AS ( ";
-		sql += "     SELECT \"RelTxseq\" AS \"TitaTxtNo\"";
+		sql += "     SELECT \"TitaTxtNo\" AS \"TitaTxtNo\"";
 		sql += "          , \"SlipNo\" ";
 		sql += "          , \"AcNo\" ";
 		sql += "          , \"AcSubBookItem\" ";
@@ -482,7 +482,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"EmpName\" ";
 		sql += "     FROM rawData ";
 		sql += "     WHERE \"EntAcCode\" = 0";
-		sql += "     GROUP BY \"RelTxseq\" ";
+		sql += "     GROUP BY \"TitaTxtNo\" ";
 		sql += "            , \"SlipNo\" ";
 		sql += "            , \"AcNo\" ";
 		sql += "            , \"AcSubBookItem\" ";

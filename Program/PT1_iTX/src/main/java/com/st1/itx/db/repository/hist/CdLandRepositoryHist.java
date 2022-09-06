@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,13 +20,12 @@ import com.st1.itx.db.domain.CdLand;
  */
 public interface CdLandRepositoryHist extends JpaRepository<CdLand, String> {
 
-  // CityCode =
-  public Slice<CdLand> findAllByCityCodeIsOrderByCityCodeAscLandOfficeCodeAsc(String cityCode_0, Pageable pageable);
+	// CityCode =
+	public Slice<CdLand> findAllByCityCodeIsOrderByCityCodeAscLandOfficeCodeAsc(String cityCode_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdLand> findByLandOfficeCode(String landOfficeCode);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdLand> findByLandOfficeCode(String landOfficeCode);
 
 }
-

@@ -24,7 +24,7 @@ public class L4R29 extends TradeBuffer {
 
 	@Autowired
 	public EmpDeductDtlService empDeductDtlService;
-	
+
 	@Autowired
 	public Parse parse;
 
@@ -44,10 +44,10 @@ public class L4R29 extends TradeBuffer {
 		int CustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int FacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		int BormNo = parse.stringToInteger(titaVo.getParam("RimBormNo"));
-		
+
 		EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
-		
+
 		tEmpDeductDtlId.setEntryDate(EntryDate);
 		tEmpDeductDtlId.setPerfMonth(PerfMonth);
 		tEmpDeductDtlId.setProcCode(ProcCode);
@@ -58,11 +58,11 @@ public class L4R29 extends TradeBuffer {
 		tEmpDeductDtlId.setFacmNo(FacmNo);
 		tEmpDeductDtlId.setBormNo(BormNo);
 		tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
-		
+
 		tEmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
-		
-		if(tEmpDeductDtl != null) {
-			this.totaVo.putParam("L4R29TxAmt" , tEmpDeductDtl.getTxAmt());
+
+		if (tEmpDeductDtl != null) {
+			this.totaVo.putParam("L4R29TxAmt", tEmpDeductDtl.getTxAmt());
 			this.totaVo.putParam("L4R29DeptCode", tEmpDeductDtl.getDeptCode());
 			this.totaVo.putParam("L4R29RepayAmt", tEmpDeductDtl.getRepayAmt());
 			this.totaVo.putParam("L4R29UnitCode", tEmpDeductDtl.getUnitCode());

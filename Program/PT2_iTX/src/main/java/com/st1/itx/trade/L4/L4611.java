@@ -192,8 +192,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setStatusCode(0);
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			tInsuRenew.setRepayCode(tFacMain.getRepayCode());
 			try {
@@ -210,8 +209,7 @@ public class L4611 extends TradeBuffer {
 			TotalPrem = oldInsuRenew.getFireInsuPrem().add(oldInsuRenew.getEthqInsuPrem());
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("TotalPrem"));
 			// 保險狀態不同、 總保費不同
-			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode"))
-					|| TotalPrem.compareTo(totPrem) != 0) {
+			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode")) || TotalPrem.compareTo(totPrem) != 0) {
 				if (tInsuRenew.getAcDate() > 0) {
 					throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
 				}
@@ -250,8 +248,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			if (tInsuRenew.getRenewCode() == 2) {
 				if (insuYearMonth <= noticeYearMonth) {
@@ -323,8 +320,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			tInsuRenew.setRemark(titaVo.getParam("Remark").trim());
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
@@ -352,7 +348,7 @@ public class L4611 extends TradeBuffer {
 			this.info("skip AcReceivable StatusCode= " + tInsuRenew.getStatusCode());
 			return;
 		}
-		
+
 		if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
 			this.info("skip AcReceivable TotInsuPrem = 0 ");
 			return;
@@ -378,8 +374,7 @@ public class L4611 extends TradeBuffer {
 
 	private String getOrigInsuNo(TitaVo titaVo) throws LogicException {
 		String result = "";
-		InsuOrignal tInsuOrignal = insuOrignalService
-				.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
+		InsuOrignal tInsuOrignal = insuOrignalService.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
 		if (tInsuOrignal == null) {
 			InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(clCode1, clCode2, clNo, prevInsuNo, titaVo);
 			if (t2InsuRenew == null) {

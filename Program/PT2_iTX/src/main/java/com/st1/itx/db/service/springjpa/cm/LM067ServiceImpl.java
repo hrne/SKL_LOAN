@@ -28,17 +28,15 @@ public class LM067ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
 //		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
-		int iYear = yearMonth/ 100;
+		int iYear = yearMonth / 100;
 		// 月
 		int iMonth = yearMonth % 100;
-
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
@@ -113,11 +111,11 @@ public class LM067ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-
-/**
+	/**
 	 * 查詢明細(LM062~LM066覆審相關報表共用)
+	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param yearMonth     西元年月
 	 * @param conditionCode 條件代碼
 	 * 
 	 */
@@ -195,6 +193,5 @@ public class LM067ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("cond", conditionCode);
 		return this.convertToMap(query);
 	}
-
 
 }

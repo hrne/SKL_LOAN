@@ -126,52 +126,46 @@ public class L6971 extends TradeBuffer {
 		}
 	}
 
-	private void doExecution5YTX(int execDate, int batchNo, int custNo, int facmNo, int bormNo, TitaVo titaVo)
-			throws LogicException {
+	private void doExecution5YTX(int execDate, int batchNo, int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
 		this.info("L6971.doExecution5YTX begins. ");
 		this.info("CustNo: " + custNo);
 		this.info("FacmNo: " + facmNo);
 		this.info("BormNo: " + bormNo);
-		
-		if (isHistoryAndOnlineSameCount5YTX(custNo, facmNo, bormNo, titaVo))
-		{
+
+		if (isHistoryAndOnlineSameCount5YTX(custNo, facmNo, bormNo, titaVo)) {
 			int deletedRecords = doDelete5YTX(custNo, facmNo, bormNo, titaVo);
 			setIsDeletedToTrue(deletedRecords, "5YTX", "LoanBorTx", execDate, batchNo, custNo, facmNo, bormNo, titaVo);
-		} else
-		{
+		} else {
 			this.error("DATA has different count in ONLINE and HISTORY!");
 			throw new LogicException("E0008", "此 PK 在歷史環境與連線環境資料筆數不同");
-			
+
 		}
 	}
-	
+
 	private Boolean isHistoryAndOnlineSameCount5YTX(int custNo, int facmNo, int bormNo, TitaVo titaVo) {
-		
+
 		//
 		// 檢查此明細 key 在 history 及 online 是否資料數量相符 for 5YTX
 		// 應該可以 generalize?
 		//
-		
-		Slice<LoanBorTx> sLoanBorTxOnline = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0,
-				Integer.MAX_VALUE, titaVo);
-		
+
+		Slice<LoanBorTx> sLoanBorTxOnline = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, titaVo);
+
 		TitaVo titaVoHistory = (TitaVo) titaVo.clone();
 		titaVoHistory.setDataBaseOnHist();
-		
-		Slice<LoanBorTx> sLoanBorTxHistory = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0,
-				Integer.MAX_VALUE, titaVoHistory);
-		
+
+		Slice<LoanBorTx> sLoanBorTxHistory = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, titaVoHistory);
+
 		return sLoanBorTxOnline.getNumberOfElements() == sLoanBorTxHistory.getNumberOfElements();
 	}
 
 	private int doDelete5YTX(int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
-		
+
 		//
 		// 刪除確認可刪除的明細 for 5YTX
 		//
-		
-		Slice<LoanBorTx> sLoanBorTx = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0,
-				Integer.MAX_VALUE, titaVo);
+
+		Slice<LoanBorTx> sLoanBorTx = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, titaVo);
 		List<LoanBorTx> lLoanBorTx = sLoanBorTx.getContent();
 
 		try {
@@ -186,16 +180,15 @@ public class L6971 extends TradeBuffer {
 		}
 	}
 
-	private void setIsDeletedToTrue(int deletedRecords, String type, String tableName, int execDate, int batchNo, int custNo, int facmNo,
-			int bormNo, TitaVo titaVo) throws LogicException {
-		
+	private void setIsDeletedToTrue(int deletedRecords, String type, String tableName, int execDate, int batchNo, int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+
 		//
 		// 完成刪除後，在 TxArchiveTableLog 將對應的資料 IsDeleted 設為 1
 		// 並且更新該筆資料內容
 		//
-		
+
 		this.info("L6971.setIsDeletedToTrue deleteAll successful. Set isDeleted to 1.");
-		
+
 		try {
 			TxArchiveTableLogId txArchiveTableLogId = new TxArchiveTableLogId();
 			txArchiveTableLogId.setType(type);
@@ -209,14 +202,13 @@ public class L6971 extends TradeBuffer {
 			txArchiveTableLogId.setBormNo(bormNo);
 
 			TxArchiveTableLog record = txArchiveTableLogService.holdById(txArchiveTableLogId, titaVo);
-			
+
 			// deletedRecords 和 TxArchiveTableLog.Records 不符時 rollback
-			if (record.getResult() != deletedRecords)
-			{
+			if (record.getResult() != deletedRecords) {
 				this.error("L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
 				throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");
 			}
-			
+
 			record.setIsDeleted(1);
 			record.setDescription("此次封存明細已從連線環境刪除");
 			record.setLastUpdate(new Timestamp(System.currentTimeMillis()));

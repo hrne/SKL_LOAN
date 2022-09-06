@@ -51,7 +51,7 @@ public class XXR99 extends TradeBuffer {
 
 	@Autowired
 	public CdBranchGroupService sCdBranchGroupService;
-	
+
 	@Autowired
 	public CdBcmService sCdBcmService;
 
@@ -101,7 +101,7 @@ public class XXR99 extends TradeBuffer {
 
 			} else if (k.length() > 4 && "GROP".equals(k.substring(0, 4))) {
 				String BrNo = k.substring(4, 8);
-				s = getGrop(BrNo,titaVo);
+				s = getGrop(BrNo, titaVo);
 
 			} else if (k.length() > 7 && "CdCode.".equals(k.substring(0, 7))) {
 				String DefCode = k.substring(7);
@@ -387,18 +387,18 @@ public class XXR99 extends TradeBuffer {
 		return s;
 	}
 
-	private String getGrop(String BrNo ,TitaVo titaVo) {
+	private String getGrop(String BrNo, TitaVo titaVo) {
 		this.info("XXR99 getGrop = " + BrNo);
 		String s = "";
 
 //		String BrNo = k.substring(4, 8);
 		this.info("XXR99 GROP = " + BrNo);
 		Slice<CdBranchGroup> tCdBranchGroup = sCdBranchGroupService.findByBranchNo(BrNo, 0, Integer.MAX_VALUE, titaVo);
-		
+
 		List<CdBranchGroup> lCdBranchGroup = tCdBranchGroup == null ? null : tCdBranchGroup.getContent();
 		if (lCdBranchGroup != null) {
-			for(CdBranchGroup Cdbg : lCdBranchGroup) {
-				s +=Cdbg.getGroupNo().trim()+ ":" + Cdbg.getGroupItem().trim();
+			for (CdBranchGroup Cdbg : lCdBranchGroup) {
+				s += Cdbg.getGroupNo().trim() + ":" + Cdbg.getGroupItem().trim();
 			}
 		}
 
@@ -482,8 +482,7 @@ public class XXR99 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index,
-				this.limit);
+		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
 
 		if (lTxAuthGroup != null) {

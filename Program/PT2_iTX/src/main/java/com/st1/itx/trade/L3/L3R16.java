@@ -48,8 +48,7 @@ public class L3R16 extends TradeBuffer {
 		String messageTxt = "(新建未收費用)";
 		// 檢查業務科目戶號額度 金額相同者
 		// 手續費帳管費:(戶號額度金額相等)1.已建企金費2.已入帳 3.新建未收費用
-		slAcReceivable = acReceivableService.useL2062Eq(wkAcctCode, iCustNo, iFacmNo, iFacmNo, 0, 1, 0,
-				Integer.MAX_VALUE, titaVo);
+		slAcReceivable = acReceivableService.useL2062Eq(wkAcctCode, iCustNo, iFacmNo, iFacmNo, 0, 1, 0, Integer.MAX_VALUE, titaVo);
 		if (slAcReceivable != null) {
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			for (AcReceivable t : lAcReceivable) {

@@ -39,7 +39,7 @@ public class LB093ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("----------- LB093.findAll ---------------");
 		this.info("-----LB093 TitaVo=" + titaVo);
 		this.info("-----LB093 Tita ENTDY=" + titaVo.getEntDy().substring(0, 6));
-		
+
 		String sql = "";
 
 		// LB093 動產及貴重物品擔保品明細檔

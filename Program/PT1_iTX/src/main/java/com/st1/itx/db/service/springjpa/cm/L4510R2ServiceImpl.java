@@ -27,7 +27,6 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-
 	private int mediaDate = 0;
 	private String procCode = "";
 
@@ -39,7 +38,7 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L4510R2.findAll");
-		this.info("L4510R2.procCode= " +  procCode);
+		this.info("L4510R2.procCode= " + procCode);
 		String sql = " select                                                           ";
 		sql += "  d.\"PerfMonth\"            AS F0                                      ";
 		sql += " ,d.\"ProcCode\"             AS F1                                      ";
@@ -50,9 +49,9 @@ public class L4510R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += " ,c.\"CustName\"             AS F6                                      ";
 		sql += " ,d.\"FacmNo\"               AS F7                                      ";
 		sql += " ,d.\"BormNo\"               AS F8                                      ";
-		sql += " ,CASE WHEN d.\"AchRepayCode\" = 4 THEN n'帳管費'                        "; 
-		sql += "      WHEN d.\"AchRepayCode\" = 6 THEN n'契變手續費'                    "; 
-		sql += "      WHEN d.\"AchRepayCode\" = 7 THEN n'法務費'                        "; 
+		sql += " ,CASE WHEN d.\"AchRepayCode\" = 4 THEN n'帳管費'                        ";
+		sql += "      WHEN d.\"AchRepayCode\" = 6 THEN n'契變手續費'                    ";
+		sql += "      WHEN d.\"AchRepayCode\" = 7 THEN n'法務費'                        ";
 		sql += "      ELSE n'其他' END AS f9                                            ";
 		sql += " ,d.\"RepayAmt\"             AS F10                                     ";
 		sql += " from \"EmpDeductDtl\" d                                                ";

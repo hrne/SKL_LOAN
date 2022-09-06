@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,19 +20,18 @@ import com.st1.itx.db.domain.CustTelNo;
  */
 public interface CustTelNoRepositoryHist extends JpaRepository<CustTelNo, String> {
 
-  // CustUKey = 
-  public Slice<CustTelNo> findAllByCustUKeyIsOrderByLastUpdateDesc(String custUKey_0, Pageable pageable);
+	// CustUKey =
+	public Slice<CustTelNo> findAllByCustUKeyIsOrderByLastUpdateDesc(String custUKey_0, Pageable pageable);
 
-  // CustUKey = ,AND TelTypeCode = 
-  public Optional<CustTelNo> findTopByCustUKeyIsAndTelTypeCodeIsOrderByCreateDateAsc(String custUKey_0, String telTypeCode_1);
+	// CustUKey = ,AND TelTypeCode =
+	public Optional<CustTelNo> findTopByCustUKeyIsAndTelTypeCodeIsOrderByCreateDateAsc(String custUKey_0, String telTypeCode_1);
 
-  // TelTypeCode = ,AND TelNo = 
-  public Slice<CustTelNo> findAllByTelTypeCodeIsAndTelNoIsOrderByCustUKeyAscCreateDateAsc(String telTypeCode_0, String telNo_1, Pageable pageable);
+	// TelTypeCode = ,AND TelNo =
+	public Slice<CustTelNo> findAllByTelTypeCodeIsAndTelNoIsOrderByCustUKeyAscCreateDateAsc(String telTypeCode_0, String telNo_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CustTelNo> findByTelNoUKey(String telNoUKey);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CustTelNo> findByTelNoUKey(String telNoUKey);
 
 }
-

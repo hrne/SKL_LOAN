@@ -175,8 +175,7 @@ public class L1102 extends TradeBuffer {
 
 		} else if ("5".equals(funcd)) {
 
-			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000")
-					&& !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
 				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
 			}
 
@@ -189,7 +188,7 @@ public class L1102 extends TradeBuffer {
 //				if (iChkFg != 0)
 //					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
 //			}
-			
+
 		}
 
 //			刪除功能
@@ -205,8 +204,7 @@ public class L1102 extends TradeBuffer {
 
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -387,7 +385,6 @@ public class L1102 extends TradeBuffer {
 		tCustMain.setDataStatus(0);
 		tCustMain.setAllowInquire("2");
 	}
-
 
 	// by eric 2021.7.31
 	private void setCustCross(TitaVo titaVo, CustMain custMain) throws LogicException {

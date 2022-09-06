@@ -96,8 +96,7 @@ public class MakeFile extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
-			int format) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, int format) throws LogicException {
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, format);
 	}
@@ -117,8 +116,7 @@ public class MakeFile extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
-			throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, 1);
 	}
@@ -151,8 +149,7 @@ public class MakeFile extends CommBuffer {
 		listMap = new ArrayList<Map<String, Object>>();
 	}
 
-	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format)
-			throws LogicException {
+	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format) throws LogicException {
 		if ("".equals(brno)) {
 			throw new LogicException("EC007", "(MakeFile)取檔單位不可為空白");
 		}

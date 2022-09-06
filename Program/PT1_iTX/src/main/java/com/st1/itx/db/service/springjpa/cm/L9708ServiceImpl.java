@@ -33,18 +33,18 @@ public class L9708ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo,int acDate) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int acDate) throws Exception {
 
 		this.info("L9708.findAll");
 		String iDAY = "";
-		if(acDate ==0) {
+		if (acDate == 0) {
 			iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
-		}else {
+		} else {
 			iDAY = String.valueOf(acDate);
 		}
-		
+
 		this.info("會計日期     = " + iDAY);
-		
+
 		String sql = "";
 		sql += "   	   SELECT    B.\"RepayBank\" F0";
 		sql += "   	   		   , B.\"RepayBank\"||D.\"BankItem\" F1";
@@ -68,9 +68,9 @@ public class L9708ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              WHERE A.\"AcDate\" = :iDAY ";
 		sql += "                AND A.\"EntAc\" = 1 ";
 		sql += "                AND A.\"TitaTxCd\" = 'L3100' ";
-		sql += "                AND F.\"RepayCode\" IN (2)  ";  // 2: 銀行扣款
+		sql += "                AND F.\"RepayCode\" IN (2)  "; // 2: 銀行扣款
 		sql += "                group by A.\"CustNo\" , A.\"FacmNo\" ";
-		sql += "             ) M  ";		
+		sql += "             ) M  ";
 		sql += "        LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"";
 		sql += "        LEFT JOIN \"BankAuthAct\" B ON B.\"CustNo\" = M.\"CustNo\"";
 		sql += "                                   AND B.\"FacmNo\" = M.\"FacmNo\"";

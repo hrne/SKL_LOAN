@@ -60,8 +60,7 @@ public class LD005Report extends MakeReport {
 		// 讀取VAR參數
 		this.setCharSpaces(0);
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("LD005").setRptItem("暫收支票收據列印(個人戶)").setSecurity("").setRptSize("A4")
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("LD005").setRptItem("暫收支票收據列印(個人戶)").setSecurity("").setRptSize("A4")
 				.setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

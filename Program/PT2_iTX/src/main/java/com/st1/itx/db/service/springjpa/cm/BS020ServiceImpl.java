@@ -49,7 +49,7 @@ public class BS020ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "( SELECT";
 		sql += "   a.\"CustNo\"             as \"CustNo\" ";
 		sql += "  ,NVL(t.\"FacmNo\",0)      as \"FacmNo\" ";
- 	    sql += "  ,max (case when NVL(f.\"RepayCode\",0) = 2 then 2  else 0 end)";
+		sql += "  ,max (case when NVL(f.\"RepayCode\",0) = 2 then 2  else 0 end)";
 		sql += "                            as \"RepayCode\"  ";
 		sql += "  ,sum (case when a.\"AcctCode\" = 'TAV' then a.\"RvBal\" else 0 end)  as TAV ";
 		sql += "  ,sum (case when a.\"AcctCode\" <> 'TAV' then a.\"RvBal\" else 0 end) as FEE ";
@@ -62,7 +62,7 @@ public class BS020ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    and a.\"ClsFlag\" = 0 ";
 		sql += "  GROUP BY a.\"CustNo\"        ";
 		sql += "          ,NVL(t.\"FacmNo\",0) ";
-  	    sql += ") av ";
+		sql += ") av ";
 		sql += "Left join";
 		sql += "( SELECT";
 		sql += "   l.\"CustNo\"               as \"CustNo\" ";

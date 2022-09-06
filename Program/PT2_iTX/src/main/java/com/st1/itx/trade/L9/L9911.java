@@ -53,7 +53,7 @@ public class L9911 extends TradeBuffer {
 		Slice<MonthlyLM052Loss> resultList = null;
 
 		resultList = sMonthlyLM052LossService.findYearMonth(startMonth, endMonth, index, limit, titaVo);
-		
+
 		if (resultList != null && !resultList.isEmpty()) {
 
 			for (MonthlyLM052Loss result : resultList.toList()) {

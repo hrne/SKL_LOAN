@@ -51,7 +51,7 @@ public class L6044 extends TradeBuffer {
 
 	@Autowired
 	CdEmpService cdEmpService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -71,16 +71,16 @@ public class L6044 extends TradeBuffer {
 		String iTranItem = "";
 		String DateTime; // YYY/MM/DD hh:mm:ss
 
-		if(iTxDateS>0) {
-			String sTxDateS = String.valueOf(iTxDateS+19110000);
-			String sTxDateE = String.valueOf(iTxDateE+19110000);
-			sTxDateS = sTxDateS.substring(0, 4)+"-"+sTxDateS.substring(4, 6)+"-"+sTxDateS.substring(6, 8)+" 00:00:00.0";
-			sTxDateE = sTxDateE.substring(0, 4)+"-"+sTxDateE.substring(4, 6)+"-"+sTxDateE.substring(6, 8)+" 23:59:59.0";
-			
+		if (iTxDateS > 0) {
+			String sTxDateS = String.valueOf(iTxDateS + 19110000);
+			String sTxDateE = String.valueOf(iTxDateE + 19110000);
+			sTxDateS = sTxDateS.substring(0, 4) + "-" + sTxDateS.substring(4, 6) + "-" + sTxDateS.substring(6, 8) + " 00:00:00.0";
+			sTxDateE = sTxDateE.substring(0, 4) + "-" + sTxDateE.substring(4, 6) + "-" + sTxDateE.substring(6, 8) + " 23:59:59.0";
+
 			ts1 = Timestamp.valueOf(sTxDateS);
 			ts2 = Timestamp.valueOf(sTxDateE);
-			this.info("ts1="+ts1);
-			this.info("ts2="+ts2);
+			this.info("ts1=" + ts1);
+			this.info("ts2=" + ts2);
 		}
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -90,52 +90,48 @@ public class L6044 extends TradeBuffer {
 
 		// 查詢主管授權紀錄
 		Slice<TxAuthorize> slTxAuthorize = null;
-		if (iEntdyS>0) {
-			slTxAuthorize = sTxAuthorizeService.findSupNoEntdy(iEntdyS+19110000, iEntdyE+19110000, iSupNo +"%", this.index, this.limit, titaVo);
-		} else if(iTxDateS>0){
-			slTxAuthorize = sTxAuthorizeService.findCreatDate(ts1, ts2, iSupNo +"%", this.index, this.limit, titaVo);
+		if (iEntdyS > 0) {
+			slTxAuthorize = sTxAuthorizeService.findSupNoEntdy(iEntdyS + 19110000, iEntdyE + 19110000, iSupNo + "%", this.index, this.limit, titaVo);
+		} else if (iTxDateS > 0) {
+			slTxAuthorize = sTxAuthorizeService.findCreatDate(ts1, ts2, iSupNo + "%", this.index, this.limit, titaVo);
 		}
-		
-		
+
 		List<TxAuthorize> lTxAuthorize = slTxAuthorize == null ? null : slTxAuthorize.getContent();
 
 		if (lTxAuthorize == null || lTxAuthorize.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "主管授權紀錄"); // 查無資料
 		}
-		
+
 		// 如有找到資料
 		for (TxAuthorize tTxAuthorize : lTxAuthorize) {
 
 			OccursList occursList = new OccursList();
-			
+
 			occursList.putParam("OOEntdy", tTxAuthorize.getEntdy());
 			occursList.putParam("OOSupNo", tTxAuthorize.getSupNo());
 			occursList.putParam("OOTlrNo", tTxAuthorize.getTlrNo());
 			occursList.putParam("OOTradeReason", tTxAuthorize.getTradeReason());
-			
+
 			String reasonFAJson = tTxAuthorize.getReasonFAJson();
 			String reasonAuth = "";
-			if (reasonFAJson != null)
-			{
+			if (reasonFAJson != null) {
 				try {
-					
+
 					TitaVo[] tArray = new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).readValue(reasonFAJson, TitaVo[].class);
-					
-					for (TitaVo t : tArray)
-					{
+
+					for (TitaVo t : tArray) {
 						reasonAuth += String.format("%s:%s;", t.getParam("NO"), t.getParam("MSG"));
 					}
-					
+
 					// strip away last semicolon
 					reasonAuth = reasonAuth.replaceAll(";$", "");
-				} catch (Exception e)
-				{
+				} catch (Exception e) {
 					this.error("L6044 trying to serialize reasonFAJson and failed!");
 					this.error(e.getMessage());
 				}
 			}
 			occursList.putParam("OOReasonAuth", reasonAuth);
-			
+
 			occursList.putParam("OOTxcd", tTxAuthorize.getTxcd());
 			occursList.putParam("OOTxSeq", tTxAuthorize.getTxSeq());
 
@@ -152,13 +148,11 @@ public class L6044 extends TradeBuffer {
 
 			DateTime = this.parse.timeStampToString(tTxAuthorize.getLastUpdate());
 			occursList.putParam("OODateTime", DateTime);
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxAuthorize.getLastUpdate())+ " " +parse.timeStampToStringTime(tTxAuthorize.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tTxAuthorize.getLastUpdate()) + " " + parse.timeStampToStringTime(tTxAuthorize.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tTxAuthorize.getLastUpdateEmpNo() + " " + empName(titaVo, tTxAuthorize.getLastUpdateEmpNo()));
-			
-			
 
 			/* 將每筆資料放入Tota的OcList */
-		this.totaVo.addOccursList(occursList);
+			this.totaVo.addOccursList(occursList);
 		}
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
@@ -188,7 +182,6 @@ public class L6044 extends TradeBuffer {
 
 	}
 
-	
 	private String inqCdEmp(String uTlrNo, String uTlrItem, TitaVo titaVo) throws LogicException {
 
 		CdEmp tCdEmp = new CdEmp();
@@ -204,6 +197,7 @@ public class L6044 extends TradeBuffer {
 		return uTlrItem;
 
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

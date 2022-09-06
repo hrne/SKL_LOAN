@@ -76,7 +76,7 @@ public class L6067 extends TradeBuffer {
 			occursList.putParam("OOGuaRelCode", tCdGuarantor.getGuaRelCode());
 			occursList.putParam("OOGuaRelItem", tCdGuarantor.getGuaRelItem());
 			occursList.putParam("OOGuaRelJcic", tCdGuarantor.getGuaRelJcic());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdGuarantor.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdGuarantor.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdGuarantor.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdGuarantor.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdGuarantor.getLastUpdateEmpNo() + " " + empName(titaVo, tCdGuarantor.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -91,6 +91,7 @@ public class L6067 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

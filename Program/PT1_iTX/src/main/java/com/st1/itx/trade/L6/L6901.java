@@ -84,15 +84,13 @@ public class L6901 extends TradeBuffer {
 		// AcDetail tacDetail = new AcDetail();
 		// 登放日期,登放序號找AcDetail資料
 		if (iRelDy == 0) {
-			slAcDetailList = sAcDetailService.findTxtNoEq(iAcDate + 19110000, iRelTxseq.substring(0, 4),
-					iRelTxseq.substring(4, 10), parse.stringToInteger(iRelTxseq.substring(10, 18)), this.index,
+			slAcDetailList = sAcDetailService.findTxtNoEq(iAcDate + 19110000, iRelTxseq.substring(0, 4), iRelTxseq.substring(4, 10), parse.stringToInteger(iRelTxseq.substring(10, 18)), this.index,
 					Integer.MAX_VALUE, titaVo);
 			lAcDetailList = slAcDetailList == null ? null : slAcDetailList.getContent();
 		} else {
-			slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index,
-					Integer.MAX_VALUE, titaVo);
+			slAcDetailList = sAcDetailService.acdtlRelTxseqEq(iRelDy + 19110000, iRelTxseq, this.index, Integer.MAX_VALUE, titaVo);
 			if (slAcDetailList != null) {
-				for (AcDetail ac : slAcDetailList.getContent()) {				
+				for (AcDetail ac : slAcDetailList.getContent()) {
 					if (iAcDate == 0 || ac.getAcDate() == iAcDate) {
 						lAcDetailList.add(ac);
 					}

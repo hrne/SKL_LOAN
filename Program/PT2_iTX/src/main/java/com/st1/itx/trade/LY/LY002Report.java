@@ -49,31 +49,27 @@ public class LY002Report extends MakeReport {
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LY002.exportExcel active");
 
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表", "LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
 
-	
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表",
-				"LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
-
-		List<Map<String, String>> lY002List = null;		
+		List<Map<String, String>> lY002List = null;
 		// 年月底
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
-		
+
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
-				
+
 		makeExcel.setValue(1, 2, "新光人壽保險股份有限公司 " + rocYear + "年度(" + rocMonth + ")報表");
-		
 
 		try {
 
 			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth, "N");
-			
+
 			makeExcel.setShiftRow(row + 1, lY002List.size() + 4);
-			
+
 			eptExcel(lY002List);
-			
+
 			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth, "Y");
-			
+
 			eptExcel(lY002List);
 
 		} catch (Exception e) {
@@ -82,21 +78,19 @@ public class LY002Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LY002ServiceImpl.exportExcel error = " + errors.toString());
 		}
-	
+
 		if (lY002List.size() == 0) {
-	
+
 			makeExcel.setValue(7, 3, "本日無資料");
 
 		}
 
 		makeExcel.close();
 
-
 		return true;
 
 	}
 
-	
 	private void eptExcel(List<Map<String, String>> lM054tLDVo) throws LogicException {
 
 		String tempNo = "";
@@ -212,14 +206,12 @@ public class LY002Report extends MakeReport {
 			mark = null;
 
 			// 逾期天數
-			makeExcel.setValue(row, 25,
-					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
+			makeExcel.setValue(row, 25, Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
 
 		}
 
 	}
-	
-	
+
 	/*
 	 * F0 戶號 F1 ID 統編或身分證 F2 客戶名稱 F3 利害關係人 F4 與本公司之關係 F5 放款種類 F6 放款科目 F7 放款年月日 F8
 	 * 放款到期年月日 F9 放款年利率% F10 付息方式 F11 最後腳昔日 F12 提供人代號(統編或身分證) F13 提供人姓名 F14 設定順位 F15
@@ -435,8 +427,7 @@ public class LY002Report extends MakeReport {
 	 * @param lY002List
 	 * @param lrow      目前列數
 	 */
-	private void exportColl(List<Map<String, String>> lY002List, int lrow)
-			throws NumberFormatException, LogicException {
+	private void exportColl(List<Map<String, String>> lY002List, int lrow) throws NumberFormatException, LogicException {
 		this.info("go exportColl");
 //		BigDecimal evaAmt = BigDecimal.ZERO;
 		BigDecimal lineAmt = BigDecimal.ZERO;
@@ -447,9 +438,7 @@ public class LY002Report extends MakeReport {
 
 		for (Map<String, String> tLDVo : lY002List) {
 			// 判斷擔保類型
-			row = tLDVo.get("TYPE").equals("A") ? 1
-					: tLDVo.get("TYPE").equals("B") ? 2
-							: tLDVo.get("TYPE").equals("C") ? 3 : tLDVo.get("TYPE").equals("D") ? 4 : 5;
+			row = tLDVo.get("TYPE").equals("A") ? 1 : tLDVo.get("TYPE").equals("B") ? 2 : tLDVo.get("TYPE").equals("C") ? 3 : tLDVo.get("TYPE").equals("D") ? 4 : 5;
 
 			// 加上明細最後一筆資料的列數
 			row = row + lrow;
@@ -477,8 +466,7 @@ public class LY002Report extends MakeReport {
 	 * 
 	 */
 
-	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt,
-			BigDecimal lineAmt) {
+	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt, BigDecimal lineAmt) {
 
 		String tempCustNo = "";
 		String tempFacmNo = "";

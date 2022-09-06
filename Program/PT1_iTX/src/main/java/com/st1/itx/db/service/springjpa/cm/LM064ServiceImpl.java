@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +28,7 @@ public class LM064ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日

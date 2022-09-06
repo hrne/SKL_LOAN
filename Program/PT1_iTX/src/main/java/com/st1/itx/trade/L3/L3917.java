@@ -76,8 +76,7 @@ public class L3917 extends TradeBuffer {
 
 		List<String> ltitaHCode = new ArrayList<String>();
 		ltitaHCode.add("0"); // 正常
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990,
-				iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findIntEndDateEq(iCustNo, iFacmNo, 1, 990, iIntEndDate + 19110000, ltitaHCode, iAcDate + 19110000, iTellerNo, iTxtNo, 0, Integer.MAX_VALUE,
 				titaVo);
 
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
@@ -104,11 +103,9 @@ public class L3917 extends TradeBuffer {
 			wkBreachAmt = wkBreachAmt.add(t.getBreachAmt()); // 違約金
 			wkCloseBreachAmt = wkCloseBreachAmt.add(t.getCloseBreachAmt()); // 清償違約金
 			// 回收金額
-			BigDecimal repayAmt = t.getPrincipal().add(t.getInterest()).add(t.getDelayInt()).add(t.getBreachAmt())
-					.add(t.getCloseBreachAmt()); // 回收金額
+			BigDecimal repayAmt = t.getPrincipal().add(t.getInterest()).add(t.getDelayInt()).add(t.getBreachAmt()).add(t.getCloseBreachAmt()); // 回收金額
 			wkRepayAmt = wkRepayAmt.add(repayAmt);
-			wkShortfall = wkShortfall
-					.add(t.getUnpaidInterest().add(t.getUnpaidPrincipal()).add(t.getUnpaidCloseBreach())); // 短收金額
+			wkShortfall = wkShortfall.add(t.getUnpaidInterest().add(t.getUnpaidPrincipal()).add(t.getUnpaidCloseBreach())); // 短收金額
 			// 交易金額
 			wkTxAmt = wkTxAmt.add(t.getTxAmt());
 		}

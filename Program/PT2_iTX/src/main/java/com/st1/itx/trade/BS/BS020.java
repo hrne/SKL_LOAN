@@ -127,8 +127,7 @@ public class BS020 extends TradeBuffer {
 			dStatusCode.add("2");
 			dStatusCode.add("3");
 			dStatusCode.add("4");
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode,
-					this.index, Integer.MAX_VALUE, titaVo);
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode, this.index, Integer.MAX_VALUE, titaVo);
 			lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 			if (lBatxDetail != null) {
 				detailSeq = lBatxDetail.size();
@@ -146,8 +145,7 @@ public class BS020 extends TradeBuffer {
 			if (tBatxHead == null)
 				this.batchNo = "BATX01";
 			else
-				this.batchNo = "BATX"
-						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+				this.batchNo = "BATX" + parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
 		}
 	}
 
@@ -187,8 +185,7 @@ public class BS020 extends TradeBuffer {
 			}
 			TempVo tTempVo = new TempVo();
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, facmNo, 0, repayCode, repayType, BigDecimal.ZERO,
-						tTempVo, titaVo);
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, facmNo, 0, repayCode, repayType, BigDecimal.ZERO, tTempVo, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
 				continue;
@@ -205,8 +202,7 @@ public class BS020 extends TradeBuffer {
 			if (listBaTxVo != null && listBaTxVo.size() != 0) {
 				for (BaTxVo ba : listBaTxVo) {
 					// 累溢收 > 費用
-					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4
-							&& baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
+					if (ba.getDataKind() == 1 && ba.getRepayType() >= 4 && baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
 						isRecvPay = true;
 					}
 					// 期款

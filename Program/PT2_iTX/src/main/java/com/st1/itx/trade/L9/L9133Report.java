@@ -110,8 +110,7 @@ public class L9133Report extends MakeReport {
 		this.setCharSpaces(0);
 
 		// 查會計業務檢核檔
-		Slice<AcAcctCheck> slAcAcctCheck = sAcAcctCheckService.findAcDate(this.reportDate, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<AcAcctCheck> slAcAcctCheck = sAcAcctCheckService.findAcDate(this.reportDate, 0, Integer.MAX_VALUE, titaVo);
 		List<AcAcctCheck> lAcAcctCheck = slAcAcctCheck == null ? null : slAcAcctCheck.getContent();
 
 		if (lAcAcctCheck == null || lAcAcctCheck.size() == 0) {
@@ -124,8 +123,7 @@ public class L9133Report extends MakeReport {
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
 			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
-			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
-					.add(tAcAcctCheck.getAcctMasterBal());
+			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal()).add(tAcAcctCheck.getAcctMasterBal());
 			if (total.compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
@@ -167,8 +165,7 @@ public class L9133Report extends MakeReport {
 			print(0, 155, diffAmt, "R");
 
 			// 有差額就把記號改為true
-			if (tAcAcctCheck.getReceivableBal().subtract(tAcAcctCheck.getAcctMasterBal())
-					.compareTo(BigDecimal.ZERO) != 0) {
+			if (tAcAcctCheck.getReceivableBal().subtract(tAcAcctCheck.getAcctMasterBal()).compareTo(BigDecimal.ZERO) != 0) {
 				isDiff = true;
 			}
 		}

@@ -51,7 +51,7 @@ public class LM061 extends BatchBase implements Tasklet, InitializingBean {
 		int iMonth = (mfbsdy / 100) % 100;
 		// 當年月
 		int thisYM = 0;
-		//月底日
+		// 月底日
 		int ymEnd = mfbsdy;
 
 		// 月底日是否大於帳務日 判斷取哪個年月

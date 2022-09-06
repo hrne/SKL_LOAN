@@ -29,7 +29,6 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM053.findAll");
 		// 取得會計日(同頁面上會計日)

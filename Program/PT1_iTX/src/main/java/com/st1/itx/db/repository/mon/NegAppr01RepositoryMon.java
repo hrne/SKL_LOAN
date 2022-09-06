@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,43 +21,42 @@ import com.st1.itx.db.domain.NegAppr01Id;
  */
 public interface NegAppr01RepositoryMon extends JpaRepository<NegAppr01, NegAppr01Id> {
 
-  // CustNo= 
-  public Slice<NegAppr01> findAllByCustNoIsOrderByExportDateDescCustNoAsc(int custNo_0, Pageable pageable);
+	// CustNo=
+	public Slice<NegAppr01> findAllByCustNoIsOrderByExportDateDescCustNoAsc(int custNo_0, Pageable pageable);
 
-  // CustNo= , AND ExportDate =
-  public Slice<NegAppr01> findAllByCustNoIsAndExportDateIsOrderByExportDateDescCustNoAsc(int custNo_0, int exportDate_1, Pageable pageable);
+	// CustNo= , AND ExportDate =
+	public Slice<NegAppr01> findAllByCustNoIsAndExportDateIsOrderByExportDateDescCustNoAsc(int custNo_0, int exportDate_1, Pageable pageable);
 
-  // CustNo= , AND ExportDate>= , AND ExportDate <=
-  public Slice<NegAppr01> findAllByCustNoIsAndExportDateGreaterThanEqualAndExportDateLessThanEqualOrderByExportDateDescCustNoAsc(int custNo_0, int exportDate_1, int exportDate_2, Pageable pageable);
+	// CustNo= , AND ExportDate>= , AND ExportDate <=
+	public Slice<NegAppr01> findAllByCustNoIsAndExportDateGreaterThanEqualAndExportDateLessThanEqualOrderByExportDateDescCustNoAsc(int custNo_0, int exportDate_1, int exportDate_2, Pageable pageable);
 
-  // ExportDate=
-  public Slice<NegAppr01> findAllByExportDateIsOrderByExportDateDescCustNoAsc(int exportDate_0, Pageable pageable);
+	// ExportDate=
+	public Slice<NegAppr01> findAllByExportDateIsOrderByExportDateDescCustNoAsc(int exportDate_0, Pageable pageable);
 
-  // ExportDate>= , AND ExportDate <=
-  public Slice<NegAppr01> findAllByExportDateGreaterThanEqualAndExportDateLessThanEqualOrderByExportDateDescCustNoAsc(int exportDate_0, int exportDate_1, Pageable pageable);
+	// ExportDate>= , AND ExportDate <=
+	public Slice<NegAppr01> findAllByExportDateGreaterThanEqualAndExportDateLessThanEqualOrderByExportDateDescCustNoAsc(int exportDate_0, int exportDate_1, Pageable pageable);
 
-  // BringUpDate=
-  public Slice<NegAppr01> findAllByBringUpDateIs(int bringUpDate_0, Pageable pageable);
+	// BringUpDate=
+	public Slice<NegAppr01> findAllByBringUpDateIs(int bringUpDate_0, Pageable pageable);
 
-  // BatchTxtNo = , AND RemitBank = , AND ApprDate=
-  public Slice<NegAppr01> findAllByBatchTxtNoIsAndRemitBankIsAndApprDateIs(String batchTxtNo_0, String remitBank_1, int apprDate_2, Pageable pageable);
+	// BatchTxtNo = , AND RemitBank = , AND ApprDate=
+	public Slice<NegAppr01> findAllByBatchTxtNoIsAndRemitBankIsAndApprDateIs(String batchTxtNo_0, String remitBank_1, int apprDate_2, Pageable pageable);
 
-  // CustNo = , AND CaseSeq = 
-  public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIs(int custNo_0, int caseSeq_1, Pageable pageable);
+	// CustNo = , AND CaseSeq =
+	public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIs(int custNo_0, int caseSeq_1, Pageable pageable);
 
-  // CustNo = , AND CaseSeq = , AND FinCode=
-  public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIsAndFinCodeIs(int custNo_0, int caseSeq_1, String finCode_2, Pageable pageable);
+	// CustNo = , AND CaseSeq = , AND FinCode=
+	public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIsAndFinCodeIs(int custNo_0, int caseSeq_1, String finCode_2, Pageable pageable);
 
-  // AcDate = , AND TitaTlrNo = ,AND TitaTxtNo=
-  public Slice<NegAppr01> findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, Pageable pageable);
+	// AcDate = , AND TitaTlrNo = ,AND TitaTxtNo=
+	public Slice<NegAppr01> findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, Pageable pageable);
 
-  // CustNo = , AND CaseSeq = , AND ExportDate=
-  public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByFinCodeAscCreateDateDesc(int custNo_0, int caseSeq_1, int exportDate_2, Pageable pageable);
+	// CustNo = , AND CaseSeq = , AND ExportDate=
+	public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByFinCodeAscCreateDateDesc(int custNo_0, int caseSeq_1, int exportDate_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<NegAppr01> findByNegAppr01Id(NegAppr01Id negAppr01Id);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<NegAppr01> findByNegAppr01Id(NegAppr01Id negAppr01Id);
 
 }
-

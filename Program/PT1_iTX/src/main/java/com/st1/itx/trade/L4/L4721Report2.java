@@ -79,8 +79,7 @@ public class L4721Report2 extends MakeReport {
 
 		List<String> file = getData(titaVo);
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-L4721.txt", fileName, 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-L4721.txt", fileName, 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -92,8 +91,7 @@ public class L4721Report2 extends MakeReport {
 
 		makeFile.toFile(sno);
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4721", titaVo.getTxCode() + " 已產生L4721.txt", titaVo);
 	}
 
 	private List<String> getData(TitaVo titaVo) throws LogicException {
@@ -120,8 +118,7 @@ public class L4721Report2 extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 0, 9, 2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -193,10 +190,8 @@ public class L4721Report2 extends MakeReport {
 						// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
 						line = "";
 						line += "45";
-						line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
-								+ showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
-								+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
-								+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
+						line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自" + showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
+								+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為" + formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
 						result.add(line);
 						line = "";
 						// 加入換行
@@ -207,9 +202,7 @@ public class L4721Report2 extends MakeReport {
 						// 0500036341+9510200000174395103000001743
 						line = "";
 						line += "05";
-						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200"
-								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
-								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
+						line += FormatUtil.pad9(headerDueAmt, 8) + "+" + "9510200" + FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300" + FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
 						result.add(line);
 						line = "";
 						// 加入換行
@@ -235,8 +228,7 @@ public class L4721Report2 extends MakeReport {
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
 			line += "01";
-			line += "地址" + tmap.get("Location") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
-					+ tmap.get("CustName");
+			line += "地址" + tmap.get("Location") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " " + tmap.get("CustName");
 			// 加入明細
 			result.add(line);
 			line = "";
@@ -246,8 +238,7 @@ public class L4721Report2 extends MakeReport {
 
 			int effectDate = parse.stringToInteger(tmap.get("TxEffectDate"));
 			if (effectDate != 0) {
-				baTxCom.getDueAmt(effectDate, parse.stringToInteger(tmap.get("CustNo")),
-						parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
+				baTxCom.getDueAmt(effectDate, parse.stringToInteger(tmap.get("CustNo")), parse.stringToInteger(tmap.get("FacmNo")), 0, titaVo);
 				headerDueAmt = "" + (baTxCom.getPrincipal().add(baTxCom.getInterest()));
 				headerExcessive = "" + baTxCom.getExcessive().subtract(baTxCom.getShortfall());
 			} else {
@@ -257,9 +248,8 @@ public class L4721Report2 extends MakeReport {
 			// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
 			line = "";
 			line += "02";
-			line += " " + tmap.get("CustName") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + tmap.get("SpecificDd")
-					+ " 日" + "          " + tmap.get("RepayCodeX") + "   " + FormatUtil.pad9(tmap.get("LoanBal"), 11)
-					+ headerExcessive;
+			line += " " + tmap.get("CustName") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + tmap.get("SpecificDd") + " 日" + "          " + tmap.get("RepayCodeX") + "   "
+					+ FormatUtil.pad9(tmap.get("LoanBal"), 11) + headerExcessive;
 
 			// 加入明細
 			result.add(line);
@@ -293,12 +283,9 @@ public class L4721Report2 extends MakeReport {
 			dateRange = tstartDate + "-" + tendDate;
 		}
 
-		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
-				+ FormatUtil.pad9(formatAmt(tmap.get("TxAmt"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("Principal"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("Interest"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("BreachAmt"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("OtherFee"), 0), 10) + "+";
+		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   " + FormatUtil.pad9(formatAmt(tmap.get("TxAmt"), 0), 10) + "+"
+				+ FormatUtil.pad9(formatAmt(tmap.get("Principal"), 0), 10) + "+" + FormatUtil.pad9(formatAmt(tmap.get("Interest"), 0), 10) + "+"
+				+ FormatUtil.pad9(formatAmt(tmap.get("BreachAmt"), 0), 10) + "+" + FormatUtil.pad9(formatAmt(tmap.get("OtherFee"), 0), 10) + "+";
 		// 加入明細
 		result.add(line);
 		line = "";

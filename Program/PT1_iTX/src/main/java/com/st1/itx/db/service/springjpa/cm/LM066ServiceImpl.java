@@ -1,6 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -29,14 +28,13 @@ public class LM066ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	
-	public List<Map<String, String>> findAll(TitaVo titaVo,int yearMonth) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
 //		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		// 年
-		int iYear = yearMonth/ 100;
+		int iYear = yearMonth / 100;
 		// 月
 		int iMonth = yearMonth % 100;
 
@@ -87,7 +85,7 @@ public class LM066ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yyyymm",iYearMonth);
+		query.setParameter("yyyymm", iYearMonth);
 		return this.convertToMap(query);
 	}
 

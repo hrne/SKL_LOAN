@@ -55,7 +55,7 @@ public class L9131 extends TradeBuffer {
 		String ntxbuf = titaVo.getTlrNo() + FormatUtil.padX("L9131", 60) + iAcDate;
 
 		this.info("ntxbuf = " + ntxbuf);
-		
+
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9131總帳日結單代傳票已完成", titaVo);
 
 		this.addList(this.totaVo);

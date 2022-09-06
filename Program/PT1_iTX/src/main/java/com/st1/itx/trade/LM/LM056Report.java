@@ -47,8 +47,7 @@ public class LM056Report extends MakeReport {
 		List<Map<String, String>> findList2 = new ArrayList<>();
 		List<Map<String, String>> findList3 = new ArrayList<>();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表",
-				"LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表", "LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
 
 		try {
 
@@ -171,7 +170,6 @@ public class LM056Report extends MakeReport {
 			row = Integer.valueOf(r.get("F0").toString().substring(1, 3));
 			amt = getBigDecimal(r.get("F1").toString());
 
-
 			makeExcel.setValue(row, col, amt, "#,##0", "R");
 
 		}
@@ -183,11 +181,12 @@ public class LM056Report extends MakeReport {
 		makeExcel.formulaCaculate(43, 4);
 		// D44 逾期放款比率%(含壽險保單質押放款)
 		makeExcel.formulaCaculate(44, 4);
-		
+
 		makeExcel.formulaCaculate(45, 4);
 		makeExcel.formulaCaculate(46, 4);
 		makeExcel.formulaCaculate(47, 4);
 	}
+
 	/**
 	 * 英文轉數字
 	 * 

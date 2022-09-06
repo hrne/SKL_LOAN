@@ -48,11 +48,9 @@ public class L9733p extends TradeBuffer {
 		boolean isFinish = l9733Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					txcd + txname + "已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), txcd + txname + "已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
-					txcd + txname + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(), txcd + txname + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

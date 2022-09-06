@@ -101,8 +101,7 @@ public class L431A extends TradeBuffer {
 
 		tBatxRateChange = batxRateChangeService.holdById(tBatxRateChangeId);
 		if (tBatxRateChange == null) {
-			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-"
-					+ parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
+			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
 		}
 
 		if (tBatxRateChange.getConfirmFlag() == 1) {
@@ -149,19 +148,15 @@ public class L431A extends TradeBuffer {
 		// 加碼利率，自訂利率時：0、指標利率時：擬調利率(已調整時為調整後利率)減合約指標利率
 		if ("99".equals(tBatxRateChange.getBaseRateCode())) {
 			if (tBatxRateChange.getRateKeyInCode() == 1) {
-				tBatxRateChange
-						.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getPresentRate()));
+				tBatxRateChange.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getPresentRate()));
 			} else {
-				tBatxRateChange
-						.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getPresentRate()));
+				tBatxRateChange.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getPresentRate()));
 			}
 		} else {
 			if (tBatxRateChange.getRateKeyInCode() == 1) {
-				tBatxRateChange
-						.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getContrBaseRate()));
+				tBatxRateChange.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getContrBaseRate()));
 			} else {
-				tBatxRateChange
-						.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getContrBaseRate()));
+				tBatxRateChange.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getContrBaseRate()));
 			}
 		}
 
@@ -175,8 +170,7 @@ public class L431A extends TradeBuffer {
 	}
 
 	private String check(String checkMsg, BatxRateChange t, TitaVo titaVo) throws LogicException {
-		LoanBorMain tLoanBorMain = loanBorMainService
-				.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
+		LoanBorMain tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
 		if (tLoanBorMain == null) {
 			throw new LogicException("E0006", "LoanBorMain ");
 		}

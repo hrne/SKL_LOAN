@@ -53,8 +53,7 @@ public class L6933 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String TranNo = titaVo.getParam("TranNo").trim();
-		Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo(TranNo, titaVo.getParam("MrKey"), 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo(TranNo, titaVo.getParam("MrKey"), 0, Integer.MAX_VALUE, titaVo);
 		List<TxDataLog> lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
 		boolean first = true;
@@ -71,7 +70,7 @@ public class L6933 extends TradeBuffer {
 					boolean skip = true;
 					for (HashMap<String, Object> map : listMap) {
 						String fld = "";
-						if(map.get("f") !=null) {
+						if (map.get("f") != null) {
 							fld = map.get("f").toString();
 						}
 						if ("延期繳款年月(起)".equals(fld) || "延期繳款年月(訖)".equals(fld)) {

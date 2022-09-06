@@ -106,7 +106,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,BDD.\"AmlRsp\"      AS \"AmlRsp\"                       ";
 			if (functionCode == 10) {
 				sql += " ,TX.\"TempAmt\"  AS \"TxTempAmt\"                    ";
-				sql += " ,TX.\"OverAmt\"  - \"ShortAmt\"   AS \"OverShort\"   " ;
+				sql += " ,TX.\"OverAmt\"  - \"ShortAmt\"   AS \"OverShort\"   ";
 			}
 			sql += " from \"BankDeductDtl\" BDD                               ";
 

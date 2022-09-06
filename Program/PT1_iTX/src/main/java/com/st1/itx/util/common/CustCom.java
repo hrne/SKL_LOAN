@@ -40,7 +40,7 @@ public class CustCom extends TradeBuffer {
 
 	@Autowired
 	public CustDataCtrlService custDataCtrlService;
-	
+
 	@Autowired
 	public CdConvertCodeService cdConvertCodeService;
 
@@ -58,11 +58,11 @@ public class CustCom extends TradeBuffer {
 		cdConvertCodeId.setCodeType("CustTypeCode");
 		cdConvertCodeId.setOrgCode(custTypeCode);
 		CdConvertCode cdConvertCode = cdConvertCodeService.findById(cdConvertCodeId, titaVo);
-		
+
 		if (cdConvertCode == null) {
 			throw new LogicException(titaVo, "E0001", "eLoan客戶代碼:" + custTypeCode);
 		}
-		
+
 		return cdConvertCode.getNewCode();
 	}
 

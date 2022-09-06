@@ -62,7 +62,7 @@ public class L6R40 extends TradeBuffer {
 					totaVo.putParam("L6R40DeptCodeXA" + r, iCdBcm.getDeptItem());
 				}
 				totaVo.putParam("L6R40WorkMonthSA" + r, Math.max(Integer.valueOf(aaCdPfParms.getWorkMonthStart()) - 191100, 0)); // 工作月欄位接受輸入0, 避免-191100的情況,
-				totaVo.putParam("L6R40WorkMonthEA" + r, Math.max(Integer.valueOf(aaCdPfParms.getWorkMonthEnd()) - 191100, 0));   // 用 Math.max(wm, 0) 做斜坡修正
+				totaVo.putParam("L6R40WorkMonthEA" + r, Math.max(Integer.valueOf(aaCdPfParms.getWorkMonthEnd()) - 191100, 0)); // 用 Math.max(wm, 0) 做斜坡修正
 				r++;
 			}
 		}

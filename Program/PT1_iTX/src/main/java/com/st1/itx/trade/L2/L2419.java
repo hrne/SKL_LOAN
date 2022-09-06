@@ -179,8 +179,7 @@ public class L2419 extends TradeBuffer {
 			throw new LogicException("E0015", "請先設定擔保品明細表");
 		}
 
-		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-				+ File.separatorChar + fileItem;
+		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + fileItem;
 
 		this.info("fileitem=" + fileItem);
 		makeExcel.openExcel(fileName, "擔保品明細表");
@@ -231,11 +230,9 @@ public class L2419 extends TradeBuffer {
 			// 擔保品代號2
 			String clCode2 = toString(makeExcel.getValue(row, 3).toString(), 2);
 			if (clCode1 == 1) {
-				String clCode2X = checkCode(titaVo, "ClCode21", "" + clCode2, "C" + row, "擔保品代號2",
-						makeExcel.getValue(row, 3).toString());
+				String clCode2X = checkCode(titaVo, "ClCode21", "" + clCode2, "C" + row, "擔保品代號2", makeExcel.getValue(row, 3).toString());
 			} else {
-				String clCode2X = checkCode(titaVo, "ClCode22", "" + clCode2, "C" + row, "擔保品代號2",
-						makeExcel.getValue(row, 3).toString());
+				String clCode2X = checkCode(titaVo, "ClCode22", "" + clCode2, "C" + row, "擔保品代號2", makeExcel.getValue(row, 3).toString());
 			}
 			occursList.putParam("ClCode2", clCode2);
 
@@ -265,11 +262,9 @@ public class L2419 extends TradeBuffer {
 			String typeCode = toString(makeExcel.getValue(row, 5).toString(), 3);
 			String TypeCodeX = "";
 			if (clCode1 == 1) {
-				TypeCodeX = checkCode(titaVo, "ClTypeCode21", typeCode, "E" + row, "擔保品類別",
-						makeExcel.getValue(row, 5).toString());
+				TypeCodeX = checkCode(titaVo, "ClTypeCode21", typeCode, "E" + row, "擔保品類別", makeExcel.getValue(row, 5).toString());
 			} else {
-				TypeCodeX = checkCode(titaVo, "ClTypeCode22", typeCode, "E" + row, "擔保品類別",
-						makeExcel.getValue(row, 5).toString());
+				TypeCodeX = checkCode(titaVo, "ClTypeCode22", typeCode, "E" + row, "擔保品類別", makeExcel.getValue(row, 5).toString());
 			}
 			occursList.putParam("TypeCode", typeCode);
 
@@ -308,8 +303,7 @@ public class L2419 extends TradeBuffer {
 				CdArea cdArea = sCdAreaService.Zip3First(zip3, titaVo);
 
 				if (cdArea == null) {
-					throw new LogicException("E0015",
-							"欄位:J" + row + ",郵遞區號 = " + makeExcel.getValue(row, 10).toString());
+					throw new LogicException("E0015", "欄位:J" + row + ",郵遞區號 = " + makeExcel.getValue(row, 10).toString());
 				}
 
 				CdCity cdCity = sCdCityService.findById(cdArea.getCityCode(), titaVo);
@@ -503,22 +497,18 @@ public class L2419 extends TradeBuffer {
 							rate = new BigDecimal(1);
 						} else {
 							if (s.length != 5) {
-								throw new LogicException("E0015",
-										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
+								throw new LogicException("E0015", "欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
 							BigDecimal part = new BigDecimal(s[3]);
 							BigDecimal total = new BigDecimal(s[4]);
-							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0
-									|| part.compareTo(total) > 0) {
-								throw new LogicException("E0015",
-										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
+							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0 || part.compareTo(total) > 0) {
+								throw new LogicException("E0015", "欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
 							rate = part.divide(total, 4, RoundingMode.HALF_UP).add(rate); // rate += part / total;
 						}
 					} else {
 						if (s.length < 3) {
-							throw new LogicException("E0015",
-									"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
+							throw new LogicException("E0015", "欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 						}
 						if (!StaticTool.checkID(s[0])) {
 							throw new LogicException("E0015", "欄位:AF" + row + ",第" + (j + 1) + "位所有權人ID格式有誤 = " + s[0]);
@@ -529,18 +519,15 @@ public class L2419 extends TradeBuffer {
 							rate = new BigDecimal(1);
 						} else {
 							if (s.length != 5) {
-								throw new LogicException("E0015",
-										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
+								throw new LogicException("E0015", "欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
 							// double part = toNumeric(s[3]);
 							// double total = toNumeric(s[4]);
 							// if (part == 0 || total == 0 || part > total) {
 							BigDecimal part = new BigDecimal(s[3]);
 							BigDecimal total = new BigDecimal(s[4]);
-							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0
-									|| part.compareTo(total) > 0) {
-								throw new LogicException("E0015",
-										"欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
+							if (part.compareTo(BigDecimal.ZERO) == 0 || total.compareTo(BigDecimal.ZERO) == 0 || part.compareTo(total) > 0) {
+								throw new LogicException("E0015", "欄位:AF" + row + ",第" + (j + 1) + "位所有權人資料格式有誤 = " + ownerString);
 							}
 							rate = part.divide(total, 4, RoundingMode.HALF_UP).add(rate); // rate += part / total;
 						}
@@ -573,47 +560,41 @@ public class L2419 extends TradeBuffer {
 			} else {
 				// 保險公司
 				String InsuCompany = toString(makeExcel.getValue(row, 34).toString(), 2);
-				String InsuCompanyX = checkCode(titaVo, "InsuCompany", InsuCompany, "AH" + row, "保險公司",
-						makeExcel.getValue(row, 34).toString());
+				String InsuCompanyX = checkCode(titaVo, "InsuCompany", InsuCompany, "AH" + row, "保險公司", makeExcel.getValue(row, 34).toString());
 
 				occursList.putParam("InsuCompany", InsuCompany);
 				occursList.putParam("InsuCompanyX", InsuCompanyX);
 				// 保險類別
 				String InsuTypeCode = toString(makeExcel.getValue(row, 35).toString(), 2);
-				String InsuTypeCodeX = checkCode(titaVo, "InsuTypeCode", InsuTypeCode, "AI" + row, "保險類別",
-						makeExcel.getValue(row, 35).toString());
+				String InsuTypeCodeX = checkCode(titaVo, "InsuTypeCode", InsuTypeCode, "AI" + row, "保險類別", makeExcel.getValue(row, 35).toString());
 				occursList.putParam("InsuTypeCode", InsuTypeCode);
 				occursList.putParam("InsuTypeCodeX", InsuTypeCodeX);
 
 				// 火災險保險金額(仟元)
 				double FireInsuCovrg = toNumeric(makeExcel.getValue(row, 36).toString()) * 1000;
 				if (FireInsuCovrg <= 0) {
-					throw new LogicException("E0015",
-							"欄位:AJ" + row + ",火災險保險金額(仟元) = " + makeExcel.getValue(row, 36).toString());
+					throw new LogicException("E0015", "欄位:AJ" + row + ",火災險保險金額(仟元) = " + makeExcel.getValue(row, 36).toString());
 				}
 				occursList.putParam("FireInsuCovrg", FireInsuCovrg);
 
 				// 火災險保費
 				double FireInsuPrem = toNumeric(makeExcel.getValue(row, 37).toString());
 				if (FireInsuPrem <= 0) {
-					throw new LogicException("E0015",
-							"欄位:AK" + row + ",火災險保費 = " + makeExcel.getValue(row, 37).toString());
+					throw new LogicException("E0015", "欄位:AK" + row + ",火災險保費 = " + makeExcel.getValue(row, 37).toString());
 				}
 				occursList.putParam("FireInsuPrem", FireInsuPrem);
 
 				// 地震險保險金額(仟元)
 				double EthqInsuCovrg = toNumeric(makeExcel.getValue(row, 38).toString()) * 1000;
 				if (EthqInsuCovrg < 0) {
-					throw new LogicException("E0015",
-							"欄位:AL" + row + ",地震險保險金額(仟元) = " + makeExcel.getValue(row, 38).toString());
+					throw new LogicException("E0015", "欄位:AL" + row + ",地震險保險金額(仟元) = " + makeExcel.getValue(row, 38).toString());
 				}
 				occursList.putParam("EthqInsuCovrg", EthqInsuCovrg);
 
 				// 地震險保費
 				double EthqInsuPrem = toNumeric(makeExcel.getValue(row, 39).toString());
 				if (EthqInsuCovrg > 0 && EthqInsuPrem <= 0) {
-					throw new LogicException("E0015",
-							"欄位:AM" + row + ",地震險保費 = " + makeExcel.getValue(row, 39).toString());
+					throw new LogicException("E0015", "欄位:AM" + row + ",地震險保費 = " + makeExcel.getValue(row, 39).toString());
 				}
 				occursList.putParam("EthqInsuPrem", EthqInsuPrem);
 
@@ -668,8 +649,7 @@ public class L2419 extends TradeBuffer {
 		}
 
 		String fileItem = titaVo.getParam("FileItem");
-		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-				+ File.separatorChar + fileItem;
+		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + fileItem;
 
 		this.info("fileitem=" + fileItem);
 		makeExcel.openExcel(fileName, "擔保品明細表");
@@ -694,8 +674,7 @@ public class L2419 extends TradeBuffer {
 			newfg = true; // 新增
 
 			// 取號
-			String clCode = StringUtils.leftPad(String.valueOf(clCode1), 2, "0")
-					+ StringUtils.leftPad(String.valueOf(clCode2), 2, "0");
+			String clCode = StringUtils.leftPad(String.valueOf(clCode1), 2, "0") + StringUtils.leftPad(String.valueOf(clCode2), 2, "0");
 
 			clNo = gSeqCom.getSeqNo(0, 0, "L2", clCode, 9999999, titaVo);
 
@@ -755,8 +734,7 @@ public class L2419 extends TradeBuffer {
 		if (loanToValue.compareTo(BigDecimal.ZERO) == 0) {
 			shareTotal = shareCompAmt;
 		} else {
-			shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
-					BigDecimal.ROUND_HALF_UP);
+			shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 		}
 		if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
 			shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
@@ -873,8 +851,7 @@ public class L2419 extends TradeBuffer {
 			// 路名
 			clBuilding.setRoad(titaVo.getParam("Road"));
 			// 建物門牌
-			clBuilding.setBdLocation(
-					titaVo.getParam("CityCodeX") + titaVo.getParam("AreaCodeX") + titaVo.getParam("Road"));
+			clBuilding.setBdLocation(titaVo.getParam("CityCodeX") + titaVo.getParam("AreaCodeX") + titaVo.getParam("Road"));
 			// 建號
 			clBuilding.setBdNo1(titaVo.getParam("BdNo1"));
 			clBuilding.setBdNo2(titaVo.getParam("BdNo2"));
@@ -944,8 +921,7 @@ public class L2419 extends TradeBuffer {
 			clLand.setLandNo1(titaVo.getParam("LdNo1"));
 			clLand.setLandNo2(titaVo.getParam("LdNo2"));
 			// 土地座落
-			String landLocation = titaVo.getParam("CityCodeX") + titaVo.getParam("AreaCodeX")
-					+ titaVo.getParam("IrCodeX") + "，地號" + titaVo.getParam("LdNo1") + "-" + titaVo.getParam("LdNo2");
+			String landLocation = titaVo.getParam("CityCodeX") + titaVo.getParam("AreaCodeX") + titaVo.getParam("IrCodeX") + "，地號" + titaVo.getParam("LdNo1") + "-" + titaVo.getParam("LdNo2");
 			clLand.setLandLocation(landLocation);
 			// 土地增值稅
 			clLand.setLVITax(parse.stringToBigDecimal(titaVo.getParam("Tax")));
@@ -977,28 +953,23 @@ public class L2419 extends TradeBuffer {
 		this.info("OwnerString = " + ownerString);
 
 		if (ownerString.isEmpty()) {
-			buildOwner(titaVo, clCode1, clCode2, clNo, custMain.getCustId(), custMain.getCustName(), "00",
-					new BigDecimal("1"), new BigDecimal("1"));
+			buildOwner(titaVo, clCode1, clCode2, clNo, custMain.getCustId(), custMain.getCustName(), "00", new BigDecimal("1"), new BigDecimal("1"));
 		} else {
 			String[] owners = ownerString.split("/");
 			for (int j = 0; j < owners.length; j++) {
 				String[] s = owners[j].split(",");
 				if (custMain.equals(s[0])) {
 					if (owners.length == 1) {
-						buildOwner(titaVo, clCode1, clCode2, clNo, custMain.getCustId(), custMain.getCustName(), "00",
-								new BigDecimal("1"), new BigDecimal("1"));
+						buildOwner(titaVo, clCode1, clCode2, clNo, custMain.getCustId(), custMain.getCustName(), "00", new BigDecimal("1"), new BigDecimal("1"));
 					} else {
-						buildOwner(titaVo, clCode1, clCode2, clNo, custMain.getCustId(), custMain.getCustName(), "00",
-								new BigDecimal(s[3]), new BigDecimal(s[4]));
+						buildOwner(titaVo, clCode1, clCode2, clNo, custMain.getCustId(), custMain.getCustName(), "00", new BigDecimal(s[3]), new BigDecimal(s[4]));
 					}
 				} else {
 					String relaCode = toString(s[2], 2);
 					if (owners.length == 1) {
-						buildOwner(titaVo, clCode1, clCode2, clNo, s[0], s[1], relaCode, new BigDecimal("1"),
-								new BigDecimal("1"));
+						buildOwner(titaVo, clCode1, clCode2, clNo, s[0], s[1], relaCode, new BigDecimal("1"), new BigDecimal("1"));
 					} else {
-						buildOwner(titaVo, clCode1, clCode2, clNo, s[0], s[1], relaCode, new BigDecimal(s[3]),
-								new BigDecimal(s[4]));
+						buildOwner(titaVo, clCode1, clCode2, clNo, s[0], s[1], relaCode, new BigDecimal(s[3]), new BigDecimal(s[4]));
 					}
 				}
 
@@ -1008,14 +979,13 @@ public class L2419 extends TradeBuffer {
 		// 刪除不在名單 owner
 
 		if (clCode1 == 1) {
-			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clCode1, clCode2, clNo, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clCode1, clCode2, clNo, 0, Integer.MAX_VALUE, titaVo);
 			List<ClBuildingOwner> lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 			if (lClBuildingOwner != null) {
 				for (ClBuildingOwner clBuildingOwner : lClBuildingOwner) {
 					ClBuildingOwnerId clBuildingOwnerId = clBuildingOwner.getClBuildingOwnerId();
-					this.info("ClBuildingOwner=" + clBuildingOwnerId.getClCode1() + "-" + clBuildingOwnerId.getClCode2()
-							+ "-" + clBuildingOwnerId.getClNo() + "/" + clBuildingOwnerId.getOwnerCustUKey());
+					this.info("ClBuildingOwner=" + clBuildingOwnerId.getClCode1() + "-" + clBuildingOwnerId.getClCode2() + "-" + clBuildingOwnerId.getClNo() + "/"
+							+ clBuildingOwnerId.getOwnerCustUKey());
 					if (ownerids.get(clBuildingOwnerId.getOwnerCustUKey()) == null) {
 //						this.info("[" + clBuildingOwner.getOwnerCustUKey() + "] is null / " + ownerids.size());
 						try {
@@ -1027,14 +997,12 @@ public class L2419 extends TradeBuffer {
 				}
 			}
 		} else {
-			Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.clNoEq(clCode1, clCode2, clNo, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.clNoEq(clCode1, clCode2, clNo, 0, Integer.MAX_VALUE, titaVo);
 			List<ClLandOwner> lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 			if (lClLandOwner != null) {
 				for (ClLandOwner clLandOwner : lClLandOwner) {
 					ClLandOwnerId clLandOwnerId = clLandOwner.getClLandOwnerId();
-					this.info("clLandOwner=" + clLandOwnerId.getClCode1() + "-" + clLandOwnerId.getClCode2() + "-"
-							+ clLandOwnerId.getClNo() + "/" + clLandOwnerId.getOwnerCustUKey());
+					this.info("clLandOwner=" + clLandOwnerId.getClCode1() + "-" + clLandOwnerId.getClCode2() + "-" + clLandOwnerId.getClNo() + "/" + clLandOwnerId.getOwnerCustUKey());
 					if (ownerids.get(clLandOwnerId.getOwnerCustUKey()) == null) {
 //						this.info("[" + clBuildingOwner.getOwnerCustUKey() + "] is null / " + ownerids.size());
 						try {
@@ -1122,14 +1090,12 @@ public class L2419 extends TradeBuffer {
 
 			String msg = "不動產擔保品資料整批匯入，" + titaVo.getSelectTotal() + "數資料已處理完畢，請至【報表及製檔】下傳回饋檔";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					String.format("%-8s", titaVo.getTlrNo().trim()) + "L2419", msg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", String.format("%-8s", titaVo.getTlrNo().trim()) + "L2419", msg, titaVo);
 		}
 
 	}
 
-	private void buildOwner(TitaVo titaVo, int clCode1, int clCode2, int clNo, String ownerId, String ownerName,
-			String relCode, BigDecimal part, BigDecimal total) throws LogicException {
+	private void buildOwner(TitaVo titaVo, int clCode1, int clCode2, int clNo, String ownerId, String ownerName, String relCode, BigDecimal part, BigDecimal total) throws LogicException {
 
 		CustMain custMain = sCustMainService.custIdFirst(ownerId, titaVo);
 
@@ -1310,8 +1276,7 @@ public class L2419 extends TradeBuffer {
 		return dateUtil.checkDate(dt2);
 	}
 
-	private String checkCode(TitaVo titaVo, String defCode, String code, String column, String desc, String eCode)
-			throws LogicException {
+	private String checkCode(TitaVo titaVo, String defCode, String code, String column, String desc, String eCode) throws LogicException {
 
 		String rs = getItem(defCode + "=" + code);
 		if (rs.isEmpty()) {
@@ -1334,8 +1299,7 @@ public class L2419 extends TradeBuffer {
 		return rs;
 	}
 
-	private String getCdCode(TitaVo titaVo, String defCode, String code, String column, String desc, String eCode)
-			throws LogicException {
+	private String getCdCode(TitaVo titaVo, String defCode, String code, String column, String desc, String eCode) throws LogicException {
 
 		CdCodeId cdCodeId = new CdCodeId();
 		cdCodeId.setDefCode(defCode);

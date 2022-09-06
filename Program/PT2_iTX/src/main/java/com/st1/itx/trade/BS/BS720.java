@@ -106,16 +106,15 @@ public class BS720 extends TradeBuffer {
 // 2021/2/24 考慮四捨五入差額，只出表、不入帳(維持至核心會計系統輸入)	=> 2022/01改回要入帳	
 		// 寫入應處理清單 ACCL04-折溢價攤銷入帳
 
-		// 1.刪除處理清單  ACCL04-折溢價攤銷入帳 //
+		// 1.刪除處理清單 ACCL04-折溢價攤銷入帳 //
 		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL04", 0, 3, this.index, Integer.MAX_VALUE);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
 		}
-		
+
 		procTxToDo(iYearMonth, titaVo);
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
-				"請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(), "請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L9719", titaVo.getTlrNo(), "請列印 放款利息法折溢價攤銷表", titaVo);
 
 		this.batchTransaction.commit();
@@ -203,7 +202,7 @@ public class BS720 extends TradeBuffer {
 	private void procFindData(int iYearMonth, int iYearMonthLast, TitaVo titaVo) throws LogicException {
 
 		List<Map<String, String>> lBS720Sql = new ArrayList<Map<String, String>>();
-		
+
 		try {
 			lBS720Sql = bS720ServiceImpl.FindAll(titaVo, iYearMonth, iYearMonthLast);
 		} catch (Exception e) {
@@ -231,16 +230,16 @@ public class BS720 extends TradeBuffer {
 		// AIL 擔保放款－折溢價 AIO 催收款項－折溢價 AII 利息收入－折溢價
 		int iDb = 0;
 		int iCr = 0;
-		int dateSent = (iYearMonth * 100 ) + 01  ;
+		int dateSent = (iYearMonth * 100) + 01;
 		dateUtil.init();
 		dateUtil.setDate_1(dateSent);
 		TxBizDate tTxBizDate = dateUtil.getForTxBizDate(true);// 若1號為假日,參數true則會找次一營業日,不會踢錯誤訊息
 
 		int iAcDate = tTxBizDate.getMfbsDy();// 畫面輸入年月的月底營業日
-		
+
 		String acBookCode = this.txBuffer.getSystemParas().getAcBookCode();
 		String acSubBookCode = this.txBuffer.getSystemParas().getAcSubBookCode();
-		//String acctCode = ;
+		// String acctCode = ;
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
 		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
 				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
@@ -258,7 +257,7 @@ public class BS720 extends TradeBuffer {
 		tTempVo.putParam("AcBookCode", acBookCode);
 		tTempVo.putParam("AcSubBookCode", acSubBookCode);
 		tTempVo.putParam("AcctCode", "AII");
-		
+
 		tTempVo.putParam("SlipNote", iYearMonth / 100 + "年" + iYearMonth % 100 + "月" + "折溢價攤銷");
 		BigDecimal lnAmt = loanAmt.subtract(loanAmtLast);
 		BigDecimal ovAmt = ovduAmt.subtract(ovduAmtLast);

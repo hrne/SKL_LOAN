@@ -77,6 +77,6 @@ public class LM085Batch extends BatchBase implements Tasklet, InitializingBean {
 		titaVo.putParam("UnitCode", "0");
 		titaVo.putParam("UnitName", "千元");
 
-		lM085Report.exec(titaVo, thisYM,lastYM);
+		lM085Report.exec(titaVo, thisYM, lastYM);
 	}
 }

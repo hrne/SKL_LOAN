@@ -42,8 +42,8 @@ public class L4043 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public L4043ServiceImpl l4043ServiceImpl;
-	
-	@Autowired 
+
+	@Autowired
 	public CdEmpService sCdEmpService;
 
 	/* 轉型共用工具 */
@@ -118,7 +118,7 @@ public class L4043 extends TradeBuffer {
 				if (deleteDate > 19110000) {
 					deleteDate = deleteDate - 19110000;
 				}
-				
+
 				if (creatdate > 19110000) {
 					creatdate = creatdate - 19110000;
 				}
@@ -177,16 +177,15 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOTitaTxCd", result.get("F22"));
 				// 判斷是否有歷程
 				occursList.putParam("OOHistory", result.get("F28"));
-				
-				createempno = findCdEmp(createempno,titaVo);
-				lastupdateempno = findCdEmp(lastupdateempno,titaVo);
+
+				createempno = findCdEmp(createempno, titaVo);
+				lastupdateempno = findCdEmp(lastupdateempno, titaVo);
 				occursList.putParam("OOCreateEmpNo", createempno);
 				occursList.putParam("OOCreareDate", creatdate);
 				occursList.putParam("OOLastUpdateEmpNo", lastupdateempno);
 				occursList.putParam("OOLastUpdate", lastupdate);
 				occursList.putParam("OOStampCancelDate", stampCancelDate);
-				
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -217,16 +216,16 @@ public class L4043 extends TradeBuffer {
 
 		return result;
 	}
-	
-	private String findCdEmp(String iEmpno, TitaVo titaVo) throws LogicException{
-		String fullname="";
-		
+
+	private String findCdEmp(String iEmpno, TitaVo titaVo) throws LogicException {
+		String fullname = "";
+
 		CdEmp tCdEmp = sCdEmpService.findById(iEmpno, titaVo);
-		
-		if(tCdEmp!=null) {
+
+		if (tCdEmp != null) {
 			fullname = tCdEmp.getFullname();
 		}
-		
+
 		return fullname;
 	}
 }

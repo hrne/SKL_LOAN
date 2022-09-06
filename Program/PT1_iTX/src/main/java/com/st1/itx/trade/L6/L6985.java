@@ -178,8 +178,7 @@ public class L6985 extends TradeBuffer {
 				occursList.putParam("OOAcctItem", AcctItem); // 科目名稱
 				occursList.putParam("OOAcBookCode", AcBookCode + "/" + AcSubBookCode); // 帳冊別
 				occursList.putParam("OORmk", SlipNote); // 摘要
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOAcDate", AcDate); // 會計日期
 				occursList.putParam("OOSlipBatNo", SlipBatNo); // 會計日期
 				occursList.putParam("OODbAmt", TxAmt); // 金額

@@ -46,7 +46,6 @@ public class FormCom extends MakeReport {
 
 		String date = titaVo.getParam("fmEntryDate");
 
-
 		// 中華民國
 		printCm(15.4, 0.9, date.substring(0, 3));
 		printCm(16.7, 0.9, date.substring(3, 5));
@@ -79,8 +78,7 @@ public class FormCom extends MakeReport {
 		printCm(2.8, 5, custNo);
 		long sno = this.close();
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), titaVo.getTxCode() + "存入憑條已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), titaVo.getTxCode() + "存入憑條已完成", titaVo);
 		return sno;
 	}
 

@@ -59,9 +59,8 @@ public class LD004Report extends MakeReport {
 
 		String formName = "1".equals(titaVo.getParam("inputOption")) ? "還本收據" : "繳息收據";
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("LD004").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity("").setRptSize("A4")
-				.setPageOrientation("L").build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("LD004").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity("")
+				.setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
@@ -139,16 +138,13 @@ public class LD004Report extends MakeReport {
 				this.print(1, 1, "├──────────┼──────────────────┼─────────┤");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				if (!rowLD004.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) // 20210916 從現有樣張上推測
-																									// 還本收據不出此字樣
+																										// 還本收據不出此字樣
 				{
 					this.print(0, 55, "非支票");
 				}
 				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 13, rowLD004.get("F15"), "C");
-				this.print(0, 34,
-						padStart(rowLD004.get("F6").toString(), 7, "0") + "-"
-								+ padStart(rowLD004.get("F7").toString(), 3, "0") + "-"
-								+ padStart(rowLD004.get("F8").toString(), 3, "0"));
+				this.print(0, 34, padStart(rowLD004.get("F6").toString(), 7, "0") + "-" + padStart(rowLD004.get("F7").toString(), 3, "0") + "-" + padStart(rowLD004.get("F8").toString(), 3, "0"));
 
 				this.print(0, 63, "$");
 
@@ -176,8 +172,7 @@ public class LD004Report extends MakeReport {
 				// 這裡可以考慮改成for迴圈
 
 				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 37,
-						showDate(rowLD004.get("F11").toString(), 1) + " - " + showDate(rowLD004.get("F12").toString(), 1));
+				this.print(0, 37, showDate(rowLD004.get("F11").toString(), 1) + " - " + showDate(rowLD004.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");

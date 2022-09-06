@@ -157,8 +157,7 @@ public class L2633ReportA extends MakeReport {
 		Slice<FacClose> slFacClose = null;
 		List<FacClose> allFacClose = new ArrayList<FacClose>();
 		Slice<FacClose> sallFacClose = null;
-		sallFacClose = sFacCloseService.findEntryDateRange(parse.stringToInteger(trandDateMS) + 19110000,
-				iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+		sallFacClose = sFacCloseService.findEntryDateRange(parse.stringToInteger(trandDateMS) + 19110000, iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		allFacClose = sallFacClose == null ? null : sallFacClose.getContent();
 		int k = 1;
 		int msCnt = 0;
@@ -166,8 +165,7 @@ public class L2633ReportA extends MakeReport {
 			for (FacClose msFacClose : allFacClose) {
 
 //				只找同戶號額度最後一筆序號
-				if (k < allFacClose.size() && msFacClose.getCustNo() == allFacClose.get(k).getCustNo()
-						&& msFacClose.getFacmNo() == allFacClose.get(k).getFacmNo()
+				if (k < allFacClose.size() && msFacClose.getCustNo() == allFacClose.get(k).getCustNo() && msFacClose.getFacmNo() == allFacClose.get(k).getFacmNo()
 						&& msFacClose.getEntryDate() == allFacClose.get(k).getEntryDate()) {
 					k++;
 					continue;
@@ -266,8 +264,7 @@ public class L2633ReportA extends MakeReport {
 				print(0, 171, FormatUtil.padX(clsNo, 20)); // 銷號欄
 				print(1, 1, "　　　　　　           ");
 			}
-			print(1, 1,
-					"－－－－－－　－－－－－－－－－－　－－－－－－－－－－－　－－－－－－－－－　－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－");
+			print(1, 1, "－－－－－－　－－－－－－－－－－　－－－－－－－－－－－　－－－－－－－－－　－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－");
 			print(1, 1, "　　　　　　           ");
 			print(0, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　合　計：" + parse.IntegerToString(cnt, 3) + "件" + "　＄"); // 合計戶
 			print(0, 97, formatAmt(totAmt, 0), "R");// 合計金額

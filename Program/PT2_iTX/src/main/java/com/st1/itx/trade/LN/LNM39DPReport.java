@@ -104,8 +104,7 @@ public class LNM39DPReport extends MakeReport {
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM39DP genFile : ");
 		boolean isNewForm = false; // 格式:false舊格式,true新格式
-		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;"
-				+ "F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;F40;F41;F42;F43";
+		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;" + "F25;F26;F27;F28;F29;F30;F31;F32;F33;F34;F35;F36;F37;F38;F39;F40;F41;F42;F43";
 		String txt1[] = txt.split(";");
 		DecimalFormat formatter = new DecimalFormat("0");
 
@@ -114,8 +113,7 @@ public class LNM39DPReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFDP", "LNM39DP 欄位清單４", "LNFDP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFDPIDX", "LNM39DP 欄位清單４控制檔", "LNFDP.IDX",
-					1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFDPIDX", "LNM39DP 欄位清單４控制檔", "LNFDP.IDX", 1); // UTF-8
 
 			// 標題列
 			// strContent = "";
@@ -208,8 +206,7 @@ public class LNM39DPReport extends MakeReport {
 							break; // 個案減損客觀證據發生日期
 						case 20:
 							formatter.applyPattern("0.000000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 上述發生日期前之最近一次利率
 						case 21:
@@ -255,9 +252,7 @@ public class LNM39DPReport extends MakeReport {
 						case 29:
 							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
 								formatter.applyPattern("0000000000");
-								strField = BigDecimal.ZERO.subtract(
-										parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP))
-										.toString();
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
 								strField = '-' + makeFile.fillStringL(strField, 10, '0');
 							} else {
 								formatter.applyPattern("00000000000");
@@ -268,9 +263,7 @@ public class LNM39DPReport extends MakeReport {
 						case 30:
 							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
 								formatter.applyPattern("0000000000");
-								strField = BigDecimal.ZERO.subtract(
-										parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP))
-										.toString();
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
 								strField = '-' + makeFile.fillStringL(strField, 10, '0');
 							} else {
 								formatter.applyPattern("00000000000");
@@ -281,9 +274,7 @@ public class LNM39DPReport extends MakeReport {
 						case 31:
 							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
 								formatter.applyPattern("0000000000");
-								strField = BigDecimal.ZERO.subtract(
-										parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP))
-										.toString();
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
 								strField = '-' + makeFile.fillStringL(strField, 10, '0');
 							} else {
 								formatter.applyPattern("00000000000");
@@ -294,9 +285,7 @@ public class LNM39DPReport extends MakeReport {
 						case 32:
 							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
 								formatter.applyPattern("0000000000");
-								strField = BigDecimal.ZERO.subtract(
-										parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP))
-										.toString();
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
 								strField = '-' + makeFile.fillStringL(strField, 10, '0');
 							} else {
 								formatter.applyPattern("00000000000");
@@ -307,9 +296,7 @@ public class LNM39DPReport extends MakeReport {
 						case 33:
 							if (parse.stringToBigDecimal(strField).compareTo(BigDecimal.ZERO) < 0) {
 								formatter.applyPattern("0000000000");
-								strField = BigDecimal.ZERO.subtract(
-										parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP))
-										.toString();
+								strField = BigDecimal.ZERO.subtract(parse.stringToBigDecimal(strField).setScale(0, BigDecimal.ROUND_HALF_UP)).toString();
 								strField = '-' + makeFile.fillStringL(strField, 10, '0');
 							} else {
 								formatter.applyPattern("00000000000");
@@ -379,8 +366,7 @@ public class LNM39DPReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
-					+ String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39DP genFile close === ");

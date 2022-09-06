@@ -35,10 +35,10 @@ public class L3703 extends TradeBuffer {
 
 	@Autowired
 	public LoanCustRmkService sLoanCustRmkService;
-	
+
 	@Autowired
 	public DataLog dataLog;
-	
+
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
@@ -69,7 +69,7 @@ public class L3703 extends TradeBuffer {
 		LoanBorTxId.setFacmNo(iFacmNo);
 		LoanBorTxId.setBormNo(iBormNo);
 		LoanBorTxId.setBorxNo(iBorxNo);
-		
+
 		tLoanBorTx = new LoanBorTx();
 
 		// PK找帳務備忘錄明細檔HOLD資料
@@ -83,10 +83,9 @@ public class L3703 extends TradeBuffer {
 		tTempVo = tTempVo.getVo(tLoanBorTx.getOtherFields());
 		tTempVo.putParam("Note", titaVo.getParam("Note"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		
-		
+
 		tLoanBorTx = LoanBorTxService.holdById(LoanBorTxId);
-		
+
 		if (tLoanBorTx == null) {
 			throw new LogicException(titaVo, "E0003", "L3703 該戶號,備忘錄序號" + iCustNo + "不存在帳務備忘錄明細資料檔。");
 		}
@@ -101,7 +100,7 @@ public class L3703 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 		}
-		
+
 		// 紀錄變更前變更後
 		dataLog.setEnv(titaVo, beforeLoanBorTx, tLoanBorTx);
 		dataLog.exec("修改帳務備忘錄明細資料檔");

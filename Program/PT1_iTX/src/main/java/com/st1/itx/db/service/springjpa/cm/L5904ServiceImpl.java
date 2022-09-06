@@ -106,9 +106,8 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		
-		if (!"00".equals(usageCode))
-		{
+
+		if (!"00".equals(usageCode)) {
 			query.setParameter("usageCode", usageCode);
 		}
 

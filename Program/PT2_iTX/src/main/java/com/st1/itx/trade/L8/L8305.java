@@ -340,7 +340,7 @@ public class L8305 extends TradeBuffer {
 				iJcicZ044.setPayLastAmt2(iJcicZ044Log.getPayLastAmt2());
 				iJcicZ044.setTranKey(iJcicZ044Log.getTranKey());
 				iJcicZ044.setOutJcicTxtDate(iJcicZ044Log.getOutJcicTxtDate());
-				
+
 				try {
 					sJcicZ044Service.update(iJcicZ044, titaVo);
 				} catch (DBException e) {
@@ -365,7 +365,7 @@ public class L8305 extends TradeBuffer {
 				throw new LogicException("E0007", "無此修改資料");
 			}
 			JcicZ044 oldJcicZ0443 = (JcicZ044) iDataLog.clone(uJcicZ0443);
-			
+
 			uJcicZ0443.setJcicZ044Id(iJcicZ044Id);
 			uJcicZ0443.setTranKey(iTranKey);
 			uJcicZ0443.setDebtCode(iDebtCode);
@@ -397,13 +397,13 @@ public class L8305 extends TradeBuffer {
 			uJcicZ0443.setMonthPayAmt2(iMonthPayAmt2);
 			uJcicZ0443.setPayLastAmt2(iPayLastAmt2);
 			uJcicZ0443.setUkey(iKey);
-			
+
 			try {
 				sJcicZ044Service.update(uJcicZ0443, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
-			
+
 			iDataLog.setEnv(titaVo, oldJcicZ0443, uJcicZ0443);
 			iDataLog.exec("L8305修改", uJcicZ0443.getSubmitKey() + uJcicZ0443.getCustId() + uJcicZ0443.getRcDate());
 

@@ -528,7 +528,7 @@ public class L5500Batch extends TradeBuffer {
 		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null ";
 		sql += "  group by bb.\"AreaCode\" ";
 		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\" ";
-		sql +="order by a.\"AreaCode\" ";
+		sql += "order by a.\"AreaCode\" ";
 
 		Map<String, String> conds = new HashMap<String, String>();
 

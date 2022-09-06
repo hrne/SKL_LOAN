@@ -21,7 +21,6 @@ import com.st1.itx.db.service.YearlyHouseLoanIntService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L5R41") // 每年房屋擔保借款繳息工作檔
 @Scope("prototype")
 /**
@@ -35,13 +34,13 @@ public class L5R41 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
-	
+
 	@Autowired
 	public FacMainService sFacMainService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -52,7 +51,7 @@ public class L5R41 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iRimFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
-		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("RimYearMonth"))+191100;
+		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("RimYearMonth")) + 191100;
 		int iRimCustNo = this.parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int iRimFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		String iRimUsageCode = titaVo.getParam("RimUsageCode").trim();
@@ -63,15 +62,15 @@ public class L5R41 extends TradeBuffer {
 		}
 
 		// 初始值Tota
-		moveTotaYearlyHouseLoanInt(iRimCustNo,iRimFacmNo,new YearlyHouseLoanInt(),titaVo);
+		moveTotaYearlyHouseLoanInt(iRimCustNo, iRimFacmNo, new YearlyHouseLoanInt(), titaVo);
 
 		// 查詢營業單位對照檔
-		YearlyHouseLoanInt tYearlyHouseLoanIntService = sYearlyHouseLoanIntService.findById(new YearlyHouseLoanIntId(iYearMonth,iRimCustNo,iRimFacmNo,iRimUsageCode), titaVo);
+		YearlyHouseLoanInt tYearlyHouseLoanIntService = sYearlyHouseLoanIntService.findById(new YearlyHouseLoanIntId(iYearMonth, iRimCustNo, iRimFacmNo, iRimUsageCode), titaVo);
 		/* 如有找到資料 */
 		if (tYearlyHouseLoanIntService != null) {
-	
-			moveTotaYearlyHouseLoanInt(iRimCustNo,iRimFacmNo,tYearlyHouseLoanIntService,titaVo);
-			
+
+			moveTotaYearlyHouseLoanInt(iRimCustNo, iRimFacmNo, tYearlyHouseLoanIntService, titaVo);
+
 		} else {
 			if (iRimFuncCode == 5) {
 				this.addList(this.totaVo);
@@ -87,28 +86,27 @@ public class L5R41 extends TradeBuffer {
 
 	// 將每筆資料放入Tota
 	// 營業單位對照檔
-	private void moveTotaYearlyHouseLoanInt(int iRimCustNo,int iRimFacmNo, YearlyHouseLoanInt mYearlyHouseLoanInt,TitaVo titaVo) throws LogicException {
+	private void moveTotaYearlyHouseLoanInt(int iRimCustNo, int iRimFacmNo, YearlyHouseLoanInt mYearlyHouseLoanInt, TitaVo titaVo) throws LogicException {
 		TempVo tTempVo = new TempVo();
-		
+
 		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
-	
+
 		CustMain tCustMain = sCustMainService.custNoFirst(iRimCustNo, iRimCustNo, titaVo);
-		if(tCustMain!=null) {
-			this.totaVo.putParam("L5R41CustName", tCustMain.getCustName());	
-			this.totaVo.putParam("L5R41CustId", tCustMain.getCustId());	
+		if (tCustMain != null) {
+			this.totaVo.putParam("L5R41CustName", tCustMain.getCustName());
+			this.totaVo.putParam("L5R41CustId", tCustMain.getCustId());
 		} else {
-			this.totaVo.putParam("L5R41CustName", "");	
-			this.totaVo.putParam("L5R41CustId", "");	 
+			this.totaVo.putParam("L5R41CustName", "");
+			this.totaVo.putParam("L5R41CustId", "");
 		}
-		
-		FacMain tFacMain = sFacMainService.findById(new FacMainId(iRimCustNo,iRimFacmNo), titaVo);
-		if(tFacMain != null) {
-			this.totaVo.putParam("L5R41LineAmt", tFacMain.getLineAmt());   
+
+		FacMain tFacMain = sFacMainService.findById(new FacMainId(iRimCustNo, iRimFacmNo), titaVo);
+		if (tFacMain != null) {
+			this.totaVo.putParam("L5R41LineAmt", tFacMain.getLineAmt());
 		} else {
-			this.totaVo.putParam("L5R41LineAmt", "");   
+			this.totaVo.putParam("L5R41LineAmt", "");
 		}
-		  
-		
+
 		this.totaVo.putParam("L5R41AcctCode", mYearlyHouseLoanInt.getAcctCode());
 		this.totaVo.putParam("L5R41RepayCode", mYearlyHouseLoanInt.getRepayCode());
 		this.totaVo.putParam("L5R41LoanAmt", mYearlyHouseLoanInt.getLoanAmt());

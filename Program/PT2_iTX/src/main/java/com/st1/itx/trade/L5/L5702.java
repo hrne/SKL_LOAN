@@ -140,7 +140,7 @@ public class L5702 extends TradeBuffer {
 
 			} else {
 				NegTrans bNegTrans = (NegTrans) dataLog.clone(tNegTrans); ////
-				
+
 				if (tNegTrans.getTxStatus() == 0) {
 					tNegTrans.setTxStatus(1); // 交易狀態0:未入帳;1:待處理;2:已入帳
 
@@ -157,7 +157,7 @@ public class L5702 extends TradeBuffer {
 				}
 				dataLog.setEnv(titaVo, bNegTrans, tNegTrans); ////
 				dataLog.exec("修改債務協商交易檔"); ////
-				
+
 			}
 		} else { // 訂正
 
@@ -258,7 +258,7 @@ public class L5702 extends TradeBuffer {
 					tNegAppr02.setTxStatus(1);
 				}
 				try {
-					sNegAppr02Service.update(tNegAppr02,titaVo);
+					sNegAppr02Service.update(tNegAppr02, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔 + tNegAppr02Id)"); // 更新資料時，發生錯誤
 				}

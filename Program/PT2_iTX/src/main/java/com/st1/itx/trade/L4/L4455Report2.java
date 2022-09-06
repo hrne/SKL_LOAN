@@ -94,8 +94,7 @@ public class L4455Report2 extends MakeReport {
 		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
-				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 1, "報　表：" + "L4455Report2");
 
 		for (CdCode tCdCode : lCdCode) {
@@ -104,11 +103,10 @@ public class L4455Report2 extends MakeReport {
 			}
 		}
 		this.print(-3, this.getMidXAxis(), "ACH 扣款失敗報表 -- " + bank, "C");
-		this.print(-3, 203, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 203, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 185, "頁　數：");
 		this.print(-4, 200, "" + this.getNowPage(), "R");
-		
+
 		if (String.valueOf(entrydate).length() == 7) {
 			year = String.valueOf(entrydate).substring(0, 3);
 			month = String.valueOf(entrydate).substring(3, 5);
@@ -122,8 +120,7 @@ public class L4455Report2 extends MakeReport {
 		this.print(-5, this.getMidXAxis(), "入帳日期 ： " + year + " 年 " + month + " 月 " + date + " 日", "C");
 
 		this.print(-5, 185, "單　位：元");
-		this.print(-7, 1,
-				"業務科目        扣款帳號         戶號         戶名                     計息起迄日        應扣款金額合計       連絡電話          聯絡人              原因              備註");
+		this.print(-7, 1, "業務科目        扣款帳號         戶號         戶名                     計息起迄日        應扣款金額合計       連絡電話          聯絡人              原因              備註");
 		this.print(-8, 1,
 				"--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
@@ -151,21 +148,20 @@ public class L4455Report2 extends MakeReport {
 			throw new LogicException("E0013", "L4455");
 		}
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L4455").setRptItem("銀行扣款失敗報表").setSecurity("").setRptSize("A4").setPageOrientation("L")
-				.build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("L4455").setRptItem("銀行扣款失敗報表").setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
-		//找銀行代碼
+		// 找銀行代碼
 		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
 		lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
-		//找業務科目代碼
+		// 找業務科目代碼
 		Slice<CdCode> slCdCode2 = sCdCodeDefService.defItemEq("AcctCode", "%", this.index, this.limit, titaVo);
 		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
 
-		//找關係代碼
+		// 找關係代碼
 		Slice<CdCode> slCdCode3 = sCdCodeDefService.defItemEq("RelationCode", "%", this.index, this.limit, titaVo);
 		lCdCode3 = slCdCode3 == null ? null : slCdCode3.getContent();
 
@@ -202,15 +198,12 @@ public class L4455Report2 extends MakeReport {
 				this.print(0, 48, limitLength(L4455List.get(i).get("CustName"), 20));// 戶名
 
 				if (parse.stringToInteger(L4455List.get(i).get("IntStartDate")) != 0) {
-					String IntStartDate = String
-							.valueOf(parse.stringToInteger(L4455List.get(i).get("IntStartDate")) - 19110000);
+					String IntStartDate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("IntStartDate")) - 19110000);
 
 					if (String.valueOf(IntStartDate).length() == 7) {
-						this.print(0, 70, IntStartDate.substring(0, 3) + "/" + IntStartDate.substring(3, 5) + "/"
-								+ IntStartDate.substring(5, 7));// 計息起訖日
+						this.print(0, 70, IntStartDate.substring(0, 3) + "/" + IntStartDate.substring(3, 5) + "/" + IntStartDate.substring(5, 7));// 計息起訖日
 					} else {
-						this.print(0, 70, IntStartDate.substring(0, 2) + "/" + IntStartDate.substring(2, 4) + "/"
-								+ IntStartDate.substring(4, 6));// 計息起訖日
+						this.print(0, 70, IntStartDate.substring(0, 2) + "/" + IntStartDate.substring(2, 4) + "/" + IntStartDate.substring(4, 6));// 計息起訖日
 					}
 
 				}
@@ -219,15 +212,12 @@ public class L4455Report2 extends MakeReport {
 
 				if (parse.stringToInteger(L4455List.get(i).get("IntEndDate")) != 0) {
 
-					String IntEndDate = String
-							.valueOf(parse.stringToInteger(L4455List.get(i).get("IntEndDate")) - 19110000);
+					String IntEndDate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("IntEndDate")) - 19110000);
 
 					if (String.valueOf(IntEndDate).length() == 7) {
-						this.print(0, 83, IntEndDate.substring(0, 3) + "/" + IntEndDate.substring(3, 5) + "/"
-								+ IntEndDate.substring(5, 7));// 計息起訖日
+						this.print(0, 83, IntEndDate.substring(0, 3) + "/" + IntEndDate.substring(3, 5) + "/" + IntEndDate.substring(5, 7));// 計息起訖日
 					} else {
-						this.print(0, 83, IntEndDate.substring(0, 2) + "/" + IntEndDate.substring(2, 4) + "/"
-								+ IntEndDate.substring(4, 6));// 計息起訖日
+						this.print(0, 83, IntEndDate.substring(0, 2) + "/" + IntEndDate.substring(2, 4) + "/" + IntEndDate.substring(4, 6));// 計息起訖日
 					}
 
 				}

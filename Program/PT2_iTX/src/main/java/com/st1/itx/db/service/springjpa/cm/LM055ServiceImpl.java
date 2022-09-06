@@ -32,26 +32,26 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		this.info("lM055.findAll");
-		
-		int ilDate = 0 ;
-		int iYear = yearMonth / 100 ;
-		int iMonth = yearMonth % 100 ;
-		if(iMonth == 1){
+
+		int ilDate = 0;
+		int iYear = yearMonth / 100;
+		int iMonth = yearMonth % 100;
+		if (iMonth == 1) {
 			ilDate = (iYear - 1) * 10000 + 1201;
-		}else{
+		} else {
 			ilDate = (yearMonth - 1) * 100 + 1;
 		}
 
 		this.info("yearMonth=" + yearMonth);
 		this.info("ilDate=" + ilDate);
-		
+
 		String sql = " ";
 		// --取 逾期放款、未列入逾期應予評估放款(KIND=1、2)
 		sql += "	WITH \"tempA\" AS (";
@@ -77,7 +77,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	       WHEN M.\"ClCode1\" IN (1,2) THEN 'C' ";
 		sql += "       	     ELSE '99' END )";
 		sql += "	      ,M.\"AssetClass\"";
-		//--取 放款折溢價及催收費用
+		// --取 放款折溢價及催收費用
 		sql += "	),\"tempB\" AS (";
 		sql += "		SELECT 'A' AS \"ClNo\"";
 		sql += "          	  ,ROUND(SUM(NVL(I.\"AccumDPAmortized\",0)),0) AS \"AMT\"";
@@ -89,7 +89,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE I.\"YearMonth\" = :yymm ";
 		sql += "	  	  AND MLB.\"AcctCode\" <> 990 ";
 		sql += "	),\"tempC\" AS (";
-		//--取 購置住宅+修繕貸款(正常)
+		// --取 購置住宅+修繕貸款(正常)
 		sql += "	SELECT RES.\"TYPE\" AS \"TYPE\" ";
 		sql += "		  ,1 AS \"KIND\" ";
 		sql += "		  ,SUM(RES.\"AMT\") AS \"AMT\"";
@@ -262,7 +262,6 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE F.\"KIND\" IN (3,4)";
 		sql += "	)R";
 		sql += "	ORDER BY R.\"KIND\"";
-	
 
 		this.info("sql=" + sql);
 
@@ -286,10 +285,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		 * 備抵損失-催收款項-營業稅提撥 或 RBC表的RBC工作表I41欄 來源參考公式
 		 *
 		 *
-		 * 溢折價與催收費用
-		 * 10600304000 擔保放款-溢折價
-		 * 10601301000 催收款項-法務費用
-		 * 10601302000 催收款項-火險費用
+		 * 溢折價與催收費用 10600304000 擔保放款-溢折價 10601301000 催收款項-法務費用 10601302000 催收款項-火險費用
 		 * 10601304000 催收款項-溢折價
 		 */
 		String sql = " ";

@@ -311,8 +311,7 @@ public class L840A extends TradeBuffer {
 				sno1 = iL8403File.exec(titaVo);
 
 				String checkMsg = "Jcic債協報送檔案已產出。";
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo() + "L8403-" + itranCode, checkMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L8403-" + itranCode, checkMsg, titaVo);
 			}
 		} else if (iSubmitType == 2) {
 
@@ -348,11 +347,8 @@ public class L840A extends TradeBuffer {
 			JcicZ040 sJcicZ040 = new JcicZ040();
 			sJcicZ040 = sJcicZ040Service.findById(jcicZ040Id, titaVo);
 			for (JcicZ040 iiJcicZ040 : iJcicZ040) {
-				if ((iiJcicZ040.getOutJcicTxtDate() == 0 || iiJcicZ040.getActualFilingDate() == 0
-						|| iiJcicZ040.getActualFilingMark() == null)
-						&& iiJcicZ040.getCustId().equals(sJcicZ040.getCustId())
-						&& iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey())
-						&& iiJcicZ040.getRcDate() == sJcicZ040.getRcDate()) {
+				if ((iiJcicZ040.getOutJcicTxtDate() == 0 || iiJcicZ040.getActualFilingDate() == 0 || iiJcicZ040.getActualFilingMark() == null) && iiJcicZ040.getCustId().equals(sJcicZ040.getCustId())
+						&& iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey()) && iiJcicZ040.getRcDate() == sJcicZ040.getRcDate()) {
 					count++;
 					uJcicZ040 = sJcicZ040Service.holdById(sJcicZ040.getJcicZ040Id(), titaVo);
 					uJcicZ040.setOutJcicTxtDate(iJcicDate);
@@ -388,11 +384,8 @@ public class L840A extends TradeBuffer {
 			JcicZ041 sJcicZ041 = new JcicZ041();
 			sJcicZ041 = sJcicZ041Service.findById(jcicZ041Id, titaVo);
 			for (JcicZ041 iiJcicZ041 : iJcicZ041) {
-				if ((iiJcicZ041.getOutJcicTxtDate() == 0 || iiJcicZ041.getActualFilingDate() == 0
-						|| iiJcicZ041.getActualFilingMark() == null)
-						&& iiJcicZ041.getCustId().equals(sJcicZ041.getCustId())
-						&& iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey())
-						&& iiJcicZ041.getRcDate() == sJcicZ041.getRcDate()) {
+				if ((iiJcicZ041.getOutJcicTxtDate() == 0 || iiJcicZ041.getActualFilingDate() == 0 || iiJcicZ041.getActualFilingMark() == null) && iiJcicZ041.getCustId().equals(sJcicZ041.getCustId())
+						&& iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey()) && iiJcicZ041.getRcDate() == sJcicZ041.getRcDate()) {
 					count++;
 					uJcicZ041 = sJcicZ041Service.holdById(sJcicZ041.getJcicZ041Id(), titaVo);
 					this.info("041iJcicDate     = " + iJcicDate);
@@ -432,11 +425,8 @@ public class L840A extends TradeBuffer {
 			JcicZ042 sJcicZ042 = new JcicZ042();
 			sJcicZ042 = sJcicZ042Service.findById(jcicZ042Id, titaVo);
 			for (JcicZ042 iiJcicZ042 : iJcicZ042) {
-				if ((iiJcicZ042.getOutJcicTxtDate() == 0 || iiJcicZ042.getActualFilingDate() == 0
-						|| iiJcicZ042.getActualFilingMark() == null)
-						&& iiJcicZ042.getCustId().equals(sJcicZ042.getCustId())
-						&& iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey())
-						&& iiJcicZ042.getMaxMainCode().equals(sJcicZ042.getMaxMainCode())
+				if ((iiJcicZ042.getOutJcicTxtDate() == 0 || iiJcicZ042.getActualFilingDate() == 0 || iiJcicZ042.getActualFilingMark() == null) && iiJcicZ042.getCustId().equals(sJcicZ042.getCustId())
+						&& iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey()) && iiJcicZ042.getMaxMainCode().equals(sJcicZ042.getMaxMainCode())
 						&& iiJcicZ042.getRcDate() == sJcicZ042.getRcDate()) {
 					count++;
 					uJcicZ042 = sJcicZ042Service.holdById(sJcicZ042.getJcicZ042Id(), titaVo);
@@ -477,13 +467,9 @@ public class L840A extends TradeBuffer {
 			JcicZ043 sJcicZ043 = new JcicZ043();
 			sJcicZ043 = sJcicZ043Service.findById(jcicZ043Id, titaVo);
 			for (JcicZ043 iiJcicZ043 : iJcicZ043) {
-				if ((iiJcicZ043.getOutJcicTxtDate() == 0 || iiJcicZ043.getActualFilingDate() == 0
-						|| iiJcicZ043.getActualFilingMark() == null)
-						&& iiJcicZ043.getCustId().equals(sJcicZ043.getCustId())
-						&& iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey())
-						&& iiJcicZ043.getRcDate() == sJcicZ043.getRcDate()
-						&& iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode())
-						&& iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())) {
+				if ((iiJcicZ043.getOutJcicTxtDate() == 0 || iiJcicZ043.getActualFilingDate() == 0 || iiJcicZ043.getActualFilingMark() == null) && iiJcicZ043.getCustId().equals(sJcicZ043.getCustId())
+						&& iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey()) && iiJcicZ043.getRcDate() == sJcicZ043.getRcDate()
+						&& iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode()) && iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())) {
 					count++;
 					uJcicZ043 = sJcicZ043Service.holdById(sJcicZ043.getJcicZ043Id(), titaVo);
 					uJcicZ043.setOutJcicTxtDate(iJcicDate);
@@ -519,11 +505,8 @@ public class L840A extends TradeBuffer {
 			JcicZ044 sJcicZ044 = new JcicZ044();
 			sJcicZ044 = sJcicZ044Service.findById(jcicZ044Id, titaVo);
 			for (JcicZ044 iiJcicZ044 : iJcicZ044) {
-				if ((iiJcicZ044.getOutJcicTxtDate() == 0 || iiJcicZ044.getActualFilingDate() == 0
-						|| iiJcicZ044.getActualFilingMark() == null)
-						&& iiJcicZ044.getCustId().equals(sJcicZ044.getCustId())
-						&& iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey())
-						&& iiJcicZ044.getRcDate() == sJcicZ044.getRcDate()) {
+				if ((iiJcicZ044.getOutJcicTxtDate() == 0 || iiJcicZ044.getActualFilingDate() == 0 || iiJcicZ044.getActualFilingMark() == null) && iiJcicZ044.getCustId().equals(sJcicZ044.getCustId())
+						&& iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey()) && iiJcicZ044.getRcDate() == sJcicZ044.getRcDate()) {
 					count++;
 					uJcicZ044 = sJcicZ044Service.holdById(sJcicZ044.getJcicZ044Id(), titaVo);
 					uJcicZ044.setOutJcicTxtDate(iJcicDate);
@@ -561,11 +544,8 @@ public class L840A extends TradeBuffer {
 			JcicZ045 sJcicZ045 = new JcicZ045();
 			sJcicZ045 = sJcicZ045Service.findById(jcicZ045Id, titaVo);
 			for (JcicZ045 iiJcicZ045 : iJcicZ045) {
-				if ((iiJcicZ045.getOutJcicTxtDate() == 0 || iiJcicZ045.getActualFilingDate() == 0
-						|| iiJcicZ045.getActualFilingMark() == null)
-						&& iiJcicZ045.getCustId().equals(sJcicZ045.getCustId())
-						&& iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey())
-						&& iiJcicZ045.getRcDate() == sJcicZ045.getRcDate()
+				if ((iiJcicZ045.getOutJcicTxtDate() == 0 || iiJcicZ045.getActualFilingDate() == 0 || iiJcicZ045.getActualFilingMark() == null) && iiJcicZ045.getCustId().equals(sJcicZ045.getCustId())
+						&& iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey()) && iiJcicZ045.getRcDate() == sJcicZ045.getRcDate()
 						&& iiJcicZ045.getMaxMainCode().equals(sJcicZ045.getMaxMainCode())) {
 					count++;
 					uJcicZ045 = sJcicZ045Service.holdById(sJcicZ045.getJcicZ045Id(), titaVo);
@@ -604,12 +584,8 @@ public class L840A extends TradeBuffer {
 			JcicZ046 sJcicZ046 = new JcicZ046();
 			sJcicZ046 = sJcicZ046Service.findById(jcicZ046Id, titaVo);
 			for (JcicZ046 iiJcicZ046 : iJcicZ046) {
-				if ((iiJcicZ046.getOutJcicTxtDate() == 0 || iiJcicZ046.getActualFilingDate() == 0
-						|| iiJcicZ046.getActualFilingMark() == null)
-						&& iiJcicZ046.getCustId().equals(sJcicZ046.getCustId())
-						&& iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey())
-						&& iiJcicZ046.getRcDate() == sJcicZ046.getRcDate()
-						&& iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate()) {
+				if ((iiJcicZ046.getOutJcicTxtDate() == 0 || iiJcicZ046.getActualFilingDate() == 0 || iiJcicZ046.getActualFilingMark() == null) && iiJcicZ046.getCustId().equals(sJcicZ046.getCustId())
+						&& iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey()) && iiJcicZ046.getRcDate() == sJcicZ046.getRcDate() && iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate()) {
 					count++;
 					uJcicZ046 = sJcicZ046Service.holdById(sJcicZ046.getJcicZ046Id(), titaVo);
 					uJcicZ046.setOutJcicTxtDate(iJcicDate);
@@ -645,11 +621,8 @@ public class L840A extends TradeBuffer {
 			JcicZ047 sJcicZ047 = new JcicZ047();
 			sJcicZ047 = sJcicZ047Service.findById(jcicZ047Id, titaVo);
 			for (JcicZ047 iiJcicZ047 : iJcicZ047) {
-				if ((iiJcicZ047.getOutJcicTxtDate() == 0 || iiJcicZ047.getActualFilingDate() == 0
-						|| iiJcicZ047.getActualFilingMark() == null)
-						&& iiJcicZ047.getCustId().equals(sJcicZ047.getCustId())
-						&& iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey())
-						&& iiJcicZ047.getRcDate() == sJcicZ047.getRcDate()) {
+				if ((iiJcicZ047.getOutJcicTxtDate() == 0 || iiJcicZ047.getActualFilingDate() == 0 || iiJcicZ047.getActualFilingMark() == null) && iiJcicZ047.getCustId().equals(sJcicZ047.getCustId())
+						&& iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey()) && iiJcicZ047.getRcDate() == sJcicZ047.getRcDate()) {
 					count++;
 					uJcicZ047 = sJcicZ047Service.holdById(sJcicZ047.getJcicZ047Id(), titaVo);
 					uJcicZ047.setOutJcicTxtDate(iJcicDate);
@@ -685,11 +658,8 @@ public class L840A extends TradeBuffer {
 			JcicZ048 sJcicZ048 = new JcicZ048();
 			sJcicZ048 = sJcicZ048Service.findById(jcicZ048Id, titaVo);
 			for (JcicZ048 iiJcicZ048 : iJcicZ048) {
-				if ((iiJcicZ048.getOutJcicTxtDate() == 0 || iiJcicZ048.getActualFilingDate() == 0
-						|| iiJcicZ048.getActualFilingMark() == null)
-						&& iiJcicZ048.getCustId().equals(sJcicZ048.getCustId())
-						&& iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey())
-						&& iiJcicZ048.getRcDate() == sJcicZ048.getRcDate()) {
+				if ((iiJcicZ048.getOutJcicTxtDate() == 0 || iiJcicZ048.getActualFilingDate() == 0 || iiJcicZ048.getActualFilingMark() == null) && iiJcicZ048.getCustId().equals(sJcicZ048.getCustId())
+						&& iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey()) && iiJcicZ048.getRcDate() == sJcicZ048.getRcDate()) {
 					count++;
 					uJcicZ048 = sJcicZ048Service.holdById(sJcicZ048.getJcicZ048Id(), titaVo);
 					uJcicZ048.setOutJcicTxtDate(iJcicDate);
@@ -725,11 +695,8 @@ public class L840A extends TradeBuffer {
 			JcicZ049 sJcicZ049 = new JcicZ049();
 			sJcicZ049 = sJcicZ049Service.findById(jcicZ049Id, titaVo);
 			for (JcicZ049 iiJcicZ049 : iJcicZ049) {
-				if ((iiJcicZ049.getOutJcicTxtDate() == 0 || iiJcicZ049.getActualFilingDate() == 0
-						|| iiJcicZ049.getActualFilingMark() == null)
-						&& iiJcicZ049.getCustId().equals(sJcicZ049.getCustId())
-						&& iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey())
-						&& iiJcicZ049.getRcDate() == sJcicZ049.getRcDate()) {
+				if ((iiJcicZ049.getOutJcicTxtDate() == 0 || iiJcicZ049.getActualFilingDate() == 0 || iiJcicZ049.getActualFilingMark() == null) && iiJcicZ049.getCustId().equals(sJcicZ049.getCustId())
+						&& iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey()) && iiJcicZ049.getRcDate() == sJcicZ049.getRcDate()) {
 					count++;
 					uJcicZ049 = sJcicZ049Service.holdById(sJcicZ049.getJcicZ049Id(), titaVo);
 					uJcicZ049.setOutJcicTxtDate(iJcicDate);
@@ -767,12 +734,8 @@ public class L840A extends TradeBuffer {
 			JcicZ050 sJcicZ050 = new JcicZ050();
 			sJcicZ050 = sJcicZ050Service.findById(jcicZ050Id, titaVo);
 			for (JcicZ050 iiJcicZ050 : iJcicZ050) {
-				if ((iiJcicZ050.getOutJcicTxtDate() == 0 || iiJcicZ050.getActualFilingDate() == 0
-						|| iiJcicZ050.getActualFilingMark() == null)
-						&& iiJcicZ050.getCustId().equals(sJcicZ050.getCustId())
-						&& iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey())
-						&& iiJcicZ050.getRcDate() == sJcicZ050.getRcDate()
-						&& iiJcicZ050.getPayDate() == sJcicZ050.getPayDate()) {
+				if ((iiJcicZ050.getOutJcicTxtDate() == 0 || iiJcicZ050.getActualFilingDate() == 0 || iiJcicZ050.getActualFilingMark() == null) && iiJcicZ050.getCustId().equals(sJcicZ050.getCustId())
+						&& iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey()) && iiJcicZ050.getRcDate() == sJcicZ050.getRcDate() && iiJcicZ050.getPayDate() == sJcicZ050.getPayDate()) {
 					count++;
 					uJcicZ050 = sJcicZ050Service.holdById(sJcicZ050.getJcicZ050Id(), titaVo);
 					uJcicZ050.setOutJcicTxtDate(iJcicDate);
@@ -810,12 +773,8 @@ public class L840A extends TradeBuffer {
 			JcicZ051 sJcicZ051 = new JcicZ051();
 			sJcicZ051 = sJcicZ051Service.findById(jcicZ051Id, titaVo);
 			for (JcicZ051 iiJcicZ051 : iJcicZ051) {
-				if ((iiJcicZ051.getOutJcicTxtDate() == 0 || iiJcicZ051.getActualFilingDate() == 0
-						|| iiJcicZ051.getActualFilingMark() == null)
-						&& iiJcicZ051.getCustId().equals(sJcicZ051.getCustId())
-						&& iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey())
-						&& iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM()
-						&& iiJcicZ051.getRcDate() == sJcicZ051.getRcDate()) {
+				if ((iiJcicZ051.getOutJcicTxtDate() == 0 || iiJcicZ051.getActualFilingDate() == 0 || iiJcicZ051.getActualFilingMark() == null) && iiJcicZ051.getCustId().equals(sJcicZ051.getCustId())
+						&& iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey()) && iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM() && iiJcicZ051.getRcDate() == sJcicZ051.getRcDate()) {
 					count++;
 					uJcicZ051 = sJcicZ051Service.holdById(sJcicZ051.getJcicZ051Id(), titaVo);
 					uJcicZ051.setOutJcicTxtDate(iJcicDate);
@@ -851,11 +810,8 @@ public class L840A extends TradeBuffer {
 			JcicZ052 sJcicZ052 = new JcicZ052();
 			sJcicZ052 = sJcicZ052Service.findById(jcicZ052Id, titaVo);
 			for (JcicZ052 iiJcicZ052 : iJcicZ052) {
-				if ((iiJcicZ052.getOutJcicTxtDate() == 0 || iiJcicZ052.getActualFilingDate() == 0
-						|| iiJcicZ052.getActualFilingMark() == null)
-						&& iiJcicZ052.getCustId().equals(sJcicZ052.getCustId())
-						&& iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey())
-						&& iiJcicZ052.getRcDate() == sJcicZ052.getRcDate()) {
+				if ((iiJcicZ052.getOutJcicTxtDate() == 0 || iiJcicZ052.getActualFilingDate() == 0 || iiJcicZ052.getActualFilingMark() == null) && iiJcicZ052.getCustId().equals(sJcicZ052.getCustId())
+						&& iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey()) && iiJcicZ052.getRcDate() == sJcicZ052.getRcDate()) {
 					count++;
 					uJcicZ052 = sJcicZ052Service.holdById(sJcicZ052.getJcicZ052Id(), titaVo);
 					uJcicZ052.setOutJcicTxtDate(iJcicDate);
@@ -893,11 +849,8 @@ public class L840A extends TradeBuffer {
 			JcicZ053 sJcicZ053 = new JcicZ053();
 			sJcicZ053 = sJcicZ053Service.findById(jcicZ053Id, titaVo);
 			for (JcicZ053 iiJcicZ053 : iJcicZ053) {
-				if ((iiJcicZ053.getOutJcicTxtDate() == 0 || iiJcicZ053.getActualFilingDate() == 0
-						|| iiJcicZ053.getActualFilingMark() == null)
-						&& iiJcicZ053.getCustId().equals(sJcicZ053.getCustId())
-						&& iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey())
-						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
+				if ((iiJcicZ053.getOutJcicTxtDate() == 0 || iiJcicZ053.getActualFilingDate() == 0 || iiJcicZ053.getActualFilingMark() == null) && iiJcicZ053.getCustId().equals(sJcicZ053.getCustId())
+						&& iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey()) && iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
 						&& iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode())) {
 					count++;
 					uJcicZ053 = sJcicZ053Service.holdById(sJcicZ053.getJcicZ053Id(), titaVo);
@@ -938,11 +891,8 @@ public class L840A extends TradeBuffer {
 			JcicZ054 sJcicZ054 = new JcicZ054();
 			sJcicZ054 = sJcicZ054Service.findById(jcicZ054Id, titaVo);
 			for (JcicZ054 iiJcicZ054 : iJcicZ054) {
-				if ((iiJcicZ054.getOutJcicTxtDate() == 0 || iiJcicZ054.getActualFilingDate() == 0
-						|| iiJcicZ054.getActualFilingMark() == null)
-						&& iiJcicZ054.getCustId().equals(sJcicZ054.getCustId())
-						&& iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey())
-						&& iiJcicZ054.getRcDate() == sJcicZ054.getRcDate()
+				if ((iiJcicZ054.getOutJcicTxtDate() == 0 || iiJcicZ054.getActualFilingDate() == 0 || iiJcicZ054.getActualFilingMark() == null) && iiJcicZ054.getCustId().equals(sJcicZ054.getCustId())
+						&& iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey()) && iiJcicZ054.getRcDate() == sJcicZ054.getRcDate()
 						&& iiJcicZ054.getMaxMainCode().equals(sJcicZ054.getMaxMainCode())) {
 					count++;
 					uJcicZ054 = sJcicZ054Service.holdById(sJcicZ054.getJcicZ054Id(), titaVo);
@@ -983,13 +933,9 @@ public class L840A extends TradeBuffer {
 			JcicZ055 sJcicZ055 = new JcicZ055();
 			sJcicZ055 = sJcicZ055Service.findById(jcicZ055Id, titaVo);
 			for (JcicZ055 iiJcicZ055 : iJcicZ055) {
-				if ((iiJcicZ055.getOutJcicTxtDate() == 0 || iiJcicZ055.getActualFilingDate() == 0
-						|| iiJcicZ055.getActualFilingMark() == null)
-						&& iiJcicZ055.getCustId().equals(sJcicZ055.getCustId())
-						&& iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey())
-						&& iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
-						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode())
-						&& iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate()) {
+				if ((iiJcicZ055.getOutJcicTxtDate() == 0 || iiJcicZ055.getActualFilingDate() == 0 || iiJcicZ055.getActualFilingMark() == null) && iiJcicZ055.getCustId().equals(sJcicZ055.getCustId())
+						&& iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey()) && iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
+						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode()) && iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate()) {
 					count++;
 					uJcicZ055 = sJcicZ055Service.holdById(sJcicZ055.getJcicZ055Id(), titaVo);
 					uJcicZ055.setOutJcicTxtDate(iJcicDate);
@@ -1029,13 +975,9 @@ public class L840A extends TradeBuffer {
 			JcicZ056 sJcicZ056 = new JcicZ056();
 			sJcicZ056 = sJcicZ056Service.findById(jcicZ056Id, titaVo);
 			for (JcicZ056 iiJcicZ056 : iJcicZ056) {
-				if ((iiJcicZ056.getOutJcicTxtDate() == 0 || iiJcicZ056.getActualFilingDate() == 0
-						|| iiJcicZ056.getActualFilingMark() == null)
-						&& iiJcicZ056.getCustId().equals(sJcicZ056.getCustId())
-						&& iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey())
-						&& iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
-						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode())
-						&& iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate()) {
+				if ((iiJcicZ056.getOutJcicTxtDate() == 0 || iiJcicZ056.getActualFilingDate() == 0 || iiJcicZ056.getActualFilingMark() == null) && iiJcicZ056.getCustId().equals(sJcicZ056.getCustId())
+						&& iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey()) && iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
+						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode()) && iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate()) {
 					count++;
 					uJcicZ056 = sJcicZ056Service.holdById(sJcicZ056.getJcicZ056Id(), titaVo);
 					uJcicZ056.setOutJcicTxtDate(iJcicDate);
@@ -1073,11 +1015,8 @@ public class L840A extends TradeBuffer {
 			JcicZ060 sJcicZ060 = new JcicZ060();
 			sJcicZ060 = sJcicZ060Service.findById(jcicZ060Id, titaVo);
 			for (JcicZ060 iiJcicZ060 : iJcicZ060) {
-				if ((iiJcicZ060.getOutJcicTxtDate() == 0 || iiJcicZ060.getActualFilingDate() == 0
-						|| iiJcicZ060.getActualFilingMark() == null)
-						&& iiJcicZ060.getCustId().equals(sJcicZ060.getCustId())
-						&& iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey())
-						&& iiJcicZ060.getRcDate() == sJcicZ060.getRcDate()
+				if ((iiJcicZ060.getOutJcicTxtDate() == 0 || iiJcicZ060.getActualFilingDate() == 0 || iiJcicZ060.getActualFilingMark() == null) && iiJcicZ060.getCustId().equals(sJcicZ060.getCustId())
+						&& iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey()) && iiJcicZ060.getRcDate() == sJcicZ060.getRcDate()
 						&& iiJcicZ060.getChangePayDate() == sJcicZ060.getChangePayDate()) {
 					count++;
 					uJcicZ060 = sJcicZ060Service.holdById(sJcicZ060.getJcicZ060Id(), titaVo);
@@ -1118,11 +1057,8 @@ public class L840A extends TradeBuffer {
 			JcicZ061 sJcicZ061 = new JcicZ061();
 			sJcicZ061 = sJcicZ061Service.findById(jcicZ061Id, titaVo);
 			for (JcicZ061 iiJcicZ061 : iJcicZ061) {
-				if ((iiJcicZ061.getOutJcicTxtDate() == 0 || iiJcicZ061.getActualFilingDate() == 0
-						|| iiJcicZ061.getActualFilingMark() == null)
-						&& iiJcicZ061.getCustId().equals(sJcicZ061.getCustId())
-						&& iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey())
-						&& iiJcicZ061.getRcDate() == sJcicZ061.getRcDate()
+				if ((iiJcicZ061.getOutJcicTxtDate() == 0 || iiJcicZ061.getActualFilingDate() == 0 || iiJcicZ061.getActualFilingMark() == null) && iiJcicZ061.getCustId().equals(sJcicZ061.getCustId())
+						&& iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey()) && iiJcicZ061.getRcDate() == sJcicZ061.getRcDate()
 						&& iiJcicZ061.getChangePayDate() == sJcicZ061.getChangePayDate()) {
 					count++;
 					uJcicZ061 = sJcicZ061Service.holdById(sJcicZ061.getJcicZ061Id(), titaVo);
@@ -1161,11 +1097,8 @@ public class L840A extends TradeBuffer {
 			JcicZ062 sJcicZ062 = new JcicZ062();
 			sJcicZ062 = sJcicZ062Service.findById(jcicZ062Id, titaVo);
 			for (JcicZ062 iiJcicZ062 : iJcicZ062) {
-				if ((iiJcicZ062.getOutJcicTxtDate() == 0 || iiJcicZ062.getActualFilingDate() == 0
-						|| iiJcicZ062.getActualFilingMark() == null)
-						&& iiJcicZ062.getCustId().equals(sJcicZ062.getCustId())
-						&& iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey())
-						&& iiJcicZ062.getRcDate() == sJcicZ062.getRcDate()
+				if ((iiJcicZ062.getOutJcicTxtDate() == 0 || iiJcicZ062.getActualFilingDate() == 0 || iiJcicZ062.getActualFilingMark() == null) && iiJcicZ062.getCustId().equals(sJcicZ062.getCustId())
+						&& iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey()) && iiJcicZ062.getRcDate() == sJcicZ062.getRcDate()
 						&& iiJcicZ062.getChangePayDate() == sJcicZ062.getChangePayDate()) {
 					count++;
 					uJcicZ062 = sJcicZ062Service.holdById(sJcicZ062.getJcicZ062Id(), titaVo);
@@ -1204,11 +1137,8 @@ public class L840A extends TradeBuffer {
 			JcicZ063 sJcicZ063 = new JcicZ063();
 			sJcicZ063 = sJcicZ063Service.findById(jcicZ063Id, titaVo);
 			for (JcicZ063 iiJcicZ063 : iJcicZ063) {
-				if ((iiJcicZ063.getOutJcicTxtDate() == 0 || iiJcicZ063.getActualFilingDate() == 0
-						|| iiJcicZ063.getActualFilingMark() == null)
-						&& iiJcicZ063.getCustId().equals(sJcicZ063.getCustId())
-						&& iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey())
-						&& iiJcicZ063.getRcDate() == sJcicZ063.getRcDate()
+				if ((iiJcicZ063.getOutJcicTxtDate() == 0 || iiJcicZ063.getActualFilingDate() == 0 || iiJcicZ063.getActualFilingMark() == null) && iiJcicZ063.getCustId().equals(sJcicZ063.getCustId())
+						&& iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey()) && iiJcicZ063.getRcDate() == sJcicZ063.getRcDate()
 						&& iiJcicZ063.getChangePayDate() == sJcicZ063.getChangePayDate()) {
 					count++;
 					uJcicZ063 = sJcicZ063Service.holdById(sJcicZ063.getJcicZ063Id(), titaVo);
@@ -1247,11 +1177,8 @@ public class L840A extends TradeBuffer {
 			JcicZ440 sJcicZ440 = new JcicZ440();
 			sJcicZ440 = sJcicZ440Service.findById(jcicZ440Id, titaVo);
 			for (JcicZ440 iiJcicZ440 : iJcicZ440) {
-				if ((iiJcicZ440.getOutJcicTxtDate() == 0 || iiJcicZ440.getActualFilingDate() == 0
-						|| iiJcicZ440.getActualFilingMark() == null)
-						&& iiJcicZ440.getCustId().equals(sJcicZ440.getCustId())
-						&& iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey())
-						&& iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate()
+				if ((iiJcicZ440.getOutJcicTxtDate() == 0 || iiJcicZ440.getActualFilingDate() == 0 || iiJcicZ440.getActualFilingMark() == null) && iiJcicZ440.getCustId().equals(sJcicZ440.getCustId())
+						&& iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey()) && iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate()
 						&& iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode())) {
 					count++;
 					uJcicZ440 = sJcicZ440Service.holdById(sJcicZ440.getJcicZ440Id(), titaVo);
@@ -1292,13 +1219,9 @@ public class L840A extends TradeBuffer {
 			JcicZ442 sJcicZ442 = new JcicZ442();
 			sJcicZ442 = sJcicZ442Service.findById(jcicZ442Id, titaVo);
 			for (JcicZ442 iiJcicZ442 : iJcicZ442) {
-				if ((iiJcicZ442.getOutJcicTxtDate() == 0 || iiJcicZ442.getActualFilingDate() == 0
-						|| iiJcicZ442.getActualFilingMark() == null)
-						&& iiJcicZ442.getCustId().equals(sJcicZ442.getCustId())
-						&& iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey())
-						&& iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate()
-						&& iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode())
-						&& iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode())) {
+				if ((iiJcicZ442.getOutJcicTxtDate() == 0 || iiJcicZ442.getActualFilingDate() == 0 || iiJcicZ442.getActualFilingMark() == null) && iiJcicZ442.getCustId().equals(sJcicZ442.getCustId())
+						&& iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey()) && iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate()
+						&& iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode()) && iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode())) {
 					count++;
 					uJcicZ442 = sJcicZ442Service.holdById(sJcicZ442.getJcicZ442Id(), titaVo);
 					uJcicZ442.setOutJcicTxtDate(iJcicDate);
@@ -1340,13 +1263,9 @@ public class L840A extends TradeBuffer {
 			JcicZ443 sJcicZ443 = new JcicZ443();
 			sJcicZ443 = sJcicZ443Service.findById(jcicZ443Id, titaVo);
 			for (JcicZ443 iiJcicZ443 : iJcicZ443) {
-				if ((iiJcicZ443.getOutJcicTxtDate() == 0 || iiJcicZ443.getActualFilingDate() == 0
-						|| iiJcicZ443.getActualFilingMark() == null)
-						&& iiJcicZ443.getCustId().equals(sJcicZ443.getCustId())
-						&& iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey())
-						&& iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate()
-						&& iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode())
-						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())) {
+				if ((iiJcicZ443.getOutJcicTxtDate() == 0 || iiJcicZ443.getActualFilingDate() == 0 || iiJcicZ443.getActualFilingMark() == null) && iiJcicZ443.getCustId().equals(sJcicZ443.getCustId())
+						&& iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey()) && iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate()
+						&& iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode()) && iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())) {
 					count++;
 					uJcicZ443 = sJcicZ443Service.holdById(sJcicZ443.getJcicZ443Id(), titaVo);
 					uJcicZ443.setOutJcicTxtDate(iJcicDate);
@@ -1384,11 +1303,8 @@ public class L840A extends TradeBuffer {
 			JcicZ444 sJcicZ444 = new JcicZ444();
 			sJcicZ444 = sJcicZ444Service.findById(jcicZ444Id, titaVo);
 			for (JcicZ444 iiJcicZ444 : iJcicZ444) {
-				if ((iiJcicZ444.getOutJcicTxtDate() == 0 || iiJcicZ444.getActualFilingDate() == 0
-						|| iiJcicZ444.getActualFilingMark() == null)
-						&& iiJcicZ444.getCustId().equals(sJcicZ444.getCustId())
-						&& iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey())
-						&& iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate()
+				if ((iiJcicZ444.getOutJcicTxtDate() == 0 || iiJcicZ444.getActualFilingDate() == 0 || iiJcicZ444.getActualFilingMark() == null) && iiJcicZ444.getCustId().equals(sJcicZ444.getCustId())
+						&& iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey()) && iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate()
 						&& iiJcicZ444.getCourtCode().equals(sJcicZ444.getCourtCode())) {
 					count++;
 					uJcicZ444 = sJcicZ444Service.holdById(sJcicZ444.getJcicZ444Id(), titaVo);
@@ -1427,11 +1343,8 @@ public class L840A extends TradeBuffer {
 			JcicZ446 sJcicZ446 = new JcicZ446();
 			sJcicZ446 = sJcicZ446Service.findById(jcicZ446Id, titaVo);
 			for (JcicZ446 iiJcicZ446 : iJcicZ446) {
-				if ((iiJcicZ446.getOutJcicTxtDate() == 0 || iiJcicZ446.getActualFilingDate() == 0
-						|| iiJcicZ446.getActualFilingMark() == null)
-						&& iiJcicZ446.getCustId().equals(sJcicZ446.getCustId())
-						&& iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey())
-						&& iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate()
+				if ((iiJcicZ446.getOutJcicTxtDate() == 0 || iiJcicZ446.getActualFilingDate() == 0 || iiJcicZ446.getActualFilingMark() == null) && iiJcicZ446.getCustId().equals(sJcicZ446.getCustId())
+						&& iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey()) && iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate()
 						&& iiJcicZ446.getCourtCode().equals(sJcicZ446.getCourtCode())) {
 					count++;
 					uJcicZ446 = sJcicZ446Service.holdById(sJcicZ446.getJcicZ446Id(), titaVo);
@@ -1470,11 +1383,8 @@ public class L840A extends TradeBuffer {
 			JcicZ447 sJcicZ447 = new JcicZ447();
 			sJcicZ447 = sJcicZ447Service.findById(jcicZ447Id, titaVo);
 			for (JcicZ447 iiJcicZ447 : iJcicZ447) {
-				if ((iiJcicZ447.getOutJcicTxtDate() == 0 || iiJcicZ447.getActualFilingDate() == 0
-						|| iiJcicZ447.getActualFilingMark() == null)
-						&& iiJcicZ447.getCustId().equals(sJcicZ447.getCustId())
-						&& iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey())
-						&& iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate()
+				if ((iiJcicZ447.getOutJcicTxtDate() == 0 || iiJcicZ447.getActualFilingDate() == 0 || iiJcicZ447.getActualFilingMark() == null) && iiJcicZ447.getCustId().equals(sJcicZ447.getCustId())
+						&& iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey()) && iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate()
 						&& iiJcicZ447.getCourtCode().equals(sJcicZ447.getCourtCode())) {
 					count++;
 					uJcicZ447 = sJcicZ447Service.holdById(sJcicZ447.getJcicZ447Id(), titaVo);
@@ -1515,13 +1425,9 @@ public class L840A extends TradeBuffer {
 			JcicZ448 sJcicZ448 = new JcicZ448();
 			sJcicZ448 = sJcicZ448Service.findById(jcicZ448Id, titaVo);
 			for (JcicZ448 iiJcicZ448 : iJcicZ448) {
-				if ((iiJcicZ448.getOutJcicTxtDate() == 0 || iiJcicZ448.getActualFilingDate() == 0
-						|| iiJcicZ448.getActualFilingMark() == null)
-						&& iiJcicZ448.getCustId().equals(sJcicZ448.getCustId())
-						&& iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey())
-						&& iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate()
-						&& iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode())
-						&& iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode())) {
+				if ((iiJcicZ448.getOutJcicTxtDate() == 0 || iiJcicZ448.getActualFilingDate() == 0 || iiJcicZ448.getActualFilingMark() == null) && iiJcicZ448.getCustId().equals(sJcicZ448.getCustId())
+						&& iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey()) && iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate()
+						&& iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode()) && iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode())) {
 					count++;
 					uJcicZ448 = sJcicZ448Service.holdById(sJcicZ448.getJcicZ448Id(), titaVo);
 					uJcicZ448.setOutJcicTxtDate(iJcicDate);
@@ -1561,13 +1467,9 @@ public class L840A extends TradeBuffer {
 			JcicZ450 sJcicZ450 = new JcicZ450();
 			sJcicZ450 = sJcicZ450Service.findById(jcicZ450Id, titaVo);
 			for (JcicZ450 iiJcicZ450 : iJcicZ450) {
-				if ((iiJcicZ450.getOutJcicTxtDate() == 0 || iiJcicZ450.getActualFilingDate() == 0
-						|| iiJcicZ450.getActualFilingMark() == null)
-						&& iiJcicZ450.getCustId().equals(sJcicZ450.getCustId())
-						&& iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey())
-						&& iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate()
-						&& iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode())
-						&& iiJcicZ450.getPayDate() == sJcicZ450.getPayDate()) {
+				if ((iiJcicZ450.getOutJcicTxtDate() == 0 || iiJcicZ450.getActualFilingDate() == 0 || iiJcicZ450.getActualFilingMark() == null) && iiJcicZ450.getCustId().equals(sJcicZ450.getCustId())
+						&& iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey()) && iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate()
+						&& iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode()) && iiJcicZ450.getPayDate() == sJcicZ450.getPayDate()) {
 					count++;
 					uJcicZ450 = sJcicZ450Service.holdById(sJcicZ450.getJcicZ450Id(), titaVo);
 					uJcicZ450.setOutJcicTxtDate(iJcicDate);
@@ -1607,13 +1509,9 @@ public class L840A extends TradeBuffer {
 			JcicZ451 sJcicZ451 = new JcicZ451();
 			sJcicZ451 = sJcicZ451Service.findById(jcicZ451Id, titaVo);
 			for (JcicZ451 iiJcicZ451 : iJcicZ451) {
-				if ((iiJcicZ451.getOutJcicTxtDate() == 0 || iiJcicZ451.getActualFilingDate() == 0
-						|| iiJcicZ451.getActualFilingMark() == null)
-						&& iiJcicZ451.getCustId().equals(sJcicZ451.getCustId())
-						&& iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey())
-						&& iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate()
-						&& iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode())
-						&& iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM()) {
+				if ((iiJcicZ451.getOutJcicTxtDate() == 0 || iiJcicZ451.getActualFilingDate() == 0 || iiJcicZ451.getActualFilingMark() == null) && iiJcicZ451.getCustId().equals(sJcicZ451.getCustId())
+						&& iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey()) && iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate()
+						&& iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode()) && iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM()) {
 					count++;
 					uJcicZ451 = sJcicZ451Service.holdById(sJcicZ451.getJcicZ451Id(), titaVo);
 					uJcicZ451.setOutJcicTxtDate(iJcicDate);
@@ -1653,13 +1551,9 @@ public class L840A extends TradeBuffer {
 			JcicZ454 sJcicZ454 = new JcicZ454();
 			sJcicZ454 = sJcicZ454Service.findById(jcicZ454Id, titaVo);
 			for (JcicZ454 iiJcicZ454 : iJcicZ454) {
-				if ((iiJcicZ454.getOutJcicTxtDate() == 0 || iiJcicZ454.getActualFilingDate() == 0
-						|| iiJcicZ454.getActualFilingMark() == null)
-						&& iiJcicZ454.getCustId().equals(sJcicZ454.getCustId())
-						&& iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey())
-						&& iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate()
-						&& iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode())
-						&& iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode())) {
+				if ((iiJcicZ454.getOutJcicTxtDate() == 0 || iiJcicZ454.getActualFilingDate() == 0 || iiJcicZ454.getActualFilingMark() == null) && iiJcicZ454.getCustId().equals(sJcicZ454.getCustId())
+						&& iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey()) && iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate()
+						&& iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode()) && iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode())) {
 					count++;
 					uJcicZ454 = sJcicZ454Service.holdById(sJcicZ454.getJcicZ454Id(), titaVo);
 					uJcicZ454.setOutJcicTxtDate(iJcicDate);
@@ -1695,11 +1589,8 @@ public class L840A extends TradeBuffer {
 			JcicZ570 sJcicZ570 = new JcicZ570();
 			sJcicZ570 = sJcicZ570Service.findById(jcicZ570Id, titaVo);
 			for (JcicZ570 iiJcicZ570 : iJcicZ570) {
-				if ((iiJcicZ570.getOutJcicTxtDate() == 0 || iiJcicZ570.getActualFilingDate() == 0
-						|| iiJcicZ570.getActualFilingMark() == null)
-						&& iiJcicZ570.getCustId().equals(sJcicZ570.getCustId())
-						&& iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey())
-						&& iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate()) {
+				if ((iiJcicZ570.getOutJcicTxtDate() == 0 || iiJcicZ570.getActualFilingDate() == 0 || iiJcicZ570.getActualFilingMark() == null) && iiJcicZ570.getCustId().equals(sJcicZ570.getCustId())
+						&& iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey()) && iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate()) {
 					count++;
 					uJcicZ570 = sJcicZ570Service.holdById(sJcicZ570.getJcicZ570Id(), titaVo);
 					uJcicZ570.setOutJcicTxtDate(iJcicDate);
@@ -1737,11 +1628,8 @@ public class L840A extends TradeBuffer {
 			JcicZ571 sJcicZ571 = new JcicZ571();
 			sJcicZ571 = sJcicZ571Service.findById(jcicZ571Id, titaVo);
 			for (JcicZ571 iiJcicZ571 : iJcicZ571) {
-				if ((iiJcicZ571.getOutJcicTxtDate() == 0 || iiJcicZ571.getActualFilingDate() == 0
-						|| iiJcicZ571.getActualFilingMark() == null)
-						&& iiJcicZ571.getCustId().equals(sJcicZ571.getCustId())
-						&& iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey())
-						&& iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate()
+				if ((iiJcicZ571.getOutJcicTxtDate() == 0 || iiJcicZ571.getActualFilingDate() == 0 || iiJcicZ571.getActualFilingMark() == null) && iiJcicZ571.getCustId().equals(sJcicZ571.getCustId())
+						&& iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey()) && iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate()
 						&& iiJcicZ571.getBankId().equals(sJcicZ571.getBankId())) {
 					count++;
 					uJcicZ571 = sJcicZ571Service.holdById(sJcicZ571.getJcicZ571Id(), titaVo);
@@ -1782,12 +1670,8 @@ public class L840A extends TradeBuffer {
 			JcicZ572 sJcicZ572 = new JcicZ572();
 			sJcicZ572 = sJcicZ572Service.findById(jcicZ572Id, titaVo);
 			for (JcicZ572 iiJcicZ572 : iJcicZ572) {
-				if ((iiJcicZ572.getOutJcicTxtDate() == 0 || iiJcicZ572.getActualFilingDate() == 0
-						|| iiJcicZ572.getActualFilingMark() == null)
-						&& iiJcicZ572.getCustId().equals(sJcicZ572.getCustId())
-						&& iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey())
-						&& iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate()
-						&& iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
+				if ((iiJcicZ572.getOutJcicTxtDate() == 0 || iiJcicZ572.getActualFilingDate() == 0 || iiJcicZ572.getActualFilingMark() == null) && iiJcicZ572.getCustId().equals(sJcicZ572.getCustId())
+						&& iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey()) && iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate() && iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
 						&& iiJcicZ572.getPayDate() == sJcicZ572.getPayDate()) {
 					count++;
 					uJcicZ572 = sJcicZ572Service.holdById(sJcicZ572.getJcicZ572Id(), titaVo);
@@ -1826,12 +1710,8 @@ public class L840A extends TradeBuffer {
 			JcicZ573 sJcicZ573 = new JcicZ573();
 			sJcicZ573 = sJcicZ573Service.findById(jcicZ573Id, titaVo);
 			for (JcicZ573 iiJcicZ573 : iJcicZ573) {
-				if ((iiJcicZ573.getOutJcicTxtDate() == 0 || iiJcicZ573.getActualFilingDate() == 0
-						|| iiJcicZ573.getActualFilingMark() == null)
-						&& iiJcicZ573.getCustId().equals(sJcicZ573.getCustId())
-						&& iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey())
-						&& iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate()
-						&& iiJcicZ573.getPayDate() == sJcicZ573.getPayDate()) {
+				if ((iiJcicZ573.getOutJcicTxtDate() == 0 || iiJcicZ573.getActualFilingDate() == 0 || iiJcicZ573.getActualFilingMark() == null) && iiJcicZ573.getCustId().equals(sJcicZ573.getCustId())
+						&& iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey()) && iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate() && iiJcicZ573.getPayDate() == sJcicZ573.getPayDate()) {
 					count++;
 					uJcicZ573 = sJcicZ573Service.holdById(sJcicZ573.getJcicZ573Id(), titaVo);
 					uJcicZ573.setOutJcicTxtDate(iJcicDate);
@@ -1867,11 +1747,8 @@ public class L840A extends TradeBuffer {
 			JcicZ574 sJcicZ574 = new JcicZ574();
 			sJcicZ574 = sJcicZ574Service.findById(jcicZ574Id, titaVo);
 			for (JcicZ574 iiJcicZ574 : iJcicZ574) {
-				if ((iiJcicZ574.getOutJcicTxtDate() == 0 || iiJcicZ574.getActualFilingDate() == 0
-						|| iiJcicZ574.getActualFilingMark() == null)
-						&& iiJcicZ574.getCustId().equals(sJcicZ574.getCustId())
-						&& iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey())
-						&& iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate()) {
+				if ((iiJcicZ574.getOutJcicTxtDate() == 0 || iiJcicZ574.getActualFilingDate() == 0 || iiJcicZ574.getActualFilingMark() == null) && iiJcicZ574.getCustId().equals(sJcicZ574.getCustId())
+						&& iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey()) && iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate()) {
 					count++;
 					uJcicZ574 = sJcicZ574Service.holdById(sJcicZ574.getJcicZ574Id(), titaVo);
 					uJcicZ574.setOutJcicTxtDate(iJcicDate);
@@ -1909,11 +1786,8 @@ public class L840A extends TradeBuffer {
 			JcicZ575 sJcicZ575 = new JcicZ575();
 			sJcicZ575 = sJcicZ575Service.findById(jcicZ575Id, titaVo);
 			for (JcicZ575 iiJcicZ575 : iJcicZ575) {
-				if ((iiJcicZ575.getOutJcicTxtDate() == 0 || iiJcicZ575.getActualFilingDate() == 0
-						|| iiJcicZ575.getActualFilingMark() == null)
-						&& iiJcicZ575.getCustId().equals(sJcicZ575.getCustId())
-						&& iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey())
-						&& iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate()
+				if ((iiJcicZ575.getOutJcicTxtDate() == 0 || iiJcicZ575.getActualFilingDate() == 0 || iiJcicZ575.getActualFilingMark() == null) && iiJcicZ575.getCustId().equals(sJcicZ575.getCustId())
+						&& iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey()) && iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate()
 						&& iiJcicZ575.getBankId().equals(sJcicZ575.getBankId())) {
 					count++;
 					uJcicZ575 = sJcicZ575Service.holdById(sJcicZ575.getJcicZ575Id(), titaVo);
@@ -1963,8 +1837,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ040SIZE     =" + lJcicZ040.size());
 			for (JcicZ040 iiJcicZ040 : lJcicZ040) {
 				count++;
-				if (iiJcicZ040.getOutJcicTxtDate() == iJcicDate && iiJcicZ040.getCustId().equals(sJcicZ040.getCustId())
-						&& iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey())
+				if (iiJcicZ040.getOutJcicTxtDate() == iJcicDate && iiJcicZ040.getCustId().equals(sJcicZ040.getCustId()) && iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey())
 						&& iiJcicZ040.getRcDate() == sJcicZ040.getRcDate() && iiJcicZ040.getActualFilingDate() == 0) {
 
 					uJcicZ040 = sJcicZ040Service.holdById(iiJcicZ040.getJcicZ040Id(), titaVo);
@@ -2005,8 +1878,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ041SIZE     =" + lJcicZ041.size());
 			for (JcicZ041 iiJcicZ041 : lJcicZ041) {
 				count++;
-				if (iiJcicZ041.getOutJcicTxtDate() == iJcicDate && iiJcicZ041.getCustId().equals(sJcicZ041.getCustId())
-						&& iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey())
+				if (iiJcicZ041.getOutJcicTxtDate() == iJcicDate && iiJcicZ041.getCustId().equals(sJcicZ041.getCustId()) && iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey())
 						&& iiJcicZ041.getRcDate() == sJcicZ041.getRcDate() && iiJcicZ041.getActualFilingDate() == 0) {
 
 					uJcicZ041 = sJcicZ041Service.holdById(iiJcicZ041.getJcicZ041Id(), titaVo);
@@ -2049,8 +1921,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ042SIZE     =" + lJcicZ042.size());
 			for (JcicZ042 iiJcicZ042 : lJcicZ042) {
 				count++;
-				if (iiJcicZ042.getOutJcicTxtDate() == iJcicDate && iiJcicZ042.getCustId().equals(sJcicZ042.getCustId())
-						&& iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey())
+				if (iiJcicZ042.getOutJcicTxtDate() == iJcicDate && iiJcicZ042.getCustId().equals(sJcicZ042.getCustId()) && iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey())
 						&& iiJcicZ042.getRcDate() == sJcicZ042.getRcDate() && iiJcicZ042.getActualFilingDate() == 0) {
 
 					uJcicZ042 = sJcicZ042Service.holdById(iiJcicZ042.getJcicZ042Id(), titaVo);
@@ -2095,11 +1966,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ043SIZE     =" + lJcicZ043.size());
 			for (JcicZ043 iiJcicZ043 : lJcicZ043) {
 				count++;
-				if (iiJcicZ043.getOutJcicTxtDate() == iJcicDate && iiJcicZ043.getCustId().equals(sJcicZ043.getCustId())
-						&& iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey())
-						&& iiJcicZ043.getRcDate() == sJcicZ043.getRcDate()
-						&& iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode())
-						&& iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())
+				if (iiJcicZ043.getOutJcicTxtDate() == iJcicDate && iiJcicZ043.getCustId().equals(sJcicZ043.getCustId()) && iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey())
+						&& iiJcicZ043.getRcDate() == sJcicZ043.getRcDate() && iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode()) && iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())
 						&& iiJcicZ043.getActualFilingDate() == 0) {
 
 					uJcicZ043 = sJcicZ043Service.holdById(iiJcicZ043.getJcicZ043Id(), titaVo);
@@ -2140,8 +2008,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ044SIZE     =" + lJcicZ044.size());
 			for (JcicZ044 iiJcicZ044 : lJcicZ044) {
 				count++;
-				if (iiJcicZ044.getOutJcicTxtDate() == iJcicDate && iiJcicZ044.getCustId().equals(sJcicZ044.getCustId())
-						&& iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey())
+				if (iiJcicZ044.getOutJcicTxtDate() == iJcicDate && iiJcicZ044.getCustId().equals(sJcicZ044.getCustId()) && iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey())
 						&& iiJcicZ044.getRcDate() == sJcicZ044.getRcDate() && iiJcicZ044.getActualFilingDate() == 0) {
 
 					uJcicZ044 = sJcicZ044Service.holdById(iiJcicZ044.getJcicZ044Id(), titaVo);
@@ -2184,11 +2051,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ045SIZE     =" + lJcicZ045.size());
 			for (JcicZ045 iiJcicZ045 : lJcicZ045) {
 				count++;
-				if (iiJcicZ045.getOutJcicTxtDate() == iJcicDate && iiJcicZ045.getCustId().equals(sJcicZ045.getCustId())
-						&& iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey())
-						&& iiJcicZ045.getRcDate() == sJcicZ045.getRcDate()
-						&& iiJcicZ045.getMaxMainCode().equals(sJcicZ045.getMaxMainCode())
-						&& iiJcicZ045.getActualFilingDate() == 0) {
+				if (iiJcicZ045.getOutJcicTxtDate() == iJcicDate && iiJcicZ045.getCustId().equals(sJcicZ045.getCustId()) && iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey())
+						&& iiJcicZ045.getRcDate() == sJcicZ045.getRcDate() && iiJcicZ045.getMaxMainCode().equals(sJcicZ045.getMaxMainCode()) && iiJcicZ045.getActualFilingDate() == 0) {
 
 					uJcicZ045 = sJcicZ045Service.holdById(iiJcicZ045.getJcicZ045Id(), titaVo);
 					oldJcicZ045 = (JcicZ045) iDataLog.clone(uJcicZ045);
@@ -2230,11 +2094,8 @@ public class L840A extends TradeBuffer {
 
 			for (JcicZ046 iiJcicZ046 : lJcicZ046) {
 				count++;
-				if (iiJcicZ046.getOutJcicTxtDate() == iJcicDate && iiJcicZ046.getCustId().equals(sJcicZ046.getCustId())
-						&& iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey())
-						&& iiJcicZ046.getRcDate() == sJcicZ046.getRcDate()
-						&& iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate()
-						&& iiJcicZ046.getActualFilingDate() == 0) {
+				if (iiJcicZ046.getOutJcicTxtDate() == iJcicDate && iiJcicZ046.getCustId().equals(sJcicZ046.getCustId()) && iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey())
+						&& iiJcicZ046.getRcDate() == sJcicZ046.getRcDate() && iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate() && iiJcicZ046.getActualFilingDate() == 0) {
 
 					uJcicZ046 = sJcicZ046Service.holdById(iiJcicZ046.getJcicZ046Id(), titaVo);
 					oldJcicZ046 = (JcicZ046) iDataLog.clone(uJcicZ046);
@@ -2274,8 +2135,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ047SIZE     =" + lJcicZ047.size());
 			for (JcicZ047 iiJcicZ047 : lJcicZ047) {
 				count++;
-				if (iiJcicZ047.getOutJcicTxtDate() == iJcicDate && iiJcicZ047.getCustId().equals(sJcicZ047.getCustId())
-						&& iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey())
+				if (iiJcicZ047.getOutJcicTxtDate() == iJcicDate && iiJcicZ047.getCustId().equals(sJcicZ047.getCustId()) && iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey())
 						&& iiJcicZ047.getRcDate() == sJcicZ047.getRcDate() && iiJcicZ047.getActualFilingDate() == 0) {
 
 					uJcicZ047 = sJcicZ047Service.holdById(iiJcicZ047.getJcicZ047Id(), titaVo);
@@ -2316,8 +2176,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ048SIZE     =" + lJcicZ048.size());
 			for (JcicZ048 iiJcicZ048 : lJcicZ048) {
 				count++;
-				if (iiJcicZ048.getOutJcicTxtDate() == iJcicDate && iiJcicZ048.getCustId().equals(sJcicZ048.getCustId())
-						&& iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey())
+				if (iiJcicZ048.getOutJcicTxtDate() == iJcicDate && iiJcicZ048.getCustId().equals(sJcicZ048.getCustId()) && iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey())
 						&& iiJcicZ048.getRcDate() == sJcicZ048.getRcDate() && iiJcicZ048.getActualFilingDate() == 0) {
 
 					uJcicZ048 = sJcicZ048Service.holdById(iiJcicZ048.getJcicZ048Id(), titaVo);
@@ -2358,8 +2217,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ049SIZE     =" + lJcicZ049.size());
 			for (JcicZ049 iiJcicZ049 : lJcicZ049) {
 				count++;
-				if (iiJcicZ049.getOutJcicTxtDate() == iJcicDate && iiJcicZ049.getCustId().equals(sJcicZ049.getCustId())
-						&& iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey())
+				if (iiJcicZ049.getOutJcicTxtDate() == iJcicDate && iiJcicZ049.getCustId().equals(sJcicZ049.getCustId()) && iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey())
 						&& iiJcicZ049.getRcDate() == sJcicZ049.getRcDate() && iiJcicZ049.getActualFilingDate() == 0) {
 
 					uJcicZ049 = sJcicZ049Service.holdById(iiJcicZ049.getJcicZ049Id(), titaVo);
@@ -2402,10 +2260,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ050SIZE     =" + lJcicZ050.size());
 			for (JcicZ050 iiJcicZ050 : lJcicZ050) {
 				count++;
-				if (iiJcicZ050.getOutJcicTxtDate() == iJcicDate && iiJcicZ050.getCustId().equals(sJcicZ050.getCustId())
-						&& iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey())
-						&& iiJcicZ050.getRcDate() == sJcicZ050.getRcDate()
-						&& iiJcicZ050.getPayDate() == sJcicZ050.getPayDate() && iiJcicZ050.getActualFilingDate() == 0) {
+				if (iiJcicZ050.getOutJcicTxtDate() == iJcicDate && iiJcicZ050.getCustId().equals(sJcicZ050.getCustId()) && iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey())
+						&& iiJcicZ050.getRcDate() == sJcicZ050.getRcDate() && iiJcicZ050.getPayDate() == sJcicZ050.getPayDate() && iiJcicZ050.getActualFilingDate() == 0) {
 
 					uJcicZ050 = sJcicZ050Service.holdById(iiJcicZ050.getJcicZ050Id(), titaVo);
 					oldJcicZ050 = (JcicZ050) iDataLog.clone(uJcicZ050);
@@ -2447,10 +2303,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ051SIZE     =" + lJcicZ051.size());
 			for (JcicZ051 iiJcicZ051 : lJcicZ051) {
 				count++;
-				if (iiJcicZ051.getOutJcicTxtDate() == iJcicDate && iiJcicZ051.getCustId().equals(sJcicZ051.getCustId())
-						&& iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey())
-						&& iiJcicZ051.getRcDate() == sJcicZ051.getRcDate()
-						&& iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM() && iiJcicZ051.getActualFilingDate() == 0) {
+				if (iiJcicZ051.getOutJcicTxtDate() == iJcicDate && iiJcicZ051.getCustId().equals(sJcicZ051.getCustId()) && iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey())
+						&& iiJcicZ051.getRcDate() == sJcicZ051.getRcDate() && iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM() && iiJcicZ051.getActualFilingDate() == 0) {
 
 					uJcicZ051 = sJcicZ051Service.holdById(iiJcicZ051.getJcicZ051Id(), titaVo);
 					oldJcicZ051 = (JcicZ051) iDataLog.clone(uJcicZ051);
@@ -2490,8 +2344,7 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ052SIZE     =" + lJcicZ052.size());
 			for (JcicZ052 iiJcicZ052 : lJcicZ052) {
 				count++;
-				if (iiJcicZ052.getOutJcicTxtDate() == iJcicDate && iiJcicZ052.getCustId().equals(sJcicZ052.getCustId())
-						&& iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey())
+				if (iiJcicZ052.getOutJcicTxtDate() == iJcicDate && iiJcicZ052.getCustId().equals(sJcicZ052.getCustId()) && iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey())
 						&& iiJcicZ052.getRcDate() == sJcicZ052.getRcDate() && iiJcicZ052.getActualFilingDate() == 0) {
 
 					uJcicZ052 = sJcicZ052Service.holdById(iiJcicZ052.getJcicZ052Id(), titaVo);
@@ -2534,11 +2387,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ053SIZE     =" + lJcicZ053.size());
 			for (JcicZ053 iiJcicZ053 : lJcicZ053) {
 				count++;
-				if (iiJcicZ053.getOutJcicTxtDate() == iJcicDate && iiJcicZ053.getCustId().equals(sJcicZ053.getCustId())
-						&& iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey())
-						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
-						&& iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode())
-						&& iiJcicZ053.getActualFilingDate() == 0) {
+				if (iiJcicZ053.getOutJcicTxtDate() == iJcicDate && iiJcicZ053.getCustId().equals(sJcicZ053.getCustId()) && iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey())
+						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate() && iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode()) && iiJcicZ053.getActualFilingDate() == 0) {
 
 					uJcicZ053 = sJcicZ053Service.holdById(iiJcicZ053.getJcicZ053Id(), titaVo);
 					oldJcicZ053 = (JcicZ053) iDataLog.clone(uJcicZ053);
@@ -2582,11 +2432,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ054SIZE     =" + lJcicZ054.size());
 			for (JcicZ054 iiJcicZ054 : lJcicZ054) {
 				count++;
-				if (iiJcicZ054.getOutJcicTxtDate() == iJcicDate && iiJcicZ054.getCustId().equals(sJcicZ054.getCustId())
-						&& iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey())
-						&& iiJcicZ054.getRcDate() == sJcicZ054.getRcDate()
-						&& iiJcicZ054.getMaxMainCode().equals(sJcicZ054.getMaxMainCode())
-						&& iiJcicZ054.getActualFilingDate() == 0) {
+				if (iiJcicZ054.getOutJcicTxtDate() == iJcicDate && iiJcicZ054.getCustId().equals(sJcicZ054.getCustId()) && iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey())
+						&& iiJcicZ054.getRcDate() == sJcicZ054.getRcDate() && iiJcicZ054.getMaxMainCode().equals(sJcicZ054.getMaxMainCode()) && iiJcicZ054.getActualFilingDate() == 0) {
 
 					uJcicZ054 = sJcicZ054Service.holdById(iiJcicZ054.getJcicZ054Id(), titaVo);
 					oldJcicZ054 = (JcicZ054) iDataLog.clone(uJcicZ054);
@@ -2630,12 +2477,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ055SIZE     =" + lJcicZ055.size());
 			for (JcicZ055 iiJcicZ055 : lJcicZ055) {
 				count++;
-				if (iiJcicZ055.getOutJcicTxtDate() == iJcicDate && iiJcicZ055.getCustId().equals(sJcicZ055.getCustId())
-						&& iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey())
-						&& iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate()
-						&& iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
-						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode())
-						&& iiJcicZ055.getActualFilingDate() == 0) {
+				if (iiJcicZ055.getOutJcicTxtDate() == iJcicDate && iiJcicZ055.getCustId().equals(sJcicZ055.getCustId()) && iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey())
+						&& iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate() && iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
+						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode()) && iiJcicZ055.getActualFilingDate() == 0) {
 
 					uJcicZ055 = sJcicZ055Service.holdById(iiJcicZ055.getJcicZ055Id(), titaVo);
 					oldJcicZ055 = (JcicZ055) iDataLog.clone(uJcicZ055);
@@ -2679,12 +2523,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ056SIZE     =" + lJcicZ056.size());
 			for (JcicZ056 iiJcicZ056 : lJcicZ056) {
 				count++;
-				if (iiJcicZ056.getOutJcicTxtDate() == iJcicDate && iiJcicZ056.getCustId().equals(sJcicZ056.getCustId())
-						&& iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey())
-						&& iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate()
-						&& iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
-						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode())
-						&& iiJcicZ056.getActualFilingDate() == 0) {
+				if (iiJcicZ056.getOutJcicTxtDate() == iJcicDate && iiJcicZ056.getCustId().equals(sJcicZ056.getCustId()) && iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey())
+						&& iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate() && iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
+						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode()) && iiJcicZ056.getActualFilingDate() == 0) {
 
 					uJcicZ056 = sJcicZ056Service.holdById(iiJcicZ056.getJcicZ056Id(), titaVo);
 					oldJcicZ056 = (JcicZ056) iDataLog.clone(uJcicZ056);
@@ -2726,11 +2567,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ060SIZE     =" + lJcicZ060.size());
 			for (JcicZ060 iiJcicZ060 : lJcicZ060) {
 				count++;
-				if (iiJcicZ060.getOutJcicTxtDate() == iJcicDate && iiJcicZ060.getCustId().equals(sJcicZ060.getCustId())
-						&& iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey())
-						&& iiJcicZ060.getRcDate() == sJcicZ060.getRcDate()
-						&& iiJcicZ060.getChangePayDate() == sJcicZ060.getChangePayDate()
-						&& iiJcicZ060.getActualFilingDate() == 0) {
+				if (iiJcicZ060.getOutJcicTxtDate() == iJcicDate && iiJcicZ060.getCustId().equals(sJcicZ060.getCustId()) && iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey())
+						&& iiJcicZ060.getRcDate() == sJcicZ060.getRcDate() && iiJcicZ060.getChangePayDate() == sJcicZ060.getChangePayDate() && iiJcicZ060.getActualFilingDate() == 0) {
 
 					uJcicZ060 = sJcicZ060Service.holdById(iiJcicZ060.getJcicZ060Id(), titaVo);
 					oldJcicZ060 = (JcicZ060) iDataLog.clone(uJcicZ060);
@@ -2774,11 +2612,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ061SIZE     =" + lJcicZ061.size());
 			for (JcicZ061 iiJcicZ061 : lJcicZ061) {
 				count++;
-				if (iiJcicZ061.getOutJcicTxtDate() == iJcicDate && iiJcicZ061.getCustId().equals(sJcicZ061.getCustId())
-						&& iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey())
-						&& iiJcicZ061.getRcDate() == sJcicZ061.getRcDate()
-						&& iiJcicZ061.getChangePayDate() == sJcicZ061.getChangePayDate()
-						&& iiJcicZ061.getActualFilingDate() == 0) {
+				if (iiJcicZ061.getOutJcicTxtDate() == iJcicDate && iiJcicZ061.getCustId().equals(sJcicZ061.getCustId()) && iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey())
+						&& iiJcicZ061.getRcDate() == sJcicZ061.getRcDate() && iiJcicZ061.getChangePayDate() == sJcicZ061.getChangePayDate() && iiJcicZ061.getActualFilingDate() == 0) {
 
 					uJcicZ061 = sJcicZ061Service.holdById(iiJcicZ061.getJcicZ061Id(), titaVo);
 					oldJcicZ061 = (JcicZ061) iDataLog.clone(uJcicZ061);
@@ -2820,11 +2655,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ062SIZE     =" + lJcicZ062.size());
 			for (JcicZ062 iiJcicZ062 : lJcicZ062) {
 				count++;
-				if (iiJcicZ062.getOutJcicTxtDate() == iJcicDate && iiJcicZ062.getCustId().equals(sJcicZ062.getCustId())
-						&& iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey())
-						&& iiJcicZ062.getRcDate() == sJcicZ062.getRcDate()
-						&& iiJcicZ062.getChangePayDate() == sJcicZ062.getChangePayDate()
-						&& iiJcicZ062.getActualFilingDate() == 0) {
+				if (iiJcicZ062.getOutJcicTxtDate() == iJcicDate && iiJcicZ062.getCustId().equals(sJcicZ062.getCustId()) && iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey())
+						&& iiJcicZ062.getRcDate() == sJcicZ062.getRcDate() && iiJcicZ062.getChangePayDate() == sJcicZ062.getChangePayDate() && iiJcicZ062.getActualFilingDate() == 0) {
 
 					uJcicZ062 = sJcicZ062Service.holdById(iiJcicZ062.getJcicZ062Id(), titaVo);
 					oldJcicZ062 = (JcicZ062) iDataLog.clone(uJcicZ062);
@@ -2866,11 +2698,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ063SIZE     =" + lJcicZ063.size());
 			for (JcicZ063 iiJcicZ063 : lJcicZ063) {
 				count++;
-				if (iiJcicZ063.getOutJcicTxtDate() == iJcicDate && iiJcicZ063.getCustId().equals(sJcicZ063.getCustId())
-						&& iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey())
-						&& iiJcicZ063.getRcDate() == sJcicZ063.getRcDate()
-						&& iiJcicZ063.getChangePayDate() == sJcicZ063.getChangePayDate()
-						&& iiJcicZ063.getActualFilingDate() == 0) {
+				if (iiJcicZ063.getOutJcicTxtDate() == iJcicDate && iiJcicZ063.getCustId().equals(sJcicZ063.getCustId()) && iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey())
+						&& iiJcicZ063.getRcDate() == sJcicZ063.getRcDate() && iiJcicZ063.getChangePayDate() == sJcicZ063.getChangePayDate() && iiJcicZ063.getActualFilingDate() == 0) {
 
 					uJcicZ063 = sJcicZ063Service.holdById(iiJcicZ063.getJcicZ063Id(), titaVo);
 					oldJcicZ063 = (JcicZ063) iDataLog.clone(uJcicZ063);
@@ -2912,11 +2741,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ440SIZE     =" + lJcicZ440.size());
 			for (JcicZ440 iiJcicZ440 : lJcicZ440) {
 				count++;
-				if (iiJcicZ440.getOutJcicTxtDate() == iJcicDate && iiJcicZ440.getCustId().equals(sJcicZ440.getCustId())
-						&& iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey())
-						&& iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate()
-						&& iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode())
-						&& iiJcicZ440.getActualFilingDate() == 0) {
+				if (iiJcicZ440.getOutJcicTxtDate() == iJcicDate && iiJcicZ440.getCustId().equals(sJcicZ440.getCustId()) && iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey())
+						&& iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate() && iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode()) && iiJcicZ440.getActualFilingDate() == 0) {
 
 					uJcicZ440 = sJcicZ440Service.holdById(iiJcicZ440.getJcicZ440Id(), titaVo);
 					oldJcicZ440 = (JcicZ440) iDataLog.clone(uJcicZ440);
@@ -2960,12 +2786,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ442SIZE     =" + lJcicZ442.size());
 			for (JcicZ442 iiJcicZ442 : lJcicZ442) {
 				count++;
-				if (iiJcicZ442.getOutJcicTxtDate() == iJcicDate && iiJcicZ442.getCustId().equals(sJcicZ442.getCustId())
-						&& iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey())
-						&& iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate()
-						&& iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode())
-						&& iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode())
-						&& iiJcicZ442.getActualFilingDate() == 0) {
+				if (iiJcicZ442.getOutJcicTxtDate() == iJcicDate && iiJcicZ442.getCustId().equals(sJcicZ442.getCustId()) && iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey())
+						&& iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate() && iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode())
+						&& iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode()) && iiJcicZ442.getActualFilingDate() == 0) {
 
 					uJcicZ442 = sJcicZ442Service.holdById(iiJcicZ442.getJcicZ442Id(), titaVo);
 					oldJcicZ442 = (JcicZ442) iDataLog.clone(uJcicZ442);
@@ -3011,12 +2834,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ443SIZE     =" + lJcicZ443.size());
 			for (JcicZ443 iiJcicZ443 : lJcicZ443) {
 				count++;
-				if (iiJcicZ443.getOutJcicTxtDate() == iJcicDate && iiJcicZ443.getCustId().equals(sJcicZ443.getCustId())
-						&& iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey())
-						&& iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate()
-						&& iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode())
-						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())
-						&& iiJcicZ443.getActualFilingDate() == 0) {
+				if (iiJcicZ443.getOutJcicTxtDate() == iJcicDate && iiJcicZ443.getCustId().equals(sJcicZ443.getCustId()) && iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey())
+						&& iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate() && iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode())
+						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode()) && iiJcicZ443.getActualFilingDate() == 0) {
 
 					uJcicZ443 = sJcicZ443Service.holdById(iiJcicZ443.getJcicZ443Id(), titaVo);
 					oldJcicZ443 = (JcicZ443) iDataLog.clone(uJcicZ443);
@@ -3058,11 +2878,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ444SIZE     =" + lJcicZ444.size());
 			for (JcicZ444 iiJcicZ444 : lJcicZ444) {
 				count++;
-				if (iiJcicZ444.getOutJcicTxtDate() == iJcicDate && iiJcicZ444.getCustId().equals(sJcicZ444.getCustId())
-						&& iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey())
-						&& iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate()
-						&& iiJcicZ444.getCourtCode().equals(sJcicZ444.getCourtCode())
-						&& iiJcicZ444.getActualFilingDate() == 0) {
+				if (iiJcicZ444.getOutJcicTxtDate() == iJcicDate && iiJcicZ444.getCustId().equals(sJcicZ444.getCustId()) && iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey())
+						&& iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate() && iiJcicZ444.getCourtCode().equals(sJcicZ444.getCourtCode()) && iiJcicZ444.getActualFilingDate() == 0) {
 
 					uJcicZ444 = sJcicZ444Service.holdById(iiJcicZ444.getJcicZ444Id(), titaVo);
 					oldJcicZ444 = (JcicZ444) iDataLog.clone(uJcicZ444);
@@ -3104,11 +2921,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ446SIZE     =" + lJcicZ446.size());
 			for (JcicZ446 iiJcicZ446 : lJcicZ446) {
 				count++;
-				if (iiJcicZ446.getOutJcicTxtDate() == iJcicDate && iiJcicZ446.getCustId().equals(sJcicZ446.getCustId())
-						&& iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey())
-						&& iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate()
-						&& iiJcicZ446.getCourtCode().equals(sJcicZ446.getCourtCode())
-						&& iiJcicZ446.getActualFilingDate() == 0) {
+				if (iiJcicZ446.getOutJcicTxtDate() == iJcicDate && iiJcicZ446.getCustId().equals(sJcicZ446.getCustId()) && iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey())
+						&& iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate() && iiJcicZ446.getCourtCode().equals(sJcicZ446.getCourtCode()) && iiJcicZ446.getActualFilingDate() == 0) {
 
 					uJcicZ446 = sJcicZ446Service.holdById(iiJcicZ446.getJcicZ446Id(), titaVo);
 					oldJcicZ446 = (JcicZ446) iDataLog.clone(uJcicZ446);
@@ -3150,11 +2964,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ447SIZE     =" + lJcicZ447.size());
 			for (JcicZ447 iiJcicZ447 : lJcicZ447) {
 				count++;
-				if (iiJcicZ447.getOutJcicTxtDate() == iJcicDate && iiJcicZ447.getCustId().equals(sJcicZ447.getCustId())
-						&& iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey())
-						&& iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate()
-						&& iiJcicZ447.getCourtCode().equals(sJcicZ447.getCourtCode())
-						&& iiJcicZ447.getActualFilingDate() == 0) {
+				if (iiJcicZ447.getOutJcicTxtDate() == iJcicDate && iiJcicZ447.getCustId().equals(sJcicZ447.getCustId()) && iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey())
+						&& iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate() && iiJcicZ447.getCourtCode().equals(sJcicZ447.getCourtCode()) && iiJcicZ447.getActualFilingDate() == 0) {
 
 					uJcicZ447 = sJcicZ447Service.holdById(iiJcicZ447.getJcicZ447Id(), titaVo);
 					oldJcicZ447 = (JcicZ447) iDataLog.clone(uJcicZ447);
@@ -3198,12 +3009,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ448SIZE     =" + lJcicZ448.size());
 			for (JcicZ448 iiJcicZ448 : lJcicZ448) {
 				count++;
-				if (iiJcicZ448.getOutJcicTxtDate() == iJcicDate && iiJcicZ448.getCustId().equals(sJcicZ448.getCustId())
-						&& iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey())
-						&& iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate()
-						&& iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode())
-						&& iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode())
-						&& iiJcicZ448.getActualFilingDate() == 0) {
+				if (iiJcicZ448.getOutJcicTxtDate() == iJcicDate && iiJcicZ448.getCustId().equals(sJcicZ448.getCustId()) && iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey())
+						&& iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate() && iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode())
+						&& iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode()) && iiJcicZ448.getActualFilingDate() == 0) {
 
 					uJcicZ448 = sJcicZ448Service.holdById(iiJcicZ448.getJcicZ448Id(), titaVo);
 					oldJcicZ448 = (JcicZ448) iDataLog.clone(uJcicZ448);
@@ -3247,11 +3055,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ450SIZE     =" + lJcicZ450.size());
 			for (JcicZ450 iiJcicZ450 : lJcicZ450) {
 				count++;
-				if (iiJcicZ450.getOutJcicTxtDate() == iJcicDate && iiJcicZ450.getCustId().equals(sJcicZ450.getCustId())
-						&& iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey())
-						&& iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate()
-						&& iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode())
-						&& iiJcicZ450.getPayDate() == sJcicZ450.getPayDate() && iiJcicZ450.getActualFilingDate() == 0) {
+				if (iiJcicZ450.getOutJcicTxtDate() == iJcicDate && iiJcicZ450.getCustId().equals(sJcicZ450.getCustId()) && iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey())
+						&& iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate() && iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode()) && iiJcicZ450.getPayDate() == sJcicZ450.getPayDate()
+						&& iiJcicZ450.getActualFilingDate() == 0) {
 
 					uJcicZ450 = sJcicZ450Service.holdById(iiJcicZ450.getJcicZ450Id(), titaVo);
 					oldJcicZ450 = (JcicZ450) iDataLog.clone(uJcicZ450);
@@ -3295,11 +3101,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ451SIZE     =" + lJcicZ451.size());
 			for (JcicZ451 iiJcicZ451 : lJcicZ451) {
 				count++;
-				if (iiJcicZ451.getOutJcicTxtDate() == iJcicDate && iiJcicZ451.getCustId().equals(sJcicZ451.getCustId())
-						&& iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey())
-						&& iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate()
-						&& iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode())
-						&& iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM() && iiJcicZ451.getActualFilingDate() == 0) {
+				if (iiJcicZ451.getOutJcicTxtDate() == iJcicDate && iiJcicZ451.getCustId().equals(sJcicZ451.getCustId()) && iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey())
+						&& iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate() && iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode()) && iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM()
+						&& iiJcicZ451.getActualFilingDate() == 0) {
 
 					uJcicZ451 = sJcicZ451Service.holdById(iiJcicZ451.getJcicZ451Id(), titaVo);
 					oldJcicZ451 = (JcicZ451) iDataLog.clone(uJcicZ451);
@@ -3343,12 +3147,9 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ454SIZE     =" + lJcicZ454.size());
 			for (JcicZ454 iiJcicZ454 : lJcicZ454) {
 				count++;
-				if (iiJcicZ454.getOutJcicTxtDate() == iJcicDate && iiJcicZ454.getCustId().equals(sJcicZ454.getCustId())
-						&& iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey())
-						&& iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate()
-						&& iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode())
-						&& iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode())
-						&& iiJcicZ454.getActualFilingDate() == 0) {
+				if (iiJcicZ454.getOutJcicTxtDate() == iJcicDate && iiJcicZ454.getCustId().equals(sJcicZ454.getCustId()) && iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey())
+						&& iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate() && iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode())
+						&& iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode()) && iiJcicZ454.getActualFilingDate() == 0) {
 
 					uJcicZ454 = sJcicZ454Service.holdById(iiJcicZ454.getJcicZ454Id(), titaVo);
 					oldJcicZ454 = (JcicZ454) iDataLog.clone(uJcicZ454);
@@ -3388,10 +3189,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ570SIZE     =" + lJcicZ570.size());
 			for (JcicZ570 iiJcicZ570 : lJcicZ570) {
 				count++;
-				if (iiJcicZ570.getOutJcicTxtDate() == iJcicDate && iiJcicZ570.getCustId().equals(sJcicZ570.getCustId())
-						&& iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey())
-						&& iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate()
-						&& iiJcicZ570.getActualFilingDate() == 0) {
+				if (iiJcicZ570.getOutJcicTxtDate() == iJcicDate && iiJcicZ570.getCustId().equals(sJcicZ570.getCustId()) && iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey())
+						&& iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate() && iiJcicZ570.getActualFilingDate() == 0) {
 
 					uJcicZ570 = sJcicZ570Service.holdById(iiJcicZ570.getJcicZ570Id(), titaVo);
 					oldJcicZ570 = (JcicZ570) iDataLog.clone(uJcicZ570);
@@ -3433,11 +3232,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ571SIZE     =" + lJcicZ571.size());
 			for (JcicZ571 iiJcicZ571 : lJcicZ571) {
 				count++;
-				if (iiJcicZ571.getOutJcicTxtDate() == iJcicDate && iiJcicZ571.getCustId().equals(sJcicZ571.getCustId())
-						&& iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey())
-						&& iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate()
-						&& iiJcicZ571.getBankId().equals(sJcicZ571.getBankId())
-						&& iiJcicZ571.getActualFilingDate() == 0) {
+				if (iiJcicZ571.getOutJcicTxtDate() == iJcicDate && iiJcicZ571.getCustId().equals(sJcicZ571.getCustId()) && iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey())
+						&& iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate() && iiJcicZ571.getBankId().equals(sJcicZ571.getBankId()) && iiJcicZ571.getActualFilingDate() == 0) {
 
 					uJcicZ571 = sJcicZ571Service.holdById(iiJcicZ571.getJcicZ571Id(), titaVo);
 					oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
@@ -3481,11 +3277,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ572SIZE     =" + lJcicZ572.size());
 			for (JcicZ572 iiJcicZ572 : lJcicZ572) {
 				count++;
-				if (iiJcicZ572.getOutJcicTxtDate() == iJcicDate && iiJcicZ572.getCustId().equals(sJcicZ572.getCustId())
-						&& iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey())
-						&& iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate()
-						&& iiJcicZ572.getPayDate() == sJcicZ572.getPayDate()
-						&& iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
+				if (iiJcicZ572.getOutJcicTxtDate() == iJcicDate && iiJcicZ572.getCustId().equals(sJcicZ572.getCustId()) && iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey())
+						&& iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate() && iiJcicZ572.getPayDate() == sJcicZ572.getPayDate() && iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
 						&& iiJcicZ572.getActualFilingDate() == 0) {
 
 					uJcicZ572 = sJcicZ572Service.holdById(iiJcicZ572.getJcicZ572Id(), titaVo);
@@ -3528,10 +3321,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ573SIZE     =" + lJcicZ573.size());
 			for (JcicZ573 iiJcicZ573 : lJcicZ573) {
 				count++;
-				if (iiJcicZ573.getOutJcicTxtDate() == iJcicDate && iiJcicZ573.getCustId().equals(sJcicZ573.getCustId())
-						&& iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey())
-						&& iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate()
-						&& iiJcicZ573.getPayDate() == sJcicZ573.getPayDate() && iiJcicZ573.getActualFilingDate() == 0) {
+				if (iiJcicZ573.getOutJcicTxtDate() == iJcicDate && iiJcicZ573.getCustId().equals(sJcicZ573.getCustId()) && iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey())
+						&& iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate() && iiJcicZ573.getPayDate() == sJcicZ573.getPayDate() && iiJcicZ573.getActualFilingDate() == 0) {
 
 					uJcicZ573 = sJcicZ573Service.holdById(iiJcicZ573.getJcicZ573Id(), titaVo);
 					oldJcicZ573 = (JcicZ573) iDataLog.clone(uJcicZ573);
@@ -3571,10 +3362,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ574SIZE     =" + lJcicZ574.size());
 			for (JcicZ574 iiJcicZ574 : lJcicZ574) {
 				count++;
-				if (iiJcicZ574.getOutJcicTxtDate() == iJcicDate && iiJcicZ574.getCustId().equals(sJcicZ574.getCustId())
-						&& iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey())
-						&& iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate()
-						&& iiJcicZ574.getActualFilingDate() == 0) {
+				if (iiJcicZ574.getOutJcicTxtDate() == iJcicDate && iiJcicZ574.getCustId().equals(sJcicZ574.getCustId()) && iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey())
+						&& iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate() && iiJcicZ574.getActualFilingDate() == 0) {
 
 					uJcicZ574 = sJcicZ574Service.holdById(iiJcicZ574.getJcicZ574Id(), titaVo);
 					oldJcicZ574 = (JcicZ574) iDataLog.clone(uJcicZ574);
@@ -3616,11 +3405,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ575SIZE     =" + lJcicZ575.size());
 			for (JcicZ575 iiJcicZ575 : lJcicZ575) {
 				count++;
-				if (iiJcicZ575.getOutJcicTxtDate() == iJcicDate && iiJcicZ575.getCustId().equals(sJcicZ575.getCustId())
-						&& iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey())
-						&& iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate()
-						&& iiJcicZ575.getBankId().equals(sJcicZ575.getBankId())
-						&& iiJcicZ575.getActualFilingDate() == 0) {
+				if (iiJcicZ575.getOutJcicTxtDate() == iJcicDate && iiJcicZ575.getCustId().equals(sJcicZ575.getCustId()) && iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey())
+						&& iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate() && iiJcicZ575.getBankId().equals(sJcicZ575.getBankId()) && iiJcicZ575.getActualFilingDate() == 0) {
 
 					uJcicZ575 = sJcicZ575Service.holdById(iiJcicZ575.getJcicZ575Id(), titaVo);
 					oldJcicZ575 = (JcicZ575) iDataLog.clone(uJcicZ575);

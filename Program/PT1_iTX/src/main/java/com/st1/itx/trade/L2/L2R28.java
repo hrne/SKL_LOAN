@@ -111,8 +111,7 @@ public class L2R28 extends TradeBuffer {
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 		tClLand = sClLandService.findById(ClLandId, titaVo);
 
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
 		ClLandReason tClLandReason = sClLandReasonService.clNoFirst(iClCode1, iClCode2, iClNo, iLandSeq, titaVo);
 
@@ -285,8 +284,7 @@ public class L2R28 extends TradeBuffer {
 
 			} else {
 				String CreateDate = tClLandReason.getCreateDate().toString();
-				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7)
-						+ CreateDate.substring(8, 10);
+				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
 				int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
 				CreateDate4 = String.valueOf(CreateDate3);
 			}

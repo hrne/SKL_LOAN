@@ -2,7 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -60,8 +59,7 @@ public class L8428 extends TradeBuffer {
 		this.info("sJcicZ446     = " + sJcicZ446.getSize());
 		if (sJcicZ446 != null) {
 			for (JcicZ446 xJcicZ446 : sJcicZ446) {
-				if ((iSubmitType == 1 && xJcicZ446.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ446.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ446.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ446.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8326");
 					occursListB.putParam("OOHistoryTxCd", "L8056");

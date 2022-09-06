@@ -37,7 +37,7 @@ public class L6031 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdCodeService sCdCodeService;
-    @Autowired 
+	@Autowired
 	public CdEmpService cdEmpService;
 	@Autowired
 	Parse parse;
@@ -75,8 +75,8 @@ public class L6031 extends TradeBuffer {
 			occursList.putParam("OOBaseRateCode", tCdCode.getCode());
 			occursList.putParam("OOBaseRateItem", tCdCode.getItem());
 			occursList.putParam("OOEffectFlag", tCdCode.getEffectFlag());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdCode.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdCode.getLastUpdate()));
-			occursList.putParam("OOLastEmp",tCdCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdCode.getLastUpdateEmpNo()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdCode.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdCode.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -90,6 +90,7 @@ public class L6031 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

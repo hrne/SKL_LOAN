@@ -32,21 +32,20 @@ public class LM085p extends TradeBuffer {
 
 	@Autowired
 	WebClient webClient;
-	
+
 	String txcd = "LM085";
 	String txName = "逾期月報表";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
-
 		this.totaVo.init(titaVo);
-		
+
 		this.info(txcd + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		lm085report.setParentTranCode(parentTranCode);
-		
+
 		int iAcDate = Integer.parseInt(titaVo.getEntDy());
 
 		// MSG帶入預設值
@@ -58,7 +57,7 @@ public class LM085p extends TradeBuffer {
 		int mfbsdy = this.txBuffer.getTxCom().getMfbsdyf();
 		// 上個月底日(西元)
 		int lmndy = this.txBuffer.getTxCom().getLmndyf();
-		
+
 		// 年
 		int iYear = mfbsdy / 10000;
 		// 月
@@ -74,21 +73,19 @@ public class LM085p extends TradeBuffer {
 		}
 
 		thisYM = iYear * 100 + iMonth;
-		
+
 		lm085report.setTxBuffer(this.getTxBuffer());
-		
-		boolean isFinish = lm085report.exec(titaVo, thisYM,lastYM);
+
+		boolean isFinish = lm085report.exec(titaVo, thisYM, lastYM);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-					txcd + txName +" 已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, txcd + txName + " 已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
-					txcd + txName +" 查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, txcd + txName + " 查無資料", titaVo);
 		}
-		
+
 		this.addList(this.totaVo);
-		
+
 		return this.sendList();
 	}
 }

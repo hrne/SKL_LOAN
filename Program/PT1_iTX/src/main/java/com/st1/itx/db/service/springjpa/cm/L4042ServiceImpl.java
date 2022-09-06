@@ -60,7 +60,7 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iDateTo = parse.stringToInteger(titaVo.get("DateTo")) + 19110000;
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iRepayBank = parse.stringToInteger(titaVo.get("RepayBank"));
-		
+
 		String iRepayAcct = FormatUtil.pad9(titaVo.get("RepayAcct").trim(), 14);
 
 		String sql = "";
@@ -113,10 +113,10 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iSearchFlag == 5) {
 			sql += "            act.\"RepayAcct\" = " + iRepayAcct;
 		}
-		if(iRepayBank ==998) {
+		if (iRepayBank == 998) {
 			sql += "          and  act.\"RepayBank\" <> " + "103";
 		}
-		if(iRepayBank ==103) {
+		if (iRepayBank == 103) {
 			sql += "          and  act.\"RepayBank\" = " + "103";
 		}
 		sql += "  order by act.\"CustNo\",act.\"FacmNo\",act.\"CreateDate\" Desc  ";

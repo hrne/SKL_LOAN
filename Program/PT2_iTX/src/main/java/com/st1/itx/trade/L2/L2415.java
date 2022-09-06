@@ -206,8 +206,7 @@ public class L2415 extends TradeBuffer {
 				insertClBuildingReason(titaVo);
 
 				dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
-				dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
-						+ titaVo.getParam("ReasonX1"));
+				dataLog.exec("不動產建物修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
 			}
 
 		}
@@ -313,8 +312,7 @@ public class L2415 extends TradeBuffer {
 	// delete 車位
 	private List<ClParkingType> deleteClParkingType(TitaVo titaVo) throws LogicException {
 		this.info("L2415 deleteClParkingType");
-		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		List<ClParkingType> lClParkingType = slClParkingType == null ? null : slClParkingType.getContent();
 		if (lClParkingType != null) {
 			try {
@@ -376,8 +374,7 @@ public class L2415 extends TradeBuffer {
 
 	// 先刪除資料後新增
 	private List<ClBuildingPublic> deleteClBuildingPublic(TitaVo titaVo) throws LogicException {
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		lClBuildingPublic = slClBuildingPublic == null ? null : slClBuildingPublic.getContent();
 		if (lClBuildingPublic != null) {
 			try {

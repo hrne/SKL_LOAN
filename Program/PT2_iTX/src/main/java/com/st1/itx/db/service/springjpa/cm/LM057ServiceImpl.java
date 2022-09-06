@@ -48,13 +48,12 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iMonth = (monthDate / 100) % 100;
 
 		int lastMonth = iYear * 100 + iMonth - 1;
-		
-		
-		if(iMonth == 1) {
-			
-			lastMonth = (iYear - 1) * 100 + 12 ;
+
+		if (iMonth == 1) {
+
+			lastMonth = (iYear - 1) * 100 + 12;
 		}
-		
+
 //		int last4Month = 0;
 //		if (iMonth <= 4) {
 //			last4Month = ((iYear - 1) * 100) + (12 - (4 - iMonth));
@@ -120,13 +119,11 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", (iYear * 100) + iMonth);
 		query.setParameter("lyymm", lastMonth);
-		
 
 		return this.convertToMap(query);
 
 	}
-	
-	
+
 	/**
 	 * 查詢資料
 	 * 
@@ -143,18 +140,16 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iMonth = (monthDate / 100) % 100;
 
 		int lastMonth = iYear * 100 + iMonth - 1;
-		
-		
-		if(iMonth == 1) {
-			
-			lastMonth = (iYear - 1) * 100 + 12 ;
+
+		if (iMonth == 1) {
+
+			lastMonth = (iYear - 1) * 100 + 12;
 		}
-		
 
 		this.info("lM057.findAll YYMM=" + ((iYear * 100) + iMonth) + ",lastMonth=" + lastMonth);
 
 		String sql = " ";
-		
+
 		sql += "	WITH \"rawData\" AS ( ";
 		sql += "      SELECT SUM(CASE WHEN I.\"YearMonth\" = :yymm ";
 		sql += "                 THEN NVL(I.\"AccumDPAmortized\", 0)";
@@ -203,11 +198,11 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 		SELECT 'Collection' AS \"Item\" ";
 		sql += " 	   		  ,SUM(\"TdBal\")  AS \"AMT\" ";
 		sql += " 		FROM \"AcMain\"";
-		sql += " 		WHERE \"AcNoCode\" IN (  '10601301000' "; //-- 催收款項-法務費用
-		sql += "								,'10601302000' "; //-- 催收款項-火險費用
-		sql += "								,'10601304000') ";//-- 催收款項-折溢價
+		sql += " 		WHERE \"AcNoCode\" IN (  '10601301000' "; // -- 催收款項-法務費用
+		sql += "								,'10601302000' "; // -- 催收款項-火險費用
+		sql += "								,'10601304000') ";// -- 催收款項-折溢價
 		sql += "   		  AND \"MonthEndYm\" = :yymm ";
-		sql += "    	UNION ";			
+		sql += "    	UNION ";
 		sql += "    	SELECT 'Loss' AS \"Item\" ";
 		sql += "          	  ,CASE WHEN R.\"LnAmt\" >= 0 ";
 		sql += "                	THEN R.\"LnAmt\" ";

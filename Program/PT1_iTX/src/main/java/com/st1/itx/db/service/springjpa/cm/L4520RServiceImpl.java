@@ -59,7 +59,7 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql += "    FROM                    ";
 		sql += "    \"EmpDeductDtl\"   ed   ";
 		sql += "    LEFT JOIN \"InsuRenew\"      ir ON ir.\"CustNo\" = ed.\"CustNo\" ";
-		sql += "                                   AND ir.\"AcDate\" = ed.\"Acdate\""; 
+		sql += "                                   AND ir.\"AcDate\" = ed.\"Acdate\"";
 		sql += "    LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\" ";
 		sql += "    LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"EmpNo\" ";
 		sql += "    WHERE                   ";

@@ -127,12 +127,12 @@ public class LB095Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01"; 
+			sfileNo2 = "01";
 		}
 
 		// 查詢系統參數設定檔-JCIC放款報送人員資料
@@ -162,8 +162,7 @@ public class LB095Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B095", "不動產擔保品明細－建號附加檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B095-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
+			strContent = "JCIC-DAT-B095-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + jcicEmpName, 80, ' ') + StringUtils.repeat(" ", 159);
 			makeFile.put(strContent);
 
@@ -275,8 +274,7 @@ public class LB095Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
-					+ StringUtils.repeat(" ", 288);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 288);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -298,7 +296,7 @@ public class LB095Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
@@ -308,11 +306,9 @@ public class LB095Report extends MakeReport {
 		String txt = "";
 
 		// B095 不動產擔保品明細-建號附加檔
-		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品所有權人或代表人IDN/BAN(62~71),縣市別(72~72),"
-				+ "鄉鎮市區別(73~74),段、小段號(75~78),建號-前五碼(79~83),建號-後三碼(84~86),縣市名稱(87~98),鄉鎮市區名稱(99~110),"
+		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品所有權人或代表人IDN/BAN(62~71),縣市別(72~72)," + "鄉鎮市區別(73~74),段、小段號(75~78),建號-前五碼(79~83),建號-後三碼(84~86),縣市名稱(87~98),鄉鎮市區名稱(99~110),"
 				+ "村里/街路/段/巷/弄/號/樓(111~186),主要用途(187~187),主要建材(結構體)(188),附屬建物用途(189~194),層數(標的所在樓高)(195~197),"
-				+ "層次(標的所在樓層)(198~204),建築完成日期(屋齡)(205~211),建物總面積(212~221),主建物(層次)面積(222~231),附屬建物面積(232~241),"
-				+ "共同部份持分面積(242~251),空白(252~295),資料所屬年月(296~300)";
+				+ "層次(標的所在樓層)(198~204),建築完成日期(屋齡)(205~211),建物總面積(212~221),主建物(層次)面積(222~231),附屬建物面積(232~241)," + "共同部份持分面積(242~251),空白(252~295),資料所屬年月(296~300)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;F25";
 
 		String txt1[] = txt.split(";");

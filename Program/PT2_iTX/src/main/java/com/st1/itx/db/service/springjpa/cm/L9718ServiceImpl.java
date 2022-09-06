@@ -53,9 +53,6 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		
-		
-		
 		String sql = "SELECT ";
 		sql += "             EMP.\"Fullname\" AS F0";
 		sql += "            ," + Integer.parseInt(titaVo.getParam("inputYearMonth").substring(3)) + " AS F1";
@@ -155,7 +152,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND FAC.\"FirstDrawdownDate\" >= :inputDrawdownDate";
 
 		sql += "  AND M.\"AcctCode\"" + (findOvdu ? "=" : "!=") + " '990'";
- 
+
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -166,7 +163,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("inputEntryDateMax=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
 		this.info("inputYearMonth=" + iYear + String.format("%02d", iMonth));
 		this.info("inputCollectorShow=" + titaVo.getParam("inputCollector"));
-		this.info("inputDrawdownDate=" +Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
+		this.info("inputDrawdownDate=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 		Query query;
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputEntryDateMin", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));

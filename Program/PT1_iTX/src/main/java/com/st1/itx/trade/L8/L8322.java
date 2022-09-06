@@ -86,12 +86,12 @@ public class L8322 extends TradeBuffer {
 		String iNotBankId5 = titaVo.getParam("NotBankId5").trim();
 		String iNotBankId6 = titaVo.getParam("NotBankId6").trim();
 		String iKey = "";
-		
+
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-		
+
 		String[] sNotBankId = { iNotBankId1, iNotBankId2, iNotBankId3, iNotBankId4, iNotBankId5, iNotBankId6 };// 未揭露債權機構代號集合
 		List<String> iL8301SqlReturn = new ArrayList<>(); // NegFinAcct有效消債條例金融機構代號集合
 
@@ -114,8 +114,7 @@ public class L8322 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			if ("A".equals(iTranKey)) {
 				// 2 IDN+調解申請日，不能重複，若有重複，剔退處理.
-				Slice<JcicZ440> sJcicZ440 = sJcicZ440Service.custRcEq(iCustId, iApplyDate + 19110000, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ440> sJcicZ440 = sJcicZ440Service.custRcEq(iCustId, iApplyDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ440 != null) {
 					throw new LogicException("E0005", "IDN+調解申請日，不能重複.");
 				}
@@ -225,7 +224,7 @@ public class L8322 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ440, uJcicZ440);
-			iDataLog.exec("L8322異動",uJcicZ440.getSubmitKey()+uJcicZ440.getCustId()+uJcicZ440.getApplyDate()+uJcicZ440.getCourtCode());
+			iDataLog.exec("L8322異動", uJcicZ440.getSubmitKey() + uJcicZ440.getCustId() + uJcicZ440.getApplyDate() + uJcicZ440.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -239,7 +238,7 @@ public class L8322 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			JcicZ440 oldJcicZ4402 = (JcicZ440) iDataLog.clone(uJcicZ4402);
 			uJcicZ4402.setAgreeDate(iAgreeDate);
 			uJcicZ4402.setStartDate(iStartDate);
@@ -254,10 +253,10 @@ public class L8322 extends TradeBuffer {
 			uJcicZ4402.setNotBankId6(iNotBankId6);
 			uJcicZ4402.setTranKey(iTranKey);
 			uJcicZ4402.setOutJcicTxtDate(0);
-			
+
 			Slice<JcicZ440Log> dJcicLogZ440 = null;
 			dJcicLogZ440 = sJcicZ440LogService.ukeyEq(iJcicZ440.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ440 == null|| ("A".equals(iTranKey) && dJcicLogZ440 == null )) {
+			if (dJcicLogZ440 == null || ("A".equals(iTranKey) && dJcicLogZ440 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ440Service.delete(iJcicZ440, titaVo);
@@ -287,7 +286,7 @@ public class L8322 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4402, uJcicZ4402);
-			iDataLog.exec("L8322刪除",uJcicZ4402.getSubmitKey()+uJcicZ4402.getCustId()+uJcicZ4402.getApplyDate()+uJcicZ4402.getCourtCode());
+			iDataLog.exec("L8322刪除", uJcicZ4402.getSubmitKey() + uJcicZ4402.getCustId() + uJcicZ4402.getApplyDate() + uJcicZ4402.getCourtCode());
 			break;
 		// 修改
 		case "7":
@@ -328,7 +327,7 @@ public class L8322 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4403, uJcicZ4403);
-			iDataLog.exec("L8322修改",uJcicZ4403.getSubmitKey()+uJcicZ4403.getCustId()+uJcicZ4403.getApplyDate()+uJcicZ4403.getCourtCode());
+			iDataLog.exec("L8322修改", uJcicZ4403.getSubmitKey() + uJcicZ4403.getCustId() + uJcicZ4403.getApplyDate() + uJcicZ4403.getCourtCode());
 		default:
 			break;
 		}

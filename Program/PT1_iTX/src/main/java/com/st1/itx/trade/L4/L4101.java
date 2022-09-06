@@ -120,7 +120,7 @@ public class L4101 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4101 ");
 		this.totaVo.init(titaVo);
-		
+
 		totaWarnMsg.putParam("MSGID", "L410W");
 		totaB.putParam("MSGID", "L410B");
 
@@ -130,8 +130,7 @@ public class L4101 extends TradeBuffer {
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}

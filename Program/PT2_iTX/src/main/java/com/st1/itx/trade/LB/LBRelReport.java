@@ -120,12 +120,12 @@ public class LBRelReport extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
 		}
-		
+
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10";
 		String txt1[] = txt.split(";");
 
@@ -133,8 +133,7 @@ public class LBRelReport extends MakeReport {
 			String strContent = "";
 
 			String strFileName = "458" + strToday + sfileNo1 + ".GRM"; // 458+年月日+序號.GRM
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName,
-					2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName, 2);
 
 			// 首筆 無 ???
 //			strContent = "JCIC-DAT-BRel-V01-458" + StringUtils.repeat(" ",5) + strToday + "01" + StringUtils.repeat(" ",10) 
@@ -200,7 +199,7 @@ public class LBRelReport extends MakeReport {
 				}
 			}
 
-			// 末筆 無 
+			// 末筆 無
 			// strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
 			// + StringUtils.repeat(" ",116);
 			// makeFile.put(strContent);
@@ -224,7 +223,7 @@ public class LBRelReport extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
@@ -234,8 +233,7 @@ public class LBRelReport extends MakeReport {
 		String txt = "";
 
 		// BRel 聯徵授信「同一關係企業及集團企業」資料報送檔
-		inf = "總行代號(1~3),分行代號(4~7),客戶填表年月(8~12),報送時機(13),授信企業統編(14~21),空白(22),"
-				+ " 關係企業統編(23~30),空白(31),關係企業關係代號(32~34),空白(35~39),結束註記碼(40)";
+		inf = "總行代號(1~3),分行代號(4~7),客戶填表年月(8~12),報送時機(13),授信企業統編(14~21),空白(22)," + " 關係企業統編(23~30),空白(31),關係企業關係代號(32~34),空白(35~39),結束註記碼(40)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10";
 
 		String txt1[] = txt.split(";");
@@ -245,8 +243,7 @@ public class LBRelReport extends MakeReport {
 			String strFileName = "458" + strToday + sfileNo1 + ".GRM.CSV"; // 458+年月日+序號.GRM.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName,
-					2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "BRel", "聯徵授信「同一關係企業及集團企業」資料報送檔", strFileName, 2);
 
 			// 標題列
 			strContent = inf;

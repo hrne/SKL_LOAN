@@ -107,7 +107,7 @@ public class L6994 extends TradeBuffer {
 			occursList.putParam("OOBsOffrPerccent", tCdPerformance.getBsOffrPerccent());
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdPerformance.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdPerformance.getLastUpdate())); // 最後修改日期
 			occursList.putParam("OOLastEmp", tCdPerformance.getLastUpdateEmpNo() + " " + empName(titaVo, tCdPerformance.getLastUpdateEmpNo())); // 最後修改人員
-			
+
 			if (tCdPerformance.getWorkMonth() > tPerformanceAcDate) {// 0:未生效
 				occursList.putParam("OOFlag", 0);
 			} else if (tCdPerformance.getWorkMonth() == tPerformanceAcDate) {// 1:生效中
@@ -129,7 +129,7 @@ public class L6994 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

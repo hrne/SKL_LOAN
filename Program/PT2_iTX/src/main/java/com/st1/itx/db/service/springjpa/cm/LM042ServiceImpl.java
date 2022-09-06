@@ -35,12 +35,12 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 查詢 LM042 統計數 工作表資料1
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 當西元年月
+	 * @param yearMonth  當西元年月
 	 * @param lYearMonth 上西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 */
-	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth,int lYearMonth) throws Exception {
+	public List<Map<String, String>> findStatistics1(TitaVo titaVo, int yearMonth, int lYearMonth) throws Exception {
 		this.info("lM042.findStatistics1");
 
 		this.info("yearMonth=" + yearMonth);
@@ -116,8 +116,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 */
 	public List<Map<String, String>> findStatistics2(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics2");
@@ -200,8 +200,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 當西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 */
 	public List<Map<String, String>> findStatistics3(TitaVo titaVo, int yearMonth) throws Exception {
 		this.info("lM042.findStatistics3 ");
@@ -258,8 +258,8 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param yearMonth     當西元年月
 	 * @param lastYearMonth 上西元年月
-	 * @return 
-	 * @throws Exception 
+	 * @return
+	 * @throws Exception
 	 */
 	public List<Map<String, String>> findRBC(TitaVo titaVo, int yearMonth, int lastYearMonth) throws Exception {
 		this.info("lM042.findRBC ");
@@ -267,11 +267,11 @@ public class LM042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 去年 年月底
 		int lEndYearMonth = (yearMonth / 100) * 100 + 12;
 
-		//當月底
+		// 當月底
 		this.info("lEndYearMonth=" + lEndYearMonth);
-		//上月底
+		// 上月底
 		this.info("lastYearMonth=" + lastYearMonth);
-		//去年 年底日
+		// 去年 年底日
 		this.info("yearMonth=" + yearMonth);
 
 		String sql = "";

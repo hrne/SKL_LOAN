@@ -61,7 +61,7 @@ public class L9136p extends TradeBuffer {
 		int acDateStart = Integer.valueOf(titaVo.getParam("sAcDate"));
 		int acDateEnd = Integer.valueOf(titaVo.getParam("eAcDate"));
 
-		this.info("acDateStart~acDateStart =" + acDateStart+ "~"+acDateEnd);
+		this.info("acDateStart~acDateStart =" + acDateStart + "~" + acDateEnd);
 
 		try {
 
@@ -77,17 +77,15 @@ public class L9136p extends TradeBuffer {
 		if ((l9136List != null && !l9136List.isEmpty()) || (l9136List2 != null && !l9136List2.isEmpty())) {
 
 			this.info("active L9136report data detail");
-			L9136Report.exec(titaVo,l9136List,l9136List2, acDateStart,acDateEnd);
+			L9136Report.exec(titaVo, l9136List, l9136List2, acDateStart, acDateEnd);
 			infoNotification = "L9136 檔案資料變更日報表";
-
 
 		} else {
 
 			infoNotification = "L9136 查無資料";
 
 		}
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO") + "L9136", infoNotification, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9136", infoNotification, titaVo);
 
 		this.addList(this.totaVo);
 

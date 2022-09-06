@@ -103,8 +103,7 @@ public class L2634 extends TradeBuffer {
 //		勾選完成最後一筆,列印
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 
-			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(choiceDate + 19110000,
-					titaVo.getTlrNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(choiceDate + 19110000, titaVo.getTlrNo(), 0, Integer.MAX_VALUE, titaVo);
 
 			lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 			if (lClOtherRights != null) {
@@ -113,16 +112,14 @@ public class L2634 extends TradeBuffer {
 					doReport1(titaVo);
 
 					String checkMsg = "申請書及其他-整批列印已完成。";
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
 				}
 //				類別 2 清償塗銷同意書
 				else {
 					doReport2(titaVo);
 
 					String checkMsg = "抵押權塗銷同意書-整批列印已完成。";
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
 				}
 				setChoiceDate0(titaVo);
 
@@ -175,8 +172,7 @@ public class L2634 extends TradeBuffer {
 			clOtherRightsSeq = titaVo.get("OOSeq");
 		}
 
-		ClOtherRights tClOtherRights = ClOtherRightsService
-				.holdById(new ClOtherRightsId(clCode1, clCode2, clNo, clOtherRightsSeq), titaVo);
+		ClOtherRights tClOtherRights = ClOtherRightsService.holdById(new ClOtherRightsId(clCode1, clCode2, clNo, clOtherRightsSeq), titaVo);
 		if (tClOtherRights != null) {
 			if (tClOtherRights.getChoiceDate() == 0) {
 				tClOtherRights.setChoiceDate(choiceDate);

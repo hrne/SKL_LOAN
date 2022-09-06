@@ -67,8 +67,7 @@ public class L2R53 extends TradeBuffer {
 			CreateFlag.add("1");
 			CreateFlag.add("2");
 			Slice<PostAuthLog> slPostAuthLog = null;
-			slPostAuthLog = postAuthLogService.custNoAuthErrorCodeEq(iCustNo, CreateFlag, wkAuthStatus, 0,
-					Integer.MAX_VALUE, titaVo);
+			slPostAuthLog = postAuthLogService.custNoAuthErrorCodeEq(iCustNo, CreateFlag, wkAuthStatus, 0, Integer.MAX_VALUE, titaVo);
 
 			List<PostAuthLog> lPostAuthLog = slPostAuthLog == null ? null : slPostAuthLog.getContent();
 
@@ -112,8 +111,7 @@ public class L2R53 extends TradeBuffer {
 			CreateFlag.add("A");
 			CreateFlag.add("D");
 			Slice<AchAuthLog> slAchAuthLog = null;
-			slAchAuthLog = achAuthLogService.custNoRepayBankEq(iCustNo, iRepayBank, wkAuthStatus, CreateFlag, 0,
-					Integer.MAX_VALUE, titaVo);
+			slAchAuthLog = achAuthLogService.custNoRepayBankEq(iCustNo, iRepayBank, wkAuthStatus, CreateFlag, 0, Integer.MAX_VALUE, titaVo);
 			List<AchAuthLog> lAchAuthLog = slAchAuthLog == null ? null : slAchAuthLog.getContent();
 			if (lAchAuthLog == null || lAchAuthLog.size() == 0) {
 				this.info("lAchAuthLog =  null");

@@ -66,7 +66,6 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 
 		thisYM = iYear * 100 + iMonth;
 
-
 		lM036Report.exec(titaVo, thisYM);
 
 //		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LM036第一類各項統計表", titaVo);

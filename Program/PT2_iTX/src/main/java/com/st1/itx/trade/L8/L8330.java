@@ -115,11 +115,9 @@ public class L8330 extends TradeBuffer {
 				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
 				if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException(titaVo, "E0005",
-								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+						throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					} else {
-						throw new LogicException(titaVo, "E0007",
-								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+						throw new LogicException(titaVo, "E0007", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					}
 				} // 2 end
 
@@ -134,8 +132,7 @@ public class L8330 extends TradeBuffer {
 				Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ451 != null) {
 					for (JcicZ451 xJcicZ451 : sJcicZ451) {
-						if (!"D".equals(xJcicZ451.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
+						if (!"D".equals(xJcicZ451.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
 							if ("L".equals(xJcicZ451.getDelayCode())) {
 								sCovDelayYM++;
 							} else {
@@ -211,8 +208,7 @@ public class L8330 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ451, uJcicZ451);
-			iDataLog.exec("L8330異動", uJcicZ451.getSubmitKey() + uJcicZ451.getCustId() + uJcicZ451.getApplyDate()
-					+ uJcicZ451.getCourtCode() + (uJcicZ451.getDelayYM() - 191100));
+			iDataLog.exec("L8330異動", uJcicZ451.getSubmitKey() + uJcicZ451.getCustId() + uJcicZ451.getApplyDate() + uJcicZ451.getCourtCode() + (uJcicZ451.getDelayYM() - 191100));
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -255,8 +251,7 @@ public class L8330 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4512, uJcicZ4512);
-			iDataLog.exec("L8330刪除", uJcicZ4512.getSubmitKey() + uJcicZ4512.getCustId() + uJcicZ4512.getApplyDate()
-					+ uJcicZ4512.getCourtCode() + (uJcicZ4512.getDelayYM() - 191100));
+			iDataLog.exec("L8330刪除", uJcicZ4512.getSubmitKey() + uJcicZ4512.getCustId() + uJcicZ4512.getApplyDate() + uJcicZ4512.getCourtCode() + (uJcicZ4512.getDelayYM() - 191100));
 			break;
 		// 修改
 		case "7":
@@ -287,8 +282,7 @@ public class L8330 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4513, uJcicZ4513);
-			iDataLog.exec("L8330修改", uJcicZ4513.getSubmitKey() + uJcicZ4513.getCustId() + uJcicZ4513.getApplyDate()
-					+ uJcicZ4513.getCourtCode() + (uJcicZ4513.getDelayYM() - 191100));
+			iDataLog.exec("L8330修改", uJcicZ4513.getSubmitKey() + uJcicZ4513.getCustId() + uJcicZ4513.getApplyDate() + uJcicZ4513.getCourtCode() + (uJcicZ4513.getDelayYM() - 191100));
 		default:
 			break;
 		}

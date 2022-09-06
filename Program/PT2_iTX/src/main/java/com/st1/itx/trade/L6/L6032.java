@@ -39,7 +39,7 @@ public class L6032 extends TradeBuffer {
 
 	@Autowired
 	private CdEmpService cdEmpService;
-	
+
 	@Autowired
 	private Parse parse;
 
@@ -99,7 +99,7 @@ public class L6032 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

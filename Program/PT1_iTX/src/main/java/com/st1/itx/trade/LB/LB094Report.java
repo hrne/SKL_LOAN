@@ -126,12 +126,12 @@ public class LB094Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01"; 
+			sfileNo2 = "01";
 		}
 
 		// 查詢系統參數設定檔-JCIC放款報送人員資料
@@ -149,7 +149,7 @@ public class LB094Report extends MakeReport {
 		} else {
 			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
 		}
-		
+
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23";
 		String txt1[] = txt.split(";");
 
@@ -160,8 +160,7 @@ public class LB094Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B094", "股票擔保品明細檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B094-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
+			strContent = "JCIC-DAT-B094-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + jcicEmpName, 80, ' ') + StringUtils.repeat(" ", 51);
 			makeFile.put(strContent);
 
@@ -263,8 +262,7 @@ public class LB094Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
-					+ StringUtils.repeat(" ", 180);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 180);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -286,7 +284,7 @@ public class LB094Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
@@ -298,8 +296,7 @@ public class LB094Report extends MakeReport {
 		// B094 股票擔保品明細檔
 		inf = "資料別(1~2),總行代號(3~5),分行代號(6~9),空白(10~11),擔保品控制編碼(12~61),擔保品類別(62~63),擔保品所有權人或代表人IDN/BAN(64~73),"
 				+ "鑑估值(74~81),鑑估日期(82~88),可放款值(89~98),設質日期(99~105),發行機構BAN(106~113),發行機構所在國別(114~115),股票代號(116~125),股票種類(126~126),"
-				+ "幣別(127~129),設定股數餘額(130~143),股票質押授信餘額(144~153),公司內部人職稱(154~154),公司內部人身分註記(155),"
-				+ "公司內部人法定關係人(156~165),處分價格(166~173),空白(174~187),資料所屬年月(188~192)";
+				+ "幣別(127~129),設定股數餘額(130~143),股票質押授信餘額(144~153),公司內部人職稱(154~154),公司內部人身分註記(155)," + "公司內部人法定關係人(156~165),處分價格(166~173),空白(174~187),資料所屬年月(188~192)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23";
 
 		String txt1[] = txt.split(";");

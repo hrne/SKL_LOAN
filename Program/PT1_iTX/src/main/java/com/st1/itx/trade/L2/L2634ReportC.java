@@ -159,8 +159,7 @@ public class L2634ReportC extends MakeReport {
 				int wkCloseMm = parse.stringToInteger(closeDate.substring(3, 5)); // 月
 				int wkCloseDd = parse.stringToInteger(closeDate.substring(5, 7)); // 日
 				this.print(-4, 13, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
-				this.print(-4, 39, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-"
-						+ StringUtils.leftPad(String.valueOf(tFacClose.getFacmNo()), 3, "0")); // 戶號額度
+				this.print(-4, 39, StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "-" + StringUtils.leftPad(String.valueOf(tFacClose.getFacmNo()), 3, "0")); // 戶號額度
 				this.print(-4, 74, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
 				this.print(-12, 66, loanCom.getCustNameByNo(tFacClose.getCustNo())); // 戶名
 				selectCnt = getSelecTotal(custNo, closeNo, lClOtherRights, titaVo);
@@ -171,10 +170,10 @@ public class L2634ReportC extends MakeReport {
 				if (isLast) {
 
 					break;
-				}else {
+				} else {
 					this.info("C newPage");
 					this.newPage(!isLast);
-					
+
 				}
 			}
 		}
@@ -184,8 +183,7 @@ public class L2634ReportC extends MakeReport {
 
 	}
 
-	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo)
-			throws LogicException {
+	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {

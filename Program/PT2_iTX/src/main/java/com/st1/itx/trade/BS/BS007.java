@@ -64,7 +64,7 @@ public class BS007 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("L2921");
 				tTxToDoDetail.setCustNo(loanNotYet.getCustNo());
 				tTxToDoDetail.setFacmNo(loanNotYet.getFacmNo());
-				
+
 				/*
 				 * 未齊件代碼說明2022.2.9 by 昱衡
 				 */
@@ -77,7 +77,7 @@ public class BS007 extends TradeBuffer {
 					tTxToDoDetail.setDtlValue("");
 					tTxToDoDetail.setProcessNote("");
 				}
-				
+
 				txToDoCom.addDetail(false, 0, tTxToDoDetail, titaVo); // addDetail
 			}
 		}

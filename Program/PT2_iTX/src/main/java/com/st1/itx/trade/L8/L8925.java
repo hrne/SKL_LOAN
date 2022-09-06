@@ -44,7 +44,7 @@ public class L8925 extends TradeBuffer {
 
 	@Autowired
 	public TxTranCodeService txTranCodeService;
-	
+
 	@Autowired
 	TxTellerService sTxTellerService;
 
@@ -71,33 +71,33 @@ public class L8925 extends TradeBuffer {
 		}
 
 		String tranName = txDataLog.getTranNo();
-		
+
 		TxTranCode txTranCode = txTranCodeService.findById(txDataLog.getTranNo(), titaVo);
 		if (txTranCode != null) {
 			tranName += " " + txTranCode.getTranItem();
 		}
 		totaVo.putParam("OTranName", tranName);
-		
+
 		this.totaVo.putParam("OCustNo", txDataLog.getCustNo());
 		this.totaVo.putParam("OFacmNo", txDataLog.getFacmNo());
 		this.totaVo.putParam("OBormNo", txDataLog.getBormNo());
 		this.totaVo.putParam("OMrKey", txDataLog.getMrKey());
-		
+
 		totaVo.putParam("OReason", txDataLog.getReason());
 
 		String lastUpdate = parse.timeStampToString(txDataLog.getLastUpdate());
 		totaVo.putParam("OLastUpdate", lastUpdate);
-		
+
 		// 此次修改是主管覆核?
 		// (放行時 update, 最後修改者仍會是經辦代號
-		//  所以用這種比較 hacky 的作法...)		
+		// 所以用這種比較 hacky 的作法...)
 		boolean isSupervisor = txDataLog.getReason() != null && "主管覆核".equals(txDataLog.getReason().trim());
 		totaVo.putParam("OIsSupervisor", isSupervisor ? "Y" : "N");
-		
+
 		// 如果是主管時, 改抓別的欄位
 		// 因為 LastUpdateEmpNo 會是經辦
 		// 這邊是新需求: 主管覆核時, 應顯示主管 id 與姓名
-		String lastEmp = isSupervisor ? txDataLog.getTlrNo(): txDataLog.getLastUpdateEmpNo();
+		String lastEmp = isSupervisor ? txDataLog.getTlrNo() : txDataLog.getLastUpdateEmpNo();
 		if (lastEmp != null && !lastEmp.trim().isEmpty()) {
 			CdEmp cdEmp = cdEmpService.findById(lastEmp, titaVo);
 			if (cdEmp != null) {
@@ -114,10 +114,10 @@ public class L8925 extends TradeBuffer {
 		} catch (IOException e) {
 			throw new LogicException("EC009", "資料格式");
 		}
-		
+
 		for (HashMap<String, Object> map : listMap) {
 			String fld = "";
-			if(map.get("f") !=null) {
+			if (map.get("f") != null) {
 				fld = map.get("f").toString();
 			}
 			String oval = map.get("o").toString();
@@ -134,9 +134,7 @@ public class L8925 extends TradeBuffer {
 //				}
 //			}
 
-
 			/* 將每筆資料放入Tota的OcList */
-
 
 			OccursList occursList = new OccursList();
 
@@ -149,6 +147,5 @@ public class L8925 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
 
 }

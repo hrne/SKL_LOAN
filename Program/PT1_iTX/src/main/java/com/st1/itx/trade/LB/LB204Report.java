@@ -128,8 +128,7 @@ public class LB204Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵每日新增授信及清償資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B204-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(" ", 16, ' ') // 聯絡電話
+			strContent = "JCIC-DAT-B204-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR(" ", 16, ' ') // 聯絡電話
 					+ StringUtils.repeat(" ", 67);
 			makeFile.put(strContent);
 
@@ -215,8 +214,7 @@ public class LB204Report extends MakeReport {
 			// 末筆
 			strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumLineAmt), 11, '0') // 訂約總金額
 					+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumDrawdownAmt), 11, '0') // 授信／清償金額總金額
-					+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 7, '0')
-					+ StringUtils.repeat(" ", 86);
+					+ StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 7, '0') + StringUtils.repeat(" ", 86);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -242,8 +240,7 @@ public class LB204Report extends MakeReport {
 		String txt = "";
 
 		// B204 聯徵每日新增授信及清償資料檔
-		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64),"
-				+ "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
+		inf = "總行代號(1~3),分行代號(4~7),新增核准額度日期／清償日期／額度到期或解約日期(8~14),額度控制編碼／帳號(15~64)," + "授信戶IDN/BAN(65~74),科目別(75),科目別註記(76),交易別(77),訂約金額(78~87),新增核准額度當日動撥／清償金額(88~97),"
 				+ "本筆新增核准額度應計入DBR22倍規範之金額(98~107),1~7欄資料值相同之交易序號(108),空白(109~128)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12";
 

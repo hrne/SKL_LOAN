@@ -50,7 +50,7 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMkey = iCustNo + "-%";
 		}
 		this.info("iMkey = " + iMkey);
-		
+
 		if (iEntdySt > 0) {
 			iEntdySt += 19110000;
 			iEntdyEd += 19110000;

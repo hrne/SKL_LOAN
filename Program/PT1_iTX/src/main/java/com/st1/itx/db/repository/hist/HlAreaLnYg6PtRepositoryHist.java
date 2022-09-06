@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.HlAreaLnYg6PtId;
  */
 public interface HlAreaLnYg6PtRepositoryHist extends JpaRepository<HlAreaLnYg6Pt, HlAreaLnYg6PtId> {
 
-  // CalDate =
-  public Slice<HlAreaLnYg6Pt> findAllByCalDateIs(int calDate_0, Pageable pageable);
+	// CalDate =
+	public Slice<HlAreaLnYg6Pt> findAllByCalDateIs(int calDate_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<HlAreaLnYg6Pt> findByHlAreaLnYg6PtId(HlAreaLnYg6PtId hlAreaLnYg6PtId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<HlAreaLnYg6Pt> findByHlAreaLnYg6PtId(HlAreaLnYg6PtId hlAreaLnYg6PtId);
 
 }
-

@@ -56,7 +56,7 @@ public class EomFinal extends BatchBase implements Tasklet, InitializingBean {
 			// TODO: 非年底日,發動Oracle DB鏡像備份
 			throw new LogicException("S0001", "本日非年底日,啟動備份.");
 		}
-		
+
 		this.info("EomFinal exit.");
 	}
 }

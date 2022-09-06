@@ -69,7 +69,7 @@ public class L2021 extends TradeBuffer {
 		CdEmp tCdEmp = new CdEmp();
 
 		Slice<FacRelation> slFacRelation = null;
-		
+
 		if (iCaseNo > 0) {
 
 			slFacRelation = sFacRelationService.CreditSysNoAll(iCaseNo, this.index, this.limit, titaVo);
@@ -106,7 +106,7 @@ public class L2021 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
-		
+
 		DateFormat df = new SimpleDateFormat("yyyyMMdd");
 		int Date = 0;
 		for (FacRelation tFacRelation : lFacRelation) {
@@ -125,7 +125,6 @@ public class L2021 extends TradeBuffer {
 				occursList.putParam("OOCustId", ""); // 統一編號
 				occursList.putParam("OOCustName", "");// 交易關係人姓名
 			}
-
 
 			occursList.putParam("OOFacRelationCode", tFacRelation.getFacRelationCode()); // 掃描類別
 
@@ -159,7 +158,6 @@ public class L2021 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 		}
 
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

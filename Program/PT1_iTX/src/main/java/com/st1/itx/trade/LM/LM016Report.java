@@ -118,7 +118,7 @@ public class LM016Report extends MakeReport {
 		}
 
 		this.close();
-		//this.toPdf(sno);
+		// this.toPdf(sno);
 
 		if (LM016List != null && LM016List.size() > 0) {
 			return true;
@@ -164,7 +164,6 @@ public class LM016Report extends MakeReport {
 			rocdate -= 19110000;
 		}
 		String rocdatex = String.valueOf(rocdate);
-
 
 		if (rocdatex.length() == 7) {
 			return rocdatex.substring(0, 3) + "/" + rocdatex.substring(3, 5) + "/" + rocdatex.substring(5, 7);

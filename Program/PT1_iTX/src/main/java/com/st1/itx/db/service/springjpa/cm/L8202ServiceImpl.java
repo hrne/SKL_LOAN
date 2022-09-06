@@ -406,7 +406,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "　";
 		int iEntryDateS = Integer.parseInt(titaVo.getParam("EntryDateSL")) + 19110000; // 入帳日期起日
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE")) + 19110000; // 入帳日期迄日
-		
+
 		sql += " SELECT \n";
 		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期
 		sql += " ,F.\"Factor\"               AS F1 \n"; // 交易樣態
@@ -507,10 +507,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("EntryDateS", iEntryDateS);
 		query.setParameter("EntryDateE", iEntryDateE);
-		
+
 		return this.convertToMap(query);
 	}
 
@@ -620,10 +620,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("EntryDateS", iEntryDateS);
 		query.setParameter("EntryDateE", iEntryDateE);
-		
+
 		return this.convertToMap(query);
 	}
 }

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.BatxBaseRateChangeId;
  */
 public interface BatxBaseRateChangeRepositoryMon extends JpaRepository<BatxBaseRateChange, BatxBaseRateChangeId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BatxBaseRateChange> findByBatxBaseRateChangeId(BatxBaseRateChangeId batxBaseRateChangeId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BatxBaseRateChange> findByBatxBaseRateChangeId(BatxBaseRateChangeId batxBaseRateChangeId);
 
 }
-

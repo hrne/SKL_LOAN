@@ -76,7 +76,7 @@ public class L2R30 extends TradeBuffer {
 			tCustRmk = sCustRmkService.findById(CustRmkId, titaVo);
 			// 該戶號 備忘錄序號查不到資料 拋錯
 			if (tCustRmk == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "備忘錄序號" + iRmkNo + "不存在顧客管控警訊檔。"); //查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "  該戶號" + iCustNo + "備忘錄序號" + iRmkNo + "不存在顧客管控警訊檔。"); // 查詢資料不存在
 			}
 
 			this.totaVo.putParam("L2r30RmkNo", tCustRmk.getRmkNo());

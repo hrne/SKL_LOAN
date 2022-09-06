@@ -69,12 +69,11 @@ public class L8082 extends TradeBuffer {
 
 		List<String> reviewType = null;
 		if ("9".equals(iReviewType)) {
-			reviewType = Arrays.asList("M","L");
+			reviewType = Arrays.asList("M", "L");
 		} else {
 			reviewType = Arrays.asList(iReviewType);
 		}
 
-		
 		if ("9".equals(iStatus)) {
 			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
 		} else if ("1".equals(iStatus)) {

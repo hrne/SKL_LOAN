@@ -133,7 +133,7 @@ public class CheckClEva extends CommBuffer {
 		ClImm tClImm = new ClImm();
 
 		tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
-		
+
 		if (tClEva.getEvaDate() != parse.stringToInteger(titaVo.getParam("EvaDate"))) { // 鑑估日期跟上次重評日期不同
 
 			tClEvaId = new ClEvaId();
@@ -333,8 +333,7 @@ public class CheckClEva extends CommBuffer {
 			shareCompAmt = wkEvaAmt;
 		}
 
-		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
-				BigDecimal.ROUND_HALF_UP);
+		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
 		// 分配金額和設定金額比較 較低的為可分配金額
 		this.info("分配金額和設定金額比較 = " + shareTotal + "," + settingAmt);

@@ -62,7 +62,7 @@ public class L6001 extends TradeBuffer {
 		// new OccursList
 		OccursList OccursList = new OccursList();
 
-		Slice<TxToDoMain> slTxToDoMain = sTxToDoMainService.findAll(this.index, this.limit,titaVo);
+		Slice<TxToDoMain> slTxToDoMain = sTxToDoMainService.findAll(this.index, this.limit, titaVo);
 		lTxToDoMain = slTxToDoMain == null ? null : slTxToDoMain.getContent();
 
 		if (lTxToDoMain == null) {

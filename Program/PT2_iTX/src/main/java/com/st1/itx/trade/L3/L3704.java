@@ -97,7 +97,7 @@ public class L3704 extends TradeBuffer {
 			tLoanFacTmp = sLoanFacTmpService.findById(LoanFacTmpId, titaVo);
 			if (tLoanFacTmp != null) {
 				if (tLoanFacTmp.getCustNo() == iCustNo && tLoanFacTmp.getFacmNo() == iFacmNo) {
-					throw new LogicException(titaVo, "E0002","該戶號、與額度編號已存在於暫收款指定額度設定查詢檔。");
+					throw new LogicException(titaVo, "E0002", "該戶號、與額度編號已存在於暫收款指定額度設定查詢檔。");
 				}
 			}
 
@@ -123,8 +123,7 @@ public class L3704 extends TradeBuffer {
 			tLoanFacTmp = sLoanFacTmpService.holdById(LoanFacTmpId);
 
 			if (tLoanFacTmp == null) {
-				throw new LogicException(titaVo, "E0003",
-						"該戶號、與額度編號,不存在暫收款指定額度設定查詢檔。");
+				throw new LogicException(titaVo, "E0003", "該戶號、與額度編號,不存在暫收款指定額度設定查詢檔。");
 			}
 
 			// 變更前
@@ -137,8 +136,7 @@ public class L3704 extends TradeBuffer {
 			tLoanFacTmp.setDescribe(iRmkDescribe);
 
 			// 非建檔者修改須刷主管卡
-			if (!tLoanFacTmp.getCreateEmpNo().equals(tLoanFacTmp.getLastUpdateEmpNo())
-					&& titaVo.getEmpNos().trim().isEmpty()) {
+			if (!tLoanFacTmp.getCreateEmpNo().equals(tLoanFacTmp.getLastUpdateEmpNo()) && titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
 			}
 

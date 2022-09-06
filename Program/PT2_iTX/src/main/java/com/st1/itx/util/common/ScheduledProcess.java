@@ -39,10 +39,10 @@ public class ScheduledProcess extends SysLogger {
 
 	@Autowired
 	private DateUtil dateUtil;
-	
+
 	@Autowired
 	private AstrMapper astrMapper;
-	
+
 	@Scheduled(cron = "0 0 2 * * ?")
 	public void reLoadAstar() {
 		this.mustInfo("reLoadAstrMapper >>>");

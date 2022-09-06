@@ -44,8 +44,7 @@ public class L9111 extends TradeBuffer {
 		if (tMonthlyLM052Loss == null) {
 			throw new LogicException(titaVo, "E0003", "備抵損失資料檔"); // 查無資料
 		} else {
-			BigDecimal approvedLoss = titaVo.getParam("ApprovedLoss") == null ? BigDecimal.ZERO
-					: new BigDecimal(titaVo.getParam("ApprovedLoss"));
+			BigDecimal approvedLoss = titaVo.getParam("ApprovedLoss") == null ? BigDecimal.ZERO : new BigDecimal(titaVo.getParam("ApprovedLoss"));
 			tMonthlyLM052Loss.setApprovedLoss(approvedLoss);
 			try {
 				sMonthlyLM052LossService.update(tMonthlyLM052Loss, titaVo);

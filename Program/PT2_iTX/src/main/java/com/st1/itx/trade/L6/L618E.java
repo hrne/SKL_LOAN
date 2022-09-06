@@ -100,8 +100,6 @@ public class L618E extends TradeBuffer {
 		tTxToDoDetailId.setDtlValue(iRvNo);
 		txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 
-		
-		
 		// 銷帳檔有資料時先銷銷帳檔
 		if (!"".equals(iAcctCode)) {
 			acReceivable = new AcReceivable();

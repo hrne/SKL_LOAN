@@ -104,8 +104,7 @@ public class L5051 extends TradeBuffer {
 		for (Map<String, String> d : L5051List) {
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim())
-						|| !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !Introducer.equals(d.get("Introducer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
 						putTota(dd, WorkMonth, DrawdownAmt, PerfEqAmt, PerfReward, PerfAmt, cnt, 1, SumByFacm, titaVo);
 					}
@@ -153,8 +152,7 @@ public class L5051 extends TradeBuffer {
 				if (d.get("MediaFg") == null || "".equals(d.get("MediaFg"))) {
 					canmodify = 1;
 				}
-				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1,
-						canmodify, SumByFacm, titaVo);
+				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("DrawdownAmt")), PerfEqAmt, PerfReward, PerfAmt, 1, canmodify, SumByFacm, titaVo);
 			}
 
 			dd.clear();
@@ -181,9 +179,8 @@ public class L5051 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt,
-			BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm, TitaVo titaVo)
-			throws LogicException {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal DrawdownAmt, BigDecimal PerfEqAmt, BigDecimal PerfReward, BigDecimal PerfAmt, int cnt, int canModify, String SumByFacm,
+			TitaVo titaVo) throws LogicException {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));

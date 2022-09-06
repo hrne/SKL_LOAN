@@ -2,7 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -45,6 +44,7 @@ public class L8407 extends TradeBuffer {
 	public JcicZ044LogService sJcicZ044LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8407 ");
@@ -59,8 +59,7 @@ public class L8407 extends TradeBuffer {
 		this.info("sJcicZ044     = " + sJcicZ044.getSize());
 		if (sJcicZ044 != null) {
 			for (JcicZ044 xJcicZ044 : sJcicZ044) {
-				if ((iSubmitType == 1 && xJcicZ044.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ044.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ044.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ044.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8305");
 					occursListB.putParam("OOHistoryTxCd", "L8035");

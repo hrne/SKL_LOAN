@@ -62,7 +62,6 @@ public class L4101OldVo extends FileVo {
 //				this.put("RetrDate", thisLine.substring(9, 17));
 			}
 
-
 			// 頁尾
 			if (i > (LastIndex - footerCounts)) {
 				// 設定頁尾欄位的擷取位置s

@@ -68,7 +68,7 @@ public class L8083 extends TradeBuffer {
 		Slice<TxAmlCredit> slTxAmlCredit = null;
 
 		List<String> reviewType = Arrays.asList("L");
-		
+
 		if ("9".equals(iStatus)) {
 			slTxAmlCredit = txAmlCreditService.processAll(reviewType, iAcDate1, iAcDate2, iProcessType, this.index, this.limit);
 		} else if ("1".equals(iStatus)) {

@@ -52,8 +52,7 @@ public class EbsCom extends CommBuffer {
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
 			// 訊息通知 SystemParas.EbsFg != Y
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "",
-					"系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
 			return true;
 		}
 
@@ -68,8 +67,7 @@ public class EbsCom extends CommBuffer {
 
 		if (returnStatus != null && returnStatus.equals("S")) {
 			// 發送成功訊息
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功",
-					titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功", titaVo);
 			return true;
 		} else {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
@@ -149,8 +147,7 @@ public class EbsCom extends CommBuffer {
 	private void insertSlipEbsRecord(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
 		String groupId = null;
 		try {
-			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL")
-					.getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
+			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL").getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
 		} catch (JSONException e1) {
 			groupId = "RequestERR";
 		}

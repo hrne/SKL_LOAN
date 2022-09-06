@@ -93,7 +93,7 @@ public class L3943 extends TradeBuffer {
 		this.totaVo.putParam("OAcDate", tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
 		this.totaVo.putParam("OChequeDate", tLoanCheque.getChequeDate());
 		// entrydate 為 0 時不顯示
-		tmpDate = tLoanCheque.getEntryDate(); 
+		tmpDate = tLoanCheque.getEntryDate();
 		this.totaVo.putParam("OEntryDate", tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
 		// 查詢行庫代號檔
 		String iBankCode1 = FormatUtil.padX(tLoanCheque.getBankCode().trim(), 7);

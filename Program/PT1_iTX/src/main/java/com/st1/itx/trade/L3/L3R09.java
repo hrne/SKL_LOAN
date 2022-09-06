@@ -77,8 +77,7 @@ public class L3R09 extends TradeBuffer {
 		// 查尋放款主檔
 		tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0001",
-					" 放款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 放款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
 		}
 		wkNextEffectDate = tLoanBorMain.getNextAdjRateDate();
 		// 額度主檔
@@ -87,15 +86,12 @@ public class L3R09 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", " 額度主檔"); // 查詢資料不存在
 		}
 		// 放款利率變動檔
-		tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
-				iEffectDate + 19110000, titaVo);
+		tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo, iEffectDate + 19110000, titaVo);
 		if (tLoanRateChange == null) {
-			throw new LogicException(titaVo, "E0001", " 放款利率變動檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = "
-					+ iBormNo + " 生效日期 = " + iEffectDate); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 放款利率變動檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + iBormNo + " 生效日期 = " + iEffectDate); // 查詢資料不存在
 		}
 		if ("A".equals(iChangFg)) {
-			tNextLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo,
-					iEffectDate + 19110001, titaVo);
+			tNextLoanRateChange = loanRateChangeService.rateChangeEffectDateAscFirst(iCustNo, iFacmNo, iBormNo, iEffectDate + 19110001, titaVo);
 			if (tNextLoanRateChange != null) {
 				wkNextEffectDate = tNextLoanRateChange.getEffectDate();
 				wkNextFitRate = tNextLoanRateChange.getFitRate();
@@ -103,11 +99,9 @@ public class L3R09 extends TradeBuffer {
 		}
 
 		// 查詢指標利率檔
-		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(),
-				tLoanRateChange.getBaseRateCode(), 10101, tLoanRateChange.getEffectDate() + 19110000, titaVo);
+		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst(tLoanBorMain.getCurrencyCode(), tLoanRateChange.getBaseRateCode(), 10101, tLoanRateChange.getEffectDate() + 19110000, titaVo);
 		if (tCdBaseRate == null) {
-			throw new LogicException(titaVo, "E0001", " 指標利率檔 利率代碼 = " + tLoanRateChange.getBaseRateCode() + " 生效日期 = "
-					+ tLoanRateChange.getEffectDate()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", " 指標利率檔 利率代碼 = " + tLoanRateChange.getBaseRateCode() + " 生效日期 = " + tLoanRateChange.getEffectDate()); // 查詢資料不存在
 		}
 		// 查詢商品參數檔
 		tFacProd = facProdService.findById(tLoanRateChange.getProdNo(), titaVo);

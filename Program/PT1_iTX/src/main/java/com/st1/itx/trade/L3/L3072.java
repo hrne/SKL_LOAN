@@ -145,8 +145,7 @@ public class L3072 extends TradeBuffer {
 			updateDate = parse.timeStampToStringDate(tLoanCustRmk.getLastUpdate()).replace("/", "");
 			this.info("createDate = " + createDate);
 			this.info("updateDate = " + updateDate);
-			
-			
+
 			occurslist.putParam("OOCreateDate", createDate);
 			occurslist.putParam("OOLastUpdate", updateDate);
 			this.totaVo.addOccursList(occurslist);

@@ -101,8 +101,7 @@ public class L6402 extends TradeBuffer {
 
 		// 清除選單快取 Adam
 		menuBuilder.evict();
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

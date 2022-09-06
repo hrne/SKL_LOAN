@@ -25,7 +25,7 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
+
 	public List<Map<String, String>> findAll(int custNoStart, int custNoEnd, int findDateStart, int findDateEnd, TitaVo titaVo) {
 		this.info("L9728ServiceImpl queryCollection ");
 
@@ -33,7 +33,7 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9728ServiceImpl custNoEnd = " + custNoEnd);
 		this.info("L9728ServiceImpl findDateStart = " + findDateStart);
 		this.info("L9728ServiceImpl findDateEnd = " + findDateEnd);
-		
+
 		String sql = "";
 		sql += " WITH CNSeq AS ";
 		sql += "          (SELECT \"CustNo\" ";
@@ -73,7 +73,6 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY CN.\"CustNo\" ASC ";
 		sql += "        , CN.\"FacmNo\" ASC ";
 
-
 		this.info("sql=" + sql);
 
 		Query query;
@@ -83,7 +82,7 @@ public class L9728ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("custNoEnd", custNoEnd);
 		query.setParameter("findDateStart", findDateStart);
 		query.setParameter("findDateEnd", findDateEnd);
-		
+
 		return this.convertToMap(query);
 	}
 

@@ -67,7 +67,6 @@ public class L2076ReportD extends MakeReport {
 	private int iCustNo = 0;
 	private int iCloseNo = 0;
 
-
 	// 自訂表頭
 	@Override
 	public void printHeader() {

@@ -97,8 +97,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		switch (intSearchOption) {
 		case 0: // 0:正常未繳 0:正常
 			if (intSearchFlag == 2) {
-				sql += " and (substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) > " + intReportYearMonth
-						+ " or i.\"AcDate\" = 0) ";
+				sql += " and (substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) > " + intReportYearMonth + " or i.\"AcDate\" = 0) ";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
@@ -108,8 +107,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 1: // 1:正常已繳 0:正常
 			if (intSearchFlag == 2) {
-				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth
-						+ "and i.\"AcDate\" > 0";
+				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth + "and i.\"AcDate\" > 0";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
@@ -127,8 +125,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 4: // 4:催收未繳 2:催收 未入帳
 			if (intSearchFlag == 2) {
-				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth
-						+ "and i.\"AcDate\" = 0";
+				sql += " and substr(LPAD(i.\"AcDate\" - 19110000, 7, 0), 1, 5) <= " + intReportYearMonth + "and i.\"AcDate\" = 0";
 			}
 			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 2                            ";

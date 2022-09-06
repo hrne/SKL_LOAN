@@ -50,13 +50,11 @@ public class LM057Report extends MakeReport {
 
 		this.info("LM057Report exec");
 
-		dateF = String.valueOf(date).substring(0, 4) + "/" + String.valueOf(date).substring(4, 6) + "/"
-				+ String.valueOf(date).substring(6, 8);
+		dateF = String.valueOf(date).substring(0, 4) + "/" + String.valueOf(date).substring(4, 6) + "/" + String.valueOf(date).substring(6, 8);
 
 		yearMon = date / 100;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM057", "表14-5、14-6會計部申報表",
-				"LM057-表14-5、14-6_會計部申報表", "LM057_底稿_表14-5、14-6_會計部申報表.xlsx", "14-5申報表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM057", "表14-5、14-6會計部申報表", "LM057-表14-5、14-6_會計部申報表", "LM057_底稿_表14-5、14-6_會計部申報表.xlsx", "14-5申報表");
 
 		try {
 
@@ -213,7 +211,6 @@ public class LM057Report extends MakeReport {
 				break;
 			}
 
-			
 			switch (lM057Vo.get("F0")) {
 			case "B1":
 			case "B3":
@@ -221,31 +218,27 @@ public class LM057Report extends MakeReport {
 			case "C2":
 			case "C5":
 			case "C7":
-		
-				
+
 				makeExcel.setValue(19, 4, colTotal, "#,##0");
 
 				break;
 
-
 			default:
 				break;
 			}
-			
-			
-			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0"))|| "Collection".equals(lM057Vo.get("F0"))) {
+
+			if ("Ovdu".equals(lM057Vo.get("F0")) || "B1".equals(lM057Vo.get("F0")) || "B3".equals(lM057Vo.get("F0")) || "Collection".equals(lM057Vo.get("F0"))) {
 				// 逾期放款總額
-				this.info("colTotal"+lM057Vo.get("F0")+"="+colTotal + "+" +amount);
+				this.info("colTotal" + lM057Vo.get("F0") + "=" + colTotal + "+" + amount);
 				colTotal = colTotal.add(amount);
 
 			}
 
 			if ("Total".equals(lM057Vo.get("F0")) || "Collection".equals(lM057Vo.get("F0")) || "Loss".equals(lM057Vo.get("F0"))) {
 				// 放款總額
-				this.info("total"+lM057Vo.get("F0")+"="+total + "+" +amount);
+				this.info("total" + lM057Vo.get("F0") + "=" + total + "+" + amount);
 				total = total.add(amount);
 			}
-				
 
 		}
 		makeExcel.setValue(18, 4, total, "#,##0");

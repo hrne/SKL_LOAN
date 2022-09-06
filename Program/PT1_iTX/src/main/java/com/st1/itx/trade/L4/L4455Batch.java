@@ -29,16 +29,15 @@ public class L4455Batch extends TradeBuffer {
 
 	@Autowired
 	public L4455Report l4455Report;
-	
+
 	@Autowired
 	public L4455Report2 l4455Report2;
-	
+
 	@Autowired
 	public DateUtil dateUtil;
 
 	@Autowired
 	public WebClient webClient;
-
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -46,19 +45,17 @@ public class L4455Batch extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		int ifunctioncode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
-		 
-		if(ifunctioncode == 1) {
-		  l4455Report.exec(titaVo);
+
+		if (ifunctioncode == 1) {
+			l4455Report.exec(titaVo);
 		} else {
-		  l4455Report2.exec(titaVo);
+			l4455Report2.exec(titaVo);
 		}
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo()+"L4455", "L4455銀行扣款報表 處理完畢", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4455", "L4455銀行扣款報表 處理完畢", titaVo);
 
 		// end
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 }

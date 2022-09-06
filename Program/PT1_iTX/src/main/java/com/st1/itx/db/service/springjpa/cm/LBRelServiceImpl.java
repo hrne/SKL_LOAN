@@ -43,10 +43,8 @@ public class LBRelServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LBRel 聯徵授信「同一關係企業及集團企業」資料報送檔
-		sql = "SELECT " + "  \"BankItem\", \"BranchItem\", \"RelYM\", \"TranCode\" "
-				+ ", \"CustId\", \"Filler6\", \"RelId\", \"Filler8\", \"RelationCode\" "
-				+ ", \"Filler10\", \"EndCode\" " + " FROM  \"JcicRel\" " + " WHERE TRUNC(\"DataYMD\" / 100) = :dataMonth "
-				+ " ORDER BY \"BankItem\", \"BranchItem\", \"TranCode\", \"CustId\", \"RelId\" ";
+		sql = "SELECT " + "  \"BankItem\", \"BranchItem\", \"RelYM\", \"TranCode\" " + ", \"CustId\", \"Filler6\", \"RelId\", \"Filler8\", \"RelationCode\" " + ", \"Filler10\", \"EndCode\" "
+				+ " FROM  \"JcicRel\" " + " WHERE TRUNC(\"DataYMD\" / 100) = :dataMonth " + " ORDER BY \"BankItem\", \"BranchItem\", \"TranCode\", \"CustId\", \"RelId\" ";
 
 		this.info("sql=" + sql);
 

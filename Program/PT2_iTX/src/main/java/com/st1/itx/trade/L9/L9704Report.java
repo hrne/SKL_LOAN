@@ -69,13 +69,12 @@ public class L9704Report extends MakeReport {
 		fontStyleVo.setFont((short) 1); // 字體 : 標楷體
 
 		fontStyleVo.setSize((short) 12); // 字體大小 : 12
-		
+
 		String today = dDateUtil.getNowStringBc();
-		
+
 		// 表頭
 		makeExcel.setValue(2, 15, "日　　期：" + this.showBcDate(today, 1));
-		makeExcel.setValue(3, 15, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		makeExcel.setValue(3, 15, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
 		int printRow = 7; // 從這行開始印
 
@@ -202,7 +201,7 @@ public class L9704Report extends MakeReport {
 		makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 
 	// 印小計

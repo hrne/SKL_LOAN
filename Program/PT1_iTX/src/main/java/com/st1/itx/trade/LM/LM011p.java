@@ -49,10 +49,10 @@ public class LM011p extends TradeBuffer {
 
 		// IF RemakeYN = "Y" THEN 更新table
 
-		//if (titaVo.getParam("RemakeYN").equals("Y")) {
-		//	this.info("LM011p: RemakeYN == Y. Update the table.");
-		//	sIas39LoanCommitService.Usp_L7_Ias39LoanCommit_Upd(dateSent, empNo, titaVo);
-		//}
+		// if (titaVo.getParam("RemakeYN").equals("Y")) {
+		// this.info("LM011p: RemakeYN == Y. Update the table.");
+		// sIas39LoanCommitService.Usp_L7_Ias39LoanCommit_Upd(dateSent, empNo, titaVo);
+		// }
 
 		this.info("LM011p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();

@@ -546,8 +546,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 營管、營推、業推、業開、單位
-	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode)
-			throws Exception {
+	public List<Map<String, String>> findAllDept(TitaVo titaVo, Map<String, String> wkVo, String deptCode) throws Exception {
 		String sdeptCode = "";
 
 		int inputYear = Integer.parseInt(wkVo.get("F0"));
@@ -574,8 +573,7 @@ public class LP004ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iWKe = inputYear + String.format("%02d", iMM);
 		}
 
-		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000"
-				|| deptCode == "A0X000") {
+		if (deptCode == "A0B000" || deptCode == "A0F000" || deptCode == "A0E000" || deptCode == "A0M000" || deptCode == "A0X000") {
 			sdeptCode = "'" + deptCode + "'";
 		} else {
 			sdeptCode = "'A0B000','A0F000','A0E000','A0M000','A0X000'";

@@ -89,8 +89,7 @@ public class L1R20 extends TradeBuffer {
 
 			rs = chkNotice(custNotice, flag);
 		} else {
-			Slice<CustNotice> slCustNotice = custNoticeService.findCustNoFormNo(custNo, formNo, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<CustNotice> slCustNotice = custNoticeService.findCustNoFormNo(custNo, formNo, 0, Integer.MAX_VALUE, titaVo);
 			List<CustNotice> lCustNotice = slCustNotice == null ? null : slCustNotice.getContent();
 			if (lCustNotice != null && lCustNotice.size() > 0) {
 				for (CustNotice custNotice : lCustNotice) {
@@ -129,8 +128,7 @@ public class L1R20 extends TradeBuffer {
 				s2 = ",";
 			}
 			if (!s1.isEmpty()) {
-				rs = "戶號:" + String.format("%07d", custNotice.getCustNo()) + "-"
-						+ String.format("%03d", custNotice.getFacmNo()) + ",已" + s1;
+				rs = "戶號:" + String.format("%07d", custNotice.getCustNo()) + "-" + String.format("%03d", custNotice.getFacmNo()) + ",已" + s1;
 				if (flag == 1) {
 					rs += "<br>";
 				} else {

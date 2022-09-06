@@ -106,7 +106,6 @@ public class LM077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ApplDateStart", ApplDateStart); // YYYYMMDD
 		query.setParameter("ApplDateEnd", ApplDateEnd); // YYYYMMDD
 
-
 		return this.convertToMap(query);
 	}
 

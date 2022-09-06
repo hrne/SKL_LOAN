@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -23,17 +22,16 @@ import com.st1.itx.db.domain.Ias34ApId;
  */
 public interface Ias34ApRepositoryDay extends JpaRepository<Ias34Ap, Ias34ApId> {
 
-  // CustNo = ,AND FacmNo = ,AND DataYM =
-  public Slice<Ias34Ap> findAllByCustNoIsAndFacmNoIsAndDataYMIs(int custNo_0, int facmNo_1, int dataYM_2, Pageable pageable);
+	// CustNo = ,AND FacmNo = ,AND DataYM =
+	public Slice<Ias34Ap> findAllByCustNoIsAndFacmNoIsAndDataYMIs(int custNo_0, int facmNo_1, int dataYM_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<Ias34Ap> findByIas34ApId(Ias34ApId ias34ApId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<Ias34Ap> findByIas34ApId(Ias34ApId ias34ApId);
 
-  // (月底日日終批次)維護 IAS34 欄位清單A檔
-  @Procedure(value = "\"Usp_L7_Ias34Ap_Upd\"")
-  public void uspL7Ias34apUpd(int TBSDYF, String EmpNo, int NewAcFg);
+	// (月底日日終批次)維護 IAS34 欄位清單A檔
+	@Procedure(value = "\"Usp_L7_Ias34Ap_Upd\"")
+	public void uspL7Ias34apUpd(int TBSDYF, String EmpNo, int NewAcFg);
 
 }
-

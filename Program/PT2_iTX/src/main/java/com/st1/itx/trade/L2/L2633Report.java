@@ -153,8 +153,7 @@ public class L2633Report extends MakeReport {
 		Slice<FacClose> slFacClose = null;
 		List<FacClose> allFacClose = new ArrayList<FacClose>();
 		Slice<FacClose> sallFacClose = null;
-		sallFacClose = sFacCloseService.findEntryDateRange(parse.stringToInteger(trandDateMS) + 19110000,
-				iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+		sallFacClose = sFacCloseService.findEntryDateRange(parse.stringToInteger(trandDateMS) + 19110000, iTranDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		allFacClose = sallFacClose == null ? null : sallFacClose.getContent();
 		int k = 1;
 		int msCnt = 0;
@@ -162,8 +161,7 @@ public class L2633Report extends MakeReport {
 			for (FacClose msFacClose : allFacClose) {
 
 //				只找同戶號額度最後一筆序號
-				if (k < allFacClose.size() && msFacClose.getCustNo() == allFacClose.get(k).getCustNo()
-						&& msFacClose.getFacmNo() == allFacClose.get(k).getFacmNo()
+				if (k < allFacClose.size() && msFacClose.getCustNo() == allFacClose.get(k).getCustNo() && msFacClose.getFacmNo() == allFacClose.get(k).getFacmNo()
 						&& msFacClose.getEntryDate() == allFacClose.get(k).getEntryDate()) {
 					k++;
 					continue;
@@ -203,8 +201,7 @@ public class L2633Report extends MakeReport {
 		BigDecimal totAmt = BigDecimal.ZERO;
 		for (FacClose tFacClose : lFacClose) {
 //			只找同戶號額度最後一筆序號
-			if (i < lFacClose.size() && tFacClose.getCustNo() == lFacClose.get(i).getCustNo()
-					&& tFacClose.getFacmNo() == lFacClose.get(i).getFacmNo()) {
+			if (i < lFacClose.size() && tFacClose.getCustNo() == lFacClose.get(i).getCustNo() && tFacClose.getFacmNo() == lFacClose.get(i).getFacmNo()) {
 				i++;
 				continue;
 			}
@@ -218,8 +215,7 @@ public class L2633Report extends MakeReport {
 			print(1, 1, " ");
 			// new occurs
 			OccursList occursList = new OccursList();
-			print(0, 2, parse.IntegerToString(tFacClose.getCustNo(), 7) + "-"
-					+ parse.IntegerToString(tFacClose.getFacmNo(), 3)); // 戶號
+			print(0, 2, parse.IntegerToString(tFacClose.getCustNo(), 7) + "-" + parse.IntegerToString(tFacClose.getFacmNo(), 3)); // 戶號
 			print(0, 15, FormatUtil.padX(loanCom.getCustNameByNo(tFacClose.getCustNo()), 20)); // 戶名
 			String CloseReasonItem = "";
 			CdCode tCdCode = cdCodeService.getItemFirst(3, "AdvanceCloseCode", tFacClose.getCloseReasonCode(), titaVo);

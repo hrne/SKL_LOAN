@@ -149,8 +149,7 @@ public class L3922 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 300; // 412 + 154 * 300 = 46612
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -181,11 +180,9 @@ public class L3922 extends TradeBuffer {
 					}
 				} else {
 					// 查詢催收呆帳檔
-					tLoanOverdue = loanOverdueService.findById(
-							new LoanOverdueId(iCustNo, ln.getFacmNo(), ln.getBormNo(), ln.getLastOvduNo()), titaVo);
+					tLoanOverdue = loanOverdueService.findById(new LoanOverdueId(iCustNo, ln.getFacmNo(), ln.getBormNo(), ln.getLastOvduNo()), titaVo);
 					if (tLoanOverdue == null) {
-						throw new LogicException(titaVo, "E0006", "催收呆帳檔 Key = " + iCustNo + "-" + ln.getFacmNo() + "-"
-								+ ln.getBormNo() + "-" + ln.getLastOvduNo()); // 鎖定資料時，發生錯誤
+						throw new LogicException(titaVo, "E0006", "催收呆帳檔 Key = " + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo() + "-" + ln.getLastOvduNo()); // 鎖定資料時，發生錯誤
 					}
 					wkOvduPaidPrin = tLoanOverdue.getOvduPrinAmt().subtract(tLoanOverdue.getOvduPrinBal()); // 催收還款本金
 					wkOvduPaidInt = tLoanOverdue.getOvduIntAmt().subtract(tLoanOverdue.getOvduIntBal()); // 催收還款利息
@@ -260,8 +257,7 @@ public class L3922 extends TradeBuffer {
 		// 結案區分 0:正常 1:展期 2:借新還舊 3:轉催收 4:催收戶本人清償 5:催收戶保證人代償 6:催收戶強制執行 7:轉列呆帳
 		// 8:催收部分轉呆 9:債權轉讓戶
 		if (iCaseCloseCode == 0 || iCaseCloseCode == 4 || iCaseCloseCode == 5 || iCaseCloseCode == 6) {
-			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, iBormNo,
-					iListCloseBreach, titaVo);
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, iBormNo, iListCloseBreach, titaVo);
 		}
 		// 清償違約金
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
@@ -289,8 +285,7 @@ public class L3922 extends TradeBuffer {
 		this.totaVo.putParam("OShortfallPrin", baTxCom.getShortfallPrincipal());
 		this.totaVo.putParam("OShortCloseBreach", baTxCom.getShortCloseBreach());
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
-		oSubTotal = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt).add(baTxCom.getShortfall())
-				.subtract(baTxCom.getExcessive());
+		oSubTotal = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt).add(baTxCom.getShortfall()).subtract(baTxCom.getExcessive());
 		this.totaVo.putParam("SubTotal", oSubTotal);
 		this.totaVo.putParam("OModifyFee", baTxCom.getModifyFee());
 		this.totaVo.putParam("OAcctFee", baTxCom.getAcctFee());
@@ -300,8 +295,7 @@ public class L3922 extends TradeBuffer {
 		this.totaVo.putParam("OLawFee", baTxCom.getLawFee());
 		this.totaVo.putParam("OOvduLawFee", baTxCom.getCollLawFee());
 		this.totaVo.putParam("OCloseBreachAmtpaid", oCloseBreachAmtPaid);
-		oTotal = oSubTotal.add(baTxCom.getModifyFee()).add(baTxCom.getAcctFee()).add(baTxCom.getFireFee())
-				.subtract(baTxCom.getUnOpenfireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollLawFee())
+		oTotal = oSubTotal.add(baTxCom.getModifyFee()).add(baTxCom.getAcctFee()).add(baTxCom.getFireFee()).subtract(baTxCom.getUnOpenfireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollLawFee())
 				.add(oCloseBreachAmtPaid);
 		this.totaVo.putParam("OTotal", oTotal);
 		this.totaVo.putParam("OCloseBreachAmtUnpaid", oCloseBreachAmtUnpaid);
@@ -320,13 +314,11 @@ public class L3922 extends TradeBuffer {
 				wkBormNoStart = iBormNo;
 				wkBormNoEnd = iBormNo;
 			}
-			this.baTxList = baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 0,
-					BigDecimal.ZERO, titaVo); // 00-費用全部
+			this.baTxList = baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 0, BigDecimal.ZERO, titaVo); // 00-費用全部
 			List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復
 			lStatus.add(1);
 			lStatus.add(2);
-			Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-					wkBormNoStart, wkBormNoEnd, 1, 999, lStatus, 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 1, 999, lStatus, 0, Integer.MAX_VALUE, titaVo);
 			lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
 
 			if (lLoanOverdue != null && lLoanOverdue.size() > 0) {

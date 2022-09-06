@@ -177,15 +177,12 @@ public class L3100Report extends MakeReport {
 			List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 			AcDetail acDetail = new AcDetail();
 
-			FacMain tFacMain = facMainService
-					.findById(new FacMainId(iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo"))), titaVo);
+			FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo"))), titaVo);
 			if (tFacMain == null) {
-				throw new LogicException(titaVo, "E0001",
-						" 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + titaVo.getParam("FacmNo")); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + iCustNo + " 額度編號 = " + titaVo.getParam("FacmNo")); // 查詢資料不存在
 			}
-			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo,
-					parse.stringToInteger(titaVo.getParam("FacmNo")), parse.stringToInteger(titaVo.getParam("FacmNo")),
-					0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo")),
+					parse.stringToInteger(titaVo.getParam("FacmNo")), 0, Integer.MAX_VALUE, titaVo);
 			if (slLoanBorMain != null) {
 				for (LoanBorMain rv : slLoanBorMain.getContent()) {
 					wkRvCnt++;
@@ -227,8 +224,7 @@ public class L3100Report extends MakeReport {
 			headAcDetail = acDetailList.get(0);
 
 //			業務類別 01.撥款匯款 02.支票繳款 03.債協 09.放款
-			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2),
-					titaVo);
+			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2), titaVo);
 
 			String secNoX = "";
 			int acDate = 0;
@@ -274,9 +270,8 @@ public class L3100Report extends MakeReport {
 
 			tCdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
 
-			LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(
-					iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo")),
-					parse.stringToInteger(titaVo.getParam("BormNo"))), titaVo);
+			LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, parse.stringToInteger(titaVo.getParam("FacmNo")), parse.stringToInteger(titaVo.getParam("BormNo"))),
+					titaVo);
 			if (tLoanBorMain != null) {
 				acDate = tLoanBorMain.getDrawdownDate() + 19110000;
 				wkBankCode = tLoanBorMain.getRemitBank();
@@ -296,10 +291,8 @@ public class L3100Report extends MakeReport {
 				remitBankt = wkBankItem + "　" + wkBranchItem;// 匯款銀行
 				paymentBank = tLoanBorMain.getPaymentBank();// 解付單位代號
 			}
-			print(-4, 2,
-					"借款人戶號　:" + parse.IntegerToString(headAcDetail.getCustNo(), 7) + "-"
-							+ parse.IntegerToString(headAcDetail.getFacmNo(), 3) + "-"
-							+ parse.IntegerToString(headAcDetail.getBormNo(), 3));
+			print(-4, 2, "借款人戶號　:" + parse.IntegerToString(headAcDetail.getCustNo(), 7) + "-" + parse.IntegerToString(headAcDetail.getFacmNo(), 3) + "-"
+					+ parse.IntegerToString(headAcDetail.getBormNo(), 3));
 			print(-4, 59, this.showRocDate(acDate, 1), "C"); // 日期
 			print(-5, 2, "戶名　　　　:" + loanCom.getCustNameByNo(headAcDetail.getCustNo()));
 

@@ -25,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * L2119 合併額度控管登錄
  */
 
-
 /**
  * L2119 共用額度登錄
  * 
@@ -86,8 +85,7 @@ public class L2119 extends TradeBuffer {
 
 			int iApplNo = parse.stringToInteger(titaVo.get("MApplNo1"));
 
-			Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(iApplNo, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<FacShareLimit> slFacShareLimit = facShareLimitService.findMainApplNoEq(iApplNo, 0, Integer.MAX_VALUE, titaVo);
 			List<FacShareLimit> lFacShareLimit = slFacShareLimit == null ? null : slFacShareLimit.getContent();
 			if (lFacShareLimit != null) {
 				try {

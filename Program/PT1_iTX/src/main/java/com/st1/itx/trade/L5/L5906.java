@@ -35,7 +35,7 @@ public class L5906 extends TradeBuffer {
 
 	@Autowired
 	L5906ServiceImpl l5906ServiceImpl;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5906 ");
@@ -48,56 +48,54 @@ public class L5906 extends TradeBuffer {
 		this.limit = 500;
 
 		this.totaVo.init(titaVo);
-		
+
 		List<Map<String, String>> resultList = null;
-		
+
 		try {
-			resultList = l5906ServiceImpl.findAll(this.index,this.limit,titaVo);
+			resultList = l5906ServiceImpl.findAll(this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			throw new LogicException("E0013", e.getMessage());
 		}
-		
-		
+
 //		if (iGraceCondition != null && iGraceCondition.hasNext()) {
 //			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 //			titaVo.setReturnIndex(this.setIndexNext());
 //			// this.totaVo.setMsgEndToAuto();// 自動折返
 //			this.totaVo.setMsgEndToEnter();// 手動折返
 //		}
-		if (resultList == null || resultList.size()==0) {
+		if (resultList == null || resultList.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "");
 		} else {
-			
+
 			if (resultList.size() == this.limit && hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
-			
-			
+
 			for (Map<String, String> result : resultList) {
-				
+
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOCustNo", result.get("F0"));
 				occursList.putParam("OOCustName", result.get("F1"));
 				occursList.putParam("OOFacmNo", result.get("F2"));
 				occursList.putParam("OOActUse", result.get("F6"));
-				
-				occursList.putParam("OOPrevPayIntDate", showDate(result.get("F3"),1));
-			
-				occursList.putParam("OOGraceDate", showDate(result.get("F4"),1));
-				
+
+				occursList.putParam("OOPrevPayIntDate", showDate(result.get("F3"), 1));
+
+				occursList.putParam("OOGraceDate", showDate(result.get("F4"), 1));
+
 				occursList.putParam("OOLoanBal", result.get("F5"));
-				
-				
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String showDate(String date, int iType) {
-		this.info("date=="+date);
+		this.info("date==" + date);
 		if (date == null || date.equals("") || date.equals("0") || date.equals(" ")) {
 			return " ";
 		}
@@ -109,7 +107,7 @@ public class L5906 extends TradeBuffer {
 
 		return rocdatex;
 	}
-	
+
 	private Boolean hasNext() {
 		Boolean result = true;
 

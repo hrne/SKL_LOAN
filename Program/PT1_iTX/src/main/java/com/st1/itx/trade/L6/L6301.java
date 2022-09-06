@@ -176,12 +176,12 @@ public class L6301 extends TradeBuffer {
 			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 1) {
 				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
 			}
-			
+
 			if (("BaseRate").equals(tCdCode.getDefCode())) {
 				tCdCode.setCdCodeId(tCdCodeId);
 				tCdCode.setEffectFlag(1);
 				tCdCode = moveCdCode(tCdCode, mFuncCode, titaVo);
-				
+
 				try {
 					this.info("1");
 					sCdCodeService.update(tCdCode, titaVo);
@@ -192,7 +192,7 @@ public class L6301 extends TradeBuffer {
 				}
 			}
 			tCdCode = moveCdCode(tCdCode, mFuncCode, titaVo);
-			
+
 			if (titaVo.isActfgSuprele()) {
 				if (tCdCode != null) {
 					try {
@@ -231,8 +231,7 @@ public class L6301 extends TradeBuffer {
 		}
 
 		if (mFuncCode != 2) {
-			mCdCode.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			mCdCode.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdCode.setCreateEmpNo(titaVo.getTlrNo());
 		}
 

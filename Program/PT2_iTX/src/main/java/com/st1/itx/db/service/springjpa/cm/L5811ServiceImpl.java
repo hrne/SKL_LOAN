@@ -26,8 +26,7 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> doQuery(int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth,
-			TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doQuery(int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth, TitaVo titaVo) throws Exception {
 
 		String sql = " ";
 		sql += "SELECT YC.R1                              AS F0  "; // r1 借戶姓名空白

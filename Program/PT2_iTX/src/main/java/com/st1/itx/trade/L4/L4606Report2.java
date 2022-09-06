@@ -30,27 +30,19 @@ public class L4606Report2 extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
-		
+
 		this.setFont(1, 9);
 		this.print(-1, 1, "程式ID：" + "L4606");
 		this.print(-1, 84, "新光人壽保險股份有限公司", "C");
 
-		this.print(
-				-1, 160, "日　　期：" + dDateUtil.getNowStringBc().substring(6, 8) + "/"
-						+ dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(2, 4),
-				"R");
+		this.print(-1, 160, "日　　期：" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(2, 4), "R");
 		this.print(-2, 1, "報　表：" + "L4606");
 		this.print(-2, this.getMidXAxis(), "火險佣金未發明細表", "C");
-		this.print(-2, 160, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6),
-				"R");
-		this.print(-3, 84,
-				titaVo.get("InsuEndMonth").substring(0, 3) + "/" + titaVo.get("InsuEndMonth").substring(3, 5), "C");
+		this.print(-2, 160, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 84, titaVo.get("InsuEndMonth").substring(0, 3) + "/" + titaVo.get("InsuEndMonth").substring(3, 5), "C");
 		this.print(-3, 160, "頁　　次：" + this.getNowPage(), "R");
-		this.print(-4, 1,
-				"保單號碼         險種   保費 起保日期  到期日期 被保險人地址                                      戶號額度    戶名          火險服務ＩＤ 火險服務人 應領金額"); // fix
-		this.print(-5, 1,
-				"-------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-4, 1, "保單號碼         險種   保費 起保日期  到期日期 被保險人地址                                      戶號額度    戶名          火險服務ＩＤ 火險服務人 應領金額"); // fix
+		this.print(-5, 1, "-------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(6);
@@ -82,7 +74,7 @@ public class L4606Report2 extends MakeReport {
 		String id = "";
 		BigDecimal totamt = new BigDecimal("0");
 		for (Map<String, String> tL4606Vo : listL4606) {
-			//this.setFont(1, 9);
+			// this.setFont(1, 9);
 			this.print(1, 1, " ");
 			this.print(0, 1, tL4606Vo.get("F0"));
 			this.print(0, 20, tL4606Vo.get("F1"));
@@ -122,10 +114,8 @@ public class L4606Report2 extends MakeReport {
 			}
 		}
 
-		this.print(1, 1,
-				"--------------------------------------------------------------------------------------------------------------------------------------------------------");
-		this.print(1, 1,
-				"                                                                總　計：           筆              火險服務人：           人 ");
+		this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(1, 1, "                                                                總　計：           筆              火險服務人：           人 ");
 		this.print(0, 91, String.format("%,d", times), "R");
 //		this.print(0, 129, String.format("%,d", people), "R");
 		this.print(0, 164, String.format("%,d", totamt.intValue()), "R");

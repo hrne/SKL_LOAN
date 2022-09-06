@@ -86,7 +86,7 @@ public class L5511Report extends MakeReport {
 		this.setCharSpaces(0);
 
 		this.setLineSpaces(2);
-		
+
 		this.setBeginRow(12);
 		this.setMaxRows(50);
 
@@ -212,7 +212,7 @@ public class L5511Report extends MakeReport {
 				this.print(0, 115, df.format(unnormalAmt1), "R");
 //				this.print(1, 3, dashLine);
 			}
-			
+
 			if (unnormalCnt2 != 0) {
 				this.print(1, 30, "其他");
 				this.print(0, 51, "小　計：");
@@ -266,7 +266,7 @@ public class L5511Report extends MakeReport {
 			}
 			this.print(1, 3, dashLine2);
 		}
-		
+
 		this.print(3, 13, "協理：　　　　　　經理：　　　　　　覆核：　　　　　　製表人：");
 
 		long pdfSno = this.close();

@@ -84,7 +84,7 @@ public class L4922 extends TradeBuffer {
 		// 如沒有找到資料
 		if (lFacMain == null || lFacMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
-		
+
 		}
 		this.totaVo.putParam("OCustNo", lFacMain.get(0).getCustNo());
 
@@ -110,8 +110,7 @@ public class L4922 extends TradeBuffer {
 
 				occursList.putParam("OOStatus", lBankAuthAct.get(0).getStatus());
 			}
-			
-			
+
 			// 戶號額度查還款帳號變更紀錄檔
 			Slice<RepayActChangeLog> slRepayActChangeLog;
 			List<RepayActChangeLog> lRepayActChangeLog;
@@ -123,7 +122,7 @@ public class L4922 extends TradeBuffer {
 			if (lRepayActChangeLog == null || lRepayActChangeLog.size() == 0) {
 				hasHistory = false;
 			}
-			
+
 			occursList.putParam("OOHasHistory", hasHistory ? 1 : 0);
 
 			this.totaVo.addOccursList(occursList);

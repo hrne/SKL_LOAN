@@ -99,11 +99,11 @@ public class L1107 extends TradeBuffer {
 		if (custMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔 : " + iCustId);
 		}
-		
+
 		titaVo.putParam("CustNo", custMain.getCustNo());
-		
+
 		if ("1".equals(iFunCd)) { // 新增
-			
+
 			iCustUKey = custMain.getCustUKey();
 			iUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			FinReportDebt finReportDebt = finReportDebtService.findCustUKeyYearFirst(iCustUKey, iStartYY, titaVo);
@@ -298,10 +298,8 @@ public class L1107 extends TradeBuffer {
 		finReportReview.setProfitBeforeTax(parse.stringToBigDecimal(titaVo.getParam("ReviewProfitBeforeTax")));
 		finReportReview.setProfitAfterTax(parse.stringToBigDecimal(titaVo.getParam("ReviewProfitAfterTax")));
 		finReportReview.setWorkingCapitalRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewWorkingCapitalRatio")));
-		finReportReview
-				.setInterestCoverageRatio1(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestCoverageRatio1")));
-		finReportReview
-				.setInterestCoverageRatio2(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestCoverageRatio2")));
+		finReportReview.setInterestCoverageRatio1(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestCoverageRatio1")));
+		finReportReview.setInterestCoverageRatio2(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestCoverageRatio2")));
 		finReportReview.setLeverageRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewLeverageRatio")));
 		finReportReview.setEquityRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewEquityRatio")));
 		finReportReview.setLongFitRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewLongFitRatio")));
@@ -568,7 +566,7 @@ public class L1107 extends TradeBuffer {
 
 				if (diff) {
 					dataLog.setEnv(titaVo, finReportProfit2, finReportProfit);
-					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.損益表","CustUKey:" + iCustUKey);
+					dataLog.exec("修改顧客/" + iStartYY + " 年度財務報表.損益表", "CustUKey:" + iCustUKey);
 				}
 
 			} catch (DBException e) {

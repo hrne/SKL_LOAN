@@ -66,9 +66,8 @@ public class LQ003 extends BatchBase implements Tasklet, InitializingBean {
 		thisYM = iYear * 100 + iMonth;
 
 		lQ003Report.setTxBuffer(this.getTxBuffer());
-		lQ003Report.exec(titaVo,thisYM);
-		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo(), "LQ003住宅違約統計季報_服務課申報表", titaVo);
+		lQ003Report.exec(titaVo, thisYM);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "LQ003住宅違約統計季報_服務課申報表", titaVo);
 	}
 
 }

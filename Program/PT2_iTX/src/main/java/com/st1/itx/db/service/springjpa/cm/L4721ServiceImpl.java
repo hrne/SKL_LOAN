@@ -66,10 +66,10 @@ public class L4721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND \"Status\" = 0                                           ";
 		sql += "             GROUP By \"CustNo\", \"FacmNo\"                                ";
 		sql += "             ) B                                                            ";
-		sql += " left join \"CustNotice\" CN                             "; //客戶通知設定檔
+		sql += " left join \"CustNotice\" CN                             "; // 客戶通知設定檔
 		sql += "        on CN.\"FormNo\" = 'L4721'                       ";
 		sql += "       and CN.\"CustNo\" = B.\"CustNo\"                  ";
-		sql += "       and CN.\"FacmNo\" = B.\"FacmNo\"                  ";  
+		sql += "       and CN.\"FacmNo\" = B.\"FacmNo\"                  ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\"   = B.\"CustNo\"                            ";
 		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\"  = B.\"CustNo\"                            ";
 		sql += "                         AND FM.\"FacmNo\"  = B.\"FacmNo\"                            ";

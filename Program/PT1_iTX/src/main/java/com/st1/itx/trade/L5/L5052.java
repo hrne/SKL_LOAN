@@ -51,7 +51,7 @@ public class L5052 extends TradeBuffer {
 
 	@Autowired
 	public L5052ServiceImpl l5052ServiceImpl;
-	
+
 	@Autowired
 	TxDataLogService sTxDataLogService;
 
@@ -124,8 +124,7 @@ public class L5052 extends TradeBuffer {
 			}
 
 			if ("Y".equals(SumByFacm)) {
-				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim())
-						|| !FacmNo.equals(d.get("FacmNo").trim())) {
+				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim()) || !FacmNo.equals(d.get("FacmNo").trim())) {
 					if (!first) {
 						putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm, titaVo);
 					}
@@ -154,8 +153,7 @@ public class L5052 extends TradeBuffer {
 					WorkMonth = "";
 				}
 			} else {
-				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt,
-						new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm, titaVo);
+				putTota(d, d.get("WorkMonth"), cntPerfCnt, cntPerfAmt, new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm, titaVo);
 			}
 
 			dd.clear();
@@ -181,8 +179,7 @@ public class L5052 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt,
-			BigDecimal DrawdownAmt, int canModify, String SumByFacm, TitaVo titaVo) {
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt, BigDecimal DrawdownAmt, int canModify, String SumByFacm, TitaVo titaVo) {
 		OccursList occursList = new OccursList();
 
 		occursList.putParam("OOLogNo", d.get("LogNo"));
@@ -236,19 +233,19 @@ public class L5052 extends TradeBuffer {
 		occursList.putParam("OORepayType", d.get("RepayType"));
 		occursList.putParam("OOLog", LogFg);
 
-		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate"))); 
-		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName")); 
-		
+		occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(d.get("LastUpdate")));
+		occursList.putParam("OOLastEmp", d.get("LastUpdateEmpNo") + " " + d.get("LastUpdateEmpName"));
+
 		// 歷程按鈕顯示與否
 		// 邏輯同 L6933
-		
-		Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5502", FormatUtil.pad9(d.get("CustNo"), 7) + "-" + FormatUtil.pad9(d.get("FacmNo"), 3) + "-" + d.get("WorkMonth").trim(), 0,
-				1, titaVo);
-		
+
+		Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5502", FormatUtil.pad9(d.get("CustNo"), 7) + "-" + FormatUtil.pad9(d.get("FacmNo"), 3) + "-" + d.get("WorkMonth").trim(), 0, 1,
+				titaVo);
+
 		List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
-		
+
 		occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
-		
+
 		this.totaVo.addOccursList(occursList);
 
 	}

@@ -73,13 +73,13 @@ public class L4454 extends TradeBuffer {
 
 	@Autowired
 	public CustNoticeCom custNoticeCom;
-	
+
 	@Autowired
 	CdReportService sCdReportService;
 
 	@Autowired
 	public BankDeductDtlService bankDeductDtlService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -154,14 +154,10 @@ public class L4454 extends TradeBuffer {
 		// 訂正交易處理 (刪除應處理明細)
 		if (titaVo.isHcodeErase()) {
 			String msg = "L4454產生銀扣失敗通知 訂正完畢。";
-			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(),
-					titaVo.getOrgTno(), titaVo);
-			cntEmail = txToDoCom.delDetailByTxNo("MAIL00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
-			cntL9705 = txToDoCom.delReserveByTxNo("NOTI01", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
-			cntL4454 = txToDoCom.delReserveByTxNo("NOTI02", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
-					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntEmail = txToDoCom.delDetailByTxNo("MAIL00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntL9705 = txToDoCom.delReserveByTxNo("NOTI01", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntL4454 = txToDoCom.delReserveByTxNo("NOTI02", titaVo.getOrgEntdyI(), titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
 			if (functionCode == 1 || functionCode == 2) {
 				msg += ", 刪除簡訊+eMail筆數：" + (cntText + cntEmail);
 				if (cntL4454 > 0) {
@@ -240,8 +236,7 @@ public class L4454 extends TradeBuffer {
 			}
 			msg += ", 繳息還本通知單份數：" + (l9705ListA.size() + l9705ListB.size());
 			if (l4454List.size() > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo()+"L4454", msg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4454", msg, titaVo);
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", msg, titaVo);
 			}
@@ -323,46 +318,43 @@ public class L4454 extends TradeBuffer {
 	private void unSuccText(String repayBank, Map<String, String> t, int insuM, TitaVo titaVo) throws LogicException {
 		boolean isSend = false;
 		TempVo tempVo = new TempVo();
-		
+
 		functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
-		
+
 		String phoneNo;
 		String emailAd;
-		
+
 		if (functionCode == 1) // 個別
 		{
 			CustMain tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
 			CdReport tCdReport = sCdReportService.findById("L4454", titaVo);
-			
+
 			if (tCustMain == null)
 				throw new LogicException("E0001", "客戶主檔");
 
 			if (tCdReport == null)
 				throw new LogicException("E0001", "報表代碼檔");
-			
+
 			phoneNo = custNoticeCom.getPhone(tCustMain, titaVo);
 			emailAd = tCustMain.getEmail();
-			
+
 			int messagePriority = tCdReport.getMessage();
 			int emailPriority = tCdReport.getEmail();
 			// 數字愈小愈優先，而簡訊優先於email（參照批次部分的註釋，那是前人留下的）
-			
-			if (messagePriority <= emailPriority && phoneNo != null && !phoneNo.trim().isEmpty())
-			{
+
+			if (messagePriority <= emailPriority && phoneNo != null && !phoneNo.trim().isEmpty()) {
 				sendText(repayBank, t, phoneNo, insuM, titaVo);
 				isSend = true;
-			} else if (emailAd != null && !emailAd.trim().isEmpty())
-			{
+			} else if (emailAd != null && !emailAd.trim().isEmpty()) {
 				sendEmail(repayBank, t, emailAd, insuM, titaVo);
 				isSend = true;
 			}
-			
-			
+
 		} else { // 批次
 			tempVo = custNoticeCom.getCustNotice("L4454", custNo, facmNo, titaVo);
 			phoneNo = tempVo.getParam("MessagePhoneNo");
 			emailAd = tempVo.getParam("EmailAddress");
-			
+
 //			寄送簡訊/電郵，若第一順位為書信，則找第二順位
 //			若為皆1則傳簡訊
 //			若為皆0則傳簡訊
@@ -376,14 +368,13 @@ public class L4454 extends TradeBuffer {
 				isSend = true;
 			}
 		}
-		
+
 		if (!isSend) {
 			cntUnsend++;
 		}
 	}
 
-	private void sendText(String repayBank, Map<String, String> t, String phoneNo, int insuM, TitaVo titaVo)
-			throws LogicException {
+	private void sendText(String repayBank, Map<String, String> t, String phoneNo, int insuM, TitaVo titaVo) throws LogicException {
 		if (repayType == 1 || repayType == 3) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
@@ -427,8 +418,8 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setDtlValue("<火險費扣款失敗>" + repayBank);
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
-				tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(phoneNo, "您好：提醒您" + sInsuMonth
-						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", this.getTxBuffer().getTxCom().getTbsdy()));
+				tTxToDoDetail.setProcessNote(
+						txToDoCom.getProcessNoteForText(phoneNo, "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", this.getTxBuffer().getTxCom().getTbsdy()));
 				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
 				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
 				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
@@ -445,8 +436,7 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private void sendEmail(String repayBank, Map<String, String> t, String emailAd, int insuM, TitaVo titaVo)
-			throws LogicException {
+	private void sendEmail(String repayBank, Map<String, String> t, String emailAd, int insuM, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
 		String dataLines = "<" + emailAd + ">";
@@ -516,13 +506,10 @@ public class L4454 extends TradeBuffer {
 	private int fistDeductCheck(TitaVo titaVo) throws LogicException {
 		int result = 1;
 		// 銀扣檔有相同繳息迄日的期款扣款失敗資料
-		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo,
-				prevIntDate + 19110000, titaVo);
+		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, prevIntDate + 19110000, titaVo);
 		if (tBankDeductDtl != null) {
 			if ((tBankDeductDtl.getEntryDate() < entryDate && tBankDeductDtl.getRepayType() == 1)) {
-				if ("Y".equals(tBankDeductDtl.getMediaCode().trim())
-						|| !("00".equals(tBankDeductDtl.getReturnCode().trim())
-								&& "".equals(tBankDeductDtl.getReturnCode().trim()))) {
+				if ("Y".equals(tBankDeductDtl.getMediaCode().trim()) || !("00".equals(tBankDeductDtl.getReturnCode().trim()) && "".equals(tBankDeductDtl.getReturnCode().trim()))) {
 					result = 2;
 				}
 			}

@@ -114,11 +114,9 @@ public class L8319 extends TradeBuffer {
 			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
 			if (iJcicZ060 == null) {
 				if ("A".equals(iTranKey)) {
-					throw new LogicException("E0005",
-							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+					throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
 				} else {
-					throw new LogicException("E0007",
-							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+					throw new LogicException("E0007", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
 				}
 			} // 3 end
 
@@ -128,8 +126,7 @@ public class L8319 extends TradeBuffer {
 			// 5 start
 			// 檢核報送單位代號+債務人IDN+協商申請日曾報送「'42':回報無擔保債權金額資料」，且未報送「'46':結案通知資料」及「'54':單獨全數受清償資料」.
 			// @@@function 要改为：custRcSubEq
-			Slice<JcicZ042> sJcicZ042 = sJcicZ042Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<JcicZ042> sJcicZ042 = sJcicZ042Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ042 == null) {
 				if ("A".equals(iTranKey)) {
 					throw new LogicException("E0005", "「報送單位代號+債務人IDN+協商申請日」未曾報送過(42)回報無擔保債權金額資料.");
@@ -138,8 +135,7 @@ public class L8319 extends TradeBuffer {
 				}
 			}
 			if ("A".equals(iTranKey)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-						Integer.MAX_VALUE, titaVo);
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
 					int sTranKey = 0;
 					for (JcicZ046 xJcicZ046 : sJcicZ046) {
@@ -152,8 +148,7 @@ public class L8319 extends TradeBuffer {
 					}
 				}
 				// @@@function 要改为：custRcSubEq
-				Slice<JcicZ054> sJcicZ054 = sJcicZ054Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
-						titaVo);
+				Slice<JcicZ054> sJcicZ054 = sJcicZ054Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ054 != null) {
 					throw new LogicException("E0005", "「報送單位代號+債務人IDN+協商申請日」已報送過(54)單獨全數受清償資料.");
 				}
@@ -220,8 +215,7 @@ public class L8319 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ061, uJcicZ061);
-			iDataLog.exec("L8319異動", uJcicZ061.getSubmitKey() + uJcicZ061.getCustId() + uJcicZ061.getRcDate()
-					+ uJcicZ061.getChangePayDate());
+			iDataLog.exec("L8319異動", uJcicZ061.getSubmitKey() + uJcicZ061.getCustId() + uJcicZ061.getRcDate() + uJcicZ061.getChangePayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -273,8 +267,7 @@ public class L8319 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0612, uJcicZ0612);
-			iDataLog.exec("L8319刪除", uJcicZ0612.getSubmitKey() + uJcicZ0612.getCustId() + uJcicZ0612.getRcDate()
-					+ uJcicZ0612.getChangePayDate());
+			iDataLog.exec("L8319刪除", uJcicZ0612.getSubmitKey() + uJcicZ0612.getCustId() + uJcicZ0612.getRcDate() + uJcicZ0612.getChangePayDate());
 			break;
 		// 修改
 		case "7":
@@ -310,8 +303,7 @@ public class L8319 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0613, uJcicZ0613);
-			iDataLog.exec("L8318修改", uJcicZ0613.getSubmitKey() + uJcicZ0613.getCustId() + uJcicZ0613.getRcDate()
-					+ uJcicZ0613.getChangePayDate());
+			iDataLog.exec("L8318修改", uJcicZ0613.getSubmitKey() + uJcicZ0613.getCustId() + uJcicZ0613.getRcDate() + uJcicZ0613.getChangePayDate());
 		default:
 			break;
 		}

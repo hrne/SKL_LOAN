@@ -90,11 +90,11 @@ public class L4454Report extends MakeReport {
 
 		for (Map<String, String> tL4454Vo : L4454List) {
 			// 確認 CustNoticeCom 檢查是否能產出郵寄通知
-			
+
 			// inputCustNo: #CustNo
 			// CustNo: Query.CustNo
 			// FacmNo: Query.FacmNo
-			
+
 			String inputCustNo = titaVo.get("CustNo");
 			String recordCustNoString = tL4454Vo.get("CustNo");
 			String recordFacmNoString = tL4454Vo.get("FacmNo");
@@ -102,7 +102,7 @@ public class L4454Report extends MakeReport {
 			int recordFacmNo = parse.stringToInteger(recordFacmNoString);
 			if (!custNoticeCom.checkIsLetterSendable(inputCustNo, recordCustNo, recordFacmNo, "L4454", titaVo))
 				continue;
-			
+
 			execCnt++;
 			if (execCnt >= 2 && execCnt != reportCnt) {
 				this.newPage();
@@ -126,10 +126,10 @@ public class L4454Report extends MakeReport {
 		String custNo = FormatUtil.pad9(tL4454Vo.get("CustNo"), 7);
 		int intCustNo = parse.stringToInteger(tL4454Vo.get("CustNo"));
 		CustMain tCustMain = custMainService.custNoFirst(intCustNo, intCustNo, titaVo);
-		if ( tCustMain == null) {
+		if (tCustMain == null) {
 			throw new LogicException("E0014", "CustMain"); // 檔案錯誤
 		}
-		String address =  custNoticeCom.getCurrAddress(tCustMain, titaVo);
+		String address = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		String custName = tCustMain.getCustName();
 		String zipCode1 = tCustMain.getCurrZip3();
 		String zipCode2 = tCustMain.getCurrZip2();

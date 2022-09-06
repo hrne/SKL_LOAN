@@ -586,33 +586,33 @@ public class CustNoticeCom extends TradeBuffer {
 		this.info(txcd + "'s SendCode is : " + sendCode);
 		return sendCode;
 	}
-	
+
 	/**
-	 * 檢查指定的戶號、額度、報表是否可產出郵寄文件。<br><br>
+	 * 檢查指定的戶號、額度、報表是否可產出郵寄文件。<br>
+	 * <br>
 	 * 邏輯為：<br>
 	 * 1. 整批時：檢查 CustNotice，客戶若申請發送才產出。<br>
 	 * 2. 指定戶號時：可產出郵寄文件。<br>
+	 * 
 	 * @param inputCustNo 戶號的輸入值，例如前端輸入欄位。用來判定是否使用者是否有輸入戶號；如果沒有輸入大於 0 的正常數字，視為整批。
-	 * @param custNo 該筆資料的戶號
-	 * @param facmNo 該筆資料的額度
-	 * @param formNo 要產生的報表代號
-	 * @param titaVo titaVo
+	 * @param custNo      該筆資料的戶號
+	 * @param facmNo      該筆資料的額度
+	 * @param formNo      要產生的報表代號
+	 * @param titaVo      titaVo
 	 * @return Boolean true:可產出/false:不可產出
 	 * @throws LogicException
 	 */
-	public Boolean checkIsLetterSendable(String inputCustNo, int custNo, int facmNo, String formNo, TitaVo titaVo) throws LogicException
-	{
+	public Boolean checkIsLetterSendable(String inputCustNo, int custNo, int facmNo, String formNo, TitaVo titaVo) throws LogicException {
 		this.info("checkIsLetterSendable starts");
 		this.info("inputCustNo: " + inputCustNo);
 		this.info("custNo: " + custNo);
 		this.info("facmNo: " + facmNo);
 		this.info("formNo: " + formNo);
-		if (!parse.isNumeric(inputCustNo) || parse.stringToInteger(inputCustNo) <= 0)
-		{
+		if (!parse.isNumeric(inputCustNo) || parse.stringToInteger(inputCustNo) <= 0) {
 			// 沒有指定戶號，需檢查 CustNotice。
 			TempVo tempVo = getCustNotice(formNo, custNo, facmNo, titaVo);
 			boolean result = "Y".equals(tempVo.get("isLetter")); // 僅回傳 Y 時允許產出
-			
+
 			this.info("checkIsLetterSendable returns " + result + ": getCustNotice says so");
 			return result;
 		} else {

@@ -108,7 +108,7 @@ public class L5711 extends TradeBuffer {
 				if (mNegAppr01 == null) {
 					throw new LogicException(titaVo, "E0003", "會計日=" + iAcDAte + ",經辦=" + iTlrNo + ",交易序號=" + iTxtNo + ",債權機構=" + iFinCode); // 修改資料不存在
 				}
-				NegAppr01 bNegAppr01 = (NegAppr01) dataLog.clone(mNegAppr01); 
+				NegAppr01 bNegAppr01 = (NegAppr01) dataLog.clone(mNegAppr01);
 				try {
 					SumApprAmt = SumApprAmt.add(parse.stringToBigDecimal(titaVo.getParam("ApprAmt" + i)));
 
@@ -120,7 +120,7 @@ public class L5711 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 				dataLog.setEnv(titaVo, bNegAppr01, mNegAppr01); ////
-				dataLog.exec("修改最大債權撥付資料檔,債權機構:"+iFinCode); ////
+				dataLog.exec("修改最大債權撥付資料檔,債權機構:" + iFinCode); ////
 			}
 		}
 
@@ -208,8 +208,8 @@ public class L5711 extends TradeBuffer {
 			if (mAccuApprAmt.compareTo(tNegMain.getAccuSklShareAmt()) == 0) {
 				return;
 			}
-			NegMain bNegMain = (NegMain) dataLog.clone(tNegMain); 
-			
+			NegMain bNegMain = (NegMain) dataLog.clone(tNegMain);
+
 			try {
 				this.info("mAccuApprAmt==" + mAccuApprAmt);
 				tNegMain.setAccuSklShareAmt(mAccuApprAmt);
@@ -220,7 +220,7 @@ public class L5711 extends TradeBuffer {
 			}
 			dataLog.setEnv(titaVo, bNegMain, tNegMain); ////
 			dataLog.exec("修改債務協商案件主檔"); ////
-			
+
 		}
 	}
 

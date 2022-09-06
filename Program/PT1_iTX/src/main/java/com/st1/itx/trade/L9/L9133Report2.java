@@ -101,10 +101,8 @@ public class L9133Report2 extends MakeReport {
 		this.setCharSpaces(0);
 
 		// 查會計業務檢核檔
-		Slice<AcAcctCheckDetail> slAcAcctCheckDetail = sAcAcctCheckDetailService.findAcDate(this.reportDate, 0,
-				Integer.MAX_VALUE, titaVo);
-		List<AcAcctCheckDetail> lAcAcctCheckDetail = slAcAcctCheckDetail == null ? null
-				: slAcAcctCheckDetail.getContent();
+		Slice<AcAcctCheckDetail> slAcAcctCheckDetail = sAcAcctCheckDetailService.findAcDate(this.reportDate, 0, Integer.MAX_VALUE, titaVo);
+		List<AcAcctCheckDetail> lAcAcctCheckDetail = slAcAcctCheckDetail == null ? null : slAcAcctCheckDetail.getContent();
 
 		if (lAcAcctCheckDetail == null || lAcAcctCheckDetail.size() == 0) {
 //			throw new LogicException("E0001", "會計業務檢核明細檔");
@@ -138,8 +136,7 @@ public class L9133Report2 extends MakeReport {
 				print(0, 119, masterBal, "R");
 
 				// 差額 (會計帳餘額-業務帳餘額)
-				String diffAmt = formatAmt(
-						tAcAcctCheckDetail.getAcBal().subtract(tAcAcctCheckDetail.getAcctMasterBal()), 0);
+				String diffAmt = formatAmt(tAcAcctCheckDetail.getAcBal().subtract(tAcAcctCheckDetail.getAcctMasterBal()), 0);
 				print(0, 155, diffAmt, "R");
 
 			}

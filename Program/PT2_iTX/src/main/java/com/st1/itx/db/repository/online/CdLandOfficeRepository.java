@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.CdLandOfficeId;
  */
 public interface CdLandOfficeRepository extends JpaRepository<CdLandOffice, CdLandOfficeId> {
 
-  // LandOfficeCode =
-  public Slice<CdLandOffice> findAllByLandOfficeCodeIsOrderByRecWordAsc(String landOfficeCode_0, Pageable pageable);
+	// LandOfficeCode =
+	public Slice<CdLandOffice> findAllByLandOfficeCodeIsOrderByRecWordAsc(String landOfficeCode_0, Pageable pageable);
 
-  // LandOfficeCode =
-  public Optional<CdLandOffice> findTopByLandOfficeCodeIsOrderByRecWordDesc(String landOfficeCode_0);
+	// LandOfficeCode =
+	public Optional<CdLandOffice> findTopByLandOfficeCodeIsOrderByRecWordDesc(String landOfficeCode_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdLandOffice> findByCdLandOfficeId(CdLandOfficeId cdLandOfficeId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdLandOffice> findByCdLandOfficeId(CdLandOfficeId cdLandOfficeId);
 
 }
-

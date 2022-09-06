@@ -87,7 +87,7 @@ public class L3R01 extends TradeBuffer {
 				wkCloseDate = tLoanNotYet.getCloseDate();
 				wkYetDate = tLoanNotYet.getYetDate();
 			}
-			
+
 		} else if (iFunCd >= 4) {
 			if (tLoanNotYet == null) {
 				throw new LogicException(titaVo, "E0001", "戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 查詢資料不存在

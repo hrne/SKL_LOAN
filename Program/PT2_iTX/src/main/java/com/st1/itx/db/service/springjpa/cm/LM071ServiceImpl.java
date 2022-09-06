@@ -27,6 +27,7 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 
 	}
+
 	/**
 	 * 查詢結果
 	 * 
@@ -34,7 +35,7 @@ public class LM071ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param yearMonth 西元年月
 	 * 
 	 */
-	
+
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
 
 		// 年

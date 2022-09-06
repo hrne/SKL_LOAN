@@ -23,8 +23,6 @@ public class L9701Report3 extends MakeReport {
 	@Autowired
 	L9701ServiceImpl l9701ServiceImpl;
 
-
-	
 	// 製表日期
 	private String nowDate;
 	// 製表時間
@@ -34,8 +32,6 @@ public class L9701Report3 extends MakeReport {
 	private String facmNo;
 
 	public int tempPage = 0;
-	
-	
 
 	String nextPageText = "=====  續下頁  =====";
 	String endText = "=====  報  表  結  束  =====";
@@ -101,7 +97,6 @@ public class L9701Report3 extends MakeReport {
 
 	private void printDataHeader() {
 
-
 		String tmpFacmNo = String.format("%03d", Integer.valueOf(facmNo));
 
 		this.print(1, 1, " ");
@@ -109,7 +104,7 @@ public class L9701Report3 extends MakeReport {
 		divider();
 		this.print(1, 2, "撥款");
 		this.print(0, 10, "入帳日期");
-		this.print(0, 28, "交易內容","C");
+		this.print(0, 28, "交易內容", "C");
 		this.print(0, 40, "交易金額");
 		this.print(0, 59, "暫收借");
 		this.print(0, 76, "本金");
@@ -131,7 +126,7 @@ public class L9701Report3 extends MakeReport {
 	public void divider() {
 		this.print(1, 2, "－－");
 		this.print(0, 9, "－－－－－");
-		this.print(0, 28, "－－－－－－","C");
+		this.print(0, 28, "－－－－－－", "C");
 		this.print(0, 38, "－－－－－－");
 		this.print(0, 56, "－－－－－－");
 		this.print(0, 72, "－－－－－－");
@@ -169,10 +164,9 @@ public class L9701Report3 extends MakeReport {
 
 		String tradeReportName = "客戶往來交易明細表";
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9701").setRptItem(tradeReportName).setSecurity("")
-				.setRptSize("A4").setPageOrientation("L").build();
-		
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("L9701").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
+
 		this.open(titaVo, reportVo);
 
 		if (listL9701 != null && listL9701.size() > 0) {
@@ -189,9 +183,7 @@ public class L9701Report3 extends MakeReport {
 					// 無交易明細且無餘額
 					if (detailCounts == 0) {
 						if (tL9701Vo.get("DB").equals("2")) {
-							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty()
-									|| tL9701Vo.get("Amount") == null ? BigDecimal.ZERO
-											: new BigDecimal(tL9701Vo.get("Amount"));
+							BigDecimal unpaidLoanBal = tL9701Vo.get("Amount").isEmpty() || tL9701Vo.get("Amount") == null ? BigDecimal.ZERO : new BigDecimal(tL9701Vo.get("Amount"));
 							if (unpaidLoanBal.compareTo(BigDecimal.ZERO) == 0) {
 								continue;
 							}

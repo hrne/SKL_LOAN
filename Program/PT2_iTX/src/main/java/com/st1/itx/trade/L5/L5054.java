@@ -41,7 +41,7 @@ public class L5054 extends TradeBuffer {
 
 	@Autowired
 	public L5054ServiceImpl l5054ServiceImpl;
-	
+
 	@Autowired
 	TxDataLogService sTxDataLogService;
 
@@ -115,7 +115,7 @@ public class L5054 extends TradeBuffer {
 					workSeason -= 19110;
 				}
 				occursList.putParam("OWorkSeason", workSeason);//
-				
+
 				if (MapL5054.get("MediaDate") == null || "".equals(MapL5054.get("MediaDate"))) {
 					occursList.putParam("OMediaFg", 0);//
 					occursList.putParam("OMediaDate", 0);
@@ -123,7 +123,7 @@ public class L5054 extends TradeBuffer {
 					occursList.putParam("OMediaFg", 1);//
 					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5054.get("MediaDate")));
 				}
-				
+
 				occursList.putParam("OManualFg", MapL5054.get("F14"));//
 
 				this.info("L5054 CreateDate =" + MapL5054.get("CreateDate") + "/" + MapL5054.get("LastUpdate"));
@@ -135,16 +135,15 @@ public class L5054 extends TradeBuffer {
 
 				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5054.get("LastUpdate")));
 
-				occursList.putParam("OLastEmp",
-						MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
-				
+				occursList.putParam("OLastEmp", MapL5054.get("LastUpdateEmpNo") + " " + MapL5054.get("LastUpdateEmpName"));
+
 				// 歷程按鈕顯示與否
 				// 邏輯同 L6933
-				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5504", FormatUtil.pad9(MapL5054.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5054.get("F3"), 3) + "-" + FormatUtil.pad9(MapL5054.get("F4"), 3) + "-7", 0,
-						1, titaVo);
-				
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5504",
+						FormatUtil.pad9(MapL5054.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5054.get("F3"), 3) + "-" + FormatUtil.pad9(MapL5054.get("F4"), 3) + "-7", 0, 1, titaVo);
+
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
-				
+
 				occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
 
 				this.totaVo.addOccursList(occursList);

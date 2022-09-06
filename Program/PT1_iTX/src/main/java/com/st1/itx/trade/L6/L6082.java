@@ -71,13 +71,13 @@ public class L6082 extends TradeBuffer {
 		if (lCdWorkMonth == null || lCdWorkMonth.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款業績工作月對照檔"); // 查無資料
 		}
-		
+
 		int distinctYear = 1911;
 		Timestamp latestUpdateTime = null;
 		String lastestUpdateEmp = "";
 		for (CdWorkMonth tCdWorkMonth : lCdWorkMonth) {
 			// 只抓取民國1年開始以後的資料
-			if(tCdWorkMonth.getYear() >= 1912) {
+			if (tCdWorkMonth.getYear() >= 1912) {
 				// 抓到的資料的 西元年
 				int yearAD = tCdWorkMonth.getYear();
 				// 抓到的資料的 lastUpdateTimeStamp
@@ -85,9 +85,9 @@ public class L6082 extends TradeBuffer {
 				// 抓到的資料的 lastUpdateEmpNo
 				String empNo = tCdWorkMonth.getLastUpdateEmpNo();
 				// 如果年度重複
-				if(distinctYear == yearAD) {
+				if (distinctYear == yearAD) {
 					// 做最後修改時間的比較
-					if(latestUpdateTime.compareTo(ts) < 0) {
+					if (latestUpdateTime.compareTo(ts) < 0) {
 						// 設定成最近更新的資料：時間、人員
 						latestUpdateTime = ts;
 						lastestUpdateEmp = getLastUpdateEmp(empNo, titaVo);
@@ -95,11 +95,11 @@ public class L6082 extends TradeBuffer {
 					continue;
 				}
 				// 第一個年度開始時，不做上一個年度（null）的資料儲存
-				if(distinctYear > 1911) {
+				if (distinctYear > 1911) {
 					// 每次遇到新的年份開始，放入上一輪年的結果
 					putDistinctYearData(distinctYear, latestUpdateTime, lastestUpdateEmp);
 				}
-				
+
 				// 新的一個年度的開始：資料的設定
 				distinctYear = yearAD;
 				latestUpdateTime = ts;
@@ -118,20 +118,20 @@ public class L6082 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private String getLastUpdateEmp(String empNo, TitaVo titaVo) throws LogicException {
-		
+
 		String empName = null;
-		
+
 		CdEmp tCdEmp = sCdEmpService.findById(empNo, titaVo);
-		if(tCdEmp != null)
+		if (tCdEmp != null)
 			empName = tCdEmp.getFullname();
-		
+
 		empName = empName.equals("") ? empNo : empName;
-		
+
 		return empNo + " " + empName;
 	}
-	
+
 	private void putDistinctYearData(int distinctYear, Timestamp latestUpdateTime, String lastestUpdateEmp) {
 
 		OccursList occursList = new OccursList();

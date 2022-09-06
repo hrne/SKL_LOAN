@@ -128,13 +128,12 @@ public class L8351File extends MakeFile {
 					iOther = FormatUtil.padX(iOther, 1);
 					iAuthMgrIdSX = FormatUtil.padX(iAuthMgrIdSX, 40);
 					iAuthMgrIdS = FormatUtil.padX(iAuthMgrIdS, 8);
-					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 20); //2022.2.18 by eric 40 > 20
+					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 20); // 2022.2.18 by eric 40 > 20
 					iAuthMgrIdE = FormatUtil.padX(iAuthMgrIdE, 8);
 					String iEmailAccount = FormatUtil.padX(aTbJcicMu01.getEmailAccount(), 50);
-					String iContent = " " + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ")
-							+ iEmpIdX + iEmpId + iTitle + iAuthQryType + iQryUserId + "          " + iQuery + iReview
-							+ iOther + StringUtils.rightPad(sAuthStartDay, 7, " ") + iAuthMgrIdSX + iAuthMgrIdS
-							+ StringUtils.rightPad(sAuthEndDay, 7, " ") + iAuthMgrIdEX + iAuthMgrIdE + iEmailAccount
+					String iContent = " " + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ") + iEmpIdX + iEmpId + iTitle + iAuthQryType + iQryUserId + "          " + iQuery
+							+ iReview + iOther + StringUtils.rightPad(sAuthStartDay, 7, " ") + iAuthMgrIdSX + iAuthMgrIdS + StringUtils.rightPad(sAuthEndDay, 7, " ") + iAuthMgrIdEX + iAuthMgrIdE
+							+ iEmailAccount
 //							+ StringUtils.rightPad(aTbJcicMu01.getModifyUserId(), 25, " ");
 							+ "                         ";
 					this.put(iContent);

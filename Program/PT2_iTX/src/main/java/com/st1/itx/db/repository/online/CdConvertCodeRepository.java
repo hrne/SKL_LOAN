@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.online;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -20,10 +19,9 @@ import com.st1.itx.db.domain.CdConvertCodeId;
  */
 public interface CdConvertCodeRepository extends JpaRepository<CdConvertCode, CdConvertCodeId> {
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<CdConvertCode> findByCdConvertCodeId(CdConvertCodeId cdConvertCodeId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<CdConvertCode> findByCdConvertCodeId(CdConvertCodeId cdConvertCodeId);
 
 }
-

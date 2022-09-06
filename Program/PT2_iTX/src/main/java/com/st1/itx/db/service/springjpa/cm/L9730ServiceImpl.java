@@ -25,17 +25,17 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
+
 	public List<Map<String, String>> findAll(int inputStartDateFirst, int inputEndDateFirst, int inputStartDateNext, int inputEndDateNext, TitaVo titaVo) {
 		this.info("L9730ServiceImpl findAll ");
-		
+
 		// 原 AS400 Query: X800
 
 		this.info("L9730ServiceImpl inputStartDateFirst = " + inputStartDateFirst);
 		this.info("L9730ServiceImpl inputEndDateFirst = " + inputEndDateFirst);
 		this.info("L9730ServiceImpl inputStartDateNext = " + inputStartDateNext);
 		this.info("L9730ServiceImpl inputEndDateNext = " + inputEndDateNext);
-		
+
 		String sql = "";
 		sql += " SELECT LRC.\"CustNo\"           AS \"CustNo\" ";
 		sql += "       ,LRC.\"FacmNo\"           AS \"FacmNo\" ";
@@ -61,8 +61,6 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         ,\"FacmNo\" ASC ";
 		sql += "         ,\"BormNo\" ASC ";
 		sql += "        ,\"EffectDate\" ASC ";
-		
-
 
 		this.info("sql=" + sql);
 
@@ -73,7 +71,7 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputEndDateFirst", inputEndDateFirst);
 		query.setParameter("inputStartDateNext", inputStartDateNext);
 		query.setParameter("inputEndDateNext", inputEndDateNext);
-		
+
 		return this.convertToMap(query);
 	}
 

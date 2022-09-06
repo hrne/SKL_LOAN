@@ -43,12 +43,9 @@ public class LNM39HPServiceImpl extends ASpringJpaParm implements InitializingBe
 		String sql = "";
 
 		// 清單8
-		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", "
-				+ " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
-				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", "
-				+ " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", "
-				+ " \"LineAmtCurr\", \"AvblBalCurr\" " + " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dataMonth "
-				+ " ORDER BY \"CustNo\", \"FacmNo\" ";
+		sql = "SELECT " + "  \"CustNo\", \"CustId\", \"FacmNo\", \"ApplNo\", \"CustKind\", \"ApproveDate\", " + " \"FirstDrawdownDate\", \"LineAmt\", \"Ifrs9ProdCode\", \"AvblBal\", "
+				+ " \"RecycleCode\", \"IrrevocableFlag\", \"IndustryCode\", " + " \"OriRating\", \"OriModel\", \"Rating\", \"Model\", \"LGDModel\", \"LGD\", " + " \"LineAmtCurr\", \"AvblBalCurr\" "
+				+ " FROM  \"LoanIfrs9Hp\" " + " WHERE \"DataYM\"   = :dataMonth " + " ORDER BY \"CustNo\", \"FacmNo\" ";
 
 		this.info("sql=" + sql);
 

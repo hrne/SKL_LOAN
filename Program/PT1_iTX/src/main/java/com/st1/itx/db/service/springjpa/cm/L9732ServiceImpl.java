@@ -41,10 +41,10 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 新增保護機制 當除數為0 該欄位輸出為0
 		String sql = " SELECT CF.\"CustNo\" "; // 戶號 0
-		sql += "      , CF.\"FacmNo\" ";//1
-		sql += "      , CF.\"ClCode1\" ";//2
-		sql += "      , CF.\"ClCode2\" ";//3
-		sql += "      , CF.\"ClNo\" ";//4
+		sql += "      , CF.\"FacmNo\" ";// 1
+		sql += "      , CF.\"ClCode1\" ";// 2
+		sql += "      , CF.\"ClCode2\" ";// 3
+		sql += "      , CF.\"ClNo\" ";// 4
 		sql += "      , CS.\"LoanToValue\" / 100  as \"LoanToValue\" ";// 核貸成數5
 		sql += "      , CS.\"SettingBalance\"  as \"SettingBalance\" ";// 設 定 股 數 ( 股 )6
 		sql += "      , NVL(LBM.\"LoanBal\",0)  AS \"LoanBal\" ";// 目前餘額(萬)7
@@ -97,7 +97,7 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                        * CS.\"ClMtr\" ";
 		sql += "                                           / 100 end  ";
 		sql += "          THEN '是' ";
-		sql += "        ELSE '否' END         AS \"IsClosingPriceLessThanRecoveryPrice\" ";//16
+		sql += "        ELSE '否' END         AS \"IsClosingPriceLessThanRecoveryPrice\" ";// 16
 		sql += "    , CM.\"CustName\" AS \"CustName\" "; // 戶名17
 		sql += "    , CS.\"StockCode\" AS \"StockCode\" "; // 股票代號18
 		sql += "    , NVL(CDS.\"StockItem\",' ') AS \"StockItem\""; // 股票名稱19
@@ -120,7 +120,7 @@ public class L9732ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CustMain\" OwnerCM ON OwnerCM.\"CustUKey\" = CS.\"OwnerCustUKey\" ";
 		sql += " WHERE CF.\"ClCode1\" = 3 ";
 		sql += "   AND CF.\"CustNo\" != 0 ";
-	    sql += "   AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += "   AND NVL(LBM.\"LoanBal\",0) > 0 ";
 
 		this.info("L9732sql=" + sql);
 		Query query;

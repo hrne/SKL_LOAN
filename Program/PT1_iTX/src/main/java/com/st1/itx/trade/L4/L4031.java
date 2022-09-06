@@ -92,8 +92,7 @@ public class L4031 extends TradeBuffer {
 // 				grp1 (Group by 作業項目 )
 				setCount(tBatxRateChange, grp1, 1);
 
-				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(),
-						tBatxRateChange.getRateKeyInCode(), 2);
+				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), tBatxRateChange.getRateKeyInCode(), 2);
 // 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
 				setCount(tBatxRateChange, grp2, 2);
 
@@ -122,8 +121,7 @@ public class L4031 extends TradeBuffer {
 					continue;
 				}
 				OccursList occursList = new OccursList();
-				this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
-						+ ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
+				this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt=" + ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
 						+ conCnt.get(tempL4031Vo) + ", relCnt=" + relCnt.get(tempL4031Vo));
 				this.info("CheckFlag=" + CheckFlag.get(tempL4031Vo));
 //				確認是否同作業項目皆已確認:0.尚有未確認 1.全皆已確認

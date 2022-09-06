@@ -159,11 +159,9 @@ public class L6984 extends TradeBuffer {
 				// 取戶名
 				tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(), titaVo);
 				// 預約日期,幣別,撥款金額
-				tLoanBorMain = sLoanBorMainService.findById(new LoanBorMainId(tTxToDoDetail.getCustNo(),
-						tTxToDoDetail.getFacmNo(), tTxToDoDetail.getBormNo()), titaVo);
+				tLoanBorMain = sLoanBorMainService.findById(new LoanBorMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getBormNo()), titaVo);
 				// 案件編號,核准號碼
-				tFacMain = sFacMainService.findById(new FacMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo()),
-						titaVo);
+				tFacMain = sFacMainService.findById(new FacMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo()), titaVo);
 				if (tFacMain != null) {
 
 					tFacCaseAppl = facCaseApplService.findById(tFacMain.getApplNo(), titaVo);
@@ -181,8 +179,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
 				if (tTxToDoDetail.getStatus() == 2) {// 已處理顯示登放序號
-					occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()
-							+ parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
+					occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
 				} else {
 					occursList.putParam("OORelNo", ""); // 登放序號
 				}

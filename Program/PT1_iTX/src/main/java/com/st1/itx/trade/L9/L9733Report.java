@@ -56,11 +56,10 @@ public class L9733Report extends MakeReport {
 	}
 
 	public boolean exportExcel(List<Map<String, String>> listL9733, TitaVo titaVo) throws LogicException {
-		
+
 		boolean result = true;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName,
-				"L9733_底稿_利率調整檢核-下調日為月底日.xlsx", "X817");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, "L9733_底稿_利率調整檢核-下調日為月底日.xlsx", "X817");
 
 		int row = 2;
 

@@ -119,8 +119,7 @@ public class L4103Batch extends TradeBuffer {
 
 		String checkMsg = "抽退票傳票明細表產檔已完成。   批號 = " + wkbatchNo;
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4103",
-				checkMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4103", checkMsg, titaVo);
 
 		return this.sendList();
 	}

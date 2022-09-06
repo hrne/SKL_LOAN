@@ -85,8 +85,7 @@ public class L6403Batch extends TradeBuffer {
 
 			tTxAuthGroup = new TxAuthGroup();
 			tTxAuthGroup = MoveToAuthGroup(iAuthNo, tTxAuthGroup, titaVo);
-			tTxAuthGroup.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tTxAuthGroup.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tTxAuthGroup.setCreateEmpNo(titaVo.getTlrNo());
 			try {
 				this.info("TxAuthGroup Authno = " + tTxAuthGroup.getAuthNo());
@@ -115,7 +114,6 @@ public class L6403Batch extends TradeBuffer {
 					dataLog.setEnv(titaVo, tTxAuthGroup2, tTxAuthGroup);
 					dataLog.exec("修改權限群組 " + tTxAuthGroup.getAuthNo());
 
-
 				} else if ("4".equals(iFunCode)) {
 					sTxAuthGroupService.delete(tTxAuthGroup);
 					DeleteAllAuthority(iAuthNo, titaVo);
@@ -129,8 +127,7 @@ public class L6403Batch extends TradeBuffer {
 			}
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
-				"已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "已成功更新權限群組" + iAuthNo + "交易權限", titaVo);
 
 		// 清除選單快取 Adam
 		menuBuilder.evict();
@@ -274,8 +271,7 @@ public class L6403Batch extends TradeBuffer {
 
 	}
 
-	private void InserOnetAuthority(String AuthNo, String TranNo, String CanFg, String InqFg, TitaVo titaVo)
-			throws LogicException {
+	private void InserOnetAuthority(String AuthNo, String TranNo, String CanFg, String InqFg, TitaVo titaVo) throws LogicException {
 //		this.info("L6403 > InserOnetAuthority = " + AuthNo + "/" + TranNo + "/" + CanFg + "/" + InqFg);
 		TxAuthority tTxAuthority = new TxAuthority();
 		int AuthFg = 0;
@@ -297,8 +293,7 @@ public class L6403Batch extends TradeBuffer {
 				TxAuthorityId tTxAuthorityId = new TxAuthorityId(AuthNo, TranNo);
 				tTxAuthority.setTxAuthorityId(tTxAuthorityId);
 				tTxAuthority.setAuthFg(AuthFg);
-				tTxAuthority.setCreateDate(
-						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tTxAuthority.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tTxAuthority.setCreateEmpNo(titaVo.getTlrNo());
 				sTxAuthorityService.insert(tTxAuthority, titaVo);
 			} catch (DBException e) {
@@ -336,7 +331,6 @@ public class L6403Batch extends TradeBuffer {
 			}
 		}
 	}
-
 
 	private String authFgX(int authfg) {
 		String r = "";

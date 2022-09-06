@@ -133,8 +133,7 @@ public class LNM34BPReport extends MakeReport {
 						} // 撥款序號
 						if (j == 5) {
 							DecimalFormat formatter = new DecimalFormat("0.000000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 						} // 貸放利率
 						if (j == 6) {

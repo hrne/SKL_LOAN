@@ -51,7 +51,7 @@ public class BS720ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		query.setParameter("YearMonth", YearMonth);
 		query.setParameter("YearMonthLast", YearMonthLast);
-		
+
 		return this.convertToMap(query);
 	}
 }

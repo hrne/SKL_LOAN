@@ -51,7 +51,7 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int BormNo = Integer.parseInt(titaVo.getParam("BORM_SEQ").toString());
 		String iTxtNo = titaVo.getParam("TxtNo").trim();
 		String iMrKey = titaVo.getParam("MrKey").trim();
-		
+
 		String sql = "SELECT A.\"TranNo\",";
 		sql += "B.\"TranItem\",";
 		sql += "A.\"CustNo\",";
@@ -73,15 +73,15 @@ public class L6932ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += "WHERE A.\"LastUpdate\" >= to_date(:TrDate1,'yyyymmdd hh24:mi:ss') AND A.\"LastUpdate\" <= to_date(:TrDate2,'yyyymmdd hh24:mi:ss') ";
 		}
-		
+
 		boolean skipCustNo = false;
-		//為客戶變更整合查詢及結清戶控管特殊處理
+		// 為客戶變更整合查詢及結清戶控管特殊處理
 		if (iMrKey.length() == 41 && "CustUKey:".equals(iMrKey.substring(0, 9))) {
 			skipCustNo = true;
 		} else if (CustNo > 0) {
 			sql += "AND A.\"CustNo\" = :CustNo ";
 		}
-		
+
 		if (FacmNo > 0) {
 			sql += "AND A.\"FacmNo\" = :FacmNo ";
 		}

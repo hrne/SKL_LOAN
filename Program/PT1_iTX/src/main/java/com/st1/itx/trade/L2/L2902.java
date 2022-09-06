@@ -92,92 +92,91 @@ public class L2902 extends TradeBuffer {
 
 		CustMain tCustMain = new CustMain();
 		FacMain tFacMain = new FacMain();
-		
+
 		// 測試該統編是否存在保證人檔
-		
+
 		tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		if (tCustMain == null) {
 			throw new LogicException("E2003", "該統編不存在客戶主檔 L2902(CustMain)");
 		}
-		
+
 		List<LinkedHashMap<String, String>> chkOccursList = null;
-		
+
 		Slice<Guarantor> slGuarantor = sGuarantorService.guaUKeyEq(tCustMain.getCustUKey(), this.index, this.limit, titaVo);
 		lGuarantor = slGuarantor == null ? null : slGuarantor.getContent();
 
 		if (lGuarantor != null) {
-			
-		  for (Guarantor tGuarantor : lGuarantor) {
-			// new occurs
-			OccursList occurslist = new OccursList();
-			// new Table
-			tCustMain = new CustMain();
-			tFacMain = new FacMain();
 
-			lLoanBorMain = new ArrayList<LoanBorMain>();
-			GuaAmt = BigDecimal.ZERO;
-			int[] test = { 0, 0 };
-
-			// 取額度號碼
-			tFacMain = sFacMainService.facmApplNoFirst(tGuarantor.getApproveNo(), titaVo);
-			if (tFacMain == null) {
-				tFacMain = new FacMain();
-			}
-			int custNo = tFacMain.getCustNo();
-			// 取戶號,戶名
-			tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
-			if (tCustMain == null) {
+			for (Guarantor tGuarantor : lGuarantor) {
+				// new occurs
+				OccursList occurslist = new OccursList();
+				// new Table
 				tCustMain = new CustMain();
-			}
-			// 取戶況,繳息迄日
-			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(tFacMain.getCustNo(), tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
+				tFacMain = new FacMain();
 
-			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-
-			if (lLoanBorMain != null && !lLoanBorMain.isEmpty()) {
-				test = judgeStatus(lLoanBorMain);
-				occurslist.putParam("OOStat", 1);
-			} else {
-				occurslist.putParam("OOStat", 0);
-			}
-
-			if (lLoanBorMain != null) {
-				for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
-					GuaAmt = GuaAmt.add(tmpLoanBorMain.getLoanBal());
-				}
-			} else {
+				lLoanBorMain = new ArrayList<LoanBorMain>();
 				GuaAmt = BigDecimal.ZERO;
+				int[] test = { 0, 0 };
+
+				// 取額度號碼
+				tFacMain = sFacMainService.facmApplNoFirst(tGuarantor.getApproveNo(), titaVo);
+				if (tFacMain == null) {
+					tFacMain = new FacMain();
+				}
+				int custNo = tFacMain.getCustNo();
+				// 取戶號,戶名
+				tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+				if (tCustMain == null) {
+					tCustMain = new CustMain();
+				}
+				// 取戶況,繳息迄日
+				Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(tFacMain.getCustNo(), tFacMain.getFacmNo(), tFacMain.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
+
+				lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+
+				if (lLoanBorMain != null && !lLoanBorMain.isEmpty()) {
+					test = judgeStatus(lLoanBorMain);
+					occurslist.putParam("OOStat", 1);
+				} else {
+					occurslist.putParam("OOStat", 0);
+				}
+
+				if (lLoanBorMain != null) {
+					for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
+						GuaAmt = GuaAmt.add(tmpLoanBorMain.getLoanBal());
+					}
+				} else {
+					GuaAmt = BigDecimal.ZERO;
+				}
+
+				occurslist.putParam("OCustNo", tFacMain.getCustNo());
+				occurslist.putParam("OFacmNo", tFacMain.getFacmNo());
+				occurslist.putParam("OOCustName", tCustMain.getCustName());
+				occurslist.putParam("OOCustStat", test[0]);
+				// 最高保證金額
+				occurslist.putParam("OOHighGuaAmt", tGuarantor.getGuaAmt());
+				occurslist.putParam("OOGuaAmt", GuaAmt);
+				occurslist.putParam("OOPayIntDate", test[1]);
+				occurslist.putParam("OOGuaStatCode", tGuarantor.getGuaStatCode());
+
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occurslist);
+			} // for
+
+			chkOccursList = this.totaVo.getOccursList();
+
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			if (slGuarantor != null && slGuarantor.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
 			}
-
-			occurslist.putParam("OCustNo", tFacMain.getCustNo());
-			occurslist.putParam("OFacmNo", tFacMain.getFacmNo());
-			occurslist.putParam("OOCustName", tCustMain.getCustName());
-			occurslist.putParam("OOCustStat", test[0]);
-			// 最高保證金額
-			occurslist.putParam("OOHighGuaAmt", tGuarantor.getGuaAmt());
-			occurslist.putParam("OOGuaAmt", GuaAmt);
-			occurslist.putParam("OOPayIntDate", test[1]);
-			occurslist.putParam("OOGuaStatCode",tGuarantor.getGuaStatCode());
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occurslist);
-		  } // for
-		  
-		  chkOccursList = this.totaVo.getOccursList();
-			
-		  /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		  if (slGuarantor != null && slGuarantor.hasNext()) {
-			  titaVo.setReturnIndex(this.setIndexNext());
-			  /* 手動折返 */
-			  this.totaVo.setMsgEndToEnter();
-		  }
 		} // if
-		
-		
+
 		if (chkOccursList == null && titaVo.getReturnIndex() == 0) {
 			throw new LogicException("E2003", ""); // 查無資料
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -43,7 +43,7 @@ public class L2632 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
-	
+
 	@Autowired
 	AcReceivableCom acReceivableCom;
 
@@ -75,7 +75,7 @@ public class L2632 extends TradeBuffer {
 		BigDecimal iCloseAmt = parse.stringToBigDecimal(titaVo.getParam("TimCloseAmt"));
 		// 作業項目
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode"));
-		
+
 		// new PK
 		FacCloseId FacCloseId = new FacCloseId();
 		FacCloseId.setCustNo(iCustNo);
@@ -91,7 +91,6 @@ public class L2632 extends TradeBuffer {
 			}
 			// 變更前
 			FacClose beforeFacClose = (FacClose) dataLog.clone(tFacClose);
-
 
 			tFacClose.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			tFacClose.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDate")));
@@ -115,13 +114,13 @@ public class L2632 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-			
+
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeFacClose, tFacClose);
 			dataLog.exec();
 			// 刪除
 		} else if (iFunCd == 4) {
-			
+
 			FacClose tFacClose4 = sFacCloseService.holdById(FacCloseId);
 			logger.info(" L2632 tFacClose4" + tFacClose4);
 			if (tFacClose4 == null) {
@@ -136,7 +135,7 @@ public class L2632 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
 			if (iItemCode == 2) {
-				
+
 				// 銷帳
 				AcReceivable acReceivable = new AcReceivable();
 				List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
@@ -149,13 +148,13 @@ public class L2632 extends TradeBuffer {
 				acReceivableList.add(acReceivable);
 				acReceivableCom.setTxBuffer(this.getTxBuffer());
 				acReceivableCom.mnt(2, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
-				
+
 			}
-			
+
 		} else if (iFunCd == 5) {
-			
+
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

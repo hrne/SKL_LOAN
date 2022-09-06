@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,16 +20,17 @@ import com.st1.itx.db.domain.InsuRenewMediaTemp;
  */
 public interface InsuRenewMediaTempRepositoryMon extends JpaRepository<InsuRenewMediaTemp, Long> {
 
-  // FireInsuMonth >= ,AND FireInsuMonth <= 
-  public Slice<InsuRenewMediaTemp> findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAscSeqAsc(String fireInsuMonth_0, String fireInsuMonth_1, Pageable pageable);
+	// FireInsuMonth >= ,AND FireInsuMonth <=
+	public Slice<InsuRenewMediaTemp> findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqualOrderByFireInsuMonthAscCustNoAscSeqAsc(String fireInsuMonth_0, String fireInsuMonth_1,
+			Pageable pageable);
 
-  // FireInsuMonth = ,AND ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND InsuNo =
-  public Optional<InsuRenewMediaTemp> findTopByFireInsuMonthIsAndClCode1IsAndClCode2IsAndClNoIsAndInsuNoIs(String fireInsuMonth_0, String clCode1_1, String clCode2_2, String clNo_3, String insuNo_4);
+	// FireInsuMonth = ,AND ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND InsuNo =
+	public Optional<InsuRenewMediaTemp> findTopByFireInsuMonthIsAndClCode1IsAndClCode2IsAndClNoIsAndInsuNoIs(String fireInsuMonth_0, String clCode1_1, String clCode2_2, String clNo_3,
+			String insuNo_4);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<InsuRenewMediaTemp> findByLogNo(Long logNo);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<InsuRenewMediaTemp> findByLogNo(Long logNo);
 
 }
-

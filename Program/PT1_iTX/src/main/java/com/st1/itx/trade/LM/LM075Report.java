@@ -24,13 +24,13 @@ public class LM075Report extends MakeReport {
 
 	@Autowired
 	LM075ServiceImpl lM075ServiceImpl;
-	
+
 	@Autowired
 	Parse parse;
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	private static final BigDecimal hundredMillion = new BigDecimal("100000000");
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -42,7 +42,7 @@ public class LM075Report extends MakeReport {
 		List<Map<String, String>> lLM075 = null;
 
 		try {
-			lLM075 = lM075ServiceImpl.findAll(titaVo, iAcDate/100);
+			lLM075 = lM075ServiceImpl.findAll(titaVo, iAcDate / 100);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -63,7 +63,7 @@ public class LM075Report extends MakeReport {
 
 		this.info("LM075Report exportExcel");
 		int entdy = date - 19110000; // expects date to be in BC Date format.
-		String YearMonth = entdy/10000 + " 年 " + String.format("%02d", entdy/100%100) + " 月";
+		String YearMonth = entdy / 10000 + " 年 " + String.format("%02d", entdy / 100 % 100) + " 月";
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM075", "B041金融機構承作「自然人購置住宅貸款」統計表", "LM075_B041金融機構承作「自然人購置住宅貸款」統計表" + showRocDate(entdy, 0).substring(0, 7),
 				"LM075_底稿_B041金融機構承作「自然人購置住宅貸款」統計表.xlsx", 1, "FOA");
@@ -91,9 +91,8 @@ public class LM075Report extends MakeReport {
 					// if specific column needs special treatment, insert case here.
 					case 0:
 						// RuleCode: 01/03 - col 3~6 (+0)
-						// 02/04/05 - col 7~10 (+4)						
-						switch (value)
-						{
+						// 02/04/05 - col 7~10 (+4)
+						switch (value) {
 						case "01":
 						case "03":
 							colShift = 0;
@@ -142,6 +141,6 @@ public class LM075Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 	}
 }

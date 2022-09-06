@@ -43,7 +43,7 @@ public class L1103 extends TradeBuffer {
 
 	@Autowired
 	public DataLog iDataLog;
-	
+
 	@Autowired
 	public SendRsp sendRsp;
 
@@ -74,11 +74,11 @@ public class L1103 extends TradeBuffer {
 		if (!titaVo.getHsupCode().equals("1")) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "");
 		}
-		
+
 		// 鎖定這筆
 		tCustMain = iCustMainService.holdById(tCustMain);
 
-		mntCust(titaVo,tCustMain);
+		mntCust(titaVo, tCustMain);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -327,8 +327,7 @@ public class L1103 extends TradeBuffer {
 			if (titaVo.getParam("IncomedatadateAft").equals("")) {
 				tCustMain.setIncomeDataDate("");
 			} else {
-				tCustMain.setIncomeDataDate(
-						"" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
+				tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
 			}
 
 		}
@@ -381,7 +380,7 @@ public class L1103 extends TradeBuffer {
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
 		iDataLog.exec("修改顧客資料", "CustUKey:" + tCustMain.getCustUKey());
-		
+
 		// 若修改戶名,則同步維護電話檔(只維護與顧客關係=00本人之資料)
 		if (titaVo.getParam("CustNameInd").equals("X")) {
 			String custUKey = tCustMain.getCustUKey().trim();
@@ -410,9 +409,8 @@ public class L1103 extends TradeBuffer {
 			}
 		}
 
-		
 	}
-	
+
 	// 原二段式交易
 
 	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
@@ -518,7 +516,7 @@ public class L1103 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0017", " "); // 該筆交易狀態非待放行，不可做交易放行
 			}
 
-			mntCust(titaVo,tCustMain);
+			mntCust(titaVo, tCustMain);
 
 		}
 
@@ -762,8 +760,7 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateBef").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate(
-							"" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBef")) + 191100));
+					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBef")) + 191100));
 				}
 
 			}
@@ -826,8 +823,7 @@ public class L1103 extends TradeBuffer {
 					}
 				}
 			}
-			
-			
+
 		}
 
 		this.addList(this.totaVo);

@@ -131,8 +131,8 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 			queryttext += " and s.\"LegalPsn\" = '" + iLegalPsn + "' ";
 			break;
 		}
-		this.info("iCityCode=="+iCityCode);
-		if (!iCityCode.equals("00") ) {
+		this.info("iCityCode==" + iCityCode);
+		if (!iCityCode.equals("00")) {
 			queryttext += " and s.\"CityCode\" =  '" + iCityCode + "'"; // 擔保品地區別
 		}
 

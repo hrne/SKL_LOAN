@@ -90,12 +90,10 @@ public class L4901 extends TradeBuffer {
 			slBankRemit = bankRemitService.findL4901A(iCustNo, this.index, this.limit);
 			break;
 		case 2: // 批號
-			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index,
-					this.limit, titaVo);
+			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index, this.limit, titaVo);
 			break;
 		case 3: // 全部批號
-			slBankRemit = bankRemitService.findL4901C(iAcDate, drawdownCodeS, drawdownCodeE, 0, 9, this.index,
-					this.limit, titaVo);
+			slBankRemit = bankRemitService.findL4901C(iAcDate, drawdownCodeS, drawdownCodeE, 0, 9, this.index, this.limit, titaVo);
 			break;
 		}
 
@@ -155,8 +153,7 @@ public class L4901 extends TradeBuffer {
 
 			CdBank tCdBank = new CdBank();
 			if (!tBankRemit.getRemitBranch().isEmpty()) {
-				tCdBank = cdBankService.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()),
-						titaVo);
+				tCdBank = cdBankService.findById(new CdBankId(tBankRemit.getRemitBank(), tBankRemit.getRemitBranch()), titaVo);
 			}
 			String ckItem = "";
 			String brItem = "";
@@ -187,7 +184,7 @@ public class L4901 extends TradeBuffer {
 			occursList.putParam("OOPayCode", tBankRemit.getPayCode());
 			occursList.putParam("OOPayCodeX", payCodeItem);
 			occursList.putParam("OORelNo", relNo);
-			occursList.putParam("OOBankCode", tBankRemit.getRemitBank()+tBankRemit.getRemitBranch());
+			occursList.putParam("OOBankCode", tBankRemit.getRemitBank() + tBankRemit.getRemitBranch());
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

@@ -112,22 +112,19 @@ public class L2604 extends TradeBuffer {
 		}
 		wkAcctCode = tCdSyndFee.getAcctCode();
 		// 檢查業務科目戶號額度費用項目下是否有資料 有資料則流水號編號+1 若無資料流水號編號1
-		slAcReceivable = sAcReceivableService.useL2062Eq(wkAcctCode, iCustNo, iFacmNo, iFacmNo, 0, 1, 0,
-				Integer.MAX_VALUE, titaVo);
+		slAcReceivable = sAcReceivableService.useL2062Eq(wkAcctCode, iCustNo, iFacmNo, iFacmNo, 0, 1, 0, Integer.MAX_VALUE, titaVo);
 		if (slAcReceivable != null) {
 			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 			for (AcReceivable t : lAcReceivable) {
 				this.info("AcReceivable RvNo = " + t.getRvNo());
 				// 檢查SL 是否為聯貸費用
-				if (!("".equals(t.getRvNo())) && t.getRvNo().length() >= 9
-						&& "SL".equals(t.getRvNo().substring(0, 2))) {
+				if (!("".equals(t.getRvNo())) && t.getRvNo().length() >= 9 && "SL".equals(t.getRvNo().substring(0, 2))) {
 					String tSyndFeeCode = "";
 					tSyndFeeCode = t.getRvNo().substring(3, 5);
 					this.info(" RvNo  tSyndFeeCode = " + tSyndFeeCode);
 					// 檢查是否同費用項目
 					// 流水號取最大
-					if (tSyndFeeCode.equals(iSyndFeeCode)
-							&& parse.stringToInteger(t.getRvNo().substring(7, 9)) > wkSeq) {
+					if (tSyndFeeCode.equals(iSyndFeeCode) && parse.stringToInteger(t.getRvNo().substring(7, 9)) > wkSeq) {
 						wkSeq = parse.stringToInteger(t.getRvNo().substring(7, 9));
 						this.info("RvNo wkSeq = " + wkSeq);
 					} else {
@@ -201,8 +198,7 @@ public class L2604 extends TradeBuffer {
 			}
 			// 一般
 			else {
-				AcReceivable tAcReceivable = sAcReceivableService
-						.holdById(new AcReceivableId(iOldAcctCode, iOldCustNo, iOldFacmNo, iOldRvNo), titaVo);
+				AcReceivable tAcReceivable = sAcReceivableService.holdById(new AcReceivableId(iOldAcctCode, iOldCustNo, iOldFacmNo, iOldRvNo), titaVo);
 				if (tAcReceivable == null) {
 					throw new LogicException(titaVo, "E2003", "此筆資料不存在銷帳檔"); // 查無資料
 				}
@@ -252,8 +248,7 @@ public class L2604 extends TradeBuffer {
 				// 銷帳編號 = SL+費用代碼(2)+流水號(3)
 				if ("".equals(iOldRvNo)) {
 
-					tAcReceivable.setRvNo("SL" + "-" + iSyndFeeCode + "-" + parse.IntegerToString(wkSeq, 3) + "-"
-							+ titaVo.getParam("YearMonth" + i)); // 銷帳編號
+					tAcReceivable.setRvNo("SL" + "-" + iSyndFeeCode + "-" + parse.IntegerToString(wkSeq, 3) + "-" + titaVo.getParam("YearMonth" + i)); // 銷帳編號
 				} else {
 					tAcReceivable.setRvNo(iOldRvNo + "-" + titaVo.getParam("YearMonth" + i));// 銷帳編號
 				}
@@ -286,8 +281,7 @@ public class L2604 extends TradeBuffer {
 		// 額度 3
 		tAcReceivable.setFacmNo(iFacmNo);
 		// 銷帳編號 = SL+費用代碼(2)+流水號(3)+費用年月
-		tAcReceivable
-				.setRvNo("SL" + "-" + iSyndFeeCode + "-" + parse.IntegerToString(wkSeq, 3) + "-" + iSyndFeeYearMonth); // 銷帳編號
+		tAcReceivable.setRvNo("SL" + "-" + iSyndFeeCode + "-" + parse.IntegerToString(wkSeq, 3) + "-" + iSyndFeeYearMonth); // 銷帳編號
 		tAcReceivable.setSlipNote(iRmk); // 備註
 		tAcReceivable.setOpenAcDate(this.txBuffer.getTxCom().getTbsdy());
 
@@ -302,8 +296,7 @@ public class L2604 extends TradeBuffer {
 	private void DelAcReceivableRoutine() throws LogicException {
 		this.info("DelAcReceivableRoutine ...");
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
-		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iOldRvNo + "%", 0, Integer.MAX_VALUE,
-				titaVo);
+		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iOldRvNo + "%", 0, Integer.MAX_VALUE, titaVo);
 
 		if (slAcReceivable != null) {
 			lAcReceivable = slAcReceivable == null ? null : new ArrayList<>(slAcReceivable.getContent());

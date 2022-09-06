@@ -100,7 +100,6 @@ public class ApControl extends SysLogger {
 	@PostConstruct
 	public void init() {
 		this.mustInfo("Test DataBase Transaction....");
-		TxCurrService txCurrService = MySpring.getBean("txCurrService", TxCurrService.class);
 		int tryTimes = 0;
 		while (true) {
 			if (tryTimes > 35) {
@@ -108,6 +107,7 @@ public class ApControl extends SysLogger {
 				throw new TransactionException("DataBase Transaction Fail");
 			}
 			try {
+				TxCurrService txCurrService = MySpring.getBean("txCurrService", TxCurrService.class);
 				txCurrService.findAll(0, Integer.MAX_VALUE);
 				this.mustInfo("Transaction Test OK....");
 				break;

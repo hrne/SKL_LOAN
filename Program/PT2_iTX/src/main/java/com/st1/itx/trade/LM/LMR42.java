@@ -49,7 +49,7 @@ public class LMR42 extends TradeBuffer {
 		int yearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 
 		Slice<MonthlyLM042RBC> sMonthlyLM042RBC;
-		
+
 		sMonthlyLM042RBC = sMonthlyLM042RBCService.findYearMonthAll(yearMonth, 0, 12, titaVo);
 
 		// 判斷有無當月資料

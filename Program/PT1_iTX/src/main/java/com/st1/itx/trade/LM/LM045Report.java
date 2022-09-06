@@ -28,7 +28,7 @@ public class LM045Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -95,21 +95,19 @@ public class LM045Report extends MakeReport {
 
 				for (int i = 0; i < 13; i++) {
 					int ymOutput = yyymm / 100 * 100;
-					
-					if (i == 0)
-					{
+
+					if (i == 0) {
 						ymOutput = ymOutput - 100 + 12; // 去年十二月
-					} else
-					{
+					} else {
 						ymOutput += i;
 					}
-					
+
 					makeExcel.setValue(3 + collPsnCount * 5, 3 + i, ymOutput, "#");
 				}
 
 				// 輸出 "與yyy年底相較"
 
-				makeExcel.setValue(3 + collPsnCount * 5, 16, "與" + (yyymm/100-1) + "年底相較");
+				makeExcel.setValue(3 + collPsnCount * 5, 16, "與" + (yyymm / 100 - 1) + "年底相較");
 
 				// 輸出姓名 / 員編
 
@@ -139,7 +137,7 @@ public class LM045Report extends MakeReport {
 			makeExcel.setValue(4 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, getBigDecimal(tLDVo.get("F2")), "#,##0");
 			makeExcel.setValue(5 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, getBigDecimal(tLDVo.get("F3")), "#,##0");
 			makeExcel.setValue(6 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, getBigDecimal(tLDVo.get("F4")), "#,##0");
-			
+
 			// 測試時發現MakeExcel會把每個大行（per AccCollPsn）的底部框線吃掉
 			// 暫時用這個方法解決，但會造成範圍內每格都有四邊框線的現象
 			// 可能要問MakeExcel
@@ -177,7 +175,7 @@ public class LM045Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 
 	}
 

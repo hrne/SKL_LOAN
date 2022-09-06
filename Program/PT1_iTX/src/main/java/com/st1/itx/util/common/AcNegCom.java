@@ -341,8 +341,7 @@ public class AcNegCom extends TradeBuffer {
 		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		if (slNegAppr02 != null) {
 			for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
-				if (tNegAppr02.getAcDate() == 0
-						&& ("4001".equals(tNegAppr02.getStatusCode()) && tNegAppr02.getTxAmt().compareTo(txAmt) == 0)) {// 須為檢核成功之資料
+				if (tNegAppr02.getAcDate() == 0 && ("4001".equals(tNegAppr02.getStatusCode()) && tNegAppr02.getTxAmt().compareTo(txAmt) == 0)) {// 須為檢核成功之資料
 					AcDetail acDetail = new AcDetail();
 					acDetail.setDbCr("C");
 					acDetail.setSumNo("094"); // 094 :轉債協暫收款

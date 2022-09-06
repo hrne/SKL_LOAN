@@ -55,14 +55,12 @@ public class LM085Report extends MakeReport {
 		String unitCode = titaVo.getParam("UnitCode").toString();
 
 		// 開啟指定檔案
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM085",
-				"放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")", "LM085-" + iRocYeatMonth + "_放款逾期月報表",
-				"LM085_底稿_放款逾期月報表.xlsx", "X月");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM085", "放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")", "LM085-" + iRocYeatMonth + "_放款逾期月報表", "LM085_底稿_放款逾期月報表.xlsx",
+				"X月");
 
 		makeExcel.setSheet("X月", iYearMonth % 100 + "月");
 
-		makeExcel.setValue(2, 1,
-				"－" + (iRocYeatMonth / 100) + "." + String.format("%02d", (iRocYeatMonth % 100)) + "－");
+		makeExcel.setValue(2, 1, "－" + (iRocYeatMonth / 100) + "." + String.format("%02d", (iRocYeatMonth % 100)) + "－");
 
 		makeExcel.setValue(3, 7, "單位：" + unitName, "R");
 		makeExcel.setValue(26, 7, "單位：" + unitName, "R");
@@ -179,7 +177,7 @@ public class LM085Report extends MakeReport {
 			// B18
 			makeExcel.formulaCalculate(18, 2);
 
-			BigDecimal legalLoss =  dataList.get(0).get("LegalLoss")==null ||  dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO:new BigDecimal(dataList.get(0).get("LegalLoss"));
+			BigDecimal legalLoss = dataList.get(0).get("LegalLoss") == null || dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO : new BigDecimal(dataList.get(0).get("LegalLoss"));
 			makeExcel.setValue(20, 2, legalLoss, "#,000", "C");
 
 			break;
@@ -187,8 +185,7 @@ public class LM085Report extends MakeReport {
 			row = 17;
 			for (Map<String, String> r : dataList) {
 				int rowSpace = Integer.valueOf(r.get("F0"));
-				BigDecimal percent = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
-						: new BigDecimal(r.get("F1"));
+				BigDecimal percent = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO : new BigDecimal(r.get("F1"));
 
 				makeExcel.setValue(row + rowSpace, 6, percent, "0.000 %");
 			}
@@ -201,8 +198,7 @@ public class LM085Report extends MakeReport {
 			row = 24;
 			for (Map<String, String> r : dataList) {
 				int count = Integer.valueOf(r.get("F0"));
-				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
-						: new BigDecimal(r.get("F1"));
+				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO : new BigDecimal(r.get("F1"));
 
 				this.info("count=" + count);
 				this.info("amt=" + amt);
@@ -362,8 +358,7 @@ public class LM085Report extends MakeReport {
 			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
 
 			// 逾放比
-			makeExcel.setValue(vaRow, 6, getBigDecimal(r.get("F4").toString())
-					.divide(getBigDecimal(r.get("F2").toString()), 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
+			makeExcel.setValue(vaRow, 6, getBigDecimal(r.get("F4").toString()).divide(getBigDecimal(r.get("F2").toString()), 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
 
 			// 當年度轉呆金額
 			col = enToNumber(r.get("F5").toString());

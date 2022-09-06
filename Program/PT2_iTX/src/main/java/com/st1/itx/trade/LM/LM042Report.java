@@ -111,8 +111,7 @@ public class LM042Report extends MakeReport {
 	public boolean exec(TitaVo titaVo, int lastYMD, int thisYMD) throws LogicException {
 		this.info("LM042Report.exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM042", "RBC表_會計部", "LM042-RBC表_會計部",
-				"LM042_底稿_RBC表_會計部_共三份.xlsx", "統計數");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM042", "RBC表_會計部", "LM042-RBC表_會計部", "LM042_底稿_RBC表_會計部_共三份.xlsx", "統計數");
 
 		iYear = thisYMD / 10000;
 		iMonth = (thisYMD / 100) % 100;
@@ -452,8 +451,7 @@ public class LM042Report extends MakeReport {
 			// J6 C非
 			cN1loseToTalAmt = cY1Amt.subtract(cHouseAndRepair);
 			cN1loseToTalAmt = cN1loseToTalAmt.multiply(percent0_005).setScale(0, BigDecimal.ROUND_HALF_UP);
-			cN1loseToTalAmt = cN1loseToTalAmt
-					.add(cHouseAndRepair.multiply(percent0_015).setScale(0, BigDecimal.ROUND_HALF_UP));
+			cN1loseToTalAmt = cN1loseToTalAmt.add(cHouseAndRepair.multiply(percent0_015).setScale(0, BigDecimal.ROUND_HALF_UP));
 			makeExcel.setValue(6, 10, cN1loseToTalAmt, "#,##0");
 
 			// J7 D
@@ -838,8 +836,7 @@ public class LM042Report extends MakeReport {
 	 * @param relatedCode 是否為利害關係人
 	 * @param amt         金額
 	 */
-	private void updateAmt(TitaVo titaVo, int yearMonth, String loanType, String loanItem, String relatedCode,
-			BigDecimal amt) throws LogicException {
+	private void updateAmt(TitaVo titaVo, int yearMonth, String loanType, String loanItem, String relatedCode, BigDecimal amt) throws LogicException {
 		MonthlyLM042RBC cMonthlyLM042RBC = new MonthlyLM042RBC();
 		MonthlyLM042RBCId cMonthlyLM042RBCId = new MonthlyLM042RBCId();
 
@@ -887,11 +884,9 @@ public class LM042Report extends MakeReport {
 
 		monthlyLM042RBC.setRiskFactor(new BigDecimal("0.0018"));
 		monthlyLM042RBC.setLoanAmount(allTotalAmt);
-		monthlyLM042RBC
-				.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		monthlyLM042RBC.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		monthlyLM042RBC.setCreateEmpNo("001718");
-		monthlyLM042RBC
-				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		monthlyLM042RBC.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		monthlyLM042RBC.setLastUpdateEmpNo("001718");
 
 		this.info("monthlyLM042RBC List=" + monthlyLM042RBC.toString());

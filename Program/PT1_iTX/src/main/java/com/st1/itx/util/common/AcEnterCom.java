@@ -215,8 +215,7 @@ public class AcEnterCom extends TradeBuffer {
 //	    	1.沖正，create 借貸相反之新分錄 
 //          2.訂正或主管放行， Load from AcDetail DB 
 //          3.正常交易，from txBuffer
-		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, this.index, Integer.MAX_VALUE,
-				titaVo); // findByTxseq
+		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, this.index, Integer.MAX_VALUE, titaVo); // findByTxseq
 		if (slAcList != null) {
 			for (AcDetail ac : slAcList.getContent()) {
 				// 沖正及被沖正不loand
@@ -321,8 +320,7 @@ public class AcEnterCom extends TradeBuffer {
 			if (slAcList != null && titaVo.isHcodeModify()) {
 				for (AcDetail ac : slAcList.getContent()) {
 					// 修正的沖正分錄紀錄主管
-					if (ac.getTitaTlrNo().equals(titaVo.getTlrNo())
-							&& parse.IntegerToString(ac.getTitaTxtNo(), 8).equals(titaVo.getTxtNo())) {
+					if (ac.getTitaTlrNo().equals(titaVo.getTlrNo()) && parse.IntegerToString(ac.getTitaTxtNo(), 8).equals(titaVo.getTxtNo())) {
 						ac.setTitaSupNo(titaVo.getParam("EraseSupNo"));
 						acListAll.add(ac);
 					}
@@ -467,8 +465,7 @@ public class AcEnterCom extends TradeBuffer {
 			}
 			// 訂正傳票批號需相同
 			if (AcHCode == 1 && SlipBatNo != acList.get(0).getSlipBatNo()) {
-				throw new LogicException(titaVo, "E6003",
-						"再開帳後，不可訂正前批關帳之帳務, " + SlipBatNo + "<>" + acList.get(0).getSlipBatNo());
+				throw new LogicException(titaVo, "E6003", "再開帳後，不可訂正前批關帳之帳務, " + SlipBatNo + "<>" + acList.get(0).getSlipBatNo());
 			}
 		}
 
@@ -528,17 +525,14 @@ public class AcEnterCom extends TradeBuffer {
 		}
 		for (AcDetail ac : acList) {
 			if (ac.getEntAc() == 0) {
-				this.info(checkAc + ac.getDbCr() + " " + ac.getAcctCode() + " "
-						+ FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-"
-						+ ac.getBormNo() + " " + ac.getRvNo());
+				this.info(checkAc + ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " "
+						+ ac.getRvNo());
 			}
 		}
-		this.info(checkAc + "DB=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", Cr=" + CrAmt + ", diff="
-				+ DbAmt.subtract(CrAmt));
+		this.info(checkAc + "DB=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", Cr=" + CrAmt + ", diff=" + DbAmt.subtract(CrAmt));
 
 		if (DbAmt.compareTo(CrAmt) != 0) {
-			throw new LogicException(titaVo, "E6003", "借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方="
-					+ CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
+			throw new LogicException(titaVo, "E6003", "借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方=" + CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
 		}
 	}
 
@@ -640,8 +634,7 @@ public class AcEnterCom extends TradeBuffer {
 				// 隔日沖正，將來源科目沖至暫收款－沖正(THC)
 				if (ac.getDbCr().equals("D") && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
 					// 整批入帳的沖正，還款來源(1xx-應收)回沖至暫收款-冲正收
-					if (acDetail.getSumNo() != null && acDetail.getSumNo().length() == 3
-							&& "1".equals(ac.getSumNo().substring(0, 1))) {
+					if (acDetail.getSumNo() != null && acDetail.getSumNo().length() == 3 && "1".equals(ac.getSumNo().substring(0, 1))) {
 
 						// 回沖至暫收款-冲正
 						acSeq++;

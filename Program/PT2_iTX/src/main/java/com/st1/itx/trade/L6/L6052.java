@@ -83,7 +83,7 @@ public class L6052 extends TradeBuffer {
 			occursList.putParam("OOLoanTotalLmt", tCdVarValue.getLoanTotalLmt());
 			occursList.putParam("OONoGurTotalLmt", tCdVarValue.getNoGurTotalLmt());
 			occursList.putParam("OOTotalequity", tCdVarValue.getTotalequity());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdVarValue.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdVarValue.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdVarValue.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdVarValue.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdVarValue.getLastUpdateEmpNo() + " " + empName(titaVo, tCdVarValue.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -94,11 +94,11 @@ public class L6052 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

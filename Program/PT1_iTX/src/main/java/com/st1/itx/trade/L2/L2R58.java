@@ -51,8 +51,7 @@ public class L2R58 extends TradeBuffer {
 		AcReceivable tAcReceivable = new AcReceivable();
 		Slice<AcReceivable> slAcReceivable = null;
 		int clsCnt = 0;
-		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iRvNo + "%", 0, Integer.MAX_VALUE,
-				titaVo);
+		slAcReceivable = sAcReceivableService.useL2r58Eq(iCustNo, iFacmNo, 0, 9, iRvNo + "%", 0, Integer.MAX_VALUE, titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		// 無資料 顯示錯誤訊息
 		if (lAcReceivable == null) {

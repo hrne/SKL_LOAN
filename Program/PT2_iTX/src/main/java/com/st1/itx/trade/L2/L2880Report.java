@@ -59,7 +59,7 @@ public class L2880Report extends MakeReport {
 		this.print(0, 53, "客戶別 . . . . .  " + titaVo.getParam("CustTypeCode") + "    " + titaVo.getParam("CustTypeCodeX"));
 		this.print(1, 10, "中文姓名 . . . .  " + titaVo.getParam("CustName"));
 		this.print(0, 53, "繳款方式 . . . .  " + titaVo.getParam("RepayCode") + "    " + titaVo.getParam("RepayCodeX"));
-		this.print(1, 10, "配偶姓名 . . . .  " + titaVo.getParam("SpouseName") + "    " +titaVo.getParam("SpouseId"));
+		this.print(1, 10, "配偶姓名 . . . .  " + titaVo.getParam("SpouseName") + "    " + titaVo.getParam("SpouseId"));
 		this.print(0, 53, "扣款銀行 . . . .  " + titaVo.getParam("RepayBank") + "    " + titaVo.getParam("RepayBankX"));
 		this.print(1, 10, "電子信箱 . . . .  " + titaVo.getParam("Email"));
 		this.print(2, 10, "基本利率代碼 . .  " + titaVo.getParam("ProdNo") + "  " + titaVo.getParam("ProdNoX"));

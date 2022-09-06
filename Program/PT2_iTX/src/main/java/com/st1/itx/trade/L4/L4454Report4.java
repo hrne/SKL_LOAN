@@ -58,8 +58,7 @@ public class L4454Report4 extends MakeReport {
 
 		this.info("交寄大宗限時掛號及掛號函件執據存根2聯單 Excel Start...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "交寄大宗限時掛號及掛號函件執據存根名單",
-				"交寄大宗限時掛號及掛號函件執據存根名單","交寄大宗限時掛號及掛號函件執據存根名單");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "交寄大宗限時掛號及掛號函件執據存根名單", "交寄大宗限時掛號及掛號函件執據存根名單", "交寄大宗限時掛號及掛號函件執據存根名單");
 
 		fontStyleVo = new ExcelFontStyleVo();
 

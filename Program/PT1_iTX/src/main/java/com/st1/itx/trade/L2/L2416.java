@@ -202,8 +202,7 @@ public class L2416 extends TradeBuffer {
 					InsertClLandReason(titaVo);
 
 					dataLog.setEnv(titaVo, beforeClLand, tClLand);
-					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
-							+ titaVo.getParam("ReasonX1"));
+					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
 				}
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
@@ -258,8 +257,7 @@ public class L2416 extends TradeBuffer {
 					InsertClLandReason(titaVo);
 
 					dataLog.setEnv(titaVo, beforeClLand, tClLand);
-					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " "
-							+ titaVo.getParam("ReasonX1"));
+					dataLog.exec("不動產土地修改原因: " + parse.stringToInteger(titaVo.getParam("Reason1")) + " " + titaVo.getParam("ReasonX1"));
 				}
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
@@ -325,9 +323,8 @@ public class L2416 extends TradeBuffer {
 			tClLand.setLandZoningCode(titaVo.getParam("LandZoningCode"));
 			tClLand.setLandUsageType(titaVo.getParam("LandUsageType"));
 			tClLand.setPostedLandValue(parse.stringToBigDecimal(titaVo.getParam("PostedLandValue")));
-			tClLand.setPostedLandValueYearMonth(parse.stringToInteger(
-					parse.IntegerToString(parse.stringToInteger(titaVo.getParam("PostedLandValueYear")) + 1911, 4)
-							+ (titaVo.getParam("PostedLandValueMonth"))));
+			tClLand.setPostedLandValueYearMonth(
+					parse.stringToInteger(parse.IntegerToString(parse.stringToInteger(titaVo.getParam("PostedLandValueYear")) + 1911, 4) + (titaVo.getParam("PostedLandValueMonth"))));
 			tClLand.setTransferedYear(parse.stringToInteger(titaVo.getParam("TransferedYear")) + 1911);
 			tClLand.setLastTransferedAmt(parse.stringToBigDecimal(titaVo.getParam("LastTransferedAmt")));
 			tClLand.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
@@ -396,8 +393,7 @@ public class L2416 extends TradeBuffer {
 
 	// delete 土地所有權人檔
 	private void deleteClLandOwner(TitaVo titaVo) throws LogicException {
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
-				Integer.MAX_VALUE);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE);
 		lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 
 		if (lClLandOwner != null && lClLandOwner.size() > 0) {

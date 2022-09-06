@@ -57,6 +57,6 @@ public class LM067 extends BatchBase implements Tasklet, InitializingBean {
 		}
 
 		thisYM = iYear * 100 + iMonth;
-		lm067report.exec(titaVo,thisYM);
+		lm067report.exec(titaVo, thisYM);
 	}
 }

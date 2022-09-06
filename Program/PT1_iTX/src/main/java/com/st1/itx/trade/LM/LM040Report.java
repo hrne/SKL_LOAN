@@ -40,13 +40,13 @@ public class LM040Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param yearMonth    西元年月
 	 * @param yearMonthEnd 月底日
 	 */
-	public boolean exec(TitaVo titaVo, int yearMonth ,int yearMonthEnd) throws LogicException {
+	public boolean exec(TitaVo titaVo, int yearMonth, int yearMonthEnd) throws LogicException {
 		List<Map<String, String>> LM040List = null;
 		try {
-			LM040List = lM040ServiceImpl.findAll(titaVo,yearMonth, yearMonthEnd);
+			LM040List = lM040ServiceImpl.findAll(titaVo, yearMonth, yearMonthEnd);
 			exportExcel(titaVo, LM040List);
 
 			return true;
@@ -63,8 +63,7 @@ public class LM040Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList) throws LogicException {
 		this.info("LM040Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM040", "地區別正常戶金額", "LM040地區別正常戶金額",
-				"LM040地區別正常戶金額.xlsx", "D960717");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM040", "地區別正常戶金額", "LM040地區別正常戶金額", "LM040地區別正常戶金額.xlsx", "D960717");
 		if (LMList == null || LMList.isEmpty()) {
 			makeExcel.setValue(3, 1, "本日無資料");
 		} else {

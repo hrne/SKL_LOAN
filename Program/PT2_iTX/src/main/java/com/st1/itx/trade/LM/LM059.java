@@ -67,6 +67,6 @@ public class LM059 extends BatchBase implements Tasklet, InitializingBean {
 		thisYM = iYear * 100 + iMonth;
 
 		lm059report.setTxBuffer(this.getTxBuffer());
-		lm059report.exec(titaVo, thisYM, ymEnd,lastYM);
+		lm059report.exec(titaVo, thisYM, ymEnd, lastYM);
 	}
 }

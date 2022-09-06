@@ -88,32 +88,25 @@ public class L4921 extends TradeBuffer {
 			sBatxOthers = batxOthersService.searchRuleE(adAcDate1, adAcDate2, this.index, this.limit, titaVo);
 			this.info("flag = E");
 		} else if ("".equals(strCreateEmpNo) && "99".equals(titaVo.getParam("RepayCode"))) {
-			sBatxOthers = batxOthersService.searchRuleA(adAcDate1, adAcDate2, strBatchNo, this.index, this.limit,
-					titaVo);
+			sBatxOthers = batxOthersService.searchRuleA(adAcDate1, adAcDate2, strBatchNo, this.index, this.limit, titaVo);
 			this.info("flag = A");
 		} else if ("99".equals(titaVo.getParam("RepayCode")) && "".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleG(adAcDate1, adAcDate2, strCreateEmpNo, this.index, this.limit,
-					titaVo);
+			sBatxOthers = batxOthersService.searchRuleG(adAcDate1, adAcDate2, strCreateEmpNo, this.index, this.limit, titaVo);
 			this.info("flag = G");
 		} else if ("".equals(strCreateEmpNo) && "".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleF(adAcDate1, adAcDate2, intRepayCode, this.index, this.limit,
-					titaVo);
+			sBatxOthers = batxOthersService.searchRuleF(adAcDate1, adAcDate2, intRepayCode, this.index, this.limit, titaVo);
 			this.info("flag = F");
 		} else if ("".equals(strCreateEmpNo)) {
-			sBatxOthers = batxOthersService.searchRuleB(adAcDate1, adAcDate2, strBatchNo, intRepayCode, this.index,
-					this.limit, titaVo);
+			sBatxOthers = batxOthersService.searchRuleB(adAcDate1, adAcDate2, strBatchNo, intRepayCode, this.index, this.limit, titaVo);
 			this.info("flag = B");
 		} else if ("99".equals(titaVo.getParam("RepayCode"))) {
-			sBatxOthers = batxOthersService.searchRuleC(adAcDate1, adAcDate2, strBatchNo, strCreateEmpNo, this.index,
-					this.limit);
+			sBatxOthers = batxOthersService.searchRuleC(adAcDate1, adAcDate2, strBatchNo, strCreateEmpNo, this.index, this.limit);
 			this.info("flag = C");
 		} else if ("".equals(strBatchNo)) {
-			sBatxOthers = batxOthersService.searchRuleH(adAcDate1, adAcDate2, intRepayCode, strCreateEmpNo, this.index,
-					this.limit, titaVo);
+			sBatxOthers = batxOthersService.searchRuleH(adAcDate1, adAcDate2, intRepayCode, strCreateEmpNo, this.index, this.limit, titaVo);
 			this.info("flag = H");
 		} else {
-			sBatxOthers = batxOthersService.searchRuleD(adAcDate1, adAcDate2, strBatchNo, intRepayCode, strCreateEmpNo,
-					this.index, this.limit, titaVo);
+			sBatxOthers = batxOthersService.searchRuleD(adAcDate1, adAcDate2, strBatchNo, intRepayCode, strCreateEmpNo, this.index, this.limit, titaVo);
 			this.info("flag = D");
 		}
 
@@ -138,8 +131,7 @@ public class L4921 extends TradeBuffer {
 					continue;
 				}
 				// 0已入帳 不顯示按紐
-				if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode())
-						|| "7".equals(tBatxDetail.getProcStsCode())) {
+				if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
 					flag = 0;
 				}
 				// 2已刪除 刪除控制不顯示兩按紐

@@ -503,29 +503,21 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		tCustMain = sCustMainService.custIdFirst(ownerId, titaVo);
 
 		if (tCustMain != null) {
-			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2)     THEN cblo.\"OwnerCustUKey\""
-					+ "      WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\""
-					+ "      WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\""
-					+ "      WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\""
-					+ " ELSE NULL END = :OwnerCustUKey");
+			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2)     THEN cblo.\"OwnerCustUKey\"" + "      WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\""
+					+ "      WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\"" + "      WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\"" + " ELSE NULL END = :OwnerCustUKey");
 		}
 		// SettingStat 設定狀態
 		int settingStat = parse.stringToInteger(titaVo.getParam("SettingStat"));
 		if (settingStat > 0) {
-			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingStat\""
-					+ "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"SettingStat\""
-					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"SettingStat\""
-					+ "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"SettingStat\""
+			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingStat\"" + "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"SettingStat\""
+					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"SettingStat\"" + "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"SettingStat\""
 					+ "         ELSE '0' END = :settingStat ");
 		}
 		// 擔保品狀態
 		int clStat = parse.stringToInteger(titaVo.getParam("ClStat"));
 		if (clStat > 0) {
-			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"ClStat\""
-					+ "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"ClStat\""
-					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"ClStat\""
-					+ "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"ClStat\""
-					+ "         ELSE '0' END = :clStat ");
+			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"ClStat\"" + "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"ClStat\""
+					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"ClStat\"" + "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"ClStat\"" + "         ELSE '0' END = :clStat ");
 		}
 
 		// 發行公司統編

@@ -44,6 +44,7 @@ public class L8430 extends TradeBuffer {
 	public JcicZ448LogService sJcicZ448LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8403 ");
@@ -58,20 +59,19 @@ public class L8430 extends TradeBuffer {
 		this.info("sJcicZ448     = " + sJcicZ448.getSize());
 		if (sJcicZ448 != null) {
 			for (JcicZ448 xJcicZ448 : sJcicZ448) {
-				if ((iSubmitType == 1 && xJcicZ448.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ448.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ448.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ448.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8328");
 					occursListB.putParam("OOHistoryTxCd", "L8058");
 					occursListB.putParam("OOCustId", xJcicZ448.getCustId());
 					occursListB.putParam("OOSubmitKey", xJcicZ448.getSubmitKey());
 					occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ448.getSubmitKey(), titaVo));
-                    occursListB.putParam("OOApplyDate", xJcicZ448.getApplyDate());
-                    occursListB.putParam("OOTranKey", xJcicZ448.getTranKey());
+					occursListB.putParam("OOApplyDate", xJcicZ448.getApplyDate());
+					occursListB.putParam("OOTranKey", xJcicZ448.getTranKey());
 					occursListB.putParam("OOCourtCode", xJcicZ448.getCourtCode());
-                    occursListB.putParam("OOMaxMainCode", xJcicZ448.getMaxMainCode());
-                    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ448.getMaxMainCode(), titaVo));
-                    // occursListB.putParam("OOTranCode", xJcicZ448.getTranCode());
+					occursListB.putParam("OOMaxMainCode", xJcicZ448.getMaxMainCode());
+					occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ448.getMaxMainCode(), titaVo));
+					// occursListB.putParam("OOTranCode", xJcicZ448.getTranCode());
 					occursListB.putParam("OOTranCode", "448");
 					int iActualFilingDate = 0;
 					iActualFilingDate = xJcicZ448.getActualFilingDate();
@@ -92,9 +92,9 @@ public class L8430 extends TradeBuffer {
 						occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ448.getSubmitKey(), titaVo));
 						occursListB.putParam("OOTranKey", xJcicZ448.getTranKey());
 						occursListB.putParam("OOApplyDate", xJcicZ448.getApplyDate());
-                        occursListB.putParam("OOCourtCode", xJcicZ448.getCourtCode());
-                        occursListB.putParam("OOMaxMainCode", xJcicZ448.getMaxMainCode());
-                        occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ448.getMaxMainCode(), titaVo));
+						occursListB.putParam("OOCourtCode", xJcicZ448.getCourtCode());
+						occursListB.putParam("OOMaxMainCode", xJcicZ448.getMaxMainCode());
+						occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ448.getMaxMainCode(), titaVo));
 //					occursListB.putParam("OOTranCode", xJcicZ448.getTranCode());
 						occursListB.putParam("OOTranCode", "448");
 						int iActualFilingDate = 0;

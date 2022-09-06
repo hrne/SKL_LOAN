@@ -58,8 +58,7 @@ public class L9732Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
-				TXCD + "_底稿_" + TXName + ".xlsx", "工作表1", "L9732_底稿_質押股票明細表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", "工作表1", "L9732_底稿_質押股票明細表");
 
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")));
 		String mmdd = showRocDate(iDAY, 1).substring(4);
@@ -89,7 +88,7 @@ public class L9732Report extends MakeReport {
 
 				// 擔保物提供人
 				makeExcel.setValue(row, 5, tLDVo.get("F20"));
-				
+
 				// 核貸成數 百分比
 				BigDecimal ratio = getBigDecimal(tLDVo.get("F5"));
 				makeExcel.setValue(row, 6, ratio, "R");
@@ -115,7 +114,7 @@ public class L9732Report extends MakeReport {
 				// 實貸成數 百分比
 				BigDecimal actual = getBigDecimal(tLDVo.get("F9"));
 				makeExcel.setValue(row, 12, actual, "R");
-				
+
 				// 每股貸放 小數點後兩位
 				BigDecimal share = getBigDecimal(tLDVo.get("F10"));
 				makeExcel.setValue(row, 13, share, "#,##0.00", "R");

@@ -83,8 +83,9 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 查詢明細(LM062~LM066覆審相關報表共用)
+	 * 
 	 * @param titaVo
-	 * @param yearMonth 西元年月
+	 * @param yearMonth     西元年月
 	 * @param conditionCode 條件代碼
 	 * 
 	 */

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.FinReportReviewId;
  */
 public interface FinReportReviewRepositoryDay extends JpaRepository<FinReportReview, FinReportReviewId> {
 
-  // CustUKey = 
-  public Slice<FinReportReview> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
+	// CustUKey =
+	public Slice<FinReportReview> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FinReportReview> findByFinReportReviewId(FinReportReviewId finReportReviewId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FinReportReview> findByFinReportReviewId(FinReportReviewId finReportReviewId);
 
 }
-

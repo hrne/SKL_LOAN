@@ -35,11 +35,10 @@ public class L9714Report extends MakeReport {
 	String f10 = "";
 	String f11 = "";
 	String f12 = "";
-	
-	
+
 	int cnt = 0;
 
-	//起始欄
+	// 起始欄
 	int colCount = 8;
 
 	@Override
@@ -75,33 +74,25 @@ public class L9714Report extends MakeReport {
 		this.print(-11, colCount + 67, "└─┴─────────────┘");
 
 		this.print(-13, colCount + 1, "┌────┬──────┬────────┬───────────────────────────┐");
-		this.print(-14, colCount + 1,
-				"│借戶姓名│            │房屋所有權人姓名│※                                                    │");
+		this.print(-14, colCount + 1, "│借戶姓名│            │房屋所有權人姓名│※                                                    │");
 		this.print(-15, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-16, colCount + 1,
-				"│統一編號│            │統一編號        │※                                                    │");
+		this.print(-16, colCount + 1, "│統一編號│            │統一編號        │※                                                    │");
 		this.print(-17, colCount + 1, "├────┼──────┼────────┼───────────────────────────┤");
-		this.print(-18, colCount + 1,
-				"│房屋稅籍│※          │房屋坐落        │※                                                    │");
+		this.print(-18, colCount + 1, "│房屋稅籍│※          │房屋坐落        │※                                                    │");
 		this.print(-19, colCount + 1, "└────┴──────┴────────┴───────────────────────────┘");
 
 		this.print(-21, colCount + 1, "┌──────┬───────┬─────────┬──────┬──────┬─────────┐");
-		this.print(-22, colCount + 1,
-				"│房屋所有權　│              │                  │            │            │      本期未償還　│");
+		this.print(-22, colCount + 1, "│房屋所有權　│              │                  │            │            │      本期未償還　│");
 		this.print(-23, colCount + 1, "│取得日※    │ 貸款帳號     │     最初貸款金額 │   貸款起日 │   貸款迄日 │      本金額（元）│");
 		this.print(-24, colCount + 1, "├──────┼───────┼─────────┼──────┼──────┼─────────┤");
-		this.print(-25, colCount + 1,
-				"│            │              │                  │            │            │                  │");
+		this.print(-25, colCount + 1, "│            │              │                  │            │            │                  │");
 		this.print(-26, colCount + 1, "└──────┴───────┴─────────┴──────┴──────┴─────────┘");
 
 		this.print(-28, colCount + 1, "┌──────────────┬────────────────┬────────────────┐");
-		this.print(-29, colCount + 1,
-				"│繳息所屬年月                │                      繳息金額　│                        用途別  │");
+		this.print(-29, colCount + 1, "│繳息所屬年月                │                      繳息金額　│                        用途別  │");
 		this.print(-30, colCount + 1, "├──────────────┼────────────────┼────────────────┤");
-		this.print(-31, colCount + 1,
-				"│自                          │                                │                                │");
-		this.print(-32, colCount + 1,
-				"│至                          │                                │                                │");
+		this.print(-31, colCount + 1, "│自                          │                                │                                │");
+		this.print(-32, colCount + 1, "│至                          │                                │                                │");
 
 		String tmp;
 
@@ -119,13 +110,13 @@ public class L9714Report extends MakeReport {
 		tmp = String.format("%07d", Integer.valueOf(f2)) + "-" + String.format("%03d", Integer.valueOf(f3));
 		this.print(-25, colCount + 18, tmp);
 		// 最初貸款金額
-		this.print(-25, colCount + 50, formatAmt(f4,0), "R");
+		this.print(-25, colCount + 50, formatAmt(f4, 0), "R");
 		// 貸款起日
-		this.print(-25, colCount + 64, showRocDate(f11, 1), "R"); 
+		this.print(-25, colCount + 64, showRocDate(f11, 1), "R");
 		// 貸款迄日
 		this.print(-25, colCount + 78, showRocDate(f12, 1), "R");
 		// 本期未償還本金額
-		this.print(-25, colCount + 98, formatAmt(f7,0), "R");
+		this.print(-25, colCount + 98, formatAmt(f7, 0), "R");
 		// 繳息期間
 		this.print(-31, colCount + 7, showRocDate(f5 + "01", 5)); // showRocDate 吃 yyymmdd, 加個dummy
 		this.print(-32, colCount + 7, showRocDate(f6 + "01", 5)); // showRocDate 吃 yyymmdd, 加個dummy
@@ -178,7 +169,7 @@ public class L9714Report extends MakeReport {
 					cnt = 0;
 
 				}
-				
+
 				printEnd();
 			}
 		} else {

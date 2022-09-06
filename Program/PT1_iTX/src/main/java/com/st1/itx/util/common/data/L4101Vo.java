@@ -151,11 +151,9 @@ public class L4101Vo extends FileVo {
 //			撥款:戶號-額度-撥款(15)
 //			退款:員編(6)+交易序號(8)
 			if (t.getDrawdownCode() == 1) { // 相關號碼 VARCHAR2 15
-				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getCustNo(), 7) + "-"
-						+ FormatUtil.pad9("" + t.getFacmNo(), 3) + "-" + FormatUtil.pad9("" + t.getBormNo(), 3);
+				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getCustNo(), 7) + "-" + FormatUtil.pad9("" + t.getFacmNo(), 3) + "-" + FormatUtil.pad9("" + t.getBormNo(), 3);
 			} else {
-				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getTitaTlrNo(), 6) + "-"
-						+ FormatUtil.pad9("" + t.getTitaTxtNo(), 8);
+				thisLine = thisLine + "," + FormatUtil.pad9("" + t.getTitaTlrNo(), 6) + "-" + FormatUtil.pad9("" + t.getTitaTxtNo(), 8);
 			}
 			if (t.getCustName().length() > 40) {
 				wkCustNm = t.getCustName().substring(0, 40);

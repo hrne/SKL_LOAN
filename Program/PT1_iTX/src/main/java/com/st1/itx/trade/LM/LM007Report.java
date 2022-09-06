@@ -36,13 +36,13 @@ public class LM007Report extends MakeReport {
 
 	// 合計總合
 	BigDecimal[] sumCounters = new BigDecimal[12];
-	
+
 	// 合計的合計（for 全部類輸出）
 	ArrayList<BigDecimal[]> totalTotal = new ArrayList<BigDecimal[]>();
 
 	// 各欄位的輸出座標
 	private static final int[] outputPos = new int[] { 8, 19, 32, 47, 60, 75, 88, 103, 116, 131, 146, 162 };
-	
+
 	// 千元單位
 	final static BigDecimal thousand = new BigDecimal("1000");
 
@@ -92,7 +92,7 @@ public class LM007Report extends MakeReport {
 		this.info("LM007Report exec iTbsdyf = " + iTbsdyf);
 
 		boolean isFirstPage = true;
-		
+
 		// 初始化 totalTotal
 		for (int i = 0; i <= 12; i++) // 0為dummy 1到12對應月份
 		{
@@ -121,7 +121,7 @@ public class LM007Report extends MakeReport {
 				} else {
 					isFirstPage = false;
 				}
-				
+
 				exportPdf(lLM007, "全部".equals(rptTypeItem));
 			}
 		}
@@ -135,9 +135,9 @@ public class LM007Report extends MakeReport {
 	}
 
 	private void exportPdf(List<Map<String, String>> lLM007, Boolean isTotal) throws LogicException {
-		
+
 		// isTotal 表示此次輸出是否為【全部】類
-		
+
 		// 為模擬原報表的四捨五入設計
 		// 【全部】類是用前面已輸出的結果 (totalTotal) 去加總輸出，而非實際數目 (query from serviceimpl) 化為千元後四捨五入
 		// 此外無論是哪一種類，合計、小計都是用該頁已輸出結果加總輸出
@@ -150,9 +150,9 @@ public class LM007Report extends MakeReport {
 		for (Map<String, String> tLDVo : lLM007) {
 
 			this.print(1, 0, "");
-			
+
 			int month = parse.stringToInteger(tLDVo.get("F0"));
-			
+
 			// totalTotal 用於【全部】類輸出
 			// 是一個 ArrayList, 包含 13 個 BigDecimal[12], index 0 是dummy, index 1 ~ 12 代表一到十二月
 			// BigDecimal[12] 代表【各類每月的細項與小計】的加總, 0 是dummy, 1~9 對應 F1~F9, 10 是每月小計, 11 是跨月小計
@@ -167,17 +167,17 @@ public class LM007Report extends MakeReport {
 				String valueStr = tLDVo.get("F" + i);
 				BigDecimal valueBd = isTotal ? totalTotalMonth[i] : getBigDecimal(valueStr); // 出【全部】類時，取 totalTotal，否則取 Query
 				valueBd = isTotal ? valueBd : computeDivide(valueBd, thousand, 0);
-				
+
 				// 這邊先 computeDivide 再加總進小計與合計
 				// 是為了模擬原報表計算小計與合計時，是用四捨五入過後的千元單位數字去加總
 				// 而非實際數字合計再除以千元並四捨五入
 				// 所以假如有三個月，細項分別為 600, 601, 602 合計 1803
 				// 報表上會顯示 3 (1+1+1) 而非 2 (1.803 四捨五入)
-				
+
 				this.print(0, outputPos[i], formatAmt(valueBd, 0), "R");
 				sumCounters[i] = sumCounters[i].add(valueBd); // 該頁合計用
 				monthlyTotal = monthlyTotal.add(valueBd); // 每月小計
-				
+
 				totalTotalMonth[i] = totalTotalMonth[i].add(valueBd); // 【全部】頁合計用
 
 				// 特殊處理: F9(每月合計前的最後一項細項)時, 處理月小計與跨月小計
@@ -186,7 +186,7 @@ public class LM007Report extends MakeReport {
 					this.print(0, outputPos[10], formatAmt(monthlyTotal, 0), "R"); // 每月小計
 					sumCounters[11] = sumCounters[11].add(monthlyTotal); // 跨月小計
 					this.print(0, outputPos[11], formatAmt(sumCounters[11], 0), "R");
-					
+
 					totalTotalMonth[10] = totalTotalMonth[10].add(monthlyTotal);
 					totalTotalMonth[11] = totalTotalMonth[11].add(sumCounters[11]);
 				}

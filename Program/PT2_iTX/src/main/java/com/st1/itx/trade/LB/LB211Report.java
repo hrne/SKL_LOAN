@@ -85,21 +85,18 @@ public class LB211Report extends MakeReport {
 
 		// 應繳日SpecificDd > strTodaydd 且 第10個欄位RepayCode > 0 且 Status不是(2,6)
 		for (Map<String, String> t : LBList) {
-			if (parse.isNumeric(t.get("RepayCode")) && parse.stringToInteger(t.get("Status")) != 2
-					&& parse.stringToInteger(t.get("Status")) != 6) {
+			if (parse.isNumeric(t.get("RepayCode")) && parse.stringToInteger(t.get("Status")) != 2 && parse.stringToInteger(t.get("Status")) != 6) {
 				if (parse.stringToInteger(t.get("RepayCode")) > 0) {
 
-					int day = parse.stringToInteger(t.get("NextPayIntDate").substring(1, 3)) * 12
-							+ parse.stringToInteger(t.get("NextPayIntDate").substring(3, 5));
-					int term = parse.stringToInteger(strToday.substring(1, 3)) * 12 + parse.stringToInteger(strTodayMM)
-							- day;
-					
+					int day = parse.stringToInteger(t.get("NextPayIntDate").substring(1, 3)) * 12 + parse.stringToInteger(t.get("NextPayIntDate").substring(3, 5));
+					int term = parse.stringToInteger(strToday.substring(1, 3)) * 12 + parse.stringToInteger(strTodayMM) - day;
+
 					this.info("NextPayIntDate = " + t.get("NextPayIntDate"));
 					this.info("day = " + day);
 					this.info("term = " + term);
 					this.info("SpecificDd = " + t.get("SpecificDd"));
 					this.info("strTodaydd = " + parse.stringToInteger(strTodaydd));
-					
+
 					if (parse.stringToInteger(t.get("SpecificDd")) > parse.stringToInteger(strTodaydd)) {
 						if (term == 0) {
 							t.put("F9", "" + term);
@@ -192,10 +189,8 @@ public class LB211Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B211", "聯徵每日授信餘額變動資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－" + jcicEmpName, 20, ' ')
-					+ makeFile.fillStringR(jcicEmpTel, 16, ' ') + makeFile.fillStringR(" ", 20, ' ')
-					+ makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80) + StringUtils.repeat(" ", 43);
+			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－" + jcicEmpName, 20, ' ')
+					+ makeFile.fillStringR(jcicEmpTel, 16, ' ') + makeFile.fillStringR(" ", 20, ' ') + makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80) + StringUtils.repeat(" ", 43);
 			makeFile.put(strContent);
 
 			// 欄位內容
@@ -287,8 +282,7 @@ public class LB211Report extends MakeReport {
 			// 末筆
 			strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(sumTxAmt), 13, '0') // 本筆撥款／還款總金額
 					+ makeFile.fillStringL(String.valueOf(sumLoanBal), 12, '0') // 本筆撥款／還款後餘額
-					+ StringUtils.repeat(" ", 2) + makeFile.fillStringL(String.valueOf(listCount), 9, '0')
-					+ StringUtils.repeat(" ", 197);
+					+ StringUtils.repeat(" ", 2) + makeFile.fillStringL(String.valueOf(listCount), 9, '0') + StringUtils.repeat(" ", 197);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -315,8 +309,7 @@ public class LB211Report extends MakeReport {
 		String txt = "";
 
 		// B211 聯徵每日授信餘額變動資料檔
-		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),交易屬性(19),交易日期(20~26),"
-				+ "本筆撥款／還款帳號(27~76),本筆撥款／還款金額(77~86),本筆撥款／還款後餘額(87~96),本筆還款後之還款紀錄(97),本筆還款後之債權結案註記(98~100),"
+		inf = "總行代號(1~3),分行代號(4~7),交易代碼(8),授信戶IDN/BAN(9~18),交易屬性(19),交易日期(20~26)," + "本筆撥款／還款帳號(27~76),本筆撥款／還款金額(77~86),本筆撥款／還款後餘額(87~96),本筆還款後之還款紀錄(97),本筆還款後之債權結案註記(98~100),"
 				+ "科目別(101),科目別註記(102),呆帳轉銷年月(103~107),個人消費性貸款註記(108),融資業務分類(109),用途別(110),空白(111~240)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17";
 

@@ -432,8 +432,7 @@ public class ExcelGenerator extends CommBuffer {
 
 		int indexOfBgColor = originalCellStyle.getFillBackgroundColor();
 
-		if (originalBgColor != null && !(originalBgColor instanceof HSSFColor) && indexOfBgColor > 0
-				&& indexOfBgColor <= 64) {
+		if (originalBgColor != null && !(originalBgColor instanceof HSSFColor) && indexOfBgColor > 0 && indexOfBgColor <= 64) {
 			IndexedColors bgColor = IndexedColors.fromInt(indexOfBgColor);
 			outputFontStyleVo.setBgColor(bgColor.toString());
 		}
@@ -593,8 +592,7 @@ public class ExcelGenerator extends CommBuffer {
 		} else {
 			// 否則,寫this.error,回傳第一個CellStyle
 			if (isFirstTimeToStyleLimit) {
-				this.error("setFontStyle error : CellStyle已超過" + limitOfCellStyle + ",不做Style設定,目前CellStyle數量為"
-						+ numOfCellStyle);
+				this.error("setFontStyle error : CellStyle已超過" + limitOfCellStyle + ",不做Style設定,目前CellStyle數量為" + numOfCellStyle);
 				isFirstTimeToStyleLimit = false;
 			}
 			return this.workbook.getCellStyleAt(0);
@@ -886,8 +884,7 @@ public class ExcelGenerator extends CommBuffer {
 
 		// 取得當前表格內文字的高度，以文字高度去*1.5倍=適應文字的表格
 		// 預設表格高度16 預設文字高度(大小)12 表格/文字=1.33 取整1.5
-		float tempRH = (float) (this.workbook.getFontAt(cell.getCellStyle().getFontIndexAsInt()).getFontHeightInPoints()
-				* fontWrap * 1.5);
+		float tempRH = (float) (this.workbook.getFontAt(cell.getCellStyle().getFontIndexAsInt()).getFontHeightInPoints() * fontWrap * 1.5);
 		// 是否同一列
 		if (this.rowNum != nowRow.getRowNum()) {
 			this.rowNum = nowRow.getRowNum();

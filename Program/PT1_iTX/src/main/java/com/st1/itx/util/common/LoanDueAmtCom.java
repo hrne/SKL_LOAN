@@ -37,8 +37,7 @@ public class LoanDueAmtCom extends CommBuffer {
 	 * @return 期金
 	 * @throws LogicException Exception
 	 */
-	public BigDecimal getDueAmt(BigDecimal iPrincipal, BigDecimal iRate, String iAmortizedCode, int iFreqBase,
-			int iLoanTerm, int iGracePeriod, int iPayIntFreq, BigDecimal iFinalBal, TitaVo titaVo)
+	public BigDecimal getDueAmt(BigDecimal iPrincipal, BigDecimal iRate, String iAmortizedCode, int iFreqBase, int iLoanTerm, int iGracePeriod, int iPayIntFreq, BigDecimal iFinalBal, TitaVo titaVo)
 			throws LogicException {
 		this.info("DueAmtCom.getDueAmt ... ");
 		this.info("   iPrincipal     = " + iPrincipal);
@@ -79,14 +78,12 @@ public class LoanDueAmtCom extends CommBuffer {
 			wkPrinciple = iPrincipal.subtract(iFinalBal);
 			if (iRate.compareTo(BigDecimal.ZERO) == 0) {
 				BigDecimal wkPeriod = new BigDecimal(iLoanTerm - iGracePeriod);
-				oDueAmt = iPrincipal.subtract(iFinalBal).divide(wkPeriod, 15, RoundingMode.HALF_UP).setScale(0,
-						RoundingMode.HALF_UP);
+				oDueAmt = iPrincipal.subtract(iFinalBal).divide(wkPeriod, 15, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
 			} else if (wkTerm == 0) {
 				oDueAmt = iPrincipal;
 			} else {
 				// 月利率 = 年利率÷1200(換算為每期利率)
-				wkRate = iRate.divide(wkFreqBaseConstant, 15, RoundingMode.HALF_UP)
-						.multiply(new BigDecimal(iPayIntFreq)).setScale(15, RoundingMode.HALF_UP);
+				wkRate = iRate.divide(wkFreqBaseConstant, 15, RoundingMode.HALF_UP).multiply(new BigDecimal(iPayIntFreq)).setScale(15, RoundingMode.HALF_UP);
 				// [(1＋月利率)^月數]
 				wkRateA = wkRate.add(new BigDecimal(1)).pow(wkTerm).setScale(15, RoundingMode.HALF_UP);
 
@@ -145,16 +142,14 @@ public class LoanDueAmtCom extends CommBuffer {
 //				this.info("lmsppa = " + lmsppa);
 //				oDueAmt = lmsppa;
 			}
-			this.info(
-					"   wkRate= " + wkRate + ", wkRateA=" + wkRateA + ", wkRateB=" + wkRateB + ", wkRateC=" + wkRateC);
+			this.info("   wkRate= " + wkRate + ", wkRateA=" + wkRateA + ", wkRateB=" + wkRateB + ", wkRateC=" + wkRateC);
 
 			this.info("   FinalInterest = " + wkFinalInterest + ", DueAmt=" + oDueAmt);
 
 			break;
 		case "4": // 本金平均法
 			BigDecimal wkPeriod = new BigDecimal(iLoanTerm - iGracePeriod);
-			oDueAmt = iPrincipal.subtract(iFinalBal).divide(wkPeriod, 15, RoundingMode.HALF_UP).setScale(0,
-					RoundingMode.HALF_UP);
+			oDueAmt = iPrincipal.subtract(iFinalBal).divide(wkPeriod, 15, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP);
 			break;
 		default:
 			throw new LogicException(titaVo, "E0010", "LoanDueAmtCom 攤還方式 = " + iAmortizedCode); // 功能選擇錯誤
@@ -178,8 +173,8 @@ public class LoanDueAmtCom extends CommBuffer {
 	 * @return 還本期數
 	 * @throws LogicException Exception
 	 */
-	public int getDueTerms(BigDecimal iPrincipal, BigDecimal iRate, String iAmortizedCode, int iFreqBase,
-			int iPayIntFreq, BigDecimal iFinalBal, BigDecimal iDueAmt, TitaVo titaVo) throws LogicException {
+	public int getDueTerms(BigDecimal iPrincipal, BigDecimal iRate, String iAmortizedCode, int iFreqBase, int iPayIntFreq, BigDecimal iFinalBal, BigDecimal iDueAmt, TitaVo titaVo)
+			throws LogicException {
 		this.info("DueAmtCom.getTotalPeriod ... ");
 		this.info("   iPrincipal     = " + iPrincipal);
 		this.info("   iRate          = " + iRate);
@@ -208,16 +203,14 @@ public class LoanDueAmtCom extends CommBuffer {
 			// 第一次的利息需小於期金
 			// 本息攤還金額 = 每期攤還金額 - 最後一期本金餘額的每月利息
 			// 月利率 = 年利率÷1200(換算為每期利率)
-			BigDecimal wkRate = iRate.divide(wkFreqBaseConstant, 15, RoundingMode.HALF_UP)
-					.multiply(new BigDecimal(iPayIntFreq)).setScale(15, RoundingMode.HALF_UP);
+			BigDecimal wkRate = iRate.divide(wkFreqBaseConstant, 15, RoundingMode.HALF_UP).multiply(new BigDecimal(iPayIntFreq)).setScale(15, RoundingMode.HALF_UP);
 			BigDecimal wkFinalInterest = iFinalBal.multiply(wkRate).setScale(0, RoundingMode.HALF_UP);
 			BigDecimal wkDueAmt = iDueAmt.subtract(wkFinalInterest);
 			if (iPrincipal.multiply(wkRate).compareTo(wkDueAmt) >= 0) {
 				throw new LogicException(titaVo, "E0019", "期金需大於利息"); // 輸入資料錯誤
 			}
 			while (wkLoanBal.compareTo(BigDecimal.ZERO) > 0) {
-				wkLoanBal = wkLoanBal
-						.subtract(wkDueAmt.subtract(wkLoanBal.multiply(wkRate).setScale(0, RoundingMode.HALF_UP)));
+				wkLoanBal = wkLoanBal.subtract(wkDueAmt.subtract(wkLoanBal.multiply(wkRate).setScale(0, RoundingMode.HALF_UP)));
 				oTerms++;
 			}
 			break;

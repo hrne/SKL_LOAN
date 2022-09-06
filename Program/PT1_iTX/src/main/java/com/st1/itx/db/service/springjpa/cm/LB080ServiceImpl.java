@@ -43,13 +43,10 @@ public class LB080ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// LB080 授信額度資料檔
-		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\""
-				+ "     , M.\"Filler4\"" + "     , M.\"CustId\"" + "     , M.\"FacmNo\"" + "     , M.\"CurrencyCode\""
-				+ "     , M.\"DrawdownAmt\"" + "     , M.\"DrawdownAmtFx\"" + "     , M.\"DrawdownDate\""
-				+ "     , M.\"MaturityDate\"" + "     , M.\"RecycleCode\"" + "     , M.\"IrrevocableFlag\""
-				+ "     , M.\"UpFacmNo\"" + "     , M.\"AcctCode\"" + "     , M.\"SubAcctCode\""
-				+ "     , M.\"ClTypeCode\"" + "     , M.\"Filler18\"" + "     , M.\"JcicDataYM\""
-				+ " FROM  \"JcicB080\" M" + " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"FacmNo\" ";
+		sql = "SELECT M.\"DataType\"" + "     , M.\"BankItem\"" + "     , M.\"BranchItem\"" + "     , M.\"TranCode\"" + "     , M.\"Filler4\"" + "     , M.\"CustId\"" + "     , M.\"FacmNo\""
+				+ "     , M.\"CurrencyCode\"" + "     , M.\"DrawdownAmt\"" + "     , M.\"DrawdownAmtFx\"" + "     , M.\"DrawdownDate\"" + "     , M.\"MaturityDate\"" + "     , M.\"RecycleCode\""
+				+ "     , M.\"IrrevocableFlag\"" + "     , M.\"UpFacmNo\"" + "     , M.\"AcctCode\"" + "     , M.\"SubAcctCode\"" + "     , M.\"ClTypeCode\"" + "     , M.\"Filler18\""
+				+ "     , M.\"JcicDataYM\"" + " FROM  \"JcicB080\" M" + " WHERE M.\"DataYM\" = :dataMonth " + " ORDER BY M.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
 

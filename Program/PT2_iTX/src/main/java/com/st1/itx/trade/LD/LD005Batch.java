@@ -75,22 +75,20 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 		statusCode.add("4"); // 兌現未入帳
 		statusCode.add("5"); // 即期票
 
-		Slice<LoanCheque> sLoanCheque = sLoanChequeService.receiveDateRange(tbsdyf, tbsdyf, statusCode, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<LoanCheque> sLoanCheque = sLoanChequeService.receiveDateRange(tbsdyf, tbsdyf, statusCode, 0, Integer.MAX_VALUE, titaVo);
 
-		List<LoanCheque> listLoanCheque = sLoanCheque == null ? new ArrayList<>()
-				: new ArrayList<>(sLoanCheque.getContent());
+		List<LoanCheque> listLoanCheque = sLoanCheque == null ? new ArrayList<>() : new ArrayList<>(sLoanCheque.getContent());
 
-		this.info("listLoanCheque.size="+listLoanCheque.size());
-		
-		if(listLoanCheque.size() == 0) {
-			
+		this.info("listLoanCheque.size=" + listLoanCheque.size());
+
+		if (listLoanCheque.size() == 0) {
+
 			titaVo.putParam("inputCustNo", 0);
 			titaVo.putParam("inputDate", tbsdyf);
 
 			lD005Report.exec(titaVo);
 		}
-		
+
 		Map<Integer, Integer> custNoMap = new HashMap<>();
 
 		for (LoanCheque loanCheque : listLoanCheque) {
@@ -99,10 +97,10 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 
 			if (!custNoMap.containsKey(custNo)) {
 				TitaVo tmpTitaVo = (TitaVo) this.titaVo.clone();
-				
-				this.info("inputCustNo="+custNo);
-				this.info("tbsdyf="+tbsdyf);
-				
+
+				this.info("inputCustNo=" + custNo);
+				this.info("tbsdyf=" + tbsdyf);
+
 				tmpTitaVo.putParam("inputCustNo", custNo);
 				tmpTitaVo.putParam("inputDate", tbsdyf);
 
@@ -111,8 +109,6 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 				custNoMap.put(custNo, 0);
 			}
 		}
-		
-		
-		
+
 	}
 }

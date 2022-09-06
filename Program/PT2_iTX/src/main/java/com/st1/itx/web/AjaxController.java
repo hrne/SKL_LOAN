@@ -173,7 +173,7 @@ public class AjaxController extends SysLogger {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
 		}
-		
+
 		String fileName = manufacture.getFilename() + manufacture.getExt();
 		String saveName = manufacture.getSavename();
 		String titleName = manufacture.getTitleName().isEmpty() ? "空白" : manufacture.getTitleName();

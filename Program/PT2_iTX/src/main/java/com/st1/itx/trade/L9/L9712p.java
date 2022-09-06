@@ -44,7 +44,7 @@ public class L9712p extends TradeBuffer {
 
 		l9712Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L9712", "L9712利息違約金減免明細表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9712", "L9712利息違約金減免明細表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

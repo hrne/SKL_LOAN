@@ -147,8 +147,7 @@ public class L2042 extends TradeBuffer {
 			int clcode1 = tClBuilding.getClCode1();
 			int clcode2 = tClBuilding.getClCode2();
 			int clno = tClBuilding.getClNo();
-			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clcode1, clcode2, clno,
-					this.index, this.limit, titaVo);
+			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clcode1, clcode2, clno, this.index, this.limit, titaVo);
 
 			List<ClBuildingOwner> lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 			if (lClBuildingOwner != null) {
@@ -182,15 +181,12 @@ public class L2042 extends TradeBuffer {
 
 			// 確認有無保險單, 邏輯參考 L4964
 			// Y/N
-			Slice<InsuRenew> slInsuRenew = sInsuRenewService.findNowInsuEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index,
-					this.limit, titaVo);
-			Slice<InsuOrignal> slInsuOrignal = sInsuOrignalService.clNoEqual(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index,
-					this.limit, titaVo);
+			Slice<InsuRenew> slInsuRenew = sInsuRenewService.findNowInsuEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit, titaVo);
+			Slice<InsuOrignal> slInsuOrignal = sInsuOrignalService.clNoEqual(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit, titaVo);
 			List<InsuRenew> lInsuRenew = slInsuRenew != null ? slInsuRenew.getContent() : null;
 			List<InsuOrignal> lInsuOrignal = slInsuOrignal != null ? slInsuOrignal.getContent() : null;
 
-			boolean hasInsu =    (lInsuRenew != null && !lInsuRenew.isEmpty())
-					          || (lInsuOrignal != null && !lInsuOrignal.isEmpty());
+			boolean hasInsu = (lInsuRenew != null && !lInsuRenew.isEmpty()) || (lInsuOrignal != null && !lInsuOrignal.isEmpty());
 
 			occurslist.putParam("OOHasInsu", hasInsu ? "Y" : "N");
 

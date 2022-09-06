@@ -54,7 +54,7 @@ public class L5053 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	TxDataLogService sTxDataLogService;
 
@@ -94,14 +94,14 @@ public class L5053 extends TradeBuffer {
 				// L5053Vo L5053VO = (L5053Vo) l5053ServiceImpl.MapToVO(MapL5053, "L5053",
 				// titaVo);
 				OccursList occursList = new OccursList();
-				/**傳入時會帶文字0而非空白 20226/3/15 Mata*/
+				/** 傳入時會帶文字0而非空白 20226/3/15 Mata */
 				if (MapL5053.get("BonusDate") == null || "0".equals(MapL5053.get("BonusDate").toString().trim())) {
 					occursList.putParam("OBonusDate", 0);// 獎金發放日期
 				} else {
 					int oBonusDate = Integer.valueOf(MapL5053.get("BonusDate").toString()) - 19110000;
 					occursList.putParam("OBonusDate", oBonusDate);// 獎金發放日期
 				}
-								
+
 				occursList.putParam("OBonusNo", MapL5053.get("F16"));// 序號
 				occursList.putParam("OBonusType", MapL5053.get("F15"));// 獎金類別
 				int oPerfDate = Integer.valueOf(MapL5053.get("F1"));
@@ -139,7 +139,7 @@ public class L5053 extends TradeBuffer {
 					occursList.putParam("OMediaFg", 1);//
 					occursList.putParam("OMediaDate", parse.stringToStringDate(MapL5053.get("MediaDate")));
 				}
-				
+
 //				int mediaDate = Integer.valueOf(MapL5053.get("F13"));
 //				if (mediaDate > 0) {
 //					mediaDate -= 19110000;
@@ -151,21 +151,21 @@ public class L5053 extends TradeBuffer {
 				} else {
 					occursList.putParam("OLogFg", 1);//
 				}
-				
+
 				this.info("LastUpdate = " + MapL5053.get("LastUpdate") + "=" + parse.stringToStringDate(MapL5053.get("LastUpdate")));
 				occursList.putParam("OLastUpdate", parse.stringToStringDateTime(MapL5053.get("LastUpdate")));
-				
+
 				occursList.putParam("OLastEmp", MapL5053.get("LastUpdateEmpNo") + " " + MapL5053.get("LastUpdateEmpName"));
-				
+
 				// 歷程按鈕顯示與否
 				// 邏輯同 L6933
-				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5503", FormatUtil.pad9(MapL5053.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5053.get("F3"), 3) + "-" + FormatUtil.pad9(MapL5053.get("F4"), 3) + "-1", 0,
-						1, titaVo);
-				
+				Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByTranNo("L5503",
+						FormatUtil.pad9(MapL5053.get("F2"), 7) + "-" + FormatUtil.pad9(MapL5053.get("F3"), 3) + "-" + FormatUtil.pad9(MapL5053.get("F4"), 3) + "-1", 0, 1, titaVo);
+
 				List<TxDataLog> lTxDataLog = slTxDataLog != null ? slTxDataLog.getContent() : null;
-				
+
 				occursList.putParam("OOHasHistory", lTxDataLog != null && !lTxDataLog.isEmpty() ? "Y" : "N");
-				
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}

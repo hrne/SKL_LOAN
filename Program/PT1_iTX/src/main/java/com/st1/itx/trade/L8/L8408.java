@@ -44,6 +44,7 @@ public class L8408 extends TradeBuffer {
 	public JcicZ045LogService sJcicZ045LogService;
 	@Autowired
 	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8408 ");
@@ -58,8 +59,7 @@ public class L8408 extends TradeBuffer {
 		this.info("sJcicZ045     = " + sJcicZ045.getSize());
 		if (sJcicZ045 != null) {
 			for (JcicZ045 xJcicZ045 : sJcicZ045) {
-				if ((iSubmitType == 1 && xJcicZ045.getOutJcicTxtDate() == 0)
-						|| (iSubmitType == 3 && xJcicZ045.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ045.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ045.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8306");
 					occursListB.putParam("OOHistoryTxCd", "L8036");
@@ -67,9 +67,9 @@ public class L8408 extends TradeBuffer {
 					occursListB.putParam("OOSubmitKey", xJcicZ045.getSubmitKey());
 					occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ045.getSubmitKey(), titaVo));
 					occursListB.putParam("OORcDate", xJcicZ045.getRcDate());
-                    occursListB.putParam("OOMaxMainCode",xJcicZ045.getMaxMainCode());
-                    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ045.getMaxMainCode(), titaVo));
-                    occursListB.putParam("OOTranKey", xJcicZ045.getTranKey());
+					occursListB.putParam("OOMaxMainCode", xJcicZ045.getMaxMainCode());
+					occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ045.getMaxMainCode(), titaVo));
+					occursListB.putParam("OOTranKey", xJcicZ045.getTranKey());
 					// occursListB.putParam("OOTranCode", xJcicZ045.getTranCode());
 					occursListB.putParam("OOTranCode", "045");
 					int iActualFilingDate = 0;
@@ -90,9 +90,9 @@ public class L8408 extends TradeBuffer {
 						occursListB.putParam("OOSubmitKey", xJcicZ045.getSubmitKey());
 						occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ045.getSubmitKey(), titaVo));
 						occursListB.putParam("OORcDate", xJcicZ045.getRcDate());
-                        occursListB.putParam("OOMaxMainCode",xJcicZ045.getMaxMainCode());
-                        occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ045.getMaxMainCode(), titaVo));
-                        occursListB.putParam("OOTranKey", xJcicZ045.getTranKey());
+						occursListB.putParam("OOMaxMainCode", xJcicZ045.getMaxMainCode());
+						occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ045.getMaxMainCode(), titaVo));
+						occursListB.putParam("OOTranKey", xJcicZ045.getTranKey());
 //					occursListB.putParam("OOTranCode", xJcicZ045.getTranCode());
 						occursListB.putParam("OOTranCode", "045");
 						int iActualFilingDate = 0;

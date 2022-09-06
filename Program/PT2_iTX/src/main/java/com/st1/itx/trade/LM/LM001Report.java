@@ -374,6 +374,6 @@ public class LM001Report extends MakeReport {
 			makeExcel.setValue(3, 1, "無資料");
 		}
 		makeExcel.close();
-		//makeExcel.toExcel(sno1);
+		// makeExcel.toExcel(sno1);
 	}
 }

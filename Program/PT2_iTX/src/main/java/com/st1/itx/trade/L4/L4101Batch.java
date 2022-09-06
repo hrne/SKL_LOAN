@@ -148,8 +148,7 @@ public class L4101Batch extends TradeBuffer {
 		List<BankRemit> lBankRemit3 = new ArrayList<BankRemit>();
 		List<BankRemit> lBankRemit4 = new ArrayList<BankRemit>();
 
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 
 		for (BankRemit t : slBankRemit.getContent()) {
 			// 作業項目為1.撥款時把退款篩選掉
@@ -191,9 +190,7 @@ public class L4101Batch extends TradeBuffer {
 		// 更新批號
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		for (BankRemit tBankRemit : lBankRemit) {
-			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
-					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE,
-					titaVo);
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate, titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (slAcDetail != null) {
 				for (AcDetail tAcDetail : slAcDetail.getContent()) {
 					if (tAcDetail.getEntAc() == 1) {
@@ -297,8 +294,7 @@ public class L4101Batch extends TradeBuffer {
 
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo() + "L4101", checkMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4101", checkMsg, titaVo);
 
 		return this.sendList();
 	}
@@ -318,10 +314,8 @@ public class L4101Batch extends TradeBuffer {
 			if ("RT".equals(batchNo.substring(0, 2))) {
 				reportItem = "-退款匯款媒體檔";
 			}
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + reportItem, titaVo.getTlrNo() + "_disb_"
-						+ (this.getTxBuffer().getTxBizDate().getTbsDy() + 19110000) + "_" + nowBatchNo + "_secret.csv",
-				2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + reportItem,
+				titaVo.getTlrNo() + "_disb_" + (this.getTxBuffer().getTxBizDate().getTbsDy() + 19110000) + "_" + nowBatchNo + "_secret.csv", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -339,8 +333,7 @@ public class L4101Batch extends TradeBuffer {
 
 	}
 
-	private void procBankRemitMediaOld(List<BankRemit> lBankRemit, String reportItem, TitaVo titaVo)
-			throws LogicException {
+	private void procBankRemitMediaOld(List<BankRemit> lBankRemit, String reportItem, TitaVo titaVo) throws LogicException {
 		this.info("procBankRemitMediaOld ...");
 
 		l4101OldVo.setOccursList(lBankRemit, titaVo);
@@ -349,8 +342,7 @@ public class L4101Batch extends TradeBuffer {
 		ArrayList<String> file = l4101OldVo.toFile();
 // 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + reportItem, "LNM24p.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + reportItem, "LNM24p.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -472,8 +464,7 @@ public class L4101Batch extends TradeBuffer {
 
 //				01:整批匯款 02:單筆匯款 04:退款台新(存款憑條) 05:退款他行(整批匯款) 11:退款新光(存款憑條)
 //				跳過單筆
-				if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4
-						|| tBankRemit.getDrawdownCode() == 11) {
+				if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4 || tBankRemit.getDrawdownCode() == 11) {
 					this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
 					continue;
 				}

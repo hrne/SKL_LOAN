@@ -108,8 +108,7 @@ public class LNM39HPReport extends MakeReport {
 
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFHP", "LNM39HP 欄位清單８", "LNFHP.TXT", 1); // UTF-8
 			// 產製[控制檔]
-			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFHPIDX", "LNM39HP 欄位清單８控制檔", "LNFHP.IDX",
-					1); // UTF-8
+			makeFileC.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LNFHPIDX", "LNM39HP 欄位清單８控制檔", "LNFHP.IDX", 1); // UTF-8
 
 			// 標題列
 			// strContent = "";
@@ -193,8 +192,7 @@ public class LNM39HPReport extends MakeReport {
 							break; // 違約損失率模型
 						case 19:
 							formatter.applyPattern("00.00000");
-							strField = formatter
-									.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
+							strField = formatter.format(Float.parseFloat(strField = (strField.isEmpty() ? "0" : strField)));
 							strField = makeFile.fillStringL(strField, 8, '0');
 							break; // 違約損失率
 						case 20:
@@ -222,8 +220,7 @@ public class LNM39HPReport extends MakeReport {
 
 			// makeFile.toFile(sno); // 不直接下傳
 
-			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + ","
-					+ String.format("%06d", L7List.size());
+			strContent = sdf.format(dateNow) + "," + calendarEntDyMonthlyEndDate(titaVo) + "," + String.format("%06d", L7List.size());
 			makeFileC.put(strContent);
 			makeFile.close();
 			this.info("=========== LNM39HP genFile close === ");

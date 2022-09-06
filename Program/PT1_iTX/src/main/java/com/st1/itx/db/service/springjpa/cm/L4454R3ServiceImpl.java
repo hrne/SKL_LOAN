@@ -108,7 +108,7 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "		    ,bd2.\"RelCustName\"";
 		sql += "		    ,bd2.\"IntStartDate\"";
 		sql += "		    ,lbm.\"PrevPayIntDate\"";
-		sql += " )";	
+		sql += " )";
 		sql += "	SELECT bd.\"RepayAcctNo\" AS \"RepayAcctNo\"";
 		sql += "   		  ,LPAD(bd.\"CustNo\", 7 , '0') AS \"CustNo\"";
 		sql += "   		  ,LPAD(bd.\"FacmNo\", 3 , '0') AS \"FacmNo\"";

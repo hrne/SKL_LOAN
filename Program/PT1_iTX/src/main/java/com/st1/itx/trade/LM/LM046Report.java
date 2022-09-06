@@ -41,8 +41,7 @@ public class LM046Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM046", "年度擔保放款信用風險分析_內部控管",
-				"LM046_年度擔保放款信用風險分析_內部控管", "LM046年度擔保放款信用風險分析_內部控管.xlsx", "衡式");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM046", "年度擔保放款信用風險分析_內部控管", "LM046_年度擔保放款信用風險分析_內部控管", "LM046年度擔保放款信用風險分析_內部控管.xlsx", "衡式");
 
 		String yy = titaVo.get("ENTDY").substring(1, 4);
 		String mm = titaVo.get("ENTDY").substring(4, 6);
@@ -94,11 +93,9 @@ public class LM046Report extends MakeReport {
 
 			makeExcel.setValue(4 + count, 1, tLDVo.get("F0"));
 			makeExcel.setValue(4 + count, 3, computeDivide(bd[2].add(bd[8]), thousand, 0), "#,##0");
-			makeExcel.setValue(4 + count, 6, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), thousand, 0),
-					"#,##0");
+			makeExcel.setValue(4 + count, 6, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), thousand, 0), "#,##0");
 			makeExcel.setValue(4 + count, 9, bd[3].add(bd[5]).add(bd[9]).add(bd[11]), "#,##0");
-			makeExcel.setValue(4 + count, 11,
-					computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), bd[2].add(bd[8]), 5), "0.00%");
+			makeExcel.setValue(4 + count, 11, computeDivide(bd[4].add(bd[6]).add(bd[10]).add(bd[12]), bd[2].add(bd[8]), 5), "0.00%");
 
 			// 第二區塊
 

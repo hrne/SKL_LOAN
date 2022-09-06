@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import java.util.List;
@@ -23,19 +22,19 @@ import com.st1.itx.db.domain.MlaundryDetailId;
  */
 public interface MlaundryDetailRepositoryDay extends JpaRepository<MlaundryDetail, MlaundryDetailId> {
 
-  // EntryDate >= ,AND EntryDate <= ,AND Rational ^i
-  public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, List<String> rational_2, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <= ,AND Rational ^i
+	public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, List<String> rational_2,
+			Pageable pageable);
 
-  // EntryDate >= ,AND EntryDate <= ,
-  public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, Pageable pageable);
+	// EntryDate >= ,AND EntryDate <= ,
+	public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, Pageable pageable);
 
-  // EntryDate >= ,AND EntryDate <= ,AND Factor = , AND CustNo = 
-  public Optional<MlaundryDetail> findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsAndCustNoIsOrderByEntryDateAsc(int entryDate_0, int entryDate_1, int factor_2, int custNo_3);
+	// EntryDate >= ,AND EntryDate <= ,AND Factor = , AND CustNo =
+	public Optional<MlaundryDetail> findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsAndCustNoIsOrderByEntryDateAsc(int entryDate_0, int entryDate_1, int factor_2, int custNo_3);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<MlaundryDetail> findByMlaundryDetailId(MlaundryDetailId mlaundryDetailId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<MlaundryDetail> findByMlaundryDetailId(MlaundryDetailId mlaundryDetailId);
 
 }
-

@@ -128,12 +128,12 @@ public class LB207Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01"; 
+			sfileNo2 = "01";
 		}
 
 		// 查詢系統參數設定檔-JCIC放款報送人員資料
@@ -165,8 +165,7 @@ public class LB207Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B207", "授信戶基本資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B207-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
-					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
+			strContent = "JCIC-DAT-B207-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + jcicEmpName, 80, ' ') + StringUtils.repeat(" ", 459);
 			makeFile.put(strContent);
 
@@ -291,8 +290,7 @@ public class LB207Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0')
-					+ StringUtils.repeat(" ", 588);
+			strContent = "TRLR" + makeFile.fillStringL(String.valueOf(listCount), 8, '0') + StringUtils.repeat(" ", 588);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -314,7 +312,7 @@ public class LB207Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
@@ -324,11 +322,9 @@ public class LB207Report extends MakeReport {
 		String txt = "";
 
 		// B207 授信戶基本資料檔
-		inf = "交易代碼(1),總行代號(2~4),空白(5~8),資料日期(9~15),授信戶IDN(16~25),中文姓名(26~45),英文姓名(46~65),出生日期(66~72),"
-				+ "戶籍地址(73~138),聯絡地址郵遞區號(139~143),聯絡地址(144~209),聯絡電話(210~225),行動電話(226~241),空白(242~246),"
+		inf = "交易代碼(1),總行代號(2~4),空白(5~8),資料日期(9~15),授信戶IDN(16~25),中文姓名(26~45),英文姓名(46~65),出生日期(66~72)," + "戶籍地址(73~138),聯絡地址郵遞區號(139~143),聯絡地址(144~209),聯絡電話(210~225),行動電話(226~241),空白(242~246),"
 				+ "教育程度代號(247),自有住宅有無(248),任職機構名稱(249~278),任職機構統一編號(279~286),職業類別(287~292),任職機構電話(293~308),"
-				+ "職位名稱(309~318),服務年資(319~320),年收入(321~326),年收入資料年月(327~331),性別(332),國籍(333~334),護照號碼(335~354),"
-				+ "舊有稅籍編號(355~364),中文姓名超逾10個字之全名(365~564),空白(565~600)";
+				+ "職位名稱(309~318),服務年資(319~320),年收入(321~326),年收入資料年月(327~331),性別(332),國籍(333~334),護照號碼(335~354)," + "舊有稅籍編號(355~364),中文姓名超逾10個字之全名(365~564),空白(565~600)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23;F24;F25;F26;F27;F28;F29";
 
 		String txt1[] = txt.split(";");

@@ -123,7 +123,7 @@ public class L6608 extends TradeBuffer {
 		mCdReport.setSignCode(this.parse.stringToInteger((titaVo.getParam("SignCode"))));
 		mCdReport.setWatermarkFlag(this.parse.stringToInteger(titaVo.getParam("Watermark")));
 		mCdReport.setEnable(titaVo.getParam("Enable"));
-		
+
 		mCdReport.setLetterFg(titaVo.getParam("LetterFg"));
 		mCdReport.setMessageFg(titaVo.getParam("MessageFg"));
 		mCdReport.setEmailFg(titaVo.getParam("EmailFg"));

@@ -61,7 +61,7 @@ public class LM052 extends BatchBase implements Tasklet, InitializingBean {
 //		int lmndy = this.txBuffer.getTxCom().getLmndy();
 
 		lM052report.exec(titaVo, tbsdy, mfbsdy);
-	
+
 	}
 
 //	private void updLM052ReportSP(int yearMonth) {

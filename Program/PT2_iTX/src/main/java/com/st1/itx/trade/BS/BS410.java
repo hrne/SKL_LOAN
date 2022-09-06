@@ -103,10 +103,9 @@ public class BS410 extends TradeBuffer {
 			filena = filena + ";";
 		}
 
-
 //		檢核檔名、檔案格式
 		checkFile(filena, titaVo);
-		
+
 		String[] filelist = filena.split(";");
 		for (String filename : filelist) {
 			this.info("fileName : " + filename);
@@ -114,8 +113,7 @@ public class BS410 extends TradeBuffer {
 			initialFileVoOccursList();
 //TODO: 回銷檔名稱待訂
 			if (filename.indexOf("LNM24r") >= 0) {
-				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-						+ File.separatorChar + filename;
+				String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + filename;
 				this.info("回銷檔 Start With -> " + filePath1);
 
 				ArrayList<String> dataLineList1 = new ArrayList<>();
@@ -135,11 +133,9 @@ public class BS410 extends TradeBuffer {
 
 //		執行無誤者連結查詢清單
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4001", titaVo.getTlrNo(),
-					"上傳完成", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4001", titaVo.getTlrNo(), "上傳完成", titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4104", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4104", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -201,7 +197,6 @@ public class BS410 extends TradeBuffer {
 					this.info("tBankRemit =" + tBankRemit);
 					this.info("OccPayStatus =" + OccPayStatus);
 
-
 				} else {
 
 					throw new LogicException("E2003", "相關號碼 = " + OccRelNum);// 查無資料
@@ -228,6 +223,7 @@ public class BS410 extends TradeBuffer {
 		ArrayList<OccursList> occursList = new ArrayList<OccursList>();
 		updateBankRemitFileVo.setOccursList(occursList);
 	}
+
 	private void checkFile(String fileName, TitaVo titaVo) throws LogicException {
 		this.info("checkFile Start...");
 //		1.檢核檔名，不為下列區間者為False
@@ -265,15 +261,15 @@ public class BS410 extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
-			}  else {
+			} else {
 				sendMsg = sendMsg + removeDot(filename) + "，檔名不符本交易處理範圍。";
 				checkFlag = false;
 				break;
 			}
 
-
 		}
 	}
+
 	private String removeDot(String input) {
 
 		if (input.indexOf(".") >= 0) {

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.mon;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.TxTempId;
  */
 public interface TxTempRepositoryMon extends JpaRepository<TxTemp, TxTempId> {
 
-  // Entdy = ,AND Kinbr = ,AND TlrNo = ,AND TxtNo = 
-  public Slice<TxTemp> findAllByEntdyIsAndKinbrIsAndTlrNoIsAndTxtNoIsOrderBySeqNoAsc(int entdy_0, String kinbr_1, String tlrNo_2, String txtNo_3, Pageable pageable);
+	// Entdy = ,AND Kinbr = ,AND TlrNo = ,AND TxtNo =
+	public Slice<TxTemp> findAllByEntdyIsAndKinbrIsAndTlrNoIsAndTxtNoIsOrderBySeqNoAsc(int entdy_0, String kinbr_1, String tlrNo_2, String txtNo_3, Pageable pageable);
 
-  // TlrNo = 
-  public Optional<TxTemp> findTopByTlrNoIsOrderByCreateDateDesc(String tlrNo_0);
+	// TlrNo =
+	public Optional<TxTemp> findTopByTlrNoIsOrderByCreateDateDesc(String tlrNo_0);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxTemp> findByTxTempId(TxTempId txTempId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxTemp> findByTxTempId(TxTempId txTempId);
 
 }
-

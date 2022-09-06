@@ -32,7 +32,6 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L9714.findAll");
@@ -41,7 +40,7 @@ public class L9714ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iFACMNO = titaVo.get("FacmNo");
 		String iUSEFG = titaVo.get("UsageCode");
 		String iYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("eYearMonth")) + 191100);
-		String sYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("sYearMonth"))+ 191100);
+		String sYEARMONTH = String.valueOf(Integer.valueOf(titaVo.get("sYearMonth")) + 191100);
 		boolean useUsageCode = !"00".equals(iUSEFG);
 		boolean useFacmNo = !"000".equals(iFACMNO);
 

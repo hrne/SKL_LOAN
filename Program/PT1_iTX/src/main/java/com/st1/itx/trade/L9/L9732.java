@@ -32,4 +32,3 @@ public class L9732 extends TradeBuffer {
 	}
 
 }
-

@@ -66,8 +66,7 @@ public class L6062 extends TradeBuffer {
 		} else if (!iIndustryCode.isEmpty()) {
 			slCdIndustry = sCdIndustryService.findIndustryCode(iIndustryCode + "%", this.index, this.limit, titaVo);
 		} else {
-			slCdIndustry = sCdIndustryService.findIndustryItem("%" + iIndustryItem + "%", this.index, this.limit,
-					titaVo);
+			slCdIndustry = sCdIndustryService.findIndustryItem("%" + iIndustryItem + "%", this.index, this.limit, titaVo);
 		}
 		List<CdIndustry> lCdIndustry = slCdIndustry == null ? null : slCdIndustry.getContent();
 
@@ -81,10 +80,8 @@ public class L6062 extends TradeBuffer {
 			occursList.putParam("OOIndustryItem", tCdIndustry.getIndustryItem());
 			occursList.putParam("OOMainType", tCdIndustry.getMainType());
 			occursList.putParam("OOIndustryRating", tCdIndustry.getIndustryRating());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdIndustry.getLastUpdate()) + " "
-					+ parse.timeStampToStringTime(tCdIndustry.getLastUpdate()));
-			occursList.putParam("OOLastEmp",
-					tCdIndustry.getLastUpdateEmpNo() + " " + empName(titaVo, tCdIndustry.getLastUpdateEmpNo()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdIndustry.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdIndustry.getLastUpdate()));
+			occursList.putParam("OOLastEmp", tCdIndustry.getLastUpdateEmpNo() + " " + empName(titaVo, tCdIndustry.getLastUpdateEmpNo()));
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

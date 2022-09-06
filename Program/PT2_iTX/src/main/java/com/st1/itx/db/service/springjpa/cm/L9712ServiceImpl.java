@@ -52,9 +52,9 @@ public class L9712ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  FROM(SELECT T.\"AcDate\"";
 		sql += "				 ,T.\"CustNo\"";
 		sql += "				 ,T.\"FacmNo\"";
-		//應收利息 = 應收利息 + 減免利息
+		// 應收利息 = 應收利息 + 減免利息
 		sql += "                 ,SUM(T.\"Interest\") + SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0)) \"Interest\"";
-		//應收違約金 = 實收違約金 +實收延滯息 + 減免違約金 
+		// 應收違約金 = 實收違約金 +實收延滯息 + 減免違約金
 		sql += "			     ,SUM(T.\"DelayInt\") + SUM(T.\"BreachAmt\") + SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt'),0)) \"BreachAmt\"";
 		sql += "                 ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceAmt'),0)) \"ReduceAmt\"";
 		sql += "                 ,SUM(NVL(JSON_VALUE(T.\"OtherFields\",'$.ReduceBreachAmt'),0)) \"ReduceBreachAmt\"";

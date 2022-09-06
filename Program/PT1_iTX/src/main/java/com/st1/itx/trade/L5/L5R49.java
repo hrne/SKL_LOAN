@@ -37,11 +37,11 @@ public class L5R49 extends TradeBuffer {
 
 		Slice<TxAttachment> iTxAttachment = null;
 		iTxAttachment = iTxAttachmentService.findOnlyTran("L5102", 0, Integer.MAX_VALUE, titaVo);
-		
+
 		if (iTxAttachment == null) {
 			totaVo.putParam("L5R49FileNo", 1);
-		}else {
-			totaVo.putParam("L5R49FileNo", iTxAttachment.getSize()+1);
+		} else {
+			totaVo.putParam("L5R49FileNo", iTxAttachment.getSize() + 1);
 		}
 
 		this.addList(this.totaVo);

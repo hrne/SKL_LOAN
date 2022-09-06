@@ -35,13 +35,13 @@ public class LY004Report extends MakeReport {
 		int entdyf = titaVo.getEntDyI() + 19110000;
 
 		int iYear = entdyf / 10000;
-		
+
 		int iMonth = entdyf % 10000;
-		
-		if(iMonth != 12) {
+
+		if (iMonth != 12) {
 			iYear = iYear - 1;
 		}
-		
+
 		int inputYearMonth = (iYear * 100) + 12;
 
 		List<Map<String, String>> lY004List = null;
@@ -58,9 +58,9 @@ public class LY004Report extends MakeReport {
 
 		// 通用處理
 		// 設定年月份
-		String iRoc = String.valueOf(inputYearMonth/100 - 1911);
-		String iMon =String.valueOf(inputYearMonth% 100);
-		makeExcel.setValue(1, 1, String.format("新光人壽保險股份有限公司  %s年度(%s月)報表", iRoc,iMon));
+		String iRoc = String.valueOf(inputYearMonth / 100 - 1911);
+		String iMon = String.valueOf(inputYearMonth % 100);
+		makeExcel.setValue(1, 1, String.format("新光人壽保險股份有限公司  %s年度(%s月)報表", iRoc, iMon));
 
 		if (lY004List != null && !lY004List.isEmpty()) {
 			// 有資料時處理
@@ -93,13 +93,13 @@ public class LY004Report extends MakeReport {
 		} else {
 			// 無資料時處理
 			makeExcel.setValue(6, 2, "本日無資料!!");
-			
+
 			return false;
 		}
 
-		 makeExcel.close();
-		 
-		 return true;
+		makeExcel.close();
+
+		return true;
 
 	}
 }

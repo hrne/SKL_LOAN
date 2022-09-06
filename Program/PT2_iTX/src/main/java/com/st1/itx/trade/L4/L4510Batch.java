@@ -193,18 +193,15 @@ public class L4510Batch extends TradeBuffer {
 		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
 //		抓取媒體日為今日者
-		slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit,
-				titaVo);
+		slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit, titaVo);
 		if (slEmpDeductSchedule != null) {
 			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 				perfMonth.put(tEmpDeductSchedule.getAgType1(), tEmpDeductSchedule.getWorkMonth());
 //				1.15日薪 2.非15日薪
-				if (iOpItem == 1 && ("4".equals(tEmpDeductSchedule.getAgType1())
-						|| "5".equals(tEmpDeductSchedule.getAgType1()))) {
+				if (iOpItem == 1 && ("4".equals(tEmpDeductSchedule.getAgType1()) || "5".equals(tEmpDeductSchedule.getAgType1()))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
 				}
-				if (iOpItem == 2 && !"4".equals(tEmpDeductSchedule.getAgType1())
-						&& !"5".equals(tEmpDeductSchedule.getAgType1())) {
+				if (iOpItem == 2 && !"4".equals(tEmpDeductSchedule.getAgType1()) && !"5".equals(tEmpDeductSchedule.getAgType1())) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
 				}
 			}
@@ -272,12 +269,10 @@ public class L4510Batch extends TradeBuffer {
 		totaVo.put("OReportF", "" + reportF);
 		if (cnt == 0) {
 			sendMsg = (iOpItem == 1 ? "15日薪" : "非15日薪") + " 產生扣薪明細筆數 = 0";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4511",
-					titaVo.get("MediaDate") + iOpItem, sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4511", titaVo.get("MediaDate") + iOpItem, sendMsg, titaVo);
 		} else {
 			sendMsg = (iOpItem == 1 ? "15日薪" : "非15日薪") + " 扣薪報表已完成，扣薪明細筆數 = " + cnt;
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4510",
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4510", sendMsg, titaVo);
 		}
 
 		this.addList(totaVo);
@@ -338,17 +333,14 @@ public class L4510Batch extends TradeBuffer {
 			}
 
 			// 應繳試算
-			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, parse.stringToInteger(result.get("CustNo")),
-					parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
+			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
 			if (!"3".equals(result.get("RepayCode"))) {
 				if (baTxCom.getTerms() < 2) {
 					this.info("skip terms < 2  " + result);
 					continue;
 				}
 			}
-			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")),
-					parse.stringToInteger(result.get("FacmNo")), 0, 0, flag,
-					parse.stringToInteger(result.get("AgType1")));
+			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 0, flag, parse.stringToInteger(result.get("AgType1")));
 			// 業務科目(額度)
 			facmAcctCode.put(tmp2, result.get("AcctCode"));
 
@@ -397,8 +389,7 @@ public class L4510Batch extends TradeBuffer {
 
 		@Override
 		public String toString() {
-			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", BormNo=" + BormNo + ", achRepayCode="
-					+ achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
+			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", BormNo=" + BormNo + ", achRepayCode=" + achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
 		}
 
 		@Override
@@ -569,8 +560,7 @@ public class L4510Batch extends TradeBuffer {
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 
-			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(),
-					tmp.getProcCode());
+			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(), tmp.getProcCode());
 			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 
 			this.info("tmp ... " + tmp);
@@ -750,14 +740,12 @@ public class L4510Batch extends TradeBuffer {
 	}
 
 //	flag = 1.15日 2.非15
-	private long setReportInsuFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo)
-			throws LogicException {
+	private long setReportInsuFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo) throws LogicException {
 
 		return l4510Report.exec(imediaDate, iProcCode, flag, titaVo);
 	}
 
-	private long setReportAcctFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo)
-			throws LogicException {
+	private long setReportAcctFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo) throws LogicException {
 
 		return l4510Report2.exec(imediaDate, iProcCode, flag, titaVo);
 	}
@@ -772,8 +760,7 @@ public class L4510Batch extends TradeBuffer {
 	}
 
 	private void deleEmpDeductDtl(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
-		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind, this.index,
-				this.limit, titaVo);
+		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind, this.index, this.limit, titaVo);
 
 		if (slEmpDeductDtl != null) {
 			for (EmpDeductDtl tEmpDeductDtl : slEmpDeductDtl.getContent()) {
@@ -800,11 +787,9 @@ public class L4510Batch extends TradeBuffer {
 						continue;
 					}
 				}
-				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
-						tBaTxVo.getRepayType(), flag, procCode);
+				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), tBaTxVo.getRepayType(), flag, procCode);
 
-				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag,
-						procCode);
+				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag, procCode);
 				tmpFacm tmp3 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag, procCode);
 
 				if (!mapFlag.containsKey(tmp)) {
@@ -863,8 +848,7 @@ public class L4510Batch extends TradeBuffer {
 					if (!rpAmt1CMap.containsKey(tmp2)) {
 						rpAmt1CMap.put(tmp2, tBaTxVo.getBreachAmt().add(tBaTxVo.getDelayInt()));
 					} else {
-						rpAmt1CMap.put(tmp2,
-								rpAmt1CMap.get(tmp2).add(tBaTxVo.getBreachAmt().add(tBaTxVo.getDelayInt())));
+						rpAmt1CMap.put(tmp2, rpAmt1CMap.get(tmp2).add(tBaTxVo.getBreachAmt().add(tBaTxVo.getDelayInt())));
 					}
 
 //					帳管費

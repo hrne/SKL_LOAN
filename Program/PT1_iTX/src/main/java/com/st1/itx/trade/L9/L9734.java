@@ -14,7 +14,7 @@ import com.st1.itx.util.MySpring;
 /**
  * L9734
  * 
- * @author 
+ * @author
  * @version 1.0.0
  */
 @Service("L9734")
@@ -29,7 +29,7 @@ public class L9734 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		MySpring.newTask(txcd + "p", this.txBuffer, titaVo);
-	
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

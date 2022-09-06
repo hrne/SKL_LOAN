@@ -47,13 +47,13 @@ public class L6403 extends TradeBuffer {
 
 		String iFunCode = titaVo.get("FunCode").trim();
 		String iAuthNo = titaVo.get("AuthNo").trim();
-		
+
 		// 檢查使用複製功能，新增的權限群組(AuthNo)沒有重複
 		TxAuthGroup tTxAuthGroup = sTxAuthGroupService.findById(iAuthNo, titaVo);
 		if (tTxAuthGroup != null && "3".equals(iFunCode)) {
 			throw new LogicException(titaVo, "E0002", "權限群組:" + iAuthNo);
 		}
-		
+
 		MySpring.newTask("L6403Batch", this.txBuffer, titaVo);
 
 		this.totaVo.setWarnMsg("背景作業中,待處理完畢訊息通知");

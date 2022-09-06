@@ -91,8 +91,7 @@ public class BS910 extends TradeBuffer {
 		this.info("BS910 iAcDate = " + iAcDate + ",iAcDateReverse=" + iAcDateReverse);
 
 		// 1.刪除處理清單 ACCL03-放款承諾提存入帳 //
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index,
-				Integer.MAX_VALUE);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index, Integer.MAX_VALUE);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
@@ -100,8 +99,7 @@ public class BS910 extends TradeBuffer {
 
 		// 刪除提存當月AcDetal:96
 		this.info("2-1.bs910 delete AcDetal-96, yearMonth=" + yearMonth);
-		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 96, this.index,
-				Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 96, this.index, Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			lAcDetail = new ArrayList<AcDetail>();
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
@@ -113,8 +111,7 @@ public class BS910 extends TradeBuffer {
 		}
 		// 刪除提存當月AcDetal:97
 		this.info("2-2.bs910 delete AcDetal-97, yearMonth=" + yearMonth);
-		slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 97, this.index,
-				Integer.MAX_VALUE, titaVo);
+		slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 97, this.index, Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			lAcDetail = new ArrayList<AcDetail>();
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
@@ -124,14 +121,13 @@ public class BS910 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
 			}
 		}
-		
+
 		// 3.迴轉上月
 		this.info("3.bs910 last month ACCL03");
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		// 2.迴轉上月
 		this.info("3.bs910 last month ACCL03");
-		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 97, this.index,
-				Integer.MAX_VALUE, titaVo);
+		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 97, this.index, Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
 				if ("LC1".equals(t.getAcctCode()) && t.getEntAc() == 1) {
@@ -180,8 +176,7 @@ public class BS910 extends TradeBuffer {
 			txToDoCom.addByDetailList(false, 0, lTxToDoDetail, titaVo); // DupSkip = false ->重複 error
 		}
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
-				"請執行 各項提存入帳作業(放款承諾)", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(), "請執行 各項提存入帳作業(放款承諾)", titaVo);
 
 		// END
 		this.batchTransaction.commit();
@@ -191,8 +186,7 @@ public class BS910 extends TradeBuffer {
 	/* 寫入應處理清單 ACCL03-各項提存作業，寫入新提存 */
 	private void procTxToDo(int yearMonth, TitaVo titaVo) throws LogicException {
 		HashMap<String, BigDecimal> map = new HashMap<>();
-		Slice<Ias39LoanCommit> slIas39LoanCommit = ias39LoanCommitService.findDataYmEq(yearMonth, this.index,
-				Integer.MAX_VALUE);
+		Slice<Ias39LoanCommit> slIas39LoanCommit = ias39LoanCommitService.findDataYmEq(yearMonth, this.index, Integer.MAX_VALUE);
 		List<Ias39LoanCommit> lIas39LoanCommit = slIas39LoanCommit == null ? null : slIas39LoanCommit.getContent();
 
 		if (lIas39LoanCommit != null) {
@@ -216,16 +210,12 @@ public class BS910 extends TradeBuffer {
 
 	private String getRvNo(TitaVo titaVo) throws LogicException {
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC"
-				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(
-						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
-						6);
+		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		return rvNo;
 	}
 
-	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal avblBal, TitaVo titaVo)
-			throws LogicException {
+	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal avblBal, TitaVo titaVo) throws LogicException {
 		// 借：不可撤銷放款承諾 貸：待抵銷不可撤銷放款承諾
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
 		String rvNo = getRvNo(titaVo);

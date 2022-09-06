@@ -57,9 +57,9 @@ public class L8035 extends TradeBuffer {
 			occursListA.putParam("OORate", rJcicZ044.getRate());
 			occursListA.putParam("OOMonthPayAmt", rJcicZ044.getMonthPayAmt());
 			occursListA.putParam("OOReceYearIncome", rJcicZ044.getReceYearIncome());
-			occursListA.putParam("OOReceYear", rJcicZ044.getReceYear()-1911);
+			occursListA.putParam("OOReceYear", rJcicZ044.getReceYear() - 1911);
 			occursListA.putParam("OOReceYear2Income", rJcicZ044.getReceYear2Income());
-			occursListA.putParam("OOReceYear2", rJcicZ044.getReceYear2()-1911);
+			occursListA.putParam("OOReceYear2", rJcicZ044.getReceYear2() - 1911);
 			occursListA.putParam("OOCurrentMonthIncome", rJcicZ044.getCurrentMonthIncome());
 			occursListA.putParam("OOLivingCost", rJcicZ044.getLivingCost());
 			occursListA.putParam("OOCompName", rJcicZ044.getCompName());
@@ -115,9 +115,9 @@ public class L8035 extends TradeBuffer {
 			occursList.putParam("OORate", rrJcicZ044Log.getRate());
 			occursList.putParam("OOMonthPayAmt", rrJcicZ044Log.getMonthPayAmt());
 			occursList.putParam("OOReceYearIncome", rrJcicZ044Log.getReceYearIncome());
-			occursList.putParam("OOReceYear", rrJcicZ044Log.getReceYear()-1911);
+			occursList.putParam("OOReceYear", rrJcicZ044Log.getReceYear() - 1911);
 			occursList.putParam("OOReceYear2Income", rrJcicZ044Log.getReceYear2Income());
-			occursList.putParam("OOReceYear2", rrJcicZ044Log.getReceYear2()-1911);
+			occursList.putParam("OOReceYear2", rrJcicZ044Log.getReceYear2() - 1911);
 			occursList.putParam("OOCurrentMonthIncome", rrJcicZ044Log.getCurrentMonthIncome());
 			occursList.putParam("OOLivingCost", rrJcicZ044Log.getLivingCost());
 			occursList.putParam("OOCompName", rrJcicZ044Log.getCompName());
