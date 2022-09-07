@@ -87,42 +87,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"CustNo\" = F.\"CustNo\" ";
 		sql += "                               AND MF.\"FacmNo\" = F.\"FacmNo\" ";
 		sql += "                               AND MF.\"YearMonth\" = M.\"YearMonth\" ";
-//		sql += " LEFT JOIN \"ClImm\" CI ON CI.\"ClCode1\" = M.\"ClCode1\" ";
-//		sql += "                       AND CI.\"ClCode2\" = M.\"ClCode2\" ";
-//		sql += "                       AND CI.\"ClNo\"    = M.\"ClNo\" ";
-//		sql += " LEFT JOIN ( SELECT M.\"ClCode1\" ";
-//		sql += "                   ,M.\"ClCode2\" ";
-//		sql += "                   ,M.\"ClNo\" ";
-//		sql += "                   ,CM.\"CustId\"                                  AS \"OwnerId\" ";
-//		sql += "                   ,\"Fn_ParseEOL\"(CM.\"CustName\", 0)            AS \"OwnerName\" ";
-//		sql += "                   ,LPAD(NVL(CL.\"LandNo1\",'0'),4,'0') ";
-//		sql += "                         || LPAD(NVL(CL.\"LandNo2\",'0'),4,'0')    AS \"LandNo\"  "; // 地號格式為 4-4
-//		sql += "                   ,LPAD(NVL(CB.\"BdNo1\",'0'),5,'0') ";
-//		sql += "                         || LPAD(NVL(CB.\"BdNo2\",'0'),3,'0')      AS \"BdNo\"  "; // 建號格式為 5-3
-//		sql += "                   ,ROW_NUMBER() OVER (PARTITION BY M.\"ClCode1\" ";
-//		sql += "                                                   ,M.\"ClCode2\" ";
-//		sql += "                                                   ,M.\"ClNo\" ";
-//		sql += "                                       ORDER BY M.\"ClNo\")        AS \"Seq\" ";
-//		sql += "             FROM \"MonthlyLoanBal\" M ";
-//		sql += "             LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" = M.\"ClCode1\" ";
-//		sql += "                                        AND CB.\"ClCode2\" = M.\"ClCode2\" ";
-//		sql += "                                        AND CB.\"ClNo\"    = M.\"ClNo\" ";
-//		sql += "             LEFT JOIN \"ClBuildingOwner\" CBO ON CBO.\"ClCode1\" = M.\"ClCode1\" ";
-//		sql += "                                              AND CBO.\"ClCode2\" = M.\"ClCode2\" ";
-//		sql += "                                              AND CBO.\"ClNo\"    = M.\"ClNo\" ";
-//		sql += "             LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = M.\"ClCode1\" ";
-//		sql += "                                    AND CL.\"ClCode2\" = M.\"ClCode2\" ";
-//		sql += "                                    AND CL.\"ClNo\"    = M.\"ClNo\" ";
-//		sql += "             LEFT JOIN \"ClLandOwner\" CLO ON CLO.\"ClCode1\" = M.\"ClCode1\" ";
-//		sql += "                                          AND CLO.\"ClCode2\" = M.\"ClCode2\" ";
-//		sql += "                                          AND CLO.\"ClNo\"    = M.\"ClNo\" ";
-//		sql += "             LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = NVL(CBO.\"OwnerCustUKey\", CLO.\"OwnerCustUKey\") ";
-//		sql += "             WHERE M.\"YearMonth\" = :entdy ";
-//		sql += "               AND M.\"LoanBalance\" > 0 ";
-//		sql += "           ) CL ON Cl.\"ClCode1\" = M.\"ClCode1\" ";
-//		sql += "               AND Cl.\"ClCode2\" = M.\"ClCode2\" ";
-//		sql += "               AND Cl.\"ClNo\"    = M.\"ClNo\" ";
-//		sql += "               AND Cl.\"Seq\"     = 1 ";
+
 		sql += " WHERE M.\"YearMonth\" = :entdy ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";
@@ -210,10 +175,16 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  AND \"AssetClassNo\" = 62 ";
 		sql += "		)";
 		sql += "		GROUP BY \"YearMonth\"";
+		sql += "	),soAmt AS (";
+		sql += "		SELECT \"YearMonth\"";
+		sql += "			  ,\"LoanBal\" AS \"Amt\"";
+		sql += "		FROM \"MonthlyLM052AssetClass\"";
+		sql += "		WHERE \"YearMonth\" BETWEEN :syearmonth AND :eyearmonth ";
+		sql += "		  AND \"AssetClassNo\" = 62 ";
 		sql += "	)";
 		sql += "	SELECT aAmt.\"YearMonth\"";
 		sql += "		  ,pAmt.\"Amt\" AS \"12Amt\"";
-		sql += "		  ,aAmt.\"Amt\" + dpAmt.\"Amt\" AS \"totalAmt\"";
+		sql += "		  ,aAmt.\"Amt\" + dpAmt.\"Amt\" + NVL(soAmt.\"Amt\",0) AS \"totalAmt\"";
 		sql += "		  ,ROUND(pAmt.\"Amt\" / (aAmt.\"Amt\" + dpAmt.\"Amt\"),15) AS \"12Rate\"";
 		sql += "		  ,oAmt.\"Amt\" AS \"oAmt\"";
 		sql += "		  ,ROUND(oAmt.\"Amt\" / (aAmt.\"Amt\" + dpAmt.\"Amt\"),15) AS \"oRate\"";
@@ -221,6 +192,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN aAmt ON aAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
 		sql += "	LEFT JOIN dpAmt ON dpAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
 		sql += "	LEFT JOIN oAmt ON oAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
+		sql += "	LEFT JOIN soAmt ON soAmt.\"YearMonth\" = pAmt.\"YearMonth\"";
 		sql += " ORDER BY  aAmt.\"YearMonth\" ASC ";
 
 		this.info("sql=" + sql);

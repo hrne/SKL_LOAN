@@ -131,9 +131,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "     ELSE BATX.\"ReconCode\" ";
 			sql += "     END = BATX.\"ReconCode\"";
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
-			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
-			sql += "                           , '6' "; // 批次入帳
-			sql += "                           , '7') ";// 轉暫收
+
 
 		} else {
 			//入帳後檢核明細表

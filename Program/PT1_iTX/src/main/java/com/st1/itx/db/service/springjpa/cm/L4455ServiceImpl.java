@@ -57,7 +57,6 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    FROM \"LoanBorTx\"";
 		sql += "    WHERE \"AcDate\" = :inputAcDate";
 		sql += "      AND \"EntryDate\" = :inputEntryDate";
-		sql += "      AND \"TitaHCode\" = 0";
 		sql += "    GROUP BY \"CustNo\"";
 		sql += "           , \"FacmNo\"";
 		sql += "           , \"BormNo\"";
@@ -98,7 +97,6 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    FROM \"LoanBorTx\"";
 		sql += "    WHERE \"AcDate\" = :inputAcDate";
 		sql += "      AND \"EntryDate\" = :inputEntryDate";
-		sql += "      AND \"TitaHCode\" = 0";
 		sql += "    GROUP BY \"CustNo\"";
 		sql += "           , \"FacmNo\"";
 		sql += "           , \"BormNo\"";
