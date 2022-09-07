@@ -304,11 +304,25 @@ T(2,#OCustNo+-+#OFacmNo+-+#OBormNo)
 !明細序號
 #OTxSno=A,2,S
 
+!交易代號
+#OOTxCd=X,5,S
+
 #BufA=X,50,S
 T(2,#OTxDate+#OTxSeq+#OTxSno)
 
 #OOBtnA=A,1,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L6934; ntxbuf=#BufA})
+
+#Entdy=D,7,S
+E(0,#OTxDate)
+#TxNo=X,18,S
+T(2,#OTxSeq)
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo)
+!交易
+#OOBtnB=X,1,S
+BIND(grid,{ cmd=DDCHECK; ntxcd=#OOTxCd; txno=#RimData;rim=LCR11})
+
 
 </sub>
 
@@ -346,6 +360,7 @@ TXFORM=L6932
 #OTxDate
 #OTxSeq
 #OTxSno
+#OOTxCd
 ^
 </sub>
 
@@ -365,6 +380,9 @@ TXFORM=L6932
 
 #OOBtnA=修改內容
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
+
+#OOBtnB=交易
+{width:40,search:false,formatter:'cust:bind-button:交易',canExport:false,align:'center'}
 
 #OTranName=交易名稱
 {width:350,align:'left'}

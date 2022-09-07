@@ -105,7 +105,11 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 29, String.format("%,d", Integer.parseInt(tL4606Vo.get("F2"))), "R");
 				this.print(0, 39, tL4606Vo.get("F3"), "R");
 				this.print(0, 49, tL4606Vo.get("F4"), "R");
-				this.print(0, 50, tL4606Vo.get("F5"));
+				if(tL4606Vo.get("F5").length()>27) {
+					this.print(0, 50, tL4606Vo.get("F5").substring(0,27));
+				}else {				
+					this.print(0, 50, tL4606Vo.get("F5"));
+				}
 				this.print(0, 104, padStart(7, tL4606Vo.get("F6")));
 				this.print(0, 112, "-");
 				this.print(0, 116, padStart(3, tL4606Vo.get("F7")), "R");
@@ -155,7 +159,11 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 29, tL4606Vo.get("F2"), "R");
 				this.print(0, 39, tL4606Vo.get("F3"), "R");
 				this.print(0, 49, tL4606Vo.get("F4"), "R");
-				this.print(0, 50, tL4606Vo.get("F5"));
+				if(tL4606Vo.get("F5").length()>27) {
+					this.print(0, 50, tL4606Vo.get("F5").substring(0,27));
+				}else {				
+					this.print(0, 50, tL4606Vo.get("F5"));
+				}
 				this.print(0, 104, padStart(7, tL4606Vo.get("F6")));
 				this.print(0, 112, "-");
 				this.print(0, 116, padStart(3, tL4606Vo.get("F7")), "R");

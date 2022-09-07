@@ -2646,20 +2646,6 @@ T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 !T(A,@RELACCTERRX,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)
 T(H,@RelationGenderX,#RelationGender,#SexHelp)
 
-![繳款方式]
-!修改時自動顯示可修改,其他自動顯示不必須輸入
-#FdRepayCode=X,2,L
-#RepayCode=A,2,I
-C(3,#UpdateCode,1,$,s)
-C(3,#BeforeAcctCheckFlag,7,s,$)
-C(3,#Hide5Fg,0,CALL(#HideP5),$)
-HELP(#RepayCodeHelp)
-@
-V(H,#RepayCodeHelp)
-!@V(2,0)V(E,0,L3DEF,RepayCodeDef)
-
-#RepayCodeX=X,16,L
-T(H,#RepayCode,#RepayCodeHelp)
 
 #RimFunCode=A,1,S
 
@@ -2705,6 +2691,20 @@ T(2,@RelationGender,#L2r44RelationGender)
 T(2,@OldRelationGender,#L2r44RelationGender)
 T(2,@MainStatus,#L2r44MainStatus)
 
+![繳款方式]
+!修改時自動顯示可修改,其他自動顯示不必須輸入
+#FdRepayCode=X,2,L
+#RepayCode=A,2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#BeforeAcctCheckFlag,7,s,$)
+C(3,#Hide5Fg,0,CALL(#HideP5),$)
+HELP(#RepayCodeHelp)
+@
+V(H,#RepayCodeHelp)
+!@V(2,0)V(E,0,L3DEF,RepayCodeDef)
+
+#RepayCodeX=X,16,L
+T(H,#RepayCode,#RepayCodeHelp)
 
 
 #WkFDP5A=X,1,S
@@ -2742,7 +2742,6 @@ HIDE(#LbRepayBank,#LbRepayAcctNo,#LbPostCode)
 !繳款方式為銀行扣款時，須輸入扣款銀行,其他則不必輸入
 !改用財金的銀行代碼(數字7位的前3碼),下拉式選單只顯示有啟用的銀行代碼。
 #FdRepayBank=X,2,L
-
 
 #RepayBank=X,3,I
 C(3,#RepayCode,2,$,S)

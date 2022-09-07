@@ -569,6 +569,14 @@ T(2,#OOAcDate+0000000+#OORelNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#OOBUF3})
 C(5,#OOAcFg,"Y",$,BIND(grid,cancel))
 
+!交易
+
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=DDCHECK; ntxcd=#OOTxCd; txno=#RimData;rim=LCR11})
+C(5,#OOCreateEmpNo,999999,BIND(grid,cancel),$)
+IF(#OOAcFg=="",BIND(grid,cancel),$)
+
+
 !計息明細
 #OOBUF4=X,34,S
 T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOAcDate+#OOTellerNo+#OOTxtNo)
@@ -709,6 +717,10 @@ TXFORM=L3005
 
 #OOAcDtRelNo=交易序號
 {width:200,align:'center'}
+
+#OOBTN2=交易
+{width:40,search:false,formatter:'cust:bind-button:交易',canExport:false,align:'center'}
+
 
 #OOBTN4=計息
 {width:40,search:true,formatter:'cust:bind-button:計息;L3913 計息',align:'center',canExport:false,}
