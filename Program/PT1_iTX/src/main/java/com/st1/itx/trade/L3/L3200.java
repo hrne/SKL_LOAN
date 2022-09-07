@@ -1397,30 +1397,33 @@ public class L3200 extends TradeBuffer {
 		if (isCalcRepayInt) {
 			// 部分償還重算期金
 			if (wkRepaykindCode == 1) {
-				int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
-						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-						tLoanBorMain.getGraceDate());
-				// 剩餘還本期數
-				int wkDueTerms = tLoanBorMain.getPaidTerms() > wkGracePeriod
-						? tLoanBorMain.getTotalPeriod() - tLoanBorMain.getPaidTerms()
-						: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
+				if ("3".equals(tLoanBorMain.getAmortizedCode()) || "4".equals(tLoanBorMain.getAmortizedCode())) {
+					int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(),
+							tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(),
+							tLoanBorMain.getSpecificDd(), tLoanBorMain.getGraceDate());
+					// 剩餘還本期數
+					int wkDueTerms = tLoanBorMain.getPaidTerms() > wkGracePeriod
+							? tLoanBorMain.getTotalPeriod() - tLoanBorMain.getPaidTerms()
+							: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
 
-				if (iPayMethod == 2) {
-					// 重算期數 ==> 繳納方式 = 2 (1.減少每期攤還金額 2.縮短應繳期數)
-					wkDueTerms = loanDueAmtCom.getDueTerms(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
-							tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
-							tLoanBorMain.getFinalBal(), tLoanBorMain.getDueAmt(), titaVo);
-					// 寬限期 + 剩餘還本期數(寬限期內)；已繳期數 + 剩餘還本期數(超過寬限期)
-					wkNewTotalPeriod = tLoanBorMain.getPaidTerms() > wkGracePeriod
-							? wkDueTerms + tLoanBorMain.getPaidTerms()
-							: wkDueTerms + wkGracePeriod;
-					tLoanBorMain.setTotalPeriod(wkNewTotalPeriod);
-				} else {
-					// 重算期金
-					wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
-							tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
-							tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
-					tLoanBorMain.setDueAmt(wkNewDueAmt);
+					if (iPayMethod == 2) {
+						// 重算期數 ==> 繳納方式 = 2 (1.減少每期攤還金額 2.縮短應繳期數)
+						wkDueTerms = loanDueAmtCom.getDueTerms(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
+								tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
+								tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), tLoanBorMain.getDueAmt(),
+								titaVo);
+						// 寬限期 + 剩餘還本期數(寬限期內)；已繳期數 + 剩餘還本期數(超過寬限期)
+						wkNewTotalPeriod = tLoanBorMain.getPaidTerms() > wkGracePeriod
+								? wkDueTerms + tLoanBorMain.getPaidTerms()
+								: wkDueTerms + wkGracePeriod;
+						tLoanBorMain.setTotalPeriod(wkNewTotalPeriod);
+					} else {
+						// 重算期金
+						wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
+								tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
+								tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
+						tLoanBorMain.setDueAmt(wkNewDueAmt);
+					}
 				}
 			} else {
 				tLoanBorMain.setStoreRate(loanCalcRepayIntCom.getStoreRate());
@@ -1429,7 +1432,7 @@ public class L3200 extends TradeBuffer {
 				tLoanBorMain.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
 				tLoanBorMain.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
 				tLoanBorMain.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
-				tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());				
+				tLoanBorMain.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
 				if (tLoanBorMain.getAmortizedCode().equals("3")
 						&& !loanCalcRepayIntCom.getDueAmt().equals(tLoanBorMain.getDueAmt())) {
 					wkNewDueAmt = loanCalcRepayIntCom.getDueAmt();

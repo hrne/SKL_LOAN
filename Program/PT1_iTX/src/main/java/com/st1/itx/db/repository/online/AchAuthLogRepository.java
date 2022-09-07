@@ -91,8 +91,8 @@ public interface AchAuthLogRepository extends JpaRepository<AchAuthLog, AchAuthL
   // PropDate = ,AND BatchNo %
   public Slice<AchAuthLog> findAllByPropDateIsAndBatchNoLikeOrderByBatchNoDesc(int propDate_0, String batchNo_1, Pageable pageable);
 
-  // PropDate <= ,AND BatchNo %
-  public Optional<AchAuthLog> findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(int propDate_0, String batchNo_1);
+  // PropDate <= ,AND RetrDate = ,AND BatchNo %
+  public Optional<AchAuthLog> findTopByPropDateLessThanEqualAndRetrDateIsAndBatchNoLikeOrderByPropDateDescBatchNoDesc(int propDate_0, int retrDate_1, String batchNo_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

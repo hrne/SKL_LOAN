@@ -107,8 +107,8 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    AND ac.\"CustNo\" = :custno";
 		sql += "    AND ac.\"FacmNo\" = :facmno";
 		sql += "    AND ac.\"RvNo\" = :rvno";
-		sql += "    AND ac.\"ReceivableFlag\" >= 0 ";
-		sql += "  UNION";
+		sql += "    AND ac.\"ReceivableFlag\" > 0 ";
+		sql += "  UNION ALL";
 		sql += "  SELECT";
 		sql += "    ad.\"RvNo\"         AS \"RvNo\",";
 		sql += "    ad.\"TxAmt\"        AS \"RvAmt\",";
@@ -153,7 +153,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    AND ar.\"CustNo\" = :custno";
 		sql += "    AND ar.\"FacmNo\" = :facmno";
 		sql += "    AND ar.\"RvNo\" = :rvno";
-		sql += "    AND NVL(ad.\"ReceivableFlag\", 0 ) >= 0";
+		sql += "    AND NVL(ad.\"ReceivableFlag\", 0 ) > 0";
 		sql += " ORDER BY \"DB\", \"AcDate\", \"CreateDate\"";
 
 		sql += " " + sqlRow;

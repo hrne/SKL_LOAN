@@ -676,20 +676,20 @@ em = null;
   }
 
   @Override
-  public AchAuthLog propDescBatchNoFirst(int propDate_0, String batchNo_1, TitaVo... titaVo) {
+  public AchAuthLog propDescBatchNoFirst(int propDate_0, int retrDate_1, String batchNo_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("propDescBatchNoFirst " + dbName + " : " + "propDate_0 : " + propDate_0 + " batchNo_1 : " +  batchNo_1);
+    this.info("propDescBatchNoFirst " + dbName + " : " + "propDate_0 : " + propDate_0 + " retrDate_1 : " +  retrDate_1 + " batchNo_2 : " +  batchNo_2);
     Optional<AchAuthLog> achAuthLogT = null;
     if (dbName.equals(ContentName.onDay))
-      achAuthLogT = achAuthLogReposDay.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+      achAuthLogT = achAuthLogReposDay.findTopByPropDateLessThanEqualAndRetrDateIsAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, retrDate_1, batchNo_2);
     else if (dbName.equals(ContentName.onMon))
-      achAuthLogT = achAuthLogReposMon.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+      achAuthLogT = achAuthLogReposMon.findTopByPropDateLessThanEqualAndRetrDateIsAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, retrDate_1, batchNo_2);
     else if (dbName.equals(ContentName.onHist))
-      achAuthLogT = achAuthLogReposHist.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+      achAuthLogT = achAuthLogReposHist.findTopByPropDateLessThanEqualAndRetrDateIsAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, retrDate_1, batchNo_2);
     else 
-      achAuthLogT = achAuthLogRepos.findTopByPropDateLessThanEqualAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, batchNo_1);
+      achAuthLogT = achAuthLogRepos.findTopByPropDateLessThanEqualAndRetrDateIsAndBatchNoLikeOrderByPropDateDescBatchNoDesc(propDate_0, retrDate_1, batchNo_2);
 
     return achAuthLogT.isPresent() ? achAuthLogT.get() : null;
   }

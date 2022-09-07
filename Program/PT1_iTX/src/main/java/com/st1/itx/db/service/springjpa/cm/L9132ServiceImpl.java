@@ -136,12 +136,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
-		if (acDate == 20220407) {
-			sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
-		} else {
-
-			sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
-		}
+		sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 		sql += " ) ";
@@ -421,12 +416,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
-		if (acDate == 20220407) {
-			sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
-		} else {
-
-			sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
-		}
+		sql += "                               AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 //		sql += "       AND (CASE WHEN AC.\"EntAc\" IN (1) ";//--正常,批次(整批、單筆)入帳
@@ -669,12 +659,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND B.\"BatchNo\" = AC.\"TitaBatchNo\" ";
 		sql += "                               AND LPAD(B.\"DetailSeq\",6,0) = AC.\"TitaBatchSeq\" ";
 		sql += "                               AND B.\"RepayCode\" IN ('01','02','03','04') ";
-		if (acDate == 20220407) {
-			sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
-		} else {
-
-			sql += "                               AND AC.\"TitaTxtNo\" > 1000000 ";
-		}
+		sql += "                               AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 		sql += " ) ";

@@ -298,14 +298,15 @@ public interface AchAuthLogService {
   public Slice<AchAuthLog> propBatchNoEq(int propDate_0, String batchNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * PropDate &lt;= ,AND BatchNo %
+   * PropDate &lt;= ,AND RetrDate = ,AND BatchNo %
    *
    * @param propDate_0 propDate_0
-   * @param batchNo_1 batchNo_1
+   * @param retrDate_1 retrDate_1
+   * @param batchNo_2 batchNo_2
    * @param titaVo Variable-Length Argument
    * @return Slice AchAuthLog AchAuthLog of List
    */
-  public AchAuthLog propDescBatchNoFirst(int propDate_0, String batchNo_1, TitaVo... titaVo);
+  public AchAuthLog propDescBatchNoFirst(int propDate_0, int retrDate_1, String batchNo_2, TitaVo... titaVo);
 
   /**
    * hold By AchAuthLog

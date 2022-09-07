@@ -77,7 +77,7 @@ T(3,@RemoveNo, )
 ["#FdRemoveNo+銷帳編號",#RemoveNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookCodeX],
-["#FdTempAmt+暫收款金額",#TwTempAmt,#UsTempAmt,#BTN7],
+["#FdTempAmt+暫收款金額",#TwTempAmt,#UsTempAmt,#BTNAmt,#BTN7],
 ["#FdBDCL+呆帳結案",#BDCLFg,#BDCLFgX],
 ["#FdSupervisor+核決主管",#Supervisor,#SupervisorX],
 ["#FdRemark+備註",#Remark],
@@ -564,11 +564,12 @@ CALL2(#ADJUSTDOT,#Precision,#L3r05TempAmt,#TempAmtX)
 #TEMPAMTMSG=x,50,S
 T(2,該戶號目前暫收款金額為+#TempAmtX)
 #TwTempAmt=m,14,I
-C(3,#Precision,0,$,s)
+T(2,#TempAmtX)
+!C(3,#Precision,0,$,s)
 @
 IF(#TwTempAmt>#L3r05TempAmt,V(P,#TEMPAMTMSG),$)
-! V(5,0,#L3r05TempAmt)
-! V(2,0)
+V(5,0,#L3r05TempAmt)
+V(2,0)
 
 #UsTempAmt=m,14.2,I
 C(3,#Precision,0,s,$)
@@ -577,6 +578,9 @@ V(2,0)
 
 #TimTempAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))
+
+#BTNAmt=X,100,L
+T(2,該戶號目前暫收款金額為+#TempAmtX)
 
 ![交易金額]
 #TXAMT=_,_,S

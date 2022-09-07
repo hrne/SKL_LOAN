@@ -85,7 +85,7 @@ T(H,#ReconCode,#ReconCodeHelp)
 T(3,1:總傳票明細表;2:入帳後撿核明細表)
 
 #ReportNo=X,1,I
-HELP(#ReportNoHelp)
+C(3,#FunctionCode,1,HELP(#ReportNoHelp),S)
 @V(7)
 C(4,#ReportNo,$,V(H,#ReportNoHelp))
 

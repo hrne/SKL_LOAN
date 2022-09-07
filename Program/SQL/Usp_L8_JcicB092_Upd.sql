@@ -199,6 +199,106 @@ BEGIN
              , S."ClCode2" 
              , S."ClNo" 
     ) 
+    , CiData AS (
+      SELECT CF."CustNo"
+           , CF."FacmNo"
+           , CF."ClCode1"
+           , CF."ClCode2"
+           , CF."ClNo"
+           , CF."MainFlag"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."CityCode" ELSE CL."CityCode" END AS "CityCode"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."AreaCode" ELSE CL."AreaCode" END AS "AreaCode"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo1" ELSE CL."LandNo1" END AS "No1"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo2" ELSE CL."LandNo2" END AS "No2"
+           , CI."SettingAmt"
+           , CASE
+               WHEN TRUNC(NVL(CI."SettingDate",0) / 100) = YYYYMM 
+               THEN CI."SettingAmt"
+             ELSE 0 END AS "ThisMonthSettingAmt"
+           , DENSE_RANK()
+             OVER (
+              ORDER BY CF."CustNo"
+                     , CF."FacmNo"
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."CityCode" ELSE CL."CityCode" END
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."AreaCode" ELSE CL."AreaCode" END
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo1" ELSE CL."LandNo1" END
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo2" ELSE CL."LandNo2" END
+             ) AS "GroupNo"
+           , ROW_NUMBER()
+             OVER (
+              PARTITION BY CF."CustNo"
+                         , CF."FacmNo"
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."CityCode" ELSE CL."CityCode" END
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."AreaCode" ELSE CL."AreaCode" END
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo1" ELSE CL."LandNo1" END
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo2" ELSE CL."LandNo2" END
+              ORDER BY CASE
+                         WHEN CF."MainFlag" = 'Y'
+                         THEN 0
+                       ELSE 1 END
+                     , CF."ClCode1" 
+                     , CF."ClCode2" 
+                     , CF."ClNo"
+             ) AS "Seq"
+      FROM "ClFac" CF
+      LEFT JOIN "ClBuilding" CB ON CB."ClCode1" = CF."ClCode1"
+                               AND CB."ClCode2" = CF."ClCode2"
+                               AND CB."ClNo" = CF."ClNo"
+                               AND CF."ClCode1" = 1
+      LEFT JOIN "ClLand" CL ON CL."ClCode1" = CF."ClCode1"
+                           AND CL."ClCode2" = CF."ClCode2"
+                           AND CL."ClNo" = CF."ClNo"
+                           AND CF."ClCode1" = 2
+      LEFT JOIN "ClImm" CI ON CI."ClCode1" = CF."ClCode1"
+                          AND CI."ClCode2" = CF."ClCode2"
+                          AND CI."ClNo" = CF."ClNo"
+      WHERE CF."ClCode1" IN (1,2)
+    )
+    , CiAmtData AS (
+      SELECT "CustNo"
+           , "FacmNo"
+           , MAX(
+                CASE
+                  WHEN "Seq" = 1
+                  THEN "ClCode1"
+                ELSE 0 END
+             ) AS "ClCode1"
+           , MAX(
+                CASE
+                  WHEN "Seq" = 1
+                  THEN "ClCode2"
+                ELSE 0 END
+             ) AS "ClCode2"
+           , MAX(
+                CASE
+                  WHEN "Seq" = 1
+                  THEN "ClNo"
+                ELSE 0 END
+             ) AS "ClNo"
+           , "CityCode"
+           , "AreaCode"
+           , "No1"
+           , "No2"
+           , SUM("SettingAmt") AS "SettingAmt"
+           , SUM("ThisMonthSettingAmt") AS "ThisMonthSettingAmt"
+           , "GroupNo"
+           , MAX("Seq") AS "MaxSeq"
+      FROM CiData
+      GROUP BY "CustNo"
+             , "FacmNo"
+             , "GroupNo"
+             , "CityCode"
+             , "AreaCode"
+             , "No1"
+             , "No2"
+      ORDER BY "CustNo"
+             , "FacmNo"
+             , "GroupNo"
+             , "CityCode"
+             , "AreaCode"
+             , "No1"
+             , "No2"
+    )
     SELECT  -- count(*) as "Count" 
            M."FacmNo"                            AS "FacmNo" 
          , M."ClActNo"                           AS "MainClActNo"    -- 主要擔保品控制編碼 
@@ -227,7 +327,7 @@ BEGIN
            END                                   AS "SettingDate"       -- 設定日期 
          , CASE 
              WHEN TRUNC(NVL(CI."SettingDate",0) / 100) = YYYYMM 
-               THEN SUBSTR('00000000' || TRUNC(NVL(CI."SettingAmt",0) / 1000), -8) 
+               THEN SUBSTR('00000000' || TRUNC(NVL(CIAD."ThisMonthSettingAmt",0) / 1000), -8) 
              ELSE '00000000' 
            END                                   AS "MonthSettingAmt"   -- 本行本月設定金額 
          , CASE 
@@ -329,7 +429,7 @@ BEGIN
                    WHEN NVL(SCLAD."SameClLineAmt",0) != 0 
                    THEN NVL(SCLAD."SameClLineAmt",0) 
                  ELSE NVL(LAD."LineAmt",0) END)  AS "LineAmt"           -- 核准額度 
-         , SUBSTR('00000000' || TRUNC(NVL(CI."SettingAmt",0) / 1000), -8) 
+         , SUBSTR('00000000' || TRUNC(NVL(CIAD."SettingAmt",0) / 1000), -8) 
                                                  AS "CiSettingAmt"      -- 本行設定金額 
     FROM   "JcicB090" M 
       LEFT JOIN "CdCl"         ON "CdCl"."ClCode1"  = to_number(SUBSTR(M."ClActNo",1,1)) 
@@ -460,6 +560,11 @@ BEGIN
                                        AND SCLAD."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1)) 
                                        AND SCLAD."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2)) 
                                        AND SCLAD."ClNo" = to_number(SUBSTR(M."ClActNo",4,7)) 
+      LEFT JOIN CiAmtData CIAD ON CIAD."CustNo" = to_number(SUBSTR(M."FacmNo",1,7)) 
+                              AND CIAD."FacmNo" = to_number(SUBSTR(M."FacmNo",8,3)) 
+                              AND CIAD."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1)) 
+                              AND CIAD."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2)) 
+                              AND CIAD."ClNo" = to_number(SUBSTR(M."ClActNo",4,7)) 
     WHERE  M."DataYM"  =  YYYYMM 
       AND  M."ClActNo" IS NOT NULL 
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')         -- 主要擔保品為不動產 
@@ -542,12 +647,20 @@ BEGIN
          , WK."OwnerId"                          AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN 
          , MAX(WK."EvaAmt")                      AS "EvaAmt"            -- 鑑估(總市)值 (後面會再更新) 
          , MAX(WK."EvaDate")                     AS "EvaDate"           -- 鑑估日期 
-         , TRUNC(MAX(WK."LineAmt") / 1000)       AS "LoanLimitAmt"      -- 可放款值 = 核准額度 (ref:AS400 LN15M1) 
+         -- TODO: 2022-09-06 Wei FROM LINDA FROM 舜雯
+         -- 可放款值LoanLimitAmt  = 最大設定金額/1.2 (by舜雯)
+         , TRUNC(MAX(WK."CiSettingAmt") / 1.2)   AS "LoanLimitAmt"      -- 可放款值 = 核准額度 (ref:AS400 LN15M1) 
          , MAX(WK."SettingDate")                 AS "SettingDate"       -- 設定日期 
+         -- TODO: 2022-09-06 Wei FROM LINDA FROM 舜雯
+         -- 本行本月設定金額MonthSettingAmt應該也要2人持有時需加總(ClImm.SettingDate是當月)
          , MAX(WK."MonthSettingAmt")             AS "MonthSettingAmt"   -- 本行本月設定金額 
          , MAX(WK."SettingSeq")                  AS "SettingSeq"        -- 本月設定抵押順位 
-         , TRUNC(MAX(WK."LineAmt") * 1.2 / 1000) AS "SettingAmt"        -- 本行累計已設定總金額 = 核准額度 * 1.2 (ref:AS400 LN15M1) 
---         , MAX(WK."CiSettingAmt")                AS "SettingAmt"        -- 本行累計已設定總金額 
+         -- TODO: 2022-09-06 Wei FROM LINDA FROM 舜雯
+         -- 本行累計已設定總金額SettingAmt重新計算 (取最大設定金額)
+         -- 該擔保品是多人持有時設定金額應加總(by舜雯),且該戶不同額度若同擔保品則各自加總後取最大的設定金額,
+         -- 例戶號1911額度6,2人持有,累計設定金額=1200000*2=2400000
+        --  , TRUNC(MAX(WK."LineAmt") * 1.2 / 1000) AS "SettingAmt"        -- 本行累計已設定總金額 = 核准額度 * 1.2 (ref:AS400 LN15M1) 
+         , MAX(WK."CiSettingAmt")                AS "SettingAmt"        -- 本行累計已設定總金額 
          , MAX(WK."PreSettingAmt")               AS "PreSettingAmt"     -- 其他債權人已設定金額 
          , MAX(WK."DispPrice")                   AS "DispPrice"         -- 處分價格 
          , MAX(WK."IssueEndDate")                AS "IssueEndDate"      -- 權利到期年月 

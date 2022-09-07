@@ -120,7 +120,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
 			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
 			sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
-			sql += "            AND TX2.\"TxAmt\" > 0";
 			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 			sql += "                      AND TX2.\"FacmNo\" > 0";
@@ -210,7 +209,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
 			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";
 			sql += "            AND TX2.\"TitaTxtNo\" = TX1.\"TitaTxtNo\"";
-			sql += "            AND TX2.\"TxAmt\" > 0";
 			sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = TX2.\"CustNo\"";
 			sql += "                      AND FAC.\"FacmNo\" = TX2.\"FacmNo\"";
 			sql += "                      AND TX2.\"FacmNo\" > 0";

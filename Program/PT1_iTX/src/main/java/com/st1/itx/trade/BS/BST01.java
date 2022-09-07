@@ -117,32 +117,34 @@ public class BST01 extends TradeBuffer {
 			}
 			LoanBorMain tLoanBorMain = loanBorMainService
 					.holdById(new LoanBorMainId(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo()), titaVo);
-			int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
-					tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-					tLoanBorMain.getGraceDate());
-			int wkPaidTerms = 0;
-			if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getSpecificDate()) {
-				wkPaidTerms = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
+			if ("3".equals(tLoanBorMain.getAmortizedCode()) || "4".equals(tLoanBorMain.getAmortizedCode())) {
+				int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
 						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-						tLoanBorMain.getPrevPayIntDate());
-			}
-			// 剩餘還本期數
-			int wkDueTerms = wkPaidTerms > wkGracePeriod ? tLoanBorMain.getTotalPeriod() - wkPaidTerms
-					: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
-			// 重算期金
-			BigDecimal wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
-					tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
-					tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
-			this.info("BST01 ID=" + tLoanBorMain.getLoanBorMainId() + ", NewDueAmt=" + wkNewDueAmt + "/"
-					+ tLoanBorMain.getDueAmt() + ", PaidTerms=" + wkPaidTerms + "/" + tLoanBorMain.getPaidTerms());
+						tLoanBorMain.getGraceDate());
+				int wkPaidTerms = 0;
+				if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getSpecificDate()) {
+					wkPaidTerms = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
+							tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+							tLoanBorMain.getPrevPayIntDate());
+				}
+				// 剩餘還本期數
+				int wkDueTerms = wkPaidTerms > wkGracePeriod ? tLoanBorMain.getTotalPeriod() - wkPaidTerms
+						: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
+				// 重算期金
+				BigDecimal wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
+						tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
+						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
+				this.info("BST01 ID=" + tLoanBorMain.getLoanBorMainId() + ", NewDueAmt=" + wkNewDueAmt + "/"
+						+ tLoanBorMain.getDueAmt() + ", PaidTerms=" + wkPaidTerms + "/" + tLoanBorMain.getPaidTerms());
 
-			if ("Y".equals(iUpdate)) {
-				tLoanBorMain.setDueAmt(wkNewDueAmt);
-				tLoanBorMain.setPaidTerms(wkPaidTerms);
-				try {
-					loanBorMainService.update(tLoanBorMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", ""); // 更新資料時，發生錯誤
+				if ("Y".equals(iUpdate)) {
+					tLoanBorMain.setDueAmt(wkNewDueAmt);
+					tLoanBorMain.setPaidTerms(wkPaidTerms);
+					try {
+						loanBorMainService.update(tLoanBorMain, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", ""); // 更新資料時，發生錯誤
+					}
 				}
 			}
 		}
