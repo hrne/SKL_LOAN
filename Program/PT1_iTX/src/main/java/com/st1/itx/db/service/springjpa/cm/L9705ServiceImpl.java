@@ -27,12 +27,13 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws LogicException {
+	public List<Map<String, String>> findAll(TitaVo titaVo, String reconCode) throws LogicException {
 
 		this.info("l9705.findAll");
 
 		String acctDateStart = titaVo.getParam("ACCTDATE_ST");
-		acctDateStart = acctDateStart.length() == 7 ? String.valueOf(Integer.valueOf(acctDateStart) + 19110000) : acctDateStart;
+		acctDateStart = acctDateStart.length() == 7 ? String.valueOf(Integer.valueOf(acctDateStart) + 19110000)
+				: acctDateStart;
 		String acctDateEnd = titaVo.getParam("ACCTDATE_ED");
 		acctDateEnd = acctDateEnd.length() == 7 ? String.valueOf(Integer.valueOf(acctDateEnd) + 19110000) : acctDateEnd;
 		String custNoStart = titaVo.getParam("CUSTNO");
@@ -115,6 +116,15 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " 		on BATX.\"TitaTxtNo\" = LBT.\"TitaTxtNo\"";
 		}
 		sql += "      WHERE F.\"DepartmentCode\" = :corpInd ";
+
+		if ("A3".equals(reconCode)) {
+			sql += "      	AND NVL(BATX.\"ReconCode\",' ') = 'A3' ";
+		} else if ("N".equals(reconCode)) {
+			sql += "      	AND NVL(BATX.\"ReconCode\",' ') <> 'A3' ";
+		}else {
+			
+		}
+
 		if (Integer.valueOf(custNoStart) > 0) {
 			sql += "        AND M.\"CustNo\" >= :custno1 ";
 			sql += "        AND M.\"CustNo\" <= :custno2 ";

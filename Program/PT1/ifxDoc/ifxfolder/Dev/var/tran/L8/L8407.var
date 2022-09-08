@@ -248,7 +248,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -278,7 +278,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -309,7 +309,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -340,7 +340,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}

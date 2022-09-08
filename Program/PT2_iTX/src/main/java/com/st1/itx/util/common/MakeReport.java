@@ -150,7 +150,7 @@ public class MakeReport extends CommBuffer {
 	private int currentCharSpaces = 1;
 
 	// 列印明細
-	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+	public List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 
 	private void checkParm(ReportVo reportVo) throws LogicException {
 		if (reportVo.getRptDate() <= 0) {
@@ -201,7 +201,7 @@ public class MakeReport extends CommBuffer {
 		if (this.nowPage > 0 && !reportVo.isUseDefault()) {
 			this.printFooter();
 		}
-		if (this.batchNo.isEmpty()) {
+		if (this.batchNo.isEmpty() && !formMode) {
 			return newFile();
 		} else {
 			return findSameBatchNoAndAppendTxFileData();
@@ -417,7 +417,8 @@ public class MakeReport extends CommBuffer {
 	private void init() {
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
-			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode).setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
+			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
+					.setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
 					.setPageOrientation(this.pageOrientation).setUseDefault(this.useDefault).build();
 		} else {
 			this.brno = this.reportVo.getBrno();
@@ -456,7 +457,8 @@ public class MakeReport extends CommBuffer {
 	private void init9() {
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
-			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode).setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
+			this.reportVo = ReportVo.builder().setBrno(this.brno).setRptDate(this.date).setRptCode(this.rptCode)
+					.setRptItem(this.rptItem).setRptSize(this.rptSize).setSecurity(this.rptSecurity)
 					.setPageOrientation(this.pageOrientation).setUseDefault(this.useDefault).build();
 		} else {
 			this.brno = this.reportVo.getBrno();
@@ -625,7 +627,8 @@ public class MakeReport extends CommBuffer {
 			this.reportVo.setRptSize("A4"); // 若未設定紙張大小，預設為A4
 		}
 
-		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty() || !this.reportVo.getPageOrientation().equals("P")) {
+		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty()
+				|| !this.reportVo.getPageOrientation().equals("P")) {
 			this.reportVo.setPageOrientation("L"); // 若未設定紙張方向 或者 不為P:直印，則預設為L:橫印
 		}
 
@@ -643,7 +646,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security)
+			throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -713,7 +717,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security, String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String security,
+			String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -757,7 +762,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String pageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
+			String pageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -809,7 +815,8 @@ public class MakeReport extends CommBuffer {
 
 		this.reportVo.setPageOrientation(this.reportVo.getPageOrientation().toUpperCase());
 
-		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty() || !this.reportVo.getPageOrientation().equals("P")) {
+		if (this.reportVo.getPageOrientation() == null || this.reportVo.getPageOrientation().isEmpty()
+				|| !this.reportVo.getPageOrientation().equals("P")) {
 			this.reportVo.setPageOrientation("L"); // 若未設定紙張方向 或者 不為P:直印，則預設為L:橫印
 		}
 
@@ -832,7 +839,8 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String pageSize, String pageOrientation) throws LogicException {
+	public void openForm(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String pageSize,
+			String pageOrientation) throws LogicException {
 
 		formMode = true;
 
@@ -1182,10 +1190,12 @@ public class MakeReport extends CommBuffer {
 		List<HashMap<String, Object>> orgMap = new ArrayList<HashMap<String, Object>>();
 
 		try {
-			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(), new TypeReference<List<Map<String, Object>>>() {
-			});
+			orgMap = new ObjectMapper().readValue(tTxFile.getFileData(),
+					new TypeReference<List<Map<String, Object>>>() {
+					});
 		} catch (IOException e) {
-			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
+			throw new LogicException("EC009",
+					"(MakeReport)輸出檔(TxFile)序號:" + tTxFile.getFileNo() + ",資料格式 " + e.getMessage());
 		}
 
 		orgMap.addAll(listMap);

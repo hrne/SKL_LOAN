@@ -281,8 +281,8 @@ T(2,3+#OORecordDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OORepayDate+#OOLogNo+#OORepay
 BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=複製;ntxbuf=#OOBUF6})
 
 ! 歷程的按鈕
-#OOBUF7=X,27,S
-T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OORecordDate+00)
+#OOBUF7=X,35,S
+T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OOTxDate+00+#OORecordDate)
 
 #OOBTN7=X,4,S
 C(3,#OOHaveLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF7}))

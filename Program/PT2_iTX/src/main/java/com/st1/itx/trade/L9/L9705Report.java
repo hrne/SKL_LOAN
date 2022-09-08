@@ -3,6 +3,7 @@ package com.st1.itx.trade.L9;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class L9705Report extends MakeReport {
 	public long exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 
 		long cls = 0;
-		
+
 		String rptitem = "";
 		if ("L8101".equals(titaVo.getTxCode())) {
 			String dataDt = titaVo.get("DataDt").trim();
@@ -99,10 +100,32 @@ public class L9705Report extends MakeReport {
 
 		String tran = titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode();
 
+//		List<Map<String, String>> listA3 = new ArrayList<Map<String, String>>();
+//		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+
+		this.custNo = 0;
+		this.facmNo = 0;
+
 		if (l9705List.size() > 0) {
-			boolean isOpenA3 = true;
-			boolean isOpen = true;
+
+			String recocode = "A3".equals(l9705List.get(0).get("ReconCode")) ? "(A3)" : "";
+
 			int count = 0;
+
+			this.info("isOpen Report");
+			this.info("l9705List=" + l9705List.toString());
+
+
+			
+			this.listMap=  new ArrayList<HashMap<String, Object>>();
+			
+			// 開啟報表
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+					.setRptCode(tran + "A" + recocode).setRptItem(rptitem + recocode).setRptSize("A4").setSecurity("")
+					.setPageOrientation("P").build();
+			
+			this.openForm(titaVo, reportVo);
+//			this.open(titaVo, reportVo);
 
 			for (Map<String, String> r : l9705List) {
 
@@ -112,9 +135,10 @@ public class L9705Report extends MakeReport {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 				int custNo = 0;
 				int facmNo = 0;
+
 				if (r.get("CustNo") != null) {
 					custNo = parse.stringToInteger(r.get("CustNo"));
 				}
@@ -124,104 +148,50 @@ public class L9705Report extends MakeReport {
 				if (r.get("RepayCode") != null) {
 					repayCode = r.get("RepayCode");
 				}
-				
+
+				this.info("L9705 custNo=" + custNo);
+				this.info("L9705 facmNo=" + facmNo);
+
 				String reconCode = "N";
 
 				if (!"L4454".equals(titaVo.getTxCode())) {
 					reconCode = r.get("ReconCode");
 				}
-				
 
 				// 同戶號 同額度使用同一頁否則換新頁
 				if (this.custNo == custNo && this.facmNo == facmNo) {
 
 				} else {
-					
-					if (count > 0 && !isOpenA3 && "A3".equals(reconCode) ) {
-						this.info("isOpenA3 newPage");
-						this.newPage();
-					}else if(count > 0 && !isOpen ){
-						this.info("isOpen newPage");
-						this.newPage();
+					if (count > 0) {
+						this.info("...newPage");
+
+						this.newPage(true);
+
 					}
+
 				}
 
 				this.custNo = custNo;
 				this.facmNo = facmNo;
 
-		
-				
-			
-				
-				// 分開兩張報表出，query已經有排序A3先
-				if ("A3".equals(reconCode)) {
+				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
+				// input parameter: CUSTNO
+				// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
+				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo))
+					continue;
 
-					if (isOpenA3) {
-						this.info("isOpenA3");
-						this.info("titaVo = " + titaVo);
+				exportData(l9705List, titaVo, txbuffer, recocode, count);
 
-						ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-								.setRptCode(tran + "A (A3)").setRptItem(rptitem+"(A3)").setRptSize("A4").setSecurity("")
-								.setPageOrientation("P").build();
-
-						this.openForm(titaVo, reportVo);
-
-						isOpenA3 = false;
-					}
-
-					// 檢查 CustNoticeCom 確認此戶此報表是否能產出
-					// input parameter: CUSTNO
-					// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
-					if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, "L9705", titaVo))
-						continue;
-
-					exportData(l9705List, titaVo, txbuffer, "A3", count);
-				} else {
-					
-					// 關閉A3的報表
-					if (!isOpenA3 && !"A3".equals(reconCode)) {
-						this.info("isCloseA3");
-						isOpenA3 = true;
-						cls = this.close();
-
-					}
-
-					if (isOpen) {
-						this.info("isOpen");
-						this.info("titaVo = " + titaVo);
-
-						ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-								.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("A4").setSecurity("")
-								.setPageOrientation("P").build();
-
-						this.openForm(titaVo, reportVo);
-
-						isOpen = false;
-					}
-					exportData(l9705List, titaVo, txbuffer, "N", count);
-
-				}
-				
-				//筆數
 				count++;
-				
-				// 關閉非A3的報表 或 關閉只有A3資料的報表
-				if (!isOpen && isOpenA3 && count == l9705List.size()) {
-					this.info("isClose");
-					isOpen = true;
-					cls = this.close();
-				} else if (!isOpenA3 && count == l9705List.size()) {
-					this.info("isCloseA3 ... only A3 data");
-					isOpenA3 = true;
-					cls = this.close();
-				}
-				
 
 			}
 
-		} else {
-			this.info("isOpen ... no data");
 
+		} else {
+
+			this.info("no data");
+
+			
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12").setSecurity("")
 					.setPageOrientation("P").build();
@@ -234,8 +204,185 @@ public class L9705Report extends MakeReport {
 
 			this.info("查無資料 Return...");
 
-			cls = this.close();
 		}
+
+		// 關閉報表
+		cls = this.close();
+
+//		// 先分A3與非A3
+//		if (l9705List.size() > 0) {
+//			for (Map<String, String> r : l9705List) {
+//				if ("A3".equals(r.get("ReconCode"))) {
+//					listA3.add(r);
+//				} else {
+//					list.add(r);
+//				}
+//			}
+//
+//			this.info("listA3 =" + listA3.size() + " = " + listA3.toString());
+//			this.info("list =" + list.size() + " = " + list.toString());
+//
+//			int count = 0;
+//			int countA3 = 0;
+//			int countNA3 = 0;
+//			this.info("isOpenA3 Report");
+//
+//			// 開啟報表
+//			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//					.setRptCode(tran + "A(A3)").setRptItem(rptitem + "(A3)").setRptSize("A4").setSecurity("")
+//					.setPageOrientation("P").build();
+//
+//			this.openForm(titaVo, reportVo);
+////			this.open(titaVo, reportVo);
+//
+//			for (Map<String, String> r : listA3) {
+//
+//				try {
+//					Thread.sleep(1 * 1000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//				
+//				int custNo = 0;
+//				int facmNo = 0;
+//				if (r.get("CustNo") != null) {
+//					custNo = parse.stringToInteger(r.get("CustNo"));
+//				}
+//				if (r.get("FacmNo") != null) {
+//					facmNo = parse.stringToInteger(r.get("FacmNo"));
+//				}
+//				if (r.get("RepayCode") != null) {
+//					repayCode = r.get("RepayCode");
+//				}
+//
+//				String reconCode = "N";
+//
+//				if (!"L4454".equals(titaVo.getTxCode())) {
+//					reconCode = r.get("ReconCode");
+//				}
+//
+//				// 同戶號 同額度使用同一頁否則換新頁
+//				if (this.custNo == custNo && this.facmNo == facmNo) {
+//
+//				} else {
+////					if (countA3 > 0) {
+//						this.info("A3 newPage");
+//						this.newPage();
+//
+////					}
+//
+//				}
+//
+//				this.custNo = custNo;
+//				this.facmNo = facmNo;
+//
+//				this.info("isOpenA3");
+//				this.info("titaVo = " + titaVo);
+//
+//				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
+//				// input parameter: CUSTNO
+//				// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
+//				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo))
+//					continue;
+//
+//				exportData(l9705List, titaVo, txbuffer, "A3", count);
+//
+//				count++;
+//				countA3++;
+//			}
+//
+//			this.info("isCloseA3 Report");
+//
+//			// 關閉報表
+//			this.close();
+//
+//			this.info("isOpenNoA3 Report");
+//			// 開啟報表
+//			ReportVo reportVo2 = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("A4").setSecurity("").setPageOrientation("P")
+//					.build();
+//
+//			this.openForm(titaVo, reportVo2);
+////			this.open(titaVo, reportVo2);
+//
+//			for (Map<String, String> r : list) {
+//				
+//				
+//				try {
+//					Thread.sleep(1 * 1000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//
+//				int custNo = 0;
+//				int facmNo = 0;
+//				if (r.get("CustNo") != null) {
+//					custNo = parse.stringToInteger(r.get("CustNo"));
+//				}
+//				if (r.get("FacmNo") != null) {
+//					facmNo = parse.stringToInteger(r.get("FacmNo"));
+//				}
+//				if (r.get("RepayCode") != null) {
+//					repayCode = r.get("RepayCode");
+//				}
+//
+//				String reconCode = "N";
+//
+//				if (!"L4454".equals(titaVo.getTxCode())) {
+//					reconCode = r.get("ReconCode");
+//				}
+//
+//				// 同戶號 同額度使用同一頁否則換新頁
+//				if (this.custNo == custNo && this.facmNo == facmNo) {
+//
+//				} else {
+//					
+//						this.info("NA3 newPage");
+//						this.newPage();
+//
+//
+//				}
+//
+//				this.custNo = custNo;
+//				this.facmNo = facmNo;
+//
+//				// 檢查 CustNoticeCom 確認此戶此報表是否能產出
+//				// input parameter: CUSTNO
+//				// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
+//				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo))
+//					continue;
+//
+//				exportData(l9705List, titaVo, txbuffer, "N", count);
+//
+//				count++;
+//				countNA3++;
+//
+//			}
+//			this.info("isCloseNoA3 Report");
+//			// 關閉報表
+//			cls = this.close();
+//
+//		} else {
+//			
+//			this.info("no data");
+//
+//			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12").setSecurity("")
+//					.setPageOrientation("P").build();
+//
+//			this.openForm(titaVo, reportVo);
+//
+//			this.setRptItem("放款本息攤還表暨繳息通知單(查無資料)");
+//
+//			this.printCm(1, 4, "*******    查無資料    ******");
+//
+//			this.info("查無資料 Return...");
+//
+//			cls = this.close();
+//		}
 
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
@@ -243,7 +390,6 @@ public class L9705Report extends MakeReport {
 					titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode() + "放款本息攤還表暨繳息通知單已完成", titaVo);
 		}
 
-		
 		return cls;
 
 	}
@@ -560,8 +706,8 @@ public class L9705Report extends MakeReport {
 			String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
 			BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
 
-			this.printCm(10, 28.5, "◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + " 業已入帳無誤。",
-					"C");
+			this.printCm(10, 28.5,
+					"◎台端於　" + transRocChinese(EntryDate) + " 所匯之還本金$" + df1.format(RepayAmt) + " 業已入帳無誤。", "C");
 		}
 
 	}
@@ -606,3 +752,137 @@ public class L9705Report extends MakeReport {
 		return result;
 	}
 }
+
+//if (l9705List.size() > 0) {
+//	boolean isOpenA3 = true;
+//	boolean isOpen = true;
+//	int count = 0;
+//
+//
+//
+//	for (Map<String, String> r : l9705List) {
+//
+//		try {
+//			Thread.sleep(1 * 1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		int custNo = 0;
+//		int facmNo = 0;
+//		if (r.get("CustNo") != null) {
+//			custNo = parse.stringToInteger(r.get("CustNo"));
+//		}
+//		if (r.get("FacmNo") != null) {
+//			facmNo = parse.stringToInteger(r.get("FacmNo"));
+//		}
+//		if (r.get("RepayCode") != null) {
+//			repayCode = r.get("RepayCode");
+//		}
+//
+//		String reconCode = "N";
+//
+//		if (!"L4454".equals(titaVo.getTxCode())) {
+//			reconCode = r.get("ReconCode");
+//		}
+//
+//		// 同戶號 同額度使用同一頁否則換新頁
+//		if (this.custNo == custNo && this.facmNo == facmNo) {
+//
+//		} else {
+//
+//			if (count > 0 && !isOpenA3 && "A3".equals(reconCode)) {
+//				this.info("isOpenA3 newPage");
+//				this.newPage();
+//			} else if (count > 0 && !isOpen) {
+//				this.info("isOpen newPage");
+//				this.newPage();
+//			}
+//		}
+//
+//		this.custNo = custNo;
+//		this.facmNo = facmNo;
+//
+//		// 分開兩張報表出，query已經有排序A3先
+//		if ("A3".equals(reconCode)) {
+//
+//			if (isOpenA3) {
+//				this.info("isOpenA3");
+//				this.info("titaVo = " + titaVo);
+//
+//				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//						.setRptCode(tran + "A (A3)").setRptItem(rptitem + "(A3)").setRptSize("A4")
+//						.setSecurity("").setPageOrientation("P").build();
+//
+//				this.openForm(titaVo, reportVo);
+//
+//				isOpenA3 = false;
+//			}
+//
+//			// 檢查 CustNoticeCom 確認此戶此報表是否能產出
+//			// input parameter: CUSTNO
+//			// L4702 會直接塞值呼叫這隻，那邊有分整批與個別功能，因此這裡透過判定 param CUSTNO 是否為空來看為個別或整批
+//			if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, "L9705", titaVo))
+//				continue;
+//
+//			exportData(l9705List, titaVo, txbuffer, "A3", count);
+//		} else {
+//
+//			// 關閉A3的報表
+//			if (!isOpenA3 && !"A3".equals(reconCode)) {
+//				this.info("isCloseA3");
+//				isOpenA3 = true;
+//				cls = this.close();
+//
+//			}
+//
+//			if (isOpen) {
+//				this.info("isOpen");
+//				this.info("titaVo = " + titaVo);
+//
+//				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//						.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("A4").setSecurity("")
+//						.setPageOrientation("P").build();
+//
+//				this.openForm(titaVo, reportVo);
+//
+//				isOpen = false;
+//			}
+//			exportData(l9705List, titaVo, txbuffer, "N", count);
+//
+//		}
+//
+//		// 筆數
+//		count++;
+//
+//		// 關閉非A3的報表 或 關閉只有A3資料的報表
+//		if (!isOpen && isOpenA3 && count == l9705List.size()) {
+//			this.info("isClose");
+//			isOpen = true;
+//			cls = this.close();
+//		} else if (!isOpenA3 && count == l9705List.size()) {
+//			this.info("isCloseA3 ... only A3 data");
+//			isOpenA3 = true;
+//			cls = this.close();
+//		}
+//
+//	}
+//
+//} else {
+//	this.info("isOpen ... no data");
+//
+//	ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+//			.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12").setSecurity("")
+//			.setPageOrientation("P").build();
+//
+//	this.openForm(titaVo, reportVo);
+//
+//	this.setRptItem("放款本息攤還表暨繳息通知單(查無資料)");
+//
+//	this.printCm(1, 4, "*******    查無資料    ******");
+//
+//	this.info("查無資料 Return...");
+//
+//	cls = this.close();
+//}

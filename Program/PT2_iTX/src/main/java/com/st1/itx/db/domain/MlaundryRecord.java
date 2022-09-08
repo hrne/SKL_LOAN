@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -28,6 +27,11 @@ import com.st1.itx.Exception.LogicException;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "`MlaundryRecord`")
 public class MlaundryRecord implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3759470986307542814L;
 
 	// 序號
 	@Id

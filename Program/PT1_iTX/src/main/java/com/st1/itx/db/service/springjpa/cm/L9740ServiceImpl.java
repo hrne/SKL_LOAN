@@ -81,7 +81,7 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("l9740.findPage2 ");
 
 		String sql = " ";
-		sql += "	SELECT MAX(M.\"StoreRate\") AS \"minRate\"";
+		sql += "	SELECT MIN(M.\"StoreRate\") AS \"minRate\"";
 		sql += "		  ,MAX(M.\"StoreRate\") AS \"maxRate\"";
 		sql += "	FROM \"LoanBorMain\" M";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";

@@ -150,8 +150,8 @@ T(3,1)ASGN(LOOP$)
 #OOActualFilingDate=D,7,O
 #OOActualFilingMark=X,3,O
 
-#OOAccount=X,25,O
-#Account=X,25,O
+#OOAccount=x,28,O
+#Account=x,28,O
 T(2,#OOAccount)
 
 #OOMaxMainCode=X,10,O

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -48,13 +47,13 @@ public class L8923 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	public TxDataLogService txDataLogService;
-
-	@Autowired
+	
+	@Autowired 
 	L8923ServiceImpl l8923Servicelmpl;
 	private int recorddate = 0;
 	private int repaydate = 0;
 	private int actualrepaydate = 0;
-
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8923 ");
@@ -64,24 +63,24 @@ public class L8923 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 50; // 507 * 50=
-
+		this.limit = 50; // 507 *  50= 
+				
 		// 取得輸入資料
 		String DateTime; // YYY/MM/DD hh:mm:ss
-		String Date = "";
-
+		String Date = "";		
+		
 		List<Map<String, String>> resultList = null;
 		try {
-			resultList = l8923Servicelmpl.queryresult(this.index, this.limit, titaVo);
-
+			resultList = l8923Servicelmpl.queryresult(this.index,this.limit,titaVo);
+	
 		} catch (Exception e) {
 			this.error("l8923Servicelmpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
 		}
-
+		
 		int iFacmNo = 0;
 		int iBormNo = 0;
-
+		
 		// 如有找到資料
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
@@ -96,7 +95,8 @@ public class L8923 extends TradeBuffer {
 				} else {
 					occursList.putParam("OOCustName", ""); // 戶名
 				}
-
+			
+			
 				occursList.putParam("OORecordDate", recorddate); // 訪談日期
 				occursList.putParam("OOCustNo", result.get("F2")); // 戶號
 				occursList.putParam("OOFacmNo", result.get("F3")); // 額度編號
@@ -104,40 +104,41 @@ public class L8923 extends TradeBuffer {
 				occursList.putParam("OORepayDate", repaydate); // 預定還款日期
 				occursList.putParam("OOActualRepayDate", actualrepaydate); // 實際還款日期
 				occursList.putParam("OORepayAmt", result.get("F5")); // 還款金額
-
+				
 				occursList.putParam("OOActualRepayAmt", result.get("F14")); // 實際還款金額
 				occursList.putParam("OOLogNo", result.get("F15")); // LogNo
-
+				
 				occursList.putParam("OOEmpNo", result.get("F10")); // 經辦
-
+			
 				iFacmNo = parse.stringToInteger(result.get("F3"));
 				iBormNo = parse.stringToInteger(result.get("F4"));
-
+		
 				DateTime = result.get("F11"); // 異動日期
-				this.info("DateTime=" + DateTime);
+				this.info("DateTime="+DateTime);
 				Date = FormatUtil.left(DateTime, 9);
-				this.info("Date=" + Date);
-
+				this.info("Date="+Date);
 				occursList.putParam("OOUpdate", Date);// 異動日期
-				String mrkey = recorddate + String.format("%07d", iCustNo) + String.format("%03d", iFacmNo) + String.format("%03d", iBormNo);
-				Slice<TxDataLog> slTxDataLog = txDataLogService.findByTranNo("L8204", mrkey, this.index, this.limit, titaVo);
-				if (slTxDataLog == null) {
+				String mrkey = recorddate + String.format("%07d", iCustNo)+String.format("%03d", iFacmNo)+String.format("%03d", iBormNo);
+				TxDataLog slTxDataLog = new TxDataLog();
+				slTxDataLog = txDataLogService.findByTranNoFirst("L8204", mrkey, titaVo);
+				if(slTxDataLog == null) {
 					occursList.putParam("OOHaveLog", "0"); // 控制歷程按鈕
 				} else {
 					occursList.putParam("OOHaveLog", "1"); // 控制歷程按鈕
+					occursList.putParam("OOTxDate", slTxDataLog.getTxDate()); // 有異動的第一筆會計日期為起日
 				}
-
+				 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
-			}
+		 }
 
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-			if (resultList != null && resultList.size() >= this.limit) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
+		 if (resultList != null &&  resultList.size() >= this.limit) {
+	 		 titaVo.setReturnIndex(this.setIndexNext());
+		 	 /* 手動折返 */
+		 	 this.totaVo.setMsgEndToEnter();
+		 }
 		} else {
 			throw new LogicException(titaVo, "E0001", "");
 		}
@@ -145,7 +146,7 @@ public class L8923 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
+	
 //	private Boolean hasNext() {
 //		Boolean result = true;
 //
@@ -166,20 +167,20 @@ public class L8923 extends TradeBuffer {
 //		return result;
 //	}
 	private void setData(Map<String, String> result) throws LogicException {
-
+		
 		recorddate = parse.stringToInteger(result.get("F0"));
 		repaydate = parse.stringToInteger(result.get("F12"));
 		actualrepaydate = parse.stringToInteger(result.get("F1"));
-		this.info("recorddate=" + recorddate + ",repaydate=" + repaydate + ",actualrepaydate=" + actualrepaydate);
-
-		if (recorddate > 19110000) {
-			recorddate = recorddate - 19110000;
+		this.info("recorddate="+recorddate+",repaydate="+repaydate+",actualrepaydate="+actualrepaydate);
+		
+		if(recorddate>19110000) {
+			recorddate = recorddate-19110000;
 		}
-		if (repaydate > 19110000) {
-			repaydate = repaydate - 19110000;
+		if(repaydate>19110000) {
+			repaydate = repaydate-19110000;
 		}
-		if (actualrepaydate > 19110000) {
-			actualrepaydate = actualrepaydate - 19110000;
+		if(actualrepaydate>19110000) {
+			actualrepaydate = actualrepaydate-19110000;
 		}
 	}
 }

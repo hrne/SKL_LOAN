@@ -90,12 +90,16 @@ T(1,#NTXBUF,15,7)
 
 #CHAIN_Factor=A,2,S
 T(1,#NTXBUF,22,2)
+! L8923帶入訪談日
+#CHAIN_RepayDate=D,7,S
+T(1,#NTXBUF,24,7)
 
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
 E(0,@TRN_CODE,#CHAIN_Code)
 E(0,@CUST_NO,#CHAIN_CutNo)
 E(0,@CDATESTART,#CHAIN_AcDate)
+
 
 
 
@@ -156,7 +160,7 @@ E(0,#CUST_NO)
 
 #MRKEY=_,_,S
 C(3,#CHAIN,1,$,S)
-C(3,#TRN_CODE,1,C(3,#CHAIN_AcDate,0,S,T(2,#CHAIN_AcDate+-+#CHAIN_Factor+-+#CHAIN_CutNo)),T(2,#CHAIN_AcDate+#CHAIN_CutNo+#CHAIN_FacmNo+#CHAIN_BormNo))
+C(3,#TRN_CODE,1,C(3,#CHAIN_AcDate,0,S,T(2,#CHAIN_AcDate+-+#CHAIN_Factor+-+#CHAIN_CutNo)),T(2,#CHAIN_RepayDate+#CHAIN_CutNo+#CHAIN_FacmNo+#CHAIN_BormNo))
 
 
 

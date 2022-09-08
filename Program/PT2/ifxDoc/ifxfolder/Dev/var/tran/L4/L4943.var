@@ -402,7 +402,7 @@ T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType
 !C(3,#FunctionCode,7,BIND(grid,cancel),$)
 !C(3,#FunctionCode,7,s,$)
 !IF(#OOAcDate!="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}),BIND(grid,cancel))
-BIND(#OOBTN_C,BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}))
+BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C})
 
 ! <交易>
 #OOBUF_D=X,390,S

@@ -50,18 +50,26 @@ public class L9705p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9705Report.setParentTranCode(parentTranCode);
-		List<Map<String, String>> l9705List = null;
+		List<Map<String, String>> l9705ListA3 = null;
+		List<Map<String, String>> l9705ListN = null;
+		List<Map<String, String>> l9705ListAll = null;
 		try {
-			l9705List = l9705ServiceImpl.findAll(titaVo);
+			// 分兩次印 (A3 跟 非A3)
+			l9705ListA3 = l9705ServiceImpl.findAll(titaVo, "A3");
+			l9705ListN = l9705ServiceImpl.findAll(titaVo, "N");
+			l9705ListAll = l9705ServiceImpl.findAll(titaVo, "All");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("l9705ServiceImpl.findAll error = " + errors.toString());
 		}
-		l9705Report.exec(l9705List, titaVo, txbuffer);
+		// A3
+		l9705Report.exec(l9705ListA3, titaVo, txbuffer);
+		// 非A3
+		l9705Report.exec(l9705ListN, titaVo, txbuffer);
 
 		// by eric 2021.12.10
-		l9705Form.exec(l9705List, titaVo, txbuffer);
+		l9705Form.exec(l9705ListAll, titaVo, txbuffer);
 
 		this.addList(this.totaVo);
 		return this.sendList();

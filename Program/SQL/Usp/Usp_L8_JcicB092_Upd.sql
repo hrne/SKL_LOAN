@@ -117,16 +117,18 @@ BEGIN
     ) 
     , ClLandData AS ( 
       SELECT r."FacmNo"                          AS "FacmNo"            -- 額度控制編碼 
+           , r."CityCode"                        AS "CityCode"          -- 縣市別 
+           , r."AreaCode"                        AS "AreaCode"          -- 鄉鎮市區別 
            , r."LandNo1"                         AS "LandNo1"           -- 地號 
            , r."LandNo2"                         AS "LandNo2"           -- 地號(子號) 
            , SUM(r."Area")                       AS "ClAreaCount"       -- 土地面積加總 
            , SUM(r."LVITax")                     AS "LVITax"            -- 土地增值稅加總 
-           , MAX(r."CityCode")                   AS "CityCode"          -- 縣市別 
-           , MAX(r."AreaCode")                   AS "AreaCode"          -- 鄉鎮市區別 
            , MAX(r."LVITaxYearMonth")            AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月 
            , MAX(r."IrCode")                     AS "IrCode"            -- 段小段 
       FROM ClLandRawData r 
       GROUP BY r."FacmNo"  
+             , r."CityCode"
+             , r."AreaCode"
              , r."LandNo1" 
              , r."LandNo2" 
     ) 
@@ -299,6 +301,150 @@ BEGIN
              , "No1"
              , "No2"
     )
+    -- 2022-09-08 Wei FROM LINDA FROM SKL珮琪
+    -- 鑑估值EvaAmt:如果ClMain.EvaAmt鑑估值=0,
+    -- 則應等於= ( 建物檔的(ClBuilding.FloorArea主建物+ClBuildingPublic.Area公設)坪數
+    --            * ClBuilding.EvaUnitPrice單價
+    --            + 土地檔的ClLand.Area面積*.ClLandEvaUnitPrice單價
+    --           )
+    -- 該戶號額度裡的擔保品是共同鑑價,鑑估值顯示一樣金額(by珮琪)
+    -- ,故該額度裡的建物跟土地全部鑑估值應加總,同擔保品若不同額度也應顯示相同
+    -- 例如:戶號1375820有3個額度是同擔保品,共4個建號1個地號(2筆土地面積)
+    -- ,則4個擔保品號碼的鑑估值應相同
+    , CBP AS ( -- 先計算建物公設坪數加總,同一擔保品在建物公設檔可以是多筆,所以要先加總
+      SELECT "ClCode1"
+           , "ClCode2"
+           , "ClNo"
+           , SUM("Area") AS "Area"
+      FROM "ClBuildingPublic"
+      GROUP BY "ClCode1"
+             , "ClCode2"
+             , "ClNo"
+    )
+    , CBLA AS ( -- 先計算建物土地鑑價金額,同一擔保品(建物)在土地檔可以是多筆,所以要先加總
+      SELECT "ClCode1"
+           , "ClCode2"
+           , "ClNo"
+           , SUM("Area" * "EvaUnitPrice") AS "EvaAmt"
+      FROM "ClLand"
+      WHERE "ClCode1" = 1
+      GROUP BY "ClCode1"
+             , "ClCode2"
+             , "ClNo"
+    )
+    , evaRawData AS (
+      SELECT CF."CustNo"
+           , CF."FacmNo"
+           , CF."ClCode1"
+           , CF."ClCode2"
+           , CF."ClNo"
+           , CF."MainFlag"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."CityCode" ELSE CL."CityCode" END AS "CityCode"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."AreaCode" ELSE CL."AreaCode" END AS "AreaCode"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo1" ELSE CL."LandNo1" END     AS "No1"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo2" ELSE CL."LandNo2" END     AS "No2"
+           , CLM."EvaAmt"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."FloorArea" ELSE CL."Area" END            AS "Area"
+           , CASE WHEN CF."ClCode1" = 1 THEN CB."EvaUnitPrice" ELSE CL."EvaUnitPrice" END AS "EvaUnitPrice"
+           , CASE WHEN CF."ClCode1" = 1 THEN CBP."Area" ELSE 0 END                        AS "PubliceArea"
+           , CASE WHEN CF."ClCode1" = 1 THEN CBLA."EvaAmt" ELSE 0 END                     AS "CBLA_EvaAmt"
+           , DENSE_RANK()
+             OVER (
+              ORDER BY CF."CustNo"
+                     , CF."FacmNo"
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."CityCode" ELSE CL."CityCode" END
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."AreaCode" ELSE CL."AreaCode" END
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo1" ELSE CL."LandNo1" END
+                     , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo2" ELSE CL."LandNo2" END
+             ) AS "GroupNo"
+           , ROW_NUMBER()
+             OVER (
+              PARTITION BY CF."CustNo"
+                         , CF."FacmNo"
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."CityCode" ELSE CL."CityCode" END
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."AreaCode" ELSE CL."AreaCode" END
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo1" ELSE CL."LandNo1" END
+                         , CASE WHEN CF."ClCode1" = 1 THEN CB."BdNo2" ELSE CL."LandNo2" END
+              ORDER BY CASE
+                         WHEN CF."MainFlag" = 'Y'
+                         THEN 0
+                       ELSE 1 END
+                     , CF."ClCode1" 
+                     , CF."ClCode2" 
+                     , CF."ClNo"
+             ) AS "Seq"
+      FROM "ClFac" CF
+      LEFT JOIN "ClMain" CLM ON CLM."ClCode1" = CF."ClCode1"
+                            AND CLM."ClCode2" = CF."ClCode2"
+                            AND CLM."ClNo" = CF."ClNo"
+      LEFT JOIN "ClBuilding" CB ON CB."ClCode1" = CF."ClCode1"
+                               AND CB."ClCode2" = CF."ClCode2"
+                               AND CB."ClNo" = CF."ClNo"
+                               AND CF."ClCode1" = 1
+      LEFT JOIN "ClLand" CL ON CL."ClCode1" = CF."ClCode1"
+                           AND CL."ClCode2" = CF."ClCode2"
+                           AND CL."ClNo" = CF."ClNo"
+                           AND CF."ClCode1" = 2
+      LEFT JOIN CBP ON CBP."ClCode1" = CF."ClCode1"
+                   AND CBP."ClCode2" = CF."ClCode2"
+                   AND CBP."ClNo" = CF."ClNo"
+                   AND CF."ClCode1" = 1
+      LEFT JOIN CBLA ON CBLA."ClCode1" = CF."ClCode1"
+                    AND CBLA."ClCode2" = CF."ClCode2"
+                    AND CBLA."ClNo" = CF."ClNo"
+                    AND CF."ClCode1" = 1
+      WHERE CF."ClCode1" IN (1,2)
+    )
+    , evaData AS (
+      SELECT "CustNo"
+           , "FacmNo"
+           , MAX(
+                CASE
+                  WHEN "Seq" = 1
+                  THEN "ClCode1"
+                ELSE 0 END
+             ) AS "ClCode1"
+           , MAX(
+                CASE
+                  WHEN "Seq" = 1
+                  THEN "ClCode2"
+                ELSE 0 END
+             ) AS "ClCode2"
+           , MAX(
+                CASE
+                  WHEN "Seq" = 1
+                  THEN "ClNo"
+                ELSE 0 END
+             ) AS "ClNo"
+           , "CityCode"
+           , "AreaCode"
+           , "No1"
+           , "No2"
+           , SUM(
+              CASE
+                WHEN "EvaAmt" = 0 
+                THEN (("Area" + "PubliceArea") * "EvaUnitPrice")
+                     + "CBLA_EvaAmt"
+              ELSE "EvaAmt" END
+             ) AS "EvaAmt"
+           , "GroupNo"
+           , MAX("Seq") AS "MaxSeq"
+      FROM evaRawData
+      GROUP BY "CustNo"
+             , "FacmNo"
+             , "GroupNo"
+             , "CityCode"
+             , "AreaCode"
+             , "No1"
+             , "No2"
+      ORDER BY "CustNo"
+             , "FacmNo"
+             , "GroupNo"
+             , "CityCode"
+             , "AreaCode"
+             , "No1"
+             , "No2"
+    )
     SELECT  -- count(*) as "Count" 
            M."FacmNo"                            AS "FacmNo" 
          , M."ClActNo"                           AS "MainClActNo"    -- 主要擔保品控制編碼 
@@ -315,7 +461,7 @@ BEGIN
              WHEN BuPublicOwner."OwnerId"  IS NOT NULL THEN BuPublicOwner."OwnerId" 
              ELSE ' ' 
            END                                   AS "OwnerId"           -- 擔保品所有權人或代表人IDN/BAN 
-         , SUBSTR('00000000' || TRUNC(NVL(CM."EvaAmt",0)  / 1000), -8) 
+         , SUBSTR('00000000' || TRUNC(NVL(ed."EvaAmt",0)  / 1000), -8)
                                                  AS "EvaAmt"            -- 鑑估(總市)值 
          , CASE 
              WHEN TRUNC(NVL(CM."EvaDate",0) / 100) < 191100 THEN TRUNC(NVL(CM."EvaDate",0) / 100) 
@@ -542,10 +688,19 @@ BEGIN
       LEFT JOIN CllandData  CLL ON CLL."FacmNo" = M."FacmNo" 
                                AND CASE 
                                      WHEN CM."ClCode1" = 2 
+                                          AND L."CityCode" = CLL."CityCode" 
+                                          AND L."AreaCode" = CLL."AreaCode" 
                                           AND L."LandNo1" = CLL."LandNo1" 
                                           AND L."LandNo2" = CLL."LandNo2" 
                                      THEN 1 
                                      WHEN CM."ClCode1" != 2 
+                                     -- 2022-09-08 Wei FROM LINDA
+                                     -- 鄉鎮市區別AreaJCICCode
+                                     -- ,有一戶戶號1202138,建物1筆三重區2筆樹林區,地號1筆三重1筆樹林
+                                     -- 現在的排列組合是3個擔保品號碼跟2個地號組合出6筆,
+                                     -- 有可能照縣市鄉鎮再排列組合嗎,看資料配對應該只排列出3筆
+                                          AND B."CityCode" = CLL."CityCode" 
+                                          AND B."AreaCode" = CLL."AreaCode" 
                                      THEN 1 
                                    ELSE 0 END = 1 
       LEFT JOIN "CdCity"       ON "CdCity"."CityCode"  = NVL(CLL."CityCode",CM."CityCode") 
@@ -565,6 +720,11 @@ BEGIN
                               AND CIAD."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1)) 
                               AND CIAD."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2)) 
                               AND CIAD."ClNo" = to_number(SUBSTR(M."ClActNo",4,7)) 
+      LEFT JOIN evaData ed ON ed."CustNo" = to_number(SUBSTR(M."FacmNo",1,7)) 
+                          AND ed."FacmNo" = to_number(SUBSTR(M."FacmNo",8,3)) 
+                          AND ed."ClCode1" = to_number(SUBSTR(M."ClActNo",1,1)) 
+                          AND ed."ClCode2" = to_number(SUBSTR(M."ClActNo",2,2)) 
+                          AND ed."ClNo" = to_number(SUBSTR(M."ClActNo",4,7)) 
     WHERE  M."DataYM"  =  YYYYMM 
       AND  M."ClActNo" IS NOT NULL 
       AND  SUBSTR("CdCl"."ClTypeJCIC",1,1) IN ('2')         -- 主要擔保品為不動產 
@@ -588,7 +748,7 @@ BEGIN
                     THEN 1 
                   ELSE 0 END 
            ELSE 0 END = 1 
-      ; 
+    ; 
  
     INS_CNT := INS_CNT + sql%rowcount; 
     DBMS_OUTPUT.PUT_LINE('INSERT Work_B092 END: INS_CNT=' || INS_CNT); 

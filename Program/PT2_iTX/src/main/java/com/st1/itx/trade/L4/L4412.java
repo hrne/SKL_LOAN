@@ -1,21 +1,20 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 //import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.PostAuthLog;
+import com.st1.itx.db.domain.PostAuthLogId;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.parse.Parse;
@@ -38,6 +37,8 @@ public class L4412 extends TradeBuffer {
 
 	@Autowired
 	BankAuthActService sBankAuthActService;
+	@Autowired
+	PostAuthLogService sPostAuthLogService;
 
 	@Autowired
 	Parse parse;
@@ -87,34 +88,37 @@ public class L4412 extends TradeBuffer {
 				}
 			}
 
-			Slice<BankAuthAct> slBankAuthAct = sBankAuthActService.facmNoEq(parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")), 0, Integer.MAX_VALUE,
-					titaVo);
+			PostAuthLogId tPostAuthLogId = new PostAuthLogId();
+			tPostAuthLogId.setAuthCreateDate(parse.stringToInteger(titaVo.getParam("AuthCreateDate")));
+			tPostAuthLogId.setAuthApplCode("1");
+			tPostAuthLogId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
+			tPostAuthLogId.setPostDepCode(titaVo.getParam("PostDepCode"));
+			tPostAuthLogId.setRepayAcct(titaVo.getParam("RepayAcct"));
+			tPostAuthLogId.setAuthCode(titaVo.getParam("AuthCode"));
+			PostAuthLog tPostAuthLog = sPostAuthLogService.findById(tPostAuthLogId, titaVo);
 
-			if (slBankAuthAct == null || slBankAuthAct.isEmpty())
-				throw new LogicException("E0003", "銀扣授權帳號檔");
 
-			List<BankAuthAct> lBankAuthAct = slBankAuthAct.getContent();
+			if (tPostAuthLog == null) {
+				throw new LogicException("E0003", "郵局授權記錄檔");
+			}
 
-			if (lBankAuthAct == null || lBankAuthAct.isEmpty())
-				throw new LogicException("E0003", "銀扣授權帳號檔");
-
-			BankAuthAct tBankAuthAct = lBankAuthAct.get(0);
-
-			cdEmp = sCdEmpService.findById(tBankAuthAct.getCreateEmpNo(), titaVo);
-
-			if (cdEmp == null)
-				throw new LogicException("E0001", "員工資料檔 " + tBankAuthAct.getCreateEmpNo());
-
-			this.totaVo.putParam("CreateEmpNo", tBankAuthAct.getCreateEmpNo() + " " + cdEmp.getFullname());
-			this.totaVo.putParam("CreateDate", parse.timeStampToStringDate(tBankAuthAct.getCreateDate()).replace("/", ""));
-
-			cdEmp = sCdEmpService.findById(tBankAuthAct.getLastUpdateEmpNo(), titaVo);
+			cdEmp = sCdEmpService.findById(tPostAuthLog.getCreateEmpNo(), titaVo);
 
 			if (cdEmp == null)
-				throw new LogicException("E0001", "員工資料檔 " + tBankAuthAct.getLastUpdateEmpNo());
+				throw new LogicException("E0001", "員工資料檔 " + tPostAuthLog.getCreateEmpNo());
 
-			this.totaVo.putParam("LastUpdateEmpNo", tBankAuthAct.getLastUpdateEmpNo() + " " + cdEmp.getFullname());
-			this.totaVo.putParam("LastUpdate", parse.timeStampToStringDate(tBankAuthAct.getLastUpdate()).replace("/", ""));
+			this.totaVo.putParam("CreateEmpNo", tPostAuthLog.getCreateEmpNo() + " " + cdEmp.getFullname());
+			this.totaVo.putParam("CreateDate",
+					parse.timeStampToStringDate(tPostAuthLog.getCreateDate()).replace("/", ""));
+
+			cdEmp = sCdEmpService.findById(tPostAuthLog.getLastUpdateEmpNo(), titaVo);
+
+			if (cdEmp == null)
+				throw new LogicException("E0001", "員工資料檔 " + tPostAuthLog.getLastUpdateEmpNo());
+
+			this.totaVo.putParam("LastUpdateEmpNo", tPostAuthLog.getLastUpdateEmpNo() + " " + cdEmp.getFullname());
+			this.totaVo.putParam("LastUpdate",
+					parse.timeStampToStringDate(tPostAuthLog.getLastUpdate()).replace("/", ""));
 
 			// FunCode 4 刪除
 		} else if ("4".equals(iFunCode)) {

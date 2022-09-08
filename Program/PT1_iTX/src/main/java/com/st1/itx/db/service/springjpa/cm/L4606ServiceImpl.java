@@ -37,7 +37,7 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   , I.\"InsuPrem\"                                          AS F2  ";
 		sql += "   , I.\"InsuStartDate\"                                     AS F3  ";
 		sql += "   , I.\"InsuEndDate\"                                       AS F4  ";
-		sql += "   , SUBSTRB(I.\"InsuredAddr\",0,40)                         AS F5  ";
+		sql += "   , SUBSTRB(I.\"InsuredAddr\",0,60)                         AS F5  ";
 		sql += "   , I.\"CustNo\"                                            AS F6  ";
 		sql += "   , I.\"FacmNo\"                                            AS F7  ";
 		sql += "   , SUBSTRB(C.\"CustName\",0,14)                            AS F8  ";
@@ -71,7 +71,7 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   , I.\"InsuPrem\"                                          AS F2  ";
 		sql += "   , I.\"InsuStartDate\"                                     AS F3  ";
 		sql += "   , I.\"InsuEndDate\"                                       AS F4  ";
-		sql += "   , SUBSTRB(I.\"InsuredAddr\",0,40)                         AS F5  ";
+		sql += "   , SUBSTRB(I.\"InsuredAddr\",0,60)                         AS F5  ";
 		sql += "   , I.\"CustNo\"                                            AS F6  ";
 		sql += "   , I.\"FacmNo\"                                            AS F7  ";
 		sql += "   , SUBSTRB(C.\"CustName\",0,14)                            AS F8  ";
