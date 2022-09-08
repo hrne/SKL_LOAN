@@ -146,13 +146,18 @@ public class L8331 extends TradeBuffer {
 			uJcicZ454.setPayOffDate(iPayOffDate);
 			uJcicZ454.setTranKey(iTranKey);
 			uJcicZ454.setOutJcicTxtDate(0);
+			
+			uJcicZ454.setActualFilingDate(0);
+			uJcicZ454.setActualFilingMark("");
+			
 			try {
 				sJcicZ454Service.update(uJcicZ454, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ454, uJcicZ454);
-			iDataLog.exec("L8331異動", uJcicZ454.getSubmitKey() + uJcicZ454.getCustId() + uJcicZ454.getApplyDate() + uJcicZ454.getCourtCode() + uJcicZ454.getMaxMainCode());
+			iDataLog.exec("L8331異動", uJcicZ454.getSubmitKey() + uJcicZ454.getCustId() + uJcicZ454.getApplyDate()
+					+ uJcicZ454.getCourtCode() + uJcicZ454.getMaxMainCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -197,7 +202,8 @@ public class L8331 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4542, uJcicZ4542);
-			iDataLog.exec("L8331刪除", uJcicZ4542.getSubmitKey() + uJcicZ4542.getCustId() + uJcicZ4542.getApplyDate() + uJcicZ4542.getCourtCode() + uJcicZ4542.getMaxMainCode());
+			iDataLog.exec("L8331刪除", uJcicZ4542.getSubmitKey() + uJcicZ4542.getCustId() + uJcicZ4542.getApplyDate()
+					+ uJcicZ4542.getCourtCode() + uJcicZ4542.getMaxMainCode());
 			break;
 		// 修改
 		case "7":
@@ -229,7 +235,8 @@ public class L8331 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4543, uJcicZ4543);
-			iDataLog.exec("L8331異動", uJcicZ4543.getSubmitKey() + uJcicZ4543.getCustId() + uJcicZ4543.getApplyDate() + uJcicZ4543.getCourtCode() + uJcicZ4543.getMaxMainCode());
+			iDataLog.exec("L8331異動", uJcicZ4543.getSubmitKey() + uJcicZ4543.getCustId() + uJcicZ4543.getApplyDate()
+					+ uJcicZ4543.getCourtCode() + uJcicZ4543.getMaxMainCode());
 		default:
 			break;
 		}

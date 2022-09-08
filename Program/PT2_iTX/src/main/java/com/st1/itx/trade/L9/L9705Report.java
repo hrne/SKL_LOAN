@@ -108,22 +108,21 @@ public class L9705Report extends MakeReport {
 
 		if (l9705List.size() > 0) {
 
-			String recocode = "A3".equals(l9705List.get(0).get("ReconCode")) ? "(A3)" : "";
+			String recocodeToFrom = "A3".equals(l9705List.get(0).get("ReconCode")) ? "(A3)" : "";
 
+			String reconCode = "A3".equals(l9705List.get(0).get("ReconCode")) ? "A3" : "N";
 			int count = 0;
 
 			this.info("isOpen Report");
 			this.info("l9705List=" + l9705List.toString());
 
+			this.listMap = new ArrayList<HashMap<String, Object>>();
 
-			
-			this.listMap=  new ArrayList<HashMap<String, Object>>();
-			
 			// 開啟報表
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-					.setRptCode(tran + "A" + recocode).setRptItem(rptitem + recocode).setRptSize("A4").setSecurity("")
-					.setPageOrientation("P").build();
-			
+					.setRptCode(tran + "A" + recocodeToFrom).setRptItem(rptitem + recocodeToFrom).setRptSize("A4")
+					.setSecurity("").setPageOrientation("P").build();
+
 			this.openForm(titaVo, reportVo);
 //			this.open(titaVo, reportVo);
 
@@ -152,8 +151,6 @@ public class L9705Report extends MakeReport {
 				this.info("L9705 custNo=" + custNo);
 				this.info("L9705 facmNo=" + facmNo);
 
-				String reconCode = "N";
-
 				if (!"L4454".equals(titaVo.getTxCode())) {
 					reconCode = r.get("ReconCode");
 				}
@@ -180,18 +177,16 @@ public class L9705Report extends MakeReport {
 				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo))
 					continue;
 
-				exportData(l9705List, titaVo, txbuffer, recocode, count);
+				exportData(l9705List, titaVo, txbuffer, reconCode, count);
 
 				count++;
 
 			}
 
-
 		} else {
 
 			this.info("no data");
 
-			
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12").setSecurity("")
 					.setPageOrientation("P").build();

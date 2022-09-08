@@ -226,6 +226,22 @@ BEGIN
                                                     WHEN S3."CORACC" = '20232020'
                                                          AND NVL(S3."CORACS",'     ') = '     '
                                                     THEN '01'
+                                                    -- 2022-09-08 Wei FROM yoko line
+                                                    WHEN S3."CORACC" = '20232182'
+                                                         AND NVL(S3."CORACS",'     ') = '     '
+                                                    THEN '01'
+                                                    -- 2022-09-08 Wei fix bug
+                                                    WHEN S3."CORACC" = '20232180'
+                                                         AND NVL(S3."CORACS",'     ') = '     '
+                                                    THEN '01'
+                                                    -- 2022-09-08 Wei fix bug
+                                                    WHEN S3."CORACC" = '20232181'
+                                                         AND NVL(S3."CORACS",'     ') = '     '
+                                                    THEN '01'
+                                                    -- 2022-09-08 Wei fix bug
+                                                    WHEN S3."CORACC" = '40907400'
+                                                         AND NVL(S3."CORACS",'     ') = '     '
+                                                    THEN '01'
                                                   ELSE '  ' END
       LEFT JOIN ATF ON ATF."ACNACC"          = S1."ACNACC"
                    AND NVL(ATF."ACNACS",' ') = NVL(S1."ACNACS",' ')
@@ -478,7 +494,34 @@ BEGIN
     FROM JORP
     LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = JORP."CORACC"
                            AND S5."AcSubCode" = NVL(JORP."CORACS",'     ')
-                           AND S5."AcDtlCode" = '  '
+                           AND S5."AcDtlCode" = CASE
+                                                  WHEN JORP."CORACC" = '40903300'
+                                                       AND NVL(JORP."CORACS",'     ') = '     '
+                                                  THEN '01' -- 放款帳管費
+                                                  -- 2022-06-30 Wei From Lai Email:
+                                                  -- AcNoCode = 20222020000
+                                                  -- 轉 AcDtlCode = 01
+                                                  --    and AcctCode = TAV
+                                                  WHEN JORP."CORACC" = '20232020'
+                                                       AND NVL(JORP."CORACS",'     ') = '     '
+                                                  THEN '01'
+                                                  -- 2022-09-08 Wei FROM yoko line
+                                                  WHEN JORP."CORACC" = '20232182'
+                                                       AND NVL(JORP."CORACS",'     ') = '     '
+                                                  THEN '01'
+                                                  -- 2022-09-08 Wei fix bug
+                                                  WHEN JORP."CORACC" = '20232180'
+                                                       AND NVL(JORP."CORACS",'     ') = '     '
+                                                  THEN '01'
+                                                  -- 2022-09-08 Wei fix bug
+                                                  WHEN JORP."CORACC" = '20232181'
+                                                       AND NVL(JORP."CORACS",'     ') = '     '
+                                                  THEN '01'
+                                                  -- 2022-09-08 Wei fix bug
+                                                  WHEN JORP."CORACC" = '40907400'
+                                                       AND NVL(JORP."CORACS",'     ') = '     '
+                                                  THEN '01'
+                                                ELSE '  ' END
     LEFT JOIN BOKOTHERS ON NVL(JORP."ACNBOK",' ') = '000'
                        AND BOKOTHERS."CORACC" = JORP."CORACC"
                        AND NVL(BOKOTHERS."CORACS",' ') = NVL(JORP."CORACS",' ')

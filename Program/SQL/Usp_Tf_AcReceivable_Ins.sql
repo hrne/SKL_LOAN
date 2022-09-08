@@ -460,7 +460,7 @@ BEGIN
       FROM LADACTP ACTP
       LEFT JOIN lastDateData ON lastDateData.MAX_BKPDAT = ACTP.BKPDAT
       WHERE ACTP.LMSACN != 601776
-        AND ACTP.BKPDAT = "TbsDyF"
+        -- AND ACTP.BKPDAT = "TbsDyF"
         AND NVL(lastDateData.MAX_BKPDAT,0) != 0
     )
     , OrderedFacmNo AS (

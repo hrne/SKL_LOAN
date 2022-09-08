@@ -233,9 +233,11 @@ E(0,#OTxDate)
 T(2,#OTxSeq)
 #RimData=x,100,S
 T(6A,#Entdy+#TxNo)
+#Txcd=X,5,S
+C(3,#TRN_CODE,1,T(2,L8203),T(2,L8204))
 !交易
 #OOBtnB=X,1,S
-BIND(grid,{ cmd=DDCHECK; ntxcd=L8203; txno=#RimData;rim=LCR11})
+BIND(grid,{ cmd=DDCHECK; ntxcd=#Txcd; txno=#RimData;rim=LCR11})
 
 
 </sub>

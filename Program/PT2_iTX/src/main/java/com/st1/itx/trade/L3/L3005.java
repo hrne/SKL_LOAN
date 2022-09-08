@@ -189,7 +189,8 @@ public class L3005 extends TradeBuffer {
 				BigDecimal overflow = parse.stringToBigDecimal(result.get("Overflow"));
 				BigDecimal loanBal = parse.stringToBigDecimal(result.get("LoanBal"));
 				BigDecimal rate = parse.stringToBigDecimal(result.get("Rate"));
-				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest")).add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
+				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest"))
+						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
 				needPaidAmt = txAmt.add(tempAmt).subtract(overflow).add(unpaidAmt);
 				newTxNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
@@ -201,10 +202,10 @@ public class L3005 extends TradeBuffer {
 				if (repayCodeX != null && !repayCodeX.isEmpty()) {
 					txMsg += repayCodeX;
 					if ("1".equals(result.get("RepayCode"))) {
-						txMsg += tTempVo.getParam("ReconCode");
+						txMsg += tTempVo.getParam("ReconCode");			
 					}
 					if (totTxAmt.compareTo(BigDecimal.ZERO) != 0) {
-						txMsg += ":" + df.format(totTxAmt);
+						txMsg += ":"+df.format(totTxAmt);
 					}
 				}
 				occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
@@ -216,7 +217,8 @@ public class L3005 extends TradeBuffer {
 					AcFg = "N";
 				}
 				// 是否顯示L3913計息明細按鈕
-				if ((titaHCode.equals("0") || titaHCode.equals("2") || titaHCode.equals("4")) && (displayflag.equals("I") || displayflag.equals("F"))) {
+				if ((titaHCode.equals("0") || titaHCode.equals("2") || titaHCode.equals("4"))
+						&& (displayflag.equals("I") || displayflag.equals("F"))) {
 					loanIntDetailFg = "Y";
 				} else {
 					loanIntDetailFg = "N";
@@ -244,15 +246,14 @@ public class L3005 extends TradeBuffer {
 				if (titaHCode.equals("1") || titaHCode.equals("3")) {
 					occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(txAmt));
 					occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(tempAmt));
-					occursList.putParam("OOOverShort", BigDecimal.ZERO.subtract(wkOverShort));
 					occursList.putParam("OONeedPaidAmt", BigDecimal.ZERO.subtract(needPaidAmt)); // 應收金額
 				} else {
 					occursList.putParam("OOTxAmt", txAmt);
 					occursList.putParam("OOTempAmt", tempAmt);
-					occursList.putParam("OOOverShort", wkOverShort);
 					occursList.putParam("OONeedPaidAmt", needPaidAmt); // 應收金額
 				}
 
+				occursList.putParam("OOOverShort", wkOverShort);
 				occursList.putParam("OOLoanBal", loanBal);
 				occursList.putParam("OORate", rate);
 				occursList.putParam("OOTitaHCode", titaHCode);

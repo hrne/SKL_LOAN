@@ -221,6 +221,10 @@ public class L8332 extends TradeBuffer {
 			uJcicZ570.setBank29(iBank29);
 			uJcicZ570.setBank30(iBank30);
 			uJcicZ570.setOutJcicTxtDate(0);
+			
+			uJcicZ570.setActualFilingDate(0);
+			uJcicZ570.setActualFilingMark("");
+			
 			try {
 				sJcicZ570Service.update(uJcicZ570, titaVo);
 			} catch (DBException e) {

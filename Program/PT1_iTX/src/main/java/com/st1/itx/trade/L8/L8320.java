@@ -124,9 +124,11 @@ public class L8320 extends TradeBuffer {
 			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
 			if (iJcicZ060 == null) {
 				if ("A".equals(iTranKey)) {
-					throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+					throw new LogicException("E0005",
+							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
 				} else {
-					throw new LogicException("E0007", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+					throw new LogicException("E0007",
+							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
 				}
 			}
 			// 1.2 end
@@ -160,9 +162,11 @@ public class L8320 extends TradeBuffer {
 					}
 					if (new BigDecimal(iMonthPayAmt).compareTo(xMonthPayAmt) < 0) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
 						} else {
-							throw new LogicException("E0007", "「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
 						}
 					} // 1.10.一.(一) end
 
@@ -176,9 +180,11 @@ public class L8320 extends TradeBuffer {
 					}
 					if (new BigDecimal(iMonthPayAmt).compareTo(xMonthPayAmt) < 0) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
 						} else {
-							throw new LogicException("E0007", "「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
 						}
 					} // 1.10.一.(二) end
 				}
@@ -194,9 +200,11 @@ public class L8320 extends TradeBuffer {
 					}
 					if (new BigDecimal(iMonthPayAmt2).compareTo(xMonthPayAmt) < 0) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
 						} else {
-							throw new LogicException("E0007", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
 						}
 					} // 1.10.二.(二).1 end
 
@@ -210,10 +218,12 @@ public class L8320 extends TradeBuffer {
 					}
 					if (new BigDecimal(iMonthPayAmt2).compareTo(xMonthPayAmt) < 0) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯利率等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
 //							throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
 						} else {
-							throw new LogicException("E0007", "「屬階梯式還款註記」填報'Y'，第二階梯利率等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]÷第二階梯期數.");
 //							throw new LogicException("E0007", "「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
 						}
 					} // 1.10.二.(二).2 end
@@ -320,13 +330,18 @@ public class L8320 extends TradeBuffer {
 			uJcicZ062.setMonthPayAmt2(iMonthPayAmt2);
 			uJcicZ062.setTranKey(iTranKey);
 			uJcicZ062.setOutJcicTxtDate(0);
+			
+			uJcicZ062.setActualFilingDate(0);
+			uJcicZ062.setActualFilingMark("");
+			
 			try {
 				sJcicZ062Service.update(uJcicZ062, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ062, uJcicZ062);
-			iDataLog.exec("L8320異動", uJcicZ062.getSubmitKey() + uJcicZ062.getCustId() + uJcicZ062.getRcDate() + uJcicZ062.getChangePayDate());
+			iDataLog.exec("L8320異動", uJcicZ062.getSubmitKey() + uJcicZ062.getCustId() + uJcicZ062.getRcDate()
+					+ uJcicZ062.getChangePayDate());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -402,7 +417,8 @@ public class L8320 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0622, uJcicZ0622);
-			iDataLog.exec("L8320刪除", uJcicZ0622.getSubmitKey() + uJcicZ0622.getCustId() + uJcicZ0622.getRcDate() + uJcicZ0622.getChangePayDate());
+			iDataLog.exec("L8320刪除", uJcicZ0622.getSubmitKey() + uJcicZ0622.getCustId() + uJcicZ0622.getRcDate()
+					+ uJcicZ0622.getChangePayDate());
 			break;
 		// 修改
 		case "7":
@@ -453,7 +469,8 @@ public class L8320 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0623, uJcicZ0623);
-			iDataLog.exec("L8320修改", uJcicZ0623.getSubmitKey() + uJcicZ0623.getCustId() + uJcicZ0623.getRcDate() + uJcicZ0623.getChangePayDate());
+			iDataLog.exec("L8320修改", uJcicZ0623.getSubmitKey() + uJcicZ0623.getCustId() + uJcicZ0623.getRcDate()
+					+ uJcicZ0623.getChangePayDate());
 		default:
 			break;
 		}
@@ -481,7 +498,8 @@ public class L8320 extends TradeBuffer {
 	private BigDecimal MonthPay1011(BigDecimal iChaRepayAmt, BigDecimal iRate, int iPeriod) {
 		BigDecimal xMonRate = iRate.divide(new BigDecimal(12 * 100), 10, BigDecimal.ROUND_HALF_UP);// 月利率=第一階梯利率/12
 		BigDecimal NUMONE = BigDecimal.ONE;// 常數1
-		return iChaRepayAmt.multiply((((NUMONE.add(xMonRate)).pow(iPeriod)).multiply(xMonRate)).divide(((NUMONE.add(xMonRate)).pow(iPeriod)).subtract(NUMONE), 10, BigDecimal.ROUND_HALF_UP));
+		return iChaRepayAmt.multiply((((NUMONE.add(xMonRate)).pow(iPeriod)).multiply(xMonRate))
+				.divide(((NUMONE.add(xMonRate)).pow(iPeriod)).subtract(NUMONE), 10, BigDecimal.ROUND_HALF_UP));
 	}
 
 	// 計算月付金：1.10.一.(一):「屬階梯式還款註記」空白且第一階梯「利率」等於0
@@ -495,16 +513,19 @@ public class L8320 extends TradeBuffer {
 	}
 
 	// 計算月付金：1.10.二.(二).1:「屬階梯式還款註記」為'Y'且第二階梯「利率」不等於0
-	private BigDecimal MonthPay10221(BigDecimal iChaRepayAmt, BigDecimal iRate2, int iPeriod2, int iMonthPayAmt, int iPeriod) {
+	private BigDecimal MonthPay10221(BigDecimal iChaRepayAmt, BigDecimal iRate2, int iPeriod2, int iMonthPayAmt,
+			int iPeriod) {
 		BigDecimal xMonRate = iRate2.divide(new BigDecimal(12 * 100), 10, BigDecimal.ROUND_HALF_UP);// 月利率=第一階梯利率/12
 		BigDecimal NUMONE = BigDecimal.ONE;// 常數1
-		return ((iChaRepayAmt.subtract(new BigDecimal(iMonthPayAmt * iPeriod))).multiply((NUMONE.add(xMonRate)).pow(iPeriod2)).multiply(xMonRate))
-				.divide(((NUMONE.add(xMonRate)).pow(iPeriod2)).subtract(NUMONE), 10, BigDecimal.ROUND_HALF_UP);
+		return ((iChaRepayAmt.subtract(new BigDecimal(iMonthPayAmt * iPeriod)))
+				.multiply((NUMONE.add(xMonRate)).pow(iPeriod2)).multiply(xMonRate))
+						.divide(((NUMONE.add(xMonRate)).pow(iPeriod2)).subtract(NUMONE), 10, BigDecimal.ROUND_HALF_UP);
 	}
 
 	// 計算月付金：1.10.二.(二).2:「屬階梯式還款註記」為'Y'且第二階梯「利率」等於0
 	private BigDecimal MonthPay10222(BigDecimal iChaRepayAmt, BigDecimal iPeriod2, int iMonthPayAmt, int iPeriod) {
-		return (iChaRepayAmt.subtract(new BigDecimal(iMonthPayAmt * iPeriod))).divide(iPeriod2, 10, BigDecimal.ROUND_HALF_UP);
+		return (iChaRepayAmt.subtract(new BigDecimal(iMonthPayAmt * iPeriod))).divide(iPeriod2, 10,
+				BigDecimal.ROUND_HALF_UP);
 	}
 
 }

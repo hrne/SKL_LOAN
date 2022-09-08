@@ -289,6 +289,8 @@ public class L840A extends TradeBuffer {
 	String iBankId;
 	String itranCode;
 	int iPayOffDate;
+	int iActualFilingDate;
+	String iActualFilingMark;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -311,7 +313,8 @@ public class L840A extends TradeBuffer {
 				sno1 = iL8403File.exec(titaVo);
 
 				String checkMsg = "Jcic債協報送檔案已產出。";
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L8403-" + itranCode, checkMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+						titaVo.getTlrNo() + "L8403-" + itranCode, checkMsg, titaVo);
 			}
 		} else if (iSubmitType == 2) {
 
@@ -329,133 +332,134 @@ public class L840A extends TradeBuffer {
 		this.info("setJcicDate");
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-		int count = 0;
 		String tranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
 		this.info("tranCode    = " + tranCode);
 		switch (tranCode) {
 		case "040":
-			Slice<JcicZ040> iJcicZ040 = null;
-			JcicZ040 uJcicZ040 = new JcicZ040();
-			iJcicZ040 = sJcicZ040Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ040Id jcicZ040Id = new JcicZ040Id();
 			jcicZ040Id.setCustId(iCustId);
 			jcicZ040Id.setRcDate(iRcDate);
 			jcicZ040Id.setSubmitKey(iSubmitKey);
-			JcicZ040 sJcicZ040 = new JcicZ040();
-			sJcicZ040 = sJcicZ040Service.findById(jcicZ040Id, titaVo);
-			for (JcicZ040 iiJcicZ040 : iJcicZ040) {
-				if ((iiJcicZ040.getOutJcicTxtDate() == 0 || iiJcicZ040.getActualFilingDate() == 0 || iiJcicZ040.getActualFilingMark() == null) && iiJcicZ040.getCustId().equals(sJcicZ040.getCustId())
-						&& iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey()) && iiJcicZ040.getRcDate() == sJcicZ040.getRcDate()) {
-					count++;
-					uJcicZ040 = sJcicZ040Service.holdById(sJcicZ040.getJcicZ040Id(), titaVo);
-					uJcicZ040.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ040.setActualFilingDate(iJcicDate);
-						uJcicZ040.setActualFilingMark("Y");
-					} else {
-						uJcicZ040.setActualFilingDate(0);
-						uJcicZ040.setActualFilingMark("");
-					}
-					try {
-						sJcicZ040Service.update(uJcicZ040, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+
+			this.info("jcicZ040Id      = " + jcicZ040Id);
+
+			JcicZ040 tJcicZ040 = new JcicZ040();
+			tJcicZ040 = sJcicZ040Service.holdById(jcicZ040Id, titaVo);
+			if (tJcicZ040 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
+			if (iSubmitType == 3) {
+				if (tJcicZ040.getOutJcicTxtDate() == 0) {
+					tJcicZ040.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ040.setActualFilingDate(iJcicDate);
+				tJcicZ040.setActualFilingMark("Y");
+			} else {
+				tJcicZ040.setOutJcicTxtDate(iJcicDate);
+				tJcicZ040.setActualFilingDate(0);
+				tJcicZ040.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ040Service.update(tJcicZ040, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
+			}
+
 			break;
 		case "041":
-			Slice<JcicZ041> iJcicZ041 = null;
-			JcicZ041 uJcicZ041 = new JcicZ041();
-			iJcicZ041 = sJcicZ041Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ041Id jcicZ041Id = new JcicZ041Id();
 			jcicZ041Id.setCustId(iCustId);
 			jcicZ041Id.setRcDate(iRcDate);
 			jcicZ041Id.setSubmitKey(iSubmitKey);
-			JcicZ041 sJcicZ041 = new JcicZ041();
-			sJcicZ041 = sJcicZ041Service.findById(jcicZ041Id, titaVo);
-			for (JcicZ041 iiJcicZ041 : iJcicZ041) {
-				if ((iiJcicZ041.getOutJcicTxtDate() == 0 || iiJcicZ041.getActualFilingDate() == 0 || iiJcicZ041.getActualFilingMark() == null) && iiJcicZ041.getCustId().equals(sJcicZ041.getCustId())
-						&& iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey()) && iiJcicZ041.getRcDate() == sJcicZ041.getRcDate()) {
-					count++;
-					uJcicZ041 = sJcicZ041Service.holdById(sJcicZ041.getJcicZ041Id(), titaVo);
-					this.info("041iJcicDate     = " + iJcicDate);
-					uJcicZ041.setOutJcicTxtDate(iJcicDate);
-					this.info("041iJcicDate  upd   = " + uJcicZ041.getOutJcicTxtDate());
-					if (iSubmitType == 3) {
-						uJcicZ041.setActualFilingDate(iJcicDate);
-						uJcicZ041.setActualFilingMark("Y");
-					} else {
-						uJcicZ041.setActualFilingDate(0);
-						uJcicZ041.setActualFilingMark("");
-					}
-					try {
-						sJcicZ041Service.update(uJcicZ041, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+
+			JcicZ041 tJcicZ041 = new JcicZ041();
+			tJcicZ041 = sJcicZ041Service.findById(jcicZ041Id, titaVo);
+			if (tJcicZ041 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ041.getOutJcicTxtDate() == 0) {
+					tJcicZ041.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ041.setActualFilingDate(iJcicDate);
+				tJcicZ041.setActualFilingMark("Y");
+			} else {
+				tJcicZ041.setOutJcicTxtDate(iJcicDate);
+				tJcicZ041.setActualFilingDate(0);
+				tJcicZ041.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ041Service.update(tJcicZ041, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "042":
-			Slice<JcicZ042> iJcicZ042 = null;
-			JcicZ042 uJcicZ042 = new JcicZ042();
-			iJcicZ042 = sJcicZ042Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ042Id jcicZ042Id = new JcicZ042Id();
 			jcicZ042Id.setCustId(iCustId);
 			jcicZ042Id.setRcDate(iRcDate);
 			jcicZ042Id.setSubmitKey(iSubmitKey);
 			jcicZ042Id.setMaxMainCode(iMaxMainCode);
-			JcicZ042 sJcicZ042 = new JcicZ042();
-			sJcicZ042 = sJcicZ042Service.findById(jcicZ042Id, titaVo);
-			for (JcicZ042 iiJcicZ042 : iJcicZ042) {
-				if ((iiJcicZ042.getOutJcicTxtDate() == 0 || iiJcicZ042.getActualFilingDate() == 0 || iiJcicZ042.getActualFilingMark() == null) && iiJcicZ042.getCustId().equals(sJcicZ042.getCustId())
-						&& iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey()) && iiJcicZ042.getMaxMainCode().equals(sJcicZ042.getMaxMainCode())
-						&& iiJcicZ042.getRcDate() == sJcicZ042.getRcDate()) {
-					count++;
-					uJcicZ042 = sJcicZ042Service.holdById(sJcicZ042.getJcicZ042Id(), titaVo);
-					uJcicZ042.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ042.setActualFilingDate(iJcicDate);
-						uJcicZ042.setActualFilingMark("Y");
-					} else {
-						uJcicZ042.setActualFilingDate(0);
-						uJcicZ042.setActualFilingMark("");
-					}
-					try {
-						sJcicZ042Service.update(uJcicZ042, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+
+			JcicZ042 tJcicZ042 = new JcicZ042();
+			tJcicZ042 = sJcicZ042Service.holdById(jcicZ042Id, titaVo);
+			if (tJcicZ042 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ042.getOutJcicTxtDate() == 0) {
+					tJcicZ042.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ042.setActualFilingDate(iJcicDate);
+				tJcicZ042.setActualFilingMark("Y");
+			} else {
+				tJcicZ042.setOutJcicTxtDate(iJcicDate);
+				tJcicZ042.setActualFilingDate(0);
+				tJcicZ042.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ042Service.update(tJcicZ042, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "043":
-			Slice<JcicZ043> iJcicZ043 = null;
-			JcicZ043 uJcicZ043 = new JcicZ043();
-			iJcicZ043 = sJcicZ043Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
 			iAccount = titaVo.getParam("Account");
 			JcicZ043Id jcicZ043Id = new JcicZ043Id();
@@ -464,422 +468,408 @@ public class L840A extends TradeBuffer {
 			jcicZ043Id.setSubmitKey(iSubmitKey);
 			jcicZ043Id.setMaxMainCode(iMaxMainCode);
 			jcicZ043Id.setAccount(iAccount);
-			JcicZ043 sJcicZ043 = new JcicZ043();
-			sJcicZ043 = sJcicZ043Service.findById(jcicZ043Id, titaVo);
-			for (JcicZ043 iiJcicZ043 : iJcicZ043) {
-				if ((iiJcicZ043.getOutJcicTxtDate() == 0 || iiJcicZ043.getActualFilingDate() == 0 || iiJcicZ043.getActualFilingMark() == null) && iiJcicZ043.getCustId().equals(sJcicZ043.getCustId())
-						&& iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey()) && iiJcicZ043.getRcDate() == sJcicZ043.getRcDate()
-						&& iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode()) && iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())) {
-					count++;
-					uJcicZ043 = sJcicZ043Service.holdById(sJcicZ043.getJcicZ043Id(), titaVo);
-					uJcicZ043.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ043.setActualFilingDate(iJcicDate);
-						uJcicZ043.setActualFilingMark("Y");
-					} else {
-						uJcicZ043.setActualFilingDate(0);
-						uJcicZ043.setActualFilingMark("");
-					}
-					try {
-						sJcicZ043Service.update(uJcicZ043, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ043 tJcicZ043 = new JcicZ043();
+			tJcicZ043 = sJcicZ043Service.holdById(jcicZ043Id, titaVo);
+			if (tJcicZ043 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ043.getOutJcicTxtDate() == 0) {
+					tJcicZ043.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ043.setActualFilingDate(iJcicDate);
+				tJcicZ043.setActualFilingMark("Y");
+			} else {
+				tJcicZ043.setOutJcicTxtDate(iJcicDate);
+				tJcicZ043.setActualFilingDate(0);
+				tJcicZ043.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ043Service.update(tJcicZ043, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "044":
-			Slice<JcicZ044> iJcicZ044 = null;
-			JcicZ044 uJcicZ044 = new JcicZ044();
-			iJcicZ044 = sJcicZ044Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ044Id jcicZ044Id = new JcicZ044Id();
 			jcicZ044Id.setCustId(iCustId);
 			jcicZ044Id.setRcDate(iRcDate);
 			jcicZ044Id.setSubmitKey(iSubmitKey);
-			JcicZ044 sJcicZ044 = new JcicZ044();
-			sJcicZ044 = sJcicZ044Service.findById(jcicZ044Id, titaVo);
-			for (JcicZ044 iiJcicZ044 : iJcicZ044) {
-				if ((iiJcicZ044.getOutJcicTxtDate() == 0 || iiJcicZ044.getActualFilingDate() == 0 || iiJcicZ044.getActualFilingMark() == null) && iiJcicZ044.getCustId().equals(sJcicZ044.getCustId())
-						&& iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey()) && iiJcicZ044.getRcDate() == sJcicZ044.getRcDate()) {
-					count++;
-					uJcicZ044 = sJcicZ044Service.holdById(sJcicZ044.getJcicZ044Id(), titaVo);
-					uJcicZ044.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ044.setActualFilingDate(iJcicDate);
-						uJcicZ044.setActualFilingMark("Y");
-					} else {
-						uJcicZ044.setActualFilingDate(0);
-						uJcicZ044.setActualFilingMark("");
-					}
-					try {
-						sJcicZ044Service.update(uJcicZ044, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ044 tJcicZ044 = new JcicZ044();
+			tJcicZ044 = sJcicZ044Service.holdById(jcicZ044Id, titaVo);
+			if (tJcicZ044 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ044.getOutJcicTxtDate() == 0) {
+					tJcicZ044.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ044.setActualFilingDate(iJcicDate);
+				tJcicZ044.setActualFilingMark("Y");
+			} else {
+				tJcicZ044.setOutJcicTxtDate(iJcicDate);
+				tJcicZ044.setActualFilingDate(0);
+				tJcicZ044.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ044Service.update(tJcicZ044, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "045":
-			Slice<JcicZ045> iJcicZ045 = null;
-			JcicZ045 uJcicZ045 = new JcicZ045();
-			iJcicZ045 = sJcicZ045Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
 			JcicZ045Id jcicZ045Id = new JcicZ045Id();
 			jcicZ045Id.setCustId(iCustId);
 			jcicZ045Id.setRcDate(iRcDate);
 			jcicZ045Id.setSubmitKey(iSubmitKey);
 			jcicZ045Id.setMaxMainCode(iMaxMainCode);
-			JcicZ045 sJcicZ045 = new JcicZ045();
-			sJcicZ045 = sJcicZ045Service.findById(jcicZ045Id, titaVo);
-			for (JcicZ045 iiJcicZ045 : iJcicZ045) {
-				if ((iiJcicZ045.getOutJcicTxtDate() == 0 || iiJcicZ045.getActualFilingDate() == 0 || iiJcicZ045.getActualFilingMark() == null) && iiJcicZ045.getCustId().equals(sJcicZ045.getCustId())
-						&& iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey()) && iiJcicZ045.getRcDate() == sJcicZ045.getRcDate()
-						&& iiJcicZ045.getMaxMainCode().equals(sJcicZ045.getMaxMainCode())) {
-					count++;
-					uJcicZ045 = sJcicZ045Service.holdById(sJcicZ045.getJcicZ045Id(), titaVo);
-					uJcicZ045.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ045.setActualFilingDate(iJcicDate);
-						uJcicZ045.setActualFilingMark("Y");
-					} else {
-						uJcicZ045.setActualFilingDate(0);
-						uJcicZ045.setActualFilingMark("");
-					}
-					try {
-						sJcicZ045Service.update(uJcicZ045, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ045 tJcicZ045 = new JcicZ045();
+			tJcicZ045 = sJcicZ045Service.holdById(jcicZ045Id, titaVo);
+			if (tJcicZ045 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ045.getOutJcicTxtDate() == 0) {
+					tJcicZ045.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ045.setActualFilingDate(iJcicDate);
+				tJcicZ045.setActualFilingMark("Y");
+			} else {
+				tJcicZ045.setOutJcicTxtDate(iJcicDate);
+				tJcicZ045.setActualFilingDate(0);
+				tJcicZ045.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ045Service.update(tJcicZ045, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "046":
-			Slice<JcicZ046> iJcicZ046 = null;
-			JcicZ046 uJcicZ046 = new JcicZ046();
-			iJcicZ046 = sJcicZ046Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate"));
 			JcicZ046Id jcicZ046Id = new JcicZ046Id();
 			jcicZ046Id.setCustId(iCustId);
 			jcicZ046Id.setRcDate(iRcDate);
 			jcicZ046Id.setSubmitKey(iSubmitKey);
 			jcicZ046Id.setCloseDate(iCloseDate);
-			JcicZ046 sJcicZ046 = new JcicZ046();
-			sJcicZ046 = sJcicZ046Service.findById(jcicZ046Id, titaVo);
-			for (JcicZ046 iiJcicZ046 : iJcicZ046) {
-				if ((iiJcicZ046.getOutJcicTxtDate() == 0 || iiJcicZ046.getActualFilingDate() == 0 || iiJcicZ046.getActualFilingMark() == null) && iiJcicZ046.getCustId().equals(sJcicZ046.getCustId())
-						&& iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey()) && iiJcicZ046.getRcDate() == sJcicZ046.getRcDate() && iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate()) {
-					count++;
-					uJcicZ046 = sJcicZ046Service.holdById(sJcicZ046.getJcicZ046Id(), titaVo);
-					uJcicZ046.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ046.setActualFilingDate(iJcicDate);
-						uJcicZ046.setActualFilingMark("Y");
-					} else {
-						uJcicZ046.setActualFilingDate(0);
-						uJcicZ046.setActualFilingMark("");
-					}
-					try {
-						sJcicZ046Service.update(uJcicZ046, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ046 tJcicZ046 = new JcicZ046();
+			tJcicZ046 = sJcicZ046Service.holdById(jcicZ046Id, titaVo);
+			if (tJcicZ046 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ046.getOutJcicTxtDate() == 0) {
+					tJcicZ046.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ046.setActualFilingDate(iJcicDate);
+				tJcicZ046.setActualFilingMark("Y");
+			} else {
+				tJcicZ046.setOutJcicTxtDate(iJcicDate);
+				tJcicZ046.setActualFilingDate(0);
+				tJcicZ046.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ046Service.update(tJcicZ046, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "047":
-			Slice<JcicZ047> iJcicZ047 = null;
-			JcicZ047 uJcicZ047 = new JcicZ047();
-			iJcicZ047 = sJcicZ047Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ047Id jcicZ047Id = new JcicZ047Id();
 			jcicZ047Id.setCustId(iCustId);
 			jcicZ047Id.setRcDate(iRcDate);
 			jcicZ047Id.setSubmitKey(iSubmitKey);
-			JcicZ047 sJcicZ047 = new JcicZ047();
-			sJcicZ047 = sJcicZ047Service.findById(jcicZ047Id, titaVo);
-			for (JcicZ047 iiJcicZ047 : iJcicZ047) {
-				if ((iiJcicZ047.getOutJcicTxtDate() == 0 || iiJcicZ047.getActualFilingDate() == 0 || iiJcicZ047.getActualFilingMark() == null) && iiJcicZ047.getCustId().equals(sJcicZ047.getCustId())
-						&& iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey()) && iiJcicZ047.getRcDate() == sJcicZ047.getRcDate()) {
-					count++;
-					uJcicZ047 = sJcicZ047Service.holdById(sJcicZ047.getJcicZ047Id(), titaVo);
-					uJcicZ047.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ047.setActualFilingDate(iJcicDate);
-						uJcicZ047.setActualFilingMark("Y");
-					} else {
-						uJcicZ047.setActualFilingDate(0);
-						uJcicZ047.setActualFilingMark("");
-					}
-					try {
-						sJcicZ047Service.update(uJcicZ047, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ047 tJcicZ047 = new JcicZ047();
+			tJcicZ047 = sJcicZ047Service.holdById(jcicZ047Id, titaVo);
+			if (tJcicZ047 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ047.getOutJcicTxtDate() == 0) {
+					tJcicZ047.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ047.setActualFilingDate(iJcicDate);
+				tJcicZ047.setActualFilingMark("Y");
+			} else {
+				tJcicZ047.setOutJcicTxtDate(iJcicDate);
+				tJcicZ047.setActualFilingDate(0);
+				tJcicZ047.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ047Service.update(tJcicZ047, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "048":
-			Slice<JcicZ048> iJcicZ048 = null;
-			JcicZ048 uJcicZ048 = new JcicZ048();
-			iJcicZ048 = sJcicZ048Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ048Id jcicZ048Id = new JcicZ048Id();
 			jcicZ048Id.setCustId(iCustId);
 			jcicZ048Id.setRcDate(iRcDate);
 			jcicZ048Id.setSubmitKey(iSubmitKey);
-			JcicZ048 sJcicZ048 = new JcicZ048();
-			sJcicZ048 = sJcicZ048Service.findById(jcicZ048Id, titaVo);
-			for (JcicZ048 iiJcicZ048 : iJcicZ048) {
-				if ((iiJcicZ048.getOutJcicTxtDate() == 0 || iiJcicZ048.getActualFilingDate() == 0 || iiJcicZ048.getActualFilingMark() == null) && iiJcicZ048.getCustId().equals(sJcicZ048.getCustId())
-						&& iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey()) && iiJcicZ048.getRcDate() == sJcicZ048.getRcDate()) {
-					count++;
-					uJcicZ048 = sJcicZ048Service.holdById(sJcicZ048.getJcicZ048Id(), titaVo);
-					uJcicZ048.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ048.setActualFilingDate(iJcicDate);
-						uJcicZ048.setActualFilingMark("Y");
-					} else {
-						uJcicZ048.setActualFilingDate(0);
-						uJcicZ048.setActualFilingMark("");
-					}
-					try {
-						sJcicZ048Service.update(uJcicZ048, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ048 tJcicZ048 = new JcicZ048();
+			tJcicZ048 = sJcicZ048Service.holdById(jcicZ048Id, titaVo);
+			if (tJcicZ048 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ048.getOutJcicTxtDate() == 0) {
+					tJcicZ048.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ048.setActualFilingDate(iJcicDate);
+				tJcicZ048.setActualFilingMark("Y");
+			} else {
+				tJcicZ048.setOutJcicTxtDate(iJcicDate);
+				tJcicZ048.setActualFilingDate(0);
+				tJcicZ048.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ048Service.update(tJcicZ048, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "049":
-			Slice<JcicZ049> iJcicZ049 = null;
-			JcicZ049 uJcicZ049 = new JcicZ049();
-			iJcicZ049 = sJcicZ049Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ049Id jcicZ049Id = new JcicZ049Id();
 			jcicZ049Id.setCustId(iCustId);
 			jcicZ049Id.setRcDate(iRcDate);
 			jcicZ049Id.setSubmitKey(iSubmitKey);
-			JcicZ049 sJcicZ049 = new JcicZ049();
-			sJcicZ049 = sJcicZ049Service.findById(jcicZ049Id, titaVo);
-			for (JcicZ049 iiJcicZ049 : iJcicZ049) {
-				if ((iiJcicZ049.getOutJcicTxtDate() == 0 || iiJcicZ049.getActualFilingDate() == 0 || iiJcicZ049.getActualFilingMark() == null) && iiJcicZ049.getCustId().equals(sJcicZ049.getCustId())
-						&& iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey()) && iiJcicZ049.getRcDate() == sJcicZ049.getRcDate()) {
-					count++;
-					uJcicZ049 = sJcicZ049Service.holdById(sJcicZ049.getJcicZ049Id(), titaVo);
-					uJcicZ049.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ049.setActualFilingDate(iJcicDate);
-						uJcicZ049.setActualFilingMark("Y");
-					} else {
-						uJcicZ049.setActualFilingDate(0);
-						uJcicZ049.setActualFilingMark("");
-					}
-					try {
-						sJcicZ049Service.update(uJcicZ049, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ049 tJcicZ049 = new JcicZ049();
+			tJcicZ049 = sJcicZ049Service.holdById(jcicZ049Id, titaVo);
+			if (tJcicZ049 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ049.getOutJcicTxtDate() == 0) {
+					tJcicZ049.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ049.setActualFilingDate(iJcicDate);
+				tJcicZ049.setActualFilingMark("Y");
+			} else {
+				tJcicZ049.setOutJcicTxtDate(iJcicDate);
+				tJcicZ049.setActualFilingDate(0);
+				tJcicZ049.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ049Service.update(tJcicZ049, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "050":
-			Slice<JcicZ050> iJcicZ050 = null;
-			JcicZ050 uJcicZ050 = new JcicZ050();
-			iJcicZ050 = sJcicZ050Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
 			JcicZ050Id jcicZ050Id = new JcicZ050Id();
 			jcicZ050Id.setCustId(iCustId);
 			jcicZ050Id.setRcDate(iRcDate);
 			jcicZ050Id.setSubmitKey(iSubmitKey);
 			jcicZ050Id.setPayDate(iPayDate);
-			JcicZ050 sJcicZ050 = new JcicZ050();
-			sJcicZ050 = sJcicZ050Service.findById(jcicZ050Id, titaVo);
-			for (JcicZ050 iiJcicZ050 : iJcicZ050) {
-				if ((iiJcicZ050.getOutJcicTxtDate() == 0 || iiJcicZ050.getActualFilingDate() == 0 || iiJcicZ050.getActualFilingMark() == null) && iiJcicZ050.getCustId().equals(sJcicZ050.getCustId())
-						&& iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey()) && iiJcicZ050.getRcDate() == sJcicZ050.getRcDate() && iiJcicZ050.getPayDate() == sJcicZ050.getPayDate()) {
-					count++;
-					uJcicZ050 = sJcicZ050Service.holdById(sJcicZ050.getJcicZ050Id(), titaVo);
-					uJcicZ050.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ050.setActualFilingDate(iJcicDate);
-						uJcicZ050.setActualFilingMark("Y");
-					} else {
-						uJcicZ050.setActualFilingDate(0);
-						uJcicZ050.setActualFilingMark("");
-					}
-					try {
-						sJcicZ050Service.update(uJcicZ050, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ050 tJcicZ050 = new JcicZ050();
+			tJcicZ050 = sJcicZ050Service.holdById(jcicZ050Id, titaVo);
+			if (tJcicZ050 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ050.getOutJcicTxtDate() == 0) {
+					tJcicZ050.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ050.setActualFilingDate(iJcicDate);
+				tJcicZ050.setActualFilingMark("Y");
+			} else {
+				tJcicZ050.setOutJcicTxtDate(iJcicDate);
+				tJcicZ050.setActualFilingDate(0);
+				tJcicZ050.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ050Service.update(tJcicZ050, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "051":
-			Slice<JcicZ051> iJcicZ051 = null;
-			JcicZ051 uJcicZ051 = new JcicZ051();
-			iJcicZ051 = sJcicZ051Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iDelayYM = Integer.valueOf(titaVo.get("DelayYM"));
 			JcicZ051Id jcicZ051Id = new JcicZ051Id();
 			jcicZ051Id.setCustId(iCustId);
 			jcicZ051Id.setRcDate(iRcDate);
 			jcicZ051Id.setSubmitKey(iSubmitKey);
 			jcicZ051Id.setDelayYM(iDelayYM);
-			JcicZ051 sJcicZ051 = new JcicZ051();
-			sJcicZ051 = sJcicZ051Service.findById(jcicZ051Id, titaVo);
-			for (JcicZ051 iiJcicZ051 : iJcicZ051) {
-				if ((iiJcicZ051.getOutJcicTxtDate() == 0 || iiJcicZ051.getActualFilingDate() == 0 || iiJcicZ051.getActualFilingMark() == null) && iiJcicZ051.getCustId().equals(sJcicZ051.getCustId())
-						&& iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey()) && iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM() && iiJcicZ051.getRcDate() == sJcicZ051.getRcDate()) {
-					count++;
-					uJcicZ051 = sJcicZ051Service.holdById(sJcicZ051.getJcicZ051Id(), titaVo);
-					uJcicZ051.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ051.setActualFilingDate(iJcicDate);
-						uJcicZ051.setActualFilingMark("Y");
-					} else {
-						uJcicZ051.setActualFilingDate(0);
-						uJcicZ051.setActualFilingMark("");
-					}
-					try {
-						sJcicZ051Service.update(uJcicZ051, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ051 tJcicZ051 = new JcicZ051();
+			tJcicZ051 = sJcicZ051Service.holdById(jcicZ051Id, titaVo);
+			if (tJcicZ051 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ051.getOutJcicTxtDate() == 0) {
+					tJcicZ051.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ051.setActualFilingDate(iJcicDate);
+				tJcicZ051.setActualFilingMark("Y");
+			} else {
+				tJcicZ051.setOutJcicTxtDate(iJcicDate);
+				tJcicZ051.setActualFilingDate(0);
+				tJcicZ051.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ051Service.update(tJcicZ051, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "052":
-			Slice<JcicZ052> iJcicZ052 = null;
-			JcicZ052 uJcicZ052 = new JcicZ052();
-			iJcicZ052 = sJcicZ052Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ052Id jcicZ052Id = new JcicZ052Id();
 			jcicZ052Id.setCustId(iCustId);
 			jcicZ052Id.setRcDate(iRcDate);
 			jcicZ052Id.setSubmitKey(iSubmitKey);
-			JcicZ052 sJcicZ052 = new JcicZ052();
-			sJcicZ052 = sJcicZ052Service.findById(jcicZ052Id, titaVo);
-			for (JcicZ052 iiJcicZ052 : iJcicZ052) {
-				if ((iiJcicZ052.getOutJcicTxtDate() == 0 || iiJcicZ052.getActualFilingDate() == 0 || iiJcicZ052.getActualFilingMark() == null) && iiJcicZ052.getCustId().equals(sJcicZ052.getCustId())
-						&& iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey()) && iiJcicZ052.getRcDate() == sJcicZ052.getRcDate()) {
-					count++;
-					uJcicZ052 = sJcicZ052Service.holdById(sJcicZ052.getJcicZ052Id(), titaVo);
-					uJcicZ052.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ052.setActualFilingDate(iJcicDate);
-						uJcicZ052.setActualFilingMark("Y");
-					} else {
-						uJcicZ052.setActualFilingDate(0);
-						uJcicZ052.setActualFilingMark("");
-					}
-					try {
-						sJcicZ052Service.update(uJcicZ052, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ052 tJcicZ052 = new JcicZ052();
+			tJcicZ052 = sJcicZ052Service.holdById(jcicZ052Id, titaVo);
+			if (tJcicZ052 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ052.getOutJcicTxtDate() == 0) {
+					tJcicZ052.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ052.setActualFilingDate(iJcicDate);
+				tJcicZ052.setActualFilingMark("Y");
+			} else {
+				tJcicZ052.setOutJcicTxtDate(iJcicDate);
+				tJcicZ052.setActualFilingDate(0);
+				tJcicZ052.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ052Service.update(tJcicZ052, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "053":
-			Slice<JcicZ053> iJcicZ053 = null;
-			JcicZ053 uJcicZ053 = new JcicZ053();
-			iJcicZ053 = sJcicZ053Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
 			JcicZ053Id jcicZ053Id = new JcicZ053Id();
 			jcicZ053Id.setCustId(iCustId);
 			jcicZ053Id.setRcDate(iRcDate);
 			jcicZ053Id.setSubmitKey(iSubmitKey);
 			jcicZ053Id.setMaxMainCode(iMaxMainCode);
-			JcicZ053 sJcicZ053 = new JcicZ053();
-			sJcicZ053 = sJcicZ053Service.findById(jcicZ053Id, titaVo);
-			for (JcicZ053 iiJcicZ053 : iJcicZ053) {
-				if ((iiJcicZ053.getOutJcicTxtDate() == 0 || iiJcicZ053.getActualFilingDate() == 0 || iiJcicZ053.getActualFilingMark() == null) && iiJcicZ053.getCustId().equals(sJcicZ053.getCustId())
-						&& iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey()) && iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
-						&& iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode())) {
-					count++;
-					uJcicZ053 = sJcicZ053Service.holdById(sJcicZ053.getJcicZ053Id(), titaVo);
-					uJcicZ053.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ053.setActualFilingDate(iJcicDate);
-						uJcicZ053.setActualFilingMark("Y");
-					} else {
-						uJcicZ053.setActualFilingDate(0);
-						uJcicZ053.setActualFilingMark("");
-					}
-					try {
-						sJcicZ053Service.update(uJcicZ053, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ053 tJcicZ053 = new JcicZ053();
+			tJcicZ053 = sJcicZ053Service.holdById(jcicZ053Id, titaVo);
+			if (tJcicZ053 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ053.getOutJcicTxtDate() == 0) {
+					tJcicZ053.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ053.setActualFilingDate(iJcicDate);
+				tJcicZ053.setActualFilingMark("Y");
+			} else {
+				tJcicZ053.setOutJcicTxtDate(iJcicDate);
+				tJcicZ053.setActualFilingDate(0);
+				tJcicZ053.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ053Service.update(tJcicZ053, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "054":
-			Slice<JcicZ054> iJcicZ054 = null;
-			JcicZ054 uJcicZ054 = new JcicZ054();
-			iJcicZ054 = sJcicZ054Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
 			iPayOffDate = Integer.valueOf(titaVo.getParam("PayOffDate"));
 			JcicZ054Id jcicZ054Id = new JcicZ054Id();
@@ -888,41 +878,39 @@ public class L840A extends TradeBuffer {
 			jcicZ054Id.setSubmitKey(iSubmitKey);
 			jcicZ054Id.setMaxMainCode(iMaxMainCode);
 			jcicZ054Id.setPayOffDate(iPayOffDate);
-			JcicZ054 sJcicZ054 = new JcicZ054();
-			sJcicZ054 = sJcicZ054Service.findById(jcicZ054Id, titaVo);
-			for (JcicZ054 iiJcicZ054 : iJcicZ054) {
-				if ((iiJcicZ054.getOutJcicTxtDate() == 0 || iiJcicZ054.getActualFilingDate() == 0 || iiJcicZ054.getActualFilingMark() == null) && iiJcicZ054.getCustId().equals(sJcicZ054.getCustId())
-						&& iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey()) && iiJcicZ054.getRcDate() == sJcicZ054.getRcDate()
-						&& iiJcicZ054.getMaxMainCode().equals(sJcicZ054.getMaxMainCode())) {
-					count++;
-					uJcicZ054 = sJcicZ054Service.holdById(sJcicZ054.getJcicZ054Id(), titaVo);
-					uJcicZ054.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ054.setActualFilingDate(iJcicDate);
-						uJcicZ054.setActualFilingMark("Y");
-					} else {
-						uJcicZ054.setActualFilingDate(0);
-						uJcicZ054.setActualFilingMark("");
-					}
-					try {
-						sJcicZ054Service.update(uJcicZ054, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ054 tJcicZ054 = new JcicZ054();
+			tJcicZ054 = sJcicZ054Service.holdById(jcicZ054Id, titaVo);
+			if (tJcicZ054 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ054.getOutJcicTxtDate() == 0) {
+					tJcicZ054.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ054.setActualFilingDate(iJcicDate);
+				tJcicZ054.setActualFilingMark("Y");
+			} else {
+				tJcicZ054.setOutJcicTxtDate(iJcicDate);
+				tJcicZ054.setActualFilingDate(0);
+				tJcicZ054.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ054Service.update(tJcicZ054, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "055":
-			Slice<JcicZ055> iJcicZ055 = null;
-			JcicZ055 uJcicZ055 = new JcicZ055();
-			iJcicZ055 = sJcicZ055Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
-			iCaseStatus = titaVo.getParam("CaseStatus");
 			iClaimDate = Integer.valueOf(titaVo.get("ClaimDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
+			iCaseStatus = titaVo.getParam("CaseStatus");
 			iCourtCode = titaVo.getParam("CourtCode");
 			JcicZ055Id jcicZ055Id = new JcicZ055Id();
 			jcicZ055Id.setCustId(iCustId);
@@ -930,41 +918,39 @@ public class L840A extends TradeBuffer {
 			jcicZ055Id.setCaseStatus(iCaseStatus);
 			jcicZ055Id.setClaimDate(iClaimDate);
 			jcicZ055Id.setCourtCode(iCourtCode);
-			JcicZ055 sJcicZ055 = new JcicZ055();
-			sJcicZ055 = sJcicZ055Service.findById(jcicZ055Id, titaVo);
-			for (JcicZ055 iiJcicZ055 : iJcicZ055) {
-				if ((iiJcicZ055.getOutJcicTxtDate() == 0 || iiJcicZ055.getActualFilingDate() == 0 || iiJcicZ055.getActualFilingMark() == null) && iiJcicZ055.getCustId().equals(sJcicZ055.getCustId())
-						&& iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey()) && iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
-						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode()) && iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate()) {
-					count++;
-					uJcicZ055 = sJcicZ055Service.holdById(sJcicZ055.getJcicZ055Id(), titaVo);
-					uJcicZ055.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ055.setActualFilingDate(iJcicDate);
-						uJcicZ055.setActualFilingMark("Y");
-					} else {
-						uJcicZ055.setActualFilingDate(0);
-						uJcicZ055.setActualFilingMark("");
-					}
-					try {
-						sJcicZ055Service.update(uJcicZ055, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ055 tJcicZ055 = new JcicZ055();
+			tJcicZ055 = sJcicZ055Service.holdById(jcicZ055Id, titaVo);
+			if (tJcicZ055 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ055.getOutJcicTxtDate() == 0) {
+					tJcicZ055.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ055.setActualFilingDate(iJcicDate);
+				tJcicZ055.setActualFilingMark("Y");
+			} else {
+				tJcicZ055.setOutJcicTxtDate(iJcicDate);
+				tJcicZ055.setActualFilingDate(0);
+				tJcicZ055.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ055Service.update(tJcicZ055, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "056":
-			Slice<JcicZ056> iJcicZ056 = null;
-			JcicZ056 uJcicZ056 = new JcicZ056();
-			iJcicZ056 = sJcicZ056Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
-			iCaseStatus = titaVo.getParam("CaseStatus");
 			iClaimDate = Integer.valueOf(titaVo.get("ClaimDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
+			iCaseStatus = titaVo.getParam("CaseStatus");
 			iCourtCode = titaVo.getParam("CourtCode");
 			JcicZ056Id jcicZ056Id = new JcicZ056Id();
 			jcicZ056Id.setCustId(iCustId);
@@ -972,80 +958,76 @@ public class L840A extends TradeBuffer {
 			jcicZ056Id.setCaseStatus(iCaseStatus);
 			jcicZ056Id.setClaimDate(iClaimDate);
 			jcicZ056Id.setCourtCode(iCourtCode);
-			JcicZ056 sJcicZ056 = new JcicZ056();
-			sJcicZ056 = sJcicZ056Service.findById(jcicZ056Id, titaVo);
-			for (JcicZ056 iiJcicZ056 : iJcicZ056) {
-				if ((iiJcicZ056.getOutJcicTxtDate() == 0 || iiJcicZ056.getActualFilingDate() == 0 || iiJcicZ056.getActualFilingMark() == null) && iiJcicZ056.getCustId().equals(sJcicZ056.getCustId())
-						&& iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey()) && iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
-						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode()) && iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate()) {
-					count++;
-					uJcicZ056 = sJcicZ056Service.holdById(sJcicZ056.getJcicZ056Id(), titaVo);
-					uJcicZ056.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ056.setActualFilingDate(iJcicDate);
-						uJcicZ056.setActualFilingMark("Y");
-					} else {
-						uJcicZ056.setActualFilingDate(0);
-						uJcicZ056.setActualFilingMark("");
-					}
-					try {
-						sJcicZ056Service.update(uJcicZ056, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ056 tJcicZ056 = new JcicZ056();
+			tJcicZ056 = sJcicZ056Service.holdById(jcicZ056Id, titaVo);
+			if (tJcicZ056 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ056.getOutJcicTxtDate() == 0) {
+					tJcicZ056.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ056.setActualFilingDate(iJcicDate);
+				tJcicZ056.setActualFilingMark("Y");
+			} else {
+				tJcicZ056.setOutJcicTxtDate(iJcicDate);
+				tJcicZ056.setActualFilingDate(0);
+				tJcicZ056.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ056Service.update(tJcicZ056, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "060":
-			Slice<JcicZ060> iJcicZ060 = null;
-			JcicZ060 uJcicZ060 = new JcicZ060();
-			iJcicZ060 = sJcicZ060Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
-			iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
+			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iChangePayDate = Integer.valueOf(titaVo.get("ChangePayDate"));
 			JcicZ060Id jcicZ060Id = new JcicZ060Id();
 			jcicZ060Id.setCustId(iCustId);
 			jcicZ060Id.setSubmitKey(iSubmitKey);
 			jcicZ060Id.setRcDate(iRcDate);
 			jcicZ060Id.setChangePayDate(iChangePayDate);
-			JcicZ060 sJcicZ060 = new JcicZ060();
-			sJcicZ060 = sJcicZ060Service.findById(jcicZ060Id, titaVo);
-			for (JcicZ060 iiJcicZ060 : iJcicZ060) {
-				if ((iiJcicZ060.getOutJcicTxtDate() == 0 || iiJcicZ060.getActualFilingDate() == 0 || iiJcicZ060.getActualFilingMark() == null) && iiJcicZ060.getCustId().equals(sJcicZ060.getCustId())
-						&& iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey()) && iiJcicZ060.getRcDate() == sJcicZ060.getRcDate()
-						&& iiJcicZ060.getChangePayDate() == sJcicZ060.getChangePayDate()) {
-					count++;
-					uJcicZ060 = sJcicZ060Service.holdById(sJcicZ060.getJcicZ060Id(), titaVo);
-					uJcicZ060.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ060.setActualFilingDate(iJcicDate);
-						uJcicZ060.setActualFilingMark("Y");
-					} else {
-						uJcicZ060.setActualFilingDate(0);
-						uJcicZ060.setActualFilingMark("");
-					}
-					try {
-						sJcicZ060Service.update(uJcicZ060, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ060 tJcicZ060 = new JcicZ060();
+			tJcicZ060 = sJcicZ060Service.holdById(jcicZ060Id, titaVo);
+			if (tJcicZ060 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ060.getOutJcicTxtDate() == 0) {
+					tJcicZ060.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ060.setActualFilingDate(iJcicDate);
+				tJcicZ060.setActualFilingMark("Y");
+			} else {
+				tJcicZ060.setOutJcicTxtDate(iJcicDate);
+				tJcicZ060.setActualFilingDate(0);
+				tJcicZ060.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ060Service.update(tJcicZ060, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "061":
-			Slice<JcicZ061> iJcicZ061 = null;
-			JcicZ061 uJcicZ061 = new JcicZ061();
-			iJcicZ061 = sJcicZ061Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
-			iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
+			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iChangePayDate = Integer.valueOf(titaVo.get("ChangePayDate"));
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
 			JcicZ061Id jcicZ061Id = new JcicZ061Id();
@@ -1054,160 +1036,152 @@ public class L840A extends TradeBuffer {
 			jcicZ061Id.setRcDate(iRcDate);
 			jcicZ061Id.setChangePayDate(iChangePayDate);
 			jcicZ061Id.setMaxMainCode(iMaxMainCode);
-			JcicZ061 sJcicZ061 = new JcicZ061();
-			sJcicZ061 = sJcicZ061Service.findById(jcicZ061Id, titaVo);
-			for (JcicZ061 iiJcicZ061 : iJcicZ061) {
-				if ((iiJcicZ061.getOutJcicTxtDate() == 0 || iiJcicZ061.getActualFilingDate() == 0 || iiJcicZ061.getActualFilingMark() == null) && iiJcicZ061.getCustId().equals(sJcicZ061.getCustId())
-						&& iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey()) && iiJcicZ061.getRcDate() == sJcicZ061.getRcDate()
-						&& iiJcicZ061.getChangePayDate() == sJcicZ061.getChangePayDate()) {
-					count++;
-					uJcicZ061 = sJcicZ061Service.holdById(sJcicZ061.getJcicZ061Id(), titaVo);
-					uJcicZ061.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ061.setActualFilingDate(iJcicDate);
-						uJcicZ061.setActualFilingMark("Y");
-					} else {
-						uJcicZ061.setActualFilingDate(0);
-						uJcicZ061.setActualFilingMark("");
-					}
-					try {
-						sJcicZ061Service.update(uJcicZ061, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ061 tJcicZ061 = new JcicZ061();
+			tJcicZ061 = sJcicZ061Service.holdById(jcicZ061Id, titaVo);
+			if (tJcicZ061 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ061.getOutJcicTxtDate() == 0) {
+					tJcicZ061.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ061.setActualFilingDate(iJcicDate);
+				tJcicZ061.setActualFilingMark("Y");
+			} else {
+				tJcicZ061.setOutJcicTxtDate(iJcicDate);
+				tJcicZ061.setActualFilingDate(0);
+				tJcicZ061.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ061Service.update(tJcicZ061, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "062":
-			Slice<JcicZ062> iJcicZ062 = null;
-			JcicZ062 uJcicZ062 = new JcicZ062();
-			iJcicZ062 = sJcicZ062Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
-			iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
+			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iChangePayDate = Integer.valueOf(titaVo.get("ChangePayDate"));
 			JcicZ062Id jcicZ062Id = new JcicZ062Id();
 			jcicZ062Id.setCustId(iCustId);
 			jcicZ062Id.setSubmitKey(iSubmitKey);
 			jcicZ062Id.setRcDate(iRcDate);
 			jcicZ062Id.setChangePayDate(iChangePayDate);
-			JcicZ062 sJcicZ062 = new JcicZ062();
-			sJcicZ062 = sJcicZ062Service.findById(jcicZ062Id, titaVo);
-			for (JcicZ062 iiJcicZ062 : iJcicZ062) {
-				if ((iiJcicZ062.getOutJcicTxtDate() == 0 || iiJcicZ062.getActualFilingDate() == 0 || iiJcicZ062.getActualFilingMark() == null) && iiJcicZ062.getCustId().equals(sJcicZ062.getCustId())
-						&& iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey()) && iiJcicZ062.getRcDate() == sJcicZ062.getRcDate()
-						&& iiJcicZ062.getChangePayDate() == sJcicZ062.getChangePayDate()) {
-					count++;
-					uJcicZ062 = sJcicZ062Service.holdById(sJcicZ062.getJcicZ062Id(), titaVo);
-					uJcicZ062.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ062.setActualFilingDate(iJcicDate);
-						uJcicZ062.setActualFilingMark("Y");
-					} else {
-						uJcicZ062.setActualFilingDate(0);
-						uJcicZ062.setActualFilingMark("");
-					}
-					try {
-						sJcicZ062Service.update(uJcicZ062, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ062 tJcicZ062 = new JcicZ062();
+			tJcicZ062 = sJcicZ062Service.holdById(jcicZ062Id, titaVo);
+			if (tJcicZ062 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ062.getOutJcicTxtDate() == 0) {
+					tJcicZ062.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ062.setActualFilingDate(iJcicDate);
+				tJcicZ062.setActualFilingMark("Y");
+			} else {
+				tJcicZ062.setOutJcicTxtDate(iJcicDate);
+				tJcicZ062.setActualFilingDate(0);
+				tJcicZ062.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ062Service.update(tJcicZ062, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "063":
-			Slice<JcicZ063> iJcicZ063 = null;
-			JcicZ063 uJcicZ063 = new JcicZ063();
-			iJcicZ063 = sJcicZ063Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
-			iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
+			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iChangePayDate = Integer.valueOf(titaVo.get("ChangePayDate"));
 			JcicZ063Id jcicZ063Id = new JcicZ063Id();
 			jcicZ063Id.setCustId(iCustId);
 			jcicZ063Id.setSubmitKey(iSubmitKey);
 			jcicZ063Id.setRcDate(iRcDate);
 			jcicZ063Id.setChangePayDate(iChangePayDate);
-			JcicZ063 sJcicZ063 = new JcicZ063();
-			sJcicZ063 = sJcicZ063Service.findById(jcicZ063Id, titaVo);
-			for (JcicZ063 iiJcicZ063 : iJcicZ063) {
-				if ((iiJcicZ063.getOutJcicTxtDate() == 0 || iiJcicZ063.getActualFilingDate() == 0 || iiJcicZ063.getActualFilingMark() == null) && iiJcicZ063.getCustId().equals(sJcicZ063.getCustId())
-						&& iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey()) && iiJcicZ063.getRcDate() == sJcicZ063.getRcDate()
-						&& iiJcicZ063.getChangePayDate() == sJcicZ063.getChangePayDate()) {
-					count++;
-					uJcicZ063 = sJcicZ063Service.holdById(sJcicZ063.getJcicZ063Id(), titaVo);
-					uJcicZ063.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ063.setActualFilingDate(iJcicDate);
-						uJcicZ063.setActualFilingMark("Y");
-					} else {
-						uJcicZ063.setActualFilingDate(0);
-						uJcicZ063.setActualFilingMark("");
-					}
-					try {
-						sJcicZ063Service.update(uJcicZ063, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ063 tJcicZ063 = new JcicZ063();
+			tJcicZ063 = sJcicZ063Service.holdById(jcicZ063Id, titaVo);
+			if (tJcicZ063 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ063.getOutJcicTxtDate() == 0) {
+					tJcicZ063.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ063.setActualFilingDate(iJcicDate);
+				tJcicZ063.setActualFilingMark("Y");
+			} else {
+				tJcicZ063.setOutJcicTxtDate(iJcicDate);
+				tJcicZ063.setActualFilingDate(0);
+				tJcicZ063.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ063Service.update(tJcicZ063, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "440":
-			Slice<JcicZ440> iJcicZ440 = null;
-			JcicZ440 uJcicZ440 = new JcicZ440();
-			iJcicZ440 = sJcicZ440Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			JcicZ440Id jcicZ440Id = new JcicZ440Id();
 			jcicZ440Id.setCustId(iCustId);
 			jcicZ440Id.setSubmitKey(iSubmitKey);
 			jcicZ440Id.setApplyDate(iApplyDate);
 			jcicZ440Id.setCourtCode(iCourtCode);
-			JcicZ440 sJcicZ440 = new JcicZ440();
-			sJcicZ440 = sJcicZ440Service.findById(jcicZ440Id, titaVo);
-			for (JcicZ440 iiJcicZ440 : iJcicZ440) {
-				if ((iiJcicZ440.getOutJcicTxtDate() == 0 || iiJcicZ440.getActualFilingDate() == 0 || iiJcicZ440.getActualFilingMark() == null) && iiJcicZ440.getCustId().equals(sJcicZ440.getCustId())
-						&& iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey()) && iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate()
-						&& iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode())) {
-					count++;
-					uJcicZ440 = sJcicZ440Service.holdById(sJcicZ440.getJcicZ440Id(), titaVo);
-					uJcicZ440.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ440.setActualFilingDate(iJcicDate);
-						uJcicZ440.setActualFilingMark("Y");
-					} else {
-						uJcicZ440.setActualFilingDate(0);
-						uJcicZ440.setActualFilingMark("");
-					}
-					try {
-						sJcicZ440Service.update(uJcicZ440, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ440 tJcicZ440 = new JcicZ440();
+			tJcicZ440 = sJcicZ440Service.holdById(jcicZ440Id, titaVo);
+			if (tJcicZ440 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ440.getOutJcicTxtDate() == 0) {
+					tJcicZ440.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ440.setActualFilingDate(iJcicDate);
+				tJcicZ440.setActualFilingMark("Y");
+			} else {
+				tJcicZ440.setOutJcicTxtDate(iJcicDate);
+				tJcicZ440.setActualFilingDate(0);
+				tJcicZ440.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ440Service.update(tJcicZ440, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "442":
-			Slice<JcicZ442> iJcicZ442 = null;
-			JcicZ442 uJcicZ442 = new JcicZ442();
-			iJcicZ442 = sJcicZ442Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			iMaxMainCode = titaVo.get("MaxMainCode");
 			JcicZ442Id jcicZ442Id = new JcicZ442Id();
@@ -1216,40 +1190,38 @@ public class L840A extends TradeBuffer {
 			jcicZ442Id.setApplyDate(iApplyDate);
 			jcicZ442Id.setCourtCode(iCourtCode);
 			jcicZ442Id.setMaxMainCode(iMaxMainCode);
-			JcicZ442 sJcicZ442 = new JcicZ442();
-			sJcicZ442 = sJcicZ442Service.findById(jcicZ442Id, titaVo);
-			for (JcicZ442 iiJcicZ442 : iJcicZ442) {
-				if ((iiJcicZ442.getOutJcicTxtDate() == 0 || iiJcicZ442.getActualFilingDate() == 0 || iiJcicZ442.getActualFilingMark() == null) && iiJcicZ442.getCustId().equals(sJcicZ442.getCustId())
-						&& iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey()) && iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate()
-						&& iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode()) && iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode())) {
-					count++;
-					uJcicZ442 = sJcicZ442Service.holdById(sJcicZ442.getJcicZ442Id(), titaVo);
-					uJcicZ442.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ442.setActualFilingDate(iJcicDate);
-						uJcicZ442.setActualFilingMark("Y");
-					} else {
-						uJcicZ442.setActualFilingDate(0);
-						uJcicZ442.setActualFilingMark("");
-					}
-					try {
-						sJcicZ442Service.update(uJcicZ442, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ442 tJcicZ442 = new JcicZ442();
+			tJcicZ442 = sJcicZ442Service.holdById(jcicZ442Id, titaVo);
+			if (tJcicZ442 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ442.getOutJcicTxtDate() == 0) {
+					tJcicZ442.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ442.setActualFilingDate(iJcicDate);
+				tJcicZ442.setActualFilingMark("Y");
+			} else {
+				tJcicZ442.setOutJcicTxtDate(iJcicDate);
+				tJcicZ442.setActualFilingDate(0);
+				tJcicZ442.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ442Service.update(tJcicZ442, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "443":
-			Slice<JcicZ443> iJcicZ443 = null;
-			JcicZ443 uJcicZ443 = new JcicZ443();
-			iJcicZ443 = sJcicZ443Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			iMaxMainCode = titaVo.get("MaxMainCode");
 			iAccount = titaVo.get("Account");
@@ -1260,160 +1232,152 @@ public class L840A extends TradeBuffer {
 			jcicZ443Id.setCourtCode(iCourtCode);
 			jcicZ443Id.setMaxMainCode(iMaxMainCode);
 			jcicZ443Id.setAccount(iAccount);
-			JcicZ443 sJcicZ443 = new JcicZ443();
-			sJcicZ443 = sJcicZ443Service.findById(jcicZ443Id, titaVo);
-			for (JcicZ443 iiJcicZ443 : iJcicZ443) {
-				if ((iiJcicZ443.getOutJcicTxtDate() == 0 || iiJcicZ443.getActualFilingDate() == 0 || iiJcicZ443.getActualFilingMark() == null) && iiJcicZ443.getCustId().equals(sJcicZ443.getCustId())
-						&& iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey()) && iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate()
-						&& iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode()) && iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())) {
-					count++;
-					uJcicZ443 = sJcicZ443Service.holdById(sJcicZ443.getJcicZ443Id(), titaVo);
-					uJcicZ443.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ443.setActualFilingDate(iJcicDate);
-						uJcicZ443.setActualFilingMark("Y");
-					} else {
-						uJcicZ443.setActualFilingDate(0);
-						uJcicZ443.setActualFilingMark("");
-					}
-					try {
-						sJcicZ443Service.update(uJcicZ443, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ443 tJcicZ443 = new JcicZ443();
+			tJcicZ443 = sJcicZ443Service.holdById(jcicZ443Id, titaVo);
+			if (tJcicZ443 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ443.getOutJcicTxtDate() == 0) {
+					tJcicZ443.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ443.setActualFilingDate(iJcicDate);
+				tJcicZ443.setActualFilingMark("Y");
+			} else {
+				tJcicZ443.setOutJcicTxtDate(iJcicDate);
+				tJcicZ443.setActualFilingDate(0);
+				tJcicZ443.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ443Service.update(tJcicZ443, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "444":
-			Slice<JcicZ444> iJcicZ444 = null;
-			JcicZ444 uJcicZ444 = new JcicZ444();
-			iJcicZ444 = sJcicZ444Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			JcicZ444Id jcicZ444Id = new JcicZ444Id();
 			jcicZ444Id.setCustId(iCustId);
 			jcicZ444Id.setSubmitKey(iSubmitKey);
 			jcicZ444Id.setApplyDate(iApplyDate);
 			jcicZ444Id.setCourtCode(iCourtCode);
-			JcicZ444 sJcicZ444 = new JcicZ444();
-			sJcicZ444 = sJcicZ444Service.findById(jcicZ444Id, titaVo);
-			for (JcicZ444 iiJcicZ444 : iJcicZ444) {
-				if ((iiJcicZ444.getOutJcicTxtDate() == 0 || iiJcicZ444.getActualFilingDate() == 0 || iiJcicZ444.getActualFilingMark() == null) && iiJcicZ444.getCustId().equals(sJcicZ444.getCustId())
-						&& iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey()) && iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate()
-						&& iiJcicZ444.getCourtCode().equals(sJcicZ444.getCourtCode())) {
-					count++;
-					uJcicZ444 = sJcicZ444Service.holdById(sJcicZ444.getJcicZ444Id(), titaVo);
-					uJcicZ444.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ444.setActualFilingDate(iJcicDate);
-						uJcicZ444.setActualFilingMark("Y");
-					} else {
-						uJcicZ444.setActualFilingDate(0);
-						uJcicZ444.setActualFilingMark("");
-					}
-					try {
-						sJcicZ444Service.update(uJcicZ444, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ444 tJcicZ444 = new JcicZ444();
+			tJcicZ444 = sJcicZ444Service.holdById(jcicZ444Id, titaVo);
+			if (tJcicZ444 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ444.getOutJcicTxtDate() == 0) {
+					tJcicZ444.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ444.setActualFilingDate(iJcicDate);
+				tJcicZ444.setActualFilingMark("Y");
+			} else {
+				tJcicZ444.setOutJcicTxtDate(iJcicDate);
+				tJcicZ444.setActualFilingDate(0);
+				tJcicZ444.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ444Service.update(tJcicZ444, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "446":
-			Slice<JcicZ446> iJcicZ446 = null;
-			JcicZ446 uJcicZ446 = new JcicZ446();
-			iJcicZ446 = sJcicZ446Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			JcicZ446Id jcicZ446Id = new JcicZ446Id();
 			jcicZ446Id.setCustId(iCustId);
 			jcicZ446Id.setSubmitKey(iSubmitKey);
 			jcicZ446Id.setApplyDate(iApplyDate);
 			jcicZ446Id.setCourtCode(iCourtCode);
-			JcicZ446 sJcicZ446 = new JcicZ446();
-			sJcicZ446 = sJcicZ446Service.findById(jcicZ446Id, titaVo);
-			for (JcicZ446 iiJcicZ446 : iJcicZ446) {
-				if ((iiJcicZ446.getOutJcicTxtDate() == 0 || iiJcicZ446.getActualFilingDate() == 0 || iiJcicZ446.getActualFilingMark() == null) && iiJcicZ446.getCustId().equals(sJcicZ446.getCustId())
-						&& iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey()) && iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate()
-						&& iiJcicZ446.getCourtCode().equals(sJcicZ446.getCourtCode())) {
-					count++;
-					uJcicZ446 = sJcicZ446Service.holdById(sJcicZ446.getJcicZ446Id(), titaVo);
-					uJcicZ446.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ446.setActualFilingDate(iJcicDate);
-						uJcicZ446.setActualFilingMark("Y");
-					} else {
-						uJcicZ446.setActualFilingDate(0);
-						uJcicZ446.setActualFilingMark("");
-					}
-					try {
-						sJcicZ446Service.update(uJcicZ446, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ446 tJcicZ446 = new JcicZ446();
+			tJcicZ446 = sJcicZ446Service.holdById(jcicZ446Id, titaVo);
+			if (tJcicZ446 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ446.getOutJcicTxtDate() == 0) {
+					tJcicZ446.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ446.setActualFilingDate(iJcicDate);
+				tJcicZ446.setActualFilingMark("Y");
+			} else {
+				tJcicZ446.setOutJcicTxtDate(iJcicDate);
+				tJcicZ446.setActualFilingDate(0);
+				tJcicZ446.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ446Service.update(tJcicZ446, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "447":
-			Slice<JcicZ447> iJcicZ447 = null;
-			JcicZ447 uJcicZ447 = new JcicZ447();
-			iJcicZ447 = sJcicZ447Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			JcicZ447Id jcicZ447Id = new JcicZ447Id();
 			jcicZ447Id.setCustId(iCustId);
 			jcicZ447Id.setSubmitKey(iSubmitKey);
 			jcicZ447Id.setApplyDate(iApplyDate);
 			jcicZ447Id.setCourtCode(iCourtCode);
-			JcicZ447 sJcicZ447 = new JcicZ447();
-			sJcicZ447 = sJcicZ447Service.findById(jcicZ447Id, titaVo);
-			for (JcicZ447 iiJcicZ447 : iJcicZ447) {
-				if ((iiJcicZ447.getOutJcicTxtDate() == 0 || iiJcicZ447.getActualFilingDate() == 0 || iiJcicZ447.getActualFilingMark() == null) && iiJcicZ447.getCustId().equals(sJcicZ447.getCustId())
-						&& iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey()) && iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate()
-						&& iiJcicZ447.getCourtCode().equals(sJcicZ447.getCourtCode())) {
-					count++;
-					uJcicZ447 = sJcicZ447Service.holdById(sJcicZ447.getJcicZ447Id(), titaVo);
-					uJcicZ447.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ447.setActualFilingDate(iJcicDate);
-						uJcicZ447.setActualFilingMark("Y");
-					} else {
-						uJcicZ447.setActualFilingDate(0);
-						uJcicZ447.setActualFilingMark("");
-					}
-					try {
-						sJcicZ447Service.update(uJcicZ447, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ447 tJcicZ447 = new JcicZ447();
+			tJcicZ447 = sJcicZ447Service.holdById(jcicZ447Id, titaVo);
+			if (tJcicZ447 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ447.getOutJcicTxtDate() == 0) {
+					tJcicZ447.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ447.setActualFilingDate(iJcicDate);
+				tJcicZ447.setActualFilingMark("Y");
+			} else {
+				tJcicZ447.setOutJcicTxtDate(iJcicDate);
+				tJcicZ447.setActualFilingDate(0);
+				tJcicZ447.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ447Service.update(tJcicZ447, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "448":
-			Slice<JcicZ448> iJcicZ448 = null;
-			JcicZ448 uJcicZ448 = new JcicZ448();
-			iJcicZ448 = sJcicZ448Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			iMaxMainCode = titaVo.get("MaxMainCode");
 			JcicZ448Id jcicZ448Id = new JcicZ448Id();
@@ -1422,40 +1386,38 @@ public class L840A extends TradeBuffer {
 			jcicZ448Id.setApplyDate(iApplyDate);
 			jcicZ448Id.setCourtCode(iCourtCode);
 			jcicZ448Id.setMaxMainCode(iMaxMainCode);
-			JcicZ448 sJcicZ448 = new JcicZ448();
-			sJcicZ448 = sJcicZ448Service.findById(jcicZ448Id, titaVo);
-			for (JcicZ448 iiJcicZ448 : iJcicZ448) {
-				if ((iiJcicZ448.getOutJcicTxtDate() == 0 || iiJcicZ448.getActualFilingDate() == 0 || iiJcicZ448.getActualFilingMark() == null) && iiJcicZ448.getCustId().equals(sJcicZ448.getCustId())
-						&& iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey()) && iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate()
-						&& iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode()) && iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode())) {
-					count++;
-					uJcicZ448 = sJcicZ448Service.holdById(sJcicZ448.getJcicZ448Id(), titaVo);
-					uJcicZ448.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ448.setActualFilingDate(iJcicDate);
-						uJcicZ448.setActualFilingMark("Y");
-					} else {
-						uJcicZ448.setActualFilingDate(0);
-						uJcicZ448.setActualFilingMark("");
-					}
-					try {
-						sJcicZ448Service.update(uJcicZ448, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ448 tJcicZ448 = new JcicZ448();
+			tJcicZ448 = sJcicZ448Service.holdById(jcicZ448Id, titaVo);
+			if (tJcicZ448 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ448.getOutJcicTxtDate() == 0) {
+					tJcicZ448.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ448.setActualFilingDate(iJcicDate);
+				tJcicZ448.setActualFilingMark("Y");
+			} else {
+				tJcicZ448.setOutJcicTxtDate(iJcicDate);
+				tJcicZ448.setActualFilingDate(0);
+				tJcicZ448.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ448Service.update(tJcicZ448, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "450":
-			Slice<JcicZ450> iJcicZ450 = null;
-			JcicZ450 uJcicZ450 = new JcicZ450();
-			iJcicZ450 = sJcicZ450Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			iPayDate = Integer.valueOf(titaVo.get("PayDate"));
 			JcicZ450Id jcicZ450Id = new JcicZ450Id();
@@ -1464,40 +1426,38 @@ public class L840A extends TradeBuffer {
 			jcicZ450Id.setApplyDate(iApplyDate);
 			jcicZ450Id.setCourtCode(iCourtCode);
 			jcicZ450Id.setPayDate(iPayDate);
-			JcicZ450 sJcicZ450 = new JcicZ450();
-			sJcicZ450 = sJcicZ450Service.findById(jcicZ450Id, titaVo);
-			for (JcicZ450 iiJcicZ450 : iJcicZ450) {
-				if ((iiJcicZ450.getOutJcicTxtDate() == 0 || iiJcicZ450.getActualFilingDate() == 0 || iiJcicZ450.getActualFilingMark() == null) && iiJcicZ450.getCustId().equals(sJcicZ450.getCustId())
-						&& iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey()) && iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate()
-						&& iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode()) && iiJcicZ450.getPayDate() == sJcicZ450.getPayDate()) {
-					count++;
-					uJcicZ450 = sJcicZ450Service.holdById(sJcicZ450.getJcicZ450Id(), titaVo);
-					uJcicZ450.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ450.setActualFilingDate(iJcicDate);
-						uJcicZ450.setActualFilingMark("Y");
-					} else {
-						uJcicZ450.setActualFilingDate(0);
-						uJcicZ450.setActualFilingMark("");
-					}
-					try {
-						sJcicZ450Service.update(uJcicZ450, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ450 tJcicZ450 = new JcicZ450();
+			tJcicZ450 = sJcicZ450Service.holdById(jcicZ450Id, titaVo);
+			if (tJcicZ450 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ450.getOutJcicTxtDate() == 0) {
+					tJcicZ450.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ450.setActualFilingDate(iJcicDate);
+				tJcicZ450.setActualFilingMark("Y");
+			} else {
+				tJcicZ450.setOutJcicTxtDate(iJcicDate);
+				tJcicZ450.setActualFilingDate(0);
+				tJcicZ450.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ450Service.update(tJcicZ450, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "451":
-			Slice<JcicZ451> iJcicZ451 = null;
-			JcicZ451 uJcicZ451 = new JcicZ451();
-			iJcicZ451 = sJcicZ451Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			iDelayYM = Integer.valueOf(titaVo.get("DelayYM"));
 			JcicZ451Id jcicZ451Id = new JcicZ451Id();
@@ -1506,40 +1466,38 @@ public class L840A extends TradeBuffer {
 			jcicZ451Id.setApplyDate(iApplyDate);
 			jcicZ451Id.setCourtCode(iCourtCode);
 			jcicZ451Id.setDelayYM(iDelayYM);
-			JcicZ451 sJcicZ451 = new JcicZ451();
-			sJcicZ451 = sJcicZ451Service.findById(jcicZ451Id, titaVo);
-			for (JcicZ451 iiJcicZ451 : iJcicZ451) {
-				if ((iiJcicZ451.getOutJcicTxtDate() == 0 || iiJcicZ451.getActualFilingDate() == 0 || iiJcicZ451.getActualFilingMark() == null) && iiJcicZ451.getCustId().equals(sJcicZ451.getCustId())
-						&& iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey()) && iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate()
-						&& iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode()) && iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM()) {
-					count++;
-					uJcicZ451 = sJcicZ451Service.holdById(sJcicZ451.getJcicZ451Id(), titaVo);
-					uJcicZ451.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ451.setActualFilingDate(iJcicDate);
-						uJcicZ451.setActualFilingMark("Y");
-					} else {
-						uJcicZ451.setActualFilingDate(0);
-						uJcicZ451.setActualFilingMark("");
-					}
-					try {
-						sJcicZ451Service.update(uJcicZ451, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ451 tJcicZ451 = new JcicZ451();
+			tJcicZ451 = sJcicZ451Service.holdById(jcicZ451Id, titaVo);
+			if (tJcicZ451 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ451.getOutJcicTxtDate() == 0) {
+					tJcicZ451.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ451.setActualFilingDate(iJcicDate);
+				tJcicZ451.setActualFilingMark("Y");
+			} else {
+				tJcicZ451.setOutJcicTxtDate(iJcicDate);
+				tJcicZ451.setActualFilingDate(0);
+				tJcicZ451.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ451Service.update(tJcicZ451, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "454":
-			Slice<JcicZ454> iJcicZ454 = null;
-			JcicZ454 uJcicZ454 = new JcicZ454();
-			iJcicZ454 = sJcicZ454Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iCourtCode = titaVo.get("CourtCode");
 			iMaxMainCode = titaVo.get("MaxMainCode");
 			JcicZ454Id jcicZ454Id = new JcicZ454Id();
@@ -1548,117 +1506,112 @@ public class L840A extends TradeBuffer {
 			jcicZ454Id.setApplyDate(iApplyDate);
 			jcicZ454Id.setCourtCode(iCourtCode);
 			jcicZ454Id.setMaxMainCode(iMaxMainCode);
-			JcicZ454 sJcicZ454 = new JcicZ454();
-			sJcicZ454 = sJcicZ454Service.findById(jcicZ454Id, titaVo);
-			for (JcicZ454 iiJcicZ454 : iJcicZ454) {
-				if ((iiJcicZ454.getOutJcicTxtDate() == 0 || iiJcicZ454.getActualFilingDate() == 0 || iiJcicZ454.getActualFilingMark() == null) && iiJcicZ454.getCustId().equals(sJcicZ454.getCustId())
-						&& iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey()) && iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate()
-						&& iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode()) && iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode())) {
-					count++;
-					uJcicZ454 = sJcicZ454Service.holdById(sJcicZ454.getJcicZ454Id(), titaVo);
-					uJcicZ454.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ454.setActualFilingDate(iJcicDate);
-						uJcicZ454.setActualFilingMark("Y");
-					} else {
-						uJcicZ454.setActualFilingDate(0);
-						uJcicZ454.setActualFilingMark("");
-					}
-					try {
-						sJcicZ454Service.update(uJcicZ454, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ454 tJcicZ454 = new JcicZ454();
+			tJcicZ454 = sJcicZ454Service.holdById(jcicZ454Id, titaVo);
+			if (tJcicZ454 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ454.getOutJcicTxtDate() == 0) {
+					tJcicZ454.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ454.setActualFilingDate(iJcicDate);
+				tJcicZ454.setActualFilingMark("Y");
+			} else {
+				tJcicZ454.setOutJcicTxtDate(iJcicDate);
+				tJcicZ454.setActualFilingDate(0);
+				tJcicZ454.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ454Service.update(tJcicZ454, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "570":
-			Slice<JcicZ570> iJcicZ570 = null;
-			JcicZ570 uJcicZ570 = new JcicZ570();
-			iJcicZ570 = sJcicZ570Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ570Id jcicZ570Id = new JcicZ570Id();
 			jcicZ570Id.setCustId(iCustId);
 			jcicZ570Id.setSubmitKey(iSubmitKey);
 			jcicZ570Id.setApplyDate(iApplyDate);
-			JcicZ570 sJcicZ570 = new JcicZ570();
-			sJcicZ570 = sJcicZ570Service.findById(jcicZ570Id, titaVo);
-			for (JcicZ570 iiJcicZ570 : iJcicZ570) {
-				if ((iiJcicZ570.getOutJcicTxtDate() == 0 || iiJcicZ570.getActualFilingDate() == 0 || iiJcicZ570.getActualFilingMark() == null) && iiJcicZ570.getCustId().equals(sJcicZ570.getCustId())
-						&& iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey()) && iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate()) {
-					count++;
-					uJcicZ570 = sJcicZ570Service.holdById(sJcicZ570.getJcicZ570Id(), titaVo);
-					uJcicZ570.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ570.setActualFilingDate(iJcicDate);
-						uJcicZ570.setActualFilingMark("Y");
-					} else {
-						uJcicZ570.setActualFilingDate(0);
-						uJcicZ570.setActualFilingMark("");
-					}
-					try {
-						sJcicZ570Service.update(uJcicZ570, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ570 tJcicZ570 = new JcicZ570();
+			tJcicZ570 = sJcicZ570Service.holdById(jcicZ570Id, titaVo);
+			if (tJcicZ570 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ570.getOutJcicTxtDate() == 0) {
+					tJcicZ570.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ570.setActualFilingDate(iJcicDate);
+				tJcicZ570.setActualFilingMark("Y");
+			} else {
+				tJcicZ570.setOutJcicTxtDate(iJcicDate);
+				tJcicZ570.setActualFilingDate(0);
+				tJcicZ570.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ570Service.update(tJcicZ570, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "571":
-			Slice<JcicZ571> iJcicZ571 = null;
-			JcicZ571 uJcicZ571 = new JcicZ571();
-			iJcicZ571 = sJcicZ571Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iBankId = titaVo.get("BankId");
 			JcicZ571Id jcicZ571Id = new JcicZ571Id();
 			jcicZ571Id.setCustId(iCustId);
 			jcicZ571Id.setSubmitKey(iSubmitKey);
 			jcicZ571Id.setApplyDate(iApplyDate);
 			jcicZ571Id.setBankId(iBankId);
-			JcicZ571 sJcicZ571 = new JcicZ571();
-			sJcicZ571 = sJcicZ571Service.findById(jcicZ571Id, titaVo);
-			for (JcicZ571 iiJcicZ571 : iJcicZ571) {
-				if ((iiJcicZ571.getOutJcicTxtDate() == 0 || iiJcicZ571.getActualFilingDate() == 0 || iiJcicZ571.getActualFilingMark() == null) && iiJcicZ571.getCustId().equals(sJcicZ571.getCustId())
-						&& iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey()) && iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate()
-						&& iiJcicZ571.getBankId().equals(sJcicZ571.getBankId())) {
-					count++;
-					uJcicZ571 = sJcicZ571Service.holdById(sJcicZ571.getJcicZ571Id(), titaVo);
-					uJcicZ571.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ571.setActualFilingDate(iJcicDate);
-						uJcicZ571.setActualFilingMark("Y");
-					} else {
-						uJcicZ571.setActualFilingDate(0);
-						uJcicZ571.setActualFilingMark("");
-					}
-					try {
-						sJcicZ571Service.update(uJcicZ571, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ571 tJcicZ571 = new JcicZ571();
+			tJcicZ571 = sJcicZ571Service.holdById(jcicZ571Id, titaVo);
+			if (tJcicZ571 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ571.getOutJcicTxtDate() == 0) {
+					tJcicZ571.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ571.setActualFilingDate(iJcicDate);
+				tJcicZ571.setActualFilingMark("Y");
+			} else {
+				tJcicZ571.setOutJcicTxtDate(iJcicDate);
+				tJcicZ571.setActualFilingDate(0);
+				tJcicZ571.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ571Service.update(tJcicZ571, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "572":
-			Slice<JcicZ572> iJcicZ572 = null;
-			JcicZ572 uJcicZ572 = new JcicZ572();
-			iJcicZ572 = sJcicZ572Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iBankId = titaVo.get("BankId");
 			iPayDate = Integer.valueOf(titaVo.get("PayDate"));
 			JcicZ572Id jcicZ572Id = new JcicZ572Id();
@@ -1667,149 +1620,139 @@ public class L840A extends TradeBuffer {
 			jcicZ572Id.setApplyDate(iApplyDate);
 			jcicZ572Id.setBankId(iBankId);
 			jcicZ572Id.setPayDate(iPayDate);
-			JcicZ572 sJcicZ572 = new JcicZ572();
-			sJcicZ572 = sJcicZ572Service.findById(jcicZ572Id, titaVo);
-			for (JcicZ572 iiJcicZ572 : iJcicZ572) {
-				if ((iiJcicZ572.getOutJcicTxtDate() == 0 || iiJcicZ572.getActualFilingDate() == 0 || iiJcicZ572.getActualFilingMark() == null) && iiJcicZ572.getCustId().equals(sJcicZ572.getCustId())
-						&& iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey()) && iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate() && iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
-						&& iiJcicZ572.getPayDate() == sJcicZ572.getPayDate()) {
-					count++;
-					uJcicZ572 = sJcicZ572Service.holdById(sJcicZ572.getJcicZ572Id(), titaVo);
-					uJcicZ572.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ572.setActualFilingDate(iJcicDate);
-						uJcicZ572.setActualFilingMark("Y");
-					} else {
-						uJcicZ572.setActualFilingDate(0);
-						uJcicZ572.setActualFilingMark("");
-					}
-					try {
-						sJcicZ572Service.update(uJcicZ572, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ572 tJcicZ572 = new JcicZ572();
+			tJcicZ572 = sJcicZ572Service.holdById(jcicZ572Id, titaVo);
+			if (tJcicZ572 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ572.getOutJcicTxtDate() == 0) {
+					tJcicZ572.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ572.setActualFilingDate(iJcicDate);
+				tJcicZ572.setActualFilingMark("Y");
+			} else {
+				tJcicZ572.setOutJcicTxtDate(iJcicDate);
+				tJcicZ572.setActualFilingDate(0);
+				tJcicZ572.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ572Service.update(tJcicZ572, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "573":
-			Slice<JcicZ573> iJcicZ573 = null;
-			JcicZ573 uJcicZ573 = new JcicZ573();
-			iJcicZ573 = sJcicZ573Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iPayDate = Integer.valueOf(titaVo.get("PayDate"));
 			JcicZ573Id jcicZ573Id = new JcicZ573Id();
 			jcicZ573Id.setCustId(iCustId);
 			jcicZ573Id.setSubmitKey(iSubmitKey);
 			jcicZ573Id.setApplyDate(iApplyDate);
 			jcicZ573Id.setPayDate(iPayDate);
-			JcicZ573 sJcicZ573 = new JcicZ573();
-			sJcicZ573 = sJcicZ573Service.findById(jcicZ573Id, titaVo);
-			for (JcicZ573 iiJcicZ573 : iJcicZ573) {
-				if ((iiJcicZ573.getOutJcicTxtDate() == 0 || iiJcicZ573.getActualFilingDate() == 0 || iiJcicZ573.getActualFilingMark() == null) && iiJcicZ573.getCustId().equals(sJcicZ573.getCustId())
-						&& iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey()) && iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate() && iiJcicZ573.getPayDate() == sJcicZ573.getPayDate()) {
-					count++;
-					uJcicZ573 = sJcicZ573Service.holdById(sJcicZ573.getJcicZ573Id(), titaVo);
-					uJcicZ573.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ573.setActualFilingDate(iJcicDate);
-						uJcicZ573.setActualFilingMark("Y");
-					} else {
-						uJcicZ573.setActualFilingDate(0);
-						uJcicZ573.setActualFilingMark("");
-					}
-					try {
-						sJcicZ573Service.update(uJcicZ573, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ573 tJcicZ573 = new JcicZ573();
+			tJcicZ573 = sJcicZ573Service.holdById(jcicZ573Id, titaVo);
+			if (tJcicZ573 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ573.getOutJcicTxtDate() == 0) {
+					tJcicZ573.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ573.setActualFilingDate(iJcicDate);
+				tJcicZ573.setActualFilingMark("Y");
+			} else {
+				tJcicZ573.setOutJcicTxtDate(iJcicDate);
+				tJcicZ573.setActualFilingDate(0);
+				tJcicZ573.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ573Service.update(tJcicZ573, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "574":
-			Slice<JcicZ574> iJcicZ574 = null;
-			JcicZ574 uJcicZ574 = new JcicZ574();
-			iJcicZ574 = sJcicZ574Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			JcicZ574Id jcicZ574Id = new JcicZ574Id();
 			jcicZ574Id.setCustId(iCustId);
 			jcicZ574Id.setSubmitKey(iSubmitKey);
 			jcicZ574Id.setApplyDate(iApplyDate);
-			JcicZ574 sJcicZ574 = new JcicZ574();
-			sJcicZ574 = sJcicZ574Service.findById(jcicZ574Id, titaVo);
-			for (JcicZ574 iiJcicZ574 : iJcicZ574) {
-				if ((iiJcicZ574.getOutJcicTxtDate() == 0 || iiJcicZ574.getActualFilingDate() == 0 || iiJcicZ574.getActualFilingMark() == null) && iiJcicZ574.getCustId().equals(sJcicZ574.getCustId())
-						&& iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey()) && iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate()) {
-					count++;
-					uJcicZ574 = sJcicZ574Service.holdById(sJcicZ574.getJcicZ574Id(), titaVo);
-					uJcicZ574.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ574.setActualFilingDate(iJcicDate);
-						uJcicZ574.setActualFilingMark("Y");
-					} else {
-						uJcicZ574.setActualFilingDate(0);
-						uJcicZ574.setActualFilingMark("");
-					}
-					try {
-						sJcicZ574Service.update(uJcicZ574, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ574 tJcicZ574 = new JcicZ574();
+			tJcicZ574 = sJcicZ574Service.holdById(jcicZ574Id, titaVo);
+			if (tJcicZ574 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
+			}
+			if (iSubmitType == 3) {
+				if (tJcicZ574.getOutJcicTxtDate() == 0) {
+					tJcicZ574.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ574.setActualFilingDate(iJcicDate);
+				tJcicZ574.setActualFilingMark("Y");
+			} else {
+				tJcicZ574.setOutJcicTxtDate(iJcicDate);
+				tJcicZ574.setActualFilingDate(0);
+				tJcicZ574.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ574Service.update(tJcicZ574, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
 			}
 			break;
 		case "575":
-			Slice<JcicZ575> iJcicZ575 = null;
-			JcicZ575 uJcicZ575 = new JcicZ575();
-			iJcicZ575 = sJcicZ575Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			if (("").equals(iActualFilingMark)) {
+				iActualFilingMark = null;
+			}
+
 			iBankId = titaVo.get("BankId");
 			JcicZ575Id jcicZ575Id = new JcicZ575Id();
 			jcicZ575Id.setCustId(iCustId);
 			jcicZ575Id.setSubmitKey(iSubmitKey);
 			jcicZ575Id.setApplyDate(iApplyDate);
 			jcicZ575Id.setBankId(iBankId);
-			JcicZ575 sJcicZ575 = new JcicZ575();
-			sJcicZ575 = sJcicZ575Service.findById(jcicZ575Id, titaVo);
-			for (JcicZ575 iiJcicZ575 : iJcicZ575) {
-				if ((iiJcicZ575.getOutJcicTxtDate() == 0 || iiJcicZ575.getActualFilingDate() == 0 || iiJcicZ575.getActualFilingMark() == null) && iiJcicZ575.getCustId().equals(sJcicZ575.getCustId())
-						&& iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey()) && iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate()
-						&& iiJcicZ575.getBankId().equals(sJcicZ575.getBankId())) {
-					count++;
-					uJcicZ575 = sJcicZ575Service.holdById(sJcicZ575.getJcicZ575Id(), titaVo);
-					uJcicZ575.setOutJcicTxtDate(iJcicDate);
-					if (iSubmitType == 3) {
-						uJcicZ575.setActualFilingDate(iJcicDate);
-						uJcicZ575.setActualFilingMark("Y");
-					} else {
-						uJcicZ575.setActualFilingDate(0);
-						uJcicZ575.setActualFilingMark("");
-					}
-					try {
-						sJcicZ575Service.update(uJcicZ575, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
-					}
-				}
-			}
-			if (count == 0) {
+			JcicZ575 tJcicZ575 = new JcicZ575();
+			tJcicZ575 = sJcicZ575Service.holdById(jcicZ575Id, titaVo);
+			if (tJcicZ575 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			break;
+			if (iSubmitType == 3) {
+				if (tJcicZ575.getOutJcicTxtDate() == 0) {
+					tJcicZ575.setOutJcicTxtDate(iJcicDate);
+				}
+				tJcicZ575.setActualFilingDate(iJcicDate);
+				tJcicZ575.setActualFilingMark("Y");
+			} else {
+				tJcicZ575.setOutJcicTxtDate(iJcicDate);
+				tJcicZ575.setActualFilingDate(0);
+				tJcicZ575.setActualFilingMark("N");
+			}
+			try {
+				sJcicZ575Service.update(tJcicZ575, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "更新報送JCIC日期時發生錯誤");
+			}
 		}
 	}
 
@@ -1837,7 +1780,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ040SIZE     =" + lJcicZ040.size());
 			for (JcicZ040 iiJcicZ040 : lJcicZ040) {
 				count++;
-				if (iiJcicZ040.getOutJcicTxtDate() == iJcicDate && iiJcicZ040.getCustId().equals(sJcicZ040.getCustId()) && iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey())
+				if (iiJcicZ040.getOutJcicTxtDate() == iJcicDate && iiJcicZ040.getCustId().equals(sJcicZ040.getCustId())
+						&& iiJcicZ040.getSubmitKey().equals(sJcicZ040.getSubmitKey())
 						&& iiJcicZ040.getRcDate() == sJcicZ040.getRcDate() && iiJcicZ040.getActualFilingDate() == 0) {
 
 					uJcicZ040 = sJcicZ040Service.holdById(iiJcicZ040.getJcicZ040Id(), titaVo);
@@ -1878,7 +1822,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ041SIZE     =" + lJcicZ041.size());
 			for (JcicZ041 iiJcicZ041 : lJcicZ041) {
 				count++;
-				if (iiJcicZ041.getOutJcicTxtDate() == iJcicDate && iiJcicZ041.getCustId().equals(sJcicZ041.getCustId()) && iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey())
+				if (iiJcicZ041.getOutJcicTxtDate() == iJcicDate && iiJcicZ041.getCustId().equals(sJcicZ041.getCustId())
+						&& iiJcicZ041.getSubmitKey().equals(sJcicZ041.getSubmitKey())
 						&& iiJcicZ041.getRcDate() == sJcicZ041.getRcDate() && iiJcicZ041.getActualFilingDate() == 0) {
 
 					uJcicZ041 = sJcicZ041Service.holdById(iiJcicZ041.getJcicZ041Id(), titaVo);
@@ -1921,7 +1866,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ042SIZE     =" + lJcicZ042.size());
 			for (JcicZ042 iiJcicZ042 : lJcicZ042) {
 				count++;
-				if (iiJcicZ042.getOutJcicTxtDate() == iJcicDate && iiJcicZ042.getCustId().equals(sJcicZ042.getCustId()) && iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey())
+				if (iiJcicZ042.getOutJcicTxtDate() == iJcicDate && iiJcicZ042.getCustId().equals(sJcicZ042.getCustId())
+						&& iiJcicZ042.getSubmitKey().equals(sJcicZ042.getSubmitKey())
 						&& iiJcicZ042.getRcDate() == sJcicZ042.getRcDate() && iiJcicZ042.getActualFilingDate() == 0) {
 
 					uJcicZ042 = sJcicZ042Service.holdById(iiJcicZ042.getJcicZ042Id(), titaVo);
@@ -1966,8 +1912,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ043SIZE     =" + lJcicZ043.size());
 			for (JcicZ043 iiJcicZ043 : lJcicZ043) {
 				count++;
-				if (iiJcicZ043.getOutJcicTxtDate() == iJcicDate && iiJcicZ043.getCustId().equals(sJcicZ043.getCustId()) && iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey())
-						&& iiJcicZ043.getRcDate() == sJcicZ043.getRcDate() && iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode()) && iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())
+				if (iiJcicZ043.getOutJcicTxtDate() == iJcicDate && iiJcicZ043.getCustId().equals(sJcicZ043.getCustId())
+						&& iiJcicZ043.getSubmitKey().equals(sJcicZ043.getSubmitKey())
+						&& iiJcicZ043.getRcDate() == sJcicZ043.getRcDate()
+						&& iiJcicZ043.getMaxMainCode().equals(sJcicZ043.getMaxMainCode())
+						&& iiJcicZ043.getAccount().equals(sJcicZ043.getAccount())
 						&& iiJcicZ043.getActualFilingDate() == 0) {
 
 					uJcicZ043 = sJcicZ043Service.holdById(iiJcicZ043.getJcicZ043Id(), titaVo);
@@ -2008,7 +1957,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ044SIZE     =" + lJcicZ044.size());
 			for (JcicZ044 iiJcicZ044 : lJcicZ044) {
 				count++;
-				if (iiJcicZ044.getOutJcicTxtDate() == iJcicDate && iiJcicZ044.getCustId().equals(sJcicZ044.getCustId()) && iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey())
+				if (iiJcicZ044.getOutJcicTxtDate() == iJcicDate && iiJcicZ044.getCustId().equals(sJcicZ044.getCustId())
+						&& iiJcicZ044.getSubmitKey().equals(sJcicZ044.getSubmitKey())
 						&& iiJcicZ044.getRcDate() == sJcicZ044.getRcDate() && iiJcicZ044.getActualFilingDate() == 0) {
 
 					uJcicZ044 = sJcicZ044Service.holdById(iiJcicZ044.getJcicZ044Id(), titaVo);
@@ -2051,8 +2001,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ045SIZE     =" + lJcicZ045.size());
 			for (JcicZ045 iiJcicZ045 : lJcicZ045) {
 				count++;
-				if (iiJcicZ045.getOutJcicTxtDate() == iJcicDate && iiJcicZ045.getCustId().equals(sJcicZ045.getCustId()) && iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey())
-						&& iiJcicZ045.getRcDate() == sJcicZ045.getRcDate() && iiJcicZ045.getMaxMainCode().equals(sJcicZ045.getMaxMainCode()) && iiJcicZ045.getActualFilingDate() == 0) {
+				if (iiJcicZ045.getOutJcicTxtDate() == iJcicDate && iiJcicZ045.getCustId().equals(sJcicZ045.getCustId())
+						&& iiJcicZ045.getSubmitKey().equals(sJcicZ045.getSubmitKey())
+						&& iiJcicZ045.getRcDate() == sJcicZ045.getRcDate()
+						&& iiJcicZ045.getMaxMainCode().equals(sJcicZ045.getMaxMainCode())
+						&& iiJcicZ045.getActualFilingDate() == 0) {
 
 					uJcicZ045 = sJcicZ045Service.holdById(iiJcicZ045.getJcicZ045Id(), titaVo);
 					oldJcicZ045 = (JcicZ045) iDataLog.clone(uJcicZ045);
@@ -2094,8 +2047,11 @@ public class L840A extends TradeBuffer {
 
 			for (JcicZ046 iiJcicZ046 : lJcicZ046) {
 				count++;
-				if (iiJcicZ046.getOutJcicTxtDate() == iJcicDate && iiJcicZ046.getCustId().equals(sJcicZ046.getCustId()) && iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey())
-						&& iiJcicZ046.getRcDate() == sJcicZ046.getRcDate() && iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate() && iiJcicZ046.getActualFilingDate() == 0) {
+				if (iiJcicZ046.getOutJcicTxtDate() == iJcicDate && iiJcicZ046.getCustId().equals(sJcicZ046.getCustId())
+						&& iiJcicZ046.getSubmitKey().equals(sJcicZ046.getSubmitKey())
+						&& iiJcicZ046.getRcDate() == sJcicZ046.getRcDate()
+						&& iiJcicZ046.getCloseDate() == sJcicZ046.getCloseDate()
+						&& iiJcicZ046.getActualFilingDate() == 0) {
 
 					uJcicZ046 = sJcicZ046Service.holdById(iiJcicZ046.getJcicZ046Id(), titaVo);
 					oldJcicZ046 = (JcicZ046) iDataLog.clone(uJcicZ046);
@@ -2135,7 +2091,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ047SIZE     =" + lJcicZ047.size());
 			for (JcicZ047 iiJcicZ047 : lJcicZ047) {
 				count++;
-				if (iiJcicZ047.getOutJcicTxtDate() == iJcicDate && iiJcicZ047.getCustId().equals(sJcicZ047.getCustId()) && iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey())
+				if (iiJcicZ047.getOutJcicTxtDate() == iJcicDate && iiJcicZ047.getCustId().equals(sJcicZ047.getCustId())
+						&& iiJcicZ047.getSubmitKey().equals(sJcicZ047.getSubmitKey())
 						&& iiJcicZ047.getRcDate() == sJcicZ047.getRcDate() && iiJcicZ047.getActualFilingDate() == 0) {
 
 					uJcicZ047 = sJcicZ047Service.holdById(iiJcicZ047.getJcicZ047Id(), titaVo);
@@ -2176,7 +2133,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ048SIZE     =" + lJcicZ048.size());
 			for (JcicZ048 iiJcicZ048 : lJcicZ048) {
 				count++;
-				if (iiJcicZ048.getOutJcicTxtDate() == iJcicDate && iiJcicZ048.getCustId().equals(sJcicZ048.getCustId()) && iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey())
+				if (iiJcicZ048.getOutJcicTxtDate() == iJcicDate && iiJcicZ048.getCustId().equals(sJcicZ048.getCustId())
+						&& iiJcicZ048.getSubmitKey().equals(sJcicZ048.getSubmitKey())
 						&& iiJcicZ048.getRcDate() == sJcicZ048.getRcDate() && iiJcicZ048.getActualFilingDate() == 0) {
 
 					uJcicZ048 = sJcicZ048Service.holdById(iiJcicZ048.getJcicZ048Id(), titaVo);
@@ -2217,7 +2175,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ049SIZE     =" + lJcicZ049.size());
 			for (JcicZ049 iiJcicZ049 : lJcicZ049) {
 				count++;
-				if (iiJcicZ049.getOutJcicTxtDate() == iJcicDate && iiJcicZ049.getCustId().equals(sJcicZ049.getCustId()) && iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey())
+				if (iiJcicZ049.getOutJcicTxtDate() == iJcicDate && iiJcicZ049.getCustId().equals(sJcicZ049.getCustId())
+						&& iiJcicZ049.getSubmitKey().equals(sJcicZ049.getSubmitKey())
 						&& iiJcicZ049.getRcDate() == sJcicZ049.getRcDate() && iiJcicZ049.getActualFilingDate() == 0) {
 
 					uJcicZ049 = sJcicZ049Service.holdById(iiJcicZ049.getJcicZ049Id(), titaVo);
@@ -2260,8 +2219,10 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ050SIZE     =" + lJcicZ050.size());
 			for (JcicZ050 iiJcicZ050 : lJcicZ050) {
 				count++;
-				if (iiJcicZ050.getOutJcicTxtDate() == iJcicDate && iiJcicZ050.getCustId().equals(sJcicZ050.getCustId()) && iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey())
-						&& iiJcicZ050.getRcDate() == sJcicZ050.getRcDate() && iiJcicZ050.getPayDate() == sJcicZ050.getPayDate() && iiJcicZ050.getActualFilingDate() == 0) {
+				if (iiJcicZ050.getOutJcicTxtDate() == iJcicDate && iiJcicZ050.getCustId().equals(sJcicZ050.getCustId())
+						&& iiJcicZ050.getSubmitKey().equals(sJcicZ050.getSubmitKey())
+						&& iiJcicZ050.getRcDate() == sJcicZ050.getRcDate()
+						&& iiJcicZ050.getPayDate() == sJcicZ050.getPayDate() && iiJcicZ050.getActualFilingDate() == 0) {
 
 					uJcicZ050 = sJcicZ050Service.holdById(iiJcicZ050.getJcicZ050Id(), titaVo);
 					oldJcicZ050 = (JcicZ050) iDataLog.clone(uJcicZ050);
@@ -2303,8 +2264,10 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ051SIZE     =" + lJcicZ051.size());
 			for (JcicZ051 iiJcicZ051 : lJcicZ051) {
 				count++;
-				if (iiJcicZ051.getOutJcicTxtDate() == iJcicDate && iiJcicZ051.getCustId().equals(sJcicZ051.getCustId()) && iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey())
-						&& iiJcicZ051.getRcDate() == sJcicZ051.getRcDate() && iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM() && iiJcicZ051.getActualFilingDate() == 0) {
+				if (iiJcicZ051.getOutJcicTxtDate() == iJcicDate && iiJcicZ051.getCustId().equals(sJcicZ051.getCustId())
+						&& iiJcicZ051.getSubmitKey().equals(sJcicZ051.getSubmitKey())
+						&& iiJcicZ051.getRcDate() == sJcicZ051.getRcDate()
+						&& iiJcicZ051.getDelayYM() == sJcicZ051.getDelayYM() && iiJcicZ051.getActualFilingDate() == 0) {
 
 					uJcicZ051 = sJcicZ051Service.holdById(iiJcicZ051.getJcicZ051Id(), titaVo);
 					oldJcicZ051 = (JcicZ051) iDataLog.clone(uJcicZ051);
@@ -2344,7 +2307,8 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ052SIZE     =" + lJcicZ052.size());
 			for (JcicZ052 iiJcicZ052 : lJcicZ052) {
 				count++;
-				if (iiJcicZ052.getOutJcicTxtDate() == iJcicDate && iiJcicZ052.getCustId().equals(sJcicZ052.getCustId()) && iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey())
+				if (iiJcicZ052.getOutJcicTxtDate() == iJcicDate && iiJcicZ052.getCustId().equals(sJcicZ052.getCustId())
+						&& iiJcicZ052.getSubmitKey().equals(sJcicZ052.getSubmitKey())
 						&& iiJcicZ052.getRcDate() == sJcicZ052.getRcDate() && iiJcicZ052.getActualFilingDate() == 0) {
 
 					uJcicZ052 = sJcicZ052Service.holdById(iiJcicZ052.getJcicZ052Id(), titaVo);
@@ -2387,8 +2351,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ053SIZE     =" + lJcicZ053.size());
 			for (JcicZ053 iiJcicZ053 : lJcicZ053) {
 				count++;
-				if (iiJcicZ053.getOutJcicTxtDate() == iJcicDate && iiJcicZ053.getCustId().equals(sJcicZ053.getCustId()) && iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey())
-						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate() && iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode()) && iiJcicZ053.getActualFilingDate() == 0) {
+				if (iiJcicZ053.getOutJcicTxtDate() == iJcicDate && iiJcicZ053.getCustId().equals(sJcicZ053.getCustId())
+						&& iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey())
+						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
+						&& iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode())
+						&& iiJcicZ053.getActualFilingDate() == 0) {
 
 					uJcicZ053 = sJcicZ053Service.holdById(iiJcicZ053.getJcicZ053Id(), titaVo);
 					oldJcicZ053 = (JcicZ053) iDataLog.clone(uJcicZ053);
@@ -2432,8 +2399,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ054SIZE     =" + lJcicZ054.size());
 			for (JcicZ054 iiJcicZ054 : lJcicZ054) {
 				count++;
-				if (iiJcicZ054.getOutJcicTxtDate() == iJcicDate && iiJcicZ054.getCustId().equals(sJcicZ054.getCustId()) && iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey())
-						&& iiJcicZ054.getRcDate() == sJcicZ054.getRcDate() && iiJcicZ054.getMaxMainCode().equals(sJcicZ054.getMaxMainCode()) && iiJcicZ054.getActualFilingDate() == 0) {
+				if (iiJcicZ054.getOutJcicTxtDate() == iJcicDate && iiJcicZ054.getCustId().equals(sJcicZ054.getCustId())
+						&& iiJcicZ054.getSubmitKey().equals(sJcicZ054.getSubmitKey())
+						&& iiJcicZ054.getRcDate() == sJcicZ054.getRcDate()
+						&& iiJcicZ054.getMaxMainCode().equals(sJcicZ054.getMaxMainCode())
+						&& iiJcicZ054.getActualFilingDate() == 0) {
 
 					uJcicZ054 = sJcicZ054Service.holdById(iiJcicZ054.getJcicZ054Id(), titaVo);
 					oldJcicZ054 = (JcicZ054) iDataLog.clone(uJcicZ054);
@@ -2477,9 +2447,12 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ055SIZE     =" + lJcicZ055.size());
 			for (JcicZ055 iiJcicZ055 : lJcicZ055) {
 				count++;
-				if (iiJcicZ055.getOutJcicTxtDate() == iJcicDate && iiJcicZ055.getCustId().equals(sJcicZ055.getCustId()) && iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey())
-						&& iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate() && iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
-						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode()) && iiJcicZ055.getActualFilingDate() == 0) {
+				if (iiJcicZ055.getOutJcicTxtDate() == iJcicDate && iiJcicZ055.getCustId().equals(sJcicZ055.getCustId())
+						&& iiJcicZ055.getSubmitKey().equals(sJcicZ055.getSubmitKey())
+						&& iiJcicZ055.getClaimDate() == sJcicZ055.getClaimDate()
+						&& iiJcicZ055.getCaseStatus().equals(sJcicZ055.getCaseStatus())
+						&& iiJcicZ055.getCourtCode().equals(sJcicZ055.getCourtCode())
+						&& iiJcicZ055.getActualFilingDate() == 0) {
 
 					uJcicZ055 = sJcicZ055Service.holdById(iiJcicZ055.getJcicZ055Id(), titaVo);
 					oldJcicZ055 = (JcicZ055) iDataLog.clone(uJcicZ055);
@@ -2523,9 +2496,12 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ056SIZE     =" + lJcicZ056.size());
 			for (JcicZ056 iiJcicZ056 : lJcicZ056) {
 				count++;
-				if (iiJcicZ056.getOutJcicTxtDate() == iJcicDate && iiJcicZ056.getCustId().equals(sJcicZ056.getCustId()) && iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey())
-						&& iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate() && iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
-						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode()) && iiJcicZ056.getActualFilingDate() == 0) {
+				if (iiJcicZ056.getOutJcicTxtDate() == iJcicDate && iiJcicZ056.getCustId().equals(sJcicZ056.getCustId())
+						&& iiJcicZ056.getSubmitKey().equals(sJcicZ056.getSubmitKey())
+						&& iiJcicZ056.getClaimDate() == sJcicZ056.getClaimDate()
+						&& iiJcicZ056.getCaseStatus().equals(sJcicZ056.getCaseStatus())
+						&& iiJcicZ056.getCourtCode().equals(sJcicZ056.getCourtCode())
+						&& iiJcicZ056.getActualFilingDate() == 0) {
 
 					uJcicZ056 = sJcicZ056Service.holdById(iiJcicZ056.getJcicZ056Id(), titaVo);
 					oldJcicZ056 = (JcicZ056) iDataLog.clone(uJcicZ056);
@@ -2567,8 +2543,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ060SIZE     =" + lJcicZ060.size());
 			for (JcicZ060 iiJcicZ060 : lJcicZ060) {
 				count++;
-				if (iiJcicZ060.getOutJcicTxtDate() == iJcicDate && iiJcicZ060.getCustId().equals(sJcicZ060.getCustId()) && iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey())
-						&& iiJcicZ060.getRcDate() == sJcicZ060.getRcDate() && iiJcicZ060.getChangePayDate() == sJcicZ060.getChangePayDate() && iiJcicZ060.getActualFilingDate() == 0) {
+				if (iiJcicZ060.getOutJcicTxtDate() == iJcicDate && iiJcicZ060.getCustId().equals(sJcicZ060.getCustId())
+						&& iiJcicZ060.getSubmitKey().equals(sJcicZ060.getSubmitKey())
+						&& iiJcicZ060.getRcDate() == sJcicZ060.getRcDate()
+						&& iiJcicZ060.getChangePayDate() == sJcicZ060.getChangePayDate()
+						&& iiJcicZ060.getActualFilingDate() == 0) {
 
 					uJcicZ060 = sJcicZ060Service.holdById(iiJcicZ060.getJcicZ060Id(), titaVo);
 					oldJcicZ060 = (JcicZ060) iDataLog.clone(uJcicZ060);
@@ -2612,8 +2591,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ061SIZE     =" + lJcicZ061.size());
 			for (JcicZ061 iiJcicZ061 : lJcicZ061) {
 				count++;
-				if (iiJcicZ061.getOutJcicTxtDate() == iJcicDate && iiJcicZ061.getCustId().equals(sJcicZ061.getCustId()) && iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey())
-						&& iiJcicZ061.getRcDate() == sJcicZ061.getRcDate() && iiJcicZ061.getChangePayDate() == sJcicZ061.getChangePayDate() && iiJcicZ061.getActualFilingDate() == 0) {
+				if (iiJcicZ061.getOutJcicTxtDate() == iJcicDate && iiJcicZ061.getCustId().equals(sJcicZ061.getCustId())
+						&& iiJcicZ061.getSubmitKey().equals(sJcicZ061.getSubmitKey())
+						&& iiJcicZ061.getRcDate() == sJcicZ061.getRcDate()
+						&& iiJcicZ061.getChangePayDate() == sJcicZ061.getChangePayDate()
+						&& iiJcicZ061.getActualFilingDate() == 0) {
 
 					uJcicZ061 = sJcicZ061Service.holdById(iiJcicZ061.getJcicZ061Id(), titaVo);
 					oldJcicZ061 = (JcicZ061) iDataLog.clone(uJcicZ061);
@@ -2655,8 +2637,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ062SIZE     =" + lJcicZ062.size());
 			for (JcicZ062 iiJcicZ062 : lJcicZ062) {
 				count++;
-				if (iiJcicZ062.getOutJcicTxtDate() == iJcicDate && iiJcicZ062.getCustId().equals(sJcicZ062.getCustId()) && iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey())
-						&& iiJcicZ062.getRcDate() == sJcicZ062.getRcDate() && iiJcicZ062.getChangePayDate() == sJcicZ062.getChangePayDate() && iiJcicZ062.getActualFilingDate() == 0) {
+				if (iiJcicZ062.getOutJcicTxtDate() == iJcicDate && iiJcicZ062.getCustId().equals(sJcicZ062.getCustId())
+						&& iiJcicZ062.getSubmitKey().equals(sJcicZ062.getSubmitKey())
+						&& iiJcicZ062.getRcDate() == sJcicZ062.getRcDate()
+						&& iiJcicZ062.getChangePayDate() == sJcicZ062.getChangePayDate()
+						&& iiJcicZ062.getActualFilingDate() == 0) {
 
 					uJcicZ062 = sJcicZ062Service.holdById(iiJcicZ062.getJcicZ062Id(), titaVo);
 					oldJcicZ062 = (JcicZ062) iDataLog.clone(uJcicZ062);
@@ -2698,8 +2683,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ063SIZE     =" + lJcicZ063.size());
 			for (JcicZ063 iiJcicZ063 : lJcicZ063) {
 				count++;
-				if (iiJcicZ063.getOutJcicTxtDate() == iJcicDate && iiJcicZ063.getCustId().equals(sJcicZ063.getCustId()) && iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey())
-						&& iiJcicZ063.getRcDate() == sJcicZ063.getRcDate() && iiJcicZ063.getChangePayDate() == sJcicZ063.getChangePayDate() && iiJcicZ063.getActualFilingDate() == 0) {
+				if (iiJcicZ063.getOutJcicTxtDate() == iJcicDate && iiJcicZ063.getCustId().equals(sJcicZ063.getCustId())
+						&& iiJcicZ063.getSubmitKey().equals(sJcicZ063.getSubmitKey())
+						&& iiJcicZ063.getRcDate() == sJcicZ063.getRcDate()
+						&& iiJcicZ063.getChangePayDate() == sJcicZ063.getChangePayDate()
+						&& iiJcicZ063.getActualFilingDate() == 0) {
 
 					uJcicZ063 = sJcicZ063Service.holdById(iiJcicZ063.getJcicZ063Id(), titaVo);
 					oldJcicZ063 = (JcicZ063) iDataLog.clone(uJcicZ063);
@@ -2741,8 +2729,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ440SIZE     =" + lJcicZ440.size());
 			for (JcicZ440 iiJcicZ440 : lJcicZ440) {
 				count++;
-				if (iiJcicZ440.getOutJcicTxtDate() == iJcicDate && iiJcicZ440.getCustId().equals(sJcicZ440.getCustId()) && iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey())
-						&& iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate() && iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode()) && iiJcicZ440.getActualFilingDate() == 0) {
+				if (iiJcicZ440.getOutJcicTxtDate() == iJcicDate && iiJcicZ440.getCustId().equals(sJcicZ440.getCustId())
+						&& iiJcicZ440.getSubmitKey().equals(sJcicZ440.getSubmitKey())
+						&& iiJcicZ440.getApplyDate() == sJcicZ440.getApplyDate()
+						&& iiJcicZ440.getCourtCode().equals(sJcicZ440.getCourtCode())
+						&& iiJcicZ440.getActualFilingDate() == 0) {
 
 					uJcicZ440 = sJcicZ440Service.holdById(iiJcicZ440.getJcicZ440Id(), titaVo);
 					oldJcicZ440 = (JcicZ440) iDataLog.clone(uJcicZ440);
@@ -2786,9 +2777,12 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ442SIZE     =" + lJcicZ442.size());
 			for (JcicZ442 iiJcicZ442 : lJcicZ442) {
 				count++;
-				if (iiJcicZ442.getOutJcicTxtDate() == iJcicDate && iiJcicZ442.getCustId().equals(sJcicZ442.getCustId()) && iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey())
-						&& iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate() && iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode())
-						&& iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode()) && iiJcicZ442.getActualFilingDate() == 0) {
+				if (iiJcicZ442.getOutJcicTxtDate() == iJcicDate && iiJcicZ442.getCustId().equals(sJcicZ442.getCustId())
+						&& iiJcicZ442.getSubmitKey().equals(sJcicZ442.getSubmitKey())
+						&& iiJcicZ442.getApplyDate() == sJcicZ442.getApplyDate()
+						&& iiJcicZ442.getCourtCode().equals(sJcicZ442.getCourtCode())
+						&& iiJcicZ442.getMaxMainCode().equals(sJcicZ442.getMaxMainCode())
+						&& iiJcicZ442.getActualFilingDate() == 0) {
 
 					uJcicZ442 = sJcicZ442Service.holdById(iiJcicZ442.getJcicZ442Id(), titaVo);
 					oldJcicZ442 = (JcicZ442) iDataLog.clone(uJcicZ442);
@@ -2834,9 +2828,12 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ443SIZE     =" + lJcicZ443.size());
 			for (JcicZ443 iiJcicZ443 : lJcicZ443) {
 				count++;
-				if (iiJcicZ443.getOutJcicTxtDate() == iJcicDate && iiJcicZ443.getCustId().equals(sJcicZ443.getCustId()) && iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey())
-						&& iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate() && iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode())
-						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode()) && iiJcicZ443.getActualFilingDate() == 0) {
+				if (iiJcicZ443.getOutJcicTxtDate() == iJcicDate && iiJcicZ443.getCustId().equals(sJcicZ443.getCustId())
+						&& iiJcicZ443.getSubmitKey().equals(sJcicZ443.getSubmitKey())
+						&& iiJcicZ443.getApplyDate() == sJcicZ443.getApplyDate()
+						&& iiJcicZ443.getCourtCode().equals(sJcicZ443.getCourtCode())
+						&& iiJcicZ443.getMaxMainCode().equals(sJcicZ443.getMaxMainCode())
+						&& iiJcicZ443.getActualFilingDate() == 0) {
 
 					uJcicZ443 = sJcicZ443Service.holdById(iiJcicZ443.getJcicZ443Id(), titaVo);
 					oldJcicZ443 = (JcicZ443) iDataLog.clone(uJcicZ443);
@@ -2878,8 +2875,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ444SIZE     =" + lJcicZ444.size());
 			for (JcicZ444 iiJcicZ444 : lJcicZ444) {
 				count++;
-				if (iiJcicZ444.getOutJcicTxtDate() == iJcicDate && iiJcicZ444.getCustId().equals(sJcicZ444.getCustId()) && iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey())
-						&& iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate() && iiJcicZ444.getCourtCode().equals(sJcicZ444.getCourtCode()) && iiJcicZ444.getActualFilingDate() == 0) {
+				if (iiJcicZ444.getOutJcicTxtDate() == iJcicDate && iiJcicZ444.getCustId().equals(sJcicZ444.getCustId())
+						&& iiJcicZ444.getSubmitKey().equals(sJcicZ444.getSubmitKey())
+						&& iiJcicZ444.getApplyDate() == sJcicZ444.getApplyDate()
+						&& iiJcicZ444.getCourtCode().equals(sJcicZ444.getCourtCode())
+						&& iiJcicZ444.getActualFilingDate() == 0) {
 
 					uJcicZ444 = sJcicZ444Service.holdById(iiJcicZ444.getJcicZ444Id(), titaVo);
 					oldJcicZ444 = (JcicZ444) iDataLog.clone(uJcicZ444);
@@ -2921,8 +2921,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ446SIZE     =" + lJcicZ446.size());
 			for (JcicZ446 iiJcicZ446 : lJcicZ446) {
 				count++;
-				if (iiJcicZ446.getOutJcicTxtDate() == iJcicDate && iiJcicZ446.getCustId().equals(sJcicZ446.getCustId()) && iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey())
-						&& iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate() && iiJcicZ446.getCourtCode().equals(sJcicZ446.getCourtCode()) && iiJcicZ446.getActualFilingDate() == 0) {
+				if (iiJcicZ446.getOutJcicTxtDate() == iJcicDate && iiJcicZ446.getCustId().equals(sJcicZ446.getCustId())
+						&& iiJcicZ446.getSubmitKey().equals(sJcicZ446.getSubmitKey())
+						&& iiJcicZ446.getApplyDate() == sJcicZ446.getApplyDate()
+						&& iiJcicZ446.getCourtCode().equals(sJcicZ446.getCourtCode())
+						&& iiJcicZ446.getActualFilingDate() == 0) {
 
 					uJcicZ446 = sJcicZ446Service.holdById(iiJcicZ446.getJcicZ446Id(), titaVo);
 					oldJcicZ446 = (JcicZ446) iDataLog.clone(uJcicZ446);
@@ -2964,8 +2967,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ447SIZE     =" + lJcicZ447.size());
 			for (JcicZ447 iiJcicZ447 : lJcicZ447) {
 				count++;
-				if (iiJcicZ447.getOutJcicTxtDate() == iJcicDate && iiJcicZ447.getCustId().equals(sJcicZ447.getCustId()) && iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey())
-						&& iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate() && iiJcicZ447.getCourtCode().equals(sJcicZ447.getCourtCode()) && iiJcicZ447.getActualFilingDate() == 0) {
+				if (iiJcicZ447.getOutJcicTxtDate() == iJcicDate && iiJcicZ447.getCustId().equals(sJcicZ447.getCustId())
+						&& iiJcicZ447.getSubmitKey().equals(sJcicZ447.getSubmitKey())
+						&& iiJcicZ447.getApplyDate() == sJcicZ447.getApplyDate()
+						&& iiJcicZ447.getCourtCode().equals(sJcicZ447.getCourtCode())
+						&& iiJcicZ447.getActualFilingDate() == 0) {
 
 					uJcicZ447 = sJcicZ447Service.holdById(iiJcicZ447.getJcicZ447Id(), titaVo);
 					oldJcicZ447 = (JcicZ447) iDataLog.clone(uJcicZ447);
@@ -3009,9 +3015,12 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ448SIZE     =" + lJcicZ448.size());
 			for (JcicZ448 iiJcicZ448 : lJcicZ448) {
 				count++;
-				if (iiJcicZ448.getOutJcicTxtDate() == iJcicDate && iiJcicZ448.getCustId().equals(sJcicZ448.getCustId()) && iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey())
-						&& iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate() && iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode())
-						&& iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode()) && iiJcicZ448.getActualFilingDate() == 0) {
+				if (iiJcicZ448.getOutJcicTxtDate() == iJcicDate && iiJcicZ448.getCustId().equals(sJcicZ448.getCustId())
+						&& iiJcicZ448.getSubmitKey().equals(sJcicZ448.getSubmitKey())
+						&& iiJcicZ448.getApplyDate() == sJcicZ448.getApplyDate()
+						&& iiJcicZ448.getCourtCode().equals(sJcicZ448.getCourtCode())
+						&& iiJcicZ448.getMaxMainCode().equals(sJcicZ448.getMaxMainCode())
+						&& iiJcicZ448.getActualFilingDate() == 0) {
 
 					uJcicZ448 = sJcicZ448Service.holdById(iiJcicZ448.getJcicZ448Id(), titaVo);
 					oldJcicZ448 = (JcicZ448) iDataLog.clone(uJcicZ448);
@@ -3055,9 +3064,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ450SIZE     =" + lJcicZ450.size());
 			for (JcicZ450 iiJcicZ450 : lJcicZ450) {
 				count++;
-				if (iiJcicZ450.getOutJcicTxtDate() == iJcicDate && iiJcicZ450.getCustId().equals(sJcicZ450.getCustId()) && iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey())
-						&& iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate() && iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode()) && iiJcicZ450.getPayDate() == sJcicZ450.getPayDate()
-						&& iiJcicZ450.getActualFilingDate() == 0) {
+				if (iiJcicZ450.getOutJcicTxtDate() == iJcicDate && iiJcicZ450.getCustId().equals(sJcicZ450.getCustId())
+						&& iiJcicZ450.getSubmitKey().equals(sJcicZ450.getSubmitKey())
+						&& iiJcicZ450.getApplyDate() == sJcicZ450.getApplyDate()
+						&& iiJcicZ450.getCourtCode().equals(sJcicZ450.getCourtCode())
+						&& iiJcicZ450.getPayDate() == sJcicZ450.getPayDate() && iiJcicZ450.getActualFilingDate() == 0) {
 
 					uJcicZ450 = sJcicZ450Service.holdById(iiJcicZ450.getJcicZ450Id(), titaVo);
 					oldJcicZ450 = (JcicZ450) iDataLog.clone(uJcicZ450);
@@ -3101,9 +3112,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ451SIZE     =" + lJcicZ451.size());
 			for (JcicZ451 iiJcicZ451 : lJcicZ451) {
 				count++;
-				if (iiJcicZ451.getOutJcicTxtDate() == iJcicDate && iiJcicZ451.getCustId().equals(sJcicZ451.getCustId()) && iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey())
-						&& iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate() && iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode()) && iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM()
-						&& iiJcicZ451.getActualFilingDate() == 0) {
+				if (iiJcicZ451.getOutJcicTxtDate() == iJcicDate && iiJcicZ451.getCustId().equals(sJcicZ451.getCustId())
+						&& iiJcicZ451.getSubmitKey().equals(sJcicZ451.getSubmitKey())
+						&& iiJcicZ451.getApplyDate() == sJcicZ451.getApplyDate()
+						&& iiJcicZ451.getCourtCode().equals(sJcicZ451.getCourtCode())
+						&& iiJcicZ451.getDelayYM() == sJcicZ451.getDelayYM() && iiJcicZ451.getActualFilingDate() == 0) {
 
 					uJcicZ451 = sJcicZ451Service.holdById(iiJcicZ451.getJcicZ451Id(), titaVo);
 					oldJcicZ451 = (JcicZ451) iDataLog.clone(uJcicZ451);
@@ -3147,9 +3160,12 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ454SIZE     =" + lJcicZ454.size());
 			for (JcicZ454 iiJcicZ454 : lJcicZ454) {
 				count++;
-				if (iiJcicZ454.getOutJcicTxtDate() == iJcicDate && iiJcicZ454.getCustId().equals(sJcicZ454.getCustId()) && iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey())
-						&& iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate() && iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode())
-						&& iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode()) && iiJcicZ454.getActualFilingDate() == 0) {
+				if (iiJcicZ454.getOutJcicTxtDate() == iJcicDate && iiJcicZ454.getCustId().equals(sJcicZ454.getCustId())
+						&& iiJcicZ454.getSubmitKey().equals(sJcicZ454.getSubmitKey())
+						&& iiJcicZ454.getApplyDate() == sJcicZ454.getApplyDate()
+						&& iiJcicZ454.getCourtCode().equals(sJcicZ454.getCourtCode())
+						&& iiJcicZ454.getMaxMainCode().equals(sJcicZ454.getMaxMainCode())
+						&& iiJcicZ454.getActualFilingDate() == 0) {
 
 					uJcicZ454 = sJcicZ454Service.holdById(iiJcicZ454.getJcicZ454Id(), titaVo);
 					oldJcicZ454 = (JcicZ454) iDataLog.clone(uJcicZ454);
@@ -3189,8 +3205,10 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ570SIZE     =" + lJcicZ570.size());
 			for (JcicZ570 iiJcicZ570 : lJcicZ570) {
 				count++;
-				if (iiJcicZ570.getOutJcicTxtDate() == iJcicDate && iiJcicZ570.getCustId().equals(sJcicZ570.getCustId()) && iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey())
-						&& iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate() && iiJcicZ570.getActualFilingDate() == 0) {
+				if (iiJcicZ570.getOutJcicTxtDate() == iJcicDate && iiJcicZ570.getCustId().equals(sJcicZ570.getCustId())
+						&& iiJcicZ570.getSubmitKey().equals(sJcicZ570.getSubmitKey())
+						&& iiJcicZ570.getApplyDate() == sJcicZ570.getApplyDate()
+						&& iiJcicZ570.getActualFilingDate() == 0) {
 
 					uJcicZ570 = sJcicZ570Service.holdById(iiJcicZ570.getJcicZ570Id(), titaVo);
 					oldJcicZ570 = (JcicZ570) iDataLog.clone(uJcicZ570);
@@ -3232,8 +3250,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ571SIZE     =" + lJcicZ571.size());
 			for (JcicZ571 iiJcicZ571 : lJcicZ571) {
 				count++;
-				if (iiJcicZ571.getOutJcicTxtDate() == iJcicDate && iiJcicZ571.getCustId().equals(sJcicZ571.getCustId()) && iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey())
-						&& iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate() && iiJcicZ571.getBankId().equals(sJcicZ571.getBankId()) && iiJcicZ571.getActualFilingDate() == 0) {
+				if (iiJcicZ571.getOutJcicTxtDate() == iJcicDate && iiJcicZ571.getCustId().equals(sJcicZ571.getCustId())
+						&& iiJcicZ571.getSubmitKey().equals(sJcicZ571.getSubmitKey())
+						&& iiJcicZ571.getApplyDate() == sJcicZ571.getApplyDate()
+						&& iiJcicZ571.getBankId().equals(sJcicZ571.getBankId())
+						&& iiJcicZ571.getActualFilingDate() == 0) {
 
 					uJcicZ571 = sJcicZ571Service.holdById(iiJcicZ571.getJcicZ571Id(), titaVo);
 					oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
@@ -3277,8 +3298,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ572SIZE     =" + lJcicZ572.size());
 			for (JcicZ572 iiJcicZ572 : lJcicZ572) {
 				count++;
-				if (iiJcicZ572.getOutJcicTxtDate() == iJcicDate && iiJcicZ572.getCustId().equals(sJcicZ572.getCustId()) && iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey())
-						&& iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate() && iiJcicZ572.getPayDate() == sJcicZ572.getPayDate() && iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
+				if (iiJcicZ572.getOutJcicTxtDate() == iJcicDate && iiJcicZ572.getCustId().equals(sJcicZ572.getCustId())
+						&& iiJcicZ572.getSubmitKey().equals(sJcicZ572.getSubmitKey())
+						&& iiJcicZ572.getApplyDate() == sJcicZ572.getApplyDate()
+						&& iiJcicZ572.getPayDate() == sJcicZ572.getPayDate()
+						&& iiJcicZ572.getBankId().equals(sJcicZ572.getBankId())
 						&& iiJcicZ572.getActualFilingDate() == 0) {
 
 					uJcicZ572 = sJcicZ572Service.holdById(iiJcicZ572.getJcicZ572Id(), titaVo);
@@ -3321,8 +3345,10 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ573SIZE     =" + lJcicZ573.size());
 			for (JcicZ573 iiJcicZ573 : lJcicZ573) {
 				count++;
-				if (iiJcicZ573.getOutJcicTxtDate() == iJcicDate && iiJcicZ573.getCustId().equals(sJcicZ573.getCustId()) && iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey())
-						&& iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate() && iiJcicZ573.getPayDate() == sJcicZ573.getPayDate() && iiJcicZ573.getActualFilingDate() == 0) {
+				if (iiJcicZ573.getOutJcicTxtDate() == iJcicDate && iiJcicZ573.getCustId().equals(sJcicZ573.getCustId())
+						&& iiJcicZ573.getSubmitKey().equals(sJcicZ573.getSubmitKey())
+						&& iiJcicZ573.getApplyDate() == sJcicZ573.getApplyDate()
+						&& iiJcicZ573.getPayDate() == sJcicZ573.getPayDate() && iiJcicZ573.getActualFilingDate() == 0) {
 
 					uJcicZ573 = sJcicZ573Service.holdById(iiJcicZ573.getJcicZ573Id(), titaVo);
 					oldJcicZ573 = (JcicZ573) iDataLog.clone(uJcicZ573);
@@ -3362,8 +3388,10 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ574SIZE     =" + lJcicZ574.size());
 			for (JcicZ574 iiJcicZ574 : lJcicZ574) {
 				count++;
-				if (iiJcicZ574.getOutJcicTxtDate() == iJcicDate && iiJcicZ574.getCustId().equals(sJcicZ574.getCustId()) && iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey())
-						&& iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate() && iiJcicZ574.getActualFilingDate() == 0) {
+				if (iiJcicZ574.getOutJcicTxtDate() == iJcicDate && iiJcicZ574.getCustId().equals(sJcicZ574.getCustId())
+						&& iiJcicZ574.getSubmitKey().equals(sJcicZ574.getSubmitKey())
+						&& iiJcicZ574.getApplyDate() == sJcicZ574.getApplyDate()
+						&& iiJcicZ574.getActualFilingDate() == 0) {
 
 					uJcicZ574 = sJcicZ574Service.holdById(iiJcicZ574.getJcicZ574Id(), titaVo);
 					oldJcicZ574 = (JcicZ574) iDataLog.clone(uJcicZ574);
@@ -3405,8 +3433,11 @@ public class L840A extends TradeBuffer {
 			this.info("iJcicZ575SIZE     =" + lJcicZ575.size());
 			for (JcicZ575 iiJcicZ575 : lJcicZ575) {
 				count++;
-				if (iiJcicZ575.getOutJcicTxtDate() == iJcicDate && iiJcicZ575.getCustId().equals(sJcicZ575.getCustId()) && iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey())
-						&& iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate() && iiJcicZ575.getBankId().equals(sJcicZ575.getBankId()) && iiJcicZ575.getActualFilingDate() == 0) {
+				if (iiJcicZ575.getOutJcicTxtDate() == iJcicDate && iiJcicZ575.getCustId().equals(sJcicZ575.getCustId())
+						&& iiJcicZ575.getSubmitKey().equals(sJcicZ575.getSubmitKey())
+						&& iiJcicZ575.getApplyDate() == sJcicZ575.getApplyDate()
+						&& iiJcicZ575.getBankId().equals(sJcicZ575.getBankId())
+						&& iiJcicZ575.getActualFilingDate() == 0) {
 
 					uJcicZ575 = sJcicZ575Service.holdById(iiJcicZ575.getJcicZ575Id(), titaVo);
 					oldJcicZ575 = (JcicZ575) iDataLog.clone(uJcicZ575);

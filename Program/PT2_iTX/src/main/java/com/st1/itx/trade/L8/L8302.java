@@ -151,6 +151,10 @@ public class L8302 extends TradeBuffer {
 			uJcicZ041.setNegoStartDate(iNegoStartDate);
 			uJcicZ041.setNonFinClaimAmt(iNonFinClaimAmt);
 			uJcicZ041.setOutJcicTxtDate(0);
+			
+			uJcicZ041.setActualFilingDate(0);
+			uJcicZ041.setActualFilingMark("");
+			
 			try {
 				sJcicZ041Service.update(uJcicZ041, titaVo);
 			} catch (DBException e) {
@@ -189,7 +193,7 @@ public class L8302 extends TradeBuffer {
 			uJcicZ0412.setOutJcicTxtDate(0);
 			Slice<JcicZ041Log> dJcicLogZ041 = null;
 			dJcicLogZ041 = sJcicZ041LogService.ukeyEq(iJcicZ041.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ041 == null || "A".equals(iTranKey)) {
+			if (dJcicLogZ041 == null || "A".equals(iTranKey) ) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ041Service.delete(iJcicZ041, titaVo);

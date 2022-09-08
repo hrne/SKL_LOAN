@@ -26,7 +26,14 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-
+	/**
+	 * @param titaVo 
+	 * @param reconCode 對帳類別(A3/N/All/null)
+	 * @return 
+	 * @throws LogicException 
+	 * 
+	 * 
+	 * */
 	public List<Map<String, String>> findAll(TitaVo titaVo, String reconCode) throws LogicException {
 
 		this.info("l9705.findAll");

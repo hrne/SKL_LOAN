@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class TxDataLog implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5249111202847295539L;
-
-@EmbeddedId
+  @EmbeddedId
   private TxDataLogId txDataLogId;
 
   // 會計日期

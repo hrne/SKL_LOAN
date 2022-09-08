@@ -159,7 +159,7 @@ BEGIN
       LEFT JOIN "CdAcCode" CAC ON CAC."AcNoCodeOld" = L.CORACC
                               AND CAC."AcSubCode" = NVL(L.CORACS,'     ')
                               AND CAC."AcDtlCode" = CASE
-                                                      WHEN L.CORACC IN ('40903300','20232020')
+                                                      WHEN L.CORACC IN ('40903300','20232020','20232182','20232180','20232181','40907400')
                                                            AND NVL(L.CORACS,'     ') = '     '
                                                       THEN '01'
                                                     ELSE '  ' END

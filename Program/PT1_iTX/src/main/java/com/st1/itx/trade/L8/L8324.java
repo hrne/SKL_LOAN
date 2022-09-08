@@ -135,16 +135,20 @@ public class L8324 extends TradeBuffer {
 					if ("Y".equals(iJcicZ440.getReportYn())) {
 						if (!"N".equals(iIsMaxMain)) {
 							if ("A".equals(iTranKey)) {
-								throw new LogicException("E0005", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+								throw new LogicException("E0005",
+										"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
 							} else {
-								throw new LogicException("E0007", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+								throw new LogicException("E0007",
+										"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
 							}
 						}
 					} else if (!"Y".equals(iIsMaxMain)) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+							throw new LogicException("E0005",
+									"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
 						} else {
-							throw new LogicException("E0007", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+							throw new LogicException("E0007",
+									"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
 						}
 					}
 				}
@@ -225,13 +229,18 @@ public class L8324 extends TradeBuffer {
 			uJcicZ443.setBeginDate(iBeginDate);
 			uJcicZ443.setEndDate(iEndDate);
 			uJcicZ443.setOutJcicTxtDate(0);
+			
+			uJcicZ443.setActualFilingDate(0);
+			uJcicZ443.setActualFilingMark("");
+			
 			try {
 				sJcicZ443Service.update(uJcicZ443, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ443, uJcicZ443);
-			iDataLog.exec("L8324異動", uJcicZ443.getSubmitKey() + uJcicZ443.getCustId() + uJcicZ443.getApplyDate() + uJcicZ443.getCourtCode() + uJcicZ443.getMaxMainCode());
+			iDataLog.exec("L8324異動", uJcicZ443.getSubmitKey() + uJcicZ443.getCustId() + uJcicZ443.getApplyDate()
+					+ uJcicZ443.getCourtCode() + uJcicZ443.getMaxMainCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -302,7 +311,8 @@ public class L8324 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ4432, uJcicZ4432);
-			iDataLog.exec("L8324刪除", uJcicZ4432.getSubmitKey() + uJcicZ4432.getCustId() + uJcicZ4432.getApplyDate() + uJcicZ4432.getCourtCode() + uJcicZ4432.getMaxMainCode());
+			iDataLog.exec("L8324刪除", uJcicZ4432.getSubmitKey() + uJcicZ4432.getCustId() + uJcicZ4432.getApplyDate()
+					+ uJcicZ4432.getCourtCode() + uJcicZ4432.getMaxMainCode());
 			break;
 		// 修改
 		case "7":
@@ -348,7 +358,8 @@ public class L8324 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ4433, uJcicZ4433);
-			iDataLog.exec("L8324修改", uJcicZ4433.getSubmitKey() + uJcicZ4433.getCustId() + uJcicZ4433.getApplyDate() + uJcicZ4433.getCourtCode() + uJcicZ4433.getMaxMainCode());
+			iDataLog.exec("L8324修改", uJcicZ4433.getSubmitKey() + uJcicZ4433.getCustId() + uJcicZ4433.getApplyDate()
+					+ uJcicZ4433.getCourtCode() + uJcicZ4433.getMaxMainCode());
 		default:
 			break;
 		}

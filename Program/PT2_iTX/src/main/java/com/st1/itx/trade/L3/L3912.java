@@ -74,7 +74,8 @@ public class L3912 extends TradeBuffer {
 			if (iCustNo == 0) {
 				tLoanBorTx = loanBorTxService.borxTxtNoFirst(iAcctDate + 19110000, iTellerNo, iTxtNo, titaVo);
 			} else {
-				tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, iAcctDate + 19110000, iTellerNo, iTxtNo, titaVo);
+				tLoanBorTx = loanBorTxService.custNoTxtNoFirst(iCustNo, iFacmNo, iBormNo, iAcctDate + 19110000,
+						iTellerNo, iTxtNo, titaVo);
 			}
 			if (tLoanBorTx == null) {
 				throw new LogicException(titaVo, "E0001", "放款交易內容檔"); // 查詢資料不存在
@@ -147,9 +148,9 @@ public class L3912 extends TradeBuffer {
 		BigDecimal wkModifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
 		BigDecimal wkFireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
 		BigDecimal wkLawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
-
-		BigDecimal wkRepayAmt = tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest()).add(tLoanBorTx.getDelayInt()).add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee)
-				.add(wkModifyFee).add(wkFireFee).add(wkLawFee);
+		BigDecimal wkRepayAmt = tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest()).add(tLoanBorTx.getDelayInt())
+				.add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee).add(wkModifyFee)
+				.add(wkFireFee).add(wkLawFee);
 
 		this.totaVo.putParam("ORPTFG", RPTFG); // rptfg
 		this.totaVo.putParam("OCustNo", tLoanBorTx.getCustNo());
@@ -165,31 +166,42 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OHCode", tLoanBorTx.getTitaHCode());
 		this.totaVo.putParam("OEntryDate", tLoanBorTx.getEntryDate());
 		this.totaVo.putParam("OCurrencyCode", tLoanBorTx.getTitaCurCd());
-		this.totaVo.putParam("OTxAmt", tLoanBorTx.getTxAmt());
-		this.totaVo.putParam("OLoanBal", tLoanBorTx.getLoanBal());
-		this.totaVo.putParam("ORemitAmt", tTempVo.getParam("RemitAmt"));
-		this.totaVo.putParam("OPrinciPal", tLoanBorTx.getPrincipal());
-		this.totaVo.putParam("OChequeAmt", tTempVo.getParam("ChequeAmt"));
-		this.totaVo.putParam("OInterest", tLoanBorTx.getInterest());
-		this.totaVo.putParam("ODelayInt", tLoanBorTx.getDelayInt());
-		this.totaVo.putParam("OBreachAmt", tLoanBorTx.getBreachAmt());
-		this.totaVo.putParam("OTempTax", tTempVo.getParam("TempTax"));
-		if ("L3230".equals(tLoanBorTx.getTitaTxCd()) && tLoanBorTx.getTxAmt().compareTo(BigDecimal.ZERO) != 0) {
-			this.totaVo.putParam("OTempRepay", tLoanBorTx.getTxAmt());// 暫收款金額
+		if ("2".equals(tLoanBorTx.getTitaHCode()) || "4".equals(tLoanBorTx.getTitaHCode())) {
+			this.totaVo.putParam("OTxAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getTxAmt()));
+			this.totaVo.putParam("OPrinciPal", BigDecimal.ZERO.subtract(tLoanBorTx.getPrincipal()));
+			this.totaVo.putParam("OInterest", BigDecimal.ZERO.subtract(tLoanBorTx.getInterest()));
+			this.totaVo.putParam("ODelayInt", BigDecimal.ZERO.subtract(tLoanBorTx.getDelayInt()));
+			this.totaVo.putParam("OBreachAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getBreachAmt()));
+			this.totaVo.putParam("OTempRepay",
+					BigDecimal.ZERO.subtract(tLoanBorTx.getTempAmt().subtract(tLoanBorTx.getOverflow())));// 暫收款金額
+			this.totaVo.putParam("ORepayAmt", BigDecimal.ZERO.subtract(wkRepayAmt));
+			this.totaVo.putParam("OCloseBreachAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getCloseBreachAmt()));
+			this.totaVo.putParam("OExtraRepay", "-" + tLoanBorTx.getExtraRepay());
 		} else {
+			this.totaVo.putParam("OTxAmt", tLoanBorTx.getTxAmt());
+			this.totaVo.putParam("OPrinciPal", tLoanBorTx.getPrincipal());
+			this.totaVo.putParam("OInterest", tLoanBorTx.getInterest());
+			this.totaVo.putParam("ODelayInt", tLoanBorTx.getDelayInt());
+			this.totaVo.putParam("OBreachAmt", tLoanBorTx.getBreachAmt());
+			this.totaVo.putParam("OTempAmt", tLoanBorTx.getTempAmt()); // 暫收借
 			this.totaVo.putParam("OTempRepay", tLoanBorTx.getTempAmt().subtract(tLoanBorTx.getOverflow()));// 暫收款金額
+			this.totaVo.putParam("ORepayAmt", wkRepayAmt);
+			this.totaVo.putParam("OCloseBreachAmt", tLoanBorTx.getCloseBreachAmt());
+			this.totaVo.putParam("OExtraRepay", tLoanBorTx.getExtraRepay());
 		}
-		this.totaVo.putParam("OOverflow", tLoanBorTx.getOverflow()); // 累溢收
-		this.totaVo.putParam("OTempAmt", tLoanBorTx.getTempAmt()); // 暫收借
 
+		this.totaVo.putParam("OOverflow", tLoanBorTx.getOverflow()); // 累溢收
+		this.totaVo.putParam("OLoanBal", tLoanBorTx.getLoanBal());
 		this.totaVo.putParam("OIntStartDate", tLoanBorTx.getIntStartDate());
 		this.totaVo.putParam("OIntEndDate", tLoanBorTx.getIntEndDate());
 		this.totaVo.putParam("OUnpaidInterest", tLoanBorTx.getUnpaidInterest());
-		this.totaVo.putParam("OCaseCloseCode", tTempVo.getParam("CaseCloseCode"));
 		this.totaVo.putParam("OUnpaidPrinciPal", tLoanBorTx.getUnpaidPrincipal());
+		this.totaVo.putParam("OUnpaidBreach", tLoanBorTx.getUnpaidCloseBreach());
+		this.totaVo.putParam("OCaseCloseCode", tTempVo.getParam("CaseCloseCode"));
+		this.totaVo.putParam("OChequeAmt", tTempVo.getParam("ChequeAmt"));
+		this.totaVo.putParam("ORemitAmt", tTempVo.getParam("RemitAmt"));
 		this.totaVo.putParam("ORemitBank", tTempVo.getParam("RemitBank"));
 		this.totaVo.putParam("ORemitBankX", loanCom.getBranchItemByBankCode(tTempVo.getParam("RemitBank")));
-		this.totaVo.putParam("OUnpaidBreach", tLoanBorTx.getUnpaidCloseBreach());
 		this.totaVo.putParam("ORemitAcctNo", tTempVo.getParam("RemitAcctNo"));
 		this.totaVo.putParam("OShortFallX", shortFallX);
 		this.totaVo.putParam("OSupperNo", tLoanBorTx.getTitaEmpNoS());
@@ -198,6 +210,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OTxDate", tLoanBorTx.getTitaCalDy());
 		this.totaVo.putParam("OTxTime", tLoanBorTx.getTitaCalTm());
 		this.totaVo.putParam("OStampFreeAmt", tTempVo.getParam("StampFreeAmt"));
+		this.totaVo.putParam("OTempTax", "-" + tTempVo.getParam("TempTax"));
 		this.totaVo.putParam("OBatchNo", tTempVo.getParam("BatchNo"));
 		this.totaVo.putParam("ORepayCode", tLoanBorTx.getRepayCode());
 		this.totaVo.putParam("ORemitSeq", tTempVo.getParam("RemitSeq"));
@@ -211,10 +224,6 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ONewDueAmt", tTempVo.getParam("NewDueAmt"));
 		this.totaVo.putParam("ONewTotalPeriod", tTempVo.getParam("NewTotalPeriod"));
 		this.totaVo.putParam("ORepayTerms", tLoanBorTx.getPaidTerms());
-		this.totaVo.putParam("ORepayAmt", wkRepayAmt);
-		this.totaVo.putParam("OCloseBreachAmt", tLoanBorTx.getCloseBreachAmt());
-		this.totaVo.putParam("OCloseBreachAmtUnpaid", tTempVo.getParam("CloseBreachAmtUnpaid"));
-		this.totaVo.putParam("OExtraRepay", tLoanBorTx.getExtraRepay());
 		this.totaVo.putParam("OIncludeIntFlag", tTempVo.getParam("IncludeIntFlag"));
 		this.totaVo.putParam("OUnpaidIntFlag", tTempVo.getParam("UnpaidIntFlag"));
 		if (tLoanBorTx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {

@@ -35,6 +35,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
+
 @Service("L8337")
 @Scope("prototype")
 /**
@@ -71,16 +72,16 @@ public class L8337 extends TradeBuffer {
 		String iModifyType = titaVo.getParam("ModifyType").trim();
 		String iBankId = titaVo.getParam("BankId").trim();
 		String iKey = "";
-
+		
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
-
-		this.info("iApplyDate" + iApplyDate);
-		this.info("iBankId" + iBankId);
-		this.info("iCustId" + iCustId);
-		this.info("iSubmitKey" + iSubmitKey);
+		
+		this.info("iApplyDate"   + iApplyDate);
+		this.info("iBankId"     + iBankId);
+		this.info("iCustId"    + iCustId);
+		this.info("iSubmitKey"  +  iSubmitKey);
 		// JcicZ575
 		JcicZ575 iJcicZ575 = new JcicZ575();
 		JcicZ575Id iJcicZ575Id = new JcicZ575Id();
@@ -95,7 +96,7 @@ public class L8337 extends TradeBuffer {
 		iJcicZ570Id.setCustId(iCustId);
 		iJcicZ570Id.setSubmitKey(iSubmitKey);
 		List<Map<String, String>> iL8337SqlReturn = new ArrayList<Map<String, String>>();
-		this.info("iJcicZ570Id" + iJcicZ570Id);
+		this.info("iJcicZ570Id"   + iJcicZ570Id);
 		// 檢核項目(D-78)
 		if (!"4".equals(iTranKey_Tmp)) {
 
@@ -158,13 +159,17 @@ public class L8337 extends TradeBuffer {
 			uJcicZ575.setModifyType(iModifyType);
 			uJcicZ575.setTranKey(iTranKey);
 			uJcicZ575.setOutJcicTxtDate(0);
+			
+			uJcicZ575.setActualFilingDate(0);
+			uJcicZ575.setActualFilingMark("");
+			
 			try {
 				sJcicZ575Service.update(uJcicZ575, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ575, uJcicZ575);
-			iDataLog.exec("L8337異動", uJcicZ575.getSubmitKey() + uJcicZ575.getCustId() + uJcicZ575.getApplyDate() + uJcicZ575.getBankId());
+			iDataLog.exec("L8337異動",uJcicZ575.getSubmitKey()+uJcicZ575.getCustId()+uJcicZ575.getApplyDate()+uJcicZ575.getBankId());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -178,15 +183,15 @@ public class L8337 extends TradeBuffer {
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-
+			
 			JcicZ575 oldJcicZ5752 = (JcicZ575) iDataLog.clone(uJcicZ5752);
 			uJcicZ5752.setModifyType(iModifyType);
 			uJcicZ5752.setTranKey(iTranKey);
 			uJcicZ5752.setOutJcicTxtDate(0);
-
+			
 			Slice<JcicZ575Log> dJcicLogZ575 = null;
 			dJcicLogZ575 = sJcicZ575LogService.ukeyEq(iJcicZ575.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ575 == null || ("A".equals(iTranKey) && dJcicLogZ575 == null)) {
+			if (dJcicLogZ575 == null|| ("A".equals(iTranKey) && dJcicLogZ575 == null)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ575Service.delete(iJcicZ575, titaVo);
@@ -206,10 +211,10 @@ public class L8337 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ5752, uJcicZ5752);
-			iDataLog.exec("L8337異動", uJcicZ5752.getSubmitKey() + uJcicZ5752.getCustId() + uJcicZ5752.getApplyDate() + uJcicZ5752.getBankId());
-			break;
-		// 修改
-		case "7":
+			iDataLog.exec("L8337異動",uJcicZ5752.getSubmitKey()+uJcicZ5752.getCustId()+uJcicZ5752.getApplyDate()+uJcicZ5752.getBankId());
+			break;		
+			//修改
+		case "7":	
 			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
 			this.info("iJcicZ570" + iJcicZ570);
 			if (iJcicZ570 == null) {
@@ -233,14 +238,14 @@ public class L8337 extends TradeBuffer {
 			uJcicZ5753.setModifyType(iModifyType);
 			uJcicZ5753.setTranKey(iTranKey);
 			uJcicZ5753.setUkey(iKey);
-
+			
 			try {
 				sJcicZ575Service.update(uJcicZ5753, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ5753, uJcicZ5753);
-			iDataLog.exec("L8337修改", uJcicZ5753.getSubmitKey() + uJcicZ5753.getCustId() + uJcicZ5753.getApplyDate() + uJcicZ5753.getBankId());
+			iDataLog.exec("L8337修改",uJcicZ5753.getSubmitKey()+uJcicZ5753.getCustId()+uJcicZ5753.getApplyDate()+uJcicZ5753.getBankId());	
 		default:
 			break;
 		}

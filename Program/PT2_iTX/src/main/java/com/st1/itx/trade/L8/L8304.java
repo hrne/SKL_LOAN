@@ -183,6 +183,10 @@ public class L8304 extends TradeBuffer {
 			uJcicZ043.setContractStartYM(iContractStartYM);
 			uJcicZ043.setContractEndYM(iContractEndYM);
 			uJcicZ043.setOutJcicTxtDate(0);
+			
+			uJcicZ043.setActualFilingDate(0);
+			uJcicZ043.setActualFilingMark("");
+			
 			try {
 				sJcicZ043Service.update(uJcicZ043, titaVo);
 			} catch (DBException e) {
@@ -192,7 +196,8 @@ public class L8304 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ043.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ043, uJcicZ043);
-			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey() + uJcicZ043.getCustId() + uJcicZ043.getRcDate() + uJcicZ043.getMaxMainCode() + uJcicZ043.getAccount());
+			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey() + uJcicZ043.getCustId() + uJcicZ043.getRcDate()
+					+ uJcicZ043.getMaxMainCode() + uJcicZ043.getAccount());
 			break;
 		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -253,11 +258,12 @@ public class L8304 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0432, uJcicZ0432);
-			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey() + uJcicZ0432.getCustId() + uJcicZ0432.getRcDate() + uJcicZ0432.getMaxMainCode() + uJcicZ0432.getAccount());
+			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey() + uJcicZ0432.getCustId() + uJcicZ0432.getRcDate()
+					+ uJcicZ0432.getMaxMainCode() + uJcicZ0432.getAccount());
 			break;
 		// 修改
 		case "7":
-
+			
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ043 = sJcicZ043Service.ukeyFirst(iKey, titaVo);
 			JcicZ043 uJcicZ0433 = new JcicZ043();
@@ -272,7 +278,7 @@ public class L8304 extends TradeBuffer {
 				throw new LogicException("E0007", "無此修改資料");
 			}
 			JcicZ043 oldJcicZ0433 = (JcicZ043) iDataLog.clone(uJcicZ0433);
-
+			
 			uJcicZ0433.setJcicZ043Id(iJcicZ043Id);
 			uJcicZ0433.setTranKey(iTranKey);
 			uJcicZ0433.setCollateralType(iCollateralType);
@@ -292,7 +298,8 @@ public class L8304 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0433, uJcicZ0433);
-			iDataLog.exec("L8304修改", uJcicZ0433.getSubmitKey() + uJcicZ0433.getCustId() + uJcicZ0433.getRcDate() + uJcicZ0433.getMaxMainCode() + uJcicZ0433.getAccount());
+			iDataLog.exec("L8304修改", uJcicZ0433.getSubmitKey() + uJcicZ0433.getCustId() + uJcicZ0433.getRcDate()
+					+ uJcicZ0433.getMaxMainCode() + uJcicZ0433.getAccount());
 		default:
 			break;
 		}

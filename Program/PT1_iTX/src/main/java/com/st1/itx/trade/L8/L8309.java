@@ -123,6 +123,10 @@ public class L8309 extends TradeBuffer {
 			uJcicZ048.setCustComTelNo(iCustComTelNo);
 			uJcicZ048.setCustMobilNo(iCustMobilNo);
 			uJcicZ048.setOutJcicTxtDate(0);
+			
+			uJcicZ048.setActualFilingDate(0);
+			uJcicZ048.setActualFilingMark("");
+			
 			try {
 				sJcicZ048Service.update(uJcicZ048, titaVo);
 			} catch (DBException e) {

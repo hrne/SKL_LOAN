@@ -159,8 +159,8 @@ E(0,#OOApplyDate)
 #CourtCode=X,3,O
 T(2,#OOCourtCode)
 
-#OOAccount=X,50,O
-#Account=X,50,O
+#OOAccount=x,50,O
+#Account=x,50,O
 T(2,#OOAccount)
 
 #OOMaxMainCode=X,3,O

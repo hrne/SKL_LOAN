@@ -139,6 +139,9 @@ public class L8313 extends TradeBuffer {
 			iJcicZ052.setDataCode5(iDataCode5);
 			iJcicZ052.setChangePayDate(iChangePayDate);
 			iJcicZ052.setUkey(iKey);
+			
+
+			
 			try {
 				sJcicZ052Service.insert(iJcicZ052, titaVo);
 			} catch (DBException e) {
@@ -167,6 +170,10 @@ public class L8313 extends TradeBuffer {
 			uJcicZ052.setDataCode5(iDataCode5);
 			uJcicZ052.setChangePayDate(iChangePayDate);
 			uJcicZ052.setOutJcicTxtDate(0);
+			
+			uJcicZ052.setActualFilingDate(0);
+			uJcicZ052.setActualFilingMark("");
+			
 			try {
 				sJcicZ052Service.update(uJcicZ052, titaVo);
 			} catch (DBException e) {

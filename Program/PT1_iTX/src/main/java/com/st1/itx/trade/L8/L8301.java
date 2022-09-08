@@ -152,9 +152,11 @@ public class L8301 extends TradeBuffer {
 							}
 							if (flagFind == 0) {
 								if ("A".equals(iTranKey)) {
-									throw new LogicException(titaVo, "E0005", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+									throw new LogicException(titaVo, "E0005",
+											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
 								} else {
-									throw new LogicException(titaVo, "E0007", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+									throw new LogicException(titaVo, "E0007",
+											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
 								}
 							}
 						}
@@ -223,6 +225,11 @@ public class L8301 extends TradeBuffer {
 			uJcicZ040.setNotBankId5(iNotBankId5);
 			uJcicZ040.setNotBankId6(iNotBankId6);
 			uJcicZ040.setOutJcicTxtDate(0);
+			
+			uJcicZ040.setActualFilingDate(0);
+			uJcicZ040.setActualFilingMark("");
+			
+			
 			try {
 				sJcicZ040Service.update(uJcicZ040, titaVo);
 			} catch (DBException e) {
@@ -270,10 +277,10 @@ public class L8301 extends TradeBuffer {
 			uJcicZ0402.setNotBankId5(iNotBankId5);
 			uJcicZ0402.setNotBankId6(iNotBankId6);
 			uJcicZ0402.setOutJcicTxtDate(0);
-
+			
 			Slice<JcicZ040Log> dJcicLogZ040 = null;
 			dJcicLogZ040 = sJcicZ040LogService.ukeyEq(iJcicZ040.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ040 == null || ("A".equals(iTranKey) && dJcicLogZ040 == null)) {
+			if (dJcicLogZ040 == null || ("A".equals(iTranKey) && dJcicLogZ040 == null) ) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ040Service.delete(iJcicZ040, titaVo);
@@ -341,6 +348,7 @@ public class L8301 extends TradeBuffer {
 			uJcicZ0403.setNotBankId5(iNotBankId5);
 			uJcicZ0403.setNotBankId6(iNotBankId6);
 			uJcicZ0403.setOutJcicTxtDate(0);
+			
 			try {
 				sJcicZ040Service.update(uJcicZ0403, titaVo);
 			} catch (DBException e) {

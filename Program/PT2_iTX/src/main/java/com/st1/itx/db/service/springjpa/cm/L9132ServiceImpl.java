@@ -470,7 +470,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     		 ,\"SlipNo\" ASC";
 		sql += " ) ";
 		sql += " SELECT * FROM ( ";
-		sql += " SELECT TO_CHAR(A.\"TitaTxtNo\") AS \"TitaTxtNo\"";
+		sql += " SELECT LPAD(TO_CHAR(A.\"TitaTxtNo\"),7,0) AS \"TitaTxtNo\"";
 		sql += "       , 90000 + ROWNUM  AS \"SlipNo\" ";
 		sql += "      , A.\"AcNo\" ";
 		sql += "      , A.\"AcSubBookItem\" ";
@@ -481,7 +481,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , A.\"EmpName\" ";
 		sql += " FROM groupData A ";
 		sql += " UNION ";
-		sql += " SELECT TO_CHAR(B.\"TitaTxtNo\") AS \"TitaTxtNo\"";
+		sql += " SELECT LPAD(TO_CHAR(B.\"TitaTxtNo\"),7,0) AS \"TitaTxtNo\"";
 		sql += "       ,B.\"SlipNo\" ";
 		sql += "      , B.\"AcNo\" ";
 		sql += "      , B.\"AcSubBookItem\" ";
@@ -551,23 +551,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       		 THEN 3 ";
 		sql += "       		 ELSE 0 ";
 		sql += "            END   AS \"EntAcCode\" ";
-		sql += "		  ,CASE ";
-		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN '000000'";
-		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		 THEN '000000'";
-		sql += "       		 WHEN AC.\"EntAc\" IN (3) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		 THEN '000000' ";
-		sql += "       		 ELSE AC.\"TitaTlrNo\"";
-		sql += "            END   AS \"TitaTlrNo\" ";
+		sql += "		  ,AC.\"TitaTlrNo\" AS \"TitaTlrNo\" ";
 		sql += "		  ,CASE ";
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
@@ -712,8 +696,9 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ORDER BY \"TitaTxtNo\" ASC";
 		sql += "     		 ,\"SlipNo\" ASC";
 		sql += " ) ";
+		sql += " SELECT * FROM ( ";
 		sql += " SELECT A.\"TitaTlrNo\" ";
-		sql += "      , A.\"TitaTxtNo\" ";
+		sql += "      , LPAD(A.\"TitaTxtNo\",7,0) AS \"TitaTxtNo\" ";
 		sql += "      , 90000 + ROWNUM  AS \"SlipNo\" ";
 		sql += "      , A.\"AcNo\" ";
 		sql += "      , A.\"AcSubBookItem\" ";
@@ -725,7 +710,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM groupData A ";
 		sql += " UNION ";
 		sql += " SELECT B.\"TitaTlrNo\" ";
-		sql += "      , B.\"TitaTxtNo\" ";
+		sql += "      , LPAD(B.\"TitaTxtNo\",7,0) AS \"TitaTxtNo\" ";
 		sql += "      , B.\"SlipNo\" ";
 		sql += "      , B.\"AcNo\" ";
 		sql += "      , B.\"AcSubBookItem\" ";
@@ -735,7 +720,14 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , B.\"CustName\" ";
 		sql += "      , B.\"EmpName\" ";
 		sql += " FROM groupData2 B ";
-
+		sql += " )";
+		sql += " ORDER BY CASE";
+		sql += " 			WHEN ASCII(SUBSTR(\"TitaTlrNo\",0,1)) >= 65 ";
+		sql += "            THEN ASCII(SUBSTR(\"TitaTlrNo\",0,1)) ";
+		sql += "          ELSE ASCII(SUBSTR(\"TitaTlrNo\",0,1)) + 43 END ASC";
+		sql += " 		   ,CASE WHEN \"SlipNo\" like '9%' AND LENGTH(\"SlipNo\")=5 THEN \"SlipNo\" ELSE \"SlipNo\" * 100000 END ASC";
+		
+		
 		this.info("doQueryL9132C sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

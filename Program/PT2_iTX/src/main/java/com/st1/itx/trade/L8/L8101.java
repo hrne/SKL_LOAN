@@ -22,10 +22,12 @@ import com.st1.itx.db.service.TxAmlCreditService;
 
 import com.st1.itx.db.domain.TxAmlNotice;
 import com.st1.itx.db.domain.TxAmlNoticeId;
+import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.TxAmlNoticeService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.springjpa.cm.L9705ServiceImpl;
+import com.st1.itx.trade.L9.L9703Report2;
 import com.st1.itx.trade.L9.L9705Report;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;

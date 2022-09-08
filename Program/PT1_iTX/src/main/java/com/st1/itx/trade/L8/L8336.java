@@ -124,6 +124,10 @@ public class L8336 extends TradeBuffer {
 			uJcicZ574.setPhoneNo(iPhoneNo);
 			uJcicZ574.setTranKey(iTranKey);
 			uJcicZ574.setOutJcicTxtDate(0);
+			
+			uJcicZ574.setActualFilingDate(0);
+			uJcicZ574.setActualFilingMark("");
+			
 			try {
 				sJcicZ574Service.update(uJcicZ574, titaVo);
 			} catch (DBException e) {

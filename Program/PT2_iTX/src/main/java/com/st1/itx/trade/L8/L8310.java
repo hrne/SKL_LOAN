@@ -177,6 +177,10 @@ public class L8310 extends TradeBuffer {
 			uJcicZ049.setApprove(iApprove);
 			uJcicZ049.setClaimDate(iClaimDate);
 			uJcicZ049.setOutJcicTxtDate(0);
+			
+			uJcicZ049.setActualFilingDate(0);
+			uJcicZ049.setActualFilingMark("");
+			
 			try {
 				sJcicZ049Service.update(uJcicZ049, titaVo);
 			} catch (DBException e) {

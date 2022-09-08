@@ -103,7 +103,8 @@ public class L8316 extends TradeBuffer {
 
 				// 1 start 案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」
 				if ("3".equals(iCaseStatus)) {
-					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
+							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ055 == null) {
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」 .");
@@ -129,7 +130,8 @@ public class L8316 extends TradeBuffer {
 
 				// 2 start 案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」
 				if ("4".equals(iCaseStatus) || "5".equals(iCaseStatus)) {
-					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
+							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ055 == null) {
 						if ("A".equals(iTranKey)) {
 							throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
@@ -145,9 +147,11 @@ public class L8316 extends TradeBuffer {
 						}
 						if (flagCaseStatus == 0) {
 							if ("A".equals(iTranKey)) {
-								throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+								throw new LogicException("E0005",
+										"案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
 							} else {
-								throw new LogicException("E0007", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+								throw new LogicException("E0007",
+										"案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
 							}
 						}
 					}
@@ -225,13 +229,18 @@ public class L8316 extends TradeBuffer {
 			uJcicZ055.setInspectName(iInspectName);
 
 			uJcicZ055.setOutJcicTxtDate(0);
+			
+			uJcicZ055.setActualFilingDate(0);
+			uJcicZ055.setActualFilingMark("");
+			
 			try {
 				sJcicZ055Service.update(uJcicZ055, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ055, uJcicZ055);
-			iDataLog.exec("L8316異動", uJcicZ055.getSubmitKey() + uJcicZ055.getCustId() + uJcicZ055.getCaseStatus() + uJcicZ055.getClaimDate() + uJcicZ055.getCourtCode());
+			iDataLog.exec("L8316異動", uJcicZ055.getSubmitKey() + uJcicZ055.getCustId() + uJcicZ055.getCaseStatus()
+					+ uJcicZ055.getClaimDate() + uJcicZ055.getCourtCode());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -305,7 +314,8 @@ public class L8316 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0552, uJcicZ0552);
-			iDataLog.exec("L8316刪除", uJcicZ0552.getSubmitKey() + uJcicZ0552.getCustId() + uJcicZ0552.getCaseStatus() + uJcicZ0552.getClaimDate() + uJcicZ0552.getCourtCode());
+			iDataLog.exec("L8316刪除", uJcicZ0552.getSubmitKey() + uJcicZ0552.getCustId() + uJcicZ0552.getCaseStatus()
+					+ uJcicZ0552.getClaimDate() + uJcicZ0552.getCourtCode());
 			break;
 		// 修改
 		case "7":
@@ -351,7 +361,8 @@ public class L8316 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0553, uJcicZ0553);
-			iDataLog.exec("L8316修改", uJcicZ0553.getSubmitKey() + uJcicZ0553.getCustId() + uJcicZ0553.getCaseStatus() + uJcicZ0553.getClaimDate() + uJcicZ0553.getCourtCode());
+			iDataLog.exec("L8316修改", uJcicZ0553.getSubmitKey() + uJcicZ0553.getCustId() + uJcicZ0553.getCaseStatus()
+					+ uJcicZ0553.getClaimDate() + uJcicZ0553.getCourtCode());
 		default:
 			break;
 		}
