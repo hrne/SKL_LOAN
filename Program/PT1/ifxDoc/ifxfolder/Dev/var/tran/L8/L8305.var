@@ -219,19 +219,17 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@RcDate,1)T(F,@DebtCode,1)T(F,@NonGageAmt,1)T(F,@Period,1)
+T(F,@DebtCode,1)T(F,@NonGageAmt,1)T(F,@Period,1)
 T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@ReceYearIncome,1)T(F,@ReceYear,1)T(F,@ReceYear2Income,1)
 T(F,@ReceYear2,1)T(F,@CurrentMonthIncome,1)T(F,@LivingCost,1)T(F,@CompName,1)T(F,@CompId,1)
 T(F,@CarCnt,1)T(F,@HouseCnt,1)T(F,@LandCnt,1)T(F,@ChildCnt,1)T(F,@ChildRate,1)
 T(F,@ParentCnt,1)T(F,@ParentRate,1)T(F,@MouthCnt,1)T(F,@MouthRate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdTranKey,*)
-T(2,@FdSubmitKey,*)
-T(2,@FdRcDate,*)
 T(2,@FdDebtCode,*)
 T(2,@FdReceYear,*)
 T(2,@FdReceYear2,*)
+T(2,@FdLivingCost,*)
 T(3,@TranKeyHelp,A:新增;X:補件;C:異動))
 
 ! [調Rim相關]
@@ -303,10 +301,10 @@ T(F,@CarCnt,1)T(F,@HouseCnt,1)T(F,@LandCnt,1)T(F,@ChildCnt,1)T(F,@ChildRate,1)
 T(F,@ParentCnt,1)T(F,@ParentRate,1)T(F,@MouthCnt,1)T(F,@MouthRate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)
 T(2,@FdDebtCode,*)
-T(2,@FdReceYear,*)T(2,@FdReceYear2,*),
-C(5,#TranKey,X,K(MODIFYBUTTON,補件),$))
+T(2,@FdReceYear,*)T(2,@FdReceYear2,*),$)
+C(5,#TranKey,X,K(MODIFYBUTTON,補件),$)
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@RcDate,1)T(F,@DebtCode,1)T(F,@NonGageAmt,1)T(F,@Period,1)
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@DebtCode,1)T(F,@NonGageAmt,1)T(F,@Period,1)
 T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@ReceYearIncome,1)T(F,@ReceYear,1)T(F,@ReceYear2Income,1)
 T(F,@ReceYear2,1)T(F,@CurrentMonthIncome,1)T(F,@LivingCost,1)T(F,@CompName,1)T(F,@CompId,1)
 T(F,@CarCnt,1)T(F,@HouseCnt,1)T(F,@LandCnt,1)T(F,@ChildCnt,1)T(F,@ChildRate,1)
@@ -316,7 +314,7 @@ T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1),$)
 
 
 #TranKeyX=X,4,L
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 !C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -338,6 +336,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -352,6 +351,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

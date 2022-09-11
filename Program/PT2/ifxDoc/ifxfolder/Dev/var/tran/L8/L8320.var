@@ -172,18 +172,15 @@ K(MODIFYBUTTON,刪除)
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 T(F,@TranKey,1)
-T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@CompletePeriod,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpBalanceAmt,1)
+T(F,@CompletePeriod,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpBalanceAmt,1)
 T(F,@CashBalanceAmt,1)T(F,@CreditBalanceAmt,1)T(F,@ChaRepayAmt,1)T(F,@ChaRepayAgreeDate,1)T(F,@ChaRepayViewDate,1)
 T(F,@ChaRepayEndDate,1)T(F,@ChaRepayFirstDate,1)T(F,@PayAccount,1)T(F,@PostAddr,1)T(F,@MonthPayAmt,1)T(F,@GradeType,1)
-T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@SubmitKey,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdChangePayDate,*)
 T(2,@FdChaRepayAgreeDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
 T(2,@FdMonthPayAmt,*)
-T(2,@FdSubmitKey,*)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
@@ -277,6 +274,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -299,6 +297,7 @@ C(5,#GradeType,Y,T(2,@FdPeriod,*)E(0,#Rate,0)T(F,@Rate,0)T(F,@Period2,1)T(F,@Mon
 
 !原前置協商申請日
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -307,6 +306,7 @@ D(8)
 
 !申請變更還款條件日
 #ChangePayDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

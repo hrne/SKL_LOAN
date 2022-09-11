@@ -163,13 +163,10 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@CloseCode,1)T(F,@BreakCode,1)T(F,@CloseDate,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
+T(F,@TranKey,1)T(F,@CloseCode,1)T(F,@BreakCode,1)K(MODIFYBUTTON,修改)
 T(2,@FdCloseCode,*)
 T(2,@FdBreakCode,*)
-T(2,@FdCloseDate,*)
-T(2,@FdSubmitKey,*)
+T(2,@FdTranKey,*)
 T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 ! [調Rim相關]
@@ -203,19 +200,31 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
+C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
-C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@CloseCode,1)T(F,@BreakCode,1)T(2,@FdCloseCode,*)T(2,@FdBreakCode,*),
-C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CloseCode,0)T(F,@BreakCode,0)T(2,@FdCloseCode, )T(2,@FdBreakCode, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CloseCode,1)T(F,@BreakCode,1)T(2,@FdCloseCode,*)T(2,@FdBreakCode,*),$)
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CloseCode,0)T(F,@BreakCode,0)T(2,@FdCloseCode, )T(2,@FdBreakCode, ),$)
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@CloseCode,1)T(F,@BreakCode,1)T(F,@CloseDate,1),$)
+
+!CALL()
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+C(5,#TranKey,A,K(MODIFYBUTTON,修改)T(F,@CloseCode,1)T(F,@BreakCode,1)T(2,@FdCloseCode,*)T(2,@FdBreakCode,*),$)
+
+!IF(#TranKey==A,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@CloseCode,1)T(F,@BreakCode,1),
+!IF(#TranKey==C,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@CloseCode,1)T(F,@BreakCode,1),
+!IF(#TranKey==D,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@CloseCode,0)T(F,@BreakCode,0),$)
+
 
 #TranKeyX=X,4,L
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7,$,s)
+IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
+C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
@@ -236,6 +245,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -250,6 +260,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -281,6 +292,7 @@ T(1,#SYSCDATE,2,7)
 
 !結案日期
 #CloseDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

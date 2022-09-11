@@ -56,7 +56,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String CustId = titaVo.getParam("CustId");
 
 		// 額度
-		String sql = "  SELECT     ";
+		String sql = "select * from (  SELECT     ";
 		sql += "    LPAD(fa.\"CreditSysNo\",7,'0')   AS \"CreditSysNo\",";
 		sql += "    fa.\"ApplNo\"        AS \"ApplNo\",";
 		sql += "    CASE";
@@ -71,6 +71,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu.\"CustUKey\"     AS \"UKey\",";
 		sql += "    cu.\"CustId\"       AS \"Id\",";
 		sql += "    cu.\"CustName\"     AS \"Name\",";
+		sql += "    1 AS \"TypeCode\",";
 		sql += "    n'授信戶' AS \"Type\",";
 		sql += "    CASE";
 		sql += "        WHEN length(cu.\"CustId\") >= 8 THEN";
@@ -89,7 +90,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE";
 		sql += "    cu.\"CustId\" = :custid";
 		sql += "  AND fm.\"ApplNo\" = fa.\"ApplNo\"";
-		sql += "  UNION";
+		sql += "  UNION ALL ";
 		// 共同借款人
 		sql += "  SELECT     ";
 		sql += "    LPAD(fa.\"CreditSysNo\",7,'0')   AS \"CreditSysNo\",";
@@ -106,15 +107,16 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu.\"CustUKey\"     AS \"UKey\",";
 		sql += "    cu.\"CustId\"       AS \"Id\",";
 		sql += "    cu.\"CustName\"     AS \"Name\",";
+		sql += "    2 AS \"TypeCode\",";
 		sql += "    n'共同借款人' AS \"Type\",";
 		sql += "    CASE";
 		sql += "        WHEN nvl(fsr.\"RelCode\", ' ') != ' ' THEN";
 		sql += "            cdg.\"GuaRelItem\"";
 		sql += "        ELSE";
 		sql += "            n'**與授信戶關係未登錄**'";
-		sql += "    END AS \"Relation\", ";
-		sql += "    null AS \"ClCode1\", ";
-		sql += "    null AS \"ClCode2\", ";
+		sql += "    END AS \"Relation\",";
+		sql += "    null AS \"ClCode1\",";
+		sql += "    null AS \"ClCode2\",";
 		sql += "    null AS \"ClNo\",";
 		sql += "    CASE";
 		sql += "        WHEN nvl(fsr.\"RelCode\", ' ') != ' ' THEN";
@@ -131,7 +133,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE";
 		sql += "    cu.\"CustId\" = :custid";
 		sql += "    AND fsr.\"RelApplNo\" = fa.\"ApplNo\"";
-		sql += "  UNION";
+		sql += "  UNION ALL ";
 		// 保證人
 		sql += "  SELECT     ";
 		sql += "    LPAD(fa.\"CreditSysNo\",7,'0')   AS \"CreditSysNo\",";
@@ -148,6 +150,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu2.\"CustUKey\"     AS \"UKey\",";
 		sql += "    cu2.\"CustId\"       AS \"Id\",";
 		sql += "    cu2.\"CustName\"     AS \"Name\",";
+		sql += "    3 AS \"TypeCode\",";
 		sql += "    n'保證人' AS \"Type\",";
 		sql += "    cdg.\"GuaRelItem\"   AS \"Relation\",";
 		sql += "    NULL AS \"ClCode1\",";
@@ -165,74 +168,25 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu.\"CustId\" = :custid";
 		sql += "    AND gu.\"GuaUKey\" = cu.\"CustUKey\"";
 
-		sql += "  UNION";
+		sql += "  UNION ALL　";
 		// 擔保品提供人
-		sql += "  SELECT DISTINCT    ";
-		sql += "    LPAD(clr.\"CreditSysNo\",7,'0')   AS \"CreditSysNo\",";
-		sql += "    fa.\"ApplNo\"        AS \"ApplNo\",";
-		sql += "    CASE";
-		sql += "        WHEN cf.\"CustNo\" IS NOT NULL THEN";
-		sql += "        lpad(cf.\"CustNo\",7,'0') ";
-		sql += "        ELSE null end   AS \"CustNo\",";
-		sql += "    CASE";
-		sql += "        WHEN cf.\"FacmNo\" IS NOT NULL THEN";
-		sql += "        lpad(cf.\"FacmNo\",3,'0') ";
-		sql += "        ELSE null end   AS \"FacmNo\",";
-		sql += "    cu.\"CustName\"      AS \"CustName\",";
-		sql += "    cu2.\"CustUKey\"     AS \"UKey\",";
-		sql += "    cu2.\"CustId\"       AS \"Id\",";
-		sql += "    cu2.\"CustName\"     AS \"Name\",";
-		sql += "    n'擔保品提供人' AS \"Type\",";
-		sql += "    CASE";
-		sql += "        WHEN nvl(clr.\"OwnerRelCode\", ' ') != ' ' THEN";
-		sql += "            cdg.\"GuaRelItem\"";
-		sql += "        ELSE";
-		sql += "            n'**與授信戶關係未登錄**'";
-		sql += "    END AS \"Relation\",";
-		sql += "    cf.\"ClCode1\"       AS \"ClCode1\",";
-		sql += "    CASE";
-		sql += "        WHEN cf.\"ClCode2\" IS NOT NULL THEN";
-		sql += "        lpad(cf.\"ClCode2\",2,'0') ";
-		sql += "        ELSE null end   AS \"ClCode2\",";
-		sql += "    CASE";
-		sql += "        WHEN cf.\"ClNo\" IS NOT NULL THEN";
-		sql += "        lpad(cf.\"ClNo\",7,'0') ";
-		sql += "        ELSE null end   AS \"ClNo\",";
-		sql += "    CASE";
-		sql += "        WHEN nvl(clr.\"OwnerRelCode\", ' ') != ' ' THEN";
-		sql += "            0";
-		sql += "        ELSE";
-		sql += "            1";
-		sql += "    END AS \"Modify\"";
-		sql += "  FROM";
-		sql += "    \"ClOwnerRelation\"           clr";
-		sql += "    LEFT JOIN \"CustMain\"          cu ON cu.\"CustUKey\" = clr.\"OwnerCustUKey\"";
-		sql += "    LEFT JOIN \"FacCaseAppl\"       fa ON fa.\"CreditSysNo\" = clr.\"CreditSysNo\"";
-		sql += "    LEFT JOIN \"ClFac\"             cf ON cf.\"ApproveNo\" = fa.\"ApplNo\"";
-
-		sql += "    LEFT JOIN \"ClBuildingOwner\"   cbo ON cbo.\"ClCode1\" = cf.\"ClCode1\"";
-		sql += "                                       AND cbo.\"ClCode2\" = cf.\"ClCode2\"";
-		sql += "                                       AND cbo.\"ClNo\" = cf.\"ClNo\"";
-		sql += "    LEFT JOIN \"ClLandOwner\"       clo ON clo.\"ClCode1\" = cf.\"ClCode1\"";
-		sql += "                                   AND clo.\"ClCode2\" = cf.\"ClCode2\"";
-		sql += "                                   AND clo.\"ClNo\" = cf.\"ClNo\"";
-		sql += "    LEFT JOIN \"ClStock\"           cs ON cs.\"ClCode1\" = cf.\"ClCode1\"";
-		sql += "                              AND cs.\"ClCode2\" = cf.\"ClCode2\"";
-		sql += "                              AND cs.\"ClNo\" = cf.\"ClNo\"";
-		sql += "    LEFT JOIN \"ClOther\"           co ON co.\"ClCode1\" = cf.\"ClCode1\"";
-		sql += "                              AND co.\"ClCode2\" = cf.\"ClCode2\"";
-		sql += "                              AND co.\"ClNo\" = cf.\"ClNo\"";
-		sql += "    LEFT JOIN \"ClMovables\"        cmv ON cmv.\"ClCode1\" = cf.\"ClCode1\"";
-		sql += "                                  AND cmv.\"ClCode2\" = cf.\"ClCode2\"";
-		sql += "                                  AND cmv.\"ClNo\" = cf.\"ClNo\"";
-		sql += "    LEFT JOIN \"CustMain\"          cu2 ON cu2.\"CustUKey\" = clr.\"OwnerCustUKey\"";
-		sql += "    LEFT JOIN \"CdGuarantor\"       cdg ON cdg.\"GuaRelCode\" = clr.\"OwnerRelCode\"";
-		sql += "  WHERE";
-		sql += "    cu.\"CustId\" = :custid";
-		sql += "    AND cf.\"CustNo\" = cu.\"CustNo\"";
-		sql += "    AND cf.\"ApproveNo\" = fa.\"ApplNo\"";
-
-		sql += "  UNION";
+        sql += "select * from (" + 
+        		"select LPAD(nvl(d.\"CreditSysNo\",0),7,'0') as \"CreditSysNo\",d.\"ApplNo\",LPAD(c.\"CustNo\",7,'0') as \"CustNo\",LPAD(c.\"FacmNo\",3,'0') as \"FacmNo\",e.\"CustName\"," + 
+        		"a.\"OwnerCustUKey\" as \"UKey\",b.\"CustId\" as \"Id\",b.\"CustName\" as \"Name\"," +
+        		"4 as \"TypeCode\",n'擔保品提供人' AS \"Type\"," + 
+        		"NVL(g.\"GuaRelItem\",n'**未登錄與授信戶關係**') as \"Relation\",a.\"ClCode1\",LPAD(a.\"ClCode2\",2,'0') as \"ClCode2\",LPAD(a.\"ClNo\",7,'0') as \"ClNo\",0 as \"Modify\" " + 
+        		"from (select \"ClCode1\",\"ClCode2\",\"ClNo\",\"OwnerCustUKey\" from \"ClBuildingOwner\"" + 
+        		"      union all" + 
+        		"      select \"ClCode1\",\"ClCode2\",\"ClNo\",\"OwnerCustUKey\" from \"ClLandOwner\"" + 
+        		"      ) a " + 
+        		"left join \"CustMain\" b on b.\"CustUKey\" = a.\"OwnerCustUKey\" " + 
+        		"left join \"ClFac\" c on c.\"ClCode1\"=a.\"ClCode1\" and c.\"ClCode2\"=a.\"ClCode2\" and c.\"ClNo\"=a.\"ClNo\" " + 
+        		"left join \"FacMain\" d on d.\"CustNo\"=c.\"CustNo\" and d.\"FacmNo\"=c.\"FacmNo\" " + 
+        		"left join \"CustMain\" e on e.\"CustNo\" = d.\"CustNo\" " + 
+        		"left join \"ClOwnerRelation\" f on f.\"CreditSysNo\"=d.\"CreditSysNo\" and f.\"CustNo\"=c.\"CustNo\" and f.\"OwnerCustUKey\"=a.\"OwnerCustUKey\" " + 
+        		"left join \"CdGuarantor\" g ON g.\"GuaRelCode\" = f.\"OwnerRelCode\" " + 
+        		"where b.\"CustId\"=:custid) ";
+		sql += "  UNION ALL　";
 		// 交易關係人
 		sql += "  SELECT  ";
 		sql += "    LPAD(fa.\"CreditSysNo\",7,'0')   AS \"CreditSysNo\",";
@@ -249,6 +203,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu2.\"CustUKey\"     AS \"UKey\",";
 		sql += "    cu2.\"CustId\"       AS \"Id\",";
 		sql += "    cu2.\"CustName\"     AS \"Name\",";
+		sql += "    5 AS \"TypeCode\",";
 		sql += "    n'交易關係人' AS \"Type\",";
 		sql += "    cd.\"Item\"          AS \"Relation\",";
 		sql += "    NULL AS \"ClCode1\",";
@@ -269,7 +224,7 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu.\"CustId\" = :custid";
 		sql += "    AND fr.\"CreditSysNo\" = fa.\"CreditSysNo\"";
 
-		sql += "  ORDER BY \"CreditSysNo\", \"ApplNo\"";
+		sql += "  ) ORDER BY \"CreditSysNo\", \"ApplNo\", \"CustNo\", \"FacmNo\", \"TypeCode\" ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);

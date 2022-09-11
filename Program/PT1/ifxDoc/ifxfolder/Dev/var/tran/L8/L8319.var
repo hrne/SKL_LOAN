@@ -152,12 +152,9 @@ K(MODIFYBUTTON,刪除)
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 T(F,@TranKey,1)
-T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@MaxMainCode,1)T(F,@ExpBalanceAmt,1)T(F,@CashBalanceAmt,1)
-T(F,@CreditBalanceAmt,1)T(F,@MaxMainNote,1)T(F,@IsGuarantor,1)T(F,@IsChangePayment,1)
+T(F,@ExpBalanceAmt,1)T(F,@CashBalanceAmt,1)T(F,@CreditBalanceAmt,1)
+T(F,@MaxMainNote,0)T(F,@IsGuarantor,1)T(F,@IsChangePayment,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdChangePayDate,*)
-T(2,@FdMaxMainCode,*)
 T(2,@FdIsGuarantor,*)
 T(2,@FdIsChangePayment,*)
 T(3,@TranKeyHelp,A:新增;C:異動))
@@ -258,6 +255,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 !原前置協商申請日
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -268,6 +266,7 @@ D(8)
 
 !申請變更還款條件日
 #ChangePayDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -276,6 +275,7 @@ D(8)
 
 !最大債權金融機構報送註記
 #MaxMainNote=X,1,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -290,6 +290,7 @@ C(4,#MaxMainNote,S,T(H,@MaxMainNoteX,#MaxMainNote,#YesNoHelp))
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

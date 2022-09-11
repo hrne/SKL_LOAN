@@ -190,14 +190,12 @@ K(MODIFYBUTTON,刪除)
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 T(F,@TranKey,1)
-T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@IsClaims,1)T(F,@GuarLoanCnt,1)T(F,@ExpLoanAmt,1)T(F,@Civil323ExpAmt,1)
+T(F,@IsClaims,1)T(F,@GuarLoanCnt,1)T(F,@ExpLoanAmt,1)T(F,@Civil323ExpAmt,1)
 T(F,@ReceExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@ReceCashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
 T(F,@ReceCreditAmt,1)T(F,@ReceExpPrin,1)T(F,@ReceExpInte,1)T(F,@ReceExpPena,1)T(F,@ReceExpOther,1)T(F,@CashCardPrin,1)
 T(F,@CashCardInte,1)T(F,@CashCardPena,1)T(F,@CashCardOther,1)T(F,@CreditCardPrin,1)T(F,@CreditCardInte,1)
 T(F,@CreditCardPena,1)T(F,@CreditCardOther,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdMaxMainCode,*)
 T(2,@FdIsClaims,*)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
@@ -299,6 +297,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -307,6 +306,7 @@ D(8)
 
 ![最大債權金融機構代號]
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

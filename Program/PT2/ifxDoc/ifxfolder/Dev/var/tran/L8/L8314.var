@@ -167,21 +167,16 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@FdTranKey,1)
-T(F,@SubmitKey,1)
-T(F,@CustId,1)
-T(F,@RcDate,1)
-T(F,@MaxMainCode,1)
+T(F,@TranKey,1)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@AgreeSend,1)
 T(F,@AgreeSendData1,1)
 T(F,@AgreeSendData2,1)
 T(F,@ChangePayDate,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdMaxMainCode,*)
 T(2,@FdAgreeSend,*)
 T(2,@FdAgreeSendData1,*)
 T(2,@FdChangePayDate,*)
+K(MODIFYBUTTON,修改)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
@@ -275,6 +270,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -283,6 +279,7 @@ D(8)
 
 ![最大債權金融機構代號]
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

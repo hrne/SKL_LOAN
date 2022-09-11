@@ -44,6 +44,7 @@ E(0,0)
 ["#FdAcDate+會計日期",#AcDateStart,"~",#AcDateEnd],
 ["#FdFileDay+報送日期",#FileDay,"#FdFileNo+檔案序號",#FileNo],
 ["#FdJcicEmpName+審查聯絡人",#JcicEmpName,"#FdJcicEmpTel+聯絡電話",#JcicEmpTel],
+["#FD_YN+是否重新產生",#RemakeYN,"@",#RemakeYNText],
 
 ["@"],
 ["@",#BtnAll,"@全選"],
@@ -66,6 +67,9 @@ T(3,*)
 T(3,*)
 #FdFileNo=X,2,L
 T(3, )
+#FD_YN=X,2,L
+T(3,*)
+
 #FdJcicEmpName=X,2,L
 T(3, )
 #FdJcicEmpTel=X,2,L
@@ -174,13 +178,26 @@ D(8)
 #FileDay=D,7,I
 C(3,#CHAIN,0,E(0,#DT2),s)
 D(8)	
-@V(7)A(4,0,#FileDay)V(5,#DT2,9999999)
+@V(7)A(4,0,#FileDay)V(6,0,#AcDateEnd)
 
 #FileNo=A,2,I
 E(0,1)
 @V(2,0)
 #JcicEmpName=x,8,L
 #JcicEmpTel=x,16,L
+
+! 是否重新產生
+#HelpChoice=X,9,S
+T(3,Y:是;N:否)
+
+#RemakeYN=X,1,I
+T(3,N)
+HELP(#HelpChoice)
+@T(3,@RemakeYNText,)
+V(H,#HelpChoice)
+
+#RemakeYNText=X,2,L
+T(H,#RemakeYN,#HelpChoice)
 
 
 ##loop {times:2,i:1} 
@@ -224,6 +241,7 @@ T(3,[L8401] 產生JCIC日報媒體檔)
 #AcDateEnd
 #FileDay
 #FileNo
+#RemakeYN
 ##loop {times:2,i:1}
 #DAILY{i}
 ##end

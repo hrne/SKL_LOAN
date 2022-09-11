@@ -188,14 +188,9 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@TranKey,1)T(F,@ApplyDate,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)T(F,@Bank1,1)T(F,@Bank2,1)
-T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
-T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
-T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
-T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)T(2,@FdBank1,*)
+T(F,@TranKey,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)T(2,@FdBank1,*)
 K(MODIFYBUTTON,修改)
 T(2,@FdTranKey,*)
-T(2,@FdApplyDate,*)
 T(2,@FdAdjudicateDate,*)
 T(2,@FdBankCount,*)
 T(3,@TranKeyHelp,A:新增;X:補件;C:異動;D:刪除))
@@ -306,12 +301,13 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
-C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@ApplyDate,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
+C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
 T(F,@Bank1,1)T(F,@Bank2,1)T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
 T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
 T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
@@ -329,19 +325,10 @@ T(F,@Bank11,0)T(F,@Bank12,0)T(F,@Bank13,0)T(F,@Bank14,0)T(F,@Bank15,0)T(F,@Bank1
 T(F,@Bank19,0)T(F,@Bank20,0)T(F,@Bank21,0)T(F,@Bank22,0)T(F,@Bank23,0)T(F,@Bank24,0)T(F,@Bank25,0)T(F,@Bank26,0)
 T(F,@Bank27,0)T(F,@Bank28,0)T(F,@Bank29,0)T(F,@Bank30,0)
 T(2,@FdAdjudicateDate, )T(2,@FdBankCount, )T(2,@FdBank1, ),$)
-C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@AdjudicateDate,0)T(F,@BankCount,0)
-T(F,@Bank1,0)T(F,@Bank2,0)T(F,@Bank3,0)T(F,@Bank4,0)T(F,@Bank5,0)T(F,@Bank6,0)T(F,@Bank7,0)T(F,@Bank8,0)T(F,@Bank9,0)T(F,@Bank10,0)
-T(F,@Bank11,0)T(F,@Bank12,0)T(F,@Bank13,0)T(F,@Bank14,0)T(F,@Bank15,0)T(F,@Bank16,0)T(F,@Bank17,0)T(F,@Bank18,0)
-T(F,@Bank19,0)T(F,@Bank20,0)T(F,@Bank21,0)T(F,@Bank22,0)T(F,@Bank23,0)T(F,@Bank24,0)T(F,@Bank25,0)T(F,@Bank26,0)
-T(F,@Bank27,0)T(F,@Bank28,0)T(F,@Bank29,0)T(F,@Bank30,0)
-T(2,@FdAdjudicateDate, )T(2,@FdBankCount, ),$)
+C(5,#TranKey,X,K(MODIFYBUTTON,補件),$)
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyDate,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
-T(F,@Bank1,1)T(F,@Bank2,1)T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
-T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
-T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
-T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)
-T(2,@FdApplyDate,*)T(2,@FdAdjudicateDate,*)T(2,@FdBankCount,*),$)
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+C(5,#TranKey,A,T(F,@TranKey,1)T(F,@AdjudicateDate,1)T(F,@BankCount,1)T(2,@FdBank1,*)K(MODIFYBUTTON,修改),$)
 
 #TranKeyX=X,4,L
 IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
@@ -370,6 +357,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 !調解申請日
 #ApplyDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -379,6 +367,7 @@ D(8)
 
 !更生方案認可裁定日
 #AdjudicateDate=D,7,I
+C(5,#TranKey,X,BIND(grid,cancel),$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@AdjudicateDate,#L8r33AdjudicateDate),$)
@@ -389,6 +378,7 @@ D(8)
 
 !更生債權金融機構家數
 #BankCount=M,2,I
+C(5,#TranKey,X,BIND(grid,cancel),$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@BankCount,#L8r33BankCount),$)
@@ -399,9 +389,11 @@ C(5,#TranKey,X,S,$)
 
 !債權金融機構代號1~30
 #Bank0=x,3,L
+
 T(2,1)
 
 #Bank1=X,3,I
+C(5,#TranKey,X,BIND(grid,cancel),$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@Bank1,#L8r33Bank1),$)
@@ -411,6 +403,7 @@ C(5,#TranKey,X,S,$)
 #RimL8r011=X,1,S
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,S,$)
 C(5,#TranKey,D,s,$)
 IF(#Bank1=="",S,$)
 T(2,@RimJcicBankCode,#Bank1)
@@ -439,6 +432,7 @@ IF(#Bank{i}=="",S,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,S,$)
 T(2,@RimJcicBankCode,#Bank{i})
 RESET_RIM(#RimL8r01{i},L8R01)
 S(L8R01,1,#RimJcicBankCode)

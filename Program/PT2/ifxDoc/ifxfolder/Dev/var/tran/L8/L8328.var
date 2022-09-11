@@ -146,7 +146,7 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1)
+T(F,@TranKey,1)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1)
 K(MODIFYBUTTON,修改)
 T(2,@FdApplyDate,*)
 T(2,@FdTranKey,*)
@@ -220,8 +220,11 @@ C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPe
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
-
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),$)
+C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
 
 
 #TranKeyX=X,4,L
@@ -248,6 +251,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![債權金融機構代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -264,6 +268,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 !調解申請日
 #ApplyDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -273,6 +278,7 @@ D(8)
 !受理調解機構代號-承審法院代碼OR郵遞區號
 !#RimJcicCourtZipCode=X,3,S
 #CourtCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -290,6 +296,7 @@ T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

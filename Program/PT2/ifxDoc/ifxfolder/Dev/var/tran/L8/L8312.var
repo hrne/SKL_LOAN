@@ -143,12 +143,10 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@TranKey,1)T(F,@RcDate,1)T(F,@DelayCode,1)T(F,@DelayYM,1)T(F,@DelayDesc,1)T(F,@SubmitKey,1)
+T(F,@TranKey,1)T(F,@DelayCode,1)T(F,@DelayDesc,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
+T(2,@FdTranKey,*)
 T(2,@FdDelayCode,*)
-T(2,@FdDelayYM,*)
-T(2,@FdSubmitKey,*)
 T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 ! 預設值
@@ -205,14 +203,22 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@DelayCode,1)T(F,@DelayDesc,1)T(2,@FdDelayCode,*),
-C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@DelayCode, )T(F,@DelayDesc, )T(F,@DelayCode,0)T(F,@DelayDesc,0),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@DelayCode,1)T(F,@DelayDesc,1)T(2,@FdDelayCode,*),$)
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@DelayCode, )T(F,@DelayDesc, )T(F,@DelayCode,0)T(F,@DelayDesc,0),$)
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@RcDate,1)T(F,@DelayCode,1)T(F,@DelayYM,1)T(F,@DelayDesc,1)T(F,@SubmitKey,1),$)
+!CALL()
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+C(5,#TranKey,A,K(MODIFYBUTTON,修改)T(F,@DelayCode,1)T(F,@DelayDesc,1)T(2,@FdDelayCode,*),$)
+
+!IF(#TranKey==A,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@DelayCode,1)T(F,@DelayDesc,1),
+!IF(#TranKey==C,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@DelayCode,1)T(F,@DelayDesc,1),
+!IF(#TranKey==D,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@DelayCode,0)T(F,@DelayDesc,0),$)
 
 #TranKeyX=X,4,L
-IF(#TranKey_Tmp==2||#TranKey_Tmp==7,$,s)
-C(5,#TranKey_Tmp,1,s,$)
+IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
@@ -233,6 +239,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -248,6 +255,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -270,6 +278,7 @@ T(H,#DelayCode,#DelayCodeHelp)
 !延期繳款年月
 
 #DelayYM=A,5,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

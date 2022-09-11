@@ -159,8 +159,8 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 T(F,@TranKey,1)
-T(F,@TranKey,1)T(F,@RcDate,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
-T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(F,@SubmitKey,1)
+T(F,@TranKey,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
+T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)
 K(MODIFYBUTTON,修改)
 T(2,@FdTranKey,*)
 T(2,@FdRcDate,*)
@@ -211,13 +211,11 @@ HELP(#TranKeyHelp)
 V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@TranKey,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
 T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)
-T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdMain,*)INVOKEJS(SHOW,p1,5,5,1),
+T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdMain,*)INVOKEJS(SHOW,p1,5,5,1),$)
 C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)
-T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdMain, )INVOKEJS(SHOW,p1,5,5,0),$))
+T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdMain, )INVOKEJS(SHOW,p1,5,5,0),$)
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@RcDate,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
-T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(F,@SubmitKey,1)
-,$)
+
 
 
 
@@ -243,6 +241,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -258,6 +257,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

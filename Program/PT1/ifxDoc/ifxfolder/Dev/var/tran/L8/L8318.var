@@ -99,6 +99,7 @@ T(1,@TranKey,#NTXBUF,2,1)
 #Deal_New=X,1,S
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
+T(F,@TranKey,0)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@YM,1)T(F,@SubmitKey,1)
 K(MODIFYBUTTON,新增)
@@ -106,14 +107,16 @@ T(2,@FdRcDate,*)
 T(2,@FdChangePayDate,*)
 T(2,@FdYM,*)
 T(2,@FdSubmitKey,*)
+
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
-T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@TranKey,0)
 T(1,@Ukey,#NTXBUF,3,32)
-K(MODIFYBUTTON,異動)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@YM,1)
 T(2,@FdYM,*)
+K(MODIFYBUTTON,異動)
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -132,12 +135,9 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@YM,1)T(F,@SubmitKey,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdChangePayDate,*)
+T(F,@YM,1)
 T(2,@FdYM,*)
-T(2,@FdSubmitKey,*)
+K(MODIFYBUTTON,修改)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
@@ -210,22 +210,13 @@ T(2,@CustIdX,#L8R57CustName)
 
 
 ![報送單位代號]
-#SubmitKey=X,3,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey_Tmp,2,s,$)
-@T(3,@SubmitKeyX,)
-V(7)
-
+#SubmitKey=X,3,L
 #SubmitKeyX=X,80,L
-T(2,@RimJcicBankCode,#SubmitKey)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@SubmitKeyX,#L8r01JcicBankName)
+
 
 !原前置協商申請日
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -236,6 +227,7 @@ D(8)
 
 !申請變更還款條件日
 #ChangePayDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

@@ -140,13 +140,9 @@ K(MODIFYBUTTON,刪除)
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 T(F,@TranKey,1)
-T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@ClosedDate,1)T(F,@ClosedResult,1)T(F,@SubmitKey,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdChangePayDate,*)
-T(2,@FdClosedDate,*)
+T(F,@ClosedDate,1)T(F,@ClosedResult,1)K(MODIFYBUTTON,修改)
 T(2,@FdClosedResult,*)
-T(2,@FdSubmitKey,*)
+T(2,@FdClosedDate,*)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
@@ -225,6 +221,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -241,6 +238,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 !原前置協商申請日
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -249,6 +247,7 @@ D(8)
 
 !申請變更還款條件日
 #ChangePayDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

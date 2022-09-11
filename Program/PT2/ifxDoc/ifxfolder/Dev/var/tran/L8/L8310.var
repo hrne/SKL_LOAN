@@ -163,18 +163,6 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
-! 修改進入
-#Deal_Revise=X,1,S
-C(5,#TranKey_Tmp,7,$,S)
-T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
-T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)T(F,@SubmitKey,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdClaimStatus,*)
-T(2,@FdApplyDate,*)
-T(2,@FdSubmitKey,*)
-T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 
 ! 預設值
@@ -188,6 +176,18 @@ RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! 修改進入
+#Deal_Revise=X,1,S
+C(5,#TranKey_Tmp,7,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
+T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)
+K(MODIFYBUTTON,修改)
+T(2,@FdTranKey,*)
+T(2,@FdClaimStatus,*)
+T(2,@FdApplyDate,*)
+T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 ! [調Rim相關]
 ! 定義Rom欄位名稱、型態、長度
@@ -228,23 +228,37 @@ C(4,#Approve,$,T(H,@ApproveX,#Approve,#YesNoHelp))
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
+C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)
-T(2,@FdClaimStatus,*)T(2,@FdApplyDate,*),
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@TranKey,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
+T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)
+T(2,@FdClaimStatus,*)T(2,@FdApplyDate,*),$)
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@ClaimStatus,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@Approve,0)T(F,@ClaimDate,0)K(MODIFYBUTTON,刪除)
-T(2,@FdClaimStatus, )T(2,@FdApplyDate, ),$))
+T(2,@FdClaimStatus, )T(2,@FdApplyDate, ),$)
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@RcDate,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
-T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)T(F,@SubmitKey,1)
-,$)
+!CALL()
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+C(5,#TranKey,A,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
+T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)
+T(2,@FdClaimStatus,*)T(2,@FdApplyDate,*),$)
+
+!IF(#TranKey==A,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
+!T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1),
+!IF(#TranKey==C,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)
+!T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1),
+!IF(#TranKey==D,K(MODIFYBUTTON,修改)
+!T(F,@TranKey,1),$)
+
 
 #TranKeyX=X,4,L
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
+IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
+C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
@@ -265,6 +279,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -280,6 +295,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

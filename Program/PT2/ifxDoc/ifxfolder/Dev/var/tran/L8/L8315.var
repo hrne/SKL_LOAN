@@ -146,12 +146,11 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdMaxMainCode,*)
+T(F,@TranKey,1)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@PayOffResult,1)
 T(2,@FdPayOffResult,*)
-T(2,@FdPayOffDate,*)
+K(MODIFYBUTTON,修改)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
@@ -245,6 +244,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -253,6 +253,7 @@ D(8)
 
 ![最大債權金融機構代號]
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -280,6 +281,7 @@ T(H,#PayOffResult,#PayOffResultHelp)
 
 !單獨全數受清償日期 
 #PayOffDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

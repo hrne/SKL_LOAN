@@ -156,11 +156,21 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@BankCode1,1)T(F,@BankCode2,1)T(F,@BankCode3,1)T(F,@BankCode4,1)T(F,@BankCode5,1)T(F,@DataCode1,1)T(F,@DataCode2,1)T(F,@DataCode3,1)T(F,@DataCode4,1)T(F,@DataCode5,1)T(F,@ChangePayDate,1)
-K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
+T(F,@TranKey,1)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@BankCode1,1)
+T(F,@BankCode2,1)
+T(F,@BankCode3,1)
+T(F,@BankCode4,1)
+T(F,@BankCode5,1)
+T(F,@DataCode1,1)
+T(F,@DataCode2,1)
+T(F,@DataCode3,1)
+T(F,@DataCode4,1)
+T(F,@DataCode5,1)
+T(F,@ChangePayDate,1)
 T(2,@FdChangePayDate,*)
-T(2,@FdSubmitKey,*)
+K(MODIFYBUTTON,修改)
 T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
@@ -218,7 +228,8 @@ T(2,@TranKey,#L8r24TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ! 調Rim相關 結束
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@BankCode1,1)T(F,@BankCode2,1)T(F,@BankCode3,1)T(F,@BankCode4,1)T(F,@BankCode5,1)T(F,@DataCode1,1)T(F,@DataCode2,1)T(F,@DataCode3,1)T(F,@DataCode4,1)T(F,@DataCode5,1)T(F,@ChangePayDate,1)
+IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)
+T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@BankCode1,1)T(F,@BankCode2,1)T(F,@BankCode3,1)T(F,@BankCode4,1)T(F,@BankCode5,1)T(F,@DataCode1,1)T(F,@DataCode2,1)T(F,@DataCode3,1)T(F,@DataCode4,1)T(F,@DataCode5,1)T(F,@ChangePayDate,1)
 ,$)
 
 ![交易代碼]
@@ -253,6 +264,7 @@ T(2,@CustIdX,#L8R57CustName)
 #CustIdX=x,100,L
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -267,6 +279,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

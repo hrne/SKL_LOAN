@@ -150,11 +150,9 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1)
+T(F,@TranKey,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdApplyDate,*)
-T(2,@FdCourtCode,*)
-T(2,@FdMaxMainCode,*)
+T(2,@FdTranKey,*)
 T(2,@FdPayOffResult,*)
 T(2,@FdPayOffDate,*)
 T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
@@ -211,13 +209,21 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
 HELP(#TranKeyHelp)
 @T(3,@TranKeyX,)
 V(H,#TranKeyHelp)
-C(5,#TranKey,X,K(MODIFYBUTTON,異動)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayOffResult,0)T(F,@PayOffDate,0)T(2,@FdPayOffResult, )T(2,@FdPayOffDate, ),$))
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1),$)
 
+!CALL()
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+IF(#TranKey==A,K(MODIFYBUTTON,修改)
+T(F,@TranKey,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),
+IF(#TranKey==C,K(MODIFYBUTTON,修改)
+T(F,@TranKey,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),
+IF(#TranKey==D,K(MODIFYBUTTON,修改)
+T(F,@TranKey,1),$)
 
 #TranKeyX=X,4,L
 IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
@@ -250,6 +256,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 !調解申請日
 #ApplyDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -259,6 +266,7 @@ A(DATE,0,#ApplyDate)
 
 !受理調解機構代號-承審法院代碼OR郵遞區號
 #CourtCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -276,6 +284,7 @@ T(2,@CourtCodeX,#L8R59CourtCodeX)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

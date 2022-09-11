@@ -61,9 +61,11 @@ public class L8205Report3 extends MakeReport {
 		this.print(-4, 5, "報  表：" + this.getRptCode());
 		this.print(-4, this.getMidXAxis(), "洗錢樣態3未完成交易確認報表", "C");
 		this.print(-3, 80, "報表等級：機密");
-		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4);
+		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8)
+				+ "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-4, 80, "日　　期：" + bcDate);
-		this.print(-5, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-5, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-6, 80, "頁　　數：　	　" + this.getNowPage());
 	}
 
@@ -100,11 +102,13 @@ public class L8205Report3 extends MakeReport {
 
 		// 入帳日區間 Min
 		String stEntryDate = titaVo.getParam("DateStart");
-		stEntryDate = stEntryDate.substring(0, 3) + "/" + stEntryDate.substring(3, 5) + "/" + stEntryDate.substring(5, 7);
+		stEntryDate = stEntryDate.substring(0, 3) + "/" + stEntryDate.substring(3, 5) + "/"
+				+ stEntryDate.substring(5, 7);
 
 		// 入帳日區間 Max
 		String edEntryDate = titaVo.getParam("DateEnd");
-		edEntryDate = edEntryDate.substring(0, 3) + "/" + edEntryDate.substring(3, 5) + "/" + edEntryDate.substring(5, 7);
+		edEntryDate = edEntryDate.substring(0, 3) + "/" + edEntryDate.substring(3, 5) + "/"
+				+ edEntryDate.substring(5, 7);
 		// 筆數計算
 		int icount = 0;
 
@@ -142,7 +146,8 @@ public class L8205Report3 extends MakeReport {
 				print(1, 4, tL8205Vo.get("F0"));
 
 				// 入帳日
-				print(0, 6, tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0 || tL8205Vo.get("F1").equals(" ") ? " " : showDate(tL8205Vo.get("F1"), 1));
+				print(0, 6, tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0
+						|| tL8205Vo.get("F1").equals(" ") ? " " : showDate(tL8205Vo.get("F1"), 1));
 
 				// 戶號
 				print(0, 16, padStart(tL8205Vo.get("F2"), 7, "0"));
@@ -155,8 +160,9 @@ public class L8205Report3 extends MakeReport {
 				print(0, 24, custname);
 
 				// 累積金額
-				BigDecimal f4 = tL8205Vo.get("F4") == "0" || tL8205Vo.get("F4") == null || tL8205Vo.get("F4").length() == 0 || tL8205Vo.get("F4").equals(" ") ? BigDecimal.ZERO
-						: new BigDecimal(tL8205Vo.get("F4"));
+				BigDecimal f4 = tL8205Vo.get("F4") == "0" || tL8205Vo.get("F4") == null
+						|| tL8205Vo.get("F4").length() == 0 || tL8205Vo.get("F4").equals(" ") ? BigDecimal.ZERO
+								: new BigDecimal(tL8205Vo.get("F4"));
 
 				print(0, 48, f4.equals(BigDecimal.ZERO) ? " " : df1.format(f4), "R");
 
@@ -171,10 +177,12 @@ public class L8205Report3 extends MakeReport {
 
 				// 同意日
 				print(0, 77,
-						tL8205Vo.get("F11") == "0" || tL8205Vo.get("F11") == null || tL8205Vo.get("F11").length() == 0 || tL8205Vo.get("F11").equals(" ") ? " " : showDate(tL8205Vo.get("F11"), 1));
+						tL8205Vo.get("F11") == "0" || tL8205Vo.get("F11") == null || tL8205Vo.get("F11").length() == 0
+								|| tL8205Vo.get("F11").equals(" ") ? " " : showDate(tL8205Vo.get("F11"), 1));
 
 				// 異動日
-				print(0, 87, tL8205Vo.get("F8") == "0" || tL8205Vo.get("F8") == null || tL8205Vo.get("F8").length() == 0 || tL8205Vo.get("F8").equals(" ") ? " " : showDate(tL8205Vo.get("F8"), 1));
+				print(0, 87, tL8205Vo.get("F8") == "0" || tL8205Vo.get("F8") == null || tL8205Vo.get("F8").length() == 0
+						|| tL8205Vo.get("F8").equals(" ") ? " " : showDate(tL8205Vo.get("F8"), 1));
 
 				// 經辦說明
 				String EmpNoDesc = tL8205Vo.get("F9");
@@ -222,6 +230,9 @@ public class L8205Report3 extends MakeReport {
 				icount = icount + 1;
 
 			}
+			if (icount > 0) {
+				print(1, 50, "【合　計：　" + icount + "　筆】", "C");
+			}
 
 		} else {
 			this.print(1, 3, "本日無資料");
@@ -232,11 +243,11 @@ public class L8205Report3 extends MakeReport {
 
 		}
 
-		if (icount > 0) {
-			this.print(-64, 50, "===== 報　表　結　束 =====" + "　　　【合　計：　" + icount + "　筆】", "C");
-		} else {
-			this.print(-64, 50, "===== 報　表　結　束 =====", "C");
-		}
+//		if (icount > 0) {
+//			this.print(-64, 50, "===== 報　表　結　束 =====" + "　　　【合　計：　" + icount + "　筆】", "C");
+//		} else {
+		this.print(-64, 50, "===== 報　表　結　束 =====", "C");
+//		}
 
 		long sno = this.close();
 		this.toPdf(sno);
@@ -244,7 +255,8 @@ public class L8205Report3 extends MakeReport {
 
 	public void makeExcel(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態3未完成交易確認報表", "L8205" + "_" + "洗錢樣態3未完成交易確認報表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態3未完成交易確認報表",
+				"L8205" + "_" + "洗錢樣態3未完成交易確認報表");
 		printExcelHeader();
 
 		int rowCursor = 2;
@@ -269,8 +281,11 @@ public class L8205Report3 extends MakeReport {
 
 				makeExcel.setValue(rowCursor, 1, tL8205Vo.get("F0"));
 
-				makeExcel.setValue(rowCursor, 2,
-						tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0 || tL8205Vo.get("F1").equals(" ") ? " " : showDate(tL8205Vo.get("F1"), 1));
+				makeExcel
+						.setValue(rowCursor, 2,
+								tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null
+										|| tL8205Vo.get("F1").length() == 0 || tL8205Vo.get("F1").equals(" ") ? " "
+												: showDate(tL8205Vo.get("F1"), 1));
 
 				makeExcel.setValue(rowCursor, 3, padStart(tL8205Vo.get("F2"), 7, "0"));
 
@@ -285,11 +300,17 @@ public class L8205Report3 extends MakeReport {
 
 				makeExcel.setValue(rowCursor, 8, tL8205Vo.get("F7"));
 
-				makeExcel.setValue(rowCursor, 9,
-						tL8205Vo.get("F11") == "0" || tL8205Vo.get("F11") == null || tL8205Vo.get("F11").length() == 0 || tL8205Vo.get("F11").equals(" ") ? " " : showDate(tL8205Vo.get("F11"), 1));
+				makeExcel
+						.setValue(rowCursor, 9,
+								tL8205Vo.get("F11") == "0" || tL8205Vo.get("F11") == null
+										|| tL8205Vo.get("F11").length() == 0 || tL8205Vo.get("F11").equals(" ") ? " "
+												: showDate(tL8205Vo.get("F11"), 1));
 
-				makeExcel.setValue(rowCursor, 10,
-						tL8205Vo.get("F8") == "0" || tL8205Vo.get("F8") == null || tL8205Vo.get("F8").length() == 0 || tL8205Vo.get("F8").equals(" ") ? " " : showDate(tL8205Vo.get("F8"), 1));
+				makeExcel
+						.setValue(rowCursor, 10,
+								tL8205Vo.get("F8") == "0" || tL8205Vo.get("F8") == null
+										|| tL8205Vo.get("F8").length() == 0 || tL8205Vo.get("F8").equals(" ") ? " "
+												: showDate(tL8205Vo.get("F8"), 1));
 
 				// 經辦說明
 				String EmpNoDesc = tL8205Vo.get("F9");

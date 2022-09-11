@@ -149,14 +149,11 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@PayDate,1)
-T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)T(F,@SubmitKey,1)
+T(F,@TranKey,1)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdRcDate,*)
-T(2,@FdPayDate,*)
+T(2,@FdTranKey,*)
 T(2,@FdStatus,*)
 T(2,@FdSecondRepayYM,*)
-T(2,@FdSubmitKey,*)
 T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
 ! 預設值
@@ -205,7 +202,6 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -217,9 +213,17 @@ T(2,@FdStatus,*)T(2,@FdSecondRepayYM,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0)
 T(2,@FdStatus, )T(2,@FdSecondRepayYM, ),$))
 
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@RcDate,1)T(F,@PayDate,1)
-T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)T(F,@SubmitKey,1)
-,$)
+!CALL()
+C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+IF(#TranKey==A,K(MODIFYBUTTON,修改)
+T(F,@TranKey,1)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
+,
+IF(#TranKey==C,K(MODIFYBUTTON,修改)
+T(F,@TranKey,1)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
+,
+IF(#TranKey==D,K(MODIFYBUTTON,修改)
+T(F,@TranKey,1),T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0),$)
+
 
 #TranKeyX=X,4,L
 IF(#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
@@ -244,6 +248,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -259,6 +264,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 ![協商申請日]
 #RcDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -267,6 +273,7 @@ D(8)
 
 !繳款日期
 #PayDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)

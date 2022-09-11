@@ -143,13 +143,12 @@ K(MODIFYBUTTON,刪除)
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@ApplyDate,1)T(F,@BankId,1)T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
+T(F,@TranKey,1)
+T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
 K(MODIFYBUTTON,修改)
-T(2,@FdApplyDate,*)
-T(2,@FdBankId,*)
 T(2,@FdOwnerYn,*)
 T(2,@FdPayYn,*)
-T(3,@TranKeyHelp,A:新增;X:補件;C:異動;D:刪除))
+T(3,@TranKeyHelp,A:新增;C:異動))
 
 ! 預設值
 #Default=X,1,S
@@ -202,18 +201,32 @@ T(2,@BankIdX,#L8r01JcicBankName)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
+IF(#TranKey_Tmp==7,$,s)
+C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-IF(#TranKey_Tmp==7,K(MODIFYBUTTON,修改)T(F,@TranKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@CloseCode,1)T(F,@CloseDate,1)T(F,@SubmitKey,1),$)
+!C(5,#TranKey,C,T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)K(MODIFYBUTTON,異動)T(2,@FdOwnerYn,*)
+!T(2,@FdPayYn,*),$)
+!C(5,#TranKey,D,T(F,@OwnerYn,0)T(F,@PayYn,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0)K(MODIFYBUTTON,刪除)T(2,@FdOwnerYn,0)
+!T(2,@FdPayYn,0),$)
+
+!CALL()
+!C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),s)
+!C(5,#TranKey,A,T(F,@OwnerYn,1)T(F,@PayYn,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1))K(MODIFYBUTTON,修改)T(2,@FdOwnerYn,*)
+!T(2,@FdPayYn,*),$)
+
+
 
 #TranKeyX=X,4,L
-IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)
+IF(#TranKey_Tmp==7,$,s)
+C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,4,s,$) 
+C(5,#TranKey_Tmp,2,s,$)
 T(H,#TranKey,#TranKeyHelp)
+
 
 ![債務人IDN]
 #CustId=X,10,L
@@ -236,6 +249,7 @@ T(2,@CustIdX,#L8R57CustName)
 
 !申請日期
 #ApplyDate=D,7,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -245,6 +259,7 @@ A(DATE,0,#ApplyDate)
 
 !受理更生款項統一收付之債權金融機構代號
 #BankId=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
