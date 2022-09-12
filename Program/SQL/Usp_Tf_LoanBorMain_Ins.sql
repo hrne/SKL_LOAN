@@ -92,6 +92,7 @@ BEGIN
                       ,"LMSAPN1"
                       ,"LMSASQ1"
              ) AS "NewSeq" -- 以新額度號碼、新撥款序號為基礎的排序
+      FROM T2RawData
     )
     , T2UnionAllData AS (
       SELECT S1."LMSACN"
@@ -100,17 +101,17 @@ BEGIN
             ,S1."RenewFlag"
             ,1 AS "OldNewFlag"
             ,S1."NewSeq" AS "Seq"
-      FROM T2RawData S1
+      FROM T2OrderedData S1
       UNION ALL
       SELECT S1."LMSACN"
             ,S1."LMSAPN1" AS "LMSAPN"-- 原額度號碼
-            ,S1."LMSAPN1" AS "LMSASQ"-- 原撥款序號
+            ,S1."LMSASQ1" AS "LMSASQ"-- 原撥款序號
             ,S1."RenewFlag"
             ,0 AS "OldNewFlag"
             ,S1."OldSeq" AS "Seq"
-      FROM T2RawData S1
+      FROM T2OrderedData S1
     )
-    , T2OrderdData AS (
+    , T2LastOrderdData AS (
       SELECT S1."LMSACN"
             ,S1."LMSAPN"
             ,S1."LMSASQ"
@@ -130,7 +131,7 @@ BEGIN
             ,S1."LMSAPN"
             ,S1."LMSASQ"
             ,S1."RenewFlag"
-      FROM T2OrderdData S1
+      FROM T2LastOrderdData S1
       WHERE "Seq" = 1
     )
     , A1 AS (
