@@ -288,12 +288,16 @@ IF(#OOAdjCode==0,T(2,),T(2,#XOAdjustedRate))
 ! 地區別下限利率
 #OOLowerLimitRate=m,2.4,O
 
-#OORateIncrX=X,9,O
-C(3,#OOContrRateIncr,#OOIndividualIncr,T(2,#XXRateIncr),T(2,#XXRateIncr+#STARSYM))
 
 #OOProcNote=x,300,O
 
 #OOOvduTerm=A,2,O
+
+#OOIncrFlag=X,1,O
+
+#OORateIncrX=X,9,O
+C(5,#OOIncrFlag,Y,T(2,#XXRateIncr),C(3,#OOContrRateIncr,#OOIndividualIncr,$,T(2,#XXRateIncr+#STARSYM)))
+
 
 ! 查詢利率歷程
 #OOBUF_L3932=X,20,S
@@ -380,6 +384,7 @@ TXFORM=L4931
 #OOLowerLimitRate
 #OOProcNote
 #OOOvduTerm
+#OOIncrFlag
 ^
 <include src="ROM.icf::L4R12.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

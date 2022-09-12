@@ -67,9 +67,11 @@ public class L4041Report extends MakeReport {
 		this.print(-4, 5, "報  表：L4041");
 		this.print(-4, 44, "授權資料明細表");
 		this.print(-3, 80, "報表等級：機密");
-		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4);
+		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8)
+				+ "/" + dDateUtil.getNowStringBc().substring(2, 4);
 		this.print(-4, 80, "日　　期：" + bcDate);
-		this.print(-5, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-5, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-6, 80, "頁　　數：　	　" + this.getNowPage());
 	}
 
@@ -103,7 +105,8 @@ public class L4041Report extends MakeReport {
 			if (!"Y".equals(result.get("F13")) && propDate > 0) {
 
 				// 戶號
-				print(1, 3, padStart(result.get("F2"), 7, "0") + " " + FormatUtil.padX(loanCom.getCustNameByNo(parse.stringToInteger(result.get("F2"))), 20));
+				print(1, 3, padStart(result.get("F2"), 7, "0") + " "
+						+ FormatUtil.padX(loanCom.getCustNameByNo(parse.stringToInteger(result.get("F2"))), 20));
 
 				// 扣款人ID
 				print(0, 31, result.get("F7"), "L");
@@ -132,7 +135,7 @@ public class L4041Report extends MakeReport {
 				}
 				print(0, 80, iEmp);
 				// 異動日期
-				print(0, 90, "" + this.showRocDate(titaVo.getEntDyI(), 1));
+				print(0, 90, "" + this.showRocDate(titaVo.getCalDy(), 1));
 
 				// 檢查列數
 				checkRow();

@@ -119,6 +119,7 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OOUpperLimitRate", result.get("UpperLimitRate"));
 				occursList.putParam("OOLowerLimitRate", result.get("LowerLimitRate"));
 				occursList.putParam("OOOvduTerm", result.get("OvduTerm"));
+				occursList.putParam("OOIncrFlag", result.get("IncrFlag"));
 
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(result.get("F34"));

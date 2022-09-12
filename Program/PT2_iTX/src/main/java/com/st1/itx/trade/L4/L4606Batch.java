@@ -20,12 +20,17 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuComm;
 import com.st1.itx.db.domain.InsuCommId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4606ServiceImpl;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
@@ -151,7 +156,8 @@ public class L4606Batch extends TradeBuffer {
 
 //		執行成功者，指向查詢畫面
 		if (isFinished) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4606", "", sendMsg, titaVo);
 		}
@@ -205,7 +211,8 @@ public class L4606Batch extends TradeBuffer {
 				l4606Report4.exec(titaVo, errorList);
 			}
 
-			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt + ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
+			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
+					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
 			printUsedTime("flagB");
 		}
 
@@ -330,7 +337,8 @@ public class L4606Batch extends TradeBuffer {
 			// 轉換資料格式
 			List<String> file = insuCommFileVo.toFile();
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險佣金媒體檔", "LNM23P.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-火險佣金媒體檔", "LNM23P.txt", 2);
 
 			for (String line : file) {
 				makeFile.put(line);
@@ -348,7 +356,8 @@ public class L4606Batch extends TradeBuffer {
 		this.info("insertIntoInsuComm Start ...");
 
 //		String fileName = "874-B1.txt";
-		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA");
+		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA");
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -436,6 +445,15 @@ public class L4606Batch extends TradeBuffer {
 //				this.info("commBase=" + commBase + ", commRate = " + commRate);
 				BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 				tInsuComm.setDueAmt(dueAmt);
+
+//    			如果額度為0的時候也需要入佣金媒體錯誤檔
+				BigDecimal totalCurrentSales = BigDecimal.ZERO;
+				if (dueAmt == totalCurrentSales) {
+					custErrorCnt++;
+					tempOccursList.putParam("ErrorMsg", "額度為0:" + custNo);
+					errorList.add(tempOccursList);
+					continue;
+				}
 
 //				By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
 //				業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
