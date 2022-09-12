@@ -55,7 +55,6 @@ public class L8302 extends TradeBuffer {
 	SendRsp iSendRsp;
 	@Autowired
 	public DataLog iDataLog;
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8302 ");

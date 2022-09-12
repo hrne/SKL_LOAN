@@ -235,9 +235,9 @@ T(2,#OTxSeq)
 T(6A,#Entdy+#TxNo)
 #Txcd=X,5,S
 C(3,#TRN_CODE,1,T(2,L8203),T(2,L8204))
-!交易
-#OOBtnB=X,1,S
-BIND(grid,{ cmd=DDCHECK; ntxcd=#Txcd; txno=#RimData;rim=LCR11})
+!交易-連結顯示原輸入畫面-點掉,由L6932才顯示
+!#OOBtnB=X,1,S
+!BIND(grid,{ cmd=DDCHECK; ntxcd=#Txcd; txno=#RimData;rim=LCR11})
 
 
 </sub>
@@ -290,8 +290,6 @@ TXFORM=L8924
 
 #OOBtnA=變更明細
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:70}
-#OOBtnB=交易
-{width:40,search:false,formatter:'cust:bind-button:交易',canExport:false,align:'center'}
 #OLastUpdate=修改日期
 {width:140,align:'left'}
 #OCustNoX=戶號

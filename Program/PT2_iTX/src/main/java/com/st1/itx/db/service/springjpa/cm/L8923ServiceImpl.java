@@ -59,6 +59,8 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFRecordDateStart = iRecordDateStart + 19110000;
 		int iFRecordDateEnd = iRecordDateEnd + 19110000;
 		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
+		//若iRepayFlag=2代表是L3130連動須找預計還款日
+		int iRepayFlag = this.parse.stringToInteger(titaVo.getParam("CHAIN_Flag"));
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
@@ -81,17 +83,20 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"RepayBank\" as F9					\n"; // 代償銀行
 		sql += ",\"LastUpdateEmpNo\" as F10				\n"; // 更新人員
 		sql += ",CASE WHEN \"LastUpdate\" IS NOT NULL   \n";
-		sql += "      THEN TO_CHAR(\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n";
+		sql += "      THEN TO_CHAR(\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n"; 
 		sql += "      END as F11                        \n"; // 更新時間 yyy/MM/dd HH:mm:ss
 		sql += ",\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",\"Description\" as F13					\n"; // 其他說明
 		sql += ",\"ActualRepayAmt\" as F14				\n"; // 實際還款金額
 		sql += ",\"LogNo\" as F15                       \n";
 		sql += "from \"MlaundryRecord\" 				\n";
-		if (iRecordDateStart > 0) {
+		if (iRecordDateStart > 0 && !(iRepayFlag == 2)) {
 			sql += "where \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
 		}
-		if (iActualRepayDateStart > 0) {
+		if (iRepayFlag == 2) {
+			sql += "where \"RepayDate\" >= :actualRepayDateStart  and \"RepayDate\" <= :actualRepayDateEnd  \n";
+		}
+		if (iActualRepayDateStart > 0 && !(iRepayFlag == 2)) {
 			sql += "where \"ActualRepayDate\" >= :actualRepayDateStart  and \"ActualRepayDate\" <= :actualRepayDateEnd  \n";
 		}
 		if (iCustNo > 0) {
@@ -150,6 +155,8 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFRecordDateStart = iRecordDateStart + 19110000;
 		int iFRecordDateEnd = iRecordDateEnd + 19110000;
 		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
+		//若iRepayFlag=2代表是L3130連動須找預計還款日
+		int iRepayFlag = this.parse.stringToInteger(titaVo.getParam("CHAIN_Flag"));
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
@@ -173,7 +180,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",M.\"RepayBank\" as F9					\n"; // 代償銀行
 		sql += ",M.\"LastUpdateEmpNo\" as F10				\n"; // 更新人員
 		sql += ",CASE WHEN M.\"LastUpdate\" IS NOT NULL   \n";
-		sql += "      THEN TO_CHAR(M.\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n";
+		sql += "      THEN TO_CHAR(M.\"LastUpdate\" - NUMTOYMINTERVAL(1911, 'YEAR'), 'YYY/MM/DD HH24:MI:SS') \n"; 
 		sql += "      END as F11                        \n"; // 更新時間 yyy/MM/dd HH:mm:ss
 		sql += ",M.\"RepayDate\" as F12					\n"; // 預定還款日期
 		sql += ",M.\"Description\" as F13					\n"; // 其他說明
@@ -183,10 +190,13 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iCustName.isEmpty() && iCustNo == 0) {
 			sql += "left join \"CustMain\" C on C.\"CustNo\" = M.\"CustNo\" \n";
 		}
-		if (iRecordDateStart > 0) {
+		if (iRecordDateStart > 0 && !(iRepayFlag == 2)) {
 			sql += "where M.\"RecordDate\" >= :recordDateStart and M.\"RecordDate\" <= :recordDateEnd  \n";
 		}
-		if (iActualRepayDateStart > 0) {
+		if (iRepayFlag == 2) {
+			sql += "where \"RepayDate\" >= :actualRepayDateStart  and \"RepayDate\" <= :actualRepayDateEnd  \n";
+		}
+		if (iActualRepayDateStart > 0 && !(iRepayFlag == 2)) {
 			sql += "where M.\"ActualRepayDate\" >= :actualRepayDateStart  and M.\"ActualRepayDate\" <= :actualRepayDateEnd  \n";
 		}
 		if (iCustNo > 0) {

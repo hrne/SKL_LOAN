@@ -2,6 +2,8 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -80,33 +82,40 @@ public class L8922 extends TradeBuffer {
 
 		// 查詢疑似洗錢交易合理性明細檔檔
 		Slice<MlaundryDetail> slMlaundryDetail = null;
-		if (iType == 1) {
+		if (iType == 1)
+		{
 			int iAcDateStart = this.parse.stringToInteger(titaVo.getParam("AcDateStart"));
 			int iAcDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDateEnd"));
 			int iFAcDateStart = iAcDateStart + 19110000;
 			int iFAcDateEnd = iAcDateEnd + 19110000;
 			this.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
 			slMlaundryDetail = sMlaundryDetailService.findbyDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
-		} else if (iType == 2) {
+		} else if (iType == 2)
+		{
 			slMlaundryDetail = sMlaundryDetailService.findAll(0, Integer.MAX_VALUE, titaVo);
 		}
-
+		
 		List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null : slMlaundryDetail.getContent();
 
 		if (lMlaundryDetail == null || lMlaundryDetail.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "疑似洗錢交易合理性明細檔"); // 查無資料
 		}
-
+		
 		boolean hasOutput = false;
 		// 如有找到資料
 		for (MlaundryDetail tMlaundryDetail : lMlaundryDetail) {
-
-			if (iType == 2) {
-				// 未完成時只接受 ManagerCheck 不為 Y 者
-				if ("Y".equals(tMlaundryDetail.getManagerCheck()))
+			
+			if (iType == 2)
+			{
+				// 未完成:1.主管覆核記號ManagerCheck=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
+				int mangerdate = tMlaundryDetail.getManagerDate();
+				dateUtil.init();
+				int retxdate = dateUtil.getbussDate(tMlaundryDetail.getEntryDate(), 4);
+				if ("Y".equals(tMlaundryDetail.getManagerCheck()) && !(mangerdate >= retxdate)) {
 					continue;
+				}
 			}
-
+			
 			OccursList occursList = new OccursList();
 
 			// 0:全部;1:樣態1;2:樣態2;3:樣態3 -> 不等時找下一筆
@@ -121,7 +130,7 @@ public class L8922 extends TradeBuffer {
 				// 經辦未輸入合理性,主管查不出來
 				this.info("L8922 Rational" + tMlaundryDetail.getRational());
 				if (tMlaundryDetail.getRational().trim().isEmpty()) {
-					this.info("Rational 空白");
+					//this.info("合理性記號Rational 空白");
 					continue;
 				}
 				break;
@@ -154,40 +163,42 @@ public class L8922 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOManagerDate", tMlaundryDetail.getManagerDate()); // 主管同意日期
 			}
-
+			
 			// 先檢查是否有訪談, Y/N
 			titaVo.putParam("CustNo", tMlaundryDetail.getCustNo());
 			titaVo.putParam("ActualRepayDateStart", tMlaundryDetail.getEntryDate());
 			titaVo.putParam("ActualRepayDateEnd", tMlaundryDetail.getEntryDate());
 			titaVo.putParam("RecordDateStart", 0);
 			titaVo.putParam("RecordDateEnd", 0);
-
+			
 			// 訪談按鈕顯示邏輯：該戶號有Record訪談日期大於Detail入帳日期的資料時，就有訪談資料
 			MlaundryRecord MlaundryRecord = sMlaundryRecordService.findCustNoAndRecordDateFirst(tMlaundryDetail.getCustNo(), tMlaundryDetail.getEntryDate() + 19110000, 99991231, titaVo);
-
+			
 			occursList.putParam("OOHasL8923", MlaundryRecord != null ? "Y" : "N");
+			
 
 			DateTime = this.parse.timeStampToString(tMlaundryDetail.getLastUpdate()); // 異動日期
 			this.info("L8922 DateTime : " + DateTime);
 			Date = FormatUtil.left(DateTime, 9);
 			occursList.putParam("OOUpdate", Date);
-
+			
+			
 			// 歷程按鈕顯示或隱藏
-			Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByCustNo1(tMlaundryDetail.getEntryDate() + 19110000, parse.stringToInteger(titaVo.getCalDy()) + 19110000, "L8203",
-					tMlaundryDetail.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
-			List<TxDataLog> lTxDataLog = slTxDataLog == null ? new ArrayList<TxDataLog>() : slTxDataLog.getContent();
-
-			boolean hasResult = false;
-
-			for (TxDataLog txDataLog : lTxDataLog) {
-				if (txDataLog.getMrKey()
-						.equals((tMlaundryDetail.getEntryDate()) + "-" + parse.IntegerToString(tMlaundryDetail.getFactor(), 2) + "-" + parse.IntegerToString(tMlaundryDetail.getCustNo(), 7))) {
-					hasResult = true;
-					break;
-				}
-			}
-
-			occursList.putParam("OOHasHistory", hasResult ? "Y" : "N");
+			 Slice<TxDataLog> slTxDataLog = sTxDataLogService.findByCustNo1(tMlaundryDetail.getEntryDate() + 19110000, parse.stringToInteger(titaVo.getCalDy()) + 19110000, "L8203", tMlaundryDetail.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			 List<TxDataLog> lTxDataLog = slTxDataLog == null ? new ArrayList<TxDataLog>() : slTxDataLog.getContent();
+			 
+			 boolean hasResult = false;
+			 
+			 for (TxDataLog txDataLog : lTxDataLog)
+			 {
+				 if (txDataLog.getMrKey().equals((tMlaundryDetail.getEntryDate()) + "-" + parse.IntegerToString(tMlaundryDetail.getFactor(), 2) + "-" + parse.IntegerToString(tMlaundryDetail.getCustNo(), 7)))
+				 {
+					 hasResult = true;
+					 break;
+				 }
+			 }
+			 
+			 occursList.putParam("OOHasHistory", hasResult ? "Y" : "N");
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
@@ -199,8 +210,9 @@ public class L8922 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-
-		if (!hasOutput) {
+		
+		if (!hasOutput)
+		{
 			this.error("Tried to output, but hasOutput == false...");
 			throw new LogicException(titaVo, "E0001", "疑似洗錢交易合理性明細檔"); // 實際上沒有任何輸出, 視為查無資料
 		}

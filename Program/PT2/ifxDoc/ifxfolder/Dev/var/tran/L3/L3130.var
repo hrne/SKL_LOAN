@@ -555,11 +555,11 @@ T(H,#BookStatus,#BookStatusHelp)
 
 #LogNo=A,20,S
 
-!新增修改複製送出後自動連動L8204疑似洗錢交易訪談記錄維護
+!新增修改複製送出後自動連動L8204疑似洗錢交易訪談記錄維護,連動L8923增加連動參數2代表預定還款日
 #NTXBUF1=X,62,S
 C(3,#FuncCode,1,T(2,1+#SysDate+#CustNo+#FacmNo+#BormNo+#BookDate+#LogNo+#TimBookAmt)ASGN(NTXBUF$),$)
-C(3,#FuncCode,2,T(2,#OldBookDate+#OldBookDate+#CustNo)ASGN(NTXBUF$),$)
-C(3,#FuncCode,4,T(2,#OldBookDate+#OldBookDate+#CustNo)ASGN(NTXBUF$),$)
+C(3,#FuncCode,2,T(2,#OldBookDate+#OldBookDate+#CustNo+2)ASGN(NTXBUF$),$)
+C(3,#FuncCode,4,T(2,#OldBookDate+#OldBookDate+#CustNo+2)ASGN(NTXBUF$),$)
 
 
 #TmpNTXCD=X,5,S

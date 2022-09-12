@@ -290,7 +290,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8926;text=查詢;ntxbuf=#OOBUF6})
 E(0,#SYSCDATE)
 
 #OOBUFL8923=X,100,S
-T(2,#OOAcDate+#TodayCDate+#OOCustNo)
+T(2,#OOAcDate+#TodayCDate+#OOCustNo+1)
 !事後新增訪談L8204-帶入畫面[戶號]+[入帳日期]+[累積金額]
 #OOBUFL8204=X,100,S
 T(2,1+#TodayCDate+#OOCustNo+000000+#OOAcDate+00000000000000000000+#OOTotalAmt)

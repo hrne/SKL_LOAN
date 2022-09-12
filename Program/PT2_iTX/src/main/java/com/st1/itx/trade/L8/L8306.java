@@ -173,7 +173,7 @@ public class L8306 extends TradeBuffer {
 
 			Slice<JcicZ045Log> dJcicLogZ045 = null;
 			dJcicLogZ045 = sJcicZ045LogService.ukeyEq(iJcicZ045.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-			if (dJcicLogZ045 == null || ("A".equals(iTranKey) && dJcicLogZ045 == null)) {
+			if (dJcicLogZ045 == null || "A".equals(iTranKey)) {
 				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ045Service.delete(iJcicZ045, titaVo);

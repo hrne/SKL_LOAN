@@ -345,6 +345,7 @@ public class L8303 extends TradeBuffer {
 			uJcicZ0422.setCreditCardOther(iCreditCardOther);
 			uJcicZ0422.setOutJcicTxtDate(0);
 
+			
 			Slice<JcicZ042Log> dJcicLogZ042 = null;
 			dJcicLogZ042 = sJcicZ042LogService.ukeyEq(iJcicZ042.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ042 == null || "A".equals(iTranKey)) {
