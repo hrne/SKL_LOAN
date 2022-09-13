@@ -107,6 +107,7 @@ public class L4211Report extends MakeReport {
 
 	String txCode = "";
 	String reportName = "";
+	int printNo = 0;
 
 	// 表頭右側對齊
 	int rightSd = 190;
@@ -178,14 +179,19 @@ public class L4211Report extends MakeReport {
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	};
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo,int printNo) throws LogicException {
 
-		this.info("titaVo.get(\"ReportNo\")=" + titaVo.get("ReportNo"));
 
+//		printNo
+//		1 匯款總傳票明細表
+//		2入帳後檢核明細表
+//		3 人工處理明細表
+		this.printNo = printNo;
+		
 		List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
 
 		try {
-			fnAllList = l4211ARServiceImpl.findAll(titaVo);
+			fnAllList = l4211ARServiceImpl.findAll(titaVo,printNo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -270,22 +276,42 @@ public class L4211Report extends MakeReport {
 		if (txCode == null || txCode.trim().isEmpty()) {
 			txCode = titaVo.getTxcd();
 		}
-		int reportNo = 0;
-		if (!"L420A".equals(txCode)) {
-			if (titaVo.get("ReportNo") != null) {
-				reportNo = Integer.valueOf(titaVo.get("ReportNo"));
-			}
-		}
+//		int reportNo = 0;
+//		if (!"L420A".equals(txCode)) {
+//			if (titaVo.get("ReportNo") != null) {
+//				reportNo = Integer.valueOf(titaVo.get("ReportNo"));
+//			}
+//		}
 
-		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表" : (reportNo == 1 ? "匯款總傳票明細表" : "入帳後檢核明細表");
+		
+		if("L420A".equals(txCode)) {
+			reportName =  "匯款轉帳檢核明細表";
+		}else if(printNo == 1) {
+			reportName =  "匯款總傳票明細表";
+		}else if(printNo == 2) {
+			reportName =  "入帳後檢核明細表";
+		}else if(printNo == 3) {
+			reportName =  "人工處理明細表";
+		}
+		
+		
+//		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表"
+//				: (reportNo == 1 || printNo == 1 ? "匯款總傳票明細表" : (printNo == 3 ? "人工處理明細表" : "入帳後檢核明細表"));
 		acdate = titaVo.get("AcDate");
 
 		if (fnAllList1.size() == 0) {
 			throw new LogicException("E2003", "查無資料"); // 查無資料
 		}
+		
+//		printNo
+//		1 匯款總傳票明細表
+//		2入帳後檢核明細表
+//		3 人工處理明細表
 
+		this.info("printNo=" + printNo);
 		this.info("titaVo.getEntDyI()=" + titaVo.getEntDyI());
 		this.info("txCode=" + txCode);
+		this.info("reportName" + reportName);
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
 				.setRptCode(txCode).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
@@ -552,12 +578,12 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, c6, name);
-			
+
 			String CloseReasonCodeText = "";
-			if(!"00".equals(tfnAllList.get("CloseReasonCode"))) {
+			if (!"00".equals(tfnAllList.get("CloseReasonCode"))) {
 				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
 			}
-			
+
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
@@ -910,14 +936,14 @@ public class L4211Report extends MakeReport {
 				name = name.substring(0, 5);
 			}
 			this.print(0, c6, name);
-			
+
 			String CloseReasonCodeText = "";
-			if(!"00".equals(tfnAllList.get("CloseReasonCode"))) {
+			if (!"00".equals(tfnAllList.get("CloseReasonCode"))) {
 				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
 			}
-			
+
 			this.print(0, c6 + 9, CloseReasonCodeText);
-			
+
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期
 				this.print(0, c7, "-" + showRocDate(tfnAllList.get("IntEndDate"), 1));// 起日與迄日
 
@@ -981,7 +1007,7 @@ public class L4211Report extends MakeReport {
 			if (count == fnAllList.size()) {
 				this.print(1, 0,
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (lastSortingForSubTotal.equals("999") ) {
+				if (lastSortingForSubTotal.equals("999")) {
 					this.print(1, 2, "暫收款");
 				} else {
 					this.print(1, 2, lastAcctItem);
@@ -1266,10 +1292,10 @@ public class L4211Report extends MakeReport {
 			}
 			this.print(0, c6, name);
 			String CloseReasonCodeText = "";
-			if(!"00".equals(tfnAllList.get("CloseReasonCode"))) {
+			if (!"00".equals(tfnAllList.get("CloseReasonCode"))) {
 				CloseReasonCodeText = tfnAllList.get("CloseReasonCode");
 			}
-			
+
 			this.print(0, c6 + 9, CloseReasonCodeText);
 
 			if ("999/12/31".equals(showRocDate(tfnAllList.get("IntStartDate"), 1))) { // 表繳短收的錢改空白日期

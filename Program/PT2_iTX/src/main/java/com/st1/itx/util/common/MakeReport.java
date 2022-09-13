@@ -124,6 +124,8 @@ public class MakeReport extends CommBuffer {
 	// 目前頁數
 	private int nowPage;
 
+	private int headerPrintPage;
+
 	// 目前row位置
 	public int NowRow; // TODO: 改為 getNowRow
 
@@ -198,10 +200,10 @@ public class MakeReport extends CommBuffer {
 		if (!reportVo.isUseDefault() && printCnt == 0) {
 			this.print(1, 1, "無資料!!!");
 		}
-		if (this.nowPage > 0 && !reportVo.isUseDefault()) {
+		if (this.nowPage > 0) {
 			this.printFooter();
 		}
-		if (this.batchNo.isEmpty() && !formMode) {
+		if (this.batchNo.isEmpty()) {
 			return newFile();
 		} else {
 			return findSameBatchNoAndAppendTxFileData();
@@ -347,8 +349,9 @@ public class MakeReport extends CommBuffer {
 	 * @return col for print
 	 */
 	public int getMidXAxis() {
-		this.info("getMidXAxis fontSize = " + this.fontSize);
-		this.info("getMidXAxis charSpaces = " + this.currentCharSpaces);
+//		this.info("getMidXAxis fontSize = " + this.fontSize);
+//		this.info("getMidXAxis charSpaces = " + this.currentCharSpaces);
+//		this.info("getMidXAxis pageOrientation = " + this.pageOrientation);
 		int fontWidth = this.fontSize / 2 + this.currentCharSpaces; // 實際產檔時這邊存成 int, 因此這裡也用 int 以便完全模擬回去
 		float paperWidthPt = ("P".equals(this.pageOrientation) ? 8.3f : 11.7f) * 72f;
 		float paperWidthPtHalf = paperWidthPt / 2f;
@@ -442,6 +445,7 @@ public class MakeReport extends CommBuffer {
 		this.nowTime = dDateUtil.getNowStringTime();
 
 		this.nowPage = 0;
+		this.headerPrintPage = 0;
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 0);
@@ -482,6 +486,7 @@ public class MakeReport extends CommBuffer {
 		this.nowTime = dDateUtil.getNowStringTime();
 
 		this.nowPage = 1;
+		this.headerPrintPage = 0;
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 9);
@@ -560,9 +565,16 @@ public class MakeReport extends CommBuffer {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 
 		if (reportVo.isUseDefault()) {
+//			this.info("newPage nowPage = " + nowPage);
+			if (this.nowPage > 0) {
+				this.printContinueNext();
+				this.printFooter();
+			}
 			this.nowPage++;
+			this.printHeader();
 			map.put("type", 1);
 			listMap.add(map);
+			printTitle();
 			return;
 		}
 
@@ -1013,7 +1025,6 @@ public class MakeReport extends CommBuffer {
 	}
 
 	private int printProw(int row) {
-
 		int prow = 0;
 
 		if (row < 0) {
@@ -1033,6 +1044,12 @@ public class MakeReport extends CommBuffer {
 			// nothing
 		} else if (this.nowPage == 0 || this.NowRow > (this.rptBeginRow + this.rptTotalRows - 1)) {
 			newPage();
+			this.NowRow += row;
+			prow = this.NowRow;
+		} else if (this.reportVo.isUseDefault() && this.headerPrintPage < this.nowPage) {
+			this.printHeader();
+			this.printTitle();
+			this.headerPrintPage++;
 			this.NowRow += row;
 			prow = this.NowRow;
 		}

@@ -74,7 +74,7 @@ public class CustRmkCom extends TradeBuffer {
 				if (cdEmp != null) {
 					emp += " " + cdEmp.getFullname();
 				}
-				s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + "<br>" + custRmk.getRmkDesc() + "<br>";
+				s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + " [" + custRmk.getRmkDesc() + "]<br>";
 				//s += custRmk.getRmkDesc() + " ("+ emp + " " + parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
 			}
 

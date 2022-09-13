@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -23,64 +24,59 @@ import com.st1.itx.util.parse.Parse;
 public class L8205Report4 extends MakeReport {
 
 	@Autowired
-	public L8205ServiceImpl l8205ServiceImpl;
-
-	@Autowired
-	DateUtil dDateUtil;
+	L8205ServiceImpl l8205ServiceImpl;
 
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	Parse parse;
 
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
 
 	@Autowired
 	MakeExcel makeExcel;
 
-	private List<Map<String, String>> L8205List = null;
+	private List<Map<String, String>> listL8205 = null;
+
+	private String stEntryDate;
+	private String edEntryDate;
 
 //	自訂表頭
 	@Override
 	public void printHeader() {
-
-		this.info("MakeReport.printHeader");
-
-		printHeaderL();
-
+		printHeaderCustomerize();
 		// 明細起始列(自訂亦必須)
-		this.setBeginRow(11);
-
+		this.setBeginRow(18);
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(58);
+		this.setMaxRows(50);
 	}
 
-	public void printHeaderL() {
-		this.print(-3, 5, "程式ID：" + this.getParentTranCode());
-		this.print(-3, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
-		this.print(-4, 5, "報  表：" + this.getRptCode());
-		this.print(-4, this.getMidXAxis(), "洗錢樣態1、2未完成交易確認報表", "C");
-		this.print(-3, 80, "報表等級：機密");
+	public void printHeaderCustomerize() {
+		this.print(-4, 3, "程式ID：" + this.getParentTranCode());
+		this.print(-4, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
+		this.print(-5, 3, "報  表：" + this.getRptCode());
+		this.print(-5, this.getMidXAxis(), "洗錢樣態1、2未完成交易確認報表", "C");
+		this.print(-4, 80, "報表等級：機密");
 		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8)
 				+ "/" + dDateUtil.getNowStringBc().substring(2, 4);
-		this.print(-4, 80, "日　　期：" + bcDate);
-		this.print(-5, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+		this.print(-5, 80, "日　　期：" + bcDate);
+		this.print(-6, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
-		this.print(-6, 80, "頁　　數：　	　" + this.getNowPage());
+		this.print(-7, 80, "頁　　數：　	　" + this.getNowPage());
+		this.print(-7, this.getMidXAxis(), stEntryDate + "－" + edEntryDate, "C");
+		this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
+		this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 	}
 
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-
-		print(-68, 1, "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "P");
-
+		print(-66, this.getMidXAxis(), "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "C");
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
-
 		try {
-			L8205List = l8205ServiceImpl.L8205Rpt4(titaVo);
+			listL8205 = l8205ServiceImpl.L8205Rpt4(titaVo);
 
 		} catch (Exception e) {
 			this.info("l8205ServiceImpl.L8205Rpt4 error = " + e.toString());
@@ -90,43 +86,34 @@ public class L8205Report4 extends MakeReport {
 
 		makeExcel(titaVo);
 
-		if (L8205List != null && L8205List.size() > 0) {
-			return true;
-		} else {
-			return false;
-		}
-
+		return (listL8205 != null && !listL8205.isEmpty());
 	}
 
 	public void makeReport(TitaVo titaVo) throws LogicException {
 
 		// 入帳日區間 Min
-		String stEntryDate = titaVo.getParam("DateStart");
+		stEntryDate = titaVo.getParam("DateStart");
 		stEntryDate = stEntryDate.substring(0, 3) + "/" + stEntryDate.substring(3, 5) + "/"
 				+ stEntryDate.substring(5, 7);
 
 		// 入帳日區間 Max
-		String edEntryDate = titaVo.getParam("DateEnd");
+		edEntryDate = titaVo.getParam("DateEnd");
 		edEntryDate = edEntryDate.substring(0, 3) + "/" + edEntryDate.substring(3, 5) + "/"
 				+ edEntryDate.substring(5, 7);
 		// 筆數計算
 		int icount = 0;
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態1、2未完成交易確認報表", "", "A4", "P");
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setSecurity("機密").setRptCode("L8205").setRptItem("洗錢樣態1、2未完成交易確認報表").setPageOrientation("P")
+				.setUseDefault(true).build();
+
+		this.open(titaVo, reportVo, "A4直式底稿.pdf");
 		// 未完成:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
 
-		if (L8205List != null && L8205List.size() > 0) {
+		if (listL8205 != null && listL8205.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
-			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-//			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
-			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
-			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-
-			for (Map<String, String> tL8205Vo : L8205List) {
-
-				// 檢查列數
-				checkRow(stEntryDate, edEntryDate);
+			for (Map<String, String> tL8205Vo : listL8205) {
 
 				int mangerdate = Integer.parseInt(tL8205Vo.get("F10"));
 				this.info("mangerdate==" + mangerdate);
@@ -136,7 +123,7 @@ public class L8205Report4 extends MakeReport {
 					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 4);
 					this.info("retxdate=" + retxdate);
 					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
-					if (!(mangerdate >= retxdate)) {
+					if (mangerdate < retxdate) {
 						continue;
 					}
 				}
@@ -230,23 +217,14 @@ public class L8205Report4 extends MakeReport {
 				icount = icount + 1;
 			}
 			if (icount > 0) {
-				print(1, 50, "【合　計：　" + icount + "　筆】", "C");
+				print(1, this.getMidXAxis(), "【合　計：　" + icount + "　筆】", "C");
 			}
 
 		} else {
 			this.print(1, 3, "本日無資料");
-			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-//			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
-			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
-			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-
 		}
 
-//		if (icount > 0) {
-//			this.print(-65, 50, "===== 報　表　結　束 =====" + "　　　【合　計：　" + icount + "　筆】", "C");
-//		} else {
-		this.print(-65, 50, "===== 報　表　結　束 =====", "C");
-//		}
+		this.print(-64, this.getMidXAxis(), "===== 報　表　結　束 =====", "C");
 
 		long sno = this.close();
 		this.toPdf(sno);
@@ -260,9 +238,9 @@ public class L8205Report4 extends MakeReport {
 
 		int rowCursor = 2;
 
-		if (L8205List != null && L8205List.size() > 0) {
+		if (listL8205 != null && listL8205.size() > 0) {
 
-			for (Map<String, String> tL8205Vo : L8205List) {
+			for (Map<String, String> tL8205Vo : listL8205) {
 
 				int mangerdate = Integer.parseInt(tL8205Vo.get("F10"));
 				this.info("mangerdate==" + mangerdate);
@@ -341,25 +319,6 @@ public class L8205Report4 extends MakeReport {
 			}
 		}
 		return temp;
-	}
-
-	/**
-	 * 檢查列數
-	 * 
-	 * @param stEntryDate 日期 區間-起
-	 * @param edEntryDate 日期 區間-止
-	 */
-	private void checkRow(String stEntryDate, String edEntryDate) {
-		this.info("NowRow==" + this.NowRow);
-		if (this.NowRow >= 61) {
-			this.info("into NowRow");
-			newPage();
-			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
-//			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");
-			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　同意日　　　異動日");
-			this.print(-10, 3, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-		}
-
 	}
 
 	private String showDate(String date, int iType) {

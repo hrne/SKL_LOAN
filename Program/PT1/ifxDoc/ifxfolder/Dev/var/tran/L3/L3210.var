@@ -960,6 +960,7 @@ E(0,@RP_CUSTNO,#TimCustNo)
 
 ! 額度
 #TempFacmNo2=X,1,S
+IF(#TempReasonCode==3||#TempReasonCode==8,$,s)
 E(0,@RP_FACMNO,#FacmNo)
 
 ! 支票帳號

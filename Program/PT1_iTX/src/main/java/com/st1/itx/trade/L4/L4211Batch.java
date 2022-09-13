@@ -57,17 +57,53 @@ public class L4211Batch extends TradeBuffer {
 		this.info("active L4211Batch ");
 		this.totaVo.init(titaVo);
 
-		if ("1".equals(titaVo.get("FunctionCode"))) {
-			// 產生匯款總傳票明細表
+		String functionCode = titaVo.get("FunctionCode");
+
+		this.info("functionCodeXXXX = " + functionCode);
+		if ("0".equals(functionCode)) {
+			// 全部
 
 			try {
-				l4211Report.exec(titaVo);
+//				printNo
+//				1 匯款總傳票明細表
+//				2入帳後檢核明細表
+//				3 人工處理明細表
+				l4211Report.exec(titaVo, 1);
+				l4211Report.exec(titaVo, 2);
+				l4211Report.exec(titaVo, 3);
+				
 			} catch (LogicException e) {
 				sendMsg = e.getErrorMsg();
 				flag = false;
 			}
 
-		} else {
+		} else if ("1".equals(functionCode)) {
+			// 產生匯款總傳票明細表
+			// 入帳後檢核明細表
+			String reportNo = titaVo.get("ReportNo");
+			this.info("reportNoXXXX = " + reportNo);
+			try {
+				if ("1".equals(reportNo)) {
+					l4211Report.exec(titaVo, 1);
+				} else {
+					l4211Report.exec(titaVo, 2);
+				}
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+
+		} else if ("2".equals(functionCode)) {
+			// 人工處理明細表
+
+			try {
+				l4211Report.exec(titaVo, 3);
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+
+		} else if ("3".equals(functionCode)) {
 			// 產生匯款總傳票明細表依戶號排序
 
 			try {
@@ -92,9 +128,11 @@ public class L4211Batch extends TradeBuffer {
 
 			sendMsg = "L4211-報表已完成";
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4211", sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4211", sendMsg, titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4211", "", sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4211", "", sendMsg,
+					titaVo);
 		}
 	}
 

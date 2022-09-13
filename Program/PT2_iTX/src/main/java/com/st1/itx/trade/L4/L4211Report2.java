@@ -18,6 +18,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4211BServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -78,6 +79,9 @@ public class L4211Report2 extends MakeReport {
 	private int tottimes7 = 0;
 	private int totaltimes = 0;
 
+	String txCode = "";
+	String reportName = "";
+
 	@Override
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
@@ -98,7 +102,8 @@ public class L4211Report2 extends MakeReport {
 		this.print(-2, 80, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //			月/日/年(西元後兩碼)
-		this.print(-2, 165, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-2, 165, "日    期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 3, "報  表 ：" + "L4211B");
 		this.print(-3, 83, "匯款轉帳失敗表 ----(									)", "C");
 
@@ -108,7 +113,8 @@ public class L4211Report2 extends MakeReport {
 			this.print(-3, 90, ReconCode);// 存摺代號(表頭)A1~A7 (P03銀行存款－新光匯款轉帳)
 		}
 
-		this.print(-3, 165, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 165, "時    間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 148, "頁    數：" + this.getNowPage());
 		this.print(-5, 64, "入帳日期 :           ");
 
@@ -125,16 +131,21 @@ public class L4211Report2 extends MakeReport {
 		this.print(-5, 74, year + "/" + month + "/" + date);
 
 		this.print(-5, 159, "單    位：元", "R");
-		this.print(-8, 1, "    匯款日    匯款序號  		          匯款金額     	 匯款銀行      戶號      戶名         	     連絡電話       	       會計日期         交易序號  	     備註 ");
+		this.print(-8, 1,
+				"    匯款日    匯款序號  		          匯款金額     	 匯款銀行      戶號      戶名         	     連絡電話       	       會計日期         交易序號  	     備註 ");
 		this.print(-9, 0,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		this.info("exec   =" + titaVo.toString());
 		long sno = 0;
+		
+		txCode = "L4211";
+		reportName = "匯款轉帳失敗表";
 
+		this.info("exec   =" + titaVo.toString());
+	
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 		try {
 			fnAllList = l4211BRServiceImpl.findAll(titaVo);
@@ -145,7 +156,12 @@ public class L4211Report2 extends MakeReport {
 		}
 
 		if (fnAllList.size() != 0) {
-			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款轉帳失敗表", "", "A4", "L");
+//		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4211", "匯款轉帳失敗表", "", "A4", "L");
+
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
+					.setRptCode(txCode).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
+
+			this.open(titaVo, reportVo);
 
 			entrydate = titaVo.get("EntryDate");
 
@@ -265,7 +281,7 @@ public class L4211Report2 extends MakeReport {
 
 			} // for
 
-			sno = this.close();
+			sno =this.close();
 			this.toPdf(sno);
 		} else {
 			throw new LogicException("E2003", "查無資料"); // 查無資料
