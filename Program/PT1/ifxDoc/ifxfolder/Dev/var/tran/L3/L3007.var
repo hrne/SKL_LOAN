@@ -403,6 +403,9 @@ T(3,)T(H,#OOStatusCode,#ChequeStatusCodeHelp)
 
 #OOChequeBranch=X,20,O
 
+#OOReceiveDate=D,7,O
+C(3,#OOReceiveDate,0,S,$)
+
 #OOEntryDate=D,7,O
 C(3,#OOEntryDate,0,S,$)
 
@@ -428,7 +431,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3943; ntxbuf=#OOBUF1})
 <sub type="TOM">
 
 TXFORM=L3007
-#OOChequeAcct#OOChequeNo#OOCurrencyCode#OOChequeAmt#OOChequeDate#OOStatusCode#OOChequeBank#OOChequeBranch#OOEntryDate
+#OOChequeAcct#OOChequeNo#OOCurrencyCode#OOChequeAmt#OOChequeDate#OOStatusCode#OOChequeBank#OOChequeBranch#OOEntryDate#OOReceiveDate
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -486,6 +489,9 @@ TXFORM=L3007
 
 #OOEntryDate=入帳日期
 {width:180,align:'left'}
+
+#OOReceiveDate=收票日
+{width:180,align:'left'}
 ^
 
 #RPTFG=3,QUERY.GRID,L3008
@@ -519,6 +525,9 @@ TXFORM=L3007
 {width:180,align:'left'}
 
 #OOEntryDate=入帳日期
+{width:180,align:'left'}
+
+#OOReceiveDate=收票日
 {width:180,align:'left'}
 ^
 

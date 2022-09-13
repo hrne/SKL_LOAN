@@ -42,8 +42,8 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 !T(1,@FunctionCode,#NTXBUF,1,1)
 
-#FunctionCodeHelp=X,20,S
-T(3,1:成功;2:失敗)
+#FunctionCodeHelp=X,30,S
+T(3,0:全部;1:成功;2:人工;3:失敗)
 
 ! 作業項目
 #FunctionCode=A,1,I
@@ -53,25 +53,29 @@ HELP(#FunctionCodeHelp)
 #FunctionCodeX=X,10,L
 T(H,#FunctionCode,#FunctionCodeHelp)
 
+!0.全部：隱藏報表種類
+!1.成功：隱藏入帳日期
+!2.人工：隱藏入帳日期、報表種類
+!3.失敗：隱藏會計日期、報表種類
 #CheckHide=X,1,S
-IF(#FunctionCode == 1,INVOKEJS(SHOW,L4211,3,3,0),INVOKEJS(SHOW,L4211,3,3,1))
-IF(#FunctionCode == 2,INVOKEJS(SHOW,L4211,2,2,0),INVOKEJS(SHOW,L4211,2,2,1))
-IF(#FunctionCode == 2,INVOKEJS(SHOW,L4211,5,5,0),INVOKEJS(SHOW,L4211,5,5,1))
+IF(#FunctionCode == 3 ,INVOKEJS(SHOW,L4211,2,2,0),INVOKEJS(SHOW,L4211,2,2,1))
+IF(#FunctionCode == 1 || #FunctionCode == 2 || #FunctionCode == 0,INVOKEJS(SHOW,L4211,3,3,0),INVOKEJS(SHOW,L4211,3,3,1))
+IF(#FunctionCode == 0 || #FunctionCode == 2 || #FunctionCode == 3,INVOKEJS(SHOW,L4211,5,5,0),INVOKEJS(SHOW,L4211,5,5,1))
 
 ! 會計日期
 #AcDate=D,7,I
-C(3,#FunctionCode,1,$,S)
+C(3,#FunctionCode,0,$,C(3,#FunctionCode,1,$,C(3,#FunctionCode,2,$,S)))
 E(0,#SYSDATE)
 @V(7)A(DATE,0,#AcDate)
 
-! 入帳日
+! 入帳日 
 #EntryDate=D,7,I
-C(3,#FunctionCode,2,$,S)
+C(3,#FunctionCode,3,$,S)
 E(0,@EntryDate,#SYSDATE)
 @V(7)A(DATE,0,#EntryDate)
 
 #ReconCodeHelp=X,100,S
-T(3,A1:企金;A2:期款;A3:還本;A6:債協;A7:前置協商收款專戶; :查全部)
+T(3,A1:企金;A2:期款;A3:還本;A6:債協;A7:前置協商收款專戶; :全部)
 
 #ReconCode=X,3,I
 HELP(#ReconCodeHelp)

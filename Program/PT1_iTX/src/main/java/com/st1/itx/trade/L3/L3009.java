@@ -105,6 +105,8 @@ public class L3009 extends TradeBuffer {
 			occursList.putParam("OOChequeAmt", tLoanCheque.getChequeAmt());
 			occursList.putParam("OOCustNo", tLoanCheque.getCustNo());
 			occursList.putParam("OOStatusCode", tLoanCheque.getStatusCode());
+			occursList.putParam("OOReceiveDate", tLoanCheque.getReceiveDate());
+			
 			// 查詢客戶資料主檔
 			CustMain tCustMain = custMainService.custNoFirst(tLoanCheque.getCustNo(), tLoanCheque.getCustNo(), titaVo);
 			if (tCustMain == null) {

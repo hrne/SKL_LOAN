@@ -316,7 +316,7 @@ E(0,#RP_FACMNO)
 
 ! 分行調rim
 #PreBankCode=x,30,S
-IF(#RPTYPZ==04,T(2,),IF(#RPTYPZ==11,T(2,1030000臺灣新光商業銀行),T(2,)))
+IF(#RPTYPZ==04,T(2,),IF(#RPTYPZ==11,T(2,103    臺灣新光商業銀行),T(2,)))
 
 #RpBankHelp=x,50000,S
 #RpBranchCode4Help=x,50000,S
