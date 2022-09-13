@@ -518,7 +518,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可暫收筆數、未執行訂正
-					if (tempVo.get("EraseCnt") != null) {
+					if (tempVo.get("EraseCnt") == null) {
 						if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
 								|| tBatxDetail.getProcStsCode().equals("4")) {
 							if (canTempCnt.containsKey(grp3)) {
