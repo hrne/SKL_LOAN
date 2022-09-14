@@ -202,7 +202,7 @@ public class L3005 extends TradeBuffer {
 				if (repayCodeX != null && !repayCodeX.isEmpty()) {
 					txMsg += repayCodeX;
 					if ("1".equals(result.get("RepayCode"))) {
-						txMsg += tTempVo.getParam("ReconCode");			
+						txMsg += result.get("ReconCode");			
 					}
 					if (totTxAmt.compareTo(BigDecimal.ZERO) != 0) {
 						txMsg += ":"+df.format(totTxAmt);

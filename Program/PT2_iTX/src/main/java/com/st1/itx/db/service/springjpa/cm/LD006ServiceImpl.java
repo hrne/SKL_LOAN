@@ -97,10 +97,12 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND PIDA.\"FacmNo\"    = I.\"FacmNo\"     ";
 		sql += "                                    AND PIDA.\"BormNo\"    = I.\"BormNo\"     ";
 		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
-		sql += "                                    AND I.\"AdjRange\" IN (1,2)               ";
+		sql += "                                    AND PIDA.\"AdjRange\" IN (1,2) ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
 		sql += "   AND I.\"Introducer\" IS NOT NULL ";
-		sql += "   AND ABS(NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\")) + ABS(NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\")) + ABS(NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\")) > 0 ";
+		sql += "   AND ABS(NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\")) ";
+		sql += "       + ABS(NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\")) ";
+		sql += "       + ABS(NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\")) > 0 ";
 		if (useWorkMonth) {
 			sql += "   AND I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {

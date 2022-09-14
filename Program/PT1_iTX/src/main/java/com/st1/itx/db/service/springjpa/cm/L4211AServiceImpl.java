@@ -291,7 +291,6 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , CASE WHEN NVL(JSON_VALUE(BATX.\"ProcNote\", '$.FacStatus'), ' ') <> ' ' THEN '暫收款' ";
 			sql += "           WHEN TX1.\"FacmNo\" = 0 THEN '暫收款' ";
 			sql += "           ELSE \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") END AS \"AcctItem\"";
-//			sql += " 	, \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") AS \"AcctItem\"";
 			sql += " 	, \"Fn_GetCdCode\"('RepayType',BATX.\"RepayType\") AS \"RepayItem\"";
 			sql += "    , NVL(TX2.\"PaidTerms\", 0) AS \"PaidTerms\" ";
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
@@ -321,8 +320,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           , '7') ";// 轉暫收
 			sql += " AND ( ";
 			sql += " 	CASE ";
-			sql += " 	  WHEN TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
-			sql += "       AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";
+			sql += " 	  WHEN SUBSTR(TX1.\"TitaTlrNo\",1,2) = SUBSTR(BATX.\"TitaTlrNo\",5,2)";
+			sql += "       AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
 			sql += "	  THEN 1 ELSE 0 END";
 			sql += "	) = 0 ";
 

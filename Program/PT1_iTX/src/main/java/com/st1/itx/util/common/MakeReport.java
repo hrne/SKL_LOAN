@@ -152,7 +152,7 @@ public class MakeReport extends CommBuffer {
 	private int currentCharSpaces = 1;
 
 	// 列印明細
-	public List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+	List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 
 	private void checkParm(ReportVo reportVo) throws LogicException {
 		if (reportVo.getRptDate() <= 0) {
@@ -203,7 +203,7 @@ public class MakeReport extends CommBuffer {
 		if (this.nowPage > 0) {
 			this.printFooter();
 		}
-		if (this.batchNo.isEmpty()) {
+		if (this.batchNo.isEmpty() && !formMode) {
 			return newFile();
 		} else {
 			return findSameBatchNoAndAppendTxFileData();
@@ -447,6 +447,8 @@ public class MakeReport extends CommBuffer {
 		this.nowPage = 0;
 		this.headerPrintPage = 0;
 
+		listMap = new ArrayList<HashMap<String, Object>>();
+
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 0);
 		map.put("paper", reportVo.getRptSize().toUpperCase());
@@ -487,6 +489,8 @@ public class MakeReport extends CommBuffer {
 
 		this.nowPage = 1;
 		this.headerPrintPage = 0;
+
+		listMap = new ArrayList<HashMap<String, Object>>();
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 9);

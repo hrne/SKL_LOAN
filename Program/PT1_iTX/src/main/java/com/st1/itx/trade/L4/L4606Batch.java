@@ -204,15 +204,15 @@ public class L4606Batch extends TradeBuffer {
 
 			if (custErrorCnt > 0) {
 				l4606Report4.exec(titaVo, errorList);
+				sendMsg = "匯入資料有誤";
 			} else {
 				l4606Report1.exec(titaVo);
 				l4606Report2.exec(titaVo);
 				l4606Report3.exec(titaVo, successList);
 				l4606Report4.exec(titaVo, errorList);
+				sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數："
+						+ zeroDueAmtCnt + ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
 			}
-
-			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
-					+ ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
 			printUsedTime("flagB");
 		}
 
@@ -372,6 +372,7 @@ public class L4606Batch extends TradeBuffer {
 		insuCommFileVo.setValueFromFile(dataLineList);
 
 		List<OccursList> uploadFile = insuCommFileVo.getOccursList();
+		this.info("insuCommFileVo   = " + insuCommFileVo.getOccursList());
 
 		int seq = 0;
 		if (uploadFile != null && !uploadFile.isEmpty()) {
@@ -447,8 +448,7 @@ public class L4606Batch extends TradeBuffer {
 				tInsuComm.setDueAmt(dueAmt);
 
 //    			如果額度為0的時候也需要入佣金媒體錯誤檔
-				BigDecimal totalCurrentSales = BigDecimal.ZERO;
-				if (dueAmt == totalCurrentSales) {
+				if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
 					custErrorCnt++;
 					tempOccursList.putParam("ErrorMsg", "額度為0:" + custNo);
 					errorList.add(tempOccursList);

@@ -142,9 +142,11 @@ public class L8309 extends TradeBuffer {
 			JcicZ048 uJcicZ0482 = new JcicZ048();
 			uJcicZ0482 = sJcicZ048Service.holdById(iJcicZ048.getJcicZ048Id(), titaVo);
 			iJcicZ048 = sJcicZ048Service.findById(iJcicZ048Id);
-			if (iJcicZ048 == null) {
-				throw new LogicException("E0008", "");
+			int JcicDate2 = iJcicZ048.getOutJcicTxtDate();
+			if (JcicDate2 != 0) {
+				throw new LogicException("E0004", "刪除資料不存在");
 			}
+
 			if (!titaVo.getHsupCode().equals("1")) {
 				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}

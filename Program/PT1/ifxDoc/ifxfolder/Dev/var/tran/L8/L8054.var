@@ -44,9 +44,9 @@ K(NOBUTTON,CLOSEY)
 ["[L8054]                                 消債條列JCIC報送資料歷程查詢(443)"],
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
 ["#FdRcDate+調解申請日",#RcDate],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
-["#FdAccount+帳號",#Account],
 ]
 
 #FdCustId=X,2,L
@@ -54,7 +54,6 @@ K(NOBUTTON,CLOSEY)
 #FdSubmitKey=X,2,L
 #FdCourtCode=X,2,L
 #FdMaxMainCode=X,2,L
-#FdAccount=X,2,L
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -106,6 +105,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 
 #RcDate=D,7,L
 #SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
 #CourtCode=X,3,L
 #MaxMainCode=X,3,L
 #Account=x,50,L

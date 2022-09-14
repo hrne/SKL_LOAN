@@ -22,6 +22,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankDeductDtl;
+import com.st1.itx.db.domain.BankRmtf;
+import com.st1.itx.db.domain.BankRmtfId;
 import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
 import com.st1.itx.db.domain.BatxHead;
@@ -34,6 +36,7 @@ import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.service.BankDeductDtlService;
+import com.st1.itx.db.service.BankRmtfService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.EmpDeductDtlService;
@@ -183,6 +186,9 @@ public class TxBatchCom extends TradeBuffer {
 
 	@Autowired
 	public BatxHeadService batxHeadService;
+
+	@Autowired
+	public BankRmtfService bankRmtfService;
 
 	@Autowired
 	public BankDeductDtlService bankDeductDtlService;
@@ -1191,6 +1197,10 @@ public class TxBatchCom extends TradeBuffer {
 
 				acDate = 0;
 			}
+			// 01.匯款轉帳
+			if (tDetail.getRepayCode() == 1) {
+				updBankRmtf(acDate, tDetail, titaVo);
+			}
 
 			// 02.銀行扣款
 			if (tDetail.getRepayCode() == 2) {
@@ -1253,7 +1263,32 @@ public class TxBatchCom extends TradeBuffer {
 
 	}
 
-//		L4002Update BankDeductDtl 交易結束更新銀扣明細檔
+//	Update BankRmtf 交易結束更新匯款轉帳檔
+	private void updBankRmtf(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		BankRmtfId tBankRmtfId = new BankRmtfId();
+		tBankRmtfId.setAcDate(tBatxDetail.getAcDate());
+		tBankRmtfId.setBatchNo(tBatxDetail.getBatchNo());
+		tBankRmtfId.setDetailSeq(tBatxDetail.getDetailSeq());
+		BankRmtf tBankRmtf = bankRmtfService.holdById(tBankRmtfId, titaVo);
+		if (tBankRmtf == null) {
+			throw new LogicException("E0006", "TxBatchCom BankRmtf"); // E0006 鎖定資料時，發生錯誤
+		}
+		if (acDate == 0) {
+			tBankRmtf.setTitaTlrNo("");
+			tBankRmtf.setTitaTxtNo("");
+		} else {
+			tBankRmtf.setTitaTlrNo(titaVo.getTlrNo());
+			tBankRmtf.setTitaTxtNo(titaVo.getTxtNo());
+		}
+		try {
+			bankRmtfService.update(tBankRmtf, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "TxBatchCom update BankDeductDtl " + e.getErrorMsg());
+		}
+
+	}
+
+//		Update BankDeductDtl 交易結束更新銀扣明細檔
 	private void updBankDeductDtl(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 
 //		BatxDetail's MediaDate MediaCode MediaSeq to find ACH/POST (僅一個媒體Table需產出多媒體File者才需區分MediaCode)
@@ -1297,7 +1332,7 @@ public class TxBatchCom extends TradeBuffer {
 
 	}
 
-//		L4002Update EmpDeductDtl  交易結束更新員工扣薪明細檔
+//		Update EmpDeductDtl  交易結束更新員工扣薪明細檔
 	private void updEmpDeductDtl(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 
 //		BatxDetail's MediaDate MediaCode MediaSeq to find 15/un15 

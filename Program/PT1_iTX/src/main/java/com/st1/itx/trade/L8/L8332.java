@@ -326,6 +326,7 @@ public class L8332 extends TradeBuffer {
 				iJcicZ570.setBank28(iJcicZ570Log.getBank28());
 				iJcicZ570.setBank29(iJcicZ570Log.getBank29());
 				iJcicZ570.setBank30(iJcicZ570Log.getBank30());
+				iJcicZ570.setTranKey(iJcicZ570Log.getTranKey());
 				iJcicZ570.setOutJcicTxtDate(iJcicZ570Log.getOutJcicTxtDate());
 				try {
 					sJcicZ570Service.update(iJcicZ570, titaVo);

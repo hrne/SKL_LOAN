@@ -105,7 +105,7 @@ T(1,@CHAIN_Flag,#NTXBUF,22,1)
 C(3,#CHAIN_Flag,2,E(0,@ActualRepayDateStart,#CHAIN_DateStart),E(0,@RecordDateStart,#CHAIN_DateStart))
 C(3,#CHAIN_Flag,2,E(0,@ActualRepayDateEnd,#CHAIN_DateEnd),E(0,@RecordDateEnd,#CHAIN_DateEnd))
 E(0,@CustNo,#CHAIN_CustNo)
-XMT()
+C(3,#CHAIN,1,E(0,#CHAIN,0)XMT(),$)
 
 ! 7+7+7+1
 #CHAIN_DateStart=X,7,S
@@ -162,6 +162,7 @@ V(5,#ActualRepayDateStart,#CDATEX)
 
 #RPTFG=A,1,S
 E(0,0)
+E(0,@CHAIN_Flag,0)
 
 !<include src="COM.icf::RPTFG.dec"/>
 
@@ -283,7 +284,8 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=複製;ntxbuf=#OOBUF6})
 
 ! 歷程的按鈕
 #OOBUF7=X,35,S
-T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OOTxDate+00+#OORecordDate)
+!T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+#OOTxDate+00+#OORecordDate)
+T(2,2+#OOCustNo+#OOFacmNo+#OOBormNo+0010101+00+#OORecordDate)
 
 #OOBTN7=X,4,S
 C(3,#OOHaveLog,0,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF7}))

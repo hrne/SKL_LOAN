@@ -127,6 +127,11 @@ BEGIN
             ,TR1."LMSASQ"
             ,TR1."TRXAMT"
             ,TR1."TRXMEM"
+            ,MIN(CASE
+                   WHEN TR1."TRXIDT" > 20400101
+                   THEN TR1."TRXDAT"
+                 ELSE TR1."TRXIDT" END
+             ) AS "TRXIDT"
             ,MAX(CASE
                    WHEN TR1."TRXTCT" IS NOT NULL
                    THEN CASE
@@ -168,6 +173,7 @@ BEGIN
              ,TR."TRXAMT"
              ,TR."TRXTCT"
              ,TR."TRXMEM"
+             ,TR."TRXIDT"
              ,CASE
                 WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'D' THEN 'C'
                 WHEN TR."TRXAMT" < 0 AND ATF."DbCr" = 'C' THEN 'D'
@@ -206,6 +212,7 @@ BEGIN
             ,NVL(S4."LMSASQ",0) AS "LMSASQ"
             ,NVL(S4."TRXAMT",FF."Fee") AS "TRXAMT"
             ,FF."RecordNo"
+            ,S4."TRXIDT"
       FROM "LA$JLNP" S1
       LEFT JOIN "LA$JLNP" S2 ON S2."TRXDAT" = S1."TRXDAT"
                             AND S2."JLNOVN" = S1."JLNVNO" -- 串取訂正資料
@@ -351,18 +358,19 @@ BEGIN
           ,''                             AS "TitaBatchSeq"        -- 整批明細序號 VARCHAR2 6 0
           ,''                             AS "TitaSupNo"           -- 核准主管 VARCHAR2 6 0
           ,0                              AS "TitaRelCd"           -- 作業模式 DECIMAL 1 0
-          ,CASE
-             WHEN S."TRXNTX" > 0 AND S."TRXTCT" IS NOT NULL
-             THEN '{'
-                    || '"StampTaxFreeAmt":"' || S."TRXNTX" || '"' -- 免印花稅金額
-                    || ','
-                    || '"CaseCloseCode":"' || S."TRXTCT" || '"' -- 結案區分
-                    || '}'
+          ,'{"EntryDate":"' ||
+           CASE
+             WHEN S."TRXIDT" != 0
+             THEN S."TRXIDT"
+           ELSE S."TRXDAT" END
+           || 
+           CASE
              WHEN S."TRXNTX" > 0 
-             THEN '{"StampTaxFreeAmt":"' || S."TRXNTX" || '"}' -- 免印花稅金額
+             THEN ',"StampTaxFreeAmt":"' || S."TRXNTX" || '"' -- 免印花稅金額
              WHEN S."TRXTCT" IS NOT NULL
-             THEN '{"CaseCloseCode":"' || S."TRXTCT" || '"}' -- 結案區分
-           ELSE '' END                    AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0
+             THEN ',"CaseCloseCode":"' || S."TRXTCT" || '"' -- 結案區分
+           ELSE '' END
+           || '}'                         AS "JsonFields"          -- jason格式紀錄欄 VARCHAR2 300 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0

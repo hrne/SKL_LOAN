@@ -228,6 +228,22 @@ T(2,@CustIdX,#L8R57CustName)
 #SubmitKey=X,3,L
 #SubmitKeyX=X,80,L
 
+!債權金融機構代號
+#BankId=X,3,I
+C(5,#TranKey_Tmp,7,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@T(3,@BankIdX,)
+V(7)
+
+
+#BankIdX=X,80,L
+T(2,@RimJcicBankCode,#BankId)
+RESET_RIM(#BankIdX,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankIdX,#L8r01JcicBankName)
 
 !申請日期
 #ApplyDate=D,7,I
@@ -255,22 +271,7 @@ C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)A(DATE,0,#PayDate)
 
-!債權金融機構代號
-#BankId=X,3,I
-C(5,#TranKey_Tmp,7,s,$)
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey_Tmp,2,s,$)
-@T(3,@BankIdX,)
-V(7)
 
-
-#BankIdX=X,80,L
-T(2,@RimJcicBankCode,#BankId)
-RESET_RIM(#BankIdX,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
 
 !參與分配債權金額
 #AllotAmt=M,9,I

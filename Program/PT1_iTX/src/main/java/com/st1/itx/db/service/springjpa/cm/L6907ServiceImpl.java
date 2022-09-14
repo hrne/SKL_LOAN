@@ -20,8 +20,8 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
-//	@Autowired
-//	private CdCodeService sCdCodeDefService;
+//  @Autowired
+//  private CdCodeService sCdCodeDefService;
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -50,13 +50,13 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iClsFlag = Integer.parseInt(titaVo.get("ClsFlag").toString());
 		int iCustNo = Integer.parseInt(titaVo.get("CustNo").toString());
 		int iFacmNo = Integer.parseInt(titaVo.get("FacmNo").toString());
-//		String[] iTmpFacmNoX = titaVo.get("TmpFacmNoX").toString(); // 指定額度
+//    String[] iTmpFacmNoX = titaVo.get("TmpFacmNoX").toString(); // 指定額度
 //
-//		String[] thisColumn = thisLine.split("[,]");
-//		String iTmpTxCode = titaVo.get("TmpTxCode").toString(); // 連動交易代號
-//		if ("L3200".equals(iTmpTxCode)) {
+//    String[] thisColumn = thisLine.split("[,]");
+//    String iTmpTxCode = titaVo.get("TmpTxCode").toString(); // 連動交易代號
+//    if ("L3200".equals(iTmpTxCode)) {
 //
-//		}
+//    }
 		this.info("iAcSubBookCode   = " + iAcSubBookCode); //
 		this.info("iAcNoCode   = " + iAcNoCode); //
 		this.info("iAcSubCode  = " + iAcSubCode); //
@@ -67,7 +67,26 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iCustNo     = " + iCustNo); // 0
 		this.info("iFacmNo     = " + iFacmNo); // 0
 
-		String sql = "Select";
+		String sql = "";
+		sql += " WITH DT1 AS ( ";
+		sql += "   SELECT \"AcDate\" ";
+		sql += "        , \"CustNo\" ";
+		sql += "        , \"FacmNo\" ";
+		sql += "        , \"TavBal\" ";
+		sql += "   FROM \"DailyTav\" ";
+		sql += "   WHERE \"LatestFlag\" = 'Y' ";
+		sql += "     AND \"SelfUseFlag\" = 'Y' ";
+		sql += " ) ";
+		sql += " , DT2 AS ( ";
+		sql += "   SELECT MIN(\"AcDate\") AS \"AcDate\" ";
+		sql += "        , \"CustNo\" ";
+		sql += "        , SUM(\"TavBal\") AS \"TavBal\" ";
+		sql += "   FROM \"DailyTav\" ";
+		sql += "   WHERE \"LatestFlag\" = 'Y' ";
+		sql += "     AND \"SelfUseFlag\" = 'N' ";
+		sql += "   GROUP BY \"CustNo\" ";
+		sql += " ) ";		
+		sql += " Select";
 		sql += "    A.\"AcNoCode\"          AS \"AcNoCode\", ";
 		sql += "    A.\"AcSubCode\"         AS \"AcSubCode\", ";
 		sql += "    A.\"AcDtlCode\"         AS \"AcDtlCode\", ";
@@ -76,12 +95,21 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    A.\"FacmNo\"            AS \"FacmNo\", ";
 		sql += "    A.\"RvNo\"              AS \"RvNo\", ";
 		sql += "    CASE ";
+		sql += "        WHEN NVL(DT1.\"AcDate\",0) != 0 ";
+		sql += "        THEN DT1.\"AcDate\" - 19110000 ";
+		sql += "        WHEN NVL(DT2.\"AcDate\",0) != 0 ";
+		sql += "        THEN DT2.\"AcDate\" - 19110000 ";
 		sql += "        WHEN A.\"OpenAcDate\" = 0 THEN ";
 		sql += "            0 ";
 		sql += "        ELSE ";
 		sql += "            trunc(A.\"OpenAcDate\" - 19110000) ";
 		sql += "    END AS \"OpenAcDate\", ";
-		sql += "    A.\"RvAmt\"             AS \"RvAmt\", ";
+		sql += "    CASE";
+		sql += "        WHEN NVL(DT1.\"AcDate\",0) != 0 ";
+		sql += "        THEN DT1.\"TavBal\" ";
+		sql += "        WHEN NVL(DT2.\"AcDate\",0) != 0 ";
+		sql += "        THEN DT2.\"TavBal\" ";
+		sql += "    ELSE A.\"RvAmt\" END    AS \"RvAmt\", ";
 		sql += "    CASE ";
 		sql += "        WHEN A.\"LastTxDate\" = 0 THEN ";
 		sql += "            0 ";
@@ -89,15 +117,14 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            trunc(A.\"LastTxDate\" - 19110000) ";
 		sql += "    END AS \"LastTxDate\", ";
 		sql += "    A.\"RvBal\"             AS \"RvBal\", ";
-		sql += "    B.\"ToAml\"           AS \"SumRvBal\", ";
+		sql += "    B.\"ToAml\"             AS \"SumRvBal\", ";
 		sql += "    A.\"AcBookCode\"        AS \"AcBookCode\", ";
 		sql += "    A.\"AcSubBookCode\"     AS \"AcSubBookCode\", ";
 		sql += "    A.\"LastUpdate\"        AS \"LastUpdate\", ";
 		sql += "    A.\"LastUpdateEmpNo\"   AS \"LastUpdateEmpNo\", ";
-		sql += "    A.\"ReceivableFlag\"   AS \"ReceivableFlag\" ";
-		sql += "    FROM ";
-		sql += "    \"AcReceivable\" A ";
-		sql += "    LEFT JOIN ( ";
+		sql += "    A.\"ReceivableFlag\"    AS \"ReceivableFlag\" ";
+		sql += " FROM  \"AcReceivable\" A ";
+		sql += " LEFT JOIN ( ";
 		sql += "    SELECT  ";
 		sql += "    \"AcctCode\"         , ";
 		sql += "    SUM(\"RvBal\") AS \"ToAml\" ";
@@ -137,6 +164,11 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "         GROUP BY \"AcctCode\" ";
 		sql += "    ) B ON A.\"AcctCode\" = B.\"AcctCode\" ";
+		sql += " LEFT JOIN DT1 ON DT1.\"CustNo\" = A.\"CustNo\" ";
+		sql += "              AND DT1.\"FacmNo\" = A.\"FacmNo\" ";
+		sql += "              AND A.\"AcctCode\" = 'TAV' ";
+		sql += " LEFT JOIN DT2 ON DT2.\"CustNo\" = A.\"CustNo\" ";
+		sql += "              AND A.\"AcctCode\" = 'TAV' ";
 		sql += " where A.\"AcBookCode\" = 000 "; // 固定傳入
 		if ("".equals(iAcctCode)) {
 			sql += "   and A.\"AcctFlag\"   = 0 ";
@@ -179,7 +211,7 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L6907Service SQL=" + sql);
 
 		Query query;
-//		query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
+//    query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		// 如果沒取得變數則不會傳入query

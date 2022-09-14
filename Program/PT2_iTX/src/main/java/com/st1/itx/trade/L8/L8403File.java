@@ -1207,6 +1207,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ040.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8403");
 				iDataLog.setEnv(titaVo, iJcicZ040Log2, uJcicZ040log);
 				iDataLog.exec("L8403報送", iJcicZ040Log2.getUkey() + iJcicZ040Log2.getTxSeq());
 				// TODO:每個File都要加
@@ -1307,6 +1308,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ041.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				this.info("iCustNo   = " + iCustNo);
+				titaVo.putParam("TXCODE", "L8404");
 				titaVo.putParam("CustNo", iCustNo);
 				iDataLog.setEnv(titaVo, iJcicZ041Log2, uJcicZ041log);
 				iDataLog.exec("L8404報送", iJcicZ041Log2.getUkey() + iJcicZ041Log2.getTxSeq());
@@ -1483,6 +1485,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ042.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8405");
 				iDataLog.setEnv(titaVo, iJcicZ042Log2, uJcicZ042log);
 				iDataLog.exec("L8405報送", iJcicZ042Log2.getUkey() + iJcicZ042Log2.getTxSeq());
 				iCount++;
@@ -1618,6 +1621,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ043.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8406");
 				iDataLog.setEnv(titaVo, iJcicZ043Log2, uJcicZ043log);
 				iDataLog.exec("L8406報送", iJcicZ043Log2.getUkey() + iJcicZ043Log2.getTxSeq());
 				iCount++;
@@ -1822,6 +1826,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ044.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8407");
 				iDataLog.setEnv(titaVo, iJcicZ044Log2, uJcicZ044log);
 				iDataLog.exec("L8407報送", iJcicZ044Log2.getUkey() + iJcicZ044Log2.getTxSeq());
 				iCount++;
@@ -1920,6 +1925,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ045.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8408");
 				iDataLog.setEnv(titaVo, iJcicZ045Log2, uJcicZ045log);
 				iDataLog.exec("L8408報送", iJcicZ045Log2.getUkey() + iJcicZ045Log2.getTxSeq());
 				iCount++;
@@ -2022,6 +2028,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ046.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8409");
 				iDataLog.setEnv(titaVo, iJcicZ046Log2, uJcicZ046log);
 				iDataLog.exec("L8409報送", iJcicZ046Log2.getUkey() + iJcicZ046Log2.getTxSeq());
 				iCount++;
@@ -2221,6 +2228,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ047.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8410");
 				iDataLog.setEnv(titaVo, iJcicZ047Log2, uJcicZ047log);
 				iDataLog.exec("L8410報送", iJcicZ047Log2.getUkey() + iJcicZ047Log2.getTxSeq());
 				iCount++;
@@ -2329,6 +2337,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ048.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8411");
 				iDataLog.setEnv(titaVo, iJcicZ048Log2, uJcicZ048log);
 				iDataLog.exec("L8411報送", iJcicZ048Log2.getUkey() + iJcicZ048Log2.getTxSeq());
 				iCount++;
@@ -2461,6 +2470,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ049.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8412");
 				iDataLog.setEnv(titaVo, iJcicZ049Log2, uJcicZ049log);
 				iDataLog.exec("L8412報送", iJcicZ049Log2.getUkey() + iJcicZ049Log2.getTxSeq());
 				iCount++;
@@ -2578,6 +2588,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ050.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8413");
 				iDataLog.setEnv(titaVo, iJcicZ050Log2, uJcicZ050log);
 				iDataLog.exec("L8413報送", iJcicZ050Log2.getUkey() + iJcicZ050Log2.getTxSeq());
 				iCount++;
@@ -2677,6 +2688,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ051.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8414");
 				iDataLog.setEnv(titaVo, iJcicZ051Log2, uJcicZ051log);
 				iDataLog.exec("L8414報送", iJcicZ051Log2.getUkey() + iJcicZ051Log2.getTxSeq());
 				iCount++;
@@ -2805,6 +2817,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ052.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8415");
 				iDataLog.setEnv(titaVo, iJcicZ052Log2, uJcicZ052log);
 				iDataLog.exec("L8415報送", iJcicZ052Log2.getUkey() + iJcicZ052Log2.getTxSeq());
 				iCount++;
@@ -2913,6 +2926,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ053.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8416");
 				iDataLog.setEnv(titaVo, iJcicZ053Log2, uJcicZ053log);
 				iDataLog.exec("L8416報送", iJcicZ053Log2.getUkey() + iJcicZ053Log2.getTxSeq());
 				iCount++;
@@ -3014,6 +3028,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ054.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8417");
 				iDataLog.setEnv(titaVo, iJcicZ054Log2, uJcicZ054log);
 				iDataLog.exec("L8417報送", iJcicZ054Log2.getUkey() + iJcicZ054Log2.getTxSeq());
 				iCount++;
@@ -3169,6 +3184,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ055.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8418");
 				iDataLog.setEnv(titaVo, iJcicZ055Log2, uJcicZ055log);
 				iDataLog.exec("L8418報送", iJcicZ055Log2.getUkey() + iJcicZ055Log2.getTxSeq());
 				iCount++;
@@ -3301,6 +3317,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ056.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8419");
 				iDataLog.setEnv(titaVo, iJcicZ056Log2, uJcicZ056log);
 				iDataLog.exec("L8419報送", iJcicZ056Log2.getUkey() + iJcicZ056Log2.getTxSeq());
 				iCount++;
@@ -3398,6 +3415,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ060.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8420");
 				iDataLog.setEnv(titaVo, iJcicZ060Log2, uJcicZ060log);
 				iDataLog.exec("L8420報送", iJcicZ060Log2.getUkey() + iJcicZ060Log2.getTxSeq());
 				iCount++;
@@ -3513,6 +3531,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ061.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8421");
 				iDataLog.setEnv(titaVo, iJcicZ061Log2, uJcicZ061log);
 				iDataLog.exec("L8421報送", iJcicZ061Log2.getUkey() + iJcicZ061Log2.getTxSeq());
 				iCount++;
@@ -3682,6 +3701,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ062.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8422");
 				iDataLog.setEnv(titaVo, iJcicZ062Log2, uJcicZ062log);
 				iDataLog.exec("L8422報送", iJcicZ062Log2.getUkey() + iJcicZ062Log2.getTxSeq());
 				iCount++;
@@ -3785,6 +3805,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ063.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8423");
 				iDataLog.setEnv(titaVo, iJcicZ063Log2, uJcicZ063log);
 				iDataLog.exec("L8423報送", iJcicZ063Log2.getUkey() + iJcicZ063Log2.getTxSeq());
 				iCount++;
@@ -3916,6 +3937,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ440.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8424");
 				iDataLog.setEnv(titaVo, iJcicZ440Log2, uJcicZ440log);
 				iDataLog.exec("L8424報送", iJcicZ440Log2.getUkey() + iJcicZ440Log2.getTxSeq());
 				iCount++;
@@ -4096,6 +4118,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ442.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8425");
 				iDataLog.setEnv(titaVo, iJcicZ442Log2, uJcicZ442log);
 				iDataLog.exec("L8425報送", iJcicZ442Log2.getUkey() + iJcicZ442Log2.getTxSeq());
 				iCount++;
@@ -4247,6 +4270,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ443.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8426");
 				iDataLog.setEnv(titaVo, iJcicZ443Log2, uJcicZ443log);
 				iDataLog.exec("L8426報送", iJcicZ443Log2.getUkey() + iJcicZ443Log2.getTxSeq());
 				iCount++;
@@ -4360,6 +4384,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ444.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8427");
 				iDataLog.setEnv(titaVo, iJcicZ444Log2, uJcicZ444log);
 				iDataLog.exec("L8427報送", iJcicZ444Log2.getUkey() + iJcicZ444Log2.getTxSeq());
 				iCount++;
@@ -4459,6 +4484,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ446.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8428");
 				iDataLog.setEnv(titaVo, iJcicZ446Log2, uJcicZ446log);
 				iDataLog.exec("L8428報送", iJcicZ446Log2.getUkey() + iJcicZ446Log2.getTxSeq());
 				iCount++;
@@ -4582,6 +4608,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ447.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8429");
 				iDataLog.setEnv(titaVo, iJcicZ447Log2, uJcicZ447log);
 				iDataLog.exec("L8429報送", iJcicZ447Log2.getUkey() + iJcicZ447Log2.getTxSeq());
 				iCount++;
@@ -4695,6 +4722,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ448.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8430");
 				iDataLog.setEnv(titaVo, iJcicZ448Log2, uJcicZ448log);
 				iDataLog.exec("L8430報送", iJcicZ448Log2.getUkey() + iJcicZ448Log2.getTxSeq());
 				iCount++;
@@ -4806,6 +4834,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ450.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8431");
 				iDataLog.setEnv(titaVo, iJcicZ450Log2, uJcicZ450log);
 				iDataLog.exec("L8431報送", iJcicZ450Log2.getUkey() + iJcicZ450Log2.getTxSeq());
 				iCount++;
@@ -4905,6 +4934,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ451.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8432");
 				iDataLog.setEnv(titaVo, iJcicZ451Log2, uJcicZ451log);
 				iDataLog.exec("L8432報送", iJcicZ451Log2.getUkey() + iJcicZ451Log2.getTxSeq());
 				iCount++;
@@ -5008,6 +5038,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ454.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8433");
 				iDataLog.setEnv(titaVo, iJcicZ454Log2, uJcicZ454log);
 				iDataLog.exec("L8433報送", iJcicZ454Log2.getUkey() + iJcicZ454Log2.getTxSeq());
 				iCount++;
@@ -5182,6 +5213,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ570.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8434");
 				iDataLog.setEnv(titaVo, iJcicZ570Log2, uJcicZ570log);
 				iDataLog.exec("L8434報送", iJcicZ570Log2.getUkey() + iJcicZ570Log2.getTxSeq());
 				iCount++;
@@ -5292,6 +5324,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ571.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8435");
 				iDataLog.setEnv(titaVo, iJcicZ571Log2, uJcicZ571log);
 				iDataLog.exec("L8435報送", iJcicZ571Log2.getUkey() + iJcicZ571Log2.getTxSeq());
 				iCount++;
@@ -5399,6 +5432,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ572.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8436");
 				iDataLog.setEnv(titaVo, iJcicZ572Log2, uJcicZ572log);
 				iDataLog.exec("L8436報送", iJcicZ572Log2.getUkey() + iJcicZ572Log2.getTxSeq());
 				iCount++;
@@ -5501,6 +5535,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ573.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8437");
 				iDataLog.setEnv(titaVo, iJcicZ573Log2, uJcicZ573log);
 				iDataLog.exec("L8437報送", iJcicZ573Log2.getUkey() + iJcicZ573Log2.getTxSeq());
 				iCount++;
@@ -5602,6 +5637,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ574.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8438");
 				iDataLog.setEnv(titaVo, iJcicZ574Log2, uJcicZ574log);
 				iDataLog.exec("L8438報送", iJcicZ574Log2.getUkey() + iJcicZ574Log2.getTxSeq());
 				iCount++;
@@ -5701,6 +5737,7 @@ public class L8403File extends MakeFile {
 				CustMain tCustMain = sCustMainService.custIdFirst(sJcicZ575.getCustId(), titaVo);
 				int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 				titaVo.putParam("CustNo", iCustNo);
+				titaVo.putParam("TXCODE", "L8439");
 				iDataLog.setEnv(titaVo, iJcicZ575Log2, uJcicZ575log);
 				iDataLog.exec("L8439報送", iJcicZ575Log2.getUkey() + iJcicZ575Log2.getTxSeq());
 				iCount++;

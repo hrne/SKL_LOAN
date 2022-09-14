@@ -116,7 +116,7 @@ public class L9705Report extends MakeReport {
 			this.info("isOpen Report");
 			this.info("l9705List=" + l9705List.toString());
 
-			this.listMap = new ArrayList<HashMap<String, Object>>();
+//			this.listMap = new ArrayList<HashMap<String, Object>>();
 
 			// 開啟報表
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
@@ -203,6 +203,7 @@ public class L9705Report extends MakeReport {
 
 		// 關閉報表
 		cls = this.close();
+//		this.toPdf(cls);
 
 //		// 先分A3與非A3
 //		if (l9705List.size() > 0) {

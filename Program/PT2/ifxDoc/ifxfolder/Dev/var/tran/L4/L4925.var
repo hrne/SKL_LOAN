@@ -46,6 +46,7 @@ E(0,0)
 [#<->#,"#FdRepayCode+還款來源",#RepayCode,#RepayCodeX],
 [#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdProcStsCode+處理狀態",#ProcStsCode,#ProcStsCodeX],
+[#<->#,"#FdReconCode+對帳類別",#ReconCode,#ReconCodeX],
 ]
 
 #FdEntryDateFrom=X,2,L
@@ -53,6 +54,7 @@ T(3,*)
 #FdRepayCode=X,2,L
 #FdCustNo=X,2,L
 #FdProcStsCode=X,2,L
+#FdReconCode=X,2,L
 
 
 
@@ -80,7 +82,7 @@ T(3,CdCode.RepayType)
 ![批次對帳類別]
 #CDDEF04=x,26,S
 T(3,CdCode.ReconCode)
-
+!A1(企業戶).A2(期款).A3(部分償還).A6(債協).A7(債協專戶)
 #ReconCodeHelp=x,1024,S
 
 ![處理說明]
@@ -197,6 +199,16 @@ T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
 !                 A,T(3,全部),
 !                 S,T(3,已處理),
 !                 R,T(3,待處理))
+
+#ReconCode=X,3,I
+C(3,#CHAIN,0,$,s)
+HELP(#ReconCodeHelp)
+@C(4,#ReconCode,S,$)
+V(H,#ReconCodeHelp)
+
+#ReconCodeX=X,15,L
+T(3,)T(H,#ReconCode,#ReconCodeHelp)
+
 
 #RPTFG=A,1,S
 
@@ -492,6 +504,7 @@ SWITCH(#OOProcStsCode,5,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=#OOBTN_TXT; ntxb
 #RepayCode
 #CustNo
 #ProcStsCode
+#ReconCode
 #END
 </sub>
 

@@ -79,6 +79,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ln3.*          ";
 		sql += "  ,cd.\"Item\"																";
 		sql += "  ,ln2.\"TotTxAmt\"												  ";
+		sql += "  ,NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), rm.\"ReconCode\")  AS  \"ReconCode\" ";
 		sql += "  FROM													";
 		sql += "  ( SELECT																	";
 		sql += "      ln.\"CustNo\"				AS	\"CustNo\"										      ";
@@ -109,6 +110,14 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND  ln2.\"TitaKinBr\" = ln3.\"TitaKinBr\"   								 ";
 		sql += "  AND  ln2.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   								 ";
 		sql += "  AND  ln2.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
+		sql += " left join \"BankRmtf\" rm  											     ";
+		sql += "   ON  rm.\"CustNo\" = ln3.\"CustNo\"   									 ";
+		sql += "  AND  rm.\"AcDate\" = ln3.\"AcDate\"   									 ";
+		sql += "  AND  rm.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   								 ";
+		sql += "  AND  rm.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
+		sql += "  AND  rm.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
+		sql += "  AND  ln3.\"RepayCode\" =  1         ";
+		sql += "  AND  NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), ' ') = ' '        ";
 		sql += " left  join \"CdCode\" cd  													 ";
 		sql += "   on  ln3.\"RepayCode\" = cd.\"Code\"   									 ";
 		sql += "  AND cd.\"DefCode\" = 'RepayCode'   									     ";
