@@ -56,7 +56,12 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
 		int iTitaHCode = this.parse.stringToInteger(titaVo.getParam("TitaHCode"));
-
+		String iTitaKinBr = titaVo.getParam("TxtNo").substring(0,4);
+		String iTitaTlrNo = titaVo.getParam("TxtNo").substring(4,10);
+		String iTitaTxtNo = titaVo.getParam("TxtNo").substring(10, 18);
+		this.info("iTitaKinBr = " + iTitaKinBr);
+		this.info("iTitaTlrNo = " + iTitaTlrNo);
+		this.info("iTitaTxtNo = " + iTitaTxtNo);
 		// work area
 		int wkFacmNoStart = 0;
 		int wkFacmNoEnd = 999;
@@ -121,10 +126,17 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left  join \"CdCode\" cd  													 ";
 		sql += "   on  ln3.\"RepayCode\" = cd.\"Code\"   									 ";
 		sql += "  AND cd.\"DefCode\" = 'RepayCode'   									     ";
-		sql += " WHERE ln3.\"FacmNo\" >= :FacmNoS											 ";
-		sql += "  AND  ln3.\"FacmNo\" <= :FacmNoE											 ";
-		sql += "  AND  ln3.\"BormNo\" >= :BormNoS											 ";
-		sql += "  AND  ln3.\"BormNo\" <= :BormNoE											 ";
+		sql += " WHERE 											 ";
+		if (iTitaTxtNo.isEmpty()) {
+			sql += " ln3.\"FacmNo\" >= :FacmNoS											 ";
+			sql += "  AND  ln3.\"FacmNo\" <= :FacmNoE											 ";
+			sql += "  AND  ln3.\"BormNo\" >= :BormNoS											 ";
+			sql += "  AND  ln3.\"BormNo\" <= :BormNoE											 ";
+		} else {
+			sql += " ln3.\"TitaKinBr\" >= :titaKinBr											 ";
+			sql += "  AND  ln3.\"TitaTlrNo\" <= :titaTlrNo											 ";
+			sql += "  AND  ln3.\"TitaTxtNo\" >= :titaTxtNo											 ";
+		}
 		if (iTitaHCode == 0) {
 			sql += "      AND ln3.\"TitaHCode\" = '0'											";
 		}
@@ -143,10 +155,16 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("CustNo", iCustNo);
-		query.setParameter("FacmNoS", wkFacmNoStart);
-		query.setParameter("FacmNoE", wkFacmNoEnd);
-		query.setParameter("BormNoS", wkBormNoStart);
-		query.setParameter("BormNoE", wkBormNoEnd);
+		if (iTitaTxtNo.isEmpty()) {
+			query.setParameter("FacmNoS", wkFacmNoStart);
+			query.setParameter("FacmNoE", wkFacmNoEnd);
+			query.setParameter("BormNoS", wkBormNoStart);
+			query.setParameter("BormNoE", wkBormNoEnd);
+		} else {
+			query.setParameter("titaKinBr", iTitaKinBr);
+			query.setParameter("titaTlrNo", iTitaTlrNo);
+			query.setParameter("titaTxtNo", iTitaTxtNo);
+		}
 		if (iAcDate == 0) {
 			query.setParameter("EntryDateS", wkEntryDateStart + 19110000);
 			query.setParameter("DateEnd", wkDateEnd);
@@ -162,7 +180,6 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("wkAcDateStart = " + wkAcDateStart);
 		this.info("wkEntryDateStart = " + wkEntryDateStart);
 		this.info("wkDateEnd = " + wkDateEnd);
-
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 		this.info("index = " + index);

@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L9;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -55,10 +54,11 @@ public class L9134Report3 extends MakeReport {
 		makeExcel.setValue(1, 2, "科目代號", "C");
 		makeExcel.setValue(1, 3, "戶號", "C");
 		makeExcel.setValue(1, 4, "額度", "C");
-		makeExcel.setValue(1, 5, "未銷帳餘額", "C");
-		makeExcel.setValue(1, 6, "會計日餘額", "C");
-		makeExcel.setValue(1, 7, "區隔帳冊", "C");
-		makeExcel.setValue(1, 8, "展期記號", "C");
+		makeExcel.setValue(1, 5, "最後交易日", "C");
+		makeExcel.setValue(1, 6, "未銷帳餘額", "C");
+		makeExcel.setValue(1, 7, "會計帳餘額", "C");
+		makeExcel.setValue(1, 8, "區隔帳冊", "C");
+		makeExcel.setValue(1, 9, "展期記號", "C");
 
 		List<Map<String, String>> list = l9134ServiceImpl.doQueryL9134_3(titaVo);
 
@@ -73,13 +73,14 @@ public class L9134Report3 extends MakeReport {
 				makeExcel.setValue(row, 1, r.get("AcNoCode"));
 				makeExcel.setValue(row, 2, r.get("AcctItem"));
 				makeExcel.setValue(row, 3, r.get("CustNo"));
-				makeExcel.setValue(row, 4, r.get("FacmNo"));
-				makeExcel.setValue(row, 5, r.get("AcBal"));
-				makeExcel.setValue(row, 6, r.get("RvBal"));
-				makeExcel.setValue(row, 7, r.get("Item"));
+				makeExcel.setValue(row, 4, r.get("LastTxDate"));
+				makeExcel.setValue(row, 5, r.get("FacmNo"));
+				makeExcel.setValue(row, 6, r.get("AcBal"));
+				makeExcel.setValue(row, 7, r.get("RvBal"));
+				makeExcel.setValue(row, 8, r.get("Item"));
 				String textRenewCode = "1".equals(r.get("RenewCode").trim()) ? "一般"
 						: "2".equals(r.get("RenewCode").trim()) ? "協議" : " ";
-				makeExcel.setValue(row, 8, textRenewCode);
+				makeExcel.setValue(row, 9, textRenewCode);
 
 			}
 

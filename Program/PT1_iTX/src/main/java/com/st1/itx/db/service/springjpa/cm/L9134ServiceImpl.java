@@ -136,6 +136,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , AC.\"AcNoCode\"";
 		sql += "          , AC.\"CustNo\"";
 		sql += "          , AC.\"FacmNo\"";
+		sql += "          , AC.\"LastTxDate\"";
 		sql += "          , AC.\"AcBal\"";
 		sql += "          , AC.\"RvBal\"";
 		sql += "          , CC.\"Item\"";
@@ -148,9 +149,11 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND CC.\"Code\" = AC.\"AcSubBookCode\" ";
 		sql += "     LEFT JOIN \"CollList\" CO ON CO.\"CustNo\" = AC.\"CustNo\" ";
 		sql += "                              AND CO.\"FacmNo\" = AC.\"FacmNo\" ";
-		sql += "     WHERE AC.\"AcctCode\" = 'TAV' ";
+		sql += "     WHERE AC.\"AcNoCode\" LIKE '20222%' ";
 		sql += "       AND AC.\"RvBal\" > 0 ";
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
+		sql += "            , AC.\"AcSubCode\" ASC ";
+		sql += "            , AC.\"AcDtlCode\" ASC ";
 		sql += "            , AC.\"CustNo\" ASC ";
 		sql += "            , AC.\"FacmNo\" ASC ";
 		

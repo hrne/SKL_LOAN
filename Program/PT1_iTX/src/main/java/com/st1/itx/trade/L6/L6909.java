@@ -78,10 +78,13 @@ public class L6909 extends TradeBuffer {
 				Map<String, String> da = new HashMap<>();
 				acdate = parse.stringToInteger(t.get("AcDate")) - 19110000;
 				int facmNo = parse.stringToInteger(t.get("FacmNo"));
+				String titaHCode = t.get("TitaHCode");
+				this.info("titaHCode = " + titaHCode);
 				int entrydate = 0;
 				BigDecimal tavDb = BigDecimal.ZERO;
 				BigDecimal tavCr = BigDecimal.ZERO;
-				String txNo = "0000" + t.get("TitaTlrNo") + parse.IntegerToString(parse.stringToInteger(t.get("TitaTxtNo")), 8);
+				String txNo = "0000" + t.get("TitaTlrNo")
+						+ parse.IntegerToString(parse.stringToInteger(t.get("TitaTxtNo")), 8);
 				String AcFg = "";
 				// 畫面按鈕控制 第一筆為主要次筆為副
 				if (txNo.equals(newTxNo)) {
@@ -126,6 +129,7 @@ public class L6909 extends TradeBuffer {
 				da.put("OOTAVBal", "" + facmBal.get(facmNo));// 暫收餘額
 				da.put("OOAcFg", "" + AcFg);// 畫面控制
 				da.put("OOTxNo", "" + txNo);// 畫面控制
+				da.put("OOHCode", titaHCode);// 訂正別
 
 				oList.add(da);
 
@@ -142,6 +146,7 @@ public class L6909 extends TradeBuffer {
 				occursList.putParam("OOTAVBal", da.get("OOTAVBal"));// 暫收餘額
 				occursList.putParam("OOAcFg", da.get("OOAcFg"));// 畫面控制
 				occursList.putParam("OOTxNo", da.get("OOTxNo"));// 畫面控制
+				occursList.putParam("OOHCode", da.get("OOHCode"));// 訂正別
 
 				this.totaVo.addOccursList(occursList);
 			}
@@ -158,9 +163,10 @@ public class L6909 extends TradeBuffer {
 				occursList.putParam("OODesc", "額度"); // 交易別
 				occursList.putParam("OOTAVDb", "");// 暫收借
 				occursList.putParam("OOTAVCr", "");// 暫收貸
-				occursList.putParam("OOTAVBal", facmBal.get(facmNo));// 暫收餘額
+				occursList.putParam("OOTAVBal", facmBal.get(facmNo).equals("0") ? "" : facmBal.get(facmNo));// 暫收餘額
 				occursList.putParam("OOAcFg", "N");// 畫面控制
 				occursList.putParam("OOTxNo", "");// 畫面控制
+				occursList.putParam("OOHCode", "");// 訂正別
 				custBal = custBal.add(facmBal.get(facmNo));
 				this.totaVo.addOccursList(occursList);
 
@@ -177,6 +183,7 @@ public class L6909 extends TradeBuffer {
 			occursList.putParam("OOTAVBal", custBal);// 暫收餘額
 			occursList.putParam("OOAcFg", "N");// 畫面控制
 			occursList.putParam("OOTxNo", "");// 畫面控制
+			occursList.putParam("OOHCode", "");// 訂正別
 			this.totaVo.addOccursList(occursList);
 
 		}

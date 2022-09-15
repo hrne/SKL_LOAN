@@ -31,7 +31,7 @@ E(0,2)
 E(0,0)
 K(MODIFYBUTTON,登錄)
 ##loop{times:20,l:0,n:1,m:2}
-C(3,#L3r11FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+C(4,#FacmBormNo{n},INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 ##end
 
 
@@ -1280,6 +1280,31 @@ T(3,[L3420] 結案登錄-不可欠繳)
 #CloseBreachAmt{n}
 #Total{n}
 ##end
+#END
+#PrincipalX
+#AcctFee1X
+#InterestX
+#ModifyFee1X
+#DelayIntX
+#FireFee1X
+#BreachAmtX
+#LawFee1X
+#ShortfallX
+#ShortfallXX
+#CloseBreachAmtX
+#ExcessiveX
+#RenewCodeX
+#AdvanceCloseCodeX
+#OvDuTrfPrincipalX
+#OvDuRepayAmtX
+#OvDuTrfInterestX
+#BadDebtTrfAmtX
+#FireFee2X
+#CollFireFeeX
+#LawFee2X
+#CollLawFeeX
+#AcctFee2X
+#OvDuBalX
 </sub>
 
 

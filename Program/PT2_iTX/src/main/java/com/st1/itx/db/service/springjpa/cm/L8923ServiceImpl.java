@@ -102,7 +102,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iCustNo > 0) {
 			sql += " and  \"CustNo\" = :custNo       \n";
 		}
-		sql += "order by \"RecordDate\",\"ActualRepayDate\", \"CustNo\",\"FacmNo\",\"BormNo\"";
+		sql += "order by \"RecordDate\" DESC,\"ActualRepayDate\" DESC, \"CustNo\",\"FacmNo\",\"BormNo\"";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -205,7 +205,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iCustName.isEmpty() && iCustNo == 0) {
 			sql += " and  C.\"CustName\" like :custName      \n";
 		}
-		sql += "order by M.\"RecordDate\",M.\"ActualRepayDate\", M.\"CustNo\",M.\"FacmNo\",M.\"BormNo\" ";
+		sql += "order by M.\"RecordDate\" DESC,M.\"ActualRepayDate\" DESC, M.\"CustNo\",M.\"FacmNo\",M.\"BormNo\" ";
 
 		sql += sqlRow;
 

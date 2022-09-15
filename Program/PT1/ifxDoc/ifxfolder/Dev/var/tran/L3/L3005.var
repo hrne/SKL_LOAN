@@ -96,13 +96,15 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
-#NTXBUF=X,31,S
+#NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainTxCd,#NTXBUF,1,5)
 T(1,@CustNo,#NTXBUF,6,7)
 T(1,@FacmNo,#NTXBUF,13,3)
 T(1,@BormNo,#NTXBUF,16,3)
 C(5,#ChainTxCd,L4943,T(1,@EntryDate,#NTXBUF,19,7),T(1,@AcDate,#NTXBUF,19,7))
+T(1,@TxtNo,#NTXBUF,26,18)
+
 
 
 #ChainTxCd=X,5,S
@@ -327,6 +329,9 @@ E(0,0)
 
 #TitaHCodeX=X,10,L
 T(3,)T(H,#TitaHCode,#inTitaHCodeHelp)
+
+#TxtNo=X,18,S
+
 
 #RPTFG=A,1,S
 E(0,0)
@@ -592,6 +597,7 @@ C(5,#OOLoanIntDetailFg,"Y",$,BIND(grid,cancel))
 <sub type="TIM">
 
 #TimCustNo#CustId#ApplNo#FacmNo#BormNo#AcDate#EntryDate#TitaHCode
+#TxtNo
 
 </sub>
 

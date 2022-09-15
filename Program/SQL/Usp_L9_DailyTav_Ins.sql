@@ -47,6 +47,7 @@ BEGIN
     FROM "AcReceivable" AR
     LEFT JOIN "DailyTav" DT ON DT."CustNo" = AR."CustNo"
                            AND DT."FacmNo" = AR."FacmNo"
+                           AND DT."LatestFlag" = 'Y'
     LEFT JOIN "LoanFacTmp" LFT ON LFT."CustNo" = AR."CustNo"
                               AND LFT."FacmNo" = AR."FacmNo"
     WHERE AR."AcctCode" = 'TAV'
@@ -66,7 +67,7 @@ BEGIN
              OVER (
                PARTITION BY "CustNo"
                           , "FacmNo"
-               ORDER BY "AcDate"
+               ORDER BY "AcDate" DESC
              ) AS "Seq"
       FROM "DailyTav"
       WHERE "LatestFlag" = 'Y'

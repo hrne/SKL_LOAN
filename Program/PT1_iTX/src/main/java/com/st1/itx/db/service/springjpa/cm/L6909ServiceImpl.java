@@ -48,6 +48,8 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFacmNo = parse.stringToInteger(titaVo.get("FacmNo"));
 		int iEntryDateS = parse.stringToInteger(titaVo.get("EntryDateS").trim());
 		int iEntryDateE = parse.stringToInteger(titaVo.get("EntryDateE").trim());
+		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
+		int iAcDateE = parse.stringToInteger(titaVo.get("AcDateE").trim());
 		String iSortCode = titaVo.get("SortCode").trim();
 
 		String sql = "  SELECT  ";
@@ -61,6 +63,8 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
 		sql += "  	lx.\"Desc\"  		AS \"Desc\", ";
 		sql += "  	lx.\"EntryDate\"  	AS \"EntryDate\", ";
+		sql += "  	MIN( case when ad.\"EntAc\" = 2 	 THEN (CASE WHEN ad.\"RelDy\" = ad.\"AcDate\" THEN 2 ELSE 4 END)	 ";
+		sql += "  			  when ad.\"EntAc\" = 3 	 THEN (CASE WHEN ad.\"RelDy\" = ad.\"AcDate\" THEN 1 ELSE 3 END ) ELSE 0	END) AS \"TitaHCode\", ";
 		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
 		sql += "    MIN(ad.\"CreateDate\")   AS \"CreateDate\",";
 		sql += "    ad.\"AcSeq\"        AS \"AcSeq\" ";
@@ -74,11 +78,16 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  LEFT JOIN \"TxTranCode\"   tc ON tc.\"TranNo\" = ad.\"TitaTxCd\"";
 		sql += "  WHERE";
 		sql += "    ad.\"AcctCode\" = 'TAV' ";
-		sql += "    AND JSON_VALUE  (ad.\"JsonFields\",  '$.EntryDate') >= :entryDateS ";
-		sql += "    AND JSON_VALUE  (ad.\"JsonFields\",  '$.EntryDate') <= :entryDateE ";
 		sql += "    AND ad.\"CustNo\" = :custno";
 		if (iFacmNo > 0) {
 			sql += "    AND ad.\"FacmNo\" = :facmno";
+		}
+		if (iAcDateS > 0) {
+			sql += "    AND ad.\"AcDate\" >= :acDateS ";
+			sql += "    AND ad.\"AcDate\" <= :acDateE ";
+		} else {
+			sql += "    AND JSON_VALUE  (ad.\"JsonFields\",  '$.EntryDate') >= :entryDateS ";
+			sql += "    AND JSON_VALUE  (ad.\"JsonFields\",  '$.EntryDate') <= :entryDateE ";
 		}
 		sql += "  GROUP BY ad.\"FacmNo\" ";
 		sql += "          ,ad.\"AcDate\"    ";
@@ -107,8 +116,13 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("entryDateS" + iEntryDateS);
 		this.info("entryDateE" + iEntryDateE);
 		query.setParameter("custno", iCustNo);
-		query.setParameter("entryDateS", iEntryDateS + 19110000);
-		query.setParameter("entryDateE", iEntryDateE + 19110000);
+		if (iAcDateS > 0) {
+			query.setParameter("acDateS", iAcDateS + 19110000);
+			query.setParameter("acDateE", iAcDateE + 19110000);
+		} else {
+			query.setParameter("entryDateS", iEntryDateS + 19110000);
+			query.setParameter("entryDateE", iEntryDateE + 19110000);
+		}
 		if (iFacmNo > 0) {
 			query.setParameter("facmno", iFacmNo);
 		}

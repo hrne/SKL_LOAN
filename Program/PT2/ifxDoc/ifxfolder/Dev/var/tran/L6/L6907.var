@@ -365,11 +365,16 @@ X(#OO_SUM1)
 
 
 !明細
-#OOBUF5=x,92,S
+#OOBUF5A=x,92,S
 T(2,#AcBookCode+#OOAcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode+#OOCustNo+#OOFacmNo+000+#OORvNo+#OOOpenAcDate+#OOLastTxDate+#OOAcctCode)
 
+#OOBUF5B=x,92,S
+T(2,#OOCustNo+000+0000000+0000000+#OOOpenAcDate+#OOOpenAcDate+1)
+
 #OOBTN5=X,1,S
-C(4,#L6908Flag,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5}))
+C(4,#L6908Flag,BIND(grid,cancel),C(5,#OOAcctCode,TAV,BIND(grid,{ cmd=CHAIN; ntxcd=L6909; ntxbuf=#OOBUF5B}),BIND(grid,{ cmd=CHAIN; ntxcd=L6908; ntxbuf=#OOBUF5A})))
+
+
 </sub>
 
 

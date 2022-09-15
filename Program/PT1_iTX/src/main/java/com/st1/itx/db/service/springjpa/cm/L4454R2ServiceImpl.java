@@ -80,6 +80,7 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "		  ,FD.\"FirstDrawdownDate\"";
 		sql += "		  ,CC.\"CityItem\"";
 		sql += "		  ,CE.\"Fullname\"";
+		sql += "		  ,CC.\"CityCode\"";
 		sql += "	FROM \"mainData\" M ";
 		sql += "    LEFT JOIN \"tmpFirstDrawdownDate\" FD ON FD.\"CustNo\" = M.\"CustNo\" ";
 		sql += "    LEFT JOIN \"tmpPrevPayIntDate\" PP ON PP.\"CustNo\" = M.\"CustNo\" ";
@@ -95,7 +96,8 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "    LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
 		sql += "    LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = FM.\"FireOfficer\" ";
 		sql += "	WHERE M.\"RepayAmt\" > 50000 ";
-		sql += "	ORDER BY M.\"RepayAcctNo\" ASC";
+		sql += "	ORDER BY CC.\"CityCode\" ASC";
+		sql += "		  	,M.\"RepayAcctNo\" ASC";
 		sql += "			,M.\"CustNo\" ASC";
 	
 

@@ -2124,22 +2124,23 @@ public class L3200 extends TradeBuffer {
 	// put Batch Tita
 	private void putBatchTita() throws LogicException {
 
-		titaVo.put("TwPrincipal", df.format(iPrincipal)); // 本金
-		titaVo.put("TwInterest", df.format(iInterest));// 利息
-		titaVo.put("TwDelayInt", df.format(iDelayInt));// 延遲息
-		titaVo.put("TwBreachAmt", df.format(iBreachAmt));// 違約金
+		titaVo.put("TwPrincipal", "" + iPrincipal); // 本金
+		titaVo.put("TwInterest", "" + iInterest);// 利息
+		titaVo.put("TwDelayInt", "" + iDelayInt);// 延遲息
+		titaVo.put("TwBreachAmt", "" + iBreachAmt);// 違約金
 		titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
 		titaVo.put("ShortfallXX", "[利息；" + df.format(iShortfallInt) + "本金；" + df.format(iShortfallPrin) + "違約金；"
 				+ df.format(iShortCloseBreach) + "]");// 累短收
-		titaVo.put("TwAcctFee", df.format(iAcctFee));// 帳管費
-		titaVo.put("TwModifyFee", df.format(iModifyFee));// 契變手續費
-		titaVo.put("TwFireFee", df.format(iFireFee));// 火險費
-		titaVo.put("TwLawFee", df.format(iLawFee));// 法務費
+		titaVo.put("TwAcctFee", "" + iAcctFee);// 帳管費
+		titaVo.put("TwModifyFee", "" + iModifyFee);// 契變手續費
+		titaVo.put("TwFireFee", "" + iFireFee);// 火險費
+		titaVo.put("TwLawFee", "" + iLawFee);// 法務費
 		titaVo.put("ExcessiveXX", df.format(baTxCom.getExcessive()) + "(全戶；"
 				+ df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())) + ")");// 累溢收(本戶)
 		titaVo.put("TwExtraCloseBreachAmt", df.format(baTxCom.getShortCloseBreach()));// 清償違約金
 		titaVo.put("BreachCodeX", "");// 清償違約金
-		titaVo.put("TwReduceAmt", df.format(iReduceAmt));// 減免金額
+		titaVo.put("TwReduceAmt", "" + iReduceAmt);// 減免金額
+
 
 	}
 

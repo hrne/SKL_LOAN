@@ -35,6 +35,9 @@ C(3,#RepayType,12
  T(F,@UsReduceAmt,0)
  ,T(F,@TwReduceAmt,1)
   T(F,@UsReduceAmt,1))
+##loop{times:20,l:0,n:1,m:2}
+C(4,#L3r06FacmNo{n},INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+##end
 
 
 
@@ -68,6 +71,7 @@ E(0,2)
 #ORGFG=_,_,S
 E(0,0)
 K(MODIFYBUTTON,登錄)
+
 </sub>
 <sub type="DC" name="BFRP">
 <include src="RPDTL.icf::BFRP.dec"/>
@@ -121,7 +125,7 @@ SHOW(#RepayType,#TwCloseBreachAmt)
 INVOKEJS(SHOW,p1,9,20,1)
 INVOKEJS(SHOW,p1,13,19,0)
 ##loop{times:20,l:0,n:1,m:2}
-C(3,#L3r06FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+C(3,#FacmBormNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 ##end
 
 <include src="COM.icf::TITLE-RUN.pre"/>
