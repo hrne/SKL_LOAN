@@ -28,7 +28,7 @@ E(0,0)
 ["[L8205]                                 產生疑似洗錢報表"],
 ["#FdType+@報表",#Type,#TypeX],
 ["#FdRecordDate+#DateItem",#DateStart,"~",#DateEnd],
-["#FdActualRepayDate+@實際償還日期",#ActualRepayDate],
+["#FdActualRepayDate+@實際償還日期",#ActualRepayDate,"(至少需輸入一個日期,符合任一日期條件的資料皆列出)"],
 ["#FdRepayDate+@預定償還日期",#RepayDate],
 ["#FdCustNo+@戶號",#CustNo],
 ]
@@ -41,9 +41,9 @@ T(3,*)
 #FdType=X,2,L
 T(3,*)
 #FdActualRepayDate=X,2,L
-T(3,*)
+T(3, )
 #FdRepayDate=X,2,L
-T(3,*)
+T(3, )
 #FdCustNo=X,2,L
 
 #TypeHelp=x,200,S
@@ -114,12 +114,14 @@ V(5,#DateStart,#CDATEX)
 #ActualRepayDate=D,7,I
 C(3,#Type,5,$,S)
 @A(DATE,1,#ActualRepayDate)
-V(7)
+!V(7)
 
 #RepayDate=D,7,I
 C(3,#Type,5,$,S)
 @A(DATE,1,#RepayDate)
-V(7)
+C(4,#ActualRepayDate,$,s)
+C(4,#RepayDate,$,s)
+V(P,至少需輸入一個日期)
 
 #CustNo=A,7,I
 C(3,#Type,5,$,S)

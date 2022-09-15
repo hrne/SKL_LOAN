@@ -246,17 +246,14 @@ public class L8205ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "left join \"CdCode\" CD on CD.\"DefCode\" = 'RepaySource'			\n";
 		sql += "and CD.\"Code\" = M.\"RepaySource\"			\n";
 		sql += "left join \"CdEmp\" E on E.\"EmployeeNo\" = M.\"CreateEmpNo\"			\n";
-		// 條件：資料有實際償還日期時比實際償還日期
-		//                       否則比預定償還日期
-		sql += "WHERE CASE WHEN NVL(M.\"ActualRepayDate\", 0) > 0 ";
-		sql += "           THEN M.\"ActualRepayDate\" ";
-		sql += "           ELSE M.\"RepayDate\" END ";
-		sql += "      = ";
-		sql += "      CASE WHEN NVL(M.\"ActualRepayDate\", 0) > 0 ";
-		sql += "           THEN :actualRepayDate ";
-		sql += "           ELSE :repayDate END ";
+		// 條件：實際償還日期與預定償還日期都有輸入時,任一日期符合該輸入條件都撈出(取合集,非交集)
+		sql += "WHERE CASE WHEN NVL(M.\"ActualRepayDate\", 0) > 0    \n";
+		sql += "                AND NVL(M.\"ActualRepayDate\", 0)  = :actualRepayDate  THEN 1  \n";
+		sql += "           WHEN NVL(M.\"RepayDate\", 0)       > 0    \n";
+		sql += "                AND  NVL(M.\"RepayDate\", 0)       = :repayDate        THEN 1  \n";
+		sql += "           ELSE 0 END = 1   \n";
 		if(useCustNo) {
-			sql += " and M.\"CustNo\" = :custNo";
+			sql += " and M.\"CustNo\" = :custNo   \n";
 		}
 		sql += " order by M.\"CustNo\"  ";
 

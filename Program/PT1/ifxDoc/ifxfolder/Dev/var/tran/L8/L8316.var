@@ -473,6 +473,20 @@ V(H,#YesNoHelp)
 #ClaimStatus2X=X,2,L
 T(H,@ClaimStatus2X,#ClaimStatus2,#YesNoHelp)
 
+!是否依更生條件履行 22
+#IsImplement=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(3,#CaseStatus,3,$,s)
+C(5,#TranKey,D,T(2,@IsImplement,#L8r27IsImplement),$)
+C(5,#TranKey,D,s,$)
+HELP(#YesNoHelp)
+@T(3,@IsImplementX,)
+V(H,#YesNoHelp)
+
+#IsImplementX=X,2,L
+T(H,@IsImplementX,#IsImplement,#YesNoHelp)
+
 !保全處分撤銷日
 #SaveEndDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -482,19 +496,9 @@ C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#SaveEndDate)
 
-!是否依更生條件履行 22
-#IsImplement=X,1,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(3,#CaseStatus,3,$,s)
-C(5,#TranKey,D,T(2,@IsImplement,#L8r27IsImplement),$)
-C(5,#TranKey,D,s,$)
-HELP(#YesNoHelp)
-@T(3,IsImplementX,)
-V(H,#YesNoHelp)
 
-#IsImplementX=X,2,L
-T(H,@IsImplementX,#IsImplement,#YesNoHelp)
+
+
 
 !監督人姓名 5全形
 #InspectName=X,10,I

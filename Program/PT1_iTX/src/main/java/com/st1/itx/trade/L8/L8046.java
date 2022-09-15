@@ -51,7 +51,11 @@ public class L8046 extends TradeBuffer {
 			String iLastUpdateEmpNo = rJcicZ055.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursListA.putParam("OOTranKey", rJcicZ055.getTranKey());
-			occursListA.putParam("OOYear", rJcicZ055.getYear());
+			if (rJcicZ055.getYear() > 1911) {
+				occursListA.putParam("OOYear", rJcicZ055.getYear() - 1911);
+			} else {
+				occursListA.putParam("OOYear", rJcicZ055.getYear());
+			}
 			occursListA.putParam("OOCourtDiv", rJcicZ055.getCourtDiv());
 			occursListA.putParam("OOCourtCaseNo", rJcicZ055.getCourtCaseNo());
 			occursListA.putParam("OOPayDate", rJcicZ055.getPayDate());
@@ -78,7 +82,8 @@ public class L8046 extends TradeBuffer {
 				}
 			}
 			String taU = rJcicZ055.getLastUpdate().toString();
-			String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uaDate = StringUtils
+					.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
 			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
 			String uTime = taU.substring(11, 19);
 			occursListA.putParam("OOLastUpdate", uaDate + " " + uTime);
@@ -97,7 +102,11 @@ public class L8046 extends TradeBuffer {
 			String iLastUpdateEmpNo = rrJcicZ055Log.getLastUpdateEmpNo();
 			CdEmp iCdEmp = new CdEmp();
 			occursList.putParam("OOTranKey", rrJcicZ055Log.getTranKey());
-			occursList.putParam("OOYear", rrJcicZ055Log.getYear());
+			if (rrJcicZ055Log.getYear() > 1911) {
+				occursList.putParam("OOYear", rrJcicZ055Log.getYear() - 1911);
+			} else {
+				occursList.putParam("OOYear", rrJcicZ055Log.getYear());
+			}
 			occursList.putParam("OOCourtDiv", rrJcicZ055Log.getCourtDiv());
 			occursList.putParam("OOCourtCaseNo", rrJcicZ055Log.getCourtCaseNo());
 			occursList.putParam("OOPayDate", rrJcicZ055Log.getPayDate());
@@ -123,7 +132,8 @@ public class L8046 extends TradeBuffer {
 				}
 			}
 			String taU = rrJcicZ055Log.getLastUpdate().toString();
-			String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uaDate = StringUtils
+					.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
 			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
 			String uTime = taU.substring(11, 19);
 			occursList.putParam("OOLastUpdate", uaDate + " " + uTime);

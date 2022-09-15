@@ -31,6 +31,10 @@ public class L9134 extends TradeBuffer {
 	/* 報表服務注入 */
 	@Autowired
 	L9134Report2 l9134Report2;
+	
+	/* 報表服務注入 */
+	@Autowired
+	L9134Report3 l9134Report3;
 
 	@Autowired
 	WebClient webClient;
@@ -56,6 +60,9 @@ public class L9134 extends TradeBuffer {
 
 		l9134Report2.setParentTranCode(parentTranCode);
 		l9134Report2.exec(startDate, endDate, titaVo);
+		
+		l9134Report3.setParentTranCode(parentTranCode);
+		l9134Report3.exec(endDate, titaVo);
 
 		// 交易櫃員
 		String empNo = titaVo.getTlrNo();

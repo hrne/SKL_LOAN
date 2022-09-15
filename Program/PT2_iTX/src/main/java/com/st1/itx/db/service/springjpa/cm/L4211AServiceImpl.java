@@ -29,8 +29,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 
 	private String inputReconCode;
 	private int inputAcDate;
-	private int reportNo = 0;
-	private int functionCode = 0;
+//	private int reportNo = 0;
+//	private int functionCode = 0;
 
 	public List<Map<String, String>> findAll(TitaVo titaVo , int printNo) throws Exception {
 
@@ -320,7 +320,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "                           , '7') ";// 轉暫收
 			sql += " AND ( ";
 			sql += " 	CASE ";
-			sql += " 	  WHEN SUBSTR(TX1.\"TitaTlrNo\",1,2) = SUBSTR(BATX.\"TitaTlrNo\",5,2)";
+			sql += " 	  WHEN SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";
 			sql += "       AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
 			sql += "	  THEN 1 ELSE 0 END";
 			sql += "	) = 0 ";

@@ -82,7 +82,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param startDate 查詢區間起日
 	 * @param endDate   查詢區間迄日
-	 * @param titaVo    TitaVo
+	 * @param titaVo  TitaVo
 	 * @return 查詢結果
 	 */
 	public List<Map<String, String>> doDetailQuery(int startDate, int endDate, TitaVo titaVo) {
@@ -112,13 +112,52 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , \"AcNoCode\" ";
 		sql += "            , \"SlipNo\" ";
 		sql += "            , \"TitaTxtNo\" ";
-
+		
 		this.info("doDetailQuery sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("startDate", startDate);
 		query.setParameter("endDate", endDate);
+		return this.convertToMap(query);
+	}
+	
+	
+	/**
+	 * L9134  放款暫收款對帳明細表
+	 * 
+	 * @param titaVo  TitaVo
+	 * @return 查詢結果
+	 */
+	public List<Map<String, String>> doQueryL9134_3( TitaVo titaVo) {
+
+		String sql = " ";
+		sql += "     SELECT C.\"AcctItem\" ";
+		sql += "          , AC.\"AcNoCode\"";
+		sql += "          , AC.\"CustNo\"";
+		sql += "          , AC.\"FacmNo\"";
+		sql += "          , AC.\"AcBal\"";
+		sql += "          , AC.\"RvBal\"";
+		sql += "          , CC.\"Item\"";
+		sql += "          , NVL(CO.\"RenewCode\",' ') AS \"RenewCode\"";
+		sql += "     FROM \"AcReceivable\" AC ";
+		sql += "     LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = AC.\"AcNoCode\" ";
+		sql += "                             AND C.\"AcSubCode\" = AC.\"AcSubCode\" ";
+		sql += "                             AND C.\"AcDtlCode\" = AC.\"AcDtlCode\" ";
+		sql += "     LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'AcSubBookCode' ";
+		sql += "                            AND CC.\"Code\" = AC.\"AcSubBookCode\" ";
+		sql += "     LEFT JOIN \"CollList\" CO ON CO.\"CustNo\" = AC.\"CustNo\" ";
+		sql += "                              AND CO.\"FacmNo\" = AC.\"FacmNo\" ";
+		sql += "     WHERE AC.\"AcctCode\" = 'TAV' ";
+		sql += "       AND AC.\"RvBal\" > 0 ";
+		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
+		sql += "            , AC.\"CustNo\" ASC ";
+		sql += "            , AC.\"FacmNo\" ASC ";
+		
+		this.info("doQueryL9134C sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
 		return this.convertToMap(query);
 	}
 }
