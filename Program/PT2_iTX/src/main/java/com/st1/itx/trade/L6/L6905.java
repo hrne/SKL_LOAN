@@ -82,7 +82,7 @@ public class L6905 extends TradeBuffer {
 			throw new LogicException(titaVo, "E5004", "");
 		}
 
-		if (this.index == 0 && dList == null || dList.size() == 0) {
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
 		}
 
@@ -95,7 +95,7 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOCustNo", d.get("CustNo"));
 			occursList.putParam("OOFacmNo", d.get("FacmNo"));
 			occursList.putParam("OOBormNo", d.get("BormNo"));
-			occursList.putParam("OORelDy", parse.stringToInteger(d.get("RelDy")) - 19110000);
+			occursList.putParam("OORelDy", parse.stringToInteger(d.get("RelDy"))-19110000);
 			occursList.putParam("OOSlipNote", d.get("SlipNote"));
 			occursList.putParam("OOTranItem", d.get("TranItem"));
 			occursList.putParam("OOTitaTxCd", d.get("TitaTxCd"));
@@ -107,13 +107,13 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOTlrItem", d.get("TLRNAME"));
 			occursList.putParam("OOTitaTlrNo", d.get("TitaTlrNo"));
 
-			// occursList.putParam("OORelTxseq", d.get("RelTxseq"));
+			//occursList.putParam("OORelTxseq", d.get("RelTxseq"));
 			int iTno = Integer.valueOf(d.get("TitaTxtNo"));
 			String iTitaTxtNo = String.format("%08d", iTno);
 			occursList.putParam("OOTitaTxtNo", iTitaTxtNo);
 			this.info("OOTxtNo      =" + iTitaTxtNo);
 			this.info("OOTxtNo2     =" + d.get("TitaTxtNo"));
-
+			
 			if ("D".equals(d.get("DbCr"))) {
 				occursList.putParam("OODbAmt", parse.stringToBigDecimal(d.get("TxAmt")));
 				occursList.putParam("OOCrAmt", 0);
@@ -121,14 +121,14 @@ public class L6905 extends TradeBuffer {
 				occursList.putParam("OODbAmt", 0);
 				occursList.putParam("OOCrAmt", parse.stringToBigDecimal(d.get("TxAmt")));
 			}
-
+			
 			String DateTime = parse.stringToStringDateTime(d.get("LastUpdate"));
 			this.info("L6905 DateTime : " + DateTime);
-			occursList.putParam("OOLastUpdate", DateTime);
-			// String Date = FormatUtil.left(DateTime, 9);
-			// occursList.putParam("OOLastDate", Date);
-			// String Time = FormatUtil.right(DateTime, 8);
-			// occursList.putParam("OOLastTime", Time);
+			occursList.putParam("OOLastUpdate",DateTime);
+			//String Date = FormatUtil.left(DateTime, 9);
+			//occursList.putParam("OOLastDate", Date);
+			//String Time = FormatUtil.right(DateTime, 8);
+			//occursList.putParam("OOLastTime", Time);
 
 			String Odate = parse.stringToStringDateTime(d.get("CreateDate"));
 			this.info("CreateDate   = " + Odate);
@@ -136,11 +136,11 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOLastDate", Date);
 			String Time = FormatUtil.right(Odate, 8);
 			occursList.putParam("OOLastTime", Time);
-
+			
 			// 查詢會計科子細目設定檔
 			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));
 			occursList.putParam("OOSlipNo", d.get("SlipNo"));
-
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
@@ -379,11 +379,11 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOTlrItem", iTlrItem);
 			occursList.putParam("OOTitaTlrNo", tAcDetail.getTitaTlrNo());
 
-			// occursList.putParam("OORelTxseq", tAcDetail.getRelTxseq());
+			//occursList.putParam("OORelTxseq", tAcDetail.getRelTxseq());
 			Integer iTno = Integer.valueOf(tAcDetail.getTitaTxtNo());
 			String iTitaTxtNo = String.format("%08d", iTno);
 			occursList.putParam("OOTxtNo", iTitaTxtNo);
-
+			
 			if (tAcDetail.getDbCr().equals("D")) {
 				occursList.putParam("OODbAmt", tAcDetail.getTxAmt());
 				occursList.putParam("OOCrAmt", 0);
@@ -401,11 +401,11 @@ public class L6905 extends TradeBuffer {
 
 			DateTime = parse.timeStampToString(tAcDetail.getLastUpdate());
 			this.info("L6905 DateTime : " + DateTime);
-			occursList.putParam("OOLastUpdate", DateTime);
-			// String Date = FormatUtil.left(DateTime, 9);
-			// occursList.putParam("OOLastDate", Date);
-			// String Time = FormatUtil.right(DateTime, 8);
-			// occursList.putParam("OOLastTime", Time);
+			occursList.putParam("OOLastUpdate",DateTime);
+			//String Date = FormatUtil.left(DateTime, 9);
+			//occursList.putParam("OOLastDate", Date);
+			//String Time = FormatUtil.right(DateTime, 8);
+			//occursList.putParam("OOLastTime", Time);
 
 			String Odate = parse.timeStampToString(tAcDetail.getCreateDate());
 			this.info("CreateDate   = " + Odate);
@@ -413,7 +413,7 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOLastDate", Date2);
 			String Time2 = FormatUtil.right(Odate, 8);
 			occursList.putParam("OOLastTime", Time2);
-
+			
 			// 查詢會計科子細目設定檔
 			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()), titaVo);
 			if (tCdAcCode == null) {
@@ -422,7 +422,7 @@ public class L6905 extends TradeBuffer {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
 			occursList.putParam("OOSlipNo", tAcDetail.getSlipNo());
-
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 

@@ -228,7 +228,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
 			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
 			sql += "                           , '6' "; // 批次入帳
-			sql += "                           , '7') ";// 轉暫收
+			sql += "                           , '7') ";// 批次人工
 
 		} else if (printNo == 3) {
 
@@ -316,8 +316,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "     END = BATX.\"ReconCode\"";
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
 			sql += " AND BATX.\"ProcStsCode\" IN ( '5'  ";// 單筆入帳
-			sql += "                           , '6' "; // 批次入帳
-			sql += "                           , '7') ";// 轉暫收
+			sql += "                           , '7') ";// 批次人工
 			sql += " AND ( ";
 			sql += " 	CASE ";
 			sql += " 	  WHEN SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";

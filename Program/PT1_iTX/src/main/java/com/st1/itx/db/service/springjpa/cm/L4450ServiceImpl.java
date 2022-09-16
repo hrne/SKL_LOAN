@@ -280,7 +280,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            case ";
 		sql += "              when b.\"DueAmt\" > 0 ";
 		sql += "              then 1 ";
-		sql += "            else 0 ";
+		sql += "            else 1 ";
 		sql += "            end ";
 		sql += "        else 1 ";
 		sql += "        end = 1 ";
@@ -366,7 +366,21 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        end = 1 ";
 		// 回收時排序,依應繳日順序由小到大、利率順序由大到小、額度由大到小
 		sql += "   order by b.\"CustNo\" ASC, b.\"NextPayIntDate\" ASC, b.\"FacmNo\" ASC, b.\"BormNo\" ASC ";
+
 		this.info("sql=" + sql);
+
+		this.info("iEntryDate" + iEntryDate);
+		this.info("iDeductDateStart" + iDeductDateStart);
+		this.info("iDeductDateEnd" + iDeductDateEnd);
+		this.info("iAchSpecificDdTo" + iAchSpecificDdTo);
+		this.info("iAchSpecificDays" + iAchSpecificDays.toString());
+		this.info("iAchSecondSpecificDdTo" + iAchSecondSpecificDdTo);
+		this.info("iAchSecondSpecificDays" + iAchSecondSpecificDays.toString());
+		this.info("iPostSpecificDate" + iPostSpecificDate);
+		this.info("iPostSpecificDay" + iPostSpecificDay);
+		this.info("iPostSecondSpecificDate" + iPostSecondSpecificDate);
+		this.info("iPostSecondSpecificDay" + iPostSecondSpecificDay);
+		this.info("iRepayBank" + iRepayBank);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

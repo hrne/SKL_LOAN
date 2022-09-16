@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.service.springjpa.cm.LC001ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CheckAuth;
 import com.st1.itx.util.date.DateUtil;
@@ -50,9 +54,10 @@ public class L6943 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 200;
 
-		List<Map<String, String>> dList = checkAuth.canDoPgms(titaVo.getParam("BrNo"), titaVo.getParam("TlrNo"), titaVo.getParam("TranNo"));
+		List<Map<String, String>> dList = checkAuth.canDoPgms(titaVo.getParam("BrNo"), titaVo.getParam("TlrNo"),
+				titaVo.getParam("TranNo"));
 
-		if (dList == null || dList.size() == 0) {
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "交易權限");
 		}
 
@@ -89,7 +94,7 @@ public class L6943 extends TradeBuffer {
 		}
 
 		this.info("dList.size = " + dList.size() + "/" + idx);
-
+		
 		if (dList != null && idx < dList.size()) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(idx);

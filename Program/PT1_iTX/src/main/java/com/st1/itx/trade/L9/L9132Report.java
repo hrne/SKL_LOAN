@@ -208,8 +208,9 @@ public class L9132Report extends MakeReport {
 				// 計算用
 				i++;
 
-				tempAcSubCode = r.get("AcSubCode");
-
+				
+				
+				
 				if (!r.get("AcNoCode").equals(acNoCode)) {
 					// 會計科目
 					acNoCode = r.get("AcNoCode");
@@ -226,15 +227,25 @@ public class L9132Report extends MakeReport {
 
 				} else {
 
+					
+					
 					this.info("AcSubCode=" + tempAcSubCode + " === " + r.get("AcSubCode") + " : " + i);
 
+					if(i == 1) {
+						tempAcSubCode = r.get("AcSubCode");
+					}
+					
 					// 子目
 					if (!r.get("AcSubCode").equals(tempAcSubCode) && i > 2) {
+						tempAcSubCode = r.get("AcSubCode");						
 						acSubCodeCalculate();
 					}
 
+
 				}
 
+				
+				
 				// 子目
 				String acSubCode = r.get("AcSubCode");
 				// 傳票號碼
@@ -254,7 +265,7 @@ public class L9132Report extends MakeReport {
 				// 借貸方金額(計算用)
 				int tDbAmt = Integer.valueOf(r.get("DbAmt")) == 0 ? 0 : Integer.valueOf(r.get("DbAmt"));
 				int tCrAmt = Integer.valueOf(r.get("CrAmt")) == 0 ? 0 : Integer.valueOf(r.get("CrAmt"));
-
+				
 				// 經辦
 				String empName = r.get("EmpName");
 
@@ -270,7 +281,7 @@ public class L9132Report extends MakeReport {
 				// 傳票號碼
 				print(0, 56, slipNo, "R");
 				// 區隔帳冊
-				print(0, 67, acSubBookItem, "C");
+				print(0, 67, acSubBookItem,"C");
 				// 戶號
 				print(0, 82, custNo);
 				// 貸方金額
@@ -284,6 +295,7 @@ public class L9132Report extends MakeReport {
 				tempAcSubCodeCount++;
 				tempAcSubCodeDbAmtTotal = tempAcSubCodeDbAmtTotal + tDbAmt;
 				tempAcSubCodeCrAmtTotal = tempAcSubCodeCrAmtTotal + tCrAmt;
+
 
 				// 科目小計
 				tempAcNoCodeCount++;
@@ -337,7 +349,8 @@ public class L9132Report extends MakeReport {
 		this.batchNo = FormatUtil.pad9(titaVo.getParam("BatchNo"), 2);
 
 		// 查AcDetail
-		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(this.reportDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(this.reportDate, iBatchNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
@@ -425,7 +438,8 @@ public class L9132Report extends MakeReport {
 
 				String acNoCode = tmpEntry.getKey();
 				String acNoItem = "";
-				Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, "     ", "     ", "  ", "  ", 0, Integer.MAX_VALUE, titaVo);
+				Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, "     ", "     ", "  ",
+						"  ", 0, Integer.MAX_VALUE, titaVo);
 				List<CdAcCode> lCdAcCode = slCdAcCode == null ? null : slCdAcCode.getContent();
 				if (lCdAcCode == null || lCdAcCode.size() == 0) {
 					acNoItem = "";
@@ -452,7 +466,8 @@ public class L9132Report extends MakeReport {
 				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
-				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet().iterator(); detailIt.hasNext();) {
+				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet()
+						.iterator(); detailIt.hasNext();) {
 					Entry<AcSubCodeVo, L9132RptDataVo> tmpDetailEntry = detailIt.next();
 
 					AcSubCodeVo tmpAcSubCodeVo = tmpDetailEntry.getKey();
@@ -481,8 +496,10 @@ public class L9132Report extends MakeReport {
 							print(1, 1, "會計科目：");
 							print(0, 13, acNoCode);
 							print(0, 26, acNoItem);
-							print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
-							print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+							print(1, 1,
+									"子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　區隔帳冊　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+							print(1, 1,
+									"－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 						}
 
 						print(1, 1, "　　");

@@ -99,7 +99,7 @@ public class L2633ReportB extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(80);
+		this.setMaxRows(70);
 
 		this.setFontSize(8);
 		/**
@@ -227,7 +227,8 @@ public class L2633ReportB extends MakeReport {
 				print(0, 171, FormatUtil.padX(clsNo, 20)); // 銷號欄
 				print(1, 1, "　　　　　　           ");
 			}
-			print(1, 1, "－－－－－－　－－－－－－－－－－　－－－－－－－－－－－　－－－－－－－－－　－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－");
+			print(1, 1,
+					"－－－－－－　－－－－－－－－－－　－－－－－－－－－－－　－－－－－－－－－　－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－");
 
 		} else {
 			// 出空表
