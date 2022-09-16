@@ -746,9 +746,7 @@ public class BaTxCom extends TradeBuffer {
 		addByBormNoBaTxList();
 
 		// 計算作帳金額(匯款轉帳檢核報表)
-		if (iRepayCode == 1) {
-			settleAcAmtBatxList(iRepayType, iTxAmt, this.shortAmt);
-		}
+		settleAcAmtBatxList(iRepayType, iTxAmt, this.shortAmt);
 		this.info("TempVo=" + tempVo.toString());
 
 		return this.baTxList;

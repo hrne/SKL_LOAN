@@ -56,9 +56,14 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
 		int iTitaHCode = this.parse.stringToInteger(titaVo.getParam("TitaHCode"));
-		String iTitaKinBr = titaVo.getParam("TxtNo").substring(0,4);
-		String iTitaTlrNo = titaVo.getParam("TxtNo").substring(4,10);
-		String iTitaTxtNo = titaVo.getParam("TxtNo").substring(10, 18);
+		String iTitaKinBr = "";
+		String iTitaTlrNo = "";
+		String iTitaTxtNo = "";
+		if (titaVo.getParam("TxtNo").length() == 18) {
+			iTitaKinBr = titaVo.getParam("TxtNo").substring(0, 4);
+			iTitaTlrNo = titaVo.getParam("TxtNo").substring(4, 10);
+			iTitaTxtNo = titaVo.getParam("TxtNo").substring(10, 18);
+		}
 		this.info("iTitaKinBr = " + iTitaKinBr);
 		this.info("iTitaTlrNo = " + iTitaTlrNo);
 		this.info("iTitaTxtNo = " + iTitaTxtNo);
@@ -133,9 +138,9 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  AND  ln3.\"BormNo\" >= :BormNoS											 ";
 			sql += "  AND  ln3.\"BormNo\" <= :BormNoE											 ";
 		} else {
-			sql += " ln3.\"TitaKinBr\" >= :titaKinBr											 ";
-			sql += "  AND  ln3.\"TitaTlrNo\" <= :titaTlrNo											 ";
-			sql += "  AND  ln3.\"TitaTxtNo\" >= :titaTxtNo											 ";
+			sql += " ln3.\"TitaKinBr\" = :titaKinBr											 ";
+			sql += "  AND  ln3.\"TitaTlrNo\" = :titaTlrNo											 ";
+			sql += "  AND  ln3.\"TitaTxtNo\" = :titaTxtNo											 ";
 		}
 		if (iTitaHCode == 0) {
 			sql += "      AND ln3.\"TitaHCode\" = '0'											";

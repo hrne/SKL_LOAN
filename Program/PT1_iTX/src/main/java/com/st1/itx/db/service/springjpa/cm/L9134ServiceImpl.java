@@ -136,6 +136,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , AC.\"AcNoCode\"";
 		sql += "          , AC.\"CustNo\"";
 		sql += "          , AC.\"FacmNo\"";
+		sql += "          , AC.\"OpenAcDate\"";
 		sql += "          , AC.\"LastTxDate\"";
 		sql += "          , AC.\"AcBal\"";
 		sql += "          , AC.\"RvBal\"";

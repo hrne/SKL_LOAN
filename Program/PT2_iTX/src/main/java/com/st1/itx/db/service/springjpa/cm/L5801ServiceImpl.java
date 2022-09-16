@@ -271,13 +271,14 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=	"		         + MOD(:thisMonth,100) - MOD(TRUNC(FA.\"FirstDrawdownDate\" / 100),100) "; 
 		sql +=	"		       )  <= 240 )" ;//排除已屆滿20年
 		
-		sql += "         AND B.\"LoanBalance\" > 0";// 排除上個月餘額已是0
+//		sql += "         AND B.\"LoanBalance\" > 0";// 排除上個月餘額已是0
 		sql += "         AND LN.\"Status\" NOT IN 1 ";// 排除展期
 		
 		sql += "   GROUP BY T.\"CustNo\", T.\"FacmNo\"";
 		sql += "   ) N";
 		sql += "   LEFT JOIN \"CustMain\" CU";
 		sql += "          ON CU.\"CustNo\" = N.\"CustNo\"";
+		sql += "   WHERE N.\"LastMonthBal\"  > 0" ;// 排除上個月餘額已是0
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
 
 		this.info("sql=" + sql);

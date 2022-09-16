@@ -104,6 +104,7 @@ T(1,@FacmNo,#NTXBUF,13,3)
 T(1,@BormNo,#NTXBUF,16,3)
 C(5,#ChainTxCd,L4943,T(1,@EntryDate,#NTXBUF,19,7),T(1,@AcDate,#NTXBUF,19,7))
 T(1,@TxtNo,#NTXBUF,26,18)
+T(1,@TitaHCode,#NTXBUF,44,1)
 
 
 
