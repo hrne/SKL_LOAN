@@ -332,11 +332,21 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 				// grp2已處理
-				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")) {
-					if (alrCnt.containsKey(grp2)) {
-						alrCnt.put(grp2, alrCnt.get(grp2) + 1);
+				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
+						|| tBatxDetail.getProcStsCode().equals("7")) {
+					if (tBatxDetail.getRepayType() == 9) {
+						// 轉戰收
+						if (virCnt.containsKey(grp2)) {
+							virCnt.put(grp2, virCnt.get(grp2) + 1);
+						} else {
+							virCnt.put(grp2, 1);
+						}
 					} else {
-						alrCnt.put(grp2, 1);
+						if (alrCnt.containsKey(grp2)) {
+							alrCnt.put(grp2, alrCnt.get(grp2) + 1);
+						} else {
+							alrCnt.put(grp2, 1);
+						}
 					}
 				}
 				// grp2待處理
@@ -346,14 +356,6 @@ public class L4002 extends TradeBuffer {
 						watCnt.put(grp2, watCnt.get(grp2) + 1);
 					} else {
 						watCnt.put(grp2, 1);
-					}
-				}
-				// grp2批次入帳後人工
-				if (tBatxDetail.getProcStsCode().equals("7")) {
-					if (virCnt.containsKey(grp2)) {
-						virCnt.put(grp2, virCnt.get(grp2) + 1);
-					} else {
-						virCnt.put(grp2, 1);
 					}
 				}
 
@@ -373,11 +375,21 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// grp3已處理
-					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")) {
-						if (alrCnt.containsKey(grp3)) {
-							alrCnt.put(grp3, alrCnt.get(grp3) + 1);
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
+							|| tBatxDetail.getProcStsCode().equals("7")) {
+						if (tBatxDetail.getRepayType() == 9) {
+							// 轉戰收
+							if (virCnt.containsKey(grp3)) {
+								virCnt.put(grp3, virCnt.get(grp3) + 1);
+							} else {
+								virCnt.put(grp3, 1);
+							}
 						} else {
-							alrCnt.put(grp3, 1);
+							if (alrCnt.containsKey(grp3)) {
+								alrCnt.put(grp3, alrCnt.get(grp3) + 1);
+							} else {
+								alrCnt.put(grp3, 1);
+							}
 						}
 					}
 					// grp3待處理

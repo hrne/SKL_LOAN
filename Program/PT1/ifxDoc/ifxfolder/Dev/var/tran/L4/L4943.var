@@ -110,7 +110,7 @@ T(B,@RepayTypeHelp,#HelpDesc2+;99:全部)
 T(B,@AmlRspHelp,#HelpDesc3)
 
 #FunctionHelp=x,140,S
-T(3,01:戶號;02:上限金額;03:下限金額;04:檢核不正常;05:扣款金額為0;06:媒體檔總金額;07:已到期未至應繳日;09:整批;10:入帳後溢短收)
+T(3,01:戶號;02:上限金額;03:下限金額;04:檢核不正常;05:扣款金額為0;06:媒體檔總金額;07:已到期未至應繳日;09:整批;10:入帳後溢短收;11:入帳後有費用未收)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -200,6 +200,10 @@ C(3,#FunctionCode,10,
 INVOKEJS(SHOW,L4943_3,1)
 INVOKEJS(SHOW,L4943_4,1)
 INVOKEJS(SHOW,L4943_5,1),$)
+C(3,#FunctionCode,11,
+INVOKEJS(SHOW,L4943_3,1)
+INVOKEJS(SHOW,L4943_4,1)
+INVOKEJS(SHOW,L4943_5,1),$)
 
 ! 戶號
 #CustNo=A,7,I
@@ -221,7 +225,7 @@ T(2,)
 ! 銀行別
 #BankCode=A,3,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==9 || #FunctionCode==10,$,s)
+IF(#FunctionCode==4 || #FunctionCode==5 || #FunctionCode==6 || #FunctionCode==7 || #FunctionCode==9 || #FunctionCode==10|| #FunctionCode==11,$,s)
 HELP(#BankDeductCdHelp,cols:4)
 @V(H,#BankDeductCdHelp)
 
@@ -234,12 +238,12 @@ T(HELP,@RepayTypeHelp1,#RepayTypeHelp,+,01;05;99)
 ! 還款類別
 #RepayType=A,2,I
 C(3,#CHAIN,1,s,$)
-IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9 || #FunctionCode==10,$,s)
+IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9 || #FunctionCode==10|| #FunctionCode==11,$,s)
 IF(#FunctionCode==6,HELP(#RepayTypeHelp1),HELP(#RepayTypeHelp))
 @IF(#FunctionCode==6,V(H,#RepayTypeHelp1),V(H,#RepayTypeHelp))
 
 #RepayTypeX=x,10,L
-IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9 || #FunctionCode==10,$,s)
+IF(#FunctionCode==5 || #FunctionCode==6 || #FunctionCode==9 || #FunctionCode==10|| #FunctionCode==11,$,s)
 IF(#FunctionCode==6,T(H,#RepayType,#RepayTypeHelp1),T(H,#RepayType,#RepayTypeHelp))
 
 
@@ -299,6 +303,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 C(3,#FunctionCode,6,E(0,@RPTFG,1),E(0,@RPTFG,0))
 C(3,#FunctionCode,7,E(0,@RPTFG,7),$)
 C(3,#FunctionCode,10,E(0,@RPTFG,2),$)
+C(3,#FunctionCode,11,E(0,@RPTFG,2),$)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -408,7 +413,8 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C})
 #OOBUF_D=X,390,S
 T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOEntryDate)
 #OOBTN_D=A,2,O
-C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
+IF(#FunctionCode==10||#FunctionCode==11,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
+! C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
 !C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:EntryDate<-OOEntryDate}),BIND(grid,cancel))
 
 #OOMediaCode=X,1,O

@@ -108,6 +108,9 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += " ,TX.\"TempAmt\"  AS \"TxTempAmt\"                    ";
 				sql += " ,TX.\"OverAmt\"  - \"ShortAmt\"   AS \"OverShort\"   ";
 			}
+			if (functionCode == 11) {
+				sql += " ,JSON_VALUE(BATX.\"ProcNote\", '$.UnPayFeeX') AS \"UnPayFeeX\"    ";
+			}
 			sql += " from \"BankDeductDtl\" BDD                               ";
 
 		} else {
@@ -150,6 +153,12 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) TX  on TX.\"AcDate\" = BDD.\"AcDate\"              ";
 			sql += "          and TX.\"TitaTlrNo\" = BDD.\"TitaTlrNo\"        ";
 			sql += "          and TX.\"TitaTxtNo\" = BDD.\"TitaTxtNo\"        ";
+		}
+
+		if (functionCode == 11) {
+			sql += " left join  \"BatxDetail\"  BATX on BATX.\"AcDate\" = BDD.\"AcDate\"              ";
+			sql += "          and BATX.\"TitaTlrNo\" = BDD.\"TitaTlrNo\"        ";
+			sql += "          and BATX.\"TitaTxtNo\" = BDD.\"TitaTxtNo\"        ";
 		}
 
 		sql += " where BDD.\"EntryDate\" >= :entryDateFm";
@@ -216,6 +225,10 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 10: // 溢短收
 			sql += "   and (   NVL(TX.\"OverAmt\",0)  > 0 ";
 			sql += "        or NVL(TX.\"ShortAmt\",0) > 0 )";
+			break;
+		case 11: // 入帳後有費用未收(銀扣期款不收費用)
+			sql += "   and BDD.\"RepayType\" = 1";
+			sql += "   and NVL(JSON_VALUE(BATX.\"ProcNote\", '$.UnPayFeeX'),' ') <> ' ' ";
 			break;
 		}
 

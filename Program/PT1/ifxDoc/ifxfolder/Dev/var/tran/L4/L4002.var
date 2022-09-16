@@ -266,7 +266,7 @@ H,T(2,整批訂正))
 ! LabelFgD 轉暫收(T)
 #OOBTNDISPLAYD=X,10,O
 SWITCH(#OOLabelFgD,
-T,T(2,單筆入帳),)
+T,T(2,勾選入帳),)
 ! C(3,#OOStatusCode,0,T(2,),$)
 ! C(3,#OOStatusCode,1,T(2,轉暫收),$)
 ! C(3,#OOStatusCode,2,T(2,轉暫收),$)
@@ -332,7 +332,7 @@ T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
 ! 20210113 新增
 ! 虛擬轉暫收按鈕_RANK=2
 #OOBUF_L4920H2=x,100,S
-T(2,7+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
+T(2,T+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
      +#OOReconCode+0000000+#OOFileName)
 
 

@@ -172,7 +172,9 @@ public class L4943 extends TradeBuffer {
 					String returnCode = result.get("ReturnCode");
 					String mediaKind = result.get("MediaKind");
 					String amlRsp = result.get("AmlRsp");
-					if (functionCode == 7) {
+					if (functionCode == 11) {
+						procNote = "未收費用:" + result.get("UnPayFeeX");
+					} else if (functionCode == 7) {
 						int maturityDate = parse.stringToInteger(result.get("MaturityDate"));
 						procNote = "已到期未至應繳日, 到期日:" + maturityDate;
 					} else if (acDate > 0) {

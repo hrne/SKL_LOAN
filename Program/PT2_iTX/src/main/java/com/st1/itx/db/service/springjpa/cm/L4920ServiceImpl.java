@@ -154,7 +154,10 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and bd.\"ProcStsCode\" in ('0','2','3','4') ";
 			break;
 		case "S":
-			sql += "   and bd.\"ProcStsCode\" in ('5','6') ";
+			sql += "   and bd.\"ProcStsCode\" in ('5','6','7') AND bd.\"RepayType\" <> 9 ";
+			break;
+		case "T":
+			sql += "   and bd.\"ProcStsCode\" in ('5','6','7') AND bd.\"RepayType\" = 9 ";
 			break;
 		default:
 			sql += "   and bd.\"ProcStsCode\" = '" + iProcStsCode + "'";
