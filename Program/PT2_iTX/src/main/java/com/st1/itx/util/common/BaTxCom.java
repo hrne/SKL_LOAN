@@ -208,6 +208,7 @@ public class BaTxCom extends TradeBuffer {
 		this.preRepayTerms = 0; // 期款可預收期數
 		this.repayIntDate = 0; // 還款應繳日
 		this.repayIntDateByFacmNoVo = new TempVo(); // 額度還款應繳日
+		this.prevPayIntDate = 0; // 上次繳息日
 		this.nextPayIntDate = 0; // 下次應繳日
 
 		// 部分還款
