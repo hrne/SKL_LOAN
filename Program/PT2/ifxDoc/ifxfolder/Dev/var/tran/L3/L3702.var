@@ -111,6 +111,8 @@ S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo,#RimAcDate)
 R(1,L3R30)
 T(2,@LoanRmkCode,#L3r30RmkCode)
 T(2,@RmkDesc,#L3r30RmkDesc)
+T(2,@RmkEmpNo,#L3r30LastUpdateEmpNo)
+T(2,@RmkEmpNoName,#L3r30FullName)
 
 ![功能]
 !下拉式選單 1.新增 2.修改 4.刪除 5.查詢
@@ -169,6 +171,8 @@ A(ID_UNINO,0,#CustId)
 #RimFunCd=A,1,S
 #RimCustNo=A,7,S
 #RimAcDate=D,8,S
+#RmkEmpNo=X,6,S
+#RmkEmpNoName=X,40,S
 
 <include src="ROM.icf::L1R01.dec"/>
 !調RIML1R01取CustName
@@ -184,13 +188,15 @@ T(2,@CustName,#L1r01CustName)
 
 ![經辦編號]
 #TlrNo=X,6,S
-IF(#FunCd==1 || #FunCd==2,T(4,TLRNO$),$)
+IF(#FunCd==1 || #FunCd==2,T(4,TLRNO$),T(4,#RmkEmpNo))
+!IF(#FunCd==1 || #FunCd==2,T(4,TLRNO$),$)
 
 ![經辦姓名]
 !自動顯示不必輸入
 #EmpName=X,10,L
 !T(4,EMPNM$)
-IF(#FunCd==1 || #FunCd==2,T(4,EMPNM$)HIDE(#BTN1),$)
+IF(#FunCd==1 || #FunCd==2,T(4,EMPNM$)HIDE(#BTN1),T(4,#RmkEmpNoName))
+!IF(#FunCd==1 || #FunCd==2 ,T(4,EMPNM$)HIDE(#BTN1),$)
 
 !調RIM參數
 #RimRmkNo=A,3,S
@@ -231,6 +237,8 @@ S(L3R30,1,#RimFunCd,#RimCustNo,#RimRmkNo,#RimAcDate)
 R(1,L3R30)
 T(2,@LoanRmkCode,#L3r30RmkCode)
 T(2,@RmkDesc,#L3r30RmkDesc)
+T(2,@RmkEmpNo,#L3r30LastUpdateEmpNo)
+T(2,@RmkEmpNoName,#L3r30FullName)
 
 
 ![備忘錄代碼]

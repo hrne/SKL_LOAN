@@ -190,19 +190,20 @@ public class L6909 extends TradeBuffer {
 			}
 
 //			全戶
-			OccursList occursList = new OccursList();
-			occursList.putParam("OOEntryDate", "");// 入帳日期
-			occursList.putParam("OOAcDate", "");// 會計日期
-			occursList.putParam("OOTAVFacmNo", "");// 暫收款額度
-			occursList.putParam("OODesc", "全戶"); // 交易別
-			occursList.putParam("OOTAVDb", "");// 暫收借
-			occursList.putParam("OOTAVCr", "");// 暫收貸
-			occursList.putParam("OOTAVBal", custBal);// 暫收餘額
-			occursList.putParam("OOAcFg", "N");// 畫面控制
-			occursList.putParam("OOTxNo", "");// 畫面控制
-			occursList.putParam("OOHCode", "");// 訂正別
-			this.totaVo.addOccursList(occursList);
-
+			if (parse.stringToInteger(titaVo.get("FacmNo")) == 0) {
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOEntryDate", "");// 入帳日期
+				occursList.putParam("OOAcDate", "");// 會計日期
+				occursList.putParam("OOTAVFacmNo", "");// 暫收款額度
+				occursList.putParam("OODesc", "全戶"); // 交易別
+				occursList.putParam("OOTAVDb", "");// 暫收借
+				occursList.putParam("OOTAVCr", "");// 暫收貸
+				occursList.putParam("OOTAVBal", custBal);// 暫收餘額
+				occursList.putParam("OOAcFg", "N");// 畫面控制
+				occursList.putParam("OOTxNo", "");// 畫面控制
+				occursList.putParam("OOHCode", "");// 訂正別
+				this.totaVo.addOccursList(occursList);
+			}
 		}
 
 		this.addList(this.totaVo);

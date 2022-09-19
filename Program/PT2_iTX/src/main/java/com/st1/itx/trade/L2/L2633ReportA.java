@@ -101,7 +101,7 @@ public class L2633ReportA extends MakeReport {
 		this.setBeginRow(7);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(66);
+		this.setMaxRows(40);
 
 		this.setFontSize(8);
 		/**

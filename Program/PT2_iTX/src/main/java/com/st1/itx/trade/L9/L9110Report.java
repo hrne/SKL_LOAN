@@ -330,8 +330,8 @@ public class L9110Report extends MakeReport {
 				this.print(1, 5, "違約適用方式 . " + tL9110.get("F58") + " " + tL9110.get("F42"));
 			}
 			if (!tL9110.get("F58").isEmpty()) {
-				this.print(0, 69, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
-				this.print(0, 105, "違約金收取方式 " + tL9110.get("F57"));
+				this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+				this.print(0, 35, "違約金收取方式 " + tL9110.get("F57"));
 			}
 			this.info(" 違約金收取方式 = " + tL9110.get("F57"));
 
@@ -1136,9 +1136,9 @@ public class L9110Report extends MakeReport {
 			this.print(0, 63, mLand.get("F4")); // 段小段
 			this.print(0, 79, mLand.get("F5")); // 地號
 //			this.print(0, 101, formatAmt(mLand.get("F6"), 2), "R"); // 面積
-			this.print(0, 101, "" + new BigDecimal(mLand.get("F6")).multiply(ownerPartTotal), "R"); // 面積
-
 			BigDecimal Area = new BigDecimal(mLand.get("F6")).multiply(ownerPartTotal);
+			this.print(0, 101, formatAmt(Area, 2), "R"); // 面積
+
 			String f7 = "";
 
 			try {

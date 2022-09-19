@@ -64,6 +64,8 @@ public class L9132Report extends MakeReport {
 
 	private String acNoCode;
 
+	private String acSubCode;
+	
 	private String acNoItem;
 
 	// 製表日期
@@ -204,22 +206,26 @@ public class L9132Report extends MakeReport {
 
 //			String tempAcNoCode = "";
 			String tempAcSubCode = "";
+			
+			
 			for (Map<String, String> r : resultList) {
 				// 計算用
 				i++;
-
 				
-				
-				
-				if (!r.get("AcNoCode").equals(acNoCode)) {
-					// 會計科目
+				if (!r.get("AcNoCode").equals(acNoCode) ) {
+					//科目
 					acNoCode = r.get("AcNoCode");
+					//子目
+					acSubCode = r.get("AcSubCode");
+					//科目中文
 					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
-
-					// 科目
+				
 					if (i > 1) {
+						//子目小計列印
 						acSubCodeCalculate();
+						//科目小計列印
 						acNoCodeCalculate();
+						
 						this.newPage();
 					}
 
@@ -227,18 +233,19 @@ public class L9132Report extends MakeReport {
 
 				} else {
 
+		
 					
+					this.info("AcSubCode=" + acSubCode + " === " + r.get("AcSubCode") + " : " + i);
 					
-					this.info("AcSubCode=" + tempAcSubCode + " === " + r.get("AcSubCode") + " : " + i);
-
-					if(i == 1) {
-						tempAcSubCode = r.get("AcSubCode");
-					}
-					
-					// 子目
-					if (!r.get("AcSubCode").equals(tempAcSubCode) && i > 2) {
-						tempAcSubCode = r.get("AcSubCode");						
+					// 子目：不同子目時畫子目小計 並換頁 
+					if (!r.get("AcSubCode").equals(acSubCode) && i > 2) {
 						acSubCodeCalculate();
+						
+						acSubCode = r.get("AcSubCode");			
+						
+						this.newPage();
+						
+						batchTitle();
 					}
 
 

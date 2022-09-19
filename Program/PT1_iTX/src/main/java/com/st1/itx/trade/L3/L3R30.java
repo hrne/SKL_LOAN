@@ -11,7 +11,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.domain.LoanCustRmkId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.LoanCustRmkService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -29,6 +31,9 @@ public class L3R30 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public LoanCustRmkService sLoanCustRmkService;
+
+	@Autowired
+	public CdEmpService cdEmpService;
 
 	/* 日期工具 */
 	@Autowired
@@ -74,17 +79,29 @@ public class L3R30 extends TradeBuffer {
 			this.totaVo.putParam("L3r30RmkNo", tLoanCustRmk.getRmkNo() + 1);
 			this.totaVo.putParam("L3r30RmkCode", "");
 			this.totaVo.putParam("L3r30RmkDesc", "");
+			this.totaVo.putParam("L3r30LastUpdateEmpNo", "");
+			this.totaVo.putParam("L3r30FullName", "");
+
 			// FunCd 2修改.4刪除.5查詢
 		} else {
 			tLoanCustRmk = sLoanCustRmkService.findById(LoanCustRmkId, titaVo);
 			// 該戶號 備忘錄序號查不到資料 拋錯
 			if (tLoanCustRmk == null) {
-				throw new LogicException(titaVo, "E0001", "  該戶號、備忘錄序號不存在帳務備忘錄明細資料檔。"); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "  該戶號、備忘錄序號不存在帳務備忘錄明細資料檔。"); //查詢資料不存在
 			}
 
+			// 查詢員工資料檔
+			String iEmployeeNo = tLoanCustRmk.getLastUpdateEmpNo().trim();
+			CdEmp tCdEmp = cdEmpService.findById(iEmployeeNo, titaVo);
+			if (tCdEmp == null) {
+				this.totaVo.putParam("L3r30FullName", "");
+			} else {
+				this.totaVo.putParam("L3r30FullName", tCdEmp.getFullname());
+			}
 			this.totaVo.putParam("L3r30RmkNo", tLoanCustRmk.getRmkNo());
 			this.totaVo.putParam("L3r30RmkCode", tLoanCustRmk.getRmkCode());
 			this.totaVo.putParam("L3r30RmkDesc", tLoanCustRmk.getRmkDesc());
+			this.totaVo.putParam("L3r30LastUpdateEmpNo", tLoanCustRmk.getLastUpdateEmpNo());
 
 		}
 

@@ -427,7 +427,10 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 		int repayType = Integer.parseInt(titaVo.getParam("RepayType")); // 還款類別
 
-		String iRepayBank = titaVo.getParam("RepayBank");
+		String iRepayBank = "";
+		if (titaVo.get("RepayBank") != null) {
+			iRepayBank = titaVo.getParam("RepayBank");
+		}
 		boolean useRepayBank = iRepayBank != null && !iRepayBank.trim().isEmpty();
 
 		String sql = "  select                                                          ";

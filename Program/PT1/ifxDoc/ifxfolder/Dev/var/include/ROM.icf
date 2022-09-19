@@ -3763,6 +3763,8 @@ TXFORM=L2R63
 #L3r30RmkNo=A,3,S
 #L3r30RmkCode=X,3,S
 #L3r30RmkDesc=c,120,S
+#L3r30LastUpdateEmpNo=X,6,S
+#L3r30FullName=X,40,S
 </L3R30.dec>
 
 <L3R30.tom>
@@ -3770,6 +3772,8 @@ TXFORM=L3R30
 #L3r30RmkNo
 #L3r30RmkCode
 #L3r30RmkDesc
+#L3r30LastUpdateEmpNo
+#L3r30FullName
 ^
 </L3R30.tom>
 
@@ -5560,6 +5564,7 @@ TXFORM=L4R30
 #L4R31AuthType=X,1,S
 #L4R31CalDate=D,7,S
 #L4R31CalTime=X,8,S
+#L4R31CreateFlag=X,1,S
 </L4R31.dec>
 
 <L4R31.tom>
@@ -5573,6 +5578,7 @@ TXFORM=L4R31
 #L4R31AuthType
 #L4R31CalDate
 #L4R31CalTime
+#L4R31CreateFlag
 ^
 </L4R31.tom>
 
@@ -5589,6 +5595,48 @@ TXFORM=L4R32
 #L4R32Date7
 ^
 </L4R32.tom>
+
+<L4R33.dec>
+#L4R33CustNo=A,7,S
+#L4R33RepayType=X,2,S
+#L4R33RepayAmt=m,14,S
+#L4R33DepAcctNo=X,14,S
+#L4R33EntryDate=D,7,S
+#L4R33DscptCode=X,4,S
+#L4R33VirtualAcctNo=X,14,S
+#L4R33WithdrawAmt=m,14,S
+#L4R33DepositAmt=m,14,S
+#L4R33Balance=m,14,S
+#L4R33RemintBank=X,7,S
+#L4R33TraderInfo=X,20,S
+#L4R33AmlRsp=X,1,S
+#L4R33ReconCode=X,3,S
+#L4R33TitaTlrNo=X,6,S
+#L4R33TitaTxtNo=X,8,S
+#L4R33CustName=X,100,S
+</L4R33.dec>
+
+<L4R33.tom>
+TXFORM=L4R33
+#L4R33CustNo
+#L4R33RepayType
+#L4R33RepayAmt
+#L4R33DepAcctNo
+#L4R33EntryDate
+#L4R33DscptCode
+#L4R33VirtualAcctNo
+#L4R33WithdrawAmt
+#L4R33DepositAmt
+#L4R33Balance
+#L4R33RemintBank
+#L4R33TraderInfo
+#L4R33AmlRsp
+#L4R33ReconCode
+#L4R33TitaTlrNo
+#L4R33TitaTxtNo
+#L4R33CustName
+^
+</L4R33.tom>
 
 <L5R01.dec>
 #L5r01CustId=X,10,S
