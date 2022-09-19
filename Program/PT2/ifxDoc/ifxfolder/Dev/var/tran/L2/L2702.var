@@ -96,10 +96,10 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2072顧客控管警訊明�
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
 T(1,@CustNo,#NTXBUF,2,7)
-T(1,@EmpName,#NTXBUF,9,10)
+T(1,@RmkEmpNoName,#NTXBUF,9,10)
 T(1,@RmkNo,#NTXBUF,19,3)
 T(1,@RmkCode,#NTXBUF,22,3)
-T(1,@RmkDesc,#NTXBUF,25,120),$)
+T(1,@RmkDesc,#NTXBUF,25,120)
 
 
 ![功能] 
@@ -160,6 +160,8 @@ A(ID_UNINO,0,#CUSTID)
 #RimFunCd=A,1,S
 #RimCustNo=A,7,S
 
+#RmkEmpNoName=X,40,S
+
 <include src="ROM.icf::L1R01.dec"/>
 !調RIML1R01取CustName
 #RimL1r01=X,1,S
@@ -194,7 +196,8 @@ T(4,TLRNO$)
 ![經辦姓名]
 !自動顯示不必輸入
 #EmpName=X,10,L
-T(4,EMPNM$)
+!T(4,EMPNM$)
+IF(#FunCd==1 || #FunCd==2,T(4,EMPNM$),T(4,#RmkEmpNoName))
 
 ! ![交易編號]
 ! #MEMTXCD=X,5,I

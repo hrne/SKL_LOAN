@@ -411,12 +411,14 @@ public class L4450Batch extends TradeBuffer {
 						tBaTxVo.setPayIntDate(baTxCom.getNextPayIntDate());
 						tBaTxVo.setIntStartDate(baTxCom.getPrevPayIntDate());
 						tBaTxVo.setIntEndDate(baTxCom.getNextPayIntDate());
-					}
+						continue;
+					} 
 					if (baTxCom.getPrevPayIntDate() <= entryDate) {
 						tBaTxVo.setDataKind(2);
 						tBaTxVo.setPayIntDate(baTxCom.getPrevPayIntDate());
 						tBaTxVo.setIntStartDate(0);
 						tBaTxVo.setIntEndDate(baTxCom.getPrevPayIntDate());
+						continue;
 					}
 				}
 			}
