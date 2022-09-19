@@ -1,24 +1,17 @@
 package com.st1.itx.trade.LC;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.springjpa.cm.LC009ServiceImpl;

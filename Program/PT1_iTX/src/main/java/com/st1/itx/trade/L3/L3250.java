@@ -136,6 +136,8 @@ public class L3250 extends TradeBuffer {
 		}
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
+		titaVo.putParam("RpCustNo1", iCustNo);
+		titaVo.putParam("RpFacmNo1", iFacmNo);
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
 
 		// 帳務處理

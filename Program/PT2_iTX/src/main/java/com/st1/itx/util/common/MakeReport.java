@@ -141,6 +141,9 @@ public class MakeReport extends CommBuffer {
 
 	private String rptPassword = "";
 
+	/**
+	 * 印表機套印模式
+	 */
 	private boolean formMode = false;
 
 	// 批號(控制分別出表,但記錄在同一TxFile)
@@ -456,7 +459,7 @@ public class MakeReport extends CommBuffer {
 		listMap.add(map);
 	}
 
-	// 套form模式
+	// 底稿模式
 	private void init9() {
 		// 使新舊方法可同時使用
 		if (this.reportVo == null) {
@@ -563,6 +566,20 @@ public class MakeReport extends CommBuffer {
 	public void newPage() {
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
+
+		if (formMode) {
+//			this.info("newPage nowPage = " + nowPage);
+			if (this.nowPage > 0) {
+				this.printContinueNext();
+				this.printFooter();
+			}
+			this.nowPage++;
+			this.printHeader();
+			map.put("type", 1);
+			listMap.add(map);
+			printTitle();
+			return;
+		}
 
 		// TODO: 參透這個欄位跟註解的真義
 		// 必須

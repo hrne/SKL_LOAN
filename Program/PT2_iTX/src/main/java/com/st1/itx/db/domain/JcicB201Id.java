@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * JcicB201 聯徵授信餘額月報資料檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicB201Id implements Serializable {
 
 
-  // 資料年月
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6803270984784236141L;
+
+// 資料年月
   @Column(name = "`DataYM`")
   private int dataYM = 0;
 
