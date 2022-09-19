@@ -311,12 +311,6 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
 		sql += "               and b.\"MaturityDate\" <= :iEntryDate ";
 		sql += "          then 1 ";
-		// 郵局-條件4: 下繳日(8碼yyyymmdd) = 郵局二扣應繳日(8碼yyyymmdd)
-		// ___________ 且 指定應繳日(2碼dd) = 0
-//        sql += "          when nvl(ba.\"RepayBank\", '000') = '700' ";
-//        sql += "               and b.\"NextPayIntDate\" = :iPostSecondSpecificDate ";
-//        sql += "               and b.\"SpecificDd\" = 0 ";
-//        sql += "          then 1 ";
 		// RepayBank not in (null,700) = ACH
 		// ACH-條件1: 下繳日(8碼yyyymmdd) <= ACH扣款應繳日止日(8碼yyyymmdd)
 		// __________ 且 指定應繳日(2碼dd) IN ACH扣款應繳日的應繳日(2碼dd)
@@ -333,16 +327,12 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// ACH-條件3: 到期日(8碼yyyymmdd) <= 入帳日(8碼yyyymmdd)
 		sql += "          when nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"MaturityDate\" <= :iEntryDate ";
-//        sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-//        sql += "               and b.\"NextPayIntDate\" between :iAchSpecificDdFrom and :iAchSpecificDdTo ";
-//        sql += "               and b.\"SpecificDd\" = 0 ";
 		sql += "          then 1 ";
-		// ACH-條件4: 下繳日(8碼yyyymmdd) 在 ACH二扣應繳日的起日與止日之間
-		// __________ 且 指定應繳日(2碼dd) = 0
-//        sql += "          when nvl(ba.\"RepayBank\", '000') not in ('000','700') ";
-//        sql += "               and b.\"NextPayIntDate\" between :iAchSecondSpecificDdFrom and :iAchSecondSpecificDdTo ";
-//        sql += "               and b.\"SpecificDd\" = 0 ";
-//        sql += "          then 1 ";
+		// 火險: 火險到期年月等於應繳日所屬月份 且 下繳日的月份大於火險到期年月
+		sql += "          when NVL(rv2.\"InsuYearMonth\",0) > 0 ";
+		sql += "               and NVL(rv2.\"InsuYearMonth\",0) = TRUNC( :iPostSpecificDate / 100 ) ";
+		sql += "               and TRUNC( b.\"NextPayIntDate\" / 100 ) > NVL(rv2.\"InsuYearMonth\",0) ";
+		sql += "          then 1 ";
 		// 郵局-費用: 費用檔有撈到就進
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
 		sql += "               and nvl(ba.\"RepayBank\", 'null') = '700' ";
@@ -352,11 +342,6 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          when nvl(rv.\"ReceivableFlag\" ,0) > 0 ";
 		sql += "               and nvl(ba.\"RepayBank\", 'null') not in ('null','700') ";
 		sql += "               and b.\"SpecificDd\" IN :iAchSpecificDays ";
-		sql += "          then 1 ";
-		// 郵局-火險: 火險到期年月等於應繳日所屬月份 且 下繳日的月份大於火險到期年月
-		sql += "          when NVL(rv2.\"InsuYearMonth\",0) > 0 ";
-		sql += "               and NVL(rv2.\"InsuYearMonth\",0) = TRUNC( :iPostSpecificDate / 100 ) ";
-		sql += "               and TRUNC( b.\"NextPayIntDate\" / 100 ) > NVL(rv2.\"InsuYearMonth\",0) ";
 		sql += "          then 1 ";
 		// 追加逾期期數
 		sql += "          when b.\"NextPayIntDate\" >= :iDeductDateStart ";

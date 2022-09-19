@@ -44,14 +44,6 @@ public class L8205Report4 extends MakeReport {
 //	自訂表頭
 	@Override
 	public void printHeader() {
-		printHeaderCustomerize();
-		// 明細起始列(自訂亦必須)
-		this.setBeginRow(18);
-		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
-	}
-
-	public void printHeaderCustomerize() {
 		this.print(-4, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-4, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-5, 3, "報  表：" + this.getRptCode());
@@ -71,7 +63,7 @@ public class L8205Report4 extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		print(-66, this.getMidXAxis(), "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "C");
+		print(-66, this.getMidXAxis(), "　經辦:　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　協理:　　　　　　　　　　　　　　", "C");
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -108,6 +100,10 @@ public class L8205Report4 extends MakeReport {
 				.setUseDefault(true).build();
 
 		this.open(titaVo, reportVo, "A4直式底稿.pdf");
+		
+		this.setBeginRow(11);
+		this.setMaxRows(50);
+		
 		// 未完成:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
 
 		if (listL8205 != null && listL8205.size() > 0) {

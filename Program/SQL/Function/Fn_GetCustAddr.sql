@@ -14,6 +14,8 @@ BEGIN
     SELECT CASE
              -- 0:戶籍地址
              WHEN "ReturnType" = 0
+                  AND CM."RegCityCode" IS NULL
+                  AND CM."RegAreaCode" IS NULL
                   AND CM."RegSection" IS NULL
                   AND CM."RegAlley" IS NULL
                   AND CM."RegLane" IS NULL
@@ -22,6 +24,17 @@ BEGIN
                   AND CM."RegFloor" IS NULL
                   AND CM."RegFloorDash" IS NULL
              THEN NVL(CM."RegRoad",N'') -- 路名
+             WHEN "ReturnType" = 0
+                  AND CM."RegSection" IS NULL
+                  AND CM."RegAlley" IS NULL
+                  AND CM."RegLane" IS NULL
+                  AND CM."RegNum" IS NULL
+                  AND CM."RegNumDash" IS NULL
+                  AND CM."RegFloor" IS NULL
+                  AND CM."RegFloorDash" IS NULL
+             THEN NVL(CITY."CityItem",N'') -- 縣市
+               || NVL(AREA."AreaItem",N'') -- 行政區
+               || NVL(CM."RegRoad",N'') -- 路名
              WHEN "ReturnType" = 0
              THEN NVL(CITY."CityItem",N'') -- 縣市
                || NVL(AREA."AreaItem",N'') -- 行政區
@@ -68,6 +81,8 @@ BEGIN
                   ELSE N'' END
              -- 1:通訊地址
              WHEN "ReturnType" = 1
+                  AND CM."CurrCityCode" IS NULL
+                  AND CM."CurrAreaCode" IS NULL
                   AND CM."CurrSection" IS NULL
                   AND CM."CurrAlley" IS NULL
                   AND CM."CurrLane" IS NULL
@@ -76,6 +91,17 @@ BEGIN
                   AND CM."CurrFloor" IS NULL
                   AND CM."CurrFloorDash" IS NULL
              THEN NVL(CM."CurrRoad",N'') -- 路名
+             WHEN "ReturnType" = 1
+                  AND CM."CurrSection" IS NULL
+                  AND CM."CurrAlley" IS NULL
+                  AND CM."CurrLane" IS NULL
+                  AND CM."CurrNum" IS NULL
+                  AND CM."CurrNumDash" IS NULL
+                  AND CM."CurrFloor" IS NULL
+                  AND CM."CurrFloorDash" IS NULL
+             THEN NVL(CITY."CityItem",N'') -- 縣市
+               || NVL(AREA."AreaItem",N'') -- 行政區
+               || NVL(CM."CurrRoad",N'') -- 路名
              WHEN "ReturnType" = 1
              THEN NVL(CITY."CityItem",N'') -- 縣市
                || NVL(AREA."AreaItem",N'') -- 行政區

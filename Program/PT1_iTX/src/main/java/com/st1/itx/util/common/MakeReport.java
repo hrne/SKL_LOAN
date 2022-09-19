@@ -124,8 +124,6 @@ public class MakeReport extends CommBuffer {
 	// 目前頁數
 	private int nowPage;
 
-	private int headerPrintPage;
-
 	// 目前row位置
 	public int NowRow; // TODO: 改為 getNowRow
 
@@ -445,7 +443,6 @@ public class MakeReport extends CommBuffer {
 		this.nowTime = dDateUtil.getNowStringTime();
 
 		this.nowPage = 0;
-		this.headerPrintPage = 0;
 
 		listMap = new ArrayList<HashMap<String, Object>>();
 
@@ -487,8 +484,7 @@ public class MakeReport extends CommBuffer {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		this.nowPage = 1;
-		this.headerPrintPage = 0;
+		this.nowPage = 0;
 
 		listMap = new ArrayList<HashMap<String, Object>>();
 
@@ -567,20 +563,6 @@ public class MakeReport extends CommBuffer {
 	public void newPage() {
 
 		HashMap<String, Object> map = new HashMap<String, Object>();
-
-		if (reportVo.isUseDefault()) {
-//			this.info("newPage nowPage = " + nowPage);
-			if (this.nowPage > 0) {
-				this.printContinueNext();
-				this.printFooter();
-			}
-			this.nowPage++;
-			this.printHeader();
-			map.put("type", 1);
-			listMap.add(map);
-			printTitle();
-			return;
-		}
 
 		// TODO: 參透這個欄位跟註解的真義
 		// 必須
@@ -1048,12 +1030,6 @@ public class MakeReport extends CommBuffer {
 			// nothing
 		} else if (this.nowPage == 0 || this.NowRow > (this.rptBeginRow + this.rptTotalRows - 1)) {
 			newPage();
-			this.NowRow += row;
-			prow = this.NowRow;
-		} else if (this.reportVo.isUseDefault() && this.headerPrintPage < this.nowPage) {
-			this.printHeader();
-			this.printTitle();
-			this.headerPrintPage++;
 			this.NowRow += row;
 			prow = this.NowRow;
 		}
@@ -1658,5 +1634,17 @@ public class MakeReport extends CommBuffer {
 		rmap.put("printJson", pMap);
 
 		return rmap;
+	}
+
+	public void checkLeftRows(int needRows) {
+		this.info("checkLeftRows NowRow = " + this.NowRow);
+		this.info("checkLeftRows rptTotalRows = " + this.rptTotalRows);
+		this.info("checkLeftRows needRows = " + needRows);
+		if ((rptTotalRows - NowRow) < needRows) {
+			this.info("checkLeftRows 剩餘明細列數不足,先換頁.");
+			this.newPage();
+		} else {
+			this.info("checkLeftRows 剩餘明細列數足夠,繼續列印明細.");
+		}
 	}
 }

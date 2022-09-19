@@ -24,7 +24,31 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "BankRmtf" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "BankRmtf"
+    INSERT INTO "BankRmtf" (
+      "AcDate"              -- 會計日 DECIMALD 8
+      ,"BatchNo"             -- 批號 VARCHAR2 6
+      ,"DetailSeq"           -- 明細序號 DECIMAL 6
+      ,"CustNo"              -- 戶號 DECIMAL 7
+      ,"RepayType"           -- 還款類別 VARCHAR2 2
+      ,"RepayAmt"            -- 還款金額 DECIMAL 14
+      ,"DepAcctNo"           -- 存摺帳號 VARCHAR2 14
+      ,"EntryDate"           -- 入帳日期 DECIMALD 8
+      ,"DscptCode"           -- 摘要代碼 VARCHAR2 14
+      ,"VirtualAcctNo"       -- 虛擬帳號 NVARCHAR2 14
+      ,"WithdrawAmt"         -- 提款 DECIMAL 14
+      ,"DepositAmt"          -- 存款 DECIMAL 14
+      ,"Balance"             -- 結餘 DECIMAL 14
+      ,"RemintBank"          -- 匯款銀行代碼 VARCHAR2 7
+      ,"TraderInfo"          -- 交易人資料 NVARCHAR2 20
+      ,"AmlRsp"              -- AML 回應碼 VARCHAR2 1
+      ,"ReconCode"           -- 對帳類別 VARCHAR2 3
+      ,"TitaTlrNo"           -- 經辦 VARCHAR2 6
+      ,"TitaTxtNo"           -- 交易序號 VARCHAR2 8
+      ,"CreateDate"          -- 建檔日期時間 DATE  
+      ,"CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+      ,"LastUpdate"          -- 最後更新日期時間 DATE  
+      ,"LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+    )
     SELECT CASE WHEN DPSP.TRXDAT = 0
                 THEN DPSP.TRXIDT
            ELSE DPSP.TRXDAT END           AS "AcDate"              -- 會計日 DECIMALD 8
@@ -56,6 +80,9 @@ BEGIN
           ,NVL(DPSP.DPSBN3, ' ')          AS "RemintBank"          -- 匯款銀行代碼 VARCHAR2 7
           ,DPSP.DPSTRA                    AS "TraderInfo"          -- 交易人資料 NVARCHAR2 20
           ,'0'                            AS "AmlRsp"              -- AML 回應碼 VARCHAR2 1
+          ,DPSP.DPSATC                    AS "ReconCode"           -- 對帳類別 VARCHAR2 3
+          ,''                             AS "TitaTlrNo"           -- 經辦 VARCHAR2 6
+          ,''                             AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  

@@ -696,7 +696,13 @@ BEGIN
            , ' '            AS "NegCreditor"       -- 債權處理後新債權人ID/債權轉讓後前手債權人ID/信保基金退理賠信用保證機構BAN
            , ' '            AS "NegNo"             -- 債權處理案號
            , ' '            AS "NegTransYM"        -- 債權轉讓年月/債權轉讓後原債權機構買回年月
-           , ' '                                   AS "Filler443"         -- 空白
+           , CASE WHEN YYYYMM < 202211 THEN ' '    -- 111/11開始申報購地貸款相關欄位
+                  WHEN F."RuleCode" = '08' THEN                           -- 規定管制代碼08:購地貸款(央行管制)
+                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN 'N'
+                         ELSE 'Y'
+                    END     
+                  ELSE ' '    
+             END                                   AS "LandLoanFg"        -- 購地貸款註記
            , M."ClType"                            AS "ClType"            -- 擔保品組合型態
            , TRUNC(NVL(M."EvaAmt",0) / 1000, 0)    AS "ClEvaAmt"          -- 擔保品(合計)鑑估值
            , NVL(M."ClTypeCode",' ')               AS "ClTypeCode"        -- 擔保品類別(JCIC)
@@ -712,13 +718,9 @@ BEGIN
                WHEN NVL(M."SyndAmt",0) = 0 THEN 0
                ELSE ROUND( NVL(M."PartAmt",0) / NVL(M."SyndAmt",0) * 100, 1)
              END                                   AS "SyndRatio"         -- 聯貸參貸比例
-           , CASE WHEN F."RuleCode" = '08' THEN                           -- 規定管制代碼08:購地貸款(央行管制)
-                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN 'N'
-                         ELSE 'Y'
-                    END     
-                  ELSE ' '    
-             END                                   AS "LandLoanFg"        -- 購地貸款註記
-           , CASE WHEN F."RuleCode" = '08' THEN
+           , ' '                                   AS "Filler51"          -- 空白
+           , CASE WHEN YYYYMM < 202211 THEN ' '                           -- 111/11開始申報購地貸款相關欄位
+                  WHEN F."RuleCode" = '08' THEN
                     CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN ' '
                          ELSE to_char(NVL(F."StarBuildingYM",' '),'00000')
                     END     
@@ -853,12 +855,13 @@ BEGIN
            , EmpNo                                 AS "CreateEmpNo"       -- 建檔人員
            , JOB_START_TIME                        AS "LastUpdate"        -- 最後更新日期時間
            , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
-           , CASE WHEN F."RuleCode" = '08' THEN
+           , CASE WHEN YYYYMM < 202211 THEN ' '                           -- 111/11開始申報購地貸款相關欄位
+                  WHEN F."RuleCode" = '08' THEN
                     CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN ' '
-                         ELSE to_char(NVL(F."StarBuildingPeriod",' '),'00')
+                         ELSE to_char(NVL(F."PreStarBuildingYM",' '),'00000')
                     END     
                   ELSE ' '    
-             END                                   AS "StarBuildingPeriod" -- 約定動工之一定期間
+             END                                   AS "PreStarBuildingYM" -- 約定動工年月
       FROM TmpMainData M
           LEFT JOIN "FacMain" F   ON F."CustNo"   = M."CustNo"
                                  AND F."FacmNo"   = M."FacmNo"

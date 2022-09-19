@@ -41,14 +41,6 @@ public class L8205Report1 extends MakeReport {
 //	自訂表頭
 	@Override
 	public void printHeader() {
-		printHeaderCustomerize();
-		// 明細起始列(自訂亦必須)
-		this.setBeginRow(18);
-		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
-	}
-
-	private void printHeaderCustomerize() {
 		this.print(-4, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-4, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-4, 80, "報表等級：機密");
@@ -68,7 +60,7 @@ public class L8205Report1 extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		print(-66, this.getMidXAxis(), "　　協理:　　　　　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　　　　　經辦:", "C");
+		print(-66, this.getMidXAxis(), "　經辦:　　　　　　　　　　　　　　經理:　　　　　　　　　　　　　　協理:　　　　　　　　　　　　　　", "C");
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -107,6 +99,9 @@ public class L8205Report1 extends MakeReport {
 
 		this.open(titaVo, reportVo, "A4直式底稿.pdf");
 
+		this.setBeginRow(12);
+		this.setMaxRows(50);
+
 		if (listL8205 != null && listL8205.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
@@ -139,7 +134,7 @@ public class L8205Report1 extends MakeReport {
 				print(0, 55, tL8205Vo.get("F5"), "R");
 
 				// 經辦
-				print(0, 57, tL8205Vo.get("F6"));
+				print(0, 59, tL8205Vo.get("F6"));
 
 				// 合理性
 				print(0, 72, tL8205Vo.get("F7"));
