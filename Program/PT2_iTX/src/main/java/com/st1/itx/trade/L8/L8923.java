@@ -6,12 +6,15 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.MlaundryRecord;
+import com.st1.itx.db.domain.MlaundryRecordId;
 import com.st1.itx.db.domain.TxDataLog;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryRecordService;
@@ -134,7 +137,7 @@ public class L8923 extends TradeBuffer {
 
 		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-		 if (resultList != null &&  resultList.size() >= this.limit) {
+		 if (resultList != null &&  resultList.size() > this.limit) {
 	 		 titaVo.setReturnIndex(this.setIndexNext());
 		 	 /* 手動折返 */
 		 	 this.totaVo.setMsgEndToEnter();

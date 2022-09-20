@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L4;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,18 +22,24 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuComm;
 import com.st1.itx.db.domain.InsuCommId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4606ServiceImpl;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.common.data.InsuCommFileVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -129,6 +137,9 @@ public class L4606Batch extends TradeBuffer {
 
 	private List<OccursList> successList = new ArrayList<>();
 	private List<OccursList> errorList = new ArrayList<>();
+
+	@Autowired
+	SortMapListCom sortMapListCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -355,10 +366,12 @@ public class L4606Batch extends TradeBuffer {
 				+ File.separatorChar + titaVo.getParam("FILENA");
 
 		ArrayList<String> dataLineList = new ArrayList<>();
+		
 
 //		 編碼參數，設定為UTF-8 || big5
 		try {
 			dataLineList = fileCom.intputTxt(filePath1, "big5");
+			
 		} catch (IOException e) {
 			throw new LogicException("E0014", "L4606(" + filePath1 + ") is error : " + e.getMessage());
 		}
@@ -367,13 +380,46 @@ public class L4606Batch extends TradeBuffer {
 		insuCommFileVo.setValueFromFile(dataLineList);
 
 		List<OccursList> uploadFile = insuCommFileVo.getOccursList();
+		
 		this.info("insuCommFileVo   = " + insuCommFileVo.getOccursList());
 
 		int seq = 0;
+		int count = 0;
 		if (uploadFile != null && !uploadFile.isEmpty()) {
 			this.info("tInsuCommId Start");
 			InsuComm tInsuComm;
 			InsuCommId tInsuCommId;
+			List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
+//			List<Map<String, String>> uploadFile1 = insuCommFileVo.getOccursList();
+
+
+//			fnAllList = uploadFile;
+					
+//			fnAllList = sortMapListCom.beginSort(uploadFile).ascString("CustNo").ascString("FacmNo").ascString("InsuNo")
+//					.ascString("InsuFee").ascString("InsuCommRate").ascString("AcSeq").getList();
+
+			if (uploadFile != null && uploadFile.size() != 0) {
+				uploadFile.sort((c1, c2) -> {
+				int result = 0;
+				if (c1.get("CustNo") != c2.get("CustNo") ) {
+					result = 1 ;
+				}else if (c1.get("FacmNo") != c2.get("FacmNo")) {
+					result = 1;
+				}else if (c1.get("InsuNo") != c2.get("InsuNo")) {
+					result = 1;
+				}else if (c1.get("InsuFee") != c2.get("InsuFee")) {
+					result = 1;
+				}else if (c1.get("InsuCommRate") != c2.get("InsuCommRate")) {
+					result = 1;
+				}else if (c1.get("AcSeq") != c2.get("AcSeq")) {
+					result = 1;
+				}
+				return result;
+				});
+			}
+			this.info("uploadFile    = " + uploadFile);
+			this.info("fnAllList     = " + fnAllList);
+
 			for (OccursList tempOccursList : uploadFile) {
 //				this.info(tempOccursList.toString());
 
@@ -441,15 +487,20 @@ public class L4606Batch extends TradeBuffer {
 //				this.info("commBase=" + commBase + ", commRate = " + commRate);
 				BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 				tInsuComm.setDueAmt(dueAmt);
-
+//				BigDecimal sumAmt;
+				
+				// 最後一筆產出
+//				if (count == fnAllList.size()) {
+//					this.info("跑進最後一筆額度為0");
 //    			如果額度為0的時候也需要入佣金媒體錯誤檔
-				if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
-					custErrorCnt++;
-					tempOccursList.putParam("ErrorMsg", "額度為0:" + custNo);
-					errorList.add(tempOccursList);
-					continue;
-				}
-
+					if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
+//						this.info("開始相加額度為0");
+						minusCnt++;
+						tempOccursList.putParam("ErrorMsg", "額度為0 :" + "戶號: "+custNo +" "+" 險種: "+ tempOccursList.get("InsuType"));
+						errorList.add(tempOccursList);
+						continue;
+					}
+//				}
 //				By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
 //				業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
 
@@ -491,6 +542,7 @@ public class L4606Batch extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0005", "InsuComm insert Error : " + e.getErrorMsg());
 				}
+				count++;
 			}
 			this.info("InsuComm insert end");
 		}

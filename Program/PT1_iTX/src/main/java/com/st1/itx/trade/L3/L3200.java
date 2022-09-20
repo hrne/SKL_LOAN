@@ -171,7 +171,8 @@ public class L3200 extends TradeBuffer {
 	private BigDecimal iOverAmt; // 溢收金額
 	private BigDecimal iShortAmt; // 短繳金額
 	private BigDecimal iRepayLoan; // 償還本利
-	private int iOverRpFacmNo; // 溢收額度
+	private int iShortFacmNo; // 短收額度
+	private int iShortBormNo; // 短收撥款
 	private String iExtraRepayFlag;
 	private String iUnpaidIntFlag;
 	private String iPayFeeFlag; // 是否回收費用
@@ -330,9 +331,14 @@ public class L3200 extends TradeBuffer {
 		}
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收 3->溢收(整批入帳、部分繳款)
-		iOverRpFacmNo = this.parse.stringToInteger(titaVo.getParam("OverRpFacmNo"));
 		if (iOverRpFg == 1) {
 			iShortAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
+			for (int i = 1; i <= 20; i++) {
+				if (titaVo.get("FacmBormNo" + i) != null && parse.stringToInteger((titaVo.get("FacmBormNo" + i)).substring(0, 3)) > 0) {
+					iShortFacmNo = parse.stringToInteger((titaVo.get("FacmBormNo" + i)).substring(0, 3));
+					iShortBormNo = parse.stringToInteger((titaVo.get("FacmBormNo" + i)).substring(4, 7));
+				}
+			}
 			iOverAmt = BigDecimal.ZERO;
 		} else {
 			iShortAmt = BigDecimal.ZERO;
@@ -355,8 +361,8 @@ public class L3200 extends TradeBuffer {
 		this.info("iFireFee=" + iFireFee + ",iLawFee1=" + iLawFee);
 		this.info("iShortfallPrin=" + iShortfallPrin + ",iShortfallInt=" + iShortfallInt + ",iShortCloseBreach="
 				+ iShortCloseBreach);
-		this.info("iRepayAmt=" + iRepayAmt + ",OverAmt=" + iOverAmt + ",iShortAmt=" + iShortAmt + ",iOverRpFacmNo="
-				+ iOverRpFacmNo);
+		this.info("iRepayAmt=" + iRepayAmt + ",OverAmt=" + iOverAmt + ",iShortAmt=" + iShortAmt + ",iShortFacmNo="
+				+ iShortFacmNo + ",iShortBormNo=" + iShortBormNo);
 		// 應繳日
 		if (titaVo.isTrmtypBatch() && titaVo.get("RepayIntDate") != null) {
 			iRepayIntDate = parse.stringToInteger(titaVo.getParam("RepayIntDate"));
@@ -629,24 +635,12 @@ public class L3200 extends TradeBuffer {
 		});
 		// 取得暫收款額度
 		this.wkTmpFacmNo = loanCom.getTmpFacmNo(iCustNo, iFacmNo, lLoanBorMain.get(0).getFacmNo(), titaVo);
+		// 回收期數>0 取得還款應繳日
 
 	}
 
 	private void calcRepayNormalRoutine() throws LogicException {
 		this.info("calcRepayNormalRoutine ...");
-		// 部分償還本金，限額含短收-利息
-		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-			wkRepaykindCode = 1;
-			wkTotalShortAmtLimit = wkTotalShortAmtLimit.add(iShortfallInt);
-		}
-		// 期款
-		else {
-			if (iRepayTerms > 0) { // 回收期數 > 0
-				wkRepaykindCode = 2;
-			} else {
-				wkRepaykindCode = 3;
-			}
-		}
 		// 部分償還本金，限額含短收-利息
 		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 			wkRepaykindCode = 1;
@@ -798,7 +792,7 @@ public class L3200 extends TradeBuffer {
 	private void calcUnpaidAmt(LoanBorMain ln) throws LogicException {
 		wkUnpaidPrin = BigDecimal.ZERO;
 		wkUnpaidInt = BigDecimal.ZERO;
-		if (iShortAmt.compareTo(BigDecimal.ZERO) == 0 || !isCalcRepayInt || ln.getFacmNo() != iOverRpFacmNo) {
+		if (iShortAmt.compareTo(BigDecimal.ZERO) == 0 || !isCalcRepayInt) {
 			return;
 		}
 		BigDecimal wkShortAmtLimit = BigDecimal.ZERO;
@@ -812,10 +806,12 @@ public class L3200 extends TradeBuffer {
 				wkUnpaidAmtRemaind = wkUnpaidAmtRemaind.subtract(wkInterest);
 			}
 		} else {
+			if (ln.getFacmNo() != iShortFacmNo || ln.getBormNo() != iShortBormNo) {
+				return;
+			}
 			// 到期取息(到期繳息還本)
 			if ("2".equals(ln.getAmortizedCode())) {
 				throw new LogicException(titaVo, "E3094", "到期繳息還本， 不可有短繳金額");
-
 			}
 			// 依 1.還本金額 2.還息金額
 			if (isRepayPrincipal) {
@@ -2140,7 +2136,6 @@ public class L3200 extends TradeBuffer {
 		titaVo.put("TwExtraCloseBreachAmt", df.format(baTxCom.getShortCloseBreach()));// 清償違約金
 		titaVo.put("BreachCodeX", "");// 清償違約金
 		titaVo.put("TwReduceAmt", "" + iReduceAmt);// 減免金額
-
 
 	}
 

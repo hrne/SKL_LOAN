@@ -117,12 +117,11 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useIntroducer) {
 			sql += "   AND I.\"Introducer\" = :introducer";
 		}
-		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=EBCDIC') ";
-		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=EBCDIC') ";
-		sql += "         ,NLSSORT(I.\"UnitCode\", 'NLS_SORT=EBCDIC') "; // 原表排序用到這三個欄位，但原環境會將英文排在數字前面；
-		sql += "         ,I.\"CustNo\" "; // 這裡利用 NLSSORT 取 EBCDIC 排序法，達到同樣效果。
-		sql += "         ,I.\"FacmNo\" ";
-		sql += "         ,I.\"BormNo\" ";
+		sql += " ORDER BY \"BsDeptItem\" ";
+		sql += "        , \"BsName\" ";
+		sql += "        , I.\"CustNo\" ";
+		sql += "        , I.\"FacmNo\" ";
+		sql += "        , I.\"BormNo\" ";
 		this.info("sql=" + sql);
 		Query query;
 

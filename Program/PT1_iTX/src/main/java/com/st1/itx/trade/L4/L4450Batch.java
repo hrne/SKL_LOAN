@@ -406,19 +406,25 @@ public class L4450Batch extends TradeBuffer {
 					tBaTxVo.setDataKind(-1);
 				}
 				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
-					if (baTxCom.getNextPayIntDate() <= entryDate) {
-						tBaTxVo.setDataKind(2);
-						tBaTxVo.setPayIntDate(baTxCom.getNextPayIntDate());
-						tBaTxVo.setIntStartDate(baTxCom.getPrevPayIntDate());
-						tBaTxVo.setIntEndDate(baTxCom.getNextPayIntDate());
-						continue;
-					} 
-					if (baTxCom.getPrevPayIntDate() <= entryDate) {
-						tBaTxVo.setDataKind(2);
-						tBaTxVo.setPayIntDate(baTxCom.getPrevPayIntDate());
-						tBaTxVo.setIntStartDate(0);
-						tBaTxVo.setIntEndDate(baTxCom.getPrevPayIntDate());
-						continue;
+					// 放期款第一筆
+					for (BaTxVo t : listBaTxVo) {
+						if (t.getDataKind() == 2) {
+							tBaTxVo.setDataKind(2);
+							tBaTxVo.setPayIntDate(t.getPayIntDate());
+							tBaTxVo.setIntStartDate(t.getIntStartDate());
+							tBaTxVo.setIntEndDate(t.getIntStartDate());
+							continue;
+						}
+					}
+					// 當期期款已繳但有短繳
+					if (tBaTxVo.getDataKind() == 1) {
+						if (baTxCom.getPrevPayIntDate() <= entryDate) {
+							tBaTxVo.setDataKind(2);
+							tBaTxVo.setPayIntDate(baTxCom.getPrevPayIntDate());
+							tBaTxVo.setIntStartDate(0);
+							tBaTxVo.setIntEndDate(baTxCom.getPrevPayIntDate());
+							continue;
+						}
 					}
 				}
 			}

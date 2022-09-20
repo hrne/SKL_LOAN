@@ -480,8 +480,10 @@ BEGIN
              WHEN to_number(NVL(CI."SettingSeq",0)) = 0 THEN 1 
              ELSE to_number(NVL(CI."SettingSeq",0)) 
            END                                   AS "SettingSeq"        -- 本月設定抵押順位 
-         , SUBSTR('00000000' || TRUNC(NVL(CI."OtherOwnerTotal",0) / 1000), -8) 
-                                                 AS "PreSettingAmt"     -- 其他債權人已設定金額 
+--         , SUBSTR('00000000' || TRUNC(NVL(CI."OtherOwnerTotal",0) / 1000), -8) 
+         , CASE WHEN to_number(NVL(CI."SettingSeq",0)) > 1 THEN '00000001'
+                ELSE '00000000'
+           END                                   AS "PreSettingAmt"     -- 其他債權人已設定金額 
          , SUBSTR('00000000' || TRUNC(NVL(CM."DispPrice",0) / 1000), -8) 
                                                  AS "DispPrice"         -- 處分價格 
          , CASE 
@@ -850,11 +852,12 @@ BEGIN
            END                                   AS "Area"              -- 車位單獨登記面積 (1平方公尺=0.3025坪) 
          , to_char(MAX(WK."LandOwnedArea"),'FM0000000.00') 
                                                  AS "LandOwnedArea"     -- 土地持份面積 (1平方公尺=0.3025坪) 
-         , CASE 
+--         , CASE 
 --           WHEN  WK."ClCode1" IN ('1') THEN 'R1' 
-             WHEN  WK."ClTypeJCIC" IN ('25') THEN 'R1' 
-             ELSE  'XX' 
-           END                                   AS "BdTypeCode"        -- 建物類別 (ref:AS400 LN15M1) 後面會再更新 
+--             WHEN  WK."ClTypeJCIC" IN ('25') THEN 'R1' 
+--             ELSE  'XX' 
+--           END                                   AS "BdTypeCode"        -- 建物類別 (ref:AS400 LN15M1) 後面會再更新 
+         , 'R1'                                  AS "BdTypeCode"        -- 建物類別 (ref:AS400 LN15M1) 後面會再更新
          , ' '                                   AS "Filler33"          -- 空白 
          , YYYYMM - 191100                       AS "JcicDataYM"        -- 資料所屬年月 
          , JOB_START_TIME                        AS "CreateDate"        -- 建檔日期時間 
