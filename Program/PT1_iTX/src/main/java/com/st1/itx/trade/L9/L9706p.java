@@ -24,13 +24,13 @@ import com.st1.itx.util.http.WebClient;
 public class L9706p extends TradeBuffer {
 
 	@Autowired
-	public L9706Report l9706Report;
+	private L9706Report l9706Report;
 
 	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 
 	@Autowired
-	public WebClient webClient;
+	private WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -39,6 +39,8 @@ public class L9706p extends TradeBuffer {
 
 		this.info("L9706p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
+
+		String tlrNo = titaVo.getTlrNo();
 
 		String content = "";
 		l9706Report.setParentTranCode(parentTranCode);
@@ -49,7 +51,7 @@ public class L9706p extends TradeBuffer {
 			content = "L9706貸款餘額證明書查無資料";
 		}
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9706", content, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", tlrNo, "Y", "LC009", tlrNo + "L9706", content, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

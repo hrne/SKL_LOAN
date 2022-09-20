@@ -24,6 +24,7 @@ import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.springjpa.cm.L9132ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -180,7 +181,13 @@ public class L9132Report extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+//		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
+				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
+				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
+		
+		this.open(titaVo, reportVo);
 
 		this.setCharSpaces(0);
 
@@ -200,12 +207,12 @@ public class L9132Report extends MakeReport {
 			print(1, 1, "本日無資料");
 
 		} else {
-			int tempPage = 0;
+
 
 			int i = 0;
 
 //			String tempAcNoCode = "";
-			String tempAcSubCode = "";
+//			String tempAcSubCode = "";
 			
 			
 			for (Map<String, String> r : resultList) {
@@ -243,6 +250,8 @@ public class L9132Report extends MakeReport {
 						
 						acSubCode = r.get("AcSubCode");			
 						
+						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
+						
 						this.newPage();
 						
 						batchTitle();
@@ -278,7 +287,7 @@ public class L9132Report extends MakeReport {
 
 				if (this.NowRow == 40) {
 					this.newPage();
-					tempPage = this.NowRow;
+
 					batchTitle();
 				}
 
@@ -346,8 +355,14 @@ public class L9132Report extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+//		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
+				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
+				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
+		
+		this.open(titaVo, reportVo);
+		
 		this.setCharSpaces(0);
 
 		// 傳票批號篩選

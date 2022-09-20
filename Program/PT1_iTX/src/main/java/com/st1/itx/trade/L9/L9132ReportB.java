@@ -12,6 +12,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9132ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -77,7 +78,7 @@ public class L9132ReportB extends MakeReport {
 		print(1, 1, "");
 //		print(1, 1, "交易序號　傳票號碼　會計科目／名稱　　　　　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　戶名　　　經辦");
 //		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
-
+		
 		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　 戶名　　　經辦");
 		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－");
 		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
@@ -97,7 +98,12 @@ public class L9132ReportB extends MakeReport {
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
 
-		open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+//		open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
+				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
+				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
+		
+		this.open(titaVo, reportVo);
 
 		setCharSpaces(0);
 

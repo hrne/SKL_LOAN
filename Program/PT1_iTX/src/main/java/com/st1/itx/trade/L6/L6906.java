@@ -84,13 +84,29 @@ public class L6906 extends TradeBuffer {
 		Slice<AcDetail> slAcDetail = null;
 		// 戶號 or 經辦 or 整批批號 or 交易代號
 		if (!(iCustNo == 0)) {
-			slAcDetail = sAcDetailService.acdtlCustNo(iBranchNo, iCurrencyCode, iFAcDate, iCustNo, this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlCustNo(iBranchNo, iCurrencyCode, iFAcDate, iCustNo, this.index,
+					this.limit, titaVo);
+			if (slAcDetail == null) {
+				throw new LogicException("E0001", "該戶號不存在");
+			}
 		} else if (!(iTitaTlrNo.isEmpty())) {
-			slAcDetail = sAcDetailService.acdtlTitaTlrNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaTlrNo, this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlTitaTlrNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaTlrNo, this.index,
+					this.limit, titaVo);
+			if (slAcDetail == null) {
+				throw new LogicException("E0001", "該經辦不存在");
+			}
 		} else if (!(iTitaBatchNo.isEmpty())) {
-			slAcDetail = sAcDetailService.acdtlTitaBatchNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaBatchNo, this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlTitaBatchNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaBatchNo, this.index,
+					this.limit, titaVo);
+			if (slAcDetail == null) {
+				throw new LogicException("E0001", "該整批批號不存在");
+			}
 		} else if (!(iTitaTxCd.isEmpty())) {
-			slAcDetail = sAcDetailService.acdtlTitaTxCd(iBranchNo, iCurrencyCode, iFAcDate, iTitaTxCd, this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.acdtlTitaTxCd(iBranchNo, iCurrencyCode, iFAcDate, iTitaTxCd, this.index,
+					this.limit, titaVo);
+			if (slAcDetail == null) {
+				throw new LogicException("E0001", "該交易代號不存在");
+			}
 		} else {
 			throw new LogicException(titaVo, "E6011", "戶號或經辦或整批批號或交易代號擇一輸入"); // 查詢資料不可為空白
 		}
@@ -162,14 +178,18 @@ public class L6906 extends TradeBuffer {
 			}
 
 			// 查詢會計科子細目設定檔
-			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()), titaVo);
+			CdAcCode tCdAcCode = sCdAcCodeService.findById(
+					new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()),
+					titaVo);
 			if (tCdAcCode == null) {
 				occursList.putParam("OOAcNoItem", "");
 			} else {
 				occursList.putParam("OOAcNoItem", tCdAcCode.getAcNoItem());
 			}
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
-			occursList.putParam("OOLastEmp", tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdAcCode.getLastUpdate()) + " "
+					+ parse.timeStampToStringTime(tCdAcCode.getLastUpdate()));
+			occursList.putParam("OOLastEmp",
+					tCdAcCode.getLastUpdateEmpNo() + " " + empName(titaVo, tCdAcCode.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

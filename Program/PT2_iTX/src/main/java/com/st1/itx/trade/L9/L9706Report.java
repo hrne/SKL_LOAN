@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L9;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.springjpa.cm.L9706ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.ConvertUpMoney;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -34,25 +36,25 @@ import com.st1.itx.util.parse.Parse;
 public class L9706Report extends MakeReport {
 
 	@Autowired
-	L9706ServiceImpl l9706ServiceImpl;
+	private L9706ServiceImpl l9706ServiceImpl;
 
 	@Autowired
-	public FacShareApplService facShareApplService;
+	private FacShareApplService facShareApplService;
 
 	@Autowired
-	public GuarantorService guarantorService;
+	private GuarantorService guarantorService;
 
 	@Autowired
-	public CustMainService custMainService;
+	private CustMainService custMainService;
 
 	@Autowired
-	public ClFacService clFacService;
+	private ClFacService clFacService;
 
 	@Autowired
-	public ClBuildingService clBuildingService;
+	private ClBuildingService clBuildingService;
 
 	@Autowired
-	Parse parse;
+	private Parse parse;
 
 	String iENTDAY = "";
 
@@ -73,29 +75,23 @@ public class L9706Report extends MakeReport {
 		// 中間 Align C 請用 this.getMidAxis()
 
 		this.print(-1, 90, "機密等級：□極機密 ■機密 □密 □普通", "R");
-		this.print(-2, 90, "文件持有人請嚴加控管本項文件", "R");
+//		this.print(-2, 90, "文件持有人請嚴加控管本項文件", "R");
 
 		this.setFontSize(standardFontSize + 3);
 		this.print(-4, this.getMidXAxis(), "貸　款　餘　額　證　明　書", "C");
 		this.setFontSize(standardFontSize);
 
-		if (footerSayContinue) // 表示是同額度第二頁
-		{
+		// 表示是同額度第二頁
+		if (footerSayContinue) {
 			this.print(-6, this.getMidXAxis(), "====　承　上　頁　====", "C");
 		}
-
-		// 明細起始列(自訂亦必須)
-		this.setBeginRow(7);
-
-		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(43);
 	}
 
 	@Override
 	public void printFooter() {
-
-		if (footerSayContinue)
+		if (footerSayContinue) {
 			print(-51, this.getMidXAxis(), "====　續　下　頁　====", "C");
+		}
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -106,7 +102,14 @@ public class L9706Report extends MakeReport {
 
 		iENTDAY = tranDate(titaVo.getCalDy());
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9706", "貸款餘額證明書", "普通", "A4", "P");
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setSecurity("普通").setRptCode("L9706").setRptItem("貸款餘額證明書").setPageOrientation("P").setUseDefault(true)
+				.build();
+
+		this.open(titaVo, reportVo, "A4直式底稿.pdf");
+		
+		this.setBeginRow(7);
+		this.setMaxRows(43);
 		this.setFontSize(standardFontSize);
 
 		List<Map<String, String>> loanBTXList = null;
@@ -163,7 +166,8 @@ public class L9706Report extends MakeReport {
 		int loanTermMm = parse.stringToInteger(tL9706Vo.get("LoanTermMm"));
 		int loanTermDd = parse.stringToInteger(tL9706Vo.get("LoanTermDd"));
 
-		String loanTermString = (loanTermYy > 0 ? loanTermYy + " 年 " : "") + (loanTermMm > 0 ? loanTermMm + " 月 " : "") + (loanTermDd > 0 ? loanTermDd + " 日" : "");
+		String loanTermString = (loanTermYy > 0 ? loanTermYy + " 年 " : "") + (loanTermMm > 0 ? loanTermMm + " 月 " : "")
+				+ (loanTermDd > 0 ? loanTermDd + " 日" : "");
 
 		loanTermString = loanTermString.trim();
 
@@ -175,15 +179,19 @@ public class L9706Report extends MakeReport {
 		} else {
 			cuscCdX = "身分證字號";
 		}
-		String basicInfo = String.format("　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款餘額為 %s整。", tL9706Vo.get("CustName") // 戶名
+		BigDecimal lineAmt = this.getBigDecimal(tL9706Vo.get("LineAmt"));
+		BigDecimal loanBal = this.getBigDecimal(tL9706Vo.get("LoanBal"));
+		String basicInfo = String.format(
+				"　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款餘額為 %s整。",
+				tL9706Vo.get("CustName") // 戶名
 				, cuscCdX, tL9706Vo.get("CustId") // 身分證字號
 				, this.showRocDate(tL9706Vo.get("FirstDrawdownDate"), 0) // 首撥日
 				, loanTermString // 辦理 %s期
-				, ConvertUpMoney.toChinese(tL9706Vo.get("LineAmt")) // 借款金額
+				, ConvertUpMoney.toChinese(lineAmt.toString()) // 借款金額
 				, FormatUtil.pad9(tL9706Vo.get("CustNo"), 7) // 戶號
 				, FormatUtil.pad9(tL9706Vo.get("FacmNo"), 3) // 額度
 				, this.showRocDate(this.titaVo.getCalDy(), 0) // 截至民國 %s 日
-				, ConvertUpMoney.toChinese(tL9706Vo.get("LoanBal"))); // 貸款餘額
+				, ConvertUpMoney.toChinese(loanBal.toString())); // 貸款餘額
 
 		// 切成當中所有 strings 長度 <= 74 的 string[]
 
@@ -199,7 +207,8 @@ public class L9706Report extends MakeReport {
 		List<CustMain> shareList = new ArrayList<CustMain>();
 		FacShareAppl tfacShareAppl = facShareApplService.findById(applNo, titaVo);
 		if (tfacShareAppl != null) {
-			Slice<FacShareAppl> slFacShareApp = facShareApplService.findMainApplNo(tfacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacShareAppl> slFacShareApp = facShareApplService.findMainApplNo(tfacShareAppl.getMainApplNo(), 0,
+					Integer.MAX_VALUE, titaVo);
 			for (FacShareAppl t : slFacShareApp.getContent()) {
 				CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
 				if (tCustMain != null && !tCustMain.getCustId().equals(tL9706Vo.get("CustId"))) {
@@ -253,7 +262,8 @@ public class L9706Report extends MakeReport {
 
 			for (ClFac f : slClFac.getContent()) {
 
-				ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
+				ClBuilding tClBuilding = clBuildingService
+						.findById(new ClBuildingId(f.getClCode1(), f.getClCode2(), f.getClNo()), titaVo);
 				if (tClBuilding != null) {
 					addressList.add(tClBuilding);
 				}
@@ -394,9 +404,13 @@ public class L9706Report extends MakeReport {
 	// copied from StringCut
 	private static boolean isChinese(char c) {
 		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
-		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
-				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
-				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
 			return true;
 		}
 		return false;
