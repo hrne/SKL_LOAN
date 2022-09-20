@@ -552,13 +552,7 @@ public class L4450Batch extends TradeBuffer {
 				}
 
 				if (tBaTxVo.getDataKind() == 2) {
-					if (prevIntDate.containsKey(tmp)) {
-						if (tBaTxVo.getIntEndDate() > prevIntDate.get(tmp)) {
-							prevIntDate.put(tmp, tBaTxVo.getIntEndDate());
-						}
-					} else {
-						prevIntDate.put(tmp, tBaTxVo.getIntEndDate());
-					}
+					prevIntDate.put(tmp, baTxCom.getPrevPayIntDate());
 //				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
 					int sendCode = isMediaSent(tmp, iRepayType, prevIntDate.get(tmp), titaVo);
 					if (sendCode == 1) {

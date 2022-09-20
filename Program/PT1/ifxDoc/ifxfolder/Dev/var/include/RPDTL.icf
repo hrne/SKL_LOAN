@@ -679,7 +679,6 @@ IF(#RpAmt{i}>0,
     IF(#RPFG==6 && #RpCode{i}==91,C(3,#RpFacmNo{i},0,V(P,需有額度號碼，請先點選[未銷帳查詢]),$),$)
     ),IF(#DF1!={i},E(0,@RpCode{i},0)INVOKEJS(SHOW,grd9_{i},0),INVOKEJS(SHOW,grd9_{i},0)))
 IF(#RPFG==3,IF(#RpAmt{i}>#RPTOTF,V(P,#RpAmtComfirmB{i}),IF(#RpAmt{i}<#RPTOTF && #DF5=={i},V(P,#RpAmtComfirmA{i}),$)),$)
-CALL(#RPTOT_CAL{i})
 
 ! 戶號
 #RpCustNo{i}=A,7,I
@@ -787,6 +786,9 @@ IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 @
 ! IF(#DF1<{i}&&#RP_IND==5,CALL(#RPTOT_DIS{i},6),$)
 CALL(#RPTOT_DIS{i},6)
+
+#checkend{i}=X,1,S
+CALL(#RPTOT_CAL{i})
 
 ##end
 

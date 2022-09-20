@@ -322,24 +322,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       		 THEN 3 ";
 		sql += "       		 ELSE 0 ";
 		sql += "            END   AS \"EntAcCode\" ";
-		sql += "		  ,CASE ";
-		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		 THEN 0";
-		sql += "       		 WHEN AC.\"EntAc\" IN (2) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		 THEN 0";
-		sql += "       		 WHEN AC.\"EntAc\" IN (3) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
-		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-		sql += "       		 THEN 0 ";
-		sql += "       		 ELSE AC.\"TitaTxtNo\"";
-		sql += "            END   AS \"TitaTxtNo\" ";
-		sql += "          ,AC.\"RelTxseq\" AS \"RelTxseq\" ";
+		sql += "          ,AC.\"RelTxseq\" AS \"TitaTxtNo\" ";
 		sql += "       	  ,CASE ";
 		sql += "		  	 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       	 	  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
@@ -471,7 +454,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     		 ,\"SlipNo\" ASC";
 		sql += " ) ";
 		sql += " SELECT * FROM ( ";
-		sql += " SELECT LPAD(TO_CHAR(A.\"TitaTxtNo\"),7,0) AS \"TitaTxtNo\"";
+		sql += " SELECT A.\"TitaTxtNo\" AS \"TitaTxtNo\"";
 		sql += "       , 90000 + ROWNUM  AS \"SlipNo\" ";
 		sql += "      , A.\"AcNo\" ";
 		sql += "      , A.\"AcSubBookItem\" ";
@@ -482,7 +465,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , A.\"EmpName\" ";
 		sql += " FROM groupData A ";
 		sql += " UNION ";
-		sql += " SELECT LPAD(TO_CHAR(B.\"TitaTxtNo\"),7,0) AS \"TitaTxtNo\"";
+		sql += " SELECT B.\"TitaTxtNo\" AS \"TitaTxtNo\"";
 		sql += "       ,B.\"SlipNo\" ";
 		sql += "      , B.\"AcNo\" ";
 		sql += "      , B.\"AcSubBookItem\" ";
@@ -492,27 +475,9 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , B.\"CustName\" ";
 		sql += "      , B.\"EmpName\" ";
 		sql += " FROM groupData2 B ";
-		sql += " ) ORDER BY \"TitaTxtNo\" ASC";
+		sql += " ) ORDER BY TO_NUMBER(SUBSTR(\"TitaTxtNo\",11,8)) ASC";
 		sql += " 		   ,CASE WHEN \"SlipNo\" like '9%' AND LENGTH(\"SlipNo\")=5 THEN \"SlipNo\" ELSE \"SlipNo\" * 100000 END ASC";
 
-		
-//		sql += "       AND (CASE WHEN AC.\"EntAc\" IN (1) ";//--正常,批次(整批、單筆)入帳
-//		sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-//		sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
-//		sql += "       			THEN 1";
-//		
-//		sql += "       			WHEN AC.\"EntAc\" IN (2) ";//--被訂正,原序號為批次入帳且訂正為整批訂正
-//		sql += "       			 AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-//		sql += "       			 AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
-//		sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-//		sql += "       			THEN 2";
-//		
-//		sql += "       			WHEN AC.\"EntAc\" IN (3) ";//--訂正,原序號為批次入帳且訂正為整批訂正
-//		sql += "       			 AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-//		sql += "       			 AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
-//		sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
-//		sql += "       			THEN 3 ";
-//		sql += "       			ELSE 0 END) > 0";
 		this.info("doQueryL9132B sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

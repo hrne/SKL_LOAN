@@ -29,6 +29,7 @@ import com.st1.itx.db.service.springjpa.cm.L9110ServiceImpl;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.EmployeeCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.format.FormatUtil;
 
 @Component("L9110Report")
 @Scope("prototype")
@@ -326,6 +327,8 @@ public class L9110Report extends MakeReport {
 			// 違約適用方式
 			if (tL9110.get("F58").isEmpty()) {
 				this.print(1, 5, "違約適用方式 . " + "無");
+			} else if ("999".equals(tL9110.get("F58"))) {
+				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
 				this.print(1, 5, "違約適用方式 . " + tL9110.get("F58") + " " + tL9110.get("F42"));
 			}
@@ -603,7 +606,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 105,
 					"貸款期間 ..... " + tL9110.get("F19") + " 年 " + tL9110.get("F20") + " 月 " + tL9110.get("F21") + " 日");
 
-			this.print(1, 5, "商品代碼 ..... " + tL9110.get("F22"));
+			this.print(1, 5, "商品代碼 ..... " + FormatUtil.padX("" + tL9110.get("F22") + " " + tL9110.get("F59"), 14));
 			this.print(0, 35, "核准利率 ..... ");
 			this.print(0, 65, formatAmt(tL9110.get("F23"), 4), "R");
 			this.print(0, 69, "利率調整週期 . " + tL9110.get("F24") + "月");
@@ -647,7 +650,9 @@ public class L9110Report extends MakeReport {
 			this.print(0, 105, "徵信姓名 ..... " + tL9110.get("F52"));
 			this.print(0, 135, "授信姓名 ..... " + tL9110.get("F53"));
 			// 違約適用方式
-			if (tL9110.get("F42").isEmpty()) {
+			if (tL9110.get("F58").isEmpty()) {
+				this.print(1, 5, "違約適用方式 . " + "無");
+			} else if ("999".equals(tL9110.get("F58"))) {
 				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
 				this.print(1, 5, "違約適用方式 . " + tL9110.get("F58") + " " + tL9110.get("F42"));

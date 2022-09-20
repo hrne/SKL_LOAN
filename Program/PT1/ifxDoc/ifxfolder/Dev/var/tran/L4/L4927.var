@@ -81,7 +81,7 @@ T(3,CdCode.RepayType)
 #RepayTypeHelp=x,1024,S
 
 !AmlRspHelp
-#CDCODEAmlRsp=x,20,S                  
+#CDCODEAmlRsp=x,30,S                  
 T(3,CdCode.AmlCheckItem)
 #AmlRspHelp=x,1024,S
 
@@ -217,7 +217,7 @@ T(H,#RepayType,#RepayTypeHelp)
 
 !AML回應碼
 #AmlRsp=X,1,L
-#AmlRspX=X,20,L
+#AmlRspX=X,30,L
 T(H,#AmlRsp,#AmlRspHelp)
 
 !存摺帳號

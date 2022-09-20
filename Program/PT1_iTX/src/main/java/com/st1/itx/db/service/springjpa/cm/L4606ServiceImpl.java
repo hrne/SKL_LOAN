@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
@@ -48,7 +50,7 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\" ";
 		sql += "                          AND I.\"CustNo\" != 0";
 		sql += "  WHERE I.\"InsuYearMonth\" = :insuYearMonth ";
-		sql += "    and I.\"DueAmt\"  > 0 ";
+		sql += "    and I.\"DueAmt\"  >= 0 ";
 		sql += "    and NVL(I.\"MediaCode\",'N') = 'Y' ";
 		sql += "  ORDER BY I.\"EmpId\",I.\"NowInsuNo\", I.\"InsuCate\" ";
 
@@ -82,7 +84,7 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\" = I.\"CustNo\" ";
 		sql += "                          AND I.\"CustNo\" != 0";
 		sql += "  WHERE I.\"InsuYearMonth\" = :insuYearMonth ";
-		sql += "    and I.\"DueAmt\"  > 0 ";
+		sql += "    and I.\"DueAmt\"  >= 0 ";
 		sql += "    and NVL(I.\"MediaCode\",'N') = 'N' ";
 		sql += "  ORDER BY I.\"EmpId\",I.\"NowInsuNo\", I.\"InsuCate\" ";
 
@@ -133,4 +135,6 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
+
+
 }

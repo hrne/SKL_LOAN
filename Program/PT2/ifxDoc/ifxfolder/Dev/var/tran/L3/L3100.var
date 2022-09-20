@@ -438,6 +438,12 @@ HIDE(#UsFinalBal,#UsPieceCodeSecondAmt,#LbUsAcctFee,#UsDrawdownAmt,#UsHandlingFe
 #BeforeDrawdownAmt=m,14.2,S
 C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
 
+! 系統日
+#wksyscdate=D,7,S
+E(0,#SYSCDATE)
+! 會計
+#wksysdate=D,7,S
+E(0,#SYSDATE)
 
 #FdACTFG=X,2,L
 
@@ -1013,7 +1019,7 @@ E(0,#TimDrawdownAmt)
 C(3,#DrawdownDate,0,E(0,#SYSDATE),$)
 D(8)
 @V(7)A(DATE,0,#DrawdownDate)
-V(5,0010101,#SYSDATE)
+C(3,#DrawdownCode,3,IF(#DrawdownDate<=#wksysdate,V(P,預撥日期不可小於等於會計日),$),V(5,0010101,#SYSDATE))
 
 #WKFADJDATE=D,8,S
 D(7,2,#DrawdownDate,#FirstRateAdjFreq,0)
@@ -1741,9 +1747,6 @@ T(2,#L2r01ProdName)
 #BaseRateCodeX=X,30,L
 C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)            
 
-! 系統日
-#wksysdate=D,7,S
-E(0,#SYSCDATE)
 
 ![指標利率]
 !L2R01
@@ -2040,7 +2043,7 @@ IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPFG,6),E(0,@RPFG,4))
 
 !撥款方式
 #TMPRPTYP=X,1,S
-IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
+IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),C(3,#DrawdownCode,3,E(0,@RPTYPZ,1),E(0,@RPTYPZ,#DrawdownCode)))
 ! C(5,#RenewFlag,Y,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
 
 !應收付總金額,撥款金額
@@ -2119,7 +2122,7 @@ C(4,#RP_AmlCheckName,s,$)
 IF(#RpCustName1!=#TimCustNoX&&#RpCustName1!=#RelationName,$,S)
 C(4,#RpRemitGender,S,$)
 @A(DATE,0,#RpRemitBirthday)
-IF(#RpRemitBirthday>#wksysdate,V(P,出生日期不可大於日曆日),$)
+IF(#RpRemitBirthday>#wksyscdate,V(P,出生日期不可大於日曆日),$)
 
 
 !AML處理
@@ -2376,8 +2379,54 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 #NotYetFlag#PieceCode#PieceCodeSecond#TimPieceCodeSecondAmt#UsageCode#RenewFlag#SyndNo#CompensateFlag
 #RelationCode#RelationBirthday#RelationGender
 #TxBormNo
-
-
+#END
+#AcctCodeX
+#DrawdownCodeX
+#TwDrawdownAmt
+#UsDrawdownAmt
+#DrawdownAmtX
+#IntCalcCodeX
+#AmortizedCodeX
+#FreqBaseX
+#PayIntFreqX
+#RepayFreqX
+#GraceDateX
+#LbAcctFee
+#MessageTxtA
+#MessageTxtB
+#NotYetFlag
+#NotYetFlagX
+#RenewFlagX
+#PieceCodeX
+#PieceCodeSecondX
+#UsageCodeX
+#CompensateFlagX
+#ProdNo
+#ProdName
+#BaseRateCode
+#BaseRateCodeX
+#BaseRate
+#ProdRate
+#RateCodeX
+##loop{times:10,n:1}
+#StepMonths{n}
+#StepMonthE{n}
+#StepRateType{n}
+#StepRateTypeX{n}
+#StepRateIncr{n}
+#StepRatePer{n}
+##end
+#RepayCodeX
+#RepayAcctNo
+#RepayBankX
+#PostCode
+#PostCodeX
+#RelationCodeX
+#RelationName
+#RelationId
+#RelationGenderX
+#RpRemitIdKindX
+#RpRemitGenderX
 <include src="RPDTL.icf::RPDTL.tim"/>
 #CustNo#CustId#ApplNo#TwDrawdownAmt#UsDrawdownAmt
 #TwAcctFee#UsAcctFee#TwFinalBal#UsFinalBal

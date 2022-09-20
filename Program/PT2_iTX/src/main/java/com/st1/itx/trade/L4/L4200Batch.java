@@ -278,28 +278,6 @@ public class L4200Batch extends TradeBuffer {
 //		檢核檔名、檔案格式、是否已入過檔(因L492A每個檔每天只能吃一次)
 		checkFile(filena, titaVo);
 
-//		A.寫入Head檔			
-		BatxHead tBatxHead = new BatxHead();
-		BatxHeadId tBatxHeadId = new BatxHeadId();
-		if (checkFlag) {
-			tBatxHeadId.setAcDate(iAcDate);
-			tBatxHeadId.setBatchNo(iBatchNo);
-			tBatxHead.setBatxHeadId(tBatxHeadId);
-			tBatxHead.setBatxTotAmt(BigDecimal.ZERO);
-			tBatxHead.setBatxTotCnt(0);
-			tBatxHead.setUnfinishCnt(0);
-			tBatxHead.setBatxExeCode("0");
-			tBatxHead.setBatxStsCode("1");
-			tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
-			tBatxHead.setTitaTxCd(titaVo.getTxcd());
-			try {
-				this.info("Insert BatxHead !!!");
-				batxHeadService.insert(tBatxHead, titaVo);
-			} catch (DBException e) {
-				sendMsg = e.getMessage();
-				checkFlag = false;
-			}
-		}
 
 		if (checkFlag) {
 			String[] filelist = filena.split(";");
@@ -477,6 +455,30 @@ public class L4200Batch extends TradeBuffer {
 				}
 			}
 
+
+//			A.寫入Head檔			
+			BatxHead tBatxHead = new BatxHead();
+			BatxHeadId tBatxHeadId = new BatxHeadId();
+			if (checkFlag) {
+				tBatxHeadId.setAcDate(iAcDate);
+				tBatxHeadId.setBatchNo(iBatchNo);
+				tBatxHead.setBatxHeadId(tBatxHeadId);
+				tBatxHead.setBatxTotAmt(BigDecimal.ZERO);
+				tBatxHead.setBatxTotCnt(0);
+				tBatxHead.setUnfinishCnt(0);
+				tBatxHead.setBatxExeCode("0");
+				tBatxHead.setBatxStsCode("1");
+				tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
+				tBatxHead.setTitaTxCd(titaVo.getTxcd());
+				try {
+					this.info("Insert BatxHead !!!");
+					batxHeadService.insert(tBatxHead, titaVo);
+				} catch (DBException e) {
+					sendMsg = e.getMessage();
+					checkFlag = false;
+				}
+			}
+			
 			if (checkFlag) {
 				try {
 					checkBatxHead(tBatxHeadId, tBatxHead, titaVo);
@@ -566,7 +568,7 @@ public class L4200Batch extends TradeBuffer {
 				String procCodeX = "";
 				BigDecimal repayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
 				String reconCode = "";
-				procStsCode = "0";
+				procStsCode = "0";	
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 					switch (tempOccursList.get("OccVirAcctNo").substring(0, 5)) {
 					case "95101":
@@ -741,7 +743,6 @@ public class L4200Batch extends TradeBuffer {
 				tBankRmtf.setBalance(parse.stringToBigDecimal(tempOccursList.get("OccBalance")).divide(bigDe100));
 				tBankRmtf.setRemintBank(tempOccursList.get("OccBankCode"));
 				tBankRmtf.setTraderInfo(tempOccursList.get("OccTrader"));
-				tBankRmtf.setReconCode(reconCode);
 				try {
 					bankRmtfService.insert(tBankRmtf, titaVo);
 				} catch (DBException e) {

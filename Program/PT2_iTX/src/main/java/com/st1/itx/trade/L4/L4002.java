@@ -401,14 +401,6 @@ public class L4002 extends TradeBuffer {
 							watCnt.put(grp3, 1);
 						}
 					}
-					// grp3批次入帳後人工
-					if (tBatxDetail.getProcStsCode().equals("7")) {
-						if (virCnt.containsKey(grp3)) {
-							virCnt.put(grp3, virCnt.get(grp3) + 1);
-						} else {
-							virCnt.put(grp3, 1);
-						}
-					}
 				}
 				// grp2 總金額計算
 				if (totalAmtSum.containsKey(grp2)) {

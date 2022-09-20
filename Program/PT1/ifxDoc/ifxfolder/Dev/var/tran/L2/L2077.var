@@ -132,6 +132,7 @@ C(3,#ApplDate,0,$,S)
 C(3,#TranDate,0,$,S)
 C(3,#ApplDate,0,$,S)
 C(3,#CustNoS,0,s,$)
+E(0,#CustNoS)
 @V(5,#CustNoS,9999999)
 
 #FdRPTFG=X,2,L
@@ -230,6 +231,7 @@ P(R,#OOCloseAmtX)
 #OOCollectWayCode=A,2,S
 
 #OOCollectWayCodeX=X,10,L
+T(3,)
 T(H,#OOCollectWayCode,#CollectWayCodeHelp)
 
 #OOReceiveDate=D,7,S
@@ -303,10 +305,8 @@ C(3,#OOFunCode,1,E(0,3),$)
 C(3,#OOFunCode,2,E(0,2),$)
 C(3,#OOFunCode,3,E(0,3),$)
 
-#OOBUF6=X,60,S
-! T(2,#FUNC6+#OOCustNo+#OOFacmNo+#OOCloseNo)
+#OOBUF6=X,100,S
 T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
-! C(3,#FUNC6,2,IF(#OORepayFg=="Y",$,T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)),$)
 
 
 !作業項目=0.清償,領取方式為01.20時連動L2631否則連動L2076
@@ -315,6 +315,7 @@ T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
 !作業項目=2.補領且累短收(清償違約金)為0時顯示連動L2076
 !OOReceiveFg為1=已領過隱藏按鈕
 #OOBTN6=X,16,S
+IF(#OOCloseDate==0,BIND(grid,cancel),$)
 C(3,#OOReceiveFg,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,cancel))
 ! C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}))
 ! IF(#OOCloseDate==0,BIND(grid,cancel),$)

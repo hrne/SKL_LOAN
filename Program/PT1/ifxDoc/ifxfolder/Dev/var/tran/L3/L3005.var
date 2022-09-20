@@ -332,6 +332,7 @@ E(0,0)
 T(3,)T(H,#TitaHCode,#inTitaHCodeHelp)
 
 #TxtNo=X,18,S
+C(3,#CHAIN,0,S,$)
 
 
 #RPTFG=A,1,S

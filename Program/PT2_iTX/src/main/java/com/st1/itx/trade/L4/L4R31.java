@@ -47,6 +47,7 @@ public class L4R31 extends TradeBuffer {
 		String iRepayAcct = titaVo.getParam("RimRepayAcct");
 		String iCreateFlag = titaVo.getParam("RimCreateFlag");
 
+		String wkCreateFlag = "";
 		if (logNo != 0) {
 			AchAuthLogHistory tAchAuthLogHistory = achAuthLogHistoryService.findById(logNo, titaVo);
 
@@ -64,9 +65,12 @@ public class L4R31 extends TradeBuffer {
 					this.totaVo.putParam("L4R31CalTime", tAchAuthLogHistory.getProcessTime());
 				} else {
 					ProcessTime = "" + tAchAuthLogHistory.getProcessTime();
-					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":" + ProcessTime.substring(4, 6);
+					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
+							+ ProcessTime.substring(4, 6);
 					this.totaVo.putParam("L4R31CalTime", ProcessTime);
 				}
+				wkCreateFlag = tAchAuthLogHistory.getCreateFlag();
+				this.totaVo.putParam("L4R31CreateFlag", wkCreateFlag);
 
 			} else {
 				throw new LogicException("E0001", "AchAuthLogHistory");
@@ -97,10 +101,19 @@ public class L4R31 extends TradeBuffer {
 					this.totaVo.putParam("L4R31CalTime", tAchAuthLog.getProcessTime());
 				} else {
 					ProcessTime = "" + tAchAuthLog.getProcessTime();
-					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":" + ProcessTime.substring(4, 6);
+					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
+							+ ProcessTime.substring(4, 6);
 					this.totaVo.putParam("L4R31CalTime", ProcessTime);
 				}
-
+				wkCreateFlag = tAchAuthLog.getCreateFlag();
+				if (tAchAuthLog.getDeleteDate() > 0) {
+					if ("0".equals(tAchAuthLog.getAuthStatus())) {
+						wkCreateFlag = "Z";
+					} else {
+						wkCreateFlag = "Y";
+					}
+				}
+				this.totaVo.putParam("L4R31CreateFlag", wkCreateFlag);
 			} else {
 				throw new LogicException("E0001", "AchAuthLog");
 			}

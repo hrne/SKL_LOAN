@@ -366,12 +366,11 @@ public class L4606Batch extends TradeBuffer {
 				+ File.separatorChar + titaVo.getParam("FILENA");
 
 		ArrayList<String> dataLineList = new ArrayList<>();
-		
 
 //		 編碼參數，設定為UTF-8 || big5
 		try {
 			dataLineList = fileCom.intputTxt(filePath1, "big5");
-			
+
 		} catch (IOException e) {
 			throw new LogicException("E0014", "L4606(" + filePath1 + ") is error : " + e.getMessage());
 		}
@@ -380,7 +379,7 @@ public class L4606Batch extends TradeBuffer {
 		insuCommFileVo.setValueFromFile(dataLineList);
 
 		List<OccursList> uploadFile = insuCommFileVo.getOccursList();
-		
+
 		this.info("insuCommFileVo   = " + insuCommFileVo.getOccursList());
 
 		int seq = 0;
@@ -389,40 +388,32 @@ public class L4606Batch extends TradeBuffer {
 			this.info("tInsuCommId Start");
 			InsuComm tInsuComm;
 			InsuCommId tInsuCommId;
-			List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
-//			List<Map<String, String>> uploadFile1 = insuCommFileVo.getOccursList();
-
-
-//			fnAllList = uploadFile;
-					
-//			fnAllList = sortMapListCom.beginSort(uploadFile).ascString("CustNo").ascString("FacmNo").ascString("InsuNo")
-//					.ascString("InsuFee").ascString("InsuCommRate").ascString("AcSeq").getList();
 
 			if (uploadFile != null && uploadFile.size() != 0) {
 				uploadFile.sort((c1, c2) -> {
-				int result = 0;
-				if (c1.get("CustNo") != c2.get("CustNo") ) {
-					result = 1 ;
-				}else if (c1.get("FacmNo") != c2.get("FacmNo")) {
-					result = 1;
-				}else if (c1.get("InsuNo") != c2.get("InsuNo")) {
-					result = 1;
-				}else if (c1.get("InsuFee") != c2.get("InsuFee")) {
-					result = 1;
-				}else if (c1.get("InsuCommRate") != c2.get("InsuCommRate")) {
-					result = 1;
-				}else if (c1.get("AcSeq") != c2.get("AcSeq")) {
-					result = 1;
-				}
-				return result;
+					int result = 0;
+					if (c1.get("CustNo") != c2.get("CustNo")) {
+						result = 1;
+					} else if (c1.get("FacmNo") != c2.get("FacmNo")) {
+						result = 1;
+					} else if (c1.get("InsuNo") != c2.get("InsuNo")) {
+						result = 1;
+					} else if (c1.get("InsuFee") != c2.get("InsuFee")) {
+						result = 1;
+					} else if (c1.get("InsuCommRate") != c2.get("InsuCommRate")) {
+						result = 1;
+					} else if (c1.get("AcSeq") != c2.get("AcSeq")) {
+						result = 1;
+					}
+					return result;
 				});
 			}
 			this.info("uploadFile    = " + uploadFile);
-			this.info("fnAllList     = " + fnAllList);
+//			String strContent = "";
 
 			for (OccursList tempOccursList : uploadFile) {
 //				this.info(tempOccursList.toString());
-
+//				strContent = "";
 				seq++;
 				tempOccursList.putParam("Seq", seq);
 
@@ -487,19 +478,12 @@ public class L4606Batch extends TradeBuffer {
 //				this.info("commBase=" + commBase + ", commRate = " + commRate);
 				BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 				tInsuComm.setDueAmt(dueAmt);
-//				BigDecimal sumAmt;
-				
-				// 最後一筆產出
-//				if (count == fnAllList.size()) {
-//					this.info("跑進最後一筆額度為0");
-//    			如果額度為0的時候也需要入佣金媒體錯誤檔
-					if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
-//						this.info("開始相加額度為0");
-						minusCnt++;
-						tempOccursList.putParam("ErrorMsg", "額度為0 :" + "戶號: "+custNo +" "+" 險種: "+ tempOccursList.get("InsuType"));
-						errorList.add(tempOccursList);
-						continue;
-					}
+//				if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
+////					this.info("開始相加額度為0");
+//					minusCnt++;
+//					tempOccursList.putParam("ErrorMsg", "額度為0 :" + "戶號: "+custNo +" "+" 險種: "+ tempOccursList.get("InsuType"));
+//					errorList.add(tempOccursList);
+//					continue;
 //				}
 //				By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
 //				業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
@@ -544,6 +528,11 @@ public class L4606Batch extends TradeBuffer {
 				}
 				count++;
 			}
+//			String strHade = "程式ID: LN2131                                             新光人壽保險股份有限公司                                                          日  期:"
+//					+ dateUtil.getNowStringBc().substring(6, 8) + "/" + dateUtil.getNowStringBc().substring(4, 6) + "/"
+//					+ dateUtil.getNowStringBc().substring(2, 4);
+//			makeFile.put(strHade);
+//			makeFile.put(strContent);
 			this.info("InsuComm insert end");
 		}
 	}

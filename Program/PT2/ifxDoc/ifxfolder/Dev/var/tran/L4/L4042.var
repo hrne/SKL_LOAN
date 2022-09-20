@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,107)ASGN(INQLEN$)
+E(0,999)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -247,6 +247,8 @@ T(2,@OORepayAcctX,#OORepayAcct)
 #OOCreateFlagX=X,20,O
 C(5,#OOCreateFlag,D,T(2,取消授權),C(5,#OOCreateFlag,A,T(2,新增授權),C(5,#OOCreateFlag,Z,T(2,暫停授權))))
 
+#OOCreateFlagR=x,1,O
+
 #OOCreateEmpNo=X,30,O
 
 #OOAuthCreateDate=D,7,O
@@ -269,8 +271,6 @@ C(3,#OOAuthStatus,0,C(5,#OOCreateFlag,D,T(3,完成取消授權),$),$)
 #OOMediaCode=X,1,O
 #OOMediaCodeX=X,10,O
 T(H,@OOMediaCodeX,#OOMediaCode,#MediaCodeHelp2)
-
-
 
 #OOAmlRsp=X,1,O
 #OORepayAcctLog=A,14,O
@@ -302,6 +302,8 @@ T(2,2
 +#OOCustNo
 +#OORepayBank
 +#OORepayAcctLog
++#OOCreateFlagR
++00000000000
 +#OOCreateFlag
 )
 #OOBUF_DELETE=X,500,S
@@ -310,7 +312,9 @@ T(2,4
 +#OOCustNo
 +#OORepayBank
 +#OORepayAcctLog
-+#OOCreateFlag
++#OOCreateFlagR
++00000000000
++#OOCreateFlagR
 )
 #OOBUF_SEARCH=X,500,S
 T(2,5
@@ -318,7 +322,9 @@ T(2,5
 +#OOCustNo
 +#OORepayBank
 +#OORepayAcctLog
-+#OOCreateFlag
++#OOCreateFlagR
++00000000000
++#OOCreateFlagR
 )
 
 ! #OOBTN_CREAT=A,2,O 改為頁面上方新增
@@ -382,6 +388,7 @@ TXFORM=L4042
 #OOStatus
 #OOLimitAmt
 #OOCreateFlag
+#OOCreateFlagR
 #OOCreateEmpNo
 #OOAuthCreateDate
 #OOPropDate
