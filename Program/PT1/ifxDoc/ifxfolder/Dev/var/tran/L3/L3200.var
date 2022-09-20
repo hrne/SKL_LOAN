@@ -36,7 +36,7 @@ C(3,#RepayType,12
  ,T(F,@TwReduceAmt,1)
   T(F,@UsReduceAmt,1))
 ##loop{times:20,l:0,n:1,m:2}
-C(4,#L3r06FacmNo{n},INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+C(5,#FacmBormNo{n},000-000,INVOKEJS(SHOW,grd1_{n},0),C(4,#FacmBormNo{n},INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
 ##end
 
 

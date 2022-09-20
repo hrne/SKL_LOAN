@@ -236,7 +236,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       AND L.\"AcDate\" >=  T.\"AcDateS\" ";
 			sql += "       AND L.\"EntryDate\" >= :entryDateS ";
 			sql += "       AND L.\"EntryDate\" <= :entryDateE ";
-			sql += "  GROUP BY L.\"CustNo\" ";
+			sql += "  GROUP BY T.\"CustNo\" ";
 		}
 		this.info("sql=" + sql);
 

@@ -190,7 +190,7 @@ public class L4451 extends TradeBuffer {
 				editBankDeductDtl.setAmlRsp(amlRsp);
 				String warningMsg = "";
 
-				String failFlag = checkAcctAuth(titaVo);
+				String failFlag = checkAcctAuth(editBankDeductDtl, titaVo);
 				TempVo tTempVo = new TempVo();
 
 //				Aml檢核未過
@@ -276,7 +276,7 @@ public class L4451 extends TradeBuffer {
 		return result;
 	}
 
-	private String checkAcctAuth(TitaVo titaVo) throws LogicException {
+	private String checkAcctAuth(BankDeductDtl tBankDeductDtl, TitaVo titaVo) throws LogicException {
 		String failFlag = " ";
 		limitAmt = BigDecimal.ZERO;
 		BankAuthAct tBankAuthAct = new BankAuthAct();
@@ -284,18 +284,15 @@ public class L4451 extends TradeBuffer {
 
 		tBankAuthActId.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
 		tBankAuthActId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
-
-		if (tempVo != null) {
-			if ("700".equals(tempVo.getParam("RepayBank"))) {
-				tBankAuthActId.setAuthType("01");
-			} else {
-				tBankAuthActId.setAuthType("00");
-			}
+		if ("700".equals(tBankDeductDtl.getRepayBank())) {
+			tBankAuthActId.setAuthType("01");
+		} else {
+			tBankAuthActId.setAuthType("00");
 		}
 
 		tBankAuthAct = bankAuthActService.findById(tBankAuthActId, titaVo);
 
-		if (tBankAuthAct != null) {
+		if (tBankAuthAct != null)		{
 			failFlag = tBankAuthAct.getStatus();
 			limitAmt = tBankAuthAct.getLimitAmt();
 		}
