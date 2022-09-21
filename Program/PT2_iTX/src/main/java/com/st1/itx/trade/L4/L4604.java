@@ -23,6 +23,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -67,7 +68,8 @@ public class L4604 extends TradeBuffer {
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
-		String slipNote = titaVo.getParam("InsuEndMonth").substring(0, 3) + "年" + titaVo.getParam("InsuEndMonth").substring(3, 5) + "月已繳火險保費轉應付費用";
+		String slipNote = titaVo.getParam("InsuEndMonth").substring(0, 3) + "年"
+				+ titaVo.getParam("InsuEndMonth").substring(3, 5) + "月已繳火險保費轉應付費用";
 // 與新光產險對帳後，列應付費用
 // 一、正常繳款(放款系統出帳)
 //  　　借:20232010 暫收及待結轉帳項-火險保費
@@ -77,7 +79,8 @@ public class L4604 extends TradeBuffer {
 //  　　貸:20210391 應付費用-待匯
 
 		// 已繳
-		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index, this.limit);
+		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index,
+				this.limit);
 		if (sInsuRenew != null) {
 			BigDecimal txAmt = BigDecimal.ZERO;
 			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
@@ -154,7 +157,11 @@ public class L4604 extends TradeBuffer {
 			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+			if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
+				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+			} else {
+				acReceivable.setRvNo(FormatUtil.pad9(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
+			}
 			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 			acReceivableList.add(acReceivable);
 		}
@@ -172,7 +179,11 @@ public class L4604 extends TradeBuffer {
 			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+			if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
+				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+			} else {
+				acReceivable.setRvNo(FormatUtil.pad9(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
+			}
 			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 			TempVo tTempVo = new TempVo();
 			tTempVo.clear();

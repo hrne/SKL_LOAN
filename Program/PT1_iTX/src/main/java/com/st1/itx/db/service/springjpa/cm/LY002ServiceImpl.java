@@ -32,7 +32,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo, int monthDate, String isAcctCode) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int monthDate,String isAcctCode) throws Exception {
 		this.info("lY002.findAll ");
 
 		this.info("YYMM:" + monthDate);
@@ -44,7 +44,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 當前年月
 		String iYearMonth = iYear * 100 + iMonth + "";
 
-		// 判斷前一個年月
+		//判斷前一個年月
 		iYear = iMonth - 1 == 0 ? (iYear - 1) : iYear;
 		iMonth = iMonth - 1 == 0 ? 12 : iMonth - 1;
 
@@ -54,9 +54,10 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 月底
 		String eYmd = monthDate + "31";
 		// 月初
-		String sYmd = monthDate + "01";
+		String sYmd = monthDate  + "01";
 
-		this.info("lM054.findAll iYearMonth=" + iYearMonth + ",iYearMonth=" + lYearMonth + "sYmd=" + sYmd + ",eYmd=" + eYmd);
+		this.info("lM054.findAll iYearMonth=" + iYearMonth + ",iYearMonth=" + lYearMonth + "sYmd=" + sYmd + ",eYmd="
+				+ eYmd);
 
 		String sql = "";
 		if (isAcctCode.equals("N")) {
@@ -83,7 +84,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  WHEN R.\"ReltCode\" IS NULL THEN 'A'";
 			sql += "			  WHEN R.\"ReltCode\" ='08' THEN 'C'";
 			sql += "			ELSE 'B' END ) AS F3";
-			// EntCode 0=個金,1=企金,2=企金自然人
+			//EntCode 0=個金,1=企金,2=企金自然人
 			sql += "		  ,(CASE";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" <> 1 THEN 'D'";
 			sql += "			  WHEN R.\"ReltCode\" IS NULL AND M.\"EntCode\" = 1 THEN 'C'";
@@ -97,7 +98,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "		  ,'TWD' AS F7";
 			sql += "		  ,L.\"DrawdownDate\" AS F8";
 			sql += "		  ,L.\"MaturityDate\" AS F9";
-			sql += "		  ,L.\"StoreRate\" / 100 AS F10";
+			sql += "		  ,M.\"StoreRate\" / 100 AS F10";
 			sql += "		  ,M.\"LoanBalance\" AS F11";
 			sql += "		  ,M.\"IntAmtAcc\" AS F12";
 			sql += "		  ,'1' AS F13";
@@ -173,7 +174,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "									  AND CT.\"SEQ\" = 1 ";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"LoanBalance\" > 0 ";
-			sql += "	  AND R.\"CustNo\" IS NOT NULL";
+			sql += "	  AND R.\"CustNo\" IS NOT NULL";	
 			sql += "	ORDER BY M2.\"CustNo\"";
 			sql += "			,M2.\"FacmNo\"";
 			sql += "			,L.\"BormNo\"";
@@ -265,7 +266,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "						    AND F.\"FacmNo\" = M.\"FacmNo\"";
 			sql += "	WHERE M.\"YearMonth\" = :yymm";
 			sql += "	  AND M.\"LoanBalance\" > 0 ";
-			sql += "	  AND R.\"CustNo\" IS NULL";
+			sql += "	  AND R.\"CustNo\" IS NULL";	
 			sql += "	GROUP BY CASE";
 			sql += "			   WHEN M.\"ClCode1\" IN (3) THEN 'D'";
 			sql += "			   WHEN M.\"ClCode1\" IN (1,2) ";
@@ -348,7 +349,7 @@ public class LY002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   		  	  GROUP BY \"CustNo\"";
 		sql += "		   		  	  		  ,\"FacmNo\" ) S";
 		sql += "		   ON S.\"CustNo\" =  T.\"CustNo\"";
-		// 需要取得非核貸金額1億元以上的 (目前缺少利害關係人的判斷)
+		//需要取得非核貸金額1億元以上的 (目前缺少利害關係人的判斷)
 		sql += "		   WHERE T.\"LineAmt\" < 100000000";
 		sql += "		  ) R";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = R.\"CustNo\"";

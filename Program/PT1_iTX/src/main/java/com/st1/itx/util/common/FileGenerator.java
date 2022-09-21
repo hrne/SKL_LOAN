@@ -77,7 +77,7 @@ public class FileGenerator extends CommBuffer {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
 							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]));
 						else
-							bos.write(s.equals("／") ? sl : s.getBytes(charsetName));
+							bos.write(s.equals("＋") || s.equals("－") || s.equals("＊") || s.equals("／")   ? sl : s.getBytes(charsetName));
 					}
 					bos.write("\r\n".getBytes(charsetName));
 				} else

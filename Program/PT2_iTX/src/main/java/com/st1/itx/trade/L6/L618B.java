@@ -152,30 +152,36 @@ public class L618B extends TradeBuffer {
 		acDetailCom.run(titaVo);
 
 //			update 火險檔
-		InsuRenew tIsuRenew = new InsuRenew();
-		tIsuRenew = insuRenewService.prevInsuNoFirst(iCustNo, iFacmNo, iRvNo);
+		InsuRenew tInsuRenew = new InsuRenew();
+		String prevInsuNo = iRvNo;
+		String endoInsuNo = " ";
+		if (iRvNo.length() > 17) {
+			prevInsuNo = iRvNo.substring(0, 17).trim();
+			endoInsuNo = iRvNo.substring(17, 1);
+		}
+		tInsuRenew = insuRenewService.findEndoInsuNoFirst(iCustNo, iFacmNo, prevInsuNo, endoInsuNo, titaVo);
 
-		tIsuRenew = insuRenewService.holdById(tIsuRenew.getInsuRenewId());
+		tInsuRenew = insuRenewService.holdById(tInsuRenew.getInsuRenewId());
 
-		InsuRenew tInsuRenew2 = (InsuRenew) dataLog.clone(tIsuRenew); // 異動前資料
+		InsuRenew tInsuRenew2 = (InsuRenew) dataLog.clone(tInsuRenew); // 異動前資料
 
-		tIsuRenew.setStatusCode(2);
+		tInsuRenew.setStatusCode(2);
 
 		if (titaVo.isHcodeNormal()) {
-			tIsuRenew.setStatusCode(2);
-			tIsuRenew.setOvduDate(this.txBuffer.getTxCom().getTbsdy());
+			tInsuRenew.setStatusCode(2);
+			tInsuRenew.setOvduDate(this.txBuffer.getTxCom().getTbsdy());
 		} else {
-			tIsuRenew.setStatusCode(1);
-			tIsuRenew.setOvduDate(0);
+			tInsuRenew.setStatusCode(1);
+			tInsuRenew.setOvduDate(0);
 		}
 
 		try {
-			tIsuRenew = insuRenewService.update2(tIsuRenew, titaVo);
+			tInsuRenew = insuRenewService.update2(tInsuRenew, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0007", "InsuRenew update error : " + e.getErrorMsg());
 		}
 
-		dataLog.setEnv(titaVo, tInsuRenew2, tIsuRenew); ////
+		dataLog.setEnv(titaVo, tInsuRenew2, tInsuRenew); ////
 		dataLog.exec(); ////
 
 		// 放款交易內容檔

@@ -34,6 +34,7 @@ import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.data.InsuRenewFileVo;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -124,7 +125,8 @@ public class L4601Batch extends TradeBuffer {
 
 //			吃檔
 //			String filePath1 = "D:\\temp\\test\\火險\\Test\\Return\\1)R-10904LNM01P.txt";
-			String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
+			String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+					+ File.separatorChar + titaVo.getParam("FILENA").trim();
 
 			ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -159,12 +161,15 @@ public class L4601Batch extends TradeBuffer {
 //		1.火險詢價上傳檔轉檔作業(檢核清單)
 //			1.總保費=0) 
 //			2.無資料(無此戶號額度、擔保品號碼
-					InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(parse.stringToInteger(t.get("CustNo").trim()), parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(),
-							titaVo);
+					InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(
+							parse.stringToInteger(t.get("CustNo").trim()),
+							parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(), titaVo);
 //				無此保單號碼
 					if (tInsuRenew == null) {
 //					檢查無此戶號額度
-						Slice<InsuRenew> slInsuRenew = insuRenewService.findL4601A(parse.stringToInteger(t.get("FireInsuMonth")), parse.stringToInteger(t.get("CustNo").trim()),
+						Slice<InsuRenew> slInsuRenew = insuRenewService.findL4601A(
+								parse.stringToInteger(t.get("FireInsuMonth")),
+								parse.stringToInteger(t.get("CustNo").trim()),
 								parse.stringToInteger(t.get("FacmNo").trim()), 0, 1, titaVo);
 						if (slInsuRenew == null) {
 							checkResultA += "12";
@@ -182,7 +187,8 @@ public class L4601Batch extends TradeBuffer {
 						tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(t.get("NewEqInsuAmt").trim()));
 						tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(t.get("NewFireInsuFee").trim()));
 						tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(t.get("NewEqInsuFee").trim()));
-						tInsuRenew.setInsuStartDate(parse.stringToInteger(t.get("NewInsuStartDate").replaceAll("/", "")));
+						tInsuRenew
+								.setInsuStartDate(parse.stringToInteger(t.get("NewInsuStartDate").replaceAll("/", "")));
 						tInsuRenew.setInsuEndDate(parse.stringToInteger(t.get("NewInsuEndDate").replaceAll("/", "")));
 						tInsuRenew.setTotInsuPrem(parse.stringToBigDecimal(t.get("NewTotalFee").trim()));
 						try {
@@ -222,7 +228,8 @@ public class L4601Batch extends TradeBuffer {
 
 			checkMsg += "續保資料錯誤：" + errorCCnt + "筆。";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4601", "2" + titaVo.getParam("InsuEndMonth"), checkMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4601",
+					"2" + titaVo.getParam("InsuEndMonth"), checkMsg, titaVo);
 
 			return null;
 
@@ -232,7 +239,8 @@ public class L4601Batch extends TradeBuffer {
 
 			String sendMsg = "L4601-報表已完成";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4601", sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4601", sendMsg, titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -268,7 +276,11 @@ public class L4601Batch extends TradeBuffer {
 		acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 		acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 		acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-		acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+		if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
+			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+		} else {
+			acReceivable.setRvNo(FormatUtil.pad9(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
+		}
 		acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 		TempVo tTempVo = new TempVo();
 		tTempVo.clear();
@@ -279,7 +291,8 @@ public class L4601Batch extends TradeBuffer {
 		acReceivableCom.mnt(flag, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
 	}
 
-	public InsuRenewMediaTemp getInsuRenewMediaTemp(OccursList occursList, InsuRenewMediaTemp t, TitaVo titaVo) throws LogicException {
+	public InsuRenewMediaTemp getInsuRenewMediaTemp(OccursList occursList, InsuRenewMediaTemp t, TitaVo titaVo)
+			throws LogicException {
 
 //	FireInsuMonth		火險到期年月	X	6	
 		t.setFireInsuMonth(occursList.get("FireInsuMonth").trim());
@@ -377,7 +390,8 @@ public class L4601Batch extends TradeBuffer {
 	}
 
 	private void deleInsuRenewMediaTemp(TitaVo titaVo) throws LogicException {
-		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth, "" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth,
+				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 
 		if (slInsuRenewMediaTemp != null) {
 
@@ -404,7 +418,8 @@ public class L4601Batch extends TradeBuffer {
 			return;
 		}
 //		已入帳,總保費與入帳金額不符 
-		if (tInsuRenew.getAcDate() > 0 && parse.stringToBigDecimal(t.get("NewTotalFee")).compareTo(tInsuRenew.getTotInsuPrem()) != 0) {
+		if (tInsuRenew.getAcDate() > 0
+				&& parse.stringToBigDecimal(t.get("NewTotalFee")).compareTo(tInsuRenew.getTotInsuPrem()) != 0) {
 			if ("".equals(checkResultA)) {
 				checkResultA = checkResultA + "15";
 			} else {
@@ -475,7 +490,8 @@ public class L4601Batch extends TradeBuffer {
 //		}
 
 //		重複投保
-		Slice<InsuRenew> sl3InsuRenew = insuRenewService.findL4601B(iInsuEndMonth, t.getClCode1(), t.getClCode2(), t.getClNo(), 0, 2, titaVo);
+		Slice<InsuRenew> sl3InsuRenew = insuRenewService.findL4601B(iInsuEndMonth, t.getClCode1(), t.getClCode2(),
+				t.getClNo(), 0, 2, titaVo);
 		if (sl3InsuRenew != null && sl3InsuRenew.getContent().size() >= 2) {
 			if ("".equals(checkResultB)) {
 				checkResultB += "23";
@@ -501,7 +517,8 @@ public class L4601Batch extends TradeBuffer {
 		// 未撥款或已結案
 		boolean isClose = true;
 		boolean isUnLoan = true;
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(),
+				0, 900, 0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain != null) {
 			isUnLoan = false;
 			for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {

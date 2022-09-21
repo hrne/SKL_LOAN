@@ -29,7 +29,7 @@ E(0,0)
 ["#FdPayIntDate+應繳日",#PayIntDate,#PayIntDateL],["#FdIntEndDate+計息迄日",#IntEndDate],
 ["#FdUnpaidAmt+應扣金額",#UnpaidAmt],["#FdTempAmt+暫收抵繳金額",#TempAmt],
 ["#FdTitaTxtNo+交易序號",#TitaTxtNo],["#FdBatchNo+批次號碼",#BatchNo],
-[#<->#,"#FdReason+扣款失敗原因",#Reason],
+[#<->#,"#FdReason+檢核／扣款結果",#Reason],
 ]
 
 #FdFunctionCodeX=X,2,L

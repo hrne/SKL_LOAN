@@ -127,8 +127,8 @@ public class MakeReport extends CommBuffer {
 	// 目前row位置
 	public int NowRow; // TODO: 改為 getNowRow
 
-	// header,footer處理記號
-	private boolean hfProcess = false;
+	// 若在換頁中,不要再判斷明細行數是否足夠
+	private boolean isInNewPageProcess = false;
 
 	// 輸出內容
 	private int printCnt = 0;
@@ -358,11 +358,7 @@ public class MakeReport extends CommBuffer {
 		float paperWidthPtHalf = paperWidthPt / 2f;
 		int frameX = 5; // hard coded because it's hard coded in doToPdf()
 
-		int result = (int) ((paperWidthPtHalf - frameX) / fontWidth + 1);
-
-//		this.info("getMidXAxis result = " + result);
-
-		return result;
+		return (int) ((paperWidthPtHalf - frameX) / fontWidth + 1);
 	}
 
 	public String getNowDate() {
@@ -586,9 +582,7 @@ public class MakeReport extends CommBuffer {
 			return;
 		}
 
-		// TODO: 參透這個欄位跟註解的真義
-		// 必須
-		this.hfProcess = true;
+		this.isInNewPageProcess = true;
 
 		if (this.nowPage > 0) {
 			this.printContinueNext();
@@ -606,9 +600,7 @@ public class MakeReport extends CommBuffer {
 
 		this.printHeader();
 
-		// TODO: 參透這個欄位跟註解的真義
-		// 必須
-		this.hfProcess = false;
+		this.isInNewPageProcess = false;
 
 		this.NowRow = this.rptBeginRow - 1;
 
@@ -1048,7 +1040,7 @@ public class MakeReport extends CommBuffer {
 		// 換頁處理,排除
 		// 1.表頭(header)及表尾(footer)
 		// 2.指定列
-		if (hfProcess || row <= 0) {
+		if (isInNewPageProcess || row <= 0) {
 			// nothing
 		} else if (this.nowPage == 0 || this.NowRow > (this.rptBeginRow + this.rptTotalRows - 1)) {
 			newPage();

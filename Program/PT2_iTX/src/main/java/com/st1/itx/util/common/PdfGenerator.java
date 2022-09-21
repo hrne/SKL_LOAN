@@ -100,9 +100,6 @@ public class PdfGenerator extends CommBuffer {
 	// 列印明細
 	private List<HashMap<String, Object>> listMap = null;
 
-	// 寬度點數
-	private double xPoints = 0;
-
 	// 高度點數
 	private double yPoints = 0;
 
@@ -129,9 +126,6 @@ public class PdfGenerator extends CommBuffer {
 	private PdfCopy copy = null;
 
 	private String defaultname = null;
-
-	// 讀取頁的長寛
-	private Rectangle page = null;
 
 	// 設定要輸出的Stream
 	private PdfContentByte content = null;
@@ -294,7 +288,6 @@ public class PdfGenerator extends CommBuffer {
 		baos = null;
 		copy = null;
 		defaultname = null;
-		page = null;
 		content = null;
 		// 預設字型
 		try {
@@ -338,9 +331,6 @@ public class PdfGenerator extends CommBuffer {
 
 		document.open();
 
-		// 讀取頁的長寛
-		page = copy.getPageSize();
-
 		// 設定要輸出的Stream
 		baos = new ByteArrayOutputStream();
 		reader = new PdfReader(defaultname);
@@ -351,10 +341,8 @@ public class PdfGenerator extends CommBuffer {
 		paperorientaton = map.get("paper.orientation").toString();
 
 		if ("P".equals(paperorientaton)) {
-			this.xPoints = stamper.getWriter().getPageSize().getWidth();
 			this.yPoints = stamper.getWriter().getPageSize().getHeight();
 		} else {
-			this.xPoints = stamper.getWriter().getPageSize().getHeight();
 			this.yPoints = stamper.getWriter().getPageSize().getWidth();
 		}
 
@@ -420,17 +408,12 @@ public class PdfGenerator extends CommBuffer {
 		}
 
 		if ("P".equals(paperorientaton)) {
-			this.xPoints = writer.getPageSize().getWidth();
 			this.yPoints = writer.getPageSize().getHeight();
 		} else {
-			this.xPoints = writer.getPageSize().getHeight();
 			this.yPoints = writer.getPageSize().getWidth();
 		}
 
 		document.open();
-
-		// 讀取頁的長寛
-		page = writer.getPageSize();
 
 		// 設定要輸出的Stream
 		content = writer.getDirectContent();

@@ -431,6 +431,7 @@ T(3,)T(H,#OOAmlRsp,#AmlRspHelp)
 
 #OOProcNote=x,300,O
 
+#OOProcStsCodeX=x,30,O
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -469,6 +470,7 @@ TXFORM=L4943
 #OOAcDate
 #OOAmlRsp
 #OOProcNote
+#OOProcStsCodeX
 #OOOverShort
 #OReturnCode
 ^
@@ -528,7 +530,9 @@ TXFORM=L4943
 {width:80}
 #OOAcDateX=會計日期
 {width:95}
-#OOProcNote=檢核結果
+#OOProcNote=檢核／扣款結果
+{width:150}
+#OOProcStsCodeX=
 {width:150}
 ^
 
@@ -568,7 +572,9 @@ TXFORM=L4943
 {width:80}
 #OOAcDateX=會計日期
 {width:95}
-#OOProcNote=檢核結果
+#OOProcNote=檢核／扣款結果
+{width:150}
+#OOProcStsCodeX=
 {width:150}
 ^
 
@@ -585,8 +591,10 @@ TXFORM=L4943
 {width:95}
 #OOUnpaidAmt=放款餘額
 {width:95,sum:true}
-#OOProcNote=檢核結果
+#OOProcNote=檢核／扣款結果
 {width:300}
+#OOProcStsCodeX=
+{width:150}
 ^
 
 <include src="PRT.icf::INQ04.sel" map="i=L4943;cpi=15"/>

@@ -177,10 +177,6 @@ public class L4943 extends TradeBuffer {
 					} else if (functionCode == 7) {
 						int maturityDate = parse.stringToInteger(result.get("MaturityDate"));
 						procNote = "已到期未至應繳日, 到期日:" + maturityDate;
-					} else if (acDate > 0) {
-						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
-							procNote = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);
-						}
 					} else if (returnCode == null || returnCode.trim().isEmpty()) {
 
 //					順序為帳號授權、AML、扣帳金額為零、扣款金額(by 額度)超過帳號設定限額(限額為零不檢查)
@@ -199,12 +195,21 @@ public class L4943 extends TradeBuffer {
 									"3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
 						}
 					}
+					String procStsCodeX = "";
 					occursList.putParam("OOAmlRsp", " ");
 					occursList.putParam("OReturnCode", returnCode);
 					occursList.putParam("OOProcNote", procNote);
+					if (acDate > 0) {
+						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
+							procStsCodeX = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);
+						}
+					}
+					occursList.putParam("OOProcStsCodeX", procStsCodeX);
+
 //					 將每筆資料放入Tota的OcList 
 					this.totaVo.addOccursList(occursList);
 				}
+
 				totaVo.putParam("OTotalUnpaidAmt", totUnpaidAmt);
 				totaVo.putParam("OTotalTempAmt", totTempAmt);
 				totaVo.putParam("OTotalRepayAmt", totRepayAmt);

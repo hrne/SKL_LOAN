@@ -224,10 +224,8 @@ C(3,#L4r18CustNo,0,s,$)
 E(0,@CustNo,#L4r18CustNo)
 E(0,@FacmNo,#L4r18FacmNo)
 E(0,@InsuYearMonth,#L4r18InsuYearMonth)
-
 !C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),T(2,@PrevInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
 C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),$),T(2,@NowInsuNo,#L4r18NowInsuNo))
-
 T(2,@EndoInsuNo,#L4r18EndoInsuNo)
 E(0,@FireInsuCovrg,#L4r18FireInsuCovrg)
 E(0,@FireInsuPrem,#L4r18FireInsuPrem)
@@ -425,6 +423,7 @@ R(1,L4R26)
 
 #RimL4R26SetValue=X,1,S
 C(3,#FunctionCode,1,$,s)
+T(2,@EndoInsuNo,#L4r26EndoInsuNo)
 E(0,@FireInsuCovrg,#L4r26FireInsuCovrg)
 E(0,@FireInsuPrem,#L4r26FireInsuPrem)
 E(0,@EthqInsuCovrg,#L4r26EthqInsuCovrg)

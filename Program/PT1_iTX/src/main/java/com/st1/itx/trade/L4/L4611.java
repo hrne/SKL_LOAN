@@ -27,6 +27,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -368,7 +369,11 @@ public class L4611 extends TradeBuffer {
 		acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 		acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 		acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-		acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+		if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
+			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+		} else {
+			acReceivable.setRvNo(FormatUtil.padX(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
+		}
 		acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 		tInsuRenew.setInsuYearMonth(insuYearMonth);
 		TempVo tTempVo = new TempVo();

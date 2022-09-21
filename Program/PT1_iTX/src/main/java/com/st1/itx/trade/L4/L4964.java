@@ -24,16 +24,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * CustNo=9,7<br>
- * FacmNo=9,3<br>
- * END=X,1<br>
- */
-
 @Service("L4964")
 @Scope("prototype")
 /**
@@ -138,8 +128,8 @@ public class L4964 extends TradeBuffer {
 					result = c2.getInsuEndDate() - c1.getInsuEndDate();
 				} else if (c1.getPrevInsuNo().compareTo(c2.getPrevInsuNo()) != 0) {
 					result = c2.getPrevInsuNo().compareTo(c1.getPrevInsuNo());
-				} else if (c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo()) != 0) {
-					result = c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo());
+				} else if (c1.getEndoInsuNo().compareTo(c2.getEndoInsuNo()) != 0) {
+					result = c1.getEndoInsuNo().compareTo(c2.getEndoInsuNo());
 				} else if (c2.getNowInsuNo().compareTo(c1.getNowInsuNo()) != 0) {
 					result = c2.getNowInsuNo().compareTo(c1.getNowInsuNo());
 				} else {
@@ -149,8 +139,9 @@ public class L4964 extends TradeBuffer {
 			});
 
 			for (InsuRenew tInsuRenew : lInsuRenew) {
-
-				tmpInsu tmp = new tmpInsu(tInsuRenew.getOrigInsuNo(), tInsuRenew.getInsuCompany());
+				
+				this.info("1.tInsuRenew = " + tInsuRenew.toString());
+				tmpInsu tmp = new tmpInsu(tInsuRenew.getPrevInsuNo(), tInsuRenew.getInsuCompany());
 
 				this.info("getPrevInsuNo : " + tInsuRenew.getPrevInsuNo());
 				this.info("getRenewCode : " + tInsuRenew.getRenewCode());
@@ -159,7 +150,8 @@ public class L4964 extends TradeBuffer {
 //				僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 				if (btnShowFlag.containsKey(tmp)) {
 					btnShowFlag.put(tmp, 0);
-					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo()) && !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
+					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo())
+							&& !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
 						this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuRenew.getEndoInsuNo());
 						btnShowFlag.put(tmp, 1);
 					}
@@ -200,7 +192,8 @@ public class L4964 extends TradeBuffer {
 					this.totaVo.addOccursList(occursList);
 					occursflg = false;
 				} else { // 近三個月、未結案
-					if ((tInsuRenew.getInsuEndDate() >= threeMonthsB4Date) || (tInsuRenew.getRenewCode() == 2 && tInsuRenew.getAcDate() == 0 && tInsuRenew.getStatusCode() != 4)) {
+					if ((tInsuRenew.getInsuEndDate() >= threeMonthsB4Date) || (tInsuRenew.getRenewCode() == 2
+							&& tInsuRenew.getAcDate() == 0 && tInsuRenew.getStatusCode() != 4)) {
 						OccursList occursList = new OccursList();
 
 						occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
@@ -241,8 +234,8 @@ public class L4964 extends TradeBuffer {
 					result = c2.getInsuEndDate() - c1.getInsuEndDate();
 				} else if (c1.getOrigInsuNo().compareTo(c2.getOrigInsuNo()) != 0) {
 					result = c2.getOrigInsuNo().compareTo(c1.getOrigInsuNo());
-				} else if (c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo()) != 0) {
-					result = c2.getEndoInsuNo().compareTo(c1.getEndoInsuNo());
+				} else if (c1.getEndoInsuNo().compareTo(c2.getEndoInsuNo()) != 0) {
+					result = c1.getEndoInsuNo().compareTo(c2.getEndoInsuNo());
 				} else {
 					result = 0;
 				}
@@ -251,6 +244,7 @@ public class L4964 extends TradeBuffer {
 
 			for (InsuOrignal tInsuOrignal : lInsuOrignal) {
 
+				this.info("1.tInsuOrignal = " + tInsuOrignal.toString());
 				tmpInsu tmp = new tmpInsu(tInsuOrignal.getOrigInsuNo(), tInsuOrignal.getInsuCompany());
 
 				this.info("tInsuOrignal.getOrigInsuNo ... " + tInsuOrignal.getOrigInsuNo());
@@ -267,7 +261,8 @@ public class L4964 extends TradeBuffer {
 //					僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 					if (btnShowFlag.containsKey(tmp)) {
 						btnShowFlag.put(tmp, 0);
-						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
+								&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 							this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 							btnShowFlag.put(tmp, 1);
 						}
@@ -306,7 +301,8 @@ public class L4964 extends TradeBuffer {
 //						僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 						if (btnShowFlag.containsKey(tmp)) {
 							btnShowFlag.put(tmp, 0);
-							if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+							if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
+									&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 								this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 								btnShowFlag.put(tmp, 1);
 							}

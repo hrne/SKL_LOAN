@@ -696,6 +696,7 @@ IF(#DF1=={i},IF(#RPFG==3||#RPFG==7,
 IF(#RpCode{i}==94 || #RpCode{i}==95 ,s,$),s),
 IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 IF(#RPFG==7,IF(#RPTOTF{z}>0,$,s),$)
+IF(#RpCode{i}==94 || #RpCode{i}==95 ,s,$)
 @
 IF(#RPFG==3||#RPFG==7,CALL(#RPTOT_DIS{i},6),s)
 

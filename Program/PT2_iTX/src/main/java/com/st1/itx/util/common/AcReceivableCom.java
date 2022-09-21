@@ -146,7 +146,7 @@ public class AcReceivableCom extends TradeBuffer {
 						wkRvFg = 0;
 				}
 				// L3250 暫收款退還沖正(轉換前交易)，一律為起帳
-				if ("L3250".equals(titaVo.getTxcd())) {
+				if ("L3250".equals(titaVo.getTxcd()) && !"TAV".equals(ac.getAcctCode())) {
 					wkRvFg = 0;
 				}
 
@@ -686,9 +686,15 @@ public class AcReceivableCom extends TradeBuffer {
 //     貸: TMI 未收火險費  ReceivableFlag = 3
 //         F09 暫付火險費   
 //		   F25   催收款項－火險費用
-
+		String prevInsuNo = wkRvNo;
+		String endoInsuNo = " ";
+		if (wkRvNo.length() > 17) {
+			prevInsuNo = wkRvNo.substring(0, 17).trim();
+			endoInsuNo = wkRvNo.substring(17, 1);
+		}
 		InsuRenew tInsuRenew = new InsuRenew();
-		tInsuRenew = insuRenewService.prevInsuNoFirst(ac.getCustNo(), ac.getFacmNo(), wkRvNo, titaVo);
+		tInsuRenew = insuRenewService.findEndoInsuNoFirst(ac.getCustNo(), ac.getFacmNo(), prevInsuNo, endoInsuNo,
+				titaVo);
 
 		if (tInsuRenew == null)
 			throw new LogicException(titaVo, "E6003", "AcReceivableCom updInsuRenew notfound " + ac.getCustNo() + "-"

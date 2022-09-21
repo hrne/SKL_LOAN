@@ -279,10 +279,13 @@ BEGIN
            ELSE TR."Overflow"
            END                            AS "Overflow"            -- 溢收 DECIMAL 16 2
           ,'{'
+          || '"TRXNM2":"'
+          || TR1."TRXNM2"
+          || '"'
           -- 結案區分
           || CASE
                WHEN TR1."TRXTCT" IS NOT NULL
-               THEN '"CaseCloseCode":"'
+               THEN ',"CaseCloseCode":"'
                     || CASE
                          WHEN TR1."TRXTCT" = '1' AND ACN."IsSameFac" = 1
                                                  THEN '2'
@@ -293,83 +296,83 @@ BEGIN
                          WHEN TR1."TRXTCT" = '5' THEN '6'
                          WHEN TR1."TRXTCT" = '6' THEN '7'
                        ELSE TR1."TRXTCT" END
-                    || '",' -- 結案區分
+                    || '"' -- 結案區分
              ELSE '' END
            || CASE
                 WHEN JL."AcctCode" = 'F10' -- 實收帳管費
-                THEN '"AcctFee":"' 
+                THEN ',"AcctFee":"' 
                      || CASE
                           WHEN TR1."TRXCRC" IN ('1','3')
                           THEN TO_CHAR(0 - JL."JLNAMT")
                         ELSE TO_CHAR(JL."JLNAMT")
                         END
-                     || '",'
+                     || '"'
                 WHEN JL."AcctCode" = 'F29' -- 實收契變手續費
-                THEN '"ModifyFee":"' 
+                THEN ',"ModifyFee":"' 
                      || CASE
                           WHEN TR1."TRXCRC" IN ('1','3')
                           THEN TO_CHAR(0 - JL."JLNAMT")
                         ELSE TO_CHAR(JL."JLNAMT")
                         END
-                     || '",'
+                     || '"'
                 WHEN JL."AcctCode" = 'TMI' -- 實收火險保費 
-                THEN '"FireFee":"' 
+                THEN ',"FireFee":"' 
                      || CASE
                           WHEN TR1."TRXCRC" IN ('1','3')
                           THEN TO_CHAR(0 - JL."JLNAMT")
                         ELSE TO_CHAR(JL."JLNAMT")
                         END
-                     || '",'
+                     || '"'
                 WHEN JL."AcctCode" = 'F07' -- 實收法拍費用
-                THEN '"LawFee":"' 
+                THEN ',"LawFee":"' 
                      || CASE
                           WHEN TR1."TRXCRC" IN ('1','3')
                           THEN TO_CHAR(0 - JL."JLNAMT")
                         ELSE TO_CHAR(JL."JLNAMT")
                         END
-                     || '",'
+                     || '"'
               ELSE '' END
            || CASE -- 減免金額
                 WHEN TR1."TRXCRC" IN ('1','3')
                      AND TR1."TRXDAM" != 0
-                THEN '"ReduceAmt":"'
+                THEN ',"ReduceAmt":"'
                      || TO_CHAR(0 - TR1."TRXDAM")
-                     || '",'
+                     || '"'
                 WHEN TR1."TRXDAM" != 0
-                THEN '"ReduceAmt":"'
+                THEN ',"ReduceAmt":"'
                      || TO_CHAR(TR1."TRXDAM")
-                     || '",'
+                     || '"'
               ELSE ''
               END
            || CASE --  減免違約金
                 WHEN TR1."TRXCRC" IN ('1','3')
                      AND TR1."TRXDBC" != 0
-                THEN '"ReduceBreachAmt":"'
+                THEN ',"ReduceBreachAmt":"'
                      || TO_CHAR(0 - TR1."TRXDBC")
-                     || '",'
+                     || '"'
                 WHEN TR1."TRXDBC" != 0
-                THEN '"ReduceBreachAmt":"'
+                THEN ',"ReduceBreachAmt":"'
                      || TO_CHAR(TR1."TRXDBC")
-                     || '",'
+                     || '"'
               ELSE ''
               END
            || CASE 
                 --  免印花稅金額
                 WHEN NVL(TO_CHAR(TR1."TRXNTX"),'0') != '0'
-                THEN '"StampFreeAmt":"' 
-                     || NVL(TO_CHAR(TR1."TRXNTX"),'0') || '"'
-                     || '",'
+                THEN ',"StampFreeAmt":"' 
+                     || NVL(TO_CHAR(TR1."TRXNTX"),'0')
+                     || '"'
               ELSE ''
               END
            || CASE 
                 --  暫收原因
                 WHEN LPAD(NVL(TR1."LMSRSN",0),2,'0') != '00'
-                THEN '"TempReasonCode":"' 
-                     || LPAD(NVL(TR1."LMSRSN",0),2,'0') || '"'
-                     || '",'
+                THEN ',"TempReasonCode":"' 
+                     || LPAD(NVL(TR1."LMSRSN",0),2,'0')
+                     || '"'
               ELSE ''
               END
-           || '"END":""}'                 AS "OtherFields"         -- 其他欄位 VARCHAR2 1000 
+           || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
