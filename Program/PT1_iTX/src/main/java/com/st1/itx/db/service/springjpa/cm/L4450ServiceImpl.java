@@ -362,6 +362,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iEntryDate" + iEntryDate);
 		this.info("iDeductDateStart" + iDeductDateStart);
 		this.info("iDeductDateEnd" + iDeductDateEnd);
+		this.info("iAchSpecificDdFrom" + iAchSpecificDdFrom);
 		this.info("iAchSpecificDdTo" + iAchSpecificDdTo);
 		this.info("iAchSpecificDays" + iAchSpecificDays.toString());
 		this.info("iAchSecondSpecificDdTo" + iAchSecondSpecificDdTo);
@@ -379,7 +380,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iDeductDateStart", iDeductDateStart);
 		query.setParameter("iDeductDateEnd", iDeductDateEnd);
 
-//        query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
+        query.setParameter("iAchSpecificDdFrom", iAchSpecificDdFrom);
 		query.setParameter("iAchSpecificDdTo", iAchSpecificDdTo);
 		query.setParameter("iAchSpecificDays", iAchSpecificDays);
 

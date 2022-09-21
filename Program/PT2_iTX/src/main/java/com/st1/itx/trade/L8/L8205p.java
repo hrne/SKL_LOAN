@@ -25,16 +25,16 @@ public class L8205p extends TradeBuffer {
 
 	@Autowired
 	L8205Report1 l8205Report1;
-
+	
 	@Autowired
 	L8205Report2 l8205Report2;
-
+	
 	@Autowired
 	L8205Report3 l8205Report3;
-
+	
 	@Autowired
 	L8205Report4 l8205Report4;
-
+	
 	@Autowired
 	L8205Report5 l8205Report5;
 
@@ -49,84 +49,87 @@ public class L8205p extends TradeBuffer {
 		this.info("active L8205p");
 		this.totaVo.init(titaVo);
 		boolean isFinish = false;
-
+		
 		String parentTranCode = titaVo.getTxcd();
 		int iType = Integer.parseInt(titaVo.getParam("Type"));
-		this.info("iType=" + iType);
+		this.info("iType="+iType);
 
-		switch (iType) {
-
+		switch(iType) {
+		
 		case 1:
-			// 樣態三報表
-
+			//樣態三報表
+			
 			l8205Report1.setParentTranCode(parentTranCode);
-
+			
 			isFinish = l8205Report1.exec(titaVo);
-
+			
 			if (isFinish) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態3合理性報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態3合理性報表完成", titaVo);
 			} else {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態3合理性報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態3合理性報表完成", titaVo);
 			}
-
+			
+			
 			break;
-
+			
 		case 2:
-			// 合理性報表
-
+			//合理性報表
+			
 			l8205Report2.setParentTranCode(parentTranCode);
-
+			
 			isFinish = l8205Report2.exec(titaVo);
-
+			
 			if (isFinish) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態1、2合理性報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態1、2合理性報表完成", titaVo);
 			} else {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態1、2合理性報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態1、2合理性報表完成", titaVo);
 			}
-
+			
 			break;
 		case 3:
-			// 樣態3延遲交易確認
-
+			//樣態3延遲交易確認
+			
 			l8205Report3.setParentTranCode(parentTranCode);
-
+			
 			isFinish = l8205Report3.exec(titaVo);
-
+			
 			if (isFinish) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態3未完成交易確認報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態3延遲交易確認報表完成", titaVo);
 			} else {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態3未完成交易確認報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態3延遲交易確認報表完成", titaVo);
 			}
-
+			
 			break;
-
+			
 		case 4:
-			// 延遲交易
-
+			//延遲交易
+			
 			l8205Report4.setParentTranCode(parentTranCode);
-
+			
 			isFinish = l8205Report4.exec(titaVo);
-
+			
 			if (isFinish) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態1、2未完成交易確認報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態1、2延遲交易確認報表完成", titaVo);
 			} else {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢樣態1、2未完成交易確認報表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢樣態1、2延遲交易確認報表完成", titaVo);
 			}
-
+			
 			break;
-
+			
 		case 5:
-			// 訪談報表
+			//訪談報表
 			isFinish = l8205Report5.exec(titaVo);
-
+			
 			if (isFinish) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢交易登記表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢交易登記表完成", titaVo);
 			} else {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L8205", "疑似洗錢交易登記表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢交易登記表完成", titaVo);
 			}
 			break;
-
+		
 		}
+		
+					
 
 		this.addList(this.totaVo);
 		return this.sendList();

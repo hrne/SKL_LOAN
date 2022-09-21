@@ -47,7 +47,7 @@ public class L8205Report4 extends MakeReport {
 		this.print(-4, 3, "程式ID：" + this.getParentTranCode());
 		this.print(-4, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
 		this.print(-5, 3, "報  表：" + this.getRptCode());
-		this.print(-5, this.getMidXAxis(), "洗錢樣態1、2未完成交易確認報表", "C");
+		this.print(-5, this.getMidXAxis(), "洗錢樣態1、2延遲交易確認報表", "C");
 		this.print(-4, 80, "報表等級：機密");
 		String bcDate = dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8)
 				+ "/" + dDateUtil.getNowStringBc().substring(2, 4);
@@ -96,7 +96,7 @@ public class L8205Report4 extends MakeReport {
 		int icount = 0;
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-				.setSecurity("機密").setRptCode("L8205").setRptItem("洗錢樣態1、2未完成交易確認報表").setPageOrientation("P")
+				.setSecurity("機密").setRptCode("L8205").setRptItem("洗錢樣態1、2延遲交易確認報表").setPageOrientation("P")
 				.setUseDefault(true).build();
 
 		this.open(titaVo, reportVo, "A4直式底稿.pdf");
@@ -104,7 +104,7 @@ public class L8205Report4 extends MakeReport {
 		this.setBeginRow(11);
 		this.setMaxRows(50);
 		
-		// 未完成:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
+		// 延遲:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
 
 		if (listL8205 != null && listL8205.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -228,8 +228,8 @@ public class L8205Report4 extends MakeReport {
 
 	public void makeExcel(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態1、2未完成交易確認報表",
-				"L8205" + "_" + "洗錢樣態1、2未完成交易確認報表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "洗錢樣態1、2延遲交易確認報表",
+				"L8205" + "_" + "洗錢樣態1、2延遲交易確認報表");
 		printExcelHeader();
 
 		int rowCursor = 2;

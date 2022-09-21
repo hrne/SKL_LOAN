@@ -2,8 +2,8 @@
 --  DDL for Procedure Usp_Tf_InsuRenew_Ins
 --------------------------------------------------------
 set define off;
-
-  CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_InsuRenew_Ins" 
+DROP PROCEDURE "Usp_Tf_InsuRenew_Ins";
+CREATE OR REPLACE PROCEDURE "Usp_Tf_InsuRenew_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -74,7 +74,10 @@ BEGIN
           ,S0."ClCode2"                   AS "ClCode2"             -- 擔保品-代號2 DECIMAL 2 0
           ,S0."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 0
           ,S0."PrevInsuNo"                AS "PrevInsuNo"          -- 原保單號碼 VARCHAR2 17 0
-          ,' '                            AS "EndoInsuNo"          -- 批單號碼 VARCHAR2 17 0
+          ,CASE
+             WHEN S0."Seq" > 1
+             THEN TO_CHAR(S0."Seq")
+           ELSE ' ' END                   AS "EndoInsuNo"          -- 批單號碼 VARCHAR2 17 0
           ,S0."InsuYearMonth"             AS "InsuYearMonth"       -- 火險到期年月 DECIMAL 6 0
           ,S0."CustNo"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,S0."FacmNo"                    AS "FacmNo"              -- 額度 DECIMAL 3 0
@@ -177,7 +180,6 @@ BEGIN
         -- AND NVL(FR1P."CHKPRO",1) = 0 -- 若為1.不處理時,不轉入
         AND NVL(CNM."ClNo",0) > 0
     ) S0
-    WHERE S0."Seq" = 1
     ;
 
     -- 記錄寫入筆數

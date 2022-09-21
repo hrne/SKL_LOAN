@@ -2,6 +2,8 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -68,9 +70,7 @@ public class L8922 extends TradeBuffer {
 		int iFactor = this.parse.stringToInteger(titaVo.getParam("Factor"));
 		int iType = this.parse.stringToInteger(titaVo.getParam("Type"));
 		int iLevel = this.txBuffer.getTxCom().getTlrLevel();
-		this.info("L8922 iLevel : " + iLevel);
-		this.info("L8922 iType : " + iType);
-		this.info("L8922 iFactor : " + iFactor);
+		this.info("L8922 iLevel : " + iLevel+",Type : " + iType+",iFactor : " + iFactor);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -103,9 +103,9 @@ public class L8922 extends TradeBuffer {
 		// 如有找到資料
 		for (MlaundryDetail tMlaundryDetail : lMlaundryDetail) {
 			
-			if (iType == 2)
-			{
-				// 未完成:1.主管覆核記號ManagerCheck=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
+			if (iType == 2) {
+				// 延遲交易
+				// :1.主管覆核記號ManagerCheck=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
 				int mangerdate = tMlaundryDetail.getManagerDate();
 				dateUtil.init();
 				int retxdate = dateUtil.getbussDate(tMlaundryDetail.getEntryDate(), 4);

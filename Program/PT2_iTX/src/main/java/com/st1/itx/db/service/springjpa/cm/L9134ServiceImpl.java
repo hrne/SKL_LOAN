@@ -55,7 +55,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM \"AcDetail\" ";
 		sql += "     WHERE \"AcDate\" >= :startDate ";
 		sql += "       AND \"AcDate\" <= :endDate ";
-		sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000') ";
+		sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000','20222180200') ";
 		sql += "     GROUP BY \"AcDate\" ";
 		sql += "            , \"AcNoCode\" ";
 		sql += " ) ";
@@ -107,7 +107,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND AD.\"CustNo\" != 0 ";
 		sql += "     WHERE \"AcDate\" >= :startDate ";
 		sql += "       AND \"AcDate\" <= :endDate ";
-		sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000') ";
+		sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000','20222180200') ";
 		sql += "     ORDER BY \"AcDate\" ";
 		sql += "            , \"AcNoCode\" ";
 		sql += "            , \"SlipNo\" ";

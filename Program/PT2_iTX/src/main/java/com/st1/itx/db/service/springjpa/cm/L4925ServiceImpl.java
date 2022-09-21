@@ -54,15 +54,15 @@ public class L4925ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L4925.findAll");
 
-		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
-		int iRepayCode = parse.stringToInteger(titaVo.get("RepayCode"));
-		String iReconCode = titaVo.get("ReconCode");
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
+		String iReconCode = titaVo.getParam("ReconCode");
 
 		int iEntryDateFrom = parse.stringToInteger(titaVo.getParam("EntryDateFrom")) + 19110000;
 		int iEntryDateTo = parse.stringToInteger(titaVo.getParam("EntryDateTo")) + 19110000;
 
 		String iProcStsCode = titaVo.get("ProcStsCode");
-
+		
 		String sql = "";
 
 		sql += "  SELECT                            ";

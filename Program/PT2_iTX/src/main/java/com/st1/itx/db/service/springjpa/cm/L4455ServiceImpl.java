@@ -132,8 +132,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       + TX2.\"DelayInt\"";
 			sql += "       + TX2.\"BreachAmt\"";
 			sql += "       + TX2.\"CloseBreachAmt\"";
-			sql += "       + TX2.\"AcctFee\"";
-			sql += "       + TX2.\"LawFee\" AS \"AcctAmt\" ";
+			sql += "       + TX2.\"AcctFee\"  AS \"AcctAmt\" ";
 		} else if (funcd == 3) { // 契變
 			sql += "     , TX2.\"Principal\"";
 			sql += "       + TX2.\"Interest\"";
@@ -141,15 +140,21 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       + TX2.\"BreachAmt\"";
 			sql += "       + TX2.\"CloseBreachAmt\"";
 			sql += "       + TX2.\"ModifyFee\" AS \"AcctAmt\" ";
-		} else { // 火險
+		} else if (funcd == 4) { // 火險
 			sql += "     , TX2.\"Principal\"";
 			sql += "       + TX2.\"Interest\"";
 			sql += "       + TX2.\"DelayInt\"";
 			sql += "       + TX2.\"BreachAmt\"";
 			sql += "       + TX2.\"CloseBreachAmt\"";
 			sql += "       + TX2.\"FireFee\" AS \"AcctAmt\" ";
+		}else if (funcd == 5) { // 法務
+			sql += "     , TX2.\"Principal\"";
+			sql += "       + TX2.\"Interest\"";
+			sql += "       + TX2.\"DelayInt\"";
+			sql += "       + TX2.\"BreachAmt\"";
+			sql += "       + TX2.\"CloseBreachAmt\"";
+			sql += "       + TX2.\"LawFee\" AS \"AcctAmt\" ";
 		}
-
 		sql += "     , TX1.\"IntStartDate\"";
 		sql += "     , TX1.\"IntEndDate\"";
 		sql += "     , TX2.\"Principal\"";
@@ -209,13 +214,16 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " AND bkd.\"RepayType\" NOT IN (4,5,6,7) ";
 			break;
 		case 2:
-			sql += " AND ( bkd.\"RepayType\" = 4 or bkd.\"RepayType\" = 7 )" ;
+			sql += " AND bkd.\"RepayType\" = 4 ";
 			break;
 		case 3:
 			sql += " AND bkd.\"RepayType\" = 6 ";
 			break;
 		case 4:
 			sql += " AND bkd.\"RepayType\" = 5 ";
+			break;
+		case 5:
+			sql += " AND bkd.\"RepayType\" = 7 ";
 			break;
 		default:
 			break;
@@ -258,7 +266,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int RepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 
 		String sql = "SELECT BKD.\"RepayBank\"   ";
-		sql += "     , CASE WHEN BKD.\"RepayType\" IN (4,5,6) THEN '456' ELSE BKD.\"AcctCode\" END AS \"AcctCode\"";
+		sql += "     , CASE WHEN BKD.\"RepayType\" IN (4,5,6,7) THEN 'ProCol' ELSE BKD.\"AcctCode\" END AS \"AcctCode\"";
 		sql += "     , BKD.\"RepayAcctNo\"  ";
 		sql += "     , BKD.\"CustNo\"       ";
 		sql += "     , CM.\"CustName\"      ";
