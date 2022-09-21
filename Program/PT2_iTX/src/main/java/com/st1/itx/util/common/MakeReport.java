@@ -352,13 +352,17 @@ public class MakeReport extends CommBuffer {
 	public int getMidXAxis() {
 //		this.info("getMidXAxis fontSize = " + this.fontSize);
 //		this.info("getMidXAxis charSpaces = " + this.currentCharSpaces);
-//		this.info("getMidXAxis pageOrientation = " + this.pageOrientation);
+//		this.info("getMidXAxis pageOrientation = " + this.reportVo.getPageOrientation());
 		int fontWidth = this.fontSize / 2 + this.currentCharSpaces; // 實際產檔時這邊存成 int, 因此這裡也用 int 以便完全模擬回去
-		float paperWidthPt = ("P".equals(this.pageOrientation) ? 8.3f : 11.7f) * 72f;
+		float paperWidthPt = ("P".equals(this.reportVo.getPageOrientation()) ? 8.3f : 11.7f) * 72f;
 		float paperWidthPtHalf = paperWidthPt / 2f;
 		int frameX = 5; // hard coded because it's hard coded in doToPdf()
 
-		return (int) ((paperWidthPtHalf - frameX) / fontWidth + 1);
+		int result = (int) ((paperWidthPtHalf - frameX) / fontWidth + 1);
+
+//		this.info("getMidXAxis result = " + result);
+
+		return result;
 	}
 
 	public String getNowDate() {
@@ -494,6 +498,7 @@ public class MakeReport extends CommBuffer {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("type", 9);
 		map.put("default", this.defaultPdf);
+		map.put("paper.orientation", reportVo.getPageOrientation());
 		map.put("font", this.font);
 		map.put("font.size", this.fontSize);
 		map.put("p", this.rptPassword);

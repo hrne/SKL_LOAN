@@ -147,6 +147,7 @@ public class PdfGenerator extends CommBuffer {
 	private int fontWidth;
 	private int fontHeight;
 	private boolean watermarkFlag;
+	private String paperorientaton;
 
 	private void adjPdfFontSize(int mapFontSize) {
 		pdfFontSize = mapFontSize;
@@ -312,7 +313,8 @@ public class PdfGenerator extends CommBuffer {
 		this.adjPdfFontSize(10);
 	}
 
-	private void openWithDefaultPdf(String outfile, HashMap<String, Object> map) throws LogicException, DocumentException, IOException {
+	private void openWithDefaultPdf(String outfile, HashMap<String, Object> map)
+			throws LogicException, DocumentException, IOException {
 		reportVo.setUseDefault(true);
 
 		defaultname = pdfFolder + map.get("default").toString();
@@ -346,6 +348,16 @@ public class PdfGenerator extends CommBuffer {
 		fields = stamper.getAcroFields();
 		content = stamper.getOverContent(1);
 
+		paperorientaton = map.get("paper.orientation").toString();
+
+		if ("P".equals(paperorientaton)) {
+			this.xPoints = stamper.getWriter().getPageSize().getWidth();
+			this.yPoints = stamper.getWriter().getPageSize().getHeight();
+		} else {
+			this.xPoints = stamper.getWriter().getPageSize().getHeight();
+			this.yPoints = stamper.getWriter().getPageSize().getWidth();
+		}
+
 		String doToPdfFont = map.get("font").toString();
 		baseFont = setBaseFont(doToPdfFont);
 		int mapFontSize = Integer.parseInt(map.get("font.size").toString());
@@ -354,8 +366,8 @@ public class PdfGenerator extends CommBuffer {
 		this.nowPage = 1;
 		this.info("open = " + this.nowPage);
 
-		this.xPoints = stamper.getWriter().getPageSize().getWidth();
-		this.yPoints = stamper.getWriter().getPageSize().getHeight();
+//		this.info("xPoints = " + xPoints);
+//		this.info("yPoints = " + yPoints);
 
 		underContent = stamper.getUnderContent(1);
 
@@ -386,7 +398,7 @@ public class PdfGenerator extends CommBuffer {
 			pagesize = new Rectangle(n1, n2);
 		}
 
-		String paperorientaton = map.get("paper.orientation").toString();
+		paperorientaton = map.get("paper.orientation").toString();
 
 		// 建立一個Document物件，並設定頁面大小及左、右、上、下的邊界，rotate()橫印
 		if ("P".equals(paperorientaton)) {
@@ -527,7 +539,8 @@ public class PdfGenerator extends CommBuffer {
 
 				content.setFontAndSize(baseFont, pdfFontSize);
 				content.setCharacterSpacing(charSpaces);
-				content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
+				content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
+						(float) (FRAME_Y + yy), 0);
 				content.endText();
 
 				ps = prefix;
@@ -540,7 +553,8 @@ public class PdfGenerator extends CommBuffer {
 			this.info("PdfGenerator basefont = " + BaseFont.TIMES_BOLD);
 			content.setFontAndSize(baseFont, pdfFontSize);
 			content.setCharacterSpacing(charSpaces);
-			content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x), (float) (FRAME_Y + yy), 0);
+			content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
+					(float) (FRAME_Y + yy), 0);
 			content.endText();
 		}
 	}
@@ -565,7 +579,7 @@ public class PdfGenerator extends CommBuffer {
 
 		String align = map.get("align").toString();
 		int x = (col - 1) * fontWidth;
-		int y = (int) page.getHeight() - (row * fontHeight);
+		int y = (int) this.yPoints - (row * fontHeight);
 		content.beginText();
 
 		content.setFontAndSize(baseFont, pdfFontSize);
@@ -754,7 +768,7 @@ public class PdfGenerator extends CommBuffer {
 			empNm = tCdEmp.getFullname();
 		}
 
-		// this.info("PdfGenerator setWatermark empNm = " + empNm);
+		this.info("PdfGenerator setWatermark empNm = " + empNm);
 
 		watermark.append(empNm).append(" ");
 
@@ -767,8 +781,16 @@ public class PdfGenerator extends CommBuffer {
 		underContent.setFontAndSize(tmpBaseFont, 12);
 		underContent.setColorFill(BaseColor.LIGHT_GRAY);
 
-		float widthMax = document.getPageSize().getWidth();
-		float heightMax = document.getPageSize().getHeight();
+		float widthMax;
+		float heightMax;
+
+		if ("P".equals(paperorientaton)) {
+			widthMax = document.getPageSize().getWidth();
+			heightMax = document.getPageSize().getHeight();
+		} else {
+			widthMax = document.getPageSize().getHeight();
+			heightMax = document.getPageSize().getWidth();
+		}
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
 			for (float h = 0; h < heightMax + 80f; h += 80f) {

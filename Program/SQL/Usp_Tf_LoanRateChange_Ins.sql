@@ -87,7 +87,7 @@ BEGIN
                 ,LM."AILIRT"
                 ,NVL(LA."ASCADT",0)  AS "IncrEffectDate" -- 加碼利率生效日 新系統 無此欄位
                 ,LI."IRTADT"         AS "EffectDate" -- 基本利率生效日
-                ,NVL(LA."ASCRAT",LM."IRTASC")
+                ,NVL(LA."ASCRAT",0)
                                      AS "RateIncr" -- 加碼利率
                 ,LI."IRTRAT"         AS "FitRate" -- 基本利率
                 ,ROW_NUMBER() OVER (PARTITION BY LM."LMSACN"
