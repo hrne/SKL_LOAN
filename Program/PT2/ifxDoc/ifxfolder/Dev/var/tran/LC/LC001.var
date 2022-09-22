@@ -165,7 +165,7 @@ C(3,#OOOrgEntdy,0,T(2,#Entdy+#Entdy+#FlowNo),T(2,#Entdy+#OOOrgEntdy+#FlowNo))
 C(3,#AcCnt,1,C(3,#Status,0,T(3,1),T(3,0)),T(3,0))
 
 #BTN2=X,1,S
-C(3,#SupRelease,1,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6901; ntxbuf=#RimData2; text=分錄; visible=#btn_visible2}))
+C(3,#AcCnt,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L6901; ntxbuf=#RimData2; text=分錄; visible=#btn_visible2}))
 
 
 

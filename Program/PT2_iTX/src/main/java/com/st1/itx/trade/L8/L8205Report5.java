@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.CdEmp;
@@ -105,8 +106,15 @@ public class L8205Report5 extends MakeReport {
 	}
 
 	public void makeReport(TitaVo titaVo) throws LogicException{
+
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setSecurity("機密").setRptCode("L8205").setRptItem("疑似洗錢交易登記表").setPageOrientation("L")
+				.setUseDefault(true).build();
+
+		this.open(titaVo, reportVo, "A4橫式底稿.pdf");
 		
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢交易登記表", "", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢交易登記表", "", "A4", "L");
 		
 		if (L8205List != null && L8205List.size() > 0) {
 			

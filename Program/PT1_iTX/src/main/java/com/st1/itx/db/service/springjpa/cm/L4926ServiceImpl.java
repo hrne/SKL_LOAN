@@ -97,6 +97,7 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " AND  \"TraderInfo\" like :traderInfo      \n";
 		}
 
+		sql += " AND  NVL(\"AmlRsp\",'9') IN ('0','1','2')     \n";//排除已刪除資料
 		sql += "ORDER BY \"EntryDate\" DESC , \"CustNo\" , \"ReconCode\" ";
 
 		sql += sqlRow;

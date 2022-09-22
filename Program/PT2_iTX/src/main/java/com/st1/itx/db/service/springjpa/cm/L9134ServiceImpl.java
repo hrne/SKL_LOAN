@@ -90,6 +90,9 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "     SELECT AD.\"AcDate\" ";
 		sql += "          , AD.\"AcNoCode\" ";
+		sql += "          , AD.\"AcSubCode\" ";
+		sql += "          , AD.\"AcDtlCode\" ";
+		sql += "          , C.\"AcctItem\" ";
 		sql += "          , CASE ";
 		sql += "              WHEN AD.\"DbCr\" = 'D' ";
 		sql += "              THEN AD.\"TxAmt\" ";
@@ -105,13 +108,20 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM \"AcDetail\" AD ";
 		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = AD.\"CustNo\" ";
 		sql += "                              AND AD.\"CustNo\" != 0 ";
-		sql += "     WHERE \"AcDate\" >= :startDate ";
-		sql += "       AND \"AcDate\" <= :endDate ";
-		sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000','20222180200') ";
-		sql += "     ORDER BY \"AcDate\" ";
-		sql += "            , \"AcNoCode\" ";
-		sql += "            , \"SlipNo\" ";
-		sql += "            , \"TitaTxtNo\" ";
+		sql += "     LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'AcSubBookCode' ";
+		sql += "                            AND CC.\"Code\" = AD.\"AcSubBookCode\" ";
+		sql += "     LEFT JOIN \"CdAcCode\" C ON C.\"AcNoCode\" = AD.\"AcNoCode\" ";
+		sql += "                             AND C.\"AcSubCode\" = AD.\"AcSubCode\" ";
+		sql += "                             AND C.\"AcDtlCode\" = AD.\"AcDtlCode\" ";
+		sql += "     WHERE AD.\"AcDate\" >= :startDate ";
+		sql += "       AND AD.\"AcDate\" <= :endDate ";
+		sql += "       AND AD.\"AcNoCode\" IN ('20222020000','20222180000','20222180200') ";
+		sql += "     ORDER BY AD.\"AcDate\" ";
+		sql += "            , AD.\"AcNoCode\" ASC ";
+		sql += "            , AD.\"AcSubCode\" ASC ";
+		sql += "            , AD.\"AcDtlCode\" ASC ";
+		sql += "            , AD.\"SlipNo\" ASC ";
+		sql += "            , AD.\"TitaTxtNo\" ASC ";
 		
 		this.info("doDetailQuery sql=" + sql);
 		Query query;
@@ -134,6 +144,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "     SELECT C.\"AcctItem\" ";
 		sql += "          , AC.\"AcNoCode\"";
+		sql += "          , AC.\"AcSubCode\"";
+		sql += "          , AC.\"AcDtlCode\"";
 		sql += "          , AC.\"CustNo\"";
 		sql += "          , AC.\"FacmNo\"";
 		sql += "          , AC.\"OpenAcDate\"";

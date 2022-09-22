@@ -140,7 +140,7 @@ public class L3932 extends TradeBuffer {
 // wkChangeFg
 //   "Y":  繳息日後的每一筆，按鈕<變更> 僅可變更、刪除利率資料，自動顯示變更的生效日期不可改
 //				
-				if (r.getEffectDate() >= effectPaidDate) {
+				if (r.getEffectDate() >= effectPaidDate &&  r.getEffectDate() > ln.getDrawdownDate()) {
 					wkChangeFg = "Y";
 				} else {
 					wkChangeFg = " ";

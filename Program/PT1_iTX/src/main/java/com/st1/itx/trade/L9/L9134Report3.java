@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L9;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -44,22 +45,23 @@ public class L9134Report3 extends MakeReport {
 
 		this.reportDate = endDate;
 
-
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(titaVo.getBrno()).setRptCode(reportCode)
 				.setRptItem(reportItem).setSecurity("security").build();
 
 		makeExcel.open(titaVo, reportVo, reportItem);
 
 		makeExcel.setValue(1, 1, "科目", "C");
-		makeExcel.setValue(1, 2, "科目代號", "C");
-		makeExcel.setValue(1, 3, "戶號", "C");
-		makeExcel.setValue(1, 4, "額度", "C");
-		makeExcel.setValue(1, 5, "起帳日期", "C");
-		makeExcel.setValue(1, 6, "最後交易日", "C");
-		makeExcel.setValue(1, 7, "未銷帳餘額", "C");
-		makeExcel.setValue(1, 8, "會計帳餘額", "C");
-		makeExcel.setValue(1, 9, "區隔帳冊", "C");
-		makeExcel.setValue(1, 10, "展期記號", "C");
+		makeExcel.setValue(1, 2, "子目", "C");
+		makeExcel.setValue(1, 3, "細目", "C");
+		makeExcel.setValue(1, 4, "科目代號", "C");
+		makeExcel.setValue(1, 5, "戶號", "C");
+		makeExcel.setValue(1, 6, "額度", "C");
+		makeExcel.setValue(1, 7, "起帳日期", "C");
+		makeExcel.setValue(1, 8, "最後交易日", "C");
+		makeExcel.setValue(1, 9, "未銷帳餘額", "C");
+		makeExcel.setValue(1, 10, "會計帳餘額", "C");
+		makeExcel.setValue(1, 11, "區隔帳冊", "C");
+		makeExcel.setValue(1, 12, "展期記號", "C");
 
 		List<Map<String, String>> list = l9134ServiceImpl.doQueryL9134_3(titaVo);
 
@@ -68,21 +70,25 @@ public class L9134Report3 extends MakeReport {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {
 			int row = 1;
-			
+
 			for (Map<String, String> r : list) {
 				row++;
 				makeExcel.setValue(row, 1, r.get("AcNoCode"));
-				makeExcel.setValue(row, 2, r.get("AcctItem"));
-				makeExcel.setValue(row, 3, r.get("CustNo"));
-				makeExcel.setValue(row, 4, r.get("FacmNo"));
-				makeExcel.setValue(row, 5, r.get("OpenAcDate"));
-				makeExcel.setValue(row, 6, r.get("LastTxDate"));
-				makeExcel.setValue(row, 7, r.get("AcBal"));
-				makeExcel.setValue(row, 8, r.get("RvBal"));
-				makeExcel.setValue(row, 9, r.get("Item"));
+				makeExcel.setValue(row, 2, r.get("AcSubCode"));
+				makeExcel.setValue(row, 3, r.get("AcDtlCode"));
+				makeExcel.setValue(row, 4, r.get("AcctItem"));
+				makeExcel.setValue(row, 5, r.get("CustNo"));
+				makeExcel.setValue(row, 6, r.get("FacmNo"));
+				makeExcel.setValue(row, 7, r.get("OpenAcDate"));
+				makeExcel.setValue(row, 8, r.get("LastTxDate"));
+				makeExcel.setValue(row, 9, r.get("AcBal").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("AcBal")),
+						"#,##0", "R");
+				makeExcel.setValue(row, 10, r.get("RvBal").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("RvBal")),
+						"#,##0", "R");
+				makeExcel.setValue(row, 11, r.get("Item"));
 				String textRenewCode = "1".equals(r.get("RenewCode").trim()) ? "一般"
 						: "2".equals(r.get("RenewCode").trim()) ? "協議" : " ";
-				makeExcel.setValue(row, 10, textRenewCode);
+				makeExcel.setValue(row, 12, textRenewCode);
 
 			}
 

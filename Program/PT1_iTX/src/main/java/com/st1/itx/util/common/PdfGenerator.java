@@ -437,27 +437,19 @@ public class PdfGenerator extends CommBuffer {
 
 		String imagename = resourceFolder + fna;
 
-		this.info("PdfGenerator imagename = " + imagename);
-
 		File tempFile = new File(imagename);
 		if (!tempFile.exists()) {
 			throw new LogicException("EC009", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo + ",圖片不存在 " + imagename);
 		}
 
-		this.info("PdfGenerator percent = " + percent);
-
 		Image image = Image.getInstance(imagename);
 
-		this.info("PdfGenerator image b = " + image.getWidth() + "/" + image.getHeight());
-
-		double imageH = Math.ceil(image.getHeight());
+		float imageH = image.getHeight();
 
 		if (percent != 0) {
 			image.scalePercent(percent);
-			imageH = Math.ceil(image.getHeight() * percent / 100);
+			imageH = imageH * percent / 100;
 		}
-
-		this.info("PdfGenerator image a = " + image.getWidth() + "/" + image.getHeight());
 
 		yy -= imageH;
 

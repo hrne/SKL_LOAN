@@ -237,7 +237,7 @@ C(3,#OOOrgEntdy,0,T(2,#Entdy+#Entdy+#FlowNo),T(2,#Entdy+#OOOrgEntdy+#FlowNo))
 BIND(grid,{ cmd=DDCHECK; ntxcd=#TranNo; txno=#RimData;rim=LCR11})
 
 #btn_visible2=X,1,S
-C(3,#AcCnt,1,C(3,#Status,0,T(3,1),T(3,0)),T(3,0))
+C(3,#AcCnt,0,T(3,0),T(3,1))
 
 #BTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6901; ntxbuf=#RimData2; text=分錄; visible=#btn_visible2})
@@ -309,7 +309,6 @@ TXFORM=LC011
 
 #BTN2=分錄
 {width:40,search:false,formatter:'cust:bind-button:分錄',canExport:false,align:'center'}
-
 
 #FlowModeX=待處理
 {width:60,align:'center'}

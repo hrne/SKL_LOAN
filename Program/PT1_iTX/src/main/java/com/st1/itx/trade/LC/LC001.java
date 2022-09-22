@@ -131,13 +131,7 @@ public class LC001 extends TradeBuffer {
 					}
 					occursList.putParam("FlowNo", daFlowNo);
 					if (daAcCnt > 0) {
-						// 當天訂正及被訂正交易 無分錄
-						if (("1".equals(daHcode) && daOrgEntdy == daEntdy) || "1".equals(daActionFg.toString())) {
-							occursList.putParam("AcCnt", 0);
-						} else {
-							occursList.putParam("AcCnt", 1);
-						}
-
+						occursList.putParam("AcCnt", 1);
 					} else {
 						occursList.putParam("AcCnt", 0);
 					}
