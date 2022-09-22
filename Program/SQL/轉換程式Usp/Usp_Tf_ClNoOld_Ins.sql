@@ -26,7 +26,8 @@ BEGIN
           ,S1."LGTSEQ"      AS "LGTSEQ"      -- 舊擔保品序號 decimal(2, 0) default 0 not null,
           ,S1."GDRNUM2"     AS "GDRNUM2"     -- 舊群組編號 decimal(10, 0) default 0 not null
           ,ROW_NUMBER() OVER (PARTITION BY S1."GDRID1",S1."GDRID2",S1."GDRNUM"
-                              ORDER BY S1."LGTCIF"
+                              ORDER BY S1."CIF_SEQ"
+                                     , S1."LGTCIF"
                                      , CASE
                                          WHEN S1."APLLAM" != 0
                                          THEN 0
@@ -47,6 +48,12 @@ BEGIN
                 ,S1."GRTSTS"
                 ,APLP.APLLAM
                 ,S1."LGTCIF"
+                ,CASE
+                   WHEN NVL(CU1."CUSCIF",0) = NVL(CU2."CUSCIF",0)
+                        AND NVL(CU1."CUSCIF",0) != 0
+                        AND NVL(CU2."CUSCIF",0) != 0
+                   THEN 0
+                 ELSE 1 END AS "CIF_SEQ"
           FROM "LA$HGTP" S1
           LEFT JOIN "ClBuildingUnique" S2 ON S2."GDRID1" = S1."GDRID1"
                                          AND S2."GDRID2" = S1."GDRID2"
@@ -55,8 +62,8 @@ BEGIN
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = S1."GDRID1"
                                 AND APLP."GDRID2" = S1."GDRID2"
                                 AND APLP."GDRNUM" = S1."GDRNUM"
-          LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S1."LGTCIF" -- 擔保品提供人
-          LEFT JOIN "CustMain" CM ON CM."CustId" = TRIM(CU."CUSID1")
+          LEFT JOIN "CU$CUSP" CU1 ON CU1."LMSACN" = APLP."LMSACN" -- 借戶
+          LEFT JOIN "CU$CUSP" CU2 ON CU2."CUSCIF" = S1."LGTCIF" -- 擔保品提供人
           WHERE CASE
                   WHEN S2."TfFg" IS NOT NULL
                        AND S2."TfFg" = 'Y'
@@ -86,6 +93,12 @@ BEGIN
                 ,S1."GRTSTS"
                 ,APLP.APLLAM
                 ,S1."LGTCIF"
+                ,CASE
+                   WHEN NVL(CU1."CUSCIF",0) = NVL(CU2."CUSCIF",0)
+                        AND NVL(CU1."CUSCIF",0) != 0
+                        AND NVL(CU2."CUSCIF",0) != 0
+                   THEN 0
+                 ELSE 1 END AS "CIF_SEQ"
           FROM "LA$LGTP" S1
           LEFT JOIN "ClLandUnique" S2 ON S2."GDRID1" = S1."GDRID1"
                                      AND S2."GDRID2" = S1."GDRID2"
@@ -94,8 +107,8 @@ BEGIN
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = S1."GDRID1"
                                 AND APLP."GDRID2" = S1."GDRID2"
                                 AND APLP."GDRNUM" = S1."GDRNUM"
-          LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = S1."LGTCIF" -- 擔保品提供人
-          LEFT JOIN "CustMain" CM ON CM."CustId" = TRIM(CU."CUSID1")
+          LEFT JOIN "CU$CUSP" CU1 ON CU1."LMSACN" = APLP."LMSACN" -- 借戶
+          LEFT JOIN "CU$CUSP" CU2 ON CU2."CUSCIF" = S1."LGTCIF" -- 擔保品提供人
           WHERE CASE
                   WHEN S2."TfFg" IS NOT NULL
                        AND S2."TfFg" = 'Y'
@@ -125,6 +138,7 @@ BEGIN
                 ,"LN$CGTP"."GRTSTS"
                 ,APLP.APLLAM
                 ,0 AS "LGTCIF"
+                ,0 AS "CIF_SEQ"
           FROM "LN$CGTP"
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LN$CGTP"."GDRID1"
                                 AND APLP."GDRID2" = "LN$CGTP"."GDRID2"
@@ -145,6 +159,7 @@ BEGIN
                 ,"LA$SGTP"."GRTSTS"
                 ,APLP.APLLAM
                 ,0 AS "LGTCIF"
+                ,0 AS "CIF_SEQ"
           FROM "LA$SGTP"
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LA$SGTP"."GDRID1"
                                 AND APLP."GDRID2" = "LA$SGTP"."GDRID2"
@@ -165,6 +180,7 @@ BEGIN
                 ,"LA$BGTP"."GRTSTS"
                 ,APLP.APLLAM
                 ,0 AS "LGTCIF"
+                ,0 AS "CIF_SEQ"
           FROM "LA$BGTP"
           LEFT JOIN LA$APLP APLP ON APLP."GDRID1" = "LA$BGTP"."GDRID1"
                                 AND APLP."GDRID2" = "LA$BGTP"."GDRID2"

@@ -656,12 +656,12 @@ public class L4450Batch extends TradeBuffer {
 					intEndDate.put(tmp, tBaTxVo.getIntEndDate());
 				}
 
-				this.info("RepayType : " + tBaTxVo.getRepayType());
-				this.info("shPayAmtMap : " + shPayAmtMap.get(tmp));
-				this.info("repAmtMap : " + repAmtMap.get(tmp));
-				this.info("tmpAmt : " + shPayAmtMap.get(tmp).subtract(repAmtMap.get(tmp)));
-				this.info("repAmtFacMap : " + repAmtFacMap.get(tmp2));
-				this.info("tmpAmtMap :: " + tmpAmtMap.get(tmpAmtFacmNo));
+//				this.info("RepayType : " + tBaTxVo.getRepayType());
+//				this.info("shPayAmtMap : " + shPayAmtMap.get(tmp));
+//				this.info("repAmtMap : " + repAmtMap.get(tmp));
+//				this.info("tmpAmt : " + shPayAmtMap.get(tmp).subtract(repAmtMap.get(tmp)));
+//				this.info("repAmtFacMap : " + repAmtFacMap.get(tmp2));
+//				this.info("tmpAmtMap :: " + tmpAmtMap.get(tmpAmtFacmNo));
 			}
 		}
 
@@ -678,7 +678,7 @@ public class L4450Batch extends TradeBuffer {
 		for (Iterator<tmpBorm> it = tempSet.iterator(); it.hasNext();) {
 			tmpBorm tmpFacmVo = it.next();
 			tempList.add(tmpFacmVo);
-			this.info("tmpFacmVo = " + tmpFacmVo);
+//			this.info("tmpFacmVo = " + tmpFacmVo);
 		}
 
 		this.info("tempList.size() = " + tempList.size());
@@ -718,11 +718,11 @@ public class L4450Batch extends TradeBuffer {
 			} else {
 				tBankDeductDtl.setPrevIntDate(0);
 			}
-			this.info("1RepayType : " + tmp.getRepayType());
-			this.info("1shPayAmtMap : " + shPayAmtMap.get(tmp));
-			this.info("1repAmtMap : " + repAmtMap.get(tmp));
-			this.info("1tmpAmt : " + shPayAmtMap.get(tmp).subtract(repAmtMap.get(tmp)));
-			this.info("1repAmtFacMap : " + repAmtFacMap.get(tmp2));
+//			this.info("1RepayType : " + tmp.getRepayType());
+//			this.info("1shPayAmtMap : " + shPayAmtMap.get(tmp));
+//			this.info("1repAmtMap : " + repAmtMap.get(tmp));
+//			this.info("1tmpAmt : " + shPayAmtMap.get(tmp).subtract(repAmtMap.get(tmp)));
+//			this.info("1repAmtFacMap : " + repAmtFacMap.get(tmp2));
 
 //			 暫收抵繳金額 = 應扣金額 shPayAmtMap -  扣款金額 repAmtMap 
 			tBankDeductDtl.setUnpaidAmt(shPayAmtMap.get(tmp));
@@ -751,10 +751,10 @@ public class L4450Batch extends TradeBuffer {
 
 			String failFlag = status.get(tmp2);
 
-			this.info("amlRsp ... " + amlRsp);
-			this.info("failFlag ... " + failFlag);
-			this.info("repAmtMap.get(tmp) ... " + repAmtMap.get(tmp));
-			this.info("limitAmt ... " + limitAmt.get(tmp2));
+//			this.info("amlRsp ... " + amlRsp);
+//			this.info("failFlag ... " + failFlag);
+//			this.info("repAmtMap.get(tmp) ... " + repAmtMap.get(tmp));
+//			this.info("limitAmt ... " + limitAmt.get(tmp2));
 
 			TempVo tTempVo = new TempVo();
 //			帳號授權檢核未過

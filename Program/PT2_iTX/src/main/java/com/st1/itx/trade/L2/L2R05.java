@@ -388,6 +388,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05ApplNo", tFacMain.getApplNo());
 		this.totaVo.putParam("L2r05ProdNo", tFacMain.getProdNo());
 		this.totaVo.putParam("L2r05BaseRateCode", tFacMain.getBaseRateCode());
+		this.totaVo.putParam("L2r05IncrFlag", tFacProd.getIncrFlag());
 		this.totaVo.putParam("L2r05RateIncr", tFacMain.getRateIncr());
 		this.totaVo.putParam("L2r05IndividualIncr", tFacMain.getIndividualIncr());
 		this.totaVo.putParam("L2r05ApproveRate", tFacMain.getApproveRate());

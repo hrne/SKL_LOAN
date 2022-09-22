@@ -153,6 +153,11 @@ public class AcDetail implements Serializable {
   @Column(name = "`SlipNo`")
   private int slipNo = 0;
 
+  // 訂正別
+  /* 0:正常1:訂正2:被訂正3:沖正4:被沖正 */
+  @Column(name = "`TitaHCode`", length = 1)
+  private String titaHCode;
+
   // 登錄單位別
   @Column(name = "`TitaKinbr`", length = 4)
   private String titaKinbr;
@@ -182,16 +187,16 @@ public class AcDetail implements Serializable {
   private String titaBatchSeq;
 
   // 核准主管
+  /* 1:一段式2:二段式3:三段式 */
   @Column(name = "`TitaSupNo`", length = 6)
   private String titaSupNo;
 
   // 作業模式
-  /* 1:一段式2:二段式3:三段式 */
+  /* 00：單筆傳票  01~99：彙總傳票批號 */
   @Column(name = "`TitaRelCd`")
   private int titaRelCd = 0;
 
   // 彙總傳票批號
-  /* 00：單筆傳票  01~99：彙總傳票批號 */
   @Column(name = "`SlipSumNo`")
   private int slipSumNo = 0;
 
@@ -842,6 +847,33 @@ C:貸
   }
 
 /**
+	* 訂正別<br>
+	* 0:正常
+1:訂正
+2:被訂正
+3:沖正
+4:被沖正
+	* @return String
+	*/
+  public String getTitaHCode() {
+    return this.titaHCode == null ? "" : this.titaHCode;
+  }
+
+/**
+	* 訂正別<br>
+	* 0:正常
+1:訂正
+2:被訂正
+3:沖正
+4:被沖正
+  *
+  * @param titaHCode 訂正別
+	*/
+  public void setTitaHCode(String titaHCode) {
+    this.titaHCode = titaHCode;
+  }
+
+/**
 	* 登錄單位別<br>
 	* 
 	* @return String
@@ -976,7 +1008,9 @@ C:貸
 
 /**
 	* 核准主管<br>
-	* 
+	* 1:一段式
+2:二段式
+3:三段式
 	* @return String
 	*/
   public String getTitaSupNo() {
@@ -985,7 +1019,9 @@ C:貸
 
 /**
 	* 核准主管<br>
-	* 
+	* 1:一段式
+2:二段式
+3:三段式
   *
   * @param titaSupNo 核准主管
 	*/
@@ -995,9 +1031,7 @@ C:貸
 
 /**
 	* 作業模式<br>
-	* 1:一段式
-2:二段式
-3:三段式
+	* 00：單筆傳票  01~99：彙總傳票批號
 	* @return Integer
 	*/
   public int getTitaRelCd() {
@@ -1006,9 +1040,7 @@ C:貸
 
 /**
 	* 作業模式<br>
-	* 1:一段式
-2:二段式
-3:三段式
+	* 00：單筆傳票  01~99：彙總傳票批號
   *
   * @param titaRelCd 作業模式
 	*/
@@ -1018,7 +1050,7 @@ C:貸
 
 /**
 	* 彙總傳票批號<br>
-	* 00：單筆傳票  01~99：彙總傳票批號
+	* 
 	* @return Integer
 	*/
   public int getSlipSumNo() {
@@ -1027,7 +1059,7 @@ C:貸
 
 /**
 	* 彙總傳票批號<br>
-	* 00：單筆傳票  01~99：彙總傳票批號
+	* 
   *
   * @param slipSumNo 彙總傳票批號
 	*/
@@ -1137,9 +1169,9 @@ C:貸
            + ", acNoCode=" + acNoCode + ", acSubCode=" + acSubCode + ", acDtlCode=" + acDtlCode + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", txAmt=" + txAmt
            + ", entAc=" + entAc + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", rvNo=" + rvNo + ", acctFlag=" + acctFlag
            + ", receivableFlag=" + receivableFlag + ", acBookFlag=" + acBookFlag + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", sumNo=" + sumNo + ", dscptCode=" + dscptCode
-           + ", slipNote=" + slipNote + ", slipBatNo=" + slipBatNo + ", slipNo=" + slipNo + ", titaKinbr=" + titaKinbr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo
-           + ", titaTxCd=" + titaTxCd + ", titaSecNo=" + titaSecNo + ", titaBatchNo=" + titaBatchNo + ", titaBatchSeq=" + titaBatchSeq + ", titaSupNo=" + titaSupNo + ", titaRelCd=" + titaRelCd
-           + ", slipSumNo=" + slipSumNo + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", slipNote=" + slipNote + ", slipBatNo=" + slipBatNo + ", slipNo=" + slipNo + ", titaHCode=" + titaHCode + ", titaKinbr=" + titaKinbr + ", titaTlrNo=" + titaTlrNo
+           + ", titaTxtNo=" + titaTxtNo + ", titaTxCd=" + titaTxCd + ", titaSecNo=" + titaSecNo + ", titaBatchNo=" + titaBatchNo + ", titaBatchSeq=" + titaBatchSeq + ", titaSupNo=" + titaSupNo
+           + ", titaRelCd=" + titaRelCd + ", slipSumNo=" + slipSumNo + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

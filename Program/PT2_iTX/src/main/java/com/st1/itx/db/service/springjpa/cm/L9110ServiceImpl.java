@@ -501,8 +501,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F25利率調整不變攤還額 ";
 		sql += "      , FAC.\"CreditScore\"            AS F26信用評分 ";
 		sql += "      , FAC.\"UtilDeadline\"           AS F27動支期限 ";
-		sql += "      , FAC.\"RateIncr\"               AS F28利率加減碼 ";
-		sql += "      , \"Fn_GetCdCode\"('UsageCode',FAC.\"UsageCode\") ";
+		sql += "      , CASE WHEN NVL(PROD.\"IncrFlag\",'') = 'Y' THEN FAC.\"RateIncr\"  ELSE FAC.\"IndividualIncr\"  END            AS F28利率加減碼 ";
+		sql += "      , \"Fn_GetCdCode\"('UsageCode',LPAD(FAC.\"UsageCode\", 2, 0)) ";
 		sql += "                                       AS F29用途別 ";
 		sql += "      , FAC.\"RecycleDeadline\"        AS F30循環動用期限 ";
 		sql += "      ,\"Fn_GetEmpName\"(FAC.\"Introducer\",1) ";
@@ -580,6 +580,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE '' ";
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F58違約適用方式 ";
+		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
 		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // 客戶資料主檔
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // 額度主檔

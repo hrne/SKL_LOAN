@@ -157,7 +157,7 @@ public class L618B extends TradeBuffer {
 		String endoInsuNo = " ";
 		if (iRvNo.length() > 17) {
 			prevInsuNo = iRvNo.substring(0, 17).trim();
-			endoInsuNo = iRvNo.substring(17, 1);
+			endoInsuNo = iRvNo.substring(17, 18);
 		}
 		tInsuRenew = insuRenewService.findEndoInsuNoFirst(iCustNo, iFacmNo, prevInsuNo, endoInsuNo, titaVo);
 

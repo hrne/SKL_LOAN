@@ -690,7 +690,7 @@ public class AcReceivableCom extends TradeBuffer {
 		String endoInsuNo = " ";
 		if (wkRvNo.length() > 17) {
 			prevInsuNo = wkRvNo.substring(0, 17).trim();
-			endoInsuNo = wkRvNo.substring(17, 1);
+			endoInsuNo = wkRvNo.substring(17, 18);
 		}
 		InsuRenew tInsuRenew = new InsuRenew();
 		tInsuRenew = insuRenewService.findEndoInsuNoFirst(ac.getCustNo(), ac.getFacmNo(), prevInsuNo, endoInsuNo,

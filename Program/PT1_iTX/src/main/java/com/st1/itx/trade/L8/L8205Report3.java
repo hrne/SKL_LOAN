@@ -96,7 +96,7 @@ public class L8205Report3 extends MakeReport {
 		int icount = 0;
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-				.setSecurity("機密").setRptCode("L8205").setRptItem("洗錢樣態3未完成交易確認報表").setPageOrientation("P")
+				.setSecurity("機密").setRptCode("L8205").setRptItem("洗錢樣態3延遲交易確認報表").setPageOrientation("P")
 				.setUseDefault(true).build();
 
 		this.open(titaVo, reportVo, "A4直式底稿.pdf");

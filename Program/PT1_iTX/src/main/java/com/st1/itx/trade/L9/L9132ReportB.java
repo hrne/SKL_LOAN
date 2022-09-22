@@ -33,7 +33,7 @@ public class L9132ReportB extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L9132B";
 //	private String reportItem = "傳票媒體明細表-交易序號";
-	private String reportItem = "傳票媒體明細表--傳票號碼";
+	private String reportItem = "傳票媒體明細表-傳票號碼";
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";

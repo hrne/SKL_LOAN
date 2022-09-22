@@ -1761,6 +1761,7 @@ TXFORM=L2R04
 #L2r05ApplNo=A,7,S
 #L2r05ProdNo=X,5,S
 #L2r05BaseRateCode=A,2,S
+#L2r05IncrFlag=X,1,S
 #L2r05RateIncr=+n,2.4,S
 #L2r05IndividualIncr=+n,2.4,S
 #L2r05ApproveRate=n,2.4,S
@@ -1880,6 +1881,7 @@ TXFORM=L2R05
 #L2r05ApplNo
 #L2r05ProdNo
 #L2r05BaseRateCode
+#L2r05IncrFlag
 #L2r05RateIncr
 #L2r05IndividualIncr
 #L2r05ApproveRate
@@ -5422,6 +5424,7 @@ TXFORM=L4R25
 
 
 <L4R26.dec>
+#L4r26EndoInsuNo=X,1,S
 #L4r26FireInsuCovrg=m,14,S
 #L4r26EthqInsuCovrg=m,14,S
 #L4r26FireInsuPrem=m,14,S
@@ -5430,6 +5433,7 @@ TXFORM=L4R25
 
 <L4R26.tom>
 TXFORM=L4R26
+#L4r26EndoInsuNo
 #L4r26FireInsuCovrg
 #L4r26EthqInsuCovrg
 #L4r26FireInsuPrem

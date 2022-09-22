@@ -94,7 +94,7 @@ BEGIN
           ,"LoanBal"             -- 放款餘額 DECIMAL 16 2
           ,"IntStartDate"        -- 計息起日 DECIMALD 8 
           ,"IntEndDate"          -- 計息迄日 DECIMALD 8 
-          ,"RepaidPeriod"        -- 回收期數 DECIMAL 3
+          ,"PaidTerm"            -- 回收期數 DECIMAL 3
           ,"Rate"                -- 利率 DECIMAL 6 4
           ,"Principal"           -- 本金 DECIMAL 16 2
           ,"Interest"            -- 利息 DECIMAL 16 2

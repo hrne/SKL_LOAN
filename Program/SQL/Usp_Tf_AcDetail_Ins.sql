@@ -196,6 +196,7 @@ BEGIN
             ,S1."JLNAMT"
             ,S1."JLNCRC"
             ,S1."BSTBTN"
+            ,S1."AGLVBN"
             ,S1."TRXTRN"
             ,S1."TRXNTX"
             ,S5."AcNoCode"
@@ -317,17 +318,9 @@ BEGIN
           ,S."TRXATP"                     AS "DbCr"                -- 借貸別 VARCHAR2 1 0
           ,ABS(NVL(S."TRXAMT",S."JLNAMT"))
                                           AS "TxAmt"               -- 記帳金額 DECIMAL 16 2
-          ,CASE TO_NUMBER(NVL(S."JLNCRC",0))
-             WHEN 0 -- 未訂正 
-             THEN 1 -- 已入帳
-             WHEN 1 -- 訂正
-             THEN 3 -- 沖正(隔日訂正)
-             WHEN 2 -- 被訂正
-             THEN 2 -- 被沖正(隔日訂正)
-             WHEN 3 -- 沖正
-             THEN 3 -- 沖正(隔日訂正)
-             WHEN 4 -- 被沖正
-             THEN 2 -- 被沖正(隔日訂正)
+          ,CASE 
+             WHEN S."JLNCRC" IS NOT NULL
+             THEN 1
            ELSE 0 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0
           ,CASE
              WHEN NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0) != 0
@@ -347,7 +340,7 @@ BEGIN
           ,''                             AS "SumNo"               -- 彙總別 VARCHAR2 3 0
           ,''                             AS "DscptCode"           -- 摘要代號 VARCHAR2 4 0
           ,u''                            AS "SlipNote"            -- 傳票摘要 NVARCHAR2 80 0
-          ,S."BSTBTN"                     AS "SlipBatNo"           -- 傳票批號 DECIMAL 2 0
+          ,S."AGLVBN"                     AS "SlipBatNo"           -- 傳票批號 DECIMAL 2 0
           ,S."JLNVNO"                     AS "SlipNo"              -- 傳票號碼 DECIMAL 6 0
           ,'0000'                         AS "TitaKinbr"           -- 登錄單位別 VARCHAR2 4 0
           ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 登錄經辦 VARCHAR2 6 0
@@ -375,7 +368,21 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-          ,JORP."BSTBTN"                  AS "SlipSumNo"
+          ,S."BSTBTN"                     AS "SlipSumNo"
+          ,CASE 
+             WHEN S."JLNCRC" IS NULL
+             THEN 0
+             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 0 -- 未訂正 
+             THEN 1 -- 已入帳
+             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 1 -- 訂正
+             THEN 3 -- 沖正(隔日訂正)
+             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 2 -- 被訂正
+             THEN 2 -- 被沖正(隔日訂正)
+             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 3 -- 沖正
+             THEN 3 -- 沖正(隔日訂正)
+             WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 4 -- 被沖正
+             THEN 2 -- 被沖正(隔日訂正)
+           ELSE 0 END                     AS "TitaHCode"
     FROM S
     LEFT JOIN ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
                  AND NVL(S."LMSACN",0) > 0
@@ -501,6 +508,7 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
           ,JORP."NEWVBN"                  AS "SlipSumNo"
+          ,0                              AS "TitaHCode"
     FROM JORP
     LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = JORP."CORACC"
                            AND S5."AcSubCode" = NVL(JORP."CORACS",'     ')

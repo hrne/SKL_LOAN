@@ -111,7 +111,7 @@ public class L4450Report extends MakeReport {
 		});
 
 		this.lBankDeductDtl = lBankDeductDtl;
-		this.info("this.lBankDeductDtl------->" + this.lBankDeductDtl);
+//		this.info("this.lBankDeductDtl------->" + this.lBankDeductDtl);
 		this.exec(titaVo);
 	}
 
@@ -180,21 +180,23 @@ public class L4450Report extends MakeReport {
 					String InsuNo = tTempVo.getParam("InsuNo");
 					String prevInsuNo = InsuNo;
 					String endoInsuNo = " ";
+					this.info("InsuNo = " + InsuNo);
 					if (InsuNo.length() > 17) {
 						prevInsuNo = InsuNo.substring(0, 17).trim();
-						endoInsuNo = InsuNo.substring(17, 1);
+						endoInsuNo = InsuNo.substring(17, 18);
 					}
-
 					this.info("tTempVo---->" + tTempVo);
+
 					if (!"".equals(InsuNo)) {
 						int InsuYearMonth = 0, InsuEndDate = 0;
 
 						String tInsuNo[] = InsuNo.split(",");
 						Boolean firstflg = false;
 						for (int k = 0; k < tInsuNo.length; k++) {
+							this.info("tInsuNo[" + k + "] = " + tInsuNo[k]);
 							InsuRenew tInsuRenew = new InsuRenew();
 							tInsuRenew = insuRenewService.findEndoInsuNoFirst(lBankDeductDtl.get(i).getCustNo(),
-									lBankDeductDtl.get(i).getFacmNo(), prevInsuNo, endoInsuNo, titaVo);
+									lBankDeductDtl.get(i).getFacmNo(),prevInsuNo, endoInsuNo, titaVo);
 
 							if (tInsuRenew != null) {
 
