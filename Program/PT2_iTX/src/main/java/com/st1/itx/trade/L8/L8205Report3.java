@@ -189,9 +189,9 @@ public class L8205Report3 extends MakeReport {
 					EmpNoDesc1 = EmpNoDesc.substring(0, ilength);
 				}
 
-				if (!EmpNoDesc1.isEmpty()) {
+//				if (!EmpNoDesc1.isEmpty()) {
 					print(1, 4, "經辦說明:" + EmpNoDesc1);
-				}
+//				}
 				if (!EmpNoDesc2.isEmpty()) {
 					print(1, 4, "　　　　 " + EmpNoDesc2);
 				}

@@ -432,6 +432,7 @@ BEGIN
                           WHERE  TRUNC(Ac."AcDate" / 100)  = YYYYMM
                             AND  SUBSTR(NVL(Ac."TitaTxCd",' '), 1, 2) = 'L3'
                             AND  NVL(Ac."AcctCode",' ') IN ('F10', 'F29', 'TMI', 'F09', 'F25', 'F07', 'F24')    -- 費用
+                            AND  Ac."EntAc" > 0
                           GROUP  BY  Ac."CustNo", Ac."FacmNo"
                         ) Ac   ON Ac."CustNo"  =  M."CustNo"
                               AND Ac."FacmNo"  =  M."FacmNo"

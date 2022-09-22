@@ -194,6 +194,7 @@ BEGIN
             WHERE "CustNo"  > 0 
              AND  "AcDate"  = TBSDYF
              AND  "AcctCode" IN ('IC1','IC2','IC3','IC4')
+             AND  "EntAc" > 0
             GROUP BY "CustNo", "FacmNo", "BormNo"
            ) T
 --IC1	短擔息

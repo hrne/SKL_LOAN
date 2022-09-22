@@ -15,6 +15,7 @@ import com.st1.itx.db.service.springjpa.cm.L8205ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ReportVo;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -161,9 +162,9 @@ public class L8205Report2 extends MakeReport {
 					EmpNoDesc1 = EmpNoDesc.substring(0, ilength);
 				}
 
-				if (!EmpNoDesc1.isEmpty()) {
+//				if (!EmpNoDesc1.isEmpty()) {
 					print(1, 4, "經辦說明:" + EmpNoDesc1);
-				}
+//				}
 				if (!EmpNoDesc2.isEmpty()) {
 					print(1, 4, "　　　　 " + EmpNoDesc2);
 				}

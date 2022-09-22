@@ -1,4 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLoanBal_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLoanBal_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -156,6 +156,7 @@ BEGIN
             WHERE "CustNo"  > 0 
              AND  TRUNC("AcDate"/100)  = YYYYMM
              AND  "AcctCode" IN ('IC1','IC2','IC3','IC4')
+             AND  "EntAc" > 0
             GROUP BY "CustNo", "FacmNo", "BormNo"
            ) T
 --IC1	短擔息

@@ -3,7 +3,7 @@
 -- 執行方式：EXEC "Usp_L9_MonthlyLM036Portfolio_Ins"(20200430,'999999');
 --
 
-CREATE OR REPLACE PROCEDURE "Usp_L9_MonthlyLM036Portfolio_Ins"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_MonthlyLM036Portfolio_Ins"
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -414,6 +414,7 @@ BEGIN
                            ,'F10' --收續費收入－放款帳管費－一般
                            ,'F08' --收回呆帳及過期障－放款
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -436,6 +437,7 @@ BEGIN
                           AND A."AcctCode" IN (
                             'ICR' --應收利息-放款部
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -462,6 +464,7 @@ BEGIN
                            ,'F24' --催收款項－法務費用
                            ,'F25' --催收款項－火險費用
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -502,6 +505,7 @@ BEGIN
                            ,'F24' --催收款項－法務費用
                            ,'F25' --催收款項－火險費用
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -571,6 +575,7 @@ BEGIN
                            ,'F10' --收續費收入－放款帳管費－一般
                            ,'F08' --收回呆帳及過期障－放款
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -593,6 +598,7 @@ BEGIN
                           AND A."AcctCode" IN (
                             'ICR' --應收利息-放款部
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -619,6 +625,7 @@ BEGIN
                            ,'F24' --催收款項－法務費用
                            ,'F25' --催收款項－火險費用
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -659,6 +666,7 @@ BEGIN
                            ,'F24' --催收款項－法務費用
                            ,'F25' --催收款項－火險費用
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -727,6 +735,7 @@ BEGIN
                            ,'F10' --收續費收入－放款帳管費－一般
                            ,'F08' --收回呆帳及過期障－放款
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -749,6 +758,7 @@ BEGIN
                           AND A."AcctCode" IN (
                             'ICR' --應收利息-放款部
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -775,6 +785,7 @@ BEGIN
                            ,'F24' --催收款項－法務費用
                            ,'F25' --催收款項－火險費用
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'
@@ -815,6 +826,7 @@ BEGIN
                            ,'F24' --催收款項－法務費用
                            ,'F25' --催收款項－火險費用
                           )
+                          AND A."EntAc" > 0
                         GROUP BY CASE 
                                   WHEN C."EntCode" = '1' 
                                   THEN '1'

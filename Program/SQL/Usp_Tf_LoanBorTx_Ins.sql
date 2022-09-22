@@ -2,8 +2,7 @@
 --  DDL for Procedure Usp_Tf_LoanBorTx_Ins
 --------------------------------------------------------
 set define off;
-
-  CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_LoanBorTx_Ins" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanBorTx_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -69,7 +68,55 @@ BEGIN
     ;
 
     -- 寫入資料
-    INSERT INTO "LoanBorTx"
+    INSERT INTO "LoanBorTx" (
+           "CustNo"              -- 借款人戶號 DECIMAL 7 
+          ,"FacmNo"              -- 額度編號 DECIMAL 3 
+          ,"BormNo"              -- 撥款序號 DECIMAL 3 
+          ,"BorxNo"              -- 交易內容檔序號 DECIMAL 4 
+          ,"TitaCalDy"           -- 交易日期 DECIMALD 8 
+          ,"TitaCalTm"           -- 交易時間 DECIMAL 8 
+          ,"TitaKinBr"           -- 單位別 VARCHAR2 4
+          ,"TitaTlrNo"           -- 經辦 VARCHAR2 6 
+          ,"TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+          ,"TitaTxCd"            -- 交易代號 VARCHAR2 5 
+          ,"TitaCrDb"            -- 借貸別 VARCHAR2 1 
+          ,"TitaHCode"           -- 訂正別 VARCHAR2 1 
+          ,"TitaCurCd"           -- 幣別 VARCHAR2 3 
+          ,"TitaEmpNoS"          -- 主管編號 VARCHAR2 6 
+          ,"RepayCode"           -- 還款來源 DECIMAL 2
+          ,"Desc"                -- 摘要 NVARCHAR2 10 
+          ,"AcDate"              -- 會計日期 DECIMALD 8 
+          ,"CorrectSeq"          -- 更正序號, 原交易序號 VARCHAR2 26 
+          ,"Displayflag"         -- 查詢時顯示否 VARCHAR2 1 
+          ,"EntryDate"           -- 入帳日期 DECIMALD 8 
+          ,"DueDate"             -- 應繳日期 DECIMALD 8 
+          ,"TxAmt"               -- 交易金額 DECIMAL 16 2
+          ,"LoanBal"             -- 放款餘額 DECIMAL 16 2
+          ,"IntStartDate"        -- 計息起日 DECIMALD 8 
+          ,"IntEndDate"          -- 計息迄日 DECIMALD 8 
+          ,"RepaidPeriod"        -- 回收期數 DECIMAL 3
+          ,"Rate"                -- 利率 DECIMAL 6 4
+          ,"Principal"           -- 本金 DECIMAL 16 2
+          ,"Interest"            -- 利息 DECIMAL 16 2
+          ,"DelayInt"            -- 延滯息 NUMBER(16,2)
+          ,"BreachAmt"           -- 違約金 DECIMAL 16 2
+          ,"CloseBreachAmt"      -- 清償違約金 DECIMAL 16 2
+          ,"TempAmt"             -- 暫收款 DECIMAL 16 2
+          ,"ExtraRepay"          -- 部分償還本金 DECIMAL 16 2
+          ,"UnpaidInterest"      -- 欠繳利息 DECIMAL 16 2
+          ,"UnpaidPrincipal"     -- 欠繳本金 DECIMAL 16 2
+          ,"UnpaidCloseBreach"   -- 欠繳違約金 DECIMAL 16 2
+          ,"Shortfall"           -- 短收 DECIMAL 16 2
+          ,"Overflow"            -- 溢收 DECIMAL 16 2
+          ,"OtherFields"         -- 其他欄位 VARCHAR2 1000 
+          ,"CreateDate"          -- 建檔日期時間 DATE  
+          ,"CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,"LastUpdate"          -- 最後更新日期時間 DATE  
+          ,"LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,"FeeAmt"
+          ,"AcSeq"
+          ,"SlipSumNo"
+    )
     WITH "TmpLMSP" AS (
       SELECT "LMSACN"
            , "LMSAPN"
@@ -214,7 +261,13 @@ BEGIN
           ,TR1."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMALD 8 
           ,TR1."TRXEDT" || '0000' || '      ' || LPAD(TR1."TRXENM",8,'0')
                                           AS "CorrectSeq"          -- 更正序號, 原交易序號 VARCHAR2 26 
-          ,'Y'                            AS "Displayflag"         -- 查詢時顯示否 VARCHAR2 1 
+          -- 2022-09-22 賴桑增加邏輯
+          -- A:帳務 = 除了L3701之外都是帳務
+          -- Y:是 = L3701
+          ,CASE
+             WHEN TR1."TRXTRN" = '3021' -- AS400交易代碼3021 = 新系統交易代號L3701
+             THEN 'Y'
+           ELSE 'A' END                   AS "Displayflag"         -- 查詢時顯示否 VARCHAR2 1 
           ,CASE
              WHEN TR1."TRXIDT" > 20400101
              THEN TR1."TRXDAT"
@@ -382,6 +435,8 @@ BEGIN
              THEN 0 - NVL(JL."JLNAMT",0)
            ELSE NVL(JL."JLNAMT",0)
            END                            AS "FeeAmt"
+          ,TR1."TRXNM2" AS "AcSeq"
+          ,TR1."BSTBTN" AS "SlipSumNo"
     FROM TR
     LEFT JOIN "LA$TRXP" TR1 ON TR1."CUSBRH" = TR."CUSBRH"
                            AND TR1."TRXDAT" = TR."TRXDAT"

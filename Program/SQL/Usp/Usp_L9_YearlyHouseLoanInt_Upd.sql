@@ -1,7 +1,7 @@
 -- 程式功能：維護 YearlyHouseLoanInt 每年房屋擔保借款繳息工作檔 
 -- 執行時機：每年年底日終批次(換日前)
 -- 執行方式：EXEC "Usp_L9_YearlyHouseLoanInt_Upd"(20201231,'999999',0,0,0,'');
-create or replace PROCEDURE "Usp_L9_YearlyHouseLoanInt_Upd"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L9_YearlyHouseLoanInt_Upd"
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -118,6 +118,7 @@ BEGIN
                    AND A."AcctCode" IN ('IC1','IC2','IC3','IC4')
               THEN 1
             ELSE 0 END = 1 -- 若有輸入科目時，篩選科目
+        AND A."EntAc" > 0
       GROUP BY A."CustNo"
              , A."FacmNo"
     )

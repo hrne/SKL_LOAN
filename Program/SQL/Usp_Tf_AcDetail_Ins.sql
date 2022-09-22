@@ -375,6 +375,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,JORP."BSTBTN"                  AS "SlipSumNo"
     FROM S
     LEFT JOIN ACT ON ACT."LMSACN" = NVL(S."LMSACN",0)
                  AND NVL(S."LMSACN",0) > 0
@@ -499,6 +500,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,JORP."NEWVBN"                  AS "SlipSumNo"
     FROM JORP
     LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = JORP."CORACC"
                            AND S5."AcSubCode" = NVL(JORP."CORACS",'     ')
