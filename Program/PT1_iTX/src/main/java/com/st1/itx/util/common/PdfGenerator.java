@@ -338,7 +338,11 @@ public class PdfGenerator extends CommBuffer {
 		fields = stamper.getAcroFields();
 		content = stamper.getOverContent(1);
 
-		paperorientaton = map.get("paper.orientation").toString();
+		if (map.containsKey("paper.orientation") && map.get("paper.orientation") != null) {
+			paperorientaton = map.get("paper.orientation").toString();
+		} else {
+			paperorientaton = "P";
+		}
 
 		if ("P".equals(paperorientaton)) {
 			this.yPoints = stamper.getWriter().getPageSize().getHeight();

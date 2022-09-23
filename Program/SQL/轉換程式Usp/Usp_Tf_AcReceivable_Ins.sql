@@ -452,14 +452,14 @@ BEGIN
     )
     , ACT AS (
       -- 篩選出基本資料
-      -- 條件1:排除戶號為601776
+      -- 條件1:排除戶號為601776,610940
       -- 條件2:BKPDAT = 有資料的最後一天的值
       SELECT ACTP.BKPDAT
            , ACTP.LMSACN
            , ACTP.LMSTOA
       FROM LADACTP ACTP
       LEFT JOIN lastDateData ON lastDateData.MAX_BKPDAT = ACTP.BKPDAT
-      WHERE ACTP.LMSACN != 601776
+      WHERE ACTP.LMSACN NOT IN (601776,610940)
         -- AND ACTP.BKPDAT = "TbsDyF"
         AND NVL(lastDateData.MAX_BKPDAT,0) != 0
     )

@@ -18,6 +18,7 @@ import com.st1.itx.db.service.springjpa.cm.L9703ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -119,7 +120,13 @@ public class L9703Report1 extends MakeReport {
 
 		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tran, "滯繳客戶明細表", "密", "A4", "");
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(tran).setRptItem("滯繳客戶明細表").setSecurity("密").setRptSize("A4").setPageOrientation("")
+				.build();
+
+		this.open(titaVo, reportVo);
 
 		bcAcDate = String.valueOf(Integer.parseInt(titaVo.getParam("AcDate")) + 19110000);
 		bcEntryDate = String.valueOf(Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000);
@@ -276,7 +283,9 @@ public class L9703Report1 extends MakeReport {
 				this.print(0, 75, this.showRocDate(lastRepaidDate, 1));
 			}
 
-			int days = getCashDay(parse.stringToInteger(lastRepaidDate), parse.stringToInteger(tL9703.get("F9")));
+//			int days = getCashDay(parse.stringToInteger(lastRepaidDate), parse.stringToInteger(tL9703.get("F9")));
+
+			int days = parse.stringToInteger(tL9703.get("OvduDays"));
 
 			// 日數
 			this.print(0, 89, "" + days, "R");
@@ -352,27 +361,27 @@ public class L9703Report1 extends MakeReport {
 		return sno;
 	}
 
-	private int getCashDay(int date, int days) throws LogicException {
-		int bussCnt = 0;
-		int tdate = date;
-		int iPayDate = 0;
-		int tdays = days;
-		while (tdays > 0) {
-			dateUtil.init();
-			dateUtil.setDate_1(tdate);
-			dateUtil.setDays(1);
-			iPayDate = dateUtil.getCalenderDay();
-			dateUtil.init();
-			dateUtil.setDate_2(iPayDate);
-			tdate = iPayDate;
-			if (dateUtil.isHoliDay()) {
-				bussCnt++;
-			}
-			tdays--;
-		}
-
-		return days - bussCnt + 1;
-
-	}
+//	private int getCashDay(int date, int days) throws LogicException {
+//		int bussCnt = 0;
+//		int tdate = date;
+//		int iPayDate = 0;
+//		int tdays = days;
+//		while (tdays > 0) {
+//			dateUtil.init();
+//			dateUtil.setDate_1(tdate);
+//			dateUtil.setDays(1);
+//			iPayDate = dateUtil.getCalenderDay();
+//			dateUtil.init();
+//			dateUtil.setDate_2(iPayDate);
+//			tdate = iPayDate;
+//			if (dateUtil.isHoliDay()) {
+//				bussCnt++;
+//			}
+//			tdays--;
+//		}
+//
+//		return days - bussCnt + 1;
+//
+//	}
 
 }

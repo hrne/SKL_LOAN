@@ -20,6 +20,7 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -90,7 +91,14 @@ public class L9703Report2 extends MakeReport {
 		String tran = titaVo.getTxCode().isEmpty() ? "L9703" : titaVo.getTxCode();
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9703A", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
-		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
+//		openForm(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
+//				titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B", rptitem, "inch,8.5,12", "P");
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(titaVo.getTxCode().isEmpty() ? tran + "B" : titaVo.getTxCode() + "B").setRptItem(rptitem)
+				.setRptSize("inch,8.5,12").setSecurity("").setPageOrientation("P").build();
+
+		this.openForm(titaVo, reportVo);
 
 		List<Map<String, String>> L9703List = null;
 		try {
@@ -146,7 +154,8 @@ public class L9703Report2 extends MakeReport {
 		this.info("entdy = " + entdy);
 
 		try {
-			lBaTxVo = dBaTxCom.termsPay(entryDate, parse.stringToInteger(tL9703Vo.get("CustNo")), parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, 0, titaVo);
+			lBaTxVo = dBaTxCom.termsPay(entryDate, parse.stringToInteger(tL9703Vo.get("CustNo")),
+					parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, 0, titaVo);
 			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
@@ -232,8 +241,10 @@ public class L9703Report2 extends MakeReport {
 		printCm(16, y, tmp);
 
 		y = top + yy + (++l) * h;
-		printCm(1.5, y, "戶    號：" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo"))) + "-" + String.format("%03d", Integer.valueOf(tL9703Vo.get("FacmNo"))) + "  目前利率："
-				+ padStart(6, "" + intRate) + "%");
+		printCm(1.5, y,
+				"戶    號：" + String.format("%07d", Integer.valueOf(tL9703Vo.get("CustNo"))) + "-"
+						+ String.format("%03d", Integer.valueOf(tL9703Vo.get("FacmNo"))) + "  目前利率："
+						+ padStart(6, "" + intRate) + "%");
 
 		y = top + yy + (++l) * h;
 		printCm(1.5, y, "客戶名稱：" + tL9703Vo.get("CustName"));
@@ -391,9 +402,11 @@ public class L9703Report2 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
+						+ " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
+						+ " 日";
 			}
 		} else {
 			return rocdatex;

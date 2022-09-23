@@ -54,6 +54,9 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
 		int prinBalance = titaVo.containsKey("PrinBalance") ? parse.stringToInteger(titaVo.getParam("PrinBalance")) : 0;
+
+		int entryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
+
 		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int payIntDateSt = parse.stringToInteger(titaVo.getParam("PayIntDateSt"));
 		if (payIntDateSt > 0) {
@@ -73,9 +76,11 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 repay      = " + repay);
 		this.info("L9703 custType   = " + custType);
 		this.info("L9703 prinBalance   = " + prinBalance);
-		this.info("L9703 acdate     = " + acdate);
 		this.info("L9703 payIntDateSt  = " + payIntDateSt);
 		this.info("L9703 payIntDateEd  = " + payIntDateEd);
+		this.info("L9703 acdate     = " + acdate);
+		this.info("L9703 entryDate = " + entryDate);
+
 
 		String sql = "";
 		sql += "SELECT CC.\"CityItem\" AS \"CityItem\"";
@@ -87,7 +92,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,D.\"PrinBalance\" AS \"PrinBalance\"";
 		sql += "            ,D.\"PrevIntDate\" AS \"PrevIntDate\"";
 		sql += "            ,D.\"NextIntDate\" AS \"NextIntDate\"";
-		sql += "            ,TO_DATE(:acdate,'YYYYMMDD')  - TO_DATE(D.\"NextIntDate\",'YYYYMMDD')  AS \"OvduDays\"";
+//		sql += "            ,TO_DATE(:acdate,'YYYYMMDD')  - TO_DATE(D.\"NextIntDate\",'YYYYMMDD')  AS \"OvduDays\"";
+		sql += "            ,TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(D.\"NextIntDate\",'YYYYMMDD')  AS \"OvduDays\"";
 		sql += "            ,NVL(T1.\"LiaisonName\",' ') AS \"LiaisonName\"";
 		sql += "            ,\"Fn_GetTelNo\"(D.\"CustUKey\",'02',1)  AS F11";
 		sql += "            ,\"Fn_GetTelNo\"(D.\"CustUKey\",'03',1)  AS F12";
@@ -107,7 +113,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "            WHERE L.\"Status\" = 0";
 		sql += "             AND  L.\"SpecificDd\" > 0";
-		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd, acdate);
+		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd,
+				entryDate);
 		sql += "            GROUP BY L.\"CustNo\", L.\"FacmNo\", ";
 		sql += "                     F.\"FirstDrawdownDate\", F.\"UtilAmt\", F.\"RepayCode\", C.\"CustName\", C.\"CustUKey\" ";
 		sql += "           ) D";
@@ -133,11 +140,10 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND T1.SEQ = 1                    ";
 
 		this.info("sql=" + sql);
+		
 		Query query;
-
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
 		if (icustno > 0) {
 			query.setParameter("icustno", icustno);
 			if (ifacmno > 0) {
@@ -150,13 +156,15 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("repay", repay);
 		}
 		query.setParameter("prinBalance", prinBalance);
-		query.setParameter("acdate", acdate);
+//		query.setParameter("acdate", acdate);
+		query.setParameter("entryDate", entryDate);
 		query.setParameter("iSpecificDays", getSpecificDays(payIntDateSt, payIntDateEd));
 
 		return this.convertToMap(query);
 	}
 
-	private String queryCondition(int icustno, int ifacmno, String unpay, String repay, String custType, int prinBalance, int payIntDateSt, int payIntDateEd, int acdate) throws LogicException {
+	private String queryCondition(int icustno, int ifacmno, String unpay, String repay, String custType,
+			int prinBalance, int payIntDateSt, int payIntDateEd, int acdate) throws LogicException {
 
 		String condition = " ";
 
@@ -171,13 +179,13 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if ("1".equals(unpay)) {
 			condition += " AND CASE L.\"SpecificDd\" ";
 			condition += "     WHEN  0 ";
-			condition += "      THEN TRUNC(MONTHS_BETWEEN(TO_DATE(:acdate,'YYYYMMDD'), TO_DATE(L.\"NextPayIntDate\", 'YYYYMMDD'))) ";
+			condition += "      THEN TRUNC(MONTHS_BETWEEN(TO_DATE(:entryDate,'YYYYMMDD'), TO_DATE(L.\"NextPayIntDate\", 'YYYYMMDD'))) ";
 			condition += "     ELSE    ";
-			condition += "           TRUNC(MONTHS_BETWEEN(TO_DATE(:acdate,'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
+			condition += "           TRUNC(MONTHS_BETWEEN(TO_DATE(:entryDate,'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "         - TRUNC(MONTHS_BETWEEN(TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "     END BETWEEN :st AND :ed ";
 		} else {
-			condition += "  AND (TO_DATE(:acdate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
+			condition += "  AND (TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
 		}
 		// repay == 0 時不篩選,
 		// repay == 9 時 篩選 RepayCode = 5,6,7,8
@@ -289,6 +297,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
 		int prinBalance = titaVo.containsKey("PrinBalance") ? parse.stringToInteger(titaVo.getParam("PrinBalance")) : 0;
+		int entryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		int acdate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int payIntDateSt = parse.stringToInteger(titaVo.getParam("PayIntDateSt"));
 		if (payIntDateSt > 0) {
@@ -308,9 +317,11 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 repay      = " + repay);
 		this.info("L9703 custType   = " + custType);
 		this.info("L9703 prinBalance   = " + prinBalance);
-		this.info("L9703 acdate     = " + acdate);
 		this.info("L9703 payIntDateSt  = " + payIntDateSt);
 		this.info("L9703 payIntDateEd  = " + payIntDateEd);
+		this.info("L9703 acdate     = " + acdate);
+		this.info("L9703 entryDate     = " + entryDate);
+
 
 		String tlrno = titaVo.getParam("TLRNO");
 
@@ -364,7 +375,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                          AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "                   WHERE L.\"Status\" = 0";
 		sql += "                    AND  L.\"SpecificDd\" > 0";
-		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd, acdate);
+		sql += queryCondition(icustno, ifacmno, unpay, repay, custType, prinBalance, payIntDateSt, payIntDateEd,
+				entryDate);
 		sql += "                   GROUP BY L.\"CustNo\", L.\"FacmNo\" ";
 		sql += "                  ) M";
 		sql += "             LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
@@ -415,7 +427,9 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("repay", repay);
 		}
 		query.setParameter("prinBalance", prinBalance);
-		query.setParameter("acdate", acdate);
+		
+//		query.setParameter("acdate", acdate);
+		query.setParameter("entryDate", entryDate);
 		query.setParameter("iSpecificDays", getSpecificDays(payIntDateSt, payIntDateEd));
 		query.setParameter("tlrno", tlrno);
 		return this.convertToMap(query);

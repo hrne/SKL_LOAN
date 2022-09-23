@@ -258,13 +258,13 @@ BEGIN
                   AND S4."TRXNMT"  = S1."TRXNMT"
                   AND S4."TRXTRN"  = CASE
                                        WHEN S1."TRXTRN" IS NOT NULL THEN S1."TRXTRN"
-                                     ELSE ATF."TRXTRN" END
+                                     ELSE ATF."TRXTRN" ENDq
                   AND S4."ACTACT"  = ATF."ACTACT"
                   AND S4."DbCr"    = S1."TRXATP"
                   AND S4."OriDbCr" = ATF."DbCr"
-                  AND S4."ACNACC"  = ATF."ACNACC"
-                  AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNACS",' ')
-                  AND NVL(S4."ACNASS",' ') = NVL(ATF."ACNASS",' ')
+                  AND S4."ACNACC"  = ATF."ACNACC"CS",' ')
+                  AND NVL(S4."ACNASS",' ') = NVL(ATF."ACN
+                  AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNAASS",' ')
       LEFT JOIN FF ON FF."OverdueDate" = S1."TRXDAT"
                   AND FF."DailyFeeTotal" = S1."JLNAMT"
                   AND NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990')
@@ -334,7 +334,8 @@ BEGIN
           ,NVL(S."AcBookFlag",0)          AS "AcBookFlag"          -- 帳冊別記號 DECIMAL 1 0
           ,'000'                          AS "AcBookCode"          -- 帳冊別 VARCHAR2 3  -- 2021-07-15 舊資料固定為000:全公司
           ,CASE
-             WHEN NVL(ACT."ACTFSC",' ') = 'A' -- 資金來源若有串到,且資料為A 則為利變帳冊
+             WHEN NVL(S."AcBookFlag",0) = 1 -- 2022-09-23 Wei BugFix From 綺萍賴桑提供
+                  AND NVL(ACT."ACTFSC",' ') = 'A' -- 資金來源若有串到,且資料為A 則為利變帳冊
              THEN '201'
            ELSE '00A' END                 AS "AcSubBookCode"       -- 區隔帳冊 VARCHAR2 3 0 -- 2021-07-15 新增欄位,00A傳統帳冊、201利變帳冊
           ,''                             AS "SumNo"               -- 彙總別 VARCHAR2 3 0
