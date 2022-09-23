@@ -163,7 +163,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     LEFT JOIN \"CollList\" CO ON CO.\"CustNo\" = AC.\"CustNo\" ";
 		sql += "                              AND CO.\"FacmNo\" = AC.\"FacmNo\" ";
 		sql += "     WHERE AC.\"AcctCode\" = 'TAV' ";
-//		sql += "       AND AC.\"RvBal\" > 0 ";
+		sql += "       AND AC.\"RvBal\" > 0 ";
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
 		sql += "            , AC.\"AcSubCode\" ASC ";
 		sql += "            , AC.\"AcDtlCode\" ASC ";

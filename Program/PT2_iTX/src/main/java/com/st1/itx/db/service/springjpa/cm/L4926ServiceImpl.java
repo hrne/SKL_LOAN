@@ -42,7 +42,7 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// *** 折返控制相關 ***
 	private int size;
 
-	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+//	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 
 	public List<Map<String, String>> queryresult(int index, int limit, TitaVo titaVo) throws Exception {
@@ -100,7 +100,7 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " AND  NVL(\"AmlRsp\",'9') IN ('0','1','2')     \n";//排除已刪除資料
 		sql += "ORDER BY \"EntryDate\" DESC , \"CustNo\" , \"ReconCode\" ";
 
-		sql += sqlRow;
+//		sql += sqlRow;
 
 		this.info("sql=" + sql);
 		Query query;
@@ -108,8 +108,8 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("ThisIndex", index);
-		query.setParameter("ThisLimit", limit);
+//		query.setParameter("ThisIndex", index);
+//		query.setParameter("ThisLimit", limit);
 
 		if (!iReconCode.isEmpty()) {
 			query.setParameter("reconCode", iReconCode);
@@ -124,13 +124,22 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("traderInfo", "%" + iTraderInfo + "%");
 		}
 
+		cnt = query.getResultList().size();
+		this.info("Total cnt ..." + cnt);
+		
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(0);
+//		query.setFirstResult(0);
+		query.setFirstResult(this.index * this.limit);
 
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
+
+		List<Object> result = query.getResultList();
+
+		size = result.size();
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(query);
 

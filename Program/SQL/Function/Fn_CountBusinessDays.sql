@@ -46,7 +46,7 @@ BEGIN
             RETURN 0;
         END IF;
 
-        loopCounts := 0;
+        loopCounts := 1;
 
         IF "InputDateA" < "InputDateB" THEN
             dateCursor := "InputDateA";
@@ -55,6 +55,15 @@ BEGIN
              dateFinalTarget := "InputDateA";
         END IF;
         
+        -- Wei: 計頭不計尾
+        -- 1/1 ~ 1/2 只算1天
+        -- 所以這裡先+1
+        dateCursor := TO_NUMBER(TO_CHAR(TO_DATE(dateCursor,'yyyymmdd') + 1,'yyyymmdd'));
+
+        IF dateCursor = dateFinalTarget THEN
+            RETURN 1;
+        END IF;
+
         WHILE dateCursor != dateFinalTarget
         LOOP
             IF "Fn_IsHoliday"(dateCursor) = 0 THEN

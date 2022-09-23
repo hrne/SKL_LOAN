@@ -68,6 +68,7 @@ BEGIN
           ,S1."ProcessTime"               AS "ProcessTime"
           ,S1."LimitAmt"                  AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
     FROM "AchAuthLog" S1
+    WHERE S1."RetrDate" > 0 -- 2022-09-22 Wei From 家興
     ;
 
     -- 記錄寫入筆數

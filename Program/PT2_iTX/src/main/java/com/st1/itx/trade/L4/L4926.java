@@ -6,19 +6,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.BankRmtf;
-import com.st1.itx.db.domain.TxDataLog;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.BankRmtfService;
-import com.st1.itx.db.service.TxDataLogService;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.service.springjpa.cm.L4926ServiceImpl;
 import com.st1.itx.util.parse.Parse;
@@ -41,13 +34,7 @@ public class L4926 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public BankRmtfService sBankRmtfService;
-	@Autowired
-	public CustMainService sCustMainService;
-	@Autowired
 	Parse parse;
-	@Autowired
-	public TxDataLogService txDataLogService;
 	
 	@Autowired 
 	L4926ServiceImpl l4926Servicelmpl;
@@ -72,6 +59,10 @@ public class L4926 extends TradeBuffer {
 			throw new LogicException("E0013", e.getMessage());
 		}
 				
+		if (this.index == 0 && (resultList == null || resultList.size() == 0)) {
+			throw new LogicException(titaVo, "E0001", "匯款轉帳檔"); // 查無資料
+		}
+
 		// 如有找到資料
 		if (resultList != null && resultList.size() > 0) {
 			for (Map<String, String> result : resultList) {
@@ -99,17 +90,36 @@ public class L4926 extends TradeBuffer {
 
 		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-		 if (resultList != null &&  resultList.size() > this.limit) {
+		 if (resultList.size() == this.limit && hasNext()) {
 	 		 titaVo.setReturnIndex(this.setIndexNext());
 		 	 /* 手動折返 */
 		 	 this.totaVo.setMsgEndToEnter();
 		 }
-		} else {
-			throw new LogicException(titaVo, "E0001", "");
-		}
+		} 
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
+	private Boolean hasNext() {
+		Boolean result = true;
+
+		int times = this.index + 1;
+		int cnt = l4926Servicelmpl.getSize();
+		int size = times * this.limit;
+
+		this.info("index ..." + this.index);
+		this.info("times ..." + times);
+		this.info("cnt ..." + cnt);
+		this.info("size ..." + size);
+
+		if (size == cnt) {
+			result = false;
+		}
+		this.info("result ..." + result);
+
+		return result;
+	}
+
 	
 }
