@@ -60,9 +60,11 @@ public class L9136Report extends MakeReport {
 		this.print(-3, rNum, "　報　表：" + this.getRptCode());
 		String tim = String.format("%02d", Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
 
-		this.print(-2, lNum, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + dateUtil.getNowStringBc().substring(2, 4));
+		this.print(-2, lNum, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/"
+				+ dateUtil.getNowStringBc().substring(2, 4));
 		this.print(-3, cNum, tradeName, "C");
-		this.print(-3, lNum, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, lNum, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, lNum, "頁　  數：   " + Integer.toString(this.getNowPage()));
 
 		this.print(-5, cNum, showRocDate(this.isAcDate, 0) + " 至 " + showRocDate(this.ieAcDate, 0), "C");
@@ -98,7 +100,8 @@ public class L9136Report extends MakeReport {
 	 * @return
 	 * @throws LogicException
 	 */
-	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9136Result, List<Map<String, String>> l9136Result2, int isAcDate, int ieAcDate) throws LogicException {
+	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9136Result,
+			List<Map<String, String>> l9136Result2, int isAcDate, int ieAcDate) throws LogicException {
 
 		this.info("L9136Report exec");
 
@@ -109,8 +112,9 @@ public class L9136Report extends MakeReport {
 		this.ieAcDate = String.valueOf(ieAcDate);
 
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode(tradeNo).setRptItem(tradeName).setSecurity("").setRptSize("A4")
-				.setPageOrientation("L").build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.build();
 
 		this.open(titaVo, reportVo);
 
@@ -125,11 +129,14 @@ public class L9136Report extends MakeReport {
 
 //				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[", "").replaceAll("\\]", "")
 //						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
-				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[\"", "").replaceAll("\"\\]", "").replaceAll("\"\\,\"", "#").split("#");
+				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
+						.replaceAll("\"\\,\"", "@").split("@");
 
-				String[] tmpOldContent = r.get("Old").replaceAll("\\[\"", "").replaceAll("\"\\]", "").replaceAll("\"\\,\"", "#").split("#");
+				String[] tmpOldContent = r.get("Old").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
+						.replaceAll("\"\\,\"", "@").split("@");
 
-				String[] tmpNewContent = r.get("New").replaceAll("\\[\"", "").replaceAll("\"\\]", "").replaceAll("\"\\,\"", "#").split("#");
+				String[] tmpNewContent = r.get("New").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
+						.replaceAll("\"\\,\"", "@").split("@");
 
 				// 要排除的字段
 				String[] word = { "最後更新日期時間", "最後更新人員", "建檔日期時間" };
@@ -139,9 +146,16 @@ public class L9136Report extends MakeReport {
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
 
+				this.info("tmp1.size()=" + tmp1.size());
+				this.info("tmp1 = " + tmp1.toString());
+				this.info("tmp2.size()=" + tmp2.size());
+				this.info("tmp2 = " + tmp2.toString());
+				this.info("tmp3.size()=" + tmp3.size());
+				this.info("tmp3 = " + tmp3.toString());
+
 				// 避免有空白
 				if (tmp1.size() == 0 || tmp2.size() == 0 || tmp3.size() == 0) {
-					break;
+					continue;
 				}
 
 				for (int i = 0; i < tmp1.size(); i++) {
@@ -155,6 +169,11 @@ public class L9136Report extends MakeReport {
 							break;
 						}
 					}
+				}
+
+				if (tmp1.size() == tmp2.size() && tmp1.size() == tmp3.size() && tmp2.size() == tmp3.size()) {
+				} else {
+					continue;
 				}
 
 				for (int i = 0; i < tmp1.size(); i++) {
@@ -219,7 +238,8 @@ public class L9136Report extends MakeReport {
 	 * @param tmpNewContent 更改後內容
 	 * @param dataSource    資料來源
 	 */
-	private void report(Map<String, String> r, String tmpUpdateItem, String tmpOldContent, String tmpNewContent, int dataSource) throws LogicException {
+	private void report(Map<String, String> r, String tmpUpdateItem, String tmpOldContent, String tmpNewContent,
+			int dataSource) throws LogicException {
 
 		// 授權主管
 		String supNoName = "";
@@ -278,7 +298,8 @@ public class L9136Report extends MakeReport {
 
 		// 更改前內容
 		String bfContent = tmpNewContent.trim().length() == 0 ? " "
-				: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-" + String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent;
+				: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
+						+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent;
 
 		this.print(0, 120, bfContent.length() == 0 ? " " : fillUpWord(bfContent, 24, " ", "R"));
 

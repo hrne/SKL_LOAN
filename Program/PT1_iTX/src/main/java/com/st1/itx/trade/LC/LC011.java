@@ -1,8 +1,5 @@
 package com.st1.itx.trade.LC;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,10 +8,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
@@ -23,17 +18,12 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.domain.TxTeller;
-import com.st1.itx.db.service.TxTellerService;
-import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
-import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.LC011ServiceImpl;
 
 @Service("LC011")

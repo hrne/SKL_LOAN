@@ -85,32 +85,61 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = "";
+		sql += "   WITH LASTTX AS ( 														";
+		sql += "   SELECT																	";
+		sql += "      \"CustNo\"				AS	\"CustNo\"								";
+		sql += "     ,\"AcDate\"	            AS	\"AcDate\"								";
+		sql += "     ,\"TitaKinBr\"	        AS	\"TitaKinBr\"								";
+		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
+		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
+		sql += "  FROM																		";
+		sql += "   (SELECT																	";
+		sql += "      \"CustNo\"				AS	\"CustNo\"								";
+		sql += "     ,\"AcDate\"	            AS	\"AcDate\"								";
+		sql += "     ,\"TitaKinBr\"	        AS	\"TitaKinBr\"								";
+		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
+		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
+		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"  ORDER BY  				";
+		sql += " 	 \"AcDate\" Desc 														";
+		sql += "     ,\"TitaCalDy\" Desc	                    							";
+		sql += "     ,\"TitaCalTm\"	Desc                    								";
+		sql += "     ,\"TitaTxtNo\" Desc             	    								";
+		sql += "     ,\"AcSeq\"     Desc )  AS \"RowNumber\"  								";
+		sql += "    FROM																	";
+		sql += "      \"LoanBorTx\"															";
+		sql += "    WHERE \"CustNo\" = :CustNo                               				";
+		sql += "      AND \"TitaTxCd\" IN ('L3240','L3230','L3220','L3210','L3200','L3420','L3410','L3440','L3711','L3712')							";
+		sql += "      AND \"TitaHCode\" = '0'											 	";
+		sql += "  ) 																		";
+		sql += "  	WHERE \"RowNumber\"	= 1													";
+		sql += "  	)																	 	";
 		sql += "  SELECT																	";
-		sql += "   ln3.*          ";
+		sql += "   ln3.*          															";
 		sql += "  ,cd.\"Item\"																";
-		sql += "  ,ln2.\"TotTxAmt\"												  ";
+		sql += "  ,ln2.\"TotTxAmt\"												  			";
 		sql += "  ,NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), rm.\"ReconCode\")  AS  \"ReconCode\" ";
-		sql += "  FROM													";
+		sql += "  ,CASE WHEN NVL(la.\"AcDate\", 0) > 0 THEN 'Y' ELSE ' ' END	    AS  \"HCodeFlag\" ";
+		sql += "  FROM																		";
 		sql += "  ( SELECT																	";
-		sql += "      ln.\"CustNo\"				AS	\"CustNo\"										      ";
-		sql += "     ,ln.\"AcDate\"	            AS	\"AcDate\"																 	    ";
-		sql += "     ,ln.\"TitaKinBr\"	        AS	\"TitaKinBr\"																";
-		sql += "     ,ln.\"TitaTlrNo\"	        AS	\"TitaTlrNo\"															  ";
-		sql += "     ,ln.\"TitaTxtNo\"		    AS	\"TitaTxtNo\"														";
-		sql += "     ,MIN(ln.\"TitaCalDy\")     AS 	\"TitaCalDy\"						";
-		sql += "     ,MIN(ln.\"TitaCalTm\")	  	AS	\"TitaCalTm\"               	";
-		sql += "     ,SUM(ln.\"TxAmt\")         AS  \"TotTxAmt\"			     	";
-		sql += "    FROM																			";
-		sql += "      \"LoanBorTx\"	ln															";
-		sql += "    WHERE ln.\"CustNo\" = :CustNo                               				";
+		sql += "      ln.\"CustNo\"				AS	\"CustNo\"								";
+		sql += "     ,ln.\"AcDate\"	            AS	\"AcDate\"								";
+		sql += "     ,ln.\"TitaKinBr\"	        AS	\"TitaKinBr\"							";
+		sql += "     ,ln.\"TitaTlrNo\"	        AS	\"TitaTlrNo\"							";
+		sql += "     ,ln.\"TitaTxtNo\"		    AS	\"TitaTxtNo\"							";
+		sql += "     ,MIN(ln.\"TitaCalDy\")     AS 	\"TitaCalDy\"							";
+		sql += "     ,MIN(ln.\"TitaCalTm\")	  	AS	\"TitaCalTm\"               			";
+		sql += "     ,SUM(ln.\"TxAmt\")         AS  \"TotTxAmt\"			     			";
+		sql += "    FROM																	";
+		sql += "      \"LoanBorTx\"	ln														";
+		sql += "    WHERE ln.\"CustNo\" = :CustNo                               			";
 		if (iAcDate == 0) {
-			sql += "      AND ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 				";
+			sql += "      AND ln.\"EntryDate\" BETWEEN :EntryDateS AND :DateEnd 			";
 		} else {
 			sql += "      AND ln.\"AcDate\" BETWEEN :AcDateS AND :DateEnd 					";
 		}
-		sql += "      AND ln.\"Displayflag\" IN ('Y','I','A','F')								";
+		sql += "      AND ln.\"Displayflag\" IN ('Y','I','A','F')							";
 		if (iTitaHCode == 0) {
-			sql += "      AND ln.\"TitaHCode\" = '0'											";
+			sql += "      AND ln.\"TitaHCode\" = '0'										";
 		}
 		sql += "      GROUP BY	 ln.\"CustNo\" , ln.\"AcDate\" , ln.\"TitaKinBr\" ,ln.\"TitaTlrNo\" ,ln.\"TitaTxtNo\" 	";
 		sql += "  ) ln2										";
@@ -126,32 +155,39 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND  rm.\"TitaTlrNo\" = ln3.\"TitaTlrNo\"   								 ";
 		sql += "  AND  rm.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
 		sql += "  AND  rm.\"TitaTxtNo\" = ln3.\"TitaTxtNo\"   								 ";
-		sql += "  AND  ln3.\"RepayCode\" =  1         ";
+		sql += "  AND  ln3.\"RepayCode\" =  1         										 ";
 		sql += "  AND  NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), ' ') = ' '        ";
 		sql += " left  join \"CdCode\" cd  													 ";
 		sql += "   on  ln3.\"RepayCode\" = cd.\"Code\"   									 ";
 		sql += "  AND cd.\"DefCode\" = 'RepayCode'   									     ";
-		sql += " WHERE 											 ";
+		sql += " LEFT JOIN LASTTX la 			 											 ";
+		sql += "   on ln3.\"CustNo\" = la.\"CustNo\"										 ";
+		sql += "  and ln3.\"AcDate\" = la.\"AcDate\"										 ";
+		sql += "  and ln3.\"TitaKinBr\"	 = la.\"TitaKinBr\"									 ";
+		sql += "  and ln3.\"TitaTlrNo\"	 = la.\"TitaTlrNo\"									 ";
+		sql += "  and ln3.\"TitaTxtNo\"	 = la.\"TitaTxtNo\"									 ";
+
+		sql += " WHERE 											 							 ";
 		if (iTitaTxtNo.isEmpty()) {
-			sql += " ln3.\"FacmNo\" >= :FacmNoS											 ";
-			sql += "  AND  ln3.\"FacmNo\" <= :FacmNoE											 ";
-			sql += "  AND  ln3.\"BormNo\" >= :BormNoS											 ";
-			sql += "  AND  ln3.\"BormNo\" <= :BormNoE											 ";
+			sql += " ln3.\"FacmNo\" >= :FacmNoS											 	 ";
+			sql += "  AND  ln3.\"FacmNo\" <= :FacmNoE										 ";
+			sql += "  AND  ln3.\"BormNo\" >= :BormNoS										 ";
+			sql += "  AND  ln3.\"BormNo\" <= :BormNoE										 ";
 		} else {
 			sql += " ln3.\"TitaKinBr\" = :titaKinBr											 ";
-			sql += "  AND  ln3.\"TitaTlrNo\" = :titaTlrNo											 ";
-			sql += "  AND  ln3.\"TitaTxtNo\" = :titaTxtNo											 ";
+			sql += "  AND  ln3.\"TitaTlrNo\" = :titaTlrNo									 ";
+			sql += "  AND  ln3.\"TitaTxtNo\" = :titaTxtNo									 ";
 		}
 		if (iTitaHCode == 0) {
-			sql += "      AND ln3.\"TitaHCode\" = '0'											";
+			sql += "      AND ln3.\"TitaHCode\" = '0'										 ";
 		}
 		sql += " ORDER BY ln2.\"AcDate\" ASC ";
-		sql += "         ,ln2.\"TitaCalDy\" ASC	                    ";
-		sql += "         ,ln2.\"TitaCalTm\"	ASC                    	";
-		sql += "         ,ln3.\"TitaTxtNo\" ASC             	    ";
-		sql += "         ,ln3.\"AcSeq\"     ASC                     ";
-		sql += "         ,ln3.\"CreateDate\" ASC                    ";
-		sql += "         ,ln3.\"Displayflag\" ASC                   ";
+		sql += "         ,ln2.\"TitaCalDy\" ASC	                    						 ";
+		sql += "         ,ln2.\"TitaCalTm\"	ASC                    							 ";
+		sql += "         ,ln3.\"TitaTxtNo\" ASC             	    						 ";
+		sql += "         ,ln3.\"AcSeq\"     ASC                     						 ";
+		sql += "         ,ln3.\"CreateDate\" ASC                    						 ";
+		sql += "         ,ln3.\"Displayflag\" ASC                  							 ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);

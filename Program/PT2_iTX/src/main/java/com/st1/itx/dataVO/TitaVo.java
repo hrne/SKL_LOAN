@@ -1438,5 +1438,13 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getReason() {
 		return this.get(ContentName.reason) == null ? "" : this.get(ContentName.reason).trim();
 	}
+	
+	public String getSpanDy() {
+		return Objects.isNull(this.get(ContentName.spanDy)) ? "0" : this.get(ContentName.spanDy).trim();
+	}
+
+	public boolean isSpanDy() {
+		return !this.getSpanDy().equals("0");
+	}
 
 }

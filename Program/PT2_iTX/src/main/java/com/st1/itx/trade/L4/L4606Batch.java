@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L4;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,17 +20,12 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuComm;
 import com.st1.itx.db.domain.InsuCommId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
-import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4606ServiceImpl;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;

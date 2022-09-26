@@ -172,6 +172,7 @@ public class L3005 extends TradeBuffer {
 				String titaTxCd = result.get("TitaTxCd");
 				String repayCodeX = result.get("Item");
 				String createEmpNo = result.get("CreateEmpNo");
+				String hCodeFlag = result.get("HCodeFlag");
 				int entryDate = parse.stringToInteger(result.get("EntryDate"));
 				BigDecimal needPaidAmt = BigDecimal.ZERO;
 				if (entryDate > 0) {
@@ -265,7 +266,8 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOTotTxAmt", totTxAmt); // 交易總金額
 				occursList.putParam("OOCreateEmpNo", createEmpNo); // 建檔人員
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號
-
+				occursList.putParam("OOHCodeFlag", hCodeFlag); // 訂正記號
+				
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
 			}

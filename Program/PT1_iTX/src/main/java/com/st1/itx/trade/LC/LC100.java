@@ -3,6 +3,8 @@ package com.st1.itx.trade.LC;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -15,14 +17,15 @@ import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -37,20 +40,22 @@ import com.st1.itx.util.parse.Parse;
 public class LC100 extends TradeBuffer {
 
 	@Autowired
-	public TxTellerService txTellerService;
+	private TxTellerService txTellerService;
 
 	@Autowired
-	public CdEmpService tCdEmpService;
-	@Autowired
-	public CdBranchService sCdBranchService;
-	@Autowired
-	public CdBranchGroupService sCdBranchGroupService;
+	private TxRecordService txRecordService;
 
 	@Autowired
-	DateUtil dDateUtil;
+	private CdEmpService tCdEmpService;
 
 	@Autowired
-	Parse parse;
+	private CdBranchService sCdBranchService;
+
+	@Autowired
+	private CdBranchGroupService sCdBranchGroupService;
+
+	@Autowired
+	private Parse parse;
 
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
@@ -84,6 +89,8 @@ public class LC100 extends TradeBuffer {
 					throw new LogicException("EC001", "營業單位課組別檔:" + tTxTeller.getGroupNo());
 				}
 
+				TxRecord txRecord = txRecordService.findEntdyFirst(titaVo.getEntDyI(), titaVo.getTlrNo());
+
 				String s = "";
 				s = tCdBranchGroup.getGroupItem();
 
@@ -104,6 +111,9 @@ public class LC100 extends TradeBuffer {
 					tTxTeller.setTxtNo(1);
 
 				this.totaVo.putParam("TXTNO", tTxTeller.getTxtNo());
+				if (!Objects.isNull(txRecord))
+					this.totaVo.putParam("TXTNO", (parse.stringToInteger(txRecord.getTxSeq()) + 1));
+
 				// MODE 0.本日 1.次日
 //				if (tTxTeller.getEntdy() == this.txBuffer.getMgBizDate().getNbsDy()) {
 //				this.totaVo.putParam("MODE", "1");

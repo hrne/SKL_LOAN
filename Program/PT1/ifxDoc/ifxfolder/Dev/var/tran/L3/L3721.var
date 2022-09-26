@@ -427,7 +427,8 @@ T(3,)T(H,#RateCode1,#RateCodeHelp)
 
 ! #AmortizedCode1X=X,12,L
 ! C(3,#AmortizedCode1,0,S,$)
-! T(A,#AmortizedCode1,L2DEF,FacmAmortizedCodeDef,FacmAmortizedCode,FacmAmortizedCodeX)            
+! T(A,#AmortizedCode1,L2DEF,FacmAmortizedCodeDef,FacmAmortizedCode,FacmAmortizedCodeX)
+
 #RimChangFg=X,1,S
 !查詢下次利率調整日期的放款利率變動檔
 #SendL3r09=X,1,S
@@ -436,8 +437,7 @@ E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,#BormNo)
 T(2,@RimChangFg,#CheckChangFg)
-C(3,#CHAIN,1,C(3,#EffectDate1,0,C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate)),E(0,@RimEffectDate,#EffectDate1)),C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate)))
-! C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate))
+C(3,#CHAIN,1,C(3,#EffectDate1,0,E(0,@RimEffectDate,#L3r02PrevPayIntDate),E(0,@RimEffectDate,#EffectDate1)),C(3,#L3r02NextRateAdjDate,0,E(0,@RimEffectDate,#L3r02DrawdownDate),E(0,@RimEffectDate,#L3r02NextRateAdjDate)))
 RESET_RIM(#SendL3r09,L3R09)
 S(L3R09,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEffectDate,#RimChangFg)
 R(1,L3R09)

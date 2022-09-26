@@ -84,6 +84,8 @@ public class ContentName {
 	public static final String errorMsgId = "MSGID";
 	public static final String errorMsg = "ERRMSG";
 	public static final String noticeMsg = "noticeMsg";
+	
+	public static final String spanDy = "SPANDY";
 
 	/* DB */
 	public static final String dataBase = "DATABASE";

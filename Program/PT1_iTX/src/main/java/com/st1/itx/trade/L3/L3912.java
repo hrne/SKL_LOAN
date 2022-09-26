@@ -83,19 +83,9 @@ public class L3912 extends TradeBuffer {
 		}
 
 		tTempVo = tTempVo.getVo(tLoanBorTx.getOtherFields());
-//		C(5,#OTxCode,L3100,E(0,@RPTFG,2),$)
-//		C(5,#OTxCode,L3200,E(0,@RPTFG,3),$)
-//		C(5,#OTxCode,L3711,E(0,@RPTFG,4),$)
-//		C(5,#OTxCode,L3712,E(0,@RPTFG,4),$)
-//		C(5,#OTxCode,L3721,E(0,@RPTFG,5),$)
-//		C(5,#OTxCode,L3600,E(0,@RPTFG,6),$)
-//		C(5,#OTxCode,L3610,E(0,@RPTFG,7),$)
-//		C(5,#OTxCode,L3410,E(0,@RPTFG,11),$)
-//		C(5,#OTxCode,L3420,E(0,@RPTFG,11),$)
-//		C(5,#OTxCode,L3440,E(0,@RPTFG,12),$)
 		if (tLoanBorTx.getTitaTxCd().equals("L3100")) {
 			RPTFG = 2;
-		} else if (tLoanBorTx.getTitaTxCd().equals("L3200")) {
+		} else if (tLoanBorTx.getTitaTxCd().equals("L3200") || tLoanBorTx.getTitaTxCd().equals("L3240")) {
 			RPTFG = 3;
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3711")) {
 			RPTFG = 4;
@@ -128,6 +118,21 @@ public class L3912 extends TradeBuffer {
 		} else {
 			RPTFG = 8;
 		}
+//		C(5,#OTxCode,L3100,E(0,@RPTFG,2),$)
+//		C(5,#OTxCode,L3200,E(0,@RPTFG,3),$)
+//		C(5,#OTxCode,L3711,E(0,@RPTFG,4),$)
+//		C(5,#OTxCode,L3712,E(0,@RPTFG,4),$)
+//		C(5,#OTxCode,L3721,E(0,@RPTFG,5),$)
+//		C(5,#OTxCode,L3600,E(0,@RPTFG,6),$)
+//		C(5,#OTxCode,L3610,E(0,@RPTFG,7),$)
+//		C(5,#OTxCode,L3410,E(0,@RPTFG,11),$)
+//		C(5,#OTxCode,L3420,E(0,@RPTFG,11),$)
+//		C(5,#OTxCode,L3440,E(0,@RPTFG,12),$)
+
+//		3240、3200、(同畫面) =3
+//		3420、3410 =11
+//		交易型態TX.SlipSumNo >0(批次({彙總批號})) ==0(人工)
+
 		BigDecimal shortFall = BigDecimal.ZERO;
 		String shortFallX = "";
 		shortFall = tLoanBorTx.getUnpaidInterest().add(tLoanBorTx.getUnpaidPrincipal());
@@ -287,6 +292,13 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OSupervisor", tTempVo.getParam("Supervisor"));
 		this.totaVo.putParam("OSupervisorX", loanCom.getEmpFullnameByEmpNo(tTempVo.getParam("Supervisor")));
 		this.totaVo.putParam("ORate", tLoanBorTx.getRate());
+		String slipSumNoX = "";
+		if (tLoanBorTx.getSlipSumNo() > 0) {
+			slipSumNoX = "批次(" + parse.IntegerToString(tLoanBorTx.getSlipSumNo(), 2) + ")";
+		} else {
+			slipSumNoX = "人工";
+		}
+		this.totaVo.putParam("OSlipSumNoX", slipSumNoX);
 
 		this.addList(this.totaVo);
 		return this.sendList();

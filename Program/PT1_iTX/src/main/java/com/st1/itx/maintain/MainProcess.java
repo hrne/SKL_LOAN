@@ -134,7 +134,8 @@ public class MainProcess extends SysLogger {
 
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
-			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
+			// ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
+			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getTlrNo());
 
 			txBuffer.init(titaVo);
 			txTeller = tTxTeller;
@@ -361,9 +362,16 @@ public class MainProcess extends SysLogger {
 			this.titaVo.putParam("ENTDY", this.txBuffer.getTxCom().getTbsdy());
 		}
 
+		/* Lai 預做交易交易日期取代 */
+		if (this.titaVo.isSpanDy()) {
+			this.titaVo.putParam(ContentName.entdy, this.titaVo.getSpanDy());
+			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy());
+//			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy().substring(this.titaVo.getSpanDy().length() - 2, this.titaVo.getSpanDy().length()));
+		}
+
 		// eric 2020.6.6
 		int entdy = this.txBuffer.getTxBizDate().getTbsDy();
-		if (!this.titaVo.isTxcdSpecial() && Integer.valueOf(this.titaVo.getEntDy()) != entdy) {
+		if (!this.titaVo.isTxcdSpecial() && Integer.valueOf(this.titaVo.getEntDy()) != entdy && !this.titaVo.isSpanDy()) {
 			throw new LogicException("CE004", "會計日期(" + this.titaVo.getEntDy().trim() + ")與系統日期(" + entdy + ")不符，請重新登入系統");
 		}
 
@@ -461,7 +469,7 @@ public class MainProcess extends SysLogger {
 				if (tTxTeller.getEntdy() == 0)
 					tTxTeller.setEntdy(this.txBuffer.getMgBizDate().getTbsDy());
 
-				if (this.titaVo.getEntDyI() != tTxTeller.getEntdy())
+				if (this.titaVo.getEntDyI() != tTxTeller.getEntdy() && !this.titaVo.isSpanDy())
 					throw new LogicException("EC004", "櫃員本、次日作業模式不一致，,請重新登入系統");
 
 				if (tTxTeller.getLogonFg() != 1)

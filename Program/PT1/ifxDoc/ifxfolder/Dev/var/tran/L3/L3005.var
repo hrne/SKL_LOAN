@@ -497,6 +497,7 @@ P(R,#OOTempAmtX)
 CALL2(#ADJUSTDOT,#OOPrecision,#OONeedPaidAmt,#OONeedPaidAmtX)
 P(R,#OONeedPaidAmtX)
 
+#OOHCodeFlag=X,1,S
 
 #OOOverShort=+m,14.2,S
 
@@ -547,9 +548,10 @@ T(2,#OORelNo)
 T(6A,#Entdy+#TxNo)
 !訂正按鈕
 #BTN=X,1,S
-IF(#OOAcFg=="",BIND(grid,cancel),IF(#OOTxCd=="L3100"||#OOTxCd=="L3240"||#OOTxCd=="L3250",BIND(grid,cancel),C(3,#OOTitaHCode,0,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))))
-C(5,#OOCreateEmpNo,999999,BIND(grid,cancel),$)
-C(5,#OODisplayFlag,Y,BIND(grid,cancel),$)
+C(5,#OOHCodeFlag,Y,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))
+! IF(#OOAcFg=="",BIND(grid,cancel),IF(#OOTxCd=="L3100"||#OOTxCd=="L3240"||#OOTxCd=="L3250",BIND(grid,cancel),C(3,#OOTitaHCode,0,BIND(grid,{ cmd=EC; ntxcd=#OOTxCd; txno=#RimData;rim=LCR01}),BIND(grid,cancel))))
+! C(5,#OOCreateEmpNo,999999,BIND(grid,cancel),$)
+! C(5,#OODisplayFlag,Y,BIND(grid,cancel),$)
 !查詢
 #OOBUF1=X,80,S
 IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#5sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo+#OOTotTxAmt+#OOBorxNo))
@@ -641,6 +643,7 @@ TXFORM=L3005
 #OOCreateEmpNo
 #OODisplayFlag
 #OONeedPaidAmt
+#OOHCodeFlag
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
