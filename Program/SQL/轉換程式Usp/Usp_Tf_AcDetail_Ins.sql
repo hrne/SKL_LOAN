@@ -65,8 +65,7 @@ BEGIN
                ORDER BY TRXNM2
              ) AS "TxSeq"
       FROM "LA$TRXP"
-      WHERE "TRXCRC" = 0
-        AND "LMSACN" != 0
+      WHERE "LMSACN" != 0
     )
     , txRawData AS (
       SELECT DISTINCT
@@ -258,17 +257,19 @@ BEGIN
                   AND S4."TRXNMT"  = S1."TRXNMT"
                   AND S4."TRXTRN"  = CASE
                                        WHEN S1."TRXTRN" IS NOT NULL THEN S1."TRXTRN"
-                                     ELSE ATF."TRXTRN" ENDq
+                                     ELSE ATF."TRXTRN" END
                   AND S4."ACTACT"  = ATF."ACTACT"
                   AND S4."DbCr"    = S1."TRXATP"
                   AND S4."OriDbCr" = ATF."DbCr"
-                  AND S4."ACNACC"  = ATF."ACNACC"CS",' ')
-                  AND NVL(S4."ACNASS",' ') = NVL(ATF."ACN
-                  AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNAASS",' ')
+                  AND S4."ACNACC"  = ATF."ACNACC"
+                  AND NVL(S4."ACNACS",' ') = NVL(ATF."ACNACS",' ')
+                  AND NVL(S4."ACNASS",' ') = NVL(ATF."ACNASS",' ')
       LEFT JOIN FF ON FF."OverdueDate" = S1."TRXDAT"
                   AND FF."DailyFeeTotal" = S1."JLNAMT"
                   AND NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990')
                   AND NVL(S4."LMSACN",0) = 0
+      LEFT JOIN tempTRXP TT ON TT."TRXDAT" = S1."TRXDAT"
+                           AND TT."TRXNMT" = S1."TRXNMT"
       WHERE NVL(S1."TRXDAT",0) > 0      -- 傳票檔會計日期不為0 *日期為0者為問題資料,則排除
         AND NVL(S1."JLNVNO",0) > 0      -- 傳票檔傳票號碼不為0 *傳票號碼為0者為訂正資料,則排除
         AND NVL(S2."TRXDAT",0) = 0      -- 若在S2有資料,表示S1此筆為被訂正資料,則排除
@@ -279,11 +280,28 @@ BEGIN
         AND S1."TRXDAT" >= 20190101
         AND S1."TRXDAT" <= "TbsDyF"
         AND CASE
-              WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
+              WHEN NVL(S5."AcctCode",' ') IN ('310','320','330','340','990'
+                                             ,'IC1','IC2','IC3','IC4','IOP','IOV'
+                                             ,'F15','F16'
+                                             ,'TMI','T12'
+                                             ,'F08','F29','F10')
                    AND NVL(S4."TRXTRN",' ') <> ' '
               THEN 1
-              WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990','IC1','IC2','IC3','IC4','IOP','IOV','F15','F16','TMI','F08','F29','F10')
+              WHEN NVL(S5."AcctCode",' ') NOT IN ('310','320','330','340','990'
+                                                 ,'IC1','IC2','IC3','IC4','IOP','IOV'
+                                                 ,'F15','F16'
+                                                 ,'TMI','T12'
+                                                 ,'F08','F29','F10')
                    AND NVL(S4."LMSACN",0) = 0
+              THEN 1
+              WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12')
+                   AND S1."TRXTRN" = '3079'
+              THEN 1
+              WHEN NVL(S5."AcctCode",' ') IN ('TMI','T12')
+                   AND NVL(S1."TRXTRN",' ') = ' '
+                   AND S4."TRXTRN" IS NULL
+              THEN 1
+              WHEN NVL(TT."LMSACN",0) != 0
               THEN 1
             ELSE 0 
             END = 1
