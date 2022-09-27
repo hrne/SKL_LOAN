@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class LoanBorTx implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 901770069226239864L;
-
-@EmbeddedId
+  @EmbeddedId
   private LoanBorTxId loanBorTxId;
 
   // 借款人戶號
@@ -72,7 +68,7 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
 
-  // 入帳序號
+  // 分錄序號(起)
   @Column(name = "`AcSeq`")
   private int acSeq = 0;
 
@@ -128,6 +124,10 @@ public class LoanBorTx implements Serializable {
   // 應繳日期
   @Column(name = "`DueDate`")
   private int dueDate = 0;
+
+  // 業務科目
+  @Column(name = "`AcctCode`", length = 3)
+  private String acctCode;
 
   // 交易金額
   /* 1.回收金額2.轉出金額(負值)轉入金額(正值)3.催呆轉帳金額 */
@@ -425,7 +425,7 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 入帳序號<br>
+	* 分錄序號(起)<br>
 	* 
 	* @return Integer
 	*/
@@ -434,10 +434,10 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 入帳序號<br>
+	* 分錄序號(起)<br>
 	* 
   *
-  * @param acSeq 入帳序號
+  * @param acSeq 分錄序號(起)
 	*/
   public void setAcSeq(int acSeq) {
     this.acSeq = acSeq;
@@ -707,6 +707,25 @@ N:否
   * @throws LogicException when Date Is Warn	*/
   public void setDueDate(int dueDate) throws LogicException {
     this.dueDate = StaticTool.rocToBc(dueDate);
+  }
+
+/**
+	* 業務科目<br>
+	* 
+	* @return String
+	*/
+  public String getAcctCode() {
+    return this.acctCode == null ? "" : this.acctCode;
+  }
+
+/**
+	* 業務科目<br>
+	* 
+  *
+  * @param acctCode 業務科目
+	*/
+  public void setAcctCode(String acctCode) {
+    this.acctCode = acctCode;
   }
 
 /**
@@ -1204,10 +1223,11 @@ N:否
     return "LoanBorTx [loanBorTxId=" + loanBorTxId + ", titaCalDy=" + titaCalDy + ", titaCalTm=" + titaCalTm
            + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", acSeq=" + acSeq + ", titaTxCd=" + titaTxCd + ", titaCrDb=" + titaCrDb
            + ", titaHCode=" + titaHCode + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", desc=" + desc + ", acDate=" + acDate
-           + ", correctSeq=" + correctSeq + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", txAmt=" + txAmt + ", loanBal=" + loanBal
-           + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate + ", principal=" + principal + ", interest=" + interest
-           + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay
-           + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow + ", slipSumNo=" + slipSumNo
-           + ", otherFields=" + otherFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", correctSeq=" + correctSeq + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", acctCode=" + acctCode + ", txAmt=" + txAmt
+           + ", loanBal=" + loanBal + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate + ", principal=" + principal
+           + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt
+           + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow
+           + ", slipSumNo=" + slipSumNo + ", otherFields=" + otherFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

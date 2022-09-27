@@ -203,15 +203,16 @@ public class L3005 extends TradeBuffer {
 				if (repayCodeX != null && !repayCodeX.isEmpty()) {
 					txMsg += repayCodeX;
 					if ("1".equals(result.get("RepayCode"))) {
-						txMsg += result.get("ReconCode");			
+						txMsg += result.get("ReconCode");
 					}
 					if (totTxAmt.compareTo(BigDecimal.ZERO) != 0) {
-						txMsg += ":"+df.format(totTxAmt);
+						txMsg += ":" + df.format(totTxAmt);
 					}
 				}
 				occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
 				if (txNo.equals(newTxNo)) {
 					AcFg = "";
+					hCodeFlag = "";
 				} else if (displayflag.equals("A") || displayflag.equals("F") || displayflag.equals("I")) {
 					AcFg = "Y";
 				} else {
@@ -267,7 +268,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOCreateEmpNo", createEmpNo); // 建檔人員
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號
 				occursList.putParam("OOHCodeFlag", hCodeFlag); // 訂正記號
-				
+
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
 			}

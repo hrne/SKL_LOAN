@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -448,20 +451,20 @@ em = null;
   }
 
   @Override
-  public LoanBorTx custNoLastTxtNoFirst(int custNo_0, int facmNo_1, String titaHCode_2, List<String> displayflag_3, TitaVo... titaVo) {
+  public LoanBorTx custNoLastTxtNoFirst(int custNo_0, String titaHCode_1, List<String> displayflag_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("custNoLastTxtNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " titaHCode_2 : " +  titaHCode_2 + " displayflag_3 : " +  displayflag_3);
+    this.info("custNoLastTxtNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " titaHCode_1 : " +  titaHCode_1 + " displayflag_2 : " +  displayflag_2);
     Optional<LoanBorTx> loanBorTxT = null;
     if (dbName.equals(ContentName.onDay))
-      loanBorTxT = loanBorTxReposDay.findTopByCustNoIsAndFacmNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, facmNo_1, titaHCode_2, displayflag_3);
+      loanBorTxT = loanBorTxReposDay.findTopByCustNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, titaHCode_1, displayflag_2);
     else if (dbName.equals(ContentName.onMon))
-      loanBorTxT = loanBorTxReposMon.findTopByCustNoIsAndFacmNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, facmNo_1, titaHCode_2, displayflag_3);
+      loanBorTxT = loanBorTxReposMon.findTopByCustNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, titaHCode_1, displayflag_2);
     else if (dbName.equals(ContentName.onHist))
-      loanBorTxT = loanBorTxReposHist.findTopByCustNoIsAndFacmNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, facmNo_1, titaHCode_2, displayflag_3);
+      loanBorTxT = loanBorTxReposHist.findTopByCustNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, titaHCode_1, displayflag_2);
     else 
-      loanBorTxT = loanBorTxRepos.findTopByCustNoIsAndFacmNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, facmNo_1, titaHCode_2, displayflag_3);
+      loanBorTxT = loanBorTxRepos.findTopByCustNoIsAndTitaHCodeIsAndDisplayflagIn(custNo_0, titaHCode_1, displayflag_2);
 
     return loanBorTxT.isPresent() ? loanBorTxT.get() : null;
   }

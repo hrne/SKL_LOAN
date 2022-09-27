@@ -3,12 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,8 +64,8 @@ public interface LoanBorTxRepositoryDay extends JpaRepository<LoanBorTx, LoanBor
   // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <= ,AND EntryDate >= ,AND EntryDate <=,AND Displayflag  ^i
   public Slice<LoanBorTx> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByIntEndDateDescAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscAcSeqAsc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND TitaHCode = ,AND Displayflag ^i
-  public Optional<LoanBorTx> findTopByCustNoIsAndFacmNoIsAndTitaHCodeIsAndDisplayflagIn(int custNo_0, int facmNo_1, String titaHCode_2, List<String> displayflag_3);
+  // CustNo = ,AND TitaHCode = ,AND Displayflag ^i
+  public Optional<LoanBorTx> findTopByCustNoIsAndTitaHCodeIsAndDisplayflagIn(int custNo_0, String titaHCode_1, List<String> displayflag_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

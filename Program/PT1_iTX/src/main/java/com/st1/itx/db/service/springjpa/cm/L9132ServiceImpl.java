@@ -491,7 +491,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , B.\"CustName\" ";
 		sql += "      , B.\"EmpName\" ";
 		sql += " FROM groupData2 B ";
-		sql += " ) ORDER BY TO_NUMBER(SUBSTR(\"TitaTxtNo\",11,8)) ASC";
+		sql += " ) ORDER BY DECODE(TO_NUMBER(SUBSTR(\"TitaTxtNo\",11,8)),0,0,1) ASC";
 		sql += " 		   ,CASE WHEN \"SlipNo\" like '9%' AND LENGTH(\"SlipNo\")=5 THEN \"SlipNo\" ELSE \"SlipNo\" * 100000 END ASC";
 
 		this.info("doQueryL9132B sql=" + sql);

@@ -111,7 +111,6 @@ public class L9136Report extends MakeReport {
 		this.isAcDate = String.valueOf(isAcDate);
 		this.ieAcDate = String.valueOf(ieAcDate);
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), tradeNo, tradeName, "", "A4", "L");
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity("").setRptSize("A4").setPageOrientation("L")
 				.build();
@@ -338,6 +337,8 @@ public class L9136Report extends MakeReport {
 			tmpText = text.substring(i, i + 1);
 			// 中文字數為2，非中文為1
 			if (tmpText.matches("[\\u4E00-\\u9FA5]+")) {
+				num[i] = 2;
+			} else if (tmpText.matches("[\\u0391-\\uFFE5]+")) {
 				num[i] = 2;
 			} else {
 				num[i] = 1;

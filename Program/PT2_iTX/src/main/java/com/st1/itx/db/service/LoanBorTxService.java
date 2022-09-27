@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LoanBorTx;
@@ -231,16 +233,15 @@ public interface LoanBorTxService {
   public Slice<LoanBorTx> borxIntEndDateDescRange(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND TitaHCode = ,AND Displayflag ^i
+   * CustNo = ,AND TitaHCode = ,AND Displayflag ^i
    *
    * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param titaHCode_2 titaHCode_2
-   * @param displayflag_3 displayflag_3
+   * @param titaHCode_1 titaHCode_1
+   * @param displayflag_2 displayflag_2
    * @param titaVo Variable-Length Argument
    * @return Slice LoanBorTx LoanBorTx of List
    */
-  public LoanBorTx custNoLastTxtNoFirst(int custNo_0, int facmNo_1, String titaHCode_2, List<String> displayflag_3, TitaVo... titaVo);
+  public LoanBorTx custNoLastTxtNoFirst(int custNo_0, String titaHCode_1, List<String> displayflag_2, TitaVo... titaVo);
 
   /**
    * hold By LoanBorTx
