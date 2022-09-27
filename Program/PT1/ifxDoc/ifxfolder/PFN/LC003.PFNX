@@ -1,0 +1,11 @@
+" A4
+   批次放行LC003
+   TLR:{{#TLRNO}} {{#EMPNM}} ^ DATE:{{#SYSDATEF}} TIME:{{#now!}}
+
+total:{{#batch-rows}}  selected:{{#batch-rows-selected}}  success:{{#batch-rows-ok}} 失敗:{{#batch-rows-error}} 請注意，若失敗筆數>0，可執行單筆放行查看錯誤原因！！
+                                          往下拉可查看失敗之交易編號。
+
+{{#batch-detail}}
+
+
+PREPARED BY：________   REVIEWED BY：________  AUTHORIZED BY：________
