@@ -68,6 +68,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\" = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\" <> '8' ";
+		sql += "           AND ACD.\"EntAc\" > 0 ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
@@ -88,6 +89,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           AND ACD.\"ReceivableFlag\" <> '8' ";
 		sql += "           AND NVL(TRIM(ACD.\"AcBookCode\"), '000') <> '000' ";
 		sql += "           AND ACD.\"AcBookFlag\" <> '3' ";
+		sql += "           AND ACD.\"EntAc\" > 0 ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
@@ -106,6 +108,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
+		sql += "           AND ACD.\"EntAc\" > 0 ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
@@ -126,6 +129,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
 		sql += "           AND NVL(TRIM(ACD.\"AcBookCode\"), '000') <> '000' ";
 		sql += "           AND ACD.\"AcBookFlag\" <> '3' ";
+		sql += "           AND ACD.\"EntAc\" > 0 ";
 		sql += "     ) S0 ";
 		sql += "     GROUP BY S0.\"AcDate\" ";
 		sql += "            , S0.\"SlipBatNo\" ";
@@ -174,9 +178,9 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                            AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
 		sql += "                            AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
-		sql += " WHERE \"AcDate\" = :acDate ";
-		sql += "   AND \"SlipBatNo\" = :slipBatNo ";
-		sql += "   AND \"EntAc\" != 9 "; // 排除入總帳記號為9的資料
+		sql += " WHERE ACD.\"AcDate\" = :acDate ";
+		sql += "   AND ACD.\"SlipBatNo\" = :slipBatNo ";
+		sql += "   AND ACD.\"EntAc\" != 9 "; // 排除入總帳記號為9的資料
 		sql += " GROUP BY ACD.\"AcDate\"        "; // 會計日期
 		sql += "        , ACD.\"SlipBatNo\"     "; // 傳票批號
 		sql += "        , ACD.\"AcBookCode\"    "; // 帳冊別: 000:全公司

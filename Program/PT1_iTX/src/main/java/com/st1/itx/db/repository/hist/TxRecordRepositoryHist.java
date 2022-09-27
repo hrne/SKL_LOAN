@@ -55,8 +55,8 @@ public interface TxRecordRepositoryHist extends JpaRepository<TxRecord, TxRecord
   // CalDate >= ,AND CalDate <= ,AND BrNo = ,AND LockCustNo = ,AND ImportFg =
   public Slice<TxRecord> findAllByCalDateGreaterThanEqualAndCalDateLessThanEqualAndBrNoIsAndLockCustNoIsAndImportFgIsOrderByCreateDateAsc(int calDate_0, int calDate_1, String brNo_2, int lockCustNo_3, String importFg_4, Pageable pageable);
 
-  // Entdy = , AND TlrNo =
-  public Optional<TxRecord> findTopByEntdyIsAndTlrNoIsOrderByTxSeqDesc(int entdy_0, String tlrNo_1);
+  // Entdy = , AND TlrNo =, AND TrmType=
+  public Optional<TxRecord> findTopByEntdyIsAndTlrNoIsAndTrmTypeIsOrderByTxSeqDesc(int entdy_0, String tlrNo_1, String trmType_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

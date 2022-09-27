@@ -89,7 +89,7 @@ public class LC100 extends TradeBuffer {
 					throw new LogicException("EC001", "營業單位課組別檔:" + tTxTeller.getGroupNo());
 				}
 
-				TxRecord txRecord = txRecordService.findEntdyFirst(titaVo.getEntDyI(), titaVo.getTlrNo());
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxCom().getTbsdyf(), titaVo.getTlrNo(), "00");
 
 				String s = "";
 				s = tCdBranchGroup.getGroupItem();

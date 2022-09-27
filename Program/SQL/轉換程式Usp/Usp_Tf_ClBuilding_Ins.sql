@@ -140,7 +140,7 @@ BEGIN
           ,LPAD(S2."HGTAUS",2,'0')        AS "BdSubUsageCode"      -- 附屬建物用途 VARCHAR2 2 
           ,NVL(S2."HGTADS",0)             AS "BdSubArea"           -- 附屬建物面積 DECIMAL 8 2
           ,S2."SALID1"                    AS "SellerId"            -- 賣方統編 VARCHAR2 10 
-          ,' '                            AS "SellerName"          -- 賣方姓名 VARCHAR2 10 
+          ,S2."SALNAM"                    AS "SellerName"          -- 賣方姓名 VARCHAR2 10 
           ,NVL(S2."BUYAMT",0)             AS "ContractPrice"       -- 買賣契約價格 DECIMAL 16 2
           ,NVL(S2."BUYDAT",0)             AS "ContractDate"        -- 買賣契約日期 decimald 8 
           -- HGTCAP	1	平道平面位

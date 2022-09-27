@@ -41,6 +41,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    SELECT AC.\"AcNoCode\" ";
 		sql += "     	  ,CDAC.\"AcNoItem\" ";
 		sql += "     	  ,AC.\"AcSubCode\" ";
+		sql += "     	  ,AC.\"EntAc\" ";
 		sql += "		  ,CASE ";
 		sql += "			 WHEN AC.\"EntAc\" IN (1) ";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
@@ -141,6 +142,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
 		sql += " ) ";
+		//--批次
 		sql += " , groupData AS ( ";
 		sql += "     SELECT \"AcNoCode\" ";
 		sql += "          , \"AcNoItem\" ";
@@ -165,6 +167,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , \"EmpName\" ";
 		sql += "            , \"ReconCode\" ";
 		sql += " ) ";
+		//--單筆
 		sql += " , groupData2 AS ( ";
 		sql += "     SELECT \"AcNoCode\" ";
 		sql += "          , \"AcNoItem\" ";
@@ -178,6 +181,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"EmpName\" ";
 		sql += "     FROM rawData ";
 		sql += "     WHERE \"EntAcCode\" = 0";
+		sql += "       AND \"EntAc\" > 0 ";
 		sql += "     GROUP BY \"AcNoCode\" ";
 		sql += "            , \"AcNoItem\" ";
 		sql += "            , \"AcSubCode\" ";
@@ -268,6 +272,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND CDAC.\"AcDtlCode\" = AC.\"AcDtlCode\" ";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
+		sql += "       AND AC.\"EntAc\" > 0 ";
 		sql += " ) ";
 		sql += " SELECT dd.\"AcNoCode\" ";
 		sql += "      , dd.\"AcNoItem\" ";
@@ -409,6 +414,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AS \"EmpName\" ";
 		sql += "          , B.\"AcDate\" AS \"AcDate\"";
 		sql += "          , B.\"ReconCode\" AS \"ReconCode\"";
+		sql += "          , AC.\"EntAc\" AS \"EntAc\"";
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
@@ -422,7 +428,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
-
+		sql += "       AND \"EntAc\" > 0 ";
 		sql += " ) ";
 		sql += " , groupData AS ( ";
 		sql += "     SELECT \"TitaTxtNo\" ";
@@ -621,6 +627,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AS \"EmpName\" ";
 		sql += "          , B.\"AcDate\" AS \"AcDate\"";
 		sql += "          , B.\"ReconCode\" AS \"ReconCode\"";
+		sql += "          , AC.\"EntAc\" AS \"EntAc\"";
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
@@ -634,6 +641,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
+		sql += "       AND AC.\"EntAc\" > 0 ";
 		sql += " ) ";
 		sql += " , groupData AS ( ";
 		sql += "     SELECT \"TitaTlrNo\" ";
@@ -758,6 +766,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM TempCDAC ";
 		sql += "     LEFT JOIN  \"AcDetail\" AC ON AC.\"AcNoCode\" = TempCDAC.\"AcNoCode\" ";
 		sql += "                             AND AC.\"AcSubBookCode\" = TempCDAC.\"AcSubBookCode\" ";
+		sql += "                             AND AC.\"EntAc\" > 0 ";
 		sql += "     WHERE CASE ";
 		sql += "             WHEN NVL(AC.\"AcDate\",0) = 0 ";
 		sql += "             THEN 1 ";
@@ -783,4 +792,21 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("batchNo", batchNo);
 		return this.convertToMap(query);
 	}
+//	sql += "       AND (CASE WHEN AC.\"EntAc\" IN (1) ";//--正常,批次(整批、單筆)入帳
+//	sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
+//	sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),3,6) = AC.\"TitaBatchSeq\"";
+//	sql += "       			THEN 1";
+//	
+//	sql += "       			WHEN AC.\"EntAc\" IN (2) ";//--被訂正,原序號為批次入帳且訂正為整批訂正
+//	sql += "       			 AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
+//	sql += "       			 AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
+//	sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
+//	sql += "       			THEN 2";
+//	
+//	sql += "       			WHEN AC.\"EntAc\" IN (3) ";//--訂正,原序號為批次入帳且訂正為整批訂正
+//	sql += "       			 AND SUBSTR(AC.\"RelTxseq\",11,2) = SUBSTR(B.\"BatchNo\",5,2) ";
+//	sql += "       			 AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
+//	sql += "       			 AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
+//	sql += "       			THEN 3 ";
+//	sql += "       			ELSE 0 END) > 0";
 }

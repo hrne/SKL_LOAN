@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxRecord;
@@ -190,14 +192,15 @@ public interface TxRecordService {
   public Slice<TxRecord> findByCustNo(int calDate_0, int calDate_1, String brNo_2, int lockCustNo_3, String importFg_4, int index, int limit, TitaVo... titaVo);
 
   /**
-   * Entdy = , AND TlrNo =
+   * Entdy = , AND TlrNo =, AND TrmType=
    *
    * @param entdy_0 entdy_0
    * @param tlrNo_1 tlrNo_1
+   * @param trmType_2 trmType_2
    * @param titaVo Variable-Length Argument
    * @return Slice TxRecord TxRecord of List
    */
-  public TxRecord findEntdyFirst(int entdy_0, String tlrNo_1, TitaVo... titaVo);
+  public TxRecord findEntdyFirst(int entdy_0, String tlrNo_1, String trmType_2, TitaVo... titaVo);
 
   /**
    * hold By TxRecord

@@ -293,7 +293,10 @@ BEGIN
           ,APLP."APLCRD"                  AS "CreditScore"         -- 信用評分 DECIMAL 3 
           ,APLP."APLCSD"                  AS "GuaranteeDate"       -- 對保日期 DECIMALD 8 
           ,CLF."CNTRCTNO"                 AS "ContractNo"          -- 合約編號 VARCHAR2 10 
-          ,APLP."GDRSTS"                  AS "ColSetFlag"          -- 擔保品設定記號 VARCHAR2 1 
+          ,CASE
+             WHEN NVL(APLP."GDRSTS",0) = 1
+             THEN 'Y'
+           ELSE 'N' END                   AS "ColSetFlag"          -- 擔保品設定記號 VARCHAR2 1 
           ,0                              AS "ActFg"               -- 交易進行記號 DECIMAL 1 
           ,0                              AS "LastAcctDate"        -- 上次交易日 NUMBER(8,0)
           ,''                             AS "LastKinbr"           -- 上次交易行別 VARCHAR2(4 BYTE)

@@ -116,6 +116,7 @@ BEGIN
           ,"FeeAmt"
           ,"AcSeq"
           ,"SlipSumNo"
+          ,"AcctCode"
     )
     WITH "TmpLMSP" AS (
       SELECT "LMSACN"
@@ -214,6 +215,13 @@ BEGIN
         AND T.TRXAMT = NVL(J.JLNAMT,0)
         AND CAC."AcctCode" IN ('F10','F29','TMI','F07')
     )
+    , correctTx AS (
+      SELECT DISTINCT
+             TRXDAT
+           , TRXNMT
+           , TRXMEM
+      FROM LA$TRXP
+    )
     SELECT TR1."LMSACN"                   AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,TR1."LMSAPN"                   AS "FacmNo"              -- 額度編號 DECIMAL 3 
           ,CASE
@@ -259,7 +267,7 @@ BEGIN
           ,REPLACE(TRIM(TO_SINGLE_BYTE(TCD."TRXDSC")),'','') 
                                           AS "Desc"                -- 摘要 NVARCHAR2 10 
           ,TR1."TRXDAT"                   AS "AcDate"              -- 會計日期 DECIMALD 8 
-          ,TR1."TRXEDT" || '0000' || '      ' || LPAD(TR1."TRXENM",8,'0')
+          ,TR1."TRXEDT" || '0000' || NVL(AEM3."EmpNo",'999999') || LPAD(TR1."TRXENM",8,'0')
                                           AS "CorrectSeq"          -- 更正序號, 原交易序號 VARCHAR2 26 
           -- 2022-09-22 賴桑增加邏輯
           -- A:帳務 = 除了L3701之外都是帳務
@@ -437,6 +445,7 @@ BEGIN
            END                            AS "FeeAmt"
           ,TR1."TRXNM2" AS "AcSeq"
           ,TR1."BSTBTN" AS "SlipSumNo"
+          ,TR1."ACTACT" AS "AcctCode"
     FROM TR
     LEFT JOIN "LA$TRXP" TR1 ON TR1."CUSBRH" = TR."CUSBRH"
                            AND TR1."TRXDAT" = TR."TRXDAT"
@@ -498,6 +507,9 @@ BEGIN
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = TR1."TRXMEM"
     LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = TR1."TRXSID"
     LEFT JOIN "TB$TCDP" TCD ON TCD."TRXTRN" = TR."TRXTRN"
+    LEFT JOIN correctTx COR ON COR."TRXDAT" = TR1."TRXEDT"
+                           AND COR."TRXNMT" = TR1."TRXENM"
+    LEFT JOIN "As400EmpNoMapping" AEM3 ON AEM3."As400TellerNo" = COR."TRXMEM"                    
     WHERE TR1."TRXDAT" <= "TbsDyF"
     ;
 

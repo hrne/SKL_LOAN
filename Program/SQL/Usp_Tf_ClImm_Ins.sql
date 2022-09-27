@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_ClImm_Ins" 
+  CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_ClImm_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -56,7 +56,12 @@ BEGIN
           ,'1'                            AS "ClCode"              -- 擔保註記 VARCHAR2 1 
           ,0                              AS "LoanToValue"         -- 貸放成數(%) DECIMAL 5 2
           ,0                              AS "OtherOwnerTotal"     -- 其他債權人設定總額 DECIMAL 16 2
-          ,'0'                            AS "CompensationCopy"    -- 代償後謄本 VARCHAR2 1 
+          ,CASE
+             WHEN S1."ClCode1" = 1
+             THEN NVL(S4."LGTSAT",0)
+             WHEN S1."ClCode1" = 2
+             THEN NVL(S5."LGTSAT",0)
+           ELSE 0 END                     AS "CompensationCopy"    -- 代償後謄本 VARCHAR2 1 
           ,CASE
              WHEN NVL(S2."GDTTMR",' ') <> ' ' 
              THEN TRIM(TO_SINGLE_BYTE(S2."GDTTMR"))
@@ -144,6 +149,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClImm_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 

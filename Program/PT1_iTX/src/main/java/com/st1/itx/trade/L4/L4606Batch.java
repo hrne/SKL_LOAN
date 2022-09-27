@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L4;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,12 +22,17 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuComm;
 import com.st1.itx.db.domain.InsuCommId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuCommService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4606ServiceImpl;
 import com.st1.itx.trade.L4.L4606Report1;
 import com.st1.itx.trade.L4.L4606Report2;
@@ -102,6 +109,11 @@ public class L4606Batch extends TradeBuffer {
 
 	@Autowired
 	private L4606Report4 l4606Report4;
+	
+	@Autowired
+	private L4606Report5 l4606Report5;
+	@Autowired
+	private L4606Report6 l4606Report6;
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -209,8 +221,11 @@ public class L4606Batch extends TradeBuffer {
 				l4606Report2.exec(titaVo);
 				l4606Report3.exec(titaVo, successList);
 				l4606Report4.exec(titaVo, errorList);
+				l4606Report5.exec(titaVo);
+				l4606Report6.exec(titaVo);	
 				sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數："
 						+ zeroDueAmtCnt + ", 戶號有誤筆數：" + custErrorCnt + ", 剔除佣金為負筆數：" + minusCnt;
+
 			}
 			printUsedTime("flagB");
 		}
@@ -402,11 +417,12 @@ public class L4606Batch extends TradeBuffer {
 				});
 			}
 			this.info("uploadFile    = " + uploadFile);
-//			String strContent = "";
+			
 
 			for (OccursList tempOccursList : uploadFile) {
-//				this.info(tempOccursList.toString());
-//				strContent = "";
+				this.info(tempOccursList.toString());
+				
+				
 				seq++;
 				tempOccursList.putParam("Seq", seq);
 
@@ -471,13 +487,7 @@ public class L4606Batch extends TradeBuffer {
 //				this.info("commBase=" + commBase + ", commRate = " + commRate);
 				BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 				tInsuComm.setDueAmt(dueAmt);
-//				if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
-////					this.info("開始相加額度為0");
-//					minusCnt++;
-//					tempOccursList.putParam("ErrorMsg", "額度為0 :" + "戶號: "+custNo +" "+" 險種: "+ tempOccursList.get("InsuType"));
-//					errorList.add(tempOccursList);
-//					continue;
-//				}
+
 //				By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
 //				業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
 
@@ -521,11 +531,7 @@ public class L4606Batch extends TradeBuffer {
 				}
 				count++;
 			}
-//			String strHade = "程式ID: LN2131                                             新光人壽保險股份有限公司                                                          日  期:"
-//					+ dateUtil.getNowStringBc().substring(6, 8) + "/" + dateUtil.getNowStringBc().substring(4, 6) + "/"
-//					+ dateUtil.getNowStringBc().substring(2, 4);
-//			makeFile.put(strHade);
-//			makeFile.put(strContent);
+
 			this.info("InsuComm insert end");
 		}
 	}

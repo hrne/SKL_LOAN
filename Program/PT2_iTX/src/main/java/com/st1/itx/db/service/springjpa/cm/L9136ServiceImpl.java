@@ -32,13 +32,15 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
+
+
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("L9136 ServiceImpl findAll");
 
 		int isAcDate = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
 		int ieAcDate = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
 
-		String sql = " ";
+		String sql = " "; 
 		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
 		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
 		sql += "		  ,T.\"CustNo\" AS \"CustNo\"";
@@ -72,6 +74,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,T.\"TlrNo\" ASC";
 		sql += "			,T.\"TxSeq\" ASC";
 
+
 		this.info("L9136ServiceImpl sql=" + sql);
 
 		Query query;
@@ -88,7 +91,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int isAcDate = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
 		int ieAcDate = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
 
-		String sql = " ";
+		String sql = " "; 
 		sql += "	WITH \"tmpTxRecord\" AS(";
 		sql += "		SELECT T.\"Entdy\" AS \"TxDate\"";
 		sql += "			  ,T.\"TxSeq\"";
@@ -110,7 +113,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		      		THEN SUBSTR(T.\"MrKey\",13,3)";
 		sql += "		      		ELSE '0' END";
 		sql += "		      ) AS \"BormNo\"";
-		sql += "		      ,' ' AS \"Item\"";
+		sql += "		      ,T.\"TranNo\" AS \"Item\"";
 		sql += "			  ,' ' AS \"Old\"";
 		sql += "		      ,CASE";
 		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
@@ -126,9 +129,9 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  ,JSON_VALUE(\"TranData\",'$.SUPNO') AS \"SupNo\"";
 		sql += "		FROM \"TxRecord\" T";
 		sql += "		WHERE T.\"Entdy\" BETWEEN :sAcDate AND :eAcDate";
-		sql += "		  AND (T.\"Hcode\" = 1 AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL )";
+		sql += "		  AND ((T.\"Hcode\" = 1 AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL )";
 		sql += "		   OR (T.\"Hcode\" <> 1 AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL )";
-		sql += "		   OR ( JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4))";
+		sql += "		   OR ( JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)))";
 		sql += "	)";
 		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
 		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
@@ -170,11 +173,12 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("eAcDate", ieAcDate);
 		return this.convertToMap(query);
 	}
-
-	public List<Map<String, String>> findSupNo(TitaVo titaVo, String TxNo) throws Exception {
+	
+	
+	public List<Map<String, String>> findSupNo(TitaVo titaVo,String TxNo) throws Exception {
 //		this.info("L9136 findSupNo =" + TxNo);
-
-		String sql = " ";
+	
+		String sql = " "; 
 		sql += " WITH \"count\" AS (";
 		sql += " 	SELECT \"TxSeq\" AS \"TxSeq\" ";
 		sql += "          ,COUNT(\"TxSeq\") AS \"Count\"";
@@ -205,14 +209,17 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"con3\" C";
 		sql += " LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = C.\"EmpNo\"";
 
+
 //		this.info("TxNo=" + TxNo);
 //		this.info("L9136ServiceImpl sql=" + sql);
 
+		
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("TxNo", TxNo);
 		return this.convertToMap(query);
 	}
+
 
 }

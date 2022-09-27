@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -391,20 +394,20 @@ em = null;
   }
 
   @Override
-  public TxRecord findEntdyFirst(int entdy_0, String tlrNo_1, TitaVo... titaVo) {
+  public TxRecord findEntdyFirst(int entdy_0, String tlrNo_1, String trmType_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findEntdyFirst " + dbName + " : " + "entdy_0 : " + entdy_0 + " tlrNo_1 : " +  tlrNo_1);
+    this.info("findEntdyFirst " + dbName + " : " + "entdy_0 : " + entdy_0 + " tlrNo_1 : " +  tlrNo_1 + " trmType_2 : " +  trmType_2);
     Optional<TxRecord> txRecordT = null;
     if (dbName.equals(ContentName.onDay))
-      txRecordT = txRecordReposDay.findTopByEntdyIsAndTlrNoIsOrderByTxSeqDesc(entdy_0, tlrNo_1);
+      txRecordT = txRecordReposDay.findTopByEntdyIsAndTlrNoIsAndTrmTypeIsOrderByTxSeqDesc(entdy_0, tlrNo_1, trmType_2);
     else if (dbName.equals(ContentName.onMon))
-      txRecordT = txRecordReposMon.findTopByEntdyIsAndTlrNoIsOrderByTxSeqDesc(entdy_0, tlrNo_1);
+      txRecordT = txRecordReposMon.findTopByEntdyIsAndTlrNoIsAndTrmTypeIsOrderByTxSeqDesc(entdy_0, tlrNo_1, trmType_2);
     else if (dbName.equals(ContentName.onHist))
-      txRecordT = txRecordReposHist.findTopByEntdyIsAndTlrNoIsOrderByTxSeqDesc(entdy_0, tlrNo_1);
+      txRecordT = txRecordReposHist.findTopByEntdyIsAndTlrNoIsAndTrmTypeIsOrderByTxSeqDesc(entdy_0, tlrNo_1, trmType_2);
     else 
-      txRecordT = txRecordRepos.findTopByEntdyIsAndTlrNoIsOrderByTxSeqDesc(entdy_0, tlrNo_1);
+      txRecordT = txRecordRepos.findTopByEntdyIsAndTlrNoIsAndTrmTypeIsOrderByTxSeqDesc(entdy_0, tlrNo_1, trmType_2);
 
     return txRecordT.isPresent() ? txRecordT.get() : null;
   }
