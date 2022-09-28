@@ -104,7 +104,7 @@ public class L4606Report6 extends MakeReport {
 						//戶名
 						String F8 = "";
 						if ((tL4606Vo.get("F8") == "")) {
-							F8 = "          ";
+							F8 = "        ";
 						} else {
 							F8 = fillUpWord(tL4606Vo.get("F8"), 8, " ", "R");
 						}
@@ -112,7 +112,7 @@ public class L4606Report6 extends MakeReport {
 						//火險服務ID
 						String F9 = "";
 						if ((tL4606Vo.get("F9") == "")) {
-							F9 = "      ";
+							F9 = "          ";
 						} else {
 							F9 = fillUpWord(tL4606Vo.get("F9"), 10, " ", "R");
 						}
@@ -120,9 +120,9 @@ public class L4606Report6 extends MakeReport {
 						//火險服務人
 						String F10 = "";
 						if ((tL4606Vo.get("F10") == "")) {
-							F10 = "                  ";
+							F10 = "          ";
 						} else {
-							F10 = fillUpWord(tL4606Vo.get("F10"), 7, " ", "R");
+							F10 = fillUpWord(tL4606Vo.get("F10"), 10, " ", "R");
 						}
 												
 						
@@ -136,12 +136,10 @@ public class L4606Report6 extends MakeReport {
 								+ fillUpWord((padStart(7, tL4606Vo.get("F6"))), 7, " ", "R")
 								+ "  " 
 								+ fillUpWord((padStart(3, tL4606Vo.get("F7"))), 4, " ", "R")+"   " 
-								+ F8+"   "+ F9+"     "+ F10+" "
+								+ F8+"    "+ F9+"       "+ F10+" "
 								+ fillUpWord(String.format("%,d", Integer.parseInt(tL4606Vo.get("F11"))), 16, " ", "L"));
 						
-						totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
-						
-						
+						totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));	
 
 			cnt++;
 			times++;

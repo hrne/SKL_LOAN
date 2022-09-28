@@ -126,6 +126,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"Fn_GetEmpName\"(AC.\"TitaTlrNo\",1) ";
 		sql += "                                  AS \"EmpName\" ";
 		sql += "          , B.\"ReconCode\" AS \"ReconCode\"";
+		sql += "          , AC.\"AcctCode\" AS \"AcctCode\"";
 		sql += "     FROM \"AcDetail\" AC ";
 		sql += "     LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = AC.\"AcNoCode\" ";
 		sql += "                              AND CDAC.\"AcSubCode\" = AC.\"AcSubCode\" ";
@@ -156,11 +157,13 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"CustNo\" ";
 		sql += "          , \"EmpName\" ";
 		sql += "          , \"ReconCode\" ";
+		sql += "          , \"AcctCode\"";
 		sql += "     FROM rawData ";
 		sql += "     WHERE \"EntAcCode\" <> 0";
 		sql += "     GROUP BY \"AcNoCode\" ";
 		sql += "            , \"AcNoItem\" ";
 		sql += "            , \"AcSubCode\" ";
+		sql += "            , \"AcctCode\"";
 		sql += "            , \"SlipNo\" ";
 		sql += "            , \"AcSubBookCode\" ";
 		sql += "            , \"AcSubBookItem\" ";
@@ -180,11 +183,13 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"AcSubBookItem\" ";
 		sql += "          , \"CustNo\" ";
 		sql += "          , \"EmpName\" ";
+		sql += "          , \"AcctCode\"";
 		sql += "     FROM rawData ";
 		sql += "     WHERE \"EntAcCode\" = 0";
 		sql += "     GROUP BY \"AcNoCode\" ";
 		sql += "            , \"AcNoItem\" ";
 		sql += "            , \"AcSubCode\" ";
+		sql += "            , \"AcctCode\"";
 		sql += "            , \"SlipNo\" ";
 		sql += "            , \"AcSubBookCode\" ";
 		sql += "            , \"AcSubBookItem\" ";
@@ -202,6 +207,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"DbAmt\" ";
 		sql += "      , \"CrAmt\" ";
 		sql += "      , \"EmpName\" ";
+		sql += "      , \"AcctCode\"";
 		sql += " FROM groupData";
 		sql += " UNION ";
 		sql += " SELECT \"AcNoCode\" ";
@@ -214,11 +220,12 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , \"DbAmt\" ";
 		sql += "      , \"CrAmt\" ";
 		sql += "      , \"EmpName\" ";
+		sql += "      , \"AcctCode\"";
 		sql += " FROM groupData2";
 		sql += " ) ";
 		sql += " ORDER BY \"AcNoCode\" ASC";
 		sql += "		 ,\"AcSubCode\" ASC";
-		sql += "         ,\"AcNoItem\" ASC";
+		sql += "         , \"AcctCode\" ASC";
 //		sql += " 		 ,CASE WHEN \"SlipNo\" LIKE '9%' AND LENGTH(\"SlipNo\") = 5 THEN \"SlipNo\" ELSE \"SlipNo\" * 99999 END ASC";
 		sql += " 		 ,\"SlipNo\" ASC";
 		sql += "		 ,\"CustNo\" ASC";
@@ -343,7 +350,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       		  AND SUBSTR(AC.\"RelTxseq\",13,6) = AC.\"TitaBatchSeq\"";
 		sql += "       		  AND SUBSTR(LPAD(AC.\"TitaTxtNo\",8,0),1,2) = SUBSTR(B.\"BatchNo\",5,2) ";
 		sql += "       		 THEN '000000000000000000' ";
-		sql += "       		 ELSE AC.\"RelTxseq\"";
+		sql += "       		 ELSE AC.\"TitaKinbr\" || AC.\"TitaTlrNo\" || LPAD(AC.\"TitaTxtNo\",7,0) ";
 		sql += "           END   AS \"TitaTxtNo\" ";
 		sql += "       	  ,CASE ";
 		sql += "		  	 WHEN AC.\"EntAc\" IN (1) ";

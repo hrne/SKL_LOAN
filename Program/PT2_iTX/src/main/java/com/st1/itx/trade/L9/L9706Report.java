@@ -66,32 +66,34 @@ public class L9706Report extends MakeReport {
 	public void printHeader() {
 
 		this.info("L9706 exec" + this.titaVo.get("ENTDY"));
+		this.setMaxRows(52);
+		
+		// 印圖片時是設定座標(x,y)
+		// 整個文件的最左上角是(0,0)
+		this.printImage(32, 20, 30f, "ReportSklLogo.jpg");
 
 		this.setFontSize(standardFontSize - 3);
-		// TODO: header 內容改成跟其他報表統一化
-		// 找 LM012 之類的報表複製一下
-		// 右邊 Align R, x 座標 90
-		// 左邊 Align L, x 座標待測, 可能為 4 ~ 5
-		// 中間 Align C 請用 this.getMidAxis()
-
-		this.print(-1, 90, "機密等級：□極機密 ■機密 □密 □普通", "R");
-//		this.print(-2, 90, "文件持有人請嚴加控管本項文件", "R");
+		this.print(-2, 90, "機密等級：□極機密 ■機密 □密 □普通", "R");
+		this.print(-3, 90, "文件持有人請嚴加控管本項文件", "R");
+		this.print(-62,90,"頁碼:"+ this.getNowPage());
 
 		this.setFontSize(standardFontSize + 3);
-		this.print(-4, this.getMidXAxis(), "貸　款　餘　額　證　明　書", "C");
+		this.print(-5, this.getMidXAxis(), "貸　款　餘　額　證　明　書", "C");
 		this.setFontSize(standardFontSize);
 
 		// 表示是同額度第二頁
 		if (footerSayContinue) {
-			this.print(-6, this.getMidXAxis(), "====　承　上　頁　====", "C");
+			this.print(-7, this.getMidXAxis(), "====　承　上　頁　====", "C");
 		}
 	}
-
+	
 	@Override
 	public void printFooter() {
 		if (footerSayContinue) {
 			print(-51, this.getMidXAxis(), "====　續　下　頁　====", "C");
 		}
+		this.print(-52,90,"頁碼:"+ this.getNowPage());
+		
 	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
@@ -103,12 +105,12 @@ public class L9706Report extends MakeReport {
 		iENTDAY = tranDate(titaVo.getCalDy());
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-				.setSecurity("普通").setRptCode("L9706").setRptItem("貸款餘額證明書").setPageOrientation("P").setUseDefault(true)
-				.build();
+				.setSecurity("普通").setRptCode("L9706").setRptItem("貸款餘額證明書").setPageOrientation("P")
+				.setUseDefault(false).build();
 
-		this.open(titaVo, reportVo, "A4直式底稿.pdf");
-		
-		this.setBeginRow(7);
+		this.open(titaVo, reportVo);
+
+		this.setBeginRow(8);
 		this.setMaxRows(43);
 		this.setFontSize(standardFontSize);
 
@@ -139,10 +141,10 @@ public class L9706Report extends MakeReport {
 			this.print(1, 1, "");
 			this.print(1, 1, "");
 		}
-		this.close();
+		long sno = this.close();
 
 		// 測試用
-		// this.toPdf(sno);
+		this.toPdf(sno);
 		return hasData;
 	}
 
@@ -182,7 +184,7 @@ public class L9706Report extends MakeReport {
 		BigDecimal lineAmt = this.getBigDecimal(tL9706Vo.get("LineAmt"));
 		BigDecimal loanBal = this.getBigDecimal(tL9706Vo.get("LoanBal"));
 		String basicInfo = String.format(
-				"　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款餘額為 %s整。",
+				"　　查　%s　君（%s%s），於 %s 向本公司辦理　%s期　購置貸款，借款金額　%s整　，戶號 %s － %s 截至民國 %s止　　貸款本金餘額為 %s整。",
 				tL9706Vo.get("CustName") // 戶名
 				, cuscCdX, tL9706Vo.get("CustId") // 身分證字號
 				, this.showRocDate(tL9706Vo.get("FirstDrawdownDate"), 0) // 首撥日
@@ -196,11 +198,12 @@ public class L9706Report extends MakeReport {
 		// 切成當中所有 strings 長度 <= 74 的 string[]
 
 		List<String> split = splitChinese(basicInfo, 74);
-
+		
+		
+		this.info("split    = " + split);
 		for (String s : split) {
-			this.print(1, 3, s);
+			this.print(2, 5, s);
 		}
-
 		// 輸出第二段：共同借款人
 		// 共同借款人資料檔
 		int applNo = parse.stringToInteger(tL9706Vo.get("ApplNo"));
@@ -239,7 +242,7 @@ public class L9706Report extends MakeReport {
 		}
 		if (shareList.size() > 0) {
 			this.print(1, 0, "");
-			this.print(1, 3, "共同借款人：");
+			this.print(2, 5, "共同借款人：");
 			for (CustMain tCustMain : shareList) {
 				cuscCdX = "身分證字號";
 				if ("2".equals(tCustMain.getCuscCd())) {
@@ -247,7 +250,7 @@ public class L9706Report extends MakeReport {
 				} else {
 					cuscCdX = "身分證字號";
 				}
-				this.print(0, 13, tCustMain.getCustName() + " (" + cuscCdX + tCustMain.getCustId() + ")");
+				this.print(0, 15, tCustMain.getCustName() + " (" + cuscCdX + tCustMain.getCustId() + ")");
 				this.print(1, 0, "");
 			}
 		}
@@ -273,10 +276,11 @@ public class L9706Report extends MakeReport {
 		}
 		if (addressList.size() > 0) {
 			this.print(1, 0, "");
-			this.print(1, 3, "貸款抵押標的物地址：");
+			this.print(2, 5, "貸款抵押標的物地址：");
 
 			// 處理重複地址問題
 			List<String> result = new ArrayList<String>();
+			
 			for (ClBuilding str : addressList) {
 				String tempBdLocation = str.getBdLocation().toString();
 				if (!result.contains(tempBdLocation)) {
@@ -285,10 +289,10 @@ public class L9706Report extends MakeReport {
 			}
 
 			for (String bdLocation : result) {
-				this.print(1, 8, bdLocation); // 每個地址的輸出位置：8
+				this.print(2, 9, bdLocation); // 每個地址的輸出位置：8
 			}
 		}
-
+		
 		// 輸出第四段：如果為政府優惠房屋貸款時，要多輸出
 		String loanKind = "";
 
@@ -328,15 +332,15 @@ public class L9706Report extends MakeReport {
 		// footer
 
 		this.print(1, 1, "");
-		this.print(1, 18, "此  致");
+		this.print(2, 21, "此  致");
 		this.print(1, 1, "");
-		this.print(1, 9, "台照");
+		this.print(2, 12, "台照");
 		this.print(1, 1, "");
-		this.print(1, 76, "新光人壽保險股份有限公司敬啟", "R");
+		this.print(2, 79, "新光人壽保險股份有限公司敬啟", "R");
 		this.print(1, 1, "");
-		this.print(1, 4, "中 　 　　華 　 　　民 　 　　國  " + iENTDAY);
+		this.print(2, 7, "中 　 　　華 　 　　民 　 　　國  " + iENTDAY);
 //		this.print(0, 66, iENTDAY, "R");
-
+		
 		footerSayContinue = false;
 	}
 

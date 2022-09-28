@@ -215,7 +215,7 @@ public class L4101ReportA extends MakeReport {
 		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
 				this.info("tAcDetail = " + tAcDetail);
-				if ("2".equals(tAcDetail.getTitaHCode())) {
+				if (tAcDetail.getEntAc() == 0) {
 					continue;
 				}
 				if (tAcDetail.getCustNo() != oldCustNo) {

@@ -66,8 +66,10 @@ public class L9132Report extends MakeReport {
 	private String acNoCode;
 
 	private String acSubCode;
-	
+
 	private String acNoItem;
+
+	private String acctCode;
 
 	// 製表日期
 	private String nowDate;
@@ -182,11 +184,11 @@ public class L9132Report extends MakeReport {
 		this.nowTime = dDateUtil.getNowStringTime();
 
 //		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
-		
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
-				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
-				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
-		
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+
 		this.open(titaVo, reportVo);
 
 		this.setCharSpaces(0);
@@ -208,31 +210,29 @@ public class L9132Report extends MakeReport {
 
 		} else {
 
-
 			int i = 0;
 
 //			String tempAcNoCode = "";
 //			String tempAcSubCode = "";
-			
-			
+
 			for (Map<String, String> r : resultList) {
 				// 計算用
 				i++;
-				
-				if (!r.get("AcNoCode").equals(acNoCode) ) {
-					//科目
+
+				if (!r.get("AcNoCode").equals(acNoCode)) {
+					// 科目
 					acNoCode = r.get("AcNoCode");
-					//子目
+					// 子目
 					acSubCode = r.get("AcSubCode");
-					//科目中文
+					// 科目中文
 					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
-				
+
 					if (i > 1) {
-						//子目小計列印
+						// 子目小計列印
 						acSubCodeCalculate();
-						//科目小計列印
+						// 科目小計列印
 						acNoCodeCalculate();
-						
+
 						this.newPage();
 					}
 
@@ -240,28 +240,35 @@ public class L9132Report extends MakeReport {
 
 				} else {
 
-		
-					
 					this.info("AcSubCode=" + acSubCode + " === " + r.get("AcSubCode") + " : " + i);
-					
-					// 子目：不同子目時畫子目小計 並換頁 
+
+					// 子目：不同子目時畫子目小計 並換頁
 					if (!r.get("AcSubCode").equals(acSubCode) && i > 2) {
 						acSubCodeCalculate();
-						
-						acSubCode = r.get("AcSubCode");			
-						
-						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
-						
-						this.newPage();
-						
-						batchTitle();
-					}
 
+						acSubCode = r.get("AcSubCode");
+
+						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12)
+								: r.get("AcNoItem");
+
+						this.newPage();
+
+						batchTitle();
+					} else if (!r.get("AcctCode").equals(acctCode) && i > 2) {
+
+						acSubCode = r.get("AcSubCode");
+
+						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12)
+								: r.get("AcNoItem");
+
+						this.newPage();
+
+						batchTitle();
+
+					}
 
 				}
 
-				
-				
 				// 子目
 				String acSubCode = r.get("AcSubCode");
 				// 傳票號碼
@@ -281,7 +288,7 @@ public class L9132Report extends MakeReport {
 				// 借貸方金額(計算用)
 				int tDbAmt = Integer.valueOf(r.get("DbAmt")) == 0 ? 0 : Integer.valueOf(r.get("DbAmt"));
 				int tCrAmt = Integer.valueOf(r.get("CrAmt")) == 0 ? 0 : Integer.valueOf(r.get("CrAmt"));
-				
+
 				// 經辦
 				String empName = r.get("EmpName");
 
@@ -297,7 +304,7 @@ public class L9132Report extends MakeReport {
 				// 傳票號碼
 				print(0, 56, slipNo, "R");
 				// 區隔帳冊
-				print(0, 67, acSubBookItem,"C");
+				print(0, 67, acSubBookItem, "C");
 				// 戶號
 				print(0, 82, custNo);
 				// 貸方金額
@@ -311,7 +318,6 @@ public class L9132Report extends MakeReport {
 				tempAcSubCodeCount++;
 				tempAcSubCodeDbAmtTotal = tempAcSubCodeDbAmtTotal + tDbAmt;
 				tempAcSubCodeCrAmtTotal = tempAcSubCodeCrAmtTotal + tCrAmt;
-
 
 				// 科目小計
 				tempAcNoCodeCount++;
@@ -357,12 +363,12 @@ public class L9132Report extends MakeReport {
 
 //		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate)
-				.setBrno(brno).setRptCode(reportCode).setRptItem(reportItem).setSecurity(security)
-				.setRptSize(pageSize).setPageOrientation(pageOrientation).build();
-		
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(reportCode)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+
 		this.open(titaVo, reportVo);
-		
+
 		this.setCharSpaces(0);
 
 		// 傳票批號篩選

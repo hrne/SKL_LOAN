@@ -174,6 +174,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          WHEN ACD.\"ReceivableFlag\" = '8' ";
 		sql += "          THEN ACD.\"RvNo\" ";
 		sql += "        ELSE ' ' END              AS \"AcReceivableCode\" "; // 銷帳碼
+		sql += "      , ACD.\"AcctCode\" ";    
 		sql += " FROM \"AcDetail\" ACD ";
 		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                            AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
@@ -181,6 +182,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "   AND ACD.\"SlipBatNo\" = :slipBatNo ";
 		sql += "   AND ACD.\"EntAc\" != 9 "; // 排除入總帳記號為9的資料
+		sql += "   AND ACD.\"EntAc\" > 0 ";
 		sql += " GROUP BY ACD.\"AcDate\"        "; // 會計日期
 		sql += "        , ACD.\"SlipBatNo\"     "; // 傳票批號
 		sql += "        , ACD.\"AcBookCode\"    "; // 帳冊別: 000:全公司
@@ -193,11 +195,13 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHEN ACD.\"ReceivableFlag\" = '8' ";
 		sql += "            THEN ACD.\"RvNo\" ";
 		sql += "          ELSE ' ' END "; // 銷帳碼
+		sql += "        , ACD.\"AcctCode\" "; 
 		sql += " ORDER BY ACD.\"AcDate\"        "; // 會計日期
 		sql += "        , ACD.\"AcBookCode\"    "; // 帳冊別: 000:全公司
 		sql += "        , ACD.\"AcSubBookCode\" "; // 區隔帳冊
 		sql += "        , ACD.\"AcNoCode\"      "; // 科目代號
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
+		sql += "        , ACD.\"AcctCode\" "; 
 		sql += "        , ACD.\"DbCr\" DESC     "; // 借貸別
 		sql += "        , RPAD(CDAC.\"AcNoItem\",40,' ') "; // 傳票摘要
 		sql += "        , CASE ";
