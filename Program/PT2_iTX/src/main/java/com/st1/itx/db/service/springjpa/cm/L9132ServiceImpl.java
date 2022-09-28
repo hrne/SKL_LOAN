@@ -141,6 +141,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           AND AC.\"TitaTxtNo\" = TO_NUMBER(SUBSTR(B.\"BatchNo\",5,2)) * 1000000 + B.\"DetailSeq\"";
 		sql += "     WHERE AC.\"AcDate\" = :acDate ";
 		sql += "       AND AC.\"SlipBatNo\" = :batchNo ";
+		sql += "       AND \"EntAc\" > 0 ";
 		sql += " ) ";
 		//--批次
 		sql += " , groupData AS ( ";
@@ -181,7 +182,6 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , \"EmpName\" ";
 		sql += "     FROM rawData ";
 		sql += "     WHERE \"EntAcCode\" = 0";
-		sql += "       AND \"EntAc\" > 0 ";
 		sql += "     GROUP BY \"AcNoCode\" ";
 		sql += "            , \"AcNoItem\" ";
 		sql += "            , \"AcSubCode\" ";
@@ -218,6 +218,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) ";
 		sql += " ORDER BY \"AcNoCode\" ASC";
 		sql += "		 ,\"AcSubCode\" ASC";
+		sql += "         ,\"AcNoItem\" ASC";
 //		sql += " 		 ,CASE WHEN \"SlipNo\" LIKE '9%' AND LENGTH(\"SlipNo\") = 5 THEN \"SlipNo\" ELSE \"SlipNo\" * 99999 END ASC";
 		sql += " 		 ,\"SlipNo\" ASC";
 		sql += "		 ,\"CustNo\" ASC";

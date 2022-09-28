@@ -880,7 +880,7 @@ BEGIN
     UPD_CNT := 0; 
  
     UPDATE "JcicB092" M 
-    SET   M."EvaAmt" = SUBSTR('00000000' || TRUNC(to_number(M."LoanLimitAmt") * 1.2), -8) 
+    SET   M."EvaAmt" = SUBSTR('00000000' || to_number(M."SettingAmt") , -8) 
     WHERE M."DataYM" =  YYYYMM 
       AND to_number(M."EvaAmt") <  to_number(M."LoanLimitAmt") 
      ; 

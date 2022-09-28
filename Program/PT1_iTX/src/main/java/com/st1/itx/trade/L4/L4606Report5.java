@@ -93,7 +93,7 @@ public class L4606Report5 extends MakeReport {
 			if ((tL4606Vo.get("F8") == "")) {
 				F8 = "          ";
 			} else {
-				F8 = fillUpWord(tL4606Vo.get("F8"), 10, " ", "L");
+				F8 = fillUpWord(tL4606Vo.get("F8"), 8, " ", "R");
 			}
 
 			//火險服務ID
@@ -101,7 +101,7 @@ public class L4606Report5 extends MakeReport {
 			if ((tL4606Vo.get("F9") == "")) {
 				F9 = "      ";
 			} else {
-				F9 = fillUpWord(tL4606Vo.get("F9"), 6, " ", "L");
+				F9 = fillUpWord(tL4606Vo.get("F9"), 10, " ", "R");
 			}
 
 			//火險服務人
@@ -109,7 +109,7 @@ public class L4606Report5 extends MakeReport {
 			if ((tL4606Vo.get("F10") == "")) {
 				F10 = "                  ";
 			} else {
-				F10 = fillUpWord(tL4606Vo.get("F10"), 18, " ", "R");
+				F10 = fillUpWord(tL4606Vo.get("F10"), 7, " ", "R");
 			}
 
 			if (i == 0) {
@@ -148,8 +148,8 @@ public class L4606Report5 extends MakeReport {
 						+ fillUpWord((padStart(7, tL4606Vo.get("F6"))), 7, " ", "R")
 						+ "  " 
 						+ fillUpWord((padStart(3, tL4606Vo.get("F7"))), 4, " ", "R")+"   " 
-						+ F8+"   "+ F9+"          "+ F10+" "
-						+ fillUpWord(String.format("%,d", Integer.parseInt(tL4606Vo.get("F11"))), 8, " ", "L"));
+						+ F8+"   "+ F9+"     "+ F10+" "
+						+ fillUpWord(String.format("%,d", Integer.parseInt(tL4606Vo.get("F11"))), 16, " ", "L"));
 
 				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
@@ -166,9 +166,9 @@ public class L4606Report5 extends MakeReport {
 					if (officer != null && !officer.isEmpty()) {
 						tfire.add(officer);
 					}
+					makeFile.put("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					makeFile.put("                                                                                            小　計："
-									+ String.format("%,d", times) +  " 筆				                                        " + String.format("%,d", amt.intValue())
-							+ ("--------------------------------------------------------------------------------------------------------------------------------------------------------"));
+									+ String.format("%,d", times) +  " 筆				                                        " + String.format("%,d", amt.intValue()));
 					amt = new BigDecimal("0");
 					total = total + times;
 					times = 1;

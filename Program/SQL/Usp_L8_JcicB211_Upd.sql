@@ -129,13 +129,19 @@ BEGIN
                   , M."Status", M."LastOvduNo",T3."TxStatus"
              FROM ( SELECT  T1."CustNo", T1."FacmNo", T1."BormNo", T1."BorxNo"
                           , ( T1."Principal"  ) AS "Principal"
-                          , T1."LoanBal", T1."TitaHCode", T1."TitaTxCd", T1."AcDate"
+                          , CASE WHEN T1."TitaHCode" = 3 THEN  NVL(LT."LoanBal",0)  -- 找原被沖正的那筆餘額
+                                 ELSE T1."LoanBal"
+                            END  AS "LoanBal"     
+                          , T1."TitaHCode", T1."TitaTxCd", T1."AcDate"
                           , CASE WHEN T1."TitaHCode" = 3 AND T1."CorrectSeq" IS NOT NULL THEN
                                       CAST(SUBSTR(T1."CorrectSeq", 1, 8) AS decimal(8, 0))
                                  ELSE 0
                             END  AS "OrigAcDate"   -- 原交易會計日期
                           , ' ' AS "TxStatus"  -- 非結案-債權結案註記= ' ' 
                       FROM  "LoanBorTx" T1
+                      LEFT JOIN "LoanBorTx" LT ON LT."AcDate" = to_number(SUBSTR(NVL(T1."CorrectSeq",'0'), 1, 8))
+                                              AND LT."TitaTlrNo" = SUBSTR(NVL(T1."CorrectSeq",'0'), 13, 6)
+                                              AND LT."TitaTxtNo" = SUBSTR(NVL(T1."CorrectSeq",'0'), 19, 8)
                      WHERE  T1."AcDate"    =  TBSDYF
                        AND  T1."TitaHCode" IN (0, 3)
                        AND  T1."Principal"  <> 0
@@ -146,6 +152,7 @@ BEGIN
                                  ELSE T2."Principal"  
                             END             AS "Principal"
                           , CASE WHEN M."Status" IN ( 2 , 6 ) THEN (T2."Principal" + T2."Interest")  -- 催收呆帳戶=本金+利息
+                                 WHEN T2."TitaHCode" = 3 THEN  NVL(LB."LoanBal",0)  -- 找原被沖正的那筆餘額
                                  ELSE T2."LoanBal"
                             END             AS  "LoanBal"     
                           , T2."TitaHCode", T2."TitaTxCd", T2."AcDate"
@@ -170,6 +177,9 @@ BEGIN
                                                 AND AL."OldFacmNo" =  T2."FacmNo"
                                                 AND AL."OldBormNo" =  T2."BormNo"
                                                 AND AL."AcDate"    =  T2."AcDate"   
+                    LEFT JOIN "LoanBorTx" LB ON LB."AcDate" = to_number(SUBSTR(NVL(T2."CorrectSeq",'0'), 1, 8))
+                                            AND LB."TitaTlrNo" = SUBSTR(NVL(T2."CorrectSeq",'0'), 13, 6)
+                                            AND LB."TitaTxtNo" = SUBSTR(NVL(T2."CorrectSeq",'0'), 19, 8)
                     WHERE  T2."AcDate"    =  TBSDYF
                       AND  T2."TitaHCode" IN (0, 3)
                       AND  T2."Principal"  <> 0
