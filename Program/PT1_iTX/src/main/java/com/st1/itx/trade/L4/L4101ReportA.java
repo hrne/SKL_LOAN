@@ -223,10 +223,6 @@ public class L4101ReportA extends MakeReport {
 					oldFacmNo = tAcDetail.getFacmNo();
 					cnt++;
 				}
-//				if (!wkRelTxSeq.equals(tAcDetail.getRelTxseq())) {
-//					wkRelTxSeq = tAcDetail.getRelTxseq();
-//					cnt++;
-//				}
 
 				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11)
 						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5);

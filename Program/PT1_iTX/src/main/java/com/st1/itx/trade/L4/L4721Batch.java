@@ -63,12 +63,12 @@ public class L4721Batch extends TradeBuffer {
 			flag = false;
 		}
 //
-//		try {
-//			l4721Report2.exec(titaVo, this.txBuffer);
-//		} catch (LogicException e) {
-//			sendMsg = e.getErrorMsg();
-//			flag = false;
-//		}
+		try {
+			l4721Report2.exec(titaVo, this.txBuffer);
+		} catch (LogicException e) {
+			sendMsg = e.getErrorMsg();
+			flag = false;
+		}
 
 		// 送出通知訊息
 		sendMessage(titaVo);
@@ -110,7 +110,8 @@ public class L4721Batch extends TradeBuffer {
 
 			sendMsg = sendMsg + "，報表產出完畢。";
 
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getEmpNot() + "L4721", sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getEmpNot() + "L4721", sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4721", "", sendMsg, titaVo);
 		}

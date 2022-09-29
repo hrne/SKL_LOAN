@@ -224,6 +224,8 @@ public class L9132Report extends MakeReport {
 					acNoCode = r.get("AcNoCode");
 					// 子目
 					acSubCode = r.get("AcSubCode");
+					
+					acctCode = r.get("AcctCode");
 					// 科目中文
 					acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12) : r.get("AcNoItem");
 
@@ -241,12 +243,15 @@ public class L9132Report extends MakeReport {
 				} else {
 
 					this.info("AcSubCode=" + acSubCode + " === " + r.get("AcSubCode") + " : " + i);
-
+					this.info("AcctCode=" + acctCode + " === " + r.get("AcctCode") + " : " + i);
 					// 子目：不同子目時畫子目小計 並換頁
-					if (!r.get("AcSubCode").equals(acSubCode) && i > 2) {
+					if ((!r.get("AcSubCode").equals(acSubCode) && i > 2) ||
+							(!r.get("AcctCode").equals(acctCode) && i > 2)) {
 						acSubCodeCalculate();
 
 						acSubCode = r.get("AcSubCode");
+						
+						acctCode = r.get("AcctCode");
 
 						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12)
 								: r.get("AcNoItem");
@@ -259,6 +264,7 @@ public class L9132Report extends MakeReport {
 
 				// 子目
 				String acSubCode = r.get("AcSubCode");
+		
 				// 傳票號碼
 				String slipNo = "0".equals(r.get("SlipNo")) ? " " : r.get("SlipNo");
 

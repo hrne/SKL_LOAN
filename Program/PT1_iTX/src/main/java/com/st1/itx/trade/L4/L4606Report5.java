@@ -260,7 +260,7 @@ public class L4606Report5 extends MakeReport {
 			i++;
 			if (i == listL4606.size()) {
 				makeFile.put("                                                                                            小　計："
-						+ String.format("%,d", times) + " 筆				                                                  "+ String.format("%,d", amt.intValue()));
+						+ String.format("%,d", times) + " 筆				                                                   "+ String.format("%,d", amt.intValue()));
 				makeFile.put(
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 				total = total + times;
@@ -292,7 +292,7 @@ public class L4606Report5 extends MakeReport {
 		}
 		makeFile.put("                                                                                            總　計："
 				+ String.format("%,d", total) + "筆 " + "             火險服務人：    " + String.format("%,d", tfire.size())
-				+ "           人                                         " + String.format("%,d", totamt.intValue()));
+				+ "           人                              " + String.format("%,d", totamt.intValue()));
 		makeFile.put(
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		makeFile.put("　　　　　　　　　　　　　　　　　　　             =====報  表  結  束=====");
