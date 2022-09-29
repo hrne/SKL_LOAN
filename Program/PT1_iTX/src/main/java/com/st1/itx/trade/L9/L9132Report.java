@@ -254,19 +254,7 @@ public class L9132Report extends MakeReport {
 						this.newPage();
 
 						batchTitle();
-					} else if (!r.get("AcctCode").equals(acctCode) && i > 2) {
-
-						acSubCode = r.get("AcSubCode");
-
-						acNoItem = "10121100000".equals(acNoCode) ? r.get("AcNoItem").substring(0, 12)
-								: r.get("AcNoItem");
-
-						this.newPage();
-
-						batchTitle();
-
-					}
-
+					} 
 				}
 
 				// 子目

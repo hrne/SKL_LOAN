@@ -42,15 +42,15 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 !T(1,@FunctionCode,#NTXBUF,1,1)
 
-#FunctionCodeHelp=X,30,S
-T(3,0:全部;1:成功;2:人工;3:失敗)
+#FunctionCodeHelp=X,40,S
+T(3,0:全部[不含失敗];1:成功;2:人工;3:失敗)
 
 ! 作業項目
 #FunctionCode=A,1,I
 HELP(#FunctionCodeHelp)
 @V(H,#FunctionCodeHelp)
 
-#FunctionCodeX=X,10,L
+#FunctionCodeX=X,18,L
 T(H,#FunctionCode,#FunctionCodeHelp)
 
 !0.全部：隱藏報表種類

@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4322 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4322.class);
 	/* DB服務注入 */
 	@Autowired
 	public CdCityService cdCityService;
@@ -72,7 +71,8 @@ public class L4322 extends TradeBuffer {
 				tCdCity.setIntRateCeiling(parse.stringToBigDecimal(iIntRateCeiling));
 				tCdCity.setIntRateFloor(parse.stringToBigDecimal(iIntRateFloor));
 
-				if (tCdCity2.getIntRateCeiling().compareTo(tCdCity.getIntRateCeiling()) == 0 && tCdCity2.getIntRateIncr().compareTo(tCdCity.getIntRateIncr()) == 0
+				if (tCdCity2.getIntRateCeiling().compareTo(tCdCity.getIntRateCeiling()) == 0
+						&& tCdCity2.getIntRateIncr().compareTo(tCdCity.getIntRateIncr()) == 0
 						&& tCdCity2.getIntRateFloor().compareTo(tCdCity.getIntRateFloor()) == 0) {
 					this.info("tCdCity2.getIntRateCeiling() ... '" + tCdCity2.getIntRateCeiling());
 					this.info("tCdCity.getIntRateCeiling() ... '" + tCdCity.getIntRateCeiling());
@@ -84,7 +84,8 @@ public class L4322 extends TradeBuffer {
 					continue;
 				}
 
-				tCdCity.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+				tCdCity.setLastUpdate(
+						parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tCdCity.setLastUpdateEmpNo(titaVo.getTlrNo());
 
 				try {
@@ -94,7 +95,7 @@ public class L4322 extends TradeBuffer {
 				}
 
 				dataLog.setEnv(titaVo, tCdCity2, tCdCity);
-				dataLog.exec();
+				dataLog.exec("修改 " + tCdCity.getCityCode() + "-" + tCdCity.getCityItem());
 			}
 		}
 
