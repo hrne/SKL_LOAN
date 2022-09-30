@@ -43,7 +43,8 @@ public class L4606Report5 extends MakeReport {
 
 		List<Map<String, String>> listL4606 = null;
 		try {
-			listL4606 = l4606ServiceImpl.findAll(titaVo);
+//			listL4606 = l4606ServiceImpl.findAll(titaVo);
+			listL4606 = l4606ServiceImpl.find(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -167,7 +168,8 @@ public class L4606Report5 extends MakeReport {
 					}
 					makeFile.put("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					makeFile.put("                                                                                            小　計："
-									+ String.format("%,d", times) +  " 筆				                                                 " + String.format("%,d", amt.intValue()));
+							+ String.format("%,d", times) +  " 筆			                                                  " + fillUpWord(String.format("%,d", amt.intValue()), 10, " ", "L"));
+					
 					amt = new BigDecimal("0");
 					total = total + times;
 					times = 1;
@@ -212,7 +214,7 @@ public class L4606Report5 extends MakeReport {
 
 					}
 
-				}
+				} 
 
 				makeFile.put(
 						  fillUpWord(tL4606Vo.get("F0"), 15, " ", "R") 
@@ -259,10 +261,12 @@ public class L4606Report5 extends MakeReport {
 			
 			i++;
 			if (i == listL4606.size()) {
-				makeFile.put("                                                                                            小　計："
-						+ String.format("%,d", times) + " 筆				                                                   "+ String.format("%,d", amt.intValue()));
-				makeFile.put(
-						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+//				makeFile.put("                                                                                            小　計："
+//						+ String.format("%,d", times) + " 筆				                                                   "+ String.format("%,d", amt.intValue()));
+//				makeFile.put(
+//						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+				
 				total = total + times;
 				times = 0;
 				pageCnt = pageCnt + 2;
