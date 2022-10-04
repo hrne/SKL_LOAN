@@ -261,7 +261,7 @@ public class L4606Report5 extends MakeReport {
 			i++;
 			if (i == listL4606.size()) {
 				makeFile.put("                                                                                            小　計："
-						+ String.format("%,d", times) + " 筆				                                                   "+ String.format("%,d", amt.intValue()));
+						+ String.format("%,d", times) + " 筆				                                                  "+ String.format("%,d", amt.intValue()));
 				makeFile.put(
 						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 

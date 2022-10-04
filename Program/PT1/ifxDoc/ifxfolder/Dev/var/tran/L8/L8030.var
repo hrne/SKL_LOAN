@@ -107,8 +107,16 @@ T(2,@CourtCode56Help,#HelpDesc6)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-#NTXBUF=X,14,S
+#NTXBUF=X,20,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@checkFlag,#NTXBUF,1,1)
+T(1,@TranCode,#NTXBUF,2,3)
+T(1,@CustId,#NTXBUF,5,10)
+C(3,#checkFlag,0,E(0,@CHAIN,0),$)
+
+! 0:帶值自行輸入 1:帶值直接送出 
+#checkFlag=A,1,S
+
 
 !---------- 日期處理 ----------
 #VeiwSysDate=X,8,S
@@ -117,7 +125,6 @@ T(1,#VeiwSysDate,2,7)
 
 !交易編號
 #TranCode=A,3,I
-C(3,#CHAIN,1,T(1,#NTXBUF,1,3),$)
 C(3,#CHAIN,1,s,$)
 HELP(#TranCodeHelp,cols:3)
 @T(3,@TranCodeX,)
@@ -131,7 +138,6 @@ T(H,#TranCode,#TranCodeHelp)
 
 ![身分證字號]
 #CustId=X,10,I
-C(3,#CHAIN,1,T(1,#NTXBUF,4,10),$)
 C(3,#CHAIN,1,s,$)
 @T(3,@CustIdX,)V(7)A(ID_UNINO,0,#CustId)
 
