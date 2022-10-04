@@ -65,7 +65,6 @@ public class L8440 extends TradeBuffer {
 			this.info("ciArray     = " + c);
 
 			try {
-				// 今日轉出有JCIC日期
 				sL8440 = iL8440.FindData(titaVo, c);
 			} catch (Exception e) {
 				this.info("L8440 have JcicDate ===");
@@ -78,8 +77,6 @@ public class L8440 extends TradeBuffer {
 				OccursList = new OccursList();	
 				OccursList.putParam("OOTranCode", c);
 				String minCode = c.substring(5,8);
-//				OccursList.putParam("OOChainTxCd", "L8404");
-//				OccursList.putParam("OOCtxCd", "041");
 				switch (minCode) {
 				case "040":
 					OccursList.putParam("OOTranCode", "JcicZ040-前置協商受理申請暨請求回報債權通知資料");
@@ -267,18 +264,11 @@ public class L8440 extends TradeBuffer {
 					OccursList.putParam("OOChainTxCd", "L8439");
 					break;
 				}
-//				if(!"0".equals(isL8440.get("F0"))) {
 					OccursList.putParam("OOToDateReport",toDay);
-//				}else {
 					OccursList.putParam("OONotRepoet",notToDay);
-//				}
-//				OccursList.putParam("OOminCode",minCode);
-				
-				
+					
 				this.totaVo.addOccursList(OccursList);
 			}
-
-			
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
