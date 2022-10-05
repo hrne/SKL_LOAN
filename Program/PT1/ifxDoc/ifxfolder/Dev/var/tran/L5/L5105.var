@@ -1,0 +1,241 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L5105)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+[
+["[L5105]                                 覆審案件明細檔維護"],
+["#FdYearMonth+年月份",#YearMonth],
+["#FdConditionCode+條件代碼",#ConditionCode,#ConditionCodeX],
+["#FdCustNo+借款人戶號",#CustNo],
+["#FdFacmNo+額度號碼",#FacmNo],
+["#FdCustName+戶名",#CustName],
+["#FdReCheckCode+覆審記號",#ReCheckCode,#ReCheckCodeX],
+["#FdReChkYearMonth+覆審年月",#ReChkYearMonth],
+["#FdReChkUnit+應覆審單位",#ReChkUnit],
+["#FdFollowMark+追蹤記號",#FollowMark,#FollowMarkX],
+["#FdTraceYearMonth+追蹤年月",#TraceYearMonth],
+["#FdRemark+備註",#Remark],
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+#Submit=X,4,S
+K(MODIFYBUTTON,維護)
+
+! 必輸欄位
+#FdYearMonth=X,2,L
+#FdConditionCode=X,2,L
+#FdCustNo=X,2,L
+#FdFacmNo=X,2,L
+#FdCustName=X,2,L
+#FdReCheckCode=X,2,L
+#FdReChkYearMonth=X,2,L
+T(3,*)
+#FdReChkUnit=X,2,L
+#FdFollowMark=X,2,L
+#FdRemark=X,2,L
+#FdTraceYearMonth=X,2,L
+T(2,*)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!條件代碼
+#CDCODECondition=x,25,S
+T(3,CdCode.ConditionCode)
+#ConditionCodeHelp=x,1024,S
+!覆審記號
+#CDCODEReCheckHelp=x,25,S
+T(3,CdCode.ReCheck)
+#ReCheckHelp=x,1024,S
+!追蹤記號
+#CDCODEFollowMark=x,25,S
+T(3,CdCode.FollowMark)
+#FollowMarkHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODECondition,#CDCODEReCheckHelp,#CDCODEFollowMark)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ConditionCodeHelp,#HelpDesc1)
+T(2,@ReCheckHelp,#HelpDesc2)
+T(2,@FollowMarkHelp,#HelpDesc3)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5905進入),$)
+
+#NTXBUF=X,17,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@YearMonth,#NTXBUF,1,5)
+T(1,@ConditionCode,#NTXBUF,6,2)
+T(1,@CustNo,#NTXBUF,8,7)
+T(1,@FacmNo,#NTXBUF,15,3)
+
+!年月份
+#YearMonth=A,5,L
+
+!條件代碼
+#ConditionCode=A,2,L
+C(3,#CHAIN,1,s,$)
+HELP(#ConditionCodeHelp)
+@T(3,@ConditionCodeX,)
+V(H,#ConditionCodeHelp)
+
+#ConditionCodeX=X,40,L
+T(H,#ConditionCode,#ConditionCodeHelp)
+
+!借款人戶號
+#CustNo=A,7,L
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+
+!額度號碼
+#FacmNo=A,3,L
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+
+#RimYearMonth=9,5,S
+E(0,#YearMonth)
+
+#RimConditionCode=9,2,S
+E(0,#ConditionCode)
+
+#RimCustNo=9,7,S
+E(0,#CustNo)
+
+#RimFacmNo=9,3,S
+E(0,#FacmNo)
+
+#SendL5R08=X,1,S
+RESET_RIM(#SendL5R08,L5R08)
+S(L5R08,1,#RimYearMonth,#RimConditionCode,#RimCustNo,#RimFacmNo)
+R(1,L5R08)
+
+#RecvL5R08=X,1,S
+T(2,@CustName,#L5R08CustName)
+T(2,@ReCheckCode,#L5R08ReCheckCode)
+T(H,@ReCheckCodeX,#ReCheckCode,#ReCheckHelp)
+E(0,@ReChkYearMonth,#L5R08ReChkYearMonth)
+T(2,@ReChkUnit,#L5R08ReChkUnit)
+T(2,@FollowMark,#L5R08FollowMark)
+T(H,@FollowMarkX,#FollowMark,#FollowMarkHelp)
+T(2,@Remark,#L5R08Remark)
+E(0,@TraceYearMonth,#L5R08TraceYearMonth)
+
+
+#Space=X,1,S
+C(5,#FollowMark,2,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
+
+!戶名
+#CustName=X,100,L
+!覆審記號  可不輸入
+#ReCheckCode=X,1,I
+HELP(#ReCheckHelp)
+@T(3,@ReCheckCodeX,)
+C(4,#ReCheckCode,$,V(H,#ReCheckHelp))
+C(5,#ReCheckCode,1,T(F,@ReChkYearMonth,1)T(2,@FdReChkYearMonth,*),T(F,@ReChkYearMonth,0)T(2,@FdReChkYearMonth, ))
+
+#ReCheckCodeX=X,6,L
+C(4,#ReCheckCode,S,T(H,#ReCheckCode,#ReCheckHelp))
+
+!覆審年月  免覆審=1 不輸入 
+#ReChkYearMonth=A,5,I
+C(5,#ReCheckCode,1,$,S)
+@A(YM,0,#ReChkYearMonth)V(2,0)
+
+!應覆審單位
+#ReChkUnit=X,20,I
+
+!追蹤記號  可不輸入
+#FollowMark=X,1,I
+HELP(#FollowMarkHelp)
+@T(3,@FollowMarkX,)
+C(4,#FollowMark,$,V(H,#FollowMarkHelp))
+C(5,#FollowMark,2,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
+
+#FollowMarkX=X,6,L
+C(4,#FollowMark,S,T(H,#FollowMark,#FollowMarkHelp))
+
+! 追蹤年月 追蹤記號=2時開啟
+#TraceYearMonth=A,5,I
+C(5,#FollowMark,2,$,S)
+@A(YM,0,#TraceYearMonth)V(2,0)
+
+!備註
+#Remark=X,120,I
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L5R08.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L5105 ----------
+<sub type="FORM" name="L5105">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L5105,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L5105] 覆審案件明細檔維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#YearMonth
+#ConditionCode
+#CustNo
+#FacmNo
+#ReCheckCode
+#ReChkYearMonth
+#ReChkUnit
+#FollowMark
+#TraceYearMonth
+#Remark
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L5105
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R08.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -101,7 +101,7 @@ public class L5905 extends TradeBuffer {
 				occursList.putParam("OOConditionCode", sConditionCode);
 				occursList.putParam("OOCustNo", parse.stringToInteger(result.get("CustNo")));
 				occursList.putParam("OOFacmNo", parse.stringToInteger(result.get("FacmNo")));
-				occursList.putParam("OOReCheckCode", parse.stringToInteger(result.get("CheckCode")));
+				occursList.putParam("OOReCheckCode", parse.stringToInteger(result.get("ReCheckCode")));
 				occursList.putParam("OOFollowMark", parse.stringToInteger(result.get("FollowMark")));
 
 				itempdate = parse.stringToInteger(result.get("DrawdownDate")) ;
@@ -113,11 +113,11 @@ public class L5905 extends TradeBuffer {
 
 				occursList.putParam("OOLoanBal", parse.stringToInteger(result.get("LoanBal")));
 				occursList.putParam("OOEvaluation", parse.stringToInteger(result.get("Evaluation")));
-				occursList.putParam("OOCustTypeItem", result.get("CustTypeItem)"));
-				occursList.putParam("OOUsageItem", result.get("UsageItem)"));
-				occursList.putParam("OOCityItem", result.get("CityItem)"));
-				occursList.putParam("OOReChkUnit", result.get("ReChkUnit)"));
-				occursList.putParam("OORemark", result.get("Remark)"));
+				occursList.putParam("OOCustTypeItem", result.get("CustTypeItem"));
+				occursList.putParam("OOUsageItem", result.get("UsageItem"));
+				occursList.putParam("OOCityItem", result.get("CityItem"));
+				occursList.putParam("OOReChkUnit", result.get("ReChkUnit"));
+				occursList.putParam("OORemark", result.get("Remark"));
 
 				iTraceMonth = parse.stringToInteger(result.get("TraceMonth"));
 				if (iTraceMonth == 0) {
@@ -125,7 +125,8 @@ public class L5905 extends TradeBuffer {
 				} else {
 					occursList.putParam("OOTraceYearMonth", iTraceMonth - 191100);
 				}
-				occursList.putParam("OOSpecifyFg", parse.stringToInteger(result.get("SpecifyFg")));
+				occursList.putParam("OOSpecifyFg", result.get("SpecifyFg"));
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

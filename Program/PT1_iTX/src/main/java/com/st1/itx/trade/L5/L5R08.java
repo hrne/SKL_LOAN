@@ -92,6 +92,14 @@ public class L5R08 extends TradeBuffer {
 		this.totaVo.putParam("L5R08ReChkUnit", mInnReCheck.getReChkUnit());
 		this.totaVo.putParam("L5R08FollowMark", mInnReCheck.getFollowMark());
 		this.totaVo.putParam("L5R08Remark", mInnReCheck.getRemark());
+		
+		int iTraceYearMonth = mInnReCheck.getTraceMonth();
+		if (iTraceYearMonth == 0) {
+			this.totaVo.putParam("L5R08TraceYearMonth", 0);
+		} else {
+			iTraceYearMonth = iTraceYearMonth - 191100;
+			this.totaVo.putParam("L5R08TraceYearMonth", iTraceYearMonth);
+		}
 
 	}
 

@@ -106,6 +106,7 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,I.\"ReChkUnit\" 						AS \"ReChkUnit\"				\n"; // 應覆審單位
 		sql += " ,I.\"Remark\" 							AS \"Remark\"					\n"; // 備註
 		sql += " ,I.\"TraceMonth\" 						AS \"TraceMonth\"				\n"; // 追蹤年月
+		sql += " ,I.\"SpecifyFg\" 						AS \"SpecifyFg\"				\n"; // 指定複審記號
 
 		sql += " FROM \"InnReCheck\" I													\n";
 		sql += " LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = I.\"CustNo\"				\n";
@@ -118,7 +119,7 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		if (iInqFg==1) {
 			sql += " AND  I.\"YearMonth\" = :iFYearMonth       \n";
-			sql += " AND  I.\"ConditionCode\" = iConditionCode       \n";
+			sql += " AND  I.\"ConditionCode\" = :iConditionCode       \n";
 		}
 		if (iInqFg == 2) {
 			sql += " AND ( I.\"YearMonth\" >= :iFYearMonthS    AND   \n";

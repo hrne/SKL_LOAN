@@ -6020,6 +6020,7 @@ TXFORM=L5R07
 #L5R08ReChkUnit=X,20,S
 #L5R08FollowMark=X,1,S
 #L5R08Remark=X,120,S
+#L5R08TraceYearMonth=N,5,S
 </L5R08.dec>
 
 <L5R08.tom>
@@ -6030,6 +6031,7 @@ TXFORM=L5R08
 #L5R08ReChkUnit
 #L5R08FollowMark
 #L5R08Remark
+#L5R08TraceYearMonth
 ^
 </L5R08.tom>
 

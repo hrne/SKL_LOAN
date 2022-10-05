@@ -455,6 +455,13 @@ public class L4606Batch extends TradeBuffer {
 					errorList.add(tempOccursList);
 					continue;
 				}
+				
+				if("".equals(tempOccursList.get("CustNo"))) {
+					custErrorCnt++;
+					tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+					errorList.add(tempOccursList);
+					continue;
+				}
 
 				tInsuCommId.setInsuYearMonth(iInsuEndMonth);
 				tInsuCommId.setInsuCommSeq(seq);
@@ -497,6 +504,12 @@ public class L4606Batch extends TradeBuffer {
 					Map<String, String> result = resultList.get(0);
 					int checkCustNo = parse.stringToInteger(result.get("CustNo") == null ? "" : result.get("CustNo"));
 					if (checkCustNo == 0) {
+						custErrorCnt++;
+						tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+						errorList.add(tempOccursList);
+						continue;
+					}
+					if("".equals(result.get("CustNo"))) {
 						custErrorCnt++;
 						tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
 						errorList.add(tempOccursList);
