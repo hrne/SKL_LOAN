@@ -458,7 +458,7 @@ public class L4606Batch extends TradeBuffer {
 				
 				if("".equals(tempOccursList.get("CustNo"))) {
 					custErrorCnt++;
-					tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+					tempOccursList.putParam("ErrorMsg", "戶號為空白");
 					errorList.add(tempOccursList);
 					continue;
 				}
@@ -511,7 +511,7 @@ public class L4606Batch extends TradeBuffer {
 					}
 					if("".equals(result.get("CustNo"))) {
 						custErrorCnt++;
-						tempOccursList.putParam("ErrorMsg", "戶號錯誤:" + custNo);
+						tempOccursList.putParam("ErrorMsg", "戶號為空白");
 						errorList.add(tempOccursList);
 						continue;
 					}

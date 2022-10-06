@@ -80,9 +80,9 @@ public class L5905ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iFTraceYearMonthE = iTraceYearMonthE + 191100;
 		}
 		String iReChkMonth = titaVo.getParam("ReChkMonth");//覆審月份
-		if (iInqFg == 4) {
-			iFTraceYearMonthS = 191101;
-			iFTraceYearMonthE = parse.stringToInteger(titaVo.getCalDy().substring(0,5))+191100;
+		if (iInqFg == 4) {//未完成:追蹤年月未到期,尚須追蹤
+			iFTraceYearMonthS = parse.stringToInteger(titaVo.getCalDy().substring(0,5))+191100;
+			iFTraceYearMonthE = 999999;
 		}
 		this.info("L5905 iFYearMonth : " + iFYearMonth + "-" + iFYearMonthS + "-" + iFYearMonthE);
 		this.info("L5905 iFTraceYearMonthS = " + iFTraceYearMonthS + "-" + iFTraceYearMonthE );
