@@ -18,7 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service("l5813ServiceImpl")
 @Repository
-/* AML每日有效客戶名單 */
 public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -60,6 +59,52 @@ public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iYYYYMM", iYYYYMM);
+
+		return this.convertToMap(query);
+	}
+
+	public List<Map<String, String>> queryBuildingOwner(int custNo, int facmNo, TitaVo titaVo) throws Exception {
+
+		this.info("queryBuildingOwner , custNo = " + custNo + " , facmNo = " + facmNo);
+
+		if (custNo == 0) {
+			this.info("CustNo = 0 return.");
+			return null;
+		}
+
+		String sql = "　";
+		sql += " SELECT NVL(OwnerCM.\"CustId\",CM.\"CustId\")     AS \"CustId\" ";
+		sql += "      , NVL(OwnerCM.\"CustName\",CM.\"CustName\") AS \"CustName\" ";
+		sql += "      , ROW_NUMBER() ";
+		sql += "        OVER ( ";
+		sql += "          PARTITION BY ";
+		sql += "            CF.\"CustNo\" ";
+		sql += "            , CF.\"FacmNo\" ";
+		sql += "          ORDER BY ";
+		sql += "            CASE ";
+		sql += "              WHEN NVL(CM.\"CustId\",' ') != ' ' ";
+		sql += "                   AND NVL(OwnerCM.\"CustId\",' ') != ' ' ";
+		sql += "                   AND CM.\"CustId\" = OwnerCM.\"CustId\" ";
+	    sql += "              THEN 0 ";
+	    sql += "            ELSE 1 END ";
+	    sql += "            , NVL(OwnerCM.\"CustId\",CM.\"CustId\") ";
+	    sql += "        ) AS \"Seq\" ";
+		sql += " FROM  \"ClFac\" CF ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = CF.\"CustNo\" ";
+		sql += " LEFT JOIN \"ClBuildingOwner\" CBO ON CBO.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                                  AND CBO.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                                  AND CBO.\"ClNo\" = CF.\"ClNo\" ";
+		sql += " LEFT JOIN \"CustMain\" OwnerCM ON OwnerCM.\"CustUKey\" = CBO.\"OwnerCustUKey\" ";
+		sql += " WHERE CF.\"CustNo\"= :custNo ";
+		sql += "   AND CF.\"FacmNo\"= :facmNo ";
+		sql += " ORDER BY \"Seq\" ";
+
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("custNo", custNo);
+		query.setParameter("facmNo", facmNo);
 
 		return this.convertToMap(query);
 	}

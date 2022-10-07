@@ -446,6 +446,14 @@ public class L4606Batch extends TradeBuffer {
 				String empName = "";
 				String agStatusCode = "";
 				String mediaCode = "";
+				
+				if("".equals(tempOccursList.get("CustNo"))) {
+					custErrorCnt++;
+					tempOccursList.putParam("ErrorMsg", "戶號為空白");
+					errorList.add(tempOccursList);
+					continue;
+				}
+				
 				int custNo = parse.stringToInteger(tempOccursList.get("CustNo"));
 				int facmNo = parse.stringToInteger(tempOccursList.get("FacmNo"));
 
@@ -456,12 +464,7 @@ public class L4606Batch extends TradeBuffer {
 					continue;
 				}
 				
-				if("".equals(tempOccursList.get("CustNo"))) {
-					custErrorCnt++;
-					tempOccursList.putParam("ErrorMsg", "戶號為空白");
-					errorList.add(tempOccursList);
-					continue;
-				}
+
 
 				tInsuCommId.setInsuYearMonth(iInsuEndMonth);
 				tInsuCommId.setInsuCommSeq(seq);

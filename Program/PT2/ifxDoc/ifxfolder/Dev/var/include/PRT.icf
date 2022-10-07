@@ -418,7 +418,7 @@ E(0,0)
 #FM101_EntAc=A,1,S
 
 #FM101_EntAcX=X,6,O
-C(2,#FM101_EntAc,T(3,未放行),T(3,已入帳),T(3,已沖正),T(3,沖正),T(3,訂正))
+! C(2,#FM101_EntAc,T(3,未放行),T(3,已入帳),T(3,已沖正),T(3,沖正),T(3,訂正))
 
 ![傳票摘要]
 #FM101_SlipNote=X,80,O
@@ -500,6 +500,7 @@ TXFORM=FM101
 #FM101_TitaTxCd
 #FM101_TitaTxCdX
 #FM101_EntAc
+#FM101_EntAcX
 #FM101_SlipNote
 #FM101_SlipBatNo
 #FM101_TitaSecNo

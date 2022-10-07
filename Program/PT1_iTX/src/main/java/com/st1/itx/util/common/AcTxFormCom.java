@@ -71,7 +71,8 @@ public class AcTxFormCom extends TradeBuffer {
 			headAcDetail = acDetailList.get(0);
 
 //			業務類別 01.撥款匯款 02.支票繳款 03.債協 09.放款
-			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2), titaVo);
+			CdCode tSN = cdCodeService.getItemFirst(6, "SecNo", FormatUtil.pad9(headAcDetail.getTitaSecNo(), 2),
+					titaVo);
 
 			String secNoX = "";
 
@@ -104,7 +105,8 @@ public class AcTxFormCom extends TradeBuffer {
 //			會計日期 
 			this.totaVo.putParam("FM101_AcDate", headAcDetail.getAcDate());
 //			登放序號 -> 交易序號
-			this.totaVo.putParam("FM101_RelTxseq", headAcDetail.getTitaKinbr() + headAcDetail.getTitaTlrNo() + parse.IntegerToString(headAcDetail.getTitaTxtNo(), 8));
+			this.totaVo.putParam("FM101_RelTxseq", headAcDetail.getTitaKinbr() + headAcDetail.getTitaTlrNo()
+					+ parse.IntegerToString(headAcDetail.getTitaTxtNo(), 8));
 //			交易代號 & 中文 
 			this.totaVo.putParam("FM101_TitaTxCd", headAcDetail.getTitaTxCd());
 			if (txTranCode == null) {
@@ -124,7 +126,46 @@ public class AcTxFormCom extends TradeBuffer {
 //			傳票批號 
 			this.totaVo.putParam("FM101_SlipBatNo", FormatUtil.pad9("" + headAcDetail.getSlipBatNo(), 2));
 //			總帳記號 0.未放行 1.已入帳 2.訂正  3.沖正  4-訂正(出分錄清單用，帳務明細刪除)
+//			TitaHCode
+//			0:正常
+//			1:訂正
+//			2:被訂正
+//			3:沖正
+//			4:被沖正
+//			TitaHCode為0時依EntAc顯示
+//			0:未入帳
+//			1:已入帳
+//			9.提存傳票已上傳核心(產生傳票批號>=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
+			String entAcX = "";
+			if ("0".equals(headAcDetail.getTitaHCode())) {
+				if (headAcDetail.getEntAc() == 0) {
+					entAcX = "未入帳";
+				} else {
+					entAcX = "已入帳";
+				}
+			} else {
+				// Entac=2 upd TitaHCode = 4
+				// Entac=3 upd TitaHCode = 3
+				// else upd TitaHCode = 0
+
+				switch (headAcDetail.getTitaHCode()) {
+				case "1":
+					entAcX = "訂正";
+					break;
+				case "2":
+					entAcX = "被訂正";
+					break;
+				case "3":
+					entAcX = "沖正";
+					break;
+				case "4":
+					entAcX = "被沖正";
+					break;
+				}
+			}
+
 			this.totaVo.putParam("FM101_EntAc", headAcDetail.getEntAc());
+			this.totaVo.putParam("FM101_EntAcX", entAcX);
 //			帳冊別
 			this.totaVo.putParam("FM101_AcBookCode", acBookCode);
 			this.totaVo.putParam("FM101_AcBookCodeX", acBookCodeX);
@@ -181,7 +222,8 @@ public class AcTxFormCom extends TradeBuffer {
 				occursList.putParam("FM101_FacmNo", tAcDetail.getFacmNo());
 				occursList.putParam("FM101_BormNo", tAcDetail.getBormNo());
 //				科子目
-				occursList.putParam("FM101_AcNoCode", FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + "-" + FormatUtil.padX(tAcDetail.getAcSubCode(), 5));
+				occursList.putParam("FM101_AcNoCode", FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + "-"
+						+ FormatUtil.padX(tAcDetail.getAcSubCode(), 5));
 				occursList.putParam("FM101_AcDtlCode", tAcDetail.getAcDtlCode());
 //				科子細目中文
 				occursList.putParam("FM101_AcNoCodeX", acNoCodeX);

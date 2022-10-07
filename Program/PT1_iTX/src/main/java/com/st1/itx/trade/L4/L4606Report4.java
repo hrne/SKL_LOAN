@@ -18,19 +18,24 @@ public class L4606Report4 extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
-
+		
 		this.print(-1, 1, "程式ID：" + "L4606");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
 
-		this.print(-1, 130, "日　　期： " + tim + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(2, 4), "R");
+		this.print(-1, 130, "日　　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dDateUtil.getNowStringBc().substring(2, 4), "R");
 		this.print(-2, 1, "報　表：" + "L4606");
 		this.print(-2, 70, "佣金媒體檔錯誤清單", "C");
-		this.print(-2, 130, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6), "R");
-		this.print(-3, 70, titaVo.get("InsuEndMonth").substring(0, 3) + "/" + titaVo.get("InsuEndMonth").substring(3, 5), "C");
+		this.print(-2, 130, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6),
+				"R");
+		this.print(-3, 70,
+				titaVo.get("InsuEndMonth").substring(0, 3) + "/" + titaVo.get("InsuEndMonth").substring(3, 5), "C");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 		this.print(-4, 1, "Seq.  火險單編號                   姓名                                         "); // fix
-		this.print(-5, 1, "-------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-5, 1,
+				"-------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(6);
@@ -60,7 +65,8 @@ public class L4606Report4 extends MakeReport {
 			}
 		}
 
-		this.print(1, 1, "                                                                          總　計：           筆              ");
+		this.print(1, 1,
+				"                                                                          總　計：           筆              ");
 		this.print(0, 91, String.format("%,d", errorList.size()), "R");
 		long sno = this.close();
 	}

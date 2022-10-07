@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +21,9 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
+import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L5813ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
@@ -39,37 +40,37 @@ public class L5813Batch extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CustMainService sCustMainService;
+	private CustMainService sCustMainService;
 
 	@Autowired
-	public YearlyHouseLoanIntService sYearlyHouseLoanIntService;
+	private YearlyHouseLoanIntService sYearlyHouseLoanIntService;
 
 	@Autowired
-	public ClFacService clFacService;
+	private ClFacService clFacService;
 
 	@Autowired
-	public ClBuildingService sClBuildingService;
+	private ClBuildingService sClBuildingService;
 
 	@Autowired
-	public ClBuildingOwnerService sClBuildingOwnerService;
+	private ClBuildingOwnerService sClBuildingOwnerService;
 
 	@Autowired
-	public CdCodeService sCdCodeService;
+	private CdCodeService sCdCodeService;
 
 	@Autowired
-	L5813ServiceImpl l5813ServiceImpl;
+	private L5813ServiceImpl l5813ServiceImpl;
 
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
+	private Parse parse;
 	@Autowired
-	public MakeFile makeFile;
+	private MakeFile makeFile;
 	@Autowired
-	public WebClient webClient;
+	private WebClient webClient;
 	@Autowired
-	MakeExcel makeExcel;
+	private MakeExcel makeExcel;
 	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 
 	private Slice<ClBuildingOwner> tClBuildingOwner = null;
 	private ClBuildingOwner cClBuildingOwner = null;
@@ -104,9 +105,11 @@ public class L5813Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L5813", "L5813國稅局申報媒體檔已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L5813", "L5813國稅局申報媒體檔已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -123,7 +126,8 @@ public class L5813Batch extends TradeBuffer {
 		String fileItem = "國稅局申報(國稅局-LNM57M1P)";
 		String fileName = "LNM57M1P-" + tYear + "年度.csv";
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName,
+				2);
 
 		for (Map<String, String> result : resultList) {
 
@@ -133,7 +137,6 @@ public class L5813Batch extends TradeBuffer {
 
 			String iCustName = "";
 			String iCustId = "";
-			String iUkey = "";
 			String bdOwner = ""; // 所有權人姓名
 			String bdCustId = ""; // 所有權人身分證
 
@@ -156,18 +159,11 @@ public class L5813Batch extends TradeBuffer {
 			int iYYYMM = Integer.parseInt(result.get("YearMonth")) - 191100;
 
 			CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+//				第170~222行
+//				不是只要找主要擔保品記號Y的那筆,
+//				而是找這一戶的全部擔保品,
+//				所有權人戶名bdOwner、統編bdCustId要先以本人為主,如果沒有本人就用找到的第一個人的資料
 			ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);// 戶號找擔保品
-
-			// 等於自然人 或 擔保品代號等於1，否則跳過
-
-			if (tCustMain != null && tClFac != null) {
-				this.info("getCuscCd==" + tCustMain.getCuscCd());
-				this.info("getClCode1==" + tClFac.getClCode1());
-				if (!("1").equals(tCustMain.getCuscCd()) && !(tClFac.getClCode1() == 1)) {
-					this.info("into continue");
-					continue;
-				}
-			}
 
 			if (tCustMain != null) {
 				iCustName = tCustMain.getCustName();
@@ -179,33 +175,17 @@ public class L5813Batch extends TradeBuffer {
 					}
 				}
 				iCustId = tCustMain.getCustId();
-				iUkey = tCustMain.getCustUKey();
 			}
 
-			// 戶號找擔保品
-			if (tClFac != null) {
-				int oClCode1 = tClFac.getClCode1();
-				int oClCode2 = tClFac.getClCode2();
-				int oClNo = tClFac.getClNo();
-
-				// 所有權人戶名、統編 先找本人
-				cClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(oClCode1, oClCode2, oClNo, iUkey), titaVo);
-
-				if (cClBuildingOwner != null) {
-					bdOwner = tCustMain.getCustName();
-					bdCustId = tCustMain.getCustId();
-				} else {
-
-					tClBuildingOwner = sClBuildingOwnerService.clNoEq(oClCode1, oClCode2, oClNo, this.index, this.limit, titaVo);
-					List<ClBuildingOwner> sClBuildingOwner = tClBuildingOwner == null ? null : tClBuildingOwner.getContent();
-
-					if (sClBuildingOwner != null) {
-						tCustMain = sCustMainService.findById(sClBuildingOwner.get(0).getOwnerCustUKey(), titaVo);
-						bdOwner = tCustMain.getCustName();
-						bdCustId = tCustMain.getCustId();
-					}
-				}
-
+			if (tCustMain != null && tClFac != null && "1".equals(tCustMain.getCuscCd()) && tClFac.getClCode1() == 1) {
+				this.info("getCuscCd==" + tCustMain.getCuscCd());
+				this.info("getClCode1==" + tClFac.getClCode1());
+				// 此筆為"自然人"且擔保品類別為"房地"時，才找所有權人
+				Map<String, String> ownerMap = findBuildingOwner(tClFac, titaVo);
+				bdCustId = ownerMap.get("OwnerId");
+				bdOwner = ownerMap.get("OwnerName");
+			} else {
+				continue;
 			}
 
 			TempVo tTempVo = new TempVo();
@@ -308,6 +288,36 @@ public class L5813Batch extends TradeBuffer {
 
 	}
 
+	private Map<String, String> findBuildingOwner(ClFac tClFac, TitaVo titaVo) {
+		this.info("findBuildingOwner start ...");
+
+		Map<String, String> result = new HashMap<>();
+
+		String ownerName = "";
+		String ownerId = "";
+
+		// 戶號找擔保品
+		if (tClFac != null) {
+			int custNo = tClFac.getCustNo();
+			int facmNo = tClFac.getFacmNo();
+			List<Map<String, String>> queryResultList = null;
+			try {
+				queryResultList = l5813ServiceImpl.queryBuildingOwner(custNo, facmNo, titaVo);
+			} catch (Exception e) {
+				this.error("queryBuildingOwner error = " + e.getMessage());
+			}
+			if (queryResultList != null && !queryResultList.isEmpty()) {
+				Map<String, String> queryResult = queryResultList.get(0);
+				ownerId = queryResult.get("CustId");
+				ownerName = queryResult.get("CustName");
+			}
+		}
+		result.put("OwnerId", ownerId);
+		result.put("OwnerName", ownerName);
+		this.info("findBuildingOwner end ... ownerName = " + ownerName + " , ownerId = " + ownerId);
+		return result;
+	}
+
 	public void doOW(TitaVo titaVo) throws LogicException {
 		// 上傳官網
 		this.info("into doOW");
@@ -315,9 +325,10 @@ public class L5813Batch extends TradeBuffer {
 		int tYear = Integer.parseInt(titaVo.getParam("Year")) + 1;
 		String fileCode = "L5813";
 		String fileItem = "國稅局申報(官網-LNM572P)";
-		String fileName = "LNM572P-" + tYear + "年度";
+		String fileName = "LNM572P-" + tYear + "年度.csv";
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName,
+				2);
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5813", fileItem, fileName, "LNM572P-"+tYear);
 
@@ -351,13 +362,6 @@ public class L5813Batch extends TradeBuffer {
 			CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 			ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);// 戶號找擔保品
 
-			// 等於自然人 或 擔保品代號等於1，否則跳過
-			if (tCustMain != null && tClFac != null) {
-				if (!("1").equals(tCustMain.getCuscCd()) && !!(tClFac.getClCode1() == 1)) {
-					continue;
-				}
-			}
-
 			if (tCustMain != null) {
 				iCustName = tCustMain.getCustName();
 				if (iCustName.length() > 5) {
@@ -371,31 +375,18 @@ public class L5813Batch extends TradeBuffer {
 				iUkey = tCustMain.getCustUKey();
 			}
 
-			// 戶號找擔保品
-			if (tClFac != null) {
-				int oClCode1 = tClFac.getClCode1();
-				int oClCode2 = tClFac.getClCode2();
-				int oClNo = tClFac.getClNo();
-
-				// 所有權人戶名、統編 先找本人
-				cClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(oClCode1, oClCode2, oClNo, iUkey), titaVo);
-
-				if (cClBuildingOwner != null) {
-					bdOwner = tCustMain.getCustName();
-					bdCustId = tCustMain.getCustId();
-				} else {
-
-					tClBuildingOwner = sClBuildingOwnerService.clNoEq(oClCode1, oClCode2, oClNo, this.index, this.limit, titaVo);
-					List<ClBuildingOwner> sClBuildingOwner = tClBuildingOwner == null ? null : tClBuildingOwner.getContent();
-
-					if (sClBuildingOwner != null) {
-						tCustMain = sCustMainService.findById(sClBuildingOwner.get(0).getOwnerCustUKey(), titaVo);
-						bdOwner = tCustMain.getCustName();
-						bdCustId = tCustMain.getCustId();
-					}
-				}
-
+			// 等於自然人 或 擔保品代號等於1，否則跳過
+			if (tCustMain != null && tClFac != null && "1".equals(tCustMain.getCuscCd()) && tClFac.getClCode1() == 1) {
+				this.info("getCuscCd==" + tCustMain.getCuscCd());
+				this.info("getClCode1==" + tClFac.getClCode1());
+				// 此筆為"自然人"且擔保品類別為"房地"時，才找所有權人
+				Map<String, String> ownerMap = findBuildingOwner(tClFac, titaVo);
+				bdCustId = ownerMap.get("OwnerId");
+				bdOwner = ownerMap.get("OwnerName");
+			} else {
+				continue;
 			}
+
 			for (int i = bdOwner.length(); i < 19; i++) {
 				bdOwner = bdOwner + "　";
 			}
