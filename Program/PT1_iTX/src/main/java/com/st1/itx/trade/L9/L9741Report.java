@@ -108,22 +108,9 @@ public class L9741Report extends MakeReport {
 
 				this.info("L9741 custNo=" + custNo);
 				this.info("L9741 facmNo=" + facmNo);
-
-				// 同戶號 同額度使用同一頁否則換新頁
-//				if (this.custNo == custNo && this.facmNo == facmNo) {
-//
-//				} else {
 				if (time > 0) {
 					this.newPage(true);
 				}
-//					if (count > 0) {
-//						this.info("...newPage");
-//
-//						this.newPage(true);
-//
-//					}
-
-//				}
 
 				this.custNo = custNo;
 				this.facmNo = facmNo;
@@ -203,9 +190,6 @@ public class L9741Report extends MakeReport {
 
 		this.setFontSize(standardFontSize);
 		setFont(1, 11);
-//		printCm(2, 2.5, "【限定本人拆閱，若無此人，請寄回本公司】");
-//		printCm(2, 3.5, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
-//		printCm(2, 4.5, currAddress);
 		this.print(1, 17, "【限定本人拆閱，若無此人，請寄回本公司】");
 		this.print(1, 1, "");
 		this.print(1, 17, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
@@ -218,7 +202,7 @@ public class L9741Report extends MakeReport {
 			nameLength = custMain.getCustName().length();
 		}
 
-//		printCm(3, 5.5, String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
+
 		this.print(1, 17, String.format("%07d", custNo) + "   " + custMain.getCustName().substring(0, nameLength));
 
 		// 印圖片時是設定座標(x,y)

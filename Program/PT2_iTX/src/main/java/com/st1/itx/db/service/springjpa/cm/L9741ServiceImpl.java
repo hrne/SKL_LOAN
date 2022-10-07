@@ -98,6 +98,7 @@ public class L9741ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += "   AND I.\"RenewCode\" = 2                             ";
 		sql += "   AND I.\"AcDate\" = 0                                ";
+
 		sql += "  ORDER BY I.\"InsuYearMonth\", I.\"CustNo\", I.\"FacmNo\" ";
 
 		this.info("sql=" + sql);
@@ -111,7 +112,6 @@ public class L9741ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (intCustNo > 0) {
 			query.setParameter("intCustNo", intCustNo);
 		}
-
 		return this.convertToMap(query);
 	}
 

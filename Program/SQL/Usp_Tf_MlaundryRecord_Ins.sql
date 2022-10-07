@@ -24,7 +24,26 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "MlaundryRecord" ENABLE PRIMARY KEY';
 
     -- 寫入資料
-    INSERT INTO "MlaundryRecord"
+    INSERT INTO "MlaundryRecord" (
+          "LogNo"
+        , "RecordDate"          -- 訪談日期 Decimald 8 0
+        , "CustNo"              -- 戶號 Decimal 7 0
+        , "FacmNo"              -- 額度編號 Decimal 3 0
+        , "BormNo"              -- 撥款序號 Decimal 3 0
+        , "RepayDate"           -- 預定還款日期 Decimald 8 0
+        , "ActualRepayDate"     -- 實際還款日期 Decimald 8 0
+        , "RepayAmt"            -- 還款金額 Decimal 16 2
+        , "ActualRepayAmt"      -- 實際還款金額 Decimal 16 2
+        , "Career"              -- 職業別 nvarchar2 20 0
+        , "Income"              -- 年收入(萬) nvarchar2 30 0
+        , "RepaySource"         -- 還款來源 Decimal 2 0
+        , "RepayBank"           -- 代償銀行 nvarchar2 10 0
+        , "Description"         -- 其他說明 nvarchar2 60 0
+        , "CreateDate"          -- 建檔日期時間 DATE 8 0
+        , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+        , "LastUpdate"          -- 最後更新日期時間 DATE 8 0
+        , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    )
     SELECT "MlaundryRecord_SEQ".nextval   AS "LogNo"
           ,IV."IVWDAT"                    AS "RecordDate"          -- 訪談日期 Decimald 8 0
           ,IV."LMSACN"                    AS "CustNo"              -- 戶號 Decimal 7 0

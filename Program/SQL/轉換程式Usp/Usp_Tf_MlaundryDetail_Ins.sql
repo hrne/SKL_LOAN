@@ -43,38 +43,47 @@ BEGIN
     SELECT A03.TRXIDT        AS "EntryDate" -- 入帳日期 Decimald 8  
          , A03.AMLTPE        AS "Factor" -- 交易樣態 DECIMAL 2  "1:樣態1 2:樣態2 3:樣態3"
          , A03.LMSACN        AS "CustNo" -- 戶號 DECIMAL 7  
-         , NVL(AC1.DOCSEQ,1) AS "TotalCnt" -- 累積筆數 DECIMAL 4  
+         , NVL(AC2.DOCSEQ,NVL(AC1.DOCSEQ,1))
+                             AS "TotalCnt" -- 累積筆數 DECIMAL 4  
          , A03.W08AM1        AS "TotalAmt" -- 累積金額   DECIMAL 16 2 
          , AC1.AMLCMD        AS "Rational" -- 合理性記號 VARCHAR2 1  "Y:是 N:否 空白:未註記"
          , TRIM(NVL(AC1.DOCTXT1,' ') || NVL(AC1.DOCTXT2,' ') || NVL(AC1.DOCTXT3,' ')) 
                              AS "EmpNoDesc" -- 經辦合理性說明 NVARCHAR2 150  2022/8/25長度放大150
          , CASE
+             WHEN TRIM(NVL(AC2.DOCTXTA,' ') || NVL(AC2.DOCTXTB,' ') || NVL(AC2.DOCTXTC,' ')) IS NOT NULL
+             THEN 'Y'
              WHEN TRIM(NVL(AC1.DOCTXTA,' ') || NVL(AC1.DOCTXTB,' ') || NVL(AC1.DOCTXTC,' ')) IS NOT NULL
              THEN 'Y'
            ELSE NULL END     AS "ManagerCheck" -- 主管覆核 VARCHAR2 1  "Y:同意 N:不同意 空白:未覆核"
          , CASE
-             WHEN AC1.CHGDAT > 0
-             THEN TO_DATE(AC1.CHGDAT,'YYYYMMDD')
+             WHEN NVL(AC1.CHGDAT,0) > 0
+             THEN AC1.CHGDAT
            ELSE 0
            END               AS "ManagerDate" -- 主管同意日期 Decimald 8  
          , CASE
-             WHEN AC1.CHGDAT > 0
-             THEN TO_DATE(AC1.CHGDAT,'YYYYMMDD')
+             WHEN NVL(AC2.CHGDAT,0) > 0
+             THEN AC2.CHGDAT
            ELSE 0
            END               AS "ManagerCheckDate" -- 主管覆核日期 Decimald 8  主管第二次覆核時顯示欄位
-         , TRIM(NVL(AC1.DOCTXTA,' ') || NVL(AC1.DOCTXTB,' ') || NVL(AC1.DOCTXTC,' ')) 
-                             AS "ManagerDesc" -- 主管覆核說明 NVARCHAR2 150  2022/8/25長度放大150
          , CASE
-             WHEN AC1.CRTDAT > 0
+             WHEN TRIM(NVL(AC2.DOCTXTA,' ') || NVL(AC2.DOCTXTB,' ') || NVL(AC2.DOCTXTC,' ')) IS NOT NULL
+             THEN TRIM(NVL(AC2.DOCTXTA,' ') || NVL(AC2.DOCTXTB,' ') || NVL(AC2.DOCTXTC,' '))
+             WHEN TRIM(NVL(AC1.DOCTXTA,' ') || NVL(AC1.DOCTXTB,' ') || NVL(AC1.DOCTXTC,' ')) IS NOT NULL
+             THEN TRIM(NVL(AC1.DOCTXTA,' ') || NVL(AC1.DOCTXTB,' ') || NVL(AC1.DOCTXTC,' '))
+           ELSE NULL END     AS "ManagerDesc" -- 主管覆核說明 NVARCHAR2 150  2022/8/25長度放大150
+         , CASE
+             WHEN NVL(AC1.CRTDAT,0) > 0
              THEN TO_DATE(AC1.CRTDAT,'YYYYMMDD')
            ELSE JOB_START_TIME
            END               AS "CreateDate" -- 建檔日期時間 DATE 8  
          , NVL(AEM1."EmpNo",'999999')
                              AS "CreateEmpNo" -- 建檔人員 VARCHAR2 6  
          , CASE
-             WHEN AC1.CHGDAT > 0
+             WHEN NVL(AC2.CHGDAT,0) > 0
+             THEN TO_DATE(AC2.CHGDAT,'YYYYMMDD')
+             WHEN NVL(AC1.CHGDAT,0) > 0
              THEN TO_DATE(AC1.CHGDAT,'YYYYMMDD')
-             WHEN AC1.CRTDAT > 0
+             WHEN NVL(AC1.CRTDAT,0) > 0
              THEN TO_DATE(AC1.CRTDAT,'YYYYMMDD')
            ELSE JOB_START_TIME
            END               AS "LastUpdate" -- 最後更新日期時間 DATE 8  
@@ -84,8 +93,13 @@ BEGIN
     LEFT JOIN DAT_LNAMlC1P AC1 ON AC1.TRXIDT = A03.TRXIDT
                               AND AC1.AMLTPE = A03.AMLTPE
                               AND AC1.LMSACN = A03.LMSACN
+                              AND AC1.DOCSEQ = 1
+    LEFT JOIN DAT_LNAMlC1P AC2 ON AC2.TRXIDT = A03.TRXIDT
+                              AND AC2.AMLTPE = A03.AMLTPE
+                              AND AC2.LMSACN = A03.LMSACN
+                              AND AC2.DOCSEQ = 2
     LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = AC1.CRTEMP
-    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = AC1.CHGEMP
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = NVL(AC2.CHGEMP,AC1.CHGEMP)
     ;
 
     -- 記錄寫入筆數
