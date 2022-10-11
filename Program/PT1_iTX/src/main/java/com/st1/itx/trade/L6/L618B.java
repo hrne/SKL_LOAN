@@ -23,6 +23,7 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
+import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
@@ -56,6 +57,9 @@ public class L618B extends TradeBuffer {
 
 	@Autowired
 	public AcDetailCom acDetailCom;
+	
+	@Autowired
+	AcRepayCom acRepayCom;
 
 	@Autowired
 	public InsuRenewService insuRenewService;
@@ -82,6 +86,8 @@ public class L618B extends TradeBuffer {
 	private TempVo tTempVo = new TempVo();
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+	private BigDecimal wkTempAmt = BigDecimal.ZERO;
+	private BigDecimal wkOverflow = BigDecimal.ZERO;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -91,6 +97,7 @@ public class L618B extends TradeBuffer {
 		baTxCom.setTxBuffer(this.txBuffer);
 		loanCom.setTxBuffer(this.txBuffer);
 		txToDoCom.setTxBuffer(this.txBuffer);
+		acRepayCom.setTxBuffer(this.getTxBuffer());
 
 		this.info("Txamt : " + titaVo.getTxAmt());
 
@@ -100,6 +107,12 @@ public class L618B extends TradeBuffer {
 		iFacmNo = parse.stringToInteger(titaVo.getParam("TxFacmNo"));
 		iRvNo = titaVo.getParam("TxDtlValue");
 		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
+		
+		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
+		if (titaVo.isHcodeErase()) {
+			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);
+		}
+
 //		update應處理清單
 		TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 
@@ -118,7 +131,7 @@ public class L618B extends TradeBuffer {
 			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 9, BigDecimal.ZERO, titaVo); //
 
 			// 暫收款金額 (暫收借)
-			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+			wkTempAmt = acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 			// 借: F25 催收款項－火險費用
 
@@ -142,7 +155,7 @@ public class L618B extends TradeBuffer {
 			acDetail.setRvNo(iRvNo);
 
 			// 累溢收入帳(暫收貸)
-			loanCom.settleOverflow(lAcDetail, titaVo);
+			wkOverflow = acRepayCom.settleOverflow(lAcDetail, titaVo);
 
 			lAcDetail.add(acDetail);
 			this.txBuffer.addAllAcDetailList(lAcDetail);
@@ -152,36 +165,30 @@ public class L618B extends TradeBuffer {
 		acDetailCom.run(titaVo);
 
 //			update 火險檔
-		InsuRenew tInsuRenew = new InsuRenew();
-		String prevInsuNo = iRvNo;
-		String endoInsuNo = " ";
-		if (iRvNo.length() > 17) {
-			prevInsuNo = iRvNo.substring(0, 17).trim();
-			endoInsuNo = iRvNo.substring(17, 18);
-		}
-		tInsuRenew = insuRenewService.findEndoInsuNoFirst(iCustNo, iFacmNo, prevInsuNo, endoInsuNo, titaVo);
+		InsuRenew tIsuRenew = new InsuRenew();
+		tIsuRenew = insuRenewService.prevInsuNoFirst(iCustNo, iFacmNo, iRvNo);
 
-		tInsuRenew = insuRenewService.holdById(tInsuRenew.getInsuRenewId());
+		tIsuRenew = insuRenewService.holdById(tIsuRenew.getInsuRenewId());
 
-		InsuRenew tInsuRenew2 = (InsuRenew) dataLog.clone(tInsuRenew); // 異動前資料
+		InsuRenew tInsuRenew2 = (InsuRenew) dataLog.clone(tIsuRenew); // 異動前資料
 
-		tInsuRenew.setStatusCode(2);
+		tIsuRenew.setStatusCode(2);
 
 		if (titaVo.isHcodeNormal()) {
-			tInsuRenew.setStatusCode(2);
-			tInsuRenew.setOvduDate(this.txBuffer.getTxCom().getTbsdy());
+			tIsuRenew.setStatusCode(2);
+			tIsuRenew.setOvduDate(this.txBuffer.getTxCom().getTbsdy());
 		} else {
-			tInsuRenew.setStatusCode(1);
-			tInsuRenew.setOvduDate(0);
+			tIsuRenew.setStatusCode(1);
+			tIsuRenew.setOvduDate(0);
 		}
 
 		try {
-			tInsuRenew = insuRenewService.update2(tInsuRenew, titaVo);
+			tIsuRenew = insuRenewService.update2(tIsuRenew, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0007", "InsuRenew update error : " + e.getErrorMsg());
 		}
 
-		dataLog.setEnv(titaVo, tInsuRenew2, tInsuRenew); ////
+		dataLog.setEnv(titaVo, tInsuRenew2, tIsuRenew); ////
 		dataLog.exec(); ////
 
 		// 放款交易內容檔
@@ -204,13 +211,15 @@ public class L618B extends TradeBuffer {
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setDesc("火險費用轉催收");
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
+		tLoanBorTx.setTempAmt(wkTempAmt);
+		tLoanBorTx.setOverflow(wkOverflow);
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tTempVo.clear();
 		tTempVo.putParam("RvNo", iRvNo);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
-		loanCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {

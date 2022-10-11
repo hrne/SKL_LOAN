@@ -25,7 +25,6 @@ import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.date.DateUtil;
@@ -68,9 +67,6 @@ public class AcReceivableCom extends TradeBuffer {
 	public AcMainCom acMainCom;
 
 	@Autowired
-	public GSeqCom gSeqCom;
-
-	@Autowired
 	public DataLog dataLog;
 
 	@Autowired
@@ -104,7 +100,7 @@ public class AcReceivableCom extends TradeBuffer {
 		int AcHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
 		int idx = 0;
 
-//		帳務訂正記號  AcHCode   0.正常     1.訂正     2.沖正   ；   訂正反序          
+//		帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正   ；   訂正反序          
 		// 1.業務科目記號 = 1 資負明細科目（放款、催收款項) 且非L6801:放款戶帳冊別轉換
 		// 2.銷帳科目記號 <> 0 0－非銷帳科目 1－會計銷帳科目 2－業務銷帳科目 3-未收款, 4-短繳期金,
 		// 5-另收欠款,8-核心銷帳碼科目(不寫銷帳檔)
@@ -131,7 +127,7 @@ public class AcReceivableCom extends TradeBuffer {
 				// 3.TRO借新還舊->相反(貸方科目，先借後貸)
 				if (ac.getReceivableFlag() >= 3) {
 					wkRvFg = 1;
-					if (AcHCode == 2) {
+					if (AcHCode >= 2) {
 						wkRvFg = 0;
 					}
 				} else if ((debitsList.contains(ac.getAcNoCode().substring(0, 1)) && ac.getDbCr().equals("D"))
@@ -183,9 +179,6 @@ public class AcReceivableCom extends TradeBuffer {
 				procSetting(AcHCode);
 				this.info("AcReceivable RvFg=" + wkRvFg + ", RvAmt=" + wkTxAmt + ", RvNo=" + wkRvNo
 						+ ", ReceivableFlag=" + ac.getReceivableFlag());
-
-				// 銷帳編號
-				this.txBuffer.getAcDetailList().get(idx).setRvNo(wkRvNo);
 
 				// 更新
 				procUpdate(AcHCode, bizTbsdy);
@@ -476,7 +469,7 @@ public class AcReceivableCom extends TradeBuffer {
 		}
 		if (tAcReceivable == null) {
 			// 0-起帳
-			if (wkRvFg == 0 || AcHCode == 2) {
+			if (wkRvFg == 0 || AcHCode >= 2) {
 				tAcReceivable = new AcReceivable();
 				tAcReceivable.setAcReceivableId(tAcReceivableId);
 				newAcReceivable(bizTbsdy);
@@ -686,16 +679,16 @@ public class AcReceivableCom extends TradeBuffer {
 //     貸: TMI 未收火險費  ReceivableFlag = 3
 //         F09 暫付火險費   
 //		   F25   催收款項－火險費用
+
 		String prevInsuNo = wkRvNo;
 		String endoInsuNo = " ";
 		if (wkRvNo.length() > 17) {
 			prevInsuNo = wkRvNo.substring(0, 17).trim();
-			endoInsuNo = wkRvNo.substring(17, 18);
+			endoInsuNo = wkRvNo.substring(17, wkRvNo.length() - 1);
 		}
 		InsuRenew tInsuRenew = new InsuRenew();
 		tInsuRenew = insuRenewService.findEndoInsuNoFirst(ac.getCustNo(), ac.getFacmNo(), prevInsuNo, endoInsuNo,
 				titaVo);
-
 		if (tInsuRenew == null)
 			throw new LogicException(titaVo, "E6003", "AcReceivableCom updInsuRenew notfound " + ac.getCustNo() + "-"
 					+ ac.getFacmNo() + "," + ac.getRvNo());

@@ -35,6 +35,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
 import com.st1.itx.util.common.AcPaymentCom;
+import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.SendRsp;
@@ -81,7 +82,7 @@ public class L3230 extends TradeBuffer {
 	@Autowired
 	BaTxCom baTxCom;
 	@Autowired
-	AcPaymentCom acPaymentCom;
+	AcRepayCom acRepayCom;
 	@Autowired
 	SendRsp sendRsp;
 
@@ -90,7 +91,7 @@ public class L3230 extends TradeBuffer {
 	private int iFacmNo;
 	private int iRpCustNo = 0;
 	private int iRpFacmNo = 0;
-	private int iRpCode = 0;
+	private int iRpCode = 90;
 	private String iRpCodeX;
 	private BigDecimal iRpAmt = BigDecimal.ZERO;
 	private String iTempItemCode;
@@ -142,7 +143,7 @@ public class L3230 extends TradeBuffer {
 		baTxCom.setTxBuffer(this.txBuffer);
 		loanCom.setTxBuffer(this.txBuffer);
 		acNegCom.setTxBuffer(this.txBuffer);
-
+		acRepayCom.setTxBuffer(this.txBuffer);
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -267,6 +268,7 @@ public class L3230 extends TradeBuffer {
 		}
 		// 訂正放款交易內容檔by交易
 		if (titaVo.isHcodeErase()) {
+			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 			loanCom.setFacmBorTxHcodeByTx(iCustNo, titaVo);
 			if ("06".equals(iTempItemCode)) {
 				for (int i = 1; i <= 50; i++) {
@@ -274,6 +276,7 @@ public class L3230 extends TradeBuffer {
 						break;
 					iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
 					if (iRpCustNo != iCustNo) {
+						loanCom.checkEraseCustNoTxSeqNo(iRpCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 						loanCom.setFacmBorTxHcodeByTx(iRpCustNo, titaVo);
 					}
 				}
@@ -301,21 +304,10 @@ public class L3230 extends TradeBuffer {
 			} catch (LogicException e) {
 				throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
 			}
-			wkCustTempBal = baTxCom.getExcessive();
-			wkTempBal = wkTempBal.subtract(wkCustTempBal);
 			// 暫收款金額 (暫收借)
-			loanCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
-			// 累溢收(暫收貸)
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("TAV");
-			acDetail.setSumNo("090");
-			acDetail.setTxAmt(baTxCom.getExcessive().subtract(iTempAmt));
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(iFacmNo);
-			acDetail.setBormNo(0);
-			lAcDetail.add(acDetail);
+			wkCustTempBal = acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+			// 退還款餘額
+			wkTempBal = wkTempBal.subtract(wkCustTempBal);
 		} else {
 			// 查詢會計銷帳檔
 			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, wkFacmNoStart,
@@ -345,7 +337,6 @@ public class L3230 extends TradeBuffer {
 							acDetail.setCustNo(iCustNo);
 							acDetail.setFacmNo(ac.getFacmNo());
 							acDetail.setSlipNote(titaVo.getParam("Description"));
-							wkCustTempBal = wkCustTempBal.add(ac.getRvBal());
 							if (wkTempBal.compareTo(ac.getRvBal()) >= 0) {
 								acDetail.setTxAmt(ac.getRvBal());
 								wkTempBal = wkTempBal.subtract(ac.getRvBal());
@@ -354,6 +345,7 @@ public class L3230 extends TradeBuffer {
 								wkTempBal = new BigDecimal(0);
 							}
 							lAcDetail.add(acDetail);
+							wkCustTempBal = wkCustTempBal.add(acDetail.getTxAmt()); // 只處理銷帳金額
 						}
 					}
 				}
@@ -373,6 +365,8 @@ public class L3230 extends TradeBuffer {
 		if (this.baTxList == null || this.baTxList.size() == 0) {
 			throw new LogicException(titaVo, "E0019", "無該項目未銷費用"); // 查詢資料不存在
 		}
+		ArrayList<BaTxVo> feeList = new ArrayList<BaTxVo>();
+
 		BigDecimal totalAmt = BigDecimal.ZERO;
 		// 單筆相同金額，銷帳編號相同
 		boolean isFind = false;
@@ -381,7 +375,7 @@ public class L3230 extends TradeBuffer {
 				if (iTempAmt.compareTo(ba.getUnPaidAmt()) == 0) {
 					if ((iRemoveNo.isEmpty()) || (iRemoveNo.length() > 0 && ba.getRvNo().length() >= iRemoveNo.length()
 							&& ba.getRvNo().substring(0, iRemoveNo.length()).equals(iRemoveNo))) {
-						addFeeRoutine(ba);
+						feeList.add(ba);
 						isFind = true;
 						break;
 					}
@@ -407,7 +401,7 @@ public class L3230 extends TradeBuffer {
 								|| (iRemoveNo.length() > 0 && ba.getRvNo().length() >= iRemoveNo.length()
 										&& ba.getRvNo().substring(0, iRemoveNo.length()).equals(iRemoveNo))) {
 
-							addFeeRoutine(ba);
+							feeList.add(ba);
 							isFind = true;
 						}
 					}
@@ -417,6 +411,8 @@ public class L3230 extends TradeBuffer {
 		if (!isFind) {
 			throw new LogicException(titaVo, "E0019", "無金額相同之未銷費用，請使用 L6907 未銷帳餘額明細查詢 "); // 查詢資料不存在
 		}
+		// 貸方：費用、累溢收
+		acRepayCom.settleFeeByTemp(iRpCode, titaVo.getEntDyI(), wkCustTempBal, feeList, lAcDetail, titaVo);
 	}
 
 	private void settingUnPaid06() throws LogicException {
@@ -488,35 +484,6 @@ public class L3230 extends TradeBuffer {
 		acDetail.setAcSubBookCode(iAcSubBookCode); // 區隔帳冊
 		acDetail.setAcBookFlag(3); // 帳冊別記號 (3: 指定帳冊)
 		lAcDetail.add(acDetail);
-	}
-
-	private void addFeeRoutine(BaTxVo ba) throws LogicException {
-
-		acDetail = new AcDetail();
-		acDetail.setDbCr("C");
-		acDetail.setAcctCode(ba.getAcctCode());
-		acDetail.setTxAmt(ba.getUnPaidAmt());
-		acDetail.setCustNo(ba.getCustNo());
-		acDetail.setFacmNo(ba.getFacmNo());
-		acDetail.setReceivableFlag(ba.getReceivableFlag());
-		acDetail.setRvNo(ba.getRvNo());
-		lAcDetail.add(acDetail);
-
-		// 累溢收入帳(暫收貸)
-		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-			loanCom.settleOverflow(lAcDetail, titaVo);
-		}
-		// 新增放款交易內容檔(收回費用)
-		tTempVo.clear();
-		tTempVo.putParam("TempReasonCode", iTempReasonCode);
-		tTempVo.putParam("TempItemCode", iTempItemCode);
-		tTempVo.putParam("RemoveNo", iRemoveNo);
-		tTempVo.putParam("Note", titaVo.getParam("Description"));
-		String desc = "暫收退" + loanCom.getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
-		loanCom.addFeeBorTxRoutine(ba, 0, desc, titaVo.getEntDyI(), tTempVo, lAcDetail, titaVo);
-
-		ba.setAcctAmt(BigDecimal.ZERO);
-
 	}
 
 	// 貸: 債權協商對應科目
@@ -677,6 +644,7 @@ public class L3230 extends TradeBuffer {
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
+		tLoanBorTx.setRepayCode(90);
 // Temp2ReasonCode
 //		1	放款暫收款
 //		2	債協暫收款
@@ -720,7 +688,7 @@ public class L3230 extends TradeBuffer {
 		tTempVo.putParam("Note", titaVo.getParam("Description"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
-		loanCom.updBorTxAcDetail(tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail);
 
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -740,6 +708,7 @@ public class L3230 extends TradeBuffer {
 //      095:轉債協退還款 (戶號)       T2x 債協退還款  
 		tLoanBorTx.setDesc(iRpCodeX);
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
+		tLoanBorTx.setRepayCode(iRpCode);
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 
 		tTempVo.clear();
@@ -751,7 +720,7 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		// 更新放款明細檔及帳務明細檔關聯欄
-		loanCom.updBorTxAcDetail(tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail);
 
 		try {
 			loanBorTxService.insert(tLoanBorTx);

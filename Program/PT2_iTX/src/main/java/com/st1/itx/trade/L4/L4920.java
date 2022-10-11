@@ -2,6 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +147,9 @@ public class L4920 extends TradeBuffer {
 
 					if (tempVo.get("ReturnMsg") != null && tempVo.get("ReturnMsg").length() > 0) {
 						procNote += "回應訊息:" + tempVo.get("ReturnMsg") + " ";
+					}
+					if (tempVo.get("EraseCnt") != null) {
+						procNote += "訂正" + tempVo.get("EraseCnt") + "次 ";
 					}
 
 					if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {

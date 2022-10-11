@@ -93,7 +93,7 @@ public class AcMainCom extends TradeBuffer {
 	/**
 	 * 入帳更新
 	 * 
-	 * @param AcHcode 帳務訂正記號 0.正常 1.當日訂正 2.隔日訂正
+	 * @param AcHcode 帳務訂正記號 // 帳務訂正記號 0-正常 1-訂正(刪除帳務) 2-出沖正帳務(入帳) 3-出沖正帳務(不入帳)
 	 * @param acList  List of AcDetail
 	 * @param titaVo  TitaVo
 	 * @throws LogicException ...
@@ -107,8 +107,17 @@ public class AcMainCom extends TradeBuffer {
 		for (AcDetail ac : acList) {
 			// 借貸別
 			dbCr = ac.getDbCr();
+			if (AcHcode == 3) {
+				if (ac.getDbCr().equals("D")) {
+					dbCr = "C";
+				} else {
+					dbCr = "D";
+				}
+			} else {
+				dbCr = ac.getDbCr();
+			}
 			// 交易金額
-			if (AcHcode == 1)
+			if (AcHcode == 1 || AcHcode == 3)
 				txAmt = BigDecimal.ZERO.subtract(ac.getTxAmt()); // 當日訂正為負
 			else
 				txAmt = ac.getTxAmt(); // 正常及隔日訂正為正
@@ -123,7 +132,7 @@ public class AcMainCom extends TradeBuffer {
 			tAcMainId.setAcDtlCode(ac.getAcDtlCode());
 			tAcMainId.setAcDate(ac.getAcDate());
 			procUpdate(0, titaVo);
-			if (ac.getDbCr().equals("D"))
+			if (dbCr.equals("D"))
 				acBookDiff = ac.getTxAmt();
 			else
 				acBookDiff = BigDecimal.ZERO.subtract(ac.getTxAmt());
@@ -161,8 +170,8 @@ public class AcMainCom extends TradeBuffer {
 						dbCr = "D";
 						acBookDiff = BigDecimal.ZERO.subtract(acBookDiff);
 					}
-					if (AcHcode == 1)
-						txAmt = BigDecimal.ZERO.subtract(acBookDiff); // 當日訂正為負
+					if (AcHcode == 1 || AcHcode == 3)
+						txAmt = BigDecimal.ZERO.subtract(acBookDiff); // 訂正為負
 					else
 						txAmt = acBookDiff; // 正常及隔日訂正為正
 					procUpdate(0, titaVo);
@@ -177,7 +186,7 @@ public class AcMainCom extends TradeBuffer {
 	/**
 	 * 在核心入帳，更新餘額欄
 	 * 
-	 * @param AcHcode 帳務訂正記號 0.正常 1.當日訂正 2.隔日訂正
+	 * @param AcHcode 帳務訂正記號 0.正常 1.訂正 2.3 沖正
 	 * @param ac      AcDetail
 	 * @param titaVo  TitaVo
 	 * @throws LogicException LogicException
@@ -185,9 +194,17 @@ public class AcMainCom extends TradeBuffer {
 	public void core(int AcHcode, AcDetail ac, TitaVo titaVo) throws LogicException {
 		acctCode = ac.getAcctCode();
 		// 借貸別
-		dbCr = ac.getDbCr();
+		if (AcHcode == 3) {
+			if (ac.getDbCr().equals("D")) {
+				dbCr = "C";
+			} else {
+				dbCr = "D";
+			}
+		} else {
+			dbCr = ac.getDbCr();
+		}
 		// 交易金額
-		if (AcHcode == 1)
+		if (AcHcode == 1 || AcHcode == 3)
 			txAmt = BigDecimal.ZERO.subtract(ac.getTxAmt()); // 當日訂正為負
 		else
 			txAmt = ac.getTxAmt(); // 正常及隔日訂正為正
@@ -266,7 +283,7 @@ public class AcMainCom extends TradeBuffer {
 	}
 
 	private void computeAmts(int Funcd) {
-		this.info("computeAmts Funcd=" + Funcd + ", DbCr=" + dbCr + ", txAmt=" + txAmt);
+		this.info("computeAmts Funcd=" + Funcd + ", DbCr=" + dbCr + ", txAmt=" + txAmt + tAcMain.toString());
 		// 0.入帳更新
 		if (Funcd == 0) {
 			if (dbCr.equals("D")) {
@@ -310,9 +327,11 @@ public class AcMainCom extends TradeBuffer {
 // 借方科目本日餘額 = 昨日餘額 + 借方金額 - 貸方金額
 // 貸方科目本日餘額 = 昨日餘額 + 貸方金額  - 借方金額
 		if (debitsList.contains(tAcMainId.getAcNoCode().substring(0, 1)))
-			tAcMain.setTdBal(tAcMain.getYdBal().add(tAcMain.getDbAmt()).subtract(tAcMain.getCrAmt()).add(tAcMain.getCoreDbAmt()).subtract(tAcMain.getCoreCrAmt()));
+			tAcMain.setTdBal(tAcMain.getYdBal().add(tAcMain.getDbAmt()).subtract(tAcMain.getCrAmt())
+					.add(tAcMain.getCoreDbAmt()).subtract(tAcMain.getCoreCrAmt()));
 		else
-			tAcMain.setTdBal(tAcMain.getYdBal().add(tAcMain.getCrAmt()).subtract(tAcMain.getDbAmt()).add(tAcMain.getCoreCrAmt()).subtract(tAcMain.getCoreDbAmt()));
+			tAcMain.setTdBal(tAcMain.getYdBal().add(tAcMain.getCrAmt()).subtract(tAcMain.getDbAmt())
+					.add(tAcMain.getCoreCrAmt()).subtract(tAcMain.getCoreDbAmt()));
 
 		// acctCode
 		tAcMain.setAcctCode(acctCode);

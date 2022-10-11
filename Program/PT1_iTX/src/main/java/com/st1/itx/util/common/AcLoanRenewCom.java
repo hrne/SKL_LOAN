@@ -88,7 +88,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 			if (ac.getAcctCode().equals("TRO") && ac.getDbCr().equals("C")) { // 借新還舊 撥款
 				iNewFacmNo = parse.stringToInteger(titaVo.getMrKey().substring(8, 11)); // 0123456-890-234
 				iNewBormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
-				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) // 帳務訂正記號 AcHCode 0.正常 1.當日訂正 2.隔日訂正
+				if (this.txBuffer.getTxCom().getBookAcHcode() == 0) // 帳務訂正記號 帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正   
 					procInsert(ac, mainFacmNo, titaVo);
 				else
 					procDelete(ac, titaVo);
@@ -100,7 +100,8 @@ public class AcLoanRenewCom extends TradeBuffer {
 	/* ----------- insert ----------- */
 	private void procInsert(AcDetail ac, int mainFacmNo, TitaVo titaVo) throws LogicException {
 		// 協議件若原有協議編號需續編
-		Slice<AcLoanRenew> slAcLoanRenew = acLoanRenewService.custNoEq(ac.getCustNo(), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<AcLoanRenew> slAcLoanRenew = acLoanRenewService.custNoEq(ac.getCustNo(), this.index, Integer.MAX_VALUE,
+				titaVo);
 		int tNegNo = 0;
 		if (slAcLoanRenew == null) {
 		} else {
@@ -117,7 +118,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 			}
 		}
 		tNegNo = tNegNo + 1;
-
+		
 		// ClsFlag = 1,AND CustNo = ,AND AcctFlag = 1,AND FacmNo >= ,AND FacmNo <=
 		// 找戶號、額度下已銷的資負明細科目(放款、催收)，且結案區分為展期或借新還舊
 		// 主要額度之借新還舊結案的第一筆撥款，主要記號=Y
@@ -143,7 +144,7 @@ public class AcLoanRenewCom extends TradeBuffer {
 				tAcLoanRenew = new AcLoanRenew();
 				tAcLoanRenew.setAcLoanRenewId(tAcLoanRenewId);
 				tAcLoanRenew.setRenewCode(tTempVo.get("RenewCode"));
-				if ("2".equals(tTempVo.get("RenewCode"))) {// 協議件需寫協議編號
+				if ("2".equals(tTempVo.get("RenewCode"))) {//協議件需寫協議編號
 					tTempVo = new TempVo();
 					tTempVo.putParam("NegNo", tNegNo);
 					tAcLoanRenew.setOtherFields(tTempVo.getJsonString());

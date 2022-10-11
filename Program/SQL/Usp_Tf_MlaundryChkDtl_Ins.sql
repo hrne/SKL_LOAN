@@ -117,7 +117,7 @@ BEGIN
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;
 
-    MERGE IN "MlaundryChkDtl" T
+    MERGE INTO "MlaundryChkDtl" T
     USING (
       SELECT "EntryDate"
            , "Factor"
@@ -138,7 +138,7 @@ BEGIN
     SET "TotalCnt" = S."TotalCnt"
     ;
 
-    MERGE IN "MlaundryDetail" T
+    MERGE INTO "MlaundryDetail" T
     USING (
       SELECT DISTINCT
              "EntryDate"

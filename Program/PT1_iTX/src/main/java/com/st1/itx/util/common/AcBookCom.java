@@ -51,7 +51,7 @@ public class AcBookCom extends TradeBuffer {
 		int acBookFlag = 0;
 		int CustNo = 0;
 		int acHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
-//		帳務訂正記號  AcHCode   0.正常     1.當日訂正     2.隔日訂正              
+//		帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正              
 		BigDecimal LoanAmt = BigDecimal.ZERO;
 
 		// 帳冊別轉換使用會計分錄上已設定好的區隔帳冊

@@ -233,15 +233,15 @@ public interface LoanBorTxService {
   public Slice<LoanBorTx> borxIntEndDateDescRange(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND TitaHCode = ,AND Displayflag ^i
+   * CustNo = ,AND TitaHCode = ,AND TitaTxCd ^i
    *
    * @param custNo_0 custNo_0
    * @param titaHCode_1 titaHCode_1
-   * @param displayflag_2 displayflag_2
+   * @param titaTxCd_2 titaTxCd_2
    * @param titaVo Variable-Length Argument
    * @return Slice LoanBorTx LoanBorTx of List
    */
-  public LoanBorTx custNoLastTxtNoFirst(int custNo_0, String titaHCode_1, List<String> displayflag_2, TitaVo... titaVo);
+  public LoanBorTx custNoLastTxtNoFirst(int custNo_0, String titaHCode_1, List<String> titaTxCd_2, TitaVo... titaVo);
 
   /**
    * hold By LoanBorTx

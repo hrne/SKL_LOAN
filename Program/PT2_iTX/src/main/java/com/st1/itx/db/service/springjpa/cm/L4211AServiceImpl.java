@@ -89,7 +89,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      + (TX2.\"Overflow\"";
 			sql += "      - TX2.\"TempAmt\")";
 			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-			sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
+			sql += "    , LPAD(TX2.\"CustNo\",7,'0')";
 			sql += "      || '-'";
 			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
 			sql += "      || '-'";
@@ -121,8 +121,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
-			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
-			sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
+			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
 			sql += "            AND SUBSTR(TX1.\"TitaTxtNo\",1,2) = SUBSTR(BATX.\"BatchNo\",5,2)";
 			sql += "            AND TO_NUMBER(SUBSTR(TX1.\"TitaTxtNo\",3,6)) = BATX.\"DetailSeq\"";
 			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
@@ -175,7 +174,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      + (TX2.\"Overflow\"";
 			sql += "      - TX2.\"TempAmt\")";
 			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-			sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
+			sql += "    , LPAD(TX2.\"CustNo\",7,'0')";
 			sql += "      || '-'";
 			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
 			sql += "      || '-'";
@@ -208,8 +207,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
-			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
-			sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
+			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
 			sql += "            AND TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
 			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";
 			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
@@ -265,7 +263,7 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      + (TX2.\"Overflow\"";
 			sql += "      - TX2.\"TempAmt\")";
 			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-			sql += "    , LPAD(BATX.\"CustNo\",7,'0')";
+			sql += "    , LPAD(TX2.\"CustNo\",7,'0')";
 			sql += "      || '-'";
 			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
 			sql += "      || '-'";
@@ -297,10 +295,11 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "    , LPAD(NVL(JSON_VALUE(TX2.\"OtherFields\", '$.AdvanceCloseCode'),0),2,0) AS \"CloseReasonCode\" ";
 			sql += " FROM \"BatxDetail\" BATX";
 			sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = BATX.\"CustNo\"";
-			sql += " LEFT JOIN TX1 ON TX1.\"CustNo\" = BATX.\"CustNo\"";
-			sql += "            AND TX1.\"AcDate\" = BATX.\"AcDate\"";
+			sql += " LEFT JOIN TX1 ON TX1.\"AcDate\" = BATX.\"AcDate\"";
 			sql += "            AND TX1.\"TitaTlrNo\" = BATX.\"TitaTlrNo\"";
-			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";
+			sql += "            AND TO_NUMBER(TX1.\"TitaTxtNo\") = BATX.\"TitaTxtNo\"";		
+//			TX1.\"CustNo\" = BATX.\"CustNo\"";
+//			sql += "            AND 
 			sql += " LEFT JOIN \"LoanBorTx\" TX2 ";
 			sql += "             ON TX2.\"AcDate\" = TX1.\"AcDate\"";
 			sql += "            AND TX2.\"TitaTlrNo\" = TX1.\"TitaTlrNo\"";

@@ -1419,13 +1419,13 @@ public class L4211Report extends MakeReport {
 
 	private void atAll() {
 
-		if (allsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
+//		if (allsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c3, formatAmt(allsumTransferAmt, 0), "R");
-		}
+//		}
 
-		if (allsumMakeferAmt.compareTo(BigDecimal.ZERO) != 0) {
+//		if (allsumMakeferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c4, formatAmt(allsumMakeferAmt, 0), "R");
-		}
+//		}
 
 		if (allsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c8, formatAmt(allsumPrincipal, 0), "R");
@@ -1463,13 +1463,13 @@ public class L4211Report extends MakeReport {
 
 	private void totalAll() {
 
-		if (totalsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
+//		if (totalsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c3, formatAmt(totalsumTransferAmt, 0), "R");
-		}
+//		}
 
-		if (totalsumMakerferAmt.compareTo(BigDecimal.ZERO) != 0) {
+//		if (totalsumMakerferAmt.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c4, formatAmt(totalsumMakerferAmt, 0), "R");
-		}
+//		}
 		if (totalsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c8, formatAmt(totalsumPrincipal, 0), "R");
 		}

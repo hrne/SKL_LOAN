@@ -82,11 +82,6 @@ import com.st1.itx.util.parse.Parse;
  * updateMlaundryRecord 更新疑似洗錢交易訪談記錄檔<BR>
  * getTmpFacmNo 取得暫收款額度<BR>
  * isLoanFacTmp 檢查額度是否為暫收指定額度<BR>
- * addFeeBorTxRoutine 新增放款交易內容檔(收回費用)<BR>
- * settleFeeRoutine 收回費用處理(新增帳務及放款交易內容檔)<BR>
- * settleOverflow 累溢收(暫收貸)帳務處理<BR>
- * settleTempAmt 暫收款金額(暫收借)帳務處理 <BR>
- * updBorTxAcDetail 更新放款明細檔及帳務明細檔關聯欄<BR>
  * updStoreRateAndDueAmt 更新放款主檔計息利率與期金<BR>
  * 
  * @author st1
@@ -308,7 +303,7 @@ public class LoanCom extends TradeBuffer {
 		// 修正時放主管放訂正主管
 		if (titaVo.isHcodeModify()) {
 			tLoanBorTx2.setTitaEmpNoS(titaVo.getParam("EraseSupNo"));
-		}		
+		}
 		tLoanBorTx2.setLoanBal(iLoanBal);
 		try {
 			loanBorTxService.insert(tLoanBorTx2);
@@ -1148,6 +1143,38 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
+	 * 檢查到同戶帳務交易需由最近一筆交易開始訂正
+	 * 
+	 * @param iCustNo 戶號
+	 * @param titaVo  TitaVo
+	 * @throws LogicException LogicException
+	 */
+	public void checkEraseCustNoTxSeqNo(int iCustNo, TitaVo titaVo) throws LogicException {
+		// CustNo = ,AND TitaHCode = ,AND Displayflag ^i
+		List<String> lTitaTxCd = new ArrayList<String>();
+		lTitaTxCd.add("L3200"); 
+		lTitaTxCd.add("L3210"); 
+		lTitaTxCd.add("L3220"); 
+		lTitaTxCd.add("L3230"); 
+		lTitaTxCd.add("L3410"); 
+		lTitaTxCd.add("L3420"); 
+		lTitaTxCd.add("L3440"); 
+		lTitaTxCd.add("L3711"); 
+		lTitaTxCd.add("L3712"); 
+		lTitaTxCd.add("L618B"); // 火險費轉列催收
+		lTitaTxCd.add("L618C"); // 法務費轉列催收
+		LoanBorTx tx = loanBorTxService.custNoLastTxtNoFirst(iCustNo, "0", lTitaTxCd, titaVo);
+		if (tx == null) {
+			throw new LogicException(titaVo, "E0001", "同戶帳務交易 戶號=" + iCustNo); // 查詢資料不存在
+		}
+		String orgTxSeq = tx.getTitaKinBr() + tx.getTitaTlrNo() + tx.getTitaTxtNo();
+	//	this.info("checkEraseCustNoTxSeqNo " + +tx.getAcDate() + "-" + orgTxSeq);
+		if (tx.getAcDate() != titaVo.getOrgEntdyI() || !orgTxSeq.equals(titaVo.getOrgTxSeq())) {
+			throw new LogicException(titaVo, "E3088", "同戶帳務最近一筆交易序號 = " + tx.getAcDate() + "-" + orgTxSeq); // 放款交易訂正須由最後一筆交易開始訂正
+		}
+	}
+
+	/**
 	 * 檢查到撥款的放款交易訂正須由最近一筆交易開始訂正
 	 * 
 	 * @param ln     LoanBorMain
@@ -1252,105 +1279,6 @@ public class LoanCom extends TradeBuffer {
 	}
 
 	/**
-	 * 收回費用處理(新增帳務及放款交易內容檔)
-	 * 
-	 * @param baTxList   還款明細
-	 * @param iRpCode    還款來源
-	 * @param iEntryDate 入帳日
-	 * @param iTempVo    OtherFields
-	 * @param lAcDetail  帳務明細
-	 * @param titaVo     TitaVo
-	 * @throws LogicException ....
-	 */
-	public void settleFeeRoutine(ArrayList<BaTxVo> baTxList, int iRpCode, int iEntryDate, TempVo iTempVo,
-			List<AcDetail> lAcDetail, TitaVo titaVo) throws LogicException {
-		for (BaTxVo ba : baTxList) {
-			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				// 暫收款金額 (暫收借)
-				settleTempAmt(baTxList, lAcDetail, titaVo);
-				AcDetail acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode(ba.getAcctCode());
-				acDetail.setTxAmt(ba.getAcctAmt());
-				acDetail.setCustNo(ba.getCustNo());
-				acDetail.setFacmNo(ba.getFacmNo());
-				acDetail.setBormNo(ba.getBormNo());
-				acDetail.setRvNo(ba.getRvNo());
-				acDetail.setReceivableFlag(ba.getReceivableFlag());
-				lAcDetail.add(acDetail);
-				// 累溢收入帳(暫收貸)
-				settleOverflow(lAcDetail, titaVo);
-				// 新增放款交易內容檔(收回費用)
-				String desc = "";
-				if ("L3210".equals(titaVo.getTxcd())) {
-					desc = "暫收銷";
-				}
-				// 費用科目代碼
-				desc += getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
-				addFeeBorTxRoutine(ba, iRpCode, desc, iEntryDate, iTempVo, lAcDetail, titaVo);
-				ba.setAcctAmt(BigDecimal.ZERO);
-			}
-		}
-	}
-
-	/**
-	 * 新增放款交易內容檔(收回費用)
-	 * 
-	 * @param ba         BaTxVo
-	 * @param iRpCode    還款來源
-	 * @param iDesc      交易別
-	 * @param iEntryDate 入帳日
-	 * @param iTempVo    TempVo
-	 * @param lAcDatail  List of AcDetail
-	 * @param titaVo     TitaVo
-	 * @return LoanBorTx
-	 * @throws LogicException ....
-	 */
-	public LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, String iDesc, int iEntryDate, TempVo iTempVo,
-			List<AcDetail> lAcDatail, TitaVo titaVo) throws LogicException {
-		this.info("addFeeBorTxRoutine ... ");
-
-		LoanBorTx tLoanBorTx = new LoanBorTx();
-		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
-		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
-		tLoanBorTx.setDesc(iDesc);
-		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setEntryDate(iEntryDate);
-		tLoanBorTx.setDueDate(ba.getPayIntDate());
-		tLoanBorTx.setFeeAmt(ba.getAcctAmt()); // 實收費用金額
-		tLoanBorTx.setDisplayflag("A"); // 無繳息
-
-		// 其他欄位
-		switch (ba.getRepayType()) {
-		case 4:
-			iTempVo.putParam("AcctFee", ba.getAcctAmt());
-			break;
-		case 5:
-			iTempVo.putParam("FireFee", ba.getAcctAmt());
-			break;
-		case 6:
-			iTempVo.putParam("ModifyFee", ba.getAcctAmt());
-			break;
-		case 7:
-			iTempVo.putParam("LawFee", ba.getAcctAmt());
-			break;
-		}
-		iTempVo.putParam("AcctCode", ba.getAcctCode()); // 業務科目銷
-		iTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
-		tLoanBorTx.setOtherFields(iTempVo.getJsonString());
-
-		// 更新放款明細檔及帳務明細檔關聯欄
-		this.updBorTxAcDetail(tLoanBorTx, lAcDatail);
-
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
-		return tLoanBorTx;
-	}
-
-	/**
 	 * 訂正放款交易內容檔by交易
 	 * 
 	 * @param iCustNo 戶號
@@ -1417,8 +1345,8 @@ public class LoanCom extends TradeBuffer {
 					}
 				}
 
-			}			
-			
+			}
+
 			try {
 				mlaundryRecordService.update(tMlaundryRecord, titaVo);
 			} catch (DBException e) {
@@ -1482,191 +1410,6 @@ public class LoanCom extends TradeBuffer {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * 累溢收(暫收貸)帳務處理
-	 * 
-	 * @param lAcDetail List of AcDetail
-	 * @param titaVo    titaVo
-	 * @throws LogicException ....
-	 */
-
-	public void settleOverflow(List<AcDetail> lAcDetail, TitaVo titaVo) throws LogicException {
-		this.info("settleOverflow ..." + lAcDetail.size());
-
-		int wkCustNo = 0;
-		int wkFacmNo = 0;
-		BigDecimal wkOverflow = BigDecimal.ZERO;
-
-		// 暫收款餘額
-		for (AcDetail ac : lAcDetail) {
-			wkCustNo = ac.getCustNo();
-			// Overflow 累溢收金額 暫收貸(正值)
-			if ("D".equals(ac.getDbCr())) {
-				wkOverflow = wkOverflow.add(ac.getTxAmt());
-			} else {
-				wkOverflow = wkOverflow.subtract((ac.getTxAmt()));
-			}
-//			this.info(ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " "
-//					+ wkOverflow + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " "
-//					+ ac.getRvNo());
-			int sumNo = 0;
-			if (parse.isNumeric(ac.getSumNo())) {
-				sumNo = parse.stringToInteger(ac.getSumNo());
-			}
-			if (sumNo <= 90 && ac.getFacmNo() > 0) {
-				wkFacmNo = ac.getFacmNo();
-			}
-		}
-
-		if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
-			AcDetail acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("TAV");
-			acDetail.setTxAmt(wkOverflow);
-			acDetail.setCustNo(wkCustNo);
-			acDetail.setFacmNo(wkFacmNo);
-			acDetail.setBormNo(0);
-			acDetail.setSumNo("090"); // 暫收可抵繳
-			lAcDetail.add(acDetail);
-		}
-
-		this.info("settleOverflow end" + ", wkOverflow=" + wkOverflow);
-
-	}
-
-	/**
-	 * 暫收款金額 (暫收借) 帳務處理
-	 * 
-	 * @param baTxList  ArrayList of BaTxVo
-	 * @param lAcDetail List of AcDetail
-	 * @param titaVo    TitaVo
-	 * @throws LogicException ....
-	 */
-	public void settleTempAmt(ArrayList<BaTxVo> baTxList, List<AcDetail> lAcDetail, TitaVo titaVo)
-			throws LogicException {
-		this.info("settleTempAmt ... " + lAcDetail.size());
-		int acPaymentSize = 0;
-		if (this.txBuffer.getAcDetailList() != null) {
-			acPaymentSize = this.txBuffer.getAcDetailList().size();
-		}
-		// 僅有收付欄分錄為首筆
-		if (lAcDetail.size() == acPaymentSize) {
-			// 借方：暫收抵繳 (交易前累溢收)
-			for (BaTxVo ba : baTxList) {
-				if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-					AcDetail acDetail = new AcDetail();
-					acDetail.setDbCr("D");
-					acDetail.setAcctCode(ba.getAcctCode());
-					acDetail.setSumNo("090");
-					acDetail.setTxAmt(ba.getAcctAmt());
-					acDetail.setCustNo(ba.getCustNo());
-					acDetail.setFacmNo(ba.getFacmNo());
-					acDetail.setBormNo(ba.getBormNo());
-					acDetail.setRvNo(ba.getRvNo());
-					acDetail.setReceivableFlag(ba.getReceivableFlag());
-					lAcDetail.add(acDetail);
-					this.info("settleTempAmt ba " + acDetail.toString());
-				}
-			}
-
-		} else {
-			AcDetail tAc = lAcDetail.get(lAcDetail.size() - 1);
-
-			if ("090".equals(tAc.getSumNo()) && "C".equals(tAc.getDbCr())) {
-				AcDetail acDetail = new AcDetail();
-				acDetail.setDbCr("D");
-				acDetail.setAcctCode(tAc.getAcctCode());
-				acDetail.setSumNo("090");
-				acDetail.setTxAmt(tAc.getTxAmt());
-				acDetail.setCustNo(tAc.getCustNo());
-				acDetail.setFacmNo(tAc.getFacmNo());
-				acDetail.setBormNo(tAc.getBormNo());
-				lAcDetail.add(acDetail);
-				this.info("settleTempAmt Last-090  " + acDetail.toString());
-			}
-		}
-		this.info("settleTempAmt end " + lAcDetail.size());
-	}
-
-	//
-	/**
-	 * 更新放款明細檔及帳務明細檔關聯欄
-	 * 
-	 * @param tLoanBorTx LoanBorTx
-	 * @param lAcDetail  List of AcDetail
-	 * @throws LogicException ....
-	 */
-
-	public void updBorTxAcDetail(LoanBorTx tLoanBorTx, List<AcDetail> lAcDetail) throws LogicException {
-		this.info("updAcDetailBorxNo ..." + lAcDetail.size());
-// 交易金額 + 暫收借 = 還款金額 + 暫收貸
-// TempAmt  暫收借 = SumNo90~98 借方
-// OverAmt  暫收貸 = SumNo90~98 貸方 
-// RepayAmt 還款金額 = [SumNo==0]貸方-借方
-// TxAmt    交易金額 = 還款金額 + 暫收貸 - 暫收借 
-// 交易金額在暫收款轉帳時需運算
-//  額度 001 轉 額度 002 $100
-//     額度 001 TxAmt = -$100
-//          Db: TAV $550 
-//                 Cr: TAV $450
-//     額度 002 TxAmt = $100
-//          Db: TAV $210
-//                 Cr: TAV $310
-// 
-		BigDecimal txAmt = BigDecimal.ZERO;
-		BigDecimal tempAmt = BigDecimal.ZERO;
-		BigDecimal overAmt = BigDecimal.ZERO;
-		BigDecimal repayAmt = BigDecimal.ZERO;
-		int acSeq = 0;
-		int ii = 0;
-		for (AcDetail ac : lAcDetail) {
-			ii++;
-			TempVo acTempVo = new TempVo();
-			if (ac.getJsonFields() != null) {
-				acTempVo = acTempVo.getVo(ac.getJsonFields());
-			}
-			if (acTempVo.get("BorxNo") == null) {
-				if (acSeq == 0) {
-					acSeq = ii;
-				}
-				int sumNo = 0;
-				if (parse.isNumeric(ac.getSumNo())) {
-					sumNo = parse.stringToInteger(ac.getSumNo());
-				}
-				if (sumNo == 0) {
-					if ("C".equals(ac.getDbCr())) {
-						repayAmt = repayAmt.add(ac.getTxAmt());
-					} else {
-						repayAmt = repayAmt.subtract(ac.getTxAmt());
-					}
-				} else if (sumNo >= 90 && sumNo <= 98) {
-					if ("D".equals(ac.getDbCr())) {
-						tempAmt = tempAmt.add(ac.getTxAmt());
-					} else {
-						overAmt = overAmt.add(ac.getTxAmt());
-					}
-				}
-				acTempVo.putParam("BorxNo", tLoanBorTx.getBorxNo());
-				if (ac.getFacmNo() != tLoanBorTx.getFacmNo()) {
-					acTempVo.putParam("FacmNo", tLoanBorTx.getFacmNo());
-				}
-				if (ac.getBormNo() != tLoanBorTx.getBormNo()) {
-					acTempVo.putParam("BormNo", tLoanBorTx.getBormNo());
-				}
-				acTempVo.putParam("EntryDate", tLoanBorTx.getEntryDate() + 19110000);
-				ac.setJsonFields(acTempVo.getJsonString());
-			}
-		}
-		txAmt = repayAmt.add(overAmt).subtract(tempAmt);
-		tLoanBorTx.setTxAmt(txAmt);
-		tLoanBorTx.setTempAmt(tempAmt);
-		tLoanBorTx.setOverflow(overAmt);
-		tLoanBorTx.setAcSeq(acSeq);
-		this.info("updAcDetailBorxNo end txAmt=" + txAmt + ", tempAmt=" + tempAmt + ", repayAmt=" + repayAmt
-				+ ", overAmt=" + overAmt + ", acSeq=" + acSeq);
-
 	}
 
 	/**

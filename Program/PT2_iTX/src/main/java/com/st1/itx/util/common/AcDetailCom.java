@@ -256,16 +256,12 @@ public class AcDetailCom extends TradeBuffer {
 					tAcDetail.setFacmNo(ac.getFacmNo());
 					tAcDetail.setBormNo(ac.getBormNo());
 				}
-
-				if (ac.getSumNo() == null)
-					tAcDetail.setSumNo("   ");
-				else
-					tAcDetail.setSumNo(ac.getSumNo());// 彙總別
-				if (ac.getDscptCode() == null)
-					tAcDetail.setDscptCode("    ");
-				else
-					tAcDetail.setDscptCode(ac.getDscptCode()); // 摘要代號
+				tAcDetail.setSlipSumNo(ac.getSlipSumNo()); // 彙總傳票批號
+				tAcDetail.setSumNo(ac.getSumNo());// 彙總別
+				tAcDetail.setDscptCode(ac.getDscptCode()); // 摘要代號
 				tAcDetail.setSlipNote(ac.getSlipNote()); // 傳票摘要
+				tAcDetail.setTitaHCode(ac.getTitaHCode()); // 訂正別 
+				
 				/*----------- TITA值 -----------*/
 				tAcDetail.setBranchNo(titaVo.getAcbrNo()); // 記帳單位別
 				if (titaVo.getCurName().trim().isEmpty())
@@ -274,17 +270,11 @@ public class AcDetailCom extends TradeBuffer {
 					tAcDetail.setCurrencyCode(titaVo.getCurName()); // 幣別 */
 				tAcDetail.setBranchNo(titaVo.getAcbrNo()); // 記帳單位別
 				tAcDetail.setTitaKinbr(titaVo.getKinbr()); // 登錄單位別
-				if (titaVo.getTlrNo() == null)
-					tAcDetail.setTitaTlrNo("      ");
-				else
-					tAcDetail.setTitaTlrNo(titaVo.getTlrNo()); // 登錄經辦
+				tAcDetail.setTitaTlrNo(titaVo.getTlrNo()); // 登錄經辦
 				tAcDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo())); // 登錄交易序號
 				tAcDetail.setTitaTxCd(titaVo.getTxcd()); // 交易代號
 				tAcDetail.setTitaSecNo(titaVo.getSecNo()); // 業務類別
-				if (titaVo.getBacthNo() == null)
-					tAcDetail.setTitaBatchNo("      ");
-				else
-					tAcDetail.setTitaBatchNo(titaVo.getBacthNo()); // 整批批號
+				tAcDetail.setTitaBatchNo(titaVo.getBacthNo()); // 整批批號
 				tAcDetail.setTitaBatchSeq(titaVo.getBatchSeq()); // 整批明細序號
 				tAcDetail.setTitaSupNo(titaVo.getEmpNos()); // 核准主管
 				tAcDetail.setTitaRelCd(parse.stringToInteger(titaVo.getRelCode())); // 作業模式
@@ -373,7 +363,8 @@ public class AcDetailCom extends TradeBuffer {
 				throw new LogicException("E6001", "AcDetailCom 支票業務別需為02," + titaVo.getSecNo());
 			}
 			// 撥款匯款業務別 2xx ,201:整批匯款 202:單筆匯款 204:退款台新(存款憑條) 205:退款他行(整批匯款) 211:退款新光(存款憑條)
-			if (ac.getSumNo() != null && ac.getSumNo().length() == 3 && ac.getSumNo().startsWith("2") && !"01".equals(titaVo.getSecNo())) {
+			if (ac.getSumNo() != null && ac.getSumNo().length() == 3 && ac.getSumNo().startsWith("2")
+					&& !"01".equals(titaVo.getSecNo())) {
 				throw new LogicException("E6001", "AcDetailCom 撥款匯款業務別需為01," + titaVo.getSecNo());
 			}
 		}
@@ -396,7 +387,8 @@ public class AcDetailCom extends TradeBuffer {
 
 		// 2. StampTaxFreeAmt 免印花稅金額
 // 還款來源 = 4.支票兌現 && 業務科目 = 利息收入(Ixx)	
-		if (titaVo.get("RpCode1") != null && parse.stringToInteger(titaVo.getParam("RpCode1")) == 4 && "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
+		if (titaVo.get("RpCode1") != null && parse.stringToInteger(titaVo.getParam("RpCode1")) == 4
+				&& "I".equals(tAcDetail.getAcctCode().substring(0, 1))) {
 			tTempVo.putParam("StampTaxFreeAmt", tAcDetail.getTxAmt());
 		}
 		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
@@ -457,7 +449,8 @@ public class AcDetailCom extends TradeBuffer {
 		// F12聯貸件收入、 F27聯貸管理費收入
 		// 聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
 		if (acctCode.equals("F12") || acctCode.equals("F27")) {
-			if (ac.getReceivableFlag() == 3 && ac.getRvNo().length() >= 15 && parse.isNumeric(ac.getRvNo().substring(10, 15))) {
+			if (ac.getReceivableFlag() == 3 && ac.getRvNo().length() >= 15
+					&& parse.isNumeric(ac.getRvNo().substring(10, 15))) {
 				if (parse.stringToInteger(ac.getRvNo().substring(10, 15)) > this.txBuffer.getTxCom().getTbsdy() / 100) {
 					acctCode = "TSL";
 					ac.setReceivableFlag(0);

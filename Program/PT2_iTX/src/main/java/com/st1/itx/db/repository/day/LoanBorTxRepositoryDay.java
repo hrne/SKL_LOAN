@@ -64,8 +64,8 @@ public interface LoanBorTxRepositoryDay extends JpaRepository<LoanBorTx, LoanBor
   // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <= ,AND EntryDate >= ,AND EntryDate <=,AND Displayflag  ^i
   public Slice<LoanBorTx> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndDisplayflagInOrderByIntEndDateDescAcDateAscTitaKinBrAscTitaTlrNoAscTitaTxtNoAscAcSeqAsc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int entryDate_5, int entryDate_6, List<String> displayflag_7, Pageable pageable);
 
-  // CustNo = ,AND TitaHCode = ,AND Displayflag ^i
-  public Optional<LoanBorTx> findTopByCustNoIsAndTitaHCodeIsAndDisplayflagInOrderByAcDateDescTitaCalDyDescTitaCalTmDescTitaTxtNoDescAcSeqDesc(int custNo_0, String titaHCode_1, List<String> displayflag_2);
+  // CustNo = ,AND TitaHCode = ,AND TitaTxCd ^i
+  public Optional<LoanBorTx> findTopByCustNoIsAndTitaHCodeIsAndTitaTxCdInOrderByAcDateDescTitaCalDyDescTitaCalTmDescTitaTxtNoDescAcSeqDesc(int custNo_0, String titaHCode_1, List<String> titaTxCd_2);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

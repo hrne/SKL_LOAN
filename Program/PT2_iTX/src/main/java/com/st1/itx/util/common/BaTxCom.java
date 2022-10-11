@@ -309,8 +309,8 @@ public class BaTxCom extends TradeBuffer {
 			this.payFeeFlag = "N";
 			this.extraRepay = iTxAmt; // 部分還款金額
 			Slice<LoanBook> slLoanBook = loanBookService.bookCustNoRange(iCustNo, iCustNo, iFacmNo,
-					iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
-					Integer.MAX_VALUE, titaVo);
+					iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, 0, Integer.MAX_VALUE,
+					titaVo);
 			if (slLoanBook != null) {
 				for (LoanBook tLoanBook : slLoanBook.getContent()) {
 					if (tLoanBook.getStatus() == 0) {
@@ -1141,7 +1141,7 @@ public class BaTxCom extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd,
-				this.index, Integer.MAX_VALUE, titaVo);
+				0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain == null) {
 			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
 		}
@@ -1653,6 +1653,23 @@ public class BaTxCom extends TradeBuffer {
 	/* 計算作帳金額 */
 	private void settleAcctAmt(int repayPriority) {
 		this.info("settleAcctAmt repayPriority=" + repayPriority);
+		// 短繳期金，放期款第一筆
+		if (repayPriority == 4) {
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getDataKind() == 1 && ba.getRepayType() == 1) {
+					for (BaTxVo t : this.baTxList) {
+						if (t.getDataKind() == 2) {
+							ba.setDataKind(2);
+							ba.setPayIntDate(t.getPayIntDate());
+							ba.setIntStartDate(t.getIntStartDate());
+							ba.setIntEndDate(t.getIntStartDate());
+							continue;
+						}
+					}
+				}
+			}
+		}
+
 		for (BaTxVo ba : this.baTxList) {
 			if (this.isPayAllFee) {
 				// 全部回收費用
@@ -2010,18 +2027,22 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-		// 有作帳金額
 		int acSeq = 0;
 		// 費用
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcAmt().compareTo(BigDecimal.ZERO) > 0) {
 				acSeq++;
 				ba.setAcSeq(acSeq);
-				ba.setTxAmt(wkTxBal);
-				ba.setTempAmt(wkTempBal);
-				ba.setOverflow(wkTxBal.add(wkTempBal).subtract(ba.getAcAmt()));
-				wkTxBal = BigDecimal.ZERO;
-				wkTempBal = ba.getOverflow();
+				if (wkTempBal.compareTo(ba.getAcAmt()) >= 0) {
+					ba.setTempAmt(ba.getAcAmt());
+					ba.setTxAmt(BigDecimal.ZERO);
+					wkTempBal = wkTempBal.subtract(ba.getTempAmt());
+				} else {
+					ba.setTempAmt(wkTempBal);
+					ba.setTxAmt(ba.getAcAmt().subtract(wkTempBal));
+					wkTempBal = BigDecimal.ZERO;
+					wkTxBal = wkTxBal.subtract(ba.getTxAmt());
+				}
 			}
 		}
 		// 放款
@@ -2033,13 +2054,28 @@ public class BaTxCom extends TradeBuffer {
 								&& (ba.getBormNo() == ln.getBormNo() || ba.getBormNo() == 0)) {
 							acSeq++;
 							ba.setAcSeq(acSeq);
-							ba.setTxAmt(wkTxBal);
-							ba.setTempAmt(wkTempBal);
-							ba.setOverflow(wkTxBal.add(wkTempBal).subtract(ba.getAcAmt()));
-							wkTxBal = BigDecimal.ZERO;
-							wkTempBal = ba.getOverflow();
+							if (wkTempBal.compareTo(ba.getAcAmt()) >= 0) {
+								ba.setTempAmt(ba.getAcAmt());
+								ba.setTxAmt(BigDecimal.ZERO);
+								wkTempBal = wkTempBal.subtract(ba.getTempAmt());
+							} else {
+								ba.setTempAmt(wkTempBal);
+								ba.setTxAmt(ba.getAcAmt().subtract(wkTempBal));
+								wkTempBal = BigDecimal.ZERO;
+								wkTxBal = wkTxBal.subtract(ba.getTxAmt());
+							}
 						}
 					}
+				}
+			}
+		}
+		// 有作帳金額的最後一筆，計算溢繳
+		if (acSeq > 0) {
+			for (BaTxVo ba : this.baTxList) {
+				if (ba.getAcSeq() == acSeq) {
+					ba.setTempAmt(ba.getTempAmt().add(wkTempBal));
+					ba.setTxAmt(ba.getTxAmt().add(wkTxBal));
+					ba.setOverflow(ba.getTempAmt().add(ba.getTxAmt()).subtract(ba.getAcAmt()));
 				}
 			}
 		}
@@ -2340,7 +2376,7 @@ public class BaTxCom extends TradeBuffer {
 
 		initRv();
 		if (this.isLoadRvList) {
-			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index,
+			Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0,
 					Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
 			rvList = srvList == null ? null : srvList.getContent();
 			this.isLoadRvList = false;

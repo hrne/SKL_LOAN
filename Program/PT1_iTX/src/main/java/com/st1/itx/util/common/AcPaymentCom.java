@@ -23,9 +23,9 @@ import com.st1.itx.db.domain.BankRemitId;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.TxAmlLog;
-import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdBankService;
@@ -33,7 +33,6 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.TxAmlLogService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.RemitFormVo;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -42,9 +41,8 @@ import com.st1.itx.util.report.RemitForm;
 /**
  * 收付欄處理<BR>
  * 1.run 收付欄(含溢收)出帳 call by L3XXX<BR>
- * 2.loanCheque 兌現票入帳更新支票檔 call by L3XXX<BR>
- * 3.remit 撥款匯款檔處理 call by L3100、L3220<BR>
- * 4.printRemitForm 產出單筆匯款單、存入憑條call by L3100、L3220<BR>
+ * 2.remit 撥款匯款檔處理 call by L3100、L3220<BR>
+ * 3.printRemitForm 產出單筆匯款單、存入憑條call by L3100、L3220<BR>
  * 
  * @author st1
  *
@@ -62,8 +60,6 @@ public class AcPaymentCom extends TradeBuffer {
 
 	@Autowired
 	public BankRemitService bankRemitService;
-	@Autowired
-	public LoanChequeService loanChequeService;
 	@Autowired
 	public TxAmlLogService txAmlLogService;
 
@@ -160,11 +156,6 @@ public class AcPaymentCom extends TradeBuffer {
 			}
 		}
 
-		// 彙總別：撥還共用(0XX)／還款來源(1xx)／撥款方式(2xx) 、業務科目對應表
-// 1-應收  RpAcctCode (整批入帳檔帶入)
-//       101.匯款轉帳 102.銀行扣款 103.員工扣款 104.支票兌現
-//       105.法院扣薪 106.理賠金 107.代收款-債權協商 109.其他 111.匯款轉帳預先作業
-//
 // 2-應付
 //		201:整批匯款                        P02 銀行存款－新光       
 //		202:單筆匯款                        P02 銀行存款－新光
@@ -174,14 +165,10 @@ public class AcPaymentCom extends TradeBuffer {
 //		
 
 // 0-共用
-//      090.暫收抵繳     (額度)       TAV 暫收款－可抵繳
-//      091:借新還舊                  TRO 暫收款－借新還舊
-//      092:暫收轉帳     (戶號+額度)  TAV 暫收款－可抵繳
-//      093:繳抽退票                  TCK 暫收款－支票
-//      094:轉債協暫收款 (戶號)       T1x 債協暫收款      
-//      095:轉債協退還款 (戶號)       T2x 債協退還款  
-//      099:暫收沖正     (戶號)       THC 暫收款－沖正
-		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6 && "RESV00".equals(titaVo.get("BATCHNO"))) {
+//      091:借新還舊            TRO 暫收款－借新還舊
+//	    093:繳抽退票                       TCK 暫收款－支票
+		if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
+				&& "RESV00".equals(titaVo.get("BATCHNO"))) {
 			acDetail.setSumNo("099");
 		} else if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
 			acDetail.setSumNo("0" + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
@@ -204,75 +191,17 @@ public class AcPaymentCom extends TradeBuffer {
 		acDetail.setRvNo(titaVo.get("RpRvno" + i)); /* 銷帳編號 VARCHAR2(30) */
 
 		switch (acDetail.getSumNo()) {
-		case "090":
-			acDetail.setAcctCode("TAV");
-			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-			if (acDetail.getCustNo() != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-				if (acDetail.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
-					// 暫收款入帳(暫收借)
-					BigDecimal excessive = addAcDetail90(acDetail.getCustNo(), acDetail.getFacmNo(), titaVo);
-					// 累溢收入帳(暫收貸)
-					acDetail.setDbCr("C");
-					acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-					acDetail.setTxAmt(excessive.subtract(acDetail.getTxAmt()));
-				}
-			}
-			break;
 		case "091":
 			acDetail.setAcctCode("TRO");
 // 1:應收     L3410  結案   D       500,000     FacmNo002    原額度002
 // 2:應付     L3100  撥貸   C       500,000     FacmNo002    新額度004，原額度002
-			if (RpFlag.equals("1")) {
-				acDetail.setRvNo("FacmNo" + titaVo.getMrKey().substring(8, 11));
-				acDetail.setFacmNo(parse.stringToInteger(titaVo.getMrKey().substring(8, 11)));
-			} else {
-				acDetail.setRvNo("FacmNo" + titaVo.getParam("RpFacmNo" + i));
-				acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-				acDetail.setSlipNote("新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));
-			}
-			break;
-		case "092": // 已由L3230程式處理
-			acDetail.setAcctCode("TAV");
-			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)));
+			acDetail.setRvNo("FacmNo" + titaVo.getParam("RpFacmNo" + i));
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+			acDetail.setSlipNote("新額度" + titaVo.getMrKey().substring(8, 11) + "，原額度" + titaVo.getParam("RpFacmNo" + i));
 			break;
 		case "093":
 			acDetail.setAcctCode("TCK");
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-			break;
-		case "094":
-			acDetail.setFacmNo(0); // 額度不放
-			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)));
-			acDetail.setAcctCode(acNegCom.getAcctCode(acDetail.getCustNo(), titaVo));
-			break;
-		case "095":
-			acDetail.setFacmNo(0); // 額度不放
-			acDetail.setCustNo(parse.stringToInteger(titaVo.getParam("RpCustNo" + i)));
-			acDetail.setAcctCode(acNegCom.getReturnAcctCode(acDetail.getCustNo(), titaVo));
-			break;
-		case "099":
-			acDetail.setAcctCode("THC");
-			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
-			break;
-		case "101": // 101.匯款轉帳
-			acDetail.setAcctCode("P03");
-			break;
-		case "102": // 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH)
-			if ("C01".equals(acDetail.getAcctCode())) {
-				acDetail.setRvNo("0010060" + this.acDate);
-			}
-			break;
-		case "103": // 103.員工扣款
-			break;
-		case "104": // 104.支票兌現
-			break;
-		// 其他還款來源有核心銷帳碼
-		case "105": // 105.法院扣薪
-		case "106": // 106.理賠金
-		case "107": // 107.代收款-債權協商
-		case "109": // 109.其他
-			break;
-		case "111": // 111.匯款轉帳預先作業
 			break;
 		case "201":
 			acDetail.setAcctCode("P02");
@@ -297,20 +226,6 @@ public class AcPaymentCom extends TradeBuffer {
 		}
 	}
 
-	private BigDecimal addAcDetail90(int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {
-		ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
-		try {
-			baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 96, BigDecimal.ZERO, titaVo);
-		} catch (LogicException e) {
-			throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
-		}
-		// 暫收款金額 (暫收借)
-		loanCom.settleTempAmt(baTxList, this.acDetailList, titaVo);
-
-		return baTxCom.getExcessive();
-
-	}
-
 	/* 匯款內容 */
 	private void moveTitaToTempVo(int i, TitaVo titaVo) throws LogicException {
 		tTempVo.clear();
@@ -320,77 +235,6 @@ public class AcPaymentCom extends TradeBuffer {
 		tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo" + i));
 		tTempVo.putParam("CustName", titaVo.getParam("RpCustName" + i));
 		tTempVo.putParam("Remark", titaVo.getParam("RpRemark" + i));
-	}
-
-	/**
-	 * 兌現票入帳更新支票檔
-	 * 
-	 * @param titaVo TitaVo
-	 * @return LoanCheque
-	 * @throws LogicException LogicException
-	 */
-	public LoanCheque loanCheque(TitaVo titaVo) throws LogicException {
-		this.info("AcPayment LoanCheque ...");
-		int iCustNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
-		String iRpRvno = titaVo.getParam("RpRvno1");
-		int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
-		int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
-		BigDecimal iRpAmt = this.parse.stringToBigDecimal(titaVo.getParam("RpAmt1"));
-
-		this.info("   iRpRvno = " + iRpRvno);
-		this.info("   iRpAmt = " + iRpAmt);
-		this.info("   iChequeAcct = " + iChequeAcct);
-		this.info("   iChequeNo = " + iChequeNo);
-
-		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
-		if (tLoanCheque == null) {
-			throw new LogicException(titaVo, "E0006", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
-		}
-		// 隔日訂正，來源科目回沖至暫收可抵繳，不處理
-		if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
-			this.info("BookAcHcode = 2, Skip Update");
-			return tLoanCheque;
-		}
-
-		// 更新欄
-		// StatusCode票據狀況碼 4: 兌現未入帳 -> 1: 兌現入帳
-		// AcDate 會計日期
-		// RepaidAmt已入帳金額
-
-		// 正常交易
-		if (titaVo.isHcodeNormal()) {
-			if (!(tLoanCheque.getStatusCode().equals("1") || tLoanCheque.getStatusCode().equals("4"))) {
-				throw new LogicException(titaVo, "E3057", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 該票據狀況碼非為兌現，不可入帳
-			}
-			if (tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt()).compareTo(iRpAmt) < 0) {
-				throw new LogicException(titaVo, "E3058", "支票尚未入帳金額 = " + tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt())); // 暫收金額超過支票尚未入帳金額
-			}
-			tLoanCheque.setStatusCode("1"); // 1: 兌現入帳
-			tLoanCheque.setRepaidAmt(tLoanCheque.getRepaidAmt().add(iRpAmt));
-			tLoanCheque.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-			tLoanCheque.setKinbr(titaVo.getKinbr());
-			tLoanCheque.setTellerNo(titaVo.getTlrNo());
-			tLoanCheque.setTxtNo(titaVo.getTxtNo());
-		}
-		// 訂正
-		if (titaVo.isHcodeErase()) {
-			tLoanCheque.setRepaidAmt(tLoanCheque.getRepaidAmt().subtract(iRpAmt));
-			if (tLoanCheque.getRepaidAmt().compareTo(new BigDecimal(0)) > 0) {
-				tLoanCheque.setStatusCode("1"); // 1: 兌現入帳
-			} else {
-				tLoanCheque.setStatusCode("4"); // 4: 兌現未入帳
-				tLoanCheque.setAcDate(0);
-				tLoanCheque.setKinbr("");
-				tLoanCheque.setTellerNo("");
-				tLoanCheque.setTxtNo("");
-			}
-		}
-		try {
-			loanChequeService.update(tLoanCheque, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
-		}
-		return tLoanCheque;
 	}
 
 	/**
@@ -409,7 +253,8 @@ public class AcPaymentCom extends TradeBuffer {
 			/* SecNo : 01:撥款匯款 */
 			/* 撥款方式為 1 ~ 89 */
 			if (titaVo.getSecNo().equals("01") && titaVo.get("RpCode" + i) != null) {
-				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0 && parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
+				if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) > 0
+						&& parse.stringToInteger(titaVo.getParam("RpCode" + i)) < 90) {
 
 					/* BankRemit寫入 */
 					procBankRemit(i, titaVo);
@@ -477,7 +322,8 @@ public class AcPaymentCom extends TradeBuffer {
 				BankRemit t2BankRemit = new BankRemit();
 				t2BankRemit = moveTitaToBankRemit(i, t2BankRemit, titaVo);// 搬BankRemit內容
 				if (isModifyRemit(tBankRemit, t2BankRemit)) {
-					if (t2BankRemit.getDrawdownCode() != tBankRemit.getDrawdownCode() && tBankRemit.getDrawdownCode() == 01) {
+					if (t2BankRemit.getDrawdownCode() != tBankRemit.getDrawdownCode()
+							&& tBankRemit.getDrawdownCode() == 01) {
 						tBankRemit.setStatusCode(4); // 4.產檔後改單筆匯款
 					} else {
 						tBankRemit.setStatusCode(3);// 3. 產檔後修正
@@ -524,7 +370,8 @@ public class AcPaymentCom extends TradeBuffer {
 			} else {
 				transactionId += titaVo.getTxSeq();
 			}
-			TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(tBankRemit.getAcDate() + 19110000, transactionId, titaVo);
+			TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(tBankRemit.getAcDate() + 19110000,
+					transactionId, titaVo);
 			if (tTxAmlLog == null) {
 				throw new LogicException(titaVo, "E0014", "TxAmlLog not found"); // 檔案錯誤
 			}
@@ -633,9 +480,13 @@ public class AcPaymentCom extends TradeBuffer {
 
 		tTempVo.clear();
 		Boolean isModify = true;
-		if (t2BankRemit.getDrawdownCode() == tBankRemit.getDrawdownCode() && t2BankRemit.getRemitBank().equals(tBankRemit.getRemitBank())
-				&& t2BankRemit.getRemitBranch().equals(tBankRemit.getRemitBranch()) && t2BankRemit.getRemitAcctNo().equals(tBankRemit.getRemitAcctNo())
-				&& t2BankRemit.getCustName().equals(tBankRemit.getCustName()) && t2BankRemit.getRemark().equals(tBankRemit.getRemark()) && t2BankRemit.getRemitAmt().equals(tBankRemit.getRemitAmt())) {
+		if (t2BankRemit.getDrawdownCode() == tBankRemit.getDrawdownCode()
+				&& t2BankRemit.getRemitBank().equals(tBankRemit.getRemitBank())
+				&& t2BankRemit.getRemitBranch().equals(tBankRemit.getRemitBranch())
+				&& t2BankRemit.getRemitAcctNo().equals(tBankRemit.getRemitAcctNo())
+				&& t2BankRemit.getCustName().equals(tBankRemit.getCustName())
+				&& t2BankRemit.getRemark().equals(tBankRemit.getRemark())
+				&& t2BankRemit.getRemitAmt().equals(tBankRemit.getRemitAmt())) {
 			isModify = false;
 		}
 		if (isModify) {
@@ -696,7 +547,8 @@ public class AcPaymentCom extends TradeBuffer {
 			// 報表代號(交易代號)
 			remitformVo.setReportCode(titaVo.getTxCode());
 			// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
-			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_" + tBankRemit.getBormNo());
+			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_"
+					+ tBankRemit.getBormNo());
 
 			remitForm.open(titaVo, remitformVo);
 
@@ -721,7 +573,8 @@ public class AcPaymentCom extends TradeBuffer {
 				remitformVo.setReportCode(titaVo.getTxCode());
 
 				// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
-				remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_" + tBankRemit.getBormNo());
+				remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo()
+						+ "_" + tBankRemit.getBormNo());
 
 				// 申請日期(民國年)
 				remitformVo.setApplyDay(titaVo.getEntDyI());

@@ -136,7 +136,7 @@ public class AcNegCom extends TradeBuffer {
 		tNegTransId.setTitaTxtNo(this.txBuffer.getTxCom().getRelTno());
 		tNegTrans.setNegTransId(tNegTransId);
 		// 正常交易新增、訂正交易要刪除
-		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.當日訂正 2.隔日訂正
+		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正   
 			tNegMain = negMainService.statusFirst("0", ac.getCustNo(), titaVo); // 0-正常
 			if (tNegMain == null) {
 				throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + ac.getCustNo());
@@ -341,7 +341,8 @@ public class AcNegCom extends TradeBuffer {
 		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		if (slNegAppr02 != null) {
 			for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
-				if (tNegAppr02.getAcDate() == 0 && ("4001".equals(tNegAppr02.getStatusCode()) && tNegAppr02.getTxAmt().compareTo(txAmt) == 0)) {// 須為檢核成功之資料
+				if (tNegAppr02.getAcDate() == 0
+						&& ("4001".equals(tNegAppr02.getStatusCode()) && tNegAppr02.getTxAmt().compareTo(txAmt) == 0)) {// 須為檢核成功之資料
 					AcDetail acDetail = new AcDetail();
 					acDetail.setDbCr("C");
 					acDetail.setSumNo("094"); // 094 :轉債協暫收款

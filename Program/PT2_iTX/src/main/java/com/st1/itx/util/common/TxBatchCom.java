@@ -31,6 +31,8 @@ import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.LoanBook;
+import com.st1.itx.db.domain.LoanCheque;
+import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.LoanCustRmk;
 import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.domain.TxRecord;
@@ -43,6 +45,7 @@ import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
+import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanCustRmkService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
@@ -195,6 +198,9 @@ public class TxBatchCom extends TradeBuffer {
 
 	@Autowired
 	public EmpDeductDtlService empDeductDtlService;
+
+	@Autowired
+	public LoanChequeService loanChequeService;
 
 	@Autowired
 	public TxRecordService txRecordService;
@@ -581,27 +587,24 @@ public class TxBatchCom extends TradeBuffer {
 		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
 		this.otherTempVo = new TempVo();
 		this.otherTempVo = this.tTempVo.getVo(tDetail.getOtherNote());
-// TXTNO = BatchNo[2] + TxtSeq [6]
+// TXTNO = BatchNo[2] + eraseNo(1) + TxtSeq [5] 
+// 整批訂正只會有一次( 整批訂正會自動刪除、單筆需人工訂正)
 // BatchNo:Batx09, TotalCnt: 32321 
-//		        EraseCnt   eraseAddNo   TxtNo                eraseAddNo
-// Normal          0           0        09000001~09032321    cnt * (EraseCnt * 2)    
-// Erase           0           4        09040001~09072321    cnt * (EraseCnt * 2 + 1)           
-// Normal          1           8        09080001~09112321    cnt * (EraseCnt * 2)     
-// Erase           1          12        09120001~09152321    cnt * (EraseCnt * 2 + 1)
-// Normal          2          16        09160001~09192321    cnt * (EraseCnt * 2)
-		int eraseAddNo = 0;
-		int cnt = iTotalcnt / 10000 + 1;
+//		        EraseCnt   eraseNo       TxtNo                 
+// Normal          0           0        09000001~09032321    
+// Erase           0           1        09100001~09132321                
+		int eraseNo = 0;
 		int eraseCnt = 0;
 		if (this.tTempVo.get("EraseCnt") != null) {
 			eraseCnt = parse.stringToInteger(tTempVo.get("EraseCnt"));
 		}
 		if (hcode == 0) {
-			eraseAddNo = cnt * (eraseCnt * 2);
+			eraseNo = eraseCnt * 2;
 		} else {
-			eraseAddNo = cnt * (eraseCnt * 2 + 1);
+			eraseNo = eraseCnt * 2 + 1;
 		}
 		String txtNo = tDetail.getBatchNo().substring(4, 6)
-				+ parse.IntegerToString(tDetail.getDetailSeq() + eraseAddNo * 10000, 6);
+				+ parse.IntegerToString(tDetail.getDetailSeq() + eraseNo * 100000, 6);
 
 		TitaVo txTitaVo = new TitaVo();
 		// 正常交易，組交易電文
@@ -709,18 +712,26 @@ public class TxBatchCom extends TradeBuffer {
 		}
 
 		// 支票兌現
-		String iChequeAcct = "";
-		String iChequeNo = "";
+		int iChequeAcct = 0;
+		int iChequeNo = 0;
 		// 030102806 0760500
 		// 01234567890123456
 		if (tDetail.getRepayCode() == 4) {
-			iChequeAcct = tDetail.getRvNo().substring(0, 9);
-			iChequeNo = tDetail.getRvNo().substring(10, 17);
+			iChequeAcct = parse.stringToInteger(tDetail.getRvNo().substring(0, 9));
+			iChequeNo = parse.stringToInteger(tDetail.getRvNo().substring(10, 17));
 		}
 		txTitaVo.putParam("ChequeName", "");
 		txTitaVo.putParam("ChequeAcct", iChequeAcct);
 		txTitaVo.putParam("ChequeNo", iChequeNo);
 		txTitaVo.putParam("ChequeDate", 0);
+		if (tDetail.getRepayCode() == 4) {
+			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), txTitaVo);
+			if (tLoanCheque != null) {
+				txTitaVo.putParam("ChequeName", tLoanCheque.getChequeName());
+				txTitaVo.putParam("ChequeDate", tLoanCheque.getChequeDate());
+				txTitaVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
+			}
+		}
 
 		// 收付欄
 		txTitaVo.putParam("RpFlag", "1"); // 1:應收
@@ -1210,6 +1221,10 @@ public class TxBatchCom extends TradeBuffer {
 			if (tDetail.getRepayCode() == 3) {
 				updEmpDeductDtl(acDate, tDetail, titaVo);
 			}
+			// 04.支票兌現
+			if (tDetail.getRepayCode() == 4) {
+				updLoanCheque(acDate, tDetail, titaVo);
+			}
 		} else {
 			// 交易失敗
 			String errorMsg = this.txBuffer.getTxCom().getErrorMsg().length() > 100
@@ -1265,6 +1280,7 @@ public class TxBatchCom extends TradeBuffer {
 
 //	Update BankRmtf 交易結束更新匯款轉帳檔
 	private void updBankRmtf(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		this.info("updBankRmtf ...");
 		BankRmtfId tBankRmtfId = new BankRmtfId();
 		tBankRmtfId.setAcDate(tBatxDetail.getAcDate());
 		tBankRmtfId.setBatchNo(tBatxDetail.getBatchNo());
@@ -1273,6 +1289,7 @@ public class TxBatchCom extends TradeBuffer {
 		if (tBankRmtf == null) {
 			throw new LogicException("E0006", "TxBatchCom BankRmtf"); // E0006 鎖定資料時，發生錯誤
 		}
+		tBankRmtf.setRepayType(parse.IntegerToString(tBatxDetail.getRepayType(), 2));
 		if (acDate == 0) {
 			tBankRmtf.setTitaTlrNo("");
 			tBankRmtf.setTitaTxtNo("");
@@ -1290,6 +1307,7 @@ public class TxBatchCom extends TradeBuffer {
 
 //		Update BankDeductDtl 交易結束更新銀扣明細檔
 	private void updBankDeductDtl(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		this.info("updBankDeductDtl ...");
 
 //		BatxDetail's MediaDate MediaCode MediaSeq to find ACH/POST (僅一個媒體Table需產出多媒體File者才需區分MediaCode)
 		Slice<BankDeductDtl> slBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
@@ -1334,6 +1352,7 @@ public class TxBatchCom extends TradeBuffer {
 
 //		Update EmpDeductDtl  交易結束更新員工扣薪明細檔
 	private void updEmpDeductDtl(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		this.info("updEmpDeductDtl ...");
 
 //		BatxDetail's MediaDate MediaCode MediaSeq to find 15/un15 
 		List<EmpDeductDtl> lEmpDeductDtl = new ArrayList<EmpDeductDtl>();
@@ -1377,6 +1396,75 @@ public class TxBatchCom extends TradeBuffer {
 		}
 	}
 
+	// 兌現票入帳更新支票檔
+	private LoanCheque updLoanCheque(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+		this.info("updLoanCheque ...");
+		int iCustNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
+		String iRpRvno = titaVo.getParam("RpRvno1");
+		int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
+		int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
+		BigDecimal iRpAmt = this.parse.stringToBigDecimal(titaVo.getParam("RpAmt1"));
+
+		this.info("   iRpRvno = " + iRpRvno);
+		this.info("   iRpAmt = " + iRpAmt);
+		this.info("   iChequeAcct = " + iChequeAcct);
+		this.info("   iChequeNo = " + iChequeNo);
+
+		LoanCheque tLoanCheque = loanChequeService.holdById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
+		if (tLoanCheque == null) {
+			throw new LogicException(titaVo, "E0006",
+					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 鎖定資料時，發生錯誤
+		}
+		// 隔日訂正，來源科目回沖至暫收可抵繳，不處理
+		if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
+			this.info("BookAcHcode = 2, Skip Update");
+			return tLoanCheque;
+		}
+
+		// 更新欄
+		// StatusCode票據狀況碼 4: 兌現未入帳 -> 1: 兌現入帳
+		// AcDate 會計日期
+		// RepaidAmt已入帳金額
+
+		// 正常交易
+		if (titaVo.isHcodeNormal()) {
+			if (!(tLoanCheque.getStatusCode().equals("1") || tLoanCheque.getStatusCode().equals("4"))) {
+				throw new LogicException(titaVo, "E3057",
+						"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo); // 該票據狀況碼非為兌現，不可入帳
+			}
+			if (tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt()).compareTo(iRpAmt) < 0) {
+				throw new LogicException(titaVo, "E3058",
+						"支票尚未入帳金額 = " + tLoanCheque.getChequeAmt().subtract(tLoanCheque.getRepaidAmt())); // 暫收金額超過支票尚未入帳金額
+			}
+			tLoanCheque.setStatusCode("1"); // 1: 兌現入帳
+			tLoanCheque.setRepaidAmt(tLoanCheque.getRepaidAmt().add(iRpAmt));
+			tLoanCheque.setAcDate(acDate);
+			tLoanCheque.setKinbr(titaVo.getKinbr());
+			tLoanCheque.setTellerNo(titaVo.getTlrNo());
+			tLoanCheque.setTxtNo(titaVo.getTxtNo());
+		}
+		// 訂正
+		if (titaVo.isHcodeErase()) {
+			tLoanCheque.setRepaidAmt(tLoanCheque.getRepaidAmt().subtract(iRpAmt));
+			if (tLoanCheque.getRepaidAmt().compareTo(new BigDecimal(0)) > 0) {
+				tLoanCheque.setStatusCode("1"); // 1: 兌現入帳
+			} else {
+				tLoanCheque.setStatusCode("4"); // 4: 兌現未入帳
+				tLoanCheque.setAcDate(0);
+				tLoanCheque.setKinbr("");
+				tLoanCheque.setTellerNo("");
+				tLoanCheque.setTxtNo("");
+			}
+		}
+		try {
+			loanChequeService.update(tLoanCheque, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007",
+					"戶號 = " + iCustNo + " 支票帳號 = " + iChequeAcct + " 支票號碼 = " + iChequeNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+		return tLoanCheque;
+	}
+
 	/* 設定明細處理狀態 */
 	private void settingprocStsCode(BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 		this.info("settingprocStsCode ...");
@@ -1406,7 +1494,7 @@ public class TxBatchCom extends TradeBuffer {
 			// 01-期款
 			case 1:
 				// A3-還本帳戶，有期款未回收，人工處理
-				if ("A3".equals(tBatxDetail.getReconCode())) {
+				if ("A3".equals(tBatxDetail.getReconCode()) && tBatxDetail.getRepayType() == 0) {
 					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
 					this.repayType = 2;
 					this.procStsCode = "2"; // 2.人工處理
@@ -1578,6 +1666,12 @@ public class TxBatchCom extends TradeBuffer {
 				break;
 			}
 		}
+		
+		// 訂正後需人工處理
+		if ("4".equals(this.procStsCode) && this.tTempVo.get("EraseCnt") != null) {
+			this.procStsCode = "2"; // 2.人工處理
+		}
+		
 		// 去起頭的空白
 		if (this.checkMsg.length() > 2 && this.checkMsg.startsWith(" ")) {
 			String str = this.checkMsg.substring(1);
