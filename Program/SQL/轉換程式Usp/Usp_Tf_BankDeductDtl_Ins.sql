@@ -51,6 +51,7 @@ BEGIN
                  ORDER BY "MediaSeq" desc
              ) AS "Seq"
       FROM "PostDeductMedia"
+      WHERE TRUNC("MediaDate" / 100) >= "DateStart"
     )
     , PDM AS (
       SELECT "MediaDate"
@@ -187,7 +188,7 @@ BEGIN
                  AND MBK."MBKTRX" = '1' -- 火險費
             THEN 0
           ELSE 1 END = 1
-      AND MBK."TRXIDT" > = "DateStart"
+      AND TRUNC(MBK."TRXIDT" / 100) >= "DateStart"
     ;
 
     -- 記錄寫入筆數
@@ -216,6 +217,7 @@ BEGIN
                  ORDER BY "MediaSeq" desc
              ) AS "Seq"
       FROM "AchDeductMedia"
+      WHERE TRUNC("MediaDate" / 100) >= "DateStart"
     )
     , ADM AS (
       SELECT "MediaDate"
@@ -357,7 +359,7 @@ BEGIN
                        AND ADM."IntEndDate" = MBK."TRXIED"
     LEFT JOIN "As400EmpNoMapping" AEM ON AEM."As400TellerNo" = MBK."CHGEMP"
     -- WHERE NVL(MBK.MBKCDE,' ') = 'Y'
-    WHERE MBK."TRXIDT" > = "DateStart"
+    WHERE TRUNC(MBK."TRXIDT" / 100) >= "DateStart"
     ;
 
     -- 記錄寫入筆數

@@ -62,7 +62,7 @@ public class L4721Batch extends TradeBuffer {
 			sendMsg = e.getErrorMsg();
 			flag = false;
 		}
-//
+
 		try {
 			l4721Report2.exec(titaVo, this.txBuffer);
 		} catch (LogicException e) {

@@ -1209,20 +1209,20 @@ public class TxBatchCom extends TradeBuffer {
 				acDate = 0;
 			}
 			// 01.匯款轉帳
-			if (tDetail.getRepayCode() == 1) {
+			if (tDetail.getRepayCode() == 1 && "BATX".equals(batchNo.substring(0, 4))) {
 				updBankRmtf(acDate, tDetail, titaVo);
 			}
 
 			// 02.銀行扣款
-			if (tDetail.getRepayCode() == 2) {
+			if (tDetail.getRepayCode() == 2 && "BATX".equals(batchNo.substring(0, 4))) {
 				updBankDeductDtl(acDate, tDetail, titaVo);
 			}
 			// 03.員工扣款
-			if (tDetail.getRepayCode() == 3) {
+			if (tDetail.getRepayCode() == 3 && "BATX".equals(batchNo.substring(0, 4))) {
 				updEmpDeductDtl(acDate, tDetail, titaVo);
 			}
 			// 04.支票兌現
-			if (tDetail.getRepayCode() == 4) {
+			if (tDetail.getRepayCode() == 4 && "BATX".equals(batchNo.substring(0, 4))) {
 				updLoanCheque(acDate, tDetail, titaVo);
 			}
 		} else {
@@ -1666,12 +1666,12 @@ public class TxBatchCom extends TradeBuffer {
 				break;
 			}
 		}
-		
+
 		// 訂正後需人工處理
 		if ("4".equals(this.procStsCode) && this.tTempVo.get("EraseCnt") != null) {
 			this.procStsCode = "2"; // 2.人工處理
 		}
-		
+
 		// 去起頭的空白
 		if (this.checkMsg.length() > 2 && this.checkMsg.startsWith(" ")) {
 			String str = this.checkMsg.substring(1);

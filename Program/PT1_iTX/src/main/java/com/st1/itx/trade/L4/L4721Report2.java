@@ -71,9 +71,9 @@ public class L4721Report2 extends MakeReport {
 	String fileName = "L4721.txt";
 
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
-
 		this.info("L4721Report2 exec start");
-
+		
+		this.titaVo = titaVo;
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
 
