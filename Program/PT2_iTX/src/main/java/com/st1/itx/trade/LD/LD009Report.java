@@ -77,8 +77,10 @@ public class LD009Report extends MakeReport {
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 		 */
 		this.print(-7, 1, "　　　　　　　　　　　　　　　 　件　　　　　　　　　　　數　　　　　　　　　　　　　　　　　　 金 　　　　　　　　　　　　　　　　　　 額");
-		this.print(-8, 1, "　　　　　　　　　　　　----------------------------------------------　---------------------------------------------------------------------------------------------");
-		this.print(-9, 1, "業務科目      　           前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
+		this.print(-8, 1,
+				"　　　　　　　　　　　　----------------------------------------------　---------------------------------------------------------------------------------------------");
+		this.print(-9, 1,
+				"業務科目      　           前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
 		this.print(-10, 1, newBorder);
 
 		// 明細起始列(自訂亦必須)
@@ -133,7 +135,7 @@ public class LD009Report extends MakeReport {
 				print(1, 0, "    ");
 
 				// 每個 AcctItem 僅第一次出現時 print
-				if (lastAcctItem == null || !lastAcctItem.equals(tLDVo.get("F1"))) {
+				if (lastAcctItem == null || !lastAcctItem.equals(tLDVo.get("AcctItem"))) {
 					// 避免最開頭出小計
 					if (lastAcctItem != null) {
 						// 小計
@@ -163,30 +165,30 @@ public class LD009Report extends MakeReport {
 
 					}
 
-					lastAcctItem = tLDVo.get("F1");
+					lastAcctItem = tLDVo.get("AcctItem");
 					print(0, 1, lastAcctItem);
 				}
 
-				print(0, 18, StringCut.stringCut(tLDVo.get("F3"), 0, 8));
-				print(0, 32, tLDVo.get("F4"), "R");
-				print(0, 38, tLDVo.get("F5"), "R");
-				print(0, 44, tLDVo.get("F6"), "R");
-				print(0, 50, tLDVo.get("F7"), "R");
-				print(0, 56, tLDVo.get("F8"), "R");
-				print(0, 62, tLDVo.get("F9"), "R");
-				print(0, 70, tLDVo.get("F10"), "R");
-				print(0, 86, formatAmt(tLDVo.get("F11"), 0), "R");
-				print(0, 102, formatAmt(tLDVo.get("F12"), 0), "R");
-				print(0, 118, formatAmt(tLDVo.get("F13"), 0), "R");
-				print(0, 132, formatAmt(tLDVo.get("F14"), 0), "R");
-				print(0, 148, formatAmt(tLDVo.get("F15"), 0), "R");
-				print(0, 166, formatAmt(tLDVo.get("F16"), 0), "R");
+				print(0, 18, StringCut.stringCut(tLDVo.get("AcSubBookCode"), 0, 8));
+				print(0, 32, tLDVo.get("yCount"), "R");
+				print(0, 38, tLDVo.get("newCnt"), "R");
+				print(0, 44, tLDVo.get("endCnt"), "R");
+				print(0, 50, tLDVo.get("inExtCnt"), "R");
+				print(0, 56, tLDVo.get("outExtCnt"), "R");
+				print(0, 62, tLDVo.get("netWorth"), "R");
+				print(0, 70, tLDVo.get("tCount"), "R");
+				print(0, 86, formatAmt(tLDVo.get("YdBal"), 0), "R");
+				print(0, 102, formatAmt(tLDVo.get("DbAmt"), 0), "R");
+				print(0, 118, formatAmt(tLDVo.get("CrAmt"), 0), "R");
+				print(0, 132, formatAmt(tLDVo.get("netWorthAmt"), 0), "R");
+				print(0, 148, formatAmt(tLDVo.get("TdBal"), 0), "R");
+				print(0, 166, formatAmt(tLDVo.get("extAmount"), 0), "R");
 
 				// 計算小計與總計
 
 				for (int i = 0; i < 13; i++) {
-					totalAll[i] = totalAll[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
-					totalPerItem[i] = totalPerItem[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
+					totalAll[i] = totalAll[i].add(getBigDecimal(tLDVo.get("F" + (2 + i))));
+					totalPerItem[i] = totalPerItem[i].add(getBigDecimal(tLDVo.get("F" + (2 + i))));
 				}
 
 			}
@@ -210,7 +212,8 @@ public class LD009Report extends MakeReport {
 			print(0, 166, formatAmt(totalPerItem[12], 0), "R");
 
 			makeSpace(3);
-			this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 1,
+					"----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 1, " 合　　計");
 			print(0, 32, totalAll[0].toString(), "R");
 			print(0, 38, totalAll[1].toString(), "R");
@@ -225,7 +228,8 @@ public class LD009Report extends MakeReport {
 			print(0, 132, formatAmt(totalAll[10], 0), "R");
 			print(0, 148, formatAmt(totalAll[11], 0), "R");
 			print(0, 166, formatAmt(totalAll[12], 0), "R");
-			this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+			this.print(1, 1,
+					"----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		} else {
 			print(1, 0, "本日無資料");
@@ -237,8 +241,9 @@ public class LD009Report extends MakeReport {
 
 	public void makePdf(TitaVo titaVo) throws LogicException {
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno()).setRptCode("LD009").setRptItem("放款授信日報表").setSecurity("密").setRptSize("A4")
-				.setPageOrientation("L").build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI() + 19110000).setBrno(titaVo.getBrno())
+				.setRptCode("LD009").setRptItem("放款授信日報表").setSecurity("密").setRptSize("A4").setPageOrientation("L")
+				.build();
 		this.open(titaVo, reportVo);
 
 		this.setCharSpaces(0);

@@ -78,6 +78,8 @@ public class L4931 extends TradeBuffer {
 
 			for (Map<String, String> result : resultList) {
 				this.info("result =" + result.toString());
+				TempVo tempVo = new TempVo();
+				tempVo = tempVo.getVo(result.get("JsonFields"));
 				OccursList occursList = new OccursList();
 				int presEffDate = parse.stringToInteger(result.get("PresEffDate"));
 				int curtEffDate = parse.stringToInteger(result.get("CurtEffDate"));
@@ -99,9 +101,9 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", result.get("FacmNo"));
 				occursList.putParam("OOBormNo", result.get("BormNo"));
 				occursList.putParam("OOCustName", result.get("CustName"));
-				occursList.putParam("OOTotalLoanBal", result.get("TotBalance"));
+				occursList.putParam("OOTotalLoanBal", result.get("TotalLoanBal"));
 				occursList.putParam("OODrawdownAmt", result.get("DrawdownAmt"));
-				occursList.putParam("OOLoanBal", result.get("LoanBalance"));
+				occursList.putParam("OOLoanBal", result.get("LoanBal"));
 				occursList.putParam("OOPresEffDate", presEffDate);
 				occursList.putParam("OOCurtEffDate", curtEffDate);
 				occursList.putParam("OOPrevIntDate", prevIntDate);
@@ -116,13 +118,10 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OOContrRateIncr", result.get("ContrRateIncr"));
 				occursList.putParam("OOPropIndexRate", result.get("CurrBaseRate"));
 				occursList.putParam("OOIndividualIncr", result.get("IndividualIncr"));
-				occursList.putParam("OOUpperLimitRate", result.get("UpperLimitRate"));
-				occursList.putParam("OOLowerLimitRate", result.get("LowerLimitRate"));
+				occursList.putParam("OOUpperLimitRate", tempVo.getParam("CityRateCeiling"));
+				occursList.putParam("OOLowerLimitRate",tempVo.getParam("CityRateFloor"));
 				occursList.putParam("OOOvduTerm", result.get("OvduTerm"));
-				occursList.putParam("OOIncrFlag", result.get("IncrFlag"));
 
-				TempVo tempVo = new TempVo();
-				tempVo = tempVo.getVo(result.get("F34"));
 				String procNote = "";
 				if (tempVo.get("CheckMsg") != null) {
 					procNote += tempVo.get("CheckMsg");

@@ -369,6 +369,7 @@ public class L4320Batch extends TradeBuffer {
 	private void seBatxRateChange(int iAdjCode, BatxRateChange b, Map<String, String> s, TitaVo titaVo)
 			throws LogicException {
 		this.info("seBatxRateChange ... iAdjCode=" + iAdjCode);
+		TempVo tTempVo = new TempVo();
 		// 作業項目
 		b.setTxKind(iTxKind);
 
@@ -477,6 +478,8 @@ public class L4320Batch extends TradeBuffer {
 		// 主檔下次利率調整日期
 		int nextAdjRateDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("NextAdjRateDate")));
 
+		// 是否利率調整日為月底日
+		boolean isNextAdjDateMonthEnd = false;
 		// 預定下次利率調整日期
 		int preNextAdjDate = 0;
 		if (iTxKind == 1) {
@@ -489,13 +492,10 @@ public class L4320Batch extends TradeBuffer {
 				dateUtil.init();
 				dateUtil.setDate_1(sDate);
 				this.info("sDate" + sDate % 100 + " " + dateUtil.getMonLimit());
-
 				if (sDate % 100 == dateUtil.getMonLimit()) {
+					isNextAdjDateMonthEnd = true;
 					int firstDrawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("FirstDrawdownDate")));
-					dateUtil.init();
-					dateUtil.setDate_1(firstDrawdownDate);
-					this.info("firstDrawdownDate" + firstDrawdownDate % 100 + " " + dateUtil.getMonLimit());
-					if (firstDrawdownDate % 100 == dateUtil.getMonLimit()) {
+					if (firstDrawdownDate % 100 > sDate % 100) {
 						sDate = firstDrawdownDate;
 					}
 				}
@@ -504,8 +504,8 @@ public class L4320Batch extends TradeBuffer {
 				this.info("sDate=" + sDate + " nextAdjRateDate=" + nextAdjRateDate);
 				if (nextAdjRateDate / 100 > sDate / 100) {
 					dateUtil.init();
-					dateUtil.setDate_1(sDate);
-					dateUtil.setDate_2(nextAdjRateDate);
+					dateUtil.setDate_1((sDate / 100) * 100 + 01);
+					dateUtil.setDate_2((nextAdjRateDate / 100) * 100 + 01);
 					dateUtil.dateDiff();
 					month += dateUtil.getMons();
 					this.info("sDate=" + sDate + " nextAdjRateDate=" + nextAdjRateDate + ", month=" + month
@@ -516,8 +516,17 @@ public class L4320Batch extends TradeBuffer {
 				dateUtil.setDate_1(sDate);
 				dateUtil.setMons(month); // 調整周期(單位固定為月)
 				preNextAdjDate = dateUtil.getCalenderDay();
-				if (preNextAdjDate > maturityDate) {
+				if (preNextAdjDate >= maturityDate) {
 					preNextAdjDate = maturityDate;
+					if (preNextAdjDate > maturityDate) {
+						warnMsg += ", 下次利率調整日+ 調整周期 > 到期日";
+					} else {
+						warnMsg += ", 下次利率調整日+ 調整周期 = 到期日";
+					}
+				} else {
+					if (isNextAdjDateMonthEnd) {
+						warnMsg += ", 利率調整日為月底日";
+					}
 				}
 			}
 		}
@@ -583,21 +592,24 @@ public class L4320Batch extends TradeBuffer {
 				adjCode = 3;
 			} else {
 				adjCode = 2;
+				tTempVo.putParam("CityRateIncr", cityRateIncr);
+				tTempVo.putParam("CityRateCeiling", cityRateCeiling);
+				tTempVo.putParam("CityRateFloor", cityRateFloor);
 				// 本次利率 = 目前利率 + 地區別加減碼
 				rateProp = presentRate.add(cityRateIncr);
 				String warn = "";
 				// 依地區別利率上、下限調整
 				if (rateProp.compareTo(cityRateCeiling) > 0) {
 					rateProp = cityRateCeiling;
-					warn = ", 達地區別上限, 地區別加減碼:" + cityRateIncr;
+					warn = ", 高於地區上限, 地區別加減碼設定值:" + cityRateIncr;
 				}
 				if (rateProp.compareTo(cityRateFloor) < 0) {
 					rateProp = cityRateFloor;
-					warn = ", 達地區別下限, 地區別加減碼:" + cityRateIncr;
+					warn = ", 低於地區下限, 地區別加減碼設定值:" + cityRateIncr;
 				}
 				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
 					rateProp = contractRate;
-					warn = ", 達合約利率上限, 地區別加減碼:" + cityRateIncr;
+					warn = ", 高於合約利率, 地區別加減碼設定值:" + cityRateIncr;
 				}
 				warnMsg += warn;
 			}
@@ -606,6 +618,11 @@ public class L4320Batch extends TradeBuffer {
 			if (adjCode == 2 && b.getOvduTerm() >= 1) {
 				adjCode = 3;
 				warnMsg += ", 逾" + dateUtil.getMons() + " 期 ";
+			}
+			
+			// 僅調整下次利率調整日
+			if (rateProp.compareTo(presentRate) == 0) {
+				warnMsg += ", 維持目前利率, 調整下次利率調整日";
 			}
 
 			break;
@@ -638,6 +655,9 @@ public class L4320Batch extends TradeBuffer {
 		case 3:
 			// 本次生效日(已放好)
 			// 本次利率 = 原利率 + 地區別利率
+			tTempVo.putParam("CityRateIncr", cityRateIncr);
+			tTempVo.putParam("CityRateCeiling", cityRateCeiling);
+			tTempVo.putParam("CityRateFloor", cityRateFloor);
 			rateProp = presentRate.add(cityRateIncr);
 			// 依地區別利率上、下限調整
 			if (rateProp.compareTo(cityRateCeiling) > 0) {
@@ -701,6 +721,7 @@ public class L4320Batch extends TradeBuffer {
 
 		if ("3".equals(rateCode) && rateAdjFreq == 0) {
 			errorFlag = 1;
+			adjCode = 3; // 有錯誤轉為人工處理
 			checkMsg += ", 定期機動但無利率調整週期";
 		}
 
@@ -724,8 +745,6 @@ public class L4320Batch extends TradeBuffer {
 
 		b.setAdjCode(adjCode);
 
-		/* 設定 jsonFields 欄 */
-		TempVo tTempVo = new TempVo();
 		// 檢核訊息
 		// 去起頭的逗號
 		if (checkMsg.length() > 2 && checkMsg.startsWith(", ")) {

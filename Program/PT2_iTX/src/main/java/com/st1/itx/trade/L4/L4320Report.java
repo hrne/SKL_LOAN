@@ -93,24 +93,36 @@ public class L4320Report extends MakeReport {
 		}
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
 
-		for (int j = 1; j <= 4; j++) {
+		for (int j = 1; j <= 5; j++) {
 			switch (j) {
 			case 1:
 				fileNm = fileNm1 + "-批次自動調整";
+				titaVo.putParam("AdjCode", 1);
+				titaVo.putParam("RateKeyInCode", 1);
 				break;
 			case 2:
-				fileNm = fileNm1 + "-按地區別調整";
+				fileNm = fileNm1 + "-按地區別調整(已調整)";
+				titaVo.putParam("AdjCode", 2);
+				titaVo.putParam("RateKeyInCode", 1);
 				break;
 			case 3:
-				fileNm = fileNm1 + "-人工調整";
+				fileNm = fileNm1 + "-人工調整(未調整)";
+				titaVo.putParam("AdjCode", 3);
+				titaVo.putParam("RateKeyInCode", 0);
 				break;
 			case 4:
+				fileNm = fileNm1 + "-人工調整(檢核有誤)";
+				titaVo.putParam("AdjCode", 3);
+				titaVo.putParam("RateKeyInCode", 9);
+				break;
+			case 5:
 				fileNm = fileNm1 + "-檢核提醒件";
+				titaVo.putParam("AdjCode", 4);
+				titaVo.putParam("RateKeyInCode", 0);
 				break;
 			default:
 				break;
 			}
-			titaVo.putParam("AdjCode", j);
 
 			try {
 				fnAllList = l4320RServiceImpl.findAll(titaVo);
@@ -123,9 +135,11 @@ public class L4320Report extends MakeReport {
 			if (fnAllList.size() > 0) {
 //				設定工作表名稱
 				if (this.iTxKind == 1) {
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E", "L4320_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+							"L4320_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 				} else {
-					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, "LNW171E", "L4320_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+							"L4320_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 				}
 				String fdnm = "";
 //					從第幾列開始(表頭位置)

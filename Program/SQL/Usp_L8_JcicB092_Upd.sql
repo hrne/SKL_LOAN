@@ -529,7 +529,9 @@ BEGIN
              ELSE 0      
            END                                   AS "LVITax"            -- 擔保品預估應計土地增值稅合計 
          , CASE 
-             WHEN NVL(CLL."LVITaxYearMonth",0) < 191100 THEN NVL(CLL."LVITaxYearMonth",0) 
+             WHEN NVL(CLL."LVITaxYearMonth",0) < 191100 AND NVL(CLL."LVITaxYearMonth",0)>0 
+                  THEN NVL(CLL."LVITaxYearMonth",0)
+             WHEN NVL(CLL."LVITaxYearMonth",0) = 0  THEN  08201 -- 日期=0時給預設值8201
              ELSE NVL(CLL."LVITaxYearMonth",0) - 191100 
            END                                   AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月  (後面再額外判斷 '日期') 
          , CASE 

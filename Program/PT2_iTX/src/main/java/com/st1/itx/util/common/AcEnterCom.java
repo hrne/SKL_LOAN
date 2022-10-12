@@ -191,6 +191,11 @@ public class AcEnterCom extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.titaVo = titaVo;
+		if (titaVo.isHcodeErase()) {
+			RelDy = titaVo.getOrgEntdyI() + 19110000; // 登放日期
+		} else {
+			RelDy = titaVo.getEntDyI() + 19110000; // 登放日期
+		}
 		RelDy = this.txBuffer.getTxCom().getReldy() + 19110000; // 登放日期
 		RelTxseq = this.txBuffer.getTxCom().getRelNo(); // 登放序號
 		AcHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
@@ -274,7 +279,7 @@ public class AcEnterCom extends TradeBuffer {
 		}
 
 		// 會計日期
-		AcDate = this.txBuffer.getTxCom().getTbsdy();
+		AcDate = titaVo.getEntDyI();
 
 		// AcHcode 帳務訂正記號 0-正常 1-刪除帳務 2-沖正帳務(沖正、要入帳) 3-沖正帳務(訂正、不入帳)
 		if (AcHCode == 1 && acList.get(0).getEntAc() == 1) {

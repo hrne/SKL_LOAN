@@ -148,7 +148,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case "4": // 部份還款
 			sql += "    AND M.\"CustNo\" > 0 ";
 			sql += "    AND LBT.\"CustNo\" IS NOT NULL";
-			sql += "    AND BATX.\"RepayCode\" = '02' ";//部分還
+			sql += "    AND BATX.\"RepayType\" = '02' ";
 			dayFg = "1";
 			break;
 		case "5": // 償還方式變更

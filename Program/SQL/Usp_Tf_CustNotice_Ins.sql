@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_CustNotice_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_CustNotice_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -33,13 +33,23 @@ BEGIN
           ,'Y'                            AS "MsgNotice"           -- 簡訊發送與否 VARCHAR2 1 
           ,'Y'                            AS "EmailNotice"         -- 電子郵件發送與否 VARCHAR2 1 
           ,0                              AS "ApplyDate"           -- 申請日期 decimald 8 
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,CASE
+             WHEN NP."CRTDTM" > 0
+             THEN TO_DATE(NP."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,CASE
+             WHEN NP."CHGDTM" > 0
+             THEN TO_DATE(NP."CHGDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LN$NPTP" NP
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = NP."LMSACN"
     LEFT JOIN "ReportCodeMapping" RCM ON RCM."OriReportCode" = NP."F23FMT"
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = NP."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = NP."CHGEMP"
     WHERE NVL(FAC."CustNo",0) <> 0
     ;
 
@@ -57,6 +67,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_CustNotice_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 

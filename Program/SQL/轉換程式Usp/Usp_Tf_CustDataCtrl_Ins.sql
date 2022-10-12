@@ -42,18 +42,27 @@ BEGIN
           ,"CustMain"."CustUKey"          AS "CustUKey"            -- 客戶識別碼 VARCHAR2 32 
           ,0                              AS "ApplMark"            -- 申請記號 DECIMAL 1 
           ,''                             AS "Reason"              -- 解除原因 VARCHAR2 50  
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+          ,CASE
+             WHEN PDCP."CRTDTM" > 0
+             THEN TO_DATE(PDCP."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+          ,CASE
+             WHEN PDCP."CRTDTM" > 0
+             THEN TO_DATE(PDCP."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
+          ,NVL(AEM1."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
           ,''                             AS "CustId"
           ,''                             AS "CustName" 
           ,''                             AS "SetDate" 
           ,''                             AS "SetEmpNo" 
           ,''                             AS "ReSetDate" 
           ,''                             AS "ReSetEmpNo" 
-    FROM "LN$PDCP"
-    LEFT JOIN "CustMain" on "CustMain"."CustId" = "LN$PDCP"."CUSID1"
+    FROM "LN$PDCP" PDCP
+    LEFT JOIN "CustMain" on "CustMain"."CustId" = PDCP."CUSID1"
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = PDCP."CRTEMP"
     ;
 
     -- 記錄寫入筆數

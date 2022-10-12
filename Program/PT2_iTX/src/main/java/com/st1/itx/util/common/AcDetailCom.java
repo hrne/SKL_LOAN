@@ -282,7 +282,7 @@ public class AcDetailCom extends TradeBuffer {
 				settingjsonfields(ac, titaVo);
 
 				/*----------- 自動設定 -----------*/
-				tAcDetailId.setRelDy(this.txBuffer.getTxCom().getReldy()); // 登放日期
+				tAcDetailId.setRelDy(titaVo.getEntDyI()); // 登放日期
 				tAcDetailId.setRelTxseq(this.txBuffer.getTxCom().getRelNo()); // 登放序號
 
 				// 分錄序號，由AcEnterComt重編
@@ -294,7 +294,7 @@ public class AcDetailCom extends TradeBuffer {
 				tAcDetail.setAcDetailId(tAcDetailId);
 				// 會計日期
 				if (ac.getAcDate() == 0) {
-					tAcDetail.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+					tAcDetail.setAcDate(titaVo.getEntDyI());
 				} else {
 					tAcDetail.setAcDate(ac.getAcDate());
 				}
@@ -451,7 +451,7 @@ public class AcDetailCom extends TradeBuffer {
 		if (acctCode.equals("F12") || acctCode.equals("F27")) {
 			if (ac.getReceivableFlag() == 3 && ac.getRvNo().length() >= 15
 					&& parse.isNumeric(ac.getRvNo().substring(10, 15))) {
-				if (parse.stringToInteger(ac.getRvNo().substring(10, 15)) > this.txBuffer.getTxCom().getTbsdy() / 100) {
+				if (parse.stringToInteger(ac.getRvNo().substring(10, 15)) > titaVo.getEntDyI() / 100) {
 					acctCode = "TSL";
 					ac.setReceivableFlag(0);
 				}
