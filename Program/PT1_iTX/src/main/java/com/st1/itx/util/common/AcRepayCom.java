@@ -184,7 +184,7 @@ public class AcRepayCom extends TradeBuffer {
 				settleFeeAmt(ba);
 				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iEntryDate, new TempVo(), titaVo);
 				ba.setAcctAmt(BigDecimal.ZERO);
-				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail); // 更新放款明細檔及帳務明細檔關聯欄
+				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 				BigDecimal txAmt = BigDecimal.ZERO;
 				BigDecimal tempAmt = BigDecimal.ZERO;
 				if (tempAmtRemaind.compareTo(repayAmt) > 0) {
@@ -209,7 +209,7 @@ public class AcRepayCom extends TradeBuffer {
 		// 貸方：本金利息
 		for (LoanBorTx tx : ilLoanBorTx) {
 			settleLoanAmt(tx);
-			BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail); // 更新放款明細檔及帳務明細檔關聯欄
+			BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 			BigDecimal txAmt = BigDecimal.ZERO;
 			BigDecimal tempAmt = BigDecimal.ZERO;
 			if (tempAmtRemaind.compareTo(repayAmt) > 0) {
@@ -235,7 +235,7 @@ public class AcRepayCom extends TradeBuffer {
 		
 		// 更新尾筆交易金額、暫收借金額、暫收貸金額
 		LoanBorTx tx = this.lLoanBorTx.get(this.lLoanBorTx.size() - 1);
-		updBorTxAcDetail(tx, this.lAcDetail); // 更新放款明細檔及帳務明細檔關聯欄
+		updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 		tx.setTxAmt(tx.getTxAmt().add(txAmtRemaind));
 		tx.setTempAmt(tx.getTempAmt().add(tempAmtRemaind));
 		tx.setOverflow(overflow);
@@ -493,11 +493,13 @@ public class AcRepayCom extends TradeBuffer {
 	 * 
 	 * @param tx      LoanBorTx
 	 * @param iAcList List of AcDetail
+	 * @param titaVo      TitaVo
 	 * @return 作帳金額
 	 * @throws LogicException ...
 	 */
-	public BigDecimal updBorTxAcDetail(LoanBorTx tx, List<AcDetail> iAcList) throws LogicException {
+	public BigDecimal updBorTxAcDetail(LoanBorTx tx, List<AcDetail> iAcList, TitaVo titaVo) throws LogicException {
 		this.info("updBorTxAcDetail ... RepayCode=" + tx.getRepayCode() + ", BacthNo=" + titaVo.getBacthNo());
+		this.titaVo =  titaVo;
 		this.lAcDetail = iAcList;
 		BigDecimal repayAmt = BigDecimal.ZERO;
 
@@ -710,7 +712,7 @@ public class AcRepayCom extends TradeBuffer {
 				settleFeeAmt(ba);
 				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iEntryDate, new TempVo(), titaVo);
 				ba.setAcctAmt(BigDecimal.ZERO);
-				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail); // 更新放款明細檔及帳務明細檔關聯欄
+				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 				BigDecimal tempAmt = BigDecimal.ZERO;
 				if (tempAmtRemaind.compareTo(repayAmt) > 0) {
 					tempAmt = repayAmt;
@@ -728,7 +730,7 @@ public class AcRepayCom extends TradeBuffer {
 		
 		// 更新尾筆暫收借金額、暫收貸金額
 		LoanBorTx tx = this.lLoanBorTx.get(this.lLoanBorTx.size() - 1);		
-		updBorTxAcDetail(tx, this.lAcDetail); // 更新放款明細檔及帳務明細檔關聯欄
+		updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 		tx.setTempAmt(tx.getTempAmt().add(tempAmtRemaind));
 		tx.setOverflow(overflow);
 

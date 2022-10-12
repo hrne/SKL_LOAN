@@ -46,69 +46,66 @@ K(MODIFYBUTTON,登錄)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[150,500,150,500];printer.width=[20,40,20,40];order=1">
 [
 ["[L3240]                                 回收冲正（轉換前資料）"],
-[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-[#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
-[#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
-[#<->#,"#FdFacmNo+額度編號",#FacmNo,#BTN4],
-["#FdBormNo+撥款序號",#BormNo],["#FdPrincipal+本金",#Principal],
-["#FdInterest+利息",#Interest],["#FdBreachAmt+違約金",#BreachAmt],
-["#FdEntryDate+入帳日期",#EntryDate],["#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#CustNoX],
+[#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 ["#FdIntStartDate+計息起日",#IntStartDate],["#FdIntEndDate+計息迄日",#IntEndDate],
-["#FdTellerNo+經辦",#TellerNo],["#FdTxtNo+交易序號",#TxtNo],
+[#<->#,"#FdPrincipal+本金",#Principal],
+[#<->#,"#FdInterest+利息",#Interest],
+[#<->#,"#FdDelayInt+延遲息",#DelayInt],
+[#<->#,"#FdBreachAmt+違約金",#BreachAmt],
+[#<->#,"#FdExtraCloseBreachAmt+清償違約金",#ExtraCloseBreachAmt],
+["#FdShortfall+累短收",#Shortfall],["#FdExcessive+累溢收",#Excessive],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdTellerNo+經辦",#TellerNo],
+[#<->#,"#FdTxtNo+交易序號",#TxtNo],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-#BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢
-#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
-#BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0;title: L2016 核准號碼明細資料查詢;
-#BTN4=X,15,I,ui:button;value:繳息情形查詢;enable:0;tabbable:0;title: L3911 繳息情形查詢;
-#BUF1=X,42,S
 
 !---------- AP TEXT AREA Variables ----------
-
-
+#FdCustNo=X,2,L
 #FdEntryDate=X,2,L
 #FdIntStartDate=X,2,L
 #FdIntEndDate=X,2,L
+#FdFacmNo=X,2,L
+#FdBormNo=X,2,L
+#FdPrincipal=X,2,L
+#FdInterest=X,2,L
+#FdShortfall=X,2,L
+#FdExcessive=X,2,L
+#FdDelayInt=X,2,L
+#FdBreachAmt=X,2,L
+#FdExtraCloseBreachAmt=X,2,L
+#FdAcDate=X,2,L
+#FdTellerNo=X,2,L
+#FdTxtNo=X,2,L
 
-#INIT=X,1,S
-HIDE(#BTN4)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L3005交易明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainCustNo,#NTXBUF,1,7)
-T(1,@CustId,#NTXBUF,8,10)
-T(1,@ChainApplNo,#NTXBUF,18,7)
-T(1,@FacmNo,#NTXBUF,25,3)
-T(1,@EntryDate,#NTXBUF,28,7)
-T(1,@IntStartDate,#NTXBUF,35,7)
-T(1,@IntEndDate,#NTXBUF,42,7)
+T(1,@FacmNo,#NTXBUF,8,3)
+T(1,@BormNo,#NTXBUF,11,3)
+T(1,@AcDate,#NTXBUF,14,7)
+T(1,@TellerNo,#NTXBUF,21,6)
+T(1,@TxtNo,#NTXBUF,27,8)
 
 #ChainCustNo=A,7,S
 
-#ChainApplNo=A,7,S
-
-
-#BUF1A=X,30,S
-T(3,00000019999999000)
-
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
 
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
-#FdCustNo=X,2,L
 
 #CustNo=X,7,I
 C(3,#CHAIN,1,C(3,#ChainCustNo,0,$,E(0,#ChainCustNo)),$)
 C(3,#CHAIN,1,s,$)
-SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 @C(4,#CustNo,S,$)
 V(9)
 
@@ -117,8 +114,6 @@ C(4,#CustNo,S,$)
 E(0,@TmpCustNo,#CustNo)
 T(2,@CustNo,#TmpCustNo)
 
-#InitFdB=X,1,S
-T(3,@FdApplNo, )
 
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
@@ -132,205 +127,114 @@ T(2,@CustNoX,#L2r07CustName)
 #CustNoX=x,100,L
 C(3,#CustNo,0,S,$)
 
-#WKBTN1=X,1,S
-C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
-
-#BUF1B=X,30,S
-C(4,#CustNo,T(3,00000009999999000),T(2,#CustNo+9999999000))
-
-#BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoX<-OOCustName})
-
-#BUF2A=X,100,S
-
-#BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
-
-![統一編號]
-#FdCustId=X,2,L
-
-#CustId=X,10,I
-C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)
-SHOW(#BTN2)HIDE(#BTN1,#BTN3)
-@C(4,#CustId,S,$)
-V(7)
-
-#BUF2B=X,100,S
-T(2,0000000+#CustId)
-
-#BIND2B=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId:CustIdX<-OOCustName})
-
-#CheckCustId=X,1,S
-C(4,#CustId,S,$)
-A(ID_UNINO,0,#CustId)
-
-#WKBTN2=X,1,S
-C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
-
-#SendL2r07B=X,1,S
-C(4,#CustId,S,$)
-T(2,@RimCustId,#CustId)
-E(0,@RimCustNo,0)
-RESET_RIM(#SendL2r07B,L2R07)
-S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
-R(1,L2R07)
-T(2,@CustIdX,#L2r07CustName)
-
-#CustIdX=x,100,L
-C(4,#CustId,S,$)
-
-#WkStartDate=D,7,S
-E(0,#SYSDATE)
-
-#BUF3A=X,45,S
-T(3,000000199999990)
-! T(2,#WkStartDate+999999900000000000000          0000000)
-
-#BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
-
-![核准編號]
-#FdApplNo=X,2,L
-C(3,#CHAIN,1,S,$)
-C(3,#CustNo,0,$,S)
-C(4,#CustId,$,S)
-T(3,*)
-
-#ApplNo=X,7,I
-C(3,#CHAIN,1,C(3,#ChainApplNo,0,$,E(0,#ChainApplNo)),$)
-C(3,#CHAIN,1,s,$)
-C(3,#CustNo,0,$,S)
-C(4,#CustId,$,S)
-SHOW(#BTN3)HIDE(#BTN1,#BTN2)
-@C(3,#ApplNo,0,V(P,需擇一輸入),$)
-
-#TmpApplNo=A,7,S
-C(4,#ApplNo,S,$)
-E(0,@TmpApplNo,#ApplNo)
-T(2,@ApplNo,#TmpApplNo)
-
-#BUF3B=X,45,S
-T(2,0000000000000000000000000000          +#ApplNo)
-
-#BIND3B=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
-
-
-!用核准號碼(ApplNo)調L2R05
-#SendL2r05A=X,1,S
-C(3,#ApplNo,0,S,$)
-E(0,@RimFuncCode,5)
-E(0,@RimCustNo,0)
-E(0,@RimFacmNo,0)
-E(0,@RimApplNo,#ApplNo)
-E(0,@RimCaseNo,0)
-RESET_RIM(#SendL2r05A,L2R05)
-S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
-R(1,L2R05)
-
-#SendL2r07C=X,1,S
-C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
-T(2,@RimCustId,#L2r05CustId)
-E(0,@RimCustNo,#CustNo)
-RESET_RIM(#SendL2r07C,L2R07)
-S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
-R(1,L2R07)
-T(2,@ApplNoX,#L2r07CustName)
-
-#ApplNoX=x,100,L
-C(3,#ApplNo,0,S,$)
 
 #TimCustNo=A,7,S
 E(0,0)
 C(3,#CustNo,0,$,E(0,#CustNo))
-C(4,#CustId,$,E(0,#L2r07CustNo))
-C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 T(2,@LockCustNo,#TimCustNo)
-T(2,@RmkCustNo,#TimCustNo)
+
 <include src="COM.icf::LockControl.rtn"/>
-<include src="COM.icf::CustRmk.rtn"/>
-
-#BUF4=X,100,S
-T(2,#TXCD+#TimCustNo+000+000)
-
-#BIND4=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF4;ntxbuf5=type<-1:TxtNo<-OOTxtNo:TellerNo<-OOTellerNo:AcDate<-OOAcDate:IntEndDate<-OOIntEndDate
-:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:TempCustNo<-OCustNo:CustNo<-OCustNo:BormNo<-OOBormNo:Principal<-OOPrincipal:Interest<-OOInterest:BreachAmt<-OOBreachAmt})
 
 !額度編號
-#FdFacmNo=X,2,L
-#FacmNo=A,3,I
-C(3,#ApplNo,0,$,E(0,#L2r05FacmNo))
-C(3,#ApplNo,0,$,s)
-SHOW(#BTN4)
+#FacmNo=A,3,S
 
-#BUF5=X,100,S
-T(2,#TXCD+#TimCustNo+#FacmNo+000)
-
-#BIND5=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF5;ntxbuf5=type<-1:TxtNo<-OOTxtNo:TellerNo<-OOTellerNo:AcDate<-OOAcDate:IntEndDate<-OOIntEndDate
-:IntStartDate<-OOIntStartDate:EntryDate<-OOEntryDate:FacmNo<-OOFacmNo:TempCustNo<-OCustNo:CustNo<-OCustNo:BormNo<-OOBormNo:Principal<-OOPrincipal:Interest<-OOInterest:BreachAmt<-OOBreachAmt})
-
-#TempCustNo=A,7,L
-
-#Check=A,1,L
-C(3,#TempCustNo,0,V(P,請點選繳息情形查詢，帶回繳息資料),s)
-
-
-#FdBormNo=X,2,L
-#BormNo=A,3,L
-
-#FdPrincipal=X,2,L
+#BormNo=A,3,S
 
 #Principal=m,14,L
 
-#FdInterest=X,2,L
-
 #Interest=m,14,L
 
-#FdBreachAmt=X,2,L
+#DelayInt=m,14,L
 
 #BreachAmt=m,14,L
 
-
 !入帳日期
 #EntryDate=D,7,L
-!@A(DATE,0,#EntryDate)
 
 !計息起日
 #IntStartDate=D,7,L
-!@A(DATE,0,#IntStartDate)
 
 !計息迄日
 #IntEndDate=D,7,L
-!@
-!A(DATE,0,#IntEndDate)
-!IF(#IntEndDate<#IntStartDate,V(P,計息迄日不可小於計息起日),$)
 
-
+#ExtraCloseBreachAmt=m,14,L
 
 !會計日期
-#FdAcDate=X,2,L
-
 #AcDate=D,7,L
-!@
-!A(DATE,0,#AcDate)
-!經辦
-#FdTellerNo=X,2,L
 
 #TellerNo=X,6,L
+
 !交易序號
-#FdTxtNo=X,2,L
-
 #TxtNo=X,8,L
-
-
+T(2,@ORGKIN,0000)
+T(2,@ORGTLR,#TellerNo)
+T(2,@ORGTNO,#TxtNo)
+E(0,@OrgEntdy,#AcDate)
 
 #MRKEY=_,_,S
-T(2,#TimCustNo+-+#FacmNo)
+T(2,#TimCustNo)
 
+#RimAcDate=D,7,S
+#RimTellerNo=X,6,S
+#RimTxtNo=X,8,S
+
+#SendL3r18S=X,1,S
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimAcDate,#AcDate)
+T(2,@RimTellerNo,#TellerNo)
+T(2,@RimTxtNo,#TxtNo)
+RESET_RIM(#SendL3r18S,L3R18)
+S(L3R18,01,#RimCustNo,#RimAcDate,#RimTellerNo,#RimTxtNo)
+R(1,L3R18)
+E(0,@IntStartDate,#L3r18IntStartDate)
+E(0,@IntEndDate,#L3r18IntEndDate)
+E(0,@EntryDate,#L3r18EntryDate)
+E(0,@Principal,#L3r18Principal)
+E(0,@Interest,#L3r18Interest)
+E(0,@DelayInt,#L3r18DelayInt)
+E(0,@BreachAmt,#L3r18BreachAmt)
+E(0,@ExtraCloseBreachAmt,#L3r18ExtraCloseBreachAmt)
+E(0,@Shortfall,#L3r18Shortfall)
+E(0,@Excessive,#L3r18Excessive)
+##loop{times:20,l:0,n:1,m:2}
+IF({n}==1,C(3,#L3r18FacmNo{n},0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1)),$)
+C(3,#L3r18FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+T(2,@FacmBormNo{n},#L3r18FacmNo{n}+-+#L3r18BormNo{n})
+T(2,@IntStartDate{n},#L3r18IntStartDate{n})
+T(2,@IntEndDate{n},#L3r18IntEndDate{n})
+T(2,@IntSEDate{n},#IntStartDate{n}+-+#IntEndDate{n})
+E(0,@Principal{n},#L3r18Principal{n})
+E(0,@Interest{n},#L3r18Interest{n})
+E(0,@DelayInt{n},#L3r18DelayInt{n})
+E(0,@BreachAmt{n},#L3r18BreachAmt{n})
+E(0,@Total{n},#L3r18Total{n})
+E(0,@CloseBreachAmt{n},#L3r18CloseBreachAmt{n})
+##end
+
+#Shortfall=m,14,L
+
+
+
+!累溢收
+
+#Excessive=m,14,L
+
+
+!----------------本息計算表----------------
+
+##loop{times:20,l:0,n:1,m:2}
+#FacmBormNo{n}=X,7,L
+#IntStartDate{n}=D,7,L
+#IntEndDate{n}=D,7,L
+#IntSEDate{n}=X,20,L
+#Principal{n}=+m,14,L
+#Interest{n}=+m,14,L
+#DelayInt{n}=+m,14,L
+#BreachAmt{n}=+m,14,L
+#Total{n}=+m,14,L
+#CloseBreachAmt{n}=+m,14,L
+##end
+!---------------------------------------------
 
 
 ![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款  09:放款
@@ -345,7 +249,20 @@ T(3,01)
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L3R18.dec"/>
 <include src="ROM.icf::L3Rim.dec"/>
+</sub>
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+[
+["<font color=red>@本息計算表"],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[70,70,120,120,120,120,120,], p_cols:[5,15,15,15,15,15,15]}","","",
+["額度撥款","計息起訖日","本金","利息","延遲息","違約金","小計"],
+[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#DelayInt1],[#BreachAmt1],[#Total1]],
+],
+]
+
+
 </sub>
 !--------- 收付欄 -----------------------
 <sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
@@ -382,7 +299,7 @@ T(3,[L3240] 回收冲正)
 #EntryDate#IntStartDate#IntEndDate
 #AcDate#TellerNo#TxtNo
 #END
-#CustNo#CustId#ApplNo
+#CustNo
 <include src="RPDTL.icf::RPDTL.tim"/>
 </sub>
 
@@ -393,6 +310,7 @@ TXFORM=L3240
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="COM.icf::LockControl.tom"/>
+<include src="ROM.icf::L3R18.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
 <include src="RPDTL.icf::RPDTL.tom"/>

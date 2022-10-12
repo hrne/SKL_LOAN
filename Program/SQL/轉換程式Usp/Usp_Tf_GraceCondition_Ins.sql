@@ -28,11 +28,21 @@ BEGIN
     SELECT "LN$GRPP"."LMSACN"             AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
           ,"LN$GRPP"."LMSAPN"             AS "FacmNo"              -- 額度編號 DECIMAL 3 0
           ,"LN$GRPP"."ACTUSE"             AS "ActUse"              -- 使用碼 VARCHAR2 1 0
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "LN$GRPP"
+          ,CASE
+             WHEN GRPP."CRTDTM" > 0
+             THEN TO_DATE(GRPP."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE 0 0
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,CASE
+             WHEN GRPP."CHGDTM" > 0
+             THEN TO_DATE(GRPP."CHGDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    FROM "LN$GRPP" GRPP
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = GRPP."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = GRPP."CHGEMP"
     ;
 
     -- 記錄寫入筆數

@@ -707,6 +707,7 @@ public class AcEnterCom extends TradeBuffer {
 						acDetail.setDbCr("C");
 						acDetail.setAcctCode("THC");
 						acDetail.setSumNo("099");
+	//					acDetail.setRvNo("" + ac.getAcDate());// 會計日期
 						acDetail.setAcSeq(acSeq);
 						acList2.add(acDetail);
 					}

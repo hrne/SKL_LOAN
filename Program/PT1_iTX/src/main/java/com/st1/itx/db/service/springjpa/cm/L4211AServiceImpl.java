@@ -89,11 +89,11 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      + (TX2.\"Overflow\"";
 			sql += "      - TX2.\"TempAmt\")";
 			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-			sql += "    , LPAD(TX2.\"CustNo\",7,'0')";
+			sql += "    , LPAD(NVL(TX2.\"CustNo\",BATX.\"CustNo\"),7,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
+			sql += "      || LPAD(NVL(TX2.\"FacmNo\",0),3,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustNo\"";// 戶號
+			sql += "      || LPAD(NVL(TX2.\"BormNo\",0),3,'0') AS \"CustNo\"";// 戶號
 			sql += "    , CM.\"CustName\""; // 戶名
 			sql += "    , TX2.\"IntStartDate\""; // 計息起日
 			sql += "    , TX2.\"IntEndDate\""; // 計息迄日
@@ -139,7 +139,8 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "     ELSE BATX.\"ReconCode\" ";
 			sql += "     END = BATX.\"ReconCode\"";
 			sql += " AND BATX.\"RepayCode\" = '01'"; // 匯款轉帳
-			sql += " AND BATX.\"ProcStsCode\" <> 'D' ";// 刪除
+//			sql += " AND BATX.\"ProcStsCode\" <> 'D' ";// 刪除
+			
 
 		} else if (printNo == 2) {
 			// 入帳後檢核明細表
@@ -174,11 +175,11 @@ public class L4211AServiceImpl extends ASpringJpaParm implements InitializingBea
 			sql += "      + (TX2.\"Overflow\"";
 			sql += "      - TX2.\"TempAmt\")";
 			sql += "      + TX2.\"FeeAmt\" AS \"AcctAmt\""; // 作帳金額(A+B+D+G+H)
-			sql += "    , LPAD(TX2.\"CustNo\",7,'0')";
+			sql += "    , LPAD(NVL(TX2.\"CustNo\",BATX.\"CustNo\"),7,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(TX2.\"FacmNo\",3,'0')";
+			sql += "      || LPAD(NVL(TX2.\"FacmNo\",0),3,'0')";
 			sql += "      || '-'";
-			sql += "      || LPAD(TX2.\"BormNo\",3,'0') AS \"CustNo\"";// 戶號
+			sql += "      || LPAD(NVL(TX2.\"BormNo\",0),3,'0') AS \"CustNo\"";// 戶號
 			sql += "    , CM.\"CustName\""; // 戶名
 			sql += "    , TX2.\"IntStartDate\""; // 計息起日
 			sql += "    , TX2.\"IntEndDate\""; // 計息迄日

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_AchAuthLog_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AchAuthLog_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -51,7 +51,7 @@ BEGIN
            ELSE 0 END                     AS "ProcessDate"         -- 處理日期時間 Decimald 8   
           ,CASE WHEN S2."ATHFND" > 0 THEN S2."ATHFND"
            ELSE 0 END                     AS "StampFinishDate"     -- 核印完成日期時間 Decimald 8   
-          ,S2."ATHCOD"                    AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
+          ,NVL(S2."ATHCOD",' ')           AS "AuthStatus"          -- 授權狀態 VARCHAR2 1 
           ,S2."ACHCOD"                    AS "AuthMeth"            -- 授權方式 VARCHAR2 1 
           ,S2."ACHCDE"                    AS "MediaCode"           -- 媒體碼 VARCHAR2 1 
           ,''                             AS "BatchNo"             -- 批號 VARCHAR2 6 
@@ -161,13 +161,13 @@ BEGIN
              WHEN S1."CRTDTM" > 0
              THEN TO_DATE(S1."CRTDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
-           END                 AS "CreateDate"          -- 建檔日期 DATE 0 0
+           END                            AS "CreateDate"          -- 建檔日期 DATE 0 0
           ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
           ,CASE
              WHEN S1."CHGDTM" > 0
              THEN TO_DATE(S1."CHGDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
-           END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
+           END                            AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"
           ,S1."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
@@ -194,6 +194,33 @@ BEGIN
 
     -- LA$APLP有授權帳號資料，AH$ACHP、AH$ACRP都沒資料的資料補寫入
     INSERT INTO "AchAuthLog"
+    WITH BAA AS (
+    SELECT BAA."CustNo"
+          ,BAA."RepayBank"
+          ,BAA."RepayAcct"
+          ,BAA."FacmNo"
+          ,BAA."CreateEmpNo"
+          ,BAA."CreateDate"
+          ,BAA."LastUpdateEmpNo"
+          ,BAA."LastUpdate"
+          ,BAA."LimitAmt"
+          ,ROW_NUMBER()
+           OVER (
+            PARTITION BY BAA."CustNo"
+                       , BAA."RepayBank"
+                       , BAA."RepayAcct"
+            ORDER BY BAA."FacmNo"
+           ) AS "BAASeq"           
+    FROM "BankAuthAct" BAA
+    LEFT JOIN "AchAuthLog" AAL ON AAL."AuthCreateDate" = "TbsDyF"
+                              AND AAL."CustNo" = BAA."CustNo"
+                              AND AAL."RepayBank" = BAA."RepayBank"
+                              AND AAL."RepayAcct" = BAA."RepayAcct"
+                              AND AAL."CreateFlag" = 'A'
+    WHERE BAA."Status" = ' ' -- 空白:未授權
+      AND BAA."RepayBank" != '700' -- 非郵局
+      AND NVL(AAL."CustNo",0) = 0 -- 不存在的才寫入
+    )
     SELECT "TbsDyF"                       AS "AuthCreateDate"      -- 建檔日期 Decimald 8 
           ,BAA."CustNo"                   AS "CustNo"  
           ,BAA."RepayBank"                AS "RepayBank"           -- 扣款銀行 VARCHAR2 3 
@@ -222,7 +249,7 @@ BEGIN
           ,BAA."LastUpdate"               AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,0                              AS "ProcessTime"
           ,BAA."LimitAmt"                 AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
-    FROM "BankAuthAct" BAA
+    FROM BAA
     LEFT JOIN (
       SELECT DISTINCT
              "LMSACN"
@@ -238,17 +265,10 @@ BEGIN
              ) AS "SEQ"
       FROM "LA$APLP"
       WHERE "LMSPYS" = 2
-    ) FACM ON FACM."LMSACN" = S1."LMSACN"
-          AND FACM."LMSPCN" = S1."LMSPCN"
+    ) FACM ON FACM."LMSACN" = BAA."CustNo"
+          AND FACM."LMSPCN" = BAA."RepayAcct"
           AND FACM."SEQ" = 1
-    LEFT JOIN "AchAuthLog" AAL ON AAL."AuthCreateDate" = "TbsDyF"
-                              AND AAL."CustNo" = BAA."CustNo"
-                              AND AAL."RepayBank" = BAA."RepayBank"
-                              AND AAL."RepayAcct" = BAA."RepayAcct"
-                              AND AAL."CreateFlag" = 'A'
-    WHERE BAA."Status" = ' ' -- 空白:未授權
-      AND BAA."RepayBank" != '700' -- 非郵局
-      AND NVL(AAL."CustNo",0) = 0 -- 不存在的才寫入
+    WHERE BAA."BAASeq" = 1 -- 只取一筆
     ;
 
     -- 記錄寫入筆數
@@ -266,6 +286,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_AchAuthLog_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
 
 /

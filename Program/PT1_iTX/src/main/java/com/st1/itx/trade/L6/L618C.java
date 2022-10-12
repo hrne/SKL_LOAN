@@ -203,7 +203,7 @@ public class L618C extends TradeBuffer {
 		tTempVo.putParam("RvNo", iRvNo);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
-		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail, titaVo);
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {

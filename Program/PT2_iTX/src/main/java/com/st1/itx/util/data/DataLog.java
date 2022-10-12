@@ -310,6 +310,7 @@ public class DataLog extends CommBuffer {
 					txDataLog.setTxDataLogId(txDataLogId);
 					try {
 						txDataLogService.insert(txDataLog, titaVo);
+						break;
 					} catch (DBException e1) {
 						if (e1.getErrorId() == 2)
 							this.warn("TxDataLog Key Duplicate : " + txDataLogId);

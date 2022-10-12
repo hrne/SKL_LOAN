@@ -1,5 +1,4 @@
-create or replace NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"  
--- create by ExecSqlApp at 2022-07-19 14:09:13 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicB092_Upd"  
 ( 
 -- 程式功能：維護 JcicB092 每月聯徵不動產擔保品明細檔 
 -- 執行時機：每月底日終批次(換日前) 
@@ -150,7 +149,6 @@ BEGIN
       LEFT JOIN "FacMain" F ON F."CustNo" = CF."CustNo" 
                            AND F."FacmNo" = CF."FacmNo" 
       WHERE CF."CustNo" != 0 
---        AND CF."MainFlag" = 'Y' 
     ) 
     -- 2022-05-24 Wei 新增此段 目的: 該戶號同擔保品的額度加總 
     -- 先找出有同擔保品的額度資料 
@@ -487,7 +485,7 @@ BEGIN
          , SUBSTR('00000000' || TRUNC(NVL(CM."DispPrice",0) / 1000), -8) 
                                                  AS "DispPrice"         -- 處分價格 
          , CASE 
-             WHEN NVL(CI."ClaimDate",0) > 29000000 THEN 99912 
+             WHEN NVL(CI."ClaimDate",0) > 29000000 THEN TRUNC(NVL(CI."SettingDate",0) / 100) - 191100 + 3000 -- 預設設定日年月+30年 
              WHEN TRUNC(NVL(CI."ClaimDate",0) / 100) < 191100 THEN TRUNC(NVL(CI."ClaimDate",0) / 100) 
              ELSE TRUNC(NVL(CI."ClaimDate",0) / 100) - 191100 
            END                                   AS "IssueEndDate"      -- 權利到期年月 
@@ -532,6 +530,7 @@ BEGIN
              WHEN NVL(CLL."LVITaxYearMonth",0) < 191100 AND NVL(CLL."LVITaxYearMonth",0)>0 
                   THEN NVL(CLL."LVITaxYearMonth",0)
              WHEN NVL(CLL."LVITaxYearMonth",0) = 0  THEN  08201 -- 日期=0時給預設值8201
+             WHEN NVL(CLL."LVITaxYearMonth",0) > YYYYMM THEN YYYYMM - 191100
              ELSE NVL(CLL."LVITaxYearMonth",0) - 191100 
            END                                   AS "LVITaxYearMonth"   -- 應計土地增值稅之預估年月  (後面再額外判斷 '日期') 
          , CASE 
@@ -891,7 +890,24 @@ BEGIN
 --  DBMS_OUTPUT.PUT_LINE('UPDATE EvaAmt UPD_CNT=' || UPD_CNT); 
     DBMS_OUTPUT.PUT_LINE('UPDATE EvaAmt END'); 
  
+-- 更新 "LVITaxYearMonth" 應計土地增值稅之預估年月, 應計土地增值稅之預估年月>鑑估日期年月時,改為鑑估日期年月減1個月
+    DBMS_OUTPUT.PUT_LINE('UPDATE LVITaxYearMonth'); 
+    UPD_CNT := 0; 
  
+    UPDATE "JcicB092" M 
+    SET  M."LVITaxYearMonth" = 
+               CASE WHEN MOD(M."EvaDate", 100) = 1 THEN    
+                         (TRUNC(M."EvaDate" / 100) - 1) * 100 + 12
+                    ELSE M."EvaDate" - 1
+               END       
+    WHERE M."DataYM"      =  YYYYMM 
+      AND M."LVITaxYearMonth" >  M."EvaDate" 
+     ; 
+    UPD_CNT := UPD_CNT + sql%rowcount; 
+--  DBMS_OUTPUT.PUT_LINE('UPDATE LVITaxYearMonth UPD_CNT=' || UPD_CNT); 
+    DBMS_OUTPUT.PUT_LINE('UPDATE LVITaxYearMonth END'); 
+ 
+
 -- 更新 "LVITax" 預估應計土地增值稅, "LVITaxYearMonth" 應計土地增值稅之預估年月 
     DBMS_OUTPUT.PUT_LINE('UPDATE LVITax, LVITaxYearMonth'); 
     UPD_CNT := 0; 

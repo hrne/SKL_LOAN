@@ -68,10 +68,18 @@ BEGIN
           ,''                             AS "SpecifyFg"           -- 指定複審記號 VARCHAR2 2	 Y-指定覆審 null-非指定
           ,S1."DTARSN"                    AS "Remark"              -- 備註 NVARCHAR2 60 0
           ,0                              AS "TraceMonth"          -- 追蹤年月 Decimal 6 FollowMark=2時輸入
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,CASE
+             WHEN S1."CRTDTM" > 0
+             THEN TO_DATE(S1."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE 0 0
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,CASE
+             WHEN S1."CHGDTM" > 0
+             THEN TO_DATE(S1."CHGDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM (SELECT "REVWMM"
                 ,"DA$RTP"
                 ,"LMSACN"
@@ -92,6 +100,10 @@ BEGIN
                      ,"LGTCTY" -- 地區別
                      ,"UNTUTC" -- 應覆審單位
                      ,"DTARSN" -- 備註
+                     ,"CRTEMP" -- 建立者櫃員編號
+                     ,"CRTDTM" -- 建立日期時間  
+                     ,"CHGEMP" -- 修改者櫃員編號
+                     ,"CHGDTM" -- 修改日期時間  
                      ,ROW_NUMBER() OVER (PARTITION BY "REVWMM"
                                                      ,"DA$RTP"
                                                      ,"LMSACN"
@@ -105,6 +117,8 @@ BEGIN
                   AND S1."Seq"    = 1
     LEFT JOIN "CdCode" CC ON CC."DefCode" = 'CustTypeCode'
                          AND CC."Code" = S1."REVECD"
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S1."CHGEMP"
     ;
 
     -- 記錄寫入筆數
@@ -133,10 +147,18 @@ BEGIN
           ,''                             AS "SpecifyFg"           -- 指定複審記號 VARCHAR2 2	 Y-指定覆審 null-非指定
           ,S1."DTARSN"                    AS "Remark"              -- 備註 NVARCHAR2 60 0
           ,0                              AS "TraceMonth"          -- 追蹤年月 Decimal 6 FollowMark=2時輸入
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 0
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,CASE
+             WHEN S1."CRTDTM" > 0
+             THEN TO_DATE(S1."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE 0 0
+          ,NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,CASE
+             WHEN S1."CHGDTM" > 0
+             THEN TO_DATE(S1."CHGDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
+          ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM (SELECT "REVWMM"
                 ,"LMSACN"
                 ,"LMSAPN"
@@ -155,6 +177,10 @@ BEGIN
                      ,"TB$FDS"
                      ,"LOCLID" -- 地區別
                      ,"DTARSN" -- 備註
+                     ,"CRTEMP" -- 建立者櫃員編號
+                     ,"CRTDTM" -- 建立日期時間  
+                     ,"CHGEMP" -- 修改者櫃員編號
+                     ,"CHGDTM" -- 修改日期時間  
                      ,ROW_NUMBER() OVER (PARTITION BY "REVWMM"
                                                      ,"LMSACN"
                                                      ,"LMSAPN"
@@ -164,6 +190,8 @@ BEGIN
                   AND S1."LMSACN" = S0."LMSACN"
                   AND S1."LMSAPN" = S0."LMSAPN"
                   AND S1."Seq"    = 1
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = S1."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = S1."CHGEMP"
     ;
 
     -- 記錄寫入筆數

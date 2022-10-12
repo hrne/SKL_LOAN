@@ -688,7 +688,7 @@ public class L3230 extends TradeBuffer {
 		tTempVo.putParam("Note", titaVo.getParam("Description"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
-		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail, titaVo);
 
 		try {
 			loanBorTxService.insert(tLoanBorTx);
@@ -720,7 +720,7 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		// 更新放款明細檔及帳務明細檔關聯欄
-		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail, titaVo);
 
 		try {
 			loanBorTxService.insert(tLoanBorTx);

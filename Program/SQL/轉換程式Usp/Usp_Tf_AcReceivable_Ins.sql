@@ -456,7 +456,7 @@ BEGIN
       -- 條件2:BKPDAT = 有資料的最後一天的值
       SELECT ACTP.BKPDAT
            , ACTP.LMSACN
-           , ACTP.LMSTOA
+           , ACTP.LMSTOA + ACTP.LMSTOH AS LMSTOA
       FROM LADACTP ACTP
       LEFT JOIN lastDateData ON lastDateData.MAX_BKPDAT = ACTP.BKPDAT
       WHERE ACTP.LMSACN NOT IN (601776,610940)

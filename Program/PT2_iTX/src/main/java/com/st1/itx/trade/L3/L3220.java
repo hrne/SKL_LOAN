@@ -465,7 +465,7 @@ public class L3220 extends TradeBuffer {
 		tTempVo.putParam("Note", titaVo.getParam("Description"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
-		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail);
+		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail, titaVo);
 		try {
 			loanBorTxService.insert(tLoanBorTx);
 		} catch (DBException e) {

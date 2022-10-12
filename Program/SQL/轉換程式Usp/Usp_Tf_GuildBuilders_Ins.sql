@@ -25,13 +25,23 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "GuildBuilders"
-    SELECT "LN$BUDP"."LMSACN"             AS "CustNo"              -- 戶號 DECIMAL 7 0
-          ,"LN$BUDP"."LU$STAT"            AS "BuilderStatus"       -- 建商狀況 VARCHAR2 20 0
-          ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 0 
-          ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-          ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
-          ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "LN$BUDP"
+    SELECT BUDP."LMSACN"                  AS "CustNo"              -- 戶號 DECIMAL 7 0
+         , BUDP."LU$STAT"                 AS "BuilderStatus"       -- 建商狀況 VARCHAR2 20 0
+         , CASE
+             WHEN BUDP."CRTDTM" > 0
+             THEN TO_DATE(BUDP."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE 0 
+         , NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+         , CASE
+             WHEN BUDP."CHGDTM" > 0
+             THEN TO_DATE(BUDP."CHGDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE 0 
+         , NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+    FROM "LN$BUDP" BUDP
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = BUDP."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = BUDP."CHGEMP"
     ;
 
     -- 記錄寫入筆數

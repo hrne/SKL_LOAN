@@ -34,11 +34,21 @@ BEGIN
          , LGDP.LGDDSC                    AS "TypeDesc"            -- 類別說明       NVARCHAR2 30  
          , LGDP.LGDPCT                    AS "LGDPercent"          -- 違約損失率％   Decimal 7 5 
          , LGDP.LGDUSE                    AS "Enable"              -- 啟用記號 VARCHAR2 1   Y:啟用 , N:未啟用
-         , JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE  
-         , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
-         , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
-         , '999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+         , CASE
+             WHEN LGDP."CRTDTM" > 0
+             THEN TO_DATE(LGDP."CRTDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "CreateDate"          -- 建檔日期時間 DATE  
+         , NVL(AEM1."EmpNo",'999999')     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+         , CASE
+             WHEN LGDP."CHGDTM" > 0
+             THEN TO_DATE(LGDP."CHGDTM",'YYYYMMDDHH24MISS')
+           ELSE JOB_START_TIME
+           END                            AS "LastUpdate"          -- 最後更新日期時間 DATE  
+         , NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM DAT_LN$LGDP LGDP
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = LGDP."CRTEMP"
+    LEFT JOIN "As400EmpNoMapping" AEM2 ON AEM2."As400TellerNo" = LGDP."CHGEMP"
     ;
 
     -- 記錄寫入筆數

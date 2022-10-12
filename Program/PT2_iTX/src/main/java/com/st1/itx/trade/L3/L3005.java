@@ -170,8 +170,17 @@ public class L3005 extends TradeBuffer {
 				String titaCurCd = result.get("TitaCurCd");
 				String desc = result.get("Desc");
 				String titaTxCd = result.get("TitaTxCd");
-				String repayCodeX = result.get("Item");
 				String createEmpNo = result.get("CreateEmpNo");
+				String eraseTxCd = result.get("TitaTxCd");
+				if ("999999".equals(createEmpNo)) {
+					if ("L3210".equals(result.get("TitaTxCd")) || "L3220".equals(result.get("TitaTxCd"))
+							|| "L3230".equals(result.get("TitaTxCd"))) {
+						eraseTxCd = "L3250";
+					} else {
+						eraseTxCd = "L3240";
+					}
+				}
+				String repayCodeX = result.get("Item");
 				String hCodeFlag = result.get("HCodeFlag");
 				int entryDate = parse.stringToInteger(result.get("EntryDate"));
 				BigDecimal needPaidAmt = BigDecimal.ZERO;
@@ -268,7 +277,8 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OOCreateEmpNo", createEmpNo); // 建檔人員
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號
 				occursList.putParam("OOHCodeFlag", hCodeFlag); // 訂正記號
-
+				occursList.putParam("OOEraseTxCd", eraseTxCd); // 訂正交易代號
+				
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
 			}

@@ -29,6 +29,12 @@
 		<!-- Usp_L9_DailyLoanBal_Upd -->
 		<step id="l9DailyLoanBalUpd" parent="parentStep">
 			<tasklet ref="L9DailyLoanBalUpd" />
+			<next on="COMPLETED" to="l9DailyTavIns" />
+			<end on="FAILED" />
+		</step>
+		<!-- Usp_L9_DailyTav_Ins -->
+		<step id="l9DailyTavIns" parent="parentStep">
+			<tasklet ref="L9DailyTavIns" />
 			<next on="COMPLETED" to="split2" />
 			<end on="FAILED" />
 		</step>

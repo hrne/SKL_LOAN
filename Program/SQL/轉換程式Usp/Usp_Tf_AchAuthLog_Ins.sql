@@ -161,13 +161,13 @@ BEGIN
              WHEN S1."CRTDTM" > 0
              THEN TO_DATE(S1."CRTDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
-           END                 AS "CreateDate"          -- 建檔日期 DATE 0 0
+           END                            AS "CreateDate"          -- 建檔日期 DATE 0 0
           ,NVL(AEM2."EmpNo",'999999')     AS "LastUpdateEmpNo"     -- 修改者櫃員編號 VARCHAR2 6 0
           ,CASE
              WHEN S1."CHGDTM" > 0
              THEN TO_DATE(S1."CHGDTM",'YYYYMMDDHH24MISS')
            ELSE JOB_START_TIME
-           END                 AS "LastUpdate"          -- 異動日期 DATE 0 0
+           END                            AS "LastUpdate"          -- 異動日期 DATE 0 0
           ,CASE WHEN S1."ACHCDT" > 0 THEN MOD(S1."ACHCDT" , 1000000)
            ELSE 0 END                     AS "ProcessTime"
           ,S1."ACHLAMT"                   AS "LimitAmt"            -- 每筆扣款限額 DECIMAL 14 
