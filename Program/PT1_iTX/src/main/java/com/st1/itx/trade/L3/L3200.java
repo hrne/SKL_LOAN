@@ -554,12 +554,12 @@ public class L3200 extends TradeBuffer {
 				if (c1.getStatus() != c2.getStatus()) {
 					return c1.getStatus() - c2.getStatus();
 				}
-				// 回收金額 > 0時排序,依應繳日順序由小到大(批次：利率順序由大到小、額度由大到小、期金由大到小，人工：額度由小到大、撥款由小到大)
+				// 回收金額 > 0時排序(批次：應繳日由小到大、利率由大到小、額度由大到小、期金由大到小，人工：額度由小到大、撥款由小到大)
 				if (iRepayType == 1) {
-					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
-						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
-					}
 					if (titaVo.isTrmtypBatch()) {
+						if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
+							return c1.getNextPayIntDate() - c2.getNextPayIntDate();
+						}
 						if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
 							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 						}
@@ -913,7 +913,11 @@ public class L3200 extends TradeBuffer {
 		wkDelayInt = BigDecimal.ZERO;
 		wkBreachAmt = BigDecimal.ZERO;
 		wkExtraRepay = BigDecimal.ZERO;
-
+		// 未計息
+		if (getCalcBorm(ln) == 0) {
+			return;			
+		}
+		
 		// 部分償還餘額 > 0
 		if (wkRepaykindCode == 1) {
 			wkExtraRepayRemaind = iExtraRepay.subtract(wkRepayLoan);

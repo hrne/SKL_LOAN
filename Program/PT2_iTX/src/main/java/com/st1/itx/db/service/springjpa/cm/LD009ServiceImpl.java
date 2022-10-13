@@ -143,7 +143,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			   ) AS \"DbAmt\"";
 		sql += "			  ,SUM(";
 		sql += "				CASE";
-		sql += "				  WHEN AC.\"DbCr\" = 'CS' ";
+		sql += "				  WHEN AC.\"DbCr\" = 'C' ";
 		sql += "				  THEN AC.\"TxAmt\"";
 		sql += "				ELSE 0 END ";
 		sql += "			   ) AS \"CrAmt\"";

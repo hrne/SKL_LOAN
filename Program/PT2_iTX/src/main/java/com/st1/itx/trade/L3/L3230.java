@@ -306,6 +306,18 @@ public class L3230 extends TradeBuffer {
 			}
 			// 暫收款金額 (暫收借)
 			wkCustTempBal = acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
+			
+			// 累溢收(暫收貸)
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("TAV");
+			acDetail.setSumNo("090");
+			acDetail.setTxAmt(baTxCom.getExcessive().subtract(iTempAmt));
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setBormNo(0);
+			lAcDetail.add(acDetail);
+		
 			// 退還款餘額
 			wkTempBal = wkTempBal.subtract(wkCustTempBal);
 		} else {

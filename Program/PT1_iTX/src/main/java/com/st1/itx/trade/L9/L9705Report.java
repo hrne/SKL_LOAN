@@ -286,23 +286,13 @@ public class L9705Report extends MakeReport {
 		// 溢短繳 UnPaidAmt
 		// 合計 = 未收本息 + 違約金 - 溢短繳
 		// 未還本金餘額
-//				金額欄位 同下繳日的加總
-
-//					不同戶號額度跳頁
-//			if (cnt >= 1) {
-
-//				this.newPage();
-
-//			}
-
-//			cnt++;
 
 		// 列印地址
 
 		setFont(1, 11);
 		printCm(1, 2.5, "【限定本人拆閱，若無此人，請寄回本公司】");
 		printCm(2, 3.5, custMain.getCurrZip3().trim() + custMain.getCurrZip2().trim());
-		if ("A3".equals(reconcode)) {
+		if ("A3".equals(reconcode) || "L4702".equals(titaVo.getTxCode())) {
 			printCm(15, 3.5, "限  時  專  送");
 		}
 		printCm(2, 4.5, currAddress);
@@ -521,7 +511,7 @@ public class L9705Report extends MakeReport {
 		}
 
 //		if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
-		if ("A3".equals(reconcode)) {
+		if ("A3".equals(reconcode) || "L4702".equals(titaVo.getTxCode())) {
 			String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
 			BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));
 

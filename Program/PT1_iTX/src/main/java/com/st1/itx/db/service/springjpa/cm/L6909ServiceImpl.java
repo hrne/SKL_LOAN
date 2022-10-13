@@ -64,8 +64,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
 		sql += "  	lx.\"Desc\"  		AS \"Desc\", ";
 		sql += "  	NVL(lx.\"EntryDate\",0) AS \"EntryDate\", ";
-		sql += "  	MIN( case when ad.\"EntAc\" = 2 	 THEN (CASE WHEN ad.\"RelDy\" = ad.\"AcDate\" THEN 2 ELSE 4 END)	 ";
-		sql += "  			  when ad.\"EntAc\" = 3 	 THEN (CASE WHEN ad.\"RelDy\" = ad.\"AcDate\" THEN 1 ELSE 3 END ) ELSE 0	END) AS \"TitaHCode\", ";
+		sql += "  	MIN(ad.\"TitaHCode\")   AS \"TitaHCode\", ";
 		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
 		sql += "    MIN(ad.\"CreateDate\")   AS \"CreateDate\",";
 		sql += "    ad.\"AcSeq\"        AS \"AcSeq\" ";

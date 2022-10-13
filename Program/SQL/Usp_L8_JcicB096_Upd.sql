@@ -240,7 +240,7 @@ BEGIN
 --             WHEN WK."LandZoningCode" IN ('1')                 THEN 'A' --住宅區 
 --             WHEN WK."LandZoningCode" IN ('2')                 THEN 'B' --商業區 
 --             WHEN WK."LandZoningCode" IN ('4')                 THEN 'Z' --其他 
---             WHEN WK."LandZoningCode" IN ('3','5','6','7','8') THEN 'R' --鄉村區 
+             WHEN WK."LandZoningCode" IN ('5','6','7','8')     THEN 'R' --鄉村區 
              WHEN WK."LandZoningCode" IN ('10')                THEN 'A' --住宅區 
              WHEN WK."LandZoningCode" IN ('11')                THEN 'B' --商業區 
              WHEN WK."LandZoningCode" IN ('24')                THEN 'Z' --其他 

@@ -451,6 +451,8 @@ public class L3220 extends TradeBuffer {
 		}
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
+		tLoanBorTx.setTempAmt(wkCustTempBal);
+		tLoanBorTx.setOverflow(wkCustTempBal.subtract(iTempAmt));
 		// 其他欄位
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);

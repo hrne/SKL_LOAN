@@ -202,7 +202,7 @@ CALL(#RP_BF)
 ["應收付類別","收付金額","備註項目"],
 [[#RpCode1,":",#RpCodeX1],[#RpAmt1],
 [#GRD_COLL1,#GRD_COLM1,#RpCustNo1,#RpFacmNo1,#RpRemitAcctNo1
-,#GRD_COLN1,#BTN_GRD_B1,#GRD_COLO1,#RpEntryDate1
+,#BTN_GRD_B1,#GRD_COLO1,#RpEntryDate1
 ,#BTN_GRD_A1,#RpRemitBankX1,#GRD_COLP1,#GRD_COLR1
 ,#RpTypeX1,#RpCustName1,#GRD_COLQ1,#NOTE1,#RpRemark1]]],
 !-----5
@@ -505,11 +505,11 @@ SWITCH(#RpCode{i}
 ,94,T(2,@RpCodeX{i},轉債協暫收款)
 ,95,T(2,@RpCodeX{i},轉債協退還款)
 ,T(2,@RpCodeX{i},)))
-HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLN{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
+HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
 IF(#RPFG==1||#RPFG==2,
 C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
-SHOW(#GRD_COLN{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
+SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
 IF(#RPFG==4||#RPFG==5||#RPFG==6,C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
@@ -518,11 +518,11 @@ SHOW(#GRD_COLL{i},#RpCustNo{i})HIDE(#RpFacmNo{i})),$)
 
 ! 欄位顯示先調整
 #PRE_COL_DIS{i}=A,1,S
-HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLN{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
+HIDE(#GRD_COLL{i},#GRD_COLM{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#GRD_COLR{i},#RpCustNo{i},#RpFacmNo{i},#BTN_GRD_B{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpDetailSeq{i},#RpEntryDate{i},#BTN_GRD_A{i},#RpRemitAcctNo{i},#RpType{i},#RpTypeX{i},#RpCustName{i},#NOTE{i},#RpRemark{i})
 IF(#RPFG==1||#RPFG==2,
 C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
-SHOW(#GRD_COLN{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
+SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
 IF(#RPFG==4||#RPFG==5||#RPFG==6,C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#BTN_GRD_B{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,
@@ -611,7 +611,7 @@ SWITCH(#RpCode{i},
 IF(#RPFG==1||#RPFG==2,
 C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i}),
 C(3,#RpCode{i},90,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),
-SHOW(#GRD_COLN{i},#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
+SHOW(#GRD_COLO{i},#GRD_COLP{i},#GRD_COLQ{i},#RpDetailSeq{i},#RpEntryDate{i},#RpType{i},#RpTypeX{i},#NOTE{i}))),$)
 IF(#RPFG==3||#RPFG==8,SHOW(#GRD_COLM{i},#GRD_COLQ{i},#RpFacmNo{i},#NOTE{i}),$)
 IF(#RPFG==4||#RPFG==5||#RPFG==6,C(3,#RpCode{i},91,SHOW(#GRD_COLM{i},#RpFacmNo{i},#BTN_GRD_A{i}),SHOW(#GRD_COLM{i},#GRD_COLO{i},#GRD_COLR{i},#GRD_COLQ{i},#BTN_GRD_B{i},#RpRemitBankX{i},#RpRemitAcctNo{i},#RpCustName{i},#RpRemark{i})),$)
 IF(#RPFG==7,

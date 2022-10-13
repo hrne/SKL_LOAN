@@ -115,7 +115,7 @@ public class AcRepayCom extends TradeBuffer {
 	 */
 	public void settleRun(List<LoanBorTx> ilLoanBorTx, ArrayList<BaTxVo> iBaTxList, TitaVo titaVo)
 			throws LogicException {
-		this.info("settle ... ");
+		this.info("settleRun ... ");
 		//
 		if (ilLoanBorTx.size() == 0) {
 			return;
@@ -195,6 +195,7 @@ public class AcRepayCom extends TradeBuffer {
 					tempAmtRemaind = BigDecimal.ZERO;
 					if (txAmtRemaind.compareTo(repayAmt.subtract(tempAmt)) > 0) {
 						txAmt = repayAmt.subtract(tempAmt);
+						txAmtRemaind = txAmtRemaind.subtract(txAmt);
 					} else {
 						txAmt = txAmtRemaind;
 						txAmtRemaind = BigDecimal.ZERO;
@@ -220,6 +221,7 @@ public class AcRepayCom extends TradeBuffer {
 				tempAmtRemaind = BigDecimal.ZERO;
 				if (txAmtRemaind.compareTo(repayAmt.subtract(tempAmt)) > 0) {
 					txAmt = repayAmt.subtract(tempAmt);
+					txAmtRemaind = txAmtRemaind.subtract(txAmt);
 				} else {
 					txAmt = txAmtRemaind;
 					txAmtRemaind = BigDecimal.ZERO;

@@ -1,5 +1,7 @@
 package com.st1.itx.maintain;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,8 +32,10 @@ import com.st1.itx.db.service.TxRecordService;
 
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
+import com.st1.itx.util.StaticTool;
 import com.st1.itx.util.common.AcEnterCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.parse.Parse;
 
@@ -366,6 +370,13 @@ public class MainProcess extends SysLogger {
 		if (this.titaVo.isSpanDy()) {
 			this.titaVo.putParam(ContentName.entdy, this.titaVo.getSpanDy());
 			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy());
+			
+			TxRecord txRecord = txRecordService.findEntdyFirst(StaticTool.rocToBc(parse.stringToInteger(this.titaVo.getSpanDy())), titaVo.getTlrNo(), "00");
+			if (Objects.isNull(txRecord))
+				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
+			else
+				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9((parse.stringToInteger(txRecord.getTxSeq()) + 1) + "", 8));
+			
 //			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy().substring(this.titaVo.getSpanDy().length() - 2, this.titaVo.getSpanDy().length()));
 		}
 
