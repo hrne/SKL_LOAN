@@ -13,6 +13,7 @@ import com.st1.itx.db.service.springjpa.cm.LM013ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.LM013ServiceImpl.EntCodeCondition;
 import com.st1.itx.db.service.springjpa.cm.LM013ServiceImpl.IsRelsCondition;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.StringCut;
 
@@ -97,7 +98,8 @@ public class LM013Report extends MakeReport {
 
 		print(-1, 192, "機密等級：密");
 		print(-2, 192, "日  期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
-		print(-3, 192, "時  間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		print(-3, 192, "時  間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		print(-4, 192, "頁  數：" + this.getNowPage());
 
 		print(-3, newBorder.length() / 2, "新光人壽保險股份有限公司", "C");
@@ -110,9 +112,11 @@ public class LM013Report extends MakeReport {
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(-9, 0, "          放款對象                                                核貸總值                                                                                  帳面總值");
+		print(-9, 0,
+				"          放款對象                                                核貸總值                                                                                  帳面總值");
 		print(-10, 0, "");
-		print(-11, 0, "戶號 額度/名稱 統編　　       不動產抵押     動產抵押       有價證券       銀行保證       專案放款           合計      不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計");
+		print(-11, 0,
+				"戶號 額度/名稱 統編　　       不動產抵押     動產抵押       有價證券       銀行保證       專案放款           合計      不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計");
 		print(-12, 0, newBorder);
 
 		// 明細起始列(自訂亦必須)
@@ -123,10 +127,12 @@ public class LM013Report extends MakeReport {
 
 	}
 
-	public Boolean exec(TitaVo titaVo, int type) throws LogicException {
+	public Boolean exec(TitaVo titaVo,int type) throws LogicException {
 
 		marginAmount = getBigDecimal(titaVo.getParam("inputAmount"));
 		validDate = showRocDate(titaVo.getParam("inputDate"), 1);
+
+		
 
 		this.info("type=" + type);
 
@@ -142,19 +148,28 @@ public class LM013Report extends MakeReport {
 
 			switch (type) {
 			case 0:
-				listsArray[0] = new DataList(lM013ServiceImpl.findAll(titaVo, EntCodeCondition.All, IsRelsCondition.All), "", false);
+				listsArray[0] = new DataList(
+						lM013ServiceImpl.findAll(titaVo, EntCodeCondition.All, IsRelsCondition.All), "", false);
 				break;
 			case 1:
-				listsArray[1] = new DataList(lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Natural, IsRelsCondition.No), "非關係自然人", false);
+				listsArray[1] = new DataList(
+						lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Natural, IsRelsCondition.No), "非關係自然人",
+						false);
 				break;
 			case 2:
-				listsArray[2] = new DataList(lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Natural, IsRelsCondition.Yes), "關係自然人", false);
+				listsArray[2] = new DataList(
+						lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Natural, IsRelsCondition.Yes), "關係自然人",
+						false);
 				break;
 			case 3:
-				listsArray[3] = new DataList(lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Enterprise, IsRelsCondition.No), "非關係法人", false);
+				listsArray[3] = new DataList(
+						lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Enterprise, IsRelsCondition.No), "非關係法人",
+						false);
 				break;
 			case 4:
-				listsArray[4] = new DataList(lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Enterprise, IsRelsCondition.Yes), "關係法人", false);
+				listsArray[4] = new DataList(
+						lM013ServiceImpl.findAll(titaVo, EntCodeCondition.Enterprise, IsRelsCondition.Yes), "關係法人",
+						false);
 				break;
 			default:
 				break;
@@ -165,8 +180,16 @@ public class LM013Report extends MakeReport {
 		}
 
 		this.info("getReportKind=" + listsArray[type].getReportKind());
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM013", "金檢報表(放款種類表)" + listsArray[type].getReportKind(), "密", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM013",
+//				"金檢報表(放款種類表)" + listsArray[type].getReportKind(), "密", "A4", "L");
+		
+		
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode("LM013").setRptItem("金檢報表(放款種類表)" + listsArray[type].getReportKind()).setRptSize("A4")
+				.setSecurity("密").setPageOrientation("L").build();
 
+		this.open(titaVo,reportVo);
+		
 		this.setFont(1, 8);
 
 		this.setCharSpaces(0);
@@ -269,7 +292,9 @@ public class LM013Report extends MakeReport {
 									this.print(1, 0, " ");
 
 									this.print(0, 0, lastTLDVo.get("F2"), "L"); // 戶號
-									this.print(0, 8, StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"), "L");
+									this.print(0, 8,
+											StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"),
+											"L");
 								}
 
 								// 出上一筆資料最後的合計
@@ -302,7 +327,9 @@ public class LM013Report extends MakeReport {
 								this.print(1, 0, " ");
 
 								this.print(0, 0, lastTLDVo.get("F2"), "L"); // 戶號
-								this.print(0, 8, StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"), "L");
+								this.print(0, 8,
+										StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"),
+										"L");
 
 								// 出上一筆資料最後的合計
 								this.print(0, 113, formatAmt(lineAmtTotal, 0), "R"); // 核貸總值合計

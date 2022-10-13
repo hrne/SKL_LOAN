@@ -31,6 +31,9 @@ public interface CdCityRateRepositoryHist extends JpaRepository<CdCityRate, CdCi
   // EffectYYMM =
   public Slice<CdCityRate> findAllByEffectYYMMIsOrderByCityCodeAsc(int effectYYMM_0, Pageable pageable);
 
+  // EffectYYMM >= ,AND EffectYYMM <=
+  public Slice<CdCityRate> findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(int effectYYMM_0, int effectYYMM_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

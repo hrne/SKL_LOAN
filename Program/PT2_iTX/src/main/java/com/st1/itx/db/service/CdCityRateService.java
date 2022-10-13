@@ -62,6 +62,18 @@ public interface CdCityRateService {
   public Slice<CdCityRate> findEffectDateEq(int effectYYMM_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * EffectYYMM &gt;= ,AND EffectYYMM &lt;=
+   *
+   * @param effectYYMM_0 effectYYMM_0
+   * @param effectYYMM_1 effectYYMM_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdCityRate CdCityRate of List
+   */
+  public Slice<CdCityRate> findEffectDateRange(int effectYYMM_0, int effectYYMM_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdCityRate
    * 
    * @param cdCityRateId key

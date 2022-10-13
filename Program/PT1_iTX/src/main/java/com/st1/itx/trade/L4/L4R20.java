@@ -1,7 +1,7 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -12,8 +12,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdCityRate;
+import com.st1.itx.db.domain.CdCityRateId;
+import com.st1.itx.db.service.CdCityRateService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L4R20")
 @Scope("prototype")
@@ -24,10 +28,15 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class L4R20 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R20.class);
 	/* DB服務注入 */
 	@Autowired
 	public CdCityService cdCityService;
+
+	@Autowired
+	public CdCityRateService cdCityRateService;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -36,32 +45,52 @@ public class L4R20 extends TradeBuffer {
 
 		this.info("L4R20 Run");
 
+		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
+		int iWorkMonth = parse.stringToInteger(titaVo.getParam("RimWorkMonth"));
+
 //		 查詢地區別代碼檔
 		this.index = 0;
 		this.limit = Integer.MAX_VALUE;
-
 		Slice<CdCity> sCdCity = cdCityService.findAll(this.index, this.limit, titaVo);
-		List<CdCity> lCdCity = sCdCity == null ? null : sCdCity.getContent();
+		Slice<CdCityRate> sCdCityRate = cdCityRateService.findEffectDateEq(iWorkMonth + 191100, this.index, this.limit,
+				titaVo);
 
-		if (lCdCity == null || lCdCity.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
+		if (iFunCd == 1 || iFunCd == 3) {
+			if (sCdCityRate != null) {
+				throw new LogicException(titaVo, "E0002", "年月 = " + iWorkMonth); // 新增資料已存在
+			}
+		} else {
+			if (sCdCityRate == null || sCdCityRate.getContent().size() == 0) {
+				throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
+			}
 		}
 
-//		 如有找到資料
 		int totalRow = 30;
-		int lCdCityL = lCdCity.size();
+		int lCdCityL = sCdCity.getContent().size();
 		int row = 1;
 
 		if (lCdCityL > totalRow) {
 			this.info("L4R20  需增加L4322 Grid長度 ..." + lCdCityL);
 		}
 
-		for (CdCity tCdCity : lCdCity) {
-			totaVo.putParam("L4r20CityCode" + row, tCdCity.getCityCode());
-			totaVo.putParam("L4r20CityItem" + row, tCdCity.getCityItem());
-			totaVo.putParam("L4r20IntRateIncr" + row, tCdCity.getIntRateIncr());
-			totaVo.putParam("L4r20IntRateCeiling" + row, tCdCity.getIntRateCeiling());
-			totaVo.putParam("L4r20IntRateFloor" + row, tCdCity.getIntRateFloor());
+		for (CdCity t : sCdCity.getContent()) {
+
+			CdCityRate tCdCityRate = cdCityRateService.findById(new CdCityRateId(iWorkMonth + 191100, t.getCityCode()),
+					titaVo);
+
+			BigDecimal intRateIncr = BigDecimal.ZERO;
+			BigDecimal intRateCeiling = BigDecimal.ZERO;
+			BigDecimal intRateFloor = BigDecimal.ZERO;
+			if (tCdCityRate != null) {
+				intRateIncr = tCdCityRate.getIntRateIncr();
+				intRateCeiling = tCdCityRate.getIntRateCeiling();
+				intRateFloor = tCdCityRate.getIntRateFloor();
+			}
+			totaVo.putParam("L4r20CityCode" + row, t.getCityCode());
+			totaVo.putParam("L4r20CityItem" + row, t.getCityItem());
+			totaVo.putParam("L4r20IntRateIncr" + row, intRateIncr);
+			totaVo.putParam("L4r20IntRateCeiling" + row, intRateCeiling);
+			totaVo.putParam("L4r20IntRateFloor" + row, intRateFloor);
 			row++;
 		}
 

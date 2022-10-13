@@ -142,6 +142,9 @@ BEGIN
                       LEFT JOIN "LoanBorTx" LT ON LT."AcDate" = to_number(SUBSTR(NVL(T1."CorrectSeq",'0'), 1, 8))
                                               AND LT."TitaTlrNo" = SUBSTR(NVL(T1."CorrectSeq",'0'), 13, 6)
                                               AND LT."TitaTxtNo" = SUBSTR(NVL(T1."CorrectSeq",'0'), 19, 8)
+                                              AND LT."CustNo"    = T1."CustNo"
+                                              AND LT."FacmNo"    = T1."FacmNo"
+                                              AND LT."BormNo"    = T1."BormNo"
                      WHERE  T1."AcDate"    =  TBSDYF
                        AND  T1."TitaHCode" IN (0, 3)
                        AND  T1."Principal"  <> 0
@@ -180,6 +183,9 @@ BEGIN
                     LEFT JOIN "LoanBorTx" LB ON LB."AcDate" = to_number(SUBSTR(NVL(T2."CorrectSeq",'0'), 1, 8))
                                             AND LB."TitaTlrNo" = SUBSTR(NVL(T2."CorrectSeq",'0'), 13, 6)
                                             AND LB."TitaTxtNo" = SUBSTR(NVL(T2."CorrectSeq",'0'), 19, 8)
+                                            AND LB."CustNo"    = T2."CustNo"
+                                            AND LB."FacmNo"    = T2."FacmNo"
+                                            AND LB."BormNo"    = T2."BormNo"
                     WHERE  T2."AcDate"    =  TBSDYF
                       AND  T2."TitaHCode" IN (0, 3)
                       AND  T2."Principal"  <> 0

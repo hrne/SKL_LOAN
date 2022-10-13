@@ -170,6 +170,34 @@ em = null;
   }
 
   @Override
+  public Slice<CdCityRate> findEffectDateRange(int effectYYMM_0, int effectYYMM_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdCityRate> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findEffectDateRange " + dbName + " : " + "effectYYMM_0 : " + effectYYMM_0 + " effectYYMM_1 : " +  effectYYMM_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdCityRateReposDay.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdCityRateReposMon.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdCityRateReposHist.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+    else 
+      slice = cdCityRateRepos.findAllByEffectYYMMGreaterThanEqualAndEffectYYMMLessThanEqualOrderByCityCodeAscEffectYYMMDesc(effectYYMM_0, effectYYMM_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public CdCityRate holdById(CdCityRateId cdCityRateId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

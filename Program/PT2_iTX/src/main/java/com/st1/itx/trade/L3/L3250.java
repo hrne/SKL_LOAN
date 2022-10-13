@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -19,9 +20,14 @@ import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.InsuRenew;
 
 import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanOverdue;
+import com.st1.itx.db.domain.LoanOverdueId;
+import com.st1.itx.db.domain.TxTemp;
+import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
@@ -67,7 +73,7 @@ public class L3250 extends TradeBuffer {
 	@Autowired
 	public LoanBorTxService loanBorTxService;
 	@Autowired
-	public LoanRateChangeService loanRateChangeService;
+	public LoanOverdueService loanOverdueService;
 	@Autowired
 	public CdAcCodeService cdAcCodeService;
 
@@ -133,7 +139,14 @@ public class L3250 extends TradeBuffer {
 		// 沖正處理
 		repayEraseRoutine();
 
-		wkRepayCode = 90; // 暫收抵繳
+		if (wkRepayCode == 0) {
+			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+				wkRepayCode = 9; // 其他
+			} else {
+				wkRepayCode = 90; // 暫收抵繳
+			}
+		}
+
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
 		titaVo.putParam("RpCustNo1", iCustNo);
@@ -143,22 +156,46 @@ public class L3250 extends TradeBuffer {
 		// 暫收款金額 (暫收借)
 		acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
-//			// 費用科目
-		acDetail = new AcDetail();
-		acDetail.setDbCr("D");
-		acDetail.setAcctCode(iAcctCode);
-		acDetail.setTxAmt(iTxAmt);
-		acDetail.setCustNo(iCustNo);
-		acDetail.setFacmNo(iFacmNo);
-		acDetail.setRvNo(iRvNo);
-		acDetail.setReceivableFlag(3);
-		if (tCdAcCode.getReceivableFlag() > 0) {
-			acDetail.setReceivableFlag(tCdAcCode.getReceivableFlag());
+		// 暫收款登錄
+		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+			lAcDetail.add(acDetail);
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode("THC");
+			acDetail.setSumNo("099");
+			acDetail.setTxAmt(wkTxAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setRvNo("" + titaVo.getOrgEntdyI());// 會計日期
+			lAcDetail.add(acDetail);
 		}
-		if ("TMI".equals(iAcctCode)) {
-			checkInsuRenew(acDetail, titaVo);
+
+		// 暫收款銷帳(費用科目)
+		if (wkTxAmt.compareTo(BigDecimal.ZERO) == 0) {
+			acDetail = new AcDetail();
+			acDetail.setDbCr("D");
+			acDetail.setAcctCode(iAcctCode);
+			acDetail.setTxAmt(iTxAmt);
+			acDetail.setCustNo(iCustNo);
+			acDetail.setFacmNo(iFacmNo);
+			acDetail.setRvNo(iRvNo);
+			acDetail.setReceivableFlag(3);
+			if (tCdAcCode.getReceivableFlag() > 0) {
+				acDetail.setReceivableFlag(tCdAcCode.getReceivableFlag());
+			}
+			// TMI 暫收款－火險保費
+			if ("TMI".equals(iAcctCode)) {
+				checkInsuRenew(acDetail, titaVo);
+			}
+			// F08 收回呆帳及過期帳
+			if ("F08".equals(iAcctCode)) {
+				UpdLoanOverDueEraseRoutine();
+			}
 		}
-		lAcDetail.add(acDetail);
+
+		// 暫收款退還(存回暫收)
+		if (wkTxAmt.compareTo(BigDecimal.ZERO) < 0) {
+		}
 
 		// 累溢收入帳(暫收貸)
 		acRepayCom.settleOverflow(lAcDetail, titaVo);
@@ -198,9 +235,9 @@ public class L3250 extends TradeBuffer {
 			if (tx.getEntryDate() != iEntryDate) {
 				continue;
 			}
-//			if (!tx.getCreateEmpNo().equals("999999")) {
-//				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
-//			}
+			if (!tx.getCreateEmpNo().equals("999999")) {
+				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
+			}
 			wkRepayCode = tx.getRepayCode();
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
@@ -242,6 +279,51 @@ public class L3250 extends TradeBuffer {
 					ac.setJsonFields(tTempVo.getJsonString());
 				}
 			}
+		}
+	}
+
+	private void UpdLoanOverDueEraseRoutine() throws LogicException {
+		this.info("UpdLoanOverDueEraseRoutine ...");
+
+		BigDecimal wkTempBal = iTxAmt;
+		BigDecimal wkRepayAmt = BigDecimal.ZERO;
+		BigDecimal wkTotalRepayAmt = BigDecimal.ZERO;
+
+		List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復
+		lStatus.add(2);
+		lStatus.add(3);
+		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, iFacmNo, iFacmNo, 1, 900, 1, 999,
+				lStatus, 0, Integer.MAX_VALUE);
+		List<LoanOverdue> lLoanOverdue = new ArrayList<LoanOverdue>();
+		lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
+		if (lLoanOverdue == null || lLoanOverdue.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "催收呆帳檔"); // 查詢資料不存在
+		}
+		for (LoanOverdue od : lLoanOverdue) {
+			if (od.getBadDebtBal().compareTo(od.getBadDebtAmt()) >= 0) {
+				continue;
+			}
+			if (wkTempBal.compareTo(BigDecimal.ZERO) == 0) {
+				break;
+			}
+			wkRepayAmt = od.getBadDebtAmt().subtract(od.getBadDebtAmt());
+			wkTotalRepayAmt = wkTotalRepayAmt.add(wkRepayAmt);
+			if (wkTempBal.compareTo(wkRepayAmt) >= 0) {
+				wkTempBal = wkTempBal.subtract(wkRepayAmt);
+			} else {
+				wkRepayAmt = wkTempBal;
+				wkTempBal = BigDecimal.ZERO;
+			}
+			od.setBadDebtBal(od.getBadDebtBal().add(wkRepayAmt));
+			try {
+				loanOverdueService.update(od);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + od.getCustNo() + " 額度編號 = " + od.getFacmNo()
+						+ " 撥款序號 = " + od.getBormNo() + " 催收序號 = " + od.getOvduNo()); // 更新資料時，發生錯誤
+			}
+		}
+		if (wkTempBal.compareTo(BigDecimal.ZERO) > 0) {
+			throw new LogicException(titaVo, "E0019", "該戶呆帳收回金額 = " + wkTotalRepayAmt); // 輸入資料錯誤
 		}
 	}
 

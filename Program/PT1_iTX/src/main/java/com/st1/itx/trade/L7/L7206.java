@@ -179,15 +179,21 @@ public class L7206 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 
 			// 連續資料串，遇到空值強行結束
-			if (makeExcel.getValue(i, 1).toString().length() == 0 || makeExcel.getValue(i, 2).toString().length() == 0
-					|| makeExcel.getValue(i, 3).toString().length() == 0) {
+			if (makeExcel.getValue(i, 1).toString().trim().length() == 0 || makeExcel.getValue(i, 2).toString().trim().length() == 0
+					|| makeExcel.getValue(i, 3).toString().trim().length() == 0) {
 				break;
 			}
 
 			try {
 				id = makeExcel.getValue(i, 1).toString().trim();
+				Object xid = makeExcel.getValue(i, 1).toString().trim().length() > 10
+						? new BigDecimal(makeExcel.getValue(i, 1).toString().trim()).toPlainString()
+						: id;
+
+				id = xid.toString();
 				name = makeExcel.getValue(i, 2).toString().trim();
 				loanAmt = new BigDecimal(makeExcel.getValue(i, 3).toString());
+				this.info("id =" + id.length() + ":" + id);
 			} catch (Exception e) {
 
 				String ErrorMsg = "L7206(Excel欄位應為關係人代號在A欄、關係人名稱在B欄、放款金額為C欄)，請確認";

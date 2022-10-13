@@ -532,7 +532,20 @@ BEGIN
       SELECT "CustNo"
            , "FacmNo"
            , "BormNo"
-           , TRUNC("DerDate" / 100) AS "IssueMonth" -- 減損發生年月
+           -- 2022-09-28 Wei 修改 from Linda's mail from 舜雯
+           -- 計算回收時，會由繳息迄日(LA$MSTP月餘額統計檔/LMSLPD繳息迄日 or LNMDLYP逾期檔/W08LPD逾期天數)
+           -- +120天的年月A
+           -- 開始往後計算5年(此客戶資料繳息迄日為20220320,120天後=20220718,A=202207)
+           -- 1. A+1年，即202207+1=202307
+           -- 2. 202307>畫面年月202208，以不超過畫面年月為限，故202307改為202208=B
+           -- 3. 火險回收時，先B-1年=202108，以此年月的月底日為條件日期C，此時C=20210831
+           -- 4. 讀取火險續保檔(Key值僅設戶號)，挑選會計日>=C(即20210831)，檔案中年月=202109那筆被讀取(如下)，
+           --    此筆火險保費=1999，資料寫入媒體檔
+           , CASE
+               WHEN TRUNC("DerDate" / 100) + 100 > YYYYMM -- 若A+1年>畫面年月
+                    THEN YYYYMM - 100 -- 取B-1年=C
+               ELSE TRUNC("DerDate" / 100) 
+             END  AS "IssueMonth" -- 減損發生年月
       FROM "LoanIfrs9Dp"
       WHERE "DerDate" > 0
         AND "DataYM" = YYYYMM

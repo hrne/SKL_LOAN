@@ -1151,16 +1151,20 @@ public class LoanCom extends TradeBuffer {
 	 */
 	public void checkEraseCustNoTxSeqNo(int iCustNo, TitaVo titaVo) throws LogicException {
 		// CustNo = ,AND TitaHCode = ,AND Displayflag ^i
+		if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
+				|| iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+			return;
+		}
 		List<String> lTitaTxCd = new ArrayList<String>();
-		lTitaTxCd.add("L3200"); 
-		lTitaTxCd.add("L3210"); 
-		lTitaTxCd.add("L3220"); 
-		lTitaTxCd.add("L3230"); 
-		lTitaTxCd.add("L3410"); 
-		lTitaTxCd.add("L3420"); 
-		lTitaTxCd.add("L3440"); 
-		lTitaTxCd.add("L3711"); 
-		lTitaTxCd.add("L3712"); 
+		lTitaTxCd.add("L3200");
+		lTitaTxCd.add("L3210");
+		lTitaTxCd.add("L3220");
+		lTitaTxCd.add("L3230");
+		lTitaTxCd.add("L3410");
+		lTitaTxCd.add("L3420");
+		lTitaTxCd.add("L3440");
+		lTitaTxCd.add("L3711");
+		lTitaTxCd.add("L3712");
 		lTitaTxCd.add("L618B"); // 火險費轉列催收
 		lTitaTxCd.add("L618C"); // 法務費轉列催收
 		LoanBorTx tx = loanBorTxService.custNoLastTxtNoFirst(iCustNo, "0", lTitaTxCd, titaVo);
@@ -1168,7 +1172,7 @@ public class LoanCom extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "同戶帳務交易 戶號=" + iCustNo); // 查詢資料不存在
 		}
 		String orgTxSeq = tx.getTitaKinBr() + tx.getTitaTlrNo() + tx.getTitaTxtNo();
-	//	this.info("checkEraseCustNoTxSeqNo " + +tx.getAcDate() + "-" + orgTxSeq);
+		// this.info("checkEraseCustNoTxSeqNo " + +tx.getAcDate() + "-" + orgTxSeq);
 		if (tx.getAcDate() != titaVo.getOrgEntdyI() || !orgTxSeq.equals(titaVo.getOrgTxSeq())) {
 			throw new LogicException(titaVo, "E3088", "同戶帳務最近一筆交易序號 = " + tx.getAcDate() + "-" + orgTxSeq); // 放款交易訂正須由最後一筆交易開始訂正
 		}
