@@ -206,6 +206,8 @@ E(0,0)
 C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 #TimCustNoX=X,100,S
 C(4,#CustNo,$,T(2,#CustNoX))

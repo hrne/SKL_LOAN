@@ -95,7 +95,7 @@ public class AcReceivableCom extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("AcReceivableCom ... ");
 		wkOpenAcDate = 0;
-		int bizTbsdy = this.txBuffer.getTxBizDate().getTbsDy();
+		int bizTbsdy = titaVo.getEntDyI();
 		this.titaVo = titaVo;
 		int AcHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
 		int idx = 0;
@@ -225,7 +225,7 @@ public class AcReceivableCom extends TradeBuffer {
 	public void mnt(int RvFg, List<AcReceivable> rvList, TitaVo titaVo) throws LogicException {
 		this.info("AcReceivableCom mnt ... ");
 		this.titaVo = titaVo;
-		int bizTbsdy = this.txBuffer.getTxBizDate().getTbsDy();
+		int bizTbsdy =  titaVo.getEntDyI();
 		// 業務科目記號 <> 0 or 銷帳科目記號 <> 0
 		for (AcReceivable rv : rvList) {
 			this.info("AcReceivableCom mnt " + rv.toString());

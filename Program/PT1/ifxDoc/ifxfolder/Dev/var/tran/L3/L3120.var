@@ -603,7 +603,9 @@ C(4,#CustId,$,E(0,#L2r07CustNo))
 C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 C(3,#FuncFg,5,s,$)
 T(2,@LockCustNo,#TimCustNo)
+T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
+<include src="COM.icf::CustRmk.rtn"/>
 
 
 ![額度編號]

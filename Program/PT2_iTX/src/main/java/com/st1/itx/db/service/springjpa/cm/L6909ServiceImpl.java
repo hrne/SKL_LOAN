@@ -94,9 +94,9 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          ,lx.\"Desc\"      ";
 		sql += "  	      ,lx.\"EntryDate\" ";
 		if ("1".equals(iSortCode)) {
-			sql += " ORDER BY  \"EntryDate\", \"CreateDate\",\"AcSeq\" ";
+			sql += " ORDER BY  \"CreateDate\",\"AcSeq\" ";
 		} else {
-			sql += " ORDER BY  \"FacmNo\", \"EntryDate\", \"CreateDate\", \"AcSeq\" ";
+			sql += " ORDER BY  \"FacmNo\", \"CreateDate\", \"AcSeq\" ";
 		}
 
 		sql += " " + sqlRow;

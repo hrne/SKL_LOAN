@@ -262,6 +262,8 @@ E(0,0)
 C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 #TimCustNoX=X,100,S
 C(4,#CustNo,$,T(2,#CustNoX))
@@ -582,6 +584,8 @@ TXFORM=L3911
 #OOBTN1=內容查詢
 {width:80,search:false,formatter:'cust:bind-button:內容查詢;L3917 繳息明細查詢',align:'center',canExport:false}
 
+#OOTxtNo=T交易序號
+{width:100}
 #OOFacmNo=額度編號 
 {width:85,align:'center'}
 
@@ -631,7 +635,7 @@ TXFORM=L3911
 {width:1,hidden:true}
 
 #OOTxtNo=
-{width:1,hidden:true}
+{width:100}
 
 ^
 
@@ -642,6 +646,8 @@ TXFORM=L3911
 #OOInterest
 #OOBreachAmt
 
+#OOTxtNo=T交易序號
+{width:100}
 #OOFacmNo=額度編號 
 {width:85,align:'center'}
 
@@ -691,7 +697,7 @@ TXFORM=L3911
 {width:1,hidden:true}
 
 #OOTxtNo=
-{width:1,hidden:true}
+{width:100}
 
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L3911;cpi=15"/>

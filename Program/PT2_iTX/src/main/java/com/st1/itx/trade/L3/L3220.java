@@ -439,6 +439,7 @@ public class L3220 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO.subtract(iTempAmt));
 		if (iTempReasonCode >= 2) {
 			tLoanBorTx.setDesc(loanCom.getCdCodeX("Temp2ReasonCode", "" + iTempItemCode, titaVo) + "退還");

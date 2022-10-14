@@ -240,6 +240,8 @@ C(3,#CHAIN,1,s,$)
 #TimCustNo=A,7,S
 E(0,0)
 C(4,#CustNo,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 
 #MRKEY=_,_,S

@@ -104,6 +104,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , AD.\"SlipNo\" ";
 		sql += "          , LPAD(AD.\"TitaTlrNo\",6,0) || LPAD(AD.\"TitaTxtNo\",7,0) AS \"TitaTxtNo\"";
 		sql += "          , LPAD(AD.\"CustNo\",7,'0') AS \"CustNo\" ";
+		sql += "          , AD.\"FacmNo\" ";
 		sql += "          , CM.\"CustName\" ";
 		sql += "     FROM \"AcDetail\" AD ";
 		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = AD.\"CustNo\" ";

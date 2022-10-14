@@ -322,6 +322,9 @@ C(4,#CaseNo,$,E(0,#L2r10CustNo))
 C(4,#CustNo,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(4,#ApplNo,$,E(0,#L2r05CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 
 #VAlidFacm=9,3,S
 

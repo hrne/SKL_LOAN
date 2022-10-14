@@ -108,7 +108,9 @@ public class L9134Report2 extends MakeReport {
 		makeExcel.setValue(2, 8, "傳票號碼", "C");
 		makeExcel.setValue(2, 9, "交易序號", "C");
 		makeExcel.setValue(2, 10, "戶號", "C");
-		makeExcel.setValue(2, 11, "戶名", "C");
+		//2022-10-14新增額度欄位
+		makeExcel.setValue(2, 11, "額度", "C");
+		makeExcel.setValue(2, 12, "戶名", "C");
 
 		List<Map<String, String>> list = l9134ServiceImpl.doDetailQuery(startDate, endDate, titaVo);
 
@@ -133,7 +135,8 @@ public class L9134Report2 extends MakeReport {
 				makeExcel.setValue(row, 8, r.get("SlipNo"),"R");
 				makeExcel.setValue(row, 9, r.get("TitaTxtNo"),"R");
 				makeExcel.setValue(row, 10, r.get("CustNo"));
-				makeExcel.setValue(row, 11, r.get("CustName"));
+				makeExcel.setValue(row, 11, r.get("FacmNo"));
+				makeExcel.setValue(row, 12, r.get("CustName"));
 
 			}
 

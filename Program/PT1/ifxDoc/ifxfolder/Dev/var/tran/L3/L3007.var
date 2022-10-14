@@ -289,6 +289,8 @@ C(3,#CaseNo,0,$,E(0,#L2r10CustNo))
 C(3,#CustNo,0,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 
 !支票號碼

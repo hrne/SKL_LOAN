@@ -16,10 +16,12 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.domain.TxBizDate;
+import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.TxBizDateService;
+import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -43,6 +45,9 @@ public class L6880 extends TradeBuffer {
 
 	@Autowired
 	private Parse parse;
+
+	@Autowired
+	private TxRecordService txRecordService;
 
 	@Autowired
 	private TxTellerService txTellerService;
@@ -184,7 +189,7 @@ public class L6880 extends TradeBuffer {
 		return tTxBizDate;
 	}
 
-	private void chgTxnoTo0(TitaVo titaVo) {
+	private void chgTxnoTo0(TitaVo titaVo) throws LogicException {
 		Slice<TxTeller> txTellerSlice = txTellerService.findAll(0, Integer.MAX_VALUE);
 		List<TxTeller> txTellerLi = txTellerSlice.hasContent() ? txTellerSlice.getContent() : null;
 
@@ -192,9 +197,10 @@ public class L6880 extends TradeBuffer {
 			return;
 
 		for (TxTeller te : txTellerLi)
-			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim()))
-				te.setTxtNo(1);
-			else
+			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), titaVo.getTlrNo(), "00");
+				te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()));
+			} else
 				te.setTxtNo(0);
 
 		try {

@@ -1660,6 +1660,7 @@ public class BaTxCom extends TradeBuffer {
 					for (BaTxVo t : this.baTxList) {
 						if (t.getDataKind() == 2) {
 							ba.setDataKind(2);
+							ba.setAcctCode(t.getAcctCode());
 							ba.setPayIntDate(t.getPayIntDate());
 							ba.setIntStartDate(t.getIntStartDate());
 							ba.setIntEndDate(t.getIntStartDate());

@@ -10,7 +10,7 @@
 ![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
 #SECNO=_,_,S
 T(3,01)
-T(2,@RimTxCode,#TXCD) 
+T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
 !#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
@@ -153,7 +153,7 @@ C(3,#HIDE3FG,1,$,s)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
 C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
 C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
-C(3,#HIDE6FG,1,CALL(#HIDEP6),$) 
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
 CALL(#KLIGHT)
 
 !--- P4 金額日期
@@ -237,6 +237,9 @@ IF(#FKEY==1,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 IF(#FKEY==2,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P6E,1),$)
 C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 
+#SPANDYH=D,7,S
+E(0,#DrawdownDate)
+ASGN(SPANDY$)
 
 <include src="COM.icf::TITLE-RUN.pre"/>
 </sub>
@@ -376,7 +379,7 @@ T(3,CdCode.RelationCode)
 #CDDEF17=x,26,S
 T(3,CdCode.CurrPrecision)
 
-#CurrPrecisionHelp=x,1024,S 
+#CurrPrecisionHelp=x,1024,S
 
 !客戶別
 #CDDEF18=x,20,S
@@ -388,13 +391,13 @@ T(3,CdCode.CustTypeCode)
 #CDDEF19=x,25,S
 T(3,CdCode.RateType)
 
-#RateTypeHelp=x,1024,S 
+#RateTypeHelp=x,1024,S
 
 !RenewFlag 展期借新還舊記號
 #CDDEF20=x,25,S
 T(3,CdCode.RenewFlag)
 
-#RenewFlagHelp=x,1024,S 
+#RenewFlagHelp=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -465,8 +468,8 @@ T(2,@FdApplNo, )
 T(2,@FdFacmNo,#WkStar)
 T(2,@FdBormNo, )
 T(2,@FdProdNo, )
-T(2,@FdBaseRateCode, ) 
-T(2,@FdBaseRate, ) 
+T(2,@FdBaseRateCode, )
+T(2,@FdBaseRate, )
 T(2,@FdProdRate, )
 T(2,@FdRateIncr, )
 T(2,@FdApproveRate, )
@@ -486,7 +489,7 @@ T(2,@FdRepayFreq,)
 T(2,@FdGracePeriod, )
 T(2,@FdGraceDate, )
 T(2,@FdSpecificDd, )
-T(2,@FdCompensateFlag,#WkStar)           
+T(2,@FdCompensateFlag,#WkStar)
 T(2,@FdFirstDueDate,#WkStar)
 T(2,@FdFirstAdjRateDate,)
 T(2,@FdAcctFee, )
@@ -813,24 +816,24 @@ T(3,@StepRatePer{n},%)
 #RcvL2r05B=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
 T(H,@DrawdownCodeX,#DrawdownCode,#DrawdownCodeHelp)
-T(H,@BaseRateCodeX,#BaseRateCode,#BaseRateCodeHelp)    
-T(H,@CurrencyCodeX,#CurrencyCode,#CurrencyCodeHelp) 
+T(H,@BaseRateCodeX,#BaseRateCode,#BaseRateCodeHelp)
+T(H,@CurrencyCodeX,#CurrencyCode,#CurrencyCodeHelp)
 T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
-T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp) 
-T(H,@FreqBaseX,#FreqBase,#FreqBase2Help) 
+T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp)
+T(H,@FreqBaseX,#FreqBase,#FreqBase2Help)
 ! T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeCodeHelp)
 T(H,@NotYetFlagX,#NotYetFlag,#YNHelp)
 T(H,@CompensateFlagX,#CompensateFlag,#YNHelp)
 T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
-T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)    
+T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)
 T(H,@UsageCodeX,#UsageCode,#UsageCodeHelp)
-T(H,@PostCodeX,#PostCode,#PostCodeHelp)  
+T(H,@PostCodeX,#PostCode,#PostCodeHelp)
 T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
 T(H,@IntCalcCodeX,#IntCalcCode,#ProdIntCalcCodeHelp)
-T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help) 
+T(H,@PayIntFreqX,#FreqBase,#FreqBase2Help)
 T(H,@RepayFreqX,#FreqBase,#FreqBase2Help)
-!T(A,@RELACCTERRX,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)  
+!T(A,@RELACCTERRX,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)
 
 #SendL2r01=X,1,S
 E(0,@RimFuncCode,5)
@@ -923,9 +926,9 @@ C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwHandlingFee,#TwFinalBal,#TwPi
                 ,HIDE(#TwDrawdownAmt,#TwAcctFee,#TwHandlingFee,#TwFinalBal,#TwPieceCodeSecondAmt,#LbAcctFee)
                  SHOW(#UsDrawdownAmt,#UsAcctFee,#UsHandlingFee,#UsFinalBal,#UsPieceCodeSecondAmt))
 C(3,#L2r05DepartmentCode,1,T(F,@TwHandlingFee,1)T(F,@UsHandlingFee,1),T(F,@TwHandlingFee,0)T(F,@UsHandlingFee,0))
-                 
-!個金                 
-#WKHIDEDEPT=X,1,S                 
+
+!個金
+#WKHIDEDEPT=X,1,S
 C(3,#L2r05DepartmentCode,1,S,$)
 SHOW(#LbAcctFee)
 HIDE(#TwAcctFee,#UsAcctFee)
@@ -957,7 +960,7 @@ HELP(#DrawdownCodeHelp)
 C(3,#FKEY,0,E(0,1),$)
 @V(H,#DrawdownCodeHelp)
 
-#DrawdownCodeX=X,10,L   
+#DrawdownCodeX=X,10,L
 C(3,#DrawdownCode,0,S,$)T(H,#DrawdownCode,#DrawdownCodeHelp)
 ![幣別]
 !L2R05
@@ -1016,11 +1019,22 @@ E(0,#TimDrawdownAmt)
 !  d.撥款日期不可大於會計日期
 #FdDrawdownDate=X,2,L
 
+! 預約撥款上送欄位
+
 #DrawdownDate=D,7,I
-C(3,#DrawdownDate,0,E(0,#SYSDATE),$)
+C(3,#DrawdownDate,0,C(3,#DrawdownCode,3,E(0,#NBSDY),E(0,#SYSDATE)),$)
 D(8)
 @V(7)A(DATE,0,#DrawdownDate)
 C(3,#DrawdownCode,3,IF(#DrawdownDate<=#wksysdate,V(P,預撥日期不可小於等於會計日),$),V(5,0010101,#SYSDATE))
+
+#checkDrawdownCode3=D,7,S
+C(3,#DrawdownCode,3,E(0,#DrawdownDate)ASGN(SPANDY$),E(0,0)ASGN(SPANDY$))
+
+
+#checkDrawdownCode3H=D,7,S
+E(0,#DrawdownDate)
+ASGN(SPANDY$)
+
 
 #WKFADJDATE=D,8,S
 D(7,2,#DrawdownDate,#FirstRateAdjFreq,0)
@@ -1087,8 +1101,8 @@ T(1,@LoanTermDd,#WkDifferenceDate,007,002)
 T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 
 
-![攤還方式] 
-!1.按月繳息 2.到期取息  3.本息平均法  4.本金平均法 
+![攤還方式]
+!1.按月繳息 2.到期取息  3.本息平均法  4.本金平均法
 !5.按月撥款收息(以房養老)已取消
 !必須輸入
 #FdAmortizedCode=X,2,L
@@ -1105,11 +1119,11 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 
 #AmortizedCodeX=X,12,L
 C(3,#AmortizedCode,0,S,$)
-T(H,#AmortizedCode,#FacmAmortizedCodeHelp)   
+T(H,#AmortizedCode,#FacmAmortizedCodeHelp)
 
 ![週期基準]
 !1:日 2:月 3:週
-!必須輸入,內定值為月 
+!必須輸入,內定值為月
 #FdFreqBase=X,2,L
 
 !2021/8/30 額度資料改為不可修改純顯示
@@ -1118,14 +1132,14 @@ C(3,#AmortizedCode,2,HIDE(#SpecificDd),C(3,#FreqBase,2,SHOW(#SpecificDd)T(2,@FdS
 ! HELP(#FreqBaseHelp)
 !到期取息者,週期基準固定為月不必輸入
 ! C(3,#AmortizedCode,2,E(0,2),$)
-! C(3,#AmortizedCode,2,s,$)  
+! C(3,#AmortizedCode,2,s,$)
 ! C(3,#FreqBase,0,E(0,2),$)
 ! C(5,#L2r01CharCode,2,s,$)
 ! @V(H,#FreqBaseHelp)
 ! !本息平均法者,週期基準只能是月或週
-! C(3,#AmortizedCode,3,V(1,2,3),$) 
-! !本金平均法者,週期基準只能是月或週 
-! C(3,#AmortizedCode,4,V(1,2,3),$)  
+! C(3,#AmortizedCode,3,V(1,2,3),$)
+! !本金平均法者,週期基準只能是月或週
+! C(3,#AmortizedCode,4,V(1,2,3),$)
 
 #FreqBaseX=X,8,L
 C(3,#FreqBase,0,S,$)
@@ -1138,14 +1152,14 @@ T(3,)T(H,#FreqBase,#FreqBase2Help)
 T(3,)T(H,#FreqBase,#FreqBase2Help)
 
 ![繳息週期]
-!必須輸入       
+!必須輸入
 #FdPayIntFreq=X,2,L
-                  
+
 !到期取息者是到期還本繳息，因此沒有繳息週期
 !週期基準為週者，繳息週期固定為雙週
 !2021/8/30 額度資料改為不可修改純顯示
 #PayIntFreq=A,2,L
-! C(3,#AmortizedCode,2,S,$)     
+! C(3,#AmortizedCode,2,S,$)
 ! C(3,#FreqBase,3,E(0,2),$)
 ! C(3,#FreqBase,3,s,$)
 ! C(3,#PayIntFreq,0,E(0,1),$)
@@ -1160,17 +1174,17 @@ T(3,)T(H,#FreqBase,#FreqBase2Help)
 #RepayFreq=A,2,L
 ! C(5,#L2r01CharCode,2,S,$)
 ! !按月繳息者是到期還本，因此沒有還本週期
-! C(3,#AmortizedCode,1,S,$)    
-! !到期取息者是到期還本繳息，因此沒有還本週期                
-! C(3,#AmortizedCode,2,S,$)     
-! !攤還方式為本息平均法時，還本週期須等於繳息週期               
-! IF(#AmortizedCode==3,E(0,#PayIntFreq),$)     
+! C(3,#AmortizedCode,1,S,$)
+! !到期取息者是到期還本繳息，因此沒有還本週期
+! C(3,#AmortizedCode,2,S,$)
+! !攤還方式為本息平均法時，還本週期須等於繳息週期
+! IF(#AmortizedCode==3,E(0,#PayIntFreq),$)
 ! IF(#AmortizedCode==3,s,$)
 ! !繳息週期不等於１時，還本週期須等於繳息週期
-! IF(#FreqBase==2 && #PayIntFreq > 1,E(0,#PayIntFreq),$)   
+! IF(#FreqBase==2 && #PayIntFreq > 1,E(0,#PayIntFreq),$)
 ! IF(#FreqBase==2 && #PayIntFreq > 1,s,$)
 ! !繳息週期不等於１時，還本週期須等於繳息週期
-! IF(#FreqBase==3 && #PayIntFreq > 2,E(0,#PayIntFreq),$)   
+! IF(#FreqBase==3 && #PayIntFreq > 2,E(0,#PayIntFreq),$)
 ! IF(#FreqBase==3 && #PayIntFreq > 2,s,$)
 ! C(3,#RepayFreq,0,E(0,1),$)
 ! @V(5,#PayIntFreq,12)V(5,#PayIntFreq,99)
@@ -1220,19 +1234,19 @@ T(1,#WKYYYYMMDD,005,002)
 T(1,#WKYYYYMMDD,007,002)
 
 #WKMONTM2=A,4,S
-C(3,#AmortizedCode,2,S,$) 
+C(3,#AmortizedCode,2,S,$)
 C(3,#FreqBase,2,$,S)
 E(0,#WKYYYY2*12+#WKMM2)
 C(3,#WKDD2,0,$,E(0,#WKMONTM2+1))
 
 #WKPERIOD2A=n,3.5,S
-C(3,#AmortizedCode,2,S,$) 
+C(3,#AmortizedCode,2,S,$)
 C(3,#FreqBase,2,$,S)
 C(3,#PayIntFreq,0,S,$)
 E(0,#WKMONTM2/#PayIntFreq)
 
 #WKPERIOD2B=n,3,S
-C(3,#AmortizedCode,2,S,$) 
+C(3,#AmortizedCode,2,S,$)
 C(3,#FreqBase,2,$,S)
 C(3,#PayIntFreq,0,E(0,1),$)
 C(3,#PayIntFreq,0,s,$)
@@ -1247,8 +1261,8 @@ C(3,#WKPERIOD1A,#WKPERIOD1B,E(0,#WKPERIOD1B),E(0,#WKPERIOD1B+1))
 C(3,#WKPERIOD2A,#WKPERIOD2B,E(0,#WKPERIOD2B),E(0,#WKPERIOD2B+1))
 
 #TotalPeriod=A,3,L
-C(3,#AmortizedCode,2,E(0,1),$) 
-C(3,#AmortizedCode,2,s,$) 
+C(3,#AmortizedCode,2,E(0,1),$)
+C(3,#AmortizedCode,2,s,$)
 C(3,#FreqBase,2,E(0,#TotalPeriod2),E(0,#TotalPeriod1))
 
 ![寬限期]
@@ -1310,7 +1324,7 @@ C(3,#GracePeriod,0,S,$)
 C(3,#GraceDate,#WKGDATE,S,$)
 E(0,#GDATEYY*12+#GDATEMM)
 T(1,@GracePeriod,#GDATEYYMM,001,003)
-!改 原是T(1,#MaturityDate,006,002)取到期日的日期16 造成WKSPDD= 15-16=小於, 14-16=小於,16-16=等於  
+!改 原是T(1,#MaturityDate,006,002)取到期日的日期16 造成WKSPDD= 15-16=小於, 14-16=小於,16-16=等於
 #WKSPDD=A,2,S
 T(1,#DrawdownDate,006,002)
 #WKMADD=A,2,S
@@ -1640,7 +1654,7 @@ T(3,)T(H,#RenewFlag,#RenewFlagHelp)
 ! C(5,#RenewFlag,Y,V(3,C,D,3,4),$)
 
 #PieceCodeX=X,20,L
-T(3,)T(H,#PieceCode,#PieceCodeHelp)            
+T(3,)T(H,#PieceCode,#PieceCodeHelp)
 
 
 !計件代碼2
@@ -1695,7 +1709,7 @@ C(3,#PRECISION,0,E(0,#TwPieceCodeSecondAmt),E(0,#UsPieceCodeSecondAmt))
 !@V(2,0)V(E,0,L3DEF,UsageCodeDef)
 
 #UsageCodeX=X,20,L
-T(H,#UsageCode,#UsageCodeHelp)            
+T(H,#UsageCode,#UsageCodeHelp)
 
 ![聯貸案序號]
 #FdSyndNo=X,2,L
@@ -1746,7 +1760,7 @@ T(2,#L2r01ProdName)
 #BaseRateCode=A,2,L
 
 #BaseRateCodeX=X,30,L
-C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)            
+C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)
 
 
 ![指標利率]
@@ -1791,7 +1805,7 @@ E(0,#BaseRate+#L2r01ProdIncr)
 ! P(L,#ProdRateX)
 ! C(3,#ProdRate,0,S,$)
 
-![利率加減碼]  
+![利率加減碼]
 !依核准額度自動顯示不必輸入 L2R05
 #FdRateIncr=X,2,L
 
@@ -1830,7 +1844,7 @@ P(L,#ApproveRateX)
 #RateCode=A,1,S
 
 #RateCodeX=X,10,L
-C(3,#RateCode,0,S,$)T(H,#RateCode,#FacmRateCodeHelp)            
+C(3,#RateCode,0,S,$)T(H,#RateCode,#FacmRateCodeHelp)
 
 ![利率調整週期]
 !利率區分為 '3' 者，必須輸入利率調整週
@@ -1907,7 +1921,7 @@ HIDE(#StepMonths{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateI
 ! #BTNHIDEP3=X,15,I,ui:button;value: 階梯式利率 ;enable:1;tabbable:1
 ! C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 
-#Wait=X,1,I 
+#Wait=X,1,I
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 @T(3,)
 
@@ -1924,7 +1938,7 @@ C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 #RepayCode=A,2,S
 
 #RepayCodeX=X,16,L
-T(H,#RepayCode,#RepayCodeHelp)            
+T(H,#RepayCode,#RepayCodeHelp)
 
 ![扣款帳號]
 !依核准額度自動顯示,不可修改,須即時做AML檢查 L2R05
@@ -1941,7 +1955,7 @@ T(H,#RepayCode,#RepayCodeHelp)
 
 #RepayBankX=X,20,L
 ! C(3,#RepayCode,2,T(2,#L2r09BankItem),S)
-              
+
 ![郵局存款別]
 !依核准額度自動顯示,不可修改 L2R05
 #FdPostCode=X,2,L
@@ -1950,12 +1964,12 @@ T(H,#RepayCode,#RepayCodeHelp)
 
 #PostCodeX=X,4,L
 C(3,#RepayBank,700,$,S)
-T(H,#PostCode,#PostCodeHelp)            
+T(H,#PostCode,#PostCodeHelp)
 
 ! #BTNHIDEP5=X,15,I,ui:button;value:  扣款帳號  ;enable:1;tabbable:1
 ! C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 
-![與借款人關係] 
+![與借款人關係]
 !L2R05
 #FdRelationCode=X,2,L
 
@@ -1965,7 +1979,7 @@ C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 !@V(E,0,L3DEF,RelationCodeDEF)
 
 #RelationCodeX=X,4,L
-T(H,#RelationCode,#RelationCodeHelp)            
+T(H,#RelationCode,#RelationCodeHelp)
 
 ![帳戶戶名]
 #FdRelationName=X,2,L
@@ -1994,7 +2008,7 @@ T(H,#RelationCode,#RelationCodeHelp)
 !#RELACCTERRX=X,10,S
 !C(4,#RelationCode,S,$)
 !C(3,#WKID,1,$,S)
-!T(A,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)   
+!T(A,#RELACCTERR,L3DEF,ACCTERRDEF,ACCTERR,ACCTERRX)
 
 ![出生日期]
 #FdRelationBirthday=X,2,L
@@ -2017,7 +2031,7 @@ T(H,#RelationGender,#SexHelp)
 C(4,#RelationId,S,$)
 P(1,#RelationId)
 
-#Wait3=X,1,I 
+#Wait3=X,1,I
 C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 @T(3,)
 
@@ -2205,7 +2219,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 [
 ![金額、日期]
 ["<font color=red>@金額、日期"],
-["#FdAcctCode+業務科目",#AcctCodeX],　       
+["#FdAcctCode+業務科目",#AcctCodeX],　
 ["#FdDrawdownCode+撥款方式",#DrawdownCode,#DrawdownCodeX],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdDrawdownAmt+撥款金額",#TwDrawdownAmt,#UsDrawdownAmt,#DrawdownAmtX],
@@ -2215,7 +2229,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["#FdAmortizedCode+攤還方式",#AmortizedCode,#AmortizedCodeX],
 ["#FdTotalPeriod+總期數",#TotalPeriod],
 ["#FdFreqBase+週期基準",#FreqBase,#FreqBaseX],
-["#FdPayIntFreq+繳息週期",#PayIntFreq,#PayIntFreqX],               
+["#FdPayIntFreq+繳息週期",#PayIntFreq,#PayIntFreqX],
 ["#FdRepayFreq+還本週期",#RepayFreq,#RepayFreqX],
 ["#FdGracePeriod+寬限期",#GracePeriod,"@個月"],
 ["#FdGraceDate+寬限到期日",#GraceDate,#GraceDateX],
@@ -2233,7 +2247,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["<font color=red>@其他"],
 ! ["#FdCustTypeCode+客戶別",#CustTypeCodeX],
 ["#FdNotYetFlag+未齊件",#NotYetFlag,#NotYetFlagX,#BTN5],
-["#FdRenewFlag+展期／借新還舊",#RenewFlag,#RenewFlagX],  
+["#FdRenewFlag+展期／借新還舊",#RenewFlag,#RenewFlagX],
 ["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
 ! ["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond,#PieceCodeSecondX],
 ! ["#FdPieceCodeSecondAmt+計件代碼2金額",#TwPieceCodeSecondAmt,#UsPieceCodeSecondAmt],
@@ -2247,8 +2261,8 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 [
 ["<font color=red>@利率"],
 [#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdName],
-["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX], 
-["#FdBaseRate+指標利率",#BaseRate,"@%"], 
+["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
+["#FdBaseRate+指標利率",#BaseRate,"@%"],
 ["#FdProdRate+商品利率",#ProdRate,"@%"],
 ["#FdRateIncr+利率加減碼",#RateIncr,"@%"],
 ["#FdApproveRate+核准利率",#ApproveRate,"@%"],
@@ -2275,9 +2289,9 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["<font color=red>@扣款帳號                                                                                         "],
 [#<->#,"#FdRepayCode+繳款方式",#RepayCodeX],
 [#<->#,"#FdRepayAcctNo+扣款帳號",#RepayAcctNo],
-[#<->#,"#FdRepayBank+扣款銀行",#RepayBankX],             
+[#<->#,"#FdRepayBank+扣款銀行",#RepayBankX],
 [#<->#,"#FdPostCode+郵局存款別",#PostCode,#PostCodeX],
-[#<->#,"#FdRelationCode+與借款人關係",#RelationCodeX], 
+[#<->#,"#FdRelationCode+與借款人關係",#RelationCodeX],
 [#<->#,"#FdRelationName+帳戶戶名",#RelationName],
 [#<->#,"#FdRelationId+身份證字號",#RelationId],
 [#<->#,"#FdRelationBirthday+出生日期",#RelationBirthday],
@@ -2322,7 +2336,7 @@ T(3,[L3100] 撥款)
 K(LIGHT,#BormNo,TXTRED,0)
 
 #Entdy=X,8,S
-T(2,#ENTDY)
+E(0,#DrawdownDate)
 
 #TxNo=X,18,S
 T(2,#KINBR+#TLRNO+#TXTNO)
@@ -2399,7 +2413,6 @@ C(3,#DSnoF,0,E(0,0),E(0,1))
 #NotYetFlagX
 #RenewFlagX
 #PieceCodeX
-#PieceCodeSecondX
 #UsageCodeX
 #CompensateFlagX
 #ProdNo
