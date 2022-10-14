@@ -80,7 +80,6 @@ D(8)
 @
 C(3,#iEntdySt,0,S,$)
 A(DATE,0,#iEntdySt)
-V(5,0010101,#SYSDATE)
 
 #iEntdyEd=D,7,I
 C(3,#iEntdySt,0,S,$)
@@ -89,7 +88,7 @@ D(8)
 @
 V(7)
 A(DATE,0,#iEntdyEd)
-V(5,#iEntdySt,#SYSDATE)
+IF(#iEntdyEd < #iEntdySt,V(P,不可小於起日),$)
 
 #iTxSt=D,7,I
 C(3,#iEntdySt,0,$,S)
@@ -231,7 +230,8 @@ C(2,#Status,T(3,正常),T(3,已訂正),T(3,已修正),T(3,已沖正),$)
 T(6A,#Entdy+#TxNo)
 
 #RimData2=x,50,S
-C(3,#OOOrgEntdy,0,T(2,#Entdy+#Entdy+#FlowNo),T(2,#Entdy+#OOOrgEntdy+#FlowNo))
+T(2,#Entdy+0000000+#TxNo)
+! C(3,#OOOrgEntdy,0,T(2,#Entdy+#Entdy+#FlowNo),T(2,#Entdy+#OOOrgEntdy+#FlowNo))
 
 #BTN=X,1,S
 BIND(grid,{ cmd=DDCHECK; ntxcd=#TranNo; txno=#RimData;rim=LCR11})

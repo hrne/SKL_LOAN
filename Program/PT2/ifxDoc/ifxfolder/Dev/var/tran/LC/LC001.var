@@ -70,7 +70,6 @@ T(4,CHAIN$)
 E(0,#SYSDATE)
 D(8)
 @V(7)A(DATE,0,#iEntdy)
-V(5,0010101,#SYSDATE)
 
 #iBrNo=X,4,L
 T(2,#KINBR) 

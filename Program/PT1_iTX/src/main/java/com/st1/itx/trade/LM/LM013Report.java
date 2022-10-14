@@ -127,12 +127,10 @@ public class LM013Report extends MakeReport {
 
 	}
 
-	public Boolean exec(TitaVo titaVo,int type) throws LogicException {
+	public Boolean exec(TitaVo titaVo, int type) throws LogicException {
 
 		marginAmount = getBigDecimal(titaVo.getParam("inputAmount"));
 		validDate = showRocDate(titaVo.getParam("inputDate"), 1);
-
-		
 
 		this.info("type=" + type);
 
@@ -182,14 +180,13 @@ public class LM013Report extends MakeReport {
 		this.info("getReportKind=" + listsArray[type].getReportKind());
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM013",
 //				"金檢報表(放款種類表)" + listsArray[type].getReportKind(), "密", "A4", "L");
-		
-		
+
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 				.setRptCode("LM013").setRptItem("金檢報表(放款種類表)" + listsArray[type].getReportKind()).setRptSize("A4")
 				.setSecurity("密").setPageOrientation("L").build();
 
-		this.open(titaVo,reportVo);
-		
+		this.open(titaVo, reportVo);
+
 		this.setFont(1, 8);
 
 		this.setCharSpaces(0);
@@ -404,6 +401,7 @@ public class LM013Report extends MakeReport {
 							break;
 						default:
 							// 其餘情況, 不予輸出
+							this.print(0, 15, tLDVo.get("F5"), "L");
 							break;
 						}
 
