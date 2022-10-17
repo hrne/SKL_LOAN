@@ -42,9 +42,10 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iEffectDateS = 0;
 		int iEffectDateE = 0;
 		if (iEffectMonth > 0) {
+			iEffectMonth = iEffectMonth + 191100;
 			iEffectDate = iEffectDate + 19110000;
-			iEffectDateS = iEffectMonth * 100 + 19110001;
-			iEffectDateE = iEffectMonth * 100 + 19110031;
+			iEffectDateS = iEffectMonth * 100 + 1;
+			iEffectDateE = iEffectMonth * 100 + 31;
 		} else {
 			iEffectDate = iEffectDate + 19110000;
 			iEffectDateS = iEffectDate;
@@ -121,7 +122,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(f.\"ApproveRate\", 0)                    as \"FacApproveRate\"  "; // 額度核准利率
 		sql += "   ,NVL(f.\"RateIncr\", 0)                       as \"FacRateIncr\"  "; // 額度加碼利率
 		sql += "   ,NVL(f.\"IndividualIncr\" , 0)                as \"FacIndividualIncr\" "; // 額度個人加碼利率
-		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日
+		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日 
 		sql += "   ,NVL(p.\"EmpFlag\", ' ')                      as \"EmpFlag\" "; // 員工利率記號
 		sql += "   ,NVL(r.\"IncrFlag\", ' ')                     as \"IncrFlag\" "; // 借戶利率檔是否依合約記號
 		sql += "   ,NVL(r.\"BaseRateCode\", ' ')                 as \"BaseRateCode\" "; // 借戶利率檔商品指標利率代碼
@@ -134,9 +135,12 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(c.\"EntCode\", ' ')                      as \"EntCode\" "; // 企金別 共用代碼檔 0:個金 1:企金 2:企金自然人
 		sql += "   ,NVL(cm.\"CityCode\", ' ')                    as \"CityCode\""; // 擔保品地區別
 		sql += "   ,NVL(cm.\"AreaCode\", ' ')                    as \"AreaCode\" "; // 擔保品鄉鎮別
-		sql += "   ,NVL(cc.\"IntRateCeiling\", 0)                as \"CityRateCeiling\" "; // 地區別利率上限
-		sql += "   ,NVL(cc.\"IntRateFloor\", 0)                  as \"CityRateFloor\" "; // 地區別利率下限
-		sql += "   ,NVL(cc.\"IntRateIncr\", 0)                   as \"CityRateIncr\" "; // 地區別利率加減碼
+		sql += "   ,NVL(\"Fn_GetCdCityIntRateCeiling\"(NVL(cm.\"CityCode\", ' '), r.\"EffectDate\" ), 0) ";
+		sql += "                                                 as \"CityRateCeiling\" "; // 地區別利率上限
+		sql += "   ,NVL(\"Fn_GetCdCityIntRateFloor\"(NVL(cm.\"CityCode\", ' '), r.\"EffectDate\" ), 0) ";
+		sql += "                                                 as \"CityRateFloor\" "; // 地區別利率下限
+		sql += "   ,NVL(\"Fn_GetCdCityIntRateIncr\"(NVL(cm.\"CityCode\", ' '), r.\"EffectDate\",  :inputEffectDateE ), 0) ";
+		sql += "                                                 as \"CityRateIncr\" "; // 地區別利率加減碼
 		sql += "   ,b.\"NextPayIntDate\"                         as \"NextPayIntDate\" "; // 下次繳息日,下次應繳日
 		sql += "   ,b.\"DrawdownDate\"                           as \"DrawdownDate\" "; // 撥款日期
 		sql += "   ,b.\"MaturityDate\"                           as \"MaturityDate\" "; // 到期日期
@@ -219,10 +223,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
-			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" + iGroupId + "'";
+			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" +iGroupId +"'";
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
-		}
-		sql += " where b.\"Status\" = 0                                        ";
+		}		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
@@ -321,6 +324,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("inputEffectDateE", iEffectDateE);
 		return this.convertToMap(query);
 	}
 
@@ -413,7 +417,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo        TitaVo
 	 * @return 查詢結果
 	 */
-	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate, TitaVo titaVo) {
+	public List<Map<String, String>> getBaseRateChangeCust(String iBaseRateCode, int iCustType, int iEffectDate,
+			TitaVo titaVo) {
 
 		if (iEffectDate <= 19110000) {
 			iEffectDate += 19110000;
@@ -474,6 +479,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputBaseRateCode", iBaseRateCode);
 		query.setParameter("inputEffectDate", iEffectDate);
 		query.setParameter("inputCustType", iCustType);
+		
 		return this.convertToMap(query);
 	}
 }

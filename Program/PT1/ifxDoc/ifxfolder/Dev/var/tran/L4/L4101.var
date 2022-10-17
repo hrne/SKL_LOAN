@@ -1,0 +1,242 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L4101)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,6)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4101" layout="cols=1;screen.width=[250,750];printer.width=[20,80];order=1">
+[
+["[L4101]                                 撥款退款作業"],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdItemCode+作業項目",#ItemCode,#ItemCodeX],
+[#<->#,"#FdReleaseCheck+是否檢核未放行",#ReleaseCheck,#ReleaseCheckX],
+[#<->#,"#FdBatchNo+整批批號",#BatchNo],
+]
+
+#FdAcDate=X,2,L
+#FdItemCode=X,2,L
+T(3,*)
+#FdReleaseCheck=X,2,L
+#FdBatchNo=X,2,L
+
+
+![戶別]
+#CDDEF01=x,26,S
+T(3,CdCode.DrawdownCode2)
+
+#DrawdownCodeHelp=x,1024,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(B,@DrawdownCodeHelp,#HelpDesc1+;99:全部)
+
+#SearchFlagHelp=x,30,S
+T(3,1:戶號;2:整批批號;3:全部批號)
+
+#StatusCodeHelp=x,50,S
+T(3,0:正常;1:產檔後修正;2:產檔後更正;3:未放行;9:全部)
+
+
+#ReleaseCheckHELP=X,1024,S
+T(3,Y:是;N:否)
+
+#ItemCodeHelp=x,1024,S
+T(3,1:撥款;2:退款)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#Init=X,1,S
+INVOKEJS(SHOW,L4101,3,3,0)
+
+#NTXBUF=X,17,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@BatchNo,#NTXBUF,1,6)
+
+! 會計日期
+#AcDate=D,7,I
+E(0,#SYSDATE)
+@V(7)A(DATE,0,#AcDate)
+V(5,#SYSDATE,#SYSNDATE)
+
+
+![經辦編號]
+#TlrNo=X,6,S
+T(4,TLRNO$)
+
+!作業項目
+
+#ItemCode=X,1,I
+HELP(#ItemCodeHelp)
+@V(H,#ItemCodeHelp)
+
+#ItemCodeX=X,10,L
+T(3,)
+T(H,#ItemCode,#ItemCodeHelp)
+IF(#ItemCode=="1",INVOKEJS(SHOW,L4101,3,3,1),INVOKEJS(SHOW,L4101,3,3,0))
+
+
+
+!是否檢核未放行
+#ReleaseCheck=X,1,I
+IF(#ItemCode=="1",$,S)
+C(4,#ReleaseCheck,T(3,Y),$)
+HELP(#ReleaseCheckHELP)
+@V(H,#ReleaseCheckHELP)
+
+#ReleaseCheckX=X,2,L
+T(3,)T(H,#ReleaseCheckHELP,#ReleaseCheckX)
+
+
+
+![整批批號]
+#BatchNo=X,6,L
+
+#FlagA=X,1,S
+T(2,Y)
+
+#RPTFG=A,1,S
+
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+!--------------L410B------------------------
+#L410BPRT=A,1,S
+C(5,#TXFORM,L410B,E(0,1),E(0,0))
+C(3,#L410BPRT,1,E(0,@RPTFG,1),$)
+
+#L410BHD=n,3,S
+C(5,#TXFORM,L410B,$,S)
+E(0,0)ASGN(INQHD$)
+
+![每筆明細(OCCURS)長度]
+#L410BLN=n,3,S
+C(5,#TXFORM,L410B,$,S)
+E(0,67)ASGN(INQLEN$)
+
+![每張印錄單列印的筆數]
+#L410BQPRT=n,2,S
+C(5,#TXFORM,L410B,$,S)
+E(0,30)ASGN(INQPRT$)
+
+![畫面顯示的明細間的高度]
+#L410BLOOP=n,3,S
+C(5,#TXFORM,L410B,$,S)
+E(0,1)ASGN(LOOPHEIGHT$)
+
+</sub>
+
+!------------ TXFORM = L4101 -----------
+<sub type="FORM" name="L4101" tota-mode="1">
+
+#OBatchNo=X,6,S
+T(2,@BatchNo,#OBatchNo)
+E(0,@RPTFG,0)
+
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+</sub>
+
+!------------ TXFORM = L410B -----------
+<sub type="FORM" name="L410B" tota-mode="1">
+
+
+#L410B_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,O
+#OOFacmNo=A,3,O
+#OOBormNo=A,3,O
+#OOCustName=x,20,O
+#OOTlrNo=X,6,O
+#OOTlrNoX=x,20,O
+#OOLastUpdateTime=X,8,O
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate
+#ReleaseCheck
+#BatchNo
+#ItemCode
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>=
+TXFORM=L4101
+#OBatchNo
+^
+
+TXFORM=L410B
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustName
+#OOTlrNo
+#OOTlrNoX
+#OOLastUpdateTime
+^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+! pdf:1, excel:2, txt:3(分號區隔)
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+
+#RPTFG=1,L4101,NA,,D,15
+#AcDate#TlrNo%
+#OOCustNo#OOFacmNo#OOBormNo
+#OOCustName
+#OOTlrNo#OOTlrNoX#OOLastUpdateTime
+@^
+
+
+</sub>

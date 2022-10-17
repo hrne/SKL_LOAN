@@ -46,9 +46,11 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 			custType2 = 2;
 		}
 		int adjCode = Integer.valueOf(titaVo.getParam("AdjCode"));
+		int rateKeyInCode = Integer.valueOf(titaVo.getParam("RateKeyInCode"));
 
 		this.info("l4320.findAll AdjDate=" + iAdjDate);
 
+		
 		String sql = "SELECT CC.\"CityItem\"    " // F0 鄉鎮區
 				+ "      , CA.\"AreaItem\"      " // F1 地區別
 				+ "      , BR.\"CustNo\"        " // F2 戶號
@@ -64,18 +66,24 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "      , FP.\"ProdName\"      " // F12 利率名稱
 				+ "      , BR.\"PresentRate\"   " // F13 目前利率
 				+ "      , BR.\"RateIncr\"      " // F14 加碼值
-				+ "      , BR.\"AdjustedRate\"  " // F15 調後利率
+				+ "      , BR.\"ProposalRate\"  " // F15 擬調利率
 				+ "      , LN.\"DrawdownDate\"  " // F16 撥款日期
 				+ "      , LN.\"MaturityDate\"  " // F17 到期日
 				+ "      , LN.\"FirstAdjRateDate\"  " // F18 首次調整日期
 				+ "      , BR.\"PreNextAdjFreq\"  " // F19 利率調整週期
 				+ "      , BR.\"PreNextAdjDate\"  " // F20 預定下次利率調整日
 				+ "      , BR.\"JsonFields\"  " // F21 jason格式紀錄欄
-				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" " + " LEFT JOIN \"LoanBorMain\" LN ON LN.\"CustNo\"   = BR.\"CustNo\" "
-				+ "                             AND LN.\"FacmNo\" = BR.\"FacmNo\" " + "                             AND LN.\"BormNo\" = BR.\"BormNo\" "
-				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" " + "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
-				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" " + " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = " + iAdjDate
-				+ "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1 + "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
+				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
+				+ " LEFT JOIN \"LoanBorMain\" LN ON LN.\"CustNo\"   = BR.\"CustNo\" "
+				+ "                             AND LN.\"FacmNo\" = BR.\"FacmNo\" "
+				+ "                             AND LN.\"BormNo\" = BR.\"BormNo\" "
+				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
+				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
+				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
+				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
+				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
+				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode
+				+ "   AND BR.\"RateKeyInCode\" = " + rateKeyInCode;
 		this.info("sql=" + sql);
 
 		Query query;

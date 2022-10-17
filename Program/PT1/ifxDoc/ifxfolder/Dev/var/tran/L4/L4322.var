@@ -47,10 +47,6 @@ T(3,1:新增;2:修改;3:複製;4:刪除;5:查詢)
 ! T(3,0:查詢;1:修改)
 
 #FunctionCode=A,1,S
-! C(3,#CHAIN,1,s,$)
-! HELP(#FunctionCodeHelp)
-! @
-! V(H,#FunctionCodeHelp)
 
 #FunctionCodeX=X,4,L
 E(0,@FUNCIND,#FunctionCode)
@@ -82,7 +78,7 @@ A(YM13,1,#WorkMonth)
 
 #HideBtn=X,1,S
 ! C(3,#FunctionCode,0,K(NOBUTTON,CLOSEY),K(NOBUTTON,SHOWY)K(MODIFYBUTTON,修改))
-C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),T(F,@WorkMonth,0)K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),T(F,@WorkMonth,0)K(MODIFYBUTTON,刪除),T(F,@WorkMonth,0)K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 
 ! 一進入就掉RIM把資料輸出
 <include src="ROM.icf::L4R20.dec"/>

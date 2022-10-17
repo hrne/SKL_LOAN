@@ -116,7 +116,7 @@ public class L9134Report2 extends MakeReport {
 
 		if (list == null || list.isEmpty()) {
 			// 本日無資料
-			print(1, 1, "本日無資料");
+			makeExcel.setValue(3, 1, "本日無資料");
 		} else {
 			int row = 2;
 

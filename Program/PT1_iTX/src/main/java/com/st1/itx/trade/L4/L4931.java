@@ -18,16 +18,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * CUST_TYPE=9,1<br>
- * RATECATE=X,2<br>
- * ADJUSTIND=X,1<br>
- * INQCD=9,1<br>
- * RATEIND=9,1<br>
- * YYYMM=9,5<br>
- * END=X,1<br>
- */
+
 
 @Service("L4931")
 @Scope("prototype")
@@ -78,8 +69,6 @@ public class L4931 extends TradeBuffer {
 
 			for (Map<String, String> result : resultList) {
 				this.info("result =" + result.toString());
-				TempVo tempVo = new TempVo();
-				tempVo = tempVo.getVo(result.get("JsonFields"));
 				OccursList occursList = new OccursList();
 				int presEffDate = parse.stringToInteger(result.get("PresEffDate"));
 				int curtEffDate = parse.stringToInteger(result.get("CurtEffDate"));
@@ -101,9 +90,9 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", result.get("FacmNo"));
 				occursList.putParam("OOBormNo", result.get("BormNo"));
 				occursList.putParam("OOCustName", result.get("CustName"));
-				occursList.putParam("OOTotalLoanBal", result.get("TotalLoanBal"));
+				occursList.putParam("OOTotalLoanBal", result.get("TotBalance"));
 				occursList.putParam("OODrawdownAmt", result.get("DrawdownAmt"));
-				occursList.putParam("OOLoanBal", result.get("LoanBal"));
+				occursList.putParam("OOLoanBal", result.get("LoanBalance"));
 				occursList.putParam("OOPresEffDate", presEffDate);
 				occursList.putParam("OOCurtEffDate", curtEffDate);
 				occursList.putParam("OOPrevIntDate", prevIntDate);
@@ -118,10 +107,13 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OOContrRateIncr", result.get("ContrRateIncr"));
 				occursList.putParam("OOPropIndexRate", result.get("CurrBaseRate"));
 				occursList.putParam("OOIndividualIncr", result.get("IndividualIncr"));
-				occursList.putParam("OOUpperLimitRate", tempVo.getParam("CityRateCeiling"));
-				occursList.putParam("OOLowerLimitRate",tempVo.getParam("CityRateFloor"));
+				occursList.putParam("OOUpperLimitRate", result.get("IntRateCeiling"));
+				occursList.putParam("OOLowerLimitRate", result.get("IntRateFloor"));
 				occursList.putParam("OOOvduTerm", result.get("OvduTerm"));
+				occursList.putParam("OOIncrFlag", result.get("IncrFlag"));
 
+				TempVo tempVo = new TempVo();
+				tempVo = tempVo.getVo(result.get("F34"));
 				String procNote = "";
 				if (tempVo.get("CheckMsg") != null) {
 					procNote += tempVo.get("CheckMsg");

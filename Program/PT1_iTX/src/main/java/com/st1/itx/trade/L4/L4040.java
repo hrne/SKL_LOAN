@@ -163,7 +163,6 @@ public class L4040 extends TradeBuffer {
 					this.error("l4040ServiceImpl findByCondition " + e.getMessage());
 					throw new LogicException("E0013", e.getMessage());
 				}
-
 				if (resultList != null && resultList.size() != 0) {
 					throw new LogicException(titaVo, "E0010", "不可一日多批"); // 功能選擇錯誤
 				}

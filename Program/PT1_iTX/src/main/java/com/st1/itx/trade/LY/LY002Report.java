@@ -55,7 +55,7 @@ public class LY002Report extends MakeReport {
 		String txcd = titaVo.getTxCode();
 		String fileItem = "非RBC_表14-1_會計部年度檢查報表";
 		String fileName = "LY002-非RBC_表14-1_會計部年度檢查報表";
-		String defaultExcel = "LY002_底稿_非RBC_表14-2_會計部年度檢查報表.xlsx";
+		String defaultExcel = "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx";
 		String defaultSheet = "表14-1";
 
 	
@@ -120,7 +120,7 @@ public class LY002Report extends MakeReport {
 		String memo = "";
 
 		for (Map<String, String> lM054Vo : lM054tLDVo) {
-			row++;
+			
 			// 項目(戶號+額度)
 			makeExcel.setValue(row, 1, lM054Vo.get("F25"), "C");
 			// 放款代號(戶號)
@@ -231,7 +231,7 @@ public class LY002Report extends MakeReport {
 			// 逾期天數
 			makeExcel.setValue(row, 25,
 					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
-
+			row++;
 		}
 
 	}

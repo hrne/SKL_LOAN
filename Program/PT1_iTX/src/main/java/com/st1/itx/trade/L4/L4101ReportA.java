@@ -152,7 +152,7 @@ public class L4101ReportA extends MakeReport {
 		this.info("L4101ReportA BatchNo = " + batchNo);
 		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
 				batchNo, 0, Integer.MAX_VALUE, titaVo);
-		this.info("slAcDetail.getContent() = " + slAcDetail.getContent());
+
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
@@ -261,26 +261,10 @@ public class L4101ReportA extends MakeReport {
 			}
 
 			if (tempList != null && tempList.size() != 0) {
-//				sort by acNoCode, acSubCode, acDtlCode
-//				tempList.sort((c1, c2) -> {
-//					int result = 0;
-//					this.info("c1 = " + c1);
-//					this.info("c2 = " + c2);
-//					if (c1.substring(0, 16).compareTo(c2.substring(0, 16)) != 0) {
-//						result = c1.substring(0, 16).compareTo(c2.substring(0, 16));
-//					}
-//					return result;
-//				});
 
 				tempList.sort((c1, c2) -> {
 					int result = 0;
-//					if ((dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1))
-//							.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)) != 0) {
-//						result = (dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1))
-//								.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2));
-//						this.info("test" + (dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1))
-//								.compareTo(dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2)));
-//					}
+
 //					借方金額在前排序
 					if ((dbAmt.get(c2) == null ? BigDecimal.ZERO : dbAmt.get(c2))
 							.compareTo(dbAmt.get(c1) == null ? BigDecimal.ZERO : dbAmt.get(c1)) != 0) {

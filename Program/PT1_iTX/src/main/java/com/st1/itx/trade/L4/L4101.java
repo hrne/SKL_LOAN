@@ -112,7 +112,7 @@ public class L4101 extends TradeBuffer {
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
 
-	int acDate = 0;
+	int iAcDate = 0;
 	String batchNo = "";
 	String newBatchNo = "";
 
@@ -124,13 +124,14 @@ public class L4101 extends TradeBuffer {
 		totaWarnMsg.putParam("MSGID", "L410W");
 		totaB.putParam("MSGID", "L410B");
 
-		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) ;
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
 		batchNo = FormatUtil.padX(this.getBatchNo(iItemCode, titaVo), 6);
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
-		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(iAcDate+ 19110000, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
@@ -209,7 +210,7 @@ public class L4101 extends TradeBuffer {
 	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {
 		String batchNo = "";
 		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
 		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
@@ -229,7 +230,7 @@ public class L4101 extends TradeBuffer {
 	// 更新批號
 	private String updBatchNo(String batchNo, TitaVo titaVo) throws LogicException {
 		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(iAcDate);
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo("01"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
 		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);

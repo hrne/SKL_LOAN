@@ -1,5 +1,7 @@
 package com.st1.itx.util.report;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,8 @@ import com.st1.itx.dataVO.TitaVo;
 @Scope("prototype")
 
 public class RemitForm extends MakeReport {
+	private static final Logger logger = LoggerFactory.getLogger(RemitForm.class);
+
 	// 自訂表頭
 	@Override
 	public void printHeader() {
@@ -43,10 +47,9 @@ public class RemitForm extends MakeReport {
 	}
 
 	public void addpage(TitaVo titaVo, RemitFormVo remitFormVo) throws LogicException {
-		this.info("RemitForm.addpage=" + this.getNowPage());
+		logger.info("RemitForm.addpage=" + this.getNowPage());
 
-		if (remitFormVo.isNewPage())
-			this.newPage();
+		this.newPage();
 
 		// 微 軟正黑體
 		this.setFont(3);
