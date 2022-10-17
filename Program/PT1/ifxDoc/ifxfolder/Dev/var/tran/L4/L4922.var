@@ -1,0 +1,336 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L4922)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,7)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,24)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+[
+["[L4922]                                 客戶還款方式及還款帳號查詢"],
+["#FdMain+查詢條件","@(借款人戶號、統一編號需擇一輸入)"],
+["#FdCustNo+．借款人戶號",#CustNo,#BTN2,#CustNoX],
+["#FdCustId+．統一編號",#CustId,#BTN3,#CustIdX],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN2=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0; title:L2015 額度明細資料查詢;
+#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BUF1=X,42,S
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 授權狀態
+#CDDEF01=x,50,S
+T(3,CdCode.AuthStatusCode)
+#AuthStatusCodeHelp=x,1024,S
+
+!RepayCode 繳款方式
+#CDDEF02=x,20,S
+T(3,CdCode.RepayCode)
+
+#RepayCodeHelp=x,1024,S
+
+
+!BankDeductCd 銀行代碼
+#CDDEF03=x,25,S
+T(3,CdCode.BankCdAppl)
+
+#BankDeductCdHelp=x,1024,S 
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@AuthStatusCodeHelp,#HelpDesc1)
+T(2,@RepayCodeHelp,#HelpDesc2)
+T(2,@BankDeductCdHelp,#HelpDesc3)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD) 
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,34,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+
+#BUF2A=X,18,S
+T(3,00000019999999000)
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+#FdMain=X,2,L
+T(3,*) 
+
+![借款人戶號]
+!借款人戶號, 統一編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=A,7,I
+C(3,#CHAIN,1,T(1,#NTXBUF,8,7),$)
+C(3,#CHAIN,1,s,$)
+
+#WKBTN2=X,1,S
+
+#BUF2B=X,18,S
+C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustNo<-OOCustNo})
+T(3,#CustNoX,)
+#SendL2r07B=X,1,S
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustNoX=x,2.50,L
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+#BUF3A=X,100,S
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<-OOCustId})
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+C(3,#CHAIN,1,T(1,#NTXBUF,15,10),$)
+C(3,#CHAIN,1,s,$)
+C(3,#CustNo,0,$,S)
+@
+C(4,#CustId,V(P,需輸入戶號或統一編號),$)
+V(7)
+
+#BUF3B=X,100,S
+T(2,0000000+#CustId)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<-OOCustId})
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#WKBTN3=X,1,S
+
+#SendL2r07C=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustIdX=x,2.50,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+
+#RPTFG2=A,1,S
+C(4,#NTXBUF5,T(3,1),T(3,2))
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L4922 ----------
+<sub type="FORM" name="L4922">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L4922,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L4922] 客戶還款方式及還款帳號查詢)
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#OCustNo=A,7,L
+
+#OCustNoX=X,50,L
+T(3,)T(2,#L2r07CustName)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+!額度編號
+#OOFacmNo=A,3,S
+
+!繳款方式
+#OORepayCode=A,2,S
+#OORepayCodeX=X,10,S
+T(3,)
+T(H,#OORepayCode,#RepayCodeHelp)
+
+!銀行代碼
+#OORepayBank=A,3,S
+#OORepayBankX=X,25,S
+T(3,)
+T(H,#OORepayBank,#BankDeductCdHelp)
+#OORepayBankXX=X,30,S
+C(3,#OORepayBank,0,S,$)
+T(2,#OORepayBank+-+#OORepayBankX)
+
+!扣款帳號
+#OORepayAcct=X,16,S
+C(3,#OORepayCode,2,$,S)
+!帳號狀態
+#OOStatus=X,1,S
+
+#OOStatusX=X,15,S
+C(3,#OORepayCode,2,$,S)
+T(3,)
+T(H,#OOStatus,#AuthStatusCodeHelp)
+
+!歷程
+!還款帳號變更含還款方式紀錄查詢
+#OOBUF1=X,34,S
+T(2,#OCustNo+#OOFacmNo)
+
+!查有歷程時才顯示歷程按鈕
+#OOHasHistory=A,1,S
+
+!無歷程時cancel解綁
+!直接hide似乎不能透過再度bind蓋過去
+#OOBTN1=X,1,S
+C(3,#OOHasHistory,1,BIND(grid,{ cmd=CHAIN; ntxcd=L4923; ntxbuf=#OOBUF1}),BIND(grid,cancel))
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#CustNo
+#CustId
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L4922
+#OCustNo
+#OOFacmNo
+#OORepayCode
+#OORepayBank
+#OORepayAcct
+#OOStatus
+#OOHasHistory
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+<sub type="PART" name="L4922" layout="cols=1;screen.width=[200,800];printer.width=[15,30,15,30]">
+[
+["[L4922]                                 客戶還款方式及還款帳號查詢"],
+[#<->#,"@借款人戶號",#OCustNo,#OCustNoX],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L4922
+#any={detail:true, header:'L4922.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+
+#OOFacmNo=額度編號
+{width:80,align:'center'}
+
+#OORepayCodeX=繳款方式
+{width:80,align:'center'}
+
+#OORepayBankXX=銀行代碼
+{width:180,align:'left'}
+
+#OORepayAcct=扣款帳號
+{width:180,align:'center'}
+
+#OOStatusX=帳號狀態
+{width:80,align:'center'}
+
+#OOBTN1=歷程
+{width:40,search:false,formatter:'cust:bind-button:歷程;L4923 還款帳號變更（含還款方式）紀錄查詢',align:'center',canExport:false}
+
+
+^
+#RPTFG2=2,QUERY.GRID,L4922
+#any={detail:true, header:'L4922.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOFacmNo=額度編號
+{width:80,align:'center'}
+
+#OORepayCodeX=繳款方式
+{width:80,align:'center'}
+
+#OORepayBankXX=銀行代碼
+{width:180,align:'left'}
+
+#OORepayAcct=扣款帳號
+{width:180,align:'center'}
+
+#OOStatusX=帳號狀態
+{width:80,align:'center'}
+
+
+
+^
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

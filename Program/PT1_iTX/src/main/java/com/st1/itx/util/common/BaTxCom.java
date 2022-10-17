@@ -1653,18 +1653,32 @@ public class BaTxCom extends TradeBuffer {
 	/* 計算作帳金額 */
 	private void settleAcctAmt(int repayPriority) {
 		this.info("settleAcctAmt repayPriority=" + repayPriority);
-		// 短繳期金，放期款第一筆
+		// 短繳期金
 		if (repayPriority == 4) {
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 1 && ba.getRepayType() == 1) {
+					boolean isCaculate = false;
 					for (BaTxVo t : this.baTxList) {
-						if (t.getDataKind() == 2) {
-							ba.setDataKind(2);
+						if (t.getDataKind() == 2 && ba.getFacmNo() == t.getFacmNo()
+								&& ba.getBormNo() == t.getBormNo()) {
 							ba.setAcctCode(t.getAcctCode());
 							ba.setPayIntDate(t.getPayIntDate());
 							ba.setIntStartDate(t.getIntStartDate());
 							ba.setIntEndDate(t.getIntStartDate());
-							continue;
+							isCaculate = true;
+							break;
+						}
+					}
+					// 未計息放期款第一筆
+					if (!isCaculate) {
+						for (BaTxVo t : this.baTxList) {
+							if (t.getDataKind() == 2) {
+								ba.setAcctCode(t.getAcctCode());
+								ba.setPayIntDate(t.getPayIntDate());
+								ba.setIntStartDate(t.getIntStartDate());
+								ba.setIntEndDate(t.getIntStartDate());
+								break;
+							}
 						}
 					}
 				}

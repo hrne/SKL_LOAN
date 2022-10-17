@@ -61,7 +61,9 @@ INVOKEJS(SHOW,p7,0)
 ["#FdFacmNo+額度編號",#FacmNo,#TmpFacmNoXX],
 ["#FdDescription+摘要內容",#Description],
 ]
+
 !---------- AP Button AREA ----------
+
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
@@ -75,39 +77,32 @@ INVOKEJS(SHOW,p7,0)
 !CurrencyCode幣別名稱
 #CDDEF01=x,30,S
 T(3,CdCode.Currency)
-
 #CurrencyCodeHelp=x,1024,S
 
 !幣別小數位
 #CDDEF02=x,26,S
 T(3,CdCode.CurrPrecision)
-
 #CurrPrecisionHelp=x,1024,S
 
 !作業項目
 #CDDEF03=x,26,S
 T(3,CdCode.TempItemCode)
-
 #TempItemCodeHelp=x,1024,S
 
 !暫收帳戶
 #CDDEF04=x,26,S
 T(3,CdCode.Temp2ReasonCode)
-
 #Temp2ReasonCodeHelp=x,1024,S
 
 ![匯款人身份別]
 #CDDEF05=x,30,S
 T(3,CdCode.CustType)
-
 #CustTypeHelp=x,1024,S
 
 !Sex
 #CDDEF06=x,20,S
 T(3,CdCode.Sex)
-
 #SexHelp=x,1024,S
-
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -171,7 +166,6 @@ C(4,#CustNo,S,$)
 #WKBTN1=X,1,S
 C(4,#CustNo,S,HIDE(#BTN1),SHOW(#BTN1))
 
-
 #BUF2A=X,100,S
 
 #BIND2A=X,1,S
@@ -218,7 +212,6 @@ E(0,#SYSDATE)
 
 #BUF3A=X,45,S
 T(3,000000199999990)
-! T(2,#WkStartDate+999999900000000000000          0000000)
 
 #BIND3A=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:ApplNoX<-OOCustName})
@@ -237,7 +230,6 @@ C(4,#CustId,$,S)
 SHOW(#BTN3)HIDE(#BTN1,#BTN2)
 @C(4,#ApplNo,V(P,需擇一輸入),$)
 
-
 #ApplNo2=A,7,S
 C(4,#ApplNo,S,$)
 E(0,#ApplNo)
@@ -249,7 +241,6 @@ T(2,0000000000000000000000000000          +#ApplNo)
 
 #BIND3B=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
-
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05A=X,1,S
@@ -288,7 +279,6 @@ T(2,@RmkCustNo,#TimCustNo)
 #TimFacmNo=A,3,S
 C(4,#ApplNo,E(0,0),E(0,#L2r05FacmNo))
 
- 
 #TimCustNoX=x,100,S
 C(4,#CustNo,$,T(2,#CustNoX))
 C(4,#CustId,$,T(2,#CustIdX))
@@ -299,7 +289,6 @@ C(4,#ApplNo,$,T(2,#ApplNoX))
 T(2,0000000+#TimCustNo+          +0000000+0)
 #BIND4=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3007; ntxbuf=#BUF4;ntxbuf5=type<-1:ChequeAcct<-OOChequeAcct:ChequeNo<-OOChequeNo})
-
 
 ![作業項目]
 !暫收款金額只可做4~29項目
@@ -325,7 +314,6 @@ SWITCH(#TempItemCode,01,SHOW(#BTN4)INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p1,8,10,
                     ,04,HIDE(#BTN4)INVOKEJS(SHOW,p1,7,7,1)INVOKEJS(SHOW,p1,8,10,0)
                     ,05,HIDE(#BTN4)INVOKEJS(SHOW,p1,7,7,1)INVOKEJS(SHOW,p1,8,10,0)
                     ,11,HIDE(#BTN4)INVOKEJS(SHOW,p1,7,7,1)INVOKEJS(SHOW,p1,8,10,0))
-
 
 ![暫收帳戶]
 #FdTempReasonCode=X,2,L
@@ -382,7 +370,6 @@ C(3,#Precision,0,SHOW(#TwTempAmt)
                  HIDE(#UsTempAmt)
                 ,HIDE(#TwTempAmt)
                  SHOW(#UsTempAmt))
-              
 
 ![暫收款金額]
 !退還暫收款金額不可>該戶號目前暫收金額
@@ -414,10 +401,6 @@ C(3,#TimTempAmt,0,T(3,@FdChequeAcct,*)T(3,@FdChequeNo,*)
                  ,T(3,@FdChequeAcct, )T(3,@FdChequeNo, ))
 
 #WKHIDECHQAMT=X,1,S
-! C(3,#TimTempAmt,0,INVOKEJS(SHOW,p1,7,7,0)
-!                   INVOKEJS(SHOW,p1,8,10,1)
-!                  ,INVOKEJS(SHOW,p1,8,10,0))
-
 
 ![支票帳號]
 #FdChequeAcct=X,2,L
@@ -663,18 +646,16 @@ IF(#RP_AmlCheckName==#TimCustNoX,T(2,@RemitIdKind,#L2r07RemitIdKind)
                                  T(H,@RpRemitGenderX,#RpRemitGender,#SexHelp)
                                  E(0,@RemitBirthday,#L2r07RemitBirthday)
                                  E(0,@RpRemitBirthday,#L2r07RemitBirthday),$)
-
-
 !匯款戶名=銀扣戶名
 IF(#RP_AmlCheckName==#RelationName,
                                    T(H,@RpRemitIdKindX,#RpRemitIdKind,#CustTypeHelp)
-                                   T(2,@RemitId,#RelationId)
-                                   T(2,@RpRemitId,#RelationId)
-                                   T(2,@RemitGender,#RelationGender)
-                                   T(2,@RpRemitGender,#RelationGender)
+                                   T(2,@RemitId,#L2r05RelationId)
+                                   T(2,@RpRemitId,#L2r05RelationId)
+                                   T(2,@RemitGender,#L2r05RelationGender)
+                                   T(2,@RpRemitGender,#L2r05RelationGender)
                                    T(H,@RpRemitGenderX,#RpRemitGender,#SexHelp)
-                                   E(0,@RemitBirthday,#RelationBirthday)
-                                   E(0,@RpRemitBirthday,#RelationBirthday),$)
+                                   E(0,@RemitBirthday,#L2r05RelationBirthday)
+                                   E(0,@RpRemitBirthday,#L2r05RelationBirthday),$)
 !匯款戶名=其他戶名
 IF(#RP_AmlCheckName!=#TimCustNoX&&#RP_AmlCheckName!=#RelationName,T(2,@RemitIdKind,#RpRemitIdKind)
                                                                   T(2,@RemitId,#RpRemitId)

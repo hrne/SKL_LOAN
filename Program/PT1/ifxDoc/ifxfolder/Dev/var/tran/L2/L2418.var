@@ -605,5 +605,6 @@ TXFORM=L2418
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
 </sub>

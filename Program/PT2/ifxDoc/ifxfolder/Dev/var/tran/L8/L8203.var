@@ -245,11 +245,11 @@ V(H,#FactorHelp)
 T(H,#Factor,#FactorHelp)
 
 
-#RimAcDate=9,7,S
+#RimAcDate=A,7,S
 E(0,#AcDate)
-#RimFactor=9,2,S
+#RimFactor=A,2,S
 E(0,#Factor)
-#RimCustNo=9,7,S
+#RimCustNo=A,7,S
 E(0,#CustNo)
 !#RimFacmNo=9,3,S
 !E(0,#FacmNo)
