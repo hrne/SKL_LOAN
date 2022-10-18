@@ -179,19 +179,18 @@ public class L4211Report extends MakeReport {
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	};
 
-	public void exec(TitaVo titaVo,int printNo) throws LogicException {
-
+	public void exec(TitaVo titaVo, int printNo) throws LogicException {
 
 //		printNo
 //		1 匯款總傳票明細表
 //		2入帳後檢核明細表
 //		3 人工處理明細表
 		this.printNo = printNo;
-		
+
 		List<Map<String, String>> fnAllList = new ArrayList<Map<String, String>>();
 
 		try {
-			fnAllList = l4211ARServiceImpl.findAll(titaVo,printNo);
+			fnAllList = l4211ARServiceImpl.findAll(titaVo, printNo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -254,15 +253,15 @@ public class L4211Report extends MakeReport {
 		// facmno, bormno 已經在 query 裡面 concat 到 custno，所以不在這裡加sort
 
 		fnAllList1 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("DetailSeq").ascString("AcSeq")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascNumber("DetailSeq").ascString("AcSeq")
 				.ascString("CustNo").getList();
 
 		fnAllList2 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
 				.ascString("SortingForSubTotal").ascString("EntryDate").descNumber("RepayAmt").ascString("CustNo")
-				.ascString("DetailSeq").ascString("AcSeq").getList();
+				.ascNumber("DetailSeq").ascString("AcSeq").getList();
 
 		fnAllList3 = sortMapListCom.beginSort(fnAllList).ascString("ReconCode").ascString("BatchNo")
-				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascString("DetailSeq")
+				.ascString("SortingForSubTotal").ascString("EntryDate").ascString("CustNo").ascNumber("DetailSeq")
 				.ascString("AcSeq").getList();
 
 		makePdf(fnAllList1, fnAllList2, fnAllList3, false, titaVo);
@@ -283,18 +282,16 @@ public class L4211Report extends MakeReport {
 //			}
 //		}
 
-		
-		if("L420A".equals(txCode)) {
-			reportName =  "匯款轉帳檢核明細表";
-		}else if(printNo == 1) {
-			reportName =  "匯款總傳票明細表";
-		}else if(printNo == 2) {
-			reportName =  "入帳後檢核明細表";
-		}else if(printNo == 3) {
-			reportName =  "人工處理明細表";
+		if ("L420A".equals(txCode)) {
+			reportName = "匯款轉帳檢核明細表";
+		} else if (printNo == 1) {
+			reportName = "匯款總傳票明細表";
+		} else if (printNo == 2) {
+			reportName = "入帳後檢核明細表";
+		} else if (printNo == 3) {
+			reportName = "人工處理明細表";
 		}
-		
-		
+
 //		reportName = "L420A".equals(txCode) ? "匯款轉帳檢核明細表"
 //				: (reportNo == 1 || printNo == 1 ? "匯款總傳票明細表" : (printNo == 3 ? "人工處理明細表" : "入帳後檢核明細表"));
 		acdate = titaVo.get("AcDate");
@@ -302,7 +299,7 @@ public class L4211Report extends MakeReport {
 		if (fnAllList1.size() == 0) {
 			throw new LogicException("E2003", "查無資料"); // 查無資料
 		}
-		
+
 //		printNo
 //		1 匯款總傳票明細表
 //		2入帳後檢核明細表
@@ -358,8 +355,12 @@ public class L4211Report extends MakeReport {
 		HashMap<tmpFacm, BigDecimal> TxAmtMap = new HashMap<>();
 
 		// 暫存L4211相同科目同戶號TxAmt累加
-		if ("L4211".equals(txCode)) {
+		if ("L4211".equals(txCode) || "L420A".equals(txCode)) {
 			for (Map<String, String> tfnAllList : fnAllList) {
+
+//				if (tfnAllList.get("CustNo").isEmpty() || tfnAllList.get("CustNo") == null) {
+//					continue;
+//				}
 
 				tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
 						parse.stringToInteger(tfnAllList.get("DetailSeq")),
@@ -558,7 +559,7 @@ public class L4211Report extends MakeReport {
 						this.print(0, c3, formatAmt(TxAmtMap.get(tmp), 0), "R");// 匯款金額
 					}
 				}
-				allsumTransferAmt = allsumTransferAmt.add(transferamt);
+				
 
 				scode = tfnAllList.get("DetailSeq");
 
@@ -634,7 +635,7 @@ public class L4211Report extends MakeReport {
 			} else {
 				this.print(0, c15, dfOthers, "R"); // 帳管費及其他
 			}
-
+			allsumTransferAmt = allsumTransferAmt.add(transferamt);
 			allsumMakeferAmt = allsumMakeferAmt.add(makeferamt);
 			allsumPrincipal = allsumPrincipal.add(principal);
 			allsumInterest = allsumInterest.add(interest);
@@ -916,7 +917,7 @@ public class L4211Report extends MakeReport {
 					}
 
 				}
-				allsumTransferAmt = allsumTransferAmt.add(transferamt);
+				
 
 				scode = tfnAllList.get("DetailSeq");
 
@@ -992,7 +993,7 @@ public class L4211Report extends MakeReport {
 			} else {
 				this.print(0, c15, dfOthers, "R"); // 帳管費及其他
 			}
-
+			allsumTransferAmt = allsumTransferAmt.add(transferamt);
 			allsumMakeferAmt = allsumMakeferAmt.add(makeferamt);
 			allsumPrincipal = allsumPrincipal.add(principal);
 			allsumInterest = allsumInterest.add(interest);
@@ -1271,7 +1272,7 @@ public class L4211Report extends MakeReport {
 					}
 				}
 
-				allsumTransferAmt = allsumTransferAmt.add(transferamt);
+				
 
 				scode = tfnAllList.get("DetailSeq");
 
@@ -1346,7 +1347,7 @@ public class L4211Report extends MakeReport {
 			} else {
 				this.print(0, c15, dfOthers, "R"); // 帳管費及其他
 			}
-
+			allsumTransferAmt = allsumTransferAmt.add(transferamt);
 			allsumMakeferAmt = allsumMakeferAmt.add(makeferamt);
 			allsumPrincipal = allsumPrincipal.add(principal);
 			allsumInterest = allsumInterest.add(interest);
@@ -1420,11 +1421,11 @@ public class L4211Report extends MakeReport {
 	private void atAll() {
 
 //		if (allsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
-			this.print(0, c3, formatAmt(allsumTransferAmt, 0), "R");
+		this.print(0, c3, formatAmt(allsumTransferAmt, 0), "R");
 //		}
 
 //		if (allsumMakeferAmt.compareTo(BigDecimal.ZERO) != 0) {
-			this.print(0, c4, formatAmt(allsumMakeferAmt, 0), "R");
+		this.print(0, c4, formatAmt(allsumMakeferAmt, 0), "R");
 //		}
 
 		if (allsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
@@ -1464,11 +1465,11 @@ public class L4211Report extends MakeReport {
 	private void totalAll() {
 
 //		if (totalsumTransferAmt.compareTo(BigDecimal.ZERO) != 0) {
-			this.print(0, c3, formatAmt(totalsumTransferAmt, 0), "R");
+		this.print(0, c3, formatAmt(totalsumTransferAmt, 0), "R");
 //		}
 
 //		if (totalsumMakerferAmt.compareTo(BigDecimal.ZERO) != 0) {
-			this.print(0, c4, formatAmt(totalsumMakerferAmt, 0), "R");
+		this.print(0, c4, formatAmt(totalsumMakerferAmt, 0), "R");
 //		}
 		if (totalsumPrincipal.compareTo(BigDecimal.ZERO) != 0) {
 			this.print(0, c8, formatAmt(totalsumPrincipal, 0), "R");

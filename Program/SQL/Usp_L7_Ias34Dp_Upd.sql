@@ -423,7 +423,7 @@ BEGIN
                                   AND AF."BormNo" = M."BormNo"
       WHERE  TRUNC(NVL(FF."FinishedDate",0) / 100) <= YYYYMM        -- 法拍完成日 <= 會計日
         AND  TRUNC(NVL(FF."FinishedDate",0) / 100) >  Last2YearsYM  -- 法拍完成日 >  會計2年前月底日
-        AND  M."Status" IN (5)       -- 5: 催收結案戶
+        AND  M."Status" IN (5 , 6)       -- 5: 催收結案戶 6:呆帳戶
         --AND  M."Status" IN (2, 7)    -- 2: 催收戶 7: 部分轉呆戶
       ;
 

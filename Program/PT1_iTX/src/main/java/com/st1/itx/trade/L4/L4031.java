@@ -92,7 +92,8 @@ public class L4031 extends TradeBuffer {
 // 				grp1 (Group by 作業項目 )
 				setCount(tBatxRateChange, grp1, 1);
 
-				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), tBatxRateChange.getRateKeyInCode(), 2);
+				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(),
+						tBatxRateChange.getRateKeyInCode(), 2);
 // 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
 				setCount(tBatxRateChange, grp2, 2);
 
@@ -121,7 +122,8 @@ public class L4031 extends TradeBuffer {
 					continue;
 				}
 				OccursList occursList = new OccursList();
-				this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt=" + ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
+				this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
+						+ ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
 						+ conCnt.get(tempL4031Vo) + ", relCnt=" + relCnt.get(tempL4031Vo));
 				this.info("CheckFlag=" + CheckFlag.get(tempL4031Vo));
 //				確認是否同作業項目皆已確認:0.尚有未確認 1.全皆已確認
@@ -160,28 +162,20 @@ public class L4031 extends TradeBuffer {
 						status = 0;
 					}
 				}
-				// 1.批次自動調整 RPTFG = 5(只有目前&調後，無取消調整)
-				// 2.按地區別調整 RPTFG = 6(只有目前&調後&上下限，無取消調整)
-				// 3.人工調整(未調整) RPTFG = 3(全部欄位，可選擇4種調整方式) 若為機動利率調整則為7
-				// 4.人工調整 (待輸入)RPTFG = 4(全部欄位，可取消調整)
-				// 5.人工調整(已調整) RPTFG = 2(全部欄位，無取消調整)
-				// A.全部 RPTFG = 4(全部欄位，可取消調整)
 
 // TxKind           Adjcode            KeyinCode          RptFg    
 // ------------------------------------------------------------------------------------------------------------------------
-//                  0.全部                                2(無利率欄)
-// 1.定期機動調整
-// 3.機動利率調整                                                                                           
-//              	1.批次自動調整                       			  5(目前&調後)   
-//              	4.批次自動調整(調整件)           			  5(目前&調後)   
-//                  2.按地區別調整                                                   
-//                                      0.未調整 9:待處理 7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
-//                                      1.已調整               6(有地區別，可選擇<取消調整>)         
-//                                      2.待輸入               6(有地區別，可選擇<取消調整>)   
-//                  3.人工調整                                   
-//                                      0.未調整  9:待處理     3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
-//                                      1.已調整                     4(無地區別，可選擇<取消調整>)   
-//                                      2.待輸入                     4(無地區別，可選擇<取消調整>)   
+//                  0.全部                         1.已調整                   2<取消調整>
+// 1.定期機動調整，3.機動利率調整
+//              	1.批次自動調整            1.已調整           	  5(目前&調後)   
+//                  2.按地區別調整            1.已調整                   6(有地區別，可選擇<取消調整>)                                          
+//                                      0.未調整                   7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)                                           
+//                  3.人工調整                                                    
+//                                      0.未調整                   7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                                      9:檢核有誤               3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                                      1.已調整                   4(無地區別，可選擇<取消調整>)   
+//                                      2.待輸入                   4(無地區別，可選擇<取消調整>)   
+//              	4.檢核提醒件               0.未調整 		  5(目前&調後)   
 // 2.指數型利率調整
 // 4.員工利率調整 
 // 5.按商品別調整  
@@ -204,24 +198,36 @@ public class L4031 extends TradeBuffer {
 					break;
 				case 2:
 					lableBX = "按地區別調整";
-					break;
-				case 3:
-					lableBX = "人工調整";
-					break;
-				case 4:
-					lableBX = "檢核提醒件";
-					rptFg = 5;
-					checkFlag = 9;
-					status = 9;
-					break;
-				}
-				if (adjCode == 2 || adjCode == 3) {
 					switch (keyinCode) {
 					case 0:
 						lableBX += "(未調整)";
+						rptFg = 7;
 						break;
 					case 1:
 						lableBX += "(已調整)";
+						rptFg = 6;
+						break;
+					}
+					break;
+				case 3:
+					lableBX = "人工調整";
+					switch (keyinCode) {
+					case 0:
+						lableBX += "(未調整)";
+						if ((txKind == 1) || txKind == 3) {
+							rptFg = 7;
+						} else {
+							rptFg = 3;
+						}
+						break;
+					case 1:
+						lableBX += "(已調整)";
+						if ((txKind == 1) || txKind == 3) {
+							rptFg = 6;
+						} else {
+							rptFg = 4;
+						}
+
 						break;
 					case 2:
 						lableBX += "(待輸入)";
@@ -229,21 +235,16 @@ public class L4031 extends TradeBuffer {
 						break;
 					case 9:
 						lableBX += "(檢核有誤)";
+						rptFg = 3;
 						break;
 					}
-					if (keyinCode == 0 || keyinCode == 9) {
-						if ((txKind == 1 && adjCode == 2) || txKind == 3) {
-							rptFg = 7;
-						} else {
-							rptFg = 3;
-						}
-					} else {
-						if ((txKind == 1 && adjCode == 2) || txKind == 3) {
-							rptFg = 6;
-						} else {
-							rptFg = 4;
-						}
-					}
+					break;
+				case 4:
+					lableBX = "檢核提醒件";
+					rptFg = 5;
+					checkFlag = 9;
+					status = 9;
+					break;
 				}
 
 				occursList.putParam("OORank", tempL4031Vo.getRank()); // 排序
