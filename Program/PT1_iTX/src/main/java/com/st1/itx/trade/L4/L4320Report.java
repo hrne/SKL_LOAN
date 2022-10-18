@@ -109,14 +109,14 @@ public class L4320Report extends MakeReport {
 				fileNm = fileNm1 + "-按地區別調整(已調整)";
 				titaVo.putParam("AdjCode", 2);
 				titaVo.putParam("RateKeyInCode", 1);
-				excelNo = 1;
+				excelNo = 2;
 				break;
 			case 3:
 				fileNm = fileNm1 + "-人工調整(未調整)";
 				titaVo.putParam("AdjCode", 3);
 				titaVo.putParam("RateKeyInCode", 0);
 				if (this.iTxKind == 1) {
-					excelNo = 1;
+					excelNo = 2;
 				} else {
 					excelNo = 3;
 				}

@@ -493,9 +493,13 @@ public class L4320Batch extends TradeBuffer {
 				dateUtil.setDate_1(sDate);
 				this.info("sDate" + sDate % 100 + " " + dateUtil.getMonLimit());
 				if (sDate % 100 == dateUtil.getMonLimit()) {
-					isNextAdjDateMonthEnd = true;
 					int firstDrawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("FirstDrawdownDate")));
-					if (firstDrawdownDate % 100 > sDate % 100) {
+					dateUtil.init();
+					dateUtil.setDate_1(firstDrawdownDate);
+					if (firstDrawdownDate % 100 == dateUtil.getMonLimit()) {
+						isNextAdjDateMonthEnd = true;						
+					}
+					if (isNextAdjDateMonthEnd && firstDrawdownDate % 100 > sDate % 100) {
 						sDate = firstDrawdownDate;
 					}
 				}
@@ -548,7 +552,7 @@ public class L4320Batch extends TradeBuffer {
 			dateUtil.dateDiff();
 			b.setOvduTerm(dateUtil.getMons());
 		}
-		this.info("iTxKind    = " + iTxKind);
+
 		/* 依作業項目設定 */
 //作業項目 
 		switch (iTxKind) {
@@ -574,8 +578,6 @@ public class L4320Batch extends TradeBuffer {
 			} else {
 				rateProp = iBaseRate.add(individualIncr);
 			}
-			this.info("iBaseRate   = " + iBaseRate);
-			
 
 			// 定期機動指標利率變動調整合約利率
 			if (iAdjCode == 4) {
@@ -599,7 +601,6 @@ public class L4320Batch extends TradeBuffer {
 				tTempVo.putParam("CityRateFloor", cityRateFloor);
 				// 本次利率 = 目前利率 + 地區別加減碼
 				rateProp = presentRate.add(cityRateIncr);
-				this.info("rateProp    = " + rateProp);
 				String warn = "";
 				// 依地區別利率上、下限調整
 				if (rateProp.compareTo(cityRateCeiling) > 0) {
@@ -658,7 +659,6 @@ public class L4320Batch extends TradeBuffer {
 		case 3:
 			// 本次生效日(已放好)
 			// 本次利率 = 原利率 + 地區別利率
-			this.info("cityRateIncr1   = " + cityRateIncr);
 			tTempVo.putParam("CityRateIncr", cityRateIncr);
 			tTempVo.putParam("CityRateCeiling", cityRateCeiling);
 			tTempVo.putParam("CityRateFloor", cityRateFloor);
@@ -673,7 +673,6 @@ public class L4320Batch extends TradeBuffer {
 				warnMsg += ", 低於地區下限 ";
 			}
 			warnMsg += ", 地區別加減設定值:" + cityRateIncr;
-			this.info("cityRateIncr2   = " + cityRateIncr);
 			// 3.人工調整
 			adjCode = 3;
 			break;

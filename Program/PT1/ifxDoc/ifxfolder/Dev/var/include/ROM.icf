@@ -3758,6 +3758,38 @@ TXFORM=L2R63
 ^
 </L2R63.tom>
 
+
+
+!    L2R64 : FOR L2631 保證人保證資料
+<L2R64.dec>
+##loop{times:20,i:1}
+#L2r64CustNo{i}=A,7,S
+#L2r64FacmNo{i}=A,3,S
+#L2r64CustName{i}=x,200,S
+#L2r64CustStat{i}=A,2,S
+#L2r64HighGuaAmt{i}=+m,14,S
+#L2r64GuaAmt{i}=+m,14,S
+#L2r64PayIntDate{i}=X,10,S
+#L2r64GuaStatCode{i}=A,1,S
+#L2r64Stat{i}=A,1,S
+##end
+</L2R64.dec>
+
+<L2R64.tom>
+TXFORM=L2R64
+##loop{times:20,i:1}
+#L2r64CustNo{i}
+#L2r64FacmNo{i}
+#L2r64CustName{i}
+#L2r64CustStat{i}
+#L2r64HighGuaAmt{i}
+#L2r64GuaAmt{i}
+#L2r64PayIntDate{i}
+#L2r64GuaStatCode{i}
+#L2r64Stat{i}
+##end
+^
+</L2R64.tom>
 ------------------------------------------------------------
 
 !    L3R30 : 帳戶備忘錄資料
@@ -4269,6 +4301,14 @@ TXFORM=L3R10
 #L3r11CloseAmt=+n,14.2,S
 #L3r11CloseReasonCode=X,2,S
 #L3r11RpFacmNo=A,3,S
+#L3r11IntStartDate=D,7,S
+#L3r11IntEndDate=D,7,S
+#L3r11ClCode1=A,1,S
+#L3r11ClCode2=A,2,S
+#L3r11ClNo=A,7,S
+#L3r11ClNoX=X,15,S
+#L3r11BdLocation=X,200,S
+#L3r11BdRmk=X,100,S
 ##loop{times:50,n:1}
 #L3r11FacmNo{n}=A,3,S
 #L3r11BormNo{n}=A,3,S
@@ -4304,6 +4344,14 @@ TXFORM=L3R11
 #L3r11CloseAmt
 #L3r11CloseReasonCode
 #L3r11RpFacmNo
+#L3r11IntStartDate
+#L3r11IntEndDate
+#L3r11ClCode1
+#L3r11ClCode2
+#L3r11ClNo
+#L3r11ClNoX
+#L3r11BdLocation
+#L3r11BdRmk
 ##loop{times:50,n:1}
 #L3r11FacmNo{n}
 #L3r11BormNo{n}

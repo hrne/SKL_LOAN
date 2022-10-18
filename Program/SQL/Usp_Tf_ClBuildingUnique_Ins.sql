@@ -50,6 +50,7 @@ BEGIN
                            PARTITION BY "GroupNo"
                                       , "SecGroupNo"
                            ORDER BY "LMSACN" -- 2022-03-10 Wei
+                                  , "LGTCIF"
                                   , CASE
                                       WHEN "LoanBalTotal" != 0
                                       THEN 0
@@ -129,16 +130,16 @@ BEGIN
     -- 更新ClBuildingUnique 同組內有兩個Y者 增加SecGroupNo
     MERGE INTO "ClBuildingUnique" T1
     USING (SELECT S2."GroupNo"
-                , MIN(NVL(S1."MinSecGroupNo",1)) AS "MinSecGroupNo"
-                , S2."GDRID1"
-                , S2."GDRID2"
-                , S2."GDRNUM"
-                , S2."LGTSEQ"
+                 ,MIN(NVL(S1."MinSecGroupNo",1)) AS "MinSecGroupNo"
+                 ,S2."GDRID1"
+                 ,S2."GDRID2"
+                 ,S2."GDRNUM"
+                 ,S2."LGTSEQ"
            FROM (SELECT "GroupNo","SecGroupNo",MAX("TfFg") AS "MaxTfFg" FROM "ClBuildingUnique" GROUP BY "GroupNo","SecGroupNo"
                 ) S0
            LEFT JOIN (SELECT CBU."GroupNo"
-                            ,HG.LGTCIF
-                            ,MIN(CBU."SecGroupNo") AS "MinSecGroupNo"
+                           , HG.LGTCIF
+                           , MIN(CBU."SecGroupNo") AS "MinSecGroupNo"
                       FROM "ClBuildingUnique" CBU
                       LEFT JOIN LA$HGTP HG ON HG.GDRID1 = CBU.GDRID1
                                           AND HG.GDRID2 = CBU.GDRID2
@@ -278,7 +279,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClBuildingUnique_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /

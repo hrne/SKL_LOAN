@@ -108,7 +108,8 @@ public class BS900 extends TradeBuffer {
 		// 1.刪除當月提息明細檔 //
 		this.info("1.bs900 delete acLoanint, yearMonth=" + yearMonth);
 
-		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE,
+				titaVo);
 		List<AcLoanInt> lAcLoanInt = slAcLoanInt == null ? null : slAcLoanInt.getContent();
 		if (lAcLoanInt != null) {
 			try {
@@ -123,7 +124,8 @@ public class BS900 extends TradeBuffer {
 
 		// 2.刪除處理清單檔 ACCL01-應收利息提存入帳 //
 		this.info("2.bs900 delete ACCL01");
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index,
+				Integer.MAX_VALUE, titaVo);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
@@ -133,7 +135,8 @@ public class BS900 extends TradeBuffer {
 
 		// 刪除提存當月AcDetal:98
 		this.info("2-1.bs900 delete AcDetal-98, yearMonth=" + yearMonth);
-		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 98, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 98, this.index,
+				Integer.MAX_VALUE, titaVo);
 		if (slAcDetail != null) {
 			lAcDetail = new ArrayList<AcDetail>();
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
@@ -145,7 +148,8 @@ public class BS900 extends TradeBuffer {
 		}
 		// 刪除提存當月AcDetal:99
 		this.info("2-2.bs900 delete AcDetal-99, yearMonth=" + yearMonth);
-		Slice<AcDetail> tlAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 99, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> tlAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 99, this.index,
+				Integer.MAX_VALUE, titaVo);
 		if (tlAcDetail != null) {
 			lAcDetail = new ArrayList<AcDetail>();
 			lAcDetail = tlAcDetail == null ? null : tlAcDetail.getContent();
@@ -160,39 +164,39 @@ public class BS900 extends TradeBuffer {
 
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL01");
-		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index, Integer.MAX_VALUE, titaVo);
+		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index, Integer.MAX_VALUE,
+				titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
-				if ("ICR".equals(t.getAcctCode()) && t.getEntAc() == 1) {
-					continue;
+				if ("ICR".equals(t.getAcctCode()) && "0".equals(t.getTitaHCode())) {
+					// 銷帳碼=原銷帳碼
+					String rvNo = t.getRvNo();
+					// 無銷帳碼則自編
+					if (rvNo.trim().isEmpty()) {
+						rvNo = getRvNo(titaVo);
+					}
+					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+					tTxToDoDetail.setItemCode("ACCL01");
+					tTxToDoDetail.setDtlValue(rvNo);
+					// 迴轉上月(傳票批號:98)
+					// 借：應收利息 貸：利息收入
+					TempVo tTempVo = new TempVo();
+					tTempVo.clear();
+					tTempVo.putParam("AcDate", iAcDate);
+					tTempVo.putParam("SlipBatNo", "98");
+					tTempVo.putParam("AcclType", "迴轉上月");
+					tTempVo.putParam("AcctCode", t.getAcctCode());
+					tTempVo.putParam("AcBookCode", t.getAcBookCode());
+					tTempVo.putParam("AcSubBookCode", t.getAcSubBookCode());
+					tTempVo.putParam("SlipNote", t.getSlipNote());
+					tTempVo.putParam("CrAcctCode1", "ICR");
+					tTempVo.putParam("CrRvNo1", rvNo);
+					tTempVo.putParam("CrTxAmt1", t.getTxAmt());
+					tTempVo.putParam("DbAcctCode1", t.getAcctCode());
+					tTempVo.putParam("DbTxAmt1", t.getTxAmt());
+					tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
+					lTxToDoDetail.add(tTxToDoDetail);
 				}
-				// 銷帳碼=原銷帳碼
-				String rvNo = t.getRvNo();
-				// 無銷帳碼則自編
-				if (rvNo.trim().isEmpty()) {
-					rvNo = getRvNo(titaVo);
-				}
-				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-				tTxToDoDetail.setItemCode("ACCL01");
-				tTxToDoDetail.setDtlValue(rvNo);
-				// 迴轉上月(傳票批號:98)
-				// 借：應收利息 貸：利息收入
-				TempVo tTempVo = new TempVo();
-				tTempVo.clear();
-				tTempVo.putParam("AcDate", iAcDate);
-				tTempVo.putParam("SlipBatNo", "98");
-				tTempVo.putParam("AcclType", "迴轉上月");
-				tTempVo.putParam("AcctCode", t.getAcctCode());
-				tTempVo.putParam("AcBookCode", t.getAcBookCode());
-				tTempVo.putParam("AcSubBookCode", t.getAcSubBookCode());
-				tTempVo.putParam("SlipNote", t.getSlipNote());
-				tTempVo.putParam("CrAcctCode1", "ICR");
-				tTempVo.putParam("CrRvNo1", rvNo);
-				tTempVo.putParam("CrTxAmt1", t.getTxAmt());
-				tTempVo.putParam("DbAcctCode1", t.getAcctCode());
-				tTempVo.putParam("DbTxAmt1", t.getTxAmt());
-				tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
-				lTxToDoDetail.add(tTxToDoDetail);
 			}
 			this.info("3.last month ACCL01 " + lTxToDoDetail.size());
 			// 應處理明細檔
@@ -207,6 +211,7 @@ public class BS900 extends TradeBuffer {
 		dateUtil.init();
 		dateUtil.setDate_1(this.getTxBuffer().getMgBizDate().getTbsDy());
 		dateUtil.setMons(1);
+
 		int intEndDate = (dateUtil.getCalenderDay() / 100) * 100 + 01; // 計算止日 =>下個月1日
 		int iEntryDate = this.getTxBuffer().getMgBizDate().getTmnDy(); // 入帳日 ==> 月底日曆日
 
@@ -245,12 +250,14 @@ public class BS900 extends TradeBuffer {
 		HashMap<String, BigDecimal> map = new HashMap<>();
 
 		// AcReceivable 會計銷帳檔，ICR 應收利息－放款部 ，未銷//
-		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE, titaVo); // ASC
+		Slice<AcLoanInt> slAcLoanInt = acLoanIntService.findYearMonthEq(yearMonth, this.index, Integer.MAX_VALUE,
+				titaVo); // ASC
 		List<AcLoanInt> lAcLoanInt = slAcLoanInt == null ? null : slAcLoanInt.getContent();
 		if (lAcLoanInt != null) {
 			for (AcLoanInt ac : lAcLoanInt) {
 				if (ac.getInterest().compareTo(BigDecimal.ZERO) > 0) {
-					String key = ac.getAcctCode() + "," + parse.IntegerToString(ac.getAging(), 1) + "," + ac.getAcBookCode() + "," + ac.getAcSubBookCode();
+					String key = ac.getAcctCode() + "," + parse.IntegerToString(ac.getAging(), 1) + ","
+							+ ac.getAcBookCode() + "," + ac.getAcSubBookCode();
 					if (map.containsKey(key)) {
 						map.put(key, map.get(key).add(ac.getInterest()));
 					} else {
@@ -268,14 +275,18 @@ public class BS900 extends TradeBuffer {
 
 	private String getRvNo(TitaVo titaVo) throws LogicException {
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
+		String rvNo = "AC"
+				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(
+						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
+						6);
 		return rvNo;
 	}
 
-	private void addTxToDoThisMonth(String acctCode, String aging, String acBookCode, String acSubBookCode, BigDecimal intAmt, TitaVo titaVo) throws LogicException {
+	private void addTxToDoThisMonth(String acctCode, String aging, String acBookCode, String acSubBookCode,
+			BigDecimal intAmt, TitaVo titaVo) throws LogicException {
 
-		// 銷帳碼(15)=年月(5)-業務科目(3)-帳齡(1)-區隔帳冊(3)
+		// 銷帳碼(14)=年月(5)業務科目(3)-帳齡(1)-區隔帳冊(3)
 		String rvNo = iAcDate / 100 + acctCode + "-" + aging + "-" + acSubBookCode;
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL01");
@@ -349,16 +360,22 @@ public class BS900 extends TradeBuffer {
 		String acSubBookCode = null;
 		int custNo = 0;
 		// find all loanBorMain status = 0 //
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, 99999999, 0, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, 99999999, 0, this.index,
+				Integer.MAX_VALUE, titaVo);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		if (lLoanBorMain != null) {
 			int cntTrans = 0;
 			// 逐筆 call BaTxCom 計算並寫入提息明細檔 //
 			for (LoanBorMain ln : lLoanBorMain) {
+				if (ln.getDrawdownDate() >= intEndDate) {
+					continue;
+				}
 				try {
-					lBaTxVo = baTxCom.acLoanInt(iEntryDate, intEndDate, ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), titaVo); // 提存
+					lBaTxVo = baTxCom.acLoanInt(iEntryDate, intEndDate, ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(),
+							titaVo); // 提存
 				} catch (LogicException e) {
-					this.error("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo());
+					this.error("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + ln.getCustNo() + "-" + ln.getFacmNo() + "-"
+							+ ln.getBormNo());
 					continue;
 				}
 				//

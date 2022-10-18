@@ -318,6 +318,4 @@ BEGIN
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_AddressSplit_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
 
-
-
 /

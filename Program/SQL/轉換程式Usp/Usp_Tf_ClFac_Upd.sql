@@ -33,35 +33,37 @@ BEGIN
              , "GDRNUM"
              , "LGTSAM"
         FROM "LA$HGTP" -- 建物
-        WHERE "LGTSAM" > 0
+        WHERE "LGTSAM" != 0
+          AND "GDRID1" != 2
         UNION ALL
         SELECT "GDRID1"
              , "GDRID2"
              , "GDRNUM"
              , "LGTSAM"
         FROM "LA$LGTP" -- 土地
-        WHERE "LGTSAM" > 0
+        WHERE "LGTSAM" != 0
+          AND "GDRID1" != 1
         UNION ALL
         SELECT "GDRID1"
              , "GDRID2"
              , "GDRNUM"
              , "CGT018"
         FROM "LN$CGTP" -- 動產
-        WHERE "CGT018" > 0
+        WHERE "CGT018" != 0
         UNION ALL
         SELECT "GDRID1"
              , "GDRID2"
              , "GDRNUM"
              , "BGTAMT"
         FROM "LA$BGTP" -- 保證
-        WHERE "BGTAMT" > 0
+        WHERE "BGTAMT" != 0
         UNION ALL
         SELECT "GDRID1"
              , "GDRID2"
              , "GDRNUM"
              , "SGDQTY"
         FROM "LA$SGDP" -- 股票
-        WHERE "SGDQTY" > 0
+        WHERE "SGDQTY" != 0
       ) CL ON CL."GDRID1" = APLP."GDRID1"
           AND CL."GDRID2" = APLP."GDRID2"
           AND CL."GDRNUM" = APLP."GDRNUM"
@@ -72,27 +74,12 @@ BEGIN
       T0."CustNo" = S0."LMSACN"
       AND T0."FacmNo" = S0."LMSAPN"
       AND T0."MainFlag" = 'Y' -- 2021-08-10 智偉增加邏輯
-      AND S0."OriSettingAmt" > 0
+      AND S0."OriSettingAmt" != 0
     )
     WHEN MATCHED THEN UPDATE
     SET T0."OriSettingAmt" = S0."OriSettingAmt"
     ;
 
-    MERGE INTO "FacMain" FM
-    USING (
-         SELECT DISTINCT
-                "CustNo"
-              , "FacmNo"
-         FROM "ClFac"
-    ) CF
-    ON (
-         CF."CustNo" = FM."CustNo"
-         AND CF."FacmNo" = FM."FacmNo"
-    )
-    WHEN MATCHED THEN UPDATE
-    SET FM."ColSetFlag" = 'Y'
-    ;
-    
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
@@ -104,9 +91,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClFac_Upd',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
-
-
 
 /

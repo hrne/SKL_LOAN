@@ -35,6 +35,12 @@
 		<!-- Usp_L9_DailyTav_Ins -->
 		<step id="l9DailyTavIns" parent="parentStep">
 			<tasklet ref="L9DailyTavIns" />
+			<next on="COMPLETED" to="insertAmlCustList" />
+			<end on="FAILED" />
+		</step>InsertAmlCustList
+		<!-- InsertAmlCustList -->
+		<step id="insertAmlCustList" parent="parentStep">
+			<tasklet ref="InsertAmlCustList" />
 			<next on="COMPLETED" to="split2" />
 			<end on="FAILED" />
 		</step>

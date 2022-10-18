@@ -31,7 +31,7 @@
 
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[180,420,150,400];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[180,420,150,400];printer.width=[20,60,20,60];order=1;">
 [
 ["[L2631]                                 清償作業"],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#BTN3,#CustName],
@@ -48,7 +48,16 @@
 ["#FdTelNo1+連絡電話１",#TelNo1,#BTN9],["#FdTelNo2+連絡電話２",#TelNo2,#BTN10],
 ["#FdTelNo3+連絡電話３",#TelNo3,#BTN11],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 [#<->#,"#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],
+[#<->#,"#FdPostAddress+郵寄地址",#PostAddress],
 [#<->#,"#FdRmk1+備註欄",#Rmk1],
+[#<->#,"#FdBdLocation+門牌號碼",#BdLocation],
+["#FdBdRmk+建物標示備註",#BdRmk],["#FdClNo+擔保品編號",#ClNoX],
+[#<->#,"#FdIntDate+計息期間",#IntStartDate,"-",#IntEndDate],
+["@本金",#PrincipalX],["@契變手續費",#ModifyFeeX],
+["@利息",#InterestX],["@帳管費用",#AcctFeeX],
+["@延遲息",#DelayIntX],["@火險費用",#FireFeeX],
+["@違約金",#BreachAmtX],["@法務費用",#LawFeeX],
+["@累短收",#ShortfallX,#ShortfallXX],["@累溢收",#ExcessiveX],
 ]
 !---------- AP Button AREA ----------   
 ![Buttom資料查詢]
@@ -132,15 +141,20 @@ T(3,CdCode.CollectWayCode)
 
 #CollectWayCodeHelp=x,1024,S
 
+#CDDEF0004=x,30,S
+T(3,CdCode.Status)
+
+#StatusHelp=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AdvanceCloseCodeHelp,#HelpDesc1)
 T(2,@CloseIndHelp,#HelpDesc2)
 T(2,@CollectWayCodeHelp,#HelpDesc3)
+T(2,@StatusHelp,#HelpDesc4)
 
 #FunCodHelp=x,100,S
 T(3,0:清償（必須為尚未結案）;1:請領（已申請者為請領）;2:補領（已結案後來申請者）;3:補發（已領過者為補發）)
@@ -151,8 +165,23 @@ T(3,Y:是;N:否)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 ! IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L2077清償作業明細資料查詢]進入),$)
+#Precision=N,1,S
+E(0,0)
 
+#WKINTX=X,6,S
+T(3,[利息 )
 
+#WKPRIX=X,5,S
+T(3,本金 )
+
+#WKCBX=X,10,S
+T(3,清償違約金 )
+
+#WKBRAX=X,1,S
+T(3,])
+
+#WKSPC2=X,2,S
+T(3,，)
 #NTXBUF=X,60,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 C(4,#NTXBUF,S,$)
@@ -161,8 +190,9 @@ T(1,@CloseNo,#NTXBUF,8,3)
 T(1,@FunCode,#NTXBUF,11,1)
 T(1,@TranDate,#NTXBUF,12,7)
 T(1,@FacmNo,#NTXBUF,19,3)
+T(1,@oldFacmNo,#NTXBUF,19,3)
 
-
+#oldFacmNo=A,3,S
 
 #TFSHOW=X,1,S
 C(4,#NTXBUF,S,$)
@@ -174,7 +204,9 @@ T(F,#CloseInd,0)
 
 
 #init=X,1,S
+INVOKEJS(SHOW,p2,0)
 INVOKEJS(SHOW,p1,9,9,0)
+INVOKEJS(SHOW,p1,15,15,0)
 K(MODIFYBUTTON,登錄)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
@@ -330,12 +362,13 @@ V(2,0)
 
 
 ![申請日期]
-!補領或補發時必須輸入
-#ApplDate=D,7,L
+!補領或補發時必須輸入,補領時依申請日期計算是否限制清償日期內
+#ApplDate=D,7,I
 E(0,#SYSCDATE)
-! @V(7)
-! A(DATE,0,#ApplDate)
-! V(2,0)
+IF(#FunCode==2||#FunCode==3,$,s)
+@V(7)
+A(DATE,0,#ApplDate)
+V(2,0)
 
 
 ![結案區分]
@@ -374,18 +407,23 @@ BIND(#BTN13,click, {cmd=CHAIN; ntxcd=L4960; ntxbuf=#BUFF})
 ![額度編號]
 #FacmNo=A,3,I
 C(2,#FunCode,INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN7,#BTN6),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN5,#BTN6)HIDE(#BTN7),INVOKEJS(SHOW,p1,9,9,1)SHOW(#BTN6)HIDE(#BTN5,#BTN7),$,$)
-C(4,#NTXBUF,$,s)
+C(3,#FunCode,2,C(3,#oldFacmNo,0,$,s),C(4,#NTXBUF,$,s))
 SHOW(#BTN8,#BTN12,#BTN13)
 @HIDE(#BTN8)
 
 #BormNo=A,3,L
+#RimCloseDate=D,7,S
+#RimApplDate=D,7,S
 
 #L3R07=X,1,S
 C(3,#FunCode,2,$,S)
+E(0,@RimFuncCode,#FunCode)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,0)
-S(L3R07,1,#RimCustNo,#RimFacmNo,#RimBormNo)
+E(0,@RimCloseDate,#TranDate)
+E(0,@RimApplDate,#ApplDate)
+S(L3R07,1,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCloseDate,#RimApplDate)
 R(1,L3R07)
 
 #checkL3r07=X,1,S
@@ -425,13 +463,11 @@ T(2,0000000+#TimCustNo+          +0000000+#FacmNo)
 #BUF6=X,10,S
 T(2,#TimCustId)
 
-
 #BUF7=X,31,S
 T(2,0000000+#TimCustNo+          +0000000)
 
 #BUF8=X,18,S
 T(2,1+#TimCustNo+          )
-
 
 !是否領取清償證明
 #CollectFlag=X,1,I
@@ -458,21 +494,76 @@ E(0,@RimCaseCloseCode,#CloseInd)
 RESET_RIM(#SendL3R11A,L3R11)
 S(L3R11,1,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimCaseCloseCode,#CollectFlag)
 R(1,L3R11)
-
-#checkl2r11=X,1,S
-C(3,#FunCode,2,S,$)
-! E(0,@CloseReasonCode,0)
 E(0,@CloseAmt,#L3r11CloseAmt)
-C(5,#L3r11CloseReasonCode,00,T(3,@closefg,Y),T(3,@closefg,N))
-C(5,#L3r11CloseReasonCode,00,S,$)
-T(2,@CloseReasonCode,#L3r11CloseReasonCode)
-
 ! closefg = Y 時為不需輸入清償原因
 ! closefg = N 時為必須輸入清償原因
 ! L3r11CloseReasonCode = "" 時為到期清償closefg=Y
+C(5,#L3r11CloseReasonCode,00,T(3,@closefg,Y),T(3,@closefg,N))
+C(5,#L3r11CloseReasonCode,00,S,$)
+E(0,@IntStartDate,#L3r11IntStartDate)
+E(0,@IntEndDate,#L3r11IntEndDate)
+T(2,@CloseReasonCode,#L3r11CloseReasonCode)
+E(0,@Principal,#L3r11Principal)
+E(0,@Interest,#L3r11Interest)
+E(0,@DelayInt,#L3r11DelayInt)
+E(0,@BreachAmt,#L3r11BreachAmt)
+E(0,@Shortfall,#L3r11Shortfall)
+E(0,@ShortfallInt,#L3r11ShortfallInt)
+E(0,@ShortfallPrin,#L3r11ShortfallPrin)
+E(0,@ShortCloseBreach,#L3r11ShortCloseBreach)
+E(0,@Excessive,#L3r11Excessive)
+E(0,@LawFee,#L3r11LawFee)
+E(0,@FireFee,#L3r11FireFee)
+E(0,@AcctFee,#L3r11AcctFee)
+E(0,@ModifyFee,#L3r11ModifyFee)
+T(2,@BdLocation,#L3r11BdLocation)
+T(2,@BdRmk,#L3r11BdRmk)
+T(2,@ClNoX,#L3r11ClNoX)
+CALL2(#ADJUSTDOT,#Precision,#Principal,#PrincipalX)
+CALL2(#ADJUSTDOT,#Precision,#Interest,#InterestX)
+CALL2(#ADJUSTDOT,#Precision,#DelayInt,#DelayIntX)
+CALL2(#ADJUSTDOT,#Precision,#BreachAmt,#BreachAmtX)
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+CALL2(#ADJUSTDOT,#Precision,#LawFee,#LawFeeX)
+CALL2(#ADJUSTDOT,#Precision,#FireFee,#FireFeeX)
+CALL2(#ADJUSTDOT,#Precision,#AcctFee,#AcctFeeX)
+CALL2(#ADJUSTDOT,#Precision,#ModifyFee,#ModifyFeeX)
+CALL2(#ADJUSTDOT,#Precision,#Shortfall,#ShortfallX)
+CALL2(#ADJUSTDOT,#Precision,#ShortfallInt,#ShortfallIntX)
+T(2,@ShortfallIntXX,#WKINTX+#ShortfallIntX)
+P(R,#ShortfallIntXX)
+CALL2(#ADJUSTDOT,#Precision,#ShortfallPrin,#ShortfallPrinX)
+P(R,#ShortfallPrinX)
+T(2,@ShortfallPrinXX,#ShortfallPrinX)
+P(L,#ShortfallPrinXX)
+T(2,@ShortfallPrinXX,#WKPRIX+#ShortfallPrinXX)
+CALL2(#ADJUSTDOT,#Precision,#ShortCloseBreach,#ShortCloseBreachAmtX)
+P(R,#ShortCloseBreachAmtX)
+T(B,@ShortCloseBreachAmtXX,#ShortCloseBreachAmtX+#WKBRAX)
+P(L,#ShortCloseBreachAmtXX)
+T(2,@ShortCloseBreachAmtXX,#WKCBX+#ShortCloseBreachAmtXX)
+T(B,@ShortfallXX,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachAmtXX)
+P(L,#ShortfallXX)
+
+#SendL2R64=X,1,S
+C(3,#FunCode,2,S,$)
+E(0,@RimCustNo,#TimCustNo)
+RESET_RIM(#SendL2R64,L2R64)
+S(L2R64,1,#RimCustNo)
+R(1,L2R64)
+##loop{times:20,l:0,n:1,m:2}
+IF({n}==1,C(3,#L2r64CustNo{n},0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1)),$)
+C(3,#L2r64CustNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+E(0,@CustNo{n},#L2r64CustNo{n})
+E(0,@HighGuaAmt{n},#L2r64HighGuaAmt{n})
+E(0,@GuaAmt{n},#L2r64GuaAmt{n})
+T(2,@CustName{n},#L2r64CustName{n})
+E(0,@CustStat{n},#L2r64CustStat{n})
+C(3,#L2r64Stat{n},1,T(H,@CustStatX{n},#CustStat{n},#StatusHelp),T(2,@CustStatX{n},尚未撥款))
+E(0,@PayIntDate{n},#L2r64PayIntDate{n})
+C(3,#PayIntDate{n},0,T(3,@PayIntDateX{n},無),E(0,@PayIntDateX{n},#PayIntDate{n}))
+##end
 #closefg=X,1,S
-
-
 
 !清償金額
 #CloseAmt=+m,14,L
@@ -490,7 +581,6 @@ T(2,@CloseReasonCode,#L3r11CloseReasonCode)
 !HELP(Y: 是;N: 否)
 !@V(2,0)
 !V(3,Y,N)
-
 
 !連絡電話１
 #TelNo1=x,15,I
@@ -520,20 +610,146 @@ HELP(#CollectWayCodeHelp,cols:5)
 C(4,#CollectWayCode,T(3,@CollectWayCodeX,),$)
 V(H,#CollectWayCodeHelp)
 C(5,#CollectFlag,"Y",V(2,01,20),V(1,01,20))
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,INVOKEJS(SHOW,p1,15,15,1),INVOKEJS(SHOW,p1,15,15,0))
 
 #CollectWayCodeX=x,12,L
 T(3,)
 C(4,#CollectWayCode,S,$)
 T(H,#CollectWayCode,#CollectWayCodeHelp)
 
+!郵寄地址
+#FdPostAddress=X,2,L
+#PostAddress=x,200,I,maxWidth:50
+IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
+
 !領取日期
 #ReceiveDate=D,7,S
-! C(3,#CollectWayCode,1,S,$)
-! C(3,#CollectWayCode,20,S,$)
-! @V(7)A(DATE,0,#ReceiveDate)
 
 !備註欄
 #Rmk1=x,100,I
+
+!門牌號碼
+#FdBdLocation=X,2,L
+#BdLocation=X,100,L
+
+!建物標示備註
+#FdBdRmk=X,2,L
+#BdRmk=X,100,L
+
+!擔保品編號
+#FdClNo=X,2,L
+#ClNoX=X,15,L
+
+!計息期間
+#FdIntDate=X,2,L
+#IntStartDate=D,7,L
+#IntEndDate=D,7,L
+
+#Principal=m,14.2,S
+E(0,@Principal,#L3r11Principal)
+
+#PrincipalX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Principal,#PrincipalX)
+
+#Interest=m,14.2,S
+E(0,@Interest,#L3r11Interest)
+
+#InterestX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Interest,#InterestX)
+
+#DelayInt=m,14.2,S
+E(0,@DelayInt,#L3r11DelayInt)
+
+#DelayIntX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#DelayInt,#DelayIntX)
+
+#BreachAmt=m,14.2,S
+E(0,@BreachAmt,#L3r11BreachAmt)
+
+#BreachAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#BreachAmt,#BreachAmtX)
+
+#Shortfall=m,14.2,S
+E(0,@Shortfall,#L3r11Shortfall)
+
+#ShortfallX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Shortfall,#ShortfallX)
+
+
+#ShortfallInt=m,14.2,S
+E(0,@ShortfallInt,#L3r11ShortfallInt)
+
+#ShortfallIntX=X,22,S
+CALL2(#ADJUSTDOT,#Precision,#ShortfallInt,#ShortfallIntX)
+
+#ShortfallIntXX=X,28,S
+T(2,#WKINTX+#ShortfallIntX)
+P(R,#ShortfallIntXX)
+
+#ShortfallPrin=m,14.2,S
+E(0,@ShortfallPrin,#L3r11ShortfallPrin)
+
+#ShortfallPrinX=X,22,S
+CALL2(#ADJUSTDOT,#Precision,#ShortfallPrin,#ShortfallPrinX)
+P(L,#ShortfallPrinX)
+
+
+#ShortfallPrinXX=X,27,S
+T(2,#WKPRIX+#ShortfallPrinX)
+P(L,#ShortfallPrinXX)
+
+
+#ShortCloseBreach=m,14.2,S
+E(0,@ShortCloseBreach,#L3r11ShortCloseBreach)
+
+#ShortCloseBreachAmtX=X,22,S
+CALL2(#ADJUSTDOT,#Precision,#ShortCloseBreach,#ShortCloseBreachAmtX)
+
+
+#ShortCloseBreachAmtXX=X,33,S
+T(2,#WKCBX+#ShortCloseBreachAmtX)
+P(L,#ShortCloseBreachAmtXX)
+
+
+#ShortfallXX=X,90,L
+T(B,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachAmtXX+#WKBRAX)
+P(L,#ShortfallXX)
+
+
+
+#Excessive=m,14.2,S
+E(0,@Excessive,#L3r11Excessive)
+
+#ExcessiveX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+
+
+#LawFee=m,14.2,S
+E(0,@LawFee,#L3r11LawFee)
+
+#LawFeeX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#LawFee,#LawFeeX)
+
+#FireFee=m,14.2,S
+E(0,@FireFee,#L3r11FireFee)
+
+#FireFeeX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#FireFee,#FireFeeX)
+
+
+#AcctFee=m,14.2,S
+E(0,@AcctFee,#L3r11AcctFee)
+
+#AcctFeeX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#AcctFee,#AcctFeeX)
+
+#ModifyFee=m,14.2,S
+E(0,@ModifyFee,#L3r11ModifyFee)
+
+#ModifyFeeX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#ModifyFee,#ModifyFeeX)
+
+
 
 #WKREM5=X,1,S
 
@@ -545,6 +761,22 @@ C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 #OOClCode2=A,2,S
 #OOClNo=A,7,S
 #OOSeq=X,8,S
+
+!----------------保證人保證資料----------------
+
+##loop{times:20,l:0,n:1,m:2}
+#CustNo{n}=A,7,L
+#HighGuaAmt{n}=+m,14,L
+#GuaAmt{n}=+m,14,L
+#CustName{n}=x,40,L
+#CustStat{n}=A,2,L
+#CustStatX{n}=X,10,L
+#PayIntDate{n}=D,7,L
+#PayIntDateX{n}=X,10,L
+##end
+
+!---------------------------------------------
+
 
 #NTXBUF1=X,25,S
 C(3,#FunCode,2,$,S)
@@ -566,12 +798,23 @@ IF(#FunCode == 2,ASGN(NTXCD$),$)
 <include src="ROM.icf::L2R01.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
-<include src="ROM.icf::L2R32.dec"/>
 <include src="ROM.icf::L2R36.dec"/>
+<include src="ROM.icf::L2R64.dec"/>
 <include src="ROM.icf::L3R07.dec"/>
 <include src="ROM.icf::L3R11.dec"/>
 </sub>
 
+<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+[
+["<font color=red>@保證人保證資料"],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[70,70,120,120,120,120,120,], p_cols:[5,15,15,15,15,15,15]}","","",
+["被保人","最高保證金額","目前保證總額","戶名","戶況","繳息迄日"],
+[[#CustNo1],[#HighGuaAmt1],[#GuaAmt1],[#CustName1],[#CustStatX1],[#PayIntDateX1]],
+],
+]
+
+
+</sub>
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
@@ -624,6 +867,7 @@ K(LIGHT,#CloseNo,TXTRED,0,1)
 #ReceiveDate
 #Rmk1
 #RpFg
+#PostAddress
 #OOClCode1
 #OOClCode2
 #OOClNo
@@ -641,8 +885,8 @@ TXFORM=L2631
 <include src="ROM.icf::L2R01.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
-<include src="ROM.icf::L2R32.tom"/>
 <include src="ROM.icf::L2R36.tom"/>
+<include src="ROM.icf::L2R64.tom"/>
 <include src="ROM.icf::L3R07.tom"/>
 <include src="ROM.icf::L3R11.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -659,8 +903,6 @@ TXFORM=L2631
 </sub>
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-
-
 <include src="PRT.icf::UPD01.sel"/>
 <include src="PRT.icf::FM01.sel"/>
 <include src="PRT.icf::FMR01.sel"/>

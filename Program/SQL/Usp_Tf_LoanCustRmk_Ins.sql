@@ -38,7 +38,7 @@ BEGIN
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
          , S1."TRXDAT"                    AS "AcDate"              -- 會計日期 DECIMALD 8
          , S1."DOCSEQ"                    AS "RmkNo"               -- 備忘錄序號 DECIMAL 3 
-         , '301'                          AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
+         , ''                             AS "RmkCode"             -- 備忘錄代碼 VARCHAR2 3
          , S1."DOCTXT"                    AS "RmkDesc"             -- 備忘錄說明 NVARCHAR2 120 
          , CASE
              WHEN S1."TRXDAT" > 0

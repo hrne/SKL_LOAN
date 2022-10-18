@@ -88,6 +88,7 @@ public class Cs70UpDBS extends CommBuffer {
 		txAuthorize.setEntdy(entdy);
 		txAuthorize.setTxcd(txcd);
 		txAuthorize.setTxSeq(txSeq);
+		txAuthorize.setMrKey(this.titaVo.getMrKey().trim());
 
 		try {
 			txAuthorize.setReasonFAJson(new ObjectMapper().configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true).writeValueAsString(reasonLi));

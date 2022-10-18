@@ -191,7 +191,7 @@ public class L4101Batch extends TradeBuffer {
 		// 更新批號
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		for (BankRemit tBankRemit : lBankRemit) {
-			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(iAcDate,
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(iAcDate + 19110000,
 					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), 0, Integer.MAX_VALUE,
 					titaVo);
 			if (slAcDetail != null) {

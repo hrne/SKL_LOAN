@@ -79,7 +79,7 @@ CloseReasonCode 需左補0 (2)
           ,''                             AS "TelNo3"              -- 連絡電話3 VARCHAR2 15 0
           ,E."TRXIDT"                     AS "EntryDate"           -- 入帳日期 DECIMALD 8 0
           ,''                             AS "AgreeNo"             -- 塗銷同意書編號 VARCHAR2 10 0
-          ,0                              AS "DocNo"               -- 公文編號 DECIMALD 7 0
+          ,0                              AS "DocNo"               -- 公文編號 DECIMAL 7 0
           ,u''                            AS "ClsNo"               -- 銷號欄 NVARCHAR2 18 0
           ,E."NGRRMK40"                   AS "Rmk"                 -- 備註 NVARCHAR2 100 0
           ,0                              AS "ClCode1"
@@ -91,6 +91,7 @@ CloseReasonCode 需左補0 (2)
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
           ,''                             AS "PostAddress"
+          ,0                              AS "DocNoE"              -- 公文編號(迄) DECIMAL 4 0
     FROM "LN$ENDP" E
     LEFT JOIN "LA$APLP" APLP ON APLP."LMSACN" = E."LMSACN"
                             AND APLP."LMSAPN" = E."LMSAPN"

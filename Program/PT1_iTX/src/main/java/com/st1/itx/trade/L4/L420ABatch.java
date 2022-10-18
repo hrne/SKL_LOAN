@@ -132,7 +132,8 @@ public class L420ABatch extends TradeBuffer {
 		this.batchTransaction.commit();
 
 		// findAll 整批入帳明細檔
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4002AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4002AEq(iAcDate, iBatchNo, this.index,
+				Integer.MAX_VALUE);
 
 		doCheckAll(true, iReconCode, slBatxDetail, titaVo);
 
@@ -147,14 +148,16 @@ public class L420ABatch extends TradeBuffer {
 
 		// end
 		this.batchTransaction.commit();
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getEntDyI() + "0" + tBatxHead.getTitaTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+				titaVo.getEntDyI() + "0" + tBatxHead.getTitaTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
 
 		// 匯款轉帳檢核明細表
 		if (l4211MapList.size() > 0) {
 			// 產生匯款轉帳檢核明細表
 			l4211Report.setParentTranCode("L420A");
 			l4211Report.execWithBatchMapList(l4211MapList, titaVo);
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L420A", "L420A-匯款轉帳檢核明細表", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L420A", "L420A-匯款轉帳檢核明細表", titaVo);
 		}
 		return null;
 
@@ -169,7 +172,8 @@ public class L420ABatch extends TradeBuffer {
 	 * @param titaVo       TitaVo
 	 * @throws LogicException ....
 	 */
-	public void doCheckAll(boolean isCommit, String iReconCode, Slice<BatxDetail> slBatxDetail, TitaVo titaVo) throws LogicException {
+	public void doCheckAll(boolean isCommit, String iReconCode, Slice<BatxDetail> slBatxDetail, TitaVo titaVo)
+			throws LogicException {
 		this.info("doCheckAll .....");
 
 		mergeCnt = new HashMap<>();
@@ -181,12 +185,15 @@ public class L420ABatch extends TradeBuffer {
 		if (slBatxDetail != null) {
 			for (BatxDetail t : slBatxDetail.getContent()) {
 				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
-					if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode()) || "7".equals(t.getProcStsCode())) {
+					if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
+							|| "7".equals(t.getProcStsCode())) {
 					}
-					if ("0".equals(t.getProcStsCode()) || "2".equals(t.getProcStsCode()) || "3".equals(t.getProcStsCode()) || "4".equals(t.getProcStsCode())) {
+					if ("0".equals(t.getProcStsCode()) || "2".equals(t.getProcStsCode())
+							|| "3".equals(t.getProcStsCode()) || "4".equals(t.getProcStsCode())) {
 						batxDetailService.holdById(t);
 						// 批次作業期間已人工入帳或轉帳收，不處理
-						if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode()) || "7".equals(t.getProcStsCode())) {
+						if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
+								|| "7".equals(t.getProcStsCode())) {
 							continue;
 						}
 						this.tTempVo = new TempVo();
@@ -198,8 +205,10 @@ public class L420ABatch extends TradeBuffer {
 						t.setProcNote(tTempVo.getJsonString());
 						lBatxDetail.add(t);
 						// 匯款轉帳同戶號多筆檢核放 00-未定 01-期款 02-部分還本 03-結案 09-其他
-						if (t.getRepayCode() == 1 && (t.getRepayType() <= 3 || t.getRepayType() == 9) && t.getCustNo() != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-							mapKey = parse.IntegerToString(t.getCustNo(), 7) + parse.IntegerToString(t.getRepayType(), 2);
+						if (t.getRepayCode() == 1 && (t.getRepayType() <= 3 || t.getRepayType() == 9)
+								&& t.getCustNo() != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+							mapKey = parse.IntegerToString(t.getCustNo(), 7)
+									+ parse.IntegerToString(t.getRepayType(), 2);
 							if (mergeAmt.containsKey(mapKey)) {
 								mergeCnt.put(mapKey, mergeCnt.get(mapKey) + 1);
 								mergeAmt.put(mapKey, mergeAmt.get(mapKey).add(t.getRepayAmt()));
@@ -289,7 +298,8 @@ public class L420ABatch extends TradeBuffer {
 				this.info("L2 BatxDetail=" + tDetail.toString());
 				this.tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tDetail.getProcNote());
-				mapKey = parse.IntegerToString(tDetail.getCustNo(), 7) + parse.IntegerToString(tDetail.getRepayType(), 2);
+				mapKey = parse.IntegerToString(tDetail.getCustNo(), 7)
+						+ parse.IntegerToString(tDetail.getRepayType(), 2);
 				mergeSeq++;
 				tTempVo.putParam("MergeCnt", mergeCnt.get(mapKey));
 				tTempVo.putParam("MergeAmt", mergeAmt.get(mapKey));
@@ -316,7 +326,8 @@ public class L420ABatch extends TradeBuffer {
 	}
 
 	// 更新同步更新同戶號檢核狀態
-	private void doMergeUpdate(boolean isCommit, int iRepayType, String iProcStsCode, TitaVo titaVo) throws LogicException {
+	private void doMergeUpdate(boolean isCommit, int iRepayType, String iProcStsCode, TitaVo titaVo)
+			throws LogicException {
 		// 任一筆 1.<檢核錯誤> 非成功=> 2:人工處理
 		// 還款類別不同需重新檢核((合併總額不同)
 		// 還款類別為結案則全部為結案(結案收全部費用)
@@ -387,7 +398,8 @@ public class L420ABatch extends TradeBuffer {
 		// 檢核正常
 		if ("4".equals(tDetail.getProcStsCode())) {
 			for (BaTxVo baTxVo : iBatxList) {
-				if (baTxVo.getTxAmt().add(baTxVo.getAcAmt()).add(baTxVo.getUnpaidInt()).add(baTxVo.getUnpaidPrin()).compareTo(BigDecimal.ZERO) == 0) {
+				if (baTxVo.getTxAmt().add(baTxVo.getAcAmt()).add(baTxVo.getUnpaidInt()).add(baTxVo.getUnpaidPrin())
+						.compareTo(BigDecimal.ZERO) == 0) {
 					continue;
 				}
 				facAcctCode = baTxVo.getFacAcctCode().trim();
@@ -419,7 +431,8 @@ public class L420ABatch extends TradeBuffer {
 		da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 		da.put("TxAmt", "" + baTxVo.getTxAmt());
 		da.put("AcctAmt", "" + baTxVo.getAcAmt().add(baTxVo.getOverflow().subtract(baTxVo.getTempAmt())));
-		da.put("CustNo", parse.IntegerToString(tDetail.getCustNo(), 7) + "-" + parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
+		da.put("CustNo", parse.IntegerToString(tDetail.getCustNo(), 7) + "-"
+				+ parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
 		da.put("PaidTerms", baTxVo.getPaidTerms() > 0 ? "" + baTxVo.getPaidTerms() : "");
 		da.put("CustName", custName);
 		da.put("CloseReasonCode", tTempVo.getParam("CloseReasonCode"));
@@ -429,7 +442,8 @@ public class L420ABatch extends TradeBuffer {
 																															// 本金(A)
 		da.put("Interest", "" + baTxVo.getInterest().add(baTxVo.getShortFallInt()).subtract(baTxVo.getUnpaidInt())); // 利息(B)
 		da.put("TempPayAmt", "0"); // 暫付款(C)
-		da.put("BreachAmt", "" + baTxVo.getDelayInt().add(baTxVo.getBreachAmt()).add(baTxVo.getCloseBreachAmt()).add(baTxVo.getShortFallCloseBreach())); // 違約金(D)
+		da.put("BreachAmt", "" + baTxVo.getDelayInt().add(baTxVo.getBreachAmt()).add(baTxVo.getCloseBreachAmt())
+				.add(baTxVo.getShortFallCloseBreach())); // 違約金(D)
 		da.put("TempDr", "" + baTxVo.getTempAmt()); // 暫收借(E)
 		da.put("TempCr", "" + baTxVo.getOverflow()); // 暫收貸(F)
 		da.put("Shortfall", "" + baTxVo.getUnpaidPrin().add(baTxVo.getUnpaidInt())); // 短繳(G)
@@ -470,8 +484,10 @@ public class L420ABatch extends TradeBuffer {
 			da.put("RepayAmt", "" + tDetail.getRepayAmt());
 			da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 			da.put("TxAmt", "" + tDetail.getRepayAmt());
-			da.put("AcctAmt", "" + "0");
-			da.put("CustNo", parse.IntegerToString(tDetail.getCustNo(), 7) + "-" + parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
+			da.put("AcctAmt", "" + tDetail.getRepayAmt());
+			da.put("CustNo",
+					parse.IntegerToString(tDetail.getCustNo(), 7) + "-" + parse.IntegerToString(baTxVo.getFacmNo(), 3)
+							+ "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
 			da.put("PaidTerms", "");
 			da.put("CustName", custName);
 			da.put("CloseReasonCode", "");
@@ -487,7 +503,8 @@ public class L420ABatch extends TradeBuffer {
 			da.put("Fee", "0"); // 帳管費及其他(H) );
 			da.put("AcDate", "" + tDetail.getAcDate());
 			da.put("TitaTlrNo", titaVo.getTlrNo());
-			da.put("TitaTxtNo", tDetail.getBatchNo().substring(4, 6) + parse.IntegerToString(tDetail.getDetailSeq(), 6));
+			da.put("TitaTxtNo",
+					tDetail.getBatchNo().substring(4, 6) + parse.IntegerToString(tDetail.getDetailSeq(), 6));
 			da.put("SortingForSubTotal", facAcctCode); // 配合小計產生的排序
 			da.put("AcctItem", facAcctItem);
 			da.put("RepayItem", "暫收");
@@ -506,7 +523,8 @@ public class L420ABatch extends TradeBuffer {
 	}
 
 	/* 更新作業狀態 */
-	private String updateHead(String iReconCode, BatxHead tHead, List<BatxDetail> lBatxDetail, TitaVo titaVo) throws LogicException {
+	private String updateHead(String iReconCode, BatxHead tHead, List<BatxDetail> lBatxDetail, TitaVo titaVo)
+			throws LogicException {
 // BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除		
 // this.procStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入 7.虛擬轉暫收
 		int manualCnt = 0; // 需人工處理, 2.人工處理

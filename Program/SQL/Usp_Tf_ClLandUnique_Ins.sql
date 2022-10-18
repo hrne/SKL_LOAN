@@ -37,6 +37,13 @@ BEGIN
     FROM "TmpLA$LGTP" S1
     ORDER BY S1."GroupNo"
             ,S1."LMSACN"
+            , CASE
+                WHEN S1."LoanBalTotal" != 0
+                THEN 0
+              ELSE 1 END -- 2022-06-13 Wei 未結案者優先
+            , S1."GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
+            , S1."LGTSAM" DESC
+            , S1."LoanBalTotal" DESC -- 2022-05-23 Wei 放款餘額越大者優先
             ,S1."LMSAPN"
             ,S1."GDRID1"
             ,S1."GDRID2"
@@ -58,7 +65,5 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_ClLandUnique_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
-
-
 
 /
