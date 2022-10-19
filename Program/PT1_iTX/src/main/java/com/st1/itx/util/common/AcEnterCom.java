@@ -225,7 +225,7 @@ public class AcEnterCom extends TradeBuffer {
 		if (slAcList != null) {
 			for (AcDetail ac : slAcList.getContent()) {
 				// 沖正及被沖正不loand
-				if (ac.getEntAc() <= 1) {
+				if ("0".equals(ac.getTitaHCode())) {
 					acList.add(ac);
 				}
 				// 分錄序號由已入帳交易續編
@@ -762,12 +762,13 @@ public class AcEnterCom extends TradeBuffer {
 		int slipBatNo = acList0.get(0).getSlipBatNo();
 		AcDetail acDetail = new AcDetail();
 		List<AcDetail> acList2 = new ArrayList<AcDetail>();
-		for (int i = acList0.size() - 1; i <= 0; i--) {
+		for (int i = acList0.size() - 1; i >= 0; i--) {
 			AcDetail ac = acList0.get(i);
 			ac.setTitaHCode("4"); // 訂正別 4:被沖正
 			acSeq++;
 			acDetail = new AcDetail();
 			moveAcDetail(ac, acDetail);
+			acDetail.setAcDate(ac.getAcDate());
 			acDetail.setSlipBatNo(slipBatNo);
 			acDetail.setAcSeq(acSeq);
 			if (ac.getDbCr().equals("D")) {
@@ -783,7 +784,7 @@ public class AcEnterCom extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E6003", "procAcHCode2 update " + e.getErrorMsg());
 		}
-		this.txBuffer.addAllAcDetailList(acList2);
+		this.txBuffer.setAcDetailList(acList2);
 
 		/* 產生會計分錄 */
 		acDetailCom.setTxBuffer(this.txBuffer);

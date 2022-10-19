@@ -102,230 +102,234 @@ public class L8443 extends TradeBuffer {
 			for(Map<String, String> isL8443 : sL8443) {
 				String iNotReportCount = isL8443.get("F0");
 				String iReportDate = isL8443.get("F1");
-
+				int iiReportDate = Integer.valueOf(iReportDate);
+				if( iiReportDate > 19110000 ) {
+					iiReportDate = iiReportDate-19110000;
+				}
+				
 				OccursList = new OccursList();	
 				
 	
 				switch (minCode) {
 				case "040":
 					OccursList.putParam("OOSubmitkey", "JcicZ040-前置協商受理申請暨請求回報債權通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "041":
 					OccursList.putParam("OOSubmitkey", "JcicZ041-協商開始暨停催通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "042":
 					OccursList.putParam("OOSubmitkey", "JcicZ042-回報無擔保債權金額資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "043":
 					OccursList.putParam("OOSubmitkey", "JcicZ043-回報有擔保債權金額資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "044":
 					OccursList.putParam("OOSubmitkey", "JcicZ044-請求同意債務清償方案通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "045":
 					OccursList.putParam("OOSubmitkey", "JcicZ045-回報是否同意債務清償方案資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "046":
 					OccursList.putParam("OOSubmitkey", "JcicZ046-結案通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "047":
 					OccursList.putParam("OOSubmitkey", "JcicZ047-金融機構無擔保債務協議資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "048":
 					OccursList.putParam("OOSubmitkey", "JcicZ048-債務人基本資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "049":
 					OccursList.putParam("OOSubmitkey", "JcicZ049-債務清償方案法院認可資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "050":
 					OccursList.putParam("OOSubmitkey", "JcicZ050-債務人繳款資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "051":
 					OccursList.putParam("OOSubmitkey", "JcicZ051-延期繳款（喘息期）資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "052":
 					OccursList.putParam("OOSubmitkey", "JcicZ052-前置協商相關資料報送例外處理");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "053":
 					OccursList.putParam("OOSubmitkey", "JcicZ053-同意報送例外處裡檔案");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "054":
 					OccursList.putParam("OOSubmitkey", "JcicZ054-單獨全數受清償資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "055":
 					OccursList.putParam("OOSubmitkey", "JcicZ055-更生案件通報資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "056":
 					OccursList.putParam("OOSubmitkey", "JcicZ056-清算案件通報資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "060":
 					OccursList.putParam("OOSubmitkey", "JcicZ060-前置協商受理變更還款條件申請暨請求回報剩餘債權通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "061":
 					OccursList.putParam("OOSubmitkey", "JcicZ061-回報協商剩餘債權金額資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "062":
 					OccursList.putParam("OOSubmitkey", "JcicZ062-金融機構無擔保債務變更還款條件協議資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "063":
 					OccursList.putParam("OOSubmitkey", "JcicZ063-變更還款方案結案通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "440":
 					OccursList.putParam("OOSubmitkey", "JcicZ440-前置調解受理申請暨請求回報債權通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "442":
 					OccursList.putParam("OOSubmitkey", "JcicZ442-前置調解回報無擔保債權金額資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "443":
 					OccursList.putParam("OOSubmitkey", "JcicZ443-前置調解回報有擔保債權金額資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "444":
 					OccursList.putParam("OOSubmitkey", "JcicZ444-前置調解債務人基本資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "446":
 					OccursList.putParam("OOSubmitkey", "JcicZ446-前置調解結案通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "447":
 					OccursList.putParam("OOSubmitkey", "JcicZ447-前置調解金融機構無擔保債務協議資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "448":
 					OccursList.putParam("OOSubmitkey", "JcicZ448-前置調解無擔保債務分配資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "450":
 					OccursList.putParam("OOSubmitkey", "JcicZ450-前置調解債務人繳款資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "451":
 					OccursList.putParam("OOSubmitkey", "JcicZ451-前置調解延期繳款資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "454":
 					OccursList.putParam("OOSubmitkey", "JcicZ454-前置調解單獨全數受清償資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "570":
 					OccursList.putParam("OOSubmitkey", "JcicZ570-受理更生款項統一收付通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "571":
 					OccursList.putParam("OOSubmitkey", "JcicZ571-更生款項統一收付回報債權資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "572":
 					OccursList.putParam("OOSubmitkey", "JcicZ572-更生款項統一收款及撥付款項分配表資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "573":
 					OccursList.putParam("OOSubmitkey", "JcicZ573-更生債務人繳款資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "574":
 					OccursList.putParam("OOSubmitkey", "JcicZ574-更生款項統一收付結案通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;
 				case "575":
 					OccursList.putParam("OOSubmitkey", "JcicZ575-債權金額異動通知資料");
-					OccursList.putParam("OOReportDate", iReportDate);
+					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
 
 					break;

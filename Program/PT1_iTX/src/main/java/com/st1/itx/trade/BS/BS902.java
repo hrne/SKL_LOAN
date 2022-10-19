@@ -24,7 +24,7 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 /**
- * 新增應處理明細－聯貸費用攤提（月初日） <br>
+ * 新增應處理明細－企金費用攤提（月初日） <br>
  * 執行時機：日始作業，應處理清單維護(BS001)自動執行 <br>
  * 
  * @author Lai
@@ -52,13 +52,15 @@ public class BS902 extends TradeBuffer {
 
 		txToDoCom.setTxBuffer(this.txBuffer);
 
+
 		// 取本年月份
 		int entryDateMm = this.txBuffer.getMgBizDate().getTbsDy() / 100;
 
 		// find data
 		// SL 聯貸費用
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 5, "SL" + "%", 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useBs902Eq(0, 9999999, 0, 5, "SL" + "%", 0,
+				Integer.MAX_VALUE, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		// data size > 0 -> 新增應處理明細
@@ -76,7 +78,8 @@ public class BS902 extends TradeBuffer {
 //				相同月份與小於本月份資料寫入應處理清單
 				this.info("rv.getRvNo().length()" + rv.getRvNo().length());
 				this.info("rv.getRvNo().substring(10, 15)" + rv.getRvNo().substring(10, 15));
-				if (rv.getRvNo().length() > 10 && parse.stringToInteger(rv.getRvNo().substring(10, 15)) <= entryDateMm) { // SL-XX-000-YYYMM
+				if (rv.getRvNo().length() > 10
+						&& parse.stringToInteger(rv.getRvNo().substring(10, 15)) <= entryDateMm) { // SL-XX-000-YYYMM
 					tTxToDoDetail = new TxToDoDetail();
 					TempVo tTempVo = new TempVo();
 					tTempVo.clear();

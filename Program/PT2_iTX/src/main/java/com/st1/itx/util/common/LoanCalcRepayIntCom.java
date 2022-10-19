@@ -491,9 +491,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				if ("1".equals(iIntCalcCode)) {
 					wkTerms = 1;
 					wkProcessCode = 1;
-					if (wkIntEndDate > iNextPayIntDate) {
-						wkIntEndDate = iNextPayIntDate;
-					}
+					wkIntEndDate = iNextPayIntDate;
 					this.info("specifyPayTermsRoutine-0");
 					specifyTermsRoutine();
 				} else {
@@ -827,7 +825,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("specifyTermsRateRoutine ... ");
 		this.info("   wkTermIndex = " + wkTermIndex + " wkTerms = " + wkTerms);
 		this.info("   wkProcessCode     = " + wkProcessCode);
-		this.info("   wkIntStartDate    = " + wkIntStartDate);
+		this.info("   wkIntStartDate/wkIntEndDate = " + wkIntStartDate + "/" + wkIntEndDate);
 		this.info("   isFirstTermMonth  = " + isFirstTermMonth);
 		this.info("   wkSpecificDate    = " + wkSpecificDate + ", wkSpecificMons=" + wkSpecificMons);
 		switch (wkProcessCode) {

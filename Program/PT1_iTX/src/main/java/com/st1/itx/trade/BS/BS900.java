@@ -102,6 +102,16 @@ public class BS900 extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 		iAcDate = this.getTxBuffer().getMgBizDate().getTmnDy();
+		// 0.檢核本月是否已入帳 /
+		this.info("2.bs900 delete ACCL01");
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 2, 2, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slTxToDoDetail != null) {
+			this.addList(this.totaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "本月利息提存已入帳，請執行訂正", titaVo);
+			return this.sendList();
+		}
+
 		// 迴轉上個月底日
 		iAcDateReverse = this.getTxBuffer().getMgBizDate().getLmnDy();
 		this.info("iAcDateReverse=" + iAcDateReverse);
@@ -124,7 +134,7 @@ public class BS900 extends TradeBuffer {
 
 		// 2.刪除處理清單檔 ACCL01-應收利息提存入帳 //
 		this.info("2.bs900 delete ACCL01");
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index,
+		slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL01", 0, 3, this.index,
 				Integer.MAX_VALUE, titaVo);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
@@ -133,38 +143,11 @@ public class BS900 extends TradeBuffer {
 
 		this.batchTransaction.commit();
 
-		// 刪除提存當月AcDetal:98
-		this.info("2-1.bs900 delete AcDetal-98, yearMonth=" + yearMonth);
-		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 98, this.index,
-				Integer.MAX_VALUE, titaVo);
-		if (slAcDetail != null) {
-			lAcDetail = new ArrayList<AcDetail>();
-			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
-			try {
-				acDetailService.deleteAll(lAcDetail, titaVo); // delete AcDetail
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
-			}
-		}
-		// 刪除提存當月AcDetal:99
-		this.info("2-2.bs900 delete AcDetal-99, yearMonth=" + yearMonth);
-		Slice<AcDetail> tlAcDetail = acDetailService.findL9RptData(iAcDate + 19110000, 99, this.index,
-				Integer.MAX_VALUE, titaVo);
-		if (tlAcDetail != null) {
-			lAcDetail = new ArrayList<AcDetail>();
-			lAcDetail = tlAcDetail == null ? null : tlAcDetail.getContent();
-			try {
-				acDetailService.deleteAll(lAcDetail, titaVo); // delete AcDetail
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", "AcDetail delete " + e.getErrorMsg());
-			}
-		}
-
 		lTxToDoDetail = new ArrayList<TxToDoDetail>();
 
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL01");
-		slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index, Integer.MAX_VALUE,
+		Slice<AcDetail> slAcDetail = acDetailService.findL9RptData(iAcDateReverse + 19110000, 99, this.index, Integer.MAX_VALUE,
 				titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {

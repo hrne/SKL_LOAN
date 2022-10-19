@@ -648,7 +648,7 @@ public class L4101Batch extends TradeBuffer {
 		l4101ReportE.setParentTranCode(parentTranCode);
 
 		// 撈資料組報表
-		l4101ReportE.exec(titaVo, iAcDate);
+		l4101ReportE.exec(titaVo, iAcDate + 19110000);
 
 		// 寫產檔記錄到TxReport
 		long rptNod = l4101ReportE.close();

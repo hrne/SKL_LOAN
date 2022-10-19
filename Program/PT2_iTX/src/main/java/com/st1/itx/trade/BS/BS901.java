@@ -24,6 +24,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("BS901")
@@ -60,6 +61,9 @@ public class BS901 extends TradeBuffer {
 
 	@Autowired
 	public GSeqCom gSeqCom;
+	
+	@Autowired
+	WebClient webClient;
 
 	private int iAcDate = 0;
 	private int iAcDateReverse = 0;
@@ -72,6 +76,15 @@ public class BS901 extends TradeBuffer {
 		int yearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100; // 提存年月
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		iAcDate = this.getTxBuffer().getMgBizDate().getTmnDy();
+		// 0.檢核本月是否已入帳 /
+		this.info("2.bs900 delete ACCL01");
+		slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL02", 2, 2, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slTxToDoDetail != null) {
+			this.addList(this.totaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "本月火險費提存已入帳，請執行訂正", titaVo);
+			return this.sendList();
+		}
 
 		// 未付火險費提存，月初日迴轉上月
 		if (this.txBuffer.getMgBizDate().getTbsDy() / 100 != this.txBuffer.getMgBizDate().getLbsDy() / 100) {

@@ -38,7 +38,8 @@ public class L8443ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L8442FindData");
 		this.info("txDate    = " + txDate);
 		String sql = "Select count(*) as \"F0\" , ";
-		sql += " \"OutJcicTxtDate\" "+ -19110000 +" as \"F1\"  ";
+		//sql += " \"OutJcicTxtDate\" "+ -19110000 +" as \"F1\"  ";
+		sql += " \"OutJcicTxtDate\"  as \"F1\"  ";
 		sql += " From \"" + table + "\" ";
 		sql += " where  ";
 		if (!"".equals(txDate)) {

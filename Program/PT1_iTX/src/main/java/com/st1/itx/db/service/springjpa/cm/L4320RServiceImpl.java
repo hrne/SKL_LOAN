@@ -50,7 +50,6 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 
 		this.info("l4320.findAll AdjDate=" + iAdjDate);
 
-		
 		String sql = "SELECT CC.\"CityItem\"    " // F0 鄉鎮區
 				+ "      , CA.\"AreaItem\"      " // F1 地區別
 				+ "      , BR.\"CustNo\"        " // F2 戶號
@@ -65,7 +64,7 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "      , BR.\"ProdNo\"        " // F11 利率代碼
 				+ "      , FP.\"ProdName\"      " // F12 利率名稱
 				+ "      , BR.\"PresentRate\"   " // F13 目前利率
-				+ "      , BR.\"RateIncr\"      " // F14 加碼值
+				+ "      , BR.\"ContrRateIncr\" " // F14 合約加碼值
 				+ "      , BR.\"ProposalRate\"  " // F15 擬調利率
 				+ "      , LN.\"DrawdownDate\"  " // F16 撥款日期
 				+ "      , LN.\"MaturityDate\"  " // F17 到期日

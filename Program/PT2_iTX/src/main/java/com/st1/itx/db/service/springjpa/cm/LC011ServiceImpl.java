@@ -68,7 +68,7 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "B.\"TranItem\" ";
 		sql += "FROM \"TxRecord\" A ";
 		sql += "LEFT JOIN \"TxTranCode\" B ON B.\"TranNo\" = A.\"TranNo\" ";
-		sql += "LEFT JOIN \"TxFlow\" F ON F.\"FlowNo\" = A.\"FlowNo\"  ";
+		sql += "LEFT JOIN \"TxFlow\" F ON F.\"FlowNo\" = A.\"FlowNo\"  AND f.\"Entdy\" = a.\"Entdy\" ";
 		if (iEntdySt > 0) {
 			sql += "WHERE A.\"Entdy\" >= :Entdy1 AND A.\"Entdy\" <= :Entdy2 ";
 		} else {

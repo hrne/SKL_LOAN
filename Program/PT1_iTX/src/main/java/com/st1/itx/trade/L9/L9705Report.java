@@ -125,6 +125,8 @@ public class L9705Report extends MakeReport {
 			this.openForm(titaVo, reportVo);
 //			this.open(titaVo, reportVo);
 
+			this.info("conditionCode = " + titaVo.get("CONDITION1"));
+
 			for (Map<String, String> r : l9705List) {
 
 				try {
@@ -145,6 +147,11 @@ public class L9705Report extends MakeReport {
 				}
 				if (r.get("RepayCode") != null) {
 					repayCode = r.get("RepayCode");
+				}
+
+				// 部分還本(4) facmNo 帶0
+				if (titaVo.get("CONDITION1") != null && "4".equals(titaVo.get("CONDITION1"))) {
+					facmNo = 0;
 				}
 
 				this.info("L9705 custNo=" + custNo);
@@ -202,7 +209,7 @@ public class L9705Report extends MakeReport {
 
 		// 關閉報表
 		cls = this.close();
-		
+
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 					titaVo.getParam("TLRNO"),
@@ -230,10 +237,12 @@ public class L9705Report extends MakeReport {
 			}
 		}
 
+		int count = c + 1;
+
 		String entdy = titaVo.getEntDy();
 
 		String conditionCode = "";
-		this.info("conditionCode = " + titaVo.get("CONDITION1"));
+
 		if (titaVo.get("CONDITION1") != null) {
 			conditionCode = titaVo.get("CONDITION1");
 		}
@@ -276,6 +285,7 @@ public class L9705Report extends MakeReport {
 
 		// 溢短繳
 		int excessive = dBaTxCom.getExcessive().intValue() - dBaTxCom.getShortfall().intValue();
+
 		// 帳管費 + 契變手續費
 		int acctFee = dBaTxCom.getAcctFee().intValue() + dBaTxCom.getModifyFee().intValue();
 		// 目前利率
@@ -426,6 +436,11 @@ public class L9705Report extends MakeReport {
 			printCm(14.5, y, String.format("%,d", LoanBal), "R");
 			// 暫付 所得稅
 			printCm(16.5, y, "0", "R");
+
+			if (count == 1) {
+				UnPaidAmt = UnPaidAmt + excessive;
+			}
+
 			// 應繳淨額
 			printCm(19, y, String.format("%,d", UnPaidAmt), "R");
 

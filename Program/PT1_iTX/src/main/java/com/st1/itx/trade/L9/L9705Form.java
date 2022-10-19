@@ -132,6 +132,12 @@ public class L9705Form extends MakeReport {
 				this.info("L9705Form = " + custNo + "-" + facmNo);
 				this.info("listBaTxVo.size = " + listBaTxVo.size());
 				this.info("listBaTxVo = " + listBaTxVo.toString());
+
+				// 溢短繳
+				int excessive = dBaTxCom.getExcessive().intValue() - dBaTxCom.getShortfall().intValue();
+				// 帳管費 + 契變手續費
+//				int acctFee = dBaTxCom.getAcctFee().intValue() + dBaTxCom.getModifyFee().intValue();
+
 				if (listBaTxVo.size() > 0) {
 					HashMap<Integer, BigDecimal> principal = new HashMap<>();
 					HashMap<Integer, BigDecimal> interest = new HashMap<>();
@@ -174,12 +180,12 @@ public class L9705Form extends MakeReport {
 							loanBal = loanBal.add(ba.getLoanBal());
 						}
 //					溢短繳 = 暫收款 - 短繳期金
-						if (ba.getDataKind() == 3) {
-							unPaidAmt = unPaidAmt.add(ba.getUnPaidAmt());
-						}
-						if (ba.getDataKind() == 1 && ba.getRepayType() == 1) {
-							unPaidAmt = unPaidAmt.subtract(ba.getUnPaidAmt());
-						}
+//						if (ba.getDataKind() == 3) {
+//							unPaidAmt = unPaidAmt.add(ba.getUnPaidAmt());
+//						}
+//						if (ba.getDataKind() == 1 && ba.getRepayType() == 1) {
+//							unPaidAmt = unPaidAmt.subtract(ba.getUnPaidAmt());
+//						}
 //					04.帳管費(總和)，含06.契變手續費
 						if (ba.getRepayType() == 4 || ba.getRepayType() == 6) {
 							acctFee = acctFee.add(ba.getUnPaidAmt());
@@ -196,6 +202,29 @@ public class L9705Form extends MakeReport {
 //						this.newPage();
 //					}
 //					cnt++;
+		
+					int tmpUnPaidAmt = 0;
+
+					if (excessive < 0) {
+						tmpUnPaidAmt = unPaidAmt.intValue() - excessive;
+						
+						excessive = 0;
+					} else {
+						if (unPaidAmt.intValue() > excessive) {
+							tmpUnPaidAmt = unPaidAmt.intValue() - excessive;
+							excessive = 0;
+						} else {
+							tmpUnPaidAmt = 0;
+							excessive = excessive - unPaidAmt.intValue();
+						}
+					}
+					unPaidAmt = new BigDecimal(tmpUnPaidAmt);
+					
+					// 只有第一筆需要sum
+					if (count != 1) {
+						unPaidAmt = BigDecimal.ZERO;
+						acctFee = BigDecimal.ZERO;
+					}
 
 					for (BaTxVo ba : listBaTxVo) {
 						this.info("getCustNo=" + ba.getCustNo());
@@ -234,6 +263,7 @@ public class L9705Form extends MakeReport {
 						bPrincipal = bPrincipal == null ? BigDecimal.ZERO : bPrincipal;
 						BigDecimal bInterest = interest.get(payIntDate);
 						bInterest = bInterest == null ? BigDecimal.ZERO : bInterest;
+
 						BigDecimal bSummry = bBreachAmt.add(bPrincipal).add(bInterest).subtract(unPaidAmt).add(acctFee);
 						this.info("bBreachAmt ..." + bBreachAmt);
 						this.info("bPrincipal ..." + bPrincipal);

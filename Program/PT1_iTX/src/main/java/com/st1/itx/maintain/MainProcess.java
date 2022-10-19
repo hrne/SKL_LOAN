@@ -198,6 +198,20 @@ public class MainProcess extends SysLogger {
 		if (this.txTeller != null)
 			this.titaVo.put(ContentName.empnm, this.txTeller.getTlrItem());
 
+		/* Lai 預做交易交易日期取代 */
+		if (this.titaVo.isSpanDy()) {
+			this.titaVo.putParam(ContentName.entdy, this.titaVo.getSpanDy());
+			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy());
+
+			TxRecord txRecord = txRecordService.findEntdyFirst(StaticTool.rocToBc(parse.stringToInteger(this.titaVo.getSpanDy())), titaVo.getTlrNo(), "00");
+			if (Objects.isNull(txRecord))
+				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
+			else
+				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9((parse.stringToInteger(txRecord.getTxSeq()) + 1) + "", 8));
+
+//			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy().substring(this.titaVo.getSpanDy().length() - 2, this.titaVo.getSpanDy().length()));
+		}
+
 		// 預設交易類別(0.查詢類別交易1.更新類別交易2.特殊類別交易)
 		if (this.titaVo.isTxcdInq())
 			txCom.setTxType(0);
@@ -364,20 +378,6 @@ public class MainProcess extends SysLogger {
 		if (this.titaVo.isEloan()) {
 			this.titaVo.putParam("TBSDY", this.txBuffer.getTxCom().getTbsdy());
 			this.titaVo.putParam("ENTDY", this.txBuffer.getTxCom().getTbsdy());
-		}
-
-		/* Lai 預做交易交易日期取代 */
-		if (this.titaVo.isSpanDy()) {
-			this.titaVo.putParam(ContentName.entdy, this.titaVo.getSpanDy());
-			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy());
-			
-			TxRecord txRecord = txRecordService.findEntdyFirst(StaticTool.rocToBc(parse.stringToInteger(this.titaVo.getSpanDy())), titaVo.getTlrNo(), "00");
-			if (Objects.isNull(txRecord))
-				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
-			else
-				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9((parse.stringToInteger(txRecord.getTxSeq()) + 1) + "", 8));
-			
-//			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy().substring(this.titaVo.getSpanDy().length() - 2, this.titaVo.getSpanDy().length()));
 		}
 
 		// eric 2020.6.6
