@@ -51,7 +51,8 @@ public class LD007Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LD007List) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD007", "房貸專員明細統計", "LD007房貸專員明細統計", "LD007房貸專員明細統計.xls", "房貸專員明細統計");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD007", "房貸專員明細統計", "LD007房貸專員明細統計",
+				"LD007房貸專員明細統計.xls", "房貸專員明細統計");
 
 		int row = 2;
 		BigDecimal total = BigDecimal.ZERO;
@@ -101,12 +102,13 @@ public class LD007Report extends MakeReport {
 				} // for
 				row++;
 			} // for
-			makeExcel.setValue(row, 10, total, "#,##0");
+			makeExcel.setFormula(row, 10, total, "SUBTOTAL(9,J2:J" + (row - 1) + ")", "#,##0");
+
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
-		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
 	}
 
 }

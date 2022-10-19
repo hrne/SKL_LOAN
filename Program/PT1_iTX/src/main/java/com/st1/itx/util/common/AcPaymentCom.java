@@ -23,14 +23,11 @@ import com.st1.itx.db.domain.BankRemitId;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.LoanCheque;
-import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.TxAmlLog;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.TxAmlLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.RemitFormVo;
@@ -107,7 +104,7 @@ public class AcPaymentCom extends TradeBuffer {
 		acNegCom.setTxBuffer(this.txBuffer);
 		loanCom.setTxBuffer(this.txBuffer);
 		baTxCom.setTxBuffer(this.txBuffer);
-		acDate = this.txBuffer.getTxCom().getTbsdy();
+		acDate = titaVo.getEntDyI();
 
 		this.acDetailList = new ArrayList<AcDetail>();
 
@@ -244,9 +241,10 @@ public class AcPaymentCom extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void remit(TitaVo titaVo) throws LogicException {
-		acDate = this.txBuffer.getTxCom().getTbsdy();
+		acDate = titaVo.getEntDyI();
 		titaTlrNo = this.txBuffer.getTxCom().getRelTlr();
 		titaTxtNo = String.format("%08d", this.txBuffer.getTxCom().getRelTno());
+
 		this.info("remit ..." + acDate + "-" + titaTlrNo + "-" + titaTxtNo);
 		for (int i = 1; i <= 5; i++) {
 			/* 若為撥款匯款，產生撥款匯款檔 BankRemit */
@@ -427,7 +425,7 @@ public class AcPaymentCom extends TradeBuffer {
 			batchNo = "RT";
 		}
 		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setAcDate(titaVo.getEntDyI());
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
 		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
@@ -446,7 +444,7 @@ public class AcPaymentCom extends TradeBuffer {
 
 	/* 搬BankRemit內容 */
 	private BankRemit moveTitaToBankRemit(int i, BankRemit tBankRemit, TitaVo titaVo) throws LogicException {
-		acDate = this.txBuffer.getTxCom().getTbsdy();
+		acDate = titaVo.getEntDyI();
 		titaTlrNo = this.txBuffer.getTxCom().getRelTlr();
 		titaTxtNo = String.format("%08d", this.txBuffer.getTxCom().getRelTno());
 		tBankRemit.setAcDate(acDate); /* 會計日期 DECIMAL(8) */
@@ -532,7 +530,7 @@ public class AcPaymentCom extends TradeBuffer {
 		BankRemit tBankRemit = new BankRemit();
 		BankRemitId tBankRemitId = new BankRemitId();
 
-		acDate = this.txBuffer.getTxCom().getTbsdy();
+		acDate = titaVo.getEntDyI();
 		titaTlrNo = this.txBuffer.getTxCom().getRelTlr();
 		titaTxtNo = String.format("%08d", this.txBuffer.getTxCom().getRelTno());
 		tBankRemitId.setAcDate(acDate);
@@ -550,7 +548,7 @@ public class AcPaymentCom extends TradeBuffer {
 			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_" + tBankRemit.getCustNo() + "_" + tBankRemit.getFacmNo() + "_"
 					+ tBankRemit.getBormNo());
 
-			remitForm.open(titaVo, remitformVo);
+			remitForm.open(titaVo, remitformVo, acDate);
 
 			remitformVo = new RemitFormVo();
 

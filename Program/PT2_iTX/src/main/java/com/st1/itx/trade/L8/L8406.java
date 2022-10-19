@@ -2,6 +2,7 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -51,7 +52,7 @@ public class L8406 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.totaVo.init(titaVo);
 		this.index = titaVo.getReturnIndex();
-		this.limit = 500;
+		this.limit = 1000;
 		Slice<JcicZ043> sJcicZ043 = null;
 		sJcicZ043 = sJcicZ043Service.findAll(index, limit, titaVo);
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
@@ -60,7 +61,8 @@ public class L8406 extends TradeBuffer {
 		this.info("sJcicZ043     = " + sJcicZ043.getSize());
 		if (sJcicZ043 != null) {
 			for (JcicZ043 xJcicZ043 : sJcicZ043) {
-				if ((iSubmitType == 1 && xJcicZ043.getOutJcicTxtDate() == 0) || (iSubmitType == 3 && xJcicZ043.getActualFilingDate() == 0)) {
+				if ((iSubmitType == 1 && xJcicZ043.getOutJcicTxtDate() == 0)
+						|| (iSubmitType == 3 && xJcicZ043.getActualFilingDate() == 0)) {
 					OccursList occursListB = new OccursList();
 					occursListB.putParam("OOChainTxCd", "L8304");
 					occursListB.putParam("OOHistoryTxCd", "L8034");

@@ -96,7 +96,6 @@ public class L3240 extends TradeBuffer {
 	private int iCustNo;
 	private int iFacmNo;
 	private int iEntryDate;
-	private int iIntStartDate;
 	private int iCaseCloseCode = 0;
 	private int wkBorxNo;
 	private int wkNewBorxNo;
@@ -232,13 +231,7 @@ public class L3240 extends TradeBuffer {
 		}
 		for (LoanBorTx tx : slLoanBorTx.getContent()) {
 			if (!tx.getTitaHCode().equals("0")) {
-				continue;
-			}
-			if (tx.getEntryDate() != iEntryDate) {
-				continue;
-			}
-			if (tx.getIntStartDate() != iIntStartDate) {
-				continue;
+				throw new LogicException(titaVo, "E0010", "非正常交易（轉換前資料）"); // 功能選擇錯誤
 			}
 			if (!tx.getCreateEmpNo().equals("999999")) {
 				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤

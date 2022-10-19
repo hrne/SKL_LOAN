@@ -36,10 +36,12 @@ public class LY002Report extends MakeReport {
 
 	}
 
+	// 估計總值
 	List<Map<String, Object>> mergeEva = new ArrayList<Map<String, Object>>();
 	Map<String, Object> mergeEvaMap = null;
 	int countEva = 1;
 
+	// 核貸金額
 	List<Map<String, Object>> mergeLine = new ArrayList<Map<String, Object>>();
 	Map<String, Object> mergeLineMap = null;
 	int countLine = 1;
@@ -58,39 +60,38 @@ public class LY002Report extends MakeReport {
 		String defaultExcel = "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx";
 		String defaultSheet = "表14-1";
 
-	
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
 
 		// 開啟報表
 
 		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
-	
+
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表",
 //				"LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
 
-		
-		
-		List<Map<String, String>> lY002List = null;		
+		List<Map<String, String>> lY002List = null;
 		// 年月底
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
-		
+
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
-				
-		makeExcel.setValue(1, 2, "新光人壽保險股份有限公司 " + rocYear + "年度(" + rocMonth + ")報表");
-		
+
+//		makeExcel.setValue(1, 2, "新光人壽保險股份有限公司 " + rocYear + "年度(" + rocMonth + ")報表");
+		makeExcel.setValue(2, 3, (rocYear + 1911) * 100 + rocMonth);
 
 		try {
 
+			// 各筆資料
 			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth, "N");
-			
+
 			makeExcel.setShiftRow(row, lY002List.size() + 4);
-			
+
 			eptExcel(lY002List);
-			
+
+			// 科目
 			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth, "Y");
-			
+
 			eptExcel(lY002List);
 
 		} catch (Exception e) {
@@ -99,122 +100,120 @@ public class LY002Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LY002ServiceImpl.exportExcel error = " + errors.toString());
 		}
-	
+
 		if (lY002List.size() == 0) {
-	
+
 			makeExcel.setValue(7, 3, "本日無資料");
 
 		}
 
 		makeExcel.close();
 
-
 		return true;
 
 	}
 
-	
-	private void eptExcel(List<Map<String, String>> lM054tLDVo) throws LogicException {
+	private void eptExcel(List<Map<String, String>> lY002tLDVo) throws LogicException {
 
 		String tempNo = "";
 		String memo = "";
 
-		for (Map<String, String> lM054Vo : lM054tLDVo) {
-			
+		for (Map<String, String> r : lY002tLDVo) {
+
 			// 項目(戶號+額度)
-			makeExcel.setValue(row, 1, lM054Vo.get("F25"), "C");
+			makeExcel.setValue(row, 1, r.get("F25"), "C");
 			// 放款代號(戶號)
-			makeExcel.setValue(row, 2, lM054Vo.get("F0"), "C");
+			makeExcel.setValue(row, 2, r.get("F0"), "C");
 			// 放款種類
-			makeExcel.setValue(row, 3, lM054Vo.get("F1"), "C");
+			makeExcel.setValue(row, 3, r.get("F1"), "C");
 			// 放款對象名稱
-			makeExcel.setValue(row, 4, lM054Vo.get("F2"), "L");
+			makeExcel.setValue(row, 4, r.get("F2"), "L");
 			// 放款對象關係人代碼
-			makeExcel.setValue(row, 5, lM054Vo.get("F3"), "C");
+			makeExcel.setValue(row, 5, r.get("F3"), "C");
 			// 利害關係人代碼
-			makeExcel.setValue(row, 6, lM054Vo.get("F4"), "C");
+			makeExcel.setValue(row, 6, r.get("F4"), "C");
 			// 是否為專案運用公共及社會福利事業投資
-			makeExcel.setValue(row, 7, lM054Vo.get("F5"), "C");
+			makeExcel.setValue(row, 7, r.get("F5"), "C");
 			// 是否為聯合貸款
-			makeExcel.setValue(row, 8, lM054Vo.get("F6"), "C");
+			makeExcel.setValue(row, 8, r.get("F6"), "C");
 			// 持有資產幣別
-			makeExcel.setValue(row, 9, lM054Vo.get("F7"), "C");
+			makeExcel.setValue(row, 9, r.get("F7"), "C");
 			// 放款日期
-			makeExcel.setValue(row, 10, lM054Vo.get("F8"), "C");
+			makeExcel.setValue(row, 10, r.get("F8"), "C");
 			// 到期日期
-			makeExcel.setValue(row, 11, lM054Vo.get("F9"), "C");
+			makeExcel.setValue(row, 11, r.get("F9"), "C");
 			// 放款年利率
-			makeExcel.setValue(row, 12, lM054Vo.get("F10"), "R");
+			makeExcel.setValue(row, 12, r.get("F10"), "R");
 			// 放款餘額
-			makeExcel.setValue(row, 13, new BigDecimal(lM054Vo.get("F11")), "#,##0");
+			makeExcel.setValue(row, 13, new BigDecimal(r.get("F11")), "#,##0");
 			// 應收利息
-			makeExcel.setValue(row, 14, new BigDecimal(lM054Vo.get("F12")), "#,##0");
+			makeExcel.setValue(row, 14, new BigDecimal(r.get("F12")), "#,##0");
 			// 擔保品設定順位
-			makeExcel.setValue(row, 15, lM054Vo.get("F13"), "C");
+			makeExcel.setValue(row, 15, r.get("F13"), "C");
 
 			// 擔保品估計總值
 			BigDecimal templineAmt = BigDecimal.ZERO;
-			BigDecimal f14 = new BigDecimal(lM054Vo.get("F14").toString());
+			BigDecimal f14 = new BigDecimal(r.get("F14").toString());
 			// decimal 等於0表示相同
 			if (templineAmt.compareTo(f14) == 0) {
 				templineAmt = BigDecimal.ZERO;
 			} else {
 				templineAmt = f14;
 			}
-			if (!tempNo.equals(lM054Vo.get("F0"))) {
+			if (!tempNo.equals(r.get("F0"))) {
 				makeExcel.setValue(row, 16, templineAmt, "#,##0");
 				// 擔保品核貸金額
-				makeExcel.setValue(row, 17, new BigDecimal(lM054Vo.get("F15")), "#,##0");
+				makeExcel.setValue(row, 17, new BigDecimal(r.get("F15")), "#,##0");
 			}
 
 			// 轉催收日期
-			makeExcel.setValue(row, 18, lM054Vo.get("F16"), "C");
+			makeExcel.setValue(row, 18, r.get("F16"), "C");
 			// 催收狀態
-			makeExcel.setValue(row, 19, lM054Vo.get("F17"), "C");
+			makeExcel.setValue(row, 19, r.get("F17"), "C");
 			// 催收狀態執行日期
-			makeExcel.setValue(row, 20, lM054Vo.get("F18"), "C");
+			makeExcel.setValue(row, 20, r.get("F18"), "C");
 
 			BigDecimal allowanceForLose = BigDecimal.ZERO;
 			// 備抵損失總額
 			// 參考報表中公式
-			if (lM054Vo.get("F20").equals("1")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.005"));
-			} else if (lM054Vo.get("F20").equals("2")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.02"));
-			} else if (lM054Vo.get("F20").equals("3")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.1"));
-			} else if (lM054Vo.get("F20").equals("4")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.5"));
-			} else if (lM054Vo.get("F20").equals("5")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11"));
+			if (r.get("F20").equals("1")) {
+				allowanceForLose = new BigDecimal(r.get("F11")).multiply(new BigDecimal("0.005"));
+			} else if (r.get("F20").equals("2")) {
+				allowanceForLose = new BigDecimal(r.get("F11")).multiply(new BigDecimal("0.02"));
+			} else if (r.get("F20").equals("3")) {
+				allowanceForLose = new BigDecimal(r.get("F11")).multiply(new BigDecimal("0.1"));
+			} else if (r.get("F20").equals("4")) {
+				allowanceForLose = new BigDecimal(r.get("F11")).multiply(new BigDecimal("0.5"));
+			} else if (r.get("F20").equals("5")) {
+				allowanceForLose = new BigDecimal(r.get("F11"));
 			}
 			makeExcel.setValue(row, 21, allowanceForLose.intValue(), "#,##0");
 
 			// 評估分類
-			makeExcel.setValue(row, 22, lM054Vo.get("F20"), "C");
+			makeExcel.setValue(row, 22, r.get("F20"), "C");
 
 			int ifrs9 = 0;
 			// IFRS9評估階段
 			// 參考報表中公式
-			if (Integer.valueOf(lM054Vo.get("F24")) >= 0 && Integer.valueOf(lM054Vo.get("F24")) < 30) {
+			if (Integer.valueOf(r.get("F24")) >= 0 && Integer.valueOf(r.get("F24")) < 30) {
 				ifrs9 = 1;
-			} else if (Integer.valueOf(lM054Vo.get("F24")) < 90) {
+			} else if (Integer.valueOf(r.get("F24")) < 90) {
 				ifrs9 = 2;
-			} else if (Integer.valueOf(lM054Vo.get("F24")) >= 90) {
+			} else if (Integer.valueOf(r.get("F24")) >= 90) {
 				ifrs9 = 3;
-			} else if (Integer.valueOf(lM054Vo.get("F24")) == -1) {
+			} else if (Integer.valueOf(r.get("F24")) == -1) {
 				ifrs9 = 2;
 			}
 			makeExcel.setValue(row, 23, ifrs9, "C");
 
 			ArrayList<String> mark = new ArrayList<String>();
-			if (lM054Vo.get("F22").length() > 1) {
-				mark.add(lM054Vo.get("F22"));
+			if (r.get("F22").length() > 1) {
+				mark.add(r.get("F22"));
 			}
-			if (lM054Vo.get("F23").length() > 1) {
-				mark.add(lM054Vo.get("F23"));
+			if (r.get("F23").length() > 1) {
+				mark.add(r.get("F23"));
 			}
-			if (tempNo.equals(lM054Vo.get("F0")) || lM054Vo.get("F0").length() != 8) {
+			if (tempNo.equals(r.get("F0")) || r.get("F0").length() != 8) {
 				mark.add("同一擔保品");
 			}
 
@@ -222,21 +221,19 @@ public class LY002Report extends MakeReport {
 				memo += mark.get(i) + "、";
 			}
 
-			tempNo = lM054Vo.get("F0");
+			tempNo = r.get("F0");
 			// 備註
 			makeExcel.setValue(row, 24, memo.length() > 0 ? memo.substring(0, memo.length() - 1) : memo, "C");
 			memo = "";
 			mark = null;
 
 			// 逾期天數
-			makeExcel.setValue(row, 25,
-					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
+			makeExcel.setValue(row, 25, Integer.valueOf(r.get("F24")) == -1 ? 0 : Integer.valueOf(r.get("F24")), "C");
 			row++;
 		}
 
 	}
-	
-	
+
 	/*
 	 * F0 戶號 F1 ID 統編或身分證 F2 客戶名稱 F3 利害關係人 F4 與本公司之關係 F5 放款種類 F6 放款科目 F7 放款年月日 F8
 	 * 放款到期年月日 F9 放款年利率% F10 付息方式 F11 最後腳昔日 F12 提供人代號(統編或身分證) F13 提供人姓名 F14 設定順位 F15

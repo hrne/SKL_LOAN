@@ -62,6 +62,7 @@ BEGIN
                 ELSE 0 END = 1
             -- RenewCode是否續保=2續保
             AND IR."RenewCode" = 2
+          GROUP BY IR."CustNo"
      )
      , loanBalData AS (
           SELECT ML."CustNo"

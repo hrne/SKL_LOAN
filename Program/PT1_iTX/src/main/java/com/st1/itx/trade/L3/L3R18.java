@@ -79,6 +79,7 @@ public class L3R18 extends TradeBuffer {
 		BigDecimal wkExtraCloseBreachAmt = BigDecimal.ZERO;
 		BigDecimal wkShortfall = BigDecimal.ZERO;
 		BigDecimal wkExcessive = BigDecimal.ZERO;
+		BigDecimal wkOverShort = BigDecimal.ZERO;
 
 		for (LoanBorTx t : sloanBorTx.getContent()) {
 			if (t.getFeeAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -99,7 +100,9 @@ public class L3R18 extends TradeBuffer {
 			wkBreachAmt = wkBreachAmt.add(t.getBreachAmt()); // 違約金
 			wkExtraCloseBreachAmt = wkExtraCloseBreachAmt.add(t.getCloseBreachAmt()); // 清償違約金
 			wkShortfall = wkShortfall.add(t.getShortfall()); // 累短收
-			wkExcessive = wkExcessive.add(t.getTempAmt()); // 累溢收
+			wkExcessive = wkExcessive.add(t.getTempAmt()); // 溢短收
+			wkOverShort = wkOverShort.add(t.getOverflow().subtract(t.getUnpaidCloseBreach())
+					.subtract(t.getUnpaidInterest()).subtract(t.getUnpaidPrincipal())); // 溢短收
 			OccursList occursList = new OccursList();
 			occursList.putParam("L3r18FacmNo", t.getFacmNo());
 			occursList.putParam("L3r18BormNo", t.getBormNo());
@@ -123,7 +126,8 @@ public class L3R18 extends TradeBuffer {
 		this.totaVo.putParam("L3r18ExtraCloseBreachAmt", wkExtraCloseBreachAmt);
 		this.totaVo.putParam("L3r18Shortfall", wkShortfall);
 		this.totaVo.putParam("L3r18Excessive", wkExcessive);
-
+		this.totaVo.putParam("L3r18OverShort", wkOverShort);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

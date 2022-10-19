@@ -1,5 +1,7 @@
 package com.st1.itx.maintain;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,8 +32,10 @@ import com.st1.itx.db.service.TxRecordService;
 
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.eum.ThreadVariable;
+import com.st1.itx.util.StaticTool;
 import com.st1.itx.util.common.AcEnterCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.parse.Parse;
 
@@ -134,7 +138,8 @@ public class MainProcess extends SysLogger {
 
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
-			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
+			// ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
+			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getTlrNo());
 
 			txBuffer.init(titaVo);
 			txTeller = tTxTeller;
@@ -192,6 +197,20 @@ public class MainProcess extends SysLogger {
 		// 交易員名稱
 		if (this.txTeller != null)
 			this.titaVo.put(ContentName.empnm, this.txTeller.getTlrItem());
+
+		/* Lai 預做交易交易日期取代 */
+		if (this.titaVo.isSpanDy()) {
+			this.titaVo.putParam(ContentName.entdy, this.titaVo.getSpanDy());
+			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy());
+
+			TxRecord txRecord = txRecordService.findEntdyFirst(StaticTool.rocToBc(parse.stringToInteger(this.titaVo.getSpanDy())), titaVo.getTlrNo(), "00");
+			if (Objects.isNull(txRecord))
+				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));
+			else
+				this.titaVo.putParam(ContentName.txtno, FormatUtil.pad9((parse.stringToInteger(txRecord.getTxSeq()) + 1) + "", 8));
+
+//			this.titaVo.putParam(ContentName.entdd, this.titaVo.getSpanDy().substring(this.titaVo.getSpanDy().length() - 2, this.titaVo.getSpanDy().length()));
+		}
 
 		// 預設交易類別(0.查詢類別交易1.更新類別交易2.特殊類別交易)
 		if (this.titaVo.isTxcdInq())
@@ -363,7 +382,7 @@ public class MainProcess extends SysLogger {
 
 		// eric 2020.6.6
 		int entdy = this.txBuffer.getTxBizDate().getTbsDy();
-		if (!this.titaVo.isTxcdSpecial() && Integer.valueOf(this.titaVo.getEntDy()) != entdy) {
+		if (!this.titaVo.isTxcdSpecial() && Integer.valueOf(this.titaVo.getEntDy()) != entdy && !this.titaVo.isSpanDy()) {
 			throw new LogicException("CE004", "會計日期(" + this.titaVo.getEntDy().trim() + ")與系統日期(" + entdy + ")不符，請重新登入系統");
 		}
 
@@ -461,7 +480,7 @@ public class MainProcess extends SysLogger {
 				if (tTxTeller.getEntdy() == 0)
 					tTxTeller.setEntdy(this.txBuffer.getMgBizDate().getTbsDy());
 
-				if (this.titaVo.getEntDyI() != tTxTeller.getEntdy())
+				if (this.titaVo.getEntDyI() != tTxTeller.getEntdy() && !this.titaVo.isSpanDy())
 					throw new LogicException("EC004", "櫃員本、次日作業模式不一致，,請重新登入系統");
 
 				if (tTxTeller.getLogonFg() != 1)

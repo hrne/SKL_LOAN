@@ -59,6 +59,7 @@ BEGIN
                   THEN 1
                 ELSE 0 END = 1
             AND FF."Fee" > 0
+          GROUP BY FF."CustNo"
      )
      , loanBalData AS (
           SELECT ML."CustNo"

@@ -98,7 +98,7 @@ public class L3250 extends TradeBuffer {
 	private int iCustNo;
 	private int iFacmNo;
 	private int iEntryDate;
-	private BigDecimal iTxAmt = BigDecimal.ZERO;
+	private BigDecimal iTempAmt = BigDecimal.ZERO;
 	private String iRvNo;
 	private String iAcctCode;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
@@ -124,6 +124,7 @@ public class L3250 extends TradeBuffer {
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
+		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
 		iRvNo = titaVo.getParam("RvNo");
 		iAcctCode = titaVo.getParam("AcctCode");
 		// Check Input
@@ -171,11 +172,11 @@ public class L3250 extends TradeBuffer {
 		}
 
 		// 暫收款銷帳(費用科目)
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) == 0) {
+		if (!iAcctCode.isEmpty()) {
 			acDetail = new AcDetail();
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(iAcctCode);
-			acDetail.setTxAmt(iTxAmt);
+			acDetail.setTxAmt(iTempAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setRvNo(iRvNo);
@@ -230,10 +231,7 @@ public class L3250 extends TradeBuffer {
 		}
 		for (LoanBorTx tx : slLoanBorTx.getContent()) {
 			if (!tx.getTitaHCode().equals("0")) {
-				continue;
-			}
-			if (tx.getEntryDate() != iEntryDate) {
-				continue;
+				throw new LogicException(titaVo, "E0010", "非正常交易（轉換前資料）"); // 功能選擇錯誤
 			}
 			if (!tx.getCreateEmpNo().equals("999999")) {
 				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
@@ -241,7 +239,9 @@ public class L3250 extends TradeBuffer {
 			wkRepayCode = tx.getRepayCode();
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
-			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
+			if (tx.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+				wkTxAmt = wkTxAmt.add(tx.getTxAmt());
+			}
 		}
 	}
 
@@ -251,7 +251,7 @@ public class L3250 extends TradeBuffer {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
 				this.info("InsuRenew=".toString());
 				if (tInsuRenew.getAcDate() > 0 && tInsuRenew.getTitaTxtNo().equals(titaVo.getOrgTno())
-						&& tInsuRenew.getTotInsuPrem().compareTo(iTxAmt) == 0) {
+						&& tInsuRenew.getTotInsuPrem().compareTo(iTempAmt) == 0) {
 					this.info("this.InsuRenew=".toString());
 					switch (tInsuRenew.getStatusCode()) {
 					case 0:
@@ -285,7 +285,7 @@ public class L3250 extends TradeBuffer {
 	private void UpdLoanOverDueEraseRoutine() throws LogicException {
 		this.info("UpdLoanOverDueEraseRoutine ...");
 
-		BigDecimal wkTempBal = iTxAmt;
+		BigDecimal wkTempBal = iTempAmt;
 		BigDecimal wkRepayAmt = BigDecimal.ZERO;
 		BigDecimal wkTotalRepayAmt = BigDecimal.ZERO;
 

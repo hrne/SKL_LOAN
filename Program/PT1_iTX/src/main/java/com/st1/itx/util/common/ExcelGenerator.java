@@ -314,6 +314,9 @@ public class ExcelGenerator extends CommBuffer {
 			case "9":
 				formulaCalculate(map);
 				break;
+			case "A":
+				setFormula(map);
+				break;
 			default:
 				// unknown type
 				break;
@@ -325,6 +328,78 @@ public class ExcelGenerator extends CommBuffer {
 		output();
 
 		this.info("MakeExcel finished.");
+	}
+
+	private void setFormula(Map<String, Object> map) throws LogicException {
+		int targetRow = 0;
+		int targetColumn = 0;
+		Object value = null;
+		String formula = "";
+		String format = "";
+		outputFontStyleVo = outputFontStyleVo.init();
+
+		targetRow = Integer.valueOf(map.get("r").toString());
+		targetColumn = Integer.valueOf(map.get("c").toString());
+		value = map.get("v");
+		formula = map.get("f").toString();
+		format = map.get("ft").toString();
+
+		outputFontStyleVo.setFormat(format);
+
+		if (outputFontStyleVo.equals(emptyFontStyleVo) && !isDefaultExcel) {
+			cellHasStyle = false;
+		} else {
+			cellHasStyle = true;
+		}
+
+		if (this.sheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)setValue sheet is null");
+		}
+
+		Row processingRow = this.sheet.getRow(targetRow - 1);
+		if (processingRow == null) {
+			processingRow = this.sheet.createRow(targetRow - 1);
+		}
+
+		int processingColumn = targetColumn - 1;
+
+		Row nowRow = processingRow;
+		if (formula == null) {
+			formula = "";
+		}
+
+		Cell cell = null;
+
+		cell = processingRow.getCell(processingColumn);
+		if (cell == null) {
+			cell = processingRow.createCell(processingColumn, CellType.NUMERIC);
+		}
+		BigDecimal bigDecValue = new BigDecimal(value.toString());
+		cell.setCellValue(bigDecValue.doubleValue());
+		cell.setCellFormula(formula);
+
+		if (needStyle && cellHasStyle) {
+			// 讀取原CellStyle設定寫進 outputFontStyleVo
+			CellStyle originalCellStyle = cell.getCellStyle();
+			cell.setCellStyle(setFontStyle(originalCellStyle, false));
+		}
+
+		// 取得當前表格內文字的高度，以文字高度去*1.5倍=適應文字的表格
+		// 預設表格高度16 預設文字高度(大小)12 表格/文字=1.33 取整1.5
+		float tempRH = (float) (this.workbook.getFontAt(cell.getCellStyle().getFontIndexAsInt()).getFontHeightInPoints()
+				* 1 * 1.5);
+		// 是否同一列
+		if (this.rowNum != nowRow.getRowNum()) {
+			this.rowNum = nowRow.getRowNum();
+			workRowHeight = tempRH;
+			nowRow.setHeightInPoints(workRowHeight);
+		} else {
+			if (workRowHeight < tempRH) {
+				workRowHeight = tempRH;
+				nowRow.setHeightInPoints(workRowHeight);
+			}
+		}
+
 	}
 
 	private void init() {
@@ -432,7 +507,8 @@ public class ExcelGenerator extends CommBuffer {
 
 		int indexOfBgColor = originalCellStyle.getFillBackgroundColor();
 
-		if (originalBgColor != null && !(originalBgColor instanceof HSSFColor) && indexOfBgColor > 0 && indexOfBgColor <= 64) {
+		if (originalBgColor != null && !(originalBgColor instanceof HSSFColor) && indexOfBgColor > 0
+				&& indexOfBgColor <= 64) {
 			IndexedColors bgColor = IndexedColors.fromInt(indexOfBgColor);
 			outputFontStyleVo.setBgColor(bgColor.toString());
 		}
@@ -592,7 +668,8 @@ public class ExcelGenerator extends CommBuffer {
 		} else {
 			// 否則,寫this.error,回傳第一個CellStyle
 			if (isFirstTimeToStyleLimit) {
-				this.error("setFontStyle error : CellStyle已超過" + limitOfCellStyle + ",不做Style設定,目前CellStyle數量為" + numOfCellStyle);
+				this.error("setFontStyle error : CellStyle已超過" + limitOfCellStyle + ",不做Style設定,目前CellStyle數量為"
+						+ numOfCellStyle);
 				isFirstTimeToStyleLimit = false;
 			}
 			return this.workbook.getCellStyleAt(0);
@@ -884,7 +961,8 @@ public class ExcelGenerator extends CommBuffer {
 
 		// 取得當前表格內文字的高度，以文字高度去*1.5倍=適應文字的表格
 		// 預設表格高度16 預設文字高度(大小)12 表格/文字=1.33 取整1.5
-		float tempRH = (float) (this.workbook.getFontAt(cell.getCellStyle().getFontIndexAsInt()).getFontHeightInPoints() * fontWrap * 1.5);
+		float tempRH = (float) (this.workbook.getFontAt(cell.getCellStyle().getFontIndexAsInt()).getFontHeightInPoints()
+				* fontWrap * 1.5);
 		// 是否同一列
 		if (this.rowNum != nowRow.getRowNum()) {
 			this.rowNum = nowRow.getRowNum();

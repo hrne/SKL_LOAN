@@ -120,7 +120,6 @@ public class L2634ReportD extends MakeReport {
 		this.info("exportExcel ... ");
 
 		// 設定字體1:標楷體 字體大小36
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634D", "雙掛號信封", "", "L2631D_雙掛號信封.pdf");
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634D", "雙掛號信封-整批列印", "", "A4", "L");
 
 		String custId = "";
@@ -138,7 +137,8 @@ public class L2634ReportD extends MakeReport {
 					continue;
 				}
 				this.info("CollectWayCode =" + tFacClose.getCollectWayCode());
-				if ("21".equals(tFacClose.getCollectWayCode()) || "26".equals(tFacClose.getCollectWayCode()) || "27".equals(tFacClose.getCollectWayCode())) {
+				if ("21".equals(tFacClose.getCollectWayCode()) || "26".equals(tFacClose.getCollectWayCode())
+						|| "27".equals(tFacClose.getCollectWayCode())) {
 					if (!isLast) {
 						this.info("C newPage");
 						this.newPage();
@@ -233,7 +233,8 @@ public class L2634ReportD extends MakeReport {
 				this.print(-11, 32, "【限定本人拆閱，若無此人，請寄回本公司】");
 				this.print(-13, 32, WkRegAddres); // 地址
 
-				this.print(-15, 41, "#" + StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "  " + custName + "  啟"); // 戶號戶名
+				this.print(-15, 41, "#" + StringUtils.leftPad(String.valueOf(tFacClose.getCustNo()), 7, "0") + "  "
+						+ custName + "  啟"); // 戶號戶名
 				this.print(-17, 39, "電話:" + telNo); // 電話
 
 			}
@@ -316,7 +317,8 @@ public class L2634ReportD extends MakeReport {
 		}
 	}
 
-	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	public int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo)
+			throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {

@@ -890,8 +890,8 @@ BEGIN
              THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate")
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
          -- 2022-07-13 Wei 新增 from Linda
-         , "Fn_GetUnpaidInsuFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate")
-           + "Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate")
+         , NVL("Fn_GetUnpaidInsuFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate") , 0)
+           + NVL("Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate"), 0)
                                            AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
          , CASE WHEN ML."LoanBalance" IS NULL OR ML1."LoanBalance" IS NULL THEN 0
                 WHEN NVL(ML."LoanBalance",0) <  NVL(ML1."LoanBalance",0)  THEN 0

@@ -257,17 +257,17 @@ TXFORM=L4031
 #any={detail:true, header:'L4031.part',width:1000, caption:'', rowNum:60, rowList:[20,40,60]}
 
 #OOLableAX=作業項目
-{width:200,align:'center'}
+{width:160,align:'center'}
 #OOLableBX=註記
-{width:320,align:'center'}
+{width:280,align:'center'}
 #OOBTN_TOTAL2=要處理
-{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
+{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:70}
 #OOBTN_Exec=
 {search:false,formatter:'cust:bind-button:#OOText_Exec',align:'center',canExport:false,width:90}
 #OOBTN_TOTAL3=待處理
-{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
+{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:70}
 #OOBTN_TOTAL1=總筆數
-{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
+{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:70}
 #OOStatusX=作業狀態
 {width:200,align:'center'}
 ^

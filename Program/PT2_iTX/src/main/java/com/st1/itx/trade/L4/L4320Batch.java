@@ -497,7 +497,7 @@ public class L4320Batch extends TradeBuffer {
 					dateUtil.init();
 					dateUtil.setDate_1(firstDrawdownDate);
 					if (firstDrawdownDate % 100 == dateUtil.getMonLimit()) {
-						isNextAdjDateMonthEnd = true;						
+						isNextAdjDateMonthEnd = true;
 					}
 					if (isNextAdjDateMonthEnd && firstDrawdownDate % 100 > sDate % 100) {
 						sDate = firstDrawdownDate;
@@ -605,16 +605,17 @@ public class L4320Batch extends TradeBuffer {
 				// 依地區別利率上、下限調整
 				if (rateProp.compareTo(cityRateCeiling) > 0) {
 					rateProp = cityRateCeiling;
-					warn = ", 高於地區上限, 地區別加減碼設定值:" + cityRateIncr;
+					warn = ", 高於地區上限" + cityRateIncr;
 				}
 				if (rateProp.compareTo(cityRateFloor) < 0) {
 					rateProp = cityRateFloor;
-					warn = ", 低於地區下限, 地區別加減碼設定值:" + cityRateIncr;
+					warn = ", 低於地區下限" + cityRateIncr;
 				}
 				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
 					rateProp = contractRate;
-					warn = ", 高於合約利率, 地區別加減碼設定值:" + cityRateIncr;
+					warn = ", 高於合約利率" + cityRateIncr;
 				}
+				warn += ", 地區別加減碼設定值:" + cityRateIncr;
 				warnMsg += warn;
 			}
 
@@ -730,7 +731,7 @@ public class L4320Batch extends TradeBuffer {
 		}
 
 		// 若利率變動且大於利率生效日
-		if (rateProp.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
+		if (adjCode < 3 && rateProp.compareTo(presentRate) != 0 && prevIntDate > effDateCurt) {
 			errorFlag = 1;
 			checkMsg += ", 上次繳息日大於利率生效日, 入帳日:" + entryDate;
 			if (adjCode == 1 || adjCode == 2) {

@@ -54,7 +54,8 @@ public class LD006Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lD006List) throws LogicException {
 		this.info("exportExcel ... ");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD006", "三階放款明細統計", "LD006三階放款明細統計", "LD006三階放款明細統計.xls", "三階放款明細統計");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD006", "三階放款明細統計", "LD006三階放款明細統計",
+				"LD006三階放款明細統計.xls", "三階放款明細統計");
 
 		// 有標題列，從第二列開始塞值
 		int row = 2;
@@ -77,12 +78,14 @@ public class LD006Report extends MakeReport {
 						break;
 					case 10: // K欄:撥款金額
 						total = total.add(getBigDecimal(tmpValue));
-						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue, "#,##0");
+						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue,
+								"#,##0");
 						break;
 					case 11: // L, M, N欄: 部室/區部/單位代號
 					case 12:
 					case 13:
-						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue, "L");
+						makeExcel.setValue(row, col, parse.isNumeric(tmpValue) ? getBigDecimal(tmpValue) : tmpValue,
+								"L");
 						break;
 					case 17: // 員工代號
 						makeExcel.setValue(row, col, tmpValue);
@@ -91,11 +94,14 @@ public class LD006Report extends MakeReport {
 						String manager = "";
 						if (!tLDVo.get("AgLevel0").isEmpty() && "H".equals(tLDVo.get("AgLevel0").substring(0, 1))) {
 							manager = tLDVo.get("ItName");
-						} else if (!tLDVo.get("AgLevel1").isEmpty() && "H".equals(tLDVo.get("AgLevel1").substring(0, 1))) {
+						} else if (!tLDVo.get("AgLevel1").isEmpty()
+								&& "H".equals(tLDVo.get("AgLevel1").substring(0, 1))) {
 							manager = tLDVo.get("ManagerName1");
-						} else if (!tLDVo.get("AgLevel2").isEmpty() && "H".equals(tLDVo.get("AgLevel2").substring(0, 1))) {
+						} else if (!tLDVo.get("AgLevel2").isEmpty()
+								&& "H".equals(tLDVo.get("AgLevel2").substring(0, 1))) {
 							manager = tLDVo.get("ManagerName2");
-						} else if (!tLDVo.get("AgLevel3").isEmpty() && "H".equals(tLDVo.get("AgLevel3").substring(0, 1))) {
+						} else if (!tLDVo.get("AgLevel3").isEmpty()
+								&& "H".equals(tLDVo.get("AgLevel3").substring(0, 1))) {
 							manager = tLDVo.get("ManagerName3");
 						}
 						makeExcel.setValue(row, col, manager);
@@ -113,13 +119,13 @@ public class LD006Report extends MakeReport {
 
 				row++;
 			} // for
-			makeExcel.setValue(row, 11, total);
+			makeExcel.setFormula(row, 11, total, "SUBTOTAL(9,K2:K" + (row - 1) + ")", "#,##0");
 		} else {
 			this.info("LD006Report exportExcel ... 本日無資料");
 			makeExcel.setValue(row, 1, "本日無資料");
 		}
-		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
 	}
 
 }

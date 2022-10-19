@@ -8,16 +8,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,7 +82,8 @@ public class MakeExcel extends CommBuffer {
 
 	private boolean isXls = false;
 
-	private void checkParameters(int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
+	private void checkParameters(int date, String brno, String fileCode, String fileItem, String fileName)
+			throws LogicException {
 		if (date == 0) {
 			throw new LogicException("EC004", "(MakeExcel)日期(date)必須有值(MakeExcel)");
 		}
@@ -272,7 +276,8 @@ public class MakeExcel extends CommBuffer {
 	 * @param calculateColumnLeft  範圍最左欄, 1-based
 	 * @param calculateColumnRight 範圍最右欄, 1-based
 	 */
-	public void formulaRangeCalculate(int calculateRowTop, int calculateRowBottom, int calculateColumnLeft, int calculateColumnRight) {
+	public void formulaRangeCalculate(int calculateRowTop, int calculateRowBottom, int calculateColumnLeft,
+			int calculateColumnRight) {
 		for (; calculateRowTop <= calculateRowBottom; calculateRowTop++)
 			for (; calculateColumnLeft <= calculateColumnRight; calculateColumnLeft++)
 				formulaCalculate(calculateRowTop, calculateColumnLeft);
@@ -320,23 +325,28 @@ public class MakeExcel extends CommBuffer {
 			return "";
 		} else {
 			Cell tmpCell = prow.getCell(col - 1);
+			Object result = null;
 			switch (tmpCell.getCellType()) {
 			case NUMERIC:
-				return tmpCell.getNumericCellValue();
+				result = tmpCell.getNumericCellValue();
+				break;
 			case BOOLEAN:
-				return tmpCell.getBooleanCellValue();
+				result = tmpCell.getBooleanCellValue();
+				break;
 			case FORMULA:
 				if (tmpCell.getCachedFormulaResultType() == CellType.NUMERIC) {
-					return tmpCell.getNumericCellValue();
+					result = tmpCell.getNumericCellValue();
 				} else if (tmpCell.getCachedFormulaResultType() == CellType.STRING) {
-					return tmpCell.getStringCellValue();
+					result = tmpCell.getStringCellValue();
 				} else {
-					return tmpCell.getCachedFormulaResultType().toString();
+					result = tmpCell.getCachedFormulaResultType().toString();
 				}
+				break;
 			case STRING:
 			default:
-				return tmpCell.getStringCellValue();
+				result = tmpCell.getStringCellValue();
 			}
+			return result == null ? "" : result;
 		}
 	}
 
@@ -374,7 +384,8 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
+			throws LogicException {
 		// 未指定sheetnanme時,預設以檔案編號為sheetnanme
 		this.open(titaVo, date, brno, fileCode, fileItem, fileName, fileCode);
 	}
@@ -395,7 +406,8 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, String sheetName) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
+			String sheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -425,7 +437,8 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, String defaultExcel, Object defaultSheet) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
+			String defaultExcel, Object defaultSheet) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -457,7 +470,8 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	@Deprecated
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
+			String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(date, brno, fileCode, fileItem, fileName);
 
@@ -518,7 +532,8 @@ public class MakeExcel extends CommBuffer {
 	 * @param defaultSheet 底稿頁籤名稱
 	 * @throws LogicException
 	 */
-	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet) throws LogicException {
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet)
+			throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
 
@@ -544,7 +559,8 @@ public class MakeExcel extends CommBuffer {
 	 * @param newSheetName 修改頁籤名稱
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet, String newSheetName) throws LogicException {
+	public void open(TitaVo titaVo, ReportVo reportVo, String fileName, String defaultExcel, Object defaultSheet,
+			String newSheetName) throws LogicException {
 		this.titaVo = titaVo;
 		this.checkParameters(reportVo, fileName);
 
@@ -595,8 +611,41 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void openExcel(String fileName, Object sheetname) throws LogicException {
-		this.openFile(fileName, false);
-		this.doSetSheet(sheetname, "");
+		String fna = "";
+
+		fna = fileName;
+
+		this.info("openExcel");
+
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream(fna);
+		} catch (FileNotFoundException e2) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "檔案不存在");
+		}
+
+		try {
+			openedWorkbook = WorkbookFactory.create(fileInputStream);
+		} catch (EncryptedDocumentException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "檔案不存在");
+		}
+		try {
+			this.openedSheet = this.openedWorkbook.getSheet(sheetname.toString());
+			this.info("get Sheet");
+		} catch (Exception e) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SHEET (" + sheetname.toString() + ") 不存在");
+		}
+		if (this.openedSheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SHEET (" + sheetname.toString() + ") 不存在");
+		}
+		try {
+			this.openedWorkbook.close();
+			this.info("close workbook");
+		} catch (IOException e) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) close excel ");
+		}
 	}
 
 	private void openFile(String fileName, boolean excelfolder) throws LogicException {
@@ -824,7 +873,8 @@ public class MakeExcel extends CommBuffer {
 	 *                      R 靠右對齊<br>
 	 * @throws LogicException LogicException
 	 */
-	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String formatOrAlign) throws LogicException {
+	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String formatOrAlign)
+			throws LogicException {
 		switch (formatOrAlign) {
 		case "L":
 		case "C":
@@ -853,7 +903,8 @@ public class MakeExcel extends CommBuffer {
 	 *               R 靠右對齊<br>
 	 * @throws LogicException LogicException
 	 */
-	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String format, String align) throws LogicException {
+	public void setMergedRegionValue(int row, int lrow, int col, int lcol, Object val, String format, String align)
+			throws LogicException {
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);
 		}
@@ -1008,7 +1059,8 @@ public class MakeExcel extends CommBuffer {
 	 * @param tmpFontStyleVo 格式設定
 	 * @throws LogicException LogicException
 	 */
-	public void setValue(int row, int col, Object val, String formatOrAlign, ExcelFontStyleVo tmpFontStyleVo) throws LogicException {
+	public void setValue(int row, int col, Object val, String formatOrAlign, ExcelFontStyleVo tmpFontStyleVo)
+			throws LogicException {
 		this.setFontStyleVo(tmpFontStyleVo);
 		switch (formatOrAlign) {
 		case "L":
@@ -1060,7 +1112,8 @@ public class MakeExcel extends CommBuffer {
 	 * @param tmpFontStyleVo 格式設定
 	 * @throws LogicException LogicException
 	 */
-	public void setValue(int row, int col, Object val, String format, String align, ExcelFontStyleVo tmpFontStyleVo) throws LogicException {
+	public void setValue(int row, int col, Object val, String format, String align, ExcelFontStyleVo tmpFontStyleVo)
+			throws LogicException {
 		this.setFontStyleVo(tmpFontStyleVo);
 		if (format != null && !format.isEmpty()) {
 			inputFontStyleVo.setFormat(format);
@@ -1172,5 +1225,25 @@ public class MakeExcel extends CommBuffer {
 	 */
 	public void toExcel(long fileno, String fileName) throws LogicException {
 		excelGenerator.generateExcel(fileno, fileName);
+	}
+
+	/**
+	 * 設定公式到儲存格
+	 * 
+	 * @param row                目標行
+	 * @param col                目標欄
+	 * @param precalculatedValue 預先計算值
+	 * @param formula            公式
+	 * @param format             格式
+	 */
+	public void setFormula(int row, int col, BigDecimal precalculatedValue, String formula, String format) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", "A");
+		map.put("r", row);
+		map.put("c", col);
+		map.put("v", precalculatedValue);
+		map.put("f", formula);
+		map.put("ft", format);
+		listMap.add(map);
 	}
 }

@@ -55,6 +55,7 @@ K(MODIFYBUTTON,登錄)
 [#<->#,"#FdBreachAmt+違約金",#BreachAmt],
 [#<->#,"#FdExtraCloseBreachAmt+清償違約金",#ExtraCloseBreachAmt],
 ["#FdShortfall+累短收",#Shortfall],["#FdExcessive+累溢收",#Excessive],
+[#<->#,"#FdOverShort+溢短收",#OverShort],
 [#<->#,"#FdAcDate+會計日期",#AcDate],
 [#<->#,"#FdTellerNo+經辦",#TellerNo],
 [#<->#,"#FdTxtNo+交易序號",#TxtNo],
@@ -198,6 +199,7 @@ E(0,@BreachAmt,#L3r18BreachAmt)
 E(0,@ExtraCloseBreachAmt,#L3r18ExtraCloseBreachAmt)
 E(0,@Shortfall,#L3r18Shortfall)
 E(0,@Excessive,#L3r18Excessive)
+E(0,@OverShort,#L3r18OverShort)
 ##loop{times:20,l:0,n:1,m:2}
 IF({n}==1,C(3,#L3r18FacmNo{n},0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1)),$)
 C(3,#L3r18FacmNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
@@ -220,7 +222,9 @@ E(0,@CloseBreachAmt{n},#L3r18CloseBreachAmt{n})
 !累溢收
 
 #Excessive=m,14,L
-
+!溢短收
+#FdOverShort=X,2,L
+#OverShort=+m,14,L
 
 !----------------本息計算表----------------
 
@@ -241,7 +245,7 @@ E(0,@CloseBreachAmt{n},#L3r18CloseBreachAmt{n})
 
 ![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款  09:放款
 #SECNO=_,_,S
-T(3,01)
+T(3,09)
 
 
 

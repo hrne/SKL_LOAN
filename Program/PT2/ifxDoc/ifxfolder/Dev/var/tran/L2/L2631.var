@@ -849,6 +849,7 @@ K(LIGHT,#CloseNo,TXTRED,0,1)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#TimCustNo
 #CustNo
 #CustId
 #CloseNo

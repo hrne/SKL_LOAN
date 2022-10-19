@@ -1,20 +1,17 @@
 package com.st1.itx.util.report;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.util.common.data.RemitFormVo;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.RemitFormVo;
 
 @Component("remitForm")
 @Scope("prototype")
 
 public class RemitForm extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(RemitForm.class);
 
 	// 自訂表頭
 	@Override
@@ -36,18 +33,21 @@ public class RemitForm extends MakeReport {
 	/**
 	 * 輸出單筆匯款申請書
 	 * 
-	 * @param titaVo      titaVo
-	 * @param remitFormVo remitFormVo
-	 * @throws LogicException LogicException
+	 * @param titaVo      TitaVo
+	 * @param remitFormVo RemitFormVo
+	 * @param acDate      會計日期
+	 * @throws LogicException ....
 	 */
-	public void open(TitaVo titaVo, RemitFormVo remitFormVo) throws LogicException {
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), remitFormVo.getReportCode(), remitFormVo.getReportItem(), "", "新版匯款申請書107年10月版.pdf");
+	public void open(TitaVo titaVo, RemitFormVo remitFormVo, int acDate) throws LogicException {
+
+		this.open(titaVo, acDate + 19110000, titaVo.getKinbr(), remitFormVo.getReportCode(),
+				remitFormVo.getReportItem(), "", "新版匯款申請書107年10月版.pdf");
 
 	}
 
 	public void addpage(TitaVo titaVo, RemitFormVo remitFormVo) throws LogicException {
-		logger.info("RemitForm.addpage=" + this.getNowPage());
+		this.info("RemitForm.addpage=" + this.getNowPage());
 
 		this.newPage();
 

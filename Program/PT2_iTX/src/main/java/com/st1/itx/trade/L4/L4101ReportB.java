@@ -109,6 +109,7 @@ public class L4101ReportB extends MakeReport {
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 2, "批號：" + titaVo.getBacthNo());
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
+		this.print(-4, 85, "會計日期：" + showBcDate(reportDate, 1), "C");
 
 		// 頁首帳冊別判斷
 //		print(-4, 10, this.nowAcBookCode);

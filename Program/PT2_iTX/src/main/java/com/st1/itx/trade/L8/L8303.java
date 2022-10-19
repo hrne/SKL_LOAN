@@ -125,11 +125,20 @@ public class L8303 extends TradeBuffer {
 		iJcicZ040Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ040Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ040Id.setRcDate(iRcDate);
+		
 		JcicZ045 iJcicZ045 = new JcicZ045();
 		JcicZ045Id iJcicZ045Id = new JcicZ045Id();
 		iJcicZ045Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ045Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ045Id.setRcDate(iRcDate);
+		
+		JcicZ045 ixJcicZ045 = new JcicZ045();
+		JcicZ045Id ixJcicZ045Id = new JcicZ045Id();
+		ixJcicZ045Id.setCustId(iCustId);// 債務人IDN
+		ixJcicZ045Id.setSubmitKey(iSubmitKey);// 報送單位代號
+		ixJcicZ045Id.setRcDate(iRcDate);
+		ixJcicZ045Id.setMaxMainCode(iMaxMainCode);
+		
 		// Date計算
 		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
 		int tDate = Integer.valueOf(titaVo.getCalDy()) + 19110000;// 日曆日
@@ -161,13 +170,13 @@ public class L8303 extends TradeBuffer {
 			if ("Y".equals(iIsClaims)) {
 				iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id, titaVo);
 				this.info("iJcicZ045   = " + iJcicZ045);
-//				if (iJcicZ045 == null) {
-//					if ("A".equals(iTranKey)) {
-//						throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
-//					} else {
-//						throw new LogicException("E0007", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
-//					}
-//				}
+				if(iJcicZ045 == null ) {
+					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+				}
+				ixJcicZ045 = sJcicZ045Service.otherFirst(iSubmitKey, iCustId, iRcDate, iMaxMainCode, titaVo);
+				if(ixJcicZ045 == null) {
+					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+				}
 				// 4 end
 
 				// 5 start 本金融機構債務人+有擔保債權筆數0，則信用貸款+現金卡放款+信用卡 本息餘額應大於0

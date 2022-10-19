@@ -4498,6 +4498,7 @@ TXFORM=L3R17
 #L3r18ExtraCloseBreachAmt=+m,14.2,S
 #L3r18Shortfall=+m,14.2,S
 #L3r18Excessive=+m,14.2,S
+#L3r18OverShort=+m,14.2,S
 ##loop{times:50,n:1}
 #L3r18FacmNo{n}=A,3,S
 #L3r18BormNo{n}=A,3,S
@@ -4524,6 +4525,7 @@ TXFORM=L3R18
 #L3r18ExtraCloseBreachAmt
 #L3r18Shortfall
 #L3r18Excessive
+#L3r18OverShort
 ##loop{times:50,n:1}
 #L3r18FacmNo{n}
 #L3r18BormNo{n}

@@ -76,7 +76,8 @@ public class L4101ReportE extends MakeReport {
 		 */
 
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "扣款銀行　　　　              撥款日期　　　　　　　　戶 號　　　　　　額度　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
+		print(1, 1,
+				"扣款銀行　　　　              撥款日期　　　　　　　　戶 號　　　　　　額度　       　首次應繳日　　　　　　　扣款帳號 　　　　　　公 司 名 稱      　　          ");
 		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		// 明細起始列(自訂亦必須)
@@ -105,8 +106,7 @@ public class L4101ReportE extends MakeReport {
 		reportCode = reportCode + "-E";
 		reportItem = reportItem;
 
-//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9708", "貸款自動轉帳申請書明細表", "", "A4", "L");
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
+		this.open(titaVo, acDate + 19110000, titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
 
 		List<Map<String, String>> l9708List = null;
 		try {

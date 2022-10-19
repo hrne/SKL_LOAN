@@ -298,8 +298,8 @@ public class L4101Batch extends TradeBuffer {
 
 		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-				titaVo.getTlrNo() + "L4101", checkMsg, titaVo);
+		webClient.sendPost("" + iAcDate, "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4101", checkMsg,
+				titaVo);
 
 		return this.sendList();
 	}
@@ -319,7 +319,7 @@ public class L4101Batch extends TradeBuffer {
 			if ("RT".equals(batchNo.substring(0, 2))) {
 				reportItem = "-退款匯款媒體檔";
 			}
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+		makeFile.open(titaVo, iAcDate + 19110000, titaVo.getKinbr(), titaVo.getTxCode(),
 				titaVo.getTxCode() + reportItem, titaVo.getTlrNo() + "_disb_"
 						+ (this.getTxBuffer().getTxBizDate().getTbsDy() + 19110000) + "_" + nowBatchNo + "_secret.csv",
 				2);
@@ -350,7 +350,7 @@ public class L4101Batch extends TradeBuffer {
 		ArrayList<String> file = l4101OldVo.toFile();
 // 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+		makeFile.open(titaVo, iAcDate + 19110000, titaVo.getKinbr(), titaVo.getTxCode(),
 				titaVo.getTxCode() + reportItem, "LNM24p.txt", 2);
 
 		for (String line : file) {
@@ -431,7 +431,7 @@ public class L4101Batch extends TradeBuffer {
 			// 報表說明(預設為"國內匯款申請書(兼取款憑條)")
 			remitformVo.setReportItem("國內匯款申請書(兼取款憑條)_整批" + "-" + batchNo);
 
-			remitForm.open(titaVo, remitformVo);
+			remitForm.open(titaVo, remitformVo, iAcDate);
 
 			BankRemit lastTalBankRemit = new BankRemit();
 			BigDecimal talAmt = BigDecimal.ZERO;

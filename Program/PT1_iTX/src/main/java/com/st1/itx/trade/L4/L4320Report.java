@@ -224,7 +224,7 @@ public class L4320Report extends MakeReport {
 							// 利率
 							ii++;
 							makeExcel.setValue(row, ii, tLDVo.get(fdnm), "#0.####");
-							if (excelNo == 2) {
+							if (excelNo == 2 && i == 15) {
 								ii++;
 								makeExcel.setValue(row, ii, tempVo.getParam("CityRateFloor"), "#0.####");
 								ii++;
