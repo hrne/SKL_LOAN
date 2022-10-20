@@ -94,7 +94,6 @@ T(1,@BatchNo,#NTXBUF,1,6)
 #AcDate=D,7,I
 E(0,#SYSDATE)
 @V(7)A(DATE,0,#AcDate)
-V(5,#SYSDATE,#SYSNDATE)
 
 
 ![經辦編號]

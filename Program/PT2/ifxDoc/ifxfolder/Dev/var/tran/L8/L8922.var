@@ -227,7 +227,8 @@ X(#OOTotalAmt1)
 C(5,#OORational,Y,T(2,是),C(5,#OORational,N,T(2,否),T(2,#OORational)))
 
 !異動日期(TOTA)
-#OOUpdate=X,9,L
+!#OOUpdate=X,9,L
+#OOUpdate=D,7,L
 
 !經辦合理性說明(TOTA)
 #OOEmpNoDesc=x,200,L

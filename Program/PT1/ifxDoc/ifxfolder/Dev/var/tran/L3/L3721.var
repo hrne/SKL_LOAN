@@ -805,7 +805,7 @@ T(2,#L2r01IncrFlag)
 
 #FitRate2=n,2.4,I
 C(5,#DeleteFg,Y,s,$)
-C(5,#effFg,Y,IF(#BaseRateCode2<99,S,$),$)
+C(5,#effFg,Y,IF(#BaseRateCode2<99,C(3,#RateCode2,2,$,S),$),$)
 
 ![加碼利率]
 !當加減碼別=1時必須輸入否則不必輸入
@@ -814,7 +814,7 @@ C(5,#effFg,Y,IF(#BaseRateCode2<99,S,$),$)
 #RateIncr2=n,2.4,I
 C(5,#DeleteFg,Y,s,$)
 ! C(5,#IncrFlag2,Y,$,S)
-C(5,#effFg,Y,IF(#BaseRateCode2<99,$,S),S)
+C(5,#effFg,Y,IF(#BaseRateCode2<99,C(3,#RateCode2,2,S,$),S),S)
 ! E(0,#FitRate2-#BaseRate2)
 
 ! #WkRate24=X,7,S

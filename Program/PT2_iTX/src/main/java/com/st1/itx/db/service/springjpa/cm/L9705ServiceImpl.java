@@ -109,7 +109,8 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "       \"CustNo\"                             ";
 			sql += "      ,\"FacmNo\"                             ";
 			sql += "      ,\"BormNo\"                             ";
-			sql += "      ,\"TitaTxtNo\"                             ";
+			sql += "      ,\"TitaTxtNo\"                          ";
+			sql += "      ,\"TitaTlrNo\"                          ";
 			sql += "      from \"LoanBorTx\"                      ";
 			sql += "      where \"TitaTxCd\" in ('L3200')         ";
 			sql += "        and \"TitaHCode\" = 0                 ";
@@ -121,6 +122,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      and LBT.\"BormNo\" = M.\"BormNo\"       ";
 			sql += " left join \"BatxDetail\" BATX";
 			sql += " 		on BATX.\"TitaTxtNo\" = LBT.\"TitaTxtNo\"";
+			sql += " 	   and BATX.\"TitaTlrNo\" = LBT.\"TitaTlrNo\"";
 		}
 		sql += "      WHERE F.\"DepartmentCode\" = :corpInd ";
 

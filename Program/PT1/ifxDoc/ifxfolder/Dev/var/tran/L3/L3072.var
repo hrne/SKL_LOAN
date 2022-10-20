@@ -40,7 +40,7 @@ E(0,0)
 
 #120spc=X,155,S
 
-#BUF2=X,11,S
+#BUF2=X,200,S
 T(2,1+0000000+          +000+00+#120spc)
 
 #button=x,100,S
@@ -89,6 +89,10 @@ C(3,#CHAIN,1,s,$)
 #oCustNo=A,7,L
 E(0,#CustNo)
 
+#buttonB=x,100,S
+T(2,@BUF2,1+#CustNo+          +000+00+#120spc)
+T(2,{ cmd=CHAIN; ntxcd=L3702; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
+
 #CustNo2=A,7,S
 
 #RimL1r09=X,1,S
@@ -110,7 +114,6 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 
 #MRKEY=_,_,S
-C(4,#CustNo,S,$)
 T(2,#CustNo)
 
 <include src="ROM.icf::L1R09.dec"/>

@@ -138,13 +138,16 @@ T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 HIDE(#UsTempAmt)
 
-#NTXBUF=X,33,S
+#NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustNo,#NTXBUF,1,7)
+T(1,@TimCustNo,#NTXBUF,1,7)
 T(1,@AcDate,#NTXBUF,8,7)
 T(1,@TellerNo,#NTXBUF,15,6)
 T(1,@TxtNo,#NTXBUF,21,8)
 T(1,@TwTempAmt,#NTXBUF,29,14)
+T(1,@Description,#NTXBUF,46,40)
+T(1,@EntryDate,#NTXBUF,86,7)
 
 #FdRvNo=X,2,L
 #FdCurrencyCode=X,2,L
@@ -158,14 +161,24 @@ T(1,@TwTempAmt,#NTXBUF,29,14)
 #RimTxtNo=X,8,S
 
 
-! #SendL3r19S=X,1,S
-! E(0,@RimCustNo,#TimCustNo)
-! E(0,@RimAcDate,#AcDate)
-! T(2,@RimTellerNo,#TellerNo)
-! T(2,@RimTxtNo,#TxtNo)
-! RESET_RIM(#SendL3r19S,L3R19)
-! S(L3R19,01,#RimCustNo,#RimAcDate,#RimTellerNo,#RimTxtNo)
-! R(1,L3R19)
+#SendL3r19S=X,1,S
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimAcDate,#AcDate)
+T(2,@RimTellerNo,#TellerNo)
+T(2,@RimTxtNo,#TxtNo)
+RESET_RIM(#SendL3r19S,L3R19)
+S(L3R19,01,#RimCustNo,#RimAcDate,#RimTellerNo,#RimTxtNo)
+R(1,L3R19)
+E(0,@EntryDate,#L3r19EntryDate)
+E(0,@FacmNo,#L3r19FacmNo)
+E(0,@TwTempAmt,#L3r19TxAmt)
+T(2,@Description,#L3r19Desc)
+T(2,@AcctCode,#L3r19AcctCode)
+T(2,@RvNo,#L3r19RvNo)
+E(0,@AcDate,#L3r19AcDate)
+T(2,@TellerNo,#L3r19TellerNo)
+T(2,@TxtNo,#L3r19TxtNo)
+
 
 #InitFd=X,1,S
 
@@ -451,6 +464,7 @@ E(0,@OrgEntdy,#AcDate)
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L3R02.dec"/>
 <include src="ROM.icf::L3R05.dec"/>
+<include src="ROM.icf::L3R19.dec"/>
 <include src="ROM.icf::L2R08.dec"/>
 </sub>
 !--------- 收付欄 -----------------------
@@ -511,6 +525,7 @@ TXFORM=L3250^
 <include src="ROM.icf::L2R08.tom"/>
 <include src="ROM.icf::L3R02.tom"/>
 <include src="ROM.icf::L3R05.tom"/>
+<include src="ROM.icf::L3R19.tom"/>
 <include src="PRT.icf::FM101.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

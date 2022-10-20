@@ -202,6 +202,8 @@ public class L3005 extends TradeBuffer {
 				BigDecimal unpaidAmt = parse.stringToBigDecimal(result.get("UnpaidInterest"))
 						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
+				int intEndDate = parse.stringToInteger(result.get("IntEndDate"));
+				
 				needPaidAmt = txAmt.add(tempAmt).subtract(overflow).add(unpaidAmt);
 				newTxNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
@@ -253,6 +255,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OORelNo", txNo); // 交易
 				occursList.putParam("OOTellerNo", titaTlrNo);
 				occursList.putParam("OOTxtNo", titaTxtNo);
+				occursList.putParam("OOIntEndDate", intEndDate-19110000);
 				occursList.putParam("OOCurrencyCode", titaCurCd);
 				if (titaHCode.equals("1") || titaHCode.equals("3")) {
 					occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(txAmt));

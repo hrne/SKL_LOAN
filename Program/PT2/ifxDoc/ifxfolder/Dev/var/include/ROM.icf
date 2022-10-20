@@ -3328,6 +3328,7 @@ TXFORM=L2R45
 #L2r46RightsNote=X,2,S
 #L2r46SecuredTotal=m,14.2,S
 #L2r46CustNo=A,7,S
+#L2r46Cnt=X,3,S
 </L2R46.dec>
 
 <L2R46.tom>
@@ -3344,6 +3345,7 @@ TXFORM=L2R46
 #L2r46RightsNote
 #L2r46SecuredTotal
 #L2r46CustNo
+#L2r46Cnt
 ^
 </L2R46.tom>
 
@@ -4541,6 +4543,31 @@ TXFORM=L3R18
 ^
 </L3R18.tom>
 
+<L3R19.dec>
+#L3r19EntryDate=D,7,S
+#L3r19AcDate=D,7,S
+#L3r19Desc=x,300,S
+#L3r19FacmNo=A,7,S
+#L3r19AcctCode=X,3,S
+#L3r19RvNo=X,20,S
+#L3r19TxAmt=+m,14.2,S
+#L3r19TellerNo=X,6,S
+#L3r19TxtNo=X,8,S
+</L3R19.dec>
+
+<L3R19.tom>
+TXFORM=L3R19
+#L3r19EntryDate
+#L3r19AcDate
+#L3r19Desc
+#L3r19FacmNo
+#L3r19AcctCode
+#L3r19RvNo
+#L3r19TxAmt
+#L3r19TellerNo
+#L3r19TxtNo
+^
+</L3R19.tom>
 --------------------------------------------------------------
 !尋找客戶檔資料
 <L1R01.dec>

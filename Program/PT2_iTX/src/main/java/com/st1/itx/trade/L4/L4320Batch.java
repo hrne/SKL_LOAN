@@ -605,7 +605,7 @@ public class L4320Batch extends TradeBuffer {
 				// 依地區別利率上、下限調整
 				if (rateProp.compareTo(cityRateCeiling) > 0) {
 					rateProp = cityRateCeiling;
-					warn = ", 高於地區上限" + cityRateIncr;
+					warn = ", 高於地區上限";
 				}
 				if (rateProp.compareTo(cityRateFloor) < 0) {
 					rateProp = cityRateFloor;
@@ -615,7 +615,7 @@ public class L4320Batch extends TradeBuffer {
 					rateProp = contractRate;
 					warn = ", 高於合約利率";
 				}
-				warn += ", 地區別加減碼設定值:";
+				warn += ", 地區別加減碼設定值:" +  cityRateIncr;
 				warnMsg += warn;
 			}
 

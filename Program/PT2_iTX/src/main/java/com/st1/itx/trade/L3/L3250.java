@@ -188,9 +188,7 @@ public class L3250 extends TradeBuffer {
 			}
 		}
 
-		// 暫收款退還(存回暫收)
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) < 0) {
-		}
+
 
 		// 累溢收入帳(暫收貸)
 		acRepayCom.settleOverflow(lAcDetail, titaVo);
@@ -227,9 +225,9 @@ public class L3250 extends TradeBuffer {
 			if (!tx.getTitaHCode().equals("0")) {
 				throw new LogicException(titaVo, "E0010", "非正常交易（轉換前資料）"); // 功能選擇錯誤
 			}
-			if (!tx.getCreateEmpNo().equals("999999")) {
-				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
-			}
+//			if (!tx.getCreateEmpNo().equals("999999")) {
+//				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
+//			}
 			wkRepayCode = tx.getRepayCode();
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);

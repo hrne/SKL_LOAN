@@ -467,6 +467,11 @@ T(2,#OOAcDate+#OORelNo)
 
 #OONote=X,60,O
 
+#OOIntEndDate=D,7,O
+#OOIntEndDateX=X,10,O
+C(3,#OOIntEndDate,0,S,CALL2(#AdjustDate,#OOIntEndDate,#OOIntEndDateX))
+
+
 #OOCurrencyCode=X,3,O 
 
 #OOPrecision=N,1,S
@@ -547,8 +552,12 @@ T(6A,#Entdy+#TxNo)
 #OOL3240BUF=X,80,S
 T(2,#OCustNo+000+000+#OOAcDate+#OOTellerNo+#OOTxtNo)
 
-#OOL3250BUF=X,80,S
-T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOAcDate+#OOTellerNo+#OOTxtNo)
+! [rim戶號 會計日期 經辦 交易序號] 交易金額[有交易金額 else 暫收借金額]
+#OOL3250BUF=X,100,S
+C(3,#OOTxAmt,0,
+T(2,#OCustNo+#OOAcDate+#OOTellerNo+#OOTxtNo+#OOTempAmt+#OODesc+#OOEntryDate),
+T(2,#OCustNo+#OOAcDate+#OOTellerNo+#OOTxtNo+#OOTxAmt+#OODesc+#OOEntryDate))
+
 
 !訂正按鈕
 #BTN=X,1,S
@@ -634,6 +643,7 @@ TXFORM=L3005
 #OOTellerNo
 #OOTxtNo
 #OODesc
+#OOIntEndDate
 #OOCurrencyCode
 #OOTxAmt
 #OOOverShort
@@ -685,8 +695,10 @@ TXFORM=L3005
 #OOAcDate=會計日期
 {width:80,align:'center'}
 
+
 #OOFacmNoX=額度編號
 {width:80,align:'center'}
+
 
 #OODesc=交易別
 {width:90}
@@ -696,6 +708,9 @@ TXFORM=L3005
 
 #BTN=訂正
 {width:40,search:false,formatter:'cust:bind-button:訂正',canExport:false,align:'center'}
+
+#OOIntEndDateX=繳息迄日
+{width:80,align:'center'}
 
 #OOCurrencyCode=幣別 
 {width:50,align:'center'}

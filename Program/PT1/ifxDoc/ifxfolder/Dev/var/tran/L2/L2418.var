@@ -42,7 +42,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品編號",#ClNo,#Other],
-["#FdSeq+序號",#ClSeq],
+["#FdSeq+序號",#ClSeq,#cntmsg],
 ["#FdCity+縣市",#City,#CityX,#InCityX],
 ["#FdLandAdm+地政",#LandAdm,#LandAdmX,#InLandAdmX],
 ["#FdRecYear+收件年",#RecYear],
@@ -363,8 +363,13 @@ RESET_RIM(#RimL2r46B,L2R46)
 S(L2R46,1,#RimClCode1,#RimClCode2,#RimClNo,#RimClSeq)
 R(1,L2R46)
 
+#cntmsg=X,50,L
+
+
 #CHECKL2R46=X,1,S
 T(2,@ClSeq,#L2r46Seq)
+C(3,#FunCd,1,K(LIGHT,#cntmsg,TXTRED,0,1),$)
+C(3,#L2r46Cnt,1,T(2,@cntmsg,),T(B,@cntmsg,該擔保品項下，第+#L2r46Cnt+筆他項權利資料。))
 C(3,#FunCd,1,S,$)
 T(2,@City,#L2r46City)
 C(4,#L2r46OtherCity,$,SHOW(#InCityX))

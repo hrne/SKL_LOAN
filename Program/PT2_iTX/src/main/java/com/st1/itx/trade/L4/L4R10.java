@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -49,11 +50,14 @@ public class L4R10 extends TradeBuffer {
 		String batchNo = "";
 //		2.其他來源建檔 L4210 > 如果有L4210&非刪除者，同經辦則抓取該批號，否則抓取目前最大的批號+1
 		if ("L4210".equals(txCode)) {
-			Slice<BatxHead> slBatxHead = batxHeadService.acDateRange(iAcDate, iAcDate, 0, Integer.MAX_VALUE);
-			for (BatxHead t2BatxHead : slBatxHead.getContent()) {
-				if (txCode.equals(t2BatxHead.getTitaTxCd())) {
-					if (!"8".equals(t2BatxHead.getBatxExeCode()) && t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
-						batchNo = t2BatxHead.getBatchNo();
+			Slice<BatxHead> slBatxHead = batxHeadService.acDateRange(iAcDate, iAcDate, 0, Integer.MAX_VALUE, titaVo);
+			if (slBatxHead != null) {
+				for (BatxHead t2BatxHead : slBatxHead.getContent()) {
+					if (txCode.equals(t2BatxHead.getTitaTxCd())) {
+						if (!"8".equals(t2BatxHead.getBatxExeCode())
+								&& t2BatxHead.getTitaTlrNo().equals(titaVo.getTlrNo())) {
+							batchNo = t2BatxHead.getBatchNo();
+						}
 					}
 				}
 			}
@@ -62,10 +66,12 @@ public class L4R10 extends TradeBuffer {
 		// 抓取目前最大的批號+1
 		if (batchNo.isEmpty()) {
 			BatxHead tBatxHead = batxHeadService.batchNoDescFirst(iAcDate, "BATX%", titaVo);
-			if (tBatxHead == null)
+			if (tBatxHead == null) {
 				batchNo = "BATX01";
-			else
-				batchNo = "BATX" + parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+			} else {
+				batchNo = "BATX"
+						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+			}
 		}
 
 		this.totaVo.putParam("L4r10BatchNo", batchNo);

@@ -11,7 +11,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.BankRmtfId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.BankRmtfService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -28,6 +31,8 @@ public class L4R04 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public BankRmtfService bankRmtfService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	public Parse parse;
@@ -57,9 +62,14 @@ public class L4R04 extends TradeBuffer {
 		tBankRmtf = bankRmtfService.findById(tBankRmtfId);
 
 		if (tBankRmtf != null) {
+			String dscpItem = "";
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("BankRmftCode", tBankRmtf.getDscptCode()), titaVo);
+			if (tCdCode != null) {
+				dscpItem = tCdCode.getItem();
+			}
 			this.totaVo.putParam("L4r04DepAcctNo", tBankRmtf.getDepAcctNo());
 			this.totaVo.putParam("L4r04EntryDate", tBankRmtf.getEntryDate());
-			this.totaVo.putParam("L4r04DscptCode", tBankRmtf.getDscptCode());
+			this.totaVo.putParam("L4r04DscptCode", tBankRmtf.getDscptCode() + " " + dscpItem);
 			this.totaVo.putParam("L4r04VirtualAcctNo", tBankRmtf.getVirtualAcctNo());
 			this.totaVo.putParam("L4r04WithdrawAmt", tBankRmtf.getWithdrawAmt());
 			this.totaVo.putParam("L4r04DepositAmt", tBankRmtf.getDepositAmt());

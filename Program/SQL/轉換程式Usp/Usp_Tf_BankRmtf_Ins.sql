@@ -48,7 +48,15 @@ BEGIN
       ,"CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
       ,"LastUpdate"          -- 最後更新日期時間 DATE   
       ,"LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
-    ) 
+    )
+    WITH txEmpData AS (
+      SELECT DISTINCT
+             TRXDAT
+           , TRXMEM
+           , TRXNMT
+           , TRXIDT
+      FROM LA$TRXP
+    )
     SELECT CASE WHEN DPSP.TRXDAT = 0 
                 THEN DPSP.TRXIDT 
            ELSE DPSP.TRXDAT END           AS "AcDate"              -- 會計日 DECIMALD 8 
@@ -81,8 +89,8 @@ BEGIN
           ,DPSP.DPSTRA                    AS "TraderInfo"          -- 交易人資料 NVARCHAR2 20 
           ,'0'                            AS "AmlRsp"              -- AML 回應碼 VARCHAR2 1 
           ,DPSP.DPSATC                    AS "ReconCode"           -- 對帳類別 VARCHAR2 3 
-          ,''                             AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
-          ,''                             AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
+          ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 
+          ,LPAD(DPSP."TRXNMT",8,'0')      AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   
@@ -90,6 +98,9 @@ BEGIN
     FROM DAT_LA$DPSP DPSP -- 匯款轉帳檔 
     LEFT JOIN TB$SPLP SPLP ON SPLP.TB$FNM = 'DPSATC' -- 特殊代碼檔: 調存摺代號 DPSATC 對應的定義 
                           AND SPLP.TB$FCD = DPSP.DPSATC 
+    LEFT JOIN txEmpData t ON t.TRXDAT = DPSP.TRXDAT
+                         AND t.TRXNMT = DPSP.TRXNMT
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AME1."As400TellerNo" = t.TRXMEM
     ; 
  
     -- 記錄寫入筆數 
