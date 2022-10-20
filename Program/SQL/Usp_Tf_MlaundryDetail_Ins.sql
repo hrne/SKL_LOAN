@@ -61,6 +61,11 @@ BEGIN
            ELSE 0
            END               AS "ManagerDate" -- 主管同意日期 Decimald 8  
          , CASE
+             WHEN NVL(AC1.CHGDAT,0) > 0
+             THEN AC1.CHGDAT -- 2022-10-20 Wei 增加 from Linda line:
+                             -- 請問MlaundryDetail裡的主管覆核日期轉檔程式備註是寫主管第二次覆核時顯示欄位
+                             -- 之前珮瑜測的時候說主管同意日期已經押了,主管覆核日期就不應該空白,
+                             -- 轉檔用的判斷第二次覆核是指什麼?
              WHEN NVL(AC2.CHGDAT,0) > 0
              THEN AC2.CHGDAT
            ELSE 0

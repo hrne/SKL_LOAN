@@ -284,7 +284,7 @@ public class BankAuthActCom extends TradeBuffer {
 					try {
 						bankAuthActService.deleteAll(slBankAuthAct.getContent(), titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg()); // TODO: 刪除
+						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 					}
 				}
 				inserPostBankAuthAct(t, "01", titaVo);
@@ -372,7 +372,7 @@ public class BankAuthActCom extends TradeBuffer {
 				try {
 					bankAuthActService.deleteAll(slBankAuthAct.getContent(), titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg()); // TODO: 刪除
+					throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 				}
 			}
 			inserAchBankAuthAct(t, "00", titaVo);
@@ -759,6 +759,9 @@ public class BankAuthActCom extends TradeBuffer {
 				if ("1".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
 					status = "0";
 					acctSeq = tPostAuthLog.getRepayAcctSeq();
+				} else if ("1".equals(tPostAuthLog.getAuthApplCode())
+						&& "".equals(tPostAuthLog.getAuthErrorCode().trim())) {
+					status = " ";
 				} else {
 					this.isNewLog = true;
 				}
@@ -770,6 +773,8 @@ public class BankAuthActCom extends TradeBuffer {
 			} else {
 				if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
 					status = "0";
+				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "".equals(tAchAuthLog.getAuthStatus().trim())) {
+					status = " ";
 				} else {
 					this.isNewLog = true;
 				}

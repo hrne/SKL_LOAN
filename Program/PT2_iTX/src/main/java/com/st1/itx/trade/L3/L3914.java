@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L3;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class L3914 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設50筆 總長不可超過六萬
-		this.limit = 100; // 100* 154 = 15400
+		this.limit = 150; // 100* 365 = 15400
 
 		// 查詢放款交易內容檔
 		List<String> lDisplayFlag = new ArrayList<String>();
@@ -83,11 +84,11 @@ public class L3914 extends TradeBuffer {
 		lDisplayFlag.add("F"); // 繳息首筆
 
 		if (iAcDate == 0) {
-			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, 0, 999, 0, 900, wkEntryDateStart, wkDateEnd,
-					lDisplayFlag, this.index, this.limit, titaVo);
+			slLoanBorTx = loanBorTxService.borxEntryDateRange(iCustNo, 0, 999, 0, 900, wkEntryDateStart,
+					wkEntryDateStart, lDisplayFlag, 0, Integer.MAX_VALUE, titaVo);
 		} else {
-			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, 0, 999, 0, 900, wkAcDateStart, wkDateEnd,
-					lDisplayFlag, this.index, this.limit, titaVo);
+			slLoanBorTx = loanBorTxService.borxAcDateRange(iCustNo, 0, 999, 0, 900, wkAcDateStart, wkAcDateStart,
+					lDisplayFlag, 0, Integer.MAX_VALUE, titaVo);
 		}
 
 		lLoanBorTx = slLoanBorTx == null ? null : new ArrayList<LoanBorTx>(slLoanBorTx.getContent());
@@ -99,43 +100,66 @@ public class L3914 extends TradeBuffer {
 			}
 		}
 		// 如有有找到資料
-		Slice<AcDetail> slAcDetail;
 		for (LoanBorTx ln : lLoanBorTx) {
 			OccursList occursList = new OccursList();
 			if (!ln.getTitaHCode().equals("0")) {
 				continue;
 			}
-			if (!("L3230".equals(ln.getTitaTxCd())||"L3220".equals(ln.getTitaTxCd()))) {
+			if (!("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
+					|| "L3230".equals(ln.getTitaTxCd()))) {
 				continue;
 			}
-			slAcDetail = acDetailService.findTxtNoEq(ln.getAcDate() + 19110000, ln.getTitaKinBr(), ln.getTitaTlrNo(),
-					parse.stringToInteger(ln.getTitaTxtNo()), 0, Integer.MAX_VALUE, titaVo);
+			Slice<AcDetail> slAcDetail = acDetailService.findTxtNoEq(ln.getAcDate() + 19110000, ln.getTitaKinBr(),
+					ln.getTitaTlrNo(), parse.stringToInteger(ln.getTitaTxtNo()), 0, Integer.MAX_VALUE, titaVo);
 			if (slAcDetail == null) {
 				this.info("slAcDetail = " + slAcDetail);
 				continue;
 			}
-			for (AcDetail ac : slAcDetail.getContent()) {
-				// F10 帳管費
-				// F29 契變手續費
-
-				this.info("ac.getDbCr() = " + ac.getDbCr());
-				this.info("ac.getAcctCode() = " + ac.getAcctCode());
-				if ("C".equals(ac.getDbCr())) {
-					if (ac.getAcctCode().equals("F10") || ac.getAcctCode().equals("F27")
-							|| ac.getAcctCode().equals("TMI")) {
-						occursList.putParam("OOEntryDate", ln.getEntryDate());
-						occursList.putParam("OOAcDate", ln.getAcDate());
-						occursList.putParam("OODesc", ln.getDesc());
-						occursList.putParam("OOAcctCode", ac.getAcctCode());
-						occursList.putParam("OOFacmNo", ln.getFacmNo());
-						occursList.putParam("OOTxAmt", ac.getTxAmt());
-						occursList.putParam("OORvNo", ac.getRvNo());
-						occursList.putParam("OOTellerNo", ac.getTitaTlrNo());
-						occursList.putParam("OOTxtNo", ac.getTitaTxtNo());
-						// 將每筆資料放入Tota的OcList
-						this.totaVo.addOccursList(occursList);
-					}
+			BigDecimal txAmt = BigDecimal.ZERO;
+			// 將每筆資料放入Tota的OcList
+			occursList = new OccursList();
+			occursList.putParam("OOEntryDate", ln.getEntryDate());
+			occursList.putParam("OOAcDate", ln.getAcDate());
+			occursList.putParam("OODesc", ln.getDesc());
+			occursList.putParam("OOFacmNo", ln.getFacmNo());
+			if (ln.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
+				txAmt = ln.getTxAmt();
+			} else if (ln.getTxAmt().compareTo(BigDecimal.ZERO) < 0) {
+				txAmt = BigDecimal.ZERO.subtract(ln.getTxAmt());
+			} else {
+				txAmt = ln.getTempAmt().subtract(ln.getOverflow());
+				if (txAmt.compareTo(BigDecimal.ZERO) < 0) {
+					txAmt = BigDecimal.ZERO.subtract(txAmt);
 				}
+			}
+			occursList.putParam("OOAcctCode", "");
+			occursList.putParam("OORvNo", "");
+			occursList.putParam("OOTxAmt", txAmt);
+			occursList.putParam("OOTellerNo", ln.getTitaTlrNo());
+			occursList.putParam("OOTxtNo", ln.getTitaTxtNo());
+			for (AcDetail ac : slAcDetail.getContent()) {
+				if ("C".equals(ac.getDbCr())) {
+					if ("F10".equals(ac.getAcctCode()) || "F27".equals(ac.getAcctCode())
+							|| "TMI".equals(ac.getAcctCode()) || "F07".equals(ac.getAcctCode())
+							|| "F08".equals(ac.getAcctCode()) || "F09".equals(ac.getAcctCode())
+							|| "F10".equals(ac.getAcctCode()) || "F12".equals(ac.getAcctCode())
+							|| "F13".equals(ac.getAcctCode()) || "F14".equals(ac.getAcctCode())
+							|| "F15".equals(ac.getAcctCode()) || "F16".equals(ac.getAcctCode())
+							|| "F18".equals(ac.getAcctCode()) || "F21".equals(ac.getAcctCode())
+							|| "F24".equals(ac.getAcctCode()) || "F25".equals(ac.getAcctCode())
+							|| "F27".equals(ac.getAcctCode()) || "F29".equals(ac.getAcctCode())) {
+						occursList.putParam("OOAcctCode", ac.getAcctCode());
+						occursList.putParam("OORvNo", ac.getRvNo());
+					}
+
+				}
+			}
+			this.totaVo.addOccursList(occursList);
+
+			if (slAcDetail != null && slAcDetail.getContent().size() >= this.limit) {
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				titaVo.setReturnIndex(this.setIndexNext());
+				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
 		}
 

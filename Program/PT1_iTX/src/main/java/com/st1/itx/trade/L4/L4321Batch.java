@@ -342,7 +342,7 @@ public class L4321Batch extends TradeBuffer {
 		tLoanBorMainId.setBormNo(tBatxRateChange.getBormNo());
 		tLoanBorMain = loanBorMainService.findById(tLoanBorMainId, titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException("E0006", "BS430 LoanBorMain " + tLoanBorMainId);
+			throw new LogicException("E0006", "L4321Batch LoanBorMain " + tLoanBorMainId);
 		}
 		if (tLoanBorMain.getPrevPayIntDate() > tBatxRateChange.getCurtEffDate()) {
 			tTempVo.putParam("CheckMsg", "上次繳息日大於利率生效日");
@@ -376,7 +376,7 @@ public class L4321Batch extends TradeBuffer {
 		tLoanBorMainId.setBormNo(tBatxRateChange.getBormNo());
 		tLoanBorMain = loanBorMainService.holdById(tLoanBorMainId, titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException("E0006", "BS430 LoanBorMain " + tLoanBorMainId);
+			throw new LogicException("E0006", "L4321Batch LoanBorMain " + tLoanBorMainId);
 		}
 		if (titaVo.isHcodeNormal()) {
 			tLoanBorMain.setNextAdjRateDate(tBatxRateChange.getPreNextAdjDate());
@@ -392,7 +392,7 @@ public class L4321Batch extends TradeBuffer {
 		try {
 			loanBorMainService.update(tLoanBorMain, titaVo);
 		} catch (DBException e) {
-			throw new LogicException("E0007", "BS430 LoanBorMain update " + e.getErrorMsg());
+			throw new LogicException("E0007", "L4321Batch LoanBorMain update " + e.getErrorMsg());
 		}
 	}
 
@@ -423,7 +423,7 @@ public class L4321Batch extends TradeBuffer {
 		if (tLoanRateChange == null) {
 			// 取消確認時，需利率變動檔需存在
 			if (this.iConfirmFlag == 0) {
-				throw new LogicException("E0006", "BS430 loanRateChang hold " + tLoanRateChangeId);
+				throw new LogicException("E0006", "L4321Batch loanRateChang hold " + tLoanRateChangeId);
 			}
 			updateFg = 0;
 			tLoanRateChange = new LoanRateChange();
@@ -453,7 +453,7 @@ public class L4321Batch extends TradeBuffer {
 			try {
 				loanRateChangeService.insert(tLoanRateChange, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0005", "BS430 loanRateChangeService insert " + e.getErrorMsg());
+				throw new LogicException("E0005", "L4321Batch loanRateChangeService insert " + e.getErrorMsg());
 			}
 		}
 		// 更新
@@ -474,7 +474,7 @@ public class L4321Batch extends TradeBuffer {
 			try {
 				loanRateChangeService.update(tLoanRateChange, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0007", "BS430 loanRateChangeService update " + e.getErrorMsg());
+				throw new LogicException("E0007", "L4321Batch loanRateChangeService update " + e.getErrorMsg());
 			}
 		}
 		// 刪除
@@ -482,7 +482,7 @@ public class L4321Batch extends TradeBuffer {
 			try {
 				loanRateChangeService.delete(tLoanRateChange, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0008", "BS430 loanRateChangeService delete " + e.getErrorMsg());
+				throw new LogicException("E0008", "L4321Batch loanRateChangeService delete " + e.getErrorMsg());
 			}
 		}
 
@@ -525,14 +525,14 @@ public class L4321Batch extends TradeBuffer {
 			try {
 				loanRateChangeService.insert(tLoanRateChange, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0005", "BS430 loanRateChangeService insert " + e.getErrorMsg());
+				throw new LogicException("E0005", "L4321Batch loanRateChangeService insert " + e.getErrorMsg());
 			}
 		} else {
 			tLoanRateChange = loanRateChangeService.holdById(tLoanRateChangeId, titaVo);
 			try {
 				loanRateChangeService.delete(tLoanRateChange, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0008", "BS430 loanRateChangeService delete " + e.getErrorMsg());
+				throw new LogicException("E0008", "L4321Batch loanRateChangeService delete " + e.getErrorMsg());
 			}
 		}
 	}
@@ -583,7 +583,7 @@ public class L4321Batch extends TradeBuffer {
 					try {
 						loanRateChangeService.update(tLoanRateChange, titaVo);
 					} catch (DBException e) {
-						throw new LogicException("E0007", "BS430 loanRateChangeService update " + e.getErrorMsg());
+						throw new LogicException("E0007", "L4321Batch loanRateChangeService update " + e.getErrorMsg());
 					}
 				}
 			}

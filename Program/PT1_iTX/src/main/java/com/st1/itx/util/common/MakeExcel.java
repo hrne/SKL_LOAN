@@ -13,14 +13,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -611,41 +609,16 @@ public class MakeExcel extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void openExcel(String fileName, Object sheetname) throws LogicException {
-		String fna = "";
-
-		fna = fileName;
-
-		this.info("openExcel");
-
-		FileInputStream fileInputStream;
-		try {
-			fileInputStream = new FileInputStream(fna);
-		} catch (FileNotFoundException e2) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "檔案不存在");
-		}
-
-		try {
-			openedWorkbook = WorkbookFactory.create(fileInputStream);
-		} catch (EncryptedDocumentException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel)" + fna + "檔案不存在");
-		}
-		try {
-			this.openedSheet = this.openedWorkbook.getSheet(sheetname.toString());
-			this.info("get Sheet");
-		} catch (Exception e) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SHEET (" + sheetname.toString() + ") 不存在");
-		}
-		if (this.openedSheet == null) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel)指定 SHEET (" + sheetname.toString() + ") 不存在");
-		}
-		try {
-			this.openedWorkbook.close();
-			this.info("close workbook");
+		this.info("openExcel start");
+		try (FileInputStream fis = new FileInputStream(fileName)) {
+			this.openedWorkbook = new XSSFWorkbook(fis);
+			this.openedSheet = openedWorkbook.getSheet(sheetname.toString());
+		} catch (FileNotFoundException e1) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)此檔案 (" + fileName + ") 不存在");
 		} catch (IOException e) {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel) close excel ");
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)無法開啟此Excel檔案");
 		}
+		this.info("openExcel finished");
 	}
 
 	private void openFile(String fileName, boolean excelfolder) throws LogicException {

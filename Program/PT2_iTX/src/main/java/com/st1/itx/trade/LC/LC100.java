@@ -89,7 +89,7 @@ public class LC100 extends TradeBuffer {
 					throw new LogicException("EC001", "營業單位課組別檔:" + tTxTeller.getGroupNo());
 				}
 
-				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxCom().getTbsdyf(), titaVo.getTlrNo(), "00");
+//				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxCom().getTbsdyf(), titaVo.getTlrNo(), "00");
 
 				String s = "";
 				s = tCdBranchGroup.getGroupItem();
@@ -111,8 +111,8 @@ public class LC100 extends TradeBuffer {
 					tTxTeller.setTxtNo(1);
 
 				this.totaVo.putParam("TXTNO", tTxTeller.getTxtNo());
-				if (!Objects.isNull(txRecord))
-					this.totaVo.putParam("TXTNO", (parse.stringToInteger(txRecord.getTxSeq()) + 1));
+//				if (!Objects.isNull(txRecord))
+//					this.totaVo.putParam("TXTNO", (parse.stringToInteger(txRecord.getTxSeq()) + 1));
 
 				// MODE 0.本日 1.次日
 //				if (tTxTeller.getEntdy() == this.txBuffer.getMgBizDate().getNbsDy()) {

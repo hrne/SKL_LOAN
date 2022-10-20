@@ -1268,12 +1268,12 @@ public class TxBatchCom extends TradeBuffer {
 			// 啟動背景作業－整批入帳完成(非整批入帳)
 			if ("BATX".equals(tBatxHead.getBatchNo().substring(0, 4)) && tBatxHead.getUnfinishCnt() == 0
 					&& "0".equals(tBatxHead.getBatxStsCode())) {
-				TitaVo bs401TitaVo = new TitaVo();
-				bs401TitaVo = (TitaVo) titaVo.clone();
-				bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核
-				bs401TitaVo.putParam("AcDate", tBatxHead.getAcDate()); // 會計日期
-				bs401TitaVo.putParam("BatchNo", tBatxHead.getBatchNo());// 批號
-				MySpring.newTask("BS401", this.txBuffer, bs401TitaVo);
+				TitaVo l420BTita = new TitaVo();
+				l420BTita = (TitaVo) titaVo.clone();
+				l420BTita.putParam("FunctionCode", "3");// 處理代碼 3.檢核
+				l420BTita.putParam("AcDate", tBatxHead.getAcDate()); // 會計日期
+				l420BTita.putParam("BatchNo", tBatxHead.getBatchNo());// 批號
+				MySpring.newTask("L420BBatch", this.txBuffer, l420BTita);
 			}
 		}
 

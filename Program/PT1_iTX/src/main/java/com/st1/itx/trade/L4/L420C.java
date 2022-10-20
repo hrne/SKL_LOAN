@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -202,12 +206,12 @@ public class L420C extends TradeBuffer {
 
 		// 啟動背景作業－整批入帳完成
 		if (tmpFinishCnt > 0 && tBatxHead.getUnfinishCnt() == 0) {
-			TitaVo bs401TitaVo = new TitaVo();
-			bs401TitaVo = (TitaVo) titaVo.clone();
-			bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核
-			bs401TitaVo.putParam("AcDate", acDate - 19110000); // 會計日期
-			bs401TitaVo.putParam("BatchNo", batchNo);// 批號
-			MySpring.newTask("BS401", this.txBuffer, bs401TitaVo);
+			TitaVo l420BTita = new TitaVo();
+			l420BTita = (TitaVo) titaVo.clone();
+			l420BTita.putParam("FunctionCode", "3");// 處理代碼 3.檢核
+			l420BTita.putParam("AcDate", acDate - 19110000); // 會計日期
+			l420BTita.putParam("BatchNo", batchNo);// 批號
+			MySpring.newTask("L420BBatch", this.txBuffer, l420BTita);
 		}
 
 	}

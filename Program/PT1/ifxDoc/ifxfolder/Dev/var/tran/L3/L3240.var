@@ -302,7 +302,9 @@ T(3,[L3240] 回收冲正)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #TimCustNo#FacmNo
-#EntryDate#IntStartDate#IntEndDate
+#EntryDate
+#IntStartDate
+#IntEndDate
 #AcDate#TellerNo#TxtNo
 #END
 #CustNo

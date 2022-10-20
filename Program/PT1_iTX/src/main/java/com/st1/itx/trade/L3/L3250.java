@@ -16,19 +16,13 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
-import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.InsuRenew;
-
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanOverdue;
-import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.domain.TxTemp;
-import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanOverdueService;
-import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
@@ -214,10 +208,10 @@ public class L3250 extends TradeBuffer {
 		if (titaVo.isHcodeErase()) {
 			throw new LogicException(titaVo, "E0010", "本交易不可訂正"); // 功能選擇錯誤
 		}
-		tCdAcCode = cdAcCodeService.acCodeAcctFirst(iAcctCode, titaVo);
-		if (tCdAcCode == null) {
-			throw new LogicException("E6001", "AcDetailCom 科目有誤" + iAcctCode); // E6001 分錄檢核有誤
-		}
+//		tCdAcCode = cdAcCodeService.acCodeAcctFirst(iAcctCode, titaVo);
+//		if (tCdAcCode == null) {
+//			throw new LogicException("E6001", "AcDetailCom 科目有誤" + iAcctCode); // E6001 分錄檢核有誤
+//		}
 	}
 
 	// 沖正處理

@@ -609,13 +609,13 @@ public class L4320Batch extends TradeBuffer {
 				}
 				if (rateProp.compareTo(cityRateFloor) < 0) {
 					rateProp = cityRateFloor;
-					warn = ", 低於地區下限" + cityRateIncr;
+					warn = ", 低於地區下限";
 				}
 				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
 					rateProp = contractRate;
-					warn = ", 高於合約利率" + cityRateIncr;
+					warn = ", 高於合約利率";
 				}
-				warn += ", 地區別加減碼設定值:" + cityRateIncr;
+				warn += ", 地區別加減碼設定值:";
 				warnMsg += warn;
 			}
 
