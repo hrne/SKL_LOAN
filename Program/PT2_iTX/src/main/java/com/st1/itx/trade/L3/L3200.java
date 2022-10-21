@@ -205,6 +205,7 @@ public class L3200 extends TradeBuffer {
 	private int wkPreRepayDate = 0;
 	private int wkPrevTermNo = 0;
 	private int wkNewTotalPeriod = 0;
+	private int wkPrePaidTerms = 0;
 	private BigDecimal wkLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkTotalExtraRepay = BigDecimal.ZERO;
 	private BigDecimal wkTotalPrincipal = BigDecimal.ZERO;
@@ -397,9 +398,9 @@ public class L3200 extends TradeBuffer {
 			}
 			batxSettleUnpaid(); // 取得未收費用
 		}
-		// put Batch Tita
-		if (titaVo.isHcodeNormal() && titaVo.isTrmtypBatch()) {
-			putBatchTita();
+		// put Tita
+		if (titaVo.isHcodeNormal()) {
+			putTita();
 		}
 		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 		if (titaVo.isHcodeErase()) {
@@ -489,7 +490,6 @@ public class L3200 extends TradeBuffer {
 	}
 
 	private void checkOutputRoutine() throws LogicException {
-
 	}
 
 	// 按清償違約金、違約金、 延滯息、利息順序減免，計算各自減免金額
@@ -915,9 +915,9 @@ public class L3200 extends TradeBuffer {
 		wkExtraRepay = BigDecimal.ZERO;
 		// 未計息
 		if (getCalcBorm(ln) == 0) {
-			return;			
+			return;
 		}
-		
+
 		// 部分償還餘額 > 0
 		if (wkRepaykindCode == 1) {
 			wkExtraRepayRemaind = iExtraRepay.subtract(wkRepayLoan);
@@ -948,15 +948,15 @@ public class L3200 extends TradeBuffer {
 					ln.getSpecificDd(), ln.getPrevPayIntDate());
 		}
 
-		// 可回收期數
-		wkPreRepayTermNo = loanCom.getTermNo(wkTbsDy >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+		// 至本日應繳期數
+		int wkTermNoTbsdy = loanCom.getTermNo(wkTbsDy >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
 				ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), wkTbsDy);
 
 		// 可回收期數；可回收期數 = 已到期期數 + 預收期數
 		if (titaVo.isTrmtypBatch()) {
-			wkPreRepayTermNo = wkPreRepayTermNo + this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+			wkPreRepayTermNo = wkTermNoTbsdy + this.txBuffer.getSystemParas().getPreRepayTermsBatch();
 		} else {
-			wkPreRepayTermNo = wkPreRepayTermNo + this.txBuffer.getSystemParas().getPreRepayTerms();
+			wkPreRepayTermNo = wkTermNoTbsdy + this.txBuffer.getSystemParas().getPreRepayTerms();
 		}
 
 		// 可回收應繳日
@@ -976,6 +976,11 @@ public class L3200 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3082",
 						checkMsg + ",可預收迄日" + wkPreRepayDate + ",可回收期數= " + (wkPreRepayTermNo - wkPrevTermNo)); // 回收期數超過可預收期數
 			}
+			// 預繳期數
+			if ((wkTerms + wkPrevTermNo - wkTermNoTbsdy) > wkPrePaidTerms) {
+				wkPrePaidTerms = wkTerms + wkPrevTermNo - wkTermNoTbsdy;
+			}
+
 			break;
 		case 3: // 回收期數 = 0
 			// 計算至入帳日或指定應繳日的應繳之期數
@@ -998,6 +1003,10 @@ public class L3200 extends TradeBuffer {
 				checkMsg += ", 可預收迄日:" + wkPreRepayDate + ", 試算收息日:" + wkIntEndDate + ",可回收期數= " + wkTerms;
 				this.info(checkMsg);
 				return;
+			}
+			// 預繳期數
+			if ((wkTerms + wkPrevTermNo - wkTermNoTbsdy) > wkPrePaidTerms) {
+				wkPrePaidTerms = wkTerms + wkPrevTermNo - wkTermNoTbsdy;
 			}
 			break;
 		}
@@ -2013,26 +2022,31 @@ public class L3200 extends TradeBuffer {
 		return isCalcFacmNo;
 	}
 
-	// put Batch Tita
-	private void putBatchTita() throws LogicException {
-
-		titaVo.put("TwPrincipal", "" + iPrincipal); // 本金
-		titaVo.put("TwInterest", "" + iInterest);// 利息
-		titaVo.put("TwDelayInt", "" + iDelayInt);// 延遲息
-		titaVo.put("TwBreachAmt", "" + iBreachAmt);// 違約金
-		titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
-		titaVo.put("ShortfallXX", "[利息；" + df.format(iShortfallInt) + "本金；" + df.format(iShortfallPrin) + "違約金；"
-				+ df.format(iShortCloseBreach) + "]");// 累短收
-		titaVo.put("TwAcctFee", "" + iAcctFee);// 帳管費
-		titaVo.put("TwModifyFee", "" + iModifyFee);// 契變手續費
-		titaVo.put("TwFireFee", "" + iFireFee);// 火險費
-		titaVo.put("TwLawFee", "" + iLawFee);// 法務費
-		titaVo.put("ExcessiveXX", df.format(baTxCom.getExcessive()) + "(全戶；"
-				+ df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())) + ")");// 累溢收(本戶)
-		titaVo.put("TwExtraCloseBreachAmt", df.format(baTxCom.getShortCloseBreach()));// 清償違約金
-		titaVo.put("BreachCodeX", "");// 清償違約金
-		titaVo.put("TwReduceAmt", "" + iReduceAmt);// 減免金額
-
+	// put Tita
+	private void putTita() throws LogicException {		
+		// 預繳期數
+		if (iRepayType == 1) {
+			titaVo.put("PrePaidTerms", "" + wkPrePaidTerms);
+		}
+        // 金額欄
+		if (titaVo.isTrmtypBatch()) {
+			titaVo.put("TwPrincipal", "" + iPrincipal); // 本金
+			titaVo.put("TwInterest", "" + iInterest);// 利息
+			titaVo.put("TwDelayInt", "" + iDelayInt);// 延遲息
+			titaVo.put("TwBreachAmt", "" + iBreachAmt);// 違約金
+			titaVo.put("ShortfallX", df.format(baTxCom.getShortfall()));// 累短收
+			titaVo.put("ShortfallXX", "[利息；" + df.format(iShortfallInt) + "本金；" + df.format(iShortfallPrin) + "違約金；"
+					+ df.format(iShortCloseBreach) + "]");// 累短收
+			titaVo.put("TwAcctFee", "" + iAcctFee);// 帳管費
+			titaVo.put("TwModifyFee", "" + iModifyFee);// 契變手續費
+			titaVo.put("TwFireFee", "" + iFireFee);// 火險費
+			titaVo.put("TwLawFee", "" + iLawFee);// 法務費
+			titaVo.put("ExcessiveXX", df.format(baTxCom.getExcessive()) + "(全戶；"
+					+ df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())) + ")");// 累溢收(本戶)
+			titaVo.put("TwExtraCloseBreachAmt", df.format(baTxCom.getShortCloseBreach()));// 清償違約金
+			titaVo.put("BreachCodeX", "");// 清償違約金
+			titaVo.put("TwReduceAmt", "" + iReduceAmt);// 減免金額
+		}
 	}
 
 }

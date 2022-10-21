@@ -131,7 +131,7 @@ public class L2631ReportB extends MakeReport {
 		this.print(1, 1, "");
 		this.print(1, 17, "設定金額：　　　　　　　　　　　萬");
 		this.print(1, 1, "");
-		this.print(1, 17, "結清日期：　999/99/99");
+		this.print(1, 17, "結清日期：　" + this.showRocDate(parse.stringToInteger(titaVo.getParam("TranDate")), 1));
 		this.print(1, 1, "");
 		this.print(1, 1, "");
 		this.print(1, 1, "");

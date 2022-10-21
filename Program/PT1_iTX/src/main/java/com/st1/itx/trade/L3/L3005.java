@@ -159,6 +159,7 @@ public class L3005 extends TradeBuffer {
 
 			this.info("Size =" + resultList.size());
 			String txNo = "";
+			String oldTxNo = "";
 			String newTxNo = "";
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
@@ -203,9 +204,11 @@ public class L3005 extends TradeBuffer {
 						.add(parse.stringToBigDecimal(result.get("UnpaidPrincipal")))
 						.add(parse.stringToBigDecimal(result.get("UnpaidCloseBreach")));
 				int intEndDate = parse.stringToInteger(result.get("IntEndDate"));
-				
+				if (intEndDate > 0) {
+					intEndDate = intEndDate - 19110000;
+				}
 				needPaidAmt = txAmt.add(tempAmt).subtract(overflow).add(unpaidAmt);
-				newTxNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				newTxNo = acDate + titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
@@ -221,7 +224,7 @@ public class L3005 extends TradeBuffer {
 					}
 				}
 				occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
-				if (txNo.equals(newTxNo)) {
+				if (oldTxNo.equals(newTxNo)) {
 					AcFg = "";
 					hCodeFlag = "";
 				} else if (displayflag.equals("A") || displayflag.equals("F") || displayflag.equals("I")) {
@@ -244,6 +247,7 @@ public class L3005 extends TradeBuffer {
 				// 溢短收
 				wkOverShort = overflow.subtract(unpaidAmt);
 				txNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				oldTxNo = acDate + titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);
 
@@ -255,7 +259,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OORelNo", txNo); // 交易
 				occursList.putParam("OOTellerNo", titaTlrNo);
 				occursList.putParam("OOTxtNo", titaTxtNo);
-				occursList.putParam("OOIntEndDate", intEndDate-19110000);
+				occursList.putParam("OOIntEndDate", intEndDate);
 				occursList.putParam("OOCurrencyCode", titaCurCd);
 				if (titaHCode.equals("1") || titaHCode.equals("3")) {
 					occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(txAmt));
@@ -281,7 +285,7 @@ public class L3005 extends TradeBuffer {
 				occursList.putParam("OODisplayFlag", displayflag); // 顯示記號
 				occursList.putParam("OOHCodeFlag", hCodeFlag); // 訂正記號
 				occursList.putParam("OOEraseTxCd", eraseTxCd); // 訂正交易代號
-				
+
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
 			}

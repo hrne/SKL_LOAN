@@ -62,7 +62,6 @@ HIDE(#what)
 ["#FdCustId+統一編號",#CustId,"@@@",#BTN2,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 ["#FdTempReasonCode+暫收帳戶",#TempReasonCodeX],
-["@",#BTN8],
 ["#FdAcctCode+作業項目",#AcctCodeX],
 ["#FdFacmNo+額度編號",#FacmNo],
 ["#FdEntryDate+入帳日期",#EntryDate],
@@ -81,6 +80,9 @@ HIDE(#what)
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0;title: L2016 核准號碼明細資料查詢;
 ! #BTN6=X,15,I,ui:button;value:撥款明細查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
+
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
 
 #BUF1=X,42,S
 HIDE(#BTN1,#BTN2,#BTN3,#what)
@@ -335,31 +337,31 @@ T(3,)T(H,#TempReasonCode,#Temp2ReasonCodeHelp)
 ![作業項目]
 #FdAcctCode=X,2,L
 
-#BUF8=X,100,S
-T(2,#TXCD+#TimCustNo)
+! #BUF8=X,100,S
+! T(2,#TXCD+#TimCustNo)
 
 
-#BIND8=X,1,S
-BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L3914; ntxbuf=#BUF8;ntxbuf5=type<-1:
-CustNo<-OCustNo:
-AcctCode<-OOAcctCode:
-AcctCodeX<-OOAcctItem:
-FacmNoR<-OOFacmNo:
-FacmNo<-OOFacmNo:
-RvNo<-OORvNo:
-EntryDate<-OOEntryDate:
-AcDate<-OOAcDate:
-OrgEntdy<-OOAcDate:
-TwTempAmt<-OOTxAmt:
-UsTempAmt<-OOTxAmt:
-TellerNo<-OOTellerNo:
-ORGTLR<-OOTellerNo:
-TxtNo<-OOTxtNo:
-ORGTNO<-OOTxtNo:
-Description<-OODesc})
+! #BIND8=X,1,S
+! BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L3914; ntxbuf=#BUF8;ntxbuf5=type<-1:
+! CustNo<-OCustNo:
+! AcctCode<-OOAcctCode:
+! AcctCodeX<-OOAcctItem:
+! FacmNoR<-OOFacmNo:
+! FacmNo<-OOFacmNo:
+! RvNo<-OORvNo:
+! EntryDate<-OOEntryDate:
+! AcDate<-OOAcDate:
+! OrgEntdy<-OOAcDate:
+! TwTempAmt<-OOTxAmt:
+! UsTempAmt<-OOTxAmt:
+! TellerNo<-OOTellerNo:
+! ORGTLR<-OOTellerNo:
+! TxtNo<-OOTxtNo:
+! ORGTNO<-OOTxtNo:
+! Description<-OODesc})
 
 
-#BTN8=X,30,I,ui:button;value:暫收款退還／銷帳資料查詢;enable:1;tabbable:1;backNext:true;title: L3914 暫收款退還／銷帳資料查詢
+! #BTN8=X,30,I,ui:button;value:暫收款退還／銷帳資料查詢;enable:1;tabbable:1;backNext:true;title: L3914 暫收款退還／銷帳資料查詢
 
 
 #AcctCode=X,3,S

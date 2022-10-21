@@ -72,7 +72,7 @@ E(0,11)
 
 ! 16
 #P2E=A,2,S
-E(0,#P2S+5)
+E(0,#P2S+6)
 ! 18
 #P3S=A,2,S
 E(0,#P2E+2)
@@ -94,17 +94,6 @@ E(0,#P3S2+3)
 #P3E=A,2,S
 E(0,#P3S+9)
 
-! #P4S=A,2,S
-! E(0,#P3E+2)
-
-! #P4E=A,2,S
-! E(0,#P4S+3)
-
-! #P5S=A,2,S
-! E(0,#P4E+2)
-
-! #P5E=A,2,S
-! E(0,#P5S+6)
 
 #P6S=A,2,S
 E(0,#P3E+1)
@@ -116,7 +105,7 @@ E(0,#P6S+7)
 C(3,#HIDE2FG,1,K(LIGHT,#BTNHIDEP2,TXTRED,0),K(LIGHT,#BTNHIDEP2,TXTRED,-1))
 C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
 C(3,#HIDE6FG,1,K(LIGHT,#BTNHIDEP6,TXTRED,0),K(LIGHT,#BTNHIDEP6,TXTRED,-1))
-C(5,#OvduFlag,Y,INVOKEJS(SHOW,p1,30,31,1),INVOKEJS(SHOW,p1,30,31,0))
+C(5,#OvduFlag,Y,INVOKEJS(SHOW,p1,31,32,1),INVOKEJS(SHOW,p1,31,32,0))
 
 !--- P2 利率
 #HIDEP2=@,1,S
@@ -142,36 +131,8 @@ C(5,#PaidFlag,Y,INVOKEJS(SHOW,p1,#P3S2,#P3E2,0),$)
 C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
 C(3,#HIDE3FG,1,$,s)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
-! C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
-! C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
 C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
 CALL(#KLIGHT)
- 
-! !--- P4 扣款帳號
-! #HIDEP4=@,1,S
-! C(3,#EXPANDFG,1,CALL(#EXPAND),$)
-! C(3,#HIDE4FG,1,E(0,@HIDE4FG,0),E(0,@HIDE4FG,1))
-! INVOKEJS(SHOW,p1,#P4S,#P4E,#HIDE4FG)
-! C(3,#HIDE4FG,1,K(LIGHT,#BTNHIDEP4,TXTRED,0),K(LIGHT,#BTNHIDEP4,TXTRED,-1))
-! C(3,#HIDE4FG,1,$,s)
-! C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
-! C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
-! C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
-! C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
-! CALL(#KLIGHT)
-
-!--- P5 與借款人關係
-! #HIDEP5=@,1,S
-! C(3,#EXPANDFG,1,CALL(#EXPAND),$)
-! C(3,#HIDE5FG,1,E(0,@HIDE5FG,0),E(0,@HIDE5FG,1))
-! INVOKEJS(SHOW,p1,#P5S,#P5E,#HIDE5FG)
-! C(3,#HIDE5FG,1,K(LIGHT,#BTNHIDEP5,TXTRED,0),K(LIGHT,#BTNHIDEP5,TXTRED,-1))
-! C(3,#HIDE5FG,1,$,s)
-! C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
-! C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
-! ! C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
-! C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
-! CALL(#KLIGHT)
  
 !--- P6 其他
 #HIDEP6=@,1,S
@@ -182,8 +143,6 @@ C(3,#HIDE6FG,1,K(LIGHT,#BTNHIDEP6,TXTRED,0),K(LIGHT,#BTNHIDEP6,TXTRED,-1))
 C(3,#HIDE6FG,1,$,s)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
 C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
-! C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
-! C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
 CALL(#KLIGHT)
 
 !--- 展開
@@ -232,6 +191,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 !利率
 ["<font color=red>@利率",""],["",""],
 ["#FdRateCode+利率區分",#RateCode1X],[#RateCodeY,#RateCode2,#RateCode2X],
+["#FdApproveRate+核准利率",#ApproveRate1X],[#ApproveRateY,#ApproveRate2,#ApproveRate2X],
 ["#FdRateIncr+利率加減碼",#RateIncr1X],[#RateIncrY,#RateIncr2,#RateIncr2X],
 ["#FdIndividualIncr+個別加減碼",#IndividualIncr1X],[#IndividualIncrY,#IndividualIncr2,#IndividualIncr2X],
 ["#FdRateAdjFreq+利率調整週期",#RateAdjFreq1,"個月"],[#RateAdjFreqY,#RateAdjFreq2,#RateAdjFreq2X],
@@ -382,11 +342,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 
 #CustNo=A,7,I
 C(3,#FKEY,0,$,s)
-! INVOKEJS(SHOW,p1,2,4,1)
 SHOW(#BTN1)HIDE(#BTN2,#BTN3)
 
 #WKBTN1=X,1,S
-! C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
 
 #BUF1B=X,18,S
 T(2,#CustNo+9999999000)
@@ -423,11 +381,9 @@ T(F,@Remark,0)
 C(3,#FKEY,0,$,s)
 T(3,@FdApplNo, )
 C(3,#CustNo,0,$,S)
-! INVOKEJS(SHOW,p1,3,4,1)
 SHOW(#BTN2)HIDE(#BTN1,#BTN3)
 
 #WKBTN2=X,1,S
-! C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
 
 #BUF2B=X,100,S
 T(2,0000000+#CustId)
@@ -472,7 +428,6 @@ T(3,*)
 C(3,#FKEY,0,$,s)
 C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
-! INVOKEJS(SHOW,p1,4,4,1)
 SHOW(#BTN3)HIDE(#BTN1,#BTN2)
 @
 T(3,#ApplNoX,)
@@ -526,7 +481,6 @@ T(2,@RmkCustNo,#TimCustNo)
 C(3,#FKEY,0,$,s)
 C(3,#L2r07BormCount,0,T(3,Y),T(3,N))
 
-
 #BUF4A=X,100,S
 T(2,0000000+#CustNo+#CustId+#ApplNo+000)
 
@@ -579,7 +533,7 @@ IF(#BormNo>0,T(3,Y),T(3,N))
 
 
 #WkBormNo=A,3,S
-C(3,#FacmNo,0,IF(#WkFacmNo==#L2r07FacmNo && #BormNo==0,E(0,#L2r07BormNo),E(0,#BormNo)),IF(#BormNo==0,E(0,#L2r07BormNo),E(0,#BormNo)))
+C(3,#FacmNo,0,IF(#WkFacmNo==#L2r07FacmNo && #BormNo==0,E(0,#L2r07BormNo),E(0,#BormNo)),IF(#BormNo==0,E(0,#L2r05BormNo),E(0,#BormNo)))
 C(3,#FKEY,0,$,s)
 C(3,#WkBormNo,0,V(P,無撥款資料),$)
 
@@ -611,6 +565,7 @@ E(0,@AcctCode1,#L2r05AcctCode)
 E(0,@MaturityDate1,#L2r05MaturityDate)
 T(2,@IntCalcCode1,#L2r05IntCalcCode)
 E(0,@RateCode1,#L2r05RateCode)
+E(0,@ApproveRate1,#L2r05ApproveRate)
 E(0,@RateIncr1,#L2r05RateIncr)
 E(0,@IndividualIncr1,#L2r05IndividualIncr)
 E(0,@RateAdjFreq1,#L2r05RateAdjFreq)
@@ -631,6 +586,7 @@ C(3,#WkBormNo,0,S,$)
 E(0,@MaturityDate1,#L3r02MaturityDate)
 T(2,@IntCalcCode1,#L3r02IntCalcCode)
 E(0,@RateCode1,#L3r02RateCode)
+E(0,@ApproveRate1,#L3r02ApproveRate)
 E(0,@RateIncr1,#L3r02RateIncr)
 E(0,@IndividualIncr1,#L3r02IndividualIncr)
 E(0,@FirstRateAdjDate1,#L3r02FirstRateAdjDate)
@@ -679,7 +635,7 @@ C(3,#L3r02PaidTerms,0,T(3,N),T(3,Y))
 #OvduFlag=X,1,S
 C(3,#FKEY,0,$,s)
 C(3,#BormStatus,2,T(3,Y),T(3,N))
-C(5,#OvduFlag,Y,INVOKEJS(SHOW,p1,30,31,1),INVOKEJS(SHOW,p1,30,31,0))
+C(5,#OvduFlag,Y,INVOKEJS(SHOW,p1,31,32,1),INVOKEJS(SHOW,p1,31,32,0))
 
 #CurrencyCode=X,3,S
 C(3,#FKEY,0,$,s)
@@ -707,6 +663,17 @@ BIND(#BTNHIDEP2,click, {cmd=CALLSEND;DOCODE=HIDEP2})
 
 #RateCode1X=X,10,L
 T(3,)T(H,#RateCode1,#RateCodeHelp)            
+
+
+![核准利率]
+!催收戶不可變更,須隱藏欄位
+#FdApproveRate=X,2,L
+  
+#ApproveRate1=n,2.4,S
+
+#ApproveRate1X=X,8,L
+X(#ApproveRate1)
+T(B,#ApproveRate1X+%)
 
 ![利率加減碼]
 !催收戶不可變更,須隱藏欄位
@@ -1016,7 +983,6 @@ T(3,@RateAdjFreq2X,個月)
 ![利率區分]
 !催收戶不可變更,須隱藏欄位
 #RateCode2=X,1,I
-C(5,#ChackBormNoFg,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
 HELP(#RateCodeHelp)
 @C(4,#RateCode2,S,$)
@@ -1024,15 +990,12 @@ V(H,#RateCodeHelp)
 V(2,#RateCode1)
 
 #RateCode2X=X,10,L
-C(5,#ChackBormNoFg,Y,S,$)
 T(3,)T(H,#RateCode2,#RateCodeHelp)            
 
 #RateCodeY=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#RateCode2,S,T(3,X))
 
 #WkRateAdjFreq=A,1,S
-C(5,#ChackBormNoFg,Y,S,$)
 E(0,0)
 C(3,#RateCode2,3,E(0,1),$)
 IF(#RateCode2=="" && #RateCode1=="3",E(0,1),$)
@@ -1045,63 +1008,72 @@ C(3,#WkRateAdjFreq,1,T(3,@RateAdjFreq2X,個月)
                      T(F,@FirstRateAdjDate2,0)
                      T(F,@NextRateAdjDate2,0))
 
+
+![核准利率]  
+!催收戶不可變更,須隱藏欄位
+#ApproveRate2X=X,1,L
+T(3,%)
+
+#ApproveRate2=X,7,I
+C(5,#OvduFlag,Y,S,$)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+
+#ApproveRate2N=n,7.4,S
+C(4,#ApproveRate2,S,$)
+E(0,#ApproveRate2)
+! V(2,#ApproveRate1)
+! V(5,0,99.9999)
+
+#ApproveRateY=X,1,L
+C(4,#ApproveRate2,S,T(3,X))
+
 ![利率加減碼]  
 !催收戶不可變更,須隱藏欄位
 #RateIncr2X=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(5,#L2r01IncrFlag,Y,T(3,%),T(3, ))
 
 #RateIncr2=X,7,I
-C(5,#ChackBormNoFg,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
 C(5,#L2r01IncrFlag,Y,$,S)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 
 #RateIncr2N=n,7.4,S
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#RateIncr2,S,$)
 E(0,#RateIncr2)
 V(2,#RateIncr1)
 V(5,0,99.9999)
 
 #RateIncrY=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#RateIncr2,S,T(3,X))
 
 ![個別加減碼]
 !催收戶不可變更,須隱藏欄位 
 #IndividualIncr2X=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(5,#L2r01IncrFlag,Y,T(3, ),T(3,%))
  
 #IndividualIncr2=X,7,I
-C(5,#ChackBormNoFg,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
 C(5,#L2r01IncrFlag,Y,S,$)
 C(3,#RateIncr2N,0,$,S)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 
 #IndividualIncr2N=n,7.4,S
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#IndividualIncr2,S,$)
 E(0,#IndividualIncr2)
 V(2,#IndividualIncr1)
 V(5,0,99.9999)
 
 #IndividualIncrY=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#IndividualIncr2,S,T(3,X))
 
 ![利率調整週期]
 !催收戶不可變更,須隱藏欄位
 !利率區分為 '3' 者，必須輸入利率調整週
 #RateAdjFreq2X=X,4,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(3,#WkRateAdjFreq,1,$,S)
 T(3,個月)
 
 #RateAdjFreq2=X,2,I
-C(5,#ChackBormNoFg,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
 C(3,#WkRateAdjFreq,1,$,S)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
@@ -1109,13 +1081,11 @@ C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 C(3,#RateAdjFreq1,0,C(3,#RateCode2,3,V(7),$),$)
 
 #RateAdjFreq2W=A,2,S
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#RateAdjFreq2,S,$)
 E(0,#RateAdjFreq2)
 V(5,1,99)
 
 #RateAdjFreqY=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#RateAdjFreq2,S,T(3,X))
 
 ![首次調整日期]
@@ -1124,7 +1094,6 @@ C(4,#RateAdjFreq2,S,T(3,X))
 !變更前自動顯示,變更後可修改
 !利率區分為定期機動者，必須輸入,其他不可輸入
 #FirstRateAdjDate2=D,7,I
-C(5,#ChackBormNoFg,Y,S,$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 C(5,#FacmOnlyFlag,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
@@ -1137,7 +1106,6 @@ V(5,#L3r02DrawdownDate,#L3r02MaturityDate)
 !V(2,#FirstRateAdjDate1)
 
 #FirstRateAdjDateY=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#FirstRateAdjDate2,S,T(3,X))
 
 ![下次調整日期]
@@ -1145,7 +1113,6 @@ C(4,#FirstRateAdjDate2,S,T(3,X))
 !變更前自動顯示,變更後可修改
 !利率區分為定期機動者，必須輸入,其他不可輸入
 #NextRateAdjDate2=D,7,I
-C(5,#ChackBormNoFg,Y,S,$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 C(5,#FacmOnlyFlag,Y,S,$)
 C(5,#OvduFlag,Y,S,$)
@@ -1157,7 +1124,6 @@ V(5,#FirstRateAdjDate2,#L3r02MaturityDate)
 !V(2,#NextRateAdjDate1)
 
 #NextRateAdjDateY=X,1,L
-C(5,#ChackBormNoFg,Y,S,$)
 C(4,#NextRateAdjDate2,S,T(3,X))
 
 !---- P3 金額日期
@@ -1865,6 +1831,7 @@ E(0,0)
 C(5,#AcctCodeY,X,E(0,1),$)
 C(5,#MaturityDateY,X,E(0,1),$)
 C(5,#RateCodeY,X,E(0,1),$)
+C(5,#ApproveRateY,X,E(0,1),$)
 C(5,#RateIncrY,X,E(0,1),$)
 C(5,#IndividualIncrY,X,E(0,1),$)
 C(5,#RateAdjFreqY,X,E(0,1),$)
@@ -1874,25 +1841,14 @@ C(5,#FirstRateAdjDateY,X,E(0,1),$)
 C(5,#AmortizedCodeY,X,E(0,1),$)
 C(5,#PayIntFreqY,X,E(0,1),$)
 C(5,#RepayFreqY,X,E(0,1),$)
-! C(5,#RepayCodeY,X,E(0,1),$)
-! C(5,#RepayBankY,X,E(0,1),$)
-! C(5,#RepayAcctNoY,X,E(0,1),$)
-! C(5,#PostCodeY,X,E(0,1),$)
-! C(5,#ProhibitDateY,X,E(0,1),$)
 C(5,#GraceDateY,X,E(0,1),$)
 C(5,#FirstDueDateY,X,E(0,1),$)
 C(5,#SpecificDdY,X,E(0,1),$)
 C(5,#AcctFeeY,X,E(0,1),$)
-! C(5,#RelationCodeY,X,E(0,1),$)
-! C(5,#RelationNameY,X,E(0,1),$)
-! C(5,#RelationIdY,X,E(0,1),$)
-! !C(5,#RELACCTERRY,X,E(0,1),$)
-! C(5,#RelationBirthdayY,X,E(0,1),$)
 C(5,#RemarkY,X,E(0,1),$)
 C(5,#PieceCodeY,X,E(0,1),$)
 C(5,#PieceCodeSecondY,X,E(0,1),$)
 C(5,#PieceCodeSecondAmtY,X,E(0,1),$)
-! C(5,#RelationGenderY,X,E(0,1),$)
 C(5,#ProcessDateY,X,E(0,1),$)
 
 
@@ -1969,6 +1925,7 @@ T(3,[L3701] 放款內容變更)
 
 #TimCustNo#FacmNo#BormNo#FacmOnlyFlag
 #RateCodeY#RateCode1#RateCode2
+#ApproveRateY#ApproveRate1#ApproveRate2#ApproveRate2N
 #RateIncrY#RateIncr1#RateIncr2#RateIncr2N
 #IndividualIncrY#IndividualIncr1#IndividualIncr2#IndividualIncr2N
 #RateAdjFreqY#RateAdjFreq1#RateAdjFreq2

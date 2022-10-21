@@ -81,6 +81,9 @@ K(MODIFYBUTTON,登錄)
 #FdTellerNo=X,2,L
 #FdTxtNo=X,2,L
 
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
 
 #CHAIN=A,1,S
 T(4,CHAIN$)

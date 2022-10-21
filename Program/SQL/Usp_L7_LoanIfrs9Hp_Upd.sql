@@ -145,11 +145,12 @@ BEGIN
                 ELSE 2
            END                                  AS "CustKind"           -- 企業戶/個人戶
          , NVL(HP."ApproveDate",0)              AS "ApproveDate"        -- 核准日期(額度)
-         , CASE
-             WHEN F."LastBormRvNo" > 900 AND F."LastBormNo" = 0
-                  THEN NVL(L."DrawdownDate",0)
-             ELSE NVL(F."FirstDrawdownDate",0)
-           END                                  AS "FirstDrawdownDate"  -- 初貸日期
+         --, CASE
+         --    WHEN F."LastBormRvNo" > 900 AND F."LastBormNo" = 0
+         --         THEN NVL(L."DrawdownDate",0)
+         --    ELSE NVL(F."FirstDrawdownDate",0)
+         --  END                                  AS "FirstDrawdownDate"  -- 初貸日期
+         , NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate"  -- 初貸日期
          , NVL(NVL(sfd."ShareLineAmt",F."LineAmt"),0) AS "LineAmt"            -- 核准金額(台幣)
          , NVL("FacProd"."Ifrs9ProdCode", ' ')  AS "Ifrs9ProdCode"      -- 產品別
          , CASE WHEN NVL(F."RecycleCode",0) = 0 AND NVL(F."UtilDeadline",0) >= TMNDYF --非循環且動支期限>=月底日  

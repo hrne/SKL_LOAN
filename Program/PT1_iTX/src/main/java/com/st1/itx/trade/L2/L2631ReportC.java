@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
@@ -17,6 +19,7 @@ import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
@@ -45,6 +48,8 @@ public class L2631ReportC extends MakeReport {
 	ClBuildingService clBuildingService;
 	@Autowired
 	ClLandService clLandService;
+	@Autowired
+	CdCodeService cdCodeService;
 
 	@Autowired
 	LoanCom loanCom;
@@ -179,9 +184,15 @@ public class L2631ReportC extends MakeReport {
 				bdLocation = tClLand.getLandLocation();
 			}
 		}
+		String collectWayCode = "";
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId("CollectWayCode", titaVo.getParam("CollectWayCode")),
+				titaVo);
+		if (tCdCode != null) {
+			collectWayCode = tCdCode.getItem();
+		}
 
 		this.print(1, 8, "茲有借款戶：　" + FormatUtil.padX(loanCom.getCustNameByNo(iCustNo), 20)); // 戶名
-		this.print(0, 40, "戶號：　" + parse.IntegerToString(iCustNo, 7)); // 戶號
+		this.print(0, 40, "戶號：　" + parse.IntegerToString(iCustNo, 7) + "-" + parse.IntegerToString(iFacmNo, 3)); // 戶號
 		this.print(1, 1, "");
 		this.print(1, 8, "押品：　" + bdLocation); // 結清日期
 		this.print(1, 1, "");
@@ -217,19 +228,19 @@ public class L2631ReportC extends MakeReport {
 		this.print(1, 1, "");
 		this.print(1, 60, "借戶經辦：　" + tlrNoX);
 		this.print(1, 1, "");
-		this.print(1, 60, "借出日期：　" + titaVo.getEntDyI());
+		this.print(1, 60, "借出日期：　" + this.showRocDate(titaVo.getEntDyI(), 1));
 		this.print(1, 1, "");
 		this.print(1, 60, "檔案管理員：　");
 		this.print(1, 1, "");
 		this.print(1, 8, "﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍﹍");
 		this.print(1, 1, "");
 		this.print(1, 8, "房貸清償證明：");
-		this.print(0, 38, "雙掛號");
+		this.print(0, 38, collectWayCode);
 		this.print(1, 1, "");
-		this.print(1, 38, "戶號：　");
-		this.print(1, 38, "戶名：　");
-		this.print(1, 38, "聯絡電話　１....");
-		this.print(1, 38, "聯絡電話　２....");
+		this.print(1, 38, "戶號：　" + parse.IntegerToString(iCustNo, 7));
+		this.print(1, 38, "戶名：　" + FormatUtil.padX(loanCom.getCustNameByNo(iCustNo), 20));
+		this.print(1, 38, "聯絡電話　１....　" + titaVo.getParam("TelNo1"));
+		this.print(1, 38, "聯絡電話　２....　" + titaVo.getParam("TelNo2"));
 		this.print(1, 1, "");
 		this.print(1, 38, "放款服務課　　寄");
 

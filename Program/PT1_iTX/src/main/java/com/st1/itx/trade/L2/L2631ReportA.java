@@ -100,7 +100,7 @@ public class L2631ReportA extends MakeReport {
 		}
 		this.print(1, 8, "戶名：" + FormatUtil.padX(loanCom.getCustNameByNo(iCustNo), 20)); // 戶名
 		this.print(0, 37, "戶號：" + parse.IntegerToString(iCustNo, 7)); // 戶號
-		this.print(0, 76, "結清日期：　" + "999/99/99", "R"); // 結清日期
+		this.print(0, 76, "結清日期：" + this.showRocDate(parse.stringToInteger(titaVo.getParam("TranDate")), 1), "R"); // 結清日期
 		this.print(1, 8, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		this.print(1, 1, "");
 		this.print(1, 44, "茲　　收　　到", "C");

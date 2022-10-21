@@ -72,7 +72,11 @@ BEGIN
     FROM   "FacMain" M
       LEFT JOIN "Work_Ifrs9FacData" WK ON WK."CustNo" = M."CustNo"
                                       AND WK."FacmNo" = M."FacmNo"
-    WHERE  M."LastBormNo" = 0
+--    WHERE  M."LastBormNo" = 0
+    WHERE  CASE WHEN M."FirstDrawdownDate" > TBSDYF  THEN 1
+                WHEN M."FirstDrawdownDate" = 0 THEN 1
+                ELSE 0
+           END = 1      
       AND  TRUNC(NVL(M."UtilDeadline",0) / 100 ) >= YYYYMM   -- 已核貸未曾動撥且仍可動撥之放款額度編號
       AND  WK."CustNo" IS NULL
     GROUP BY M."CustNo", M."FacmNo"
@@ -123,12 +127,12 @@ BEGIN
          , CASE WHEN F."RecycleCode" IN ('1') THEN NVL(F."RecycleDeadline",0)  -- 循環動用
                 ELSE NVL(F."UtilDeadline",0)                                   -- 非循環動用
            END                                  AS "UtilDeadline"      -- 動支期限
-         --, NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
-         , CASE
-             WHEN  M."DrawdownFg" = 0 AND F."LastBormRvNo" > 900
-                   THEN NVL(L."DrawdownDate",0)
-             ELSE  NVL(F."FirstDrawdownDate",0)
-           END                                  AS "FirstDrawdownDate" -- 初貸日期
+         , NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
+         --, CASE
+         --    WHEN  M."DrawdownFg" = 0 AND F."LastBormRvNo" > 900
+         --          THEN NVL(L."DrawdownDate",0)
+         --    ELSE  NVL(F."FirstDrawdownDate",0)
+         --  END                                  AS "FirstDrawdownDate" -- 初貸日期
          , NVL(F."MaturityDate",0)              AS "MaturityDate"      -- 到期日(額度)
          , NVL(F."LineAmt",0)                   AS "LineAmt"           -- 核准金額
          , NVL(F."AcctFee",0)                   AS "AcctFee"           -- 帳管費

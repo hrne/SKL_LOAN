@@ -85,6 +85,9 @@ public class L3R18 extends TradeBuffer {
 			if (t.getFeeAmt().compareTo(BigDecimal.ZERO) > 0) {
 				continue;
 			}
+			if (!t.getTitaHCode().equals("0")) {
+				throw new LogicException(titaVo, "E0015", "訂正別非正常狀態"); // 檢查錯誤
+			}
 			if (t.getEntryDate() != 0) {
 				wkEntryDate = t.getEntryDate();
 			}

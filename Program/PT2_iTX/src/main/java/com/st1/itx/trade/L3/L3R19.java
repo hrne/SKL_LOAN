@@ -73,7 +73,7 @@ public class L3R19 extends TradeBuffer {
 		}
 		for (LoanBorTx ln : sloanBorTx.getContent()) {
 			if (!ln.getTitaHCode().equals("0")) {
-				continue;
+				throw new LogicException(titaVo, "E0015", "訂正別非正常狀態"); // 檢查錯誤
 			}
 			if (!("L3210".equals(ln.getTitaTxCd()) || "L3220".equals(ln.getTitaTxCd())
 					|| "L3230".equals(ln.getTitaTxCd()))) {

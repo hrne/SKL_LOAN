@@ -1162,10 +1162,24 @@ public class TxBatchCom extends TradeBuffer {
 				tDetail.setAcctAmt(acctAmt); // 已作帳金額
 				tDetail.setDisacctAmt(tDetail.getRepayAmt().subtract(acctAmt));
 				unfinishCnt = -1;
-				if ("L3210".equals(titaVo.getTxcd())) {
+				tDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
+				switch (titaVo.getTxcd()) {
+				case "L3200":
+					tDetail.setRepayType(parse.stringToInteger(titaVo.getParam("RepayType")));
+					if (titaVo.get("PrePaidTerms") != null) {
+						this.tTempVo.putParam("PrePaidTerms", titaVo.getParam("PrePaidTerms"));
+					}
+					break;
+				case "L3210":
 					if (tDetail.getRepayType() >= 1 && tDetail.getRepayType() <= 3) {
 						tDetail.setRepayType(9); // 9.暫收
+						tTempVo.putParam("CheckMsg", "");
 					}
+					this.tTempVo.putParam("TempReasonCodeX", titaVo.getParam("TempReasonCodeX"));
+					break;
+				case "L34200":
+					tDetail.setRepayType(3);
+					break;
 				}
 				if (titaVo.isTrmtypBatch()) { // 批次入帳
 					// 檢核訊息
@@ -1180,6 +1194,7 @@ public class TxBatchCom extends TradeBuffer {
 						tDetail.setProcStsCode("5"); // 5:單筆入帳
 					}
 				} else {
+					tTempVo.putParam("CheckMsg", "");
 					if ("6".equals(this.tTempVo.getParam("BatchProcStsCode"))) {
 						tDetail.setProcStsCode("7"); // 7.批次入帳後人工
 					} else {
@@ -1501,6 +1516,9 @@ public class TxBatchCom extends TradeBuffer {
 					this.procStsCode = "2"; // 2.人工處理
 					break;
 				}
+				if (this.intEndDate > titaVo.getEntDyI()) {
+					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
+				}
 				// 無償還本利
 				// 處理狀態:2.人工處理
 				// 處理說明:繳息迄日:999999
@@ -1538,6 +1556,7 @@ public class TxBatchCom extends TradeBuffer {
 				break;
 			// 02-部分償還
 			case 2:
+				this.checkMsg += " 繳息迄日:" + this.prevPayintDate;
 				// 有期款未回收，人工處理
 				if ("1".equals(tTempVo.getParam("RepayTypeChange"))) {
 					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
@@ -1606,6 +1625,7 @@ public class TxBatchCom extends TradeBuffer {
 				// 處理狀態:2.人工處理
 				// 處理說明:提前結案請先執行 L2631-清償作業(L2077)
 				if (this.closeFg == 2) {
+					this.checkMsg += " 繳息迄日:" + this.prevPayintDate;
 					facCloseRepayType(tBatxDetail, checkAmt, titaVo);
 					if (this.tTempVo.get("CloseReasonCode") == null) {
 						this.checkMsg += " 提前結案請先執行 L2631-清償作業(L2077)";
@@ -1712,6 +1732,10 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg += " 償還本利:" + df.format(this.repayLoan);
 			if (this.repayType == 1) {
 				this.checkMsg += "(" + this.intStartDate + "~" + this.intEndDate + ")";
+				this.checkMsg += "(" + this.intStartDate + "~" + this.intEndDate + ")";
+				if (this.intEndDate > titaVo.getEntDyI()) {
+					this.checkMsg += "預繳";
+				}
 			}
 		}
 		if (this.closeBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -2015,7 +2039,7 @@ public class TxBatchCom extends TradeBuffer {
 			this.repayIntDateByFacmNoVo = this.tTempVo.get("RepayIntDateByFacmNoVo"); // 還款額度
 		}
 		// 上次繳息日
-		if (this.repayType == 1) {
+		if (this.repayType <= 3) {
 			this.prevPayintDate = baTxCom.getPrevPayIntDate();
 		}
 

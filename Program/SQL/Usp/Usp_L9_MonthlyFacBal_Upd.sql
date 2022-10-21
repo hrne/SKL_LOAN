@@ -160,6 +160,7 @@ BEGIN
            , MAX("MaturityDate") AS "MaturityDate"
       FROM "LoanBorMain"
       WHERE "Status" in (0,2,3,4,5,6,7,8,9)
+        AND "DrawdownDate" <= TBSDYF
       GROUP BY "CustNo"
              , "FacmNo"
     ) B ON B."CustNo" = L."CustNo"

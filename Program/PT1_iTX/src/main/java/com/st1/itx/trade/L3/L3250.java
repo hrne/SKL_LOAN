@@ -186,6 +186,7 @@ public class L3250 extends TradeBuffer {
 			if ("F08".equals(iAcctCode)) {
 				UpdLoanOverDueEraseRoutine();
 			}
+			lAcDetail.add(acDetail);
 		}
 
 

@@ -113,6 +113,7 @@ BEGIN
                                                 THEN 1
                                               ELSE 0 END = 1
            WHERE B."Status" in (0,1,2,3,4,5,6,7,8,9)   
+             AND B."DrawdownDate" <= TBSDYF
           ) M
      LEFT  JOIN  "DailyLoanBal" D ON D."CustNo" = M."CustNo"
                                  AND D."FacmNo" = M."FacmNo"

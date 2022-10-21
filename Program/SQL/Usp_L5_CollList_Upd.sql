@@ -159,6 +159,7 @@ BEGIN
                                       AND R."NewBormNo"  = B."BormNo" 
                                       AND R."MainFlag"  = 'Y'
            WHERE B."Status" in (0,2,3,4,5,6,7,8,9)  
+             AND B."DrawdownDate" <= TBSDYF
            GROUP BY  B."CustNo",  B."FacmNo",  B."CurrencyCode"
           ) M
         LEFT JOIN  "ClFac" C ON M."PrinBalance" > 0                --  已還清不排序
@@ -494,6 +495,7 @@ BEGIN
                ) AS "Seq"
         FROM "LoanBorMain"
         WHERE "Status" in (0,2,3,4,5,6,7,8,9)  
+          AND "DrawdownDate" <= TBSDYF
       )
       SELECT C1."CustNo"                AS "CustNo"              -- '戶號';
             ,C1."FacmNo"                AS "FacmNo"              -- '額度';

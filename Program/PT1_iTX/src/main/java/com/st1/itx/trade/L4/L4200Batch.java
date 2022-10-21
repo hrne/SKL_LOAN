@@ -278,7 +278,6 @@ public class L4200Batch extends TradeBuffer {
 //		檢核檔名、檔案格式、是否已入過檔(因L492A每個檔每天只能吃一次)
 		checkFile(filena, titaVo);
 
-
 		if (checkFlag) {
 			String[] filelist = filena.split(";");
 			for (String filename : filelist) {
@@ -455,7 +454,6 @@ public class L4200Batch extends TradeBuffer {
 				}
 			}
 
-
 //			A.寫入Head檔			
 			BatxHead tBatxHead = new BatxHead();
 			BatxHeadId tBatxHeadId = new BatxHeadId();
@@ -478,7 +476,7 @@ public class L4200Batch extends TradeBuffer {
 					checkFlag = false;
 				}
 			}
-			
+
 			if (checkFlag) {
 				try {
 					checkBatxHead(tBatxHeadId, tBatxHead, titaVo);
@@ -494,8 +492,7 @@ public class L4200Batch extends TradeBuffer {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
 					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(), sendMsg, titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4200", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -568,7 +565,7 @@ public class L4200Batch extends TradeBuffer {
 				String procCodeX = "";
 				BigDecimal repayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
 				String reconCode = "";
-				procStsCode = "0";	
+				procStsCode = "0";
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 					switch (tempOccursList.get("OccVirAcctNo").substring(0, 5)) {
 					case "95101":
