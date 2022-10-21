@@ -102,7 +102,8 @@ public class L2916 extends TradeBuffer {
 		}
 		// 該擔保品編號存在擔保品不動產建物檔
 		// 塞tota
-		this.totaVo.putParam("LandLocation", tClLand.getLandLocation());
+		this.totaVo.putParam("LandLocation",
+				tClLand.getLandLocation() + "，地號" + tClLand.getLandNo1() + "-" + tClLand.getLandNo2());
 		this.totaVo.putParam("LandCode", tClLand.getLandCode());
 		this.totaVo.putParam("Area", tClLand.getArea());
 		this.totaVo.putParam("LandZoningCode", tClLand.getLandZoningCode());
@@ -132,7 +133,8 @@ public class L2916 extends TradeBuffer {
 		this.totaVo.putParam("LandRentEndDate", tClLand.getLandRentEndDate());
 
 		// tita擔保品編號取建物所有權人檔資料list
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
+				Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
 
 		if (lClLandOwner == null || lClLandOwner.size() == 0) {

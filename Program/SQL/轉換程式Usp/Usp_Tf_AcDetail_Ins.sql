@@ -338,10 +338,10 @@ BEGIN
           ,S."TRXATP"                     AS "DbCr"                -- 借貸別 VARCHAR2 1 0 
           ,ABS(NVL(S."TRXAMT",S."JLNAMT")) 
                                           AS "TxAmt"               -- 記帳金額 DECIMAL 16 2 
-          ,CASE  
-             WHEN S."JLNCRC" IS NOT NULL 
-             THEN 1 
-           ELSE 0 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0 
+          ,CASE
+             WHEN S."AGLVBN" > 90
+             THEN 9
+           ELSE 1 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0 
           ,NVL(NVL(S."LMSACN",tempTRXP."LMSACN"),0)
                                           AS "CustNo"              -- 戶號 DECIMAL 7 0 
           ,NVL(S."LMSAPN",0)              AS "FacmNo"              -- 額度編號 DECIMAL 3 0 
@@ -497,7 +497,10 @@ BEGIN
                WHEN NVL(JORP."ACNBOK",' ') = '000' 
                THEN NVL(BOKOTHERS."CORAMT",0) 
              ELSE 0 END                   AS "TxAmt"               -- 記帳金額 DECIMAL 16 2 
-          ,0                              AS "EntAc"               -- 入總帳記號 DECIMAL 1 0 
+          ,CASE
+             WHEN JORP."NEWVBN" > 90
+             THEN 9
+           ELSE 1 END                     AS "EntAc"               -- 入總帳記號 DECIMAL 1 0 
           ,0                              AS "CustNo"              -- 戶號 DECIMAL 7 0 
           ,0                              AS "FacmNo"              -- 額度編號 DECIMAL 3 0 
           ,0                              AS "BormNo"              -- 撥款序號 DECIMAL 3 0 

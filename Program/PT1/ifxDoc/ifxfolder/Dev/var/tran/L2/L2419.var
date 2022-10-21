@@ -4,10 +4,8 @@
 
 <sub type="SYS" name="label">
 
-
 #SECNO=_,_,S
 T(3,09)
-
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
@@ -42,15 +40,14 @@ K(MODIFYBUTTON,上傳及檢查)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,1200];printer.width=[20,20];">
 [
 ["[L2419]                                 不動產擔保品資料整批匯入"],
+[#<->#,"#FdFunction+功能選擇",#Function,#FunctionX],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo,#ApplNoBtn],
 [#<->#,"#FdCustNo+戶@@@@號",#CustNo],
 [#<->#,"#FdCustId+統@@@@編",#CustId],
 [#<->#,"#FdCustName+戶@@@@名",#CustName],
 [#<->#,"#FdEvaCompany+鑑價公司",#EvaCompany,#EvaCompanyBtn,#EvaCompanyX],
 [#<->#,"#FdEvaDate+鑑價日期",#EvaDate],
-[#<->#,"@@","@@"],
 [#<->#,"#FdFileBtn+擔保品明細表","#FileBtn"],
-[#<->#,"@@","@@"],
 ]
 
 !---------- AP Button AREA ----------
@@ -66,7 +63,6 @@ T(2,不動產擔保品資料整批匯入EXCEL檔範本)
 
 #BufL2419=X,200,S
 T(2,L24190000000000000+#L2419Mrkey+#L2419Note)
-
 
 #Button=x,100,S
 T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufL2419})ASGN(BTN_NEW1$)
@@ -94,7 +90,6 @@ T(3,*)
 #ApplNoBtn=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
 #EvaCompanyBtn=X,15,I,ui:button;value:鑑定公司查詢;enable:1;tabbable:0;
 
-
 #ApplnoBuf=X,14,S
 T(2,00000019999999)
 
@@ -107,8 +102,6 @@ T(2,2+  +0)
 #BindEvaCompanyBtn=X,1,S
 BIND(#EvaCompanyBtn,click, {cmd=CHAIN; ntxcd=L6073; ntxbuf=#EvaCompanyBuf;ntxbuf5=type<-1:EvaCompany<-OOInsurerCode:EvaCompanyX<-OOInsurerItem})
 
-
-
 ![一般數值 multiple:true 可上傳多個檔案]
 #FileBtn=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:false;fieldName:#FileItem;width:600
 
@@ -120,11 +113,30 @@ T(4,CHAIN$)
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-
 #RPTFG=A,1,S
 E(0,0)
 
+#FdFunction=X,2,L
+T(3,*)
+
+#FunctionHelp=X,100,S
+T(3,1:上傳及檢核;2:上傳回饋檔並寫入擔保品檔)
+
+! 功能選擇
+#Function=A,1,I
+HELP(#FunctionHelp)
+@V(H,#FunctionHelp)
+
+#FunctionX=X,30,L
+T(H,#Function,#FunctionHelp)
+
+#HideAndShow=A,1,S
+IF(#Function==1,E(0,1),E(0,0))
+INVOKEJS(SHOW,p1,2,7,#HideAndShow)
+
+
 #ApplNo=A,7,I
+IF(#Function==1,$,S)
 @
 V(2,0)
 
@@ -138,6 +150,7 @@ T(3,L2419)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05=X,1,S
+IF(#Function==1,$,S)
 E(0,@CustNo,0)
 E(0,@FacmNo,0)
 T(3,@CustId,)
@@ -155,6 +168,7 @@ E(0,@FacmNo,#L2r05FacmNo)
 T(2,@CustId,#L2r05CustId)
 
 #SendL2r07D=X,1,S
+IF(#Function==1,$,S)
 C(3,#ApplNo,0,S,$)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimCustNo,0)
@@ -174,6 +188,7 @@ T(2,#CustNo+-+#FacmNo)
 
 ! [鑑價公司]
 #EvaCompany=X,2,I
+IF(#Function==1,$,S)
 @
 V(7)
 
@@ -184,6 +199,7 @@ V(7)
 #RimL6R10InsurerCode=X,2,S
 
 #SendL6R10=X,1,S
+IF(#Function==1,$,S)
 E(0,@RimFuncCode,5)
 T(2,@RimL6R10InsurerType,2)
 T(2,@RimL6R10InsurerCode,#EvaCompany)
@@ -194,17 +210,14 @@ R(1,L6R10)
 #EvaCompanyX=x,100,L
 T(2,#L6R10InsurerItem)
 
-
 ! [鑑估日期] v
 #EvaDate=D,7,I
+IF(#Function==1,$,S)
 D(8)
 @
 V(7)
 A(4,0,#EvaDate)
 IF(#EvaDate>#SysDate,V(P,不得超過日曆日),$)
-
-#Step=x,1,S
-T(3,1)
 
 </sub>
 
@@ -228,132 +241,12 @@ T(3,[L2419] 上傳附件查詢)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-!索引
-#Idx=A,5,L
-
-!No
-#No=x,4,L
-
-!擔保品編號
-#ClCode1=A,1,L
-#ClCode2=A,2,L
-#ClNo=A,7,L
-#ClCode=X,12,L
-!類別/擔保品代號2判斷用
-#Type=x,10,L
-!擔保品類別代碼 v
-#TypeCode=X,3,L
-!建號 v
-#BdNo1=x,5,L
-#BdNo2=x,3,L
-#BdNo=X,9,L
-C(4,#BdNo2,T(2,#BdNo1),T(2,#BdNo1+-+#BdNo2))
-
-!地號 v
-#LdNo1=x,4,L
-#LdNo2=x,4,L
-#LdNo=X,9,L
-C(4,#LdNo2,T(2,#LdNo1),T(2,#LdNo1+-+#LdNo2))
-
-!縣市 v
-#CityCode=x,2,L
-#CityCodeX=x,10,L
-!鄉鎮市區 v
-#AreaCode=x,2,L
-#AreaCodeX=x,10,L
-!段小段代碼 v
-#IrCode=x,4,L
-#IrCodeX=x,30,L
-!門牌 v
-#Road=x,40,L
-!用途 v
-#UseCode=x,2,L
-!建物類別
-#BuTypeCode=X,2,L
-!建材 v
-#MtrlCode=x,2,L
-!樓層 v
-#FloorNo=x,7,L
-!總樓層 v
-#TotalFloor=n,3,L
-!建築完成日期 v
-#BdDate=x,9,L
-!設定日期 v
-#SettingDate=x,9,L
-!面積 v
-#FloorArea=n,5.2,L
-!單價 v
-#UnitPrice=n,8.2,L
-!鑑估總價 v
-#EvaAmt=n,11.2,L
-!增值稅 v
-#Tax=n,8.2,L
-!押租金 v ???
-#RentPrice=n,11.2,S
-!淨值 v
-#NetWorth=n,11.2,L
-!貸放成數 v
-#LoanToValue=n,3.2,L
-!設定金額 v
-#SettingAmt=n,11.2,L
-!所有權人
-#Owner=x,200,L,maxWidth:50
-
-!保險單號碼
-#InsuNo=x,17,L
-!保險公司
-#InsuCompany=X,2,L
-#InsuCompanyX=x,20,L
-!保險類別
-#InsuTypeCode=X,2,L
-#InsuTypeCodeX=x,14,L
-!火災險保險金額
-#FireInsuCovrg=m,11,L
-!火災險保費
-#FireInsuPrem=m,8,L
-!地震險保險金額
-#EthqInsuCovrg=m,11,L
-!地震險保費
-#EthqInsuPrem=m,8,L
-!保險起日
-#InsuStartDate=x,9,L
-!保險迄日
-#InsuEndDate=x,9,L
-
-#Buf=x,2000,S
-T(3,@Step,2)
-T(6A,#Step+#FileItem+#ApplNo+#CustNo+#FacmNo+#CustId+#EvaCompany+#EvaDate+#Idx+#No+#ClCode1+#ClCode2+#ClNo+#ClCode+#Type+#TypeCode+#BdNo1+#BdNo2+#LdNo1+#LdNo2+#CityCode+#CityCodeX+#AreaCode+#AreaCodeX+#IrCode+#IrCodeX+#Road+#UseCode+#MtrlCode+#BuTypeCode+#FloorNo+#TotalFloor+#BdDate+#SettingDate+#FloorArea+#UnitPrice+#EvaAmt+#Tax+#NetWorth+#LoanToValue+#SettingAmt+#RentPrice+#Owner+#InsuNo+#InsuCompany+#InsuCompanyX+#InsuTypeCode+#InsuTypeCodeX+#FireInsuCovrg+#FireInsuPrem+#EthqInsuCovrg+#EthqInsuPrem+#InsuStartDate+#InsuEndDate)
-
-!! ---------------- batch variables -------------------------------
-
-#batch-detail=x,100000,S
-
-#batch-print=A,1,S
-
-!#batch-rows 總筆數
-#batch-rows=X,2,S
-
-!#batch-rows-selected 勾選之筆數
-#batch-rows-selected=X,2,S
-
-!#batch-rows-ok  傳送成功筆數
-#batch-rows-ok=X,2,S
-
-!#batch-rows-error 傳送失敗筆數
-#batch-rows-error=X,2,S
-
-!#batch-row-status 該列傳送狀態
-#batch-row-status=X,30,S
-
-!#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
-
 </sub>
 
 
 !------ 上行電文 ------
 <sub type="TIM">
-#Step
+#Function
 #FileItem
 #ApplNo
 #CustNo
@@ -373,181 +266,12 @@ T(6A,#Step+#FileItem+#ApplNo+#CustNo+#FacmNo+#CustId+#EvaCompany+#EvaDate+#Idx+#
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L6R10.tom"/>
 TXFORM=L2419
-#Idx
-#No
-#ClCode1
-#ClCode2
-#ClNo
-#ClCode
-#Type
-#TypeCode
-#BdNo1
-#BdNo2
-#LdNo1
-#LdNo2
-#CityCode
-#CityCodeX
-#AreaCode
-#AreaCodeX
-#IrCode
-#IrCodeX
-#Road
-#UseCode
-#MtrlCode
-#BuTypeCode
-#FloorNo
-#TotalFloor
-#BdDate
-#SettingDate
-#FloorArea
-#UnitPrice
-#EvaAmt
-#Tax
-#NetWorth
-#LoanToValue
-#SettingAmt
-#RentPrice
-#Owner
-#InsuNo
-#InsuCompany
-#InsuCompanyX
-#InsuTypeCode
-#InsuTypeCodeX
-#FireInsuCovrg
-#FireInsuPrem
-#EthqInsuCovrg
-#EthqInsuPrem
-#InsuStartDate
-#InsuEndDate
 ^
 </sub>
 
-!--------- OUTPUT畫面 --------
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-#batch-print=1,L2419.PFNX,NA,,,,,,1169:827
-^
-#RPTFG=0,QUERY.GRID,L2419
-#any={caption:'[L2419]不動產擔保品資料整批匯入/匯入資料先勾選後再按[整批匯入]按鈕(點各欄右方可排序)',setSelectAll:'true',rowList:[100,400,800,1600],rowNum:10,
-ifxBatch:{
-	name:'整批匯入',
-	type:'5',
-	rim:'L2419',
-	txtno:'#Buf',
-	txtdata:'#ClCode',
-	pfnx:"L2419.PFNX",
-	col_captions:["序號","擔保品編號","更新狀態"],
-	col_names:["#No","#ClCode","#batch-row-status"]
-	}
-}
-#Buf
-
-#No=序號
-{width:60,align:'center'}
-
-#ClCode1=------<br>代碼 1
-{width:60,align:'center'}
-
-#ClCode2=擔保品<br>代碼 2
-{width:60,align:'center'}
-
-#ClNo=------<br>編號
-{width:60,align:'center'}
-
-#TypeCode=類別<br>代碼
-{width:60,align:'center'}
-
-#BdNo=建號
-{width:80,align:'center'}
-
-#LdNo=地號
-{width:80,align:'center'}
-
-#CityCodeX=縣市
-{width:60,align:'center'}
-
-#AreaCodeX=鄉鎮<br>市區
-{width:60,align:'center'}
-
-#IrCode=區小段
-{width:60,align:'center'}
-
-#Road=建物門牌
-{width:120,align:'center'}
-
-#FloorNo=樓層
-{width:60,align:'center'}
-
-#TotalFloor=總樓層
-{width:60,align:'center'}
-
-#UseCode=用途
-{width:60,align:'center'}
-
-#BuTypeCode=建物<br>類別
-{width:60,align:'center'}
-
-#MtrlCode=建材
-{width:60,align:'center'}
-
-#BdDate=建築<br>完成日期
-{width:80,align:'center'}
-
-#SettingDate=設定日期
-{width:80,align:'center'}
-
-#FloorArea=面積
-{width:120,align:'right'}
-
-#UnitPrice=單價
-{width:120,align:'right'}
-
-#EvaAmt=鑑估總價
-{width:120,align:'right'}
-
-#Tax=增值稅
-{width:120,align:'right'}
-
-#NetWorth=淨值
-{width:120,align:'right'}
-
-#LoanToValue=貸放成數%
-{width:120,align:'right'}
-
-#SettingAmt=設定金額
-{width:120,align:'right'}
-
-#Owner=所有權人
-{width:150,align:'left'}
-
-#InsuNo=保險單號碼
-{width:100,align:'left'}
-
-#InsuCompanyX=保險公司
-{width:120,align:'left'}
-
-#InsuTypeCodeX=保險類別
-{width:120,align:'left'}
-
-#FireInsuCovrg=火災險保險金額
-{width:120,align:'right'}
-
-#FireInsuPrem=火災險保費
-{width:120,align:'right'}
-
-#EthqInsuCovrg=地震險保險金額
-{width:120,align:'right'}
-
-#EthqInsuPrem=地震險保費
-{width:120,align:'right'}
-
-#InsuStartDate=保險起日
-{width:80,align:'center'}
-
-#InsuEndDate=保險迄日
-{width:80,align:'center'}
-
-^
+<include src="PRT.icf::INQ01.sel"/>
 </sub>
 
 

@@ -113,7 +113,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 AND CBPK.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                 AND CBPK.\"ClNo\"    = CF.\"ClNo\"";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "   AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
+//		sql += "   AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
 		sql += "   AND NVL(L.\"ClNo\",0) > 0 "; // -- 主要擔保品
 
 		this.info("sql=" + sql);
@@ -437,7 +437,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
+//		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
 		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
 
 		this.info("sql=" + sql);

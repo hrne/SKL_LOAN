@@ -16,10 +16,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
+import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -70,6 +72,8 @@ public class L3250 extends TradeBuffer {
 	public LoanOverdueService loanOverdueService;
 	@Autowired
 	public CdAcCodeService cdAcCodeService;
+	@Autowired
+	public ForeclosureFeeService foreclosureFeeService;
 
 	@Autowired
 	Parse parse;
@@ -96,13 +100,13 @@ public class L3250 extends TradeBuffer {
 	private String iRvNo;
 	private String iAcctCode;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
+	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private int wkRepayCode;
 
 	// work area
 	private AcDetail acDetail;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
-	private CdAcCode tCdAcCode = new CdAcCode();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -174,22 +178,32 @@ public class L3250 extends TradeBuffer {
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setRvNo(iRvNo);
-			acDetail.setReceivableFlag(3);
-			if (tCdAcCode.getReceivableFlag() > 0) {
-				acDetail.setReceivableFlag(tCdAcCode.getReceivableFlag());
-			}
-			// TMI 暫收款－火險保費
-			if ("TMI".equals(iAcctCode)) {
+			switch (iAcctCode) {
+			case "TMI": // TMI 暫收款－火險保費
+			case "F25": // F25 催收款項－火險費用
 				checkInsuRenew(acDetail, titaVo);
+				break;
+			case "F07": // F07 暫付法務費
+			case "F24": // F24 催收款項－法務費用
+				acDetail.setReceivableFlag(2);
+				checkForeclosureFee(acDetail, titaVo);
+				break;
+			case "10": // 10.沖帳管費/手續費
+			case "12": // 12.聯貸件
+			case "27": // 27.聯貸管理費
+			case "29": // 29.貸後契變手續費
+			case "30": // 30.沖呆帳戶法務費墊付
+				acDetail.setReceivableFlag(3);
+				lAcDetail.add(acDetail);
+				break;
+			default:
+				lAcDetail.add(acDetail);
+				// F08 收回呆帳及過期帳
+				if ("F08".equals(iAcctCode)) {
+					UpdLoanOverDueEraseRoutine();
+				}
 			}
-			// F08 收回呆帳及過期帳
-			if ("F08".equals(iAcctCode)) {
-				UpdLoanOverDueEraseRoutine();
-			}
-			lAcDetail.add(acDetail);
 		}
-
-
 
 		// 累溢收入帳(暫收貸)
 		acRepayCom.settleOverflow(lAcDetail, titaVo);
@@ -207,10 +221,6 @@ public class L3250 extends TradeBuffer {
 		if (titaVo.isHcodeErase()) {
 			throw new LogicException(titaVo, "E0010", "本交易不可訂正"); // 功能選擇錯誤
 		}
-//		tCdAcCode = cdAcCodeService.acCodeAcctFirst(iAcctCode, titaVo);
-//		if (tCdAcCode == null) {
-//			throw new LogicException("E6001", "AcDetailCom 科目有誤" + iAcctCode); // E6001 分錄檢核有誤
-//		}
 	}
 
 	// 沖正處理
@@ -238,14 +248,17 @@ public class L3250 extends TradeBuffer {
 		}
 	}
 
+	// 火險費用
 	private void checkInsuRenew(AcDetail ac, TitaVo titaVo) throws LogicException {
 		Slice<InsuRenew> slInsuRenew = insuRenewService.findCustEq(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
 				this.info("InsuRenew=".toString());
-				if (tInsuRenew.getAcDate() > 0 && tInsuRenew.getTitaTxtNo().equals(titaVo.getOrgTno())
-						&& tInsuRenew.getTotInsuPrem().compareTo(iTempAmt) == 0) {
+				if (tInsuRenew.getAcDate() == titaVo.getOrgEntdyI()
+						&& tInsuRenew.getTitaTxtNo().equals(titaVo.getOrgTno())) {
 					this.info("this.InsuRenew=".toString());
+					ac.setTxAmt(tInsuRenew.getTotInsuPrem());
+					wkTempAmt = wkTempAmt.add(tInsuRenew.getTotInsuPrem());
 					switch (tInsuRenew.getStatusCode()) {
 					case 0:
 						ac.setReceivableFlag(3);
@@ -270,8 +283,48 @@ public class L3250 extends TradeBuffer {
 					tTempVo.putParam("OpenAcDate", tInsuRenew.getInsuStartDate());
 					tTempVo.putParam("InsuYearMonth", tInsuRenew.getInsuYearMonth());
 					ac.setJsonFields(tTempVo.getJsonString());
+					lAcDetail.add(acDetail);
 				}
 			}
+		}
+		if (wkTempAmt.compareTo(iTempAmt) != 0) {
+			throw new LogicException(titaVo, "E0015", "火險費用不符" + wkTempAmt); // 檢查錯誤
+		}
+	}
+
+	// 法拍費用
+	private void checkForeclosureFee(AcDetail ac, TitaVo titaVo) throws LogicException {
+		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.custNoEq(iCustNo, this.index, this.limit,
+				titaVo);
+		if (slForeclosureFee == null) {
+			throw new LogicException(titaVo, "E2003", "法拍費用檔查無資料"); // 查無資料
+		}
+		int closeDate = 0;
+		// 找金額相同(負)
+		for (ForeclosureFee tForeclosureFee : slForeclosureFee.getContent()) {
+			if (tForeclosureFee.getOpenAcDate() == titaVo.getOrgEntdyI()
+					&& tForeclosureFee.getFee().compareTo(BigDecimal.ZERO.subtract(iTempAmt)) == 0) {
+				closeDate = tForeclosureFee.getCloseDate();
+				break;
+			}
+		}
+		// 找銷號日期相同，金額正值
+		if (closeDate > 0) {
+			for (ForeclosureFee tForeclosureFee : slForeclosureFee.getContent()) {
+				if (tForeclosureFee.getCloseDate() == closeDate
+						&& tForeclosureFee.getFee().compareTo(BigDecimal.ZERO) > 0) {
+					ac.setTxAmt(tForeclosureFee.getFee()); // 記帳金額
+					wkTempAmt = wkTempAmt.add(tForeclosureFee.getFee());
+					ac.setCustNo(tForeclosureFee.getCustNo());
+					ac.setFacmNo(tForeclosureFee.getFacmNo());
+					// 紀錄號碼 7 int轉string左補0
+					ac.setRvNo(parse.IntegerToString(tForeclosureFee.getRecordNo(), 7)); // 銷帳編號
+					lAcDetail.add(acDetail);
+				}
+			}
+		}
+		if (wkTempAmt.compareTo(iTempAmt) != 0) {
+			throw new LogicException(titaVo, "E0015", "法拍費用不符" + wkTempAmt); // 檢查錯誤
 		}
 	}
 

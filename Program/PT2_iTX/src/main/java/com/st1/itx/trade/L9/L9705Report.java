@@ -54,9 +54,12 @@ public class L9705Report extends MakeReport {
 	@Autowired
 	CustNoticeCom custNoticeCom;
 
-	public int custNo = 0;
-	public int facmNo = 0;
-	public String repayCode = "";
+	private int custNo = 0;
+	private int facmNo = 0;
+	private String repayCode = "";
+	private BigDecimal excessive = BigDecimal.ZERO;
+	private BigDecimal acctFee = BigDecimal.ZERO;
+	private BigDecimal shortFall = BigDecimal.ZERO;
 
 	@Override
 	public void printHeader() {
@@ -127,6 +130,9 @@ public class L9705Report extends MakeReport {
 
 			this.info("conditionCode = " + titaVo.get("CONDITION1"));
 
+			int tmpListSize = 0;
+			boolean isLast = false;
+
 			for (Map<String, String> r : l9705List) {
 
 				try {
@@ -149,11 +155,6 @@ public class L9705Report extends MakeReport {
 					repayCode = r.get("RepayCode");
 				}
 
-				// 部分還本(4) facmNo 帶0
-				if (titaVo.get("CONDITION1") != null && "4".equals(titaVo.get("CONDITION1"))) {
-					facmNo = 0;
-				}
-
 				this.info("L9705 custNo=" + custNo);
 				this.info("L9705 facmNo=" + facmNo);
 
@@ -162,13 +163,13 @@ public class L9705Report extends MakeReport {
 				}
 
 				// 同戶號 同額度使用同一頁否則換新頁
-				if (this.custNo == custNo && this.facmNo == facmNo) {
-
-				} else {
+//				if (this.custNo == custNo && this.facmNo == facmNo) {
+				if (this.custNo == custNo) {
+					continue;
+				}else {
 					if (count > 0) {
-						this.info("...newPage");
-
-						this.newPage(true);
+						this.info("0 newPage...");
+						this.newPage();
 
 					}
 
@@ -183,15 +184,148 @@ public class L9705Report extends MakeReport {
 				if (!custNoticeCom.checkIsLetterSendable(titaVo.get("CUSTNO"), custNo, facmNo, tran, titaVo))
 					continue;
 
-				exportData(l9705List, titaVo, txbuffer, reconCode, count);
+				/**************************************************************************************/
+
+				ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
+				ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
+
+				dBaTxCom.setTxBuffer(txbuffer);
+
+				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
+
+				CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+
+				int terms = 6;
+
+				if (titaVo.containsKey("Terms") && titaVo.getParam("Terms") != null) {
+					try {
+						terms = Integer.parseInt(titaVo.getParam("Terms"));
+					} catch (Exception e) {
+						terms = 6; // 若無法轉為數值,改為預設6
+					}
+				}
+
+				try {
+					lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, 0, 0, terms, 0, titaVo);
+					listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
+				} catch (LogicException e) {
+					this.error("listBaTxVo ErrorMsg :" + e.getMessage());
+				}
+
+				this.info("listBaTxVo.size()=" + listBaTxVo.size());
+
+				tmpListSize = tmpListSize + listBaTxVo.size();
+
+				// 是否最後一筆
+				if (l9705List.size() == (count + 1)) {
+					this.info("last count...");
+					isLast = true;
+				}
+
+				if (listBaTxVo.size() == 0) {
+					continue;
+				}
+
+				// 排序 CustNo ASC,FacmNo ASC,PayIntDate ASC
+				listBaTxVo.sort((c1, c2) -> {
+					if (c1.getCustNo() - c2.getCustNo() != 0) {
+						return c1.getCustNo() - c2.getCustNo();
+					} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
+						return c1.getFacmNo() - c2.getFacmNo();
+					} else if (c1.getBormNo() - c2.getBormNo() != 0) {
+						return c1.getBormNo() - c2.getBormNo();
+					} else if (c1.getPayIntDate() - c2.getPayIntDate() != 0) {
+						return c1.getPayIntDate() - c2.getPayIntDate();
+					} else {
+						return 0;
+					}
+				});
+
+				this.info("listBaTxVo1 = " + listBaTxVo.toString());
+
+				// 先算短繳
+				for (BaTxVo baTxVo : listBaTxVo) {
+					// 短繳
+					if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
+
+						shortFall = shortFall.add(baTxVo.getUnPaidAmt());
+					}
+				}
+
+				int con1Count = 0;
+				int con2Count = 0;
+				int totalCount = 0;
+				int tmpCustNo = 0;
+				int tmpFacmNo = 0;
+				ArrayList<BaTxVo> tmplistBaTxVo = new ArrayList<>();
+
+				for (BaTxVo baTxVo : listBaTxVo) {
+					// 算總數
+					totalCount++;
+					// 算各戶號額度筆數
+					con1Count++;
+					
+					con2Count++;
+
+					// 如果戶號額度與上一筆不同，換新頁;
+					this.info(totalCount + ".tmpCustNo =" + tmpCustNo + ",getCustNo = " + baTxVo.getCustNo());
+					this.info(totalCount + ".tmpFacmNo =" + tmpFacmNo + ",getFacmNo = " + baTxVo.getFacmNo());
+					this.info("actTmpCount =" + con1Count);
+					if (tmpCustNo == baTxVo.getCustNo() && tmpFacmNo == baTxVo.getFacmNo()) {
+						tmplistBaTxVo.add(baTxVo);
+					} else {
+						
+						// 不同戶號額度，且不能是第一筆時，輸出列印，並換頁
+						if (con1Count > 1) {
+							exportData(l9705List, titaVo, tmplistBaTxVo, custMain, reconCode, count);
+
+							this.info("2 cust facm different....");
+							this.info("newPage....");
+							this.newPage();
+
+							con1Count = 1;
+							tmplistBaTxVo = new ArrayList<>();
+						}
+		
+
+						// 第一次一定不同
+						if (con1Count == 1) {
+							this.info("1 cust facm different....");
+							tmplistBaTxVo.add(baTxVo);
+						}
+
+					
+
+					}
+
+					this.info("baTxVo =" + baTxVo.toString());
+
+					tmpCustNo = baTxVo.getCustNo();
+					tmpFacmNo = baTxVo.getFacmNo();
+					// listBaTxVo的最後一筆
+					if (listBaTxVo.size() == con2Count) {
+						exportData(l9705List, titaVo, tmplistBaTxVo, custMain, reconCode, count);
+						// 是否為全部資料的最後一筆
+						if (!isLast) {
+							this.info("3 cust facm different....");
+							this.info("newPage....");
+							this.newPage();
+							con2Count = 0;
+						}
+
+					}
+
+				
+
+				}
+
+				/**************************************************************************************/
 
 				count++;
 
 			}
 
 		} else {
-
-			this.info("no data");
 
 			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 					.setRptCode(tran + "A").setRptItem(rptitem).setRptSize("inch,8.5,12").setSecurity("")
@@ -220,24 +354,22 @@ public class L9705Report extends MakeReport {
 
 	}
 
-	private void exportData(List<Map<String, String>> r, TitaVo titaVo, TxBuffer txbuffer, String reconcode, int c)
-			throws LogicException {
+	private void exportData(List<Map<String, String>> r, TitaVo titaVo, ArrayList<BaTxVo> listBaTxVo, CustMain custMain,
+			String reconcode, int c) throws LogicException {
 
 		this.info("titaVo.getTxCode =" + titaVo.getTxCode());
 		this.info("exportData.count = 第" + (c + 1) + "筆" + ",reconcode = " + reconcode);
-		this.info("exportData.List = " + r.toString());
+		this.info("listBaTxVo2 = 第" + listBaTxVo.toString());
 		// 設定試算期數 2021-12-24 智偉新增
-		int terms = 6; // 預設印6期
+//		int terms = 6; // 預設印6期
 
-		if (titaVo.containsKey("Terms") && titaVo.getParam("Terms") != null) {
-			try {
-				terms = Integer.parseInt(titaVo.getParam("Terms"));
-			} catch (Exception e) {
-				terms = 6; // 若無法轉為數值,改為預設6
-			}
-		}
-
-		int count = c + 1;
+//		if (titaVo.containsKey("Terms") && titaVo.getParam("Terms") != null) {
+//			try {
+//				terms = Integer.parseInt(titaVo.getParam("Terms"));
+//			} catch (Exception e) {
+//				terms = 6; // 若無法轉為數值,改為預設6
+//			}
+//		}
 
 		String entdy = titaVo.getEntDy();
 
@@ -250,44 +382,43 @@ public class L9705Report extends MakeReport {
 //		A.匯款轉帳，已入金，有欠繳-------入帳完成後，於應處理事項清單執行L4702。
 //		B.銀扣火險成功，期款失敗----------L4454.銀扣失敗通知(一扣)
 
-		int cnt = 0;
+//		int cnt = 0;
 
-		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
-		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
-
-		dBaTxCom.setTxBuffer(txbuffer);
-
-		int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
-
+//		ArrayList<BaTxVo> lBaTxVo = new ArrayList<>();
+//		ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
+//
+//		dBaTxCom.setTxBuffer(txbuffer);
+//
+//		int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
+//
 		String payIntAcct = "";
 		String payPriAcct = "";
 		DecimalFormat df1 = new DecimalFormat("#,##0");
-
-		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+//
+//		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 		String currAddress = custNoticeCom.getCurrAddress(custMain, titaVo);
-
-		try {
-			lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
-			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
-		} catch (LogicException e) {
-			this.error("listBaTxVo ErrorMsg :" + e.getMessage());
-		}
-
-		this.info("listBaTxVo.size()=" + listBaTxVo.size());
-
+//
+//		try {
+//			lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, terms, 0, titaVo);
+//			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
+//		} catch (LogicException e) {
+//			this.error("listBaTxVo ErrorMsg :" + e.getMessage());
+//		}
+//
+//		this.info("listBaTxVo.size()=" + listBaTxVo.size());
+//
 		if (listBaTxVo.size() == 0) {
-			if (cnt == 0) {
-				printCm(1, 4, "*******    查無資料   ******");
-			}
+			printCm(1, 4, "*******    查無資料   ******");
 
 			return;
 		}
 
 		// 溢短繳
-		int excessive = dBaTxCom.getExcessive().intValue() - dBaTxCom.getShortfall().intValue();
+		excessive = dBaTxCom.getExcessive();
 
-		// 帳管費 + 契變手續費
-		int acctFee = dBaTxCom.getAcctFee().intValue() + dBaTxCom.getModifyFee().intValue();
+		// 帳管費 + 契變手續費(只有第一期需扣)
+		acctFee = c + 1 == 1 ? dBaTxCom.getAcctFee().add(dBaTxCom.getModifyFee()) : BigDecimal.ZERO;
+
 		// 目前利率
 		double intRate = dBaTxCom.getFitRate().doubleValue();
 
@@ -331,19 +462,21 @@ public class L9705Report extends MakeReport {
 		printCm(16, y, repayCodeX(repayCode));
 
 		y = top + yy + (++l) * h;
-
-		printCm(1.5, y, "戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-"
-				+ String.format("%03d", Integer.valueOf(facmNo)) + "  目前利率：" + padStart(6, "" + intRate) + "%");
+		this.info("listBaTxVo.get(0).getFacmNo()=" + listBaTxVo.get(0).getFacmNo());
+		printCm(1.5, y,
+				"戶    號：" + String.format("%07d", Integer.valueOf(custNo)) + "-"
+						+ String.format("%03d", Integer.valueOf(listBaTxVo.get(0).getFacmNo())) + "  目前利率："
+						+ padStart(6, "" + intRate) + "%");
 
 		y = top + yy + (++l) * h;
 
 		printCm(1.5, y, "客戶名稱：" + custMain.getCustName().substring(0, nameLength));
 		printCm(12, y, "溢短繳：", "R");
-		printCm(14, y, String.format("%,d", excessive), "R");
+		printCm(14, y, df1.format(excessive), "R");
 
 		y = top + yy + (++l) * h;
 		printCm(12, y, "帳管費：", "R");
-		printCm(14, y, String.format("%,d", acctFee), "R");
+		printCm(14, y, df1.format(acctFee), "R");
 
 		y = top + yy + (++l) * h;
 		printCm(8.8, y, "每期應攤還", "R");
@@ -363,14 +496,20 @@ public class L9705Report extends MakeReport {
 		y = top + yy + (++l) * h;
 		printCm(1, y, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		String tempDate = "";
-		int Principal = 0;
-		int Interest = 0;
-		int BreachAmt = 0;
-		int UnPaidAmt = 0;
-		int LoanBal = 0;
+		BigDecimal Principal = BigDecimal.ZERO;
+		BigDecimal Interest = BigDecimal.ZERO;
+		BigDecimal BreachAmt = BigDecimal.ZERO;
+		BigDecimal UnPaidAmt = BigDecimal.ZERO;
+		BigDecimal LoanBal = BigDecimal.ZERO;
 		int tmpCount = 0;
 
 		for (BaTxVo baTxVo : listBaTxVo) {
+
+			this.info("baTxVo.getDataKind()=" + baTxVo.getDataKind());
+			// 本金、利息
+			if (baTxVo.getDataKind() != 2) {
+				continue;
+			}
 
 			tmpCount++;
 
@@ -378,23 +517,18 @@ public class L9705Report extends MakeReport {
 				break;
 			}
 
-			this.info("baTxVo.getDataKind()=" + baTxVo.getDataKind());
-			// 本金、利息
-			if (baTxVo.getDataKind() != 2) {
-				continue;
-			}
 			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 
 			// 違約金
-			BreachAmt = baTxVo.getBreachAmt().intValue() + baTxVo.getDelayInt().intValue();
+			BreachAmt = baTxVo.getBreachAmt().add(baTxVo.getDelayInt());
 			// 本金
-			Principal = baTxVo.getPrincipal().intValue();
+			Principal = baTxVo.getPrincipal();
 			// 利息
-			Interest = baTxVo.getInterest().intValue();
+			Interest = baTxVo.getInterest();
 			// 未還本金餘額
-			LoanBal = baTxVo.getLoanBalPaid().intValue();
+			LoanBal = baTxVo.getLoanBalPaid();
 
-			UnPaidAmt = BreachAmt + Principal + Interest;
+			UnPaidAmt = BreachAmt.add(Principal).add(Interest).add(shortFall).add(acctFee);
 
 			this.info("tempDate=" + tempDate);
 			this.info("BreachAmt=" + BreachAmt);
@@ -404,45 +538,44 @@ public class L9705Report extends MakeReport {
 			this.info("UnPaidAmt=" + UnPaidAmt);
 			this.info("excessive=" + excessive);
 			this.info("acctFee=" + acctFee);
+			this.info("shortFall=" + shortFall);
 			this.info("intRate=" + intRate);
 
-			if (UnPaidAmt == 0) {
+			if (UnPaidAmt.compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
-			if (excessive < 0) {
-				UnPaidAmt = UnPaidAmt - excessive;
-				excessive = 0;
+			if (UnPaidAmt.compareTo(BigDecimal.ZERO) < 0) {
+				UnPaidAmt = UnPaidAmt.subtract(excessive);
+				excessive = BigDecimal.ZERO;
 			} else {
-				if (UnPaidAmt > excessive) {
-					UnPaidAmt = UnPaidAmt - excessive;
-					excessive = 0;
+				if (UnPaidAmt.compareTo(excessive) > 0) {
+					UnPaidAmt = UnPaidAmt.subtract(excessive);
+					excessive = BigDecimal.ZERO;
 				} else {
-					UnPaidAmt = 0;
-					excessive = excessive - UnPaidAmt;
+					UnPaidAmt = BigDecimal.ZERO;
+					excessive = excessive.subtract(UnPaidAmt);
 				}
 			}
 			y = top + yy + (++l) * h;
 			// 應繳日
 			printCm(1, y, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
 			// 違約金
-			printCm(4.5, y, String.format("%,d", BreachAmt), "R");
+			printCm(4.5, y, df1.format(BreachAmt), "R");
 			// 本金
-			printCm(7, y, String.format("%,d", Principal), "R");
+			printCm(7, y, df1.format(Principal), "R");
 			// 利息
-			printCm(9.5, y, String.format("%,d", Interest), "R");
+			printCm(9.5, y, df1.format(Interest), "R");
 			// 應繳合計
-			printCm(12, y, String.format("%,d", UnPaidAmt), "R");
+			printCm(12, y, df1.format(UnPaidAmt), "R");
 			// 未還 本金餘額
-			printCm(14.5, y, String.format("%,d", LoanBal), "R");
+			printCm(14.5, y, df1.format(LoanBal), "R");
 			// 暫付 所得稅
 			printCm(16.5, y, "0", "R");
-
-			if (count == 1) {
-				UnPaidAmt = UnPaidAmt + excessive;
-			}
-
 			// 應繳淨額
-			printCm(19, y, String.format("%,d", UnPaidAmt), "R");
+			printCm(19, y, df1.format(UnPaidAmt), "R");
+
+			acctFee = BigDecimal.ZERO;
+			shortFall = BigDecimal.ZERO;
 
 		} // loop -- batxCom
 
@@ -467,6 +600,7 @@ public class L9705Report extends MakeReport {
 //							"＊＊註：違約金暫計到" + transRocChinese(titaVo.getParam("EntryDate")) + "，若提前或延後繳款，請電話查詢　該違約金額");
 //					this.print(1, 8, "＊＊您好！本月份扣款含年度火險、地震險保費、每月房貸期款，因您存款不足；");
 //					this.print(1, 8, "　　請速將本期款匯入期款專用帳號。");
+
 		// L4454-A： 銀扣連續扣款失敗通知
 		// L4454-B： 銀扣火險成功期款失敗通知單
 		// L4702-C： 本日有匯款轉帳且有滯繳
@@ -525,7 +659,6 @@ public class L9705Report extends MakeReport {
 //				}
 		}
 
-//		if (RepayAmt.compareTo(new BigDecimal("0")) > 0) {
 		if ("A3".equals(reconcode) || "L4702".equals(titaVo.getTxCode())) {
 			String EntryDate = r.get(c).get("EntryDate"); // 入帳日期
 			BigDecimal RepayAmt = parse.stringToBigDecimal(r.get(c).get("RepayAmt"));

@@ -51,7 +51,9 @@ BEGIN
          , M."FacmNo"              AS "FacmNo"        -- 額度編號
          , 1                       AS "DrawdownFg"    -- 已核撥
          , SUM(M."LoanBal")        AS "TotalLoanBal"  -- 本金餘額(撥款)合計
+         , 0                       AS "RvLoanAmt"     -- 預撥金額
     FROM     "Ifrs9LoanData" M
+
     WHERE    M."DataYM"          =  YYYYMM
     GROUP BY M."CustNo", M."FacmNo"
       ;
@@ -69,22 +71,36 @@ BEGIN
          , M."FacmNo"              AS "FacmNo"        -- 額度編號
          , 0                       AS "DrawdownFg"    -- 已核撥
          , 0                       AS "TotalLoanBal"  -- 本金餘額(撥款)合計
+         , 0                       AS "RvLoanAmt"     -- 預撥金額
     FROM   "FacMain" M
-      LEFT JOIN "Work_Ifrs9FacData" WK ON WK."CustNo" = M."CustNo"
-                                      AND WK."FacmNo" = M."FacmNo"
---    WHERE  M."LastBormNo" = 0
     WHERE  CASE WHEN M."FirstDrawdownDate" > TBSDYF  THEN 1
                 WHEN M."FirstDrawdownDate" = 0 THEN 1
                 ELSE 0
            END = 1      
       AND  TRUNC(NVL(M."UtilDeadline",0) / 100 ) >= YYYYMM   -- 已核貸未曾動撥且仍可動撥之放款額度編號
-      AND  WK."CustNo" IS NULL
     GROUP BY M."CustNo", M."FacmNo"
       ;
 
     INS_CNT := INS_CNT + sql%rowcount;
     DBMS_OUTPUT.PUT_LINE('INSERT Work_Ifrs9FacData DrawdownFg=0 未動撥 END: INS_CNT=' || INS_CNT);
 
+    -- 維護預撥金額
+    DBMS_OUTPUT.PUT_LINE('UPDATE Work_Ifrs9FacData ');
+    MERGE INTO "Work_Ifrs9FacData" T2
+    USING (SELECT
+                  "CustNo"
+                 ,"FacmNo"
+                 ,SUM("DrawdownAmt") AS "DrawdownAmt"
+           FROM  "LoanBorMain"
+           WHERE "DrawdownDate" > TBSDYF
+           GROUP BY "CustNo", "FacmNo"
+          ) T1
+    ON (    T2."CustNo" = T1."CustNo"
+        AND T2."FacmNo" = T1."FacmNo"
+       )
+    WHEN MATCHED THEN UPDATE SET T2."RvLoanAmt" = T1."DrawdownAmt"
+
+    ;
 
     -- 刪除舊資料
     DBMS_OUTPUT.PUT_LINE('DELETE Ifrs9FacData');
@@ -108,8 +124,7 @@ BEGIN
                ORDER BY "OpenAcDate" DESC
              ) AS "ArSeq"
       FROM "AcReceivable"
-      WHERE TRUNC("OpenAcDate" / 100) <= YYYYMM
-        AND "AcctFlag" = 1
+      WHERE "AcctFlag" = 1
     )
     SELECT
            YYYYMM                               AS "DataYM"            -- 資料年月
@@ -128,11 +143,6 @@ BEGIN
                 ELSE NVL(F."UtilDeadline",0)                                   -- 非循環動用
            END                                  AS "UtilDeadline"      -- 動支期限
          , NVL(F."FirstDrawdownDate",0)         AS "FirstDrawdownDate" -- 初貸日期
-         --, CASE
-         --    WHEN  M."DrawdownFg" = 0 AND F."LastBormRvNo" > 900
-         --          THEN NVL(L."DrawdownDate",0)
-         --    ELSE  NVL(F."FirstDrawdownDate",0)
-         --  END                                  AS "FirstDrawdownDate" -- 初貸日期
          , NVL(F."MaturityDate",0)              AS "MaturityDate"      -- 到期日(額度)
          , NVL(F."LineAmt",0)                   AS "LineAmt"           -- 核准金額
          , NVL(F."AcctFee",0)                   AS "AcctFee"           -- 帳管費
@@ -172,9 +182,9 @@ BEGIN
                 WHEN Cl."ClCode1" in (9)    THEN NVL(Eva9."EvaAmt",0)
                 ELSE 0
            END                                  AS "EvaAmt"            -- 原始鑑價金額
-         , NVL(F."UtilAmt",0)                   AS "UtilAmt"           -- 累計撥款金額(額度層)
-         , NVL(F."UtilBal",0)                   AS "UtilBal"           -- 已動用餘額(額度層)
-         , NVL(M."TotalLoanBal",0)              AS "TotalLoanBal"      -- 本金餘額(額度層)合計
+         , F."UtilAmt" - M."RvLoanAmt"          AS "UtilAmt"           -- 累計撥款金額(額度層),放款餘額 - 預撥金額
+         , F."UtilBal" - M."RvLoanAmt"          AS "UtilBal"           -- 已動用餘額(額度層) - 預撥金額
+         , NVL(M."TotalLoanBal",0)              AS "TotalLoanBal"      -- 本金餘額(額度層)合計,催收餘額
          , CASE WHEN F."RecycleCode" IS NULL  THEN 0
                 WHEN F."RecycleCode" IN ('1') THEN 1
                 ELSE 0
@@ -201,9 +211,6 @@ BEGIN
     FROM   "Work_Ifrs9FacData" M
       LEFT JOIN "FacMain" F     ON F."CustNo"       = M."CustNo"
                                AND F."FacmNo"       = M."FacmNo"
-      LEFT JOIN "LoanBorMain" L ON L."CustNo"       = M."CustNo"
-                               AND L."FacmNo"       = M."FacmNo"
-                               AND L."BormNo"       = F."LastBormRvNo"
       LEFT JOIN "FacCaseAppl" ON "FacCaseAppl"."ApplNo"   =  F."ApplNo"
       LEFT JOIN "MonthlyFacBal" MF  ON MF."YearMonth" =  YYYYMM
                                    AND MF."CustNo"    =  M."CustNo"

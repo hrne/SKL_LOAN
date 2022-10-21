@@ -95,7 +95,7 @@ public class L4101ReportE extends MakeReport {
 		}
 	}
 
-	public void exec(TitaVo titaVo, int acDate) throws LogicException {
+	public void exec(TitaVo titaVo, int acDateF) throws LogicException {
 
 		this.info("L9708Report exec");
 		String batchNo = "";
@@ -106,11 +106,11 @@ public class L4101ReportE extends MakeReport {
 		reportCode = reportCode + "-E";
 		reportItem = reportItem;
 
-		this.open(titaVo, acDate + 19110000, titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
+		this.open(titaVo, acDateF , titaVo.getKinbr(), reportCode, reportItem + "-" + batchNo, "", "A4", "L");
 
 		List<Map<String, String>> l9708List = null;
 		try {
-			l9708List = l9708ServiceImpl.findAll(titaVo, acDate);
+			l9708List = l9708ServiceImpl.findAll(titaVo, acDateF);
 			this.info("L9708Report findAll =" + l9708List.toString());
 		} catch (Exception e) {
 			this.info("L9708ServiceImpl.LoanBorTx error = " + e.toString());

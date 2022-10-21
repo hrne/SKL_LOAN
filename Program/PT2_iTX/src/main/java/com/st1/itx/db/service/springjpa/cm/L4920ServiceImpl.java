@@ -33,9 +33,6 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private Parse parse;
 
-	@Autowired
-	private DateUtil dateUtil;
-
 	// *** 折返控制相關 ***
 	private int index;
 
@@ -47,6 +44,8 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// *** 折返控制相關 ***
 	private int size;
+	
+	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -54,7 +53,7 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(int flag, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int flag, int index, int limit, TitaVo titaVo) throws Exception {
 
 		this.info("L4920.findAll");
 
@@ -88,23 +87,23 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		if (flag == 0) {
 			sql += " select                                       ";
-			sql += "   bd.\"DetailSeq\"    AS F0                  ";
-			sql += "  ,bd.\"EntryDate\"    AS F1                  ";
-			sql += "  ,bd.\"CustNo\"       AS F2                  ";
-			sql += "  ,bd.\"FacmNo\"       AS F3                  ";
-			sql += "  ,bd.\"RepayType\"    AS F4                  ";
-			sql += "  ,bd.\"RepayCode\"    AS F5                  ";
-			sql += "  ,bd.\"ReconCode\"    AS F6                  ";
-			sql += "  ,nvl(ca.\"AcctItem\", bd.\"ReconCode\") AS F7 ";
-			sql += "  ,bd.\"RepayAmt\"     AS F8                  ";
-			sql += "  ,bd.\"AcctAmt\"      AS F9                  ";
-			sql += "  ,bd.\"ProcStsCode\"  AS F10                 ";
-			sql += "  ,bd.\"ProcCode\"     AS F11                 ";
-			sql += "  ,bd.\"ProcNote\"     AS F12                 ";
-			sql += "  ,bd.\"TitaTlrNo\"    AS F13                 ";
-			sql += "  ,bd.\"TitaTxtNo\"    AS F14                 ";
-			sql += "  ,bd.\"DisacctAmt\"   AS F15                 ";
-			sql += "  ,bd.\"FileName\"     AS F16                 ";
+			sql += "   bd.\"DetailSeq\"                 ";
+			sql += "  ,bd.\"EntryDate\"                 ";
+			sql += "  ,bd.\"CustNo\"                    ";
+			sql += "  ,bd.\"FacmNo\"                    ";
+			sql += "  ,bd.\"RepayType\"                 ";
+			sql += "  ,bd.\"RepayCode\"                 ";
+			sql += "  ,bd.\"ReconCode\"                 ";
+			sql += "  ,nvl(ca.\"AcctItem\", bd.\"ReconCode\") AS \"ReconCodeX\" ";
+			sql += "  ,bd.\"RepayAmt\"                  ";
+			sql += "  ,bd.\"AcctAmt\"                   ";
+			sql += "  ,bd.\"ProcStsCode\"               ";
+			sql += "  ,bd.\"ProcCode\"                  ";
+			sql += "  ,bd.\"ProcNote\"                  ";
+			sql += "  ,bd.\"TitaTlrNo\"                 ";
+			sql += "  ,bd.\"TitaTxtNo\"                 ";
+			sql += "  ,bd.\"DisacctAmt\"                ";
+			sql += "  ,bd.\"FileName\"                  ";
 			sql += " from \"BatxDetail\" bd                       ";
 			sql += " left join (                                  ";
 			sql += "     select                                   ";
@@ -172,39 +171,32 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and bd.\"ProcStsCode\" != '1' ";
 			sql += "   GROUP BY bd.\"AcDate\" ";
 		}
+		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
+		
+		query.setParameter("ThisIndex", index);
+		query.setParameter("ThisLimit", limit);
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
-
-		if (flag == 0) {
-			// *** 折返控制相關 ***
-			// 設定從第幾筆開始抓,需在createNativeQuery後設定
-			query.setFirstResult(this.index * this.limit);
-
-			// *** 折返控制相關 ***
-			// 設定每次撈幾筆,需在createNativeQuery後設定
-			query.setMaxResults(this.limit);
-		}
-
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+//		query.setFirstResult(this.index * this.limit);
+		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
 		List<Object> result = query.getResultList();
 
 		size = result.size();
 		this.info("Total size ..." + size);
 
-		return this.convertToMap(result);
-	}
-
-	public List<Map<String, String>> findAll(int flag, int index, int limit, TitaVo titaVo) throws Exception {
-		this.index = index;
-		this.limit = limit;
-
-		return findAll(flag, titaVo);
+		return this.convertToMap(query);
 	}
 
 	public int getSize() {

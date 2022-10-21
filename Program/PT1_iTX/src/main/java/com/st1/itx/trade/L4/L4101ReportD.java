@@ -74,6 +74,7 @@ public class L4101ReportD extends MakeReport {
 		this.print(-3, 2, "來源別：放款服務課");
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
+		this.print(-4, 85, "會計日期：" + this.showRocDate(reportDate, 1), "C");
 
 		// 頁首帳冊別判斷
 //		print(-4, 10, this.nowAcBookCode);

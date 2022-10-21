@@ -85,7 +85,7 @@ public class L4920 extends TradeBuffer {
 
 		try {
 			// *** 折返控制相關 ***
-			resultAllList = l4920ServiceImpl.findAll(1, titaVo);
+			resultAllList = l4920ServiceImpl.findAll(1,  this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l4920ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -115,35 +115,36 @@ public class L4920 extends TradeBuffer {
 
 			for (Map<String, String> result : resultPartList) {
 				OccursList occursList = new OccursList();
-
+				this.info("result=" + result);
 				int entryDate = 0;
 
-				if (parse.stringToInteger(result.get("F1")) > 19110000) {
-					entryDate = parse.stringToInteger(result.get("F1")) - 19110000;
+				if (parse.stringToInteger(result.get("EntryDate")) > 19110000) {
+					entryDate = parse.stringToInteger(result.get("EntryDate")) - 19110000;
 				}
 
-				occursList.putParam("OODetailSeq", result.get("F0"));
+				occursList.putParam("OODetailSeq", result.get("DetailSeq"));
 				occursList.putParam("OOEntryDate", entryDate);
-				occursList.putParam("OOCustNo", result.get("F2"));
-				occursList.putParam("OOFacmNo", result.get("F3"));
-				occursList.putParam("OORepayType", result.get("F4"));
-				occursList.putParam("OORepayCode", result.get("F5"));
-				occursList.putParam("OOReconCode", result.get("F6"));
-				occursList.putParam("OOReconCodeX", result.get("F7"));
-				occursList.putParam("OORepayAmt", result.get("F8"));
-				occursList.putParam("OOAcctAmt", result.get("F9"));
-				occursList.putParam("OODisacctAmt", result.get("F15"));
-				occursList.putParam("OOProcStsCode", result.get("F10"));
-				occursList.putParam("OOProcCode", result.get("F11"));
+				occursList.putParam("OOCustNo", result.get("CustNo"));
+				occursList.putParam("OOFacmNo", result.get("FacmNo"));
+				occursList.putParam("OORepayType", result.get("RepayType"));
+				occursList.putParam("OORepayCode", result.get("RepayCode"));
+				occursList.putParam("OOReconCode", result.get("ReconCode"));
+				occursList.putParam("OOReconCodeX", result.get("ReconCodeX"));
+				occursList.putParam("OORepayAmt", result.get("RepayAmt"));
+				occursList.putParam("OOAcctAmt", result.get("AcctAmt"));
+				occursList.putParam("OODisacctAmt", result.get("DisacctAmt"));
+				occursList.putParam("OOProcStsCode", result.get("ProcStsCode"));
+				occursList.putParam("OOProcCode", result.get("ProcCode"));
 
 				String procNote = "";
 				String txcd = "";
-				String fileSeq = result.get("F0");
+				String fileSeq = result.get("DetailSeq");
+				int custNo = parse.stringToInteger(result.get("CustNo"));
 
-				if (result.get("F12") != null) {
+				if (result.get("ProcNote") != null) {
 
 					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(result.get("F12"));
+					tempVo = tempVo.getVo(result.get("ProcNote"));
 
 					if (tempVo.get("ReturnMsg") != null && tempVo.get("ReturnMsg").length() > 0) {
 						procNote += "回應訊息:" + tempVo.get("ReturnMsg") + " ";
@@ -160,15 +161,19 @@ public class L4920 extends TradeBuffer {
 						procNote += "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
 					}
 
-					if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
-						procNote += "摘要:" + tempVo.get("Note");
+					if ("9".equals(result.get("RepayType"))) {
+						if (tempVo.get("TempReasonCodeX") != null && tempVo.get("TempReasonCodeX").length() > 0) {
+							procNote = procNote + "暫收原因:" + tempVo.get("TempReasonCodeX") + " ";
+						}
 					}
-					if (tempVo.get("VirtualAcctNo") != null && parse.stringToInteger(result.get("F4")) == 0
-							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
-						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
-					}
-					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
-						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
+					if ("1".equals(result.get("RepayType"))) {
+						if (tempVo.get("PrePaidTerms") != null
+								&& parse.stringToInteger(tempVo.get("PrePaidTerms")) > 0) {
+							procNote = procNote + "預繳期數:" + tempVo.get("PrePaidTerms") + "期 ";
+						}
+						if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
+							procNote = procNote + "應繳日:" + tempVo.get("PayIntDate") + " ";
+						}
 					}
 					if (tempVo.get("FileSeq") != null && tempVo.get("FileSeq").length() > 0) {
 						fileSeq = tempVo.get("FileSeq");
@@ -180,11 +185,11 @@ public class L4920 extends TradeBuffer {
 
 				occursList.putParam("OOProcNote", procNote);
 
-				occursList.putParam("OOTxSn", titaVo.getKinbr() + result.get("F13") + result.get("F14"));
-				occursList.putParam("OOFileName", result.get("F16"));
+				occursList.putParam("OOTxSn", titaVo.getKinbr() + result.get("TitaTlrNo") + result.get("TitaTxtNo"));
+				occursList.putParam("OOFileName", result.get("FileName"));
 				occursList.putParam("OOFileSeq", fileSeq);
 				occursList.putParam("OOTxCd", txcd);
-				
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
