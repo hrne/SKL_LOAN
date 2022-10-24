@@ -1,6 +1,5 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 29 09:48:54 CST 2021
-httpcore-4.4.13-javadoc.jar>central=
-httpcore-4.4.13.jar>central=
+#Wed Nov 25 14:24:25 CST 2020
 httpcore-4.4.13.pom>central=
+httpcore-4.4.13.jar>central=
 httpcore-4.4.13-sources.jar>central=

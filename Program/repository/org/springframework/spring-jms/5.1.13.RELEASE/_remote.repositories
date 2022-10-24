@@ -1,6 +1,5 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 29 09:50:58 CST 2021
+#Thu May 28 14:10:09 CST 2020
 spring-jms-5.1.13.RELEASE.pom>central=
 spring-jms-5.1.13.RELEASE.jar>central=
-spring-jms-5.1.13.RELEASE-javadoc.jar>central=
 spring-jms-5.1.13.RELEASE-sources.jar>central=

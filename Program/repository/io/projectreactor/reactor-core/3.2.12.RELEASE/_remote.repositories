@@ -1,6 +1,5 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 29 10:23:33 CST 2021
+#Thu May 28 14:10:53 CST 2020
 reactor-core-3.2.12.RELEASE.jar>central=
-reactor-core-3.2.12.RELEASE-javadoc.jar>central=
 reactor-core-3.2.12.RELEASE-sources.jar>central=
 reactor-core-3.2.12.RELEASE.pom>central=

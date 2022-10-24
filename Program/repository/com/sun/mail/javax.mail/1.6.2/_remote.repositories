@@ -1,6 +1,5 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Wed Jul 20 17:34:35 CST 2022
-javax.mail-1.6.2-javadoc.jar>central=
+#Thu May 28 14:08:00 CST 2020
 javax.mail-1.6.2-sources.jar>central=
 javax.mail-1.6.2.jar>central=
 javax.mail-1.6.2.pom>central=

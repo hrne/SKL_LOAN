@@ -1,6 +1,5 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 29 10:23:40 CST 2021
-spring-integration-file-5.1.9.RELEASE-javadoc.jar>central=
+#Thu May 28 14:10:55 CST 2020
 spring-integration-file-5.1.9.RELEASE-sources.jar>central=
 spring-integration-file-5.1.9.RELEASE.jar>central=
 spring-integration-file-5.1.9.RELEASE.pom>central=

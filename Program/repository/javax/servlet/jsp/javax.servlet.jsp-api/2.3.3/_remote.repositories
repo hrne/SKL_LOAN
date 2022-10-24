@@ -1,6 +1,5 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu Jul 29 09:49:04 CST 2021
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Mon Dec 30 17:46:49 CST 2019
 javax.servlet.jsp-api-2.3.3.jar>central=
 javax.servlet.jsp-api-2.3.3.pom>central=
-javax.servlet.jsp-api-2.3.3-javadoc.jar>central=
 javax.servlet.jsp-api-2.3.3-sources.jar>central=
