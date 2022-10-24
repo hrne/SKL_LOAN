@@ -1,5 +1,6 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Mon Dec 30 17:47:23 CST 2019
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Jul 29 10:24:39 CST 2021
 querydsl-core-4.2.1.jar>central=
 querydsl-core-4.2.1.pom>central=
+querydsl-core-4.2.1-javadoc.jar>central=
 querydsl-core-4.2.1-sources.jar>central=

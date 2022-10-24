@@ -7,7 +7,7 @@ set define off;
 (
 -- 程式功能：維護 LoanIfrs9Hp 每月IFRS9欄位清單8
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Hp_Upd"(20201231,'System');
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Hp_Upd"(20201231,'999999');
 --
 
     -- 參數
@@ -61,6 +61,19 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('INSERT LoanIfrs9Hp');
 
     INSERT INTO "LoanIfrs9Hp"
+    WITH "Work_Temp" AS (
+          SELECT  LM."CustNo"
+                 ,LM."FacmNo"
+                 ,SUM("LM.DrawdownAmt") AS "DrawdownAmt" -- 未動撥的預撥金額
+           FROM  "LoanBorMain"
+           LEFT JOIN "Ifrs9FacData" F ON F."CustNo" = LM."CustNo"
+                                     AND F."FacmNo" = LM."FacmNo"
+                                     AND F."DrawdownFg" = 0
+                                     AND F."DataYM" = YYYYMM
+           WHERE LM."DrawdownDate" > TBSDYF
+           GROUP BY LM."CustNo", LM."FacmNo"
+    )
+
     WITH "Work_HP" AS (
 
     -- 撈符合條件額度資料，寫入 "Work_HP" 暫存檔
@@ -83,9 +96,11 @@ BEGIN
            UNION
            SELECT F."CustNo"                  AS "CustNo"
                 , F."FacmNo"                  AS "FacmNo"
-                , 0                           AS "PreDrawdownAmt"
+                , NVL(WT."DrawdownAmt",0)     AS "PreDrawdownAmt"
                 , NVL(F."ApproveDate",0)      AS "ApproveDate"   -- 核准日期(額度)
            FROM   "Ifrs9FacData" F
+           LEFT JOIN "Work_Temp" WT ON WT."CustNo" = F."CustNo"
+                                   AND WT."FacmNo" = F."FacmNo"
            WHERE  F."DrawdownFg" = 0
              AND  F."DataYM" =  YYYYMM
          )   A

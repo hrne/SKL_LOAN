@@ -1,5 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Thu May 28 14:10:37 CST 2020
+#Thu Jul 29 10:22:48 CST 2021
 spring-batch-core-4.1.4.RELEASE.jar>central=
 spring-batch-core-4.1.4.RELEASE.pom>central=
+spring-batch-core-4.1.4.RELEASE-javadoc.jar>central=
 spring-batch-core-4.1.4.RELEASE-sources.jar>central=

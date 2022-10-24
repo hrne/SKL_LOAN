@@ -381,26 +381,21 @@ public class TxBatchCom extends TradeBuffer {
 		this.info("TxBatchCom run ... " + titaVo);
 		// 以批號、明細檔序號更新整批入帳檔
 		if ("L32".equals(titaVo.getTxCode().substring(0, 3)) || "L34".equals(titaVo.getTxCode().substring(0, 3))) {
+			// 訂正AS400帳務，產生暫收沖正
+			if ("L3240".equals(titaVo.getTxCode()) || "L3250".equals(titaVo.getTxCode())) {
+				insBatxResv(titaVo);
+			}
 			// 整批入帳
 			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
-					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4)) && titaVo.get("RpDetailSeq1") != null) {
+					&& ("BATX".equals(titaVo.get("BATCHNO").substring(0, 4))
+							|| "RESV".equals(titaVo.get("BATCHNO").substring(0, 4)))
+					&& titaVo.get("RpDetailSeq1") != null) {
 				// 隔日訂正，回沖至暫收款－沖正(RESV00)
 				if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
 					insBatxResv(titaVo);
 				} else {
 					updBatxResult(titaVo.getParam("BATCHNO"), titaVo.getParam("RpDetailSeq1"), titaVo);
 				}
-			}
-			// 訂正AS400帳務，產生暫收沖正
-			if ("L3240".equals(titaVo.getTxCode()) || "L3250".equals(titaVo.getTxCode())) {
-				insBatxResv(titaVo);
-			}
-
-			// 暫收沖正入帳
-			if (titaVo.get("BATCHNO") != null && titaVo.get("BATCHNO").trim().length() == 6
-					&& "RESV".equals(titaVo.get("BATCHNO").substring(0, 4)) && titaVo.get("RpDetailSeq1") != null) {
-				// 隔日訂正回沖至暫收款－沖正，再執行交易
-				updBatxResult(titaVo.getParam("BATCHNO"), titaVo.getParam("RpDetailSeq1"), titaVo);
 			}
 		}
 		return null;
@@ -1516,9 +1511,6 @@ public class TxBatchCom extends TradeBuffer {
 					this.procStsCode = "2"; // 2.人工處理
 					break;
 				}
-				if (this.intEndDate > titaVo.getEntDyI()) {
-					this.checkMsg += " 有期款未回收，應繳日=" + tTempVo.getParam("NextPayIntDate");
-				}
 				// 無償還本利
 				// 處理狀態:2.人工處理
 				// 處理說明:繳息迄日:999999
@@ -1731,7 +1723,6 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.repayLoan.compareTo(BigDecimal.ZERO) > 0) {
 			this.checkMsg += " 償還本利:" + df.format(this.repayLoan);
 			if (this.repayType == 1) {
-				this.checkMsg += "(" + this.intStartDate + "~" + this.intEndDate + ")";
 				this.checkMsg += "(" + this.intStartDate + "~" + this.intEndDate + ")";
 				if (this.intEndDate > titaVo.getEntDyI()) {
 					this.checkMsg += "預繳";

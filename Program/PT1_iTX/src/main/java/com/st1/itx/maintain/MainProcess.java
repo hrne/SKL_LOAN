@@ -474,7 +474,7 @@ public class MainProcess extends SysLogger {
 			// 端末交易檢核
 			if (!this.titaVo.isTxcdSpecial() && this.titaVo.isTrmtypTerminal()) {
 
-				if (!this.titaVo.isTxcdInq() && Integer.parseInt(this.titaVo.getTxtNo().trim()) < tTxTeller.getTxtNo())
+				if (!this.titaVo.isTxcdInq() && Integer.parseInt(this.titaVo.getTxtNo().trim()) < tTxTeller.getTxtNo() && !this.titaVo.isSpanDy())
 					throw new LogicException("EC004", "使用者(" + this.titaVo.getTlrNo() + ")交易序號錯誤,請重新登入系統");
 
 				if (tTxTeller.getEntdy() == 0)

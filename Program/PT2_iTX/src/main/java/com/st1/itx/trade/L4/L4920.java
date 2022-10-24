@@ -171,9 +171,9 @@ public class L4920 extends TradeBuffer {
 								&& parse.stringToInteger(tempVo.get("PrePaidTerms")) > 0) {
 							procNote = procNote + "預繳期數:" + tempVo.get("PrePaidTerms") + "期 ";
 						}
-						if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
-							procNote = procNote + "應繳日:" + tempVo.get("PayIntDate") + " ";
-						}
+//						if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
+//							procNote = procNote + "應繳日:" + tempVo.get("PayIntDate") + " ";
+//						}
 					}
 					if (tempVo.get("FileSeq") != null && tempVo.get("FileSeq").length() > 0) {
 						fileSeq = tempVo.get("FileSeq");

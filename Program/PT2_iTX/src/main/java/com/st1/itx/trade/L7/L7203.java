@@ -85,6 +85,8 @@ public class L7203 extends TradeBuffer {
 
 		// 整批處理：利息法帳面資料檔更新、寫入應處理清單 ACCL00-各項提存作業(折溢價攤銷)
 		MySpring.newTask("BS720", this.txBuffer, titaVo);
+		titaVo.setDataBaseOnMon();// 指定月報環境
+		MySpring.newTask("BS720", this.txBuffer, titaVo);
 
 		this.totaVo.putParam("Count", uploadFile.size());
 		this.totaVo.putParam("Amount", AmortizedAmt.setScale(0, RoundingMode.HALF_UP));

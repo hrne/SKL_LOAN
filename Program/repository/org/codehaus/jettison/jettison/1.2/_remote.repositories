@@ -1,5 +1,6 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Mon Dec 30 17:47:08 CST 2019
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Jul 29 10:23:00 CST 2021
+jettison-1.2-javadoc.jar>central=
 jettison-1.2-sources.jar>central=
-jettison-1.2.pom>central=
 jettison-1.2.jar>central=
+jettison-1.2.pom>central=

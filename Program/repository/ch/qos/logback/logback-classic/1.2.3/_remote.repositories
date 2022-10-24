@@ -1,5 +1,6 @@
-#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
-#Mon Dec 30 17:46:51 CST 2019
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Jul 29 09:49:41 CST 2021
 logback-classic-1.2.3.pom>central=
-logback-classic-1.2.3-sources.jar>central=
+logback-classic-1.2.3-javadoc.jar>central=
 logback-classic-1.2.3.jar>central=
+logback-classic-1.2.3-sources.jar>central=

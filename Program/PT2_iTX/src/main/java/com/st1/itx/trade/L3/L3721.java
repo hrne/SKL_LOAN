@@ -77,7 +77,9 @@ public class L3721 extends TradeBuffer {
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
 	private int iFacmNo;
-//	private int iBormNo;
+	private int iBormNo;
+	private int iBormNoS = 0;
+	private int iBormNoE = 900;
 	private int iEffectDate;
 	private int iNextRateAdjDate;
 	private String iRateCode;
@@ -137,7 +139,7 @@ public class L3721 extends TradeBuffer {
 		// 取得輸入資料
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
-//		iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
+		iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		iEffectDate = this.parse.stringToInteger(titaVo.getParam("EffectDate2"));
 		iRateCode = titaVo.getParam("RateCode2");
 		iProdNo = titaVo.getParam("ProdNo2");
@@ -146,6 +148,12 @@ public class L3721 extends TradeBuffer {
 		iIncrFlag = titaVo.getParam("IncrFlag2");
 		iBaseRate = this.parse.stringToBigDecimal(titaVo.getParam("BaseRate2"));
 //		iProdRate = this.parse.stringToBigDecimal(titaVo.getParam("ProdRate2"));
+
+		if (iBormNo > 0) {
+
+			iBormNoS = iBormNo;
+			iBormNoE = iBormNo;
+		}
 
 		// 自訂利率
 		if ("99".equals(iBaseRateCode)) {
@@ -224,7 +232,7 @@ public class L3721 extends TradeBuffer {
 	private void EntryNormalRoutine() throws LogicException {
 		this.info("EntryNormalRoutine ... ");
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, 0,
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, iBormNoS, iBormNoE, 0,
 				Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {

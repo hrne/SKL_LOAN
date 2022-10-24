@@ -79,7 +79,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 [#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@",#BTN3,#ApplNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
-! ["#FdBormNo+撥款序號",#BormNo],
+[#<->#,"#FdBormNo+撥款序號",#BormNo],
 [#<->#,"#FdNextRateAdjDate1+下次利率調整日",#NextRateAdjDate1],
 ["#FdEffectDate1+生效日期",#EffectDate1],
 ["#FdRateCode1+利率區分",#RateCode1X],
@@ -159,7 +159,7 @@ E(0,@RimFKey,#FKEY)
 T(F,#CustNo,0)
 T(F,#FacmNo,0)
 HIDE(#BTN4)
-INVOKEJS(SHOW,p1,12,16,0)
+INVOKEJS(SHOW,p1,13,17,0)
 
 #rimtxtype=X,2,S
 
@@ -373,10 +373,10 @@ R(1,L2R05)
 C(3,#FKEY,0,$,s)
 C(3,#L2r05BormCount,1,T(3, )T(F,@BormNo,0),T(3,*)T(F,@BormNo,1))
 
-#BormNo=A,3,S
+#BormNo=A,3,I
 C(3,#CHAIN,1,C(5,#rimtxtype,L4,$,s),$)
 IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
-IF(#L2r05BormCount>=1,s,$)
+! IF(#L2r05BormCount>=1,s,$)
 
 !查尋放款主檔
 #SendL3r02=X,1,S
@@ -602,7 +602,7 @@ HELP(#YNHelp)
 
 
 #DeleteFgX=X,4,L
-C(5,#DeleteFg,N,INVOKEJS(SHOW,p1,12,16,1),INVOKEJS(SHOW,p1,12,16,0))
+C(5,#DeleteFg,N,INVOKEJS(SHOW,p1,13,17,1),INVOKEJS(SHOW,p1,13,17,0))
 C(4,#DeleteFg,S,$)
 T(3,)T(H,#DeleteFg,#YNHelp)
 C(3,#FKEY,0,$,s)
@@ -703,8 +703,8 @@ HELP(#RateCodeHelp)
 
 #RateCode2X=X,10,L
 T(3,)T(H,#RateCode2,#RateCodeHelp)
-C(3,#RateCode2,1,C(3,#BaseRateCode2,99,INVOKEJS(SHOW,p1,18,18,1),INVOKEJS(SHOW,p1,18,18,0)),INVOKEJS(SHOW,p1,18,18,1))
-C(3,#RateCode2,2,INVOKEJS(SHOW,p1,18,18,0),$)
+C(3,#RateCode2,1,C(3,#BaseRateCode2,99,INVOKEJS(SHOW,p1,19,19,1),INVOKEJS(SHOW,p1,19,19,0)),INVOKEJS(SHOW,p1,19,19,1))
+C(3,#RateCode2,2,INVOKEJS(SHOW,p1,19,19,0),$)
 
 
 #BUF6A=X,6,S
@@ -900,11 +900,10 @@ T(3,[L3721] 借戶利率變更)
 
 
 </sub>
-
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#TimCustNo#FacmNo#RateCode2#EffectDate2
+#TimCustNo#FacmNo#BormNo#RateCode2#EffectDate2
 #ProdNo2#ProdNo2X#ProdRate2
 #BaseRateCode2#BaseRate2#IncrFlag2#FitRate2#RateIncr2
 #Remark#NextRateAdjDate2

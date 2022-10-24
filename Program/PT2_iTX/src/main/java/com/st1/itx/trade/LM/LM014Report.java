@@ -17,6 +17,7 @@ import com.st1.itx.db.service.springjpa.cm.LM014ServiceImpl.DepartmentCodeCondit
 import com.st1.itx.db.service.springjpa.cm.LM014ServiceImpl.EntCodeCondition;
 import com.st1.itx.db.service.springjpa.cm.LM014ServiceImpl.QueryType;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -58,26 +59,27 @@ public class LM014Report extends MakeReport {
 	}
 
 	private ReportType currentReportType = null;
+//	private String title = "";
 
 	@Override
 	public void printHeader() {
 
 		// 設定字體大小
-		this.setFontSize(9);
+		this.setFontSize(8);
 
-		this.print(-1, 186, "機密等級：密");
+		this.print(-1, 148, "機密等級：密");
 
 		this.print(-2, 3, "程式ＩＤ：" + this.getParentTranCode());
-		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
-		this.print(-2, 186, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
+		this.print(-2, 85, "新光人壽保險股份有限公司", "C");
+		this.print(-2, 148, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
 
 		this.print(-3, 3, "報　　表：" + this.getRptCode());
-		this.print(-3, this.getMidXAxis(), "平均利率月報表《" + currentReportType.value + "》", "C");
-		this.print(-3, 186, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 85, "平均利率月報表《" + currentReportType.value + "》", "C");
+		this.print(-3, 148, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
-		this.print(-4, 186, "頁　　數：" + this.getNowPage());
+		this.print(-4, 148, "頁　　數：" + this.getNowPage());
 
-		this.print(-5, this.getMidXAxis(), getshowRocDate(this.getReportDate()), "C");
+		this.print(-5, 85, getshowRocDate(this.getReportDate()), "C");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(6);
@@ -122,7 +124,7 @@ public class LM014Report extends MakeReport {
 			// C <--> 3
 			// D <--> 4
 			// 無對應 0
-
+		
 			for (int i = 0; i < ReportType.values().length; i++) {
 				queryList.add(new Query(ReportType.values()[i], QueryType.values()[inputType - 1]));
 			}
@@ -149,9 +151,18 @@ public class LM014Report extends MakeReport {
 		for (Query qo : queryList) {
 			// 取得此循環應做的報表，並且開pdf/開新頁
 			currentReportType = qo.reportType;
-
+			this.info("currentReportType =" + currentReportType.value);
 			if (isFirstOutput) {
-				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM014", "平均利率月報表", "LM014", "A4", "L");
+				// 開啟報表
+				
+//				this.title = qo.reportType.value;
+				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+						.setRptCode("LM014").setRptItem("平均利率月報表("+currentReportType.value+")").setRptSize("A4")
+						.setSecurity("").setPageOrientation("L").build();
+
+				
+				this.open(titaVo, reportVo);
+//				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM014", "平均利率月報表", "LM014", "A4", "L");
 				isFirstOutput = false;
 			} else {
 				this.newPage();
@@ -187,16 +198,16 @@ public class LM014Report extends MakeReport {
 					print(1, 0, "｜　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　｜　　　　　　　　｜　　　　｜　　　　　　　｜　　　　　　　　｜　　　　｜　　　　　　　　｜　　　　｜　　　　　　　｜");
 					print(0, 4, tLDVo.get("F0"), "L");
 					print(0, 24, tLDVo.get("F1"), "L");
-					print(0, 60, formatAmt(tLDVo.get("F2"), 0), "R");
-					print(0, 72, tLDVo.get("F3"), "R");
-					print(0, 92, formatAmt(tLDVo.get("F4"), 0), "R");
-					print(0, 103, tLDVo.get("F5"), "R");
-					print(0, 111, tLDVo.get("F6"), "L");
-					print(0, 142, formatAmt(tLDVo.get("F7"), 0), "R");
-					print(0, 153, tLDVo.get("F8"), "R");
-					print(0, 173, formatAmt(tLDVo.get("F9"), 0), "R");
-					print(0, 184, tLDVo.get("F10"), "R");
-					print(0, 192, tLDVo.get("F11"), "L");
+					print(0, 48, formatAmt(tLDVo.get("F2"), 0), "R");
+					print(0, 56, tLDVo.get("F3"), "R");
+					print(0, 72, formatAmt(tLDVo.get("F4"), 0), "R");
+					print(0, 81, tLDVo.get("F5"), "R");
+					print(0, 89, tLDVo.get("F6"), "L");
+					print(0, 113, formatAmt(tLDVo.get("F7"), 0), "R");
+					print(0, 122, tLDVo.get("F8"), "R");
+					print(0, 138, formatAmt(tLDVo.get("F9"), 0), "R");
+					print(0, 146, tLDVo.get("F10"), "R");
+					print(0, 154, tLDVo.get("F11"), "L");
 				}
 
 				print(1, 0, "└─────────────────┴────────┴────┴────────┴────┴───────┴────────┴────┴────────┴────┴───────┘");

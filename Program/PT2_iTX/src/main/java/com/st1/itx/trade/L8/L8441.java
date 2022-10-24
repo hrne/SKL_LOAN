@@ -92,16 +92,46 @@ public class L8441 extends TradeBuffer {
 		this.info("dataLineList1    = " + dataLineList1);
 		for (String filename : dataLineList1) {
 			if (filename.contains("畫面編號:")) {
+			int Xx =	filename.length();
+			this.info("XX    = "  + Xx); // 050 28
+			}
+			if (filename.contains("畫面編號:")) {
 				iSubmitkey = filename.substring(7, 10).trim();
 			}
 			if (filename.contains("本次檢核共檢視過")) {
-				int iTotal = parse.stringToInteger(filename.substring(8, 17).trim());
-				sTotal = iTotal;
-				int iCorrect = parse.stringToInteger(filename.substring(25, 35).trim());
-				sCorrect = iCorrect;
-				int iMistakeCount = parse.stringToInteger(filename.substring(39, 49).trim());
-				sMistakeCount = iMistakeCount;
-			}
+//				int iTotal = parse.stringToInteger(filename.substring(8, 17).trim());
+				String ixTotal = filename.substring(8, 17).trim();
+				String ixTotal2 ="";
+				for(int i=0; i < ixTotal.length(); i++) {
+					if(ixTotal.charAt(i)>=48 && ixTotal.charAt(i)<=57) {
+						ixTotal2 += ixTotal.charAt(i);
+					}
+				}	
+				sTotal = parse.stringToInteger(ixTotal2);
+				
+//				int iCorrect = parse.stringToInteger(filename.substring(25, 35).trim());
+				String ixCorrect = filename.substring(25, 35).trim();
+				String ixCorrect2 ="";
+				for(int i=0; i < ixCorrect.length(); i++) {
+					if(ixCorrect.charAt(i)>=48 && ixCorrect.charAt(i)<=57) {
+						ixCorrect2 += ixCorrect.charAt(i);
+					}
+				}	
+				sCorrect = parse.stringToInteger(ixCorrect2);
+				
+//				int iMistakeCount = parse.stringToInteger(filename.substring(39, 49).trim());
+				String ixMistakeCount = filename.substring(39, 49).trim();
+				String ixMistakeCount2 ="";
+				for(int i=0; i < ixMistakeCount.length(); i++) {
+					if(ixMistakeCount.charAt(i)>=48 && ixMistakeCount.charAt(i)<=57) {
+						ixMistakeCount2 += ixMistakeCount.charAt(i);
+					}
+				}	
+				sMistakeCount = parse.stringToInteger(ixMistakeCount2);;
+				
+				this.info("sMistakeCount    =  " + sMistakeCount);
+				
+			} 
 			if (filename.contains("報送日期")) {
 				int iJcicDate = parse.stringToInteger(filename.substring(6, 13).trim());
 				sJcicDate = iJcicDate;
@@ -112,7 +142,7 @@ public class L8441 extends TradeBuffer {
 		this.info("sTotal       = " + sTotal);
 		this.info("sCorrect     = " + sCorrect);
 		this.info("sMistakeCount  = " + sMistakeCount);
-
+		
 		JcicReFileId iJcicReFileid = new JcicReFileId();
 		JcicReFile iJcicReFile = new JcicReFile();
 		JcicReFile chJcicReFile = new JcicReFile();
@@ -141,6 +171,7 @@ public class L8441 extends TradeBuffer {
 		this.totaVo.putParam("ReportTotal", sTotal);
 		this.totaVo.putParam("CorrectCount", sCorrect);
 		this.totaVo.putParam("MistakeCount", sMistakeCount);
+		this.info("sMistakeCount    =  " + sMistakeCount);
 		
 		String checkMsg = "聯真回寫筆數已上傳。";
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8442",
