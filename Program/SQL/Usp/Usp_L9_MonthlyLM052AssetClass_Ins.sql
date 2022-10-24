@@ -54,6 +54,63 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "MonthlyLM052AssetClass"
+    WITH "tmpAssetClass" AS (
+      SELECT M."YearMonth"
+            ,M."CustNo"
+            ,M."FacmNo"
+            ,M."ClCode1"
+            ,M."FacAcctCode"
+            ,M."ProdNo"
+            ,M."PrevIntDate"
+            ,CASE
+               WHEN M."PrinBalance" = 1
+                AND M."AcctCode" = 990
+               THEN '5'        --(5)第五類-收回無望(應為法務進度901，現暫以餘額掛1為第五類)
+                               --   無擔保部分--超過清償期12月者
+                               --   或拍訂貨拍賣無實益之損失者
+                               --   或放款資產經評估無法回收者   
+              --將2之X的判斷由程式自行
+               WHEN M."AcctCode" = 990
+                AND M."ProdNo" IN ('60','61','62')
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者         
+               WHEN M."OvduTerm" >= 7
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者    
+               WHEN M."AcctCode" = 990
+                AND M."OvduTerm" <= 12
+               THEN '23'       --(23)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期7-12月者
+                               --    或無擔保部分--超過清償期1-3月者    
+               WHEN M."AcctCode" <> 990
+                AND M."ProdNo" IN ('60','61','62')
+                AND M."OvduTerm" = 0
+               THEN '21'       --(21)第二類-應予注意：
+                               --    有足額擔保--但債信以不良者
+                               --    (有擔保分期協議且正常還款者)
+               WHEN M."AcctCode" <> 990
+                AND M."OvduTerm" >= 1
+                AND M."OvduTerm" <= 6
+               THEN '22'       --(22)第二類-應予注意：
+                               --    有足無擔保--逾繳超過清償期1-6月者
+               WHEN M."AcctCode" = 990
+                AND M."OvduTerm" > 12
+               THEN '3'        --(3)第三類-可望收回：
+                               --   有足無擔保--逾繳超過清償期12月者
+                               --   或無擔保部分--超過清償期3-6月者                         
+               ELSE '1'       -- 正常繳息
+             END                  AS "AssetClass"	--放款資產項目	  
+             ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
+             ,M."PrinBalance"      --放款餘額     
+             ,M."LawAmount"    
+           FROM "MonthlyFacBal" M
+           WHERE M."PrinBalance" > 0
+             AND M."YearMonth" = TYYMM
+
+    )
     SELECT "YearMonth" 							AS "YearMonth"			--資料年月 DECIMAL 6 0
           ,"AssetClass" 						AS "AssetClassNo"		--資產五分類 VARCHAR2
 																				--1~5分類
@@ -71,80 +128,16 @@ BEGIN
 				  ,JOB_START_TIME           AS "LastUpdate"          -- 最後更新日期時間 DATE 0 0
 				  ,EmpNo                    AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM ( SELECT M."YearMonth"
-                 ,CASE
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" = 990
-                     AND M."ProdNo" IN ('60','61','62')
-                    THEN '23'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者         
-                    WHEN M."AssetClass" = 2
-                     AND M."OvduTerm" >= 7
-                     AND M."OvduTerm" <= 12
-                    THEN '23'        --(23)第二類-應予注意：
-                                    --    有足無擔保--逾繳超過清償期7-12月者
-                                    --    或無擔保部分--超過清償期1-3月者    
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" = 990
-                     AND M."OvduTerm" <= 12
-                    THEN '23'        --(23)第二類-應予注意：
-                                    --    有足無擔保--逾繳超過清償期7-12月者
-                                    --    或無擔保部分--超過清償期1-3月者    
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" <> 990
-                     AND M."ProdNo" IN ('60','61','62')
-                     AND M."OvduTerm" = 0
-                    THEN '21'        --(21)第二類-應予注意：
-                                    --    有足額擔保--但債信以不良者
-                                    --    (有擔保分期協議且正常還款者)
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" <> 990
-                     AND M."OvduTerm" >= 1
-                     AND M."OvduTerm" <= 6
-                    THEN '22'       --(22)第二類-應予注意：
-                                   --    有足無擔保--逾繳超過清償期1-6月者 
-                  ELSE M."AssetClass" END AS "AssetClass"  
+                 ,M."AssetClass"
                  ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
                  ,SUM(M."PrinBalance" - M."LawAmount")      AS "Amt"           --放款餘額
-           FROM "MonthlyFacBal" M
+           FROM "tmpAssetClass" M
            WHERE M."PrinBalance" > 0
              AND M."YearMonth" = TYYMM
              AND M."AssetClass" <> 1
            GROUP BY M."YearMonth"
-                  ,CASE
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" = 990
-                     AND M."ProdNo" IN ('60','61','62')
-                    THEN '23'       --(23)第二類-應予注意：
-                               --    有足無擔保--逾繳超過清償期7-12月者
-                               --    或無擔保部分--超過清償期1-3月者         
-                    WHEN M."AssetClass" = 2
-                     AND M."OvduTerm" >= 7
-                     AND M."OvduTerm" <= 12
-                    THEN '23'        --(23)第二類-應予注意：
-                                    --    有足無擔保--逾繳超過清償期7-12月者
-                                    --    或無擔保部分--超過清償期1-3月者    
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" = 990
-                     AND M."OvduTerm" <= 12
-                    THEN '23'        --(23)第二類-應予注意：
-                                    --    有足無擔保--逾繳超過清償期7-12月者
-                                    --    或無擔保部分--超過清償期1-3月者    
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" <> 990
-                     AND M."ProdNo" IN ('60','61','62')
-                     AND M."OvduTerm" = 0
-                    THEN '21'        --(21)第二類-應予注意：
-                                    --    有足額擔保--但債信以不良者
-                                    --    (有擔保分期協議且正常還款者)
-                    WHEN M."AssetClass" = 2
-                     AND M."AcctCode" <> 990
-                     AND M."OvduTerm" >= 1
-                     AND M."OvduTerm" <= 6
-                    THEN '22'       --(22)第二類-應予注意：
-                                   --    有足無擔保--逾繳超過清償期1-6月者 
-                  ELSE M."AssetClass" END  	  
-                   ,M."AcSubBookCode"
+                  , M."AssetClass"   	  
+                  , M."AcSubBookCode"
            UNION
            SELECT M."YearMonth"
                  ,CASE
@@ -175,7 +168,7 @@ BEGIN
                   END                  AS "AssetClass"	--放款資產項目	  
                  ,M."AcSubBookCode"    AS "AcSubBookCode" --區隔帳冊
                  ,SUM(M."PrinBalance" - M."LawAmount")      AS "Amt"           --放款餘額
-           FROM "MonthlyFacBal" M
+           FROM "tmpAssetClass" M
            LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                                 AND F."FacmNo" = M."FacmNo"
            LEFT JOIN "CustMain" CM ON CM."CustNo" = M."CustNo"

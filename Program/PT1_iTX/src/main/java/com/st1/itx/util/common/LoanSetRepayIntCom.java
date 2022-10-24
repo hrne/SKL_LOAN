@@ -64,20 +64,24 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 	 * @return loanCalcRepayIntCom
 	 * @throws LogicException LogicException
 	 */
-	public LoanCalcRepayIntCom setRepayInt(LoanBorMain loanBorMain, int iRepayTerms, int iIntEndDate, int iIntEndCode, int iEntryDate, TitaVo titaVo) throws LogicException {
+	public LoanCalcRepayIntCom setRepayInt(LoanBorMain loanBorMain, int iRepayTerms, int iIntEndDate, int iIntEndCode,
+			int iEntryDate, TitaVo titaVo) throws LogicException {
 		this.info("active setRepayInt ");
 		this.info("   RepayTerms = " + iRepayTerms);
 		this.info("   IntEndDate = " + iIntEndDate);
 		this.info("   IntEndCode = " + iIntEndCode);
 		this.info("   EntryDate  = " + iEntryDate);
 		this.info("   PrevPayIntDate  = " + loanBorMain.getPrevPayIntDate());
-		prevPayIntDate = loanBorMain.getPrevPayIntDate() == 0 ? loanBorMain.getDrawdownDate() : loanBorMain.getPrevPayIntDate();
+		prevPayIntDate = loanBorMain.getPrevPayIntDate() == 0 ? loanBorMain.getDrawdownDate()
+				: loanBorMain.getPrevPayIntDate();
 		this.info("   prevPayIntDate = " + prevPayIntDate);
 
 		// 查詢額度檔
-		FacMain facMain = facMainService.findById(new FacMainId(loanBorMain.getCustNo(), loanBorMain.getFacmNo()), titaVo);
+		FacMain facMain = facMainService.findById(new FacMainId(loanBorMain.getCustNo(), loanBorMain.getFacmNo()),
+				titaVo);
 		if (facMain == null) {
-			throw new LogicException(titaVo, "E0001", "額度主檔 借款人戶號 = " + loanBorMain.getCustNo() + "額度編號 = " + loanBorMain.getFacmNo()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001",
+					"額度主檔 借款人戶號 = " + loanBorMain.getCustNo() + "額度編號 = " + loanBorMain.getFacmNo()); // 查詢資料不存在
 		}
 		// 查詢商品參數檔
 		FacProd tFacProd = facProdService.findById(facMain.getProdNo(), titaVo);
@@ -100,7 +104,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setBaseRateCode(facMain.getBaseRateCode()); // 指標利率代碼
 		loanCalcRepayIntCom.setRateCode(loanBorMain.getRateCode()); // 利率區分 1:機動 2:固動 3:定期機動
 		loanCalcRepayIntCom.setRateAdjFreq(loanBorMain.getRateAdjFreq() == 0 ? 99 : loanBorMain.getRateAdjFreq()); // 利率調整週期
-		loanCalcRepayIntCom.setNextAdjRateDate(loanBorMain.getNextAdjRateDate() == 0 ? 9991231 : loanBorMain.getNextAdjRateDate()); // 下次利率調整日
+		loanCalcRepayIntCom
+				.setNextAdjRateDate(loanBorMain.getNextAdjRateDate() == 0 ? 9991231 : loanBorMain.getNextAdjRateDate()); // 下次利率調整日
 		loanCalcRepayIntCom.setPrincipal(loanBorMain.getLoanBal()); // 計息本金
 		loanCalcRepayIntCom.setIncrFlag(tFacProd.getIncrFlag()); // 加減碼是否依合約 Y:是 N:否
 		loanCalcRepayIntCom.setStoreRate(loanBorMain.getStoreRate()); // 上次收息利率
@@ -114,12 +119,14 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntStartDate(prevPayIntDate); // 計算起日
 		loanCalcRepayIntCom.setIntEndCode(iIntEndCode); // 計算止日代碼 0.無計算止日 1.至計算止日 2:利息提存
 		// 計算止日小於上次繳息日，則以上次繳息日為計算止日
-		loanCalcRepayIntCom.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
+		loanCalcRepayIntCom
+				.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
 		loanCalcRepayIntCom.setFirstDrawdownDate(facMain.getFirstDrawdownDate()); // 初貸日
 		loanCalcRepayIntCom.setDrawdownDate(loanBorMain.getDrawdownDate()); // 貸放起日
 		loanCalcRepayIntCom.setMaturityDate(loanBorMain.getMaturityDate()); // 貸放止日
 		loanCalcRepayIntCom.setBreachValidDate(iEntryDate); // 違約金生效日
-		loanCalcRepayIntCom.setPrevRepaidDate(loanBorMain.getPrevRepaidDate() == 0 ? loanBorMain.getDrawdownDate() : loanBorMain.getPrevRepaidDate()); // 上次還本日
+		loanCalcRepayIntCom.setPrevRepaidDate(
+				loanBorMain.getPrevRepaidDate() == 0 ? loanBorMain.getDrawdownDate() : loanBorMain.getPrevRepaidDate()); // 上次還本日
 		loanCalcRepayIntCom.setPrevPaidIntDate(prevPayIntDate); // 上次繳息日
 		loanCalcRepayIntCom.setNextPayIntDate(loanBorMain.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
 		loanCalcRepayIntCom.setNextRepayDate(loanBorMain.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
@@ -145,7 +152,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		if (iIntEndCode == 2) {
 			settingForMonthlyCalculateInterest(loanBorMain, facMain);
 		}
-
+		
 		loanCalcRepayIntCom.setDelayFlag(0); // 0:收遲延息 1: 不收
 		loanCalcRepayIntCom.setNonePrincipalFlag(0); // 0:契約到期要還本 1:契約到期不還本記號
 		loanCalcRepayIntCom.setTbsDy(this.txBuffer.getTxCom().getTbsdy()); // 營業日期
@@ -169,7 +176,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setFinalBal(loanBorMain.getFinalBal()); // 最後一期本金餘額
 
 		// 重新計算寬限期數
-		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(loanBorMain.getAmortizedCode(), loanBorMain.getFreqBase(), loanBorMain.getPayIntFreq(), loanBorMain.getSpecificDate(),
+		loanCalcRepayIntCom.setGracePeriod(loanCom.getGracePeriod(loanBorMain.getAmortizedCode(),
+				loanBorMain.getFreqBase(), loanBorMain.getPayIntFreq(), loanBorMain.getSpecificDate(),
 				loanBorMain.getSpecificDd(), loanBorMain.getGraceDate()));
 		loanCalcRepayIntCom.setTotalPeriod(loanBorMain.getTotalPeriod()); // 總期數
 
@@ -210,13 +218,15 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 			}
 			// 2022-04-19 智偉增加
 			// 若帳號計息方式是2:按月計息 且 下繳日大於等於下月1日 且 上繳日小於本月1日
-			if (intCalcCode.equals("2") && loanBorMain.getNextPayIntDate() >= nextMonth01 && loanBorMain.getPrevPayIntDate() < thisMonth01) {
+			if (intCalcCode.equals("2") && loanBorMain.getNextPayIntDate() >= nextMonth01
+					&& loanBorMain.getPrevPayIntDate() < thisMonth01) {
 				// 計息方式改為1:按日計息
 				intCalcCode = "1";
 			}
 			// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
 		}
-		if (loanBorMain.getMaturityDate() < nextMonth01 && loanBorMain.getPrevPayIntDate() > 0 && loanBorMain.getPrevPayIntDate() < loanBorMain.getMaturityDate()) {
+		if (loanBorMain.getMaturityDate() < nextMonth01 && loanBorMain.getPrevPayIntDate() > 0
+				&& loanBorMain.getPrevPayIntDate() < loanBorMain.getMaturityDate()) {
 			// 2022-05-04 智偉: 到期日早於本月月底日
 			// 2022-05-04 智偉: 上繳日與到期日超過一期
 			dDateUtil.init();
@@ -229,7 +239,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				// 計息方式調成1:以日計息
 				intCalcCode = "1";
 				amortizedCode = "2";
-				loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
+				// loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
 
 				// 2022-05-09 智偉增加判斷
 				// 符合此條件者
@@ -244,9 +254,11 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		}
 		loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));
-		this.info("Caculate log Set ... 戶號= " + loanBorMain.getCustNo() + "-" + loanBorMain.getFacmNo() + "-" + loanBorMain.getBormNo() + ", AcctCode=" + facMain.getAcctCode() + ", CalcCode ="
-				+ loanBorMain.getIntCalcCode() + "/" + intCalcCode + ", AmortizedCode=" + loanBorMain.getAmortizedCode() + "/" + amortizedCode + ", SpecificDate =" + loanBorMain.getSpecificDate()
-				+ " ,prevPayIntDate =" + prevPayIntDate);
+		this.info("Caculate log Set ... 戶號= " + loanBorMain.getCustNo() + "-" + loanBorMain.getFacmNo() + "-"
+				+ loanBorMain.getBormNo() + ", AcctCode=" + facMain.getAcctCode() + ", CalcCode ="
+				+ loanBorMain.getIntCalcCode() + "/" + intCalcCode + ", AmortizedCode=" + loanBorMain.getAmortizedCode()
+				+ "/" + amortizedCode + ", SpecificDate =" + loanBorMain.getSpecificDate() + " ,prevPayIntDate ="
+				+ prevPayIntDate);
 	}
 
 	@Override

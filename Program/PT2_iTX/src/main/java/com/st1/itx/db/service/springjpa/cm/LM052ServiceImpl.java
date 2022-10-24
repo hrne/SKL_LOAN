@@ -27,14 +27,15 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+
 	/**
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
 	 * @param formNum   表格次序
-	 * @return
-	 * @throws Exception
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 
@@ -123,7 +124,8 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                	   ELSE ABS(R.\"LnAmt\") END AS \"AMT\"";
 			sql += "    	  FROM roundData R";
 			sql += "		  UNION";
-			sql += "	      SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
+			sql += "	      SELECT SUM(\"TdBal\") AS \"AMT\"";
+//			sql += "	      SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
 			sql += "		  FROM \"AcMain\"";
 			sql += "		  WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000)";
 			sql += "	  		AND \"MonthEndYm\" = :yymm ) ";

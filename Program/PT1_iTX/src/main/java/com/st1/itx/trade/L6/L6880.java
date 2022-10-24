@@ -199,7 +199,7 @@ public class L6880 extends TradeBuffer {
 		for (TxTeller te : txTellerLi)
 			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
 				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), titaVo.getTlrNo(), "00");
-				te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
+				te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()));
 			} else
 				te.setTxtNo(0);
 

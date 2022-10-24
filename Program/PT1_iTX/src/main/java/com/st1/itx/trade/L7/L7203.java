@@ -31,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L7203 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L7203.class);
 
 	@Autowired
 	public Parse parse;
@@ -60,8 +59,10 @@ public class L7203 extends TradeBuffer {
 		try {
 			dataLineList = fileCom.intputTxt(filename, "UTF-8");
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new LogicException("E0014", "L7203(" + filename + ")");
+			this.info("L5706(" + filename + ") : " + e.getMessage());
+			String ErrorMsg = "檔案不存在,請查驗路徑.\r\n" + filename;
+			
+			throw new LogicException("E0014", ErrorMsg);
 		}
 
 //       使用資料容器內定義的方法切資料

@@ -133,7 +133,14 @@ BEGIN
           ,APLP."IRTBCD"                  AS "ProdNo"              -- 商品代碼 VARCHAR2 5  
           ,PROD."BaseRateCode"            AS "BaseRateCode"        -- 指標利率代碼 VARCHAR2 2  
           ,APLP."IRTASC"                  AS "RateIncr"            -- 加碼利率 DECIMAL 6 4 -- 2020/10/19 Wei修改 
-          ,NVL(A1."ASCRAT",0)             AS "IndividualIncr"      -- 個別加碼 DECIMAL 6 4 
+          -- 2022-10-24 Wei 增加判斷 
+          -- from 家興&賴桑口述 : 
+          -- PROD."IncrFlag" = 'N' 時 , "IndividualIncr" 用 "RateIncr" 寫入
+          ,CASE
+             WHEN PROD."IncrFlag" = 'N'
+             THEN APLP."IRTASC"
+           ELSE NVL(A1."ASCRAT",0)
+           END                            AS "IndividualIncr"      -- 個別加碼 DECIMAL 6 4 
           ,APLP."APLRAT"                  AS "ApproveRate"         -- 核准利率 DECIMAL 6 4 
           ,0                              AS "AnnualIncr"          -- 年繳比重優惠加減碼 DECIMAL 6 4 
           ,0                              AS "EmailIncr"           -- 提供EMAIL優惠減碼 DECIMAL 6 4 
