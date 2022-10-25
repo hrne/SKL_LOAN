@@ -17,10 +17,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBaseRate;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
@@ -65,6 +67,8 @@ public class L9110Report extends MakeReport {
 	FacMainService sFacMainService;
 	@Autowired
 	CdEmpService sCdEmpService;
+	@Autowired
+	CdBaseRateService cdBaseRateService;
 
 	@Autowired
 	FacCaseApplService sFacCaseApplService;
@@ -608,7 +612,7 @@ public class L9110Report extends MakeReport {
 
 			this.print(1, 5, "商品代碼 ..... " + FormatUtil.padX("" + tL9110.get("F22") + " " + tL9110.get("F59"), 14));
 			this.print(0, 35, "核准利率 ..... ");
-			this.print(0, 65, formatAmt(tL9110.get("F23"), 4), "R");
+			this.print(0, 65, formatAmt(getBaseRate(tL9110.get("F60"), titaVo), 4), "R");
 			this.print(0, 69, "利率調整週期 . " + tL9110.get("F24") + "月");
 			this.print(0, 105, "利率調整不變攤還額 . " + tL9110.get("F25"));
 			this.print(0, 135, "信用評分　.... " + tL9110.get("F26"));
@@ -933,7 +937,7 @@ public class L9110Report extends MakeReport {
 
 			this.print(1, 11, mBuilding.get("F9")); // 門牌號碼
 			this.print(0, 55,
-					"擔保品編號：　" + mBuilding.get("F12") + "-" + mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
+					"擔保品編號：　" + mBuilding.get("F13") + "-" + mBuilding.get("F14") + "-" + mBuilding.get("F15")); // 擔保品編號
 		}
 
 		checkSpace(2);
@@ -1298,5 +1302,17 @@ public class L9110Report extends MakeReport {
 		print(1, 6, "合計 : ");
 		print(0, 47, formatAmt(totalShares, 0), "R"); // 數量(股)
 		print(0, 63, formatAmt(totalValues, 0), "R"); // 面額合計
+	}
+
+	private BigDecimal getBaseRate(String baseRateCode, TitaVo titaVo) {
+		BigDecimal baseRate = BigDecimal.ZERO;
+		CdBaseRate tCdBaseRate = new CdBaseRate();
+		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", baseRateCode, 19110101, titaVo.getEntDyI()+19110000,
+				titaVo);
+		this.info(" cdBaseRate date =" + titaVo.getEntDyI());
+		if (tCdBaseRate != null) {
+			baseRate = tCdBaseRate.getBaseRate();
+		}
+		return baseRate;
 	}
 }

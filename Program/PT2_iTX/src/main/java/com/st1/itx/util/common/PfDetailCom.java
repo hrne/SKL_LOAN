@@ -221,6 +221,12 @@ public class PfDetailCom extends TradeBuffer {
 			return null;
 		}
 
+		// 2022-10-25 Wei 修改
+		// 預撥不寫入業績檔，由日始批次的BS996寫入當日業績檔
+		if (titaVo.getEntDyI() > this.txBuffer.getTxBizDate().getTbsDy()) {
+			return null;
+		}
+		
 		// 業績日期(中曆)=輸入業績日期/系統營業日(會計日期)
 		if (iPf.getPerfDate() > 0) {
 			perfDate = iPf.getPerfDate();

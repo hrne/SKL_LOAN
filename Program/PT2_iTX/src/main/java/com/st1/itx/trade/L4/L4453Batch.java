@@ -112,10 +112,8 @@ public class L4453Batch extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		if (titaVo.isHcodeErase()) {
 //			刪除TxToDoDetail
-			dele("TEXT00", "<期款扣款通知>", titaVo);
-			dele("TEXT00", "<火險扣款通知>", titaVo);
-			dele("MAIL00", "<期款扣款通知>", titaVo);
-			dele("MAIL00", "<火險扣款通知>", titaVo);
+			dele("TEXT00",  titaVo);
+			dele("MAIL00", titaVo);
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
 					"L4453 銀扣扣款前通知 訂正完畢，總筆數：" + totalCnt + ", 刪除筆數：" + deleteCnt, titaVo);
 		} else {
@@ -242,7 +240,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setProcessNote(dataLines);
 
 				txToDoCom.setTxBuffer(this.getTxBuffer());
-				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
 				custLoanFlag.put(tmp.getCustNo(), 1);
@@ -266,11 +264,11 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setBormNo(0);
 				tTxToDoDetail.setDtlValue("<火險扣款通知>");
 				tTxToDoDetail.setItemCode("TEXT00");
-				tTxToDoDetail.setStatus(0);
+				tTxToDoDetail.setStatus(0);			
 				tTxToDoDetail.setProcessNote(dataLines);
 
 				txToDoCom.setTxBuffer(this.getTxBuffer());
-				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
 				custFireFlag.put(tmp.getCustNo(), 1);
@@ -300,7 +298,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
-				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
 				custLoanFlag.put(tmp.getCustNo(), 1);
@@ -325,7 +323,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
-				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
+				txToDoCom.addDetail(true, 9, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
 				custFireFlag.put(tmp.getCustNo(), 1);
@@ -441,7 +439,7 @@ public class L4453Batch extends TradeBuffer {
 	}
 
 //	刪除TxToDoDetail 同L4454 須同步更改
-	private void dele(String itemCode, String dtlValue, TitaVo titaVo) throws LogicException {
+	private void dele(String itemCode, TitaVo titaVo) throws LogicException {
 //		刪除未處理
 		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.findTxNoEq(itemCode, titaVo.getOrgEntdyI() + 19110000,
 				titaVo.getOrgKin(), titaVo.getOrgTlr(), parse.stringToInteger(titaVo.getOrgTno()), 0, Integer.MAX_VALUE,

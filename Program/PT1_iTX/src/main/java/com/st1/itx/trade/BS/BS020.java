@@ -187,8 +187,8 @@ public class BS020 extends TradeBuffer {
 			}
 			TempVo tTempVo = new TempVo();
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, tbsdy, custNo, facmNo, 0, repayCode, repayType, BigDecimal.ZERO,
-						tTempVo, titaVo);
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, tbsdy, custNo, facmNo, 0, repayCode, repayType,
+						BigDecimal.ZERO, tTempVo, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
 				continue;
@@ -210,13 +210,10 @@ public class BS020 extends TradeBuffer {
 						isRecvPay = true;
 					}
 					// 期款
-					if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-						isTermPay = true;
-					}
-					// 短繳
-					if (ba.getDataKind() == 4) {
-						if ("D".equals(ba.getDbCr()) && ba.getUnPaidAmt().compareTo(BigDecimal.ZERO) > 0)
-							isTermPay = false;
+					if (baTxCom.getShortAmt().compareTo(BigDecimal.ZERO) == 0) {
+						if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+							isTermPay = true;
+						}
 					}
 				}
 			}

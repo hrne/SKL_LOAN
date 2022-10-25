@@ -85,7 +85,7 @@ public class L4920 extends TradeBuffer {
 
 		try {
 			// *** 折返控制相關 ***
-			resultAllList = l4920ServiceImpl.findAll(1,  this.index, this.limit, titaVo);
+			resultAllList = l4920ServiceImpl.findAll(1, 0, Integer.MAX_VALUE, titaVo);
 		} catch (Exception e) {
 			this.error("l4920ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -106,12 +106,7 @@ public class L4920 extends TradeBuffer {
 		}
 
 		if (resultPartList != null && resultPartList.size() > 0) {
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (resultPartList.size() == this.limit && hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
+			
 
 			for (Map<String, String> result : resultPartList) {
 				OccursList occursList = new OccursList();
@@ -200,13 +195,18 @@ public class L4920 extends TradeBuffer {
 		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
-
 		List<LinkedHashMap<String, String>> chkOccursList = this.totaVo.getOccursList();
 
 		if (chkOccursList == null || chkOccursList.size() == 0) {
 			throw new LogicException("E0001", "查無資料"); // 查無資料
 		}
 
+		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+		if (resultPartList.size() >= this.limit ) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

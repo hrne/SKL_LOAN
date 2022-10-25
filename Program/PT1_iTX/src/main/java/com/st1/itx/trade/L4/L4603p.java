@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
@@ -241,7 +242,8 @@ public class L4603p extends TradeBuffer {
 
 				iEntryDate = parse.stringToInteger(sInsuEndMonth + sspecificDd);
 
-				sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/" + ("" + iEntryDate).substring(6);
+				sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
+						+ ("" + iEntryDate).substring(6);
 
 				this.info("iEntryDate : " + iEntryDate);
 
@@ -275,7 +277,7 @@ public class L4603p extends TradeBuffer {
 					long sno = l4603report2.exec(titaVo, t, this.getTxBuffer());
 
 					// 2022-01-14 智偉修改
-					setEMailFileVO(t, 0, titaVo, sno);
+					setEMailFileVO(t, 9, titaVo, sno);
 
 //					String bodyText = "親愛的客戶，繳款通知" + "\n" + "新光人壽關心您。";
 //					mailService.setParams(tempVo.getParam("EmailAddress"), subject, bodyText);
@@ -291,7 +293,8 @@ public class L4603p extends TradeBuffer {
 			if (dataListLatter.size() > 0)
 
 			{
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "火險通知作業_LNM52P", "LNM52P.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "火險通知作業_LNM52P",
+						"LNM52P.txt", 2);
 
 				for (String line : dataListLatter) {
 					makeFile.put(line);
@@ -303,7 +306,8 @@ public class L4603p extends TradeBuffer {
 				makeFile.toFile(sno);
 
 			}
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L4603", "L4603火險通知作業已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO") + "L4603", "L4603火險通知作業已完成", titaVo);
 
 		} // if
 
@@ -319,19 +323,30 @@ public class L4603p extends TradeBuffer {
 		if (tCustMain != null) {
 
 			// 判定是否有設定不通知
-			if (!custNoticeCom.checkIsLetterSendable(null, tCustMain.getCustNo(), tInsuRenew.getFacmNo(), "L4603", titaVo))
+			if (!custNoticeCom.checkIsLetterSendable(null, tCustMain.getCustNo(), tInsuRenew.getFacmNo(), "L4603",
+					titaVo))
 				return;
 
 //			QC 495 中文欄位前+半形空格
-			dataLines = " " + FormatUtil.padX(getZipCode(tCustMain), 9) + ", " + FormatUtil.padX(noticeAddress, 64) + "," + FormatUtil.padX("", 42) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ", " + FormatUtil.padX(tCustMain.getCustName().trim(), 12) + "," + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ","
-					+ FormatUtil.padX("-", 1) + "," + FormatUtil.pad9("" + tInsuRenew.getFacmNo(), 3) + ", " + FormatUtil.padX(getRepayCode(tInsuRenew, titaVo), 10) + ", "
-					+ FormatUtil.padX(tCustMain.getCustName().trim(), 42) + ", " + FormatUtil.padX(getBdLocation(tInsuRenew, titaVo), 58) + "," + FormatUtil.padX(tInsuRenew.getOrigInsuNo(), 16) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.padX("-", 1) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getInsuEndDate(), 8) + "," + FormatUtil.pad9("" + tInsuRenew.getFireInsuPrem(), 6) + "," + FormatUtil.pad9("" + tInsuRenew.getFireInsuCovrg(), 11)
-					+ "," + FormatUtil.pad9("" + tInsuRenew.getEthqInsuPrem(), 6) + "," + FormatUtil.pad9("" + tInsuRenew.getEthqInsuCovrg(), 7) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getTotInsuPrem(), 6) + "," + FormatUtil.pad9("" + (iEntryDate - 19110000), 8) + "," + "9510200" + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7)
-					+ " ";
+			dataLines = " " + FormatUtil.padX(getZipCode(tCustMain), 9) + ", " + FormatUtil.padX(noticeAddress, 64)
+					+ "," + FormatUtil.padX("", 42) + "," + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ", "
+					+ FormatUtil.padX(tCustMain.getCustName().trim(), 12) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + "," + FormatUtil.padX("-", 1) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getFacmNo(), 3) + ", "
+					+ FormatUtil.padX(getRepayCode(tInsuRenew, titaVo), 10) + ", "
+					+ FormatUtil.padX(tCustMain.getCustName().trim(), 42) + ", "
+					+ FormatUtil.padX(getBdLocation(tInsuRenew, titaVo), 58) + ","
+					+ FormatUtil.padX(tInsuRenew.getOrigInsuNo(), 16) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.padX("-", 1) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getInsuEndDate(), 8) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getFireInsuPrem(), 6) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getFireInsuCovrg(), 11) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getEthqInsuPrem(), 6) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getEthqInsuCovrg(), 7) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getTotInsuPrem(), 6) + ","
+					+ FormatUtil.pad9("" + (iEntryDate - 19110000), 8) + "," + "9510200"
+					+ FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + " ";
 			dataListLatter.add(dataLines);
 		}
 	}
@@ -361,8 +376,9 @@ public class L4603p extends TradeBuffer {
 		tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("TEXT00");
 		tTxToDoDetail.setStatus(0);
-		tTxToDoDetail.setProcessNote(
-				txToDoCom.getProcessNoteForText(noticePhoneNo, "您好：提醒您" + insuMonth + "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　", this.getTxBuffer().getMgBizDate().getTbsDy()));
+		tTxToDoDetail.setProcessNote(txToDoCom.getProcessNoteForText(noticePhoneNo,
+				"您好：提醒您" + insuMonth + "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　",
+				this.getTxBuffer().getMgBizDate().getTbsDy()));
 
 		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo);
 	}
@@ -385,7 +401,8 @@ public class L4603p extends TradeBuffer {
 		// L4711>String email = processNotes[2];
 		// L4711>long pdfno = Long.parseLong(processNotes[3]);
 		// 若未來有修改此段落時,請一併修改L4711
-		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\"," + noticeEmail + "," + sno + ",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+		dataLines += "\"H1\",\"" + tCustMain.getCustId() + "\"," + noticeEmail + "," + sno
+				+ ",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 		dataList.add(dataLines);
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
@@ -408,7 +425,8 @@ public class L4603p extends TradeBuffer {
 
 		if (tCustMain != null) {
 			if (tCustMain.getRegZip3() != null && tCustMain.getRegZip3().length() >= 3) {
-				zipCode = tCustMain.getRegZip3().substring(0, 1) + " " + tCustMain.getRegZip3().substring(1, 2) + " " + tCustMain.getRegZip3().substring(2, 3);
+				zipCode = tCustMain.getRegZip3().substring(0, 1) + " " + tCustMain.getRegZip3().substring(1, 2) + " "
+						+ tCustMain.getRegZip3().substring(2, 3);
 			}
 			if (tCustMain.getRegZip2() != null && tCustMain.getRegZip2().length() >= 2) {
 				zipCode += tCustMain.getRegZip2().substring(0, 1) + " " + tCustMain.getRegZip2().substring(1, 2);
@@ -492,10 +510,12 @@ public class L4603p extends TradeBuffer {
 	// 刪除處理清單
 	private void deleteTxToDo(String itemCode, TitaVo titaVo) throws LogicException {
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(itemCode, 0, 0, 0, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.findTxNoEq(itemCode, titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgKin(), titaVo.getOrgTlr(), parse.stringToInteger(titaVo.getOrgTno()), 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slTxToDoDetail != null) {
 			for (TxToDoDetail t : slTxToDoDetail.getContent()) {
-				if (t.getDtlValue().length() >= 6 && t.getDtlValue().substring(0, 6).equals("<火險保費>")) {
+				if (t.getStatus() == 0) {
 					lTxToDoDetail.add(t);
 				}
 			}
@@ -511,7 +531,8 @@ public class L4603p extends TradeBuffer {
 		specificDd = 01;
 		boolean isClose = true;
 		boolean isUnLoan = true;
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(custNo, facmNo, facmNo, 0, 900, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(custNo, facmNo, facmNo, 0, 900, this.index,
+				this.limit, titaVo);
 		if (slLoanBorMain != null) {
 			isUnLoan = false;
 			for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {

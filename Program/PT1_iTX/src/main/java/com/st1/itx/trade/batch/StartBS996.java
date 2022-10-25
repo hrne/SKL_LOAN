@@ -57,7 +57,7 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 		this.info("active StartBS996 ");
 
 		TitaVo titaVo = new TitaVo();
-
+		
 		try {
 			titaVo.init();
 			titaVo.putParam(ContentName.kinbr, "0000");
@@ -67,7 +67,8 @@ public class StartBS996 extends BatchBase implements Tasklet, InitializingBean {
 			TxBuffer txBuffer = MySpring.getBean("txBuffer", TxBuffer.class);
 			txBuffer.init(titaVo);
 
-			String parm = "0,N,0,0";
+			// 重算當日業績
+			String parm = "0,N,0,0,0";
 
 			titaVo.putParam("Parm", parm);
 

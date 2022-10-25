@@ -439,7 +439,7 @@ public class L3230 extends TradeBuffer {
 		case 92: // 放款暫收款
 			// 96 : 單一額度轉帳
 			if (iRpCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
-				FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
+				FacMain tFacMain = facMainService.findById(new FacMainId(iRpCustNo, iRpFacmNo), titaVo);
 				if (tFacMain == null) {
 					throw new LogicException(titaVo, "E0015", "額度不存在 戶號 = " + iCustNo + "-" + iFacmNo); // 檢查錯誤
 				}

@@ -100,7 +100,7 @@ public class L8441 extends TradeBuffer {
 			}
 			if (filename.contains("本次檢核共檢視過")) {
 //				int iTotal = parse.stringToInteger(filename.substring(8, 17).trim());
-				String ixTotal = filename.substring(8, 17).trim();
+				String ixTotal = filename.substring(8, 18).trim();
 				String ixTotal2 ="";
 				for(int i=0; i < ixTotal.length(); i++) {
 					if(ixTotal.charAt(i)>=48 && ixTotal.charAt(i)<=57) {
@@ -110,7 +110,7 @@ public class L8441 extends TradeBuffer {
 				sTotal = parse.stringToInteger(ixTotal2);
 				
 //				int iCorrect = parse.stringToInteger(filename.substring(25, 35).trim());
-				String ixCorrect = filename.substring(25, 35).trim();
+				String ixCorrect = filename.substring(26, 36).trim();
 				String ixCorrect2 ="";
 				for(int i=0; i < ixCorrect.length(); i++) {
 					if(ixCorrect.charAt(i)>=48 && ixCorrect.charAt(i)<=57) {
@@ -120,7 +120,7 @@ public class L8441 extends TradeBuffer {
 				sCorrect = parse.stringToInteger(ixCorrect2);
 				
 //				int iMistakeCount = parse.stringToInteger(filename.substring(39, 49).trim());
-				String ixMistakeCount = filename.substring(39, 49).trim();
+				String ixMistakeCount = filename.substring(40, 50).trim();
 				String ixMistakeCount2 ="";
 				for(int i=0; i < ixMistakeCount.length(); i++) {
 					if(ixMistakeCount.charAt(i)>=48 && ixMistakeCount.charAt(i)<=57) {

@@ -160,7 +160,11 @@ BEGIN
            , NVL(FR1P."TFRBAD",0)           AS "OvduDate"            -- 轉催收日 DECIMAL 8 0
            , NVL(FR1P."TFRNO",0)            AS "OvduNo"              -- 轉催編號 DECIMAL 10 0
            , ROW_NUMBER() OVER (PARTITION BY FR1P."INSNUM"
-                                ORDER BY FR1P."CHKPRO"
+                                ORDER BY CASE
+                                           WHEN FR1P."TRXDAT" = 0
+                                           THEN 0
+                                         ELSE 1 END
+                                       , FR1P."CHKPRO"
                                        , FR1P."TRXDAT" DESC
                                        , FR1P."ADTYMT" DESC
                                )            AS "Seq"

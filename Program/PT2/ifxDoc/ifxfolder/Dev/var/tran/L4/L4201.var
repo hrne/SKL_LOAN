@@ -29,7 +29,7 @@ E(0,0)
 ["@存摺帳號",#DepAcctNo],["@入帳日期",#EntryDate],
 ["@摘要",#DscptCode],["@虛擬帳號",#VirtualAcctNo],
 ["@提款",#WithdrawAmt],["@存款",#DepositAmt],
-["@結餘",#Balance],["@匯款銀行代碼",#RemintBankX],
+[#<->#,"@匯款銀行代碼",#RemintBankX],
 [#<->#,"@交易人資料",#TraderInfo],
 [#<->#,"@還款類別",#RepayTypeA,#RepayTypeAX],
 [#<->#,"@入帳戶號",#CustNoA,"-",#FacmNoA],
@@ -293,7 +293,7 @@ BIND(#BTN_L3420,click, {cmd=CHAIN; ntxcd=L3420; ntxbuf=#BUF_L3420})
 !存款
 #DepositAmt=+m,14,L
 !結餘
-#Balance=m,14,L
+#Balance=m,14,S
 !匯款銀行代碼
 #RemintBank=A,3,L
 

@@ -20,6 +20,7 @@ import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanOverdue;
+import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.InsuRenewService;
@@ -74,6 +75,8 @@ public class L3250 extends TradeBuffer {
 	public CdAcCodeService cdAcCodeService;
 	@Autowired
 	public ForeclosureFeeService foreclosureFeeService;
+	@Autowired
+	public AcDetailService acDetailService;
 
 	@Autowired
 	Parse parse;
@@ -150,6 +153,51 @@ public class L3250 extends TradeBuffer {
 		titaVo.putParam("RpAmt1", wkTxAmt);
 		titaVo.putParam("RpCustNo1", iCustNo);
 		titaVo.putParam("RpFacmNo1", iFacmNo);
+		// 101.匯款轉帳 P03
+		// 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
+		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgKin() + titaVo.getOrgTlr() + titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo); // findByTxseq
+		if (slAcList != null) {
+			for (AcDetail ac : slAcList.getContent()) {
+				if ("D".equals(ac.getDbCr())) {
+					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
+							|| "P01".equals(ac.getAcctCode())) {
+						String sumNo = "";
+						if ("P03".equals(ac.getAcctCode())) {
+							sumNo = "101";
+						} else {
+							sumNo = "102";
+						}
+						String rvNo = "";
+						if ("C01".equals(acDetail.getAcctCode())) {
+							rvNo = "0010060" + titaVo.getOrgEntdyI();
+						}
+						acDetail = new AcDetail();
+						acDetail.setDbCr("D");
+						acDetail.setAcctCode(ac.getAcctCode());
+						acDetail.setSumNo(sumNo);
+						acDetail.setTxAmt(ac.getTxAmt());
+						acDetail.setCustNo(iCustNo);
+						acDetail.setFacmNo(0);
+						lAcDetail.add(acDetail);
+						acDetail.setRvNo(rvNo);
+						lAcDetail.add(acDetail);
+						acDetail = new AcDetail();
+						acDetail.setDbCr("C");
+						acDetail.setAcctCode(ac.getAcctCode());
+						acDetail.setSumNo(sumNo);
+						acDetail.setTxAmt(ac.getTxAmt());
+						acDetail.setCustNo(iCustNo);
+						acDetail.setFacmNo(0);
+						lAcDetail.add(acDetail);
+						acDetail.setRvNo(rvNo);
+						lAcDetail.add(acDetail);
+					}
+				}
+			}
+		}
+
+		
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
 
 		// 暫收款金額 (暫收借)

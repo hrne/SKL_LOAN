@@ -316,7 +316,7 @@ T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
 !OOReceiveFg為1=已領過隱藏按鈕
 #OOBTN6=X,16,S
 IF(#OOCloseDate==0,BIND(grid,cancel),$)
-C(3,#OOReceiveFg,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,cancel))
+C(3,#OOReceiveFg,1,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}))
 ! C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}))
 ! IF(#OOCloseDate==0,BIND(grid,cancel),$)
 ! IF(#OOAllCloseFg=="N",BIND(grid,cancel),$)
