@@ -13,8 +13,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustRmk;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustRmkService;
+import com.st1.itx.db.service.TxTranCodeService;
 //import com.st1.itx.db.service.TxCtrlService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -45,9 +47,12 @@ public class CustRmkCom extends TradeBuffer {
 
 	@Autowired
 	public CustRmkService custRmkService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
+
+	@Autowired
+	public TxTranCodeService txTranCodeService;
 
 	@Autowired
 	public WebClient webClient;
@@ -61,7 +66,7 @@ public class CustRmkCom extends TradeBuffer {
 		this.info("CustRmkCom.getCustRmk = " + iCustNo);
 
 		this.totaVo.init(titaVo);
-		
+
 		// 查詢顧客控管警訊檔
 
 		Slice<CustRmk> slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
@@ -74,8 +79,10 @@ public class CustRmkCom extends TradeBuffer {
 				if (cdEmp != null) {
 					emp += " " + cdEmp.getFullname();
 				}
-				s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + " [" + custRmk.getRmkDesc() + "]<br>";
-				//s += custRmk.getRmkDesc() + " ("+ emp + " " + parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
+				s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + " ["
+						+ custRmk.getRmkDesc() + "]<br>";
+				// s += custRmk.getRmkDesc() + " ("+ emp + " " +
+				// parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
 			}
 
 			this.totaVo.init(titaVo);
@@ -93,5 +100,30 @@ public class CustRmkCom extends TradeBuffer {
 		}
 
 		return this.sendList();
+	}
+
+	public void getCustRmkbyRim(TotaVo totaVo, TitaVo titaVo, int iCustNo) throws LogicException {
+		this.info("CustRmkCom.getCustRmk = " + iCustNo);
+
+		// 查詢顧客控管警訊檔
+		TxTranCode txTranCode = txTranCodeService.findById(titaVo.getTxcd(), titaVo);
+
+		if (txTranCode != null && txTranCode.getCustRmkFg() == 1) {
+			Slice<CustRmk> slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+			List<CustRmk> lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
+			if (lCustRmk != null && lCustRmk.size() > 0) {
+				String s = "{red-s}{b-s}顧客控管警訊：{b-e}{red-e}<br><br>";
+				for (CustRmk custRmk : lCustRmk) {
+					CdEmp cdEmp = cdEmpService.findById(custRmk.getLastUpdateEmpNo(), titaVo);
+					String emp = custRmk.getLastUpdateEmpNo();
+					if (cdEmp != null) {
+						emp += " " + cdEmp.getFullname();
+					}
+					s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + " ["
+							+ custRmk.getRmkDesc() + "]<br>";
+				}
+				totaVo.setHtmlContent(s);
+			}
+		}
 	}
 }

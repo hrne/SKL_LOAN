@@ -1,6 +1,5 @@
 package com.st1.itx.util.common;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,7 +151,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		if (iIntEndCode == 2) {
 			settingForMonthlyCalculateInterest(loanBorMain, facMain);
 		}
-		
+
 		loanCalcRepayIntCom.setDelayFlag(0); // 0:收遲延息 1: 不收
 		loanCalcRepayIntCom.setNonePrincipalFlag(0); // 0:契約到期要還本 1:契約到期不還本記號
 		loanCalcRepayIntCom.setTbsDy(this.txBuffer.getTxCom().getTbsdy()); // 營業日期
@@ -225,21 +224,21 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 			}
 			// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
 		}
-		// if (loanBorMain.getMaturityDate() < nextMonth01 && loanBorMain.getPrevPayIntDate() > 0
-		// 		&& loanBorMain.getPrevPayIntDate() < loanBorMain.getMaturityDate()) {
+		if (loanBorMain.getMaturityDate() < nextMonth01 && loanBorMain.getPrevPayIntDate() > 0
+				&& loanBorMain.getPrevPayIntDate() < loanBorMain.getMaturityDate()) {
 			// 2022-05-04 智偉: 到期日早於本月月底日
 			// 2022-05-04 智偉: 上繳日與到期日超過一期
-			// dDateUtil.init();
-			// dDateUtil.setDate_1(loanBorMain.getPrevPayIntDate());
-			// dDateUtil.setDate_2(loanBorMain.getMaturityDate());
-			// dDateUtil.dateDiff();
-			// int unpayTerms = dDateUtil.getMons();
+			dDateUtil.init();
+			dDateUtil.setDate_1(loanBorMain.getPrevPayIntDate());
+			dDateUtil.setDate_2(loanBorMain.getMaturityDate());
+			dDateUtil.dateDiff();
+			int unpayTerms = dDateUtil.getMons();
 
-			// if (unpayTerms >= 2) {
+			if (unpayTerms >= 2) {
 				// 計息方式調成1:以日計息
-				// intCalcCode = "1";
-				// amortizedCode = "2";
-				// loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
+				 intCalcCode = "1";
+//				 amortizedCode = "2";
+				// loanCalcRepayIntCom.setDueAmdt(BigDecimal.ZERO); // 每期攤還金額
 
 				// 2022-05-09 智偉增加判斷
 				// 符合此條件者
@@ -250,8 +249,8 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 				// dDateUtil.setDays(1);
 				// int newMaturityDate = dDateUtil.getCalenderDay();
 				// loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
-			// }
-		// }
+			}
+		}
 		loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));
 		this.info("Caculate log Set ... 戶號= " + loanBorMain.getCustNo() + "-" + loanBorMain.getFacmNo() + "-"

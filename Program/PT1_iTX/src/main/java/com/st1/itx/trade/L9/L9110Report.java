@@ -932,6 +932,8 @@ public class L9110Report extends MakeReport {
 			this.print(0, 155, mBuilding.get("F11")); // 賣方ID
 
 			this.print(1, 11, mBuilding.get("F9")); // 門牌號碼
+			this.print(0, 55,
+					"擔保品編號：　" + mBuilding.get("F12") + "-" + mBuilding.get("F13") + "-" + mBuilding.get("F14")); // 擔保品編號
 		}
 
 		checkSpace(2);
@@ -1119,7 +1121,7 @@ public class L9110Report extends MakeReport {
 		 */
 		checkSpace(4);
 		print(1, 5, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　（坪）　　　　　　 （元） 　　　（仟／坪）　　 （仟）　　　 （仟）");
-		print(1, 5, "序號　提供人　　　　　　　　　　　　　　縣市　　鄉鎮區　　　　段小段　　　　地號　　　　 面積 　　年度　　前次移轉　　　 鑑定單價 　　  核貸　　　　 設定");
+		print(1, 5, "序號　提供人／擔保品編號　　　　　　　　縣市　　鄉鎮區　　　　段小段　　　　地號　　　　 面積 　　年度　　前次移轉　　　 鑑定單價 　　  核貸　　　　 設定");
 		print(1, 5, "－－　－－－－－－－－－－－－－－－　－－－－　－－－－　－－－－－－－　－－－－－　－－－－－　－－　－－－－－－－　－－－－－　－－－－－－　－－－－－－");
 		for (Map<String, String> mLand : listLandQuery) {
 			BigDecimal ownerPart = new BigDecimal(mLand.get("F11"));
@@ -1157,6 +1159,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 135, formatAmt(computeDivide(getBigDecimal(mLand.get("F9")), thousand, 0), 0), "R"); // 鑑定單價
 			this.print(0, 149, formatAmt(computeDivide(getBigDecimal(lineAmt), thousand, 0), 0), "R"); // 核貸
 			this.print(0, 163, formatAmt(computeDivide(getBigDecimal(mLand.get("F10")), thousand, 0), 0), "R"); // 設定
+			this.print(1, 11, mLand.get("F13") + "-" + mLand.get("F14") + "-" + mLand.get("F15")); // 擔保品編號
 
 			totalArea = totalArea.add(Area);
 			totalLastTransferred = totalLastTransferred.add(getBigDecimal(mLand.get("F8")));

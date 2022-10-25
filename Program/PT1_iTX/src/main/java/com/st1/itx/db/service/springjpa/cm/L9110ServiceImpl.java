@@ -58,6 +58,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                        AS SellerName "; // -- 賣方姓名 F10
 		sql += "      , NVL(L.\"SellerId\",' ')         AS SellerId "; // -- 賣方ID F11
 		sql += "      , NVL(L.\"BdSubArea\",0)          AS BdSubArea "; // -- 附屬建物 F12
+		sql += "      , LPAD(L.\"ClCode1\",1,'0')		AS ClCode1 "; // -- F13 擔保品代號1
+		sql += "      , LPAD(L.\"ClCode2\",2,'0')		AS ClCode2 "; // -- F14 擔保品代號2
+		sql += "      , LPAD(L.\"ClNo\",7,'0')			AS ClNo "; // -- F15 擔保品編號
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClBuilding\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                           AND L.\"ClCode2\" = CF.\"ClCode2\"";
@@ -395,21 +398,24 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     , CF.\"ClNo\"";
 		sql += "                          ORDER BY LO.\"LandSeq\""; // -- ??? 房地只取一筆?
 		sql += "                         )     AS Seq "; // -- F0 序號
-		sql += "     , LO.\"Owner\"            AS Owner "; // -- F1 提供人 ??? 房地只取一筆?
-		sql += "     , CITY.\"CityItem\"       AS CityItem "; // -- F2 縣市
-		sql += "     , AREA.\"AreaItem\"       AS AreaItem "; // -- F3 鄉鎮區
-		sql += "     , CDLS.\"IrItem\"         AS IrItem "; // -- F4 段小段
+		sql += "     , LO.\"Owner\"							AS Owner "; // -- F1 提供人 ??? 房地只取一筆?
+		sql += "     , CITY.\"CityItem\"					AS CityItem "; // -- F2 縣市
+		sql += "     , AREA.\"AreaItem\"					AS AreaItem "; // -- F3 鄉鎮區
+		sql += "     , CDLS.\"IrItem\"						AS IrItem "; // -- F4 段小段
 		sql += "     , LPAD(L.\"LandNo1\",4,'0') ";
 		sql += "       || '-' ";
 		sql += "       || LPAD(L.\"LandNo2\",4,'0') ";
 		sql += "                               AS LandNo "; // -- F5 地號
-		sql += "     , NVL(L.\"Area\",0)              AS Area "; // -- F6 面積
-		sql += "     , L.\"TransferedYear\"    AS TransferedYear "; // -- F7 年度
-		sql += "     , L.\"LastTransferedAmt\" AS LastTransferedAmt "; // -- F8 前次移轉
-		sql += "     , L.\"EvaUnitPrice\"      AS EvaUnitPrice "; // -- F9 鑑定單價
-		sql += "     , CLI.\"SettingAmt\"      AS SettingAmt "; // -- F10設定
-		sql += "     , NVL(LO.\"OwnerPart\",0)            AS OwnerPart "; // -- F11 持份比例
-		sql += "     , NVL(LO.\"OwnerTotal\",0)            AS OwnerTotal "; // -- F12 持份總比例
+		sql += "     , NVL(L.\"Area\",0)					AS Area "; // -- F6 面積
+		sql += "     , L.\"TransferedYear\"					AS TransferedYear "; // -- F7 年度
+		sql += "     , L.\"LastTransferedAmt\"				AS LastTransferedAmt "; // -- F8 前次移轉
+		sql += "     , L.\"EvaUnitPrice\"					AS EvaUnitPrice "; // -- F9 鑑定單價
+		sql += "     , CLI.\"SettingAmt\"					AS SettingAmt "; // -- F10設定
+		sql += "     , NVL(LO.\"OwnerPart\",0)				AS OwnerPart "; // -- F11 持份比例
+		sql += "     , NVL(LO.\"OwnerTotal\",0)				AS OwnerTotal "; // -- F12 持份總比例
+		sql += "     , LPAD(CF.\"ClCode1\",1,'0')			AS ClCode1 "; // -- F13 擔保品代號1
+		sql += "     , LPAD(CF.\"ClCode2\",2,'0')			AS ClCode2 "; // -- F14 擔保品代號2
+		sql += "     , LPAD(CF.\"ClNo\",7,'0')				AS ClNo "; // -- F15 擔保品編號
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";

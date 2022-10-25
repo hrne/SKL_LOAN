@@ -132,7 +132,7 @@ public class L8441 extends TradeBuffer {
 				this.info("sMistakeCount    =  " + sMistakeCount);
 				
 			} 
-			if (filename.contains("報送日期")) {
+			if (filename.contains("報送日期:")) {
 				int iJcicDate = parse.stringToInteger(filename.substring(6, 13).trim());
 				sJcicDate = iJcicDate;
 			}

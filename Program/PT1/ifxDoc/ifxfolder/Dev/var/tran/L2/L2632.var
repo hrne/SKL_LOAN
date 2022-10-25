@@ -176,9 +176,9 @@ C(3,#L2r36CloseDate,0,S,$)
 T(F,@AgreeNo,0)
 T(F,@DocNo,0)
 T(F,@EntryDate,0)
-T(F,@CloseInd,0)
-T(F,@CollectFlag,0)
-T(F,@CloseReasonCode,0)
+! T(F,@CloseInd,0)
+! T(F,@CollectFlag,0)
+! T(F,@CloseReasonCode,0)
 
 !作業項目
 #ItemCode=A,1,S
@@ -278,7 +278,7 @@ C(3,#L2r36CloseDate,0,$,s)
 #CloseInd=X,1,I
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
-C(3,#L2r36CloseDate,0,$,s)
+! C(3,#L2r36CloseDate,0,$,s)
 HELP(#CloseIndHelp)
 @V(H,#CloseIndHelp)
 
@@ -335,7 +335,7 @@ C(5,#L3r11CloseReasonCode,00,S,$)
 #TwCloseAmt=+m,14,I
 C(3,#FunCode,4,s,$)
 C(3,#FunCode,5,s,$)
-C(3,#L2r36CloseDate,0,$,s)
+! C(3,#L2r36CloseDate,0,$,s)
 @V(2,0)
 
 #TimCloseAmt=+m,14.2,S
@@ -367,7 +367,7 @@ C(3,#FunCode,5,s,$)
 #CloseReasonCode=X,2,I
 C(2,#FunCode,S,S,$,S,s,s,S)
 C(5,#closefg,Y,S,$)
-C(3,#L2r36CloseDate,0,$,s)
+! C(3,#L2r36CloseDate,0,$,s)
 ! HELP(1: 買賣;2: 自行還清;3: 軍功教勞工貸款轉貸;4: 利率過高轉貸;5: 增貸不准轉貸;6: 額度內動支不准轉貸;7: 內部代償;8: 借新還舊;9: 其他;10: 買回;11: 綁約期還款)
 HELP(#CloseReasonCodeHelp,cols:5)
 @IF(#CloseReasonCode==#L2r36CloseReasonCode,$,V(H,#CloseReasonCodeHelp))

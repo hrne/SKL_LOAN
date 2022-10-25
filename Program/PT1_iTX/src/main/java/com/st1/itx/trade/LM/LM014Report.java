@@ -197,10 +197,10 @@ public class LM014Report extends MakeReport {
 					print(1, 0, "├─────────────────┼────────┼────┼────────┼────┼───────┼────────┼────┼────────┼────┼───────┤");
 					print(1, 0, "｜　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　｜　　　　　　　　｜　　　　｜　　　　　　　｜　　　　　　　　｜　　　　｜　　　　　　　　｜　　　　｜　　　　　　　｜");
 					print(0, 4, tLDVo.get("F0"), "L");
-					print(0, 24, tLDVo.get("F1"), "L");
+					print(0, 20, tLDVo.get("F1"), "L");
 					print(0, 48, formatAmt(tLDVo.get("F2"), 0), "R");
 					print(0, 56, tLDVo.get("F3"), "R");
-					print(0, 72, formatAmt(tLDVo.get("F4"), 0), "R");
+					print(0, 73, formatAmt(tLDVo.get("F4"), 0), "R");
 					print(0, 81, tLDVo.get("F5"), "R");
 					print(0, 89, tLDVo.get("F6"), "L");
 					print(0, 113, formatAmt(tLDVo.get("F7"), 0), "R");

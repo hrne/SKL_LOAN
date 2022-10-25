@@ -228,14 +228,18 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF9A})
 #BUF1=X,8,S
 
 #BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
 
 #CustNo=A,7,I
 INVOKEJS(SHOW,p1,1,2,1)
 C(4,#NTXBUF,$,s)
 SHOW(#BTN1,#BTN3)
 @
+T(2,@BUF1,#CustNo+          )
 T(3,#CustName,)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
 
 #SENDL2R07A=X,1,S
 C(3,#CustNo,0,S,$)
@@ -257,7 +261,7 @@ T(2,1+#SysDate+#CustNo+#FacmNo+000)
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF9B})
 
 !統一編號 按[瀏覽]連結[顧客明細資料查詢]
-#BUF2=X,8,S
+#BUF2=X,17,S
 
 #BIND2=X,1,S
 BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustId<-OOCustId})
@@ -267,7 +271,11 @@ C(3,#CustNo,0,$,S)
 C(4,#NTXBUF,$,s)
 SHOW(#BTN2,#BTN4)
 @C(4,#CustId,V(P,需擇一輸入),$)
+T(2,@BUF2,0000000+#CustId)
 A(ID_UNINO,0,#CustId)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustId<-OOCustId})
 
 #SENDL2R07B=X,1,S
 C(3,#CustNo,0,$,S)

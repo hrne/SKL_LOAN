@@ -617,6 +617,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				}
 				this.info("specifyPayTermsRoutine-0");
 				specifyTermsRoutine();
+				if (wkIntEndDate >= iIntEndDate) {
+					return;
+				}
 			} else {
 				dDateUtil.init();
 				dDateUtil.setDate_1(wkIntStartDate);

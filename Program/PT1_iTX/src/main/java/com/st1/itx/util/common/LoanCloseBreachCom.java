@@ -72,7 +72,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	 * @return 清償違約金計算明細
 	 * @throws LogicException LogicException
 	 */
-	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtPaid(int iCustNo, int iFacmNo, int iBormNo, List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
+	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtPaid(int iCustNo, int iFacmNo, int iBormNo,
+			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmt  ... ");
 
 		int wkFacmNoStart = 1;
@@ -82,7 +83,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkFacmNoEnd = iFacmNo;
 		}
 		// 查詢額度主檔
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
@@ -100,7 +102,9 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
 				continue;
 			}
-
+			if (tFacMain.getFirstDrawdownDate() == 0) {
+				continue;
+			}
 			// 只處理收取方式 "1":即時收取
 			if ("1".equals(tFacProd.getBreachGetCode())) {
 				// 前期
@@ -155,7 +159,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkFacmNoEnd = iFacmNo;
 		}
 		// 查詢額度主檔
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
@@ -172,6 +177,10 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
 				continue;
 			}
+			if (tFacMain.getFirstDrawdownDate() == 0) {
+				continue;
+			}
+			
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
 			dDateUtil.setMons(tFacProd.getProhibitMonth());
@@ -196,7 +205,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	 * @return 清償違約金計算明細
 	 * @throws LogicException LogicException
 	 */
-	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
+	public ArrayList<LoanCloseBreachVo> getCloseBreachAmtAll(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo,
+			List<LoanCloseBreachVo> iListVo, TitaVo titaVo) throws LogicException {
 		this.info("getCloseBreachAmtAll  ");
 
 		int wkFacmNoStart = 1;
@@ -206,7 +216,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkFacmNoEnd = iFacmNo;
 		}
 		// 查詢額度主檔
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null) {
 			throw new LogicException(titaVo, "E2003", "額度主檔"); // 查無資料
@@ -225,7 +236,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 				continue;
 			}
 			if (tFacMain.getFirstDrawdownDate() == 0) {
-				this.info("skip FirstDrawdownDate = 0");
+				continue;
 			}
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
@@ -240,7 +251,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					int facmNo = 0;
 					for (LoanCloseBreachVo iVo : iListVo) {
 						if (iVo.getFacmNo() == tFacMain.getFacmNo()) {
-							// 同額度只load一次BorTx
+							//同額度只load一次BorTx
 							if (facmNo == 0 || facmNo != iVo.getFacmNo()) {
 								this.info("facmNo == 0 || facmNo != iVo.getFacmNo() ");
 								loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), 0, titaVo);
@@ -254,7 +265,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 
 				} else {
 					this.info("iListVo = null");
-					// 貸出金額(放款餘額)為0
+					//貸出金額(放款餘額)為0
 					if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
 						loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
 					}
@@ -298,11 +309,13 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		}
 
 		List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>();
-		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findDueDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, 99991231, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findDueDateRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, 0, 99991231, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
 		if (lLoanBorTx != null) {
 			for (LoanBorTx tLoanBorTx : lLoanBorTx) {
-				if ("0".equals(tLoanBorTx.getTitaHCode()) && tLoanBorTx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
+				if ("0".equals(tLoanBorTx.getTitaHCode())
+						&& tLoanBorTx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
 					v.setCustNo(tLoanBorTx.getCustNo()); // 戶號
 					v.setFacmNo(tLoanBorTx.getFacmNo()); // 額度編號
@@ -431,7 +444,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		calcVo.setMonIdx(wkMonIdx);
 
 		// 計算百分比 = 違約金百分比 - 遞減段數 * 分段遞減百分比
-		wkBreachRate = calcVo.getBreachPercent().subtract(calcVo.getBreachDecrease().multiply(new BigDecimal(wkMonIdx)));
+		wkBreachRate = calcVo.getBreachPercent()
+				.subtract(calcVo.getBreachDecrease().multiply(new BigDecimal(wkMonIdx)));
 		if (wkBreachRate.compareTo(BigDecimal.ZERO) == 0) {
 			this.info("calcCloseBreachAmtRoutine end C");
 			return calcVo;
@@ -439,7 +453,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 
 		// 違約起算金額 = 撥款金額 * 還款起算比例
 		// 2022-03-16 智偉修改:模仿AS400運算過程中小數位數最多9位，超過時無條件捨去
-		wkBreachStartAmt = calcVo.getUtilBal().multiply(new BigDecimal(calcVo.getBreachStartPercent())).divide(new BigDecimal(100), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
+		wkBreachStartAmt = calcVo.getUtilBal().multiply(new BigDecimal(calcVo.getBreachStartPercent()))
+				.divide(new BigDecimal(100), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
 		calcVo.setBreachStartAmt(wkBreachStartAmt);
 
 		this.info("wkBreachStartAmt 違約起算金額 = " + wkBreachStartAmt);
@@ -482,7 +497,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			if ("3".equals(calcVo.getAmortizedCode()) || "4".equals(calcVo.getAmortizedCode())) {
 				if (calcVo.getExtraRepayAcc().compareTo(wkBreachStartAmt) <= 0) {
 					wkBreachAmount = BigDecimal.ZERO;
-				} else if ((calcVo.getExtraRepayAcc().subtract(wkBreachStartAmt)).compareTo(calcVo.getExtraRepay()) < 0) {
+				} else if ((calcVo.getExtraRepayAcc().subtract(wkBreachStartAmt))
+						.compareTo(calcVo.getExtraRepay()) < 0) {
 					wkBreachAmount = calcVo.getExtraRepayAcc().subtract(wkBreachStartAmt);
 				} else {
 					wkBreachAmount = calcVo.getExtraRepay();
@@ -500,7 +516,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 
 		// 清償違約金 = 計算金額 * 計算百分比 / 100
 		// 2022-03-16 智偉修改:模仿AS400運算過程中小數位數最多9位，超過時無條件捨去
-		wkCloseBreachAmt = wkBreachAmount.multiply(wkBreachRate).divide(new BigDecimal(100), 9, RoundingMode.DOWN).setScale(0, RoundingMode.HALF_UP);
+		wkCloseBreachAmt = wkBreachAmount.multiply(wkBreachRate).divide(new BigDecimal(100), 9, RoundingMode.DOWN)
+				.setScale(0, RoundingMode.HALF_UP);
 
 		calcVo.setAmount(wkBreachAmount); // 計算金額
 		calcVo.setBreachRate(wkBreachRate); // 計算利率
@@ -594,7 +611,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					wkBreachD = "，" + tFacProd.getBreachPercent() + "% 計付違約金";
 				}
 				if (tFacProd.getBreachDecreaseMonth() != 0) {
-					wkBreachE = "，但每" + tFacProd.getBreachDecreaseMonth() + "個月遞減違約金" + tFacProd.getBreachDecrease() + "%";
+					wkBreachE = "，但每" + tFacProd.getBreachDecreaseMonth() + "個月遞減違約金" + tFacProd.getBreachDecrease()
+							+ "%";
 				}
 				switch (tFacProd.getBreachGetCode()) {
 				case "1":

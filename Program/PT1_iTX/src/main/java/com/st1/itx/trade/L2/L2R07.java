@@ -2,6 +2,7 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -13,10 +14,13 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.CustRmkCom;
 import com.st1.itx.util.parse.Parse;
 
 /* Tita
@@ -42,6 +46,14 @@ public class L2R07 extends TradeBuffer {
 	@Autowired
 	public FacMainService facMainService;
 
+	@Autowired
+	public CustRmkService custRmkService;
+	
+	@Autowired
+	public CdEmpService cdEmpService;
+	@Autowired
+	private CustRmkCom custRmkCom;
+	
 	@Autowired
 	Parse parse;
 
@@ -130,6 +142,10 @@ public class L2R07 extends TradeBuffer {
 			FacmCountRoutine2(tCustMain.getCustNo()); // 取得戶號之下的額度及放款筆數
 			break;
 		}
+
+		// 查詢顧客控管警訊檔
+		custRmkCom.getCustRmkbyRim(totaVo, titaVo, iCustNo);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
