@@ -79,7 +79,7 @@ T(3,*)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 !CloseReasonCode
 #CDDEF0001=x,30,S
-T(3,CdCode.CloseReasonCode)
+T(3,CdCode.AdvanceCloseCode)
 
 #CloseReasonCodeHelp=x,1024,S
 

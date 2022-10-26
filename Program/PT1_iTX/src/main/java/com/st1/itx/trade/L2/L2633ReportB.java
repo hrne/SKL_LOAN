@@ -210,22 +210,23 @@ public class L2633ReportB extends MakeReport {
 								Integer.MAX_VALUE, titaVo);
 						if (slClFac2 != null) {
 							for (ClFac t2 : slClFac2.getContent()) {
-//								if ((t2.getCustNo() == iCustNo)) {
-								// 撥款主檔
-								Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(t2.getCustNo(),
-										t2.getFacmNo(), t2.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
-								if (slLoanBorMain != null) {
-									for (LoanBorMain tlbm : slLoanBorMain.getContent()) {
+								if ((t2.getCustNo() == custNo && facmNo == 0)
+										|| (t2.getCustNo() == custNo && t2.getFacmNo() == facmNo)) {
+									// 撥款主檔
+									Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(t2.getCustNo(),
+											t2.getFacmNo(), t2.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+									if (slLoanBorMain != null) {
+										for (LoanBorMain tlbm : slLoanBorMain.getContent()) {
 
-										// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-										if (tlbm.getStatus() == 0 || tlbm.getStatus() == 2 || tlbm.getStatus() == 4
-												|| tlbm.getStatus() == 6 || tlbm.getStatus() == 8) {
-											isAllClose = false;
-											break;
+											// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
+											if (tlbm.getStatus() == 0 || tlbm.getStatus() == 2 || tlbm.getStatus() == 4
+													|| tlbm.getStatus() == 6 || tlbm.getStatus() == 8) {
+												isAllClose = false;
+												break;
+											}
 										}
 									}
 								}
-//								}
 							}
 						}
 					}

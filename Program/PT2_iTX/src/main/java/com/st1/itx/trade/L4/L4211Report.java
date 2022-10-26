@@ -375,7 +375,7 @@ public class L4211Report extends MakeReport {
 		}
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
+//			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
 			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
@@ -549,6 +549,11 @@ public class L4211Report extends MakeReport {
 
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
+			
+				if (!"L4211".equals(txCode)) {
+					this.print(0, c3, tfnAllList.get("RepayAmt"), "R");// 匯款金額
+				}
+
 				if ("L4211".equals(txCode)) {
 
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
@@ -565,9 +570,6 @@ public class L4211Report extends MakeReport {
 
 			}
 
-			if (!"L4211".equals(txCode)) {
-				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
-			}
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
@@ -741,7 +743,7 @@ public class L4211Report extends MakeReport {
 		}
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
+//			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
 			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
@@ -906,6 +908,10 @@ public class L4211Report extends MakeReport {
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 
+				if (!"L4211".equals(txCode)) {
+					this.print(0, c3, tfnAllList.get("RepayAmt"), "R");// 匯款金額
+				}
+
 				if ("L4211".equals(txCode)) {
 
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
@@ -923,9 +929,6 @@ public class L4211Report extends MakeReport {
 
 			}
 
-			if (!"L4211".equals(txCode)) {
-				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
-			}
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");
@@ -1097,7 +1100,7 @@ public class L4211Report extends MakeReport {
 
 		for (Map<String, String> tfnAllList : fnAllList) {
 
-			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
+//			String dfTransferAmt = formatAmt(tfnAllList.get("TxAmt"), 0);
 			String dfMakeferAmt = formatAmt(tfnAllList.get("AcctAmt"), 0);
 			String dfPrincipal = formatAmt(tfnAllList.get("Principal"), 0);
 			String dfInterest = formatAmt(tfnAllList.get("Interest"), 0);
@@ -1261,7 +1264,9 @@ public class L4211Report extends MakeReport {
 
 			if (!scode.equals(tfnAllList.get("DetailSeq"))) { // 匯款序號不同 印匯款金額
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
-
+				if (!"L4211".equals(txCode)) {
+					this.print(0, c3, tfnAllList.get("RepayAmt"), "R");// 匯款金額
+				}
 				if ("L4211".equals(txCode)) {
 					tmpFacm tmp = new tmpFacm(parse.stringToInteger(tfnAllList.get("CustNo").substring(0, 7)),
 							parse.stringToInteger(tfnAllList.get("DetailSeq")),
@@ -1278,9 +1283,7 @@ public class L4211Report extends MakeReport {
 
 			}
 
-			if (!"L4211".equals(txCode)) {
-				this.print(0, c3, dfTransferAmt, "R");// 匯款金額
-			}
+	
 
 			this.print(0, c4, dfMakeferAmt, "R");// 作帳金額
 			String custNo = tfnAllList.get("CustNo");

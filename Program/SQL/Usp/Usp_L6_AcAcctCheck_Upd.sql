@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L6_AcAcctCheck_Upd" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L6_AcAcctCheck_Upd" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -86,6 +86,8 @@ BEGIN
       FROM "AcReceivable" S2
       WHERE S2."AcctFlag" = 1 -- 篩選 業務科目記號 1: 資負明細科目
         AND S2."AcctCode" IN ('310','320','330','340','990') -- xwh 20211124 added 340
+      -- 2022-10-25 Wei: 排除預撥
+        AND S2."OpenAcDate" <= TBSDYF
       GROUP BY "AcctCode"
              , "AcSubBookCode"
              , "CurrencyCode"
@@ -121,6 +123,8 @@ BEGIN
                          , "FacmNo"
                 ) AR ON AR."CustNo" = F1."CustNo"
                     AND AR."FacmNo" = F1."FacmNo"
+      -- 2022-10-25 Wei: 排除預撥
+      WHERE L1."DrawdownDate" <= TBSDYF
       GROUP BY CASE WHEN NVL(L2."BormNo",0) > 0 THEN '990' ELSE F1."AcctCode" END
              , AR."AcSubBookCode"
     )

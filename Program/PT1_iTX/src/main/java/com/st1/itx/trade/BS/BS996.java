@@ -131,14 +131,15 @@ public class BS996 extends TradeBuffer {
 		// Parm = 1090101,N,0,0
 		String[] strAr = titaVo.getParam("Parm").split(",");
 		List<String> strList = Arrays.asList(strAr);
-		if (strList.size() != 4 || (!"Y".equals(strAr[1]) && !"N".equals(strAr[1]))) {
-			throw new LogicException(titaVo, "E0000", "參數：EX.1090402,Y,1,9999999( 業績起日,是否更新員工資料欄Y/N, 起戶號, 止戶號)");
+		if (strList.size() != 5 || (!"Y".equals(strAr[1]) && !"N".equals(strAr[1]))) {
+			throw new LogicException(titaVo, "E0000",
+					"參數：EX.1090402,Y,1,9999999,1090402 ( 業績起日,是否更新員工資料欄Y/N, 起戶號, 止戶號, 業績止日) ");
 		}
-		iAcdate = this.parse.stringToInteger(strAr[0]); // 業績起日
-		iEmpResetFg = strAr[1]; // 是否更新員工資料欄
-		iCustNoS = this.parse.stringToInteger(strAr[2]); // 起戶號
-		iCustNoE = this.parse.stringToInteger(strAr[3]); // 止戶號
-		iAcdateEnd = this.parse.stringToInteger(strAr[1]); // 業績止日
+		iAcdate = strAr[0] == null ? 0 : this.parse.stringToInteger(strAr[0]); // 業績起日
+		iEmpResetFg = strAr[1] == null ? "N" : strAr[1]; // 是否更新員工資料欄
+		iCustNoS = strAr[2] == null ? 0 : this.parse.stringToInteger(strAr[2]); // 起戶號
+		iCustNoE = strAr[3] == null ? 0 : this.parse.stringToInteger(strAr[3]); // 止戶號
+		iAcdateEnd = strAr[4] == null ? 0 : this.parse.stringToInteger(strAr[4]); // 業績止日
 		if (iCustNoS == 0 && iCustNoE == 0) {
 			iCustNoE = 9999999;
 		}
@@ -281,8 +282,8 @@ public class BS996 extends TradeBuffer {
 
 	private void clearPfDetail(int iAcdate, int iCustNoS, int iCustNoE, TitaVo titaVo) throws LogicException {
 		/* 業績明細計算檔 */
-		Slice<PfDetail> slPfDetail = pfDetailService.findByPerfDate(iAcdate + 19110000, iAcdateEnd, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<PfDetail> slPfDetail = pfDetailService.findByPerfDate(iAcdate + 19110000, iAcdateEnd, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<PfDetail> pfList = new ArrayList<PfDetail>();
 		if (slPfDetail != null) {
 			for (PfDetail pf : slPfDetail.getContent()) {

@@ -990,8 +990,9 @@ BEGIN
          , NVL(INT3."IntAmtRcv",0)         AS  "DerY3Int"        -- 個案減損客觀證據發生後第三年應收利息回收金額
          , NVL(INT4."IntAmtRcv",0)         AS  "DerY4Int"        -- 個案減損客觀證據發生後第四年應收利息回收金額
          , NVL(INT5."IntAmtRcv",0)         AS  "DerY5Int"        -- 個案減損客觀證據發生後第五年應收利息回收金額
-         , NVL(AF."AvgLawFee1",0)
-           + NVL(AF."AvgInsuFee1",0)       AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入
+                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
+           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee2",0)
            + NVL(AF."AvgInsuFee2",0)       AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee3",0)

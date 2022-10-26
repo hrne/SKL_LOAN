@@ -894,46 +894,47 @@ BEGIN
            + NVL("Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate"), 0)
                                            AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
          , CASE WHEN ML."LoanBalance" IS NULL OR ML1."LoanBalance" IS NULL THEN 0
-                WHEN NVL(ML."LoanBalance",0) <  NVL(ML1."LoanBalance",0)  THEN 0
-                ELSE NVL(ML."LoanBalance",0) -  NVL(ML1."LoanBalance",0)
-           END                             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額
+                WHEN ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  <  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))  THEN 0
+                ELSE ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))
+           END                             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額,調整轉催差額
          , CASE WHEN ML1."LoanBalance" IS NULL  THEN 0
-                WHEN NVL(ML1."LoanBalance",0) < NVL(ML2."LoanBalance",0)  THEN 0 
-                ELSE NVL(ML1."LoanBalance",0) - NVL(ML2."LoanBalance",0)
-           END                             AS  "DerY2Amt"        -- 個案減損客觀證據發生後第二年本金回收金額
+                WHEN ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) < ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))  THEN 0 
+                ELSE ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) - ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))
+           END                             AS  "DerY2Amt"        -- 個案減損客觀證據發生後第二年本金回收金額,調整轉催差額
          , CASE WHEN ML2."LoanBalance" IS NULL  THEN 0
-                WHEN NVL(ML2."LoanBalance",0) < NVL(ML3."LoanBalance",0)  THEN 0 
-                ELSE NVL(ML2."LoanBalance",0) - NVL(ML3."LoanBalance",0)
-           END                             AS  "DerY3Amt"        -- 個案減損客觀證據發生後第三年本金回收金額
+                WHEN ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) < ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))  THEN 0 
+                ELSE ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) - ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))
+           END                             AS  "DerY3Amt"        -- 個案減損客觀證據發生後第三年本金回收金額,調整轉催差額
          , CASE WHEN ML3."LoanBalance" IS NULL  THEN 0
-                WHEN NVL(ML3."LoanBalance",0) <  NVL(ML4."LoanBalance",0)  THEN 0 
-                ELSE NVL(ML3."LoanBalance",0) -  NVL(ML4."LoanBalance",0)
-           END                             AS  "DerY4Amt"        -- 個案減損客觀證據發生後第四年本金回收金額
+                WHEN ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) < ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  THEN 0 
+                ELSE ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) - ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))
+           END                             AS  "DerY4Amt"        -- 個案減損客觀證據發生後第四年本金回收金額,調整轉催差額
          , CASE WHEN ML4."LoanBalance" IS NULL  THEN 0
-                WHEN NVL(ML4."LoanBalance",0) < NVL(ML5."LoanBalance",0)  THEN 0 
-                ELSE NVL(ML4."LoanBalance",0) - NVL(ML5."LoanBalance",0)
-           END                             AS  "DerY5Amt"        -- 個案減損客觀證據發生後第五年本金回收金額
+                WHEN ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) < ( NVL(ML5."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  THEN 0 
+                ELSE ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) - ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0))
+           END                             AS  "DerY5Amt"        -- 個案減損客觀證據發生後第五年本金回收金額,調整轉催差額
          , NVL(INT1."IntAmtRcv",0)         AS  "DerY1Int"        -- 個案減損客觀證據發生後第一年應收利息回收金額
          , NVL(INT2."IntAmtRcv",0)         AS  "DerY2Int"        -- 個案減損客觀證據發生後第二年應收利息回收金額
          , NVL(INT3."IntAmtRcv",0)         AS  "DerY3Int"        -- 個案減損客觀證據發生後第三年應收利息回收金額
          , NVL(INT4."IntAmtRcv",0)         AS  "DerY4Int"        -- 個案減損客觀證據發生後第四年應收利息回收金額
          , NVL(INT5."IntAmtRcv",0)         AS  "DerY5Int"        -- 個案減損客觀證據發生後第五年應收利息回收金額
          -- 依舜雯2022/1/20堤供,已結案時下列法拍火險費用為0 
-         , 0                               AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
-         , 0                               AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
-         , 0                               AS  "DerY3Fee"        -- 個案減損客觀證據發生後第三年法拍及火險費用回收金額
-         , 0                               AS  "DerY4Fee"        -- 個案減損客觀證據發生後第四年法拍及火險費用回收金額
-         , 0                               AS  "DerY5Fee"        -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
---         , NVL(AF."AvgLawFee1",0)
---           + NVL(AF."AvgInsuFee1",0)       AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
---         , NVL(AF."AvgLawFee2",0)
---           + NVL(AF."AvgInsuFee2",0)       AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
---         , NVL(AF."AvgLawFee3",0)
---           + NVL(AF."AvgInsuFee3",0)       AS  "DerY3Fee"        -- 個案減損客觀證據發生後第三年法拍及火險費用回收金額
---         , NVL(AF."AvgLawFee4",0)
---           + NVL(AF."AvgInsuFee4",0)       AS  "DerY4Fee"        -- 個案減損客觀證據發生後第四年法拍及火險費用回收金額
---         , NVL(AF."AvgLawFee5",0)
---           + NVL(AF."AvgInsuFee5",0)       AS  "DerY5Fee"        -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
+--         , 0                               AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+--         , 0                               AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
+--         , 0                               AS  "DerY3Fee"        -- 個案減損客觀證據發生後第三年法拍及火險費用回收金額
+--         , 0                               AS  "DerY4Fee"        -- 個案減損客觀證據發生後第四年法拍及火險費用回收金額
+--         , 0                               AS  "DerY5Fee"        -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
+         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入
+                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
+           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+         , NVL(AF."AvgLawFee2",0)
+           + NVL(AF."AvgInsuFee2",0)       AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
+         , NVL(AF."AvgLawFee3",0)
+           + NVL(AF."AvgInsuFee3",0)       AS  "DerY3Fee"        -- 個案減損客觀證據發生後第三年法拍及火險費用回收金額
+         , NVL(AF."AvgLawFee4",0)
+           + NVL(AF."AvgInsuFee4",0)       AS  "DerY4Fee"        -- 個案減損客觀證據發生後第四年法拍及火險費用回收金額
+         , NVL(AF."AvgLawFee5",0)
+           + NVL(AF."AvgInsuFee5",0)       AS  "DerY5Fee"        -- 個案減損客觀證據發生後第五年法拍及火險費用回收金額
     FROM   "Ias34Dp" M
       -- 法拍件回收登錄件的最後一筆計息迄日
       LEFT JOIN LT ON LT."CustNo"  = M."CustNo"

@@ -499,8 +499,10 @@ public class PdfGenerator extends CommBuffer {
 		int pw = 0;
 
 		StringBuilder prefix = new StringBuilder();
+		String space ="";
 		for (int i = 0; i < w2; i++) {
-			prefix.append(" ");
+//			prefix.append(" ");
+			space = space + " ";
 		}
 
 		for (int i = 0; i < s.length(); i++) {
@@ -521,8 +523,8 @@ public class PdfGenerator extends CommBuffer {
 				content.showTextAligned(PdfContentByte.ALIGN_LEFT, ps.toString(), (float) (FRAME_X + x),
 						(float) (FRAME_Y + yy), 0);
 				content.endText();
-
-				ps = prefix;
+				ps.delete(0, w);
+				ps.append(space);
 				pw = w2;
 				yy -= h;
 			}
