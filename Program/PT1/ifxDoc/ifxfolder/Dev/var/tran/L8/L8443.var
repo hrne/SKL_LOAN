@@ -101,6 +101,9 @@ T(3,1)ASGN(LOOP$)
 !未回檔報送日期
 #OOReportDate=D,7,L
 
+!未回檔ID
+#OOReportId=X,10,S
+
 !傳送帶碼
 #OOCtxCd=X,20,S
 
@@ -129,6 +132,7 @@ TXFORM=L8443
 #OOReportDate
 #OONotReportCount
 #OOCtxCd
+#OOReportId
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -150,6 +154,9 @@ TXFORM=L8443
 {width:450,align:'left'}
 
 #OONotReportCount=未回檔筆數
+{width:100,align:'center'}
+
+#OOReportId=未回檔ID
 {width:100,align:'center'}
 
 #OOReportDate=未回檔報送日期

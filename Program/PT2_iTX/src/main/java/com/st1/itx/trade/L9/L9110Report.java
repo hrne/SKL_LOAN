@@ -32,6 +32,7 @@ import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.EmployeeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L9110Report")
 @Scope("prototype")
@@ -78,6 +79,9 @@ public class L9110Report extends MakeReport {
 
 	@Autowired
 	L9110ServiceImpl l9110ServiceImpl;
+	/* 轉換工具 */
+	@Autowired
+	public Parse parse;
 
 	@Autowired
 	AuthLogCom authLogCom;
@@ -612,7 +616,8 @@ public class L9110Report extends MakeReport {
 
 			this.print(1, 5, "商品代碼 ..... " + FormatUtil.padX("" + tL9110.get("F22") + " " + tL9110.get("F59"), 14));
 			this.print(0, 35, "核准利率 ..... ");
-			this.print(0, 65, formatAmt(getBaseRate(tL9110.get("F60"), titaVo), 4), "R");
+			this.print(0, 65, formatAmt(
+					getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))), 4), "R");
 			this.print(0, 69, "利率調整週期 . " + tL9110.get("F24") + "月");
 			this.print(0, 105, "利率調整不變攤還額 . " + tL9110.get("F25"));
 			this.print(0, 135, "信用評分　.... " + tL9110.get("F26"));
@@ -1307,8 +1312,8 @@ public class L9110Report extends MakeReport {
 	private BigDecimal getBaseRate(String baseRateCode, TitaVo titaVo) {
 		BigDecimal baseRate = BigDecimal.ZERO;
 		CdBaseRate tCdBaseRate = new CdBaseRate();
-		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", baseRateCode, 19110101, titaVo.getEntDyI()+19110000,
-				titaVo);
+		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", baseRateCode, 19110101,
+				titaVo.getEntDyI() + 19110000, titaVo);
 		this.info(" cdBaseRate date =" + titaVo.getEntDyI());
 		if (tCdBaseRate != null) {
 			baseRate = tCdBaseRate.getBaseRate();

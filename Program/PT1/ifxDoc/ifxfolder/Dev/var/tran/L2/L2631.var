@@ -348,6 +348,7 @@ R(1,L2R36)
 C(3,#CHAIN,1,$,S)
 C(3,#FunCode,2,$,S)
 T(2,@Rmk1,#L2r36Rmk)
+T(2,@CloseInd,#L2r36CloseInd)
 T(2,@TelNo1,#L2r36TelNo1)
 T(2,@TelNo2,#L2r36TelNo2)
 T(2,@TelNo3,#L2r36TelNo3)
@@ -373,7 +374,7 @@ V(2,0)
 !補領或補發時必須輸入,補領時依申請日期計算是否限制清償日期內
 #ApplDate=D,7,I
 E(0,#SYSCDATE)
-IF(#FunCode==2||#FunCode==3,$,s)
+IF(#FunCode==2||#FunCode==3,$,S)
 @V(7)
 A(DATE,0,#ApplDate)
 V(2,0)
@@ -493,7 +494,7 @@ T(H,#CollectFlag,#YNHelp)
 #RimCaseCloseCode=A,1,S
 
 #SendL3R11A=X,1,S
-C(3,#FunCode,2,S,$)
+! C(3,#FunCode,2,S,$)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,0)
@@ -507,7 +508,6 @@ E(0,@CloseAmt,#L3r11CloseAmt)
 ! closefg = N 時為必須輸入清償原因
 ! L3r11CloseReasonCode = "" 時為到期清償closefg=Y
 C(5,#L3r11CloseReasonCode,00,T(3,@closefg,Y),T(3,@closefg,N))
-C(5,#L3r11CloseReasonCode,00,S,$)
 E(0,@IntStartDate,#L3r11IntStartDate)
 E(0,@IntEndDate,#L3r11IntEndDate)
 T(2,@CloseReasonCode,#L3r11CloseReasonCode)
@@ -552,6 +552,7 @@ P(L,#ShortCloseBreachAmtXX)
 T(2,@ShortCloseBreachAmtXX,#WKCBX+#ShortCloseBreachAmtXX)
 T(B,@ShortfallXX,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachAmtXX)
 P(L,#ShortfallXX)
+
 
 #SendL2R64=X,1,S
 C(3,#FunCode,2,S,$)
@@ -601,12 +602,12 @@ C(3,#PayIntDate{n},0,T(3,@PayIntDateX{n},無),E(0,@PayIntDateX{n},#PayIntDate{n}
 
 !清償原因
 #CloseReasonCode=X,2,I
-C(5,#closefg,Y,S,$)
+C(5,#closefg,Y,s,$)
 HELP(#AdvanceCloseCodeHelp)
 @
 C(4,#CloseReasonCode,T(3,@CloseReasonCodeX,),$)
 V(H,#AdvanceCloseCodeHelp)
-C(5,#closefg,Y,S,V(2,0))
+C(5,#closefg,Y,s,V(2,0))
 
 #CloseReasonCodeX=X,20,L
 T(3,)T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)

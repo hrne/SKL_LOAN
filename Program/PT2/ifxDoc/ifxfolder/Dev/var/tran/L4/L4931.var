@@ -700,18 +700,8 @@ ifxBatch:{
 ^
 
 #RPTFG=2,QUERY.GRID,L4931
-#any={caption:'[L4931]',width:1000,rowNum:100,ifxDisplay:1,
-ifxBatch:{
-     	name:'重新處理',
-	     type:'5',
-	     rim:'L431A',
-	     txtno:'#secret-no',
-	pfnx:"L4931.PFNX",
-	col_captions:["戶號","執行狀態　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
-	col_names:["#OOCustNumber","#batch-row-status"]
-	}
+#any={detail:true, header:'L4931.part', caption:'', rowNum:20, rowList:[20,40,60],ifxDisplay:0,
 }
-#secret-no
 
 #OOBTN_L3932=
 {search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}

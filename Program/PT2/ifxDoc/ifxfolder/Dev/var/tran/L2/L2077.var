@@ -193,9 +193,11 @@ E(0,5)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-#OOTranDate=D,7,L
-
+#OOEntryDate=D,7,L
 C(3,#OOFunCode,1,C(3,#OOCloseDate,0,))
+
+#OOApplDate=D,7,L
+
 !作業項目
 #OOFunCode=A,1,S
 
@@ -302,11 +304,13 @@ E(0,1)
 C(3,#OOFunCode,0,C(3,#OOCollectWayCode,01,E(0,2),$),$)
 C(3,#OOFunCode,0,C(3,#OOCollectWayCode,20,E(0,2),$),$)
 C(3,#OOFunCode,1,E(0,3),$)
+C(3,#OOFunCode,1,C(3,#OOCollectWayCode,01,E(0,2),$),$)
+C(3,#OOFunCode,1,C(3,#OOCollectWayCode,20,E(0,2),$),$)
 C(3,#OOFunCode,2,E(0,2),$)
 C(3,#OOFunCode,3,E(0,3),$)
 
 #OOBUF6=X,100,S
-T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
+T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOEntryDate+#OOFacmNo)
 
 
 !作業項目=0.清償,領取方式為01.20時連動L2631否則連動L2076
@@ -316,6 +320,7 @@ T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)
 !OOReceiveFg為1=已領過隱藏按鈕
 #OOBTN6=X,16,S
 IF(#OOCloseDate==0,BIND(grid,cancel),$)
+IF(#OOCloseDate==0,s,$)
 C(3,#OOReceiveFg,1,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}))
 ! C(3,#FUNC6,2,BIND(grid,{ cmd=CHAIN; ntxcd=L2631;text=新增; ntxbuf=#OOBUF6}),BIND(grid,{ cmd=CHAIN; ntxcd=L2076;text=新增; ntxbuf=#OOBUF6}))
 ! IF(#OOCloseDate==0,BIND(grid,cancel),$)
@@ -354,7 +359,8 @@ C(5,#OOHasHistory,"Y",BIND(grid,{ cmd=CHAIN; ntxcd=L6932;text=歷程 ;ntxbuf=#OO
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L2077
-#OOTranDate
+#OOEntryDate
+#OOApplDate
 #OOFunCode
 #OOCustNo
 #OOCustName
@@ -407,7 +413,10 @@ TXFORM=L2077
 #OOBTN1=歷程
 {width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
 
-#OOTranDate=入帳日期
+#OOEntryDate=入帳日期
+{width:100,align:'center'}
+
+#OOApplDate=申請日期
 {width:100,align:'center'}
 
 #OOCloseNo=序號
@@ -452,7 +461,7 @@ TXFORM=L2077
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L2077;cpi=15"/>
 %
-#OOTranDate#OOCloseNo#OOFunCodX#OOCustNo#OOFacmNo#OOCustName#OOCloseReasonCodeX#OOCloseAmtX#OOCollectWayCodeX#OORmk#OOTelNo1#OODocNo#OOAgreeNo#OOClsNo
+#OOEntryDate#OOCloseNo#OOFunCodX#OOCustNo#OOFacmNo#OOCustName#OOCloseReasonCodeX#OOCloseAmtX#OOCollectWayCodeX#OORmk#OOTelNo1#OODocNo#OOAgreeNo#OOClsNo
 @
 ^
 </sub>

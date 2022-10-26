@@ -249,6 +249,10 @@ public class L3R11 extends TradeBuffer {
 				custNoIntStartDate = c.getStartDate() < custNoIntStartDate ? c.getStartDate() : custNoIntStartDate;
 				custNoIntEndDate = c.getEndDate() > custNoIntEndDate ? c.getEndDate() : custNoIntEndDate;
 			}
+			if (wkIntStartDate == 99991231) {
+				wkIntStartDate = 0;
+			}
+
 			OccursList occursList = new OccursList();
 			occursList.putParam("L3r11FacmNo", ln.getFacmNo());
 			occursList.putParam("L3r11BormNo", ln.getBormNo());
@@ -293,7 +297,9 @@ public class L3R11 extends TradeBuffer {
 			iListCloseBreach.add(v);
 
 		}
-		if (wkTotaCount == 0) {
+
+		this.info("iTxCode = " + iTxCode);
+		if (!("L2631".equals(iTxCode)) && wkTotaCount == 0) {
 			throw new LogicException(titaVo, "E3081", ""); // 無符合結案區分之撥款資料
 		}
 		//
@@ -377,6 +383,10 @@ public class L3R11 extends TradeBuffer {
 		// 清償要扣除未到期火險費、溢收款
 		if ("L2631".equals(iTxCode) || "L2632".equals(iTxCode)) {
 			oCloseAmt = oCloseAmt.subtract(baTxCom.getUnOpenfireFee()).subtract(baTxCom.getExcessive());
+		}
+
+		if (custNoIntStartDate == 99991231) {
+			custNoIntStartDate = 0;
 		}
 		this.totaVo.putParam("L3r11CloseAmt", oCloseAmt);
 		this.totaVo.putParam("L3r11CloseReasonCode", wkCloseReasonCode);

@@ -102,6 +102,7 @@ public class L8443 extends TradeBuffer {
 			for(Map<String, String> isL8443 : sL8443) {
 				String iNotReportCount = isL8443.get("F0");
 				String iReportDate = isL8443.get("F1");
+				String iReportId = isL8443.get("F2");
 				int iiReportDate = Integer.valueOf(iReportDate);
 				if( iiReportDate > 19110000 ) {
 					iiReportDate = iiReportDate-19110000;
@@ -115,7 +116,8 @@ public class L8443 extends TradeBuffer {
 					OccursList.putParam("OOSubmitkey", "JcicZ040-前置協商受理申請暨請求回報債權通知資料");
 					OccursList.putParam("OOReportDate", iiReportDate);
 					OccursList.putParam("OONotReportCount", iNotReportCount);
-
+					OccursList.putParam("OOReportId", iReportId);
+					
 					break;
 				case "041":
 					OccursList.putParam("OOSubmitkey", "JcicZ041-協商開始暨停催通知資料");

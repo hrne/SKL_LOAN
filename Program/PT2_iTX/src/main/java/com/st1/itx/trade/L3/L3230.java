@@ -441,7 +441,7 @@ public class L3230 extends TradeBuffer {
 			if (iRpCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 				FacMain tFacMain = facMainService.findById(new FacMainId(iRpCustNo, iRpFacmNo), titaVo);
 				if (tFacMain == null) {
-					throw new LogicException(titaVo, "E0015", "額度不存在 戶號 = " + iCustNo + "-" + iFacmNo); // 檢查錯誤
+					throw new LogicException(titaVo, "E0015", "額度不存在 戶號 = " + iRpCustNo + "-" + iRpFacmNo); // 檢查錯誤
 				}
 				try {
 					this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iRpCustNo, iRpFacmNo, 0, 96, iRpAmt,

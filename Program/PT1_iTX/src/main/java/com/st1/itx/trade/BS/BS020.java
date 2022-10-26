@@ -187,7 +187,7 @@ public class BS020 extends TradeBuffer {
 			}
 			TempVo tTempVo = new TempVo();
 			try {
-				listBaTxVo = baTxCom.settleUnPaid(tbsdy, tbsdy, custNo, facmNo, 0, repayCode, repayType,
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, tbsdy, custNo, facmNo, 0, 90, repayType,
 						BigDecimal.ZERO, tTempVo, titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());

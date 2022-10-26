@@ -612,7 +612,16 @@ public class MakeExcel extends CommBuffer {
 		this.info("openExcel start");
 		try (FileInputStream fis = new FileInputStream(fileName)) {
 			this.openedWorkbook = new XSSFWorkbook(fis);
-			this.openedSheet = openedWorkbook.getSheet(sheetname.toString());
+//			this.openedSheet = openedWorkbook.getSheet(sheetname.toString());
+
+			if (sheetname instanceof String) {
+				this.openedSheet = this.openedWorkbook.getSheet(sheetname.toString());
+				sheetname = sheetname.toString();
+			} else {
+				this.openedSheet = this.openedWorkbook.getSheetAt(Integer.valueOf(sheetname.toString()) - 1);
+				sheetname = this.openedSheet.getSheetName();
+			}
+			
 		} catch (FileNotFoundException e1) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel)此檔案 (" + fileName + ") 不存在");
 		} catch (IOException e) {

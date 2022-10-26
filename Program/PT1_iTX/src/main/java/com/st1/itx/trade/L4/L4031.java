@@ -76,7 +76,7 @@ public class L4031 extends TradeBuffer {
 
 //		0:個金 1:企金 2:企金自然人
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		sBatxRateChange = batxRateChangeService.custCodeEq(date, date, custCode1, custCode2, this.index, this.limit);
+		sBatxRateChange = batxRateChangeService.custCodeEq(date, date, custCode1, custCode2, 0, Integer.MAX_VALUE);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -207,6 +207,11 @@ public class L4031 extends TradeBuffer {
 						lableBX += "(已調整)";
 						rptFg = 6;
 						break;
+					case 2:
+						lableBX += "(待輸入)";
+						checkFlag = 2; // 2-輸入利率
+						rptFg = 6;
+						break;
 					}
 					break;
 				case 3:
@@ -231,6 +236,11 @@ public class L4031 extends TradeBuffer {
 						break;
 					case 2:
 						lableBX += "(待輸入)";
+						if ((txKind == 1) || txKind == 3) {
+							rptFg = 6;
+						} else {
+							rptFg = 4;
+						}
 						checkFlag = 2; // 2-輸入利率
 						break;
 					case 9:
