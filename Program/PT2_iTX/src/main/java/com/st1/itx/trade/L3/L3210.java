@@ -373,7 +373,6 @@ public class L3210 extends TradeBuffer {
 		// call 應繳試算
 		this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, this.repayFacmNo, 0, iRepayType, iTempAmt,
 				titaVo);
-
 		if (iTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 			// 借方：交易金額(已出)
 
@@ -393,8 +392,8 @@ public class L3210 extends TradeBuffer {
 
 			// 新增放款交易內容檔
 			addLoanBorTxRoutine(acDetail);
-
 		}
+		BigDecimal wkOverflow = baTxCom.getExcessive().add(iTempAmt);
 		// 費用
 		if (isRepaidFee) {
 			// 收回費用處理(新增帳務及放款交易內容檔)
@@ -409,14 +408,14 @@ public class L3210 extends TradeBuffer {
 				AcDetail acDetail = new AcDetail();
 				acDetail.setDbCr("D");
 				acDetail.setAcctCode("TAV");
-				acDetail.setTxAmt(tLoanBorTx.getOverflow());
+				acDetail.setTxAmt(wkOverflow);
 				acDetail.setCustNo(iCustNo);
 				acDetail.setFacmNo(iFacmNo);
 				acDetail.setBormNo(0);
 				acDetail.setSumNo("090"); // 暫收可抵繳
 				lAcDetail.add(acDetail);
 				// 貸方：費用、累溢收
-				acRepayCom.settleFeeByTemp(iRpCode, iEntryDate, tLoanBorTx.getOverflow(), feeList, lAcDetail, titaVo);
+				acRepayCom.settleFeeByTemp(iRpCode, iEntryDate, wkOverflow, feeList, lAcDetail, titaVo);
 			}
 		}
 		// 無費用項目可抵繳

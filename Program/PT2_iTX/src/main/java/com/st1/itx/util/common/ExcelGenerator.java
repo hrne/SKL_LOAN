@@ -578,10 +578,6 @@ public class ExcelGenerator extends CommBuffer {
 		addRengionBorder(startCol, startRow, endCol, endRow, point);
 	}
 
-	/**
-	 * @param readStyle 是否讀取格式
-	 * @throws CloneNotSupportedException
-	 */
 	private CellStyle setFontStyle(CellStyle originalCellStyle, boolean readStyle) {
 		// 預計要回傳的 CellStyle
 		CellStyle resultCellStyle = null;

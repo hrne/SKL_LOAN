@@ -12,9 +12,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -1227,5 +1229,40 @@ public class MakeExcel extends CommBuffer {
 		map.put("f", formula);
 		map.put("ft", format);
 		listMap.add(map);
+	}
+
+	public void lockColumn(int rowStart, int rowEnd, int columnStart, int columnEnd, int totalColumn)
+			throws LogicException {
+		this.info("lockColumn start");
+		if (this.openedSheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)lockColumn sheet is null");
+		}
+		Map<Integer, CellStyle> cellStyleMap = new HashMap<>();
+		for (int nowRow = rowStart; nowRow <= rowEnd; nowRow++) {
+			Row processingRow = this.openedSheet.getRow(nowRow - 1);
+			if (processingRow == null) {
+				processingRow = this.openedSheet.createRow(nowRow - 1);
+			}
+			for (int nowColumn = columnStart; nowColumn <= totalColumn; nowColumn++) {
+				this.info("nowColumn = " + nowColumn);
+				Cell cell = null;
+				cell = processingRow.getCell(nowColumn - 1);
+				if (cell == null) {
+					cell = processingRow.createCell(nowColumn - 1, CellType.BLANK);
+				}
+				CellStyle oriCellStyle = cell.getCellStyle();
+				if (!cellStyleMap.containsKey(nowColumn)) {
+					CellStyle tempStyle = this.openedWorkbook.createCellStyle();
+					tempStyle.cloneStyleFrom(oriCellStyle);
+					tempStyle.setLocked(nowColumn <= columnEnd); // 鎖定或不鎖定的判斷
+					cellStyleMap.put(nowColumn, tempStyle);
+				}
+				cell.setCellStyle(cellStyleMap.get(nowColumn));
+			}
+		}
+	}
+
+	public void protectSheet(String groupNo) {
+		this.openedSheet.protectSheet(groupNo);
 	}
 }

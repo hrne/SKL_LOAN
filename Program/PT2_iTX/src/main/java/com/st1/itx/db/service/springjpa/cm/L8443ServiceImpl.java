@@ -47,6 +47,7 @@ public class L8443ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " \"OutJcicTxtDate\"  not in " + (txDate) + " and ";
 		}
 		sql += "  \"OutJcicTxtDate\" != 0 ";
+		sql += "  and \"OutJcicTxtDate\" > 20211231 ";
 		sql += " group by \"OutJcicTxtDate\" , \"CustId\" ";
 
 		this.info("FindDataL8440 sql=" + sql);

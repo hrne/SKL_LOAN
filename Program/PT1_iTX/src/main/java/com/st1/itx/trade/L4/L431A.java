@@ -2,18 +2,24 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -101,7 +107,8 @@ public class L431A extends TradeBuffer {
 
 		tBatxRateChange = batxRateChangeService.holdById(tBatxRateChangeId);
 		if (tBatxRateChange == null) {
-			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-" + parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
+			throw new LogicException("E0001", "L431A Couldn't Find CustNo : " + parse.IntegerToString(custNo, 7) + "-"
+					+ parse.IntegerToString(facmNo, 3) + "-" + parse.IntegerToString(bormNo, 3));
 		}
 
 		if (tBatxRateChange.getConfirmFlag() == 1) {
@@ -139,6 +146,7 @@ public class L431A extends TradeBuffer {
 			break;
 
 		case 1: // 1.已調整
+		case 2: // 2.輸入利率
 			// 取消調整
 			tBatxRateChange.setAdjustedRate(BigDecimal.ZERO);
 			tBatxRateChange.setRateKeyInCode(0); // 0.未調整
@@ -148,15 +156,19 @@ public class L431A extends TradeBuffer {
 		// 加碼利率，自訂利率時：0、指標利率時：擬調利率(已調整時為調整後利率)減合約指標利率
 		if ("99".equals(tBatxRateChange.getBaseRateCode())) {
 			if (tBatxRateChange.getRateKeyInCode() == 1) {
-				tBatxRateChange.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getPresentRate()));
+				tBatxRateChange
+						.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getPresentRate()));
 			} else {
-				tBatxRateChange.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getPresentRate()));
+				tBatxRateChange
+						.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getPresentRate()));
 			}
 		} else {
 			if (tBatxRateChange.getRateKeyInCode() == 1) {
-				tBatxRateChange.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getContrBaseRate()));
+				tBatxRateChange
+						.setRateIncr(tBatxRateChange.getAdjustedRate().subtract(tBatxRateChange.getContrBaseRate()));
 			} else {
-				tBatxRateChange.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getContrBaseRate()));
+				tBatxRateChange
+						.setRateIncr(tBatxRateChange.getProposalRate().subtract(tBatxRateChange.getContrBaseRate()));
 			}
 		}
 
@@ -170,7 +182,8 @@ public class L431A extends TradeBuffer {
 	}
 
 	private String check(String checkMsg, BatxRateChange t, TitaVo titaVo) throws LogicException {
-		LoanBorMain tLoanBorMain = loanBorMainService.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
+		LoanBorMain tLoanBorMain = loanBorMainService
+				.holdById(new LoanBorMainId(t.getCustNo(), t.getFacmNo(), t.getBormNo()));
 		if (tLoanBorMain == null) {
 			throw new LogicException("E0006", "LoanBorMain ");
 		}

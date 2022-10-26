@@ -15,9 +15,13 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacClose;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.FacCloseService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.springjpa.cm.L2633ServiceImpl;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
@@ -31,6 +35,10 @@ public class L2633ReportA extends MakeReport {
 
 	@Autowired
 	public FacCloseService sFacCloseService;
+	@Autowired
+	public ClFacService clFacService;
+	@Autowired
+	public LoanBorMainService loanBorMainService;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -225,6 +233,44 @@ public class L2633ReportA extends MakeReport {
 				String agreeNo = result.get("AgreeNo");
 				String clsNo = result.get("ClsNo");
 
+				// 全部結案
+				Slice<ClFac> slClFac = null; // 擔保品與額度關聯檔
+				if (facmNo == 0) {
+					slClFac = clFacService.custNoEq(custNo, 0, Integer.MAX_VALUE, titaVo);
+				} else {
+					slClFac = clFacService.facmNoEq(custNo, facmNo, 0, Integer.MAX_VALUE, titaVo);
+				}
+				boolean isAllClose = true;
+				if (slClFac != null) {
+					for (ClFac t : slClFac.getContent()) {
+						Slice<ClFac> slClFac2 = null;
+						slClFac2 = clFacService.clNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), 0,
+								Integer.MAX_VALUE, titaVo);
+						if (slClFac2 != null) {
+							for (ClFac t2 : slClFac2.getContent()) {
+//								if ((t2.getCustNo() == iCustNo)) {
+								// 撥款主檔
+								Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(t2.getCustNo(),
+										t2.getFacmNo(), t2.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+								if (slLoanBorMain != null) {
+									for (LoanBorMain tlbm : slLoanBorMain.getContent()) {
+
+										// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
+										if (tlbm.getStatus() == 0 || tlbm.getStatus() == 2 || tlbm.getStatus() == 4
+												|| tlbm.getStatus() == 6 || tlbm.getStatus() == 8) {
+											isAllClose = false;
+											break;
+										}
+									}
+								}
+//								}
+							}
+						}
+					}
+				}
+				if (!isAllClose) {
+					continue;
+				}
 				i++;
 				cnt++;
 

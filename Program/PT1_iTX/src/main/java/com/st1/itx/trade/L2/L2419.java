@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdArea;
@@ -30,43 +28,18 @@ import com.st1.itx.db.domain.CdLandSection;
 import com.st1.itx.db.domain.CdLandSectionId;
 import com.st1.itx.db.domain.ClBatch;
 import com.st1.itx.db.domain.ClBatchId;
-import com.st1.itx.db.domain.ClBuilding;
-import com.st1.itx.db.domain.ClBuildingId;
-import com.st1.itx.db.domain.ClBuildingOwner;
-import com.st1.itx.db.domain.ClBuildingOwnerId;
-import com.st1.itx.db.domain.ClFac;
-import com.st1.itx.db.domain.ClFacId;
-import com.st1.itx.db.domain.ClImm;
-import com.st1.itx.db.domain.ClImmId;
-import com.st1.itx.db.domain.ClLand;
-import com.st1.itx.db.domain.ClLandId;
-import com.st1.itx.db.domain.ClLandOwner;
-import com.st1.itx.db.domain.ClLandOwnerId;
-import com.st1.itx.db.domain.ClMain;
-import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdClBatchService;
-import com.st1.itx.db.service.CdClService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdLandSectionService;
 import com.st1.itx.db.service.ClBatchService;
-import com.st1.itx.db.service.ClBuildingOwnerService;
-import com.st1.itx.db.service.ClBuildingService;
-import com.st1.itx.db.service.ClFacService;
-import com.st1.itx.db.service.ClImmService;
-import com.st1.itx.db.service.ClLandOwnerService;
-import com.st1.itx.db.service.ClLandService;
-import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
-import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.date.DateUtil;
@@ -107,45 +80,22 @@ public class L2419 extends TradeBuffer {
 	private GSeqCom gSeqCom;
 
 	@Autowired
-	private ClImmService sClImmService;
-	@Autowired
-	private ClMainService sClMainService;
-	@Autowired
 	private CdCodeService sCdCodeService;
 	@Autowired
 	private CustMainService sCustMainService;
-	@Autowired
-	private CdClService sCdClService;
 	@Autowired
 	private CdCityService sCdCityService;
 	@Autowired
 	private CdAreaService sCdAreaService;
 	@Autowired
-	private ClBuildingService sClBuildingService;
-	@Autowired
-	private ClBuildingOwnerService sClBuildingOwnerService;
-	@Autowired
-	private ClLandService sClLandService;
-	@Autowired
-	private ClLandOwnerService sClLandOwnerService;
-	@Autowired
-	private ClFacService sClFacService;
-	@Autowired
-	private FacMainService sFacMainService;
-	/* DB服務注入 */
-	@Autowired
 	private TxFileService sTxFileService;
 	@Autowired
 	private CdLandSectionService sCdLandSectionService;
-	@Autowired
-	private ClFacCom clFacCom;
-
 	@Autowired
 	private CdClBatchService sCdClBatchService;
 	@Autowired
 	private ClBatchService sClBatchService;
 
-	private HashMap<String, String> ownerids = new HashMap<String, String>();
 	private HashMap<String, String> items = new HashMap<String, String>();
 
 	private List<Map<String, String>> lastOwnerList = null;
@@ -202,7 +152,8 @@ public class L2419 extends TradeBuffer {
 		ClBatch tClBatch;
 		ClBatchId tClBatchId;
 
-		for (int row = 3; row <= lastRowNum + 1; row++) {
+		int row = 3;
+		for (; row <= lastRowNum + 1; row++) {
 			this.info("row = " + row);
 
 			// 編號
@@ -250,6 +201,11 @@ public class L2419 extends TradeBuffer {
 				throw new LogicException("E0005", "擔保品整批匯入檔(ClBatch),上傳檔編號(" + no + ")");
 			}
 		}
+
+		makeExcel.lockColumn(3, row - 1, 1, 4, 140);
+
+		makeExcel.protectSheet(groupNo);
+
 		String newFileItem = "擔保品明細表回饋檔_" + groupNo + ".xlsx";
 		String fileName = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + newFileItem;
@@ -262,7 +218,7 @@ public class L2419 extends TradeBuffer {
 	}
 
 	/**
-	 * 檢核上傳檔並
+	 * 檢核上傳檔
 	 * 
 	 * @param titaVo titaVo
 	 * @throws LogicException LogicException
@@ -338,7 +294,7 @@ public class L2419 extends TradeBuffer {
 			int clNo = (int) toNumeric(columnD);
 
 			if (!columnD.isEmpty() && clNo != 0) {
-				// TODO: 必須為空白
+				throw new LogicException("E0015", "欄位:D ,行數:" + row + ",擔保品號碼不可輸入");
 			}
 
 			// 擔保品類別代碼
@@ -360,12 +316,12 @@ public class L2419 extends TradeBuffer {
 				if (bdno1 == 0) {
 					throw new LogicException("E0015", "欄位:F ,行數:" + row + ",房地擔保品必須輸入建號前5碼，且建號前5碼不得為0或空白 = " + columnF);
 				}
-				String buildNo1 = leftPadZero(columnF, 5);
+//				String buildNo1 = leftPadZero(columnF, 5);
 
 				// 建號-後3碼
 				String columnG = makeExcel.getValue(row, 7).toString();
 				this.info("columnG = " + columnG);
-				String buildNo2 = leftPadZero(columnG, 3);
+//				String buildNo2 = leftPadZero(columnG, 3);
 			}
 
 			// 地號-前4碼
@@ -376,11 +332,11 @@ public class L2419 extends TradeBuffer {
 			if (ldno1 == 0) {
 				throw new LogicException("E0015", "欄位:H ,行數:" + row + ",必須輸入地號前4碼且不得為0 = " + columnH);
 			}
-			String landNo1 = leftPadZero(columnH, 4);
+//			String landNo1 = leftPadZero(columnH, 4);
 
 			String columnI = makeExcel.getValue(row, 9).toString();
 			this.info("columnI = " + columnI);
-			String landNo2 = leftPadZero(columnI, 4);
+//			String landNo2 = leftPadZero(columnI, 4);
 
 			// 郵遞區號
 			String columnJ = makeExcel.getValue(row, 10).toString();
@@ -536,26 +492,50 @@ public class L2419 extends TradeBuffer {
 			// 增值稅
 			String columnW = makeExcel.getValue(row, 23).toString();
 			this.info("columnW = " + columnW);
-			String value23 = columnW;
-			BigDecimal tax = new BigDecimal(value23);
-			tax = tax.setScale(0, RoundingMode.HALF_UP);
+			String tax = columnW;
+			if (tax != null && !tax.isEmpty()) {
+				try {
+					new BigDecimal(tax);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:W ,行數:" + row + ",增值稅有輸入時需為數字,增值稅=" + tax);
+				}
+			}
 
 			// 淨值
 			String columnX = makeExcel.getValue(row, 24).toString();
 			this.info("columnX = " + columnX);
-			String value24 = columnX;
-			BigDecimal netWorth = new BigDecimal(value24);
-			netWorth = netWorth.setScale(0, RoundingMode.HALF_UP);
+			String netValue = columnX;
+			if (netValue != null && !netValue.isEmpty()) {
+				try {
+					new BigDecimal(netValue);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:X ,行數:" + row + ",淨值有輸入時需為數字,淨值=" + netValue);
+				}
+			}
 
 			// 押金
 			String columnY = makeExcel.getValue(row, 25).toString();
 			this.info("columnY = " + columnY);
-			// TODO: ???
+			String rentPrice = columnY;
+			if (rentPrice != null && !rentPrice.isEmpty()) {
+				try {
+					new BigDecimal(rentPrice);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:Y ,行數:" + row + ",押金有輸入時需為數字,押金=" + rentPrice);
+				}
+			}
 
 			// 出租淨值
 			String columnZ = makeExcel.getValue(row, 26).toString();
 			this.info("columnZ = " + columnZ);
-			// TODO: ???
+			String rentEvaValue = columnZ;
+			if (rentEvaValue != null && !rentEvaValue.isEmpty()) {
+				try {
+					new BigDecimal(rentEvaValue);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:Z ,行數:" + row + ",出租淨值有輸入時需為數字,出租淨值=" + rentEvaValue);
+				}
+			}
 
 			// 貸放成數
 			String columnAA = makeExcel.getValue(row, 27).toString();
@@ -569,7 +549,14 @@ public class L2419 extends TradeBuffer {
 			// 借款金額
 			String columnAB = makeExcel.getValue(row, 28).toString();
 			this.info("columnAB = " + columnAB);
-			// TODO: ???
+			String loanAmt = columnAB;
+			if (loanAmt != null && !loanAmt.isEmpty()) {
+				try {
+					new BigDecimal(loanAmt);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:AB ,行數:" + row + ",借款金額有輸入時需為數字,借款金額=" + loanAmt);
+				}
+			}
 
 			// 設定金額
 			String columnAC = makeExcel.getValue(row, 29).toString();
@@ -582,7 +569,14 @@ public class L2419 extends TradeBuffer {
 			// 還款金額
 			String columnAD = makeExcel.getValue(row, 30).toString();
 			this.info("columnAD = " + columnAD);
-			// TODO: ???
+			String repayAmt = columnAD;
+			if (repayAmt != null && !repayAmt.isEmpty()) {
+				try {
+					new BigDecimal(repayAmt);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:AD ,行數:" + row + ",借款金額有輸入時需為數字,借款金額=" + repayAmt);
+				}
+			}
 
 			// 保險單號碼
 			String columnAE = makeExcel.getValue(row, 31).toString();
@@ -595,14 +589,14 @@ public class L2419 extends TradeBuffer {
 			String columnAF = makeExcel.getValue(row, 32).toString();
 			this.info("columnAF = " + columnAF);
 			String insuCompany = columnAF.substring(0, columnAF.indexOf("_"));
-			String insuCompanyX = columnAF.substring(columnAF.indexOf("_") + 1);
+//			String insuCompanyX = columnAF.substring(columnAF.indexOf("_") + 1);
 			checkCode(titaVo, "InsuCompany", insuCompany, "AF ,行數:" + row, "保險公司", insuCompany);
 
 			// 保險類別
 			String columnAG = makeExcel.getValue(row, 33).toString();
 			this.info("columnAG = " + columnAG);
 			String insuTypeCode = columnAG.substring(0, columnAG.indexOf("_"));
-			String insuTypeCodeX = columnAG.substring(columnAG.indexOf("_") + 1);
+//			String insuTypeCodeX = columnAG.substring(columnAG.indexOf("_") + 1);
 			checkCode(titaVo, "InsuTypeCode", insuTypeCode, "AG ,行數:" + row, "保險類別", insuTypeCode);
 
 			// 火災險保險金額
@@ -616,16 +610,40 @@ public class L2419 extends TradeBuffer {
 			// 火災險保費
 			String columnAI = makeExcel.getValue(row, 35).toString();
 			this.info("columnAI = " + columnAI);
-			// TODO: ???
+			String fireInsuExpense = columnAI;
+			if (fireInsuExpense != null && !fireInsuExpense.isEmpty()) {
+				try {
+					new BigDecimal(fireInsuExpense);
+				} catch (Exception e) {
+					throw new LogicException("E0015", "欄位:AI ,行數:" + row + ",火災險保費有輸入時需為數字,火災險保費=" + fireInsuExpense);
+				}
+			}
 
 			// 地震險保險金額
 			String columnAJ = makeExcel.getValue(row, 36).toString();
 			this.info("columnAJ = " + columnAJ);
-			// TODO: ???
+			String earthquakeInsuAmt = columnAJ;
+			if (earthquakeInsuAmt != null && !earthquakeInsuAmt.isEmpty()) {
+				try {
+					new BigDecimal(earthquakeInsuAmt);
+				} catch (Exception e) {
+					throw new LogicException("E0015",
+							"欄位:AI ,行數:" + row + ",地震險保險金額有輸入時需為數字,地震險保險金額=" + earthquakeInsuAmt);
+				}
+			}
 
 			// 地震險保費
 			String columnAK = makeExcel.getValue(row, 37).toString();
 			this.info("columnAK = " + columnAK);
+			String earthquakeInsuExpense = columnAK;
+			if (earthquakeInsuExpense != null && !earthquakeInsuExpense.isEmpty()) {
+				try {
+					new BigDecimal(earthquakeInsuExpense);
+				} catch (Exception e) {
+					throw new LogicException("E0015",
+							"欄位:AI ,行數:" + row + ",地震險保費有輸入時需為數字,地震險保費=" + earthquakeInsuExpense);
+				}
+			}
 
 			// 保險起日
 			String columnAL = makeExcel.getValue(row, 38).toString();
@@ -646,15 +664,15 @@ public class L2419 extends TradeBuffer {
 			// 所有權人1-所有權種類
 			String columnAN = makeExcel.getValue(row, 40).toString();
 			String ownerType1 = columnAN;
-			if (columnAN != null && !columnAN.isEmpty() && columnAN.indexOf("_") >= 1) {
+			if (columnAN != null && !columnAN.isEmpty() && columnAN.indexOf("_") >= 0) {
 				ownerType1 = columnAN.substring(0, columnAN.indexOf("_"));
 				ownerType1 = ownerType1.trim();
 			}
 			this.info("columnAN = " + columnAN);
 			// 2022-10-18 Wei 修改 from 2022-10-17 會議
 			// 所有權人1必須輸入，可以只輸入第一筆，留空白者複製前一筆所有權人資料
-			// TODO: 需判斷擔保品代號1為1房地時,所有權人1需填建物所有權人
-			// TODO: 當所有權人1的種類為空時,取前一筆資料的全部所有權人資料,若無前一筆資料的全部所有權人資料時,須給錯誤提示
+			// 需判斷擔保品代號1為1房地時,所有權人1需填建物所有權人
+			// 當所有權人1的種類為空時,取前一筆資料的全部所有權人資料,若無前一筆資料的全部所有權人資料時,須給錯誤提示
 
 			if (ownerType1 == null || ownerType1.isEmpty()) {
 				// CASE 1: 所有權人1-所有權種類為空白
@@ -705,7 +723,7 @@ public class L2419 extends TradeBuffer {
 			if (ownerRel1 == null || ownerRel1.isEmpty()) {
 				throw new LogicException("E0015", "欄位:AQ ,行數:" + row + ",有選擇所有權種類時,所有權人-與授信戶關係不得為空白.");
 			}
-			if (ownerRel1.indexOf("_") >= 1) {
+			if (ownerRel1.indexOf("_") >= 0) {
 				ownerRel1 = ownerRel1.substring(0, ownerRel1.indexOf("_"));
 				if (!ownerRel1.equals("00")) {
 					checkCode(titaVo, "GuaRelCode", ownerRel1, "AQ ,行數:" + row, "與授信戶關係", ownerRel1);
@@ -719,7 +737,7 @@ public class L2419 extends TradeBuffer {
 			if (columnAR == null || columnAR.isEmpty()) {
 				throw new LogicException("E0015", "欄位:AR ,行數:" + row + ",有選擇所有權種類時,所有權人-持份比率不得為空白.");
 			}
-			if (columnAR.indexOf("分之") >= 1) {
+			if (columnAR.indexOf("分之") >= 0) {
 				String ownerTotal = columnAR.substring(0, columnAR.indexOf("分之")); // 持份比率(分母)
 				String ownerPart = columnAR.substring(columnAR.indexOf("分之") + 2); // 持份比率(分子)
 				this.info("ownerPart = " + ownerPart);
@@ -756,7 +774,7 @@ public class L2419 extends TradeBuffer {
 			// 所有權人-所有權種類
 			String columnAN = makeExcel.getValue(row, column).toString();
 			String ownerType1 = columnAN;
-			if (columnAN != null && !columnAN.isEmpty() && columnAN.indexOf("_") >= 1) {
+			if (columnAN != null && !columnAN.isEmpty() && columnAN.indexOf("_") >= 0) {
 				ownerType1 = columnAN.substring(0, columnAN.indexOf("_"));
 				ownerType1 = ownerType1.trim();
 			}
@@ -796,7 +814,7 @@ public class L2419 extends TradeBuffer {
 			if (ownerRel1 == null || ownerRel1.isEmpty()) {
 				throw new LogicException("E0015", "行數:" + row + ",有選擇所有權種類時,所有權人" + ownerSeq + "-與授信戶關係不得為空白.");
 			}
-			if (ownerRel1.indexOf("_") >= 1) {
+			if (ownerRel1.indexOf("_") >= 0) {
 				ownerRel1 = ownerRel1.substring(0, ownerRel1.indexOf("_"));
 				if (!ownerRel1.equals("00")) {
 					checkCode(titaVo, "GuaRelCode", ownerRel1, "行數:" + row, "所有權人" + ownerSeq + "與授信戶關係", ownerRel1);
@@ -810,7 +828,7 @@ public class L2419 extends TradeBuffer {
 			if (columnAR == null || columnAR.isEmpty()) {
 				throw new LogicException("E0015", "行數:" + row + ",有選擇所有權種類時,所有權人" + ownerSeq + "-持份比率不得為空白.");
 			}
-			if (columnAR.indexOf("分之") >= 1) {
+			if (columnAR.indexOf("分之") >= 0) {
 				String ownerTotal = columnAR.substring(0, columnAR.indexOf("分之")); // 持份比率(分母)
 				String ownerPart = columnAR.substring(columnAR.indexOf("分之") + 2); // 持份比率(分子)
 				this.info("ownerPart = " + ownerPart);
