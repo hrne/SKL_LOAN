@@ -1068,8 +1068,8 @@ public class L4211Report extends MakeReport {
 	}
 
 	private void report3(List<Map<String, String>> fnAllList, boolean isBatchMapList) throws LogicException {
-		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
-		String lastAcctItem = ""; // 上一個AcctItem
+//		String lastSortingForSubTotal = ""; // 上一個SortingForSubTotal
+//		String lastAcctItem = ""; // 上一個AcctItem
 		String msName = ""; // 表頭P號
 		String msNum = ""; // 批次號碼
 		int count = 0;
@@ -1127,17 +1127,17 @@ public class L4211Report extends MakeReport {
 			if (!msName.equals(tfnAllList.get("ReconCode")) || !msNum.equals(tfnAllList.get("BatchNo"))) {
 
 				if (npcount > 0) { // 除當頁第一筆
-					this.print(1, 0,
-							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (lastSortingForSubTotal.equals("999")) {
-						this.print(1, 2, "暫收款");
-					} else {
-						this.print(1, 2, lastAcctItem);
-					}
-					this.print(0, 14, " 小計 ");
+//					this.print(1, 0,
+//							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+//					lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+//					if (lastSortingForSubTotal.equals("999")) {
+//						this.print(1, 2, "暫收款");
+//					} else {
+//						this.print(1, 2, lastAcctItem);
+//					}
+//					this.print(0, 14, " 小計 ");
 
-					atAll();
+//					atAll();
 
 					totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 					totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
@@ -1185,26 +1185,26 @@ public class L4211Report extends MakeReport {
 				// 當前的批號與批次號碼相同
 				if (tround > 0) {
 					// 判斷前一筆與當筆是否相同科目
-					String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
-					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
-						this.info("currSort     = " + currentSortingForSubTotal);
-						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
+//					String currentSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+//					if (!lastSortingForSubTotal.equals(currentSortingForSubTotal)) {
+//						this.info("currSort     = " + currentSortingForSubTotal);
+//						this.info("curracctItem = " + tfnAllList.get("AcctItem"));
 
-						this.print(1, 0,
-								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						if (lastSortingForSubTotal.equals("999")) {
-							this.print(1, 2, "暫收款");
-						} else {
-							this.print(1, 2, lastAcctItem);
-						}
-						this.print(0, 14, " 小計 ");
+//						this.print(1, 0,
+//								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+//						if (lastSortingForSubTotal.equals("999")) {
+//							this.print(1, 2, "暫收款");
+//						} else {
+//							this.print(1, 2, lastAcctItem);
+//						}
+//						this.print(0, 14, " 小計 ");
 
-						atAll();
+//						atAll();
 
-						this.print(1, 0, "");
+//						this.print(1, 0, "");
 
-						pageCnt = pageCnt + 2;
-
+//						pageCnt = pageCnt + 2;
+//
 						totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 						totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);
 						totalsumPrincipal = totalsumPrincipal.add(allsumPrincipal);
@@ -1226,7 +1226,7 @@ public class L4211Report extends MakeReport {
 						allsumCollection = BigDecimal.ZERO;
 						allsumShortPayment = BigDecimal.ZERO;
 						allsumOthers = BigDecimal.ZERO;
-					}
+//					}
 
 				}
 
@@ -1253,9 +1253,9 @@ public class L4211Report extends MakeReport {
 			pageCnt++;
 
 			// 第一筆或相同的時候放入暫存 給下次一筆 比對使用
-			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
+//			lastSortingForSubTotal = tfnAllList.get("SortingForSubTotal");
 
-			lastAcctItem = tfnAllList.get("AcctItem");
+//			lastAcctItem = tfnAllList.get("AcctItem");
 
 			// 報表邏輯及排序
 
@@ -1363,16 +1363,16 @@ public class L4211Report extends MakeReport {
 
 			// 最後一筆產出
 			if (count == fnAllList.size()) {
-				this.print(1, 0,
-						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-				if (lastSortingForSubTotal.equals("999")) {
-					this.print(1, 2, "暫收款");
-				} else {
-					this.print(1, 2, lastAcctItem);
-				}
-				this.print(0, 14, " 小計 ");
-
-				atAll();
+//				this.print(1, 0,
+//						"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+//				if (lastSortingForSubTotal.equals("999")) {
+//					this.print(1, 2, "暫收款");
+//				} else {
+//					this.print(1, 2, lastAcctItem);
+//				}
+//				this.print(0, 14, " 小計 ");
+//
+//				atAll();
 
 				totalsumTransferAmt = totalsumTransferAmt.add(allsumTransferAmt);
 				totalsumMakerferAmt = totalsumMakerferAmt.add(allsumMakeferAmt);

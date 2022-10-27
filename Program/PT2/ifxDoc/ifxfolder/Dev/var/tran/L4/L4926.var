@@ -48,6 +48,7 @@ E(0,0)
 ["#FdReconCode+對帳類別  ",#ReconCode,#ReconCodeX],
 ["#FdEntryDate+入帳日期",#EntryDate],
 ["#FdCustNo+戶號","#CustNo],
+["#FdRepayAmt+交易金額","#RepayAmt],
 ["#FdTraderInfo+交易人資料","#TraderInfo],
 ]
 !---------- AP Button AREA ----------
@@ -65,14 +66,29 @@ T(3, )
 T(3, )
 #FdTraderInfo=X,2,L
 T(3, )
+#FdRepayAmt=X,2,L
+T(3, )
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #ApHelp=x,1024,S
-T(3,CdCode.ReconCode)
+T(3,CdCode.BankReconCode)
 S(XXR99,01,#ApHelp)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,#HelpDesc1)
+
+!DscptCodeHelp
+#CDCODEDscptCode=x,20,S                  
+T(3,CdCode.BankRmftCode)
+#DscptCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEDscptCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@DscptCodeHelp,#HelpDesc1)
+
 
 
 #CHAIN=A,1,S
@@ -130,12 +146,15 @@ C(4,#ReconCode,$,s)
 C(4,#EntryDate,$,s)
 C(3,#CustNo,0,V(2,0),$)
 
+!金額
+#RepayAmt=m,14,I
 
 !交易人資料
 #TraderInfo=X,20,I
 @
-C(4,#ReconCode,C(3,#EntryDate,0,$,C(3,#CustNo,0,$,s)),C(3,#EntryDate,0,C(3,#CustNo,0,$,s),s))
+C(4,#ReconCode,C(3,#EntryDate,0,$,C(3,#CustNo,0,$,s)C(3,#RepayAmt,0,$,s)),C(3,#EntryDate,0,C(3,#CustNo,0,$,s)C(3,#RepayAmt,0,$,s),s))
 V(7)
+
 
 
 #RPTFG=A,1,S
@@ -203,6 +222,12 @@ X(#OORepayAmt1)
 #OORepayType=X,2,S
 !摘要代碼
 #OODscptCode=X,4,S
+#OODscptCodeX=X,20,O
+T(H,#OODscptCode,#DscptCodeHelp)
+
+#OODscptCodeX2=X,50,O
+T(2,#OODscptCode+#OODscptCodeX)
+
 !匯款銀行代碼
 #OORemintBank=X,7,S
 
@@ -250,6 +275,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L4927;text=查詢;ntxbuf=#OOBUF5})
 #EntryDate
 #CustNo
 #TraderInfo
+#RepayAmt
 #END
 </sub>
 
@@ -321,8 +347,8 @@ TXFORM=L4926
 #OORepayAmtX=還款金額
 {width:140,align:'right'}
 
-#OODscptCode=摘要代碼
-{width:80,align:'left'}
+#OODscptCodeX2=摘要代碼
+{width:100,align:'left'}
 
 #OOTraderInfo=交易人資料
 {width:150,align:'left'}

@@ -64,8 +64,8 @@ BEGIN
     WITH "Work_Temp" AS (
           SELECT  LM."CustNo"
                  ,LM."FacmNo"
-                 ,SUM("LM.DrawdownAmt") AS "DrawdownAmt" -- 未動撥的預撥金額
-           FROM  "LoanBorMain"
+                 ,SUM(LM."DrawdownAmt") AS "DrawdownAmt" -- 未動撥的預撥金額
+           FROM  "LoanBorMain" LM
            LEFT JOIN "Ifrs9FacData" F ON F."CustNo" = LM."CustNo"
                                      AND F."FacmNo" = LM."FacmNo"
                                      AND F."DrawdownFg" = 0
@@ -74,7 +74,7 @@ BEGIN
            GROUP BY LM."CustNo", LM."FacmNo"
     )
 
-    WITH "Work_HP" AS (
+    , "Work_HP" AS (
 
     -- 撈符合條件額度資料，寫入 "Work_HP" 暫存檔
     SELECT A."CustNo"            AS "CustNo"

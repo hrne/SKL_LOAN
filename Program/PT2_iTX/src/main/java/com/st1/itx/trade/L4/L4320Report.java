@@ -191,8 +191,8 @@ public class L4320Report extends MakeReport {
 
 // 地區別
 // +1         +2          
-// 地區別下限 地區別上限
-// 1.85       2.8
+// 地區別上限  地區別下限 
+//  2.8       1.85      
 
 // 定期機動
 // 16       17      18           19           20                 
@@ -225,10 +225,10 @@ public class L4320Report extends MakeReport {
 							ii++;
 							makeExcel.setValue(row, ii, tLDVo.get(fdnm), "#0.####");
 							if (excelNo == 2 && i == 15) {
+								ii++; 
+								makeExcel.setValue(row, ii, tempVo.getParam("CityRateCeiling"), "#0.####");
 								ii++;
 								makeExcel.setValue(row, ii, tempVo.getParam("CityRateFloor"), "#0.####");
-								ii++;
-								makeExcel.setValue(row, ii, tempVo.getParam("CityRateCeiling"), "#0.####");
 							}
 							break;
 						case 16:

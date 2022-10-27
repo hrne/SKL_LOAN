@@ -92,6 +92,7 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iFacmNo != 0) {
 			sql += "     and M.\"FacmNo\" = :iFacmNo  ";
 		}
+		sql += " order by \"FacmNo\" ";
 
 		this.info("L9706 Simplsql=" + sql);
 		Query query;

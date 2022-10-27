@@ -59,6 +59,7 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFEntryDate = 0;
 		int iCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
 		String iTraderInfo = titaVo.getParam("TraderInfo");
+		int iRepayAmt = Integer.parseInt(titaVo.getParam("RepayAmt"));
 
 		if (iEntryDate > 0){
 			iFEntryDate = iEntryDate + 19110000 ;
@@ -96,7 +97,9 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iTraderInfo.isEmpty()) {
 			sql += " AND  \"TraderInfo\" like :traderInfo      \n";
 		}
-
+		if (iRepayAmt > 0 ) {
+			sql += " AND \"RepayAmt\" = :repayAmt  \n";
+		}
 		sql += " AND  NVL(\"AmlRsp\",'9') IN ('0','1','2')     \n";//排除已刪除資料
 		sql += "ORDER BY \"EntryDate\" DESC , \"CustNo\" , \"ReconCode\" ";
 
@@ -123,7 +126,9 @@ public class L4926ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iTraderInfo.isEmpty()) {
 			query.setParameter("traderInfo", "%" + iTraderInfo + "%");
 		}
-
+		if (iRepayAmt > 0 ) {
+			query.setParameter("repayAmt", iRepayAmt);
+		}
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 		

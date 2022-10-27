@@ -894,22 +894,27 @@ BEGIN
            + NVL("Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate"), 0)
                                            AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
          , CASE WHEN ML."LoanBalance" IS NULL OR ML1."LoanBalance" IS NULL THEN 0
+                WHEN ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  < 0 THEN 0
                 WHEN ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  <  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))  THEN 0
                 ELSE ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))
            END                             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額,調整轉催差額
          , CASE WHEN ML1."LoanBalance" IS NULL  THEN 0
+                WHEN ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) < 0 THEN 0
                 WHEN ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) < ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))  THEN 0 
                 ELSE ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) - ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))
            END                             AS  "DerY2Amt"        -- 個案減損客觀證據發生後第二年本金回收金額,調整轉催差額
          , CASE WHEN ML2."LoanBalance" IS NULL  THEN 0
+                WHEN ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) < 0 THEN 0
                 WHEN ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) < ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))  THEN 0 
                 ELSE ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) - ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))
            END                             AS  "DerY3Amt"        -- 個案減損客觀證據發生後第三年本金回收金額,調整轉催差額
          , CASE WHEN ML3."LoanBalance" IS NULL  THEN 0
+                WHEN ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) < 0 THEN 0
                 WHEN ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) < ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  THEN 0 
                 ELSE ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) - ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))
            END                             AS  "DerY4Amt"        -- 個案減損客觀證據發生後第四年本金回收金額,調整轉催差額
          , CASE WHEN ML4."LoanBalance" IS NULL  THEN 0
+                WHEN ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) < 0 THEN 0
                 WHEN ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) < ( NVL(ML5."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  THEN 0 
                 ELSE ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) - ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0))
            END                             AS  "DerY5Amt"        -- 個案減損客觀證據發生後第五年本金回收金額,調整轉催差額
