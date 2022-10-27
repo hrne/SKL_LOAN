@@ -41,6 +41,17 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
+/**
+ * Tita<br>
+ * CUST_NO=9,7<br>
+ * FACM_NO=9,3<br>
+ * COL_IND1=9,1<br>
+ * COL_IND2=9,2<br>
+ * COL_NO=9,7<br>
+ * SearchClsFg=X,1<br>
+ * END=X,1<br>
+ */
+
 @Service("L2017")
 @Scope("prototype")
 /**
@@ -139,11 +150,11 @@ public class L2017 extends TradeBuffer {
 			ClNoSt = iClNo;
 			ClNoEd = iClNo;
 		}
-
-		// wk
-		int wkClCode1 = 0;
-		int wkClCode2 = 0;
-		int wkClNo = 0;
+//
+//		// wk
+//		int wkClCode1 = 0;
+//		int wkClCode2 = 0;
+//		int wkClNo = 0;
 
 		// new ArrayList
 		List<ClFac> lClFac = new ArrayList<ClFac>();
@@ -272,14 +283,15 @@ public class L2017 extends TradeBuffer {
 
 			// 同一擔保品編號只顯示第一筆
 			String wkOrigInsuNo = "";
-			if (wkClCode1 == tmpClFac.getClCode1() && wkClCode2 == tmpClFac.getClCode2() && wkClNo == tmpClFac.getClNo()) {
-				wkOrigInsuNo = "";
-			} else {
-				wkOrigInsuNo = tInsuOrignal.getOrigInsuNo();
-			}
-			wkClCode1 = tmpClFac.getClCode1();
-			wkClCode2 = tmpClFac.getClCode2();
-			wkClNo = tmpClFac.getClNo();
+			wkOrigInsuNo = tInsuOrignal.getOrigInsuNo();
+//			if (wkClCode1 == tmpClFac.getClCode1() && wkClCode2 == tmpClFac.getClCode2() && wkClNo == tmpClFac.getClNo()) {
+//				wkOrigInsuNo = "";
+//			} else {
+//			wkOrigInsuNo = tInsuOrignal.getOrigInsuNo();
+//			}
+//			wkClCode1 = tmpClFac.getClCode1();
+//			wkClCode2 = tmpClFac.getClCode2();
+//			wkClNo = tmpClFac.getClNo();
 
 			// new occurs
 			OccursList occurslist = new OccursList();

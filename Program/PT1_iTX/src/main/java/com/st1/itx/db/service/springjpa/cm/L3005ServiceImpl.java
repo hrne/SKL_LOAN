@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -94,21 +95,22 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
 		sql += "  FROM																		";
 		sql += "   (SELECT																	";
-		sql += "      \"CustNo\"				AS	\"CustNo\"								";
-		sql += "     ,\"AcDate\"	            AS	\"AcDate\"								";
+		sql += "      \"CustNo\"		    AS	\"CustNo\"					    			";
+		sql += "     ,\"AcDate\"	        AS	\"AcDate\"						    		";
 		sql += "     ,\"TitaKinBr\"	        AS	\"TitaKinBr\"								";
 		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
 		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
-		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"  ORDER BY  				";
-		sql += " 	 \"AcDate\" Desc 														";
-		sql += "     ,\"TitaCalDy\" Desc	                    							";
-		sql += "     ,\"TitaCalTm\"	Desc                    								";
-		sql += "     ,\"TitaTxtNo\" Desc             	    								";
-		sql += "     ,\"AcSeq\"     Desc )  AS \"RowNumber\"  								";
+		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
+		sql += "      ,CASE WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'), ' ') IN ('0', '00') THEN 1 ELSE 0 END "; // 債協入帳分開控管
+		sql += " 	   ORDER BY \"AcDate\" Desc 											";
+		sql += "               ,\"TitaCalDy\" Desc	                    					";
+		sql += "               ,\"TitaCalTm\"	Desc                    					";
+		sql += "               ,\"TitaTxtNo\" Desc             	    						";
+		sql += "               ,\"AcSeq\"     Desc )  AS \"RowNumber\"  					";
 		sql += "    FROM																	";
 		sql += "      \"LoanBorTx\"															";
 		sql += "    WHERE \"CustNo\" = :CustNo                               				";
-		sql += "      AND \"TitaTxCd\" IN ('L3240','L3230','L3220','L3210','L3200','L3420','L3410','L3440','L3711','L3712')							";
+		sql += "      AND \"TitaTxCd\" IN ('L3200','L3210','L3220','L3230','L3410','L3420','L3410','L3440','L3711','L3712', 'L618B','L618C')							";
 		sql += "      AND \"TitaHCode\" = '0'											 	";
 		sql += "  ) 																		";
 		sql += "  	WHERE \"RowNumber\"	= 1													";
@@ -243,9 +245,45 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-
 	public int getSize() {
 		return cnt;
+	}
+	
+	public List<Map<String, String>> custNoLastLoanBorTx(int iCustNo, TitaVo titaVo) throws Exception {
+		String sql = "";
+		sql += "  SELECT																	";
+		sql += "  tx.*                                    						    	   	";
+		sql += "  FROM																		";
+		sql += "   (SELECT																	";
+		sql += "     \"LoanBorTx\".* 					    			                    ";
+		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
+		sql += "      ,CASE WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'), ' ') IN ('0', '00') THEN 1 ELSE 0 END "; // 債協入帳分開控管
+		sql += " 	   ORDER BY \"AcDate\" Desc 											";
+		sql += "               ,\"TitaCalDy\" Desc	                    					";
+		sql += "               ,\"TitaCalTm\"	Desc                    					";
+		sql += "               ,\"TitaTxtNo\" Desc             	    						";
+		sql += "               ,\"AcSeq\"     Desc )  AS \"RowNumber\"  					";
+		sql += "    FROM																	";
+		sql += "      \"LoanBorTx\"															";
+		sql += "    WHERE \"CustNo\" = :CustNo                               				";
+		sql += "      AND \"TitaTxCd\" IN ('L3200','L3210','L3220','L3230','L3410','L3420','L3410','L3440','L3711','L3712', 'L618B','L618C')							";
+		sql += "      AND \"TitaHCode\" = '0'											 	";
+		sql += "  ) tx																		";
+		sql += "  WHERE \"RowNumber\"	= 1													";
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		this.info("sql=" + sql);
+		query.setParameter("CustNo", iCustNo);
+		query.setFirstResult(0);
+		query.setMaxResults(this.limit);
+		List<Object> result = query.getResultList();
+		size = result.size();
+		this.info("Total size ..." + size);
+
+		return this.convertToMap(query);
 	}
 
 }

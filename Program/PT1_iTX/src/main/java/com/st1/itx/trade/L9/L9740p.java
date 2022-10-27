@@ -46,15 +46,23 @@ public class L9740p extends TradeBuffer {
 
 		l9740Report.setParentTranCode(parentTranCode);
 
-		int DrawDownDate = Integer.valueOf(titaVo.getParam("DrawDownDate")) + 19110000;
+		int DrawDownDate1 = Integer.valueOf(titaVo.getParam("DrawDownDate1")) + 19110000;
+
+		
+		int DrawDownDate2 = Integer.valueOf(titaVo.getParam("DrawDownDate2")) + 19110000;
+
+		
+		int DrawDownDate3 = Integer.valueOf(titaVo.getParam("DrawDownDate3")) + 19110000;
 		BigDecimal rate = new BigDecimal(titaVo.getParam("Rate"));
 
-		this.info("DrawDownDate = " + DrawDownDate);
+		this.info("DrawDownDate1 = " + DrawDownDate1);
+		this.info("DrawDownDate2 = " + DrawDownDate2);
+		this.info("DrawDownDate3 = " + DrawDownDate3);
 		this.info("rate = " + rate);
 
 		boolean isFinish = false;
 
-		isFinish = l9740Report.exec(titaVo, DrawDownDate, rate);
+		isFinish = l9740Report.exec(titaVo, DrawDownDate1, DrawDownDate2, DrawDownDate3, rate);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",

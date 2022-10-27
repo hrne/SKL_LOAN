@@ -50,14 +50,16 @@ public class L9740Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param iDate  撥款日(西元)
+	 * @param iDate1  撥款日1(西元)
+	 * @param iDate2  撥款日2(西元)
+	 * @param iDate3  撥款日3(西元)
 	 * @param rate   利率
 	 * @return
 	 * @throws LogicException
 	 *
 	 * 
 	 */
-	public boolean exec(TitaVo titaVo, int iDate, BigDecimal rate) throws LogicException {
+	public boolean exec(TitaVo titaVo, int iDate1, int iDate2,int iDate3,BigDecimal rate) throws LogicException {
 		this.info("L9740 exec");
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -83,13 +85,13 @@ public class L9740Report extends MakeReport {
 			this.rate = rate;
 
 			// Q9309141 新撥款之戶號
-			listL9740Data1 = l9740ServiceImpl.findPage1(titaVo, iDate);
+			listL9740Data1 = l9740ServiceImpl.findPage1(titaVo, iDate1);
 
 			// Q9309142 續期放款利率 最低、最高
-			listL9740Data2 = l9740ServiceImpl.findPage2(titaVo, iDate);
+			listL9740Data2 = l9740ServiceImpl.findPage2(titaVo, iDate2);
 
 			// Q9309143 利率超過 X.XX% 之借戶
-			listL9740Data3 = l9740ServiceImpl.findPage3(titaVo, iDate, rate);
+			listL9740Data3 = l9740ServiceImpl.findPage3(titaVo, iDate3, rate);
 
 			exportData(listL9740Data1, listL9740Data2, listL9740Data3);
 

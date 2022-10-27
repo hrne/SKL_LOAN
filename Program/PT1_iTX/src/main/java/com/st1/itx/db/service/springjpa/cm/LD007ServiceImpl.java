@@ -37,6 +37,8 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
 		String bsOfficer = titaVo.getParam("bsOfficer");
 		Boolean useBsOfficer = bsOfficer != null && !bsOfficer.trim().isEmpty();
+		int entDy = titaVo.getEntDyI();
+		this.info("entDy = " + entDy);
 
 		this.info(String.format("lD007.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useBfOfficer:%s", useWorkMonth, useCustNo, useFacmNo, useBsOfficer));
 
@@ -77,6 +79,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND F.\"FacmNo\" = B.\"FacmNo\" ";
 		sql += " WHERE B.\"DrawdownAmt\" > 0 ";
 		sql += "   AND B.\"PerfAmt\" > 0 ";
+		sql += "   AND B.\"PerfDate\" <= :entDy ";
 		if (useWorkMonth) {
 			sql += "   AND B.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
 		} else {
@@ -93,7 +96,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += " ORDER BY NLSSORT(B.\"BsOfficer\", 'NLS_SORT=EBCDIC') "; // 參考樣張，應是以此欄位排序；NLSSORT by EBCDIC 效果為英文先於數字
 		// 2022-08-25大約下午三點,與User珮君電話中討論LD007出表時排序方式,最後決定:房貸專員>戶號>額度>撥款
-		sql += "        , \"CustNo\" ";
+		sql += "        , \"CustNo\" "; 
 		sql += "        , \"FacmNo\" ";
 		sql += "        , \"BormNo\" ";
 
@@ -123,6 +126,8 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("bsOfficer", bsOfficer);
 		}
 
+		query.setParameter("entDy", entDy);
+		
 		return this.convertToMap(query);
 	}
 

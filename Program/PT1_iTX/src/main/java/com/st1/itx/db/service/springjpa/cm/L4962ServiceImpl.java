@@ -16,8 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L4962ServiceImpl")
 @Repository
@@ -29,12 +27,6 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
-
-	@Autowired
-	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -75,7 +67,7 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    \"CustNo\"                                                   ";
 		sql += "   ,\"FacmNo\"                                                   ";
 		sql += "     from \"CollList\"                                           ";
-		sql += "    where \"Status\" in ('0','2','4','6')                        ";
+		sql += "    where \"Status\" in ('0','2','4','6','7')                    ";
 		sql += " ) coll                                                          ";
 		sql += " left join \"ClFac\" cf   on cf.\"CustNo\" = coll.\"CustNo\"     ";
 		sql += "                       and cf.\"FacmNo\" = coll.\"FacmNo\"       ";

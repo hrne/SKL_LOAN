@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -287,8 +288,10 @@ public class L3240 extends TradeBuffer {
 			wkRepayCode = tx.getRepayCode();
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 			wkBorxNo = tx.getBorxNo();
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(tx.getOtherFields());
 			if ("L3410".equals(tx.getTitaTxCd()) || "L3420".equals(tx.getTitaTxCd())) {
-				iCaseCloseCode = this.parse.stringToInteger(titaVo.getParam("CaseCloseCode"));
+				iCaseCloseCode = this.parse.stringToInteger(tTempVo.getParam("CaseCloseCode"));
 				// 還原催收檔
 				if (iCaseCloseCode >= 3) {
 					RestoredOverdueRoutine(iCaseCloseCode, tx);

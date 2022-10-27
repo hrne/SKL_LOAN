@@ -622,8 +622,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
-#OOBTN24=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN24',align:'center',canExport:false}
+!#OOBTN24=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN24',align:'center',canExport:false}
 ^
 #RPTFG=5,QUERY.GRID,L8030
 #any={detail:true, header:'L8030C.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -678,8 +678,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
-#OOBTN24=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN24',align:'center',canExport:false}
+!#OOBTN24=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN24',align:'center',canExport:false}
 ^
 #RPTFG=7,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -707,8 +707,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
-#OOBTN34=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN34',align:'center',canExport:false}
+!#OOBTN34=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN34',align:'center',canExport:false}
 ^
 #RPTFG=8,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -734,8 +734,8 @@ TXFORM=L8030
 {width:150,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN35=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN35',align:'center',canExport:false}
+!#OOBTN35=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN35',align:'center',canExport:false}
 ^
 
 #RPTFG=D,QUERY.GRID,L8030
@@ -762,8 +762,8 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN22=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN22',align:'center',canExport:false}
+!#OOBTN22=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN22',align:'center',canExport:false}
 ^
 #RPTFG=E,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -789,8 +789,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
-#OOBTN23=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN23',align:'center',canExport:false}
+!#OOBTN23=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN23',align:'center',canExport:false}
 ^
 #RPTFG=G,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -818,8 +818,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
-#OOBTN30=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN30',align:'center',canExport:false}
+!#OOBTN30=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN30',align:'center',canExport:false}
 ^
 #RPTFG=H,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -847,8 +847,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:140,align:'center',hidden:false}
-#OOBTN31=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN31',align:'center',canExport:false}
+!#OOBTN31=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN31',align:'center',canExport:false}
 ^
 #RPTFG=K,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -876,8 +876,8 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
-#OOBTN29=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN29',align:'center',canExport:false}
+!#OOBTN29=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN29',align:'center',canExport:false}
 ^
 #RPTFG=L,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -901,8 +901,8 @@ TXFORM=L8030
 {width:250,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN18=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN18',align:'center',canExport:false}
+!#OOBTN18=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN18',align:'center',canExport:false}
 ^
 #RPTFG=M,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -928,8 +928,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN20=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN20',align:'center',canExport:false}
+!#OOBTN20=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN20',align:'center',canExport:false}
 ^
 #RPTFG=N,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -955,8 +955,8 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN21=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN21',align:'center',canExport:false}
+!#OOBTN21=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN21',align:'center',canExport:false}
 ^
 #RPTFG=O,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -984,8 +984,8 @@ TXFORM=L8030
 {width:400,align:'left',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN19=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN19',align:'center',canExport:false}
+!#OOBTN19=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN19',align:'center',canExport:false}
 ^
 #RPTFG=P,QUERY.GRID,L8030
 #any={detail:true, header:'L8030C.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -1011,8 +1011,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN26=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN26',align:'center',canExport:false}
+!#OOBTN26=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN26',align:'center',canExport:false}
 ^
 #RPTFG=Q,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -1036,8 +1036,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN32=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN32',align:'center',canExport:false}
+!#OOBTN32=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN32',align:'center',canExport:false}
 ^
 #RPTFG=R,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -1063,8 +1063,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:170,align:'center',hidden:false}
-#OOBTN33=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN33',align:'center',canExport:false}
+!#OOBTN33=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN33',align:'center',canExport:false}
 ^
 #RPTFG=S,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -1090,8 +1090,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN27=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN27',align:'center',canExport:false}
+!#OOBTN27=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN27',align:'center',canExport:false}
 
 
 ^
@@ -1121,8 +1121,8 @@ TXFORM=L8030
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
-#OOBTN28=當前異動紀錄
-{width:180,search:false,formatter:'cust:bind-button:#OOBTN28',align:'center',canExport:false}
+!#OOBTN28=當前異動紀錄
+!{width:180,search:false,formatter:'cust:bind-button:#OOBTN28',align:'center',canExport:false}
 ^
 
 <include src="PRT.icf::INQ01.sel"/>

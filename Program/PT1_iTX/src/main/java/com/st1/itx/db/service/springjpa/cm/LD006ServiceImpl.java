@@ -34,11 +34,15 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// parse.stringToInteger handles null as 0
 		Boolean useWorkMonth = parse.stringToInteger(titaVo.getParam("workMonthStart")) > 0;
 		Boolean useCustNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0;
-		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
+		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0
+				&& parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
 		String introducer = titaVo.getParam("Introducer");
 		Boolean useIntroducer = introducer != null && !introducer.trim().isEmpty();
+		int entDy = titaVo.getEntDyI();
+		this.info("entDy = " + entDy);
 
-		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useIntroducer:%s", useWorkMonth, useCustNo, useFacmNo, useIntroducer));
+		this.info(String.format("lD006.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useIntroducer:%s",
+				useWorkMonth, useCustNo, useFacmNo, useIntroducer));
 		// check titaVo for input values
 
 		String sql = "";
@@ -63,7 +67,8 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示 此三金額修改為撥款層而非額度層總計
+		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\") AS \"PerfEqAmt\" "; // 換算業績 -- 20211201 依eric指示
+																						// 此三金額修改為撥款層而非額度層總計
 		sql += "       ,NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬 -- 參考L5051
 		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\") AS \"PerfAmt\" "; // 業績金額
 		sql += "       ,NVL(e1.\"AgLevel\", '')  AS \"AgLevel0\""; // 介紹人職等
@@ -100,6 +105,7 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND PIDA.\"AdjRange\" IN (1,2) ";
 		sql += " WHERE I.\"DrawdownAmt\" > 0 ";
 		sql += "   AND I.\"Introducer\" IS NOT NULL ";
+		sql += "   AND I.\"PerfDate\" <= :entDy ";
 		sql += "   AND ABS(NVL(PIDA.\"AdjPerfEqAmt\", I.\"PerfEqAmt\")) ";
 		sql += "       + ABS(NVL(PIDA.\"AdjPerfReward\", I.\"PerfReward\")) ";
 		sql += "       + ABS(NVL(PIDA.\"AdjPerfAmt\", I.\"PerfAmt\")) > 0 ";
@@ -132,7 +138,8 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
 			query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
 		} else {
-			query.setParameter("drawdownDateStart", parse.stringToInteger(titaVo.getParam("drawdownDateStart")) + 19110000);
+			query.setParameter("drawdownDateStart",
+					parse.stringToInteger(titaVo.getParam("drawdownDateStart")) + 19110000);
 			query.setParameter("drawdownDateEnd", parse.stringToInteger(titaVo.getParam("drawdownDateEnd")) + 19110000);
 		}
 
@@ -147,6 +154,8 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (useIntroducer) {
 			query.setParameter("introducer", introducer);
 		}
+
+		query.setParameter("entDy", entDy);
 
 		return this.convertToMap(query);
 	}

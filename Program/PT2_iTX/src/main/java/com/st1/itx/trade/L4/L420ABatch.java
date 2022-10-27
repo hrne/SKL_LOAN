@@ -393,7 +393,7 @@ public class L420ABatch extends TradeBuffer {
 		iTempVo = iTempVo.getVo(tDetail.getProcNote());
 		// 檢核失敗
 		if (!"4".equals(tDetail.getProcStsCode())) {
-			addL4211TempAmt(tDetail, iBatxList, titaVo);
+			addL4211TempAmt(tDetail, iTempVo, iBatxList, titaVo);
 		}
 		// 檢核正常
 		if ("4".equals(tDetail.getProcStsCode())) {
@@ -415,18 +415,17 @@ public class L420ABatch extends TradeBuffer {
 				} else {
 					facAcctItem = getCdCode("AcctCode", facAcctCode, titaVo);
 				}
-				addL4211AcAmt(tDetail, baTxVo, titaVo);
+				addL4211AcAmt(tDetail, iTempVo, baTxVo, titaVo);
 			}
 		}
 	}
 
-	private void addL4211AcAmt(BatxDetail tDetail, BaTxVo baTxVo, TitaVo titaVo) throws LogicException {
+	private void addL4211AcAmt(BatxDetail tDetail, TempVo iTempVo, BaTxVo baTxVo, TitaVo titaVo) throws LogicException {
 		Map<String, String> da = new HashMap<>();
 		da.put("ReconCode", "" + tDetail.getReconCode());
 		da.put("BatchNo", "" + tDetail.getBatchNo());
 		da.put("EntryDate", "" + tDetail.getEntryDate());
 		da.put("DetailSeq", "" + tDetail.getDetailSeq());
-		da.put("RepayAmt", "" + tDetail.getRepayAmt());
 		da.put("RepayAmt", "" + tDetail.getRepayAmt());
 		da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 		da.put("TxAmt", "" + baTxVo.getTxAmt());
@@ -435,7 +434,7 @@ public class L420ABatch extends TradeBuffer {
 				+ parse.IntegerToString(baTxVo.getFacmNo(), 3) + "-" + parse.IntegerToString(baTxVo.getBormNo(), 3));
 		da.put("PaidTerms", baTxVo.getPaidTerms() > 0 ? "" + baTxVo.getPaidTerms() : "");
 		da.put("CustName", custName);
-		da.put("CloseReasonCode", tTempVo.getParam("CloseReasonCode"));
+		da.put("CloseReasonCode", iTempVo.getParam("CloseReasonCode"));
 		da.put("IntStartDate", "" + baTxVo.getIntStartDate());
 		da.put("IntEndDate", "" + baTxVo.getIntEndDate());
 		da.put("Principal", "" + baTxVo.getPrincipal().add(baTxVo.getShortFallPrin()).subtract(baTxVo.getUnpaidPrin())); // //
@@ -458,9 +457,8 @@ public class L420ABatch extends TradeBuffer {
 		this.info("addL4211AcAmt = " + da.toString());
 	}
 
-	private void addL4211TempAmt(BatxDetail tDetail, ArrayList<BaTxVo> iBatxList, TitaVo titaVo) throws LogicException {
-		TempVo iTempVo = new TempVo();
-		iTempVo = iTempVo.getVo(tDetail.getProcNote());
+	private void addL4211TempAmt(BatxDetail tDetail, TempVo iTempVo, ArrayList<BaTxVo> iBatxList, TitaVo titaVo)
+			throws LogicException {
 		BigDecimal wkTempBal = BigDecimal.ZERO;
 		if (iTempVo.get("MergeAmt") != null) {
 			wkTempBal = parse.stringToBigDecimal(iTempVo.getParam("MergeTempAmt"));
@@ -480,7 +478,6 @@ public class L420ABatch extends TradeBuffer {
 			da.put("BatchNo", "" + tDetail.getBatchNo());
 			da.put("EntryDate", "" + tDetail.getEntryDate());
 			da.put("DetailSeq", "" + tDetail.getDetailSeq());
-			da.put("RepayAmt", "" + tDetail.getRepayAmt());
 			da.put("RepayAmt", "" + tDetail.getRepayAmt());
 			da.put("AcSeq", parse.IntegerToString(baTxVo.getAcSeq(), 4));
 			da.put("TxAmt", "" + tDetail.getRepayAmt());

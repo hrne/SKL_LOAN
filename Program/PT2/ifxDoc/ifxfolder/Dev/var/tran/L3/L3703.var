@@ -113,17 +113,19 @@ C(3,#CHAIN,1,s,$)
 
 #FdLoanNoteCode=X,2,L
 #LoanNoteCode=A,3,I
+C(4,#Note,$,S)
 HELP(#LoanNoteCodeHelp)
 @C(4,#LoanNoteCode,S,V(H,#LoanNoteCodeHelp))
 
  
-#FdRmkDesc =X,2,L
+#FdRmkDesc=X,2,L
 
 !#Note=c,120,I
 #Note=x,10.50,I
 C(3,#Note,1,s,$)
 T(2,@Note,#Note)
-C(4,#LoanNoteCode,$,T(H,#LoanNoteCode,#LoanNoteCodeHelp))
+C(4,#Note,C(4,#LoanNoteCode,$,T(H,#LoanNoteCode,#LoanNoteCodeHelp)),$)
+
 
 
 #MRKEY=_,_,S

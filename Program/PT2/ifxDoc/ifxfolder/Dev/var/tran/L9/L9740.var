@@ -44,10 +44,15 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[180,850];printer.width=[20,20];">
 [
 ["[L9740]                                 公會無自用住宅利率報送"],
-["@撥款日期",#DrawDownDate],
+["新撥款之借戶"],
+["@撥款日期",#DrawDownDate1],
+["續期放款利率 最低、最高"],
+["@撥款日期",#DrawDownDate2],
+["利率超過之借戶"],
+["@撥款日期",#DrawDownDate3],
 ["@續期放款利率大於",#Rate,"％"],
 ]
 !---------- AP TEXT AREA Variables ----------
@@ -68,12 +73,22 @@ T(B,#WkDate+01)
 #DT2=D,7,S
 E(0,#WkDate)
 
+
 ![撥款日]
-#DrawDownDate=D,7,I
-E(0,#DT2)
+#DrawDownDate1=D,7,I
+E(0,#DT1)
 @V(7)
-A(DATE,0,#DrawDownDate)
-!V(5,#DT2, 9999999)
+A(DATE,0,#DrawDownDate1)
+
+#DrawDownDate2=D,7,I
+E(0,#DT1)
+@V(7)
+A(DATE,0,#DrawDownDate2)
+
+#DrawDownDate3=D,7,I
+E(0,#DT1)
+@V(7)
+A(DATE,0,#DrawDownDate3)    
 
 #Rate=n,2.2,I
 @V(5,0.00,99.99)
@@ -107,7 +122,9 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DrawDownDate
+#DrawDownDate1
+#DrawDownDate2
+#DrawDownDate3
 #Rate
 </sub>
 
