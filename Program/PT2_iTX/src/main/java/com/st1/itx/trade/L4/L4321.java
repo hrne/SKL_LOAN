@@ -11,6 +11,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4321")
@@ -22,9 +23,12 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4321 extends TradeBuffer {
+
+	@Autowired
+	public MakeReport makeReport;
 	@Autowired
 	public Parse parse;
-	
+
 	private int iTxKind = 0;
 	private int iCustType = 0;
 	private int iAdjCode = 0;
@@ -87,9 +91,10 @@ public class L4321 extends TradeBuffer {
 		default:
 			break;
 		}
-		
+		fileNm += makeReport.showTime(titaVo.getCalTm());
+
 		titaVo.putParam("FileNm", fileNm);
-		titaVo.putParam("iCode", "L4320");
+		titaVo.putParam("iCode", "L4321");
 		titaVo.putParam("iItem", fileNm);
 
 		// 執行交易

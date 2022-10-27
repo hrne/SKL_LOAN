@@ -131,6 +131,10 @@ C(3,#TxAmt1,0,T(3,)T(3,@CurName,),X(#TxAmt1)) ! 金額為0時隱藏幣別與金�
 #TlrNo=X,20,S
 #FlowType=X,1,S
 #FlowStep=A,1,S
+#iCode=X,20,S
+#FileNm=x,40,S
+#iItem=x,40,S
+
 #TypeX=X,4,S
 C(3,#FlowStep,3,T(3,審核放行),T(3,放行))
 
@@ -143,7 +147,15 @@ T(6A,#Entdy+#TxNo+#Actfg)
 #BTN=X,1,S
 BIND(grid,{ cmd=APPROVAL;once=1; ntxcd=#TranCode; txno=#RimData;rim=LCR03})
 
-!! ---------------- batch variables -------------------------------
+
+#Lc009Buf=x,100,S
+T(2,      +#iCode+#iItem+#Entdy)
+
+#BTN2=X,1,S
+! BIND(grid,{ cmd=APPROVAL;once=1; ntxcd=#TranCode; txno=#RimData;rim=LC009})
+C(4,#iCode,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN;ntxcd=LC009; text=單據; ntxbuf=#Lc009Buf}))
+
+! ---------------- batch variables -------------------------------
 #batch-detail=x,100000,S
 
 #batch-print=A,1,S
@@ -191,6 +203,9 @@ TXFORM=LC003
 #TlrNo
 #FlowType
 #FlowStep
+#iCode
+#FileNm
+#iItem
 ^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
@@ -244,6 +259,9 @@ ifxBatch:{
 
 #TxAmtX=金額
 {width:120,align:'right'}
+
+#BTN2=單據
+{width:40,search:false,formatter:'cust:bind-button:單據',canExport:false,align:'center'}
 
 #BrNo=使用單位
 {width:150,align:'left'}

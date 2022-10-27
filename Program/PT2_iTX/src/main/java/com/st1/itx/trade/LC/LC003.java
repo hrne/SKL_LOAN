@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -89,7 +90,8 @@ public class LC003 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
 
-		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index, this.limit);
+		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index,
+				this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 		if (lTxFlow == null) {
 			throw new LogicException(titaVo, "E0001", "放行資料");
@@ -122,7 +124,17 @@ public class LC003 extends TradeBuffer {
 				occursList.putParam("CalTime", tTxRecord.getCalTime());
 				occursList.putParam("Entdy", tTxRecord.getEntdy());
 				occursList.putParam("TxNo", tTxRecord.getTxNo());
-
+				String iCode = "";
+				String fileNm = "";
+				String iItem = "";
+				TempVo tTempVo = new TempVo();
+				tTempVo.clear();
+				if (tTxRecord.getTranData() != null) {
+					tTempVo = tTempVo.getVo(tTxRecord.getTranData());
+					iCode = tTempVo.get("iCode");
+					fileNm = tTempVo.get("FileNm");
+					iItem = tTempVo.get("iItem");
+				}
 				String tran = tTxRecord.getTranNo();
 				TxTranCode txTranCode = txTranCodeService.findById(tTxRecord.getTranNo(), titaVo);
 				if (txTranCode != null) {
@@ -150,6 +162,10 @@ public class LC003 extends TradeBuffer {
 
 				occursList.putParam("FlowType", tTxFlow.getFlowType());
 				occursList.putParam("FlowStep", tTxFlow.getFlowStep());
+				occursList.putParam("iCode", iCode);
+				occursList.putParam("FileNm", fileNm);
+				occursList.putParam("iItem", iItem);
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
