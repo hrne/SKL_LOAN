@@ -170,6 +170,9 @@ public class L5971 extends TradeBuffer {
 					int TotalPeriod = NegMainVO.getTotalPeriod();// 期數
 					int RepaidPeriod = NegMainVO.getRepaidPeriod();// 已繳期數
 					OORemainPeriod = TotalPeriod - RepaidPeriod;
+					if (OORemainPeriod < 0) {//轉舊資料時有錯誤的已經期數造成期數為負值,調整為0 - 2022/10/28
+						OORemainPeriod = 0;
+					}
 					NegMainStatus = NegMainVO.getStatus();
 					NegMainAccuSklShareAmt = NegMainVO.getAccuSklShareAmt();
 				}

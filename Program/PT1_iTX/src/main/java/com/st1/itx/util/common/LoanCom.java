@@ -3,6 +3,7 @@ package com.st1.itx.util.common;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -11,10 +12,9 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TempVo;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdCode;
@@ -44,8 +44,8 @@ import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.TxRecordService;
+import com.st1.itx.db.service.springjpa.cm.L3005ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -121,6 +121,8 @@ public class LoanCom extends TradeBuffer {
 	DateUtil dDateUtil;
 	@Autowired
 	LoanDueAmtCom loanDueAmtCom;
+	@Autowired
+	L3005ServiceImpl l3005ServiceImpl;
 
 	/**
 	 * 設定交易暫存檔(TxTemp)的共同資料
@@ -1150,31 +1152,35 @@ public class LoanCom extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void checkEraseCustNoTxSeqNo(int iCustNo, TitaVo titaVo) throws LogicException {
-		// CustNo = ,AND TitaHCode = ,AND Displayflag ^i
+		this.info("checkEraseCustNoTxSeqNo ... ");
 		if (iCustNo == this.txBuffer.getSystemParas().getLoanDeptCustNo()
 				|| iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
 			return;
 		}
-		List<String> lTitaTxCd = new ArrayList<String>();
-		lTitaTxCd.add("L3200");
-		lTitaTxCd.add("L3210");
-		lTitaTxCd.add("L3220");
-		lTitaTxCd.add("L3230");
-		lTitaTxCd.add("L3410");
-		lTitaTxCd.add("L3420");
-		lTitaTxCd.add("L3440");
-		lTitaTxCd.add("L3711");
-		lTitaTxCd.add("L3712");
-		lTitaTxCd.add("L618B"); // 火險費轉列催收
-		lTitaTxCd.add("L618C"); // 法務費轉列催收
-		LoanBorTx tx = loanBorTxService.custNoLastTxtNoFirst(iCustNo, "0", lTitaTxCd, titaVo);
-		if (tx == null) {
-			throw new LogicException(titaVo, "E0001", "同戶帳務交易 戶號=" + iCustNo); // 查詢資料不存在
+
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
+		try {
+			resultList = l3005ServiceImpl.custNoLastLoanBorTx(iCustNo, titaVo);
+		} catch (Exception e) {
+			this.info("Error ... " + e.getMessage());
 		}
-		String orgTxSeq = tx.getTitaKinBr() + tx.getTitaTlrNo() + tx.getTitaTxtNo();
-		// this.info("checkEraseCustNoTxSeqNo " + +tx.getAcDate() + "-" + orgTxSeq);
-		if (tx.getAcDate() != titaVo.getOrgEntdyI() || !orgTxSeq.equals(titaVo.getOrgTxSeq())) {
-			throw new LogicException(titaVo, "E3088", "同戶帳務最近一筆交易序號 = " + tx.getAcDate() + "-" + orgTxSeq); // 放款交易訂正須由最後一筆交易開始訂正
+
+		String orgTxSeq = "";
+		int acDate = 0;
+		boolean isCustNoLastTx = false;
+		if (resultList != null && resultList.size() != 0) {
+			this.info("Size =" + resultList.size());
+			for (Map<String, String> result : resultList) {
+				orgTxSeq = result.get("TitaKinBr") + result.get("TitaTlrNo") + result.get("TitaTxtNo");
+				acDate = parse.stringToInteger(result.get("AcDate")) - 19110000;
+				if (acDate == titaVo.getOrgEntdyI() && orgTxSeq.equals(titaVo.getOrgTxSeq())) {
+					isCustNoLastTx = true;
+				}
+			}
+		}
+		if (!isCustNoLastTx ) {
+			throw new LogicException(titaVo, "E3088", "同戶帳務最近一筆交易序號 = " + acDate + "-" + orgTxSeq); // 放款交易訂正須由最後一筆交易開始訂正
 		}
 	}
 

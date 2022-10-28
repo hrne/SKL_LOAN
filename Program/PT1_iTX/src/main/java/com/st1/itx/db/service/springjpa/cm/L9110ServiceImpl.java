@@ -588,6 +588,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        END                            AS F58違約適用方式 ";
 		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
 		sql += "      , FAC.\"BaseRateCode\"       	   AS F60指標利率代碼 ";
+		sql += "      , FAC.\"LastBormNo\"       	   AS F61最後撥款序號 ";
 		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // 客戶資料主檔
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // 額度主檔

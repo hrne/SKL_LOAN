@@ -107,15 +107,18 @@ public class BS720 extends TradeBuffer {
 		// 寫入應處理清單 ACCL04-折溢價攤銷入帳
 
 		// 1.刪除處理清單 ACCL04-折溢價攤銷入帳 //
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL04", 0, 3, this.index, Integer.MAX_VALUE);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL04", 0, 3, this.index,
+				Integer.MAX_VALUE);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
 		}
 
 		procTxToDo(iYearMonth, titaVo);
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(), "請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L9719", titaVo.getTlrNo(), "請列印 放款利息法折溢價攤銷表", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
+				"請執行 各項提存入帳作業(折溢價攤銷)", titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L9719", titaVo.getTlrNo(),
+				"請列印 放款利息法折溢價攤銷表", titaVo);
 
 		this.batchTransaction.commit();
 		return null;
@@ -125,7 +128,8 @@ public class BS720 extends TradeBuffer {
 		List<Ias39IntMethod> lIas39IntMethod = new ArrayList<Ias39IntMethod>();
 
 //      吃檔                                            
-		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
+		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -170,7 +174,8 @@ public class BS720 extends TradeBuffer {
 				tIas39IntMethod.setPrincipal(parse.stringToBigDecimal(tempOccursList.get("Principal")));
 				tIas39IntMethod.setBookValue(parse.stringToBigDecimal(tempOccursList.get("BookValue")));
 				tIas39IntMethod.setAccumDPAmortized(parse.stringToBigDecimal(tempOccursList.get("AccumDPAmortized")));
-				tIas39IntMethod.setAccumDPunAmortized(parse.stringToBigDecimal(tempOccursList.get("AccumDPunAmortized")));
+				tIas39IntMethod
+						.setAccumDPunAmortized(parse.stringToBigDecimal(tempOccursList.get("AccumDPunAmortized")));
 				tIas39IntMethod.setDPAmortized(parse.stringToBigDecimal(tempOccursList.get("DPAmortized")));
 				lIas39IntMethod.add(tIas39IntMethod);
 			}
@@ -178,8 +183,35 @@ public class BS720 extends TradeBuffer {
 		}
 		if (lIas39IntMethod.size() > 0) {
 			// 刪檔
-			Slice<Ias39IntMethod> slIas39IntMethod = ias39IntMethodService.findYearMonthEq(iYearMonth, 0, Integer.MAX_VALUE, titaVo);
-			List<Ias39IntMethod> oListIas39IntMethod = slIas39IntMethod == null ? null : new ArrayList<Ias39IntMethod>(slIas39IntMethod.getContent());
+			Slice<Ias39IntMethod> slIas39IntMethod = ias39IntMethodService.findYearMonthEq(iYearMonth, 0,
+					Integer.MAX_VALUE, titaVo);
+			List<Ias39IntMethod> oListIas39IntMethod = slIas39IntMethod == null ? null
+					: new ArrayList<Ias39IntMethod>(slIas39IntMethod.getContent());
+			if (oListIas39IntMethod != null) {
+				try {
+					ias39IntMethodService.deleteAll(oListIas39IntMethod);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new LogicException(titaVo, "E0008", "Ias39IntMethod利息法帳面資料檔" + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+			}
+			// 新增
+			try {
+				ias39IntMethodService.insertAll(lIas39IntMethod);
+			} catch (DBException e) {
+				e.printStackTrace();
+				throw new LogicException("E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+
+		}
+		this.info("setDataBaseOnMon...");
+		titaVo.setDataBaseOnMon();
+		if (lIas39IntMethod.size() > 0) {
+			// 刪檔
+			Slice<Ias39IntMethod> slIas39IntMethod = ias39IntMethodService.findYearMonthEq(iYearMonth, 0,
+					Integer.MAX_VALUE, titaVo);
+			List<Ias39IntMethod> oListIas39IntMethod = slIas39IntMethod == null ? null
+					: new ArrayList<Ias39IntMethod>(slIas39IntMethod.getContent());
 			if (oListIas39IntMethod != null) {
 				try {
 					ias39IntMethodService.deleteAll(oListIas39IntMethod);
@@ -241,8 +273,11 @@ public class BS720 extends TradeBuffer {
 		String acSubBookCode = this.txBuffer.getSystemParas().getAcSubBookCode();
 		// String acctCode = ;
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
+		String rvNo = "AC"
+				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(
+						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
+						6);
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL04"); // ACCL04-折溢價攤銷入帳
 		tTxToDoDetail.setDtlValue(rvNo);

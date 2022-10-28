@@ -18,8 +18,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcDetail;
-import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacCloseId;
 import com.st1.itx.db.domain.FacMain;
@@ -32,7 +30,6 @@ import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -40,9 +37,9 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
@@ -87,8 +84,6 @@ public class L3420 extends TradeBuffer {
 	public LoanIntDetailService loanIntDetailService;
 	@Autowired
 	public FacCloseService facCloseService;
-	@Autowired
-	public ClFacService clFacService;
 
 	@Autowired
 	Parse parse;
@@ -103,13 +98,13 @@ public class L3420 extends TradeBuffer {
 	@Autowired
 	LoanCom loanCom;
 	@Autowired
-	LoanSetRepayIntCom loanSetRepayIntCom;
+	private LoanSetRepayIntCom loanSetRepayIntCom;
 	@Autowired
-	LoanCalcRepayIntCom loanCalcRepayIntCom;
+	private LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
-	AcReceivableCom acReceivableCom;
+	private PfDetailCom pfDetailCom;
 	@Autowired
-	PfDetailCom pfDetailCom;
+	private LoanAvailableAmt loanAvailableAmt;
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -1673,7 +1668,11 @@ public class L3420 extends TradeBuffer {
 		if (iCaseCloseCode != 0 && iCaseCloseCode != 4 && iCaseCloseCode != 5 && iCaseCloseCode != 6) {
 			return;
 		}
-
+		
+		// 結清時判斷該戶號額度下主要擔保品的其他額度是否已全部結清
+		if (isAllClose) {
+			isAllClose = loanAvailableAmt.isAllCloseClFac(iCustNo, iFacmNo, titaVo);
+		}
 		if (isAllClose) {
 			if (titaVo.isHcodeNormal()) {
 				FacCloseNormal();
@@ -1683,14 +1682,7 @@ public class L3420 extends TradeBuffer {
 		}
 	}
 
-
 	private void FacCloseNormal() throws LogicException {
-		// 銀扣檢查主要擔保品的項下全部撥款餘額，若有餘額則不產生清償資料
-		if (iRpCode == 2) {
-			if (this.getMainClFacUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
-				return;
-			}
-		}
 		// 0:清償(必須為尚未結案)
 		tFacClose = facCloseService.findFacmNoFirst(iCustNo, iFacmNo, Arrays.asList(new String[] { "0" }), titaVo);
 		if (tFacClose == null) {
@@ -1726,26 +1718,6 @@ public class L3420 extends TradeBuffer {
 			}
 		}
 
-	}
-	// 主要擔保品的全部撥款餘額
-	private BigDecimal getMainClFacUtilAmt() throws LogicException {
-		BigDecimal wkUtilAmt = BigDecimal.ZERO;
-		ClFac tlClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);
-		if (tlClFac != null) {
-			Slice<ClFac> slClFac = clFacService.clNoEq(tlClFac.getClCode1(), tlClFac.getClCode2(), tlClFac.getClNo(), 0,
-					Integer.MAX_VALUE, titaVo);
-			if (slClFac != null) {
-				for (ClFac t : slClFac.getContent()) {
-					FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
-					if (t1FacMain == null) {
-						throw new LogicException(titaVo, "E0001", "額度主檔" + t.getCustNo() + "-" + t.getFacmNo()); // 查詢資料不存在
-					}
-					wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
-				}
-
-			}
-		}
-		return wkUtilAmt;
 	}
 
 	private void FacCloseErase() throws LogicException {

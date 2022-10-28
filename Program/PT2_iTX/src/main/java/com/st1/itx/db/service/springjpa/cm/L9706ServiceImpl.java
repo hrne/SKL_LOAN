@@ -69,6 +69,7 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              FROM ( SELECT  \"CustNo\"    ";
 		sql += "                             ,\"FacmNo\"    ";
 		sql += "                             ,\"BormNo\"    ";
+		sql += "                             MAX(\"AcDate\") as \"AcDate\" ";
 		//sql += "                             ,\"LoanBal\"   ";
 		//sql += "                             ,ROW_NUMBER() OVER (PARTITION By \"CustNo\", \"FacmNo\", \"BormNo\" ORDER BY \"BorxNo\" DESC) as ROW_NO   ";
 		sql += "                     FROM  \"LoanBorTx\"              ";
@@ -76,6 +77,10 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      and  \"AcDate\" <= :iDAY      ";
 		sql += "                      and \"TitaTxCd\" in ('L3100','L3200','L3240','L3410','L3420')  ";
 		sql += "                      and \"BormNo\" > 0  ";
+		sql += "                      group by ";
+		sql += "                             \"CustNo\"    ";
+		sql += "                             ,\"FacmNo\"    ";
+		sql += "                             ,\"BormNo\"    ";
 		sql += "               ) M";
 		sql += "                Left join \"LoanBorMain\" l ";
 		sql += "                        on  m.\"CustNo\" = l.\"CustNo\"    ";

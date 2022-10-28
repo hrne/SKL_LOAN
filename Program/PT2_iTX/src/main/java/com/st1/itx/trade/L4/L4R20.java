@@ -2,6 +2,9 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -14,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.domain.CdCityRate;
 import com.st1.itx.db.domain.CdCityRateId;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdCityRateService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -52,6 +56,25 @@ public class L4R20 extends TradeBuffer {
 		this.index = 0;
 		this.limit = Integer.MAX_VALUE;
 		Slice<CdCity> sCdCity = cdCityService.findAll(this.index, this.limit, titaVo);
+		if (sCdCity == null) {
+			throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
+		}
+		List<CdCity> lCdCity = new ArrayList<CdCity>(sCdCity.getContent());
+		Collections.sort(lCdCity, new Comparator<CdCity>() {
+			public int compare(CdCity c1, CdCity c2) {
+				// 六都排前面(05:台北市 10:新北市 15:桃園市 35:台中市 65:台南市 70:高雄市)
+				try {
+					if (getSort(c1) != getSort(c2)) {					
+						return getSort(c1) - getSort(c2); 
+					}
+				} catch (LogicException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return 0;
+			}
+		});
+
 		Slice<CdCityRate> sCdCityRate = cdCityRateService.findEffectDateEq(iWorkMonth + 191100, this.index, this.limit,
 				titaVo);
 
@@ -73,11 +96,9 @@ public class L4R20 extends TradeBuffer {
 			this.info("L4R20  需增加L4322 Grid長度 ..." + lCdCityL);
 		}
 
-		for (CdCity t : sCdCity.getContent()) {
-
+		for (CdCity t : lCdCity) {
 			CdCityRate tCdCityRate = cdCityRateService.findById(new CdCityRateId(iWorkMonth + 191100, t.getCityCode()),
 					titaVo);
-
 			BigDecimal intRateIncr = BigDecimal.ZERO;
 			BigDecimal intRateCeiling = BigDecimal.ZERO;
 			BigDecimal intRateFloor = BigDecimal.ZERO;
@@ -105,5 +126,17 @@ public class L4R20 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	// 六都排前面(05:台北市 10:新北市 15:桃園市 35:台中市 65:台南市 70:高雄市)
+	private int getSort(CdCity cd) throws LogicException {
+		int i = 99;
+		if (parse.isNumeric(cd.getCityCode())) {
+			i = parse.stringToInteger(cd.getCityCode());
+		}
+		if (i == 05 || i == 10 || i == 15 || i == 35 || i == 65 || i == 70) {
+			return -100 + i;
+		}
+		return i;
 	}
 }

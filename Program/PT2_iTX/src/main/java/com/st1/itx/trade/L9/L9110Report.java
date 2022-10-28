@@ -616,6 +616,17 @@ public class L9110Report extends MakeReport {
 
 			this.print(1, 5, "商品代碼 ..... " + FormatUtil.padX("" + tL9110.get("F22") + " " + tL9110.get("F59"), 14));
 			this.print(0, 35, "核准利率 ..... ");
+//			若未撥過款則抓最新指標利率+加減碼
+//			否則抓額度主檔核准利率
+			if (parse.stringToInteger(tL9110.get("F61")) == 0 && !"99".equals("F60")) {
+				this.print(0, 65,
+						formatAmt(
+								getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))),
+								4),
+						"R");
+			} else {
+				this.print(0, 65, formatAmt(parse.stringToBigDecimal(tL9110.get("F23")), 4), "R");
+			}
 			this.print(0, 65, formatAmt(
 					getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))), 4), "R");
 			this.print(0, 69, "利率調整週期 . " + tL9110.get("F24") + "月");
@@ -868,6 +879,13 @@ public class L9110Report extends MakeReport {
 					// 更新原DB
 					tFacMain = sFacMainService.holdById(tFacMain, titaVo);
 					tFacMain.setL9110Flag("Y");
+					if (tFacMain.getLastBormNo() == 0 && !"99".equals(tFacMain.getBaseRateCode())) {
+						BigDecimal approveRate = getBaseRate(tFacMain.getBaseRateCode(), titaVo)
+								.add(tFacMain.getRateIncr());
+						if (approveRate.compareTo(tFacMain.getApproveRate()) != 0) {
+							tFacMain.setApproveRate(approveRate);
+						}
+					}
 					try {
 						sFacMainService.update(tFacMain, titaVo);
 					} catch (DBException e) {

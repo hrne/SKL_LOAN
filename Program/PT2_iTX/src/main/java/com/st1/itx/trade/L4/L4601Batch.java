@@ -427,15 +427,15 @@ public class L4601Batch extends TradeBuffer {
 			}
 			return;
 		}
-//
-//		if ("Y".equals(tInsuRenew.getNotiTempFg())) {
-//			if ("".equals(checkResultA)) {
-//				checkResultA += "13";
-//			} else {
-//				checkResultA += ",13";
-//			}
-//			return;
-//		}
+
+		if (tInsuRenew.getRenewCode() != 2) {
+			if ("".equals(checkResultA)) {
+				checkResultA += "16";
+			} else {
+				checkResultA += ",16";
+			}
+			return;
+		}
 
 //		已入通知檔
 		if ("Y".equals(tInsuRenew.getNotiTempFg())) {

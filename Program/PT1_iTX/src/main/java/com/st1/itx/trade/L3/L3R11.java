@@ -36,12 +36,12 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -75,8 +75,6 @@ public class L3R11 extends TradeBuffer {
 	@Autowired
 	private Parse parse;
 	@Autowired
-	private DateUtil dDateUtil;
-	@Autowired
 	private BaTxCom baTxCom;
 	@Autowired
 	private LoanSetRepayIntCom loanSetRepayIntCom;
@@ -84,6 +82,8 @@ public class L3R11 extends TradeBuffer {
 	private LoanCalcRepayIntCom loanCalcRepayIntCom;
 	@Autowired
 	private LoanCloseBreachCom loanCloseBreachCom;
+	@Autowired
+	private LoanAvailableAmt loanAvailableAmt;
 
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
@@ -478,10 +478,13 @@ public class L3R11 extends TradeBuffer {
 				for (LoanBorMain ln : lLoanBorMain) {
 					if (ln.getBormNo() != iBormNo && (ln.getStatus() == 0 || ln.getStatus() == 4)) {
 						isAllClose = false;
-						break;
+						return;
 					}
 				}
 			}
+			// 結清時判斷該戶號額度下主要擔保品的其他額度是否已全部結清
+			isAllClose = loanAvailableAmt.isAllCloseClFac(iCustNo, iFacmNo, titaVo);
+			
 			// 清償作業檔
 			if (isAllClose) {
 				boolean isFindFacClose = false;

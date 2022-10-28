@@ -156,58 +156,43 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class TxBatchCom extends TradeBuffer {
 
-	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-
 	@Autowired
 	DateUtil dDateUtil;
-
 	@Autowired
 	public BaTxCom baTxCom;
-
 	@Autowired
 	public AcNegCom acNegCom;
-
 	@Autowired
 	public TxAmlCom txAmlCom;
-
 	@Autowired
 	LoanCom loanCom;
+	@Autowired
+	private LoanAvailableAmt loanAvailableAmt;
 
 	@Autowired
 	public LoanBookService loanBookService;
-
 	@Autowired
 	public FacCloseService facCloseService;
-
 	@Autowired
 	public FacMainService facMainService;
-
 	@Autowired
 	public BatxDetailService batxDetailService;
-
 	@Autowired
 	public BatxHeadService batxHeadService;
-
 	@Autowired
 	public BankRmtfService bankRmtfService;
-
 	@Autowired
 	public BankDeductDtlService bankDeductDtlService;
-
 	@Autowired
 	public EmpDeductDtlService empDeductDtlService;
-
 	@Autowired
 	public LoanChequeService loanChequeService;
-
 	@Autowired
 	public TxRecordService txRecordService;
-
 	@Autowired
 	public TxErrCodeService txErrCodeService;
-
 	@Autowired
 	public LoanCustRmkService loanCustRmkService;
 
@@ -1618,11 +1603,14 @@ public class TxBatchCom extends TradeBuffer {
 				// 處理說明:提前結案請先執行 L2631-清償作業(L2077)
 				if (this.closeFg == 2) {
 					this.checkMsg += " 繳息迄日:" + this.prevPayintDate;
-					facCloseRepayType(tBatxDetail, checkAmt, titaVo);
-					if (this.tTempVo.get("CloseReasonCode") == null) {
-						this.checkMsg += " 提前結案請先執行 L2631-清償作業(L2077)";
-						this.procStsCode = "2"; // 2.人工處理
-						break;
+					// 結清時判斷該戶號額度下主要擔保的其他額度是否已全部結清
+					if (loanAvailableAmt.isAllCloseClFac(tBatxDetail.getCustNo(), this.repayFacmNo, titaVo)) {
+						facCloseRepayType(tBatxDetail, checkAmt, titaVo);
+						if (this.tTempVo.get("CloseReasonCode") == null) {
+							this.checkMsg += " 提前結案且擔保品額度是已全部結清，請先執行 L2631-清償作業(L2077)";
+							this.procStsCode = "2"; // 2.人工處理
+							break;
+						}
 					}
 				}
 				// 檢核正常

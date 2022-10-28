@@ -21,6 +21,8 @@ import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 //  -----------------------  應處理清單維護 ------------------ 
@@ -86,18 +88,14 @@ import com.st1.itx.util.parse.Parse;
 public class TxToDoCom extends TradeBuffer {
 	@Autowired
 	public TxToDoDetailService txToDoDetailService;
-
 	@Autowired
 	public TxToDoMainService txToDoMainService;
-
 	@Autowired
 	private TxToDoDetailReserveService txToDoDetailReserveService;
-
 	@Autowired
 	Parse parse;
-
 	@Autowired
-	MakeReport makeReport;
+	MakeReport makeReport;	
 
 	private TxToDoDetail tDetail = new TxToDoDetail();
 	private TxToDoDetailId tDetailId = new TxToDoDetailId();
@@ -309,7 +307,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * add by Detail List
 	 * 
 	 * @param dupSkip    true: duplicate skip
-	 * @param HCode      0.新增 1.刪除  9.新增(有交易序號)
+	 * @param HCode      0.新增 1.刪除 9.新增(有交易序號)
 	 * @param detailList 應處理明細檔List
 	 * @param titaVo     TitaVo
 	 * @throws LogicException ...
@@ -479,31 +477,6 @@ public class TxToDoCom extends TradeBuffer {
 		delByDetailList(detailList, titaVo);
 
 		return;
-	}
-
-	/**
-	 * 刪除應處理明細檔BY交易序號
-	 * 
-	 * @param ItemCode  項目
-	 * @param TitaEntdy ..
-	 * @param TitaKinbr ..
-	 * @param TitaTlrNo ..
-	 * @param TitaTxtNo ..
-	 * @param titaVo    ..
-	 * @return 刪除筆數
-	 * @throws LogicException ...
-	 */
-	public int delDetailByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
-			TitaVo titaVo) throws LogicException {
-		int size = 0;
-		this.info("TxToDoCom ... delByDetailList ...");
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.findTxNoEq(ItemCode, TitaEntdy + 19110000, TitaKinbr,
-				TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index, Integer.MAX_VALUE, titaVo);
-		if (slTxToDoDetail != null) {
-			size = slTxToDoDetail.getContent().size();
-			delByDetailList(slTxToDoDetail.getContent(), titaVo);
-		}
-		return size;
 	}
 
 	/**

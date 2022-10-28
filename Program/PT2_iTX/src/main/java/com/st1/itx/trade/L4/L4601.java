@@ -77,7 +77,8 @@ public class L4601 extends TradeBuffer {
 			totaA.putParam("MSGID", "L461A");
 //			totaB.putParam("MSGID", "L461B");
 			totaC.putParam("MSGID", "L461C");
-			Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(iInsuEndMonth + "", iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
+			Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService
+					.fireInsuMonthRg(iInsuEndMonth + "", iInsuEndMonth + "", 0, Integer.MAX_VALUE, titaVo);
 			if (slInsuRenewMediaTemp != null) {
 				for (InsuRenewMediaTemp t : slInsuRenewMediaTemp.getContent()) {
 					if (!"".equals(reportA) && !"".equals(t.getCheckResultA())) {
@@ -118,7 +119,7 @@ public class L4601 extends TradeBuffer {
 			// 產重複投保報表
 			MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
 		}
-
+		
 		this.info("totavoList L4601  = " + this.sendList());
 
 		return this.sendList();
@@ -145,6 +146,8 @@ public class L4601 extends TradeBuffer {
 			occursListReport.putParam("ReportAErrorMsg", "處理代碼非0.正常");
 		} else if (errorCode == 15) {
 			occursListReport.putParam("ReportAErrorMsg", "已入帳，總保費與入帳金額不符 ");
+		} else if (errorCode == 16) {
+			occursListReport.putParam("ReportAErrorMsg", "已自保");
 		} else {
 			occursListReport.putParam("ReportAErrorMsg", errorCode);
 		}
@@ -153,6 +156,7 @@ public class L4601 extends TradeBuffer {
 		errorACnt = errorACnt + 1;
 		return totaA;
 	}
+
 
 	private TotaVo errorReportC(InsuRenewMediaTemp t, int errorCode, TitaVo titaVo) throws LogicException {
 		this.info("ReportC Start, errorCode :" + +errorCode);
