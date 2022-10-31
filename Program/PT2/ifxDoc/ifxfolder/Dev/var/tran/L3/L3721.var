@@ -381,7 +381,6 @@ IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
 !查尋放款主檔
 #SendL3r02=X,1,S
 IF(#FKEY==0||#FKEY==7,$,s)
-C(3,#BormNo,0,S,$)
 E(0,@RimFuncCode,5)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
@@ -667,11 +666,8 @@ T(1,#EffectDate2,1,5)
 #checkdate=+n,6,S
 E(0,#effdateyymm-#dateyymm)
 
-
 #checkeffectdate=X,1,S
 IF(#checkdate>0,T(3,@effFg,Y),T(3,@effFg,N))
-
-
 
 !#FdAdjust=X,2,L
 #GetValue=X,1,S
@@ -695,11 +691,17 @@ T(2,@ProdNo2X,#L2r01ProdName)
 ![利率區分]
 !自動顯示不必輸入 1:機動 2:固動 3:定期機動
 #FdRateCode2=X,2,L
+#RateCode2Help=x,1024,S
+C(2,#RateCode1,$,T(HELP,@RateCode2Help,#RateCodeHelp,+,1;2),T(HELP,@RateCode2Help,#RateCodeHelp,+,2),T(HELP,@RateCode2Help,#RateCodeHelp,+,2;3))
+
+
 
 #RateCode2=A,1,I
 C(5,#DeleteFg,Y,s,$)
-HELP(#RateCodeHelp)
-@V(H,#RateCodeHelp)
+HELP(#RateCode2Help)
+@
+! V(1,2,#RateCode1)
+V(H,#RateCode2Help)
 
 #RateCode2X=X,10,L
 T(3,)T(H,#RateCode2,#RateCodeHelp)

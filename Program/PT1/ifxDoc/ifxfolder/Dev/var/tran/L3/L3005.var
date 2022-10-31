@@ -465,7 +465,7 @@ T(2,#OOAcDate+#OORelNo)
 
 #OODesc=X,40,O
 
-#OONote=X,60,O
+#OONote=X,500,O
 
 #OOIntEndDate=D,7,O
 #OOIntEndDateX=X,10,O
@@ -582,7 +582,7 @@ IF(#OOAcFg=="",T(3,內容),T(3,內容查詢))
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 
 !維護
-#OOBTNRMK=X,77,S
+#OOBTNRMK=X,577,S
 T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OONote)
 BIND(grid,{ cmd=CHAIN; ntxcd=L3703;text=維護;ntxbuf=#OOBTNRMK})
 
@@ -734,7 +734,7 @@ TXFORM=L3005
 {width:80}
 
 #OONote=摘要
-{width:90}
+{width:500}
 
 #OOBTNRMK=摘要
 {width:55,search:true,formatter:'cust:bind-button:維護;L3703 帳務明細摘要維護',align:'center',canExport:false}

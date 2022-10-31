@@ -54,6 +54,7 @@ public class L4101ReportA extends MakeReport {
 	private String brno = "";
 	private String reportCode = "L4101";
 	private String reportItem = "撥款傳票總表";
+	private String drawdownDate = "";
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
@@ -84,6 +85,7 @@ public class L4101ReportA extends MakeReport {
 			if ("RT".equals(batchNo.substring(0, 2))) {
 				reportItem = "退款傳票總表";
 			}
+		drawdownDate = this.showRocDate(acDate, 0);
 		this.print(-1, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 145, "機密等級：" + this.security);
@@ -94,6 +96,7 @@ public class L4101ReportA extends MakeReport {
 		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 2, "批號：" + titaVo.getBacthNo());
 		this.print(-4, 145, "頁　　次：" + this.getNowPage());
+		this.print(-4, 85, drawdownDate, "C");
 
 		// 頁首帳冊別判斷
 //		print(-4, 10, this.nowAcBookCode);

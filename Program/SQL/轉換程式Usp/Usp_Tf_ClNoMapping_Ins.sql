@@ -30,9 +30,16 @@ BEGIN
           ,CASE
              WHEN S1."Sequence" = 1 THEN S1."GDRNUM"
            ELSE S2."SeqNo" 
-                + ROW_NUMBER() OVER (PARTITION BY S1."GDRID1",S1."GDRID2"
-                                     ORDER BY S1."GDRID1",S1."GDRID2",S1."GDRNUM",S1."LGTSEQ",S1."Sequence"
-                                    )
+           + ROW_NUMBER()
+             OVER (
+               PARTITION BY S1."GDRID1"
+                          , S1."GDRID2"
+               ORDER BY S1."GDRID1"
+                      , S1."GDRID2"
+                      , S1."GDRNUM"
+                      , S1."LGTSEQ"
+                      , S1."Sequence"
+             )
            END                     AS "ClNo"                -- 擔保品編號 DECIMAL 7 
           ,S1."GDRID1"             AS "GDRID1"              -- 舊擔保品代號1 decimal(1, 0) default 0 not null,
           ,S1."GDRID2"             AS "GDRID2"              -- 舊擔保品代號2 decimal(2, 0) default 0 not null,

@@ -183,7 +183,7 @@ public class L4450Report extends MakeReport {
 					this.info("InsuNo = " + InsuNo);
 					if (InsuNo.length() > 17) {
 						prevInsuNo = InsuNo.substring(0, 17).trim();
-						endoInsuNo = InsuNo.substring(17, 18);
+//						endoInsuNo = InsuNo.substring(17, 18);
 					}
 					this.info("tTempVo---->" + tTempVo);
 
@@ -195,8 +195,9 @@ public class L4450Report extends MakeReport {
 						for (int k = 0; k < tInsuNo.length; k++) {
 							this.info("tInsuNo[" + k + "] = " + tInsuNo[k]);
 							InsuRenew tInsuRenew = new InsuRenew();
+							prevInsuNo = tInsuNo[k];
 							tInsuRenew = insuRenewService.findEndoInsuNoFirst(lBankDeductDtl.get(i).getCustNo(),
-									lBankDeductDtl.get(i).getFacmNo(),prevInsuNo, endoInsuNo, titaVo);
+									lBankDeductDtl.get(i).getFacmNo(), prevInsuNo, endoInsuNo, titaVo);
 
 							if (tInsuRenew != null) {
 

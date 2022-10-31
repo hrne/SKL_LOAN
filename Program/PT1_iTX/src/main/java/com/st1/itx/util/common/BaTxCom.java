@@ -1143,7 +1143,7 @@ public class BaTxCom extends TradeBuffer {
 		slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd,
 				0, Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0001", "戶號有誤"); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "該戶號無撥款資料"); // 查詢資料不存在
 		}
 		boolean isStautsNormal = false;
 		for (LoanBorMain ln : slLoanBorMain.getContent()) {
@@ -2111,7 +2111,7 @@ public class BaTxCom extends TradeBuffer {
 		this.info(" addByBormNo .... ");
 		ArrayList<BaTxVo> listbaTxVo = new ArrayList<BaTxVo>();
 		for (BaTxVo ba : this.baTxList) {
-			if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+			if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0 || ba.getDataKind() == 4) {
 				listbaTxVo.add(ba);
 			}
 		}

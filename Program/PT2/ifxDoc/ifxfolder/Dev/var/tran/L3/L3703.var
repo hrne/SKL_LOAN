@@ -83,14 +83,13 @@ T(2,#DT2)
 @V(7)A(DATE,0,#AcDate)
 V(5,0,9999999)
 
-#NTXBUF=X,77,S
+#NTXBUF=X,517,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
 T(1,@BormNo,#NTXBUF,11,3)
 T(1,@BorxNo,#NTXBUF,14,4)
-T(1,@Note,#NTXBUF,18,60)
-
+T(1,@Note,#NTXBUF,18,500)
 
 #FdCustNo=X,2,L
 
@@ -120,7 +119,6 @@ HELP(#LoanNoteCodeHelp)
  
 #FdRmkDesc=X,2,L
 
-!#Note=c,120,I
 #Note=x,10.50,I
 C(3,#Note,1,s,$)
 T(2,@Note,#Note)

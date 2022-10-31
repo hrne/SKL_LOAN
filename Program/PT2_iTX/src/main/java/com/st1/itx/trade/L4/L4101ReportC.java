@@ -91,8 +91,10 @@ public class L4101ReportC extends MakeReport {
 		// 退款名稱
 		if ("BCK".equals(batchNo)) {
 			reportItem = "抽退票傳票明細表";
+			drawdownDate = this.showRocDate(acDate, 0);
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
+			drawdownDate = this.showRocDate(acDate, 0);
 		} else {
 			drawdownDate = "撥款日期：" + this.showRocDate(acDate, 1);
 		}
@@ -157,7 +159,7 @@ public class L4101ReportC extends MakeReport {
 		} else if ("RT".equals(batchNo.substring(0, 2))) {
 			reportItem = "退款傳票明細表";
 		}
-		reportItem = reportItem ;
+		reportItem = reportItem;
 		String wkName = "";
 		String wkBankCode = "";
 		String wkBranchCode = "";
@@ -173,13 +175,15 @@ public class L4101ReportC extends MakeReport {
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
 			// 出空表
-			this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
+			this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
+					pageOrientation);
 			this.setCharSpaces(0);
 			print(1, 1, "本日無資料");
 			return;
 		}
 
-		this.open(titaVo, reportDate, brno, reportCode, reportItem+ "-" + batchNo, security, pageSize, pageOrientation);
+		this.open(titaVo, reportDate, brno, reportCode, reportItem + "-" + batchNo, security, pageSize,
+				pageOrientation);
 		// 統一大小
 		this.setFont(1, 10);
 

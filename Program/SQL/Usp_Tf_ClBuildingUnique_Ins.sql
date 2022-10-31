@@ -56,8 +56,10 @@ BEGIN
                                       THEN 0
                                     ELSE 1 END -- 2022-06-13 Wei 未結案者優先
                                   , "GRTSTS" DESC -- 2022-05-06 Wei 有設定擔保者優先
-                                  , "LGTSAM" DESC
-                                  , "LoanBalTotal" DESC -- 2022-05-23 Wei 放款餘額越大者優先
+                                  , CASE
+                                      WHEN "LGTSAM" != 0
+                                      THEN 0
+                                    ELSE 1 END -- 2022-10-31 Wei 原本已設定金額大小反序，現在僅比較設定金額有值及無值 
                                   , "LMSAPN" DESC -- 2022-03-10 Wei
                                   , "GDRID1"
                                   , "GDRID2"

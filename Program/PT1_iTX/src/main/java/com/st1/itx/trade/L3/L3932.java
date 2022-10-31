@@ -100,7 +100,7 @@ public class L3932 extends TradeBuffer {
 		}
 
 		for (LoanBorMain ln : lLoanBorMain) {
-			
+
 			// 上次繳息日
 			effectPaidDate = ln.getPrevPayIntDate(); // 繳息日前的一筆
 
@@ -140,7 +140,8 @@ public class L3932 extends TradeBuffer {
 // wkChangeFg
 //   "Y":  繳息日後的每一筆，按鈕<變更> 僅可變更、刪除利率資料，自動顯示變更的生效日期不可改
 //				
-				if (r.getEffectDate() >= effectPaidDate &&  r.getEffectDate() > ln.getDrawdownDate()) {
+				if (r.getEffectDate() >= effectPaidDate
+						&& (r.getStatus() == 2 || r.getEffectDate() > ln.getDrawdownDate())) {
 					wkChangeFg = "Y";
 				} else {
 					wkChangeFg = " ";
@@ -190,6 +191,7 @@ public class L3932 extends TradeBuffer {
 				// 未生效的指標利率放0
 				occursList.putParam("OORemark", r.getRemark());
 				occursList.putParam("OOChangeFg", wkChangeFg);
+				occursList.putParam("OOStatus", ln.getStatus());
 
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);

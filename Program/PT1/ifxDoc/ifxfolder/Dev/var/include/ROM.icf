@@ -4228,6 +4228,12 @@ TXFORM=L3R08
 #L3r09FacBaseRateCode=X,2,S
 #L3r09NextEffectDate=D,7,S
 #L3r09NextFitRate=n,2.4,S
+#L3r09CurrencyCode=X,3,S
+#L3r09MaturityDate=D,7,S
+#L3r09PrevPayIntDate=D,7,S
+#L3r09LoanRateCode=A,2,S
+#L3r09RateAdjFreq=A,1,S
+#L3r09NextRateAdjDate=D,7,S
 
 </L3R09.dec>
 <L3R09.tom>
@@ -4249,6 +4255,12 @@ TXFORM=L3R09
 #L3r09FacBaseRateCode
 #L3r09NextEffectDate
 #L3r09NextFitRate
+#L3r09CurrencyCode
+#L3r09MaturityDate
+#L3r09PrevPayIntDate
+#L3r09LoanRateCode
+#L3r09RateAdjFreq
+#L3r09NextRateAdjDate
 ^
 </L3R09.tom>
 

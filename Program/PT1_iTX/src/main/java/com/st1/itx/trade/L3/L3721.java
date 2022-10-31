@@ -150,7 +150,6 @@ public class L3721 extends TradeBuffer {
 //		iProdRate = this.parse.stringToBigDecimal(titaVo.getParam("ProdRate2"));
 
 		if (iBormNo > 0) {
-
 			iBormNoS = iBormNo;
 			iBormNoE = iBormNo;
 		}
@@ -232,8 +231,8 @@ public class L3721 extends TradeBuffer {
 	private void EntryNormalRoutine() throws LogicException {
 		this.info("EntryNormalRoutine ... ");
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, iBormNoS, iBormNoE, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, iBormNoS,
+				iBormNoE, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -262,10 +261,6 @@ public class L3721 extends TradeBuffer {
 			if (tLoanBorMain == null) {
 				throw new LogicException(titaVo, "E0006",
 						"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
-			}
-			if (titaVo.isHcodeNormal() && tLoanBorMain.getActFg() == 1) {
-				throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 =  "
-						+ tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo()); // 該筆資料待放行中
 			}
 
 			wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
@@ -628,12 +623,11 @@ public class L3721 extends TradeBuffer {
 		}
 		// 放行 一般
 		if (titaVo.isHcodeNormal()) {
-			if (tLoanBorMain.getActFg() != 1) {
-				throw new LogicException(titaVo, "E0017",
-						"撥款主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + "撥款序號 = " + wkBormNo); // 該筆交易狀態非待放行，不可做交易放行
-			}
 			// 更新撥款主檔
-			tLoanBorMain.setActFg(titaVo.getActFgI());
+			
+			if (tLoanBorMain.getLastBorxNo() == wkBorxNo) {
+				tLoanBorMain.setActFg(titaVo.getActFgI());
+			}
 		}
 		// 放行訂正
 		if (titaVo.isHcodeErase()) {

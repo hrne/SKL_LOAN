@@ -98,7 +98,8 @@ public class BS720 extends TradeBuffer {
 		procFindData(iYearMonth, iYearMonthLast, titaVo);
 
 		if (this.loanAmt.add(ovduAmt).compareTo(BigDecimal.ZERO) == 0) {
-			throw new LogicException(titaVo, "E0015", "本期累計應攤銷折溢價=0 ");
+			this.info("本期累計應攤銷折溢價=0 ");
+//			throw new LogicException(titaVo, "E0015", "本期累計應攤銷折溢價=0 ");
 		}
 
 		this.batchTransaction.commit();

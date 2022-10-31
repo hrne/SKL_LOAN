@@ -127,11 +127,6 @@ BEGIN
                -- 1: FAP、FAE、FEP、FEE、FFP、FNP
                -- 2: 保險起迄日少於一年時歸類短期保單
                -- from USER 淑微 PT2 UAT測試問題 第322號
-               WHEN TRUNC(MONTHS_BETWEEN(
-                      TO_DATE(FR1P."INSSDT2",'YYYYMMDD')
-                      , TO_DATE(FR1P."INSEDT2",'YYYYMMDD')
-                    )) < 12
-               THEN '09' -- 短期保單
                WHEN FR1P."INSNUM2" LIKE '%FAP%' -- 商業火單
                THEN '08'
                WHEN FR1P."INSNUM2" LIKE '%FAE%' -- 商業火單加批保單
@@ -144,6 +139,14 @@ BEGIN
                THEN '12'
                WHEN FR1P."INSNUM2" LIKE '%FNP%' -- 住宅地震基本保險
                THEN '13'
+               WHEN FR1P."INSSDT2" > 0
+                    AND FR1P."INSEDT2" > 0
+                    AND
+                    TRUNC(MONTHS_BETWEEN(
+                      TO_DATE(FR1P."INSEDT2",'YYYYMMDD')
+                      , TO_DATE(FR1P."INSSDT2",'YYYYMMDD')
+                    )) < 12
+               THEN '09' -- 短期保單
                WHEN FR1P."INSIAM2" > 0 -- 火災險保險金額
                     AND FR1P."INSIAE2" > 0 -- 地震險保險金額
                THEN '01' -- 住宅火險地震險

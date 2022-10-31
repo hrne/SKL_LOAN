@@ -616,19 +616,7 @@ public class L9110Report extends MakeReport {
 
 			this.print(1, 5, "商品代碼 ..... " + FormatUtil.padX("" + tL9110.get("F22") + " " + tL9110.get("F59"), 14));
 			this.print(0, 35, "核准利率 ..... ");
-//			若未撥過款則抓最新指標利率+加減碼
-//			否則抓額度主檔核准利率
-			if (parse.stringToInteger(tL9110.get("F61")) == 0 && !"99".equals("F60")) {
-				this.print(0, 65,
-						formatAmt(
-								getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))),
-								4),
-						"R");
-			} else {
-				this.print(0, 65, formatAmt(parse.stringToBigDecimal(tL9110.get("F23")), 4), "R");
-			}
-			this.print(0, 65, formatAmt(
-					getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))), 4), "R");
+			this.print(0, 65, formatAmt(parse.stringToBigDecimal(tL9110.get("F23")), 4), "R");
 			this.print(0, 69, "利率調整週期 . " + tL9110.get("F24") + "月");
 			this.print(0, 105, "利率調整不變攤還額 . " + tL9110.get("F25"));
 			this.print(0, 135, "信用評分　.... " + tL9110.get("F26"));
@@ -820,12 +808,11 @@ public class L9110Report extends MakeReport {
 		for (int currentApplNoItem = 1; currentApplNoItem <= 50; currentApplNoItem++) {
 			thisApplNo = titaVo.getParam("APPLNO" + currentApplNoItem);
 
-			this.info("thisApplNo = " + thisApplNo);
-
 			BigDecimal loanBal = BigDecimal.ZERO;
 
 			if (thisApplNo != null && !(thisApplNo.isEmpty()) && Integer.parseInt(thisApplNo) > 0) {
 
+				this.info("thisApplNo = " + thisApplNo);
 				// 每次查詢都須確定企金別以決定輸出方式
 				FacMain tFacMain = sFacMainService.facmApplNoFirst(Integer.parseInt(thisApplNo), titaVo);
 
@@ -875,23 +862,6 @@ public class L9110Report extends MakeReport {
 
 				fillData(titaVo, custEntCode.equals("1"));
 
-				if (tFacMain != null) {
-					// 更新原DB
-					tFacMain = sFacMainService.holdById(tFacMain, titaVo);
-					tFacMain.setL9110Flag("Y");
-					if (tFacMain.getLastBormNo() == 0 && !"99".equals(tFacMain.getBaseRateCode())) {
-						BigDecimal approveRate = getBaseRate(tFacMain.getBaseRateCode(), titaVo)
-								.add(tFacMain.getRateIncr());
-						if (approveRate.compareTo(tFacMain.getApproveRate()) != 0) {
-							tFacMain.setApproveRate(approveRate);
-						}
-					}
-					try {
-						sFacMainService.update(tFacMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "額度主檔" + thisApplNo);
-					}
-				}
 			}
 		}
 
@@ -1327,15 +1297,4 @@ public class L9110Report extends MakeReport {
 		print(0, 63, formatAmt(totalValues, 0), "R"); // 面額合計
 	}
 
-	private BigDecimal getBaseRate(String baseRateCode, TitaVo titaVo) {
-		BigDecimal baseRate = BigDecimal.ZERO;
-		CdBaseRate tCdBaseRate = new CdBaseRate();
-		tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", baseRateCode, 19110101,
-				titaVo.getEntDyI() + 19110000, titaVo);
-		this.info(" cdBaseRate date =" + titaVo.getEntDyI());
-		if (tCdBaseRate != null) {
-			baseRate = tCdBaseRate.getBaseRate();
-		}
-		return baseRate;
-	}
 }

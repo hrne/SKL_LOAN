@@ -248,6 +248,9 @@ T(F,@EntryDate,0)
 T(F,@CloseInd,0)
 T(F,@CollectFlag,0)
 T(F,@CloseReasonCode,0)
+T(F,@TwCloseAmt,0)
+T(F,@PostAddress,0)
+
 
 !借戶戶號 修改時自動顯示可修改,其他自動顯示不需輸入
 #CustNo=A,7,I
@@ -389,6 +392,8 @@ T(H,#CollectWayCode,#CollectWayCodeHelp)
 #FdPostAddress=X,2,L
 #PostAddress=x,200,I,maxWidth:50
 IF(#CollectWayCode==21||#CollectWayCode==26||#CollectWayCode==27,$,S)
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
 
 
 

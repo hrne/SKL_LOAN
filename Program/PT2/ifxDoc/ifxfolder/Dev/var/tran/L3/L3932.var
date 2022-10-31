@@ -84,13 +84,19 @@ T(3,CdCode.BaseRate)
 
 #BaseRateHelp=x,1024,S
 
+!Status狀態
+#CDDEF03=x,20,S
+T(3,CdCode.Status)
+#StatusHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
 R(1,XXR99)
 CALL(#HelpProc) 
 T(2,@RateCodeHelp,#HelpDesc1)
 T(2,@BaseRateHelp,#HelpDesc2)
+T(2,@StatusHelp,#HelpDesc3)
 
 
 
@@ -452,6 +458,10 @@ C(3,#OONextAdjRateDate,0,S,$)
 
 #OOChangeFg=X,1,O
 
+#OOStatus=A,2,O
+
+#OOStatusX=X,14,O
+T(H,#OOStatus,#StatusHelp)
 
 !修改
 #OOBUF2=X,100,S
@@ -481,7 +491,7 @@ C(4,#OOChangeFg,BIND(grid,cancel),$)
 TXFORM=L3932
 #OOCustNo#OOFacmNo#OOBormNo
 #OOEffectDate#OOFitRate#OOProdNo#OOProdName#OORateCode#OOBaseRateCode
-#OOBaseRate#OOProdRate#OORateIncr#OOIndividualIncr#OONextAdjRateDate#OORemark#OOChangeFg
+#OOBaseRate#OOProdRate#OORateIncr#OOIndividualIncr#OONextAdjRateDate#OORemark#OOChangeFg#OOStatus
 
 ^
 <include src="COM.icf::TRCTL.tom"/>
@@ -515,6 +525,7 @@ TXFORM=L3932
 #OOBormNo
 #OOBormNoX=撥款 
 {width:50,align:'center'}
+
 
 #OOEffectDate=生效日期 
 {width:85,align:'center'}
@@ -552,6 +563,10 @@ TXFORM=L3932
 
 #OORemark=備註
 {width:300,align:'left'}
+
+#OOStatusX=戶況
+{width:50,align:'center'}
+
 ^
 
 <include src="PRT.icf::INQ01.sel" map="i=L3932;cpi=15"/>
