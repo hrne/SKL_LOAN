@@ -122,6 +122,28 @@ BEGIN
            , FR1P."INSNUM2"                 AS "NowInsuNo"           -- 保險單號碼 VARCHAR2 17 0
            , FR1P."INSIID"                  AS "InsuCompany"         -- 保險公司 VARCHAR2 2 0
            , CASE
+               -- 2022-10-31 Wei 
+               -- 新增判斷
+               -- 1: FAP、FAE、FEP、FEE、FFP、FNP
+               -- 2: 保險起迄日少於一年時歸類短期保單
+               -- from USER 淑微 PT2 UAT測試問題 第322號
+               WHEN TRUNC(MONTHS_BETWEEN(
+                      TO_DATE(FR1P."INSSDT2",'YYYYMMDD')
+                      , TO_DATE(FR1P."INSEDT2",'YYYYMMDD')
+                    )) < 12
+               THEN '09' -- 短期保單
+               WHEN FR1P."INSNUM2" LIKE '%FAP%' -- 商業火單
+               THEN '08'
+               WHEN FR1P."INSNUM2" LIKE '%FAE%' -- 商業火單加批保單
+               THEN '10'
+               WHEN FR1P."INSNUM2" LIKE '%FEP%' -- 住宅火險地震險
+               THEN '01'
+               WHEN FR1P."INSNUM2" LIKE '%FEE%' -- 住宅火險地震險加批保單
+               THEN '11'
+               WHEN FR1P."INSNUM2" LIKE '%FFP%' -- 住宅火災及地震基本保險(甲式)
+               THEN '12'
+               WHEN FR1P."INSNUM2" LIKE '%FNP%' -- 住宅地震基本保險
+               THEN '13'
                WHEN FR1P."INSIAM2" > 0 -- 火災險保險金額
                     AND FR1P."INSIAE2" > 0 -- 地震險保險金額
                THEN '01' -- 住宅火險地震險
