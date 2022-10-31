@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -379,6 +380,7 @@ public class L3100 extends TradeBuffer {
 		BigDecimal wkRvDrawdownAmt = new BigDecimal(0);
 		int wkFirstDrawdownDate = 0;
 		int wkMaturityDate = 0;
+		BigDecimal wkApproveRate = new BigDecimal(0);
 
 		if (titaVo.isActfgSuprele()) {
 			tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
@@ -451,6 +453,7 @@ public class L3100 extends TradeBuffer {
 			facTempVo.clear();
 			facTempVo.putParam("DrawdownAmt", iDrawdownAmt);
 			facTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
+			facTempVo.putParam("ApproveRate", tFacMain.getApproveRate());
 			facTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
 			facTempVo.putParam("BormNo", wkBormNo);
 
@@ -486,6 +489,7 @@ public class L3100 extends TradeBuffer {
 			wkDrawdownAmt = this.parse.stringToBigDecimal(facTempVo.get("DrawdownAmt"));
 			wkFirstDrawdownDate = this.parse.stringToInteger(facTempVo.get("FirstDrawdownDate"));
 			wkMaturityDate = this.parse.stringToInteger(facTempVo.get("MaturityDate"));
+			wkApproveRate = this.parse.stringToBigDecimal(facTempVo.getParam("ApproveRate"));
 
 			wkBormNo = this.parse.stringToInteger(facTempVo.get("BormNo"));
 
@@ -499,6 +503,7 @@ public class L3100 extends TradeBuffer {
 			}
 
 			tFacMain.setFirstDrawdownDate(wkFirstDrawdownDate);
+			tFacMain.setApproveRate(wkApproveRate);
 			tFacMain.setMaturityDate(wkMaturityDate);
 
 		}
@@ -520,6 +525,7 @@ public class L3100 extends TradeBuffer {
 			facTempVo.clear();
 			facTempVo.putParam("DrawdownAmt", iDrawdownAmt);
 			facTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
+			facTempVo.putParam("ApproveRate", tFacMain.getApproveRate());
 			facTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
 			facTempVo.putParam("BormNo", wkBormNo);
 			facTempVo.putParam("CompensateFlag", tFacMain.getCompensateFlag());
@@ -532,10 +538,16 @@ public class L3100 extends TradeBuffer {
 			}
 			// 準備更新額度資料
 			tFacMain.setUtilAmt(tFacMain.getUtilAmt().add(iDrawdownAmt));
-			tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
+			// 借新還舊不更新已動用額度餘額
+			if ("2".equals(titaVo.getParam("RenewFlag")) && parse.stringToInteger(titaVo.getParam("RpFacmNo1")) == parse
+					.stringToInteger(titaVo.getParam("FacmNo"))) {
+			} else {
+				tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
+			}
 
 			if (tFacMain.getFirstDrawdownDate() == 0 || wkBormNo == 1) {
 				tFacMain.setFirstDrawdownDate(iDrawdownDate);
+				tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
 			}
 			if (tFacMain.getMaturityDate() == 0 || wkBormNo == 1) {
 				tFacMain.setMaturityDate(iMaturityDate);
@@ -608,8 +620,12 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "銀扣授權檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 			}
 			wkBorxNo = tLoanBorMain.getLastBorxNo();
+			Timestamp createDate = tLoanBorMain.getCreateDate();
+			String createEmpNo = tLoanBorMain.getCreateEmpNo();
 			tLoanBorMain = new LoanBorMain();
 			moveLoanBorMain();
+			tLoanBorMain.setCreateDate(createDate);
+			tLoanBorMain.setCreateEmpNo(createEmpNo);
 			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
 			// 主管訂正後修正，交易序號+2(訂正、修正)
 			if (tLoanBorTx != null && "2".equals(tLoanBorTx.getTitaHCode())) {

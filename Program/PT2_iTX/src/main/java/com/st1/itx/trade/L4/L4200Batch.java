@@ -713,6 +713,7 @@ public class L4200Batch extends TradeBuffer {
 				tBankRmtf.setAcDate(iAcDate);
 				tBankRmtf.setBatchNo(iBatchNo);
 				tBankRmtf.setDetailSeq(i + 1);
+				tBankRmtf.setReconCode(reconCode);
 				tBankRmtf.setCustNo(custNo);
 				tBankRmtf.setRepayAmt(repayAmt);
 				tBankRmtf.setDepAcctNo(tempOccursList.get("OccAcctNo"));

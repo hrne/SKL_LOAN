@@ -61,13 +61,13 @@ public class L4031 extends TradeBuffer {
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		int date = parse.stringToInteger(titaVo.getParam("RateChangeDate")) + 19110000;
-		int custType = parse.stringToInteger(titaVo.getParam("CustType"));
+		int iDate = parse.stringToInteger(titaVo.getParam("RateChangeDate")) + 19110000;
+		int iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 
 		int custCode1 = 0;
 		int custCode2 = 0;
 //		1:個金;2:企金（含企金自然人）
-		if (custType == 2) {
+		if (iCustType == 2) {
 			custCode1 = 1;
 			custCode2 = 2;
 		}
@@ -76,7 +76,7 @@ public class L4031 extends TradeBuffer {
 
 //		0:個金 1:企金 2:企金自然人
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		sBatxRateChange = batxRateChangeService.custCodeEq(date, date, custCode1, custCode2, 0, Integer.MAX_VALUE);
+		sBatxRateChange = batxRateChangeService.custCodeEq(iDate, iDate, custCode1, custCode2, 0, Integer.MAX_VALUE);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -219,7 +219,7 @@ public class L4031 extends TradeBuffer {
 					switch (keyinCode) {
 					case 0:
 						lableBX += "(未調整)";
-						if ((txKind == 1) || txKind == 3) {
+						if (iCustType == 1 && (txKind == 1 || txKind == 3)) {
 							rptFg = 7;
 						} else {
 							rptFg = 3;
@@ -227,7 +227,7 @@ public class L4031 extends TradeBuffer {
 						break;
 					case 1:
 						lableBX += "(已調整)";
-						if ((txKind == 1) || txKind == 3) {
+						if (iCustType == 1 && (txKind == 1 || txKind == 3)) {
 							rptFg = 6;
 						} else {
 							rptFg = 4;
@@ -236,7 +236,7 @@ public class L4031 extends TradeBuffer {
 						break;
 					case 2:
 						lableBX += "(待輸入)";
-						if ((txKind == 1) || txKind == 3) {
+						if (iCustType == 1 && (txKind == 1 || txKind == 3)) {
 							rptFg = 6;
 						} else {
 							rptFg = 4;

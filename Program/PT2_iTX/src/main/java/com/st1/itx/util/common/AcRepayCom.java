@@ -71,7 +71,7 @@ public class AcRepayCom extends TradeBuffer {
 	// initialize variable
 	@PostConstruct
 	public void init() {
-		this.info("init  ...");
+		this.info("AcRepayCom init ...");
 		this.lAcDetail = new ArrayList<AcDetail>();
 		this.lLoanBorTx = new ArrayList<LoanBorTx>();
 		this.baTxList = new ArrayList<BaTxVo>();
@@ -181,9 +181,38 @@ public class AcRepayCom extends TradeBuffer {
 		// 貸方：費用
 		for (BaTxVo ba : baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				settleFeeAmt(ba);
 				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iEntryDate, new TempVo(), titaVo);
+				settleFeeAmt(ba, tx); // 費用出帳
 				ba.setAcctAmt(BigDecimal.ZERO);
+				if (tx.getTxAmt().compareTo(BigDecimal.ZERO) == 0) {
+					BigDecimal txAmt = BigDecimal.ZERO;
+					BigDecimal tempAmt = BigDecimal.ZERO;
+					BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
+					if (tempAmtRemaind.compareTo(repayAmt) > 0) {
+						tempAmt = repayAmt;
+						tempAmtRemaind = tempAmtRemaind.subtract(tempAmt);
+					} else {
+						tempAmt = tempAmtRemaind;
+						tempAmtRemaind = BigDecimal.ZERO;
+						if (txAmtRemaind.compareTo(repayAmt.subtract(tempAmt)) > 0) {
+							txAmt = repayAmt.subtract(tempAmt);
+							txAmtRemaind = txAmtRemaind.subtract(txAmt);
+						} else {
+							txAmt = txAmtRemaind;
+							txAmtRemaind = BigDecimal.ZERO;
+						}
+					}
+					tx.setTxAmt(txAmt);
+					tx.setTempAmt(tempAmt);
+				}
+				this.lLoanBorTx.add(tx);
+			}
+		}
+
+		// 貸方：本金利息
+		for (LoanBorTx tx : ilLoanBorTx) {
+			settleLoanAmt(tx); // 本金利息出帳
+			if (tx.getTxAmt().compareTo(BigDecimal.ZERO) == 0) {
 				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 				BigDecimal txAmt = BigDecimal.ZERO;
 				BigDecimal tempAmt = BigDecimal.ZERO;
@@ -203,38 +232,13 @@ public class AcRepayCom extends TradeBuffer {
 				}
 				tx.setTxAmt(txAmt);
 				tx.setTempAmt(tempAmt);
-				this.lLoanBorTx.add(tx);
 			}
-		}
-
-		// 貸方：本金利息
-		for (LoanBorTx tx : ilLoanBorTx) {
-			settleLoanAmt(tx);
-			BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
-			BigDecimal txAmt = BigDecimal.ZERO;
-			BigDecimal tempAmt = BigDecimal.ZERO;
-			if (tempAmtRemaind.compareTo(repayAmt) > 0) {
-				tempAmt = repayAmt;
-				tempAmtRemaind = tempAmtRemaind.subtract(tempAmt);
-			} else {
-				tempAmt = tempAmtRemaind;
-				tempAmtRemaind = BigDecimal.ZERO;
-				if (txAmtRemaind.compareTo(repayAmt.subtract(tempAmt)) > 0) {
-					txAmt = repayAmt.subtract(tempAmt);
-					txAmtRemaind = txAmtRemaind.subtract(txAmt);
-				} else {
-					txAmt = txAmtRemaind;
-					txAmtRemaind = BigDecimal.ZERO;
-				}
-			}
-			tx.setTxAmt(txAmt);
-			tx.setTempAmt(tempAmt);
 			this.lLoanBorTx.add(tx);
 		}
 
 		// 貸方：溢收款
 		BigDecimal overflow = settleOverflow(this.lAcDetail, titaVo);
-		
+
 		// 更新尾筆交易金額、暫收借金額、暫收貸金額
 		LoanBorTx tx = this.lLoanBorTx.get(this.lLoanBorTx.size() - 1);
 		updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
@@ -380,7 +384,7 @@ public class AcRepayCom extends TradeBuffer {
 		case "101": // 101.匯款轉帳
 			acDetail.setAcctCode("P03");
 			break;
-		case "102": // 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH)
+		case "102": // 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
 			if ("C01".equals(acDetail.getAcctCode())) {
 				acDetail.setRvNo("0010060" + titaVo.getEntDyI());
 			}
@@ -495,13 +499,13 @@ public class AcRepayCom extends TradeBuffer {
 	 * 
 	 * @param tx      LoanBorTx
 	 * @param iAcList List of AcDetail
-	 * @param titaVo      TitaVo
+	 * @param titaVo  TitaVo
 	 * @return 作帳金額
 	 * @throws LogicException ...
 	 */
 	public BigDecimal updBorTxAcDetail(LoanBorTx tx, List<AcDetail> iAcList, TitaVo titaVo) throws LogicException {
 		this.info("updBorTxAcDetail ... RepayCode=" + tx.getRepayCode() + ", BacthNo=" + titaVo.getBacthNo());
-		this.titaVo =  titaVo;
+		this.titaVo = titaVo;
 		this.lAcDetail = iAcList;
 		BigDecimal repayAmt = BigDecimal.ZERO;
 
@@ -563,6 +567,7 @@ public class AcRepayCom extends TradeBuffer {
 				acDetail.setFacmNo(tx.getFacmNo());
 				acDetail.setBormNo(tx.getBormNo());
 				lAcDetail.add(acDetail);
+				tx.setTxAmt(acDetail.getTxAmt()); // 轉催呆金額放LoanBorTx交易金額
 			}
 			// 轉呆帳 借:備抵呆帳
 			if (iCaseCloseCode == 7 || iCaseCloseCode == 8) {
@@ -574,6 +579,7 @@ public class AcRepayCom extends TradeBuffer {
 				acDetail.setFacmNo(tx.getFacmNo());
 				acDetail.setBormNo(tx.getBormNo());
 				lAcDetail.add(acDetail);
+				tx.setTxAmt(acDetail.getTxAmt()); // 轉催呆金額放LoanBorTx交易金額
 			}
 		}
 		// 催收回復
@@ -629,7 +635,7 @@ public class AcRepayCom extends TradeBuffer {
 				}
 			}
 		}
-		// 本金
+		// 本金(放款科目或催收款項)
 		if (tx.getPrincipal().subtract(shortfallPrincipal).compareTo(BigDecimal.ZERO) > 0) {
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
@@ -711,8 +717,8 @@ public class AcRepayCom extends TradeBuffer {
 		// 貸方：費用
 		for (BaTxVo ba : baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				settleFeeAmt(ba);
 				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iEntryDate, new TempVo(), titaVo);
+				settleFeeAmt(ba, tx);
 				ba.setAcctAmt(BigDecimal.ZERO);
 				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 				BigDecimal tempAmt = BigDecimal.ZERO;
@@ -729,9 +735,9 @@ public class AcRepayCom extends TradeBuffer {
 		}
 		// 貸方：溢收款
 		BigDecimal overflow = settleOverflow(this.lAcDetail, titaVo);
-		
+
 		// 更新尾筆暫收借金額、暫收貸金額
-		LoanBorTx tx = this.lLoanBorTx.get(this.lLoanBorTx.size() - 1);		
+		LoanBorTx tx = this.lLoanBorTx.get(this.lLoanBorTx.size() - 1);
 		updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 		tx.setTempAmt(tx.getTempAmt().add(tempAmtRemaind));
 		tx.setOverflow(overflow);
@@ -744,7 +750,7 @@ public class AcRepayCom extends TradeBuffer {
 	}
 
 	// 新增放款交易內容檔(收回費用)
-	private void settleFeeAmt(BaTxVo ba) throws LogicException {
+	private void settleFeeAmt(BaTxVo ba, LoanBorTx tx) throws LogicException {
 		this.info("settleFeeAmt ... ");
 		// 轉呆帳 借:備抵呆帳
 		if (iCaseCloseCode == 7 || iCaseCloseCode == 8) {
@@ -756,6 +762,7 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setFacmNo(ba.getFacmNo());
 			acDetail.setBormNo(ba.getBormNo());
 			lAcDetail.add(acDetail);
+			tx.setTxAmt(acDetail.getTxAmt()); // 轉催呆金額放LoanBorTx交易金額
 		}
 		// 新增帳務分錄
 		AcDetail acDetail = new AcDetail();

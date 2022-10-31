@@ -122,10 +122,12 @@ public class L4962 extends TradeBuffer {
 			sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom, iInsuEndMonthTo, 0, Integer.MAX_VALUE, titaVo);
 			if (sInsuRenew != null) {
 				for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
-					if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
-						errorReportA(tInsuRenew, 1, titaVo);
-					} else if (tInsuRenew.getAcDate() == 0) {
-						errorReportA(tInsuRenew, 2, titaVo);
+					if (tInsuRenew.getRenewCode() == 2) {
+						if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
+							errorReportA(tInsuRenew, 1, titaVo);
+						} else if (tInsuRenew.getAcDate() == 0) {
+							errorReportA(tInsuRenew, 2, titaVo);
+						}
 					}
 				}
 			}
@@ -133,8 +135,9 @@ public class L4962 extends TradeBuffer {
 
 //			B.額度無保單檢核表
 //			戶號 額度 借款人 首撥日 押品號碼 保單號碼(最末) 保險起日 保險迄日 說明
-//				1.保單資料已到期 : 該月月底日前之所有保單(續保&正常)
-//				2.無保單資料 : 無目前保單號碼者
+//            有撥款且未結案：
+//				1.保單資料已到期 
+//				2.無保單資料 
 		if ("Y".equals(flagB)) {
 			totaB.init(titaVo);
 //				1.CollList額度之戶況為0246者

@@ -225,7 +225,7 @@ public class AcReceivableCom extends TradeBuffer {
 	public void mnt(int RvFg, List<AcReceivable> rvList, TitaVo titaVo) throws LogicException {
 		this.info("AcReceivableCom mnt ... ");
 		this.titaVo = titaVo;
-		int bizTbsdy =  titaVo.getEntDyI();
+		int bizTbsdy = titaVo.getEntDyI();
 		// 業務科目記號 <> 0 or 銷帳科目記號 <> 0
 		for (AcReceivable rv : rvList) {
 			this.info("AcReceivableCom mnt " + rv.toString());
@@ -565,12 +565,8 @@ public class AcReceivableCom extends TradeBuffer {
 //				&& tAcReceivable.getOpenTxtNo() == ac.getTitaTxtNo()) {
 //			tAcReceivable.setRvAmt(tAcReceivable.getRvBal());
 //		}
-
-		if (ac.getAcDate() == bizTbsdy) {
-			tAcReceivable.setAcBal(wkTxAmt.add(tAcReceivable.getAcBal())); // 次日交易不累加會計日餘額
-		} else {
-			this.info("AcReceivable procUpdate :" + ", bizTbsdy=" + bizTbsdy + ", AcBal=" + tAcReceivable.getAcBal());
-		}
+		// 累加會計日餘額
+		tAcReceivable.setAcBal(wkTxAmt.add(tAcReceivable.getAcBal())); 
 //4.設定銷帳記號	 銷帳記號 0.未銷、1.已銷
 		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) == 0) {
 			tAcReceivable.setClsFlag(1);

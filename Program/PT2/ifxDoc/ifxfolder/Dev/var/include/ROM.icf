@@ -5954,6 +5954,7 @@ TXFORM=L5R02
 #L5r03TransAccuOverAmt=m,14,S
 #L5r03NewTransAccuOverAmt=m,14,S
 #L5r03TrialFunc=A,1,S
+#L5r03CaseKindCode=X,1,S
 </L5R03.dec>
 
 <L5R03.tom>
@@ -6044,6 +6045,7 @@ TXFORM=L5R03
 #L5r03TransAccuOverAmt
 #L5r03NewTransAccuOverAmt
 #L5r03TrialFunc
+#L5r03CaseKindCode
 ^
 </L5R03.tom>
 

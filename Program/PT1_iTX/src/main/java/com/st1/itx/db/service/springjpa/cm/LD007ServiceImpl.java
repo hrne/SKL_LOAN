@@ -37,7 +37,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Boolean useFacmNo = parse.stringToInteger(titaVo.getParam("custNo")) > 0 && parse.stringToInteger(titaVo.getParam("facmNo")) > 0;
 		String bsOfficer = titaVo.getParam("bsOfficer");
 		Boolean useBsOfficer = bsOfficer != null && !bsOfficer.trim().isEmpty();
-		int entDy = titaVo.getEntDyI();
+		int entDy = titaVo.getEntDyI() + 19110000;
 		this.info("entDy = " + entDy);
 
 		this.info(String.format("lD007.findAll useWorkMonth:%s useCustNo:%s useFacmNo:%s useBfOfficer:%s", useWorkMonth, useCustNo, useFacmNo, useBsOfficer));

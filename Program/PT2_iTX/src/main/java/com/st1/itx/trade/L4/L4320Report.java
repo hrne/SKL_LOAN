@@ -115,7 +115,7 @@ public class L4320Report extends MakeReport {
 				fileNm = fileNm1 + "-人工調整(未調整)";
 				titaVo.putParam("AdjCode", 3);
 				titaVo.putParam("RateKeyInCode", 0);
-				if (this.iTxKind == 1) {
+				if (this.iTxKind == 1 && this.iCustType == 1) {
 					excelNo = 2;
 				} else {
 					excelNo = 3;
@@ -158,7 +158,7 @@ public class L4320Report extends MakeReport {
 
 				if (excelNo == 1) {
 					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
-							"L4320_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
+							"L4320_LNW171E底稿(10909調息檔)定期機動.xlsx", "正常件"); // 無地區
 				} else if (excelNo == 2) {
 					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 							"L4320_LNW171E底稿(10909調息檔)定期機動-地區別調整.xlsx", "正常件");
@@ -173,7 +173,7 @@ public class L4320Report extends MakeReport {
 				for (Map<String, String> tLDVo : fnAllList) {
 					this.info("tLDVo-------->" + tLDVo.toString());
 					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(tLDVo.get("F21"));
+					tempVo = tempVo.getVo(tLDVo.get("F22"));
 					row++;
 					int ii = 0;
 
@@ -185,21 +185,21 @@ public class L4320Report extends MakeReport {
 //							設定每欄之Format
 						switch (i) {
 
-//0		  1		2	3	4	   5	6		7		 8		     9		    10		   11	 12		      13	  14	 15		    
-//鄉鎮區 地區別	戶號	 額度 撥款  戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	利率代碼 利率名稱	       目前利率   加碼值	 擬調利率 
-//北投區 台北市	548040 2 1	        600,000 48,897 	1080319	    1090919	    1090810	  1E 退休滿五年員工	1.8600	  0.35   1.7500
+//0		  1		2	3	4	   5	6		7		 8		     9		    10		   11	 12		   13          14	     15	     16		    
+//鄉鎮區 地區別	戶號	 額度 撥款  戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	商品代碼 商品名稱	  利率種類         目前利率   加碼值	 擬調利率 
+//北投區 台北市	548040 2 1	        600,000 48,897 	1080319	    1090919	    1090810	 1E 退休滿五年員工 保單分紅利率  1.8600     0.35   1.7500
 
 // 地區別
 // +1         +2          
-// 地區別上限  地區別下限 
-//  2.8       1.85      
+//  地區別下限 地區別上限 
+//  1.85        2.8      
 
 // 定期機動
-// 16       17      18           19           20                 
+// 17       18         19           20           21                
 // 撥款日  到期日  首次調整日期 利率調整週期 預定下次利率調整日 
 // 1050319 1340919	 1050810	   6          1060210
 
-// 21
+// 22
 // 檢核訊息
 						case 2:
 						case 3:
@@ -218,30 +218,30 @@ public class L4320Report extends MakeReport {
 							ii++;
 							makeExcel.setValue(row, ii, tLDVo.get(fdnm), "#,##0");
 							break;
-						case 13:
 						case 14:
 						case 15:
+						case 16:
 							// 利率
 							ii++;
 							makeExcel.setValue(row, ii, tLDVo.get(fdnm), "#0.####");
-							if (excelNo == 2 && i == 15) {
-								ii++; 
-								makeExcel.setValue(row, ii, tempVo.getParam("CityRateCeiling"), "#0.####");
+							if (excelNo == 2 && i == 16) {
 								ii++;
 								makeExcel.setValue(row, ii, tempVo.getParam("CityRateFloor"), "#0.####");
+								ii++;
+								makeExcel.setValue(row, ii, tempVo.getParam("CityRateCeiling"), "#0.####");
 							}
 							break;
-						case 16:
 						case 17:
 						case 18:
 						case 19:
 						case 20:
+						case 21:
 							if (this.iTxKind == 1) {
 								ii++;
 								makeExcel.setValue(row, ii, tLDVo.get(fdnm));
 							}
 							break;
-						case 21:
+						case 22:
 							String procNote = "";
 							if (tempVo.get("CheckMsg") != null) {
 								procNote += tempVo.get("CheckMsg");

@@ -25,8 +25,6 @@ import com.st1.itx.util.parse.Parse;
 public class L4321 extends TradeBuffer {
 
 	@Autowired
-	public MakeReport makeReport;
-	@Autowired
 	public Parse parse;
 
 	private int iTxKind = 0;
@@ -91,7 +89,7 @@ public class L4321 extends TradeBuffer {
 		default:
 			break;
 		}
-		fileNm += makeReport.showTime(titaVo.getCalTm());
+		fileNm += titaVo.getCalTm().substring(0, 2) + ":" + titaVo.getCalTm().substring(2, 4);
 
 		titaVo.putParam("FileNm", fileNm);
 		titaVo.putParam("iCode", "L4321");

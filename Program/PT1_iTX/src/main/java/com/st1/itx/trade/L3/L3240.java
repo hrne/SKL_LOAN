@@ -204,6 +204,10 @@ public class L3240 extends TradeBuffer {
 		// 沖正處理
 		repayEraseRoutine();
 
+		 if (iCaseCloseCode == 3 || iCaseCloseCode == 7 || iCaseCloseCode == 8) {
+			 wkTxAmt = BigDecimal.ZERO;
+		 }
+		 
 		if (wkRepayCode == 0) {
 			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 				wkRepayCode = 9; // 其他
@@ -225,9 +229,9 @@ public class L3240 extends TradeBuffer {
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 4 沖正
 		// L3240 TxAmt = 300 TempAmt = 300 Loan 0 ==> HCODE = 0 (入帳金額轉暫收款-冲正產生)
 		// Debit: Loan 500 Credit TAV 500(Tx 300, Temp 200)
-
+        // 轉催呆金額放LoanBorTx交易金額 
 		// THC 暫收款－沖正
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
+		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0 && iCaseCloseCode < 3) {
 			acDetail = new AcDetail();
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("THC");
@@ -558,6 +562,7 @@ public class L3240 extends TradeBuffer {
 				acDetail.setFacmNo(tx.getFacmNo());
 				acDetail.setBormNo(tx.getBormNo());
 				lAcDetail.add(acDetail);
+				wkTxAmt = BigDecimal.ZERO; // 轉催呆金額放LoanBorTx交易金額
 			}
 		}
 		// 利息

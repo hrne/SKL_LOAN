@@ -910,6 +910,7 @@ A(ID_UNINO,0,#GroupId)
 #AdjustDateD
 #AdjustDateC
 #GroupId
+#BaseRateCodeX
 </sub>
 
 !------ 下行電文TOM ------

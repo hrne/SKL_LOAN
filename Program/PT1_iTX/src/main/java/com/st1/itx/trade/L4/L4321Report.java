@@ -49,13 +49,14 @@ public class L4321Report extends MakeReport {
 	private int iAdjCode = 0;
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private long sno;
-	String fileNm = "";
+	private String fileNm = "";
 
 	public long exec(TitaVo titaVo) throws LogicException {
 		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
 
+		this.fileNm = titaVo.getParam("FileNm");
 		this.info("L4321Report exec");
 
 //		titaVo titaVo
@@ -66,45 +67,17 @@ public class L4321Report extends MakeReport {
 //		filename 輸出檔案名稱(不含副檔名,預設為.xlsx)
 //		defaultExcel 預設excel底稿檔
 //		defaultSheet 預設sheet,可指定 sheet index or sheet name
-		String fileNm1 = "";
-		if (this.iCustType == 1) {
-			fileNm1 = "個金";
-		} else {
-			fileNm1 = "企金";
-		}
-		switch (this.iTxKind) {
-		case 1:
-			fileNm1 += "定期機動利率";
-			break;
-		case 2:
-			fileNm1 += "機動指數利率";
-			break;
-		case 3:
-			fileNm1 += "機動非指數利率";
-			break;
-		case 4:
-			fileNm1 += "員工利率變動";
-			break;
-		case 5:
-			fileNm1 += "按商品別利率";
-			break;
-		default:
-			break;
-		}
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
 		switch (this.iAdjCode) {
 		case 1:
-			fileNm += fileNm1 + "-批次自動調整";
 			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 			break;
 		case 2:
-			fileNm += fileNm1 + "-按地區別調整";
 			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 			break;
 		case 3:
-			fileNm += fileNm1 + "-人工調整";
 			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
 			break;
@@ -138,9 +111,9 @@ public class L4321Report extends MakeReport {
 //						設定每欄之Format
 					switch (i) {
 
-//		0		1		2	3	4	     5  	6		7		8		  9		     10		   11		12		   13	    14	
-//		 鄉鎮區	地區別	戶號	 額度 撥款	戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	利率代碼 	利率名稱	目前利率 	調整後利率
-//		 北投區	台北市	548040	2	1	600,000 48,897 	1080319	1090919	1090810	1E	退休滿五年員工	1.8600	      1.25  	1.75	
+//		0		1		2	3	4	     5  	6		7		8		  9		     10		   11	  12	  13	       14	      15
+//		 鄉鎮區	地區別	戶號	 額度 撥款	戶名	撥款金額	放款餘額	 目前生效日  	本次生效日	繳息迄日	商品代碼  商品名稱 利率種類	  目前利率 	調整後利率
+//		 北投區	台北市	548040	2	1	     600,000 48,897  1080319	1090919  	1090810  1E	退休滿五年員工 保單分紅利率 1.8600	     1.75	
 					case 2:
 					case 3:
 					case 4:
@@ -156,8 +129,8 @@ public class L4321Report extends MakeReport {
 						// 金額
 						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#,##0");
 						break;
-					case 13:
 					case 14:
+					case 15:
 						// 利率
 						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm), "#0.####");
 						break;

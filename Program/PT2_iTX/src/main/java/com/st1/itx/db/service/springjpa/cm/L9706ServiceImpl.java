@@ -69,7 +69,7 @@ public class L9706ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              FROM ( SELECT  \"CustNo\"    ";
 		sql += "                             ,\"FacmNo\"    ";
 		sql += "                             ,\"BormNo\"    ";
-		sql += "                             MAX(\"AcDate\") as \"AcDate\" ";
+		sql += "                             ,MAX(\"AcDate\") as \"AcDate\" ";
 		//sql += "                             ,\"LoanBal\"   ";
 		//sql += "                             ,ROW_NUMBER() OVER (PARTITION By \"CustNo\", \"FacmNo\", \"BormNo\" ORDER BY \"BorxNo\" DESC) as ROW_NO   ";
 		sql += "                     FROM  \"LoanBorTx\"              ";

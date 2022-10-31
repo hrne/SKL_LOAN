@@ -48,7 +48,9 @@ import com.st1.itx.db.domain.JcicZ450Id;
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
 import com.st1.itx.db.domain.JcicZ447;
+import com.st1.itx.db.domain.JcicZ447Id;
 import com.st1.itx.db.domain.JcicZ572;
+import com.st1.itx.db.domain.JcicZ572Id;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 //import com.st1.itx.db.domain.AcReceivableId;
@@ -251,7 +253,7 @@ public class NegCom extends CommBuffer {
 			{ "L5r03NewTransRepayDate", "NewTransRepayDate", "入帳還款日期(後)", "" }, // DateRocToAc
 			{ "L5r03TransOrgAccuOverAmt", "TransOrgAccuOverAmt", "累溢繳款(交易後)(前)", "" }, { "L5r03NewTransOrgAccuOverAmt", "NewTransOrgAccuOverAmt", "累溢繳款(交易後)(後)", "" },
 			{ "L5r03TransAccuOverAmt", "TransAccuOverAmt", "累溢繳款(交易後)(前)", "" }, { "L5r03NewTransAccuOverAmt", "NewTransAccuOverAmt", "累溢繳款(交易後)(後)", "" },
-			{ "L5r03TrialFunc", "TrialFunc", "程式功能內部用代號", "" } };
+			{ "L5r03TrialFunc", "TrialFunc", "程式功能內部用代號", "" } , { "L5r03CaseKindCode", "CaseKindCode", "案件種類", "" }};
 
 	public NegCom() {
 
@@ -893,6 +895,7 @@ public class NegCom extends CommBuffer {
 		mapNeg.put("NewTransAccuOverAmt", String.valueOf(transAccuOverAmt));// 累溢繳款(交易後)(後)
 
 		mapNeg.put("Trial", iTrialFunc);
+		mapNeg.put("CaseKindCode", tNegMain.getCaseKindCode());//案件種類
 
 	}
 
@@ -1765,7 +1768,7 @@ public class NegCom extends CommBuffer {
 	 * 
 	 * @param payIntDate   繳息迄日
 	 * @param repaidPeriod 繳期數
-	 * @param titaVo       TitaVo
+	 * @param titaVo TitaVo
 	 * @return 應繳日
 	 * @throws LogicException ..
 	 */

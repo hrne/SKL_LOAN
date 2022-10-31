@@ -195,6 +195,7 @@ public class L618C extends TradeBuffer {
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setDesc("法務費轉列催收");
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
+		tLoanBorTx.setTxAmt(iTxAmt); // 轉催呆金額放LoanBorTx交易金額
 		tLoanBorTx.setTempAmt(wkTempAmt);
 		tLoanBorTx.setOverflow(wkOverflow);
 		//

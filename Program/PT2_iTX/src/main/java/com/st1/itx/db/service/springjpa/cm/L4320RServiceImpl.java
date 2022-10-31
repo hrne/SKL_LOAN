@@ -61,23 +61,25 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "      , BR.\"PresEffDate\"   " // F8 目前生效日
 				+ "      , BR.\"CurtEffDate\"   " // F9 本次生效日
 				+ "      , BR.\"PrevIntDate\"   " // F10 繳息迄日
-				+ "      , BR.\"ProdNo\"        " // F11 利率代碼
-				+ "      , FP.\"ProdName\"      " // F12 利率名稱
-				+ "      , BR.\"PresentRate\"   " // F13 目前利率
-				+ "      , BR.\"ContrRateIncr\" " // F14 合約加碼值
-				+ "      , BR.\"ProposalRate\"  " // F15 擬調利率
-				+ "      , LN.\"DrawdownDate\"  " // F16 撥款日期
-				+ "      , LN.\"MaturityDate\"  " // F17 到期日
-				+ "      , LN.\"FirstAdjRateDate\"  " // F18 首次調整日期
-				+ "      , BR.\"PreNextAdjFreq\"  " // F19 利率調整週期
-				+ "      , BR.\"PreNextAdjDate\"  " // F20 預定下次利率調整日
-				+ "      , BR.\"JsonFields\"  " // F21 jason格式紀錄欄
+				+ "      , BR.\"ProdNo\"        " // F11 商品代碼
+				+ "      , FP.\"ProdName\"      " // F12 商品名稱
+	 	        + "      , CD.\"Item\"          " // F13 利率種類
+				+ "      , BR.\"PresentRate\"   " // F14 目前利率
+				+ "      , BR.\"ContrRateIncr\" " // F15 合約加碼值
+				+ "      , BR.\"ProposalRate\"  " // F16 擬調利率
+				+ "      , LN.\"DrawdownDate\"  " // F17 撥款日期
+				+ "      , LN.\"MaturityDate\"  " // F18 到期日
+				+ "      , LN.\"FirstAdjRateDate\"  " // F19 首次調整日期
+				+ "      , BR.\"PreNextAdjFreq\"  " // F20 利率調整週期
+				+ "      , BR.\"PreNextAdjDate\"  " // F21預定下次利率調整日
+				+ "      , BR.\"JsonFields\"  " // F22 jason格式紀錄欄
 				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
 				+ " LEFT JOIN \"LoanBorMain\" LN ON LN.\"CustNo\"   = BR.\"CustNo\" "
 				+ "                             AND LN.\"FacmNo\" = BR.\"FacmNo\" "
 				+ "                             AND LN.\"BormNo\" = BR.\"BormNo\" "
 				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
 				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
+				+ " LEFT JOIN \"CdCode\"   CD ON CD.\"DefCode\" = 'BaseRate0' "
 				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
 				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
 				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1

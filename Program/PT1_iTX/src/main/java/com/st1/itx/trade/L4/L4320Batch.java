@@ -592,7 +592,7 @@ public class L4320Batch extends TradeBuffer {
 				warnMsg += ", 下次利率調整日為到期日";
 			} else if ("Y".equals(incrFlag)) {
 				adjCode = 1;
-			} else if ("".equals(cityCode.trim())) {
+			} else if ("".equals(cityCode.trim()) || this.iCustType == 2) {
 				adjCode = 3;
 			} else {
 				adjCode = 2;
@@ -605,17 +605,17 @@ public class L4320Batch extends TradeBuffer {
 				// 依地區別利率上、下限調整
 				if (rateProp.compareTo(cityRateCeiling) > 0) {
 					rateProp = cityRateCeiling;
-					warn = ", 高於地區上限";
+					warn = ", 高於地區上限，依地區上限利率調整";
 				}
 				if (rateProp.compareTo(cityRateFloor) < 0) {
 					rateProp = cityRateFloor;
-					warn = ", 低於地區下限";
+					warn = ", 低於地區下限，依地區下限利率調整";
 				}
 				if (rateIncr.compareTo(BigDecimal.ZERO) > 0 && contractRate.compareTo(rateProp) < 0) {
 					rateProp = contractRate;
-					warn = ", 高於合約利率";
+					warn = ", 高於合約利率，依合約利率調整";
 				}
-				warn += ", 地區別加減碼設定值:" +  cityRateIncr;
+				warn += ", 地區別加減碼設定值:" + cityRateIncr;
 				warnMsg += warn;
 			}
 

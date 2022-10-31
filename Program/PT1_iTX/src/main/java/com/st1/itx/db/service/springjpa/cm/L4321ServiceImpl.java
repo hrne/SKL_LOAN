@@ -60,14 +60,19 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "      , BR.\"PresEffDate\"   " // F8 目前生效日
 				+ "      , BR.\"CurtEffDate\"   " // F9 本次生效日
 				+ "      , BR.\"PrevIntDate\"   " // F10 繳息迄日
-				+ "      , BR.\"ProdNo\"        " // 利率代碼
-				+ "      , FP.\"ProdName\"      " // 利率名稱
-				+ "      , BR.\"PresentRate\"   " // 目前利率
-				+ "      , BR.\"AdjustedRate\"  " // 調後利率
-				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" " + " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
-				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" " + " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
-				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = " + iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= "
-				+ custType1 + "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
+				+ "      , BR.\"ProdNo\"        " // F11 商品代碼
+				+ "      , FP.\"ProdName\"      " // F12 商品名稱
+	 	        + "      , CD.\"Item\"          " // F13 利率種類
+				+ "      , BR.\"PresentRate\"   " // F14 目前利率
+				+ "      , BR.\"AdjustedRate\"  " // F15 調後利率
+				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
+				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
+				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
+				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
+				+ " LEFT JOIN \"CdCode\"   CD ON CD.\"DefCode\" = 'BaseRate0' "
+				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
+				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
+				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode;
 		this.info("sql=" + sql);
 
 		Query query;
