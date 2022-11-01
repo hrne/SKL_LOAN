@@ -89,6 +89,11 @@ public class L3R02 extends TradeBuffer {
 				}
 			}
 		}
+		// L3721檢查
+		if ("L3721".equals(titaVo.getTxcd()) && iBormNo == 0) {
+			throw new LogicException(titaVo, "E0010", "無正常撥款資料"); // 功能選擇錯誤
+		}
+
 		LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
 			if (iBormNo > 900) {

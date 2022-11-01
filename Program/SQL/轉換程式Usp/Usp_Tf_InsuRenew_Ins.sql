@@ -127,24 +127,24 @@ BEGIN
                -- 1: FAP、FAE、FEP、FEE、FFP、FNP
                -- 2: 保險起迄日少於一年時歸類短期保單
                -- from USER 淑微 PT2 UAT測試問題 第322號
-               WHEN FR1P."INSNUM2" LIKE '%FAP%' -- 商業火單
+               WHEN NVL(FR1P."INSNUM2",FR1P."INSNUM") LIKE '%FAP%' -- 商業火單
                THEN '08'
-               WHEN FR1P."INSNUM2" LIKE '%FAE%' -- 商業火單加批保單
+               WHEN NVL(FR1P."INSNUM2",FR1P."INSNUM") LIKE '%FAE%' -- 商業火單加批保單
                THEN '10'
-               WHEN FR1P."INSNUM2" LIKE '%FEP%' -- 住宅火險地震險
+               WHEN NVL(FR1P."INSNUM2",FR1P."INSNUM") LIKE '%FEP%' -- 住宅火險地震險
                THEN '01'
-               WHEN FR1P."INSNUM2" LIKE '%FEE%' -- 住宅火險地震險加批保單
+               WHEN NVL(FR1P."INSNUM2",FR1P."INSNUM") LIKE '%FEE%' -- 住宅火險地震險加批保單
                THEN '11'
-               WHEN FR1P."INSNUM2" LIKE '%FFP%' -- 住宅火災及地震基本保險(甲式)
+               WHEN NVL(FR1P."INSNUM2",FR1P."INSNUM") LIKE '%FFP%' -- 住宅火災及地震基本保險(甲式)
                THEN '12'
-               WHEN FR1P."INSNUM2" LIKE '%FNP%' -- 住宅地震基本保險
+               WHEN NVL(FR1P."INSNUM2",FR1P."INSNUM") LIKE '%FNP%' -- 住宅地震基本保險
                THEN '13'
-               WHEN FR1P."INSSDT2" > 0
-                    AND FR1P."INSEDT2" > 0
+               WHEN NVL(FR1P."INSSDT2",FR1P."INSSDT") > 0
+                    AND NVL(FR1P."INSEDT2",FR1P."INSEDT") > 0
                     AND
                     TRUNC(MONTHS_BETWEEN(
-                      TO_DATE(FR1P."INSEDT2",'YYYYMMDD')
-                      , TO_DATE(FR1P."INSSDT2",'YYYYMMDD')
+                      TO_DATE(NVL(FR1P."INSEDT2",FR1P."INSEDT"),'YYYYMMDD')
+                      , TO_DATE(NVL(FR1P."INSSDT2",FR1P."INSSDT"),'YYYYMMDD')
                     )) < 12
                THEN '09' -- 短期保單
                WHEN FR1P."INSIAM2" > 0 -- 火災險保險金額

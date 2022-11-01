@@ -87,7 +87,7 @@ BEGIN
             LEFT JOIN "TmpQQQP" QQ ON QQ."LMSACN" = A1."LMSACN"
                                   AND QQ."LMSAPN" = A1."LMSAPN"
                                   AND QQ."CASCDE" = A1."CASCDE"
-            WHERE NVL("LMSLLD",0) > 20200610
+            WHERE NVL("LMSLLD",0) >= 20210101
               AND NVL("LMSLLD",0) < 29101231) S1
     -- 計算累積撥款金額 (合計到額度層 ??? )
     LEFT JOIN "FacMain" FAC ON FAC."CustNo" = S1."LMSACN"
@@ -95,7 +95,13 @@ BEGIN
     LEFT JOIN "TB$WKMP" S2 ON S2."DATES" <= S1."LMSLLD"
                           AND S2."DATEE" >= S1."LMSLLD"
     -- AS400員工檔
-    LEFT JOIN "LN$DTYP" S3 ON S3.CUSID1 = NVL(S1.ID1X,S1."CUSEMP") -- 介紹人 -- 2022-05-13 智偉修改:ID1X NULL 時用CUSEMP補上
+    LEFT JOIN "LN$DTYP" S3 ON CASE -- 介紹人 
+                                WHEN S1.ID1X = NULL
+                                     AND S3.CUSEMP = S1.CUSEMP -- 2022-05-13 智偉修改:ID1X NULL 時用CUSEMP補上
+                                THEN 1
+                                WHEN S3.CUSID1 = S1.ID1X
+                                THEN 1
+                              ELSE 0 END
     LEFT JOIN "LN$DTYP" S4 ON S4.CUSID1 = S1.ID7X -- 處經理
     LEFT JOIN "CdBcm" S5 ON S5."UnitCode" = S1."BCMCOD"
     WHERE S1."Seq" = 1

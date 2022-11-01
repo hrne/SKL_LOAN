@@ -80,6 +80,7 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
 				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
 				+ " LEFT JOIN \"CdCode\"   CD ON CD.\"DefCode\" = 'BaseRate0' "
+				+ "                          AND CD.\"Code\" = BR.\"BaseRateCode\" "
 				+ " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\"   = BR.\"CustNo\" "
 				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
 				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1

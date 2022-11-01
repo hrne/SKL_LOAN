@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,6 +22,7 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SortMapListCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -48,6 +50,9 @@ public class L2072 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
+	
+	@Autowired
+	SortMapListCom sortMapListCom;
 
 	/* 轉換工具 */
 	@Autowired
@@ -86,6 +91,17 @@ public class L2072 extends TradeBuffer {
 			slCustRmk = sCustRmkService.findAll(this.index, this.limit, titaVo);
 			lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
 		}
+		//CreateDate DESC RmkNo ASC 
+		List<CustRmk> lCustRmk2 = new ArrayList<>(lCustRmk);
+
+		lCustRmk2.sort((c1, c2) -> {
+			if (c1.getCreateDate().compareTo(c2.getCreateDate()) != 0) {
+				return 1;
+			} else if(c1.getRmkNo()-c2.getRmkNo() != 0){
+				return c1.getRmkNo()-c2.getRmkNo();
+			}
+				return 0;
+		});
 
 		if (lCustRmk == null) {
 			throw new LogicException(titaVo, "E2003", "L2072 該戶號" + iCustNo + "不存在顧客控管警訊檔。");
@@ -99,7 +115,7 @@ public class L2072 extends TradeBuffer {
 
 		CdEmp tCdEmp = new CdEmp();
 
-		for (CustRmk tCustRmk : lCustRmk) {
+		for (CustRmk tCustRmk : lCustRmk2) {
 			this.info("tCustRmk---->" + tCustRmk);
 			// new occurs
 			OccursList occurslist = new OccursList();

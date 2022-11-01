@@ -351,6 +351,88 @@ BEGIN
         -- SET "Status" = 3
         -- WHERE "PrinBalance" + "OvduBal" + "BadDebtBal" = 0
 
+        --   更新 FeeAmt 費用
+
+        DBMS_OUTPUT.PUT_LINE('UPDATE FeeAmt ');
+
+        -- 2021-02-19 更新 須配合新增欄位
+        MERGE INTO "MonthlyFacBal" M
+        USING ( 
+          WITH LastMonthData AS (
+            SELECT MAX("YearMonth") AS "LastMonth"
+            FROM "MonthlyFacBal"
+          )
+          SELECT "YearMonth"
+                ,"CustNo"
+                ,"FacmNo"
+                ,NVL(SUM("FireFee"), 0)       AS "FireFee"
+                ,NVL(SUM("LawFee"), 0)        AS "LawFee"
+                ,NVL(SUM("ModifyFee"), 0)     AS "ModifyFee"
+                ,NVL(SUM("AcctFee"), 0)       AS "AcctFee"
+                ,NVL(SUM("ShortfallPrin"), 0) AS "ShortfallPrin"
+                ,NVL(SUM("ShortfallInt"), 0)  AS "ShortfallInt"
+                ,NVL(SUM("TempAmt"), 0)       AS "TempAmt"
+          FROM ( 
+            SELECT M."YearMonth" 
+                  ,M."CustNo"
+                  ,M."FacmNo"
+                  ,CASE
+                      WHEN A."AcctCode" IN ('TMI')
+                      THEN A."RvBal"
+                      WHEN A."AcctCode" IN ('F09', 'F25')
+                      THEN A."RvBal"
+                      WHEN IR."CustNo" IS NOT NULL
+                      THEN IR."TotInsuPrem"
+                    ELSE 0 END AS "FireFee" -- 火險費用
+                  ,CASE
+                      WHEN A."AcctCode" IN ('F07', 'F24')
+                      THEN A."RvBal"
+                    ELSE 0 END AS "LawFee" -- 法務費用
+                  ,CASE
+                      WHEN A."AcctCode" IN ('F29')
+                      THEN A."RvBal"
+                    ELSE 0 END AS "ModifyFee" -- 契變手續費
+                  ,CASE
+                      WHEN A."AcctCode" IN ('F10')
+                      THEN A."RvBal"
+                    ELSE 0 END AS "AcctFee" -- 帳管費用
+                  ,CASE
+                      WHEN SUBSTR(A."AcctCode",0,1) IN ('Z')
+                      THEN A."RvBal"
+                    ELSE 0 END AS "ShortfallPrin" -- 短繳本金
+                  ,CASE
+                      WHEN SUBSTR(A."AcctCode",0,1) IN ('I')
+                      THEN A."RvBal"
+                    ELSE 0 END AS "ShortfallInt" -- 短繳利息
+                  ,CASE
+                      WHEN A."AcctCode" = 'TAV'
+                      THEN A."RvBal"
+                    ELSE 0 END AS "TempAmt" -- 暫收金額
+            FROM "MonthlyFacBal" M
+            LEFT JOIN "LastMonthData" LMD ON LMD."LastMonth" = M."YearMonth"
+            LEFT JOIN "AcReceivable" A ON A."CustNo" = M."CustNo"
+                                      AND A."FacmNo" = M."FacmNo"
+            LEFT JOIN "InsuRenew" IR ON IR."CustNo" = A."CustNo"
+                                    AND IR."FacmNo" = A."FacmNo"
+                                    AND IR."PrevInsuNo" = A."RvNo"                
+            WHERE M."YearMonth" = NVL(LMD."LastMonth",0)
+              AND (A."AcctCode" IN ('F10','F29','TMI', 'F09', 'F25', 'F07', 'F24','TAV')
+                    OR SUBSTR(A."AcctCode",0,1) IN ('I','Z'))
+          ) M
+          GROUP BY "YearMonth","CustNo", "FacmNo" 
+        ) D
+        ON (    M."YearMonth" = D."YearMonth"
+            AND M."CustNo"    = D."CustNo"
+            AND M."FacmNo"    = D."FacmNo")
+        WHEN MATCHED THEN UPDATE
+        SET M."FireFee"       = D."FireFee"
+          ,M."LawFee"        = D."LawFee"
+          ,M."ModifyFee"     = D."ModifyFee"
+          ,M."AcctFee"       = D."AcctFee"
+          ,M."ShortfallPrin" = D."ShortfallPrin"
+          ,M."ShortfallInt"  = D."ShortfallInt"
+          ,M."TempAmt"       = D."TempAmt"
+        ;
         -- 記錄程式結束時間
         JOB_END_TIME := SYSTIMESTAMP;
 

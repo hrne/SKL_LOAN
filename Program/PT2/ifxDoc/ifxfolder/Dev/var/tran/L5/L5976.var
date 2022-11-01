@@ -747,8 +747,8 @@ BIND(#BtnConnect,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BufConnect})
 ! L1905 顧客聯絡電話查詢
 
 !債務人連絡電話
-#PhoneConnect=X,13,S
-T(2,048+#CustId)
+#PhoneConnect=X,14,S
+T(2,1048+#CustId)
 
 #BINDK=X,1,S
 BIND(#BTNK,click, {cmd=CHAIN; ntxcd=L8030; ntxbuf=#PhoneConnect})

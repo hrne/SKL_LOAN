@@ -21,8 +21,8 @@ E(0,0)
 [#<->#,"#FdFunctionCode+功能",#FunctionCodeX],
 [#<->#,"#FdWorkMonth+利率年月",#WorkMonth],
 ["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[50,100,150,150,150], p_cols:[10,20,20,20,20]}","","",
-["地區別","地區別名稱","利率加減碼","利率上限","利率下限"],
-[[#CityCode1],[#CityItem1],[#IntRateIncr1,#PersentA1],[#IntRateCeiling1,#PersentB1],[#IntRateFloor1,#PersentC1]]],
+["地區別","地區別名稱","利率加減碼","利率下限","利率上限"],
+[[#CityCode1],[#CityItem1],[#IntRateIncr1,#PersentA1],[#IntRateFloor1,#PersentC1],[#IntRateCeiling1,#PersentB1]]],
 ]
 
 #FdFunctionCode=X,2,L
@@ -36,6 +36,7 @@ E(0,0)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
+C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L4022地區利率查詢]進入),$),$)
 
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -56,7 +57,7 @@ T(H,#FunctionCode,#FunctionCodeHelp)
 C(3,#FunctionCode,3,$,S)
 E(0,@RimFunCd,5)
 E(0,@RimWorkMonth,#WorkMonth)
-RESET_RIM(#RimL4r20copy,L4R20)
+! RESET_RIM(#RimL4r20copy,L4R20)
 S(L4R20,1,#RimCityCode,#RimWorkMonth,#RimFunCd)
 R(1,L4R20)
 ##loop{times:30,i:1}
@@ -90,19 +91,23 @@ E(0,#WorkMonth)
 E(0,#FunctionCode)
 
 #RimL4r20=X,1,S
-RESET_RIM(#RimL4r20,L4R20)
+! RESET_RIM(#RimL4r20,L4R20)
 S(L4R20,1,#RimCityCode,#RimWorkMonth,#RimFunCd)
 R(1,L4R20)
+CALL(#SetValue)
 
-#SetValue=A,1,S
-C(3,#FunctionCode,3,S,$)
+
+
+#SetValue=@,1,S
 ##loop{times:30,i:1}
+C(3,#FunctionCode,3,s,$)
 T(2,@CityCode{i},#L4r20CityCode{i})
 T(2,@CityItem{i},#L4r20CityItem{i})
 E(0,@IntRateIncr{i},#L4r20IntRateIncr{i})
 E(0,@IntRateCeiling{i},#L4r20IntRateCeiling{i})
 E(0,@IntRateFloor{i},#L4r20IntRateFloor{i})
 ##end
+
 
 ##loop {times:30,i:1,j:1,k:2}
 IF(#CityCode{i}!="",$,INVOKEJS(SHOW,grd1,{j},{k},0))
@@ -136,17 +141,18 @@ C(3,#UpdateCode,1,$,s)
 IF(#CityCode{i}!="",$,S)
 C(3,#UpdateCode,1,$,s)
 
+
+#IntRateFloor{i}=m,2.4,I
+IF(#CityCode{i}!="",$,S)
+C(3,#UpdateCode,1,$,s)
+
+
 #IntRateCeiling{i}=m,2.4,I
 IF(#CityCode{i}!="",$,S)
 C(3,#UpdateCode,1,$,s)
 @
 V(2,0)
-
-#IntRateFloor{i}=m,2.4,I
-IF(#CityCode{i}!="",$,S)
-C(3,#UpdateCode,1,$,s)
-@
-V(5,0.0001,#IntRateCeiling{i})
+IF(#IntRateCeiling{i}<#IntRateFloor{i},V(P,不可低於利率下限),$)
 
 
 ##end

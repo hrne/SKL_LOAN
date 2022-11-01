@@ -317,7 +317,7 @@ BEGIN
             FROM ( SELECT M."CustNo"
                          ,M."FacmNo"
                          ,CASE
-                            WHEN A."AcctCode" IN ('TMI') AND 	A."OpenAcDate" <=	TBSDYF		--不含未到期火險費
+                            WHEN A."AcctCode" IN ('TMI')
                             THEN A."RvBal"
                             WHEN A."AcctCode" IN ('F09', 'F25')
                             THEN A."RvBal"

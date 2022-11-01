@@ -169,7 +169,7 @@ public class CheckClEva extends CommBuffer {
 			checkAmt(titaVo, iClNo);
 
 			try {
-				sClEvaService.insert(tClEva);
+				sClEvaService.insert(tClEva, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "擔保品重評資料檔");
 			}
@@ -201,7 +201,7 @@ public class CheckClEva extends CommBuffer {
 			tClMain.setShareTotal(shareTotal);
 		}
 		try {
-			tClMain = sClMainService.update2(tClMain);
+			tClMain = sClMainService.update2(tClMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0007", "擔保品主檔");
 		}
@@ -220,7 +220,7 @@ public class CheckClEva extends CommBuffer {
 		tClImm.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
 
 		try {
-			tClImm = sClImmService.update(tClImm);
+			tClImm = sClImmService.update(tClImm, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0007", "擔保品不動產檔");
 		}
@@ -238,7 +238,7 @@ public class CheckClEva extends CommBuffer {
 
 		ClImm tClImm = new ClImm();
 
-		tClImm = sClImmService.holdById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
+		tClImm = sClImmService.findById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
 
 		ClMain tClMain = new ClMain();
 
@@ -291,7 +291,7 @@ public class CheckClEva extends CommBuffer {
 		checkAmt(titaVo, iClNo);
 
 		try {
-			sClEvaService.insert(tClEva);
+			sClEvaService.insert(tClEva, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0005", "擔保品重評資料檔");
 		}
@@ -333,7 +333,8 @@ public class CheckClEva extends CommBuffer {
 			shareCompAmt = wkEvaAmt;
 		}
 
-		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
+				BigDecimal.ROUND_HALF_UP);
 
 		// 分配金額和設定金額比較 較低的為可分配金額
 		this.info("分配金額和設定金額比較 = " + shareTotal + "," + settingAmt);
