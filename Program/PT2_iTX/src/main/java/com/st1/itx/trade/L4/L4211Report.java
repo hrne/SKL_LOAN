@@ -551,7 +551,7 @@ public class L4211Report extends MakeReport {
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 			
 				if (!"L4211".equals(txCode)) {
-					this.print(0, c3, tfnAllList.get("RepayAmt"), "R");// 匯款金額
+					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")),0), "R");// 匯款金額
 				}
 
 				if ("L4211".equals(txCode)) {
@@ -909,7 +909,7 @@ public class L4211Report extends MakeReport {
 				this.print(0, c2, tfnAllList.get("DetailSeq"), "C");// 匯款序號
 
 				if (!"L4211".equals(txCode)) {
-					this.print(0, c3, tfnAllList.get("RepayAmt"), "R");// 匯款金額
+					this.print(0, c3, formatAmt(new BigDecimal(tfnAllList.get("RepayAmt")),0), "R");// 匯款金額
 				}
 
 				if ("L4211".equals(txCode)) {

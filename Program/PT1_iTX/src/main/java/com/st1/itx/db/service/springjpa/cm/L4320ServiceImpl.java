@@ -148,6 +148,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(r2.\"EffectDate\", 0)                    as \"PresEffDate\" "; // 目前生效日
 		sql += "   ,NVL(r2.\"FitRate\", 0)                       as \"PresentRate\" "; // 目前利率
 		sql += "   ,NVL(tx.\"EntryDate\", 0)                     as \"EntryDate\" "; // 入帳日期
+		sql += "   ,NVL(tot.\"TotBalance\",0)                    as \"TotBalance\"  "; // 全戶餘額
 		sql += " from \"LoanBorMain\" b                                 ";
 // 要調整的利率資料
 		sql += " left join(                                             ";
@@ -201,6 +202,13 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and  r2.\"FacmNo\" = b.\"FacmNo\"        ";
 		sql += "                       and  r2.\"BormNo\" = b.\"BormNo\"        ";
 		sql += "                       and  r2.seq = 1                          ";
+		sql += " left join(                                             ";
+		sql += "           select                                       ";
+		sql += "             \"CustNo\"                              ";
+		sql += "            ,SUM(\"LoanBal\")   AS  \"TotBalance\"  ";
+		sql += "           from \"LoanBorMain\"                      ";
+		sql += "           group by  \"CustNo\"                      ";
+		sql += "        ) tot        on  tot.\"CustNo\" = b.\"CustNo\"        ";
 		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = b.\"CustNo\"      ";
 		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
@@ -225,7 +233,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
 			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" +iGroupId +"'";
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
-		}		sql += " where b.\"Status\" = 0                                        ";
+		}	
+		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;

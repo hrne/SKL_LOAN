@@ -91,7 +91,6 @@ public class L4320Batch extends TradeBuffer {
 	@Autowired
 	public L4320Report l4320Report;
 
-	private HashMap<tmpBorm, BigDecimal> loanBalTot = new HashMap<>();
 	private HashMap<tmpBorm, BigDecimal> facRate = new HashMap<>();
 	private HashMap<tmpBorm, Integer> facRateFlag = new HashMap<>();
 
@@ -174,7 +173,6 @@ public class L4320Batch extends TradeBuffer {
 			}
 			// 定期機動檢核件
 			if (flag && iTxKind == 1) {
-				loanBalTot = new HashMap<>();
 				facRate = new HashMap<>();
 				facRateFlag = new HashMap<>();
 				try {
@@ -292,14 +290,11 @@ public class L4320Batch extends TradeBuffer {
 		} catch (Exception e) {
 			throw new LogicException("E0015", ", " + e.getMessage());
 		}
-
-//		合計帳戶餘額
-		getTotalLoanBal(fnAllList);
-
+		
 //		額度下撥款的目前利率是否相同
 		setFacRate(fnAllList);
 
-//		運算全戶餘額及其他輸出欄位
+//		運算輸出欄位
 		if (fnAllList != null && fnAllList.size() != 0) {
 			for (Map<String, String> s : fnAllList) {
 				this.info("fnAllList=" + s);
@@ -340,10 +335,6 @@ public class L4320Batch extends TradeBuffer {
 				if (this.processCnt % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
-
-				// 全戶餘額
-				tmpBorm cust = new tmpBorm(custNo, 0, 0);
-				b.setTotBalance(loanBalTot.get(cust));
 
 				/* 新增或更新整批利率調整檔 */
 				if (isInsert) {
@@ -391,8 +382,7 @@ public class L4320Batch extends TradeBuffer {
 		b.setLoanBalance(loanBal);
 		b.setDrawdownAmt(drawdownAmt);
 		// 全戶餘額
-		tmpBorm cust = new tmpBorm(custNo, 0, 0);
-		b.setTotBalance(loanBalTot.get(cust));
+		b.setTotBalance(parse.stringToBigDecimal(s.get("TotBalance")));
 		// F11 員工利率記號
 		// F12 借戶利率檔是否依合約記號
 		String incrFlag = s.get("IncrFlag");
@@ -876,26 +866,6 @@ public class L4320Batch extends TradeBuffer {
 			return L4320Batch.this;
 		}
 
-	}
-
-	private void getTotalLoanBal(List<Map<String, String>> fnAllList) throws LogicException {
-		if (fnAllList != null && fnAllList.size() != 0) {
-			int i = 0;
-			for (int j = 1; j <= fnAllList.size(); j++) {
-				i = j - 1;
-
-				int custNo = parse.stringToInteger(fnAllList.get(i).get("CustNo"));
-
-				tmpBorm cust = new tmpBorm(custNo, 0, 0);
-
-				if (loanBalTot.containsKey(cust)) {
-					loanBalTot.put(cust,
-							loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("LoanBal"))));
-				} else {
-					loanBalTot.put(cust, parse.stringToBigDecimal(fnAllList.get(i).get("LoanBal")));
-				}
-			}
-		}
 	}
 
 	private void setFacRate(List<Map<String, String>> fnAllList) throws LogicException {

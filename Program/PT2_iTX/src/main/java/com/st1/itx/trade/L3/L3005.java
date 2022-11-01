@@ -115,7 +115,7 @@ public class L3005 extends TradeBuffer {
 				if (!loanCustRmkX.isEmpty()) {
 					loanCustRmkX += "\n";
 				}
-				loanCustRmkX += t.getRmkDesc();
+				loanCustRmkX += "會計日期:" + t.getAcDate() + " 說明:" + t.getRmkDesc();
 			}
 
 			oLoanCustRmkFlag = "Y";
@@ -159,7 +159,6 @@ public class L3005 extends TradeBuffer {
 
 			this.info("Size =" + resultList.size());
 			String txNo = "";
-			String oldTxNo = "";
 			String newTxNo = "";
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
@@ -208,7 +207,7 @@ public class L3005 extends TradeBuffer {
 					intEndDate = intEndDate - 19110000;
 				}
 				needPaidAmt = txAmt.add(tempAmt).subtract(overflow).add(unpaidAmt);
-				newTxNo = acDate + titaVo.getKinbr() + titaTlrNo + titaTxtNo;
+				newTxNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(result.get("OtherFields"));
 				BigDecimal totTxAmt = parse.stringToBigDecimal(result.get("TotTxAmt"));
@@ -224,7 +223,7 @@ public class L3005 extends TradeBuffer {
 					}
 				}
 				occursList.putParam("OOTxMsg", txMsg); // 還款類別 + 金額
-				if (oldTxNo.equals(newTxNo)) {
+				if (txNo.equals(newTxNo)) {
 					AcFg = "";
 					hCodeFlag = "";
 				} else if (displayflag.equals("A") || displayflag.equals("F") || displayflag.equals("I")) {
@@ -247,7 +246,6 @@ public class L3005 extends TradeBuffer {
 				// 溢短收
 				wkOverShort = overflow.subtract(unpaidAmt);
 				txNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
-				oldTxNo = acDate + titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);
 
