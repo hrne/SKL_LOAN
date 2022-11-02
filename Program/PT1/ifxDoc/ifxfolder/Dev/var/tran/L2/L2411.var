@@ -695,7 +695,6 @@ IF(#FunCd == 2 || #FunCd == 4,T(3,@FdCOLNO,*),S)
 
 #CustNo=A,7,S
 
-
 #CustNoX=X,100,L
 C(3,#CustNo,0,S,$)
 
@@ -1032,6 +1031,7 @@ T(H,#CityCode,#L6r03ResultCity)
 !調RIM鄉鎮 ST
 ! 調RIM取鄉鎮市區代碼
 #RimL6r03Area=X,1,S
+IF(#FunCd==2,IF(#CityCode == #L2r27CityCode,s,$),$)
 C(3,#ClCode1,1,$,S)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
@@ -1060,7 +1060,8 @@ V(H,#L6r03ResultArea)
 
 ! 鄉鎮市區代碼的對應名稱
 #AreaItem=x,20,L
-T(H,#AreaCode,#L6r03ResultArea)
+IF(#FunCd==2,IF(#AreaCode == #L6r03ResultArea,s,$),$)
+!T(H,#AreaCode,#L6r03ResultArea)
 
 !調RIM鄉鎮 ED
 
@@ -1095,7 +1096,8 @@ V(H,#L6r03ResultIr)
 
 ! 地段代碼的對應名稱
 #IrItem=X,20,L
-T(H,#IrCode,#L6r03ResultIr)
+IF(#FunCd==2,IF(#IrCode == #L6r03ResultIr,s,$),$)
+!T(H,#IrCode,#L6r03ResultIr)
 
 !調RIM地段 ED
 
@@ -1515,16 +1517,17 @@ V(7)
 #RimL6R10InsurerCode=X,2,S
 
 #SendL6R10=X,1,S
+IF(#FunCd==2,IF(#EvaCompany == #L2r23EvaCompany,s,$),$)
 E(0,@RimFuncCode,5)
 T(2,@RimL6R10InsurerType,2)
 T(2,@RimL6R10InsurerCode,#EvaCompany)
 RESET_RIM(#SendL6R10,L6R10)
 S(L6R10,1,#RimFuncCode,#RimTxCode,#RimL6R10InsurerType,#RimL6R10InsurerCode)
 R(1,L6R10)
+T(2,@EvaCompanyX,#L6R10InsurerItem)
 
 
 #EvaCompanyX=x,100,L
-T(2,#L6R10InsurerItem)
 
 ! [權利種類]
 #OwnershipCode=A,1,I
