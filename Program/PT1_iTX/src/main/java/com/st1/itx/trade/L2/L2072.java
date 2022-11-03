@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -50,7 +49,7 @@ public class L2072 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
-	
+
 	@Autowired
 	SortMapListCom sortMapListCom;
 
@@ -79,33 +78,31 @@ public class L2072 extends TradeBuffer {
 		String createDate = "";
 		String updateDate = "";
 		// new ArrayList
-		List<CustRmk> lCustRmk = new ArrayList<CustRmk>();
 		Slice<CustRmk> slCustRmk = null;
 
 		// PK
 		// 測試該戶號是否有資料存在顧客控管警訊檔
 		if (iCustNo > 0) {
 			slCustRmk = sCustRmkService.findCustNo(iCustNo, this.index, this.limit, titaVo);
-			lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
 		} else {
 			slCustRmk = sCustRmkService.findAll(this.index, this.limit, titaVo);
-			lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
 		}
-		//CreateDate DESC RmkNo ASC 
-		List<CustRmk> lCustRmk2 = new ArrayList<>(lCustRmk);
-
-		lCustRmk2.sort((c1, c2) -> {
-			if (c1.getCreateDate().compareTo(c2.getCreateDate()) != 0) {
-				return 1;
-			} else if(c1.getRmkNo()-c2.getRmkNo() != 0){
-				return c1.getRmkNo()-c2.getRmkNo();
-			}
-				return 0;
-		});
-
-		if (lCustRmk == null) {
+		if (slCustRmk == null) {
 			throw new LogicException(titaVo, "E2003", "L2072 該戶號" + iCustNo + "不存在顧客控管警訊檔。");
 		}
+		// CreateDate DESC RmkNo ASC
+		List<CustRmk> lCustRmk2 = new ArrayList<>(slCustRmk.getContent());
+
+		lCustRmk2.sort((c1, c2) -> {
+//			if (c1.getCreateDate().compareTo(c2.getCreateDate()) != 0) {
+			if(c1.getCreateDate().before(c2.getCreateDate())) {
+				return 1;
+			} else if (c1.getRmkNo() - c2.getRmkNo() != 0) {
+				return c1.getRmkNo() - c2.getRmkNo();
+			}
+			return 0;
+		});
+
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slCustRmk != null && slCustRmk.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
@@ -125,8 +122,10 @@ public class L2072 extends TradeBuffer {
 			occurslist.putParam("OORmkCode", tCustRmk.getRmkCode());
 			occurslist.putParam("OORmkDesc", tCustRmk.getRmkDesc());
 
-			String tempEmpNo = tCustRmk.getCreateEmpNo() == "" ? tCustRmk.getLastUpdateEmpNo() : tCustRmk.getCreateEmpNo();
-			String updateEmpNo = tCustRmk.getLastUpdateEmpNo() == "" ? tCustRmk.getCreateEmpNo() : tCustRmk.getLastUpdateEmpNo();
+			String tempEmpNo = tCustRmk.getCreateEmpNo() == "" ? tCustRmk.getLastUpdateEmpNo()
+					: tCustRmk.getCreateEmpNo();
+			String updateEmpNo = tCustRmk.getLastUpdateEmpNo() == "" ? tCustRmk.getCreateEmpNo()
+					: tCustRmk.getLastUpdateEmpNo();
 
 			occurslist.putParam("OOEmpNo", tempEmpNo);
 

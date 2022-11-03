@@ -105,6 +105,15 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 			break;
 		case 2: // 整批列印
+			sql += " SELECT       *                                         "
+					+ " FROM  ( SELECT                                      "
+					+ "          d.*                                        "
+					+ "         ,i.\"InsuYearMonth\"                        "
+					+ "         ,ROW_NUMBER() OVER(                         "
+					+ "            PARTITION BY i.\"CustNo\", i.\"FacmNo\"  "
+					+ "                ORDER BY i.\"InsuYearMonth\" ASC )  "
+					+ "          AS \"InsuRowNumber\"                       "
+					+ "          FROM (                                     ";
 			sql += " select                                                 ";
 			sql += "  b.\"EntryDate\" - 19110000     AS \"EntryDate\"       ";
 			sql += " ,b.\"CustNo\"                   AS \"CustNo\"          ";
@@ -152,6 +161,13 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 				useRepayBank = true;
 				break;
 			}
+			sql += " ) d             LEFT JOIN \"InsuRenew\" i ON d.\"RepayType\" = 5             "
+					+ "                                       AND i.\"CustNo\" = d.\"CustNo\"     "
+					+ "                                       AND i.\"FacmNo\" = d.\"FacmNo\"     "
+					+ "                                       AND i.\"RenewCode\" = 2             "
+					+ "                                       AND i.\"AcDate\" = 0                "
+					+ "                                       AND i.\"TotInsuPrem\" > 0 )         "
+					+ " WHERE nvl(\"InsuRowNumber\",1) = 1 or \"RepayType\" <> 5 ";
 			break;
 		case 3: // 連續扣款失敗明細＆通知
 			sql += " WITH S0 AS (";

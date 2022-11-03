@@ -263,12 +263,14 @@ public class L4454 extends TradeBuffer {
 		repayAmt = parse.stringToBigDecimal(t.get("RepayAmt"));
 		prevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
 		tTempVo = tTempVo.getVo(t.get("JsonFields"));
+		this.info("InsuYearMonth=" + t.get("InsuYearMonth"));
 		this.info(t.toString());
 //		抓取火險到期年月 = 火險應繳日前5碼
 		int insuMon = 0;
 		if (repayType == 5) {
-			if (tTempVo.get("InsuDate") != null) {
-				insuMon = parse.stringToInteger(FormatUtil.pad9("" + tTempVo.get("InsuDate"), 7).substring(0, 5));
+			if (t.get("InsuYearMonth") != null) {
+				insuMon = parse.stringToInteger(t.get("InsuYearMonth")) - 191100;
+				unSuccText(iRepayBank, t, insuMon, titaVo); // 不成功簡訊通知
 			}
 		}
 

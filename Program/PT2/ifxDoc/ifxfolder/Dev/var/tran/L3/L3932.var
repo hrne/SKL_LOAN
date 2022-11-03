@@ -465,7 +465,7 @@ T(H,#OOStatus,#StatusHelp)
 
 !修改
 #OOBUF2=X,100,S
-T(2,L3932+#OOCustNo+          +0000000+#OOFacmNo+#OOBormNo+#OONextAdjRateDate+#OOEffectDate+#OORateCode+#OOProdNo+#OOBaseRateCode+#OOBaseRate+#OOFitRate+#OORateIncr+#OOIndividualIncr+#OOChangeFg)
+T(2,L3932+#OOCustNo+          +0000000+#OOFacmNo+000+#OONextAdjRateDate+#OOEffectDate+#OORateCode+#OOProdNo+#OOBaseRateCode+#OOBaseRate+#OOFitRate+#OORateIncr+#OOIndividualIncr+#OOChangeFg)
 
 
 #OOBTN2=X,8,S

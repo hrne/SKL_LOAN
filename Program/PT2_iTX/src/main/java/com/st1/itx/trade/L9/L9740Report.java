@@ -50,16 +50,12 @@ public class L9740Report extends MakeReport {
 	 * 執行報表輸出
 	 * 
 	 * @param titaVo
-	 * @param iDate1  撥款日1(西元)
-	 * @param iDate2  撥款日2(西元)
-	 * @param iDate3  撥款日3(西元)
-	 * @param rate   利率
 	 * @return
 	 * @throws LogicException
 	 *
 	 * 
 	 */
-	public boolean exec(TitaVo titaVo, int iDate1, int iDate2,int iDate3,BigDecimal rate) throws LogicException {
+	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9740 exec");
 
 		int reportDate = titaVo.getEntDyI() + 19110000;
@@ -81,17 +77,30 @@ public class L9740Report extends MakeReport {
 
 		List<Map<String, String>> listL9740Data3 = null;
 
+		int drawDownDateA1 = Integer.valueOf(titaVo.getParam("DrawDownDateA1")) + 19110000;
+		int drawDownDateA2 = Integer.valueOf(titaVo.getParam("DrawDownDateA2")) + 19110000;
+		String acctCodeA = titaVo.getParam("AcctCodeA");
+		String renewFlagA = titaVo.getParam("RenewFlagA");
+
+		int drawDownDateB1 = Integer.valueOf(titaVo.getParam("DrawDownDateB1")) + 19110000;
+		String acctCodeB = titaVo.getParam("AcctCodeB");
+		String statusB = titaVo.getParam("StatusB");
+
+		int drawDownDateC1 = Integer.valueOf(titaVo.getParam("DrawDownDateC1")) + 19110000;
+		String acctCodeC = titaVo.getParam("AcctCodeC");
+		String statusC = titaVo.getParam("StatusC");
+		BigDecimal rateC = new BigDecimal(titaVo.getParam("RateC"));
+
 		try {
-			this.rate = rate;
 
 			// Q9309141 新撥款之戶號
-			listL9740Data1 = l9740ServiceImpl.findPage1(titaVo, iDate1);
+			listL9740Data1 = l9740ServiceImpl.findPage1(titaVo, drawDownDateA1, drawDownDateA2, acctCodeA, renewFlagA);
 
 			// Q9309142 續期放款利率 最低、最高
-			listL9740Data2 = l9740ServiceImpl.findPage2(titaVo, iDate2);
+			listL9740Data2 = l9740ServiceImpl.findPage2(titaVo, drawDownDateB1, acctCodeB, statusB);
 
 			// Q9309143 利率超過 X.XX% 之借戶
-			listL9740Data3 = l9740ServiceImpl.findPage3(titaVo, iDate3, rate);
+			listL9740Data3 = l9740ServiceImpl.findPage3(titaVo, drawDownDateC1, acctCodeC, statusC, rateC);
 
 			exportData(listL9740Data1, listL9740Data2, listL9740Data3);
 
@@ -123,7 +132,7 @@ public class L9740Report extends MakeReport {
 		String time = dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4)
 				+ ":" + dateUtil.getNowStringTime().substring(4, 6);
 		String name = "Q9309141  新撥款之戶號";
-		String page = "PAGE   " + 1;//暫時固定
+		String page = "PAGE   " + 1;// 暫時固定
 
 		String titleText = date + "  " + time + "  " + name + "  " + page;
 		this.print(1, 3, titleText);

@@ -1113,7 +1113,7 @@ public class L3701 extends TradeBuffer {
 		}
 
 		// 更新放款利率變動檔
-		if (iRateIncrY.equals("X") || iIndividualIncrY.equals("X")) {
+		if (iRateIncrY.equals("X") || iIndividualIncrY.equals("X")|| iApproveRateY.equals("X")) {
 			updLoanRateChangeRoutine();
 		}
 
@@ -1764,7 +1764,7 @@ public class L3701 extends TradeBuffer {
 			tLoanBorMain.setIndividualIncr(this.parse.stringToBigDecimal(tTemp1Vo.getParam("IduIncr1")));
 		}
 		// 更新放款利率變動檔
-		if (tTemp1Vo.getParam("RtIncrY").equals("X") || tTemp1Vo.getParam("IduIncrY").equals("X")) {
+		if (tTemp1Vo.getParam("RtIncrY").equals("X") || tTemp1Vo.getParam("IduIncrY").equals("X")||tTemp1Vo.getParam("FcApproveRateY").equals("X")) {
 			updLoanRateChangeRoutine();
 		}
 

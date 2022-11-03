@@ -543,16 +543,17 @@ public class L4200Batch extends TradeBuffer {
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
 				this.info("OccursList=" + tempOccursList.toString());
+				int entryDate = parse.stringToInteger(tempOccursList.get("OccEntryDate")) - 19110000;
+				// 檢核入帳日期是否有誤
+				if (entryDate != iEntryDate) {
+					throw new LogicException("E0015", "資料入帳日期為" + entryDate); // 檢查錯誤
+				}
 				int custNo = 0;
 				int repayType = 0;
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 					custNo = parse.stringToInteger(tempOccursList.get("OccVirAcctNo").substring(7));
 				} else {
 					custNo = 0;
-				}
-				// 檢核入帳日期是否有誤
-				if (parse.stringToInteger(tempOccursList.get("OccEntryDate")) - 19110000 != iEntryDate) {
-					throw new LogicException("E0015", "資料入帳日期不為" + iEntryDate); // 檢查錯誤
 				}
 //				B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
 //				轉帳匯款檔並無寫入檔
@@ -813,10 +814,6 @@ public class L4200Batch extends TradeBuffer {
 				int reIntEndDate = parse.stringToInteger(tempOccursList.get("OccSenderRemarker").substring(11, 19));
 				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
 
-//				if (reIntEndDate >= 10101) {
-//					reIntEndDate = reIntEndDate + 19110000;
-//				}
-
 				tAchDeductMedia = achDeductMediaService.reseiveCheckFirst(reCustNo, reFacmNo, "" + reRepayCode,
 						reIntEndDate, reRepayAmt, titaVo);
 
@@ -831,7 +828,6 @@ public class L4200Batch extends TradeBuffer {
 				int achRepayType = 0;
 				String returnCode = tempOccursList.get("OccReturnCode");
 				if (tAchDeductMedia == null) {
-					// 媒體檔無此資料
 					procCode = "E0014"; // 檔案錯誤
 					procCodeX = "媒體檔無此資料";
 				} else {
@@ -842,6 +838,10 @@ public class L4200Batch extends TradeBuffer {
 					}
 
 					achEntryDate = tAchDeductMedia.getEntryDate();
+					if (achEntryDate != iEntryDate) {
+						throw new LogicException("E0015", "媒體檔入帳日期為" + achEntryDate + ", SenderRemarker="
+								+ tempOccursList.get("OccSenderRemarker") + ", RepayAmt=" + reRepayAmt); // 檢查錯誤
+					}
 					achRepayType = tAchDeductMedia.getRepayType();
 //					回寫媒體檔
 					tAchDeductMedia = achDeductMediaService.holdById(tAchDeductMedia, titaVo);
@@ -975,6 +975,9 @@ public class L4200Batch extends TradeBuffer {
 //			B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
 				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt")).divide(bigDe100);
 				int reEntryDate = parse.stringToInteger(tempOccursList.get("OccTxDate"));
+				if (reEntryDate != iEntryDate) {
+					throw new LogicException("E0015", "資料入帳日期為" + reEntryDate); // 檢查錯誤
+				}
 				int postRepayType = 0;
 				String procCodeX = "";
 //				PostUserNo = ,AND RepayAmt = ,AND OutsrcRemark = 

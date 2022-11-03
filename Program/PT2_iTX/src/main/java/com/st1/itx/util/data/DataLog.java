@@ -202,6 +202,8 @@ public class DataLog extends CommBuffer {
 
 	private void toExec(String reason, String MrKey) throws LogicException {
 		Map<String, Map<String, Object>> resultMap = this.compareFields(this.bef, this.aft);
+		resultMap.remove("LastUpdate");
+		resultMap.remove("LastUpdateEmpNo");
 		int size = resultMap.size();
 
 		Map<String, String> columnMap = new LinkedHashMap<String, String>();

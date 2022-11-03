@@ -374,8 +374,7 @@ C(3,#FKEY,0,$,s)
 C(3,#L2r05BormCount,1,T(3, )T(F,@BormNo,0),T(3,*)T(F,@BormNo,1))
 
 #BormNo=A,3,I
-C(3,#CHAIN,1,C(5,#rimtxtype,L4,$,s),$)
-IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
+! IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
 ! IF(#L2r05BormCount>=1,s,$)
 
 !查尋放款主檔

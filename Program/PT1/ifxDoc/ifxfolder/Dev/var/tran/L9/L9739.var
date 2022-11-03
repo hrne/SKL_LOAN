@@ -52,9 +52,9 @@ E(0,0)
 #buttonGo=X,1,S
 T(2,)
 !#SendLMR42=X,1,S
-!RESET_RIM(#SendLMR42,L973A)
-S(L973A,0,#buttonGo)
-R(1,L973A)
+!RESET_RIM(#SendLMR42,L9R39)
+S(L9R39,0,#buttonGo)
+R(1,L9R39)
 
 
 ##loop{times:9,i:1}
@@ -148,7 +148,7 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-
+#buttonGo
 
 </sub>
 
@@ -159,7 +159,7 @@ TXFORM=L9739
 
 
 ^
-TXFORM=L973A
+TXFORM=L9R39
 ##loop{times:9,i:1}
 #OOProdNo{i}
 #OOProdName{i}

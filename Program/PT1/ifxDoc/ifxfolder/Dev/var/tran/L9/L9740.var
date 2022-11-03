@@ -44,16 +44,22 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[180,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,750];printer.width=[20,20];">
 [
 ["[L9740]                                 公會無自用住宅利率報送"],
-["新撥款之借戶"],
-["@撥款日期",#DrawDownDate1],
-["續期放款利率 最低、最高"],
-["@撥款日期",#DrawDownDate2],
-["利率超過之借戶"],
-["@撥款日期",#DrawDownDate3],
-["@續期放款利率大於",#Rate,"％"],
+["","@@@@@(Q9309141)新撥款之借戶"],
+["@撥款期間",#DrawDownDateA1,"～",#DrawDownDateA2],
+["@業務科目",#AcctCodeA,#AcctCodeAX],
+["@是否排除借新還舊",#RenewFlagA,#RenewFlagAX],
+["","@@@@@(Q9309142)續期放款利率 最低、最高"],
+["@撥款日期前(含)",#DrawDownDateB1],
+["@業務科目",#AcctCodeB,#AcctCodeBX],
+["@戶況",#StatusB,#StatusBX],
+["","@@@@@(Q9309143)利率超過之借戶"],
+["@撥款日期前(含)",#DrawDownDateC1],
+["@業務科目",#AcctCodeC,#AcctCodeCX],
+["@戶況",#StatusC,#StatusCX],
+["@檢核利率",#RateC,"@％"],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -74,26 +80,140 @@ T(B,#WkDate+01)
 E(0,#WkDate)
 
 
-![撥款日]
-#DrawDownDate1=D,7,I
+![----------------------------]第一張報表欄位-開始----------------------------]]
+#DrawDownDateA1=D,7,I
+A(DATE,0,#DT1)
+E(0,#DT1)
+
+#DrawDownDateA2=D,7,I
+A(DATE,0,#DT1)
+E(0,#DT1)
+V(5,#DT1, 9999999)
+
+! Help
+
+#AcctCodeAHelp=X,100,S
+T(3,
+310:短期擔保放款;
+320:中期擔保放款;
+330:長期擔保放款;
+340:長期擔保放款-無自用住宅放款)
+
+
+#AcctCodeA=A,3,I
+T(3,340)
+HELP(#AcctCodeAHelp)
+@V(H,#AcctCodeAHelp)
+
+#AcctCodeAX=X,40,L
+T(H,#AcctCodeA,#AcctCodeAHelp)
+
+#RenewFlagAHelp=X,20,S
+T(3,Y:是;N:否)
+
+#RenewFlagA=X,1,I
+T(3,Y)
+HELP(#RenewFlagAHelp)
+@V(H,#RenewFlagAHelp)
+
+#RenewFlagAX=X,18,L
+T(H,#RenewFlagA,#RenewFlagAHelp)
+
+
+!#CheckHide=X,1,S
+!IF(#AcctCodeA == 3 ,
+!INVOKEJS(SHOW,L9740,5,5,0),
+!NVOKEJS(SHOW,L9740,5,5,1))
+
+!#AcctCodeA=A,1,I
+!HELP(#AcctCodeAHelp)
+!@V(H,#AcctCodeAHelp)
+![----------------------------]第一張報表欄位-結束----------------------------]]
+
+
+![----------------------------]第二張報表欄位-開始----------------------------]]
+#DrawDownDateB1=D,7,I
+A(DATE,0,#DT1)
+E(0,#DT1)
+
+#AcctCodeBHelp=X,100,S
+T(3,
+310:短期擔保放款;
+320:中期擔保放款;
+330:長期擔保放款;
+340:長期擔保放款-無自用住宅放款)
+
+#AcctCodeB=A,3,I
+T(3,340)
+HELP(#AcctCodeBHelp)
+@V(H,#AcctCodeBHelp)
+
+#AcctCodeBX=X,40,L
+T(H,#AcctCodeB,#AcctCodeBHelp)
+
+#StatusBHelp=X,40,S
+T(3,0:正常戶;1:催收戶; :全部[正常+催收])
+
+#StatusB=X,1,I
+HELP(#StatusBHelp)
+@V(H,#StatusBHelp)
+
+#StatusBX=X,18,L
+T(H,#StatusB,#StatusBHelp)
+![----------------------------]第二張報表欄位-結束----------------------------]]
+
+
+![----------------------------]第三張報表欄位-開始----------------------------]]
+#DrawDownDateC1=D,7,I
 E(0,#DT1)
 @V(7)
-A(DATE,0,#DrawDownDate1)
+A(DATE,0,#DT1)
 
-#DrawDownDate2=D,7,I
-E(0,#DT1)
-@V(7)
-A(DATE,0,#DrawDownDate2)
+#AcctCodeCHelp=X,100,S
+T(3,
+310:短期擔保放款;
+320:中期擔保放款;
+330:長期擔保放款;
+340:長期擔保放款-無自用住宅放款)
 
-#DrawDownDate3=D,7,I
-E(0,#DT1)
-@V(7)
-A(DATE,0,#DrawDownDate3)    
+#AcctCodeC=A,3,I
+T(3,340)
+HELP(#AcctCodeCHelp)
+@V(H,#AcctCodeCHelp)
 
-#Rate=n,2.2,I
+#AcctCodeCX=X,40,L
+T(H,#AcctCodeC,#AcctCodeCHelp)
+
+#StatusCHelp=X,40,S
+T(3,0:正常戶;1:催收戶; :全部[正常+催收])
+
+#StatusC=X,1,I
+HELP(#StatusBHelp)
+@V(H,#StatusBHelp)
+
+#StatusCX=X,18,L
+T(H,#StatusC,#StatusCHelp)
+
+
+#RateC=n,2.2,I
 @V(5,0.00,99.99)
 
+![----------------------------]第三張報表欄位-結束----------------------------]
+ 
 
+
+
+
+!CustTypeCode 客戶別
+#CDDEF0001=x,20,S
+T(3,CdCode.CustTypeCode)
+#CODEF0002=x,20,S
+T(3,CdCode.IdKind)
+
+!#CustTypeCodeHelpRim=X,1,S
+!RESET_RIM(#CustTypeCodeHelpRim,XXR99)
+!S(XXR99,01,#CDDEF0001,#CODEF0002)
+!R(1,XXR99)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -122,10 +242,18 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DrawDownDate1
-#DrawDownDate2
-#DrawDownDate3
-#Rate
+#DrawDownDateA1
+#DrawDownDateA2
+#AcctCodeA
+#AcctCodeAX
+#RenewFlagA
+#DrawDownDateB1
+#AcctCodeB
+#StatusB
+#DrawDownDateC1
+#AcctCodeC
+#StatusC
+#RateC
 </sub>
 
 

@@ -31,14 +31,16 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * Query(新撥款之戶號)
 	 * 
 	 * @param titaVo
-	 * @param dDate 撥款日(西元)
+	 * @param sDate 撥款起日(西元)
+	 * @param eDate 撥款迄日(西元) 
+	 * @param acctCode 科目代號
+	 * @param renewFlag 是否借新還舊
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findPage1(TitaVo titaVo, int dDate) throws Exception {
+	public List<Map<String, String>> findPage1(TitaVo titaVo, int sDate,int eDate,String acctCode ,String renewFlag) throws Exception {
 		this.info("l9740.findPage1 ");
-
-		int startDate = Integer.valueOf(String.valueOf(dDate / 100) + "01");
+		
 
 		String sql = " ";
 		sql += "	SELECT M.\"CustNo\"";
@@ -51,12 +53,22 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "	WHERE M.\"DrawdownAmt\" BETWEEN :startDate AND :endDate";
-		sql += "	  AND M.\"RenewFlag\" <> 1 ";
-		sql += "	  AND F.\"AcctCode\" = 340";
+		//RenewFlag 0:正常 1:展期撥款 2:借新還舊撥款
+		if("Y".equals(renewFlag)) {
+			sql += "	  AND M.\"RenewFlag\" <> 1 ";		
+		}else {
+			sql += "	  AND M.\"RenewFlag\" = 1 ";			
+		}
+		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 		sql += "	ORDER BY M.\"CustNo\" ASC";
 		sql += "			,M.\"FacmNo\" ASC";
 		sql += "			,M.\"BormNo\" ASC";
 
+		
+		this.info("sDate =" + sDate);
+		this.info("eDate =" + eDate);
+		this.info("acctCode =" + acctCode);
+		this.info("renewFlag =" + renewFlag);
 
 		this.info("sql=" + sql);
 
@@ -64,8 +76,9 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("startDate", startDate);
-		query.setParameter("endDate", dDate);
+		query.setParameter("startDate", sDate);
+		query.setParameter("endDate", eDate);
+		query.setParameter("acctCode", acctCode);
 		return this.convertToMap(query);
 	}
 
@@ -73,13 +86,16 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * Query(續期放款利率 最低 最高)
 	 * 
 	 * @param titaVo
-	 * @param dDate 撥款日(西元)
+	 * @param date 撥款日(西元)
+	 * @param acctCode 科目代號
+	 * @param statusCode 戶況代號 
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findPage2(TitaVo titaVo, int dDate ) throws Exception {
+	public List<Map<String, String>> findPage2(TitaVo titaVo, int date,String acctCode ,String statusCode ) throws Exception {
 		this.info("l9740.findPage2 ");
 
+				
 		String sql = " ";
 		sql += "	SELECT MIN(M.\"StoreRate\") AS \"minRate\"";
 		sql += "		  ,MAX(M.\"StoreRate\") AS \"maxRate\"";
@@ -87,16 +103,28 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "	WHERE M.\"DrawdownAmt\" <= :endDate";
-		sql += "	  AND M.\"Status\" IN (0,2)";
-		sql += "	  AND F.\"AcctCode\" = 340";
+		sql += "	  AND F.\"AcctCode\" = :acctCode ";
 
+		//status 0:正常戶 2:催收戶
+		if("0".equals(statusCode)) {
+			sql += "	  AND M.\"Status\" IN (0)";
+		}else if("1".equals(statusCode)) {
+			sql += "	  AND M.\"Status\" IN (2)";
+		}else {
+			sql += "	  AND M.\"Status\" IN (0,2)";
+		}
+		this.info("date =" + date);
+		this.info("acctCode =" + acctCode);
+		this.info("status =" + statusCode);
+		
 		this.info("sql2=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("endDate", dDate);
+		query.setParameter("endDate", date);
+		query.setParameter("acctCode", acctCode);
 		return this.convertToMap(query);
 	}
 
@@ -104,12 +132,14 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * Query(x利率超過 X%之借戶)
 	 * 
 	 * @param titaVo
-	 * @param dDate 撥款日(西元)
+	 * @param date 撥款日(西元)
+	 * @param acctCode 科目代號
+	 * @param statusCode 戶況代號 
 	 * @param rate 利率
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findPage3(TitaVo titaVo, int dDate, BigDecimal rate) throws Exception {
+	public List<Map<String, String>> findPage3(TitaVo titaVo, int date,String acctCode ,String statusCode, BigDecimal rate) throws Exception {
 		this.info("l9740.findPage3 ");
 
 		String sql = " ";
@@ -125,20 +155,32 @@ public class L9740ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += "	WHERE M.\"DrawdownAmt\" <= :endDate";
 		sql += "	  AND M.\"StoreRate\" > :rate ";
-		sql += "	  AND M.\"Status\" IN (0,2)";
-		sql += "	  AND F.\"AcctCode\" = 340";
+		sql += "	  AND F.\"AcctCode\" = :acctCode ";
+		//status 0:正常戶 2:催收戶
+		if("0".equals(statusCode)) {
+			sql += "	  AND M.\"Status\" IN (0)";
+		}else if("1".equals(statusCode)) {
+			sql += "	  AND M.\"Status\" IN (2)";
+		}else {
+			sql += "	  AND M.\"Status\" IN (0,2)";
+		}
 		sql += "	ORDER BY M.\"CustNo\" ASC";
 		sql += "			,M.\"FacmNo\" ASC";
 		sql += "			,M.\"BormNo\" ASC";
 
+		this.info("date =" + date);
+		this.info("acctCode =" + acctCode);
+		this.info("status =" + statusCode);
+		
 		this.info("sql3=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
+		query.setParameter("endDate", date);
 		query.setParameter("rate", rate);
-		query.setParameter("endDate", dDate);
+		query.setParameter("acctCode", acctCode);
 		return this.convertToMap(query);
 	}
 

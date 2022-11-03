@@ -273,7 +273,7 @@ T(H,#LoanRmkCode,#RmkCodeHelp)
 !2022.3.18 QC1698皆必須輸入
 !#RmkDesc=c,120,I
 !#RmkDesc=x,10.50,I
-#RmkDesc=c,3.40,I
+#RmkDesc=c,6.40,I
 
 TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FunCd,4,s,$)
