@@ -125,6 +125,7 @@ public class L4601Report extends MakeReport {
 				.setRptCode(txCode).setRptItem(reportName).setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
+		
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
 //		if (reporttype == 1) {
 //			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4601", reportName, "", "A4", "L");

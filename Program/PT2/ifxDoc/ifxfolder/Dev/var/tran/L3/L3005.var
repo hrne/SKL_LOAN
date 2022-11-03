@@ -734,7 +734,7 @@ TXFORM=L3005
 {width:80}
 
 #OONote=摘要
-{width:1800}
+{width:90}
 
 #OOBTNRMK=摘要
 {width:55,search:true,formatter:'cust:bind-button:維護;L3703 帳務明細摘要維護',align:'center',canExport:false}

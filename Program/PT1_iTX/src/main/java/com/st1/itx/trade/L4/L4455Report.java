@@ -247,7 +247,7 @@ public class L4455Report extends MakeReport {
 			throw new LogicException("E0013", "L4455");
 		}
 		Report(titaVo, L4455List, funcd);
-		
+
 		this.info("L4455Report Collist");
 		funcd = 5;
 		try {
@@ -456,7 +456,7 @@ public class L4455Report extends MakeReport {
 					entrydate = String.valueOf(parse.stringToInteger(L4455List.get(j).get("EntryDate")) - 19110000);
 					repaybank = L4455List.get(j).get("RepayBank");
 					acctcode = L4455List.get(j).get("AcctCode");
-					
+
 					for (CdCode tCdCode : lCdCode) {
 						if (repaybank.equals(tCdCode.getCode())) {
 							bank = tCdCode.getItem();
@@ -464,10 +464,9 @@ public class L4455Report extends MakeReport {
 						}
 					}
 					this.info("repaybank new  = " + repaybank);
-					
+
 					this.info("bank  = " + bank);
-					
-					
+
 					if (!L4455List.get(i).get("BatchNo").equals(batchno)
 							|| !String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000)
 									.equals(entrydate)
@@ -508,34 +507,35 @@ public class L4455Report extends MakeReport {
 						continue;
 
 					}
-
-					if (!L4455List.get(i).get("AcctCode").equals(acctcode)) { // 科目不同 科目合計
-						this.print(1, 1,
-								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						this.print(1, 1,
-								"                                                                                                                                                                               ");
-						for (CdCode tCdCode : lCdCode2) {
-							if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
-								acctcodex = tCdCode.getItem();
+					//銀行扣款總傳票明細表(火險費)
+					if (funcd != 4) {
+						if (!L4455List.get(i).get("AcctCode").equals(acctcode)) { // 科目不同 科目合計
+							this.print(1, 1,
+									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+							this.print(1, 1,
+									"                                                                                                                                                                               ");
+							for (CdCode tCdCode : lCdCode2) {
+								if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
+									acctcodex = tCdCode.getItem();
+								}
 							}
+							if (funcd != 1) {
+								acctcodex = "暫收款";
+							}
+							this.print(0, 1, acctcodex);
+							this.print(0, 19, "小計");
+
+							amt();
+
+							this.print(2, 1,
+									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+							pageCnt = pageCnt + 4;
+
+							amttototal(); // 業務科目金額to總和
+							init(); // 業務科目金額歸0
+
 						}
-						if (funcd != 1) {
-							acctcodex = "暫收款";
-						}
-						this.print(0, 1, acctcodex);
-						this.print(0, 19, "小計");
-
-						amt();
-
-						this.print(2, 1,
-								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-						pageCnt = pageCnt + 4;
-
-						amttototal(); // 業務科目金額to總和
-						init(); // 業務科目金額歸0
-
 					}
-
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 34) {
 						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");

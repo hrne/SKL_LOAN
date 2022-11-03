@@ -130,7 +130,7 @@ public class L9705Report extends MakeReport {
 
 			this.info("conditionCode = " + titaVo.get("CONDITION1"));
 
-			int tmpListSize = 0;
+//			int tmpListSize = 0;
 			boolean isLast = false;
 
 			for (Map<String, String> r : l9705List) {
@@ -214,7 +214,7 @@ public class L9705Report extends MakeReport {
 
 				this.info("listBaTxVo.size()=" + listBaTxVo.size());
 
-				tmpListSize = tmpListSize + listBaTxVo.size();
+//				tmpListSize = tmpListSize + listBaTxVo.size();
 
 				// 是否最後一筆
 				if (l9705List.size() == (count + 1)) {
@@ -306,7 +306,7 @@ public class L9705Report extends MakeReport {
 					if (listBaTxVo.size() == con2Count) {
 						exportData(l9705List, titaVo, tmplistBaTxVo, custMain, reconCode, count);
 						// 是否為全部資料的最後一筆
-						if (!isLast) {
+						if (isLast) {
 							this.info("3 cust facm different....");
 							this.info("newPage....");
 							this.newPage();
@@ -635,7 +635,7 @@ public class L9705Report extends MakeReport {
 
 		if (r.get(c).get("CustNo") != null) {
 //			共用代碼檔0:個金1:企金2:企金自然人
-			if ("0".equals(r.get(c).get("EntCode"))) {
+			if (!"1".equals(r.get(c).get("EntCode"))) {
 				payIntAcct = "9510200" + String.format("%07d", Integer.valueOf(custNo));
 				payPriAcct = "9510300" + String.format("%07d", Integer.valueOf(custNo));
 			} else {

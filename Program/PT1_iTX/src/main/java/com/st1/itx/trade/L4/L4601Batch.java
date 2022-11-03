@@ -113,9 +113,6 @@ public class L4601Batch extends TradeBuffer {
 	@Autowired
 	public L4600Batch l4600Batch;
 
-	@Autowired
-	public L4601Batch l4601Batch;
-
 	private ArrayList<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<>();
 
 	private ArrayList<OccursList> tmpList = new ArrayList<>();
@@ -607,7 +604,7 @@ public class L4601Batch extends TradeBuffer {
 				occursList = l4600Batch.getOccurs("L4602", occursList, t, titaVo);
 				tmpList.add(occursList);
 				InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
-				tInsuRenewMediaTemp = l4601Batch.getInsuRenewMediaTemp(occursList, tInsuRenewMediaTemp, titaVo);
+				tInsuRenewMediaTemp = getInsuRenewMediaTemp(occursList, tInsuRenewMediaTemp, titaVo);
 
 				TempVo tempVo = new TempVo();
 				tempVo = custNoticeCom.getCustNotice("L4603", t.getCustNo(), t.getFacmNo(), titaVo);
