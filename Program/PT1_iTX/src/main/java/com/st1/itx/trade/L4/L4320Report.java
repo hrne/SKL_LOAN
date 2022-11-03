@@ -144,6 +144,7 @@ public class L4320Report extends MakeReport {
 			default:
 				break;
 			}
+			fileNm += titaVo.getCalTm().substring(0, 4);
 
 			try {
 				fnAllList = l4320RServiceImpl.findAll(titaVo);

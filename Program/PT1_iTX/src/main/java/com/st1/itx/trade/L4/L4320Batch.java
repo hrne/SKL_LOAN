@@ -230,12 +230,11 @@ public class L4320Batch extends TradeBuffer {
 							titaVo.getTlrNo() + "L4320", sendMsg, titaVo);
 				}
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320",
-						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "",
+						sendMsg + "，筆數：" + this.processCnt, titaVo);
 			}
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", sendMsg, titaVo);
 		}
 
 		// end
@@ -288,9 +287,22 @@ public class L4320Batch extends TradeBuffer {
 		try {
 			fnAllList = l4320BatchServiceImpl.findAll(iAdjCode, titaVo);
 		} catch (Exception e) {
-			throw new LogicException("E0015", ", " + e.getMessage());
+			throw new LogicException("E0015", ", " + e.getMessage()); // 檢查錯誤
 		}
 		
+		// 檢查未放行
+		if (fnAllList != null && fnAllList.size() != 0) {
+			for (Map<String, String> s : fnAllList) {
+				if ("1".equals(s.get("ActFg"))) {
+					flag = false;
+					sendMsg += " 戶號：" + s.get("CustNo");
+				}
+			}
+		}
+		if (!flag) {
+			throw new LogicException("E0015", sendMsg + " 資料待放行中"); // 檢查錯誤
+		}
+
 //		額度下撥款的目前利率是否相同
 		setFacRate(fnAllList);
 
@@ -347,6 +359,8 @@ public class L4320Batch extends TradeBuffer {
 					}
 				} else {
 					try {
+						b.setTitaTlrNo(titaVo.getTlrNo());
+						b.setTitaTxtNo(titaVo.getTxtNo());
 						batxRateChangeService.update(b, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0007", "BatxRateChange update error : " + e.getErrorMsg());

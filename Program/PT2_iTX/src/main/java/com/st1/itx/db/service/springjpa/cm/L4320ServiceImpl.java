@@ -122,7 +122,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(f.\"ApproveRate\", 0)                    as \"FacApproveRate\"  "; // 額度核准利率
 		sql += "   ,NVL(f.\"RateIncr\", 0)                       as \"FacRateIncr\"  "; // 額度加碼利率
 		sql += "   ,NVL(f.\"IndividualIncr\" , 0)                as \"FacIndividualIncr\" "; // 額度個人加碼利率
-		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日 
+		sql += "   ,NVL(f.\"FirstDrawdownDate\",0)               as \"FirstDrawdownDate\" "; // 首撥日
 		sql += "   ,NVL(p.\"EmpFlag\", ' ')                      as \"EmpFlag\" "; // 員工利率記號
 		sql += "   ,NVL(r.\"IncrFlag\", ' ')                     as \"IncrFlag\" "; // 借戶利率檔是否依合約記號
 		sql += "   ,NVL(r.\"BaseRateCode\", ' ')                 as \"BaseRateCode\" "; // 借戶利率檔商品指標利率代碼
@@ -149,6 +149,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(r2.\"FitRate\", 0)                       as \"PresentRate\" "; // 目前利率
 		sql += "   ,NVL(tx.\"EntryDate\", 0)                     as \"EntryDate\" "; // 入帳日期
 		sql += "   ,NVL(tot.\"TotBalance\",0)                    as \"TotBalance\"  "; // 全戶餘額
+		sql += "   ,b.\"ActFg\"                                  as \"ActFg\"  "; // 交易進行記號
 		sql += " from \"LoanBorMain\" b                                 ";
 // 要調整的利率資料
 		sql += " left join(                                             ";
@@ -231,9 +232,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
 		}
 		if (iTxKind == 5 && !iGroupId.isEmpty()) {
-			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" +iGroupId +"'";
+			sql += " left join \"CustMain\" cg on  cg.\"CustId\" = " + "'" + iGroupId + "'";
 			sql += " left join \"FacCaseAppl\" a on  a.\"ApplNo\" = f.\"ApplNo\"  ";
-		}	
+		}
 		sql += " where b.\"Status\" = 0                                        ";
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
@@ -488,7 +489,7 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputBaseRateCode", iBaseRateCode);
 		query.setParameter("inputEffectDate", iEffectDate);
 		query.setParameter("inputCustType", iCustType);
-		
+
 		return this.convertToMap(query);
 	}
 }

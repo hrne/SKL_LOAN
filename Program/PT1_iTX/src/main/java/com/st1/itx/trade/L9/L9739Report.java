@@ -80,7 +80,7 @@ public class L9739Report extends MakeReport {
 		List<Map<String, String>> listL9739Detail = null;
 		try {
 
-			listL9739Title = l9739ServiceImpl.findStandard(titaVo);
+			listL9739Title = l9739ServiceImpl.findStandard(titaVo,"0");
 			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
 
 			exportData(listL9739Title, listL9739Detail);

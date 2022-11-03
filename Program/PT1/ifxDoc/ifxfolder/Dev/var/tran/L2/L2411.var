@@ -486,7 +486,7 @@ E(0,@EvaNetWorth,0)
 E(0,@LVITax,0)
 E(0,@RentEvaValue,0)
 E(0,@RentPrice,0)
-E(0,@OwnershipCode,0)
+T(3,@OwnershipCode,)
 E(0,@MtgCode,0)
 T(3,@MtgCheck,)
 T(3,@MtgLoan,)
@@ -1530,7 +1530,7 @@ T(2,@EvaCompanyX,#L6R10InsurerItem)
 #EvaCompanyX=x,100,L
 
 ! [權利種類]
-#OwnershipCode=A,1,I
+#OwnershipCode=X,1,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==4,$,CALL(#Show4))
 HELP(#OwnershipCodeHelp)

@@ -149,7 +149,9 @@ public class L420BBatch extends TradeBuffer {
 						errorMsg = "刪除時有入帳成功資料";
 					}
 					if (iFunctionCode == 5) {
-						lBatxDetail.add(t);
+						if ("6".equals(t.getProcStsCode())) {
+							lBatxDetail.add(t);
+						}
 					}
 				} else {
 					if (iFunctionCode != 5) {
@@ -163,7 +165,7 @@ public class L420BBatch extends TradeBuffer {
 						titaVo.getEntDyI() + "9" + tBatxHead.getTitaTlrNo(), iBatchNo + errorMsg, titaVo);
 				return this.sendList();
 			}
-			
+
 			tBatxHead = batxHeadService.holdById(tBatxHeadId);
 			if (tBatxHead == null) {
 				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
@@ -173,7 +175,8 @@ public class L420BBatch extends TradeBuffer {
 			try {
 				batxHeadService.update(tBatxHead);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "L420BBatch update BatxHead " + tBatxHeadId + e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007",
+						"L420BBatch update BatxHead " + tBatxHeadId + e.getErrorMsg());
 			}
 
 			this.batchTransaction.commit();

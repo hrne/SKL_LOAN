@@ -290,25 +290,25 @@ public class L4454 extends TradeBuffer {
 						putTotaA(t, titaVo); // 列印清單
 						if ("1".equals(t.get("RowNumber"))) {
 							l9705ListB.add(t); // 繳息還本通知單(火險成功期款失敗通知) ，同戶號、額度只印一份
+							failNoticeDateUpdate("NOTI01", "火險成功期款失敗通知", titaVo); // 失敗通知日期
 						}
-						failNoticeDateUpdate("NOTI01", "火險成功期款失敗通知", titaVo); // 失敗通知日期
 					}
 				}
 				if (fistDeduct == 2) {
 					if (titaVo.isHcodeNormal()) {
 						if ("1".equals(t.get("RowNumber"))) {
 							l4454List.add(t); // 列印明信片，同戶號、額度只印一份
+							failNoticeDateUpdate("NOTI02", "期款二扣失敗明信片", titaVo); // 失敗通知日期
 						}
 					}
-					failNoticeDateUpdate("NOTI02", "期款二扣失敗明信片", titaVo); // 失敗通知日期
 				}
 				break;
 			case 3: // 連續扣款失敗明細＆通知
 				putTotaA(t, titaVo); // 列印清單
 				if ("1".equals(t.get("RowNumber"))) {
 					l9705ListA.add(t); // 繳息還本通知單，同戶號、額度只印一份
+					failNoticeDateUpdate("NOTI01", "連續扣款失敗通知", titaVo); // 失敗通知日期
 				}
-				failNoticeDateUpdate("NOTI01", "連續扣款失敗通知", titaVo); // 失敗通知日期
 				break;
 			}
 		}

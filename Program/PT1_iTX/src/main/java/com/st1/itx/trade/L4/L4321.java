@@ -89,7 +89,7 @@ public class L4321 extends TradeBuffer {
 		default:
 			break;
 		}
-		fileNm += titaVo.getCalTm().substring(0, 2) + ":" + titaVo.getCalTm().substring(2, 4);
+		fileNm += titaVo.getCalTm().substring(0, 4);
 
 		titaVo.putParam("FileNm", fileNm);
 		titaVo.putParam("iCode", "L4321");

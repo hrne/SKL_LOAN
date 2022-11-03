@@ -4,42 +4,19 @@
 
 <sub type="SYS" name="label">
 
-!#TXCD
-!T(3,L9739)
-
-![資料表頭(HEADER)長度]
-#INQHD=n,3,S
-E(0,0)ASGN(INQHD$)
-
-![每筆資料明細(OCCURS)長度]
-#INQLEN=n,3,S
-E(0,75)ASGN(INQLEN$)
-
-![多筆查詢之一個畫面有N筆資料]
-#INQREC=n,2,S
-E(0,20)ASGN(INQREC$)
-
-![畫面顯示的明細間的高度]
-#LOOPH=n,3,S
-E(0,1)ASGN(LOOPHEIGHT$)
-
-![每張印錄單列印的筆數]
-#INQPRT=n,2,S
-E(0,40)ASGN(INQPRT$)
+#TXCD=_,_,S
+T(3,L9739)
 
 </sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
 
 <sub type="DC" name="BFHEAD">
-<include src="COM.icf::BFHEAD.dec"/>
-!起始交易記號  0:起始交易,1:非起始交易
-#ORGFG=_,_,S
-E(0,0)
+<include src="COM.icf::BFHEAD2.dec"/>
 
-#BUF2=X,11,S
-T(2,1+          )
 
-#ORGFG=_,_,S
-E(0,0)
 
 </sub>
 
@@ -47,13 +24,102 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,20];">
 [
 ["[L9739]                                檢核政府優惠房貸利率脫勾表                                                             "],
-[#<->#," ","檢核政府優惠房貸利率脫勾表，直接送出"],
+["",#SP,"逐項檢核政府優惠房貸利率不符當時利率"],
+["#grid#,{id:1,expand:false,loop:9,row_height:0,s_cols:[100,100]}","","",
+["商品代碼","中文名稱","生效日期","利率"],
+[#ProdNo1,#ProdName1,#EffectDate1,#FitRate1],
+], 
 ]
 !---------- AP TEXT AREA Variables ----------
 
-#FUNCIND=_,_,S
-E(0,5)
-<include src="COM.icf::CheckAuth.rtn"/>
+!<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,3,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@FUNCD,#NTXBUF,1,1)
+! T(1,@TLR,#NTXBUF,2,2)
+T(2,@FKEY,7)
+
+
+#SP=X,35,L
+
+#RPTFG=X,1,S
+E(0,0) 
+
+#buttonGo=X,1,S
+T(2,)
+!#SendLMR42=X,1,S
+!RESET_RIM(#SendLMR42,L973A)
+S(L973A,0,#buttonGo)
+R(1,L973A)
+
+
+##loop{times:9,i:1}
+#OOProdNo{i}=X,2,L
+#OOProdName{i}=X,80,L
+#OOEffectDate{i}=X,8,L
+#OOFitRate{i}=n,4.2,L
+##end
+
+#ProdGroup1=X,25,S
+T(3,IA/1200 億青年優惠房貸)
+#ProdGroup2=X,25,S
+T(3,IB/2000 億優惠房貸)
+#ProdGroup3=X,25,S
+T(3,IC/2000 億優惠房貸)
+#ProdGroup4=X,25,S
+T(3,ID/20 億優惠房貸)
+#ProdGroup5=X,25,S
+T(3,IE/15 億優惠房貸)
+#ProdGroup6=X,25,S
+T(3,IF/12 億優惠房貸)
+#ProdGroup7=X,25,S
+T(3,IG/10 億優惠房貸)
+#ProdGroup8=X,25,S
+T(3,IH/2000 億優惠房貸)
+#ProdGroup9=X,25,S
+T(3,II/2000 億優惠房貸 - 續)
+
+! 修改這裡的 loop times
+##loop{times:9,i:1}
+
+! TradeCat: 1st byte of TradeDic. Trade's category.
+#ProdNo{i}=X,15,L
+T(1,#ProdGroup{i},1,2)
+
+! TradeCode: 3-7 th bytes of TradeDic. The TXCD of a trade.
+#ProdName{i}=X,70,L
+T(1,#ProdGroup{i},4,25)
+
+#EffectDate{i}=X,15,L
+IF(#OOEffectDate{i} >= 0,E(0,#OOEffectDate{i}),E(0,0))
+
+#FitRate{i}=n,10.2,L
+IF(#OOFitRate{i} >= 0,E(0,#OOFitRate{i}),E(0,0.00))
+
+##end
+
+
+
+
+!S(L9739,0,#FunctionCode)
+!R(1,L9739)
+!E(0,@RiskFactor1,#LMR42RiskFactor1)
+!#RiskFactor1=n,1.4,I
+!@V(5,0.0000,0.9999)
+!#ProdNo=X,2,S
+!T(2,#OOProdNo)
+!#ProdName=X,80,S
+!T(2,#OOProdName)
+!#EffectDate=X,8,S
+!E(0,#OOEffectDate)
+!#FitRate=X,4.2,S
+!E(0,#OOFitRate)
+
+
 
 
 
@@ -67,41 +133,49 @@ E(0,5)
 !---------- TXFORM = L9739 ----------
 <sub type="FORM" name="L9739">
 
-!#SCRPRT=_,_,S
-!C(5,#TXFORM,L9739,$,S)
+#SCRPRT=_,_,S
+C(5,#TXFORM,L9739,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L9739]            X800)
-
-!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-
-!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+T(3,[L9739] 檢核政府優惠房貸利率脫勾表)
 
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
+
 
 </sub>
 
 
 !------ 上行電文 ------
 <sub type="TIM">
+
+
 </sub>
 
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-
 TXFORM=L9739
+
+
+^
+TXFORM=L973A
+##loop{times:9,i:1}
+#OOProdNo{i}
+#OOProdName{i}
+#OOEffectDate{i}
+#OOFitRate{i}
+##end
 ^
 
-<include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
+
+
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L9739" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
-[
-["[L9739]                                    檢核政府優惠房貸利率脫勾表                                                             "],
-]
+
 </sub>
 
 

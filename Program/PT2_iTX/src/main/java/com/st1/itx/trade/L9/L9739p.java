@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.service.springjpa.cm.L9739ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -27,20 +28,25 @@ public class L9739p extends TradeBuffer {
 	L9739Report l9739Report;
 
 	@Autowired
+	L9739ServiceImpl l9739ServiceImpl;
+
+	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
 	WebClient webClient;
 
-	String txCD = "L9739";
+	String txcd = "L9739";
 	String txName = "檢核政府優惠房貸利率脫鉤";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active " + txCD + "p");
+		this.info("active " + txcd + "p");
+		
 		this.totaVo.init(titaVo);
 
-		this.info(txCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
+		
+		this.info(txcd + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		l9739Report.setParentTranCode(parentTranCode);
@@ -63,18 +69,43 @@ public class L9739p extends TradeBuffer {
 			iYearMonth = mfbsdsy / 100;
 		}
 
+//		List<Map<String, String>> listL9739Detail = null;
+//		try {
+//
+//			listL9739Detail = l9739ServiceImpl.findAll(titaVo, iYearMonth);
+//
+//		} catch (Exception e) {
+//			StringWriter errors = new StringWriter();
+//			e.printStackTrace(new PrintWriter(errors));
+//			this.error(txcd + "ServiceImpl.findAll error = " + errors.toString());
+//		}
+//
+//		if (listL9739Detail.size() > 0) {
+//			for (int i = 0; i < listL9739Detail.size(); i++) {
+//
+//				this.totaVo.putParam("OCustNo" , listL9739Detail.get(i).get("CustNo"));
+//				this.totaVo.putParam("OFacmNo", listL9739Detail.get(i).get("FacmNo"));
+//				this.totaVo.putParam("OBormNo" , listL9739Detail.get(i).get("BormNo"));
+//				this.totaVo.putParam("OFitRate", listL9739Detail.get(i).get("FitRate"));
+//				this.totaVo.putParam("OEffectDate" + i, listL9739Detail.get(i).get("EffectDate"));
+//				this.totaVo.putParam("OProdNo", listL9739Detail.get(i).get("ProdNo"));
+//		
+//			}
+//		} 
 		boolean isFinish = false;
 
 		isFinish = l9739Report.exec(titaVo,iYearMonth);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + " 已完成", titaVo);
+					titaVo.getParam("TLRNO"), txcd + txName + " 已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), txCD + txName + " 查無資料", titaVo);
+					titaVo.getParam("TLRNO"), txcd + txName + " 查無資料", titaVo);
 		}
-
+	
+		
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

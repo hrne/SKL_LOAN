@@ -102,6 +102,7 @@ public class L4450Batch extends TradeBuffer {
 	private int iEntryDate = 0;
 
 	private int cnt = 0;
+	private int deleteCnt = 0;
 
 //	重複註記
 	private HashMap<tmpBorm, Integer> flagMap = new HashMap<>();
@@ -116,6 +117,7 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, String> repayBank = new HashMap<>();
 	private HashMap<tmpBorm, String> repayAcct = new HashMap<>();
 	private HashMap<tmpBorm, String> postCode = new HashMap<>();
+	private HashMap<tmpBorm, String> custId = new HashMap<>();
 	private HashMap<tmpBorm, String> relationCode = new HashMap<>();
 	private HashMap<tmpBorm, String> relationName = new HashMap<>();
 	private HashMap<tmpBorm, String> relationId = new HashMap<>();
@@ -231,68 +233,78 @@ public class L4450Batch extends TradeBuffer {
 
 //		清除扣帳日(EntryDate) 之資料
 			deleBankDeductDtl(iOpItem, titaVo);
-			if (checkFlag) {
-				try {
-					fnAllList = l4450ServiceImpl.findAll(titaVo);
-				} catch (Exception e) {
-					StringWriter errors = new StringWriter();
-					e.printStackTrace(new PrintWriter(errors));
-					this.error("l4450ServiceImpl.findAll error = " + errors.toString());
-					checkMsg = e.getMessage();
-					checkFlag = false;
+			if (titaVo.isHcodeErase()) {
+				if (checkFlag) {
+					checkMsg = "刪除筆數" + deleteCnt;
 				}
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
+						titaVo.getTlrNo(), checkMsg, titaVo);
+
 			}
+			if (titaVo.isHcodeNormal()) {
+				if (checkFlag) {
+					try {
+						fnAllList = l4450ServiceImpl.findAll(titaVo);
+					} catch (Exception e) {
+						StringWriter errors = new StringWriter();
+						e.printStackTrace(new PrintWriter(errors));
+						this.error("l4450ServiceImpl.findAll error = " + errors.toString());
+						checkMsg = e.getMessage();
+						checkFlag = false;
+					}
+				}
 
-			if (checkFlag) {
-				this.info("fnAllList.size() = " + fnAllList.size());
-				if (fnAllList.size() == 0) {
-					checkMsg = "查無吻合之撥款檔資料";
-					checkFlag = false;
-				} else {
-					int i = 0;
-					for (int j = 1; j <= fnAllList.size(); j++) {
-						i = j - 1;
+				if (checkFlag) {
+					this.info("fnAllList.size() = " + fnAllList.size());
+					if (fnAllList.size() == 0) {
+						checkMsg = "查無吻合之撥款檔資料";
+						checkFlag = false;
+					} else {
+						int i = 0;
+						for (int j = 1; j <= fnAllList.size(); j++) {
+							i = j - 1;
 
-						setFacmValue(fnAllList, i);
+							setFacmValue(fnAllList, i);
 
-						// 還款試算
-						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")),
-								parse.stringToInteger(fnAllList.get(i).get("FacmNo")), 1, titaVo); // 期款
+							// 還款試算
+							doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")),
+									parse.stringToInteger(fnAllList.get(i).get("FacmNo")), 1, titaVo); // 期款
 
-						if (i % commitCnt == 0) {
-							this.batchTransaction.commit();
+							if (i % commitCnt == 0) {
+								this.batchTransaction.commit();
+							}
 						}
+					}
+					this.batchTransaction.commit();
+				}
+				if (checkFlag) {
+					setBankDeductDtl(shPayAmtMap, titaVo);
+					if (cnt == 0) {
+						checkMsg = "E0001 查無資料";
+						checkFlag = false;
 					}
 				}
 				this.batchTransaction.commit();
-			}
-			if (checkFlag) {
-				setBankDeductDtl(shPayAmtMap, titaVo);
-				if (cnt == 0) {
-					checkMsg = "E0001 查無資料";
-					checkFlag = false;
+				if (checkFlag) {
+					try {
+						l4450Report.doReport(lBankDeductDtl, titaVo);
+					} catch (LogicException e) {
+						checkMsg = e.getMessage();
+						checkFlag = false;
+					}
 				}
-			}
-			this.batchTransaction.commit();
-			if (checkFlag) {
-				try {
-					l4450Report.doReport(lBankDeductDtl, titaVo);
-				} catch (LogicException e) {
-					checkMsg = e.getMessage();
-					checkFlag = false;
+
+				if (checkFlag) {
+					checkMsg = "銀行扣款合計報表已完成，總筆數=" + cnt;
 				}
-			}
-
-			if (checkFlag) {
-				checkMsg = "銀行扣款合計報表已完成，總筆數=" + cnt;
-			}
-
-			if (checkFlag) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getTlrNo(), checkMsg, titaVo);
-			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
-						titaVo.getTlrNo(), checkMsg, titaVo);
+           
+				if (checkFlag) {
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo(), checkMsg, titaVo);
+				} else {
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
+							titaVo.getTlrNo(), checkMsg, titaVo);
+				}
 			}
 		}
 		// 單筆
@@ -413,7 +425,8 @@ public class L4450Batch extends TradeBuffer {
 							tBaTxVo.setPayIntDate(t.getPayIntDate());
 							tBaTxVo.setIntStartDate(t.getIntStartDate());
 							tBaTxVo.setIntEndDate(t.getIntStartDate());
-							continue;
+							this.info("1=" + tBaTxVo.toString());
+							break;
 						}
 					}
 					// 當期期款已繳但有短繳
@@ -423,7 +436,8 @@ public class L4450Batch extends TradeBuffer {
 							tBaTxVo.setPayIntDate(baTxCom.getPrevPayIntDate());
 							tBaTxVo.setIntStartDate(0);
 							tBaTxVo.setIntEndDate(baTxCom.getPrevPayIntDate());
-							continue;
+							this.info("2=" + tBaTxVo.toString());
+							break;
 						}
 					}
 				}
@@ -453,6 +467,7 @@ public class L4450Batch extends TradeBuffer {
 						tBaTxVo.setDataKind(3);
 					}
 				}
+				this.info("Vo=" + tBaTxVo.toString());
 				tmpBorm tmp = new tmpBorm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, tBaTxVo.getRepayType(),
 						tBaTxVo.getDataKind() == 2 ? tBaTxVo.getPayIntDate() : 0);
 // 
@@ -760,6 +775,8 @@ public class L4450Batch extends TradeBuffer {
 //			帳號授權檢核未過
 			if (!"0".equals(failFlag)) {
 				tTempVo.putParam("Auth", failFlag);
+			} else {
+
 			}
 //			Deduct 兩個只會發生一個
 //			繳款金額=0(抵繳)
@@ -782,6 +799,7 @@ public class L4450Batch extends TradeBuffer {
 					tTempVo.putParam("InsuDate", insuDateMap.get(tmp2));
 				}
 			}
+
 			tBankDeductDtl.setJsonFields(tTempVo.getJsonString());
 
 			lBankDeductDtl.add(tBankDeductDtl);
@@ -823,8 +841,6 @@ public class L4450Batch extends TradeBuffer {
 			break;
 		}
 
-		// lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
-
 		if (slBankDeductDtl != null) {
 			for (BankDeductDtl tBankDeductDtl : slBankDeductDtl.getContent()) {
 				if (tBankDeductDtl.getAcDate() > 0) {
@@ -839,6 +855,7 @@ public class L4450Batch extends TradeBuffer {
 					checkFlag = false;
 					break;
 				}
+				deleteCnt++;
 				bankDeductDtlService.holdById(tBankDeductDtl, titaVo);
 				try {
 					bankDeductDtlService.delete(tBankDeductDtl, titaVo);
@@ -911,6 +928,8 @@ public class L4450Batch extends TradeBuffer {
 			repayAcct.put(tmp2, fnAllList.get(i).get("RepayAcct"));
 		if (!postCode.containsKey(tmp2))
 			postCode.put(tmp2, fnAllList.get(i).get("PostDepCode"));
+		if (!custId.containsKey(tmp2))
+			custId.put(tmp2, fnAllList.get(i).get("CustId"));
 		if (!relationCode.containsKey(tmp2))
 			relationCode.put(tmp2, fnAllList.get(i).get("RelationCode"));
 		if (!relationName.containsKey(tmp2))

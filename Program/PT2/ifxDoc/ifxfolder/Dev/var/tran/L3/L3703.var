@@ -119,7 +119,8 @@ HELP(#LoanNoteCodeHelp)
  
 #FdRmkDesc=X,2,L
 
-#Note=x,10.50,I
+!#Note=x,10.50,I
+#Note=C,5.50,I
 C(3,#Note,1,s,$)
 T(2,@Note,#Note)
 C(4,#Note,C(4,#LoanNoteCode,$,T(H,#LoanNoteCode,#LoanNoteCodeHelp)),$)

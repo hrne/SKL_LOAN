@@ -44,16 +44,11 @@ public class L4321Report extends MakeReport {
 
 	}
 
-	private int iTxKind = 0;
-	private int iCustType = 0;
 	private int iAdjCode = 0;
-	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private long sno;
 	private String fileNm = "";
 
-	public long exec(TitaVo titaVo) throws LogicException {
-		this.iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
-		this.iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
+	public long exec(List<Map<String, String>> fnAllList, TitaVo titaVo) throws LogicException {
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
 
 		this.fileNm = titaVo.getParam("FileNm");
@@ -85,14 +80,6 @@ public class L4321Report extends MakeReport {
 			break;
 		}
 
-		try {
-			fnAllList = L4321ServiceImpl.findAll(titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L4321ServiceImpl.findAll error = " + errors.toString());
-		}
-
 		if (fnAllList.size() > 0) {
 			String fdnm = "";
 //				從第幾列開始(表頭位置)
@@ -103,7 +90,7 @@ public class L4321Report extends MakeReport {
 				row++;
 
 //					i = 欄數(Columns)
-				for (int i = 0; i < tLDVo.size(); i++) {
+				for (int i = 0; i < 16 ; i++) {
 
 //						預設每個欄位名稱為F1~Fn
 					fdnm = "F" + String.valueOf(i);

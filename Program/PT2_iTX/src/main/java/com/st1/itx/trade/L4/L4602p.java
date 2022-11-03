@@ -71,8 +71,6 @@ public class L4602p extends TradeBuffer {
 	@Autowired
 	L4602Report l4602Report;
 
-	@Autowired
-	L4602Report2 l4602Report2;
 
 	private ArrayList<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<>();
 	private ArrayList<OccursList> tmpList = new ArrayList<>();
@@ -87,12 +85,13 @@ public class L4602p extends TradeBuffer {
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
 		// 刪除暫存檔
-		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth, "" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> slInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg("" + iInsuEndMonth,
+				"" + iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenewMediaTemp != null) {
-
-			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>();
+			
+			List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>(); 
 			lInsuRenewMediaTemp = slInsuRenewMediaTemp.getContent();
-
+			
 			try {
 				insuRenewMediaTempService.deleteAll(lInsuRenewMediaTemp, titaVo);
 			} catch (DBException e) {
@@ -163,9 +162,11 @@ public class L4602p extends TradeBuffer {
 		}
 		// 報表製作完成，發MESSAGE
 		if (isFinished) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4602", "L4602火險出單明細表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+					"L4602火險出單明細表已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4602", "L4602火險出單明細表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+					"L4602火險出單明細表查無資料", titaVo);
 		}
 
 		if (lInsuRenewMediaTemp.size() > 0) {
@@ -175,35 +176,38 @@ public class L4602p extends TradeBuffer {
 				throw new LogicException("E0005", "InsuRenew : " + e.getErrorMsg());
 			}
 		}
-		// 把明細資料容器裝到檔案資料容器內
-		insuRenewFileVo.setOccursList(tmpList);
-		// 轉換資料格式
-		ArrayList<String> file = insuRenewFileVo.toFile();
-
-		if (file.isEmpty()) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4602", "L4602火險到期檔查無資料", titaVo);
-		} else {
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
-
-			for (String line : file) {
-				makeFile.put(line);
-			}
-
-			long sno = makeFile.close();
-
-			this.info("sno : " + sno);
-			makeFile.toFile(sno);
-
-//		totaVo.put("PdfSnoM", "" + sno);
-
-			// TXT製作完成，發MESSAGE
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4602", "L4602火險到期檔LNM01P.txt已完成", titaVo);
-		}
-
-		// 2021-11-09 智偉修改
-		// 原本在L4600產生
-		// 改為在L4602產生,並將報表程式改名
-		l4602Report2.exec(titaVo);
+//		// 把明細資料容器裝到檔案資料容器內
+//		insuRenewFileVo.setOccursList(tmpList);
+//		// 轉換資料格式
+//		ArrayList<String> file = insuRenewFileVo.toFile();
+//
+//		if (file.isEmpty()) {
+//			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+//					"L4602火險到期檔查無資料", titaVo);
+//		} else {
+//			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+//					titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
+//
+//			for (String line : file) {
+//				makeFile.put(line);
+//			}
+//
+//			long sno = makeFile.close();
+//
+//			this.info("sno : " + sno);
+//			makeFile.toFile(sno);
+//
+////		totaVo.put("PdfSnoM", "" + sno);
+//
+//			// TXT製作完成，發MESSAGE
+//			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4602",
+//					"L4602火險到期檔LNM01P.txt已完成", titaVo);
+//		}
+//
+//		// 2021-11-09 智偉修改
+//		// 原本在L4600產生
+//		// 改為在L4602產生,並將報表程式改名
+//		l4602Report2.exec(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

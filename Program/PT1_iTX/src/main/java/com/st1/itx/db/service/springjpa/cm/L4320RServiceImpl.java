@@ -47,7 +47,8 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 		}
 		int adjCode = Integer.valueOf(titaVo.getParam("AdjCode"));
 		int rateKeyInCode = Integer.valueOf(titaVo.getParam("RateKeyInCode"));
-
+		String titaTlrNo = titaVo.getTlrNo();
+		String titaTxtNo = titaVo.getTxtNo();
 		this.info("l4320.findAll AdjDate=" + iAdjDate);
 
 		String sql = "SELECT CC.\"CityItem\"    " // F0 鄉鎮區
@@ -63,7 +64,7 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ "      , BR.\"PrevIntDate\"   " // F10 繳息迄日
 				+ "      , BR.\"ProdNo\"        " // F11 商品代碼
 				+ "      , FP.\"ProdName\"      " // F12 商品名稱
-	 	        + "      , CD.\"Item\"          " // F13 利率種類
+				+ "      , CD.\"Item\"          " // F13 利率種類
 				+ "      , BR.\"PresentRate\"   " // F14 目前利率
 				+ "      , BR.\"ContrRateIncr\" " // F15 合約加碼值
 				+ "      , BR.\"ProposalRate\"  " // F16 擬調利率
@@ -85,7 +86,8 @@ public class L4320RServiceImpl extends ASpringJpaParm implements InitializingBea
 				+ " LEFT JOIN \"FacProd\"  FP ON FP.\"ProdNo\"   = BR.\"ProdNo\" " + " WHERE BR.\"AdjDate\" = "
 				+ iAdjDate + "   AND BR.\"TxKind\" = " + txKind + "   AND BR.\"CustCode\" >= " + custType1
 				+ "   AND BR.\"CustCode\" <= " + custType2 + "   AND BR.\"AdjCode\" = " + adjCode
-				+ "   AND BR.\"RateKeyInCode\" = " + rateKeyInCode;
+				+ "   AND BR.\"RateKeyInCode\" = " + rateKeyInCode + "   AND BR.\"TitaTlrNo\" = " + titaTlrNo
+				+ "   AND BR.\"TitaTxtNo\" = " + titaTxtNo;
 		this.info("sql=" + sql);
 
 		Query query;

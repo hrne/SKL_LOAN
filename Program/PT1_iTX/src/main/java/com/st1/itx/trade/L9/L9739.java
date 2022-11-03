@@ -2,12 +2,14 @@ package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.service.springjpa.cm.L9739ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 
@@ -23,12 +25,14 @@ public class L9739 extends TradeBuffer {
 
 	String txcd = "L9739";
 
+	@Autowired
+	L9739ServiceImpl l9739ServiceImpl;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active " + txcd);
-		this.totaVo.init(titaVo);
 
-		MySpring.newTask(txcd + "p", this.txBuffer, titaVo);
+		MySpring.newTask("L9739p", this.txBuffer, titaVo);	
 
 		this.addList(this.totaVo);
 		return this.sendList();

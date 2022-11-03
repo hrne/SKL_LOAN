@@ -17,6 +17,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
+import com.st1.itx.db.domain.BatxRateChange;
+import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -30,6 +32,7 @@ import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.domain.TxTemp;
 import com.st1.itx.db.domain.TxTempId;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
@@ -73,6 +76,9 @@ public class L3701 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public TxTempService txTempService;
+	@Autowired
+	public BatxRateChangeService batxRateChangeService;
+
 	@Autowired
 	public FacMainService facMainService;
 	@Autowired
@@ -1056,6 +1062,8 @@ public class L3701 extends TradeBuffer {
 			if (overdueFlag) {
 				throw new LogicException(titaVo, "E0019", "催收戶不可變更[利率區分]"); // 輸入資料錯誤
 			}
+			// 登錄時檢核如L4321已確認未放行，則出錯誤訊息
+			CheckBatxRateChangeRoutine();
 			this.info("ApproveRate2N =" + this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate2N")));
 			updLoanBorMain = true;
 			tTemp2Vo.putParam("RtApproveRateY", iApproveRateY);
@@ -1473,7 +1481,7 @@ public class L3701 extends TradeBuffer {
 		}
 		// 到期日、 攤還方式、 繳息週期、 寬限到期日變更，須重算期金
 		if (iMaturityDateY.equals("X") || iAmortizedCodeY.equals("X") || iPayIntFreqY.equals("X")
-				|| iGraceDateY.equals("X")||iApproveRateY.equals("X")) {
+				|| iGraceDateY.equals("X") || iApproveRateY.equals("X")) {
 			wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
 					tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
 					tLoanBorMain.getGraceDate());
@@ -1972,4 +1980,15 @@ public class L3701 extends TradeBuffer {
 		pfDetailCom.addDetail(pf, titaVo);
 	}
 
+	// 登錄時檢核如L4321已確認未放行，則出錯誤訊息
+	private void CheckBatxRateChangeRoutine() throws LogicException {
+		this.info("CheckBatxRateChangeRoutine ... ");
+
+		BatxRateChange tBatxRateChange = batxRateChangeService
+				.findById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, wkFacmNo, wkBormNo), titaVo);
+		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 1) {
+			throw new LogicException(titaVo, "E0007", "整批利率調整確認未放行"); // 更新資料時，發生錯誤
+
+		}
+	}
 }

@@ -25,7 +25,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
+
 	/**
 	 * 執行報表輸出(放款餘額明細表)
 	 * 
@@ -33,7 +33,7 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Map<String, String>> findStandard(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findStandard(TitaVo titaVo, String prodCode) throws Exception {
 		this.info("l9739.findAll ");
 
 		String sql = " ";
@@ -54,7 +54,11 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			WHERE REGEXP_LIKE(\"ProdNo\",'I[A-I]')";
 		sql += "		)";
 		sql += "	) R ON R.\"ProdNo\" = P.\"ProdNo\"";
-		sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
+		if ("0".equals(prodCode)) {
+			sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
+		} else {
+			sql += "	WHERE REGEXP_LIKE(P.\"ProdNo\",'" + prodCode + "')";
+		}
 		sql += "	ORDER BY P.\"ProdNo\" ASC";
 
 		this.info("sql1=" + sql);
@@ -81,19 +85,19 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	SELECT L.\"CustNo\"";
 		sql += "		  ,L.\"FacmNo\"";
 		sql += "		  ,L.\"BormNo\"";
-		sql += "		  ,ML.\"StoreRate\"";
-		sql += "		  ,LC.\"EffectDate\"";
+		sql += " 		  ,NVL(ML.\"StoreRate\",0.00) AS \"StoreRate\"";
+		sql += " 		  ,NVL(LC.\"EffectDate\",0) AS \"EffectDate\"";
 		sql += "		  ,F.\"ProdNo\"";
 		sql += "	FROM \"LoanBorMain\" L";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "	LEFT JOIN \"MonthlyLoanBal\" ML ON ML.\"CustNo\" = L.\"CustNo\"";
 		sql += "								   AND ML.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "								   AND ML.\"BormNo\" = L.\"BormNo\""; 
-		sql += "								   AND ML.\"YearMonth\" = :yearmonth "; 
-		//--確認最新訂定生效日
+		sql += "								   AND ML.\"BormNo\" = L.\"BormNo\"";
+		sql += "								   AND ML.\"YearMonth\" = :yearmonth ";
+		// --確認最新訂定生效日
 		sql += "	LEFT JOIN \"FacProd\" P ON P.\"ProdNo\" = F.\"ProdNo\"";
-		//--確認戶號撥款最新商品生效日
+		// --確認戶號撥款最新商品生效日
 		sql += "	LEFT JOIN (";
 		sql += "		SELECT \"CustNo\"";
 		sql += "			  ,\"FacmNo\"";
@@ -110,11 +114,11 @@ public class L9739ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"LoanRateChange\" LRC ON LRC.\"CustNo\" = LC.\"CustNo\"";
 		sql += "								    AND LRC.\"FacmNo\" = LC.\"FacmNo\"";
 		sql += "								    AND LRC.\"BormNo\" = LC.\"BormNo\"";
-		sql += "								    AND LRC.\"EffectDate\" = LC.\"EffectDate\""; 
+		sql += "								    AND LRC.\"EffectDate\" = LC.\"EffectDate\"";
 		sql += "	WHERE L.\"Status\" = 0";
-		sql += "	  AND REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
-		sql += "	  AND P.\"StartDate\" = LC.\"EffectDate\"";
-		sql += "	  AND LRC.\"FitRate\" <> ML.\"StoreRate\"";
+//		sql += "	  AND REGEXP_LIKE(P.\"ProdNo\",'I[A-I]')";
+//		sql += "	  AND P.\"StartDate\" = LC.\"EffectDate\"";
+//		sql += "	  AND LRC.\"FitRate\" <> ML.\"StoreRate\"";
 		sql += "	ORDER BY L.\"CustNo\" ASC";
 		sql += "			,L.\"FacmNo\" ASC";
 		sql += "			,L.\"BormNo\" ASC";

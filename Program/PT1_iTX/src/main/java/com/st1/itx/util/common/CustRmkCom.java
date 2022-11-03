@@ -20,6 +20,7 @@ import com.st1.itx.db.service.TxTranCodeService;
 //import com.st1.itx.db.service.TxCtrlService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
@@ -73,18 +74,21 @@ public class CustRmkCom extends TradeBuffer {
 		List<CustRmk> lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
 		if (lCustRmk != null && lCustRmk.size() > 0) {
 			String s = "{red-s}{b-s}顧客控管警訊：{b-e}{red-e}<br><br>";
+			s += FormatUtil.padX("建立日期", 20) + FormatUtil.padX("備忘錄說明", 50) + FormatUtil.padX("經辦", 20) + "<br>";
 			for (CustRmk custRmk : lCustRmk) {
 				CdEmp cdEmp = cdEmpService.findById(custRmk.getLastUpdateEmpNo(), titaVo);
 				String emp = custRmk.getLastUpdateEmpNo();
 				if (cdEmp != null) {
 					emp += " " + cdEmp.getFullname();
 				}
-				s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + " ["
-						+ custRmk.getRmkDesc() + "]<br>";
+
+				s += FormatUtil.padX(parse.timeStampToStringDate(custRmk.getLastUpdate()), 20) + FormatUtil.padX(custRmk.getRmkDesc(), 50) + FormatUtil.padX(emp, 20) + "<br>";
+				// s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + " 經辦 :
+				// " + emp + " [" + custRmk.getRmkDesc() + "]<br>";
 				// s += custRmk.getRmkDesc() + " ("+ emp + " " +
 				// parse.timeStampToString(custRmk.getLastUpdate()) + ")<br>";
 			}
-
+			
 			this.totaVo.init(titaVo);
 
 			this.totaVo.setHtmlContent(s);
@@ -113,14 +117,14 @@ public class CustRmkCom extends TradeBuffer {
 			List<CustRmk> lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
 			if (lCustRmk != null && lCustRmk.size() > 0) {
 				String s = "{red-s}{b-s}顧客控管警訊：{b-e}{red-e}<br><br>";
+				s += FormatUtil.padX("建立日期", 20) + FormatUtil.padX("備忘錄說明", 50) + FormatUtil.padX("經辦", 20) + "<br>";
 				for (CustRmk custRmk : lCustRmk) {
 					CdEmp cdEmp = cdEmpService.findById(custRmk.getLastUpdateEmpNo(), titaVo);
 					String emp = custRmk.getLastUpdateEmpNo();
 					if (cdEmp != null) {
 						emp += " " + cdEmp.getFullname();
 					}
-					s += "日期 : " + parse.timeStampToStringDate(custRmk.getLastUpdate()) + "  經辦 : " + emp + " ["
-							+ custRmk.getRmkDesc() + "]<br>";
+					s += FormatUtil.padX(parse.timeStampToStringDate(custRmk.getLastUpdate()), 20) + FormatUtil.padX(custRmk.getRmkDesc().trim(), 50) + FormatUtil.padX(emp.trim(), 20) + "<br>";
 				}
 				totaVo.setHtmlContent(s);
 			}

@@ -286,6 +286,8 @@ public class L3721 extends TradeBuffer {
 				}
 			}
 
+			// 登錄時檢核如L4321已確認未放行，則出錯誤訊息
+			CheckBatxRateChangeRoutine();
 			// 刪除整批利率調整檔(未確認)
 			DeleteBatxRateChangeRoutine();
 
@@ -329,9 +331,10 @@ public class L3721 extends TradeBuffer {
 		}
 	}
 
-	// 刪除整批利率調整檔(未確認)(//，放行後刪除整批利率調整檔， 撥款序號 =
+	// 刪除整批利率調整檔(未確認)(//，放行後刪除整批利率調整檔， 撥款序號
 	private void DeleteBatxRateChangeRoutine() throws LogicException {
 		this.info("ReleaseBatxRateRoutine ... ");
+
 		BatxRateChange tBatxRateChange = batxRateChangeService
 				.holdById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, iFacmNo, wkBormNo), titaVo);
 		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 0) {
@@ -346,6 +349,18 @@ public class L3721 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0007", "整批利率調整檔"); // 更新資料時，發生錯誤
 				}
 			}
+		}
+	}
+
+	// 登錄時檢核如L4321已確認未放行，則出錯誤訊息
+	private void CheckBatxRateChangeRoutine() throws LogicException {
+		this.info("CheckBatxRateChangeRoutine ... ");
+
+		BatxRateChange tBatxRateChange = batxRateChangeService
+				.findById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, iFacmNo, wkBormNo), titaVo);
+		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 1) {
+			throw new LogicException(titaVo, "E0007", "整批利率調整確認未放行"); // 更新資料時，發生錯誤
+
 		}
 	}
 
@@ -624,7 +639,7 @@ public class L3721 extends TradeBuffer {
 		// 放行 一般
 		if (titaVo.isHcodeNormal()) {
 			// 更新撥款主檔
-			
+
 			if (tLoanBorMain.getLastBorxNo() == wkBorxNo) {
 				tLoanBorMain.setActFg(titaVo.getActFgI());
 			}

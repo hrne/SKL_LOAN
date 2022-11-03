@@ -197,7 +197,9 @@ public class L420C extends TradeBuffer {
 			throw new LogicException("E0014", tBatxHeadId + " hold not exist"); // E0014 檔案錯誤
 		}
 		tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() - tmpFinishCnt);
-
+		if (tBatxHead.getUnfinishCnt() == 0) {
+			tBatxHead.setBatxExeCode("4");
+		}
 		try {
 			batxHeadService.update(tBatxHead);
 		} catch (DBException e) {
@@ -205,7 +207,7 @@ public class L420C extends TradeBuffer {
 		}
 
 		// 啟動背景作業－整批入帳完成
-		if (tmpFinishCnt > 0 && tBatxHead.getUnfinishCnt() == 0) {
+		if (tBatxHead.getUnfinishCnt() == 0) {
 			TitaVo l420BTita = new TitaVo();
 			l420BTita = (TitaVo) titaVo.clone();
 			l420BTita.putParam("FunctionCode", "3");// 處理代碼 3.檢核

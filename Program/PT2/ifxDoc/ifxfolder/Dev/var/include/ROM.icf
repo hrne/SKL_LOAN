@@ -2380,7 +2380,7 @@ TXFORM=L2R22
 #L2r23LVITax=m,14,S
 #L2r23RentEvaValue=m,14,S
 #L2r23RentPrice=m,14,S
-#L2r23OwnershipCode=A,1,S
+#L2r23OwnershipCode=X,1,S
 #L2r23MtgCode=A,1,S
 #L2r23MtgCheck=X,1,S
 #L2r23MtgLoan=X,1,S
@@ -3317,7 +3317,7 @@ TXFORM=L2R45
 !    L2R46 : 依擔保品編號取他項權利資料
 <L2R46.dec>
 #L2r46Seq=X,7,S
-#L2r46City=X,2,S
+#L2r46City=X,4,S
 #L2r46OtherCity=x,20,S
 #L2r46LandAdm=X,2,S
 #L2r46OtherLandAdm=x,10,S

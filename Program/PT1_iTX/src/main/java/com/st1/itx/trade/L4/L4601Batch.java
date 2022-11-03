@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +33,11 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.FileCom;
+import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.InsuRenewFileVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
@@ -59,6 +64,9 @@ public class L4601Batch extends TradeBuffer {
 
 	@Autowired
 	public FileCom fileCom;
+
+	@Autowired
+	public MakeFile makeFile;
 
 	@Autowired
 	public InsuRenewFileVo insuRenewFileVo;
@@ -98,6 +106,24 @@ public class L4601Batch extends TradeBuffer {
 
 	@Autowired
 	public L4601Report l4601Report;
+
+	@Autowired
+	public L4601Report2 l4601Report2;
+
+	@Autowired
+	public L4600Batch l4600Batch;
+
+	@Autowired
+	public L4601Batch l4601Batch;
+
+	private ArrayList<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<>();
+
+	private ArrayList<OccursList> tmpList = new ArrayList<>();
+
+	private List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+
+	@Autowired
+	CustNoticeCom custNoticeCom;
 
 	private String checkMsg = "";
 	private int errorACnt = 0;
@@ -236,6 +262,7 @@ public class L4601Batch extends TradeBuffer {
 		} else {
 			// 產重複投保報表
 			l4601Report.exec(titaVo);
+			l4601Report2(titaVo);
 
 			String sendMsg = "L4601-報表已完成";
 
@@ -547,6 +574,116 @@ public class L4601Batch extends TradeBuffer {
 		if (!"".equals(checkResultC)) {
 			errorCCnt = errorCCnt + 1;
 		}
+
+	}
+
+	/**
+	 * 出表：保單險種不足明細表/LN5811P.CSV
+	 * 
+	 * @param titaVo
+	 * @throws LogicException
+	 * 
+	 */
+	public void l4601Report2(TitaVo titaVo) throws LogicException {
+		this.info("active l4601Report2 ");
+		this.totaVo.init(titaVo);
+
+		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
+//		出表明細
+		Slice<InsuRenew> slInsuRenew = insuRenewService.selectC(iInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+
+		// 報表明細資料容器
+		List<Map<String, Object>> listL4601 = new ArrayList<>();
+
+		if (slInsuRenew != null) {
+
+			for (InsuRenew t : slInsuRenew.getContent()) {
+//				排除自保件
+				if (t.getRenewCode() == 1) {
+					continue;
+				}
+
+				OccursList occursList = new OccursList();
+				occursList = l4600Batch.getOccurs("L4602", occursList, t, titaVo);
+				tmpList.add(occursList);
+				InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
+				tInsuRenewMediaTemp = l4601Batch.getInsuRenewMediaTemp(occursList, tInsuRenewMediaTemp, titaVo);
+
+				TempVo tempVo = new TempVo();
+				tempVo = custNoticeCom.getCustNotice("L4603", t.getCustNo(), t.getFacmNo(), titaVo);
+				int noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+				tInsuRenewMediaTemp.setRepayCode(t.getRepayCode());
+				tInsuRenewMediaTemp.setNoticeFlag(noticeFlag);
+				lInsuRenewMediaTemp.add(tInsuRenewMediaTemp);
+				lInsuRenew.add(t);
+
+				this.info(occursList.toString());
+				this.info(t.toString());
+				this.info(tInsuRenewMediaTemp.toString());
+
+				// 報表明細資料容器
+				Map<String, Object> tL4601 = new HashMap<>();
+
+				tL4601.put("OOClCode1", t.getClCode1());
+				tL4601.put("OOClCode2", t.getClCode2());
+				tL4601.put("OOClNo", t.getClNo());
+				tL4601.put("OOPrevInsuNo", t.getPrevInsuNo());
+				tL4601.put("OOCustNo", t.getCustNo());
+				tL4601.put("OOFacmNo", t.getFacmNo());
+				tL4601.put("OORepayCodeX", t.getRepayCode());
+				tL4601.put("OOCustName", tInsuRenewMediaTemp.getLoanCustName());
+				tL4601.put("OONewInsuStartDate", t.getInsuStartDate());
+				tL4601.put("OONewInsuEndDate", t.getInsuEndDate());
+				tL4601.put("OOFireAmt", t.getFireInsuCovrg());
+				tL4601.put("OOFireFee", t.getFireInsuPrem());
+				tL4601.put("OOEthqAmt", t.getEthqInsuCovrg());
+				tL4601.put("OOEthqFee", t.getEthqInsuPrem());
+				tL4601.put("OOTotlFee", t.getTotInsuPrem());
+				tL4601.put("OONoticeWay", tInsuRenewMediaTemp.getNoticeFlag());
+
+				// 報表明細資料
+				listL4601.add(tL4601);
+			}
+
+		}
+		// 把明細資料容器裝到檔案資料容器內
+		insuRenewFileVo.setOccursList(tmpList);
+		// 轉換資料格式
+		ArrayList<String> file = insuRenewFileVo.toFile();
+
+		if (file.isEmpty()) {
+			webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4602", "L4602火險到期檔查無資料", titaVo);
+		} else {
+
+			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
+					.setRptCode(titaVo.getTxCode()).build();
+
+			makeFile.open(titaVo, reportVo, "LNM01P.txt", 2);
+			
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
+//			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+//					titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
+
+			for (String line : file) {
+				makeFile.put(line);
+			}
+
+			long sno = makeFile.close();
+
+			this.info("sno : " + sno);
+			makeFile.toFile(sno);
+
+//		totaVo.put("PdfSnoM", "" + sno);
+
+			// TXT製作完成，發MESSAGE
+			webClient.sendPost(dateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4602", "L4602火險到期檔LNM01P.txt已完成", titaVo);
+		}
+
+		// 2021-11-09 智偉修改， 原本在L4600產生 改為在L4602產生,並將報表程式改名
+		// 2022-11-02楷杰修改，需求：原L4602產生此表，改成在L4601產生
+		l4601Report2.exec(titaVo);
 
 	}
 

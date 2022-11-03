@@ -1,8 +1,11 @@
 package com.st1.itx.trade.L4;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +28,7 @@ import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanRateChangeService;
+import com.st1.itx.db.service.springjpa.cm.L4321ServiceImpl;
 import com.st1.itx.trade.L4.L4321Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
@@ -63,6 +67,9 @@ public class L4321Batch extends TradeBuffer {
 	public DateUtil dateUtil;
 
 	@Autowired
+	public L4321ServiceImpl L4321ServiceImpl;
+
+	@Autowired
 	public L4321Report l4321Report;
 
 	@Autowired
@@ -86,6 +93,7 @@ public class L4321Batch extends TradeBuffer {
 	private Boolean flag = true;
 	private BigDecimal rateIncr = BigDecimal.ZERO;
 	private BigDecimal individualIncr = BigDecimal.ZERO;
+	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
 //	輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //	客戶檔 0:個金1:企金2:企金自然人
@@ -105,12 +113,35 @@ public class L4321Batch extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE;
 
 		try {
-			execute(titaVo);
-		} catch (LogicException e) {
-			sendMsg = e.getErrorMsg();
+			fnAllList = L4321ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
 			flag = false;
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("L4321ServiceImpl.findAll error = " + errors.toString());
 		}
-
+		// 檢查未放行
+		if (!flag) {
+			if (fnAllList != null && fnAllList.size() != 0) {
+				for (Map<String, String> s : fnAllList) {
+					if ("1".equals(s.get("ActFg"))) {
+						flag = false;
+						sendMsg += " 戶號：" + s.get("CustNo");
+					}
+				}
+			}
+			if (!flag) {
+				throw new LogicException("E0015", sendMsg); // 檢查錯誤
+			}
+		}
+		if (flag) {
+			try {
+				execute(titaVo);
+			} catch (LogicException e) {
+				sendMsg = e.getErrorMsg();
+				flag = false;
+			}
+		}
 		// 送出通知訊息
 		sendMessage(titaVo);
 
@@ -161,7 +192,7 @@ public class L4321Batch extends TradeBuffer {
 		// 產出確認清單
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
 			this.batchTransaction.commit();
-			l4321Report.exec(titaVo);
+			l4321Report.exec(fnAllList, titaVo);
 		}
 	}
 
@@ -203,8 +234,13 @@ public class L4321Batch extends TradeBuffer {
 			}
 
 			if (titaVo.isHcodeNormal()) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
+				if (titaVo.isActfgEntry()) {
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo() + "L4321", sendMsg, titaVo);
+				} else {
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", sendMsg,
+							titaVo);
+				}
 //				主管放行提醒原櫃員執行列印對帳單交易			
 				if (titaVo.isActfgSuprele() && isComplete(titaVo)) {
 					this.info("OrgTlr ..." + titaVo.getOrgTlr());
@@ -214,6 +250,8 @@ public class L4321Batch extends TradeBuffer {
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
 			}
+		} else {
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
 		}
 	}
 
@@ -247,15 +285,20 @@ public class L4321Batch extends TradeBuffer {
 					this.info(tBatxRateChange.getCustNo() + "  continue...");
 					continue;
 				}
-
+				// get tempVo
+				tTempVo = new TempVo();
+				tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
+				if (titaVo.isActfgSuprele()) {
+					if (parse.stringToInteger(tTempVo.getParam("EntDy")) != this.txBuffer.getTxCom().getReldy()
+							|| !tTempVo.getParam("TxSeq").equals(this.txBuffer.getTxCom().getRelNo())) {
+						continue;
+					}
+				}
 				// commit per commitCnt
 				this.processCnt++;
 				if (this.processCnt % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
-				// get tempVo
-				tTempVo = new TempVo();
-				tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
 
 				// 放款利率變動檔生效日，利率未變動為零
 				int txEffectDate = 0;
@@ -317,6 +360,11 @@ public class L4321Batch extends TradeBuffer {
 						tBatxRateChange.setTxEffectDate(0);
 					} else {
 						tBatxRateChange.setTxEffectDate(txEffectDate);
+					}
+					if (this.iConfirmFlag == 1) {
+						tTempVo.putParam("EntDy", titaVo.getEntDyI());
+						tTempVo.putParam("TxSeq", titaVo.getTxSeq());
+						;
 					}
 					tBatxRateChange.setConfirmFlag(this.iConfirmFlag);
 					tBatxRateChange.setJsonFields(tTempVo.getJsonString());

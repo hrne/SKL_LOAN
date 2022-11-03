@@ -16,6 +16,7 @@ import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 /**
@@ -50,8 +51,16 @@ public class L4602Report extends MakeReport {
 		// 取得共用代碼檔
 		getCdCodeMaps(titaVo);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName);
 
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
+				.setRptCode(txcd).setRptItem(txName).build();
+
+		makeExcel.open(titaVo, reportVo,txcd + "_" + txName);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName);
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCode, reportName, "", "A4", "L");
+		
 		// 輸出表頭
 		printL4602Header();
 

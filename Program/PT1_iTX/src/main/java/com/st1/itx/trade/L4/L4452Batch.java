@@ -408,12 +408,11 @@ public class L4452Batch extends TradeBuffer {
 				String custId = "";
 				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(tBankDeductDtl.getCustNo(),
 						tBankDeductDtl.getPostCode(), tBankDeductDtl.getRepayAcctNo(), "1", titaVo);
-				if (tPostAuthLog != null) {
-					custId = tPostAuthLog.getCustId();
-				} else {
-					throw new LogicException("E0005", "無授權檔資料");
+				if (tPostAuthLog == null) {
+					sendMsg += " 無授權檔資料，戶號：" + tBankDeductDtl.getCustNo() ;
+					continue;
 				}
-
+				custId = tPostAuthLog.getCustId();
 				tPostDeductMedia.setPostUserNo(
 						FormatUtil.padX(tBankDeductDtl.getRepayAcctSeq(), 2) + FormatUtil.padX(custId, 10)
 								+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
@@ -719,7 +718,7 @@ public class L4452Batch extends TradeBuffer {
 			tmp53NPostDeductFileVo.put("FootIndex", "2");
 			tmp53NPostDeductFileVo.put("FootDepCode", FormatUtil.padX("", 1));
 			tmp53NPostDeductFileVo.put("FootOrgCode", "53N");
-			tmp53NPostDeductFileVo.put("FootDistCode", "");
+			tmp53NPostDeductFileVo.put("FootDistCode", "    ");
 			tmp53NPostDeductFileVo.put("FootTxDate", transDate);
 			tmp53NPostDeductFileVo.put("FootKeepColA", FormatUtil.padX("", 3));
 			tmp53NPostDeductFileVo.put("FootTotCnt", FormatUtil.pad9("" + cnt53N, 7));
