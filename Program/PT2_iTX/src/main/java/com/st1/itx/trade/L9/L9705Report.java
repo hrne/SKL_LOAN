@@ -309,7 +309,7 @@ public class L9705Report extends MakeReport {
 						if (isLast) {
 							this.info("3 cust facm different....");
 							this.info("newPage....");
-							this.newPage();
+//							this.newPage();
 							con2Count = 0;
 						}
 

@@ -90,7 +90,7 @@ public class L9740Report extends MakeReport {
 		String acctCodeC = titaVo.getParam("AcctCodeC");
 		String statusC = titaVo.getParam("StatusC");
 		BigDecimal rateC = new BigDecimal(titaVo.getParam("RateC"));
-
+		 this.rate =  rateC;
 		try {
 
 			// Q9309141 新撥款之戶號

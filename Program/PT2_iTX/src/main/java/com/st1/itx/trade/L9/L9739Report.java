@@ -41,7 +41,7 @@ public class L9739Report extends MakeReport {
 	MakeExcel makeExcel;
 
 	String txcd = "L9739";
-	String txname = "檢核政府優惠房貸利率脫鉤";
+	String txname = "檢核政府優惠房貸利率脫勾";
 
 	@Override
 	public void printHeader() {
@@ -121,23 +121,23 @@ public class L9739Report extends MakeReport {
 		}
 		this.print(1, 1, " ");
 		this.print(1, 3, "不符者，產出明細欄位如下");
-		this.print(1, 3, "戶號");
-		this.print(0, 13, "額度");
-		this.print(0, 20, "額度");
-		this.print(0, 27, "利率");
-		this.print(0, 35, "生效日期");
-		this.print(0, 50, "基本利率代碼");
+		this.print(1, 13, "戶號");
+		this.print(0, 23, "額度");
+		this.print(0, 30, "額度");
+		this.print(0, 37, "利率");
+		this.print(0, 45, "生效日期");
+		this.print(0, 60, "基本利率代碼");
 
 		if (listL9739Detail.size() > 0) {
 
 			for (Map<String, String> r : listL9739Detail) {
 
-				this.print(1, 3, r.get("CustNo"));
-				this.print(0, 13, r.get("FacmNo"));
-				this.print(0, 20, r.get("BormNo"));
-				this.print(0, 27, r.get("StoreRate"));
-				this.print(0, 35, showBcDate(r.get("EffectDate"), 0));
-				this.print(0, 50, r.get("ProdNo"));
+				this.print(1, 13, r.get("CustNo"));
+				this.print(0, 23, r.get("FacmNo"));
+				this.print(0, 30, r.get("BormNo"));
+				this.print(0, 37, r.get("StoreRate"));
+				this.print(0, 45, showBcDate(r.get("EffectDate"), 0));
+				this.print(0, 60, r.get("ProdNo"));
 
 			}
 
