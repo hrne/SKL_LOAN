@@ -459,7 +459,7 @@ public class L2153 extends TradeBuffer {
 			if (titaVo.get("BaseRateCode") == null || titaVo.get("BaseRateCode").trim().isEmpty()) {
 				tFacMain.setBaseRateCode("99");
 			} else {
-				tFacMain.setBaseRateCode(titaVo.get("BaseRateCode"));
+				tFacMain.setBaseRateCode(parse.IntegerToString(parse.stringToInteger(titaVo.get("BaseRateCode")), 2));
 			}
 
 			// 綠色授信註記

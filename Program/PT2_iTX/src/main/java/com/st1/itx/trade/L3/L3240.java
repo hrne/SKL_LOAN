@@ -169,7 +169,7 @@ public class L3240 extends TradeBuffer {
 							sumNo = "102";
 						}
 						String rvNo = "";
-						if ("C01".equals(acDetail.getAcctCode())) {
+						if ("C01".equals(ac.getAcctCode())) {
 							rvNo = "0010060" + titaVo.getOrgEntdyI();
 						}
 						acDetail = new AcDetail();

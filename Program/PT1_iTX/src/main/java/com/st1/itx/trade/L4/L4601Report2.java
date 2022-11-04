@@ -58,23 +58,23 @@ public class L4601Report2 extends MakeReport {
 		List<String> file = getData(titaVo);
 
 		
-//		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).
-//				.setRptCode(titaVo.getTxCode()).build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).
+				setRptCode(titaVo.getTxCode()).setRptItem(fileName).build();
 
-//		makeFile.open(titaVo, reportVo, fileName, 2);
+		makeFile.open(titaVo, reportVo, fileName, 2);
 		
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-				titaVo.getTxCode() + "-LN5811P.CSV", fileName, 2);
+//		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+//				titaVo.getTxCode() + "-LN5811P.CSV", fileName, 2);
 
 		for (String line : file) {
 			makeFile.put(line);
 		}
 
-		long sno = makeFile.close();
+		makeFile.close();
 
-		this.info("sno : " + sno);
+//		this.info("sno : " + sno);
 
-		makeFile.toFile(sno);
+//		makeFile.toFile(sno);
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L4601",
 				titaVo.getTxCode() + " 已產生LN5811P.CSV", titaVo);

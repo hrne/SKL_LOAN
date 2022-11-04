@@ -39,7 +39,7 @@ public class L4607 extends TradeBuffer {
 		String CityCode = titaVo.getParam("CityCode");
 		int Material = parse.stringToInteger(titaVo.getParam("Material"));
 		int iFinal = parse.stringToInteger(titaVo.getParam("Final"));
-		int VersionDate = parse.stringToInteger(titaVo.getParam("VersionDate"));
+		int VersionDate = parse.stringToInteger(titaVo.getParam("VersionDate")) + 19110000;
 
 		for (int i = 1; i <= 50; i++) {
 			CdBuildingCost tCdBuildingCost = new CdBuildingCost();

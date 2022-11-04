@@ -99,7 +99,11 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
-  // 摘要
+  // 交易別代碼
+  @Column(name = "`TxDescCode`", length = 4)
+  private String txDescCode;
+
+  // 交易別
   @Column(name = "`Desc`", length = 15)
   private String desc;
 
@@ -588,7 +592,26 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 摘要<br>
+	* 交易別代碼<br>
+	* 
+	* @return String
+	*/
+  public String getTxDescCode() {
+    return this.txDescCode == null ? "" : this.txDescCode;
+  }
+
+/**
+	* 交易別代碼<br>
+	* 
+  *
+  * @param txDescCode 交易別代碼
+	*/
+  public void setTxDescCode(String txDescCode) {
+    this.txDescCode = txDescCode;
+  }
+
+/**
+	* 交易別<br>
 	* 
 	* @return String
 	*/
@@ -597,10 +620,10 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 摘要<br>
+	* 交易別<br>
 	* 
   *
-  * @param desc 摘要
+  * @param desc 交易別
 	*/
   public void setDesc(String desc) {
     this.desc = desc;
@@ -1222,12 +1245,12 @@ N:否
   public String toString() {
     return "LoanBorTx [loanBorTxId=" + loanBorTxId + ", titaCalDy=" + titaCalDy + ", titaCalTm=" + titaCalTm
            + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", acSeq=" + acSeq + ", titaTxCd=" + titaTxCd + ", titaCrDb=" + titaCrDb
-           + ", titaHCode=" + titaHCode + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", desc=" + desc + ", acDate=" + acDate
-           + ", correctSeq=" + correctSeq + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", acctCode=" + acctCode + ", txAmt=" + txAmt
-           + ", loanBal=" + loanBal + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate + ", principal=" + principal
-           + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt + ", tempAmt=" + tempAmt
-           + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall + ", overflow=" + overflow
-           + ", slipSumNo=" + slipSumNo + ", otherFields=" + otherFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", titaHCode=" + titaHCode + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", txDescCode=" + txDescCode + ", desc=" + desc
+           + ", acDate=" + acDate + ", correctSeq=" + correctSeq + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", acctCode=" + acctCode
+           + ", txAmt=" + txAmt + ", loanBal=" + loanBal + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", paidTerms=" + paidTerms + ", rate=" + rate
+           + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", feeAmt=" + feeAmt
+           + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal + ", unpaidCloseBreach=" + unpaidCloseBreach + ", shortfall=" + shortfall
+           + ", overflow=" + overflow + ", slipSumNo=" + slipSumNo + ", otherFields=" + otherFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -54,7 +54,7 @@ E(0,0)
 ], 
 
 ["#grid#,{id:3,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
-["@放款管理課月報",[#BtnAllShell2,"@全選"],[#BtnExpShell2,"@",#ExpText2]],"",
+["@逾期暨風險控管月報",[#BtnAllShell2,"@全選"],[#BtnExpShell2,"@",#ExpText2]],"",
 ],
 
 ["#grid#,{id:4,expand:true,loop:32,row_height:1}","","",

@@ -43,7 +43,7 @@ E(0,0)
 ["[L3703]                                 帳務明細摘要維護"],
 ["#FdCustNo+借戶戶號",#CustNo,"-",#FacmNo,"-",#BormNo,"-",#BorxNo],
 ["#FdLoanNoteCode+摘要代碼",#LoanNoteCode],
-["#FdRmkDesc+摘要",#Note],
+["#FdRmkDesc+摘要",#Note,"Shift+Enter換行，Enter跳一下欄位"],
 !["@@@@會計日期",#AcDate],
 !["#FdEmpNm+建檔經辦",#EmpName],
 ]
@@ -120,7 +120,7 @@ HELP(#LoanNoteCodeHelp)
 #FdRmkDesc=X,2,L
 
 !#Note=x,10.50,I
-#Note=C,5.50,I
+#Note=c,5.50,I
 C(3,#Note,1,s,$)
 T(2,@Note,#Note)
 C(4,#Note,C(4,#LoanNoteCode,$,T(H,#LoanNoteCode,#LoanNoteCodeHelp)),$)
