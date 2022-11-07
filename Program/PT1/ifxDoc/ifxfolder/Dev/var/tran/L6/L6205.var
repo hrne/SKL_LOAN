@@ -23,7 +23,7 @@ E(0,0)
 ["#FdFunCd+功能",#FunCdX],
 ["#FdCityCode+縣市代碼",#CityCode,#CityCodeX],
 ["#FdLandOfficeCode+地政別代碼",#LandOfficeCode],
-["#FdLandOfficeItem+地政別代碼",#LandOfficeItem],
+["#FdLandOfficeItem+地政別說明",#LandOfficeItem],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]

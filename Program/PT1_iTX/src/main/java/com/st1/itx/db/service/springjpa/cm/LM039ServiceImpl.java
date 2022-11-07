@@ -35,8 +35,8 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @return
-	 * @throws Exception
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth) throws Exception {
@@ -74,7 +74,8 @@ public class LM039ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "            ,F.\"UtilBal\"";
 		sql += "            ,L.\"DrawdownAmt\"";
 		sql += "            ,F.\"CreditOfficer\"";
-		sql += "            ,F.\"LoanOfficer\"";
+//		sql += "            ,F.\"LoanOfficer\"";
+		sql += "            ,F.\"BusinessOfficer\"";
 		sql += "            ,Li.\"AccCollPsn\"";
 		sql += "            ,F.\"UsageCode\"";
 		sql += "            ,F.\"ProdNo\"";
