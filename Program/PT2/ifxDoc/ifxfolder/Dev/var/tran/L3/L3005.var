@@ -583,7 +583,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
 
 !維護
 #OOBTNRMK=X,577,S
-T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo+#OONote)
+T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOBorxNo)
 BIND(grid,{ cmd=CHAIN; ntxcd=L3703;text=維護;ntxbuf=#OOBTNRMK})
 
 !分錄

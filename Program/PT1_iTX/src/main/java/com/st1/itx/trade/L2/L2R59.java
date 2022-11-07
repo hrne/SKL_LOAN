@@ -1,11 +1,9 @@
-package com.st1.itx.trade.L2;
+	package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class L2R59 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R59.class);
 
 	@Autowired
 	public L2418ServiceImpl l2418ServiceImpl;

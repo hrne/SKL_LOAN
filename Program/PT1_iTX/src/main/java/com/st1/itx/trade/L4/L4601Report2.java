@@ -59,7 +59,7 @@ public class L4601Report2 extends MakeReport {
 
 		
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno()).
-				setRptCode(titaVo.getTxCode()).setRptItem(fileName).build();
+				setRptCode(titaVo.getTxCode()).setRptItem("LN5811P").build();
 
 		makeFile.open(titaVo, reportVo, fileName, 2);
 		

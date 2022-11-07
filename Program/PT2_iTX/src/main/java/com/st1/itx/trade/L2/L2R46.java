@@ -53,7 +53,7 @@ public class L2R46 extends TradeBuffer {
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		// 他項權利序號
-		String iClSeq = titaVo.getParam("RimClSeq");
+		int iClSeq = parse.stringToInteger(titaVo.getParam("RimClSeq"));
 
 		// WK
 		ClMain tClMain = new ClMain();

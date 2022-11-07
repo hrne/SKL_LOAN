@@ -31,6 +31,7 @@ E(0,40)ASGN(INQPRT$)
 
 <sub type="DC" name="BFHEAD">
 <include src="COM.icf::BFHEAD.dec"/>
+<include src="ROM.icf::L3R31.dec"/>
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
@@ -76,7 +77,6 @@ CALL(#HelpProc)
 T(2,@LoanNoteCodeHelp,#HelpDesc1)
 
 
-
 !會計日期
 #AcDate=D,7,L
 T(2,#DT2)
@@ -89,9 +89,28 @@ T(1,@CustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
 T(1,@BormNo,#NTXBUF,11,3)
 T(1,@BorxNo,#NTXBUF,14,4)
-T(1,@Note,#NTXBUF,18,500)
+
+
+
+
+#RimL3r31S=X,1,S
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+E(0,@RimBorxNo,#BorxNo)
+S(L3R31,1,#RimCustNo,#RimFacmNo,#RimBormNo,#RimBorxNo)
+R(1,L3R31)
+T(2,@Note,#L3r31Note)
+
+
 
 #FdCustNo=X,2,L
+
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+#RimBormNo=A,3,S
+#RimBorxNo=A,4,S
+#RimNote=X,500,S
 
 #CustNo=X,7,L
 C(3,#CHAIN,1,s,$)
@@ -138,6 +157,7 @@ C(3,#BormNo,s,T(2,#CustNo+-+#FacmNo+-+#BormNo))
 C(3,#Note,1,S,$)
 E(0,1)ASGN(AGAIN$)
 
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -175,11 +195,10 @@ T(3,[L3703] 帳務備忘錄明細資料維護)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L3R31.tom"/>
 TXFORM=L3703
 
-</sub>
 ^
-<include src="COM.icf::TRCTL.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

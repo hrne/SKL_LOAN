@@ -56,7 +56,7 @@ public class L2418 extends TradeBuffer {
 	// 戶號
 	private int iCustNo = 0;
 	// 他項權利序號
-	private String iClSeq;
+	private int iClSeq;
 
 	private boolean isEloan = false;
 
@@ -82,7 +82,7 @@ public class L2418 extends TradeBuffer {
 		// 擔保品編號
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		// 他項權利序號
-		iClSeq = titaVo.getParam("ClSeq");
+		iClSeq = parse.stringToInteger(titaVo.getParam("ClSeq"));
 		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		titaVo.putParam("MRKEY", iCustNo);
 
@@ -99,7 +99,7 @@ public class L2418 extends TradeBuffer {
 			throw new LogicException("E2003", "擔保品編號不存在擔保品主檔");
 		}
 		tClMain = sClMainService.holdById(tClMain, titaVo);
-		tClMain.setLastClOtherSeq(parse.stringToInteger(iClSeq));
+		tClMain.setLastClOtherSeq(iClSeq);
 
 		try {
 			sClMainService.update(tClMain, titaVo);

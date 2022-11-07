@@ -41,10 +41,12 @@ public class L6R47 extends TradeBuffer {
 
 		// tita
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
+		String iCityCode = titaVo.getParam("RimCityCode");
 		String iLandOfficeCode = titaVo.getParam("RimLandOfficeCode");
 		String iRecWord = titaVo.getParam("RimRecWord");
 
 		CdLandOfficeId cdLandOfficeId = new CdLandOfficeId();
+		cdLandOfficeId.setCityCode(iCityCode);
 		cdLandOfficeId.setLandOfficeCode(iLandOfficeCode);
 		cdLandOfficeId.setRecWord(iRecWord);
 		CdLandOffice tCdLandOffice = cdLandOfficeService.findById(cdLandOfficeId, titaVo);
@@ -55,11 +57,13 @@ public class L6R47 extends TradeBuffer {
 			case 2:
 			case 4:
 			case 5:
-				throw new LogicException(titaVo, "E2003", "不存在地政收件字檔" + "地政所代號 = " + iLandOfficeCode + " 收件字代號 = " + iRecWord); // 查無資料
+				throw new LogicException(titaVo, "E2003",
+						"不存在地政收件字檔" + "地政所代號 = " + iLandOfficeCode + " 收件字代號 = " + iRecWord); // 查無資料
 			}
 		} else {
 			if (iFunCd == 1) {
-				throw new LogicException(titaVo, "E0002", "地政收件字檔" + "地政所代號 = " + iLandOfficeCode + " 收件字代號 =" + iRecWord); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002",
+						"地政收件字檔" + "地政所代號 = " + iLandOfficeCode + " 收件字代號 =" + iRecWord); // 新增資料已存在
 			}
 
 			this.totaVo.putParam("L6r47LandOfficeCode", tCdLandOffice.getLandOfficeCode());

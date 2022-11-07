@@ -68,6 +68,7 @@ public class L6023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	FROM ";
 		sql += " 	    \"CdLandOffice\"    co ";
 		sql += " 	    LEFT JOIN \"CdLand\"   cl ON co.\"LandOfficeCode\" = cl.\"LandOfficeCode\" ";
+		sql += " 	    and cl.\"CityCode\" = co.\"CityCode\"  ";
 
 		if (!iCityCode.isEmpty() || !iLandOfficeCode.isEmpty() || !iRecWord.isEmpty()) {
 			sql += " 	WHERE ";

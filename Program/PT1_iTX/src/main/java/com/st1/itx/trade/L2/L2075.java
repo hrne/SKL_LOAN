@@ -152,7 +152,8 @@ public class L2075 extends TradeBuffer {
 					funCode = tFacClose.getFunCode();
 				}
 				// 擔保品與額度關聯檔
-				Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(custNo, facmNoS, facmNoE, 0, Integer.MAX_VALUE, titaVo);
+				Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(custNo, facmNoS, facmNoE, 0, Integer.MAX_VALUE,
+						titaVo);
 
 				lClFac = slClFac == null ? null : slClFac.getContent();
 				isAllClose = true;
@@ -162,16 +163,19 @@ public class L2075 extends TradeBuffer {
 
 						// 全部結案
 						List<ClFac> l2ClFac = new ArrayList<ClFac>(); // 擔保品與額度關聯檔
-						Slice<ClFac> slClFac2 = clFacService.clNoEq(t2.getClCode1(), t2.getClCode2(), t2.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+						Slice<ClFac> slClFac2 = clFacService.clNoEq(t2.getClCode1(), t2.getClCode2(), t2.getClNo(), 0,
+								Integer.MAX_VALUE, titaVo);
 						l2ClFac = slClFac2 == null ? null : slClFac2.getContent();
 						for (ClFac c : l2ClFac) {
 
 							// 撥款主檔
-							Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+							Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(),
+									c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 							if (slLoanBorMain != null) {
 								for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
 									// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-									if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6
+									if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2
+											|| tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6
 											|| tLoanBorMain.getStatus() == 8) {
 										isAllClose = false;
 										break;
@@ -194,7 +198,8 @@ public class L2075 extends TradeBuffer {
 							} else {
 								continue;
 							}
-							Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(t3.getClCode1(), t3.getClCode2(), t3.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+							Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(t3.getClCode1(),
+									t3.getClCode2(), t3.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 							lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 
 							if (lClOtherRights != null) {
@@ -212,7 +217,8 @@ public class L2075 extends TradeBuffer {
 						}
 					}
 				} else {
-					Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(clCode1, clCode2, clNo, 0, Integer.MAX_VALUE, titaVo);
+					Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(clCode1, clCode2, clNo, 0,
+							Integer.MAX_VALUE, titaVo);
 					lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 
 					if (lClOtherRights != null) {
@@ -273,7 +279,8 @@ public class L2075 extends TradeBuffer {
 		occursList.putParam("OOCity", wkCityItem);
 		// 找地政所名稱
 		if ("".equals(tClOtherRights.getOtherLandAdm())) {
-			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()), titaVo);
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
+					titaVo);
 			if (tCdCode != null) {
 				wkLandOfficeItem = tCdCode.getItem();
 			}
@@ -284,7 +291,8 @@ public class L2075 extends TradeBuffer {
 		occursList.putParam("OORecYear", tClOtherRights.getRecYear());
 		// 找 收件字名稱
 		if ("".equals(tClOtherRights.getOtherRecWord())) {
-			CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+			CdLandOffice tCdLandOffice = cdLandOfficeService.findById(new CdLandOfficeId(tClOtherRights.getCity(),
+					tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
 			if (tCdLandOffice != null) {
 				wkRecWordItem = tCdLandOffice.getRecWordItem();
 			}

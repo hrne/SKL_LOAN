@@ -10,6 +10,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdLand;
+import com.st1.itx.db.domain.CdLandId;
 import com.st1.itx.db.service.CdLandService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -40,7 +41,7 @@ public class L6R50 extends TradeBuffer {
 		String iCityCode = titaVo.getParam("RimCityCode");
 		String iLandOfficeCode = titaVo.getParam("RimLandOfficeCode");
 
-		CdLand tCdLand = cdLandService.findById(iLandOfficeCode, titaVo);
+		CdLand tCdLand = cdLandService.findById(new CdLandId(iCityCode, iLandOfficeCode), titaVo);
 		if (tCdLand == null) {
 			switch (iFunCd) {
 			case 1:
@@ -48,11 +49,13 @@ public class L6R50 extends TradeBuffer {
 			case 2:
 			case 4:
 			case 5:
-				throw new LogicException(titaVo, "E2003", "不存在縣市地政檔  地政所代號= " + iLandOfficeCode); // 查無資料
+				throw new LogicException(titaVo, "E2003",
+						"不存在縣市地政檔" + "縣市別 =" + iCityCode + "  地政所代號= " + iLandOfficeCode); // 查無資料
 			}
 		} else {
 			if (iFunCd == 1) {
-				throw new LogicException(titaVo, "E0002", "地政收件字檔 " + " 地政所代號 =" + iLandOfficeCode); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002",
+						"地政收件字檔 " + "縣市別 =" + iCityCode + " 地政所代號 =" + iLandOfficeCode); // 新增資料已存在
 			}
 
 			this.totaVo.putParam("L6r50CityCode", tCdLand.getCityCode());

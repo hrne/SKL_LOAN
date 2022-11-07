@@ -654,7 +654,7 @@ public class L4601Batch extends TradeBuffer {
 		} else {
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getBrno())
-					.setRptCode(titaVo.getTxCode()).build();
+					.setRptCode(titaVo.getTxCode()+ "-火險到期檔").setRptCode("LNM01P").build();
 
 			makeFile.open(titaVo, reportVo, "LNM01P.txt", 2);
 			

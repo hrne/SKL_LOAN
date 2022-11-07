@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L2;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,18 +13,16 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.ClOtherRightsId;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacCloseId;
-import com.st1.itx.db.service.CdCityService;
-import com.st1.itx.db.service.CdCodeService;
-import com.st1.itx.db.service.CdLandOfficeService;
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
-import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.data.DataLog;
@@ -45,20 +44,11 @@ public class L2634 extends TradeBuffer {
 	@Autowired
 	public FacCloseService sFacCloseService;
 	@Autowired
-	public CustMainService sCustMainService;
-	@Autowired
 	public ClOtherRightsService ClOtherRightsService;
 	@Autowired
 	public ClFacService clFacService;
 	@Autowired
-	public LoanBorMainService loanBorMainService;
-
-	@Autowired
-	public CdCodeService cdCodeService;
-	@Autowired
-	public CdCityService cdCityService;
-	@Autowired
-	public CdLandOfficeService cdLandOfficeService;
+	public AcReceivableService acReceivableService;
 	/* 報表服務注入 */
 	@Autowired
 	public L2634ReportA l2634ReportA;
@@ -103,7 +93,8 @@ public class L2634 extends TradeBuffer {
 //		勾選完成最後一筆,列印
 		if (titaVo.get("selectTotal") == null || titaVo.get("selectTotal").equals(titaVo.get("selectIndex"))) {
 
-			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(choiceDate + 19110000, titaVo.getTlrNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findChoiceDateEq(choiceDate + 19110000,
+					titaVo.getTlrNo(), 0, Integer.MAX_VALUE, titaVo);
 
 			lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 			if (lClOtherRights != null) {
@@ -112,14 +103,16 @@ public class L2634 extends TradeBuffer {
 					doReport1(titaVo);
 
 					String checkMsg = "申請書及其他-整批列印已完成。";
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
 				}
 //				類別 2 清償塗銷同意書
 				else {
 					doReport2(titaVo);
 
 					String checkMsg = "抵押權塗銷同意書-整批列印已完成。";
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo() + "L2634", checkMsg, titaVo);
 				}
 				setChoiceDate0(titaVo);
 
@@ -146,6 +139,10 @@ public class L2634 extends TradeBuffer {
 		if (iType == 2) {
 			FacClose tFacClose = sFacCloseService.holdById(new FacCloseId(custNo, closeNo), titaVo);
 			if (tFacClose != null) {
+
+				if (tFacClose.getCloseDate() == 0) {
+					throw new LogicException(titaVo, "E0015", "結案日期未註記"); // 檢查錯誤
+				}
 				tFacClose.setReceiveFg(1);
 				try {
 					sFacCloseService.update(tFacClose, titaVo);
@@ -158,7 +155,7 @@ public class L2634 extends TradeBuffer {
 		int clCode1 = 0;
 		int clCode2 = 0;
 		int clNo = 0;
-		String clOtherRightsSeq = "";
+		String clOtherRightsSeq = "0";
 		if (titaVo.get("OOClCode1") != null || !titaVo.get("OOClCode1").isEmpty()) {
 			clCode1 = parse.stringToInteger(titaVo.get("OOClCode1"));
 		}
@@ -172,8 +169,10 @@ public class L2634 extends TradeBuffer {
 			clOtherRightsSeq = titaVo.get("OOSeq");
 		}
 
-		ClOtherRights tClOtherRights = ClOtherRightsService.holdById(new ClOtherRightsId(clCode1, clCode2, clNo, clOtherRightsSeq), titaVo);
+		ClOtherRights tClOtherRights = ClOtherRightsService
+				.holdById(new ClOtherRightsId(clCode1, clCode2, clNo, parse.stringToInteger(clOtherRightsSeq)), titaVo);
 		if (tClOtherRights != null) {
+
 			if (tClOtherRights.getChoiceDate() == 0) {
 				tClOtherRights.setChoiceDate(choiceDate);
 				tClOtherRights.setReceiveCustNo(custNo);
@@ -270,5 +269,32 @@ public class L2634 extends TradeBuffer {
 		// 撈資料組報表
 		l2634ReportE.exec(lClOtherRights, titaVo);
 
+	}
+
+	private void checkCloseBreach(int custNo, ClOtherRights tClOtherRights, TitaVo titaVo) throws LogicException {
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, custNo, 0, 0, 999, 0,
+				Integer.MAX_VALUE);
+
+		if (slAcReceivable == null) {
+			return;
+		}
+
+		Slice<ClFac> slClFac = clFacService.clNoEq(tClOtherRights.getClCode1(), tClOtherRights.getClCode2(),
+				tClOtherRights.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+		if (slClFac == null) {
+			return;
+		}
+		// 銷帳檔全銷(減免導致與入帳金額不一致，需自行銷帳)
+		for (AcReceivable ac : slAcReceivable.getContent()) {
+			if (ac.getAcctCode().equals("IOP") && (ac.getRvBal().compareTo(BigDecimal.ZERO) > 0)) {
+				for (ClFac tClFac : slClFac.getContent()) {
+					if (ac.getCustNo() == tClFac.getCustNo() && ac.getFacmNo() == tClFac.getFacmNo()) {
+						throw new LogicException(titaVo, "E0015",
+								"有清償違約金未償還 戶號=" + ac.getCustNo() + "-" + ac.getFacmNo()); // 檢查錯誤
+
+					}
+				}
+			}
+		}
 	}
 }

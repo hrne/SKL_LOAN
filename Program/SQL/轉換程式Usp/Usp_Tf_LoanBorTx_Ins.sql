@@ -118,6 +118,7 @@ BEGIN
           ,"AcSeq" 
           ,"SlipSumNo" 
           ,"AcctCode" 
+          ,"TxDescCode" 
     ) 
     WITH "TmpLMSP" AS ( 
       SELECT "LMSACN" 
@@ -448,6 +449,76 @@ BEGIN
           ,TR1."TRXNM2" AS "AcSeq" 
           ,TR1."BSTBTN" AS "SlipSumNo" 
           ,TR1."ACTACT" AS "AcctCode" 
+          /* 更新交易別代碼 */ 
+          -- 2022-11-07 Wei 新增 from Lai 寫在LoanBorTx.xlsx 的 交易別 Sheet
+          ,CASE 
+             WHEN TR1.TRXTRN='3025'
+             THEN '3100'
+             WHEN TR1.TRXTRN='3087' AND LBM."RenewFlag"='1'
+             THEN '3101'
+             WHEN TR1.TRXTRN='3087' AND LBM."RenewFlag"='2'
+             THEN '3102'
+             WHEN TR1.TRXTRN='3031'
+             THEN '3201'
+             WHEN TR1.TRXTRN='3085'
+             THEN '3202'
+             WHEN TR1.TRXTRN='3080'
+             THEN '3202'
+             WHEN TR1.TRXTRN='3084'
+             THEN '3203'
+             WHEN TR1.TRXTRN='3066'
+             THEN '3204'
+             WHEN TR1.TRXTRN='3081'
+             THEN '3205'
+             WHEN TR1.TRXTRN='3036'
+             THEN '3210'
+             WHEN TR1.TRXTRN='3082'
+             THEN '3210'
+             WHEN TR1.TRXTRN='3036' AND TR1.LMSRSN=0
+             THEN '3211'
+             WHEN TR1.TRXTRN='3036' AND TR1.LMSRSN=3
+             THEN '3212'
+             WHEN TR1.TRXTRN='3036' AND TR1.LMSRSN=6
+             THEN '3213'
+             WHEN TR1.TRXTRN='3088'
+             THEN '3214'
+             WHEN TR1.TRXTRN='3037'
+             THEN '3221'
+             WHEN TR1.TRXTRN='3083'
+             THEN '3230'
+             WHEN TR1.TRXTRN='3033' AND JL."AcctCode" = 'F07'
+             THEN '3240'
+             WHEN TR1.TRXTRN='3033' AND JL."AcctCode" = 'TMI'
+             THEN '3242'
+             WHEN TR1.TRXTRN='3033' AND JL."AcctCode" = 'F10'
+             THEN '3244'
+             WHEN TR1.TRXTRN='3033' AND JL."AcctCode" = 'F29'
+             THEN '3260'
+             WHEN TR1.TRXTRN='3041'
+             THEN '3420'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=1 AND ACN."IsSameFac" = 1 
+             THEN '3422'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=1
+             THEN '3421'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=2
+             THEN '3423'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=3
+             THEN '3424'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=4
+             THEN '3425'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=5
+             THEN '3426'
+             WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=6
+             THEN '3427'
+             WHEN TR1.TRXTRN='3086'
+             THEN '3427'
+             WHEN TR1.TRXTRN='3089'
+             THEN '3428'
+             WHEN TR1.TRXTRN='3021'
+             THEN '3701'
+             WHEN TR1.TRXTRN='3046'
+             THEN '3711'
+           ELSE '9999' END AS "TxDescCode"
     FROM TR 
     LEFT JOIN "LA$TRXP" TR1 ON TR1."CUSBRH" = TR."CUSBRH" 
                            AND TR1."TRXDAT" = TR."TRXDAT" 
@@ -512,6 +583,9 @@ BEGIN
     LEFT JOIN correctTx COR ON COR."TRXDAT" = TR1."TRXEDT" 
                            AND COR."TRXNMT" = TR1."TRXENM" 
     LEFT JOIN "As400EmpNoMapping" AEM3 ON AEM3."As400TellerNo" = COR."TRXMEM"                     
+    LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = TR1.LMSACN
+                               AND LBM."FacmNo" = TR1.LMSAPN
+                               AND LBM."BormNo" = TR1.LMSASQ
 --    WHERE TR1."TRXDAT" <= "TbsDyF" 
     ; 
  

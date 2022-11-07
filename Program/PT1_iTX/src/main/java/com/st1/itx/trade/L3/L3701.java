@@ -984,6 +984,10 @@ public class L3701 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0006",
 					"撥款主檔 戶號 = " + iCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 鎖定資料時，發生錯誤
 		}
+
+		// 更新撥款檔時檢核如L4321已確認未放行，則出錯誤訊息
+		CheckBatxRateChangeRoutine();
+
 		beforeLoanBorMain = (LoanBorMain) datalog.clone(tLoanBorMain);
 		if (tLoanBorMain.getPaidTerms() > 0) {
 			paidTermFlag = true;
@@ -1062,8 +1066,6 @@ public class L3701 extends TradeBuffer {
 			if (overdueFlag) {
 				throw new LogicException(titaVo, "E0019", "催收戶不可變更[利率區分]"); // 輸入資料錯誤
 			}
-			// 登錄時檢核如L4321已確認未放行，則出錯誤訊息
-			CheckBatxRateChangeRoutine();
 			this.info("ApproveRate2N =" + this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate2N")));
 			updLoanBorMain = true;
 			tTemp2Vo.putParam("RtApproveRateY", iApproveRateY);
@@ -1113,7 +1115,7 @@ public class L3701 extends TradeBuffer {
 		}
 
 		// 更新放款利率變動檔
-		if (iRateIncrY.equals("X") || iIndividualIncrY.equals("X")|| iApproveRateY.equals("X")) {
+		if (iRateIncrY.equals("X") || iIndividualIncrY.equals("X") || iApproveRateY.equals("X")) {
 			updLoanRateChangeRoutine();
 		}
 
@@ -1764,7 +1766,8 @@ public class L3701 extends TradeBuffer {
 			tLoanBorMain.setIndividualIncr(this.parse.stringToBigDecimal(tTemp1Vo.getParam("IduIncr1")));
 		}
 		// 更新放款利率變動檔
-		if (tTemp1Vo.getParam("RtIncrY").equals("X") || tTemp1Vo.getParam("IduIncrY").equals("X")||tTemp1Vo.getParam("FcApproveRateY").equals("X")) {
+		if (tTemp1Vo.getParam("RtIncrY").equals("X") || tTemp1Vo.getParam("IduIncrY").equals("X")
+				|| tTemp1Vo.getParam("FcApproveRateY").equals("X")) {
 			updLoanRateChangeRoutine();
 		}
 

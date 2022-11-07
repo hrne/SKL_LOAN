@@ -36,6 +36,7 @@ public class L2R60 extends TradeBuffer {
 		this.info("active L2R60 ");
 		this.totaVo.init(titaVo);
 
+		String iCityCode = titaVo.getParam("RimCityCode");
 		String iLandOfficeCode = titaVo.getParam("RimLandOfficeCode");
 
 		String s = "";
@@ -44,7 +45,8 @@ public class L2R60 extends TradeBuffer {
 		Slice<CdLandOffice> slCdLandOffice = null;
 		List<CdLandOffice> lCdLandOffice = new ArrayList<CdLandOffice>();
 
-		slCdLandOffice = cdLandOfficeService.findLandOfficeCode(iLandOfficeCode, 0, Integer.MAX_VALUE, titaVo);
+		slCdLandOffice = cdLandOfficeService.findLandOfficeCode(iCityCode, iLandOfficeCode, 0, Integer.MAX_VALUE,
+				titaVo);
 		lCdLandOffice = slCdLandOffice == null ? null : new ArrayList<CdLandOffice>(slCdLandOffice.getContent());
 
 		if (lCdLandOffice != null) {

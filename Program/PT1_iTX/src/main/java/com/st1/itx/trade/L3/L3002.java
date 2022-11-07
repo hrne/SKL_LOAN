@@ -178,6 +178,10 @@ public class L3002 extends TradeBuffer {
 			// occursList.putParam("OOCustNo", "");
 			// occursList.putParam("OOCustName", "");
 			// }
+			int newStatus = tLoanBorMain.getStatus();
+			if (tLoanBorMain.getStatus() == 1) {
+				newStatus = 3;
+			}
 			occursList.putParam("OOFacmNo", tLoanBorMain.getFacmNo());
 			occursList.putParam("OOBormNo", tLoanBorMain.getBormNo());
 			occursList.putParam("OODrawdownDate", tLoanBorMain.getDrawdownDate());
@@ -225,6 +229,7 @@ public class L3002 extends TradeBuffer {
 			if (!"".equals(tLoanBorMain.getRenewFlag()) && !tLoanBorMain.getRenewFlag().equals("0")) {
 				occursList.putParam("OORenewFlag", tLoanBorMain.getRenewFlag());
 			}
+			occursList.putParam("OONewStatus", newStatus);
 
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);

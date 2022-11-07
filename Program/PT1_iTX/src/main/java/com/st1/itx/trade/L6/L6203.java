@@ -42,6 +42,7 @@ public class L6203 extends TradeBuffer {
 	@Autowired
 	public SendRsp sendRsp;
 
+	public String iCityCode;
 	public String iLandOffice;
 	public String iRecWord;
 	public String iRecWordItem;
@@ -55,6 +56,7 @@ public class L6203 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iFunCd = this.parse.stringToInteger(titaVo.getParam("FunCd"));
+		iCityCode = titaVo.getParam("CityCode");
 		iLandOffice = titaVo.getParam("LandOfficeCode");
 		iRecWord = titaVo.getParam("RecWord");
 		iRecWordItem = titaVo.getParam("RecWordItem");
@@ -66,6 +68,7 @@ public class L6203 extends TradeBuffer {
 		}
 
 		CdLandOfficeId cdLandOfficeId = new CdLandOfficeId();
+		cdLandOfficeId.setCityCode(iCityCode);
 		cdLandOfficeId.setLandOfficeCode(iLandOffice);
 		cdLandOfficeId.setRecWord(iRecWord);
 		tCdLandOffice = cdLandOfficeService.holdById(cdLandOfficeId);
@@ -132,8 +135,9 @@ public class L6203 extends TradeBuffer {
 		// 新增收件字代號 流水編號
 		// 維護時從收件字最後一號開始續編
 		if (mFuncCode == 1) {
-			CdLandOffice tLastCdLandOffice = cdLandOfficeService.findRecWordFirst(iLandOffice, titaVo);
+			CdLandOffice tLastCdLandOffice = cdLandOfficeService.findRecWordFirst(iCityCode, iLandOffice, titaVo);
 			this.info("tLastCdLandOffice = " + tLastCdLandOffice);
+			cdLandOfficeId.setCityCode(iCityCode);
 			cdLandOfficeId.setLandOfficeCode(iLandOffice);
 			if (tLastCdLandOffice == null) {
 				wkRecWord = "001";

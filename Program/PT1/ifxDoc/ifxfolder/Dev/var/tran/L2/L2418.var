@@ -77,7 +77,7 @@ T(3,1:房地;2:土地)
 T(3,1:新增;2:修改;4:刪除;5:查詢)
 
 !調RIM參數
-#RimCityCode=X,2,S
+#RimCityCode=X,4,S
 #RimAreaCode=X,3,S
 
 ! 調RIM取縣市代碼
@@ -99,12 +99,21 @@ T(3,CdCode.ClRightsNote)
 
 #ClRightsNoteHelp=x,1024,S
 
+! 他項權利縣市別
+#CDDEF002=x,50,S
+T(3,CdCode.ClOtherRightsCityCd)
+
+#ClOtherRightsCityHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF001)
+S(XXR99,01,#CDDEF001,#CDDEF002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClRightsNoteHelp,#HelpDesc1)
+T(2,@ClOtherRightsCityHelp,#HelpDesc2)
+T(B,@L6r03ResultCity,#L6r03ResultCity+;+#ClOtherRightsCityHelp)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -165,9 +174,10 @@ T(H,@LandAdmX,#LandAdm,#LoanOfficeHelp)
 ! 依縣市別地政組收件字下拉選單
 #RimL2r60A=X,1,S
 C(3,#FunCd,1,S,$)
+T(2,@RimCityCode,#City)
 T(2,@RimLandOfficeCode,#LandAdm)
 RESET_RIM(#RimL2r60A,L2R60)
-S(L2R60,1,#RimLandOfficeCode)
+S(L2R60,1,#RimCityCode,#RimLandOfficeCode)
 R(1,L2R60)
 T(2,@RecWordHelp,:自行輸入;+#L2r60Help1)
 C(4,#L2r60Help1,T(3,@RecWordHelp,:自行輸入),$)
@@ -391,7 +401,7 @@ E(0,@CustNo,#L2r46CustNo)
 
 #CityCode=X,2,S
 !縣市
-#City=X,2,I
+#City=X,4,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#L6r03ResultCity)
@@ -451,9 +461,10 @@ C(4,#L2r60Help1,T(3,@RecWordHelp,:自行輸入),$)
 ! 依縣市別地政組收件字下拉選單
 #RimL2r60B=X,1,S
 C(4,#LandAdm,S,$)
+T(2,@RimCityCode,#City)
 T(2,@RimLandOfficeCode,#LandAdm)
 RESET_RIM(#RimL2r60B,L2R60)
-S(L2R60,1,#RimLandOfficeCode)
+S(L2R60,1,#RimCityCode,#RimLandOfficeCode)
 R(1,L2R60)
 C(4,#L2r60Help1,T(3,@RecWordHelp,:自行輸入),T(2,@RecWordHelp,:自行輸入;+#L2r60Help1))
 

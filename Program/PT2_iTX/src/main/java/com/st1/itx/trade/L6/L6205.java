@@ -69,8 +69,9 @@ public class L6205 extends TradeBuffer {
 		}
 
 		CdLandId cdLandId = new CdLandId();
+		cdLandId.setCityCode(iCityCode);
 		cdLandId.setLandOfficeCode(iLandOfficeCode);
-		tCdLand = cdLandService.holdById(iLandOfficeCode);
+		tCdLand = cdLandService.holdById(new CdLandId(iCityCode, iLandOfficeCode), titaVo);
 
 		switch (iFunCd) {
 		case 1: // 新增
@@ -132,7 +133,9 @@ public class L6205 extends TradeBuffer {
 
 	private void moveCdLand(int mFuncCode, TitaVo titaVo) throws LogicException {
 		CdLandId cdLandId = new CdLandId();
-
+		cdLandId.setCityCode(iCityCode);
+		cdLandId.setLandOfficeCode(iLandOfficeCode);
+		tCdLand.setCdLandId(cdLandId);
 		tCdLand.setCityCode(iCityCode);
 		tCdLand.setLandOfficeCode(iLandOfficeCode);
 		tCdLand.setLandOfficeItem(iLandOfficeItem);

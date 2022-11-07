@@ -49,17 +49,23 @@ E(0,0)
 T(3,CdCode.FuncCode2)                  
 #FunCd2Help=x,50,S     
 
+! 他項權利縣市別
+#CODE0002=x,50,S
+T(3,CdCode.ClOtherRightsCityCd)
+
+#ClOtherRightsCityHelp=x,1024,S
 
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CODE0001)
+S(XXR99,01,#CODE0001,#CODE0002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FunCd2Help,#HelpDesc1)
+T(2,@ClOtherRightsCityHelp,#HelpDesc2)
 
 !調RIM參數
-#RimCityCode=X,2,S
+#RimCityCode=X,4,S
 #RimTxCode=X,5,S
 #RimFunCd=A,1,S
 #RimSyndFeeCode=X,2,S
@@ -70,7 +76,7 @@ E(0,@RimFunCd,1)
 T(2,@RimCityCode,)
 S(L6R49,1,#RimFunCd,#RimCityCode)
 R(1,L6R49)
-T(2,@L6r49ResultCity,#L6r49Result)
+T(B,@L6r49ResultCity,#L6r49Result+;+#ClOtherRightsCityHelp)
 
 ! 縣市代碼的下拉選單
 #L6r49ResultCity=X,50000,S
@@ -84,8 +90,9 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6023進入),$)
 #NTXBUF=X,66,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-T(1,@LandOfficeCode,#NTXBUF,2,2)
-T(1,@RecWord,#NTXBUF,4,3)
+T(1,@CityCode,#NTXBUF,2,4)
+T(1,@LandOfficeCode,#NTXBUF,6,2)
+T(1,@RecWord,#NTXBUF,8,3)
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
 #FunCd=A,1,S
@@ -100,7 +107,7 @@ C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪�
 #CheckFunCd=X,1,S
 C(3,#FunCd,1,$,T(F,@LandOfficeCode,0))
 C(3,#FunCd,2,T(F,@RecWord,0),$)
-C(3,#FunCd,4,T(F,@RecWord,0)T(F,@RecWordItem,0),$)
+C(3,#FunCd,4,T(F,@CityCode,0)T(F,@RecWord,0)T(F,@RecWordItem,0),$)
 
 
 
@@ -115,7 +122,8 @@ E(0,1)ASGN(AGAIN$)
 #LandOfficeHelp=X,2000,S
 
 
-#CityCode=X,2,I
+#CityCode=X,4,I
+C(3,#FunCd,1,$,s)
 HELP(#L6r49ResultCity)
 @C(4,#CityCode,S,V(H,#L6r49ResultCity))
 
@@ -123,22 +131,29 @@ HELP(#L6r49ResultCity)
 C(4,#CityCode,S,$)
 T(H,#CityCode,#L6r49ResultCity)
 
+#LoanOfficeHelp=X,2000,S
+
+
 ! 依縣市別組地政下拉選單
-#RimL2r59=X,1,S
-RESET_RIM(#RimL2r59,L2R59)
-S(L2R59,1,#CityCode)
-R(1,L2R59)
-T(2,@LandOfficeHelp,#L2r59Help1)
+#RimL6r49LandOffice=X,1,S
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#CityCode)
+RESET_RIM(#RimL6r49LandOffice,L6R49)
+S(L6R49,1,#RimFunCd,#RimCityCode)
+R(1,L6R49)
+T(2,@LoanOfficeHelp,#L6r49Result)
+
 
 
 #LandOfficeCode=X,2,I
 C(3,#FunCd,1,$,s)
-HELP(#LandOfficeHelp)
+C(4,#LoanOfficeHelp,V(P,先至L6205新增地政別代號),$)
+HELP(#LoanOfficeHelp)
 @T(3,@LandOfficeCodeX,)
-V(H,#LandOfficeHelp)
+V(H,#LoanOfficeHelp)
 
 #LandOfficeCodeX=x,8,L
-T(H,#LandOfficeCode,#LandOfficeHelp)
+T(H,#LandOfficeCode,#LoanOfficeHelp)
 
 #RecWord=X,3,L
 
@@ -147,9 +162,10 @@ T(H,#LandOfficeCode,#LandOfficeHelp)
 
 #RimL6r47=X,1,S
 E(0,@RimFunCd,#FunCd)
+T(2,@RimCityCode,#CityCode)
 T(2,@RimLandOfficeCode,#LandOfficeCode)
 T(2,@RimRecWord,#RecWord)
-S(L6R47,1,#RimFunCd,#RimLandOfficeCode,#RimRecWord)
+S(L6R47,1,#RimFunCd,#RimCityCode,#RimLandOfficeCode,#RimRecWord)
 R(1,L6R47)
 T(2,@RecWordItem,#L6r47RecWordItem)
 
@@ -191,7 +207,7 @@ C(3,#RecWord,0,T(2,@RecWord,#ORecWord)K(LIGHT,#RecWord,TXTRED,0,1),$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#FunCd#LandOfficeCode#RecWord#RecWordItem
+#FunCd#CityCode#LandOfficeCode#RecWord#RecWordItem
 #END
 </sub>
 

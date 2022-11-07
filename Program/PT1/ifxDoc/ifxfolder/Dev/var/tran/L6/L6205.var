@@ -47,14 +47,20 @@ E(0,0)
 T(3,CdCode.FuncCode2)                  
 #FunCd2Help=x,50,S     
 
+! 他項權利縣市別
+#CODE0002=x,50,S
+T(3,CdCode.ClOtherRightsCityCd)
+
+#ClOtherRightsCityHelp=x,1024,S
 
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CODE0001)
+S(XXR99,01,#CODE0001,#CODE0002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FunCd2Help,#HelpDesc1)
+T(2,@ClOtherRightsCityHelp,#HelpDesc2)
 
 !RIM參數
 #RimTxCode=X,5,S
@@ -68,8 +74,8 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6025進入),$)
 #NTXBUF=X,66,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-T(1,@CityCode,#NTXBUF,2,2)
-T(1,@LandOfficeCode,#NTXBUF,4,3)
+T(1,@CityCode,#NTXBUF,2,4)
+T(1,@LandOfficeCode,#NTXBUF,6,3)
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
 #FunCd=A,1,S
@@ -99,7 +105,7 @@ E(0,1)ASGN(AGAIN$)
 #LandOfficeHelp=X,2000,S
 
 !調RIM參數
-#RimCityCode=X,2,S
+#RimCityCode=X,4,S
 #RimFunCd=A,1,S
 
 ! 調RIM取縣市代碼
@@ -108,12 +114,12 @@ E(0,@RimFunCd,1)
 T(2,@RimCityCode,)
 S(L6R49,1,#RimFunCd,#RimCityCode)
 R(1,L6R49)
-T(2,@L6r49ResultCity,#L6r49Result)
+T(B,@L6r49ResultCity,#L6r49Result+;+#ClOtherRightsCityHelp)
 
 ! 縣市代碼的下拉選單
 #L6r49ResultCity=X,50000,S
 
-#CityCode=X,2,I
+#CityCode=X,4,I
 C(3,#FunCd,1,$,s)
 HELP(#L6r49ResultCity)
 @T(3,@CityCodeX,)

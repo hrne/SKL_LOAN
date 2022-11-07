@@ -94,7 +94,7 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " MIN(clor.\"RecNumber\") AS \"RecNumber\", ";
 		sql += " MIN(clor.\"RightsNote\") AS \"RightsNote\", ";
 		sql += " MIN(clor.\"SecuredTotal\") AS \"SecuredTotal\", ";
-		sql += " nvl(MIN(clor.\"OtherCity\"), MIN(ccity.\"CityItem\")) AS \"CityItem\", ";
+		sql += " nvl(MIN(clor.\"OtherCity\"), NVL(MIN(ccity.\"CityItem\"),MIN(ccode2.\"Item\"))) AS \"CityItem\", ";
 		sql += " nvl(MIN(clor.\"OtherLandAdm\"), MIN(ccode.\"Item\")) AS \"LandAdm\", ";
 		sql += " nvl(MIN(clor.\"OtherRecWord\"), MIN(clo.\"RecWordItem\")) AS \"RecWordItem\", ";
 		sql += " MIN(clor.\"CustNo\") AS \"CustNo\" ";
@@ -120,6 +120,10 @@ public class L2918ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " AND ccode.\"Code\" =clor.\"LandAdm\" ";
 		sql += " LEFT JOIN \"CdLandOffice\" clo ON clo.\"LandOfficeCode\" = clor.\"LandAdm\" ";
 		sql += " AND clo.\"RecWord\" = clor.\"RecWord\" ";
+		sql += " AND clo.\"CityCode\" = clor.\"City\" ";
+
+		sql += " LEFT JOIN \"CdCode\" ccode2 ON ccode2.\"Code\" = clor.\"City\" ";
+		sql += " AND ccode2.\"DefCode\" = 'ClOtherRightsCityCd' ";
 		if (iCustNo > 0) {
 			sql += " WHERE ";
 			sql += " cf.\"CustNo\" = :custNo ";

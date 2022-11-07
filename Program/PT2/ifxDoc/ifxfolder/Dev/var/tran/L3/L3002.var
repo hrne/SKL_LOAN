@@ -430,8 +430,9 @@ T(3,1)ASGN(LOOP$)
 
 #OOStatus=A,2,S
 
+#OONewStatus=A,2,S
 #OOStatusX=X,10,O
-T(H,#OOStatus,#StatusHelp)
+T(H,#OONewStatus,#StatusHelp)
 
 ! T(A,#OOStatus,L3DEF,BormStatusCodeDef,BormStatusCode,BormStatusCodeX)
 
@@ -516,7 +517,7 @@ C(3,#OOStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=L2079; ntxbuf=#OOBUF3}),$)
 TXFORM=L3002
 #OOCaseNo#OOApplNo#OOCustNo#OOCustName#OOFacmNo#OOBormNo#OODrawdownDate#OOMaturityDate
 #OOStatus#OOPrevIntDate#OOStoreRate#OOCurrencyCode#OOLoanBal#OODrawdownAmt#OODepartment#OOUsageCodeX
-#OOBookFlag#OORenewFlag
+#OOBookFlag#OORenewFlag#OONewStatus
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
