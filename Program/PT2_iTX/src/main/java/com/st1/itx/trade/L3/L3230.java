@@ -695,10 +695,32 @@ public class L3230 extends TradeBuffer {
 //		27	沖聯貸費用
 //		29	貸後契變手續費
 //		30	呆帳戶法務費墊付
+
 		if ("06".equals(iTempItemCode)) {
-			tLoanBorTx.setDesc(loanCom.getCdCodeX("Temp2ReasonCode", iTempItemCode, titaVo) + "暫收轉帳");
+			// 3230 暫收款轉出
+			// 3231 債協暫收款轉出
+			// 3232 債協退還款轉出
+			// 3233 AML暫收款轉出
+			// 3234 聯貸費攤提暫收款轉出
+			switch (iTempReasonCode) {
+			case 2:
+				tLoanBorTx.setTxDescCode("3231");
+				break;
+			case 3:
+				tLoanBorTx.setTxDescCode("3232");
+				break;
+			case 4:
+				tLoanBorTx.setTxDescCode("3233");
+				break;
+			case 5:
+				tLoanBorTx.setTxDescCode("3234");
+				break;
+			default:
+				tLoanBorTx.setTxDescCode("3230");
+				break;
+			}
 		} else {
-			tLoanBorTx.setDesc("暫收銷" + loanCom.getCdCodeX("Temp2ItemCode", iTempItemCode, titaVo));
+			tLoanBorTx.setTxDescCode("Fee");
 		}
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(wkCustTempBal);
@@ -713,7 +735,7 @@ public class L3230 extends TradeBuffer {
 		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail, titaVo);
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
@@ -728,7 +750,20 @@ public class L3230 extends TradeBuffer {
 //      092:暫收轉帳     (戶號+額度)  TAV 暫收款－可抵繳
 //      094:轉債協暫收款 (戶號)       T1x 債協暫收款      
 //      095:轉債協退還款 (戶號)       T2x 債協退還款  
-		tLoanBorTx.setDesc(iRpCodeX);
+		// 3235 轉入放款暫收款
+		// 3236 轉入債協暫收款
+		// 3237 轉入債協退還款
+		switch (iRpCode) {
+		case 94:
+			tLoanBorTx.setTxDescCode("3236");
+			break;
+		case 95:
+			tLoanBorTx.setTxDescCode("3237");
+			break;
+		default:
+			tLoanBorTx.setTxDescCode("3235");
+			break;
+		}
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setRepayCode(iRpCode);
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
@@ -747,7 +782,7 @@ public class L3230 extends TradeBuffer {
 		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail, titaVo);
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}

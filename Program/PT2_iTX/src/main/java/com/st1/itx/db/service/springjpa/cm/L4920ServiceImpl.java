@@ -16,7 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4920ServiceImpl")
@@ -104,6 +103,7 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,bd.\"TitaTxtNo\"                 ";
 			sql += "  ,bd.\"DisacctAmt\"                ";
 			sql += "  ,bd.\"FileName\"                  ";
+			sql += "  ,bd.\"BatchNo\"                  ";
 			sql += " from \"BatxDetail\" bd                       ";
 			sql += " left join (                                  ";
 			sql += "     select                                   ";

@@ -163,7 +163,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OBormNo", tLoanBorTx.getBormNo());
 		this.totaVo.putParam("OCustNoX", loanCom.getCustNameByNo(tLoanBorTx.getCustNo()));
 		this.totaVo.putParam("OTxCode", tLoanBorTx.getTitaTxCd());
-		this.totaVo.putParam("OTxCodeX", tLoanBorTx.getDesc());
+		this.totaVo.putParam("OTxCodeX", loanCom.getTxDescCodeX(tLoanBorTx, titaVo));
 		this.totaVo.putParam("OAcctDate", tLoanBorTx.getAcDate());
 		this.totaVo.putParam("OTellerNo", tLoanBorTx.getTitaTlrNo());
 		this.totaVo.putParam("OTellerNoX", loanCom.getEmpFullnameByEmpNo(tLoanBorTx.getTitaTlrNo()));

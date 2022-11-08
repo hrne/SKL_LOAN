@@ -441,16 +441,43 @@ public class L3220 extends TradeBuffer {
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO.subtract(iTempAmt));
-		if (iTempReasonCode >= 2) {
-			tLoanBorTx.setDesc(loanCom.getCdCodeX("Temp2ReasonCode", "" + iTempItemCode, titaVo) + "退還");
-		} else {
-			if (iTempItemCode <= 3) {
-				tLoanBorTx.setDesc(loanCom.getCdCodeX("Temp2ReasonCode", "" + iTempItemCode, titaVo) + "退還");
-			} else {
-				tLoanBorTx.setDesc("暫收款退還");
+		// 3221 暫收款退還
+		// 3222 抽票退還
+		// 3223 退票退還
+		// 3224 服務中心代收抽票退還
+		// 3225 債協暫收款(退還)
+		// 3226 債協退還款退還
+		// 3227 AML暫收款退還
+		// 3228 聯貸費攤提暫收款
+		switch (iTempItemCode) {
+		case 1:
+			tLoanBorTx.setTxDescCode("3222");
+			break;
+		case 2:
+			tLoanBorTx.setTxDescCode("3223");
+			break;
+		case 3:
+			tLoanBorTx.setTxDescCode("3224");
+			break;
+		default:
+			switch (iTempReasonCode) {
+			case 2:
+				tLoanBorTx.setTxDescCode("3225");
+				break;
+			case 3:
+				tLoanBorTx.setTxDescCode("3226");
+				break;
+			case 4:
+				tLoanBorTx.setTxDescCode("3227");
+				break;
+			case 5:
+				tLoanBorTx.setTxDescCode("3228");
+				break;
+			default:
+				tLoanBorTx.setTxDescCode("3221");
+				break;
 			}
 		}
-		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(wkCustTempBal);
 		tLoanBorTx.setOverflow(wkCustTempBal.subtract(iTempAmt));
@@ -470,7 +497,7 @@ public class L3220 extends TradeBuffer {
 		// 更新放款明細檔及帳務明細檔關聯欄
 		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail, titaVo);
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}

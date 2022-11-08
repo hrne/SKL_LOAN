@@ -122,8 +122,14 @@ public class L8330 extends TradeBuffer {
 								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					}
 				} // 2 end
-
+				
 				// 4 start 延期繳款累積期數(月份)不得超過6期
+				if (!"L".equals(iDelayCode)) {
+					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custRcSubCourtEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode, 0,  1, titaVo);
+					if(sJcicZ451 != null) {
+						throw new LogicException("E0005", "IDN+報送單位代號+協調申請日+受理調解機構代號，已報送過(451)前置調解延期繳款資料.");
+					}
+				}	
 				// 6.2 start 「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核4的限制.
 				if ("L".equals(iDelayCode)) {
 					sCovDelayYM = 1;

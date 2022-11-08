@@ -570,7 +570,7 @@ public class L3721 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRate(iFitRate);
-		tLoanBorTx.setDesc("借戶利率變更");
+		tLoanBorTx.setTxDescCode("3721"); // 借戶利率變更"
 		// 其他欄位
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {

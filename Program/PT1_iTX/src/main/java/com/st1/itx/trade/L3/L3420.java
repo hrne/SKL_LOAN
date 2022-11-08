@@ -1369,11 +1369,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		if (iCaseCloseCode == 0) {
-			tLoanBorTx.setDesc("結案登錄");
-		} else {
-			tLoanBorTx.setDesc(titaVo.getParam("CaseCloseCodeX"));
-		}
+		tLoanBorTx.setTxDescCode("342" + iCaseCloseCode);
 		if (iCaseCloseCode >= 4) {
 			tLoanBorTx.setAcctCode("990");
 		} else {
@@ -1444,7 +1440,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
 		}
@@ -1459,7 +1455,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc(titaVo.getParam("CaseCloseCodeX"));
+		tLoanBorTx.setTxDescCode("340" + iCaseCloseCode);
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setLoanBal(BigDecimal.ZERO);
 		tLoanBorTx.setAcctCode("990");
@@ -1473,7 +1469,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
 		}
@@ -1521,7 +1517,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc(titaVo.getParam("CaseCloseCodeX"));
+		tLoanBorTx.setTxDescCode("340" + iCaseCloseCode);
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setAcctCode("990");
 		tLoanBorTx.setLoanBal(od.getOvduBal().subtract(wkTrfPrin.add(wkTrfInt).add(wkTrfBreach)));
@@ -1534,7 +1530,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
 		}
@@ -1549,7 +1545,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc("債權轉讓戶");
+		tLoanBorTx.setTxDescCode("340" + iCaseCloseCode);
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setAcctCode("990");
 		tLoanBorTx.setLoanBal(BigDecimal.ZERO);
@@ -1562,7 +1558,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
 		}
@@ -1668,7 +1664,7 @@ public class L3420 extends TradeBuffer {
 		if (iCaseCloseCode != 0 && iCaseCloseCode != 4 && iCaseCloseCode != 5 && iCaseCloseCode != 6) {
 			return;
 		}
-		
+
 		// 結清時判斷該戶號額度下主要擔保品的其他額度是否已全部結清
 		if (isAllClose) {
 			isAllClose = loanAvailableAmt.isAllCloseClFac(iCustNo, iFacmNo, titaVo);

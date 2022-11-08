@@ -88,6 +88,12 @@ VALUES ('TxDescCode','3','3701','放款內容變更','Y','0','0','0');
 INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") 
 VALUES ('TxDescCode','3','3711','應繳日變更','Y','0','0','0');
 INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") 
+VALUES ('TxDescCode','3','3721','借戶利率變更','Y','0','0','0');
+INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") 
+VALUES ('TxDescCode','3','3731','轉呆帳結案戶','Y','0','0','0');
+INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") 
 VALUES ('TxDescCode','3','6180','火險費用轉催收','Y','0','0','0');
 INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") 
 VALUES ('TxDescCode','3','6181','法務費轉列催收','Y','0','0','0');
+INSERT INTO "CdCode" ("DefCode","DefType","Code","Item","Enable","EffectFlag","MinCodeLength","MaxCodeLength") 
+VALUES ('TxDescCode','3','6182','呆帳戶法務費墊付','Y','0','0','0');

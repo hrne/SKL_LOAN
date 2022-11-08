@@ -25,82 +25,49 @@ BEGIN
 
     -- -- 寫入資料
     INSERT INTO "TmpLA$HGTP"
-    SELECT DENSE_RANK() OVER (ORDER BY S1."LMSACN" -- 戶號
-                                      ,S1."LGTCIF" -- 提供人
+    WITH LBL AS (
+      SELECT LMSACN
+           , LMSAPN
+           , SUM(LMSLBL) AS "LoanBalTotal"
+      FROM LA$LMSP
+      WHERE LMSLBL <> 0
+      GROUP BY LMSACN
+             , LMSAPN
+    )
+    , HGData AS (
+      SELECT HG.*
+      FROM "LA$HGTP" HG
+      LEFT JOIN LA$APLP APLP ON APLP.GDRID1 = HG.GDRID1
+                            AND APLP.GDRID2 = HG.GDRID2
+                            AND APLP.GDRNUM = HG.GDRNUM
+      WHERE HG.LGTADR IS NOT NULL -- 地址非空,空白地址由下一段程式處理
+        AND NVL(HG.HGTMHN,0) != 0 -- 主建號
+        AND NVL(APLP.LMSACN,0) != 0 -- 已跟額度綁定
+        AND HG.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
+    )
+    , DistinctData AS (
+      SELECT S5.CUSENT
+            ,S3.LMSACN
+            ,S3.LMSAPN
+            ,NVL(S4."LoanBalTotal",0) AS "LoanBalTotal"
+            ,S2.*
+      FROM HGData S2
+      LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S2.GDRID1
+                          AND S3.GDRID2 = S2.GDRID2
+                          AND S3.GDRNUM = S2.GDRNUM
+      LEFT JOIN LBL S4 ON S4.LMSACN = S3.LMSACN
+                      AND S4.LMSAPN = S3.LMSAPN
+      LEFT JOIN CU$CUSP S5 on S5.LMSACN = S3.LMSACN
+      WHERE NVL(S3.LMSACN,0) != 0
+        AND S2.GDRID1 = 1
+    )
+    SELECT DENSE_RANK() OVER (ORDER BY S1."LMSACN"
                                       ,S1."HGTAD1"
                                       ,S1."HGTAD2"
-                                    --   ,S1.hgtmhn --建號
                                     ) AS "GroupNo"
           ,0 AS "SecGroupNo"
           ,S1.*
-    FROM ( SELECT DISTINCT
-                  S5.CUSENT
-                 ,S3.LMSACN
-                 ,S3.LMSAPN
-                 ,NVL(S4."LoanBalTotal",0) AS "LoanBalTotal"
-                 ,S2.*
-           FROM ( SELECT S1.LGTCIF
-                        ,TRANSLATE(S1.HGTAD3,'一二三四五六七八九－','１２３４５６７８９之') AS HGTAD3
-                        ,NVL(S1.HGTAD1,' ') AS HGTAD1
-                        ,NVL(S1.HGTAD2,' ') AS HGTAD2
-                        ,S1.HGTMHN
-                  FROM "LA$HGTP" S1
-                  LEFT JOIN CU$CUSP S2 ON S2.CUSCIF = S1.LGTCIF
-                  LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S1.GDRID1
-                                      AND S3.GDRID2 = S1.GDRID2
-                                      AND S3.GDRNUM = S1.GDRNUM
-                  WHERE NVL(LGTADR,' ') <> ' '
-                    AND NVL(HGTMHN,0) <> 0
-                    -- AND NVL(LGTCIF,0) <> 0 -- 2021-04-06 智偉修改: 放寬條件
-                    -- AND NVL(S2.CUSCIF,0) <> 0 -- 2021-04-06 智偉修改: 放寬條件
-                    AND NVL(S3.LMSACN,0) <> 0
-                    AND S1.GDRID1 = 1
-                    AND S1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
-                  GROUP BY S1.LGTCIF
-                          ,TRANSLATE(S1.HGTAD3,'一二三四五六七八九－','１２３４５６７８９之')
-                          ,NVL(S1.HGTAD1,' ')
-                          ,NVL(S1.HGTAD2,' ')
-                          ,S1.HGTMHN
-                  HAVING COUNT(*) >= 2
-                ) S1
-           LEFT JOIN ( SELECT SS1.*
-                       FROM "LA$HGTP" SS1
-                       LEFT JOIN CU$CUSP SS2 ON SS2.CUSCIF = SS1.LGTCIF
-                       LEFT JOIN LA$APLP SS3 ON SS3.GDRID1 = SS1.GDRID1
-                                            AND SS3.GDRID2 = SS1.GDRID2
-                                            AND SS3.GDRNUM = SS1.GDRNUM
-                       WHERE SS1.LGTADR IS NOT NULL
-                         AND NVL(SS1.HGTMHN,0) <> 0
-                         AND NVL(SS1.LGTCIF,0) <> 0
-                        --  AND NVL(SS2.cuscif,0) <> 0 -- 2021-04-06 智偉修改: 放寬條件 只需要有LGTCIF不存在於客戶主檔也進來
-                         AND NVL(SS3.LMSACN,0) <> 0
-                         AND SS1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
-                     ) S2 on S2.LGTCIF = S1.LGTCIF
-                         AND (  -- 地址相同
-                             TRANSLATE(S2.HGTAD3,'一二三四五六七八九－','１２３４５６７８９之') = S1.HGTAD3 -- 門牌地址
-                             -- 或 縣市鄉鎮 相同
-                             OR (    NVL(S2.HGTAD1,' ') = NVL(S1.HGTAD1,' ') -- 縣市
-                                 AND NVL(S2.HGTAD2,' ') = NVL(S1.HGTAD2,' ') -- 鄉鎮
-                             )
-                             -- 或 主建號相同
-                             OR S2.HGTMHN = S1.HGTMHN -- 主建號
-                             ) 
-           LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S2.GDRID1
-                               AND S3.GDRID2 = S2.GDRID2
-                               AND S3.GDRNUM = S2.GDRNUM
-           LEFT JOIN (SELECT LMSACN
-                            ,LMSAPN
-                            ,SUM(LMSLBL) AS "LoanBalTotal"
-                      FROM LA$LMSP
-                      WHERE LMSLBL <> 0
-                      GROUP BY LMSACN
-                              ,LMSAPN
-                     ) S4 ON S4.LMSACN = S3.LMSACN
-                         AND S4.LMSAPN = S3.LMSAPN
-           LEFT JOIN CU$CUSP S5 on S5.LMSACN = S3.LMSACN
-           WHERE NVL(S3.LMSACN,0) <> 0
-             AND S2.GDRID1 = 1
-         ) S1
+    FROM DistinctData S1
     ;
 
     -- 記錄寫入筆數
@@ -116,10 +83,8 @@ BEGIN
     )
     SELECT M."Value" +
            DENSE_RANK() OVER (ORDER BY S1."LMSACN" -- 戶號
-                                      ,S1."LGTCIF" -- 提供人
                                       ,S1."HGTAD1"
                                       ,S1."HGTAD2"
-                                    --   ,S1.hgtmhn --建號
                                     ) AS "GroupNo"
          , 0 AS "SecGroupNo"
          , S1.*
@@ -137,13 +102,13 @@ BEGIN
                             ,LMSAPN
                             ,SUM(LMSLBL) AS "LoanBalTotal"
                       FROM LA$LMSP
-                      WHERE LMSLBL <> 0
+                      WHERE LMSLBL != 0
                       GROUP BY LMSACN
                               ,LMSAPN
                      ) S4 ON S4.LMSACN = S3.LMSACN
                          AND S4.LMSAPN = S3.LMSAPN
            LEFT JOIN CU$CUSP S5 on S5.LMSACN = S3.LMSACN
-           WHERE NVL(S3.LMSACN,0) <> 0
+           WHERE NVL(S3.LMSACN,0) != 0
              AND S1.GDRID1 = 1
              AND NVL(S1.LGTADR,' ') = ' '
              AND S1.GDRNUM2 = 0 -- 新光沒做過唯一性處理的,才由本支程式處理
@@ -177,7 +142,7 @@ BEGIN
                      ,LMSAPN
                      ,SUM(LMSLBL) AS "LoanBalTotal"
                FROM LA$LMSP
-               WHERE LMSLBL <> 0
+               WHERE LMSLBL != 0
                GROUP BY LMSACN
                        ,LMSAPN
               ) S4 ON S4.LMSACN = S3.LMSACN

@@ -486,7 +486,7 @@ public class L3712 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		tLoanBorTx.setDesc("應繳日變更-可欠繳");
+		tLoanBorTx.setTxDescCode("3711"); // 3711 應繳日變更
 		tLoanBorTx.setEntryDate(wkTbsDy);
 		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setLoanBal(wkLoanBal);
@@ -506,7 +506,7 @@ public class L3712 extends TradeBuffer {
 		tTempVo.putParam("NewSpecificDd", tLoanBorMain.getSpecificDd()); // 新指定應繳日
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}

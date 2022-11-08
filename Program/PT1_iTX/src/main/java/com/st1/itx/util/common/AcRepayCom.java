@@ -784,24 +784,12 @@ public class AcRepayCom extends TradeBuffer {
 		this.info("addFeeBorTxRoutine ... ");
 
 		// 新增放款交易內容檔(收回費用)
-		String desc = "";
-		if ("L3210".equals(titaVo.getTxcd())) {
-			desc = "暫收銷";
-		}
-		if ("L3230".equals(titaVo.getTxcd())) {
-			desc = "暫收退";
-		}
-		// 費用科目代碼
-		desc += getCdCodeX("AcctCode", ba.getAcctCode(), titaVo);
-		if (iCaseCloseCode == 7 || iCaseCloseCode == 8) {
-			desc += "轉呆帳";
-		}
 		LoanBorTx tLoanBorTx = new LoanBorTx();
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
 		tLoanBorTx.setCustNo(ba.getCustNo());
 		tLoanBorTx.setFacmNo(ba.getFacmNo());
-		tLoanBorTx.setDesc(desc);
+		tLoanBorTx.setTxDescCode("Fee");
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(ba.getPayIntDate());

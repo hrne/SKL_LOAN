@@ -444,11 +444,31 @@ public class L3210 extends TradeBuffer {
 //		08	兌現票入帳
 //		09	其他
 //		10	AML凍結／未確定
-
-		if (iTempReasonCode == 0 || iTempReasonCode == 3 || iTempReasonCode == 6 || iTempReasonCode == 10) {
-			tLoanBorTx.setDesc(iTempReasonCodeX + "登錄");
-		} else {
-			tLoanBorTx.setDesc("暫收款登錄");
+		// 3210 暫收款登錄
+		// 3211 債協暫收款登錄
+		// 3212 期票登錄
+		// 3213 即期票現金登錄
+		// 3214 支票兌現
+		// 3215 AML凍結／未確定
+		switch (iTempReasonCode) {
+		case 0:
+			tLoanBorTx.setTxDescCode("3211");
+			break;
+		case 3:
+			tLoanBorTx.setTxDescCode("3212");
+			break;
+		case 6:
+			tLoanBorTx.setTxDescCode("3213");
+			break;
+		case 8:
+			tLoanBorTx.setTxDescCode("3214");
+			break;
+		case 10:
+			tLoanBorTx.setTxDescCode("3215");
+			break;
+		default:
+			tLoanBorTx.setTxDescCode("3210");
+			break;			
 		}
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源

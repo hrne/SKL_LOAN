@@ -57,7 +57,7 @@ public class L618C extends TradeBuffer {
 
 	@Autowired
 	LoanCom loanCom;
-	
+
 	@Autowired
 	AcRepayCom acRepayCom;
 
@@ -95,7 +95,7 @@ public class L618C extends TradeBuffer {
 		iFacmNo = parse.stringToInteger(titaVo.getParam("TxFacmNo"));
 		iRvNo = titaVo.getParam("TxDtlValue");
 		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
-		
+
 		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 		if (titaVo.isHcodeErase()) {
 			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);
@@ -117,7 +117,7 @@ public class L618C extends TradeBuffer {
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 
 			lAcDetail = new ArrayList<AcDetail>();
-			
+
 			// call 應繳試算
 			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 9, BigDecimal.ZERO, titaVo); //
 
@@ -144,11 +144,10 @@ public class L618C extends TradeBuffer {
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setRvNo(iRvNo);
 			lAcDetail.add(acDetail);
-			
+
 			// 累溢收入帳(暫收貸)
-			wkOverflow = acRepayCom.settleOverflow(lAcDetail, titaVo);			
-			
-			
+			wkOverflow = acRepayCom.settleOverflow(lAcDetail, titaVo);
+
 			this.txBuffer.addAllAcDetailList(lAcDetail);
 
 			/* 產生會計分錄 */
@@ -193,7 +192,7 @@ public class L618C extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-		tLoanBorTx.setDesc("法務費轉列催收");
+		tLoanBorTx.setTxDescCode("6181"); // 6181 法務費轉列催收
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(iTxAmt); // 轉催呆金額放LoanBorTx交易金額
 		tLoanBorTx.setTempAmt(wkTempAmt);

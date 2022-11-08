@@ -584,8 +584,6 @@ TXFORM=L3911
 #OOBTN1=內容查詢
 {width:80,search:false,formatter:'cust:bind-button:內容查詢;L3917 繳息明細查詢',align:'center',canExport:false}
 
-#OOTxtNo=T交易序號
-{width:100}
 #OOFacmNo=額度編號 
 {width:85,align:'center'}
 
@@ -635,7 +633,7 @@ TXFORM=L3911
 {width:1,hidden:true}
 
 #OOTxtNo=
-{width:100}
+{width:1,hidden:true}
 
 ^
 
@@ -646,8 +644,7 @@ TXFORM=L3911
 #OOInterest
 #OOBreachAmt
 
-#OOTxtNo=T交易序號
-{width:100}
+
 #OOFacmNo=額度編號 
 {width:85,align:'center'}
 
@@ -697,7 +694,7 @@ TXFORM=L3911
 {width:1,hidden:true}
 
 #OOTxtNo=
-{width:100}
+{width:1,hidden:true}
 
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L3911;cpi=15"/>

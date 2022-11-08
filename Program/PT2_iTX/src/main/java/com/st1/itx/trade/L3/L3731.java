@@ -354,7 +354,7 @@ public class L3731 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		tLoanBorTx.setDesc("轉呆帳結案戶");
+		tLoanBorTx.setTxDescCode("3731"); // 3731 轉呆帳結案戶
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO);
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
@@ -372,7 +372,7 @@ public class L3731 extends TradeBuffer {
 		tTempVo.putParam("Remark", titaVo.get("Remark"));
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
 		}

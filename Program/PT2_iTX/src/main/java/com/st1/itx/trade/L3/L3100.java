@@ -1145,13 +1145,15 @@ public class L3100 extends TradeBuffer {
 
 	private void moveLoanBorTx() throws LogicException {
 		this.info("   moveLoanBorTx ...");
-
+		// 3100 撥款                
+		// 3101 展期                
+		// 3102 借新還舊            
 		if ("1".equals(titaVo.getParam("RenewFlag"))) {
-			tLoanBorTx.setDesc("展期");
+			tLoanBorTx.setTxDescCode("3101");
 		} else if ("2".equals(titaVo.getParam("RenewFlag"))) {
-			tLoanBorTx.setDesc("借新還舊");
+			tLoanBorTx.setTxDescCode("3102");
 		} else {
-			tLoanBorTx.setDesc("撥款");
+			tLoanBorTx.setTxDescCode("3100");
 		}
 		tLoanBorTx.setTitaHCode("0");
 		tLoanBorTx.setEntryDate(tLoanBorMain.getDrawdownDate());

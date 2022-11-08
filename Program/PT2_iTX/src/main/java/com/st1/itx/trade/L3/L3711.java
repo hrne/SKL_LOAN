@@ -167,17 +167,17 @@ public class L3711 extends TradeBuffer {
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iRpCode = 90;
-		
+
 		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 		if (titaVo.isHcodeErase()) {
 			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);
 		}
-		
+
 		wkReduceAmt = iReduceAmt;
-				
+
 		if (titaVo.isHcodeNormal()) {
 			// call 應繳試算
-			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo); 
+			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 0, BigDecimal.ZERO, titaVo);
 			SpecificNormalRoutine();
 			titaVo.setTxAmt(wkTotalInterest.subtract(iReduceAmt));
 		} else {
@@ -186,7 +186,7 @@ public class L3711 extends TradeBuffer {
 		// 帳務處理
 		acRepayCom.setTxBuffer(this.txBuffer);
 		acRepayCom.settleRun(this.lLoanBorTx, this.baTxList, titaVo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -501,9 +501,7 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		// 3711 應繳日變更
-		tLoanBorTx.setTxDescCode("3711");
-		tLoanBorTx.setDesc("應繳日變更-不可欠繳");
+		tLoanBorTx.setTxDescCode("3711"); // 3711 應繳日變更
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
@@ -531,11 +529,11 @@ public class L3711 extends TradeBuffer {
 		tTempVo.putParam("NewSpecificDd", tLoanBorMain.getSpecificDd()); // 新指定應繳日
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
-		this.lLoanBorTx.add(tLoanBorTx); 
+		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
 	// 還原撥款主檔

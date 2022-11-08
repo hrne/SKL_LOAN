@@ -205,30 +205,7 @@ public class BS720 extends TradeBuffer {
 			}
 
 		}
-		this.info("setDataBaseOnMon...");
-		titaVo.setDataBaseOnMon();
-		if (lIas39IntMethod.size() > 0) {
-			// 刪檔
-			Slice<Ias39IntMethod> slIas39IntMethod = ias39IntMethodService.findYearMonthEq(iYearMonth, 0,
-					Integer.MAX_VALUE, titaVo);
-			List<Ias39IntMethod> oListIas39IntMethod = slIas39IntMethod == null ? null
-					: new ArrayList<Ias39IntMethod>(slIas39IntMethod.getContent());
-			if (oListIas39IntMethod != null) {
-				try {
-					ias39IntMethodService.deleteAll(oListIas39IntMethod);
-				} catch (DBException e) {
-					e.printStackTrace();
-					throw new LogicException(titaVo, "E0008", "Ias39IntMethod利息法帳面資料檔" + " " + e.getErrorMsg()); // 刪除資料時，發生錯誤
-				}
-			}
-			// 新增
-			try {
-				ias39IntMethodService.insertAll(lIas39IntMethod);
-			} catch (DBException e) {
-				e.printStackTrace();
-				throw new LogicException("E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-			}
-		}
+		
 
 	}
 

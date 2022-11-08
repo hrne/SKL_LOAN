@@ -2,7 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -184,6 +183,7 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOFileName", result.get("FileName"));
 				occursList.putParam("OOFileSeq", fileSeq);
 				occursList.putParam("OOTxCd", txcd);
+				occursList.putParam("OOBatchNo", result.get("BatchNo"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

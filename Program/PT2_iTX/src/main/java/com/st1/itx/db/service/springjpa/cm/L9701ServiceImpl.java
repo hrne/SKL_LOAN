@@ -26,9 +26,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
+	
 	/**
 	 * 客戶往來本息明細表（撥款）
-	 * 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
@@ -52,11 +52,15 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Interest\"";
 		sql += "            ,T.\"BreachAmt\"";
 		sql += "            ,T.\"TxAmt\"";
-		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --短繳
-		sql += "            ,T.\"TempAmt\"";// --暫收借
-		sql += "            ,T.\"Overflow\"";// --暫收貸
-		sql += "            ,T.\"ShortAmt\"";// --短繳
-		sql += "            ,T.\"Desc\"";
+		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";//--短繳
+		sql += "            ,T.\"TempAmt\"";//--暫收借
+		sql += "            ,T.\"Overflow\"";//--暫收貸
+		sql += "            ,T.\"ShortAmt\"";//--短繳
+		sql += "            ,CASE WHEN T.\"TxDescCode\" = 'Fee' AND T.\"TitaTxCd\" = 'L3210' THEN '暫收銷'  ||  CDF.\"Item\" 	 ";
+		sql += "                  WHEN T.\"TxDescCode\" = 'Fee' AND T.\"TitaTxCd\" = 'L3230' THEN '暫收退'  ||  CDF.\"Item\" 	 ";
+		sql += "                  WHEN T.\"TxDescCode\" = 'Fee' THEN CDF.\"Item\"                                            ";
+		sql += "                  ELSE NVL(CDT.\"Item\",T.\"Desc\")  	    	                                             ";
+		sql += "                  END                     AS \"Desc\"	                                                 ";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
 		sql += "            ,CASE ";
@@ -86,13 +90,16 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            ELSE \"FeeAmt\" END )  AS \"FeeAmt\"";
 		sql += "                  ,SUM(CASE WHEN \"TitaHCode\" IN (2,4) THEN - \"UnpaidInterest\" - \"UnpaidPrincipal\" - \"UnpaidCloseBreach\" ";
 		sql += "                            ELSE \"UnpaidInterest\" + \"UnpaidPrincipal\" + \"UnpaidCloseBreach\" END) AS \"ShortAmt\"";
-		sql += "                  ,\"Desc\" ";
+		sql += "                  ,\"Desc\"        ";
+		sql += "                  ,\"TxDescCode\"  ";
+		sql += "                  ,\"AcctCode\"    ";
+		sql += "                  ,MAX(\"TitaTxCd\")     AS \"TitaTxCd\"  ";
 		sql += "                  ,MAX(\"TitaCalDy\")    AS \"TitaCalDy\" ";
 		sql += "                  ,MAX(\"TitaCalTm\")    AS \"TitaCalTm\" ";
 		sql += "                  ,1                 AS \"DB\"   ";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
-		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";// --03期票 06即期票現金
+		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";//--03期票 06即期票現金
 		sql += "             AND ( \"TxAmt\" <> 0";
 		sql += "               OR  \"TempAmt\" <> 0)";
 
@@ -107,7 +114,8 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iHFG.equals("0")) {
 			sql += "          AND \"TitaHCode\" = 0";
 		}
-		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", \"Desc\",  \"TitaTlrNo\",  \"TitaTxtNo\" ";
+		sql += "            GROUP BY \"CustNo\", \"FacmNo\", \"AcDate\", \"IntStartDate\", \"IntEndDate\", \"Rate\", ";
+		sql += "                     \"Desc\", \"TxDescCode\", \"AcctCode\", \"TitaTlrNo\",  \"TitaTxtNo\" ";
 		sql += "            UNION ALL";
 		sql += "            SELECT F.\"CustNo\"";
 		sql += "                  ,F.\"FacmNo\"";
@@ -127,8 +135,11 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,0    AS \"Overflow\"";
 		sql += "                  ,0    AS \"FeeAmt\"";
 		sql += "                  ,NULL AS \"Desc\" ";
-		sql += "                  ,0    AS \"TitaCalDy\" ";
-		sql += "                  ,0    AS \"TitaCalTm\" ";
+		sql += "                  ,NULL AS \"TxDescCode\" ";
+		sql += "                  ,NULL AS \"AcctCode\"   ";
+		sql += "                  ,NULL AS \"TitaTxCd\"   ";
+		sql += "                  ,0    AS \"TitaCalDy\"  ";
+		sql += "                  ,0    AS \"TitaCalTm\"  ";
 		sql += "                  ,2    AS \"DB\"   ";
 		sql += "            FROM  \"FacMain\" F";
 		sql += "            LEFT JOIN \"LoanBorMain\" M ON M.\"CustNo\" = F.\"CustNo\"";
@@ -154,8 +165,15 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND CL.\"LandSeq\" = 0 ";
+		sql += "                             AND CL.\"LandSeq\" = 0 ";	
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
+		sql += "      LEFT JOIN \"CdCode\" CDT												     	 ";
+		sql += "            ON  CDT.\"DefCode\" = 'TxDescCode'   							         ";
+		sql += "           AND  CDT.\"Code\"    = T.\"TxDescCode\" 									 ";
+		sql += "      LEFT JOIN \"CdCode\" CDF  													 ";
+		sql += "            ON   T.\"TxDescCode\" = 'Fee'   									     ";
+		sql += "           AND  CDF.\"DefCode\" = 'AcctCode'   									     ";
+		sql += "           AND  CDF.\"Code\"    = T.\"AcctCode\" 									 ";
 		sql += "      ORDER BY T.\"FacmNo\", T.\"DB\" ,T.\"TitaCalDy\", T.\"TitaCalTm\"";
 
 		this.info("sql=" + sql);
@@ -169,9 +187,9 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	
 	/**
 	 * 客戶往來本息明細表（額度）
-	 * 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
@@ -196,10 +214,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Interest\"";
 		sql += "            ,T.\"BreachAmt\"";
 		sql += "            ,T.\"TxAmt\"";
-		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --費用
-		sql += "            ,T.\"TempAmt\"";// --暫收借
-		sql += "            ,T.\"Overflow\"";// --暫收貸
-		sql += "            ,T.\"ShortAmt\"";// --短繳
+		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";//--費用
+		sql += "            ,T.\"TempAmt\"";//--暫收借
+		sql += "            ,T.\"Overflow\"";//--暫收貸
+		sql += "            ,T.\"ShortAmt\"";//--短繳
 		sql += "            ,T.\"Desc\"";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
@@ -239,7 +257,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				  ,\"Displayflag\" AS \"Displayflag\"";
 		sql += "            FROM \"LoanBorTx\" ";
 		sql += "            WHERE \"CustNo\" = :icustno";
-		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";// --03期票 06即期票現金
+		sql += "             AND NVL(JSON_VALUE(\"OtherFields\",'$.TempReasonCode'),' ') NOT IN ('03','06')";//--03期票 06即期票現金
 		sql += "             AND ( \"TxAmt\" <> 0";
 		sql += "               OR  \"TempAmt\" <> 0)";
 		sql += "             AND  NVL(\"BormNo\", 0) > 0 ";
@@ -305,7 +323,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND CL.\"LandSeq\" = 0 ";
+		sql += "                             AND CL.\"LandSeq\" = 0 ";	
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
 		sql += "              ,T.\"Displayflag\" ";
@@ -324,7 +342,6 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/**
 	 * 客戶往來本息明細表（額度）
-	 * 
 	 * @param titaVo
 	 * @return
 	 * @throws Exception
@@ -345,10 +362,10 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,T.\"Principal\"";
 		sql += "            ,T.\"Interest\"";
 		sql += "            ,T.\"BreachAmt\"";
-		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";// --費用
-		sql += "            ,T.\"TempAmt\"";// --暫收借
-		sql += "            ,T.\"Overflow\"";// --暫收貸
-		sql += "            ,T.\"ShortAmt\"";// --短繳
+		sql += "            ,T.\"FeeAmt\" AS \"FeeAmt\"";//--費用
+		sql += "            ,T.\"TempAmt\"";//--暫收借
+		sql += "            ,T.\"Overflow\"";//--暫收貸
+		sql += "            ,T.\"ShortAmt\"";//--短繳
 		sql += "            ,T.\"Desc\"";
 		sql += "            ,T.\"DB\"";
 		sql += "            ,\"Fn_ParseEOL\"(C.\"CustName\",0) AS \"CustName\"";
@@ -446,7 +463,7 @@ public class L9701ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = F.\"ClCode1\"";
 		sql += "                             AND CL.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\"    = F.\"ClNo\"";
-		sql += "                             AND CL.\"LandSeq\" = 0 ";
+		sql += "                             AND CL.\"LandSeq\" = 0 ";	
 		sql += "                             AND F.\"ClCode1\"  = 2 ";
 		sql += "      ORDER BY T.\"FacmNo\",T.\"DB\" ,T.\"BormNo\", T.\"TitaCalDy\", T.\"TitaCalTm\"";
 		sql += "              ,T.\"Displayflag\" ";

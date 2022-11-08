@@ -168,7 +168,7 @@ public class L3005 extends TradeBuffer {
 				String titaHCode = result.get("TitaHCode");
 				String displayflag = result.get("Displayflag");
 				String titaCurCd = result.get("TitaCurCd");
-				String desc = result.get("Desc");
+				String desc = result.get("TxDescCodeX");
 				String titaTxCd = result.get("TitaTxCd");
 				String createEmpNo = result.get("CreateEmpNo");
 				String eraseTxCd = result.get("TitaTxCd");
@@ -180,7 +180,7 @@ public class L3005 extends TradeBuffer {
 						eraseTxCd = "L3240";
 					}
 				}
-				String repayCodeX = result.get("Item");
+				String repayCodeX = result.get("RepayCodeX");
 				String hCodeFlag = result.get("HCodeFlag");
 				int entryDate = parse.stringToInteger(result.get("EntryDate"));
 				BigDecimal needPaidAmt = BigDecimal.ZERO;

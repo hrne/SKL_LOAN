@@ -696,7 +696,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
-		tLoanBorTx.setDesc("催收回復登錄");
+		tLoanBorTx.setTxDescCode("3440"); // 催收回復
 		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
@@ -751,7 +751,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx.setTxAmt(tLoanBorTx.getTxAmt().subtract(ovDuRepaid));
 
 		try {
-			loanBorTxService.insert(tLoanBorTx);
+			loanBorTxService.insert(tLoanBorTx, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}

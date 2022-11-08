@@ -1645,13 +1645,16 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
+		// 3201 回收登錄            
+		// 3202 回收利息            
+		// 3203 部分償還本金        
 		if (iRepayType == 2) {
-			tLoanBorTx.setDesc("部分償還本金");
+			tLoanBorTx.setTxDescCode("3203");
 		} else {
 			if (isRepayPrincipal) {
-				tLoanBorTx.setDesc("回收登錄");
+				tLoanBorTx.setTxDescCode("3201");
 			} else {
-				tLoanBorTx.setDesc("回收利息");
+				tLoanBorTx.setTxDescCode("3202");
 			}
 		}
 
@@ -1769,7 +1772,8 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc("回收登錄-清償違約金");
+		// 3205 回收登錄-清償違約金 
+		tLoanBorTx.setTxDescCode("3205");
 		tLoanBorTx.setEntryDate(iEntryDate);
 		//
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode()); // 業務科目
@@ -1803,7 +1807,8 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setDesc("回收登錄-催收收回");
+		// 3204 回收登錄-催收收回   
+		tLoanBorTx.setTxDescCode("3204");
 		tLoanBorTx.setEntryDate(iEntryDate);
 		//
 		tLoanBorTx.setAcctCode("990");

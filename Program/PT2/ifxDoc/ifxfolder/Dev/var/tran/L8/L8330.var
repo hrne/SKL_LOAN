@@ -75,8 +75,9 @@ T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
 !DelayCode
-#CODEF0002=x,20,S
-T(3,CdCode.DelayCode)
+#CODEF0002=x,23,S
+!T(3,CdCode.DelayCode)
+T(3,CdCode.DelayCodeJcic451)
 #DelayCodeHelp=x,2024,S
 
 ! CourtCode

@@ -40,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L618E extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L618E.class);
 
 	@Autowired
 	public ForeclosureFeeService sForeclosureFeeService;
@@ -100,6 +99,8 @@ public class L618E extends TradeBuffer {
 		tTxToDoDetailId.setDtlValue(iRvNo);
 		txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 
+		
+		
 		// 銷帳檔有資料時先銷銷帳檔
 		if (!"".equals(iAcctCode)) {
 			acReceivable = new AcReceivable();
@@ -174,7 +175,7 @@ public class L618E extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-		tLoanBorTx.setDesc("呆帳戶法務費墊付");
+		tLoanBorTx.setTxDescCode("6182"); // 6182 呆帳戶法務費墊付
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務

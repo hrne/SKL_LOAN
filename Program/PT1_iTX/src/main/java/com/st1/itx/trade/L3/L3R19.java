@@ -19,6 +19,7 @@ import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -40,6 +41,8 @@ public class L3R19 extends TradeBuffer {
 	public AcDetailService acDetailService;
 	@Autowired
 	public BaTxCom baTxCom;
+	@Autowired
+	public LoanCom loanCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -85,9 +88,6 @@ public class L3R19 extends TradeBuffer {
 				this.info("slAcDetail = " + slAcDetail);
 				continue;
 			}
-			
-			
-
 			BigDecimal txAmt = BigDecimal.ZERO;
 			if (ln.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
 				txAmt = ln.getTxAmt();
@@ -101,7 +101,7 @@ public class L3R19 extends TradeBuffer {
 			}
 			this.totaVo.putParam("L3r19EntryDate", ln.getEntryDate());
 			this.totaVo.putParam("L3r19AcDate", ln.getAcDate());
-			this.totaVo.putParam("L3r19Desc", ln.getDesc());
+			this.totaVo.putParam("L3r19Desc", loanCom.getTxDescCodeX(ln, titaVo));
 			this.totaVo.putParam("L3r19FacmNo", ln.getFacmNo());
 			this.totaVo.putParam("L3r19AcctCode", "");
 			this.totaVo.putParam("L3r19RvNo", "");

@@ -308,7 +308,7 @@ public class LoanCom extends TradeBuffer {
 		}
 		tLoanBorTx2.setLoanBal(iLoanBal);
 		try {
-			loanBorTxService.insert(tLoanBorTx2);
+			loanBorTxService.insert(tLoanBorTx2, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
@@ -1179,7 +1179,7 @@ public class LoanCom extends TradeBuffer {
 				}
 			}
 		}
-		if (!isCustNoLastTx ) {
+		if (!isCustNoLastTx) {
 			throw new LogicException(titaVo, "E3088", "同戶帳務最近一筆交易序號 = " + acDate + "-" + orgTxSeq); // 放款交易訂正須由最後一筆交易開始訂正
 		}
 	}
@@ -1420,6 +1420,26 @@ public class LoanCom extends TradeBuffer {
 			}
 		}
 		return false;
+	}
+
+	public String getTxDescCodeX(LoanBorTx ln, TitaVo titaVo) throws LogicException {
+		String txDescCodeX = "";
+		if ("Fee".equals(ln.getTxDescCode())) {
+			txDescCodeX = getCdCodeX("AcctCode", ln.getAcctCode(), titaVo);
+			if ("L3210".equals(ln.getTitaTxCd())) {
+				txDescCodeX = "暫收銷" + txDescCodeX;
+			}
+			if ("L3230".equals(ln.getTitaTxCd())) {
+				txDescCodeX = "暫收退" + txDescCodeX;
+			}
+		} else {
+			txDescCodeX = getCdCodeX("TxDescCode", ln.getTxDescCode(), titaVo);
+		}
+
+		if (txDescCodeX.isEmpty()) {
+			txDescCodeX = ln.getDesc();
+		}
+		return txDescCodeX;
 	}
 
 	/**

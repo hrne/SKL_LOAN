@@ -162,7 +162,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      WHERE M.\"YearMonth\" = :inputYearMonth";
 		sql += "        AND M.\"Status\" = 0";
 		sql += "        AND :inputCollPsn IN ('999999', NVL(M.\"AccCollPsn\",' '))";
-		sql += "        AND M.\"OvduDays\" > 0";
+//		sql += "        AND M.\"OvduDays\" > 0";
 		sql += "        AND M.\"OvduTerm\" >= :inputOvduTermMin";
 		sql += "        AND M.\"OvduTerm\" <= :inputOvduTermMax";
 		sql += "   		AND TRUNC(M.\"NextIntDate\" / 100) <= :inputYearMonth ";
@@ -272,11 +272,11 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,DECODE(CB.\"BdDate\",0,0,TRUNC(CB.\"BdDate\" / 10000)) AS F35";
 		sql += "            ,F.\"CreditOfficer\" F36";
 		sql += "            ,F.\"BusinessOfficer\" F37";
-		sql += "            ,L.\"DrawdownAmt\" F38";
-		sql += "            ,MB.\"AccCollPsn\" F39";
-		sql += "            ,F.\"UsageCode\" F40";
-		sql += "            ,F.\"ProdNo\" F41";
-		sql += "            ,CE.\"Fullname\" F42";
+//		sql += "            ,L.\"DrawdownAmt\" F38";
+		sql += "            ,MB.\"AccCollPsn\" F38";
+		sql += "            ,F.\"UsageCode\" F39";
+		sql += "            ,F.\"ProdNo\" F40";
+		sql += "            ,CE.\"Fullname\" F41";
 		sql += "      FROM \"MonthlyLoanBal\" M";
 		sql += "      LEFT JOIN \"MonthlyFacBal\" MB ON MB.\"CustNo\" = M.\"CustNo\"";
 		sql += "                                	AND MB.\"FacmNo\" = M.\"FacmNo\"";

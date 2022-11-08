@@ -19,6 +19,7 @@ import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -47,6 +48,8 @@ public class L3914 extends TradeBuffer {
 	public AcDetailService acDetailService;
 	@Autowired
 	public AcReceivableService acReceivableService;
+	@Autowired
+	public LoanCom loanCom;
 
 	@Autowired
 	Parse parse;
@@ -120,7 +123,7 @@ public class L3914 extends TradeBuffer {
 			occursList = new OccursList();
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());
-			occursList.putParam("OODesc", ln.getDesc());
+			occursList.putParam("OODesc",loanCom.getTxDescCodeX(ln, titaVo));
 			occursList.putParam("OOFacmNo", ln.getFacmNo());
 			if (ln.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
 				txAmt = ln.getTxAmt();

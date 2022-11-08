@@ -25,10 +25,11 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "ClBuildingOwner"
-    SELECT S1."ClCode1"                   AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
-          ,S1."ClCode2"                   AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
-          ,S1."ClNo"                      AS "ClNo"                -- 擔保品編號 DECIMAL 7 
-          ,S4."CustUKey"                  AS "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
+    SELECT DISTINCT
+           CNM."ClCode1"                  AS "ClCode1"             -- 擔保品代號1 DECIMAL 1 
+          ,CNM."ClCode2"                  AS "ClCode2"             -- 擔保品代號2 DECIMAL 2 
+          ,CNM."ClNo"                     AS "ClNo"                -- 擔保品編號 DECIMAL 7 
+          ,CM."CustUKey"                  AS "OwnerCustUKey"       -- 所有權人客戶識別碼 VARCHAR2 32 
           ,''                             AS "OwnerRelCode"        -- 與授信戶關係 VARCHAR2 2
           -- 擔保品持分
           ,1                              AS "OwnerPart"           -- 持分比率(分子) DECIMAL 10
@@ -37,21 +38,21 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE  
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
-    FROM "ClNoMapping" S1
-    LEFT JOIN "LA$HGTP" S2 ON S2."GDRID1" = S1."GDRID1"
-                          AND S2."GDRID2" = S1."GDRID2"
-                          AND S2."GDRNUM" = S1."GDRNUM"
-                          AND S2."LGTSEQ" = S1."LGTSEQ"
-    LEFT JOIN "CU$CUSP" S3 ON S3."CUSCIF" = S2."LGTCIF"
-    LEFT JOIN "CustMain" S4 ON TRIM(S4."CustId") = TRIM(S3."CUSID1")
-    LEFT JOIN "ClBuilding" S5 ON S5."ClCode1" = S1."ClCode1"
-                             AND S5."ClCode2" = S1."ClCode2"
-                             AND S5."ClNo"    = S1."ClNo"
-    WHERE S1."GDRID1" = '1' -- 只撈不動產
-      AND NVL(S2."LGTCIF",0) > 0 -- 舊系統建物資料有"提供人識別碼"才寫入
-      AND NVL(S3."CUSCIF",0) > 0 -- 舊系統顧客主檔有資料才寫入
-      AND NVL(S4."CustId",' ') <> ' ' -- 新系統顧客主檔有資料才寫入
-      AND NVL(S5."ClNo",0) > 0 -- 建物檔有資料才需寫入
+    FROM "ClBuildingUnique" CBU0
+    LEFT JOIN "ClNoMapping" CNM ON CNM."GDRID1" = CBU0."GDRID1"
+                               AND CNM."GDRID2" = CBU0."GDRID2"
+                               AND CNM."GDRNUM" = CBU0."GDRNUM"
+                               AND CNM."LGTSEQ" = CBU0."LGTSEQ"
+    LEFT JOIN "ClBuildingUnique" CBU1 ON CBU1."GroupNo" = CBU0."GroupNo"
+                                     AND CBU1."SecGroupNo" = CBU0."SecGroupNo"
+    LEFT JOIN LA$HGTP HG ON HG."GDRID1" = CBU1."GDRID1"
+                        AND HG."GDRID2" = CBU1."GDRID2"
+                        AND HG."GDRNUM" = CBU1."GDRNUM"
+                        AND HG."LGTSEQ" = CBU1."LGTSEQ"
+    LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = CU."LGTCIF"
+    LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CM."CUSID1")
+    WHERE CBU0."TfFg" = 'Y'
+      AND NVL(CM."CustUKey",' ') != ' '
     ;
     -- 記錄寫入筆數
     INS_CNT := INS_CNT + sql%rowcount;

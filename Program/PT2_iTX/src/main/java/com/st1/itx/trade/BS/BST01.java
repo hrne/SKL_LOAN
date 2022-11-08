@@ -13,7 +13,9 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBaseRate;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.FacProdStepRate;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -32,6 +34,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -109,38 +112,39 @@ public class BST01 extends TradeBuffer {
 				Integer.MAX_VALUE, titaVo);
 
 		for (LoanBorTx ln : slLoanBorTx.getContent()) {
-			if (!"部分償還本金".equals(ln.getDesc())) {
-				continue;
-			}
-			LoanBorMain tLoanBorMain = loanBorMainService
-					.holdById(new LoanBorMainId(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo()), titaVo);
-			if ("3".equals(tLoanBorMain.getAmortizedCode()) || "4".equals(tLoanBorMain.getAmortizedCode())) {
-				int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
-						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-						tLoanBorMain.getGraceDate());
-				int wkPaidTerms = 0;
-				if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getSpecificDate()) {
-					wkPaidTerms = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
-							tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
-							tLoanBorMain.getPrevPayIntDate());
-				}
-				// 剩餘還本期數
-				int wkDueTerms = wkPaidTerms > wkGracePeriod ? tLoanBorMain.getTotalPeriod() - wkPaidTerms
-						: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
-				// 重算期金
-				BigDecimal wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(), tLoanBorMain.getStoreRate(),
-						tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(), wkDueTerms, 0,
-						tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
-				this.info("BST01 ID=" + tLoanBorMain.getLoanBorMainId() + ", NewDueAmt=" + wkNewDueAmt + "/"
-						+ tLoanBorMain.getDueAmt() + ", PaidTerms=" + wkPaidTerms + "/" + tLoanBorMain.getPaidTerms());
+			if ("3203".equals(ln.getTxDescCode()) || "部分償還本金".equals(ln.getDesc())) {
+				LoanBorMain tLoanBorMain = loanBorMainService
+						.holdById(new LoanBorMainId(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo()), titaVo);
+				if ("3".equals(tLoanBorMain.getAmortizedCode()) || "4".equals(tLoanBorMain.getAmortizedCode())) {
+					int wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(),
+							tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(),
+							tLoanBorMain.getSpecificDd(), tLoanBorMain.getGraceDate());
+					int wkPaidTerms = 0;
+					if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getSpecificDate()) {
+						wkPaidTerms = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(),
+								tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
+								tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+								tLoanBorMain.getPrevPayIntDate());
+					}
+					// 剩餘還本期數
+					int wkDueTerms = wkPaidTerms > wkGracePeriod ? tLoanBorMain.getTotalPeriod() - wkPaidTerms
+							: tLoanBorMain.getTotalPeriod() - wkGracePeriod;
+					// 重算期金
+					BigDecimal wkNewDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getLoanBal(),
+							tLoanBorMain.getStoreRate(), tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
+							wkDueTerms, 0, tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
+					this.info("BST01 ID=" + tLoanBorMain.getLoanBorMainId() + ", NewDueAmt=" + wkNewDueAmt + "/"
+							+ tLoanBorMain.getDueAmt() + ", PaidTerms=" + wkPaidTerms + "/"
+							+ tLoanBorMain.getPaidTerms());
 
-				if ("Y".equals(iUpdate)) {
-					tLoanBorMain.setDueAmt(wkNewDueAmt);
-					tLoanBorMain.setPaidTerms(wkPaidTerms);
-					try {
-						loanBorMainService.update(tLoanBorMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", ""); // 更新資料時，發生錯誤
+					if ("Y".equals(iUpdate)) {
+						tLoanBorMain.setDueAmt(wkNewDueAmt);
+						tLoanBorMain.setPaidTerms(wkPaidTerms);
+						try {
+							loanBorMainService.update(tLoanBorMain, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", ""); // 更新資料時，發生錯誤
+						}
 					}
 				}
 			}

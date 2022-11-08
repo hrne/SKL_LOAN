@@ -50,7 +50,6 @@ BEGIN
                            PARTITION BY "GroupNo"
                                       , "SecGroupNo"
                            ORDER BY "LMSACN" -- 2022-03-10 Wei
-                                  , "LGTCIF"
                                   , CASE
                                       WHEN "LoanBalTotal" != 0
                                       THEN 0
@@ -140,27 +139,16 @@ BEGIN
            FROM (SELECT "GroupNo","SecGroupNo",MAX("TfFg") AS "MaxTfFg" FROM "ClBuildingUnique" GROUP BY "GroupNo","SecGroupNo"
                 ) S0
            LEFT JOIN (SELECT CBU."GroupNo"
-                           , HG.LGTCIF
                            , MIN(CBU."SecGroupNo") AS "MinSecGroupNo"
                       FROM "ClBuildingUnique" CBU
-                      LEFT JOIN LA$HGTP HG ON HG.GDRID1 = CBU.GDRID1
-                                          AND HG.GDRID2 = CBU.GDRID2
-                                          AND HG.GDRNUM = CBU.GDRNUM
-                                          AND HG.LGTSEQ = CBU.LGTSEQ
                       WHERE CBU."TfFg" = 'Y'
                       GROUP BY CBU."GroupNo"
-                             , HG.LGTCIF
                      ) S1 ON S1."GroupNo"    = S0."GroupNo"
            LEFT JOIN "ClBuildingUnique" S2 ON S2."GroupNo" = S0."GroupNo"
                                           AND S2."TfFg" = ' '
-           LEFT JOIN LA$HGTP HG2 ON HG2.GDRID1 = S2.GDRID1
-                                AND HG2.GDRID2 = S2.GDRID2
-                                AND HG2.GDRNUM = S2.GDRNUM
-                                AND HG2.LGTSEQ = S2.LGTSEQ
            WHERE S0."MaxTfFg" = ' '
              AND S1."MinSecGroupNo" IS NOT NULL
              AND S2."SecGroupNo" = 0
-             AND HG2.LGTCIF = S1.LGTCIF
            GROUP BY S2."GroupNo"
                   , S2."GDRID1"
                   , S2."GDRID2"

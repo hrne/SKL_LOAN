@@ -26,73 +26,19 @@ BEGIN
     -- -- 寫入資料
     INSERT INTO "TmpLA$LGTP"
     SELECT ' ' AS "TfFg"
-          ,S0."GroupNo"
+          ,DENSE_RANK() OVER (ORDER BY S1.LGTCTY
+                                     , NVL(S1.LGTTWN,' ')
+                                     , NVL(S1.LGTSGM,' ')
+                                     , NVL(S1.LGTSSG,' ')
+                                     , S1.LGTNM1
+                                     , S1.LGTNM2)
+                                    AS "GroupNo"
           ,0 AS "NewGroupNo"
           ,S2.LMSACN
           ,S2.LMSAPN
           ,NVL(S3."LoanBalTotal",0) AS "LoanBalTotal"
           ,S1.*
-    FROM (SELECT DENSE_RANK() OVER (ORDER BY S1.LGTCIF
-                                            ,S1.LGTCTY
-                                            ,NVL(S1.LGTTWN,' ')
-                                            ,NVL(S1.LGTSGM,' ')
-                                            ,NVL(S1.LGTSSG,' ')
-                                            ,S1.LGTNM1
-                                            ,S1.LGTNM2)
-                                    AS "GroupNo"
-                ,S1.LGTCIF
-                ,S1.LGTCTY
-                ,NVL(S1.LGTTWN,' ') AS "LGTTWN"
-                ,NVL(S1.LGTSGM,' ') AS "LGTSGM"
-                ,NVL(S1.LGTSSG,' ') AS "LGTSSG"
-                ,S1.LGTNM1
-                ,S1.LGTNM2
-          FROM "LA$LGTP" s1
-          LEFT JOIN CU$CUSP S2 ON S2.CUSCIF = S1.LGTCIF
-          LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S1.GDRID1
-                              AND S3.GDRID2 = S1.GDRID2
-                              AND S3.GDRNUM = S1.GDRNUM
-          WHERE NVL(LGTCTY,' ') <> ' '
-          AND NVL(LGTNM1,0) <> 0
-          -- AND NVL(LGTCIF,0) <> 0
-          -- AND NVL(S2.CUSCIF,0) <> 0
-          AND NVL(S3.LMSACN,0) <> 0
-          AND S1.GDRID1 = 2
-          GROUP BY S1.LGTCIF
-                  ,S1.LGTCTY
-                  ,NVL(S1.LGTTWN,' ')
-                  ,NVL(S1.LGTSGM,' ')
-                  ,NVL(S1.LGTSSG,' ')
-                  ,S1.LGTNM1
-                  ,S1.LGTNM2
-          HAVING COUNT(*) >= 2
-          ORDER BY S1.LGTCIF
-                  ,S1.LGTCTY
-                  ,NVL(S1.LGTTWN,' ')
-                  ,NVL(S1.LGTSGM,' ')
-                  ,NVL(S1.LGTSSG,' ')
-                  ,S1.LGTNM1
-                  ,S1.LGTNM2
-    ) S0
-    LEFT JOIN (SELECT S1.*
-               FROM "LA$LGTP" S1
-               LEFT JOIN CU$CUSP S2 ON S2.CUSCIF = S1.LGTCIF
-               LEFT JOIN LA$APLP S3 ON S3.GDRID1 = S1.GDRID1
-                                   AND S3.GDRID2 = S1.GDRID2
-                                   AND S3.GDRNUM = S1.GDRNUM
-               WHERE NVL(LGTCTY,' ') <> ' '
-                 AND NVL(LGTNM1,0) <> 0
-                --  AND NVL(LGTCIF,0) <> 0
-                --  AND NVL(S2.CUSCIF,0) <> 0
-                 AND NVL(S3.LMSACN,0) <> 0 
-                 AND S1.GDRID1 = 2
-              ) S1 ON S1.LGTCIF = S0.LGTCIF
-                  AND S1.LGTCTY = S0.LGTCTY
-                  AND NVL(S1.LGTTWN,' ') = S0."LGTTWN"
-                  AND NVL(S1.LGTSGM,' ') = S0."LGTSGM"
-                  AND NVL(S1.LGTSSG,' ') = S0."LGTSSG"
-                  AND S1.LGTNM1 = S0.LGTNM1
-                  AND S1.LGTNM2 = S0.LGTNM2
+    FROM "LA$LGTP" S1 
     LEFT JOIN LA$APLP S2 ON S2.GDRID1 = S1.GDRID1
                         AND S2.GDRID2 = S1.GDRID2
                         AND S2.GDRNUM = S1.GDRNUM
@@ -100,11 +46,13 @@ BEGIN
                      ,LMSAPN
                      ,SUM(LMSLBL) AS "LoanBalTotal"
                FROM LA$LMSP
-               WHERE LMSLBL <> 0
+               WHERE LMSLBL != 0
                GROUP BY LMSACN,LMSAPN
               ) S3 ON S3.LMSACN = S2.LMSACN
-                  AND S3.LMSAPN = S2.LMSAPN
-    WHERE NVL(S2.LMSACN,0) <> 0
+                 AND S3.LMSAPN = S2.LMSAPN
+    WHERE NVL(S1.LGTCTY,' ') != ' '
+      AND NVL(S1.LGTNM1,0) != 0
+      AND NVL(S2.LMSACN,0) != 0
       AND S1.GDRID1 = 2
     ;
 

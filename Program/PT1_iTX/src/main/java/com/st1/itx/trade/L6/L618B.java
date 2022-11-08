@@ -209,7 +209,7 @@ public class L618B extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
-		tLoanBorTx.setDesc("火險費用轉催收");
+		tLoanBorTx.setTxDescCode("6180");  // 6180 火險費用轉催收
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(iTxAmt); // 轉催呆金額放LoanBorTx交易金額
 		tLoanBorTx.setTempAmt(wkTempAmt);

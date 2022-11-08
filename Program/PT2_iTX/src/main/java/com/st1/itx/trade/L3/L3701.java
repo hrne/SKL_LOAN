@@ -359,7 +359,7 @@ public class L3701 extends TradeBuffer {
 			tLoanBorTx = new LoanBorTx();
 			tLoanBorTxId = new LoanBorTxId();
 			loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-			tLoanBorTx.setDesc("放款內容變更");
+			tLoanBorTx.setTxDescCode("3701"); // 3701 放款內容變更
 			tLoanBorTx.setLoanBal(ln.getLoanBal());
 			tLoanBorTx.setRate(ln.getStoreRate());
 			if (iAcctCodeY.equals("X"))
