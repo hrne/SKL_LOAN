@@ -246,7 +246,8 @@ public class L8305 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ044.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ044, uJcicZ044);
-			iDataLog.exec("L8305異動", uJcicZ044.getSubmitKey() + uJcicZ044.getCustId() + uJcicZ044.getRcDate());
+//			iDataLog.exec("L8305異動", uJcicZ044.getSubmitKey() + uJcicZ044.getCustId() + uJcicZ044.getRcDate());
+			iDataLog.exec("L8305異動", uJcicZ044.getUkey());
 			break;
 		case "4": // 需刷主管卡
 			String iOUkey = titaVo.getParam("Ukey");
@@ -352,7 +353,8 @@ public class L8305 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0442, uJcicZ0442);
-			iDataLog.exec("L8305刪除", uJcicZ0442.getSubmitKey() + uJcicZ0442.getCustId() + uJcicZ0442.getRcDate());
+//			iDataLog.exec("L8305刪除", uJcicZ0442.getSubmitKey() + uJcicZ0442.getCustId() + uJcicZ0442.getRcDate());
+			iDataLog.exec("L8305刪除", uJcicZ0442.getUkey());
 			break;
 		case "7":
 			iKey = titaVo.getParam("Ukey");
@@ -409,8 +411,8 @@ public class L8305 extends TradeBuffer {
 			}
 			
 			iDataLog.setEnv(titaVo, oldJcicZ0443, uJcicZ0443);
-			iDataLog.exec("L8305修改", uJcicZ0443.getSubmitKey() + uJcicZ0443.getCustId() + uJcicZ0443.getRcDate());
-
+//			iDataLog.exec("L8305修改", uJcicZ0443.getSubmitKey() + uJcicZ0443.getCustId() + uJcicZ0443.getRcDate());
+			iDataLog.exec("L8305修改", uJcicZ0443.getUkey());
 		default:
 			break;
 		}

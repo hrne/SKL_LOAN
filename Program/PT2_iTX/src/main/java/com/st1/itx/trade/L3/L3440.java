@@ -697,6 +697,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("催收回復登錄");
+		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(wkDueDate);

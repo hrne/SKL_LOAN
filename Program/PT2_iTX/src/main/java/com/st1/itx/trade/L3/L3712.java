@@ -136,10 +136,8 @@ public class L3712 extends TradeBuffer {
 	private LoanIntDetail tLoanIntDetail;
 	private LoanIntDetailId tLoanIntDetailId;
 	private TempVo tTempVo = new TempVo();
-	private AcReceivable tAcReceivable = new AcReceivable();
 	private List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>();
 	private List<LoanBorMain> lLoanBorMain;
-	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo = new ArrayList<CalcRepayIntVo>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private boolean isFirstBorm = true;
@@ -269,8 +267,6 @@ public class L3712 extends TradeBuffer {
 			AddLoanIntDetailRoutine();
 			// 新增放款交易內容檔
 			AddLoanBorTxRoutine();
-			// 利息可欠繳時, 新增銷帳檔
-			AcReceivableRoutine();
 			// FirstBorm
 			isFirstBorm = false;
 		}
@@ -316,8 +312,6 @@ public class L3712 extends TradeBuffer {
 			// 註記交易內容檔
 			loanCom.setLoanBorTxHcode(wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, wkNewBorxNo, tLoanBorMain.getLoanBal(),
 					titaVo);
-			// 利息可欠繳時, 新增銷帳檔
-			AcReceivableRoutine();
 			// FirstBorm
 			isFirstBorm = false;
 		}
@@ -493,7 +487,8 @@ public class L3712 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("應繳日變更-可欠繳");
-		tLoanBorTx.setEntryDate(0);
+		tLoanBorTx.setEntryDate(wkTbsDy);
+		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setLoanBal(wkLoanBal);
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
@@ -516,21 +511,6 @@ public class L3712 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
 		this.lLoanBorTx.add(tLoanBorTx); 
-	}
-
-	// 利息可欠繳時, 新增銷帳檔
-	private void AcReceivableRoutine() throws LogicException {
-		this.info("AcReceivableRoutine ... ");
-		if (wkUnpaidInt.compareTo(BigDecimal.ZERO) > 0) {
-			tAcReceivable = new AcReceivable();
-			tAcReceivable.setReceivableFlag(4); // 4-短繳期金
-			tAcReceivable.setAcctCode(loanCom.setShortIntAcctCode(tFacMain.getAcctCode()));
-			tAcReceivable.setCustNo(wkCustNo);
-			tAcReceivable.setFacmNo(wkFacmNo);
-			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3));
-			tAcReceivable.setRvAmt(wkUnpaidInt);
-			lAcReceivable.add(tAcReceivable);
-		}
 	}
 
 	// 還原撥款主檔

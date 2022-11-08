@@ -274,10 +274,10 @@ col_captions:["戶號","報送金融機構代號","調解申請日","受理調�
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 #RPTFG=1,QUERY.GRID,L8433
 #any={detail:true, header:'L8433.part', caption:'[L8433]JCIC檔案匯出作業（454）', width:1000, rowNum:20, rowList:[20,40,60],
@@ -307,10 +307,10 @@ col_captions:["戶號","報送金融機構代號","調解申請日","受理調�
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 #RPTFG=2,QUERY.GRID,L8433
@@ -341,10 +341,10 @@ col_captions:["戶號","報送金融機構代號","調解申請日","受理調�
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 #RPTFG=3,QUERY.GRID,L8433
@@ -375,10 +375,10 @@ col_captions:["戶號","報送金融機構代號","調解申請日","受理調�
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 </sub>
 

@@ -169,7 +169,8 @@ public class L8337 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ575, uJcicZ575);
-			iDataLog.exec("L8337異動",uJcicZ575.getSubmitKey()+uJcicZ575.getCustId()+uJcicZ575.getApplyDate()+uJcicZ575.getBankId());
+//			iDataLog.exec("L8337異動",uJcicZ575.getSubmitKey()+uJcicZ575.getCustId()+uJcicZ575.getApplyDate()+uJcicZ575.getBankId());
+			iDataLog.exec("L8337異動",uJcicZ575.getUkey());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -211,7 +212,8 @@ public class L8337 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ5752, uJcicZ5752);
-			iDataLog.exec("L8337異動",uJcicZ5752.getSubmitKey()+uJcicZ5752.getCustId()+uJcicZ5752.getApplyDate()+uJcicZ5752.getBankId());
+//			iDataLog.exec("L8337異動",uJcicZ5752.getSubmitKey()+uJcicZ5752.getCustId()+uJcicZ5752.getApplyDate()+uJcicZ5752.getBankId());
+			iDataLog.exec("L8337異動",uJcicZ5752.getUkey());
 			break;		
 			//修改
 		case "7":	
@@ -245,7 +247,8 @@ public class L8337 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ5753, uJcicZ5753);
-			iDataLog.exec("L8337修改",uJcicZ5753.getSubmitKey()+uJcicZ5753.getCustId()+uJcicZ5753.getApplyDate()+uJcicZ5753.getBankId());	
+//			iDataLog.exec("L8337修改",uJcicZ5753.getSubmitKey()+uJcicZ5753.getCustId()+uJcicZ5753.getApplyDate()+uJcicZ5753.getBankId());
+			iDataLog.exec("L8337修改",uJcicZ5753.getUkey());
 		default:
 			break;
 		}

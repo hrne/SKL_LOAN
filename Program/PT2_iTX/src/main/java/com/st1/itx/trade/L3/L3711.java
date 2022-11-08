@@ -501,9 +501,12 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
+		// 3711 應繳日變更
+		tLoanBorTx.setTxDescCode("3711");
 		tLoanBorTx.setDesc("應繳日變更-不可欠繳");
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setEntryDate(wkTbsDy);
+		tLoanBorTx.setEntryDate(iEntryDate);
+		tLoanBorTx.setAcctCode(tFacMain.getAcctCode());
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
 		tLoanBorTx.setRate(tLoanBorMain.getStoreRate());
 		tLoanBorTx.setIntStartDate(wkIntStartDate);

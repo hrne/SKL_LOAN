@@ -290,7 +290,8 @@ public class L8308 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ047.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ047, uJcicZ047);
-			iDataLog.exec("L8308異動", uJcicZ047.getSubmitKey() + uJcicZ047.getCustId() + uJcicZ047.getRcDate());
+//			iDataLog.exec("L8308異動", uJcicZ047.getSubmitKey() + uJcicZ047.getCustId() + uJcicZ047.getRcDate());
+			iDataLog.exec("L8308異動", uJcicZ047.getUkey());
 			break;
 		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -385,7 +386,8 @@ public class L8308 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0472, uJcicZ0472);
-			iDataLog.exec("L8308刪除", uJcicZ0472.getSubmitKey() + uJcicZ0472.getCustId() + uJcicZ0472.getRcDate());
+//			iDataLog.exec("L8308刪除", uJcicZ0472.getSubmitKey() + uJcicZ0472.getCustId() + uJcicZ0472.getRcDate());
+			iDataLog.exec("L8308刪除", uJcicZ0472.getUkey());
 			break;
 		// 修改
 		case "7":
@@ -439,7 +441,9 @@ public class L8308 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0473, uJcicZ0473);
-			iDataLog.exec("L8308修改", uJcicZ0473.getSubmitKey() + uJcicZ0473.getCustId() + uJcicZ0473.getRcDate());
+//			iDataLog.exec("L8308修改", uJcicZ0473.getSubmitKey() + uJcicZ0473.getCustId() + uJcicZ0473.getRcDate());
+			iDataLog.exec("L8308修改", uJcicZ0473.getUkey());
+			
 		default:
 			break;
 		}

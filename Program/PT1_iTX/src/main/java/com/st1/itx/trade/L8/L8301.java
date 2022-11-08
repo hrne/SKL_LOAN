@@ -228,7 +228,7 @@ public class L8301 extends TradeBuffer {
 			
 			uJcicZ040.setActualFilingDate(0);
 			uJcicZ040.setActualFilingMark("");
-			
+//			uJcicZ040.setJcicReportDate(0);
 			
 			try {
 				sJcicZ040Service.update(uJcicZ040, titaVo);
@@ -244,7 +244,8 @@ public class L8301 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ040.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ040, uJcicZ040);
-			iDataLog.exec("L8301異動", uJcicZ040.getSubmitKey() + uJcicZ040.getCustId() + uJcicZ040.getRcDate());
+//			iDataLog.exec("L8301異動", uJcicZ040.getSubmitKey() + uJcicZ040.getCustId() + uJcicZ040.getRcDate());
+			iDataLog.exec("L8301異動",uJcicZ040.getUkey());
 			break;
 		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -277,7 +278,7 @@ public class L8301 extends TradeBuffer {
 			uJcicZ0402.setNotBankId5(iNotBankId5);
 			uJcicZ0402.setNotBankId6(iNotBankId6);
 			uJcicZ0402.setOutJcicTxtDate(0);
-			
+//			uJcicZ0402.setJcicReportDate(0);
 			Slice<JcicZ040Log> dJcicLogZ040 = null;
 			dJcicLogZ040 = sJcicZ040LogService.ukeyEq(iJcicZ040.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ040 == null || "A".equals(iTranKey) ) {
@@ -300,15 +301,17 @@ public class L8301 extends TradeBuffer {
 				iJcicZ040.setNotBankId6(iJcicZ040Log.getNotBankId6());
 				iJcicZ040.setTranKey(iJcicZ040Log.getTranKey());
 				iJcicZ040.setOutJcicTxtDate(iJcicZ040Log.getOutJcicTxtDate());
+				//iJcicZ040.setSubmitJcicDate(iJcicZ040Log.getSubmitJcicDate());
 				try {
 					sJcicZ040Service.update(iJcicZ040, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-
+			
 			iDataLog.setEnv(titaVo, oldJcicZ0402, uJcicZ0402);
-			iDataLog.exec("L8301刪除", uJcicZ0402.getSubmitKey() + uJcicZ0402.getCustId() + uJcicZ0402.getRcDate());
+//			iDataLog.exec("L8301刪除", uJcicZ0402.getSubmitKey() + uJcicZ0402.getCustId() + uJcicZ0402.getRcDate());
+			iDataLog.exec("L8301刪除", uJcicZ0402.getUkey());
 //			List<Map<String,String>> list2 = sL6932Service.findDataLog(uJcicZ0402.getSubmitKey()+uJcicZ0402.getCustId()+uJcicZ0402.getRcDate(),titaVo);
 //			int number2 =list2.size();
 //			iDataLog.exec("L8301刪除", uJcicZ0402.getSubmitKey()+uJcicZ0402.getCustId()+uJcicZ0402.getRcDate()+number2);
@@ -348,7 +351,7 @@ public class L8301 extends TradeBuffer {
 			uJcicZ0403.setNotBankId5(iNotBankId5);
 			uJcicZ0403.setNotBankId6(iNotBankId6);
 			uJcicZ0403.setOutJcicTxtDate(0);
-			
+//			uJcicZ0403.setJcicReportDate(0);
 			try {
 				sJcicZ040Service.update(uJcicZ0403, titaVo);
 			} catch (DBException e) {
@@ -356,7 +359,8 @@ public class L8301 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0403, uJcicZ0403);
-			iDataLog.exec("L8301修改", uJcicZ0403.getSubmitKey() + uJcicZ0403.getCustId() + uJcicZ0403.getRcDate());
+//			iDataLog.exec("L8301修改", uJcicZ0403.getSubmitKey() + uJcicZ0403.getCustId() + uJcicZ0403.getRcDate());
+			iDataLog.exec("L8301修改", uJcicZ0403.getUkey());
 		default:
 			break;
 		}

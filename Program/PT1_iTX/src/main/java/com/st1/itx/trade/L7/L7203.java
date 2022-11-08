@@ -66,8 +66,6 @@ public class L7203 extends TradeBuffer {
 			throw new LogicException("E0014", ErrorMsg);
 		}
 
-		titaVo.setDataBaseOnMon();
-
 //       使用資料容器內定義的方法切資料
 		Ias39IntMethodFileVo.setValueFromFile(dataLineList);
 

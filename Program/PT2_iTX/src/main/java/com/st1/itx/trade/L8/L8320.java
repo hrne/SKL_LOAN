@@ -340,8 +340,9 @@ public class L8320 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ062, uJcicZ062);
-			iDataLog.exec("L8320異動", uJcicZ062.getSubmitKey() + uJcicZ062.getCustId() + uJcicZ062.getRcDate()
-					+ uJcicZ062.getChangePayDate());
+//			iDataLog.exec("L8320異動", uJcicZ062.getSubmitKey() + uJcicZ062.getCustId() + uJcicZ062.getRcDate()
+//					+ uJcicZ062.getChangePayDate());
+			iDataLog.exec("L8320異動", uJcicZ062.getUkey());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -417,8 +418,9 @@ public class L8320 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0622, uJcicZ0622);
-			iDataLog.exec("L8320刪除", uJcicZ0622.getSubmitKey() + uJcicZ0622.getCustId() + uJcicZ0622.getRcDate()
-					+ uJcicZ0622.getChangePayDate());
+//			iDataLog.exec("L8320刪除", uJcicZ0622.getSubmitKey() + uJcicZ0622.getCustId() + uJcicZ0622.getRcDate()
+//					+ uJcicZ0622.getChangePayDate());
+			iDataLog.exec("L8320刪除", uJcicZ0622.getUkey());
 			break;
 		// 修改
 		case "7":
@@ -469,8 +471,9 @@ public class L8320 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0623, uJcicZ0623);
-			iDataLog.exec("L8320修改", uJcicZ0623.getSubmitKey() + uJcicZ0623.getCustId() + uJcicZ0623.getRcDate()
-					+ uJcicZ0623.getChangePayDate());
+//			iDataLog.exec("L8320修改", uJcicZ0623.getSubmitKey() + uJcicZ0623.getCustId() + uJcicZ0623.getRcDate()
+//					+ uJcicZ0623.getChangePayDate());
+			iDataLog.exec("L8320修改", uJcicZ0623.getUkey());
 		default:
 			break;
 		}

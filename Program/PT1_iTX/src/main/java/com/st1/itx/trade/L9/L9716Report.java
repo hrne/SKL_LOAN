@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9716ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -55,7 +56,7 @@ public class L9716Report extends MakeReport {
 		exportExcel2(titaVo, lL9716_2);
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 
 		return true;
 
@@ -68,7 +69,10 @@ public class L9716Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+
+		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
+				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -102,6 +106,8 @@ public class L9716Report extends MakeReport {
 						}
 						break;
 					}
+
+
 
 				} // for
 
@@ -150,9 +156,11 @@ public class L9716Report extends MakeReport {
 					// breaks if more than 26 columns!
 					tmpValue = tLDVo.get("F" + i);
 
-//					if (tmpValue == "F42") {
-//						break;
-//					}
+					if ("F" + i == "F13") {
+						this.info("L9716.catch3=" + tmpValue);
+						makeExcel.setValue(row, col, tmpValue, "L");
+						break;
+					}
 
 					switch (String.valueOf((char) (65 + i))) {
 					// if specific column needs special treatment, insert case here.
@@ -160,7 +168,7 @@ public class L9716Report extends MakeReport {
 						try {
 							makeExcel.setValue(row, col, new BigDecimal(tmpValue), "L");
 						} catch (Exception e) {
-							this.info("L9716.catch2" + tmpValue);
+							this.info("L9716.catch2=" + tmpValue);
 							makeExcel.setValue(row, col, tmpValue, "L");
 						}
 						break;
@@ -177,7 +185,7 @@ public class L9716Report extends MakeReport {
 
 			makeExcel.formulaCaculate(1, 6);
 			makeExcel.formulaCaculate(1, 9);
-			makeExcel.formulaCaculate(1, 38);
+			makeExcel.formulaCaculate(1, 39);
 		} else {
 			makeExcel.setValue(pivotRow, pivotCol, "本月無資料");
 		}

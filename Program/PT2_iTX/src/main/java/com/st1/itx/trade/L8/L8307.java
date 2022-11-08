@@ -79,7 +79,8 @@ public class L8307 extends TradeBuffer {
 		String iCloseCode = titaVo.getParam("CloseCode").trim();
 		String iBreakCode = titaVo.getParam("BreakCode").trim();
 		String iKey = "";
-
+		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+		this.info("iJcicDate   = " + iJcicDate);
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
@@ -126,6 +127,7 @@ public class L8307 extends TradeBuffer {
 				} // 1.5 end
 
 				// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
+				this.info(" iCloseCode     = " + iCloseCode);
 				if ("00".equals(iCloseCode)) {
 					Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 							Integer.MAX_VALUE, titaVo);
@@ -138,11 +140,15 @@ public class L8307 extends TradeBuffer {
 						}
 						// 日期格式不一致， xJcicZ051.getDelayYM()是YYYMM，日期設31-->不合理，但不影響檢核
 						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
-						if (txDate <= formateDelayYM) {
+						this.info("formateDelayYM    = " + formateDelayYM);
+						this.info("txDate            = " + txDate);
+						int txDelay = formateDelayYM-19110000;
+						this.info("txDelay           = " + txDelay);
+						if (txDate <= txDelay) {
 							if ("A".equals(iTranKey)) {
-								throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+								throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + txDelay + "前)不可報送'00'毀諾.");
 							} else {
-								throw new LogicException("E0007", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+								throw new LogicException("E0007", "於(51)延期繳款(喘息期)期間(" + txDelay + "前)不可報送'00'毀諾.");
 							}
 						}
 					}
@@ -216,8 +222,9 @@ public class L8307 extends TradeBuffer {
 			this.info("進入6932 ================ L8301");
 			this.info("UKey    ===== " + uJcicZ046.getUkey());
 			iDataLog.setEnv(titaVo, oldJcicZ046, uJcicZ046);
-			iDataLog.exec("L8307異動", uJcicZ046.getSubmitKey() + uJcicZ046.getCustId() + uJcicZ046.getRcDate()
-					+ uJcicZ046.getCloseDate());
+//			iDataLog.exec("L8307異動", uJcicZ046.getSubmitKey() + uJcicZ046.getCustId() + uJcicZ046.getRcDate()
+//					+ uJcicZ046.getCloseDate());
+			iDataLog.exec("L8307異動",uJcicZ046.getUkey());
 			break;
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
@@ -261,8 +268,9 @@ public class L8307 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0462, uJcicZ0462);
-			iDataLog.exec("L8307刪除", uJcicZ0462.getSubmitKey() + uJcicZ0462.getCustId() + uJcicZ0462.getRcDate()
-					+ uJcicZ0462.getCloseDate());
+//			iDataLog.exec("L8307刪除", uJcicZ0462.getSubmitKey() + uJcicZ0462.getCustId() + uJcicZ0462.getRcDate()
+//					+ uJcicZ0462.getCloseDate());
+			iDataLog.exec("L8307刪除", uJcicZ0462.getUkey());
 			break;
 		// 修改
 		case "7":
@@ -294,8 +302,9 @@ public class L8307 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0463, uJcicZ0463);
-			iDataLog.exec("L8307修改", uJcicZ0463.getSubmitKey() + uJcicZ0463.getCustId() + uJcicZ0463.getRcDate()
-					+ uJcicZ0463.getCloseDate());
+//			iDataLog.exec("L8307修改", uJcicZ0463.getSubmitKey() + uJcicZ0463.getCustId() + uJcicZ0463.getRcDate()
+//					+ uJcicZ0463.getCloseDate());
+			iDataLog.exec("L8307修改",uJcicZ0463.getUkey());
 		default:
 			break;
 		}

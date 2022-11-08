@@ -260,10 +260,10 @@ col_captions:["戶號","報送金融機構代號","協商申請日","申請變�
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 #RPTFG=1,QUERY.GRID,L8422
@@ -292,10 +292,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 
@@ -325,10 +325,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 #RPTFG=3,QUERY.GRID,L8422
@@ -357,10 +357,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 </sub>

@@ -187,7 +187,9 @@ public class L8310 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ049, uJcicZ049);
-			iDataLog.exec("L8310異動", uJcicZ049.getSubmitKey() + uJcicZ049.getCustId() + uJcicZ049.getRcDate());
+//			iDataLog.exec("L8310異動", uJcicZ049.getSubmitKey() + uJcicZ049.getCustId() + uJcicZ049.getRcDate());
+			iDataLog.exec("L8310異動", uJcicZ049.getUkey());
+			
 			break;
 		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -282,7 +284,8 @@ public class L8310 extends TradeBuffer {
 			}
 
 			iDataLog.setEnv(titaVo, oldJcicZ0493, uJcicZ0493);
-			iDataLog.exec("L8310修改", uJcicZ0493.getSubmitKey() + uJcicZ0493.getCustId() + uJcicZ0493.getRcDate());
+//			iDataLog.exec("L8310修改", uJcicZ0493.getSubmitKey() + uJcicZ0493.getCustId() + uJcicZ0493.getRcDate());
+			iDataLog.exec("L8310修改", uJcicZ0493.getUkey());
 		default:
 			break;
 		}

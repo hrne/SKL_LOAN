@@ -196,8 +196,9 @@ public class L8304 extends TradeBuffer {
 			this.info("UKey    ===== " + uJcicZ043.getUkey());
 
 			iDataLog.setEnv(titaVo, oldJcicZ043, uJcicZ043);
-			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey() + uJcicZ043.getCustId() + uJcicZ043.getRcDate()
-					+ uJcicZ043.getMaxMainCode() + uJcicZ043.getAccount());
+//			iDataLog.exec("L8304異動", uJcicZ043.getSubmitKey() + uJcicZ043.getCustId() + uJcicZ043.getRcDate()
+//					+ uJcicZ043.getMaxMainCode() + uJcicZ043.getAccount());
+			iDataLog.exec("L8304異動", uJcicZ043.getUkey());
 			break;
 		// 2022/7/14 新增刪除必須也要在記錄檔l6932裡面
 		case "4": // 需刷主管卡
@@ -258,8 +259,9 @@ public class L8304 extends TradeBuffer {
 				}
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0432, uJcicZ0432);
-			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey() + uJcicZ0432.getCustId() + uJcicZ0432.getRcDate()
-					+ uJcicZ0432.getMaxMainCode() + uJcicZ0432.getAccount());
+//			iDataLog.exec("L8304刪除", uJcicZ0432.getSubmitKey() + uJcicZ0432.getCustId() + uJcicZ0432.getRcDate()
+//					+ uJcicZ0432.getMaxMainCode() + uJcicZ0432.getAccount());
+			iDataLog.exec("L8304刪除", uJcicZ0432.getUkey());
 			break;
 		// 修改
 		case "7":
@@ -298,8 +300,9 @@ public class L8304 extends TradeBuffer {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ0433, uJcicZ0433);
-			iDataLog.exec("L8304修改", uJcicZ0433.getSubmitKey() + uJcicZ0433.getCustId() + uJcicZ0433.getRcDate()
-					+ uJcicZ0433.getMaxMainCode() + uJcicZ0433.getAccount());
+//			iDataLog.exec("L8304修改", uJcicZ0433.getSubmitKey() + uJcicZ0433.getCustId() + uJcicZ0433.getRcDate()
+//					+ uJcicZ0433.getMaxMainCode() + uJcicZ0433.getAccount());
+			iDataLog.exec("L8304修改", uJcicZ0433.getUkey());
 		default:
 			break;
 		}

@@ -344,12 +344,12 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; ntxbuf=#OOBUF4})
 IF(#OOStatusFg==0,BIND(grid,cancel),$)
 IF(#OODeleteFg==0,BIND(grid,cancel),$)
 
-#OOBUF6=X,50,S
-T(2,#OOChainTxCd+#OOUkey)
+!#OOBUF6=X,50,S
+!T(2,#OOChainTxCd+#OOUkey)
 
-#OOBTN6=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=#OOHistoryTxCd; ntxbuf=#OOBUF6})
-IF(#OOHistoryFg==0,BIND(grid,cancel),$)
+!#OOBTN6=X,1,S
+!BIND(grid,{ cmd=CHAIN; ntxcd=#OOHistoryTxCd; ntxbuf=#OOBUF6})
+!IF(#OOHistoryFg==0,BIND(grid,cancel),$)
 
 #OOBUF7=X,50,S
 T(2,7+ +#OOUkey)
@@ -366,6 +366,15 @@ IF(#OODeleteFg==0,BIND(grid,cancel),$)
 #7sp=X,7,S
 #5sp=X,5,S
 #3sp=X,3,S
+
+#OOBUF6=X,121,S
+T(2,0010101+9991231+#5sp+#18sp+#7sp+#3sp+#3sp+#20sp+#5sp+#7sp+#7sp+#OOUkey)
+
+
+#OOBTN6=X,1,S
+BIND(grid,{cmd=CHAIN; ntxcd=L6932;text=查詢; ntxbuf=#OOBUF6})
+IF(#OOHistoryFg==0,BIND(grid,cancel),$)
+
 
 !查詢L6932(L)
 #OOMrKey=X,50,S

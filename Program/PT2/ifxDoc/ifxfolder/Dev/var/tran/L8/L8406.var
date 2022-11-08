@@ -145,6 +145,7 @@ T(3,1)ASGN(LOOP$)
 #OOChainTxCd=X,7,O
 #OOHistoryTxCd=X,7,O
 #OOSubmitKey=X,3,O
+#OOSubmitKeyX=X,50,O
 #OORcDate=D,7,O
 #OOTranKey=X,1,O
 #OOActualFilingDate=D,7,O
@@ -176,7 +177,8 @@ T(2,#OOActualFilingMark)
 #secret-no=x,1000,S
 T(6A,#OOSubmitKey+#ReportDate+#SubmitType+#TranCode+#ReportTime+#RcDate+#ActualFilingMark+#ActualFilingDate+#CustId+#MaxMainCode+#Account)
 
-
+#SubmitKeyX2=X,50,O
+T(2,#OOSubmitKey+#OOSubmitKeyX)
 
 #batch-detail=x,100000,S
 #batch-print=A,1,S
@@ -215,6 +217,7 @@ TXFORM=L8406
 #OOHistoryTxCd
 #OOCustId
 #OOSubmitKey
+#OOSubmitKeyX
 #OORcDate
 #OOTranKey
 #OOActualFilingDate
@@ -247,7 +250,7 @@ ifxBatch:{
 	txtno:'#secret-no',
 	pfnx:"L8406.PFNX",
 	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","帳號","處理結果"],
-	col_names:["#OOCustId","#OOSubmitKey","#OORcDate","#OOMaxMainCode","#OOAccount","#batch-row-status"]
+	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCode","#OOAccount","#batch-row-status"]
 	}
 }
 
@@ -256,7 +259,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -266,10 +269,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 ^
 
 #RPTFG=1,QUERY.GRID,L8406
@@ -281,7 +284,7 @@ ifxBatch:{
 	txtno:'#secret-no',
 	pfnx:"L8406.PFNX",
 	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","帳號","處理結果"],
-	col_names:["#OOCustId","#OOSubmitKey","#OOMaxMainCode","#OOAccount","#OORcDate","#batch-row-status"]
+	col_names:["#OOCustId","#SubmitKeyX2","#OOMaxMainCode","#OOAccount","#OORcDate","#batch-row-status"]
 	}
 }
 
@@ -290,7 +293,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -300,10 +303,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 
 ^
 
@@ -316,7 +319,7 @@ ifxBatch:{
 	txtno:'#secret-no',
 	pfnx:"L8406.PFNX",
 	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","帳號","處理結果"],
-	col_names:["#OOCustId","#OOSubmitKey","#OOMaxMainCode","#OOAccount","#OORcDate","#batch-row-status"]
+	col_names:["#OOCustId","#SubmitKeyX2","#OOMaxMainCode","#OOAccount","#OORcDate","#batch-row-status"]
 	}
 }
 
@@ -325,7 +328,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -335,10 +338,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 
 ^
 
@@ -351,7 +354,7 @@ ifxBatch:{
 	txtno:'#secret-no',
 	pfnx:"L8406.PFNX",
 	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","帳號","處理結果"],
-	col_names:["#OOCustId","#OOSubmitKey","#OOMaxMainCode","#OOAccount","#OORcDate","#batch-row-status"]
+	col_names:["#OOCustId","#SubmitKeyX2","#OOMaxMainCode","#OOAccount","#OORcDate","#batch-row-status"]
 	}
 }
 
@@ -360,7 +363,7 @@ ifxBatch:{
 
 #OOCustId=戶號
 {width:100,align:'center'}
-#OOSubmitKey=報送金融機構代號
+#SubmitKeyX2=報送金融機構代號
 {width:100,align:'center'}
 #OORcDate=協商申請日
 {width:100,align:'center'}
@@ -370,10 +373,10 @@ ifxBatch:{
 {width:100,align:'center'}
 #OOTranKey=交易代碼
 {width:100,align:'center'}
-#OOActualFilingDate=實際報送日
-{width:100,align:'center'}
-#OOActualFilingMark=實際報送記號
-{width:100,align:'center'}
+!#OOActualFilingDate=實際報送日
+!{width:100,align:'center'}
+!#OOActualFilingMark=實際報送記號
+!{width:100,align:'center'}
 
 ^
 </sub>
