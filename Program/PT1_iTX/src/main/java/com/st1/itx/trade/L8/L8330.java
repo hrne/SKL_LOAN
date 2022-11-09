@@ -185,7 +185,7 @@ public class L8330 extends TradeBuffer {
 			// 檢核是否重複，並寫入JcicZ451
 			chJcicZ451 = sJcicZ451Service.findById(iJcicZ451Id, titaVo);
 			if (chJcicZ451 != null) {
-				throw new LogicException("E0005", "已有相同資料存在");
+				throw new LogicException("E0002", "已有相同資料存在");
 			}
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			iJcicZ451.setJcicZ451Id(iJcicZ451Id);

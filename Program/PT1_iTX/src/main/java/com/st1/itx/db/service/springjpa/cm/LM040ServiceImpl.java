@@ -60,7 +60,7 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                        AND F.\"FacmNo\" = M.\"FacmNo\"";
 		sql += " WHERE M.\"YearMonth\" = :entryMonth";
-//		sql += "   AND M.\"Status\" = 0";
+		sql += "   AND M.\"Status\" = 0";
 		sql += "   AND M.\"PrinBalance\" > 0";
 		sql += "   AND F.\"FirstDrawdownDate\" <= :inputDate";
 		sql += " GROUP BY DECODE(M.\"EntCode\", 1, 1, 0)";

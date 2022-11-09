@@ -14,7 +14,7 @@ BEGIN
      --------------------------------------------------------
      -- 2022-7-12 Wei from Linda
      -- 上述發生日期時之法拍及火險費用(台幣),要照餘額分攤=
-     -- 法拍: OpenAcDate起帳日期<=發生日 
+     -- 法拍: OpenAcDate起帳日期<=發生日 ,2022/11/4 比照AS400,調整為只看此行條件,費用加總(加借減貸)
      --       ,Fee費用金額>0
      --       ,CloseDate銷號日期=0 或 >發生日(發生日當時未銷)
      --       ,費用累加
@@ -29,14 +29,15 @@ BEGIN
           WHERE FF."CustNo" = "InputCustNo"
             -- OpenAcDate起帳日期<=發生日 
             AND FF."OpenAcDate" <= "InputDerogationDate"
+--2022/11/4比照AS400,以下條件點掉
             -- CloseDate銷號日期=0 或 >發生日(發生日當時未銷)
-            AND CASE
-                  WHEN FF."CloseDate" = 0
-                  THEN 1
-                  WHEN FF."CloseDate" > "InputDerogationDate"
-                  THEN 1
-                ELSE 0 END = 1
-            AND FF."Fee" > 0
+--            AND CASE
+--                  WHEN FF."CloseDate" = 0
+--                  THEN 1
+--                  WHEN FF."CloseDate" > "InputDerogationDate"
+--                  THEN 1
+--                ELSE 0 END = 1
+--            AND FF."Fee" > 0
           ;
 
           IF haveUnpaidForeclosureFee = 0 THEN
@@ -51,14 +52,15 @@ BEGIN
           WHERE FF."CustNo" = "InputCustNo"
             -- OpenAcDate起帳日期<=發生日 
             AND FF."OpenAcDate" <= "InputDerogationDate"
+--2022/11/4比照AS400,以下條件點掉
             -- CloseDate銷號日期=0 或 >發生日(發生日當時未銷)
-            AND CASE
-                  WHEN FF."CloseDate" = 0
-                  THEN 1
-                  WHEN FF."CloseDate" > "InputDerogationDate"
-                  THEN 1
-                ELSE 0 END = 1
-            AND FF."Fee" > 0
+--            AND CASE
+--                  WHEN FF."CloseDate" = 0
+--                  THEN 1
+--                  WHEN FF."CloseDate" > "InputDerogationDate"
+--                  THEN 1
+--                ELSE 0 END = 1
+--            AND FF."Fee" > 0
           GROUP BY FF."CustNo"
      )
      , loanBalData AS (

@@ -78,21 +78,9 @@ BEGIN
       LEFT JOIN "Work_B080" WK ON WK."DataYM" =  YYYYMM
                               AND M."CustNo"  =  WK."CustNo"
                               AND M."FacmNo"  =  WK."FacmNo"
-    WHERE  M."Status" IN (99)
+    WHERE  TRUNC(M."DrawdownDate" / 100) >  YYYYMM    -- 撥款日大於本月
       AND  WK."CustNo" IS NULL
     GROUP BY M."CustNo", M."FacmNo"
---    UNION  --改由201加入仍有效之資料
---    -- 寫入資料 Work_B080    -- 循環動用 且 未至循環動用期限 且 放款餘額為0 且 尚有可動用額度餘額（未申報 B201 ）
---    SELECT YYYYMM                                AS "DataYM"
---         , M."CustNo"                            AS "CustNo"            -- 戶號
---         , M."FacmNo"                            AS "FacmNo"            -- 額度編號
---         , LPAD(M."CustNo", 7, '0') || LPAD(M."FacmNo", 3, '0')
---                                                 AS "B201FacmNo"        -- B201 上階額度
---    FROM   "FacMain" M
---    WHERE M."RecycleCode" = 1 -- 循環動用
---      AND M."RecycleDeadline" >= TBSDYF -- 未至循環動用期限
---      AND M."UtilAmt" = 0 -- 放款餘額為0 
---      AND M."LineAmt" - M."UtilBal" > 0 -- 尚有可動用額度餘額
     )
 
     SELECT
@@ -111,13 +99,6 @@ BEGIN
                 ELSE TRUNC( NVL( F."LineAmt",0) / 1000, 0)
            END                                   AS "DrawdownAmt"       -- 本階訂約金額(台幣)  -- (ref:LN15E1 (#M3601 80 8))
          , 0                                     AS "DrawdownAmtFx"     -- 本階訂約金額(外幣)
---         , CASE
---             WHEN NVL(F."GuaranteeDate",0) = 0 THEN
---                CASE WHEN NVL("FacCaseAppl"."ApproveDate",0) = 0 THEN 0
---                     ELSE TRUNC("FacCaseAppl"."ApproveDate" / 100) - 191100
---                END
---             ELSE TRUNC(F."GuaranteeDate" / 100) - 191100
---           END                                   AS "DrawdownDate"      -- 本階額度開始年月
          , TRUNC(F."SettingDate" / 100) - 191100 AS "DrawdownDate"      -- 本階額度開始年月
          , CASE
              WHEN NVL(F."MaturityDate",0) = 0 THEN 0

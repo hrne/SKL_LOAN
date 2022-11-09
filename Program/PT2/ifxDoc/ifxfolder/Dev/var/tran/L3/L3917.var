@@ -245,7 +245,7 @@ T(3,[L3917] 繳息情形)
 #OIntStartDate=D,7,L
 #OIntEndDate=D,7,L
 #OTellerNo=X,6,L
-#OTellerName=x,100,L
+#OTellerName=x,40,L
 #OTxtNo=X,8,L
 
 #OTxAmt=+m,14.2,S
@@ -374,13 +374,11 @@ TXFORM=L3917
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
-<sub type="PART" name="L3917" layout="cols=2;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
+<sub type="PART" name="L3917" layout="cols=2;screen.width=[150,350,150,400];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3917]                                 繳息明細查詢"],
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@",#OCustName],
-["@會計日期",#OAcDate],["@入帳日期",#OEntryDate],
-[#<->#,"@櫃員編號",#OTellerNo,#OTellerName],
-[#<->#,"@交易序號",#OTxtNo],
+[#<->#,"@入帳日期",#OEntryDate],
 ["@幣別",#OCurrencyCode],["@交易金額",#OTxAmtX],
 ["@回收金額",#ORepayAmtX],["@暫收金額",#OTempAmtX],
 ["@計息起日",#OIntStartDate],["@暫收抵繳",#OTempRepayX],
@@ -392,6 +390,8 @@ TXFORM=L3917
 ["@違約金",#OBreachAmtX],["@清償違約金",#OCloseBreachAmtX],
 ["@溢收金額",#OOverflowX],
 ["@短收金額",#OShortFallX],
+["@會計日期",#OAcDate],["@櫃員編號",#OTellerNo,#OTellerName],
+["@",""],["@交易序號",#OTxtNo],
 ]
 </sub>
 

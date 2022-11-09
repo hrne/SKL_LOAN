@@ -273,11 +273,20 @@ IF(#OODbCr=="D",T(3,借),T(3,貸))
 
 ! 交易金額
 #OOTxAmt=+m,14.2,S
+T(3,@OODbAmt1,)
+T(3,@OOCrAmt1,)
+IF(#OODbCr=="D",E(0,@OODbAmt1,#OOTxAmt),E(0,@OOCrAmt1,#OOTxAmt))
 #OOTxAmt1=+m,14,S
 E(0,#OOTxAmt)
 #OOTxAmtX=X,17,S
 IF(#OOTxAmt1==0,S,$)
 X(#OOTxAmt1)
+!借方金額
+#OODbAmt1=X,17,S
+X(#OODbAmt1)
+!貸方金額
+#OOCrAmt1=X,17,S
+X(#OOCrAmt1)
 
 ! 餘額
 #OOTdBal=+m,14.2,S
@@ -294,6 +303,9 @@ X(#OOTdBal1)
 #OOLastUpdate=x,20,S
 
 #OOLastEmp=x,47,S
+
+! 戶號
+#OOCustNo=X,15,S
 
 </sub>
 
@@ -322,7 +334,6 @@ TXFORM=L6903
 #OODbAmt
 #OOCrAmt
 #OOAcDate
-
 #OORelDy#OORelTxseq
 #OOTitaTxCd
 #OOTranItem
@@ -332,6 +343,7 @@ TXFORM=L6903
 #OOSlipNote
 #OOLastUpdate
 #OOLastEmp
+#OOCustNo
 ^
 </sub>
 
@@ -354,23 +366,26 @@ TXFORM=L6903
 #OOAcDate=會計日期
 {width:80,align:'center'}
 
-#OORelTxseqX=登放日期、序號
-{width:200,align:'center'}
+#OOCustNo=戶號
+{width:130,align:'left'}
 
 #OOTitaTxCdX=交易代號
-{width:150,align:'center'}
+{width:130,align:'left'}
 
-#OODbCrX=借貸
-{width:40,align:'center'}
-
-#OOTxAmtX=交易金額
+#OODbAmt1=借方金額
 {width:120,align:'right'}
 
-#OOTdBalX=餘額
+#OOCrAmt1=貸方金額
 {width:120,align:'right'}
+
+!#OOTdBalX=餘額
+!{width:120,align:'right'}
 
 #OOSlipNote=摘要
-{width:500,align:'left'}
+{width:200,align:'left'}
+
+#OORelTxseqX=登放日期、序號
+{width:200,align:'center'}
 
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}

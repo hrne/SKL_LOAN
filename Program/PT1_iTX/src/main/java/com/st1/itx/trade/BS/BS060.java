@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS060 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS060.class);
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -88,7 +87,7 @@ public class BS060 extends TradeBuffer {
 		int cntTrans = 0;
 
 		ArrayList<BaTxVo> lBaTxVo = new ArrayList<BaTxVo>();
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, entryDate + 19110000, 0, this.index, Integer.MAX_VALUE);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, entryDate + 19110000, 0, this.index, Integer.MAX_VALUE, titaVo);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 
 		this.batchTransaction.commit();
@@ -128,7 +127,7 @@ public class BS060 extends TradeBuffer {
 
 		int yearMonth = (entryDate / 100) + 191100;
 
-		CdCashFlow tCdCashFlow = cdCashFlowService.holdById(yearMonth);
+		CdCashFlow tCdCashFlow = cdCashFlowService.holdById(yearMonth, titaVo);
 		if (tCdCashFlow == null) {
 			tCdCashFlow = new CdCashFlow();
 			tCdCashFlow.setDataYearMonth(yearMonth);
@@ -136,7 +135,7 @@ public class BS060 extends TradeBuffer {
 			tCdCashFlow.setPrincipalAmortizeAmt(principalAmortizeAmt); // 本金攤還金額
 			tCdCashFlow.setDuePaymentAmt(duePaymentAmt); // 到期清償金額
 			try {
-				cdCashFlowService.insert(tCdCashFlow);
+				cdCashFlowService.insert(tCdCashFlow, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "CdCashFlow insert " + e.getErrorMsg());
 			}
@@ -145,7 +144,7 @@ public class BS060 extends TradeBuffer {
 			tCdCashFlow.setPrincipalAmortizeAmt(principalAmortizeAmt); // 本金攤還金額
 			tCdCashFlow.setDuePaymentAmt(duePaymentAmt); // 到期清償金額
 			try {
-				cdCashFlowService.update(tCdCashFlow);
+				cdCashFlowService.update(tCdCashFlow, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "CdCashFlow update " + e.getErrorMsg());
 			}

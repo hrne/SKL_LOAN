@@ -18,6 +18,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -1107,7 +1109,30 @@ public class MakeExcel extends CommBuffer {
 		}
 		setValueToMap(row, 0, col, 0, val);
 	}
+	
+	CellStyle errorColumnStyle = null;
 
+	public void setErrorColumn(int row, int col) throws LogicException {
+		if (this.openedSheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) openedSheet is null");
+		}
+
+		Row prow = this.openedSheet.getRow(row - 1);
+
+		if (errorColumnStyle == null) {
+			errorColumnStyle = this.openedWorkbook.createCellStyle();
+			errorColumnStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+			errorColumnStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		}
+
+		if (prow != null) {
+			Cell tmpCell = prow.getCell(col - 1);
+			tmpCell.setCellStyle(errorColumnStyle);
+		} else {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) setErrorColumn error = " + row + "/" + col);
+		}
+	}
+	
 	// 2022.3.25 by eric for 配合openExcel變更EXCEL檔
 	public void setValueInt(int row, int col, int val) throws LogicException {
 		if (this.openedSheet == null) {

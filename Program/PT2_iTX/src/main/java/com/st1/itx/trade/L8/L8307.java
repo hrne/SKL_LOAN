@@ -116,12 +116,13 @@ public class L8307 extends TradeBuffer {
 				if (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals)) {
 					iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
 					if (iJcicZ047 != null && !"D".equals(iJcicZ047.getTranKey())) {
-						if (iJcicZ047.getSignDate() > 0 && iJcicZ047.getSignDate() <= txDate) {
-							if ("A".equals(iTranKey)) {
+//						if (iJcicZ047.getSignDate() > 0 && iJcicZ047.getSignDate() <= txDate) {
+							if (iJcicZ047.getSignDate() > 0) {
+//							if ("A".equals(iTranKey)) {
 								throw new LogicException("E0005", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
-							} else {
-								throw new LogicException("E0007", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
-							}
+//							} else {
+//								throw new LogicException("E0007", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
+//							}
 						}
 					}
 				} // 1.5 end
@@ -152,7 +153,7 @@ public class L8307 extends TradeBuffer {
 							}
 						}
 					}
-				} // 1.6 end
+				}// 1.6 end
 			}
 
 			// 1.7

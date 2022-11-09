@@ -32,7 +32,9 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 查詢資料
 	 * 
 	 * @param titaVo
-	 * @param iYearMonth 西元年月底日
+	 * @param iYearMonth 西元年月
+	 * @throws Exception
+	 * @return 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int iYearMonth) throws Exception {
@@ -40,28 +42,30 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 年
 		int iYear = iYearMonth / 100;
 
+		// 月
+		int iMonth = iYearMonth % 100;
+		int ilYearMonth = 0;
+		if (iMonth == 1) {
+			ilYearMonth = (iYear - 1) * 100 + 12;
+		} else {
+			ilYearMonth = iYearMonth - 1;
+		}
+
 		this.info("lM058.findAll YYMM=" + iYearMonth);
 		String sql = " ";
 		sql += "	 WITH \"allMonthMaxLoan\" AS ("; // -- 整年度最高月份金額
-		sql += "	 	SELECT M.\"CustNo\" AS \"CustNo\"";
-		sql += "	 		  ,MAX(\"MaxLoanBalance\") AS \"MaxLoanBal\"";
-		sql += "	 	FROM(";
 		sql += "	 		SELECT \"CustNo\"";
-		sql += "	 			  ,\"YearMonth\"";
-		sql += "	 			  ,SUM(\"LoanBalance\") AS \"MaxLoanBalance\"";
-		sql += "	 		FROM \"MonthlyLoanBal\"";
-		sql += "	 		WHERE TRUNC(\"YearMonth\" / 100 ) = :year";
+		sql += "	 			  ,SUM(\"LoanBalance\") AS \"TotalLoanBal\"";
+		sql += "	 		FROM \"DailyLoanBal\"";
+		sql += "	 		WHERE TRUNC(\"DataDate\" / 100 ) = :lyymm";
 		sql += "	 		  AND \"LoanBalance\" > 0 ";
 		sql += "	 		GROUP BY \"CustNo\"";
-		sql += "	 				,\"YearMonth\"";
-		sql += "	 	)M";
-		sql += "	 	GROUP BY M.\"CustNo\"";
 		sql += "	 ),\"mainData\" AS (";
 		sql += "	 	SELECT * FROM (";
-		sql += "	 		SELECT \"CustNo\" AS \"CustNo\"";
-		sql += "	 	  		  ,SUM(\"LoanBalance\") AS \"TotalLoanBal\"";
-		sql += "	 		FROM \"MonthlyLoanBal\"";
-		sql += "	 		WHERE \"YearMonth\" = :yymm ";
+		sql += "	 		SELECT \"CustNo\"";
+		sql += "	 			  ,SUM(\"LoanBalance\") AS \"TotalLoanBal\"";
+		sql += "	 		FROM \"DailyLoanBal\"";
+		sql += "	 		WHERE TRUNC(\"DataDate\" / 100 ) = :yymm";
 		sql += "	 		  AND \"LoanBalance\" > 0 ";
 		sql += "	 		GROUP BY \"CustNo\"";
 		sql += "	 		ORDER BY SUM(\"LoanBalance\") DESC";
@@ -78,9 +82,16 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,'2' AS F4";
 		sql += "			,'新光人壽' AS F5";
 		sql += "			,'2' AS F6";
-		sql += "			,M2.\"MaxLoanBal\" AS F7";
+		sql += "			,CASE ";
+		sql += "			   WHEN M2.\"TotalLoanBal\" IS NULL THEN M.\"TotalLoanBal\" ";
+		sql += "			   WHEN M.\"TotalLoanBal\" >= M2.\"TotalLoanBal\" THEN M.\"TotalLoanBal\" ";
+		sql += "			 ELSE M2.\"TotalLoanBal\" END AS F7";
 		sql += "			,M.\"TotalLoanBal\" AS F8";
-		sql += "			,M.\"TotalLoanBal\" - M2.\"MaxLoanBal\" AS F9";
+		sql += "			,M.\"TotalLoanBal\" - ";
+		sql += "			 CASE ";
+		sql += "			   WHEN M2.\"TotalLoanBal\" IS NULL THEN M.\"TotalLoanBal\" ";
+		sql += "			   WHEN M.\"TotalLoanBal\" >= M2.\"TotalLoanBal\" THEN M.\"TotalLoanBal\" ";
+		sql += "			 ELSE M2.\"TotalLoanBal\" END AS F9";
 		sql += "			,M.\"TotalLoanBal\" AS F10";
 		sql += "			,ROW_NUMBER () OVER (ORDER BY M.\"TotalLoanBal\" DESC) AS F11";
 		sql += "	  FROM \"mainData\" M ";
@@ -159,7 +170,7 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("year", iYear);
+		query.setParameter("lyymm", ilYearMonth);
 		query.setParameter("yymm", iYearMonth);
 
 		return this.convertToMap(query);

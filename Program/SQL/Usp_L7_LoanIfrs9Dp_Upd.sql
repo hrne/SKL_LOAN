@@ -2,7 +2,7 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L7_LoanIfrs9Dp_Upd"
 (
 -- 程式功能：維護 LoanIfrs9Dp 每月IFRS9欄位清單D檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L7_LoanIfrs9Dp_Upd"(20211230,'System',1);
+-- 執行方式：EXEC "Usp_L7_LoanIfrs9Dp_Upd"(20211230,'999999',1);
 --
 
     -- 參數
@@ -62,20 +62,20 @@ BEGIN
          , W."BormNo"                           AS "BormNo"             -- 撥款序號
          , W."DataFg"                           AS "DataFg"             -- 資料類別
          , W."FinishedDate"                     AS "FinishedDate"       -- 拍定完成日
-    FROM ( -- 比照 Ias23DP 篩選[法拍完成資料檔(ForeclosureFinished)]
-           SELECT FF."CustNo"                   AS "CustNo"
-                , FF."FacmNo"                   AS "FacmNo"
-                , M."BormNo"                    AS "BormNo"
+    FROM ( -- 取Ias34Dp 已完成撈取該月法拍戶資料from[法拍完成資料檔(ForeclosureFinished)]
+           SELECT IA."CustNo"                   AS "CustNo"
+                , IA."FacmNo"                   AS "FacmNo"
+                , IA."BormNo"                   AS "BormNo"
                 , 1                             AS "DataFg"
                 , NVL(FF."FinishedDate",0)      AS "FinishedDate"
-           FROM   "ForeclosureFinished" FF
-             LEFT JOIN "JcicMonthlyLoanData" M  ON M."DataYM"    = YYYYMM
-                                               AND M."CustNo"    = FF."CustNo"
-                                               AND M."FacmNo"    = FF."FacmNo"
-           WHERE  TRUNC(NVL(FF."FinishedDate",0) / 100) <= YYYYMM        -- 法拍完成日 <= 會計日
-             AND  TRUNC(NVL(FF."FinishedDate",0) / 100) >  Last2YearsYM  -- 法拍完成日 >  會計2年前月底日
-             --AND  M."Status" IN (2, 7)    -- 2: 催收戶 7: 部分轉呆戶
-             AND  M."Status" IN (5 , 6)     -- 5: 催收結案戶 6:呆帳戶
+           FROM   "Ias34Dp"  IA
+           LEFT JOIN "ForeclosureFinished" FF ON IA."CustNo" = FF."CustNo"
+                                             AND IA."FacmNo" = FF."FacmNo"
+                                             AND IA."DataYM" = YYYYMM
+           WHERE  IA."DataYM" = YYYYMM 
+           --  AND  TRUNC(NVL(FF."FinishedDate",0) / 100) <= YYYYMM        -- 法拍完成日 <= 會計日
+           --  AND  TRUNC(NVL(FF."FinishedDate",0) / 100) >  Last2YearsYM  -- 法拍完成日 >  會計2年前月底日
+           --  AND  M."Status" IN (2 ,5 ,6 ,7 ,8 ,9 )  --2:催收戶 5:催收結案戶 6:呆帳戶 7: 部分轉呆戶 8:債權轉讓戶 9:呆帳結案戶
            -- 逾期 90 天
            UNION
            SELECT M."CustNo"                    AS "CustNo"
@@ -87,8 +87,6 @@ BEGIN
              LEFT JOIN "ForeclosureFinished" FF  ON FF."CustNo"    = M."CustNo"
                                                 AND FF."FacmNo"    = M."FacmNo"
            WHERE  M."DataYM"    = YYYYMM
-             --AND  FF."FacmNo" IS NULL
-             --AND  M."Status" IN (0, 2, 4, 6, 7)
              AND M."Status" IN (0)
              AND CASE
                    WHEN M."MaturityDate" < M."NextPayIntDate"  -- 已到期
@@ -160,10 +158,11 @@ BEGIN
            , SUM("TotInsuPrem") AS "Fee"
       FROM "InsuRenew"
       WHERE "TotInsuPrem" > 0
+        AND "RenewCode" = 2 
+        AND "InsuYearMonth" <= YYYYMM
         AND
             CASE
-              WHEN "AcDate" = 0 AND "RenewCode" = 2 
-                   AND  "InsuYearMonth" <= YYYYMM  -- 未銷直接計入
+              WHEN "AcDate" = 0 -- 未銷直接計入
               THEN 1
               WHEN TRUNC("AcDate" / 100) > YYYYMM -- 銷帳日期大於本月,計入
               THEN 1
@@ -308,9 +307,6 @@ BEGIN
          , CASE WHEN NewAcFg = 0 THEN RPAD(NVL("CdAcCode"."AcNoCodeOld",' '),8,' ')   -- 舊
                 ELSE                  RPAD(NVL("CdAcCode"."AcNoCode",' '),11,' ')     -- 新
            END                                       AS "AcCode"            -- 會計科目
---         , CASE WHEN M."Status" IN (2)      THEN 2   -- 催收
---                WHEN M."Status" IN (6,7)    THEN 3   -- 呆帳 (部份轉呆)
---                ELSE  1                              -- 正常
          , CASE WHEN M."Status" IN (0)      THEN 1   -- 正常
                 WHEN M."Status" IN (6,7,9)  THEN 3   -- 呆帳 (部份轉呆)
                 ELSE  2                              -- 催收
@@ -322,8 +318,9 @@ BEGIN
          , NVL(M."DrawdownAmt",0)                    AS "DrawdownAmt"        -- 撥款金額
          , NVL(M."LoanBal",0)                        AS "LoanBal"            -- 本金餘額(撥款)
          , NVL(M."IntAmt",0)                         AS "IntAmt"             -- 應收利息
-         , NVL(AF."AvgLawFee",0)
-           + NVL(AF."AvgInsuFee",0)                  AS "Fee"               -- 法拍及火險費用
+         , CASE WHEN WK."DataFg" = 1 THEN IA."Fee"
+                ELSE NVL(AF."AvgLawFee",0) + NVL(AF."AvgInsuFee",0)
+           END                                       AS "Fee"                -- 法拍及火險費用
          , CASE WHEN WK."DataFg" = 1 THEN IA."OvduDays"
                 WHEN M."NextPayIntDate" IS NULL  THEN 0
                 WHEN M."MaturityDate" < M."NextPayIntDate"
@@ -575,16 +572,16 @@ BEGIN
       FROM RawData
     )
     , Law AS (
-      -- 取各戶號每個月實收法拍費用
+      -- 取各戶號每個月實收法拍費用,2022/11/1改為入帳日OpenAcDate年月取貸方
       SELECT "CustNo"
-           , TRUNC("CloseDate" / 100)  AS "Month"
-           , SUM("Fee")                AS "LawFee"
+           , TRUNC("OpenAcDate" / 100)  AS "Month"  --  2022/11/1:CloseDate改為OpenAcDate
+           , SUM("Fee")                 AS "LawFee"
       FROM "ForeclosureFee"
-      WHERE "CloseDate" > 0
-        AND "Fee" > 0
+      WHERE --"CloseDate" > 0  --  2022/11/1點掉
+            "Fee" < 0  --  2022/11/1改為貸方,金額小於0  
         --AND "FeeCode" NOT IN ('11','15') -- 排除全額沖銷、催收沖銷資料
       GROUP BY "CustNo"
-             , TRUNC("CloseDate" / 100)
+             , TRUNC("OpenAcDate" / 100)
     )
     , Insu AS (
       -- 取各額度每個月實收火險費用
@@ -607,31 +604,31 @@ BEGIN
               CASE
                 WHEN L."Month" > M."IssueMonth"
                      AND L."Month" <= M."EndMonth1"
-                THEN L."LawFee"
+                THEN ABS(L."LawFee")    --2022/11/1 累計貸方為負值,取正數
               ELSE 0 END ) AS "LawFee1" -- 第一年法務費用
            , SUM(
               CASE
                 WHEN L."Month" > M."EndMonth1"
                      AND L."Month" <= M."EndMonth2"
-                THEN L."LawFee"
+                THEN ABS(L."LawFee")  
               ELSE 0 END ) AS "LawFee2" -- 第二年法務費用
            , SUM(
               CASE
                 WHEN L."Month" > M."EndMonth2"
                      AND L."Month" <= M."EndMonth3"
-                THEN L."LawFee"
+                THEN ABS(L."LawFee")    
               ELSE 0 END ) AS "LawFee3" -- 第三年法務費用
            , SUM(
               CASE
                 WHEN L."Month" > M."EndMonth3"
                      AND L."Month" <= M."EndMonth4"
-                THEN L."LawFee"
+                THEN ABS(L."LawFee")    
               ELSE 0 END ) AS "LawFee4" -- 第四年法務費用
            , SUM(
               CASE
                 WHEN L."Month" > M."EndMonth4"
                      AND L."Month" <= M."EndMonth5"
-                THEN L."LawFee"
+                THEN ABS(L."LawFee")    
               ELSE 0 END ) AS "LawFee5" -- 第五年法務費用
       FROM MonthData M
       LEFT JOIN Law L ON L."CustNo" = M."CustNo"
@@ -785,6 +782,16 @@ BEGIN
            , ID."InsuFee3" -- 第三年火險費用
            , ID."InsuFee4" -- 第四年火險費用
            , ID."InsuFee5" -- 第五年火險費用
+           , CT."CustTotal1"  --  發生日後第一年戶號合計餘額
+           , CT."CustTotal2"  --  發生日後第二年戶號合計餘額
+           , CT."CustTotal3"  --  發生日後第三年戶號合計餘額
+           , CT."CustTotal4"  --  發生日後第四年戶號合計餘額
+           , CT."CustTotal5"  --  發生日後第五年戶號合計餘額
+           , FT."FacTotal1"   --  發生日後第一年額度合計餘額
+           , FT."FacTotal2"   --  發生日後第二年額度合計餘額
+           , FT."FacTotal3"   --  發生日後第三年額度合計餘額
+           , FT."FacTotal4"   --  發生日後第四年額度合計餘額
+           , FT."FacTotal5"   --  發生日後第五年額度合計餘額
            , CASE
                WHEN CT."CustTotal1" > 0
                THEN ROUND(LD."LawFee1" * L."LoanBal1" / CT."CustTotal1",0)
@@ -846,60 +853,70 @@ BEGIN
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
+--                AND  B."CustTotal1"  >  0 
                THEN B."LawFee1" - NVL(O1."OtherLawFee1",0)
              ELSE B."AvgLawFee1"
              END)                               AS "AvgLawFee1"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
+--                AND  B."CustTotal2"  >  0 
                THEN B."LawFee2" - NVL(O1."OtherLawFee2",0)
              ELSE B."AvgLawFee2"
              END)                               AS "AvgLawFee2"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
+--                AND  B."CustTotal3"  >  0 
                THEN B."LawFee3" - NVL(O1."OtherLawFee3",0)
              ELSE B."AvgLawFee3"
              END)                               AS "AvgLawFee3"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
+--                AND  B."CustTotal4"  >  0 
                THEN B."LawFee4" - NVL(O1."OtherLawFee4",0)
              ELSE B."AvgLawFee4"
              END)                               AS "AvgLawFee4"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
+--                AND  B."CustTotal5"  >  0 
                THEN B."LawFee5" - NVL(O1."OtherLawFee5",0)
              ELSE B."AvgLawFee5"
              END)                               AS "AvgLawFee5"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
+--                AND  B."FacTotal1"  >  0
                THEN B."InsuFee1" - NVL(O2."OtherInsuFee1",0)
              ELSE B."AvgInsuFee1"
              END)                               AS "AvgInsuFee1"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
+--                AND  B."FacTotal2"  >  0
                THEN B."InsuFee2" - NVL(O2."OtherInsuFee2",0)
              ELSE B."AvgInsuFee2"
              END)                               AS "AvgInsuFee2"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
+--                AND  B."FacTotal3"  >  0
                THEN B."InsuFee3" - NVL(O2."OtherInsuFee3",0)
              ELSE B."AvgInsuFee3"
              END)                               AS "AvgInsuFee3"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
+--                AND  B."FacTotal4"  >  0
                THEN B."InsuFee4" - NVL(O2."OtherInsuFee4",0)
              ELSE B."AvgInsuFee4"
              END)                               AS "AvgInsuFee4"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
+--                AND  B."FacTotal5"  >  0
                THEN B."InsuFee5" - NVL(O2."OtherInsuFee5",0)
              ELSE B."AvgInsuFee5"
              END)                               AS "AvgInsuFee5"
@@ -990,9 +1007,11 @@ BEGIN
          , NVL(INT3."IntAmtRcv",0)         AS  "DerY3Int"        -- 個案減損客觀證據發生後第三年應收利息回收金額
          , NVL(INT4."IntAmtRcv",0)         AS  "DerY4Int"        -- 個案減損客觀證據發生後第四年應收利息回收金額
          , NVL(INT5."IntAmtRcv",0)         AS  "DerY5Int"        -- 個案減損客觀證據發生後第五年應收利息回收金額
-         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入
-                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
-           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+--         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入 ,2022/11/1待廠商回覆
+--                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
+--           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+         , NVL(AF."AvgLawFee1",0) 
+           + NVL(AF."AvgInsuFee1",0)       AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee2",0)
            + NVL(AF."AvgInsuFee2",0)       AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee3",0)

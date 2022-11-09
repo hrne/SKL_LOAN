@@ -474,6 +474,9 @@ public class L3701 extends TradeBuffer {
 			if (wkUpdLoanBorMain.equals("X")) {
 				ReleaseLoanBorMainRoutine();
 			}
+			if (iRateIncrY.equals("X") || iIndividualIncrY.equals("X") || iApproveRateY.equals("X")) {
+				DeleteBatxRateChangeRoutine();
+			}
 		}
 	}
 
@@ -1982,6 +1985,27 @@ public class L3701 extends TradeBuffer {
 		pf.setDrawdownDate(tLoanBorMain.getDrawdownDate());// 撥款日期
 		pf.setRepaidPeriod(tLoanBorMain.getRepaidPeriod()); // 已攤還期數
 		pfDetailCom.addDetail(pf, titaVo);
+	}
+
+	// 刪除整批利率調整檔(未確認)(//，放行後刪除整批利率調整檔， 撥款序號
+	private void DeleteBatxRateChangeRoutine() throws LogicException {
+		this.info("ReleaseBatxRateRoutine ... ");
+
+		BatxRateChange tBatxRateChange = batxRateChangeService
+				.holdById(new BatxRateChangeId(titaVo.getEntDyI() + 19110000, iCustNo, iFacmNo, wkBormNo), titaVo);
+		if (tBatxRateChange != null && tBatxRateChange.getConfirmFlag() == 0) {
+			if (titaVo.isActfgEntry()) {
+				this.totaVo.setWarnMsg(
+						"利率已變動,，放行後刪除整批利率調整檔， 撥款序號 =" + wkBormNo + " 生效日 = " + tBatxRateChange.getCurtEffDate());
+				this.addList(this.totaVo);
+			} else {
+				try {
+					batxRateChangeService.delete(tBatxRateChange, titaVo);
+				} catch (DBException f) {
+					throw new LogicException(titaVo, "E0007", "整批利率調整檔"); // 更新資料時，發生錯誤
+				}
+			}
+		}
 	}
 
 	// 登錄時檢核如L4321已確認未放行，則出錯誤訊息

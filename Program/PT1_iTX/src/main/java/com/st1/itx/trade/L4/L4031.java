@@ -219,28 +219,15 @@ public class L4031 extends TradeBuffer {
 					switch (keyinCode) {
 					case 0:
 						lableBX += "(未調整)";
-						if (iCustType == 1 && (txKind == 1 || txKind == 3)) {
-							rptFg = 7;
-						} else {
-							rptFg = 3;
-						}
+						rptFg = 3;
 						break;
 					case 1:
 						lableBX += "(已調整)";
-						if (iCustType == 1 && (txKind == 1 || txKind == 3)) {
-							rptFg = 6;
-						} else {
-							rptFg = 4;
-						}
-
+						rptFg = 4;
 						break;
 					case 2:
 						lableBX += "(待輸入)";
-						if (iCustType == 1 && (txKind == 1 || txKind == 3)) {
-							rptFg = 6;
-						} else {
-							rptFg = 4;
-						}
+						rptFg = 4;
 						checkFlag = 2; // 2-輸入利率
 						break;
 					case 9:

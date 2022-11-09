@@ -145,13 +145,13 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 		// 更新房貸獎勵保費檢核檔
 		if (isInsert) {
 			try {
-				pfInsCheckService.insert(tPfInsCheck);
+				pfInsCheckService.insert(tPfInsCheck, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "PfInsCheck insert " + tPfInsCheckId.toString() + e.getErrorMsg());
 			}
 		} else {
 			try {
-				pfInsCheckService.update(tPfInsCheck);
+				pfInsCheckService.update(tPfInsCheck, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "PfInsCheck update " + tPfInsCheckId.toString() + e.getErrorMsg());
 			}
@@ -163,7 +163,7 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 	// 抓取案件資料
 	private void getCaseAppl(int iCustNo, int iFacmNo, TitaVo titaVo) throws LogicException {
-		FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo));
+		FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
 		if (tFacMain == null) {
 			throw new LogicException(titaVo, "E0001", "額度主檔" + iCustNo + "-" + iFacmNo); // 查詢資料不存在
 		}
