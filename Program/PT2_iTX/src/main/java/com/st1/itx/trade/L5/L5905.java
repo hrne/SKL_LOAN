@@ -15,7 +15,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L5905ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
-import com.st1.itx.util.format.FormatUtil;
 
 /**
  * Tita InqFg=9,1 YearMonth=9,5 ConditionCode=9,2 YearMonthS=9,5 YearMonthE=9,5

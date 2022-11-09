@@ -15,7 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9716ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")

@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CdLand 縣市地政檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdLandId implements Serializable {
 
 
-  // 縣市代碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2777547867708394620L;
+
+// 縣市代碼
   @Column(name = "`CityCode`", length = 4)
   private String cityCode = " ";
 

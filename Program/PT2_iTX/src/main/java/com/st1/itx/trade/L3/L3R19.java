@@ -14,7 +14,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;

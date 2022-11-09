@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CdClBatch 擔保品整批匯入批號紀錄檔<br>
@@ -27,7 +23,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdClBatch implements Serializable {
 
 
-  // 核准號碼
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7150223963161026522L;
+
+// 核准號碼
   /* L2419畫面輸入的核准號碼 */
   @Id
   @Column(name = "`ApplNo`")

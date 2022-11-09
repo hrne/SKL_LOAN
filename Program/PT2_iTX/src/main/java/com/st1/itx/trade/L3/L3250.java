@@ -15,7 +15,6 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
-import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.LoanBorTx;

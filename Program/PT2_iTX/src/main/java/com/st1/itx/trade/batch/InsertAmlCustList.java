@@ -5,16 +5,13 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
 import com.st1.itx.util.MySpring;
-import com.st1.itx.util.date.DateUtil;
 
 @Service("InsertAmlCustList")
 @Scope("step")

@@ -17,7 +17,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.domain.CdCityRate;
 import com.st1.itx.db.domain.CdCityRateId;
-import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdCityRateService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.tradeService.TradeBuffer;

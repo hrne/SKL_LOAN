@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdBaseRateId implements Serializable {
 
 
-  // 幣別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7306735981594376024L;
+
+// 幣別
   /* 共用代碼檔TWD:新台幣 */
   @Column(name = "`CurrencyCode`", length = 3)
   private String currencyCode = " ";

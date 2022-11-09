@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CustRmk 顧客控管警訊檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class CustRmkId implements Serializable {
 
 
-  // 借款人戶號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4720405069188958744L;
+
+// 借款人戶號
   @Column(name = "`CustNo`")
   private int custNo = 0;
 

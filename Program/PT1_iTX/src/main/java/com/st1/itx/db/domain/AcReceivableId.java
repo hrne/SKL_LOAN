@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * AcReceivable 會計銷帳檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class AcReceivableId implements Serializable {
 
 
-  // 業務科目代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8626321893687912764L;
+
+// 業務科目代號
   /* CdAcCode會計科子細目設定檔 */
   @Column(name = "`AcctCode`", length = 3)
   private String acctCode = " ";

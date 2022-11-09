@@ -11,11 +11,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCityRate;
-import com.st1.itx.db.domain.CdPerformance;
-import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.service.CdCityRateService;
-import com.st1.itx.db.service.CdPerformanceService;
-import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
