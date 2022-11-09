@@ -113,6 +113,12 @@ T(4,CHAIN$)
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
+#DT1=D,8,S
+T(4,DATE$)
+
+#DT2=D,7,S
+T(1,#DT1,2,7)
+
 #RPTFG=A,1,S
 E(0,0)
 
@@ -189,6 +195,7 @@ T(2,#CustNo+-+#FacmNo)
 ! [鑑價公司]
 #EvaCompany=X,2,I
 IF(#Function==1,$,S)
+T(3,09)
 @
 V(7)
 
@@ -213,6 +220,7 @@ T(2,#L6R10InsurerItem)
 ! [鑑估日期] v
 #EvaDate=D,7,I
 IF(#Function==1,$,S)
+T(2,#DT2)
 D(8)
 @
 V(7)

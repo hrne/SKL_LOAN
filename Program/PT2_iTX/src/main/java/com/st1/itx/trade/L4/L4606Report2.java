@@ -119,7 +119,7 @@ public class L4606Report2 extends MakeReport {
 			}
 
 			i++;
-			if (cnt >= 35) {
+			if (cnt >= 45) {
 				cnt = 0;
 				this.print(1, this.getMidXAxis(), "===== 續下頁======", "C");
 				this.newPage();

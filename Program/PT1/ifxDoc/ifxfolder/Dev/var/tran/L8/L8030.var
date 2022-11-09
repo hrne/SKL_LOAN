@@ -343,6 +343,7 @@ T(2,4+ +#OOUkey)
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; ntxbuf=#OOBUF4})
 IF(#OOStatusFg==0,BIND(grid,cancel),$)
 IF(#OODeleteFg==0,BIND(grid,cancel),$)
+C(5,#OOTranKey,A,$,BIND(grid,cancel))
 
 !#OOBUF6=X,50,S
 !T(2,#OOChainTxCd+#OOUkey)

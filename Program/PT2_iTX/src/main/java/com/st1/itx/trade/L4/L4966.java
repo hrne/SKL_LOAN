@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,6 @@ public class L4966 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0001", "客戶主檔");
 			}
-//			slInsuComm = insuCommService.findAll(this.index,this.limit, titaVo);
 			slInsuComm = insuCommService.findCustNo(tCustNo, this.index, this.limit, titaVo);
 		} else if (iCustNo != 0) {
 			slInsuComm = insuCommService.findCustNo(iCustNo, this.index, this.limit, titaVo);
@@ -97,6 +97,21 @@ public class L4966 extends TradeBuffer {
 				occursList.putParam("OOFireOfficer", tnsuComm.getFireOfficer() + " " + tnsuComm.getEmpName());
 				occursList.putParam("OOEmpId", tnsuComm.getEmpId());
 				occursList.putParam("OODueAmt", tnsuComm.getDueAmt());
+				BigDecimal tDueAmt = tnsuComm.getDueAmt();
+				BigDecimal ZERO = BigDecimal.ZERO;
+				this.info("tDueAmt   =" + tDueAmt);
+
+				if ("Y".equals(tnsuComm.getMediaCode())) {
+					this.info("走到已發放");
+					occursList.putParam("OOIssue", "O");
+				} else if (tDueAmt.compareTo(ZERO) == 0) {
+					this.info("走到0");
+					occursList.putParam("OOIssue", " ");
+				} else if (tDueAmt.compareTo(ZERO) > -1) {
+					this.info("走到未發放");
+					occursList.putParam("OOIssue", "X");
+				}
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

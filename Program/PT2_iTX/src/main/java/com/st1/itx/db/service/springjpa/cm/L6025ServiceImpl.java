@@ -64,7 +64,10 @@ public class L6025ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	from \"CdLand\" cl ";
 		sql += "	left join \"CdCity\" cc ON cc.\"CityCode\" = cl.\"CityCode\" ";
 		sql += "	left join \"CdCode\" cd ON cd.\"Code\" = cl.\"LandOfficeCode\"";
-		sql += "	left join \"CdCode\" cd2 ON cd2.\"Code\" = :cityCode and cd2.\"DefCode\" = 'ClOtherRightsCityCd' WHERE cd.\\\"DefCode\\\" = 'LandOfficeCode'  ";
+		sql += "	left join \"CdCode\" cd2 ON cd2.\"DefCode\" = 'ClOtherRightsCityCd' ";
+		sql += "	and cd2.\"Code\" = cl.\"CityCode\"  ";
+
+		sql += "	WHERE cd.\"DefCode\" = 'LandOfficeCode'  ";
 		if (!iCityCode.isEmpty()) {
 			sql += "	and cl.\"CityCode\" = :cityCode ";
 		}
@@ -85,7 +88,6 @@ public class L6025ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 
-		query.setParameter("cityCode", iCityCode);
 		if (!iCityCode.isEmpty()) {
 			query.setParameter("cityCode", iCityCode);
 		}

@@ -139,6 +139,7 @@ E(0,1)ASGN(LOOP$)
 #OOFireOfficer=X,46,O
 #OOEmpId=X,10,O
 #OODueAmt=m,14,O
+#OOIssue=X,1,O
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -170,6 +171,7 @@ TXFORM=L4966
 #OOFireOfficer
 #OOEmpId
 #OODueAmt
+#OOIssue
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R47.tom"/>
@@ -226,6 +228,10 @@ TXFORM=L4966
 
 #OODueAmt=應領金額
 {width:100,align:'right'}
+
+#OOIssue=媒體檔
+{width:100,align:'center'}
+
 ^
 
 <include src="PRT.icf::INQ01.sel"/>

@@ -97,7 +97,8 @@ public class L7205 extends TradeBuffer {
 		this.info("L7205 iMfbsDy : " + iMfbsDy);
 
 		// 吃檔
-		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
+		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		this.info("filename=" + filename);
 
@@ -122,13 +123,13 @@ public class L7205 extends TradeBuffer {
 
 			makeExcel.openExcel(filename, 1);
 			// 取得年月
-			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
+//			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
 
-			this.info("fileYearMonth=" + fileYearMonth);
+//			this.info("fileYearMonth=" + fileYearMonth);
 
-			if (fileYearMonth != iYearMonth) {
-				throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + iYearMonth);
-			}
+//			if (fileYearMonth != iYearMonth) {
+//				throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + iYearMonth);
+//			}
 			// 切資料
 			setValueFromFileExcelNew(titaVo, iYearMonth);
 		} else if ("csv".equals(extension[extension.length - 1])) {
@@ -306,7 +307,8 @@ public class L7205 extends TradeBuffer {
 //			this.info("iAssetClass=" + makeExcel.getValue(i, 8).toString());
 
 			// 正常是連續的資料串，遇到空值強行結束
-			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0 || makeExcel.getValue(i, 8).toString().length() == 0
+			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
+					|| makeExcel.getValue(i, 8).toString().length() == 0
 					|| makeExcel.getValue(i, 9).toString().length() == 0) {
 				break;
 			}
@@ -357,7 +359,8 @@ public class L7205 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 
 			// 正常是連續的資料串，遇到空值強行結束
-			if (makeExcel.getValue(i, 1).toString().length() == 0 || makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
+			if (makeExcel.getValue(i, 1).toString().length() == 0 || makeExcel.getValue(i, 2).toString().length() == 0
+					|| makeExcel.getValue(i, 3).toString().length() == 0
 					|| makeExcel.getValue(i, 4).toString().length() == 0) {
 				break;
 			}
@@ -365,7 +368,8 @@ public class L7205 extends TradeBuffer {
 			if (Integer.valueOf(makeExcel.getValue(i, 1).toString()) != iYearMonth) {
 				this.info("輸入的年份：" + iYearMonth);
 				this.info("檔案的年份：" + Integer.valueOf(makeExcel.getValue(i, 1).toString()));
-				throw new LogicException(titaVo, "E0015", "年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + makeExcel.getValue(i, 1));
+				throw new LogicException(titaVo, "E0015",
+						"年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + makeExcel.getValue(i, 1));
 
 			}
 			try {

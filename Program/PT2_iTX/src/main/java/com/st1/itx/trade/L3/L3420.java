@@ -1699,6 +1699,7 @@ public class L3420 extends TradeBuffer {
 			tFacClose.setEntryDate(iEntryDate);
 			tFacClose.setCloseReasonCode(iAdvanceCloseCode);
 			tFacClose.setCloseAmt(iRealRepayAmt);
+			tFacClose.setCloseInd(parse.IntegerToString(iCaseCloseCode, 1));
 			try {
 				facCloseService.insert(tFacClose);
 			} catch (DBException e) {
@@ -1726,7 +1727,7 @@ public class L3420 extends TradeBuffer {
 		// 申請日期自動寫入時為0
 		if (tFacClose.getApplDate() == 0) {
 			try {
-				facCloseService.delete(tFacClose);
+				facCloseService.delete(tFacClose, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "清償作業檔 Key = " + iCustNo + wkCloseNo); // 新增資料時，發生錯誤 }
 			}
@@ -1734,7 +1735,7 @@ public class L3420 extends TradeBuffer {
 			tFacClose = facCloseService.holdById(tFacClose, titaVo);
 			tFacClose.setCloseDate(0);
 			try {
-				facCloseService.update(tFacClose);
+				facCloseService.update(tFacClose, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "清償作業檔 Key = " + iCustNo + wkCloseNo); // 新增資料時，發生錯誤 }
 			}

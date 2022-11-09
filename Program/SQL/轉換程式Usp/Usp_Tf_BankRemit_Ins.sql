@@ -93,7 +93,7 @@ BEGIN
                                AND LBM."BormNo" = EXGP.LMSASQ
     LEFT JOIN txEmpData t ON t.TRXDAT = EXGP.TRXDAT
                          AND t.TRXNMT = EXGP.TRXNMT
-    LEFT JOIN "As400EmpNoMapping" AEM1 ON AME1."As400TellerNo" = t.TRXMEM
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = t.TRXMEM
     ; 
  
     -- 記錄寫入筆數 

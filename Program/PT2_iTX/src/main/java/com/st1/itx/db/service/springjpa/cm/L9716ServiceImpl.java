@@ -167,6 +167,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND M.\"OvduTerm\" <= :inputOvduTermMax";
 		sql += "   		AND TRUNC(M.\"NextIntDate\" / 100) <= :inputYearMonth ";
 		sql += "   		AND TRUNC(M.\"PrevIntDate\" / 100) <> :inputYearMonth ";
+//		sql += "        AND M.\"PrevIntDate\" <> 0 ";
 
 		this.info("sql=" + sql);
 
