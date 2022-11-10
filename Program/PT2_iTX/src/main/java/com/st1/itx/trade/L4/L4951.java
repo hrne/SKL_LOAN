@@ -113,6 +113,13 @@ public class L4951 extends TradeBuffer {
 			throw new LogicException("E0001", "L4951 查無資料");
 		}
 
+		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+		if (sEmpDeductDtl != null && sEmpDeductDtl.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

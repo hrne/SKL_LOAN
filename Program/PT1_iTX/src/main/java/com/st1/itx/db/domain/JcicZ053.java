@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ053 implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3681848529054576976L;
-
-@EmbeddedId
+  @EmbeddedId
   private JcicZ053Id jcicZ053Id;
 
   // 交易代碼
@@ -73,7 +70,7 @@ public class JcicZ053 implements Serializable {
   private String agreeSendData2;
 
   // 申請變更還款條件日
-  @Column(name = "`ChangePayDate`")
+  @Column(name = "`ChangePayDate`", insertable = false, updatable = false)
   private int changePayDate = 0;
 
   // 轉出JCIC文字檔日期
@@ -448,7 +445,7 @@ C:異動
   @Override
   public String toString() {
     return "JcicZ053 [jcicZ053Id=" + jcicZ053Id + ", tranKey=" + tranKey + ", agreeSend=" + agreeSend
-           + ", agreeSendData1=" + agreeSendData1 + ", agreeSendData2=" + agreeSendData2 + ", changePayDate=" + changePayDate + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate
+           + ", agreeSendData1=" + agreeSendData1 + ", agreeSendData2=" + agreeSendData2 + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate
            + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", actualFilingDate=" + actualFilingDate + ", actualFilingMark=" + actualFilingMark + "]";
   }
 }

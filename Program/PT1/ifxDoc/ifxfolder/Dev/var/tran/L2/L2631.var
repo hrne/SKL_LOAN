@@ -158,6 +158,8 @@ T(2,@StatusHelp,#HelpDesc4)
 
 #FunCodHelp=x,100,S
 T(3,0:清償（必須為尚未結案）;1:請領（已申請者為請領）;2:補領（已結案後來申請者）;3:補發（已領過者為補發）)
+#FunCodHelp2=x,100,S
+T(HELP,@FunCodHelp2,#FunCodHelp,+,0;3)
 
 #YNHelp=x,20,S
 T(3,Y:是;N:否)
@@ -188,10 +190,13 @@ C(4,#NTXBUF,S,$)
 T(1,@CustNo,#NTXBUF,1,7)
 T(1,@CloseNo,#NTXBUF,8,3)
 T(1,@FunCode,#NTXBUF,11,1)
+T(1,@CHAIN_FUNCODE,#NTXBUF,11,1)
 T(1,@TranDate,#NTXBUF,12,7)
 T(1,@FacmNo,#NTXBUF,19,3)
 T(1,@oldFacmNo,#NTXBUF,19,3)
 
+
+#CHAIN_FUNCODE=A,1,S
 #oldFacmNo=A,3,S
 
 #TFSHOW=X,1,S
@@ -201,7 +206,6 @@ T(F,#CustId,0)
 T(F,#TranDate,0)
 T(F,#FacmNo,0)
 T(F,#CloseInd,0)
-
 
 #init=X,1,S
 INVOKEJS(SHOW,p2,0)
@@ -292,8 +296,6 @@ T(2,#L2r07CustName)
 #TimCustNo=A,7,S
 C(3,#CustNo,0,T(2,#L2r07CustNo),E(0,#CustNo))
 
-
-
 #CSPACE=X,10,S
 #BUFTelNo=X,18,S
 T(2,1+#CSPACE+#TimCustNo)
@@ -308,7 +310,6 @@ BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFTelNo;ntxbuf5=type<-1:Tel
 C(3,#CustNo,0,T(2,#CustId),T(2,#L2r07CustId))
 C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,1,1,1)INVOKEJS(SHOW,p1,2,2,0))
 
-
 #BUF12=X,25,S
 T(2,1+#SysDate+#TimCustNo+#FacmNo+000)
 
@@ -319,11 +320,11 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF12})
 #CloseNo=A,3,L
 
 !作業功能
-#FunCode=A,1,L
+#FunCode=A,1,I
 C(4,#NTXBUF,$,s)
 E(0,0)
-HELP(#FunCodHelp)
-@V(H,#FunCodHelp)
+HELP(#FunCodHelp2)
+@V(H,#FunCodHelp2)
 
 #FunCodX=X,30,L
 T(H,#FunCode,#FunCodHelp)
@@ -355,8 +356,6 @@ T(2,@TelNo3,#L2r36TelNo3)
 T(2,@CloseReasonCode,#L2r36CloseReasonCode)
 T(H,@CloseReasonCodeX,#CloseReasonCode,#AdvanceCloseCodeHelp)
 
-
-
 ![入帳日期]
 !必須輸入
 #TranDate=D,7,I
@@ -368,8 +367,6 @@ D(8)
 A(DATE,0,#TranDate)
 V(2,0)
 
-
-
 ![申請日期]
 !補領或補發時必須輸入,補領時依申請日期計算是否限制清償日期內
 #ApplDate=D,7,I
@@ -378,7 +375,6 @@ IF(#FunCode==2||#FunCode==3,$,S)
 @V(7)
 A(DATE,0,#ApplDate)
 V(2,0)
-
 
 ![結案區分]
 !必須輸入
@@ -436,6 +432,7 @@ S(L3R07,1,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCloseDate,#RimApplDate)
 R(1,L3R07)
 
 #checkL3r07=X,1,S
+C(3,#FunCode,2,$,S)
 E(0,@CloseAmt,#L3r07CloseBreachAmt)
 
 #BUFA=X,100,S

@@ -108,7 +108,71 @@ BEGIN
  
     -- 記錄寫入筆數 
     INS_CNT := INS_CNT + sql%rowcount; 
- 
+
+    MERGE INTO "LoanBorTx" T
+    USING (
+      WITH BR AS (
+        SELECT "AcDate"
+             , "TitaTlrNo"
+             , "TitaTxtNo"
+             , MAX("RemitBank")   AS "RemitBank"
+             , MAX("RemitBranch") AS "RemitBranch"
+             , MAX("RemitAcctNo") AS "RemitAcctNo"
+             , MAX("Remark")      AS "Remark"
+             , MAX("Seq")         AS "Seq"
+             , SUM("RemitAmt")    AS "RemitAmt"
+             , MAX("CustName")    AS "CustName"
+        FROM "BankRemit"
+        GROUP BY "AcDate"
+               , "TitaTlrNo"
+               , "TitaTxtNo"
+      )
+      , TX AS (
+        SELECT TX."CustNo"
+             , TX."FacmNo"
+             , TX."BormNo"
+             , TX."BorxNo"
+             , TX."AcDate"
+             , TX."TitaTlrNo"
+             , TX."TitaTxtNo"
+             , SUBSTR(TX."OtherFields",0,INSTR(TX."OtherFields",'}')-1) AS "OtherFields"
+             , BR."RemitBank"
+             , BR."RemitBranch"
+             , BR."RemitAcctNo"
+             , BR."Remark"
+             , BR."Seq"
+             , BR."RemitAmt"
+             , BR."CustName"
+        FROM "LoanBorTx" TX
+        LEFT JOIN BR ON BR."AcDate" = TX."AcDate"
+                    AND BR."TitaTlrNo" = TX."TitaTlrNo"
+                    AND BR."TitaTxtNo" = TX."TitaTxtNo"
+        WHERE NVL(BR."AcDate",0) != 0
+      )
+      SELECT "CustNo"
+           , "FacmNo"
+           , "BormNo"
+           , "BorxNo"
+           , "OtherFields" ||
+             ',"RemitBank":"' || "RemitBank" || "RemitBranch" || '"' ||
+             ',"RemitAcctNo":"' || "RemitAcctNo" || '"' ||
+             ',"RemitRemark":"' || "Remark" || '"' ||
+             ',"RemitSeq":"' || "Seq" || '"' ||
+             ',"RemitAmt":"' || "RemitAmt" || '"' ||
+             ',"RemitCustName":"' || "CustName" || '"' ||
+             '}' AS "OtherFields"
+      FROM TX
+    ) S
+    ON (
+      T."CustNo" = S."CustNo"
+      AND T."FacmNo" = S."FacmNo"
+      AND T."BormNo" = S."BormNo"
+      AND T."BorxNo" = S."BorxNo"
+    )
+    WHEN MATCHED THEN UPDATE
+    SET T."OtherFields" = S."OtherFields"
+    ;
+
     -- 記錄程式結束時間 
     JOB_END_TIME := SYSTIMESTAMP; 
  

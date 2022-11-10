@@ -90,14 +90,6 @@ import com.st1.itx.db.service.JcicZ454LogService;
 import com.st1.itx.db.service.JcicZ454Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
-/**
- * Tita<br>
- * MEMTXCD=X,3<br>
- * CUSTID=X,10<br>
- * RCDATE=9,7<br>
- * END=X,1<br>
- */
-
 @Service("L8030")
 @Scope("prototype")
 /**
@@ -261,7 +253,6 @@ public class L8030 extends TradeBuffer {
 	public CdCodeService iCdCodeService;
 	@Autowired
 	public CdCityService iCdCityService;
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8030 ");
@@ -1521,7 +1512,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCustId", xJcicZ051.getCustId());
 				occursListB.putParam("OORcDate", xJcicZ051.getRcDate());
 				occursListB.putParam("OOSubmitKey", xJcicZ051.getSubmitKey());
-				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM() - 191100);
+				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM()-191100);
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ051.getSubmitKey(), titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ051.getTranKey());
 				int iOutJcicTxtDate = 0;
@@ -1686,6 +1677,7 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOSubmitKeyX", "");
 		occursListA.putParam("OORcDate", "");
 		occursListA.putParam("OOMaxMainCode", "");
+		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOOutJcicTxtDate", "");
 		occursListA.putParam("OOTranKey", "");
 
@@ -1698,7 +1690,6 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOBankId", "");
 		occursListA.putParam("OOBankIdX", "");
 		occursListA.putParam("OOCloseDate", "");
-		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
 		occursListA.putParam("OOMaxMainCodeX", "");
 		occursListA.putParam("OOCourtCodeX", "");
@@ -1721,6 +1712,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ053.getMaxMainCode(), titaVo));
 				occursListB.putParam("OOSubmitKey", xJcicZ053.getSubmitKey());
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ053.getSubmitKey(), titaVo));
+				occursListB.putParam("OOChangePayDate", xJcicZ053.getChangePayDate());
 				occursListB.putParam("OOTranKey", xJcicZ053.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ053.getOutJcicTxtDate();
@@ -1732,6 +1724,7 @@ public class L8030 extends TradeBuffer {
 				// 按鈕控制
 				JcicZ053 rJcicZ053 = new JcicZ053();
 				JcicZ053Id rJcicZ053Id = new JcicZ053Id();
+				rJcicZ053Id.setChangePayDate(xJcicZ053.getChangePayDate());
 				rJcicZ053Id.setMaxMainCode(xJcicZ053.getMaxMainCode());
 				rJcicZ053Id.setRcDate(xJcicZ053.getRcDate());
 				rJcicZ053Id.setCustId(xJcicZ053.getCustId());
@@ -1763,7 +1756,6 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOBankId", "");
 				occursListB.putParam("OOBankIdX", "");
 				occursListB.putParam("OOCloseDate", "");
-				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
 				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
@@ -3310,7 +3302,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OORcDate", xJcicZ451.getApplyDate());
 				occursListB.putParam("OOCourtCode", xJcicZ451.getCourtCode());
 				occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ451.getCourtCode(), titaVo));
-				occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM() - 191100);
+				occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM()-191100);
 				occursListB.putParam("OOTranKey", xJcicZ451.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ451.getOutJcicTxtDate();
@@ -4084,17 +4076,17 @@ public class L8030 extends TradeBuffer {
 //	}
 	public String dealCourtName(String CourtId, TitaVo titaVo) throws LogicException {
 		String JcicCourtName = "";// 80碼長度
-
+		
 		CdCodeId iCdCodeId = new CdCodeId();
 		iCdCodeId.setDefCode("CourtCode");
 		iCdCodeId.setCode(CourtId);
 		CdCode iCdCode = iCdCodeService.findById(iCdCodeId, titaVo);
 		if (iCdCode == null) {
 			CdCity iCdCity = iCdCityService.findById(CourtId, titaVo);
-			if (iCdCity != null) {
+			if (iCdCity !=null) {
 				JcicCourtName = iCdCity.getCityItem();
 			}
-		} else {
+		}else {
 			JcicCourtName = iCdCode.getItem();
 		}
 		return JcicCourtName;

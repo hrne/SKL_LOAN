@@ -51,7 +51,7 @@ public class L8403 extends TradeBuffer {
 		this.info("active L8403 ");
 		this.totaVo.init(titaVo);
 		this.index = titaVo.getReturnIndex();
-		this.limit = 500;
+		this.limit = 5000;
 		Slice<JcicZ040> sJcicZ040 = null;
 		sJcicZ040 = sJcicZ040Service.findAll(index, limit, titaVo);
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));

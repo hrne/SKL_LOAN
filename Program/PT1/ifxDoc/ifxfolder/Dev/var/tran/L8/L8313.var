@@ -45,11 +45,11 @@ E(0,0)
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
-["#FdBankCode1+同意報送債權機構代號1",#BankCode1,#BankCodeX1],["#FdDataCode1+同意報送檔案格式資料別1",#DataCode1,#DataCodeX1],
-["#FdBankCode2+同意報送債權機構代號2",#BankCode2,#BankCodeX2],["#FdDataCode2+同意報送檔案格式資料別2",#DataCode2,#DataCodeX2],
-["#FdBankCode3+同意報送債權機構代號3",#BankCode3,#BankCodeX3],["#FdDataCode3+同意報送檔案格式資料別3",#DataCode3,#DataCodeX3],
-["#FdBankCode4+同意報送債權機構代號4",#BankCode4,#BankCodeX4],["#FdDataCode4+同意報送檔案格式資料別4",#DataCode4,#DataCodeX4],
-["#FdBankCode5+同意報送債權機構代號5",#BankCode5,#BankCodeX5],["#FdDataCode5+同意報送檔案格式資料別5",#DataCode5,#DataCodeX5],
+["#FdBankCode1+補報送債權機構代號1",#BankCode1,#BankCodeX1],["#FdDataCode1+補報送檔案格式資料別1",#DataCode1,#DataCodeX1],
+["#FdBankCode2+補報送債權機構代號2",#BankCode2,#BankCodeX2],["#FdDataCode2+補報送檔案格式資料別2",#DataCode2,#DataCodeX2],
+["#FdBankCode3+補報送債權機構代號3",#BankCode3,#BankCodeX3],["#FdDataCode3+補報送檔案格式資料別3",#DataCode3,#DataCodeX3],
+["#FdBankCode4+補報送債權機構代號4",#BankCode4,#BankCodeX4],["#FdDataCode4+補報送檔案格式資料別4",#DataCode4,#DataCodeX4],
+["#FdBankCode5+補報送債權機構代號5",#BankCode5,#BankCodeX5],["#FdDataCode5+補報送檔案格式資料別5",#DataCode5,#DataCodeX5],
 [#<->#,"#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -289,7 +289,7 @@ D(8)
 #BankCode0=x,3,L
 T(2,1)
 ##loop {times:5,i:1,j:0}
-! 同意報送債權機構代號
+! 補報送債權機構代號
 #BankCode{i}=X,3,I
 C(4,#BankCode{j},S,$)
 C(5,#TranKey_Tmp,5,s,$)
@@ -305,11 +305,11 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@BankCodeX{i},#L8r01JcicBankName)
 
-! 同意報送債權機構代號,債協機構中文名稱
+! 補報送債權機構代號,債協機構中文名稱
 #BankCodeX{i}=X,40,L
 C(4,#BankCode{i},S,$)
 
-! 同意報送檔案格式資料別
+! 補報送檔案格式資料別
 #DataCode{i}=X,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -318,7 +318,7 @@ HELP(#DataCodeHelp)
 @T(3,@DataCodeX{i},)
 V(H,#DataCodeHelp)
 
-! 同意報送檔案格式資料別名稱
+! 補報送檔案格式資料別名稱
 #DataCodeX{i}=X,40,L
 C(4,#DataCode{i},S,T(H,#DataCode{i},#DataCodeHelp))
 

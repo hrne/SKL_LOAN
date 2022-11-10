@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE "Usp_L6_CdEmp_Ins"
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L6_CdEmp_Ins"
 (
     -- 參數
     "EmpNo" IN VARCHAR2   --執行人員員編
@@ -260,14 +260,17 @@ BEGIN
                 ,"AGENT_CODE"
                 ,ROW_NUMBER() OVER (PARTITION BY "EMPLOYEE_NO" 
                                     ORDER BY CASE
-                                               WHEN "AG_CUR_IND" = 'Y' THEN '0'
-                                             ELSE '1' END 
-                                            ,"EMPLOYEE_NO"
-                                            ,"AG_STATUS_DATE" DESC
-                                            ,"AGENT_CODE") AS "Seq"
+                                               WHEN "AG_CUR_IND" = 'Y' THEN 0
+                                             ELSE 1 END
+                                            ,CASE
+                                               WHEN "AG_STATUS_CODE" = '1' THEN 0
+                                             ELSE 1 END 
+                                            ,NVL(TO_NUMBER(TO_CHAR("AG_STATUS_DATE",'YYYYMMDD')),0) DESC
+                                            ,NVL(TO_NUMBER(TO_CHAR("LEVEL_DATE",'YYYYMMDD')),0) DESC
+                                            ,"AGENT_CODE" DESC
+                                            ) AS "Seq"
           FROM "StgCdEmp"
           WHERE NVL("EMPLOYEE_NO",' ') <> ' '    -- 電腦編號
-            AND NVL("AG_STATUS_DATE",' ') <> ' ' -- 業務人員任用狀況異動日
          ) S1
     LEFT JOIN "StgCdEmp" S2 ON S2."EMPLOYEE_NO" = S1."EMPLOYEE_NO"
                            AND S2."AGENT_CODE" = S1."AGENT_CODE"

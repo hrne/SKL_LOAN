@@ -179,12 +179,13 @@ E(0,1)ASGN(LOOP$)
 
 ! 戶名  
 #OOCustName=X,100,O
-! <毀諾> 03 FunctionCodeDef 03:毀諾
+! <毀諾> 03 FunctionCodeDef 03:毀諾 , 應還期數超過1期才顯示按鈕
 #OOBufA=X,22,S
 T(2,03+#OOCustId+#OOCustNo+#OOCaseSeq)
 #OOBtnA=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5701; ntxbuf=#OOBufA})
-! BIND(grid,cancel)
+IF(#OOPayTerm > 1,s,$)
+BIND(grid,cancel)
 
 ! <二階段新增> 11 FunctionCodeDef 11:二階段新增
 #OOBufH=X,22,S

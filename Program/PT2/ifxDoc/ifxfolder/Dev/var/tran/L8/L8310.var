@@ -350,7 +350,7 @@ C(5,#TranKey,D,T(2,@Year,#L8r21Year),$)
 C(5,#TranKey,D,s,$)
 @C(5,#ClaimStatus,1,$,V(2,0))
 !法院承審股別(兩個中文字) 11
-#CourtDiv=C,4,I
+#CourtDiv=C,6,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtDiv,#L8r21CourtDiv),$)

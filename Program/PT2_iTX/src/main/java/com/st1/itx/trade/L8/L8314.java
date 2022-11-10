@@ -84,6 +84,7 @@ public class L8314 extends TradeBuffer {
 		iJcicZ053Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ053Id.setRcDate(iRcDate);
 		iJcicZ053Id.setMaxMainCode(iMaxMainCode);
+		iJcicZ053Id.setChangePayDate(iChangePayDate);
 		JcicZ053 chJcicZ053 = new JcicZ053();
 
 		// 檢核項目(D-29)
@@ -119,7 +120,7 @@ public class L8314 extends TradeBuffer {
 			// 檢核是否重複，並寫入JcicZ053
 			chJcicZ053 = sJcicZ053Service.findById(iJcicZ053Id, titaVo);
 			if (chJcicZ053 != null) {
-				throw new LogicException("E0005", "已有相同資料");
+					throw new LogicException("E0005", "已有相同資料");
 			}
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			iJcicZ053.setJcicZ053Id(iJcicZ053Id);
@@ -127,7 +128,7 @@ public class L8314 extends TradeBuffer {
 			iJcicZ053.setAgreeSend(iAgreeSend);
 			iJcicZ053.setAgreeSendData1(iAgreeSendData1);
 			iJcicZ053.setAgreeSendData2(iAgreeSendData2);
-			iJcicZ053.setChangePayDate(iChangePayDate);
+//			iJcicZ053.setChangePayDate(iChangePayDate);
 			iJcicZ053.setUkey(iKey);
 			try {
 				sJcicZ053Service.insert(iJcicZ053, titaVo);
@@ -148,12 +149,12 @@ public class L8314 extends TradeBuffer {
 			uJcicZ053.setAgreeSend(iAgreeSend);
 			uJcicZ053.setAgreeSendData1(iAgreeSendData1);
 			uJcicZ053.setAgreeSendData2(iAgreeSendData2);
-			uJcicZ053.setChangePayDate(iChangePayDate);
+//			uJcicZ053.setChangePayDate(iChangePayDate);
 			uJcicZ053.setOutJcicTxtDate(0);
-			
+
 			uJcicZ053.setActualFilingDate(0);
 			uJcicZ053.setActualFilingMark("");
-			
+
 			try {
 				sJcicZ053Service.update(uJcicZ053, titaVo);
 			} catch (DBException e) {
@@ -182,7 +183,7 @@ public class L8314 extends TradeBuffer {
 			uJcicZ0532.setAgreeSend(iAgreeSend);
 			uJcicZ0532.setAgreeSendData1(iAgreeSendData1);
 			uJcicZ0532.setAgreeSendData2(iAgreeSendData2);
-			uJcicZ0532.setChangePayDate(iChangePayDate);
+//			uJcicZ0532.setChangePayDate(iChangePayDate);
 			uJcicZ0532.setOutJcicTxtDate(0);
 
 			Slice<JcicZ053Log> dJcicLogZ053 = null;
@@ -200,7 +201,7 @@ public class L8314 extends TradeBuffer {
 				iJcicZ053.setAgreeSend(iJcicZ053Log.getAgreeSend());
 				iJcicZ053.setAgreeSendData1(iJcicZ053Log.getAgreeSendData1());
 				iJcicZ053.setAgreeSendData2(iJcicZ053Log.getAgreeSendData2());
-				iJcicZ053.setChangePayDate(iJcicZ053Log.getChangePayDate());
+//				iJcicZ053.setChangePayDate(iJcicZ053Log.getChangePayDate());
 				iJcicZ053.setTranKey(iJcicZ053Log.getTranKey());
 				iJcicZ053.setOutJcicTxtDate(iJcicZ053Log.getOutJcicTxtDate());
 				try {
@@ -236,7 +237,7 @@ public class L8314 extends TradeBuffer {
 			uJcicZ0533.setAgreeSend(iAgreeSend);
 			uJcicZ0533.setAgreeSendData1(iAgreeSendData1);
 			uJcicZ0533.setAgreeSendData2(iAgreeSendData2);
-			uJcicZ0533.setChangePayDate(iChangePayDate);
+//			uJcicZ0533.setChangePayDate(iChangePayDate);
 			uJcicZ0533.setUkey(iKey);
 
 			try {

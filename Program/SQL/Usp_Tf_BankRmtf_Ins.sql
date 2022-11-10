@@ -100,7 +100,7 @@ BEGIN
                           AND SPLP.TB$FCD = DPSP.DPSATC 
     LEFT JOIN txEmpData t ON t.TRXDAT = DPSP.TRXDAT
                          AND t.TRXNMT = DPSP.TRXNMT
-    LEFT JOIN "As400EmpNoMapping" AEM1 ON AME1."As400TellerNo" = t.TRXMEM
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = t.TRXMEM
     ; 
  
     -- 記錄寫入筆數 

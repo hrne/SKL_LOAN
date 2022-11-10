@@ -44,11 +44,16 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public String sqlL5974(String FinCode) {
 
-		String SqlNegFinAcct = "SELECT " + "FA.\"FinCode\" AS \"OOFinCode\"," + "FA.\"FinItem\" AS \"OOFinCodeX\"," + "FA.\"RemitBank\" AS \"OORemitBank\"," + "FA1.\"FinItem\" AS \"OORemitBankX1\","
-				+ "FA2.\"BankItem\" AS \"OORemitBankX2\"," + "FA.\"RemitAcct\" AS \"OORemitAcct\", " + "FA.\"DataSendSection\" AS \"OODataSendSection\", "
-				+ "FA3.\"FinItem\" AS \"OODataSendSectionX1\", " + "FA4.\"BankItem\" AS \"OODataSendSectionX2\" " + "FROM \"NegFinAcct\" FA " + "LEFT JOIN \"NegFinAcct\" FA1 "
-				+ "ON FA1.\"FinCode\"=FA.\"RemitBank\" " + "LEFT JOIN \"CdBank\" FA2 " + "ON FA2.\"BranchCode\"='    ' " + "AND FA2.\"BankCode\"=FA.\"RemitBank\" " + "LEFT JOIN \"NegFinAcct\" FA3 "
-				+ "ON FA3.\"FinCode\"=FA.\"DataSendSection\" " + "LEFT JOIN \"CdBank\" FA4 " + "ON FA4.\"BranchCode\"='    ' " + "AND FA4.\"BankCode\"=FA.\"DataSendSection\" " + "WHERE 1=1 ";
+		String SqlNegFinAcct = "SELECT " + "FA.\"FinCode\" AS \"OOFinCode\"," + "FA.\"FinItem\" AS \"OOFinCodeX\","
+				+ "FA.\"RemitBank\" AS \"OORemitBank\"," + "FA1.\"FinItem\" AS \"OORemitBankX1\","
+				+ "FA2.\"BankItem\" AS \"OORemitBankX2\"," + "FA.\"RemitAcct\" AS \"OORemitAcct\", "
+				+ "FA.\"DataSendSection\" AS \"OODataSendSection\", " + "FA3.\"FinItem\" AS \"OODataSendSectionX1\", "
+				+ "FA4.\"BankItem\" AS \"OODataSendSectionX2\" " + "FROM \"NegFinAcct\" FA "
+				+ "LEFT JOIN \"NegFinAcct\" FA1 " + "ON FA1.\"FinCode\"=FA.\"RemitBank\" " + "LEFT JOIN \"CdBank\" FA2 "
+				+ "ON FA2.\"BranchCode\"= NVL(SUBSTR(FA.\"RemitBank\",4,4 ),'    ') " + "AND FA2.\"BankCode\" = SUBSTR(FA.\"RemitBank\",1,3 ) "
+				+ "LEFT JOIN \"NegFinAcct\" FA3 " + "ON FA3.\"FinCode\" = FA.\"DataSendSection\" "
+				+ "LEFT JOIN \"CdBank\" FA4 " + "ON FA4.\"BranchCode\" = NVL(SUBSTR(FA.\"DataSendSection\",4,4),'    ') "
+				+ "AND FA4.\"BankCode\" = SUBSTR(FA.\"DataSendSection\",1,3) " + "WHERE 1=1 ";
 		if (FinCode != null && FinCode.length() != 0) {
 			SqlNegFinAcct += "AND FA.\"FinCode\"= :FinCode ";
 		}
@@ -88,21 +93,18 @@ public class L5974ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
 
-		@SuppressWarnings("unchecked")
-		List<Object> lObject = this.convertToMap(query.getResultList());
-		return FindData(lObject);
+		return FindData(this.convertToMap(query));
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<String[]> FindData(List<Object> lObject) throws LogicException {
+	public List<String[]> FindData(List<Map<String, String>> lObject) throws LogicException {
 		List<String[]> data = new ArrayList<String[]>();
 		if (lObject != null && lObject.size() != 0) {
-			int col = ((Map<String, String>) lObject.get(0)).keySet().size();
-			for (Object obj : lObject) {
-				Map<String, String> MapObj = (Map<String, String>) obj;
+			int col = lObject.get(0).keySet().size();
+			for (Map<String, String> MapObj : lObject) {
+
 				String row[] = new String[col];
 				for (int i = 0; i < col; i++) {
-					row[i] = MapObj.get("F" + String.valueOf(i));
+					row[i] = MapObj.get("F" + i);
 				}
 				data.add(row);
 			}

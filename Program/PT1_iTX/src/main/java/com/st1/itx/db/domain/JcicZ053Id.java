@@ -2,6 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -18,12 +20,7 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ053Id implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3676130059455913364L;
-
-// 報送單位代號
+  // 報送單位代號
   /* 三位文數字 */
   @Column(name = "`SubmitKey`", length = 3)
   private String submitKey = " ";
@@ -42,14 +39,19 @@ public class JcicZ053Id implements Serializable {
   @Column(name = "`MaxMainCode`", length = 3)
   private String maxMainCode = " ";
 
+  // 申請變更還款條件日
+  @Column(name = "`ChangePayDate`")
+  private int changePayDate = 0;
+
   public JcicZ053Id() {
   }
 
-  public JcicZ053Id(String submitKey, String custId, int rcDate, String maxMainCode) {
+  public JcicZ053Id(String submitKey, String custId, int rcDate, String maxMainCode, int changePayDate) {
     this.submitKey = submitKey;
     this.custId = custId;
     this.rcDate = rcDate;
     this.maxMainCode = maxMainCode;
+    this.changePayDate = changePayDate;
   }
 
 /**
@@ -128,10 +130,29 @@ public class JcicZ053Id implements Serializable {
     this.maxMainCode = maxMainCode;
   }
 
+/**
+	* 申請變更還款條件日<br>
+	* 
+	* @return Integer
+	*/
+  public int getChangePayDate() {
+    return  StaticTool.bcToRoc(this.changePayDate);
+  }
+
+/**
+	* 申請變更還款條件日<br>
+	* 
+  *
+  * @param changePayDate 申請變更還款條件日
+  * @throws LogicException when Date Is Warn	*/
+  public void setChangePayDate(int changePayDate) throws LogicException {
+    this.changePayDate = StaticTool.rocToBc(changePayDate);
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(submitKey, custId, rcDate, maxMainCode);
+    return Objects.hash(submitKey, custId, rcDate, maxMainCode, changePayDate);
   }
 
   @Override
@@ -141,11 +162,11 @@ public class JcicZ053Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ053Id jcicZ053Id = (JcicZ053Id) obj;
-    return submitKey.equals(jcicZ053Id.submitKey) && custId.equals(jcicZ053Id.custId) && rcDate == jcicZ053Id.rcDate && maxMainCode == jcicZ053Id.maxMainCode;
+    return submitKey.equals(jcicZ053Id.submitKey) && custId.equals(jcicZ053Id.custId) && rcDate == jcicZ053Id.rcDate && maxMainCode == jcicZ053Id.maxMainCode && changePayDate == jcicZ053Id.changePayDate;
   }
 
   @Override
   public String toString() {
-    return "JcicZ053Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", maxMainCode=" + maxMainCode + "]";
+    return "JcicZ053Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", maxMainCode=" + maxMainCode + ", changePayDate=" + changePayDate + "]";
   }
 }
