@@ -193,13 +193,15 @@ public class L2419Batch extends TradeBuffer {
 
 			row = seq + 2;
 
-			String seqInExcel = makeExcel.getValue(row, 1).toString(); // column A
+			String seqInExcel = makeExcel.getValue(row, L2419Column.NO.getIndex()).toString(); // column A
 			// column B
-			String clCode1InExcel = getCodeAndCheck(makeExcel.getValue(row, 2).toString(), "B", "ClCode1", "擔保品代號1");
+			String clCode1InExcel = getCodeAndCheck(
+					makeExcel.getValue(row, L2419Column.CL_CODE_1.getIndex()).toString(), "B", "ClCode1", "擔保品代號1");
 			// column C
-			String clCode2InExcel = getCodeAndCheck(makeExcel.getValue(row, 3).toString(), "C",
+			String clCode2InExcel = getCodeAndCheck(
+					makeExcel.getValue(row, L2419Column.CL_CODE_2.getIndex()).toString(), "C",
 					"ClCode2" + clCode1InExcel, "擔保品代號2");
-			String clNoInExcel = makeExcel.getValue(row, 4).toString(); // column D
+			String clNoInExcel = makeExcel.getValue(row, L2419Column.CL_NO.getIndex()).toString(); // column D
 
 			this.info("seqInExcel = " + seqInExcel);
 			this.info("clCode1InExcel = " + clCode1InExcel);
@@ -220,22 +222,27 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column E 擔保品類別
-			String clTypeCode = getCodeAndCheck(makeExcel.getValue(row, 5).toString(), "E", "ClTypeCode", "擔保品類別");
+			String clTypeCode = getCodeAndCheck(makeExcel.getValue(row, L2419Column.CL_TYPE.getIndex()).toString(), "E",
+					"ClTypeCode", "擔保品類別");
 
 			// 房地才需要寫入建號
 			// column F 建號-前5碼
-			String buildNo1 = clCode1 == 1 ? leftPadZero(makeExcel.getValue(row, 6).toString(), 5) : "";
+			String buildNo1 = clCode1 == 1
+					? leftPadZero(makeExcel.getValue(row, L2419Column.BUILD_NO_1.getIndex()).toString(), 5)
+					: "";
 			// column G 建號-後3碼
-			String buildNo2 = clCode1 == 1 ? leftPadZero(makeExcel.getValue(row, 7).toString(), 3) : "";
+			String buildNo2 = clCode1 == 1
+					? leftPadZero(makeExcel.getValue(row, L2419Column.BUILD_NO_2.getIndex()).toString(), 3)
+					: "";
 
 			// 房地跟土地都需要寫入地號
 			// column H 地號-前4碼
-			String landNo1 = leftPadZero(makeExcel.getValue(row, 8).toString(), 4);
+			String landNo1 = leftPadZero(makeExcel.getValue(row, L2419Column.LAND_NO_1.getIndex()).toString(), 4);
 			// column I 地號-後4碼
-			String landNo2 = leftPadZero(makeExcel.getValue(row, 9).toString(), 4);
+			String landNo2 = leftPadZero(makeExcel.getValue(row, L2419Column.LAND_NO_2.getIndex()).toString(), 4);
 
 			// column J // 郵遞區號
-			String zipCode = makeExcel.getValue(row, 10).toString();
+			String zipCode = makeExcel.getValue(row, L2419Column.ZIP_3.getIndex()).toString();
 			String cityCode = getZipItem("zipcity=" + zipCode);
 			String areaCode = "";
 			String cityItem = "";
@@ -274,41 +281,41 @@ public class L2419Batch extends TradeBuffer {
 				areaItem = getZipItem("area=" + cityCode + "-" + areaCode);
 			}
 			// column K 地段4碼
-			String landSectionCode = leftPadZero(makeExcel.getValue(row, 11).toString(), 4);
+			String landSectionCode = leftPadZero(makeExcel.getValue(row, L2419Column.IR_CODE.getIndex()).toString(), 4);
 
 			// 房地才需要輸入門牌
 			// column L 門牌
-			String address = clCode1 == 1 ? makeExcel.getValue(row, 12).toString() : "";
+			String address = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.ROAD.getIndex()).toString() : "";
 
 			// 房地才需要輸入用途
 			// column M 用途
 			String usage = clCode1 == 1
-					? getCodeAndCheck(makeExcel.getValue(row, 13).toString(), "M", "BdMainUseCode", "用途")
+					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.USE_CODE.getIndex()).toString(), "M", "BdMainUseCode", "用途")
 					: "";
 
 			// 房地才需要輸入建物類別
 			// column N 類別
 			String buildingTypeCode = clCode1 == 1
-					? getCodeAndCheck(makeExcel.getValue(row, 14).toString(), "N", "BdTypeCode", "建物類別")
+					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.BUILD_TYPE.getIndex()).toString(), "N", "BdTypeCode", "建物類別")
 					: "";
 
 			// 房地才需要輸入建材
 			// column O 建材
 			String buildingMtrlCode = clCode1 == 1
-					? getCodeAndCheck(makeExcel.getValue(row, 15).toString(), "O", "BdMtrlCode", "建材")
+					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.MTRL.getIndex()).toString(), "O", "BdMtrlCode", "建材")
 					: "";
 
 			// 房地才需要輸入樓層
 			// column P 樓層
-			String floorNo = clCode1 == 1 ? makeExcel.getValue(row, 16).toString() : "";
+			String floorNo = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.FLOOR_NO.getIndex()).toString() : "";
 
 			// 房地才需要輸入總樓層
 			// column Q 總樓層
-			String totalFloor = clCode1 == 1 ? makeExcel.getValue(row, 17).toString() : "";
+			String totalFloor = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.TOTAL_FLOOR.getIndex()).toString() : "";
 
 			// 房地才需要輸入建築完成日期
 			// column R 建物完成日期
-			String buildDate = clCode1 == 1 ? makeExcel.getValue(row, 18).toString() : "";
+			String buildDate = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.BUILD_DATE.getIndex()).toString() : "";
 			if (clCode1 == 1 && !checkDate(buildDate)) {
 				throwErrorMsg("E0015", "欄位:R ,行數:" + row + ",不是一個正確的日期,建築完成日期=" + buildDate);
 			}
@@ -317,7 +324,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column S 設定日期
-			String settingDate = makeExcel.getValue(row, 19).toString();
+			String settingDate = makeExcel.getValue(row, L2419Column.SETTING_DATE.getIndex()).toString();
 			if (!checkDate(settingDate)) {
 				throwErrorMsg("E0015", "欄位:S ,行數:" + row + ",不是一個正確的日期,設定日期=" + settingDate);
 			}
@@ -326,28 +333,28 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column T 面積
-			String floorArea = makeExcel.getValue(row, 20).toString();
+			String floorArea = makeExcel.getValue(row, L2419Column.FLOOR_AREA.getIndex()).toString();
 			BigDecimal floorAreaBigDecimal = new BigDecimal(floorArea);
 			if (floorAreaBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
 				throwErrorMsg("E0015", "欄位:T ,行數:" + row + ",面積不得為0或空白,面積=" + floorArea);
 			}
 
 			// column U 鑑估單價
-			String evaUnitPrice = makeExcel.getValue(row, 21).toString();
+			String evaUnitPrice = makeExcel.getValue(row, L2419Column.UNIT_PRICE.getIndex()).toString();
 			BigDecimal evaUnitPriceBigDecimal = new BigDecimal(evaUnitPrice);
 			if (evaUnitPriceBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
 				throwErrorMsg("E0015", "欄位:U ,行數:" + row + ",鑑估單價不得為0或空白,鑑估單價=" + evaUnitPrice);
 			}
 
 			// column V 鑑估總價
-			String evaAmt = makeExcel.getValue(row, 22).toString();
+			String evaAmt = makeExcel.getValue(row, L2419Column.EVA_AMT.getIndex()).toString();
 			BigDecimal evaAmtBigDecimal = new BigDecimal(evaAmt);
 			if (evaAmtBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
 				throwErrorMsg("E0015", "欄位:V ,行數:" + row + ",鑑估總價不得為0或空白,鑑估總價=" + evaAmt);
 			}
 
 			// column W 增值稅
-			String tax = makeExcel.getValue(row, 23).toString();
+			String tax = makeExcel.getValue(row, L2419Column.TAX.getIndex()).toString();
 			if (tax != null && !tax.isEmpty()) {
 				try {
 					new BigDecimal(tax);
@@ -357,7 +364,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column X 淨值
-			String netValue = makeExcel.getValue(row, 24).toString();
+			String netValue = makeExcel.getValue(row, L2419Column.NET_VALUE.getIndex()).toString();
 			if (netValue != null && !netValue.isEmpty()) {
 				try {
 					new BigDecimal(netValue);
@@ -367,7 +374,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column Y 押金
-			String rentPrice = makeExcel.getValue(row, 25).toString();
+			String rentPrice = makeExcel.getValue(row, L2419Column.RENT_PRICE.getIndex()).toString();
 			if (rentPrice != null && !rentPrice.isEmpty()) {
 				try {
 					new BigDecimal(rentPrice);
@@ -377,7 +384,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column Z 出租淨值
-			String rentEvaValue = makeExcel.getValue(row, 26).toString();
+			String rentEvaValue = makeExcel.getValue(row, L2419Column.RENT_EVA_VALUE.getIndex()).toString();
 			if (rentEvaValue != null && !rentEvaValue.isEmpty()) {
 				try {
 					new BigDecimal(rentEvaValue);
@@ -387,7 +394,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AA 貸放成數(%)
-			String loanToValue = makeExcel.getValue(row, 27).toString();
+			String loanToValue = makeExcel.getValue(row, L2419Column.LOAN_TO_VALUE.getIndex()).toString();
 			BigDecimal loanToValueBigDecimal = null;
 			try {
 				loanToValueBigDecimal = new BigDecimal(loanToValue);
@@ -399,17 +406,10 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AB 借款金額(仟元)
-			String loanAmt = makeExcel.getValue(row, 28).toString();
-			if (loanAmt != null && !loanAmt.isEmpty()) {
-				try {
-					new BigDecimal(loanAmt);
-				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:AB ,行數:" + row + ",借款金額有輸入時需為數字,借款金額=" + loanAmt);
-				}
-			}
+			String loanAmt = makeExcel.getValue(row, L2419Column.LOAN_AMT.getIndex()).toString();
 
 			// column AC 設定金額(仟元)
-			String settingAmt = makeExcel.getValue(row, 29).toString();
+			String settingAmt = makeExcel.getValue(row, L2419Column.SETTING_AMT.getIndex()).toString();
 			BigDecimal settingAmtBigDecimal = null;
 			try {
 				settingAmtBigDecimal = new BigDecimal(settingAmt);
@@ -421,29 +421,22 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AD 還款金額(仟元)
-			String repayAmt = makeExcel.getValue(row, 30).toString();
-			if (repayAmt != null && !repayAmt.isEmpty()) {
-				try {
-					new BigDecimal(repayAmt);
-				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:AD ,行數:" + row + ",借款金額有輸入時需為數字,借款金額=" + repayAmt);
-				}
-			}
+			String repayAmt = makeExcel.getValue(row, L2419Column.REPAY_AMT.getIndex()).toString();
 
 			// column AE 保險單號碼
-			String insuNo = makeExcel.getValue(row, 31).toString();
+			String insuNo = makeExcel.getValue(row, L2419Column.INSU_NO.getIndex()).toString();
 			if (insuNo == null || insuNo.isEmpty()) {
 				throwErrorMsg("E0015", "欄位:AE ,行數:" + row + ",保險單號碼不得為空白.");
 			}
 
 			// column AF 保險公司
-			String insuCompany = getCodeAndCheck(makeExcel.getValue(row, 32).toString(), "AF", "InsuCompany", "保險公司");
+			String insuCompany = getCodeAndCheck(makeExcel.getValue(row, L2419Column.INSU_COMPANY.getIndex()).toString(), "AF", "InsuCompany", "保險公司");
 
 			// column AG 保險類別
-			String insuTypeCode = getCodeAndCheck(makeExcel.getValue(row, 33).toString(), "AF", "InsuTypeCode", "保險類別");
+			String insuTypeCode = getCodeAndCheck(makeExcel.getValue(row, L2419Column.INSU_TYPE.getIndex()).toString(), "AF", "InsuTypeCode", "保險類別");
 
 			// column AH 火災險保險金額(仟元)
-			String fireInsuAmt = makeExcel.getValue(row, 34).toString();
+			String fireInsuAmt = makeExcel.getValue(row, L2419Column.FIRE_INSU_AMT.getIndex()).toString();
 			BigDecimal fireInsuAmtBigDecimal = null;
 			try {
 				fireInsuAmtBigDecimal = new BigDecimal(fireInsuAmt);
@@ -455,7 +448,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AI 火災險保費
-			String fireInsuExpense = makeExcel.getValue(row, 35).toString();
+			String fireInsuExpense = makeExcel.getValue(row, L2419Column.FIRE_INSU_EXPENSE.getIndex()).toString();
 			if (fireInsuExpense != null && !fireInsuExpense.isEmpty()) {
 				try {
 					new BigDecimal(fireInsuExpense);
@@ -465,7 +458,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AJ 地震險保險金額(仟元)
-			String earthquakeInsuAmt = makeExcel.getValue(row, 36).toString();
+			String earthquakeInsuAmt = makeExcel.getValue(row, L2419Column.EARTHQUAKE_INSU_AMT.getIndex()).toString();
 			if (earthquakeInsuAmt != null && !earthquakeInsuAmt.isEmpty()) {
 				try {
 					new BigDecimal(earthquakeInsuAmt);
@@ -475,7 +468,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AK 地震險保費
-			String earthquakeInsuExpense = makeExcel.getValue(row, 37).toString();
+			String earthquakeInsuExpense = makeExcel.getValue(row, L2419Column.EARTHQUAKE_INSU_EXPENSE.getIndex()).toString();
 			if (earthquakeInsuExpense != null && !earthquakeInsuExpense.isEmpty()) {
 				try {
 					new BigDecimal(earthquakeInsuExpense);
@@ -485,7 +478,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AL 保險起日
-			String insuStartDate = makeExcel.getValue(row, 38).toString();
+			String insuStartDate = makeExcel.getValue(row, L2419Column.INSU_START.getIndex()).toString();
 			if (!checkDate(insuStartDate)) {
 				throwErrorMsg("E0015", "欄位:AL ,行數:" + row + ",不是一個正確的日期,保險起日=" + insuStartDate);
 			}
@@ -494,7 +487,7 @@ public class L2419Batch extends TradeBuffer {
 			}
 
 			// column AM 保險迄日
-			String insuEndDate = makeExcel.getValue(row, 39).toString();
+			String insuEndDate = makeExcel.getValue(row, L2419Column.INSU_END.getIndex()).toString();
 			if (!checkDate(insuEndDate)) {
 				throwErrorMsg("E0015", "欄位:AM ,行數:" + row + ",不是一個正確的日期,checkDate=" + insuEndDate);
 			}
@@ -506,7 +499,7 @@ public class L2419Batch extends TradeBuffer {
 			// 當所有權人1的種類為空時,取前一筆資料的全部所有權人資料,若無前一筆資料的全部所有權人資料時,須給錯誤提示
 
 			// column AN 所有權人1-所有權種類
-			String ownerType1 = makeExcel.getValue(row, 40).toString();
+			String ownerType1 = makeExcel.getValue(row, L2419Column.OWNER_TYPE_1.getIndex()).toString();
 
 			if (ownerType1 == null || ownerType1.isEmpty() || ownerType1.indexOf("_") < 0) {
 				// CASE 1: 所有權人1-所有權種類為空白
@@ -536,19 +529,19 @@ public class L2419Batch extends TradeBuffer {
 				}
 
 				// column AO 所有權人1-身分證/統編
-				String ownerId1 = makeExcel.getValue(row, 41).toString().trim();
+				String ownerId1 = makeExcel.getValue(row, L2419Column.OWNER_ID_1.getIndex()).toString().trim();
 				if (ownerId1 == null || ownerId1.isEmpty()) {
 					throwErrorMsg("E0015", "欄位:AO ,行數:" + row + ",有選擇所有權種類時,所有權人-身分證/統編不得為空白.");
 				}
 
 				// column AP 所有權人1-姓名
-				String ownerName1 = makeExcel.getValue(row, 42).toString().trim();
+				String ownerName1 = makeExcel.getValue(row, L2419Column.OWNER_NAME_1.getIndex()).toString().trim();
 				if (ownerName1 == null || ownerName1.isEmpty()) {
 					throwErrorMsg("E0015", "欄位:AP ,行數:" + row + ",有選擇所有權種類時,所有權人-姓名不得為空白.");
 				}
 
 				// column AQ 所有權人1-與授信戶關係
-				String ownerRel1 = makeExcel.getValue(row, 43).toString();
+				String ownerRel1 = makeExcel.getValue(row, L2419Column.OWNER_RELATION_1.getIndex()).toString();
 				if (ownerRel1 != null && !ownerRel1.isEmpty() && ownerRel1.indexOf("_") >= 0) {
 					if (ownerRel1.substring(0, ownerRel1.indexOf("_")).equals("00")) {
 						ownerRel1 = ownerRel1.substring(0, ownerRel1.indexOf("_"));
@@ -560,7 +553,7 @@ public class L2419Batch extends TradeBuffer {
 				}
 
 				// column AR 所有權人1-持份比率
-				String part = makeExcel.getValue(row, 44).toString();
+				String part = makeExcel.getValue(row, L2419Column.OWNER_PARTIAL_1.getIndex()).toString();
 				if (part == null || part.isEmpty()) {
 					throwErrorMsg("E0015", "欄位:AR ,行數:" + row + ",有選擇所有權種類時,所有權人-持份比率不得為空白.");
 				}
@@ -1231,7 +1224,7 @@ public class L2419Batch extends TradeBuffer {
 			// 所有權人2 第1欄為45
 			// 所有權人3 第1欄為50
 			// 依此類推...
-			int column = 45 + ((ownerSeq - 2) * 5);
+			int column = L2419Column.OWNER_TYPE_2.getIndex() + ((ownerSeq - 2) * 5);
 
 			this.info("ownerSeq=" + ownerSeq);
 			this.info("column=" + column);

@@ -48,7 +48,9 @@ import com.st1.itx.db.domain.JcicZ450Id;
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
 import com.st1.itx.db.domain.JcicZ447;
+import com.st1.itx.db.domain.JcicZ447Id;
 import com.st1.itx.db.domain.JcicZ572;
+import com.st1.itx.db.domain.JcicZ572Id;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 //import com.st1.itx.db.domain.AcReceivableId;
@@ -378,25 +380,26 @@ public class NegCom extends CommBuffer {
 
 		}
 
+// 2022/11/9調整:喘息期間繳款,怡婷意見:下次繳款日為原下次繳款日(喘息期後)往後計算,故點掉下列特殊處理
 		// 喘息期間繳款-同步調整下次繳款日,還款結束日,繳息迄日
-		if (tNegMain.getDeferYMStart() > 0) {
-			int dayst = tNegMain.getDeferYMStart() * 100 - 19110000 + 01;
-			int dayend = tNegMain.getDeferYMEnd() * 100 - 19110000 + 31;
-			int dayend10 = tNegMain.getDeferYMEnd() * 100 - 19110000 + 10;
-			String itransEntryDate = String.valueOf(transEntryDate).substring(0, 5) + "10";
-			int daynext = Integer.valueOf(itransEntryDate);// 需取繳款日當月10號
-			int oldNextPayDate = tNegMain.getNextPayDate();// 原始下次繳款日
-			if (transEntryDate >= dayst && transEntryDate <= dayend && mainNextPayDate > dayend && mainPayIntDate < dayend10) {
-				if (transEntryDate <= daynext) {// 繳款日小於等於當月10號
-					mainNextPayDate = daynext;
-				} else {
-					mainNextPayDate = getRepayDate(daynext, 1, titaVo);// 下個月10號
-				}
-				mainPayIntDate = getRepayDate(mainNextPayDate, -1, titaVo);// 上次繳息迄日為下次繳款日往前推一個月
-				int period = DiffMonth(1, mainNextPayDate, oldNextPayDate);// 往前推幾期
-				mainLastDueDate = getRepayDate(mainLastDueDate, 0 - period, titaVo);
-			}
-		}
+		//		if (tNegMain.getDeferYMStart() > 0) {
+//			int dayst = tNegMain.getDeferYMStart() * 100 - 19110000 + 01;
+//			int dayend = tNegMain.getDeferYMEnd() * 100 - 19110000 + 31;
+//			int dayend10 = tNegMain.getDeferYMEnd() * 100 - 19110000 + 10;
+//			String itransEntryDate = String.valueOf(transEntryDate).substring(0, 5) + "10";
+//			int daynext = Integer.valueOf(itransEntryDate);// 需取繳款日當月10號
+//			int oldNextPayDate = tNegMain.getNextPayDate();// 原始下次繳款日
+//			if (transEntryDate >= dayst && transEntryDate <= dayend && mainNextPayDate > dayend && mainPayIntDate < dayend10) {
+//				if (transEntryDate <= daynext) {// 繳款日小於等於當月10號
+//					mainNextPayDate = daynext;
+//				} else {
+//					mainNextPayDate = getRepayDate(daynext, 1, titaVo);// 下個月10號
+//				}
+//				mainPayIntDate = getRepayDate(mainNextPayDate, -1, titaVo);// 上次繳息迄日為下次繳款日往前推一個月
+//				int period = DiffMonth(1, mainNextPayDate, oldNextPayDate);// 往前推幾期
+//				mainLastDueDate = getRepayDate(mainLastDueDate, 0 - period, titaVo);
+//			}
+//		}
 
 		// 用客戶繳款日期去算到本期為止應該還幾期
 		if (mainNextPayDate == 0) {

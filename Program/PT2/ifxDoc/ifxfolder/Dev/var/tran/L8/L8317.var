@@ -311,6 +311,8 @@ C(5,#CaseStatus,H,T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt
 
 #CaseStatusX=X,40,L
 T(H,#CaseStatus,#CaseStatus56Help)
+C(5,#CaseStatus,B,$,C(5,#CaseStatus,C,$,T(3,@Approve,)T(H,@ApproveX,#Approve,#YesNoHelp)))
+
 
 
 
@@ -383,13 +385,27 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@Approve,#L8r28Approve),$)
 C(5,#TranKey,D,s,$)
-C(5,#CaseStatus,B,$,C(5,#CaseStatus,C,$,s))
+C(5,#CaseStatus,B,$,C(5,#CaseStatus,C,$,S))
 HELP(#YesNoHelp)
-!@T(3,ApproveX,)
+@T(3,@ApproveX,)
 V(H,#YesNoHelp)
+IF(#CaseStatus=="A",S,$)
+IF(#CaseStatus=="D",S,$)
+IF(#CaseStatus=="E",S,$)
+IF(#CaseStatus=="F",S,$)
+IF(#CaseStatus=="G",S,$)
+IF(#CaseStatus=="H",S,$)
+
 
 #ApproveX=X,2,L
+IF(#CaseStatus=="A",S,$)
+IF(#CaseStatus=="D",S,$)
+IF(#CaseStatus=="E",S,$)
+IF(#CaseStatus=="F",S,$)
+IF(#CaseStatus=="G",S,$)
+IF(#CaseStatus=="H",S,$)
 T(H,@ApproveX,#Approve,#YesNoHelp)
+
 
 !原始債權金額 13
 #OutstandAmt=M,9,I

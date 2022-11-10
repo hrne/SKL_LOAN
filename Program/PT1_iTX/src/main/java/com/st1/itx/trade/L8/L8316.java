@@ -101,6 +101,17 @@ public class L8316 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
 
+				if ("A".equals(iTranKey)) {
+					if ("3".equals(iCaseStatus)) {
+						chJcicZ055 = sJcicZ055Service.findById(iJcicZ055Id, titaVo);
+						if (chJcicZ055 == null) {
+							if (!"Y".equals(iIsImplement)) {
+								throw new LogicException("E0005", "首次報送案件狀態為3﹐「是否依更生條件履行」必須為'Y'.");
+							}
+						}
+					}
+				}
+				
 				// 1 start 案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」
 				if ("3".equals(iCaseStatus)) {
 					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
@@ -157,6 +168,7 @@ public class L8316 extends TradeBuffer {
 					}
 				} // 2 end
 			}
+
 		}
 
 		// 3.1 key值為「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複，重複者予以剔退-case "1"檢核
@@ -229,10 +241,10 @@ public class L8316 extends TradeBuffer {
 			uJcicZ055.setInspectName(iInspectName);
 
 			uJcicZ055.setOutJcicTxtDate(0);
-			
+
 			uJcicZ055.setActualFilingDate(0);
 			uJcicZ055.setActualFilingMark("");
-			
+
 			try {
 				sJcicZ055Service.update(uJcicZ055, titaVo);
 			} catch (DBException e) {

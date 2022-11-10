@@ -49,11 +49,13 @@ public class AcRepayCom extends TradeBuffer {
 	@Autowired
 	public LoanBorTxService loanBorTxService;
 	@Autowired
-	LoanCom loanCom;
+	private LoanCom loanCom;
 	@Autowired
-	AcDetailCom acDetailCom;
+	private AcDetailCom acDetailCom;
 	@Autowired
-	AcReceivableCom acReceivableCom;
+	private AcReceivableCom acReceivableCom;
+	@Autowired
+	private BaTxCom baTxCom;
 	@Autowired
 	public Parse parse;
 
@@ -173,6 +175,12 @@ public class AcRepayCom extends TradeBuffer {
 					txAmtRemaind = txAmtRemaind.add(ac.getTxAmt());
 				} else {
 					tempAmtRemaind = tempAmtRemaind.add(ac.getTxAmt());
+				}
+			} else {
+				if (sumNo >= 98) {
+					txAmtRemaind = txAmtRemaind.subtract(ac.getTxAmt());
+				} else {
+					tempAmtRemaind = tempAmtRemaind.subtract(ac.getTxAmt());
 				}
 			}
 		}
@@ -302,12 +310,17 @@ public class AcRepayCom extends TradeBuffer {
 	/* 收付欄出帳 */
 	private void addPayment(int i, TitaVo titaVo) throws LogicException {
 		String iRpFlag = titaVo.getParam("RpFlag"); /* 收付記號 DECIMAL(1) */
+		// 收付金額
+		BigDecimal rpAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i));
+		if (rpAmt.compareTo(BigDecimal.ZERO) == 0) {
+			return;
+		}
+
 		acDetail = new AcDetail();
 
 		acDetail.setDscptCode(titaVo.get("RpDscpt" + i)); // 摘要代號
 		acDetail.setSlipNote(titaVo.get("RpNote" + i)); // 摘要
-		// 收付金額
-		acDetail.setTxAmt(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i)));
+		acDetail.setTxAmt(rpAmt);
 
 		// 戶號 0123456-890-234
 		acDetail.setCustNo(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
@@ -359,8 +372,30 @@ public class AcRepayCom extends TradeBuffer {
 
 		switch (acDetail.getSumNo()) {
 		case "090":
-			throw new LogicException(titaVo, "E0015", "請自行執行L3230 暫收款銷帳(06-轉帳), 額度" + titaVo.getParam("RpFacmNo" + i)
-					+ ", 金額" + titaVo.getParam("RpAmt" + i)); // 檢查錯誤
+			acDetail.setAcctCode("TAV");
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+			if (acDetail.getCustNo() != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
+				baTxCom.setTxBuffer(this.txBuffer);
+				try {
+					baTxCom.settingUnPaid(titaVo.getEntDyI(), acDetail.getCustNo(), acDetail.getFacmNo(), 0, 96,
+							BigDecimal.ZERO, titaVo);
+				} catch (LogicException e) {
+					throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
+				}
+				BigDecimal excessive = baTxCom.getExcessive();
+				acDetail.setTxAmt(excessive);
+				// 暫收款入帳(暫收借)
+				this.lAcDetail.add(acDetail);
+				// 累溢收入帳(暫收貸)
+				acDetail = new AcDetail();
+				acDetail.setSumNo("090");
+				acDetail.setAcctCode("TAV");
+				acDetail.setCustNo(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
+				acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+				acDetail.setDbCr("C");
+				acDetail.setTxAmt(excessive.subtract(rpAmt));
+			}
+			break;
 		case "091":
 			acDetail.setAcctCode("TRO");
 			// 1:應收 L3410 結案 D 500,000 FacmNo002 原額度002
@@ -820,11 +855,4 @@ public class AcRepayCom extends TradeBuffer {
 		}
 		return tLoanBorTx;
 	}
-
-	// 取得代碼說明
-	private String getCdCodeX(String defCode, String cdCode, TitaVo titaVo) throws LogicException {
-		CdCode tCdCode = cdCodeService.findById(new CdCodeId(defCode, cdCode), titaVo);
-		return tCdCode == null ? "" : tCdCode.getItem();
-	}
-
 }

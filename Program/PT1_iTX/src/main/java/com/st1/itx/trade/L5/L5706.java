@@ -533,7 +533,8 @@ public class L5706 extends TradeBuffer {
 			if (tNegFinAcct != null) {
 
 			} else {
-				throw new LogicException(titaVo, "E0001", "債權金融機構=" + fincode + ",身分證字號=" + id + ",識別碼=" + code + ",請先由入口交易L5974新增債權金融機構");
+				throw new LogicException(titaVo, "E0001",
+						"債權金融機構=" + fincode + ",身分證字號=" + id + ",識別碼=" + code + ",請先由入口交易L5974新增債權金融機構");
 			}
 		} else {
 			throw new LogicException(titaVo, "E0015", "債權金融機構不可空白" + ":身分證字號=" + id + ",識別碼=" + code);
@@ -1113,7 +1114,11 @@ public class L5706 extends TradeBuffer {
 		tNegFinShareLog.setDueAmt(tNegFinShare.getDueAmt());
 		tNegFinShareLog.setCancelDate(DateRocToDC(paydate, "單獨受償日期", titaVo));// 註銷日期
 		// 註銷金額=簽約金額/簽約金額加總*總本金餘額 ; 先乘再除,四捨五入到整數
-		BigDecimal CancelAmt = tNegFinShare.getContractAmt().multiply(tNegMain.getPrincipalBal()).divide(sumContractAmt, 0, BigDecimal.ROUND_HALF_UP);
+		//BigDecimal CancelAmt = tNegFinShare.getContractAmt().multiply(tNegMain.getPrincipalBal()).divide(sumContractAmt, 0, BigDecimal.ROUND_HALF_UP);
+		// 2022/11/19調整為改以總本金餘額*債權比例/100
+		BigDecimal rate100 = new BigDecimal(100);
+		BigDecimal CancelAmt = tNegMain.getPrincipalBal().multiply(tNegFinShare.getAmtRatio()).divide(rate100, 0,
+				BigDecimal.ROUND_HALF_UP);
 		tNegFinShareLog.setCancelAmt(CancelAmt);
 
 		// 存到暫存檔

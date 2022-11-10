@@ -36,6 +36,8 @@ import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.SendRsp;
+
 
 /*DB服務*/
 import com.st1.itx.db.service.CustMainService;
@@ -119,6 +121,9 @@ public class L5701 extends TradeBuffer {
 
 	@Autowired
 	public DataLog iDataLog;
+
+	@Autowired
+	SendRsp sendRsp;
 
 	@Autowired
 	NegCom negCom;
@@ -273,6 +278,14 @@ public class L5701 extends TradeBuffer {
 			}
 			if (Delete == 0) {
 				// 可刪除
+
+				// 刷主管卡後始可刪除
+				// 交易需主管核可
+				if (!titaVo.getHsupCode().equals("1")) {
+					// titaVo.getSupCode();
+					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				}
+				
 				try {
 					sNegMainService.holdById(NegMainId);
 					sNegMainService.delete(NegMainVO);
@@ -280,6 +293,9 @@ public class L5701 extends TradeBuffer {
 					// E0008 刪除資料時，發生錯誤
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 				}
+				iDataLog.setEnv(titaVo, NegMainVO, NegMainVO); 
+				iDataLog.exec("刪除債權主檔"); 
+
 				DelNegFinShare(intCustNo, IntCaseSeq);
 				DelNegFinShareLog(intCustNo, IntCaseSeq);
 			} else {

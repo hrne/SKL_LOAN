@@ -28,6 +28,7 @@ BEGIN
         "AcDate" -- 會計日期 Decimald 8
       , "TitaTlrNo" -- 經辦 VARCHAR2 6
       , "TitaTxtNo" -- 交易序號 VARCHAR2 8
+      , "Seq"
       , "BatchNo" -- 整批批號 VARCHAR2 6
       , "DrawdownCode" -- 撥款方式 DECIMAL 2
       , "StatusCode" -- 狀態 DECIMAL 1
@@ -63,6 +64,15 @@ BEGIN
     SELECT EXGP.TRXDAT                         AS "AcDate" -- 會計日期 Decimald 8
          , NVL(AEM1."EmpNo",'999999')          AS "TitaTlrNo" -- 經辦 VARCHAR2 6
          , LPAD(EXGP.TRXNMT,8,'0')             AS "TitaTxtNo" -- 交易序號 VARCHAR2 8
+         , ROW_NUMBER()
+           OVER (
+            PARTITION BY
+              EXGP.TRXDAT
+              , NVL(AEM1."EmpNo",'999999')
+              , LPAD(EXGP.TRXNMT,8,'0')
+            ORDER BY
+              EXGP.EXGASQ
+           )                                   AS "Seq"
          , 'LN01  '                            AS "BatchNo" -- 整批批號 VARCHAR2 6
          , 1                                   AS "DrawdownCode" -- 撥款方式 DECIMAL 2
          , 0                                   AS "StatusCode" -- 狀態 DECIMAL 1

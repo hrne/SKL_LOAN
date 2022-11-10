@@ -2,6 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -18,12 +20,7 @@ import com.st1.itx.Exception.LogicException;
 public class BankRemitId implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6427168503113686743L;
-
-// 會計日期
+  // 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
