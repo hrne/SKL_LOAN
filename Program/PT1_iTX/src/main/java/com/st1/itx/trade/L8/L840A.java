@@ -304,7 +304,8 @@ public class L840A extends TradeBuffer {
 		if (titaVo.get("OOSubmitKey") != null) {
 			titaVo.put("SubmitKey", titaVo.get("OOSubmitKey"));
 		}
-		if (iSubmitType == 1 || iSubmitType == 3) {
+//		if (iSubmitType == 1 || iSubmitType == 3) {
+		if (iSubmitType == 1 ) {
 //			更新篩選資料日期
 			setJcicDate(titaVo);
 
@@ -357,15 +358,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ040 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ040.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ040.getOutJcicTxtDate() == 0) {
 					tJcicZ040.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ040.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ040.setActualFilingDate(iJcicDate);
 				tJcicZ040.setActualFilingMark("Y");
 			} else {
-				tJcicZ040.setOutJcicTxtDate(iJcicDate);
-				tJcicZ040.setActualFilingDate(0);
+				tJcicZ040.setOutJcicTxtDate(0);
+//				tJcicZ040.setActualFilingDate(0);
 				tJcicZ040.setActualFilingMark("N");
 			}
 			try {
@@ -395,15 +396,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ041 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ041.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ041.getOutJcicTxtDate() == 0) {
 					tJcicZ041.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ041.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ041.setActualFilingDate(iJcicDate);
 				tJcicZ041.setActualFilingMark("Y");
 			} else {
-				tJcicZ041.setOutJcicTxtDate(iJcicDate);
-				tJcicZ041.setActualFilingDate(0);
+				tJcicZ041.setOutJcicTxtDate(0);
+//				tJcicZ041.setActualFilingDate(0);
 				tJcicZ041.setActualFilingMark("N");
 			}
 			try {
@@ -434,15 +435,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ042 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ042.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ042.getOutJcicTxtDate() == 0) {
 					tJcicZ042.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ042.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ042.setActualFilingDate(iJcicDate);
 				tJcicZ042.setActualFilingMark("Y");
 			} else {
-				tJcicZ042.setOutJcicTxtDate(iJcicDate);
-				tJcicZ042.setActualFilingDate(0);
+				tJcicZ042.setOutJcicTxtDate(0);
+//				tJcicZ042.setActualFilingDate(0);
 				tJcicZ042.setActualFilingMark("N");
 			}
 			try {
@@ -473,15 +474,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ043 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ043.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ043.getOutJcicTxtDate() == 0) {
 					tJcicZ043.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ043.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ043.setActualFilingDate(iJcicDate);
 				tJcicZ043.setActualFilingMark("Y");
 			} else {
-				tJcicZ043.setOutJcicTxtDate(iJcicDate);
-				tJcicZ043.setActualFilingDate(0);
+				tJcicZ043.setOutJcicTxtDate(0);
+//				tJcicZ043.setActualFilingDate(0);
 				tJcicZ043.setActualFilingMark("N");
 			}
 			try {
@@ -509,15 +510,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ044 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ044.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ044.getOutJcicTxtDate() == 0) {
 					tJcicZ044.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ044.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ044.setActualFilingDate(iJcicDate);
 				tJcicZ044.setActualFilingMark("Y");
 			} else {
-				tJcicZ044.setOutJcicTxtDate(iJcicDate);
-				tJcicZ044.setActualFilingDate(0);
+				tJcicZ044.setOutJcicTxtDate(0);
+//				tJcicZ044.setActualFilingDate(0);
 				tJcicZ044.setActualFilingMark("N");
 			}
 			try {
@@ -547,15 +548,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ045 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ045.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ045.getOutJcicTxtDate() == 0) {
 					tJcicZ045.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ045.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ045.setActualFilingDate(iJcicDate);
 				tJcicZ045.setActualFilingMark("Y");
 			} else {
-				tJcicZ045.setOutJcicTxtDate(iJcicDate);
-				tJcicZ045.setActualFilingDate(0);
+				tJcicZ045.setOutJcicTxtDate(0);
+//				tJcicZ045.setActualFilingDate(0);
 				tJcicZ045.setActualFilingMark("N");
 			}
 			try {
@@ -585,15 +586,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ046 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ046.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ046.getOutJcicTxtDate() == 0) {
 					tJcicZ046.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ046.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ046.setActualFilingDate(iJcicDate);
 				tJcicZ046.setActualFilingMark("Y");
 			} else {
-				tJcicZ046.setOutJcicTxtDate(iJcicDate);
-				tJcicZ046.setActualFilingDate(0);
+				tJcicZ046.setOutJcicTxtDate(0);
+//				tJcicZ046.setActualFilingDate(0);
 				tJcicZ046.setActualFilingMark("N");
 			}
 			try {
@@ -621,15 +622,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ047 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ047.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ047.getOutJcicTxtDate() == 0) {
 					tJcicZ047.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ047.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ047.setActualFilingDate(iJcicDate);
 				tJcicZ047.setActualFilingMark("Y");
 			} else {
-				tJcicZ047.setOutJcicTxtDate(iJcicDate);
-				tJcicZ047.setActualFilingDate(0);
+				tJcicZ047.setOutJcicTxtDate(0);
+//				tJcicZ047.setActualFilingDate(0);
 				tJcicZ047.setActualFilingMark("N");
 			}
 			try {
@@ -657,15 +658,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ048 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ048.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ048.getOutJcicTxtDate() == 0) {
 					tJcicZ048.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ048.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ048.setActualFilingDate(iJcicDate);
 				tJcicZ048.setActualFilingMark("Y");
 			} else {
-				tJcicZ048.setOutJcicTxtDate(iJcicDate);
-				tJcicZ048.setActualFilingDate(0);
+				tJcicZ048.setOutJcicTxtDate(0);
+//				tJcicZ048.setActualFilingDate(0);
 				tJcicZ048.setActualFilingMark("N");
 			}
 			try {
@@ -693,15 +694,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ049 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ049.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ049.getOutJcicTxtDate() == 0) {
 					tJcicZ049.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ049.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ049.setActualFilingDate(iJcicDate);
 				tJcicZ049.setActualFilingMark("Y");
 			} else {
-				tJcicZ049.setOutJcicTxtDate(iJcicDate);
-				tJcicZ049.setActualFilingDate(0);
+				tJcicZ049.setOutJcicTxtDate(0);
+//				tJcicZ049.setActualFilingDate(0);
 				tJcicZ049.setActualFilingMark("N");
 			}
 			try {
@@ -731,15 +732,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ050 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ050.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ050.getOutJcicTxtDate() == 0) {
 					tJcicZ050.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ050.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ050.setActualFilingDate(iJcicDate);
 				tJcicZ050.setActualFilingMark("Y");
 			} else {
-				tJcicZ050.setOutJcicTxtDate(iJcicDate);
-				tJcicZ050.setActualFilingDate(0);
+				tJcicZ050.setOutJcicTxtDate(0);
+//				tJcicZ050.setActualFilingDate(0);
 				tJcicZ050.setActualFilingMark("N");
 			}
 			try {
@@ -769,15 +770,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ051 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ051.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ051.getOutJcicTxtDate() == 0) {
 					tJcicZ051.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ051.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ051.setActualFilingDate(iJcicDate);
 				tJcicZ051.setActualFilingMark("Y");
 			} else {
-				tJcicZ051.setOutJcicTxtDate(iJcicDate);
-				tJcicZ051.setActualFilingDate(0);
+				tJcicZ051.setOutJcicTxtDate(0);
+//				tJcicZ051.setActualFilingDate(0);
 				tJcicZ051.setActualFilingMark("N");
 			}
 			try {
@@ -805,15 +806,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ052 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ052.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ052.getOutJcicTxtDate() == 0) {
 					tJcicZ052.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ052.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ052.setActualFilingDate(iJcicDate);
 				tJcicZ052.setActualFilingMark("Y");
 			} else {
-				tJcicZ052.setOutJcicTxtDate(iJcicDate);
-				tJcicZ052.setActualFilingDate(0);
+				tJcicZ052.setOutJcicTxtDate(0);
+//				tJcicZ052.setActualFilingDate(0);
 				tJcicZ052.setActualFilingMark("N");
 			}
 			try {
@@ -843,15 +844,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ053 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ053.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ053.getOutJcicTxtDate() == 0) {
 					tJcicZ053.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ053.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ053.setActualFilingDate(iJcicDate);
 				tJcicZ053.setActualFilingMark("Y");
 			} else {
-				tJcicZ053.setOutJcicTxtDate(iJcicDate);
-				tJcicZ053.setActualFilingDate(0);
+				tJcicZ053.setOutJcicTxtDate(0);
+//				tJcicZ053.setActualFilingDate(0);
 				tJcicZ053.setActualFilingMark("N");
 			}
 			try {
@@ -883,15 +884,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ054 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ054.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ054.getOutJcicTxtDate() == 0) {
 					tJcicZ054.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ054.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ054.setActualFilingDate(iJcicDate);
 				tJcicZ054.setActualFilingMark("Y");
 			} else {
-				tJcicZ054.setOutJcicTxtDate(iJcicDate);
-				tJcicZ054.setActualFilingDate(0);
+				tJcicZ054.setOutJcicTxtDate(0);
+//				tJcicZ054.setActualFilingDate(0);
 				tJcicZ054.setActualFilingMark("N");
 			}
 			try {
@@ -923,15 +924,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ055 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ055.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ055.getOutJcicTxtDate() == 0) {
 					tJcicZ055.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ055.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ055.setActualFilingDate(iJcicDate);
 				tJcicZ055.setActualFilingMark("Y");
 			} else {
-				tJcicZ055.setOutJcicTxtDate(iJcicDate);
-				tJcicZ055.setActualFilingDate(0);
+				tJcicZ055.setOutJcicTxtDate(0);
+//				tJcicZ055.setActualFilingDate(0);
 				tJcicZ055.setActualFilingMark("N");
 			}
 			try {
@@ -963,15 +964,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ056 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ056.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ056.getOutJcicTxtDate() == 0) {
 					tJcicZ056.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ056.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ056.setActualFilingDate(iJcicDate);
 				tJcicZ056.setActualFilingMark("Y");
 			} else {
-				tJcicZ056.setOutJcicTxtDate(iJcicDate);
-				tJcicZ056.setActualFilingDate(0);
+				tJcicZ056.setOutJcicTxtDate(0);
+//				tJcicZ056.setActualFilingDate(0);
 				tJcicZ056.setActualFilingMark("N");
 			}
 			try {
@@ -1001,15 +1002,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ060 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ060.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ060.getOutJcicTxtDate() == 0) {
 					tJcicZ060.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ060.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ060.setActualFilingDate(iJcicDate);
 				tJcicZ060.setActualFilingMark("Y");
 			} else {
-				tJcicZ060.setOutJcicTxtDate(iJcicDate);
-				tJcicZ060.setActualFilingDate(0);
+				tJcicZ060.setOutJcicTxtDate(0);
+//				tJcicZ060.setActualFilingDate(0);
 				tJcicZ060.setActualFilingMark("N");
 			}
 			try {
@@ -1041,15 +1042,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ061 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ061.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ061.getOutJcicTxtDate() == 0) {
 					tJcicZ061.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ061.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ061.setActualFilingDate(iJcicDate);
 				tJcicZ061.setActualFilingMark("Y");
 			} else {
-				tJcicZ061.setOutJcicTxtDate(iJcicDate);
-				tJcicZ061.setActualFilingDate(0);
+				tJcicZ061.setOutJcicTxtDate(0);
+//				tJcicZ061.setActualFilingDate(0);
 				tJcicZ061.setActualFilingMark("N");
 			}
 			try {
@@ -1079,15 +1080,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ062 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ062.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ062.getOutJcicTxtDate() == 0) {
 					tJcicZ062.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ062.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ062.setActualFilingDate(iJcicDate);
 				tJcicZ062.setActualFilingMark("Y");
 			} else {
-				tJcicZ062.setOutJcicTxtDate(iJcicDate);
-				tJcicZ062.setActualFilingDate(0);
+				tJcicZ062.setOutJcicTxtDate(0);
+//				tJcicZ062.setActualFilingDate(0);
 				tJcicZ062.setActualFilingMark("N");
 			}
 			try {
@@ -1117,15 +1118,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ063 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ063.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ063.getOutJcicTxtDate() == 0) {
 					tJcicZ063.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ063.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ063.setActualFilingDate(iJcicDate);
 				tJcicZ063.setActualFilingMark("Y");
 			} else {
-				tJcicZ063.setOutJcicTxtDate(iJcicDate);
-				tJcicZ063.setActualFilingDate(0);
+				tJcicZ063.setOutJcicTxtDate(0);
+//				tJcicZ063.setActualFilingDate(0);
 				tJcicZ063.setActualFilingMark("N");
 			}
 			try {
@@ -1155,15 +1156,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ440 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ440.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ440.getOutJcicTxtDate() == 0) {
 					tJcicZ440.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ440.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ440.setActualFilingDate(iJcicDate);
 				tJcicZ440.setActualFilingMark("Y");
 			} else {
-				tJcicZ440.setOutJcicTxtDate(iJcicDate);
-				tJcicZ440.setActualFilingDate(0);
+				tJcicZ440.setOutJcicTxtDate(0);
+//				tJcicZ440.setActualFilingDate(0);
 				tJcicZ440.setActualFilingMark("N");
 			}
 			try {
@@ -1195,15 +1196,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ442 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ442.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ442.getOutJcicTxtDate() == 0) {
 					tJcicZ442.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ442.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ442.setActualFilingDate(iJcicDate);
 				tJcicZ442.setActualFilingMark("Y");
 			} else {
-				tJcicZ442.setOutJcicTxtDate(iJcicDate);
-				tJcicZ442.setActualFilingDate(0);
+				tJcicZ442.setOutJcicTxtDate(0);
+//				tJcicZ442.setActualFilingDate(0);
 				tJcicZ442.setActualFilingMark("N");
 			}
 			try {
@@ -1237,15 +1238,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ443 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ443.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ443.getOutJcicTxtDate() == 0) {
 					tJcicZ443.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ443.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ443.setActualFilingDate(iJcicDate);
 				tJcicZ443.setActualFilingMark("Y");
 			} else {
-				tJcicZ443.setOutJcicTxtDate(iJcicDate);
-				tJcicZ443.setActualFilingDate(0);
+				tJcicZ443.setOutJcicTxtDate(0);
+//				tJcicZ443.setActualFilingDate(0);
 				tJcicZ443.setActualFilingMark("N");
 			}
 			try {
@@ -1275,15 +1276,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ444 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ444.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ444.getOutJcicTxtDate() == 0) {
 					tJcicZ444.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ444.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ444.setActualFilingDate(iJcicDate);
 				tJcicZ444.setActualFilingMark("Y");
 			} else {
-				tJcicZ444.setOutJcicTxtDate(iJcicDate);
-				tJcicZ444.setActualFilingDate(0);
+				tJcicZ444.setOutJcicTxtDate(0);
+//				tJcicZ444.setActualFilingDate(0);
 				tJcicZ444.setActualFilingMark("N");
 			}
 			try {
@@ -1313,15 +1314,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ446 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ446.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ446.getOutJcicTxtDate() == 0) {
 					tJcicZ446.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ446.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ446.setActualFilingDate(iJcicDate);
 				tJcicZ446.setActualFilingMark("Y");
 			} else {
-				tJcicZ446.setOutJcicTxtDate(iJcicDate);
-				tJcicZ446.setActualFilingDate(0);
+				tJcicZ446.setOutJcicTxtDate(0);
+//				tJcicZ446.setActualFilingDate(0);
 				tJcicZ446.setActualFilingMark("N");
 			}
 			try {
@@ -1351,15 +1352,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ447 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ447.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ447.getOutJcicTxtDate() == 0) {
 					tJcicZ447.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ447.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ447.setActualFilingDate(iJcicDate);
 				tJcicZ447.setActualFilingMark("Y");
 			} else {
-				tJcicZ447.setOutJcicTxtDate(iJcicDate);
-				tJcicZ447.setActualFilingDate(0);
+				tJcicZ447.setOutJcicTxtDate(0);
+//				tJcicZ447.setActualFilingDate(0);
 				tJcicZ447.setActualFilingMark("N");
 			}
 			try {
@@ -1391,15 +1392,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ448 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ448.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ448.getOutJcicTxtDate() == 0) {
 					tJcicZ448.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ448.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ448.setActualFilingDate(iJcicDate);
 				tJcicZ448.setActualFilingMark("Y");
 			} else {
-				tJcicZ448.setOutJcicTxtDate(iJcicDate);
-				tJcicZ448.setActualFilingDate(0);
+				tJcicZ448.setOutJcicTxtDate(0);
+//				tJcicZ448.setActualFilingDate(0);
 				tJcicZ448.setActualFilingMark("N");
 			}
 			try {
@@ -1431,15 +1432,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ450 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ450.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ450.getOutJcicTxtDate() == 0) {
 					tJcicZ450.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ450.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ450.setActualFilingDate(iJcicDate);
 				tJcicZ450.setActualFilingMark("Y");
 			} else {
-				tJcicZ450.setOutJcicTxtDate(iJcicDate);
-				tJcicZ450.setActualFilingDate(0);
+				tJcicZ450.setOutJcicTxtDate(0);
+//				tJcicZ450.setActualFilingDate(0);
 				tJcicZ450.setActualFilingMark("N");
 			}
 			try {
@@ -1471,15 +1472,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ451 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ451.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ451.getOutJcicTxtDate() == 0) {
 					tJcicZ451.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ451.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ451.setActualFilingDate(iJcicDate);
 				tJcicZ451.setActualFilingMark("Y");
 			} else {
-				tJcicZ451.setOutJcicTxtDate(iJcicDate);
-				tJcicZ451.setActualFilingDate(0);
+				tJcicZ451.setOutJcicTxtDate(0);
+//				tJcicZ451.setActualFilingDate(0);
 				tJcicZ451.setActualFilingMark("N");
 			}
 			try {
@@ -1511,15 +1512,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ454 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ454.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ454.getOutJcicTxtDate() == 0) {
 					tJcicZ454.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ454.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ454.setActualFilingDate(iJcicDate);
 				tJcicZ454.setActualFilingMark("Y");
 			} else {
-				tJcicZ454.setOutJcicTxtDate(iJcicDate);
-				tJcicZ454.setActualFilingDate(0);
+				tJcicZ454.setOutJcicTxtDate(0);
+//				tJcicZ454.setActualFilingDate(0);
 				tJcicZ454.setActualFilingMark("N");
 			}
 			try {
@@ -1547,15 +1548,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ570 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ570.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ570.getOutJcicTxtDate() == 0) {
 					tJcicZ570.setOutJcicTxtDate(iJcicDate);
-				}
+//				}
 				tJcicZ570.setActualFilingDate(iJcicDate);
 				tJcicZ570.setActualFilingMark("Y");
 			} else {
-				tJcicZ570.setOutJcicTxtDate(iJcicDate);
-				tJcicZ570.setActualFilingDate(0);
+				tJcicZ570.setOutJcicTxtDate(0);
+//				tJcicZ570.setActualFilingDate(0);
 				tJcicZ570.setActualFilingMark("N");
 			}
 			try {
@@ -1585,15 +1586,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ571 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ571.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ571.getOutJcicTxtDate() == 0) {
 					tJcicZ571.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ571.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ571.setActualFilingDate(iJcicDate);
 				tJcicZ571.setActualFilingMark("Y");
 			} else {
-				tJcicZ571.setOutJcicTxtDate(iJcicDate);
-				tJcicZ571.setActualFilingDate(0);
+				tJcicZ571.setOutJcicTxtDate(0);
+//				tJcicZ571.setActualFilingDate(0);
 				tJcicZ571.setActualFilingMark("N");
 			}
 			try {
@@ -1625,15 +1626,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ572 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ572.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ572.getOutJcicTxtDate() == 0) {
 					tJcicZ572.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ572.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ572.setActualFilingDate(iJcicDate);
 				tJcicZ572.setActualFilingMark("Y");
 			} else {
-				tJcicZ572.setOutJcicTxtDate(iJcicDate);
-				tJcicZ572.setActualFilingDate(0);
+				tJcicZ572.setOutJcicTxtDate(0);
+//				tJcicZ572.setActualFilingDate(0);
 				tJcicZ572.setActualFilingMark("N");
 			}
 			try {
@@ -1663,15 +1664,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ573 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ573.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ573.getOutJcicTxtDate() == 0) {
 					tJcicZ573.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ573.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ573.setActualFilingDate(iJcicDate);
 				tJcicZ573.setActualFilingMark("Y");
 			} else {
-				tJcicZ573.setOutJcicTxtDate(iJcicDate);
-				tJcicZ573.setActualFilingDate(0);
+				tJcicZ573.setOutJcicTxtDate(0);
+//				tJcicZ573.setActualFilingDate(0);
 				tJcicZ573.setActualFilingMark("N");
 			}
 			try {
@@ -1699,15 +1700,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ574 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ574.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ574.getOutJcicTxtDate() == 0) {
 					tJcicZ574.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ574.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ574.setActualFilingDate(iJcicDate);
 				tJcicZ574.setActualFilingMark("Y");
 			} else {
-				tJcicZ574.setOutJcicTxtDate(iJcicDate);
-				tJcicZ574.setActualFilingDate(0);
+				tJcicZ574.setOutJcicTxtDate(0);
+//				tJcicZ574.setActualFilingDate(0);
 				tJcicZ574.setActualFilingMark("N");
 			}
 			try {
@@ -1737,15 +1738,15 @@ public class L840A extends TradeBuffer {
 			if (tJcicZ575 == null) {
 				throw new LogicException(titaVo, "E2003", "查無該轉出日期資料");
 			}
-			if (iSubmitType == 3) {
-				if (tJcicZ575.getOutJcicTxtDate() == 0) {
+			if (iSubmitType == 1) {
+//				if (tJcicZ575.getOutJcicTxtDate() == 0) {
 					tJcicZ575.setOutJcicTxtDate(iJcicDate);
-				}
-				tJcicZ575.setActualFilingDate(iJcicDate);
+//				}
+//				tJcicZ575.setActualFilingDate(iJcicDate);
 				tJcicZ575.setActualFilingMark("Y");
 			} else {
-				tJcicZ575.setOutJcicTxtDate(iJcicDate);
-				tJcicZ575.setActualFilingDate(0);
+				tJcicZ575.setOutJcicTxtDate(0);
+//				tJcicZ575.setActualFilingDate(0);
 				tJcicZ575.setActualFilingMark("N");
 			}
 			try {

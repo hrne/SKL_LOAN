@@ -15,17 +15,22 @@ E(0,0)
 
 #button=x,100,S
 K(MODIFYBUTTON,執行)
+
+
+
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L7206]                                 人壽利關人職員名單上傳"],
+["[L7206]                               利關人名單檔上傳"],
+["#FdBUTTON_FLD+上傳檔案",#FunctionCode,#FunctionCodeX], 
 ["#FdBUTTON_FLD+選擇檔案",#BUTTON_FLD],
 ]
 
 !---------- AP TEXT AREA Variables ----------
 #BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600
+
 
 #FdYear=X,2,L
 T(3,*)
@@ -37,6 +42,9 @@ BIND(#BUTTON_FLD,click)
 
 ! 上傳欄名返回傳接收變數
 #FILENA=x,1000,S
+
+
+
 
 
 #RPTFG=A,1,S
@@ -51,6 +59,16 @@ D(7,2,#SYSDATE,1,0)
 #DATE=D,8,S
 T(4,DATE$)
 
+#FunctionCodeHelp=X,200,S
+T(3,0:人壽利關人職員名單[LA$RLTP];1:人壽利關人負責人名單[T07];2:人壽負利關人職員名單[T07_2];3:金控利關人名單[T044])
+
+! 作業項目
+#FunctionCode=A,1,I
+HELP(#FunctionCodeHelp)
+@V(H,#FunctionCodeHelp)
+
+#FunctionCodeX=X,30,L
+T(H,#FunctionCode,#FunctionCodeHelp)
 
 </sub>
 
@@ -66,6 +84,7 @@ T(4,DATE$)
 C(5,#TXFORM,L7206,$,S)
 
 #SCRTIL=_,_,S
+
 T(3,[L7206] 人壽利關人職員名單上傳)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
@@ -87,6 +106,8 @@ T(3,[L7206] 人壽利關人職員名單上傳)
 !------ 上行電文 ------
 <sub type="TIM">
 #FILENA
+#FunctionCode
+#FunctionCodeX
 #END
 </sub>
 

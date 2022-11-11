@@ -369,7 +369,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                FROM \"ClFac\" ";
 		sql += "                WHERE \"ApproveNo\" = :applNo ";
 		sql += "             ) tempCF ON tempCF.\"CustNo\" = IR.\"CustNo\" ";
-		sql += "                     AND tempCF.\"FacmNo\" = IR.\"FacmNo\" ";
 		sql += "             WHERE NVL(IR.\"NowInsuNo\",' ') != ' ' ";
 		sql += "               AND NVL(tempCF.\"CustNo\",0) != 0 ";
 		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";

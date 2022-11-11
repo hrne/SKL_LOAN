@@ -92,6 +92,7 @@ import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L8403File")
 @Scope("prototype")
@@ -101,7 +102,8 @@ public class L8403File extends MakeFile {
 	public DataLog iDataLog;
 	@Autowired
 	public CustMainService sCustMainService;
-
+	@Autowired
+	public Parse parse;
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
@@ -1146,12 +1148,13 @@ public class L8403File extends MakeFile {
 		jcicZ040Id.setSubmitKey(iSubmitKey);
 
 		this.info("iCount   = " + iCount);
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+ 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ040 = sJcicZ040Service.findkeyFilingDate(iActualFilingDate , iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -1163,7 +1166,8 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ040   = " + zJcicZ040);
 		for (JcicZ040 sJcicZ040 : zJcicZ040) {
-			if (sJcicZ040.getOutJcicTxtDate() == iJcicDate || sJcicZ040.getActualFilingDate() == iJcicDate) {
+//			if (sJcicZ040.getOutJcicTxtDate() == iJcicDate || sJcicZ040.getActualFilingDate() == iJcicDate) {
+			if ("Y".equals(sJcicZ040.getActualFilingMark())) {
 				String iTranKey = sJcicZ040.getTranKey();
 				iTranKey = FormatUtil.padX(iTranKey, 1);
 				String iSubmitKey = sJcicZ040.getSubmitKey();
@@ -1199,12 +1203,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ040.setOutJcicTxtDate(sJcicZ040.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ040.setActualFilingDate(iDate);
-					sJcicZ040.setActualFilingMark("Y");
-				} else {
-					sJcicZ040.setActualFilingDate(sJcicZ040.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ040.setActualFilingDate(iDate);
 					sJcicZ040.setActualFilingMark("N");
+				} else {
+//					sJcicZ040.setActualFilingDate(sJcicZ040.getActualFilingDate());
+					sJcicZ040.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ040Service.update(sJcicZ040, titaVo);
@@ -1265,14 +1269,16 @@ public class L8403File extends MakeFile {
 		jcicZ041Id.setCustId(iCustId);
 		jcicZ041Id.setRcDate(iRcDate);
 		jcicZ041Id.setSubmitKey(iSubmitKey);
-
-		if (iSubmitType != 3) {
+		
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+ 19110000;
-			iActualFilingMark = "Y";
 		}
+		
 		rJcicZ041 = sJcicZ041Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
 		zJcicZ041 = rJcicZ041 == null ? null : rJcicZ041.getContent();
@@ -1306,13 +1312,14 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ041.setOutJcicTxtDate(sJcicZ041.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ041.setActualFilingDate(iDate);
-					sJcicZ041.setActualFilingMark("Y");
-				} else {
-					sJcicZ041.setActualFilingDate(sJcicZ041.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ041.setActualFilingDate(iDate);
 					sJcicZ041.setActualFilingMark("N");
+				} else {
+//					sJcicZ041.setActualFilingDate(sJcicZ041.getActualFilingDate());
+					sJcicZ041.setActualFilingMark("Y");
 				}
+
 				try {
 					sJcicZ041Service.update(sJcicZ041, titaVo);
 				} catch (Exception e) {
@@ -1372,12 +1379,13 @@ public class L8403File extends MakeFile {
 		jcicZ042Id.setRcDate(iRcDate);
 		jcicZ042Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ042 = sJcicZ042Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -1464,12 +1472,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ042.setOutJcicTxtDate(sJcicZ042.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ042.setActualFilingDate(iDate);
-					sJcicZ042.setActualFilingMark("Y");
-				} else {
-					sJcicZ042.setActualFilingDate(sJcicZ042.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ042.setActualFilingDate(iDate);
 					sJcicZ042.setActualFilingMark("N");
+				} else {
+//					sJcicZ042.setActualFilingDate(sJcicZ042.getActualFilingDate());
+					sJcicZ042.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ042Service.update(sJcicZ042, titaVo);
@@ -1549,12 +1557,13 @@ public class L8403File extends MakeFile {
 		jcicZ043Id.setRcDate(iRcDate);
 		jcicZ043Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ043 = sJcicZ043Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -1614,12 +1623,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ043.setOutJcicTxtDate(sJcicZ043.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ043.setActualFilingDate(iDate);
-					sJcicZ043.setActualFilingMark("Y");
-				} else {
-					sJcicZ043.setActualFilingDate(sJcicZ043.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ043.setActualFilingDate(iDate);
 					sJcicZ043.setActualFilingMark("N");
+				} else {
+//					sJcicZ043.setActualFilingDate(sJcicZ043.getActualFilingDate());
+					sJcicZ043.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ043Service.update(sJcicZ043, titaVo);
@@ -1686,12 +1695,13 @@ public class L8403File extends MakeFile {
 		jcicZ044Id.setRcDate(iRcDate);
 		jcicZ044Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+ 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ044 = sJcicZ044Service.findkeyFilingDate(iActualFilingDate , iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -1802,12 +1812,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ044.setOutJcicTxtDate(sJcicZ044.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ044.setActualFilingDate(iDate);
-					sJcicZ044.setActualFilingMark("Y");
-				} else {
-					sJcicZ044.setActualFilingDate(sJcicZ044.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ044.setActualFilingDate(iDate);
 					sJcicZ044.setActualFilingMark("N");
+				} else {
+//					sJcicZ044.setActualFilingDate(sJcicZ044.getActualFilingDate());
+					sJcicZ044.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ044Service.update(sJcicZ044, titaVo);
@@ -1892,12 +1902,13 @@ public class L8403File extends MakeFile {
 		jcicZ045Id.setRcDate(iRcDate);
 		jcicZ045Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ045 = sJcicZ045Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -1928,12 +1939,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ045.setOutJcicTxtDate(sJcicZ045.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ045.setActualFilingDate(iDate);
-					sJcicZ045.setActualFilingMark("Y");
-				} else {
-					sJcicZ045.setActualFilingDate(sJcicZ045.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ045.setActualFilingDate(iDate);
 					sJcicZ045.setActualFilingMark("N");
+				} else {
+//					sJcicZ045.setActualFilingDate(sJcicZ045.getActualFilingDate());
+					sJcicZ045.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ045Service.update(sJcicZ045, titaVo);
@@ -1992,12 +2003,13 @@ public class L8403File extends MakeFile {
 		jcicZ046Id.setRcDate(iRcDate);
 		jcicZ046Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ046 = sJcicZ046Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2031,12 +2043,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ046.setOutJcicTxtDate(sJcicZ046.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ046.setActualFilingDate(iDate);
-					sJcicZ046.setActualFilingMark("Y");
-				} else {
-					sJcicZ046.setActualFilingDate(sJcicZ046.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ046.setActualFilingDate(iDate);
 					sJcicZ046.setActualFilingMark("N");
+				} else {
+//					sJcicZ046.setActualFilingDate(sJcicZ046.getActualFilingDate());
+					sJcicZ046.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ046Service.update(sJcicZ046, titaVo);
@@ -2096,12 +2108,13 @@ public class L8403File extends MakeFile {
 		jcicZ047Id.setRcDate(iRcDate);
 		jcicZ047Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ047 = sJcicZ047Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2212,12 +2225,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ047.setOutJcicTxtDate(sJcicZ047.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ047.setActualFilingDate(iDate);
-					sJcicZ047.setActualFilingMark("Y");
-				} else {
-					sJcicZ047.setActualFilingDate(sJcicZ047.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ047.setActualFilingDate(iDate);
 					sJcicZ047.setActualFilingMark("N");
+				} else {
+//					sJcicZ047.setActualFilingDate(sJcicZ047.getActualFilingDate());
+					sJcicZ047.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ047Service.update(sJcicZ047, titaVo);
@@ -2297,12 +2310,13 @@ public class L8403File extends MakeFile {
 		jcicZ048Id.setRcDate(iRcDate);
 		jcicZ048Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ048 = sJcicZ048Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2339,12 +2353,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ048.setOutJcicTxtDate(sJcicZ048.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ048.setActualFilingDate(iDate);
-					sJcicZ048.setActualFilingMark("Y");
-				} else {
-					sJcicZ048.setActualFilingDate(sJcicZ048.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ048.setActualFilingDate(iDate);
 					sJcicZ048.setActualFilingMark("N");
+				} else {
+//					sJcicZ048.setActualFilingDate(sJcicZ048.getActualFilingDate());
+					sJcicZ048.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ048Service.update(sJcicZ048, titaVo);
@@ -2407,12 +2421,13 @@ public class L8403File extends MakeFile {
 		jcicZ049Id.setRcDate(iRcDate);
 		jcicZ049Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ049 = sJcicZ049Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2470,12 +2485,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ049.setOutJcicTxtDate(sJcicZ049.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ049.setActualFilingDate(iDate);
-					sJcicZ049.setActualFilingMark("Y");
-				} else {
-					sJcicZ049.setActualFilingDate(sJcicZ049.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ049.setActualFilingDate(iDate);
 					sJcicZ049.setActualFilingMark("N");
+				} else {
+//					sJcicZ049.setActualFilingDate(sJcicZ049.getActualFilingDate());
+					sJcicZ049.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ049Service.update(sJcicZ049, titaVo);
@@ -2541,12 +2556,13 @@ public class L8403File extends MakeFile {
 		jcicZ050Id.setRcDate(iRcDate);
 		jcicZ050Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ050 = sJcicZ050Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2592,12 +2608,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ050.setOutJcicTxtDate(sJcicZ050.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ050.setActualFilingDate(iDate);
-					sJcicZ050.setActualFilingMark("Y");
-				} else {
-					sJcicZ050.setActualFilingDate(sJcicZ050.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ050.setActualFilingDate(iDate);
 					sJcicZ050.setActualFilingMark("N");
+				} else {
+//					sJcicZ050.setActualFilingDate(sJcicZ050.getActualFilingDate());
+					sJcicZ050.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ050Service.update(sJcicZ050, titaVo);
@@ -2660,12 +2676,13 @@ public class L8403File extends MakeFile {
 		jcicZ051Id.setRcDate(iRcDate);
 		jcicZ051Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ051 = sJcicZ051Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2697,12 +2714,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ051.setOutJcicTxtDate(sJcicZ051.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ051.setActualFilingDate(iDate);
-					sJcicZ051.setActualFilingMark("Y");
-				} else {
-					sJcicZ051.setActualFilingDate(sJcicZ051.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ051.setActualFilingDate(iDate);
 					sJcicZ051.setActualFilingMark("N");
+				} else {
+//					sJcicZ051.setActualFilingDate(sJcicZ051.getActualFilingDate());
+					sJcicZ051.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ051Service.update(sJcicZ051, titaVo);
@@ -2761,12 +2778,13 @@ public class L8403File extends MakeFile {
 		jcicZ052Id.setRcDate(iRcDate);
 		jcicZ052Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ052 = sJcicZ052Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2817,12 +2835,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ052.setOutJcicTxtDate(sJcicZ052.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ052.setActualFilingDate(iDate);
-					sJcicZ052.setActualFilingMark("Y");
-				} else {
-					sJcicZ052.setActualFilingDate(sJcicZ052.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ052.setActualFilingDate(iDate);
 					sJcicZ052.setActualFilingMark("N");
+				} else {
+//					sJcicZ052.setActualFilingDate(sJcicZ052.getActualFilingDate());
+					sJcicZ052.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ052Service.update(sJcicZ052, titaVo);
@@ -2891,12 +2909,13 @@ public class L8403File extends MakeFile {
 		jcicZ053Id.setRcDate(iRcDate);
 		jcicZ053Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ053 = sJcicZ053Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -2935,12 +2954,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ053.setOutJcicTxtDate(sJcicZ053.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ053.setActualFilingDate(iDate);
-					sJcicZ053.setActualFilingMark("Y");
-				} else {
-					sJcicZ053.setActualFilingDate(sJcicZ053.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ053.setActualFilingDate(iDate);
 					sJcicZ053.setActualFilingMark("N");
+				} else {
+//					sJcicZ053.setActualFilingDate(sJcicZ053.getActualFilingDate());
+					sJcicZ053.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ053Service.update(sJcicZ053, titaVo);
@@ -3001,12 +3020,13 @@ public class L8403File extends MakeFile {
 		jcicZ054Id.setRcDate(iRcDate);
 		jcicZ054Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+ 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ054 = sJcicZ054Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
 				titaVo);
@@ -3040,12 +3060,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ054.setOutJcicTxtDate(sJcicZ054.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ054.setActualFilingDate(iDate);
-					sJcicZ054.setActualFilingMark("Y");
-				} else {
-					sJcicZ054.setActualFilingDate(sJcicZ054.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ054.setActualFilingDate(iDate);
 					sJcicZ054.setActualFilingMark("N");
+				} else {
+//					sJcicZ054.setActualFilingDate(sJcicZ054.getActualFilingDate());
+					sJcicZ054.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ054Service.update(sJcicZ054, titaVo);
@@ -3104,12 +3124,13 @@ public class L8403File extends MakeFile {
 		jcicZ055Id.setClaimDate(iRcDate);
 		jcicZ055Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ055 = sJcicZ055Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3185,12 +3206,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ055.setOutJcicTxtDate(sJcicZ055.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ055.setActualFilingDate(iDate);
-					sJcicZ055.setActualFilingMark("Y");
-				} else {
-					sJcicZ055.setActualFilingDate(sJcicZ055.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ055.setActualFilingDate(iDate);
 					sJcicZ055.setActualFilingMark("N");
+				} else {
+//					sJcicZ055.setActualFilingDate(sJcicZ055.getActualFilingDate());
+					sJcicZ055.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ055Service.update(sJcicZ055, titaVo);
@@ -3261,12 +3282,13 @@ public class L8403File extends MakeFile {
 		jcicZ056Id.setClaimDate(iClaimDate);
 		jcicZ056Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ056 = sJcicZ056Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3321,12 +3343,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ056.setOutJcicTxtDate(sJcicZ056.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ056.setActualFilingDate(iDate);
-					sJcicZ056.setActualFilingMark("Y");
-				} else {
-					sJcicZ056.setActualFilingDate(sJcicZ056.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ056.setActualFilingDate(iDate);
 					sJcicZ056.setActualFilingMark("N");
+				} else {
+//					sJcicZ056.setActualFilingDate(sJcicZ056.getActualFilingDate());
+					sJcicZ056.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ056Service.update(sJcicZ056, titaVo);
@@ -3395,12 +3417,13 @@ public class L8403File extends MakeFile {
 		jcicZ060Id.setRcDate(iRcDate);
 		jcicZ060Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+ 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ060 = sJcicZ060Service.findkeyFilingDate(iActualFilingDate , iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3430,12 +3453,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ060.setOutJcicTxtDate(sJcicZ060.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ060.setActualFilingDate(iDate);
-					sJcicZ060.setActualFilingMark("Y");
-				} else {
-					sJcicZ060.setActualFilingDate(sJcicZ060.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ060.setActualFilingDate(iDate);
 					sJcicZ060.setActualFilingMark("N");
+				} else {
+//					sJcicZ060.setActualFilingDate(sJcicZ060.getActualFilingDate());
+					sJcicZ060.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ060Service.update(sJcicZ060, titaVo);
@@ -3494,12 +3517,13 @@ public class L8403File extends MakeFile {
 		jcicZ061Id.setRcDate(iRcDate);
 		jcicZ061Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ061 = sJcicZ061Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3543,12 +3567,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ061.setOutJcicTxtDate(sJcicZ061.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ061.setActualFilingDate(iDate);
-					sJcicZ061.setActualFilingMark("Y");
-				} else {
-					sJcicZ061.setActualFilingDate(sJcicZ061.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ061.setActualFilingDate(iDate);
 					sJcicZ061.setActualFilingMark("N");
+				} else {
+//					sJcicZ061.setActualFilingDate(sJcicZ061.getActualFilingDate());
+					sJcicZ061.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ061Service.update(sJcicZ061, titaVo);
@@ -3611,12 +3635,13 @@ public class L8403File extends MakeFile {
 		jcicZ062Id.setRcDate(iRcDate);
 		jcicZ062Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ062 = sJcicZ062Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3701,12 +3726,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ062.setOutJcicTxtDate(sJcicZ062.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ062.setActualFilingDate(iDate);
-					sJcicZ062.setActualFilingMark("Y");
-				} else {
-					sJcicZ062.setActualFilingDate(sJcicZ062.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ062.setActualFilingDate(iDate);
 					sJcicZ062.setActualFilingMark("N");
+				} else {
+//					sJcicZ062.setActualFilingDate(sJcicZ062.getActualFilingDate());
+					sJcicZ062.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ062Service.update(sJcicZ062, titaVo);
@@ -3782,12 +3807,13 @@ public class L8403File extends MakeFile {
 		jcicZ063Id.setRcDate(iRcDate);
 		jcicZ063Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ063 = sJcicZ063Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3822,12 +3848,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ063.setOutJcicTxtDate(sJcicZ063.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ063.setActualFilingDate(iDate);
-					sJcicZ063.setActualFilingMark("Y");
-				} else {
-					sJcicZ063.setActualFilingDate(sJcicZ063.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ063.setActualFilingDate(iDate);
 					sJcicZ063.setActualFilingMark("N");
+				} else {
+//					sJcicZ063.setActualFilingDate(sJcicZ063.getActualFilingDate());
+					sJcicZ063.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ063Service.update(sJcicZ063, titaVo);
@@ -3887,12 +3913,13 @@ public class L8403File extends MakeFile {
 		jcicZ440Id.setApplyDate(iApplyDate);
 		jcicZ440Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ440 = sJcicZ440Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -3946,12 +3973,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ440.setOutJcicTxtDate(sJcicZ440.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ440.setActualFilingDate(iDate);
-					sJcicZ440.setActualFilingMark("Y");
+				if (iSubmitType == 1) {
+//					sJcicZ440.setActualFilingDate(iDate);
+					sJcicZ440.setActualFilingMark("N");
 				} else {
 					sJcicZ440.setActualFilingDate(sJcicZ440.getActualFilingDate());
-					sJcicZ440.setActualFilingMark("N");
+					sJcicZ440.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ440Service.update(sJcicZ440, titaVo);
@@ -4020,12 +4047,13 @@ public class L8403File extends MakeFile {
 		jcicZ442Id.setApplyDate(iApplyDate);
 		jcicZ442Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ442 = sJcicZ442Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4054,13 +4082,13 @@ public class L8403File extends MakeFile {
 				String iGuarLoanCnt = String.valueOf(sJcicZ442.getGuarLoanCnt());
 				int ixGuarLoanCnt = Integer.valueOf(sJcicZ442.getGuarLoanCnt());
 				String iCivil323ExpAmt = String.valueOf(sJcicZ442.getCivil323ExpAmt());
-				int ixCivil323ExpAmt = Integer.valueOf(sJcicZ442.getCivil323ExpAmt());
+				BigDecimal ixCivil323ExpAmt = sJcicZ442.getCivil323ExpAmt();
 				String iCivil323CashAmt = String.valueOf(sJcicZ442.getCivil323CashAmt());
-				int ixCivil323CashAmt = Integer.valueOf(sJcicZ442.getCivil323CashAmt());
+				BigDecimal ixCivil323CashAmt = sJcicZ442.getCivil323CashAmt();
 				String iCivil323CreditAmt = String.valueOf(sJcicZ442.getCivil323CreditAmt());
-				int ixCivil323CreditAmt = Integer.valueOf(sJcicZ442.getCivil323CreditAmt());
+				BigDecimal ixCivil323CreditAmt = sJcicZ442.getCivil323CreditAmt();
 				String iCivil323GuarAmt = String.valueOf(sJcicZ442.getCivil323GuarAmt());
-				int ixCivil323GuarAmt = Integer.valueOf(sJcicZ442.getCivil323GuarAmt());
+				BigDecimal ixCivil323GuarAmt = sJcicZ442.getCivil323GuarAmt();
 				String iReceExpPrin = String.valueOf(sJcicZ442.getReceExpPrin());
 				int ixReceExpPrin = Integer.valueOf(sJcicZ442.getReceExpPrin());
 				String iReceExpInte = String.valueOf(sJcicZ442.getReceExpInte());
@@ -4115,12 +4143,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ442.setOutJcicTxtDate(sJcicZ442.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ442.setActualFilingDate(iDate);
-					sJcicZ442.setActualFilingMark("Y");
-				} else {
-					sJcicZ442.setActualFilingDate(sJcicZ442.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ442.setActualFilingDate(iDate);
 					sJcicZ442.setActualFilingMark("N");
+				} else {
+//					sJcicZ442.setActualFilingDate(sJcicZ442.getActualFilingDate());
+					sJcicZ442.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ442Service.update(sJcicZ442, titaVo);
@@ -4202,12 +4230,13 @@ public class L8403File extends MakeFile {
 		jcicZ443Id.setApplyDate(iApplyDate);
 		jcicZ443Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ443 = sJcicZ443Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4276,12 +4305,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ443.setOutJcicTxtDate(sJcicZ443.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ443.setActualFilingDate(iDate);
-					sJcicZ443.setActualFilingMark("Y");
-				} else {
-					sJcicZ443.setActualFilingDate(sJcicZ443.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ443.setActualFilingDate(iDate);
 					sJcicZ443.setActualFilingMark("N");
+				} else {
+//					sJcicZ443.setActualFilingDate(sJcicZ443.getActualFilingDate());
+					sJcicZ443.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ443Service.update(sJcicZ443, titaVo);
@@ -4354,12 +4383,13 @@ public class L8403File extends MakeFile {
 		jcicZ444Id.setApplyDate(iApplyDate);
 		jcicZ444Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ444 = sJcicZ444Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4402,12 +4432,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ444.setOutJcicTxtDate(sJcicZ444.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ444.setActualFilingDate(iDate);
-					sJcicZ444.setActualFilingMark("Y");
-				} else {
-					sJcicZ444.setActualFilingDate(sJcicZ444.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ444.setActualFilingDate(iDate);
 					sJcicZ444.setActualFilingMark("N");
+				} else {
+//					sJcicZ444.setActualFilingDate(sJcicZ444.getActualFilingDate());
+					sJcicZ444.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ444Service.update(sJcicZ444, titaVo);
@@ -4470,12 +4500,13 @@ public class L8403File extends MakeFile {
 		jcicZ446Id.setApplyDate(iApplyDate);
 		jcicZ446Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ446 = sJcicZ446Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4507,12 +4538,12 @@ public class L8403File extends MakeFile {
 				this.put(text);
 				// 檔案產生後，回填JcicDate
 				sJcicZ446.setOutJcicTxtDate(sJcicZ446.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ446.setActualFilingDate(iDate);
-					sJcicZ446.setActualFilingMark("Y");
-				} else {
-					sJcicZ446.setActualFilingDate(sJcicZ446.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ446.setActualFilingDate(iDate);
 					sJcicZ446.setActualFilingMark("N");
+				} else {
+//					sJcicZ446.setActualFilingDate(sJcicZ446.getActualFilingDate());
+					sJcicZ446.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ446Service.update(sJcicZ446, titaVo);
@@ -4571,12 +4602,13 @@ public class L8403File extends MakeFile {
 		jcicZ447Id.setApplyDate(iApplyDate);
 		jcicZ447Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ447 = sJcicZ447Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4624,12 +4656,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ447.setOutJcicTxtDate(sJcicZ447.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ447.setActualFilingDate(iDate);
-					sJcicZ447.setActualFilingMark("Y");
-				} else {
-					sJcicZ447.setActualFilingDate(sJcicZ447.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ447.setActualFilingDate(iDate);
 					sJcicZ447.setActualFilingMark("N");
+				} else {
+//					sJcicZ447.setActualFilingDate(sJcicZ447.getActualFilingDate());
+					sJcicZ447.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ447Service.update(sJcicZ447, titaVo);
@@ -4696,12 +4728,13 @@ public class L8403File extends MakeFile {
 		jcicZ448Id.setApplyDate(iApplyDate);
 		jcicZ448Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ448 = sJcicZ448Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4743,12 +4776,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ448.setOutJcicTxtDate(sJcicZ448.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ448.setActualFilingDate(iDate);
-					sJcicZ448.setActualFilingMark("Y");
+				if (iSubmitType == 1) {
+//					sJcicZ448.setActualFilingDate(iDate);
+					sJcicZ448.setActualFilingMark("N");
 				} else {
 					sJcicZ448.setActualFilingDate(sJcicZ448.getActualFilingDate());
-					sJcicZ448.setActualFilingMark("N");
+					sJcicZ448.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ448Service.update(sJcicZ448, titaVo);
@@ -4811,12 +4844,13 @@ public class L8403File extends MakeFile {
 		jcicZ450Id.setApplyDate(iApplyDate);
 		jcicZ450Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ450 = sJcicZ450Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4857,12 +4891,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ450.setOutJcicTxtDate(sJcicZ450.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ450.setActualFilingDate(iDate);
-					sJcicZ450.setActualFilingMark("Y");
-				} else {
-					sJcicZ450.setActualFilingDate(sJcicZ450.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ450.setActualFilingDate(iDate);
 					sJcicZ450.setActualFilingMark("N");
+				} else {
+//					sJcicZ450.setActualFilingDate(sJcicZ450.getActualFilingDate());
+					sJcicZ450.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ450Service.update(sJcicZ450, titaVo);
@@ -4924,12 +4958,13 @@ public class L8403File extends MakeFile {
 		jcicZ451Id.setApplyDate(iApplyDate);
 		jcicZ451Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ451 = sJcicZ451Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4961,12 +4996,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ451.setOutJcicTxtDate(sJcicZ451.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ451.setActualFilingDate(iDate);
-					sJcicZ451.setActualFilingMark("Y");
-				} else {
-					sJcicZ451.setActualFilingDate(sJcicZ451.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ451.setActualFilingDate(iDate);
 					sJcicZ451.setActualFilingMark("N");
+				} else {
+//					sJcicZ451.setActualFilingDate(sJcicZ451.getActualFilingDate());
+					sJcicZ451.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ451Service.update(sJcicZ451, titaVo);
@@ -5025,12 +5060,13 @@ public class L8403File extends MakeFile {
 		jcicZ454Id.setApplyDate(iApplyDate);
 		jcicZ454Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ454 = sJcicZ454Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -5065,12 +5101,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ454.setOutJcicTxtDate(sJcicZ454.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ454.setActualFilingDate(iDate);
-					sJcicZ454.setActualFilingMark("Y");
-				} else {
-					sJcicZ454.setActualFilingDate(sJcicZ454.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ454.setActualFilingDate(iDate);
 					sJcicZ454.setActualFilingMark("N");
+				} else {
+//					sJcicZ454.setActualFilingDate(sJcicZ454.getActualFilingDate());
+					sJcicZ454.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ454Service.update(sJcicZ454, titaVo);
@@ -5130,12 +5166,13 @@ public class L8403File extends MakeFile {
 		jcicZ570Id.setApplyDate(iApplyDate);
 		jcicZ570Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ570 = sJcicZ570Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -5212,12 +5249,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ570.setOutJcicTxtDate(sJcicZ570.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ570.setActualFilingDate(iDate);
-					sJcicZ570.setActualFilingMark("Y");
-				} else {
-					sJcicZ570.setActualFilingDate(sJcicZ570.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ570.setActualFilingDate(iDate);
 					sJcicZ570.setActualFilingMark("N");
+				} else {
+//					sJcicZ570.setActualFilingDate(sJcicZ570.getActualFilingDate());
+					sJcicZ570.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ570Service.update(sJcicZ570, titaVo);
@@ -5306,12 +5343,13 @@ public class L8403File extends MakeFile {
 		jcicZ571Id.setApplyDate(iApplyDate);
 		jcicZ571Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ571 = sJcicZ571Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -5351,12 +5389,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ571.setOutJcicTxtDate(sJcicZ571.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ571.setActualFilingDate(iDate);
-					sJcicZ571.setActualFilingMark("Y");
-				} else {
-					sJcicZ571.setActualFilingDate(sJcicZ571.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ571.setActualFilingDate(iDate);
 					sJcicZ571.setActualFilingMark("N");
+				} else {
+//					sJcicZ571.setActualFilingDate(sJcicZ571.getActualFilingDate());
+					sJcicZ571.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ571Service.update(sJcicZ571, titaVo);
@@ -5418,12 +5456,13 @@ public class L8403File extends MakeFile {
 		jcicZ572Id.setApplyDate(iApplyDate);
 		jcicZ572Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ572 = sJcicZ572Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -5461,12 +5500,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ572.setOutJcicTxtDate(sJcicZ572.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ572.setActualFilingDate(iDate);
-					sJcicZ572.setActualFilingMark("Y");
-				} else {
-					sJcicZ572.setActualFilingDate(sJcicZ572.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ572.setActualFilingDate(iDate);
 					sJcicZ572.setActualFilingMark("N");
+				} else {
+//					sJcicZ572.setActualFilingDate(sJcicZ572.getActualFilingDate());
+					sJcicZ572.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ572Service.update(sJcicZ572, titaVo);
@@ -5527,13 +5566,13 @@ public class L8403File extends MakeFile {
 		jcicZ573Id.setApplyDate(iApplyDate);
 		jcicZ573Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-			
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 			rJcicZ573 = sJcicZ573Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
 					titaVo);
@@ -5566,12 +5605,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ573.setOutJcicTxtDate(sJcicZ573.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ573.setActualFilingDate(iDate);
-					sJcicZ573.setActualFilingMark("Y");
-				} else {
-					sJcicZ573.setActualFilingDate(sJcicZ573.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ573.setActualFilingDate(iDate);
 					sJcicZ573.setActualFilingMark("N");
+				} else {
+//					sJcicZ573.setActualFilingDate(sJcicZ573.getActualFilingDate());
+					sJcicZ573.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ573Service.update(sJcicZ573, titaVo);
@@ -5631,12 +5670,13 @@ public class L8403File extends MakeFile {
 		jcicZ574Id.setApplyDate(iApplyDate);
 		jcicZ574Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate+ 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ574 = sJcicZ574Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0, Integer.MAX_VALUE,
 				titaVo);
@@ -5668,12 +5708,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ574.setOutJcicTxtDate(sJcicZ574.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ574.setActualFilingDate(iDate);
-					sJcicZ574.setActualFilingMark("Y");
-				} else {
-					sJcicZ574.setActualFilingDate(sJcicZ574.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ574.setActualFilingDate(iDate);
 					sJcicZ574.setActualFilingMark("N");
+				} else {
+//					sJcicZ574.setActualFilingDate(sJcicZ574.getActualFilingDate());
+					sJcicZ574.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ574Service.update(sJcicZ574, titaVo);
@@ -5734,12 +5774,13 @@ public class L8403File extends MakeFile {
 		jcicZ575Id.setApplyDate(iApplyDate);
 		jcicZ575Id.setSubmitKey(iSubmitKey);
 
-		if (iSubmitType != 3) {
+		if (iSubmitType == 1) {
+//			iActualFilingDate = iJcicDate+ 19110000;
+			iActualFilingDate = 0;
+			iActualFilingMark = "Y";
+		} else {
 			iActualFilingDate = 0;
 			iActualFilingMark = "N";
-		} else {
-			iActualFilingDate = iJcicDate + 19110000;
-			iActualFilingMark = "Y";
 		}
 		rJcicZ575 = sJcicZ575Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -5771,12 +5812,12 @@ public class L8403File extends MakeFile {
 
 				// 檔案產生後，回填JcicDate
 				sJcicZ575.setOutJcicTxtDate(sJcicZ575.getOutJcicTxtDate());
-				if (iSubmitType == 3) {
-					sJcicZ575.setActualFilingDate(iDate);
-					sJcicZ575.setActualFilingMark("Y");
-				} else {
-					sJcicZ575.setActualFilingDate(sJcicZ575.getActualFilingDate());
+				if (iSubmitType == 1) {
+//					sJcicZ575.setActualFilingDate(iDate);
 					sJcicZ575.setActualFilingMark("N");
+				} else {
+//					sJcicZ575.setActualFilingDate(sJcicZ575.getActualFilingDate());
+					sJcicZ575.setActualFilingMark("Y");
 				}
 				try {
 					sJcicZ575Service.update(sJcicZ575, titaVo);

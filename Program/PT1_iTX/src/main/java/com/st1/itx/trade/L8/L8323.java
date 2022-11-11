@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L8;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -37,6 +38,7 @@ import com.st1.itx.db.service.JcicZ446Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L8323")
 @Scope("prototype")
@@ -62,7 +64,9 @@ public class L8323 extends TradeBuffer {
 	SendRsp iSendRsp;
 	@Autowired
 	DataLog iDataLog;
-
+	@Autowired
+	public Parse parse;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8323 ");
@@ -77,10 +81,23 @@ public class L8323 extends TradeBuffer {
 		String iCourtCode = titaVo.getParam("CourtCode").trim();
 		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
 		int iGuarLoanCnt = Integer.valueOf(titaVo.getParam("GuarLoanCnt").trim());
-		int iCivil323ExpAmt = Integer.valueOf(titaVo.getParam("Civil323ExpAmt").trim());
-		int iCivil323CashAmt = Integer.valueOf(titaVo.getParam("Civil323CashAmt").trim());
-		int iCivil323CreditAmt = Integer.valueOf(titaVo.getParam("Civil323CreditAmt").trim());
-		int iCivil323GuarAmt = Integer.valueOf(titaVo.getParam("Civil323GuarAmt").trim());
+		
+		BigDecimal iCivil323ExpAmt = new BigDecimal("0");
+		iCivil323ExpAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323ExpAmt").trim());
+		int ixCivil323ExpAmt = iCivil323ExpAmt.intValue();
+		
+		BigDecimal iCivil323CashAmt = new BigDecimal("0");
+		iCivil323CashAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323CashAmt").trim());
+		int ixCivil323CashAmt = iCivil323CashAmt.intValue();
+		
+		BigDecimal iCivil323CreditAmt = new BigDecimal("0");
+		iCivil323CreditAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323CreditAmt").trim());
+		int ixCivil323CreditAmt = iCivil323CreditAmt.intValue();
+		
+		BigDecimal iCivil323GuarAmt = new BigDecimal("0");
+		iCivil323GuarAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323GuarAmt").trim());
+		int ixCivil323GuarAmt = iCivil323GuarAmt.intValue();
+		
 		int iReceExpPrin = Integer.valueOf(titaVo.getParam("ReceExpPrin").trim());
 		int iReceExpInte = Integer.valueOf(titaVo.getParam("ReceExpInte").trim());
 		int iReceExpPena = Integer.valueOf(titaVo.getParam("ReceExpPena").trim());
@@ -166,7 +183,7 @@ public class L8323 extends TradeBuffer {
 			// 7
 			// 第10欄「是否為本金融機構債務人」填報'Y',且第11欄「有擔保債權筆數」填報'0'者，檢核本檔案格式[第12+13+14+15欄'依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額]之值需大於0，否則予以剔退.
 			if ("Y".equals(iIsClaims) && iGuarLoanCnt == 0) {
-				if ((iCivil323ExpAmt + iCivil323CashAmt + iCivil323CreditAmt + iCivil323GuarAmt) <= 0) {
+				if ((ixCivil323ExpAmt + ixCivil323CashAmt + ixCivil323CreditAmt + ixCivil323GuarAmt) <= 0) {
 					if ("A".equals(iTranKey)) {
 						throw new LogicException("E0005",
 								"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");
@@ -302,10 +319,10 @@ public class L8323 extends TradeBuffer {
 			uJcicZ442.setGuarObliPena(iGuarObliPena);
 			uJcicZ442.setGuarObliOther(iGuarObliOther);
 			uJcicZ442.setOutJcicTxtDate(0);
-			
+
 			uJcicZ442.setActualFilingDate(0);
 			uJcicZ442.setActualFilingMark("");
-			
+
 			try {
 				sJcicZ442Service.update(uJcicZ442, titaVo);
 			} catch (DBException e) {

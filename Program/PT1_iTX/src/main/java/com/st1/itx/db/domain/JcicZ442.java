@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ442 implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 339848101719425308L;
-
-@EmbeddedId
+  @EmbeddedId
   private JcicZ442Id jcicZ442Id;
 
   // 交易代碼
@@ -77,19 +74,19 @@ public class JcicZ442 implements Serializable {
 
   // 依民法第323條計算之信用放款本息餘額
   @Column(name = "`Civil323ExpAmt`")
-  private int civil323ExpAmt = 0;
+  private BigDecimal civil323ExpAmt = new BigDecimal("0");
 
   // 依民法第323條計算之現金卡放款本息餘額
   @Column(name = "`Civil323CashAmt`")
-  private int civil323CashAmt = 0;
+  private BigDecimal civil323CashAmt = new BigDecimal("0");
 
   // 依民法第323條計算之信用卡本息餘額
   @Column(name = "`Civil323CreditAmt`")
-  private int civil323CreditAmt = 0;
+  private BigDecimal civil323CreditAmt = new BigDecimal("0");
 
   // 依民法第323條計算之保證債權本息餘額
   @Column(name = "`Civil323GuarAmt`")
-  private int civil323GuarAmt = 0;
+  private BigDecimal civil323GuarAmt = new BigDecimal("0");
 
   // 信用放款本金
   @Column(name = "`ReceExpPrin`")
@@ -376,9 +373,9 @@ C:異動
 /**
 	* 依民法第323條計算之信用放款本息餘額<br>
 	* 
-	* @return Integer
+	* @return BigDecimal
 	*/
-  public int getCivil323ExpAmt() {
+  public BigDecimal getCivil323ExpAmt() {
     return this.civil323ExpAmt;
   }
 
@@ -388,16 +385,16 @@ C:異動
   *
   * @param civil323ExpAmt 依民法第323條計算之信用放款本息餘額
 	*/
-  public void setCivil323ExpAmt(int civil323ExpAmt) {
+  public void setCivil323ExpAmt(BigDecimal civil323ExpAmt) {
     this.civil323ExpAmt = civil323ExpAmt;
   }
 
 /**
 	* 依民法第323條計算之現金卡放款本息餘額<br>
 	* 
-	* @return Integer
+	* @return BigDecimal
 	*/
-  public int getCivil323CashAmt() {
+  public BigDecimal getCivil323CashAmt() {
     return this.civil323CashAmt;
   }
 
@@ -407,16 +404,16 @@ C:異動
   *
   * @param civil323CashAmt 依民法第323條計算之現金卡放款本息餘額
 	*/
-  public void setCivil323CashAmt(int civil323CashAmt) {
+  public void setCivil323CashAmt(BigDecimal civil323CashAmt) {
     this.civil323CashAmt = civil323CashAmt;
   }
 
 /**
 	* 依民法第323條計算之信用卡本息餘額<br>
 	* 
-	* @return Integer
+	* @return BigDecimal
 	*/
-  public int getCivil323CreditAmt() {
+  public BigDecimal getCivil323CreditAmt() {
     return this.civil323CreditAmt;
   }
 
@@ -426,16 +423,16 @@ C:異動
   *
   * @param civil323CreditAmt 依民法第323條計算之信用卡本息餘額
 	*/
-  public void setCivil323CreditAmt(int civil323CreditAmt) {
+  public void setCivil323CreditAmt(BigDecimal civil323CreditAmt) {
     this.civil323CreditAmt = civil323CreditAmt;
   }
 
 /**
 	* 依民法第323條計算之保證債權本息餘額<br>
 	* 
-	* @return Integer
+	* @return BigDecimal
 	*/
-  public int getCivil323GuarAmt() {
+  public BigDecimal getCivil323GuarAmt() {
     return this.civil323GuarAmt;
   }
 
@@ -445,7 +442,7 @@ C:異動
   *
   * @param civil323GuarAmt 依民法第323條計算之保證債權本息餘額
 	*/
-  public void setCivil323GuarAmt(int civil323GuarAmt) {
+  public void setCivil323GuarAmt(BigDecimal civil323GuarAmt) {
     this.civil323GuarAmt = civil323GuarAmt;
   }
 
