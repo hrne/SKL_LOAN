@@ -492,7 +492,7 @@ public class L4200Batch extends TradeBuffer {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
 					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(), sendMsg, titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);

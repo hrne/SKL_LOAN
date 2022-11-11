@@ -154,9 +154,11 @@ public class L8922 extends TradeBuffer {
 				titaVo.putParam("RecordDateStart", 0);
 				titaVo.putParam("RecordDateEnd", 0);
 
-				// 訪談按鈕顯示邏輯：該戶號有Record訪談資料時，就顯示
+				// 訪談按鈕顯示邏輯：該戶號有Record訪談資料時，就顯示=>調整為該戶訪談紀錄的實際還款日與合理性入帳日期相同即代表有資料
+//				MlaundryRecord MlaundryRecord = sMlaundryRecordService
+//						.findCustNoAndRecordDateFirst(tMlaundryDetail.getCustNo(), 19110101, 99991231, titaVo);
 				MlaundryRecord MlaundryRecord = sMlaundryRecordService
-						.findCustNoAndRecordDateFirst(tMlaundryDetail.getCustNo(), 19110101, 99991231, titaVo);
+						.findCustNoAndActualRepayDateFirst(tMlaundryDetail.getCustNo(), tMlaundryDetail.getEntryDate()+19110000, tMlaundryDetail.getEntryDate()+19110000, titaVo);
 
 				occursList.putParam("OOHasL8923", MlaundryRecord != null ? "Y" : "N");
 

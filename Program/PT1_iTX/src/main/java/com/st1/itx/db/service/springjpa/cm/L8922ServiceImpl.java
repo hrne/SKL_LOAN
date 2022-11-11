@@ -55,6 +55,10 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.limit = limit;
 
 		int iFactor = this.parse.stringToInteger(titaVo.getParam("Factor"));
+		String iEntryDateStart = titaVo.getParam("AcDateStart");
+		String iEntryDateEnd = titaVo.getParam("AcDateEnd");
+		int afEntryDateStart = Integer.parseInt(iEntryDateStart) + 19110000;
+		int afEntryDateEnd = Integer.parseInt(iEntryDateEnd) + 19110000;
 
 		this.info("iFactor=" + iFactor );
 
@@ -78,6 +82,7 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = M.\"CustNo\"		\n";
 		sql += "LEFT JOIN \"CdEmp\" E ON M.\"CreateEmpNo\" = E.\"EmployeeNo\"	\n";
 		sql += " WHERE  1=1     \n";
+		sql += " AND  M.\"EntryDate\" >= :entryStart AND M.\"EntryDate\" <= :entrydEnd   \n";
 		sql += " AND  CASE WHEN NVL(M.\"ManagerCheck\", 'N') != 'Y' THEN 1     \n     ";
 		sql += "           WHEN \"Fn_CountBusinessDays\"(M.\"EntryDate\",M.\"ManagerDate\") > 3   THEN 1     \n     ";
 		sql += "           ELSE 0 END=1  \n";
@@ -97,6 +102,8 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		query.setParameter("ThisIndex", index);
 //		query.setParameter("ThisLimit", limit);
+		query.setParameter("entryStart", afEntryDateStart);
+		query.setParameter("entrydEnd", afEntryDateEnd);
 
 		if (iFactor > 0) {
 			query.setParameter("iFactor", iFactor);

@@ -1142,7 +1142,9 @@ public class TxBatchCom extends TradeBuffer {
 				tDetail.setAcctAmt(acctAmt); // 已作帳金額
 				tDetail.setDisacctAmt(tDetail.getRepayAmt().subtract(acctAmt));
 				unfinishCnt = -1;
-				tDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
+				if ("BATX".equals(titaVo.get("BATCHNO").substring(0, 4))) {
+					tDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
+				}
 				switch (titaVo.getTxcd()) {
 				case "L3200":
 					tDetail.setRepayType(parse.stringToInteger(titaVo.getParam("RepayType")));
@@ -1157,7 +1159,7 @@ public class TxBatchCom extends TradeBuffer {
 					}
 					this.tTempVo.putParam("TempReasonCodeX", titaVo.getParam("TempReasonCodeX"));
 					break;
-				case "L34200":
+				case "L3420":
 					tDetail.setRepayType(3);
 					break;
 				}

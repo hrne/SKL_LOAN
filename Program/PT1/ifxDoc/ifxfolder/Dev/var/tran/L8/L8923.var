@@ -95,15 +95,16 @@ T(1,#CDATE,2,7)
 T(4,DATE$)
 
 
-!接收此格式: RecordDateStart-RecordDateEnd-CustNo 7-7-7 ,L8922連動增加記號1:代表帶入訪問日起迄,L3130連動增加記號2:代表帶入預定償還日起迄
+!接收此格式: RecordDateStart-RecordDateEnd-CustNo 7-7-7 ,L8922連動增加記號1:代表帶入訪問日起迄,
+!L3130連動增加記號2:代表帶入預定償還日起迄,L8922連動增加記號3:代表帶入實際還款日期
 #NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CHAIN_DateStart,#NTXBUF,1,7)
 T(1,@CHAIN_DateEnd,#NTXBUF,8,7)
 T(1,@CHAIN_CustNo,#NTXBUF,15,7)
 T(1,@CHAIN_Flag,#NTXBUF,22,1)
-C(3,#CHAIN_Flag,2,E(0,@ActualRepayDateStart,#CHAIN_DateStart),E(0,@RecordDateStart,#CHAIN_DateStart))
-C(3,#CHAIN_Flag,2,E(0,@ActualRepayDateEnd,#CHAIN_DateEnd),E(0,@RecordDateEnd,#CHAIN_DateEnd))
+C(3,#CHAIN_Flag,1,E(0,@RecordDateStart,#CHAIN_DateStart),E(0,@ActualRepayDateStart,#CHAIN_DateStart))
+C(3,#CHAIN_Flag,1,E(0,@RecordDateEnd,#CHAIN_DateEnd),E(0,@ActualRepayDateEnd,#CHAIN_DateEnd))
 E(0,@CustNo,#CHAIN_CustNo)
 C(3,#CHAIN,1,E(0,#CHAIN,0)XMT(),$)
 

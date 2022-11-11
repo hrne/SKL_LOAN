@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.LoanBorTx;
@@ -151,7 +152,7 @@ public class L3250 extends TradeBuffer {
 		titaVo.putParam("RpCode1", wkRepayCode);
 		titaVo.putParam("RpAmt1", wkTxAmt);
 		titaVo.putParam("RpCustNo1", iCustNo);
-		titaVo.putParam("RpFacmNo1", iFacmNo);
+		titaVo.putParam("RpFacmNo1", 0);
 		// 101.匯款轉帳 P03
 		// 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
 		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(titaVo.getOrgEntdyI() + 19110000,
@@ -168,7 +169,7 @@ public class L3250 extends TradeBuffer {
 							sumNo = "102";
 						}
 						String rvNo = "";
-						if ("C01".equals(acDetail.getAcctCode())) {
+						if ("C01".equals(ac.getAcctCode())) {
 							rvNo = "0010060" + titaVo.getOrgEntdyI();
 						}
 						acDetail = new AcDetail();
@@ -211,7 +212,7 @@ public class L3250 extends TradeBuffer {
 			acDetail.setSumNo("099");
 			acDetail.setTxAmt(wkTxAmt);
 			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(iFacmNo);
+			acDetail.setFacmNo(0);
 			acDetail.setRvNo("" + titaVo.getOrgEntdyI());// 會計日期
 			lAcDetail.add(acDetail);
 		}

@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -12,7 +14,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryDetail;
 import com.st1.itx.db.domain.MlaundryDetailId;
+import com.st1.itx.db.domain.MlaundryChkDtl;
 import com.st1.itx.db.service.MlaundryDetailService;
+import com.st1.itx.db.service.MlaundryChkDtlService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -39,6 +43,9 @@ public class L8203 extends TradeBuffer {
 	@Autowired
 	public MlaundryDetailService sMlaundryDetailService;
 	@Autowired
+	public MlaundryChkDtlService sMlaundryChkDtlService;
+
+	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
 	Parse parse;
@@ -52,7 +59,6 @@ public class L8203 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8203 ");
 		this.totaVo.init(titaVo);
-
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		int iFactor = this.parse.stringToInteger(titaVo.getParam("Factor"));
@@ -87,7 +93,8 @@ public class L8203 extends TradeBuffer {
 		MlaundryDetailId tMlaundryDetailId = new MlaundryDetailId();
 		switch (iFuncCode) {
 		case 1: // 新增
-			moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo, iManagerCheck, iFManagerDate, titaVo);
+			moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo,
+					iManagerCheck, iFManagerDate, titaVo);
 			try {
 				this.info("1");
 				sMlaundryDetailService.insert(tMlaundryDetail);
@@ -109,7 +116,8 @@ public class L8203 extends TradeBuffer {
 			MlaundryDetail tMlaundryDetail2 = (MlaundryDetail) dataLog.clone(tMlaundryDetail); ////
 
 			try {
-				moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo, iManagerCheck, iFManagerDate, titaVo);
+				moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo,
+						iManagerCheck, iFManagerDate, titaVo);
 				tMlaundryDetail = sMlaundryDetailService.update2(tMlaundryDetail, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -134,7 +142,6 @@ public class L8203 extends TradeBuffer {
 			}
 
 			if (tMlaundryDetail != null) {
-
 				try {
 					sMlaundryDetailService.delete(tMlaundryDetail);
 
@@ -146,6 +153,9 @@ public class L8203 extends TradeBuffer {
 			}
 			dataLog.setEnv(titaVo, tMlaundryDetail, tMlaundryDetail); ////
 			dataLog.exec("刪除疑似洗錢交易合理性");
+			// 一併刪除疑似洗錢檢核資料MlaundryChkDtl
+			DelMlaundryChkDtl(iFEntryDate, iFEntryDate, iFactor, iCustNo,titaVo);
+
 			break;
 		}
 		this.info("3");
@@ -153,8 +163,9 @@ public class L8203 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveMlaundryDetail(MlaundryDetail mMlaundryDetail, MlaundryDetailId mMlaundryDetailId, int mFuncCode, int mFEntryDate, int mFactor, int mCustNo, String iManagerCheck,
-			int iFManagerDate, TitaVo titaVo) throws LogicException {
+	private void moveMlaundryDetail(MlaundryDetail mMlaundryDetail, MlaundryDetailId mMlaundryDetailId, int mFuncCode,
+			int mFEntryDate, int mFactor, int mCustNo, String iManagerCheck, int iFManagerDate, TitaVo titaVo)
+			throws LogicException {
 
 		mMlaundryDetailId.setEntryDate(mFEntryDate);
 		mMlaundryDetailId.setFactor(mFactor);
@@ -181,8 +192,25 @@ public class L8203 extends TradeBuffer {
 //			mMlaundryDetail.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 //			mMlaundryDetail.setCreateEmpNo(titaVo.getTlrNo());
 //		}
-		mMlaundryDetail.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		mMlaundryDetail
+				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mMlaundryDetail.setLastUpdateEmpNo(titaVo.getTlrNo());
 		this.info("getTlrNo==" + titaVo.getTlrNo());
 	}
+
+	public void DelMlaundryChkDtl(int iFEntryDateS, int iFEntryDateE, int iFactor, int iCustNo ,TitaVo titaVo) throws LogicException {
+		// 2022/11/11 :刪除該疑似洗錢合理性對應的疑似洗錢檢核資料BY珮瑜需求
+		Slice<MlaundryChkDtl> slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRangeFactorCustNo(iFEntryDateS,
+				iFEntryDateE, iFactor, iCustNo, 0, Integer.MAX_VALUE, titaVo);
+		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
+		if (lMlaundryChkDtl != null && lMlaundryChkDtl.size() != 0) {
+			try {
+				sMlaundryChkDtlService.deleteAll(lMlaundryChkDtl);
+			} catch (DBException e) {
+				// E0008 刪除資料時，發生錯誤
+				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+			}
+		}
+	}
+
 }

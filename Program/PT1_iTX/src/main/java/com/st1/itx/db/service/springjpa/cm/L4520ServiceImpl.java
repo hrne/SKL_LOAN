@@ -185,7 +185,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"EmpNo\"       ";
 		
 	
-		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = ed.\"AcDate\"" ;
+		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = ed.\"Acdate\"" ;
 		sql += "                             AND BD.\"TitaTlrNo\" = ed.\"TitaTlrNo\""; 
 		sql += "                             AND BD.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "  LEFT JOIN tx1 ON tx1.\"CustNo\" = ed.\"CustNo\"";

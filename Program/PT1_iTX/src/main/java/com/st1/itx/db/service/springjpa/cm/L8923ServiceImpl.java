@@ -59,7 +59,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFRecordDateStart = iRecordDateStart + 19110000;
 		int iFRecordDateEnd = iRecordDateEnd + 19110000;
 		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
-		//若iRepayFlag=2代表是L3130連動須找預計還款日
+		//若iRepayFlag=2代表是L3130連動須找預計還款日,iRepayFlag=3代表是L8922連動須找實際還款日
 		int iRepayFlag = this.parse.stringToInteger(titaVo.getParam("CHAIN_Flag"));
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
@@ -90,7 +90,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ",\"ActualRepayAmt\" as F14				\n"; // 實際還款金額
 		sql += ",\"LogNo\" as F15                       \n";
 		sql += "from \"MlaundryRecord\" 				\n";
-		if (iRecordDateStart > 0 && !(iRepayFlag == 2)) {
+		if (iRecordDateStart > 0 && !(iRepayFlag == 2)) { 
 			sql += "where \"RecordDate\" >= :recordDateStart and \"RecordDate\" <= :recordDateEnd  \n";
 		}
 		if (iRepayFlag == 2) {

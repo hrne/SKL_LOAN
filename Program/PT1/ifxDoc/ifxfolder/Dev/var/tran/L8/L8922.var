@@ -86,11 +86,12 @@ V(H,#TypeHelp)
 #TypeX=X,12,L
 T(H,#Type,#TypeHelp)
 
+!2022/11/11珮瑜需求加回:一律顯示入帳日期
 !Type為1時顯示入帳日期
 !為2時隱藏入帳日期
-#HideByType=A,1,S
-C(3,#Type,1,INVOKEJS(SHOW,p1,2,2,1),$)
-C(3,#Type,2,INVOKEJS(SHOW,p1,2,2,0),$)
+!#HideByType=A,1,S
+!C(3,#Type,1,INVOKEJS(SHOW,p1,2,2,1),$)
+!C(3,#Type,2,INVOKEJS(SHOW,p1,2,2,0),$)
 
 ! 交易樣態(Factor)
 #FactorHelpRim=X,1,S
@@ -130,14 +131,14 @@ T(4,LBSDY$)
 !入帳日期起止
 !Type為2時清空跳過
 #AcDateStart=D,7,I
-C(3,#Type,2,S,$)
+!C(3,#Type,2,S,$)
 E(0,#LDATE)
 D(8)
 @V(7)A(DATE,0,#AcDateStart)
 V(5,0010101,#CDATE)
 
 #AcDateEnd=D,7,I
-C(3,#Type,2,S,$)
+!C(3,#Type,2,S,$)
 E(0,#LDATE)
 D(8)	
 @V(7)A(DATE,0,#AcDateEnd)
@@ -289,19 +290,20 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8926;text=查詢;ntxbuf=#OOBUF6})
 #TodayCDate=D,7,S
 E(0,#SYSCDATE)
 
+!連動L8923增加記號3:代表帶入實際還款日期
 #OOBUFL8923=X,100,S
-!T(2,#OOAcDate+#TodayCDate+#OOCustNo+1)
-T(2,0010101+#TodayCDate+#OOCustNo+1)
+T(2,#OOAcDate+#OOAcDate+#OOCustNo+3)
 !事後新增訪談L8204-帶入畫面[戶號]+[入帳日期]+[累積金額]
 #OOBUFL8204=X,100,S
 T(2,1+#TodayCDate+#OOCustNo+000000+#OOAcDate+00000000000000000000+#OOTotalAmt)
 
 
 #OOBTNL8923=X,4,S
-!C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=登錄;ntxbuf=#OOBUFL8204}))
-C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,cancel))
-#OOBTNL8204=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=訪談登錄;ntxbuf=#OOBUFL8204})
+C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=登錄;ntxbuf=#OOBUFL8204}))
+!改回共用一個按鈕以下先點掉
+!C(5,#OOHasL8923,"Y",BIND(grid,{cmd=CHAIN;ntxcd=L8923;text=訪談;ntxbuf=#OOBUFL8923}),BIND(grid,cancel))
+!#OOBTNL8204=X,4,S
+!BIND(grid,{cmd=CHAIN;ntxcd=L8204;text=訪談登錄;ntxbuf=#OOBUFL8204})
 
 
 </sub>
@@ -368,8 +370,6 @@ TXFORM=L8922
 
 #OOBTNL8923=訪談
 {width:50,search:false,formatter:'cust:bind-button:#OOBTNL8923',align:'center',canExport:false}
-#OOBTNL8204=訪談
-{width:70,search:false,formatter:'cust:bind-button:#OOBTNL8204',align:'center',canExport:false}
 
 #OOFactor=交易樣態
 {width:70,align:'center'}
