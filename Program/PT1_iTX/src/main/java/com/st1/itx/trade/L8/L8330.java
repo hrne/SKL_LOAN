@@ -155,13 +155,14 @@ public class L8330 extends TradeBuffer {
 						} else {
 							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
 						}
-					} else if (sCovDelayYM > 6) {
-						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
-						} else {
-							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
-						}
-					}
+					} 
+//					else if (sCovDelayYM > 6) {
+//						if ("A".equals(iTranKey)) {
+//							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+//						} else {
+//							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+//						}
+//					}
 				} // 4, 6.2 end
 			}
 			// 3 「延期繳款年月」不得小於「調解申請日」--->(前端檢核)

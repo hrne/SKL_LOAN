@@ -47,6 +47,7 @@ E(0,0)
 !["#FdMain+查詢條件","@(單位代號、員工編號、員工姓名，擇一輸入，不輸入查全部)"],
 ["#FdCenterCode+單位代號",#CenterCode,#BTNA,#CenterCodeName],
 ["#FdEmployeeNo+員工編號",#EmployeeNo],
+["#FdEmpId+員工統編",#EmpId],
 ["#FdEmployeeNoX+員工姓名",#EmployeeNoX],
 ["#FdAgStatusCode+是否在職",#AgStatusCode,#AgStatusCodeX,"@(輸入空白查全部)"],
 !["#FdRPTFG+顯示方式",
@@ -82,6 +83,7 @@ T(2,@EmpIdentityHelp,#HelpDesc2)
 #FdCenterCode=X,2,L
 #FdEmployeeNo=X,2,L
 #FdEmployeeNoX=X,2,L
+#FdEmpId=X,2,L
 #FdAgStatusCode=X,2,L
 !#FdRPTFG=X,2,L
 !T(3,*)
@@ -138,13 +140,23 @@ C(4,#CenterCode,$,S)
 ! C(4,#CenterCode,INVOKEJS(SHOW,p1,2,2,1),S)
 ! @C(4,#EmployeeNo,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,3,3,0))
 
+!員工統編
+#EmpId=X,10,I
+C(4,#CenterCode,$,S)
+C(4,#EmployeeNo,$,S)
+@
+C(4,#EmpId,$,A(ID_UNINO,0,#EmpId))
+
+
 ! 員工姓名
 #EmployeeNoX=x,40,I
 !C(3,#CHAIN,1,s,$)
+C(4,#EmpId,$,S)
 C(4,#CenterCode,$,S)
 C(4,#EmployeeNo,$,S)
 ! C(4,#EmployeeNo,INVOKEJS(SHOW,p1,3,3,1),S)
 ! @C(4,#EmployeeNoX,INVOKEJS(SHOW,p1,3,3,0),$)
+
 
 !現職記號
 #AgStatusCode=X,1,I
@@ -193,6 +205,9 @@ T(3,1)ASGN(LOOP$)
 
 ! 員工姓名(TOTA)
 #OOFullname=x,80,L
+
+!年資
+#OOSeniorityYYMM=x,80,L
 
 ! 組長
 #OOChief=x,93,L
@@ -243,6 +258,7 @@ T(3,1)ASGN(LOOP$)
 <sub type="TIM">
 #CenterCode
 #EmployeeNo
+#EmpId
 #EmployeeNoX
 #AgStatusCode
 #END
@@ -259,6 +275,7 @@ TXFORM=L6088
 #OOEmployeeNo
 #OOAgentId
 #OOFullname
+#OOSeniorityYYMM
 #OOChief
 #OODirector
 #OOManager
@@ -296,6 +313,9 @@ TXFORM=L6088
 {width:85,align:'center'}
 
 #OOFullname=員工姓名
+{width:70,align:'center'}
+
+#OOSeniorityYYMM=年資
 {width:70,align:'center'}
 
 #OOChief=組長

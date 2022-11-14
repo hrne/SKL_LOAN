@@ -38,8 +38,9 @@ C(3,#RepayType,12
 ##loop{times:20,l:0,n:1,m:2}
 C(5,#FacmBormNo{n},000-000,INVOKEJS(SHOW,grd1_{n},0),C(4,#FacmBormNo{n},INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
 ##end
-
-
+##loop{times:5,n:1,m:2}
+C(3,#RpAmt{n},0,INVOKEJS(SHOW,grd9_{n},0),INVOKEJS(SHOW,grd9_{n},1))
+##end
 
 </sub>
 
@@ -1306,6 +1307,7 @@ T(2,@errmsg,不可超過累溢收金額)
 
 #TmpAmt=m,14,I
 E(0,#L3r06Excessive)
+IF(#RepayType==1||#RepayType==2,$,s)
 @
 IF(#TmpAmt>#L3r06Excessive,V(P,#errmsg),$)
 
@@ -1447,7 +1449,7 @@ T(2,@RP_NOTE,#DetailNote)
 ["<font color=red>@本息計算表"],
 ["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[70,70,120,120,120,120,120,], p_cols:[5,15,15,15,15,15,15]}","","",
 ["額度撥款","計息起訖日","本金","利息","延遲息","違約金","小計"],
-[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#BreachAmt1],[#DelayInt1],[#Total1]],
+[[#FacmBormNo1],[#IntSEDate1],[#Principal1],[#Interest1],[#DelayInt1],[#BreachAmt1],[#Total1]],
 ],
 ]
 

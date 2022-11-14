@@ -94,6 +94,10 @@ T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@CloseCodeHelp,#HelpDesc2)
 T(2,@BreakCodeHelp,#HelpDesc3)
 
+
+#ReportDate=X,8,S
+T(4,#SYSCDATE)
+
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic046連動進入),$)
@@ -370,6 +374,7 @@ T(3,[L8307] 結案通知資料檔案格式)
 #CloseDate
 #OutJcicTxtDate
 #Ukey
+#ReportDate
 </sub>
 
 

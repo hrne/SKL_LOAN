@@ -93,6 +93,9 @@ public class L5709 extends TradeBuffer {
 		int falseamt = 0;
 
 		// 路徑
+		if ("".equals(titaVo.getParam("FILENA").trim())) {
+			throw new LogicException(titaVo, "E0015", "檔案不存在,請查驗路徑");
+		}
 		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		NegReportCom.CheckNegArrp(IntBringUpDate, 3, titaVo);

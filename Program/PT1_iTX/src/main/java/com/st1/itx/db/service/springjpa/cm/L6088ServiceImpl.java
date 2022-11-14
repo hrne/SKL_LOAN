@@ -39,16 +39,19 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String iCenterCode = titaVo.getParam("CenterCode").trim(); // 單位代號
 		String iEmployeeNo = titaVo.getParam("EmployeeNo").trim(); // 員工編號
+		String iEmpId = titaVo.getParam("EmpId").trim(); // 員工統編
 		String iEmployeeNoX = titaVo.getParam("EmployeeNoX").trim(); // 員工姓名
 		String iAgStatusCode = titaVo.getParam("AgStatusCode").trim(); // 是否在職
 
 		this.info("CenterCode: [" + iCenterCode + "]");
 		this.info("EmployeeNo: [" + iEmployeeNo + "]");
+		this.info("EmpId: [" + iEmpId + "]");
 		this.info("EmployeeNoX: [" + iEmployeeNoX + "]");
 		this.info("AgStatusCode: [" + iAgStatusCode + "]");
 
 		boolean useCenterCode = !iCenterCode.isEmpty();
 		boolean useEmployeeNo = !iEmployeeNo.isEmpty();
+		boolean useEmpId = !iEmpId.isEmpty();
 		boolean useEmployeeNoX = !iEmployeeNoX.isEmpty();
 		boolean useAgStatusCode = !iAgStatusCode.isEmpty();
 
@@ -56,6 +59,8 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT CE.\"EmployeeNo\" "; // 員工編號
 		sql += "      , CE.\"AgentId\"    	AS \"AgentId\""; // 身分證字號
 		sql += "      , CE.\"Fullname\"   	AS \"Fullname\""; // 員工姓名
+		sql += "      , NVL(CE.\"SeniorityYY\",0)   	AS \"SeniorityYY\""; // 年資_年
+		sql += "      , NVL(CE.\"SeniorityMM\",0)   	AS \"SeniorityMM\""; // 年資_月
 		sql += "      , CE.\"AgLevel\"    	AS \"EmployeeAgLevel\" "; // 上一級主管職等
 		sql += "      , S1.\"AgLevel\"    	AS \"FirstSuperiorAgLevel\" "; // 上一級主管職等
 		sql += "      , S1.\"EmployeeNo\"  	AS \"FirstSuperiorEmpNo\" "; // 上一級主管編號
@@ -82,7 +87,8 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdEmp\" S3 ON S2.\"DirectorId\" = S3.\"AgentCode\" ";
 		sql += " LEFT JOIN \"CdCode\" CD ON CD.\"DefCode\" = 'EmpIdentity' ";
 		sql += "                        AND CD.\"Code\"    = CE.\"AgStatusCode\" ";
-		sql += " LEFT JOIN \"CdBcm\" CBUnit ON CBUnit.\"UnitCode\" = CE.\"CenterCode\" "; // CdBcm 結構: 所有單位/部室/區部 都寫一筆 UnitCode = 它 的資料
+		sql += " LEFT JOIN \"CdBcm\" CBUnit ON CBUnit.\"UnitCode\" = CE.\"CenterCode\" "; // CdBcm 結構: 所有單位/部室/區部 都寫一筆
+																							// UnitCode = 它 的資料
 		sql += " LEFT JOIN \"CdBcm\" CBDist ON CBDist.\"UnitCode\" = CE.\"CenterCode1\" "; // 所以這邊都用 UnitCode
 		sql += " LEFT JOIN \"CdBcm\" CBDept ON CBDept.\"UnitCode\" = CE.\"CenterCode2\" ";
 		sql += " WHERE 1 = 1 "; // dummy
@@ -90,10 +96,13 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " AND CE.\"CenterCode\" = :CenterCode ";
 		if (useEmployeeNo)
 			sql += " AND CE.\"EmployeeNo\" = :EmployeeNo ";
+		if (useEmpId)
+			sql += " AND CE.\"AgentId\" = :EmpId ";
 		if (useEmployeeNoX)
 			sql += " AND CE.\"Fullname\" = :EmployeeNoX ";
 		if (useAgStatusCode)
-			sql += " AND CE.\"AgCurInd\" = :AgStatusCode "; // 這裡 AgStatusCode 是 Y/N，條件是在職/非在職，應該是對應 AgCurInd (Y/N) 而非 AgStatusCode (null/1)
+			sql += " AND CE.\"AgCurInd\" = :AgStatusCode "; // 這裡 AgStatusCode 是 Y/N，條件是在職/非在職，應該是對應 AgCurInd (Y/N) 而非
+															// AgStatusCode (null/1)
 		sql += " ORDER BY CE.\"EmployeeNo\" ";
 		sql += " OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
@@ -107,6 +116,8 @@ public class L6088ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("CenterCode", iCenterCode);
 		if (useEmployeeNo)
 			query.setParameter("EmployeeNo", iEmployeeNo);
+		if (useEmpId)
+			query.setParameter("EmpId", iEmpId);
 		if (useEmployeeNoX)
 			query.setParameter("EmployeeNoX", iEmployeeNoX);
 		if (useAgStatusCode)

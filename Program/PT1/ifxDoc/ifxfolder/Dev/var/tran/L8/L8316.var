@@ -367,6 +367,7 @@ C(5,#TranKey_Tmp,4,s,$)
 !C(5,#TranKey,D,T(2,@Year,#L8r27Year),$)
 C(5,#TranKey,D,s,$)
 @V(7)
+IF(#Year==0,V(P,請輸入年度別, ),$)
 
 !法院承審股別 2個全形
 #CourtDiv=C,4,I

@@ -104,7 +104,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,BDD.\"ReturnCode\"  AS \"ReturnCode\"                   ";
 			sql += " ,BDD.\"MediaKind\"   AS \"MediaKind\"                    ";
 			sql += " ,BDD.\"AmlRsp\"      AS \"AmlRsp\"                       ";
-			if (functionCode == 10) {
+			if (functionCode == 10 || functionCode == 11) {
 				sql += " ,TX.\"TempAmt\"  AS \"TxTempAmt\"                    ";
 				sql += " ,TX.\"OverAmt\"  - \"ShortAmt\"   AS \"OverShort\"   ";
 			}
@@ -133,14 +133,18 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
-		if (functionCode == 10) {
+		if (functionCode == 10 || functionCode == 11 ) {
 			sql += " left join (                                              ";
 			sql += "     select                                               ";
 			sql += "      \"AcDate\"                                          ";
 			sql += "     ,\"TitaTlrNo\"                                       ";
 			sql += "     ,\"TitaTxtNo\"                                       ";
-			sql += "     ,SUM(Case when \"AcSeq\" = 1 then \"TempAmt\" else 0 end) as  \"TempAmt\"  ";
-			sql += "     ,SUM(Case when \"AcSeq\" = 1 then \"Overflow\" else \"Overflow\"-\"TempAmt\" end) as \"OverAmt\" ";
+			sql += "     ,SUM(Case when \"TitaTcCd\" = 'L3210' and \"AcSeq\" = 1 then \"TempAmt\" ";
+			sql += "               when \"TitaTcCd\" = 'L3210' and \"AcSeq\" > 1 then 0           ";
+			sql += "               else \"TempAmt\" end)   as  \"TempAmt\"  ";
+			sql += "     ,SUM(Case when \"TitaTcCd\" = 'L3210' and \"AcSeq\" = 1 then \"Overflow\" ";
+			sql += "               when \"TitaTcCd\" = 'L3210' and \"AcSeq\" > 1 then \"Overflow\"-\"TempAmt\" "; 
+			sql += "     ,         else \"Overflow\" end)  as \"OverAmt\" ";
 			sql += "     ,SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\" + \"UnpaidCloseBreach\") as \"ShortAmt\" ";
 			sql += "     from \"LoanBorTx\"                                   ";
 			sql += "     where \"RepayCode\" = 2                              ";

@@ -162,7 +162,7 @@ public class L4943 extends TradeBuffer {
 					occursList.putParam("OORepayAmt", result.get("RepayAmt"));
 					occursList.putParam("OOMediaCode", result.get("MediaCode"));
 					occursList.putParam("OOAcDate", acDate);
-					if (functionCode == 10) { // 入帳後溢短收
+					if (functionCode == 10 || functionCode == 11) { // 入帳後溢短收
 						occursList.putParam("OOTempAmt", result.get("TxTempAmt"));
 						occursList.putParam("OOOverShort", result.get("OverShort"));
 					}

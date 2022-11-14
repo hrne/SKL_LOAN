@@ -59,11 +59,17 @@ public class L6088 extends TradeBuffer {
 		this.info("lL6088 ==== " + lL6088);
 
 		for (Map<String, String> m : lL6088) {
+			String seniorityYYMM = "";
+			if (!"0".equals(m.get("SeniorityYY"))) {
+				seniorityYYMM = m.get("SeniorityYY") + "年";
+			}
+			seniorityYYMM += m.get("SeniorityMM") + "個月";
 
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOEmployeeNo", m.get("EmployeeNo"));
 			occursList.putParam("OOAgentId", m.get("AgentId"));
 			occursList.putParam("OOFullname", m.get("Fullname"));
+			occursList.putParam("OOSeniorityYYMM", seniorityYYMM);// 年資
 
 			// 把各員工資料(4筆)，放入符合自己職等的欄位
 			occursList.putParam("OOChief", "");
@@ -72,11 +78,14 @@ public class L6088 extends TradeBuffer {
 			if (!m.get("EmployeeAgLevel").trim().isEmpty())
 				putEmpToAgCol(occursList, m.get("EmployeeAgLevel"), m.get("EmployeeNo"), m.get("Fullname"));
 			if (!m.get("FirstSuperiorAgLevel").trim().isEmpty())
-				putEmpToAgCol(occursList, m.get("FirstSuperiorAgLevel"), m.get("FirstSuperiorEmpNo"), m.get("FirstSuperiorName"));
+				putEmpToAgCol(occursList, m.get("FirstSuperiorAgLevel"), m.get("FirstSuperiorEmpNo"),
+						m.get("FirstSuperiorName"));
 			if (!m.get("SecondSuperiorAgLevel").trim().isEmpty())
-				putEmpToAgCol(occursList, m.get("SecondSuperiorAgLevel"), m.get("SecondSuperiorEmpNo"), m.get("SecondSuperiorName"));
+				putEmpToAgCol(occursList, m.get("SecondSuperiorAgLevel"), m.get("SecondSuperiorEmpNo"),
+						m.get("SecondSuperiorName"));
 			if (!m.get("ThirdSuperiorAgLevel").trim().isEmpty())
-				putEmpToAgCol(occursList, m.get("ThirdSuperiorAgLevel"), m.get("ThirdSuperiorEmpNo"), m.get("ThirdSuperiorName"));
+				putEmpToAgCol(occursList, m.get("ThirdSuperiorAgLevel"), m.get("ThirdSuperiorEmpNo"),
+						m.get("ThirdSuperiorName"));
 
 			occursList.putParam("OOCenterCode", m.get("UnitCode"));
 			occursList.putParam("OOCenterCodeName", m.get("UnitItem"));

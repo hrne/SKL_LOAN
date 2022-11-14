@@ -32,6 +32,7 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4510ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
@@ -90,6 +91,9 @@ public class L4510Batch extends TradeBuffer {
 	public TxToDoCom txToDoCom;
 
 	@Autowired
+	LoanCom loanCom;
+
+	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
@@ -134,7 +138,10 @@ public class L4510Batch extends TradeBuffer {
 	private HashMap<tmpFacm, Integer> mapFlag = new HashMap<>();
 // 火險單
 	private HashMap<tmpFacm, String> insuNoMap = new HashMap<>();
+//
 	private HashMap<tmpFacm, Integer> bormMap = new HashMap<>();
+
+	private HashMap<tmpFacm, Integer> tmpAmtFacmNo = new HashMap<>();
 
 	private int mediaDate = 0;
 //	private int entryDate = 0;
@@ -193,25 +200,25 @@ public class L4510Batch extends TradeBuffer {
 		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
 //		抓取媒體日為今日者
-		slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit, titaVo);
+		slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit,
+				titaVo);
 		if (slEmpDeductSchedule != null) {
 			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 				perfMonth.put(tEmpDeductSchedule.getAgType1(), tEmpDeductSchedule.getWorkMonth());
 //				1.15日薪 2.非15日薪
-				if (iOpItem == 1 && ("4".equals(tEmpDeductSchedule.getAgType1()) || "5".equals(tEmpDeductSchedule.getAgType1()))) {
+				if (iOpItem == 1 && ("4".equals(tEmpDeductSchedule.getAgType1())
+						|| "5".equals(tEmpDeductSchedule.getAgType1()))) {
 					procCodeIs15.add(tEmpDeductSchedule.getAgType1());
 				}
-				if (iOpItem == 2 && !"4".equals(tEmpDeductSchedule.getAgType1()) && !"5".equals(tEmpDeductSchedule.getAgType1())) {
+				if (iOpItem == 2 && !"4".equals(tEmpDeductSchedule.getAgType1())
+						&& !"5".equals(tEmpDeductSchedule.getAgType1())) {
 					procCodeUn15.add(tEmpDeductSchedule.getAgType1());
 				}
 			}
 
 		}
 
-//		刪除舊資料
 		if (iOpItem == 1) {
-
-			deleEmpDeductDtl("4", mediaDate, titaVo);
 			// 還款試算
 			calculateY15BaTxCom(titaVo);
 //		D E F
@@ -235,9 +242,9 @@ public class L4510Batch extends TradeBuffer {
 			}
 		}
 		if (iOpItem == 2) {
-			deleEmpDeductDtl("5", mediaDate, titaVo);
-//			3.產出火險(05)、帳管(04)、明細表
+			// 還款試算
 			calculateN15BaTxCom(titaVo);
+//			3.產出火險(05)、帳管(04)、明細表
 
 //			A B C
 //			火險費
@@ -269,10 +276,12 @@ public class L4510Batch extends TradeBuffer {
 		totaVo.put("OReportF", "" + reportF);
 		if (cnt == 0) {
 			sendMsg = (iOpItem == 1 ? "15日薪" : "非15日薪") + " 產生扣薪明細筆數 = 0";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4511", titaVo.get("MediaDate") + iOpItem, sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4511",
+					titaVo.get("MediaDate") + iOpItem, sendMsg, titaVo);
 		} else {
 			sendMsg = (iOpItem == 1 ? "15日薪" : "非15日薪") + " 扣薪報表已完成，扣薪明細筆數 = " + cnt;
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4510", sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4510", sendMsg, titaVo);
 		}
 
 		this.addList(totaVo);
@@ -314,6 +323,7 @@ public class L4510Batch extends TradeBuffer {
 			getList(flag, slEmpDeductSchedule, result.get("AgType1"));
 			int nextPayIntDate = parse.stringToInteger(result.get("NextPayIntDate")) - 19110000;
 			int firstDueDate = parse.stringToInteger(result.get("FirstDueDate")) - 19110000;
+			int procCode = parse.stringToInteger(result.get("AgType1"));
 			if ("3".equals(result.get("RepayCode"))) {
 				if (nextPayIntDate > iRepayEndDate) {
 					this.info("skip NextPayIntDate > iPayIntDate " + result);
@@ -331,16 +341,19 @@ public class L4510Batch extends TradeBuffer {
 				}
 				iPayIntDate = iEntryDate;
 			}
+			int custNo = parse.stringToInteger(result.get("CustNo"));
+			int facmNo = parse.stringToInteger(result.get("FacmNo"));
 
 			// 應繳試算
-			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 1, BigDecimal.ZERO, titaVo);
+			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO,
+					titaVo);
 			if (!"3".equals(result.get("RepayCode"))) {
 				if (baTxCom.getTerms() < 2) {
 					this.info("skip terms < 2  " + result);
 					continue;
 				}
 			}
-			tmpFacm tmp2 = new tmpFacm(parse.stringToInteger(result.get("CustNo")), parse.stringToInteger(result.get("FacmNo")), 0, 0, flag, parse.stringToInteger(result.get("AgType1")));
+			tmpFacm tmp2 = new tmpFacm(custNo, facmNo, 0, 0, flag, procCode);
 			// 業務科目(額度)
 			facmAcctCode.put(tmp2, result.get("AcctCode"));
 
@@ -349,8 +362,18 @@ public class L4510Batch extends TradeBuffer {
 				custAcctCode.put(parse.stringToInteger(result.get("CustNo")), result.get("AcctCode"));
 			}
 
+			// 取得暫收指定額度：000-全部非指定額度，或 > 0 => 單一額度
+			int wkTmpFacmNo = loanCom.getTmpFacmNo(custNo, 0, facmNo, titaVo);
+			tmpAmtFacmNo.put(tmp2, wkTmpFacmNo);
+
+			tmpFacm tmpAmtFacmNo = new tmpFacm(custNo, wkTmpFacmNo, 0, 0, flag, procCode);
+
+			// 取得暫收款餘額，暫收指定額度不同時寫入
+			if (!rpAmt30Map.containsKey(tmpAmtFacmNo)) {
+				rpAmt30Map.put(tmpAmtFacmNo, baTxCom.getExcessive());
+			}
 			this.info("listBaTxVo =" + listBaTxVo);
-			setBatxValue(listBaTxVo, flag, parse.stringToInteger(result.get("AgType1")));
+			setBatxValue(listBaTxVo, flag, procCode);
 		} // for
 
 //		各個repaycode寫入BankDeductDtl
@@ -389,7 +412,8 @@ public class L4510Batch extends TradeBuffer {
 
 		@Override
 		public String toString() {
-			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", BormNo=" + BormNo + ", achRepayCode=" + achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
+			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", BormNo=" + BormNo + ", achRepayCode="
+					+ achRepayCode + ", flag=" + flag + ", procCode=" + procCode + "]";
 		}
 
 		@Override
@@ -560,8 +584,12 @@ public class L4510Batch extends TradeBuffer {
 			EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
 			EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 
-			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(), tmp.getProcCode());
+			tmpFacm tmp2 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(), 0, tmp.getFlag(),
+					tmp.getProcCode());
 			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
+
+			int wkTmpFacmNo = tmpAmtFacmNo.get(tmp2);
+			tmpFacm tmpAmtFacmNo = new tmpFacm(tmp.getCustNo(), wkTmpFacmNo, 0, 0, tmp.getFlag(), tmp.getProcCode());
 
 			this.info("tmp ... " + tmp);
 			this.info("tmp2 ... " + tmp2);
@@ -591,18 +619,18 @@ public class L4510Batch extends TradeBuffer {
 
 			if (tmp.getAchRepayCode() == 1 && rpAmt01Map.get(tmp) != null) {
 				txAmt = rpAmt01Map.get(tmp);
-				if (rpAmt30Map.get(tmp3) != null) {
-					if (rpAmt30Map.get(tmp3).compareTo(txAmt) >= 0) {
-						rpAmt30Map.put(tmp3, rpAmt30Map.get(tmp3).subtract(txAmt));
+				if (rpAmt30Map.get(tmpAmtFacmNo) != null) {
+					if (rpAmt30Map.get(tmpAmtFacmNo).compareTo(txAmt) >= 0) {
+						rpAmt30Map.put(tmpAmtFacmNo, rpAmt30Map.get(tmpAmtFacmNo).subtract(txAmt));
 						tempVo.putParam("TempAmt", txAmt);
 						txAmt = BigDecimal.ZERO;
-					} else if (rpAmt30Map.get(tmp3).compareTo(BigDecimal.ZERO) > 0) {
-						txAmt = txAmt.subtract(rpAmt30Map.get(tmp3));
-						tempVo.putParam("TempAmt", rpAmt30Map.get(tmp3));
-						rpAmt30Map.put(tmp3, BigDecimal.ZERO);
+					} else if (rpAmt30Map.get(tmpAmtFacmNo).compareTo(BigDecimal.ZERO) > 0) {
+						txAmt = txAmt.subtract(rpAmt30Map.get(tmpAmtFacmNo));
+						tempVo.putParam("TempAmt", rpAmt30Map.get(tmpAmtFacmNo));
+						rpAmt30Map.put(tmpAmtFacmNo, BigDecimal.ZERO);
 					}
 				}
-//				4D.短收	4C.溢收
+//	未使用			4D.短收	4C.溢收
 				if (rpAmt4DMap.get(tmp3) != null) {
 					tEmpDeductDtl.setSumOvpayAmt(rpAmt4DMap.get(tmp3));
 					rpAmt4DMap.put(tmp3, BigDecimal.ZERO);
@@ -740,12 +768,14 @@ public class L4510Batch extends TradeBuffer {
 	}
 
 //	flag = 1.15日 2.非15
-	private long setReportInsuFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo) throws LogicException {
+	private long setReportInsuFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo)
+			throws LogicException {
 
 		return l4510Report.exec(imediaDate, iProcCode, flag, titaVo);
 	}
 
-	private long setReportAcctFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo) throws LogicException {
+	private long setReportAcctFee(int imediaDate, List<String> iProcCode, int flag, TitaVo titaVo)
+			throws LogicException {
 
 		return l4510Report2.exec(imediaDate, iProcCode, flag, titaVo);
 	}
@@ -757,22 +787,6 @@ public class L4510Batch extends TradeBuffer {
 		this.info("flag ... " + flag);
 
 		return l4510Report3.exec(imediaDate, iProcCode, flag, titaVo);
-	}
-
-	private void deleEmpDeductDtl(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
-		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaDateRng(iMediaDate, MediaKind, this.index, this.limit, titaVo);
-
-		if (slEmpDeductDtl != null) {
-			for (EmpDeductDtl tEmpDeductDtl : slEmpDeductDtl.getContent()) {
-				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl.getEmpDeductDtlId(), titaVo);
-				try {
-					empDeductDtlService.delete(tEmpDeductDtl, titaVo);
-					this.info("deleEmpDeductDtl =" + tEmpDeductDtl);
-				} catch (DBException e) {
-					throw new LogicException("E0008", "員工扣薪檔刪除失敗 :" + e.getErrorMsg());
-				}
-			}
-		}
 	}
 
 //	flag 1:15日薪 2:非15日薪
@@ -787,9 +801,11 @@ public class L4510Batch extends TradeBuffer {
 						continue;
 					}
 				}
-				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), tBaTxVo.getRepayType(), flag, procCode);
+				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
+						tBaTxVo.getRepayType(), flag, procCode);
 
-				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag, procCode);
+				tmpFacm tmp2 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(), 0, flag,
+						procCode);
 				tmpFacm tmp3 = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), 0, 0, flag, procCode);
 
 				if (!mapFlag.containsKey(tmp)) {
@@ -848,7 +864,8 @@ public class L4510Batch extends TradeBuffer {
 					if (!rpAmt1CMap.containsKey(tmp2)) {
 						rpAmt1CMap.put(tmp2, tBaTxVo.getBreachAmt().add(tBaTxVo.getDelayInt()));
 					} else {
-						rpAmt1CMap.put(tmp2, rpAmt1CMap.get(tmp2).add(tBaTxVo.getBreachAmt().add(tBaTxVo.getDelayInt())));
+						rpAmt1CMap.put(tmp2,
+								rpAmt1CMap.get(tmp2).add(tBaTxVo.getBreachAmt().add(tBaTxVo.getDelayInt())));
 					}
 
 //					帳管費
@@ -907,13 +924,6 @@ public class L4510Batch extends TradeBuffer {
 						rpAmt42Map.put(tmp2, tBaTxVo.getInterest());
 					} else {
 						rpAmt42Map.put(tmp2, rpAmt42Map.get(tmp2).add(tBaTxVo.getInterest()));
-					}
-//					暫收抵繳 --結算至到額度用tmp3
-				} else if (tBaTxVo.getDataKind() == 3) {
-					if (!rpAmt30Map.containsKey(tmp3)) {
-						rpAmt30Map.put(tmp3, tBaTxVo.getUnPaidAmt());
-					} else {
-						rpAmt30Map.put(tmp3, rpAmt30Map.get(tmp3).add(tBaTxVo.getUnPaidAmt()));
 					}
 				}
 			}

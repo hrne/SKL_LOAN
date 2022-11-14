@@ -369,7 +369,7 @@ C(3,#FunCode,5,s,$)
 !清償原因 修改時自動顯示可修改,其他自動顯示不需輸入
 #CloseReasonCode=X,2,I
 C(2,#FunCode,S,S,$,S,s,s,S)
-C(5,#closefg,Y,S,$)
+! C(5,#closefg,Y,S,$)
 ! C(3,#L2r36CloseDate,0,$,s)
 ! HELP(1: 買賣;2: 自行還清;3: 軍功教勞工貸款轉貸;4: 利率過高轉貸;5: 增貸不准轉貸;6: 額度內動支不准轉貸;7: 內部代償;8: 借新還舊;9: 其他;10: 買回;11: 綁約期還款)
 HELP(#CloseReasonCodeHelp,cols:5)

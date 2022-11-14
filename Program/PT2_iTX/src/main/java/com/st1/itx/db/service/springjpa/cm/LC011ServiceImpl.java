@@ -92,6 +92,9 @@ public class LC011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (iStatus == 1 || iStatus == 2) {
 			sql += "AND A.\"Hcode\" = :Hcode ";
 		}
+		if (iStatus == 0) {
+			sql += "AND A.\"Hcode\" <> 1 ";
+		}
 
 		sql += "AND A.\"TxResult\" = 'S' AND substr(A.\"TranNo\",0,2) not in ('L9','L0','LC') ";
 

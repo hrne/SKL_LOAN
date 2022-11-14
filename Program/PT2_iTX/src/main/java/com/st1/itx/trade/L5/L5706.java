@@ -136,7 +136,11 @@ public class L5706 extends TradeBuffer {
 		this.info("active L5706 ");
 		this.totaVo.init(titaVo);
 		this.info("L5706 TitaVo=[" + titaVo + "]");
+		
 		// 路徑
+		if ("".equals(titaVo.getParam("FILENA").trim())) {
+			throw new LogicException(titaVo, "E0015", "檔案不存在,請查驗路徑");
+		}
 		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */

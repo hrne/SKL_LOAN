@@ -382,14 +382,11 @@ V(2,0)
 C(4,#NTXBUF,$,s)
 HIDE(#BTN8)
 HELP(#CloseIndHelp)
-! HELP(L3DEF,CLOSEINDDEF,CloseInd,CloseIndX)
 E(0,0)
 @V(H,#CloseIndHelp)
-! V(E,0,L3DEF,CLOSEINDDEF)
 
 #CloseIndX=X,20,L
 T(H,#CloseInd,#CloseIndHelp)
-! T(A,#CloseInd,L3DEF,CLOSEINDDEF,CloseInd,CloseIndX)
 
 #BUFD=X,18,S
 T(2,#TimCustNo+#TimCustNo+000)
@@ -599,12 +596,12 @@ C(3,#PayIntDate{n},0,T(3,@PayIntDateX{n},無),E(0,@PayIntDateX{n},#PayIntDate{n}
 
 !清償原因
 #CloseReasonCode=X,2,I
-C(5,#closefg,Y,s,$)
+! C(5,#closefg,Y,s,$)
 HELP(#AdvanceCloseCodeHelp)
 @
 C(4,#CloseReasonCode,T(3,@CloseReasonCodeX,),$)
 V(H,#AdvanceCloseCodeHelp)
-C(5,#closefg,Y,s,V(2,0))
+! C(5,#closefg,Y,s,V(2,0))
 
 #CloseReasonCodeX=X,20,L
 T(3,)T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)
@@ -754,8 +751,6 @@ E(0,@ModifyFee,#L3r11ModifyFee)
 
 #ModifyFeeX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#ModifyFee,#ModifyFeeX)
-
-
 
 #WKREM5=X,1,S
 
