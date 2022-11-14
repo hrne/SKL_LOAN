@@ -139,12 +139,12 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      \"AcDate\"                                          ";
 			sql += "     ,\"TitaTlrNo\"                                       ";
 			sql += "     ,\"TitaTxtNo\"                                       ";
-			sql += "     ,SUM(Case when \"TitaTcCd\" = 'L3210' and \"AcSeq\" = 1 then \"TempAmt\" ";
-			sql += "               when \"TitaTcCd\" = 'L3210' and \"AcSeq\" > 1 then 0           ";
+			sql += "     ,SUM(Case when \"TitaTxCd\" = 'L3210' and \"AcSeq\" = 1 then \"TempAmt\" ";
+			sql += "               when \"TitaTxCd\" = 'L3210' and \"AcSeq\" > 1 then 0           ";
 			sql += "               else \"TempAmt\" end)   as  \"TempAmt\"  ";
-			sql += "     ,SUM(Case when \"TitaTcCd\" = 'L3210' and \"AcSeq\" = 1 then \"Overflow\" ";
-			sql += "               when \"TitaTcCd\" = 'L3210' and \"AcSeq\" > 1 then \"Overflow\"-\"TempAmt\" "; 
-			sql += "     ,         else \"Overflow\" end)  as \"OverAmt\" ";
+			sql += "     ,SUM(Case when \"TitaTxCd\" = 'L3210' and \"AcSeq\" = 1 then \"Overflow\" ";
+			sql += "               when \"TitaTxCd\" = 'L3210' and \"AcSeq\" > 1 then \"Overflow\"-\"TempAmt\" "; 
+			sql += "               else \"Overflow\" end)  as \"OverAmt\" ";
 			sql += "     ,SUM(\"UnpaidInterest\"+\"UnpaidPrincipal\" + \"UnpaidCloseBreach\") as \"ShortAmt\" ";
 			sql += "     from \"LoanBorTx\"                                   ";
 			sql += "     where \"RepayCode\" = 2                              ";

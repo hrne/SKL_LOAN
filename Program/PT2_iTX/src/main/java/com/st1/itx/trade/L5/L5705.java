@@ -79,7 +79,7 @@ public class L5705 extends TradeBuffer {
 			InsertCust(CustId, iRcDateFrom, iRcDateTo, this.index, this.limit, titaVo);
 		} else {
 			// 製檔
-			String strToday = titaVo.getCalDy();
+			String strToday = titaVo.getEntDy(); //titaVo.getCalDy() 改為會計日2022/11/14
 			int Today = 0;
 			if (String.valueOf(Integer.parseInt(strToday)).length() != 8) {
 				Today = Integer.parseInt(strToday) + 19110000;

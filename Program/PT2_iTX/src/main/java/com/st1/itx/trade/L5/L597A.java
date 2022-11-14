@@ -96,14 +96,14 @@ public class L597A extends TradeBuffer {
 			sql = l597AServiceImpl.FindL597A(titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, IsBtn, "");
 		} catch (Exception e) {
 			// E5003 組建SQL語法發生問題
-			logger.info("L5051 ErrorForSql=" + e);
+			this.info("L5051 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5003", "");
 		}
 		try {
 			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, IsBtn), "L597A");
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
-			logger.info("L5051 ErrorForDB=" + e);
+			this.info("L5051 ErrorForDB=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
 

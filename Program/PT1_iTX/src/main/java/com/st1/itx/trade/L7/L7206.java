@@ -119,7 +119,7 @@ public class L7206 extends TradeBuffer {
 			// 人壽負責人名單檔
 		} else if ("T044".equals(tmpName.substring(0, 4)) && iFunctionName.contains("T044") && iFunctionCode == 3) {
 			// 金控利關人名單檔
-		}else if ((tmpName.contains("LA$RLTP") && iFunctionName.contains("LA$RLTP")) || iFunctionCode ==0) {
+		} else if ((tmpName.contains("LA$RLTP") && iFunctionName.contains("LA$RLTP")) || iFunctionCode == 0) {
 			// 人壽利關人職員名單檔 主要給LM013 金檢報表使用
 		} else {
 			String ErrorMsg = "請確認上傳選項與上傳檔案不符合";
@@ -137,7 +137,11 @@ public class L7206 extends TradeBuffer {
 
 			// 編碼參數，設定為UTF-8 || big5
 			try {
+
 				dataLineList = fileCom.intputTxt(filename, "UTF-8");
+				this.info("dataLineList = " + dataLineList);
+
+
 			} catch (IOException e) {
 				this.info("L7206(" + filename + ") : " + e.getMessage());
 				String ErrorMsg = "檔案不存在,請查驗路徑.\r\n" + filename;
@@ -215,7 +219,7 @@ public class L7206 extends TradeBuffer {
 				String iHeadId = converntScientificNotation(tempOccursList.get("HeadId").toString());
 				String iHeadName = tempOccursList.get("HeadName").toString();
 				String iHeadTitle = tempOccursList.get("HeadTitle").toString();
-				String iRelId =  converntScientificNotation(tempOccursList.get("RelId").toString());
+				String iRelId = converntScientificNotation(tempOccursList.get("RelId").toString());
 				String iRelName = tempOccursList.get("RelName").toString();
 				String iRelKinShip = tempOccursList.get("RelKinShip").toString();
 				String iRelTitle = tempOccursList.get("RelTitle").toString();
@@ -230,7 +234,7 @@ public class L7206 extends TradeBuffer {
 				sLifeRelHeadId.setHeadId(iHeadId);
 				sLifeRelHeadId.setRelId(iRelId);
 				sLifeRelHeadId.setBusId(iBusId);
-				
+
 				LifeRelHead sLifeRelHead = new LifeRelHead();
 				sLifeRelHead.setLifeRelHeadId(sLifeRelHeadId);
 				sLifeRelHead.setRelWithCompany(iRelWithCompany);
@@ -383,20 +387,79 @@ public class L7206 extends TradeBuffer {
 	 *                 3:金控利關人名單[T044]<br>
 	 */
 	public void setValueFromFile(ArrayList<String> lineList, int repoNo) {
-
+		int row = 0;
 		// 依照行數擷取明細資料
 		for (String thisLine : lineList) {
 
+			row++;
+
+			if (row == 1) {
+				continue;
+			}
+
+			this.info(repoNo + "," + row + ".thisLine = " + thisLine);
 			// 明細
 			OccursList occursList = new OccursList();
 
 			String[] thisColumn = thisLine.split(",");
+
 			if (thisColumn.length >= 1 && thisColumn != null) {
-				occursList.putParam("StaffId", thisColumn[0]);
-				occursList.putParam("StaffName", thisColumn[1]);
-				occursList.putParam("LoanAmount", thisColumn[2]);
+				// 0:人壽利關人職員名單[LA$RLTP]
+				if (repoNo == 0) {
+
+					occursList.putParam("StaffId", thisColumn[0]);
+					occursList.putParam("StaffName", thisColumn[1]);
+					occursList.putParam("LoanAmount", thisColumn[2]);
+
+					// 1:人壽利關人負責人名單[T07]
+				} else if (repoNo == 1) {
+					int col = 1;
+					occursList.putParam("RelWithCompany", thisColumn[col + 0]);
+					occursList.putParam("HeadId", thisColumn[col + 1]);
+					occursList.putParam("HeadName", thisColumn[col + 2]);
+					occursList.putParam("HeadTitle", thisColumn[col + 3]);
+					occursList.putParam("RelId", thisColumn[col + 4]);
+					occursList.putParam("RelName", thisColumn[col + 5]);
+					occursList.putParam("RelKinShip", thisColumn[col + 6]);
+					occursList.putParam("RelTitle", thisColumn[col + 7]);
+					occursList.putParam("BusId", thisColumn[col + 8]);
+					occursList.putParam("BusName", thisColumn[col + 9]);
+					occursList.putParam("ShareHoldingRatio", thisColumn[col + 10]);
+					occursList.putParam("BusTitle", thisColumn[col + 11]);
+					occursList.putParam("LineAmt", thisColumn[col + 12]);
+					occursList.putParam("LoanBalance", thisColumn[col + 13]);
+
+					// 2:人壽負利關人職員名單[T07_2]
+				} else if (repoNo == 2) {
+
+					int s = 0;
+					for (int i = 0; i < thisColumn.length; i++) {
+						if ((thisColumn[i].length() == 10 || thisColumn[i].length() == 8) && row == 2) {
+							s = i;
+							this.info("start col =" + s);
+							break;
+						}
+					}
+
+					occursList.putParam("EmpId", thisColumn[s + 0]);
+					occursList.putParam("EmpName", thisColumn[s + 1]);
+					occursList.putParam("LoanBalance", thisColumn[s + 12]);
+
+					// 3:金控利關人名單[T044]
+				} else if (repoNo == 3) {
+
+					occursList.putParam("CompanyName", thisColumn[0]);
+					occursList.putParam("Id", thisColumn[1]);
+					occursList.putParam("Name", thisColumn[2]);
+					occursList.putParam("BusTitle", thisColumn[3]);
+					occursList.putParam("LineAmt", thisColumn[4]);
+					occursList.putParam("LoanBalance", thisColumn[5]);
+
+				}
+
 			}
 			this.occursList.add(occursList);
+
 		}
 
 	}
@@ -636,7 +699,7 @@ public class L7206 extends TradeBuffer {
 		} else {
 			resText = text;
 		}
-		
+
 		this.info("text after = " + resText);
 		return resText;
 	}

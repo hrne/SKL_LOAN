@@ -98,7 +98,7 @@ public class L5812 extends TradeBuffer {
 		case 5: // inq
 			break;
 		}
-		logger.info("3");
+		this.info("3");
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -123,9 +123,10 @@ public class L5812 extends TradeBuffer {
 		mYearlyHouseLoanInt.setHouseBuyDate(this.parse.stringToInteger(titaVo.getParam("HouseBuyDate"))); // 房屋取得日期
 
 		tTempVo = tTempVo.getVo(mYearlyHouseLoanInt.getJsonFields());
-
-		tTempVo.putParam("BdLoacation", titaVo.getParam("Location")); // 地址
+		
+		tTempVo.putParam("BdLoacation", titaVo.getParam("Location"));  //地址
 		mYearlyHouseLoanInt.setJsonFields(tTempVo.getJsonString());
+		
 
 	}
 }

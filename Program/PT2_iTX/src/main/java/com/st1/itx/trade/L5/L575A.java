@@ -25,7 +25,6 @@ import com.st1.itx.util.date.DateUtil;
  * @version 1.0.0
  */
 public class L575A extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L575A.class);
 	@Autowired
 	public NegQueryCustService sNegQueryCustService;
 	@Autowired
@@ -35,7 +34,7 @@ public class L575A extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5705File ");
 		this.totaVo.init(titaVo);
-		String strToday = titaVo.getCalDy();// 日曆日
+		String strToday = titaVo.getEntDy(); //titaVo.getCalDy() 改為會計日2022/11/14
 
 		int Today = 0;
 		String CustId = titaVo.getParam("TxCustId").trim();// 身份證字號

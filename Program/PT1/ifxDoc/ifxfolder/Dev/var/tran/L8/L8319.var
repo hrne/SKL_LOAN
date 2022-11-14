@@ -43,7 +43,7 @@ E(0,0)
 ["[L8319]                                 (61)回報協商剩餘債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
-[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+原前置協商申請日",#RcDate],
 [#<->#,"#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 [#<->#,"#FdMaxMainNote+最大債權金融機構報送註記",#MaxMainNote,#MaxMainNoteX],
@@ -87,9 +87,21 @@ T(3,CdCode.TranKey)
 T(3,CdCode.YesNo)
 #YesNoHelp=x,1024,S
 
+
+#YesblankHelp=x,1024,S
+T(3,:空白;Y:是)
+
+#YesNoblankHelp=x,1024,S
+T(3,:空白;Y:是;N:否)
+
+#YesNoHelp2=x,1024,S
+T(3,Y:是;N:否)
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
+!S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
 S(XXR99,01,#CDDEF0001,#CDDEF0002)
+!S(XXR99,01,#CDDEF0001)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
@@ -196,9 +208,8 @@ T(2,@IsChangePayment,#L8r30IsChangePayment)
 E(0,@OutJcicTxtDate,#L8r30OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(H,@MaxMainNoteX,#MaxMainNote,#YesNoHelp)
-T(H,@IsGuarantorX,#IsGuarantor,#YesNoHelp)
-T(H,@IsChangePaymentX,#IsChangePayment,#YesNoHelp)
+!T(H,@IsGuarantorX,#IsGuarantor,#YesNoHelp)
+!T(H,@IsChangePaymentX,#IsChangePayment,#YesNoHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r30TranKey)
@@ -279,14 +290,15 @@ C(5,#TranKey_Tmp,7,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+HELP(#YesblankHelp)
 @T(3,@MaxMainNoteX,)
 C(4,#MaxMainNote,$,C(5,#MaxMainNote,Y,$,V(P,限輸入Y或空白)))
-C(5,#MaxMainNote,Y,T(2,#MaxMainCode,458)T(2,@FdMaxMainCode, )T(F,@MaxMainCode,0)T(2,@FdIsGuarantor, )T(F,@IsGuarantor,0)T(2,@IsGuarantorX, )T(2,@IsGuarantor, ),
+C(5,#MaxMainNote,Y,T(2,#MaxMainCode,458)T(2,#IsChangePayment,Y)T(F,@IsChangePayment,0)T(2,@FdMaxMainCode, )T(F,@MaxMainCode,0)T(2,@FdIsGuarantor, )T(F,@IsGuarantor,0)T(2,@IsGuarantor, )T(2,@IsGuarantor, ),
                    T(2,@FdIsGuarantor,*)T(2,@FdMaxMainCode,*)T(F,@MaxMainCode,1)T(2,@FdIsGuarantor,*)T(F,@IsGuarantor,1))
 
                    
 #MaxMainNoteX=X,2,L
-C(4,#MaxMainNote,S,T(H,@MaxMainNoteX,#MaxMainNote,#YesNoHelp))
+C(4,#MaxMainNote,S,T(H,@MaxMainNoteX,#MaxMainNote,#YesblankHelp))
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
@@ -326,24 +338,27 @@ C(5,#TranKey_Tmp,4,s,$)
 #IsGuarantor=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-C(5,#MaxMainNote,Y,S,$)
-HELP(#YesNoHelp)
+C(5,#MaxMainNote,Y,s,$)
+HELP(#YesNoblankHelp)
 @T(3,@IsGuarantorX,)
-V(H,#YesNoHelp)
 
 #IsGuarantorX=X,2,L
-C(4,#IsGuarantor,S,T(H,@IsGuarantorX,#IsGuarantor,#YesNoHelp))
+C(4,#IsGuarantor,S,T(H,@IsGuarantorX,#IsGuarantor,#YesNoblankHelp))
 
 !是否同意債務人申請變更還款條件方案
 #IsChangePayment=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#MaxMainNote,Y,s,$)
 HELP(#YesNoHelp)
 @T(3,@IsChangePaymentX,)
 V(H,#YesNoHelp)
+!C(5,#MaxMainNote,Y,C(4,IsChangePayment,s,V(P,限輸入Y)),$)
+
 
 #IsChangePaymentX=X,2,L
-T(H,@IsChangePaymentX,#IsChangePayment,#YesNoHelp)
+T(H,@IsChangePaymentX,#IsChangePayment,#YesNoHelp2)
+!C(4,#IsChangePayment,S,T(H,@IsChangePaymentX,#IsChangePayment,#YesNoHelp2))
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

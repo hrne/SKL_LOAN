@@ -1634,7 +1634,7 @@ public class BaTxCom extends TradeBuffer {
 					&& this.txBal.compareTo(ba.getUnPaidAmt()) == 0) {
 				ba.setRepayPriority(1);
 			} else if (ba.getDataKind() == 1) {
-				if (ba.getRepayType() == iRepayType) {
+				if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType) {
 					ba.setRepayPriority(2);
 				} else if (ba.getRepayType() == 1) {
 					ba.setRepayPriority(4);

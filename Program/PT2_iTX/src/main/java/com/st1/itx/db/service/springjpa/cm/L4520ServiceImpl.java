@@ -84,8 +84,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "WITH tx1 AS ("; 
 		sql += "      SELECT" ; 
 		sql += "          \"CustNo\"," ; 
-		sql += "          \"FacmNo\"," ; 
-		sql += "          \"BormNo\"," ; 
+//		sql += "          \"FacmNo\"," ; 
+//		sql += "          \"BormNo\"," ; 
 		sql += "          \"IntStartDate\"," ; 
 		sql += "          \"IntEndDate\"," ; 
 		sql += "          \"AcDate\"," ; 
@@ -95,11 +95,13 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          \"LoanBorTx\"" ; 
 		sql += "      WHERE" ; 
 		sql += "          \"AcDate\" = :inputacdate" ; 
-		sql += "          AND \"TitaHCode\" = 0" ; 
+		sql += "          AND \"TitaHCode\" = 0" ;
+		sql += "          AND (\"IntStartDate\" > 0 " ; 
+		sql += "           OR \"TitaTxCd\" = 'L3210' )" ; 
 		sql += "      GROUP BY" ; 
 		sql += "          \"CustNo\"," ; 
-		sql += "          \"FacmNo\"," ; 
-		sql += "          \"BormNo\"," ; 
+//		sql += "          \"FacmNo\"," ; 
+//		sql += "          \"BormNo\"," ; 
 		sql += "          \"IntStartDate\"," ; 
 		sql += "          \"IntEndDate\"," ; 
 		sql += "          \"AcDate\"," ; 
@@ -135,6 +137,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      WHERE" ; 
 		sql += "          \"AcDate\" = :inputacdate" ; 
 		sql += "          AND \"TitaHCode\" = 0" ; 
+		sql += "          AND (\"IntStartDate\" > 0 " ; 
+		sql += "           OR \"TitaTxCd\" = 'L3210' )" ; 
 		sql += "      GROUP BY" ; 
 		sql += "          \"CustNo\"," ; 
 		sql += "          \"FacmNo\"," ; 
@@ -179,12 +183,27 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  MIN(ed.\"ProcCode\") as \"ProcCode\",";
 		sql += "  MIN(ed.\"Acdate\") as \"Acdate\"" ;
 		sql += "  FROM";
-		sql += "  \"EmpDeductDtl\"   ed ";
-		
-		sql += "  LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\"              ";
+		sql += "  ( ";
+		sql += "  SELECT DISTINCT";
+		sql += "  		 \"CustNo\"";
+		sql += "  		,\"EmpNo\"";
+		sql += "  		,\"Acdate\"";
+		sql += "  		,\"TitaTlrNo\"";
+		sql += "  		,\"TitaTxtNo\"";
+		sql += "  		,\"ProcCode\"";
+		sql += "  		,\"AcctCode\"";
+		sql += "  		,\"RepayCode\"";
+		sql += "  FROM \"EmpDeductDtl\" ";
+		sql += "  WHERE \"AchRepayCode\" IN ( 1, 5) ";
+		sql += "    AND \"PerfMonth\" = :PerfMonth";
+		sql += "    AND \"BatchNo\" >= :BatchNoFm";
+		sql += "    AND \"BatchNo\" <= :BatchNoTo";
+		if(!"0".equals(ProcCode)) {
+			sql += "    AND \"ProcCode\" = :ProcCode";
+		}
+		sql += "  ) ed ";
+		sql += "  LEFT JOIN \"CustMain\"       cm ON cm.\"CustNo\" = ed.\"CustNo\"        ";
 		sql += "  LEFT JOIN \"CdEmp\"          ce ON ce.\"EmployeeNo\" = ed.\"EmpNo\"       ";
-		
-	
 		sql += "  LEFT JOIN \"BatxDetail\" BD ON BD.\"AcDate\" = ed.\"Acdate\"" ;
 		sql += "                             AND BD.\"TitaTlrNo\" = ed.\"TitaTlrNo\""; 
 		sql += "                             AND BD.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
@@ -193,21 +212,13 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND SUBSTR(tx1.\"TitaTxtNo\",1,2) = SUBSTR(BD.\"BatchNo\",5,2)";
 		sql += "               AND TO_NUMBER(SUBSTR(tx1.\"TitaTxtNo\",3,6)) = BD.\"DetailSeq\"";
 		sql += "  LEFT JOIN tx2 ON tx2.\"CustNo\" = tx1.\"CustNo\"";
-		sql += "                       AND tx2.\"FacmNo\" = tx1.\"FacmNo\"";
-		sql += "                       AND tx2.\"BormNo\" = tx1.\"BormNo\"";
+//		sql += "                       AND tx2.\"FacmNo\" = tx1.\"FacmNo\"";
+//		sql += "                       AND tx2.\"BormNo\" = tx1.\"BormNo\"";
 		sql += "                       AND tx2.\"IntStartDate\" = tx1.\"IntStartDate\"";
 		sql += "                       AND tx2.\"IntEndDate\" = tx1.\"IntEndDate\"";
 		sql += "                       AND tx2.\"AcDate\" = tx1.\"AcDate\"";
 		sql += "                       AND tx2.\"TitaTlrNo\" = tx1.\"TitaTlrNo\""; 
 		sql += "                       AND tx2.\"TitaTxtNo\" = tx1.\"TitaTxtNo\"";
-	
-		sql += "  WHERE \"AchRepayCode\" IN ( 1, 5) ";
-		sql += "  AND \"PerfMonth\" = :PerfMonth";
-		sql += "    AND ed.\"BatchNo\" >= :BatchNoFm";
-		sql += "    AND ed.\"BatchNo\" <= :BatchNoTo";
-		if(!"0".equals(ProcCode)) {
-			sql += "    AND ed.\"ProcCode\" = :ProcCode";
-		}
 		sql += "  GROUP BY   ed.\"CustNo\"";
 		sql += "  ORDER BY   \"RepayCode\", \"AcctCode\", \"ProcCode\", \"CustNo\", \"IntStartDate\", \"IntEndDate\"";
 

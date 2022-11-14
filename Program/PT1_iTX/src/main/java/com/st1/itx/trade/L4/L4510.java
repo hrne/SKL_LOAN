@@ -102,7 +102,9 @@ public class L4510 extends TradeBuffer {
 				throw new LogicException("E0008", "員工扣薪檔刪除失敗 :" + e.getErrorMsg());
 			}
 		}
-		MySpring.newTask("L4510Batch", this.txBuffer, titaVo);
+		if (titaVo.isHcodeNormal()) {
+			MySpring.newTask("L4510Batch", this.txBuffer, titaVo);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
