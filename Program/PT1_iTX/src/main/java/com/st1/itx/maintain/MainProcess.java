@@ -226,7 +226,8 @@ public class MainProcess extends SysLogger {
 
 		// 電文中實際交易時間於 APCTL 置放
 		this.titaVo.putParam(ContentName.caldy, dateUtil.getNowStringRoc());
-		this.titaVo.putParam(ContentName.caltm, dateUtil.getNowStringTime(true));
+		this.titaVo.putParam(ContentName.caltm, dateUtil.getNowStringTime());
+		txCom.setTxTime(dateUtil.getNowIntegerTime(true));
 
 //		// eric remark 2020.6.8
 //		// 本次日交易判斷

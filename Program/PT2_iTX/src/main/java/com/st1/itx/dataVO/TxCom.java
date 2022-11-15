@@ -130,6 +130,9 @@ public class TxCom {
 	// 本月月底營業日西元
 	private int mfbsdyf = 0;
 
+	// 交易時間
+	private int txTime = 0;
+
 	/*
 	 * -----------------------------------------------------------------------------
 	 * ----------------------------
@@ -808,6 +811,14 @@ public class TxCom {
 	 */
 	public void setMfbsdyf(int mfbsdyf) {
 		this.mfbsdyf = mfbsdyf;
+	}
+
+	public int getTxTime() {
+		return txTime;
+	}
+
+	public void setTxTime(int txTime) {
+		this.txTime = txTime;
 	}
 
 	/**

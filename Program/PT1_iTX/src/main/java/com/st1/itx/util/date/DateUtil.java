@@ -401,12 +401,19 @@ public class DateUtil extends SysLogger {
 	/**
 	 * get Time Now
 	 * 
-	 * @return Integer HHmmss
+	 * @param isHaveFemto boolean need FemtoSecond set true
+	 * @return Integer HHmmss or HHmmssSS
 	 */
-	public int getNowIntegerTime() {
+	public int getNowIntegerTime(boolean... isHaveFemto) {
 		Date date = new Date();
-		SimpleDateFormat dt = new SimpleDateFormat("HHmmss");
-		return Integer.parseInt(dt.format(date));
+		SimpleDateFormat dt = null;
+		if (isHaveFemto.length >= 1 && isHaveFemto[0]) {
+			dt = new SimpleDateFormat("HHmmssSSS");
+			return Integer.parseInt(dt.format(date).substring(0, 8));
+		} else {
+			dt = new SimpleDateFormat("HHmmss");
+			return Integer.parseInt(dt.format(date));
+		}
 	}
 
 	/**
