@@ -1897,6 +1897,9 @@ public class TxBatchCom extends TradeBuffer {
 		if (t.get("PreRepayTerms") != null) {
 			tTempVo.putParam("PreRepayTerms", t.get("PreRepayTerms")); // 批次預收期數
 		}
+		if (t.get("payFeeMethod") != null) {
+			tTempVo.putParam("payFeeMethod", t.get("payFeeMethod")); // 回收費用方式 Y/N
+		}
 	}
 
 	/* 設定處理說明 */

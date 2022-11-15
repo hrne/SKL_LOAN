@@ -347,6 +347,12 @@ public class L4510Batch extends TradeBuffer {
 			// 應繳試算
 			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO,
 					titaVo);
+			// 非15日薪僅扣期款
+			if (flag == 2) {
+				baTxCom.setPayFeeMethod("N");
+			} else {
+				baTxCom.setPayFeeMethod("Y");				
+			}
 			if (!"3".equals(result.get("RepayCode"))) {
 				if (baTxCom.getTerms() < 2) {
 					this.info("skip terms < 2  " + result);
@@ -588,13 +594,8 @@ public class L4510Batch extends TradeBuffer {
 					tmp.getProcCode());
 			tmpFacm tmp3 = new tmpFacm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, tmp.getFlag(), tmp.getProcCode());
 
-			int wkTmpFacmNo = tmpAmtFacmNo.get(tmp2);
+			int wkTmpFacmNo = tmpAmtFacmNo.get(tmp3);
 			tmpFacm tmpAmtFacmNo = new tmpFacm(tmp.getCustNo(), wkTmpFacmNo, 0, 0, tmp.getFlag(), tmp.getProcCode());
-
-			this.info("tmp ... " + tmp);
-			this.info("tmp2 ... " + tmp2);
-			this.info("tmp3 ... " + tmp3);
-			this.info("rpAmt30Map ... " + rpAmt30Map.get(tmp3));
 
 //			暫收抵繳僅寫入第一筆為期款撥款(報表用)
 			tempVo = new TempVo();
@@ -795,12 +796,6 @@ public class L4510Batch extends TradeBuffer {
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
-				// 非15日薪僅扣期款
-				if (flag == 2) {
-					if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() >= 4) {
-						continue;
-					}
-				}
 				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
 						tBaTxVo.getRepayType(), flag, procCode);
 

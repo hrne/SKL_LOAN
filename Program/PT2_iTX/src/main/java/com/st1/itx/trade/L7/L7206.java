@@ -70,6 +70,10 @@ public class L7206 extends TradeBuffer {
 		this.info("active L7206 ");
 		this.totaVo.init(titaVo);
 
+		if(titaVo.getParam("FILENA").trim().length() == 0) {
+			throw new LogicException(titaVo, "E0014", "沒有選擇檔案");
+		}
+		
 		// 吃檔
 		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
@@ -92,21 +96,27 @@ public class L7206 extends TradeBuffer {
 		this.info("iFunctionCode=" + iFunctionCode);
 		this.info("iFunctionName=" + iFunctionName);
 
-		String extension[] = filename.split("\\.");
+		
+		// 路徑
+		String[] extension = null;
+		if(filename.contains("\\/")) {
+			extension = filename.split("\\/");
+		}else if(filename.contains("\\\\")) {
+			extension = filename.split("\\\\");
+		}else if(filename.contains("/")) {
+			extension = filename.split("/");
+		}
+		
+		
 
+		String tmpNameG[] = extension[extension.length - 1].split("\\.");
 		// 檔案名稱
-		// \絕對路徑   /相對路徑
-		String tmpNameG[] = extension[extension.length - 2].split("\\/");
 		String tmpName = tmpNameG[tmpNameG.length - 1];
 		// 附檔名
-		String fileExt = extension[extension.length - 1];
+		String fileExt = extension[extension.length - 2].toLowerCase();
 		this.info("file fileName=" + tmpName);
 		this.info("file fileExt=" + fileExt);
-
-//		this.info("\"T07_2\".contains(tmpName)=" + tmpName.contains("T07_2"));
-//		this.info("\"T07_2\".contains(iFunctionName)=" + iFunctionName.contains("T07_2"));	
-//		this.info("\"T07_2\".indexOf(iFunctionName)=" + tmpName.indexOf("T07_2"));	
-//		this.info("\"T07_2\".indexOf(iFunctionName)=" + iFunctionName.indexOf("T07_2"));	
+	
 		// 判斷選擇上傳的項目與實際上傳的檔案名稱要相符(避免上傳錯檔案，欄位不符會報錯)
 		if ("T07_2".equals(tmpName.substring(0, 5))
 				&& tmpName.contains("T07_2_") && "T07_2".equals(iFunctionName

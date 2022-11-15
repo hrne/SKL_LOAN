@@ -239,7 +239,7 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setBorxNo(iBorxNo);
 		tLoanBorTx.setLoanBorTxId(tLoanBorTxId);
 		tLoanBorTx.setTitaCalDy(this.parse.stringToInteger(titaVo.getCalDy()));
-		tLoanBorTx.setTitaCalTm(this.parse.stringToInteger(titaVo.getCalTm()));
+		tLoanBorTx.setTitaCalTm(this.txBuffer.getTxCom().getTxTime());
 		tLoanBorTx.setTitaKinBr(titaVo.getKinbr());
 		tLoanBorTx.setTitaTlrNo(titaVo.getTlrNo());
 		tLoanBorTx.setTitaTxtNo(titaVo.getTxtNo());

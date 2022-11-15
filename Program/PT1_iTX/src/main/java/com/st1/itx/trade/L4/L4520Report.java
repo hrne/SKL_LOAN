@@ -17,6 +17,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4520ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -174,13 +175,13 @@ public class L4520Report extends MakeReport {
 			}
 
 			if (Csize != 0) {
-				setReportA(lEmpDeductMediaC, titaVo1,true); // 非15 成功
+				setReportA(lEmpDeductMediaC, titaVo1,false); // 非15 成功
 				this.info("Csize =" + Csize);
 			}
 			
 			if (Bsize != 0) {
 				header = 1;
-				setReportB(lEmpDeductMediaB, titaVo1,false); // 15 失敗
+				setReportB(lEmpDeductMediaB, titaVo1,true); // 15 失敗
 				this.info("Bsize =" + Bsize);
 			}
 			
@@ -199,10 +200,23 @@ public class L4520Report extends MakeReport {
 
 //		MediaKind = tEmpDeductMedia.get(0).get("MediaKind");
 		BatchNo = tEmpDeductMedia.get(0).get("BatchNo");
+		
+		
 		if(isSuccess) {
-		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "15日薪扣薪媒體回傳成功明細表", "", "A4", "L");
+			
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode("L4520")
+					.setRptItem("15日薪扣薪媒體回傳成功明細表").setRptSize("A4").setSecurity("").setPageOrientation("L").build();
+			
+			this.open(titaVo, reportVo);
+			
+			
+//		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "15日薪扣薪媒體回傳成功明細表", "", "A4", "L");
 		} else {
-		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "非15日薪扣薪媒體回傳成功明細表", "", "A4", "L");
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode("L4520")
+					.setRptItem( "非15日薪扣薪媒體回傳成功明細表").setRptSize("A4").setSecurity("").setPageOrientation("L").build();
+			
+			this.open(titaVo, reportVo);
+//		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "非15日薪扣薪媒體回傳成功明細表", "", "A4", "L");
 		}
 		
 		DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -339,9 +353,19 @@ public class L4520Report extends MakeReport {
 //		MediaKind = tEmpDeductMedia.get(0).get("MediaKind");
 		BatchNo = tEmpDeductMedia.get(0).get("BatchNo");
 		if(isSuccess) {
-		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "15日薪扣薪媒體回傳失敗明細表", "", "A4", "L");
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode("L4520")
+					.setRptItem( "15日薪扣薪媒體回傳失敗明細表").setRptSize("A4").setSecurity("").setPageOrientation("L").build();
+			
+			this.open(titaVo, reportVo);
+			
+//		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "15日薪扣薪媒體回傳失敗明細表", "", "A4", "L");
 		} else {
-		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "非15日薪扣薪媒體回傳失敗明細表", "", "A4", "L");
+			
+			ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode("L4520")
+					.setRptItem( "非15日薪扣薪媒體回傳失敗明細表").setRptSize("A4").setSecurity("").setPageOrientation("L").build();
+			
+			this.open(titaVo, reportVo);
+//		  this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4520", "非15日薪扣薪媒體回傳失敗明細表", "", "A4", "L");
 		}
 		
 

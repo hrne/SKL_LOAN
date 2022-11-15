@@ -96,6 +96,10 @@ public class L7205 extends TradeBuffer {
 		int iMfbsDy = tTxBizDate.getMfbsDy() + 19110000;// 畫面輸入年月的月底營業日
 		this.info("L7205 iMfbsDy : " + iMfbsDy);
 
+		if(titaVo.getParam("FILENA").trim().length() == 0) {
+			throw new LogicException(titaVo, "E0014", "沒有選擇檔案");
+		}
+		
 		// 吃檔
 		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
@@ -132,7 +136,7 @@ public class L7205 extends TradeBuffer {
 //			}
 			// 切資料
 			setValueFromFileExcelNew(titaVo, iYearMonth);
-		} else if ("csv".equals(extension[extension.length - 1])) {
+		} else if ("csv".equals(extension[extension.length - 1].toLowerCase())) {
 			setValueFromFile(dataLineList);
 		} else {
 			String ErrorMsg = "請上傳正確附檔名之檔案-csv,xls,xlsx";

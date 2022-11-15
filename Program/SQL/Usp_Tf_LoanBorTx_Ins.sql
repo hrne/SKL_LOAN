@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-CREATE OR REPLACE EDITIONABLE PROCEDURE "Usp_Tf_LoanBorTx_Ins" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_LoanBorTx_Ins" 
 ( 
     -- 參數 
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間 
@@ -169,7 +169,7 @@ BEGIN
                    WHEN S1."TRXTRN" = '3033' THEN S1."TRXAMT" -- 3033:其他費用登錄 
                    WHEN S1."TRXTRN" = '3036' THEN S1."TRXAMT" -- 3036:暫收款登錄 
                    WHEN S1."TRXTRN" = '3082' THEN S1."TRXAMT" -- 3082:暫付所得稅 
-                   WHEN S1."TRXTRN" = '3088' THEN S1."TRXAMT" -- 3088:支票兌現 
+               --     WHEN S1."TRXTRN" = '3088' THEN S1."TRXAMT" -- 3088:支票兌現 
                  ELSE 0 END)                AS "Overflow"             -- 暫收款 DECIMAL 16 2 
       FROM "CountLA$TRXP" S0 
       LEFT JOIN "LA$TRXP" S1 ON S1."CUSBRH" = S0."CUSBRH" 
@@ -242,7 +242,7 @@ BEGIN
                                       ,TR1."TRXTIM") 
                                           AS "BorxNo"              -- 交易內容檔序號 DECIMAL 4  
           ,TR1."TRXTDT"                   AS "TitaCalDy"           -- 交易日期 DECIMALD 8  
-          ,TR1."TRXTIM"                   AS "TitaCalTm"           -- 交易時間 DECIMAL 8  
+          ,TR1."TRXTIM" * 100             AS "TitaCalTm"           -- 交易時間 DECIMAL 8  
           ,'0000'                         AS "TitaKinBr"           -- 單位別 VARCHAR2 4 
           ,NVL(AEM1."EmpNo",'999999')     AS "TitaTlrNo"           -- 經辦 VARCHAR2 6  
 	        -- "TRXNMT" NUMBER(7,0), 目前最大20519 
@@ -296,6 +296,14 @@ BEGIN
              WHEN TR1."TRXCRC" IN ('1','3') 
              THEN 0 - NVL(JL."JLNAMT",0) 
            ELSE NVL(JL."JLNAMT",0) 
+           END
+           +
+           CASE
+             WHEN TR1."TRXCRC" IN ('1','3')  AND TR1."TRXNTX" != 0
+             THEN NVL(JL."JLNAMT",0) 
+             WHEN TR1."TRXNTX" != 0
+             THEN 0 - TR1."TRXNTX"
+           ELSE 0
            END                            AS "TxAmt"               -- 交易金額 DECIMAL 16 2 
           ,TR1."LMSLBL"                   AS "LoanBal"             -- 放款餘額 DECIMAL 16 2 
           ,TR1."TRXISD"                   AS "IntStartDate"        -- 計息起日 DECIMALD 8  

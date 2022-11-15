@@ -50,10 +50,17 @@ public class L7203 extends TradeBuffer {
 
 		int iYearMonth = parse.stringToInteger(titaVo.getParam("YearMonth")) + 191100;
 		this.info("L7203 YearMonth : " + iYearMonth);
+		
+		if(titaVo.getParam("FILENA").trim().length() == 0) {
+			throw new LogicException(titaVo, "E0014", "沒有選擇檔案");
+		}
+		
 //      吃檔                                            
 		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
+		
 
+		
 		ArrayList<String> dataLineList = new ArrayList<>();
 
 //       編碼參數，設定為UTF-8 || big5

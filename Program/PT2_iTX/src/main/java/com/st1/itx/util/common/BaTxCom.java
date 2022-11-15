@@ -9,6 +9,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -18,6 +21,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -158,9 +162,23 @@ public class BaTxCom extends TradeBuffer {
 	private String payMethod = "";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 	private String tmpFacmNoX = "";// 暫收指定額度
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
+	
+	private String payFeeMethod = "";// 回收費用方式 Y/N
+
+	// initialize variable
+	@PostConstruct
+	public void initial() {
+		this.payFeeMethod = "";
+	}
 
 //  initialize
 	private void init() {
+		// 是否回收費用 Y-是 N-否
+		if ("N".equals(this.payFeeMethod)) {
+			this.payFeeFlag = "N";
+		} else {
+			this.payFeeFlag = "Y";
+		}
 
 		this.baTxVo = new BaTxVo();
 		this.baTxList = new ArrayList<BaTxVo>();
@@ -200,8 +218,6 @@ public class BaTxCom extends TradeBuffer {
 		this.fitRate = BigDecimal.ZERO; // 目前利率
 		this.calcLoanBal = BigDecimal.ZERO; // 還款前本金餘額
 
-		// 費用
-		this.payFeeFlag = "Y";// 是否回收費用 Y-是 N-否
 
 		// 期款
 		this.unpaidFlag = "Y";// 是否可欠繳
@@ -431,9 +447,13 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settleUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settleUnPaid TxAmt 回收金額=" + iTxAmt);
 		this.info("BaTxCom settleUnPaid TempVo 處理說明=" + iTempVo.toString());
-		init();
 		this.tempVo = iTempVo;
+		
+		if (tempVo.get("PayFeeMethod") != null) {
+			this.payFeeMethod = tempVo.get("PayFeeMethod");
+		}
 
+		init();
 // STEP 1:  Load repayLoanList facTempList, UnPaidlist 
 
 		// input 還款類別
@@ -2837,6 +2857,15 @@ public class BaTxCom extends TradeBuffer {
 	public String getPayFeeFlag() {
 		return payFeeFlag;
 	}
+	
+	/**
+	 * 回收費用方式 
+	 * @param payFeeMethod Y/N
+	 */
+	public void setPayFeeMethod(String payFeeMethod) {
+		this.payFeeMethod = payFeeMethod;
+	}
+
 
 	/**
 	 * 是否可欠繳
