@@ -8,9 +8,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +51,16 @@ public class FileGenerator extends CommBuffer {
 
 	private String charsetName;
 
+	private Map<String, byte[]> sb = new HashMap<String, byte[]>();
+
+	public FileGenerator() {
+		sb.put("＋", new byte[] { (byte) 0xA1, (byte) 0xCF });
+		sb.put("－", new byte[] { (byte) 0xA1, (byte) 0xD0 });
+		sb.put("＊", new byte[] { (byte) 0xA1, (byte) 0xAF });
+		sb.put("／", new byte[] { (byte) 0xA1, (byte) 0xFE });
+		sb.put("～", new byte[] { (byte) 0xA1, (byte) 0xE3 });
+	}
+
 	public void generateFile(long fileNo, String fileName) throws LogicException {
 		this.info("generateFile=" + fileNo);
 
@@ -77,7 +89,7 @@ public class FileGenerator extends CommBuffer {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
 							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]));
 						else
-							bos.write(s.equals("＋") || s.equals("－") || s.equals("＊") || s.equals("／")   ? sl : s.getBytes(charsetName));
+							bos.write(Objects.isNull(sb.get(s)) ? s.getBytes(charsetName) : sb.get(s));
 					}
 					bos.write("\r\n".getBytes(charsetName));
 				} else
