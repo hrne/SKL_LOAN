@@ -123,6 +123,7 @@ public class L4002 extends TradeBuffer {
 	private void setL4002Tota(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
 		String batchNo = tBatxHead.getBatchNo();
 		boolean isRepayCode1To4 = false;
+		boolean isBatchErase = false;
 		int labelRankFlag = 1;
 		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
@@ -204,6 +205,10 @@ public class L4002 extends TradeBuffer {
 				// 可入帳 => 檢核成功、還款來源(1~4)
 				if (tBatxDetail.getRepayCode() >= 1 && tBatxDetail.getRepayCode() <= 4) {
 					isRepayCode1To4 = true;
+				}
+				// 可整批訂正
+				if (tBatxDetail.getProcStsCode().equals("6"))  {
+					isBatchErase = true;
 				}
 				// 可刪除回復 => 刪除且未曾入過
 				if (isDeleteRecovery && tempVo.get("EraseCnt") != null) {
@@ -596,7 +601,7 @@ public class L4002 extends TradeBuffer {
 							if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
 								labelFgA = "D";
 							} else {
-								if (isRepayCode1To4) {
+								if (isBatchErase) {
 									labelFgA = "H";
 								}
 							}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +23,7 @@ import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BankRmtf;
 import com.st1.itx.db.domain.BankRmtfId;
 import com.st1.itx.db.domain.BatxDetail;
+import com.st1.itx.db.domain.BatxDetailId;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.EmpDeductMedia;
@@ -39,6 +41,7 @@ import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.PostDeductMediaService;
+import com.st1.itx.db.service.springjpa.cm.L420BServiceImpl;
 import com.st1.itx.main.ApControl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
@@ -97,6 +100,9 @@ public class L420BBatch extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
+	@Autowired
+	L420BServiceImpl l420BServiceImpl;
+
 	private int ProcessCnt = 0;
 	private int iFunctionCode;
 	private int iAcDate;
@@ -133,28 +139,42 @@ public class L420BBatch extends TradeBuffer {
 				throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
 			}
 			// findAll 整批入帳明細檔
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
-					Integer.MAX_VALUE);
-			if (slBatxDetail == null) {
-				throw new LogicException("E0014", "整批入帳明細檔= null"); // E0014 檔案錯誤
-			}
+			List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+			Slice<BatxDetail> slBatxDetail;
 			List<BatxDetail> lBatxDetail = new ArrayList<BatxDetail>();
-			for (BatxDetail t : slBatxDetail.getContent()) {
-				if (!"".equals(iReconCode) && !t.getReconCode().equals(iReconCode)) {
-					continue;
+			if (iFunctionCode == 5) {
+				try {
+					resultList = l420BServiceImpl.findAll(0, Integer.MAX_VALUE, titaVo);
+				} catch (Exception e) {
+					errorMsg = e.getMessage();
 				}
-				if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
-						|| "7".equals(t.getProcStsCode())) {
-					if (iFunctionCode == 1) {
-						errorMsg = "刪除時有入帳成功資料";
-					}
-					if (iFunctionCode == 5) {
-						if ("6".equals(t.getProcStsCode())) {
-							lBatxDetail.add(t);
+				if (resultList != null && resultList.size() != 0) {
+					for (Map<String, String> result : resultList) {
+						if ("6".equals(result.get("ProcStsCode"))) {
+							BatxDetail t = batxDetailService.findById(
+									new BatxDetailId(iAcDate, iBatchNo, parse.stringToInteger(result.get("DetailSeq"))),
+									titaVo);
+							if (t != null) {
+								lBatxDetail.add(t);
+							}
 						}
 					}
-				} else {
-					if (iFunctionCode != 5) {
+				}
+			} else {
+				slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, 0, Integer.MAX_VALUE);
+				if (slBatxDetail == null) {
+					throw new LogicException("E0014", "整批入帳明細檔= null"); // E0014 檔案錯誤
+				}
+				for (BatxDetail t : slBatxDetail.getContent()) {
+					if (!"".equals(iReconCode) && !t.getReconCode().equals(iReconCode)) {
+						continue;
+					}
+					if ("5".equals(t.getProcStsCode()) || "6".equals(t.getProcStsCode())
+							|| "7".equals(t.getProcStsCode())) {
+						if (iFunctionCode == 1) {
+							errorMsg = "刪除時有入帳成功資料";
+						}
+					} else {
 						lBatxDetail.add(t);
 					}
 				}
@@ -194,24 +214,15 @@ public class L420BBatch extends TradeBuffer {
 					});
 				}
 			}
-			// 整批訂正，以最後更新日期時間反序
-			if (iFunctionCode == 5) {
-				Collections.sort(lBatxDetail, new Comparator<BatxDetail>() {
-					public int compare(BatxDetail c1, BatxDetail c2) {
-						if (c1.getLastUpdate().compareTo(c2.getLastUpdate()) < 0) {
-							return c2.getLastUpdate().compareTo(c1.getLastUpdate());
-						}
-						return 0;
-					}
-				});
-			}
 			this.batchTransaction.commitEnd();
 			this.batchTransaction.init();
 			// functionCode 處理代碼 0:入帳 1:刪除 3.檢核 4.刪除回復
 			// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.需轉暫收
 			// 訂正使用L420C
 			//
-			for (BatxDetail tDetail : lBatxDetail) {
+			for (
+
+			BatxDetail tDetail : lBatxDetail) {
 				boolean isUpdate = false;
 				TempVo tTempVo = new TempVo();
 				tTempVo = tTempVo.getVo(tDetail.getProcNote());

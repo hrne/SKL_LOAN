@@ -32,13 +32,19 @@ public class BankRemitId implements Serializable {
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo = " ";
 
+  // 流水號
+  /* 舊資料有多筆同一筆會計日期+經辦+交易序號有多筆 */
+  @Column(name = "`Seq`")
+  private int seq = 0;
+
   public BankRemitId() {
   }
 
-  public BankRemitId(int acDate, String titaTlrNo, String titaTxtNo) {
+  public BankRemitId(int acDate, String titaTlrNo, String titaTxtNo, int seq) {
     this.acDate = acDate;
     this.titaTlrNo = titaTlrNo;
     this.titaTxtNo = titaTxtNo;
+    this.seq = seq;
   }
 
 /**
@@ -98,10 +104,29 @@ public class BankRemitId implements Serializable {
     this.titaTxtNo = titaTxtNo;
   }
 
+/**
+	* 流水號<br>
+	* 舊資料有多筆同一筆會計日期+經辦+交易序號有多筆
+	* @return Integer
+	*/
+  public int getSeq() {
+    return this.seq;
+  }
+
+/**
+	* 流水號<br>
+	* 舊資料有多筆同一筆會計日期+經辦+交易序號有多筆
+  *
+  * @param seq 流水號
+	*/
+  public void setSeq(int seq) {
+    this.seq = seq;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(acDate, titaTlrNo, titaTxtNo);
+    return Objects.hash(acDate, titaTlrNo, titaTxtNo, seq);
   }
 
   @Override
@@ -111,11 +136,11 @@ public class BankRemitId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     BankRemitId bankRemitId = (BankRemitId) obj;
-    return acDate == bankRemitId.acDate && titaTlrNo.equals(bankRemitId.titaTlrNo) && titaTxtNo.equals(bankRemitId.titaTxtNo);
+    return acDate == bankRemitId.acDate && titaTlrNo.equals(bankRemitId.titaTlrNo) && titaTxtNo.equals(bankRemitId.titaTxtNo) && seq == bankRemitId.seq;
   }
 
   @Override
   public String toString() {
-    return "BankRemitId [acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + "]";
+    return "BankRemitId [acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", seq=" + seq + "]";
   }
 }

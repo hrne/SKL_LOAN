@@ -58,7 +58,7 @@ public interface BankRemitService {
    * @param titaVo Variable-Length Argument
    * @return Slice BankRemit BankRemit of List
    */
-  public Slice<BankRemit> findL4901A(int custNo_0, int index, int limit, TitaVo... titaVo);
+  public Slice<BankRemit> findL4901A2(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate = ,AND BatchNo = ,AND DrawdownCode &gt;= ,AND DrawdownCode &lt;= ,AND StatusCode &gt;= ,AND StatusCode &lt;= 

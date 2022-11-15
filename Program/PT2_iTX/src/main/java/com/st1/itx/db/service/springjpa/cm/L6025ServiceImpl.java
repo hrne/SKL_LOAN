@@ -58,7 +58,7 @@ public class L6025ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	cl.\"CityCode\" AS \"CityCode\" , ";
 		sql += "	cl.\"LandOfficeCode\" AS \"LandOfficeCode\" , ";
 		sql += "	NVL(MIN(cc.\"CityItem\"),MIN(cd2.\"Item\")) AS \"CityItem\" , ";
-		sql += "	MIN(cd.\"Item\") AS \"LoanItem\" , ";
+		sql += "	MIN(cl.\"LandOfficeItem\") AS \"LoanItem\" , ";
 		sql += "	MIN(cl.\"LastUpdate\") AS \"LastUpdate\", ";
 		sql += "	MIN(cl.\"LastUpdateEmpNo\") AS \"LastUpdateEmpNo\" ";
 		sql += "	from \"CdLand\" cl ";
@@ -67,9 +67,8 @@ public class L6025ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	left join \"CdCode\" cd2 ON cd2.\"DefCode\" = 'ClOtherRightsCityCd' ";
 		sql += "	and cd2.\"Code\" = cl.\"CityCode\"  ";
 
-		sql += "	WHERE cd.\"DefCode\" = 'LandOfficeCode'  ";
 		if (!iCityCode.isEmpty()) {
-			sql += "	and cl.\"CityCode\" = :cityCode ";
+		sql += "	WHERE cl.\"CityCode\" = :cityCode ";
 		}
 		sql += "	GROUP BY  cl.\"CityCode\",cl.\"LandOfficeCode\" order by cl.\"CityCode\" ";
 

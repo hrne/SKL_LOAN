@@ -293,9 +293,9 @@ E(0,#SYSCDATE)
 !連動L8923增加記號3:代表帶入實際還款日期
 #OOBUFL8923=X,100,S
 T(2,#OOAcDate+#OOAcDate+#OOCustNo+3)
-!事後新增訪談L8204-帶入畫面[戶號]+[入帳日期]+[累積金額]
+!事後新增訪談L8204-帶入畫面[戶號]+[入帳日期]+[累積金額],最後一碼參數=1代表要帶入實際還款日與金額
 #OOBUFL8204=X,100,S
-T(2,1+#TodayCDate+#OOCustNo+000000+#OOAcDate+00000000000000000000+#OOTotalAmt)
+T(2,1+#TodayCDate+#OOCustNo+000000+#OOAcDate+00000000000000000000+#OOTotalAmt1+1)
 
 
 #OOBTNL8923=X,4,S

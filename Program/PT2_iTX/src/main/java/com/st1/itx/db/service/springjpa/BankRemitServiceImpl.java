@@ -94,9 +94,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "Seq"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "Seq"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAll(pageable);
@@ -142,7 +142,7 @@ em = null;
   }
 
   @Override
-  public Slice<BankRemit> findL4901A(int custNo_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<BankRemit> findL4901A2(int custNo_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<BankRemit> slice = null;
     if (titaVo.length != 0)
@@ -153,7 +153,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findL4901A " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findL4901A2 " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAllByCustNoIs(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))

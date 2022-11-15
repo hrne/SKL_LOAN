@@ -140,10 +140,18 @@ public class L8309 extends TradeBuffer {
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ048 = sJcicZ048Service.ukeyFirst(iKey, titaVo);
+			if (iJcicZ048 == null) {
+				throw new LogicException("E0004", "刪除資料不存在");
+			}
 			JcicZ048 uJcicZ0482 = new JcicZ048();
 			uJcicZ0482 = sJcicZ048Service.holdById(iJcicZ048.getJcicZ048Id(), titaVo);
+			if(uJcicZ0482 == null ) {
+				throw new LogicException("E0004", "刪除資料不存在");
+			}
+
 			iJcicZ048 = sJcicZ048Service.findById(iJcicZ048Id);
 			int JcicDate2 = iJcicZ048.getOutJcicTxtDate();
+
 			if (JcicDate2 != 0) {
 				throw new LogicException("E0004", "刪除資料不存在");
 			}

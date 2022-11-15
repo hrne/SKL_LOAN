@@ -42,6 +42,11 @@ public class BankRemit implements Serializable {
   @Column(name = "`TitaTxtNo`", length = 8, insertable = false, updatable = false)
   private String titaTxtNo;
 
+  // 流水號
+  /* 舊資料有多筆同一筆會計日期+經辦+交易序號有多筆 */
+  @Column(name = "`Seq`", insertable = false, updatable = false)
+  private int seq = 0;
+
   // 整批批號
   /* "LN + 傳票批號 + 匯款批號 */
   @Column(name = "`BatchNo`", length = 6)
@@ -211,6 +216,25 @@ public class BankRemit implements Serializable {
 	*/
   public void setTitaTxtNo(String titaTxtNo) {
     this.titaTxtNo = titaTxtNo;
+  }
+
+/**
+	* 流水號<br>
+	* 舊資料有多筆同一筆會計日期+經辦+交易序號有多筆
+	* @return Integer
+	*/
+  public int getSeq() {
+    return this.seq;
+  }
+
+/**
+	* 流水號<br>
+	* 舊資料有多筆同一筆會計日期+經辦+交易序號有多筆
+  *
+  * @param seq 流水號
+	*/
+  public void setSeq(int seq) {
+    this.seq = seq;
   }
 
 /**
@@ -744,10 +768,10 @@ U:禁止交易(AML)
 
   @Override
   public String toString() {
-    return "BankRemit [bankRemitId=" + bankRemitId + ", batchNo=" + batchNo + ", drawdownCode=" + drawdownCode + ", statusCode=" + statusCode
-           + ", remitBank=" + remitBank + ", remitBranch=" + remitBranch + ", remitAcctNo=" + remitAcctNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo
-           + ", custName=" + custName + ", custId=" + custId + ", custBirthday=" + custBirthday + ", custGender=" + custGender + ", remark=" + remark + ", currencyCode=" + currencyCode
-           + ", remitAmt=" + remitAmt + ", amlRsp=" + amlRsp + ", actFg=" + actFg + ", modifyContent=" + modifyContent + ", payCode=" + payCode + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "BankRemit [bankRemitId=" + bankRemitId + ", batchNo=" + batchNo + ", drawdownCode=" + drawdownCode
+           + ", statusCode=" + statusCode + ", remitBank=" + remitBank + ", remitBranch=" + remitBranch + ", remitAcctNo=" + remitAcctNo + ", custNo=" + custNo + ", facmNo=" + facmNo
+           + ", bormNo=" + bormNo + ", custName=" + custName + ", custId=" + custId + ", custBirthday=" + custBirthday + ", custGender=" + custGender + ", remark=" + remark
+           + ", currencyCode=" + currencyCode + ", remitAmt=" + remitAmt + ", amlRsp=" + amlRsp + ", actFg=" + actFg + ", modifyContent=" + modifyContent + ", payCode=" + payCode
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

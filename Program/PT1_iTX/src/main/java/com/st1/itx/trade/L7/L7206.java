@@ -95,7 +95,8 @@ public class L7206 extends TradeBuffer {
 		String extension[] = filename.split("\\.");
 
 		// 檔案名稱
-		String tmpNameG[] = extension[extension.length - 2].split("\\\\");
+		// \絕對路徑   /相對路徑
+		String tmpNameG[] = extension[extension.length - 2].split("\\/");
 		String tmpName = tmpNameG[tmpNameG.length - 1];
 		// 附檔名
 		String fileExt = extension[extension.length - 1];

@@ -87,7 +87,7 @@ public class L4901 extends TradeBuffer {
 		Slice<BankRemit> slBankRemit = null;
 		switch (iSearchFlag) {
 		case 1: // 戶號
-			slBankRemit = bankRemitService.findL4901A(iCustNo, this.index, this.limit);
+			slBankRemit = bankRemitService.findL4901A2(iCustNo, this.index, this.limit);
 			break;
 		case 2: // 批號
 			slBankRemit = bankRemitService.findL4901B(iAcDate, batchNo, drawdownCodeS, drawdownCodeE, 0, 9, this.index,

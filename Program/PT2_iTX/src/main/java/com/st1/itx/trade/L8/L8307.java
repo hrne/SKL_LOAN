@@ -85,6 +85,7 @@ public class L8307 extends TradeBuffer {
 		int iCustNo = tCustMain == null ? 0 : tCustMain.getCustNo();
 		titaVo.putParam("CustNo", iCustNo);
 		this.info("CustNo   = " + iCustNo);
+		int EntDy = Integer.valueOf(titaVo.getParam("wkSYSCDATE").trim());
 
 		// JcicZ046, JcicZ040
 		JcicZ046 iJcicZ046 = new JcicZ046();
@@ -130,9 +131,11 @@ public class L8307 extends TradeBuffer {
 				// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
 				this.info(" iCloseCode     = " + iCloseCode);
 				if ("00".equals(iCloseCode)) {
+					this.info("00   = 檢核00");
 					Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 							Integer.MAX_VALUE, titaVo);
 					if (sJcicZ051 != null) {
+						this.info("00   = 不是空值");
 						int sDelayYM = 0;// 最晚「延期繳款年月」
 						for (JcicZ051 xJcicZ051 : sJcicZ051) {
 							if (!"D".equals(xJcicZ051.getTranKey()) && xJcicZ051.getDelayYM() > sDelayYM) {
@@ -143,9 +146,10 @@ public class L8307 extends TradeBuffer {
 						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
 						this.info("formateDelayYM    = " + formateDelayYM);
 						this.info("txDate            = " + txDate);
+						this.info("EntDy             = " + EntDy);
 						int txDelay = formateDelayYM-19110000;
 						this.info("txDelay           = " + txDelay);
-						if (txDate <= txDelay) {
+						if (EntDy <= txDelay) {
 							if ("A".equals(iTranKey)) {
 								throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + txDelay + "前)不可報送'00'毀諾.");
 							} else {
@@ -168,7 +172,7 @@ public class L8307 extends TradeBuffer {
 				if (!"00".equals(iCloseCode)) {
 					throw new LogicException("E0007", "'D'刪除功能僅限毀諾資料.");
 				}
-				if (GetRocYYYMM(iCloseDate) != GetRocYYYMM(txDate)) {
+				if (GetRocYYYMM(iCloseDate) != GetRocYYYMM(EntDy)) {
 					throw new LogicException("E0007", "'D'刪除毀諾資料需在結案日當月.");
 				}
 			} // 4 end

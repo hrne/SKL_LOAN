@@ -84,7 +84,7 @@ T(2,@ApHelp,#HelpDesc2)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8923 疑似洗錢交易訪談記錄查詢]進入),$)
 
-#NTXBUF=X,62,S
+#NTXBUF=X,100,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_FuncCode=X,1,S
@@ -107,10 +107,11 @@ T(1,#NTXBUF,22,7)
 
 #CHAIN_LogNo=A,20,S
 T(1,#NTXBUF,29,20)
-!ALERT(#CHAIN_LogNo)
 #CHAIN_RepayAmt=m,14,S
 T(1,#NTXBUF,49,14)
 
+#CHAIN_ActualFalg=X,1,S
+T(1,#NTXBUF,63,1)
 
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -197,10 +198,11 @@ T(2,@Description,#L8R51Description)
 T(2,@CustName,#L8R51CustName)
 T(H,#RepaySourceX,#RepaySource,#ApHelp)
 
-!訪談事後新增-由L8922帶入還款日期與金額,預定與實際帶相同值
+!訪談事後新增-由L8922帶入還款日期與金額,預定與實際帶相同值(#CHAIN_ActualFalg=1才帶預設值)
 #SendFromL8922=X,1,S
 C(3,#FuncCode,1,$,s)
 C(1,#CustNo,s,s,$)
+C(3,#CHAIN_ActualFalg,1,$,s)
 E(0,@ActualRepayDate,#RepayDate)
 E(0,@ActualRepayAmt,#RepayAmt)
 
