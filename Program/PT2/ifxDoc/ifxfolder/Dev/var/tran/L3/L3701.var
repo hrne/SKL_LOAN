@@ -984,6 +984,7 @@ T(3,@RateAdjFreq2X,個月)
 !催收戶不可變更,須隱藏欄位
 #RateCode2=X,1,I
 C(5,#OvduFlag,Y,S,$)
+C(5,#PaidFlag,Y,S,$)
 HELP(#RateCodeHelp)
 @C(4,#RateCode2,S,$)
 V(H,#RateCodeHelp)
@@ -1016,6 +1017,7 @@ T(3,%)
 
 #ApproveRate2=X,7,I
 C(5,#OvduFlag,Y,S,$)
+C(5,#PaidFlag,Y,S,$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 
 #ApproveRate2N=n,7.4,S
@@ -1034,6 +1036,7 @@ C(5,#L2r01IncrFlag,Y,T(3,%),T(3, ))
 
 #RateIncr2=X,7,I
 C(5,#OvduFlag,Y,S,$)
+C(5,#PaidFlag,Y,S,$)
 C(5,#L2r01IncrFlag,Y,$,S)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 
@@ -1053,6 +1056,7 @@ C(5,#L2r01IncrFlag,Y,T(3, ),T(3,%))
  
 #IndividualIncr2=X,7,I
 C(5,#OvduFlag,Y,S,$)
+C(5,#PaidFlag,Y,S,$)
 C(5,#L2r01IncrFlag,Y,S,$)
 C(3,#RateIncr2N,0,$,S)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)

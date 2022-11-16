@@ -73,10 +73,9 @@ public class L4943 extends TradeBuffer {
 
 		if (functionCode != 7) {
 			try {
-				// *** 折返控制相關 ***
-				resulAlltList = l4943ServiceImpl.findAll(1, titaVo);
+				resulAlltList = l4943ServiceImpl.querySummary(titaVo);
 			} catch (Exception e) {
-				this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+				this.error("l4943ServiceImpl querySummary " + e.getMessage());
 				throw new LogicException("E0013", e.getMessage());
 			}
 		}
@@ -92,25 +91,23 @@ public class L4943 extends TradeBuffer {
 			totaVo.putParam("OTotalTempAmt", totTempAmt);
 			totaVo.putParam("OTotalRepayAmt", totRepayAmt);
 		} else {
-
 			if (functionCode == 7) {
 				// 7:已到期未至應繳日
 				try {
 					resulParttList = l4943ServiceImpl.doQuery7(this.index, this.limit, titaVo);
 				} catch (Exception e) {
-					this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+					this.error("l4943ServiceImpl doQuery7 " + e.getMessage());
 					throw new LogicException("E0013", e.getMessage());
 				}
 			} else {
 				try {
 					// *** 折返控制相關 ***
-					resulParttList = l4943ServiceImpl.findAll(0, this.index, this.limit, titaVo);
+					resulParttList = l4943ServiceImpl.findAll(this.index, this.limit, titaVo);
 				} catch (Exception e) {
-					this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+					this.error("l4943ServiceImpl findAll " + e.getMessage());
 					throw new LogicException("E0013", e.getMessage());
 				}
 			}
-
 			if (resulParttList != null && resulParttList.size() > 0) {
 
 				for (Map<String, String> result : resulParttList) {
@@ -215,7 +212,7 @@ public class L4943 extends TradeBuffer {
 				totaVo.putParam("OTotalRepayAmt", totRepayAmt);
 
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-				if (resulParttList.size() == this.limit && hasNext()) {
+				if (l4943ServiceImpl.hasNext()) {
 					titaVo.setReturnIndex(this.setIndexNext());
 					/* 手動折返 */
 					this.totaVo.setMsgEndToEnter();
@@ -274,26 +271,6 @@ public class L4943 extends TradeBuffer {
 		if (cdCode != null) {
 			result = cdCode.getItem();
 		}
-
-		return result;
-	}
-
-	private Boolean hasNext() {
-		Boolean result = true;
-
-		int times = this.index + 1;
-		int cnt = l4943ServiceImpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
 
 		return result;
 	}

@@ -1,0 +1,1 @@
+UPDATE "TxTranCode"SET "MenuFg"='0' WHERE "TranNo" = 'L4321';

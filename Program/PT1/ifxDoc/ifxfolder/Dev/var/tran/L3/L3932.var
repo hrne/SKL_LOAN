@@ -465,7 +465,7 @@ T(H,#OOStatus,#StatusHelp)
 
 !修改
 #OOBUF2=X,100,S
-T(2,L3932+#OOCustNo+          +0000000+#OOFacmNo+000+#OONextAdjRateDate+#OOEffectDate+#OORateCode+#OOProdNo+#OOBaseRateCode+#OOBaseRate+#OOFitRate+#OORateIncr+#OOIndividualIncr+#OOChangeFg)
+T(2,L3932+#OOCustNo+          +0000000+#OOFacmNo+#OOBormNo+#OONextAdjRateDate+#OOEffectDate+#OORateCode+#OOProdNo+#OOBaseRateCode+#OOBaseRate+#OOFitRate+#OORateIncr+#OOIndividualIncr+#OOChangeFg)
 
 
 #OOBTN2=X,8,S
@@ -538,7 +538,7 @@ TXFORM=L3932
 {width:80,align:'center'}
 
 #OORateIncrX
-#OORateIncrXX=加碼利率
+#OORateIncrXX=利率加減碼
 {width:85,align:'center'}
 
 #OOIndividualIncrX

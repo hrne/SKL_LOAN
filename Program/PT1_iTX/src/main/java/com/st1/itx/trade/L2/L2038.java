@@ -44,35 +44,35 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L2038 extends TradeBuffer {
 	@Autowired
-	public L2038ServiceImpl sL2038ServiceImpl;
+	L2038ServiceImpl sL2038ServiceImpl;
 
 	@Autowired
-	public ClBuildingService sClBuildingService;
+	ClBuildingService sClBuildingService;
 
 	@Autowired
-	public ClLandService sClLandService;
+	ClLandService sClLandService;
 
 	@Autowired
-	public ClStockService sClStockService;
+	ClStockService sClStockService;
 
 	@Autowired
-	public ClMovablesService sClMovablesService;
-
-	/* DB服務注入 */
-	@Autowired
-	public CustMainService sCustMainService;
+	ClMovablesService sClMovablesService;
 
 	/* DB服務注入 */
 	@Autowired
-	public CdCodeService sCdCodeDefService;
+	CustMainService sCustMainService;
+
+	/* DB服務注入 */
+	@Autowired
+	CdCodeService sCdCodeDefService;
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
 
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -142,7 +142,8 @@ public class L2038 extends TradeBuffer {
 					tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 
 					if (tClBuilding != null) {
-						occurslist.putParam("OOOther", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
+						occurslist.putParam("OOOther", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1()
+								+ "-" + tClBuilding.getBdNo2());
 					} else {
 						occurslist.putParam("OOOther", "");
 					}
@@ -167,7 +168,8 @@ public class L2038 extends TradeBuffer {
 						endlandNo = endlandNo + landNo4;
 					}
 
-					Slice<ClLand> slClLand = sClLandService.findClNo(TempClCode1, TempClCode2, TempClNo, this.index, this.limit, titaVo);
+					Slice<ClLand> slClLand = sClLandService.findClNo(TempClCode1, TempClCode2, TempClNo, this.index,
+							this.limit, titaVo);
 
 					List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 
@@ -178,7 +180,8 @@ public class L2038 extends TradeBuffer {
 						for (ClLand tClLand : lClLand) {
 
 							if (landNo1 > 0 || landNo2 > 0 || landNo3 > 0 || landNo4 > 0) { // 打建號且有打地號 或 打地號
-								int tempNo = parse.stringToInteger(tClLand.getLandNo1()) * 10000 + parse.stringToInteger(tClLand.getLandNo2());
+								int tempNo = parse.stringToInteger(tClLand.getLandNo1()) * 10000
+										+ parse.stringToInteger(tClLand.getLandNo2());
 								if (startlandNo <= tempNo && tempNo <= endlandNo) {
 									occurslist.putParam("OOOther1", tClLand.getLandLocation());
 								} // if
@@ -219,7 +222,8 @@ public class L2038 extends TradeBuffer {
 
 					if (tClStock != null) {
 
-						CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", tClStock.getStockCode(), titaVo);
+						CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", tClStock.getStockCode(),
+								titaVo);
 
 						if (tCdCode != null) {
 							occurslist.putParam("OOOther", tClStock.getStockCode() + " " + tCdCode.getItem());
@@ -260,7 +264,8 @@ public class L2038 extends TradeBuffer {
 				}
 
 				// 是否有他項權利資料，Y/N
-				occurslist.putParam("OOHasOtherRights", parse.stringToInteger(result.get("OtherRightsCount")) > 0 ? "Y" : "N");
+				occurslist.putParam("OOHasOtherRights",
+						parse.stringToInteger(result.get("OtherRightsCount")) > 0 ? "Y" : "N");
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
@@ -269,7 +274,7 @@ public class L2038 extends TradeBuffer {
 
 			chkOccursList = this.totaVo.getOccursList();
 
-			if (resultList.size() == this.limit && hasNext()) {
+			if (sL2038ServiceImpl.hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
@@ -284,25 +289,4 @@ public class L2038 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-	private Boolean hasNext() {
-		Boolean result = true;
-
-		int times = this.index + 1;
-		int cnt = sL2038ServiceImpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
-
-		return result;
-	}
-
 }

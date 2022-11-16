@@ -67,9 +67,6 @@ public class L4321Batch extends TradeBuffer {
 	public DateUtil dateUtil;
 
 	@Autowired
-	public L4321ServiceImpl L4321ServiceImpl;
-
-	@Autowired
 	public L4321Report l4321Report;
 
 	@Autowired
@@ -84,6 +81,7 @@ public class L4321Batch extends TradeBuffer {
 	private int iCustType = 0;
 	private int iConfirmFlag = 0;
 	private int processCnt = 0;
+	private int checkErrorCnt = 0;
 	private TempVo tTempVo = new TempVo();
 	private String sendMsg = "";
 	private String iLableBX = "";
@@ -113,34 +111,10 @@ public class L4321Batch extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE;
 
 		try {
-			fnAllList = L4321ServiceImpl.findAll(titaVo);
-		} catch (Exception e) {
+			execute(titaVo);
+		} catch (LogicException e) {
+			sendMsg = e.getErrorMsg();
 			flag = false;
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("L4321ServiceImpl.findAll error = " + errors.toString());
-		}
-		// 檢查未放行
-		if (!flag) {
-			if (fnAllList != null && fnAllList.size() != 0) {
-				for (Map<String, String> s : fnAllList) {
-					if ("1".equals(s.get("ActFg"))) {
-						flag = false;
-						sendMsg += " 戶號：" + s.get("CustNo");
-					}
-				}
-			}
-			if (!flag) {
-				throw new LogicException("E0015", sendMsg); // 檢查錯誤
-			}
-		}
-		if (flag) {
-			try {
-				execute(titaVo);
-			} catch (LogicException e) {
-				sendMsg = e.getErrorMsg();
-				flag = false;
-			}
 		}
 		// 送出通知訊息
 		sendMessage(titaVo);
@@ -201,9 +175,9 @@ public class L4321Batch extends TradeBuffer {
 			// 設定訊息
 			if (iTxKind <= 3) {
 				if (this.iCustType == 1) {
-					sendMsg = "個金，" + sendMsg;
+					sendMsg = "個金" + sendMsg;
 				} else {
-					sendMsg = "企金，" + sendMsg;
+					sendMsg = "企金" + sendMsg;
 				}
 			}
 
@@ -228,9 +202,12 @@ public class L4321Batch extends TradeBuffer {
 			}
 
 			if (titaVo.isHcodeNormal()) {
-				sendMsg = sendMsg + "，" + iLableBX + "，完成確認，筆數：" + this.processCnt;
+				sendMsg += "，" + iLableBX + "，完成確認，筆數：" + this.processCnt;
+				if (this.checkErrorCnt > 0) {
+					sendMsg += "，確認失敗筆數：" + this.checkErrorCnt;
+				}
 			} else {
-				sendMsg = sendMsg + "，" + iLableBX + "，取消確認，筆數：" + this.processCnt;
+				sendMsg += "，" + iLableBX + "，取消確認，筆數：" + this.processCnt;
 			}
 
 			if (titaVo.isHcodeNormal()) {
@@ -308,15 +285,15 @@ public class L4321Batch extends TradeBuffer {
 				// 經辦更新
 				if (titaVo.isActfgEntry()) {
 
+					// 確認檢核
+					if (titaVo.isHcodeNormal()) {
+						if (checkConfirm(tBatxRateChange, titaVo)) {
+							continue;
+						}
+					}
 					// 處理本次生效日
 					if (txEffectDate > 0) {
 						setLoanRateChange(tBatxRateChange, titaVo);
-					}
-					// 檢核撥款主檔
-					if (txEffectDate > 0 && titaVo.isHcodeNormal()) {
-						if (checkBormError(tBatxRateChange, titaVo)) {
-							continue;
-						}
 					}
 
 					// 更新撥款主檔
@@ -364,7 +341,6 @@ public class L4321Batch extends TradeBuffer {
 					if (this.iConfirmFlag == 1) {
 						tTempVo.putParam("EntDy", titaVo.getEntDyI());
 						tTempVo.putParam("TxSeq", titaVo.getTxSeq());
-						;
 					}
 					tBatxRateChange.setConfirmFlag(this.iConfirmFlag);
 					tBatxRateChange.setJsonFields(tTempVo.getJsonString());
@@ -380,9 +356,11 @@ public class L4321Batch extends TradeBuffer {
 		this.info("processUpdate End...");
 	}
 
-	// 檢核撥款主檔
-	private boolean checkBormError(BatxRateChange tBatxRateChange, TitaVo titaVo) throws LogicException {
+	// 檢核確認資料是否有變動
+	private boolean checkConfirm(BatxRateChange tBatxRateChange, TitaVo titaVo) throws LogicException {
 		boolean isCheckError = false;
+		String checkMsg = "";
+		// check LoanBorMain
 		LoanBorMain tLoanBorMain = new LoanBorMain();
 		LoanBorMainId tLoanBorMainId = new LoanBorMainId();
 		tLoanBorMainId.setCustNo(tBatxRateChange.getCustNo());
@@ -392,17 +370,73 @@ public class L4321Batch extends TradeBuffer {
 		if (tLoanBorMain == null) {
 			throw new LogicException("E0006", "L4321Batch LoanBorMain " + tLoanBorMainId);
 		}
-		if (tLoanBorMain.getPrevPayIntDate() > tBatxRateChange.getCurtEffDate()) {
-			tTempVo.putParam("CheckMsg", "上次繳息日大於利率生效日");
-			tBatxRateChange.setAdjCode(3);
-			tBatxRateChange.setRateKeyInCode(9);
+		if (tBatxRateChange.getAdjustedRate().compareTo(tBatxRateChange.getPresentRate()) != 0
+				&& tLoanBorMain.getPrevPayIntDate() > tBatxRateChange.getCurtEffDate()) {
+			checkMsg += "上次繳息日大於利率生效日 ";
+			isCheckError = true;
+		}
+
+		if ("3".equals(tBatxRateChange.getRateCode())
+				&& tLoanBorMain.getNextAdjRateDate() != tBatxRateChange.getCurtEffDate()) {
+			checkMsg += "下次利率調整日已變動";
+			isCheckError = true;
+		}
+
+		// check PresEffDate
+		LoanRateChange tLoanRateChange = new LoanRateChange();
+		LoanRateChangeId tLoanRateChangeId = new LoanRateChangeId();
+		tLoanRateChangeId.setCustNo(tBatxRateChange.getCustNo());
+		tLoanRateChangeId.setFacmNo(tBatxRateChange.getFacmNo());
+		tLoanRateChangeId.setBormNo(tBatxRateChange.getBormNo());
+		tLoanRateChangeId.setEffectDate(tBatxRateChange.getPresEffDate());
+		tLoanRateChange = loanRateChangeService.findById(tLoanRateChangeId, titaVo);
+		if (tLoanRateChange == null) {
+			checkMsg += "利率資料已變動";
+			isCheckError = true;
+		}
+		if (!tLoanRateChange.getRateCode().equals(tBatxRateChange.getRateCode())
+				|| !tLoanRateChange.getBaseRateCode().equals(tBatxRateChange.getBaseRateCode())) {
+			checkMsg += "利率資料已變動";
+			isCheckError = true;
+		}
+		if (!tLoanRateChange.getRateCode().equals(tBatxRateChange.getRateCode())
+				|| !tLoanRateChange.getBaseRateCode().equals(tBatxRateChange.getBaseRateCode())) {
+			checkMsg += "利率資料已變動";
+			isCheckError = true;
+		} else if (tLoanRateChange.getRateIncr().compareTo(tBatxRateChange.getRateIncr()) != 0
+				|| tLoanRateChange.getIndividualIncr().compareTo(tBatxRateChange.getIndividualIncr()) != 0) {
+			checkMsg += "利率資料已變動";
+			isCheckError = true;
+		} else if ("99".equals(tBatxRateChange.getBaseRateCode())
+				&& tLoanRateChange.getFitRate().compareTo(tBatxRateChange.getPresentRate()) != 0) {
+			checkMsg += "利率資料已變動";
+			isCheckError = true;
+		}
+		
+		// check CurtEffDate
+		if (tBatxRateChange.getCurtEffDate() != tBatxRateChange.getPresEffDate()) {
+			tLoanRateChange = new LoanRateChange();
+			tLoanRateChangeId = new LoanRateChangeId();
+			tLoanRateChangeId.setCustNo(tBatxRateChange.getCustNo());
+			tLoanRateChangeId.setFacmNo(tBatxRateChange.getFacmNo());
+			tLoanRateChangeId.setBormNo(tBatxRateChange.getBormNo());
+			tLoanRateChangeId.setEffectDate(tBatxRateChange.getCurtEffDate());
+			tLoanRateChange = loanRateChangeService.findById(tLoanRateChangeId, titaVo);
+			if (tLoanRateChange != null) {
+				checkMsg += "利率資料已新增";
+				isCheckError = true;
+			}
+		}
+		if (isCheckError) {
+			this.checkErrorCnt++;
+			tBatxRateChange.setAdjCode(5);
+			tTempVo.putParam("CheckMsg", checkMsg);
 			tBatxRateChange.setJsonFields(tTempVo.getJsonString());
 			try {
 				batxRateChangeService.update(tBatxRateChange, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "BatxRateChange update is error : " + e.getErrorMsg());
 			}
-			isCheckError = true;
 		}
 		return isCheckError;
 	}

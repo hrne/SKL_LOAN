@@ -19,7 +19,19 @@ import com.st1.itx.util.log.SysLogger;
 
 public class ASpringJpaParm extends SysLogger {
 
-	public List<Map<String, String>> convertToMap(List<Object> list) {
+	// *** 折返控制相關 ***
+	protected int index;
+
+	// *** 折返控制相關 ***
+	protected int limit;
+
+	// *** 折返控制相關 ***
+	protected int pageCount = 0;
+
+	// *** 折返控制相關 ***
+	protected int totalSize = 0;
+
+	protected List<Map<String, String>> convertToMap(List<Object> list) {
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
 		try {
@@ -39,7 +51,7 @@ public class ASpringJpaParm extends SysLogger {
 		return result;
 	}
 
-	public List<Map<String, String>> convertToMap(Query query, boolean isUpdate) {
+	protected List<Map<String, String>> convertToMap(Query query, boolean isUpdate) {
 		if (isUpdate) {
 			query.executeUpdate();
 			return new ArrayList<Map<String, String>>();
@@ -47,14 +59,23 @@ public class ASpringJpaParm extends SysLogger {
 			return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> convertToMap(Query query) {
-		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-
-		query.unwrap(NativeQueryImpl.class).setResultTransformer(AliasToEntityLinkHashMapResultTransformer.INSTANCE);
+	// 設定回傳的資料具有Query定義的欄位名稱
+	private Query preparedQuery(Query query) {
+		query = query.unwrap(NativeQueryImpl.class)
+				.setResultTransformer(AliasToEntityLinkHashMapResultTransformer.INSTANCE);
 //		.setResultTransformer(Transformers.aliasToBean(new LinkedHashMap<String, Object>().getClass()));
 //		.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-		List rows = query.getResultList();
+		return query;
+	}
 
+	protected List<Map<String, String>> convertToMap(Query query) {
+		query = preparedQuery(query);
+		List rows = query.getResultList();
+		return convert(rows);
+	}
+
+	private List<Map<String, String>> convert(List rows) {
+		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 		for (Object obj : rows) {
 			Map<String, Object> row = (LinkedHashMap<String, Object>) obj;
 			Map<String, String> m = new LinkedHashMap<String, String>();
@@ -86,5 +107,46 @@ public class ASpringJpaParm extends SysLogger {
 		}
 		this.info("result:" + result.size());
 		return result;
+	}
+
+	// *** 折返控制相關 ***
+	/**
+	 * 具折返控制的查詢方式
+	 * 
+	 * @param query 查詢語句
+	 * @return 查詢結果
+	 * @throws Exception 查詢相關的Exception
+	 */
+	protected List<Map<String, String>> switchback(Query query) throws Exception {
+
+		// *** 折返控制相關 ***
+		// 只有第一次進來的時候多查詢一次拿總筆數
+		if (this.index == 0) {
+			totalSize = query.getResultList().size();
+		}
+
+//		// *** 折返控制相關 ***
+//		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		query.setFirstResult(this.index * this.limit);
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
+
+		return this.convertToMapWithQueryByPage(query);
+	}
+
+	// *** 折返控制相關 ***
+	private List<Map<String, String>> convertToMapWithQueryByPage(Query query) {
+		query = preparedQuery(query);
+		List rows = query.getResultList();
+		pageCount = rows.size(); // 紀錄本次筆數
+		this.info("pageCount ..." + pageCount);
+		return convert(rows);
+	}
+
+	// *** 折返控制相關 ***
+	public boolean hasNext() {
+		return (this.index * this.limit + this.pageCount) < this.totalSize;
 	}
 }

@@ -38,27 +38,12 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private Query query;
 
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
-
-	// *** 折返控制相關 ***
-	private int cnt;
-
-	// *** 折返控制相關 ***
-	private int size;
-
-//	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Map<String, String>> execSql(TitaVo titaVo) throws Exception {
-		this.info("L2038ServiceImpl.find");
+		this.info("L2038ServiceImpl.execSql");
 
 		String sql = "";
 		sql += "     SELECT MIN(cf.\"ApproveNo\")                           AS \"ApproveNo\"";
@@ -211,28 +196,11 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		setConditionValue(titaVo);
 
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
-
-//		// *** 折返控制相關 ***
-//		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
-
-		return this.convertToMap(query);
+		return switchback(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Map<String, String>> execSqlForL2418(TitaVo titaVo) throws Exception {
-		this.info("L2038ServiceImpl.find");
+		this.info("L2038ServiceImpl.execSqlForL2418");
 
 		String sql = "";
 		sql += "     SELECT MIN(cf.\"ApproveNo\")                           AS \"ApproveNo\"";
@@ -385,33 +353,17 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		setConditionValue(titaVo);
 
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
-
-//		// *** 折返控制相關 ***
-//		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
-
-		return this.convertToMap(query);
+		return switchback(query);
 	}
 
 	/**
-	 * *** 折返控制相關 ***
+	 * L2038查詢用，須帶入折返相關參數
 	 * 
-	 * @param index  從第幾筆開始抓
-	 * @param limit  每次抓幾筆
-	 * @param titaVo titaVO
+	 * @param index  折返第幾次
+	 * @param limit  每次明細筆數
+	 * @param titaVo titaVo
 	 * @return 查詢結果
-	 * @throws Exception 錯誤
+	 * @throws Exception Exception
 	 */
 	public List<Map<String, String>> findByCondition(int index, int limit, TitaVo titaVo) throws Exception {
 		this.info("L2038ServiceImpl.findByCondition");
@@ -503,21 +455,29 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		tCustMain = sCustMainService.custIdFirst(ownerId, titaVo);
 
 		if (tCustMain != null) {
-			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2)     THEN cblo.\"OwnerCustUKey\"" + "      WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\""
-					+ "      WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\"" + "      WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\"" + " ELSE NULL END = :OwnerCustUKey");
+			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2)     THEN cblo.\"OwnerCustUKey\""
+					+ "      WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\""
+					+ "      WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\""
+					+ "      WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\""
+					+ " ELSE NULL END = :OwnerCustUKey");
 		}
 		// SettingStat 設定狀態
 		int settingStat = parse.stringToInteger(titaVo.getParam("SettingStat"));
 		if (settingStat > 0) {
-			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingStat\"" + "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"SettingStat\""
-					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"SettingStat\"" + "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"SettingStat\""
+			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingStat\""
+					+ "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"SettingStat\""
+					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"SettingStat\""
+					+ "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"SettingStat\""
 					+ "         ELSE '0' END = :settingStat ");
 		}
 		// 擔保品狀態
 		int clStat = parse.stringToInteger(titaVo.getParam("ClStat"));
 		if (clStat > 0) {
-			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"ClStat\"" + "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"ClStat\""
-					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"ClStat\"" + "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"ClStat\"" + "         ELSE '0' END = :clStat ");
+			conditionList.add(" CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"ClStat\""
+					+ "              WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"ClStat\""
+					+ "              WHEN cm.\"ClCode1\" = 5      THEN co.\"ClStat\""
+					+ "              WHEN cm.\"ClCode1\" = 9      THEN cmv.\"ClStat\""
+					+ "         ELSE '0' END = :clStat ");
 		}
 
 		// 發行公司統編
@@ -843,11 +803,5 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			licenseNo = "%" + licenseNo + "%";
 			query.setParameter("licenseNo", licenseNo);
 		}
-
-		return;
-	}
-
-	public int getSize() {
-		return cnt;
 	}
 }

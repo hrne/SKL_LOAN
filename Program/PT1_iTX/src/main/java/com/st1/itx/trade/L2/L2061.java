@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L2;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class L2061 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
-
+	
 	@Autowired
 	L4943ServiceImpl l4943ServiceImpl;
 
@@ -100,29 +101,29 @@ public class L2061 extends TradeBuffer {
 			occursList.putParam("OOContractChgCode", contractChgCode);
 			occursList.putParam("OOCurrencyCode", tmpAcReceivable.getCurrencyCode());
 			occursList.putParam("OOFeeAmt", tmpAcReceivable.getRvAmt());
-
+			
 			// L4943 需要的欄位
 			titaVo.putParam("CustNo", iCustNo);
 			titaVo.putParam("EntryDateFm", tmpAcReceivable.getLastAcDate());
 			titaVo.putParam("EntryDateTo", tmpAcReceivable.getLastAcDate());
 			titaVo.putParam("FunctionCode", 1);
-
+			
 			titaVo.putParam("BankCode", "");
 			titaVo.putParam("OpItem", 0);
 			titaVo.putParam("RepayType", 0);
 			titaVo.putParam("PostLimitAmt", 0);
 			titaVo.putParam("SingleLimit", 0);
 			titaVo.putParam("LowLimit", 0);
-
+			
 			List<Map<String, String>> l4943Vo = null;
-
+			
 			try {
-				l4943Vo = l4943ServiceImpl.findAll(0, titaVo);
+				l4943Vo = l4943ServiceImpl.querySummary(titaVo);
 			} catch (Exception e) {
 				this.error("L2061 Exception when L4943ServiceImpl: " + e.getMessage());
 				throw new LogicException("E0013", "L4943ServiceImpl");
 			}
-
+			
 			occursList.putParam("OOHasL4943", l4943Vo != null && !l4943Vo.isEmpty() ? "Y" : "N");
 
 			this.info("occursList L2061" + occursList);

@@ -242,6 +242,12 @@ public class L4031 extends TradeBuffer {
 					checkFlag = 9;
 					status = 9;
 					break;
+				case 5:
+					lableBX = "確認失敗件";
+					rptFg = 5;
+					checkFlag = 9;
+					status = 9;
+					break;
 				}
 
 				occursList.putParam("OORank", tempL4031Vo.getRank()); // 排序
