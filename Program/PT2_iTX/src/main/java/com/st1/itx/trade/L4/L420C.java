@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -111,10 +115,6 @@ public class L420C extends TradeBuffer {
 		if (functionCode == 1) {
 			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "請執行交易訂正"); // 檢查錯誤
 		}
-		// 2:轉暫收
-		if (functionCode == 2) {
-			tBatxDetail.setRepayType(9);
-		}
 		// 暫收抵繳 ， 轉暫收時直接更新、不送交易
 		if (tBatxDetail.getRepayCode() == 90) {
 			if (functionCode == 2) {
@@ -152,11 +152,6 @@ public class L420C extends TradeBuffer {
 			// 組入帳交易電文
 			TitaVo txTitaVo = new TitaVo();
 			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, tBatxHead.getBatxTotCnt(), titaVo); // 1:訂正
-			// 執行入帳交易
-			if (functionCode == 0) {
-				tTempVo = tTempVo.getVo(tBatxDetail.getProcNote());
-				txTitaVo.put("CheckMsg", tTempVo.getParam("CheckMsg"));
-			}
 			this.info("L420C excuteTx " + txTitaVo);
 			// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
 			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);

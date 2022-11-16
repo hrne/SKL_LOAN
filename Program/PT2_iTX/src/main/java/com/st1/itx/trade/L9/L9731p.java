@@ -45,17 +45,7 @@ public class L9731p extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info(TXCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
-		String parentTranCode = titaVo.getTxcd();
 
-		l9731Report.setParentTranCode(parentTranCode);
-
-		int iYear = Integer.valueOf(titaVo.getParam("InputYear")) + 1911;
-		int iMonth = Integer.valueOf(titaVo.getParam("InputMonth"));
-		int iYearMonth = iYear * 100 + iMonth;
-
-		this.info("iYearMonth= " + iYearMonth);
-
-		boolean isFinish = l9731Report.exec(titaVo, iYearMonth);
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
@@ -67,12 +57,26 @@ public class L9731p extends TradeBuffer {
 			}
 		}
 
+		String parentTranCode = titaVo.getTxcd();
+
+		l9731Report.setParentTranCode(parentTranCode);
+
+		int iYear = Integer.valueOf(titaVo.getParam("InputYear")) + 1911;
+		int iMonth = Integer.valueOf(titaVo.getParam("InputMonth"));
+		int iYearMonth = iYear * 100 + iMonth;
+
+		this.info("iYearMonth= " + iYearMonth);
+
 		tradeName = tradeName.substring(0, tradeName.length() - 1);
 
+		boolean isFinish = l9731Report.exec(titaVo, iYearMonth);
+
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "(" + tradeName + ")已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), TXCD + TXName + "(" + tradeName + ")已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

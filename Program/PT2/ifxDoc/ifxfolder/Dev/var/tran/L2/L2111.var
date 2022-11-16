@@ -1145,7 +1145,8 @@ IF(#ProcessCode!=#L2r02ProcessCode,E(0,13),$)
 IF(#GroupId!=#L2r02GroupId,E(0,13),$) 
 IF(#IsSuspected!=#L1R16IsSuspectedYn,E(0,14),$)
 IF(#IsSuspectedCheck!=#L1R16IsSuspectedYn,E(0,15),$)
-IF(#DepartmentCode!=#DepartmentCode,E(0,16),$)
+IF(#DepartmentCode!=#L2r02DepartmentCode,E(0,16),$)
+IF(#SyndNo!=#L2r02SyndNo,E(0,17),$)
 
 #MSGERR=X,1,S
 @

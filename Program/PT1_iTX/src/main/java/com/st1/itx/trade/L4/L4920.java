@@ -159,6 +159,9 @@ public class L4920 extends TradeBuffer {
 						if (tempVo.get("TempReasonCodeX") != null && tempVo.get("TempReasonCodeX").length() > 0) {
 							procNote = procNote + "暫收原因:" + tempVo.get("TempReasonCodeX") + " ";
 						}
+						if (tempVo.get("CheckMsgOrg") != null && tempVo.get("CheckMsgOrg").length() > 0) {
+							procNote = procNote + "原檢核訊息:" + tempVo.get("CheckMsgOrg") + " ";
+						}
 					}
 					if ("1".equals(result.get("RepayType"))) {
 						if (tempVo.get("PrePaidTerms") != null

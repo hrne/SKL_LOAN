@@ -22,6 +22,7 @@ import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.PfInsCheckService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.data.CheckInsuranceVo;
 import com.st1.itx.util.common.data.PfInsDetailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -39,7 +40,7 @@ import com.st1.itx.util.parse.Parse;
 public class PfCheckInsuranceCom extends TradeBuffer {
 
 	@Autowired
-	public DateUtil dateUtil;
+	DateUtil dateUtil;
 
 	@Autowired
 	Parse parse;
@@ -48,16 +49,19 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 	EmployeeCom employeeCom;
 
 	@Autowired
-	public PfInsCheckService pfInsCheckService;
+	PfInsCheckService pfInsCheckService;
 
 	@Autowired
-	public FacMainService facMainService;
+	FacMainService facMainService;
 
 	@Autowired
-	public FacCaseApplService facCaseApplService;
+	FacCaseApplService facCaseApplService;
 
 	@Autowired
-	public CustMainService custMainService;
+	CustMainService custMainService;
+
+	@Autowired
+	CheckInsurance checkInsurance;
 
 	private PfInsCheckId tPfInsCheckId = new PfInsCheckId();
 	private PfInsCheck tPfInsCheck = new PfInsCheck();
@@ -77,7 +81,8 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 	 * @return PfInsCheck
 	 * @throws LogicException ...
 	 */
-	public PfInsCheck check(int iKind, int iCustNo, int iFacmNo, int iCheckWorkMonth, TitaVo titaVo) throws LogicException {
+	public PfInsCheck check(int iKind, int iCustNo, int iFacmNo, int iCheckWorkMonth, TitaVo titaVo)
+			throws LogicException {
 		this.info("PfInsCheck check ..... Kind = " + iKind + "," + iCustNo + "-" + iFacmNo + "," + iCheckWorkMonth);
 
 		String returnMsg = null;
@@ -147,13 +152,15 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 			try {
 				pfInsCheckService.insert(tPfInsCheck, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "PfInsCheck insert " + tPfInsCheckId.toString() + e.getErrorMsg());
+				throw new LogicException(titaVo, "E0005",
+						"PfInsCheck insert " + tPfInsCheckId.toString() + e.getErrorMsg());
 			}
 		} else {
 			try {
 				pfInsCheckService.update(tPfInsCheck, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "PfInsCheck update " + tPfInsCheckId.toString() + e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007",
+						"PfInsCheck update " + tPfInsCheckId.toString() + e.getErrorMsg());
 			}
 		}
 
@@ -198,6 +205,10 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 	// Query 核心系統保單資料
 	private String queryCoreInsurance(PfInsCheck iPf, TitaVo titaVo) throws LogicException {
+		CheckInsuranceVo checkVo = new CheckInsuranceVo();
+		checkVo.setCustId(iPf.getCustId());
+		checkVo = checkInsurance.checkInsurance(titaVo, checkVo);
+		this.info("MsgRs=" + checkVo.getMsgRs());
 		String returnStr = null;
 		return returnStr;
 	}

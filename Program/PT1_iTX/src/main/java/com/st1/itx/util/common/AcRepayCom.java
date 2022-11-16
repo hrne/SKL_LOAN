@@ -17,8 +17,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.service.CdCodeService;
@@ -415,6 +413,7 @@ public class AcRepayCom extends TradeBuffer {
 			break;
 		case "099":
 			acDetail.setAcctCode("THC");
+			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
 			break;
 		case "101": // 101.匯款轉帳
 			acDetail.setAcctCode("P03");
@@ -744,6 +743,7 @@ public class AcRepayCom extends TradeBuffer {
 		this.titaVo = titaVo;
 		this.baTxList = iFeeList;
 		this.lAcDetail = iAcDetailList;
+		loanCom.setTxBuffer(this.txBuffer);
 
 		this.iRepayCode = iRpCode;
 		this.iEntryDate = iEntryDate;

@@ -1800,7 +1800,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8403");
 					iDataLog.setEnv(titaVo, oldJcicZ040, uJcicZ040);
-					iDataLog.exec("L8403取消報送", iJcicZ040Log.getUkey() + iJcicZ040Log.getTxSeq());
+					iDataLog.exec("L8403取消報送", iJcicZ040Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -1843,7 +1843,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8404");
 					iDataLog.setEnv(titaVo, oldJcicZ041, uJcicZ041);
-					iDataLog.exec("L8404取消報送", iJcicZ041Log.getUkey() + iJcicZ041Log.getTxSeq());
+					iDataLog.exec("L8404取消報送", iJcicZ041Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -1888,7 +1888,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8405");
 					iDataLog.setEnv(titaVo, oldJcicZ042, uJcicZ042);
-					iDataLog.exec("L8405取消報送", iJcicZ042Log.getUkey() + iJcicZ042Log.getTxSeq());
+					iDataLog.exec("L8405取消報送", iJcicZ042Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -1938,7 +1938,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8406");
 					iDataLog.setEnv(titaVo, oldJcicZ043, uJcicZ043);
-					iDataLog.exec("L8406取消報送", iJcicZ043Log.getUkey() + iJcicZ043Log.getTxSeq());
+					iDataLog.exec("L8406取消報送", iJcicZ043Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -1981,7 +1981,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8407");
 					iDataLog.setEnv(titaVo, oldJcicZ044, uJcicZ044);
-					iDataLog.exec("L8407取消報送", iJcicZ044Log.getUkey() + iJcicZ044Log.getTxSeq());
+					iDataLog.exec("L8407取消報送", iJcicZ044Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2028,7 +2028,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8408");
 					iDataLog.setEnv(titaVo, oldJcicZ045, uJcicZ045);
-					iDataLog.exec("L8408取消報送", iJcicZ045Log.getUkey() + iJcicZ045Log.getTxSeq());
+					iDataLog.exec("L8408取消報送", iJcicZ045Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2075,7 +2075,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8409");
 					iDataLog.setEnv(titaVo, oldJcicZ046, uJcicZ046);
-					iDataLog.exec("L8409取消報送", iJcicZ046Log.getUkey() + iJcicZ046Log.getTxSeq());
+					iDataLog.exec("L8409取消報送", iJcicZ046Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2118,7 +2118,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8410");
 					iDataLog.setEnv(titaVo, oldJcicZ047, uJcicZ047);
-					iDataLog.exec("L8410取消報送", iJcicZ047Log.getUkey() + iJcicZ047Log.getTxSeq());
+					iDataLog.exec("L8410取消報送", iJcicZ047Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2161,7 +2161,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8411");
 					iDataLog.setEnv(titaVo, oldJcicZ048, uJcicZ048);
-					iDataLog.exec("L8411取消報送", iJcicZ048Log.getUkey() + iJcicZ048Log.getTxSeq());
+					iDataLog.exec("L8411取消報送", iJcicZ048Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2204,7 +2204,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8412");
 					iDataLog.setEnv(titaVo, oldJcicZ049, uJcicZ049);
-					iDataLog.exec("L8412取消報送", iJcicZ049Log.getUkey() + iJcicZ049Log.getTxSeq());
+					iDataLog.exec("L8412取消報送", iJcicZ049Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2250,7 +2250,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8413");
 					iDataLog.setEnv(titaVo, oldJcicZ050, uJcicZ050);
-					iDataLog.exec("L8413取消報送", iJcicZ050Log.getUkey() + iJcicZ050Log.getTxSeq());
+					iDataLog.exec("L8413取消報送", iJcicZ050Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2296,7 +2296,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8414");
 					iDataLog.setEnv(titaVo, oldJcicZ051, uJcicZ051);
-					iDataLog.exec("L8414取消報送", iJcicZ051Log.getUkey() + iJcicZ051Log.getTxSeq());
+					iDataLog.exec("L8414取消報送", iJcicZ051Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2339,7 +2339,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8415");
 					iDataLog.setEnv(titaVo, oldJcicZ052, uJcicZ052);
-					iDataLog.exec("L8415取消報送", iJcicZ052Log.getUkey() + iJcicZ052Log.getTxSeq());
+					iDataLog.exec("L8415取消報送", iJcicZ052Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2386,7 +2386,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8416");
 					iDataLog.setEnv(titaVo, oldJcicZ053, uJcicZ053);
-					iDataLog.exec("L8416取消報送", iJcicZ053Log.getUkey() + iJcicZ053Log.getTxSeq());
+					iDataLog.exec("L8416取消報送", iJcicZ053Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2435,7 +2435,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8417");
 					iDataLog.setEnv(titaVo, oldJcicZ054, uJcicZ054);
-					iDataLog.exec("L8417取消報送", iJcicZ054Log.getUkey() + iJcicZ054Log.getTxSeq());
+					iDataLog.exec("L8417取消報送", iJcicZ054Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2485,7 +2485,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8418");
 					iDataLog.setEnv(titaVo, oldJcicZ055, uJcicZ055);
-					iDataLog.exec("L8418取消報送", iJcicZ055Log.getUkey() + iJcicZ055Log.getTxSeq());
+					iDataLog.exec("L8418取消報送", iJcicZ055Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2535,7 +2535,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8419");
 					iDataLog.setEnv(titaVo, oldJcicZ056, uJcicZ056);
-					iDataLog.exec("L8419取消報送", iJcicZ056Log.getUkey() + iJcicZ056Log.getTxSeq());
+					iDataLog.exec("L8419取消報送", iJcicZ056Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2582,7 +2582,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8420");
 					iDataLog.setEnv(titaVo, oldJcicZ060, uJcicZ060);
-					iDataLog.exec("L8420取消報送", iJcicZ060Log.getUkey() + iJcicZ060Log.getTxSeq());
+					iDataLog.exec("L8420取消報送", iJcicZ060Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2631,7 +2631,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8421");
 					iDataLog.setEnv(titaVo, oldJcicZ061, uJcicZ061);
-					iDataLog.exec("L8421取消報送", iJcicZ061Log.getUkey() + iJcicZ061Log.getTxSeq());
+					iDataLog.exec("L8421取消報送", iJcicZ061Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2678,7 +2678,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8422");
 					iDataLog.setEnv(titaVo, oldJcicZ062, uJcicZ062);
-					iDataLog.exec("L8422取消報送", iJcicZ062Log.getUkey() + iJcicZ062Log.getTxSeq());
+					iDataLog.exec("L8422取消報送", iJcicZ062Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2725,7 +2725,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8423");
 					iDataLog.setEnv(titaVo, oldJcicZ063, uJcicZ063);
-					iDataLog.exec("L8423取消報送", iJcicZ063Log.getUkey() + iJcicZ063Log.getTxSeq());
+					iDataLog.exec("L8423取消報送", iJcicZ063Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2772,7 +2772,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8424");
 					iDataLog.setEnv(titaVo, oldJcicZ440, uJcicZ440);
-					iDataLog.exec("L8424取消報送", iJcicZ440Log.getUkey() + iJcicZ440Log.getTxSeq());
+					iDataLog.exec("L8424取消報送", iJcicZ440Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2822,7 +2822,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8425");
 					iDataLog.setEnv(titaVo, oldJcicZ442, uJcicZ442);
-					iDataLog.exec("L8425取消報送", iJcicZ442Log.getUkey() + iJcicZ442Log.getTxSeq());
+					iDataLog.exec("L8425取消報送", iJcicZ442Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2874,7 +2874,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8426");
 					iDataLog.setEnv(titaVo, oldJcicZ443, uJcicZ443);
-					iDataLog.exec("L8426取消報送", iJcicZ443Log.getUkey() + iJcicZ443Log.getTxSeq());
+					iDataLog.exec("L8426取消報送", iJcicZ443Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2921,7 +2921,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8427");
 					iDataLog.setEnv(titaVo, oldJcicZ444, uJcicZ444);
-					iDataLog.exec("L8427取消報送", iJcicZ444Log.getUkey() + iJcicZ444Log.getTxSeq());
+					iDataLog.exec("L8427取消報送", iJcicZ444Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -2968,7 +2968,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8428");
 					iDataLog.setEnv(titaVo, oldJcicZ446, uJcicZ446);
-					iDataLog.exec("L8428取消報送", iJcicZ446Log.getUkey() + iJcicZ446Log.getTxSeq());
+					iDataLog.exec("L8428取消報送", iJcicZ446Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3015,7 +3015,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8429");
 					iDataLog.setEnv(titaVo, oldJcicZ447, uJcicZ447);
-					iDataLog.exec("L8429取消報送", iJcicZ447Log.getUkey() + iJcicZ447Log.getTxSeq());
+					iDataLog.exec("L8429取消報送", iJcicZ447Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3065,7 +3065,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8430");
 					iDataLog.setEnv(titaVo, oldJcicZ448, uJcicZ448);
-					iDataLog.exec("L8430取消報送", iJcicZ448Log.getUkey() + iJcicZ448Log.getTxSeq());
+					iDataLog.exec("L8430取消報送", iJcicZ448Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3114,7 +3114,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8431");
 					iDataLog.setEnv(titaVo, oldJcicZ450, uJcicZ450);
-					iDataLog.exec("L8431取消報送", iJcicZ450Log.getUkey() + iJcicZ450Log.getTxSeq());
+					iDataLog.exec("L8431取消報送", iJcicZ450Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3163,7 +3163,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8432");
 					iDataLog.setEnv(titaVo, oldJcicZ451, uJcicZ451);
-					iDataLog.exec("L8432取消報送", iJcicZ451Log.getUkey() + iJcicZ451Log.getTxSeq());
+					iDataLog.exec("L8432取消報送", iJcicZ451Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3213,7 +3213,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8433");
 					iDataLog.setEnv(titaVo, oldJcicZ454, uJcicZ454);
-					iDataLog.exec("L8433取消報送", iJcicZ454Log.getUkey() + iJcicZ454Log.getTxSeq());
+					iDataLog.exec("L8433取消報送", iJcicZ454Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3257,7 +3257,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8434");
 					iDataLog.setEnv(titaVo, oldJcicZ570, uJcicZ570);
-					iDataLog.exec("L8434取消報送", iJcicZ570Log.getUkey() + iJcicZ570Log.getTxSeq());
+					iDataLog.exec("L8434取消報送", iJcicZ570Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3304,7 +3304,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8435");
 					iDataLog.setEnv(titaVo, oldJcicZ571, uJcicZ571);
-					iDataLog.exec("L8435取消報送", iJcicZ571Log.getUkey() + iJcicZ571Log.getTxSeq());
+					iDataLog.exec("L8435取消報送", iJcicZ571Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3354,7 +3354,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8436");
 					iDataLog.setEnv(titaVo, oldJcicZ572, uJcicZ572);
-					iDataLog.exec("L8436取消報送", iJcicZ572Log.getUkey() + iJcicZ572Log.getTxSeq());
+					iDataLog.exec("L8436取消報送", iJcicZ572Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3400,7 +3400,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8437");
 					iDataLog.setEnv(titaVo, oldJcicZ573, uJcicZ573);
-					iDataLog.exec("L8437取消報送", iJcicZ573Log.getUkey() + iJcicZ573Log.getTxSeq());
+					iDataLog.exec("L8437取消報送", iJcicZ573Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3444,7 +3444,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8438");
 					iDataLog.setEnv(titaVo, oldJcicZ574, uJcicZ574);
-					iDataLog.exec("L8438取消報送", iJcicZ574Log.getUkey() + iJcicZ574Log.getTxSeq());
+					iDataLog.exec("L8438取消報送", iJcicZ574Log.getUkey());
 				}
 			}
 			if (count == 0) {
@@ -3491,7 +3491,7 @@ public class L840A extends TradeBuffer {
 					titaVo.putParam("CustNo", iCustNo);
 					titaVo.putParam("TXCODE", "L8439");
 					iDataLog.setEnv(titaVo, oldJcicZ575, uJcicZ575);
-					iDataLog.exec("L8439取消報送", iJcicZ575Log.getUkey() + iJcicZ575Log.getTxSeq());
+					iDataLog.exec("L8439取消報送", iJcicZ575Log.getUkey());
 				}
 			}
 			if (count == 0) {

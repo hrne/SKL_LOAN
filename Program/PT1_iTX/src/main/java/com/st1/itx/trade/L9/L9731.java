@@ -28,6 +28,20 @@ public class L9731 extends TradeBuffer {
 		this.info("active " + txcd);
 		this.totaVo.init(titaVo);
 
+		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
+
+		String tradeName = "";
+
+		for (int i = 1; i <= totalItem; i++) {
+			if (titaVo.getParam("BtnShell" + i).equals("V")) {
+				tradeName += (titaVo.getParam("TradeName" + i) + "、");
+			}
+		}
+
+		if (tradeName.trim().length() == 0) {
+			throw new LogicException(titaVo, "E0015", "尚未勾選項目");
+		}
+
 		MySpring.newTask(txcd + "p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);

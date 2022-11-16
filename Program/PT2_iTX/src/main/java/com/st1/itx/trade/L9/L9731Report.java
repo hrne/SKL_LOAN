@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9731ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -46,6 +47,8 @@ public class L9731Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @return
+	 * @throws LogicException
 	 *
 	 * 
 	 */
@@ -58,15 +61,14 @@ public class L9731Report extends MakeReport {
 
 		int rocYearMonth = yearMonth - 191100;
 
-//		上傳用 
-//		this.info("L9731 get value" + makeExcel.getValue(2, 2));
-//		this.info("L9731 get value" + makeExcel.getValue(3, 2));
-//		this.info("L9731 get value" + makeExcel.getValue(4, 2));
-
-//		formNum.forEach(item -> {
-//		this.info("totalItem=" + item);
-//
-//	});	
+		// L9731
+		String txcd = titaVo.getTxcd();
+		// 檔案名稱
+		String rptItem = "";
+		// 輸出檔名
+		String fileName = "";
+		// 底稿名稱
+		String defaultName = "";
 
 		for (int i = 1; i <= totalItem; i++) {
 
@@ -75,36 +77,52 @@ public class L9731Report extends MakeReport {
 				String tradeCode = titaVo.getParam("TradeCode" + i);
 				String tradeName = titaVo.getParam("TradeName" + i);
 
+				rptItem = "人工檢核表(" + tradeName + ")";
+				// L9731-人工檢核表(XXXX)-YYYMM
+				fileName = txcd + "-" + rptItem + " - " + rocYearMonth;
+				
+				defaultName = "L9731_底稿_人工檢核表" + i + ".xlsx";
+				
+				//開啟報表
+				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+						.setRptCode(txcd).setRptItem(rptItem).build();
+				
 				try {
 
 					switch (tradeCode) {
 					// 五類資產檢核表
 					case "HANDMADE1":
 
-						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
-								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+					
+						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
+
+//						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731",
+//								"人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
+//								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
 
 						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
 
 						exportSheet1(titaVo, findList, rocYearMonth);
 
 						break;
+						
 					// 放款總歸戶明細表
 					case "HANDMADE2":
 
-						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
-								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+				
+						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
 						findList = l9731ServiceImpl.findSheet2(titaVo, yearMonth);
 
 						exportSheet2(titaVo, findList);
 
 						break;
+						
 					// 放款額度明細表
 					case "HANDMADE3":
 
-						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
-								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+					
+						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
 						findList = l9731ServiceImpl.findSheet3_1(titaVo, yearMonth);
 
@@ -114,11 +132,13 @@ public class L9731Report extends MakeReport {
 //						exportSheet3(titaVo, findList, 2);
 
 						break;
+						
 					// 放款餘額明細表
 					case "HANDMADE4":
 
-						makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9731", "人工檢核表(" + tradeName + ")", "L9731-人工檢核表(" + tradeName + ")-" + rocYearMonth,
-								"L9731_底稿_人工檢核表" + i + ".xlsx", tradeName);
+	
+
+						makeExcel.open(titaVo, reportVo, fileName, defaultName, tradeName);
 
 						findList = l9731ServiceImpl.findSheet1(titaVo, yearMonth);
 
@@ -145,20 +165,22 @@ public class L9731Report extends MakeReport {
 	/**
 	 * Sheet1 五類資產檢核表
 	 */
-	private void exportSheet1(TitaVo titaVo, List<Map<String, String>> listL9731, int rocYearMonth) throws LogicException {
+	private void exportSheet1(TitaVo titaVo, List<Map<String, String>> listL9731, int rocYearMonth)
+			throws LogicException {
 		this.info("L9731Report exportSheet1");
 
 		if (listL9731 == null || listL9731.isEmpty()) {
 
 			makeExcel.setValue(2, 1, "本日無資料", "L");
-
+			makeExcel.setValue(2, 2, 12313, "0000000", "C");
 		} else {
 
 			int row = 2;
 			makeExcel.setValue(1, 10, rocYearMonth, "C");
 
 			for (Map<String, String> tLDVo : listL9731) {
-				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "######0", "L");
+				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
+						"######0", "L");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
@@ -235,7 +257,8 @@ public class L9731Report extends MakeReport {
 				String custID = tLDVo.get("F2").isEmpty() ? " " : tLDVo.get("F2");
 				makeExcel.setValue(row, 3, custID, "L");
 
-				BigDecimal amt = tLDVo.get("F3").isEmpty() || tLDVo.get("F0") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
+				BigDecimal amt = tLDVo.get("F3").isEmpty() || tLDVo.get("F0") == null ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F3"));
 				makeExcel.setValue(row, 4, amt, "#,000", "R");
 
 				row++;
@@ -265,7 +288,8 @@ public class L9731Report extends MakeReport {
 				int row = 2;
 
 				for (Map<String, String> tLDVo : listL9731) {
-					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "######0", "R");
+					makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
+							"######0", "R");
 
 					for (int i = 0; i < tLDVo.size(); i++) {
 
@@ -373,7 +397,8 @@ public class L9731Report extends MakeReport {
 			int row = 2;
 
 			for (Map<String, String> tLDVo : listL9731) {
-				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()), "###0", "R");
+				makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get("F0").toString() + tLDVo.get("F1").toString()),
+						"###0", "R");
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					String fieldValue = tLDVo.get("F" + i);

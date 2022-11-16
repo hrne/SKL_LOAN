@@ -28,39 +28,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.common.data.CheckInsuranceVo;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.st1.itx.db.service.TxAmlLogService;
-
-import com.st1.itx.db.service.CustMainService;
 
 @Component("checkInsurance")
 @Scope("prototype")
 public class CheckInsurance extends TradeBuffer {
-
-	/* DB服務注入 */
-	@Autowired
-	public TxAmlLogService txAmlLogService;
-
-	@Autowired
-	public CustMainService custMainService;
-
-	@Autowired
-	DateUtil dateUtil;
 
 	// Web api check control flag 0.正常 1.aml系統異常改由人工確認 2.測試套不檢查,並預設非可疑名單
 	private int apiFlag = 0;
@@ -73,20 +57,9 @@ public class CheckInsurance extends TradeBuffer {
 	// connect AML status
 	private boolean connectSuccess;
 
-	/**
-	 * AML姓名檢核
-	 * 
-	 * @param titaVo 檢查內容
-	 * @return CheckInsuranceVo ...
-	 * @throws LogicException LogicException
-	 */
-
-	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckInsurance run ... ");
-
 		return null;
-
 	}
 
 	public CheckInsuranceVo checkInsurance(TitaVo titaVo, CheckInsuranceVo checkVo) throws LogicException {
@@ -151,7 +124,6 @@ public class CheckInsurance extends TradeBuffer {
 
 				// if (highest_loan == null) -> 0 else -> [loan_amt] + [highest_loan]
 				HashMap<String, String> map = lDetail.get(i);
-				int loanBal = 0;
 				if (map.get("highest_loan") != null) {
 					int highestLoan = Integer.valueOf(map.get("highest_loan"));
 					int loanAmt = 0;
@@ -203,7 +175,6 @@ public class CheckInsurance extends TradeBuffer {
 		if (checkVo.getCustId().isEmpty()) {
 			throw new LogicException("EC004", "CheckInsurance.CheckInsuranceVo : 參數 CustId 不可為空白");
 		}
-
 	}
 
 	private String makeXml(CheckInsuranceVo checkVo) {
@@ -271,12 +242,10 @@ public class CheckInsurance extends TradeBuffer {
 			try {
 				transformer.transform(new DOMSource(doc), new StreamResult(sw));
 			} catch (TransformerException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			rs = sw.toString();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -347,37 +316,21 @@ public class CheckInsurance extends TradeBuffer {
 			this.connectSuccess = false;
 			return "Exception = " + e.getMessage();
 		}
-
 	}
 
-	/**
-	 * 將 string 轉換成 xml
-	 * 
-	 * @param xmlstring 轉換的XML String
-	 * @return xml Document
-	 */
 	public Document convertStringToXml(String xmlstring) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
 		DocumentBuilder builder = null;
 		try {
 			builder = factory.newDocumentBuilder();
-
 			Document doc = builder.parse(new InputSource(new StringReader(xmlstring)));
 			return doc;
 		} catch (Exception e) {
 			return null;
 		}
-
 	}
 
-	/**
-	 * 取 XML 指定TAG值
-	 * 
-	 * @param doc     XML 的 Document
-	 * @param tagName TAG名稱
-	 * @return 指定TAG值
-	 */
 	public String getXmlValue(Document doc, String tagName) {
 		NodeList nl = doc.getElementsByTagName(tagName);
 		if (nl.getLength() > 0) {
@@ -415,10 +368,4 @@ public class CheckInsurance extends TradeBuffer {
 
 		return listMap;
 	}
-
-//	@Override
-//	public void exec() throws LogicException {
-//		// TODO Auto-generated method stub
-
-//	}
 }

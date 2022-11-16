@@ -16,18 +16,21 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
+import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
@@ -162,6 +165,11 @@ public class L3210 extends TradeBuffer {
 			this.isRepaidFee = true;
 		}
 
+		// 07火險、帳管
+		if (iTempReasonCode == 7) {
+			this.isRepaidFee = true;
+		}
+		
 		if (iTempSourceCode == 4) { // 支票
 			tLoanChequeId = new LoanChequeId(iChequeAcct, iChequeNo);
 			if (iTempReasonCode != 8) {
@@ -465,7 +473,7 @@ public class L3210 extends TradeBuffer {
 			break;
 		default:
 			tLoanBorTx.setTxDescCode("3210");
-			break;			
+			break;
 		}
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setRepayCode(iRpCode); // 還款來源

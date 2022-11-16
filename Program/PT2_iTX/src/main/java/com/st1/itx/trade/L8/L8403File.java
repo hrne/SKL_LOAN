@@ -594,10 +594,15 @@ public class L8403File extends MakeFile {
 		String iReportDate = titaVo.getParam("ReportDate");
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		String iReportTime = titaVo.getParam("ReportTime");
+		int ixReportTime = parse.stringToInteger(titaVo.getParam("ReportTime"));
+		if(ixReportTime<10) {
+			iReportTime = "0"+iReportTime;	
+		}
+		
 		// 頭筆資料
 		// JCIC-DAT-Z040-V01
 		String iContactX = FormatUtil.padX("放款部聯絡人-邱怡婷", 80);
-		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + "01          02-23895858#7076" + iContactX;
+		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + iReportTime+"          02-23895858#7076" + iContactX;
 		// 檔名
 		// 金融機構總行代號+月份+日期+次數.檔案類別
 		fileName = iSubmitKey + iReportDate.substring(3) + iReportTime + "." + tranCode;
