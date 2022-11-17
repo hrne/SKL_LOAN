@@ -1529,7 +1529,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			this.info("fillBreachRoutine end A");
 			return wkIndex;
 		}
-		// 利率變動、且有還本，設定應繳日為區段止日
+		// 區段有還本，設定應繳日為區段止日
 		if (vCalcRepayIntVo.getDuraFlag() == 1 && vCalcRepayIntVo.getPrincipal().compareTo(BigDecimal.ZERO) > 0) {
 			iNextPayIntDate = vCalcRepayIntVo.getEndDate();
 			adjustBreachValidDateRoutine();
@@ -1625,11 +1625,21 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			return;
 		}
 
+		// 違約金起算日為到期日且為假日，寬限期間多一個營業日
+		if (wkBreachStartDate == iMaturityDate) {
+			dDateUtil.init();
+			dDateUtil.setDate_2(wkBreachStartDate);
+			if (dDateUtil.isHoliDay()) {
+				iBreachGraceDays++;
+				this.info("違約金起算日為到期日且為假日，寬限期間多一個營業日");
+			}
+		}
+
 		// 計算寬限期間(5個營業日)的日數
 		wkBreachGraceDays = 0;
 		if (iBreachGraceDays > 0) {
-			wkCount = 0;
 			wkDays = 0;
+			wkCount = 0;
 			do {
 				wkDays++;
 				dDateUtil.init();
@@ -1648,7 +1658,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			dDateUtil.dateDiff();
 			wkBreachGraceDays = dDateUtil.getDays();
 		}
-		this.info("   wkGraceDays   寬限期間(5個營業日)的日數  = " + wkBreachGraceDays);
+		this.info("   wkGraceDays   寬限期間(" + iBreachGraceDays + "個營業日)的日數  = " + wkBreachGraceDays);
 
 		// 5.逾期日數(違約金起算日到違約金生效日) <= 計算寬限期間(5個營業日)的日數，不處理
 		if (wkOdDays <= wkBreachGraceDays) {
@@ -2430,7 +2440,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 //                    違約金生效日
 // 下次繳息日為星期六(假日)，則入帳日為星期一 ，違約金生效日均為星期六
 //         
-// 違約寬限天數(營業日)參數設為零時，才有調整意義
+// 計算違約金時另有違約寬限天數(營業日)判斷
 		this.info("adjustBreachValidDateRoutine ..." + "iNextPayIntDate=" + iNextPayIntDate + " ,iBreachValidDate="
 				+ iBreachValidDate);
 

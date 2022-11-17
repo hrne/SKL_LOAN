@@ -160,17 +160,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setUsageCode(loanBorMain.getUsageCode()); // 資金用途別 1: 週轉金2: 購置不動產3: 營業用資產4: 固定資產5: 企業投資6:
 																		// 購置動產9: 其他
 		loanCalcRepayIntCom.setCaseCloseFlag("N"); // 結案記號 Y:是 N:否
-
-		// 減免違約金 Y:是 N:否
-		loanCalcRepayIntCom.setBreachReliefFlag("N");
-
-		// 2022-11-15 Wei 把註解打開,賴桑說的,不提供原因
-		// 2022-11-15 Wei 加個保護"iIntEndCode != 2" 不要影響提存的CASE
-		// 最後一期期款，入帳日在應繳日前減免違約金，即只收至到期日的利息、不收延滯息及違約金
-		if (loanBorMain.getNextPayIntDate() > loanBorMain.getMaturityDate()
-				&& iEntryDate <= loanBorMain.getNextPayIntDate() && iIntEndCode != 2) {
-			loanCalcRepayIntCom.setBreachReliefFlag("Y");
-		}
+		loanCalcRepayIntCom.setBreachReliefFlag("N"); // 減免違約金 Y:是 N:否
 
 		// 聯貸案件 Y:是 N:否
 		// 聯貸案編號

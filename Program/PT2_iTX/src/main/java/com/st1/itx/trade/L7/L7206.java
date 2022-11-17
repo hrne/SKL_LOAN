@@ -113,7 +113,7 @@ public class L7206 extends TradeBuffer {
 		// 檔案名稱
 		String tmpName = tmpNameG[tmpNameG.length - 2];
 		// 附檔名
-		String fileExt = extension[extension.length - 1].toLowerCase();
+		String fileExt = tmpNameG[tmpNameG.length - 1].toLowerCase();
 		this.info("file fileName=" + tmpName);
 		this.info("file fileExt=" + fileExt);
 	

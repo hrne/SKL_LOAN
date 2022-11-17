@@ -200,9 +200,10 @@ public class L6880 extends TradeBuffer {
 			if (te.getTlrNo().trim().equals(titaVo.getTlrNo().trim())) {
 				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), titaVo.getTlrNo(), "00");
 				te.setTxtNo(Objects.isNull(txRecord) ? 1 : parse.stringToInteger(txRecord.getTxSeq()));
-			} else
-				te.setTxtNo(0);
-
+			} else {
+				TxRecord txRecord = txRecordService.findEntdyFirst(this.getTxBuffer().getTxBizDate().getTbsDyf(), titaVo.getTlrNo(), "00");
+				te.setTxtNo(Objects.isNull(txRecord) ? 0 : parse.stringToInteger(txRecord.getTxSeq()));
+			}
 		try {
 			txTellerService.updateAll(txTellerLi, titaVo);
 			titaVo.putParam(ContentName.txtno, FormatUtil.pad9("1", 8));

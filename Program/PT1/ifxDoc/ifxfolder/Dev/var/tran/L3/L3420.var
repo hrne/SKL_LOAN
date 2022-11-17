@@ -1137,7 +1137,7 @@ IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),$)
 !應收付總金額
 #TotalRepayAmt=m,14.2,S
 E(0,0)
-E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt+#Shortfall-#Excessive)
+E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt-#Excessive)
 ! C(3,#CaseCloseCode,0,E(0,#Principal+#Interest+#Shortfall-#TimReduceAmt),$,)
 ! C(3,#CaseCloseCode,0,E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt),$)
 ! C(3,#CaseCloseCode,1,E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt),$)
