@@ -377,9 +377,9 @@ public class L3100 extends TradeBuffer {
 		BigDecimal wkAvailableAmt = new BigDecimal(0);
 		BigDecimal wkDrawdownAmt = new BigDecimal(0);
 		BigDecimal wkRvDrawdownAmt = new BigDecimal(0);
+		BigDecimal wkApproveRate = new BigDecimal(0);
 		int wkFirstDrawdownDate = 0;
 		int wkMaturityDate = 0;
-		BigDecimal wkApproveRate = new BigDecimal(0);
 
 		if (titaVo.isActfgSuprele()) {
 			tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
@@ -543,7 +543,6 @@ public class L3100 extends TradeBuffer {
 			} else {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
 			}
-
 			if (tFacMain.getFirstDrawdownDate() == 0 || wkBormNo == 1) {
 				tFacMain.setFirstDrawdownDate(iDrawdownDate);
 				tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
@@ -619,12 +618,14 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "銀扣授權檔 借款人戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查詢資料不存在
 			}
 			wkBorxNo = tLoanBorMain.getLastBorxNo();
+
 			Timestamp createDate = tLoanBorMain.getCreateDate();
 			String createEmpNo = tLoanBorMain.getCreateEmpNo();
 			tLoanBorMain = new LoanBorMain();
 			moveLoanBorMain();
 			tLoanBorMain.setCreateDate(createDate);
 			tLoanBorMain.setCreateEmpNo(createEmpNo);
+
 			tLoanBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, wkBormNo, titaVo);
 			// 主管訂正後修正，交易序號+2(訂正、修正)
 			if (tLoanBorTx != null && "2".equals(tLoanBorTx.getTitaHCode())) {
@@ -927,6 +928,14 @@ public class L3100 extends TradeBuffer {
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setBormNo(wkBormNo);
+			tTempVo.clear();
+			tTempVo.putParam("DrawdownCode", titaVo.getParam("RpCode1"));
+			tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank1"));
+			tTempVo.putParam("RemitBranch", titaVo.getParam("RpRemitBranch1"));
+			tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo1"));
+			tTempVo.putParam("CustName", titaVo.getParam("RpCustName1"));
+			tTempVo.putParam("Remark", titaVo.getParam("RpRemark1"));
+			acDetail.setJsonFields(tTempVo.getJsonString());
 			lAcDetail.add(acDetail);
 			this.txBuffer.addAllAcDetailList(lAcDetail);
 
@@ -1144,9 +1153,10 @@ public class L3100 extends TradeBuffer {
 
 	private void moveLoanBorTx() throws LogicException {
 		this.info("   moveLoanBorTx ...");
-		// 3100 撥款                
-		// 3101 展期                
-		// 3102 借新還舊            
+
+		// 3100 撥款
+		// 3101 展期
+		// 3102 借新還舊
 		if ("1".equals(titaVo.getParam("RenewFlag"))) {
 			tLoanBorTx.setTxDescCode("3101");
 		} else if ("2".equals(titaVo.getParam("RenewFlag"))) {

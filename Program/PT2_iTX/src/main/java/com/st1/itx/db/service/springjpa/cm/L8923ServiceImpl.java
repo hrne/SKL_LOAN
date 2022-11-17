@@ -31,24 +31,25 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 	Parse parse;
 
 	// *** 折返控制相關 ***
-	private int index;
+//	private int index;
 
 	// *** 折返控制相關 ***
-	private int limit;
+//	private int limit;
 
 	// *** 折返控制相關 ***
-	private int cnt;
+//	private int cnt;
 
 	// *** 折返控制相關 ***
-	private int size;
+//	private int size;
 
-	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+//	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryfindbycustno(int index, int limit, TitaVo titaVo) throws Exception {
 
 		this.info("L8923ServiceImpl.queryfindbycustno");
-
+		//此段暫不使用
+		
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
@@ -121,21 +122,21 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("custNo", iCustNo);
 		}
 
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
+//		cnt = query.getResultList().size();
+//		this.info("Total cnt ..." + cnt);
 
-		// *** 折返控制相關 ***
-		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
+//		// *** 折返控制相關 ***
+//		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+//		query.setFirstResult(this.index * this.limit);
+//
+//		// *** 折返控制相關 ***
+//		// 設定每次撈幾筆,需在createNativeQuery後設定
+//		query.setMaxResults(this.limit);
+//
 		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
+//
+//		size = result.size();
+//		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 
@@ -155,8 +156,9 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iFRecordDateStart = iRecordDateStart + 19110000;
 		int iFRecordDateEnd = iRecordDateEnd + 19110000;
 		this.info("iFRecordDateStart=" + iFRecordDateStart + ",iFRecordDateEnd=" + iFRecordDateEnd);
-		//若iRepayFlag=2代表是L3130連動須找預計還款日
+		//若iRepayFlag=2代表是L3130連動須找預計還款日,iRepayFlag=3代表是L8922連動須找實際還款日
 		int iRepayFlag = this.parse.stringToInteger(titaVo.getParam("CHAIN_Flag"));
+		this.info("***L8923**iRepayFlag="+iRepayFlag);
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
@@ -207,7 +209,7 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "order by M.\"RecordDate\" DESC,M.\"ActualRepayDate\" DESC, M.\"CustNo\",M.\"FacmNo\",M.\"BormNo\" ";
 
-		sql += sqlRow;
+//		sql += sqlRow;
 
 		this.info("sql=" + sql);
 		Query query;
@@ -215,8 +217,8 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("ThisIndex", index);
-		query.setParameter("ThisLimit", limit);
+//		query.setParameter("ThisIndex", index);
+//		query.setParameter("ThisLimit", limit);
 
 		if (iRecordDateStart > 0) {
 			query.setParameter("recordDateStart", iFRecordDateStart);
@@ -235,18 +237,18 @@ public class L8923ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(0);
+//		query.setFirstResult(0);
 
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
+//		query.setMaxResults(this.limit);
 
-		return this.convertToMap(query);
+		return this.switchback(query);
 
 	}
 
-	public int getSize() {
-		return cnt;
-	}
+//	public int getSize() {
+//		return cnt;
+//	}
 
 }

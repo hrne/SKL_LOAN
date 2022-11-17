@@ -1681,7 +1681,10 @@ public class L3420 extends TradeBuffer {
 	private void FacCloseNormal() throws LogicException {
 		// 0:清償(必須為尚未結案)
 		tFacClose = facCloseService.findFacmNoFirst(iCustNo, iFacmNo, Arrays.asList(new String[] { "0" }), titaVo);
-		if (tFacClose == null) {
+		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
+			tFacClose = facCloseService.findFacmNoFirst(iCustNo, 0, Arrays.asList(new String[] { "0" }), titaVo);
+		}
+		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
 			FacClose t2FacClose = facCloseService.findMaxCloseNoFirst(iCustNo);
 			if (t2FacClose == null) {
 				wkCloseNo = 1;
@@ -1719,7 +1722,10 @@ public class L3420 extends TradeBuffer {
 
 	private void FacCloseErase() throws LogicException {
 		tFacClose = facCloseService.findFacmNoFirst(iCustNo, iFacmNo, Arrays.asList(new String[] { "0" }), titaVo);
-		if (tFacClose == null) {
+		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
+			tFacClose = facCloseService.findFacmNoFirst(iCustNo, 0, Arrays.asList(new String[] { "0" }), titaVo);
+		}
+		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
 			return;
 		}
 		wkCloseNo = tFacClose.getCloseNo();

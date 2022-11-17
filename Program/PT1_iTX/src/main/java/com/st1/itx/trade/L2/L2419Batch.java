@@ -193,6 +193,8 @@ public class L2419Batch extends TradeBuffer {
 
 			row = seq + 2;
 
+			cleanBackgroundColor(row);
+
 			String seqInExcel = makeExcel.getValue(row, L2419Column.NO.getIndex()).toString(); // column A
 			// column B
 			String clCode1InExcel = getCodeAndCheck(
@@ -219,6 +221,15 @@ public class L2419Batch extends TradeBuffer {
 			}
 			if (parseInt(clNoInExcel) != clNo) {
 				throwErrorMsg("E0015", "欄位:D ,行數:" + row + ",回饋檔的擔保品號碼,與擔保品整批匯入檔資料不符,請使用L2419功能1,重新產生回饋檔.");
+			}
+
+			// INSERT_FLAG = N
+			String insertFlag = makeExcel.getValue(row, L2419Column.INSERT_FLAG.getIndex()).toString();
+
+			if (insertFlag.equals("N")) {
+				String insuNo = makeExcel.getValue(row, L2419Column.INSU_NO.getIndex()).toString();
+				deleteData(clCode1, clCode2, clNo, tClBatch, insuNo, titaVo);
+				continue;
 			}
 
 			// column E 擔保品類別
@@ -253,13 +264,12 @@ public class L2419Batch extends TradeBuffer {
 				CdArea cdArea = sCdAreaService.Zip3First(zipCode, titaVo);
 
 				if (cdArea == null) {
-					throwErrorMsg("E0015", "欄位:J ,行數:" + row + ",郵遞區號無法配對到鄉鎮市區代碼,郵遞區號=" + zipCode);
+					makeExcel.setErrorColumn(row, L2419Column.ZIP_3.getIndex());
 				}
 
 				CdCity cdCity = sCdCityService.findById(cdArea.getCityCode(), titaVo);
 				if (cdCity == null) {
-					throwErrorMsg("E0015",
-							"欄位:J ,行數:" + row + ",郵遞區號對應之縣市別代碼無法配對到正確的縣市代碼檔,縣市別代碼=" + cdArea.getCityCode());
+					makeExcel.setErrorColumn(row, L2419Column.ZIP_3.getIndex());
 				}
 
 				zipItems.put("zipcity=" + zipCode, cdArea.getCityCode());
@@ -290,19 +300,22 @@ public class L2419Batch extends TradeBuffer {
 			// 房地才需要輸入用途
 			// column M 用途
 			String usage = clCode1 == 1
-					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.USE_CODE.getIndex()).toString(), "M", "BdMainUseCode", "用途")
+					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.USE_CODE.getIndex()).toString(), "M",
+							"BdMainUseCode", "用途")
 					: "";
 
 			// 房地才需要輸入建物類別
 			// column N 類別
 			String buildingTypeCode = clCode1 == 1
-					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.BUILD_TYPE.getIndex()).toString(), "N", "BdTypeCode", "建物類別")
+					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.BUILD_TYPE.getIndex()).toString(), "N",
+							"BdTypeCode", "建物類別")
 					: "";
 
 			// 房地才需要輸入建材
 			// column O 建材
 			String buildingMtrlCode = clCode1 == 1
-					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.MTRL.getIndex()).toString(), "O", "BdMtrlCode", "建材")
+					? getCodeAndCheck(makeExcel.getValue(row, L2419Column.MTRL.getIndex()).toString(), "O",
+							"BdMtrlCode", "建材")
 					: "";
 
 			// 房地才需要輸入樓層
@@ -311,46 +324,55 @@ public class L2419Batch extends TradeBuffer {
 
 			// 房地才需要輸入總樓層
 			// column Q 總樓層
-			String totalFloor = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.TOTAL_FLOOR.getIndex()).toString() : "";
+			String totalFloor = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.TOTAL_FLOOR.getIndex()).toString()
+					: "";
 
 			// 房地才需要輸入建築完成日期
 			// column R 建物完成日期
-			String buildDate = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.BUILD_DATE.getIndex()).toString() : "";
+			String buildDate = clCode1 == 1 ? makeExcel.getValue(row, L2419Column.BUILD_DATE.getIndex()).toString()
+					: "";
 			if (clCode1 == 1 && !checkDate(buildDate)) {
-				throwErrorMsg("E0015", "欄位:R ,行數:" + row + ",不是一個正確的日期,建築完成日期=" + buildDate);
+				makeExcel.setErrorColumn(row, L2419Column.BUILD_DATE.getIndex());
 			}
 			if (clCode1 == 1 && !compareDate(buildDate, titaVo.getParam("CALDY"))) {
-				throwErrorMsg("E0015", "欄位:R ,行數:" + row + ",建築完成日期(" + buildDate + "),不可大於日曆日");
+				makeExcel.setErrorColumn(row, L2419Column.BUILD_DATE.getIndex());
 			}
 
 			// column S 設定日期
 			String settingDate = makeExcel.getValue(row, L2419Column.SETTING_DATE.getIndex()).toString();
 			if (!checkDate(settingDate)) {
-				throwErrorMsg("E0015", "欄位:S ,行數:" + row + ",不是一個正確的日期,設定日期=" + settingDate);
+				makeExcel.setErrorColumn(row, L2419Column.SETTING_DATE.getIndex());
 			}
 			if (!compareDate(settingDate, titaVo.getParam("CALDY"))) {
-				throwErrorMsg("E0015", "欄位:S ,行數:" + row + ",設定日期(" + settingDate + "),不可大於日曆日");
+				makeExcel.setErrorColumn(row, L2419Column.SETTING_DATE.getIndex());
+			}
+
+			// 擔保債權確定日期
+			String claimDate = makeExcel.getValue(row, L2419Column.CLAIM_DATE.getIndex()).toString();
+			this.info("claimDate = " + claimDate);
+			if ((!claimDate.isEmpty()) && !checkDate(claimDate)) {
+				makeExcel.setErrorColumn(row, L2419Column.CLAIM_DATE.getIndex());
 			}
 
 			// column T 面積
 			String floorArea = makeExcel.getValue(row, L2419Column.FLOOR_AREA.getIndex()).toString();
 			BigDecimal floorAreaBigDecimal = new BigDecimal(floorArea);
 			if (floorAreaBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
-				throwErrorMsg("E0015", "欄位:T ,行數:" + row + ",面積不得為0或空白,面積=" + floorArea);
+				makeExcel.setErrorColumn(row, L2419Column.FLOOR_AREA.getIndex());
 			}
 
 			// column U 鑑估單價
 			String evaUnitPrice = makeExcel.getValue(row, L2419Column.UNIT_PRICE.getIndex()).toString();
 			BigDecimal evaUnitPriceBigDecimal = new BigDecimal(evaUnitPrice);
 			if (evaUnitPriceBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
-				throwErrorMsg("E0015", "欄位:U ,行數:" + row + ",鑑估單價不得為0或空白,鑑估單價=" + evaUnitPrice);
+				makeExcel.setErrorColumn(row, L2419Column.UNIT_PRICE.getIndex());
 			}
 
 			// column V 鑑估總價
 			String evaAmt = makeExcel.getValue(row, L2419Column.EVA_AMT.getIndex()).toString();
 			BigDecimal evaAmtBigDecimal = new BigDecimal(evaAmt);
 			if (evaAmtBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
-				throwErrorMsg("E0015", "欄位:V ,行數:" + row + ",鑑估總價不得為0或空白,鑑估總價=" + evaAmt);
+				makeExcel.setErrorColumn(row, L2419Column.EVA_AMT.getIndex());
 			}
 
 			// column W 增值稅
@@ -359,7 +381,7 @@ public class L2419Batch extends TradeBuffer {
 				try {
 					new BigDecimal(tax);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:W ,行數:" + row + ",增值稅有輸入時需為數字,增值稅=" + tax);
+					makeExcel.setErrorColumn(row, L2419Column.TAX.getIndex());
 				}
 			}
 
@@ -369,7 +391,7 @@ public class L2419Batch extends TradeBuffer {
 				try {
 					new BigDecimal(netValue);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:X ,行數:" + row + ",淨值有輸入時需為數字,淨值=" + netValue);
+					makeExcel.setErrorColumn(row, L2419Column.NET_VALUE.getIndex());
 				}
 			}
 
@@ -379,7 +401,7 @@ public class L2419Batch extends TradeBuffer {
 				try {
 					new BigDecimal(rentPrice);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:Y ,行數:" + row + ",押金有輸入時需為數字,押金=" + rentPrice);
+					makeExcel.setErrorColumn(row, L2419Column.RENT_PRICE.getIndex());
 				}
 			}
 
@@ -389,7 +411,7 @@ public class L2419Batch extends TradeBuffer {
 				try {
 					new BigDecimal(rentEvaValue);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:Z ,行數:" + row + ",出租淨值有輸入時需為數字,出租淨值=" + rentEvaValue);
+					makeExcel.setErrorColumn(row, L2419Column.RENT_EVA_VALUE.getIndex());
 				}
 			}
 
@@ -399,10 +421,10 @@ public class L2419Batch extends TradeBuffer {
 			try {
 				loanToValueBigDecimal = new BigDecimal(loanToValue);
 			} catch (Exception e) {
-				throwErrorMsg(e, "E0015", "欄位:AA ,行數:" + row + ",貸放成數不得為0或空白,貸放成數=" + loanToValue);
+				makeExcel.setErrorColumn(row, L2419Column.LOAN_TO_VALUE.getIndex());
 			}
 			if (loanToValueBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
-				throwErrorMsg("E0015", "欄位:AA ,行數:" + row + ",貸放成數不得為0或空白,貸放成數=" + loanToValue);
+				makeExcel.setErrorColumn(row, L2419Column.LOAN_TO_VALUE.getIndex());
 			}
 
 			// column AB 借款金額(仟元)
@@ -414,10 +436,10 @@ public class L2419Batch extends TradeBuffer {
 			try {
 				settingAmtBigDecimal = new BigDecimal(settingAmt);
 			} catch (Exception e) {
-				throwErrorMsg(e, "E0015", "欄位:AC ,行數:" + row + ",設定金額不得為0或空白,設定金額=" + settingAmt);
+				makeExcel.setErrorColumn(row, L2419Column.SETTING_AMT.getIndex());
 			}
 			if (settingAmtBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
-				throwErrorMsg("E0015", "欄位:AC ,行數:" + row + ",設定金額不得為0或空白,設定金額=" + settingAmt);
+				makeExcel.setErrorColumn(row, L2419Column.SETTING_AMT.getIndex());
 			}
 
 			// column AD 還款金額(仟元)
@@ -426,14 +448,17 @@ public class L2419Batch extends TradeBuffer {
 			// column AE 保險單號碼
 			String insuNo = makeExcel.getValue(row, L2419Column.INSU_NO.getIndex()).toString();
 			if (insuNo == null || insuNo.isEmpty()) {
-				throwErrorMsg("E0015", "欄位:AE ,行數:" + row + ",保險單號碼不得為空白.");
+				makeExcel.setErrorColumn(row, L2419Column.INSU_NO.getIndex());
 			}
 
 			// column AF 保險公司
-			String insuCompany = getCodeAndCheck(makeExcel.getValue(row, L2419Column.INSU_COMPANY.getIndex()).toString(), "AF", "InsuCompany", "保險公司");
+			String insuCompany = getCodeAndCheck(
+					makeExcel.getValue(row, L2419Column.INSU_COMPANY.getIndex()).toString(), "AF", "InsuCompany",
+					"保險公司");
 
 			// column AG 保險類別
-			String insuTypeCode = getCodeAndCheck(makeExcel.getValue(row, L2419Column.INSU_TYPE.getIndex()).toString(), "AF", "InsuTypeCode", "保險類別");
+			String insuTypeCode = getCodeAndCheck(makeExcel.getValue(row, L2419Column.INSU_TYPE.getIndex()).toString(),
+					"AF", "InsuTypeCode", "保險類別");
 
 			// column AH 火災險保險金額(仟元)
 			String fireInsuAmt = makeExcel.getValue(row, L2419Column.FIRE_INSU_AMT.getIndex()).toString();
@@ -441,10 +466,10 @@ public class L2419Batch extends TradeBuffer {
 			try {
 				fireInsuAmtBigDecimal = new BigDecimal(fireInsuAmt);
 			} catch (Exception e) {
-				throwErrorMsg(e, "E0015", "欄位:AH ,行數:" + row + ",火災險保險金額不得為0或空白,火災險保險金額=" + fireInsuAmt);
+				makeExcel.setErrorColumn(row, L2419Column.FIRE_INSU_AMT.getIndex());
 			}
 			if (fireInsuAmtBigDecimal.compareTo(BigDecimal.ZERO) == 0) {
-				throwErrorMsg("E0015", "欄位:AH ,行數:" + row + ",火災險保險金額不得為0或空白,火災險保險金額=" + fireInsuAmt);
+				makeExcel.setErrorColumn(row, L2419Column.FIRE_INSU_AMT.getIndex());
 			}
 
 			// column AI 火災險保費
@@ -453,7 +478,7 @@ public class L2419Batch extends TradeBuffer {
 				try {
 					new BigDecimal(fireInsuExpense);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:AI ,行數:" + row + ",火災險保費有輸入時需為數字,火災險保費=" + fireInsuExpense);
+					makeExcel.setErrorColumn(row, L2419Column.FIRE_INSU_EXPENSE.getIndex());
 				}
 			}
 
@@ -463,33 +488,34 @@ public class L2419Batch extends TradeBuffer {
 				try {
 					new BigDecimal(earthquakeInsuAmt);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:AI ,行數:" + row + ",地震險保險金額有輸入時需為數字,地震險保險金額=" + earthquakeInsuAmt);
+					makeExcel.setErrorColumn(row, L2419Column.EARTHQUAKE_INSU_AMT.getIndex());
 				}
 			}
 
 			// column AK 地震險保費
-			String earthquakeInsuExpense = makeExcel.getValue(row, L2419Column.EARTHQUAKE_INSU_EXPENSE.getIndex()).toString();
+			String earthquakeInsuExpense = makeExcel.getValue(row, L2419Column.EARTHQUAKE_INSU_EXPENSE.getIndex())
+					.toString();
 			if (earthquakeInsuExpense != null && !earthquakeInsuExpense.isEmpty()) {
 				try {
 					new BigDecimal(earthquakeInsuExpense);
 				} catch (Exception e) {
-					throwErrorMsg(e, "E0015", "欄位:AI ,行數:" + row + ",地震險保費有輸入時需為數字,地震險保費=" + earthquakeInsuExpense);
+					makeExcel.setErrorColumn(row, L2419Column.EARTHQUAKE_INSU_EXPENSE.getIndex());
 				}
 			}
 
 			// column AL 保險起日
 			String insuStartDate = makeExcel.getValue(row, L2419Column.INSU_START.getIndex()).toString();
 			if (!checkDate(insuStartDate)) {
-				throwErrorMsg("E0015", "欄位:AL ,行數:" + row + ",不是一個正確的日期,保險起日=" + insuStartDate);
+				makeExcel.setErrorColumn(row, L2419Column.INSU_START.getIndex());
 			}
 			if (!compareDate(insuStartDate, titaVo.getParam("CALDY"))) {
-				throwErrorMsg("E0015", "欄位:AL ,行數:" + row + ",保險起日(" + insuStartDate + "),不可大於日曆日");
+				makeExcel.setErrorColumn(row, L2419Column.INSU_START.getIndex());
 			}
 
 			// column AM 保險迄日
 			String insuEndDate = makeExcel.getValue(row, L2419Column.INSU_END.getIndex()).toString();
 			if (!checkDate(insuEndDate)) {
-				throwErrorMsg("E0015", "欄位:AM ,行數:" + row + ",不是一個正確的日期,checkDate=" + insuEndDate);
+				makeExcel.setErrorColumn(row, L2419Column.INSU_END.getIndex());
 			}
 
 			// 所有權人
@@ -506,7 +532,7 @@ public class L2419Batch extends TradeBuffer {
 				// 此情形需確認上一筆所有權人資料是否存在
 				// 若不存在須提示錯誤
 				if (lastOwnerList == null || lastOwnerList.isEmpty()) {
-					throwErrorMsg("E0015", "欄位:AN ,行數:" + row + ",無前筆資料時,所有權人1不得為空白.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_TYPE_1.getIndex());
 				} else {
 					// 沿用上一筆所有權人資料時,此筆不繼續往右讀取
 					this.info("行數:" + row + ",沿用上一筆所有權人資料時,此筆不繼續往右讀取");
@@ -521,23 +547,23 @@ public class L2419Batch extends TradeBuffer {
 
 				// 檢核 所有權種類 1:建物;2:土地
 				if (clCode1 == 1 && !ownerType1.equals("1")) {
-					throwErrorMsg("E0015", "欄位:AN ,行數:" + row + ",此筆為房地擔保品,所有權人1須填寫建物所有權人.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_TYPE_1.getIndex());
 				} else if (clCode1 == 2 && !ownerType1.equals("2")) {
-					throwErrorMsg("E0015", "欄位:AN ,行數:" + row + ",此筆為土地擔保品,所有權人1須填寫土地所有權人.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_TYPE_1.getIndex());
 				} else if (!ownerType1.equals("1") && !ownerType1.equals("2")) {
-					throwErrorMsg("E0015", "欄位:AN ,行數:" + row + ",所有權人1-所有權種類應為1_建物或2_土地,所有權種類=" + ownerType1);
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_TYPE_1.getIndex());
 				}
 
 				// column AO 所有權人1-身分證/統編
 				String ownerId1 = makeExcel.getValue(row, L2419Column.OWNER_ID_1.getIndex()).toString().trim();
 				if (ownerId1 == null || ownerId1.isEmpty()) {
-					throwErrorMsg("E0015", "欄位:AO ,行數:" + row + ",有選擇所有權種類時,所有權人-身分證/統編不得為空白.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_ID_1.getIndex());
 				}
 
 				// column AP 所有權人1-姓名
 				String ownerName1 = makeExcel.getValue(row, L2419Column.OWNER_NAME_1.getIndex()).toString().trim();
 				if (ownerName1 == null || ownerName1.isEmpty()) {
-					throwErrorMsg("E0015", "欄位:AP ,行數:" + row + ",有選擇所有權種類時,所有權人-姓名不得為空白.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_NAME_1.getIndex());
 				}
 
 				// column AQ 所有權人1-與授信戶關係
@@ -549,13 +575,13 @@ public class L2419Batch extends TradeBuffer {
 						ownerRel1 = getCodeAndCheck(ownerRel1, "AQ", "GuaRelCode", "與授信戶關係");
 					}
 				} else {
-					throwErrorMsg("E0015", "欄位:AQ ,行數:" + row + ",有選擇所有權種類時,所有權人-與授信戶關係不得為空白.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_RELATION_1.getIndex());
 				}
 
 				// column AR 所有權人1-持份比率
 				String part = makeExcel.getValue(row, L2419Column.OWNER_PARTIAL_1.getIndex()).toString();
 				if (part == null || part.isEmpty()) {
-					throwErrorMsg("E0015", "欄位:AR ,行數:" + row + ",有選擇所有權種類時,所有權人-持份比率不得為空白.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_PARTIAL_1.getIndex());
 				}
 				if (part.indexOf("分之") >= 0) {
 					String ownerTotal = part.substring(0, part.indexOf("分之")); // 持份比率(分母)
@@ -563,7 +589,7 @@ public class L2419Batch extends TradeBuffer {
 					this.info("ownerPart = " + ownerPart);
 					this.info("ownerTotal = " + ownerTotal);
 				} else {
-					throwErrorMsg("E0015", "欄位:AR ,行數:" + row + ",所有權人-持份比率格式為幾分之幾,可參考權狀上的權利範圍.");
+					makeExcel.setErrorColumn(row, L2419Column.OWNER_PARTIAL_1.getIndex());
 				}
 
 				// 所有權人1 檢核皆通過,紀錄到lastOwnerList
@@ -706,7 +732,7 @@ public class L2419Batch extends TradeBuffer {
 			// 設定金額
 			clImm.setSettingAmt(parse.stringToBigDecimal(settingAmt));
 			// 擔保債權確定日期:設定日期+30年
-			clImm.setClaimDate(clImm.getSettingDate() + 300000);
+			clImm.setClaimDate(getDate(claimDate));
 			// 設定順位(1~9)
 			clImm.setSettingSeq("1");
 
@@ -773,9 +799,9 @@ public class L2419Batch extends TradeBuffer {
 				// 屋頂結構:07:其他 ???
 				clBuilding.setRoofStructureCode("07");
 				// 建築完成日期
-				clBuilding.setBdDate(getDate(buildDate));
-				// 房屋取得日期,預設為"建築完成日期"
-				clBuilding.setHouseBuyDate(clBuilding.getBdDate());
+				clBuilding.setBdDate(0);
+				// 房屋取得日期
+				clBuilding.setHouseBuyDate(0);
 
 				if (isExistInClBuilding) {
 					try {
@@ -940,6 +966,154 @@ public class L2419Batch extends TradeBuffer {
 		return null;
 	}
 
+	private void deleteData(int clCode1, int clCode2, int clNo, ClBatch tClBatch, String insuNo, TitaVo titaVo)
+			throws LogicException {
+
+		// Table 1 : ClMain
+		ClMainId clMainId = new ClMainId();
+		clMainId.setClCode1(clCode1);
+		clMainId.setClCode2(clCode2);
+		clMainId.setClNo(clNo);
+
+		ClMain clMain;
+		clMain = sClMainService.holdById(clMainId, titaVo);
+
+		if (clMain != null) {
+			try {
+				sClMainService.delete(clMain, titaVo);
+			} catch (DBException e) {
+				throwErrorMsg(e, "E0007", "擔保品主檔(ClMain)" + e.getErrorMsg());
+			}
+		}
+
+		// Table 2 : ClImm
+		ClImmId clImmId = new ClImmId();
+
+		clImmId.setClCode1(clCode1);
+		clImmId.setClCode2(clCode2);
+		clImmId.setClNo(clNo);
+
+		ClImm clImm;
+		clImm = sClImmService.holdById(clImmId, titaVo);
+
+		if (clImm != null) {
+			try {
+				sClImmService.delete(clImm, titaVo);
+			} catch (DBException e) {
+				throwErrorMsg(e, "E0007", "擔保品不動產檔(ClImm)" + e.getErrorMsg());
+			}
+		}
+
+		// Table 3 : ClBuilding
+		if (clCode1 == 1) {
+			ClBuildingId clBuildingId = new ClBuildingId();
+			clBuildingId.setClCode1(clCode1);
+			clBuildingId.setClCode2(clCode2);
+			clBuildingId.setClNo(clNo);
+
+			ClBuilding clBuilding;
+			clBuilding = sClBuildingService.holdById(clBuildingId, titaVo);
+			if (clBuilding != null) {
+				try {
+					sClBuildingService.delete(clBuilding, titaVo);
+				} catch (DBException e) {
+					throwErrorMsg(e, "E0007", "擔保品不動產建物檔主檔(ClBuilding)" + e.getErrorMsg());
+				}
+			}
+
+		}
+		// Table 4 : ClLand
+		ClLandId clLandId = new ClLandId();
+		clLandId.setClCode1(clCode1);
+		clLandId.setClCode2(clCode2);
+		clLandId.setClNo(clNo);
+
+		ClLand clLand;
+		clLand = sClLandService.holdById(clLandId, titaVo);
+		if (clLand != null) {
+			try {
+				sClLandService.delete(clLand, titaVo);
+			} catch (DBException e) {
+				throwErrorMsg(e, "E0007", "擔保品不動產建土地主檔(ClLand)" + e.getErrorMsg());
+			}
+		}
+
+		// Table 4 : InsuComm
+		ClFacId clFacId = new ClFacId();
+		clFacId.setClCode1(clCode1);
+		clFacId.setClCode2(clCode2);
+		clFacId.setClNo(clNo);
+		clFacId.setApproveNo(applNo);
+
+		ClFac clFac = sClFacService.holdById(clFacId, titaVo);
+		if (clFac != null) {
+			try {
+				sClFacService.delete(clFac, titaVo);
+			} catch (DBException e) {
+				throwErrorMsg(e, "E0007", "擔保品與額度關聯檔(ClFac)" + e.getErrorMsg());
+			}
+		}
+
+		// Table 6 : ClBuildingOwner
+		// Table 7 : ClLandOwner
+		if (clCode1 == 1) {
+			Slice<ClBuildingOwner> sClBuildingOwner = sClBuildingOwnerService.clNoEq(clCode1, clCode2, clNo, 0,
+					Integer.MAX_VALUE, titaVo);
+			List<ClBuildingOwner> lClBuildingOwner = sClBuildingOwner == null ? null : sClBuildingOwner.getContent();
+			if (lClBuildingOwner != null && !lClBuildingOwner.isEmpty()) {
+				try {
+					sClBuildingOwnerService.deleteAll(lClBuildingOwner, titaVo);
+				} catch (DBException e) {
+					throwErrorMsg(e, "E0007", "建物所有權人檔(ClBuildingOwner)" + e.getErrorMsg());
+				}
+			}
+		}
+		
+		Slice<ClLandOwner> sClLandOwner = sClLandOwnerService.clNoEq(clCode1, clCode2, clNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<ClLandOwner> lClLandOwner = sClLandOwner == null ? null : sClLandOwner.getContent();
+		if (lClLandOwner != null && !lClLandOwner.isEmpty()) {
+			try {
+				sClLandOwnerService.deleteAll(lClLandOwner, titaVo);
+			} catch (DBException e) {
+				throwErrorMsg(e, "E0007", "土地所有權人檔(ClLandOwner)" + e.getErrorMsg());
+			}
+		}
+
+		// Table 8 : ClFac
+		if (insuNo != null) {
+			InsuOrignalId insuOrignalId = new InsuOrignalId();
+			insuOrignalId.setClCode1(clCode1);
+			insuOrignalId.setClCode2(clCode2);
+			insuOrignalId.setClNo(clNo);
+			insuOrignalId.setOrigInsuNo(insuNo);
+
+			InsuOrignal insuOrignal = sInsuOrignalService.holdById(insuOrignalId, titaVo);
+			if (insuOrignal != null) {
+				try {
+					sInsuOrignalService.delete(insuOrignal, titaVo);
+				} catch (DBException e) {
+					throwErrorMsg(e, "E0007", "火險初保檔(InsuOrignal)" + e.getErrorMsg());
+				}
+			}
+		}
+
+		// 更新ClBatch
+		tClBatch = sClBatchService.holdById(tClBatch, titaVo);
+		tClBatch.setInsertStatus(0);
+		try {
+			sClBatchService.update2(tClBatch, titaVo);
+		} catch (DBException e) {
+			throwErrorMsg(e, "E0007", "擔保品整批匯入檔(ClBatch)" + e.getErrorMsg());
+		}
+	}
+
+	private void cleanBackgroundColor(int thisRow) throws LogicException {
+		for (int c = 1; c <= 142; c++) {
+			makeExcel.setDefaultColumn(thisRow, c);
+		}
+	}
+
 	private void throwErrorMsg(String errorCode, String errorMsg) throws LogicException {
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", batchTitaVo.getTlrNo(), "Y", "L2419", "",
 				"[" + errorCode + "] " + errorMsg, batchTitaVo);
@@ -1030,9 +1204,9 @@ public class L2419Batch extends TradeBuffer {
 		// 與授信戶關係
 		clLandOwner.setOwnerRelCode(rel);
 		// 持份比率(分子)
-		clLandOwner.setOwnerPart(parse.stringToBigDecimal(part.substring(0, part.indexOf("分之"))));
+		clLandOwner.setOwnerPart(parse.stringToBigDecimal(part.substring(part.indexOf("分之") + 2)));
 		// 持份比率(分母)
-		clLandOwner.setOwnerTotal(parse.stringToBigDecimal(part.substring(part.indexOf("分之") + 2)));
+		clLandOwner.setOwnerTotal(parse.stringToBigDecimal(part.substring(0, part.indexOf("分之"))));
 
 		if (isExistInClLandOwner) {
 			try {
@@ -1069,9 +1243,9 @@ public class L2419Batch extends TradeBuffer {
 		// 與授信戶關係
 		clBuildingOwner.setOwnerRelCode(rel);
 		// 持份比率(分子)
-		clBuildingOwner.setOwnerPart(parse.stringToBigDecimal(part.substring(0, part.indexOf("分之"))));
+		clBuildingOwner.setOwnerPart(parse.stringToBigDecimal(part.substring(part.indexOf("分之") + 2)));
 		// 持份比率(分母)
-		clBuildingOwner.setOwnerTotal(parse.stringToBigDecimal(part.substring(part.indexOf("分之") + 2)));
+		clBuildingOwner.setOwnerTotal(parse.stringToBigDecimal(part.substring(0, part.indexOf("分之"))));
 
 		if (isExistInClBuildingOwner) {
 			try {
@@ -1130,8 +1304,7 @@ public class L2419Batch extends TradeBuffer {
 		cdCodeId.setCode(code);
 		CdCode cdCode = sCdCodeService.findById(cdCodeId, batchTitaVo);
 		if (cdCode == null) {
-			throwErrorMsg("E0015",
-					"欄位:" + column + " ,行數:" + row + " ,回饋檔的" + defCodeDesc + "(" + code + "),代碼錯誤,請依下拉選單選擇.");
+			makeExcel.setErrorColumn(row, Integer.parseInt(column));
 		}
 		return cdCode.getItem();
 	}

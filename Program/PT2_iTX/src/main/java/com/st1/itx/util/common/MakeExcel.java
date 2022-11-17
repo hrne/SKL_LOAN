@@ -1132,6 +1132,29 @@ public class MakeExcel extends CommBuffer {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel) setErrorColumn error = " + row + "/" + col);
 		}
 	}
+
+	CellStyle defaultColumnStyle = null;
+	
+	public void setDefaultColumn(int row, int col) throws LogicException {
+		if (this.openedSheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) openedSheet is null");
+		}
+
+		Row prow = this.openedSheet.getRow(row - 1);
+
+		if (defaultColumnStyle == null) {
+			defaultColumnStyle = this.openedWorkbook.createCellStyle();
+			defaultColumnStyle.setFillForegroundColor(IndexedColors.AUTOMATIC.getIndex());
+			defaultColumnStyle.setFillPattern(FillPatternType.NO_FILL);
+		}
+
+		if (prow != null) {
+			Cell tmpCell = prow.getCell(col - 1);
+			tmpCell.setCellStyle(defaultColumnStyle);
+		} else {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel) setDefaultColumn error = " + row + "/" + col);
+		}
+	}
 	
 	// 2022.3.25 by eric for 配合openExcel變更EXCEL檔
 	public void setValueInt(int row, int col, int val) throws LogicException {

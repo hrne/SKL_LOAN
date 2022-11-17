@@ -115,6 +115,9 @@ public class L2419 extends TradeBuffer {
 		case "2":
 			modifyClData(titaVo); // 寫入或修改整批匯入的擔保品資料
 			break;
+		case "3":
+			report(titaVo); // 以系統擔保品資料產生回饋檔
+			break;
 		default:
 			break;
 		}
@@ -945,6 +948,11 @@ public class L2419 extends TradeBuffer {
 	private void modifyClData(TitaVo titaVo) throws LogicException {
 		// 執行背景交易
 		MySpring.newTask("L2419Batch", this.txBuffer, titaVo);
+	}
+
+	private void report(TitaVo titaVo) throws LogicException {
+		// 執行背景交易
+		MySpring.newTask("L2419Report", this.txBuffer, titaVo);
 	}
 
 	private long toTxFile(TitaVo titaVo, String filename, String newFileItem) throws LogicException {

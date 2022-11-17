@@ -274,7 +274,7 @@ public class L4101ReportB extends MakeReport {
 			}
 			String remitBank = tBankRemit.getRemitBank(); // 銀行別
 			String remitBranch = tBankRemit.getRemitBranch(); // 分行別
-			String remitAcctNo = tBankRemit.getRemitAcctNo(); // 匯款帳號
+			String remitAcctNo = FormatUtil.pad9(tBankRemit.getRemitAcctNo(), 14); // 匯款帳號
 			// 取銀行中文
 			CdBank t = cdBankService.findById(new CdBankId(remitBank, remitBranch), titaVo);
 			if (t != null) {
@@ -308,7 +308,8 @@ public class L4101ReportB extends MakeReport {
 				wkFullName = wkBusinessOfficer;
 			}
 			int wkCorFlag = corFlag; // 沖轉
-
+//			匯款帳號11~14加密
+			remitAcctNo = remitAcctNo.substring(0, 7) + "XXXX" + remitAcctNo.substring(11, 14);
 			// 明細資料第一行
 			print(1, 1, "　　");
 			print(0, 1, FormatUtil.pad9("" + rounds, 3));// 序號

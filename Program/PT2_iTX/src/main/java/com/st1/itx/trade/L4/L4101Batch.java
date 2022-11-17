@@ -348,7 +348,6 @@ public class L4101Batch extends TradeBuffer {
 
 		// 轉換資料格式
 		ArrayList<String> file = l4101OldVo.toFile();
-// 檔案產生者員編_disb_送匯日期_3碼檔案序號_secret.csv
 
 		makeFile.open(titaVo, iAcDate + 19110000, titaVo.getKinbr(), titaVo.getTxCode(),
 				titaVo.getTxCode() + reportItem, "LNM24p.txt", 2);
@@ -529,7 +528,11 @@ public class L4101Batch extends TradeBuffer {
 				}
 
 				// 匯款人代理人電話
-				remitformVo.setAgentTel("戶號" + parse.IntegerToString(tBankRemit.getCustNo(), 7));
+				if (tBankRemit.getCustNo() == 0) {
+					remitformVo.setAgentTel("");
+				} else {
+					remitformVo.setAgentTel("戶號" + parse.IntegerToString(tBankRemit.getCustNo(), 7));
+				}
 
 				// 匯款金額
 				remitformVo.setRemitAmt(parse.stringToInteger("" + tBankRemit.getRemitAmt()));

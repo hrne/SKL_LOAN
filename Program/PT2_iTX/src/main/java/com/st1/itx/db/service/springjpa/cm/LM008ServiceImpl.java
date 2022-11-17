@@ -61,6 +61,46 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String bcYearMonth = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
 		String sql = "";
+		sql += " WITH rawData AS ( ";
+		sql += " SELECT A.\"AcctCode\" ";
+		sql += "      , A.\"Aging\" ";
+		sql += "      , A.\"CustNo\" ";
+		sql += "      , C.\"CustName\" ";
+		sql += "      , A.\"FacmNo\" ";
+		sql += "      , ROW_NUMBER() OVER (PARTITION BY A.\"AcctCode\" ";
+		sql += "                                       ,A.\"CustNo\" ";
+		sql += "                                       ,A.\"FacmNo\" ";
+		sql += "                                       ,DECODE(A.\"IntRate\", 0, 0, 1) "; // 有些資料計息利率是 0，透過這裡讓非 0 的利率優先
+		sql += "                           ORDER BY A.\"BormNo\" DESC ";
+		sql += "                                   ,A.\"TermNo\" DESC) AS \"seq\" ";
+		sql += "      , A.\"LoanBal\" ";
+		sql += "      , A.\"IntRate\" ";
+		sql += "      , A.\"IntStartDate\" ";
+		sql += "      , CASE WHEN TRUNC(A.\"PayIntDate\" / 100)     <= :bcYearMonth ";
+		sql += "              AND TRUNC(A.\"IntStartDate\" / 100)   <= :bcYearMonth ";
+		sql += "              AND TRUNC(A.\"IntEndDate\" / 100)     <= :bcYearMonth ";
+		sql += "              AND TRUNC(LBM.\"MaturityDate\" / 100) >  :bcYearMonth "; // 2022-05-18
+																						// 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
+		sql += "             THEN A.\"Interest\" ";
+		sql += "             ELSE 0 ";
+		sql += "        END AS \"UnpaidInt\" "; // 已到期
+		sql += "      , CASE WHEN TRUNC(A.\"PayIntDate\" / 100)     <= :bcYearMonth ";
+		sql += "              AND TRUNC(A.\"IntStartDate\" / 100)   <= :bcYearMonth ";
+		sql += "              AND TRUNC(A.\"IntEndDate\" / 100)     <= :bcYearMonth ";
+		sql += "              AND TRUNC(LBM.\"MaturityDate\" / 100) >  :bcYearMonth "; // 2022-05-18
+																						// 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
+		sql += "             THEN 0 ";
+		sql += "             ELSE A.\"Interest\" ";
+		sql += "        END AS \"UnexpiredInt\" "; // 未到期
+		sql += " FROM \"AcLoanInt\" A ";
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\" ";
+		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = A.\"CustNo\" ";
+		sql += "                              AND LBM.\"FacmNo\" = A.\"FacmNo\" ";
+		sql += "                              AND LBM.\"BormNo\" = A.\"BormNo\" ";
+		sql += " WHERE A.\"YearMonth\" = :bcYearMonth ";
+		sql += "   AND A.\"AcctCode\"  = :acctCode ";
+		sql += " ) ";
+		sql += " , groupData AS ( ";
 		sql += " SELECT \"AcctCode\"                     AS \"AcctCode\" ";
 		sql += "      , \"Aging\"                        AS \"Aging\" ";
 		sql += "      , \"CustNo\"                       AS \"CustNo\" ";
@@ -77,47 +117,25 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ELSE 99991231 END)           AS \"IntStartDate\" ";
 		sql += "      , SUM(\"UnpaidInt\")               AS \"UnpaidInt\" ";
 		sql += "      , SUM(\"UnexpiredInt\")            AS \"UnexpiredInt\" ";
-		sql += " FROM (SELECT A.\"AcctCode\" ";
-		sql += "            , A.\"Aging\" ";
-		sql += "            , A.\"CustNo\" ";
-		sql += "            , C.\"CustName\" ";
-		sql += "            , A.\"FacmNo\" ";
-		sql += "            , ROW_NUMBER() OVER (PARTITION BY A.\"AcctCode\" ";
-		sql += "                                             ,A.\"CustNo\" ";
-		sql += "                                             ,A.\"FacmNo\" ";
-		sql += "                                             ,DECODE(A.\"IntRate\", 0, 0, 1) "; // 有些資料計息利率是 0，透過這裡讓非 0 的利率優先
-		sql += "                                 ORDER BY A.\"BormNo\" DESC ";
-		sql += "                                         ,A.\"TermNo\" DESC) AS \"seq\" ";
-		sql += "            , A.\"LoanBal\" ";
-		sql += "            , A.\"IntRate\" ";
-		sql += "            , A.\"IntStartDate\" ";
-		sql += "            , CASE WHEN TRUNC(A.\"PayIntDate\" / 100)     <= :bcYearMonth ";
-		sql += "                    AND TRUNC(A.\"IntStartDate\" / 100)   <= :bcYearMonth ";
-		sql += "                    AND TRUNC(A.\"IntEndDate\" / 100)     <= :bcYearMonth ";
-		sql += "                    AND TRUNC(LBM.\"MaturityDate\" / 100) >  :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
-		sql += "                   THEN A.\"Interest\" ";
-		sql += "                   ELSE 0 ";
-		sql += "              END AS \"UnpaidInt\" "; // 已到期
-		sql += "            , CASE WHEN TRUNC(A.\"PayIntDate\" / 100)     <= :bcYearMonth ";
-		sql += "                    AND TRUNC(A.\"IntStartDate\" / 100)   <= :bcYearMonth ";
-		sql += "                    AND TRUNC(A.\"IntEndDate\" / 100)     <= :bcYearMonth ";
-		sql += "                    AND TRUNC(LBM.\"MaturityDate\" / 100) >  :bcYearMonth "; // 2022-05-18 應收利息差異會議上SKL珮琪提供:若該戶到期日<=當月月底日,利息放在未到期應收息
-		sql += "                   THEN 0 ";
-		sql += "                   ELSE A.\"Interest\" ";
-		sql += "              END AS \"UnexpiredInt\" "; // 未到期
-		sql += "       FROM \"AcLoanInt\" A ";
-		sql += "       LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\" ";
-		sql += "       LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = A.\"CustNo\" ";
-		sql += "                                    AND LBM.\"FacmNo\" = A.\"FacmNo\" ";
-		sql += "                                    AND LBM.\"BormNo\" = A.\"BormNo\" ";
-		sql += "       WHERE A.\"YearMonth\" = :bcYearMonth ";
-		sql += "         AND A.\"AcctCode\"  = :acctCode ";
-		sql += "      ) S1 ";
+		sql += " FROM rawData ";
 		sql += " GROUP BY \"AcctCode\" ";
 		sql += "        , \"Aging\" ";
 		sql += "        , \"CustNo\" ";
 		sql += "        , \"CustName\" ";
 		sql += "        , \"FacmNo\" ";
+		sql += " ) ";
+		sql += " SELECT \"AcctCode\" ";
+		sql += "      , \"Aging\" ";
+		sql += "      , \"CustNo\" ";
+		sql += "      , \"FacmNo\" ";
+		sql += "      , \"CustName\" ";
+		sql += "      , \"LoanBal\" ";
+		sql += "      , \"IntRate\" ";
+		sql += "      , \"IntStartDate\" ";
+		sql += "      , \"UnpaidInt\" ";
+		sql += "      , \"UnexpiredInt\" ";
+		sql += " FROM groupData ";
+		sql += " WHERE \"UnpaidInt\" + \"UnexpiredInt\" != 0 ";
 		sql += " ORDER BY \"AcctCode\" ";
 		sql += "        , \"Aging\" ";
 		sql += "        , \"CustNo\" ";

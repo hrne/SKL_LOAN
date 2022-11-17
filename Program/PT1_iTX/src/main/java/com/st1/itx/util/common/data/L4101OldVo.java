@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
@@ -99,15 +103,15 @@ public class L4101OldVo extends FileVo {
 ////		AcctNo		帳號			X	14	4	18
 ////		Amount		金額			X	13	18	31
 ////		UnitCode	解付單位代號	X	7	31	38
-////		RemitName	代償專戶		X	59	38	97
-////		ColumnA	新光人壽保險股份有限公司─放款服務課	X	35	97	132
-////		ColumnB		space		X	59	132	191
+////		RemitName	代償專戶		X	57	38	97
+////		ColumnA	新光人壽保險股份有限公司─放款服務課	X	36	97	132
+////		ColumnB		space		X	38	132	191
 ////		ColumnC		00174		X	5	191	196
 ////		RemitDate	匯款日期		X	8	196	204
 ////		BatchNo		批號			X	2	204	206
 			// 明細資料的單筆資料的欄位組合
 			String thisLine = "" + FormatUtil.pad9("" + seq, 4) // 序號
-					+ FormatUtil.padX(t.getRemitAcctNo(), 14) // 帳號
+					+ FormatUtil.pad9(t.getRemitAcctNo(), 14) // 帳號
 					+ FormatUtil.pad9("" + t.getRemitAmt(), 13) // 金額
 					+ FormatUtil.pad9("" + t.getRemitBank(), 3)// 解付單位代號3
 					+ FormatUtil.pad9("" + t.getRemitBranch(), 4)// 解付單位代號4
