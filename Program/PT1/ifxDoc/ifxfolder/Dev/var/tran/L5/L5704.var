@@ -1,0 +1,257 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5704)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5704" layout="cols=3;screen.width=[150,850];printer.width=[20,80];order=1">
+[
+["[L5704]                           債務協商作業－撥付日期設定"],
+[#<->#,"#FdFunctionCode+功能",#FunctionCodeX],
+[#<->#,"#FdYYY+年月",#YYY,"年",#MM,"月"],
+["#grid#,{id:1,expand:true,loop:4,row_height:1,s_cols:[], p_cols:[]}","","","",
+["年月","類別","製檔日","傳票日","提兌日"],
+[[#SearchYYYMM1],[#Lable1],[#ExportDate1],[#ApprAcDate1],[#BringUpDate1]]],
+]
+!---------- AP TEXT AREA Variables ----------
+! 使用JAVA L5R02 L5704
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FdFunctionCode=X,2,L
+
+#FdYYY=X,2,L
+
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)              
+#FuncCode2Help=x,50,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L5073債務協商作業-撥付日期查詢]進入),$)
+
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+
+#NTXBUF=X,46,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+
+#CHAIN_FuncCode=A,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_Year=X,3,S
+T(1,#NTXBUF,2,3)
+
+#CHAIN_Month=X,2,S
+T(1,#NTXBUF,5,2)
+
+
+#ChainGive=X,1,S
+T(2,@FunctionCode,#CHAIN_FuncCode)
+C(3,#CHAIN_FuncCode,1,s,$)
+T(2,@YYY,#CHAIN_Year)
+T(2,@MM,#CHAIN_Month)
+
+
+
+##loop {times:4,i:1}
+#SearchYYYMM{i}=X,6,L
+#Lable{i}=X,10,L
+##end
+
+
+! 功能
+#FunctionCode=A,1,S
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FunctionCodeX=X,4,L
+T(H,#FunctionCode,#FuncCode2Help)
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(NOBUTTON,CLOSEY))
+
+#FUNCIND=_,_,S
+E(0,#FunctionCode)
+
+#Star=X,1,S
+C(3,#FunctionCode,1,T(2,*),T(2, ))
+
+#BKM=X,1,S
+T(2,#FdFunctionCode,#Star)
+T(2,#FdYYY,#Star)
+
+#WKM=A,1,S
+IF(#FunctionCode==2 || #FunctionCode==4 ,T(F,@YYY,0)T(F,@MM,0) ,T(F,@YYY,1)T(F,@MM,1))
+
+#YYY=A,3,I
+C(3,#FunctionCode,1,$,s)
+@V(2,0)
+
+#MM=A,2,I
+C(3,#FunctionCode,1,$,s)
+@V(5,1,12)
+
+
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L5R02.dec"/>
+
+#RimFunctionCode=A,1,S
+#RimYYY=A,3,S
+#RimMM=A,2,S
+
+#RimL5r02=X,1,S
+C(4,#YYY,S,$)
+C(4,#MM,S,$)
+T(2,@RimYYY,#YYY)
+T(2,@RimMM,#MM)
+T(2,@RimFunctionCode,#CHAIN_FuncCode)
+RESET_RIM(#RimL5r02,L5R02)
+S(L5R02,1,#RimYYY,#RimMM,#RimFunctionCode)
+R(1,L5R02)
+
+#L5r02=X,1,S
+C(3,#FunctionCode,1,s,$)
+##loop {times:4,i:1}
+T(2,@ExportDate{i},#L5r02ExportDate{i})
+T(2,@ApprAcDate{i},#L5r02ApprAcDate{i})
+T(2,@BringUpDate{i},#L5r02BringUpDate{i})
+T(2,@ExportMark{i},#L5r02ExportMark{i})
+T(2,@ApprAcMark{i},#L5r02ApprAcMark{i})
+T(2,@BringUpMark{i},#L5r02BringUpMark{i})
+##end
+
+! 調Rim相關 結束
+
+!顯示框線
+#WKTF=A,1,S
+C(2,#FunctionCode,s,E(0,1),E(0,1),s,E(0,0))
+
+##loop{times:4,i:1}
+
+#WKTFM{i}=X,1,S
+T(F,@ExportDate{i},#WKTF)
+T(F,@ApprAcDate{i},#WKTF)
+T(F,@BringUpDate{i},#WKTF)
+
+#ExportMark{i}=A,1,S
+C(3,#ExportMark{i},1,T(F,@ExportDate{i},0)T(F,@ApprAcDate{i},0)T(F,@BringUpDate{i},0),s)
+
+#ApprAcMark{i}=A,1,S
+#BringUpMark{i}=A,1,S
+
+##end
+
+#La!leValue=A,1,S
+T(2,@Lable1,一分)T(2,@SearchYYYMM1,#YYY+/+#MM)
+T(2,@Lable2,二分、調解)
+T(2,@Lable3,更生)
+T(2,@Lable4,清算)
+
+
+
+##loop{times:4,i:1}
+
+#ExportDate{i}=D,7,I
+C(3,#FunctionCode,4,s,$)
+C(3,#L5r02ExportMark{i},1,s,$)
+D(8)
+@
+C(3,#ExportDate{i},0,S,$)
+V(7)A(DATE,0,#ExportDate{i})
+
+#ApprAcDate{i}=D,7,I
+C(3,#FunctionCode,4,s,$)
+C(3,#L5r02ExportMark{i},1,s,$)
+C(3,#ExportDate{i},0,S,$)
+D(8)
+@V(7)
+IF(#ApprAcDate{i}<#ExportDate{i},V(P,傳票日不可小於製檔日),A(DATE,0,#ApprAcDate{i}))
+
+! #ApprAcDateCheck{i}=X,1,S
+
+
+#BringUpDate{i}=D,7,I
+C(3,#FunctionCode,4,s,$)
+C(3,#L5r02ExportMark{i},1,s,$)
+C(3,#ExportDate{i},0,S,$)
+D(8)
+@V(7)
+IF(#BringUpDate{i}<#ApprAcDate{i},V(P,提兌日不可小於傳票日),A(DATE,0,#BringUpDate{i}))
+
+##end
+
+#LOOPCHK=X,1,S
+C(3,#FunctionCode,1,$,s)
+@IF(#ExportDate1==0 && #ExportDate2==0 && #ExportDate3==0 && #ExportDate4==0 ,V(P,新增時不可全部類別都空白),$)
+
+
+#AGAIN=X,1,S
+IF(#FunctionCode==2 ||#FunctionCode==4,$,S)
+E(0,1)ASGN(AGAIN$)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#YYY+#MM)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5704 -----------
+<sub type="FORM" name="L5704">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCode
+#YYY
+#MM
+##loop{times:4,i:1}
+#ExportDate{i}
+#ApprAcDate{i}
+#BringUpDate{i}
+##end
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R02.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5704
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
