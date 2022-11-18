@@ -126,7 +126,7 @@ E(0,0)
 T(3,*)
 
 #FunctionHelp=X,100,S
-T(3,1:上傳及檢核;2:上傳回饋檔並寫入擔保品檔)
+T(3,1:上傳及檢核;2:上傳回饋檔並寫入擔保品檔;3:以系統擔保品資料產生回饋檔)
 
 ! 功能選擇
 #Function=A,1,I
@@ -136,13 +136,26 @@ HELP(#FunctionHelp)
 #FunctionX=X,30,L
 T(H,#Function,#FunctionHelp)
 
-#HideAndShow=A,1,S
-IF(#Function==1,E(0,1),E(0,0))
-INVOKEJS(SHOW,p1,2,7,#HideAndShow)
+#HideAll=A,1,S
+E(0,0)
+INVOKEJS(SHOW,p1,2,8,#HideAll)
+K(MODIFYBUTTON,上傳及檢查)
 
+#Show1=A,1,S
+IF(#Function==1,E(0,1),S)
+INVOKEJS(SHOW,p1,2,8,#Show1)
+
+#Show2=A,1,S
+IF(#Function==2,E(0,1),S)
+INVOKEJS(SHOW,p1,8,8,#Show2)
+
+#Show3=A,1,S
+IF(#Function==3,E(0,1),S)
+INVOKEJS(SHOW,p1,2,5,#Show3)
+K(MODIFYBUTTON,送出)
 
 #ApplNo=A,7,I
-IF(#Function==1,$,S)
+IF(#Function==1||#Function==3,$,S)
 @
 V(2,0)
 
@@ -156,7 +169,7 @@ T(3,L2419)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05=X,1,S
-IF(#Function==1,$,S)
+IF(#Function==1||#Function==3,$,S)
 E(0,@CustNo,0)
 E(0,@FacmNo,0)
 T(3,@CustId,)
@@ -174,7 +187,7 @@ E(0,@FacmNo,#L2r05FacmNo)
 T(2,@CustId,#L2r05CustId)
 
 #SendL2r07D=X,1,S
-IF(#Function==1,$,S)
+IF(#Function==1||#Function==3,$,S)
 C(3,#ApplNo,0,S,$)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimCustNo,0)

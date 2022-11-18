@@ -625,7 +625,7 @@ public class MakeExcel extends CommBuffer {
 				this.openedSheet = this.openedWorkbook.getSheetAt(Integer.valueOf(sheetname.toString()) - 1);
 				sheetname = this.openedSheet.getSheetName();
 			}
-			
+
 		} catch (FileNotFoundException e1) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel)此檔案 (" + fileName + ") 不存在");
 		} catch (IOException e) {
@@ -1109,7 +1109,7 @@ public class MakeExcel extends CommBuffer {
 		}
 		setValueToMap(row, 0, col, 0, val);
 	}
-	
+
 	CellStyle errorColumnStyle = null;
 
 	public void setErrorColumn(int row, int col) throws LogicException {
@@ -1134,7 +1134,7 @@ public class MakeExcel extends CommBuffer {
 	}
 
 	CellStyle defaultColumnStyle = null;
-	
+
 	public void setDefaultColumn(int row, int col) throws LogicException {
 		if (this.openedSheet == null) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel) openedSheet is null");
@@ -1150,12 +1150,12 @@ public class MakeExcel extends CommBuffer {
 
 		if (prow != null) {
 			Cell tmpCell = prow.getCell(col - 1);
-			tmpCell.setCellStyle(defaultColumnStyle);
-		} else {
-			throw new LogicException(titaVo, "E0013", "(MakeExcel) setDefaultColumn error = " + row + "/" + col);
+			if (tmpCell != null) {
+				tmpCell.setCellStyle(defaultColumnStyle);
+			}
 		}
 	}
-	
+
 	// 2022.3.25 by eric for 配合openExcel變更EXCEL檔
 	public void setValueInt(int row, int col, int val) throws LogicException {
 		if (this.openedSheet == null) {

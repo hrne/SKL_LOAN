@@ -24,6 +24,23 @@ BEGIN
     -- 寫入資料
     INSERT INTO "CdEmp"
     SELECT S2."AGENT_CODE"                 AS "AgentCode"           -- 業務員代號 VARCHAR2 12 
+          ,S2."EMPLOYEE_NO"                AS "EmployeeNo"          -- 電腦編號 VARCHAR2 10 0
+          ,REPLACE(S2."FULLNAME",'○','X')  AS "Fullname"            -- 姓名 VARCHAR2 40 0
+          ,S2."CENTER_SHORT_NAME"          AS "CenterShortName"     -- 單位簡稱 VARCHAR2 10 0
+          ,S2."CENTER_CODE_NAME"           AS "CenterCodeName"      -- 單位名稱 VARCHAR2 20 0
+          ,S2."CENTER_CODE_1"              AS "CenterCode1"         -- 區部代號 VARCHAR2 6 0
+          ,S2."CENTER_CODE_1_SHORT"        AS "CenterCode1Short"  -- 區部簡稱 VARCHAR2 10 0
+          ,S2."CENTER_CODE_1_NAME"         AS "CenterCode1Name"    -- 區部名稱 VARCHAR2 20 0
+          ,S2."CENTER_CODE_2"              AS "CenterCode2"         -- 部室代號 VARCHAR2 6 0
+          ,S2."CENTER_CODE_2_SHORT"
+                                           AS "CenterCode2Short"  -- 部室簡稱 VARCHAR2 10 0
+          ,S2."CENTER_CODE_2_NAME"         AS "CenterCode2Name"    -- 部室名稱 VARCHAR2 20 0
+          ,S2."CENTER_CODE_ACC_1"          AS "CenterCodeAcc1"      -- 區部代號(駐在單位) VARCHAR2 6 0
+          ,S2."CENTER_CODE_ACC_1_NAME"
+                                           AS "CenterCodeAcc1Name" -- 區部名稱(駐在單位) VARCHAR2 20 0
+          ,S2."CENTER_CODE_ACC_2"          AS "CenterCodeAcc2"      -- 部室代號(駐在單位) VARCHAR2 6 0
+          ,S2."CENTER_CODE_ACC_2_NAME"
+                                           AS "CenterCodeAcc2Name" -- 部室名稱(駐在單位) VARCHAR2 20 0
           ,S2."COMM_LINE_CODE"             AS "CommLineCode"        -- 業務線代號 VARCHAR2 2 
           ,S2."COMM_LINE_TYPE"             AS "CommLineType"        -- 業務線別 VARCHAR2 1 
           ,S2."ORIG_INTRODUCER_ID"         AS "OrigIntroducerId"   -- 介紹人 VARCHAR2 12 
@@ -114,7 +131,6 @@ BEGIN
           ,S2."AG_DEGREE"                  AS "AgDegree"            -- 業務人員職級 VARCHAR2 2 0
           ,S2."COLLECT_IND"                AS "CollectInd"          -- 收費員指示碼 VARCHAR2 1 0
           ,S2."AG_TYPE_1"                  AS "AgType1"             -- 制度別 VARCHAR2 1 0
-          ,S2."EMPLOYEE_NO"                AS "EmployeeNo"          -- 電腦編號 VARCHAR2 10 0
           ,S2."CONTRACT_IND"               AS "ContractInd"         -- 單雙合約碼 VARCHAR2 1 0
           ,S2."CONTRACT_IND_YM"            AS "ContractIndYM"       -- 單雙合約異動工作月 VARCHAR2 7 0
           ,S2."AG_TYPE_2"                  AS "AgType2"             -- 身份別 VARCHAR2 1 0
@@ -159,7 +175,6 @@ BEGIN
           ,S2."BATCH_NO"                   AS "BatchNo"             -- 批次號碼 NUMBER 10 0
           ,S2."EVALUE_YM"                  AS "EvalueYM"            -- 考核年月 VARCHAR2 7 0
           ,S2."AG_TRANSFER_CODE"           AS "AgTransferCode"      -- 轉檔碼 VARCHAR2 2 0
-          ,REPLACE(S2."FULLNAME",'○','X')  AS "Fullname"            -- 姓名 VARCHAR2 40 0
           ,NVL(SUBSTR(S2."BIRTH",0,4)
                ||LPAD(SUBSTR(S2."BIRTH",6,INSTR(SUBSTR(S2."BIRTH",6),'/')-1),2,'0')
                ||LPAD(SUBSTR(S2."BIRTH",INSTR(SUBSTR(S2."BIRTH",6),'/')+6),2,'0')
@@ -174,21 +189,6 @@ BEGIN
                ||LPAD(SUBSTR(S2."QUIT_DATE",6,INSTR(SUBSTR(S2."QUIT_DATE",6),'/')-1),2,'0')
                ||LPAD(SUBSTR(S2."QUIT_DATE",INSTR(SUBSTR(S2."QUIT_DATE",6),'/')+6),2,'0')
               ,0)                          AS "QuitDate"            -- 離職/停約日 decimalD 8 0
-          ,S2."CENTER_SHORT_NAME"          AS "CenterShortName"     -- 單位簡稱 VARCHAR2 10 0
-          ,S2."CENTER_CODE_NAME"           AS "CenterCodeName"      -- 單位名稱 VARCHAR2 20 0
-          ,S2."CENTER_CODE_1"              AS "CenterCode1"         -- 區部代號 VARCHAR2 6 0
-          ,S2."CENTER_CODE_1_SHORT"        AS "CenterCode1Short"  -- 區部簡稱 VARCHAR2 10 0
-          ,S2."CENTER_CODE_1_NAME"         AS "CenterCode1Name"    -- 區部名稱 VARCHAR2 20 0
-          ,S2."CENTER_CODE_2"              AS "CenterCode2"         -- 部室代號 VARCHAR2 6 0
-          ,S2."CENTER_CODE_2_SHORT"
-                                           AS "CenterCode2Short"  -- 部室簡稱 VARCHAR2 10 0
-          ,S2."CENTER_CODE_2_NAME"         AS "CenterCode2Name"    -- 部室名稱 VARCHAR2 20 0
-          ,S2."CENTER_CODE_ACC_1"          AS "CenterCodeAcc1"      -- 區部代號(駐在單位) VARCHAR2 6 0
-          ,S2."CENTER_CODE_ACC_1_NAME"
-                                           AS "CenterCodeAcc1Name" -- 區部名稱(駐在單位) VARCHAR2 20 0
-          ,S2."CENTER_CODE_ACC_2"          AS "CenterCodeAcc2"      -- 部室代號(駐在單位) VARCHAR2 6 0
-          ,S2."CENTER_CODE_ACC_2_NAME"
-                                           AS "CenterCodeAcc2Name" -- 部室名稱(駐在單位) VARCHAR2 20 0
           ,S2."AG_POST"                    AS "AgPost"              -- 職務 VARCHAR2 2 0
           ,S2."LEVEL_NAME_CHS"             AS "LevelNameChs"        -- 職等中文 VARCHAR2 10 0
           ,S2."LR_SYSTEM_TYPE"             AS "LrSystemType"        -- 勞退碼 VARCHAR2 1 0
@@ -269,11 +269,11 @@ BEGIN
                                             ,NVL(TO_NUMBER(TO_CHAR("LEVEL_DATE",'YYYYMMDD')),0) DESC
                                             ,"AGENT_CODE" DESC
                                             ) AS "Seq"
-          FROM "StgCdEmp"
+          FROM TPSAS047
           WHERE NVL("EMPLOYEE_NO",' ') <> ' '    -- 電腦編號
          ) S1
-    LEFT JOIN "StgCdEmp" S2 ON S2."EMPLOYEE_NO" = S1."EMPLOYEE_NO"
-                           AND S2."AGENT_CODE" = S1."AGENT_CODE"
+    LEFT JOIN TPSAS047 S2 ON S2."EMPLOYEE_NO" = S1."EMPLOYEE_NO"
+                         AND S2."AGENT_CODE" = S1."AGENT_CODE"
     WHERE S1."Seq" = 1
       AND NVL(S2."AGENT_CODE",' ') <> ' ' -- 業務員代號
     ;
