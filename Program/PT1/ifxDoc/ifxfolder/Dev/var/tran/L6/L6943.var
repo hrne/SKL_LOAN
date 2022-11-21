@@ -48,6 +48,7 @@ T(3,0: ;1:主管;3:經辦)
 ["#Fd+使用單位",#BrNo,#BrNoX],
 ["#Fd+使用者",#TlrNo],
 ["#Fd+交易代號",#TranNo],
+["#Fd+權限群組",#AuthNo],
 ]
 !---------- AP Button AREA ----------
 
@@ -94,8 +95,12 @@ C(4,#BrNo,$,S)
 
 #RPTFG=A,1,S
 
+#AuthNo=X,6,I
+
 #TXMT=A,1,S
 C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+
 
 </sub>
 
@@ -138,6 +143,7 @@ T(3,1)ASGN(LOOP$)
 #BrNo
 #TlrNo
 #TranNo
+#AuthNo
 #END
 </sub>
 

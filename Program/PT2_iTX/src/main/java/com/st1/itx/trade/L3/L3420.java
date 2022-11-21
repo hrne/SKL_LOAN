@@ -437,8 +437,10 @@ public class L3420 extends TradeBuffer {
 		FacCloseRoutine();
 
 		// 更新疑似洗錢交易訪談記錄檔
-		loanCom.updateMlaundryRecord(iCustNo, iFacmNo, iBormNo, iEntryDate, iTxAmt, titaVo);
-
+		if (iRpCode == 1 || iRpCode == 2 || iRpCode == 4) {// 還款來源限1.匯款轉帳,2.銀扣,4.支票
+			loanCom.updateMlaundryRecord(iCustNo, 0, 0, iEntryDate, iTxAmt, titaVo);
+		}
+		
 		// 帳務處理
 		if (iCaseCloseCode < 9) {
 			acRepayCom.setTxBuffer(this.txBuffer);

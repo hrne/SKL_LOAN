@@ -27,6 +27,7 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
+import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
@@ -449,8 +450,8 @@ public class L3200 extends TradeBuffer {
 		}
 
 		// 更新疑似洗錢交易訪談記錄檔
-		if (iRepayType == 2) {
-			loanCom.updateMlaundryRecord(iCustNo, iFacmNo, iBormNo, iEntryDate, iTxAmt, titaVo);
+		if (iRpCode == 1 || iRpCode == 2 || iRpCode == 4 ) {//還款來源限1.匯款轉帳,2.銀扣,4.支票
+			loanCom.updateMlaundryRecord(iCustNo, 0, 0, iEntryDate, iTxAmt, titaVo);
 		}
 
 		// Check output

@@ -239,6 +239,9 @@ E(0,1)ASGN(LOOP$)
 #OOCustId=X,10,O
 ! 戶號
 #OOCustNo=X,7,O
+#OOCustNoA=A,7,S
+E(0,#OOCustNo)
+
 ! 案件序號
 #OOCaseSeq=A,3,O
 
@@ -308,6 +311,8 @@ T(2,)
 #OOTitaTlrNo=X,6,S
 ! 交易序號
 #OOTitaTxtNo=X,8,S
+#OOTitaTxtNoA=A,8,S
+E(0,#OOTitaTxtNo)
 
 #OOStatus=X,1,S
 #OONewStatus=X,1,S
@@ -393,7 +398,7 @@ T(2,)
 
 ! 交易序號(顯示用)
 #OOShowTitaTxtNo=X,14,O
-T(2,#OOTitaTlrNo+#OOTitaTxtNo)
+T(2,#OOTitaTlrNo+#OOTitaTxtNoA)
 
 ! 名稱
 #OOBtnSearchValue=X,8,O
@@ -405,7 +410,7 @@ IF(#SearchOption=="11" || #SearchOption=="13" || #SearchOption=="14" || #SearchO
 		,T(2,)
 	)
 )
-
+!取消暫收解入=>L5704直接不顯示按鈕
 #OOBtnSearchValue2=X,8,O
 T(2,暫收解入)
 
@@ -459,7 +464,7 @@ E(0,2)
 !訂正時顯示之欄位
 !參考編號
 #MRKEY=_,_,S
-T(2,#OOCustId)
+T(2,#OOCustNoA+#OOCaseSeq)
 
 ![交易金額]
 #TXAMT=_,_,S
@@ -670,7 +675,7 @@ T(6A,#OOEntryDate+#FinCode+#TxSeq+#CustId+#CustNo+#OOPayAmt+#OOCustName)
 #batch-row-status=X,50,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
+#batch-row-txtno=X,14,O
 
 #ButtonName=x,8,O
 

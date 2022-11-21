@@ -194,7 +194,7 @@ public class L3701 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		this.wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
-
+		loanCom.setTxBuffer(txBuffer);
 		// 取得輸入資料
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));

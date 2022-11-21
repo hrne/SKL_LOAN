@@ -70,10 +70,10 @@ public class L7206 extends TradeBuffer {
 		this.info("active L7206 ");
 		this.totaVo.init(titaVo);
 
-		if(titaVo.getParam("FILENA").trim().length() == 0) {
+		if (titaVo.getParam("FILENA").trim().length() == 0) {
 			throw new LogicException(titaVo, "E0014", "沒有選擇檔案");
 		}
-		
+
 		// 吃檔
 		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
@@ -96,18 +96,15 @@ public class L7206 extends TradeBuffer {
 		this.info("iFunctionCode=" + iFunctionCode);
 		this.info("iFunctionName=" + iFunctionName);
 
-		
 		// 路徑
 		String[] extension = null;
-		if(filename.contains("\\/")) {
+		if (filename.contains("\\/")) {
 			extension = filename.split("\\/");
-		}else if(filename.contains("\\\\")) {
+		} else if (filename.contains("\\\\")) {
 			extension = filename.split("\\\\");
-		}else if(filename.contains("/")) {
+		} else if (filename.contains("/")) {
 			extension = filename.split("/");
 		}
-		
-		
 
 		String tmpNameG[] = extension[extension.length - 1].split("\\.");
 		// 檔案名稱
@@ -116,7 +113,7 @@ public class L7206 extends TradeBuffer {
 		String fileExt = tmpNameG[tmpNameG.length - 1].toLowerCase();
 		this.info("file fileName=" + tmpName);
 		this.info("file fileExt=" + fileExt);
-	
+
 		// 判斷選擇上傳的項目與實際上傳的檔案名稱要相符(避免上傳錯檔案，欄位不符會報錯)
 		if ("T07_2".equals(tmpName.substring(0, 5))
 				&& tmpName.contains("T07_2_") && "T07_2".equals(iFunctionName
@@ -151,7 +148,6 @@ public class L7206 extends TradeBuffer {
 
 				dataLineList = fileCom.intputTxt(filename, "UTF-8");
 				this.info("dataLineList = " + dataLineList);
-
 
 			} catch (IOException e) {
 				this.info("L7206(" + filename + ") : " + e.getMessage());
@@ -420,7 +416,8 @@ public class L7206 extends TradeBuffer {
 
 					occursList.putParam("StaffId", thisColumn[0]);
 					occursList.putParam("StaffName", thisColumn[1]);
-					occursList.putParam("LoanAmount", thisColumn[2]);
+					String tmpLoanAmount = thisColumn[2].length() == 0 ? "0" : thisColumn[2];
+					occursList.putParam("LoanAmount", tmpLoanAmount);
 
 					// 1:人壽利關人負責人名單[T07]
 				} else if (repoNo == 1) {
@@ -435,10 +432,12 @@ public class L7206 extends TradeBuffer {
 					occursList.putParam("RelTitle", thisColumn[col + 7]);
 					occursList.putParam("BusId", thisColumn[col + 8]);
 					occursList.putParam("BusName", thisColumn[col + 9]);
-					occursList.putParam("ShareHoldingRatio", thisColumn[col + 10]);
+					String tmpShareHoldingRatio = thisColumn[col + 10].length() == 0 ? "0" : thisColumn[col + 10];
+					occursList.putParam("ShareHoldingRatio", tmpShareHoldingRatio);
 					occursList.putParam("BusTitle", thisColumn[col + 11]);
 					occursList.putParam("LineAmt", thisColumn[col + 12]);
-					occursList.putParam("LoanBalance", thisColumn[col + 13]);
+					String tmpLoanBalance = thisColumn[col + 13].length() == 0 ? "0" : thisColumn[col + 13];
+					occursList.putParam("LoanBalance", tmpLoanBalance);
 
 					// 2:人壽負利關人職員名單[T07_2]
 				} else if (repoNo == 2) {
@@ -454,7 +453,8 @@ public class L7206 extends TradeBuffer {
 
 					occursList.putParam("EmpId", thisColumn[s + 0]);
 					occursList.putParam("EmpName", thisColumn[s + 1]);
-					occursList.putParam("LoanBalance", thisColumn[s + 12]);
+					String tmpLoanBalance = thisColumn[s + 12].length() == 0 ? "0" : thisColumn[s + 12];
+					occursList.putParam("LoanBalance", tmpLoanBalance);
 
 					// 3:金控利關人名單[T044]
 				} else if (repoNo == 3) {
@@ -464,7 +464,8 @@ public class L7206 extends TradeBuffer {
 					occursList.putParam("Name", thisColumn[2]);
 					occursList.putParam("BusTitle", thisColumn[3]);
 					occursList.putParam("LineAmt", thisColumn[4]);
-					occursList.putParam("LoanBalance", thisColumn[5]);
+					String tmpLoanBalance = thisColumn[5].length() == 0 ? "0" : thisColumn[5];
+					occursList.putParam("LoanBalance", tmpLoanBalance);
 
 				}
 
@@ -704,11 +705,11 @@ public class L7206 extends TradeBuffer {
 	private String converntScientificNotation(String text) {
 		String resText = "";
 		this.info("text before= " + text);
-		if (text.contains("E")) {
+		if (text.contains("E") && text.length() != 10) {
 			BigDecimal decimalFormat = new BigDecimal(text);
 			resText = decimalFormat.toPlainString();
 		} else {
-			resText = text;
+			resText = "";
 		}
 
 		this.info("text after = " + resText);

@@ -318,6 +318,8 @@ E(0,#CaseSeqR)
 
 ! 戶號
 #CustNo=X,7,L
+#CustNoA=A,7,S
+E(0,#CustNo)
 
 #CustName=x,100,L
 
@@ -693,7 +695,7 @@ T(H,#DataType,#DataTypeValue)
 !訂正時顯示之欄位
 !參考編號
 #MRKEY=_,_,S
-T(2,#CustNo+#CaseSeq)
+T(2,#CustNoA+#CaseSeq)
 ![交易金額]
 #TXAMT=_,_,S
 E(0,#TransTxAmt)

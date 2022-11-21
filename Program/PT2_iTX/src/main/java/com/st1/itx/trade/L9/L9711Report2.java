@@ -69,7 +69,7 @@ public class L9711Report2 extends MakeReport {
 
 	}
 
-	public long exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> L9711List) throws LogicException {
+	public long exec(TitaVo titaVo, TxBuffer txbuffer, List<Map<String, String>> L9711List,String nTxCd) throws LogicException {
 
 		this.info("L9711Report2 exec");
 		ENTDY = String.valueOf(Integer.parseInt(titaVo.getParam("ENTDY").toString()));
@@ -84,7 +84,7 @@ public class L9711Report2 extends MakeReport {
 		String pageSize = "A4";
 		String pageOrientation = "P";
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(nTxCd)
 				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
 				.build();
 		this.openForm(titaVo, reportVo);

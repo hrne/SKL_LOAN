@@ -180,6 +180,11 @@ public class L3210 extends TradeBuffer {
 		// 帳務處理
 		AcDetailRoutine();
 
+		// 更新疑似洗錢交易訪談記錄檔
+		if (iRpCode == 1 || iRpCode == 2 || iRpCode == 4) {// 還款來源限1.匯款轉帳,2.銀扣,4.支票
+			loanCom.updateMlaundryRecord(iCustNo, 0, 0, iEntryDate, iTempAmt, titaVo);
+		}
+
 		// 訂正處理
 		if (titaVo.isHcodeErase()) {
 			loanCom.checkEraseCustNoTxSeqNo(iCustNo, titaVo);// 檢查到同戶帳務交易需由最近一筆交易開始訂正
