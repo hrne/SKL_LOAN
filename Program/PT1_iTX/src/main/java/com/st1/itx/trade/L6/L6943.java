@@ -51,8 +51,8 @@ public class L6943 extends TradeBuffer {
 		this.limit = 200;
 
 		List<Map<String, String>> dList = checkAuth.canDoPgms(titaVo.getParam("BrNo"), titaVo.getParam("TlrNo"),
-				titaVo.getParam("TranNo"));
-
+				titaVo.getParam("TranNo"),titaVo.getParam("AuthNo"));
+		
 		if (this.index == 0 && (dList == null || dList.size() == 0)) {
 			throw new LogicException(titaVo, "E0001", "交易權限");
 		}

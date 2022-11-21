@@ -3,8 +3,11 @@ package com.st1.itx.trade.LC;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -15,10 +18,14 @@ import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.JcicZ041;
+import com.st1.itx.db.domain.TxAgent;
+import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.TxAgentService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.eum.ContentName;
@@ -52,6 +59,9 @@ public class LC100 extends TradeBuffer {
 	private CdBranchGroupService sCdBranchGroupService;
 
 	@Autowired
+	private TxAgentService sTxAgentService;
+	
+	@Autowired
 	private Parse parse;
 
 	@SuppressWarnings("unlikely-arg-type")
@@ -60,6 +70,25 @@ public class LC100 extends TradeBuffer {
 		this.info("active LC100 ");
 		this.totaVo.init(titaVo);
 
+		String tTlrNo = titaVo.getTlrNo();
+		Slice<TxAgent> tTxAgent = null;
+		tTxAgent =  sTxAgentService.findByTlrNo(tTlrNo, index, limit, titaVo);
+		this.info("titaVo.getCalTm()    = " + titaVo.getCalTm());
+		int xCalTm = parse.stringToInteger(titaVo.getCalTm());
+		if(tTxAgent != null ) {
+			for(TxAgent iTxAgent : tTxAgent) {
+				this.info("titaVo.getCalDy()   = " + titaVo.getCalDy());//1111121
+				int xCalDy = parse.stringToInteger(titaVo.getCalDy());
+				this.info("xCalDy    = " + xCalDy);
+				this.info("iTxAgent.getBeginDate  = " + iTxAgent.getBeginDate());
+				this.info("iTxAgent.getEndDate()  = " + iTxAgent.getEndDate());
+				if( iTxAgent.getBeginDate() >= xCalDy && xCalDy <= iTxAgent.getEndDate()) {
+					throw new LogicException("EC001", "被代理人不能登入:" + titaVo.getTlrNo());
+				}
+			}
+		}
+		
+		
 		CdEmp tCdEmp = tCdEmpService.findById(titaVo.getTlrNo(), titaVo);
 
 		if (tCdEmp != null) {

@@ -97,7 +97,7 @@ public class L9110Report extends MakeReport {
 			+ " ";
 
 	private String custEntCode = "0";
-
+	private boolean isShareAppl = false;
 	private String thisApplNo;
 
 	private int thisBeginRow = 7;
@@ -362,11 +362,11 @@ public class L9110Report extends MakeReport {
 //					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 //					this.print(0, 135, "鑑估總值 .....");
 //					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
-					this.print(1, 5, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
-					this.print(0, 35, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(1, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
 					this.print(0, 69, "順位 ......... " + tL9110Cl.get("F5"));
-					this.print(0, 105, "鑑估總值 .....");
-					this.print(0, 134, formatAmt(tL9110Cl.get("F17"), 0), "R");
+					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(0, 135, "鑑估總值 .....");
+					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
 //					this.print(0, 35, "前順位金額 ...");
 //					this.print(0, 65, formatAmt(tL9110Cl.get("F6"), 0), "R");
 					this.print(0, 135, "評估淨值 .....");
@@ -563,8 +563,8 @@ public class L9110Report extends MakeReport {
 				achRelId = "";
 				achRelName = "本人";
 			} else if (achRelId == null) {
-				achRelId = "";
-				achRelName = "";
+				achRelId = "無";
+				achRelName = "無";
 			}
 
 			this.print(-6, 153, tL9110.get("F3")); // 核准編號
@@ -630,8 +630,8 @@ public class L9110Report extends MakeReport {
 			} else {
 				this.print(0, 65, formatAmt(parse.stringToBigDecimal(tL9110.get("F23")), 4), "R");
 			}
-			this.print(0, 65, formatAmt(
-					getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))), 4), "R");
+//			this.print(0, 65, formatAmt(
+//					getBaseRate(tL9110.get("F60"), titaVo).add(parse.stringToBigDecimal(tL9110.get("F28"))), 4), "R");
 			this.print(0, 69, "利率調整週期 . " + tL9110.get("F24") + "月");
 			this.print(0, 105, "利率調整不變攤還額 . " + tL9110.get("F25"));
 			this.print(0, 135, "信用評分　.... " + tL9110.get("F26"));
@@ -705,21 +705,17 @@ public class L9110Report extends MakeReport {
 //					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 //					this.print(0, 135, "鑑估總值 .....");
 //					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
-					this.print(1, 5, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
-					this.print(0, 35, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
-					this.print(0, 69, "鑑估總值 .....");
-					this.print(0, 99, formatAmt(tL9110Cl.get("F17"), 0), "R");
-					this.print(0, 105, "順位 ......... " + tL9110Cl.get("F5"));
-					this.print(0, 135, "評估淨值 .....");
-					this.print(0, 165, formatAmt(tL9110Cl.get("F21"), 0), "R");
-//					this.print(0, 35, "前順位金額 ...");
-//					this.print(0, 65, formatAmt(tL9110Cl.get("F6"), 0), "R");
-//					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
-//					this.print(0, 105, "鑑定公司 ..... " + tL9110Cl.get("F8"));
+					this.print(1, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
+					this.print(0, 69, "順位 ......... " + tL9110Cl.get("F5"));
+					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(0, 135, "鑑估總值 .....");
+					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
 					this.print(1, 5, "建物標示備註 . " + tL9110Cl.get("F9"));
 					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
 					this.print(0, 105, "設定金額 ...");
 					this.print(0, 135, formatAmt(tL9110Cl.get("F22"), 0), "R");
+					this.print(0, 135, "評估淨值 .....");
+					this.print(0, 165, formatAmt(tL9110Cl.get("F21"), 0), "R");
 
 					if (listLandQuery != null && !listLandQuery.isEmpty()) {
 						// 列印土地明細
@@ -738,11 +734,7 @@ public class L9110Report extends MakeReport {
 //					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
 					this.print(1, 5, "有價證券代號 . " + tL9110Cl.get("F12")); // F12 股票代號及股票名稱
 
-					if (tL9110Cl.get("F13").isEmpty()) {
-						this.print(0, 35, "質權設定書號 . " + "無"); // F13 質權設定書號
-					} else {
-						this.print(0, 35, "質權設定書號 . " + tL9110Cl.get("F13")); // F13 質權設定書號
-					}
+					this.print(0, 35, "質權設定書號 . " + tL9110Cl.get("F13")); // F13 質權設定書號
 					this.print(0, 69, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
 					this.print(0, 105, "三個月平均價 . ");
 					this.print(0, 135, formatAmt(tL9110Cl.get("F14"), 2), "R"); // F14 三個月平均價
@@ -756,11 +748,7 @@ public class L9110Report extends MakeReport {
 					this.print(0, 100, formatAmt(tL9110Cl.get("F18"), 2) + "%", "R"); // F18 貸放成數
 					this.print(0, 105, "核准額度 ..... ");
 					this.print(0, 135, formatAmt(tL9110Cl.get("F19"), 0), "R"); // F19 核准額度
-					if (tL9110Cl.get("F20").isEmpty()) {
-						this.print(0, 135, "保管條號碼 ... " + "無"); // F20 保管條號碼
-					} else {
-						this.print(0, 135, "保管條號碼 ... " + tL9110Cl.get("F20")); // F20 保管條號碼
-					}
+					this.print(0, 135, "保管條號碼 ... " + tL9110Cl.get("F20")); // F20 保管條號碼
 					printStockDetail(listStockQuery);
 
 					break;
@@ -1001,6 +989,7 @@ public class L9110Report extends MakeReport {
 		print(1, 5, "－－－－－－　－－－－－－－－－－－　－－－－－　－－　－－－－－－－　－－－－－－－　－－－－　－－－－");
 
 		for (Map<String, String> queryCoborrower : listCoborrowerQuery) {
+			isShareAppl = true;
 			print(1, 5, queryCoborrower.get("F0")); // 戶號
 			print(0, 19, queryCoborrower.get("F1")); // 戶名
 			print(0, 43, showRocDate(queryCoborrower.get("F2"), 1)); // 循環動用動支期限
@@ -1274,27 +1263,30 @@ public class L9110Report extends MakeReport {
 						print(0, 40, formatAmt(availableAmt, 0), "R");
 
 						checkSpace(4);
-						/**
-						 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
-						 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
-						 */
-						print(1, 5, "　　　　　　　　　　　　　　　　　　　循環動用");
-						print(1, 5, "戶號　　　　　戶名　　　　　　　　　　動支期限　　幣別　核准額度　　　　已動用額度餘額　目前餘額　　　　循環動用");
-						print(1, 5, "－－－－－－　－－－－－－－－－－－　－－－－－　－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－");
+						if (!isShareAppl) {
+							/**
+							 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
+							 * ------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+							 */
+							print(1, 5, "　　　　　　　　　　　　　　　　　　　循環動用");
+							print(1, 5, "戶號　　　　　戶名　　　　　　　　　　動支期限　　幣別　核准額度　　　　已動用額度餘額　目前餘額　　　　循環動用");
+							print(1, 5, "－－－－－－　－－－－－－－－－－－　－－－－－　－－　－－－－－－－　－－－－－－－　－－－－－－－　－－－－");
 
+						}
 						// 列印過增加i,使得加總資料只印一次
 						i++;
 					}
-
-					// 列印合併額度控管之明細資料
-					print(1, 5, queryShareQuota.get("F5")); // 戶號
-					print(0, 19, queryShareQuota.get("F6")); // 戶名
-					print(0, 43, showRocDate(queryShareQuota.get("F7"), 1)); // 循環動用動支期限
-					print(0, 55, queryShareQuota.get("F8")); // 幣別
-					print(0, 75, formatAmt(queryShareQuota.get("F9"), 0), "R"); // 核准額度
-					print(0, 91, formatAmt(queryShareQuota.get("F10"), 0), "R"); // 已動用額度餘額
-					print(0, 107, formatAmt(queryShareQuota.get("F11"), 0), "R"); // 貸出金額(放款餘額、目前餘額)
-					print(0, 109, queryShareQuota.get("F12")); // 循環動用
+					if (!isShareAppl) {
+						// 列印合併額度控管之明細資料
+						print(1, 5, queryShareQuota.get("F5")); // 戶號
+						print(0, 19, queryShareQuota.get("F6")); // 戶名
+						print(0, 43, showRocDate(queryShareQuota.get("F7"), 1)); // 循環動用動支期限
+						print(0, 55, queryShareQuota.get("F8")); // 幣別
+						print(0, 75, formatAmt(queryShareQuota.get("F9"), 0), "R"); // 核准額度
+						print(0, 91, formatAmt(queryShareQuota.get("F10"), 0), "R"); // 已動用額度餘額
+						print(0, 107, formatAmt(queryShareQuota.get("F11"), 0), "R"); // 貸出金額(放款餘額、目前餘額)
+						print(0, 109, queryShareQuota.get("F12")); // 循環動用
+					}
 				}
 			}
 		}
@@ -1347,5 +1339,12 @@ public class L9110Report extends MakeReport {
 			baseRate = tCdBaseRate.getBaseRate();
 		}
 		return baseRate;
+	}
+
+	private String isNullorEmpty(String text, TitaVo titaVo) {
+		if (text == null || text.trim().isEmpty()) {
+			return "無";
+		}
+		return text;
 	}
 }

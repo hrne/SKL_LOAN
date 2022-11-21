@@ -77,8 +77,9 @@ public class CheckAuthServiceImpl extends ASpringJpaParm implements Initializing
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findCanDoPgms(String brno, String tlrno, String tranno) throws Exception {
+	public List<Map<String, String>> findCanDoPgms(String brno, String tlrno, String tranno , String authNo) throws Exception {
 		this.info("CheckAuthServiceImpl.findCanDoPgms tlrno = " + tlrno);
+		this.info("findCanDoPgms   = " + authNo);
 
 		String sql = "select A.\"BrNo\",E.\"BranchShort\",A.\"TlrNo\",F.\"Fullname\",B.\"AuthNo\",G.\"AuthItem\",C.\"TranNo\",D.\"TranItem\",C.\"AuthFg\",";
 		sql += "case C.\"AuthFg\" when 1 then '限查詢' else '全部' end as \"AuthFgX\",C.\"LastUpdate\",C.\"LastUpdateEmpNo\",H.\"Fullname\" AS \"LastUpdateEmpName\" ";
@@ -101,6 +102,9 @@ public class CheckAuthServiceImpl extends ASpringJpaParm implements Initializing
 		if (!"".equals(tranno)) {
 			sql += "and C.\"TranNo\" = :tranno ";
 		}
+		if(!"".equals(authNo)) {
+			sql += "and G.\"AuthNo\" = :authNo ";
+		}
 
 		sql += "order by A.\"BrNo\",A.\"TlrNo\",C.\"TranNo\",B.\"AuthNo\" ";
 
@@ -119,6 +123,9 @@ public class CheckAuthServiceImpl extends ASpringJpaParm implements Initializing
 		}
 		if (!"".equals(tranno)) {
 			query.setParameter("tranno", tranno);
+		}
+		if(!"".equals(authNo)) {
+			query.setParameter("authNo", authNo);
 		}
 
 		return this.convertToMap(query);
