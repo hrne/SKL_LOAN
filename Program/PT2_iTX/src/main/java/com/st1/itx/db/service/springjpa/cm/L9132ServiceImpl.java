@@ -252,7 +252,7 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WITH detailData AS ( ";
 		sql += "     SELECT AC.\"AcNoCode\" ";
 		sql += "            || CASE ";
-		sql += "                 WHEN TRIM(AC.\"AcSubCode\") != NULL ";
+		sql += "                 WHEN TRIM(AC.\"AcSubCode\") IS NOT NULL ";
 		sql += "                 THEN '-' || AC.\"AcSubCode\" ";
 		sql += "               ELSE '' END           AS \"AcNoCode\" ";
 		sql += "          , CDAC.\"AcNoItem\" ";

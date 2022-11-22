@@ -1626,13 +1626,11 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		}
 
 		// 違約金起算日為到期日且為假日，寬限期間多一個營業日
-		if (wkBreachStartDate == iMaturityDate) {
-			dDateUtil.init();
-			dDateUtil.setDate_2(wkBreachStartDate);
-			if (dDateUtil.isHoliDay()) {
-				iBreachGraceDays++;
-				this.info("違約金起算日為到期日且為假日，寬限期間多一個營業日");
-			}
+		dDateUtil.init();
+		dDateUtil.setDate_2(wkBreachStartDate);
+		if (dDateUtil.isHoliDay()) {
+			iBreachGraceDays++;
+			this.info("違約金起算日為假日，寬限期間多一個營業日");
 		}
 
 		// 計算寬限期間(5個營業日)的日數

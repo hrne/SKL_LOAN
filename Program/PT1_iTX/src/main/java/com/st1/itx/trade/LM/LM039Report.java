@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM039ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -32,12 +33,13 @@ public class LM039Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @throws LogicException 
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
 		List<Map<String, String>> listLM039 = null;
 		try {
-			listLM039 = lM039ServiceImpl.findAll(titaVo, yearMonth);
+			listLM039 = lM039ServiceImpl.findAll(titaVo,yearMonth);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -49,8 +51,26 @@ public class LM039Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM039) throws LogicException {
 		this.info("LM039Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM039", "催收案件明細", "LM039催收案件明細", "LM039催收案件明細.xls", "D9210083");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM039", "催收案件明細", "LM039催收案件明細",
+//				"LM039_底稿_催收案件明細", "D9210083");
+		
+		//LM039
+		String txcd = titaVo.getTxcd();
+		// 檔案名稱
+		String rptItem = "催收案件明細";
+		// 輸出檔名
+		String fileName = "LM039催收案件明細";
+		// 底稿名稱
+		String defaultName = "LM039_底稿_催收案件明細";
+		// 底稿工作表名 
+		String defaultSheetName = "";
 
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(txcd).setRptItem(rptItem).build();
+		
+		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
+		
+		
 		if (listLM039 == null || listLM039.isEmpty()) {
 			makeExcel.setValue(4, 1, "本日無資料");
 		} else {
@@ -64,7 +84,7 @@ public class LM039Report extends MakeReport {
 
 					int col = i + 1;
 
-					String value = tLDVo.get("F" + i);
+					String value = tLDVo.get("F"+i);
 					value = value == null ? "" : value.trim();
 
 					switch (i) {
@@ -117,7 +137,7 @@ public class LM039Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

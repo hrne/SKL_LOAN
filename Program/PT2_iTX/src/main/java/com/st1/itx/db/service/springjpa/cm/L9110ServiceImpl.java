@@ -54,13 +54,14 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , L.\"EvaUnitPrice\"              AS EvaUnitPrice "; // -- 鑑定單價 F7
 		sql += "      , CLI.\"SettingAmt\"              AS SettingAmt "; // -- 設定 F8
 		sql += "      , L.\"BdLocation\"                AS BdLocation "; // -- 門牌地址 F9
-		sql += "      , NVL(SUBSTR(L.\"SellerName\",0,6),' ') ";
+		sql += "      , NVL(SUBSTR(L.\"SellerName\",0,6),'無') ";
 		sql += "                                        AS SellerName "; // -- 賣方姓名 F10
-		sql += "      , NVL(L.\"SellerId\",' ')         AS SellerId "; // -- 賣方ID F11
+		sql += "      , NVL(L.\"SellerId\",'無')         AS SellerId "; // -- 賣方ID F11
 		sql += "      , NVL(L.\"BdSubArea\",0)          AS BdSubArea "; // -- 附屬建物 F12
 		sql += "      , LPAD(L.\"ClCode1\",1,'0')		AS ClCode1 "; // -- F13 擔保品代號1
 		sql += "      , LPAD(L.\"ClCode2\",2,'0')		AS ClCode2 "; // -- F14 擔保品代號2
 		sql += "      , LPAD(L.\"ClNo\",7,'0')			AS ClNo "; // -- F15 擔保品編號
+		sql += "      , CDC1.\\\"Item\\\"				AS ClItem "; // -- F16 擔保品別
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClBuilding\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                           AND L.\"ClCode2\" = CF.\"ClCode2\"";
@@ -115,6 +116,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ) CBPK ON CBPK.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                 AND CBPK.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                 AND CBPK.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'ClCode2' || CF.\"ClCode1\"";
+		sql += "                        AND CDC1.\"Code\"    = LPAD(CF.\"ClCode2\",2,'0')";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
 //		sql += "   AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
 		sql += "   AND NVL(L.\"ClNo\",0) > 0 "; // -- 主要擔保品
@@ -150,7 +153,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS ClNo "; // -- F1 擔保品號碼 原\"押品號碼\"
 		sql += "            , CDC1.\"Item\"            AS ClItem "; // -- F2 擔保品別 原\"押品別\"
 		sql += "            , CLM.\"EvaDate\"          AS EvaDate "; // -- F3 鑑價日期
-		sql += "            , CLI.\"ClaimDate\"        AS OtherDate "; // -- F4 他項存續期限 ???
+		sql += "            , CLI.\"ClaimDate\"        AS OtherDate "; // -- F4 他項存續期限 抓最新一筆
 		sql += "            , CLI.\"SettingSeq\"       AS SettingSeq "; // -- F5 順位 只有不動產會有此欄位
 		sql += "            , CLIRD.\"FirstAmt\"       AS FirstAmt "; // -- F6 前順位金額 只有不動產會有此欄位
 		sql += "            , CITY.\"CityItem\"        AS CityItem "; // -- F7 地區別
@@ -170,14 +173,14 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , CLS.\"StockCode\"";
 		sql += "              || ' '";
 		sql += "              || CDS.\"StockItem\"     AS StockName "; // F12 股票代號及股票名稱
-		sql += "            , CLS.\"PledgeNo\"         AS PledgeNo "; // F13 質權設定書號
+		sql += "            , NVL(CLS.\"PledgeNo\",'無')         AS PledgeNo "; // F13 質權設定書號
 		sql += "            , CLS.\"ThreeMonthAvg\"    AS ThreeMonthAvg ";// F14 三個月平均價
 		sql += "            , CLS.\"YdClosingPrice\"   AS YdClosingPrice "; // F15 前日收盤價
 		sql += "            , CLS.\"EvaUnitPrice\"     AS EvaUnitPrice "; // F16 鑑定單價
 		sql += "            , CLM.\"EvaAmt\"           AS EvaAmt ";// F17 鑑定總價
 		sql += "            , CLS.\"LoanToValue\"      AS LTV "; // F18 貸放成數
 		sql += "            , FAC.\"LineAmt\"          AS LineAmt "; // F19 核准額度
-		sql += "            , CLS.\"CustodyNo\"        AS CustodyNo ";// F20 保管條號碼
+		sql += "            , NVL(CLS.\"CustodyNo\",'無')        AS CustodyNo ";// F20 保管條號碼
 		sql += "            , CLI.\"EvaNetWorth\"      AS EvaNetWorth ";// F21 評估淨值
 		sql += "            , CLI.\"SettingAmt\"       AS SettingAmt ";// F22 設定金額
 		sql += "       FROM \"ClFac\" CF";
@@ -207,8 +210,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     AND CLMOV.\"ClNo\"    = CF.\"ClNo\"";
 		sql += "       LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'EvaCompanyCode'";
 		sql += "                                AND CDC2.\"Code\" = NVL(CLI.\"EvaCompanyCode\",' ')";
+
 		sql += "       WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "         AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
+//		sql += "         AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
 
 		this.info("sql=" + sql);
 		Query query;
@@ -362,19 +366,12 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             FROM \"InsuRenew\" IR ";
 		sql += "             LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'InsuCompany'"; // -- 共用代碼檔(保險公司)
 		sql += "                                      AND CDC1.\"Code\"    = IR.\"InsuCompany\"";
-		sql += "             LEFT JOIN ( ";
-		sql += "             	SELECT DISTINCT";
-		sql += "                       \"CustNo\" ";
-		sql += "             	     , \"FacmNo\" ";
-		sql += "                FROM \"ClFac\" ";
-		sql += "                WHERE \"ApproveNo\" = :applNo ";
-		sql += "             ) tempCF ON tempCF.\"CustNo\" = IR.\"CustNo\" ";
 		sql += "             WHERE NVL(IR.\"NowInsuNo\",' ') != ' ' ";
-		sql += "               AND NVL(tempCF.\"CustNo\",0) != 0 ";
 		sql += "           ) IR ON IR.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "               AND IR.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\" ";
-		sql += " WHERE CF.\"ApproveNo\" = :applNo ";
+		sql += "               AND IR.\"InsuEndDate\"    >= :date ";
+		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
 
 		this.info("sql=" + sql);
@@ -383,6 +380,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
+		int cDate = titaVo.getEntDyI() + 19110000;
+		query.setParameter("date", cDate);
+		this.info("cDate =" + cDate);
 
 		return this.convertToMap(query);
 	}
@@ -415,6 +415,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , LPAD(CF.\"ClCode1\",1,'0')			AS ClCode1 "; // -- F13 擔保品代號1
 		sql += "     , LPAD(CF.\"ClCode2\",2,'0')			AS ClCode2 "; // -- F14 擔保品代號2
 		sql += "     , LPAD(CF.\"ClNo\",7,'0')				AS ClNo "; // -- F15 擔保品編號
+		sql += "     , L.\"LandLocation\"					AS LandLocation "; // -- F16 土地座落
+		sql += "     , CDC1.\"Item\"						AS ClItem "; // -- F17 擔保品別
+
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
@@ -441,6 +444,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                        AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'ClCode2' || CF.\"ClCode1\"";
+		sql += "                        AND CDC1.\"Code\"    = LPAD(CF.\"ClCode2\",2,'0')";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
 //		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
 		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
@@ -509,8 +514,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , FAC.\"RateIncr\"			   AS F28利率加減碼 ";
 		sql += "      , \"Fn_GetCdCode\"('UsageCode',LPAD(FAC.\"UsageCode\", 2, 0)) ";
 		sql += "                                       AS F29用途別 ";
-		sql += "      , FAC.\"RecycleDeadline\"        AS F30循環動用期限 ";
-		sql += "      ,\"Fn_GetEmpName\"(FAC.\"Introducer\",1) ";
+		sql += "      ,FAC.\"RecycleDeadline\"        AS F30循環動用期限 ";
+		sql += "      ,NVL(\"Fn_GetEmpName\"(FAC.\"Introducer\",1),'無') ";
 		sql += "                                       AS F31介紹人姓名 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"IncomeTaxFlag\" = 'Y' ";
@@ -526,9 +531,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , FAC.\"FirstRateAdjFreq\"       AS F36首次調整週期 ";
 		sql += "      , \"Fn_GetCdCode\"('RepayCode', LPAD(FAC.\"RepayCode\", 2, 0)) ";
 		sql += "                                       AS F37繳款方式 ";
-		sql += "      , \"Fn_GetCdCode\"('BankDeductCd',\"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')) ";
+		sql += "      , NVL(\"Fn_GetCdCode\"('BankDeductCd',\"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')),'無') ";
 		sql += "                                       AS F38扣款銀行 ";
-		sql += "      , \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'1')";
+		sql += "      , NVL(\"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'1'),'無') ";
 		sql += "                                       AS F39扣款帳號 ";
 		sql += "      , FAC.\"PayIntFreq\" ";
 		sql += "        || CASE FAC.\"FreqBase\" ";
@@ -546,12 +551,12 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE FAC.\"BreachDescription\" ";
 //		sql += "        ELSE NULL ";
 		sql += "        END                            AS F42違約適用方式 ";
-		sql += "      , \"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0)           AS F43團體戶名 "; // 法人不出
+		sql += "      , NVL(\"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0),'無')           AS F43團體戶名 "; // 法人不出
 		sql += "      , FAC.\"PieceCode\" ";
 		sql += "　　　　　　　　　　　　　　             AS F44計件代碼 ";
-		sql += "      , \"Fn_GetEmpName\"(FAC.\"FireOfficer\",1) ";
+		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"FireOfficer\",1),'無') ";
 		sql += "                                       AS F45火險服務姓名 ";
-		sql += "      , \"Fn_GetEmpName\"(NVL(FAC.\"LoanOfficer\",FC.\"LoanOfficer\"),1) ";
+		sql += "      , NVL(\"Fn_GetEmpName\"(NVL(FAC.\"LoanOfficer\",FC.\"LoanOfficer\"),1),'無') ";
 		sql += "                                       AS F46放款專員 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ApprovedLevel\" = '9' ";
@@ -560,15 +565,15 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        END                            AS F47核決主管 ";
 		sql += "      , PROD.\"ProhibitMonth\"         AS F48限制清償期限 ";
 		sql += "      , FAC.\"AcctFee\"                AS F49帳管費 ";
-		sql += "      , \"Fn_GetEmpName\"(FAC.\"EstimateReview\",1) ";
+		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"EstimateReview\",1),'無') ";
 		sql += "                                       AS F50估價覆核姓名 ";
 		sql += "      , \"Fn_GetCdCode\"('CustTypeCode',FAC.\"CustTypeCode\") ";
 		sql += "                                       AS F51客戶別 ";
-		sql += "      , \"Fn_GetEmpName\"(FAC.\"InvestigateOfficer\",1) ";
+		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"InvestigateOfficer\",1),'無') ";
 		sql += "                                       AS F52徵信姓名 ";
-		sql += "      , \"Fn_GetEmpName\"(FAC.\"CreditOfficer\",1) ";
+		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"CreditOfficer\",1),'無') ";
 		sql += "                                       AS F53授信姓名 ";
-		sql += "      , \"Fn_GetEmpName\"(FAC.\"Coorgnizer\",1) ";
+		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"Coorgnizer\",1),'無') ";
 		sql += "                                       AS F54協辦姓名 ";
 		sql += "      , NVL(LBM.\"LoanBal\",0)         AS F55本戶目前總額 ";
 		sql += "      , \"Fn_GetCdCode\"('RuleCode',FAC.\"RuleCode\") ";
@@ -588,6 +593,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
 		sql += "      , FAC.\"BaseRateCode\"       	   AS F60指標利率代碼 ";
 		sql += "      , FAC.\"LastBormNo\"       	   AS F61最後撥款序號 ";
+		sql += "      , PROD.\"BreachDecreaseMonth\"   AS F62違約金分段月數";
 		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // 客戶資料主檔
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // 額度主檔
@@ -731,7 +737,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND FAC.\"FacmNo\" = S1.\"FacmNo\" ";
 		sql += " LEFT JOIN (SELECT FSL.\"MainApplNo\" ";
 		sql += "                 , FAC.\"CurrencyCode\" AS \"MainCCY\" ";
-		sql += "                 , SUM(FAC.\"LineAmt\") AS \"LineAmtTotal\" ";
+		sql += "                 , MAX(FAC.\"LineAmt\") AS \"LineAmtTotal\" ";
 		sql += "                 , SUM(FAC.\"UtilBal\") AS \"UtilBalTotal\" ";
 		sql += "                 , SUM(FAC.\"UtilAmt\") AS \"UtilAmtTotal\" ";
 		sql += "            FROM \"FacShareLimit\" FSL ";

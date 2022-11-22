@@ -81,12 +81,14 @@ public class L2634ReportE extends MakeReport {
 				if (tFacClose == null) {
 					continue;
 				}
-				if (!(tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26") || tFacClose.getCollectWayCode().equals("27"))) {
+				if (!(tFacClose.getCollectWayCode().equals("21") || tFacClose.getCollectWayCode().equals("26")
+						|| tFacClose.getCollectWayCode().equals("27"))) {
 					continue;
 				}
 				getSelecTotal(custNo, closeNo, lClOtherRights, titaVo);
 
-				Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+				Slice<FacMain> slFacMain = facMainService.facmCustNoRange(tFacClose.getCustNo(), tFacClose.getCustNo(),
+						0, 999, 0, Integer.MAX_VALUE, titaVo);
 				List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 
 				String facms = "";
@@ -123,7 +125,8 @@ public class L2634ReportE extends MakeReport {
 
 	}
 
-	private int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
+	private int getSelecTotal(int custNo, int closeNo, List<ClOtherRights> lClOtherRights, TitaVo titaVo)
+			throws LogicException {
 		int selecTotal = 0;
 		int cnt = 0;
 		for (ClOtherRights t : lClOtherRights) {
@@ -138,7 +141,8 @@ public class L2634ReportE extends MakeReport {
 		return selecTotal;
 	}
 
-	private boolean isFacmNo(int custNo, ClOtherRights tClOtherRights, TitaVo titaVo) throws LogicException {
+	private boolean isFacmNo(int custNo, ClOtherRights tClOtherRights, TitaVo titaVo)
+			throws LogicException {
 		boolean isFacmNo = true;
 //		clFacService.clNoEq(tClOtherRights.getClCode1(), tClOtherRights.getClCode2(), tClOtherRights.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 		return isFacmNo;
