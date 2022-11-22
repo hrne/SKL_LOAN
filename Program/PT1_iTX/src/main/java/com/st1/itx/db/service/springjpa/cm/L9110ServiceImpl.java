@@ -546,10 +546,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F41利率區分 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-//		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
 		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',PROD.\"BreachCode\")) ";
 		sql += "        ELSE FAC.\"BreachDescription\" ";
-//		sql += "        ELSE NULL ";
 		sql += "        END                            AS F42違約適用方式 ";
 		sql += "      , NVL(\"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0),'無')           AS F43團體戶名 "; // 法人不出
 		sql += "      , FAC.\"PieceCode\" ";
@@ -585,10 +583,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        END                            AS F57違約金收取方式 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-//		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
 		sql += "          THEN PROD.\"BreachCode\" ";
 		sql += "        ELSE '' ";
-//		sql += "        ELSE NULL ";
 		sql += "        END                            AS F58違約適用方式 ";
 		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
 		sql += "      , FAC.\"BaseRateCode\"       	   AS F60指標利率代碼 ";

@@ -74,7 +74,8 @@ public class L2R29 extends TradeBuffer {
 		// new PK
 		ClEvaId tClEvaId = new ClEvaId();
 
-		Slice<ClMain> slClMain = sClMainService.findClNo(iRimClCode1, iRimClCode2, iRimClNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClMain> slClMain = sClMainService.findClNo(iRimClCode1, iRimClCode2, iRimClNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		lClMain = slClMain == null ? null : slClMain.getContent();
 
 		if (lClMain == null) {
@@ -82,14 +83,33 @@ public class L2R29 extends TradeBuffer {
 		}
 
 		tClEvaId = new ClEvaId();
-		tClEva = new ClEva();
+		int evaNo = 0;
+		// 回傳最後一筆序號
+		if (iRimEvaNo == 0) {
+			tClEva = new ClEva();
+			tClEva = sClEvaService.ClNoFirst(iRimClCode1, iRimClCode2, iRimClNo, titaVo);
+			if (tClEva != null) {
+				evaNo = tClEva.getEvaNo() + 1;
+			} else {
+				evaNo = 1;
+			}
+		} else {
 
-		tClEvaId.setClCode1(iRimClCode1);
-		tClEvaId.setClCode2(iRimClCode2);
-		tClEvaId.setClNo(iRimClNo);
-		tClEvaId.setEvaNo(iRimEvaNo);
+			tClEva = new ClEva();
+			tClEvaId.setClCode1(iRimClCode1);
+			tClEvaId.setClCode2(iRimClCode2);
+			tClEvaId.setClNo(iRimClNo);
+			tClEvaId.setEvaNo(iRimEvaNo);
+			tClEva = sClEvaService.findById(tClEvaId, titaVo);
+			if (tClEva != null) {
+				if (iFunCd == 3) {
+					evaNo = tClEva.getEvaNo() + 1;
+				} else {
+					evaNo = tClEva.getEvaNo();
+				}
+			}
 
-		tClEva = sClEvaService.findById(tClEvaId, titaVo);
+		}
 
 		if (tClEva == null) {
 			if (iFunCd == 1) {
@@ -102,11 +122,10 @@ public class L2R29 extends TradeBuffer {
 				throw new LogicException("E0001", "擔保品重評資料檔");
 			}
 		}
-
 		this.totaVo.putParam("L2r29ClCode1", tClEva.getClCode1());
 		this.totaVo.putParam("L2r29ClCode2", tClEva.getClCode2());
 		this.totaVo.putParam("L2r29ClNo", tClEva.getClNo());
-		this.totaVo.putParam("L2r29EvaNo", tClEva.getEvaNo());
+		this.totaVo.putParam("L2r29EvaNo", evaNo);
 		this.totaVo.putParam("L2r29EvaDate", tClEva.getEvaDate());
 		this.totaVo.putParam("L2r29EvaAmt", tClEva.getEvaAmt());
 		this.totaVo.putParam("L2r29EvaNetWorth", tClEva.getEvaNetWorth());

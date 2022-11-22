@@ -1010,10 +1010,15 @@ public class TxBatchCom extends TradeBuffer {
 		l3420TitaVo.putParam("ShortPrinPercent", "0"); // 短收本金比率
 		l3420TitaVo.putParam("ShortIntPercent", "0"); // 短收利息比率
 		// 提前清償原因
-		if ("".equals(this.tTempVo.getParam("CloseReasonCode")))
-			l3420TitaVo.putParam("AdvanceCloseCode", "00"); // 00-無
-		else
+		if ("".equals(this.tTempVo.getParam("CloseReasonCode"))) {
+			if (tBatxDetail.getRepayCode() == 2) {
+				l3420TitaVo.putParam("AdvanceCloseCode", "13"); // 13-銀扣到期
+			} else {
+				l3420TitaVo.putParam("AdvanceCloseCode", "00"); // 00-無
+			}
+		} else {
 			l3420TitaVo.putParam("AdvanceCloseCode", this.tTempVo.getParam("CloseReasonCode"));
+		}
 		// 清償違約金
 		if ("".equals(this.tTempVo.getParam("CloseBreachAmt"))) {
 			l3420TitaVo.putParam("CloseBreachAmt", "0");

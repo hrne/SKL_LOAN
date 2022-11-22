@@ -92,11 +92,11 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,F.\"MaturityDate\"                           F21 ";
 		sql += "       ,M.\"AcctCode\"                               F22 ";
 		sql += "       ,F.\"LineAmt\"                                F23 ";
-		sql += "       ,CB.\"TotalFloor\"                            F24 ";
-		sql += "       ,TO_NUMBER(F.\"UsageCode\")                   F25 ";
-		sql += "       ,F.\"ProdNo\"                                 F26 ";
-		sql += "       ,M.\"EntCode\"                                F27 ";
-		sql += "       ,E.\"Fullname\"                               F28 ";
+//		sql += "       ,CB.\"TotalFloor\"                            F24 ";
+		sql += "       ,TO_NUMBER(F.\"UsageCode\")                   F24 ";
+		sql += "       ,F.\"ProdNo\"                                 F25 ";
+		sql += "       ,M.\"EntCode\"                                F26 ";
+		sql += "       ,E.\"Fullname\"                               F27 ";
 		sql += " FROM \"MonthlyFacBal\" M ";
 		sql += " LEFT JOIN \"MonthlyFacBal\" L ON L.\"YearMonth\" = \"Fn_GetLastMonth\"(:entdy) ";
 		sql += "                              AND L.\"CustNo\"    = M.\"CustNo\" ";

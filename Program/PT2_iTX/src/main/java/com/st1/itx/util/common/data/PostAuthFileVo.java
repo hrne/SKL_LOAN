@@ -1,6 +1,9 @@
 package com.st1.itx.util.common.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,11 +53,9 @@ public class PostAuthFileVo extends FileVo {
 				// 設定頁首欄位的擷取位置
 				// 無
 			}
-
 			// 明細
 			if (i >= headerCounts && i <= (LastIndex - footerCounts)) {
 				OccursList occursList = new OccursList();
-
 				// 設定明細欄位的擷取位置
 //				1   OccDataClass    資料別		0-1		X(1)	固定值為1	
 //				2   OccOrgCode  	委託機構代號	1-4		X(3)	大寫英數字	
@@ -169,7 +170,9 @@ public class PostAuthFileVo extends FileVo {
 			}
 		});
 		// 組明細
+		int dataSeq = 0;
 		for (OccursList occursList : occursList) {
+			dataSeq++;
 			// 明細資料的單筆資料的欄位組合
 //			1	資料別		0-1		X(1)	固定值為1	
 //			2	委託機構代號	1-4		X(3)	大寫英數字	
@@ -191,7 +194,7 @@ public class PostAuthFileVo extends FileVo {
 					+ occursList.get("OccNoteA") // 3 保留欄
 					+ occursList.get("OccMediaDate")// 4 媒體產生日期
 					+ occursList.get("OccBatchNo")// 5 批號
-					+ occursList.get("OccDataSeq") // 6 流水號
+					+ parse.IntegerToString(dataSeq, 6) // 6 流水號
 					+ occursList.get("OccApprCode") // 7 申請代號
 					+ occursList.get("OccAcctType") // 8 帳戶別
 					+ occursList.get("OccRepayAcct")// 9 儲金帳號

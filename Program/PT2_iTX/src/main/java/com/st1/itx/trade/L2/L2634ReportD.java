@@ -139,10 +139,7 @@ public class L2634ReportD extends MakeReport {
 				this.info("CollectWayCode =" + tFacClose.getCollectWayCode());
 				if ("21".equals(tFacClose.getCollectWayCode()) || "26".equals(tFacClose.getCollectWayCode())
 						|| "27".equals(tFacClose.getCollectWayCode())) {
-					if (!isLast) {
-						this.info("C newPage");
-						this.newPage();
-					}
+
 				} else {
 					this.info("continue 2");
 					continue;
@@ -242,6 +239,9 @@ public class L2634ReportD extends MakeReport {
 			if (isLast) {
 
 				break;
+			} else {
+				this.info("D newPage");
+				this.newPage();
 			}
 		}
 		this.info("D 結束");

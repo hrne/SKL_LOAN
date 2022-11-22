@@ -115,7 +115,13 @@ public class L4041Report extends MakeReport {
 				print(0, 43, result.get("F3") + " " + result.get("F4"));
 
 				// 授權方式
-				print(0, 62, "紙本");
+				if ("1".equals(result.get("F1"))) {
+					print(0, 62, "紙本申請");
+				} else if ("2".equals(result.get("F1"))) {
+					print(0, 62, "紙本終止");
+				} else {
+					print(0, 62, "紙本");
+				}
 
 				// 授權類別
 				String iAuthCode = result.get("F5");

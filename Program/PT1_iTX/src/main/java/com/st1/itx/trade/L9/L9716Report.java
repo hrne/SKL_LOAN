@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9716ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -55,7 +56,7 @@ public class L9716Report extends MakeReport {
 		exportExcel2(titaVo, lL9716_2);
 
 		makeExcel.close();
-		//makeExcel.toExcel(sno);
+		// makeExcel.toExcel(sno);
 
 		return true;
 
@@ -68,10 +69,24 @@ public class L9716Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
+//				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
-		
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
-				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		// L9716
+		String txcd = TXCD;
+		// 檔案名稱
+		String rptItem = TXName;
+		// 輸出檔名
+		String fileName = TXCD + "_" + TXName;
+		// 底稿名稱
+		String defaultName = TXCD + "_底稿_" + TXName + ".xlsx";
+		// 底稿工作表名
+		String defaultSheetName = SheetName;
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode(txcd)
+				.setRptItem(rptItem).build();
+
+		makeExcel.open(titaVo, reportVo, fileName, defaultName, 1, defaultSheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -105,8 +120,6 @@ public class L9716Report extends MakeReport {
 						}
 						break;
 					}
-
-
 
 				} // for
 

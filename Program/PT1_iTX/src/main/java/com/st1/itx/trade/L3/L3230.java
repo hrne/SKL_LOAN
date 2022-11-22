@@ -37,6 +37,7 @@ import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcNegCom;
+import com.st1.itx.util.common.AcPaymentCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
@@ -312,9 +313,10 @@ public class L3230 extends TradeBuffer {
 			wkCustTempBal = acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 			if ("06".equals(iTempItemCode)) {
 				// 累溢收(暫收貸)
+				wkAcctCode = "TAV";
 				acDetail = new AcDetail();
 				acDetail.setDbCr("C");
-				acDetail.setAcctCode("TAV");
+				acDetail.setAcctCode(wkAcctCode);
 				acDetail.setSumNo("090");
 				acDetail.setTxAmt(baTxCom.getExcessive().subtract(iTempAmt));
 				acDetail.setCustNo(iCustNo);
@@ -345,9 +347,10 @@ public class L3230 extends TradeBuffer {
 								&& ac.getRvBal().compareTo(new BigDecimal(0)) > 0
 								&& wkTempBal.compareTo(new BigDecimal(0)) > 0) {
 							// 借方 暫收及待結轉帳項-擔保放款
+							wkAcctCode = ac.getAcctCode();
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
-							acDetail.setAcctCode(ac.getAcctCode());
+							acDetail.setAcctCode(wkAcctCode);
 							acDetail.setSumNo("090");
 							acDetail.setCurrencyCode(iCurrencyCode);
 							acDetail.setCustNo(iCustNo);
@@ -488,15 +491,16 @@ public class L3230 extends TradeBuffer {
 			lAcDetail.add(acDetail);
 			break;
 		}
+		wkAcctCode = acDetail.getAcctCode();
 		addLoanBorTx06Routine(iRpCustNo, iRpFacmNo, excessive);
 	}
 
 	// 借:暫收可抵繳 貸:利息收入(3200億專案息)
 	private void subsidyInterest() throws LogicException {
-
+		wkAcctCode = "F16";
 		acDetail = new AcDetail();
 		acDetail.setDbCr("C");
-		acDetail.setAcctCode("F16");
+		acDetail.setAcctCode(wkAcctCode);
 		acDetail.setCurrencyCode(iCurrencyCode);
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
@@ -508,9 +512,10 @@ public class L3230 extends TradeBuffer {
 
 	// 貸: 債權協商對應科目
 	private void NegAcDetailRoutine() throws LogicException {
+		wkAcctCode = acNegCom.getAcctCode(iCustNo, titaVo);
 		AcDetail acDetail = new AcDetail();
 		acDetail.setDbCr("C");
-		acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
+		acDetail.setAcctCode(wkAcctCode);
 		acDetail.setCurrencyCode(iCurrencyCode);
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
@@ -724,6 +729,7 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(wkCustTempBal);
 		tLoanBorTx.setOverflow(wkCustTempBal.subtract(iTempAmt));
+		tLoanBorTx.setAcctCode(wkAcctCode);
 		tTempVo.clear();
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
 		tTempVo.putParam("TempItemCode", iTempItemCode);
@@ -768,6 +774,7 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(excessive);
 		tLoanBorTx.setOverflow(excessive.add(iTempAmt));
+		tLoanBorTx.setAcctCode(wkAcctCode);
 
 		tTempVo.clear();
 		// 其他欄位

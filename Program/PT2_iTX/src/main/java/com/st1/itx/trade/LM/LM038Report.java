@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM038ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -37,13 +38,14 @@ public class LM038Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @throws LogicException 
 	 * 
 	 */
-	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
+	public void exec(TitaVo titaVo, int yearMonth)  throws LogicException {
 
 		List<Map<String, String>> LM038List = null;
 		try {
-			LM038List = lM038ServiceImpl.findAll(titaVo, yearMonth);
+			LM038List = lM038ServiceImpl.findAll(titaVo,yearMonth);
 			exportExcel(titaVo, LM038List);
 
 		} catch (Exception e) {
@@ -56,7 +58,26 @@ public class LM038Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("LM038Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM038", "逾期案件明細", "LM038-逾期案件明細", "LM038逾期案件明細.xls", "D9210081");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM038", "逾期案件明細", "LM038-逾期案件明細",
+//				"LM038逾期案件明細.xls", "D9210081");
+		
+		//LM038
+		String txcd = titaVo.getTxcd();
+		// 檔案名稱
+		String rptItem = "逾期案件明細";
+		// 輸出檔名
+		String fileName = "LM038-逾期案件明細";
+		// 底稿名稱
+		String defaultName = "LM038_底稿_逾期案件明細.xls";
+		// 底稿工作表名 
+		String defaultSheetName = "D9210081";
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(txcd).setRptItem(rptItem).build();
+		
+		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
+		
+		
 		if (LDList == null || LDList.isEmpty()) {
 			makeExcel.setValue(4, 1, "本日無資料");
 		} else {
@@ -70,11 +91,11 @@ public class LM038Report extends MakeReport {
 			for (Map<String, String> tLDVo : LDList) {
 
 				int col = 0;
-				for (int i = 0; i <= 28; i++) {
+				for (int i = 0; i <= 27; i++) {
 
 					String value = tLDVo.get("F" + i);
 					BigDecimal bd = null;
-
+					
 					col++;
 					switch (i) {
 					case 5:
@@ -89,7 +110,7 @@ public class LM038Report extends MakeReport {
 						break;
 
 					case 11:
-						bd = getBigDecimal(value);
+						 bd = getBigDecimal(value);
 						total_Principal = total_Principal.add(bd);
 						makeExcel.setValue(row, col, bd, "#,##0");
 						break;
@@ -100,7 +121,7 @@ public class LM038Report extends MakeReport {
 						makeExcel.setValue(row, col, bd, "#,##0");
 						break;
 
-					case 25:
+					case 24:
 						makeExcel.setValue(row, col, value, "R");
 						break;
 					case 20:
@@ -129,7 +150,7 @@ public class LM038Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 
 }

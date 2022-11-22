@@ -118,6 +118,15 @@ public class L2634ReportE extends MakeReport {
 
 				CdEmp cdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
 				this.printCm(8, 7.5, cdEmp.getFullname());
+
+				if (isLast) {
+
+					break;
+				}else {
+					this.info("E newPage");
+					this.newPage(!isLast);
+					
+				}
 			}
 		}
 		this.info("E 結束");

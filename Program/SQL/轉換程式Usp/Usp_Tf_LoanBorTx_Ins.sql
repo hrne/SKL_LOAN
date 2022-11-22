@@ -438,7 +438,7 @@ BEGIN
               END 
            || CASE  
                 --  暫收原因 
-                WHEN LPAD(NVL(TR1."LMSRSN",0),2,'0') != '00' 
+                WHEN TR1.TRXTRN IN ('3036','3037','3082','3083')
                 THEN ',"TempReasonCode":"'  
                      || LPAD(NVL(TR1."LMSRSN",0),2,'0') 
                      || '"' 
@@ -536,49 +536,50 @@ BEGIN
     LEFT JOIN "TmpLMSP" TL ON TL."LMSACN" = TR1."LMSACN" 
                           AND TL."LMSAPN" = TR1."LMSAPN" 
                           AND TL."LMSASQ" = TR1."LMSASQ" 
-    LEFT JOIN (SELECT "LMSACN" 
-                     ,"LMSAPN" 
-                     ,"LMSASQ" 
-                     ,"TRXISD" 
-                     ,NVL(RC."FitRate",LBM."StoreRate") AS "FitRate" -- 適用利率 
-                     ,ROW_NUMBER() OVER (PARTITION BY TX."LMSACN"  
-                                                     ,TX."LMSAPN" 
-                                                     ,TX."LMSASQ" 
-                                                     ,TX."TRXISD" 
-                                         ORDER BY NVL(RC."EffectDate",0) DESC) AS "Seq" 
-               FROM ( 
-                SELECT DISTINCT 
-                      "LMSACN" 
-                     ,"LMSAPN" 
-                     ,"LMSASQ" 
-                     ,"TRXISD" 
-                FROM "LA$TRXP" 
-                WHERE "TRXISD" > 0 
-               ) TX 
-               LEFT JOIN "LoanRateChange" RC ON RC."CustNo" = TX."LMSACN" 
-                                            AND RC."FacmNo" = TX."LMSAPN" 
-                                            AND RC."BormNo" = TX."LMSASQ" 
-                                            AND RC."EffectDate" <= TX."TRXISD" 
-               LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = TX."LMSACN" 
-                                          AND LBM."FacmNo" = TX."LMSAPN" 
-                                          AND LBM."BormNo" = TX."LMSASQ" 
-               WHERE NVL(RC."FitRate",LBM."StoreRate") > 0 
-              ) RC ON RC."LMSACN" = TR1."LMSACN" 
-                  AND RC."LMSAPN" = TR1."LMSAPN" 
-                  AND RC."LMSASQ" = TR1."LMSASQ" 
-                  AND RC."TRXISD" = TR1."TRXISD" 
-                  AND RC."Seq" = 1 
+    LEFT JOIN (
+        SELECT "LMSACN" 
+              ,"LMSAPN" 
+              ,"LMSASQ" 
+              ,"TRXISD" 
+              ,NVL(RC."FitRate",LBM."StoreRate") AS "FitRate" -- 適用利率 
+              ,ROW_NUMBER() OVER (PARTITION BY TX."LMSACN"  
+                                              ,TX."LMSAPN" 
+                                              ,TX."LMSASQ" 
+                                              ,TX."TRXISD" 
+                                  ORDER BY NVL(RC."EffectDate",0) DESC) AS "Seq" 
+        FROM ( 
+            SELECT DISTINCT 
+                  "LMSACN" 
+                 ,"LMSAPN" 
+                 ,"LMSASQ" 
+                 ,"TRXISD" 
+            FROM "LA$TRXP" 
+            WHERE "TRXISD" > 0 
+        ) TX 
+        LEFT JOIN "LoanRateChange" RC ON RC."CustNo" = TX."LMSACN" 
+                                     AND RC."FacmNo" = TX."LMSAPN" 
+                                     AND RC."BormNo" = TX."LMSASQ" 
+                                     AND RC."EffectDate" <= TX."TRXISD" 
+        LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = TX."LMSACN" 
+                                   AND LBM."FacmNo" = TX."LMSAPN" 
+                                   AND LBM."BormNo" = TX."LMSASQ" 
+        WHERE NVL(RC."FitRate",LBM."StoreRate") > 0 
+    ) RC ON RC."LMSACN" = TR1."LMSACN" 
+        AND RC."LMSAPN" = TR1."LMSAPN" 
+        AND RC."LMSASQ" = TR1."LMSASQ" 
+        AND RC."TRXISD" = TR1."TRXISD" 
+        AND RC."Seq" = 1 
     LEFT JOIN ( 
-      SELECT "LMSACN" 
-            ,"LMSAPN1" 
-            ,"LMSASQ1" 
-            ,MAX(CASE 
-                   WHEN "LMSAPN" = "LMSAPN1" THEN 1 
-                 ELSE 0 END) AS "IsSameFac" 
-      FROM "LNACNP" 
-      GROUP BY "LMSACN" 
+        SELECT "LMSACN" 
               ,"LMSAPN1" 
               ,"LMSASQ1" 
+              ,MAX(CASE 
+                     WHEN "LMSAPN" = "LMSAPN1" THEN 1 
+                   ELSE 0 END) AS "IsSameFac" 
+        FROM "LNACNP" 
+        GROUP BY "LMSACN" 
+                ,"LMSAPN1" 
+                ,"LMSASQ1" 
     ) ACN ON ACN."LMSACN" = TR1."LMSACN" 
          AND ACN."LMSAPN1" = TR1."LMSAPN" 
          AND ACN."LMSASQ1" = TR1."LMSASQ" 

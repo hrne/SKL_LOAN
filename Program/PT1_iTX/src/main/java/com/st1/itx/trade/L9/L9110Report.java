@@ -343,12 +343,28 @@ public class L9110Report extends MakeReport {
 			} else if ("999".equals(tL9110.get("F58"))) {
 				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
-				this.print(1, 5, "違約適用方式 . " + isNullorEmpty(tL9110.get("F42"), titaVo));
-			}
-			if (!tL9110.get("F58").isEmpty()) {
-				this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
-				this.print(0, 35, "違約分段月數 . " + tL9110.get("F62") + " 個月");
-//				this.print(0, 35, "違約金收取方式 " + tL9110.get("F57")); 11/11會議決議移除
+				if ("001".equals(tL9110.get("F58")) || "002".equals(tL9110.get("F58"))) {
+					this.info(" 違約是用方式中文 = " + tL9110.get("F42"));
+					String textA = tL9110.get("F42").substring(0, 4);
+					String textB = tL9110.get("F42").substring(4, 8);
+					this.info(" 違約是用方式中文 textA = " + textA);
+					this.info(" 違約是用方式中文 textB = " + textB);
+					if ("002".equals(tL9110.get("F58"))) {
+
+						this.print(1, 5, "違約適用方式 . " + textA + tL9110.get("F62") + textB);
+						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					} else {
+						String BreachDecreaseYY = formatAmt(
+								computeDivide(getBigDecimal(tL9110.get("F62")), new BigDecimal(12), 0), 0);
+						this.print(1, 5, "違約適用方式 . " + textA + BreachDecreaseYY + textB);
+						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					}
+
+				} else {
+					this.print(1, 5, "違約適用方式 . " + isNullorEmpty(tL9110.get("F42"), titaVo));
+					this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					this.print(0, 35, "違約分段月數 . " + tL9110.get("F62") + " 個月");
+				}
 			}
 
 			if (tL9110Cl != null) {
@@ -686,14 +702,30 @@ public class L9110Report extends MakeReport {
 			} else if ("999".equals(tL9110.get("F58"))) {
 				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
-				this.print(1, 5, "違約適用方式 . " + isNullorEmpty(tL9110.get("F42"), titaVo));
+				if ("001".equals(tL9110.get("F58")) || "002".equals(tL9110.get("F58"))) {
+					this.info(" 違約是用方式中文 = " + tL9110.get("F42"));
+					String textA = tL9110.get("F42").substring(0, 4);
+					String textB = tL9110.get("F42").substring(4, 8);
+					this.info(" 違約是用方式中文 textA = " + textA);
+					this.info(" 違約是用方式中文 textB = " + textB);
+					if ("002".equals(tL9110.get("F58"))) {
+
+						this.print(1, 5, "違約適用方式 . " + textA + tL9110.get("F62") +"個"+ textB);
+						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					} else {
+						String BreachDecreaseYY = formatAmt(
+								computeDivide(getBigDecimal(tL9110.get("F62")), new BigDecimal(12), 0), 0);
+						this.print(1, 5, "違約適用方式 . " + textA + BreachDecreaseYY + textB);
+						this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					}
+
+				} else {
+					this.print(1, 5, "違約適用方式 . " + isNullorEmpty(tL9110.get("F42"), titaVo));
+					this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
+					this.print(0, 35, "違約分段月數 . " + tL9110.get("F62") + " 個月");
+				}
 			}
 
-			if (!tL9110.get("F58").isEmpty()) {
-				this.print(1, 5, "綁約期限 ..... " + tL9110.get("F48") + " 個月");
-				this.print(0, 35, "違約分段月數 . " + tL9110.get("F62") + " 個月");
-//				this.print(0, 35, "違約金收取方式 " + tL9110.get("F57")); 11/11會議決議移除
-			}
 			// TODO:擔保品
 			// 4
 			if (tL9110Cl != null) {
@@ -910,9 +942,10 @@ public class L9110Report extends MakeReport {
 	 * 列印建物明細(自然人、法人共用)
 	 *
 	 * @param listBuildingQuery 建物明細查詢結果
-	 * @throws LogicException 
+	 * @throws LogicException
 	 */
-	private void printBuildingDetail(List<Map<String, String>> listBuildingQuery, String lineAmt) throws LogicException {
+	private void printBuildingDetail(List<Map<String, String>> listBuildingQuery, String lineAmt)
+			throws LogicException {
 		// TODO:建物
 
 		/**

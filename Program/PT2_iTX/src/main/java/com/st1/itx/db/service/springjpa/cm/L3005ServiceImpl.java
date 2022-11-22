@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -100,7 +101,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
 		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
 		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
-		sql += "      ,CASE WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'), ' ') IN ('0', '00') THEN 1 ELSE 0 END "; // 債協入帳分開控管
+		sql += "      ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1 ELSE 0 END "; // 債協科目分開控管
 		sql += " 	   ORDER BY \"AcDate\" Desc 											";
 		sql += "               ,\"TitaCalDy\" Desc	                    					";
 		sql += "               ,\"TitaCalTm\"	Desc                    					";

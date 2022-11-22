@@ -120,19 +120,13 @@ public class L2480 extends TradeBuffer {
 		tClEvaId.setClNo(iClNo);
 		tClEvaId.setEvaNo(iEvaNo);
 
-		int newEvaNo = 1;
-		int oEvaNo = iEvaNo;
-		// 抓當前序號 EvaNo desc
-		tClEva = sClEvaService.ClNoFirst(iClCode1, iClCode2, iClNo);
+		// 新增一筆00原始的資料 再新增一筆新的
+		tClEva = sClEvaService.ClNoFirst(iClCode1, iClCode2, iClNo, titaVo);
 
 		// FunCd = 1 新增 3複製
 		if (iFunCd == 1 || iFunCd == 3) {
 
-			if (tClEva != null) { // 新增時，若存在則抓最新的序號+1
-				newEvaNo += tClEva.getEvaNo();
-				oEvaNo = newEvaNo;
-			} else { // 新增一筆00原始的資料 再新增一筆新的
-
+			if (tClEva == null) {
 				sCheckClEva.setOriginalClEva(titaVo, iClNo);
 			} // 新增一筆00原始的資料 再新增一筆新的
 
@@ -140,14 +134,14 @@ public class L2480 extends TradeBuffer {
 			tClEvaId.setClCode1(iClCode1);
 			tClEvaId.setClCode2(iClCode2);
 			tClEvaId.setClNo(iClNo);
-			tClEvaId.setEvaNo(newEvaNo);
+			tClEvaId.setEvaNo(iEvaNo);
 
 			tClEva = new ClEva();
 			tClEva.setClEvaId(tClEvaId);
 			tClEva.setClCode1(iClCode1);
 			tClEva.setClCode2(iClCode2);
 			tClEva.setClNo(iClNo);
-			tClEva.setEvaNo(newEvaNo);
+			tClEva.setEvaNo(iEvaNo);
 			tClEva.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 			tClEva.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
 			tClEva.setEvaNetWorth(parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth")));
@@ -161,7 +155,7 @@ public class L2480 extends TradeBuffer {
 			sCheckClEva.checkAmt(titaVo, iClNo);
 
 			try {
-				sClEvaService.insert(tClEva);
+				sClEvaService.insert(tClEva, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "擔保品重評資料檔");
 			}
@@ -178,7 +172,8 @@ public class L2480 extends TradeBuffer {
 				throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 			}
 
-			shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+			shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue())
+					.divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
 			tClMain.setShareTotal(shareTotal);
 			tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
@@ -190,7 +185,7 @@ public class L2480 extends TradeBuffer {
 				tClMain.setShareTotal(shareTotal);
 			}
 			try {
-				tClMain = sClMainService.update2(tClMain);
+				tClMain = sClMainService.update2(tClMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "擔保品主檔");
 			}
@@ -209,7 +204,7 @@ public class L2480 extends TradeBuffer {
 			tClImm.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
 
 			try {
-				tClImm = sClImmService.update(tClImm);
+				tClImm = sClImmService.update(tClImm, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "擔保品不動產檔");
 			}
@@ -241,7 +236,7 @@ public class L2480 extends TradeBuffer {
 			tClEva1.setOtherReason(titaVo.getParam("EvaReasonX").trim());
 
 			try {
-				tClEva1 = sClEvaService.update2(tClEva1);
+				tClEva1 = sClEvaService.update2(tClEva1, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "擔保品重評資料檔");
 			}
@@ -268,7 +263,8 @@ public class L2480 extends TradeBuffer {
 					throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 				}
 
-				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue())
+						.divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
 				tClMain.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
 				tClMain.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
@@ -281,7 +277,7 @@ public class L2480 extends TradeBuffer {
 				}
 
 				try {
-					tClMain = sClMainService.update2(tClMain);
+					tClMain = sClMainService.update2(tClMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品主檔");
 				}
@@ -298,9 +294,9 @@ public class L2480 extends TradeBuffer {
 				tClImm.setEvaNetWorth(parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth")));
 				// 出租評估淨值
 				tClImm.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
-				;
+
 				try {
-					tClImm = sClImmService.update(tClImm);
+					tClImm = sClImmService.update(tClImm, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產檔");
 				}
@@ -311,15 +307,15 @@ public class L2480 extends TradeBuffer {
 			}
 			// FunCd = 4 刪除
 		} else if (iFunCd == 4) {
-			tClEva = sClEvaService.holdById(tClEvaId);
+			tClEva = sClEvaService.holdById(tClEvaId, titaVo);
 			try {
-				sClEvaService.delete(tClEva);
+				sClEvaService.delete(tClEva, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品重評資料檔");
 			}
 
 			// 抓舊資料update回原先的 最早是抓00
-			tClEva = sClEvaService.ClNoFirst(iClCode1, iClCode2, iClNo);
+			tClEva = sClEvaService.ClNoFirst(iClCode1, iClCode2, iClNo, titaVo);
 
 			if (tClEva == null) { // 沒資料抓正刪除的這一筆資料更新
 
@@ -335,7 +331,8 @@ public class L2480 extends TradeBuffer {
 					throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
 				}
 
-				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue()).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+				shareTotal = parse.stringToBigDecimal(titaVo.getParam("EvaAmt")).multiply(tClImm.getLoanToValue())
+						.divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 
 				// 變更前
 				ClMain beforeClMain = (ClMain) dataLog.clone(tClMain);
@@ -350,7 +347,7 @@ public class L2480 extends TradeBuffer {
 				}
 
 				try {
-					tClMain = sClMainService.update2(tClMain);
+					tClMain = sClMainService.update2(tClMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品主檔");
 				}
@@ -369,7 +366,7 @@ public class L2480 extends TradeBuffer {
 				tClImm.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
 				;
 				try {
-					tClImm = sClImmService.update(tClImm);
+					tClImm = sClImmService.update(tClImm, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產檔");
 				}
@@ -398,7 +395,7 @@ public class L2480 extends TradeBuffer {
 				}
 
 				try {
-					tClMain = sClMainService.update2(tClMain);
+					tClMain = sClMainService.update2(tClMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品主檔");
 				}
@@ -420,7 +417,7 @@ public class L2480 extends TradeBuffer {
 				// 出租評估淨值
 				tClImm.setRentEvaValue(tClEva.getRentEvaValue());
 				try {
-					tClImm = sClImmService.update(tClImm);
+					tClImm = sClImmService.update(tClImm, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產檔");
 				}
@@ -433,7 +430,6 @@ public class L2480 extends TradeBuffer {
 		}
 
 		this.totaVo.putParam("OWarningMsg", wkWarningMsg);
-		this.totaVo.putParam("OEvaNo", oEvaNo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

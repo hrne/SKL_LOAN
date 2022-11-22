@@ -109,6 +109,7 @@ public class L3220 extends TradeBuffer {
 	private BigDecimal wkTempBal;
 	private BigDecimal wkCustTempBal;
 	private BigDecimal wkChequeAmt;
+	private String wkAcctCode;
 	private List<AcDetail> lAcDetail;
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private LoanBorTx tLoanBorTx;
@@ -127,6 +128,7 @@ public class L3220 extends TradeBuffer {
 		this.iCurrencyCode = "";
 		this.wkChequeAmt = new BigDecimal(0);
 		this.wkCustTempBal = new BigDecimal(0);
+		this.wkAcctCode = "";
 		this.iTempAmt = new BigDecimal(0);
 		this.lAcDetail = new ArrayList<AcDetail>();
 	}
@@ -289,6 +291,7 @@ public class L3220 extends TradeBuffer {
 				}
 			}
 		}
+		wkAcctCode = this.lAcDetail.get(0).getAcctCode();
 		if (wkTempBal.compareTo(new BigDecimal(0)) > 0) {
 			throw new LogicException(titaVo, "E3060", "目前客戶之暫收款 = " + wkCustTempBal); // 退還金額大於目前客戶之暫收款
 		}
@@ -481,6 +484,7 @@ public class L3220 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(wkCustTempBal);
 		tLoanBorTx.setOverflow(wkCustTempBal.subtract(iTempAmt));
+		tLoanBorTx.setAcctCode(wkAcctCode);
 		// 其他欄位
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);
