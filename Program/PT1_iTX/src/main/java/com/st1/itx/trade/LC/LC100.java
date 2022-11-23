@@ -1,5 +1,6 @@
 package com.st1.itx.trade.LC;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,14 +76,35 @@ public class LC100 extends TradeBuffer {
 		tTxAgent =  sTxAgentService.findByTlrNo(tTlrNo, index, limit, titaVo);
 		this.info("titaVo.getCalTm()    = " + titaVo.getCalTm());
 		int xCalTm = parse.stringToInteger(titaVo.getCalTm());
+		long time=new Date().getTime();
+		System.out.println(""+time);
+		Date dates=new Date(time);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmm");
+		String times=sdf.format(dates);
+		this.info("times     = " + times);
+//		BigDecimal xtimes = new BigDecimal(times);
+//		this.info("xtimes   = " + xtimes);
+
+		
 		if(tTxAgent != null ) {
 			for(TxAgent iTxAgent : tTxAgent) {
-				this.info("titaVo.getCalDy()   = " + titaVo.getCalDy());//1111121
-				int xCalDy = parse.stringToInteger(titaVo.getCalDy());
-				this.info("xCalDy    = " + xCalDy);
-				this.info("iTxAgent.getBeginDate  = " + iTxAgent.getBeginDate());
-				this.info("iTxAgent.getEndDate()  = " + iTxAgent.getEndDate());
-				if( iTxAgent.getBeginDate() >= xCalDy && xCalDy <= iTxAgent.getEndDate()) {
+		
+				String sTdayY = times.substring(0,4);
+				String sTdayMDHM = times.substring(4,12);
+				String tTtDayY = parse.IntegerToString(parse.stringToInteger(sTdayY)-1911,3);
+				BigDecimal xTday = new BigDecimal(tTtDayY+sTdayMDHM);
+				
+				String sSday = parse.IntegerToString(iTxAgent.getBeginDate(),7);
+				String sTime = parse.IntegerToString(iTxAgent.getBeginTime(),4);
+				BigDecimal xBeginDate = new BigDecimal(sSday.substring(0,3)+sSday.substring(3,7)+sTime);
+
+				String sEday = parse.IntegerToString(iTxAgent.getEndDate(),7);
+				String sETime = parse.IntegerToString(iTxAgent.getEndTime(),4);
+				BigDecimal xEndDate = new BigDecimal(sEday.substring(0,3)+sEday.substring(3,7)+sETime);
+				this.info("xTday   = " + xTday);
+				this.info("xBeginDate = " + xBeginDate);
+				this.info("xEndDate  = " + xEndDate);
+				if( xTday.compareTo(xBeginDate) > -1 && xTday.compareTo(xEndDate) < 1) {
 					throw new LogicException("EC001", "被代理人不能登入:" + titaVo.getTlrNo());
 				}
 			}

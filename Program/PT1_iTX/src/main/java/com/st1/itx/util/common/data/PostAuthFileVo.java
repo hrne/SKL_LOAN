@@ -1,8 +1,6 @@
 package com.st1.itx.util.common.data;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +20,9 @@ public class PostAuthFileVo extends FileVo {
 
 	private static final long serialVersionUID = -5842366114565250478L;
 
+	@Autowired
+	public Parse parse;
+
 	// 設定首筆筆數
 	private final int headerCounts = 0;
 	// 設定尾筆筆數
@@ -35,8 +36,6 @@ public class PostAuthFileVo extends FileVo {
 	 * 
 	 * @param lineList 放入FileCom的intputTxt取得的ArrayList&lt;String&gt;
 	 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public void setValueFromFile(ArrayList<String> lineList) {
@@ -188,13 +187,13 @@ public class PostAuthFileVo extends FileVo {
 //			12	狀況代號		71-73	X(2)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
 //			13	核對註記		73-75	X(1)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
 //			14	保留欄		75-100	X(26)	空白	
-
+			this.info("dataSeq = " + String.format("%06d", dataSeq));
 			String thisLine = "" + occursList.get("OccDataClass") // 1 資料別
 					+ occursList.get("OccOrgCode") // 2 委託機構代號
 					+ occursList.get("OccNoteA") // 3 保留欄
 					+ occursList.get("OccMediaDate")// 4 媒體產生日期
 					+ occursList.get("OccBatchNo")// 5 批號
-					+ parse.IntegerToString(dataSeq, 6) // 6 流水號
+					+ String.format("%06d", dataSeq) // 6 流水號
 					+ occursList.get("OccApprCode") // 7 申請代號
 					+ occursList.get("OccAcctType") // 8 帳戶別
 					+ occursList.get("OccRepayAcct")// 9 儲金帳號

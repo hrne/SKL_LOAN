@@ -52,6 +52,8 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,c.\"EntCode\"                         AS \"EntCode\"   ";
 		sql += " ,d.\"EntryDate\"                       AS \"EntryDate\" ";
 		sql += " ,NVL(x.\"TxAmt\",0)                    AS \"RepayAmt\"  ";
+		sql += " ,d.\"ReconCode\"                       AS \"ReconCode\"  ";
+		sql += " ,JSON_VALUE(x.\"OtherFields\",'$.RepayKindCode') AS \"RepayKindCode\" ";
 		sql += " from \"BatxDetail\" d                                   ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\" ";
 		sql += " left join \"LoanBorTx\" x on x.\"AcDate\" = d.\"AcDate\"        ";
@@ -70,10 +72,10 @@ public class L4702ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      group by \"CustNo\", \"FacmNo\"                    ";
 		sql += " ) l   on l.\"CustNo\" = d.\"CustNo\"                    ";
 		sql += "      and l.\"NextPayIntDate\" <= d.\"EntryDate\"        "; // 有逾期
-		sql += " left join \"CustNotice\" n                              "; // 客戶通知設定檔
+		sql += " left join \"CustNotice\" n                              "; //客戶通知設定檔
 		sql += "        on \"FormNo\" = 'L4702'                          ";
 		sql += "       and n.\"CustNo\" = l.\"CustNo\"                   ";
-		sql += "       and n.\"FacmNo\" = l.\"FacmNo\"                   ";
+		sql += "       and n.\"FacmNo\" = l.\"FacmNo\"                   ";  
 		sql += " where d.\"RepayCode\" = 1                               "; // 01.匯款轉帳
 		sql += "   and d.\"ProcStsCode\" <> 'D'                          ";
 		sql += "   and d.\"RepayType\" = 1                               ";

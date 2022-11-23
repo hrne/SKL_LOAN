@@ -272,6 +272,10 @@ public class L2075 extends TradeBuffer {
 			CdCity tCdCity = cdCityService.findById(tClOtherRights.getCity(), titaVo);
 			if (tCdCity != null) {
 				wkCityItem = tCdCity.getCityItem();
+			} else {
+				CdCode tCdCode = cdCodeService.findById(new CdCodeId("ClOtherRightsCityCd", tClOtherRights.getCity()),
+						titaVo);
+				wkCityItem = tCdCode.getItem();
 			}
 		} else {
 			wkCityItem = tClOtherRights.getOtherCity();

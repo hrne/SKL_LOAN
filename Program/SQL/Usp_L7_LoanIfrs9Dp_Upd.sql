@@ -115,22 +115,30 @@ BEGIN
     INSERT INTO "LoanIfrs9Dp"
     WITH Total AS (
       -- 各戶號放款餘額加總
-      SELECT "DataYM"                 AS "DataYM"
-           , "CustNo"                 AS "CustNo"
-           , SUM("LoanBal")           AS "LoanBalTotal"
-      FROM "JcicMonthlyLoanData"
-      WHERE "DataYM" =  YYYYMM
+      SELECT JM."DataYM"                 AS "DataYM"
+           , JM."CustNo"                 AS "CustNo"
+           , SUM(JM."LoanBal")           AS "LoanBalTotal"
+      FROM "JcicMonthlyLoanData"  JM
+      LEFT JOIN "Work_DP_Data" WK  ON WK."CustNo" = JM."CustNo"
+                                  AND WK."FacmNo" = JM."FacmNo"
+                                  AND WK."BormNo" = JM."BormNo"
+      WHERE JM."DataYM" =  YYYYMM
+        AND WK."CustNo" > 0
       GROUP BY "DataYM"
              , "CustNo"
     )
     , FacTotal AS (
       -- 各額度放款餘額加總
-      SELECT "DataYM"                 AS "DataYM"
-           , "CustNo"                 AS "CustNo"
-           , "FacmNo"                 AS "FacmNo"
-           , SUM("LoanBal")           AS "LoanBalTotal"
-      FROM "JcicMonthlyLoanData"
-      WHERE "DataYM" =  YYYYMM
+      SELECT JM."DataYM"                 AS "DataYM"
+           , JM."CustNo"                 AS "CustNo"
+           , JM."FacmNo"                 AS "FacmNo"
+           , SUM(JM."LoanBal")           AS "LoanBalTotal"
+      FROM "JcicMonthlyLoanData" JM
+      LEFT JOIN "Work_DP_Data" WK  ON WK."CustNo" = JM."CustNo"
+                                  AND WK."FacmNo" = JM."FacmNo"
+                                  AND WK."BormNo" = JM."BormNo"
+      WHERE JM."DataYM" =  YYYYMM
+        AND WK."CustNo" > 0
       GROUP BY "DataYM"
              , "CustNo"
              , "FacmNo"
@@ -182,6 +190,9 @@ BEGIN
            , NVL(L."Fee",0) AS "LawFee"
            , NVL(I."Fee",0) AS "InsuFee"
       FROM "JcicMonthlyLoanData" M
+      LEFT JOIN "Work_DP_Data" WK  ON WK."CustNo" = M."CustNo"
+                                  AND WK."FacmNo" = M."FacmNo"
+                                  AND WK."BormNo" = M."BormNo"
       LEFT JOIN Total T ON T."DataYM" = M."DataYM"
                        AND T."CustNo" = M."CustNo"
       LEFT JOIN FacTotal FT ON FT."DataYM" = M."DataYM"
@@ -853,70 +864,60 @@ BEGIN
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal1"  >  0 
                THEN B."LawFee1" - NVL(O1."OtherLawFee1",0)
              ELSE B."AvgLawFee1"
              END)                               AS "AvgLawFee1"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal2"  >  0 
                THEN B."LawFee2" - NVL(O1."OtherLawFee2",0)
              ELSE B."AvgLawFee2"
              END)                               AS "AvgLawFee2"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal3"  >  0 
                THEN B."LawFee3" - NVL(O1."OtherLawFee3",0)
              ELSE B."AvgLawFee3"
              END)                               AS "AvgLawFee3"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal4"  >  0 
                THEN B."LawFee4" - NVL(O1."OtherLawFee4",0)
              ELSE B."AvgLawFee4"
              END)                               AS "AvgLawFee4"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal5"  >  0 
                THEN B."LawFee5" - NVL(O1."OtherLawFee5",0)
              ELSE B."AvgLawFee5"
              END)                               AS "AvgLawFee5"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal1"  >  0
                THEN B."InsuFee1" - NVL(O2."OtherInsuFee1",0)
              ELSE B."AvgInsuFee1"
              END)                               AS "AvgInsuFee1"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal2"  >  0
                THEN B."InsuFee2" - NVL(O2."OtherInsuFee2",0)
              ELSE B."AvgInsuFee2"
              END)                               AS "AvgInsuFee2"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal3"  >  0
                THEN B."InsuFee3" - NVL(O2."OtherInsuFee3",0)
              ELSE B."AvgInsuFee3"
              END)                               AS "AvgInsuFee3"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal4"  >  0
                THEN B."InsuFee4" - NVL(O2."OtherInsuFee4",0)
              ELSE B."AvgInsuFee4"
              END)                               AS "AvgInsuFee4"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal5"  >  0
                THEN B."InsuFee5" - NVL(O2."OtherInsuFee5",0)
              ELSE B."AvgInsuFee5"
              END)                               AS "AvgInsuFee5"
@@ -1007,11 +1008,9 @@ BEGIN
          , NVL(INT3."IntAmtRcv",0)         AS  "DerY3Int"        -- 個案減損客觀證據發生後第三年應收利息回收金額
          , NVL(INT4."IntAmtRcv",0)         AS  "DerY4Int"        -- 個案減損客觀證據發生後第四年應收利息回收金額
          , NVL(INT5."IntAmtRcv",0)         AS  "DerY5Int"        -- 個案減損客觀證據發生後第五年應收利息回收金額
---         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入 ,2022/11/1待廠商回覆
---                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
---           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
-         , NVL(AF."AvgLawFee1",0) 
-           + NVL(AF."AvgInsuFee1",0)       AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入
+                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
+           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee2",0)
            + NVL(AF."AvgInsuFee2",0)       AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee3",0)

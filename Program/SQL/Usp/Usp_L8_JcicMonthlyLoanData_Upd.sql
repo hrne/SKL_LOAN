@@ -2,7 +2,7 @@ CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L8_JcicMonthlyLoanData_Upd"
 (
 -- 程式功能：維護 JcicMonthlyLoanData 聯徵放款月報資料檔
 -- 執行時機：每月底日終批次(換日前)
--- 執行方式：EXEC "Usp_L8_JcicMonthlyLoanData_Upd"(20210531,'System');
+-- 執行方式：EXEC "Usp_L8_JcicMonthlyLoanData_Upd"(20210531,'999999');
 --
 
     -- 參數
@@ -116,7 +116,7 @@ BEGIN
          , NVL(LM."DrawdownAmt",0)                AS "DrawdownAmt"       -- 撥款金額
          , NVL(M."LoanBalance",0)                 AS "LoanBal"           -- 放款餘額
          , NVL(AC."Principal",0)                  AS "PrevAmt"           -- 本月應收本金
-         , NVL(AC."Interest",0)                   AS "IntAmt"            -- 本月應收利息
+         , NVL(M."IntAmtAcc",0)                   AS "IntAmt"            -- 本月應收利息
          , 0                                      AS "PrevAmtRcv"        -- 本月實收本金   -- 後面才更新值
          , 0                                      AS "IntAmtRcv"         -- 本月實收利息   -- 後面才更新值
          , 0                                      AS "FeeAmtRcv"         -- 本月收取費用   -- 後面才更新值
@@ -234,7 +234,7 @@ BEGIN
                 ) OD2   ON OD2."CustNo"     = M."CustNo"
                        AND OD2."FacmNo"     = M."FacmNo"
                        AND OD2."BormNo"     = M."BormNo"
-      -- 提息明細檔 回收本金,利息
+      -- 提息明細檔 回收本金
       LEFT JOIN ( SELECT "AcLoanInt"."CustNo"                 AS  "CustNo"
                        , "AcLoanInt"."FacmNo"                 AS  "FacmNo"
                        , "AcLoanInt"."BormNo"                 AS  "BormNo"

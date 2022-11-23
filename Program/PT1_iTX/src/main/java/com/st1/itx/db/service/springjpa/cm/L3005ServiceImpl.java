@@ -101,7 +101,9 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ,\"TitaTlrNo\"	        AS	\"TitaTlrNo\"								";
 		sql += "     ,\"TitaTxtNo\"		    AS	\"TitaTxtNo\"								";
 		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
-		sql += "      ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1 ELSE 0 END "; // 債協科目分開控管
+		sql += "       ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1  "; // 債協科目分開控管
+		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6') THEN 1 "; // 債協入帳分開控管
+		sql += "             ELSE 0 END";
 		sql += " 	   ORDER BY \"AcDate\" Desc 											";
 		sql += "               ,\"TitaCalDy\" Desc	                    					";
 		sql += "               ,\"TitaCalTm\"	Desc                    					";
@@ -269,7 +271,9 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   (SELECT																	";
 		sql += "     \"LoanBorTx\".* 					    			                    ";
 		sql += " 	 ,ROW_NUMBER() OVER (Partition By \"CustNo\"             				";
-		sql += "      ,CASE WHEN NVL(JSON_VALUE(\"OtherFields\", '$.TempReasonCode'), ' ') IN ('0', '00') THEN 1 ELSE 0 END "; // 債協入帳分開控管
+		sql += "       ,CASE WHEN \"AcctCode\" IN ('T11','T12','T13','T21','T22','T23') THEN 1  "; // 債協科目分開控管
+		sql += "             WHEN NVL(JSON_VALUE(\"OtherFields\", '$.ReconCode'),' ')  IN ('A6') THEN 1 "; // 債協入帳分開控管
+		sql += "             ELSE 0 END";
 		sql += " 	   ORDER BY \"AcDate\" Desc 											";
 		sql += "               ,\"TitaCalDy\" Desc	                    					";
 		sql += "               ,\"TitaCalTm\"	Desc                    					";

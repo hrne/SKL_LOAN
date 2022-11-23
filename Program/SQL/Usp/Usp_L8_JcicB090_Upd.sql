@@ -114,10 +114,13 @@ BEGIN
                                AND CL."ClCode2"  = F."ClCode2"
                                AND CL."ClNo"     = F."ClNo"
                                AND F."ClCode1" = 2
+          LEFT JOIN "FacCaseAppl" FCA ON FCA."ApplNo" = F."ApproveNo"
+          LEFT JOIN "LoanSynd" LS ON LS."SyndNo" = FCA."SyndNo"
       WHERE  M."DataYM"   =   YYYYMM
         AND  M."FacmNo"   IS  NOT NULL
         AND  F."ClNo"     IS  NOT NULL
         AND  CM."ClStatus" IN '1'  -- 已抵押
+        AND  LS."SyndNo" IS NULL   -- 剔除聯貸案件
       --GROUP BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
       ORDER BY M."CustId", M."FacmNo", F."ClCode1", F."ClCode2", F."ClNo"
     )

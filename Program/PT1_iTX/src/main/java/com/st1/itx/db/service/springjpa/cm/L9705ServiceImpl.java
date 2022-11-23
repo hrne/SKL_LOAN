@@ -64,9 +64,13 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,F.\"RepayCode\"          AS \"RepayCode\" ";
 		sql += "            ,C.\"EntCode\"            AS \"EntCode\"   ";
 		if ("4".equals(condition1)) {
+//			sql += "            ,BATX.\"ReconCode\"             AS \"ReconCode\"   ";
+//			sql += "            ,BATX.\"EntryDate\" - 19110000  AS \"EntryDate\"   ";
+//			sql += "            ,BATX.\"RepayAmt\"              AS \"RepayAmt\"   ";
 			sql += "            ,BATX.\"ReconCode\"             AS \"ReconCode\"   ";
-			sql += "            ,BATX.\"EntryDate\" - 19110000  AS \"EntryDate\"   ";
-			sql += "            ,BATX.\"RepayAmt\"              AS \"RepayAmt\"   ";
+			sql += "            ,LBT.\"EntryDate\" - 19110000  AS \"EntryDate\"   ";
+			sql += "            ,LBT.\"ExtraRepay\"            AS \"RepayAmt\"   ";
+			sql += "            ,LBT.\"RepayKindCode\"         AS \"RepayKindCode\"   ";
 		} else {
 			sql += "            ,'N'            AS \"ReconCode\"   ";
 		}
@@ -111,6 +115,9 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      ,\"BormNo\"                             ";
 			sql += "      ,\"TitaTxtNo\"                          ";
 			sql += "      ,\"TitaTlrNo\"                          ";
+			sql += "      ,\"EntryDate\"                          ";
+			sql += "      ,\"ExtraRepay\"                          ";
+			sql += "      ,JSON_VALUE(\"OtherFields\",'$.RepayKindCode') AS \"RepayKindCode\" ";
 			sql += "      from \"LoanBorTx\"                      ";
 			sql += "      where \"TitaTxCd\" in ('L3200')         ";
 			sql += "        and \"TitaHCode\" = 0                 ";

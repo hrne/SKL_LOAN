@@ -62,7 +62,7 @@ E(0,0)
 ], 
 
 ["#grid#,{id:5,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
-["@放款審查課月報",[#BtnAllShell3,"@全選"],[#BtnExpShell3,"@",#ExpText3]],"",
+["@覆審作業月報",[#BtnAllShell3,"@全選"],[#BtnExpShell3,"@",#ExpText3]],"",
 ],
 
 ["#grid#,{id:6,expand:true,loop:6,row_height:1}","","",

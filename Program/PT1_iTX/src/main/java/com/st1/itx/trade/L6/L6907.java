@@ -144,14 +144,18 @@ public class L6907 extends TradeBuffer {
 			// Y-顯示[明細]按鈕
 			String l6908Flag = "Y";
 			// 未收費用未變動不顯示按鈕
-			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3 && tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
+			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
+					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
+				l6908Flag = "";
+			}
+			if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
+				l6908Flag = "";
+			}
+			if ("0".equals(tAcReceivable.get("TitaTxtNo")) || "999999".equals(tAcReceivable.get("LastUpdateEmpNo"))) {
 				l6908Flag = "";
 			}
 			// 交易序號 = 0不顯示按鈕
 			occursList.putParam("L6908Flag", l6908Flag);
-			if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
-				l6908Flag = "";
-			}
 			// 戶號 OOCustNoX
 			occursList.putParam("OOCustNoX", tAcReceivable.get("CustNo") + '-' + tAcReceivable.get("FacmNo"));
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));

@@ -153,7 +153,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS ClNo "; // -- F1 擔保品號碼 原\"押品號碼\"
 		sql += "            , CDC1.\"Item\"            AS ClItem "; // -- F2 擔保品別 原\"押品別\"
 		sql += "            , CLM.\"EvaDate\"          AS EvaDate "; // -- F3 鑑價日期
-		sql += "            , CLI.\"ClaimDate\"        AS OtherDate "; // -- F4 他項存續期限 抓最新一筆
+		sql += "            , CLI2.\"ClaimDate\"        AS OtherDate "; // -- F4 他項存續期限 抓最新一筆
 		sql += "            , CLI.\"SettingSeq\"       AS SettingSeq "; // -- F5 順位 只有不動產會有此欄位
 		sql += "            , CLIRD.\"FirstAmt\"       AS FirstAmt "; // -- F6 前順位金額 只有不動產會有此欄位
 		sql += "            , CITY.\"CityItem\"        AS CityItem "; // -- F7 地區別
@@ -210,6 +210,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     AND CLMOV.\"ClNo\"    = CF.\"ClNo\"";
 		sql += "       LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'EvaCompanyCode'";
 		sql += "                                AND CDC2.\"Code\" = NVL(CLI.\"EvaCompanyCode\",' ')";
+		sql += "       LEFT JOIN (SELECT MAX(cli.\"ClaimDate\") AS \"ClaimDate\" ,\"ApproveNo\" AS \"ApplNo\" FROM \"ClFac\" cf2"
+				+ "		LEFT JOIN \"ClImm\" cli ON cli.\"ClCode1\" = cf2.\"ClCode1\" AND cli.\"ClCode2\" = cf2.\"ClCode2\" AND cli.\"ClNo\" = cf2.\"ClNo\"  "
+				+ "		WHERE cf2.\"ApproveNo\" = :applNo"
+				+ "		GROUP BY \"ApproveNo\") CLI2  ON CLI2.\"ApplNo\" =  CF.\"ApproveNo\" ";
 
 		sql += "       WHERE CF.\"ApproveNo\" = :applNo";
 //		sql += "         AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品

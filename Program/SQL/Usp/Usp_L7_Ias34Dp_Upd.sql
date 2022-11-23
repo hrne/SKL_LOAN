@@ -84,7 +84,7 @@ BEGIN
         AND TRUNC(NVL(FF."FinishedDate",0) / 100)  >   Last2YearsYM   -- 法拍完成日 >   會計2年前月底日 
         AND M."Status" IN (2 ,5 ,6 ,7 ,8 ,9)    --2:催收戶 5:催收結案戶 6:呆帳戶 7: 部分轉呆戶 8:債權轉讓戶 9:呆帳結案戶
         )
-      --  只取撥款序號第一筆  --  2022/11/1新增
+      --  只取撥款序號第一筆  
     , FF_DATA AS (
       SELECT  "CustNo"                AS "CustNo"            -- 戶號 
             , "FacmNo"                AS "FacmNo"            -- 額度編號 
@@ -137,14 +137,14 @@ BEGIN
              , "FacmNo"
     )
     , CustcountData AS (     
-      --  戶報筆數合計
+      --  同戶號筆數合計
       SELECT  "CustNo" 
             , COUNT(*)                AS "CuCount" --  戶號項下筆數
       FROM   FF_DATA 
       GROUP  BY  "CustNo" 
     )   
     , CustFmcountData AS (     
-      --  戶報額度筆數合計
+      --  同戶號額度筆數合計
       SELECT  "CustNo" 
             , "FacmNo" 
             , COUNT(*)                AS "CuFmCount" --  戶號額度項下筆數
@@ -836,70 +836,60 @@ BEGIN
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal1"  >  0 
                THEN B."LawFee1" - NVL(O1."OtherLawFee1",0)
              ELSE B."AvgLawFee1"
              END)                               AS "AvgLawFee1"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal2"  >  0 
                THEN B."LawFee2" - NVL(O1."OtherLawFee2",0)
              ELSE B."AvgLawFee2"
              END)                               AS "AvgLawFee2"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal3"  >  0 
                THEN B."LawFee3" - NVL(O1."OtherLawFee3",0)
              ELSE B."AvgLawFee3"
              END)                               AS "AvgLawFee3"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal4"  >  0 
                THEN B."LawFee4" - NVL(O1."OtherLawFee4",0)
              ELSE B."AvgLawFee4"
              END)                               AS "AvgLawFee4"
            , SUM(
              CASE
                WHEN B."Seq" = G1."MaxSeq"
---                AND  B."CustTotal5"  >  0 
                THEN B."LawFee5" - NVL(O1."OtherLawFee5",0)
              ELSE B."AvgLawFee5"
              END)                               AS "AvgLawFee5"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal1"  >  0
                THEN B."InsuFee1" - NVL(O2."OtherInsuFee1",0)
              ELSE B."AvgInsuFee1"
              END)                               AS "AvgInsuFee1"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal2"  >  0
                THEN B."InsuFee2" - NVL(O2."OtherInsuFee2",0)
              ELSE B."AvgInsuFee2"
              END)                               AS "AvgInsuFee2"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal3"  >  0
                THEN B."InsuFee3" - NVL(O2."OtherInsuFee3",0)
              ELSE B."AvgInsuFee3"
              END)                               AS "AvgInsuFee3"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal4"  >  0
                THEN B."InsuFee4" - NVL(O2."OtherInsuFee4",0)
              ELSE B."AvgInsuFee4"
              END)                               AS "AvgInsuFee4"
            , SUM(
              CASE
                WHEN B."FacSeq" = G2."MaxSeq"
---                AND  B."FacTotal5"  >  0
                THEN B."InsuFee5" - NVL(O2."OtherInsuFee5",0)
              ELSE B."AvgInsuFee5"
              END)                               AS "AvgInsuFee5"
@@ -1032,11 +1022,9 @@ BEGIN
          , NVL(INT3."IntAmtRcv",0)         AS  "DerY3Int"        -- 個案減損客觀證據發生後第三年應收利息回收金額
          , NVL(INT4."IntAmtRcv",0)         AS  "DerY4Int"        -- 個案減損客觀證據發生後第四年應收利息回收金額
          , NVL(INT5."IntAmtRcv",0)         AS  "DerY5Int"        -- 個案減損客觀證據發生後第五年應收利息回收金額
---         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入 ,2022/11/1待廠商回覆
---                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
---           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
-         , NVL(AF."AvgLawFee1",0) 
-           + NVL(AF."AvgInsuFee1",0)       AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
+         , CASE WHEN TRUNC(M."DerDate" / 100) >=  YYYYMM THEN 0  -- 若發生日與本月底日是同年月則不計入
+                ELSE NVL(AF."AvgLawFee1",0) + NVL(AF."AvgInsuFee1",0)
+           END                             AS  "DerY1Fee"        -- 個案減損客觀證據發生後第一年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee2",0)
            + NVL(AF."AvgInsuFee2",0)       AS  "DerY2Fee"        -- 個案減損客觀證據發生後第二年法拍及火險費用回收金額
          , NVL(AF."AvgLawFee3",0)

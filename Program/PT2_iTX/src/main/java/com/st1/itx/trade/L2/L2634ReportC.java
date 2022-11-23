@@ -173,7 +173,7 @@ public class L2634ReportC extends MakeReport {
 					break;
 				}else {
 					this.info("C newPage");
-					this.newPage(!isLast);
+					this.newPage();
 					
 				}
 			}
