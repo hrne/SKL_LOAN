@@ -708,8 +708,10 @@ public class L7206 extends TradeBuffer {
 		if (text.contains("E") && text.length() != 10) {
 			BigDecimal decimalFormat = new BigDecimal(text);
 			resText = decimalFormat.toPlainString();
-		} else {
-			resText = "";
+		} else if (text.contains("-") || text.length() == 0) {
+			resText = "-";
+		}else {
+			resText = text;
 		}
 
 		this.info("text after = " + resText);

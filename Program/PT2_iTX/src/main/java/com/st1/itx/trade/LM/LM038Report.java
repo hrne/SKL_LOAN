@@ -62,7 +62,7 @@ public class LM038Report extends MakeReport {
 //				"LM038逾期案件明細.xls", "D9210081");
 		
 		//LM038
-		String txcd = titaVo.getTxcd();
+		String txcd = "LM038";
 		// 檔案名稱
 		String rptItem = "逾期案件明細";
 		// 輸出檔名

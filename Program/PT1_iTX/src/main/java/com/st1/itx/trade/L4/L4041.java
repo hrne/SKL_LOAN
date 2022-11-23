@@ -134,7 +134,8 @@ public class L4041 extends TradeBuffer {
 			txtitaVo.putParam("FunctionCode", "3");
 			try {
 				// *** 折返控制相關 ***
-				resultList = l4041ServiceImpl.findAll(nPropDate, this.index, Integer.MAX_VALUE, txtitaVo);
+				resultList = l4041ServiceImpl.findAll(dateUtil.getNowIntegerForBC() + 19110000, this.index,
+						Integer.MAX_VALUE, txtitaVo);
 			} catch (Exception e) {
 				this.error("l4920ServiceImpl findByCondition " + e.getMessage());
 				throw new LogicException("E0013", e.getMessage());
@@ -257,7 +258,9 @@ public class L4041 extends TradeBuffer {
 						} else {
 							acctSeq = FormatUtil.padX("", 2);
 						}
-						occursList.putParam("OccCustNo", FormatUtil.padLeft(acctSeq + FormatUtil.padX(result.get("F7"), 10) + result.get("F3") + FormatUtil.pad9(result.get("F2"), 7), 20));
+						occursList.putParam("OccCustNo",
+								FormatUtil.padLeft(acctSeq + FormatUtil.padX(result.get("F7"), 10) + result.get("F3")
+										+ FormatUtil.pad9(result.get("F2"), 7), 20));
 						occursList.putParam("OccCustId", FormatUtil.padX(result.get("F7"), 10));
 						occursList.putParam("OccStatusCode", FormatUtil.padX("", 2));
 						occursList.putParam("OccCheckInd", FormatUtil.padX("", 1));
@@ -407,7 +410,8 @@ public class L4041 extends TradeBuffer {
 				// 轉換資料格式
 				ArrayList<String> aFile = postAuthFileVo846.toFile();
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權出.txt", 2);
 
 				for (String line : aFile) {
 					makeFile.put(line);
@@ -440,7 +444,8 @@ public class L4041 extends TradeBuffer {
 				// 轉換資料格式
 				ArrayList<String> bFile = postAuthFileVo53N.toFile();
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局授權提出媒體檔53N", "PO$P12P_53N授權出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-郵局授權提出媒體檔53N", "PO$P12P_53N授權出.txt", 2);
 
 				for (String line : bFile) {
 					makeFile.put(line);

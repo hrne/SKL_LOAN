@@ -55,15 +55,15 @@ public class LM039Report extends MakeReport {
 //				"LM039_底稿_催收案件明細", "D9210083");
 		
 		//LM039
-		String txcd = titaVo.getTxcd();
+		String txcd = "LM039";
 		// 檔案名稱
 		String rptItem = "催收案件明細";
 		// 輸出檔名
 		String fileName = "LM039催收案件明細";
 		// 底稿名稱
-		String defaultName = "LM039_底稿_催收案件明細";
+		String defaultName = "LM039_底稿_催收案件明細.xls";
 		// 底稿工作表名 
-		String defaultSheetName = "";
+		String defaultSheetName = "D9210083";
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
 				.setRptCode(txcd).setRptItem(rptItem).build();
