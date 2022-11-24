@@ -70,9 +70,13 @@ public class L2634ReportE extends MakeReport {
 
 		this.setFontSize(12);
 
+		int custNo = 0;
+		int closeNo = 0;
 		for (ClOtherRights t : lClOtherRights) {
-			int custNo = 0;
-			int closeNo = 0;
+			this.setFont(1);
+
+			this.setFontSize(12);
+
 			int selectCnt = 0;
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getReceiveCustNo();
@@ -119,15 +123,16 @@ public class L2634ReportE extends MakeReport {
 				CdEmp cdEmp = cdEmpService.findById(titaVo.getTlrNo(), titaVo);
 				this.printCm(8, 7.5, cdEmp.getFullname());
 
+				this.info("E isLast = " + isLast);
 				if (isLast) {
-
 					break;
 				}else {
 					this.info("E newPage");
-					this.newPage(!isLast);
+					this.newPage(isLast);
 					
 				}
 			}
+
 		}
 		this.info("E 結束");
 		return this.close();

@@ -136,11 +136,13 @@ public class L2634ReportB extends MakeReport {
 		this.setCharSpaces(0);
 		String custId = "";
 		int cnt = 0;
+		int custNo = 0;
+		int closeNo = 0;
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
-			int custNo = 0;
-			int closeNo = 0;
 			int selectCnt = 0;
+			this.info("L2634B測試 ...");
+			this.info("戶號 ... " + custNo + " " + t.getReceiveCustNo());
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 
 				custNo = t.getReceiveCustNo();
@@ -204,15 +206,16 @@ public class L2634ReportB extends MakeReport {
 				this.print(-39, 42, amtChinese + " 元整"); // 設定金額
 
 				this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
+			}
 
-				if (isLast) {
+			this.info("isLast = " + isLast);
+			if (isLast) {
 
-					break;
-				} else {
-					this.info("B newPage");
-					this.newPage(!isLast);
+				break;
+			} else {
+				this.info("B newPage");
+				this.newPage();
 
-				}
 			}
 		}
 

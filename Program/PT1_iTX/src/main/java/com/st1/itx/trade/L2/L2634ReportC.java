@@ -88,7 +88,7 @@ public class L2634ReportC extends MakeReport {
 		this.info("L2634ReportC.printHeader");
 
 //		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
-//		this.print(-3, 55, "抵押權塗銷同意書", "C");
+//		this.print(-3, 55, "簽收回條", "C");
 		this.print(-4, 6, "", "L");
 
 		// 明細起始列(自訂亦必須)
@@ -128,11 +128,13 @@ public class L2634ReportC extends MakeReport {
 		this.setCharSpaces(0);
 		int cnt = 0;
 
+		int custNo = 0;
+		int closeNo = 0;
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
-			int custNo = 0;
-			int closeNo = 0;
 			int selectCnt = 0;
+			this.info("L2634C測試 ...");
+			this.info("戶號 ... " + custNo + " " + t.getReceiveCustNo());
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getReceiveCustNo();
 				closeNo = t.getCloseNo();
@@ -168,14 +170,16 @@ public class L2634ReportC extends MakeReport {
 				this.print(-13, 65, custId); // 統編
 				this.print(-49, 74, tlrName); // 經辦
 
-				if (isLast) {
+			}
 
-					break;
-				}else {
-					this.info("C newPage");
-					this.newPage();
-					
-				}
+			this.info("isLast = " + isLast);
+			if (isLast) {
+
+				break;
+			} else {
+				this.info("C newPage");
+				this.newPage();
+
 			}
 		}
 

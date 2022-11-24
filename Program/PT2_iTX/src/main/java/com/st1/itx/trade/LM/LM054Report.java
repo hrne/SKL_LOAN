@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM054ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -41,6 +42,7 @@ public class LM054Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param monthDate 西元年月底日
+	 * @throws LogicException 
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int monthDate) throws LogicException {
@@ -49,7 +51,24 @@ public class LM054Report extends MakeReport {
 
 		this.info("LM054Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表", "LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
+		
+		//LM054
+		String txcd = "LM054";
+		// 檔案名稱
+		String rptItem = "A041重要放款餘額明細表";
+		// 輸出檔名
+		String fileName = "LM054-A041重要放款餘額明細表";
+		// 底稿名稱
+		String defaultName = "LM054_底稿_A041放款餘額彙總表.xlsx";
+		// 底稿工作表名 
+		String defaultSheetName = "A041重要放款餘額明細表(大額、逾期、催收、國外)";
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(txcd).setRptItem(rptItem).build();
+		
+		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表", "LM054-A041重要放款餘額明細表",
+//				"LM054_底稿_A041放款餘額彙總表.xlsx", "A041重要放款餘額明細表(大額、逾期、催收、國外)");
 		makeExcel.setValue(2, 3, monthDate / 100);
 		try {
 			fnAllList = lM054ServiceImpl.findAll(titaVo, monthDate, "N");
@@ -144,13 +163,17 @@ public class LM054Report extends MakeReport {
 			// 備抵損失總額
 			// 參考報表中公式
 			if (lM054Vo.get("F20").equals("1")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.005"));
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.005")).setScale(0,
+						BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("F20").equals("2")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.02"));
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.02")).setScale(0,
+						BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("F20").equals("3")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.1"));
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.1")).setScale(0,
+						BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("F20").equals("4")) {
-				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.5"));
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.5")).setScale(0,
+						BigDecimal.ROUND_HALF_UP);
 			} else if (lM054Vo.get("F20").equals("5")) {
 				allowanceForLose = new BigDecimal(lM054Vo.get("F11"));
 			}
@@ -180,8 +203,10 @@ public class LM054Report extends MakeReport {
 			if (lM054Vo.get("F23").length() > 1) {
 				mark.add(lM054Vo.get("F23"));
 			}
-			if (tempNo.equals(lM054Vo.get("F0")) || lM054Vo.get("F0").length() != 8) {
-				mark.add("同一擔保品");
+			if ((tempNo.equals(lM054Vo.get("F0")) && lM054Vo.get("F0").length() != 8) ) {
+				if(lM054Vo.get("F0") != null) {
+					mark.add("同一擔保品");
+				}
 			}
 
 			for (int i = 0; i < mark.size(); i++) {
@@ -195,7 +220,8 @@ public class LM054Report extends MakeReport {
 			mark = null;
 
 			// 逾期天數
-			makeExcel.setValue(row, 25, Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
+			makeExcel.setValue(row, 25,
+					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
 
 		}
 

@@ -15,6 +15,7 @@ import com.st1.itx.db.domain.TxAmlLog;
 import com.st1.itx.db.service.TxAmlLogService;
 
 import com.st1.itx.util.common.data.CheckAmlVo;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.common.CheckAml;
 
 @Service("L8100")
@@ -26,7 +27,6 @@ import com.st1.itx.util.common.CheckAml;
  * @version 1.0.0
  */
 public class L8100 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8100.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -34,7 +34,9 @@ public class L8100 extends TradeBuffer {
 
 	@Autowired
 	public CheckAml checkAml;
-
+	@Autowired
+	public DataLog iDataLog;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8100 ");
@@ -80,20 +82,17 @@ public class L8100 extends TradeBuffer {
 			String iConfirmCode = titaVo.getParam("ConfirmCode");
 
 			TxAmlLog tTxAmlLog = txAmlLogService.holdById(iLogNo);
+			
 			if (tTxAmlLog == null) {
 				throw new LogicException("EC001", "TxAmlLog.LogNo:" + iLogNo);
 			}
-			if ("1".equals(iConfirmCode))
+			TxAmlLog oldtxAmlLog = (TxAmlLog)iDataLog.clone(tTxAmlLog);
+			if ("1".equals(iConfirmCode)) {
 				tTxAmlLog.setConfirmStatus("0");
-			else
+			}else
 				tTxAmlLog.setConfirmStatus("2");
 			tTxAmlLog.setConfirmCode(titaVo.get("ConfirmCode"));
 			tTxAmlLog.setConfirmEmpNo(titaVo.get("ConfirmEmpNo"));
-			try {
-				txAmlLogService.update(tTxAmlLog);
-			} catch (DBException e) {
-				throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
-			}
 			checkAmlVo.setLogNo(tTxAmlLog.getLogNo());
 			checkAmlVo.setStatus(tTxAmlLog.getStatus());
 			checkAmlVo.setStatusCode(tTxAmlLog.getStatusCode());
@@ -106,7 +105,14 @@ public class L8100 extends TradeBuffer {
 			checkAmlVo.setConfirmCode(tTxAmlLog.getConfirmCode());
 			checkAmlVo.setConfirmEmpNo(tTxAmlLog.getConfirmEmpNo());
 			checkAmlVo.setConfirmTranCode(tTxAmlLog.getConfirmTranCode());
-
+			try {
+				txAmlLogService.update(tTxAmlLog);
+			} catch (DBException e) {
+				throw new LogicException("EC003", "update TxAmlLog:" + e.getErrorMsg()); // 更新資料
+			}
+			iDataLog.setEnv(titaVo, oldtxAmlLog, tTxAmlLog);
+			iDataLog.exec();
+			
 		} else if ("5".equals(iFunCode)) {
 			checkAmlVo = checkAml.refreshStatus(iLogNo, titaVo);
 		}

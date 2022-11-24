@@ -1046,6 +1046,10 @@ public class TxBatchCom extends TradeBuffer {
 		}
 		int repayCode = parse.stringToInteger(titaVo.getParam("RpCode1"));
 		String rvNo = "" + titaVo.getOrgEntdyI();
+		String reconCode = "";
+		if (titaVo.get("RpAcctCode1") != null) {
+			reconCode = titaVo.getParam("RpAcctCode1");
+		}
 		// 暫收抵繳不處理
 		if (repayCode >= 90 || repayAmt.compareTo(BigDecimal.ZERO) <= 0) {
 			return;
@@ -1091,7 +1095,7 @@ public class TxBatchCom extends TradeBuffer {
 		tBatxDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo1")));
 		tBatxDetail.setRvNo(rvNo);
 		tBatxDetail.setRepayType(repayType);
-		tBatxDetail.setReconCode("");
+		tBatxDetail.setReconCode(reconCode);
 		tBatxDetail.setRepayAcCode("");
 		tBatxDetail.setRepayAmt(repayAmt);
 		tBatxDetail.setAcquiredAmt(BigDecimal.ZERO);

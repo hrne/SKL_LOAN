@@ -315,9 +315,9 @@ public class L2411 extends TradeBuffer {
 					throw new LogicException("E0005", "擔保品主檔" + e.getErrorMsg());
 				}
 
+				tClImm = new ClImm();
 				// 擔保品不動產檔
 				setClImm(titaVo);
-				tClImm = new ClImm();
 				try {
 					sClImmService.insert(tClImm, titaVo);
 				} catch (DBException e) {

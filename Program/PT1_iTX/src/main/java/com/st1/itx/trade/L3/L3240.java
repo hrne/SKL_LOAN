@@ -104,7 +104,8 @@ public class L3240 extends TradeBuffer {
 	private int wkNewBorxNo;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
-	private int wkRepayCode;
+	private int wkRepayCode = 0;
+	private String wkReconCode = "";
 
 	private FacProd tFacProd;
 	private FacMain tFacMain;
@@ -204,10 +205,10 @@ public class L3240 extends TradeBuffer {
 		// 沖正處理
 		repayEraseRoutine();
 
-		 if (iCaseCloseCode == 3 || iCaseCloseCode == 7 || iCaseCloseCode == 8) {
-			 wkTxAmt = BigDecimal.ZERO;
-		 }
-		 
+		if (iCaseCloseCode == 3 || iCaseCloseCode == 7 || iCaseCloseCode == 8) {
+			wkTxAmt = BigDecimal.ZERO;
+		}
+
 		if (wkRepayCode == 0) {
 			if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
 				wkRepayCode = 9; // 其他
@@ -223,13 +224,13 @@ public class L3240 extends TradeBuffer {
 		titaVo.putParam("RpType1", 9);
 		titaVo.putParam("RpCustNo1", iCustNo);
 		titaVo.putParam("RpFacmNo1", 0);
-
+		titaVo.putParam("RpAcctCode1", wkReconCode);
 		// Temp 200
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 3 被沖正
 		// L3200 TxAmt = 300 TempAmt = -200 Loan 500 ==> HCODE = 4 沖正
 		// L3240 TxAmt = 300 TempAmt = 300 Loan 0 ==> HCODE = 0 (入帳金額轉暫收款-冲正產生)
 		// Debit: Loan 500 Credit TAV 500(Tx 300, Temp 200)
-        // 轉催呆金額放LoanBorTx交易金額 
+		// 轉催呆金額放LoanBorTx交易金額
 		// THC 暫收款－沖正
 		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0 && iCaseCloseCode < 3) {
 			acDetail = new AcDetail();
@@ -294,6 +295,7 @@ public class L3240 extends TradeBuffer {
 			wkBorxNo = tx.getBorxNo();
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
+			wkReconCode = tTempVo.getParam("ReconCode");
 			if ("L3410".equals(tx.getTitaTxCd()) || "L3420".equals(tx.getTitaTxCd())) {
 				iCaseCloseCode = this.parse.stringToInteger(tTempVo.getParam("CaseCloseCode"));
 				// 還原催收檔

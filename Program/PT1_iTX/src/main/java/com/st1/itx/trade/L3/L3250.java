@@ -104,7 +104,8 @@ public class L3250 extends TradeBuffer {
 	private String iAcctCode;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
-	private int wkRepayCode;
+	private int wkRepayCode = 0;
+	private String wkReconCode = "";
 
 	// work area
 	private AcDetail acDetail;
@@ -153,6 +154,7 @@ public class L3250 extends TradeBuffer {
 		titaVo.putParam("RpAmt1", wkTxAmt);
 		titaVo.putParam("RpCustNo1", iCustNo);
 		titaVo.putParam("RpFacmNo1", 0);
+		titaVo.putParam("RpAcctCode1", wkReconCode);
 		// 101.匯款轉帳 P03
 		// 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
 		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(titaVo.getOrgEntdyI() + 19110000,
@@ -288,6 +290,9 @@ public class L3250 extends TradeBuffer {
 //				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
 //			}
 			wkRepayCode = tx.getRepayCode();
+			TempVo tTempVo = new TempVo();
+			tTempVo = tTempVo.getVo(tx.getOtherFields());
+			wkReconCode = tTempVo.getParam("ReconCode");
 			// 註記交易內容檔
 			loanCom.setFacmBorTxHcode(tx.getCustNo(), tx.getFacmNo(), tx.getBorxNo(), titaVo);
 			if (tx.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {

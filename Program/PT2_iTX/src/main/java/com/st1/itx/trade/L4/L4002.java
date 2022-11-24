@@ -78,11 +78,11 @@ public class L4002 extends TradeBuffer {
 
 		lBatxHead = sBatxHead == null ? null : sBatxHead.getContent();
 
-		// 未輸入經辦 or 經辦相同 or BS020
+		// 未輸入經辦 or 經辦相同 or BS020 or RESV00
 		if (lBatxHead != null && lBatxHead.size() != 0) {
 			for (BatxHead tBatxHead : lBatxHead) {
 				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo)
-						|| "BS020".equals(tBatxHead.getTitaTxCd())) {
+						|| "BS020".equals(tBatxHead.getTitaTxCd()) || "RESV00".equals(tBatxHead.getBatchNo())) {
 				} else {
 					continue;
 				}

@@ -128,6 +128,8 @@ public class L2634ReportD extends MakeReport {
 		int closeNo = 0;
 		for (ClOtherRights t : lClOtherRights) {
 
+			this.info("L2634D測試 ...");
+			this.info("戶號 ... " + custNo + " " + t.getReceiveCustNo());
 			if (custNo != t.getReceiveCustNo() || closeNo != t.getCloseNo()) {
 				custNo = t.getReceiveCustNo();
 				closeNo = t.getCloseNo();
@@ -236,8 +238,8 @@ public class L2634ReportD extends MakeReport {
 
 			}
 
+			this.info("isLast = " + isLast);
 			if (isLast) {
-
 				break;
 			} else {
 				this.info("D newPage");
