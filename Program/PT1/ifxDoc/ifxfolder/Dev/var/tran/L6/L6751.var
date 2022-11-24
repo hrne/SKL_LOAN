@@ -264,9 +264,16 @@ SHOW(#PieceCode0)
 
 #PieceCode0=X,1,I
 C(2,#FuncCode,$,$,$,$,s,s)
+T(3,@CheckPieceCode0,)
 HELP(#ApHelp,cols:2)
 @T(3,@PieceCodex0,)
 C(4,#PieceCode0,S,V(H,#ApHelp))
+V(4,#CheckPieceCode0,#CheckPieceCode1,#CheckPieceCode2,#CheckPieceCode3,#CheckPieceCode4,#CheckPieceCode5,#CheckPieceCode6,#CheckPieceCode7,#CheckPieceCode8,#CheckPieceCode9,#CheckPieceCode10,#CheckPieceCode11,#CheckPieceCode12,#CheckPieceCode13,#CheckPieceCode14,#CheckPieceCode15,#CheckPieceCode16,#CheckPieceCode17,#CheckPieceCode18,#CheckPieceCode19)
+
+#CheckPieceCode0=X,1,S
+
+#WKI=X,1,S
+T(2,@CheckPieceCode0,#PieceCode0)
 
 #PieceCodex0=X,10,L
 C(4,#PieceCode0,S,$)
@@ -277,11 +284,13 @@ T(H,#PieceCode0,#ApHelp)
 #PieceCode{i}=X,1,I
 C(4,#PieceCode{j},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
 C(4,#PieceCode{j},S,$)
+T(3,@CheckPieceCode{i},)
 C(2,#FuncCode,$,$,$,$,s,s)
 HELP(#ApHelp,cols:2)
 @T(3,@PieceCodex{i},)
 C(4,#PieceCode{i},S,V(H,#ApHelp))
 C(4,#PieceCode{i},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
+V(4,#CheckPieceCode0,#CheckPieceCode1,#CheckPieceCode2,#CheckPieceCode3,#CheckPieceCode4,#CheckPieceCode5,#CheckPieceCode6,#CheckPieceCode7,#CheckPieceCode8,#CheckPieceCode9,#CheckPieceCode10,#CheckPieceCode11,#CheckPieceCode12,#CheckPieceCode13,#CheckPieceCode14,#CheckPieceCode15,#CheckPieceCode16,#CheckPieceCode17,#CheckPieceCode18,#CheckPieceCode19)
    
 #PieceCodex{i}=X,10,L
 C(4,#PieceCode{j},HIDE(#PieceCodex{i}),SHOW(#PieceCodex{i}))
@@ -292,6 +301,9 @@ T(H,#PieceCode{i},#ApHelp)
 C(4,#PieceCode{i},HIDE(#PieceCode{i}),SHOW(#PieceCode{i}))
 C(4,#PieceCode{i},HIDE(#PieceCodex{i}),SHOW(#PieceCodex{i}))
 
+#CheckPieceCode{i}=X,1,S
+#WKI{i}=X,1,S
+T(2,@CheckPieceCode{i},#PieceCode{i})
 ##end
 
 
@@ -325,21 +337,21 @@ C(3,#AmtStartRange0,0,s,INVOKEJS(SHOW,grd1,4,4,1))
 
 !獎金發放標準檢核
 
-#ChkBonusX1=X,1,S
-IF(#AmtStartRange0>=600000 && #AmtEndRange0<=2999999,$,S)
-C(3,#Bonus0,200,$,V(P,60萬含以上未達300萬，核發獎金津貼200元，獎勵津貼輸入錯誤))
+! #ChkBonusX1=X,1,S
+! IF(#AmtStartRange0>=600000 && #AmtEndRange0<=2999999,$,S)
+! C(3,#Bonus0,200,$,V(P,60萬含以上未達300萬，核發獎金津貼200元，獎勵津貼輸入錯誤))
 
-#ChkBonusX2=X,1,S
-IF(#AmtStartRange0>=3000000 &&	#AmtEndRange0<=5999999,$,S)
-C(3,#Bonus0,500,$,V(P,300萬含以上未達600萬，核發獎金津貼500元，獎勵津貼輸入錯誤))
+! #ChkBonusX2=X,1,S
+! IF(#AmtStartRange0>=3000000 &&	#AmtEndRange0<=5999999,$,S)
+! C(3,#Bonus0,500,$,V(P,300萬含以上未達600萬，核發獎金津貼500元，獎勵津貼輸入錯誤))
 
-#ChkBonusX3=X,1,S
-IF(#AmtStartRange0>=6000000 &&	#AmtEndRange0<=9999999,$,S)
-C(3,#Bonus0,800,$,V(P,600萬含以上未達1000萬，核發獎金津貼800元，獎勵津貼輸入錯誤))
+! #ChkBonusX3=X,1,S
+! IF(#AmtStartRange0>=6000000 &&	#AmtEndRange0<=9999999,$,S)
+! C(3,#Bonus0,800,$,V(P,600萬含以上未達1000萬，核發獎金津貼800元，獎勵津貼輸入錯誤))
 
-#ChkBonusX4=X,1,S
-IF(#AmtStartRange0>=10000000 && #AmtEndRange0>=10000000 ,$,S)
-C(3,#Bonus0,1200,$,V(P,1000萬含以上，核發獎金津貼1200元，獎勵津貼輸入錯誤))
+! #ChkBonusX4=X,1,S
+! IF(#AmtStartRange0>=10000000 && #AmtEndRange0>=10000000 ,$,S)
+! C(3,#Bonus0,1200,$,V(P,1000萬含以上，核發獎金津貼1200元，獎勵津貼輸入錯誤))
 
 
 !用於計算下一個級距的最小金額
@@ -371,21 +383,21 @@ C(3,#AmtStartRange{i},0,S,$)
 C(2,#FuncCode,$,$,$,$,s,s)
 @V(2,0)
 
-#ChkBonus1{i}=X,1,S
-IF(#AmtStartRange{i}>=600000 &&	 #AmtEndRange{i}==2999999,$,S)
-C(3,#Bonus{i},200,$,V(P,60萬含以上未達300萬，核發獎金津貼200元，獎勵津貼輸入錯誤))
+! #ChkBonus1{i}=X,1,S
+! IF(#AmtStartRange{i}>=600000 &&	 #AmtEndRange{i}==2999999,$,S)
+! C(3,#Bonus{i},200,$,V(P,60萬含以上未達300萬，核發獎金津貼200元，獎勵津貼輸入錯誤))
 
-#ChkBonus2{i}=X,1,S
-IF(#AmtStartRange{i}>=3000000 &&	 #AmtEndRange{i}==5999999,$,S)
-C(3,#Bonus{i},500,$,V(P,300萬含以上未達600萬，核發獎金津貼500元，獎勵津貼輸入錯誤))
+! #ChkBonus2{i}=X,1,S
+! IF(#AmtStartRange{i}>=3000000 &&	 #AmtEndRange{i}==5999999,$,S)
+! C(3,#Bonus{i},500,$,V(P,300萬含以上未達600萬，核發獎金津貼500元，獎勵津貼輸入錯誤))
 
-#ChkBonus3{i}=X,1,S
-IF(#AmtStartRange{i}>=6000000 &&	 #AmtEndRange{i}==9999999,$,S)
-C(3,#Bonus{i},800,$,V(P,600萬含以上未達1000萬，核發獎金津貼800元，獎勵津貼輸入錯誤))
+! #ChkBonus3{i}=X,1,S
+! IF(#AmtStartRange{i}>=6000000 &&	 #AmtEndRange{i}==9999999,$,S)
+! C(3,#Bonus{i},800,$,V(P,600萬含以上未達1000萬，核發獎金津貼800元，獎勵津貼輸入錯誤))
 
-#ChkBonus4{i}=X,1,S
-IF(#AmtStartRange{i}>=10000000 && #AmtEndRange{i}>=10000000,$,S)
-C(3,#Bonus{i},1200,$,V(P,1000萬含以上，核發獎金津貼1200元，獎勵津貼輸入錯誤))
+! #ChkBonus4{i}=X,1,S
+! IF(#AmtStartRange{i}>=10000000 && #AmtEndRange{i}>=10000000,$,S)
+! C(3,#Bonus{i},1200,$,V(P,1000萬含以上，核發獎金津貼1200元，獎勵津貼輸入錯誤))
 
 #showAmt{i}=X,1,S
 !C(3,#AmtStartRange{i},0,HIDE(#AmtStartRange{i},#sign{i},#AmtEndRange{i},#Bonus{i}),SHOW(#AmtStartRange{i},#sign{i},#AmtEndRange{i},#Bonus{i}))

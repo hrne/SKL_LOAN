@@ -382,9 +382,11 @@ public class L9110Report extends MakeReport {
 //					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 //					this.print(0, 135, "鑑估總值 .....");
 //					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
-					this.print(1, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
-					this.print(0, 69, "順位 ......... " + tL9110Cl.get("F5"));
-					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(1, 5, "順位 ......... " + tL9110Cl.get("F5"));
+					this.print(0, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
+					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
+					this.print(0, 105, "設定金額 .....");
+					this.print(0, 134, formatAmt(tL9110Cl.get("F22"), 0), "R");
 					this.print(0, 135, "鑑估總值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
 //					this.print(0, 35, "前順位金額 ...");
@@ -392,9 +394,7 @@ public class L9110Report extends MakeReport {
 //					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
 //					this.print(0, 105, "鑑定公司 ..... " + tL9110Cl.get("F8"));
 					this.print(1, 5, "建物標示備註 . " + tL9110Cl.get("F9"));
-					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
-					this.print(0, 105, "設定金額 .....");
-					this.print(0, 135, formatAmt(tL9110Cl.get("F22"), 0), "R");
+					this.print(0, 69, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 					this.print(0, 135, "評估淨值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F21"), 0), "R");
 
@@ -411,9 +411,9 @@ public class L9110Report extends MakeReport {
 					break;
 				case "3": // 股票
 				case "4": // 有價證券
-//					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
-//					this.print(0, 35, "擔保品別 ..... " + tL9110Cl.get("F2"));
-//					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 ..... " + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
 					this.print(0, 105, "有價證券代號 . " + tL9110Cl.get("F12")); // F12 股票代號及股票名稱
 
 					this.print(1, 5, "質權設定書號 . " + tL9110Cl.get("F13")); // F13 質權設定書號
@@ -742,15 +742,15 @@ public class L9110Report extends MakeReport {
 //					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 //					this.print(0, 135, "鑑估總值 .....");
 //					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
-					this.print(1, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
-					this.print(0, 69, "順位 ......... " + tL9110Cl.get("F5"));
-					this.print(0, 105, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(1, 5, "順位 ......... " + tL9110Cl.get("F5"));
+					this.print(0, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
+					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
+					this.print(0, 105, "設定金額 ...");
+					this.print(0, 134, formatAmt(tL9110Cl.get("F22"), 0), "R");
 					this.print(0, 135, "鑑估總值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
 					this.print(1, 5, "建物標示備註 . " + tL9110Cl.get("F9"));
-					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
-					this.print(0, 105, "設定金額 ...");
-					this.print(0, 135, formatAmt(tL9110Cl.get("F22"), 0), "R");
+					this.print(0, 69, "他項存續期限 . " + this.showRocDate(tL9110Cl.get("F4"), 1));
 					this.print(0, 135, "評估淨值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F21"), 0), "R");
 
@@ -766,9 +766,9 @@ public class L9110Report extends MakeReport {
 					break;
 				case "3": // 股票
 				case "4": // 有價證券
-//					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
-//					this.print(0, 35, "擔保品別 ..... " + tL9110Cl.get("F2"));
-//					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 ..... " + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 ....... " + tL9110Cl.get("F7"));
 					this.print(1, 5, "有價證券代號 . " + tL9110Cl.get("F12")); // F12 股票代號及股票名稱
 
 					this.print(0, 35, "質權設定書號 . " + tL9110Cl.get("F13")); // F13 質權設定書號

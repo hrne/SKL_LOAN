@@ -1178,7 +1178,7 @@ T(2,@L3600MasterCustIdX,#OMasterCustIdX)
 !銷帳編號
 #ORvNo=X,30,L
 
-#OSupervisor=X,6,L
+#OSupervisor=X,20,L
 T(2,@L3731Supervisor,#OSupervisor)
 #OSupervisorX=X,20,L
 T(2,@L3731SupervisorX,#OSupervisorX)
@@ -1197,7 +1197,7 @@ T(2,@L3731RateX,#ORateX)
 #OSlipSumNoX=x,10,L
 
 !核決主管
-#L3731Supervisor=X,6,L
+#L3731Supervisor=X,20,L
 
 #L3731SupervisorX=X,20,L
 

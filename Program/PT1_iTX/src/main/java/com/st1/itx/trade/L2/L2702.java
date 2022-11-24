@@ -138,7 +138,8 @@ public class L2702 extends TradeBuffer {
 			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
 			// 非建檔者修改須刷主管卡
-			if (tCustRmk.getCreateEmpNo().equals(tCustRmk.getLastUpdateEmpNo()) && titaVo.getEmpNos().trim().isEmpty()) {
+			if (!(tCustRmk.getCreateEmpNo().equals(tCustRmk.getLastUpdateEmpNo()))
+					&& titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
 			}
 
@@ -163,6 +164,7 @@ public class L2702 extends TradeBuffer {
 			if (tCustRmk == null) {
 				throw new LogicException(titaVo, "E0004", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於顧客管控警訊檔。");
 			}
+			CustRmk beforeCustRmk = (CustRmk) dataLog.clone(tCustRmk);
 
 			// 刪除須刷主管卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
@@ -179,6 +181,9 @@ public class L2702 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
+			// 紀錄變更前變更後
+			dataLog.setEnv(titaVo, beforeCustRmk, tCustRmk);
+			dataLog.exec("刪除顧客管控警訊檔資料");
 		} else if (iFunCd == 5) {
 
 		}

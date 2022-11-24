@@ -1250,8 +1250,8 @@ C(3,#UpdateCode,1,RESET_RIM(#RcvL2r08A,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)
 T(2,@IntroducerX,#L2r08FullName)
-T(2,@District,#L2r08CenterCode1)
-T(2,@DistrictX,#L2r08CenterCode1Name)
+! T(2,@District,#L2r08CenterCode1)
+! T(2,@DistrictX,#L2r08CenterCode1Name)
 
 #RcvL2r08B=X,1,S  
 C(3,#UpdateCode,1,$,S)
@@ -1544,7 +1544,6 @@ T(2,#L2r01ProdName)
 #FdBaseRateCode=X,2,L
 
 #BaseRateCode=A,2,L
-E(0,#L2r01BaseRateCode)
 
 
 #BaseRateCodeX=X,30,L
@@ -1572,6 +1571,7 @@ E(0,@BaseRate,#L2r06Rate)
 !8/17 配合少玄開放可修正
 #BaseRate=n,2.4,I
 C(3,#FuncCode,5,s,$)
+C(3,#FuncCode,4,s,$)
 ! E(0,#L2r06Rate)
 !#Wk_BaseRate=X,8,S
 !X(#BaseRate)
@@ -3031,7 +3031,7 @@ BIND(#BTN11,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF11B;ntxbuf5=type<-1:Intro
 #SendL2r08A=X,1,S
 C(4,#Introducer,S,$)
 T(2,@RimEmployeeNo,#Introducer)
-IF(#L2r05Introducer==#Introducer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05Introducer==#Introducer,s,T(3,@RimErrorSkip,))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r08A,L2R08),$)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
 R(1,L2R08)

@@ -87,10 +87,10 @@ public class L2R31 extends TradeBuffer {
 		}
 
 		if (iFunCd == 1) {
-
-			if (tCustDataCtrl == null) {
-				// 此為新增
-				tCustDataCtrl = new CustDataCtrl();
+			if (tCustDataCtrl != null) {
+				throw new LogicException(titaVo, "E0012", "此戶個資控管已設定");// 該筆資料已存在
+			} else {
+				tCustDataCtrl = new CustDataCtrl();// 此為新增
 			}
 
 			this.totaVo.putParam("L2r31CustNo", custNo);

@@ -17,6 +17,7 @@ import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
 /*
@@ -47,6 +48,8 @@ public class L6701 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	public DataLog dataLog;
+	@Autowired
+	public SendRsp sendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -80,9 +83,11 @@ public class L6701 extends TradeBuffer {
 
 			tCdBank.setBankItem(iBankItem);
 			tCdBank.setBranchItem(iBranchItem);
-			tCdBank.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tCdBank.setCreateDate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tCdBank.setCreateEmpNo(titaVo.getTlrNo());
-			tCdBank.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tCdBank.setLastUpdate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
 			try {
 				sCdBankService.insert(tCdBank, titaVo);
@@ -106,7 +111,8 @@ public class L6701 extends TradeBuffer {
 				tCdBank.setBankItem(iBankItem);
 				tCdBank.setBranchCode(iBranchCode);
 				tCdBank.setBranchItem(iBranchItem);
-				tCdBank.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tCdBank.setLastUpdate(
+						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 				tCdBank.setLastUpdateEmpNo(titaVo.getTlrNo());
 				tCdBank = sCdBankService.update2(tCdBank, titaVo); ////
 			} catch (DBException e) {
@@ -119,6 +125,11 @@ public class L6701 extends TradeBuffer {
 		case 4: // 刪除
 			tCdBank = sCdBankService.holdById(new CdBankId(iBankCode, iBranchCode));
 			if (tCdBank != null) {
+
+				// 刪除須刷主管卡
+				if (titaVo.getEmpNos().trim().isEmpty()) {
+					sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
+				}
 				try {
 					sCdBankService.delete(tCdBank);
 				} catch (DBException e) {

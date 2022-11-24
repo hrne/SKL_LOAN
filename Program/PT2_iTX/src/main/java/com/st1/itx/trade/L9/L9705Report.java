@@ -215,8 +215,6 @@ public class L9705Report extends MakeReport {
 
 				this.info("listBaTxVo.size()=" + listBaTxVo.size());
 
-//				tmpListSize = tmpListSize + listBaTxVo.size();
-
 				// 是否最後一筆
 				if (l9705List.size() == (count + 1)) {
 					this.info("last count...");
@@ -243,6 +241,10 @@ public class L9705Report extends MakeReport {
 				});
 
 				this.info("listBaTxVo1 = " + listBaTxVo.toString());
+				this.info("dBaTxCom getShortAmt = " + dBaTxCom.getShortAmt());
+				this.info("dBaTxCom getExcessive = " + dBaTxCom.getExcessive());
+				this.info("dBaTxCom getShortfall = " + dBaTxCom.getShortfall());
+				this.info("dBaTxCom getOverAmt = " + dBaTxCom.getOverAmt());
 
 				// 先算短繳
 				for (BaTxVo baTxVo : listBaTxVo) {
@@ -251,8 +253,24 @@ public class L9705Report extends MakeReport {
 
 						shortFall = shortFall.add(baTxVo.getUnPaidAmt());
 					}
+					
+					// 溢繳
+					if (baTxVo.getDataKind() == 3) {
+						excessive = excessive.add(baTxVo.getUnPaidAmt());
+					}
+					// 溢短繳
+					if (baTxVo.getDataKind() == 3) {
+						overShort = overShort.add(baTxVo.getUnPaidAmt());
+					}
+					
+					
+					if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
+						overShort = overShort.subtract(shortFall);
+					}
 				}
 
+
+				
 				int con1Count = 0;
 				int con2Count = 0;
 				int totalCount = 0;
@@ -409,23 +427,23 @@ public class L9705Report extends MakeReport {
 			return;
 		}
 
-		for (BaTxVo baTxVo : listBaTxVo) {
-
-			this.info("baTxVo.getDataKind()=" + baTxVo.getDataKind());
-			// 溢繳
-			if (baTxVo.getDataKind() == 3) {
-				excessive = excessive.add(baTxVo.getUnPaidAmt());
-			}
-			// 溢短繳
-			if (baTxVo.getDataKind() == 3) {
-				overShort = overShort.add(baTxVo.getUnPaidAmt());
-			}
-			
-			if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
-				overShort = overShort.subtract(shortFall);
-			}
-			
-		}
+//		for (BaTxVo baTxVo : listBaTxVo) {
+//
+//			this.info("baTxVo.getDataKind()=" + baTxVo.getDataKind());
+//			// 溢繳
+//			if (baTxVo.getDataKind() == 3) {
+//				excessive = excessive.add(baTxVo.getUnPaidAmt());
+//			}
+//			// 溢短繳
+//			if (baTxVo.getDataKind() == 3) {
+//				overShort = overShort.add(baTxVo.getUnPaidAmt());
+//			}
+//			
+//			if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
+//				overShort = overShort.subtract(shortFall);
+//			}
+//			
+//		}
 		
 		// 帳管費 + 契變手續費(只有第一期需扣)
 		acctFee = c + 1 == 1 ? dBaTxCom.getAcctFee().add(dBaTxCom.getModifyFee()) : BigDecimal.ZERO;

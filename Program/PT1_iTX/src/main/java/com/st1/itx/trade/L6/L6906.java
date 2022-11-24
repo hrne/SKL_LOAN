@@ -87,25 +87,25 @@ public class L6906 extends TradeBuffer {
 			slAcDetail = sAcDetailService.acdtlCustNo(iBranchNo, iCurrencyCode, iFAcDate, iCustNo, this.index,
 					this.limit, titaVo);
 			if (slAcDetail == null) {
-				throw new LogicException("E0001", "該戶號不存在");
+				throw new LogicException("E0001", "無該戶號資料");
 			}
 		} else if (!(iTitaTlrNo.isEmpty())) {
 			slAcDetail = sAcDetailService.acdtlTitaTlrNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaTlrNo, this.index,
 					this.limit, titaVo);
 			if (slAcDetail == null) {
-				throw new LogicException("E0001", "該經辦不存在");
+				throw new LogicException("E0001", "無該經辦資料");
 			}
 		} else if (!(iTitaBatchNo.isEmpty())) {
 			slAcDetail = sAcDetailService.acdtlTitaBatchNo(iBranchNo, iCurrencyCode, iFAcDate, iTitaBatchNo, this.index,
 					this.limit, titaVo);
 			if (slAcDetail == null) {
-				throw new LogicException("E0001", "該整批批號不存在");
+				throw new LogicException("E0001", "無該整批批號資料");
 			}
 		} else if (!(iTitaTxCd.isEmpty())) {
 			slAcDetail = sAcDetailService.acdtlTitaTxCd(iBranchNo, iCurrencyCode, iFAcDate, iTitaTxCd, this.index,
 					this.limit, titaVo);
 			if (slAcDetail == null) {
-				throw new LogicException("E0001", "該交易代號不存在");
+				throw new LogicException("E0001", "無該交易代號資料");
 			}
 		} else {
 			throw new LogicException(titaVo, "E6011", "戶號或經辦或整批批號或交易代號擇一輸入"); // 查詢資料不可為空白

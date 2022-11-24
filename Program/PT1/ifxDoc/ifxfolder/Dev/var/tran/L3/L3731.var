@@ -138,7 +138,7 @@ T(2,      +Y)
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
 
 !核決主管
-#Supervisor=X,6,I
+#Supervisor=X,20,I
 SHOW(#BTN1)
 @
 HIDE(#BTN1)
