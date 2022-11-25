@@ -1,0 +1,1 @@
+UPDATE "TxTranCode" SET "TranItem"='公職人員財產申報作業' WHERE "TranNo"='L8701';

@@ -54,7 +54,7 @@ C(3,#FunCode,3,SHOW(#AuthNoFd2,#AuthNo2),HIDE(#AuthNoFd2,#AuthNo2))
 !Ap5: 120
 !Ap6: 130
 !Ap7: 20
-!Ap8: 150
+!Ap8: 170
 !Ap9: 160
 
 #ApL=X,30000,S
@@ -103,7 +103,7 @@ INVOKEJS(SHOW,grd6_{i},0)
 ##loop {times:20,i:1}
 INVOKEJS(SHOW,grd7_{i},0)
 ##end
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 INVOKEJS(SHOW,grd8_{i},0)
 ##end
 ##loop {times:160,i:1}
@@ -262,7 +262,7 @@ C(5,#OiaBtn0,V,T(3,@OiaBtn0, ),T(3,@OiaBtn0,V))
 C(2,#ApaType{i},T(2,@OiaBtn{i},#OiaBtn0),$,C(5,#ApaBtn{i},V,T(2,@OiaBtn{i},#OiaBtn0),$)) 
 ##end
 
-!
+
 ##loop {times:30,i:1}
 !權限勾選按鈕
 #ApaBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
@@ -968,7 +968,7 @@ C(2,#ApgType{i},$,$,C(5,#ApgBtn{i},V,C(3,#ApgSno{i},#it1,T(2,@OigBtn{i},#it2),$)
 #Ap8ProcA=@,1,S
 T(1,@ApCount,#ApL8,1,3)
 E(0,@ApIdx,4)
-##loop {times:150,i:1,j:0}
+##loop {times:170,i:1,j:0}
 T(1,@AphType{i},#ApL8,#ApIdx,1)
 E(0,@ApIdx,#ApIdx+1)
 T(1,@AphSno{i},#ApL8,#ApIdx,2)
@@ -985,7 +985,7 @@ C(3,#ApCount,{i},s,$)
 ##end
 
 #Ap8ProcB=@,1,S
-##loop {times:150,i:1,j:0}
+##loop {times:170,i:1,j:0}
 C(2,#AphAuth{i},T(3,@AphBtn{i}, ),T(3,@AphBtn{i},V),T(3,@AphBtn{i},V))
 C(2,#AphAuth{i},T(3,@OihBtn{i}, ),T(3,@OihBtn{i},V),T(3,@OihBtn{i}, ))
 C(2,#AphType{i},T(3,@AphTypeX{i},子選單),T(3,@AphTypeX{i},查詢交易),T(3,@AphTypeX{i},維護交易),$)
@@ -1002,7 +1002,7 @@ BIND(#AphBtn0,click, {cmd=CALLSEND;DOCODE=AphBtnProc0})
 #AphBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#AphBtn0,V,T(3,@AphBtn0, ),T(3,@AphBtn0,V))
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 T(2,@AphBtn{i},#AphBtn0)
 C(5,#AphBtn{i},V,C(3,#AphType{i},1,T(3,@OihBtn{i},V),$),T(3,@OihBtn{i}, ))
 ##end
@@ -1015,12 +1015,12 @@ BIND(#OihBtn0,click, {cmd=CALLSEND;DOCODE=OihBtnProc0})
 #OihBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#OihBtn0,V,T(3,@OihBtn0, ),T(3,@OihBtn0,V))
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 C(2,#AphType{i},T(2,@OihBtn{i},#OihBtn0),$,C(5,#AphBtn{i},V,T(2,@OihBtn{i},#OihBtn0),$)) 
 ##end
 
 !
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 !權限勾選按鈕
 #AphBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
 !限查詢按鈕
@@ -1059,13 +1059,13 @@ C(3,#AphType{i},0,CALL(#OihSub,#AphSno{i},#OihBtn{i}),$)
 ##end
 
 #AphSub=@,1,S
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 C(3,#AphSno{i},#it1,T(2,@AphBtn{i},#it2),$)
 C(5,#AphBtn{i},V,C(3,#AphType{i},1,T(3,@OihBtn{i},V),$),T(3,@OihBtn{i}, ))
 ##end
 
 #OihSub=@,1,S
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 C(2,#AphType{i},$,$,C(5,#AphBtn{i},V,C(3,#AphSno{i},#it1,T(2,@OihBtn{i},#it2),$),$)) 
 ##end
 
@@ -1458,7 +1458,7 @@ T(2,CODE:+#AuthNo)
 [
 [],
 [#<->#,"L8.遵循法令作業"],
-["#grid#,{id:8,expand:true,loop:150,row_height:1}","　",
+["#grid#,{id:8,expand:true,loop:170,row_height:1}","　",
 [[#AphBtn0,"執行權限"],[#OihBtn0,"限查詢"],"代號","名稱","類別"],
 [#AphBtn1,#OihBtn1,#AphCode1,#AphDesc1,#AphTypeX1]
 ],
@@ -1526,7 +1526,7 @@ T(2,CODE:+#AuthNo)
 #ApgBtn{i}
 #OigBtn{i}
 ##end
-##loop {times:150,i:1}
+##loop {times:170,i:1}
 #AphCode{i}
 #AphBtn{i}
 #OihBtn{i}
