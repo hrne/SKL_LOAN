@@ -62,12 +62,13 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,NVL(rn.\"InsuStartDate\",NVL(og.\"InsuStartDate\",0))  AS F8   ";
 		sql += " ,NVL(rn.\"InsuEndDate\",NVL(og.\"InsuEndDate\",0))      AS F9   ";
 		sql += " ,NVL(rn.\"PrevInsuNo\",NVL(og.\"OrigInsuNo\",''))       AS F10  ";
+		sql += " ,coll.\"Status\"                                        AS F11   ";
 		sql += " from(                                                           ";
 		sql += "   select                                                        ";
 		sql += "    \"CustNo\"                                                   ";
 		sql += "   ,\"FacmNo\"                                                   ";
 		sql += "     from \"CollList\"                                           ";
-		sql += "    where \"Status\" in ('0','2','4','6','7')                    ";
+		sql += "    where \"Status\" in ('0','2','4','7')                    ";
 		sql += " ) coll                                                          ";
 		sql += " left join \"ClFac\" cf   on cf.\"CustNo\" = coll.\"CustNo\"     ";
 		sql += "                       and cf.\"FacmNo\" = coll.\"FacmNo\"       ";

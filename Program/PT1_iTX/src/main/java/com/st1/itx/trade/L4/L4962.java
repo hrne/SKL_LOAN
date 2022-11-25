@@ -123,10 +123,10 @@ public class L4962 extends TradeBuffer {
 			if (sInsuRenew != null) {
 				for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
 					if (tInsuRenew.getRenewCode() == 2) {
-						if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
-							errorReportA(tInsuRenew, 1, titaVo);
-						} else if (tInsuRenew.getAcDate() == 0) {
+						if (tInsuRenew.getAcDate() == 0) {
 							errorReportA(tInsuRenew, 2, titaVo);
+						} else if (tInsuRenew.getNowInsuNo() == null || "".equals(tInsuRenew.getNowInsuNo().trim())) {
+							errorReportA(tInsuRenew, 1, titaVo);
 						}
 					}
 				}
@@ -183,12 +183,10 @@ public class L4962 extends TradeBuffer {
 						}
 						int custNo = parse.stringToInteger(result.get("F0"));
 						int facmNo = parse.stringToInteger(result.get("F1"));
-						int colStatus = 99;
-						CollList tCollList = collListService.findById(new CollListId(custNo, facmNo), titaVo);
-						if (tCollList != null) {
-							colStatus = tCollList.getStatus();
+						int colStatus = parse.stringToInteger(result.get("F11"));
+						if (colStatus == 4) {
+							colStatus = 0;
 						}
-
 						OccursList occursListReport = new OccursList();
 						occursListReport.putParam("ReportBCustNo", result.get("F0"));
 						occursListReport.putParam("ReportBFacmNo", result.get("F1"));
@@ -295,6 +293,9 @@ public class L4962 extends TradeBuffer {
 		if (tCollList != null) {
 			colStatus = tCollList.getStatus();
 		}
+		if (colStatus == 4) {
+			colStatus = 0;
+		}
 
 		cntA = cntA + 1;
 
@@ -331,6 +332,16 @@ public class L4962 extends TradeBuffer {
 	}
 
 	private void errorReportC(InsuRenew tInsuRenew, int errorFlag, TitaVo titaVo) {
+		CollList tCollList = collListService.findById(new CollListId( tInsuRenew.getCustNo(), tInsuRenew.getFacmNo()), titaVo);
+		if (tCollList == null) {
+			return;
+		}
+		int colStatus = tCollList.getStatus();
+		if (colStatus == 0 || colStatus == 2 || colStatus == 4 || colStatus == 7) {
+		} else {
+			return;
+		}
+		
 		cntC = cntC + 1;
 
 		CustMain tCustMain = new CustMain();
@@ -363,28 +374,34 @@ public class L4962 extends TradeBuffer {
 	}
 
 	private void errorReportC2(InsuOrignal tInsuOrignal, TitaVo titaVo) {
-		cntC = cntC + 1;
 
 		Slice<ClFac> sClFac = clFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(),
 				tInsuOrignal.getClNo(), this.index, this.limit, titaVo);
 
+		if (sClFac == null) {
+			return;
+		}
 		int custno = 0;
 		int facmno = 0;
 		String custname = "";
-		List<ClFac> lClFac = null;
-		if (sClFac != null) {
-			lClFac = sClFac.getContent();
+		List<ClFac> lClFac = sClFac.getContent();
+		custno = lClFac.get(0).getCustNo();
+		facmno = lClFac.get(0).getFacmNo();
+		CustMain tCustMain = custMainService.custNoFirst(custno, custno, titaVo);
+		if (tCustMain != null) {
+			custname = tCustMain.getCustName();
+		}
+		CollList tCollList = collListService.findById(new CollListId(custno, facmno), titaVo);
+		if (tCollList == null) {
+			return;
+		}
+		int colStatus = tCollList.getStatus();
+		if (colStatus == 0 || colStatus == 2 || colStatus == 4 || colStatus == 7) {
+		} else {
+			return;
 		}
 
-		if (lClFac != null) {
-			custno = lClFac.get(0).getCustNo();
-			facmno = lClFac.get(0).getFacmNo();
-			CustMain tCustMain = custMainService.custNoFirst(custno, custno, titaVo);
-			if (tCustMain != null) {
-				custname = tCustMain.getCustName();
-			}
-		}
-
+		cntC = cntC + 1;
 		OccursList occursListReport = new OccursList();
 		occursListReport.putParam("ReportCInsuEndMonth", (tInsuOrignal.getInsuEndDate() / 100));
 

@@ -38,6 +38,8 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @param titaVo
 	 * @param formNum        表格次序
 	 * @param endOfYearMonth 西元年底年月
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum, int endOfYearMonth) throws Exception {
@@ -193,6 +195,8 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll2(TitaVo titaVo, int yearMonth) throws Exception {
@@ -262,6 +266,8 @@ public class LY003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll3(TitaVo titaVo, int yearMonth) throws Exception {

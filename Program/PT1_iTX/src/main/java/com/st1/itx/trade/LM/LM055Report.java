@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM055ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Service
 @Scope("prototype")
@@ -44,6 +45,7 @@ public class LM055Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @throws LogicException 
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
@@ -51,7 +53,24 @@ public class LM055Report extends MakeReport {
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表", "LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
+		// LM054
+		String txcd = "LM055";
+		// 檔案名稱
+		String rptItem = "A041重要放款餘額明細表";
+		// 輸出檔名
+		String fileName = "A042放款餘額彙總表_工作表";
+		// 底稿名稱
+		String defaultName = "LM055_底稿_A042放款餘額彙總表.xlsx";
+		// 底稿工作表名
+		String defaultSheetName = "A042放款餘額彙總表";
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI()).setRptCode(txcd)
+				.setRptItem(rptItem).build();
+
+		makeExcel.open(titaVo, reportVo, fileName, defaultName, defaultSheetName);
+
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表",
+//				"LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
 
 		makeExcel.setValue(2, 3, yearMonth);
 
@@ -118,83 +137,6 @@ public class LM055Report extends MakeReport {
 
 	}
 
-	private void exportExcel2(List<Map<String, String>> listData) throws LogicException {
-
-		int col = 0;
-		int colAllow = 0;
-		int row = 0;
-
-		BigDecimal normalAmount = BigDecimal.ZERO;
-		BigDecimal specificAmount = BigDecimal.ZERO;
-
-		BigDecimal amount = BigDecimal.ZERO;
-		BigDecimal allowAmount = BigDecimal.ZERO;
-
-		for (Map<String, String> lM055Vo : listData) {
-
-			/*
-			 * COL 1=逾期放款(F) 2=未列入逾期應予評估放款(G) 3=正常放款I(H) 4=應予注意II(I) 5=可望收回III(J)
-			 * 6=收回困難IV(K) 7=收回無望V(L)
-			 * 
-			 * 99=購置住宅+修繕貸款
-			 * 
-			 */
-
-			// 起始欄E欄位 + (1~7)
-			// (自訂 FIVE=五類資產、9=備呆子目)
-			if (!lM055Vo.get("F0").equals("N")) {
-
-				if (lM055Vo.get("F0").equals("FIVE") || lM055Vo.get("F0").equals("9")) {
-					col = 19;
-				} else if (!lM055Vo.get("F0").equals("99")) {
-					col = 5 + Integer.valueOf(lM055Vo.get("F0"));
-					colAllow = 10 + Integer.valueOf(lM055Vo.get("F0"));
-				}
-
-				// 依放款種類 區分列數
-				// (自訂 FIVE=五類資產、AL=備呆子目)
-				row = lM055Vo.get("F1").equals("C") ? 10 : (lM055Vo.get("F1").equals("D") ? 11 : (lM055Vo.get("F1").equals("FIVE") || lM055Vo.get("F1").equals("AL") ? 16 : 12));
-
-				// 放款金額
-				if (!lM055Vo.get("F0").equals("99")) {
-
-					amount = lM055Vo.get("F2").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F2"));
-
-					makeExcel.setValue(row, col, amount, "#,##0");
-				}
-
-				// 備抵損失
-				if (lM055Vo.get("F0").equals("3")) {
-
-					normalAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
-
-				} else if (lM055Vo.get("F0").equals("99")) {
-
-					specificAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
-
-					allowAmount = specificAmount.add(normalAmount);
-
-					makeExcel.setValue(row, 13, allowAmount, "#,##0");
-
-				} else {
-
-					allowAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
-
-					makeExcel.setValue(row, colAllow, allowAmount, "#,##0");
-
-				}
-			}
-
-		}
-
-		// F15~S15
-		for (int i = 6; i <= 19; i++) {
-			makeExcel.formulaCaculate(15, i);
-		}
-		// R16、R17
-		makeExcel.formulaCaculate(18, 16);
-		makeExcel.formulaCaculate(18, 17);
-
-	}
+	
 
 }
