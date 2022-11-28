@@ -1,0 +1,152 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L5104)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5104" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5104]                                 檔案借閱報表作業(列印)"],
+[#<->#,"#FdStartDate+借閱日期",#StartDate,"~",#EndDate],
+[#<->#,"#FdReportFlag+報表種類",#ReportFlag,#ReportFlagX],
+]
+!---------- AP TEXT AREA Variables ----------
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FdStartDate=X,2,L
+#FdReportFlag=X,2,L
+
+!報表種類
+#ReportHelp=X,100,S
+T(3,1:未歸還月報表;2:法拍件月報表;3:件數統計表;4:全部)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+
+
+!4用途
+#UsageCodeXRimName=x,20,S
+T(3,CdCode.UsageCodeX)
+#UsageCodeXHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#UsageCodeXRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@UsageCodeXHelp,#HelpDesc1) 
+
+#TODAY=A,7,S
+T(1,#SYSCDATE,2,7)
+
+#PREVALUE=A,1,S
+E(0,@StartDate,#TODAY)
+E(0,@EndDate,#TODAY)
+
+! 開始日期
+#StartDate=D,7,I
+C(3,#CHAIN,0,$,s)
+@V(5,0000000,#TODAY)V(7)
+
+! 終止日期
+#EndDate=D,7,I
+@V(5,#StartDate,#TODAY)V(7)
+
+! 報表種類
+#ReportFlag=A,1,I
+E(0,4)
+HELP(#ReportHelp)
+@T(3,@ReportFlagX,)
+V(H,#ReportHelp)
+     
+#ReportFlagX=X,12,L
+T(3, )
+T(H,#ReportFlag,#ReportHelp)
+
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L5104 ----------
+<sub type="FORM" name="L5104">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L5104,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L5104] 檔案借閱報表作業(列印))
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#StartDate
+#EndDate
+#ReportFlag
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L5104^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L5104" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L5104]                                 檔案借閱報表作業(列印)"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

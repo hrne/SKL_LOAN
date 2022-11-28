@@ -30,21 +30,21 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private String sql = "";
 
-	private int applStartDate = 0;
-	private int applEndDate = 0;
-	private String usageCode = "";
-	private int type = 0;
+//	private int applStartDate = 0;
+//	private int applEndDate = 0;
+//	private String usageCode = "";
+//	private int type = 0;
 	// *** 折返控制相關 ***
-	private int index;
+//	private int index;
 
 	// *** 折返控制相關 ***
-	private int limit;
+//	private int limit;
 
 	// *** 折返控制相關 ***
 	private int cnt;
 
 	// *** 折返控制相關 ***
-	private int size;
+//	private int size;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -52,7 +52,7 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int applStartDate, int applEndDate, String usageCode, int type, int index, int limit, TitaVo titaVo) throws Exception {
 
 //		T(3,01:未還;02:已還;09:全部)
 
@@ -60,6 +60,9 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L5904.findAll applStartDate=" + applStartDate);
 		this.info("L5904.findAll applEndDate=" + applEndDate);
+		this.info("usageCode    = " + usageCode);
+		this.info("type         = " + type);
+
 
 		sql = " select   i.\"CustNo\"                                     "; // F0
 		sql += "        ,i.\"FacmNo\"                                     "; // F1
@@ -74,6 +77,9 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"CopyCode\"                                   "; // F10
 		sql += "        ,i.\"Remark\"                                     "; // F11
 		sql += "        ,i.\"ApplObj\"                                    "; // F12
+		sql +="         ,j.\"TlrItem\"                                    "; // F13
+		sql +="         ,l.\"TlrItem\"                                    as \"LTlrItem\" "; // F14
+		
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 
@@ -88,12 +94,16 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) i2  on i2.\"CustNo\"  = i.\"CustNo\"                   ";
 		sql += "      and i2.\"FacmNo\"  = i.\"FacmNo\"                   ";
 		sql += "      and i2.\"ApplSeq\" = i.\"ApplSeq\"                ";
-
+		sql +="   LEFT JOIN \"TxTeller\" j on i.\"KeeperEmpNo\" = j.\"TlrNo\"  ";
+		sql +="   LEFT JOIN \"TxTeller\" l on i.\"ApplEmpNo\" = l.\"TlrNo\"    ";
+		
+		
+		
 		sql += " where i.\"ApplDate\" >= " + applStartDate;
 		sql += "   and i.\"ApplDate\" <= " + applEndDate;
 
 		if (!"00".equals(usageCode)) {
-			sql += "   and \"UsageCode\" = :usageCode";
+			sql += "   and \"UsageCode\" = " + usageCode;
 		}
 		if (type == 1 || type == 2) {
 			sql += "   and i.\"ApplCode\" = '1'  ";
@@ -106,39 +116,25 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-
-		if (!"00".equals(usageCode)) {
-			query.setParameter("usageCode", usageCode);
-		}
-
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
-
-		// *** 折返控制相關 ***
-		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
-
+		
+//		if (!"00".equals(usageCode))
+//		{
+//			query.setParameter("usageCode", usageCode);
+//		}
+		
 		return this.convertToMap(query);
+		
 	}
 
-	public List<Map<String, String>> findAll(int applStartDate, int applEndDate, String usageCode, int type, int index, int limit, TitaVo titaVo) throws Exception {
-		this.applStartDate = applStartDate;
-		this.applEndDate = applEndDate;
-		this.usageCode = usageCode;
-		this.type = type;
-		this.index = index;
-		this.limit = limit;
-		return findAll(titaVo);
-	}
+//	public List<Map<String, String>> findAll(int applStartDate, int applEndDate, String usageCode, int type, int index, int limit, TitaVo titaVo) throws Exception {
+//		this.applStartDate = applStartDate;
+//		this.applEndDate = applEndDate;
+//		this.usageCode = usageCode;
+//		this.type = type;
+//		this.index = index;
+//		this.limit = limit;
+//		return findAll(titaVo);
+//	}
 
 	public int getSize() {
 		return cnt;
