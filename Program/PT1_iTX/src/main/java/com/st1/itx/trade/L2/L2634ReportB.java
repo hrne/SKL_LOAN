@@ -28,6 +28,7 @@ import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -127,7 +128,13 @@ public class L2634ReportB extends MakeReport {
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634B", "用印申請書-整批列印", "", "L2631B_用印申請書.pdf");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634B", "用印申請書-整批列印", "", "L2631B_用印申請書.pdf");
+
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setSecurity("機密").setRptCode("L2634B").setRptItem("用印申請書-整批列印").setPageOrientation("P")
+				.setUseDefault(true).build();
+
+		this.open(titaVo, reportVo, "L2631B_用印申請書.pdf");
 
 		this.setFont(1);
 
@@ -138,6 +145,7 @@ public class L2634ReportB extends MakeReport {
 		int cnt = 0;
 		int custNo = 0;
 		int closeNo = 0;
+
 		for (ClOtherRights t : lClOtherRights) {
 			cnt++;
 			int selectCnt = 0;
@@ -151,6 +159,7 @@ public class L2634ReportB extends MakeReport {
 				if (tFacClose == null) {
 					continue;
 				}
+
 
 				CustMain tCustMain = sCustMainService.custNoFirst(tFacClose.getCustNo(), tFacClose.getCustNo(), titaVo);
 				if (tCustMain != null) {
@@ -170,6 +179,7 @@ public class L2634ReportB extends MakeReport {
 				int wkCloseMm = parse.stringToInteger(closeDate.substring(3, 5)); // 月
 				int wkCloseDd = parse.stringToInteger(closeDate.substring(5, 7)); // 日
 
+				this.print(1, 0, "");
 				this.info("wkYymmdd = " + wkYy + "/" + wkMm + "/" + wkDd);
 				this.print(-17, 86, "" + wkYy); // 年
 				this.print(-20, 87, "" + wkMm); // 月
@@ -206,21 +216,22 @@ public class L2634ReportB extends MakeReport {
 				this.print(-39, 42, amtChinese + " 元整"); // 設定金額
 
 				this.print(-41, 42, wkCloseYy + "/" + wkCloseMm + "/" + wkCloseDd); // 結清日期
+
+				this.info("isLast = " + isLast);
+				this.info("NowPage = " + this.getNowPage());
+				if (isLast) {
+					break;
+				} else {
+					this.info("B newPage");
+					this.newPage();
+					this.info("NowPage = " + this.getNowPage());
+				}
 			}
 
-			this.info("isLast = " + isLast);
-			if (isLast) {
-
-				break;
-			} else {
-				this.info("B newPage");
-				this.newPage();
-
-			}
 		}
 
 		this.info("B 結束");
-		this.close();
+		this.toPdf(this.close());
 
 	}
 

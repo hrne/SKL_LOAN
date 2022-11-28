@@ -82,12 +82,11 @@ public class L2R31 extends TradeBuffer {
 		} else {
 			// 於客戶主檔有
 			custNo = tCustMain.getCustNo();
-			parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime());
 			tCustDataCtrl = sCustDataCtrlService.findById(custNo, titaVo);
 		}
 
 		if (iFunCd == 1) {
-			if (tCustDataCtrl != null) {
+			if (tCustDataCtrl != null && tCustDataCtrl.getApplMark() != 3) {
 				throw new LogicException(titaVo, "E0012", "此戶個資控管已設定");// 該筆資料已存在
 			} else {
 				tCustDataCtrl = new CustDataCtrl();// 此為新增

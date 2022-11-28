@@ -32,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R04 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5R04.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegFinAcctService sNegFinAcctService;
@@ -62,6 +61,9 @@ public class L5R04 extends TradeBuffer {
 			totaVo.putParam("L5r04FinCodeX", NegFinAcctVO.getFinItem());
 			totaVo.putParam("L5r04RemitBank", NegFinAcctVO.getRemitBank());
 			totaVo.putParam("L5r04RemitAcct", NegFinAcctVO.getRemitAcct());
+			totaVo.putParam("L5r04RemitAcct2", NegFinAcctVO.getRemitAcct2());
+			totaVo.putParam("L5r04RemitAcct3", NegFinAcctVO.getRemitAcct3());
+			totaVo.putParam("L5r04RemitAcct4", NegFinAcctVO.getRemitAcct4());
 			totaVo.putParam("L5r04DataSendSection", NegFinAcctVO.getDataSendSection());
 		} else {
 			String RemitBank = RimFinCode;
@@ -69,6 +71,9 @@ public class L5R04 extends TradeBuffer {
 			totaVo.putParam("L5r04FinCodeX", "");
 			totaVo.putParam("L5r04RemitBank", RemitBank);// 七碼
 			totaVo.putParam("L5r04RemitAcct", "");
+			totaVo.putParam("L5r04RemitAcct2", "");
+			totaVo.putParam("L5r04RemitAcct3", "");
+			totaVo.putParam("L5r04RemitAcct4", "");
 			totaVo.putParam("L5r04DataSendSection", "");
 		}
 		this.addList(this.totaVo);

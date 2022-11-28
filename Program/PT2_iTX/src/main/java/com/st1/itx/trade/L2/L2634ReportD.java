@@ -23,6 +23,7 @@ import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -120,8 +121,14 @@ public class L2634ReportD extends MakeReport {
 		this.info("exportExcel ... ");
 
 		// 設定字體1:標楷體 字體大小36
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634D", "雙掛號信封-整批列印", "", "A4", "L");
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634D", "雙掛號信封-整批列印", "", "A4", "L");
 
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setSecurity("機密").setRptCode("L2634D").setRptItem("雙掛號信封-整批列印").setPageOrientation("L")
+				.setUseDefault(true).build();
+
+		this.open(titaVo, reportVo);
+		
 		String custId = "";
 
 		int custNo = 0;
@@ -236,15 +243,15 @@ public class L2634ReportD extends MakeReport {
 						+ custName + "  啟"); // 戶號戶名
 				this.print(-17, 39, "電話:" + telNo); // 電話
 
+				this.info("isLast = " + isLast);
+				if (isLast) {
+					break;
+				} else {
+					this.info("D newPage");
+					this.newPage();
+				}
 			}
 
-			this.info("isLast = " + isLast);
-			if (isLast) {
-				break;
-			} else {
-				this.info("D newPage");
-				this.newPage();
-			}
 		}
 		this.info("D 結束");
 

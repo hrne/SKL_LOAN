@@ -496,7 +496,7 @@ public class L3210 extends TradeBuffer {
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
-			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1")); // 對帳類別
+			tTempVo.putParam("ReconCode", titaVo.getParam("RpAcctCode1")); // 對帳類別
 			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
 		}
 

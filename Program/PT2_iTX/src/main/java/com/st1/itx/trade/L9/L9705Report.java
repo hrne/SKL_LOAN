@@ -245,12 +245,16 @@ public class L9705Report extends MakeReport {
 				this.info("dBaTxCom getExcessive = " + dBaTxCom.getExcessive());
 				this.info("dBaTxCom getShortfall = " + dBaTxCom.getShortfall());
 				this.info("dBaTxCom getOverAmt = " + dBaTxCom.getOverAmt());
-
+				
+				shortFall = BigDecimal.ZERO;
+				excessive = BigDecimal.ZERO;
+				overShort = BigDecimal.ZERO;
+				acctFee = BigDecimal.ZERO;
+				
 				// 先算短繳
 				for (BaTxVo baTxVo : listBaTxVo) {
 					// 短繳
 					if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
-
 						shortFall = shortFall.add(baTxVo.getUnPaidAmt());
 					}
 					
@@ -603,8 +607,8 @@ public class L9705Report extends MakeReport {
 			// 應繳淨額
 			printCm(19, y, df1.format(UnPaidAmt), "R");
 
-			acctFee = BigDecimal.ZERO;
-			shortFall = BigDecimal.ZERO;
+//			acctFee = BigDecimal.ZERO;
+//			shortFall = BigDecimal.ZERO;
 
 		} // loop -- batxCom
 

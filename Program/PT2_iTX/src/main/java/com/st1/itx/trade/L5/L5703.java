@@ -66,7 +66,10 @@ public class L5703 extends TradeBuffer {
 		String FinCode = titaVo.getParam("FinCode").trim(); // 債權機構
 		String FinCodeX = titaVo.getParam("FinCodeX").trim(); // 債權機構名稱
 		String RemitBank = titaVo.getParam("RemitBank").trim(); // 匯款銀行
-		String RemitAcct = titaVo.getParam("RemitAcct").trim(); // 匯款帳號
+		String RemitAcct = titaVo.getParam("RemitAcct").trim(); // 債協匯款帳號
+		String RemitAcct2 = titaVo.getParam("RemitAcct2").trim(); // 調解匯款帳號
+		String RemitAcct3 = titaVo.getParam("RemitAcct3").trim(); // 更生匯款帳號
+		String RemitAcct4 = titaVo.getParam("RemitAcct4").trim(); // 清算匯款帳號
 		String DataSendSection = titaVo.getParam("DataSendSection").trim(); // 資料傳送單位
 
 		NegFinAcct NegFinAcctVO = new NegFinAcct();
@@ -85,6 +88,9 @@ public class L5703 extends TradeBuffer {
 			tNegFinAcct.setFinItem(FinCodeX);
 			tNegFinAcct.setRemitBank(RemitBank);
 			tNegFinAcct.setRemitAcct(RemitAcct);
+			tNegFinAcct.setRemitAcct2(RemitAcct2);
+			tNegFinAcct.setRemitAcct3(RemitAcct3);
+			tNegFinAcct.setRemitAcct4(RemitAcct4);
 			tNegFinAcct.setDataSendSection(DataSendSection);
 			tNegFinAcct.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tNegFinAcct.setCreateEmpNo(titaVo.get("TlrNo"));
@@ -111,6 +117,9 @@ public class L5703 extends TradeBuffer {
 			NegFinAcctVO.setFinItem(FinCodeX);
 			NegFinAcctVO.setRemitBank(RemitBank);
 			NegFinAcctVO.setRemitAcct(RemitAcct);
+			NegFinAcctVO.setRemitAcct2(RemitAcct2);
+			NegFinAcctVO.setRemitAcct3(RemitAcct3);
+			NegFinAcctVO.setRemitAcct4(RemitAcct4);
 			NegFinAcctVO.setDataSendSection(DataSendSection);
 			//NegFinAcctVO.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			//NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));

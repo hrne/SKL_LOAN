@@ -117,6 +117,9 @@ public class L5974 extends TradeBuffer {
 				occursList.putParam("OORemitBank", OORemitBank);//
 				occursList.putParam("OORemitBankX", OORemitBankX);//
 				occursList.putParam("OORemitAcct", rowData[5]);//
+				occursList.putParam("OORemitAcct2", rowData[9]);//
+				occursList.putParam("OORemitAcct3", rowData[10]);//
+				occursList.putParam("OORemitAcct4", rowData[11]);//
 				occursList.putParam("OODataSendSection", OODataSendSection);//
 				occursList.putParam("OODataSendSectionX", OODataSendSectionX);//
 				this.totaVo.addOccursList(occursList);

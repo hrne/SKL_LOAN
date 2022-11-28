@@ -33,7 +33,7 @@ public class NegFinAcct implements Serializable {
   private String finCode = " ";
 
   // 債權機構名稱
-  @Column(name = "`FinItem`", length = 60)
+  @Column(name = "`FinItem`", length = 100)
   private String finItem;
 
   // 匯款銀行

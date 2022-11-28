@@ -71,9 +71,9 @@ public class L5104Report extends MakeReport {
 		// 明細表頭
 		// -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		// ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		this.print(-5, 1, "　　　戶號　　　　         戶名　　　　　　　　　　　　         　　用途　　　借閱人　　　　　　　　　　   　管理人　　　　　    　　借閱日期");
-		this.print(-6, 7,
-				"-------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-5, 1, "戶號　　　　         戶名　　　　　　　　　　　　         　　用途　　　借閱人　　　　　　　　　　   　管理人　　　　　    　　借閱日期");
+		this.print(-6, 1,
+				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(7);
@@ -130,8 +130,8 @@ public class L5104Report extends MakeReport {
 				i++;
 				if (!ipUsCode.equals(result.get("F9"))) {
 					if (i != 1) {
-						print(1, 7,
-								"-------------------------------------------------------------------------------------------------------------------------------------------");
+						print(1, 1,
+								"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					}
 				}
 				int iFacmNo = parse.stringToInteger(result.get("F1"));
@@ -147,8 +147,8 @@ public class L5104Report extends MakeReport {
 						ixCustNo += "0";
 				}
 				this.info("ixCustNo    = " + ixCustNo);
-				print(1, 7, ixCustNo += result.get("F0") + '-' + ixFacmNo);
-				print(0, 28, result.get("F3"));
+				print(1, 1, ixCustNo += result.get("F0") + '-' + ixFacmNo);
+				print(0, 22, result.get("F3"));
 				String iUsCode = result.get("F9");
 				String iUsCodeName = "";
 				if ("01".equals(iUsCode)) {
@@ -176,25 +176,25 @@ public class L5104Report extends MakeReport {
 					iUsCodeName = "其他";
 				}
 
-				print(0, 69, iUsCodeName);
+				print(0, 63, iUsCodeName);
 
-				print(0, 79, result.get("F5") + ' ' + result.get("LTlrItem"));
-				print(0, 110, result.get("F4") + ' ' + result.get("F13"));
+				print(0, 73, result.get("F5") + ' ' + result.get("LTlrItem"));
+				print(0, 104, result.get("F4") + ' ' + result.get("F13"));
 				String iYYY = parse.IntegerToString(parse.stringToInteger(result.get("F6").substring(0, 4)) - 1911, 3);
 				String iMM = result.get("F6").substring(4, 6);
 				String iDD = result.get("F6").substring(6, 8);
 				this.info("iYYY  = " + iYYY);
 				this.info("iMM   = " + iMM);
 				this.info("iDD   = " + iDD);
-				print(0, 134, iYYY + '/' + iMM + '/' + iDD);
+				print(0, 128, iYYY + '/' + iMM + '/' + iDD);
 				this.info("iUsCode      = " + iUsCode);
 				this.info("ipUsCode     = " + ipUsCode);
 
 				ipUsCode = iUsCode;
 				if (i == resultList.size()) {
-					print(1, 7,
-							"-------------------------------------------------------------------------------------------------------------------------------------------");
-					print(1, 7, "總　　計:" + "         " + i + "筆　　未歸還");
+					print(1, 1,
+							"---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					print(1, 1, "總　　計:" + "         " + i + "筆　　未歸還");
 				}
 
 			}

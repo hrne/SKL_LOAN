@@ -22,7 +22,8 @@ E(0,0)
 [#<->#,"#FdFunCd+功能",#FunCdX],
 [#<->#,"#FdFinCode+債權機構",#FinCode,#FinCodeX,"(債權機構代號-債權機構名稱)"],
 [#<->#,"#FdRemitBank+匯款銀行",#RemitBank,#RemitBankX],
-[#<->#,"#FdRemitAcct+匯款帳號",#RemitAcct],
+[#<->#,"#FdRemitAcct+債協匯款帳號",#RemitAcct],["#FdRemitAcct2+調解匯款帳號",#RemitAcct2],
+[#<->#,"#FdRemitAcct3+更生匯款帳號",#RemitAcct3],["#FdRemitAcct4+清算匯款帳號",#RemitAcct4],
 [#<->#,"#FdDataSendSection+資料傳送單位",#DataSendSection,#DataSendSectionX],
 ]
 
@@ -36,6 +37,12 @@ T(3,* )
 T(3,* )
 #FdDataSendSection=X,2,L
 T(3,* )
+#FdRemitAcct2=X,2,L
+T(3, )
+#FdRemitAcct3=X,2,L
+T(3, )
+#FdRemitAcct4=X,2,L
+T(3, )
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -90,7 +97,7 @@ C(2,#FunCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,�
 !顯示框線
 #Flag=X,1,S
 IF(#FunCode==1,$,T(F,@FinCode,0))
-IF(#FunCode==4,T(F,@FinCode,0)T(F,@FinCodeX,0)T(F,@RemitBank,0)T(F,@RemitAcct,0)T(F,@DataSendSection,0),$) 
+IF(#FunCode==4,T(F,@FinCode,0)T(F,@FinCodeX,0)T(F,@RemitBank,0)T(F,@RemitAcct,0)T(F,@RemitAcct2,0)T(F,@RemitAcct3,0)T(F,@RemitAcct4,0)T(F,@DataSendSection,0),$) 
 
 #RimFinCode=X,8,S
 #RimBankCode=X,8,S
@@ -117,6 +124,9 @@ R(1,L5R04)
 T(2,@FinCode,#L5r04FinCode)
 T(2,@RemitBank,#L5r04RemitBank)
 T(2,@RemitAcct,#L5r04RemitAcct)
+T(2,@RemitAcct2,#L5r04RemitAcct2)
+T(2,@RemitAcct3,#L5r04RemitAcct3)
+T(2,@RemitAcct4,#L5r04RemitAcct4)
 T(2,@DataSendSection,#L5r04DataSendSection)
 
 #RimL5r12A=X,1,S
@@ -150,6 +160,9 @@ R(1,L5R04)
 T(2,@FinCode,#L5r04FinCode)
 T(2,@RemitBank,#L5r04RemitBank)
 T(2,@RemitAcct,#L5r04RemitAcct)
+T(2,@RemitAcct2,#L5r04RemitAcct2)
+T(2,@RemitAcct3,#L5r04RemitAcct3)
+T(2,@RemitAcct4,#L5r04RemitAcct4)
 T(2,@DataSendSection,#L5r04DataSendSection)
 
 
@@ -162,7 +175,7 @@ R(1,L5R12)
 T(2,@DataSendSectionX,#L5r12BankItem)
 
 
-#FinCodeX=X,60,I
+#FinCodeX=X,2.60,I
 IF(#FunCode==4,s,$)
 @V(7)
 
@@ -181,13 +194,41 @@ S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
 
-#RemitBankX=X,100,L
+#RemitBankX=X,120,L
 IF(#FunCode==1 || #FunCode==2,IF(#RemitBank==#FinCode,T(2,#FinCodeX),$),$)
 
-! 匯款帳號
+! 債協匯款帳號
 #RemitAcct=X,16,I
 IF(#FunCode==4,s,$)
 @V(7)
+E(0,@RemitAcctA,#RemitAcct)
+T(2,#RemitAcctA)
+#RemitAcctA=A,16,S
+#RemitAcct2A=A,16,S
+#RemitAcct3A=A,16,S
+#RemitAcct4A=A,16,S
+
+! 調解匯款帳號
+#RemitAcct2=X,16,I
+IF(#FunCode==4,s,$)
+@
+E(0,@RemitAcct2A,#RemitAcct2)
+IF(#RemitAcct2A == 0,S,T(2,#RemitAcct2A))
+
+! 更生匯款帳號
+#RemitAcct3=X,16,I
+IF(#FunCode==4,s,$)
+@
+E(0,@RemitAcct3A,#RemitAcct3)
+IF(#RemitAcct3A == 0,S,T(2,#RemitAcct3A))
+
+! 清算匯款帳號
+#RemitAcct4=X,16,I
+IF(#FunCode==4,s,$)
+@
+E(0,@RemitAcct4A,#RemitAcct4)
+IF(#RemitAcct4A == 0,S,T(2,#RemitAcct4A))
+
 
 ! 資料傳送單位
 #DataSendSection=X,8,I
@@ -204,7 +245,7 @@ S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@DataSendSectionX,#L5r12BankItem)
 
-#DataSendSectionX=X,100,L
+#DataSendSectionX=X,120,L
 IF(#FunCode==1 || #FunCode==2,IF(#DataSendSection==#FinCode,T(2,#FinCodeX),$),$)
 
 #RPTFG=A,1,S
@@ -231,6 +272,9 @@ T(2,#FinCode)
 #FinCodeX
 #RemitBank
 #RemitAcct
+#RemitAcct2
+#RemitAcct3
+#RemitAcct4
 #DataSendSection
 </sub>
 

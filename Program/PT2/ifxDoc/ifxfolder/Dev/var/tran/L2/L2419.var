@@ -87,14 +87,17 @@ T(3,*)
 #FdEvaDate=X,2,L
 T(3,*)
 
-#ApplNoBtn=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+#ApplNoBtn=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2010 申請案件明細資料查詢;
 #EvaCompanyBtn=X,15,I,ui:button;value:鑑定公司查詢;enable:1;tabbable:0;
 
+! #ApplnoBuf=X,14,S
+! T(2,00000019999999)
+
 #ApplnoBuf=X,14,S
-T(2,00000019999999)
+T(2, )
 
 #BindApplNoBtn=X,1,S
-BIND(#ApplNoBtn,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#ApplnoBuf;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+BIND(#ApplNoBtn,click, {cmd=CHAIN; ntxcd=L2010; ntxbuf=#ApplnoBuf;ntxbuf5=type<-1:ApplNo<-OOApplNo})
 
 #EvaCompanyBuf=X,4,S
 T(2,2+  +0)

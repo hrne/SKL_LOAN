@@ -56,7 +56,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHERE \"AcDate\" >= :startDate ";
 		sql += "       AND \"AcDate\" <= :endDate ";
 		//sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000','20222180200') ";
-		sql += "       AND AD.\"AcNoCode\" LIKE '20222%' ";
+		sql += "       AND \"AcNoCode\" LIKE '20222%' ";
 		sql += "     GROUP BY \"AcDate\" ";
 		sql += "            , \"AcNoCode\" ";
 		sql += " ) ";

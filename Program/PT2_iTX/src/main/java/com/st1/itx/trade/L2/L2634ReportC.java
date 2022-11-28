@@ -23,6 +23,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -118,9 +119,14 @@ public class L2634ReportC extends MakeReport {
 
 	private void exportPdf(List<ClOtherRights> lClOtherRights, TitaVo titaVo) throws LogicException {
 		this.info("exportExcel ... ");
+//
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634C", "簽收回條-整批列印", "", "L2631C_簽收回條.pdf");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L2634C", "簽收回條-整批列印", "", "L2631C_簽收回條.pdf");
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setSecurity("機密").setRptCode("L2634C").setRptItem("簽收回條-整批列印").setPageOrientation("P")
+				.setUseDefault(true).build();
 
+		this.open(titaVo, reportVo, "L2631C_簽收回條.pdf");
 		this.setFont(1);
 
 		this.setFontSize(12);
@@ -155,6 +161,7 @@ public class L2634ReportC extends MakeReport {
 				if (tCdEmp != null) {
 					tlrName = tCdEmp.getFullname();
 				}
+				this.print(1, 0, "");
 				String closeDate = parse.IntegerToString(tFacClose.getCloseDate(), 7); // 結清日期
 				this.info("closeDate = " + closeDate);
 				int wkCloseYy = parse.stringToInteger(closeDate.substring(0, 3)); // 年
@@ -170,17 +177,17 @@ public class L2634ReportC extends MakeReport {
 				this.print(-13, 65, custId); // 統編
 				this.print(-49, 74, tlrName); // 經辦
 
+				this.info("isLast = " + isLast);
+				if (isLast) {
+
+					break;
+				} else {
+					this.info("C newPage");
+					this.newPage();
+
+				}
 			}
 
-			this.info("isLast = " + isLast);
-			if (isLast) {
-
-				break;
-			} else {
-				this.info("C newPage");
-				this.newPage();
-
-			}
 		}
 
 		this.info("C 結束");
