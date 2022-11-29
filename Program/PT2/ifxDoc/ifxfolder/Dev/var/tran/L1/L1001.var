@@ -127,6 +127,7 @@ T(1,@Mobile,#NTXBUF,119,15)
 T(1,@IdKind,#NTXBUF,134,1)
 
 
+
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 
@@ -321,8 +322,8 @@ IF(#custidlen==8,C(5,#OODataStatus,1,T(3,L1102),T(3,L1104)),C(5,#OODataStatus,1,
 #OO_FUNCD=X,1,S
 T(3,5)
 
-#OOBUF1=X,11,S
-T(2,#OO_FUNCD+#OOCustId)
+#OOBUF1=X,18,S
+T(2,#OO_FUNCD+#OOCustId+#OOCustNo)
 
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTTXCD; ntxbuf=#OOBUF1})

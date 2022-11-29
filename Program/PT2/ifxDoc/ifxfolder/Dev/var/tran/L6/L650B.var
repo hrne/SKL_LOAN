@@ -1,0 +1,519 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L650B)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,修改)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p0" layout="cols=2;screen.width=[300,700];printer.width=[20,80];">
+[
+["[L650B]                                 業績計算特殊參數設定(排除部門別)"],
+["#FdExclude+設定選項",#ExcludeX],
+[#<->#,"#FdExcludeItem+排除項目",#Ap1,#Ap2,#Ap3,#Ap4,#Ap5],
+]
+#FdExclude=X,2,L
+#FdExcludeItem=X,2,L
+#FdCommon=X,2,L
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L6R37.dec"/>
+<include src="ROM.icf::L6R40.dec"/>
+#CDDEF0001=x,20,S
+T(3,CdCode.Exclude)
+#ExcludeHelp=x,1024,S
+
+#CDDEF0002=x,20,S
+T(3,CdCode.YesNo)
+#YesNoHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ExcludeHelp,#HelpDesc1)
+T(2,@YesNoHelp,#HelpDesc2)
+
+! 設定選項
+#Exclude=X,1,S
+T(2,2)
+#ExcludeX=X,20,L
+T(H,#Exclude,#ExcludeHelp)
+
+! 排除部門別按鈕start
+#Ap1=X,15,I,ui:button;value:業績全部;enable:1;tabbable:0
+#Ap2=X,15,I,ui:button;value:換算業績、業務報酬;enable:1;tabbable:0
+#Ap3=X,15,I,ui:button;value:介紹獎金;enable:1;tabbable:0
+#Ap4=X,15,I,ui:button;value:加碼獎勵津貼;enable:1;tabbable:0
+#Ap5=X,15,I,ui:button;value:協辦獎金;enable:1;tabbable:0
+! 排除部門別按鈕end
+
+#BIND_1=X,1,S
+BIND(#Ap1,click, {cmd=CALLSEND;DOCODE=Show1})
+
+#BIND_2=X,1,S
+BIND(#Ap2,click, {cmd=CALLSEND;DOCODE=Show2})
+
+#BIND_3=X,1,S
+BIND(#Ap3,click, {cmd=CALLSEND;DOCODE=Show3})
+
+#BIND_4=X,1,S
+BIND(#Ap4,click, {cmd=CALLSEND;DOCODE=Show4})
+
+#BIND_5=X,1,S
+BIND(#Ap5,click, {cmd=CALLSEND;DOCODE=Show5})
+
+#PageFg=A,1,S
+E(0,0)
+
+! 顯示第一頁
+#Show1=@,1,S
+IF(#PageFg==1,E(0,@PageFg,0),E(0,@PageFg,1))
+CALL(#ResetPages)
+
+! 顯示第二頁
+#Show2=@,1,S
+IF(#PageFg==2,E(0,@PageFg,0),E(0,@PageFg,2))
+CALL(#ResetPages)
+
+! 顯示第三頁
+#Show3=@,1,S
+IF(#PageFg==3,E(0,@PageFg,0),E(0,@PageFg,3))
+CALL(#ResetPages)
+
+! 顯示第四頁
+#Show4=@,1,S
+IF(#PageFg==4,E(0,@PageFg,0),E(0,@PageFg,4))
+CALL(#ResetPages)
+
+! 顯示第五頁
+#Show5=@,1,S
+IF(#PageFg==5,E(0,@PageFg,0),E(0,@PageFg,5))
+CALL(#ResetPages)
+
+#CALLGRID=@,1,S
+##loop{times:30,n:1,k:2}
+C(4,#DeptCodeA{n},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
+C(4,#DeptCodeB{n},INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
+C(4,#DeptCodeC{n},INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
+C(4,#DeptCodeD{n},INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
+C(4,#DeptCodeE{n},INVOKEJS(SHOW,grd5_{k},0),INVOKEJS(SHOW,grd5_{k},1))
+##end
+
+#ResetPages=@,1,S
+INVOKEJS(SHOW,p1,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+INVOKEJS(SHOW,p4,0)
+INVOKEJS(SHOW,p5,0)
+CALL(#CALLGRID)
+IF(#PageFg==1 ,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,grd1_2,1)K(LIGHT,#Ap1,TXTRED,0),K(LIGHT,#Ap1,TXTRED,-1))
+IF(#PageFg==2 ,INVOKEJS(SHOW,p2,1)INVOKEJS(SHOW,grd2_2,1)K(LIGHT,#Ap2,TXTRED,0),K(LIGHT,#Ap2,TXTRED,-1))
+IF(#PageFg==3 ,INVOKEJS(SHOW,p3,1)INVOKEJS(SHOW,grd3_2,1)K(LIGHT,#Ap3,TXTRED,0),K(LIGHT,#Ap3,TXTRED,-1))
+IF(#PageFg==4 ,INVOKEJS(SHOW,p4,1)INVOKEJS(SHOW,grd4_2,1)K(LIGHT,#Ap4,TXTRED,0),K(LIGHT,#Ap4,TXTRED,-1))
+IF(#PageFg==5 ,INVOKEJS(SHOW,p5,1)INVOKEJS(SHOW,grd5_2,1)K(LIGHT,#Ap5,TXTRED,0),K(LIGHT,#Ap5,TXTRED,-1))
+! 調Rim(L6R40)
+#RimFunc=A,1,S
+E(0,1)
+#RimL6R40=X,1,S
+
+RESET_RIM(#RimL6R40,L6R40)
+S(L6R40,1,#RimFunc)
+R(1,L6R40)
+##loop{times:30,i:1}
+T(2,@DeptCodeA{i},#L6R40DeptCodeA{i})
+T(2,@DeptCodeAX{i},#L6R40DeptCodeXA{i})
+T(2,@CheckDeptCodeA{i},#DeptCodeA{i})
+T(2,@DeptCodeB{i},#L6R40DeptCodeB{i})
+T(2,@DeptCodeBX{i},#L6R40DeptCodeXB{i})
+T(2,@CheckDeptCodeB{i},#DeptCodeB{i})
+T(2,@DeptCodeC{i},#L6R40DeptCodeC{i})
+T(2,@DeptCodeCX{i},#L6R40DeptCodeXC{i})
+T(2,@CheckDeptCodeC{i},#DeptCodeC{i})
+T(2,@DeptCodeD{i},#L6R40DeptCodeD{i})
+T(2,@DeptCodeDX{i},#L6R40DeptCodeXD{i})
+T(2,@CheckDeptCodeD{i},#DeptCodeD{i})
+T(2,@DeptCodeE{i},#L6R40DeptCodeE{i})
+T(2,@DeptCodeEX{i},#L6R40DeptCodeXE{i})
+T(2,@CheckDeptCodeE{i},#DeptCodeE{i})
+E(0,@WorkMonthSA{i},#L6R40WorkMonthSA{i})
+E(0,@WorkMonthEA{i},#L6R40WorkMonthEA{i})
+E(0,@WorkMonthSB{i},#L6R40WorkMonthSB{i})
+E(0,@WorkMonthEB{i},#L6R40WorkMonthEB{i})
+E(0,@WorkMonthSC{i},#L6R40WorkMonthSC{i})
+E(0,@WorkMonthEC{i},#L6R40WorkMonthEC{i})
+E(0,@WorkMonthSD{i},#L6R40WorkMonthSD{i})
+E(0,@WorkMonthED{i},#L6R40WorkMonthED{i})
+E(0,@WorkMonthSE{i},#L6R40WorkMonthSE{i})
+E(0,@WorkMonthEE{i},#L6R40WorkMonthEE{i})
+##end
+
+! 調Rim值宣告(L6R37)
+#RimFlag=A,1,S
+E(0,2)
+#RimProdCode=X,6,S
+#RimDeptCode=X,6,S
+
+#DeptCodeA0=X,1,S
+T(3,X)
+
+##loop{times:30,i:1,j:0,rowSeq:2}
+#CheckDeptCodeA{i}=X,6,S
+T(3, )
+
+#HIDE_A_ROW_{i}=@,1,S
+C(4,#L6R40DeptCodeA{i},INVOKEJS(SHOW,grd1_{rowSeq},0),INVOKEJS(SHOW,grd1_{rowSeq},1))
+
+#SHOW_A_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd1_{rowSeq},1)
+
+#DeptCodeA{i}=X,6,I
+IF(#PageFg==1,$,CALL(#Show1))
+C(4,#DeptCodeA{j},CALL(#HIDE_A_ROW_{i}),CALL(#SHOW_A_ROW_{i}))
+C(4,#DeptCodeA{j},S,$)
+T(3,@CheckDeptCodeA{i}, )
+@T(3,@DeptCodeAX{i},)
+C(4,#DeptCodeA{i},S,$)
+V(4,#CheckDeptCodeA1,#CheckDeptCodeA2,#CheckDeptCodeA3,#CheckDeptCodeA4,#CheckDeptCodeA5,#CheckDeptCodeA6,#CheckDeptCodeA7,#CheckDeptCodeA8,#CheckDeptCodeA9,#CheckDeptCodeA10,#CheckDeptCodeA11,#CheckDeptCodeA12,#CheckDeptCodeA13,#CheckDeptCodeA14,#CheckDeptCodeA15,#CheckDeptCodeA16,#CheckDeptCodeA17,#CheckDeptCodeA18,#CheckDeptCodeA19,#CheckDeptCodeA20,#CheckDeptCodeA21,#CheckDeptCodeA22,#CheckDeptCodeA23,#CheckDeptCodeA24,#CheckDeptCodeA25,#CheckDeptCodeA26,#CheckDeptCodeA27,#CheckDeptCodeA28,#CheckDeptCodeA29,#CheckDeptCodeA30)
+
+
+#RimL6R37A{i}=X,1,S
+C(4,#DeptCodeA{i},S,$)
+T(2,@RimDeptCode,#DeptCodeA{i})
+RESET_RIM(#RimL6R37A{i},L6R37)
+S(L6R37,1,#RimFlag,#RimProdCode,#RimDeptCode)
+R(1,L6R37)
+T(2,@DeptCodeAX{i},#L6R37DeptName)
+
+#DeptCodeAX{i}=X,20,L
+C(4,#DeptCodeA{i},S,$)
+
+#WorkMonthSA{i}=A,5,I
+IF(#PageFg==1,$,CALL(#Show1))
+C(4,#DeptCodeA{j},S,$)
+@C(4,#DeptCodeA{i},S,A(YM13,0,#WorkMonthSA{i}))
+
+#WorkMonthEA{i}=A,5,I
+IF(#PageFg==1,$,CALL(#Show1))
+C(4,#DeptCodeA{j},S,$)
+@C(4,#DeptCodeA{i},S,$)
+C(3,#WorkMonthEA{i},0,s,A(YM13,0,#WorkMonthEA{i}))
+IF(#WorkMonthSA{i}>#WorkMonthEA{i},V(P,止月不可小於起月),$)
+
+#WKA{i}=X,1,S
+T(2,@CheckDeptCodeA{i},#DeptCodeA{i})
+##end
+
+#DeptCodeB0=X,1,S
+T(3,X)
+
+##loop{times:30,i:1,j:0,rowSeq:2}
+#CheckDeptCodeB{i}=X,6,S
+T(3, )
+
+#HIDE_B_ROW_{i}=@,1,S
+C(4,#L6R40DeptCodeB{i},INVOKEJS(SHOW,grd2_{rowSeq},0),INVOKEJS(SHOW,grd2_{rowSeq},1))
+
+#SHOW_B_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd2_{rowSeq},1)
+
+#DeptCodeB{i}=X,6,I
+IF(#PageFg==2,$,CALL(#Show2))
+C(4,#DeptCodeB{j},CALL(#HIDE_B_ROW_{i}),CALL(#SHOW_B_ROW_{i}))
+C(4,#DeptCodeB{j},S,$)
+T(3,@CheckDeptCodeB{i}, )
+@T(3,@DeptCodeBX{i},)
+C(4,#DeptCodeB{i},S,$)
+V(4,#CheckDeptCodeB1,#CheckDeptCodeB2,#CheckDeptCodeB3,#CheckDeptCodeB4,#CheckDeptCodeB5,#CheckDeptCodeB6,#CheckDeptCodeB7,#CheckDeptCodeB8,#CheckDeptCodeB9,#CheckDeptCodeB10,#CheckDeptCodeB11,#CheckDeptCodeB12,#CheckDeptCodeB13,#CheckDeptCodeB14,#CheckDeptCodeB15,#CheckDeptCodeB16,#CheckDeptCodeB17,#CheckDeptCodeB18,#CheckDeptCodeB19,#CheckDeptCodeB20,#CheckDeptCodeB21,#CheckDeptCodeB22,#CheckDeptCodeB23,#CheckDeptCodeB24,#CheckDeptCodeB25,#CheckDeptCodeB26,#CheckDeptCodeB27,#CheckDeptCodeB28,#CheckDeptCodeB29,#CheckDeptCodeB30)
+
+
+
+#RimL6R37B{i}=X,1,S
+C(4,#DeptCodeB{i},S,$)
+T(2,@RimDeptCode,#DeptCodeB{i})
+RESET_RIM(#RimL6R37B{i},L6R37)
+S(L6R37,1,#RimFlag,#RimProdCode,#RimDeptCode)
+R(1,L6R37)
+T(2,@DeptCodeBX{i},#L6R37DeptName)
+
+#DeptCodeBX{i}=X,20,L
+C(4,#DeptCodeB{i},S,$)
+
+#WorkMonthSB{i}=A,5,I
+IF(#PageFg==2,$,CALL(#Show2))
+C(4,#DeptCodeB{j},S,$)
+@C(4,#DeptCodeB{i},S,A(YM13,0,#WorkMonthSB{i}))
+
+#WorkMonthEB{i}=A,5,I
+IF(#PageFg==2,$,CALL(#Show2))
+C(4,#DeptCodeB{j},S,$)
+@C(4,#DeptCodeB{i},S,$)
+C(3,#WorkMonthEB{i},0,s,A(YM13,1,#WorkMonthEB{i}))
+IF(#WorkMonthSB{i}>#WorkMonthEB{i},V(P,止月不可小於起月),$)
+
+#WKB{i}=X,1,S
+T(2,@CheckDeptCodeB{i},#DeptCodeB{i})
+##end
+
+#DeptCodeC0=X,1,S
+T(3,X)
+
+##loop{times:30,i:1,j:0,rowSeq:2}
+#CheckDeptCodeC{i}=X,6,S
+T(3, )
+
+#HIDE_C_ROW_{i}=@,1,S
+C(4,#L6R40DeptCodeC{i},INVOKEJS(SHOW,grd3_{rowSeq},0),INVOKEJS(SHOW,grd3_{rowSeq},1))
+#SHOW_C_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd3_{rowSeq},1)
+
+#DeptCodeC{i}=X,6,I
+IF(#PageFg==3,$,CALL(#Show3))
+C(4,#DeptCodeC{j},CALL(#HIDE_C_ROW_{i}),CALL(#SHOW_C_ROW_{i}))
+C(4,#DeptCodeC{j},S,$)
+T(3,@CheckDeptCodeC{i}, )
+@T(3,@DeptCodeCX{i},)
+C(4,#DeptCodeC{i},S,$)
+V(4,#CheckDeptCodeC1,#CheckDeptCodeC2,#CheckDeptCodeC3,#CheckDeptCodeC4,#CheckDeptCodeC5,#CheckDeptCodeC6,#CheckDeptCodeC7,#CheckDeptCodeC8,#CheckDeptCodeC9,#CheckDeptCodeC10,#CheckDeptCodeC11,#CheckDeptCodeC12,#CheckDeptCodeC13,#CheckDeptCodeC14,#CheckDeptCodeC15,#CheckDeptCodeC16,#CheckDeptCodeC17,#CheckDeptCodeC18,#CheckDeptCodeC19,#CheckDeptCodeC20,#CheckDeptCodeC21,#CheckDeptCodeC22,#CheckDeptCodeC23,#CheckDeptCodeC24,#CheckDeptCodeC25,#CheckDeptCodeC26,#CheckDeptCodeC27,#CheckDeptCodeC28,#CheckDeptCodeC29,#CheckDeptCodeC30)
+
+
+#RimL6R37C{i}=X,1,S
+C(4,#DeptCodeC{i},S,$)
+T(2,@RimDeptCode,#DeptCodeC{i})
+RESET_RIM(#RimL6R37C{i},L6R37)
+S(L6R37,1,#RimFlag,#RimProdCode,#RimDeptCode)
+R(1,L6R37)
+T(2,@DeptCodeCX{i},#L6R37DeptName)
+
+#DeptCodeCX{i}=X,20,L
+C(4,#DeptCodeC{i},S,$)
+
+#WorkMonthSC{i}=A,5,I
+IF(#PageFg==3,$,CALL(#Show3))
+C(4,#DeptCodeC{j},S,$)
+@C(4,#DeptCodeC{i},S,A(YM13,0,#WorkMonthSC{i}))
+
+#WorkMonthEC{i}=A,5,I
+IF(#PageFg==3,$,CALL(#Show3))
+C(4,#DeptCodeC{j},S,$)
+@C(4,#DeptCodeC{i},S,$)
+C(3,#WorkMonthEC{i},0,s,A(YM13,1,#WorkMonthEC{i}))
+IF(#WorkMonthSC{i}>#WorkMonthEC{i},V(P,止月不可小於起月),$)
+
+#WKC{i}=X,1,S
+T(2,@CheckDeptCodeC{i},#DeptCodeC{i})
+##end
+
+#DeptCodeD0=X,1,S
+T(3,X)
+
+##loop{times:30,i:1,j:0,rowSeq:2}
+#CheckDeptCodeD{i}=X,6,S
+T(3, )
+
+#HIDE_D_ROW_{i}=@,1,S
+C(4,#L6R40DeptCodeD{i},INVOKEJS(SHOW,grd4_{rowSeq},0),INVOKEJS(SHOW,grd4_{rowSeq},1))
+#SHOW_D_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd4_{rowSeq},1)
+
+#DeptCodeD{i}=X,6,I
+IF(#PageFg==4,$,CALL(#Show4))
+C(4,#DeptCodeD{j},CALL(#HIDE_D_ROW_{i}),CALL(#SHOW_D_ROW_{i}))
+C(4,#DeptCodeD{j},S,$)
+T(3,@CheckDeptCodeD{i}, )
+@T(3,@DeptCodeDX{i},)
+C(4,#DeptCodeD{i},S,$)
+V(4,#CheckDeptCodeD1,#CheckDeptCodeD2,#CheckDeptCodeD3,#CheckDeptCodeD4,#CheckDeptCodeD5,#CheckDeptCodeD6,#CheckDeptCodeD7,#CheckDeptCodeD8,#CheckDeptCodeD9,#CheckDeptCodeD10,#CheckDeptCodeD11,#CheckDeptCodeD12,#CheckDeptCodeD13,#CheckDeptCodeD14,#CheckDeptCodeD15,#CheckDeptCodeD16,#CheckDeptCodeD17,#CheckDeptCodeD18,#CheckDeptCodeD19,#CheckDeptCodeD20,#CheckDeptCodeD21,#CheckDeptCodeD22,#CheckDeptCodeD23,#CheckDeptCodeD24,#CheckDeptCodeD25,#CheckDeptCodeD26,#CheckDeptCodeD27,#CheckDeptCodeD28,#CheckDeptCodeD29,#CheckDeptCodeD30)
+
+
+#RimL6R37D{i}=X,1,S
+C(4,#DeptCodeD{i},S,$)
+T(2,@RimDeptCode,#DeptCodeD{i})
+RESET_RIM(#RimL6R37D{i},L6R37)
+S(L6R37,1,#RimFlag,#RimProdCode,#RimDeptCode)
+R(1,L6R37)
+T(2,@DeptCodeDX{i},#L6R37DeptName)
+
+#DeptCodeDX{i}=X,20,L
+C(4,#DeptCodeD{i},S,$)
+
+#WorkMonthSD{i}=A,5,I
+IF(#PageFg==4,$,CALL(#Show4))
+C(4,#DeptCodeD{j},S,$)
+@C(4,#DeptCodeD{i},S,A(YM13,0,#WorkMonthSD{i}))
+
+#WorkMonthED{i}=A,5,I
+IF(#PageFg==4,$,CALL(#Show4))
+C(4,#DeptCodeD{j},S,$)
+@C(4,#DeptCodeD{i},S,$)
+C(3,#WorkMonthED{i},0,s,A(YM13,1,#WorkMonthED{i}))
+IF(#WorkMonthSD{i}>#WorkMonthED{i},V(P,止月不可小於起月),$)
+
+#WKD{i}=X,1,S
+T(2,@CheckDeptCodeD{i},#DeptCodeD{i})
+##end
+
+#DeptCodeE0=X,1,S
+T(3,X)
+
+##loop{times:30,i:1,j:0,rowSeq:2}
+#CheckDeptCodeE{i}=X,6,S
+T(3, )
+
+#HIDE_E_ROW_{i}=@,1,S
+C(4,#L6R40DeptCodeE{i},INVOKEJS(SHOW,grd5_{rowSeq},0),INVOKEJS(SHOW,grd5_{rowSeq},1))
+#SHOW_E_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd5_{rowSeq},1)
+
+#DeptCodeE{i}=X,6,I
+IF(#PageFg==5,$,CALL(#Show5))
+C(4,#DeptCodeE{j},CALL(#HIDE_E_ROW_{i}),CALL(#SHOW_E_ROW_{i}))
+C(4,#DeptCodeE{j},S,$)
+T(3,@CheckDeptCodeE{i}, )
+@T(3,@DeptCodeEX{i},)
+C(4,#DeptCodeE{i},S,$)
+V(4,#CheckDeptCodeE1,#CheckDeptCodeE2,#CheckDeptCodeE3,#CheckDeptCodeE4,#CheckDeptCodeE5,#CheckDeptCodeE6,#CheckDeptCodeE7,#CheckDeptCodeE8,#CheckDeptCodeE9,#CheckDeptCodeE10,#CheckDeptCodeE11,#CheckDeptCodeE12,#CheckDeptCodeE13,#CheckDeptCodeE14,#CheckDeptCodeE15,#CheckDeptCodeE16,#CheckDeptCodeE17,#CheckDeptCodeE18,#CheckDeptCodeE19,#CheckDeptCodeE20,#CheckDeptCodeE21,#CheckDeptCodeE22,#CheckDeptCodeE23,#CheckDeptCodeE24,#CheckDeptCodeE25,#CheckDeptCodeE26,#CheckDeptCodeE27,#CheckDeptCodeE28,#CheckDeptCodeE29,#CheckDeptCodeE30)
+
+
+#RimL6R37E{i}=X,1,S
+C(4,#DeptCodeE{i},S,$)
+T(2,@RimDeptCode,#DeptCodeE{i})
+RESET_RIM(#RimL6R37E{i},L6R37)
+S(L6R37,1,#RimFlag,#RimProdCode,#RimDeptCode)
+R(1,L6R37)
+T(2,@DeptCodeEX{i},#L6R37DeptName)
+
+#DeptCodeEX{i}=X,20,L
+C(4,#DeptCodeE{i},S,$)
+
+#WorkMonthSE{i}=A,5,I
+IF(#PageFg==5,$,CALL(#Show5))
+C(4,#DeptCodeE{j},S,$)
+@C(4,#DeptCodeE{i},S,A(YM13,0,#WorkMonthSE{i}))
+
+#WorkMonthEE{i}=A,5,I
+IF(#PageFg==5,$,CALL(#Show5))
+C(4,#DeptCodeE{j},S,$)
+@C(4,#DeptCodeE{i},S,$)
+C(3,#WorkMonthEE{i},0,s,A(YM13,1,#WorkMonthEE{i}))
+IF(#WorkMonthSE{i}>#WorkMonthEE{i},V(P,止月不可小於起月),$)
+
+#WKE{i}=X,1,S
+T(2,@CheckDeptCodeE{i},#DeptCodeE{i})
+##end
+
+
+
+
+</sub>
+<sub type="DC" name="p1" layout="cols=2;screen.width=[300,700];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"#FdCommon+排除部門別-業績全部",],
+["#grid#,{id:1,expand:true,loop:30,row_height:1}","　","","",
+["部門代號","部門名稱","起始年月","結束年月"],
+[#DeptCodeA1,#DeptCodeAX1,#WorkMonthSA1,#WorkMonthEA1]
+],
+]
+</sub>
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[300,700];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"#FdCommon+排除部門別-換算業績、業務報酬",],
+["#grid#,{id:2,expand:true,loop:30,row_height:1}","　","","",
+["部門代號","部門名稱","起始年月","結束年月"],
+[#DeptCodeB1,#DeptCodeBX1,#WorkMonthSB1,#WorkMonthEB1]
+],
+]
+</sub>
+
+<sub type="DC" name="p3" layout="cols=2;screen.width=[300,700];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"#FdCommon+排除部門別-介紹獎金",],
+["#grid#,{id:3,expand:true,loop:30,row_height:1}","　","","",
+["部門代號","部門名稱","起始年月","結束年月"],
+[#DeptCodeC1,#DeptCodeCX1,#WorkMonthSC1,#WorkMonthEC1]
+],
+]
+</sub>
+
+<sub type="DC" name="p4" layout="cols=2;screen.width=[300,700];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"#FdCommon+排除部門別-加碼獎勵津貼",],
+["#grid#,{id:4,expand:true,loop:30,row_height:1}","　","","",
+["部門代號","部門名稱","起始年月","結束年月"],
+[#DeptCodeD1,#DeptCodeDX1,#WorkMonthSD1,#WorkMonthED1]
+],
+]
+</sub>
+
+<sub type="DC" name="p5" layout="cols=2;screen.width=[300,700];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"#FdCommon+排除部門別-協辦獎金",],
+["#grid#,{id:5,expand:true,loop:30,row_height:1}","　","","",
+["部門代號","部門名稱","起始年月","結束年月"],
+[#DeptCodeE1,#DeptCodeEX1,#WorkMonthSE1,#WorkMonthEE1]
+],
+]
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L650B -----------
+<sub type="FORM" name="L650B">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+##loop {times:30,i:1}
+#DeptCodeA{i}
+#DeptCodeB{i}
+#DeptCodeC{i}
+#DeptCodeD{i}
+#DeptCodeE{i}
+#WorkMonthSA{i}
+#WorkMonthEA{i}
+#WorkMonthSB{i}
+#WorkMonthEB{i}
+#WorkMonthSC{i}
+#WorkMonthEC{i}
+#WorkMonthSD{i}
+#WorkMonthED{i}
+#WorkMonthSE{i}
+#WorkMonthEE{i}
+##end
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R37.tom"/>
+<include src="ROM.icf::L6R40.tom"/>
+TXFORM=L650B
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

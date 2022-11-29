@@ -857,8 +857,6 @@ V(H,#JobTitleHelp)
 
 #TEMP_MEMB_POS=A,2,S
 
-
-
 #InsiderJobTitleX=X,30,L
 C(4,#InsiderJobTitle,S,$)
 T(H,#InsiderJobTitle,#JobTitleHelp)
@@ -875,7 +873,6 @@ V(H,#PositionHelp)
 
 #TEMP_MEMB_IND=A,2,S
 
-
 #InsiderPositionX=X,20,L
 C(4,#InsiderPosition,S,$)
 T(H,#InsiderPosition,#PositionHelp)
@@ -887,14 +884,14 @@ IF(#FunCd==4,s,$)
 @A(ID_UNINO,0,#LegalPersonId)
 
 
-#RimL1r09A=X,1,S
-T(2,@L1r09CustName,)
-E(0,@RimFunCd,1)
-T(2,@RimCustId,#LegalPersonId)
-E(0,@RimCustNo,0)
-RESET_RIM(#RimL1r09,L1R09)
-S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
-R(1,L1R09)
+! #RimL1r09A=X,1,S
+! T(2,@L1r09CustName,)
+! E(0,@RimFunCd,1)
+! T(2,@RimCustId,#LegalPersonId)
+! E(0,@RimCustNo,0)
+! RESET_RIM(#RimL1r09,L1R09)
+! S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+! R(1,L1R09)
 
 #LoanToValueHelp=X,1024,S
 T(3,:<font color=red>下列「擔保維持率」、「通知追繳維持率」、「實行質權維持率」與批示條件不同時請自行輸入。

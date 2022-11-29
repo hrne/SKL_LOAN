@@ -147,6 +147,10 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"CdCode\" ";
 		sql += " WHERE \"DefCode\" = 'AcSubBookCode' ";
 		sql += " UNION ALL ";
+		sql += " SELECT '000' F0 ";
+		sql += "       ,n'傳統帳冊A' F1 ";
+		sql += " FROM DUAL ";
+		sql += " UNION ALL ";
 		sql += " SELECT '%' F0 ";
 		sql += "       ,n'全部' F1 ";
 		sql += " FROM DUAL ";

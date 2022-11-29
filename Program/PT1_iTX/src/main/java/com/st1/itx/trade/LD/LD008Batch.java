@@ -51,13 +51,13 @@ public class LD008Batch extends BatchBase implements Tasklet, InitializingBean {
 		this.info("active LD008Batch ");
 
 		// 各產一張 0:放款餘額總表;1:關係人放款餘額總表
-		titaVo.putParam("inputShowType", 0);
+//		titaVo.putParam("inputShowType", 0);
 
-		lD008Report.exec(titaVo);
+		lD008Report.exec(titaVo, "0");
 
 		// 各產一張 0:放款餘額總表;1:關係人放款餘額總表
-		titaVo.putParam("inputShowType", 1);
+//		titaVo.putParam("inputShowType", 1);
 
-		lD008Report.exec(titaVo);
+		lD008Report.exec(titaVo, "1");
 	}
 }

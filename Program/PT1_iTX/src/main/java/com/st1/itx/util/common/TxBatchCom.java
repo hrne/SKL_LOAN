@@ -701,10 +701,8 @@ public class TxBatchCom extends TradeBuffer {
 			iChequeAcct = parse.stringToInteger(tDetail.getRvNo().substring(0, 9));
 			iChequeNo = parse.stringToInteger(tDetail.getRvNo().substring(10, 17));
 		}
-		txTitaVo.putParam("ChequeName", "");
 		txTitaVo.putParam("ChequeAcct", iChequeAcct);
 		txTitaVo.putParam("ChequeNo", iChequeNo);
-		txTitaVo.putParam("ChequeDate", 0);
 
 		// 收付欄
 		txTitaVo.putParam("RpFlag", "1"); // 1:應收

@@ -19,8 +19,11 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
+import com.st1.itx.db.domain.LoanCheque;
+import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
@@ -44,6 +47,8 @@ public class AcRepayCom extends TradeBuffer {
 
 	@Autowired
 	public CdCodeService cdCodeService;
+	@Autowired
+	public LoanChequeService loanChequeService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
 	@Autowired
@@ -426,6 +431,16 @@ public class AcRepayCom extends TradeBuffer {
 		case "103": // 103.員工扣款
 			break;
 		case "104": // 104.支票兌現
+			int iChequeAcct = this.parse.stringToInteger(acDetail.getRvNo().substring(0, 9));
+			int iChequeNo = this.parse.stringToInteger(acDetail.getRvNo().substring(10, 17));
+			titaVo.putParam("ChequeAcct", iChequeAcct);
+			titaVo.putParam("ChequeNo", iChequeNo);
+			titaVo.putParam("ChequeAmt", acDetail.getTxAmt());
+			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
+			if (tLoanCheque != null) {
+				titaVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
+			}
+
 			break;
 		// 其他還款來源有核心銷帳碼
 		case "105": // 105.法院扣薪
@@ -549,6 +564,24 @@ public class AcRepayCom extends TradeBuffer {
 					&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4))) {
 				tx.setSlipSumNo(parse.stringToInteger(titaVo.get("BATCHNO").substring(4, 6)));
 			}
+		}
+		// 收付欄 TempVo
+		TempVo tTempVo = new TempVo();
+		tTempVo = tTempVo.getVo(tx.getOtherFields());
+		// 整批
+		if (titaVo.getBacthNo().trim() != "") {
+			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
+			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
+			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1") == null ? "" : titaVo.get("RpAcctCode1").trim()); // 對帳類別
+			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
+		}
+		// 支票繳款
+		if (tx.getRepayCode() == 4) {
+			tTempVo.putParam("ChequeAmt", titaVo.get("ChequeAmt"));
+			tTempVo.putParam("ChequeAcctNo", titaVo.get("ChequeAcctNo"));
+			tTempVo.putParam("ChequeNo", titaVo.get("ChequeNo"));
+			tTempVo.putParam("StampFreeAmt",
+					tx.getInterest().add(tx.getDelayInt()).add(tx.getBreachAmt()).add(tx.getCloseBreachAmt()));// 利息免印花稅
 		}
 
 		int acSeq = 0;

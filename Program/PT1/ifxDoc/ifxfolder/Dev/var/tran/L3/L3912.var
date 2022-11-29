@@ -2301,7 +2301,7 @@ TXFORM=L3912
 [#<->#,"@清償違約金",#L3200CloseBreachAmtX],
 [#<->#,"@暫收來源",#OTempSourceCodeX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
-["@",""],["@作業日期",#L3200TxDate,#L3200TxTimeX],
+["@主管編號",#L3440SupperNo,#L3440SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
 </sub>
 

@@ -1,15 +1,16 @@
 package com.st1.itx.trade.LD;
 
-import java.util.ArrayList;
-
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.MySpring;
+import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * LD008
@@ -18,19 +19,44 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 @Service("LD008")
-@Scope("prototype")
-public class LD008 extends TradeBuffer {
+@Scope("step")
+public class LD008 extends BatchBase implements Tasklet, InitializingBean {
 
-	String tranCode = "LD008";
+	@Autowired
+	LD008Report lD008report;
+
+	@Autowired
+	Parse parse;
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		;
+	}
 
 	@Override
-	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active " + tranCode);
-		this.totaVo.init(titaVo);
-
-		MySpring.newTask(tranCode + "p", this.txBuffer, titaVo);
-
-		this.addList(this.totaVo);
-		return this.sendList();
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		lD008report.setParentTranCode(this.getParent());
+		return this.exec(contribution, "D");
 	}
+
+	@Override
+	public void run() throws LogicException {
+		this.info("active LD003 ");
+		
+		int totalItem = parse.stringToInteger(titaVo.getParam("TotalItem"));
+
+		String subReportCode = "";
+		
+		for (int i = 1; i <= totalItem; i++) {
+			if (!titaVo.getParam("BtnShell" + i).trim().isEmpty()) {
+				this.info(i + "====" + titaVo.getParam("TradeSub" + i));
+				subReportCode = titaVo.getParam("TradeSub" + i);
+				lD008report.exec(titaVo,subReportCode);
+			}
+		}
+		
+		
+	
+	}
+
 }

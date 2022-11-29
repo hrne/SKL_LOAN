@@ -745,27 +745,6 @@ public class L3440 extends TradeBuffer {
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		
-		if (titaVo.getBacthNo().trim() != "") {
-			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
-			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
-			tTempVo.putParam("ReconCode", titaVo.getParam("RpAcctCode1")); // 對帳類別
-			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
-		}
-		// 支票繳款
-		if (iRpCode == 4) {
-			String iRpRvno = titaVo.getParam("RpRvno1");
-			int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
-			int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
-			tTempVo.putParam("ChequeAcct", iChequeAcct);
-			tTempVo.putParam("ChequeNo", iChequeNo);
-			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
-			if (tLoanCheque != null) {
-				tTempVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
-			}
-			// 利息免印花稅
-			tTempVo.putParam("StampFreeAmt", wkInterest.add(wkDelayInt).add(wkBreachAmt).add(wkCloseBreachAmt));
-		}
-
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		// 暫收款金額含催收還款金額

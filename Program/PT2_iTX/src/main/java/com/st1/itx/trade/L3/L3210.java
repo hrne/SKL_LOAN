@@ -88,7 +88,6 @@ public class L3210 extends TradeBuffer {
 	private int iChequeAcct;
 	private int iChequeNo;
 	private int iTempReasonCode;
-	private String iTempReasonCodeX;
 	private int iTempSourceCode;
 	private int iOverRpFacmNo;
 	private int iRpCode = 0; // 還款來源
@@ -137,7 +136,6 @@ public class L3210 extends TradeBuffer {
 		iChequeAcct = this.parse.stringToInteger(titaVo.getParam("ChequeAcct"));
 		iChequeNo = this.parse.stringToInteger(titaVo.getParam("ChequeNo"));
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
-		iTempReasonCodeX = titaVo.getParam("TempReasonCodeX");
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
@@ -492,24 +490,6 @@ public class L3210 extends TradeBuffer {
 
 		// 其他欄位
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
-
-		if (titaVo.getBacthNo().trim() != "") {
-			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
-			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
-			tTempVo.putParam("ReconCode", titaVo.getParam("RpAcctCode1")); // 對帳類別
-			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
-		}
-		if (iRpCode == 4) {
-			String iRpRvno = titaVo.getParam("RpRvno1");
-			int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
-			int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
-			tTempVo.putParam("ChequeAcct", iChequeAcct);
-			tTempVo.putParam("ChequeNo", iChequeNo);
-			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
-			if (tLoanCheque != null) {
-				tTempVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
-			}
-		}
 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄

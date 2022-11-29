@@ -79,14 +79,14 @@ public class L2702 extends TradeBuffer {
 		if (iFunCd == 1) {
 
 			// 測試該戶號是否存在客戶主檔
-			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
+			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 			this.info("tCustMain = " + tCustMain);
 			// 該戶號部存在客戶主檔 拋錯
 			if (tCustMain == null) {
 				throw new LogicException(titaVo, "E0005", "L2702 該戶號" + iCustNo + "不存在客戶主檔。");
 			}
 
-			tCustRmk = sCustRmkService.findById(custRmkId);
+			tCustRmk = sCustRmkService.findById(custRmkId, titaVo);
 			// 新增時 該戶號,備忘錄序號查有資料 拋錯
 			if (tCustRmk != null) {
 				throw new LogicException(titaVo, "E0002", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "已存在於顧客管控警訊檔。");
@@ -110,7 +110,7 @@ public class L2702 extends TradeBuffer {
 
 			/* 存入DB */
 			try {
-				sCustRmkService.insert(tCustRmk);
+				sCustRmkService.insert(tCustRmk, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
@@ -119,7 +119,7 @@ public class L2702 extends TradeBuffer {
 
 			tCustRmk = new CustRmk();
 			// PK找顧客管控警訊檔HOLD資料
-			tCustRmk = sCustRmkService.holdById(custRmkId);
+			tCustRmk = sCustRmkService.holdById(custRmkId, titaVo);
 
 			if (tCustRmk == null) {
 				throw new LogicException(titaVo, "E0003", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於顧客管控警訊檔。");
@@ -127,7 +127,7 @@ public class L2702 extends TradeBuffer {
 			// 變更前
 			CustRmk beforeCustRmk = (CustRmk) dataLog.clone(tCustRmk);
 
-			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
+			tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 
 			tCustRmk.setCustRmkId(custRmkId);
 			tCustRmk.setCustNo(iCustNo);
@@ -145,7 +145,7 @@ public class L2702 extends TradeBuffer {
 
 			try {
 				// 修改
-				tCustRmk = sCustRmkService.update2(tCustRmk);
+				tCustRmk = sCustRmkService.update2(tCustRmk, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
@@ -160,7 +160,7 @@ public class L2702 extends TradeBuffer {
 			tCustRmk = new CustRmk();
 
 			// PK找關係人主檔HOLD資料
-			tCustRmk = sCustRmkService.holdById(custRmkId);
+			tCustRmk = sCustRmkService.holdById(custRmkId, titaVo);
 			if (tCustRmk == null) {
 				throw new LogicException(titaVo, "E0004", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於顧客管控警訊檔。");
 			}
@@ -176,7 +176,7 @@ public class L2702 extends TradeBuffer {
 				this.info(" L2702 deleteCustRmkLog" + tCustRmk);
 
 				if (tCustRmk != null) {
-					sCustRmkService.delete(tCustRmk);
+					sCustRmkService.delete(tCustRmk, titaVo);
 				}
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());

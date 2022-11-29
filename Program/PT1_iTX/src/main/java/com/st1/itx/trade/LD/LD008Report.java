@@ -30,11 +30,11 @@ public class LD008Report extends MakeReport {
 	@Autowired
 	InnFundAplService innFundAplService;
 
-	@Autowired
-	Parse parse;
-
 	String exportDate;
 
+	@Autowired
+	Parse parse;
+	
 	// 報表種類
 	int rptType;
 
@@ -48,6 +48,9 @@ public class LD008Report extends MakeReport {
 	String fundsMonth;
 	String fundsDay;
 
+	String tranCode = "LD008";
+	String tranName = "放款餘額總表";
+	
 	// percent函數計算用
 	private static final BigDecimal hundred = BigDecimal.valueOf(100);
 
@@ -75,11 +78,12 @@ public class LD008Report extends MakeReport {
 		this.setMaxRows(50);
 	}
 
-	public Boolean exec(TitaVo titaVo) throws LogicException {
+	public Boolean exec(TitaVo titaVo,String subReportCode) throws LogicException {
 
 		this.titaVo = titaVo;
 
-		Boolean findRelatedOnly = "1".equals(titaVo.getParam("inputShowType"));
+	
+		Boolean findRelatedOnly = "1".equals(subReportCode);
 
 		// 設定製表日期
 		setExportDate(dDateUtil.getNowStringBc());
@@ -97,7 +101,8 @@ public class LD008Report extends MakeReport {
 			this.error("lD008ServiceImpl.findAll error = " + e.getMessage());
 		}
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("LD008").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity("機密")
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("LD008").setRptItem((findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")).setSecurity("密")
 				.setRptSize("A4").setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);

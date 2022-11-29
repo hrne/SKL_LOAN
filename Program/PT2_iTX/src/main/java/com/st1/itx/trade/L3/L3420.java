@@ -26,8 +26,6 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
-import com.st1.itx.db.domain.LoanCheque;
-import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
 import com.st1.itx.db.domain.LoanOverdue;
@@ -36,7 +34,6 @@ import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -87,8 +84,6 @@ public class L3420 extends TradeBuffer {
 	public LoanIntDetailService loanIntDetailService;
 	@Autowired
 	public FacCloseService facCloseService;
-	@Autowired
-	public LoanChequeService loanChequeService;
 
 	@Autowired
 	Parse parse;
@@ -1428,8 +1423,6 @@ public class L3420 extends TradeBuffer {
 			tTempVo.putParam("ReduceBreachAmt", wkReduceBreachAmt); // 減免清償違約金+減免違約金+減免延滯息
 		}
 
-		addRpTempVoRoutine(); // // 收付欄 TempVo
-
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		try {
@@ -1438,25 +1431,6 @@ public class L3420 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
 		}
 		this.lLoanBorTx.add(tLoanBorTx);
-	}
-
-	// 收付欄 TempVo
-	private void addRpTempVoRoutine() throws LogicException {
-
-		if (titaVo.getBacthNo().trim() != "") {
-			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
-			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
-			tTempVo.putParam("ReconCode", titaVo.getParam("RpAcctCode1")); // 對帳類別
-			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
-		}
-		// 支票繳款
-		if (iRpCode == 4) {
-			tTempVo.putParam("ChequeAmt", titaVo.get("ChequeAmt"));
-			tTempVo.putParam("ChequeAcctNo", titaVo.get("ChequeAcctNo"));
-			tTempVo.putParam("ChequeNo", titaVo.get("ChequeNo"));
-			// 利息免印花稅
-			tTempVo.putParam("StampFreeAmt", wkInterest.add(wkDelayInt).add(wkBreachAmt).add(wkCloseBreachAmt));
-		}
 	}
 
 	// 新增放款交易內容檔
@@ -1821,16 +1795,5 @@ public class L3420 extends TradeBuffer {
 		titaVo.put("CloseBreachAmtX", df.format(iCloseBreachAmt));// 清償違約金
 		titaVo.put("ExcessiveX", df.format(baTxCom.getExcessive().add(baTxCom.getExcessiveOther())));// 累溢收
 		titaVo.put("TwReduceAmt", df.format(iReduceAmt));// 減免金額
-		if (iRpCode == 4) {
-			String iRpRvno = titaVo.getParam("RpRvno1");
-			int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
-			int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
-			titaVo.putParam("ChequeAcct", iChequeAcct);
-			titaVo.putParam("ChequeNo", iChequeNo);
-			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
-			if (tLoanCheque != null) {
-				titaVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
-			}
-		}
 	}
 }
