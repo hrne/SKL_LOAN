@@ -705,14 +705,6 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("ChequeAcct", iChequeAcct);
 		txTitaVo.putParam("ChequeNo", iChequeNo);
 		txTitaVo.putParam("ChequeDate", 0);
-		if (tDetail.getRepayCode() == 4) {
-			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), txTitaVo);
-			if (tLoanCheque != null) {
-				txTitaVo.putParam("ChequeName", tLoanCheque.getChequeName());
-				txTitaVo.putParam("ChequeDate", tLoanCheque.getChequeDate());
-				txTitaVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
-			}
-		}
 
 		// 收付欄
 		txTitaVo.putParam("RpFlag", "1"); // 1:應收
@@ -1914,8 +1906,8 @@ public class TxBatchCom extends TradeBuffer {
 		if (t.get("PreRepayTerms") != null) {
 			tTempVo.putParam("PreRepayTerms", t.get("PreRepayTerms")); // 批次預收期數
 		}
-		if (t.get("payFeeMethod") != null) {
-			tTempVo.putParam("payFeeMethod", t.get("payFeeMethod")); // 回收費用方式 Y/N
+		if (t.get("PayFeeMethod") != null) {
+			tTempVo.putParam("PayFeeMethod", t.get("PayFeeMethod")); // 回收費用方式 Y/N
 		}
 	}
 

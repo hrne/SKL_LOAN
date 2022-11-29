@@ -169,7 +169,7 @@ public class L3210 extends TradeBuffer {
 		if (iTempReasonCode == 7) {
 			this.isRepaidFee = true;
 		}
-		
+
 		if (iTempSourceCode == 4) { // 支票
 			tLoanChequeId = new LoanChequeId(iChequeAcct, iChequeNo);
 			if (iTempReasonCode != 8) {
@@ -498,6 +498,17 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 			tTempVo.putParam("ReconCode", titaVo.getParam("RpAcctCode1")); // 對帳類別
 			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
+		}
+		if (iRpCode == 4) {
+			String iRpRvno = titaVo.getParam("RpRvno1");
+			int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
+			int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
+			tTempVo.putParam("ChequeAcct", iChequeAcct);
+			tTempVo.putParam("ChequeNo", iChequeNo);
+			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
+			if (tLoanCheque != null) {
+				tTempVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
+			}
 		}
 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());

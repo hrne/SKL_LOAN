@@ -67,6 +67,7 @@ public class L4962ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   select                                                        ";
 		sql += "    \"CustNo\"                                                   ";
 		sql += "   ,\"FacmNo\"                                                   ";
+		sql += "   ,\"Status\"                                                   ";
 		sql += "     from \"CollList\"                                           ";
 		sql += "    where \"Status\" in ('0','2','4','7')                    ";
 		sql += " ) coll                                                          ";

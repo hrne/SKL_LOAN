@@ -28,6 +28,7 @@ import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanCheque;
+import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.LoanFacTmp;
 import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
@@ -39,6 +40,7 @@ import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanFacTmpService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
@@ -104,6 +106,8 @@ public class L3200 extends TradeBuffer {
 	public TxTempService txTempService;
 	@Autowired
 	public LoanFacTmpService loanFacTmpService;
+	@Autowired
+	public LoanChequeService loanChequeService;
 	@Autowired
 	Parse parse;
 	@Autowired
@@ -1718,6 +1722,28 @@ public class L3200 extends TradeBuffer {
 			tTempVo.putParam("NewTotalPeriod", wkNewTotalPeriod);
 		}
 		tTempVo.putParam("RepayKindCode", wkRepaykindCode);
+		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
+			tTempVo.putParam("ExtraRepayFlag", iExtraRepayFlag);
+			tTempVo.putParam("UnpaidIntFlag", iUnpaidIntFlag);
+			tTempVo.putParam("PayMethod", iPayMethod);
+		}
+
+		addRpTempVoRoutine(); // // 收付欄 TempVo
+
+		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+
+		try {
+			loanBorTxService.insert(tLoanBorTx, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+		}
+
+		this.lLoanBorTx.add(tLoanBorTx);
+	}
+
+	// 收付欄 TempVo
+	private void addRpTempVoRoutine() throws LogicException {
+
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
@@ -1732,20 +1758,6 @@ public class L3200 extends TradeBuffer {
 			// 利息免印花稅
 			tTempVo.putParam("StampFreeAmt", wkInterest.add(wkDelayInt).add(wkBreachAmt).add(wkCloseBreachAmt));
 		}
-		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
-			tTempVo.putParam("ExtraRepayFlag", iExtraRepayFlag);
-			tTempVo.putParam("UnpaidIntFlag", iUnpaidIntFlag);
-			tTempVo.putParam("PayMethod", iPayMethod);
-		}
-		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
-
-		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
 	// 交易前撥款主檔留存欄（訂正使用）
@@ -1789,6 +1801,9 @@ public class L3200 extends TradeBuffer {
 		if (wkReduceBreachAmt.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ReduceBreachAmt", wkReduceBreachAmt); // 減免清償違約金+減免違約金+減免延滯息
 		}
+
+		addRpTempVoRoutine(); // // 收付欄 TempVo
+
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		this.lLoanBorTx.add(tLoanBorTx);
@@ -1818,6 +1833,8 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTx.setPrincipal(wkPrincipal);
 		tLoanBorTx.setDisplayflag("A");
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
+
+		addRpTempVoRoutine(); // // 收付欄 TempVo
 
 		try {
 			loanBorTxService.insert(tLoanBorTx, titaVo);
@@ -2054,6 +2071,19 @@ public class L3200 extends TradeBuffer {
 			titaVo.put("BreachCodeX", "");// 清償違約金
 			titaVo.put("TwReduceAmt", "" + iReduceAmt);// 減免金額
 		}
+		
+		if (iRpCode == 4) {
+			String iRpRvno = titaVo.getParam("RpRvno1");
+			int iChequeAcct = this.parse.stringToInteger(iRpRvno.substring(0, 9));
+			int iChequeNo = this.parse.stringToInteger(iRpRvno.substring(10, 17));
+			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
+			if (tLoanCheque != null) {
+				titaVo.putParam("ChequeAcct", iChequeAcct);
+				titaVo.putParam("ChequeNo", iChequeNo);
+				titaVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
+			}
+		}
+
 	}
 
 }
