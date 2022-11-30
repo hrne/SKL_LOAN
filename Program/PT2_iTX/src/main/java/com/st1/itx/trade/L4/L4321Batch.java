@@ -393,17 +393,11 @@ public class L4321Batch extends TradeBuffer {
 		if (tLoanRateChange == null) {
 			checkMsg += "利率資料已變動";
 			isCheckError = true;
-		}
-		if (!tLoanRateChange.getRateCode().equals(tBatxRateChange.getRateCode())
+		} else if (!tLoanRateChange.getRateCode().equals(tBatxRateChange.getRateCode())
 				|| !tLoanRateChange.getBaseRateCode().equals(tBatxRateChange.getBaseRateCode())) {
 			checkMsg += "利率資料已變動";
 			isCheckError = true;
-		}
-		if (!tLoanRateChange.getRateCode().equals(tBatxRateChange.getRateCode())
-				|| !tLoanRateChange.getBaseRateCode().equals(tBatxRateChange.getBaseRateCode())) {
-			checkMsg += "利率資料已變動";
-			isCheckError = true;
-		} else if (tLoanRateChange.getRateIncr().compareTo(tBatxRateChange.getRateIncr()) != 0
+		} else if (tLoanRateChange.getRateIncr().compareTo(tBatxRateChange.getContrRateIncr()) != 0
 				|| tLoanRateChange.getIndividualIncr().compareTo(tBatxRateChange.getIndividualIncr()) != 0) {
 			checkMsg += "利率資料已變動";
 			isCheckError = true;
@@ -412,7 +406,7 @@ public class L4321Batch extends TradeBuffer {
 			checkMsg += "利率資料已變動";
 			isCheckError = true;
 		}
-		
+
 		// check CurtEffDate
 		if (tBatxRateChange.getCurtEffDate() != tBatxRateChange.getPresEffDate()) {
 			tLoanRateChange = new LoanRateChange();

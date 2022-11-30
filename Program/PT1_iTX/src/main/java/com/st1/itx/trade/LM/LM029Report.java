@@ -15,6 +15,7 @@ import com.st1.itx.db.service.springjpa.cm.LM029ServiceImpl;
 
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -68,13 +69,31 @@ public class LM029Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM029) throws LogicException {
 		this.info("LM029Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表", "LM029_底稿_放款餘額明細表.xlsx", "la$w30p");
+
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM029";
+		String fileItem = "放款餘額明細表";
+		String fileName = "LM029-放款餘額明細表";
+		String defaultExcel = "LM029_底稿_放款餘額明細表.xlsx";
+		String defaultSheet = "la$w30p";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表",
+//				"LM029_底稿_放款餘額明細表.xlsx", "la$w30p");
 
 		String today = dDateUtil.getNowStringBc();
 
 		// 表頭
 		makeExcel.setValue(2, 20, "日　　期：" + this.showBcDate(today, 1));
-		makeExcel.setValue(3, 20, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		makeExcel.setValue(3, 20, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
 		if (listLM029 == null || listLM029.isEmpty()) {
 
@@ -146,10 +165,10 @@ public class LM029Report extends MakeReport {
 		this.info("LM029Report exportExcel2");
 
 		makeExcel.setSheet("Deliquency");
-
+		
 		// 起始欄
 		int col = 2;
-
+		
 		// 單位元位置
 		int unitCol = iYearMonth / 100 + 1;
 		makeExcel.setValue(2, unitCol, "單位：元", "R");
@@ -160,6 +179,7 @@ public class LM029Report extends MakeReport {
 
 		} else {
 
+
 			for (Map<String, String> r : listLM029) {
 
 				// 項目(年月日)
@@ -169,23 +189,28 @@ public class LM029Report extends MakeReport {
 				makeExcel.setValue(2, col, year + "/" + month, "C");
 
 				// 逾1-2期金額
-				BigDecimal onetwoAmt = r.get("12Amt").isEmpty() || r.get("12Amt") == null ? BigDecimal.ZERO : new BigDecimal(r.get("12Amt"));
+				BigDecimal onetwoAmt = r.get("12Amt").isEmpty() || r.get("12Amt") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("12Amt"));
 				makeExcel.setValue(3, col, onetwoAmt, "#,##0", "R");
 
 				// 放款總餘額
-				BigDecimal totalAmt = r.get("totalAmt").isEmpty() || r.get("totalAmt") == null ? BigDecimal.ZERO : new BigDecimal(r.get("totalAmt"));
+				BigDecimal totalAmt = r.get("totalAmt").isEmpty() || r.get("totalAmt") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("totalAmt"));
 				makeExcel.setValue(4, col, totalAmt, "#,##0", "R");
 
 				// 逾1~2期佔總額比
-				BigDecimal onetwoRate = r.get("12Rate").isEmpty() || r.get("12Rate") == null ? BigDecimal.ZERO : new BigDecimal(r.get("12Rate"));
+				BigDecimal onetwoRate = r.get("12Rate").isEmpty() || r.get("12Rate") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("12Rate"));
 				makeExcel.setValue(5, col, onetwoRate, "R");
 
 				// 逾放總額
-				BigDecimal threeAmt = r.get("oAmt").isEmpty() || r.get("oAmt") == null ? BigDecimal.ZERO : new BigDecimal(r.get("oAmt"));
+				BigDecimal threeAmt = r.get("oAmt").isEmpty() || r.get("oAmt") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("oAmt"));
 				makeExcel.setValue(6, col, threeAmt, "#,##0", "R");
 
 				// 放款逾放比
-				BigDecimal threeRate = r.get("oRate").isEmpty() || r.get("oRate") == null ? BigDecimal.ZERO : new BigDecimal(r.get("oRate"));
+				BigDecimal threeRate = r.get("oRate").isEmpty() || r.get("oRate") == null ? BigDecimal.ZERO
+						: new BigDecimal(r.get("oRate"));
 				makeExcel.setValue(7, col, threeRate, "R");
 
 				col++;
@@ -193,6 +218,8 @@ public class LM029Report extends MakeReport {
 			} // for
 
 		}
+
+		
 
 	}
 

@@ -269,7 +269,7 @@ public class L9705Report extends MakeReport {
 					
 					
 					if (baTxVo.getDataKind() == 1 && baTxVo.getRepayType() == 1) {
-						overShort = overShort.subtract(shortFall);
+						overShort = overShort.subtract(baTxVo.getUnPaidAmt());
 					}
 				}
 

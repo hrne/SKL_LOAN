@@ -61,8 +61,6 @@ BEGIN
       FROM "LoanBorMain" 
     ) 
     , TMP AS ( 
-      -- 依照額度放款餘額佔戶號放款餘額的比例 
-      -- 將費用分配到各個額度 
       SELECT ACTP.BKPDAT 
            , ACTP.LMSACN 
            , ACTP.LMSTOA + ACTP.LMSTOH AS LMSTOA 
@@ -77,7 +75,6 @@ BEGIN
                                  AND OFN."FacmNoSeq" = 1 
                                  AND NVL(lastDateData.MAX_BKPDAT,0) != 0 -- 2022-10-12 Wei 最新一筆才判斷額度號碼 
       WHERE ACTP.LMSACN NOT IN (601776,610940) 
-        AND ACTP.LMSTOA + ACTP.LMSTOH > 0 -- 有費用的才做 
     ) 
     SELECT TMP.BKPDAT                     AS "AcDate"              -- 會計日期 DECIMAL 8   
          , TMP.LMSACN                     AS "CustNo"              -- 借款人戶號 DECIMAL 7   

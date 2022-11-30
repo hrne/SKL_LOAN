@@ -207,7 +207,7 @@ public class L8922 extends TradeBuffer {
 			
 		} else if (iType == 2) {
 			// 延遲交易
-			// :1.主管覆核記號ManagerCheck=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
+			// :1.主管覆核記號ManagerCheck=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後4天內須同意,超過4天則需列出
 			List<Map<String, String>> resultList = null;
 			try {
 				resultList = l8922Servicelmpl.queryresult(this.index, this.limit, titaVo);

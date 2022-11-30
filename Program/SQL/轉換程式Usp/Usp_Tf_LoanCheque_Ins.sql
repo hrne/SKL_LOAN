@@ -25,15 +25,22 @@ BEGIN
 
     -- 寫入資料
     INSERT INTO "LoanCheque"
+    WITH txEmpData AS (
+      SELECT DISTINCT
+             TRXDAT
+           , TRXMEM
+           , TRXNMT
+      FROM LA$TRXP
+    )
     SELECT S1."LMSACN"                    AS "CustNo"              -- 借款人戶號 DECIMAL 7 
           ,S1."CHKACN"                    AS "ChequeAcct"          -- 支票帳號 DECIMAL 9 
           ,S1."CHKASQ"                    AS "ChequeNo"            -- 支票號碼 DECIMAL 7 
           ,S1."CHKCDE"                    AS "StatusCode"          -- 票據狀況碼 VARCHAR2 1 
           ,S1."CHKPRO"                    AS "ProcessCode"         -- 處理代碼 VARCHAR2 1 
           ,S1."TRXDAT"                    AS "AcDate"              -- 交易序號-會計日期 DECIMALD 8 
-          ,''                             AS "Kinbr"               -- 交易單位 VARCHAR2 4 
-          ,''                             AS "TellerNo"            -- 交易序號-櫃員 VARCHAR2 6 
-          ,S1."TRXNMT"                    AS "TxtNo"               -- 交易序號-流水號 VARCHAR2 8 
+          ,'0000'                         AS "Kinbr"               -- 交易單位 VARCHAR2 4 
+          ,NVL(AEM1."EmpNo",'999999')     AS "TellerNo"            -- 交易序號-櫃員 VARCHAR2 6 
+          ,LPAD(S1."TRXNMT",8,'0')        AS "TxtNo"               -- 交易序號-流水號 VARCHAR2 8 
           ,S1."CHKRDT"                    AS "ReceiveDate"         -- 收票日 DECIMALD 8  
           ,S1."CHKLTD"                    AS "EntryDate"           -- 入帳日 DECIMALD 8 
           ,'TWD'                          AS "CurrencyCode"        -- 幣別 VARCHAR2 3 
@@ -55,9 +62,9 @@ BEGIN
           ,LPAD(NVL(S2."RECPNO",''),5,0)  AS "ReceiptNo"           -- 收據號碼 VARCHAR2 5 
           ,NVL(S2."CHKAMT",0)             AS "RepaidAmt"           -- 已入帳金額 DECIMAL 16 2
          ,JOB_START_TIME                  AS "CreateDate"          -- 建檔日期時間 DATE  
-         ,'999999'                        AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
+         ,NVL(AEM1."EmpNo",'999999')      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
          ,JOB_START_TIME                  AS "LastUpdate"          -- 最後更新日期時間 DATE  
-         ,'999999'                        AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+         ,NVL(AEM1."EmpNo",'999999')      AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
     FROM "LA$CHKP" S1
     LEFT JOIN (SELECT "LMSACN" -- 戶號
                      ,"CHKACN" -- 支票帳號
@@ -71,6 +78,9 @@ BEGIN
                                        AND S2."CHKACN" = S1."CHKACN"
                                        AND S2."CHKASQ" = S1."CHKASQ"
                                        AND S2."TRXDAT" = S1."TRXDAT"
+    LEFT JOIN txEmpData ON txEmpData.TRXDAT = S1.TRXDAT
+                       AND txEmpData.TRXNMT = S1.TRXNMT
+    LEFT JOIN "As400EmpNoMapping" AEM1 ON AEM1."As400TellerNo" = txEmpData."TRXMEM"
     ;
 
     -- 記錄寫入筆數

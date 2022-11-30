@@ -44,7 +44,8 @@ public class LD003Report extends MakeReport {
 		this.print(-3, 5, "報　表：" + this.getRptCode());
 		this.print(-3, 60, "放款明細餘額總表（日）", "C");
 		this.print(-2, 100, "日　期：" + this.showBcDate(dateUtil.getNowStringBc(), 1));
-		this.print(-3, 100, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 100, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 100, "頁　數：" + this.getNowPage());
 		this.print(-5, 60, getshowRocDate(this.getReportDate()), "C");
 		this.print(-6, 100, "單位：元");
@@ -66,7 +67,8 @@ public class LD003Report extends MakeReport {
 
 	public void exportResult(TitaVo titaVo, List<Map<String, String>> LD003List) throws LogicException {
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("LD003").setRptItem("放款明細餘額總表(日)").setSecurity("機密").setRptSize("A4")
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("LD003").setRptItem("放款明細餘額總表(日)").setSecurity("機密").setRptSize("A4")
 				.setPageOrientation("P").build();
 
 		this.open(titaVo, reportVo);
@@ -198,7 +200,9 @@ public class LD003Report extends MakeReport {
 			this.print(-51, 115, df1.format(totalSA.add(totalMA).add(totalLA).add(totalTA)), "R");
 
 			this.print(-53, 0, ""); // 把 cursor 移動到最後一行以後，避免簽核歪掉
-
+			
+			this.print(-54, 50, "經辦：                                       主管：","C"); 
+			this.print(-55, 50, "=====　報　表　結　束　=====","C");
 		} else {
 			this.print(-11, 115, "本日無資料", "R");
 		}

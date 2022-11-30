@@ -167,14 +167,17 @@ public class L8303 extends TradeBuffer {
 			} // 3 end
 
 			// 4 start 本金融機構債務人必須填報'45':回報是否同意債務清償方案資料
+			this.info("iIsClaims    =" + iIsClaims);
 			if ("Y".equals(iIsClaims)) {
-				iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id, titaVo);
+				
+				this.info("iJcicZ045Id   = " + ixJcicZ045Id);
+				iJcicZ045 = sJcicZ045Service.findById(ixJcicZ045Id, titaVo);
 				this.info("iJcicZ045   = " + iJcicZ045);
-				if(iJcicZ045 == null ) {
+				if(iJcicZ045 != null ) {
 					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
 				}
 				ixJcicZ045 = sJcicZ045Service.otherFirst(iSubmitKey, iCustId, iRcDate, iMaxMainCode, titaVo);
-				if(ixJcicZ045 == null) {
+				if(ixJcicZ045 != null) {
 					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
 				}
 				// 4 end

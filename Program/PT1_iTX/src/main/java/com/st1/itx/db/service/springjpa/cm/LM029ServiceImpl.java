@@ -74,6 +74,8 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,M.\"ClCode1\"                             AS F18 ";
 		sql += "       ,M.\"ClCode2\"                             AS F19 ";
 		sql += "       ,M.\"ClNo\"                                AS F20 ";
+		sql += "       ,CC.\"Item\"                               AS F21 ";
+		sql += "       ,CD.\"IndustryItem\"                       AS F22 ";
 		sql += " FROM \"MonthlyLoanBal\" M ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = M.\"CustNo\" ";
@@ -87,7 +89,11 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"CustNo\" = F.\"CustNo\" ";
 		sql += "                               AND MF.\"FacmNo\" = F.\"FacmNo\" ";
 		sql += "                               AND MF.\"YearMonth\" = M.\"YearMonth\" ";
-
+		sql += " LEFT JOIN (SELECT DISTINCT SUBSTR(\"IndustryCode\",3,4) AS \"IndustryCode\" ";
+		sql += "            	  ,\"IndustryItem\"";
+		sql += "            FROM \"CdIndustry\") CD ON CD.\"IndustryCode\" = SUBSTR(C.\"IndustryCode\",3,4)";
+		sql += " LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'EntCode' ";
+		sql += "                        AND CC.\"Code\" = C.\"EntCode\" ";
 		sql += " WHERE M.\"YearMonth\" = :entdy ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";

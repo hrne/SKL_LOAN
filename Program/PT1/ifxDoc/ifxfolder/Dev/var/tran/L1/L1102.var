@@ -83,7 +83,7 @@ T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L1001 顧客明細資料查詢]進入),$)
 T(2,@RimTxCode,#TXCD)
 
-#NTXBUF1=X,18,S
+#NTXBUF1=X,19,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF1,1,1)
 
@@ -95,7 +95,7 @@ E(0,#FunCd)
 T(1,#NTXBUF1,2,10)
 
 #CustNo=A,7,S
-T(1,@CustNo,#NTXBUF,12,7)
+T(1,@CustNo,#NTXBUF1,12,7)
 
 #Space=X,1,S
 T(2,@CustId,#CHAIN_CustId)
@@ -407,7 +407,6 @@ A(ID_UNINO,0,#CustId))
 
 #MRKEY=_,_,S
 C(3,#CustNo,0,T(2,#CustId),T(2,#CustNo))
-
 
 #chechCustId=X,1,S
 A(ID_UNINO,0,#CustId)

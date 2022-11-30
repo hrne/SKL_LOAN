@@ -235,6 +235,7 @@ public class L2634ReportD extends MakeReport {
 				this.drawLineList(lineList);
 				this.drawLineList4(lineList4);
 
+				this.print(1, 0, "");
 				this.print(-8, 80, "雙掛號");
 				this.print(-11, 32, "【限定本人拆閱，若無此人，請寄回本公司】");
 				this.print(-13, 32, WkRegAddres); // 地址

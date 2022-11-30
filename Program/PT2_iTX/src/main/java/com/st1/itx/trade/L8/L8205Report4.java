@@ -104,7 +104,7 @@ public class L8205Report4 extends MakeReport {
 		this.setBeginRow(11);
 		this.setMaxRows(50);
 		
-		// 延遲:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後3天內須同意,超過3天則需列出
+		// 延遲:1.主管覆核記號=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後4天內須同意,超過4天則需列出
 
 		if (listL8205 != null && listL8205.size() > 0) {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -116,9 +116,9 @@ public class L8205Report4 extends MakeReport {
 				dateUtil.init();
 
 				if (mangerdate != 0) {
-					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 4);
+					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 5);
 					this.info("retxdate=" + retxdate);
-					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
+					// 延遲交易確認=依據[主管同意日期] >入帳日＋4營業日
 					if (mangerdate < retxdate) {
 						continue;
 					}
@@ -243,9 +243,9 @@ public class L8205Report4 extends MakeReport {
 				dateUtil.init();
 
 				if (mangerdate != 0) {
-					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 4);
+					int retxdate = dateUtil.getbussDate(Integer.parseInt(tL8205Vo.get("F1")), 5);
 					this.info("retxdate=" + retxdate);
-					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
+					// 延遲交易確認=依據[主管同意日期] >入帳日＋4營業日
 					if (!(mangerdate >= retxdate)) {
 						continue;
 					}

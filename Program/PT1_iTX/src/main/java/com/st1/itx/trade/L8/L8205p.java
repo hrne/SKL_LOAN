@@ -121,9 +121,9 @@ public class L8205p extends TradeBuffer {
 			isFinish = l8205Report5.exec(titaVo);
 			
 			if (isFinish) {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢交易登記表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢訪談交易登記表完成", titaVo);
 			} else {
-				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢交易登記表完成", titaVo);
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO")+"L8205", "疑似洗錢訪談交易登記表完成", titaVo);
 			}
 			break;
 		

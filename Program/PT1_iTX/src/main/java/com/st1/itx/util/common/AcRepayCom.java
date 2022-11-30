@@ -371,7 +371,8 @@ public class AcRepayCom extends TradeBuffer {
 		}
 
 		// 銷帳編號
-		acDetail.setRvNo(titaVo.get("RpRvno" + i)); /* 銷帳編號 VARCHAR2(30) */
+		String rvNo = titaVo.get("RpRvno" + i);
+		acDetail.setRvNo(rvNo); /* 銷帳編號 VARCHAR2(30) */
 
 		switch (acDetail.getSumNo()) {
 		case "090":
@@ -583,6 +584,7 @@ public class AcRepayCom extends TradeBuffer {
 			tTempVo.putParam("StampFreeAmt",
 					tx.getInterest().add(tx.getDelayInt()).add(tx.getBreachAmt()).add(tx.getCloseBreachAmt()));// 利息免印花稅
 		}
+		tx.setOtherFields(tTempVo.getJsonString());
 
 		int acSeq = 0;
 		for (AcDetail ac : this.lAcDetail) {

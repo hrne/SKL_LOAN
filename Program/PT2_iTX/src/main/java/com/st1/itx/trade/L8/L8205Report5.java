@@ -70,7 +70,7 @@ public class L8205Report5 extends MakeReport {
 		this.print(-3, 5, "");
 		this.print(-3, 50, "");
 		this.print(-4, 5, "");
-		this.print(-4, this.getMidXAxis(), "疑似洗錢交易登記表", "C");
+		this.print(-4, this.getMidXAxis(), "疑似洗錢訪談交易登記表", "C");
 		this.print(-3, 80, "");
 		this.print(-5, 113, "機密等級 : 機密");
 //		this.print(-5, 113, "文件持有人請嚴加管控本項文件" );
@@ -109,7 +109,7 @@ public class L8205Report5 extends MakeReport {
 
 
 		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
-				.setSecurity("機密").setRptCode("L8205").setRptItem("疑似洗錢交易登記表").setPageOrientation("L")
+				.setSecurity("機密").setRptCode("L8205").setRptItem("疑似洗錢訪談交易登記表").setPageOrientation("L")
 				.setUseDefault(true).build();
 
 		this.open(titaVo, reportVo, "A4橫式底稿.pdf");
@@ -237,7 +237,7 @@ public class L8205Report5 extends MakeReport {
 	}
 	
 	public void makeExcel(TitaVo titaVo) throws LogicException{
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢交易登記表", "L8205" + "_" + "疑似洗錢交易登記表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L8205", "疑似洗錢訪談交易登記表", "L8205" + "_" + "疑似洗錢訪談交易登記表");
 		printExcelHeader();
 		
 		int rowCursor = 2;
