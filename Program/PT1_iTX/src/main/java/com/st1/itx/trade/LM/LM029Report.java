@@ -144,7 +144,9 @@ public class LM029Report extends MakeReport {
 					case 18:
 					case 19:
 					case 20:
-						makeExcel.setValue(row, col, fieldValue, "L"); // 餘期數
+					case 21:
+					case 22:
+						makeExcel.setValue(row, col, fieldValue, "L"); 
 						break;
 					default:
 						makeExcel.setValue(row, col + 1, fieldValue, "L");

@@ -49,7 +49,7 @@ E(0,0)
 ["@放款服務課月報",[#BtnAllShell1,"@全選"],[#BtnExpShell1,"@",#ExpText1]],"",
 ], 
 
-["#grid#,{id:2,expand:false,loop:33,row_height:0}","","",
+["#grid#,{id:2,expand:false,loop:37,row_height:0}","","",
 [],[#BtnShell1,#TradeCode1,#TradeName1],
 ], 
 
@@ -58,7 +58,7 @@ E(0,0)
 ],
 
 ["#grid#,{id:4,expand:true,loop:32,row_height:1}","","",
-[],[#BtnShell34,#TradeCode34,#TradeName34],
+[],[#BtnShell38,#TradeCode38,#TradeName38],
 ], 
 
 ["#grid#,{id:5,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
@@ -66,7 +66,7 @@ E(0,0)
 ],
 
 ["#grid#,{id:6,expand:true,loop:6,row_height:1}","","",
-[],[#BtnShell66,#TradeCode66,#TradeName66],
+[],[#BtnShell70,#TradeCode70,#TradeName70],
 ], 
 
 ["#grid#,{id:7,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
@@ -74,7 +74,7 @@ E(0,0)
 ],
 
 ["#grid#,{id:8,expand:true,loop:6,row_height:1}","","",
-[],[#BtnShell72,#TradeCode72,#TradeName72],
+[],[#BtnShell76,#TradeCode76,#TradeName76],
 ], 
 
 ["@"],
@@ -98,9 +98,9 @@ E(0,0)
 
 ! 4. 這裡的 TotalItem 與 TotalCat 作修改
 
-! 總項目數 77
+! 總項目數 81
 #TotalItem=N,3,S
-E(0,77)
+E(0,81)
 
 ! 總分類數 4
 #TotalCat=N,1,S
@@ -149,181 +149,192 @@ V(5,0,#DT2)
 ! 也不可以跳號
 
 #TradeDic1=X,26,S
-T(3,1/LM001/公會無自用住宅統計)
+T(3,1/0/LM001/公會無自用住宅統計)
 #TradeDic2=X,20,S
-T(3,1/LM002/房貸專案放款)
+T(3,1/0/LM002/房貸專案放款)
 #TradeDic3=X,32,S
-T(3,1/LM003/撥款／還款金額比較月報表)
+T(3,1/0/LM003/撥款／還款金額比較月報表)
 #TradeDic4=X,30,S
-T(3,1/LM004/長中短期放款到期明細表)
+T(3,1/0/LM004/長中短期放款到期明細表)
 #TradeDic5=X,26,S
-T(3,1/LM007/放款利息收入成長表)
+T(3,1/0/LM007/放款利息收入成長表)
 #TradeDic6=X,22,S
-T(3,1/LM008/應收利息明細表)
+T(3,1/0/LM008/應收利息明細表)
 #TradeDic7=X,28,S
-T(3,1/LM009/應收利息總表（核心）)
+T(3,1/0/LM009/應收利息總表（核心）)
 #TradeDic8=X,28,S
-T(3,1/LM011/表外放款承諾資料產出)
+T(3,1/0/LM011/表外放款承諾資料產出)
 #TradeDic9=X,22,S
-T(3,1/LM012/放款利率分佈表)
+T(3,1/0/LM012/放款利率分佈表)
 #TradeDic10=X,30,S
-T(3,1/LM013/金檢報表（放款種類表）)
-#TradeDic11=X,22,S
-T(3,1/LM014/平均利率月報表)
-#TradeDic12=X,24,S
-T(3,1/LM015/信用曝險分佈報表)
-#TradeDic13=X,24,S
-T(3,1/LM016/寬限條件控管繳息)
-#TradeDic14=X,30,S
-T(3,1/LM018/專案放款餘額及利息收入)
-#TradeDic15=X,32,S
-T(3,1/LM019/利息收入明細表（印花稅）)
-#TradeDic16=X,31,S
-T(3,1/LM022/中央銀行業務局921補貼息)
-#TradeDic17=X,16,S
-T(3,1/LM023/利息收入)
-#TradeDic18=X,32,S
-T(3,1/LM025/減損系統有效利率資料查核)
-#TradeDic19=X,22,S
-T(3,1/LM027/轉銷呆帳備忘錄)
-#TradeDic20=X,20,S
-T(3,1/LM028/預估現金流量)
-#TradeDic21=X,22,S
-T(3,1/LM030/轉催收明細總表)
-#TradeDic22=X,24,S
-T(3,1/LM073/央行報送明細資料)
-#TradeDic23=X,54,S
-T(3,1/LM074/B040金融機構承作「公司法人購置住宅貸款」統計表)
-#TradeDic24=X,52,S
-T(3,1/LM075/B041金融機構承作「自然人購置住宅貸款」統計表)
-#TradeDic25=X,42,S
-T(3,1/LM077/B042金融機構承作「購地貸款」統計表)
-#TradeDic26=X,42,S
-T(3,1/LM077/B043金融機構承作「餘屋貸款」統計表)
-#TradeDic27=X,72,S
-T(3,1/LM078/B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形)
-#TradeDic28=X,56,S
-T(3,1/LM079/B045金融機構承作「工業區閒置土地抵押貸款」統計表)
-#TradeDic29=X,82,S
-T(3,1/LM080/B046金融機構承作「公司法人購置住宅貸款」統計表（110.3.19（含）起辦理案件）)
-#TradeDic30=X,77,S
-T(3,1/LM081/B047金融機構承作「自然人購屋貸款」統計表（110.3.19（含）起辦理案件）)
-#TradeDic31=X,84,S
-T(3,1/LM082/B048金融機構承作「自然人購置高價住宅貸款」統計表（110.3.19（含）起辦理案件）)
-#TradeDic32=X,19,S
-T(3,1/LM083/ICS放款資料)
-#TradeDic33=X,28,S
-T(3,1/LM084/應收利息之帳齡分析表)
+T(3,1/0/LM013/金檢報表（放款種類表）)
+#TradeDic11=X,45,S
+T(3,1/0/LM014/平均利率月報表（全部）)
+#TradeDic12=X,45,S
+T(3,1/1/LM014/平均利率月報表（科目別）)
+#TradeDic13=X,45,S
+T(3,1/2/LM014/平均利率月報表（種類別）)
+#TradeDic14=X,45,S
+T(3,1/3/LM014/平均利率月報表（關係人）)
+#TradeDic15=X,45,S
+T(3,1/4/LM014/平均利率月報表（種類別+關係人）)
+#TradeDic16=X,24,S
+T(3,1/0/LM015/信用曝險分佈報表)
+#TradeDic17=X,24,S
+T(3,1/0/LM016/寬限條件控管繳息)
+#TradeDic18=X,30,S
+T(3,1/0/LM018/專案放款餘額及利息收入)
+#TradeDic19=X,32,S
+T(3,1/0/LM019/利息收入明細表（印花稅）)
+#TradeDic20=X,31,S
+T(3,1/0/LM022/中央銀行業務局921補貼息)
+#TradeDic21=X,16,S
+T(3,1/0/LM023/利息收入)
+#TradeDic22=X,32,S
+T(3,1/0/LM025/減損系統有效利率資料查核)
+#TradeDic23=X,22,S
+T(3,1/0/LM027/轉銷呆帳備忘錄)
+#TradeDic24=X,20,S
+T(3,1/0/LM028/預估現金流量)
+#TradeDic25=X,22,S
+T(3,1/0/LM030/轉催收明細總表)
+#TradeDic26=X,24,S
+T(3,1/0/LM073/央行報送明細資料)
+#TradeDic27=X,54,S
+T(3,1/0/LM074/B040金融機構承作「公司法人購置住宅貸款」統計表)
+#TradeDic28=X,52,S
+T(3,1/0/LM075/B041金融機構承作「自然人購置住宅貸款」統計表)
+#TradeDic29=X,42,S
+T(3,1/0/LM077/B042金融機構承作「購地貸款」統計表)
+#TradeDic30=X,42,S
+T(3,1/0/LM077/B043金融機構承作「餘屋貸款」統計表)
+#TradeDic31=X,72,S
+T(3,1/0/LM078/B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形)
+#TradeDic32=X,56,S
+T(3,1/0/LM079/B045金融機構承作「工業區閒置土地抵押貸款」統計表)
+#TradeDic33=X,82,S
+T(3,1/0/LM080/B046金融機構承作「公司法人購置住宅貸款」統計表（110.3.19（含）起辦理案件）)
+#TradeDic34=X,77,S
+T(3,1/0/LM081/B047金融機構承作「自然人購屋貸款」統計表（110.3.19（含）起辦理案件）)
+#TradeDic35=X,84,S
+T(3,1/0/LM082/B048金融機構承作「自然人購置高價住宅貸款」統計表（110.3.19（含）起辦理案件）)
+#TradeDic36=X,19,S
+T(3,1/0/LM083/ICS放款資料)
+#TradeDic37=X,28,S
+T(3,1/0/LM084/應收利息之帳齡分析表)
 
-#TradeDic34=X,22,S
-T(3,2/LM029/放款餘額明細表)
-#TradeDic35=X,18,S
-T(3,2/LM031/企業動用率)
-#TradeDic36=X,26,S
-T(3,2/LM032/逾期案件滾動率明細)
-#TradeDic37=X,20,S
-T(3,2/LM033/新撥案件明細)
-#TradeDic38=X,18,S
-T(3,2/LM035/地區逾放比)
-#TradeDic39=X,24,S
-T(3,2/LM036/第一類各項統計表)
-#TradeDic40=X,24,S
-T(3,2/LM037/地區別催收總金額)
+#TradeDic38=X,22,S
+T(3,2/0/LM029/放款餘額明細表)
+#TradeDic39=X,18,S
+T(3,2/0/LM031/企業動用率)
+#TradeDic40=X,26,S
+T(3,2/0/LM032/逾期案件滾動率明細)
 #TradeDic41=X,20,S
-T(3,2/LM038/逾期案件明細)
-#TradeDic42=X,20,S
-T(3,2/LM039/催收案件明細)
+T(3,2/0/LM033/新撥案件明細)
+#TradeDic42=X,18,S
+T(3,2/0/LM035/地區逾放比)
 #TradeDic43=X,24,S
-T(3,2/LM040/地區別正常戶金額)
-#TradeDic44=X,32,S
-T(3,2/LM041/催收及呆帳戶暫收款明細表)
+T(3,2/0/LM036/第一類各項統計表)
+#TradeDic44=X,24,S
+T(3,2/0/LM037/地區別催收總金額)
 #TradeDic45=X,20,S
-T(3,2/LM042/RBC表_會計部)
-#TradeDic46=X,27,S
-T(3,2/LM043/地區放款數_內部控管)
-#TradeDic47=X,48,S
-T(3,2/LM044/地區／區域中心逾比及分級管理逾放比明細表)
-#TradeDic48=X,39,S
-T(3,2/LM045/年度催收逾放總額明細表_內部控管)
-#TradeDic49=X,41,S
-T(3,2/LM046/年度擔保放款信用風險分析_內部控管)
-#TradeDic50=X,37,S
-T(3,2/LM047/放款分期協議案件明細_內部控管)
-#TradeDic51=X,47,S
-T(3,2/LM048/放款企業放款風險承擔限額控管表_限額控管)
-#TradeDic52=X,53,S
-T(3,2/LM049/放款金控法第44條利害關係人放款餘額表_限額控管)
-#TradeDic53=X,52,S
-T(3,2/LM050/放款保險法第3條利害關係人放款餘額表_限額控管)
-#TradeDic54=X,39,S
-T(3,2/LM051/放款資產分類案件明細表_內部控管)
-#TradeDic55=X,35,S
-T(3,2/LM052/放款資產分類-會計部備呆計提)
-#TradeDic56=X,33,S
-T(3,2/LM053/法務分配款明細表_內部控管)
-#TradeDic57=X,56,S
-T(3,2/LM054/A041重要放款餘額明細表（大額、逾期、催收、國外）)
-#TradeDic58=X,26,S
-T(3,2/LM055/A042放款餘額彙總表)
-#TradeDic59=X,31,S
-T(3,2/LM056/表14-1、14-2 xls_會計部申報表)
-#TradeDic60=X,31,S
-T(3,2/LM057/表14-5、14-6 xls_會計部申報表)
-#TradeDic61=X,26,S
-T(3,2/LM058/表A19_會計部申報表)
+T(3,2/0/LM038/逾期案件明細)
+#TradeDic46=X,20,S
+T(3,2/0/LM039/催收案件明細)
+#TradeDic47=X,24,S
+T(3,2/0/LM040/地區別正常戶金額)
+#TradeDic48=X,32,S
+T(3,2/0/LM041/催收及呆帳戶暫收款明細表)
+#TradeDic49=X,20,S
+T(3,2/0/LM042/RBC表_會計部)
+#TradeDic50=X,27,S
+T(3,2/0/LM043/地區放款數_內部控管)
+#TradeDic51=X,48,S
+T(3,2/0/LM044/地區／區域中心逾比及分級管理逾放比明細表)
+#TradeDic52=X,39,S
+T(3,2/0/LM045/年度催收逾放總額明細表_內部控管)
+#TradeDic53=X,41,S
+T(3,2/0/LM046/年度擔保放款信用風險分析_內部控管)
+#TradeDic54=X,37,S
+T(3,2/0/LM047/放款分期協議案件明細_內部控管)
+#TradeDic55=X,47,S
+T(3,2/0/LM048/放款企業放款風險承擔限額控管表_限額控管)
+#TradeDic56=X,53,S
+T(3,2/0/LM049/放款金控法第44條利害關係人放款餘額表_限額控管)
+#TradeDic57=X,52,S
+T(3,2/0/LM050/放款保險法第3條利害關係人放款餘額表_限額控管)
+#TradeDic58=X,39,S
+T(3,2/0/LM051/放款資產分類案件明細表_內部控管)
+#TradeDic59=X,35,S
+T(3,2/0/LM052/放款資產分類-會計部備呆計提)
+#TradeDic60=X,33,S
+T(3,2/0/LM053/法務分配款明細表_內部控管)
+#TradeDic61=X,56,S
+T(3,2/0/LM054/A041重要放款餘額明細表（大額、逾期、催收、國外）)
 #TradeDic62=X,26,S
-T(3,2/LM059/表F22_會計部申報表)
-#TradeDic63=X,33,S
-T(3,2/LM060/暫付款金額調節表_內部控管)
-#TradeDic64=X,43,S
-T(3,2/LM061/逾清償期二年案件追蹤控管表_內部控管)
-#TradeDic65=X,37,S
-T(3,2/LM085/放款逾期月報表) 
-
-#TradeDic66=X,37,S
-T(3,3/LM062/覆審案件資料表-個金3000萬以上)
-#TradeDic67=X,47,S
-T(3,3/LM063/覆審案件資料表-企金3000萬以上)
-#TradeDic68=X,46,S
-T(3,3/LM064/覆審案件資料表-個金2000萬以上小於3000萬)
+T(3,2/0/LM055/A042放款餘額彙總表)
+#TradeDic63=X,31,S
+T(3,2/0/LM056/表14-1、14-2 xls_會計部申報表)
+#TradeDic64=X,31,S
+T(3,2/0/LM057/表14-5、14-6 xls_會計部申報表)
+#TradeDic65=X,26,S
+T(3,2/0/LM058/表A19_會計部申報表)
+#TradeDic66=X,26,S
+T(3,2/0/LM059/表F22_會計部申報表)
+#TradeDic67=X,33,S
+T(3,2/0/LM060/暫付款金額調節表_內部控管)
+#TradeDic68=X,43,S
+T(3,2/0/LM061/逾清償期二年案件追蹤控管表_內部控管)
 #TradeDic69=X,37,S
-T(3,3/LM065/覆審案件資料表-個金100萬以上小於2000萬)
-#TradeDic70=X,22,S
-T(3,3/LM066/覆審案件資料表-企金未達3000萬)
-#TradeDic71=X,30,S
-T(3,3/LM067/土地貸款覆審表)
+T(3,2/0/LM085/放款逾期月報表) 
+#TradeDic70=X,37,S
+T(3,3/0/LM062/覆審案件資料表-個金3000萬以上)
+#TradeDic71=X,47,S
+T(3,3/0/LM063/覆審案件資料表-企金3000萬以上)
+#TradeDic72=X,46,S
+T(3,3/0/LM064/覆審案件資料表-個金2000萬以上小於3000萬)
+#TradeDic73=X,37,S
+T(3,3/0/LM065/覆審案件資料表-個金100萬以上小於2000萬)
+#TradeDic74=X,22,S
+T(3,3/0/LM066/覆審案件資料表-企金未達3000萬)
+#TradeDic75=X,30,S
+T(3,3/0/LM067/土地貸款覆審表)
 
-#TradeDic72=X,24,S
-T(3,4/LM070/介紹人加碼獎勵津貼明細)
-#TradeDic73=X,30,S
-T(3,4/LM071/退休員工利率名單)
-#TradeDic74=X,40,S
-T(3,4/LP001/工作月區域中心業績累計)
-#TradeDic75=X,28,S
-T(3,4/LP002/三階（部室、區部、通訊處）累計表)
 #TradeDic76=X,24,S
-T(3,4/LP003/部專暨房專業績累計表)
-#TradeDic77=X,28,S
-T(3,4/LP004/內網業績統計報表)
+T(3,4/0/LM070/介紹人加碼獎勵津貼明細)
+#TradeDic77=X,30,S
+T(3,4/0/LM071/退休員工利率名單)
+#TradeDic78=X,40,S
+T(3,4/0/LP001/工作月區域中心業績累計)
+#TradeDic79=X,28,S
+T(3,4/0/LP002/三階（部室、區部、通訊處）累計表)
+#TradeDic80=X,24,S
+T(3,4/0/LP003/部專暨房專業績累計表)
+#TradeDic81=X,28,S
+T(3,4/0/LP004/內網業績統計報表)
 
 
 
 !---------- TRADE DICTIONARY SPLIT AND ASSIGN -----------
 
 ! 修改這裡的 loop times
-##loop{times:77,i:1}
+##loop{times:81,i:1}
 
 ! TradeCat: 1st byte of TradeDic. Trade's category.
 #TradeCat{i}=X,1,S
 T(1,#TradeDic{i},1,1)
 
+#TradeSub{i}=X,1,S
+T(1,#TradeDic{i},3,1)
+HIDE(#TradeSub{i})
+
 ! TradeCode: 3-7 th bytes of TradeDic. The TXCD of a trade.
 #TradeCode{i}=X,5,L
-T(1,#TradeDic{i},3,5)
+T(1,#TradeDic{i},5,5)
 
 ! TradeName: all bytes after 8th in TradeDic. The Chinese Name of a trade.
 #TradeName{i}=X,84,L
-T(1,#TradeDic{i},9,95)
+T(1,#TradeDic{i},11,95)
 
 ##end
 
@@ -336,7 +347,7 @@ T(1,#TradeDic{i},9,95)
 ! How many trades are there, how many buttons should be made.
 
 ! 修改這裡的 loop times
-##loop{times:77,i:1}
+##loop{times:81,i:1}
 
 
 !---------- BUTTON VISUAL -----------
@@ -461,7 +472,7 @@ C(5,#BtnExpShell{i},＋,CALL(#FuncFoldCat),CALL(#FuncExpandCat))
 
 ! 修改這裡的 2 個 loop times
 #FuncSelectEverything=@,1,S
-##loop{times:77,i:1}
+##loop{times:81,i:1}
 C(5,#BtnAllShell0,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},　),$)
 ##end
 ##loop{times:4,i:1}
@@ -474,7 +485,7 @@ C(5,#BtnAllShell0,V,T(3,@BtnAllShell{i},V),T(3,@BtnAllShell{i},　))
 
 ! 修改這裡的 loop times
 #FuncSelectCat=@,1,S
-##loop{times:77,k:1}
+##loop{times:81,k:1}
 C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
 ##end
 
@@ -482,7 +493,7 @@ C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
 
 ! 修改這裡的 loop times
 #FuncUnselectCat=@,1,S
-##loop{times:77,i:1}
+##loop{times:81,i:1}
 C(5,#TradeCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
 ##end
 
@@ -533,8 +544,9 @@ T(3,@BtnAllShell0,　)
 ! 修改這裡的 loop times
 <sub type="TIM">
 #TotalItem
-##loop{times:77,i:1}
+##loop{times:81,i:1}
 #BtnShell{i}
+#TradeSub{i}
 #TradeCode{i}
 #TradeName{i}
 ##end

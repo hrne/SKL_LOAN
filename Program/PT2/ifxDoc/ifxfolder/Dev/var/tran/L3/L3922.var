@@ -672,6 +672,9 @@ E(0,#OTotal2)
 #OCloseTotalX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#OCloseTotal,#OCloseTotalX))
 
+!清償說明
+#OBreachDescription=X,100,L
+
 ![轉催收本金]
 #OOvDuTrfPrincipal=+m,14.2,S
 
@@ -815,6 +818,7 @@ TXFORM=L3922
 #OShortfall#OShortfallInt#OShortfallPrin#OShortCloseBreach#OExcessive
 #OUnOpenfireFee#OOvduLawFee#OOvduFireFee#OAcctFee#OModifyFee
 #SubTotal#OTotal#OTotal2
+#OBreachDescription
 #OOvDuTrfPrincipal#OOvduAmt#OOvduBal#OBadDebtAmt#OOvDuTrfInterest#OFireFee#OLawFee#OCollFireFee#OCollLawFee
 #OOFacmNo#OOBormNo#OOIntStartDate#OOIntEndDate#OOAmount#OORate
 #OOPrincipal#OOInterest#OODelayInt#OOBreachAmt#OOCloseBreachAmt
@@ -849,6 +853,7 @@ TXFORM=L3922
 ["<font color=red>@小計",#OSumX],["<font color=red>@總計",#OTotalX],
 ["@"],["<font color=red>@清償違約金",#OCloseBreachAmtUnpaidX,"（領清償證明）"],
 ["@"],["<font color=red>@總計",#OCloseTotalX,"（領清償證明）"],
+[#<->#,"@清償說明",#OBreachDescription],
 ! ["<font color=red>@小計 [含清償違約金]",#OCloseSumX],["<font color=red>@總計 [含清償違約金]",#OCloseTotalX],
 ]
 </sub>
@@ -863,6 +868,7 @@ TXFORM=L3922
 ["@火險費用",#OFireFeeX],["@催收火險費",#OCollFireFeeX],
 ["@法務費用",#OLawFeeX],["@催收法務費",#OCollLawFeeX],
 ["@催收餘額",#OOvDuBalX]
+[#<->#,"@清償說明",#OBreachDescription],
 ]
 </sub>
 

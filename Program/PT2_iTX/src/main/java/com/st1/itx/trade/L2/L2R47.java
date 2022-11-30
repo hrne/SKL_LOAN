@@ -67,7 +67,7 @@ public class L2R47 extends TradeBuffer {
 		}
 		if (lCustDataCtrl == null && tCustMain == null) {
 
-			throw new LogicException(titaVo, "E0001", "查無此編號"); // 查無資料錯誤
+			throw new LogicException(titaVo, "E0001", "客戶主檔 查無此編號 " + iCustId); // 查無資料錯誤
 		}
 
 		totaVo.putParam("L2R47CustNo", custNo);

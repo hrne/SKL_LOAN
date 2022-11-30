@@ -88,7 +88,7 @@ public class LM014Report extends MakeReport {
 		this.setMaxRows(50);
 	}
 
-	public Boolean exec(TitaVo titaVo) throws LogicException {
+	public Boolean exec(TitaVo titaVo,String subReportCode,String reportName) throws LogicException {
 
 		this.setCharSpaces(0);
 
@@ -105,9 +105,9 @@ public class LM014Report extends MakeReport {
 		// DepartmentCode Y 企金通路
 		// N 非企金通路
 
-		this.info("LM014Report.exec");
+		this.info("LM014Report.exec " + subReportCode);
 
-		int inputType = parse.stringToInteger(titaVo.getParam("inputType"));
+		int inputType = parse.stringToInteger(subReportCode);
 
 		// 依據輸入種類, 製作需要產的表的 List
 
@@ -157,7 +157,7 @@ public class LM014Report extends MakeReport {
 				
 //				this.title = qo.reportType.value;
 				ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getBrno()).setRptDate(titaVo.getEntDyI())
-						.setRptCode("LM014").setRptItem("平均利率月報表("+currentReportType.value+")").setRptSize("A4")
+						.setRptCode("LM014").setRptItem(reportName).setRptSize("A4")
 						.setSecurity("").setPageOrientation("L").build();
 
 				
