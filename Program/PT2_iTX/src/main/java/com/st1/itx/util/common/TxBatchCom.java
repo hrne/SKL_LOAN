@@ -417,7 +417,7 @@ public class TxBatchCom extends TradeBuffer {
 
 		// tempVo的初值為處理說明欄的原始值
 		TempVo tempVo = new TempVo();
-		initialProcNote(tempVo.getVo(tDetail.getProcNote()), titaVo);
+		initialProcNote(tDetail, tempVo.getVo(tDetail.getProcNote()), titaVo);
 		this.otherTempVo = new TempVo();
 
 		// 入帳日期檢核
@@ -960,7 +960,7 @@ public class TxBatchCom extends TradeBuffer {
 			l3200TitaVo.putParam("TimExtraRepay", "0");
 			l3200TitaVo.putParam("IncludeIntFlag", " ");
 			l3200TitaVo.putParam("UnpaidIntFlag", " ");
-			l3200TitaVo.putParam("PayFeeFlag", "Y"); // 是否回收費用
+			l3200TitaVo.putParam("PayFeeFlag", "N".equals(tTempVo.getParam("PayFeeFlag")) ? "N" : "Y"); // 是否回收費用
 			l3200TitaVo.putParam("PayMethod", " ");
 		}
 		if (tBatxDetail.getRepayType() == 12) {
@@ -1035,6 +1035,7 @@ public class TxBatchCom extends TradeBuffer {
 			repayType = parse.stringToInteger(titaVo.getParam("RpType1"));
 		}
 		int repayCode = parse.stringToInteger(titaVo.getParam("RpCode1"));
+
 		String rvNo = "" + titaVo.getOrgEntdyI();
 		String reconCode = "";
 		if (titaVo.get("RpAcctCode1") != null) {
@@ -1095,6 +1096,11 @@ public class TxBatchCom extends TradeBuffer {
 		tBatxDetail.setProcCode("");
 		tBatxDetail.setTitaTlrNo("");
 		tBatxDetail.setTitaTxtNo("");
+		TempVo tempVo = new TempVo();
+		tempVo.putParam("ResvEntdy", titaVo.getOrgEntdyI()); // for 隔日沖正再做新交易時紀錄於LoanBorTx.OtherFiled
+		tempVo.putParam("ResvTxSeq", titaVo.getOrgTxSeq());  // 同上 
+		tBatxDetail.setProcNote(tempVo.getJsonString());
+
 		try {
 			batxDetailService.insert(tBatxDetail, titaVo);
 		} catch (DBException e) {
@@ -1868,7 +1874,7 @@ public class TxBatchCom extends TradeBuffer {
 	}
 
 	/* 初始處理說明 */
-	private void initialProcNote(TempVo t, TitaVo titaVo) throws LogicException {
+	private void initialProcNote(BatxDetail tDetail, TempVo t, TitaVo titaVo) throws LogicException {
 		this.info("initialProcNote AmlRsp1=" + t.get("AmlRsp1") + ", AmlRsp2=" + t.get("AmlRsp2"));
 		this.tTempVo.clear();
 		this.tTempVo.putParam("CheckMsg", "");
@@ -1907,6 +1913,14 @@ public class TxBatchCom extends TradeBuffer {
 		if (t.get("PayFeeMethod") != null) {
 			tTempVo.putParam("PayFeeMethod", t.get("PayFeeMethod")); // 回收費用方式 Y/N
 		}
+		if (t.get("ChequeAmt") != null) {
+			tTempVo.putParam("ChequeAmt", t.get("ChequeAmt")); // 回收費用方式 Y/N
+		}
+		// 非15日薪僅扣期款
+		if ("5".equals(tDetail.getMediaKind())) {
+			tTempVo.putParam("PayFeeMethod", "N");
+		}
+
 	}
 
 	/* 設定處理說明 */

@@ -1,5 +1,8 @@
 package com.st1.itx.trade.L4;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +47,9 @@ public class L4321Report extends MakeReport {
 	private int iAdjCode = 0;
 	private long sno;
 	private String fileNm = "";
+	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
-	public long exec(List<Map<String, String>> fnAllList, TitaVo titaVo) throws LogicException {
+	public long exec(TitaVo titaVo) throws LogicException {
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
 
 		this.fileNm = titaVo.getParam("FileNm");
@@ -75,6 +79,13 @@ public class L4321Report extends MakeReport {
 			break;
 		default:
 			break;
+		}
+		try {
+			fnAllList = L4321ServiceImpl.findAll(1, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("L4321ServiceImpl.findAll error = " + errors.toString());
 		}
 
 		if (fnAllList.size() > 0) {

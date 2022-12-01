@@ -1313,4 +1313,22 @@ public class MakeExcel extends CommBuffer {
 	public void protectSheet(String groupNo) {
 		this.openedSheet.protectSheet(groupNo);
 	}
+
+	public void setLockColumn(int rowStart, int rowEnd, int columnStart, int columnEnd, int totalColumn) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", "B");
+		map.put("rs", rowStart);
+		map.put("re", rowEnd);
+		map.put("cs", columnStart);
+		map.put("ce", columnEnd);
+		map.put("tc", totalColumn);
+		listMap.add(map);		
+	}
+
+	public void setProtectSheet(String pw) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("t", "C");
+		map.put("pw", pw);
+		listMap.add(map);				
+	}
 }

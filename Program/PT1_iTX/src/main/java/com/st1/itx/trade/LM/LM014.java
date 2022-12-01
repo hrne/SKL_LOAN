@@ -56,7 +56,7 @@ public class LM014 extends BatchBase implements Tasklet, InitializingBean {
 		String subReportCode = "";
 		
 		for (int i = 1; i <= totalItem; i++) {
-			if (!titaVo.getParam("BtnShell" + i).trim().isEmpty()) {
+			if (!titaVo.getParam("BtnShell" + i).trim().isEmpty() && "LM014".equals(titaVo.getParam("TradeCode" + i))) {
 				this.info(i + "====" + titaVo.getParam("TradeSub" + i));
 				subReportCode = titaVo.getParam("TradeSub" + i);
 				lM014report.exec(titaVo,subReportCode, titaVo.getParam("TradeName" + i));

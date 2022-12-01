@@ -456,7 +456,15 @@ BEGIN
            END                            AS "FeeAmt" 
           ,TR1."TRXNM2" AS "AcSeq" 
           ,TR1."BSTBTN" AS "SlipSumNo" 
-          ,TR1."ACTACT" AS "AcctCode" 
+          ,CASE
+             -- 2022-12-01 Wei from Lai 口頭說要新增
+             WHEN JL."AcctCode"
+                  IN ( 'F10'   -- 實收帳管費 
+                     , 'F29'   -- 實收契變手續費 
+                     , 'TMI'   -- 實收火險保費  
+                     , 'F07' ) -- 實收法拍費用 
+             THEN JL."AcctCode"
+           ELSE TR1."ACTACT" END          AS "AcctCode" 
           /* 更新交易別代碼 */ 
           -- 2022-11-07 Wei 新增 from Lai 寫在LoanBorTx.xlsx 的 交易別 Sheet
           ,CASE 
@@ -478,16 +486,16 @@ BEGIN
              THEN '3204'
              WHEN TR1.TRXTRN='3081'
              THEN '3205'
-             WHEN TR1.TRXTRN='3036'
-             THEN '3210'
-             WHEN TR1.TRXTRN='3082'
-             THEN '3210'
              WHEN TR1.TRXTRN='3036' AND TR1.LMSRSN=0
              THEN '3211'
              WHEN TR1.TRXTRN='3036' AND TR1.LMSRSN=3
              THEN '3212'
              WHEN TR1.TRXTRN='3036' AND TR1.LMSRSN=6
              THEN '3213'
+             WHEN TR1.TRXTRN='3036'
+             THEN '3210'
+             WHEN TR1.TRXTRN='3082'
+             THEN '3210'
              WHEN TR1.TRXTRN='3088'
              THEN '3214'
              WHEN TR1.TRXTRN='3037'

@@ -60,6 +60,7 @@ public class L2419ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , CB.\"BdMainUseCode\" ";
 		sql += " , CB.\"BdMtrlCode\" ";
 		sql += " , CB.\"BdTypeCode\" ";
+		sql += " , CB.\"BdDate\" ";
 		sql += " , CB.\"TotalFloor\" ";
 		sql += " , CB.\"FloorNo\" ";
 		sql += " , CASE ";

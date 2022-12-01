@@ -15,6 +15,8 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.springjpa.cm.L9701ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 
@@ -41,6 +43,9 @@ public class L9701p extends TradeBuffer {
 	L9701Report3 l9701Report3;
 
 	@Autowired
+	CdReportService sCdReportService;
+
+	@Autowired
 	BaTxCom baTxCom;
 
 	@Autowired
@@ -54,6 +59,11 @@ public class L9701p extends TradeBuffer {
 		this.info("active L9701p ");
 		this.totaVo.init(titaVo);
 
+		String formNo = "L9701";
+		CdReport tCdReport = new CdReport();
+		tCdReport = sCdReportService.findById(formNo, titaVo);
+		String Fg = tCdReport.getLetterFg();
+		if ("Y".equals(Fg)) {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9701Report.setParentTranCode(parentTranCode);
@@ -68,19 +78,18 @@ public class L9701p extends TradeBuffer {
 		if (!iReportType.equals("3")) {
 			listBaTxVo = runBaTxCom(titaVo);
 		}
+			if (iReportType.equals("1") || iReportType.equals("9")) {
+				l9701Report.exec(titaVo, listBaTxVo);
+			}
 
-		if (iReportType.equals("1") || iReportType.equals("9")) {
-			l9701Report.exec(titaVo, listBaTxVo);
+			if (iReportType.equals("2") || iReportType.equals("9")) {
+				l9701Report2.exec(titaVo, listBaTxVo);
+			}
+
+			if (iReportType.equals("3") || iReportType.equals("9")) {
+				l9701Report3.exec(titaVo);
+			}
 		}
-
-		if (iReportType.equals("2") || iReportType.equals("9")) {
-			l9701Report2.exec(titaVo, listBaTxVo);
-		}
-
-		if (iReportType.equals("3") || iReportType.equals("9")) {
-			l9701Report3.exec(titaVo);
-		}
-
 		String nowBc = dDateUtil.getNowStringBc();
 		String tlrNo = titaVo.getTlrNo();
 

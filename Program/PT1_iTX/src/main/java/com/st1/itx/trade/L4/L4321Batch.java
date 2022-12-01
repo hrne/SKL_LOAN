@@ -1,19 +1,16 @@
 package com.st1.itx.trade.L4;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -28,8 +25,6 @@ import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanRateChangeService;
-import com.st1.itx.db.service.springjpa.cm.L4321ServiceImpl;
-import com.st1.itx.trade.L4.L4321Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
@@ -91,7 +86,6 @@ public class L4321Batch extends TradeBuffer {
 	private Boolean flag = true;
 	private BigDecimal rateIncr = BigDecimal.ZERO;
 	private BigDecimal individualIncr = BigDecimal.ZERO;
-	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
 //	輸入畫面 戶別 CustType 1:個金;2:企金（含企金自然人）
 //	客戶檔 0:個金1:企金2:企金自然人
@@ -166,7 +160,7 @@ public class L4321Batch extends TradeBuffer {
 		// 產出確認清單
 		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
 			this.batchTransaction.commit();
-			l4321Report.exec(fnAllList, titaVo);
+			l4321Report.exec(titaVo);
 		}
 	}
 

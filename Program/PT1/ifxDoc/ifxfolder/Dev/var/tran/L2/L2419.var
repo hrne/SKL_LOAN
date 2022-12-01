@@ -166,6 +166,21 @@ V(2,0)
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R65.dec"/>
+
+! 功能2,3時,需檢核是否已撥款
+#SendL2R65CheckDrawdown=X,1,S
+IF(#Function==2||#Function==3,$,S)
+T(3,@DrawdownStatus,)
+E(0,@RimApplNo,#ApplNo)
+RESET_RIM(#SendL2R65CheckDrawdown,L2R65)
+S(L2R65,1,#RimApplNo)
+R(1,L2R65)
+T(2,@DrawdownStatus,#L2r05DrawdownStatus)
+
+#DrawdownStatus=X,1,S
+IF(#Function==2||#Function==3,$,S)
+IF(#DrawdownStatus=="Y",V(P,此核准號碼已撥款,不可使用此功能),s)
 
 #RimTxCode=_,_,S
 T(3,L2419)
@@ -288,6 +303,7 @@ T(3,1)ASGN(LOOP$)
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R65.tom"/>
 <include src="ROM.icf::L6R10.tom"/>
 TXFORM=L2419
 ^

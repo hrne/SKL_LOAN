@@ -214,7 +214,8 @@ public class L1108 extends TradeBuffer {
 					}
 				} else {
 					// 變更前
-					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice()) || !VarEMail.equals(tCustNotice.getEmailNotice())) {
+					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice())
+							|| !VarEMail.equals(tCustNotice.getEmailNotice())) {
 
 						// 只在有修改選項時，才實際更新
 						log = true;
@@ -232,21 +233,35 @@ public class L1108 extends TradeBuffer {
 						}
 					}
 
-				}
-				if (log) {
-					// 紀錄變更前變更後
+					this.info("Log   = " + log);
+					if (log) {
+						// 紀錄變更前變更後
+						this.info("tCustNotice.getFormNo( )      = " + tCustNotice.getFormNo());
 
-					String formx = "";
-					CdReport cdReport = sCdReportService.findById(tCustNotice.getFormNo(), titaVo);
-					if (cdReport != null) {
-						formx = cdReport.getFormName();
+						String formx = "";
+						CdReport cdReport = sCdReportService.findById(tCustNotice.getFormNo(), titaVo);
+						if (cdReport != null) {
+							formx = cdReport.getFormName();
+						}
+						CdReport oCdReport = (CdReport) iDataLog.clone(cdReport);
+						cdReport.setMessageFg(VarMsg);//簡訊
+						cdReport.setEmailFg(VarEMail);//Email
+						cdReport.setLetterFg(VarPaper);//書面
+						
+						oCustNotice = tranDesc(oCustNotice);
+						CustNotice nCustNotice = tranDesc(tCustNotice);
+						try {
+						sCdReportService.update(cdReport, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0005", "L1908申請不列印書面通知書");
+						}
+						iDataLog.setEnv(titaVo, oCdReport, cdReport);
+						iDataLog.exec("L1908異動",cdReport.getFormNo());
+						
+						iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
+						iDataLog.exec("修改顧客/" + oCustNotice.getFormNo() + " " + formx + " 通知設定",
+								"CustUKey:" + custMain.getCustUKey());
 					}
-
-					oCustNotice = tranDesc(oCustNotice);
-					CustNotice nCustNotice = tranDesc(tCustNotice);
-
-					iDataLog.setEnv(titaVo, oCustNotice, nCustNotice);
-					iDataLog.exec("修改顧客 " + custMain.getCustId() + "/" + oCustNotice.getFormNo() + " " + formx + " 通知書", "CustUKey:" + custMain.getCustUKey());
 				}
 			}
 		}

@@ -32,7 +32,7 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int iConfirmFlag, TitaVo titaVo) throws Exception {
 
 		String iAdjDate = String.valueOf(Integer.valueOf(titaVo.get("AdjDate")) + 19110000);
 		int custType1 = 0;
@@ -81,7 +81,7 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "   AND BR.\"CustCode\" >= " + custType1 + "                                    "
 				+ "   AND BR.\"CustCode\" <= " + custType2 + "                                    "
 				+ "   AND BR.\"AdjCode\" = " + adjCode + "                                         "
-				+ "   AND BR.\"ConfirmFlag\" = 0 ";
+				+ "   AND BR.\"ConfirmFlag\" = " + iConfirmFlag;
 		this.info("sql=" + sql);
 
 		Query query;

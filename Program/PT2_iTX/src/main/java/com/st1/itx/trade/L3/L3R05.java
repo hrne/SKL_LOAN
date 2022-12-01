@@ -105,7 +105,11 @@ public class L3R05 extends TradeBuffer {
 			}
 		}
 
-		if (("L3230".equals(iTxCode) || "L3220".equals(iTxCode)) && wkTempAmt.compareTo(BigDecimal.ZERO) == 0) {
+		if ("L3220".equals(iTxCode) && (iTempItemCode == 4 || iTempItemCode == 5 || iTempItemCode == 11)
+				&& wkTempAmt.compareTo(BigDecimal.ZERO) == 0) {
+			throw new LogicException(titaVo, "E3093", " 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查無暫收款(暫收款金額為零)
+		}
+		if ("L3230".equals(iTxCode) && wkTempAmt.compareTo(BigDecimal.ZERO) == 0) {
 			throw new LogicException(titaVo, "E3093", " 戶號 = " + iCustNo + " 額度編號 = " + iFacmNo); // 查無暫收款(暫收款金額為零)
 		}
 

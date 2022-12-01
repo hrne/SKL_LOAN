@@ -175,15 +175,20 @@ public class L2419Report extends TradeBuffer {
 
 			detailNo++;
 		}
+		
+		makeExcel.setLockColumn(3, detailNo - 1, L2419Column.NO.getIndex(), L2419Column.CL_NO.getIndex(), 142);
+		
+		makeExcel.setProtectSheet(groupNo);
 
-		makeExcel.close();
+		makeExcel.toExcel(makeExcel.close());
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", "", "L2419已完成", titaVo);
 
 		return null;
 	}
 
-	private void recordClBatch(int applNo, String clCode1, String clCode2, String clNo, String groupNo, int no) throws LogicException {
+	private void recordClBatch(int applNo, String clCode1, String clCode2, String clNo, String groupNo, int no)
+			throws LogicException {
 
 		ClBatchId tClBatchId;
 		ClBatch tClBatch;
@@ -231,6 +236,7 @@ public class L2419Report extends TradeBuffer {
 		String bdMtrlCode = result.get("BdMtrlCode");
 		String bdTypeCode = result.get("BdTypeCode");
 		String totalFloor = result.get("TotalFloor");
+		String bdDate = result.get("BdDate");
 		String floorNo = result.get("FloorNo");
 		String area = result.get("Area");
 		String evaUnitPrice = result.get("EvaUnitPrice");
@@ -269,7 +275,7 @@ public class L2419Report extends TradeBuffer {
 		makeExcel.setValue(detailNo, L2419Column.MTRL.getIndex(), getItem("BdMtrlCode", bdMtrlCode));
 		makeExcel.setValue(detailNo, L2419Column.FLOOR_NO.getIndex(), floorNo);
 		makeExcel.setValue(detailNo, L2419Column.TOTAL_FLOOR.getIndex(), totalFloor);
-		makeExcel.setValue(detailNo, L2419Column.BUILD_DATE.getIndex(), "");
+		makeExcel.setValue(detailNo, L2419Column.BUILD_DATE.getIndex(), getFormattedRocDate(bdDate));
 		makeExcel.setValue(detailNo, L2419Column.SETTING_DATE.getIndex(), getFormattedRocDate(settingDate));
 		makeExcel.setValue(detailNo, L2419Column.CLAIM_DATE.getIndex(), getFormattedRocDate(claimDate));
 		makeExcel.setValue(detailNo, L2419Column.FLOOR_AREA.getIndex(), rptUtil.getBigDecimal(area));

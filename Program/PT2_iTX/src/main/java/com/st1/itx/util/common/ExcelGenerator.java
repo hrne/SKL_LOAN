@@ -317,6 +317,12 @@ public class ExcelGenerator extends CommBuffer {
 			case "A":
 				setFormula(map);
 				break;
+			case "B":
+				setLockColumn(map);
+				break;
+			case "C":
+				setProtectSheet(map);
+				break;
 			default:
 				// unknown type
 				break;
@@ -328,6 +334,46 @@ public class ExcelGenerator extends CommBuffer {
 		output();
 
 		this.info("MakeExcel finished.");
+	}
+
+	private void setProtectSheet(Map<String, Object> map) {
+		this.sheet.protectSheet(map.get("pw").toString());
+	}
+
+	private void setLockColumn(Map<String, Object> map) throws LogicException {
+		int rowStart = Integer.valueOf(map.get("rs").toString());
+		int rowEnd = Integer.valueOf(map.get("re").toString());
+		int columnStart = Integer.valueOf(map.get("cs").toString());
+		int columnEnd = Integer.valueOf(map.get("ce").toString());
+		int totalColumn = Integer.valueOf(map.get("tc").toString());
+
+		this.info("lockColumn start");
+		if (this.sheet == null) {
+			throw new LogicException(titaVo, "E0013", "(MakeExcel)lockColumn sheet is null");
+		}
+		Map<Integer, CellStyle> cellStyleMap = new HashMap<>();
+		for (int nowRow = rowStart; nowRow <= rowEnd; nowRow++) {
+			Row processingRow = this.sheet.getRow(nowRow - 1);
+			if (processingRow == null) {
+				processingRow = this.sheet.createRow(nowRow - 1);
+			}
+			for (int nowColumn = columnStart; nowColumn <= totalColumn; nowColumn++) {
+				this.info("nowColumn = " + nowColumn);
+				Cell cell = null;
+				cell = processingRow.getCell(nowColumn - 1);
+				if (cell == null) {
+					cell = processingRow.createCell(nowColumn - 1, CellType.BLANK);
+				}
+				CellStyle oriCellStyle = cell.getCellStyle();
+				if (!cellStyleMap.containsKey(nowColumn)) {
+					CellStyle tempStyle = this.workbook.createCellStyle();
+					tempStyle.cloneStyleFrom(oriCellStyle);
+					tempStyle.setLocked(nowColumn <= columnEnd); // 鎖定或不鎖定的判斷
+					cellStyleMap.put(nowColumn, tempStyle);
+				}
+				cell.setCellStyle(cellStyleMap.get(nowColumn));
+			}
+		}
 	}
 
 	private void setFormula(Map<String, Object> map) throws LogicException {

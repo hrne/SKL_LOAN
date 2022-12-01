@@ -48,6 +48,7 @@ public class ReportCom extends CommBuffer {
 	@Autowired
 	Parse parse;
 
+
 	public BeanDefinition getBean(String beanName) {
 		try {
 			return applicationContext.getBeanFactory().getBeanDefinition(beanName);
@@ -118,7 +119,9 @@ public class ReportCom extends CommBuffer {
 					// add into batch job
 					// batchJob format: j[BEANNAME];j[BEANNAME];...;j[BEANNAME]
 					this.info("ReportCom: adding BatchJob j" + tradeCode + "(" + txcd + ")");
-					backgroundJobs.append("j" + tradeCode + ";");
+					if(!backgroundJobs.toString().contains(tradeCode)){
+						backgroundJobs.append("j" + tradeCode + ";");
+					}
 
 				}
 			}

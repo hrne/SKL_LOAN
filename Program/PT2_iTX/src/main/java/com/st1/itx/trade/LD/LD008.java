@@ -27,7 +27,7 @@ public class LD008 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		;
@@ -41,22 +41,20 @@ public class LD008 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void run() throws LogicException {
-		this.info("active LD003 ");
-		
-		int totalItem = parse.stringToInteger(titaVo.getParam("TotalItem"));
+		this.info("active LD008 ");
 
+		int totalItem = parse.stringToInteger(titaVo.getParam("TotalItem"));
+		String txcd = titaVo.getTxcd();
 		String subReportCode = "";
-		
+
 		for (int i = 1; i <= totalItem; i++) {
-			if (!titaVo.getParam("BtnShell" + i).trim().isEmpty()) {
+			if (!titaVo.getParam("BtnShell" + i).trim().isEmpty() && "LD008".equals(titaVo.getParam("TradeCode" + i))) {
 				this.info(i + "====" + titaVo.getParam("TradeSub" + i));
 				subReportCode = titaVo.getParam("TradeSub" + i);
-				lD008report.exec(titaVo,subReportCode);
+				lD008report.exec(titaVo, subReportCode);
 			}
 		}
-		
-		
-	
+
 	}
 
 }

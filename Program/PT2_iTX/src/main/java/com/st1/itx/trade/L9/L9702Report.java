@@ -115,6 +115,8 @@ public class L9702Report extends MakeReport {
 
 		String subName = titaVo.get("ReportCodeX").trim();
 
+		String type = titaVo.getParam("ReportCode");
+
 		List<Map<String, String>> listL9702 = null;
 
 		if ("1".equals(typeReportCode)) {
@@ -130,8 +132,8 @@ public class L9702Report extends MakeReport {
 			}
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-					.setRptCode("L9702").setRptItem(reportName + "(" + subName + ")").setSecurity("密").setRptSize("A4")
-					.setPageOrientation("L").build();
+					.setRptCode("L9702").setRptItem(reportName + "(" + ("4".equals(type) ? "總表" : subName) + ")")
+					.setSecurity("密").setRptSize("A4").setPageOrientation("L").build();
 
 			this.open(titaVo, reportVo);
 
@@ -282,8 +284,8 @@ public class L9702Report extends MakeReport {
 //			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9702", "放款餘額及財收統計表-通路別", "", "A4", "");
 
 			ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-					.setRptCode("L9702").setRptItem(reportName + "(" + subName + ")").setSecurity("密").setRptSize("A4")
-					.setPageOrientation("L").build();
+					.setRptCode("L9702").setRptItem(reportName + "(" + ("4".equals(type) ? "通路別" : subName) + ")")
+					.setSecurity("密").setRptSize("A4").setPageOrientation("L").build();
 
 			this.open(titaVo, reportVo);
 

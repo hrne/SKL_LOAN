@@ -295,7 +295,7 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3007; ntxbuf=#BUF4;ntxbuf5=type<-1:ChequeAc
 !支票金額只可做1,2,3項目
 #FdTempItemCode=X,2,L
 T(3,*)
-
+#RimTempItemCode=A,2,S
 #TempItemCode=A,2,I
 HELP(#TempItemCodeHelp)
 @V(H,#TempItemCodeHelp)
@@ -342,8 +342,9 @@ C(3,#TempItemCode,3,T(3,09),$)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#TimFacmNo)
 E(0,@RimTempReasonCode,#TempReasonCode)
+E(0,@RimTempItemCode,#TempItemCode)
 RESET_RIM(#SendL3r05,L3R05)
-S(L3R05,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimTempReasonCode)
+S(L3R05,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimTempReasonCode,#RimTempItemCode)
 R(1,L3R05)
 C(4,#L3r05TmpFacmNoX,T(2,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#L3r05TmpFacmNoX))
 

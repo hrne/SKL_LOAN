@@ -288,9 +288,6 @@ public class DataLog extends CommBuffer {
 
 		if (otherList != null) 
 			listMap.addAll(otherList);
-		
-		if (listMap.size() == 0)
-			return;
 
 		txDataLog.setReason(reason);
 

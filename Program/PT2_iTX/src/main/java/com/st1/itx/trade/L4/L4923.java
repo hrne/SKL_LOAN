@@ -82,12 +82,12 @@ public class L4923 extends TradeBuffer {
 			}
 
 			wkUser = TlrNo;
-			// 組經辦人員姓名
-			CdEmp tCdEmp = cdEmpService.findById(TlrNo, titaVo);
-			if (tCdEmp != null) {
-				if ("999999".equals(TlrNo)) {
-					wkUser = "系統轉換";
-				} else {
+			if ("999999".equals(TlrNo)) {
+				wkUser = "系統轉換";
+			} else {
+				// 組經辦人員姓名
+				CdEmp tCdEmp = cdEmpService.findById(TlrNo, titaVo);
+				if (tCdEmp != null) {
 					wkUser = wkUser + " " + tCdEmp.getFullname();
 				}
 			}
@@ -104,7 +104,6 @@ public class L4923 extends TradeBuffer {
 				} else {
 					occursList.putParam("OORepayAcct", t.getPostDepCode() + t.getRepayAcct());
 				}
-
 			}
 			occursList.putParam("OOTlrNo", wkUser);
 			String sDate = "";

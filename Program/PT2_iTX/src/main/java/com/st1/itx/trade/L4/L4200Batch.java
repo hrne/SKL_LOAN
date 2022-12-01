@@ -1164,11 +1164,6 @@ public class L4200Batch extends TradeBuffer {
 					procCode = "E0014"; // 檔案錯誤
 					procCodeX = "媒體檔無此資料";
 				} else {
-					// 非15日薪僅扣期款
-					if ("5".equals(tEmpDeductMedia.getMediaKind())) {
-						tempVo.putParam("PayFeeMethod", "N");						
-					}
-
 					Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(
 							tEmpDeductMedia.getMediaDate() + 19110000, tEmpDeductMedia.getMediaKind(),
 							tEmpDeductMedia.getMediaSeq(), 0, Integer.MAX_VALUE, titaVo);
@@ -1416,6 +1411,7 @@ public class L4200Batch extends TradeBuffer {
 						+ parse.IntegerToString(chequeNo, 7) + " 支票金額 : " + chequeAmt);
 
 				tempVo.putParam("Remark", chequeDate + " " + chequeAmt);
+				tempVo.putParam("ChequeAmt", chequeAmt);
 				if ("0".equals(procStsCode)) {
 					int listCnt = 1;
 					for (AcReceivable tAcReceivable : lAcReceivable) {
