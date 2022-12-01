@@ -124,8 +124,8 @@ BEGIN
                                   AND WK."BormNo" = JM."BormNo"
       WHERE JM."DataYM" =  YYYYMM
         AND WK."CustNo" > 0
-      GROUP BY "DataYM"
-             , "CustNo"
+      GROUP BY JM."DataYM"
+             , JM."CustNo"
     )
     , FacTotal AS (
       -- 各額度放款餘額加總
@@ -139,9 +139,9 @@ BEGIN
                                   AND WK."BormNo" = JM."BormNo"
       WHERE JM."DataYM" =  YYYYMM
         AND WK."CustNo" > 0
-      GROUP BY "DataYM"
-             , "CustNo"
-             , "FacmNo"
+      GROUP BY JM."DataYM"
+             , JM."CustNo"
+             , JM."FacmNo"
     )
     , Law AS (
       -- 把本月各戶號法拍費用餘額撈出來

@@ -296,7 +296,7 @@ C(4,#RelationCode,S,T(H,#RelationCode,#RelationCodeHelp))
 ! 聯絡人姓名
 #LiaisonName=x,100,I
 C(4,#RelationCode,S,$)
-T(2,#L1r09CustName)
+!T(2,#L1r09CustName)
 !IF(#RelationCode == "00",T(2,#L1r09CustName),$)
 !IF(#RelationCode == "00",s,$)
 @IF(#TelTypeCode == "06" || #TelTypeCode == "09",V(7),$)

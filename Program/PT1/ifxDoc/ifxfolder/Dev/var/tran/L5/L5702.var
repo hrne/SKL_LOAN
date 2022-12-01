@@ -454,7 +454,7 @@ V(H,#TxKindHelp)
 T(H,#NewTransTxKind,#TxKindHelp)
 !案件種類是更生時,且金額>=期款,才可讓使用者選擇要還1期或提前還本
 #CheckTxKindX=X,1,S
-IF(#NewTransTxKind==6,s,$)
+@IF(#NewTransTxKind==6,s,$)
 IF(#CaseKindCode==3,IF(#L5r03NewTransTxKind==0 || #L5r03NewTransTxKind==1 || #L5r03NewTransTxKind==3,IF(#NewTransTxKind==3,s,$),$),$)
 IF(#L5r03NewTransTxKind==3,IF(#NewTransTxKind==1 || #NewTransTxKind==3,s,$),IF(#TempTransTxKind!=#NewTransTxKind,$,s))
 IF(#CaseKindCode==3,V(P,更生僅金額大於等於期款可換成提前還本，其餘不可變更),V(P,僅提前還本可換成溢繳，其餘不可變更))

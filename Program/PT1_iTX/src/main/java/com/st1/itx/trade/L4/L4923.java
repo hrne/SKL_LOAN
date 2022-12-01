@@ -85,7 +85,11 @@ public class L4923 extends TradeBuffer {
 			// 組經辦人員姓名
 			CdEmp tCdEmp = cdEmpService.findById(TlrNo, titaVo);
 			if (tCdEmp != null) {
-				wkUser = wkUser + " " + tCdEmp.getFullname();
+				if ("999999".equals(TlrNo)) {
+					wkUser = "系統轉換";
+				} else {
+					wkUser = wkUser + " " + tCdEmp.getFullname();
+				}
 			}
 			OccursList occursList = new OccursList();
 
