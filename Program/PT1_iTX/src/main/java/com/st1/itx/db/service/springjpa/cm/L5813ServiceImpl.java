@@ -39,20 +39,29 @@ public class L5813ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iYYYYMM==" + iYYYYMM);
 
 		sql += "select \r\n";
-		sql += "	\"CustNo\"\r\n";
-		sql += "	,\"FacmNo\"\r\n";
-		sql += "	,\"HouseBuyDate\"\r\n";
-		sql += "	,\"LoanAmt\"\r\n";
-		sql += "	,\"FirstDrawdownDate\"\r\n";
-		sql += "	,\"MaturityDate\"\r\n";
-		sql += "	,\"LoanBal\"\r\n";
-		sql += "	,\"YearMonth\"\r\n";
-		sql += "	,\"JsonFields\"\r\n";
-		sql += "	,\"UsageCode\"\r\n";
-		sql += "	,\"YearlyInt\"\r\n";
-		sql += "	from  \"YearlyHouseLoanInt\"\r\n";
+		sql += "	 y.\"CustNo\"\r\n";
+		sql += "	,y.\"FacmNo\"\r\n";
+		sql += "	,y.\"HouseBuyDate\"\r\n";
+		sql += "	,y.\"LoanAmt\"\r\n";
+		sql += "	,y.\"FirstDrawdownDate\"\r\n";
+		sql += "	,y.\"MaturityDate\"\r\n";
+		sql += "	,y.\"LoanBal\"\r\n";
+		sql += "	,y.\"YearMonth\"\r\n";
+		sql += "	,y.\"JsonFields\"\r\n";
+		sql += "	,y.\"UsageCode\"\r\n";
+		sql += "	,y.\"YearlyInt\"\r\n";
+		sql += "	,cb.\"BdLocation\"\r\n";
+		sql += "	from  \"YearlyHouseLoanInt\"  y   \r\n";
+		sql += "	left join  \"ClFac\" cl on cl.\"CustNo\" = y.\"CustNo\"      \r\n";
+		sql += "	                       and cl.\"FacmNo\" = y.\"FacmNo\"      \r\n";
+		sql += "	                       and cl.\"MainFlag\" = 'Y'             \r\n";
+		sql += "	                       and cl.\"ClCode1\" = 1                 \r\n";
+		sql += "	left join  \"ClBuilding\" cb on cb.\"ClCode1\" = cl.\"ClCode1\"      \r\n";
+		sql += "	                            and cb.\"ClCode2\" = cl.\"ClCode2\"      \r\n";
+		sql += "	                            and cb.\"ClNo\" = cl.\"ClNo\"      \r\n";
+		
 		sql += "	where \"YearMonth\"= :iYYYYMM ";
-		sql += "	order by \"CustNo\",\"FacmNo\" ";
+		sql += "	order by \"CustNo\",\"FacmNo\" , \"UsageCode\" DESC ";
 
 		this.info("sql=" + sql);
 		Query query;

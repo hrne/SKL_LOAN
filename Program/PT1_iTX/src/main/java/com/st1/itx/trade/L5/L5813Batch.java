@@ -23,6 +23,7 @@ import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.YearlyHouseLoanIntService;
+import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L5813ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
@@ -166,6 +167,7 @@ public class L5813Batch extends TradeBuffer {
 
 			if (tCustMain != null) {
 				iCustName = tCustMain.getCustName();
+				iCustName = covertToChineseFullChar(iCustName);
 				if (iCustName.length() > 9) {
 					iCustName = iCustName.substring(0, 9);
 				} else if (iCustName.length() < 9) {
@@ -192,13 +194,18 @@ public class L5813Batch extends TradeBuffer {
 
 			String bdLocation = "";// 建物地址
 			bdLocation = tTempVo.get("BdLoacation");
+			if (bdLocation.length() < 2) {
+				bdLocation = result.get("BdLocation");
+			}
 			bdLocation = covertToChineseFullChar(bdLocation);
 			if (bdLocation.length() < 28) {
 				for (int a = bdLocation.length(); a < 28; a++) {
 					bdLocation = bdLocation + '　';
 				}
 			}
+			bdLocation = bdLocation.substring(0, 28);
 
+			bdOwner = covertToChineseFullChar(bdOwner);
 			if (bdOwner.length() > 9) {
 				bdOwner = bdOwner.substring(0, 9);
 			} else {
@@ -264,9 +271,9 @@ public class L5813Batch extends TradeBuffer {
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanAmt), 10, '0'); // 最初貸款金額 右靠前埔0
 			strField += vertical;
-			strField += String.valueOf(iFirstDrawdownDate); // 貸款起日
+			strField += StringUtils.leftPad(String.valueOf(iFirstDrawdownDate), 7,'0'); // 貸款起日
 			strField += vertical;
-			strField += String.valueOf(iMaturityDate); // 貸款迄日
+			strField += StringUtils.leftPad(String.valueOf(iMaturityDate),7,'0'); // 貸款迄日
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanBal), 10, '0'); // 截至本年度未償還本金餘額
 			strField += vertical;
@@ -325,6 +332,10 @@ public class L5813Batch extends TradeBuffer {
 		String fileCode = "L5813";
 		String fileItem = "國稅局申報(官網-LNM572P)";
 		String fileName = "LNM572P-" + tYear + "年度.csv";
+		String dataCustNo = "";
+		String dataFacmNo = "";
+		int printfg = 0;
+		String pUsageCode = "";//國稅局-用途別只找一次,出檔用
 
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName,
 				2);
@@ -333,6 +344,35 @@ public class L5813Batch extends TradeBuffer {
 
 		for (Map<String, String> result : resultList) {
 
+			if ("".equals(dataCustNo)) {//第一筆
+				dataCustNo = result.get("CustNo");
+				dataFacmNo =  result.get("FacmNo");
+				String cUsageCode = result.get("UsageCode");
+				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
+					cUsageCode = "0" + cUsageCode;
+				}
+				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
+				if (tCdCode != null) {// 用途別
+					pUsageCode = tCdCode.getItem();
+				} else {
+					pUsageCode = "週轉金";
+				}
+
+			}
+			if ( !dataCustNo.equals(result.get("CustNo")) || !dataFacmNo.equals(result.get("FacmNo")) ) {
+				dataCustNo = result.get("CustNo");
+				dataFacmNo =  result.get("FacmNo");
+				printfg = 0;
+			}
+			
+			int tUsageCode = Integer.parseInt(result.get("UsageCode"));
+			
+			if (tUsageCode == 2 ) {//國稅局-紀錄有資料但不寫
+				printfg = 1;
+				continue;
+			}
+
+			
 			String bdOwner = ""; // 所有權人姓名
 			String bdCustId = ""; // 所有權人身分證
 			String iCustName = "";
@@ -363,6 +403,7 @@ public class L5813Batch extends TradeBuffer {
 
 			if (tCustMain != null) {
 				iCustName = tCustMain.getCustName();
+				iCustName = covertToChineseFullChar(iCustName);
 				if (iCustName.length() > 5) {
 					iCustName = iCustName.substring(0, 5);
 				} else if (iCustName.length() < 5) {
@@ -386,9 +427,11 @@ public class L5813Batch extends TradeBuffer {
 				continue;
 			}
 
+			bdOwner = covertToChineseFullChar(bdOwner);
 			for (int i = bdOwner.length(); i < 19; i++) {
 				bdOwner = bdOwner + "　";
 			}
+			bdOwner = bdOwner.substring(0, 19);
 
 			String bdLocation = "";// 建物地址
 			String bdSpace = "";// 空白
@@ -397,12 +440,16 @@ public class L5813Batch extends TradeBuffer {
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(result.get("JsonFields"));
 			bdLocation = tTempVo.get("BdLoacation");
+			if (bdLocation.length() < 2) {
+				bdLocation = result.get("BdLocation");
+			}
 			bdLocation = covertToChineseFullChar(bdLocation);
 			if (bdLocation.length() < 28) {
 				for (int a = bdLocation.length(); a < 28; a++) {
 					bdLocation = bdLocation + '　';
 				}
 			}
+			bdLocation = bdLocation.substring(0, 28);
 
 			// 貸款帳號
 			String iAccounount = "";
@@ -429,15 +476,19 @@ public class L5813Batch extends TradeBuffer {
 			this.info("iYearMonthSt==" + iYearMonthSt);
 
 			String iUsageCode = "";
-			if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-				cUsageCode = "0" + cUsageCode;
-			}
-			CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
-			if (tCdCode != null) {// 用途別
-				iUsageCode = tCdCode.getItem();
+			if (printfg == 1) {// 國稅局有資料-代表購置不動產
+				iUsageCode = pUsageCode;
 			} else {
-				iUsageCode = "週轉金";
-			}
+				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
+					cUsageCode = "0" + cUsageCode;
+				}
+				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
+				if (tCdCode != null) {// 用途別
+					iUsageCode = tCdCode.getItem();
+				} else {
+					iUsageCode = "週轉金";
+				}
+			}			
 
 			String strField = "";
 			String vertical = ",";
@@ -469,9 +520,9 @@ public class L5813Batch extends TradeBuffer {
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanAmt), 10, '0'); // 最初貸款金額 右靠前埔0
 			strField += vertical;
-			strField += String.valueOf(iFirstDrawdownDate); // 貸款起日
+			strField += StringUtils.leftPad(String.valueOf(iFirstDrawdownDate),7,'0'); // 貸款起日
 			strField += vertical;
-			strField += String.valueOf(iMaturityDate); // 貸款迄日
+			strField += StringUtils.leftPad(String.valueOf(iMaturityDate),7,'0'); // 貸款迄日
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanBal), 10, '0'); // 截至本年度未償還本金餘額
 			strField += vertical;

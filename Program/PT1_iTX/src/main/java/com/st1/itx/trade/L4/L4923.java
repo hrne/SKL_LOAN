@@ -74,11 +74,10 @@ public class L4923 extends TradeBuffer {
 		}
 		// 如有有找到資料
 		for (RepayActChangeLog t : lRepayActChangeLog) {
+
 			String TlrNo = "";
-			if (!"".equals(t.getRelTxseq()) && t.getRelTxseq().length() > 10) {
-				TlrNo = t.getRelTxseq().substring(4, 10);
-				this.info("RelTxseq = " + t.getRelTxseq());
-				this.info("TlrNo = " + TlrNo);
+			if (t.getCreateEmpNo() != null) {
+				TlrNo = t.getCreateEmpNo();
 			}
 
 			wkUser = TlrNo;
