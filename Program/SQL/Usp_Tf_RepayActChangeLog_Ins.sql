@@ -53,6 +53,7 @@ BEGIN
     LEFT JOIN "BankAuthAct" A
       ON A."CustNo" = F."CustNo"
       AND A."FacmNo" = F."FacmNo"
+    WHERE A."AuthType" IN ('00','01')
     ;
 
     -- 記錄寫入筆數

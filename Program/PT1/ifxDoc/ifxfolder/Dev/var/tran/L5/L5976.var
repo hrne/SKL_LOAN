@@ -320,11 +320,13 @@ IF(#ChgCondDate!=0,CALL(#ShowChgCondDate),
     IF(#FunctionCode==9,CALL(#ShowChgCondDate),CALL(#HideChgCondDate)))
 !債權銀行3碼改為8碼
 #RimBankCode=X,8,S
+#RimErrFg=A,1,S
 
 #RimL5r12A=X,1,S
 IF(#MainFinCode!="",$,s)
 T(2,@RimBankCode,#MainFinCode)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+E(0,@RimErrFg,1)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeName,#L5r12BankItem)
 
@@ -337,9 +339,9 @@ SHOW(#BTNJ,#BTNL)
 IF(#Status=="0",SHOW(#BTND,#BTNF,#BTNG,#BTNH,#BTNI),$)
 IF(#Status=="2",SHOW(#BTNE),$)
 IF(#Status=="4",SHOW(#BTNF),$)
-IF(#CaseKindCode==1,HIDE(#BTND,#BTNG,#BTNI),$)
-IF(#TwoStepCode=="N",HIDE(#BTNI),$)
+IF(#CaseKindCode==1,IF(#IsMainFin=="Y",HIDE(#BTND,#BTNG,#BTNI),HIDE(#BTND)),$)
 IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
+IF(#TwoStepCode=="N",HIDE(#BTNI),$)
 
 
 ! INVOKEJS(SHOW,grd1,1) BTN那行
@@ -705,7 +707,8 @@ V(P,最大債權機構不可為458)
 #RimL5r12B=X,1,S
 IF(#MainFinCode!="",$,S)
 T(2,@RimBankCode,#MainFinCode)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+E(0,@RimErrFg,1)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeName,#L5r12BankItem)
 
@@ -895,7 +898,8 @@ IF(#NegFinShareFinCode{i}=="",S,$)
 #RimL5r12C{i}=X,1,S
 IF(#NegFinShareFinCode{i}=="",S,$)
 T(2,@RimBankCode,#NegFinShareFinCode{i})
-S(L5R12,1,#RimBankCode,#FunctionCode)
+E(0,@RimErrFg,1)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@FinCodeName{i},#L5r12BankItem)
 

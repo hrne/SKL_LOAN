@@ -32,7 +32,7 @@ E(0,0)
 ["#FdTotalPeriod+期數",#TotalPeriod],["#FdIntRate+計息條件",#IntRate,"%"],
 ["#FdFirstDueDate+首次應繳日",#FirstDueDate],["#FdLastDueDate+還款結束日",#LastDueDate],
 ["#FdFieldName+#FieldName",#TotalContrAmt],["#FdNextPayDate+下次應繳日",#NextPayDate],
-[#<->#,"#FdMainFinCode+最大債權機構",#MainFinCode,#MainFinCodeName],
+[#<->#,"#FdMainFinCode+最大債權機構",#MainFinCode,#BTNM,#MainFinCodeName],
 ["#FdTwoStepCode+二階段註記",#TwoStepCode,#TwoStepCodeX],
 [#<->#,"@",#BTNK,#BtnConnect,#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL],
 ["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[], p_cols:[]}","","",
@@ -118,7 +118,7 @@ T(3,受理調解機構代號)
 #Hide=X,1,S
 INVOKEJS(SHOW,grd1,0)
 HIDE(#BtnDetail)
-HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL)
+HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL,#BTNM)
 !HIDE(#BtnBankCode)
 
 #BtnDetail=X,1,S,ui:button;value:交易明細;enable:1;tabbable:0
@@ -132,6 +132,10 @@ HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL)
 #BTNJ=X,1,S,ui:button;value:債權異動歷程;enable:1;tabbable:0
 #BTNK=X,1,S,ui:button;value:債務人聯絡電話;enable:1;tabbable:0
 #BTNL=X,1,S,ui:button;value:喘息期歷程;enable:1;tabbable:0
+#BTNM=X,1,S,ui:button;value:查詢;enable:1;tabbable:0
+#BUFM=X,1,S
+#BINDM=X,1,S
+BIND(#BTNM,click, {cmd=CHAIN; ntxcd=L5974; ntxbuf=#BUFM;ntxbuf5=type<-1:MainFinCode<-OOFinCode})
 
 ! 查詢銀行代碼
 #BUFBankCode=X,1,S
@@ -318,17 +322,18 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 C(4,#L2r07CustName,S,T(2,@PayerCustName,#L2r07CustName))
 
-
 #CheckChgCondDateIsZero=X,1,S
 IF(#ChgCondDate!=0,CALL(#ShowChgCondDate),
     IF(#FunctionCode==9,CALL(#ShowChgCondDate),CALL(#HideChgCondDate)))
 !債權銀行3碼改為8碼
 #RimBankCode=X,8,S
+#RimErrFg=A,1,S
 
 #RimL5r12A=X,1,S
 IF(#MainFinCode!="",$,s)
 T(2,@RimBankCode,#MainFinCode)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+E(0,@RimErrFg,1)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeName,#L5r12BankItem)
 
@@ -344,7 +349,6 @@ IF(#Status=="4",SHOW(#BTNF),$)
 IF(#CaseKindCode==1,HIDE(#BTND,#BTNG,#BTNI),$)
 IF(#TwoStepCode=="N",HIDE(#BTNI),$)
 IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
-
 
 ! INVOKEJS(SHOW,grd1,1) BTN那行
 #TestShowNegFinShare=X,1,S
@@ -477,10 +481,8 @@ T(2,@CustNo,#L5r09CustNo)
 ! 戶號
 #CustNo=A,7,L
 
-
 ! 案件序號
 #CaseSeq=A,3,L
-
 
 ! 最大債權
 #IsMainFin=X,1,I
@@ -489,20 +491,23 @@ HELP(#YNHelp)
 @V(H,#YNHelp)
 C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
 IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,Y,T(2,@MainFinCode,458)T(2,@MainFinCodeName,),$),$)
+IF(#FunctionCode==02 || #FunctionCode==01|| #FunctionCode==09|| #FunctionCode==11,C(5,#IsMainFin,Y,HIDE(#BTNM),SHOW(#BTNM)),HIDE(#BTNM))
 IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,N,IF(#MainFinCode=="458",T(2,@MainFinCode,)T(2,@MainFinCodeName,),$),$),$)
-IF(#FunctionCode==02,IF(#MainFinCode!=#L5r01MainFinCode,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),s),$)
-IF(#FunctionCode==01,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),$)
-
+IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),$)
 
 #IsMainFinIsY=@,1,S
 INVOKEJS(SHOW,grd1,1)
-INVOKEJS(SHOW,grd1,3,31,0)
+IF(#FunctionCode==02,CALL(#CheckgrdA),INVOKEJS(SHOW,grd1,2,31,0))
 
+#CheckgrdA=@,1,S
+##loop {times:30,i:1}
+IF({i}==1,$,C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1,{i},{i},0),INVOKEJS(SHOW,grd1,{i},{i},1)))
+##end
+
+! INVOKEJS(SHOW,grd1,1,31,1)
 
 #IsMainFinIsN=@,1,S
-
 INVOKEJS(SHOW,grd1,0)
-
 
 ##loop {times:30,i:1}
 T(2,@NegFinShareFinCode{i},)
@@ -620,11 +625,11 @@ C(4,#DeferYMStartX,S,$)
 A(YM,0,#DeferYMEndX)
 
 #DeferYMEnd=A,5,S
-C(4,#DeferYMEndX,s,$)
+C(4,#DeferYMEndX,S,$)
 E(0,#DeferYMEndX)
 
 #DeferYMCheck=X,1,S
-IF(#DeferYMStart>#DeferYMEnd,V(P,[延期繳款年月-訖]不得小於[延期繳款年月-起]),s)
+@IF(#DeferYMStart>#DeferYMEnd,V(P,[延期繳款年月-訖]不得小於[延期繳款年月-起]),s)
 ! @A(YM13,0,#DeferYMStart)
 
 ! 協商申請日
@@ -640,7 +645,7 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 D(8)
 IF(#FunctionCode==9,$,s)
 @V(7)
-@A(DATE,0,#ChgCondDate)
+A(DATE,0,#ChgCondDate)
 
 
 
@@ -714,15 +719,16 @@ IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 E(0,#TotalContrAmt)
 
 #CheckMainFinCode=X,1,S
-IF(#IsMainFin=="N",$,S)
+@IF(#IsMainFin=="N",$,S)
 IF(#MainFinCode=="458",$,S)
 V(P,最大債權機構不可為458)
 
 #RimL5r12B=X,1,S
 IF(#MainFinCode!="",$,S)
 T(2,@RimBankCode,#MainFinCode)
+E(0,@RimErrFg,0)
 RESET_RIM(#RimL5r12B,L5R12)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeName,#L5r12BankItem)
 
@@ -738,8 +744,8 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 HELP(#YNHelp)
 @T(3,@TwoStepCodeX,)
 V(3,Y,N,1,2)
-@IF(#TwoStepCode=="Y",T(2,1),$)
-@IF(#L5r01TwoStepCode==1 && #FunctionCode==11,T(2,2),s)
+IF(#TwoStepCode=="Y",T(2,1),$)
+IF(#L5r01TwoStepCode==1 && #FunctionCode==11,T(2,2),s)
 
 #TwoStepCodeX=x,18,L
 SWITCH(#TwoStepCode,
@@ -769,8 +775,6 @@ T(2,1048+#CustId)
 
 #BINDK=X,1,S
 BIND(#BTNK,click, {cmd=CHAIN; ntxcd=L8030; ntxbuf=#PhoneConnect})
-
-
 
 ! <刪除>
 ! #BUFC=X,22,S
@@ -852,11 +856,11 @@ BIND(#BTNL,click, {cmd=CHAIN; ntxcd=L6932; ntxbuf=#BUFL})
 #RimContractAmtX=m,14,S
 E(0,0)
 
+!債權機構每一家原簽約金額加總-調rim資料不含已註銷
 ##loop {times:30,i:1}
 #ContracAmtX{i}=X,1,S
 E(0,@RimContractAmtX,#RimContractAmtX+#L5r01NegFinShareContractAmt{i})
 ##end
-
 
 ##loop {times:30,i:1,j:0,k:2}
 ! Test{i}==1 繼續 Test{i}==0跳過
@@ -911,7 +915,8 @@ IF(#NegFinShareFinCode{i}=="",S,$)
 #RimL5r12C{i}=X,1,S
 IF(#NegFinShareFinCode{i}=="",S,$)
 T(2,@RimBankCode,#NegFinShareFinCode{i})
-S(L5R12,1,#RimBankCode,#FunctionCode)
+E(0,@RimErrFg,0)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@FinCodeName{i},#L5r12BankItem)
 
@@ -930,7 +935,8 @@ C(4,#NegFinShareFinCode{i},S,$)
 IF(#CaseKindCode=="1",s,$)
 IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",$,s)
-E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/#TotalContrAmt)
+E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#TotalContrAmt*100)
+! E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/#TotalContrAmt)
 
 #NegFinShareAmtRatio{i}=m,3.2,I
 C(4,#NegFinShareFinCode{i},S,$)
@@ -944,9 +950,8 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=
 C(4,#NegFinShareFinCode{i},S,$)
 IF(#CaseKindCode=="1",s,$)
 IF(#IsMainFin=="Y",$,S)
-IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",$,s)
-E(0,@NegFinShareDueAmt{i},#NegFinShareContractAmt{i}*#DueAmt/#TotalContrAmt)
-
+IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11"|| #FunctionCode=="06",$,s)
+E(0,@NegFinShareDueAmt{i},#NegFinShareAmtRatio{i}*#DueAmt/100)
 
 #NegFinShareDueAmt{i}=m,14,I
 IF(#CaseKindCode=="1",s,$)
@@ -955,6 +960,10 @@ C(4,#NegFinShareFinCode{i},S,$)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 @V(2,0)
 
+#NegFinShareContractAmtX{i}=X,17,S
+CALL2(#ADJUSTDOT,0,#L5r01NegFinShareContractAmt{i},#NegFinShareContractAmtX{i})
+#VPmsg{i}=X,100,S
+T(2,註銷不可修改簽約金額，原簽約金額+#NegFinShareContractAmtX{i})
 #NegFinShareCancelDate{i}=D,7,I
 IF(#CaseKindCode=="1",s,$)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
@@ -963,13 +972,24 @@ IF(#Test{i}=="0",S,$)
 IF(#NegFinShareFinCode{i}=="",S,$)
 D(8)
 @A(DATE,0,#NegFinShareCancelDate{i})
+IF(#FunctionCode=="02"
+ ,IF(#NegFinShareCancelDate{i}>0
+  ,IF(#NegFinShareCancelDate{i}==#L5r01NegFinShareCancelDate{i}
+   ,$
+   ,IF(#NegFinShareContractAmt{i}==#L5r01NegFinShareContractAmt{i}
+    ,$
+    ,V(P,#VPmsg{i})))
+  ,$)
+ ,$)
+
+
 
 
 #NegFinShareCancelAmt{i}=m,14,O
 IF(#CaseKindCode=="1",s,$)
 IF(#NegFinShareCancelDate{i}>0,$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#NegFinShareContractAmt{i}),$)
-IF(#FunctionCode=="02"||#FunctionCode=="06",C(3,#RimContractAmtX,0,E(0,#NegFinShareContractAmt{i}),E(0,#NegFinShareContractAmt{i}*#PrincipalBal/#RimContractAmtX)),$)
+IF(#FunctionCode=="02"||#FunctionCode=="06",C(3,#RimContractAmtX,0,E(0,#NegFinShareContractAmt{i}),E(0,#NegFinShareAmtRatio{i}*#PrincipalBal/100)),$)
 
 
 
@@ -1021,43 +1041,40 @@ E(0,@CountContractAmtX,#CountContractAmtX+#NegFinShareContractAmt{i})
 E(0,@CountCancelAmtX,#CountCancelAmtX+#NegFinShareCancelAmt{i})
 ##end
 
-##loop {times:30,i:1,j:0,k:2}
+! ##loop {times:30,i:1,j:0,k:2}
+! #AmtRatioX{i}=X,1,S
+! IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+! C(3,#NegFinShareCancelAmt{i},0,$,s)
+! C(3,#NegFinShareContractAmt{i},0,s,$)
+! E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/(#ContractAmtX-#CountCancelAmtX))
+! E(0,#CountAmtRatioXX,#CountAmtRatioXX+#NegFinShareAmtRatio{i})
 
-#AmtRatioX{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-C(3,#NegFinShareCancelAmt{i},0,$,s)
-C(3,#NegFinShareContractAmt{i},0,s,$)
-E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/(#ContractAmtX-#CountCancelAmtX))
-E(0,#CountAmtRatioXX,#CountAmtRatioXX+#NegFinShareAmtRatio{i})
+! !最後一筆比例用減的
+! #cAmtRatio{i}=X,1,S
+! IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+! IF({i}==1,s,$)
+! IF({k}==31,s,$)
+! C(4,#NegFinShareFinCode{i},s,$)
+! C(4,#NegFinShareFinCode{k},$,s)
+! C(3,#NegFinShareCancelDate{i},0,E(0,@NegFinShareAmtRatio{i},100+#NegFinShareAmtRatio{i}-#CountAmtRatioXX),E(0,@NegFinShareAmtRatio{j},100+#NegFinShareAmtRatio{j}-#CountAmtRatioXX))
 
-!最後一筆比例用減的
-#cAmtRatio{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-IF({i}==1,s,$)
-IF({k}==31,s,$)
-C(4,#NegFinShareFinCode{i},s,$)
-C(4,#NegFinShareFinCode{k},$,s)
-C(3,#NegFinShareCancelDate{i},0,E(0,@NegFinShareAmtRatio{i},100+#NegFinShareAmtRatio{i}-#CountAmtRatioXX),E(0,@NegFinShareAmtRatio{j},100+#NegFinShareAmtRatio{j}-#CountAmtRatioXX))
+! !計算期款
+! #DueAmtX{i}=X,1,S
+! IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+! C(3,#NegFinShareCancelAmt{i},0,$,s)
+! C(3,#NegFinShareAmtRatio{i},0,s,$)
+! E(0,@NegFinShareDueAmt{i},#NegFinShareAmtRatio{i}*#DueAmt/100)
+! E(0,#CountDueAmtXX,#CountDueAmtXX+#NegFinShareDueAmt{i})
 
-
-!計算期款
-#DueAmtX{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-C(3,#NegFinShareCancelAmt{i},0,$,s)
-C(3,#NegFinShareAmtRatio{i},0,s,$)
-E(0,@NegFinShareDueAmt{i},#NegFinShareAmtRatio{i}*#DueAmt/100)
-E(0,#CountDueAmtXX,#CountDueAmtXX+#NegFinShareDueAmt{i})
-
-!最後一筆期金用減的
-#cDueAmtX{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-IF({i}==1,s,$)
-IF({k}==31,s,$)
-C(4,#NegFinShareFinCode{i},s,$)
-C(4,#NegFinShareFinCode{k},$,s)
-C(3,#NegFinShareCancelDate{i},0,E(0,#NegFinShareDueAmt{i},#DueAmt+#NegFinShareDueAmt{i}-#CountDueAmtXX),E(0,#NegFinShareDueAmt{j},#DueAmt+#NegFinShareDueAmt{j}-#CountDueAmtXX))
-
-##end
+! !最後一筆期金用減的
+! #cDueAmtX{i}=X,1,S
+! IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+! IF({i}==1,s,$)
+! IF({k}==31,s,$)
+! C(4,#NegFinShareFinCode{i},s,$)
+! C(4,#NegFinShareFinCode{k},$,s)
+! C(3,#NegFinShareCancelDate{i},0,E(0,#NegFinShareDueAmt{i},#DueAmt+#NegFinShareDueAmt{i}-#CountDueAmtXX),E(0,#NegFinShareDueAmt{j},#DueAmt+#NegFinShareDueAmt{j}-#CountDueAmtXX))
+! ##end
 
 ##loop {times:30,i:1}
 
@@ -1080,12 +1097,16 @@ IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$))
 
 #CContracAmt2=X,1,S
+IF(#IsMainFin=="Y",$,S)
+IF(#CaseKindCode=="1",s,$)
 IF(#FunctionCode=="02",$,s)
 IF(#L5r01TotalContrAmt!=#TotalContrAmt,$,s)
 C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$))
 
 
 #CContracAmt3=X,1,S
+IF(#IsMainFin=="Y",$,S)
+IF(#CaseKindCode=="1",s,$)
 IF(#FunctionCode=="02",$,s)
 ##loop {times:30,i:1}
 C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},$,C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$)))

@@ -148,7 +148,7 @@ public class L4511 extends TradeBuffer {
 				type.add("5");
 
 				Slice<EmpDeductDtl> sis15EmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, type,
-						this.index, this.limit, titaVo);
+						0, Integer.MAX_VALUE, titaVo);
 				List<EmpDeductDtl> is15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 				is15EmpDeductDtl = sis15EmpDeductDtl == null ? null : sis15EmpDeductDtl.getContent();
 				this.info("Is15 Dtl Start...");
@@ -179,7 +179,7 @@ public class L4511 extends TradeBuffer {
 				type.add("9");
 
 				Slice<EmpDeductDtl> sun15EmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, type,
-						this.index, this.limit, titaVo);
+						0, Integer.MAX_VALUE, titaVo);
 
 				List<EmpDeductDtl> un15EmpDeductDtl = new ArrayList<EmpDeductDtl>();
 				un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
@@ -317,7 +317,7 @@ public class L4511 extends TradeBuffer {
 	private void deleEmpDeductMedia(String MediaKind, int iMediaDate, TitaVo titaVo) throws LogicException {
 
 		Slice<EmpDeductMedia> slEmpDeductMedia = empDeductMediaService.mediaDateRng(iMediaDate, iMediaDate, MediaKind,
-				this.index, this.limit, titaVo);
+				0, Integer.MAX_VALUE, titaVo);
 
 		if (slEmpDeductMedia != null) {
 			for (EmpDeductMedia tEmpDeductMedia : slEmpDeductMedia.getContent()) {

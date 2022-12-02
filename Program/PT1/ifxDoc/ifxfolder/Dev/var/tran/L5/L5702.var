@@ -292,11 +292,13 @@ E(0,#L5r03NewTransTxKind)
 #RimBankCode=X,8,S
 #FunctionCode=X,2,S
 T(2,#FunctionCode,05)
+#RimErrFg=A,1,S
 
 #RimL5r12A=X,1,S
 T(2,@RimBankCode,#L5r03MainFinCode)
+E(0,@RimErrFg,0)
 RESET_RIM(#RimL5r12A,L5R12)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeX,#L5r12BankItem)
 
@@ -364,8 +366,9 @@ T(H,#CustLoanKind,#CustLoanKindHelp)
 
 #RimL5r12B=X,1,S
 T(2,@RimBankCode,#MainFinCode)
+E(0,@RimErrFg,0)
 RESET_RIM(#RimL5r12B,L5R12)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeX,#L5r12BankItem)
 
@@ -586,8 +589,9 @@ T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
 
 #RimL5r12C=X,1,S
 T(2,@RimBankCode,#MainFinCode)
+E(0,@RimErrFg,0)
 RESET_RIM(#RimL5r12C,L5R12)
-S(L5R12,1,#RimBankCode,#FunctionCode)
+S(L5R12,1,#RimBankCode,#FunctionCode,#RimErrFg)
 R(1,L5R12)
 T(2,@MainFinCodeX,#L5r12BankItem)
 

@@ -11,6 +11,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.NegCom;
+import com.st1.itx.util.parse.Parse;
+
 
 @Service("L5R12")
 @Scope("prototype")
@@ -24,6 +26,9 @@ public class L5R12 extends TradeBuffer {
 	@Autowired
 	public NegCom sNegCom;
 
+	@Autowired
+	public Parse parse;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
@@ -31,6 +36,7 @@ public class L5R12 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String strBankCode = titaVo.getParam("RimBankCode");// 銀行代碼
 		String iFunctionCode = titaVo.getParam("FunctionCode");
+		int errflag = parse.stringToInteger(titaVo.getParam("RimErrFg").trim());//0:踢錯誤訊息,1:不踢錯誤訊息
 
 		this.totaVo.putParam("L5r12BankItem", "");
 		this.totaVo.putParam("L5r12BranchItem", "");
@@ -46,9 +52,11 @@ public class L5R12 extends TradeBuffer {
 				}
 			} else {
 				this.info("iFunctionCode=" + iFunctionCode);
-				if (("01").equals(iFunctionCode) || ("02").equals(iFunctionCode) || ("09").equals(iFunctionCode) || ("11").equals(iFunctionCode)) {
-
-					throw new LogicException(titaVo, "E0001", ""); // 查無資料
+				if (("01").equals(iFunctionCode) || ("02").equals(iFunctionCode) || ("09").equals(iFunctionCode)
+						|| ("11").equals(iFunctionCode)) {
+					if (errflag == 0) {//輸入該欄位時調rim無資料才踢錯誤,預設的調rim不踢錯誤
+						throw new LogicException(titaVo, "E0001", ""); // 查無資料
+					}
 				}
 			}
 
