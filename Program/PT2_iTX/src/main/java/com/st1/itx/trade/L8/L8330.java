@@ -127,7 +127,7 @@ public class L8330 extends TradeBuffer {
 				if (!"L".equals(iDelayCode)) {
 					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custRcSubCourtEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode, 0,  1, titaVo);
 					if(sJcicZ451 != null) {
-						throw new LogicException("E0005", "IDN+報送單位代號+協調申請日+受理調解機構代號，已報送過(451)前置調解延期繳款資料.");
+						throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
 					}
 				}	
 				// 6.2 start 「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核4的限制.

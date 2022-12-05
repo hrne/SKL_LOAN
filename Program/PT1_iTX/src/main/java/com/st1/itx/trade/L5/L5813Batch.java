@@ -357,7 +357,6 @@ public class L5813Batch extends TradeBuffer {
 				} else {
 					pUsageCode = "週轉金";
 				}
-
 			}
 			if ( !dataCustNo.equals(result.get("CustNo")) || !dataFacmNo.equals(result.get("FacmNo")) ) {
 				dataCustNo = result.get("CustNo");
@@ -365,13 +364,10 @@ public class L5813Batch extends TradeBuffer {
 				printfg = 0;
 			}
 			
-			int tUsageCode = Integer.parseInt(result.get("UsageCode"));
-			
-			if (tUsageCode == 2 ) {//國稅局-紀錄有資料但不寫
+			if (("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode")) ) {//國稅局-紀錄有資料但不寫
 				printfg = 1;
 				continue;
 			}
-
 			
 			String bdOwner = ""; // 所有權人姓名
 			String bdCustId = ""; // 所有權人身分證
@@ -489,7 +485,6 @@ public class L5813Batch extends TradeBuffer {
 					iUsageCode = "週轉金";
 				}
 			}			
-
 			String strField = "";
 			String vertical = ",";
 

@@ -178,7 +178,7 @@ C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 T(3,@ClaimDateNameHelp,1:     裁定日期;2:     發文日期;3:     裁定日期;4:     更生方案履行完畢日期;5:     裁定日期;6:     發文日期)
-
+E(0,@FUNCIND,4)
 
 ! 修改進入
 #Deal_Revise=X,1,S

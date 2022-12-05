@@ -202,8 +202,7 @@ public class DataLog extends CommBuffer {
 
 	private void toExec(String reason, String MrKey) throws LogicException {
 		Map<String, Map<String, Object>> resultMap = this.compareFields(this.bef, this.aft);
-		
-		
+
 		resultMap.remove("lastUpdate");
 		resultMap.remove("lastUpdateEmpNo");
 		int size = resultMap.size();
@@ -288,9 +287,9 @@ public class DataLog extends CommBuffer {
 			this.info("物件1與物件2的屬性值無差異！");
 		}
 
-		if (otherList != null) 
+		if (otherList != null)
 			listMap.addAll(otherList);
-		
+
 		if (listMap.size() == 0)
 			return;
 
@@ -413,6 +412,15 @@ public class DataLog extends CommBuffer {
 
 						map.put(name, valueMap);
 
+					}
+
+					/* 刪除全寫 */
+					if(this.titaVo.isFuncindDel()) {
+						Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+						valueMap.put("oldValue", oldValue.toString());
+						valueMap.put("newValue", oldValue.toString());
+
+						map.put(name, valueMap);
 					}
 				}
 			}

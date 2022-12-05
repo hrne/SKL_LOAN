@@ -748,6 +748,7 @@ public class L9110Report extends MakeReport {
 					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
 					this.print(0, 105, "設定金額 ...");
 					this.print(0, 134, formatAmt(tL9110Cl.get("F22"), 0), "R");
+					settingAmttotal = parse.stringToBigDecimal(tL9110Cl.get("F22"));
 					this.print(0, 135, "鑑估總值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
 					this.print(1, 5, "建物標示備註 . " + tL9110Cl.get("F9"));
@@ -1215,6 +1216,7 @@ public class L9110Report extends MakeReport {
 		// 核貸總金額餘額
 		loanAmttotal = computeDivide(loanAmttotal, thousand, 0);
 		BigDecimal loanAmtBal = loanAmttotal;
+		settingAmttotal = computeDivide(settingAmttotal, thousand, 0);
 		BigDecimal settingAmtBal = settingAmttotal;
 		int i = 0;
 		for (Map<String, String> mLand : listLandQuery) {

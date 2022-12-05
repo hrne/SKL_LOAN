@@ -130,7 +130,7 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 C(5,#TranKey_Tmp,4,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
-
+E(0,@FUNCIND,4)
 ! 修改進入
 #Deal_Revise=X,1,S
 C(5,#TranKey_Tmp,7,$,S)
