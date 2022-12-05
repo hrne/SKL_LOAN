@@ -194,7 +194,7 @@ public class L5813Batch extends TradeBuffer {
 
 			String bdLocation = "";// 建物地址
 			bdLocation = tTempVo.get("BdLoacation");
-			if (bdLocation.length() < 2) {
+			if (bdLocation == null) {
 				bdLocation = result.get("BdLocation");
 			}
 			bdLocation = covertToChineseFullChar(bdLocation);
@@ -440,7 +440,7 @@ public class L5813Batch extends TradeBuffer {
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(result.get("JsonFields"));
 			bdLocation = tTempVo.get("BdLoacation");
-			if (bdLocation.length() < 2) {
+			if (bdLocation == null) {
 				bdLocation = result.get("BdLocation");
 			}
 			bdLocation = covertToChineseFullChar(bdLocation);

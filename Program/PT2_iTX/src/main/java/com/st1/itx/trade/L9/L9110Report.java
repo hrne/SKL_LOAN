@@ -104,6 +104,7 @@ public class L9110Report extends MakeReport {
 	private int thisMaxRow = 39;
 	private boolean isLastPage = false;
 	BigDecimal loanAmttotal = BigDecimal.ZERO;
+	BigDecimal settingAmttotal = BigDecimal.ZERO;
 
 	/**
 	 * Make sure there's space for <i>line</i> lines of output on current page.
@@ -288,7 +289,6 @@ public class L9110Report extends MakeReport {
 			this.print(0, 65, formatAmt(tL9110.get("F17"), 0), "R");
 			loanAmttotal = parse.stringToBigDecimal(tL9110.get("F17"));
 
-
 			this.print(0, 69, "核准科目 ..... " + tL9110.get("F18"));
 			this.print(0, 105,
 					"貸款期間 ..... " + tL9110.get("F19") + " 年 " + tL9110.get("F20") + " 月 " + tL9110.get("F21") + " 日");
@@ -387,6 +387,7 @@ public class L9110Report extends MakeReport {
 					this.print(0, 69, "設定日期 ..... " + this.showRocDate(tL9110Cl.get("F10"), 1));
 					this.print(0, 105, "設定金額 .....");
 					this.print(0, 134, formatAmt(tL9110Cl.get("F22"), 0), "R");
+					settingAmttotal = parse.stringToBigDecimal(tL9110Cl.get("F22"));
 					this.print(0, 135, "鑑估總值 .....");
 					this.print(0, 165, formatAmt(tL9110Cl.get("F17"), 0), "R");
 //					this.print(0, 35, "前順位金額 ...");
@@ -983,7 +984,6 @@ public class L9110Report extends MakeReport {
 				loanAmt = loanAmtBal;
 			}
 
-
 //			this.print(1, 9, mBuilding.get("F0"), "R"); // 序號
 			this.print(1, 5, mBuilding.get("F13") + "-" + mBuilding.get("F14") + "-" + mBuilding.get("F15")); // 擔保品編號
 
@@ -1207,20 +1207,23 @@ public class L9110Report extends MakeReport {
 		 */
 		checkSpace(4);
 		print(1, 5, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　（坪）　　　  （仟）　　　 （仟）");
-		print(1, 5, "擔保品編號　　提供人　　　　　　　　　　　　　　　　　　土地坐落　　　　　　　　　　　　　　　　　　　　　擔保品別 　　　　面積 　　　　  核貸　　　　 設定");
-		print(1, 5, "－－－－－－　－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－　－－－－－　－－－－－－　－－－－－－");
+		print(1, 5, "擔保品編號　　提供人　　　　　　　　　　　土地坐落　　　　　　　　　　　　　　　　　　　　　　　年度　　　擔保品別 　　　　面積 　　　　  核貸　　　　 設定");
+		print(1, 5, "－－－－－－　－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－　－－－－－　－－－－－－　－－－－－－");
 
 		int clsize = 0;
 		clsize = listLandQuery.size();
 		// 核貸總金額餘額
 		loanAmttotal = computeDivide(loanAmttotal, thousand, 0);
 		BigDecimal loanAmtBal = loanAmttotal;
+		BigDecimal settingAmtBal = settingAmttotal;
 		int i = 0;
 		for (Map<String, String> mLand : listLandQuery) {
 			BigDecimal ownerPart = new BigDecimal(mLand.get("F11"));
 			BigDecimal ownerTotal = new BigDecimal(mLand.get("F12"));
 			BigDecimal ownerPartTotal = BigDecimal.ZERO;
 			BigDecimal loanAmt = BigDecimal.ZERO;
+			BigDecimal settingAmt = BigDecimal.ZERO;
+
 			if (ownerPart.compareTo(BigDecimal.ZERO) == 0 && ownerTotal.compareTo(BigDecimal.ZERO) == 0) {
 				ownerPartTotal = BigDecimal.ZERO;
 			} else {
@@ -1231,10 +1234,12 @@ public class L9110Report extends MakeReport {
 			if (clsize - i != 0) {
 				loanAmt = computeDivide(loanAmttotal, new BigDecimal(clsize), 0);
 				loanAmtBal = loanAmtBal.subtract(loanAmt);
+				settingAmt = computeDivide(settingAmttotal, new BigDecimal(clsize), 0);
+				settingAmtBal = settingAmtBal.subtract(settingAmt);
 			} else {
 				loanAmt = loanAmtBal;
+				settingAmt = settingAmtBal;
 			}
-
 
 			this.print(1, 5, mLand.get("F13") + "-" + mLand.get("F14") + "-" + mLand.get("F15")); // 擔保品編號
 //			this.print(1, 9, mLand.get("F0"), "R"); // 序號 11/11改為擔保品編號
@@ -1242,12 +1247,9 @@ public class L9110Report extends MakeReport {
 //			this.print(0, 43, mLand.get("F2")); // 縣市
 //			this.print(0, 53, mLand.get("F3")); // 鄉鎮區
 //			this.print(0, 63, mLand.get("F4")); // 段小段
-			this.print(0, 61, mLand.get("F16")); // 縣市 11/11改為組起來門牌
+			this.print(0, 47, mLand.get("F16")); // 縣市 11/11改為組起來門牌
 //			this.print(0, 79, mLand.get("F5")); // 地號
 //			this.print(0, 101, formatAmt(mLand.get("F6"), 2), "R"); // 面積
-			this.print(0, 121, mLand.get("F17"), "R"); // 擔保品別
-			BigDecimal Area = new BigDecimal(mLand.get("F6")).multiply(ownerPartTotal);
-			this.print(0, 133, formatAmt(Area, 2), "R"); // 面積
 			String f7 = "";
 
 			try {
@@ -1256,24 +1258,27 @@ public class L9110Report extends MakeReport {
 				this.warn(thisApplNo + "'s land " + mLand.get("F0") + " got a wrong F7 input, " + e);
 			}
 
-//			this.print(0, 107, f7, "R"); // 年度 11/11會議決議刪除
+			this.print(0, 107, f7, "R"); // 年度 11/11會議決議刪除12/1會議加回來
+			this.print(0, 121, mLand.get("F17"), "R"); // 擔保品別
+			BigDecimal Area = new BigDecimal(mLand.get("F6")).multiply(ownerPartTotal);
+			this.print(0, 133, formatAmt(Area, 2), "R"); // 面積
 //			this.print(0, 123, formatAmt(mLand.get("F8"), 0), "R"); // 前次移轉  11/11會議決議刪除
 //			this.print(0, 135, formatAmt(computeDivide(getBigDecimal(mLand.get("F9")), thousand, 0), 0), "R"); // 鑑定單價  11/11會議決議刪除
 			this.print(0, 147, formatAmt(loanAmt, 0), "R"); // 核貸
-			this.print(0, 161, formatAmt(computeDivide(getBigDecimal(mLand.get("F10")), thousand, 0), 0), "R"); // 設定
+			this.print(0, 161, formatAmt(settingAmt, 0), "R"); // 設定
 			totalSettingAmt = totalSettingAmt.add(getBigDecimal(mLand.get("F10")));
 
 			totalArea = totalArea.add(Area);
 //			totalLastTransferred = totalLastTransferred.add(getBigDecimal(mLand.get("F8")));
 		}
 		checkSpace(2);
-		print(1, 5, "－－－－－－　－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－　－－－－－　－－－－－－　－－－－－－");
+		print(1, 5, "－－－－－－　－－－－－－－－－－－－－　－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－　－－－－－　－－－－－－　－－－－－－");
 		print(1, 5, "土地合計：");
 		print(0, 133, formatAmt(totalArea, 2), "R"); // 合計-面積
 //		print(0, 123, formatAmt(totalLastTransferred, 0), "R"); // 合計-前次移轉
 		// 2022-04-25 智偉:改為不顯示加總的設定金額
 		print(0, 147, formatAmt(loanAmttotal, 0), "R"); // 合計-設定
-		print(0, 161, formatAmt(computeDivide(totalSettingAmt, thousand, 0), 0), "R"); // 合計-設定
+		print(0, 161, formatAmt(settingAmttotal, 0), "R"); // 合計-設定
 	}
 
 	/**

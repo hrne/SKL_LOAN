@@ -554,6 +554,7 @@ BEGIN
                     THEN YYYYMM - 100 -- 取B-1年=C
                ELSE TRUNC("DerDate" / 100) 
              END  AS "IssueMonth" -- 減損發生年月
+           , "DerDate"  
       FROM "LoanIfrs9Dp"
       WHERE "DerDate" > 0
         AND "DataYM" = YYYYMM
@@ -581,6 +582,7 @@ BEGIN
                ORDER BY "BormNo"
              ) AS "FacSeq"
       FROM RawData
+      WHERE TRUNC("DerDate" / 100) < YYYYMM -- 2022/12/2 第1~5年費用分攤排除減損發生日為出表日當月資料
     )
     , Law AS (
       -- 取各戶號每個月實收法拍費用,2022/11/1改為入帳日OpenAcDate年月取貸方
