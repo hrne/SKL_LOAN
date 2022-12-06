@@ -191,7 +191,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
 
 			if (iAuthCreateDate > 0) {
-				sql += "   and \"AuthCreateDate\" =" + iAuthCreateDate;
+				sql += "   and \"PropDate\" =" + iAuthCreateDate;
 			}
 
 			if (iAuthCode > 0) {
@@ -200,11 +200,11 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 			break;
 		case 3:
-			sql += "   and \"PropDate\" = " + propDate;
+
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
 
 			if (iAuthCreateDate > 0) {
-				sql += "   and \"AuthCreateDate\" =" + iAuthCreateDate;
+				sql += "   and \"PropDate\" =" + iAuthCreateDate;
 			}
 
 			if (iAuthCode > 0) {

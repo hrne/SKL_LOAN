@@ -43,7 +43,7 @@ E(0,0)
 [#<->#,"#FdAuthApplCode+申請代號",#AuthApplCode,#AuthApplCodeX],
 [#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdPropDate+提出日期+(+起日+)",#PropDate],
-[#<->#,"#FdAuthCreateDate+資料產生日期",#AuthCreateDate],
+[#<->#,"#FdAuthCreateDate+提出日期",#AuthCreateDate],
 [#<->#,"#FdAuthCode+授權方式",#AuthCode,#AuthCodeX],
 ]
 

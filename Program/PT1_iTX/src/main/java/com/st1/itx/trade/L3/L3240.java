@@ -106,7 +106,6 @@ public class L3240 extends TradeBuffer {
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 	private int wkRepayCode = 0;
 	private String wkReconCode = "";
-
 	private FacProd tFacProd;
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
@@ -117,6 +116,7 @@ public class L3240 extends TradeBuffer {
 	private List<AcReceivable> lAcReceivableDelete = new ArrayList<AcReceivable>();
 	private List<AcReceivable> lAcReceivableInsert = new ArrayList<AcReceivable>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+	private TempVo tTempVo = new TempVo();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -240,7 +240,7 @@ public class L3240 extends TradeBuffer {
 			acDetail.setTxAmt(wkTxAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(0);
-			acDetail.setRvNo("" + titaVo.getOrgEntdyI());// 會計日期
+			acDetail.setRvNo( "" + titaVo.getOrgEntdyI());
 			lAcDetail.add(acDetail);
 		}
 		// 累溢收入帳(暫收貸)
@@ -293,9 +293,10 @@ public class L3240 extends TradeBuffer {
 			wkRepayCode = tx.getRepayCode();
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 			wkBorxNo = tx.getBorxNo();
-			TempVo tTempVo = new TempVo();
+			tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
 			wkReconCode = tTempVo.getParam("ReconCode");
+
 			if ("L3410".equals(tx.getTitaTxCd()) || "L3420".equals(tx.getTitaTxCd())) {
 				iCaseCloseCode = this.parse.stringToInteger(tTempVo.getParam("CaseCloseCode"));
 				// 還原催收檔

@@ -564,7 +564,6 @@ CALL2(#ADJUSTDOT,#Precision,#L3r05TempAmt,#TempAmtX)
 #TEMPAMTMSG=x,50,S
 T(2,該戶號目前暫收款金額為+#TempAmtX)
 #TwTempAmt=m,14,I
-T(2,#TempAmtX)
 !C(3,#Precision,0,$,s)
 @
 IF(#TwTempAmt>#L3r05TempAmt,V(P,#TEMPAMTMSG),$)

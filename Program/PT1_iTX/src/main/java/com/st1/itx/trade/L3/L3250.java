@@ -111,6 +111,7 @@ public class L3250 extends TradeBuffer {
 	private AcDetail acDetail;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+	private TempVo tTempVo = new TempVo();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -215,7 +216,7 @@ public class L3250 extends TradeBuffer {
 			acDetail.setTxAmt(wkTxAmt);
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(0);
-			acDetail.setRvNo("" + titaVo.getOrgEntdyI());// 會計日期
+			acDetail.setRvNo( "" + titaVo.getOrgEntdyI());
 			lAcDetail.add(acDetail);
 		}
 
@@ -290,7 +291,7 @@ public class L3250 extends TradeBuffer {
 //				throw new LogicException(titaVo, "E0010", "非轉換資料不可執行L3240回收冲正（轉換前資料）"); // 功能選擇錯誤
 //			}
 			wkRepayCode = tx.getRepayCode();
-			TempVo tTempVo = new TempVo();
+			tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
 			wkReconCode = tTempVo.getParam("ReconCode");
 			// 註記交易內容檔

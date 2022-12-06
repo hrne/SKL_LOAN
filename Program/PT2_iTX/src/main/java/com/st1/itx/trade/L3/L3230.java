@@ -97,12 +97,12 @@ public class L3230 extends TradeBuffer {
 	private int iRpCustNo = 0;
 	private int iRpFacmNo = 0;
 	private int iRpCode = 90;
-	private String iRpCodeX;
 	private BigDecimal iRpAmt = BigDecimal.ZERO;
 	private String iTempItemCode;
 	private String iRemoveNo;
 	private int iTempReasonCode;
 	private String iCurrencyCode;
+	private String iNote;
 	private BigDecimal iTempAmt;
 	private BigDecimal wkTempBal = BigDecimal.ZERO;
 	private BigDecimal wkCustTempBal = BigDecimal.ZERO;
@@ -139,6 +139,7 @@ public class L3230 extends TradeBuffer {
 		this.wkCustTempBal = new BigDecimal(0);
 		this.iTempAmt = new BigDecimal(0);
 		this.iRemoveNo = "";
+		this.iNote = "";
 		this.lAcDetail = new ArrayList<AcDetail>();
 	}
 
@@ -161,6 +162,7 @@ public class L3230 extends TradeBuffer {
 		iCurrencyCode = titaVo.getParam("CurrencyCode");
 		iRemoveNo = titaVo.getParam("RemoveNo").trim(); // 銷帳編號
 		iAcSubBookCode = titaVo.getParam("AcSubBookCode"); // 區隔帳冊
+		iNote = titaVo.getParam("Description"); // 摘要內容
 
 		wkTempBal = iTempAmt;
 
@@ -225,7 +227,6 @@ public class L3230 extends TradeBuffer {
 					iRpCustNo = parse.stringToInteger(titaVo.getParam("RpCustNo" + i));
 					iRpFacmNo = parse.stringToInteger(titaVo.getParam("RpFacmNo" + i));
 					iRpCode = parse.stringToInteger(titaVo.getParam("RpCode" + i));
-					iRpCodeX = titaVo.getParam("RpCodeX1");
 					iRpAmt = parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i));
 					settingUnPaid06();
 					this.txBuffer.setAcDetailList(lAcDetail);
@@ -322,6 +323,7 @@ public class L3230 extends TradeBuffer {
 				acDetail.setCustNo(iCustNo);
 				acDetail.setFacmNo(iFacmNo);
 				acDetail.setBormNo(0);
+				acDetail.setSlipNote(iNote);
 				lAcDetail.add(acDetail);
 			}
 			// 退還款餘額
@@ -355,7 +357,7 @@ public class L3230 extends TradeBuffer {
 							acDetail.setCurrencyCode(iCurrencyCode);
 							acDetail.setCustNo(iCustNo);
 							acDetail.setFacmNo(ac.getFacmNo());
-							acDetail.setSlipNote(titaVo.getParam("Description"));
+							acDetail.setSlipNote(iNote);
 							if (wkTempBal.compareTo(ac.getRvBal()) >= 0) {
 								acDetail.setTxAmt(ac.getRvBal());
 								wkTempBal = wkTempBal.subtract(ac.getRvBal());
@@ -431,7 +433,7 @@ public class L3230 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0019", "無金額相同之未銷費用，請使用 L6907 未銷帳餘額明細查詢 "); // 查詢資料不存在
 		}
 		// 貸方：費用、累溢收
-		acRepayCom.settleFeeByTemp(iRpCode, titaVo.getEntDyI(), wkCustTempBal, feeList, lAcDetail, titaVo);
+		acRepayCom.settleFeeByTemp(iRpCode, iNote, titaVo.getEntDyI(), wkCustTempBal, feeList, lAcDetail, titaVo);
 	}
 
 	private void settingUnPaid06() throws LogicException {
@@ -460,6 +462,7 @@ public class L3230 extends TradeBuffer {
 				acDetail.setTxAmt(excessive);
 				acDetail.setCustNo(iRpCustNo);
 				acDetail.setFacmNo(iRpFacmNo);
+				acDetail.setSlipNote(iNote);
 				lAcDetail.add(acDetail);
 			}
 			// 累溢收(暫收貸)
@@ -470,6 +473,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setTxAmt(iRpAmt.add(excessive));
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setFacmNo(iRpFacmNo);
+			acDetail.setSlipNote(iNote);
 			lAcDetail.add(acDetail);
 			break;
 		case 94: // 轉債協暫收款
@@ -479,6 +483,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setAcctCode(acNegCom.getAcctCode(iRpCustNo, titaVo));
 			acDetail.setSumNo("094");
 			acDetail.setTxAmt(iRpAmt);
+			acDetail.setSlipNote(iNote);
 			lAcDetail.add(acDetail);
 			break;
 		case 95: // 轉債協退還款
@@ -488,6 +493,7 @@ public class L3230 extends TradeBuffer {
 			acDetail.setAcctCode(acNegCom.getReturnAcctCode(iRpCustNo, titaVo));
 			acDetail.setSumNo("095");
 			acDetail.setTxAmt(iRpAmt);
+			acDetail.setSlipNote(iNote);
 			lAcDetail.add(acDetail);
 			break;
 		}
@@ -504,9 +510,9 @@ public class L3230 extends TradeBuffer {
 		acDetail.setCurrencyCode(iCurrencyCode);
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
-		acDetail.setSlipNote(titaVo.getParam("Description"));
 		acDetail.setAcSubBookCode(iAcSubBookCode); // 區隔帳冊
 		acDetail.setAcBookFlag(3); // 帳冊別記號 (3: 指定帳冊)
+		acDetail.setSlipNote(iNote);
 		lAcDetail.add(acDetail);
 	}
 
@@ -519,7 +525,7 @@ public class L3230 extends TradeBuffer {
 		acDetail.setCurrencyCode(iCurrencyCode);
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
-		acDetail.setSlipNote(titaVo.getParam("Description"));
+		acDetail.setSlipNote(iNote);
 		lAcDetail.add(acDetail);
 	}
 
@@ -532,7 +538,7 @@ public class L3230 extends TradeBuffer {
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
 		acDetail.setFacmNo(iFacmNo);
-		acDetail.setSlipNote(titaVo.getParam("Description"));
+		acDetail.setSlipNote(iNote);
 		lAcDetail.add(acDetail);
 	}
 
@@ -734,7 +740,7 @@ public class L3230 extends TradeBuffer {
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("RemoveNo", iRemoveNo);
-		tTempVo.putParam("Note", titaVo.getParam("Description"));
+		tTempVo.putParam("Note", iNote);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
 		acRepayCom.updBorTxAcDetail(tLoanBorTx, lAcDetail, titaVo);
@@ -781,7 +787,7 @@ public class L3230 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		// 新增摘要
-		tTempVo.putParam("Note", titaVo.getParam("Description"));
+		tTempVo.putParam("Note", iNote);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
 		// 更新放款明細檔及帳務明細檔關聯欄

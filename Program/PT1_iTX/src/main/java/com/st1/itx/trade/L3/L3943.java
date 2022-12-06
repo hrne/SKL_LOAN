@@ -15,10 +15,13 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
+import com.st1.itx.db.domain.CdBankOld;
+import com.st1.itx.db.domain.CdBankOldId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.CdBankOldService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanChequeService;
@@ -51,6 +54,8 @@ public class L3943 extends TradeBuffer {
 	public CdBankService cdBankService;
 	@Autowired
 	public AcReceivableService acReceivableService;
+	@Autowired
+	public CdBankOldService cdBankOldService;
 
 	@Autowired
 	Parse parse;
@@ -76,6 +81,7 @@ public class L3943 extends TradeBuffer {
 		if (tLoanCheque == null) {
 			throw new LogicException(titaVo, "E0001", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 查詢資料不存在
 		}
+		this.info("tLoanCheque = " + tLoanCheque);
 		this.totaVo.putParam("OCustNo", tLoanCheque.getCustNo());
 		// 查詢客戶資料主檔
 		CustMain tCustMain = custMainService.custNoFirst(tLoanCheque.getCustNo(), tLoanCheque.getCustNo(), titaVo);
@@ -90,23 +96,41 @@ public class L3943 extends TradeBuffer {
 		this.totaVo.putParam("OChequeNo", tLoanCheque.getChequeNo());
 		// AcDate 為 0 時不顯示
 		int tmpDate = tLoanCheque.getAcDate();
-		this.totaVo.putParam("OAcDate", tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
+		this.totaVo.putParam("OAcDate",
+				tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
 		this.totaVo.putParam("OChequeDate", tLoanCheque.getChequeDate());
 		// entrydate 為 0 時不顯示
 		tmpDate = tLoanCheque.getEntryDate();
-		this.totaVo.putParam("OEntryDate", tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
+		this.totaVo.putParam("OEntryDate",
+				tmpDate != 0 ? String.format("%d/%02d/%02d", tmpDate / 10000, tmpDate / 100 % 100, tmpDate % 100) : "");
 		// 查詢行庫代號檔
-		String iBankCode1 = FormatUtil.padX(tLoanCheque.getBankCode().trim(), 7);
-		String bankCode1 = FormatUtil.padX(iBankCode1, 3);
-		String branchCode1 = FormatUtil.right(iBankCode1, 4);
-		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode1, branchCode1), titaVo);
-		if (tCdBank == null) {
-			this.totaVo.putParam("OBankItem", "");
-			this.totaVo.putParam("OBranchItem", "");
+		String wkBankCode = "";
+		wkBankCode = FormatUtil.pad9(String.valueOf(tLoanCheque.getBankCode()), 7);
+		wkBankCode = FormatUtil.padX(wkBankCode, 7);
+		String bankCode = FormatUtil.padX(wkBankCode, 3);
+		String branchCode = FormatUtil.right(wkBankCode, 4);
+		if ("000".equals(bankCode) && "0000".equals(branchCode)) {
+			this.info("OBankItem = " + tLoanCheque.getBankItem());
+			this.info("OBranchItem = " + tLoanCheque.getBranchItem());
+			this.totaVo.putParam("OBankItem", tLoanCheque.getBankItem());
+			this.totaVo.putParam("OBranchItem", tLoanCheque.getBranchItem());
 		} else {
-			this.totaVo.putParam("OBankItem", tCdBank.getBankItem());
-			this.totaVo.putParam("OBranchItem", tCdBank.getBranchItem());
+			CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
+			if (tCdBank == null) {
+				CdBankOld tCdBankOld = cdBankOldService.findById(new CdBankOldId(bankCode, branchCode), titaVo);// 找已裁撤銀行
+				if (tCdBankOld == null) {
+					this.totaVo.putParam("OBankItem", "");
+					this.totaVo.putParam("OBranchItem", "");
+				} else {
+					this.totaVo.putParam("OBankItem", tCdBankOld.getBankItem());
+					this.totaVo.putParam("OBranchItem", tCdBankOld.getBranchItem());
+				}
+			} else {
+				this.totaVo.putParam("OBankItem", tCdBank.getBankItem());
+				this.totaVo.putParam("OBranchItem", tCdBank.getBranchItem());
+			}
 		}
+
 		this.totaVo.putParam("OAreaCode", tLoanCheque.getAreaCode());
 		this.totaVo.putParam("OOutsideCode", tLoanCheque.getOutsideCode());
 		this.totaVo.putParam("OProcessCode", tLoanCheque.getProcessCode());
@@ -123,7 +147,7 @@ public class L3943 extends TradeBuffer {
 		String iBankCode2 = FormatUtil.padX(tLoanCheque.getCreditorBankCode().trim(), 7);
 		String bankCode2 = FormatUtil.padX(iBankCode2, 3);
 		String branchCode2 = FormatUtil.right(iBankCode2, 4);
-		tCdBank = cdBankService.findById(new CdBankId(bankCode2, branchCode2), titaVo);
+		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode2, branchCode2), titaVo);
 		if (tCdBank == null) {
 			this.totaVo.putParam("OCreditorBankItem", " ");
 		} else {
@@ -140,8 +164,10 @@ public class L3943 extends TradeBuffer {
 		}
 
 //		 查詢會計銷帳檔
-		wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " " + FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo, 0, Integer.MAX_VALUE, titaVo);
+		wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
+				+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		if (lAcReceivable != null && lAcReceivable.size() > 0) {

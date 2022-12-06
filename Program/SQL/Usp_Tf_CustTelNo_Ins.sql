@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_Tf_CustTelNo_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_CustTelNo_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -236,6 +236,14 @@ BEGIN
        AND "TelTypeCode" != '05' -- 05:簡訊
      ;
 
+     UPDATE "TempCustTelNo"
+     SET "TelNo" = CASE
+                     WHEN LENGTH(TRANSLATE("CUSTEL",'0123456789-','0123456789')) > 10
+                     THEN SUBSTR(TRANSLATE("CUSTEL",'0123456789-','0123456789'),0,10)
+                   ELSE TRANSLATE("CUSTEL",'0123456789-','0123456789') END
+     WHERE "TelTypeCode" = '05' -- 05:簡訊
+     ;
+
      /* -數量大於3 */
      UPDATE "TempCustTelNo"
      SET "TelArea" = SUBSTR("CUSTEL",0,INSTR("CUSTEL",'-') - 1)
@@ -393,6 +401,7 @@ BEGIN
     ERROR_MSG := SQLERRM || CHR(13) || CHR(10) || dbms_utility.format_error_backtrace;
     -- "Usp_Tf_ErrorLog_Ins"(BATCH_LOG_UKEY,'Usp_Tf_CustTelNo_Ins',SQLCODE,SQLERRM,dbms_utility.format_error_backtrace);
 END;
+
 
 
 

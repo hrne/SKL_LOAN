@@ -14,6 +14,8 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -29,6 +31,8 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.AcDetailCom;
+import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCalcRepayIntCom;
@@ -39,6 +43,7 @@ import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -500,11 +505,6 @@ public class L3712 extends TradeBuffer {
 		tTempVo.putParam("OldSpecificDd", wkOldSpecificDd); // 原指定應繳日
 		tTempVo.putParam("NewSpecificDd", tLoanBorMain.getSpecificDd()); // 新指定應繳日
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
 		this.lLoanBorTx.add(tLoanBorTx); 
 	}
 

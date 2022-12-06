@@ -3,8 +3,6 @@ package com.st1.itx.trade.L3;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -41,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3007")
 @Scope("prototype")
 public class L3007 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3007.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -62,7 +59,7 @@ public class L3007 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L3007 ");
+		this.info("active L3007 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -89,7 +86,6 @@ public class L3007 extends TradeBuffer {
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
 
-
 		if (iChequeDateStart > 0) {
 			wkChequeDateStart = iChequeDateStart + 19110000;
 		}
@@ -99,7 +95,7 @@ public class L3007 extends TradeBuffer {
 
 		List<String> lStatusCode = new ArrayList<String>();
 		if (iStatusCode.isEmpty()) {
-			logger.info("未輸入支票狀況");
+			this.info("未輸入支票狀況");
 			lStatusCode.add("0"); // 0: 未處理
 			lStatusCode.add("1"); // 1: 兌現入帳
 			lStatusCode.add("2"); // 2: 退票
@@ -107,7 +103,7 @@ public class L3007 extends TradeBuffer {
 			lStatusCode.add("4"); // 4: 兌現未入帳
 			lStatusCode.add("5"); // 5: 即期票
 		} else {
-			logger.info("有輸入支票狀況");
+			this.info("有輸入支票狀況");
 			lStatusCode.add(iStatusCode);
 		}
 
@@ -153,27 +149,31 @@ public class L3007 extends TradeBuffer {
 		occursList.putParam("OOChequeDate", mLoanCheque.getChequeDate());
 		occursList.putParam("OOStatusCode", mLoanCheque.getStatusCode());
 		occursList.putParam("OOReceiveDate", mLoanCheque.getReceiveDate());
-		
-		
+
 		// 查詢尋找行庫資料檔
 		wkBankCode = FormatUtil.pad9(String.valueOf(mLoanCheque.getBankCode()), 7);
 		wkBankCode = FormatUtil.padX(wkBankCode, 7);
 		String bankCode = FormatUtil.padX(wkBankCode, 3);
 		String branchCode = FormatUtil.right(wkBankCode, 4);
-		CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
-		if (tCdBank == null) {
-			CdBankOld tCdBankOld = cdBankOldService.findById(new CdBankOldId(bankCode, branchCode), titaVo);//找已裁撤銀行
-			if(tCdBankOld == null) {
-				occursList.putParam("OOChequeBank", "");
-				occursList.putParam("OOChequeBranch", "");
-			} else {
-				occursList.putParam("OOChequeBank", tCdBankOld.getBankItem());
-				occursList.putParam("OOChequeBranch", tCdBankOld.getBranchItem());
-			}
-			
+
+		if ("000".equals(bankCode) && "0000".equals(branchCode)) {
+			occursList.putParam("OOChequeBank", mLoanCheque.getBankItem());
+			occursList.putParam("OOChequeBranch", mLoanCheque.getBranchItem());
 		} else {
-			occursList.putParam("OOChequeBank", tCdBank.getBankItem());
-			occursList.putParam("OOChequeBranch", tCdBank.getBranchItem());
+			CdBank tCdBank = cdBankService.findById(new CdBankId(bankCode, branchCode), titaVo);
+			if (tCdBank == null) {
+				CdBankOld tCdBankOld = cdBankOldService.findById(new CdBankOldId(bankCode, branchCode), titaVo);// 找已裁撤銀行
+				if (tCdBankOld == null) {
+					occursList.putParam("OOChequeBank", "");
+					occursList.putParam("OOChequeBranch", "");
+				} else {
+					occursList.putParam("OOChequeBank", tCdBankOld.getBankItem());
+					occursList.putParam("OOChequeBranch", tCdBankOld.getBranchItem());
+				}
+			} else {
+				occursList.putParam("OOChequeBank", tCdBank.getBankItem());
+				occursList.putParam("OOChequeBranch", tCdBank.getBranchItem());
+			}
 		}
 		occursList.putParam("OOEntryDate", mLoanCheque.getEntryDate()); // TODO: 兌現入帳日
 

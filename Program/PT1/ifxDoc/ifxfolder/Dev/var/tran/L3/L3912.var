@@ -2147,7 +2147,7 @@ TXFORM=L3912
 ]
 
 </sub>
-<sub type="PART" name="L3200" layout="cols=3;screen.width=[150,400,130,300];printer.width=[15,30,15,30];order=1;">
+<sub type="PART" name="L3200" layout="cols=3;screen.width=[150,400,130,500];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
 [#<->#,"@借戶戶號",#L3100CustNo,"@-",#L3200FacmNo,"@-",#L3200BormNo,"@",#L3100CustNoX],
@@ -2162,7 +2162,7 @@ TXFORM=L3912
 ["@計息迄日",#L3200IntEndDateX],["@免印花稅金額",#OStampFreeAmtX],
 ["@減免金額",#L3200ReduceAmtX],["@帳管費",#L3420AcctFeeX],
 ["@本金",#L3200PrinciPalX],["@契變手續費",#L3420ModifyFeeX],
-["@利息",#L3200InterextX],["@火險費",#L3420FireFeeX],
+["@利息",#L3200InterextX],["@火險費",#L3420FireFeeX,"@",#ORvNo],
 ["@延遲息",#L3200DelayIntX],["@法務費",#L3420LawFeeX],
 ["@違約金",#L3200BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
 ["@溢收金額",#OOverflowX],["@部分償還金額",#L3200ExtraRepayX],
@@ -2216,7 +2216,7 @@ TXFORM=L3912
 
 </sub>
 
-<sub type="PART" name="L3410" layout="cols=3;screen.width=[150,400,130,300];printer.width=[15,30,15,30];order=1;">
+<sub type="PART" name="L3410" layout="cols=3;screen.width=[150,400,130,500];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
 [#<->#,"@借戶戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
@@ -2231,7 +2231,7 @@ TXFORM=L3912
 ["@計息迄日",#L3410IntEndDateX],["@免印花稅金額",#OStampFreeAmtX],
 ["@減免金額",#L3410ReduceAmtX],["@帳管費",#L3420AcctFeeX],
 ["@本金",#L3410PrinciPalX],["@契變手續費",#L3420ModifyFeeX],
-["@利息",#L3410InterextX],["@火險費",#L3420FireFeeX],
+["@利息",#L3410InterextX],["@火險費",#L3420FireFeeX,"@",#ORvNo],
 ["@延遲息",#L3410DelayIntX],["@法務費",#L3420LawFeeX],
 ["@違約金",#L3410BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
 ["@累溢短收",#L3410OverflowX],["@主管編號",#L3410SupperNo,#L3410SupperNoX],
@@ -2296,7 +2296,7 @@ TXFORM=L3912
 ["@暫收借",#L3440TempAmtX],["@累溢收",#L3440OverflowX],
 [#<->#,"@帳管費",#L3420AcctFeeX],
 [#<->#,"@契變手續費",#L3420ModifyFeeX],
-[#<->#,"@火險費",#L3420FireFeeX],
+[#<->#,"@火險費",#L3420FireFeeX,"@",#ORvNo],
 [#<->#,"@法務費",#L3420LawFeeX],
 [#<->#,"@清償違約金",#L3200CloseBreachAmtX],
 [#<->#,"@暫收來源",#OTempSourceCodeX],

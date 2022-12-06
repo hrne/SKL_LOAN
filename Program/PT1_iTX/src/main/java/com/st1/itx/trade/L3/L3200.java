@@ -1728,12 +1728,6 @@ public class L3200 extends TradeBuffer {
 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
-
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
@@ -1783,11 +1777,6 @@ public class L3200 extends TradeBuffer {
 
 		this.lLoanBorTx.add(tLoanBorTx);
 
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
 		return tLoanBorTx;
 	}
 
@@ -1809,11 +1798,6 @@ public class L3200 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A");
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
 		return tLoanBorTx;
 	}
 

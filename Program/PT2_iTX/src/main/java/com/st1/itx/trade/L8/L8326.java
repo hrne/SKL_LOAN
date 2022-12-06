@@ -196,7 +196,7 @@ public class L8326 extends TradeBuffer {
 			chJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			this.info("TEST===" + chJcicZ446);
 			if (chJcicZ446 != null) {
-				throw new LogicException("E0005", "已有相同資料");
+				throw new LogicException("E0002", "已有相同資料");
 			}
 
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");

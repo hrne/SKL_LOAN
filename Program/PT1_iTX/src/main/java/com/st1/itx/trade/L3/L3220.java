@@ -105,6 +105,7 @@ public class L3220 extends TradeBuffer {
 	private int iTempItemCode;
 	private int iTempReasonCode;
 	private String iCurrencyCode;
+	private String iNote;
 	private BigDecimal iTempAmt;
 	private BigDecimal wkTempBal;
 	private BigDecimal wkCustTempBal;
@@ -126,6 +127,7 @@ public class L3220 extends TradeBuffer {
 		this.iTempItemCode = 0;
 		this.iTempReasonCode = 0;
 		this.iCurrencyCode = "";
+		this.iNote = "";
 		this.wkChequeAmt = new BigDecimal(0);
 		this.wkCustTempBal = new BigDecimal(0);
 		this.wkAcctCode = "";
@@ -166,6 +168,7 @@ public class L3220 extends TradeBuffer {
 		iTempItemCode = this.parse.stringToInteger(titaVo.getParam("TempItemCode"));
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iCurrencyCode = titaVo.getParam("CurrencyCode");
+		iNote = titaVo.getParam("Description"); // 摘要內容
 		wkTempBal = iTempAmt;
 		if (iFacmNo > 0) {
 			wkFacmNoS = iFacmNo;
@@ -271,7 +274,7 @@ public class L3220 extends TradeBuffer {
 							acDetail.setCurrencyCode(iCurrencyCode);
 							acDetail.setCustNo(iCustNo);
 							acDetail.setFacmNo(ac.getFacmNo());
-							acDetail.setSlipNote(titaVo.getParam("Description"));
+							acDetail.setSlipNote(iNote);
 							wkCustTempBal = wkCustTempBal.add(ac.getRvBal());
 							if (wkTempBal.compareTo(ac.getRvBal()) >= 0) {
 								acDetail.setTxAmt(ac.getRvBal());
@@ -384,7 +387,7 @@ public class L3220 extends TradeBuffer {
 			acDetail.setCurrencyCode(iCurrencyCode);
 			acDetail.setTxAmt(wkChequeAmt);
 			acDetail.setCustNo(iCustNo);
-			acDetail.setSlipNote(titaVo.getParam("Description"));
+			acDetail.setSlipNote(iNote);
 			lAcDetail.add(acDetail);
 		}
 	}
@@ -489,14 +492,13 @@ public class L3220 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
-		tTempVo.putParam("Description", titaVo.getParam("Description"));
 		tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank1") + titaVo.getParam("RpRemitBranch1"));
 		tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo1"));
 		tTempVo.putParam("RemitCustName", titaVo.getParam("RpCustName1"));
 		tTempVo.putParam("RemitRemark", titaVo.getParam("RpRemark1"));
 		tTempVo.putParam("RemitAmt", titaVo.getParam("RpAmt1"));
 		// 新增摘要
-		tTempVo.putParam("Note", titaVo.getParam("Description"));
+		tTempVo.putParam("Note", iNote);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		// 更新放款明細檔及帳務明細檔關聯欄
 		acRepayCom.updBorTxAcDetail(this.tLoanBorTx, lAcDetail, titaVo);

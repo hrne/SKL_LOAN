@@ -83,7 +83,7 @@ public class FileGenerator extends CommBuffer {
 			String row;
 			for (Map<String, Object> map : listMap) {
 				row = map.get("d").toString();
-				if (charsetName.toUpperCase(Locale.getDefault()).equals("BIG5")) {
+				if (charsetName.toUpperCase(Locale.TAIWAN).equals("BIG5")) {
 					String[] ss = row.split("");
 					for (String s : ss) {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))

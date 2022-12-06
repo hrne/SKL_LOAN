@@ -64,7 +64,6 @@ public class L3912 extends TradeBuffer {
 
 		// work area
 		LoanBorTx tLoanBorTx;
-		TempVo tTempVo = new TempVo();
 		int RPTFG = 8;
 		BigDecimal wkReduceAmt = BigDecimal.ZERO;
 		if (iBorxNo > 0) {
@@ -82,7 +81,10 @@ public class L3912 extends TradeBuffer {
 			}
 		}
 
+		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(tLoanBorTx.getOtherFields());
+		TempVo rvTempVo = new TempVo();
+		rvTempVo = tTempVo.getVo(tTempVo.getParam("RvJsonFields"));
 		if (tLoanBorTx.getTitaTxCd().equals("L3100")) {
 			RPTFG = 2;
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3200") || tLoanBorTx.getTitaTxCd().equals("L3240")) {
@@ -157,6 +159,10 @@ public class L3912 extends TradeBuffer {
 				.add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee).add(wkModifyFee)
 				.add(wkFireFee).add(wkLawFee);
 
+		String rvNo = tTempVo.getParam("RvNo");
+		if (wkFireFee.compareTo(BigDecimal.ZERO) > 0 && !"".equals(rvTempVo.getParam("InsuYearMonth"))) {
+			rvNo = "" + (parse.stringToInteger(rvTempVo.getParam("InsuYearMonth")) - 191100) + " " + rvNo;
+		}
 		this.totaVo.putParam("ORPTFG", RPTFG); // rptfg
 		this.totaVo.putParam("OCustNo", tLoanBorTx.getCustNo());
 		this.totaVo.putParam("OFacmNo", tLoanBorTx.getFacmNo());
@@ -292,7 +298,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OCentralBankPercent", tTempVo.getParam("CentralBankPercent"));
 		this.totaVo.putParam("OMasterCustId", tTempVo.getParam("MasterCustId"));
 		this.totaVo.putParam("OMasterCustIdX", loanCom.getCustNameById(tTempVo.getParam("MasterCustId")));
-		this.totaVo.putParam("ORvNo", tTempVo.getParam("RvNo"));
+		this.totaVo.putParam("ORvNo", rvNo);
 		this.totaVo.putParam("OSupervisor", tTempVo.getParam("Supervisor"));
 		this.totaVo.putParam("OSupervisorX", loanCom.getEmpFullnameByEmpNo(tTempVo.getParam("Supervisor")));
 		this.totaVo.putParam("ORate", tLoanBorTx.getRate());

@@ -448,12 +448,13 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settleUnPaid TxAmt 回收金額=" + iTxAmt);
 		this.info("BaTxCom settleUnPaid TempVo 處理說明=" + iTempVo.toString());
 		this.tempVo = iTempVo;
-		
+// initial		
 		if (tempVo.get("PayFeeMethod") != null) {
 			this.payFeeMethod = tempVo.get("PayFeeMethod");
 		}
 
 		init();
+		
 // STEP 1:  Load repayLoanList facTempList, UnPaidlist 
 
 		// input 還款類別
@@ -2427,6 +2428,7 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setAcctCode(rv.getAcctCode());
 				baTxVo.setUnPaidAmt(rv.getRvBal());
 				baTxVo.setAcctAmt(BigDecimal.ZERO);
+				baTxVo.setRvJsonFields(rv.getJsonFields());
 				// 利息提存只列欠繳利息
 				if (isAcLoanInt) {
 					if ("I".equals(rv.getAcctCode().substring(0, 1)) && iFacmNo == rv.getFacmNo()

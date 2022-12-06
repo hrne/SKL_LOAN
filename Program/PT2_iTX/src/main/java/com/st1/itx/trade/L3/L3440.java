@@ -751,12 +751,6 @@ public class L3440 extends TradeBuffer {
 		BigDecimal ovDuRepaid = od.getOvduAmt().subtract(parse.stringToBigDecimal(tTempVo.get("OvduBal")));
 		tLoanBorTx.setTempAmt(tLoanBorTx.getTempAmt().add(ovDuRepaid));
 		tLoanBorTx.setTxAmt(tLoanBorTx.getTxAmt().subtract(ovDuRepaid));
-
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 

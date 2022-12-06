@@ -423,7 +423,7 @@ public class L3210 extends TradeBuffer {
 				acDetail.setSumNo("090"); // 暫收可抵繳
 				lAcDetail.add(acDetail);
 				// 貸方：費用、累溢收
-				acRepayCom.settleFeeByTemp(iRpCode, iEntryDate, wkOverflow, feeList, lAcDetail, titaVo);
+				acRepayCom.settleFeeByTemp(iRpCode, "", iEntryDate, wkOverflow, feeList, lAcDetail, titaVo);
 			}
 		}
 		// 無費用項目可抵繳

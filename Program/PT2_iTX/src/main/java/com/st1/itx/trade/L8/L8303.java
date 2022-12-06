@@ -136,7 +136,7 @@ public class L8303 extends TradeBuffer {
 		JcicZ045Id ixJcicZ045Id = new JcicZ045Id();
 		ixJcicZ045Id.setCustId(iCustId);// 債務人IDN
 		ixJcicZ045Id.setSubmitKey(iSubmitKey);// 報送單位代號
-		ixJcicZ045Id.setRcDate(iRcDate);
+		ixJcicZ045Id.setRcDate(iRcDate+19110000);
 		ixJcicZ045Id.setMaxMainCode(iMaxMainCode);
 		
 		// Date計算
@@ -176,7 +176,7 @@ public class L8303 extends TradeBuffer {
 				if(iJcicZ045 == null ) {
 					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
 				}
-				ixJcicZ045 = sJcicZ045Service.otherFirst(iSubmitKey, iCustId, iRcDate, iMaxMainCode, titaVo);
+				ixJcicZ045 = sJcicZ045Service.otherFirst(iSubmitKey, iCustId, iRcDate+19110000, iMaxMainCode, titaVo);
 				if(ixJcicZ045 == null) {
 					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
 				}

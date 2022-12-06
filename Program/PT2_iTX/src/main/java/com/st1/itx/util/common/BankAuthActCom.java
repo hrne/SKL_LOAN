@@ -761,6 +761,9 @@ public class BankAuthActCom extends TradeBuffer {
 					acctSeq = tPostAuthLog.getRepayAcctSeq();
 				} else if ("1".equals(tPostAuthLog.getAuthApplCode())
 						&& "".equals(tPostAuthLog.getAuthErrorCode().trim())) {
+					if ("L4412".equals(iTitaTxCd)) {
+						throw new LogicException("E0015", "此扣款帳號已建檔"); // 檢查錯誤
+					}
 					status = " ";
 				} else {
 					this.isNewLog = true;
@@ -774,6 +777,9 @@ public class BankAuthActCom extends TradeBuffer {
 				if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
 					status = "0";
 				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "".equals(tAchAuthLog.getAuthStatus().trim())) {
+					if ("L4410".equals(iTitaTxCd)) {
+						throw new LogicException("E0015", "此扣款帳號已建檔"); // 檢查錯誤
+					}
 					status = " ";
 				} else {
 					this.isNewLog = true;

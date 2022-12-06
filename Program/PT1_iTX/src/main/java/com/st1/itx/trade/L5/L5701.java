@@ -527,7 +527,7 @@ public class L5701 extends TradeBuffer {
 					cPrincipalBal = cPrincipalBal.subtract(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 				}
 			}
-			InputNegMain.setPrincipalBal(cPrincipalBal);// 總本金餘額=簽約總金額-註銷金額
+			InputNegMain.setPrincipalBal(cPrincipalBal);// 總本金餘額=簽約總金額(或總本金餘額) - 註銷金額
 		}
 		if (InputNegMain.getNextPayDate() == 0) {
 			// 下次應繳日
@@ -574,6 +574,17 @@ public class L5701 extends TradeBuffer {
 							InputNegMain.setNextPayDate(negCom.getRepayDate(InputNegMain.getNextPayDate(), period, titaVo));
 							InputNegMain.setLastDueDate(negCom.getRepayDate(InputNegMain.getLastDueDate(), period, titaVo));
 						}
+					}
+				}
+			}
+			//未曾繳款-才可修改簽約總金額,首次應繳日
+			if (("02").equals(FunctionCode)) {
+				if (sNegMsain.getTotalContrAmt().compareTo(sNegMsain.getPrincipalBal()) == 0) {
+					if (sNegMsain.getTotalContrAmt().compareTo(InputNegMain.getTotalContrAmt()) != 0) {
+						InputNegMain.setPrincipalBal(InputNegMain.getTotalContrAmt());// 同步調整總本金餘額
+					}
+					if (sNegMsain.getFirstDueDate() != InputNegMain.getFirstDueDate()) {
+						InputNegMain.setNextPayDate(InputNegMain.getFirstDueDate());// 同步調整下次繳款日
 					}
 				}
 			}

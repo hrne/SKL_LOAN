@@ -17,13 +17,14 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.BatxDetail;
+import com.st1.itx.db.domain.BatxDetailId;
+import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
-import com.st1.itx.db.domain.LoanCheque;
-import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
@@ -48,8 +49,6 @@ public class AcRepayCom extends TradeBuffer {
 	@Autowired
 	public CdCodeService cdCodeService;
 	@Autowired
-	public LoanChequeService loanChequeService;
-	@Autowired
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	private LoanCom loanCom;
@@ -57,6 +56,9 @@ public class AcRepayCom extends TradeBuffer {
 	private AcDetailCom acDetailCom;
 	@Autowired
 	private AcReceivableCom acReceivableCom;
+	@Autowired
+	public BatxDetailService batxDetailService;
+
 	@Autowired
 	private BaTxCom baTxCom;
 	@Autowired
@@ -192,8 +194,8 @@ public class AcRepayCom extends TradeBuffer {
 		// 貸方：費用
 		for (BaTxVo ba : baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iEntryDate, new TempVo(), titaVo);
-				settleFeeAmt(ba, tx); // 費用出帳
+				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, "",iEntryDate, new TempVo(), titaVo);
+				settleFeeAmt(ba, "", tx); // 費用出帳
 				ba.setAcctAmt(BigDecimal.ZERO);
 				if (tx.getTxAmt().compareTo(BigDecimal.ZERO) == 0) {
 					BigDecimal txAmt = BigDecimal.ZERO;
@@ -258,7 +260,7 @@ public class AcRepayCom extends TradeBuffer {
 		tx.setOverflow(overflow);
 
 		try {
-			loanBorTxService.updateAll(this.lLoanBorTx);
+			loanBorTxService.insertAll(this.lLoanBorTx);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
@@ -370,9 +372,7 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setAcDtlCode(rpAcCode.substring(16, 18));
 		}
 
-		// 銷帳編號
-		String rvNo = titaVo.get("RpRvno" + i);
-		acDetail.setRvNo(rvNo); /* 銷帳編號 VARCHAR2(30) */
+		acDetail.setRvNo(titaVo.get("RpRvno" + i)); /* 銷帳編號 VARCHAR2(30) */
 
 		switch (acDetail.getSumNo()) {
 		case "090":
@@ -420,6 +420,12 @@ public class AcRepayCom extends TradeBuffer {
 		case "099":
 			acDetail.setAcctCode("THC");
 			acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("RpFacmNo" + i)));
+			BatxDetail tDetail = batxDetailService.findById(new BatxDetailId(this.txBuffer.getTxCom().getTbsdyf(),
+					titaVo.get("BATCHNO"), parse.stringToInteger(titaVo.getParam("RpDetailSeq1"))), titaVo);
+			TempVo tempVo = new TempVo();
+			tempVo = tempVo.getVo(tDetail.getProcNote());
+			titaVo.putParam("ResvEntdy", tempVo.getParam("ResvEntdy"));
+			titaVo.putParam("ResvTxSeq", tempVo.getParam("ResvTxSeq"));
 			break;
 		case "101": // 101.匯款轉帳
 			acDetail.setAcctCode("P03");
@@ -436,12 +442,6 @@ public class AcRepayCom extends TradeBuffer {
 			int iChequeNo = this.parse.stringToInteger(acDetail.getRvNo().substring(10, 17));
 			titaVo.putParam("ChequeAcct", iChequeAcct);
 			titaVo.putParam("ChequeNo", iChequeNo);
-			titaVo.putParam("ChequeAmt", acDetail.getTxAmt());
-			LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
-			if (tLoanCheque != null) {
-				titaVo.putParam("ChequeAmt", tLoanCheque.getChequeAmt());
-			}
-
 			break;
 		// 其他還款來源有核心銷帳碼
 		case "105": // 105.法院扣薪
@@ -575,10 +575,14 @@ public class AcRepayCom extends TradeBuffer {
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 			tTempVo.putParam("ReconCode", titaVo.get("RpAcctCode1") == null ? "" : titaVo.get("RpAcctCode1").trim()); // 對帳類別
 			tTempVo.putParam("DscptCode", titaVo.get("RpDscpt1")); // 摘要代碼
+			tTempVo.putParam("RpRvno", titaVo.get("RpRvno1")); // 銷帳編號
+			if (titaVo.get("ResvEntdy") != null) {
+				tTempVo.putParam("ResvEntdy", titaVo.get("ResvEntdy"));
+				tTempVo.putParam("ResvTxSeq", titaVo.get("ResvTxSeq"));
+			}
 		}
 		// 支票繳款
 		if (tx.getRepayCode() == 4) {
-			tTempVo.putParam("ChequeAmt", titaVo.get("ChequeAmt"));
 			tTempVo.putParam("ChequeAcctNo", titaVo.get("ChequeAcctNo"));
 			tTempVo.putParam("ChequeNo", titaVo.get("ChequeNo"));
 			tTempVo.putParam("StampFreeAmt",
@@ -765,6 +769,7 @@ public class AcRepayCom extends TradeBuffer {
 	 * 暫收款收回費用處理(新增帳務及放款交易內容檔)
 	 * 
 	 * @param iRpCode       還款來源
+	 * @param iNote         摘要內容
 	 * @param iEntryDate    入帳日
 	 * @param iTempAmt      暫收款金額
 	 * @param iFeeList      費用明細
@@ -772,8 +777,8 @@ public class AcRepayCom extends TradeBuffer {
 	 * @param titaVo        TitaVo
 	 * @throws LogicException ....
 	 */
-	public void settleFeeByTemp(int iRpCode, int iEntryDate, BigDecimal iTempAmt, ArrayList<BaTxVo> iFeeList,
-			List<AcDetail> iAcDetailList, TitaVo titaVo) throws LogicException {
+	public void settleFeeByTemp(int iRpCode, String iNote, int iEntryDate, BigDecimal iTempAmt,
+			ArrayList<BaTxVo> iFeeList, List<AcDetail> iAcDetailList, TitaVo titaVo) throws LogicException {
 		this.info("settleFeeByTemp ... ");
 		this.titaVo = titaVo;
 		this.baTxList = iFeeList;
@@ -787,8 +792,8 @@ public class AcRepayCom extends TradeBuffer {
 		// 貸方：費用
 		for (BaTxVo ba : baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
-				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iEntryDate, new TempVo(), titaVo);
-				settleFeeAmt(ba, tx);
+				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iNote, iEntryDate, new TempVo(), titaVo);
+				settleFeeAmt(ba,iNote, tx);
 				ba.setAcctAmt(BigDecimal.ZERO);
 				BigDecimal repayAmt = updBorTxAcDetail(tx, this.lAcDetail, titaVo); // 更新放款明細檔及帳務明細檔關聯欄
 				BigDecimal tempAmt = BigDecimal.ZERO;
@@ -813,14 +818,14 @@ public class AcRepayCom extends TradeBuffer {
 		tx.setOverflow(overflow);
 
 		try {
-			loanBorTxService.updateAll(this.lLoanBorTx);
+			loanBorTxService.insertAll(this.lLoanBorTx);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
 	}
 
 	// 新增放款交易內容檔(收回費用)
-	private void settleFeeAmt(BaTxVo ba, LoanBorTx tx) throws LogicException {
+	private void settleFeeAmt(BaTxVo ba, String iNote, LoanBorTx tx) throws LogicException {
 		this.info("settleFeeAmt ... ");
 		// 轉呆帳 借:備抵呆帳
 		if (iCaseCloseCode == 7 || iCaseCloseCode == 8) {
@@ -831,6 +836,8 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setCustNo(ba.getCustNo());
 			acDetail.setFacmNo(ba.getFacmNo());
 			acDetail.setBormNo(ba.getBormNo());
+			acDetail.setSlipNote(iNote);
+			
 			lAcDetail.add(acDetail);
 			tx.setTxAmt(acDetail.getTxAmt()); // 轉催呆金額放LoanBorTx交易金額
 		}
@@ -844,13 +851,14 @@ public class AcRepayCom extends TradeBuffer {
 		acDetail.setBormNo(ba.getBormNo());
 		acDetail.setRvNo(ba.getRvNo());
 		acDetail.setReceivableFlag(ba.getReceivableFlag());
+		acDetail.setSlipNote(iNote);
 		this.lAcDetail.add(acDetail);
 
 	}
 
 	// 新增放款交易內容檔(收回費用)
-	private LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, int iEntryDate, TempVo iTempVo, TitaVo titaVo)
-			throws LogicException {
+	private LoanBorTx addFeeBorTxRoutine(BaTxVo ba, int iRpCode, String iNote, int iEntryDate, TempVo iTempVo,
+			TitaVo titaVo) throws LogicException {
 		this.info("addFeeBorTxRoutine ... ");
 
 		// 新增放款交易內容檔(收回費用)
@@ -881,13 +889,13 @@ public class AcRepayCom extends TradeBuffer {
 			iTempVo.putParam("LawFee", ba.getAcctAmt());
 			break;
 		}
-		iTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
-		tLoanBorTx.setOtherFields(iTempVo.getJsonString());
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+		if (!iNote.isEmpty()) {
+			iTempVo.putParam("Note", iNote);
 		}
+		iTempVo.putParam("RvNo", ba.getRvNo()); // 銷帳編號
+		iTempVo.putParam("RvJsonFields", ba.getRvJsonFields()); // 銷帳JsonFields
+		tLoanBorTx.setOtherFields(iTempVo.getJsonString());
+
 		return tLoanBorTx;
 	}
 }

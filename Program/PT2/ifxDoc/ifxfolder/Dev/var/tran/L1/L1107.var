@@ -303,18 +303,18 @@ T(2,@OfficeTypeHelp,#HelpDesc5)
 T(2,@ChangeReasonHelp,#HelpDesc6)
 
 
-!功能 下拉式選單 1: 新增 2:修改 4:刪除;5:查詢
+!功能 下拉式選單 1: 新增 2:修改 3:複製 4:刪除;5:查詢
 #FunCd=A,1,S
 C(3,#FunCd,1,$,HIDE(#BTN1))
 #FunCdX=X,4,L
 T(H,#FunCd,#FunCdHelp)
-C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,確定),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 C(3,#CHAIN,1,C(3,#FunCd,1,E(0,@CHAIN,0),$),$)
 
 #Space=X,1,S
 C(3,#FunCd,1,T(3,@FdCustId,*)T(F,@CustId,1),T(3,@FdCustId, )T(F,@CustId,0))
 IF(#FunCd==1 || #FunCd==2,T(3,@FdStartYY,*),T(3,@FdStartYY, )T(F,@StartYY,0)T(F,@StartMM,0)T(F,@EndYY,0)T(F,@EndMM,0))
-IF(#FunCd==1 || #FunCd==2,s,$)
+IF(#FunCd==1 || #FunCd==2 || #FunCd==3,s,$)
 T(F,@Cash,0)
 T(F,@ShortLoan,0)
 T(F,@FinAsset,0)
@@ -473,6 +473,7 @@ CALL(#ReviewInterestCoverageRatio2Proc)
 !統一編號
 #CustId=X,8,I
 C(3,#FunCd,1,$,s)
+C(3,#FunCd,3,$,s)
 @
 V(7)
 A(ID_UNINO,0,#CustId)
@@ -483,12 +484,23 @@ A(ID_UNINO,0,#CustId)
 
 #RimL1r01=X,1,S
 C(3,#FunCd,1,$,S)
+C(3,#FunCd,3,$,S)
 E(0,@RimFunCd,5)
 T(2,@RimCustId,#CustId)
 RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
 T(2,@CustName,#L1r01CustName)
+
+
+!複製進來先調rim
+!#RimL1r01A=X,1,S
+!C(3,#FuncCode,3,$,S)
+!E(0,@RimFunCd,5)
+!T(2,@RimCustId,#CustId)
+!RESET_RIM(#RimL1r01A,L1R01)
+!S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+!R(1,L1R01)
 
 !戶名
 #CustName=X,100,L
@@ -508,6 +520,7 @@ V(2,0)
 C(2,#FunCd,S,$,C(3,#StartYY,#StartYY2,S,$),S,S,S)
 RESET_RIM(#CheckYY,L1R19)
 E(0,@RimFunCd,2)
+E(0,@RimFunCd,3)
 T(2,@RimCustId,#CustId)
 E(0,@RimYear,#StartYY)
 S(L1R19,1,#RimFunCd,#RimCustId,#RimYear)

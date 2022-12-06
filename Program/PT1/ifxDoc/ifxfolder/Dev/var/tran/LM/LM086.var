@@ -1,0 +1,103 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM086)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[15,200];">
+[
+["[LM086] 放款餘額明細表 "],
+["@年月",#inputYear,"/",#inputMonth],
+["@金額",#lowerLimit," 元以上"]
+]
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+!-----------------------------------------------------
+
+#TXCD2=X,5,S
+T(3,LM086)
+
+#currentYear=A,3,S
+T(1,#SYSDATE,2,3)
+#currentMonth=A,2,S
+T(1,#SYSDATE,5,2)
+
+#inputYear=A,3,I
+E(0,#currentYear)
+@V(5,1,#currentYear)
+
+#inputMonth=A,2,I
+E(0,#currentMonth)
+@V(5,1,12)
+
+#lowerLimit=m,14.0,I
+E(0,0)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(3,#HCODE,1,S,$)
+C(5,#TXFORM,LM086,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+!---------- TXFORM = LM086 ----------
+<sub type="FORM" name="LM086">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM086,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM086] 放款餘額明細表)
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#inputYear
+#inputMonth
+#lowerLimit
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LM086
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

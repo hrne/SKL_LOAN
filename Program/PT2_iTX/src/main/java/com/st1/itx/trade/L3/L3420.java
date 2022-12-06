@@ -1425,11 +1425,6 @@ public class L3420 extends TradeBuffer {
 
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
-		}
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
@@ -1453,12 +1448,6 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("Note", iNote);
 		tTempVo.putParam("ReduceAmt", iReduceAmt); // 減免金額
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
-		}
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
@@ -1515,11 +1504,6 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("PaidTerms", 0);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
-		}
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 
@@ -1542,12 +1526,6 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("ReduceAmt", iReduceAmt); // 減免金額
 		tTempVo.putParam("PaidTerms", 0);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg() + " Key = " + tLoanBorTxId); // 新增資料時，發生錯誤
-		}
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 

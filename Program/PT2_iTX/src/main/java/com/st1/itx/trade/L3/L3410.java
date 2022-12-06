@@ -14,6 +14,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -718,12 +720,6 @@ public class L3410 extends TradeBuffer {
 			tTempVo.putParam("ShortCloseBreach", wkShortCloseBreach);
 		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-
-		try {
-			loanBorTxService.insert(tLoanBorTx, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
 		
 		this.lLoanBorTx.add(tLoanBorTx); 
 

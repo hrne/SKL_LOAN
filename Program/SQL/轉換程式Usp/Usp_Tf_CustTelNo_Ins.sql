@@ -236,6 +236,14 @@ BEGIN
        AND "TelTypeCode" != '05' -- 05:簡訊
      ;
 
+     UPDATE "TempCustTelNo"
+     SET "TelNo" = CASE
+                     WHEN LENGTH(TRANSLATE("CUSTEL",'0123456789-','0123456789')) > 10
+                     THEN SUBSTR(TRANSLATE("CUSTEL",'0123456789-','0123456789'),0,10)
+                   ELSE TRANSLATE("CUSTEL",'0123456789-','0123456789') END
+     WHERE "TelTypeCode" = '05' -- 05:簡訊
+     ;
+
      /* -數量大於3 */
      UPDATE "TempCustTelNo"
      SET "TelArea" = SUBSTR("CUSTEL",0,INSTR("CUSTEL",'-') - 1)

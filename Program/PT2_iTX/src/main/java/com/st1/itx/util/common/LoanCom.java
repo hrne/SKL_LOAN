@@ -1377,25 +1377,26 @@ public class LoanCom extends TradeBuffer {
 	public int getTmpFacmNo(int iCustNo, int iFacmNo, int iFirstFacmNo, TitaVo titaVo) throws LogicException {
 //  暫收款額度 > 0 => 單一額度
 //  暫收款額度 = 0 => 全部非指定額度
+		int wkTmpFacmNo = 0;
 		if (iFacmNo > 0) {
-			return iFacmNo;
-		}
-		Slice<LoanFacTmp> slLoanFacTmp = loanFacTmpService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
-		if (slLoanFacTmp == null) {
-			return 0;
-		}
-		int firstFacmNo = iFirstFacmNo;
-		Boolean isLoanFacTmp = false;
-		for (LoanFacTmp t : slLoanFacTmp.getContent()) {
-			if (iFacmNo == t.getFacmNo()) {
-				isLoanFacTmp = true;
+			wkTmpFacmNo = iFacmNo;
+		} else {
+			Slice<LoanFacTmp> slLoanFacTmp = loanFacTmpService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+			if (slLoanFacTmp != null) {
+				Boolean isLoanFacTmp = false;
+				for (LoanFacTmp t : slLoanFacTmp.getContent()) {
+					if (iFirstFacmNo == t.getFacmNo()) {
+						isLoanFacTmp = true;
+					}
+				}
+				if (isLoanFacTmp) {
+					wkTmpFacmNo = iFirstFacmNo;
+				}
 			}
 		}
-		if (isLoanFacTmp) {
-			return firstFacmNo;
-		} else {
-			return 0;
-		}
+		this.info("getTmpFacmNo iCustNo=" + iCustNo + ", iFacmNo=" + iFacmNo + ", iFirstFacmNo=" + iFirstFacmNo
+				+ ", TmpFacmNo=" + wkTmpFacmNo);
+		return wkTmpFacmNo;
 	}
 
 	/**

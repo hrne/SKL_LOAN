@@ -91,8 +91,8 @@ public class LM029Report extends MakeReport {
 		String today = dDateUtil.getNowStringBc();
 
 		// 表頭
-		makeExcel.setValue(2, 20, "日　　期：" + this.showBcDate(today, 1));
-		makeExcel.setValue(3, 20, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+		makeExcel.setValue(2, 22, "日　　期：" + this.showBcDate(today, 1));
+		makeExcel.setValue(3, 22, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 
 		if (listLM029 == null || listLM029.isEmpty()) {

@@ -442,10 +442,10 @@ BEGIN
           ,'{"ContractChgCode":"' || TRIM(TO_CHAR(S1.CFRCOD,'00')) || '"}' 
                                 AS "JsonFields"       -- jason格式紀錄 
           ,AEM."EmpNo"          AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
-          ,TO_DATE(TO_CHAR(S1."CFPTDT") || TO_CHAR(S1."CFPTIM"),'YYYYMMDDHH24MISS')
+          ,TO_DATE(TO_CHAR(S1."CFPTDT") || LPAD(S1."CFPTIM",6,'0'),'YYYYMMDDHH24MISS')
                                 AS "CreateDate"          -- 建檔日期時間 DATE 8  
           ,AEM."EmpNo"          AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
-          ,TO_DATE(TO_CHAR(S1."CFPTDT") || TO_CHAR(S1."CFPTIM"),'YYYYMMDDHH24MISS')
+          ,TO_DATE(TO_CHAR(S1."CFPTDT") || LPAD(S1."CFPTIM",6,'0'),'YYYYMMDDHH24MISS')
                                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8  
           ,''                   AS "OpenTxCd" -- 起帳交易代號 VARCHAR2 5 
           ,'0000'               AS "OpenKinBr" -- 起帳單位別 VARCHAR2 4 

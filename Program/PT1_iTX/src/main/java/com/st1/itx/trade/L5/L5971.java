@@ -217,7 +217,7 @@ public class L5971 extends TradeBuffer {
 			}
 
 			if (TestFinnd == 0) {
-				throw new LogicException(titaVo, "E0001", "債務協商案件主檔");
+				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "債務協商交易檔");
