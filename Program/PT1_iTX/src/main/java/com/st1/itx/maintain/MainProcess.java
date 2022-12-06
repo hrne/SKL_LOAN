@@ -139,7 +139,7 @@ public class MainProcess extends SysLogger {
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
 			
-			this.info(">>> " + this.titaVo.getTlrNo());
+			this.info(">[" + this.titaVo.getTlrNo() + "]<");
 			// ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
 			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getTlrNo());
 

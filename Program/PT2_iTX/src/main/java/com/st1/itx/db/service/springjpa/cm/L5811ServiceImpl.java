@@ -26,7 +26,8 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> doQuery(int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> doQuery(int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth,
+			TitaVo titaVo) throws Exception {
 
 		String sql = " ";
 		sql += "SELECT YC.R1                              AS F0  "; // r1 借戶姓名空白
@@ -49,8 +50,8 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , Y.\"CustNo\"                       AS F17 "; // CK02 戶號
 		sql += "     , Y.\"FacmNo\"                       AS F18 "; // CK04 額度
 		sql += "     , NULL                               AS F19 "; // CK05 聯絡人姓名 ???
-		sql += "     , NULL                               AS F20  "; // CK06 戶名
-		sql += "     , NVL(JSON_VALUE(Y.\"JsonFields\",  '$.BdLoacation'),'') ";
+		sql += "     ,  NVL(C.\"CustName\",'')              AS F20  "; // CK06 戶名 -同借戶姓名
+		sql += "     , NVL(JSON_VALUE(Y.\"JsonFields\",  '$.BdLoacation'), NVL(CB.\"BdLocation\",'') ) ";
 		sql += "               AS F21  "; // 地址
 		sql += "     , NVL(C.\"CustName\",'')             AS F22 "; // 借戶姓名
 		sql += "     , NVL(C.\"CustId\",'')               AS F23 "; // 統一編號
@@ -66,7 +67,9 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , Y.\"YearMonth\" - 191100           AS F29 "; // 繳息所屬年月(止)
 		sql += "     , Y.\"YearlyInt\"                    AS F30 "; // 繳息金額
 		sql += "     , Y.\"AcctCode\"                     AS F31 "; // 科子細目代號暨說明 ???
-		sql += "     , LPAD(Y.\"UsageCode\",2,'0')        AS F32 "; // 科子細目代號暨說明 ???
+		sql += "     , LPAD(Y.\"UsageCode\",2,'0')        AS F32 "; // 資金用途別
+		sql += "     , NVL(C.\"CustUKey\",'')             AS F33 "; // 客戶識別碼
+
 		sql += " FROM \"YearlyHouseLoanInt\" Y   ";
 		sql += " LEFT JOIN \"YearlyHouseLoanIntCheck\" YC ON YC.\"YearMonth\" = Y.\"YearMonth\" ";
 		sql += "                                         AND YC.\"CustNo\" = Y.\"CustNo\" ";
@@ -123,4 +126,41 @@ public class L5811ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("EndMonth", iEndMonth);
 		return this.convertToMap(query);
 	}
+	
+	public List<Map<String, String>> queryCustTelNo(String custukey,  TitaVo titaVo) throws Exception {
+
+		this.info("queryCustTelNo , custukey = " + custukey );
+
+		if (custukey == null) {
+			this.info("custukey == null return.");
+			return null;
+		}
+
+		String sql = "　";
+		sql += " SELECT NVL(CM.\"CustId\", '')     AS \"CustId\" ";
+		sql += "      , NVL(CT.\"LiaisonName\",CM.\"CustName\")   AS \"ContactName\" ";
+		sql += "      , ROW_NUMBER() ";
+		sql += "        OVER ( ";
+		sql += "          PARTITION BY ";
+		sql += "              CT.\"CustUKey\" ";
+		sql += "            , CT.\"TelTypeCode\" ";
+		sql += "          ORDER BY ";
+	    sql += "              NVL(CT.\"CustUKey\",CM.\"CustId\") ";
+	    sql += "            , NVL(CT.\"TelTypeCode\",CM.\"CustId\") ";
+	    sql += "        ) AS \"Seq\" ";
+		sql += " FROM  \"CustTelNo\" CT ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = CT.\"CustUKey\" ";
+
+		sql += " WHERE CT.\"CustUKey\" = :custukey ";
+		sql += " ORDER BY \"Seq\" ";
+
+		this.info("sql=" + sql);
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("custukey", custukey);
+
+		return this.convertToMap(query);
+	}
+
 }

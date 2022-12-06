@@ -65,6 +65,8 @@ BEGIN
          ,NVL(AEM1."EmpNo",'999999')      AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 
          ,JOB_START_TIME                  AS "LastUpdate"          -- 最後更新日期時間 DATE  
          ,NVL(AEM1."EmpNo",'999999')      AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 
+         ,S1.CHKCBK                       AS "BankItem"
+         ,S1.CHKBBK                       AS "BranchItem"
     FROM "LA$CHKP" S1
     LEFT JOIN (SELECT "LMSACN" -- 戶號
                      ,"CHKACN" -- 支票帳號

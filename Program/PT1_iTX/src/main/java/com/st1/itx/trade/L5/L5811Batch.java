@@ -2,6 +2,7 @@ package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.db.service.springjpa.cm.L5811ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -83,7 +85,8 @@ public class L5811Batch extends TradeBuffer {
 		}
 
 		// 發動產生檢核檔的StoredProcedure
-		sJobMainService.Usp_L9_YearlyHouseLoanIntCheck_Upd(titaVo.getEntDyI(), titaVo.getTlrNo(), iYYYYMM, iStartMonth, iEndMonth, iCustNo, iAcctCode, titaVo);
+		sJobMainService.Usp_L9_YearlyHouseLoanIntCheck_Upd(titaVo.getEntDyI(), titaVo.getTlrNo(), iYYYYMM, iStartMonth,
+				iEndMonth, iCustNo, iAcctCode, titaVo);
 
 		try {
 			makeExcel(iYear, iYYYYMM, iCustNo, iAcctCode, iStartMonth, iEndMonth, titaVo);
@@ -93,9 +96,11 @@ public class L5811Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L5811", "L5811國稅局申報檢核檔已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo()+"L5811",
+					"L5811國稅局申報檢核檔已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5811", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5811", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -103,7 +108,8 @@ public class L5811Batch extends TradeBuffer {
 
 	}
 
-	public void makeExcel(String iYear, int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth, TitaVo titaVo) throws LogicException {
+	public void makeExcel(String iYear, int iYYYYMM, int iCustNo, String iAcctCode, int iStartMonth, int iEndMonth,
+			TitaVo titaVo) throws LogicException {
 
 		int excelYear = Integer.parseInt(iYear) + 1;
 		List<Map<String, String>> resultList = null;
@@ -119,7 +125,8 @@ public class L5811Batch extends TradeBuffer {
 			sendMsg = "每年房屋擔保借款繳息檔無資料";
 		}
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5811", "每年房屋擔保借款繳息檢核檔" + excelYear + "年度", "每年房屋擔保借款繳息檢核檔" + excelYear + "年度", "L5811_每年房屋擔保借款繳息檢核檔.xls", "Sheet1");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5811", "每年房屋擔保借款繳息檢核檔" + excelYear + "年度",
+				"每年房屋擔保借款繳息檢核檔" + excelYear + "年度", "L5811_每年房屋擔保借款繳息檢核檔.xls", "Sheet1");
 		int i = 3;
 
 		this.info("resultList size==" + resultList.size());
@@ -147,7 +154,13 @@ public class L5811Batch extends TradeBuffer {
 				makeExcel.setValue(i, 17, result.get("F16"));// CK01 郵遞區號
 				makeExcel.setValue(i, 18, result.get("F17"));// CK02 戶號
 				makeExcel.setValue(i, 19, result.get("F18"));// CK04 額度
-				makeExcel.setValue(i, 20, result.get("F19"));// CK05 聯絡人姓名
+
+//				makeExcel.setValue(i, 20, result.get("F19"));// CK05 聯絡人姓名
+				String icustukey = result.get("F33");//客戶識別碼
+				Map<String, String> custTelNoMap = findCustTelNo(icustukey, titaVo);
+				makeExcel.setValue(i, 20, custTelNoMap.get("ContactName"));// CK05 聯絡人姓名
+				
+				
 				makeExcel.setValue(i, 21, result.get("F20"));// CK06 戶名
 				makeExcel.setValue(i, 22, result.get("F21"));// 地址
 				makeExcel.setValue(i, 23, result.get("F22"));// 借戶姓名
@@ -205,4 +218,34 @@ public class L5811Batch extends TradeBuffer {
 		long sno = makeExcel.close();
 		totaVo.put("ExcelSnoM", "" + sno);
 	}
+	
+	private Map<String, String> findCustTelNo(String custukey, TitaVo titaVo) {
+		this.info("findCustTelNo start ...");
+
+		Map<String, String> result = new HashMap<>();
+
+		String contactName = "";
+		String scustId = "";
+
+		if (custukey == null || ("").equals(custukey)) {
+		} else {
+			List<Map<String, String>> queryResultList = null;
+			try {
+				queryResultList = l5811ServiceImpl.queryCustTelNo(custukey, titaVo);
+			} catch (Exception e) {
+				this.error("queryCustTelNo error = " + e.getMessage());
+			}
+			if (queryResultList != null && !queryResultList.isEmpty()) {
+				Map<String, String> queryResult = queryResultList.get(0);
+				scustId = queryResult.get("CustId");
+				contactName = queryResult.get("ContactName");
+			}
+
+		}
+		result.put("ScustId", scustId);
+		result.put("ContactName", contactName);
+		this.info("findCustTelNo end ... contactName = " + contactName + " , scustId = " + scustId);
+		return result;
+	}
+
 }

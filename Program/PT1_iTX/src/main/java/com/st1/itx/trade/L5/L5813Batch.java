@@ -347,25 +347,29 @@ public class L5813Batch extends TradeBuffer {
 			if ("".equals(dataCustNo)) {//第一筆
 				dataCustNo = result.get("CustNo");
 				dataFacmNo =  result.get("FacmNo");
-				String cUsageCode = result.get("UsageCode");
-				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-					cUsageCode = "0" + cUsageCode;
-				}
-				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
-				if (tCdCode != null) {// 用途別
-					pUsageCode = tCdCode.getItem();
-				} else {
-					pUsageCode = "週轉金";
-				}
 			}
 			if ( !dataCustNo.equals(result.get("CustNo")) || !dataFacmNo.equals(result.get("FacmNo")) ) {
 				dataCustNo = result.get("CustNo");
 				dataFacmNo =  result.get("FacmNo");
-				printfg = 0;
+				printfg = 0;//initialize
 			}
 			
 			if (("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode")) ) {//國稅局-紀錄有資料但不寫
 				printfg = 1;
+
+				String cUsageCode = result.get("UsageCode");
+				if (("").equals(pUsageCode)) {//只找一次
+					if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
+						cUsageCode = "0" + cUsageCode;
+					}
+					CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
+					if (tCdCode != null) {// 用途別
+						pUsageCode = tCdCode.getItem();
+					} else {
+						pUsageCode = "週轉金";
+					}
+				}
+
 				continue;
 			}
 			

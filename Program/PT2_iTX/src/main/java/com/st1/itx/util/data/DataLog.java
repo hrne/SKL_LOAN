@@ -412,6 +412,15 @@ public class DataLog extends CommBuffer {
 						map.put(name, valueMap);
 
 					}
+					
+					/* 刪除全寫 */
+					if(this.titaVo.isFuncindDel()) {
+						Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+						valueMap.put("oldValue", oldValue.toString());
+						valueMap.put("newValue", oldValue.toString());
+
+						map.put(name, valueMap);
+					}
 				}
 			}
 		} catch (Exception e) {

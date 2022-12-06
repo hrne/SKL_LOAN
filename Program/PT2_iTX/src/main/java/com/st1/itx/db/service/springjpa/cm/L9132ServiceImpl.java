@@ -788,6 +788,8 @@ public class L9132ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(dd.\"DbAmt\") AS \"DbAmt\" ";
 		sql += "      , SUM(dd.\"CrAmt\") AS \"CrAmt\" ";
 		sql += " FROM detailData dd ";
+		sql += " WHERE  ";
+		sql += " rtrim(ltrim(dd.\"AcSubBookItem\",' '),' ') !=' ' ";
 		sql += " GROUP BY dd.\"AcNo\" ";
 		sql += "        , dd.\"AcSubBookItem\" ";
 		sql += " ORDER BY dd.\"AcNo\" ";

@@ -93,6 +93,8 @@ public class L5812 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", ""); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tYearlyHouseLoanInt, tYearlyHouseLoanInt); ////
+			dataLog.exec(); ////
 			break;
 
 		case 5: // inq
