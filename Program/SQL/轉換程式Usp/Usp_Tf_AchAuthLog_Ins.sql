@@ -186,7 +186,18 @@ BEGIN
               ) FACM ON FACM."LMSACN" = S1."LMSACN"
                     AND FACM."LMSPCN" = S1."LMSPCN"
                     AND FACM."SEQ" = 1
+    LEFT JOIN "AchAuthLog" AAL ON AAL."AuthCreateDate" = TRUNC(S1."CRTDTM" / 1000000) 
+                              AND AAL."CustNo" = S1."LMSACN"
+                              AND AAL."RepayBank" = CASE
+                                                      WHEN S1."LMSPBK" = '1' THEN '812'
+                                                      WHEN S1."LMSPBK" = '2' THEN '006'
+                                                      WHEN S1."LMSPBK" = '3' THEN '700'
+                                                      WHEN S1."LMSPBK" = '4' THEN '103'
+                                                    ELSE '000' END
+                              AND AAL."RepayAcct" = LPAD(S1."LMSPCN",14,'0')
+                              AND AAL."CreateFlag" = 'A'
     WHERE NVL(S1."ATHCOD",' ') = ' '
+      AND NVL(AAL."CustNo",0) = 0 -- 不存在的才寫入
     ;
 
     -- 記錄寫入筆數

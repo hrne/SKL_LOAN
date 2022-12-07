@@ -344,15 +344,15 @@ public class L4510Batch extends TradeBuffer {
 			int custNo = parse.stringToInteger(result.get("CustNo"));
 			int facmNo = parse.stringToInteger(result.get("FacmNo"));
 
-			// 應繳試算
-			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO,
-					titaVo);
 			// 非15日薪僅扣期款
 			if (flag == 2) {
 				baTxCom.setPayFeeMethod("N");
 			} else {
 				baTxCom.setPayFeeMethod("Y");				
 			}
+			// 應繳試算
+			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO,
+					titaVo);
 			if (!"3".equals(result.get("RepayCode"))) {
 				if (baTxCom.getTerms() < 2) {
 					this.info("skip terms < 2  " + result);

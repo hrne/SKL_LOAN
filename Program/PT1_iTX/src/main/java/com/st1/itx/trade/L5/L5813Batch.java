@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
@@ -105,11 +106,9 @@ public class L5813Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-					titaVo.getTlrNo() + "L5813", "L5813國稅局申報媒體檔已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L5813", "L5813國稅局申報媒體檔已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -126,8 +125,7 @@ public class L5813Batch extends TradeBuffer {
 		String fileItem = "國稅局申報(國稅局-LNM57M1P)";
 		String fileName = "LNM57M1P-" + tYear + "年度.csv";
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName,
-				2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
 
 		for (Map<String, String> result : resultList) {
 
@@ -194,7 +192,7 @@ public class L5813Batch extends TradeBuffer {
 
 			String bdLocation = "";// 建物地址
 			bdLocation = tTempVo.get("BdLoacation");
-			if (bdLocation == null) {
+			if (bdLocation == null) {//YearlyHouseLoanInt無門牌資料則改放建物檔門牌地址
 				bdLocation = result.get("BdLocation");
 			}
 			bdLocation = covertToChineseFullChar(bdLocation);
@@ -271,9 +269,9 @@ public class L5813Batch extends TradeBuffer {
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanAmt), 10, '0'); // 最初貸款金額 右靠前埔0
 			strField += vertical;
-			strField += StringUtils.leftPad(String.valueOf(iFirstDrawdownDate), 7,'0'); // 貸款起日
+			strField += StringUtils.leftPad(String.valueOf(iFirstDrawdownDate), 7, '0'); // 貸款起日
 			strField += vertical;
-			strField += StringUtils.leftPad(String.valueOf(iMaturityDate),7,'0'); // 貸款迄日
+			strField += StringUtils.leftPad(String.valueOf(iMaturityDate), 7, '0'); // 貸款迄日
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanBal), 10, '0'); // 截至本年度未償還本金餘額
 			strField += vertical;
@@ -335,44 +333,43 @@ public class L5813Batch extends TradeBuffer {
 		String dataCustNo = "";
 		String dataFacmNo = "";
 		int printfg = 0;
-		String pUsageCode = "";//國稅局-用途別只找一次,出檔用
+		String pUsageCode = "";// 國稅局-用途別只找一次,出檔用
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName,
-				2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5813", fileItem, fileName, "LNM572P-"+tYear);
 
 		for (Map<String, String> result : resultList) {
 
-			if ("".equals(dataCustNo)) {//第一筆
+			if ("".equals(dataCustNo)) {// 第一筆
 				dataCustNo = result.get("CustNo");
-				dataFacmNo =  result.get("FacmNo");
+				dataFacmNo = result.get("FacmNo");
 			}
-			if ( !dataCustNo.equals(result.get("CustNo")) || !dataFacmNo.equals(result.get("FacmNo")) ) {
+			if (!dataCustNo.equals(result.get("CustNo")) || !dataFacmNo.equals(result.get("FacmNo"))) {
 				dataCustNo = result.get("CustNo");
-				dataFacmNo =  result.get("FacmNo");
-				printfg = 0;//initialize
+				dataFacmNo = result.get("FacmNo");
+				printfg = 0;// initialize
 			}
-			
-			if (("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode")) ) {//國稅局-紀錄有資料但不寫
+
+			if (("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode"))) {// 國稅局-紀錄有資料但不寫
 				printfg = 1;
 
-				String cUsageCode = result.get("UsageCode");
-				if (("").equals(pUsageCode)) {//只找一次
-					if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-						cUsageCode = "0" + cUsageCode;
-					}
-					CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
-					if (tCdCode != null) {// 用途別
-						pUsageCode = tCdCode.getItem();
-					} else {
-						pUsageCode = "週轉金";
-					}
-				}
+//				String cUsageCode = result.get("UsageCode");
+//				if (("").equals(pUsageCode)) {// 只找一次
+//					if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
+//						cUsageCode = "0" + cUsageCode;
+//					}
+//					CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
+//					if (tCdCode != null) {// 用途別
+//						pUsageCode = tCdCode.getItem();
+//					} else {
+//						pUsageCode = "週轉金";
+//					}
+//				}
 
 				continue;
 			}
-			
+
 			String bdOwner = ""; // 所有權人姓名
 			String bdCustId = ""; // 所有權人身分證
 			String iCustName = "";
@@ -396,7 +393,7 @@ public class L5813Batch extends TradeBuffer {
 			}
 			BigDecimal iLoanBal = parse.stringToBigDecimal(result.get("LoanBal"));// 放款餘額
 			int iYYYMM = Integer.parseInt(result.get("YearMonth")) - 191100;
-			String cUsageCode = result.get("UsageCode"); // 用途別
+//			String cUsageCode = result.get("UsageCode2"); // 使用LoanBorMain的用途別
 
 			CustMain tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 			ClFac tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);// 戶號找擔保品
@@ -440,7 +437,7 @@ public class L5813Batch extends TradeBuffer {
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(result.get("JsonFields"));
 			bdLocation = tTempVo.get("BdLoacation");
-			if (bdLocation == null) {
+			if (bdLocation == null) {//YearlyHouseLoanInt無門牌資料則改放建物檔門牌地址
 				bdLocation = result.get("BdLocation");
 			}
 			bdLocation = covertToChineseFullChar(bdLocation);
@@ -475,20 +472,26 @@ public class L5813Batch extends TradeBuffer {
 			}
 			this.info("iYearMonthSt==" + iYearMonthSt);
 
-			String iUsageCode = "";
-			if (printfg == 1) {// 國稅局有資料-代表購置不動產
-				iUsageCode = pUsageCode;
-			} else {
-				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-					cUsageCode = "0" + cUsageCode;
+			String iUsageCode = result.get("Item");
+//			if (printfg == 1) {// 國稅局有資料-代表購置不動產
+//				iUsageCode = pUsageCode ;
+//			} else {
+//				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
+//					cUsageCode = "0" + cUsageCode;
+//				}
+//				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
+//				if (tCdCode != null) {// 用途別
+//					iUsageCode = tCdCode.getItem();
+//				} else {
+//					iUsageCode = "週轉金";
+//				}
+//			}
+			if(iUsageCode.length() < 6) {
+				for (int i = iUsageCode.length(); i < 6; i++) { 
+					iUsageCode = iUsageCode + "  ";
 				}
-				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
-				if (tCdCode != null) {// 用途別
-					iUsageCode = tCdCode.getItem();
-				} else {
-					iUsageCode = "週轉金";
-				}
-			}			
+			}
+			
 			String strField = "";
 			String vertical = ",";
 
@@ -519,9 +522,9 @@ public class L5813Batch extends TradeBuffer {
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanAmt), 10, '0'); // 最初貸款金額 右靠前埔0
 			strField += vertical;
-			strField += StringUtils.leftPad(String.valueOf(iFirstDrawdownDate),7,'0'); // 貸款起日
+			strField += StringUtils.leftPad(String.valueOf(iFirstDrawdownDate), 7, '0'); // 貸款起日
 			strField += vertical;
-			strField += StringUtils.leftPad(String.valueOf(iMaturityDate),7,'0'); // 貸款迄日
+			strField += StringUtils.leftPad(String.valueOf(iMaturityDate), 7, '0'); // 貸款迄日
 			strField += vertical;
 			strField += StringUtils.leftPad(String.valueOf(iLoanBal), 10, '0'); // 截至本年度未償還本金餘額
 			strField += vertical;
@@ -546,24 +549,14 @@ public class L5813Batch extends TradeBuffer {
 
 	public String covertToChineseFullChar(String str) {
 		String result = "";
-		if (StringUtils.isNotEmpty(str)) {
+		if (!Objects.isNull(str) && !str.trim().isEmpty()) {
 			char[] chars = str.toCharArray();
 			for (int i = 0; i < chars.length; i++) { // bypass Chinese character
-				if (chars[i] > '\200') {
-					continue;
-				}
-				// 半型空白轉成全型空白
-				if (chars[i] == 32) {
-					chars[i] = (char) 12288;
-					continue;
-				}
-				// 有定義的字、數字及符號
-				if (Character.isLetterOrDigit(chars[i])) {
-					chars[i] = (char) (chars[i] + 65248);
-					continue;
-				}
-				// 其它不合要求的，全部轉成全型空白。
-				chars[i] = (char) 12288;
+		        if (chars[i] >= 33 && chars[i] <= 126) {
+		        	chars[i] = (char) (chars[i] + 65248);
+		        } else if (chars[i] == 32) {
+		        	chars[i] = (char) 12288;
+		        }
 			}
 			result = String.valueOf(chars);
 		}

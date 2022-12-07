@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * DailyTav 每日暫收款餘額檔<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class DailyTav implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1322253667729435096L;
-
-@EmbeddedId
+  @EmbeddedId
   private DailyTavId dailyTavId;
 
   // 會計日期
@@ -57,6 +55,11 @@ public class DailyTav implements Serializable {
   /* Y:此筆為該戶號+額度的最新一筆資料N:此筆為歷史資料 */
   @Column(name = "`LatestFlag`", length = 1)
   private String latestFlag;
+
+  // 業務科目
+  /* TAV,T10 */
+  @Column(name = "`AcctCode`", length = 3)
+  private String acctCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -204,6 +207,25 @@ N:此筆為歷史資料
   }
 
 /**
+	* 業務科目<br>
+	* TAV,T10
+	* @return String
+	*/
+  public String getAcctCode() {
+    return this.acctCode == null ? "" : this.acctCode;
+  }
+
+/**
+	* 業務科目<br>
+	* TAV,T10
+  *
+  * @param acctCode 業務科目
+	*/
+  public void setAcctCode(String acctCode) {
+    this.acctCode = acctCode;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -283,6 +305,6 @@ N:此筆為歷史資料
   @Override
   public String toString() {
     return "DailyTav [dailyTavId=" + dailyTavId + ", selfUseFlag=" + selfUseFlag + ", tavBal=" + tavBal + ", latestFlag=" + latestFlag
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", acctCode=" + acctCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

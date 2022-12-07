@@ -87,7 +87,7 @@ public class FileGenerator extends CommBuffer {
 					String[] ss = row.split("");
 					for (String s : ss) {
 						if (new String(s.getBytes(charsetName), "UTF-8").equals("?"))
-							bos.write(astrMapper.getMapperChar(s.toCharArray()[0]));
+							bos.write(Objects.isNull(sb.get(s)) ? astrMapper.getMapperChar(s.toCharArray()[0]) : sb.get(s));
 						else
 							bos.write(Objects.isNull(sb.get(s)) ? s.getBytes(charsetName) : sb.get(s));
 					}
