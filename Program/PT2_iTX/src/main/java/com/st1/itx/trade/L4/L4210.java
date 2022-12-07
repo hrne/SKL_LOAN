@@ -118,7 +118,8 @@ public class L4210 extends TradeBuffer {
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 		iRepayType = parse.stringToInteger(titaVo.getParam("RepayType"));
-		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5) + FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
+		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5)
+				+ FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
 		iRepayAmt = parse.stringToBigDecimal(titaVo.getParam("RepayAmt"));
 		iRepayId = titaVo.getParam("RepayId");
 		iRepayName = titaVo.getParam("RepayName");
@@ -290,14 +291,14 @@ public class L4210 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxDetail 無此資料");
 		}
 
-		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
+		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode())
+				|| "7".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException(titaVo, "E0010", "已入帳，請先訂正該筆資料"); // E0010 功能選擇錯誤
 		}
 
 		tempVo = tempVo.getVo(tBatxDetail.getProcNote());
 		wkRemark = tempVo.get("Remark");
-		this.info("wkRemark=" + wkRemark);
-		if (wkRemark.length() >= 23 && "Bank:".equals(wkRemark.substring(0, 5))) {
+		if (wkRemark != null && wkRemark.length() >= 23 && "Bank:".equals(wkRemark.substring(0, 5))) {
 			throw new LogicException(titaVo, "E0010", "一般債權撥付轉入資料不可修改"); // E0010 功能選擇錯誤
 		}
 

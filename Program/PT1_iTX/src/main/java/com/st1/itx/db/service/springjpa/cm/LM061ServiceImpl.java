@@ -35,10 +35,13 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
-	 * @param ymEnd     月底日(依yearMonth的月份)
+	 * @param ymEnd 月底日(依yearMonth的月份)
+	 * @return 
+	 * @throws Exception 
 	 * 
 	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, int yearMonth, int ymEnd) throws Exception {
+
 
 		// 年
 		int iYear = yearMonth / 100;
@@ -51,7 +54,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Calendar calendar = Calendar.getInstance();
 
 		String iYearMonth = String.valueOf(yearMonth);
-
+		
 		// 月底日
 		int iDay = ymEnd % 100;
 
@@ -125,7 +128,33 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         AND LO.\"FacmNo\"  = M.\"FacmNo\"";
 		sql += "      WHERE M.\"YearMonth\" = :yymm";
 		sql += "        AND M.\"Status\" IN (2,6,7)";
-		sql += "        AND M.\"AssetClass\" IN ('21','22','23','3','4','5')";
+		sql += "        AND M.\"AssetClass\" || ";
+		sql += "		   CASE";
+		sql += "			 WHEN M.\"AcctCode\" = '990' ";
+		sql += "		 	  AND M.\"ProdNo\" IN ('60','61','62')";
+		sql += "		 	  AND M.\"AssetClass\" = 2 ";
+		sql += "			 THEN '3'";
+		sql += "			 WHEN M.\"OvduTerm\" >= 7";
+		sql += "			  AND M.\"OvduTerm\" <= 12";
+		sql += "		 	  AND M.\"AssetClass\" = 2 ";
+		sql += "			 THEN '3'";
+		sql += "			 WHEN M.\"AcctCode\" = '990'";
+		sql += "			  AND M.\"OvduTerm\" <= 12";
+		sql += "		 	  AND M.\"AssetClass\" = 2 ";
+		sql += "			 THEN '3'";
+		sql += "   		     WHEN M.\"AcctCode\" <> '990'";
+		sql += "			  AND M.\"ProdNo\" IN ('60','61','62')";
+		sql += "			  AND M.\"OvduTerm\" = 0";
+		sql += "		 	  AND M.\"AssetClass\" = 2 ";
+		sql += "			 THEN '1'";
+		sql += "			 WHEN M.\"AcctCode\" <> '990'";
+		sql += "			  AND M.\"OvduTerm\" >= 1";
+		sql += "			  AND M.\"OvduTerm\" <= 6";
+		sql += "		 	  AND M.\"AssetClass\" = 2 ";
+		sql += "			 THEN '2'";
+		sql += "			 ELSE '' END ";
+		sql += "	   IN ('21','22','23','3','4','5')";
+		sql += "        AND M.\"PrinBalance\" > 0 ";
 		sql += "        AND M.\"OvduTerm\" > 0 ";
 		sql += "     	AND M.\"PrevIntDate\" <= :iOneYearAgo";
 		sql += "     ORDER BY M.\"CustNo\"";
