@@ -43,7 +43,44 @@ BEGIN
     -- 寫入資料
     -- DBMS_OUTPUT.PUT_LINE('INSERT MonthlyLoanBal');
 
-    INSERT INTO "MonthlyLoanBal"
+    INSERT INTO "MonthlyLoanBal" (
+      "YearMonth"           -- 資料年月
+      , "CustNo"              -- 戶號 
+      , "FacmNo"              -- 額度 
+      , "BormNo"              -- 撥款序號 
+      , "AcctCode"            -- 業務科目代號  
+      , "FacAcctCode"         -- 額度業務科目
+      , "CurrencyCode"        -- 幣別 
+      , "LoanBalance"         -- 放款餘額
+      , "MaxLoanBal"          -- 最高放款餘額 DECIMAL 16 2
+      , "StoreRate"           -- 計息利率
+      , "IntAmtRcv"           -- 實收利息     
+      , "IntAmtAcc"           -- 提存利息  
+      , "UnpaidInt"           -- 已到期未繳息 DECIMAL 16 2
+      , "UnexpiredInt"        -- 未到期應收息 DECIMAL 16 2
+      , "SumRcvInt"           -- 累計回收利息 DECIMAL 16 2
+      , "IntAmt"              -- 本月利息
+      , "ProdNo"              -- 商品代碼
+      , "AcBookCode"          -- 帳冊別             
+      , "EntCode"             -- 企金別             
+      , "RelsCode"            -- (準)利害關係人職稱      
+      , "DepartmentCode"      -- 案件隸屬單位          
+      , "ClCode1"             -- 擔保品代號1            
+      , "ClCode2"             -- 擔保品代號2  
+      , "ClNo"                -- 主要擔保品編號
+      , "CityCode"            -- 主要擔保品地區別    
+      , "OvduPrinAmt"         -- 轉催收本金 DECIMAL 16 2 
+      , "OvduIntAmt"          -- 轉催收利息 DECIMAL 16 2 
+      , "CreateDate"          -- 建檔日期時間  
+      , "CreateEmpNo"         -- 建檔人員 
+      , "LastUpdate"          -- 最後更新日期時間  
+      , "LastUpdateEmpNo"     -- 最後更新人員 
+      , "AcSubBookCode"       -- 區隔帳冊  
+      , "SumRcvPrin"
+      , "OvduRcvAmt"
+      , "BadDebtAmt"
+      , "PrevPayIntDate"
+    )
     WITH "DailyData" AS (
         SELECT D."MonthEndYm"             --AS "YearMonth"           -- 資料年月
               ,D."CustNo"                 --AS "CustNo"              -- 戶號 
@@ -128,6 +165,16 @@ BEGIN
           ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間  
           ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員 
           ,A."AcSubBookCode"          AS "AcSubBookCode"       -- 區隔帳冊       
+          ,0                          AS "SumRcvPrin"          -- 累計回收本金
+          ,CASE
+             WHEN NVL(LO."Status",0) IN (1,2) -- 1:催收 2:部分轉呆
+                  AND (NVL(LO."OvduAmt",0) - NVL(LO."OvduBal",0) - NVL(LO."BadDebtAmt",0)) > 0
+             -- 2022-12-08 Wei新增 from Lai :催收還款金額=轉催金額-催收餘額-轉呆金額
+             THEN NVL(LO."OvduAmt",0) - NVL(LO."OvduBal",0) - NVL(LO."BadDebtAmt",0)
+           ELSE 0 END                 AS "OvduRcvAmt"          -- 催收還款金額
+          ,NVL(LO."BadDebtAmt",0)     AS "BadDebtAmt"          -- 轉銷呆帳金額
+          ,NVL(LBM."PrevPayIntDate",0)
+                                      AS "PrevPayIntDate"      -- 繳息迄日
     FROM "DailyData" D
     LEFT JOIN "FacMain" F ON F."CustNo" = D."CustNo"
                          AND F."FacmNo" = D."FacmNo"
@@ -139,6 +186,13 @@ BEGIN
                   AND A."CustNo"   = D."CustNo"
                   AND A."FacmNo"   = D."FacmNo"
                   AND A."ArSeq"    = 1
+    LEFT JOIN "LoanBorMain" LBM ON LBM."CustNo" = D."CustNo"
+                               AND LBM."FacmNo" = D."FacmNo"
+                               AND LBM."BormNo" = D."BormNo"
+    LEFT JOIN "LoanOverdue" LO ON LO."CustNo" = LBM."CustNo"
+                              AND LO."FacmNo" = LBM."FacmNo"
+                              AND LO."BormNo" = LBM."BormNo"
+                              AND LO."OvduNo" = LBM."LastOvduNo"
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

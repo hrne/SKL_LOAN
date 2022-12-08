@@ -744,13 +744,10 @@ public class L3440 extends TradeBuffer {
 		tTempVo.putParam("BeforeLoanBal", wkBeforeLoanBal); // 交易前放款餘額
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
 		tTempVo.putParam("PaidTerms", wkPaidTerms);
+		tTempVo.putParam("OvDuRepaid", od.getOvduAmt().subtract(parse.stringToBigDecimal(tTempVo.get("OvduBal"))));// 催收還款金額
 		
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
-		// 暫收款金額含催收還款金額
-		BigDecimal ovDuRepaid = od.getOvduAmt().subtract(parse.stringToBigDecimal(tTempVo.get("OvduBal")));
-		tLoanBorTx.setTempAmt(tLoanBorTx.getTempAmt().add(ovDuRepaid));
-		tLoanBorTx.setTxAmt(tLoanBorTx.getTxAmt().subtract(ovDuRepaid));
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 

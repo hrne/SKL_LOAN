@@ -307,7 +307,9 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settingUnPaid 戶號=" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("BaTxCom settingUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settingUnPaid TxAmt 回收金額=" + iTxAmt);
+		this.info("BaTxCom settingUnPaid TxAmt 回收費用方式=" + this.payFeeMethod);		
 		init();
+		this.info("BaTxCom settingUnPaid TxAmt 是否回收費用=" + this.payFeeMethod);		
 
 		// STEP 1: 設定預設值
 		// isPayAllFee 費用是否全部回收->
@@ -1025,7 +1027,7 @@ public class BaTxCom extends TradeBuffer {
 		init();
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
-		this.isEmptyLoanBaTxVo = false;
+		this.isEmptyLoanBaTxVo = true;
 
 		// 還款主檔清單
 		loadRepayLoan(iEntryDate, iCustNo, iFacmNo, iBormNo, 01, titaVo); // 還款主檔清單

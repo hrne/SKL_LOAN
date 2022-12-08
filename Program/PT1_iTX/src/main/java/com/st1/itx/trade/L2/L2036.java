@@ -55,11 +55,11 @@ public class L2036 extends TradeBuffer {
 		String Ukey = "";
 
 		Slice<ReltMain> iReltMain = null;
-
-		if (iCaseNo == 0) { // L1001連進來查該戶號全部
-			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);
+		
+		if(iCaseNo == 0) { // L1001連進來查該戶號全部
+			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);		
 		} else {
-			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);
+			iReltMain = iReltMainService.findByBoth(iCaseNo, iCustNo, this.index, this.limit, titaVo);			
 		}
 
 //		if (iReltMain == null) {
@@ -71,21 +71,24 @@ public class L2036 extends TradeBuffer {
 			if (iReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 			}
-		} else {
+		}else{
 			iReltMain = iReltMainService.custNoEq(iCustNo, this.index, this.limit, titaVo);
-			if (iReltMain == null) {
-				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
-			}
+				if (iReltMain == null) {
+					throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
+				}
 		}
 		for (ReltMain rReltMain : iReltMain) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCaseNo", rReltMain.getCaseNo());
 			occursList.putParam("OOCustNo", rReltMain.getCustNo());
 
-			Ukey = rReltMain.getReltUKey();
+//			Ukey = rReltMain.getReltUKey();
+//			lCustMain = sCustMainService.findById(Ukey, titaVo);
 
-			lCustMain = sCustMainService.findById(Ukey, titaVo);
-
+			int tCustNo = rReltMain.getCustNo();
+			lCustMain = sCustMainService.custNoFirst(tCustNo, tCustNo, titaVo);
+			this.info("lCustMain    = " + lCustMain);
+			
 			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
 			}

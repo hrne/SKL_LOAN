@@ -62,7 +62,6 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
 		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
-		sql += "  	lx.\"Desc\"  		AS \"Desc\", ";
 		sql += "  	NVL(lx.\"EntryDate\",0) AS \"EntryDate\", ";
 		sql += "  	MIN(ad.\"TitaHCode\")   AS \"TitaHCode\", ";
 		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
@@ -132,7 +131,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	// 讀取暫收餘額檔餘額
+	// 讀取AcDate當日暫收餘額檔反算昨日餘額
 	public List<Map<String, String>> queryDailyTav(TitaVo titaVo) throws LogicException {
 		this.info("queryDailyTav CustNo=" + titaVo.get("CustNo") + ", EntryDate=" + titaVo.get("EntryDateS") + "~"
 				+ titaVo.get("EntryDateE") + ", AcDate=" + titaVo.get("AcDateS") + "~" + titaVo.get("AcDateE"));
@@ -150,6 +149,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , ROW_NUMBER ()  OVER ( PARTITION BY \"CustNo\", \"FacmNo\"  ORDER BY  \"AcDate\" DESC ) AS \"Seq\" ";
 		sql += "     FROM \"DailyTav\"  ";
 		sql += "     WHERE \"CustNo\" = :custno";
+		sql += "       AND \"CreateEmpNo\" <> '999999' ";
 		sql += "       AND \"AcDate\" <= :acDateS";
 		if (iFacmNo > 0) {
 			sql += "    AND \"FacmNo\" = :facmno";
@@ -202,6 +202,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
+	// 讀取暫收餘額檔餘額(非轉換)找出最小的AcDate
 	public List<Map<String, String>> queryAcDate(TitaVo titaVo) throws LogicException {
 
 		this.info("queryAcDate CustNo=" + titaVo.get("CustNo") + ", EntryDate=" + titaVo.get("EntryDateS") + "~"
@@ -218,6 +219,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , Min(\"AcDate\") AS \"AcDateS\" ";
 		sql += "     FROM \"DailyTav\"  ";
 		sql += "     WHERE \"CustNo\" = :custno";
+		sql += "      AND  \"CreateEmpNo\" <> '999999' ";
 		sql += "     GROUP BY \"CustNo\" ";
 		sql += " ) ";
 		if (iAcDateS > 0) {

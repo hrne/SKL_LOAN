@@ -1168,6 +1168,10 @@ public class L4452Batch extends TradeBuffer {
 
 		int n = 0;
 		for (BankDeductDtl tBankDeductDtl : lBankDeductDtl) {
+			// 轉換資料不check
+			if ("999999".equals(tBankDeductDtl.getCreateEmpNo())) {
+				continue;
+			}
 			if (!"0".equals(tBankDeductDtl.getAmlRsp())) {
 				n++;
 				if (n % commitCnt == 0) {

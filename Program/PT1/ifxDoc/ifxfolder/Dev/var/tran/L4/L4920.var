@@ -53,6 +53,7 @@ E(0,0)
 T(3,*)
 
 #FdBatchNo=X,2,L
+T(3,*)
 
 #FdStatusCode=X,2,L
 T(3,*)
@@ -143,6 +144,7 @@ C(3,#CHAIN,0,$,s)
 ! 整批批號
 #BatchNo=X,6,I
 C(3,#CHAIN,0,$,s)
+@V(7)
 
 ! 作業狀態
 #StatusCode=A,1,I
@@ -498,7 +500,7 @@ E(0,#OOFacmNo)
 T(2,0)
 
 #secret-no=x,1000,S
-T(6A,#AcDate+#OOBatchNo+#DetailSeq+#RepayTypeA+#CustNoA+#ProcStsCode+#FacmNoA)
+T(6A,#AcDate+#BatchNo+#DetailSeq+#RepayTypeA+#CustNoA+#ProcStsCode+#FacmNoA)
 
 
 #batch-detail=x,100000,S

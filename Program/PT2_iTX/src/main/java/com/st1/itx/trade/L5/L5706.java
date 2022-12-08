@@ -572,6 +572,16 @@ public class L5706 extends TradeBuffer {
 
 	}
 
+	public void Checkintformat(String text1,String formcode, TitaVo titaVo) throws LogicException {
+		this.info("L5706 Checkintformat Run");
+		int oldlength = text1.length();
+		int newlength = text1.trim().length();
+		if (oldlength != newlength) {
+			throw new LogicException(titaVo, "E0015", "檔案格式有誤:"+formcode+"內容="+text1+";");
+		}
+		
+	}
+	
 	public int StrToInt(String value, String DataName, TitaVo titaVo) throws LogicException {
 		int intvalue = 0;
 		value = TrimStart(value, '0');
@@ -764,11 +774,24 @@ public class L5706 extends TradeBuffer {
 //		String CREDIT_CARD_AMT=getCutSkill(titaVo,Code,mLineCut,"CREDIT_CARD_AMT");//信用卡債務簽約總金額
 		String TOTAL_AMT = getCutSkill(Code, mLineCut, "TOTAL_AMT", titaVo);// 總簽約金額合計
 
+		//檢查數字格式
+		Checkintformat(PERIOD, "ZZS260", titaVo);
+		Checkintformat(RATE, "ZZS260", titaVo);
+		Checkintformat(PAY_AMOUNT, "ZZS260", titaVo);
+		Checkintformat(TOTAL_AMT, "ZZS260", titaVo);
+
+		
 		// 查驗是否已有客戶主檔
 		int CustNo = CheckCustId(IDN_BAN, titaVo);
 		custid = IDN_BAN;
 		// 檢查債權機構
 		CheckNegFinAcct(MAIN_CODE, IDN_BAN, "ZZS260", titaVo);
+		//檢查戶況
+		NegMain sNegMain = sNegMainService.statusFirst("0",CustNo, titaVo);
+		boolean isstatus = false;
+		if (sNegMain != null) {
+			isstatus= true;
+		}
 
 		// 檢查是否有NEGMAIN的主檔-無則新增
 		NegMain tNegMain = sNegMainService.custNoAndApplDateFirst(CustNo, DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
@@ -778,6 +801,11 @@ public class L5706 extends TradeBuffer {
 			dueAmt = tNegMain.getDueAmt();// 分攤檔金額檢核使用
 			// 已有資料不做處理
 		} else {
+			//客戶只可有一筆戶況正常資料
+			if(isstatus) {
+				throw new LogicException(titaVo, "E0005", "債權主檔該客戶尚有戶況正常之資料，不可新增");
+			}
+			
 			isNewMain = true;
 			// 未有資料-新增處理
 			NegMainId tNegMainId = new NegMainId();
@@ -888,7 +916,14 @@ public class L5706 extends TradeBuffer {
 		String CREDIT_CARD_AMT = getCutSkill(Code, mLineCut, "CREDIT_CARD_AMT", titaVo);// 信用卡債權金額
 		String DISP_AMT = getCutSkill(Code, mLineCut, "DISP_AMT", titaVo);// 每期可分配金額
 		String LOAN_RATE = getCutSkill(Code, mLineCut, "LOAN_RATE", titaVo);// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
-
+		
+		//檢查數字格式
+		Checkintformat(EXP_LOAN_AMT, "ZZM260", titaVo);
+		Checkintformat(CASH_CARD_AMT, "ZZM260", titaVo);
+		Checkintformat(CREDIT_CARD_AMT, "ZZM260", titaVo);
+		Checkintformat(DISP_AMT, "ZZM260", titaVo);
+		Checkintformat(LOAN_RATE, "ZZM260", titaVo);
+		
 		int CustNo = CheckCustId(IDN_BAN, titaVo);
 		custid = IDN_BAN;
 
@@ -975,6 +1010,13 @@ public class L5706 extends TradeBuffer {
 		String PAY_DATE = getCutSkill(Code, mLineCut, "PAY_DATE", titaVo);// 單獨受償日期
 //		String PAY_SEQ=getCutSkill(titaVo,Code,mLineCut,"PAY_SEQ");//單獨受償次序
 //		String PAY_REASON=getCutSkill(titaVo,Code,mLineCut,"PAY_REASON");//單獨受償原因代碼  (對照表)
+
+		//檢查數字格式
+		Checkintformat(EXP_LOAN_AMT, "ZZM262", titaVo);
+		Checkintformat(CASH_CARD_AMT, "ZZM262", titaVo);
+		Checkintformat(CREDIT_CARD_AMT, "ZZM262", titaVo);
+		Checkintformat(DISP_AMT, "ZZM262", titaVo);
+		Checkintformat(LOAN_RATE, "ZZM262", titaVo);
 
 		// 找債協主檔序號最大的那筆
 		int CustNo = CheckCustId(IDN_BAN, titaVo);

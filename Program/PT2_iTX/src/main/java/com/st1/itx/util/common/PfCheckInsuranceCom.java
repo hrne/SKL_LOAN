@@ -205,6 +205,7 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 
 	// Query 核心系統保單資料
 	private String queryCoreInsurance(PfInsCheck iPf, TitaVo titaVo) throws LogicException {
+		checkInsurance.setTxBuffer(this.getTxBuffer());
 		CheckInsuranceVo checkVo = new CheckInsuranceVo();
 		checkVo.setCustId(iPf.getCustId());
 		checkVo = checkInsurance.checkInsurance(titaVo, checkVo);

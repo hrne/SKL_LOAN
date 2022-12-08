@@ -401,7 +401,7 @@ public class L5512Batch extends TradeBuffer {
 				this.limit, titaVo);
 		List<PfRewardMedia> lPfRewardMedia = slPfRewardMedia == null ? null : slPfRewardMedia.getContent();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.2", "介紹加碼獎金媒體檔", "TOTAL.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.2", "介紹加碼獎金媒體檔", "TOTAL.csv", 2);
 		int cnt = 0;
 		if (lPfRewardMedia != null) {
 			for (PfRewardMedia pfRewardMedia : lPfRewardMedia) {

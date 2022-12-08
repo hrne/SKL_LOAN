@@ -159,6 +159,11 @@ public class L3912 extends TradeBuffer {
 				.add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee).add(wkModifyFee)
 				.add(wkFireFee).add(wkLawFee);
 
+		BigDecimal wkTempRepay = BigDecimal.ZERO; // 暫收抵繳
+		if (tLoanBorTx.getTempAmt().compareTo(tLoanBorTx.getOverflow()) > 0) {
+			wkTempRepay = tLoanBorTx.getTempAmt().subtract(tLoanBorTx.getOverflow());
+		}
+
 		String rvNo = tTempVo.getParam("RvNo");
 		if (wkFireFee.compareTo(BigDecimal.ZERO) > 0 && !"".equals(rvTempVo.getParam("InsuYearMonth"))) {
 			rvNo = "" + (parse.stringToInteger(rvTempVo.getParam("InsuYearMonth")) - 191100) + " " + rvNo;
@@ -184,7 +189,7 @@ public class L3912 extends TradeBuffer {
 			this.totaVo.putParam("ODelayInt", BigDecimal.ZERO.subtract(tLoanBorTx.getDelayInt()));
 			this.totaVo.putParam("OBreachAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getBreachAmt()));
 			this.totaVo.putParam("OTempRepay",
-					BigDecimal.ZERO.subtract(tLoanBorTx.getTempAmt().subtract(tLoanBorTx.getOverflow())));// 暫收款金額
+					BigDecimal.ZERO.subtract(wkTempRepay));
 			this.totaVo.putParam("ORepayAmt", BigDecimal.ZERO.subtract(wkRepayAmt));
 			this.totaVo.putParam("OCloseBreachAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getCloseBreachAmt()));
 			this.totaVo.putParam("OExtraRepay", "-" + tLoanBorTx.getExtraRepay());
@@ -195,7 +200,7 @@ public class L3912 extends TradeBuffer {
 			this.totaVo.putParam("ODelayInt", tLoanBorTx.getDelayInt());
 			this.totaVo.putParam("OBreachAmt", tLoanBorTx.getBreachAmt());
 			this.totaVo.putParam("OTempAmt", tLoanBorTx.getTempAmt()); // 暫收借
-			this.totaVo.putParam("OTempRepay", tLoanBorTx.getTempAmt().subtract(tLoanBorTx.getOverflow()));// 暫收款金額
+			this.totaVo.putParam("OTempRepay", wkTempRepay);// 暫收款金額
 			this.totaVo.putParam("ORepayAmt", wkRepayAmt);
 			this.totaVo.putParam("OCloseBreachAmt", tLoanBorTx.getCloseBreachAmt());
 			this.totaVo.putParam("OExtraRepay", tLoanBorTx.getExtraRepay());

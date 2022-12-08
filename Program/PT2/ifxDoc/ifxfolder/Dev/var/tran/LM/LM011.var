@@ -1,0 +1,135 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM011)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,550];printer.width=[20,20,20,20];order=1;">
+[
+["[LM011]                LM011表外放款承諾資料產出"],
+["@年月",#Year,"@年",#Month,"@月"],
+!["@是否重新產生",#RemakeYN,"@",#RemakeYNText],
+]
+
+!---------- AP TEXT AREA Variables ----------
+
+!-----------------------------------------------------
+
+! 日期
+
+!年月預設值為上月，若系統日(會計日期)為月底日則預設本月
+! Default Date calculation
+#MonthOfToday=X,2,S
+T(1,#SYSDATE,5,2)
+
+#MonthOfTomorrow=X,2,S
+T(1,#SYSNDATE,5,2)
+
+#DateOfLastMonth=D,8,S
+D(7,3,#SYSDATE,1,0)
+ 
+! 今天和明天的月份一樣的話, 代表今天不是月底日: 上月
+! 否則: 本月
+#Year=A,3,I
+C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,2,3),T(1,#SYSDATE,2,3))
+@V(5,0,999)
+
+#Month=A,2,I
+C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,5,2),T(2,#MonthOfToday))
+@V(5,1,12)
+
+
+! 是否重新產生
+
+!#HelpChoice=X,9,S
+!T(3,Y:是;N:否)
+
+!#RemakeYN=X,1,I
+!T(3,N)
+!HELP(#HelpChoice)
+!@V(H,#HelpChoice)
+
+!#RemakeYNText=X,2,L
+!T(H,#RemakeYN,#HelpChoice)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+! #PRTSC_RFG=X,1,S
+! C(3,#HCODE,1,S,$)
+! C(5,#TXFORM,LM011,$,S)
+! C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LM011">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,C5100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM011] LM011表外放款承諾資料產出)
+
+</sub>
+
+!---------- TXFORM = LM011 ----------
+<sub type="FORM" name="LM011">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM011,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM011] LM011表外放款承諾資料產出)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#Year
+#Month
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LM011
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+
