@@ -154,7 +154,8 @@ public class L5512Batch extends TradeBuffer {
 
 		this.info("lPfInsCheck size=" + lPfInsCheck.size());
 		if (lPfInsCheck.size() > 0) {
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.1", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "房貸獎勵保費檢核檔(介紹人加碼獎金)", "介紹人加碼獎金");
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.1", "房貸獎勵保費檢核檔(介紹人加碼獎金)",
+					"房貸獎勵保費檢核檔(介紹人加碼獎金)", "介紹人加碼獎金");
 
 			int row = 1;
 			makeExcel.setValue(row, 1, "戶號");
@@ -252,7 +253,8 @@ public class L5512Batch extends TradeBuffer {
 				}
 			}
 			// 3.檢核結果為Y且檢核工作月為本月，追回前月累計
-			if (iPf.getWorkMonth() < iWorkMonth && "Y".equals(tPfInsCheck.getCheckResult()) && tPfInsCheck.getCheckWorkMonth() == iWorkMonth) {
+			if (iPf.getWorkMonth() < iWorkMonth && "Y".equals(tPfInsCheck.getCheckResult())
+					&& tPfInsCheck.getCheckWorkMonth() == iWorkMonth) {
 				this.info("calculate 3 addBonusLM =" + addBonusLM);
 				// 追回前月業績，不超過前月累計
 				if (iPf.getIntroducerAddBonus().compareTo(BigDecimal.ZERO) > 0) {
@@ -374,7 +376,8 @@ public class L5512Batch extends TradeBuffer {
 
 		String msg = "共匯入" + cnt + "筆資料，可至L5054查詢匯入資料,【報表及製檔】下傳檢核檔";
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", iWorkYM + "9", msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", iWorkYM + "9", msg,
+				titaVo);
 		return cnt;
 
 	}
@@ -394,7 +397,8 @@ public class L5512Batch extends TradeBuffer {
 		List<Integer> typeList = new ArrayList<>();
 		typeList.add(7);
 
-		Slice<PfRewardMedia> slPfRewardMedia = pfRewardMediaService.findWorkMonth(iWorkYM, typeList, 0, this.index, this.limit, titaVo);
+		Slice<PfRewardMedia> slPfRewardMedia = pfRewardMediaService.findWorkMonth(iWorkYM, typeList, 0, this.index,
+				this.limit, titaVo);
 		List<PfRewardMedia> lPfRewardMedia = slPfRewardMedia == null ? null : slPfRewardMedia.getContent();
 
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5512.2", "介紹加碼獎金媒體檔", "TOTAL.txt", 2);
@@ -430,8 +434,11 @@ public class L5512Batch extends TradeBuffer {
 
 				String workMonth = String.valueOf(pfRewardMedia.getWorkMonth());
 				s += workMonth.substring(0, 4) + "/" + workMonth.substring(4, 6); // 業績年月(7)
+				s += ",";
 				s += "10H000"; // 申請單位代號(6)
+				s += ",";
 				s += "0000000001"; // 申請批號(10)
+				s += ",";
 
 				String employeeId = "";
 				CdEmp cdEmp = cdEmpService.findById(pfRewardMedia.getEmployeeNo(), titaVo);
@@ -442,24 +449,47 @@ public class L5512Batch extends TradeBuffer {
 				}
 
 				s += employeeId; // 身份證字號(10)
+				s += ",";
 				s += "Q1"; // 薪碼(2)
+				s += ",";
 				s += "放款獎勵津貼        "; // 薪碼說明
+				s += ",";
 
 				if (bbonus.compareTo(BigDecimal.ZERO) < 0) {
 					DecimalFormat df = new DecimalFormat("000000000");
 					s += df.format(bbonus);// 金額(10)
+					s += ",";
 				} else {
 					DecimalFormat df = new DecimalFormat("0000000000");
 					s += df.format(bbonus);// 金額(10)
+					s += ",";
 				}
 
 				s += "0000000000";// 業績(FYC)(10)
+				s += ",";
 				s += "0000000000";// 業績(FYP)(10)
-				s += String.format("%07d%03d", pfRewardMedia.getCustNo(), pfRewardMedia.getFacmNo()) + "000放款獎勵津貼               ";// 轉發明細(40)
+				s += ",";
+				s += String.format("%07d%03d", pfRewardMedia.getCustNo(), pfRewardMedia.getFacmNo())
+						+ "000放款獎勵津貼               ";// 轉發明細(40)
+				s += ",";
 				s += "0000000000";// 計算基礎(10)
+				s += ",";
 				s += "00000.00";// FP跨售換算率(8)
+				s += ",";
 				s += "00000.00";// FC跨售換算率(8)
+				s += ",";
 				s += " ";// 跨售類別(1)
+				s += ",";
+
+				// 2022-12-08 Wei 增加 from 淳英提供新格式
+				s += "Z"; // 轉發類別(1) A:一般獎勵 C:人件費 Z:特殊拆分
+				s += ",";
+				s += "                    "; // 專案代碼(20)
+				s += ",";
+				s += "                  "; // 沖銷碼
+				s += ",";
+				s += "10H000"; // 成本單位代號
+				
 				makeFile.put(s);
 				cnt++;
 			}
@@ -468,10 +498,12 @@ public class L5512Batch extends TradeBuffer {
 		if (cnt > 0) {
 			makeFile.close();
 			msg = "共產製 " + cnt + "筆媒體檔資料,請至【報表及製檔】作業,下傳【媒體檔】";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", String.format("%-8s", titaVo.getTlrNo().trim()) + "L5512", msg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					String.format("%-8s", titaVo.getTlrNo().trim()) + "L5512", msg, titaVo);
 		} else {
 			msg = "共產製 " + cnt + "筆媒體檔資料";
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", workYM + "9", msg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", workYM + "9", msg,
+					titaVo);
 		}
 
 		// 寫入交易控制檔
@@ -497,7 +529,8 @@ public class L5512Batch extends TradeBuffer {
 		List<Integer> typeList = new ArrayList<>();
 		typeList.add(7);
 
-		Slice<PfRewardMedia> slPfRewardMedia = pfRewardMediaService.findWorkMonth(iWorkYM, typeList, 1, this.index, this.limit, titaVo);
+		Slice<PfRewardMedia> slPfRewardMedia = pfRewardMediaService.findWorkMonth(iWorkYM, typeList, 1, this.index,
+				this.limit, titaVo);
 		List<PfRewardMedia> lPfRewardMedia = slPfRewardMedia == null ? null : slPfRewardMedia.getContent();
 
 		int cnt = 0;
@@ -522,7 +555,8 @@ public class L5512Batch extends TradeBuffer {
 		}
 
 		msg = "共取消" + cnt + "筆資料";
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", workYM + "9", msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L5054", workYM + "9", msg,
+				titaVo);
 
 		return cnt;
 	}

@@ -89,7 +89,8 @@ public class L9136 extends TradeBuffer {
 			infoNotification = "L9136 檔案資料變更日報表";
 
 		} else {
-
+			this.info("L9136report no data ");
+			L9136Report.exec(titaVo, l9136List, l9136List2, acDateStart, acDateEnd);
 			infoNotification = "L9136 查無資料";
 
 		}

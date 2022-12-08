@@ -100,7 +100,7 @@ public class L9136Report extends MakeReport {
 	 * @return
 	 * @throws LogicException
 	 */
-	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9136Result,
+	public void exec(TitaVo titaVo, List<Map<String, String>> l9136Result,
 			List<Map<String, String>> l9136Result2, int isAcDate, int ieAcDate) throws LogicException {
 
 		this.info("L9136Report exec");
@@ -226,7 +226,6 @@ public class L9136Report extends MakeReport {
 
 		this.close();
 
-		return l9136List;
 
 	}
 

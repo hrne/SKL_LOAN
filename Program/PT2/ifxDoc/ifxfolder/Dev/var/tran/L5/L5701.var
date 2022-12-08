@@ -942,7 +942,7 @@ C(4,#NegFinShareFinCode{i},S,$)
 IF(#CaseKindCode=="1",s,$)
 IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#TotalContrAmt*100),$)
-IF(#FunctionCode=="02",C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},C(3,#TotalContrAmt,#L5r01TotalContrAmt,E(0,@NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i}),E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#TotalContrAmt*100)),E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#L5r01TotalContrAmt*100)),$)
+IF(#FunctionCode=="02",C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},C(3,#TotalContrAmt,#L5r01TotalContrAmt,E(0,@NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i}),E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#RimContractAmtX*100)),E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#RimContractAmtX*100)),$)
 ! E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/#TotalContrAmt*100)
 ! E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/#TotalContrAmt)
 
