@@ -117,7 +117,6 @@ BEGIN
       LEFT JOIN NOW_INSUNO ON NOW_INSUNO.INSNUM2 = TRIM(INSP."INSNUM")
       WHERE INSP."Seq" = 1
         AND NVL(CNM."ClNo",0) > 0 -- 擔保品存在
-        AND (INSP."INSPRM" + INSP."INSEPM") > 0
         AND NVL(INSP."INSIID",' ') != ' '
         AND NVL(NOW_INSUNO.INSNUM2,' ') = ' '
       GROUP BY CNM."ClCode1"

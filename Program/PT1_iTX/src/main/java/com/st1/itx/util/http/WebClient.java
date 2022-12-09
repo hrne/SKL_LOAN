@@ -52,7 +52,7 @@ public class WebClient extends SysLogger {
 
 		String msgNo = "";
 
-		String url = FormatUtil.padX(vDate, 8) + FormatUtil.padX(vTime, 4) + FormatUtil.pad9(msgNo, 5) + FormatUtil.padX(msg, 200);
+		String url = FormatUtil.padX(vDate, 8) + FormatUtil.padX(vTime, 4) + FormatUtil.pad9(msgNo, 5) + FormatUtil.padX(msg.replaceAll("\\.", "%20"), 200);
 		url += FormatUtil.padX(mode, 1);
 		url += FormatUtil.padX(txCode, 5);
 		url += params;

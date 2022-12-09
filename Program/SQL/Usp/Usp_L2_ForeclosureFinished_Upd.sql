@@ -106,15 +106,15 @@ BEGIN
     commit;
 
     -- 例外處理
-    Exception
-    WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L2_ForeclosureFinished_Upd' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , EmpNo -- 發動預存程序的員工編號
-    );
+    -- Exception
+    -- WHEN OTHERS THEN
+    -- "Usp_L9_UspErrorLog_Ins"(
+    --     'Usp_L2_ForeclosureFinished_Upd' -- UspName 預存程序名稱
+    --   , SQLCODE -- Sql Error Code (固定值)
+    --   , SQLERRM -- Sql Error Message (固定值)
+    --   , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+    --   , EmpNo -- 發動預存程序的員工編號
+    -- );
   END;
 END;
 

@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L4321ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -45,11 +46,11 @@ public class L4321Report extends MakeReport {
 	}
 
 	private int iAdjCode = 0;
-	private long sno;
+//	private long sno;
 	private String fileNm = "";
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
-	public long exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo) throws LogicException {
 		this.iAdjCode = parse.stringToInteger(titaVo.get("AdjCode"));
 
 		this.fileNm = titaVo.getParam("FileNm");
@@ -64,22 +65,47 @@ public class L4321Report extends MakeReport {
 //		defaultExcel 預設excel底稿檔
 //		defaultSheet 預設sheet,可指定 sheet index or sheet name
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd =  titaVo.getTxcd();
+		String fileItem = fileNm;
+		String fileName = fileNm;
+		String defaultExcel = "";
+		String defaultSheet = "";
+		
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+		
 		switch (this.iAdjCode) {
 		case 1:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
-					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+//					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+			defaultExcel = "L4321_LNW171E底稿(10909調息檔)機動.xlsx";
+			defaultSheet ="正常件";
 			break;
 		case 2:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
-					"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
+//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+//					"L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
+			defaultExcel = "L4321_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx";
+			defaultSheet ="正常件";
 			break;
 		case 3:
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
-					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+//			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+//					"L4321_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+			defaultExcel = "L4321_LNW171E底稿(10909調息檔)機動.xlsx";
+			defaultSheet ="正常件";
 			break;
 		default:
 			break;
 		}
+		
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		
+		
 		try {
 			fnAllList = L4321ServiceImpl.findAll(1, titaVo);
 		} catch (Exception e) {
@@ -138,10 +164,8 @@ public class L4321Report extends MakeReport {
 			}
 		}
 
-		sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
 
-		return sno;
 	}
 
 }

@@ -3,7 +3,7 @@
 --------------------------------------------------------
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "Usp_L2_CustDataCtrl_Ins" 
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L2_CustDataCtrl_Ins" 
 (
     -- 參數
     TBSDYF         IN  INT,        -- 系統會計日期(西元)
@@ -100,15 +100,15 @@ BEGIN
     commit;
 
     -- 例外處理
-    Exception
-    WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L2_CustDataCtrl_Ins' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , EmpNo -- 發動預存程序的員工編號
-    );
+    -- Exception
+    -- WHEN OTHERS THEN
+    -- "Usp_L9_UspErrorLog_Ins"(
+    --     'Usp_L2_CustDataCtrl_Ins' -- UspName 預存程序名稱
+    --   , SQLCODE -- Sql Error Code (固定值)
+    --   , SQLERRM -- Sql Error Message (固定值)
+    --   , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+    --   , EmpNo -- 發動預存程序的員工編號
+    -- );
   END;
 END;
 

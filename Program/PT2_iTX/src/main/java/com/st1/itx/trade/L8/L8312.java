@@ -213,6 +213,9 @@ public class L8312 extends TradeBuffer {
 		case "4": // 需刷主管卡
 			iKey = titaVo.getParam("Ukey");
 			iJcicZ051 = sJcicZ051Service.ukeyFirst(iKey, titaVo);
+			//JcicZ051 uJcicZ0512 = new JcicZ051();
+			//uJcicZ0512 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
+			iJcicZ051 = sJcicZ051Service.findById(iJcicZ051Id);
 			if (iJcicZ051 == null) {
 				throw new LogicException("E0004", "刪除資料不存在");
 			}
@@ -221,9 +224,11 @@ public class L8312 extends TradeBuffer {
 			if (uJcicZ0512 == null) {
 				throw new LogicException("E0004", "刪除資料不存在");
 			}
-			iJcicZ051 = sJcicZ051Service.findById(iJcicZ051Id);
+			//if (iJcicZ051 == null) {
+			//	throw new LogicException("E0008", "");
+			//}
 			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer, titaVo, "E0004", "刪除資料不存在");
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			
 			JcicZ051 oldJcicZ0512 = (JcicZ051) iDataLog.clone(uJcicZ0512);

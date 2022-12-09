@@ -24,12 +24,22 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER TABLE "DailyTav" ENABLE PRIMARY KEY'; 
  
     -- 寫入資料 
-    INSERT INTO "DailyTav" 
+    INSERT INTO "DailyTav" (
+        "AcDate"              -- 會計日期 DECIMAL 8   
+      , "CustNo"              -- 借款人戶號 DECIMAL 7   
+      , "FacmNo"              -- 額度編號 DECIMAL 3  
+      , "SelfUseFlag"         -- 額度自用記號 VARCHAR2 1   
+      , "TavBal"              -- 暫收款餘額 DECIMAL 16 2 
+      , "LatestFlag"          -- 最新記號 VARCHAR2 1  
+      , "AcctCode"
+      , "CreateDate"          -- 建檔日期時間 DATE   
+      , "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
+      , "LastUpdate"          -- 最後更新日期時間 DATE   
+      , "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
+    )
     WITH lastDateData AS ( 
       SELECT MAX(BKPDAT) AS MAX_BKPDAT 
       FROM LADACTP ACTP 
-      WHERE ACTP.LMSACN NOT IN (601776,610940) 
-      -- 2022-05-19 智偉增加 from Lai : 暫收款排除610940 
     ) 
     , OrderedFacmNo AS ( 
       SELECT "CustNo" 
@@ -73,8 +83,8 @@ BEGIN
       LEFT JOIN lastDateData ON lastDateData.MAX_BKPDAT = ACTP.BKPDAT 
       LEFT JOIN OrderedFacmNo OFN ON OFN."CustNo" = ACTP.LMSACN 
                                  AND OFN."FacmNoSeq" = 1 
-                                 AND NVL(lastDateData.MAX_BKPDAT,0) != 0 -- 2022-10-12 Wei 最新一筆才判斷額度號碼 
-      WHERE ACTP.LMSACN NOT IN (601776,610940) 
+                                 AND NVL(lastDateData.MAX_BKPDAT,0) != 0
+                                 -- 2022-10-12 Wei 最新一筆才判斷額度號碼 
     ) 
     SELECT TMP.BKPDAT                     AS "AcDate"              -- 會計日期 DECIMAL 8   
          , TMP.LMSACN                     AS "CustNo"              -- 借款人戶號 DECIMAL 7   
@@ -85,6 +95,13 @@ BEGIN
            ELSE 'N' END                   AS "SelfUseFlag"         -- 額度自用記號 VARCHAR2 1   
          , TMP.LMSTOA                     AS "TavBal"              -- 暫收款餘額 DECIMAL 16 2 
          , TMP."LatestFlag"               AS "LatestFlag"          -- 最新記號 VARCHAR2 1   
+         -- 2022-12-08 Wei 增加 from Lai
+         , CASE
+             WHEN TMP.LMSACN = 601776
+             THEN 'T10'
+             WHEN TMP.LMSACN = 610940
+             THEN 'TLD'
+           ELSE 'TAV' END                 AS "AcctCode"
          , JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
          , '999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
          , JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE   

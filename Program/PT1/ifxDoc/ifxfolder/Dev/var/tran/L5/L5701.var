@@ -390,7 +390,10 @@ T(H,#FunctionCode,#FunctionCodeHelp)
 !C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
 K(MODIFYBUTTON,#FunctionCodeX)
 C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
-E(0,@FUNCIND,#FunctionCode)
+
+#FUNCIND=_,_,S
+E(0,#FunctionCode)
+IF(#FunctionCode==06||#FunctionCode==07||#FunctionCode==08||#FunctionCode==09||#FunctionCode==11,E(0,2),$)
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S

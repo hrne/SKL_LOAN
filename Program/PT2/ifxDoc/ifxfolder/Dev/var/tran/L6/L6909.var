@@ -260,7 +260,8 @@ C(3,#OOTAVCr,0,S,$)
 !暫收餘額
 #OOTAVBal=+m,14.2,S
 #OOTAVBalX=X,22,L
-C(3,#OOTAVBal,0,S,$)
+!C(3,#OOTAVBal,0,S,$)
+
 CALL2(#ADJUSTDOT,#Precision,#OOTAVBal,#OOTAVBalX)
 P(R,#OOTAVBalX)
 ! C(3,#OOTAVBal,0,S,$)

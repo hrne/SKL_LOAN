@@ -1,0 +1,270 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5102)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5102" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5102]                                 授信審議委員會會議紀錄維護"],
+[#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
+[#<->#,"#FdMeetingDate+日期",#MeetingDate],
+[#<->#,"#FdIssue+議題",#Issue],
+[#<->#,"#FdCustCode+事項",#CustCode,#CustCodeX],
+[#<->#,"#FdAmount+金額+(+千元+)",#Amount],
+[#<->#,"#FdRemark+備註",#Remark],
+]
+
+#FdFunctionCodeX=X,2,L
+#FdMeetingDate=X,2,L
+T(3,*)
+#FdIssue=X,2,L
+T(3,*)
+
+#FdCustCode=X,2,L
+T(3,*)
+#FdAmount=X,2,L
+#FdRemark=X,2,L
+
+!<include src="ROM.icf::L5R49.dec"/>  
+!#RimL5R49=X,1,S 
+!#RimFunCd=X,1,S
+!T(2,1)
+!RESET_RIM(#RimL5R49,L5R49)
+!S(L5R49,1,#RimFunCd)
+!R(1,L5R49)
+!T(2,@FileNo,#L5R49FileNo)
+
+
+
+!---------- AP TEXT AREA Variables ----------
+
+! #BTNA=X,94,I,ui:button;value:瀏覽;enable:1;tabbable:0
+
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 功能下拉選單
+#EntCodeRimName=x,20,S
+T(3,CdCode.InnEntCode)
+#EntCodeHelpRim=X,1,S
+RESET_RIM(#EntCodeHelpRim,XXR99)
+S(XXR99,01,#EntCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@InnEntCodeHelp,#HelpDesc1)
+#InnEntCodeHelp=x,1024,S
+
+!功能
+#FuncHelp=X,50,S
+T(3,1:新增;2:修改;4:刪除;5:查詢)
+
+#FuncHelp1=X,50,S
+T(3,2:修改;4:刪除;5:查詢)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5902進入),$)
+C(3,#CHAIN,1,E(0,@FunctionCode,1),s)
+
+#NTXBUF=x,579,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCode,#NTXBUF,1,1)
+T(1,@MeetingDate,#NTXBUF,2,7)
+T(1,@CustCode,#NTXBUF,9,1)
+T(1,@AmountX,#NTXBUF,10,14)
+T(1,@MeetNo,#NTXBUF,24,6)
+T(1,@Issue,#NTXBUF,30,50)
+T(1,@Remark,#NTXBUF,80,500)
+
+
+INVOKEJS(SHOW,p1,02,02,1)
+
+#AmountX=X,20,O
+
+#Convert=A,1,O
+E(0,@Amount,#AmountX)
+
+#Space=X,1,S
+C(3,#FunctionCode,1,S,$)
+T(H,@CustCodeX,#CustCode,#InnEntCodeHelp)
+
+C(2,#FunctionCode,s,s,T(3,@FdMeetingDate, ),T(3,@FdMeetingDate, )T(3,@FdCustCode, ),T(3,@FdMeetingDate, )T(3,@FdCustCode, ),T(3,@FdMeetingDate, )T(3,@FdCustCode, ))
+
+! 功能
+#FunctionCode=A,1,S
+C(3,#CHAIN,0,E(0,@FunctionCode,1),HELP(#FuncHelp1))
+C(3,#CHAIN,0,s,$)
+C(3,#FunctionCode,2,$,s)
+@C(3,#CHAIN,0,V(1,1),V(H,#FuncHelp))
+E(0,@FUNCIND,#FunctionCode)
+
+#FunctionCodeX=X,4,L
+T(H,#FunctionCode,#FuncHelp)
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+!C(3,#FunctionCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+
+!顯示框線
+#WKTF=X,1,S
+SWITCH(#FunctionCode,
+1,
+T(F,@MeetingDate,1)
+T(F,@Issue,1)
+T(F,@CustCode,1)
+T(F,@Amount,1)
+T(F,@Remark,1),
+2,
+T(F,@MeetingDate,0)
+T(F,@Issue,1)
+T(F,@CustCode,1)
+T(F,@Amount,1)
+T(F,@Remark,1),
+4,
+T(F,@MeetingDate,0)
+T(F,@Issue,0)
+T(F,@CustCode,0)
+T(F,@Amount,0)
+T(F,@Remark,0),
+5,
+T(F,@MeetingDate,0)
+T(F,@Issue,0)
+T(F,@CustCode,0)
+T(F,@Amount,0)
+T(F,@Remark,0)
+)
+
+! !<瀏覽>
+! #BUFA=X,74,S
+! T(2,#MeetingDate)
+! #BINDA=X,1,S
+! BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L5902; ntxbuf=#BUFA})
+
+
+#TODAY=A,7,S
+T(1,#SYSCDATE,2,7)
+C(2,#FunctionCode,s,$,s,s,s,s)
+E(0,@MeetingDate,#TODAY)
+
+
+! 日期
+#MeetingDate=D,7,I
+! C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
+C(2,#FunctionCode,s,$,s,s,s,s)
+@V(7)
+A(DATE,0,#MeetingDate)
+
+
+! 議題
+#Issue=X,50,I
+C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
+@
+V(7)
+
+#LC014Note=X,100,S
+T(2,授信審議委員會會議紀錄/+#MeetingDate+ +#Issue)
+
+#LC014Mrkey=X,100,S
+T(2,#MeetNo)
+
+#BufLC014=X,250,S
+T(2,L5102+0000000+000+000+#LC014Mrkey+#LC014Note)
+
+#button2=x,100,S
+C(3,#FunctionCode,5,$,S)
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,上傳附件)
+
+#button3=x,100,S
+C(3,#FunctionCode,5,$,S)
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,上傳附件查詢)
+
+! 戶別
+#CustCode=X,1,I
+C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
+HELP(#InnEntCodeHelp)
+@T(3,@CustCodeX,)
+V(H,#InnEntCodeHelp)
+#CustCodeX=X,30,L
+T(H,#CustCode,#InnEntCodeHelp)
+
+! 金額
+#Amount=m,14,I
+C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
+
+! 備註
+#Remark=x,10.50,I
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
+
+! 放審會流水號
+#MeetNo=A,6,S
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5102 -----------
+<sub type="FORM" name="L5102">
+
+
+#LC014Mrkey=_,_,S
+T(2,#MeetNo)
+
+#BufLC014=_,_,S
+T(2,L5102+0000000+000+000+#LC014Mrkey+#LC014Note)
+
+#button2=_,_,S
+T(2,{cmd=CHAIN; ntxcd=LC104; ntxbuf=#BufLC014})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,上傳附件)
+
+#button3=_,_,S
+T(2,{cmd=CHAIN; ntxcd=LC014; ntxbuf=#BufLC014})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,上傳附件查詢)
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCode
+#MeetingDate
+#CustCode
+#Amount
+#MeetNo
+#Issue
+#Remark
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R49.tom"/>
+TXFORM=L5102
+#MeetNo
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

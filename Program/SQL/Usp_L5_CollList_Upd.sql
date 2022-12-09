@@ -23,19 +23,13 @@ BEGIN
     JOB_START_TIME := SYSTIMESTAMP;
 
     -- 刪除舊資料
-    -- DBMS_OUTPUT.PUT_LINE('DELETE CollListTmp');
-
     DELETE FROM "CollListTmp";
 
---   step 1  同擔保品取嚴重等級最高者為同擔保品額度
---
---      step 2  同額度有多筆同擔保品額度取嚴重等級最高者為新同擔保品額度 
---
---      step 3  以新同擔保品額度更新同擔保品額度 
+     -- step 1  同擔保品取嚴重等級最高者為同擔保品額度
+     -- step 2  同額度有多筆同擔保品額度取嚴重等級最高者為新同擔保品額度 
+     -- step 3  以新同擔保品額度更新同擔保品額度 
 
     -- 寫入暫存資料
-    -- DBMS_OUTPUT.PUT_LINE('INSERT CollListTmp');
-
     INSERT INTO "CollListTmp"
     SELECT M."CustNo"                        AS "CustNo"              -- '戶號';
           ,M."FacmNo"                        AS "FacmNo"              -- '額度';
@@ -118,15 +112,15 @@ BEGIN
                      WHEN  9  THEN  '89' 
                  END)                                                                                                           
                        AS "Status"      
--- 1     -- 6.呆帳戶
--- 2     -- 7.部分轉呆戶
--- 3     -- 2.催收戶
--- 4     -- 4.逾期戶
--- 5     -- 0.正常戶
--- 6     -- 5.催收結案戶
--- 7     -- 8.債權轉讓戶
--- 8     -- 9.呆帳結案戶
--- 9     -- 3.結案戶
+               -- 1     -- 6.呆帳戶
+               -- 2     -- 7.部分轉呆戶
+               -- 3     -- 2.催收戶
+               -- 4     -- 4.逾期戶
+               -- 5     -- 0.正常戶
+               -- 6     -- 5.催收結案戶
+               -- 7     -- 8.債權轉讓戶
+               -- 8     -- 9.呆帳結案戶
+               -- 9     -- 3.結案戶
                  -- '戶況';                                  BorMain                Overdue                  NegMain          
                  --     逾期/催收戶           04,06                             
                  --     正常/呆帳戶-全部      02~10          
@@ -166,18 +160,15 @@ BEGIN
                      AND C."CustNo"      = M."CustNo" 
                      AND C."FacmNo"      = M."FacmNo"        -- 擔保品與額度關聯檔
                      AND C."MainFlag"    = 'Y'               -- 主要擔保品
-          LEFT  JOIN  "FacMain" F  ON F."CustNo" = M."CustNo" AND F."FacmNo"  = M."FacmNo"  
-
+        LEFT  JOIN  "FacMain" F  ON F."CustNo" = M."CustNo" AND F."FacmNo"  = M."FacmNo"  
         ;
---    step 1  擔保品相同取嚴重等級最高者為同擔保品額度
---     100-4 A       1 100-4 
---     100-1 A       2 100-1 -> 100-4 
---     200-1 A       3 200-1 -> 100-4 
+     --    step 1  擔保品相同取嚴重等級最高者為同擔保品額度
+     --     100-4 A       1 100-4 
+     --     100-1 A       2 100-1 -> 100-4 
+     --     200-1 A       3 200-1 -> 100-4 
 
---     100-3 B       1 100-3 
---     100-4 B       2 100-4 -> 100-3
-
-    DBMS_OUTPUT.PUT_LINE('step 1 UPDATE CollListTmp ');
+     --     100-3 B       1 100-3 
+     --     100-4 B       2 100-4 -> 100-3
     MERGE INTO "CollListTmp" T2
     USING (SELECT "ClCustNo"
                  ,"ClFacmNo"
@@ -194,17 +185,13 @@ BEGIN
        )
     WHEN MATCHED THEN UPDATE SET T2."ClCustNo" = T1."ClCustNo"
                                 ,T2."ClFacmNo" = T1."ClFacmNo"
-
     ;
---      step 2  同額度有多筆同擔保品額度取嚴重等級最高者為新同擔保品額度 
---     100-4 A       1         100-4    2
---     100-1 A       2         100-4    1
---     200-1 A       3         100-4    1
---     100-3 B       1         100-3    1
---     100-4 B       2         100-3    1
-
-    DBMS_OUTPUT.PUT_LINE('step 2 UPDATE CollListTmp ');
-
+     --      step 2  同額度有多筆同擔保品額度取嚴重等級最高者為新同擔保品額度 
+     --     100-4 A       1         100-4    2
+     --     100-1 A       2         100-4    1
+     --     200-1 A       3         100-4    1
+     --     100-3 B       1         100-3    1
+     --     100-4 B       2         100-3    1
     MERGE INTO "CollListTmp" T2
     USING (SELECT ROW_NUMBER() Over (Partition By "CustNo", "FacmNo" Order By CASE "Status" 
                                             WHEN  0  THEN  '50'
@@ -235,17 +222,14 @@ BEGIN
      WHEN MATCHED THEN UPDATE SET T2."ClRowNo" = T1.ROW_NO
      ;
 
---      step 3  以新同擔保品額度更新同擔保品額度 
---     100-4 B       1         100-3  
---     100-4 A       2         100-4  -> 100-3 
---     100-4 A       2         100-4  -> 100-3 
---     100-1 A       1         100-4  -> 100-3 
---     200-1 A       1         100-4  -> 100-3  
---     100-3 B       1         100-3 
---     100-4 B       1         100-3  
-
-    DBMS_OUTPUT.PUT_LINE('step 3 UPDATE CollListTmp ');
-
+     --      step 3  以新同擔保品額度更新同擔保品額度 
+     --     100-4 B       1         100-3  
+     --     100-4 A       2         100-4  -> 100-3 
+     --     100-4 A       2         100-4  -> 100-3 
+     --     100-1 A       1         100-4  -> 100-3 
+     --     200-1 A       1         100-4  -> 100-3  
+     --     100-3 B       1         100-3 
+     --     100-4 B       1         100-3  
     MERGE INTO "CollListTmp" T3
     USING ( SELECT
              T2."CustNo"     AS "CustNo"
@@ -276,17 +260,12 @@ BEGIN
                                 ,T3."ClFacmNo" = S1."ClFacmNo"
     ;
 
---      step 4  刪除同擔保品額度非嚴重等級最高的重複額度
-
-    DBMS_OUTPUT.PUT_LINE('step 4 DELETE CollListTmp ClRowNo > 1');
-
+    -- step 4  刪除同擔保品額度非嚴重等級最高的重複額度
     DELETE FROM "CollListTmp" T
     WHERE T."ClRowNo" > 1
     ;
 
---      step 5  重編同擔保品序列號
-
-    DBMS_OUTPUT.PUT_LINE('step 5 RESET CollListTmp ClRowNo');
+    -- step 5  重編同擔保品序列號
     MERGE INTO "CollListTmp" T2
     USING (SELECT ROW_NUMBER() Over (Partition By "ClCustNo", "ClFacmNo" Order By CASE "Status" 
                                             WHEN  0  THEN  '50'
@@ -317,10 +296,8 @@ BEGIN
      WHEN MATCHED THEN UPDATE SET T2."ClRowNo" = T1.ROW_NO
      ;
 
- ------- 債務協商案件---------------
+    ------- 債務協商案件---------------
     -- 寫入暫存資料
-
-    DBMS_OUTPUT.PUT_LINE('INSERT CollListTmp from NegMain');
 
     INSERT INTO "CollListTmp"
     SELECT N."CustNo"                 AS "CustNo"              -- '戶號';
@@ -371,56 +348,9 @@ BEGIN
            WHERE "Status" not in ('1','4')  -- 排除 1.已變更 4.未生效
           ) N
      WHERE N.ROW_NUMBER = 1
-     ;                  
- ------- 寫入法催紀錄清單檔 --------------
-    DBMS_OUTPUT.PUT_LINE('INSERT CollList');
-
-    /*
-    INSERT INTO "CollList"
-    SELECT T."CustNo"                 AS "CustNo"              -- '戶號';
-          ,T."FacmNo"                 AS "FacmNo"              -- '額度';
-          ,T."CaseCode"               AS "CaseCode"            -- '案件種類';
-          ,0                          AS "TxDate"              -- '作業日期';
-          ,' '                        AS "TxCode"              -- '作業項目'; 
-          ,T."PrevIntDate"            AS "PrevIntDate"         -- '繳息迄日';
-          ,T."NextIntDate"            AS "NextIntDate"         -- '應繳息日';
-          ,CASE WHEN T."NextIntDate" = 0 OR T."NextIntDate" >= TBSDYF   THEN  0 
-                ELSE TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(T."NextIntDate",'YYYYMMDD')))
-           END                         AS "OvduTerm"            -- '逾期期數';
-          ,CASE WHEN  T."NextIntDate" = 0 OR T."NextIntDate" >= TBSDYF  THEN  0 
-                ELSE  TO_DATE(TBSDYF,'YYYYMMDD')  - TO_DATE(T."NextIntDate",'YYYYMMDD') 
-                END                   AS "OvduDays"            -- '逾期天數';
-          ,T."CurrencyCode"           AS "CurrencyCode"        -- '幣別';
-          ,T."PrinBalance"            AS "PrinBalance"         -- '本金餘額';
-          ,T."BadDebtBal"             AS "BadDebtBal"          -- '呆帳餘額'; 
-          ,' '                        AS "AccCollPsn"          -- '催收員';
-          ,' '                        AS "LegalPsn"            -- '法務人員';
-          ,T."Status"                 AS "Status"              -- '戶況';
-          ,T."AcctCode"               AS "AcctCode"            -- 業務科目代號
-          ,T."FacAcctCode"            AS "FacAcctCode"         -- 額度業務科目   
-          ,T."ClCustNo"               AS "ClCustNo"            -- '同擔保品戶號';
-          ,T."ClFacmNo"               AS "ClFacmNo"            -- '同擔保品額度';
-          ,T."ClRowNo"                AS "ClRowNo"             -- '同擔保品序列號';
-          ,T."RenewCode"              AS "RenewCode"           -- 空白、1.展期一般 2.展期協議 
-          ,T."AcDate"                 AS "AcDate"              -- 會計日期
-          ,T."CreateDate"             AS "CreateDate"          -- 建檔日期時間  
-          ,T."CreateEmpNo"            AS "CreateEmpNo"         -- 建檔人員 
-          ,T."LastUpdate"             AS "LastUpdate"          -- 最後更新日期時間  
-          ,T."LastUpdateEmpNo"        AS "LastUpdateEmpNo"     -- 最後更新人員 
-    FROM "CollListTmp" T
-    WHERE  NOT EXISTS ( SELECT C."CustNo"
-                        FROM "CollList" C 
-                        WHERE C."CustNo" = T."CustNo"
-                         AND  C."FacmNo" = T."FacmNo"
-                      )
-    ;
-
-    INS_CNT := INS_CNT + sql%rowcount;
-    */
-
- -------  更新資料  ------- 
-    DBMS_OUTPUT.PUT_LINE('UPDATE CollList');
-
+     ;
+    
+    -------  更新資料  -------
     MERGE INTO "CollList" C
     USING ( 
       WITH "rawData" AS (
@@ -825,13 +755,13 @@ BEGIN
     -- 例外處理
     Exception
     WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L5_CollList_Upd' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , EmpNo -- 發動預存程序的員工編號
-    );
+--     "Usp_L9_UspErrorLog_Ins"(
+--         'Usp_L5_CollList_Upd' -- UspName 預存程序名稱
+--       , SQLCODE -- Sql Error Code (固定值)
+--       , SQLERRM -- Sql Error Message (固定值)
+--       , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+--       , EmpNo -- 發動預存程序的員工編號
+--     );
   END;
 END;
 

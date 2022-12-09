@@ -26,6 +26,7 @@ BEGIN
       , "SelfUseFlag" -- 額度自用記號
       , "TavBal" -- 暫收款餘額
       , "LatestFlag" -- 最新記號
+      , "AcctCode"
       , "CreateDate"
       , "CreateEmpNo"
       , "LastUpdate"
@@ -40,6 +41,8 @@ BEGIN
            ELSE 'N' END           AS "SelfUseFlag"
          , AR."RvBal"             AS "TavBal"
          , 'Y'                    AS "LatestFlag"
+         -- 2022-12-08 Wei 增加 from Lai
+         , AR."AcctCode"          AS "AcctCode"
          , AR."LastUpdate"        AS "CreateDate"
          , AR."LastUpdateEmpNo"   AS "CreateEmpNo"
          , AR."LastUpdate"        AS "LastUpdate"
@@ -50,7 +53,7 @@ BEGIN
                            AND DT."LatestFlag" = 'Y'
     LEFT JOIN "LoanFacTmp" LFT ON LFT."CustNo" = AR."CustNo"
                               AND LFT."FacmNo" = AR."FacmNo"
-    WHERE AR."AcctCode" = 'TAV'
+    WHERE AR."AcctCode" IN ('TAV','T10','TLD')
       AND NVL(DT."TavBal",0) != AR."RvBal"
     ;
 
@@ -87,14 +90,14 @@ BEGIN
     commit;
 
     -- 例外處理
-    Exception
-    WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L9_DailyTav_Ins' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , EmpNo -- 發動預存程序的員工編號
-    );
+    -- Exception
+    -- WHEN OTHERS THEN
+    -- "Usp_L9_UspErrorLog_Ins"(
+    --     'Usp_L9_DailyTav_Ins' -- UspName 預存程序名稱
+    --   , SQLCODE -- Sql Error Code (固定值)
+    --   , SQLERRM -- Sql Error Message (固定值)
+    --   , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+    --   , EmpNo -- 發動預存程序的員工編號
+    -- );
   END;
 END;

@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L5_InnReCheck_Upd" (
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L5_InnReCheck_Upd" (
    -- 參數
    TBSDYF IN INT , -- 系統營業日(西元)
    EMPNO  IN VARCHAR2 -- 經辦
@@ -27,12 +27,10 @@ BEGIN
 
     --
     -- 刪除舊資料
-        DBMS_OUTPUT.PUT_LINE('DELETE InnReCheck');
         DELETE "InnReCheck"
         WHERE "YearMonth" = TYYYYMM; 
 
     -- 寫入資料
-        DBMS_OUTPUT.PUT_LINE('INSERT InnReCheck 1-5');
         INSERT INTO "InnReCheck"
             SELECT TYYYYMM                AS "YearMonth"           --資料年月  
                  , CASE
@@ -133,8 +131,6 @@ BEGIN
 -- 04-個金100萬以上小於2000萬
 -- 05-企金未達3000萬
 -- 06-土地追蹤
---  
-        DBMS_OUTPUT.PUT_LINE('INSERT InnReCheck 6');
         INSERT INTO "InnReCheck"
             SELECT TYYYYMM             AS "YearMonth"           --資料年月  
                  , 6                   AS "ConditionCode"      --條件代碼  
@@ -203,18 +199,13 @@ BEGIN
             WHERE CF."ClCode1" = 2            -- 土地
                   AND M."LoanBal" > 0;
         INS_CNT := INS_CNT + SQL%ROWCOUNT;
-
--- 
---                 
+  
 -- 1  房地
 -- 2  土地
 -- 3  股票
 -- 4  其他有價證券
 -- 5  銀行保證
 -- 9  動產
--- 
--- 
--- 
 --  
 -- 1: 週轉金
 -- 2: 購置不動產
@@ -223,7 +214,6 @@ BEGIN
 -- 5: 企業投資
 -- 6: 購置動產
 -- 9: 其他                 
-        DBMS_OUTPUT.PUT_LINE('step 1 UPDATE InnReCheck ');
         MERGE INTO "InnReCheck" T2
         USING (
                   SELECT "CustNo"
@@ -249,22 +239,20 @@ BEGIN
           , T2."ReChkUnit" = T1."ReChkUnit"
           , T2."Remark" = T1."Remark";
         UPD_CNT := UPD_CNT + SQL%ROWCOUNT;
-        DBMS_OUTPUT.PUT_LINE('UPDATE END');
-
 
     -- 記錄程式結束時間
         JOB_END_TIME := SYSTIMESTAMP;
         COMMIT;
 
     -- 例外處理
-    Exception
-    WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L5_InnReCheck_Upd' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , EMPNO -- 發動預存程序的員工編號
-    );
+    -- Exception
+    -- WHEN OTHERS THEN
+    -- "Usp_L9_UspErrorLog_Ins"(
+    --     'Usp_L5_InnReCheck_Upd' -- UspName 預存程序名稱
+    --   , SQLCODE -- Sql Error Code (固定值)
+    --   , SQLERRM -- Sql Error Message (固定值)
+    --   , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+    --   , EMPNO -- 發動預存程序的員工編號
+    -- );
     END;
 END;

@@ -25,15 +25,11 @@ BEGIN
     JOB_START_TIME := SYSTIMESTAMP;
 
     -- 刪除舊資料
-    DBMS_OUTPUT.PUT_LINE('DELETE DailyLoanBal');
-
     DELETE FROM "DailyLoanBal"
     WHERE "DataDate" = TBSDYF
     ; 
 
     -- 寫入資料
-    DBMS_OUTPUT.PUT_LINE('INSERT DailyLoanBal');
-
     INSERT INTO "DailyLoanBal"
     SELECT TBSDYF                     AS "DataDate"            -- 資料日期
           ,M."CustNo"                 AS "CustNo"              -- 戶號 
@@ -53,7 +49,6 @@ BEGIN
           ,EmpNo                      AS "CreateEmpNo"         -- 建檔人員 
           ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間  
           ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員 
-
     FROM ( SELECT
             B."CustNo"                        AS "CustNo"           
            ,B."FacmNo"                        AS "FacmNo"   
@@ -154,8 +149,6 @@ BEGIN
     INS_CNT := INS_CNT + sql%rowcount;
 
 --   同撥款只有一筆日期最大著為最新
-    DBMS_OUTPUT.PUT_LINE('UPDATE LatestFlag');
-
     MERGE INTO "DailyLoanBal" M
     USING (SELECT "DataDate" 
                  ,"CustNo"
@@ -181,9 +174,6 @@ BEGIN
     UPD_CNT := UPD_CNT + sql%rowcount;
 
 --   更新 IntAmtRcv 	實收利息
-
-    DBMS_OUTPUT.PUT_LINE('UPDATE IntAmtRcv');
-
     MERGE INTO "DailyLoanBal" M
     USING (SELECT "CustNo"
                  ,"FacmNo"
@@ -202,7 +192,6 @@ BEGIN
 --IC2	中擔息
 --IC3	長擔息
 --IC4	三十年房貸息
-
     ON (    M."DataDate" = TBSDYF
         AND M."CustNo"  = T."CustNo"
         AND M."FacmNo"  = T."FacmNo"
@@ -214,7 +203,6 @@ BEGIN
 
 
 --   更新 IntAmtAcc 提存利息 月底日
-
    IF TBSDYF =  MFBSDYF THEN
     DBMS_OUTPUT.PUT_LINE('UPDATE IntAmtAcc');   
     MERGE INTO "DailyLoanBal" M
@@ -237,24 +225,20 @@ BEGIN
     UPD_CNT := UPD_CNT + sql%rowcount;
     END IF;   
 
-
-    DBMS_OUTPUT.PUT_LINE('UPDATE LatestFlag END');
-
-
     -- 記錄程式結束時間
     JOB_END_TIME := SYSTIMESTAMP;
 
     commit;
 
     -- 例外處理
-    Exception
-    WHEN OTHERS THEN
-    "Usp_L9_UspErrorLog_Ins"(
-        'Usp_L9_DailyLoanBal_Upd' -- UspName 預存程序名稱
-      , SQLCODE -- Sql Error Code (固定值)
-      , SQLERRM -- Sql Error Message (固定值)
-      , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
-      , EmpNo -- 發動預存程序的員工編號
-    );
+   --  Exception
+   --  WHEN OTHERS THEN
+   --  "Usp_L9_UspErrorLog_Ins"(
+   --      'Usp_L9_DailyLoanBal_Upd' -- UspName 預存程序名稱
+   --    , SQLCODE -- Sql Error Code (固定值)
+   --    , SQLERRM -- Sql Error Message (固定值)
+   --    , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+   --    , EmpNo -- 發動預存程序的員工編號
+   --  );
   END;
 END;

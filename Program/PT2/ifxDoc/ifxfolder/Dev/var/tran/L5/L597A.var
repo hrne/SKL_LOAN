@@ -180,7 +180,7 @@ T(H,#Export,#HelpExport)
 
 !最大債權已入帳04且細項為0,每一個細項製檔日可能不同,故不可選已製檔
 #CheckExport=X,1,S
-IF(#Export==1,$,S)
+@IF(#Export==1,$,S)
 IF(#SearchOption==04 && #SearchDetail==0,V(P,查詢已製檔資料時查詢細項不可為0),S)
 
 

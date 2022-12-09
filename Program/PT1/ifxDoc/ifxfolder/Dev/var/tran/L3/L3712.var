@@ -61,7 +61,7 @@ T(3,@FdNewSpecificDd,*)
 ["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
 ["#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
-["#FdFacmNo+額度編號",#FacmNo,"@@@@@@@"],
+["#FdFacmNo+額度編號",#FacmNo,#TmpFacmNoXX],
 ["#FdBormNo+撥款序號",#BormNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdPrevPayIntDate+繳息迄日",#PrevPayIntDateX],
@@ -69,6 +69,7 @@ T(3,@FdNewSpecificDd,*)
 ["#FdNewSpecificDd+新指定應繳日",#NewSpecificDd],
 ["#FdNewPayIntDate+應收息迄日",#NewPayIntDate],
 ["#FdInterest+利息",#InterestX],
+["#FdExcessive+累溢收",#ExcessiveXX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -281,6 +282,10 @@ RESET_RIM(#SendL2r05B,L2R05)
 S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
 R(1,L2R05)
 
+#TmpFacmNoX=X,50,S
+
+#TmpFacmNoXX=X,60,L
+
 ![撥款序號]
 #FdBormNo=X,2,L
 
@@ -311,7 +316,28 @@ C(3,#BormNo,0,s,T(2,#L3r02CurrencyCode))
 #Precision=N,1,S
 E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
 
-
+#SendL3r06A=X,1,S
+E(0,@RimFuncCode,2)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,0)
+T(2,@RimCurrencyCode,#CurrencyCode)
+E(0,@RimExtraRepay,0)
+T(2,@RimIncludeIntFlag,N)
+E(0,@RimRepayTerms,0)
+E(0,@RimRepayType,1)
+E(0,@RimEntryDate,#SYSDATE)
+E(0,@RimCloseBreachAmt,0)
+RESET_RIM(#SendL3r06A,L3R06)
+S(L3R06,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
+R(1,L3R06)
+T(2,@TmpFacmNoX,#L3r06tmpFacmNoX)
+C(4,#TmpFacmNoX,T(3,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#TmpFacmNoX))
+E(0,@Excessive,#L3r06Excessive)
+E(0,@ExcessiveAll,#L3r06ExcessiveAll)
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 
 ![繳息迄日]
 #FdPrevPayIntDate=X,2,L
@@ -410,6 +436,23 @@ E(0,#L3r08Interest)
 #InterestX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#Interest,#InterestX)
 
+
+!累溢收
+#FdExcessive=X,2,L
+
+#Excessive=m,14.2,S
+E(0,#L3r06Excessive)
+#ExcessiveAll=m,14.2,S
+E(0,#L3r06ExcessiveAll)
+
+#ExcessiveX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+#ExcessiveAllX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+#ExcessiveXX=X,50,L
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
+
+
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
@@ -419,6 +462,7 @@ C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L3R06.dec"/>
 <include src="ROM.icf::L3R08.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L3R02.dec"/>
@@ -457,6 +501,7 @@ TXFORM=L3712^
 <include src="COM.icf::LockControl.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L3R06.tom"/>
 <include src="ROM.icf::L3R08.tom"/>
 <include src="ROM.icf::L3R02.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
