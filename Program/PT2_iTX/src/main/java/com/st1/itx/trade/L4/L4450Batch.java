@@ -162,24 +162,29 @@ public class L4450Batch extends TradeBuffer {
 //	二扣應繳日：會計日前五個營業日（含本日），為基準計算上述之該日應繳日
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		int tbsdyf = txBuffer.getMgBizDate().getTbsDyf();
-		// 暫收抵繳整批入帳完畢，再產檔
-		BatxHead tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, "L4450", " ");
-		if (tBatxHead == null) {
-			tBatxHead = bs020.exec(titaVo, this.txBuffer);
-			this.info("BatchNo = " + tBatxHead.getBatchNo());
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
-					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(),
-					"請完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+		if ("L4450".equals(titaVo.getTxcd())) {
+			int tbsdyf = txBuffer.getMgBizDate().getTbsDyf();
+			// 暫收抵繳整批入帳完畢，再產檔
+			BatxHead tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, "L4450", " ");
+			if (tBatxHead == null) {
+				tBatxHead = bs020.exec(titaVo, this.txBuffer);
+				this.info("BatchNo = " + tBatxHead.getBatchNo());
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+						titaVo.getEntDyI() + "0" + titaVo.getTlrNo(),
+						"請完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+			}
+			if ("4".equals(tBatxHead.getBatxExeCode()) || "8".equals(tBatxHead.getBatxExeCode())) {
+				exec(titaVo);
+			} else {
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
+						titaVo.getEntDyI() + "0" + titaVo.getTlrNo(),
+						"請先完成或刪除暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+			}
 		}
-		if ("4".equals(tBatxHead.getBatxExeCode()) || "8".equals(tBatxHead.getBatxExeCode())) {
-			exec(titaVo);
-		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002",
-					titaVo.getEntDyI() + "0" + titaVo.getTlrNo(),
-					"請先完成或刪除暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+		// 單筆
+		if ("L4451".equals(titaVo.getTxcd())) {
+			exec(titaVo);			
 		}
-
 		return this.sendList();
 	}
 
@@ -297,7 +302,7 @@ public class L4450Batch extends TradeBuffer {
 				if (checkFlag) {
 					checkMsg = "銀行扣款合計報表已完成，總筆數=" + cnt;
 				}
-           
+
 				if (checkFlag) {
 					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 							titaVo.getTlrNo(), checkMsg, titaVo);
@@ -361,7 +366,7 @@ public class L4450Batch extends TradeBuffer {
 
 			if (checkFlag) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4943",
-						"1" + titaVo.getParam("CustNo") + "00000" + titaVo.getParam("EntryDate")
+						"1" + titaVo.getParam("CustNo") + titaVo.getParam("EntryDate")
 								+ titaVo.getParam("EntryDate"),
 						checkMsg, titaVo);
 			} else {

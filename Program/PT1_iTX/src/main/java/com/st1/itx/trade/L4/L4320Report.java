@@ -106,23 +106,27 @@ public class L4320Report extends MakeReport {
 				}
 				break;
 			case 2:
-				fileNm = fileNm1 + "-按地區別調整(已調整)";
+				fileNm = fileNm1 + "-按地區別調整";
 				titaVo.putParam("AdjCode", 2);
 				titaVo.putParam("RateKeyInCode", 1);
-				excelNo = 2;
+				if (this.iTxKind == 1) {
+					excelNo = 2;
+				} else {
+					excelNo = 4;
+				}
 				break;
 			case 3:
-				fileNm = fileNm1 + "-人工調整(未調整)";
+				fileNm = fileNm1 + "-人工調整_按合約(未調整)";
 				titaVo.putParam("AdjCode", 3);
 				titaVo.putParam("RateKeyInCode", 0);
-				if (this.iTxKind == 1 && this.iCustType == 1) {
-					excelNo = 2;
+				if (this.iTxKind == 1) {
+					excelNo = 1;
 				} else {
 					excelNo = 3;
 				}
 				break;
 			case 4:
-				fileNm = fileNm1 + "-人工調整(檢核有誤)";
+				fileNm = fileNm1 + "-人工調整_按合約(檢核有誤)";
 				titaVo.putParam("AdjCode", 3);
 				titaVo.putParam("RateKeyInCode", 9);
 				if (this.iTxKind == 1) {
@@ -132,8 +136,28 @@ public class L4320Report extends MakeReport {
 				}
 				break;
 			case 5:
-				fileNm = fileNm1 + "-檢核提醒件";
+				fileNm = fileNm1 + "-人工調整_按地區別(未調整)";
 				titaVo.putParam("AdjCode", 4);
+				titaVo.putParam("RateKeyInCode", 0);
+				if (this.iTxKind == 1) {
+					excelNo = 2;
+				} else {
+					excelNo = 4;
+				}
+				break;
+			case 6:
+				fileNm = fileNm1 + "-人工調整_按地區別(檢核有誤)";
+				titaVo.putParam("AdjCode", 4);
+				titaVo.putParam("RateKeyInCode", 9);
+				if (this.iTxKind == 1) {
+					excelNo = 2;
+				} else {
+					excelNo = 4;
+				}
+				break;
+			case 7:
+				fileNm = fileNm1 + "-檢核提醒件";
+				titaVo.putParam("AdjCode", 9);
 				titaVo.putParam("RateKeyInCode", 0);
 				if (this.iTxKind == 1) {
 					excelNo = 1;
@@ -163,9 +187,12 @@ public class L4320Report extends MakeReport {
 				} else if (excelNo == 2) {
 					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 							"L4320_LNW171E底稿(10909調息檔)定期機動-地區別調整.xlsx", "正常件");
-				} else {
+				} else if (excelNo == 3) {
 					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
 							"L4320_LNW171E底稿(10909調息檔)機動.xlsx", "正常件");
+				} else {
+					makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxcd(), fileNm, fileNm,
+							"L4320_LNW171E底稿(10909調息檔)機動-地區別調整.xlsx", "正常件");
 				}
 				String fdnm = "";
 //					從第幾列開始(表頭位置)
@@ -191,7 +218,7 @@ public class L4320Report extends MakeReport {
 //北投區 台北市	548040 2 1	        600,000 48,897 	1080319	    1090919	    1090810	 1E 退休滿五年員工 保單分紅利率  1.8600     0.35   1.7500
 
 // 地區別
-// +1         +2          
+//  json       json         
 //  地區別下限 地區別上限 
 //  1.85        2.8      
 
@@ -199,6 +226,11 @@ public class L4320Report extends MakeReport {
 // 17       18         19           20           21                
 // 撥款日  到期日  首次調整日期 利率調整週期 預定下次利率調整日 
 // 1050319 1340919	 1050810	   6          1060210
+
+// 機動
+// 17       18                    
+// 撥款日  到期日  
+// 1050319 1340919	 
 
 // 22
 // 檢核訊息
@@ -225,18 +257,23 @@ public class L4320Report extends MakeReport {
 							// 利率
 							ii++;
 							makeExcel.setValue(row, ii, tLDVo.get(fdnm), "#0.####");
-							if (excelNo == 2 && i == 16) {
-								ii++;
-								makeExcel.setValue(row, ii, tempVo.getParam("CityRateFloor"), "#0.####");
-								ii++;
-								makeExcel.setValue(row, ii, tempVo.getParam("CityRateCeiling"), "#0.####");
+							if (i == 16) {
+								if (excelNo == 2 || excelNo == 4) {
+									ii++;
+									makeExcel.setValue(row, ii, tempVo.getParam("CityRateFloor"), "#0.####");
+									ii++;
+									makeExcel.setValue(row, ii, tempVo.getParam("CityRateCeiling"), "#0.####");
+								}
 							}
 							break;
-						case 17:
-						case 18:
-						case 19:
-						case 20:
-						case 21:
+						case 17: // F17 撥款日期
+						case 18: // F18 到期日
+							ii++;
+							makeExcel.setValue(row, ii, tLDVo.get(fdnm));
+							break;
+						case 19:  // F19 首次調整日期
+						case 20:  // F20 利率調整週期
+						case 21:  // F21預定下次利率調整日
 							if (this.iTxKind == 1) {
 								ii++;
 								makeExcel.setValue(row, ii, tLDVo.get(fdnm));

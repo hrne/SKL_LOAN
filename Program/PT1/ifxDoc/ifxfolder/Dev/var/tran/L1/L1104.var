@@ -122,6 +122,7 @@ T(2,@RimTxCode,#TXCD)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustId,#NTXBUF,2,8)
 
+
 #TypeCodeHelp=x,100,S
 T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
 
@@ -1180,6 +1181,10 @@ IF(#EmailAft==#EmailBef,T(3,),T(3,X))
 #IncomeofyearlyInd=_,_,L
 IF(#IncomeofyearlyAft==#IncomeofyearlyBef,T(3,),T(3,X))
 
+#YearMonthOfToday=X,5,S
+T(1,#SYSCDATE7,1,5)
+ALERT(#SYSCDATE7)
+ALERT(#YearMonthOfToday)
 !年收入資料年月
 #IncomeDataDateBef=X,5,L
 
@@ -1197,7 +1202,7 @@ A(YM,0,#IncomeDataDateAft)
 
 #IncomeDataDateInd=_,_,L
 IF(#IncomeDataDateAft==#IncomeDataDateBef,T(3,),T(3,X))
-
+IF(#IncomeDataDateAft>#YearMonthOfToday,V(P,年收入資料年月不可大於日曆日),$)
 
 
 !串IND IF空白跳ERROR

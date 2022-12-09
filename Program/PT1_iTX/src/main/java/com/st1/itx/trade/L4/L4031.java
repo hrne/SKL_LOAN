@@ -79,197 +79,223 @@ public class L4031 extends TradeBuffer {
 		sBatxRateChange = batxRateChangeService.custCodeEq(iDate, iDate, custCode1, custCode2, 0, Integer.MAX_VALUE);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
+		if (lBatxRateChange == null || lBatxRateChange.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "查無資料");
+		}
 
-		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
-			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
+		for (BatxRateChange tBatxRateChange : lBatxRateChange) {
 //				Key = 調整日 + 戶別(自然人;企金戶) + 作業項目 + 調整記號 + 輸入記號 + 排序
 //				#OOLableA 作業項目
 //				#OOLableB 調整記號
 //				#OOLableC 輸入記號
 //				#OORank 排序
 
-				tmpBatx grp1 = new tmpBatx(tBatxRateChange.getTxKind(), 0, 0, 1);
+			tmpBatx grp1 = new tmpBatx(tBatxRateChange.getTxKind(), 0, 0, 1);
 // 				grp1 (Group by 作業項目 )
-				setCount(tBatxRateChange, grp1, 1);
+			setCount(tBatxRateChange, grp1, 1);
 
-				tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(),
-						tBatxRateChange.getRateKeyInCode(), 2);
+			tmpBatx grp2 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(),
+					tBatxRateChange.getRateKeyInCode(), 2);
 // 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
-				setCount(tBatxRateChange, grp2, 2);
+			setCount(tBatxRateChange, grp2, 2);
 
-				tmpBatx grp3 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), 1, 2);
+			tmpBatx grp3 = new tmpBatx(tBatxRateChange.getTxKind(), tBatxRateChange.getAdjCode(), 1, 2);
 // 				grp2 (Group by 作業項目，調整記號, 輸入記號 )
-				if (tBatxRateChange.getRateKeyInCode() != 1 && !CheckFlag.containsKey(grp3)) {
-					CheckFlag.put(grp3, 9);
-				}
+			if (tBatxRateChange.getRateKeyInCode() != 1 && !CheckFlag.containsKey(grp3)) {
+				CheckFlag.put(grp3, 9);
 			}
+		}
 
-			Set<tmpBatx> tempSet = totCnt.keySet();
+		Set<tmpBatx> tempSet = totCnt.keySet();
 
-			List<tmpBatx> tempList = new ArrayList<>();
+		List<tmpBatx> tempList = new ArrayList<>();
 
-			for (Iterator<tmpBatx> it = tempSet.iterator(); it.hasNext();) {
-				tmpBatx tmpBatxVo = it.next();
-				tempList.add(tmpBatxVo);
+		for (Iterator<tmpBatx> it = tempSet.iterator(); it.hasNext();) {
+			tmpBatx tmpBatxVo = it.next();
+			tempList.add(tmpBatxVo);
+		}
+
+		tempList.sort((c1, c2) -> {
+			return c1.compareTo(c2);
+		});
+
+		for (tmpBatx tempL4031Vo : tempList) {
+			if (totCnt.get(tempL4031Vo) == 0) {
+				continue;
 			}
-
-			tempList.sort((c1, c2) -> {
-				return c1.compareTo(c2);
-			});
-
-			for (tmpBatx tempL4031Vo : tempList) {
-				if (totCnt.get(tempL4031Vo) == 0) {
-					continue;
-				}
-				OccursList occursList = new OccursList();
-				this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
-						+ ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
-						+ conCnt.get(tempL4031Vo) + ", relCnt=" + relCnt.get(tempL4031Vo));
-				this.info("CheckFlag=" + CheckFlag.get(tempL4031Vo));
+			OccursList occursList = new OccursList();
+			this.info("proCnt=" + proCnt.get(tempL4031Vo) + ", sumCnt = " + sumCnt.get(tempL4031Vo) + ",ignCnt="
+					+ ignCnt.get(tempL4031Vo) + ", keyinCnt=" + keyinCnt.get(tempL4031Vo) + ", conCnt="
+					+ conCnt.get(tempL4031Vo) + ", relCnt=" + relCnt.get(tempL4031Vo));
+			this.info("CheckFlag=" + CheckFlag.get(tempL4031Vo));
 //				確認是否同作業項目皆已確認:0.尚有未確認 1.全皆已確認
-				int txKind = tempL4031Vo.getLableA();
-				int adjCode = tempL4031Vo.getLableB() / 10;
-				int keyinCode = tempL4031Vo.getLableB() % 10;
-				// 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
-				int status = 9;
-				// 檢核記號 0-確認 1-已確認報表 2-輸入利率
-				int checkFlag = 9;
-				// 記號放在已輸入利率那筆，如有未輸入利率則為9
-				if (tempL4031Vo.getRank() > 1 && keyinCode == 1) {
-					if (CheckFlag.get(tempL4031Vo) != null) {
-						checkFlag = CheckFlag.get(tempL4031Vo);
-					} else {
+//				int txKind = tempL4031Vo.getLableA();
+			int adjCode = tempL4031Vo.getLableB() / 10;
+			int keyinCode = tempL4031Vo.getLableB() % 10;
+			// 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
+			int status = 9;
+			// 檢核記號 0-確認 1-已確認報表 2-輸入利率
+			int checkFlag = 9;
+			// 記號放在已輸入利率那筆，如有未輸入利率則為9
+			if (tempL4031Vo.getRank() > 1 && keyinCode == 1) {
+				if (CheckFlag.get(tempL4031Vo) != null) {
+					checkFlag = CheckFlag.get(tempL4031Vo);
+				} else {
 
-						if (relCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
-							status = 2; // 2.已確認放行
-							checkFlag = 1; // 1-已確認報表
-						} else if (conCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
-							status = 1; // 1.確認未放行
-							checkFlag = 9;
-						} else if (keyinCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
-							status = 0; // 0.未確認
-							checkFlag = 0; // 0-確認
-						}
-
-					}
-				}
-				if (tempL4031Vo.getRank() == 1) {
 					if (relCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
-						status = 2;
+						status = 2; // 2.已確認放行
+						checkFlag = 1; // 1-已確認報表
 					} else if (conCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
-						status = 1;
-					} else {
-						status = 0;
+						status = 1; // 1.確認未放行
+						checkFlag = 9;
+					} else if (keyinCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
+						status = 0; // 0.未確認
+						checkFlag = 0; // 0-確認
 					}
+
 				}
+			}
+			if (tempL4031Vo.getRank() == 1) {
+				if (relCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
+					status = 2;
+				} else if (conCnt.get(tempL4031Vo).equals(proCnt.get(tempL4031Vo))) {
+					status = 1;
+				} else {
+					status = 0;
+				}
+			}
 
 // TxKind           Adjcode            KeyinCode          RptFg    
 // ------------------------------------------------------------------------------------------------------------------------
-//                  0.全部                         1.已調整                   2<取消調整>
-// 1.定期機動調整，3.機動利率調整
-//              	1.批次自動調整            1.已調整           	  5(目前&調後)   
-//                  2.按地區別調整            1.已調整                   6(有地區別，可選擇<取消調整>)                                          
-//                                      0.未調整                   7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)                                           
-//                  3.人工調整                                                    
-//                                      0.未調整                   7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
-//                                      9:檢核有誤               3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
-//                                      1.已調整                   4(無地區別，可選擇<取消調整>)   
-//                                      2.待輸入                   4(無地區別，可選擇<取消調整>)   
-//              	4.檢核提醒件               0.未調整 		  5(目前&調後)   
+// 1.定期機動調整, 3.機動利率調整       
+//              	1. 批次自動調整            1.已調整           	   5(目前&調後)   
+//                  2.按地區別調整      1.已調整           6(有地區別，可選擇<取消調整>)                                          
+//                                      0.未調整           7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整><按合約利率調整>)                                           
+//                  3.人工調整(按合約)                                                     
+//                                      0.未調整           3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)   
+//                                      1.已調整           4(無地區別，可選擇<取消調整>)   
+//                                      2.待輸入           4(無地區別，可選擇<取消調整>)   
+//                                      9:檢核有誤         3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                  4.人工調整(按地區別)                                                    
+//                                      0.未調整           7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                                      1.已調整           6(有地區別，可選擇<取消調整>)   
+//                                      2.待輸入           6(有地區別，可選擇<取消調整>)   
+//                                      9:檢核有誤         7(有地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整><按合約利率調整>)  
+//                  8.確認失敗件                1.已調整 		       5(目前&調後)   
+//              	9.檢核提醒件                0.未調整 		       5(目前&調後)   
 // 2.指數型利率調整
 // 4.員工利率調整 
 // 5.按商品別調整  
-//				    1.批次自動調整                                              5(目前&調後)  
+//				    1.批次自動調整             1.已調整                     5(目前&調後)  
 //				             
-//				    3.人工調整                                   
-//				                        0.未調整  9:待處理     3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//				    3.人工調整(按合約)                                   
+//				                        0.未調整                     3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
 //				                        1.已調整                     4(無地區別，可選擇<取消調整>)   
 //				                        2.待輸入                     4(無地區別，可選擇<取消調整>)   
+//                                      9.檢核有誤         3(無地區別，可選擇<按擬調利率調整><按目前利率調整><輸入利率調整>)  
+//                  8.確認失敗件                1.已調整 		       5(目前&調後)   
 
-				int rptFg = 0;
-				String lableBX = "";
-				switch (adjCode) {
+			int rptFg = 0;
+			String lableBX = "";
+			switch (adjCode) {
+			case 0:
+				rptFg = 2; // 無利率欄
+				break;
+			case 1:
+				lableBX = "批次自動調整";
+				rptFg = 5;
+				break;
+			case 2:
+				lableBX = "按地區別調整";
+				switch (keyinCode) {
 				case 0:
-					rptFg = 2;
+					lableBX += "(未調整)";
+					rptFg = 7;
 					break;
 				case 1:
-					lableBX = "批次自動調整";
-					rptFg = 5;
+					lableBX += "(已調整)";
+					rptFg = 6;
 					break;
 				case 2:
-					lableBX = "按地區別調整";
-					switch (keyinCode) {
-					case 0:
-						lableBX += "(未調整)";
-						rptFg = 7;
-						break;
-					case 1:
-						lableBX += "(已調整)";
-						rptFg = 6;
-						break;
-					case 2:
-						lableBX += "(待輸入)";
-						checkFlag = 2; // 2-輸入利率
-						rptFg = 6;
-						break;
-					}
-					break;
-				case 3:
-					lableBX = "人工調整";
-					switch (keyinCode) {
-					case 0:
-						lableBX += "(未調整)";
-						rptFg = 3;
-						break;
-					case 1:
-						lableBX += "(已調整)";
-						rptFg = 4;
-						break;
-					case 2:
-						lableBX += "(待輸入)";
-						rptFg = 4;
-						checkFlag = 2; // 2-輸入利率
-						break;
-					case 9:
-						lableBX += "(檢核有誤)";
-						rptFg = 3;
-						break;
-					}
-					break;
-				case 4:
-					lableBX = "檢核提醒件";
-					rptFg = 5;
-					checkFlag = 9;
-					status = 9;
-					break;
-				case 5:
-					lableBX = "確認失敗件";
-					rptFg = 5;
-					checkFlag = 9;
-					status = 9;
+					lableBX += "(待輸入)";
+					checkFlag = 2; // 2-輸入利率
+					rptFg = 6;
 					break;
 				}
-
-				occursList.putParam("OORank", tempL4031Vo.getRank()); // 排序
-				occursList.putParam("OOLableA", tempL4031Vo.getLableA()); // 作業項目
-				occursList.putParam("OOLableB", tempL4031Vo.getLableB()); // 輸入記號
-				occursList.putParam("OOLableBX", lableBX); // 註記
-				occursList.putParam("OOSumCnt", sumCnt.get(tempL4031Vo));
-				occursList.putParam("OOIgnCnt", ignCnt.get(tempL4031Vo));
-				occursList.putParam("OOTotCnt", totCnt.get(tempL4031Vo));
-				occursList.putParam("OOCheckFlag", checkFlag); // 檢核記號 0-確認 1-已確認報表 2-輸入利率
-				occursList.putParam("OOStatus", status); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
-				occursList.putParam("OORptFg", rptFg);
-				occursList.putParam("OONeedConCnt", needConCnt.get(tempL4031Vo));
-
-				this.info("L4031 occursList : " + occursList.toString());
-				/* 將每筆資料放入Tota的OcList */
-				this.totaVo.addOccursList(occursList);
+				break;
+			case 3:
+				lableBX = "人工調整_按合約";
+				switch (keyinCode) {
+				case 0:
+					lableBX += "(未調整)";
+					rptFg = 3;
+					break;
+				case 1:
+					lableBX += "(已調整)";
+					rptFg = 4;
+					break;
+				case 2:
+					lableBX += "(待輸入)";
+					rptFg = 4;
+					checkFlag = 2; // 2-輸入利率
+					break;
+				case 9:
+					lableBX += "(檢核有誤)";
+					rptFg = 3;
+					break;
+				}
+				break;
+			case 4:
+				lableBX = "人工調整_按地區別";
+				switch (keyinCode) {
+				case 0:
+					lableBX += "(未調整)";
+					rptFg = 7;
+					break;
+				case 1:
+					lableBX += "(已調整)";
+					rptFg = 6;
+					break;
+				case 2:
+					lableBX += "(待輸入)";
+					rptFg = 6;
+					checkFlag = 2; // 2-輸入利率
+					break;
+				case 9:
+					lableBX += "(檢核有誤)";
+					rptFg = 7;
+					break;
+				}
+				break;
+			case 8:
+				lableBX = "確認失敗件";
+				rptFg = 5;
+				checkFlag = 9;
+				status = 9;
+				break;
+			case 9:
+				lableBX = "檢核提醒件";
+				rptFg = 5;
+				checkFlag = 9;
+				status = 9;
+				break;
 			}
-		} else
 
-		{
-			throw new LogicException(titaVo, "E0001", "查無資料");
+			occursList.putParam("OORank", tempL4031Vo.getRank()); // 排序
+			occursList.putParam("OOLableA", tempL4031Vo.getLableA()); // 作業項目
+			occursList.putParam("OOLableB", tempL4031Vo.getLableB()); // 輸入記號
+			occursList.putParam("OOLableBX", lableBX); // 註記
+			occursList.putParam("OOSumCnt", sumCnt.get(tempL4031Vo));
+			occursList.putParam("OOIgnCnt", ignCnt.get(tempL4031Vo));
+			occursList.putParam("OOTotCnt", totCnt.get(tempL4031Vo));
+			occursList.putParam("OOCheckFlag", checkFlag); // 檢核記號 0-確認 1-已確認報表 2-輸入利率
+			occursList.putParam("OOStatus", status); // 作業項目狀態 0.未確認 1.確認未放行 2.已確認放行
+			occursList.putParam("OORptFg", rptFg);
+			occursList.putParam("OONeedConCnt", needConCnt.get(tempL4031Vo));
+
+			this.info("L4031 occursList : " + occursList.toString());
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
 		}
 
 		this.addList(this.totaVo);
@@ -373,9 +399,13 @@ public class L4031 extends TradeBuffer {
 	private void setCount(BatxRateChange tBatxRateChange, tmpBatx grp, int rank) {
 		// private HashMap<tmpBatx, Integer> sumCnt = new HashMap<>();// 要處理筆數
 		// private HashMap<tmpBatx, Integer> ignCnt = new HashMap<>();// 待處理筆數
+		// private HashMap<tmpBatx, Integer> proCnt = new HashMap<>();// 需處理筆數
 		// private HashMap<tmpBatx, Integer> totCnt = new HashMap<>();// 總筆數
 		// private HashMap<tmpBatx, Integer> conCnt = new HashMap<>();// 已確認筆數
-		// private HashMap<tmpBatx, Integer> keyinCnt = new HashMap<>();// 已處理筆數
+		// private HashMap<tmpBatx, Integer> relCnt = new HashMap<>();// 已放行筆數
+		// private HashMap<tmpBatx, Integer> keyinCnt = new HashMap<>();// 已輸入筆數
+		// private HashMap<tmpBatx, Integer> needConCnt = new HashMap<>();// 需確認筆數
+
 // RateKeyInCode	0:未調整		1:已調整		2:待輸入		9:待處理(檢核有誤)
 		if (!totCnt.containsKey(grp)) {
 			totCnt.put(grp, 0);
@@ -404,8 +434,8 @@ public class L4031 extends TradeBuffer {
 			needConCnt.put(grp, 0);
 		}
 
-		// 提醒件不累計
-		if (tBatxRateChange.getAdjCode() == 4) {
+		// 提醒件、確認失敗件不累計
+		if (tBatxRateChange.getAdjCode() == 8 || tBatxRateChange.getAdjCode() == 9) {
 			return;
 		}
 

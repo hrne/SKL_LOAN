@@ -348,7 +348,7 @@ public class L4510Batch extends TradeBuffer {
 			if (flag == 2) {
 				baTxCom.setPayFeeMethod("N");
 			} else {
-				baTxCom.setPayFeeMethod("Y");				
+				baTxCom.setPayFeeMethod("Y");
 			}
 			// 應繳試算
 			listBaTxVo = baTxCom.settingPayintDate(iEntryDate, iPayIntDate, custNo, facmNo, 0, 1, BigDecimal.ZERO,
@@ -796,6 +796,10 @@ public class L4510Batch extends TradeBuffer {
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 			for (BaTxVo tBaTxVo : listBaTxVo) {
+				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() >= 4
+						&& tBaTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) == 0) {
+					continue;
+				}
 				tmpFacm tmp = new tmpFacm(tBaTxVo.getCustNo(), tBaTxVo.getFacmNo(), tBaTxVo.getBormNo(),
 						tBaTxVo.getRepayType(), flag, procCode);
 
@@ -922,7 +926,9 @@ public class L4510Batch extends TradeBuffer {
 					}
 				}
 			}
-		} else {
+		} else
+
+		{
 			this.info("listBaTxVo is null");
 		}
 	}

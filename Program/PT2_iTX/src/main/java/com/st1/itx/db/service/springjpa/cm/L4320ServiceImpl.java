@@ -151,6 +151,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,NVL(tot.\"TotBalance\",0)                    as \"TotBalance\"  "; // 全戶餘額
 		sql += "   ,b.\"ActFg\"                                  as \"ActFg\"  "; // 交易進行記號
 		sql += " from \"LoanBorMain\" b                                 ";
+		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
+		sql += "                         and  f.\"FacmNo\" = b.\"FacmNo\"      ";
 // 要調整的利率資料
 		sql += " left join(                                             ";
 		sql += "           select                                       ";
@@ -175,8 +177,14 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                    AND LBM.\"FacmNo\" = rr.\"FacmNo\" ";
 			sql += "                                    AND LBM.\"BormNo\" = rr.\"BormNo\" ";
 			sql += "       where rr.\"EffectDate\" <= LBM.\"NextAdjRateDate\" ";
+			sql += "        and  rr.\"BaseRateCode\" = " + iBaseRateCode;
 			break;
 		case 2: // 指數型利率調整
+			sql += "       ,row_number() over (partition by rr.\"CustNo\", rr.\"FacmNo\", rr.\"BormNo\" order by rr.\"EffectDate\" Desc) as seq ";
+			sql += "       from \"LoanRateChange\" rr                          ";
+			sql += "       where rr.\"EffectDate\" <= " + iEffectDateE;
+			sql += "        and  rr.\"BaseRateCode\" = " + iBaseRateCode;
+			break;
 		case 3: // 機動利率調整
 		case 4: // 員工利率調整
 		case 5: // 按商品別調整
@@ -212,8 +220,6 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ) tot        on  tot.\"CustNo\" = b.\"CustNo\"        ";
 		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = b.\"CustNo\"      ";
-		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
-		sql += "                       and  f.\"FacmNo\" = b.\"FacmNo\"        ";
 		sql += " left join \"ClFac\"   cf on cf.\"CustNo\" = b.\"CustNo\"      ";
 		sql += "                       and cf.\"FacmNo\" = b.\"FacmNo\"        ";
 		sql += "                       and cf.\"MainFlag\" = 'Y'               ";
@@ -239,13 +245,13 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and b.\"MaturityDate\" >= " + iEffectDate;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
-//  1.定期機動調整 ==>  1.下次利率調整日為調整月份(撥款主檔的利率區分=3.定期機動)
-//	                   2.指標利率變動調整合約利率(指標利率相同且利率檔利率生效日>=指標利率生效日)
+//  1.定期機動調整 ==>  0.下次利率調整日為調整月份(撥款主檔的利率區分=3.定期機動)
+//	                    9.定期機動檢核件(下次利率調整日<指標利率生效日 and 下次利率調整日<到期日)
 		if (iTxKind == 1) {
 			sql += "       and b.\"RateCode\" = '3' ";
 			sql += "       and r.\"BaseRateCode\" = " + iBaseRateCode;
 			sql += "       and r.\"RateCode\" = '3'                  ";
-			// 0: 一般、 4:定期機動指標利率變動調整合約利率
+			// 0: 一般、9:定期機動檢核件
 			if (iAdjCode == 0) {
 				sql += "       and b.\"NextAdjRateDate\" >= " + iEffectDateS;
 				sql += "       and b.\"NextAdjRateDate\" <= " + iEffectDateE;

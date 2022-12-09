@@ -64,8 +64,15 @@ public class L4321ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ "      , FP.\"ProdName\"      " // F12 商品名稱
 				+ "      , CD.\"Item\"          " // F13 利率種類
 				+ "      , BR.\"PresentRate\"   " // F14 目前利率
-				+ "      , BR.\"AdjustedRate\"  " // F15 調後利率
-				+ "      , LB.\"ActFg\"         " // F16 交易進行記號
+				+ "      , BR.\"ContrRateIncr\" " // F15 合約加碼值
+				+ "      , BR.\"AdjustedRate\"  " // F16 調後利率
+				+ "      , LB.\"DrawdownDate\"  " // F17 撥款日期
+				+ "      , LB.\"MaturityDate\"  " // F18 到期日
+				+ "      , LB.\"FirstAdjRateDate\"  " // F19 首次調整日期
+				+ "      , BR.\"PreNextAdjFreq\"  " // F20 利率調整週期
+				+ "      , BR.\"PreNextAdjDate\"  " // F21預定下次利率調整日
+				+ "      , BR.\"JsonFields\"  " // F22 jason格式紀錄欄
+				+ "      , LB.\"ActFg\"         " // F23 交易進行記號
 				+ " FROM \"BatxRateChange\" BR " + " LEFT JOIN \"CdCity\"   CC ON CC.\"CityCode\" = BR.\"CityCode\" "
 				+ " LEFT JOIN \"CdArea\"   CA ON CA.\"CityCode\" = BR.\"CityCode\" "
 				+ "                        AND CA.\"AreaCode\" = BR.\"AreaCode\" "
