@@ -28,6 +28,7 @@ E(0,0)
 [#LabelA,#PrevIntDate,#PrevIntDateL],["#FdIntStartDate+計息起日",#IntStartDate],
 ["#FdPayIntDate+應繳日",#PayIntDate,#PayIntDateL],["#FdIntEndDate+計息迄日",#IntEndDate],
 ["#FdUnpaidAmt+應扣金額",#UnpaidAmt],["#FdTempAmt+暫收抵繳金額",#TempAmt],
+[#<->#,"#FdRepayAmt+扣款金額",#RepayAmt],
 ["#FdTitaTxtNo+交易序號",#TitaTxtNo],["#FdBatchNo+批次號碼",#BatchNo],
 [#<->#,"#FdReason+檢核／扣款結果",#Reason],
 ]
@@ -42,6 +43,7 @@ E(0,0)
 #FdCustName=X,2,L
 #FdRepayBank=X,2,L
 #FdRepayAcctNo=X,2,L
+#FdRepayAmt=X,2,L
 #FdAcctCodeX=X,2,L
 #FdTitaTxtNo=X,2,L
 #FdIntStartDate=X,2,L
@@ -80,7 +82,7 @@ T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4943進入),$)
 
 
-#NTXBUF=X,390,S
+#NTXBUF=X,420,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 C(4,#NTXBUF,S,$)
 T(1,@FunctionCode,#NTXBUF,1,1)
@@ -101,13 +103,15 @@ T(1,@AcDate,#NTXBUF,35,7)
 T(1,@PRE_UnpaidAmt,#NTXBUF,42,20)
 T(1,@PRE_TempAmt,#NTXBUF,62,20)
 T(1,@Reason,#NTXBUF,82,300)
+T(1,@PRE_RepayAmt,#NTXBUF,382,20)
 
 #PRE_UnpaidAmt=m,20,S
 E(0,@UnpaidAmt,#PRE_UnpaidAmt)
 #PRE_TempAmt=m,20,S
 E(0,@TempAmt,#PRE_TempAmt)
 T(2,@LabelA,     繳息迄日)
-
+#PRE_RepayAmt=m,20,S
+E(0,@RepayAmt,#PRE_RepayAmt)
 
 #RimFunCd=A,1,S
 #RimCustId=X,10,S
@@ -192,6 +196,7 @@ E(0,1)ASGN(AGAIN$)
 #ShowFd=X,1,S
 C(2,#FunctionCode,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 T(2,@FdUnpaidAmt,#ShowFd)
+T(2,@FdRepayAmt,#ShowFd)
 C(3,#FunctionCode,1,$,s)
 T(2,@FdEntryDate,#ShowFd)     
 T(2,@FdRepayType,#ShowFd)
@@ -203,12 +208,14 @@ T(2,@LabelA,*    繳息迄日)
 #Border=X,1,S
 C(3,#FunctionCode,4,$,s)
 T(F,#UnpaidAmt,0)
+T(F,#RepayAmt,0)
 T(F,#TempAmt,0)
 
 ! 查詢隱藏邊框
 #Border1=X,1,S
 C(3,#FunctionCode,5,$,s)
 T(F,#UnpaidAmt,0)
+T(F,#RepayAmt,0)
 T(F,#TempAmt,0)
 
 ! 明細序號
@@ -331,6 +338,14 @@ C(3,#FunctionCode,5,s,$)
 C(3,#FunctionCode,1,s,$)
 C(3,#FunctionCode,4,s,$)
 C(3,#FunctionCode,5,s,$)
+
+! 扣款金額
+#RepayAmt=m,14,I
+C(3,#FunctionCode,1,s,$)
+C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
+@V(2,0)
+
 ! 會計日期
 #AcDate=D,7,O
 T(1,#SYSDATE,2,7)
@@ -370,6 +385,7 @@ E(0,1)ASGN(LOOP$)
 #RepayType
 #UnpaidAmt
 #TempAmt
+#RepayAmt
 #AcDate
 #END
 </sub>

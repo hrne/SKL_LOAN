@@ -457,7 +457,6 @@ CALL2(#AdjustDate,#OEffectDate3,#OEffectDate3X)
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
-
 #OOFacmNo=A,3,O
 
 #OOBormNo=A,3,O

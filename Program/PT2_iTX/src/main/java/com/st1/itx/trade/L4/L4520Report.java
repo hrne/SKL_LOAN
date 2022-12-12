@@ -318,10 +318,13 @@ public class L4520Report extends MakeReport {
 			pageCnt++;
 
 //			2.再與下一筆比較，決定是否換行或換頁
-//			if (j != tEmpDeductMedia.size()) {
 
-			MediaKind = tEmpDeductMedia.get(j).get("MediaKind");
-			BatchNo = tEmpDeductMedia.get(j).get("BatchNo");
+			if (j != tEmpDeductMedia.size()) {
+
+				MediaKind = tEmpDeductMedia.get(j).get("MediaKind");
+				BatchNo = tEmpDeductMedia.get(j).get("BatchNo");
+
+			}
 //				每頁第40筆 跳頁 
 			if (pageCnt == 37) {
 				this.print(2, 70, "=====續下頁=====", "C");
@@ -341,9 +344,9 @@ public class L4520Report extends MakeReport {
 //			} else {
 //			3.若為最後一筆，則固定產出小計、總計、報表合計
 			if (total == tEmpDeductMedia.size()) {
-				
-				//如果目前比行數加行會超過40行，必須換頁新頁
-				if(pageCnt + 3 >=37) {
+
+				// 如果目前比行數加行會超過40行，必須換頁新頁
+				if (pageCnt + 3 >= 37) {
 					this.newPage();
 				}
 				this.print(1, 1,
@@ -484,8 +487,12 @@ public class L4520Report extends MakeReport {
 //			2.再與下一筆比較，決定是否換行或換頁
 //			if (j != tEmpDeductMedia.size()) {
 
-			MediaKind = tEmpDeductMedia.get(j).get("MediaKind");
-			BatchNo = tEmpDeductMedia.get(j).get("BatchNo");
+			if (j != tEmpDeductMedia.size()) {
+
+				MediaKind = tEmpDeductMedia.get(j).get("MediaKind");
+				BatchNo = tEmpDeductMedia.get(j).get("BatchNo");
+
+			}
 //				每頁第40筆 跳頁 
 			if (pageCnt == 37) {
 				this.print(2, 70, "=====續下頁=====", "C");
@@ -505,9 +512,9 @@ public class L4520Report extends MakeReport {
 //			} else {
 //			3.若為最後一筆，則固定產出小計、總計、報表合計
 			if (total == tEmpDeductMedia.size()) {
-				
-				//如果目前比行數加行會超過40行，必須換頁新頁
-				if(pageCnt + 3 >=37) {
+
+				// 如果目前比行數加行會超過40行，必須換頁新頁
+				if (pageCnt + 3 >= 37) {
 					this.newPage();
 				}
 				this.print(1, 1,

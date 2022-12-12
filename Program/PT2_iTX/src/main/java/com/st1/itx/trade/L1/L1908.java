@@ -1,5 +1,7 @@
 package com.st1.itx.trade.L1;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +21,14 @@ import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L1908ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L1R04ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -61,7 +65,7 @@ public class L1908 extends TradeBuffer {
 	/* 轉換工具 */
 	@Autowired
 	public Parse iParse;
-
+	
 	boolean found = false;
 
 	@Override
@@ -88,7 +92,8 @@ public class L1908 extends TradeBuffer {
 		if (facmNo > 0) {
 			findData(titaVo, custNo, facmNo);
 		} else {
-			Slice<FacMain> slFacMain = facMainService.facmCustNoRange(custNo, custNo, 1, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> slFacMain = facMainService.facmCustNoRange(custNo, custNo, 1, 999, 0, Integer.MAX_VALUE,
+					titaVo);
 			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			if (lFacMain != null) {
 				for (FacMain tFacMain : lFacMain) {
@@ -100,13 +105,14 @@ public class L1908 extends TradeBuffer {
 		if (!found) {
 			throw new LogicException(titaVo, "E0001", "客戶無申請不列印通知書");
 		}
-
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
 	private void findData(TitaVo titaVo, int custNo, int facmNo) throws LogicException {
-		Slice<CustNotice> slCustNotice = sCustNoticeService.facmNoEq(custNo, facmNo, facmNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<CustNotice> slCustNotice = sCustNoticeService.facmNoEq(custNo, facmNo, facmNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<CustNotice> lCustNotice = slCustNotice == null ? null : slCustNotice.getContent();
 		if (lCustNotice == null || lCustNotice.size() == 0) {
 			return;
@@ -129,13 +135,15 @@ public class L1908 extends TradeBuffer {
 					occursList.putParam("OOLastUpdateEmpNo", dVo.get("LastUpdateEmpNo"));
 					occursList.putParam("OOLastUpdateEmpNoName", dVo.get("Fullname"));
 					occursList.putParam("OOLastUpdate", iParse.stringToStringDateTime(dVo.get("LastUpdate")));
+					this.info("更新日期1      = " + iParse.stringToStringDateTime(dVo.get("LastUpdate")));
+					this.info("更新日期2      = " + dVo.get("LastUpdate"));
 
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
-
+					
 					found = true;
 				}
-			}
+			} 
 		} catch (LogicException e) {
 			throw e;
 		} catch (Exception e) {
@@ -249,7 +257,8 @@ public class L1908 extends TradeBuffer {
 				}
 			}
 			String taU = tCustNotice.getLastUpdate().toString();
-			String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uaDate = StringUtils
+					.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
 			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
 			occursList.putParam("OOLastUpdate", uaDate);
 			/* 將每筆資料放入Tota的OcList */

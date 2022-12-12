@@ -13,6 +13,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriUtils;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.filter.FilterUtils;
@@ -52,7 +53,7 @@ public class WebClient extends SysLogger {
 
 		String msgNo = "";
 
-		String url = FormatUtil.padX(vDate, 8) + FormatUtil.padX(vTime, 4) + FormatUtil.pad9(msgNo, 5) + FormatUtil.padX(msg.replaceAll("\\.", "%20"), 200);
+		String url = FormatUtil.padX(vDate, 8) + FormatUtil.padX(vTime, 4) + FormatUtil.pad9(msgNo, 5) + FormatUtil.padX(msg.replaceAll("\\.", "[,]"), 200);
 		url += FormatUtil.padX(mode, 1);
 		url += FormatUtil.padX(txCode, 5);
 		url += params;
@@ -60,9 +61,10 @@ public class WebClient extends SysLogger {
 			url = "http://192.168.10.8:7003/iFX/mvc/msw/systemTalk/host/" + to + "/" + url.trim();
 		else
 			url = System.getProperty("ifx_LocalAddr") + "/mvc/msw/systemTalk/host/" + to + "/" + url.trim();
-		url = url.replaceAll(" ", "_");
+		url = UriUtils.encodePath(url, "UTF-8");
+		// url = url.replaceAll(" ", "_");
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		this.info("sendPost url!" + FilterUtils.escape(url));
+		this.info("sendPost url!" + url);
 		HttpPost httpPost;
 		HttpResponse response = null;
 		try {

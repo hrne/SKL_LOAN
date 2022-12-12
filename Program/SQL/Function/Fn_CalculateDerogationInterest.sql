@@ -57,7 +57,7 @@ BEGIN
           AND LRC."EffectDate" < "InputDerogationDate"
           UNION
           SELECT "InputPrevPayIntDate" AS "EffectDate"
-               , "Fn_GetFitRate"("InputCustNo", "InputFacmNo", "InputBormNo", "InputPrevPayIntDate")
+               , TRUNC("Fn_GetFitRate"("InputCustNo", "InputFacmNo", "InputBormNo", "InputPrevPayIntDate"))
                                        AS "FitRate"
           FROM DUAL
           UNION

@@ -722,7 +722,9 @@ BEGIN
            , CASE WHEN YYYYMM < 202211 THEN ' '                           -- 111/11開始申報購地貸款相關欄位
                   WHEN F."RuleCode" = '08' THEN
                     CASE WHEN NVL(F."SettingDate",0) < 20211217 THEN ' '
-                         ELSE LPAD(NVL(F."StarBuildingYM",0),5,'0')
+                         WHEN NVL(F."StarBuildingYM",0) = 0 THEN
+                              LPAD(NVL(F."StarBuildingYM",0),5,'0')
+                         ELSE LPAD(NVL(F."StarBuildingYM",0) - 191100 ,5,'0')
                     END     
                   ELSE ' '    
              END                                   AS "StarBuildingYM"    -- 實際興建年月
@@ -858,7 +860,9 @@ BEGIN
            , CASE WHEN YYYYMM < 202211 THEN ' '                           -- 111/11開始申報購地貸款相關欄位
                   WHEN F."RuleCode" = '08' THEN
                     CASE WHEN NVL(F."SettingDate",0) < 20211217 THEN ' '
-                         ELSE LPAD((NVL(F."PreStarBuildingYM",0),5,'0')
+                         WHEN NVL(F."PreStarBuildingYM",0) = 0 THEN
+                              LPAD(NVL(F."PreStarBuildingYM",0),5,'0')
+                         ELSE LPAD(NVL(F."PreStarBuildingYM",0) - 191100 ,5,'0')
                     END     
                   ELSE ' '    
              END                                   AS "PreStarBuildingYM" -- 約定動工年月

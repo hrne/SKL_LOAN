@@ -245,6 +245,10 @@ public class L3005 extends TradeBuffer {
 				wkOverShort = BigDecimal.ZERO;
 				// 溢短收
 				wkOverShort = overflow.subtract(unpaidAmt);
+
+				occursList.putParam("OOOverflow", overflow);
+				occursList.putParam("OOUnpaidAmt", unpaidAmt);
+
 				txNo = titaVo.getKinbr() + titaTlrNo + titaTxtNo;
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOAcDate", acDate);

@@ -71,7 +71,7 @@ public class L1108 extends TradeBuffer {
 		int iFacmNo = iParse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		CustMain custMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-
+		
 		if (custMain == null) {
 			throw new LogicException("E0001", "客戶資料主檔");
 		}
@@ -161,12 +161,15 @@ public class L1108 extends TradeBuffer {
 
 				// 這邊的邏輯因為前端 VAR 是設定「不通知申請」，所以Paper{i}, Msg{i}, EMail{i}為 Y 時對應DB的 N
 				if (titaVo.getParam("Paper" + i).trim().isEmpty()) {
+					this.info("Paper   = " + titaVo.getParam("Paper" + i).trim().isEmpty());
 					VarPaper = "Y";
 				}
 				if (titaVo.getParam("Msg" + i).trim().isEmpty()) {
+					this.info("Msg   = " + titaVo.getParam("Msg" + i).trim().isEmpty());
 					VarMsg = "Y";
 				}
 				if (titaVo.getParam("EMail" + i).trim().isEmpty()) {
+					this.info("EMail  = " + titaVo.getParam("EMail" + i).trim().isEmpty() );
 					VarEMail = "Y";
 				}
 
@@ -206,6 +209,10 @@ public class L1108 extends TradeBuffer {
 						throw new LogicException("E0005", "客戶通知設定檔");
 					}
 					if ("N".equals(VarPaper) || "N".equals(VarMsg) || "N".equals(VarPaper)) {
+						this.info("跑進211");
+						this.info("tCustNotice.getPaperNotice()     = " + tCustNotice.getPaperNotice());
+						this.info("tCustNotice.getMsgNotice()       = " + tCustNotice.getMsgNotice());
+						this.info("tCustNotice.getEmailNotice()     = " + tCustNotice.getEmailNotice());
 						log = true;
 						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
 						oCustNotice.setPaperNotice("Y");
@@ -213,9 +220,16 @@ public class L1108 extends TradeBuffer {
 						oCustNotice.setEmailNotice("Y");
 					}
 				} else {
+					this.info("跑進222");
+					this.info("tCustNotice.getPaperNotice()     = " + tCustNotice.getPaperNotice());
+					this.info("tCustNotice.getMsgNotice()       = " + tCustNotice.getMsgNotice());
+					this.info("tCustNotice.getEmailNotice()     = " + tCustNotice.getEmailNotice());
+
+					
 					// 變更前
 					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice())
 							|| !VarEMail.equals(tCustNotice.getEmailNotice())) {
+						
 
 						// 只在有修改選項時，才實際更新
 						log = true;
@@ -225,11 +239,11 @@ public class L1108 extends TradeBuffer {
 						tCustNotice.setMsgNotice(VarMsg);
 						tCustNotice.setEmailNotice(VarEMail);
 						tCustNotice.setApplyDate(ApplyDt);
-
+						
 						try {
 							tCustNotice = sCustNoticeService.update2(tCustNotice, titaVo);
 						} catch (DBException e) {
-							throw new LogicException("E0007", "客戶通知設定檔");
+							throw new LogicException("E0005","不可申請全部不寄送");
 						}
 					}
 
@@ -247,7 +261,13 @@ public class L1108 extends TradeBuffer {
 						cdReport.setMessageFg(VarMsg);//簡訊
 						cdReport.setEmailFg(VarEMail);//Email
 						cdReport.setLetterFg(VarPaper);//書面
-						
+						this.info("VarMsg    = " + VarMsg);
+						this.info("VarEMail    = " + VarEMail);
+						this.info("VarPaper    = " + VarPaper);
+						if("N".equals(tCustNotice.getPaperNotice()) && "N".equals(tCustNotice.getMsgNotice())
+								&& "N".equals(tCustNotice.getEmailNotice())) {
+							throw new LogicException("E0007", "不可申請全部不寄送");
+						}
 						oCustNotice = tranDesc(oCustNotice);
 						CustNotice nCustNotice = tranDesc(tCustNotice);
 						try {

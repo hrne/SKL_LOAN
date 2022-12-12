@@ -508,6 +508,16 @@ P(R,#OONeedPaidAmtX)
 CALL2(#ADJUSTDOT,#OOPrecision,#OOOverShort,#OOOverShortX)
 P(R,#OOOverShortX)
 
+#OOOverflow=+m,14.2,S
+#OOOverflowX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOOverflow,#OOOverflowX)
+P(R,#OOOverflowX)
+
+#OOUnpaidAmt=+m,14.2,S
+#OOUnpaidAmtX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOUnpaidAmt,#OOUnpaidAmtX)
+P(R,#OOUnpaidAmtX)
+
 #OOLoanBal=m,14.2,S
 
 #OOLoanBalX=X,22,O
@@ -647,6 +657,8 @@ TXFORM=L3005
 #OOCurrencyCode
 #OOTxAmt
 #OOOverShort
+#OOOverflow
+#OOUnpaidAmt
 #OOLoanBal
 #OORate
 #OOTitaHCode
@@ -715,6 +727,7 @@ TXFORM=L3005
 #OOCurrencyCode=幣別 
 {width:50,align:'center'}
 
+
 #OOTxAmtX=交易金額 
 {width:180}
 
@@ -724,8 +737,11 @@ TXFORM=L3005
 #OONeedPaidAmtX=應收金額
 {width:180}
 
-#OOOverShortX=溢短收
-{width:180}
+#OOOverflowX=溢收金額
+{width:180,align:'right'}
+
+#OOUnpaidAmtX=短收金額
+{width:180,align:'right'}
 
 #OOLoanBalX=放款餘額
 {width:180}
