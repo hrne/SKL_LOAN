@@ -698,7 +698,7 @@ BEGIN
            , ' '            AS "NegTransYM"        -- 債權轉讓年月/債權轉讓後原債權機構買回年月
            , CASE WHEN YYYYMM < 202211 THEN ' '    -- 111/11開始申報購地貸款相關欄位
                   WHEN F."RuleCode" = '08' THEN                           -- 規定管制代碼08:購地貸款(央行管制)
-                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN 'N'
+                    CASE WHEN NVL(F."SettingDate",0) < 20211217 THEN 'N'  -- 設定日期須>=20211217才報Y
                          ELSE 'Y'
                     END     
                   ELSE ' '    
@@ -721,8 +721,8 @@ BEGIN
            , ' '                                   AS "Filler51"          -- 空白
            , CASE WHEN YYYYMM < 202211 THEN ' '                           -- 111/11開始申報購地貸款相關欄位
                   WHEN F."RuleCode" = '08' THEN
-                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN ' '
-                         ELSE to_char(NVL(F."StarBuildingYM",' '),'00000')
+                    CASE WHEN NVL(F."SettingDate",0) < 20211217 THEN ' '
+                         ELSE LPAD(NVL(F."StarBuildingYM",0),5,'0')
                     END     
                   ELSE ' '    
              END                                   AS "StarBuildingYM"    -- 實際興建年月
@@ -857,8 +857,8 @@ BEGIN
            , EmpNo                                 AS "LastUpdateEmpNo"   -- 最後更新人員
            , CASE WHEN YYYYMM < 202211 THEN ' '                           -- 111/11開始申報購地貸款相關欄位
                   WHEN F."RuleCode" = '08' THEN
-                    CASE WHEN NVL(M."DrawdownDate",0) < 20211217 THEN ' '
-                         ELSE to_char(NVL(F."PreStarBuildingYM",' '),'00000')
+                    CASE WHEN NVL(F."SettingDate",0) < 20211217 THEN ' '
+                         ELSE LPAD((NVL(F."PreStarBuildingYM",0),5,'0')
                     END     
                   ELSE ' '    
              END                                   AS "PreStarBuildingYM" -- 約定動工年月

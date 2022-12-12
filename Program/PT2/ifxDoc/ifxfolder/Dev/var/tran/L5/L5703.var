@@ -80,7 +80,6 @@ C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp) 
 @T(3,@FunCdX,)
 V(H,#FunCdHelp)
-E(0,@FUNCIND,#FunCode)
 
 #SetSysPar1=X,1,S
 IF(#FunCode ==1 || #FunCode ==3,E(0,0)ASGN(AGAIN$),$)
@@ -89,6 +88,7 @@ IF(#FunCode ==1 || #FunCode ==3,E(0,0)ASGN(AGAIN$),$)
 C(4,#FunCode,S,$)
 T(H,#FunCode,#FunCdHelp)
 C(2,#FunCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+E(0,@FUNCIND,#FunCode)
 
 
 <include src="ROM.icf::L5R12.dec"/>

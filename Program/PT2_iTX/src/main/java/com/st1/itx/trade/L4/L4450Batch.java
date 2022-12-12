@@ -366,7 +366,7 @@ public class L4450Batch extends TradeBuffer {
 
 			if (checkFlag) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4943",
-						"1" + titaVo.getParam("CustNo") + titaVo.getParam("EntryDate")
+						"01" + titaVo.getParam("CustNo") + titaVo.getParam("EntryDate")
 								+ titaVo.getParam("EntryDate"),
 						checkMsg, titaVo);
 			} else {

@@ -206,8 +206,8 @@ IF(#BringUpDate{i}<#ApprAcDate{i},V(P,提兌日不可小於傳票日),A(DATE,0,#
 ##end
 
 #LOOPCHK=X,1,S
-C(3,#FunctionCode,1,$,s)
-@IF(#ExportDate1==0 && #ExportDate2==0 && #ExportDate3==0 && #ExportDate4==0 ,V(P,新增時不可全部類別都空白),$)
+C(3,#FunctionCode,4,s,$)
+@IF(#ExportDate1==0 && #ExportDate2==0 && #ExportDate3==0 && #ExportDate4==0 ,V(P,新增修改時不可全部類別都空白),$)
 
 
 #AGAIN=X,1,S

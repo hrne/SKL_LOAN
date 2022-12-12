@@ -495,7 +495,7 @@ public class L4320Batch extends TradeBuffer {
 				dateUtil.setDate_1(nextAdjRateDate);
 				dateUtil.setMons(rateAdjFreq); // 調整周期(單位固定為月)
 				preNextAdjDate = dateUtil.getCalenderDay();
-
+                int preDD = preNextAdjDate % 100; 
 				// 預定下次利率調整日月底日
 				dateUtil.init();
 				dateUtil.setDate_1(preNextAdjDate);
@@ -506,16 +506,17 @@ public class L4320Batch extends TradeBuffer {
 				dateUtil.init();
 				dateUtil.setDate_1(firstAdjRateDate);
 				// 首次利率調整日為月底日取首次利率調整日/本次利率調整日/首撥日/到期日的最大DD
+				int maxDD;
 				if (firstAdjRateDate % 100 == dateUtil.getMonLimit()) {
-					int dd = Math.max(firstAdjRateDate % 100, nextAdjRateDate);
+					maxDD = Math.max(firstAdjRateDate % 100, nextAdjRateDate);
 					int firstDrawdownDate = StaticTool.bcToRoc(parse.stringToInteger(s.get("FirstDrawdownDate")));
-					dd = Math.max(dd, firstDrawdownDate % 100);
-					dd = Math.max(dd, maturityDate % 100);
+					maxDD = Math.max(maxDD, firstDrawdownDate % 100);
+					maxDD = Math.max(maxDD, maturityDate % 100);
 					// 不可大於月底日
-					if (dd > preNextAdjDateMonLimit) {
-						dd = preNextAdjDateMonLimit;
+					if (maxDD > preNextAdjDateMonLimit) {
+						maxDD = preNextAdjDateMonLimit;
 					}
-					preNextAdjDate = (preNextAdjDate / 100) * 100 + dd;
+					preNextAdjDate = (preNextAdjDate / 100) * 100 + maxDD;
 				}
 				// 下次調整日月份>=到期日月份，則下次調整日為到期日
 				if (preNextAdjDate / 100 >= maturityDate / 100) {
@@ -527,8 +528,8 @@ public class L4320Batch extends TradeBuffer {
 						warnMsg += ", 下次利率調整月份 + 調整周期 = 到期日月份"; // 不及通知客戶，故不調整
 					}
 					preNextAdjDate = maturityDate;
-				} else if (preNextAdjDate % 100 == preNextAdjDateMonLimit) {
-					warnMsg += ",  利率調整日為月底日";
+				} else if (preNextAdjDate % 100 > preDD) {
+					warnMsg += ", 下次利率調整日>相對日";
 				}
 			}
 		}

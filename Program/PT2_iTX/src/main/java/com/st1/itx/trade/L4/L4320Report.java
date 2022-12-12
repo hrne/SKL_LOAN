@@ -93,7 +93,7 @@ public class L4320Report extends MakeReport {
 		}
 		int excelNo = 0;
 		this.info("titaVo.getTxcd() = " + titaVo.getTxcd());
-		for (int j = 1; j <= 5; j++) {
+		for (int j = 1; j <= 7; j++) {
 			switch (j) {
 			case 1:
 				fileNm = fileNm1 + "-批次自動調整";

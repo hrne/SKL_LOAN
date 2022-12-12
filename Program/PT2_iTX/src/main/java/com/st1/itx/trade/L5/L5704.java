@@ -25,6 +25,8 @@ import com.st1.itx.db.service.NegApprService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.data.DataLog;
+
 
 /**
  * Tita<br>
@@ -65,6 +67,9 @@ public class L5704 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
+	
+	@Autowired
+	public DataLog dataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -85,8 +90,8 @@ public class L5704 extends TradeBuffer {
 		if (FunctionCode.equals("1") || FunctionCode.equals("3")) {
 
 			moveNegAppr(FunctionCode, iYearMonth, titaVo);
-			// 修改-先刪全部再建
-		} else if (FunctionCode.equals("2")) {
+			
+		} else if (FunctionCode.equals("2")) {// 修改
 
 			Slice<NegAppr> sNegAppr;
 			sNegAppr = sNegApprService.yyyyMmEq(iYearMonth, this.index, this.limit, titaVo);
@@ -96,35 +101,36 @@ public class L5704 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "撥付日期設定檔"); // 查無資料
 			}
 
-			for (NegAppr tNegAppr : lNegAppr) {
+			for (int i = 1; i <= 4; i++) {
+				mExportDate = parse.stringToInteger(titaVo.getParam("ExportDate" + i)); // 製檔日
+				mBringUpDate = parse.stringToInteger(titaVo.getParam("BringUpDate" + i)); // 提兌日
+				mApprAcDate = parse.stringToInteger(titaVo.getParam("ApprAcDate" + i)); // 傳票日
+				this.info("mExportDate==" + mExportDate + ",mApprAcDate==" + mApprAcDate + ",mBringUpDate=="
+						+ mBringUpDate);
 
-				NegAppr dNegAppr = new NegAppr();
-				dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, tNegAppr.getKindCode()));
+				NegAppr tNegAppr = new NegAppr();
+				tNegAppr = sNegApprService.findById(new NegApprId(iYearMonth, i));
 
-				if (dNegAppr == null) {
-					throw new LogicException(titaVo, "E0006", "撥付日期設定檔"); // 鎖定資料不存在
+				if (tNegAppr == null) {
+					throw new LogicException(titaVo, "E0001", "撥付日期設定檔"); // 查無資料
+				} 
+				if (tNegAppr != null) {
+					NegAppr dNegAppr = new NegAppr();
+					dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, i));
+					NegAppr beforeNegAppr = (NegAppr) dataLog.clone(dNegAppr);
+						dNegAppr.setExportDate(mExportDate);
+						dNegAppr.setApprAcDate(mApprAcDate);
+						dNegAppr.setBringUpDate(mBringUpDate);
+						try {
+							sNegApprService.update(dNegAppr);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "撥付日期設定檔"); // 修改資料時，發生錯誤
+						}
+						dataLog.setEnv(titaVo, beforeNegAppr, dNegAppr);
+						dataLog.exec("修改撥付日期設定檔-類別="+i);
 				}
-
-				mExportDate = parse.stringToInteger(titaVo.getParam("ExportDate" + dNegAppr.getKindCode())); // 製檔日
-				mBringUpDate = parse.stringToInteger(titaVo.getParam("BringUpDate" + dNegAppr.getKindCode())); // 提兌日
-				mApprAcDate = parse.stringToInteger(titaVo.getParam("ApprAcDate" + dNegAppr.getKindCode())); // 傳票日
-				if (dNegAppr.getExportMark() == 1) {
-					if (dNegAppr.getExportDate() != mExportDate || dNegAppr.getBringUpDate() != mBringUpDate || dNegAppr.getApprAcDate() != mApprAcDate) {
-						throw new LogicException(titaVo, "E0015", "已製檔不可修改，類別＝" + dNegAppr.getKindCode());
-					}
-					continue; // 已製檔不刪除
-				}
-
-				try {
-					this.info("FunctionCode=2 delete");
-					sNegApprService.delete(dNegAppr);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
-				}
-
 			}
-			// 每個條件都建一筆
-			moveNegAppr(FunctionCode, iYearMonth, titaVo);
+
 
 		} else if (FunctionCode.equals("4")) {
 			this.info("FunctionCode=4 Start");
@@ -140,20 +146,22 @@ public class L5704 extends TradeBuffer {
 				this.info("FunctionCode=4 HoldBy");
 				NegAppr dNegAppr = new NegAppr();
 				dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, tNegAppr.getKindCode()));
+				NegAppr beforeNegAppr = (NegAppr) dataLog.clone(dNegAppr);
 
 				if (dNegAppr == null) {
 					throw new LogicException(titaVo, "E0004", "撥付日期設定檔"); // 刪除資料不存在
 				}
-				if (dNegAppr.getExportMark() != dNegAppr.getApprAcMark() || dNegAppr.getApprAcMark() != dNegAppr.getBringUpMark() || dNegAppr.getBringUpMark() != dNegAppr.getExportMark()) {
-					throw new LogicException(titaVo, "E0015", "製檔日傳票日提兌日記號不一致，類別＝" + dNegAppr.getKindCode());
-				}
-
+//				if (dNegAppr.getExportMark() != dNegAppr.getApprAcMark() || dNegAppr.getApprAcMark() != dNegAppr.getBringUpMark() || dNegAppr.getBringUpMark() != dNegAppr.getExportMark()) {
+//					throw new LogicException(titaVo, "E0015", "製檔日傳票日提兌日記號不一致，類別＝" + dNegAppr.getKindCode());
+//				}
+				int tKindCode = dNegAppr.getKindCode();
 				try {
 					sNegApprService.delete(dNegAppr);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}
-
+				dataLog.setEnv(titaVo, beforeNegAppr,dNegAppr);
+				dataLog.exec("刪除撥付日期設定檔-類別="+tKindCode);
 			}
 		}
 
@@ -175,33 +183,26 @@ public class L5704 extends TradeBuffer {
 
 			NegAppr tNegAppr = new NegAppr();
 			NegApprId tNegApprId = new NegApprId();
-			if (Integer.valueOf(mExportDate) == 0 && Integer.valueOf(mApprAcDate) == 0 && Integer.valueOf(mBringUpDate) == 0) {
-				continue;
-			}
 
 			tNegApprId.setYyyyMm(mWorkMonth);
 			tNegApprId.setKindCode(i);
-			if (("2").equals(mFuncCode)) {
-				NegAppr sNegAppr = new NegAppr();
-				sNegAppr = sNegApprService.findById(tNegApprId, titaVo);
-				if (sNegAppr != null) { // 已存在不新增
-					continue;
-				}
-			}
 
 			tNegAppr.setNegApprId(tNegApprId);
-			tNegAppr.setExportDate(Integer.valueOf(mExportDate));
-			tNegAppr.setApprAcDate(Integer.valueOf(mApprAcDate));
-			tNegAppr.setBringUpDate(Integer.valueOf(mBringUpDate));
+			if (Integer.valueOf(mExportDate) == 0 && Integer.valueOf(mApprAcDate) == 0
+					&& Integer.valueOf(mBringUpDate) == 0) {
+				tNegAppr.setExportDate(0);
+				tNegAppr.setApprAcDate(0);
+				tNegAppr.setBringUpDate(0);
+			} else {
+				tNegAppr.setExportDate(Integer.valueOf(mExportDate));
+				tNegAppr.setApprAcDate(Integer.valueOf(mApprAcDate));
+				tNegAppr.setBringUpDate(Integer.valueOf(mBringUpDate));
+			}
 
 			try {
 				sNegApprService.insert(tNegAppr);
 			} catch (DBException e) {
-				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
-				} else {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
-				}
+				throw new LogicException(titaVo, "E0005", "撥付日期設定檔"); // 新增資料時，發生錯誤
 			}
 
 		}

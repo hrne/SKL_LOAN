@@ -2,18 +2,24 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxRateChange;
 import com.st1.itx.db.domain.BatxRateChangeId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.LoanRateChange;
+import com.st1.itx.db.domain.LoanRateChangeId;
 import com.st1.itx.db.service.BatxRateChangeService;
 import com.st1.itx.db.service.CdBaseRateService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -131,6 +137,10 @@ public class L431A extends TradeBuffer {
 			case 2: // 2.按輸入利率調整
 				tBatxRateChange.setAdjustedRate(BigDecimal.ZERO);
 				tBatxRateChange.setRateKeyInCode(2); // 2.待輸入
+				break;
+			case 3: // 3.按合約利率調整
+				tBatxRateChange.setAdjustedRate(tBatxRateChange.getContractRate());
+				tBatxRateChange.setRateKeyInCode(1); // 1.已調整
 				break;
 			}
 			checkMsg = check("", tBatxRateChange, titaVo);

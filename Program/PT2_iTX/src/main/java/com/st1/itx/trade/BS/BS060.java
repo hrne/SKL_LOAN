@@ -13,8 +13,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcLoanInt;
+import com.st1.itx.db.domain.AcLoanIntCashFlow;
+import com.st1.itx.db.domain.AcLoanIntCashFlowId;
+import com.st1.itx.db.domain.AcLoanIntId;
 import com.st1.itx.db.domain.CdCashFlow;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.service.AcLoanIntCashFlowService;
+import com.st1.itx.db.service.AcLoanIntService;
 import com.st1.itx.db.service.CdCashFlowService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -51,7 +57,12 @@ public class BS060 extends TradeBuffer {
 	@Autowired
 	public LoanBorMainService loanBorMainService;
 
+	@Autowired
+	private AcLoanIntCashFlowService acLoanIntCashFlowService;
+
 	private int commitCnt = 20;
+
+	private int cnt = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -80,53 +91,105 @@ public class BS060 extends TradeBuffer {
 		BigDecimal interestIncome = BigDecimal.ZERO; // 利息收入
 		BigDecimal principalAmortizeAmt = BigDecimal.ZERO; // 本金攤還金額
 		BigDecimal duePaymentAmt = BigDecimal.ZERO; // 到期清償金額
+		this.index = 0;
+		this.limit = Integer.MAX_VALUE;
 
-		BigDecimal loanBal = BigDecimal.ZERO; // 放款餘額(還款前、只放第一期)
-		BigDecimal principal = BigDecimal.ZERO; // 本金
-		BigDecimal interest = BigDecimal.ZERO; // 利息
 		int cntTrans = 0;
-
-		ArrayList<BaTxVo> lBaTxVo = new ArrayList<BaTxVo>();
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, entryDate + 19110000, 0, this.index, Integer.MAX_VALUE, titaVo);
-		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
-
-		this.batchTransaction.commit();
-		if (lLoanBorMain != null)
-			for (LoanBorMain bo : lLoanBorMain) {
-				{
-					if (cntTrans > this.commitCnt) {
-						cntTrans = 0;
-						this.batchTransaction.commit();
-					}
-					cntTrans++;
-					// baTxCom.cashFlow 現金流量預估
-					try {
-						lBaTxVo = baTxCom.cashFlow(entryDate, bo.getCustNo(), bo.getFacmNo(), bo.getBormNo(), titaVo);
-					} catch (LogicException e) {
-						this.info("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + bo.getCustNo() + "-" + bo.getFacmNo() + "-" + bo.getBormNo());
-					}
-					if (lBaTxVo != null) {
-						loanBal = BigDecimal.ZERO;
-						principal = BigDecimal.ZERO;
-						interest = BigDecimal.ZERO;
-						for (BaTxVo baTxVo : lBaTxVo) {
-							if (baTxVo.getPayIntDate() >= beginDate && baTxVo.getPayIntDate() <= entryDate) {
-								loanBal = loanBal.add(baTxVo.getLoanBal());
-								principal = principal.add(baTxVo.getPrincipal());
-								interest = interest.add(baTxVo.getInterest());
-							}
-						}
-					}
-					interestIncome = interestIncome.add(interest);
-					if (loanBal.equals(principal))
-						duePaymentAmt = duePaymentAmt.add(principal);
-					else
-						principalAmortizeAmt = principalAmortizeAmt.add(principal);
-				}
-			}
-
 		int yearMonth = (entryDate / 100) + 191100;
 
+		Slice<AcLoanIntCashFlow> slAcLoanIntCashFlow = acLoanIntCashFlowService.findYearMonthEq(yearMonth, this.index,
+				Integer.MAX_VALUE, titaVo);
+		List<AcLoanIntCashFlow> lAcLoanIntCashFlow = slAcLoanIntCashFlow == null ? null
+				: slAcLoanIntCashFlow.getContent();
+		if (lAcLoanIntCashFlow != null) {
+			try {
+				acLoanIntCashFlowService.deleteAll(lAcLoanIntCashFlow, titaVo);
+			} catch (DBException e) {
+				e.printStackTrace();
+				throw new LogicException(titaVo, "E0008", "AcLoanInt delete " + e.getErrorMsg());
+			}
+		}
+
+		ArrayList<BaTxVo> lBaTxVo = new ArrayList<BaTxVo>();
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, entryDate + 19110000, 0,
+				this.index, Integer.MAX_VALUE, titaVo);
+		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+		lAcLoanIntCashFlow = new ArrayList<AcLoanIntCashFlow>();
+
+		this.batchTransaction.commit();
+		if (lLoanBorMain != null) {
+			for (LoanBorMain ln : lLoanBorMain) {
+				if (cntTrans > this.commitCnt) {
+					cntTrans = 0;
+					if (lAcLoanIntCashFlow.size() > 0) {
+						try {
+							acLoanIntCashFlowService.insertAll(lAcLoanIntCashFlow, titaVo);
+						} catch (DBException e) {
+							e.printStackTrace();
+							throw new LogicException(titaVo, "E0005", "AcLoanIntCashFlow insert " + e.getErrorMsg());
+						}
+					}
+					this.batchTransaction.commit();
+					lAcLoanIntCashFlow = new ArrayList<AcLoanIntCashFlow>();
+				}
+				cntTrans++;
+				// baTxCom.cashFlow 現金流量預估
+				lBaTxVo = new ArrayList<BaTxVo>();
+				try {
+					lBaTxVo = baTxCom.cashFlow(entryDate, ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), titaVo);
+				} catch (LogicException e) {
+					this.info("ErrorMsg :" + e.getErrorMsg(titaVo) + " " + ln.getCustNo() + "-" + ln.getFacmNo() + "-"
+							+ ln.getBormNo());
+				}
+				if (lBaTxVo != null) {
+					int termNo = 0;
+					for (BaTxVo ba : lBaTxVo) {
+						AcLoanIntCashFlow tAc = new AcLoanIntCashFlow();
+						AcLoanIntCashFlowId tAcId = new AcLoanIntCashFlowId();
+						tAcId.setYearMonth(yearMonth); // 提息年月
+						tAcId.setCustNo(ba.getCustNo()); // 借款人戶號
+						tAcId.setFacmNo(ba.getFacmNo()); // 額度編號
+						tAcId.setBormNo(ba.getBormNo()); // 撥款序號
+						termNo++;
+						// tAcId.setTermNo(ba.getPaidTerms()); // 期數編號
+						tAcId.setTermNo(termNo); // 期數編號
+						tAc.setAcLoanIntCashFlowId(tAcId);
+						tAc.setIntStartDate(ba.getIntStartDate()); // 計息起日
+						tAc.setIntEndDate(ba.getIntEndDate()); // 計息止日
+						tAc.setAmount(ba.getAmount()); // 計息本金
+						tAc.setIntRate(ba.getIntRate()); // 計息利率
+						tAc.setPrincipal(ba.getPrincipal()); // 回收本金
+						tAc.setInterest(ba.getInterest()); // 利息
+						tAc.setDelayInt(ba.getDelayInt()); // 延滯息
+						tAc.setBreachAmt(ba.getBreachAmt()); // 違約金
+						tAc.setAmortizedCode(ln.getAmortizedCode());
+						tAc.setIntCalcCode(ln.getIntCalcCode());
+						tAc.setAcctCode(ba.getAcctCode()); //
+						tAc.setPayIntDate(ba.getPayIntDate()); // 應繳息日
+						tAc.setLoanBal(ba.getLoanBal()); // 放款餘額
+						lAcLoanIntCashFlow.add(tAc);
+						cnt++;
+						if (ba.getPayIntDate() >= beginDate && ba.getPayIntDate() <= entryDate) {
+							interestIncome = interestIncome.add(ba.getInterest());
+							if ("3".equals(ln.getAmortizedCode()) || "4".equals(ln.getAmortizedCode()))
+								principalAmortizeAmt = principalAmortizeAmt.add(ba.getPrincipal());
+							else
+								duePaymentAmt = duePaymentAmt.add(ba.getPrincipal());
+						}
+					}
+				}
+			}
+		}
+
+		if (lAcLoanIntCashFlow.size() > 0) {
+			try {
+				acLoanIntCashFlowService.insertAll(lAcLoanIntCashFlow, titaVo);
+			} catch (DBException e) {
+				e.printStackTrace();
+				throw new LogicException(titaVo, "E0005", "AcLoanIntCashFlow insert " + e.getErrorMsg());
+			}
+		}
+		this.info("AcLoanIntCashFlow cnt=" + cnt);
 		CdCashFlow tCdCashFlow = cdCashFlowService.holdById(yearMonth, titaVo);
 		if (tCdCashFlow == null) {
 			tCdCashFlow = new CdCashFlow();

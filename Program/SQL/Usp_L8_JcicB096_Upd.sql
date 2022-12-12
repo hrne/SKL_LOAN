@@ -261,7 +261,8 @@ BEGIN
            END                                   AS "PostedLandValue"   -- 公告土地現值                  DECIMAL   10 
          , CASE 
              WHEN NVL(WK."PostedLandValueYearMonth",0) = 0 THEN 9607   -- (ref:AS400 LN15M1) 
-             WHEN NVL(WK."PostedLandValueYearMonth",0) < 191100 THEN NVL(WK."PostedLandValueYearMonth",0) 
+             WHEN NVL(WK."PostedLandValueYearMonth",0) < 191100 THEN NVL(WK."PostedLandValueYearMonth",0)
+             WHEN NVL(WK."PostedLandValueYearMonth",0) > (191100 * 2) THEN NVL(WK."PostedLandValueYearMonth",0) - (191100 * 2) 
              ELSE WK."PostedLandValueYearMonth" - 191100 
            END                                   AS "PostedLandValueYearMonth" -- 公告土地現值年月              DECIMAL   5 
          , ' '                                   AS "Filler18"           -- 空白                          VARCHAR2  30 

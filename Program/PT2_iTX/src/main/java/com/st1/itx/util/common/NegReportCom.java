@@ -1043,6 +1043,13 @@ public class NegReportCom extends CommBuffer {
 											throw new LogicException(titaVo, "E5009", "最大債權撥付資料檔已製檔");
 										}
 										ExportDate = intdate; // 會計日期-西元年
+										String tRemitAcct = tNegAppr01.getRemitAcct().trim();
+										if (tRemitAcct == null || tRemitAcct.length() == 0
+												|| ("0000000000000000").equals(tRemitAcct)) {
+											throw new LogicException(titaVo, "E5009", "戶號" + tNegAppr01.getCustNo()
+													+ "匯款銀行" + tNegAppr01.getRemitBank() + "的匯款帳號有誤:" + tRemitAcct);
+										}
+										
 									} else {
 										// 逆向
 										ExportDate = 0;
@@ -1230,7 +1237,14 @@ public class NegReportCom extends CommBuffer {
 							String ToFinCode = tNegAppr01.getRemitBank();// 債權機構代號-需放實際匯出帳號的匯款銀行
 
 							// 轉帳類別(同檔案一致)-Order3
-							String TransAccCode = "02960";// 代發前置協商金融款項
+							String tCaseKindCode = tNegMain.getCaseKindCode();//取自NegMain的案件種類
+							String TransAccCode = "";// 轉帳類別
+							if (("1").equals(tCaseKindCode) || ("2").equals(tCaseKindCode)) {
+								TransAccCode ="02960";//債協與調解的轉帳類別
+							}else {
+								TransAccCode ="02950";//更生與清算的轉帳類別
+							}
+							
 //							// 入/扣帳日(同檔案一致)-Order4
 //							int AssigeDate = tNegAppr01.getExportDate();//
 //							if(AssigeDate!=0) {
@@ -1293,11 +1307,22 @@ public class NegReportCom extends CommBuffer {
 							case "02120":
 								// 市水水號(10位)
 								break;
-							case "02960":
+							case "02950"://更生與清算
+								if(("3").equals(tCaseKindCode)) {//更生多加A
+									Detail16 = "A";
+								}
+								if(("4").equals(tCaseKindCode)) {//清算多加B
+									Detail16 = "B";
+								}
+								break;
+							case "02960"://債協與調解
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
 								Detail16 = tNegTrans.getTxKind();// tNegTrans-交易別
 								if (("5").equals(Detail16)) {// tNegTrans-交易別=5:提前清償
 									Detail16 = "4";
+								}
+								if(("2").equals(tCaseKindCode)) {//調解需多加B
+									Detail16 = Detail16 +"B";
 								}
 								break;
 							case "02970":
@@ -1346,6 +1371,7 @@ public class NegReportCom extends CommBuffer {
 			List<String> lTrialTrans1AccCode = new ArrayList<String>();
 			lTrialTrans1AccCode.add("02960");
 			lTrialTrans1AccCode.add("02970");
+			lTrialTrans1AccCode.add("02950");//更生與清算
 
 			// Detail14-轉帳帳號-特殊條件
 			List<String> lTrialTrans2AccCode = new ArrayList<String>();

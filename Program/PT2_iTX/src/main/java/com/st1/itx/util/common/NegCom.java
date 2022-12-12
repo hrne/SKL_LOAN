@@ -973,6 +973,7 @@ public class NegCom extends CommBuffer {
 		tNegAppr01Upd.setNegAppr01Id(tNegAppr01Id);
 		tNegAppr01Upd.setCustNo(tNegTrans.getCustNo());// 戶號
 		tNegAppr01Upd.setCaseSeq(tNegTrans.getCaseSeq());// 案件序號
+		String tCaseKindCode = tNegMain.getCaseKindCode();//取自NegMain的案件種類
 		tNegAppr01Upd.setCaseKindCode(tNegMain.getCaseKindCode());// 案件種類
 		tNegAppr01Upd.setApprAmt(shareAmt);// 撥付金額
 		tNegAppr01Upd.setAccuApprAmt(SumCustNoFinCode.add(shareAmt));// 累計撥付金額
@@ -981,7 +982,34 @@ public class NegCom extends CommBuffer {
 		tNegAppr01Upd.setApprDate(0);// 撥付日期
 		tNegAppr01Upd.setBringUpDate(0);// 提兌日
 		tNegAppr01Upd.setRemitBank(tNegFinAcct.getRemitBank());// 匯款銀行
-		tNegAppr01Upd.setRemitAcct(tNegFinAcct.getRemitAcct());// 匯款帳號
+		//案件種類:調解若匯款帳號空白則使用債協匯款帳號(BATCHTX01此二類的轉帳類別02960),
+		//清算匯款帳號若空白則使用更生匯款帳號(BATCHTX01此二類的轉帳類別02950)
+		String tRemitAcct1 = tNegFinAcct.getRemitAcct().trim();//1:債協匯款帳號
+		String tRemitAcct2 = tNegFinAcct.getRemitAcct2().trim();//2:調解匯款帳號
+		String tRemitAcct3 = tNegFinAcct.getRemitAcct3().trim();//3:更生匯款帳號
+		String tRemitAcct4 = tNegFinAcct.getRemitAcct4().trim();//4:清算匯款帳號
+		String tRemitAcct = tRemitAcct1;//匯款帳號預設為債協匯款帳號
+		if (("2").equals(tCaseKindCode)) {//調解
+			if (tRemitAcct2 != null && tRemitAcct2.length() != 0 && !("0000000000000000").equals(tRemitAcct2)) {
+				tRemitAcct = tRemitAcct2;
+			}
+		}
+		if (("3").equals(tCaseKindCode) || ("4").equals(tCaseKindCode)) {//更生與清算
+			if (tRemitAcct3 != null && tRemitAcct3.length() != 0 && !("0000000000000000").equals(tRemitAcct3)) {
+				tRemitAcct = tRemitAcct3;
+			}
+			if (("4").equals(tCaseKindCode)) {//清算
+				if (tRemitAcct4 != null && tRemitAcct4.length() != 0 && !("0000000000000000").equals(tRemitAcct4)) {
+					tRemitAcct = tRemitAcct4;
+				}
+			}
+		}
+		if (tRemitAcct == null || tRemitAcct.length() == 0 || ("0000000000000000").equals(tRemitAcct)) {
+			throw new LogicException(titaVo, "E5009",
+					"戶號" + tNegTrans.getCustNo() + "匯款銀行" + tNegFinAcct.getRemitBank() + "的匯款帳號有誤:" + tRemitAcct);
+		}
+
+		tNegAppr01Upd.setRemitAcct(tRemitAcct);// 匯款帳號
 		tNegAppr01Upd.setDataSendUnit(tNegFinAcct.getDataSendSection());// 資料傳送單位
 		tNegAppr01Upd.setApprAcDate(0);// 撥付傳票日
 		tNegAppr01Upd.setReplyCode("");// 回應代碼
