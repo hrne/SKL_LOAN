@@ -976,7 +976,9 @@ BEGIN
          -- 上述發生日期時之應收利息(台幣)=繳息迄日~發生日期間的利息
          -- 若此區間無新利率則利息=發生日時餘額*發生日時利率*120/360/100
          -- 若此區間有不同利率則以分段計算
+         -- 減損發生月的科目若為990則不計算利息(2022/12/12 FROM Goldie)
          , CASE
+             WHEN NVL(ML."AcctCode",'0') = '990'  THEN 0
              WHEN M."DerDate" != 0  AND M."OvduDate" = 0                        -- 減損發生日,2022/12/6若無轉催日則計算起日為第一筆利率生效日
                THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LR1."EffectDate",M."DerDate")
              WHEN M."DerDate" != 0  AND M."OvduDate" > 0                        -- 減損發生日,若有轉催日則計算起日為繳息迄日

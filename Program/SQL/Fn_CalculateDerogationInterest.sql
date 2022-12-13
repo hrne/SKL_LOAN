@@ -26,7 +26,6 @@ BEGIN
      -- 若此區間有不同利率則以分段計算
      -- 發生日時餘額 * (利率生效日、發生日)時利率 * 天數(繳息迄日~利率生效日~發生日 分段) / 360 / 100
      -- 2022-12-6:無轉催日,傳入之起日改為第一筆利率生效日
-     -- 若有不同利率需分段計算:此時利率取整數,每一段利息小數位無條件捨去
 
      DECLARE
           haveRateChange NUMBER;
@@ -48,7 +47,7 @@ BEGIN
 
      WITH rawData AS (
           SELECT LRC."EffectDate"
-               , TRUNC(LRC."FitRate") AS "FitRate"
+               , LRC."FitRate"  
           FROM "LoanRateChange" LRC
           WHERE LRC."CustNo" = "InputCustNo"
           AND LRC."FacmNo" = "InputFacmNo"
@@ -57,7 +56,7 @@ BEGIN
           AND LRC."EffectDate" < "InputDerogationDate"
           UNION
           SELECT "InputPrevPayIntDate" AS "EffectDate"
-               , TRUNC("Fn_GetFitRate"("InputCustNo", "InputFacmNo", "InputBormNo", "InputPrevPayIntDate"))
+               , "Fn_GetFitRate"("InputCustNo", "InputFacmNo", "InputBormNo", "InputPrevPayIntDate")
                                        AS "FitRate"
           FROM DUAL
           UNION

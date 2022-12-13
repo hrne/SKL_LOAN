@@ -660,38 +660,43 @@ BEGIN
              , M."FacmNo"
              , M."BormNo"
     )
-    , LoanData AS (
+    , LoanData AS ( -- 戶況非正常之餘額=轉催收本金+轉催收利息-催收還款金額-轉銷呆帳金額
       SELECT M."CustNo"
            , M."FacmNo"
            , M."BormNo"
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth1"
-                 THEN MLB."LoanBalance"
+--                 THEN MLB."LoanBalance"
+                   THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal1" -- 發生日後第一年餘額
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth2"
-                 THEN MLB."LoanBalance"
+--                 THEN MLB."LoanBalance"
+                   THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal2" -- 發生日後第二年餘額
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth3"
-                 THEN MLB."LoanBalance"
+--                 THEN MLB."LoanBalance"
+                   THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal3" -- 發生日後第三年餘額
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth4"
-                 THEN MLB."LoanBalance"
+--                 THEN MLB."LoanBalance"
+                   THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal4" -- 發生日後第四年餘額
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth5"
-                 THEN MLB."LoanBalance"
+--                 THEN MLB."LoanBalance"
+                   THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal5" -- 發生日後第五年餘額
            , M."Seq"
@@ -958,8 +963,10 @@ BEGIN
          -- 上述發生日期時之應收利息(台幣)=繳息迄日~發生日期間的利息
          -- 若此區間無新利率則利息=發生日時餘額*發生日時利率*120/360/100
          -- 若此區間有不同利率則以分段計算
+         -- 減損發生月的科目若為990則不計算利息(2022/12/12 FROM Goldie)
          , CASE
-             WHEN M."DerDate" != 0 -- 減損發生日
+             WHEN NVL(ML."AcctCode",'0') = '990'  THEN 0
+             WHEN M."DerDate" != 0      -- 減損發生日
              THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate")
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
          -- 2022-07-13 Wei 新增 from Linda

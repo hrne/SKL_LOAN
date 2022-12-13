@@ -70,6 +70,7 @@ public class L4455Report extends MakeReport {
 	private String acctcode = "";
 	private String acctcodex = "";
 	private String tCustName = "";
+	private String repaybankX= "";
 
 	// 合計
 
@@ -119,47 +120,47 @@ public class L4455Report extends MakeReport {
 	}
 
 	public void printHeaderP() {
-
+			
 		this.setFont(1, 9);
 		this.print(-1, 185, "機密等級：密");
 		this.print(-2, 1, "程式ID：" + "L4455Report");
-		this.print(-2, this.getMidXAxis(), "新光人壽保險股份有限公司", "C");
+		this.print(-2, 95, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
 		this.print(-2, 203, "日　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
 				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-3, 1, "報　表：" + "L4455Report");
-
-		String feeItem = "";
-		switch (funcd) {
-		case 2:
-			feeItem = "（帳管費）";
-			break;
-		case 3:
-			feeItem = "（契變手續費）";
-			break;
-		case 4:
-			feeItem = "（火險費）";
-			break;
-		case 5:
-			feeItem = "（法務費）";
-			break;
-		default:
-			feeItem = "";
-			break;
-		}
+//		if (!"700".equals(repaybank)) {
+//		this.print(-3, 95, "扣款總傳票明細表", "C");
+//		} else {
+//			this.print(-3, 95, "扣款總傳票明細表", "C");
+//		}
 
 		if ("999".equals(irepaybank)) {
-			this.print(-3, this.getMidXAxis(), "銀行扣款總傳票明細表" + feeItem, "C");
+			this.print(-3, 95, "銀行扣款總傳票明細表", "C");
 		} else {
-			this.print(-3, this.getMidXAxis(), "ACH 扣款總傳票明細表" + feeItem, "C");
+			this.print(-3, 95, "ACH 扣款總傳票明細表", "C");
 		}
 
+		switch (funcd) {
+		case 2:
+			this.print(-3, 120, "（帳管費）", "C");
+			break;
+		case 3:
+			this.print(-3, 120, "（契變手續費）", "C");
+			break;
+		case 4:
+			this.print(-3, 120, "（火險費）", "C");
+			break;
+		default:
+			break;
+		}
 		this.print(-3, 203, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-4, 185, "頁　數：");
 		this.print(-4, 200, "" + this.getNowPage(), "R");
 		this.print(-5, 3, "批次號碼：" + batchno);
+		this.print(-5, 95, " 年    月    日", "C");
 
 		if (String.valueOf(acdate).length() == 7) {
 			year = String.valueOf(acdate).substring(0, 3);
@@ -171,7 +172,9 @@ public class L4455Report extends MakeReport {
 			date = String.valueOf(acdate).substring(4, 6);
 		}
 
-		this.print(-5, this.getMidXAxis(), year + " 年 " + month + " 月 " + date + " 日", "C");
+		this.print(-5, 84, year);
+		this.print(-5, 91, month);
+		this.print(-5, 98, date);
 
 		this.print(-5, 185, "單　位：元");
 		if (String.valueOf(entrydate).length() == 7) {
@@ -184,11 +187,20 @@ public class L4455Report extends MakeReport {
 			this.print(-6, 3, "扣款日期：");
 		}
 
-		if (dataSize == 0) {
-			bank = "";
-			repaybank = "";
+		for (CdCode tCdCode : lCdCode) {
+			this.info("RepayBank" +  titaVo.get("RepayBank"));
+			if (titaVo.get("RepayBank").equals(tCdCode.getCode())) {
+				bank = tCdCode.getItem();
+				repaybank = titaVo.get("RepayBank");
+				repaybankX = titaVo.get("RepayBankX");
+				this.info("RepayBankX     = "    + repaybankX);
+			}
 		}
-
+		if (dataSize == 0) {
+			//repaybank = "";
+			repaybank = titaVo.get("RepayBank")+' '+titaVo.get("RepayBankX");
+			bank = "";
+		}
 		this.print(-6, 35, "扣款銀行：" + repaybank + "  " + bank);
 
 		this.print(-8, 1,
@@ -200,9 +212,13 @@ public class L4455Report extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L4455Report exec");
-
 		acdate = parse.stringToInteger(titaVo.getParam("AcDate"));
+		this.info("acdate   = " + acdate);
+		
 		entrydate = titaVo.getParam("EntryDate");
+		this.info("entrydate   = " + entrydate);
+		
+		this.info("");
 		irepaybank = titaVo.getParam("RepayBank");
 
 		List<Map<String, String>> L4455List = new ArrayList<Map<String, String>>();
@@ -247,109 +263,69 @@ public class L4455Report extends MakeReport {
 			throw new LogicException("E0013", "L4455");
 		}
 		Report(titaVo, L4455List, funcd);
-
-		this.info("L4455Report Collist");
-		funcd = 5;
-		try {
-			L4455List = sL4455ServiceImpl.findAll(titaVo, funcd);
-		} catch (Exception e) {
-			this.error("L4455ServiceImpl findByCondition " + e.getMessage());
-			throw new LogicException("E0013", "L4455");
-		}
-		Report(titaVo, L4455List, funcd);
 	}
 
 	private void Report(TitaVo titaVo, List<Map<String, String>> L4455List, int function) throws LogicException {
 
-		// 是否有資料
 		dataSize = L4455List.size() > 0 && !L4455List.isEmpty() ? L4455List.size() : 0;
 
 		String tradeReportName = "";
 		switch (function) {
 		case 1:
 			tradeReportName = "銀行扣款總傳票明細表";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表", "", "A4", "L");
 			break;
 		case 2:
 			tradeReportName = "銀行扣款總傳票明細表(帳管費)";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(帳管費)", "", "A4", "L");
 			break;
 		case 3:
 			tradeReportName = "銀行扣款總傳票明細表(契變手續費)";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(契變手續費)", "", "A4", "L");
 			break;
 		case 4:
 			tradeReportName = "銀行扣款總傳票明細表(火險費)";
-			break;
-		case 5:
-			tradeReportName = "銀行扣款總傳票明細表(法務費)";
+//			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4455", "銀行扣款總傳票明細表(火險費)", "", "A4", "L");
 			break;
 		default:
 			break;
 		}
 
-		this.info("L4455List = " + L4455List.toString() + ",size = " + L4455List.size());
-
-		// 找銀行代碼
-		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
-		lCdCode = slCdCode == null ? null : slCdCode.getContent();
-
-		// 找科目代碼
-		Slice<CdCode> slCdCode2 = sCdCodeDefService.defItemEq("AcctCode", "%", this.index, this.limit, titaVo);
-		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
-
-		// 設定報表格式
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode("L4455").setRptItem(tradeReportName).setSecurity("").setRptSize("A4")
 				.setPageOrientation("L").build();
-		// 開啟報表
+
 		this.open(titaVo, reportVo);
 
-		if (titaVo.getParam("BatchNo") != null) {
+		Slice<CdCode> slCdCode = sCdCodeDefService.defItemEq("BankDeductCd", "%", this.index, this.limit, titaVo);
+
+		lCdCode = slCdCode == null ? null : slCdCode.getContent();
+
+		Slice<CdCode> slCdCode2 = sCdCodeDefService.defItemEq("AcctCode", "%", this.index, this.limit, titaVo);
+
+		lCdCode2 = slCdCode2 == null ? null : slCdCode2.getContent();
+
+		this.info("L4455List = " + L4455List.toString());
+		this.info("size = " + L4455List.size());
+		if(titaVo.getParam("BatchNo") != null){
 			this.info("BatchNo   = " + titaVo.getParam("BatchNo"));
 		}
-
-		if (L4455List.size() == 0) {
-			batchno = "BATX" + titaVo.getParam("BatchNo");
+		if(L4455List.size() <= 0 && L4455List.isEmpty()) {
+			batchno = "BATX"+titaVo.getParam("BatchNo");
 			entrydate = String.valueOf(parse.stringToInteger(titaVo.getParam("EntryDate")));
 			repaybank = titaVo.getParam("RepayBank");
-
+			this.info("batchno  = " + batchno);
+			this.info("entrydate = " + entrydate);
+			this.info("repaybank = " + repaybank);
 		}
-
-		if (L4455List.size() > 0) {
+		if (L4455List.size() > 0 && !L4455List.isEmpty()) {
 			int i = 0, pageCnt = 0;
 
-			if (!batchno.equals(L4455List.get(i).get("BatchNo"))) {
-				batchno = L4455List.get(i).get("BatchNo");
-			}
-
-			if (!entrydate
-					.equals(String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000))) {
-				entrydate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000);
-			}
-
-			this.info("repaybank old = " + L4455List.get(i).get("RepayBank"));
-			if (!repaybank.equals(L4455List.get(i).get("RepayBank"))) {
-
-				repaybank = L4455List.get(i).get("RepayBank");
-				for (CdCode tCdCode : lCdCode) {
-					if (repaybank.equals(tCdCode.getCode())) {
-						bank = tCdCode.getItem();
-
-					}
-				}
-				this.info("repaybank new  = " + repaybank);
-				this.info("bank  = " + bank);
-				if (this.getNowPage() > 1) {
-					this.info("getNowPage  = " + this.getNowPage());
-					this.info("NowRow  = " + this.NowRow);
-					this.info("newPage  = " + L4455List.get(i).get("RepayBank"));
-					this.newPage();
-				}
-
-			}
-
-			if (!acctcode.equals(L4455List.get(i).get("AcctCode"))) {
-				acctcode = L4455List.get(i).get("AcctCode");
-			}
-
+			batchno = L4455List.get(0).get("BatchNo");
+			entrydate = String.valueOf(parse.stringToInteger(L4455List.get(0).get("EntryDate")) - 19110000);
+			repaybank = L4455List.get(0).get("RepayBank");
+			acctcode = L4455List.get(0).get("AcctCode").equals("900") ? "990" : L4455List.get(0).get("AcctCode");
+			
 			for (int j = 1; j <= L4455List.size(); j++) {
 				i = j - 1;
 
@@ -359,7 +335,8 @@ public class L4455Report extends MakeReport {
 				DecimalFormat df1 = new DecimalFormat("#,##0");
 
 //				1.每筆先印出明細
-				this.print(1, 1, " ");
+				this.print(1, 1,
+						"                                                                                                                                                                               ");
 				this.print(0, 1, L4455List.get(i).get("CustNo"));// 戶號
 
 				if (!tCustName.equals(limitLength(L4455List.get(i).get("CustName"), 20))) {
@@ -455,17 +432,8 @@ public class L4455Report extends MakeReport {
 					batchno = L4455List.get(j).get("BatchNo");
 					entrydate = String.valueOf(parse.stringToInteger(L4455List.get(j).get("EntryDate")) - 19110000);
 					repaybank = L4455List.get(j).get("RepayBank");
-					acctcode = L4455List.get(j).get("AcctCode");
-
-					for (CdCode tCdCode : lCdCode) {
-						if (repaybank.equals(tCdCode.getCode())) {
-							bank = tCdCode.getItem();
-
-						}
-					}
-					this.info("repaybank new  = " + repaybank);
-
-					this.info("bank  = " + bank);
+					acctcode = L4455List.get(j).get("AcctCode").equals("900") ? "990"
+							: L4455List.get(j).get("AcctCode");
 
 					if (!L4455List.get(i).get("BatchNo").equals(batchno)
 							|| !String.valueOf(parse.stringToInteger(L4455List.get(i).get("EntryDate")) - 19110000)
@@ -477,13 +445,14 @@ public class L4455Report extends MakeReport {
 								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1,
 								"                                                                                                                                                                               ");
-						String tmpAcctcodex = L4455List.get(i).get("AcctCode");
+						String tmpAcctcodex = L4455List.get(i).get("AcctCode").equals("900") ? "990"
+								: L4455List.get(i).get("AcctCode");
 						for (CdCode tCdCode : lCdCode2) {
 							if (tmpAcctcodex.equals(tCdCode.getCode())) {
 								acctcodex = tCdCode.getItem();
 							}
 						}
-						if (funcd != 1) {
+						if(L4455List.get(i).get("AcctCode").equals("456")) {
 							acctcodex = "暫收款";
 						}
 
@@ -494,9 +463,9 @@ public class L4455Report extends MakeReport {
 						amt();
 
 						if (pageIndex - pageCnt - 2 <= 0) {
-							this.print(1, this.getMidXAxis(), "=====續下頁=====", "C");
+							this.print(1, 95, "=====續下頁=====", "C");
 						} else {
-							this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
+							this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
 						}
 						pageCnt = 0;
 						this.newPage();
@@ -507,38 +476,38 @@ public class L4455Report extends MakeReport {
 						continue;
 
 					}
-					//銀行扣款總傳票明細表(火險費)
-					if (funcd != 4) {
-						if (!L4455List.get(i).get("AcctCode").equals(acctcode)) { // 科目不同 科目合計
-							this.print(1, 1,
-									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-							this.print(1, 1,
-									"                                                                                                                                                                               ");
-							for (CdCode tCdCode : lCdCode2) {
-								if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
-									acctcodex = tCdCode.getItem();
-								}
+
+					if (!L4455List.get(i).get("AcctCode").equals(acctcode)) { // 科目不同 科目合計
+						this.print(1, 1,
+								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1,
+								"                                                                                                                                                                               ");
+						for (CdCode tCdCode : lCdCode2) {
+							if (L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
+								acctcodex = tCdCode.getItem();
 							}
-							if (funcd != 1) {
-								acctcodex = "暫收款";
-							}
-							this.print(0, 1, acctcodex);
-							this.print(0, 19, "小計");
-
-							amt();
-
-							this.print(2, 1,
-									"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-							pageCnt = pageCnt + 4;
-
-							amttototal(); // 業務科目金額to總和
-							init(); // 業務科目金額歸0
-
 						}
+						if(L4455List.get(i).get("AcctCode").equals("456")) {
+							acctcodex = "暫收款";
+						}
+
+						this.print(0, 1, acctcodex);
+						this.print(0, 19, "小計");
+
+						amt();
+
+						this.print(2, 1,
+								"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+						pageCnt = pageCnt + 4;
+
+						amttototal(); // 業務科目金額to總和
+						init(); // 業務科目金額歸0
+
 					}
+
 //					每頁第38筆 跳頁 
 					if (pageCnt >= 34) {
-						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====續下頁=====", "C");
+						this.print(pageIndex - pageCnt - 2, 95, "=====續下頁=====", "C");
 //
 						pageCnt = 0;
 						this.newPage();
@@ -556,7 +525,7 @@ public class L4455Report extends MakeReport {
 							acctcodex = tCdCode.getItem();
 						}
 					}
-					if (funcd != 1) {
+					if(L4455List.get(i).get("AcctCode").equals("456")) {
 						acctcodex = "暫收款";
 					}
 
@@ -576,19 +545,19 @@ public class L4455Report extends MakeReport {
 					inittotal(); // 合計歸0
 					pageCnt = pageCnt + 4;
 					if (pageIndex - pageCnt - 2 <= 0) {
-						this.print(1, this.getMidXAxis(), "=====報表結束=====", "C");
+						this.print(1, 95, "=====報表結束=====", "C");
 					} else {
-						this.print(pageIndex - pageCnt - 2, this.getMidXAxis(), "=====報表結束=====", "C");
+						this.print(pageIndex - pageCnt - 2, 95, "=====報表結束=====", "C");
 					}
 
-					this.print(2, this.getMidXAxis(), "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
+					this.print(2, 95, "　　　　　　　　　　　　　　　　　　　　課長：　　　　　　　　　　製表人：", "C");
 				}
 
 			} // for
 
 		} else {
 
-			this.print(1, this.getMidXAxis(), "*******    查無資料    ******");
+			this.print(1, 20, "*******    查無資料   ******");
 		}
 
 		long sno = this.close();
