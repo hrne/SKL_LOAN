@@ -334,6 +334,7 @@ public class L840A extends TradeBuffer {
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 		String tranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
+		this.info("053ID  = " + titaVo.getParam("ChangePayDate"));
 		this.info("tranCode    = " + tranCode);
 		switch (tranCode) {
 		case "040":
@@ -827,6 +828,7 @@ public class L840A extends TradeBuffer {
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			
 			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
 			iActualFilingMark = titaVo.get("ActualFilingMark");
 			if (("").equals(iActualFilingMark)) {
@@ -834,11 +836,13 @@ public class L840A extends TradeBuffer {
 			}
 
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
+			iChangePayDate= Integer.valueOf(titaVo.getParam("ChangePayDate"));
 			JcicZ053Id jcicZ053Id = new JcicZ053Id();
 			jcicZ053Id.setCustId(iCustId);
 			jcicZ053Id.setRcDate(iRcDate);
 			jcicZ053Id.setSubmitKey(iSubmitKey);
 			jcicZ053Id.setMaxMainCode(iMaxMainCode);
+			jcicZ053Id.setChangePayDate(iChangePayDate);
 			JcicZ053 tJcicZ053 = new JcicZ053();
 			tJcicZ053 = sJcicZ053Service.holdById(jcicZ053Id, titaVo);
 			if (tJcicZ053 == null) {
@@ -2352,11 +2356,13 @@ public class L840A extends TradeBuffer {
 			iSubmitKey = titaVo.get("SubmitKey");
 			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
 			iMaxMainCode = titaVo.getParam("MaxMainCode");
+			iChangePayDate= Integer.valueOf(titaVo.getParam("ChangePayDate"));
 			JcicZ053Id jcicZ053Id = new JcicZ053Id();
 			jcicZ053Id.setCustId(iCustId);
 			jcicZ053Id.setRcDate(iRcDate);
 			jcicZ053Id.setSubmitKey(iSubmitKey);
 			jcicZ053Id.setMaxMainCode(iMaxMainCode);
+			jcicZ053Id.setChangePayDate(iChangePayDate);
 			JcicZ053 sJcicZ053 = new JcicZ053();
 			sJcicZ053 = sJcicZ053Service.findById(jcicZ053Id, titaVo);
 			Slice<JcicZ053> JcicZ053S = sJcicZ053Service.findAll(0, Integer.MAX_VALUE, titaVo);
@@ -2369,7 +2375,8 @@ public class L840A extends TradeBuffer {
 						&& iiJcicZ053.getSubmitKey().equals(sJcicZ053.getSubmitKey())
 						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
 						&& iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode())
-						&& iiJcicZ053.getActualFilingDate() == 0) {
+						&& iiJcicZ053.getActualFilingDate() == 0
+						&& iiJcicZ053.getChangePayDate() == 0) {
 
 					uJcicZ053 = sJcicZ053Service.holdById(iiJcicZ053.getJcicZ053Id(), titaVo);
 					oldJcicZ053 = (JcicZ053) iDataLog.clone(uJcicZ053);

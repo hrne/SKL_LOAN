@@ -148,6 +148,9 @@ T(3,1)ASGN(LOOP$)
 #OOSubmitKey=X,3,O
 #OOSubmitKeyX=X,50,O
 #OORcDate=D,7,O
+#OOChangePayDate=D,7,O
+#ChangePayDate=D,7,O
+E(0,#OOChangePayDate)
 #OOTranKey=X,1,O
 #OOActualFilingDate=D,7,O
 #OOActualFilingMark=X,3,O
@@ -172,7 +175,7 @@ E(0,#OOActualFilingDate)
 T(2,#OOActualFilingMark)
 
 #secret-no=x,1000,S
-T(6A,#OOSubmitKey+#ReportDate+#SubmitType+#TranCode+#ReportTime+#RcDate+#ActualFilingMark+#ActualFilingDate+#CustId+#MaxMainCode)
+T(6A,#OOSubmitKey+#ReportDate+#SubmitType+#TranCode+#ReportTime+#RcDate+#ActualFilingMark+#ActualFilingDate+#CustId+#MaxMainCode+#ChangePayDate)
 
 #SubmitKeyX2=X,50,O
 T(2,#OOSubmitKey+#OOSubmitKeyX)
@@ -224,7 +227,7 @@ TXFORM=L8416
 #OOActualFilingMark
 #OOMaxMainCode
 #OOMaxMainCodeX
-
+#OOChangePayDate
 #ExcelSnoM
 ^
 <include src="COM.icf::TRCTL.tom"/>
@@ -249,8 +252,8 @@ ifxBatch:{
 	rim:'L840A',
 	txtno:'#secret-no',
 	pfnx:"L8416.PFNX",
-	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","處理結果"],
-	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#batch-row-status"]
+	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","申請變更還款條件日","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#OOChangePayDate","#batch-row-status"]
 	}
 }
 
@@ -266,6 +269,8 @@ ifxBatch:{
 #OOMaxMainCodeX2=最大債權金融機構代號
 {width:100,align:'center'}
 #OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOChangePayDate=申請變更還款條件日
 {width:100,align:'center'}
 !#OOActualFilingDate=實際報送日
 !{width:100,align:'center'}
@@ -282,8 +287,8 @@ ifxBatch:{
 	rim:'L840A',
 	txtno:'#secret-no',
 	pfnx:"L8416.PFNX",
-	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","處理結果"],
-	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#batch-row-status"]
+	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","申請變更還款條件日","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#OOChangePayDate","#batch-row-status"]
 	}
 }
 
@@ -299,6 +304,8 @@ ifxBatch:{
 #OOMaxMainCodeX2=最大債權金融機構代號
 {width:100,align:'center'}
 #OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOChangePayDate=申請變更還款條件日
 {width:100,align:'center'}
 !#OOActualFilingDate=實際報送日
 !{width:100,align:'center'}
@@ -315,8 +322,8 @@ ifxBatch:{
 	rim:'L840A',
 	txtno:'#secret-no',
 	pfnx:"L8416.PFNX",
-	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","處理結果"],
-	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#batch-row-status"]
+	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","申請變更還款條件日","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#OOChangePayDate","#batch-row-status"]
 	}
 }
 
@@ -332,6 +339,8 @@ ifxBatch:{
 #OOMaxMainCodeX2=最大債權金融機構代號
 {width:100,align:'center'}
 #OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOChangePayDate=申請變更還款條件日
 {width:100,align:'center'}
 !#OOActualFilingDate=實際報送日
 !{width:100,align:'center'}
@@ -348,8 +357,8 @@ ifxBatch:{
 	rim:'L840A',
 	txtno:'#secret-no',
 	pfnx:"L8416.PFNX",
-	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","處理結果"],
-	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#batch-row-status"]
+	col_captions:["戶號","報送金融機構代號","協商申請日","最大債權金融機構代號","申請變更還款條件日","處理結果"],
+	col_names:["#OOCustId","#SubmitKeyX2","#OORcDate","#OOMaxMainCodeX2","#OOChangePayDate","#batch-row-status"]
 	}
 }
 
@@ -365,6 +374,8 @@ ifxBatch:{
 #OOMaxMainCodeX2=最大債權金融機構代號
 {width:100,align:'center'}
 #OOTranKey=交易代碼
+{width:100,align:'center'}
+#OOChangePayDate=申請變更還款條件日
 {width:100,align:'center'}
 !#OOActualFilingDate=實際報送日
 !{width:100,align:'center'}

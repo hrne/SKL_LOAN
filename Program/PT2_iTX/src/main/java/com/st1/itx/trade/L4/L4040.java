@@ -20,10 +20,12 @@ import com.st1.itx.db.domain.AchAuthLogId;
 import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.AchAuthLogService;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L4040ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.FileCom;
@@ -74,6 +76,8 @@ public class L4040 extends TradeBuffer {
 
 	@Autowired
 	public BankAuthActService bankAuthActService;
+	@Autowired
+	public CustMainService custMainService;
 
 	@Autowired
 	public CdCodeService cdCodeService;
@@ -339,7 +343,18 @@ public class L4040 extends TradeBuffer {
 //							5.OccRepayAcct			委繳戶帳號		X	14	40	扣款帳號
 						occursList.putParam("OccRepayAcct", FormatUtil.padX(result.get("F4"), 14));
 //							6.OccCustId				委繳戶統一編號	X	10	50	身分證字號
-						occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
+						if (parse.stringToInteger(result.get("F17")) == 0) {
+							CustMain tCustMain = custMainService.custNoFirst(parse.stringToInteger(result.get("F2")),
+									parse.stringToInteger(result.get("F2")), titaVo);
+							if (tCustMain != null) {
+								occursList.putParam("OccCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
+							} else {
+								occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
+							}
+						} else {
+
+							occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
+						}
 //							7.OccCustNo				用戶號碼		X	20	70	借款人戶號
 						occursList.putParam("OccCustNo",
 								FormatUtil.padX(FormatUtil.pad9("" + result.get("F2"), 7), 20));

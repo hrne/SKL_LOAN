@@ -160,7 +160,8 @@ public class L3943 extends TradeBuffer {
 
 		} else {
 
-			this.totaVo.putParam("ORelNo", tLoanCheque.getKinbr() + tLoanCheque.getTellerNo() + tLoanCheque.getTxtNo());
+			this.totaVo.putParam("ORelNo",
+					tLoanCheque.getKinbr() + tLoanCheque.getTellerNo() + FormatUtil.pad9(tLoanCheque.getTxtNo(), 8));
 		}
 
 //		 查詢會計銷帳檔

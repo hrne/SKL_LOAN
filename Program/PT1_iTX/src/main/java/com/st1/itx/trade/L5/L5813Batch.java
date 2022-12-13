@@ -128,7 +128,7 @@ public class L5813Batch extends TradeBuffer {
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
 
 		for (Map<String, String> result : resultList) {
-
+			//只挑用途別是2的資料-代表有建物
 			if (!(("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode")))) {
 				continue;
 			}
@@ -323,52 +323,19 @@ public class L5813Batch extends TradeBuffer {
 	}
 
 	public void doOW(TitaVo titaVo) throws LogicException {
-		// 上傳官網
+		// 上傳官網 -- SQL不挑用途別撈該年度全部資料
 		this.info("into doOW");
 
 		int tYear = Integer.parseInt(titaVo.getParam("Year")) + 1;
 		String fileCode = "L5813";
 		String fileItem = "國稅局申報(官網-LNM572P)";
 		String fileName = "LNM572P-" + tYear + "年度.csv";
-		String dataCustNo = "";
-		String dataFacmNo = "";
-		int printfg = 0;
-		String pUsageCode = "";// 國稅局-用途別只找一次,出檔用
 
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
 
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5813", fileItem, fileName, "LNM572P-"+tYear);
 
 		for (Map<String, String> result : resultList) {
-
-			if ("".equals(dataCustNo)) {// 第一筆
-				dataCustNo = result.get("CustNo");
-				dataFacmNo = result.get("FacmNo");
-			}
-			if (!dataCustNo.equals(result.get("CustNo")) || !dataFacmNo.equals(result.get("FacmNo"))) {
-				dataCustNo = result.get("CustNo");
-				dataFacmNo = result.get("FacmNo");
-				printfg = 0;// initialize
-			}
-
-			if (("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode"))) {// 國稅局-紀錄有資料但不寫
-				printfg = 1;
-
-//				String cUsageCode = result.get("UsageCode");
-//				if (("").equals(pUsageCode)) {// 只找一次
-//					if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-//						cUsageCode = "0" + cUsageCode;
-//					}
-//					CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
-//					if (tCdCode != null) {// 用途別
-//						pUsageCode = tCdCode.getItem();
-//					} else {
-//						pUsageCode = "週轉金";
-//					}
-//				}
-
-				continue;
-			}
 
 			String bdOwner = ""; // 所有權人姓名
 			String bdCustId = ""; // 所有權人身分證
@@ -473,19 +440,6 @@ public class L5813Batch extends TradeBuffer {
 			this.info("iYearMonthSt==" + iYearMonthSt);
 
 			String iUsageCode = result.get("Item");
-//			if (printfg == 1) {// 國稅局有資料-代表購置不動產
-//				iUsageCode = pUsageCode ;
-//			} else {
-//				if (!cUsageCode.isEmpty() && cUsageCode.length() < 2) {
-//					cUsageCode = "0" + cUsageCode;
-//				}
-//				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode", cUsageCode), titaVo);
-//				if (tCdCode != null) {// 用途別
-//					iUsageCode = tCdCode.getItem();
-//				} else {
-//					iUsageCode = "週轉金";
-//				}
-//			}
 			if(iUsageCode.length() < 6) {
 				for (int i = iUsageCode.length(); i < 6; i++) { 
 					iUsageCode = iUsageCode + "  ";

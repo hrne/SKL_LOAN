@@ -111,7 +111,7 @@ A(DATE,0,#AcDate1)
 E(0,#SYSDATE)
 @
 V(7)
-V(5,#AcDate1,#SYSDATE)
+IF(#AcDate2<#AcDate1,V(P,不可小於會計起日),$)
 A(DATE,0,#AcDate2)
 
 
@@ -252,7 +252,7 @@ T(3,L8100)
 #batch-row-status=X,30,S
 
 !#batch-row-txtno 該列傳送序號
-#batch-row-txtno=X,18,O
+#batch-row-txtno=X,14,O
 
 
 !! ------- end of batch variables   -------------

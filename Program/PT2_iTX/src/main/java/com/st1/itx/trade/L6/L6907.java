@@ -151,9 +151,6 @@ public class L6907 extends TradeBuffer {
 			if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
 				l6908Flag = "";
 			}
-			if ("0".equals(tAcReceivable.get("TitaTxtNo")) || "999999".equals(tAcReceivable.get("LastUpdateEmpNo"))) {
-				l6908Flag = "";
-			}
 			// 交易序號 = 0不顯示按鈕
 			occursList.putParam("L6908Flag", l6908Flag);
 			// 戶號 OOCustNoX
