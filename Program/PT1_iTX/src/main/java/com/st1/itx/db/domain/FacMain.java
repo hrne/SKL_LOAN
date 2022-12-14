@@ -303,6 +303,41 @@ public class FacMain implements Serializable {
   @Column(name = "`ProdBreachFlag`", length = 1)
   private String prodBreachFlag;
 
+  // 是否綁約
+  /* Y:是N:否 */
+  @Column(name = "`BreachFlag`", length = 1)
+  private String breachFlag;
+
+  // 違約適用方式
+  /* 共用代碼檔001:綁約[按年分段]002:綁約[按月分段]003:依核准額度004:依撥款金額005:依提前償還金額 */
+  @Column(name = "`BreachCode`", length = 3)
+  private String breachCode;
+
+  // 違約金收取方式
+  /* 共用代碼檔1:即時收取2:領清償證明時收取 */
+  @Column(name = "`BreachGetCode`", length = 1)
+  private String breachGetCode;
+
+  // 限制清償期限
+  @Column(name = "`ProhibitMonth`")
+  private int prohibitMonth = 0;
+
+  // 違約金百分比
+  @Column(name = "`BreachPercent`")
+  private BigDecimal breachPercent = new BigDecimal("0");
+
+  // 違約金分段月數
+  @Column(name = "`BreachDecreaseMonth`")
+  private int breachDecreaseMonth = 0;
+
+  // 分段遞減百分比
+  @Column(name = "`BreachDecrease`")
+  private BigDecimal breachDecrease = new BigDecimal("0");
+
+  // 還款起算比例%
+  @Column(name = "`BreachStartPercent`")
+  private int breachStartPercent = 0;
+
   // 違約適用說明
   @Column(name = "`BreachDescription`", length = 200)
   private String breachDescription;
@@ -1802,6 +1837,174 @@ N:否
   }
 
 /**
+	* 是否綁約<br>
+	* Y:是
+N:否
+	* @return String
+	*/
+  public String getBreachFlag() {
+    return this.breachFlag == null ? "" : this.breachFlag;
+  }
+
+/**
+	* 是否綁約<br>
+	* Y:是
+N:否
+  *
+  * @param breachFlag 是否綁約
+	*/
+  public void setBreachFlag(String breachFlag) {
+    this.breachFlag = breachFlag;
+  }
+
+/**
+	* 違約適用方式<br>
+	* 共用代碼檔
+001:綁約[按年分段]
+002:綁約[按月分段]
+003:依核准額度
+004:依撥款金額
+005:依提前償還金額
+	* @return String
+	*/
+  public String getBreachCode() {
+    return this.breachCode == null ? "" : this.breachCode;
+  }
+
+/**
+	* 違約適用方式<br>
+	* 共用代碼檔
+001:綁約[按年分段]
+002:綁約[按月分段]
+003:依核准額度
+004:依撥款金額
+005:依提前償還金額
+  *
+  * @param breachCode 違約適用方式
+	*/
+  public void setBreachCode(String breachCode) {
+    this.breachCode = breachCode;
+  }
+
+/**
+	* 違約金收取方式<br>
+	* 共用代碼檔
+1:即時收取
+2:領清償證明時收取
+	* @return String
+	*/
+  public String getBreachGetCode() {
+    return this.breachGetCode == null ? "" : this.breachGetCode;
+  }
+
+/**
+	* 違約金收取方式<br>
+	* 共用代碼檔
+1:即時收取
+2:領清償證明時收取
+  *
+  * @param breachGetCode 違約金收取方式
+	*/
+  public void setBreachGetCode(String breachGetCode) {
+    this.breachGetCode = breachGetCode;
+  }
+
+/**
+	* 限制清償期限<br>
+	* 
+	* @return Integer
+	*/
+  public int getProhibitMonth() {
+    return this.prohibitMonth;
+  }
+
+/**
+	* 限制清償期限<br>
+	* 
+  *
+  * @param prohibitMonth 限制清償期限
+	*/
+  public void setProhibitMonth(int prohibitMonth) {
+    this.prohibitMonth = prohibitMonth;
+  }
+
+/**
+	* 違約金百分比<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getBreachPercent() {
+    return this.breachPercent;
+  }
+
+/**
+	* 違約金百分比<br>
+	* 
+  *
+  * @param breachPercent 違約金百分比
+	*/
+  public void setBreachPercent(BigDecimal breachPercent) {
+    this.breachPercent = breachPercent;
+  }
+
+/**
+	* 違約金分段月數<br>
+	* 
+	* @return Integer
+	*/
+  public int getBreachDecreaseMonth() {
+    return this.breachDecreaseMonth;
+  }
+
+/**
+	* 違約金分段月數<br>
+	* 
+  *
+  * @param breachDecreaseMonth 違約金分段月數
+	*/
+  public void setBreachDecreaseMonth(int breachDecreaseMonth) {
+    this.breachDecreaseMonth = breachDecreaseMonth;
+  }
+
+/**
+	* 分段遞減百分比<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getBreachDecrease() {
+    return this.breachDecrease;
+  }
+
+/**
+	* 分段遞減百分比<br>
+	* 
+  *
+  * @param breachDecrease 分段遞減百分比
+	*/
+  public void setBreachDecrease(BigDecimal breachDecrease) {
+    this.breachDecrease = breachDecrease;
+  }
+
+/**
+	* 還款起算比例%<br>
+	* 
+	* @return Integer
+	*/
+  public int getBreachStartPercent() {
+    return this.breachStartPercent;
+  }
+
+/**
+	* 還款起算比例%<br>
+	* 
+  *
+  * @param breachStartPercent 還款起算比例%
+	*/
+  public void setBreachStartPercent(int breachStartPercent) {
+    this.breachStartPercent = breachStartPercent;
+  }
+
+/**
 	* 違約適用說明<br>
 	* 
 	* @return String
@@ -2408,11 +2611,12 @@ ELOAN:擔保品案件在上送的時候，會回寫額度設定日，傳的日�
            + ", departmentCode=" + departmentCode + ", incomeTaxFlag=" + incomeTaxFlag + ", compensateFlag=" + compensateFlag + ", irrevocableFlag=" + irrevocableFlag + ", rateAdjNoticeCode=" + rateAdjNoticeCode + ", pieceCode=" + pieceCode
            + ", repayCode=" + repayCode + ", introducer=" + introducer + ", district=" + district + ", fireOfficer=" + fireOfficer + ", estimate=" + estimate + ", creditOfficer=" + creditOfficer
            + ", loanOfficer=" + loanOfficer + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer
-           + ", advanceCloseCode=" + advanceCloseCode + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo
-           + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
-           + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", grcd=" + grcd + ", grKind=" + grKind
-           + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", renewCnt=" + renewCnt + ", oldFacmNo=" + oldFacmNo + ", settingDate=" + settingDate
-           + ", preStarBuildingYM=" + preStarBuildingYM + ", starBuildingYM=" + starBuildingYM + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", advanceCloseCode=" + advanceCloseCode + ", prodBreachFlag=" + prodBreachFlag + ", breachFlag=" + breachFlag + ", breachCode=" + breachCode + ", breachGetCode=" + breachGetCode + ", prohibitMonth=" + prohibitMonth
+           + ", breachPercent=" + breachPercent + ", breachDecreaseMonth=" + breachDecreaseMonth + ", breachDecrease=" + breachDecrease + ", breachStartPercent=" + breachStartPercent + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore
+           + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr
+           + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel
+           + ", grcd=" + grcd + ", grKind=" + grKind + ", esGcd=" + esGcd + ", esGKind=" + esGKind + ", esGcnl=" + esGcnl + ", renewCnt=" + renewCnt
+           + ", oldFacmNo=" + oldFacmNo + ", settingDate=" + settingDate + ", preStarBuildingYM=" + preStarBuildingYM + ", starBuildingYM=" + starBuildingYM + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

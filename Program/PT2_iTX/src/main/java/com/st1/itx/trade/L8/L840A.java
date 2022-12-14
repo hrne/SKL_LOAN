@@ -333,7 +333,6 @@ public class L840A extends TradeBuffer {
 		int iSubmitType = Integer.valueOf(titaVo.getParam("SubmitType"));
 		int iJcicDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 		String tranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
-		this.info("053ID  = " + titaVo.getParam("ChangePayDate"));
 		this.info("tranCode    = " + tranCode);
 		switch (tranCode) {
 		case "040":

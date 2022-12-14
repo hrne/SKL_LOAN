@@ -121,12 +121,16 @@ public class L9132ReportD extends MakeReport {
 		if (resultList != null && !resultList.isEmpty()) {
 			for (Map<String, String> result : resultList) {
 				print(1, 1, "｜　　　　　　　　　　　　　｜　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　｜　　　　　　　　｜　　　　　　　　　　　　　｜");
-				String acNo = result.get("AcNo") == null ? "" : result.get("AcNo");
-				String acSubBookItem = result.get("AcSubBookItem") == null ? "" : result.get("AcSubBookItem");
+				String acNo = result.get("AcNoCode") == null ? "" : result.get("AcNoCode");
+				String acNoItem = result.get("AcNoItem") == null ? "" : result.get("AcNoItem");
+				String acSubBookItem = "";
+				if(!"".equals(result.get("AcSubBookCode"))) {
+					acSubBookItem = result.get("AcSubBookCode");
+				}
 				BigDecimal dbAmt = getBigDecimal(result.get("DbAmt"));
 				BigDecimal crAmt = getBigDecimal(result.get("CrAmt"));
 
-				print(0, 31, acNo);
+				print(0, 31, acNo+' '+acNoItem);
 				print(0, 119, acSubBookItem);
 				print(0, 23, formatAmt(dbAmt, 0), "R");
 				print(0, 153, formatAmt(crAmt, 0), "R");

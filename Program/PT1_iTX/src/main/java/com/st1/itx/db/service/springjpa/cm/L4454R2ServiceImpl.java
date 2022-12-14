@@ -57,7 +57,8 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "			,\"RelCustName\"";
 		sql += " ), \"tmpFirstDrawdownDate\" AS (";
 		sql += "	SELECT L.\"CustNo\"";
-		sql += "		  ,MIN(FM.\"FirstDrawdownDate\") AS \"FirstDrawdownDate\"";
+//		sql += "		  ,MIN(FM.\"FirstDrawdownDate\") AS \"FirstDrawdownDate\"";
+		sql += "		  ,MIN(L.\"DrawdownDate\") AS \"FirstDrawdownDate\"";
 		sql += "	FROM \"LoanBorMain\" L";
 		sql += "    LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = L.\"CustNo\"";
 		sql += "                            AND FM.\"FacmNo\"= L.\"FacmNo\"";
@@ -76,11 +77,11 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "		  ,M.\"RepayAmt\"";
 		sql += "   		  ,NVL(\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1),\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)) AS \"PhoneNo\"";
 		sql += "   		  ,NVL(M.\"RelCustName\", CM.\"CustName\")  AS \"RelCustName\"";         
-		sql += "		  ,PP.\"PrevPayIntDate\"";
-		sql += "		  ,FD.\"FirstDrawdownDate\"";
+		sql += "		  ,PP.\"PrevPayIntDate\" - 19110000 \"PrevPayIntDate\"";
+		sql += "		  ,FD.\"FirstDrawdownDate\" - 19110000 AS \"FirstDrawdownDate\"";
 		sql += "		  ,CC.\"CityItem\"";
-		sql += "		  ,CE.\"Fullname\"";
 		sql += "		  ,CC.\"CityCode\"";
+		sql += "		  ,CE.\"Fullname\"";
 		sql += "	FROM \"mainData\" M ";
 		sql += "    LEFT JOIN \"tmpFirstDrawdownDate\" FD ON FD.\"CustNo\" = M.\"CustNo\" ";
 		sql += "    LEFT JOIN \"tmpPrevPayIntDate\" PP ON PP.\"CustNo\" = M.\"CustNo\" ";

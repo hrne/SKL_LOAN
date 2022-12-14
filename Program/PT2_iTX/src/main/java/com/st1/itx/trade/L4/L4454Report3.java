@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L4454R3ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -53,7 +54,21 @@ public class L4454Report3 extends MakeReport {
 
 		this.info("一年內新貸件扣款失敗表 Excel Start...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表-底稿.xlsx", "LAW7U1Pqp");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "L4454";
+		String fileItem = "一年內新貸件扣款失敗表";
+		String fileName = "一年內新貸件扣款失敗表";
+		String defaultExcel = "一年內新貸件扣款失敗表-底稿.xlsx";
+		String defaultSheet = "LAW7U1Pqp";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表", "一年內新貸件扣款失敗表-底稿.xlsx", "LAW7U1Pqp");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
@@ -109,7 +124,7 @@ public class L4454Report3 extends MakeReport {
 			makeExcel.setValue(2, 1, "查無資料");
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+//		makeExcel.toExcel(sno);
 	}
 }

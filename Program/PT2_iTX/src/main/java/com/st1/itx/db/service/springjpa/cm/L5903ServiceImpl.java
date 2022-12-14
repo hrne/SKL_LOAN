@@ -57,6 +57,10 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iApplDateFrom = parse.stringToInteger(titaVo.getParam("ApplDateFrom")) + 19110000;
 		int iApplDateTo = parse.stringToInteger(titaVo.getParam("ApplDateTo")) + 19110000;
+		if (iApplDateTo == 19110000) {//無輸入起訖日時
+			iApplDateTo = 99991231;
+		}
+		
 		String iUsageCode = titaVo.getParam("UsageCode");
 		String iApplCode = titaVo.getParam("ApplCode");
 

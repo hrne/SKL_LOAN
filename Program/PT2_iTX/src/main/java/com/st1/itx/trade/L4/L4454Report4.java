@@ -15,6 +15,7 @@ import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.ExcelFontStyleVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
@@ -57,8 +58,22 @@ public class L4454Report4 extends MakeReport {
 	public void exec(TitaVo titaVo, List<Map<String, String>> tList) throws LogicException {
 
 		this.info("交寄大宗限時掛號及掛號函件執據存根2聯單 Excel Start...");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "L4454";
+		String fileItem = "交寄大宗限時掛號及掛號函件執據存根名單";
+		String fileName = "交寄大宗限時掛號及掛號函件執據存根名單";
+//		String expFileName = "交寄大宗限時掛號及掛號函件執據存根名單";
+//		String defaultExcel = "一年內新貸件扣款失敗表-底稿.xlsx";
+//		String defaultSheet = "LAW7U1Pqp";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "交寄大宗限時掛號及掛號函件執據存根名單", "交寄大宗限時掛號及掛號函件執據存根名單", "交寄大宗限時掛號及掛號函件執據存根名單");
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4454", "交寄大宗限時掛號及掛號函件執據存根名單",
+//				"交寄大宗限時掛號及掛號函件執據存根名單","交寄大宗限時掛號及掛號函件執據存根名單");
 
 		fontStyleVo = new ExcelFontStyleVo();
 
@@ -92,7 +107,7 @@ public class L4454Report4 extends MakeReport {
 			printRow++;
 		}
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		makeExcel.close();
+//		makeExcel.toExcel(sno);
 	}
 }

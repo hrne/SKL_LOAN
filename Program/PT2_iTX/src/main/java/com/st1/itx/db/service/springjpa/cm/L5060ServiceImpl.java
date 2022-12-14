@@ -74,6 +74,7 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += ",s.\"ClRowNo\""; // 同擔保品序列號
 		queryttext += ",s.\"IsSpecify\"";// 是否為指定
 		queryttext += ",s.\"CityCode\"";// 擔保品地區別
+		queryttext += ",s.\"NextIntDate\""; // 下次應繳日
 //		queryttext += ") ";
 		queryttext += " from \"CollList\" s "; // 法催紀錄清單檔
 //		queryttext += "left join \"CollList\" c on s.\"ClCustNo\" = s.\"ClCustNo\" and s.\"ClFacmNo\" = s.\"ClFacmNo\" "; // 法催紀錄清單檔
@@ -131,8 +132,8 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 			queryttext += " and s.\"LegalPsn\" = '" + iLegalPsn + "' ";
 			break;
 		}
-		this.info("iCityCode==" + iCityCode);
-		if (!iCityCode.equals("00")) {
+		this.info("iCityCode=="+iCityCode);
+		if (!iCityCode.equals("00") ) {
 			queryttext += " and s.\"CityCode\" =  '" + iCityCode + "'"; // 擔保品地區別
 		}
 

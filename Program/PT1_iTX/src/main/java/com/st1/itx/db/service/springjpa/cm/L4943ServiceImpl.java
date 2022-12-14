@@ -277,6 +277,8 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,BDD.\"ReturnCode\"  AS \"ReturnCode\"                   ";
 		sql += " ,BDD.\"MediaKind\"   AS \"MediaKind\"                    ";
 		sql += " ,BDD.\"AmlRsp\"      AS \"AmlRsp\"                       ";
+		sql += " ,BDD.\"TitaTlrNo\"   AS \"TitaTlrNo\"                    ";
+		sql += " ,BDD.\"TitaTxtNo\"   AS \"TitaTxtNo\"                    ";
 		if (functionCode == 10 || functionCode == 11) {
 			sql += " ,TX.\"TempAmt\"  AS \"TxTempAmt\"                    ";
 			sql += " ,TX.\"OverAmt\"  - \"ShortAmt\"   AS \"OverShort\"   ";

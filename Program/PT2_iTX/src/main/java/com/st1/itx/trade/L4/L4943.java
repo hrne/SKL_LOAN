@@ -202,6 +202,8 @@ public class L4943 extends TradeBuffer {
 						}
 					}
 					occursList.putParam("OOProcStsCodeX", procStsCodeX);
+					occursList.putParam("OOTitaTlrNo", result.get("TitaTlrNo"));
+					occursList.putParam("OOTitaTxtNo", result.get("TitaTxtNo"));
 
 //					 將每筆資料放入Tota的OcList 
 					this.totaVo.addOccursList(occursList);

@@ -48,6 +48,7 @@ public class L5060 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 
+
 	@Override
 	/* 應處理清單 放款轉列催收 */
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -102,11 +103,11 @@ public class L5060 extends TradeBuffer {
 			if (iOprionCd.equals("1")) {
 				lL5060Vo = l5060ServiceImpl.load(this.index, this.limit, titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovdtrmfm")), Integer.valueOf(titaVo.getParam("Ovdtrmto")),
 						titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")), this.getTxBuffer().getTxBizDate().getTbsDyf(), iIdentity, iCustNo,
-						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode, titaVo);
+						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode , titaVo);
 			} else {
 				lL5060Vo = l5060ServiceImpl.load(this.index, this.limit, titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovddayfm")), Integer.valueOf(titaVo.getParam("Ovddayto")),
 						titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")), this.getTxBuffer().getTxBizDate().getTbsDyf(), iIdentity, iCustNo,
-						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode, titaVo);
+						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, iCityCode , titaVo);
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -202,6 +203,7 @@ public class L5060 extends TradeBuffer {
 				occursList.putParam("OOClFlagA", 0);
 			}
 			int previntdate = Integer.valueOf(thisL5060Vo.get("F5"));
+			int nextintdate = Integer.valueOf(thisL5060Vo.get("F20"));
 			int txdate = Integer.valueOf(thisL5060Vo.get("F2"));
 			if (txdate == 0) {
 				occursList.putParam("OOTxDate", txdate);
@@ -212,7 +214,7 @@ public class L5060 extends TradeBuffer {
 			occursList.putParam("OOCustNo", thisL5060Vo.get("F0"));
 			CustMain tCustMain = new CustMain();
 			String CustName = "";
-			tCustMain = sCustMainService.custNoFirst(Integer.valueOf(thisL5060Vo.get("F0")), Integer.valueOf(thisL5060Vo.get("F0")), titaVo);
+			tCustMain = sCustMainService.custNoFirst(Integer.valueOf(thisL5060Vo.get("F0")),Integer.valueOf(thisL5060Vo.get("F0")), titaVo);
 			if (tCustMain != null) {
 				CustName = StringCut.replaceLineUp(tCustMain.getCustName());
 			}
@@ -222,6 +224,11 @@ public class L5060 extends TradeBuffer {
 				occursList.putParam("OOPrevIntDate", previntdate);
 			} else {
 				occursList.putParam("OOPrevIntDate", previntdate - 19110000);
+			}
+			if (nextintdate == 0) {
+				occursList.putParam("OONextIntDate", nextintdate);
+			} else {
+				occursList.putParam("OONextIntDate", nextintdate - 19110000);
 			}
 			occursList.putParam("OOOverDueterm", thisL5060Vo.get("F6"));
 			occursList.putParam("OOOvduDays", thisL5060Vo.get("F7"));

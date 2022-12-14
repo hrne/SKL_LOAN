@@ -3,6 +3,7 @@ package com.st1.itx.maintain;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +16,8 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TxCom;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
+import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
 import com.st1.itx.db.service.TxRecordService;
@@ -224,8 +227,10 @@ public class Cs80UpDBS extends CommBuffer {
 		this.info("CS80 updTxTeller....");
 		TxTeller tTxTeller = txTellerService.holdById(this.titaVo.getTlrNo());
 
-		if (tTxTeller.getTxtNo() < Integer.valueOf(this.titaVo.getTxtNo()) && titaVo.getTxCode().toString().equals("L6880"))
+		if (tTxTeller.getTxtNo() < Integer.valueOf(this.titaVo.getTxtNo()) && titaVo.getTxCode().equals("L6880"))
 			;
+		else if (this.titaVo.isSpanDy() && !Objects.isNull(ThreadVariable.getObject(ContentName.txtno)))
+			tTxTeller.setTxtNo(Integer.valueOf((String) ThreadVariable.getObject(ContentName.txtno)));
 		else
 			tTxTeller.setTxtNo(Integer.valueOf(this.titaVo.getTxtNo()));
 		tTxTeller.setLtxDate(Integer.valueOf(this.titaVo.getCalDy()));

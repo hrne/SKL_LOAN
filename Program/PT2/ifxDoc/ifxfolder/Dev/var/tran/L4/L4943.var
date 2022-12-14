@@ -367,6 +367,10 @@ X(#OOTempAmt)
 !回應代碼
 #OReturnCode=X,2,O
 
+#OOTitaTlrNo=X,6,O
+
+#OOTitaTxtNo=A,8,O
+
 ! 會計日期
 #OOAcDate=D,7,O
 #OOAcDateA=A,3,O
@@ -411,9 +415,12 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C})
 
 ! <交易>
 #OOBUF_D=X,390,S
-T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOEntryDate)
+T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOAcDate+0000+#OOTitaTlrNo+#OOTitaTxtNo+9)
+! T(2,#TXCD+#CustNo+000+000+#OOAcDate+#OOTxNo+9)
+
 #OOBTN_D=A,2,O
-IF(#FunctionCode==10||#FunctionCode==11,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
+C(3,#OOAcDate,0,BIND(grid,cancel),BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}))
+! IF(#FunctionCode==10||#FunctionCode==11,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
 ! C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D}),BIND(grid,cancel))
 !C(3,#FunctionCode,10,BIND(grid, {cmd=CHAIN; ntxcd=L3005; ntxbuf=#OOBUF_D;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo:EntryDate<-OOEntryDate}),BIND(grid,cancel))
 
@@ -473,6 +480,8 @@ TXFORM=L4943
 #OOProcStsCodeX
 #OOOverShort
 #OReturnCode
+#OOTitaTlrNo
+#OOTitaTxtNo
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

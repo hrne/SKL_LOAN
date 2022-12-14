@@ -54,7 +54,7 @@ BEGIN
           ,CASE WHEN M."NextIntDate" = 99991231 
                      THEN 0
                 ELSE  M."NextIntDate"
-           END                               AS "NextIntDate"         -- '應繳息日';
+           END                               AS "NextIntDate"         -- '下次應繳日';
           ,M."CurrencyCode"                  AS "CurrencyCode"        -- '幣別';
           ,M."PrinBalance"                   AS "PrinBalance"         -- '本金餘額';
           ,M."BadDebtBal"                    AS "BadDebtBal"          -- '呆帳餘額'; 
@@ -85,7 +85,7 @@ BEGIN
            ,MIN(CASE WHEN B."Status" IN (3,5,6,8,9) 
                           THEN 99991231   
                      ELSE B."NextPayIntDate"
-                END )                    AS "NextIntDate"       -- '應繳息日';
+                END )                    AS "NextIntDate"       -- '下次應繳日';
            ,B."CurrencyCode"             AS "CurrencyCode"      -- '幣別';
            ,SUM(CASE WHEN B."Status" IN (0,4) 
                           THEN B."LoanBal"
@@ -310,7 +310,7 @@ BEGIN
           ,1                          AS "ClRowNo"             -- '同擔保品序列號';
           ,'2'                        AS "CaseCode"            -- '案件種類';
           ,N."PayIntDate"             AS "PrevIntDate"         -- '繳息迄日';
-          ,N."NextPayDate"            AS "NextIntDate"         -- '應繳息日';
+          ,N."NextPayDate"            AS "NextIntDate"         -- '下次應繳日';
           ,'TWD'                      AS "CurrencyCode"        -- '幣別';
           ,CASE WHEN N."Status" = 3   THEN 0
                 ELSE N."PrinBalance"  
@@ -433,8 +433,8 @@ BEGIN
             ,NVL(LTD."TxDate",0)        AS "TxDate"              -- '作業日期';
             ,NVL(LTD."TxCode",' ')      AS "TxCode"              -- '作業項目'; 
             ,C1."PrevIntDate"           AS "PrevIntDate"         -- '繳息迄日';
-            ,C1."NextIntDate"           AS "NextIntDate"         -- '應繳息日';
-            -- 若 應繳息日 < 系統營業日(TBSDYF)
+            ,C1."NextIntDate"           AS "NextIntDate"         -- '下次應繳日';
+            -- 若 下次應繳日 < 系統營業日(TBSDYF)
             -- 則 計算逾期期數
             -- 否則 擺零
             ,CASE
@@ -451,7 +451,7 @@ BEGIN
                     AND NVL(LBM."SpecificDd",0) = 0
                THEN TRUNC(MONTHS_BETWEEN(TO_DATE(TBSDYF,'YYYYMMDD'), TO_DATE(C1."NextIntDate",'YYYYMMDD')))
              ELSE 0 END                 AS "OvduTerm"            -- '逾期期數';
-            -- 若 應繳息日 <= 系統營業日(TBSDYF)
+            -- 若 下次應繳日 <= 系統營業日(TBSDYF)
             -- 則 計算逾期天數
             -- 否則 擺零
             ,CASE
@@ -461,7 +461,7 @@ BEGIN
             ,C1."CurrencyCode"          AS "CurrencyCode"        -- '幣別';
             ,C1."PrinBalance"           AS "PrinBalance"         -- '本金餘額';
             ,C1."BadDebtBal"            AS "BadDebtBal"          -- '呆帳餘額'; 
-            -- 若 應繳息日 < 系統營業日(TBSDYF)
+            -- 若 下次應繳日 < 系統營業日(TBSDYF)
             -- 則 擺擔保品地區別在"CdCity"的催收員 (若該擔保品無地區別,擺台北市的催收員)
             -- 否則 擺空白
             -- 2022-03-22 新增條件 from Linda: CaseCode=2債協的時候,如果是否指定IsSpecify=N,催收人員AccCollPsn跟法務人員LegalPsn都固定放怡婷的員編CB7541
@@ -473,7 +473,7 @@ BEGIN
                THEN NVL(Ori."AccCollPsn",' ')
              ELSE NVL(S1."AccCollPsn",' ')
              END                        AS "AccCollPsn"          -- '催收員';
-            -- 若 應繳息日 < 系統營業日(TBSDYF)
+            -- 若 下次應繳日 < 系統營業日(TBSDYF)
             -- 則 擺擔保品地區別在"CdCity"的法務人員 (若該擔保品無地區別,擺台北市的法務人員)
             -- 否則 擺空白
             -- 2022-03-22 新增條件 from Linda: CaseCode=2債協的時候,如果是否指定IsSpecify=N,催收人員AccCollPsn跟法務人員LegalPsn都固定放怡婷的員編CB7541
@@ -605,7 +605,7 @@ BEGIN
                                   ,"TxDate"              -- '作業日期';
                                   ,"TxCode"              -- '作業項目';
                                   ,"PrevIntDate"         -- '繳息迄日';
-                                  ,"NextIntDate"         -- '應繳息日';
+                                  ,"NextIntDate"         -- '下次應繳日';
                                   ,"OvduTerm"            -- '逾期期數';
                                   ,"OvduDays"            -- '逾期天數';
                                   ,"CurrencyCode"        -- '幣別';
@@ -677,7 +677,7 @@ BEGIN
 
     UPD_CNT := UPD_CNT + sql%rowcount;
 
-    /* 若 應繳息日 > 前七營業日 且 應繳息日 <= 前六營業日 寫入 CollRemind */
+    /* 若 下次應繳日 > 前七營業日 且 下次應繳日 <= 前六營業日 寫入 CollRemind */
     MERGE INTO "CollRemind" C
     USING ( SELECT C1."CaseCode"        AS "CaseCode"        -- 案件種類 VARCHAR2 1
                   ,C1."CustNo"          AS "CustNo"          -- 借款人戶號 DECIMAL 7
