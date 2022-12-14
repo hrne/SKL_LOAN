@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -39,6 +40,8 @@ import org.xml.sax.InputSource;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.CheckInsuranceVo;
 
@@ -57,6 +60,9 @@ public class CheckInsurance extends TradeBuffer {
 	// connect AML status
 	private boolean connectSuccess;
 
+	@Autowired
+	private SystemParasService sSystemParasService;
+	
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckInsurance run ... ");
 		return null;
@@ -64,8 +70,13 @@ public class CheckInsurance extends TradeBuffer {
 
 	public CheckInsuranceVo checkInsurance(TitaVo titaVo, CheckInsuranceVo checkVo) throws LogicException {
 
-		apiFlag = this.txBuffer.getSystemParas().getAmlFg();
-		apiUrl = this.txBuffer.getSystemParas().getAmlUrl();
+		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
+
+		if (tSystemParas == null) {
+			throw new LogicException("E0001", "CheckInsurance,SystemParas");
+		}
+		apiFlag = tSystemParas.getAmlFg();
+		apiUrl = tSystemParas.getAmlUrl();
 		this.info("CheckInsurance.checkInsurance:apiFlag=" + apiFlag + ",apiUrl=" + apiUrl);
 		CheckVo(checkVo);
 

@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9721ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -57,7 +58,10 @@ public class L9721Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		ReportVo reportVo = ReportVo.builder().setBrno(titaVo.getKinbr()).setRptDate(titaVo.getEntDyI())
+				.setRptCode(TXCD).setRptItem(TXName).setUseDefault(true).build();
+
+		makeExcel.open(titaVo, reportVo, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", SheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -76,6 +80,8 @@ public class L9721Report extends MakeReport {
 					// is set in SQL
 					// notice it's 0-based for those names
 					String tmpValue = tLDVo.get("F" + i);
+
+					tmpValue = tmpValue == null ? "" : tmpValue;
 
 					// switch by code of Column; i.e. Col A, Col B...
 					// breaks if more than 26 columns!
@@ -100,7 +106,7 @@ public class L9721Report extends MakeReport {
 						makeExcel.setValue(row, col, tmpValue, "L");
 						break;
 					default:
-						makeExcel.setValue(row, col, tmpValue.equals("") ? "" : Integer.parseInt(tmpValue), "L");
+						makeExcel.setValue(row, col, tmpValue.isEmpty() ? "" : Integer.parseInt(tmpValue), "L");
 						break;
 					}
 

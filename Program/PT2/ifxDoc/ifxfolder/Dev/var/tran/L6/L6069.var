@@ -158,8 +158,8 @@ T(4,CHAIN$)
 #OOFunc2=A,1,S
 E(0,2)
 
-#OOBUF2=x,41,S
-T(2,#OOFunc2+#DefCode+#OOCode)
+#OOBUF2=x,63,S
+T(2,#OOFunc2+#DefCode+#OOCode+#OODefItem)
 
 ! 連結時隱藏按鈕
 #OOBTN2=X,4,S
@@ -170,8 +170,8 @@ IF(#OOCHAIN==1,BIND(grid,cancel),$)
 #OOFunc4=A,1,S
 E(0,4)
 
-#OOBUF4=x,41,S
-T(2,#OOFunc4+#DefCode+#OOCode)
+#OOBUF4=x,63,S
+T(2,#OOFunc4+#DefCode+#OOCode+#OODefItem)
 
 ! 連結時隱藏按鈕
 #OOBTN4=X,4,S

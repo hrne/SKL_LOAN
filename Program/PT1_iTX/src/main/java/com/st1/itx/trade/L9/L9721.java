@@ -20,7 +20,6 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class L9721 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9721.class);
 
 	String TXCD = "L9721";
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -22,13 +23,27 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
+	@Autowired
+	private Parse parse;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		this.info("l9721.findAll ");
+		this.info("L9721ServiceImpl findAll ");
+
+		int year = parse.stringToInteger(titaVo.getParam("InputYear"));
+		int month = parse.stringToInteger(titaVo.getParam("InputMonth"));
+
+		int inputEndDate = year + 1911;
+		inputEndDate *= 100;
+		inputEndDate += month;
+		inputEndDate += 1;
+		inputEndDate *= 100;
+		inputEndDate += 1;
+
+		this.info("L9721ServiceImpl inputEndDate = " + inputEndDate);
 
 		String sql = "SELECT m.\"CustNo\" AS \"戶號\"";
 		sql += "            ,m.\"FacmNo\" AS \"額度\"";
@@ -86,6 +101,7 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdArea\" cda ON cda.\"CityCode\" = cl.\"CityCode\"";
 		sql += "                              AND cda.\"AreaCode\" = cl.\"AreaCode\"";
 		sql += "      WHERE m.row_number = 1";
+		sql += "        AND m.\"DrawdownDate\" < :inputEndDate";
 
 		this.info("sql=" + sql);
 
@@ -93,8 +109,10 @@ public class L9721ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
+		
+		query.setParameter("inputEndDate", inputEndDate);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

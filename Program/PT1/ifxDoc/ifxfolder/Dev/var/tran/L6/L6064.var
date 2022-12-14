@@ -126,11 +126,12 @@ T(2,@DefCodeH,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-#NTXBUF=x,42,S
+#NTXBUF=x,63,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@DefType,#NTXBUF,1,2)
 T(1,@DefCode,#NTXBUF,3,20)
 T(1,@Code,#NTXBUF,23,20)
+T(1,@DefItem,#NTXBUF,43,20)
 HIDE(#CodeBTN)
 
 #WKTF=X,1,S
@@ -151,6 +152,7 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 C(3,#CHAIN,1,s,$)
 !HELP(#DefCodeH)
 !@C(4,#DefCode,$,V(H,#DefCodeH))
+!IF(#DefItem!="" & #DefCode!="",C(4,#DefType,s,S),I)
 
 !處理
 
@@ -181,12 +183,16 @@ C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
 !C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
 @
 IF(#DefType=="" & #DefCode=="" & #DefItem== "",V(P,業務類別、代碼類別代號、代碼類別檔名稱需擇一輸入),$)
+C(4,#DefItem,SHOW(#DefType)SHOW(#DefTypeX),HIDE(#DefType)HIDE(#DefTypeX))
 
 !代碼
 #Code=x,20,I
 !C(3,#CHAIN,1,s,$)
+C(4,#DefItem,$,S)
 
 #CodeItem=x,50,I
+C(4,#DefItem,$,S)
+C(4,#Code,$,S)
 
 #RPTFG=A,1,S
 C(4,#DefItem,E(0,0),E(0,1))

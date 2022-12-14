@@ -57,8 +57,6 @@ E(0,1)ASGN(AGAIN$)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-
-
 ! ENABLE(#BTN2)ENABLE(#BTN3)
 !---------- Required Input Setting ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>

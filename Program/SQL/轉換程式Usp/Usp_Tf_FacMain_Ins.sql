@@ -123,6 +123,8 @@ BEGIN
           ,"RenewCnt"            -- 展期次數 DECIMAL 3 
           ,"OldFacmNo"           -- 原額度編號 DECIMAL 3 
           ,"SettingDate"         -- 額度設定日 DECIMALD 8 
+          ,"PreStarBuildingYM"   -- 約定動工年月 DECIMAL 6
+          ,"StarBuildingYM"      -- 實際興建年月 DECIMAL 6
     ) 
     SELECT APLP."LMSACN"                  AS "CustNo"              -- 借款人戶號 DECIMAL 7  
           ,APLP."LMSAPN"                  AS "FacmNo"              -- 額度編號 DECIMAL 3  
@@ -341,6 +343,8 @@ BEGIN
           ,APLP."APLEPT"                  AS "RenewCnt"            -- 展期次數 DECIMAL 3 
           ,APLP."APLOAP"                  AS "OldFacmNo"           -- 原額度編號 DECIMAL 3 
           ,APLP."APLSDT"                  AS "SettingDate"         -- 額度設定日 DECIMALD 8 
+          ,NVL(APLP.APLPSC,0)             AS "PreStarBuildingYM"   -- 約定動工年月 DECIMAL 6
+          ,NVL(APLP.APLRSC,0)             AS "StarBuildingYM"      -- 實際興建年月 DECIMAL 6
     FROM "LA$APLP" APLP 
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN" 
     LEFT JOIN "FacCaseAppl" APPL ON APPL."ApplNo" = APLP."APLNUM" 

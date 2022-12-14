@@ -102,7 +102,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L840A")
 @Scope("prototype")
 /**
- * 同意報送例外處裡檔案(040)
  * 
  * @author Mata
  * @version 1.0.0
