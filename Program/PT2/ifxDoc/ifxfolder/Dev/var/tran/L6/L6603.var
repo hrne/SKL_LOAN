@@ -1,0 +1,255 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6603]                                 擔保品代號資料維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1Item],
+["#FdClCode2+擔保品代號2",#ClCode2],
+["#FdClItem+擔保品名稱",#ClItem],
+["#FdClTypeJCIC+JCIC類別",#ClTypeJCIC],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+
+! 必輸欄位
+
+! 永遠為必輸欄位
+#FdFuncCode=X,2,L
+T(3,*)
+#FdClCode1=X,2,L
+T(3,*)
+#FdClCode2=X,2,L
+T(3,*)
+#FdClTypeJCIC=X,2,L
+T(3,*)
+#FdClItem=X,2,L
+T(3,*)
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,50,S     
+
+!擔保品代號1
+#CODEClCode1=x,20,S                  
+T(3,CdCode.ClCode1)                  
+#ApHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2,#CODEClCode1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@ApHelp,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6063 擔保品代號資料查詢]進入),$)
+
+#NTXBUF=X,46,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_ClCode1=X,1,S
+T(1,#NTXBUF,2,1)
+
+#CHAIN_ClCode2=X,2,S
+T(1,#NTXBUF,3,2)
+
+#CHAIN_ClItem=x,40,S
+T(1,#NTXBUF,5,40)
+
+#CHAIN_ClTypeJCIC=X,2,S
+T(1,#NTXBUF,45,2)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+T(2,@ClCode1,#CHAIN_ClCode1)
+T(2,@ClCode2,#CHAIN_ClCode2)
+T(2,@ClItem,#CHAIN_ClItem)
+T(2,@ClTypeJCIC,#CHAIN_ClTypeJCIC)
+
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 ,T(F,@ClCode1,1)T(F,@ClCode2,1)T(F,@ClItem,1)T(F,@ClTypeJCIC,1),
+                  T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClItem,0)T(F,@ClTypeJCIC,0))
+IF (#FuncCode==2 ,T(F,@ClItem,1)T(F,@ClTypeJCIC,1),$)
+                                  
+#WKPSC=X,2,S
+
+#WKSTAR1=X,2,S
+C(2,#FuncCode,S,T(3,*),S,S,S,S)
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+C(3,#CHAIN,1,T(2,@FdFuncCode,#WKPSC),T(2,@FdFuncCode,#WKSTAR2))
+C(3,#CHAIN,1,T(2,@FdClCode1,#WKSTAR1),T(2,@FdClCode1,#WKSTAR2))
+C(3,#CHAIN,1,T(2,@FdClCode2,#WKSTAR1),T(2,@FdClCode2,#WKSTAR2))
+T(2,@FdClItem,#WKSTAR2)
+T(2,@FdClTypeJCIC,#WKSTAR2)
+
+
+! 擔保品代號1
+#ClCode1=A,1,I
+C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+HELP(#ApHelp)
+@T(3,@ClCode1Item,)
+C(3,#FuncCode,1,V(H,#ApHelp),$)
+
+! 擔保品代號1-名稱
+#ClCode1Item=X,40,L
+T(H,#ClCode1,#ApHelp)
+C(3,#FuncCode,4,s)
+
+
+#RimL6r29=X,1,S
+T(2,@L6R29ClCode1,#ClCode1)
+S(L6R29,1,#L6R29ClCode1)
+R(1,L6R29)
+T(2,@CodeHelp,#L6r29clCodeHelpList)
+
+#CodeHelp=x,50000,S
+
+! 擔保品代號2
+#ClCode2=A,2,I
+C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+!C(4,#CodeHelp,$,HELP(#CodeHelp,cols:2))
+@V(7)
+
+#SendL6R05=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+RESET_RIM(#SendL6R05,L6R05)
+S(L6R05,1,#RimFuncCode,#RimTxCode,#RimClCode1,#RimClCode2)
+S(L6R05,1,#RimFuncCode,#RimTxCode,#RimClCode1)
+R(1,L6R05)
+
+#RL6R05=X,1,S
+C(3,#FuncCode,1,s,$)
+T(2,@ClItem,#L6R05ClItem)
+T(2,@ClTypeJCIC,#L6R05ClTypeJCIC)
+
+
+! 擔保品名稱
+#ClItem=x,40,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! JCIC類別
+#ClTypeJCIC=X,2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)V(NL)
+
+#RPTFG=A,1,S
+E(0,0)
+
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+!參考編號
+#MRKEY=_,_,S
+T(2,#ClCode1+-+#ClCode2)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R05Rim.dec"/>
+<include src="ROM.icf::L6R05.dec"/>
+<include src="ROM.icf::L6R29Rim.dec"/>
+<include src="ROM.icf::L6R29.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6603 ----------
+<sub type="FORM" name="L6603">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6603,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6603] 擔保品代號資料維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode#ClCode1#ClCode2#ClItem#ClTypeJCIC
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6603
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R05.tom"/>
+<include src="ROM.icf::L6R29.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

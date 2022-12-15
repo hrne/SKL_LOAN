@@ -46,9 +46,9 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate" -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo" -- 最後更新人員 VARCHAR2 6 0
           ,R2.REMITACCT2                  AS "RemitAcct2" -- 匯款帳號 VARCHAR2 16 0
-          ,R3.REMITACCT3                  AS "RemitAcct3" -- 匯款帳號 VARCHAR2 16 0
+          ,TRIM(R3.REMITACCT3)            AS "RemitAcct3" -- 匯款帳號 VARCHAR2 16 0
           ,R4.REMITACCT4                  AS "RemitAcct4" -- 匯款帳號 VARCHAR2 16 0
-    FROM "tbJCICAccountData" JCIC
+    FROM REMIN_TBJCICACCOUNTDATA JCIC
     LEFT JOIN REMIT_ACCT_2 R2 ON R2.FINCODE = JCIC.CREDIT_CODE
     LEFT JOIN REMIT_ACCT_3 R3 ON R3.FINCODE = JCIC.CREDIT_CODE
     LEFT JOIN REMIT_ACCT_4 R4 ON R4.FINCODE = JCIC.CREDIT_CODE

@@ -26,27 +26,27 @@ BEGIN
     -- 寫入資料
     INSERT INTO "CollLetter"
     SELECT '1'                            AS "CaseCode"            -- 案件種類 VARCHAR2 1 0
-          ,"ReminMail_Info".LMSACN        AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
-          ,"ReminMail_Info".LMSAPN        AS "FacmNo"              -- 額度編號 DECIMAL 3 0
-          ,TO_NUMBER(TO_CHAR("ReminMail_Info".Entry_Date,'YYYYMMDD'))
+          ,M.LMSACN                       AS "CustNo"              -- 借款人戶號 DECIMAL 7 0
+          ,M.LMSAPN                       AS "FacmNo"              -- 額度編號 DECIMAL 3 0
+          ,TO_NUMBER(TO_CHAR(M.Entry_Date,'YYYYMMDD'))
                                           AS "AcDate"              -- 作業日期 DecimalD 8 0
-          ,SUBSTR("ReminMail_Info".UserID,0,6)
+          ,SUBSTR(M.UserID,0,6)
                                           AS "TitaTlrNo"           -- 經辦 VARCHAR2 6 0
-          ,LPAD("ReminMail_Info".SerialNum,8,'0')
+          ,LPAD(M.SerialNum,8,'0')
                                           AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8 0
           -- 2022-03-02 Wei 修改: from Linda "MailTypeCode" =>舊資料若=3存證信函則轉新資料=2,其他則新資料轉成1
           ,CASE
-             WHEN "ReminMail_Info".Mail_Type = 3
+             WHEN M.Mail_Type = 3
              THEN '2'
            ELSE '1' END                   AS "MailTypeCode"        -- 發函種類 VARCHAR2 1 0
-          ,NVL("ReminMail_Info".Mail_Date,0)
+          ,NVL(M.Mail_Date,0)
                                           AS "MailDate"            -- 發函日期 DecimalD 8 0
-          ,"ReminMail_Info".Mail_Person   AS "MailObj"             -- 發函對象 VARCHAR2 1 0
-          ,"ReminMail_Info".Mail_PersonName
+          ,M.Mail_Person                  AS "MailObj"             -- 發函對象 VARCHAR2 1 0
+          ,M.Mail_PersonName
                                           AS "CustName"            -- 姓名 NVARCHAR2 100 0
           -- 2022-03-02 Wei 修改: from Linda "DelvrYet" =>舊資料若=1則新資料=1已送達,其他則轉成新資料=2未送達
           ,CASE
-             WHEN "ReminMail_Info".Mail_Flg = '1'
+             WHEN M.Mail_Flg = '1'
              THEN '1'
            ELSE '2' END                   AS "DelvrYet"            -- 送達否 VARCHAR2 1 0
           -- 2022-03-02 Wei 修改: from Linda
@@ -54,22 +54,22 @@ BEGIN
           -- =>新的1:郵務-平信 2:郵務-限時專送 3:郵務-掛號 4:郵務-雙掛號 5:親自送達; 
           -- 舊資料非1~3時新的放0
           ,CASE
-             WHEN TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service)) = '1' 
+             WHEN TO_CHAR(TO_NUMBER(M.Mail_Service)) = '1' 
              THEN '5'
-             WHEN TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service)) = '2'
+             WHEN TO_CHAR(TO_NUMBER(M.Mail_Service)) = '2'
              THEN '1'
-             WHEN TO_CHAR(TO_NUMBER("ReminMail_Info".Mail_Service)) = '3'
+             WHEN TO_CHAR(TO_NUMBER(M.Mail_Service)) = '3'
              THEN '3'
            ELSE '0' END                   AS "DelvrCode"           -- 送達方式 VARCHAR2 1 0
           ,0                              AS "AddressCode"         -- 寄送地點選項 DECIMAL 1 0
-          ,"ReminMail_Info".Mail_Addr     AS "Address"             -- 寄送地點 NVARCHAR2 60 0
-          ,TRIM(TO_SINGLE_BYTE("ReminMail_Info".other_record))
+          ,M.Mail_Addr                    AS "Address"             -- 寄送地點 NVARCHAR2 60 0
+          ,TRIM(TO_SINGLE_BYTE(M.other_record))
                                           AS "Remark"              -- 其他記錄 NVARCHAR2 500 0
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE 8 0
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "ReminMail_Info"
+    FROM REMIN_REMINMAIL_INFO M
     ;
 
     -- 記錄寫入筆數

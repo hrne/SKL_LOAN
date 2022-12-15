@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_ClBuildingOwner_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClBuildingOwner_Ins" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_ClBuildingOwner_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間
@@ -49,8 +44,8 @@ BEGIN
                         AND HG."GDRID2" = CBU1."GDRID2"
                         AND HG."GDRNUM" = CBU1."GDRNUM"
                         AND HG."LGTSEQ" = CBU1."LGTSEQ"
-    LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = CU."LGTCIF"
-    LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CM."CUSID1")
+    LEFT JOIN "CU$CUSP" CU ON CU."CUSCIF" = HG."LGTCIF"
+    LEFT JOIN "CustMain" CM ON TRIM(CM."CustId") = TRIM(CU."CUSID1")
     WHERE CBU0."TfFg" = 'Y'
       AND NVL(CM."CustUKey",' ') != ' '
     ;

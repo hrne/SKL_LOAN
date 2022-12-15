@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_ClFac_Upd
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_ClFac_Upd" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_ClFac_Upd" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間

@@ -68,6 +68,7 @@ K(MODIFYBUTTON,1,新增)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
 T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #CDFacRelationCode=x,40,S
@@ -88,6 +89,23 @@ T(2,@FacRelationCodeHelp,#HelpDesc1)
 #CaseNo=A,7,I
 C(3,#CHAIN,1,s,$)
 
+
+#SendL2r10=X,1,S
+C(3,#CaseNo,0,S,$)
+E(0,@RimCaseNo,#CaseNo)
+RESET_RIM(#SendL2r10,L2R10)
+S(L2R10,1,#RimCaseNo)
+R(1,L2R10)
+
+#SendL2r07=X,1,S
+C(3,#CaseNo,0,S,$)
+T(2,@RimCustId, )
+E(0,@RimCustNo,#L2r10CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+
 #FdCustId=X,2,L
 C(3,#CaseNo,0,T(3,*),S)
 
@@ -97,8 +115,30 @@ C(3,#CHAIN,1,s,$)
 C(3,#CaseNo,0,$,S)
 @V(7)A(ID_UNINO,0,#CustId)
 
+#SendL2r07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+
+#TimCustNo=A,7,S
+E(0,0)
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#CaseNo,0,$,E(0,#L2r07CustNo))
+<include src="COM.icf::CustRmk.rtn"/>
+
+
 #RPTFG=A,1,S
 E(0,0)
+
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R10.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -202,6 +242,8 @@ TXFORM=L2021
 
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R10.tom"/>
 </sub>
 
 <sub type="PART" name="L2021" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">

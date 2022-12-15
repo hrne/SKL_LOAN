@@ -45,7 +45,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , LPAD(TX.\"BormNo\", 3, '0') AS \"BormNo\" "; // 撥款編號
 		sql += "      , \"Fn_ParseEOL\"(CM.\"CustName\", 0) AS \"CustName\" "; // 戶名
 		sql += "      , CASE WHEN :inputOption = 1 "; // 還本收據
-		sql += "             THEN TX.\"Principal\" + TX.\"ExtraRepay\" ";
+		sql += "             THEN TX.\"Principal\" ";
 		sql += "             WHEN :inputOption = 2 "; // 繳息收據
 		sql += "             THEN TX.\"Interest\" ";
 		sql += "        ELSE 0 END AS \"Amt\" ";
@@ -72,11 +72,10 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
 		sql += "   AND ACD.\"TitaTxtNo\" <= :inputTitaTxtNoEnd "; // 交易序號-止
 		sql += "   AND CASE WHEN :inputOption = 1 "; // 作業選項1:還本收據
-		sql += "            THEN TX.\"Principal\" + TX.\"ExtraRepay\" ";
+		sql += "            THEN TX.\"Principal\" ";
 		sql += "            WHEN :inputOption = 2 "; // 作業選項2:繳息收據
 		sql += "            THEN TX.\"Interest\" ";
 		sql += "       ELSE 0 END > 0 "; // 選項所對應的金額大於0時才入表
-		sql += "   AND TX.\"TxAmt\" > 0 ";
 
 		this.info("sql=" + sql);
 

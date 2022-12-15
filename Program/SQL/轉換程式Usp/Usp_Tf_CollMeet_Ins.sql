@@ -47,7 +47,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "ReminMeet_Info" M
+    FROM REMIN_REMINMEET_INFO M
     ;
 
     -- 記錄寫入筆數

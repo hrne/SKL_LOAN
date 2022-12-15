@@ -77,6 +77,7 @@ T(2,@CurrPrecisionHelp,#HelpDesc1)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -86,7 +87,6 @@ T(1,@ApplNo,#NTXBUF,8,7)
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 C(4,#NTXBUF5,E(0,@RPTFG2,0),E(0,@RPTFG2,2))
-
 
 !主要/共用戶號
 #FdCustNo=X,2,L
@@ -99,6 +99,24 @@ C(3,#CHAIN,1,s,$)
 C(3,#CHAIN,1,s,$)
 C(3,#CustNo,0,$,S)
 
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -107,6 +125,9 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 #RPTFG=A,1,S
 #RPTFG2=A,1,S
 
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -234,6 +255,7 @@ TXFORM=L2018
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

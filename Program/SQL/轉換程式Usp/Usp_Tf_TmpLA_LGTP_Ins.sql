@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_TmpLA$LGTP_Ins
---------------------------------------------------------
-set define off;
-
-  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_TmpLA$LGTP_Ins" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_TmpLA$LGTP_Ins" 
 (
     -- 參數
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間

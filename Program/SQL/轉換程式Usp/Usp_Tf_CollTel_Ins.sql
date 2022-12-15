@@ -88,7 +88,7 @@ BEGIN
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
-    FROM "ReminTel_Info" S0
+    FROM REMIN_REMINTEL_INFO S0
     ;
 
     -- 記錄寫入筆數
