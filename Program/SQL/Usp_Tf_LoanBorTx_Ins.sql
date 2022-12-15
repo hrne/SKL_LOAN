@@ -510,8 +510,6 @@ BEGIN
              THEN '3244'
              WHEN TR1.TRXTRN='3033' AND JL."AcctCode" = 'F29'
              THEN '3260'
-             WHEN TR1.TRXTRN='3041'
-             THEN '3420'
              WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=1 AND ACN."IsSameFac" = 1 
              THEN '3422'
              WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=1
@@ -526,6 +524,8 @@ BEGIN
              THEN '3426'
              WHEN TR1.TRXTRN='3041' AND TR1.TRXTCT=6
              THEN '3427'
+             WHEN TR1.TRXTRN='3041'
+             THEN '3420'
              WHEN TR1.TRXTRN='3086'
              THEN '3427'
              WHEN TR1.TRXTRN='3089'

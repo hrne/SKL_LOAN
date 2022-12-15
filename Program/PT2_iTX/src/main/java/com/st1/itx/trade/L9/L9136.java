@@ -59,12 +59,12 @@ public class L9136 extends TradeBuffer {
 //		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 		int acDateStart = 0;
 		int acDateEnd = 0;
-		if ("L9130".equals(titaVo.getTxcd().toString())) {
-			acDateStart = Integer.valueOf(titaVo.getParam("AcDate"));
-			acDateEnd = Integer.valueOf(titaVo.getParam("AcDate"));
-		} else {
+		if ("L9136".equals(titaVo.getTxcd().toString())) {
 			acDateStart = Integer.valueOf(titaVo.getParam("sAcDate"));
 			acDateEnd = Integer.valueOf(titaVo.getParam("eAcDate"));
+		} else {
+			acDateStart = Integer.valueOf(titaVo.getParam("AcDate"));
+			acDateEnd = Integer.valueOf(titaVo.getParam("AcDate"));
 		}
 
 		this.info("acDateStart~acDateStart =" + acDateStart + "~" + acDateEnd);

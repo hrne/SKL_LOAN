@@ -27,7 +27,6 @@ import com.st1.itx.util.common.AcRepayCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
-import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -85,7 +84,6 @@ public class L618B extends TradeBuffer {
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo = new TempVo();
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkOverflow = BigDecimal.ZERO;
 
@@ -127,11 +125,6 @@ public class L618B extends TradeBuffer {
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 
 			lAcDetail = new ArrayList<AcDetail>();
-			// call 應繳試算
-			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 9, BigDecimal.ZERO, titaVo); //
-
-			// 暫收款金額 (暫收借)
-			wkTempAmt = acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 			// 借: F25 催收款項－火險費用
 
@@ -153,9 +146,6 @@ public class L618B extends TradeBuffer {
 			acDetail.setCustNo(iCustNo);
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setRvNo(iRvNo);
-
-			// 累溢收入帳(暫收貸)
-			wkOverflow = acRepayCom.settleOverflow(lAcDetail, titaVo);
 
 			lAcDetail.add(acDetail);
 			this.txBuffer.addAllAcDetailList(lAcDetail);

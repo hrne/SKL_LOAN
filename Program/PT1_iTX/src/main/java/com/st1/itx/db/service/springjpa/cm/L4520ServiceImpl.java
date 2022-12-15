@@ -88,7 +88,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          \"IntEndDate\"," ; 
 		sql += "          \"AcDate\"," ; 
 		sql += "          \"TitaTlrNo\"," ; 
-		sql += "          \"TitaTxtNo\"" ; 
+		sql += "          \"TitaTxtNo\"," ;
+		sql += "          \"AcctCode\"" ; 
 		sql += "      FROM" ;
 		sql += "          \"LoanBorTx\"" ; 
 		sql += "      WHERE" ; 
@@ -102,7 +103,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          \"IntEndDate\"," ; 
 		sql += "          \"AcDate\"," ; 
 		sql += "          \"TitaTlrNo\"," ; 
-		sql += "          \"TitaTxtNo\"" ; 
+		sql += "          \"TitaTxtNo\"," ; 
+		sql += "          \"AcctCode\"" ; 
 		sql += "  ), tx2 AS (" ; 
 		sql += "      SELECT" ; 
 		sql += "          \"CustNo\"," ; 
@@ -114,6 +116,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          \"TitaTxCd\",";
 		sql += "          \"TitaTlrNo\"," ; 
 		sql += "          \"TitaTxtNo\"," ; 
+		sql += "          \"AcctCode\"," ; 
 		sql += "          SUM(\"TxAmt\") AS \"TxAmt\"," ; 
 		sql += "          SUM(\"Principal\") AS \"Principal\"," ; 
 		sql += "          SUM(\"Interest\") AS \"Interest\"," ; 
@@ -147,7 +150,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          \"TitaTxCd\",";
 		sql += "          \"TitaTlrNo\"," ; 
 		sql += "          \"TitaTxtNo\"," ; 
-		sql += "          DECODE(\"AcSeq\",1,1,2) " ;
+		sql += "          DECODE(\"AcSeq\",1,1,2), " ;
+		sql += "          \"AcctCode\"," ;
 		sql += "  )";
 		sql += "  SELECT ";
 		sql += "  MIN(substr(ed.\"TitaTxtNo\", 0, 2)) AS \"BaTxNo\",";
@@ -167,13 +171,13 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  MIN(ce.\"EmployeeNo\") AS \"EmployeeNo\", ";
 		sql += "  MIN(cm.\"CustId\") AS \"CustId\", ";
 		sql += "  MIN(ed.\"RepayCode\") AS \"RepayCode\",  ";
-		sql += "  MIN(fac.\"AcctCode\") as \"AcctCode\",  ";
 		sql += "  MIN(ed.\"ProcCode\") as \"ProcCode\",";
 		sql += "  MIN(ed.\"Acdate\") as \"Acdate\"," ;
 		sql += "  CASE " ;
 		sql += "  	WHEN tx2.\"TitaTxCd\" = 'L3210' " ;
 		sql += "    THEN tx2.\"AcSeq\" " ;
-		sql += "   ELSE 0 END AS \"AcSeq\" " ;
+		sql += "   ELSE 0 END AS \"AcSeq\"," ;
+		sql += "   tx2.\"AcctCode\" AS \"AcctCode\"" ;
 		sql += "  FROM";
 		sql += "  ( ";
 		sql += "  SELECT DISTINCT";
@@ -200,7 +204,8 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND BD.\"TitaTlrNo\" = ed.\"TitaTlrNo\""; 
 		sql += "                             AND BD.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "  LEFT JOIN tx1 ON tx1.\"CustNo\" = ed.\"CustNo\"";
-		sql += "               AND tx1.\"AcDate\" = ed.\"Acdate\"";  
+		sql += "               AND tx1.\"AcDate\" = ed.\"Acdate\"";
+		sql += "               AND tx1.\"AcctCode\" = ed.\"AcctCode\"";  
 		sql += "               AND SUBSTR(tx1.\"TitaTxtNo\",1,2) = SUBSTR(BD.\"BatchNo\",5,2)";
 		sql += "               AND TO_NUMBER(SUBSTR(tx1.\"TitaTxtNo\",3,6)) = BD.\"DetailSeq\"";
 		sql += "  LEFT JOIN tx2 ON tx2.\"CustNo\" = tx1.\"CustNo\"";
@@ -209,13 +214,15 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       AND tx2.\"AcDate\" = tx1.\"AcDate\"";
 		sql += "                       AND tx2.\"TitaTlrNo\" = tx1.\"TitaTlrNo\""; 
 		sql += "                       AND tx2.\"TitaTxtNo\" = tx1.\"TitaTxtNo\"";
+		sql += "               		   AND tx2.\"AcctCode\" = tx1.\"AcctCode\""; 
 		sql += " LEFT JOIN \"FacMain\" fac ON fac.\"CustNo\" = tx2.\"CustNo\"";
 		sql += "                      AND fac.\"FacmNo\" = tx2.\"FacmNo\"";
 		sql += "  GROUP BY ed.\"CustNo\",";
 		sql += " 		   CASE " ;
 		sql += "  			 WHEN tx2.\"TitaTxCd\" = 'L3210' " ;
 		sql += "    		 THEN tx2.\"AcSeq\" " ;
-		sql += "   		   ELSE 0 END" ;
+		sql += "   		   ELSE 0 END ," ;
+		sql += "          tx2.\"AcctCode\""; 
 		sql += "  ORDER BY   \"RepayCode\", \"AcctCode\", \"ProcCode\", \"CustNo\",\"AcSeq\", \"IntStartDate\", \"IntEndDate\"";
 
 		this.info("sql=" + sql);

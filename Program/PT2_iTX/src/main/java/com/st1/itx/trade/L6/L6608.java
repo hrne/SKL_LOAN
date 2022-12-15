@@ -89,7 +89,6 @@ public class L6608 extends TradeBuffer {
 			dataLog.setEnv(titaVo, tCdReport2, tCdReport); ////
 			dataLog.exec("修改報表代號對照檔"); ////
 			break;
-
 		case 4: // 刪除
 			tCdReport = sCdReportService.holdById(iFormNo);
 			if (tCdReport != null) {
@@ -123,7 +122,7 @@ public class L6608 extends TradeBuffer {
 		mCdReport.setSignCode(this.parse.stringToInteger((titaVo.getParam("SignCode"))));
 		mCdReport.setWatermarkFlag(this.parse.stringToInteger(titaVo.getParam("Watermark")));
 		mCdReport.setEnable(titaVo.getParam("Enable"));
-
+		
 		mCdReport.setLetterFg(titaVo.getParam("LetterFg"));
 		mCdReport.setMessageFg(titaVo.getParam("MessageFg"));
 		mCdReport.setEmailFg(titaVo.getParam("EmailFg"));

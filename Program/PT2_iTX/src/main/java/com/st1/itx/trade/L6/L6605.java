@@ -70,6 +70,7 @@ public class L6605 extends TradeBuffer {
 				sCdOverdueService.insert(tCdOverdue, titaVo);
 				this.info("2");
 			} catch (DBException e) {
+
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
 				} else {
@@ -159,5 +160,6 @@ public class L6605 extends TradeBuffer {
 		}
 		mCdOverdue.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mCdOverdue.setLastUpdateEmpNo(titaVo.getTlrNo());
+
 	}
 }

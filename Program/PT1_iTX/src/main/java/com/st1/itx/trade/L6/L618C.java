@@ -23,10 +23,8 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcRepayCom;
-import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
-import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
 
@@ -62,9 +60,6 @@ public class L618C extends TradeBuffer {
 	AcRepayCom acRepayCom;
 
 	@Autowired
-	BaTxCom baTxCom;
-
-	@Autowired
 	public DataLog dataLog;
 
 	private String iItemCode;
@@ -76,7 +71,6 @@ public class L618C extends TradeBuffer {
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo = new TempVo();
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkOverflow = BigDecimal.ZERO;
 
@@ -84,7 +78,6 @@ public class L618C extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L618C ");
 		this.totaVo.init(titaVo);
-		baTxCom.setTxBuffer(this.txBuffer);
 		loanCom.setTxBuffer(this.txBuffer);
 		acRepayCom.setTxBuffer(this.getTxBuffer());
 
@@ -118,12 +111,6 @@ public class L618C extends TradeBuffer {
 
 			lAcDetail = new ArrayList<AcDetail>();
 
-			// call 應繳試算
-			this.baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, 9, BigDecimal.ZERO, titaVo); //
-
-			// 暫收款金額 (暫收借)
-			wkTempAmt = acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
 //			借F24 催收款項－法務費用
 			AcDetail acDetail = new AcDetail();
 			acDetail.setDbCr("D");
@@ -144,9 +131,6 @@ public class L618C extends TradeBuffer {
 			acDetail.setFacmNo(iFacmNo);
 			acDetail.setRvNo(iRvNo);
 			lAcDetail.add(acDetail);
-
-			// 累溢收入帳(暫收貸)
-			wkOverflow = acRepayCom.settleOverflow(lAcDetail, titaVo);
 
 			this.txBuffer.addAllAcDetailList(lAcDetail);
 

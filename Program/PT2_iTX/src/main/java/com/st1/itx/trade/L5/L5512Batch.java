@@ -28,6 +28,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.PfCheckInsuranceCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.service.PfRewardMediaService;
@@ -469,8 +470,11 @@ public class L5512Batch extends TradeBuffer {
 				s += ",";
 				s += "0000000000";// 業績(FYP)(10)
 				s += ",";
-				s += String.format("%07d%03d", pfRewardMedia.getCustNo(), pfRewardMedia.getFacmNo())
-						+ "000放款獎勵津貼               ";// 轉發明細(40)
+				String custNo = "" + pfRewardMedia.getCustNo();
+				String facmNo = "" + pfRewardMedia.getFacmNo();
+				custNo = FormatUtil.padLeft(custNo, 7);
+				facmNo = FormatUtil.padLeft(facmNo, 3);
+				s += FormatUtil.padX(custNo + facmNo + "000放款獎勵津貼", 40);// 轉發明細(40)
 				s += ",";
 				s += "0000000000";// 計算基礎(10)
 				s += ",";
@@ -489,7 +493,7 @@ public class L5512Batch extends TradeBuffer {
 				s += "                  "; // 沖銷碼
 				s += ",";
 				s += "10H000"; // 成本單位代號
-				
+
 				makeFile.put(s);
 				cnt++;
 			}

@@ -253,7 +253,7 @@ C(3,#ApplNo,0,S,T(2,#L2r07CustName))
 !
 !#ENBTN4=X,1,S
 !C(3,#WK3,0,DISABLE(#BTN4),ENABLE(#BTN4))
-!        
+
 #TimCustNo=A,7,S
 C(3,#CustNo,0,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
@@ -737,10 +737,7 @@ TXFORM=L3005
 #OONeedPaidAmtX=應收金額
 {width:180}
 
-#OOOverflowX=溢收金額
-{width:180,align:'right'}
-
-#OOUnpaidAmtX=短收金額
+#OOOverShortX=溢短收
 {width:180,align:'right'}
 
 #OOLoanBalX=放款餘額

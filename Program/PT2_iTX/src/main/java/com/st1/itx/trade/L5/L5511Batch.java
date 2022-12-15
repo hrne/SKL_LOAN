@@ -32,6 +32,7 @@ import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.PfRewardMediaService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.MakeFile;
@@ -549,22 +550,25 @@ public class L5511Batch extends TradeBuffer {
 				if (bbonus.compareTo(BigDecimal.ZERO) < 0) {
 					DecimalFormat df = new DecimalFormat("000000000");
 					s += df.format(bbonus);// 金額(10)
+					s += ",";
 				} else {
 					DecimalFormat df = new DecimalFormat("0000000000");
 					s += df.format(bbonus);// 金額(10)
+					s += ",";
 				}
 
 				s += "0000000000";// 業績(FYC)(10)
 				s += ",";
 				s += "0000000000";// 業績(FYP)(10)
 				s += ",";
+				String transferDetail="";
 				if (pfRewardMedia.getBonusType() == 1) {
-					s += " 介紹獎金                               ";// 轉發明細(40)
-					s += ",";
+					transferDetail = " 介紹獎金";
 				} else if (pfRewardMedia.getBonusType() == 5) {
-					s += " 協辦獎金                               ";// 轉發明細(40)
-					s += ",";
+					transferDetail = " 協辦獎金";
 				}
+				s += FormatUtil.padX(transferDetail, 40);// 轉發明細(40)
+				s += ",";
 				s += "0000000000";// 計算基礎(10)
 				s += ",";
 				s += "00000.00";// FP跨售換算率(8)
@@ -582,7 +586,7 @@ public class L5511Batch extends TradeBuffer {
 				s += "                  "; // 沖銷碼
 				s += ",";
 				s += "10H000"; // 成本單位代號
-				
+
 				makeFile.put(s);
 				cnt++;
 			}

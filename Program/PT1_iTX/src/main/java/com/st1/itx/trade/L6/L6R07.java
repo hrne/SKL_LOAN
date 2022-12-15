@@ -29,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R07 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R07.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,7 +46,6 @@ public class L6R07 extends TradeBuffer {
 		String iRimTxCode = titaVo.getParam("RimTxCode");
 		String iRimOverdueSign = titaVo.getParam("RimOverdueSign");
 		String iRimOverdueCode = titaVo.getParam("RimOverdueCode");
-		String dOverdueCode = "";
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
 			throw new LogicException(titaVo, "E0009", "L6R07"); // 交易代號不可為空白
@@ -61,11 +59,11 @@ public class L6R07 extends TradeBuffer {
 
 		// 查詢逾期新增減少原因檔
 		CdOverdue tCdOverdue = sCdOverdueService.findById(new CdOverdueId(iRimOverdueSign, iRimOverdueCode), titaVo);
-
 		/* 如有找到資料 */
 		if (tCdOverdue != null) {
 			if (iRimTxCode.equals("L6605") && iRimFuncCode == 1) {
-				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimOverdueSign")); // 新增資料已存在
+//				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimOverdueSign")); // 新增資料已存在
+				throw new LogicException(titaVo, "E0002", "新增資料已存在"); // 更新資料時，發生錯誤
 			} else {
 				/* 將每筆資料放入Tota */
 				moveTotaCdOverdue(tCdOverdue);

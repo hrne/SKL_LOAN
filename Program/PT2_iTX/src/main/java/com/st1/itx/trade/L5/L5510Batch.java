@@ -35,6 +35,7 @@ import com.st1.itx.util.common.PfCheckInsuranceCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.common.MakeExcel;
@@ -530,113 +531,6 @@ public class L5510Batch extends TradeBuffer {
 			cnt++;
 		}
 
-//		if (lPfItDetail != null) {
-//			for (PfItDetail pfItDetail : lPfItDetail) {
-//
-//				BigDecimal perfReward = pfItDetail.getPerfReward();
-//
-//				this.info("L5510Batch.makeMedia data = " + pfItDetail.getMediaFg() + "/" + perfReward + '/'
-//						+ pfItDetail.getIntroducer().trim());
-//
-//				if (pfItDetail.getMediaFg() > 0) {
-//					continue;
-//				}
-//
-//				if (perfReward.compareTo(BigDecimal.ZERO) == 0) {
-//					continue;
-//				}
-//
-//				if ("".equals(pfItDetail.getIntroducer().trim())) {
-//					continue;
-//				}
-//
-//				if (pfItDetail.getDrawdownAmt().compareTo(BigDecimal.ZERO) == 0) {
-//					continue;
-//				}
-//
-//				this.info("L5510Batch.makeMedia DrawdownAmt = " + pfItDetail.getDrawdownAmt());
-//
-//				PfItDetail pfItDetail2 = pfItDetailService.holdById(pfItDetail, titaVo);
-//				if (pfItDetail2 == null) {
-//					throw new LogicException(titaVo, "E0001", "介紹人業績明細檔");
-//				}
-//
-////				pfItDetail2.setRewardDate(this.txBuffer.getTxCom().getTbsdy());//暫不使用
-//				pfItDetail2.setMediaFg(1);
-//				pfItDetail2.setMediaDate(this.txBuffer.getTxCom().getTbsdy());
-//				try {
-//					pfItDetailService.update(pfItDetail2, titaVo);
-//				} catch (DBException e) {
-//					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
-//				}
-//				//
-//				String s = "";
-//
-//				String workMonth = String.valueOf(pfItDetail.getWorkMonth());
-//				s += workMonth.substring(0, 4) + "/" + workMonth.substring(4, 6); // 業績年月(7)
-//				s += "10H000"; // 申請單位代號(6)
-//				s += "0000" + workMonth; // 申請批號(10)
-//
-//				String employeeId = "";
-//				CdEmp cdEmp = cdEmpService.findById(pfItDetail.getIntroducer(), titaVo);
-//				if (cdEmp == null) {
-//					throw new LogicException(titaVo, "E0001", "員工編號=" + pfItDetail.getIntroducer());
-//				} else {
-//					employeeId = String.format("%-10s", cdEmp.getAgentId());
-//				}
-//
-//				s += employeeId; // 身份證字號(10)
-//				s += "QQ"; // 薪碼(2)
-//				s += "                    "; // 薪碼說明
-//
-//				String ss = "";
-//				if (perfReward.compareTo(BigDecimal.ZERO) < 0) {
-//					DecimalFormat df = new DecimalFormat("000000000");
-//					ss = df.format(perfReward);
-//				} else {
-//					DecimalFormat df = new DecimalFormat("0000000000");
-//					ss = df.format(perfReward);
-//				}
-//				s += ss;// 金額(10)
-//
-//				s += ss;// 業績(FYC)(10)
-//
-//				BigDecimal perfEqAmt = pfItDetail.getPerfEqAmt();
-//				if (perfEqAmt.compareTo(BigDecimal.ZERO) < 0) {
-//					DecimalFormat df = new DecimalFormat("000000000");
-//					ss = df.format(perfEqAmt);
-//				} else {
-//					DecimalFormat df = new DecimalFormat("0000000000");
-//					ss = df.format(perfEqAmt);
-//				}
-//
-//				s += ss;// 業績(FYP)(10)
-//
-//				//
-//
-//				s += String.format("%07d%03d", pfItDetail.getCustNo(), pfItDetail.getFacmNo())
-//						+ "000                           ";// 轉發明細(40)
-//
-//				// 撥款金額/追回金額
-//				BigDecimal drawdownAmt = pfItDetail.getDrawdownAmt();
-//				if (drawdownAmt.compareTo(BigDecimal.ZERO) < 0) {
-//					DecimalFormat df = new DecimalFormat("000000000");
-//					ss = df.format(drawdownAmt);// 業績(FYP)(10)
-//				} else {
-//					DecimalFormat df = new DecimalFormat("0000000000");
-//					ss = df.format(drawdownAmt);// 業績(FYP)(10)
-//				}
-//
-//				s += ss;// 計算基礎(10)
-//
-//				s += "00035.00";// FP跨售換算率(8)
-//				s += "00012.50";// FC跨售換算率(8)
-//				s += "6";// 跨售類別(1)
-//				makeFile.put(s);
-//				cnt++;
-//			}
-//		}
-
 		if (cnt > 0) {
 			makeFile.close();
 			String msg = "共產製 " + cnt + "筆媒體檔資料,請至【報表及製檔】作業,下傳【媒體檔】";
@@ -706,12 +600,12 @@ public class L5510Batch extends TradeBuffer {
 		s += ss;// 業績(FYP)(10)
 		s += ",";
 
-		//
+		String custNo = d.get("CustNo").trim();
+		String facmNo = d.get("FacmNo").trim();
+		custNo = FormatUtil.padLeft(custNo, 7);
+		facmNo = FormatUtil.padLeft(facmNo, 3);
 
-		s += String.format("%07d%03d", Integer.valueOf(d.get("CustNo").trim()),
-				Integer.valueOf(d.get("FacmNo").trim()));
-		s += ",";
-		s += "000                           ";// 轉發明細(40)
+		s += FormatUtil.padX(custNo + facmNo + "000", 40);// 轉發明細(40)
 		s += ",";
 
 		// 撥款金額/追回金額
@@ -742,7 +636,7 @@ public class L5510Batch extends TradeBuffer {
 		s += "                  "; // 沖銷碼
 		s += ",";
 		s += "      "; // 成本單位代號
-		
+
 		makeFile.put(s);
 	}
 
