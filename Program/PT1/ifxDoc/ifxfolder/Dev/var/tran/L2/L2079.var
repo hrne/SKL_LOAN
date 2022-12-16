@@ -94,6 +94,11 @@ T(1,@NewFacmNo,#NTXBUF,21,3)
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
 
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 #DATE=D,8,S
 T(4,DATE$)
 

@@ -383,6 +383,13 @@ R(1,L2R07)
 #CustIdX=X,100,L
 T(2,#L2r07CustName)
 
+
+#TimCustNo=A,7,S
+C(4,#CustId,$,E(0,#L2r07CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
+
 #CustEntCode=A,1,S
 E(0,#L2r07EntCode)
 C(3,#CustEntCode,1,INVOKEJS(SHOW,p2,4,4,0),INVOKEJS(SHOW,p2,4,4,1))

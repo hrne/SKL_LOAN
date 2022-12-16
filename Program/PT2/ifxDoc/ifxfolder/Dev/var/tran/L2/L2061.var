@@ -125,6 +125,11 @@ T(2,@CustName,#L1r01CustName)
 
 
 
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 !額度編號
 #FacmNo=A,3,I
 C(3,#CHAIN,1,s,$)

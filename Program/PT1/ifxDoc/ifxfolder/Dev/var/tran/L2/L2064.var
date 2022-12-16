@@ -1,0 +1,333 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2064)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,166)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,20)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+
+#FirstIn=A,1,S
+!HIDE(#BTN1)
+E(0,0)
+
+#BtnAddBuf=X,8,S
+T(2,1)
+
+#BtnAdd=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2604; ntxbuf=1; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L2064]                                 企金費用明細資料查詢"],
+["#FdCustNo+借戶戶號",#CustNo,#CustName],
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+#BUF1=X,42,S
+! ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+
+#FdCustNo=X,2,L
+T(3,*)
+
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF01=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S 
+
+
+#StatusHelpRim=X,1,S
+RESET_RIM(#StatusHelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@CurrPrecisionHelp,#HelpDesc1) 
+
+#CurrencyCode=X,3,S
+T(3,TWD)
+
+#Precision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,100,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#NTXBUF5=X,100,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#CHAINTXCD=_,_,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
+
+#CustNo=A,7,I
+C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+T(3,#CustName,)
+
+#RimL1r09=X,1,S
+E(0,@RimFunCd,1)
+T(2,@RimCustId,)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+T(2,@CustName,#L1r09CustName)
+
+#CustName=x,100,L
+
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
+#RPTFG=A,0,S
+
+#RPTFG2=A,1,S
+C(4,#NTXBUF5,E(0,0),E(0,2))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L1R09.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2064 ----------
+<sub type="FORM" name="L2064">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2064,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2064] 企金案訂約明細資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+!借戶戶號
+#OCustNo=A,7,L
+E(0,#CustNo)
+#OCustNoX=x,100,L
+T(2,#CustName)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 戶號
+#OOCustNo=A,7,O
+! 額度
+#OOFacmNo=A,3,O
+! 企金費用代碼+說明
+#OOSyndFeeItem=x,50,O
+! 費用金額
+#OOSyndFee=m,14.2,O
+
+#OOSyndFeeX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOSyndFee,#OOSyndFeeX)
+P(R,#OOSyndFeeX)
+
+!已銷金額
+#OOClsAmt=m,14.2,O
+
+#OOClsAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOClsAmt,#OOClsAmtX)
+P(R,#OOClsAmtX)
+
+#OOEntryAmt=m,14.2,O
+
+#OOEntryAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOEntryAmt,#OOEntryAmtX)
+P(R,#OOEntryAmtX)
+
+!備註
+#OORmk=x,40,O
+
+#OOEntryFG=X,1,O
+
+! rvno
+#OORvNo=X,15,O
+! 業務科目
+#OOAcctCode=X,3,O
+
+! Y為已銷
+#OOcheckamt=m,14.2,S
+E(0,#OOSyndFee-#OOClsAmt)
+#OOCheck=X,1,S
+IF(#OOcheckamt==0,T(3,Y),T(3,N))
+!修改
+#OOBUF1=X,100,S
+T(2,2+#OOCustNo+#OOFacmNo+#OORvNo+#OOAcctCode+#OOCheck)
+
+#OOBTN1=X,1,S
+C(5,#OOCheck,Y,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF1}))
+! BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF1})
+
+!刪除
+#OOBUF3=X,100,S
+T(2,4+#OOCustNo+#OOFacmNo+#OORvNo+#OOAcctCode)
+
+#OOBTN3=X,1,S
+C(5,#OOCheck,Y,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF3}))
+
+
+!查詢
+#OOBUF4=X,100,S
+T(2,5+#OOCustNo+#OOFacmNo+#OORvNo+#OOAcctCode)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2604; ntxbuf=#OOBUF4})
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#CustNo
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L2064
+#OOCustNo
+#OOFacmNo
+#OOSyndFeeItem
+#OOSyndFee
+#OOClsAmt
+#OORmk
+#OORvNo
+#OOAcctCode
+#OOEntryAmt
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L1R09.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+<sub type="PART" name="L2064" layout="cols=1;screen.width=[130,880];printer.width=[15,30,15,30];">
+[
+["[L2064]                                 企金費用明細資料查詢"],
+["@借戶戶號",#OCustNo,#OCustNoX],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=0,QUERY.GRID,L2064
+#any={detail:true, header:'L2064.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=修改
+{width:50,search:false,formatter:'cust:bind-button:修改;L2604 企金費用維護',align:'center',canExport:false}
+
+#OOBTN3=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除;L2604 企金費用維護',align:'center',canExport:false}
+
+#OOBTN4=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢;L2604 企金費用維護',align:'center',canExport:false}
+
+
+
+#OOCustNo=戶號
+{width:85,align:'center'}
+#OOFacmNo=額度編號 
+{width:85,align:'center'}
+#OOSyndFeeItem=費用說明
+{width:120,align:'center'}
+#OOSyndFeeX=金額
+{width:180,align:'center'}
+#OOEntryAmtX=已入帳金額
+{width:180,align:'center'}
+#OOClsAmtX=已銷／已攤提金額
+{width:180,align:'center'}
+#OORmk=備註
+{width:200,align:'center'}
+
+^
+
+#RPTFG2=2,QUERY.GRID,L2064
+#any={detail:true, header:'L2064.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOCustNo=戶號
+{width:85,align:'center'}
+#OOFacmNo=額度編號 
+{width:85,align:'center'}
+#OOSyndFeeItem=費用說明
+{width:120,align:'center'}
+#OOSyndFeeX=金額
+{width:180,align:'center'}
+#OOEntryAmtX=已入帳金額
+{width:180,align:'center'}
+#OOClsAmtX=已銷／已攤提金額
+{width:180,align:'center'}
+#OORmk=備註
+{width:200,align:'center'}
+
+
+
+^
+</sub>

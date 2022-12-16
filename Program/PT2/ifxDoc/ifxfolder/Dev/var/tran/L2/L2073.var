@@ -122,6 +122,12 @@ RESET_RIM(#RimL1r09,L1R09)
 S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
 R(1,L1R09)
 
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2R47CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 
 #MRKEY=_,_,S
 C(2,#IdNo,S,T(2,#L2R47CustNo),T(2,#CustNo))

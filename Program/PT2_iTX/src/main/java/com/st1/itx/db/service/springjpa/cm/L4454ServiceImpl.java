@@ -134,10 +134,14 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,c.\"CustName\"                 AS \"CustName\"        ";
 			sql += " ,2                              AS \"RepayCode\" ";
 			sql += " ,decode(nvl(d.\"RepayType\", 0),5,'Y',' ') AS \"FireFeeSuccess\"  "; // Y-火險費成功、期款失敗
+			sql += " ,decode(nvl(coll.\"PrevIntDate\", 0), 0, coll.\"PrevIntDate\" - 19110000) AS \"CollPrevIntDate\"     ";
 			sql += " ,ROW_NUMBER() OVER (Partition By b.\"CustNo\", b.\"FacmNo\", b.\"RepayType\" ORDER BY b.\"PayIntDate\") AS \"RowNumber\"  ";
 			sql += " from \"BankDeductDtl\" b                               ";
 			sql += " left join \"CustMain\" c on c.\"CustNo\" = b.\"CustNo\"";
-			sql += " left join \"BankDeductDtl\" d                          ";
+			sql += " left join \"CollList\" coll                            ";
+			sql += "       on coll.\"CustNo\" = b.\"CustNo\"                ";
+			sql += "      and coll.\"FacmNo\" = b.\"FacmNo\"	            ";
+		    sql += " left join \"BankDeductDtl\" d                          ";
 			sql += "       on d.\"CustNo\" = b.\"CustNo\"                   ";
 			sql += "      and d.\"FacmNo\" = b.\"FacmNo\"	                ";
 			sql += "      and d.\"EntryDate\" = b.\"EntryDate\"	            ";

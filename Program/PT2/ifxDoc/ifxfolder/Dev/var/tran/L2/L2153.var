@@ -732,6 +732,11 @@ RESET_RIM(#SendL2r07,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
+#TimCustNo=A,7,S
+C(4,#CustId,$,E(0,#L2r07CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 #SendL6r28=X,1,S
 E(0,@RimFuncCode,5)
 T(2,@RimBusinessType,LN)

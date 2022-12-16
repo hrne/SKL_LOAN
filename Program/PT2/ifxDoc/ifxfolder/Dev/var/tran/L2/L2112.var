@@ -163,6 +163,11 @@ R(1,L2R07)
 !C(3,#L2r07CustTypeCode,6,$,V(P,此統編非團體戶))
 T(2,#L2r07CustName)
 
+#TimCustNo=A,7,S
+C(4,#GroupId,$,E(0,#L2r07CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 #RcvL2r03=X,1,S
 T(2,@ProdNo,#L2r03ProdNo)
 T(2,@CurrencyCode,#L2r03CurrencyCode)

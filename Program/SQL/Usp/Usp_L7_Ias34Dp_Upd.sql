@@ -660,42 +660,47 @@ BEGIN
              , M."FacmNo"
              , M."BormNo"
     )
-    , LoanData AS ( -- 戶況非正常之餘額=轉催收本金+轉催收利息-催收還款金額-轉銷呆帳金額
+    , LoanData AS ( -- 月底餘額檔科目為990之餘額=轉催收本金+轉催收利息-催收還款金額-轉銷呆帳金額
       SELECT M."CustNo"
            , M."FacmNo"
            , M."BormNo"
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth1"
---                 THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                   THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal1" -- 發生日後第一年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth2"
---                 THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                   THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal2" -- 發生日後第二年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth3"
---                 THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                   THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal3" -- 發生日後第三年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth4"
---                 THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                   THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal4" -- 發生日後第四年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth5"
---                 THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                   THEN MLB."LoanBalance"
+                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal5" -- 發生日後第五年餘額
