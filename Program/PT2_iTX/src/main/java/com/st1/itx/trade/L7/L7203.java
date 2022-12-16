@@ -95,29 +95,6 @@ public class L7203 extends TradeBuffer {
 		MySpring.newTask("BS720", this.txBuffer, titaVo);
 		
 		
-		this.info("setDataBaseOnMon...");
-		titaVo.setDataBaseOnMon();
-		uploadFile = Ias39IntMethodFileVo.getOccursList();
-		 AmortizedAmt = BigDecimal.ZERO;
-		if (uploadFile != null && uploadFile.size() != 0) {
-			for (OccursList tempOccursList : uploadFile) {
-				if (!(iYearMonth == parse.stringToInteger(tempOccursList.get("YearMonth")))) {
-					throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + tempOccursList.get("YearMonth"));
-				}
-				AmortizedAmt = AmortizedAmt.add(parse.stringToBigDecimal(tempOccursList.get("AccumDPAmortized")));
-			}
-
-			if (AmortizedAmt.compareTo(BigDecimal.ZERO) == 0) {
-				throw new LogicException(titaVo, "E0015", "本期累計應攤銷折溢價=0 ");
-			}
-		}
-		// 整批處理：利息法帳面資料檔更新、寫入應處理清單 ACCL00-各項提存作業(折溢價攤銷)
-		MySpring.newTask("BS720", this.txBuffer, titaVo);
-
-
-		
-		
-		
 		this.totaVo.putParam("Count", uploadFile.size());
 		this.totaVo.putParam("Amount", AmortizedAmt.setScale(0, RoundingMode.HALF_UP));
 

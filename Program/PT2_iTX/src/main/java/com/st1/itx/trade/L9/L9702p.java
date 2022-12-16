@@ -45,7 +45,7 @@ public class L9702p extends TradeBuffer {
 		// 產表種類
 		String type = titaVo.getParam("ReportCode");
 		if ("4".equals(type)) {
-			for (int i = 1; i <= 4; i++) {
+			for (int i = 1; i <= 3; i++) {
 				l9702Report.exec(titaVo, String.valueOf(i));
 			}
 		} else {

@@ -119,9 +119,19 @@ public class L9702Report extends MakeReport {
 
 		List<Map<String, String>> listL9702 = null;
 
+		totalOfBeginBal = BigDecimal.ZERO;
+		totalOfDrawdownAmt = BigDecimal.ZERO;
+		totalOfEndBal = BigDecimal.ZERO;
+		totalOfOvduPrinAmt = BigDecimal.ZERO;
+		totalOfEndvduBal = BigDecimal.ZERO;
+		totalOfRepaidAmt = BigDecimal.ZERO;
+		totalOfIntRcv = BigDecimal.ZERO;
+
 		if ("1".equals(typeReportCode)) {
 
 			this.info("type = 1");
+
+			rptFg = 0;
 
 			try {
 				listL9702 = l9702ServiceImpl.getType1(startDate, endDate, titaVo);

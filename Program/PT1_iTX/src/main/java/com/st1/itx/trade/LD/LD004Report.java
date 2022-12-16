@@ -59,8 +59,9 @@ public class LD004Report extends MakeReport {
 
 		String formName = "1".equals(titaVo.getParam("inputOption")) ? "還本收據" : "繳息收據";
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr()).setRptCode("LD004").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity("")
-				.setRptSize("A4").setPageOrientation("L").build();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("LD004").setRptItem("企金戶還本收據及繳息收據(" + formName + ")").setSecurity("").setRptSize("A4")
+				.setPageOrientation("L").build();
 
 		this.open(titaVo, reportVo);
 
@@ -126,7 +127,14 @@ public class LD004Report extends MakeReport {
 					this.print(0, 64, acChineseNameWrap.get(0));
 				}
 
-				this.print(1, 3, "現金　　電匯　　票據　　調整");
+				int repayCode = Integer.valueOf(rowLD004.get("RepayCode"));
+				
+			
+				if(repayCode==4) {
+					this.print(1, 3, "現金　　電匯　　票據 Ｖ 調整");
+				}else {
+					this.print(1, 3, "現金 Ｖ 電匯　　票據　　調整");
+				}
 
 				if (acChineseNameWrap.size() >= 2) {
 					this.print(0, 64, acChineseNameWrap.get(1));
@@ -134,24 +142,28 @@ public class LD004Report extends MakeReport {
 
 				this.print(1, 1, "┌──────────┬──────────────────┬─────────┐");
 				this.print(1, 1, "│　　　　子目　　　　│　　摘（　　　　　　入帳）要　　　　│　　　 金額 　　　│");
-				this.print(0, 39, showDate(rowLD004.get("F5").toString(), 1), "C");
+				this.print(0, 36, showDate(rowLD004.get("F5").toString(), 1), "C");
 				this.print(1, 1, "├──────────┼──────────────────┼─────────┤");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				if (!rowLD004.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) // 20210916 從現有樣張上推測
-																										// 還本收據不出此字樣
+																									// 還本收據不出此字樣
 				{
-					this.print(0, 55, "非支票");
+					this.print(0, 50, "非支票");
 				}
-				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 13, rowLD004.get("F15"), "C");
-				this.print(0, 34, padStart(rowLD004.get("F6").toString(), 7, "0") + "-" + padStart(rowLD004.get("F7").toString(), 3, "0") + "-" + padStart(rowLD004.get("F8").toString(), 3, "0"));
-
-				this.print(0, 63, "$");
+				this.print(0, 58, "$");
 
 				BigDecimal f10 = new BigDecimal(rowLD004.get("F10").toString());
 				DecimalFormat df1 = new DecimalFormat("#,##0");
-				this.print(0, 80, df1.format(f10), "R");
+				this.print(0, 73, df1.format(f10), "R");
 
+				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
+				this.print(0, 13, rowLD004.get("F15"), "C");
+				this.print(0, 34,
+						padStart(rowLD004.get("F6").toString(), 7, "0") + "-"
+								+ padStart(rowLD004.get("F7").toString(), 3, "0") + "-"
+								+ padStart(rowLD004.get("F8").toString(), 3, "0"));
+
+	
 				// 戶名固定做wrap
 
 				ArrayList<String> custNameWrap = longStringWrap(rowLD004.get("F9"), 20);
@@ -172,11 +184,12 @@ public class LD004Report extends MakeReport {
 				// 這裡可以考慮改成for迴圈
 
 				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 37, showDate(rowLD004.get("F11").toString(), 1) + " - " + showDate(rowLD004.get("F12").toString(), 1));
+				this.print(0, 34,
+						showDate(rowLD004.get("F11").toString(), 1) + " - " + showDate(rowLD004.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "└──────────┴──────────────────┴─────────┘");
-				this.print(1, 52, "新台幣　" + ConvertUpMoney.toChinese(rowLD004.get("F10")), "R");
+				this.print(1, 52, "新台幣　" + ConvertUpMoney.toChinese(rowLD004.get("F10")) + "整", "R");
 				String tmp = rowLD004.get("F13");
 				String TLRNO = titaVo.getParam("TLRNO");
 				if (rowLD004.get("F13") == null || rowLD004.get("F13") == "") {
