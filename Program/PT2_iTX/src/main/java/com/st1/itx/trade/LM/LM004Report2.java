@@ -12,6 +12,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("lM004Report2")
 @Scope("prototype")
@@ -33,7 +34,24 @@ public class LM004Report2 extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
 		String entdy = titaVo.get("ENTDY").toString();
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM004";
+		String fileItem = "長中短期放款到期追蹤表";
+		String fileName = "LM004長中短期放款到期追蹤表";
+		String defaultExcel = "LM004長中短期放款到期追蹤表.xls";
+		String defaultSheet = "10806";
+		String  newSheetName =showDate(entdy, 1);
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		makeExcel.setSheet(defaultSheet, newSheetName);
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表",
+//				"LM004長中短期放款到期追蹤表.xls", "10806", );
 
 		int row = 3;
 		int num = 1;
@@ -78,11 +96,11 @@ public class LM004Report2 extends MakeReport {
 				case 8:
 
 					// 到期日
-					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F8")) + 19110000);
+					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F8")));
 					break;
 				case 9:
 					// 應完成日
-					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F9")) + 19110000);
+					makeExcel.setValue(row, col, Integer.valueOf(tLDVo.get("F9")));
 					break;
 				case 10:
 					// 金額

@@ -199,6 +199,11 @@ T(3,@ReSetEmpName,)
 T(2,@ReSetDate,#L2r31ReSetDate)
 E(0,@ApplMark,#L2r31ApplMark)
 
+#TimCustNo=A,7,S
+C(4,#CustId,$,E(0,#L2r31CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 #PutCustIdToWork=A,1,S
 T(2,#CustIdWork,#CustId)
 
@@ -280,10 +285,14 @@ IF(#FunCd==2,$,s)
 !---------- TXFORM = L2703 ----------
 <sub type="FORM" name="L2703">
 
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2703,$,S)
+
 #SCRTIL=_,_,S
 T(3,[L2703] 結清客戶申請個人資料控管維護)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!建立日期
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 

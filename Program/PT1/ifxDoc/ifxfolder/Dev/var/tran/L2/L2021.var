@@ -128,6 +128,7 @@ R(1,L2R07)
 E(0,0)
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(3,#CaseNo,0,$,E(0,#L2r07CustNo))
+T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::CustRmk.rtn"/>
 
 

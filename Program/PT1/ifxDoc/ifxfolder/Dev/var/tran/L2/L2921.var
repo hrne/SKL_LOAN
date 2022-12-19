@@ -136,6 +136,14 @@ C(3,#CHAIN,1,s,$)
 !INVOKEJS(SHOW,p1,1,5,1)
 ! SHOW(#BTN1)
 
+#SendL2r10=X,1,S
+C(3,#CaseNo,0,S,$)
+E(0,@RimCaseNo,#CaseNo)
+RESET_RIM(#SendL2r10,L2R10)
+S(L2R10,1,#RimCaseNo)
+R(1,L2R10)
+
+
 #BUF2A=X,18,S
 T(3,00000019999999000)
 
@@ -233,9 +241,12 @@ R(1,L2R07)
 
 #TimCustNo=A,7,S
 E(0,0)
+C(3,#CaseNo,0,$,E(0,#L2r10CustNo))
 C(3,#CustNo,0,$,E(0,#CustNo))
 C(4,#CustId,$,E(0,#L2r07CustNo))
 C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 #BUF5=X,18,S
 
@@ -326,6 +337,7 @@ C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 <include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R10.dec"/>
 <include src="ROM.icf::L2R08.dec"/>
 
 </sub>
@@ -512,6 +524,7 @@ TXFORM=L2921
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L2R08.tom"/>
+<include src="ROM.icf::L2R10.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

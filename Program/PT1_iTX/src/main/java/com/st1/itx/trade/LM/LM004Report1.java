@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.date.DateUtil;
 
 @Component("lM004Report1")
@@ -31,13 +32,12 @@ public class LM004Report1 extends MakeReport {
 		this.setMaxRows(60);
 
 	}
-
 	public void printHeaderL() {
 		this.print(-1, 172, "機密等級：密");
 		this.print(-2, 1, "　 程式 ID：" + this.getParentTranCode());
 		this.print(-2, 100, "新光人壽保險股份有限公司", "C");
 		this.print(-2, 172, "日　期：" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
-		this.print(-3, 1, "　 報　 表：" + this.getRptCode());
+		this.print(-3, 1, "　 報　 表："+ this.getRptCode());
 		this.print(-3, 100, "長中短期放款到期明細表", "C");
 		this.print(-3, 172, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 172, "頁　數：" + this.getNowPage());
@@ -48,7 +48,21 @@ public class LM004Report1 extends MakeReport {
 
 	public void exec(TitaVo titaVo, List<Map<String, String>> LM004List) throws LogicException {
 		this.setCharSpaces(0);
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期明細表", "", "A4", "L");
+		
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期明細表", "", "A4", "L");
+		String brno=titaVo.getBrno();
+		int rptDate = titaVo.getEntDyI();
+		String rptCode = titaVo.getTxcd();
+		String rptName = "長中短期放款到期明細表";
+		String rptSize = "A4";
+		String security = "";
+		String pageOrien= "L";
+		
+		ReportVo reportVo = ReportVo.builder().setBrno(brno).setRptDate(rptDate)
+				.setRptCode(rptCode).setRptItem(rptName).setRptSize(rptSize)
+				.setSecurity(security).setPageOrientation(pageOrien).build();
+		
+		this.open(titaVo, reportVo);
 
 		if (LM004List.size() != 0) {
 
@@ -87,9 +101,9 @@ public class LM004Report1 extends MakeReport {
 			} // for
 
 		} // if
-
-		this.close();
-		// this.toPdf(sno);
+		
+		this.close();		
+		//this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {
@@ -101,11 +115,11 @@ public class LM004Report1 extends MakeReport {
 		if (rocdate > 19110000) {
 			rocdate -= 19110000;
 		}
-
+		
 		String rocdatex = String.valueOf(rocdate);
-
+		
 		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
-
+		
 		if (iType == 1) {
 			if (rocdatex.length() == 6) {
 				return rocdatex.substring(0, 2) + "/" + rocdatex.substring(2, 4) + "/" + rocdatex.substring(4, 6);

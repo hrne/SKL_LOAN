@@ -622,20 +622,35 @@ public class L8403File extends MakeFile {
 			for (JcicZ040 iJcicZ040 : xJcicZ040) {
 				this.info("iJcicZ040 Count = " + iCount);
 //				if (iJcicZ040.getOutJcicTxtDate() == jcicdate || iJcicZ040.getActualFilingDate() == jcicdate) {
-				if (iJcicZ040.getOutJcicTxtDate() == jcicdate ) {
+				if (iJcicZ040.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ040.getActualFilingMark()) ) {
 					iCount += 1;
 				} 
 			}
 
 			break;
 		case "041":
+			iCustId = titaVo.getParam("CustId");
+			iSubmitKey = titaVo.get("SubmitKey");
+			iRcDate = Integer.valueOf(titaVo.get("RcDate"));
+			iActualFilingDate = Integer.valueOf(titaVo.get("ActualFilingDate"));
+			iActualFilingMark = titaVo.get("ActualFilingMark");
+			JcicZ041Id jcicZ041Id = new JcicZ041Id();
+			jcicZ041Id.setCustId(iCustId);
+			jcicZ041Id.setRcDate(iRcDate);
+			jcicZ041Id.setSubmitKey(iSubmitKey);
+
+			JcicZ041 tJcicZ041 = new JcicZ041();
+			tJcicZ041 = sJcicZ041Service.findById(jcicZ041Id, titaVo);
+			
+			this.info("tJcicZ041   = " + tJcicZ041);
+			
 			Slice<JcicZ041> xJcicZ041 = sJcicZ041Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			this.info(" z041yu = " + xJcicZ041.getContent());
 			if (xJcicZ041.getContent() == null) {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ041 iJcicZ041 : xJcicZ041) {
-				if (iJcicZ041.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ041.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ041.getActualFilingMark()) ) {
 					iCount += 1;
 				}
 //				else if (iJcicZ041.getActualFilingDate() == jcicdate) {
@@ -649,7 +664,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ042 iJcicZ042 : xJcicZ042) {
-				if (iJcicZ042.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ042.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ042.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ042.getActualFilingDate() == jcicdate) {
@@ -663,7 +678,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ043 iJcicZ043 : xJcicZ043) {
-				if (iJcicZ043.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ043.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ043.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ043.getActualFilingDate() == jcicdate) {
@@ -677,7 +692,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ044 iJcicZ044 : xJcicZ044) {
-				if (iJcicZ044.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ044.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ044.getActualFilingMark()) ) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ044.getActualFilingDate() == jcicdate) {
@@ -691,7 +706,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ045 iJcicZ045 : xJcicZ045) {
-				if (iJcicZ045.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ045.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ045.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ045.getActualFilingDate() == jcicdate) {
@@ -705,7 +720,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ046 iJcicZ046 : xJcicZ046) {
-				if (iJcicZ046.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ046.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ046.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ046.getActualFilingDate() == jcicdate) {
@@ -719,7 +734,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ047 iJcicZ047 : xJcicZ047) {
-				if (iJcicZ047.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ047.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ047.getActualFilingMark()) ) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ047.getActualFilingDate() == jcicdate) {
@@ -733,7 +748,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ048 iJcicZ048 : xJcicZ048) {
-				if (iJcicZ048.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ048.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ048.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ048.getActualFilingDate() == jcicdate) {
@@ -747,7 +762,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ049 iJcicZ049 : xJcicZ049) {
-				if (iJcicZ049.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ049.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ049.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ049.getActualFilingDate() == jcicdate) {
@@ -761,7 +776,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ050 iJcicZ050 : xJcicZ050) {
-				if (iJcicZ050.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ050.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ050.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ050.getActualFilingDate() == jcicdate) {
@@ -775,7 +790,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ051 iJcicZ051 : xJcicZ051) {
-				if (iJcicZ051.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ051.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ051.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ051.getActualFilingDate() == jcicdate) {
@@ -789,7 +804,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ052 iJcicZ052 : xJcicZ052) {
-				if (iJcicZ052.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ052.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ052.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ052.getActualFilingDate() == jcicdate) {
@@ -803,7 +818,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ053 iJcicZ053 : xJcicZ053) {
-				if (iJcicZ053.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ053.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ053.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ053.getActualFilingDate() == jcicdate) {
@@ -817,7 +832,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ054 iJcicZ054 : xJcicZ054) {
-				if (iJcicZ054.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ054.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ054.getActualFilingMark()))  {
 					iCount += 1;
 				} 
 //				else if (iJcicZ054.getActualFilingDate() == jcicdate) {
@@ -831,7 +846,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ055 iJcicZ055 : xJcicZ055) {
-				if (iJcicZ055.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ055.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ055.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ055.getActualFilingDate() == jcicdate) {
@@ -845,7 +860,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ056 iJcicZ056 : xJcicZ056) {
-				if (iJcicZ056.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ056.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ056.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ056.getActualFilingDate() == jcicdate) {
@@ -859,7 +874,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ060 iJcicZ060 : xJcicZ060) {
-				if (iJcicZ060.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ060.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ060.getActualFilingMark()))  {
 					iCount += 1;
 				} 
 //				else if (iJcicZ060.getActualFilingDate() == jcicdate) {
@@ -873,7 +888,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ061 iJcicZ061 : xJcicZ061) {
-				if (iJcicZ061.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ061.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ061.getActualFilingMark()) ) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ061.getActualFilingDate() == jcicdate) {
@@ -887,7 +902,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ062 iJcicZ062 : xJcicZ062) {
-				if (iJcicZ062.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ062.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ062.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ062.getActualFilingDate() == jcicdate) {
@@ -901,7 +916,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ063 iJcicZ063 : xJcicZ063) {
-				if (iJcicZ063.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ063.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ063.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ063.getActualFilingDate() == jcicdate) {
@@ -915,7 +930,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ440 iJcicZ440 : xJcicZ440) {
-				if (iJcicZ440.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ440.getOutJcicTxtDate() == jcicdate  && ("Y").equals(iJcicZ440.getActualFilingMark())) {
 					iCount += 1;
 				}
 //				else if (iJcicZ440.getActualFilingDate() == jcicdate) {
@@ -929,7 +944,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ442 iJcicZ442 : xJcicZ442) {
-				if (iJcicZ442.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ442.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ442.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ442.getActualFilingDate() == jcicdate) {
@@ -943,7 +958,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ443 iJcicZ443 : xJcicZ443) {
-				if (iJcicZ443.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ443.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ443.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ443.getActualFilingDate() == jcicdate) {
@@ -957,7 +972,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ444 iJcicZ444 : xJcicZ444) {
-				if (iJcicZ444.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ444.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ444.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ444.getActualFilingDate() == jcicdate) {
@@ -971,7 +986,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ446 iJcicZ446 : xJcicZ446) {
-				if (iJcicZ446.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ446.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ446.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ446.getActualFilingDate() == jcicdate) {
@@ -985,7 +1000,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ447 iJcicZ447 : xJcicZ447) {
-				if (iJcicZ447.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ447.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ447.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ447.getActualFilingDate() == jcicdate) {
@@ -999,7 +1014,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ448 iJcicZ448 : xJcicZ448) {
-				if (iJcicZ448.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ448.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ448.getActualFilingMark())) {
 					iCount += 1;
 				}
 //				else if (iJcicZ448.getActualFilingDate() == jcicdate) {
@@ -1013,7 +1028,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ450 iJcicZ450 : xJcicZ450) {
-				if (iJcicZ450.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ450.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ450.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ450.getActualFilingDate() == jcicdate) {
@@ -1027,7 +1042,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ451 iJcicZ451 : xJcicZ451) {
-				if (iJcicZ451.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ451.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ451.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ451.getActualFilingDate() == jcicdate) {
@@ -1041,7 +1056,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ454 iJcicZ454 : xJcicZ454) {
-				if (iJcicZ454.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ454.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ454.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ454.getActualFilingDate() == jcicdate) {
@@ -1055,7 +1070,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ570 iJcicZ570 : xJcicZ570) {
-				if (iJcicZ570.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ570.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ570.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ570.getActualFilingDate() == jcicdate) {
@@ -1069,7 +1084,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ571 iJcicZ571 : xJcicZ571) {
-				if (iJcicZ571.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ571.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ571.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ571.getActualFilingDate() == jcicdate) {
@@ -1083,7 +1098,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ572 iJcicZ572 : xJcicZ572) {
-				if (iJcicZ572.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ572.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ572.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ572.getActualFilingDate() == jcicdate) {
@@ -1097,7 +1112,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ573 iJcicZ573 : xJcicZ573) {
-				if (iJcicZ573.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ573.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ573.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ573.getActualFilingDate() == jcicdate) {
@@ -1111,7 +1126,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ574 iJcicZ574 : xJcicZ574) {
-				if (iJcicZ574.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ574.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ574.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ574.getActualFilingDate() == jcicdate) {
@@ -1125,7 +1140,7 @@ public class L8403File extends MakeFile {
 				throw new LogicException(titaVo, "E2003", "查無可轉出資料");
 			}
 			for (JcicZ575 iJcicZ575 : xJcicZ575) {
-				if (iJcicZ575.getOutJcicTxtDate() == jcicdate) {
+				if (iJcicZ575.getOutJcicTxtDate() == jcicdate && ("Y").equals(iJcicZ575.getActualFilingMark())) {
 					iCount += 1;
 				} 
 //				else if (iJcicZ575.getActualFilingDate() == jcicdate) {
@@ -1171,8 +1186,8 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ040   = " + zJcicZ040);
 		for (JcicZ040 sJcicZ040 : zJcicZ040) {
-//			if (sJcicZ040.getOutJcicTxtDate() == iJcicDate || sJcicZ040.getActualFilingDate() == iJcicDate) {
-			if ("Y".equals(sJcicZ040.getActualFilingMark())) {
+			if (sJcicZ040.getOutJcicTxtDate() == iJcicDate &&  "Y".equals(sJcicZ040.getActualFilingMark())) {
+//			if ("Y".equals(sJcicZ040.getActualFilingMark())) {
 				String iTranKey = sJcicZ040.getTranKey();
 				iTranKey = FormatUtil.padX(iTranKey, 1);
 				String iSubmitKey = sJcicZ040.getSubmitKey();
@@ -1213,7 +1228,7 @@ public class L8403File extends MakeFile {
 					sJcicZ040.setActualFilingMark("N");
 				} else {
 //					sJcicZ040.setActualFilingDate(sJcicZ040.getActualFilingDate());
-					sJcicZ040.setActualFilingMark("Y");
+					sJcicZ040.setActualFilingMark("");
 				}
 				try {
 					sJcicZ040Service.update(sJcicZ040, titaVo);
@@ -1293,7 +1308,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ041   = " + zJcicZ041);
 		for (JcicZ041 sJcicZ041 : zJcicZ041) {
-			if (sJcicZ041.getOutJcicTxtDate() == iJcicDate || sJcicZ041.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ041.getOutJcicTxtDate() == iJcicDate && ("Y").equals(sJcicZ041.getActualFilingMark()) ) {
 				String iTranKey = sJcicZ041.getTranKey();
 				String iSubmitKey = sJcicZ041.getSubmitKey();
 				String iCustId = sJcicZ041.getCustId();
@@ -1322,7 +1337,7 @@ public class L8403File extends MakeFile {
 					sJcicZ041.setActualFilingMark("N");
 				} else {
 //					sJcicZ041.setActualFilingDate(sJcicZ041.getActualFilingDate());
-					sJcicZ041.setActualFilingMark("Y");
+					sJcicZ041.setActualFilingMark("");
 				}
 
 				try {
@@ -1482,7 +1497,7 @@ public class L8403File extends MakeFile {
 					sJcicZ042.setActualFilingMark("N");
 				} else {
 //					sJcicZ042.setActualFilingDate(sJcicZ042.getActualFilingDate());
-					sJcicZ042.setActualFilingMark("Y");
+					sJcicZ042.setActualFilingMark("");
 				}
 				try {
 					sJcicZ042Service.update(sJcicZ042, titaVo);
@@ -1579,7 +1594,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ043   = " + zJcicZ043);
 		for (JcicZ043 sJcicZ043 : zJcicZ043) {
-			if (sJcicZ043.getOutJcicTxtDate() == iJcicDate || sJcicZ043.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ043.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ043.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ043.getTranKey();
 				String iSubmitKey = sJcicZ043.getSubmitKey();
@@ -1633,7 +1648,7 @@ public class L8403File extends MakeFile {
 					sJcicZ043.setActualFilingMark("N");
 				} else {
 //					sJcicZ043.setActualFilingDate(sJcicZ043.getActualFilingDate());
-					sJcicZ043.setActualFilingMark("Y");
+					sJcicZ043.setActualFilingMark("");
 				}
 				try {
 					sJcicZ043Service.update(sJcicZ043, titaVo);
@@ -1717,7 +1732,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ044   = " + zJcicZ044);
 		for (JcicZ044 sJcicZ044 : zJcicZ044) {
-			if (sJcicZ044.getOutJcicTxtDate() == iJcicDate || sJcicZ044.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ044.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ044.getActualFilingMark())) {
 				String iTranKey = sJcicZ044.getTranKey();
 				String iSubmitKey = sJcicZ044.getSubmitKey();
 				String iCustId = sJcicZ044.getCustId();
@@ -1822,7 +1837,7 @@ public class L8403File extends MakeFile {
 					sJcicZ044.setActualFilingMark("N");
 				} else {
 //					sJcicZ044.setActualFilingDate(sJcicZ044.getActualFilingDate());
-					sJcicZ044.setActualFilingMark("Y");
+					sJcicZ044.setActualFilingMark("");
 				}
 				try {
 					sJcicZ044Service.update(sJcicZ044, titaVo);
@@ -1924,7 +1939,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ045   = " + zJcicZ045);
 		for (JcicZ045 sJcicZ045 : zJcicZ045) {
-			if (sJcicZ045.getOutJcicTxtDate() == iJcicDate || sJcicZ045.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ045.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ045.getActualFilingMark())) {
 				String iTranKey = sJcicZ045.getTranKey();
 				String iSubmitKey = sJcicZ045.getSubmitKey();
 				String iCustId = sJcicZ045.getCustId();
@@ -1949,7 +1964,7 @@ public class L8403File extends MakeFile {
 					sJcicZ045.setActualFilingMark("N");
 				} else {
 //					sJcicZ045.setActualFilingDate(sJcicZ045.getActualFilingDate());
-					sJcicZ045.setActualFilingMark("Y");
+					sJcicZ045.setActualFilingMark("");
 				}
 				try {
 					sJcicZ045Service.update(sJcicZ045, titaVo);
@@ -2025,7 +2040,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ046   = " + zJcicZ046);
 		for (JcicZ046 sJcicZ046 : zJcicZ046) {
-			if (sJcicZ046.getOutJcicTxtDate() == iJcicDate || sJcicZ046.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ046.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ046.getActualFilingMark()) ) {
 				String iTranKey = sJcicZ046.getTranKey();
 				String iSubmitKey = sJcicZ046.getSubmitKey();
 				String iCustId = sJcicZ046.getCustId();
@@ -2053,7 +2068,7 @@ public class L8403File extends MakeFile {
 					sJcicZ046.setActualFilingMark("N");
 				} else {
 //					sJcicZ046.setActualFilingDate(sJcicZ046.getActualFilingDate());
-					sJcicZ046.setActualFilingMark("Y");
+					sJcicZ046.setActualFilingMark("");
 				}
 				try {
 					sJcicZ046Service.update(sJcicZ046, titaVo);
@@ -2130,7 +2145,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ047   = " + zJcicZ047);
 		for (JcicZ047 sJcicZ047 : zJcicZ047) {
-			if (sJcicZ047.getOutJcicTxtDate() == iJcicDate || sJcicZ047.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ047.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ047.getActualFilingMark())) {
 				String iTranKey = sJcicZ047.getTranKey();
 				String iSubmitKey = sJcicZ047.getSubmitKey();
 				String iCustId = sJcicZ047.getCustId();
@@ -2235,7 +2250,7 @@ public class L8403File extends MakeFile {
 					sJcicZ047.setActualFilingMark("N");
 				} else {
 //					sJcicZ047.setActualFilingDate(sJcicZ047.getActualFilingDate());
-					sJcicZ047.setActualFilingMark("Y");
+					sJcicZ047.setActualFilingMark("");
 				}
 				try {
 					sJcicZ047Service.update(sJcicZ047, titaVo);
@@ -2332,7 +2347,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ048   = " + zJcicZ048);
 		for (JcicZ048 sJcicZ048 : zJcicZ048) {
-			if (sJcicZ048.getOutJcicTxtDate() == iJcicDate || sJcicZ048.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ048.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ048.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ048.getTranKey();
 				String iSubmitKey = sJcicZ048.getSubmitKey();
@@ -2363,7 +2378,7 @@ public class L8403File extends MakeFile {
 					sJcicZ048.setActualFilingMark("N");
 				} else {
 //					sJcicZ048.setActualFilingDate(sJcicZ048.getActualFilingDate());
-					sJcicZ048.setActualFilingMark("Y");
+					sJcicZ048.setActualFilingMark("");
 				}
 				try {
 					sJcicZ048Service.update(sJcicZ048, titaVo);
@@ -2443,7 +2458,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ049   = " + zJcicZ049);
 		for (JcicZ049 sJcicZ049 : zJcicZ049) {
-			if (sJcicZ049.getOutJcicTxtDate() == iJcicDate || sJcicZ049.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ049.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ049.getActualFilingMark())) {
 				String iTranKey = sJcicZ049.getTranKey();
 				String iSubmitKey = sJcicZ049.getSubmitKey();
 				String iCustId = sJcicZ049.getCustId();
@@ -2495,7 +2510,7 @@ public class L8403File extends MakeFile {
 					sJcicZ049.setActualFilingMark("N");
 				} else {
 //					sJcicZ049.setActualFilingDate(sJcicZ049.getActualFilingDate());
-					sJcicZ049.setActualFilingMark("Y");
+					sJcicZ049.setActualFilingMark("");
 				}
 				try {
 					sJcicZ049Service.update(sJcicZ049, titaVo);
@@ -2578,7 +2593,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ050   = " + zJcicZ050);
 		for (JcicZ050 sJcicZ050 : zJcicZ050) {
-			if (sJcicZ050.getOutJcicTxtDate() == iJcicDate || sJcicZ050.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ050.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ050.getActualFilingMark())) {
 				String iTranKey = sJcicZ050.getTranKey();
 				String iSubmitKey = sJcicZ050.getSubmitKey();
 				String iCustId = sJcicZ050.getCustId();
@@ -2618,7 +2633,7 @@ public class L8403File extends MakeFile {
 					sJcicZ050.setActualFilingMark("N");
 				} else {
 //					sJcicZ050.setActualFilingDate(sJcicZ050.getActualFilingDate());
-					sJcicZ050.setActualFilingMark("Y");
+					sJcicZ050.setActualFilingMark("");
 				}
 				try {
 					sJcicZ050Service.update(sJcicZ050, titaVo);
@@ -2698,7 +2713,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ051   = " + zJcicZ051);
 		for (JcicZ051 sJcicZ051 : zJcicZ051) {
-			if (sJcicZ051.getOutJcicTxtDate() == iJcicDate || sJcicZ051.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ051.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ051.getActualFilingMark())) {
 				String iTranKey = sJcicZ051.getTranKey();
 				String iSubmitKey = sJcicZ051.getSubmitKey();
 				String iCustId = sJcicZ051.getCustId();
@@ -2724,7 +2739,7 @@ public class L8403File extends MakeFile {
 					sJcicZ051.setActualFilingMark("N");
 				} else {
 //					sJcicZ051.setActualFilingDate(sJcicZ051.getActualFilingDate());
-					sJcicZ051.setActualFilingMark("Y");
+					sJcicZ051.setActualFilingMark("");
 				}
 				try {
 					sJcicZ051Service.update(sJcicZ051, titaVo);
@@ -2800,7 +2815,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ052   = " + zJcicZ052);
 		for (JcicZ052 sJcicZ052 : zJcicZ052) {
-			if (sJcicZ052.getOutJcicTxtDate() == iJcicDate || sJcicZ052.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ052.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ052.getActualFilingMark())) {
 				String iTranKey = sJcicZ052.getTranKey();
 				String iSubmitKey = sJcicZ052.getSubmitKey();
 				String iCustId = sJcicZ052.getCustId();
@@ -2845,7 +2860,7 @@ public class L8403File extends MakeFile {
 					sJcicZ052.setActualFilingMark("N");
 				} else {
 //					sJcicZ052.setActualFilingDate(sJcicZ052.getActualFilingDate());
-					sJcicZ052.setActualFilingMark("Y");
+					sJcicZ052.setActualFilingMark("");
 				}
 				try {
 					sJcicZ052Service.update(sJcicZ052, titaVo);
@@ -2931,7 +2946,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ053   = " + zJcicZ053);
 		for (JcicZ053 sJcicZ053 : zJcicZ053) {
-			if (sJcicZ053.getOutJcicTxtDate() == iJcicDate || sJcicZ053.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ053.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ053.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ053.getTranKey();
 				String iSubmitKey = sJcicZ053.getSubmitKey();
@@ -2964,7 +2979,7 @@ public class L8403File extends MakeFile {
 					sJcicZ053.setActualFilingMark("N");
 				} else {
 //					sJcicZ053.setActualFilingDate(sJcicZ053.getActualFilingDate());
-					sJcicZ053.setActualFilingMark("Y");
+					sJcicZ053.setActualFilingMark("");
 				}
 				try {
 					sJcicZ053Service.update(sJcicZ053, titaVo);
@@ -3042,7 +3057,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ054   = " + zJcicZ054);
 		for (JcicZ054 sJcicZ054 : zJcicZ054) {
-			if (sJcicZ054.getOutJcicTxtDate() == iJcicDate || sJcicZ054.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ054.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ054.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ054.getTranKey();
 				String iSubmitKey = sJcicZ054.getSubmitKey();
@@ -3070,7 +3085,7 @@ public class L8403File extends MakeFile {
 					sJcicZ054.setActualFilingMark("N");
 				} else {
 //					sJcicZ054.setActualFilingDate(sJcicZ054.getActualFilingDate());
-					sJcicZ054.setActualFilingMark("Y");
+					sJcicZ054.setActualFilingMark("");
 				}
 				try {
 					sJcicZ054Service.update(sJcicZ054, titaVo);
@@ -3146,7 +3161,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ055   = " + zJcicZ055);
 		for (JcicZ055 sJcicZ055 : zJcicZ055) {
-			if (sJcicZ055.getOutJcicTxtDate() == iJcicDate || sJcicZ055.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ055.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ055.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ055.getTranKey();
 				String iSubmitKey = sJcicZ055.getSubmitKey();
@@ -3216,7 +3231,7 @@ public class L8403File extends MakeFile {
 					sJcicZ055.setActualFilingMark("N");
 				} else {
 //					sJcicZ055.setActualFilingDate(sJcicZ055.getActualFilingDate());
-					sJcicZ055.setActualFilingMark("Y");
+					sJcicZ055.setActualFilingMark("");
 				}
 				try {
 					sJcicZ055Service.update(sJcicZ055, titaVo);
@@ -3304,7 +3319,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ056   = " + zJcicZ056);
 		for (JcicZ056 sJcicZ056 : zJcicZ056) {
-			if (sJcicZ056.getOutJcicTxtDate() == iJcicDate || sJcicZ056.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ056.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ056.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ056.getTranKey();
 				String iSubmitKey = sJcicZ056.getSubmitKey();
@@ -3353,7 +3368,7 @@ public class L8403File extends MakeFile {
 					sJcicZ056.setActualFilingMark("N");
 				} else {
 //					sJcicZ056.setActualFilingDate(sJcicZ056.getActualFilingDate());
-					sJcicZ056.setActualFilingMark("Y");
+					sJcicZ056.setActualFilingMark("");
 				}
 				try {
 					sJcicZ056Service.update(sJcicZ056, titaVo);
@@ -3439,7 +3454,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ060   = " + zJcicZ060);
 		for (JcicZ060 sJcicZ060 : zJcicZ060) {
-			if (sJcicZ060.getOutJcicTxtDate() == iJcicDate || sJcicZ060.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ060.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ060.getActualFilingMark()) ) {
 				String iTranKey = sJcicZ060.getTranKey();
 				String iSubmitKey = sJcicZ060.getSubmitKey();
 				String iCustId = sJcicZ060.getCustId();
@@ -3463,7 +3478,7 @@ public class L8403File extends MakeFile {
 					sJcicZ060.setActualFilingMark("N");
 				} else {
 //					sJcicZ060.setActualFilingDate(sJcicZ060.getActualFilingDate());
-					sJcicZ060.setActualFilingMark("Y");
+					sJcicZ060.setActualFilingMark("");
 				}
 				try {
 					sJcicZ060Service.update(sJcicZ060, titaVo);
@@ -3539,7 +3554,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ061   = " + zJcicZ061);
 		for (JcicZ061 sJcicZ061 : zJcicZ061) {
-			if (sJcicZ061.getOutJcicTxtDate() == iJcicDate || sJcicZ061.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ061.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ061.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ061.getTranKey();
 				String iSubmitKey = sJcicZ061.getSubmitKey();
@@ -3577,7 +3592,7 @@ public class L8403File extends MakeFile {
 					sJcicZ061.setActualFilingMark("N");
 				} else {
 //					sJcicZ061.setActualFilingDate(sJcicZ061.getActualFilingDate());
-					sJcicZ061.setActualFilingMark("Y");
+					sJcicZ061.setActualFilingMark("");
 				}
 				try {
 					sJcicZ061Service.update(sJcicZ061, titaVo);
@@ -3656,7 +3671,7 @@ public class L8403File extends MakeFile {
 		}
 		this.info("zJcicZ062   = " + zJcicZ062);
 		for (JcicZ062 sJcicZ062 : zJcicZ062) {
-			if (sJcicZ062.getOutJcicTxtDate() == iJcicDate || sJcicZ062.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ062.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ062.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ062.getTranKey();
 				String iSubmitKey = sJcicZ062.getSubmitKey();
@@ -3736,7 +3751,7 @@ public class L8403File extends MakeFile {
 					sJcicZ062.setActualFilingMark("N");
 				} else {
 //					sJcicZ062.setActualFilingDate(sJcicZ062.getActualFilingDate());
-					sJcicZ062.setActualFilingMark("Y");
+					sJcicZ062.setActualFilingMark("");
 				}
 				try {
 					sJcicZ062Service.update(sJcicZ062, titaVo);
@@ -3829,7 +3844,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ063   = " + zJcicZ063);
 		for (JcicZ063 sJcicZ063 : zJcicZ063) {
-			if (sJcicZ063.getOutJcicTxtDate() == iJcicDate || sJcicZ063.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ063.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ063.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ063.getTranKey();
 				String iSubmitKey = sJcicZ063.getSubmitKey();
@@ -3858,7 +3873,7 @@ public class L8403File extends MakeFile {
 					sJcicZ063.setActualFilingMark("N");
 				} else {
 //					sJcicZ063.setActualFilingDate(sJcicZ063.getActualFilingDate());
-					sJcicZ063.setActualFilingMark("Y");
+					sJcicZ063.setActualFilingMark("");
 				}
 				try {
 					sJcicZ063Service.update(sJcicZ063, titaVo);
@@ -3935,7 +3950,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ440   = " + zJcicZ440);
 		for (JcicZ440 sJcicZ440 : zJcicZ440) {
-			if (sJcicZ440.getOutJcicTxtDate() == iJcicDate || sJcicZ440.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ440.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ440.getActualFilingMark())) {
 				String iTranKey = sJcicZ440.getTranKey();
 				String iSubmitKey = sJcicZ440.getSubmitKey();
 				String iCustId = sJcicZ440.getCustId();
@@ -3983,7 +3998,7 @@ public class L8403File extends MakeFile {
 					sJcicZ440.setActualFilingMark("N");
 				} else {
 					sJcicZ440.setActualFilingDate(sJcicZ440.getActualFilingDate());
-					sJcicZ440.setActualFilingMark("Y");
+					sJcicZ440.setActualFilingMark("");
 				}
 				try {
 					sJcicZ440Service.update(sJcicZ440, titaVo);
@@ -4069,7 +4084,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ442   = " + zJcicZ442);
 		for (JcicZ442 sJcicZ442 : zJcicZ442) {
-			if (sJcicZ442.getOutJcicTxtDate() == iJcicDate || sJcicZ442.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ442.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ442.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ442.getTranKey();
 				String iSubmitKey = sJcicZ442.getSubmitKey();
@@ -4153,7 +4168,7 @@ public class L8403File extends MakeFile {
 					sJcicZ442.setActualFilingMark("N");
 				} else {
 //					sJcicZ442.setActualFilingDate(sJcicZ442.getActualFilingDate());
-					sJcicZ442.setActualFilingMark("Y");
+					sJcicZ442.setActualFilingMark("");
 				}
 				try {
 					sJcicZ442Service.update(sJcicZ442, titaVo);
@@ -4241,7 +4256,7 @@ public class L8403File extends MakeFile {
 			iActualFilingMark = "Y";
 		} else {
 			iActualFilingDate = 0;
-			iActualFilingMark = "N";
+			iActualFilingMark = "";
 		}
 		rJcicZ443 = sJcicZ443Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4252,7 +4267,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ443   = " + zJcicZ443);
 		for (JcicZ443 sJcicZ443 : zJcicZ443) {
-			if (sJcicZ443.getOutJcicTxtDate() == iJcicDate || sJcicZ443.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ443.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ443.getActualFilingMark())) {
 				String iTranKey = sJcicZ443.getTranKey();
 				String iSubmitKey = sJcicZ443.getSubmitKey();
 				String iCustId = sJcicZ443.getCustId();
@@ -4315,7 +4330,7 @@ public class L8403File extends MakeFile {
 					sJcicZ443.setActualFilingMark("N");
 				} else {
 //					sJcicZ443.setActualFilingDate(sJcicZ443.getActualFilingDate());
-					sJcicZ443.setActualFilingMark("Y");
+					sJcicZ443.setActualFilingMark("");
 				}
 				try {
 					sJcicZ443Service.update(sJcicZ443, titaVo);
@@ -4405,7 +4420,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ444   = " + zJcicZ444);
 		for (JcicZ444 sJcicZ444 : zJcicZ444) {
-			if (sJcicZ444.getOutJcicTxtDate() == iJcicDate || sJcicZ444.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ444.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ444.getActualFilingMark())) {
 				String iTranKey = sJcicZ444.getTranKey();
 				String iSubmitKey = sJcicZ444.getSubmitKey();
 				String iCustId = sJcicZ444.getCustId();
@@ -4442,7 +4457,7 @@ public class L8403File extends MakeFile {
 					sJcicZ444.setActualFilingMark("N");
 				} else {
 //					sJcicZ444.setActualFilingDate(sJcicZ444.getActualFilingDate());
-					sJcicZ444.setActualFilingMark("Y");
+					sJcicZ444.setActualFilingMark("");
 				}
 				try {
 					sJcicZ444Service.update(sJcicZ444, titaVo);
@@ -4548,7 +4563,7 @@ public class L8403File extends MakeFile {
 					sJcicZ446.setActualFilingMark("N");
 				} else {
 //					sJcicZ446.setActualFilingDate(sJcicZ446.getActualFilingDate());
-					sJcicZ446.setActualFilingMark("Y");
+					sJcicZ446.setActualFilingMark("");
 				}
 				try {
 					sJcicZ446Service.update(sJcicZ446, titaVo);
@@ -4613,7 +4628,7 @@ public class L8403File extends MakeFile {
 			iActualFilingMark = "Y";
 		} else {
 			iActualFilingDate = 0;
-			iActualFilingMark = "N";
+			iActualFilingMark = "";
 		}
 		rJcicZ447 = sJcicZ447Service.findkeyFilingDate(iActualFilingDate, iActualFilingMark, 0,
 				Integer.MAX_VALUE, titaVo);
@@ -4624,7 +4639,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ447   = " + zJcicZ447);
 		for (JcicZ447 sJcicZ447 : zJcicZ447) {
-			if (sJcicZ447.getOutJcicTxtDate() == iJcicDate || sJcicZ447.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ447.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ447.getActualFilingMark())) {
 				String iTranKey = sJcicZ447.getTranKey();
 				String iSubmitKey = sJcicZ447.getSubmitKey();
 				String iCustId = sJcicZ447.getCustId();
@@ -4666,7 +4681,7 @@ public class L8403File extends MakeFile {
 					sJcicZ447.setActualFilingMark("N");
 				} else {
 //					sJcicZ447.setActualFilingDate(sJcicZ447.getActualFilingDate());
-					sJcicZ447.setActualFilingMark("Y");
+					sJcicZ447.setActualFilingMark("");
 				}
 				try {
 					sJcicZ447Service.update(sJcicZ447, titaVo);
@@ -4750,7 +4765,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ448   = " + zJcicZ448);
 		for (JcicZ448 sJcicZ448 : zJcicZ448) {
-			if (sJcicZ448.getOutJcicTxtDate() == iJcicDate || sJcicZ448.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ448.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ448.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ448.getTranKey();
 				String iSubmitKey = sJcicZ448.getSubmitKey();
@@ -4786,7 +4801,7 @@ public class L8403File extends MakeFile {
 					sJcicZ448.setActualFilingMark("N");
 				} else {
 					sJcicZ448.setActualFilingDate(sJcicZ448.getActualFilingDate());
-					sJcicZ448.setActualFilingMark("Y");
+					sJcicZ448.setActualFilingMark("");
 				}
 				try {
 					sJcicZ448Service.update(sJcicZ448, titaVo);
@@ -4866,7 +4881,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ450   = " + zJcicZ450);
 		for (JcicZ450 sJcicZ450 : zJcicZ450) {
-			if (sJcicZ450.getOutJcicTxtDate() == iJcicDate || sJcicZ450.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ450.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ450.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ450.getTranKey();
 				String iSubmitKey = sJcicZ450.getSubmitKey();
@@ -4901,7 +4916,7 @@ public class L8403File extends MakeFile {
 					sJcicZ450.setActualFilingMark("N");
 				} else {
 //					sJcicZ450.setActualFilingDate(sJcicZ450.getActualFilingDate());
-					sJcicZ450.setActualFilingMark("Y");
+					sJcicZ450.setActualFilingMark("");
 				}
 				try {
 					sJcicZ450Service.update(sJcicZ450, titaVo);
@@ -4980,7 +4995,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ451   = " + zJcicZ451);
 		for (JcicZ451 sJcicZ451 : zJcicZ451) {
-			if (sJcicZ451.getOutJcicTxtDate() == iJcicDate || sJcicZ451.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ451.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ451.getActualFilingMark())) {
 				String iTranKey = sJcicZ451.getTranKey();
 				String iSubmitKey = sJcicZ451.getSubmitKey();
 				String iCustId = sJcicZ451.getCustId();
@@ -5006,7 +5021,7 @@ public class L8403File extends MakeFile {
 					sJcicZ451.setActualFilingMark("N");
 				} else {
 //					sJcicZ451.setActualFilingDate(sJcicZ451.getActualFilingDate());
-					sJcicZ451.setActualFilingMark("Y");
+					sJcicZ451.setActualFilingMark("");
 				}
 				try {
 					sJcicZ451Service.update(sJcicZ451, titaVo);
@@ -5082,7 +5097,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ454   = " + zJcicZ454);
 		for (JcicZ454 sJcicZ454 : zJcicZ454) {
-			if (sJcicZ454.getOutJcicTxtDate() == iJcicDate || sJcicZ454.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ454.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ454.getActualFilingMark())) {
 				String iTranKey = sJcicZ454.getTranKey();
 				String iSubmitKey = sJcicZ454.getSubmitKey();
 				String iCustId = sJcicZ454.getCustId();
@@ -5111,7 +5126,7 @@ public class L8403File extends MakeFile {
 					sJcicZ454.setActualFilingMark("N");
 				} else {
 //					sJcicZ454.setActualFilingDate(sJcicZ454.getActualFilingDate());
-					sJcicZ454.setActualFilingMark("Y");
+					sJcicZ454.setActualFilingMark("");
 				}
 				try {
 					sJcicZ454Service.update(sJcicZ454, titaVo);
@@ -5188,7 +5203,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ570   = " + zJcicZ570);
 		for (JcicZ570 sJcicZ570 : zJcicZ570) {
-			if (sJcicZ570.getOutJcicTxtDate() == iJcicDate || sJcicZ570.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ570.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ570.getActualFilingMark())) {
 				String iTranKey = sJcicZ570.getTranKey();
 				String iSubmitKey = sJcicZ570.getSubmitKey();
 				String iCustId = sJcicZ570.getCustId();
@@ -5259,7 +5274,7 @@ public class L8403File extends MakeFile {
 					sJcicZ570.setActualFilingMark("N");
 				} else {
 //					sJcicZ570.setActualFilingDate(sJcicZ570.getActualFilingDate());
-					sJcicZ570.setActualFilingMark("Y");
+					sJcicZ570.setActualFilingMark("");
 				}
 				try {
 					sJcicZ570Service.update(sJcicZ570, titaVo);
@@ -5365,7 +5380,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ571   = " + zJcicZ571);
 		for (JcicZ571 sJcicZ571 : zJcicZ571) {
-			if (sJcicZ571.getOutJcicTxtDate() == iJcicDate || sJcicZ571.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ571.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ571.getActualFilingMark())) {
 				String iTranKey = sJcicZ571.getTranKey();
 				String iSubmitKey = sJcicZ571.getSubmitKey();
 				String iCustId = sJcicZ571.getCustId();
@@ -5399,7 +5414,7 @@ public class L8403File extends MakeFile {
 					sJcicZ571.setActualFilingMark("N");
 				} else {
 //					sJcicZ571.setActualFilingDate(sJcicZ571.getActualFilingDate());
-					sJcicZ571.setActualFilingMark("Y");
+					sJcicZ571.setActualFilingMark("");
 				}
 				try {
 					sJcicZ571Service.update(sJcicZ571, titaVo);
@@ -5478,7 +5493,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ572   = " + zJcicZ572);
 		for (JcicZ572 sJcicZ572 : zJcicZ572) {
-			if (sJcicZ572.getOutJcicTxtDate() == iJcicDate || sJcicZ572.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ572.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ572.getActualFilingMark())) {
 				String iTranKey = sJcicZ572.getTranKey();
 				String iSubmitKey = sJcicZ572.getSubmitKey();
 				String iCustId = sJcicZ572.getCustId();
@@ -5510,7 +5525,7 @@ public class L8403File extends MakeFile {
 					sJcicZ572.setActualFilingMark("N");
 				} else {
 //					sJcicZ572.setActualFilingDate(sJcicZ572.getActualFilingDate());
-					sJcicZ572.setActualFilingMark("Y");
+					sJcicZ572.setActualFilingMark("");
 				}
 				try {
 					sJcicZ572Service.update(sJcicZ572, titaVo);
@@ -5587,7 +5602,7 @@ public class L8403File extends MakeFile {
 			}
 		this.info("zJcicZ573   = " + zJcicZ573);
 		for (JcicZ573 sJcicZ573 : zJcicZ573) {
-			if (sJcicZ573.getOutJcicTxtDate() == iJcicDate || sJcicZ573.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ573.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ573.getActualFilingMark())) {
 				String iTranKey = sJcicZ573.getTranKey();
 				String iSubmitKey = sJcicZ573.getSubmitKey();
 				String iCustId = sJcicZ573.getCustId();
@@ -5691,7 +5706,7 @@ public class L8403File extends MakeFile {
 		}
 		this.info("zJcicZ574   = " + zJcicZ574);
 		for (JcicZ574 sJcicZ574 : zJcicZ574) {
-			if (sJcicZ574.getOutJcicTxtDate() == iJcicDate || sJcicZ574.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ574.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ574.getActualFilingMark())) {
 				String iTranKey = sJcicZ574.getTranKey();
 				String iSubmitKey = sJcicZ574.getSubmitKey();
 				String iCustId = sJcicZ574.getCustId();
@@ -5718,7 +5733,7 @@ public class L8403File extends MakeFile {
 					sJcicZ574.setActualFilingMark("N");
 				} else {
 //					sJcicZ574.setActualFilingDate(sJcicZ574.getActualFilingDate());
-					sJcicZ574.setActualFilingMark("Y");
+					sJcicZ574.setActualFilingMark("");
 				}
 				try {
 					sJcicZ574Service.update(sJcicZ574, titaVo);
@@ -5796,7 +5811,7 @@ public class L8403File extends MakeFile {
 
 		this.info("zJcicZ575   = " + zJcicZ575);
 		for (JcicZ575 sJcicZ575 : zJcicZ575) {
-			if (sJcicZ575.getOutJcicTxtDate() == iJcicDate || sJcicZ575.getActualFilingDate() == iJcicDate) {
+			if (sJcicZ575.getOutJcicTxtDate() == iJcicDate && "Y".equals(sJcicZ575.getActualFilingMark())) {
 
 				String iTranKey = sJcicZ575.getTranKey();
 				String iSubmitKey = sJcicZ575.getSubmitKey();
@@ -5822,7 +5837,7 @@ public class L8403File extends MakeFile {
 					sJcicZ575.setActualFilingMark("N");
 				} else {
 //					sJcicZ575.setActualFilingDate(sJcicZ575.getActualFilingDate());
-					sJcicZ575.setActualFilingMark("Y");
+					sJcicZ575.setActualFilingMark("");
 				}
 				try {
 					sJcicZ575Service.update(sJcicZ575, titaVo);

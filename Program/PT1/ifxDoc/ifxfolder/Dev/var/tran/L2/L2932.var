@@ -90,7 +90,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
 @V(2,0)
-
+T(3,#CustName,)
 
 #SendL2r07=X,1,S
 C(3,#CustNo,0,S,$)
@@ -99,6 +99,13 @@ E(0,@RimCustNo,#CustNo)
 RESET_RIM(#SendL2r07,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
+
+#TimCustNo=A,7,S
+E(0,0)
+C(3,#CustNo,0,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 
 #CustName=x,100,L
 C(3,#CustNo,0,S,T(2,#L2r07CustName))

@@ -258,6 +258,11 @@ C(3,#CHAIN,1,s,$)
 C(2,#FunCode,$,$,T(F,1),$,T(F,0),T(F,0),$)
 C(2,#FunCode,S,S,$,S,s,s,S)
 
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
+
 #CustName=X,100,L
 !清償序號 必須輸入
 #CloseNo=A,3,I

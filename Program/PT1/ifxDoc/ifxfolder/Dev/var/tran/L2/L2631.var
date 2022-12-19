@@ -295,6 +295,8 @@ T(2,#L2r07CustName)
 
 #TimCustNo=A,7,S
 C(3,#CustNo,0,T(2,#L2r07CustNo),E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 #CSPACE=X,10,S
 #BUFTelNo=X,18,S

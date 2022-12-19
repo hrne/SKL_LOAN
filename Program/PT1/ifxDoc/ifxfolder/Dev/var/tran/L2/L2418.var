@@ -300,6 +300,10 @@ R(1,L2R07)
 #CustNoX=X,2.50,L
 C(3,#CustNo,0,S,T(2,#L2r07CustName))
 
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+T(2,@RmkCustNo,#TimCustNo)
+<include src="COM.icf::CustRmk.rtn"/>
 
 ! [擔保品代號1]
 #ClCode1=A,1,I
