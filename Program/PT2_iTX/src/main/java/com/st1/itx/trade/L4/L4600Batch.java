@@ -15,8 +15,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdArea;
-import com.st1.itx.db.domain.CdAreaId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
@@ -154,9 +152,11 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo() + "L4600", "L4600 已產生火險到期檔", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() + "L4600", "L4600 已產生火險到期檔", titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -175,7 +175,6 @@ public class L4600Batch extends TradeBuffer {
 //		刪除舊資料
 		deleInsuRenew(iInsuEndMonth, titaVo);
 
-//      
 //		step1 將到期年月，加入續保List
 //		新保 ->續保
 		orignalToList(titaVo);
@@ -194,13 +193,13 @@ public class L4600Batch extends TradeBuffer {
 //		因可能會有多筆保單合為一筆的情況，所以需先insert完再逐筆合計寫入File
 //		將到期資料寫入File
 		toFile(titaVo);
-
 		// 把明細資料容器裝到檔案資料容器內
 		insuRenewFileVo.setOccursList(tmpList);
 		// 轉換資料格式
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔",
+				"LNM01P.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -221,7 +220,8 @@ public class L4600Batch extends TradeBuffer {
 	}
 
 	private void orignalToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
+				Integer.MAX_VALUE, titaVo);
 		if (slInsuOrignal != null) {
 			for (InsuOrignal tInsuOrignal : slInsuOrignal.getContent()) {
 				InsuRenew tempInsuRenew = new InsuRenew();
@@ -251,8 +251,10 @@ public class L4600Batch extends TradeBuffer {
 
 	private void endoInsuNoToList(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
 		for (InsuRenew t : lInsuRenewTemp) {
-			if (tInsuRenew.getClCode1() == t.getClCode1() && tInsuRenew.getClCode2() == t.getClCode2() && tInsuRenew.getClNo() == t.getClNo() && tInsuRenew.getClCode2() == t.getClCode2()
-					&& tInsuRenew.getPrevInsuNo().equals(t.getPrevInsuNo()) && tInsuRenew.getInsuEndDate() == t.getInsuEndDate()) {
+			if (tInsuRenew.getClCode1() == t.getClCode1() && tInsuRenew.getClCode2() == t.getClCode2()
+					&& tInsuRenew.getClNo() == t.getClNo() && tInsuRenew.getClCode2() == t.getClCode2()
+					&& tInsuRenew.getPrevInsuNo().equals(t.getPrevInsuNo())
+					&& tInsuRenew.getInsuEndDate() == t.getInsuEndDate()) {
 				t.setFireInsuCovrg(t.getFireInsuCovrg().add(tInsuRenew.getFireInsuCovrg()));
 				t.setFireInsuPrem(t.getFireInsuPrem().add(tInsuRenew.getFireInsuPrem()));
 				t.setEthqInsuCovrg(t.getEthqInsuCovrg().add(tInsuRenew.getEthqInsuCovrg()));
@@ -263,7 +265,8 @@ public class L4600Batch extends TradeBuffer {
 	}
 
 	private void renewToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0, Integer.MAX_VALUE);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
+				Integer.MAX_VALUE);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
 				if ("".equals(tInsuRenew.getEndoInsuNo().trim())) {
@@ -286,7 +289,8 @@ public class L4600Batch extends TradeBuffer {
 			}
 
 //				排除自保件
-			InsuRenew nInsuRenew = insuRenewService.findById(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "), titaVo);
+			InsuRenew nInsuRenew = insuRenewService.findById(
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "), titaVo);
 
 			if (nInsuRenew != null) {
 				this.info("排除自保件 ... " + t.getNowInsuNo());
@@ -306,7 +310,8 @@ public class L4600Batch extends TradeBuffer {
 			tInsuRenew.setClNo(t.getClNo());
 			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
 			tInsuRenew.setEndoInsuNo(" ");
-			tInsuRenew.setInsuRenewId(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
+			tInsuRenew.setInsuRenewId(
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
 			tInsuRenew.setNowInsuNo("");
 			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
 			tInsuRenew.setInsuYearMonth(iInsuEndMonth);
@@ -353,7 +358,8 @@ public class L4600Batch extends TradeBuffer {
 		// 原額度為正常戶優先
 		Slice<LoanBorMain> slLoanBorMain;
 		if (tInsuRenew.getFacmNo() > 0) {
-			slLoanBorMain = loanBorMainService.bormCustNoEq(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(), tInsuRenew.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+			slLoanBorMain = loanBorMainService.bormCustNoEq(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(),
+					tInsuRenew.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
 			if (slLoanBorMain != null) {
 				int status = facStatusCom.settingStatus(slLoanBorMain.getContent(), tInsuRenew.getInsuEndDate());
 				if (status == 0 || status == 4) {
@@ -365,13 +371,16 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 		if (priorty > 0) {
-			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(), tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
+					tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (slClFac != null) {
 				for (ClFac tClFac : slClFac.getContent()) {
-					slLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(), tClFac.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+					slLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(),
+							tClFac.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
 					int priortyNow = 99;
 					if (slLoanBorMain != null) {
-						int status = facStatusCom.settingStatus(slLoanBorMain.getContent(), tInsuRenew.getInsuEndDate());
+						int status = facStatusCom.settingStatus(slLoanBorMain.getContent(),
+								tInsuRenew.getInsuEndDate());
 						if (status == 0 || status == 4) {
 							priortyNow = 1;
 						} else if (status == 2) {
@@ -396,7 +405,8 @@ public class L4600Batch extends TradeBuffer {
 			}
 		}
 
-		this.info("findFacmNo CustNo=" + this.custNo + ", FacmNo=" + this.facmNo + ", priorty=" + priorty + ", approveNo=" + approveNo);
+		this.info("findFacmNo CustNo=" + this.custNo + ", FacmNo=" + this.facmNo + ", priorty=" + priorty
+				+ ", approveNo=" + approveNo);
 
 	}
 
@@ -431,14 +441,8 @@ public class L4600Batch extends TradeBuffer {
 	private String findZipCode(CustMain tCustMain, TitaVo titaVo) throws LogicException {
 		String zip = "";
 		if (tCustMain != null) {
-			CdArea tCdArea = new CdArea();
-			CdAreaId tCdAreaId = new CdAreaId();
-			tCdAreaId.setCityCode(tCustMain.getCurrCityCode());
-			tCdAreaId.setAreaCode(tCustMain.getCurrAreaCode());
-			tCdArea = cdAreaService.findById(tCdAreaId, titaVo);
-			if (tCdArea != null) {
-				zip = tCdArea.getZip3();
-			}
+			zip = FormatUtil.pad9(tCustMain.getCurrZip3(), 3)
+					+ FormatUtil.pad9(tCustMain.getCurrZip2(), 3).substring(0, 2);
 		}
 		return zip;
 	}
@@ -484,7 +488,8 @@ public class L4600Batch extends TradeBuffer {
 		return result;
 	}
 
-	public OccursList getOccurs(String iTxCode, OccursList occursList, InsuRenew t, TitaVo titaVo) throws LogicException {
+	public OccursList getOccurs(String iTxCode, OccursList occursList, InsuRenew t, TitaVo titaVo)
+			throws LogicException {
 		occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (t.getInsuYearMonth()), 6));
 		occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
 		occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
@@ -493,17 +498,18 @@ public class L4600Batch extends TradeBuffer {
 		ClBuilding tClBuilding = null;
 		ClBuildingOwner tClBuildingOwner = null;
 		if (t.getClCode1() == 1) {
-			tClBuilding = clBuildingService.findById(new ClBuildingId(t.getClCode1(), t.getClCode2(), t.getClNo()), titaVo);
+			tClBuilding = clBuildingService.findById(new ClBuildingId(t.getClCode1(), t.getClCode2(), t.getClNo()),
+					titaVo);
 			tClBuildingOwner = clBuildingOwnerService.clNoFirst(t.getClCode1(), t.getClCode2(), t.getClNo(), titaVo);
 		}
 		if (tClBuildingOwner != null) {
 			CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
 			if (custMain != null) {
 				occursList.putParam("InsuCustId", FormatUtil.padX(custMain.getCustId(), 10));
-				occursList.putParam("InsuCustName", FormatUtil.padX(custMain.getCustName(), 12));
+				occursList.putParam("InsuCustName", FormatUtil.padX(custMain.getCustName(), 10));
 			} else {
 				occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
-				occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
+				occursList.putParam("InsuCustName", FormatUtil.padX("", 10));
 			}
 		} else {
 			occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
@@ -511,10 +517,10 @@ public class L4600Batch extends TradeBuffer {
 		}
 		if (tCustMain != null) {
 			occursList.putParam("LoanCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
-			occursList.putParam("LoanCustName", FormatUtil.padX(tCustMain.getCustName(), 12));
+			occursList.putParam("LoanCustName", FormatUtil.padX(tCustMain.getCustName(), 10));
 		} else {
 			occursList.putParam("LoanCustId", FormatUtil.padX("", 10));
-			occursList.putParam("LoanCustName", FormatUtil.padX("", 12));
+			occursList.putParam("LoanCustName", FormatUtil.padX("", 10));
 		}
 
 		BigDecimal mainArea = BigDecimal.ZERO;
@@ -523,7 +529,8 @@ public class L4600Batch extends TradeBuffer {
 		BigDecimal publicArea = BigDecimal.ZERO;
 
 		if (tClBuilding != null) {
-			Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(),
+					tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (sClBuildingPublic != null) {
 				for (ClBuildingPublic tClBuildingPublic : sClBuildingPublic.getContent()) {
 					publicArea = publicArea.add(tClBuildingPublic.getArea());
@@ -533,29 +540,30 @@ public class L4600Batch extends TradeBuffer {
 			mainArea = tClBuilding.getFloorArea();
 			subArea = tClBuilding.getBdSubArea();
 			occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
-			occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 58));
-			occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
+			occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 56));
+			occursList.putParam("BuildingSquare",
+					FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
 			occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
 			occursList.putParam("BuildingYears", FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
-			occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getFloor(), 2));
+			occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getTotalFloor(), 2));
 			occursList.putParam("RoofCode", FormatUtil.pad9("" + tClBuilding.getRoofStructureCode(), 2));
-			occursList.putParam("BusinessUnit", FormatUtil.pad9("" + tClBuilding.getBdMainUseCode(), 4));
+			occursList.putParam("BusinessUnit", "0000");
 		} else {
-			occursList.putParam("PostalCode", FormatUtil.padX("", 5));
-			occursList.putParam("Address", FormatUtil.padX("", 58));
+			occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
+			occursList.putParam("Address", FormatUtil.padX("", 56));
 			occursList.putParam("BuildingSquare", FormatUtil.padX("", 9));
 			occursList.putParam("BuildingCode", FormatUtil.padX("", 2));
 			occursList.putParam("BuildingYears", FormatUtil.padX((""), 3));
 			occursList.putParam("BuildingFloors", FormatUtil.padX("", 2));
 			occursList.putParam("RoofCode", FormatUtil.padX("", 2));
-			occursList.putParam("BusinessUnit", FormatUtil.padX("", 4));
+			occursList.putParam("BusinessUnit", "0000");
 		}
 		occursList.putParam("ClCode1", FormatUtil.padX("" + t.getClCode1(), 1));
 		occursList.putParam("ClCode2", FormatUtil.pad9("" + t.getClCode2(), 2));
 		occursList.putParam("ClNo", FormatUtil.pad9("" + t.getClNo(), 7));
 
 //				19	Seq					序號			X	2	???
-		occursList.putParam("Seq", FormatUtil.pad9("", 2)); // ???
+		occursList.putParam("Seq", FormatUtil.pad9("1", 2)); // ???
 		occursList.putParam("InsuNo", FormatUtil.padX("" + t.getPrevInsuNo(), 16));
 
 		int b4StartDate = 0;
@@ -567,7 +575,8 @@ public class L4600Batch extends TradeBuffer {
 
 //		原保單之年月
 //		1.初保檔 = 原保險單號碼=原始保險單號碼
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoEq(t.getClCode1(), t.getClCode2(),
+				t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuOrignal != null) {
 			for (InsuOrignal t2 : slInsuOrignal.getContent()) {
 				if ("".equals(t2.getEndoInsuNo().trim())) {
@@ -582,7 +591,8 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 //		2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
-		Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(),
+				t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew t2 : slInsuRenew.getContent()) {
 				if ("".equals(t2.getEndoInsuNo().trim())) {
@@ -599,36 +609,37 @@ public class L4600Batch extends TradeBuffer {
 		occursList.putParam("InsuEndDate", FormatUtil.pad9("" + (b4EndDate + 19110000), 8));
 		if ("L4600".equals(iTxCode)) {
 			occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + t.getFireInsuCovrg(), 11));
-			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 7));
+			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 6));
 			occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + t.getEthqInsuCovrg(), 7));
 			occursList.putParam("EqInsuFee", FormatUtil.pad9("" + t.getEthqInsuPrem(), 6));
 			occursList.putParam("NewInusNo", FormatUtil.padX("", 16));
 			occursList.putParam("NewInsuStartDate", FormatUtil.padX("", 8));
 			occursList.putParam("NewInsuEndDate", FormatUtil.padX("", 8));
 			occursList.putParam("NewFireInsuAmt", FormatUtil.padX("", 11));
-			occursList.putParam("NewFireInsuFee", FormatUtil.padX("", 7));
+			occursList.putParam("NewFireInsuFee", FormatUtil.padX("", 6));
 			occursList.putParam("NewEqInsuAmt", FormatUtil.padX("", 7));
 			occursList.putParam("NewEqInsuFee", FormatUtil.padX("", 6));
-			occursList.putParam("NewTotalFee", FormatUtil.padX("", 7));
+			occursList.putParam("NewTotalFee", FormatUtil.padX("", 6));
 		} else {
 			occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + fireInsuCovrg, 11));
-			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + fireInsuPrem, 7));
+			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + fireInsuPrem, 6));
 			occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + ethqInsuCovrg, 7));
 			occursList.putParam("EqInsuFee", FormatUtil.pad9("" + eqthqInsuPrem, 6));
 			occursList.putParam("NewInusNo", FormatUtil.padX(t.getNowInsuNo(), 16));
 			occursList.putParam("NewInsuStartDate", FormatUtil.pad9("" + (t.getInsuStartDate() + 19110000), 8));
 			occursList.putParam("NewInsuEndDate", FormatUtil.pad9("" + (t.getInsuEndDate() + 19110000), 8));
 			occursList.putParam("NewFireInsuAmt", FormatUtil.pad9("" + t.getFireInsuCovrg(), 11));
-			occursList.putParam("NewFireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 7));
+			occursList.putParam("NewFireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 6));
 			occursList.putParam("NewEqInsuAmt", FormatUtil.pad9("" + t.getEthqInsuCovrg(), 7));
 			occursList.putParam("NewEqInsuFee", FormatUtil.pad9("" + t.getEthqInsuPrem(), 6));
-			occursList.putParam("NewTotalFee", FormatUtil.pad9("" + t.getTotInsuPrem(), 7));
+			occursList.putParam("NewTotalFee", FormatUtil.pad9("" + t.getTotInsuPrem(), 6));
 		}
 
 		occursList.putParam("CustNo", FormatUtil.pad9("" + t.getCustNo(), 7));
 		occursList.putParam("FacmNo", FormatUtil.pad9("" + t.getFacmNo(), 3));
 		occursList.putParam("Space", FormatUtil.padX("", 4));
-		occursList.putParam("SendDate", FormatUtil.padLeft("" + (parse.stringToInteger(titaVo.getCalDy()) + 19110000), 14));
+		occursList.putParam("SendDate",
+				FormatUtil.padLeft("" + (parse.stringToInteger(titaVo.getCalDy()) + 19110000), 14));
 //				SklSalesName 2.CdEmp.FullName
 //				SklUnitCode  2.CdEmp.CenterCodeAcc
 //				SklUnitName  2.CdEmp.CenterShortName
@@ -647,26 +658,27 @@ public class L4600Batch extends TradeBuffer {
 		}
 		if (tCdEmp != null) {
 			occursList.putParam("SklSalesCode", FormatUtil.padX("" + tFacMain.getIntroducer(), 6));
-			occursList.putParam("SklSalesName", FormatUtil.padX("" + tCdEmp.getFullname(), 10));
+			occursList.putParam("SklSalesName", FormatUtil.padX("" + tCdEmp.getFullname(), 12));
 			occursList.putParam("SklUnitCode", FormatUtil.padX("" + tCdEmp.getCenterCodeAcc(), 6));
 			occursList.putParam("SklUnitName", FormatUtil.padX("" + tCdEmp.getCenterShortName(), 10));
-			occursList.putParam("RenewTrlCode", FormatUtil.padX("" + tCdEmp.getCenterCode1(), 8));
+			occursList.putParam("RenewTrlCode", FormatUtil.padX("" + tCdEmp.getCenterCode1(), 6));
 			occursList.putParam("RenewUnit", FormatUtil.padX("" + tCdEmp.getCenterCode1Short(), 10));
 		} else {
 			occursList.putParam("SklSalesCode", FormatUtil.padX("", 6));
-			occursList.putParam("SklSalesName", FormatUtil.padX("", 10));
+			occursList.putParam("SklSalesName", FormatUtil.padX("", 12));
 			occursList.putParam("SklUnitCode", FormatUtil.padX("", 6));
 			occursList.putParam("SklUnitName", FormatUtil.padX("", 10));
-			occursList.putParam("RenewTrlCode", FormatUtil.padX("", 8));
+			occursList.putParam("RenewTrlCode", FormatUtil.padX("", 6));
 			occursList.putParam("RenewUnit", FormatUtil.padX("", 10));
 		}
-		occursList.putParam("Remark1", FormatUtil.padX("", 16));
+		occursList.putParam("Remark1", FormatUtil.padX("", 14));
 		if (tCustMain == null) {
 			occursList.putParam("MailingAddress", FormatUtil.padX("", 60));
 		} else {
-			occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain, titaVo), 60));
+			occursList.putParam("MailingAddress",
+					FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain, titaVo), 60));
 		}
-		occursList.putParam("Remark2", FormatUtil.padX("", 39));
+		occursList.putParam("Remark2", FormatUtil.padX("", 36));
 		occursList.putParam("Space46", FormatUtil.padX("", 46));
 		return occursList;
 	}
@@ -674,7 +686,8 @@ public class L4600Batch extends TradeBuffer {
 	private void check(TitaVo titaVo) throws LogicException {
 		String sInsuEndMonth = iInsuEndMonth + "";
 
-		Slice<InsuRenewMediaTemp> sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth, sInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth,
+				sInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 		// 已執行L4602
 		if (sInsuRenewMediaTemp != null) {
 			throw new LogicException("E0015", "該批已送回詢價，不可再產檔 ");

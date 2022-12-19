@@ -286,9 +286,10 @@ public class L4454 extends TradeBuffer {
 			case 1: // 個別列印
 			case 2: // 整批列印
 				int fistDeduct = 0;
-				// 繳息迄日>=入帳日，不出
-				if (parse.stringToInteger(t.get("CollPrevIntDate")) >= entryDate) {
-					this.info("繳息迄日>=入帳日" + t.toString() );
+				// 目前繳息迄日>扣帳檔繳息迄日，不出
+				if (parse.stringToInteger(t.get("CollPrevIntDate")) > prevIntDate) {
+					this.info("目前繳息迄日>扣帳檔繳息迄日" + t.toString() );
+					break;
 				}
 				unSuccText(iRepayBank, t, insuMon, titaVo); // 不成功簡訊通知
 				fistDeduct = fistDeductCheck(titaVo);

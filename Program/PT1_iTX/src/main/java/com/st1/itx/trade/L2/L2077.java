@@ -200,7 +200,6 @@ public class L2077 extends TradeBuffer {
 					applDate = applDate - 19110000;
 				}
 
-
 				occursList.putParam("OOEntryDate", entryDate);
 				occursList.putParam("OOApplDate", applDate);
 				occursList.putParam("OOFunCode", result.get("FunCode"));
@@ -233,6 +232,10 @@ public class L2077 extends TradeBuffer {
 
 				this.info("occursList L2077" + occursList);
 				this.totaVo.addOccursList(occursList);
+			}
+			if (l2077ServiceImpl.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				this.totaVo.setMsgEndToEnter();
 			}
 
 			this.addList(this.totaVo);

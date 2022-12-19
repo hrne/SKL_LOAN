@@ -108,7 +108,7 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		size = result.size();
 		this.info("Total size ..." + size);
 
-		return this.convertToMap(query);
+		return switchback(query);
 	}
 
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {

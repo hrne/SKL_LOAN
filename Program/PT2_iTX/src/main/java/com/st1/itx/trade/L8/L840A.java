@@ -2374,7 +2374,7 @@ public class L840A extends TradeBuffer {
 						&& iiJcicZ053.getRcDate() == sJcicZ053.getRcDate()
 						&& iiJcicZ053.getMaxMainCode().equals(sJcicZ053.getMaxMainCode())
 						&& iiJcicZ053.getActualFilingDate() == 0
-						&& iiJcicZ053.getChangePayDate() == 0) {
+						) {
 
 					uJcicZ053 = sJcicZ053Service.holdById(iiJcicZ053.getJcicZ053Id(), titaVo);
 					oldJcicZ053 = (JcicZ053) iDataLog.clone(uJcicZ053);

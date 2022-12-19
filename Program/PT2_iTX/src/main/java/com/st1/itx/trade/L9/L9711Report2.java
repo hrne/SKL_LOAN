@@ -204,7 +204,7 @@ public class L9711Report2 extends MakeReport {
 
 		setFont(1, 14);
 
-		printCm(10, 19, "放款本息攤還表暨繳息通知單", "C");
+		 printCm(10, 19, " ", "C");
 
 		setFont(1, 11);
 

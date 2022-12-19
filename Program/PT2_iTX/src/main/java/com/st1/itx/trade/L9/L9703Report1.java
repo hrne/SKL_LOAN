@@ -43,6 +43,9 @@ public class L9703Report1 extends MakeReport {
 	BaTxCom baTxCom;
 
 	@Autowired
+	BaTxVo baTxVo;
+
+	@Autowired
 	Parse parse;
 
 	/**
@@ -183,8 +186,16 @@ public class L9703Report1 extends MakeReport {
 			this.info("L9703Report1 tL9703.facmNo = " + facmNo);
 
 			baTxCom.setTxBuffer(txbuffer);
+			this.info("titaVo.getTxcd()=" + titaVo.getTxcd());
 			try {
-				listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+				if ("L4703".equals(titaVo.getTxcd())) {
+					listBaTxVo = baTxCom.settingPayintDate(entryDate, titaVo.getEntDyI(), custNo, facmNo, 0, 1,
+							BigDecimal.ZERO, titaVo);
+				} else {
+					listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+
+				}
+
 			} catch (LogicException e) {
 				this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
 			}

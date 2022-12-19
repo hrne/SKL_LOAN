@@ -92,11 +92,11 @@ public class L3005 extends TradeBuffer {
 //			備忘錄代碼由大到小排序 序號由大到小
 			Collections.sort(lLoanCustRmk, new Comparator<LoanCustRmk>() {
 				public int compare(LoanCustRmk c1, LoanCustRmk c2) {
-					if (!c1.getRmkCode().equals(c2.getRmkCode())) {
-						return c2.getRmkCode().compareTo(c1.getRmkCode());
+					if (c1.getAcDate() != c2.getAcDate()) {
+						return c2.getAcDate() - c1.getAcDate();
 					}
 					if (c1.getRmkNo() != c2.getRmkNo()) {
-						return c2.getRmkNo() - c1.getRmkNo();
+						return c1.getRmkNo() - c2.getRmkNo();
 					}
 
 					return 0;
@@ -272,7 +272,6 @@ public class L3005 extends TradeBuffer {
 					occursList.putParam("OOTempAmt", tempAmt);
 					occursList.putParam("OONeedPaidAmt", needPaidAmt); // 應收金額
 				}
-
 				occursList.putParam("OOOverShort", wkOverShort);
 				occursList.putParam("OOLoanBal", loanBal);
 				occursList.putParam("OORate", rate);

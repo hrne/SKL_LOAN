@@ -2,6 +2,7 @@ package com.st1.itx.trade.L9;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -150,13 +151,24 @@ public class L9703Report2 extends MakeReport {
 			termEnd = 6;
 		}
 
+		int custNo = parse.stringToInteger(tL9703Vo.get("CustNo"));
+		int facmNo = parse.stringToInteger(tL9703Vo.get("FacmNo"));
 		dBaTxCom.setTxBuffer(txbuffer);
 		this.info("entdy = " + entdy);
+		this.info("titaVo.getTxcd()=" + titaVo.getTxcd());
+		this.info("titaVo.getEntDyI()=" + titaVo.getEntDyI());
 
 		try {
-			lBaTxVo = dBaTxCom.termsPay(entryDate, parse.stringToInteger(tL9703Vo.get("CustNo")),
-					parse.stringToInteger(tL9703Vo.get("FacmNo")), 0, termEnd, 0, titaVo);
-			listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
+
+			if ("L4703".equals(titaVo.getTxcd())) {
+				listBaTxVo = dBaTxCom.settingPayintDate(entryDate, titaVo.getEntDyI(), custNo, facmNo, 0, 1,
+						BigDecimal.ZERO, titaVo);
+			} else {
+
+				lBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, termEnd, 0, titaVo);
+				listBaTxVo = dBaTxCom.addByPayintDate(lBaTxVo, titaVo);
+			}
+
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -189,7 +201,7 @@ public class L9703Report2 extends MakeReport {
 
 		printCm(2, 5, tranNum(tL9703Vo.get("CurrZip3")) + tranNum(tL9703Vo.get("CurrZip2")));
 
-		int custNo = Integer.valueOf(tL9703Vo.get("CustNo"));
+		custNo = Integer.valueOf(tL9703Vo.get("CustNo"));
 
 		CustMain custMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 		String addr = custNoticeCom.getCurrAddress(custMain, titaVo);
@@ -280,6 +292,7 @@ public class L9703Report2 extends MakeReport {
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
 		int terms = 0;
+		int payIntDate = 0;
 
 		dDateUtil.init();
 		dDateUtil.setDate_1(entdy);
@@ -297,8 +310,12 @@ public class L9703Report2 extends MakeReport {
 			}
 
 			terms++;
+			
+			
+			if (payIntDate < baTxVo.getPayIntDate()) {
+				tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
+			}
 
-			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 			// 違約金
 			BreachAmt = baTxVo.getBreachAmt().intValue() + baTxVo.getDelayInt().intValue();
 			// 本金
