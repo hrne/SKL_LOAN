@@ -154,6 +154,9 @@ public class L6985 extends TradeBuffer {
 				String AcclType = tTempVo.getParam("AcclType");
 				String SlipNote = tTempVo.getParam("SlipNote");
 				BigDecimal TxAmt = parse.stringToBigDecimal(tTempVo.getParam("DbTxAmt1"));
+				if ("ACCL04".equals(iItemCode) ) {//折溢價
+					TxAmt = parse.stringToBigDecimal(tTempVo.getParam("DbTxAmt1")).subtract(parse.stringToBigDecimal(tTempVo.getParam("CrTxAmt1")));
+				}
 				String AcctCode = tTempVo.getParam("AcctCode");
 				String AcBookCode = tTempVo.getParam("AcBookCode");
 				String AcSubBookCode = tTempVo.getParam("AcSubBookCode");
@@ -178,7 +181,8 @@ public class L6985 extends TradeBuffer {
 				occursList.putParam("OOAcctItem", AcctItem); // 科目名稱
 				occursList.putParam("OOAcBookCode", AcBookCode + "/" + AcSubBookCode); // 帳冊別
 				occursList.putParam("OORmk", SlipNote); // 摘要
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
+						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOAcDate", AcDate); // 會計日期
 				occursList.putParam("OOSlipBatNo", SlipBatNo); // 會計日期
 				occursList.putParam("OODbAmt", TxAmt); // 金額

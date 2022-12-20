@@ -415,7 +415,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C})
 
 ! <交易>
 #OOBUF_D=X,390,S
-T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOAcDate+0000+#OOTitaTlrNo+#OOTitaTxtNo+9)
+T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOEntryDate+0000+#OOTitaTlrNo+#OOTitaTxtNo+9)
 ! T(2,#TXCD+#CustNo+000+000+#OOAcDate+#OOTxNo+9)
 
 #OOBTN_D=A,2,O

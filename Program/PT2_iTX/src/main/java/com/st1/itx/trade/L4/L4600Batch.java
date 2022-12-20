@@ -490,9 +490,10 @@ public class L4600Batch extends TradeBuffer {
 
 	public OccursList getOccurs(String iTxCode, OccursList occursList, InsuRenew t, TitaVo titaVo)
 			throws LogicException {
+
 		occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (t.getInsuYearMonth()), 6));
 		occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
-		occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
+		occursList.putParam("InsuCampCode", FormatUtil.pad9(t.getInsuCompany(), 2));
 		CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
 		FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
 		ClBuilding tClBuilding = null;

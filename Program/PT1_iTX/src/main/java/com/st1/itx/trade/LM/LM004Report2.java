@@ -57,6 +57,8 @@ public class LM004Report2 extends MakeReport {
 		int num = 1;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
+		makeExcel.setShiftRow(3, LDList.size());
+		
 		for (Map<String, String> tLDVo : LDList) {
 
 			int col = 0;

@@ -242,7 +242,7 @@ T(2,#OOCustNo+－+#OOFacmNo)
 ! 項目
 #OOItemCode=X,6,S
 ! 金額
-#OODbAmt=m,14,L
+#OODbAmt=+m,14,L
 
 !統編
 ! #OOCustId=X,10,S

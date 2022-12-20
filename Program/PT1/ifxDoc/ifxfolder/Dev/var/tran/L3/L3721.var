@@ -98,6 +98,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ["#FdProdNo2+商品代碼",#ProdNo2,#ProdNo2X],
 ["#FdBaseRateCode2+指標利率代碼",#BaseRateCode2,#BaseRateCode2X], 
 ["#FdBaseRate2+指標利率",#BaseRate2X],
+[#<->#,"變動合約加減碼",#ChangFg],
 ["#FdFitRate2+適用利率",#FitRate2,"@%"],
 ! ["#FdProdRate2+商品利率",#ProdRate2X],
 ["#FdRateIncr2+利率加減碼",#RateIncr2,"@%"], 
@@ -159,7 +160,7 @@ E(0,@RimFKey,#FKEY)
 T(F,#CustNo,0)
 T(F,#FacmNo,0)
 HIDE(#BTN4)
-INVOKEJS(SHOW,p1,13,17,0)
+INVOKEJS(SHOW,p1,13,18,0)
 
 #rimtxtype=X,2,S
 
@@ -373,21 +374,7 @@ R(1,L2R05)
 C(3,#FKEY,0,$,s)
 C(3,#L2r05BormCount,1,T(3, )T(F,@BormNo,0),T(3,*)T(F,@BormNo,1))
 
-
 #RimChangFg=X,1,S
-!查詢下次利率調整日期的放款利率變動檔
-#SendL3r09=X,1,S
-C(3,#FKEY,0,$,s)
-E(0,@RimCustNo,#TimCustNo)
-E(0,@RimFacmNo,#FacmNo)
-E(0,@RimBormNo,#BormNo)
-T(2,@RimChangFg,#CheckChangFg)
-C(3,#CHAIN,1,C(3,#EffectDate1,0,E(0,@RimEffectDate,#L3r02PrevPayIntDate),E(0,@RimEffectDate,#EffectDate1)),E(0,@RimEffectDate,#L3r02PrevPayIntDate))
-! RESET_RIM(#SendL3r09,L3R09)
-S(L3R09,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEffectDate,#RimChangFg)
-R(1,L3R09)
-
-
 
 #BormNo=A,3,I
 ! IF(#L2r05BormCount>=1,E(0,#L2r05BormNo),$)
@@ -403,6 +390,18 @@ E(0,@RimBormNo,#BormNo)
 RESET_RIM(#SendL3r02,L3R02)
 S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
 R(1,L3R02)
+
+!查詢下次利率調整日期的放款利率變動檔
+#SendL3r09=X,1,S
+C(3,#FKEY,0,$,s)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+T(2,@RimChangFg,#CheckChangFg)
+C(3,#CHAIN,1,C(3,#EffectDate1,0,E(0,@RimEffectDate,#L3r02PrevPayIntDate),E(0,@RimEffectDate,#EffectDate1)),E(0,@RimEffectDate,#L3r02PrevPayIntDate))
+! RESET_RIM(#SendL3r09,L3R09)
+S(L3R09,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEffectDate,#RimChangFg)
+R(1,L3R09)
 
 #MRKEY=_,_,S
 T(2,#TimCustNo+-+#FacmNo)
@@ -604,7 +603,7 @@ HELP(#YNHelp)
 
 
 #DeleteFgX=X,4,L
-C(5,#DeleteFg,N,INVOKEJS(SHOW,p1,13,17,1),INVOKEJS(SHOW,p1,13,17,0))
+C(5,#DeleteFg,N,INVOKEJS(SHOW,p1,13,18,1),INVOKEJS(SHOW,p1,13,18,0))
 C(4,#DeleteFg,S,$)
 T(3,)T(H,#DeleteFg,#YNHelp)
 C(3,#FKEY,0,$,s)
@@ -697,20 +696,16 @@ T(2,@ProdNo2X,#L2r01ProdName)
 #RateCode2Help=x,1024,S
 C(2,#RateCode1,$,T(HELP,@RateCode2Help,#RateCodeHelp,+,1;2),T(HELP,@RateCode2Help,#RateCodeHelp,+,2),T(HELP,@RateCode2Help,#RateCodeHelp,+,2;3))
 
-
-
 #RateCode2=A,1,I
 C(5,#DeleteFg,Y,s,$)
 HELP(#RateCode2Help)
 @
-! V(1,2,#RateCode1)
 V(H,#RateCode2Help)
 
 #RateCode2X=X,10,L
 T(3,)T(H,#RateCode2,#RateCodeHelp)
-C(3,#RateCode2,1,C(3,#BaseRateCode2,99,INVOKEJS(SHOW,p1,19,19,1),INVOKEJS(SHOW,p1,19,19,0)),INVOKEJS(SHOW,p1,19,19,1))
-C(3,#RateCode2,2,INVOKEJS(SHOW,p1,19,19,0),$)
-
+C(3,#RateCode2,1,C(3,#BaseRateCode2,99,INVOKEJS(SHOW,p1,20,20,1),INVOKEJS(SHOW,p1,20,20,0)),INVOKEJS(SHOW,p1,20,20,1))
+C(3,#RateCode2,2,INVOKEJS(SHOW,p1,20,20,0),$)
 
 #BUF6A=X,6,S
 T(2,#ProdNo2+0)
@@ -756,6 +751,7 @@ C(5,#DeleteFg,Y,s,$)
 #BaseRateCode2X=X,30,L
 C(3,#BaseRateCode2,0,S,$)
 T(3,)T(H,#BaseRateCode2,#BaseRateCodeHelp)
+C(3,#BaseRateCode2,99,INVOKEJS(SHOW,17,17,0),INVOKEJS(SHOW,17,17,1))
 
 !尋找指標利率檔資料
 #SendL2r06=X,1,S
@@ -804,16 +800,28 @@ P(L,#ProdRate2X)
 #IncrFlag2=X,1,S
 T(2,#L2r01IncrFlag)
 
+!新增變動合約加減碼(Y/N) 
+!指標利率代碼為99時隱藏
+!Y:可同時輸入加減碼,利率
+!N:輸入適用利率自動顯示利率加減碼，輸入利率加減碼顯示適用利率
+#ChangFg=X,1,I
+C(3,#BaseRateCode2,99,S,$)
+HELP(#YNHelp)
+@
+V(H,#YNHelp)
+
 ![適用利率]
 !自動顯示不必輸入
 #FdFitRate2=X,2,L
 
 #FitRate2=n,2.4,I
 C(5,#DeleteFg,Y,s,$)
+C(4,#ChangFg,IF(#BaseRateCode2<99,C(3,#RateCode2,2,$,S),$),$)
+
 ! C(5,#effFg,Y,IF(#BaseRateCode2<99,C(3,#RateCode2,2,$,S),$),$)
 #wkRateIncr2=X,1,S
 C(5,#DeleteFg,Y,s,$)
-E(0,@RateIncr2,#FitRate2-#BaseRate2)
+C(5,#ChangFg,Y,$,E(0,@RateIncr2,#FitRate2-#BaseRate2))
 
 ![加碼利率]
 !當加減碼別=1時必須輸入否則不必輸入
@@ -821,12 +829,15 @@ E(0,@RateIncr2,#FitRate2-#BaseRate2)
 
 #RateIncr2=n,2.4,I
 C(5,#DeleteFg,Y,s,$)
+C(4,#ChangFg,IF(#BaseRateCode2==99,C(3,#RateCode2,2,S,$),$),$)
+
 ! C(5,#IncrFlag2,Y,$,S)
 ! C(5,#effFg,Y,IF(#BaseRateCode2<99,C(3,#RateCode2,2,S,$),S),S)
 ! E(0,#FitRate2-#BaseRate2)
 #wkFitRate2=X,1,S
 C(5,#DeleteFg,Y,s,$)
-E(0,@FitRate2,#RateIncr2+#BaseRate2)
+C(5,#ChangFg,Y,$,E(0,@FitRate2,#RateIncr2+#BaseRate2))
+
 
 ! #WkRate24=X,7,S
 ! X(#RateIncr2)
