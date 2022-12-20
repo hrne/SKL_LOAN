@@ -18,6 +18,7 @@ import com.st1.itx.db.service.TbJcicMu01Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L8351")
@@ -41,7 +42,10 @@ public class L8351 extends TradeBuffer {
 
 	@Autowired
 	public TbJcicMu01Service iTbJcicMu01Service;
-
+	
+	@Autowired
+	public WebClient webClient;
+	
 	@Autowired
 	public L8351File iL8351File;
 
@@ -57,19 +61,23 @@ public class L8351 extends TradeBuffer {
 		if (iSubmitType.equals("1")) {
 			// 檔名
 			String filename = iSubmitKey + iTxtDate.substring(3) + ".MU1";
-
+			
 			iL8351File.exec(titaVo);
+			String checkMsg = "MU1人員名冊報送檔案已產出。";
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+					titaVo.getTlrNo() , checkMsg, titaVo);
+		
 			fileNo = iL8351File.close();
 			iL8351File.toFile(fileNo, filename);
 			totaVo.put("ExcelSnoM", "" + fileNo);
-		} else {
+		}else {
 			Slice<TbJcicMu01> xTbJcicMu01 = null;
 			xTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 			if (xTbJcicMu01 != null) {
 				int aTxDate = Integer.valueOf(iTxtDate);
-
+				
 				for (TbJcicMu01 xxTbJcicMu01 : xTbJcicMu01) {
-					this.info("TESTTT=" + xxTbJcicMu01.getOutJcictxtDate());
+					this.info("TESTTT="+xxTbJcicMu01.getOutJcictxtDate());
 					if (xxTbJcicMu01.getOutJcictxtDate() == aTxDate) {
 						xxTbJcicMu01.setOutJcictxtDate(0);
 						try {
@@ -82,6 +90,7 @@ public class L8351 extends TradeBuffer {
 			}
 			totaVo.put("ExcelSnoM", "" + fileNo);
 		}
+
 
 		this.addList(this.totaVo);
 		return this.sendList();

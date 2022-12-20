@@ -25,23 +25,29 @@ public class L5024ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
 
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
-
-	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-
 	public List<Map<String, String>> FindData(int index, int limit, String DeptCode, String DistCode, String UnitCode, TitaVo titaVo) throws Exception {
-		Query query;
+		
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select \"UnitCode\", \"UnitItem\", \"DistCode\", \"DistItem\", \"DeptCode\", \"DeptItem\", \"EmpNo\", \"EmpName\", ";
-		sql += "\"DirectorCode\", \"DepartOfficer\", \"GoalCnt\", \"SumGoalCnt\", \"GoalAmt\", \"SumGoalAmt\" from \"PfDeparment\" ";
+
+		String sql ="";
+		sql += " select \"UnitCode\" "; // 單位代號
+		sql += "      , \"UnitItem\" ";
+		sql += "      , \"DistCode\" "; // 區部代號
+		sql += "      , \"DistItem\" ";
+		sql += "      , \"DeptCode\" "; // 部室代號
+		sql += "      , \"DeptItem\" ";
+		sql += "      , \"EmpNo\" ";
+		sql += "      , \"EmpName\" ";
+		sql += "      , \"DirectorCode\" ";
+		sql += "      , \"DepartOfficer\" ";
+		sql += "      , \"GoalCnt\" ";
+		sql += "      , \"SumGoalCnt\" ";
+		sql += "      , \"GoalAmt\" ";
+		sql += "      , \"SumGoalAmt\" ";
+		sql += " from \"PfDeparment\" ";
 		if (!DeptCode.equals("") || !DistCode.equals("") || !UnitCode.equals("")) {
 			sql += "where ";
 		}
@@ -62,20 +68,17 @@ public class L5024ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 			sql += " \"UnitCode\" = \'" + UnitCode + "\' ";
 		}
-		sql += sqlRow;
+		// 2022-12-15 暫定排序
+		// 部室代號由小到大
+		// 同部室時，區部代號由小到大
+		// 同區部時，單位代號由小到大
+		sql += "  ORDER BY \"DeptCode\" ";
+		sql += "         , NVL(\"DistCode\",'000000') ";
+		sql += "         , NVL(\"UnitCode\",'000000') ";
+
 		this.info("sql = " + sql);
-
-		query = em.createNativeQuery(sql);
-		query.setParameter("ThisIndex", index);
-		query.setParameter("ThisLimit", limit);
-
-		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		this.info("L5024Service FindData=" + query.toString());
-		return this.convertToMap(query.getResultList());
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		Query query = em.createNativeQuery(sql);
+		return switchback(query);
 	}
 }

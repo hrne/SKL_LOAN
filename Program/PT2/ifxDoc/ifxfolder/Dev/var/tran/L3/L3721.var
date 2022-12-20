@@ -98,7 +98,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ["#FdProdNo2+商品代碼",#ProdNo2,#ProdNo2X],
 ["#FdBaseRateCode2+指標利率代碼",#BaseRateCode2,#BaseRateCode2X], 
 ["#FdBaseRate2+指標利率",#BaseRate2X],
-[#<->#,"變動合約加減碼",#ChangFg],
+[#<->#,"變動合約加減碼",#ChangFg,#ChangFgX],
 ["#FdFitRate2+適用利率",#FitRate2,"@%"],
 ! ["#FdProdRate2+商品利率",#ProdRate2X],
 ["#FdRateIncr2+利率加減碼",#RateIncr2,"@%"], 
@@ -810,6 +810,10 @@ HELP(#YNHelp)
 @
 V(H,#YNHelp)
 
+#ChangFgX=X,2,L
+T(3,)
+T(H,#ChangFg,#YNHelp)
+
 ![適用利率]
 !自動顯示不必輸入
 #FdFitRate2=X,2,L
@@ -937,6 +941,7 @@ T(3,[L3721] 借戶利率變更)
 #IncrFlag1
 #DeleteFg
 #CheckChangFg
+#ChangFg
 </sub>
 
 

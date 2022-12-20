@@ -48,8 +48,9 @@ public class L8351File extends MakeFile {
 		// 用String.format()
 		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 
+		
 		// 第一行
-		String iContactX = FormatUtil.padX("放款部聯絡人-程慧娟", 80);
+		String iContactX = FormatUtil.padX("放款部聯絡人-張舜雯", 80);
 //		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s01          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
 		String iFirstLine = "JCIC-DAT-MU01-V01-458     " + iTxtDate + "01          02-23895858#7075" + iContactX;
 		this.put(iFirstLine);
@@ -128,12 +129,13 @@ public class L8351File extends MakeFile {
 					iOther = FormatUtil.padX(iOther, 1);
 					iAuthMgrIdSX = FormatUtil.padX(iAuthMgrIdSX, 40);
 					iAuthMgrIdS = FormatUtil.padX(iAuthMgrIdS, 8);
-					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 20); // 2022.2.18 by eric 40 > 20
+					iAuthMgrIdEX = FormatUtil.padX(iAuthMgrIdEX, 20); //2022.2.18 by eric 40 > 20
 					iAuthMgrIdE = FormatUtil.padX(iAuthMgrIdE, 8);
 					String iEmailAccount = FormatUtil.padX(aTbJcicMu01.getEmailAccount(), 50);
-					String iContent = " " + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ") + iEmpIdX + iEmpId + iTitle + iAuthQryType + iQryUserId + "          " + iQuery
-							+ iReview + iOther + StringUtils.rightPad(sAuthStartDay, 7, " ") + iAuthMgrIdSX + iAuthMgrIdS + StringUtils.rightPad(sAuthEndDay, 7, " ") + iAuthMgrIdEX + iAuthMgrIdE
-							+ iEmailAccount
+					String iContent = " " + iHeadOfficeCode + iBranchCode + StringUtils.rightPad(sDataDate, 7, " ")
+							+ iEmpIdX + iEmpId + iTitle + iAuthQryType + iQryUserId + "          " + iQuery + iReview
+							+ iOther + StringUtils.rightPad(sAuthStartDay, 7, " ") + iAuthMgrIdSX + iAuthMgrIdS
+							+ StringUtils.rightPad(sAuthEndDay, 7, " ") + iAuthMgrIdEX + iAuthMgrIdE + iEmailAccount
 //							+ StringUtils.rightPad(aTbJcicMu01.getModifyUserId(), 25, " ");
 							+ "                         ";
 					this.put(iContent);

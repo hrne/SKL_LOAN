@@ -37,8 +37,16 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("L9136 ServiceImpl findAll");
 
-		int isAcDate = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
-		int ieAcDate = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
+		int acDateStart = 0;
+		int acDateEnd = 0;
+		if ("L9136".equals(titaVo.getTxcd().toString())) {
+			acDateStart =  this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
+			acDateEnd = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
+		} else {
+			acDateStart = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+			acDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		}
+
 
 		String sql = " "; 
 		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
@@ -80,17 +88,23 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("sAcDate", isAcDate);
-		query.setParameter("eAcDate", ieAcDate);
+		query.setParameter("sAcDate", acDateStart);
+		query.setParameter("eAcDate", acDateEnd);
 		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
 		this.info("L9136 ServiceImpl findAll2");
 
-		int isAcDate = this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
-		int ieAcDate = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
-
+		int acDateStart = 0;
+		int acDateEnd = 0;
+		if ("L9136".equals(titaVo.getTxcd().toString())) {
+			acDateStart =  this.parse.stringToInteger(titaVo.getParam("sAcDate")) + 19110000;
+			acDateEnd = this.parse.stringToInteger(titaVo.getParam("eAcDate")) + 19110000;
+		} else {
+			acDateStart = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+			acDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		}
 		String sql = " "; 
 		sql += "	WITH \"tmpTxRecord\" AS(";
 		sql += "		SELECT T.\"Entdy\" AS \"TxDate\"";
@@ -169,8 +183,8 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("sAcDate", isAcDate);
-		query.setParameter("eAcDate", ieAcDate);
+		query.setParameter("sAcDate", acDateStart);
+		query.setParameter("eAcDate", acDateEnd);
 		return this.convertToMap(query);
 	}
 	

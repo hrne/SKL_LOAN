@@ -43,9 +43,6 @@ public class L9703Report1 extends MakeReport {
 	BaTxCom baTxCom;
 
 	@Autowired
-	BaTxVo baTxVo;
-
-	@Autowired
 	Parse parse;
 
 	/**

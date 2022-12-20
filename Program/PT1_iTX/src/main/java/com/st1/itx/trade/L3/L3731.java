@@ -1,15 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
 package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
@@ -90,6 +79,7 @@ public class L3731 extends TradeBuffer {
 	private int iFacmNo;
 	private int iBormNo;
 	private int iEntryDate;
+	private int iStatusCode;
 	// work area
 	private int wkTbsDy;
 	private int wkCustNo = 0;
@@ -138,7 +128,8 @@ public class L3731 extends TradeBuffer {
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
-
+		iStatusCode = this.parse.stringToInteger(titaVo.get("StatusCode"));
+		
 		// 設定額度撥款起止序號
 		if (iFacmNo > 0) {
 			wkFacmNoStart = iFacmNo;
@@ -245,10 +236,10 @@ public class L3731 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0021", "放款主檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 =  "
 					+ tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo()); // 該筆資料待放行中
 		}
-		// 
+		//
 		if (tLoanBorMain.getStatus() != 6) {
-			throw new LogicException(titaVo, "E0015", "撥款主檔 戶況不為呆帳戶 " +  wkFacmNo + "-" + wkBormNo); // 檢查錯誤
-		
+			throw new LogicException(titaVo, "E0015", "撥款主檔 戶況不為呆帳戶 " + wkFacmNo + "-" + wkBormNo); // 檢查錯誤
+
 		}
 
 	}
@@ -354,7 +345,11 @@ public class L3731 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, wkCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		tLoanBorTx.setTxDescCode("3731"); // 3731 轉呆帳結案戶
+		if(iStatusCode==8) {
+			tLoanBorTx.setTxDescCode("3732"); // 3732 轉債權轉讓戶
+		}else {
+			tLoanBorTx.setTxDescCode("3731"); // 3731 轉呆帳結案戶
+		}
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setTxAmt(BigDecimal.ZERO);
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());

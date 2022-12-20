@@ -98,8 +98,7 @@ public class L2077 extends TradeBuffer {
 		} catch (Exception e) {
 			this.info("Error ... " + e.getMessage());
 		}
-		this.info("resultList = " + resultList);
-		this.info("resultList.size() = " + resultList.size());
+
 		if (resultList != null && resultList.size() != 0) {
 
 			this.info("Size =" + resultList.size());
@@ -144,7 +143,7 @@ public class L2077 extends TradeBuffer {
 				this.info("FunCode = " + result.get("FunCode"));
 				if (("2".equals(result.get("FunCode")) || "3".equals(result.get("FunCode")))
 						&& baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
-					this.info("wkRepayFg = \"Y\"");
+
 					wkRepayFg = "Y";
 				}
 

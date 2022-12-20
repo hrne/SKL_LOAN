@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
@@ -27,29 +26,12 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private BaseEntityManager baseEntityManager;
 
 	@Autowired
-	private LoanBorMainRepository loanBorMainRepos;
-
-	@Autowired
 	private Parse parse;
-
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
-
-	// *** 折返控制相關 ***
-	private int cnt;
-
-	// *** 折返控制相關 ***
-	private int size;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("L8080.findAll");
@@ -59,97 +41,93 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAcDate1 = Integer.valueOf(titaVo.getParam("AcDate1")) + 19110000;
 		int iAcDate2 = Integer.valueOf(titaVo.getParam("AcDate2")) + 19110000;
 		int iTypeCode = parse.stringToInteger(titaVo.getParam("TypeCode"));
+		String custId = titaVo.getParam("CustId").trim();
+		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
-		String sql = " select * from ( select                                    ";
-		sql += "  t.\"LogNo\"                                                    ";
-		sql += " ,t.\"Entdy\"                                                    ";
-		sql += " ,t.\"TransactionId\"                                            ";
-		sql += " ,t.\"AcctNo\"       	                                         ";
-		sql += " ,t.\"CaseNo\"         	                                         ";
-		sql += " ,t.\"MsgRg\"      		                                         ";
-		sql += " ,t.\"ConfirmStatus\"                                            ";
-		sql += " ,t.\"ConfirmCode\"                                              ";
-		sql += " ,t.\"ConfirmEmpNo\"                                             ";
-		sql += " ,t.\"ConfirmTranCode\"                                          ";
-		sql += " from \"TxAmlLog\" t                                             ";
-		sql += " where                                                           ";
+		String sql = "";
+		sql += " select t.\"LogNo\" ";
+		sql += "      , t.\"Entdy\" ";
+		sql += "      , t.\"TransactionId\" ";
+		sql += "      , t.\"AcctNo\" ";
+		sql += "      , t.\"CaseNo\" ";
+		sql += "      , t.\"MsgRg\" ";
+		sql += "      , t.\"ConfirmStatus\" ";
+		sql += "      , t.\"ConfirmCode\" ";
+		sql += "      , t.\"ConfirmEmpNo\" "; 
+		sql += "      , t.\"ConfirmTranCode\" ";
+		sql += " from \"TxAmlLog\" t ";
+		sql += " where \"BrNo\" = :iBrNo ";
+		sql += "   and \"Entdy\" >= :iAcDate1 ";
+		sql += "   and \"Entdy\" <= :iAcDate2 ";
 
 		if (iTypeCode != 9) {
 			switch (iTypeCode) {
 			case 0:
-				sql += " case                                                         ";
-				sql += " when SUBSTR(\"CaseNo\",0,2) in ('LN','RT')                   ";
-				sql += " THEN 1                                  				      ";
-				sql += " when (\"CaseNo\") = 'L3110'                                  ";
-				sql += " THEN 1                                  					  ";
-				sql += " ELSE 0 END >0                                  			  ";
-				sql += " AND 			                                  			  ";
+				sql += " case ";
+				sql += "   when SUBSTR(\"CaseNo\",0,2) in ('LN','RT') ";
+				sql += "   then 1 ";
+				sql += "   when \"CaseNo\" = 'L3110' ";
+				sql += "   then 1 ";
+				sql += " else 0 end > 0 ";
 //				L3110
 //				LNnnnn
 				break;
 			case 1:
-				sql += " case                                                         ";
-				sql += " when (\"CaseNo\") = 'AUTH'                                   ";
-				sql += " THEN 1                                  					  ";
-				sql += " ELSE 0 END >0                                  			  ";
-				sql += " AND 			                                  			  ";
+				sql += " case ";
+				sql += "   when (\"CaseNo\") = 'AUTH' ";
+				sql += "   then 1 ";
+				sql += " else 0 end > 0 ";
 //				AUTH
 				break;
 			case 2:
-				sql += " case                                                         ";
-				sql += " when (\"CaseNo\") = 'DEDUCT'                                 ";
-				sql += " THEN 1                                  					  ";
-				sql += " ELSE 0 END >0                                  			  ";
-				sql += " AND 			                                  			  ";
+				sql += " case ";
+				sql += " when (\"CaseNo\") = 'DEDUCT' ";
+				sql += " THEN 1 ";
+				sql += " ELSE 0 END > 0 ";
 //				DEDUCT
 				break;
 			case 3:
-				sql += " case                                                         ";
-				sql += " when SUBSTR(\"CaseNo\",0,4) = 'BATX'                         ";
-				sql += " THEN 1                                  				      ";
-				sql += " ELSE 0 END >0                                  			  ";
-				sql += " AND 			                                  			  ";
+				sql += " case ";
+				sql += "   when SUBSTR(\"CaseNo\",0,4) = 'BATX' ";
+				sql += "   then 1 ";
+				sql += " else 0 end > 0 ";
 //				BATXnn
 				break;
 			}
 		}
-		if ("9".equals(iStatus)) {
-			sql += "            \"BrNo\" = " + iBrNo;
-			sql += "        and \"Entdy\" >= " + iAcDate1;
-			sql += "        and \"Entdy\" <= " + iAcDate2;
-		} else {
-			sql += "            \"ConfirmStatus\" = " + iStatus;
-			sql += "        and \"BrNo\" = " + iBrNo;
-			sql += "        and \"Entdy\" >= " + iAcDate1;
-			sql += "        and \"Entdy\" <= " + iAcDate2;
+		if (!"9".equals(iStatus)) {
+			sql += " and \"ConfirmStatus\" = " + iStatus;
+		}
+		if (custId != null && !custId.isEmpty()) {
+			sql += " and \"CustId\" = :custId ";
+		}
+		if (custNo != 0) {
+			sql += " and \"CustNo\" = :custNo ";
 		}
 
 		sql += " order by t.\"CreateDate\" Desc ";
-		sql += " )  ";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
+		
+		query.setParameter("iBrNo", iBrNo);
+		query.setParameter("iAcDate1", iAcDate1);
+		query.setParameter("iAcDate2", iAcDate2);
+		
+		if (!"9".equals(iStatus)) {
+			query.setParameter("iStatus", iStatus);
+		}
+		if (custId != null && !custId.isEmpty()) {
+			query.setParameter("custId", custId);
+		}
+		if (custNo != 0) {
+			query.setParameter("custNo", custNo);
+		}
 
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
-
-		// *** 折返控制相關 ***
-		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
-
-		return this.convertToMap(query);
+		return switchback(query);
 	}
 
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
@@ -157,9 +135,5 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.limit = limit;
 
 		return findAll(titaVo);
-	}
-
-	public int getSize() {
-		return cnt;
 	}
 }

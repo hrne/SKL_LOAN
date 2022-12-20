@@ -48,12 +48,13 @@ E(0,0)
 <include src="COM.icf::TITLE-RUN.pre"/>
 </sub>
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[130,370,150,350];printer.width=[15,35,15,35];order=1">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[130,500,150,350];printer.width=[15,35,15,35];order=1">
 [
-["[L3731]                                    呆帳戶改呆帳結案戶"],
+["[L3731]                                    呆帳戶更改戶況"],
 [#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@",#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdBormNo+撥款序號",#BormNo],
+[#<->#,"#FdStatusCode+戶況",#StatusCode,#StatusCodeX],
 [#<->#,"#FdSupervisor+核決主管",#Supervisor,#BTN1,#SupervisorX],
 [#<->#,"#FdRemark+備註",#Remark],
 ]
@@ -75,6 +76,7 @@ T(2,@RimTxCode,#TXCD)
 HIDE(#BTN1)
 #FdFacmNo=X,2,L
 #FdBormNo=X,2,L
+#FdStatusCode=X,2,L
 #FdSupervisor=X,2,L
 #FdRemark=X,2,L
 
@@ -84,6 +86,9 @@ T(1,@CustNo,#NTXBUF,1,7)
 T(1,@TimCustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
 T(1,@BormNo,#NTXBUF,11,3)
+
+#StatusCodeHelp=x,1024,S
+T(3,8:呆帳戶改債權轉讓戶;9:呆帳戶改呆帳結案戶)
 
 #Init=X,1,S
 T(3,@FdCustNo,*)
@@ -137,6 +142,17 @@ T(2,      +Y)
 #BIND1=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6088; ntxbuf=#BUF1;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo:SupervisorX<-OOFullname})
 
+#StatusCode=A,1,I
+HELP(#StatusCodeHelp)
+@
+V(H,#StatusCodeHelp)
+
+
+#StatusCodeX=X,20,L
+T(3,)
+T(H,#StatusCode,#StatusCodeHelp)
+
+
 !核決主管
 #Supervisor=X,20,I
 SHOW(#BTN1)
@@ -179,6 +195,7 @@ C(3,#BormNo,0,s,T(2,#CustNo+-+#FacmNo+-+#BormNo))
 #TimCustNo
 #FacmNo
 #BormNo
+#StatusCode
 #Supervisor
 #Remark
 #END

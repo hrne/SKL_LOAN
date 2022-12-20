@@ -6242,6 +6242,8 @@ TXFORM=L5R09
 #L5R10GoalAmt=m,14.2,S
 #L5R10SmryGoalAmt=m,14.2,S
 #L5R10StationName=X,20,S
+#L5R10PfCnt=m,14.2,S
+#L5R10DrawdownAmt=m,14.2,S
 </L5R10.dec>
 
 <L5R10.tom>
@@ -6256,6 +6258,8 @@ TXFORM=L5R10
 #L5R10GoalAmt
 #L5R10SmryGoalAmt
 #L5R10StationName
+#L5R10PfCnt
+#L5R10DrawdownAmt
 ^
 </L5R10.tom>
 
@@ -8457,6 +8461,7 @@ TXFORM=L8R48
 #L8R49Factor2AmtEnd=m,14,S
 #L8R49Factor3TotLimit=m,14,S
 #L8R49FactorDays=N,3,S
+#L8R49FactorDays2=N,3,S
 #L8R49FactorDays3=N,3,S
 </L8R49.dec>
 
@@ -8468,6 +8473,7 @@ TXFORM=L8R49
 #L8R49Factor2AmtEnd
 #L8R49Factor3TotLimit
 #L8R49FactorDays
+#L8R49FactorDays2
 #L8R49FactorDays3
 ^
 </L8R49.tom>

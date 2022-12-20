@@ -444,6 +444,70 @@ BEGIN
                      || '"' 
               ELSE '' 
               END 
+           || CASE  
+                --  新每期攤還金額 2022-12-20 Wei新增
+                WHEN TR1.TRXNPA != 0
+                THEN ',"NewDueAmt":"'
+                     || TR1.TRXNPA
+                     || '"' 
+              ELSE '' 
+              END 
+           || CASE  
+                --  新繳款總期數 2022-12-20 Wei新增
+                WHEN TR1.TRXNPR != 0
+                THEN ',"NewTotalPeriod":"'
+                     || TR1.TRXNPR
+                     || '"' 
+              ELSE '' 
+              END 
+           || CASE  
+                --  支票帳號 2022-12-20 Wei新增
+                WHEN TR1.CHKACN != 0
+                THEN ',"ChequeAcctNo":"'
+                     || TR1.CHKACN
+                     || '"' 
+              ELSE '' 
+              END 
+           || CASE  
+                --  支票號碼 2022-12-20 Wei新增
+                WHEN TR1.CHKASQ != 0
+                THEN ',"ChequeNo":"'
+                     || TR1.CHKASQ
+                     || '"' 
+              ELSE '' 
+              END
+           || CASE  
+                --  匯款序號 2022-12-20 Wei新增
+                WHEN TR1.DPSSEQ != 0
+                THEN ',"RemitSeq":"'
+                     || TR1.DPSSEQ
+                     || '"' 
+              ELSE '' 
+              END
+           || CASE  
+                --  帳戶區分 2022-12-20 Wei新增
+                WHEN TR1.TRXACD >= 0
+                THEN ',"AcctDivisionCode":"'
+                     || TR1.TRXACD
+                     || '"' 
+              ELSE ''
+              END
+           || CASE
+                --  扣款銀行 2022-12-20 Wei新增
+                WHEN TR1.LMSPBK >= 0
+                THEN ',"RepayBank":"'
+                     || TR1.LMSPBK
+                     || '"'
+              ELSE ''
+              END
+           || --  收據號碼 2022-12-20 Wei新增
+              ',"RECPNO":"'
+              || TR1.RECPNO
+              || '"' 
+           || --  代收繳款方式 2022-12-20 Wei新增
+              ',"PAYCOD":"'
+              || TR1.PAYCOD
+              || '"'
            || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000  
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  

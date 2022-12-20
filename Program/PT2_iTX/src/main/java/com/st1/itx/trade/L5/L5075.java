@@ -98,7 +98,7 @@ public class L5075 extends TradeBuffer {
 		this.limit = 100;// 查全部
 
 //		String IsMainFin=titaVo.getParam("IsMainFin").trim(); //是否為最大債權 1:Y;2:N
-		String WorkSubject = titaVo.getParam("WorkSubject").trim(); // 作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
+		String WorkSubject=titaVo.getParam("WorkSubject").trim(); //作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
 		String NextPayDate = titaVo.getParam("NextPayDate").trim(); // 1:滯繳- 逾期基準日;2:應繳-下次應繳日
 //		String CustId=titaVo.getParam("CustId").trim(); //員工編號
 
@@ -110,8 +110,12 @@ public class L5075 extends TradeBuffer {
 			for (NegMain NegMainVO : lNegMain) {
 				int ThisCustNo = NegMainVO.getCustNo();
 				CustMain CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
-				String ThisCustId = CustMainVO.getCustId();
-				String ThisCustName = StringCut.replaceLineUp(CustMainVO.getCustName());
+				String ThisCustId = "";
+				String ThisCustName = "";
+				if (CustMainVO != null) {
+					ThisCustId = CustMainVO.getCustId();
+					ThisCustName = StringCut.replaceLineUp(CustMainVO.getCustName());
+				}
 
 				NegTrans NegTransVO = new NegTrans();
 
@@ -156,15 +160,17 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOCustComAddr", "");// 債務人通訊地址
 				if ("1".equals(WorkSubject)) {// 滯繳才需帶出聯徵通訊地址
 					int rcdate = NegMainVO.getApplDate() + 19110000;
-					if ("1".equals(NegMainVO.getCaseKindCode())) {// 案件種類:債協
-						JcicZ048 tJcicZ048 = sJcicZ048Service.forL5075First(ThisCustId, rcdate, titaVo);
-						if (tJcicZ048 != null) {
-							occursList.putParam("OOCustComAddr", tJcicZ048.getCustComAddr());// 債務人通訊地址
-						}
-					} else {// 案件種類:前置調解
-						JcicZ444 tJcicZ444 = sJcicZ444Service.forL5075First(ThisCustId, rcdate, titaVo);
-						if (tJcicZ444 != null) {
-							occursList.putParam("OOCustComAddr", tJcicZ444.getCustComAddr());// 債務人通訊地址
+					if (!("").equals(ThisCustId)) {
+						if ("1".equals(NegMainVO.getCaseKindCode())) {// 案件種類:債協
+							JcicZ048 tJcicZ048 = sJcicZ048Service.forL5075First(ThisCustId, rcdate, titaVo);
+							if (tJcicZ048 != null) {
+								occursList.putParam("OOCustComAddr", tJcicZ048.getCustComAddr());// 債務人通訊地址
+							}
+						} else {// 案件種類:前置調解
+							JcicZ444 tJcicZ444 = sJcicZ444Service.forL5075First(ThisCustId, rcdate, titaVo);
+							if (tJcicZ444 != null) {
+								occursList.putParam("OOCustComAddr", tJcicZ444.getCustComAddr());// 債務人通訊地址
+							}
 						}
 					}
 				}

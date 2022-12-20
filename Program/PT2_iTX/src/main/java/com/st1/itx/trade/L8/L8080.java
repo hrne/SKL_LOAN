@@ -31,14 +31,14 @@ public class L8080 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public TxAmlLogService txAmlLogService;
+	TxAmlLogService txAmlLogService;
 	@Autowired
-	public L8080ServiceImpl l8080ServiceImpl;
+	L8080ServiceImpl l8080ServiceImpl;
 
 	@Autowired
 	Parse parse;
 	@Autowired
-	public CheckAml checkAml;
+	CheckAml checkAml;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -65,7 +65,7 @@ public class L8080 extends TradeBuffer {
 
 		if (resultList != null && resultList.size() != 0) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (resultList.size() == this.limit && hasNext()) {
+			if (l8080ServiceImpl.hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
@@ -114,25 +114,4 @@ public class L8080 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-	private Boolean hasNext() {
-		Boolean result = true;
-
-		int times = this.index + 1;
-		int cnt = l8080ServiceImpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
-
-		return result;
-	}
-
 }

@@ -134,7 +134,7 @@ public class L4454ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,c.\"CustName\"                 AS \"CustName\"        ";
 			sql += " ,2                              AS \"RepayCode\" ";
 			sql += " ,decode(nvl(d.\"RepayType\", 0),5,'Y',' ') AS \"FireFeeSuccess\"  "; // Y-火險費成功、期款失敗
-			sql += " ,decode(nvl(coll.\"PrevIntDate\", 0), 0, coll.\"PrevIntDate\" - 19110000) AS \"CollPrevIntDate\"     ";
+			sql += " ,decode(nvl(coll.\"PrevIntDate\", 0), 0, 0, coll.\"PrevIntDate\" - 19110000) AS \"CollPrevIntDate\"     ";
 			sql += " ,ROW_NUMBER() OVER (Partition By b.\"CustNo\", b.\"FacmNo\", b.\"RepayType\" ORDER BY b.\"PayIntDate\") AS \"RowNumber\"  ";
 			sql += " from \"BankDeductDtl\" b                               ";
 			sql += " left join \"CustMain\" c on c.\"CustNo\" = b.\"CustNo\"";

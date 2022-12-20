@@ -20,7 +20,6 @@ import com.st1.itx.util.MySpring;
 @Service("L9703")
 @Scope("prototype")
 public class L9703 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9703.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

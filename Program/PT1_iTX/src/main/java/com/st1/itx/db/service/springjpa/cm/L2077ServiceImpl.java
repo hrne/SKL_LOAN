@@ -35,18 +35,6 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private DateUtil dateUtil;
 
-	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
-	private int limit;
-
-	// *** 折返控制相關 ***
-	private int cnt;
-
-	// *** 折返控制相關 ***
-	private int size;
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
@@ -92,22 +80,6 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query.setParameter("type", iType);
 		this.info("L2077Service FindData=" + query);
 
-		cnt = query.getResultList().size();
-		this.info("Total cnt ..." + cnt);
-
-		// *** 折返控制相關 ***
-		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-		query.setFirstResult(this.index * this.limit);
-
-		// *** 折返控制相關 ***
-		// 設定每次撈幾筆,需在createNativeQuery後設定
-		query.setMaxResults(this.limit);
-
-		List<Object> result = query.getResultList();
-
-		size = result.size();
-		this.info("Total size ..." + size);
-
 		return switchback(query);
 	}
 
@@ -116,9 +88,5 @@ public class L2077ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.limit = limit;
 
 		return findAll(titaVo);
-	}
-
-	public int getSize() {
-		return cnt;
 	}
 }

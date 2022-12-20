@@ -234,7 +234,6 @@ public class L3922 extends TradeBuffer {
 				v.setEndDate(iEntryDate);
 				iListCloseBreach.add(v);
 
-				//
 				for (CalcRepayIntVo c : lCalcRepayIntVo) {
 					OccursList occursList = new OccursList();
 					oIntStartDate = c.getStartDate() < oIntStartDate ? c.getStartDate() : oIntStartDate;
@@ -268,6 +267,9 @@ public class L3922 extends TradeBuffer {
 			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtAll(iEntryDate, iCustNo, iFacmNo, iBormNo,
 					iListCloseBreach, titaVo);
 		}
+
+		String BreachDescription = "";
+		int wkFacmNo = 0;
 		// 清償違約金
 		if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 			for (LoanCloseBreachVo v : oListCloseBreach) {
@@ -275,6 +277,19 @@ public class L3922 extends TradeBuffer {
 					oCloseBreachAmt = oCloseBreachAmt.add(v.getCloseBreachAmt());
 					oCloseBreachAmtPaid = oCloseBreachAmtPaid.add(v.getCloseBreachAmtPaid());
 					oCloseBreachAmtUnpaid = oCloseBreachAmtUnpaid.add(v.getCloseBreachAmtUnpaid());
+					if (wkFacmNo != v.getFacmNo()) {
+						wkFacmNo = v.getFacmNo();
+						FacMain tFacMain = facMainService.findById(new FacMainId(iCustNo, v.getFacmNo()), titaVo);
+						if (!BreachDescription.isEmpty()) {
+							BreachDescription = BreachDescription + "，";
+						}
+						BreachDescription = BreachDescription + "額度:" + tFacMain.getFacmNo();
+						if (tFacMain.getProhibitMonth() == 0) {
+							BreachDescription = BreachDescription + " 無";
+						} else {
+							BreachDescription = BreachDescription + tFacMain.getProhibitMonth() + "個月";
+						}
+					}
 				}
 			}
 		}
@@ -355,17 +370,7 @@ public class L3922 extends TradeBuffer {
 				}
 			}
 		}
-		FacMain tFacMain = new FacMain();
-		String BreachDescription = "";
-		if (iFacmNo == 0) {
-			tFacMain = facMainService.findLastFacmNoFirst(iCustNo, titaVo);
-		} else {
-			tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
-		}
-		if (tFacMain != null) {
-			BreachDescription = loanCloseBreachCom.getBreachDescription(tFacMain.getProdNo(), titaVo);
-		}
-		this.info("清償違約說明= " + BreachDescription);
+
 		this.totaVo.putParam("OOvDuTrfPrincipal", wkOvduPrinAmt);
 		this.totaVo.putParam("OOvduAmt", wkOvduAmt);
 		this.totaVo.putParam("OOvduBal", wkOvduBal);

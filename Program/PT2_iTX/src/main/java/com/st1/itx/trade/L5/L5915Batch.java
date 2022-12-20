@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.trade.LP.LP005Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -27,6 +28,9 @@ public class L5915Batch extends TradeBuffer {
 	L5915Report l5915Report;
 
 	@Autowired
+	LP005Report lP005Report;
+
+	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
@@ -42,7 +46,15 @@ public class L5915Batch extends TradeBuffer {
 
 		boolean isFinish = l5915Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", (isFinish ? "LC009" : "L5915"), titaVo.getTlrNo(), TRAN_CODE + TRAN_NAME + (isFinish ? "已完成" : "查無資料"), titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", (isFinish ? "LC009" : "L5915"),
+				titaVo.getTlrNo(), TRAN_CODE + TRAN_NAME + (isFinish ? "已完成" : "查無資料"), titaVo);
+
+		lP005Report.setTxBuffer(this.getTxBuffer());
+		lP005Report.setParentTranCode("L5915");
+		lP005Report.exec(titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				"LP005房貸協辦人員考核核算底稿已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

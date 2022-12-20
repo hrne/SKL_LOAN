@@ -87,6 +87,7 @@ public class L3721 extends TradeBuffer {
 //	private String iProdName;
 	private String iBaseRateCode;
 	private String iIncrFlag;
+	private String iChangFg;
 	private BigDecimal iBaseRate;
 //	private BigDecimal iProdRate;
 	private BigDecimal iFitRate;
@@ -148,6 +149,7 @@ public class L3721 extends TradeBuffer {
 		iIncrFlag = titaVo.getParam("IncrFlag2");
 		iBaseRate = this.parse.stringToBigDecimal(titaVo.getParam("BaseRate2"));
 //		iProdRate = this.parse.stringToBigDecimal(titaVo.getParam("ProdRate2"));
+		iChangFg = titaVo.get("ChangFg");
 
 		if (iBormNo > 0) {
 			iBormNoS = iBormNo;
@@ -160,31 +162,30 @@ public class L3721 extends TradeBuffer {
 			iIndividualIncr = BigDecimal.ZERO;
 			iRateIncr = BigDecimal.ZERO;
 		}
-
 		// 指標利率
 		else {
-			// 輸入加碼利率
-			if (this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2")).compareTo(BigDecimal.ZERO) != 0) {
+			//變動合約加減碼 Y/N
+			if ("Y".equals(iChangFg)) {
 				// 利率按合約
 				if ("Y".equals(iIncrFlag)) {
 					iIndividualIncr = BigDecimal.ZERO;
 					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
-					iFitRate = iBaseRate.add(iRateIncr);
+					iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
+				} else {
+					iIndividualIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
+					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
+					iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
+				}
+			} else {
+				// 利率按合約
+				if ("Y".equals(iIncrFlag)) {
+					iIndividualIncr = BigDecimal.ZERO;
+					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
+					iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
 				} else {
 					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr1"));
 					iIndividualIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr2"));
-					iFitRate = iBaseRate.add(iIndividualIncr);
-				}
-			}
-			// 輸入適用利率
-			else {
-				iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
-				if ("Y".equals(iIncrFlag)) {
-					iIndividualIncr = BigDecimal.ZERO;
-					iRateIncr = iFitRate.subtract(iBaseRate);
-				} else {
-					iRateIncr = this.parse.stringToBigDecimal(titaVo.getParam("RateIncr1"));
-					iIndividualIncr = iFitRate.subtract(iBaseRate);
+					iFitRate = this.parse.stringToBigDecimal(titaVo.getParam("FitRate2"));
 				}
 			}
 		}

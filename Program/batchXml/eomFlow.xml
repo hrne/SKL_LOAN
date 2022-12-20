@@ -76,23 +76,20 @@
 		<step id="l7Ias39LoanCommitUpd" parent="parentStep">
 			<tasklet ref="L7Ias39LoanCommitUpd" />
 			<end on="FAILED" />
-			<next on="COMPLETED" to="splitJcic1" />
+			<next on="COMPLETED" to="l8JcicB201Upd" />
 		</step>
 
 		<!-- 聯徵申報月檔 -->
-		<split id="splitJcic1" task-executor="taskExecutor"
-			next="splitJcic2">
-			<flow>
-				<step id="l8JcicB201Upd" parent="parentStep">
-					<tasklet ref="L8JcicB201Upd" />
-				</step>
-			</flow>
-			<flow>
-				<step id="l8JcicB207Upd" parent="parentStep">
-					<tasklet ref="L8JcicB207Upd" />
-				</step>
-			</flow>
-		</split>
+		<step id="l8JcicB201Upd" parent="parentStep">
+			<tasklet ref="L8JcicB201Upd" />
+			<end on="FAILED" />
+			<next on="COMPLETED" to="l8JcicB207Upd" />
+		</step>
+		<step id="l8JcicB207Upd" parent="parentStep">
+			<tasklet ref="L8JcicB207Upd" />
+			<end on="FAILED" />
+			<next on="COMPLETED" to="splitJcic2" />
+		</step>
 
 		<split id="splitJcic2" task-executor="taskExecutor"
 			next="l8JcicB090Upd">

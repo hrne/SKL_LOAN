@@ -1,6 +1,10 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -12,6 +16,7 @@ import com.st1.itx.db.domain.PfBsOfficer;
 import com.st1.itx.db.domain.PfBsOfficerId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfBsOfficerService;
+import com.st1.itx.db.service.springjpa.cm.L5R10ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 
 @Service("L5R10")
@@ -26,10 +31,13 @@ public class L5R10 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdEmpService sCdEmpService;
+	CdEmpService sCdEmpService;
 
 	@Autowired
-	public PfBsOfficerService iPfBsOffcierService;
+	PfBsOfficerService iPfBsOffcierService;
+
+	@Autowired
+	L5R10ServiceImpl l5R10ServiceImpl;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -58,6 +66,27 @@ public class L5R10 extends TradeBuffer {
 			totaVo.putParam("L5R10SmryGoalAmt", rPfBsOfficer.getSmryGoalAmt()); // 累計目標金額
 			totaVo.putParam("L5R10StationName", rPfBsOfficer.getStationName()); // 駐在地
 		}
+		List<Map<String, String>> resultList = l5R10ServiceImpl.doQuery(titaVo);
+
+		BigDecimal pfCnt = BigDecimal.ZERO;
+		BigDecimal drawdownAmt = BigDecimal.ZERO;
+
+		if (resultList != null && !resultList.isEmpty()) {
+			Map<String, String> result = resultList.get(0);
+			try {
+				pfCnt = new BigDecimal(result.get("PfCnt"));
+			} catch (Exception e) {
+				pfCnt = BigDecimal.ZERO;
+			}
+			try {
+				drawdownAmt = new BigDecimal(result.get("DrawdownAmt"));
+			} catch (Exception e) {
+				drawdownAmt = BigDecimal.ZERO;
+			}
+		}
+
+		totaVo.putParam("L5R10PfCnt", pfCnt); // 房貸撥款件數
+		totaVo.putParam("L5R10DrawdownAmt", drawdownAmt); // 房貸撥款金額
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -153,7 +153,11 @@ BEGIN
            ELSE '20' END                  AS "LandUsageType"       -- 使用地類別 VARCHAR2 2  
           ,''                             AS "LandUsageCode"       -- 土地使用別 VARCHAR2 1  
           ,NVL(S2."LGTVAL",0)             AS "PostedLandValue"     -- 公告土地現值 DECIMAL 16 2 
-          ,NVL(S2."LGTVYM",0)             AS "PostedLandValueYearMonth" -- 公告土地現值年月 DECIMAL 6  
+          ,CASE
+             -- 2022-12-20 Wei 新增 舊資料有392612以上的資料
+             WHEN NVL(S2."LGTVYM",0) >= (191100 * 2)
+             THEN NVL(S2."LGTVYM",0) - 191100
+           ELSE NVL(S2."LGTVYM",0) END    AS "PostedLandValueYearMonth" -- 公告土地現值年月 DECIMAL 6  
           ,NVL(S2."LGTTYR",0)             AS "TransferedYear"      -- 移轉年度 DECIMAL 4  
           ,NVL(S2."LGTPTA",0)             AS "LastTransferedAmt"   -- 前次移轉金額 DECIMAL 16 2 
           ,NVL(S2."LGTTAX",0)             AS "LVITax"              -- 土地增值稅 DECIMAL 16 2 

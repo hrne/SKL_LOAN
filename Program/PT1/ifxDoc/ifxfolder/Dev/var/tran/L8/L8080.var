@@ -47,6 +47,8 @@ K(MODIFYBUTTON,查詢)
 ["#FdStatus+狀態",#Status,#StatusX],
 ["#FdAcDate1+會計日期",#AcDate1,"~",#AcDate2],
 ["#FdTypeCode+類別",#TypeCode,#TypeCodeX],
+["#FdCustId+客戶ID",#CustId],
+["#FdCustNo+戶號",#CustNo],
 ]
 !["@顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
@@ -64,6 +66,10 @@ T(3,*)
 T(3,*)
 #FdTypeCode=X,2,L
 T(3,*)
+#FdCustId=X,2,L
+T(3,)
+#FdCustNo=X,2,L
+T(3,)
 
 !AmlCheckItem
 #CDCODEAmlCheckItem=x,25,S
@@ -128,8 +134,12 @@ V(H,#TypeCodeHelp)
 #TypeCodeX=X,10,L
 T(3,)T(H,#TypeCode,#TypeCodeHelp)
 
-#iCustId=X,10,S
-#iCustNo=A,7,S
+!客戶ID
+#CustId=X,10,I
+@C(4,#CustId,$,A(ID_UNINO,0,#CustId))
+
+!戶號
+#CustNo=A,7,I
 
 #RPTFG=A,1,S
 E(0,0)
@@ -268,8 +278,8 @@ T(3,L8100)
 #AcDate1
 #AcDate2
 #TypeCode
-#iCustId
-#iCustNo
+#CustId
+#CustNo
 #END
 </sub>
 

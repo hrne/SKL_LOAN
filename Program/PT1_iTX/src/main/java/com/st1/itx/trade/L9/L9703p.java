@@ -48,7 +48,7 @@ public class L9703p extends TradeBuffer {
 		l9703report.exec(titaVo, this.getTxBuffer());
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO") + parentTranCode, tran + " 滯繳客戶明細表 已完成", titaVo);
+				titaVo.getParam("TLRNO") + tran, tran + " 滯繳客戶明細表 已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

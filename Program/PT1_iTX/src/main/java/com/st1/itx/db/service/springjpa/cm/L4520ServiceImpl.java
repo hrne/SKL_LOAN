@@ -151,7 +151,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          \"TitaTlrNo\"," ; 
 		sql += "          \"TitaTxtNo\"," ; 
 		sql += "          DECODE(\"AcSeq\",1,1,2), " ;
-		sql += "          \"AcctCode\"," ;
+		sql += "          \"AcctCode\"" ;
 		sql += "  )";
 		sql += "  SELECT ";
 		sql += "  MIN(substr(ed.\"TitaTxtNo\", 0, 2)) AS \"BaTxNo\",";
