@@ -65,7 +65,8 @@ public class L4R30 extends TradeBuffer {
 					this.totaVo.putParam("L4R30CalTime", tPostAuthLogHistory.getProcessTime());
 				} else {
 					ProcessTime = "" + tPostAuthLogHistory.getProcessTime();
-					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":" + ProcessTime.substring(4, 6);
+					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
+							+ ProcessTime.substring(4, 6);
 					this.totaVo.putParam("L4R30CalTime", ProcessTime);
 				}
 
@@ -78,12 +79,15 @@ public class L4R30 extends TradeBuffer {
 				this.totaVo.putParam("L4R30LastUpdate", sLastUpdate);
 				this.totaVo.putParam("L4R30StampCancelDate", tPostAuthLogHistory.getStampCancelDate());
 				this.totaVo.putParam("L4R30LimitAmt", tPostAuthLogHistory.getLimitAmt());
+				this.totaVo.putParam("L4R30AuthApplCode", tPostAuthLogHistory.getAuthApplCode());
 
 			} else {
 				throw new LogicException("E0001", "PostAuthLogHistory");
 			}
 
 		} else {
+
+			String wkAuthApplCode = "";
 			PostAuthLog tPostAuthLog = new PostAuthLog();
 			PostAuthLogId tPostAuthLogId = new PostAuthLogId();
 			tPostAuthLogId.setAuthCreateDate(iAuthCreateDate);
@@ -110,7 +114,8 @@ public class L4R30 extends TradeBuffer {
 					this.totaVo.putParam("L4R30CalTime", tPostAuthLog.getProcessTime());
 				} else {
 					ProcessTime = "" + tPostAuthLog.getProcessTime();
-					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":" + ProcessTime.substring(4, 6);
+					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"
+							+ ProcessTime.substring(4, 6);
 					this.totaVo.putParam("L4R30CalTime", ProcessTime);
 				}
 
@@ -124,6 +129,15 @@ public class L4R30 extends TradeBuffer {
 				this.totaVo.putParam("L4R30StampCancelDate", tPostAuthLog.getStampCancelDate());
 				this.totaVo.putParam("L4R30LimitAmt", tPostAuthLog.getLimitAmt());
 
+				wkAuthApplCode = tPostAuthLog.getAuthApplCode();
+				if (tPostAuthLog.getDeleteDate() > 0) {
+					if ("00".equals(tPostAuthLog.getAuthErrorCode())) {
+						wkAuthApplCode = "9";
+					} else {
+						wkAuthApplCode = "2";
+					}
+				}
+				this.totaVo.putParam("L4R30AuthApplCode", wkAuthApplCode);
 			} else {
 				throw new LogicException("E0001", "PostAuthLog");
 			}

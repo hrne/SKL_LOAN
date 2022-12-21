@@ -50,7 +50,7 @@ public class L8950ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      a.\"LastUpdateEmpNo\" as \"LastUpdateEmpNo\",  ";
 		sql += "      d.\"Fullname\" as \"LastUpdateEmpName\"   ";
 		sql += "     from \"TbJcicMu01\" a";
-		sql += "     left join \"CdBank\" b on a.\"HeadOfficeCode\" = b.\"BankCode\" ";
+		sql += "     left join \"CdBank\" b on a.\"HeadOfficeCode\" = b.\"BankCode\" and b.\"BranchCode\"='    ' ";
 		sql += "     left join \"CdEmp\" c on a.\"EmpId\" = c.\"EmployeeNo\" ";
 		sql += "     LEFT JOIN \"CdEmp\" d ON A.\"LastUpdateEmpNo\" = D.\"EmployeeNo\" ";
 		if (!"".equals(iEmpId) || iDataDate > 19110000) {

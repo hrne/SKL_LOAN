@@ -240,6 +240,8 @@ T(H,@OOStatusX,#OOStatus,#AuthStatusCodeHelp)
 T(H,#OOCreateFlag,#AuthApplCodeHelp)
 ! SWITCH(#OOCreateFlag,1,T(2,申請),2,T(2,終止),9,T(2,暫停),T(2,))
 
+#OOCreateFlagR=X,1,O
+
 #OOAuthCreateDate=D,7,O
 
 #OOPropDate=D,7,O
@@ -283,32 +285,38 @@ T(1,#OOTitaTxCd,1,2)
 
 ! #OOBUF_CREAT=X,1,S 改由上方畫面新增
 ! T(2,1)
-#OOBUF_EDIT=X,45,S
+#OOBUF_EDIT=X,100,S
 T(2,2
 +#OOAuthCreateDate
-+#OOCreateFlag
++#OOCreateFlagR
 +#OOCustNo
 +#OOPostDepCode
 +#OORepayAcctLog
 +#OOAuthType
++00000000000
++#OOCreateFlag
 )
-#OOBUF_DELETE=X,45,S
+#OOBUF_DELETE=X,100,S
 T(2,4
 +#OOAuthCreateDate
-+#OOCreateFlag
++#OOCreateFlagR
 +#OOCustNo
 +#OOPostDepCode
 +#OORepayAcctLog
 +#OOAuthType
++00000000000
++#OOCreateFlagR
 )
-#OOBUF_SEARCH=X,45,S
+#OOBUF_SEARCH=X,100,S
 T(2,5
 +#OOAuthCreateDate
-+#OOCreateFlag
++#OOCreateFlagR
 +#OOCustNo
 +#OOPostDepCode
 +#OORepayAcctLog
 +#OOAuthType
++00000000000
++#OOCreateFlagR
 )
 
 
@@ -378,6 +386,7 @@ TXFORM=L4043
 #OOAcctSeq
 #OOCustId
 #OOCreateFlag
+#OOCreateFlagR
 #OOAuthCreateDate
 #OOPropDate
 #OORetrDate

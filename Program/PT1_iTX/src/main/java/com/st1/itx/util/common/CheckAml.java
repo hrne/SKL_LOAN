@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -76,7 +77,6 @@ public class CheckAml extends TradeBuffer {
 	// connect AML status
 	private boolean connectSuccess;
 
-	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("CheckAml run ... ");
 
@@ -117,6 +117,24 @@ public class CheckAml extends TradeBuffer {
 
 		txAmlLog.setMsgRg(msgrq);
 		txAmlLog.setMsgRs(msgrs);
+
+		String custKey = checkAmlVo.getCustKey();
+
+		if (custKey != null && !custKey.isEmpty()) {
+			txAmlLog.setCustId(custKey);
+		}
+
+		String refNo = checkAmlVo.getRefNo();
+		if (refNo != null && !refNo.isEmpty()) {
+			int custNo = 0;
+
+			try {
+				custNo = Integer.parseInt(refNo);
+			} catch (Exception e) {
+				custNo = 0;
+			}
+			txAmlLog.setCustNo(custNo);
+		}
 
 		if (amlflag == 1) {
 			txAmlLog.setConfirmStatus("1");
@@ -436,6 +454,7 @@ public class CheckAml extends TradeBuffer {
 		return checkAmlVo;
 	}
 
+	@SuppressWarnings("unchecked")
 	private TxAmlLog parseResult(Document doc, TxAmlLog txAmlLog) throws LogicException {
 //		Document doc = convertStringToXml(msgrs);		
 
@@ -443,7 +462,7 @@ public class CheckAml extends TradeBuffer {
 			String ResultString = getXmlValue(doc, "AML_SCAN_QUERY_FirstResult");
 
 			try {
-				HashMap<String, Object> ResultMap = new ObjectMapper().readValue(ResultString, HashMap.class);
+				Map<String, Object> ResultMap = new ObjectMapper().readValue(ResultString, HashMap.class);
 
 				txAmlLog.setStatus(ResultMap.get("Status").toString());
 				txAmlLog.setStatusCode(ResultMap.get("Status_Code").toString());
@@ -539,7 +558,8 @@ public class CheckAml extends TradeBuffer {
 		SvcRq = appendChildElement(doc, SvcRq, "Notify_Email", checkAmlVo.getNotifyEmail());
 		SvcRq = appendChildElement(doc, SvcRq, "Query_Id", checkAmlVo.getQueryId());
 		SvcRq = appendChildElement(doc, SvcRq, "Source_Id", checkAmlVo.getSourceId());
-		SvcRq = appendChildElement(doc, SvcRq, "Modify_Date", String.format("%08d%06d", dateUtil.getNowIntegerRoc(), dateUtil.getNowIntegerForBC()));
+		SvcRq = appendChildElement(doc, SvcRq, "Modify_Date",
+				String.format("%08d%06d", dateUtil.getNowIntegerRoc(), dateUtil.getNowIntegerForBC()));
 		SvcRq = appendChildElement(doc, SvcRq, "InsrNHdr_Same", checkAmlVo.getInsrNHdrSame());
 		SvcRq = appendChildElement(doc, SvcRq, "Role_Status", checkAmlVo.getRoleStatus());
 

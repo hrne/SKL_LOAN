@@ -211,13 +211,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findDtlEntryDate " + dbName + " : " + "dtlEntryDate_0 : " + dtlEntryDate_0 + " dtlEntryDate_1 : " +  dtlEntryDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = mlaundryChkDtlReposDay.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByFactorAscDtlEntryDateAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
+      slice = mlaundryChkDtlReposDay.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByDtlEntryDateAscFactorAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = mlaundryChkDtlReposMon.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByFactorAscDtlEntryDateAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
+      slice = mlaundryChkDtlReposMon.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByDtlEntryDateAscFactorAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = mlaundryChkDtlReposHist.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByFactorAscDtlEntryDateAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
+      slice = mlaundryChkDtlReposHist.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByDtlEntryDateAscFactorAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
     else 
-      slice = mlaundryChkDtlRepos.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByFactorAscDtlEntryDateAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
+      slice = mlaundryChkDtlRepos.findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByDtlEntryDateAscFactorAscCustNoAscDtlSeqAsc(dtlEntryDate_0, dtlEntryDate_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

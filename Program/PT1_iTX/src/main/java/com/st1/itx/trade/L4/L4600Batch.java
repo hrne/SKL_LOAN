@@ -542,8 +542,7 @@ public class L4600Batch extends TradeBuffer {
 			subArea = tClBuilding.getBdSubArea();
 			occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
 			occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 56));
-			occursList.putParam("BuildingSquare",
-					FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
+			occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea), 9));
 			occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
 			occursList.putParam("BuildingYears", FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
 			occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getTotalFloor(), 2));

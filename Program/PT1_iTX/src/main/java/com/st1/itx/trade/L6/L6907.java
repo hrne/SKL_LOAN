@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L6;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -179,6 +180,12 @@ public class L6907 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", parse.stringToStringDateTime(tAcReceivable.get("LastUpdate")));
 			// 最後修改人員 OOLastEmp
 			occursList.putParam("OOLastEmp", tAcReceivable.get("LastUpdateEmpNo"));
+			
+			occursList.putParam("OOGetFeeTxt", "");
+			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
+					&& parse.stringToBigDecimal(tAcReceivable.get("RvBal")).compareTo(BigDecimal.ZERO) > 0) {
+				occursList.putParam("OOGetFeeTxt", "未收");
+			}
 
 			this.totaVo.addOccursList(occursList);
 

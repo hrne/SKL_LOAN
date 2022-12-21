@@ -806,6 +806,7 @@ T(2,#L2r01IncrFlag)
 !N:輸入適用利率自動顯示利率加減碼，輸入利率加減碼顯示適用利率
 #ChangFg=X,1,I
 C(3,#BaseRateCode2,99,S,$)
+T(3,N)
 HELP(#YNHelp)
 @
 V(H,#YNHelp)

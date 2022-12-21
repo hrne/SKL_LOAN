@@ -48,7 +48,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
 T(1,@AuthCreateDate,#NTXBUF,2,7)
 T(1,@AuthApplCode,#NTXBUF,9,1)
-T(1,@AuthApplCodeTemp,#NTXBUF,9,1)
+T(1,@AuthApplCodeTemp,#NTXBUF,44,1)
 T(1,@CustNo,#NTXBUF,10,7)
 T(1,@PostDepCode,#NTXBUF,17,1)
 T(1,@RepayAcct,#NTXBUF,18,14)
@@ -158,7 +158,6 @@ T(2,@StampCodeHelp,#HelpDesc6)
 T(2,@AuthErrorCodeHelp,#HelpDesc7)
 T(2,@AmlRspHelp,#HelpDesc8)
 
-
 #RimRepayAcct=A,14,S
 #RimAuthCode=A,1,S
 #RimLogNo=A,11,S
@@ -193,6 +192,7 @@ T(2,@LastUpdateEmpNo,#L4R30LastUpdateEmpNo)
 T(2,@LastUpdate,#L4R30LastUpdate)
 T(2,@StampCancelDate,#L4R30StampCancelDate)
 E(0,@LimitAmt,#L4R30LimitAmt)
+T(2,@AuthApplCode,#L4R30AuthApplCode)
 
 #RimTxCode=X,5,S
 T(2,L4412)

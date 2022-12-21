@@ -35,7 +35,7 @@ public interface MlaundryChkDtlRepositoryMon extends JpaRepository<MlaundryChkDt
   public Slice<MlaundryChkDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndFactorIsAndCustNoIsOrderByEntryDateAscDtlSeqAsc(int entryDate_0, int entryDate_1, int factor_2, int custNo_3, Pageable pageable);
 
   // DtlEntryDate >= ,AND DtlEntryDate <= 
-  public Slice<MlaundryChkDtl> findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByFactorAscDtlEntryDateAscCustNoAscDtlSeqAsc(int dtlEntryDate_0, int dtlEntryDate_1, Pageable pageable);
+  public Slice<MlaundryChkDtl> findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualOrderByDtlEntryDateAscFactorAscCustNoAscDtlSeqAsc(int dtlEntryDate_0, int dtlEntryDate_1, Pageable pageable);
 
   // DtlEntryDate >= ,AND DtlEntryDate <= ,AND Factor =
   public Slice<MlaundryChkDtl> findAllByDtlEntryDateGreaterThanEqualAndDtlEntryDateLessThanEqualAndFactorIsOrderByDtlEntryDateAscCustNoAscDtlSeqAsc(int dtlEntryDate_0, int dtlEntryDate_1, int factor_2, Pageable pageable);
