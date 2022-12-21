@@ -71,7 +71,7 @@ public class MlaundryDetail implements Serializable {
   private int managerDate = 0;
 
   // 主管覆核日期
-  /* 主管覆核=N時自動顯示當天日期,主管覆核=Y時與主管同意日期相同 */
+  /* 主管覆核=N時為覆核當天日期,主管覆核=Y時與主管同意日期相同 */
   @Column(name = "`ManagerCheckDate`")
   private int managerCheckDate = 0;
 
@@ -292,7 +292,7 @@ N:不同意
 
 /**
 	* 主管覆核日期<br>
-	* 主管覆核=N時自動顯示當天日期,主管覆核=Y時與主管同意日期相同
+	* 主管覆核=N時為覆核當天日期,主管覆核=Y時與主管同意日期相同
 	* @return Integer
 	*/
   public int getManagerCheckDate() {
@@ -301,7 +301,7 @@ N:不同意
 
 /**
 	* 主管覆核日期<br>
-	* 主管覆核=N時自動顯示當天日期,主管覆核=Y時與主管同意日期相同
+	* 主管覆核=N時為覆核當天日期,主管覆核=Y時與主管同意日期相同
   *
   * @param managerCheckDate 主管覆核日期
   * @throws LogicException when Date Is Warn	*/

@@ -42,13 +42,12 @@ public class L8351File extends MakeFile {
 		String filecode = "L8351";
 		String fileitem = "暫定每月產檔";
 		// 檔名
-		String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
-
+		//String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
+		String filename = iSubmitKey + iTxtDate.substring(3,7) + ".MU1";
 		this.open(titaVo, date, brno, filecode, fileitem, filename, 2);
 		// 用String.format()
 		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 
-		
 		// 第一行
 		String iContactX = FormatUtil.padX("放款部聯絡人-張舜雯", 80);
 //		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s01          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);

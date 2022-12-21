@@ -48,10 +48,11 @@ public class L8950ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      a.\"LastUpdate\" as \"LastUpdate\" ,  ";
 		sql += "      a.\"CreateDate\" as \"CreateDate\",  ";
 		sql += "      a.\"LastUpdateEmpNo\" as \"LastUpdateEmpNo\",  ";
-		sql += "      c.\"Fullname\" as \"LastUpdateEmpName\"   ";
+		sql += "      d.\"Fullname\" as \"LastUpdateEmpName\"   ";
 		sql += "     from \"TbJcicMu01\" a";
 		sql += "     left join \"CdBank\" b on a.\"HeadOfficeCode\" = b.\"BankCode\" ";
 		sql += "     left join \"CdEmp\" c on a.\"EmpId\" = c.\"EmployeeNo\" ";
+		sql += "     LEFT JOIN \"CdEmp\" d ON A.\"LastUpdateEmpNo\" = D.\"EmployeeNo\" ";
 		if (!"".equals(iEmpId) || iDataDate > 19110000) {
 			sql += "  where  ";
 		}
@@ -59,25 +60,29 @@ public class L8950ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   a.\"EmpId\" =  :EmpId";
 		}
 		if (iDataDate > 19110000) {
+			if(!"".equals(iEmpId)) {
+				sql += " and";
+			}
 			sql += "  a.\"DataDate\" = :DataDate";
 		}
-		sql += "     order by \"LastUpdate\"";
+		sql+="     order by a.\"LastUpdate\"";
 
-		this.info("sql=" + sql);
-		Query query;
+	this.info("sql="+sql);
+
+	Query query;
 //		query = em.createNativeQuery(sql,L5051Vo.class);//進SQL 所以不要用.class (要用.class 就要使用HQL)
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
+	EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);query=em.createNativeQuery(sql);
 
-		if (!"".equals(iEmpId)) {
-			query.setParameter("EmpId", iEmpId);
-		}
-		if (iDataDate > 19110000) {
-			query.setParameter("DataDate", iDataDate);
-		}
-
-		return this.convertToMap(query);
-
+	if(!"".equals(iEmpId))
+	{
+		query.setParameter("EmpId", iEmpId);
+	}if(iDataDate>19110000)
+	{
+		query.setParameter("DataDate", iDataDate);
 	}
+
+	return this.convertToMap(query);
+
+}
 
 }
