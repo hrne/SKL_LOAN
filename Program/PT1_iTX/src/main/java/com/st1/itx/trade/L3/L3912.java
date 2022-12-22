@@ -188,8 +188,7 @@ public class L3912 extends TradeBuffer {
 			this.totaVo.putParam("OInterest", BigDecimal.ZERO.subtract(tLoanBorTx.getInterest()));
 			this.totaVo.putParam("ODelayInt", BigDecimal.ZERO.subtract(tLoanBorTx.getDelayInt()));
 			this.totaVo.putParam("OBreachAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getBreachAmt()));
-			this.totaVo.putParam("OTempRepay",
-					BigDecimal.ZERO.subtract(wkTempRepay));
+			this.totaVo.putParam("OTempRepay", BigDecimal.ZERO.subtract(wkTempRepay));
 			this.totaVo.putParam("ORepayAmt", BigDecimal.ZERO.subtract(wkRepayAmt));
 			this.totaVo.putParam("OCloseBreachAmt", BigDecimal.ZERO.subtract(tLoanBorTx.getCloseBreachAmt()));
 			this.totaVo.putParam("OExtraRepay", "-" + tLoanBorTx.getExtraRepay());
@@ -314,6 +313,12 @@ public class L3912 extends TradeBuffer {
 			slipSumNoX = "人工";
 		}
 		this.totaVo.putParam("OSlipSumNoX", slipSumNoX);
+		String ExcessiveX = "";
+		if (tTempVo.get("Excessive") != null) {
+			ExcessiveX = "本戶累溢收";
+		}
+		this.totaVo.putParam("OExcessive", tTempVo.getParam("Excessive"));
+		this.totaVo.putParam("OExcessiveX", ExcessiveX);
 
 		this.addList(this.totaVo);
 		return this.sendList();

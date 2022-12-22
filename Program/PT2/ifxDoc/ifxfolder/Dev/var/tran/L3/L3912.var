@@ -1196,6 +1196,15 @@ T(2,@L3731RateX,#ORateX)
 
 #OSlipSumNoX=x,10,L
 
+#OExcessive=+m,14.2,S
+
+#OExcessiveX=X,11,L
+
+#OExcessiveXX=X,22,L
+C(4,#OExcessiveX,S,$)
+CALL2(#ADJUSTDOT,#Precision,#OExcessive,#OExcessiveXX)
+
+
 !核決主管
 #L3731Supervisor=X,20,L
 
@@ -2084,6 +2093,8 @@ TXFORM=L3912
 #OSupervisorX
 #ORate
 #OSlipSumNoX
+#OExcessive
+#OExcessiveX
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 
@@ -2162,9 +2173,9 @@ TXFORM=L3912
 ["@利息",#L3200InterextX],["@火險費",#L3420FireFeeX,"@",#ORvNo],
 ["@延遲息",#L3200DelayIntX],["@法務費",#L3420LawFeeX],
 ["@違約金",#L3200BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
-["@溢收金額",#OOverflowX],["@部分償還金額",#L3200ExtraRepayX],
-["@短收金額",#OShortFallX],["@部分償還欠繳利息",#L3200ExtraUnpaidIntX],
-[#<->#,"@新攤還金額",#L3200NewDueAmtX],
+["@溢收金額",#OOverflowX],[""+#OExcessiveX,#OExcessiveXX],
+["@短收金額",#OShortFallX],["@部分償還金額",#L3200ExtraRepayX],
+["@新攤還金額",#L3200NewDueAmtX],["@部分償還欠繳利息",#L3200ExtraUnpaidIntX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
 ["@主管編號",#L3200SupperNo,#L3200SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
@@ -2187,7 +2198,7 @@ TXFORM=L3912
 [#<->#,"@延遲息",#L3712DelayIntX],
 [#<->#,"@違約金",#L3712BreachAmtX],
 [#<->#,"@減免金額",#L3712ReduceAmtX],
-[#<->#,"@累溢短收",#L3712OverflowX],
+["@溢短收",#L3712OverflowX],[""+#OExcessiveX,#OExcessiveXX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
 ["@主管編號",#L3410SupperNo,#L3410SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
@@ -2231,7 +2242,7 @@ TXFORM=L3912
 ["@利息",#L3410InterextX],["@火險費",#L3420FireFeeX,"@",#ORvNo],
 ["@延遲息",#L3410DelayIntX],["@法務費",#L3420LawFeeX],
 ["@違約金",#L3410BreachAmtX],["@清償違約金",#L3200CloseBreachAmtX],
-[#<->#,"@累溢短收",#L3410OverflowX],
+["@溢短收",#L3410OverflowX],[""+#OExcessiveX,#OExcessiveXX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
 ["@主管編號",#L3410SupperNo,#L3410SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
@@ -2249,7 +2260,7 @@ TXFORM=L3912
 [#<->#,"火險費用轉銷呆帳",#L3420FireFeeX],
 [#<->#,"法務費用轉銷呆帳",#L3420LawFeeX],
 [#<->#,"催收餘額轉銷呆帳",#L3420TrfOvDuAmt],
-[#<->#,"轉銷呆帳金額",#L3420TrfBadAmt],
+["轉銷呆帳金額",#L3420TrfBadAmt],[""+#OExcessiveX,#OExcessiveXX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
 ["@主管編號",#L3410SupperNo,#L3410SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
@@ -2273,7 +2284,7 @@ TXFORM=L3912
 [#<->#,"@延遲息",#L3440DelayIntX],
 ["@違約金",#L3440BreachAmtX],["@免印花稅金額",#OStampFreeAmtX],
 [#<->#,"@減免金額",#L3440ReduceAmtX],
-[#<->#,"@累溢短收",#L3440OverflowX],
+["@溢短收",#L3440OverflowX],[""+#OExcessiveX,#OExcessiveXX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
 ["@主管編號",#L3440SupperNo,#L3440SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
 ]
@@ -2289,7 +2300,8 @@ TXFORM=L3912
 ["@會計日期",#OAcctDate],["@入帳日期",#OEntryDateX],
 ["@額度編號",#OFacmNo],["@交易金額",#L3440TxAmtX],
 [#<->#,"@幣別",#OCurrencyCode],
-["@暫收借",#L3440TempAmtX],["@累溢收",#L3440OverflowX],
+[#<->#,"@暫收借",#L3440TempAmtX],
+["@溢收",#L3440OverflowX],[""+#OExcessiveX,#OExcessiveXX],
 [#<->#,"@帳管費",#L3420AcctFeeX],
 [#<->#,"@契變手續費",#L3420ModifyFeeX],
 [#<->#,"@火險費",#L3420FireFeeX,"@",#ORvNo],
@@ -2308,7 +2320,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 [#<->#,"@交易型態",#OSlipSumNoX],
 [#<->#,"@幣別",#OCurrencyCode],
-[#<->#,"@暫收款金額",#OTempRepayX],
+["@暫收款金額",#OTempRepayX],[""+#OExcessiveX,#OExcessiveXX],
 [#<->#,"@作業項目",#OTempItemCode,#L3220TempItemCodeX],
 [#<->#,"@摘要內容",#ODescription],
 [#<->#,"@匯款銀行",#L3100RemitBank,#L3100RemitBankX],
@@ -2330,7 +2342,7 @@ TXFORM=L3912
 [#<->#,"@作業項目",#OTempItemCode,#L3230TempItemCodeX],
 [#<->#,"@額度編號",#OFacmNo],
 [#<->#,"@幣別",#OCurrencyCode],
-[#<->#,"@暫收款金額",#OTempRepayX],
+["@暫收款金額",#OTempRepayX],[""+#OExcessiveX,#OExcessiveXX],
 [#<->#,"@摘要內容",#ODescription],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],
 ["@主管編號",#L3440SupperNo,#L3440SupperNoX],["@作業日期",#L3200TxDate,#L3200TxTimeX],
@@ -2343,7 +2355,8 @@ TXFORM=L3912
 [#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 [#<->#,"@交易型態",#OSlipSumNoX],
-["@會計日期",#OAcctDate],["@轉催收金額",#OTxAmtXX],
+[#<->#,"@會計日期",#OAcctDate],
+["@轉催收金額",#OTxAmtXX],[""+#OExcessiveX,#OExcessiveXX],
 ["@交易序號",#OTxtNo],["@銷帳編號",#ORvNo],
 ["@訂正別",#OHCode,#OHCodeX],["@還款來源",#ORepayCode,#ORepayCodeX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#OTxtNoX],

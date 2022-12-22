@@ -47,7 +47,10 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if ("1".equals(unpay)) {
 			st = parse.stringToInteger(titaVo.getParam("UnpaidTermSt"));
 			ed = parse.stringToInteger(titaVo.getParam("UnpaidTermEd"));
-		} else {
+		} else if("L4703".equals(titaVo.getTxcd())){
+			st = 0;
+			ed = 9999;
+		}else {
 			st = parse.stringToInteger(titaVo.getParam("UnpaidDaySt"));
 			ed = parse.stringToInteger(titaVo.getParam("UnpaidDayEd"));
 		}
@@ -80,7 +83,6 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 payIntDateEd  = " + payIntDateEd);
 		this.info("L9703 acdate     = " + acdate);
 		this.info("L9703 entryDate = " + entryDate);
-
 
 		String sql = "";
 		sql += "SELECT CC.\"CityItem\" AS \"CityItem\"";
@@ -140,7 +142,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AND T1.SEQ = 1                    ";
 
 		this.info("sql=" + sql);
-		
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
@@ -185,7 +187,9 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			condition += "         - TRUNC(MONTHS_BETWEEN(TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'), TO_DATE(19110100 + L.\"SpecificDd\", 'YYYYMMDD'))) ";
 			condition += "     END BETWEEN :st AND :ed ";
 		} else {
+
 			condition += "  AND (TO_DATE(:entryDate,'YYYYMMDD')  - TO_DATE(L.\"NextPayIntDate\",'YYYYMMDD'))  BETWEEN :st AND :ed ";
+
 		}
 		// repay == 0 時不篩選,
 		// repay == 9 時 篩選 RepayCode = 5,6,7,8
@@ -322,7 +326,6 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 acdate     = " + acdate);
 		this.info("L9703 entryDate     = " + entryDate);
 
-
 		String tlrno = titaVo.getParam("TLRNO");
 
 		String sql = " SELECT *";
@@ -427,7 +430,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("repay", repay);
 		}
 		query.setParameter("prinBalance", prinBalance);
-		
+
 //		query.setParameter("acdate", acdate);
 		query.setParameter("entryDate", entryDate);
 		query.setParameter("iSpecificDays", getSpecificDays(payIntDateSt, payIntDateEd));

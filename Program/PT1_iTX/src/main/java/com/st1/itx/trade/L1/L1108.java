@@ -102,6 +102,7 @@ public class L1108 extends TradeBuffer {
 				String VarPaper = "N";
 				String VarMsg = "N";
 				String VarEMail = "N";
+				
 
 				// FormNo報表代號
 				iFormNo = titaVo.getParam("FormNo" + i);
@@ -210,9 +211,6 @@ public class L1108 extends TradeBuffer {
 					}
 					if ("N".equals(VarPaper) || "N".equals(VarMsg) || "N".equals(VarPaper)) {
 						this.info("跑進211");
-						this.info("tCustNotice.getPaperNotice()     = " + tCustNotice.getPaperNotice());
-						this.info("tCustNotice.getMsgNotice()       = " + tCustNotice.getMsgNotice());
-						this.info("tCustNotice.getEmailNotice()     = " + tCustNotice.getEmailNotice());
 						log = true;
 						oCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
 						oCustNotice.setPaperNotice("Y");
@@ -221,10 +219,6 @@ public class L1108 extends TradeBuffer {
 					}
 				} else {
 					this.info("跑進222");
-					this.info("tCustNotice.getPaperNotice()     = " + tCustNotice.getPaperNotice());
-					this.info("tCustNotice.getMsgNotice()       = " + tCustNotice.getMsgNotice());
-					this.info("tCustNotice.getEmailNotice()     = " + tCustNotice.getEmailNotice());
-
 					
 					// 變更前
 					if (!VarPaper.equals(tCustNotice.getPaperNotice()) || !VarMsg.equals(tCustNotice.getMsgNotice())
@@ -261,9 +255,9 @@ public class L1108 extends TradeBuffer {
 						cdReport.setMessageFg(VarMsg);//簡訊
 						cdReport.setEmailFg(VarEMail);//Email
 						cdReport.setLetterFg(VarPaper);//書面
-						this.info("VarMsg    = " + VarMsg);
-						this.info("VarEMail    = " + VarEMail);
-						this.info("VarPaper    = " + VarPaper);
+						this.info("VarMsg2    = " + VarMsg);
+						this.info("VarEMail2    = " + VarEMail);
+						this.info("VarPaper2    = " + VarPaper);
 						if("N".equals(tCustNotice.getPaperNotice()) && "N".equals(tCustNotice.getMsgNotice())
 								&& "N".equals(tCustNotice.getEmailNotice())) {
 							throw new LogicException("E0007", "不可申請全部不寄送");

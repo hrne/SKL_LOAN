@@ -48,6 +48,7 @@ E(0,0)
 ["#FdAcDate+會計日期",#AcDateS,#AcDateE],
 ["#FdEntryDate+入帳日期",#EntryDateS,#EntryDateE],
 ["#FdSortCode+資料排序",#SortCode,#SortCodeX],
+["#FdTitaHCode+訂正別",#TitaHCode,#TitaHCodeX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -65,6 +66,8 @@ K(MODIFYBUTTON,查詢)
 #SortCodeHELP=x,1024,S
 T(3,1:入帳日期+額度;2:額度+入帳日期)
 
+#inTitaHCodeHelp=x,1024,S
+T(3,0:正常、冲正、被冲正;9:全部)
 
 #CDDEF0001=x,26,S
 T(3,CdCode.TitaHCode)
@@ -91,6 +94,7 @@ T(1,@EntryDateE,#NTXBUF,18,7)
 T(1,@AcDateS,#NTXBUF,25,7)
 T(1,@AcDateE,#NTXBUF,32,7)
 T(1,@SortCode,#NTXBUF,39,1)
+T(1,@TitaHCode,#NTXBUF,40,1)
 
 
 ! 必輸欄位
@@ -103,7 +107,7 @@ T(3,*)
 #FdEntryDate=X,2,L
 #FdAcDate=X,2,L
 #FdSortCode=X,2,L
-
+#FdTitaHCode=X,2,L
 #RPTFG=A,1,S
 E(0,0)
 
@@ -200,6 +204,18 @@ V(H,#SortCodeHELP)
 #SortCodeX=X,20,L
 T(H,#SortCode,#SortCodeHELP)
 
+!訂正別
+#TitaHCode=X,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#inTitaHCodeHelp)
+@
+V(H,#inTitaHCodeHelp)
+
+#TitaHCodeX=X,20,L
+T(H,#TitaHCode,#inTitaHCodeHelp)
+
+
+
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
@@ -259,12 +275,11 @@ C(3,#OOTAVCr,0,S,$)
 
 !暫收餘額
 #OOTAVBal=+m,14.2,S
+
 #OOTAVBalX=X,22,L
-!C(3,#OOTAVBal,0,S,$)
 
 CALL2(#ADJUSTDOT,#Precision,#OOTAVBal,#OOTAVBalX)
 P(R,#OOTAVBalX)
-! C(3,#OOTAVBal,0,S,$)
 
 #OOAcFg=X,1,S
 
@@ -280,6 +295,12 @@ T(H,#OOHCode,#TitaHCodeHelp)
 T(2,#TXCD+#CustNo+000+000+#OOAcDate+#OOTxNo+9)
 #OOBTN1=X,1,S
 C(5,#OOAcFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易明細;ntxbuf=#OOBUF1}),BIND(grid,cancel))
+!分錄
+#OOBUF2=X,50,S
+T(2,#OOAcDate+0000000+#OOTxNo)
+
+#OOBTN2=X,1,S
+C(5,#OOAcFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#OOBUF2}),BIND(grid,cancel))
 
 
 </sub>
@@ -294,6 +315,7 @@ C(5,#OOAcFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L3005;text=交易明細;ntxbuf=#OOBUF
 #AcDateS
 #AcDateE
 #SortCode
+#TitaHCode
 #END
 </sub>
 
@@ -336,6 +358,8 @@ TXFORM=L6909
 
 #OOBTN1=
 {width:80,search:false,formatter:'cust:bind-button:',canExport:false,align:'center'}
+#OOBTN2=分錄
+{width:40,search:false,formatter:'cust:bind-button:',canExport:false,align:'center'}
 
 #OOEntryDate=入帳日期
 {width:80,align:'center'}

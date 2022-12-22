@@ -103,10 +103,6 @@ public class L2702 extends TradeBuffer {
 			tCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
 			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
-			// 新增須刷主管卡 經理層級
-			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0703", "");
-			}
 
 			/* 存入DB */
 			try {
@@ -158,19 +154,16 @@ public class L2702 extends TradeBuffer {
 		} else if (iFunCd == 4) {
 
 			tCustRmk = new CustRmk();
-
 			// PK找關係人主檔HOLD資料
 			tCustRmk = sCustRmkService.holdById(custRmkId, titaVo);
 			if (tCustRmk == null) {
 				throw new LogicException(titaVo, "E0004", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於顧客管控警訊檔。");
 			}
 			CustRmk beforeCustRmk = (CustRmk) dataLog.clone(tCustRmk);
-
 			// 刪除須刷主管卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0704", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-
 			try {
 
 				this.info(" L2702 deleteCustRmkLog" + tCustRmk);

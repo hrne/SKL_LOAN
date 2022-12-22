@@ -3,16 +3,20 @@ package com.st1.itx.trade.L1;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -38,6 +42,7 @@ public class L1R20 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		
 		this.info("active L1R20 ");
 		this.totaVo.init(titaVo);
 
@@ -89,7 +94,8 @@ public class L1R20 extends TradeBuffer {
 
 			rs = chkNotice(custNotice, flag);
 		} else {
-			Slice<CustNotice> slCustNotice = custNoticeService.findCustNoFormNo(custNo, formNo, 0, Integer.MAX_VALUE, titaVo);
+			Slice<CustNotice> slCustNotice = custNoticeService.findCustNoFormNo(custNo, formNo, 0, Integer.MAX_VALUE,
+					titaVo);
 			List<CustNotice> lCustNotice = slCustNotice == null ? null : slCustNotice.getContent();
 			if (lCustNotice != null && lCustNotice.size() > 0) {
 				for (CustNotice custNotice : lCustNotice) {
@@ -128,7 +134,8 @@ public class L1R20 extends TradeBuffer {
 				s2 = ",";
 			}
 			if (!s1.isEmpty()) {
-				rs = "戶號:" + String.format("%07d", custNotice.getCustNo()) + "-" + String.format("%03d", custNotice.getFacmNo()) + ",已" + s1;
+				rs = "戶號:" + String.format("%07d", custNotice.getCustNo()) + "-"
+						+ String.format("%03d", custNotice.getFacmNo()) + ",已" + s1;
 				if (flag == 1) {
 					rs += "<br>";
 				} else {

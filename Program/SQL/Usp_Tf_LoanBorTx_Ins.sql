@@ -508,6 +508,10 @@ BEGIN
               ',"PAYCOD":"'
               || TR1.PAYCOD
               || '"'
+           || --  累溢短收 2022-12-22 Wei新增
+              ',"Excessive":"'
+              || TR1.TRXAOS
+              || '"'
            || '}'                         AS "OtherFields"         -- 其他欄位 VARCHAR2 1000  
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  

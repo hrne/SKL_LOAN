@@ -83,9 +83,9 @@ T(1,@FacmNo,#NTXBUF,9,3)
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
-E(0,@FUNCIND,#FunCd)
 
 #FunCdX=X,4,L
+E(0,@FUNCIND,#FunCd)
 C(4,#FunCd,S,$)
 T(H,#FunCd,#FunCdHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(NOBUTTON,CLOSEY))
@@ -169,10 +169,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @V(7)
 
-
 #RPTFG=A,1,S
-
-
 
 #MRKEY=_,_,S
 T(2,#CustNo)
