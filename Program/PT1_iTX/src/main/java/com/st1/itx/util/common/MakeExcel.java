@@ -327,6 +327,9 @@ public class MakeExcel extends CommBuffer {
 			return "";
 		} else {
 			Cell tmpCell = prow.getCell(col - 1);
+			if (tmpCell == null) {
+				return "";
+			}
 			Object result = null;
 			switch (tmpCell.getCellType()) {
 			case NUMERIC:
@@ -615,9 +618,12 @@ public class MakeExcel extends CommBuffer {
 	public void openExcel(String fileName, Object sheetname) throws LogicException {
 		this.info("openExcel start");
 		try (FileInputStream fis = new FileInputStream(fileName)) {
-			this.openedWorkbook = new XSSFWorkbook(fis);
-//			this.openedSheet = openedWorkbook.getSheet(sheetname.toString());
 
+			if (fileName.contains(".xlsx")) {
+				this.openedWorkbook = new XSSFWorkbook(fis);
+			} else {
+				this.openedWorkbook = new HSSFWorkbook(fis);
+			}
 			if (sheetname instanceof String) {
 				this.openedSheet = this.openedWorkbook.getSheet(sheetname.toString());
 				sheetname = sheetname.toString();
@@ -625,7 +631,6 @@ public class MakeExcel extends CommBuffer {
 				this.openedSheet = this.openedWorkbook.getSheetAt(Integer.valueOf(sheetname.toString()) - 1);
 				sheetname = this.openedSheet.getSheetName();
 			}
-
 		} catch (FileNotFoundException e1) {
 			throw new LogicException(titaVo, "E0013", "(MakeExcel)此檔案 (" + fileName + ") 不存在");
 		} catch (IOException e) {
@@ -1322,13 +1327,13 @@ public class MakeExcel extends CommBuffer {
 		map.put("cs", columnStart);
 		map.put("ce", columnEnd);
 		map.put("tc", totalColumn);
-		listMap.add(map);		
+		listMap.add(map);
 	}
 
 	public void setProtectSheet(String pw) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("t", "C");
 		map.put("pw", pw);
-		listMap.add(map);				
+		listMap.add(map);
 	}
 }

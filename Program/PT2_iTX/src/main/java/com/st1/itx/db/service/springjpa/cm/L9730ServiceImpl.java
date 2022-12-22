@@ -52,6 +52,7 @@ public class L9730ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND LBM.\"FacmNo\" = LRC.\"FacmNo\" ";
 		sql += "                              AND LBM.\"BormNo\" = LRC.\"BormNo\" ";
 		sql += " WHERE LRC.\"Status\" = 2 "; // 只抓加碼利率（定期機動）
+		sql += "   AND LRC.\"IncrFlag\" = 'N' ";
 		sql += "   AND ( (     NVL(LBM.\"LoanBal\", 0) != 0 ";
 		sql += "           AND NVL(LBM.\"NextAdjRateDate\", 0) BETWEEN :inputStartDateNext AND :inputEndDateNext "; // A. 如果餘額為0且下次調整日在此區間
 		sql += "         ) ";

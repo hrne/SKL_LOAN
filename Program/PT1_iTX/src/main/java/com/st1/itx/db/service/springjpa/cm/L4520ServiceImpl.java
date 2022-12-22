@@ -187,7 +187,6 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  		,\"TitaTlrNo\"";
 		sql += "  		,\"TitaTxtNo\"";
 		sql += "  		,\"ProcCode\"";
-		sql += "  		,\"AcctCode\"";
 		sql += "  		,\"RepayCode\"";
 		sql += "  FROM \"EmpDeductDtl\" ";
 		sql += "  WHERE \"AchRepayCode\" IN ( 1, 5) ";
@@ -205,7 +204,6 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND BD.\"TitaTxtNo\" = ed.\"TitaTxtNo\"";
 		sql += "  LEFT JOIN tx1 ON tx1.\"CustNo\" = ed.\"CustNo\"";
 		sql += "               AND tx1.\"AcDate\" = ed.\"Acdate\"";
-		sql += "               AND tx1.\"AcctCode\" = ed.\"AcctCode\"";  
 		sql += "               AND SUBSTR(tx1.\"TitaTxtNo\",1,2) = SUBSTR(BD.\"BatchNo\",5,2)";
 		sql += "               AND TO_NUMBER(SUBSTR(tx1.\"TitaTxtNo\",3,6)) = BD.\"DetailSeq\"";
 		sql += "  LEFT JOIN tx2 ON tx2.\"CustNo\" = tx1.\"CustNo\"";

@@ -3,8 +3,8 @@ package com.st1.itx.trade.L5;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -22,51 +22,99 @@ import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfBsOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.report.ReportUtil;
 
-@Service("L5402")
-@Scope("prototype")
 /**
- * 年度業績目標更新
+ * 年度業績目標更新<BR>
+ * 2022-12-22 Wei refactor<BR>
+ * 1. 解掉巢狀while(true)+switch造成的業務邏輯解讀困難<BR>
+ * 2. User不同意增加部室、區部的代碼欄位<BR>
  * 
  * @author Fegie
  * @version 1.0.0
  */
+@Service("L5402")
+@Scope("prototype")
 public class L5402 extends TradeBuffer {
 
-	/* 轉型共用工具 */
-	/* 日期工具 */
 	@Autowired
-	public DateUtil iDateUtil;
+	private DateUtil iDateUtil;
 
 	@Autowired
-	public PfBsOfficerService iPfBsOfficerService;
+	private PfBsOfficerService sPfBsOfficerService;
 
 	@Autowired
-	public CdBcmService iCdBcmService;
+	private CdBcmService sCdBcmService;
 
 	@Autowired
-	public CdEmpService iCdEmpService;
+	private CdEmpService sCdEmpService;
 
 	@Autowired
-	public DataLog dataLog;
+	private DataLog dataLog;
 
 	@Autowired
-	MakeExcel makeExcel;
+	private MakeExcel makeExcel;
+
+	@Autowired
+	private ReportUtil rptUtil;
 
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
+
+	private int bcYear = 0;
+
+	private List<PfBsOfficer> listPfBsOfficer;
+
+	private int deptIndex = 0; // 服務部室-欄位序號
+	private int distIndex = 0; // 服務區部-欄位序號
+	private int bsNameIndex = 0; // 專員-欄位序號
+	private int empNoIndex = 0; // 員編-欄位序號
+	private int workMonth1Index = 0; // 第1工作月-欄位序號
+	private int workMonth2Index = 0; // 第2工作月-欄位序號
+	private int workMonth3Index = 0; // 第3工作月-欄位序號
+	private int workMonth4Index = 0; // 第4工作月-欄位序號
+	private int workMonth5Index = 0; // 第5工作月-欄位序號
+	private int workMonth6Index = 0; // 第6工作月-欄位序號
+	private int workMonth7Index = 0; // 第7工作月-欄位序號
+	private int workMonth8Index = 0; // 第8工作月-欄位序號
+	private int workMonth9Index = 0; // 第9工作月-欄位序號
+	private int workMonth10Index = 0; // 第10工作月-欄位序號
+	private int workMonth11Index = 0; // 第11工作月-欄位序號
+	private int workMonth12Index = 0; // 第12工作月-欄位序號
+	private int workMonth13Index = 0; // 第13工作月-欄位序號
+	private int endRowIndex = 0; // 結束行-行序號(目前以"部專合計")
+
+	private String deptCode = ""; // 部室代號
+	private String deptItem = ""; // 部室中文
+	private String distCode = ""; // 區部代號
+	private String distItem = ""; // 區部中文
+	private String empNo = ""; // 員編
+	private String empName = ""; // 員工姓名
+	private String areaCode = "";
+	private String areaItem = "";
+
+	private BigDecimal tenThousand = new BigDecimal("10000");
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5402 ");
 		this.totaVo.init(titaVo);
 
+		iDateUtil.init();
+
 		String iYear = titaVo.getParam("UploadYear");
-		String iFileName = inFolder + iDateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
-		int iUploadFg = Integer.valueOf(titaVo.getParam("UploadFg"));
+
+		bcYear = (Integer.parseInt(iYear) + 1911 * 100);
+
+		String iFileName = inFolder + iDateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA").trim();
+
+//		int iUploadFg = Integer.parseInt(titaVo.getParam("UploadFg"));
+
+		this.info("iFileName = " + iFileName);
 
 		if (iFileName.equals("")) {
 			throw new LogicException(titaVo, "E0014", "上傳檔案為空，請選擇 .xls之Excel檔案");
@@ -78,397 +126,16 @@ public class L5402 extends TradeBuffer {
 
 		makeExcel.openExcel(iFileName, 1);
 
-		int checkValue = 5;
-		String checkName = "";
+		// 檢核必須存在的欄位
+		checkColumn(titaVo);
 
-		int officerCodeYE = 5;
-		String iOfficerCode = "";
-		String iDeptCode = "";
-		String iLastDeptCode = "";
-		String iDistCode = "";
-		String iDistName = "";
-		String iAreaCode = "";
-		String iAreaItem = "";
+		// 檢核並取得明細資料
+		checkAndGetDetail(titaVo);
 
-		// 判斷100行內"部專合計"資料是否存在
-		while (true) {
-			if (checkValue >= 100) {
-				throw new LogicException(titaVo, "E0014", "固定位置無部專合計");
-			}
-			try {
-				checkName = (String) makeExcel.getValue(checkValue, 1);
-			} catch (Exception e) {
-				throw new LogicException(titaVo, "E0014", "固定位置資料型態錯誤，請重新上傳");
-			}
+		// 寫入資料
+		modifyData(titaVo);
 
-			if (checkName.equals("部專合計")) {
-				break;
-			} else {
-				checkValue++;
-			}
-		}
-		// 吃檔主執行區
-		while (true) {
-			// 有效資料範圍結束，officerCodeYE遍歷與checkValue值相同時跳出
-			if (officerCodeYE == checkValue) {
-				break;
-			}
-
-			// 第一筆資料檢核
-			try {
-				iOfficerCode = (String) makeExcel.getValue(officerCodeYE, 6);
-			} catch (Exception e) {
-				throw new LogicException(titaVo, "E0014", "員工編號資料型態錯誤，請重新上傳");
-			}
-			if (officerCodeYE == 5 && iOfficerCode.equals("")) {
-				throw new LogicException(titaVo, "E0014", "固定位置無員工編號	");
-			}
-			try {
-				iDeptCode = (String) makeExcel.getValue(officerCodeYE, 2);
-			} catch (Exception e) {
-				throw new LogicException(titaVo, "E0014", "部室代號資料型態錯誤，請重新上傳");
-			}
-			if (officerCodeYE == 5 && iDeptCode.equals("")) {
-				throw new LogicException(titaVo, "E0014", "固定位置無部室代號	");
-			}
-			try {
-				iDistCode = (String) makeExcel.getValue(officerCodeYE, 4);
-			} catch (Exception e) {
-				throw new LogicException(titaVo, "E0014", "區部代號資料型態錯誤，請重新上傳");
-			}
-			try {
-				iDistName = (String) makeExcel.getValue(officerCodeYE, 3);
-			} catch (Exception e) {
-				throw new LogicException(titaVo, "E0014", "區部名稱資料型態錯誤，請重新上傳");
-			}
-
-			if (officerCodeYE == 5 && iDistCode.equals("") && iDistName.equals("")) {
-				throw new LogicException(titaVo, "E0014", "固定位置無區部代號或區部名稱");
-			}
-
-			if (iOfficerCode.equals("") || !iOfficerCode.equals("") && iDistName.equals("部專")) {
-				officerCodeYE++;
-				continue;
-			}
-
-			// 第一筆與之後資料處理
-			int iWorkMonth = 7;
-			switch (iUploadFg) {
-			// 1 :新增 2:修改
-			case 1:
-				PfBsOfficer iPfBsOfficer = new PfBsOfficer();
-				PfBsOfficerId iPfBsOfficeId = new PfBsOfficerId();
-				CdBcm iCdBcm = new CdBcm();
-				CdEmp iCdEmp = new CdEmp();
-				while (true) {
-					if (iWorkMonth == 20) {
-						break;
-					}
-					int seWorkMonth = Integer.valueOf(iYear + StringUtils.leftPad(String.valueOf(iWorkMonth - 6), 2, "0")) + 191100;
-					iPfBsOfficeId.setEmpNo(iOfficerCode);
-					iPfBsOfficeId.setWorkMonth(seWorkMonth);
-					iPfBsOfficer = iPfBsOfficerService.findById(iPfBsOfficeId, titaVo);
-					if (iPfBsOfficer != null) {
-						throw new LogicException(titaVo, "E0005", "員工編號:" + iOfficerCode + "，工作月" + String.valueOf(seWorkMonth) + "已有資料");
-					} else {
-						iPfBsOfficer = new PfBsOfficer();
-					}
-
-					// 部室代號處理，若iDeptCode為空則抓iLastDeptCode
-					if (iDeptCode.equals("")) {
-						iPfBsOfficer.setDeptCode(iLastDeptCode);
-						iCdBcm = iCdBcmService.deptCodeFirst(iLastDeptCode, titaVo);
-					} else {
-						iLastDeptCode = iDeptCode;
-						iPfBsOfficer.setDeptCode(iDeptCode);
-						iCdBcm = iCdBcmService.deptCodeFirst(iDeptCode, titaVo);
-					}
-					if (iCdBcm == null) {
-//						iPfBsOfficer.setDepItem("");
-						throw new LogicException(titaVo, "E0001", "查無部室代號(" + iDeptCode + ")");
-					} else {
-						iPfBsOfficer.setDepItem(iCdBcm.getDeptItem());
-						// 處理areacode
-						switch (iCdBcm.getDeptCode()) {
-						case "A0F000":
-							iAreaCode = "10HC00";
-							iAreaItem = "北部區域中心";
-							break;
-						case "A0M000":
-							iAreaCode = "10HL00";
-							iAreaItem = "南部區域中心";
-							break;
-						case "A0B000":
-							iAreaCode = "10HC00";
-							iAreaItem = "北部區域中心";
-							break;
-						case "A0E000":
-							iAreaCode = "10HJ00";
-							iAreaItem = "中部區域中心";
-							break;
-						default:
-							iAreaCode = "";
-							iAreaItem = "";
-							break;
-						}
-					}
-					// 區域中心塞值
-					iPfBsOfficer.setAreaCode(iAreaCode);
-					iPfBsOfficer.setAreaItem(iAreaItem);
-
-					// 區部代號處理，代號為空白放區部名稱否則抓CdBcm資料
-					iPfBsOfficer.setDistCode(iDistCode);
-					if (iDistCode.equals("")) {
-						if (iDistName.equals("")) {
-							// 區部代號與區部中文皆為空白時塞房貸部專
-							iPfBsOfficer.setDistItem("房貸部專");
-						} else {
-							iPfBsOfficer.setDistItem(iDistName);
-						}
-					} else {
-						iCdBcm = iCdBcmService.distCodeFirst(iDistCode, titaVo);
-						if (iCdBcm == null) {
-//							iPfBsOfficer.setDistItem("");
-							throw new LogicException(titaVo, "E0001", "查無區部代號(" + iDistCode + ")");
-						} else {
-							iPfBsOfficer.setDistItem(iCdBcm.getDistItem());
-						}
-					}
-
-					// 房貸專員姓名處理
-					iCdEmp = iCdEmpService.findById(iOfficerCode, titaVo);
-					if (iCdEmp == null) {
-//						iPfBsOfficer.setFullname("");
-						throw new LogicException(titaVo, "E0001", "查無員工代號(" + iOfficerCode + ")");
-					} else {
-						iPfBsOfficer.setFullname(iCdEmp.getFullname());
-					}
-					double dGoalAmt = 0;
-					// 目標金額處理
-					try {
-						dGoalAmt = (double) makeExcel.getValue(officerCodeYE, iWorkMonth) * 10000;
-					} catch (Exception e) {
-						throw new LogicException(titaVo, "E0014", "目標金額欄位資料型態錯誤，請重新上傳");
-					}
-
-					int iGoalAmt = Math.round((float) dGoalAmt);
-					iPfBsOfficer.setGoalAmt(new BigDecimal(iGoalAmt));
-
-					iPfBsOfficer.setPfBsOfficerId(iPfBsOfficeId);
-					try {
-						iPfBsOfficerService.insert(iPfBsOfficer, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增錯誤訊息
-					}
-
-					iWorkMonth++;
-				}
-				break;
-			case 2:
-				PfBsOfficer uPfBsOfficer = new PfBsOfficer();
-				PfBsOfficer hPfBsOfficer = new PfBsOfficer();
-				PfBsOfficerId uPfBsOfficeId = new PfBsOfficerId();
-				CdBcm uCdBcm = new CdBcm();
-				CdEmp uCdEmp = new CdEmp();
-				while (true) {
-					if (iWorkMonth == 20) {
-						break;
-					}
-					int seWorkMonth = Integer.valueOf(iYear + StringUtils.leftPad(String.valueOf(iWorkMonth - 6), 2, "0")) + 191100;
-					uPfBsOfficeId.setEmpNo(iOfficerCode);
-					uPfBsOfficeId.setWorkMonth(seWorkMonth);
-					uPfBsOfficer = iPfBsOfficerService.findById(uPfBsOfficeId, titaVo);
-
-					if (uPfBsOfficer == null) {
-						// 查無資料執行新增
-						uPfBsOfficer = new PfBsOfficer();
-						// 部室代號處理，若iDeptCode為空則抓iLastDeptCode
-						if (iDeptCode.equals("")) {
-							uPfBsOfficer.setDeptCode(iLastDeptCode);
-							uCdBcm = iCdBcmService.deptCodeFirst(iLastDeptCode, titaVo);
-						} else {
-							iLastDeptCode = iDeptCode;
-							uPfBsOfficer.setDeptCode(iDeptCode);
-							uCdBcm = iCdBcmService.deptCodeFirst(iDeptCode, titaVo);
-						}
-						if (uCdBcm == null) {
-//							uPfBsOfficer.setDepItem("");
-							throw new LogicException(titaVo, "E0001", "查無部室代號(" + iDeptCode + ")");
-						} else {
-							uPfBsOfficer.setDepItem(uCdBcm.getDeptItem());
-							// 處理areacode
-							switch (uCdBcm.getDeptCode()) {
-							case "A0F000":
-								iAreaCode = "10HC00";
-								iAreaItem = "北部區域中心";
-								break;
-							case "A0M000":
-								iAreaCode = "10HL00";
-								iAreaItem = "南部區域中心";
-								break;
-							case "A0B000":
-								iAreaCode = "10HC00";
-								iAreaItem = "北部區域中心";
-								break;
-							case "A0E000":
-								iAreaCode = "10HJ00";
-								iAreaItem = "中部區域中心";
-								break;
-							default:
-								iAreaCode = "";
-								iAreaItem = "";
-								break;
-							}
-						}
-						// 區域中心塞值
-						uPfBsOfficer.setAreaCode(iAreaCode);
-						uPfBsOfficer.setAreaItem(iAreaItem);
-
-						// 區部代號處理，代號為空白放區部名稱否則抓CdBcm資料
-						uPfBsOfficer.setDistCode(iDistCode);
-						if (iDistCode.equals("")) {
-							uPfBsOfficer.setDistItem(iDistName);
-						} else {
-							uCdBcm = iCdBcmService.distCodeFirst(iDistCode, titaVo);
-							if (uCdBcm == null) {
-//								uPfBsOfficer.setDistItem("");
-								throw new LogicException(titaVo, "E0001", "查無區部代號(" + iDistCode + ")");
-							} else {
-								uPfBsOfficer.setDistItem(uCdBcm.getDistItem());
-							}
-						}
-						// 區部代號與區部中文皆為空白時塞房貸部專
-						if (iDistCode.equals("") && iDistName.equals("")) {
-							uPfBsOfficer.setDistItem("房貸部專");
-						}
-
-						// 房貸專員姓名處理
-						uCdEmp = iCdEmpService.findById(iOfficerCode, titaVo);
-						if (uCdEmp == null) {
-//							uPfBsOfficer.setFullname("");
-							throw new LogicException(titaVo, "E0001", "查無員工代號(" + iOfficerCode + ")");
-						} else {
-							uPfBsOfficer.setFullname(uCdEmp.getFullname());
-						}
-
-						double dGoalAmt = 0;
-						// 目標金額處理
-						try {
-							dGoalAmt = (double) makeExcel.getValue(officerCodeYE, iWorkMonth) * 10000;
-						} catch (Exception e) {
-							throw new LogicException(titaVo, "E0014", "目標金額欄位資料型態錯誤，請重新上傳");
-						}
-						int iGoalAmt = Math.round((float) dGoalAmt);
-						uPfBsOfficer.setGoalAmt(new BigDecimal(iGoalAmt));
-
-						uPfBsOfficer.setPfBsOfficerId(uPfBsOfficeId);
-
-						try {
-							iPfBsOfficerService.insert(uPfBsOfficer, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增錯誤訊息
-						}
-
-						iWorkMonth++;
-					} else {
-
-						// 資料重複執行更新
-						// 變更前
-						hPfBsOfficer = iPfBsOfficerService.holdById(uPfBsOfficeId, titaVo);
-						// 部室代號處理，若iDeptCode為空則抓iLastDeptCode
-						if (iDeptCode.equals("")) {
-							hPfBsOfficer.setDeptCode(iLastDeptCode);
-							uCdBcm = iCdBcmService.deptCodeFirst(iLastDeptCode, titaVo);
-						} else {
-							iLastDeptCode = iDeptCode;
-							hPfBsOfficer.setDeptCode(iDeptCode);
-							uCdBcm = iCdBcmService.deptCodeFirst(iDeptCode, titaVo);
-						}
-						if (uCdBcm == null) {
-							hPfBsOfficer.setDepItem("");
-							throw new LogicException(titaVo, "E0001", "查無部室代號(" + iDeptCode + ")");
-						} else {
-							hPfBsOfficer.setDepItem(uCdBcm.getDeptItem());
-							// 處理areacode
-							switch (uCdBcm.getDeptCode()) {
-							case "A0F000":
-								iAreaCode = "10HC00";
-								iAreaItem = "北部區域中心";
-								break;
-							case "A0M000":
-								iAreaCode = "10HL00";
-								iAreaItem = "南部區域中心";
-								break;
-							case "A0B000":
-								iAreaCode = "10HC00";
-								iAreaItem = "北部區域中心";
-								break;
-							case "A0E000":
-								iAreaCode = "10HJ00";
-								iAreaItem = "中部區域中心";
-								break;
-							default:
-								iAreaCode = "";
-								iAreaItem = "";
-								break;
-							}
-						}
-						// 區域中心塞值
-						hPfBsOfficer.setAreaCode(iAreaCode);
-						hPfBsOfficer.setAreaItem(iAreaItem);
-
-						// 區部代號處理，代號為空白放區部名稱否則抓CdBcm資料
-						hPfBsOfficer.setDistCode(iDistCode);
-						if (iDistCode.equals("")) {
-							hPfBsOfficer.setDistItem(iDistName);
-						} else {
-							uCdBcm = iCdBcmService.distCodeFirst(iDistCode, titaVo);
-							if (uCdBcm == null) {
-//								hPfBsOfficer.setDistItem("");
-								throw new LogicException(titaVo, "E0001", "查無區部代號(" + iDistCode + ")");
-							} else {
-								hPfBsOfficer.setDistItem(uCdBcm.getDistItem());
-							}
-						}
-						// 區部代號與區部中文皆為空白時塞房貸部專
-						if (iDistCode.equals("") && iDistName.equals("")) {
-							hPfBsOfficer.setDistItem("房貸部專");
-						}
-
-						// 房貸專員姓名處理
-						uCdEmp = iCdEmpService.findById(iOfficerCode, titaVo);
-						if (uCdEmp == null) {
-//							hPfBsOfficer.setFullname("");
-							throw new LogicException(titaVo, "E0001", "查無員工代號(" + iOfficerCode + ")");
-						} else {
-							hPfBsOfficer.setFullname(uCdEmp.getFullname());
-						}
-
-						double dGoalAmt = 0;
-						// 目標金額處理
-						try {
-							dGoalAmt = (double) makeExcel.getValue(officerCodeYE, iWorkMonth) * 10000;
-						} catch (Exception e) {
-							throw new LogicException(titaVo, "E0014", "目標金額欄位資料型態錯誤，請重新上傳");
-						}
-						int iGoalAmt = Math.round((float) dGoalAmt);
-						hPfBsOfficer.setGoalAmt(new BigDecimal(iGoalAmt));
-						try {
-							iPfBsOfficerService.update(hPfBsOfficer, titaVo);
-						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料更新錯誤
-						}
-
-						iWorkMonth++;
-					}
-				}
-				break;
-			}
-
-			officerCodeYE++;
-		}
-
-		System.out.print(titaVo.getParam("FILENA").trim() + "資料新增成功");
+		this.info(titaVo.getParam("FILENA").trim() + "資料新增成功");
 
 		totaVo.putParam("OSuccessFlag", 1);
 
@@ -476,4 +143,300 @@ public class L5402 extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private void checkColumn(TitaVo titaVo) throws LogicException {
+		int headerRow = 3;
+		for (int column = 0; column <= 18; column++) {
+			String columnName = getExcelValueInString(headerRow, column);
+			setColumnIndex(columnName, column);
+		}
+		// 目前資料大約總共35行
+		// 若搜到1000行都沒有專員合計就當作此檔案不是我們要的檔案
+		for (int row = 0; row <= 1000; row++) {
+			String value = getExcelValueInString(row, 1);
+			if (value.equals("部專合計")) {
+				endRowIndex = row;
+			}
+		}
+		// 這些欄位必須存在
+		checkColumnIndex(titaVo);
+	}
+
+	private String getExcelValueInString(int row, int col) throws LogicException {
+		Object value = makeExcel.getValue(row, col);
+		return value == null ? "" : value.toString().trim();
+	}
+
+	private void setColumnIndex(String columnName, int column) {
+		// 原本ST1-嘉榮設計部室跟區部要請User增加欄位輸入代號
+		// User不同意,強調不會打錯字
+		switch (columnName) {
+		case "服務部室":
+			deptIndex = column;
+			break;
+		case "服務區部":
+			distIndex = column;
+			break;
+		case "專員":
+			bsNameIndex = column;
+			break;
+		case "員編":
+			empNoIndex = column;
+			break;
+		case "第1工作月":
+			workMonth1Index = column;
+			break;
+		case "第2工作月":
+			workMonth2Index = column;
+			break;
+		case "第3工作月":
+			workMonth3Index = column;
+			break;
+		case "第4工作月":
+			workMonth4Index = column;
+			break;
+		case "第5工作月":
+			workMonth5Index = column;
+			break;
+		case "第6工作月":
+			workMonth6Index = column;
+			break;
+		case "第7工作月":
+			workMonth7Index = column;
+			break;
+		case "第8工作月":
+			workMonth8Index = column;
+			break;
+		case "第9工作月":
+			workMonth9Index = column;
+			break;
+		case "第10工作月":
+			workMonth10Index = column;
+			break;
+		case "第11工作月":
+			workMonth11Index = column;
+			break;
+		case "第12工作月":
+			workMonth12Index = column;
+			break;
+		case "第13工作月":
+			workMonth13Index = column;
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void checkColumnIndex(TitaVo titaVo) throws LogicException {
+		if (deptIndex == 0) {
+			throw new LogicException(titaVo, "E0014", "服務部室，此欄位必須存在");
+		}
+		if (distIndex == 0) {
+			throw new LogicException(titaVo, "E0014", "服務區部，此欄位必須存在");
+		}
+		if (bsNameIndex == 0) {
+			throw new LogicException(titaVo, "E0014", "專員，此欄位必須存在");
+		}
+		if (empNoIndex == 0) {
+			throw new LogicException(titaVo, "E0014", "員編，此欄位必須存在");
+		}
+		if (workMonth1Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第1工作月，此欄位必須存在");
+		}
+		if (workMonth2Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第2工作月，此欄位必須存在");
+		}
+		if (workMonth3Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第3工作月，此欄位必須存在");
+		}
+		if (workMonth4Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第4工作月，此欄位必須存在");
+		}
+		if (workMonth5Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第5工作月，此欄位必須存在");
+		}
+		if (workMonth6Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第6工作月，此欄位必須存在");
+		}
+		if (workMonth7Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第7工作月，此欄位必須存在");
+		}
+		if (workMonth8Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第8工作月，此欄位必須存在");
+		}
+		if (workMonth9Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第9工作月，此欄位必須存在");
+		}
+		if (workMonth10Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第10工作月，此欄位必須存在");
+		}
+		if (workMonth11Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第11工作月，此欄位必須存在");
+		}
+		if (workMonth12Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第12工作月，此欄位必須存在");
+		}
+		if (workMonth13Index == 0) {
+			throw new LogicException(titaVo, "E0014", "第13工作月，此欄位必須存在");
+		}
+		if (endRowIndex == 0) {
+			throw new LogicException(titaVo, "E0014", "部專合計，此欄位必須存在");
+		}
+	}
+
+	private void checkAndGetDetail(TitaVo titaVo) throws LogicException {
+		String deptName = "";
+		listPfBsOfficer = new ArrayList<>();
+		for (int detailRowIndex = 5; detailRowIndex < endRowIndex; detailRowIndex++) {
+			empNo = getExcelValueInString(detailRowIndex, empNoIndex);
+			if (empNo == null || empNo.isEmpty()) {
+				continue;
+			}
+			String tempDeptName = getExcelValueInString(detailRowIndex, deptIndex);
+			String distName = getExcelValueInString(detailRowIndex, distIndex);
+			if (tempDeptName != null && !tempDeptName.isEmpty()) {
+				deptName = tempDeptName;
+			}
+			if (distName == null || distName.isEmpty()) {
+				continue;
+			}
+			// 檢核明細
+			checkDetail(deptName, distName, empNo, titaVo);
+
+			setAreaCenter();
+
+			addPfBsOfficer(1, getAmt(detailRowIndex, workMonth1Index));
+			addPfBsOfficer(2, getAmt(detailRowIndex, workMonth2Index));
+			addPfBsOfficer(3, getAmt(detailRowIndex, workMonth3Index));
+			addPfBsOfficer(4, getAmt(detailRowIndex, workMonth4Index));
+			addPfBsOfficer(5, getAmt(detailRowIndex, workMonth5Index));
+			addPfBsOfficer(6, getAmt(detailRowIndex, workMonth6Index));
+			addPfBsOfficer(7, getAmt(detailRowIndex, workMonth7Index));
+			addPfBsOfficer(8, getAmt(detailRowIndex, workMonth8Index));
+			addPfBsOfficer(9, getAmt(detailRowIndex, workMonth9Index));
+			addPfBsOfficer(10, getAmt(detailRowIndex, workMonth10Index));
+			addPfBsOfficer(11, getAmt(detailRowIndex, workMonth11Index));
+			addPfBsOfficer(12, getAmt(detailRowIndex, workMonth12Index));
+			addPfBsOfficer(13, getAmt(detailRowIndex, workMonth13Index));
+		}
+	}
+
+	private void checkDetail(String deptName, String distName, String empNo, TitaVo titaVo) throws LogicException {
+		switch (deptName) {
+		case "營管部":
+			deptCode = "A0B000";
+			deptItem = "營業管理部";
+			break;
+		case "營推部":
+			deptCode = "A0F000";
+			deptItem = "營業推展部";
+			break;
+		case "業推部":
+			deptCode = "A0E000";
+			deptItem = "業務推展部";
+			break;
+		case "業開部":
+			deptCode = "A0M000";
+			deptItem = "業務開發部";
+			break;
+		default:
+			throw new LogicException(titaVo, "E0014", "服務部室，查無對應代碼(" + deptName + ")，限輸入營管部、營推部、業推部、業開部");
+		}
+		if (!distName.equals("部專")) {
+			CdBcm tCdBcm = sCdBcmService.distItemFirst(distName, titaVo);
+			if (tCdBcm == null || tCdBcm.getDistCode() == null) {
+				throw new LogicException(titaVo, "E0014", "服務區部，查無對應代碼(" + distName + ")");
+			} else {
+				distCode = tCdBcm.getDistCode();
+				distItem = tCdBcm.getDistItem();
+			}
+		} else {
+			distItem = "房貸部專";
+		}
+
+		CdEmp tCdEmp = sCdEmpService.findById(empNo, titaVo);
+		if (tCdEmp == null || tCdEmp.getEmployeeNo() == null) {
+			throw new LogicException(titaVo, "E0014", "員編，查無員工資料(" + empNo + ")");
+		} else {
+			empName = tCdEmp.getFullname();
+		}
+	}
+
+	private void setAreaCenter() {
+		switch (deptCode) {
+		case "A0B000":
+		case "A0F000":
+			areaCode = "10HC00";
+			areaItem = "北部區域中心";
+			break;
+		case "A0E000":
+			areaCode = "10HJ00";
+			areaItem = "中部區域中心";
+			break;
+		case "A0M000":
+			areaCode = "10HL00";
+			areaItem = "南部區域中心";
+			break;
+		default:
+			areaCode = "";
+			areaItem = "";
+			break;
+		}
+	}
+
+	private void addPfBsOfficer(int i, BigDecimal amt) {
+		PfBsOfficerId pfBsOfficerId = new PfBsOfficerId();
+		pfBsOfficerId.setEmpNo(empNo);
+		pfBsOfficerId.setWorkMonth(bcYear + i);
+		PfBsOfficer pfBsOfficer = new PfBsOfficer();
+		pfBsOfficer.setPfBsOfficerId(pfBsOfficerId);
+		pfBsOfficer.setFullname(empName); // 員工姓名
+		pfBsOfficer.setAreaCode(areaCode); // 區域中心
+		pfBsOfficer.setAreaItem(areaItem); // 中心中文
+		pfBsOfficer.setDeptCode(deptCode); // 部室代號
+		pfBsOfficer.setDepItem(deptItem); // 部室中文
+		pfBsOfficer.setDistCode(distCode); // 區部代號
+		pfBsOfficer.setDistItem(distItem); // 區部中文
+		pfBsOfficer.setGoalAmt(amt); // 目標金額
+		listPfBsOfficer.add(pfBsOfficer);
+	}
+
+	private BigDecimal getAmt(int rowIndex, int columnIndex) throws LogicException {
+		return rptUtil.getBigDecimal(getExcelValueInString(rowIndex, columnIndex)).multiply(tenThousand);
+	}
+
+	private void modifyData(TitaVo titaVo) throws LogicException {
+		if (listPfBsOfficer == null || listPfBsOfficer.isEmpty()) {
+			return;
+		}
+		for (PfBsOfficer pfBsOfficer : listPfBsOfficer) {
+			PfBsOfficer tempPfBsOfficer = sPfBsOfficerService.holdById(pfBsOfficer, titaVo);
+			if (tempPfBsOfficer == null) {
+				try {
+					sPfBsOfficerService.insert(pfBsOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增錯誤訊息
+				}
+			} else {
+				// 變更前
+				PfBsOfficer beforePfBsOfficer = (PfBsOfficer) dataLog.clone(tempPfBsOfficer);
+
+				tempPfBsOfficer.setFullname(pfBsOfficer.getFullname()); // 員工姓名
+				tempPfBsOfficer.setAreaCode(pfBsOfficer.getAreaCode()); // 區域中心
+				tempPfBsOfficer.setAreaItem(pfBsOfficer.getAreaItem()); // 中心中文
+				tempPfBsOfficer.setDeptCode(pfBsOfficer.getDeptCode()); // 部室代號
+				tempPfBsOfficer.setDepItem(pfBsOfficer.getDepItem()); // 部室中文
+				tempPfBsOfficer.setDistCode(pfBsOfficer.getDistCode()); // 區部代號
+				tempPfBsOfficer.setDistItem(pfBsOfficer.getDistItem()); // 區部中文
+				tempPfBsOfficer.setGoalAmt(pfBsOfficer.getGoalAmt()); // 目標金額
+				try {
+					tempPfBsOfficer = sPfBsOfficerService.update2(tempPfBsOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料更新錯誤
+				}
+				// 紀錄變更前變更後
+				dataLog.setEnv(titaVo, beforePfBsOfficer, tempPfBsOfficer);
+				dataLog.exec();
+			}
+		}
+	}
 }

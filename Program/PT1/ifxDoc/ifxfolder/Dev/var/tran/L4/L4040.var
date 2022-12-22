@@ -43,7 +43,7 @@ E(0,0)
 [#<->#,"#FdCreateFlag+新增或取消",#CreateFlag,#CreateFlagX],
 [#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdPropDate+提出日期+(+起日+)",#PropDate],
-[#<->#,"#FdDataCreateDate+資料產生日期",#DataCreateDate],
+[#<->#,"#FdDataCreateDate+提出日期",#DataCreateDate],
 [#<->#,"#FdRepayBank+扣款銀行",#RepayBank,#RepayBankX],
 ]
 

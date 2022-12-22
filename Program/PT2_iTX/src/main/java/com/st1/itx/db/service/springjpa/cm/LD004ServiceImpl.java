@@ -55,6 +55,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , TX.\"AcDate\" "; // 會計日期
 		sql += "      , ACD.\"AcSubCode\" "; // 子目
 		sql += "      , ACD.\"SlipBatNo\" "; // 傳票批號
+		sql += "      , TX.\"RepayCode\" "; // 還款來源
 		sql += " FROM \"LoanBorTx\" TX ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = TX.\"CustNo\" ";
 		sql += " LEFT JOIN \"AcDetail\" ACD ON ACD.\"AcDate\" = TX.\"AcDate\" ";

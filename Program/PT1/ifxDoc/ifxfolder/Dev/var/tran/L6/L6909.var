@@ -64,7 +64,7 @@ K(MODIFYBUTTON,查詢)
 
 
 #SortCodeHELP=x,1024,S
-T(3,1:入帳日期+額度;2:額度+入帳日期)
+T(3,0:會計日期+額度;1:入帳日期+額度;2:額度+入帳日期)
 
 #inTitaHCodeHelp=x,1024,S
 T(3,0:正常、冲正、被冲正;9:全部)
@@ -196,7 +196,7 @@ A(DATE,0,#EntryDateE)
 !         2.額度+入帳日期
 #SortCode=X,1,I
 C(3,#CHAIN,1,s,$)
-C(4,#SortCode,T(3,1),$)
+C(4,#SortCode,T(3,0),$)
 HELP(#SortCodeHELP)
 @T(3,@SortCodeX,)
 V(H,#SortCodeHELP)

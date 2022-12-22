@@ -90,10 +90,11 @@ public class L4043 extends TradeBuffer {
 				int deleteDate = parse.stringToInteger(result.get("F20"));
 				String wkCreateFlag = result.get("F10");
 				String wkPostMediaCode = result.get("F16"); // 媒體檔
-				String createempno = result.get("F23");
-				String lastupdateempno = result.get("F25");
-				int creatdate = Integer.parseInt(result.get("F24"));
-				int lastupdate = Integer.parseInt(result.get("F26"));
+				int processdate = parse.stringToInteger(result.get("F23"));
+				String createempno = result.get("F25");
+				String lastupdateempno = result.get("F27");
+				int creatdate = Integer.parseInt(result.get("F26"));
+				int lastupdate = Integer.parseInt(result.get("F28"));
 				if (wkPostMediaCode == null) {
 					wkPostMediaCode = "";
 				}
@@ -114,11 +115,12 @@ public class L4043 extends TradeBuffer {
 				if (stampCancelDate > 19110000) {
 					stampCancelDate = stampCancelDate - 19110000;
 				}
-
+				if (processdate > 19110000) {
+					processdate = processdate - 19110000;
+				}
 				if (deleteDate > 19110000) {
 					deleteDate = deleteDate - 19110000;
 				}
-
 				if (creatdate > 19110000) {
 					creatdate = creatdate - 19110000;
 				}
@@ -161,6 +163,7 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOAcctSeq", result.get("F8"));
 				occursList.putParam("OOCustId", result.get("F9"));
 				occursList.putParam("OOCreateFlag", wkCreateFlag);
+				occursList.putParam("OOCreateFlagR", result.get("F10"));
 				occursList.putParam("OOAuthCreateDate", authCreateDate);
 				occursList.putParam("OOPropDate", propDate);
 				occursList.putParam("OORetrDate", retrDate);
@@ -175,8 +178,8 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOButtenFlagA", result.get("F21"));
 				occursList.putParam("OORetFlag", wkRetFlag);
 				occursList.putParam("OOTitaTxCd", result.get("F22"));
-				// 判斷是否有歷程
-				occursList.putParam("OOHistory", result.get("F28"));
+				occursList.putParam("OOProcessDate", processdate);
+				occursList.putParam("OOProcessTime", result.get("F24"));
 
 				createempno = findCdEmp(createempno, titaVo);
 				lastupdateempno = findCdEmp(lastupdateempno, titaVo);

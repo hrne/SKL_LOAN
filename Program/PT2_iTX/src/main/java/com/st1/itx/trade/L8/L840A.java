@@ -1554,7 +1554,7 @@ public class L840A extends TradeBuffer {
 //				if (tJcicZ570.getOutJcicTxtDate() == 0) {
 					tJcicZ570.setOutJcicTxtDate(iJcicDate);
 //				}
-				tJcicZ570.setActualFilingDate(iJcicDate);
+//				tJcicZ570.setActualFilingDate(iJcicDate);
 				tJcicZ570.setActualFilingMark("Y");
 			} else {
 				tJcicZ570.setOutJcicTxtDate(0);
@@ -3230,6 +3230,7 @@ public class L840A extends TradeBuffer {
 			iCustId = titaVo.getParam("CustId");
 			iSubmitKey = titaVo.get("SubmitKey");
 			iApplyDate = Integer.valueOf(titaVo.get("ApplyDate"));
+			this.info("iApplyDate日期     = " + iApplyDate);
 			JcicZ570Id jcicZ570Id = new JcicZ570Id();
 			jcicZ570Id.setCustId(iCustId);
 			jcicZ570Id.setSubmitKey(iSubmitKey);

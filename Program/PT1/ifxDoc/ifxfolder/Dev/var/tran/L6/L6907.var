@@ -453,8 +453,8 @@ TXFORM=L6907
 #OOCustNoX=戶號
 {width:100,align:'center'}
 
-#OOGetFeeTxt=
-{width:30,align:'center'}
+#OOGetFeeTxt=未收
+{width:40,align:'center'}
 
 #OOAcctCodeX=業務科目
 {width:200,align:'left'}
@@ -490,7 +490,6 @@ TXFORM=L6907
 {width:1,hidden:true}
 
 
-
 ^
 
 #RPTFG2=2,QUERY.GRID,L6907
@@ -499,8 +498,8 @@ TXFORM=L6907
 #OOCustNoX=戶號
 {width:100,align:'center'}
 
-#OOGetFeeTxt=
-{width:30,align:'center'}
+#OOGetFeeTxt=未收
+{width:40,align:'center'}
 
 #OOAcctCodeX=業務科目
 {width:200,align:'left'}
