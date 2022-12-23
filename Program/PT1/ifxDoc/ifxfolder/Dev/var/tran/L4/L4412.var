@@ -193,6 +193,7 @@ T(2,@LastUpdate,#L4R30LastUpdate)
 T(2,@StampCancelDate,#L4R30StampCancelDate)
 E(0,@LimitAmt,#L4R30LimitAmt)
 T(2,@AuthApplCode,#L4R30AuthApplCode)
+CALL(#wkCustCode)
 
 #RimTxCode=X,5,S
 T(2,L4412)

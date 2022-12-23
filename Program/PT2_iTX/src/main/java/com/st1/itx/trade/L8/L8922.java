@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -88,9 +89,30 @@ public class L8922 extends TradeBuffer {
 			int iFAcDateStart = iAcDateStart + 19110000;
 			int iFAcDateEnd = iAcDateEnd + 19110000;
 			this.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
+			
+			// 主管需篩選合理性記號=Y或N,代表經辦已經提交
+			List<String> lRational = new ArrayList<String>();
+			lRational.add("Y");
+			lRational.add("N");
 
-			slMlaundryDetail = sMlaundryDetailService.findbyDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit,
-					titaVo);
+			if (iLevel == 1) {// 主管
+				if (iFactor == 0) {
+					slMlaundryDetail = sMlaundryDetailService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, lRational,
+							this.index, Integer.MAX_VALUE, titaVo);
+				} else {
+					slMlaundryDetail = sMlaundryDetailService.findEntryDateRangeFactor(iFAcDateStart, iFAcDateEnd,
+							iFactor, lRational, this.index, this.limit, titaVo);
+				}
+			} else {// 經辦
+				if (iFactor == 0) {
+					slMlaundryDetail = sMlaundryDetailService.findbyDate(iFAcDateStart, iFAcDateEnd, this.index,
+							this.limit, titaVo);
+				} else {
+					slMlaundryDetail = sMlaundryDetailService.findFactor(iFAcDateStart, iFAcDateEnd, iFactor,
+							this.index, this.limit, titaVo);
+				}
+			}
+
 			List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null : slMlaundryDetail.getContent();
 
 			if (this.index == 0 && (lMlaundryDetail == null || lMlaundryDetail.size() == 0)) {
@@ -210,7 +232,7 @@ public class L8922 extends TradeBuffer {
 			// :1.主管覆核記號ManagerCheck=N或空白,2.主管覆核記號=Y則會有同意日期,需判斷是否為延遲交易確認:入帳日後4天內須同意,超過4天則需列出
 			List<Map<String, String>> resultList = null;
 			try {
-				resultList = l8922Servicelmpl.queryresult(this.index, this.limit, titaVo);
+				resultList = l8922Servicelmpl.queryresult(iLevel, this.index, this.limit, titaVo);
 			} catch (Exception e) {
 				this.error("l4926Servicelmpl findByCondition " + e.getMessage());
 				throw new LogicException("E0013", e.getMessage());

@@ -1829,6 +1829,12 @@ TXFORM=L2R04
 #L2r05BreachGetCode=A,1,S
 #L2r05ProdBreachFlag=X,1,S
 #L2r05Breach=x,200,S
+#L2r05BreachFlag=X,1,S
+#L2r05ProhibitMonth=A,3,S
+#L2r05BreachPercent=n,3.2,S
+#L2r05BreachDecreaseMonth=n,3,S
+#L2r05BreachDecrease=n,3.2,S
+#L2r05BreachStartPercent=n,3,S
 #L2r05CreditScore=A,3,S
 #L2r05GuaranteeDate=D,7,S
 #L2r05ContractNo=X,10,S
@@ -1949,6 +1955,14 @@ TXFORM=L2R05
 #L2r05BreachGetCode
 #L2r05ProdBreachFlag
 #L2r05Breach
+
+#L2r05BreachFlag
+#L2r05ProhibitMonth
+#L2r05BreachPercent
+#L2r05BreachDecreaseMonth
+#L2r05BreachDecrease
+#L2r05BreachStartPercent
+
 #L2r05CreditScore
 #L2r05GuaranteeDate
 #L2r05ContractNo

@@ -159,12 +159,12 @@ public class L3916 extends TradeBuffer {
 
 		}
 		int Prohibitperiod = 0;
-		this.info("Prohibityear = " + tFacProd.getProhibitMonth());
 
-		if (tFacProd.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
+
+		if (tFacMain.getProhibitMonth() > 0 && tFacMain.getFirstDrawdownDate() > 0) {
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
-			dDateUtil.setMons(tFacProd.getProhibitMonth());
+			dDateUtil.setMons(tFacMain.getProhibitMonth());
 			Prohibitperiod = dDateUtil.getCalenderDay(); // 綁約期限
 		}
 //		目前利率
@@ -184,7 +184,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("OCustNo", tLoanBorMain.getCustNo());
 		this.totaVo.putParam("OFacmNo", tLoanBorMain.getFacmNo());
 		this.totaVo.putParam("OBormNo", tLoanBorMain.getBormNo());
-		this.totaVo.putParam("ProdNo", tFacProd.getProdNo());
+		this.totaVo.putParam("ProdNo", tFacMain.getProdNo());
 		this.totaVo.putParam("ProdName", tFacProd.getProdName());
 		this.totaVo.putParam("OApplNo", tFacMain.getApplNo());
 		this.totaVo.putParam("PROHIBITPERIOD", Prohibitperiod);

@@ -22,11 +22,13 @@ E(0,0)
 [
 ["[L8202]                                 疑似洗錢樣態資料產生"],
 ["#FdEntryDate+入帳日期",#EntryDateS],
-["#FdFactorDays+統計期間天數",#FactorDays," (洗錢樣態一、二)"],
-["#FdFactorRange+統計期間",#EntryDateSL,"~",#EntryDateE],
 ["@洗錢樣態一","銀扣/匯款轉帳/支票兌現(不含專戶)"],
+["#FdFactorDays+統計期間天數",#FactorDays],
+["#FdFactorRange+統計期間",#EntryDateSL,"~",#EntryDateE],
 ["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
 ["@洗錢樣態二","銀扣/匯款轉帳/支票兌現(不含專戶)"],
+["#FdFactorDays2+統計期間天數",#FactorDays2],
+["#FdFactorRange+統計期間",#EntryDateSL2,"~",#EntryDateE2],
 ["#FdFactor2Count+次數",#Factor2Count],
 ["#FdFactor2AmtStart+單筆金額起迄",#Factor2AmtStart,"~",#Factor2AmtEnd],
 ["@洗錢樣態三","匯款摘要0087ＡＴ存入或0001現金存入"],
@@ -49,6 +51,7 @@ T(3, )
 #FdEntryDate=X,2,L
 T(3,*)
 #FdFactorDays=X,2,L
+#FdFactorDays2=X,2,L
 #FdFactorDays3=X,2,L
 #FdFactorRange=X,2,L
 !---------- AP TEXT AREA Variables ----------
@@ -76,6 +79,7 @@ R(1,L8R49)
 
 E(0,@FactorDays,#L8R49FactorDays)
 E(0,@Factor1TotLimit,#L8R49Factor1TotLimit)
+E(0,@FactorDays2,#L8R49FactorDays2)
 E(0,@Factor2Count,#L8R49Factor2Count)
 E(0,@Factor2AmtStart,#L8R49Factor2AmtStart)
 E(0,@Factor2AmtEnd,#L8R49Factor2AmtEnd)
@@ -83,6 +87,7 @@ E(0,@FactorDays3,#L8R49FactorDays3)
 E(0,@Factor3TotLimit,#L8R49Factor3TotLimit)
 T(F,@FactorDays,0)
 T(F,@Factor1TotLimit,0)
+T(F,@FactorDays2,0)
 T(F,@Factor2Count,0)
 T(F,@Factor2AmtStart,0)
 T(F,@Factor2AmtEnd,0)
@@ -114,6 +119,16 @@ D(6,2,#EntryDateSL8,1)
 #EntryDateSL=D,7,L
 E(0,#EntryDateSL8-19110000)
 
+! 退回 FactorDays2 天
+! 再加 1 天, 因迄日也含
+#EntryDateSL28=D,8,S
+E(0,#EntryDateS+19110000)
+D(6,3,#EntryDateSL28,#FactorDays2)
+D(6,2,#EntryDateSL28,1)
+
+#EntryDateSL2=D,7,L
+E(0,#EntryDateSL28-19110000)
+
 ! 退回 FactorDays3 天
 ! 再加 1 天, 因迄日也含
 #EntryDateSL38=D,8,S
@@ -124,11 +139,14 @@ D(6,2,#EntryDateSL38,1)
 #EntryDateSL3=D,7,L
 E(0,#EntryDateSL38-19110000)
 
-!統計期間天數
+!統計期間天數-樣態一
 #FactorDays=A,3,S
 
 ! 樣態一-金額合計超過
 #Factor1TotLimit=m,14,S
+
+!統計期間天數-樣態二
+#FactorDays2=A,3,S
 
 ! 樣態二-次數
 #Factor2Count=N,4,S
@@ -138,12 +156,15 @@ E(0,#EntryDateSL38-19110000)
 
 #Factor2AmtEnd=m,14,S
 
-!統計期間天數
+!統計期間天數-樣態三
 #FactorDays3=A,3,S
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,S
 
 #EntryDateE=D,7,L
+E(0,#EntryDateS)
+
+#EntryDateE2=D,7,L
 E(0,#EntryDateS)
 
 #EntryDateE3=D,7,L
@@ -179,8 +200,10 @@ T(3,[L8202] 疑似洗錢樣態資料產生)
 !------ 上行電文 ------
 <sub type="TIM">
 #EntryDateSL
+#EntryDateSL2
 #EntryDateSL3
 #EntryDateE
+#EntryDateE2
 #EntryDateE3
 #Factor1TotLimit
 #Factor2Count
@@ -188,6 +211,7 @@ T(3,[L8202] 疑似洗錢樣態資料產生)
 #Factor2AmtEnd
 #Factor3TotLimit
 #FactorDays
+#FactorDays2
 #FactorDays3
 #END
 </sub>

@@ -188,6 +188,8 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOLastUpdateEmpNo", lastupdateempno);
 				occursList.putParam("OOLastUpdate", lastupdate);
 				occursList.putParam("OOStampCancelDate", stampCancelDate);
+				// 判斷是否有歷程
+				occursList.putParam("OOHistory", result.get("F30"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

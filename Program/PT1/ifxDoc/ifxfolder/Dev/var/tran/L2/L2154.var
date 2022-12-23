@@ -845,7 +845,7 @@ T(2,@RimErrorSkip,Y)
 #FuncCodeX=X,4,L
 IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@FUNCIND,#FuncCode)
-T(H,#FuncCode,#FuncCodeHelp) 
+T(H,#FuncCode,#FuncCodeHelp)
 C(3,#FuncCode,2,K(MODIFYBUTTON,修改)E(0,@RELCD,2)E(0,@ACTFG,1),$)
 C(3,#FuncCode,4,K(MODIFYBUTTON,刪除)E(0,@RELCD,2)E(0,@ACTFG,1),$)
 C(3,#FuncCode,5,K(MODIFYBUTTON,查詢)E(0,@RELCD,0)E(0,@ACTFG,0),$)

@@ -92,21 +92,17 @@ public class LoanCloseBreachCom extends TradeBuffer {
 
 		// 依額度的清償違約條件計算清償違約金
 		for (FacMain tFacMain : lFacMain) {
-			// 查詢商品參數檔
-			FacProd tFacProd = facProdService.findById(tFacMain.getProdNo(), titaVo);
-			if (tFacProd == null) {
-				throw new LogicException(titaVo, "E0001", "商品參數檔 商品代碼 = " + tFacMain.getProdNo()); // 查詢資料不存在
-			}
+
 			// 是否限制清償 Y:是 N:否
-			if (!"Y".equals(tFacProd.getBreachFlag())) {
-				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
+			if (!"Y".equals(tFacMain.getBreachFlag())) {
+				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacMain.getBreachFlag());
 				continue;
 			}
 			if (tFacMain.getFirstDrawdownDate() == 0) {
 				continue;
 			}
 			// 只處理收取方式 "1":即時收取
-			if ("1".equals(tFacProd.getBreachGetCode())) {
+			if ("1".equals(tFacMain.getBreachGetCode())) {
 				// 前期
 				loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
 
@@ -119,7 +115,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					}
 				}
 				// 計算清償違約金 By 額度
-				calculateRoutine(tFacMain, tFacProd, titaVo);
+				calculateRoutine(tFacMain, titaVo);
 			}
 		}
 
@@ -167,23 +163,19 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		}
 		// 依額度的清償違約條件計算清償違約金
 		for (FacMain tFacMain : lFacMain) {
-			// 查詢商品參數檔
-			FacProd tFacProd = facProdService.findById(tFacMain.getProdNo(), titaVo);
-			if (tFacProd == null) {
-				throw new LogicException(titaVo, "E0001", "商品參數檔 商品代碼 = " + tFacMain.getProdNo()); // 查詢資料不存在
-			}
+
 			// 是否限制清償 Y:是 N:否
-			if (!"Y".equals(tFacProd.getBreachFlag())) {
-				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
+			if (!"Y".equals(tFacMain.getBreachFlag())) {
+				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacMain.getBreachFlag());
 				continue;
 			}
 			if (tFacMain.getFirstDrawdownDate() == 0) {
 				continue;
 			}
-			
+
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
-			dDateUtil.setMons(tFacProd.getProhibitMonth());
+			dDateUtil.setMons(tFacMain.getProhibitMonth());
 			if (prohibitDate == 0 || prohibitDate < dDateUtil.getCalenderDay()) {
 				prohibitDate = dDateUtil.getCalenderDay();
 			}
@@ -225,14 +217,10 @@ public class LoanCloseBreachCom extends TradeBuffer {
 
 		// 依額度的清償違約條件計算清償違約金
 		for (FacMain tFacMain : lFacMain) {
-			// 查詢商品參數檔
-			FacProd tFacProd = facProdService.findById(tFacMain.getProdNo(), titaVo);
-			if (tFacProd == null) {
-				throw new LogicException(titaVo, "E0001", "商品參數檔 商品代碼 = " + tFacMain.getProdNo()); // 查詢資料不存在
-			}
+
 			// 是否限制清償 Y:是 N:否
-			if (!"Y".equals(tFacProd.getBreachFlag())) {
-				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacProd.getBreachFlag());
+			if (!"Y".equals(tFacMain.getBreachFlag())) {
+				this.info("ProdNo = " + tFacMain.getProdNo() + " skip BreachFlag=" + tFacMain.getBreachFlag());
 				continue;
 			}
 			if (tFacMain.getFirstDrawdownDate() == 0) {
@@ -240,7 +228,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			}
 			dDateUtil.init();
 			dDateUtil.setDate_1(tFacMain.getFirstDrawdownDate());
-			dDateUtil.setMons(tFacProd.getProhibitMonth());
+			dDateUtil.setMons(tFacMain.getProhibitMonth());
 			int prohibitDate = dDateUtil.getCalenderDay();
 //			限制清償期間內
 			if (iEntryDate > 0 && iEntryDate >= prohibitDate) {
@@ -251,7 +239,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					int facmNo = 0;
 					for (LoanCloseBreachVo iVo : iListVo) {
 						if (iVo.getFacmNo() == tFacMain.getFacmNo()) {
-							//同額度只load一次BorTx
+							// 同額度只load一次BorTx
 							if (facmNo == 0 || facmNo != iVo.getFacmNo()) {
 								this.info("facmNo == 0 || facmNo != iVo.getFacmNo() ");
 								loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), 0, titaVo);
@@ -265,14 +253,14 @@ public class LoanCloseBreachCom extends TradeBuffer {
 
 				} else {
 					this.info("iListVo = null");
-					//貸出金額(放款餘額)為0
+					// 貸出金額(放款餘額)為0
 					if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
 						loadBortxRoutine(iCustNo, tFacMain.getFacmNo(), iBormNo, titaVo);
 					}
 				}
 			}
 			// 計算清償違約金 By 額度
-			calculateRoutine(tFacMain, tFacProd, titaVo);
+			calculateRoutine(tFacMain, titaVo);
 		}
 
 		// LogOutput
@@ -360,7 +348,7 @@ public class LoanCloseBreachCom extends TradeBuffer {
 	}
 
 	// 計算
-	private void calculateRoutine(FacMain m, FacProd p, TitaVo titaVo) throws LogicException {
+	private void calculateRoutine(FacMain m, TitaVo titaVo) throws LogicException {
 		this.info("v=" + lLoanCloseBreach.toString());
 		if (lLoanCloseBreach != null && lLoanCloseBreach.size() > 0) {
 			BigDecimal extraRepayAcc = BigDecimal.ZERO; // 提前還款金額累計
@@ -371,17 +359,17 @@ public class LoanCloseBreachCom extends TradeBuffer {
 					v.setAmortizedCode(m.getAmortizedCode()); // 攤還方式,還本方式 1.按月繳息(按期繳息到期還本) 2.到期取息(到期繳息還本)
 																// 3.本息平均法(期金) 4.本金平均法
 					v.setStartDate(m.getFirstDrawdownDate());
-					v.setBreachGetCode(p.getBreachGetCode()); // 清償違約金收取方式 "1":即時收取 "2":領清償證明時收取
-					v.setBreachCode(p.getBreachCode()); // 違約適用方式
-					v.setProhibitMonth(p.getProhibitMonth());// 限制清償年限
-					v.setBreachPercent(p.getBreachPercent()); // 違約金百分比;
-					v.setBreachDecreaseMonth(p.getBreachDecreaseMonth()); // 違約金分段月數
-					v.setBreachDecrease(p.getBreachDecrease()); // 分段遞減百分比;
+					v.setBreachGetCode(m.getBreachGetCode()); // 清償違約金收取方式 "1":即時收取 "2":領清償證明時收取
+					v.setBreachCode(m.getBreachCode()); // 違約適用方式
+					v.setProhibitMonth(m.getProhibitMonth());// 限制清償年限
+					v.setBreachPercent(m.getBreachPercent()); // 違約金百分比;
+					v.setBreachDecreaseMonth(m.getBreachDecreaseMonth()); // 違約金分段月數
+					v.setBreachDecrease(m.getBreachDecrease()); // 分段遞減百分比;
 					v.setLineAmt(m.getLineAmt()); // 核准額度
 					v.setUtilBal(m.getUtilBal()); // 撥款金額
 					extraRepayAcc = extraRepayAcc.add(v.getExtraRepay());
 					v.setExtraRepayAcc(extraRepayAcc); // 提前還款金額累計
-					v.setBreachStartPercent(p.getBreachStartPercent()); // 還款起算比例
+					v.setBreachStartPercent(m.getBreachStartPercent()); // 還款起算比例
 					this.info("v=" + v.toString());
 
 					// 2022-03-22 智偉增加
@@ -571,8 +559,8 @@ public class LoanCloseBreachCom extends TradeBuffer {
 		}
 	}
 
-	// 清償違約說明
-	public String getBreachDescription(String ProdNo, TitaVo titaVo) throws LogicException {
+	// 商品清償違約說明
+	public String getProdBreachDescription(String ProdNo, TitaVo titaVo) throws LogicException {
 		this.info("getBreachDescription  ");
 
 		String wkBreachDescription = "";
@@ -628,6 +616,62 @@ public class LoanCloseBreachCom extends TradeBuffer {
 			wkBreachDescription = wkBreachA + wkBreachB + wkBreachC + wkBreachD + wkBreachE + wkBreachF;
 
 		}
+
+		return wkBreachDescription;
+	}
+
+	// 額度清償違約說明
+	public String getFacBreachDescription(FacMain tFacMain, TitaVo titaVo) throws LogicException {
+		this.info("getBreachDescription  ");
+
+		String wkBreachDescription = "";
+		String wkBreachA = "";
+		String wkBreachB = "";
+		String wkBreachC = "";
+		String wkBreachD = "";
+		String wkBreachE = "";
+		String wkBreachF = "";
+
+		if ("Y".equals(tFacMain.getBreachFlag())) {
+			wkBreachA = "自借款日起算，於未滿 " + tFacMain.getProhibitMonth() + "個月期間提前清償者";
+			if (tFacMain.getBreachStartPercent() != 0) {
+				wkBreachB = "，還款金額達 " + tFacMain.getBreachStartPercent() + "% 以上時";
+			}
+			switch (tFacMain.getBreachCode()) {
+			case "001":
+				wkBreachC = "，按各次提前清償金額";
+				break;
+			case "002":
+				wkBreachC = "，按各次提前清償金額";
+				break;
+			case "003":
+				wkBreachC = "，每次還款按核准額度";
+				break;
+			case "004":
+				wkBreachC = "，每次還款依撥款金額";
+				break;
+			case "005":
+				wkBreachC = "，按各次提前清償金額";
+				break;
+			}
+			if (tFacMain.getBreachPercent().compareTo(BigDecimal.ZERO) > 0) {
+				wkBreachD = "，" + tFacMain.getBreachPercent() + "% 計付違約金";
+			}
+			if (tFacMain.getBreachDecreaseMonth() != 0) {
+				wkBreachE = "，但每" + tFacMain.getBreachDecreaseMonth() + "個月遞減違約金" + tFacMain.getBreachDecrease() + "%";
+			}
+			switch (tFacMain.getBreachGetCode()) {
+			case "1":
+				wkBreachF = "，即時收取";
+				break;
+
+			case "2":
+				wkBreachF = "，領清償證明時收取";
+				break;
+			}
+
+		}
+		wkBreachDescription = wkBreachA + wkBreachB + wkBreachC + wkBreachD + wkBreachE + wkBreachF;
 
 		return wkBreachDescription;
 	}

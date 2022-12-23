@@ -84,12 +84,6 @@ public class L3130 extends TradeBuffer {
 			wkBormNoS = iBormNo;
 			wkBormNoE = iBormNo;
 		}
-		// 入帳日或會計日小於等於約定部分償還日期，同日僅能一筆
-		LoanBook lastLoanBook = loanBookService.facmNoLastBookDateFirst(iCustNo, iFacmNo, iFacmNo, wkBormNoS, wkBormNoE, titaVo);
-
-		if (lastLoanBook != null && iBookDate <= lastLoanBook.getBookDate()) {
-			existence = true;
-		}
 
 		// 更新放款約定還本檔
 		LoanBookId tLoanBookId = new LoanBookId();
@@ -100,9 +94,11 @@ public class L3130 extends TradeBuffer {
 		tLoanBookId.setBookDate(iBookDate);
 		switch (iFuncCode) {
 		case 1: // 新增
-			if (existence) {
+			tLoanBook = loanBookService.findById(tLoanBookId, titaVo);
+			if (tLoanBook != null) {
 				throw new LogicException(titaVo, "E0015", "約定部分償還，同日僅能一筆"); // 檢查錯誤
 			}
+			tLoanBook = new LoanBook();
 			tLoanBook.setCustNo(iCustNo);
 			tLoanBook.setFacmNo(iFacmNo);
 			tLoanBook.setBormNo(iBormNo);
@@ -161,6 +157,7 @@ public class L3130 extends TradeBuffer {
 				tOldLoanBookId.setBookDate(iOldBookDate);
 
 				tOldLoanBook = loanBookService.holdById(tOldLoanBookId);
+				beforeLoanBook = (LoanBook) datalog.clone(tOldLoanBook);
 
 				try {
 					loanBookService.delete(tOldLoanBook, titaVo);
@@ -188,6 +185,9 @@ public class L3130 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0005", "放款約定還本檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
 				}
+
+				datalog.setEnv(titaVo, beforeLoanBook, tLoanBook);
+				datalog.exec();
 			}
 
 			break;

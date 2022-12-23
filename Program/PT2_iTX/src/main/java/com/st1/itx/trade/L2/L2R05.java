@@ -449,12 +449,19 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05Coorgnizer", tFacMain.getCoorgnizer());
 		this.totaVo.putParam("L2r05GroupId", wkGroupId);
 		this.totaVo.putParam("L2r05AdvanceCloseCode", tFacMain.getAdvanceCloseCode());
-		this.totaVo.putParam("L2r05BreachCode", tFacProd.getBreachCode());
-		this.totaVo.putParam("L2r05BreachGetCode", tFacProd.getBreachGetCode());
-//		this.totaVo.putParam("L2r05DecreaseFlag", tFacProd.getDecreaseFlag());
-//		this.totaVo.putParam("L2r05CopyFlag", tFacMain.getCopyFlag());
+
 		this.totaVo.putParam("L2r05ProdBreachFlag", tFacMain.getProdBreachFlag());
+		this.totaVo.putParam("L2r05BreachCode", tFacMain.getBreachCode());
+		this.totaVo.putParam("L2r05BreachGetCode", tFacMain.getBreachGetCode());
 		this.totaVo.putParam("L2r05Breach", tFacMain.getBreachDescription());
+
+		this.totaVo.putParam("L2r05BreachFlag", tFacMain.getBreachFlag());
+		this.totaVo.putParam("L2r05ProhibitMonth", tFacMain.getProhibitMonth());
+		this.totaVo.putParam("L2r05BreachPercent", tFacMain.getBreachPercent());
+		this.totaVo.putParam("L2r05BreachDecreaseMonth", tFacMain.getBreachDecreaseMonth());
+		this.totaVo.putParam("L2r05BreachDecrease", tFacMain.getBreachDecrease());
+		this.totaVo.putParam("L2r05BreachStartPercent", tFacMain.getBreachStartPercent());
+		
 		this.totaVo.putParam("L2r05CreditScore", tFacMain.getCreditScore());
 		this.totaVo.putParam("L2r05GuaranteeDate", tFacMain.getGuaranteeDate());
 		this.totaVo.putParam("L2r05ContractNo", tFacMain.getContractNo());
@@ -632,6 +639,12 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05BreachCode", "");
 		this.totaVo.putParam("L2r05BreachGetCode", "");
 		this.totaVo.putParam("L2r05ProdBreachFlag", "");
+		this.totaVo.putParam("L2r05BreachFlag", "");
+		this.totaVo.putParam("L2r05ProhibitMonth",0);
+		this.totaVo.putParam("L2r05BreachPercent", 0);
+		this.totaVo.putParam("L2r05BreachDecreaseMonth", 0);
+		this.totaVo.putParam("L2r05BreachDecrease", 0);
+		this.totaVo.putParam("L2r05BreachStartPercent", 0);
 		this.totaVo.putParam("L2r05Breach", "");
 		this.totaVo.putParam("L2r05CreditScore", "");
 		this.totaVo.putParam("L2r05GuaranteeDate", "");

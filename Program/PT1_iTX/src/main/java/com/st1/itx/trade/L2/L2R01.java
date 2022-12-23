@@ -106,27 +106,30 @@ public class L2R01 extends TradeBuffer {
 					throw new LogicException(titaVo, "E2052", "商品參數檔"); // 商品參數生效後禁止刪除
 				}
 			} else {
+				if (iRimTxCode.equals("L2101")) {
+					if (iRimFuncCode == 2) {
 
+					} else {
+
+					}
+				}
 				if (iRimFuncCode != 5) {
 					if (!(tFacProd.getStartDate() <= parse.stringToInteger(titaVo.getCalDy()))) {
 						throw new LogicException(titaVo, "E2053", "商品參數檔"); // 此商品尚未生效
 					}
 					if (tFacProd.getEndDate() > 0) {
 						if (tFacProd.getEndDate() < parse.stringToInteger(titaVo.getCalDy())) {
-							throw new LogicException(titaVo, "E2054", "商品參數檔" + " 商品代碼 = " + iRimProdNo + " 商品截止日期 : " + tFacProd.getEndDate()); // 此商品已截止
+							throw new LogicException(titaVo, "E2054",
+									"商品參數檔" + " 商品代碼 = " + iRimProdNo + " 商品截止日期 : " + tFacProd.getEndDate()); // 此商品已截止
 						}
 					}
-
 					if (!tFacProd.getStatusCode().equals("0")) {
 						throw new LogicException(titaVo, "E2055", "商品已停用 =" + tFacProd.getProdNo() + "商品參數檔"); // 此商品已停用
 					}
 				}
-
 			}
-
-			BreachDescription = loanCloseBreachCom.getBreachDescription(tFacProd.getProdNo(), titaVo);
+			BreachDescription = loanCloseBreachCom.getProdBreachDescription(tFacProd.getProdNo(), titaVo);
 			this.info("清償違約說明= " + BreachDescription);
-
 			/* 將每筆資料放入Tota */
 			SetTotaFacProd();
 		} else {
@@ -165,18 +168,21 @@ public class L2R01 extends TradeBuffer {
 		}
 
 		// 查詢年繳保費優惠減碼
-		lFacProdPremium = facProdPremiumService.premiumProdNoEq(iRimProdNo, new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		lFacProdPremium = facProdPremiumService.premiumProdNoEq(iRimProdNo, new BigDecimal(0.00),
+				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdPremium == null || lFacProdPremium.isEmpty())) {
 			SetTotaPremium();
 		}
 
 		// 查詢帳管費
-		lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1", new BigDecimal(0.00),
+				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 			SetTotaAcctFee();
 		}
 		// 查詢手續費
-		lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2", new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2", new BigDecimal(0.00),
+				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty())) {
 			SetTotaHandingFee();
 		}

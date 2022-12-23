@@ -166,11 +166,6 @@ public class L2153 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2003", "商品參數檔  商品代碼=" + iProdNo); // 查無資料
 		}
 
-		// Eloan 清償違約說明
-		if (this.isEloan) {
-			titaVo.putParam("Breach", loanCloseBreachCom.getBreachDescription(iProdNo, titaVo));
-		}
-
 		isElaonUpdate = false;
 		// Eloan check 是否重送 Y -> 修正
 		if (this.isEloan) {
@@ -533,6 +528,23 @@ public class L2153 extends TradeBuffer {
 			if (!custTypeCode.isEmpty()) {
 				custTypeCode = custCom.eLoanCustTypeCode(titaVo, custTypeCode);
 			}
+			tFacMain.setBreachFlag(titaVo.getParam("BreachFlag"));
+			tFacMain.setBreachCode(parse.IntegerToString(parse.stringToInteger(titaVo.getParam("BreachCode")), 3));
+			tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
+			tFacMain.setProhibitMonth(parse.stringToInteger(titaVo.getParam("ProhibitMonth")));
+			tFacMain.setBreachPercent(parse.stringToBigDecimal(titaVo.getParam("BreachPercent")));
+			tFacMain.setBreachDecreaseMonth(parse.stringToInteger(titaVo.getParam("BreachDecreaseMonth")));
+			tFacMain.setBreachDecrease(parse.stringToBigDecimal(titaVo.getParam("BreachDecrease")));
+			tFacMain.setBreachStartPercent(parse.stringToInteger(titaVo.getParam("BreachStartPercent")));
+		} else {
+			tFacMain.setBreachFlag(tFacProd.getBreachFlag());
+			tFacMain.setBreachCode(tFacProd.getBreachCode());
+			tFacMain.setBreachGetCode(tFacProd.getBreachGetCode());
+			tFacMain.setProhibitMonth(tFacProd.getProhibitMonth());
+			tFacMain.setBreachPercent(tFacProd.getBreachPercent());
+			tFacMain.setBreachDecreaseMonth(tFacProd.getBreachDecreaseMonth());
+			tFacMain.setBreachDecrease(tFacProd.getBreachDecrease());
+			tFacMain.setBreachStartPercent(tFacProd.getBreachStartPercent());
 		}
 		tFacMain.setCustTypeCode(custTypeCode);
 		tFacMain.setRuleCode(titaVo.getParam("RuleCode"));
@@ -558,9 +570,14 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
-
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
+
+		// Eloan 清償違約說明
+		if (this.isEloan) {
+			titaVo.putParam("Breach", loanCloseBreachCom.getFacBreachDescription(tFacMain, titaVo));
+		}
 		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
+		
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
 		tFacMain.setContractNo("");

@@ -26,10 +26,11 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,40];">
 [
 ["[L8201]                                 疑似洗錢樣態條件設定"],
-["#FdFactorDays+統計期間天數",#FactorDays," (洗錢樣態一、二)"],
 ["@洗錢樣態一","銀扣/匯款轉帳/支票兌現(不含專戶)"],
+["#FdFactorDays+統計期間天數",#FactorDays],
 ["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
 ["@洗錢樣態二","銀扣/匯款轉帳/支票兌現(不含專戶)"],
+["#FdFactorDays2+統計期間天數",#FactorDays2],
 ["#FdFactor2Count+次數",#Factor2Count],
 ["#FdFactor2AmtStart+單筆金額起迄",#Factor2AmtStart,"~",#Factor2AmtEnd],
 ["@洗錢樣態三","匯款摘要0087ＡＴ存入或0001現金存入"],
@@ -50,6 +51,8 @@ T(3,*)
 #FdFactor3TotLimit=X,2,L
 T(3,*)
 #FdFactorDays=X,2,L
+T(3,*)
+#FdFactorDays2=X,2,L
 T(3,*)
 #FdFactorDays3=X,2,L
 T(3,*)
@@ -87,17 +90,22 @@ E(0,@Factor2AmtStart,#L8R49Factor2AmtStart)
 E(0,@Factor2AmtEnd,#L8R49Factor2AmtEnd)
 E(0,@Factor3TotLimit,#L8R49Factor3TotLimit)
 E(0,@FactorDays,#L8R49FactorDays)
+E(0,@FactorDays2,#L8R49FactorDays2)
 E(0,@FactorDays3,#L8R49FactorDays3)
 
 #FuncCode1=A,1,S
 C(3,#L8R49FactorDays,0,E(0,#FuncCode,1),E(0,#FuncCode,2))
 
-!統計期間天數
+!統計期間天數-樣態一
 #FactorDays=N,3,I
 @V(2,0)
 
 ! 樣態一-金額合計超過
 #Factor1TotLimit=m,14,I
+@V(2,0)
+
+!統計期間天數-樣態二
+#FactorDays2=N,3,I
 @V(2,0)
 
 ! 樣態二-次數
@@ -111,7 +119,7 @@ C(3,#L8R49FactorDays,0,E(0,#FuncCode,1),E(0,#FuncCode,2))
 #Factor2AmtEnd=m,14,I
 @V(2,0)
 
-!統計期間天數
+!統計期間天數-樣態三
 #FactorDays3=N,3,I
 @V(2,0)
 
@@ -155,6 +163,7 @@ T(3,[L8201] 疑似洗錢樣態條件設定)
 #Factor2AmtEnd
 #Factor3TotLimit
 #FactorDays
+#FactorDays2
 #FactorDays3
 #END
 </sub>

@@ -207,7 +207,7 @@ X(#OOTotalAmt1)
 
 !統計期間迄日
 #OOEndEntryDate=D,7,L
-E(0,#OOEntryDate)
+!E(0,#OOEntryDate)
 
 </sub>
 
@@ -247,6 +247,7 @@ TXFORM=L8926
 #OOFactor
 #OOCreateDate
 #OOEntryDate
+#OOEndEntryDate
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L8R49.tom"/>

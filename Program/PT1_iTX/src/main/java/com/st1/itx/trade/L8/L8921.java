@@ -70,12 +70,12 @@ public class L8921 extends TradeBuffer {
 
 		// 查詢疑似洗錢樣態檢核明細檔檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;
-		if (iFactor == 0) {
-			slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
+		if(iFactor==0) {
+			slMlaundryChkDtl = sMlaundryChkDtlService.findDtlEntryDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
 		} else {
-			slMlaundryChkDtl = sMlaundryChkDtlService.findFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
+			slMlaundryChkDtl = sMlaundryChkDtlService.DtlEntryDateFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
 		}
-
+		
 		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
 
 		if (lMlaundryChkDtl == null || lMlaundryChkDtl.size() == 0) {
@@ -93,20 +93,22 @@ public class L8921 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 			}
+			
 
 			occursList.putParam("OOFactor", tMlaundryChkDtl.getFactor()); // 交易樣態
-			occursList.putParam("OOEntryDate", tMlaundryChkDtl.getEntryDate()); // 入帳日期
+			occursList.putParam("OOEntryDate", tMlaundryChkDtl.getDtlEntryDate()); // 實際入帳日期
 			occursList.putParam("OOCustNo", tMlaundryChkDtl.getCustNo()); // 戶號
 			occursList.putParam("OORepayItem", tMlaundryChkDtl.getRepayItem()); // 來源
-
+			
 			// 匯款摘要
 			CdCode tCdCode = sCdCodeService.getItemFirst(4, "BankRmftCode", tMlaundryChkDtl.getDscptCode(), titaVo);
 			occursList.putParam("OODscptCode", tCdCode != null ? tCdCode.getItem() : tMlaundryChkDtl.getDscptCode());
-
+			
 			occursList.putParam("OOTxAmt", tMlaundryChkDtl.getTxAmt()); // 交易金額
 			occursList.putParam("OOTotalAmt", tMlaundryChkDtl.getTotalAmt()); // 累計金額
 			occursList.putParam("OOTotalCnt", tMlaundryChkDtl.getTotalCnt()); // 累計筆數
 			occursList.putParam("OOStartEntryDate", tMlaundryChkDtl.getStartEntryDate()); // 統計期間起日
+			occursList.putParam("OOEndEntryDate", tMlaundryChkDtl.getEntryDate()); // 統計期間止日
 
 			DateTime = this.parse.timeStampToString(tMlaundryChkDtl.getCreateDate()); // 產製日期
 			this.info("L8921 DateTime : " + DateTime);

@@ -92,6 +92,7 @@ public class L8R49 extends TradeBuffer {
 		this.totaVo.putParam("L8R49Factor2AmtEnd", mMlaundryParas.getFactor2AmtEnd());
 		this.totaVo.putParam("L8R49Factor3TotLimit", mMlaundryParas.getFactor3TotLimit());
 		this.totaVo.putParam("L8R49FactorDays", mMlaundryParas.getFactorDays());
+		this.totaVo.putParam("L8R49FactorDays2", mMlaundryParas.getFactorDays2()); //2022/12/18待DB換版
 		this.totaVo.putParam("L8R49FactorDays3", mMlaundryParas.getFactorDays3());
 	}
 

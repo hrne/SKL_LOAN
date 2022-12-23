@@ -96,7 +96,7 @@ public class L8201 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tMlaundryParas2, tMlaundryParas); ////
-			dataLog.exec(); ////
+			dataLog.exec("疑似洗錢樣態條件設定檔"); ////
 
 			break;
 		case 4: // 刪除
@@ -110,6 +110,8 @@ public class L8201 extends TradeBuffer {
 			} else {
 				throw new LogicException(titaVo, "E0004", iBusinessType); // 刪除資料不存在
 			}
+			dataLog.setEnv(titaVo, tMlaundryParas, tMlaundryParas); ////
+			dataLog.exec("疑似洗錢樣態條件設定檔"); ////
 			break;
 		case 5: // inq
 			break;
@@ -127,6 +129,7 @@ public class L8201 extends TradeBuffer {
 		mMlaundryParas.setFactor2AmtEnd(this.parse.stringToBigDecimal(titaVo.getParam("Factor2AmtEnd")));
 		mMlaundryParas.setFactor3TotLimit(this.parse.stringToBigDecimal(titaVo.getParam("Factor3TotLimit")));
 		mMlaundryParas.setFactorDays(this.parse.stringToInteger(titaVo.getParam("FactorDays")));
+		mMlaundryParas.setFactorDays2(this.parse.stringToInteger(titaVo.getParam("FactorDays2"))); 
 		mMlaundryParas.setFactorDays3(this.parse.stringToInteger(titaVo.getParam("FactorDays3")));
 		if (mFuncCode != 2) {
 			mMlaundryParas.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

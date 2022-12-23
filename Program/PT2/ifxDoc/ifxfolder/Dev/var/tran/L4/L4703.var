@@ -180,7 +180,7 @@ T(3,)T(H,#NoticeFlag,#NoticeFlagHelp)
 <include src="ROM.icf::L1R20.dec"/>
 <include src="ROM.icf::L4R32.dec"/>
 #FormNo=x,10,S
-T(3,L9703)
+T(3,L4703)
 
 
 

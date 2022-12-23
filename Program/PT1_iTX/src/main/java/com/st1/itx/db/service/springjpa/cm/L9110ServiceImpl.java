@@ -426,7 +426,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                    AND L.\"ClNo\"    = CF.\"ClNo\"";
-		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(\"Fn_ParseEOL\"(CM.\"CustName\", 0),0,15),' ') AS \"Owner\"";
+		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(\"Fn_ParseEOL\"(CM.\"CustName\", 0),0,7),' ') AS \"Owner\"";
 		sql += "                 , LO.\"ClCode1\"";
 		sql += "                 , LO.\"ClCode2\"";
 		sql += "                 , LO.\"ClNo\"";
@@ -550,7 +550,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F41利率區分 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',PROD.\"BreachCode\")) ";
+		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',FAC.\"BreachCode\")) ";
 		sql += "        ELSE FAC.\"BreachDescription\" ";
 		sql += "        END                            AS F42違約適用方式 ";
 		sql += "      , NVL(\"Fn_ParseEOL\"(GROUPCM.\"CustName\", 0),'無')           AS F43團體戶名 "; // 法人不出
@@ -565,7 +565,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          THEN n'董事會' "; // 核准層級9:董事會，不需填寫核決主管
 		sql += "        ELSE \"Fn_GetEmpName\"(FAC.\"Supervisor\",1) ";
 		sql += "        END                            AS F47核決主管 ";
-		sql += "      , PROD.\"ProhibitMonth\"         AS F48限制清償期限 ";
+		sql += "      , FAC.\"ProhibitMonth\"         AS F48限制清償期限 ";
 		sql += "      , FAC.\"AcctFee\"                AS F49帳管費 ";
 		sql += "      , NVL(\"Fn_GetEmpName\"(FAC.\"EstimateReview\",1),'無') ";
 		sql += "                                       AS F50估價覆核姓名 ";
@@ -582,18 +582,18 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F56規定管制代碼 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-		sql += "          THEN TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',PROD.\"BreachGetCode\")) ";
+		sql += "          THEN TO_CHAR(\"Fn_GetCdCode\"('BreachGetCode',FAC.\"BreachGetCode\")) ";
 		sql += "        ELSE '' ";
 		sql += "        END                            AS F57違約金收取方式 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
-		sql += "          THEN PROD.\"BreachCode\" ";
+		sql += "          THEN FAC.\"BreachCode\" ";
 		sql += "        ELSE '' ";
 		sql += "        END                            AS F58違約適用方式 ";
 		sql += "      , PROD.\"ProdName\"       	   AS F59商品名稱 ";
 		sql += "      , FAC.\"BaseRateCode\"       	   AS F60指標利率代碼 ";
 		sql += "      , FAC.\"LastBormNo\"       	   AS F61最後撥款序號 ";
-		sql += "      , PROD.\"BreachDecreaseMonth\"   AS F62違約金分段月數";
+		sql += "      , FAC.\"BreachDecreaseMonth\"   AS F62違約金分段月數";
 		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // 客戶資料主檔
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // 額度主檔

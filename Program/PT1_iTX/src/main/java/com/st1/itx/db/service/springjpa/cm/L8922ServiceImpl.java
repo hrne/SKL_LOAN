@@ -45,7 +45,7 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 //	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 
-	public List<Map<String, String>> queryresult(int index, int limit, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> queryresult(int iLevel, int index, int limit, TitaVo titaVo) throws Exception {
 
 		this.info("L8922ServiceImpl.queryresult");
 
@@ -86,8 +86,13 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " AND  CASE WHEN NVL(M.\"ManagerCheck\", 'N') != 'Y' THEN 1     \n     ";
 		sql += "           WHEN \"Fn_CountBusinessDays\"(M.\"EntryDate\",M.\"ManagerDate\") > 4   THEN 1     \n     ";
 		sql += "           ELSE 0 END=1  \n";
+		
 		if (iFactor > 0) {
 			sql += " AND  M.\"Factor\" = :iFactor       \n";
+		}
+
+		if (iLevel == 1) {
+			sql += " AND  NVL(M.\"Rational\") IN ('Y','N')     \n";
 		}
 
 		sql += "ORDER BY M.\"EntryDate\" DESC , M.\"CustNo\" , M.\"Factor\" ";
@@ -108,7 +113,6 @@ public class L8922ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iFactor > 0) {
 			query.setParameter("iFactor", iFactor);
 		}
-
 
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
