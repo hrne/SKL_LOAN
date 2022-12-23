@@ -54,7 +54,10 @@ public class L2419ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     WHEN CF.\"ClCode1\" = 1 ";
 		sql += "     THEN CB.\"IrCode\" ";
 		sql += "   ELSE CL.\"IrCode\" END AS \"IrCode\" ";
-		sql += " , CB.\"Road\" ";
+		sql += " , SUBSTR(CB.\"BdLocation\", ";
+		sql += "          INSTR(CB.\"BdLocation\", CA.\"CityItem\" || CA.\"AreaItem\") ";
+		sql += "          + LENGTH(CA.\"CityItem\" || CA.\"AreaItem\") ";
+		sql += "         ) AS \"Road\" ";
 		sql += " , CB.\"BdNo1\" ";
 		sql += " , CB.\"BdNo2\" ";
 		sql += " , CB.\"BdMainUseCode\" ";

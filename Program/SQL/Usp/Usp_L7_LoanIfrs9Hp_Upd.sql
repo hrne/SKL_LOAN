@@ -91,6 +91,7 @@ BEGIN
            FROM   "Ifrs9LoanData" M
              LEFT JOIN "Ifrs9FacData"  F   ON  F."CustNo" = M."CustNo"
                                           AND  F."FacmNo" = M."FacmNo"
+                                          AND  F."DataYM" = YYYYMM
            WHERE M."DataYM" =  YYYYMM                              
            -- 尚未撥款的資料 (已核撥記號=0 & 動支期限>=月底日)
            UNION

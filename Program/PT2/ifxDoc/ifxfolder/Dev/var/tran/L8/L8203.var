@@ -344,7 +344,6 @@ T(H,#RepaySource,#ApHelp)
 C(4,#L8R50Rational,$,s)
 C(3,#RepaySource,1,T(B,依據電話訪問還款資金來源為+#RepayBank+#RepaySourceX),T(B,依據電話訪問還款資金來源為+#RepaySourceX+#Description))
 
-
 #EmpNoDesc=x,4.50,I
 TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FuncCode,4,s)
@@ -359,7 +358,9 @@ T(4,@CDATE,CDATE$)
 C(3,#FuncCode,4,s,$)
 C(3,#FuncCode,5,s,$)
 C(3,#Level,1,$,s)
+IF(#L8R50ManagerCheck=="Y" || #L8R50ManagerCheck=="N",$,T(2,@ManagerCheck,Y))
 T(3,@AgreeHelp,Y:同意;N:退回)
+
 HELP(#AgreeHelp)
 @T(3,@ManagerCheckX,)
 V(H,#AgreeHelp)

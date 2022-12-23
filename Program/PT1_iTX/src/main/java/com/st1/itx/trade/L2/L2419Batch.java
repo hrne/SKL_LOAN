@@ -646,6 +646,13 @@ public class L2419Batch extends TradeBuffer {
 				clBuilding.setIrCode(landSectionCode);
 				// 路名
 				clBuilding.setRoad(address);
+				clBuilding.setSection("");
+				clBuilding.setAlley("");
+				clBuilding.setLane("");
+				clBuilding.setNum("");
+				clBuilding.setNumDash("");
+				clBuilding.setFloor("");
+				clBuilding.setFloorDash("");
 				// 建物門牌
 				clBuilding.setBdLocation(cityItem + areaItem + address);
 				// 建號

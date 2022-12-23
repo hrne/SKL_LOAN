@@ -105,7 +105,7 @@ BEGIN
          , C."CustId"                            AS "CustId"            -- 授信戶IDN
          , CASE
              WHEN TRIM(NVL(C."CustName", ' ')) = ''  THEN TO_NCHAR('　　　　　　　　　　')
-             ELSE RPAD(REPLACE(C."CustName",'　'),20,TO_NCHAR('　'))   
+             ELSE RPAD(REPLACE(C."CustName",'　'),10,TO_NCHAR('　'))   
            END                                   AS "CustName"          -- 中文姓名
          --, RPAD(C."CustName",18,'　')            AS "CustName"          -- 中文姓名
          , SUBSTR(NVL(C."EName",' '),1,20)       AS "EName"             -- 英文姓名
