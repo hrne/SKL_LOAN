@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM050ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -49,8 +50,25 @@ public class LM050Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM050", "放款保險法第3條利害關係人放款餘額表_限額控管", "LM050放款保險法第3條利害關係人放款餘額表_限額控管", "LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
+//				"LM050", "放款保險法第3條利害關係人放款餘額表_限額控管", 
+//				"LM050放款保險法第3條利害關係人放款餘額表_限額控管",
+//				"LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM050";
+		String fileItem = "放款保險法第3條利害關係人放款餘額表_限額控管";
+		String fileName = "LM050放款保險法第3條利害關係人放款餘額表_限額控管";
+		String defaultExcel = "LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx";
+		String defaultSheet = "108.04";
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
 		// 取得民國年帳務日
 		String entdy = titaVo.getEntDy();
 

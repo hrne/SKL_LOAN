@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM041ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -41,6 +42,7 @@ public class LM041Report extends MakeReport {
 	 * 
 	 * @param titaVo
 	 * @param yearMonth 西元年月
+	 * @throws LogicException 
 	 * 
 	 */
 	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
@@ -59,7 +61,23 @@ public class LM041Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList, int yearMonth) throws LogicException {
 		this.info("LM041Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM041", "催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表.xlsx", "D961211M");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM041", 
+//				"催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表",
+//				"LM041_底稿_催收及呆帳戶暫收款明細表.xlsx", "D961211M");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM041";
+		String fileItem = "催收及呆帳戶暫收款明細表";
+		String fileName = "LM041催收及呆帳戶暫收款明細表";
+		String defaultExcel = "LM041_底稿_催收及呆帳戶暫收款明細表.xlsx";
+		String defaultSheet = "D961211M";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
 
 		if (LMList == null || LMList.isEmpty()) {
 
@@ -92,12 +110,13 @@ public class LM041Report extends MakeReport {
 //			int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
 //			int year = entdy / 10000;
 //			int month = entdy / 100 % 100;
-
+			
 			int year = yearMonth / 100;
 			int month = yearMonth % 100;
 
 			makeExcel.setMergedRegion(row + 3, row + 3, 1, 7);
-			makeExcel.setValue(row + 3, 1, "一、擬 " + year + "年" + month + "月份呆帳戶之暫收款項金額共計 $" + formatAmt(total, 0) + "元入呆帳回收。");
+			makeExcel.setValue(row + 3, 1,
+					"一、擬 " + year + "年" + month + "月份呆帳戶之暫收款項金額共計 $" + formatAmt(total, 0) + "元入呆帳回收。");
 			makeExcel.setMergedRegion(row + 4, row + 4, 1, 7);
 			makeExcel.setValue(row + 4, 1, "二、陳核。");
 

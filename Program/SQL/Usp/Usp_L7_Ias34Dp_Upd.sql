@@ -674,33 +674,33 @@ BEGIN
              )                       AS "LoanBal1" -- 發生日後第一年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                 WHEN MLB."YearMonth" = M."EndMonth2" AND MLB."AcctCode" NOT IN ('990')
                    THEN MLB."LoanBalance"
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
+                 WHEN MLB."YearMonth" = M."EndMonth2" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal2" -- 發生日後第二年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                 WHEN MLB."YearMonth" = M."EndMonth3" AND MLB."AcctCode" NOT IN ('990')
                    THEN MLB."LoanBalance"
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
+                 WHEN MLB."YearMonth" = M."EndMonth3" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal3" -- 發生日後第三年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                 WHEN MLB."YearMonth" = M."EndMonth4" AND MLB."AcctCode" NOT IN ('990')
                    THEN MLB."LoanBalance"
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
+                 WHEN MLB."YearMonth" = M."EndMonth4" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal4" -- 發生日後第四年餘額
            , SUM (
                CASE
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
+                 WHEN MLB."YearMonth" = M."EndMonth5" AND MLB."AcctCode" NOT IN ('990')
                    THEN MLB."LoanBalance"
-                 WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
+                 WHEN MLB."YearMonth" = M."EndMonth5" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
              )                       AS "LoanBal5" -- 發生日後第五年餘額
@@ -709,7 +709,7 @@ BEGIN
       FROM MonthData M
       LEFT JOIN "MonthlyLoanBal" MLB ON MLB."CustNo" = M."CustNo"
                                     AND MLB."FacmNo" = M."FacmNo"
-                                    AND MLB."BormNo" = M."FacmNo"
+                                    AND MLB."BormNo" = M."BormNo"
                                     AND MLB."YearMonth" IN (
                                             M."EndMonth1"
                                           , M."EndMonth2"
@@ -845,60 +845,70 @@ BEGIN
            , B."BormNo"
            , SUM(
              CASE
+               WHEN B."CustTotal1" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee1" - NVL(O1."OtherLawFee1",0)
              ELSE B."AvgLawFee1"
              END)                               AS "AvgLawFee1"
            , SUM(
              CASE
+               WHEN B."CustTotal2" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee2" - NVL(O1."OtherLawFee2",0)
              ELSE B."AvgLawFee2"
              END)                               AS "AvgLawFee2"
            , SUM(
              CASE
+               WHEN B."CustTotal3" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee3" - NVL(O1."OtherLawFee3",0)
              ELSE B."AvgLawFee3"
              END)                               AS "AvgLawFee3"
            , SUM(
              CASE
+               WHEN B."CustTotal4" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee4" - NVL(O1."OtherLawFee4",0)
              ELSE B."AvgLawFee4"
              END)                               AS "AvgLawFee4"
            , SUM(
              CASE
+               WHEN B."CustTotal5" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee5" - NVL(O1."OtherLawFee5",0)
              ELSE B."AvgLawFee5"
              END)                               AS "AvgLawFee5"
            , SUM(
              CASE
+               WHEN B."FacTotal1" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee1" - NVL(O2."OtherInsuFee1",0)
              ELSE B."AvgInsuFee1"
              END)                               AS "AvgInsuFee1"
            , SUM(
              CASE
+               WHEN B."FacTotal2" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee2" - NVL(O2."OtherInsuFee2",0)
              ELSE B."AvgInsuFee2"
              END)                               AS "AvgInsuFee2"
            , SUM(
              CASE
+               WHEN B."FacTotal3" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee3" - NVL(O2."OtherInsuFee3",0)
              ELSE B."AvgInsuFee3"
              END)                               AS "AvgInsuFee3"
            , SUM(
              CASE
+               WHEN B."FacTotal4" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee4" - NVL(O2."OtherInsuFee4",0)
              ELSE B."AvgInsuFee4"
              END)                               AS "AvgInsuFee4"
            , SUM(
              CASE
+               WHEN B."FacTotal5" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee5" - NVL(O2."OtherInsuFee5",0)
              ELSE B."AvgInsuFee5"
@@ -978,57 +988,21 @@ BEGIN
          , NVL("Fn_GetUnpaidInsuFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate") , 0)
            + NVL("Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate"), 0)
                                            AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
-         , CASE WHEN ML."LoanBalance" IS NULL OR ML1."LoanBalance" IS NULL THEN 0
-                WHEN ML."LoanBalance" IS NULL THEN LM."DrawdownAmt" -   ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) --發生日無餘額改使用撥款計算
-                WHEN ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  < 0 THEN 0
-                WHEN ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  <  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))  THEN 0
---                WHEN TRUNC(M."BadDebtDate" / 100) > TRUNC(M."DerDate" / 100) AND TRUNC(M."BadDebtDate" / 100) < TRUNC(M."DerDate" / 100) + 100 
---                     AND ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0) > 0 THEN
---                       ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0)
-                WHEN ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0) - NVL(ML."BadDebtAmt",0) )  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0) - NVL(ML1."BadDebtAmt",0)) > 0 THEN
-                     ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0) - NVL(ML."BadDebtAmt",0) )  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0) - NVL(ML1."BadDebtAmt",0)) 
-                ELSE ( NVL(ML."LoanBalance",0) - NVL(ML."OvduIntAmt",0))  -  ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))
-           END                             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額,調整轉催與轉呆差額
-         , CASE WHEN ML1."LoanBalance" IS NULL  THEN 0
-                WHEN ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) < 0 THEN 0
-                WHEN ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) < ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))  THEN 0 
---                WHEN TRUNC(M."BadDebtDate" / 100) > TRUNC(M."DerDate" / 100) + 100 AND TRUNC(M."BadDebtDate" / 100) < TRUNC(M."DerDate" / 100) + 200 
---                     AND ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))  -  ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0) > 0 THEN
---                       ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0))  -  ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0)
-                WHEN ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0) - NVL(ML1."BadDebtAmt",0) )  -  ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0) - NVL(ML2."BadDebtAmt",0)) > 0 THEN
-                     ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0) - NVL(ML1."BadDebtAmt",0) )  -  ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0) - NVL(ML2."BadDebtAmt",0)) 
-                ELSE ( NVL(ML1."LoanBalance",0) - NVL(ML1."OvduIntAmt",0)) - ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))
-           END                             AS  "DerY2Amt"        -- 個案減損客觀證據發生後第二年本金回收金額,調整轉催與轉呆差額
-         , CASE WHEN ML2."LoanBalance" IS NULL  THEN 0
-                WHEN ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) < 0 THEN 0
-                WHEN ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) < ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))  THEN 0 
---                WHEN TRUNC(M."BadDebtDate" / 100) > TRUNC(M."DerDate" / 100) + 200 AND TRUNC(M."BadDebtDate" / 100) < TRUNC(M."DerDate" / 100) + 300 
---                     AND ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))  -  ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0) > 0 THEN
---                       ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0))  -  ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0)
-                WHEN ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0) - NVL(ML2."BadDebtAmt",0) )  -  ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0) - NVL(ML3."BadDebtAmt",0)) > 0 THEN
-                     ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0) - NVL(ML2."BadDebtAmt",0) )  -  ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0) - NVL(ML3."BadDebtAmt",0)) 
-                ELSE ( NVL(ML2."LoanBalance",0) - NVL(ML2."OvduIntAmt",0)) - ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))
-           END                             AS  "DerY3Amt"        -- 個案減損客觀證據發生後第三年本金回收金額,調整轉催與轉呆差額
-         , CASE WHEN ML3."LoanBalance" IS NULL  THEN 0
-                WHEN ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) < 0 THEN 0
-                WHEN ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) < ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  THEN 0 
---                WHEN TRUNC(M."BadDebtDate" / 100) > TRUNC(M."DerDate" / 100) + 300 AND TRUNC(M."BadDebtDate" / 100) < TRUNC(M."DerDate" / 100) + 400 
---                     AND ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))  -  ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0) > 0 THEN
---                       ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0))  -  ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0)
-                WHEN ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0) - NVL(ML3."BadDebtAmt",0) )  -  ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0) - NVL(ML4."BadDebtAmt",0)) > 0 THEN
-                     ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0) - NVL(ML3."BadDebtAmt",0) )  -  ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0) - NVL(ML4."BadDebtAmt",0)) 
-                ELSE ( NVL(ML3."LoanBalance",0) - NVL(ML3."OvduIntAmt",0)) - ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))
-           END                             AS  "DerY4Amt"        -- 個案減損客觀證據發生後第四年本金回收金額,調整轉催與轉呆差額
-         , CASE WHEN ML4."LoanBalance" IS NULL  THEN 0
-                WHEN ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) < 0 THEN 0
-                WHEN ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) < ( NVL(ML5."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  THEN 0 
---                WHEN TRUNC(M."BadDebtDate" / 100) > TRUNC(M."DerDate" / 100) + 400 AND TRUNC(M."BadDebtDate" / 100) < TRUNC(M."DerDate" / 100) + 500 
---                     AND ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  -  ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0) > 0 THEN
---                       ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0))  -  ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0)) -  NVL(M."BadDebtAmt",0)
-                WHEN ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0) - NVL(ML4."BadDebtAmt",0) )  -  ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0) - NVL(ML5."BadDebtAmt",0)) > 0 THEN
-                     ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0) - NVL(ML4."BadDebtAmt",0) )  -  ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0) - NVL(ML5."BadDebtAmt",0)) 
-                ELSE ( NVL(ML4."LoanBalance",0) - NVL(ML4."OvduIntAmt",0)) - ( NVL(ML5."LoanBalance",0) - NVL(ML5."OvduIntAmt",0))
-           END                             AS  "DerY5Amt"        -- 個案減損客觀證據發生後第五年本金回收金額,調整轉催與轉呆差額
+         , CASE WHEN NVL(ML1."SumRcvPrin",0) = 0 THEN 0             -- 第一年累計回收本金=0則為0
+                ELSE ML1."SumRcvPrin" - NVL(ML."SumRcvPrin",0)      -- 第一年累計回收本金 減 減損發生日年月的累計回收本金
+           END                             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額
+         , CASE WHEN NVL(ML2."SumRcvPrin",0) = 0 THEN 0             -- 第二年累計回收本金=0則為0
+                ELSE ML2."SumRcvPrin" - NVL(ML1."SumRcvPrin",0)     -- 第二年累計回收本金 減 第一年累計回收本金
+           END                             AS  "DerY2Amt"        -- 個案減損客觀證據發生後第二年本金回收金額
+         , CASE WHEN NVL(ML3."SumRcvPrin",0) = 0 THEN 0             -- 第三年累計回收本金=0則為0
+                ELSE ML3."SumRcvPrin" - NVL(ML2."SumRcvPrin",0)     -- 第三年累計回收本金 減 第二年累計回收本金
+           END                             AS  "DerY3Amt"        -- 個案減損客觀證據發生後第三年本金回收金額
+         , CASE WHEN NVL(ML4."SumRcvPrin",0) = 0 THEN 0             -- 第四年累計回收本金=0則為0
+                ELSE ML4."SumRcvPrin" - NVL(ML3."SumRcvPrin",0)     -- 第四年累計回收本金 減 第三年累計回收本金
+           END                             AS  "DerY4Amt"        -- 個案減損客觀證據發生後第四年本金回收金額
+         , CASE WHEN NVL(ML5."SumRcvPrin",0) = 0 THEN 0             -- 第五年累計回收本金=0則為0
+                ELSE ML5."SumRcvPrin" - NVL(ML4."SumRcvPrin",0)     -- 第五年累計回收本金 減 第四年累計回收本金
+           END                             AS  "DerY5Amt"        -- 個案減損客觀證據發生後第五年本金回收金額
          , NVL(INT1."IntAmtRcv",0)         AS  "DerY1Int"        -- 個案減損客觀證據發生後第一年應收利息回收金額
          , NVL(INT2."IntAmtRcv",0)         AS  "DerY2Int"        -- 個案減損客觀證據發生後第二年應收利息回收金額
          , NVL(INT3."IntAmtRcv",0)         AS  "DerY3Int"        -- 個案減損客觀證據發生後第三年應收利息回收金額

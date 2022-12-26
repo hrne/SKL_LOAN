@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM053ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -37,8 +38,23 @@ public class LM053Report extends MakeReport {
 
 		this.info("LM053Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM053", "法務分配款明細表_內部控管", "LM053法務分配款明細表_內部控管", "LM053_底稿_法務分配款明細表_內部控管.xlsx", "法務分配表");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM053", "法務分配款明細表_內部控管", 
+//				"LM053法務分配款明細表_內部控管",
+//				"LM053_底稿_法務分配款明細表_內部控管.xlsx", "法務分配表");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM053";
+		String fileItem = "法務分配款明細表_內部控管";
+		String fileName = "LM053法務分配款明細表_內部控管";
+		String defaultExcel = "LM053_底稿_法務分配款明細表_內部控管.xlsx";
+		String defaultSheet = "法務分配表";
 
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
 		try {
 			fnAllList = lM053ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
@@ -70,9 +86,11 @@ public class LM053Report extends MakeReport {
 								makeExcel.setValue(row, i + 1, xdate);
 							} else {
 								if (xdate.length() == 7) {
-									makeExcel.setValue(row, i + 1, xdate.substring(0, 3) + "." + xdate.substring(3, 5) + "." + xdate.substring(5, 7));
+									makeExcel.setValue(row, i + 1, xdate.substring(0, 3) + "." + xdate.substring(3, 5)
+											+ "." + xdate.substring(5, 7));
 								} else if (xdate.length() == 6) {
-									makeExcel.setValue(row, i + 1, xdate.substring(0, 2) + "." + xdate.substring(2, 4) + "." + xdate.substring(4, 6));
+									makeExcel.setValue(row, i + 1, xdate.substring(0, 2) + "." + xdate.substring(2, 4)
+											+ "." + xdate.substring(4, 6));
 								}
 
 							}
@@ -111,6 +129,6 @@ public class LM053Report extends MakeReport {
 		}
 		makeExcel.setValue(1, 3, row - 2);
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 }

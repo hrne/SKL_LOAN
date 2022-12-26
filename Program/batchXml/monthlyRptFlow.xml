@@ -203,7 +203,7 @@
 					<tasklet ref="LM039" />
 				</step>
 			</flow>
-			<!-- Step: LM040  地區別正常戶金額 -->
+			<!-- Step: LM040 地區別正常戶金額 -->
 			<flow>
 				<step id="sLM040" parent="parentStep">
 					<tasklet ref="LM040" />
@@ -437,10 +437,28 @@
 					<tasklet ref="LM082" />
 				</step>
 			</flow>
+			<!-- Step: LM083 ICS放款資料 -->
+			<flow>
+				<step id="sLM083" parent="parentStep">
+					<tasklet ref="LM083" />
+				</step>
+			</flow>
+			<!-- Step: LM084 應收利息之帳齡分析表 -->
+			<flow>
+				<step id="sLM084" parent="parentStep">
+					<tasklet ref="LM084" />
+				</step>
+			</flow>
 			<!-- Batch: LM085 逾期月報表 -->
 			<flow>
 				<step id="sLM085Batch" parent="parentStep">
-					<tasklet ref="LM042Batch" />
+					<tasklet ref="LM085Batch" />
+				</step>
+			</flow>
+			<!-- Step: LM086放款餘額明細表 -->
+			<flow>
+				<step id="sLM086" parent="parentStep">
+					<tasklet ref="LM086" />
 				</step>
 			</flow>
 

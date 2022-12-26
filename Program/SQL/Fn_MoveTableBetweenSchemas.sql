@@ -48,20 +48,60 @@ BEGIN
         ) IS
         BEGIN
             BEGIN
-                INSERT INTO "TxArchiveTableLog" ("Type", "DataFrom", "DataTo", "ExecuteDate", "TableName", "BatchNo",
-                                                 "Result", "CustNo",
-                                                 "FacmNo", "BormNo", "Description", "CreateDate", "CreateEmpNo",
-                                                 "LastUpdate", "LastUpdateEmpNo", "Records")
-                VALUES (v_type, CASE WHEN v_flipRoute = 1
-                                         THEN 'HISTORY'
-                                         ELSE 'ONLINE'
-                                END
-                           , CASE WHEN v_flipRoute = 1
-                                      THEN 'ONLINE'
-                                      ELSE 'HISTORY'
-                             END, v_tbsdyf, v_tableName, v_batchNo, p_result, v_custNo, v_facmNo, v_bormNo,
-                        SUBSTR(p_description, 1, 200), SYSDATE, v_empNo, SYSDATE, v_empNo, p_records);
+                INSERT INTO "TxArchiveTableLog" (
+                    "LogNo"
+                    , "Type"
+                    , "DataFrom"
+                    , "DataTo"
+                    , "ExecuteDate"
+                    , "TableName"
+                    , "BatchNo"
+                    , "Result"
+                    , "CustNo"
+                    , "FacmNo"
+                    , "BormNo"
+                    , "Description"
+                    , "CreateDate"
+                    , "CreateEmpNo"
+                    , "LastUpdate"
+                    , "LastUpdateEmpNo"
+                    , "Records")
+                VALUES (
+                    "TxArchiveTableLog_SEQ".nextval
+                    , v_type
+                    , CASE
+                        WHEN v_flipRoute = 1
+                        THEN 'HISTORY'
+                      ELSE 'ONLINE' END
+                    , CASE 
+                        WHEN v_flipRoute = 1
+                        THEN 'ONLINE'
+                      ELSE 'HISTORY' END
+                    , v_tbsdyf
+                    , v_tableName
+                    , v_batchNo
+                    , p_result
+                    , v_custNo
+                    , v_facmNo
+                    , v_bormNo
+                    , SUBSTR(p_description, 1, 200)
+                    , SYSDATE
+                    , v_empNo
+                    , SYSDATE
+                    , v_empNo
+                    , p_records
+                );
             END;
+            -- 例外處理
+            Exception
+            WHEN OTHERS THEN
+            "Usp_L9_UspErrorLog_Ins"(
+                'INSERT_LOG' -- UspName 預存程序名稱
+            , SQLCODE -- Sql Error Code (固定值)
+            , SQLERRM -- Sql Error Message (固定值)
+            , dbms_utility.format_error_backtrace -- Sql Error Trace (固定值)
+            , v_empNo -- 發動預存程序的員工編號
+            );
         END;
 
 
@@ -77,8 +117,8 @@ BEGIN
             v_schemaNameTarget := v_schemaNameOnline;
         ELSE
             DBMS_OUTPUT.PUT_LINE('flipRoute: ' || v_flipRoute);
-            v_schemaNameSource := v_schemaNameOnline;
-            v_schemaNameTarget := v_schemaNameHistory;
+            v_schemaNameSource := TRIM(v_schemaNameOnline);
+            v_schemaNameTarget := TRIM(v_schemaNameHistory);
         end if;
 
         -- Step 0. 檢查欄位差異
@@ -95,7 +135,7 @@ BEGIN
 
         -- 先檢查權限
 
-        SELECT TO_NUMBER(COUNT(*))
+        SELECT TO_NUMBER(COUNT(1))
         INTO v_targetColCount
         FROM ALL_TAB_COLUMNS
         WHERE OWNER = DBMS_ASSERT.SCHEMA_NAME(v_schemaNameTarget)
@@ -103,6 +143,9 @@ BEGIN
 
         IF v_targetColCount = 0
         THEN
+            DBMS_OUTPUT.PUT_LINE('v_schemaNameTarget=' || v_schemaNameTarget);
+            DBMS_OUTPUT.PUT_LINE('v_tableName=' || v_tableName);
+            DBMS_OUTPUT.PUT_LINE('v_targetColCount=' || v_targetColCount);
             DBMS_OUTPUT.PUT_LINE(DBMS_ASSERT.ENQUOTE_LITERAL(v_tableName) ||
                                  ' 在 HISTORY.ALL_TAB_COLS 讀取不到欄位! 是不是 SELECT 權限尚未 GRANT ?');
             INSERT_LOG(0, 'HISTORY.ALL_TAB_COLS 讀取不到欄位，可能為權限問題', 0);
