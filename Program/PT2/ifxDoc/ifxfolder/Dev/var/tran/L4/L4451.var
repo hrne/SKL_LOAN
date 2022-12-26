@@ -179,8 +179,8 @@ E(0,@FUNCIND,#FunctionCode)
 T(3,)T(H,#FunctionCode,#FunctionHelp)
 C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
-C(3,#FunctionCode,1,INVOKEJS(SHOW,L4451,6,12,0)
-                   ,INVOKEJS(SHOW,L4451,6,12,1))
+C(3,#FunctionCode,1,INVOKEJS(SHOW,L4451,6,13,0)
+                   ,INVOKEJS(SHOW,L4451,6,13,1))
 
 
 !SWITCH(#FunctionCode,2,T(2,修改),

@@ -111,6 +111,7 @@ T(3,Y:同意;N:退回)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
+C(3,#FKEY,0,$,s)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L8922 疑似洗錢交易合理性查詢]進入),$)
 
 #NTXBUF=X,23,S
@@ -214,6 +215,7 @@ T(4,DATE$)
 !入帳日期
 #AcDate=D,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(3,#FKEY,0,$,s)
 T(1,#DATE,2,7)
 D(8)
 @V(7)A(DATE,0,#AcDate)
@@ -222,6 +224,7 @@ V(5,0000000,#DATE)
 !戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(3,#FKEY,0,$,s)
 @V(7)
 
 !額度號碼
@@ -238,6 +241,7 @@ C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 #Factor=N,2,I
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
 HELP(#FactorHelp)
+C(3,#FKEY,0,$,s)
 @T(3,@FactorX,)
 V(H,#FactorHelp)
 

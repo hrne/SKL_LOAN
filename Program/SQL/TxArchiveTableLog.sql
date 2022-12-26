@@ -1,6 +1,9 @@
 drop table "TxArchiveTableLog" purge;
 
+drop sequence "TxArchiveTableLog_SEQ";
+
 create table "TxArchiveTableLog" (
+  "LogNo" decimal(11,0) not null,
   "Type" varchar2(4),
   "DataFrom" varchar2(7),
   "DataTo" varchar2(7),
@@ -20,9 +23,12 @@ create table "TxArchiveTableLog" (
   "LastUpdateEmpNo" varchar2(6)
 );
 
-alter table "TxArchiveTableLog" add constraint "TxArchiveTableLog_PK" primary key("Type", "DataFrom", "DataTo", "ExecuteDate", "TableName", "BatchNo", "CustNo", "FacmNo", "BormNo");
+alter table "TxArchiveTableLog" add constraint "TxArchiveTableLog_PK" primary key("LogNo");
+
+create sequence "TxArchiveTableLog_SEQ" minvalue 1 maxvalue 2147483647 increment by 1 start with 1 nocache cycle;
 
 comment on table "TxArchiveTableLog" is '歷史封存表紀錄檔';
+comment on column "TxArchiveTableLog"."LogNo" is '序號';
 comment on column "TxArchiveTableLog"."Type" is '分類';
 comment on column "TxArchiveTableLog"."DataFrom" is '搬運來源環境';
 comment on column "TxArchiveTableLog"."DataTo" is '搬運目標環境';
@@ -34,7 +40,7 @@ comment on column "TxArchiveTableLog"."CustNo" is '戶號';
 comment on column "TxArchiveTableLog"."FacmNo" is '額度';
 comment on column "TxArchiveTableLog"."BormNo" is '撥款序號';
 comment on column "TxArchiveTableLog"."Description" is '執行結果說明';
-comment on column "TxArchiveTableLog"."Records" is '搬運資料筆數';
+comment on column "TxArchiveTableLog"."Records" is '操作資料筆數';
 comment on column "TxArchiveTableLog"."IsDeleted" is '已自連線環境刪除';
 comment on column "TxArchiveTableLog"."CreateDate" is '建檔日期時間';
 comment on column "TxArchiveTableLog"."CreateEmpNo" is '建檔人員';

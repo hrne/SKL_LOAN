@@ -18,7 +18,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.TxArchiveTableLog;
-import com.st1.itx.db.domain.TxArchiveTableLogId;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.TxArchiveTableLogService;
 import com.st1.itx.db.service.springjpa.cm.L6971ServiceImpl;
@@ -126,7 +125,8 @@ public class L6971 extends TradeBuffer {
 		}
 	}
 
-	private void doExecution5YTX(int execDate, int batchNo, int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+	private void doExecution5YTX(int execDate, int batchNo, int custNo, int facmNo, int bormNo, TitaVo titaVo)
+			throws LogicException {
 		this.info("L6971.doExecution5YTX begins. ");
 		this.info("CustNo: " + custNo);
 		this.info("FacmNo: " + facmNo);
@@ -149,12 +149,14 @@ public class L6971 extends TradeBuffer {
 		// 應該可以 generalize?
 		//
 
-		Slice<LoanBorTx> sLoanBorTxOnline = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> sLoanBorTxOnline = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
+				0, Integer.MAX_VALUE, titaVo);
 
 		TitaVo titaVoHistory = (TitaVo) titaVo.clone();
 		titaVoHistory.setDataBaseOnHist();
 
-		Slice<LoanBorTx> sLoanBorTxHistory = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, titaVoHistory);
+		Slice<LoanBorTx> sLoanBorTxHistory = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE,
+				0, Integer.MAX_VALUE, titaVoHistory);
 
 		return sLoanBorTxOnline.getNumberOfElements() == sLoanBorTxHistory.getNumberOfElements();
 	}
@@ -165,7 +167,8 @@ public class L6971 extends TradeBuffer {
 		// 刪除確認可刪除的明細 for 5YTX
 		//
 
-		Slice<LoanBorTx> sLoanBorTx = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorTx> sLoanBorTx = loanBorTxService.borxBormNoEq(custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<LoanBorTx> lLoanBorTx = sLoanBorTx.getContent();
 
 		try {
@@ -180,7 +183,8 @@ public class L6971 extends TradeBuffer {
 		}
 	}
 
-	private void setIsDeletedToTrue(int deletedRecords, String type, String tableName, int execDate, int batchNo, int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
+	private void setIsDeletedToTrue(int deletedRecords, String type, String tableName, int execDate, int batchNo,
+			int custNo, int facmNo, int bormNo, TitaVo titaVo) throws LogicException {
 
 		//
 		// 完成刪除後，在 TxArchiveTableLog 將對應的資料 IsDeleted 設為 1
@@ -190,30 +194,25 @@ public class L6971 extends TradeBuffer {
 		this.info("L6971.setIsDeletedToTrue deleteAll successful. Set isDeleted to 1.");
 
 		try {
-			TxArchiveTableLogId txArchiveTableLogId = new TxArchiveTableLogId();
-			txArchiveTableLogId.setType(type);
-			txArchiveTableLogId.setTableName(tableName);
-			txArchiveTableLogId.setExecuteDate(execDate);
-			txArchiveTableLogId.setDataFrom("ONLINE");
-			txArchiveTableLogId.setDataTo("HISTORY");
-			txArchiveTableLogId.setBatchNo(batchNo);
-			txArchiveTableLogId.setCustNo(custNo);
-			txArchiveTableLogId.setFacmNo(facmNo);
-			txArchiveTableLogId.setBormNo(bormNo);
 
-			TxArchiveTableLog record = txArchiveTableLogService.holdById(txArchiveTableLogId, titaVo);
+			Slice<TxArchiveTableLog> recordList = txArchiveTableLogService.findLogs(type, tableName, execDate, "ONLINE",
+					"HISTORY", batchNo, custNo, facmNo, bormNo, 0, Integer.MAX_VALUE, titaVo);
 
-			// deletedRecords 和 TxArchiveTableLog.Records 不符時 rollback
-			if (record.getResult() != deletedRecords) {
-				this.error("L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
-				throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");
+			if (recordList != null && !recordList.isEmpty()) {
+				for (TxArchiveTableLog record : recordList) {
+					// deletedRecords 和 TxArchiveTableLog.Records 不符時 rollback
+					if (record.getResult() != deletedRecords) {
+						this.error(
+								"L6971.setIsDeletedToTrue: different count between deleted records and TxArchiveTableLog.Records! rollback");
+						throw new LogicException("E0007", "實際刪除資料數與 TxArchiveTableLog 紀錄的數量不符");
+					}
+					record.setIsDeleted(1);
+					record.setDescription("此次封存明細已從連線環境刪除");
+					record.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+					record.setLastUpdateEmpNo(titaVo.getTlrNo());
+					txArchiveTableLogService.update(record, titaVo);
+				}
 			}
-
-			record.setIsDeleted(1);
-			record.setDescription("此次封存明細已從連線環境刪除");
-			record.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-			record.setLastUpdateEmpNo(titaVo.getTlrNo());
-			txArchiveTableLogService.update(record, titaVo);
 		} catch (Exception e) {
 			this.error("L6971.setIsDeletedToTrue failed to update IsDeleted.");
 			StringWriter errors = new StringWriter();

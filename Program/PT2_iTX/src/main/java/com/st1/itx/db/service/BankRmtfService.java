@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.BankRmtf;
@@ -34,6 +36,17 @@ public interface BankRmtfService {
    * @return Slice BankRmtf BankRmtf of List
    */
   public Slice<BankRmtf> findAll(int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
+   *
+   * @param acDate_0 acDate_0
+   * @param titaTlrNo_1 titaTlrNo_1
+   * @param titaTxtNo_2 titaTxtNo_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice BankRmtf BankRmtf of List
+   */
+  public BankRmtf findTxSeqFirst(int acDate_0, String titaTlrNo_1, String titaTxtNo_2, TitaVo... titaVo);
 
   /**
    * hold By BankRmtf

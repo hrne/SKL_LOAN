@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -108,6 +111,25 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public BankRmtf findTxSeqFirst(int acDate_0, String titaTlrNo_1, String titaTxtNo_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findTxSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
+    Optional<BankRmtf> bankRmtfT = null;
+    if (dbName.equals(ContentName.onDay))
+      bankRmtfT = bankRmtfReposDay.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+    else if (dbName.equals(ContentName.onMon))
+      bankRmtfT = bankRmtfReposMon.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+    else if (dbName.equals(ContentName.onHist))
+      bankRmtfT = bankRmtfReposHist.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+    else 
+      bankRmtfT = bankRmtfRepos.findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2);
+
+    return bankRmtfT.isPresent() ? bankRmtfT.get() : null;
   }
 
   @Override

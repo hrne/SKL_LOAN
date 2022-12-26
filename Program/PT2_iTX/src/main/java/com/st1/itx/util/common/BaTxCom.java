@@ -23,6 +23,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanFacTmp;
@@ -162,7 +163,7 @@ public class BaTxCom extends TradeBuffer {
 	private String payMethod = "";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 	private String tmpFacmNoX = "";// 暫收指定額度
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
-	
+
 	private String payFeeMethod = "";// 回收費用方式 Y/N
 
 	// initialize variable
@@ -217,7 +218,6 @@ public class BaTxCom extends TradeBuffer {
 		this.rateEffectDate = 0; // 目前利率生效日
 		this.fitRate = BigDecimal.ZERO; // 目前利率
 		this.calcLoanBal = BigDecimal.ZERO; // 還款前本金餘額
-
 
 		// 期款
 		this.unpaidFlag = "Y";// 是否可欠繳
@@ -307,9 +307,9 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settingUnPaid 戶號=" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("BaTxCom settingUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settingUnPaid TxAmt 回收金額=" + iTxAmt);
-		this.info("BaTxCom settingUnPaid TxAmt 回收費用方式=" + this.payFeeMethod);		
+		this.info("BaTxCom settingUnPaid TxAmt 回收費用方式=" + this.payFeeMethod);
 		init();
-		this.info("BaTxCom settingUnPaid TxAmt 是否回收費用=" + this.payFeeMethod);		
+		this.info("BaTxCom settingUnPaid TxAmt 是否回收費用=" + this.payFeeMethod);
 
 		// STEP 1: 設定預設值
 		// isPayAllFee 費用是否全部回收->
@@ -456,7 +456,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		init();
-		
+
 // STEP 1:  Load repayLoanList facTempList, UnPaidlist 
 
 		// input 還款類別
@@ -1446,18 +1446,21 @@ public class BaTxCom extends TradeBuffer {
 					wkTerms = wkTerms - loanCom.getTermNo(1, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
 							ln.getSpecificDd(), ln.getPrevPayIntDate());
 				}
-
 				// 每次計算一期，最後一期計算到利息計算止日
 				if (iPayIntDate <= ln.getNextPayIntDate()) {
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iPayIntDate, 2, iEntryDate, titaVo);
 				} else {
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 2, iEntryDate, titaVo);
 				}
+				// 每月月底提息特殊參數設定
+				caculateSpecialAdjust(iPayIntDate, ln.getPrevPayIntDate(), ln.getNextPayIntDate(), ln,
+						loanCalcRepayIntCom, titaVo);
 				for (int i = 1; i <= wkTerms; i++) {
 					if (i == wkTerms) {
 						loanCalcRepayIntCom.setTerms(0); // 本次計息期數
 						loanCalcRepayIntCom.setIntEndDate(iPayIntDate); // 計息止日
 					}
+					// 計算利息
 					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo, i);
 					loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
@@ -1469,9 +1472,13 @@ public class BaTxCom extends TradeBuffer {
 					loanCalcRepayIntCom.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate()); // 下次繳息日,應繳息日,預定收息日
 					loanCalcRepayIntCom.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
 					loanCalcRepayIntCom.setDueAmt(loanCalcRepayIntCom.getDueAmt()); // 每期攤還金額
-					if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
+					if (loanCalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)
+							|| loanCalcRepayIntCom.getPrevPaidIntDate() >= iPayIntDate) {
 						break;
 					}
+					// 每月月底提息特殊參數設定
+					caculateSpecialAdjust(iPayIntDate, loanCalcRepayIntCom.getPrevRepaidDate(),
+							loanCalcRepayIntCom.getNextPayIntDate(), ln, loanCalcRepayIntCom, titaVo);
 				}
 				this.info("Caculate log Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
 						+ ", principal=" + this.principal + ", interest=" + this.interest + ", delayInt="
@@ -1499,6 +1506,85 @@ public class BaTxCom extends TradeBuffer {
 				return c1.compareTo(c2);
 			});
 		}
+	}
+
+	// 每月月底提息特殊參數設定
+	private void caculateSpecialAdjust(int iPayIntDate, int iPrevPaidIntDate, int iNextPayIntDate, LoanBorMain ln,
+			LoanCalcRepayIntCom loanCalcRepayIntCom, TitaVo titaVo) throws LogicException {
+// 1.短擔以日計算 
+// 2.中長擔，已到期按月(下次繳息日 <= 下個月1日)；未到期，首次繳款按日  
+// 3. 未到期利息=>以日計息，不分期且到期日當日也算1天 
+// 4.未到期以最後一段利率計算(計息程式內處理)
+
+		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
+		int thisMonth01 = (this.txBuffer.getTxCom().getTbsdy() / 100) * 100 + 1;
+
+		String intCalcCode = ln.getIntCalcCode();
+		String amortizedCode = ln.getAmortizedCode();
+		int maturityDate = ln.getMaturityDate();
+		String acctCode = loanCalcRepayIntCom.getAcctCode();
+
+		// 短擔=>按日計息
+		// 中長擔應繳日為1日=>按月計息但下繳日大於等於下月1日 且 上繳日小於本月1日=>按日計息
+		if (acctCode.equals("310")) {
+			// 1.短擔
+			intCalcCode = "1";// 計息方式 1:按日計息
+		} else {
+			// 2. 中長擔
+			// 2022-04-19 智偉增加
+			// 若帳號計息方式是1:按日計息 且 繳息日期(2碼)為1
+			if (intCalcCode.equals("1") && ln.getSpecificDd() == 1) {
+				// 計息方式改為2:按月計息
+				intCalcCode = "2";
+			}
+			// 2022-04-19 智偉增加
+			// 若帳號計息方式是2:按月計息 且 下繳日大於等於下月1日 且 上繳日小於本月1日
+			if (intCalcCode.equals("2") && ln.getNextPayIntDate() >= nextMonth01
+					&& ln.getPrevPayIntDate() < thisMonth01) {
+				// 計息方式改為1:按日計息
+				intCalcCode = "1";
+			}
+			// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
+		}
+
+		// 已到期
+		// 1.繳息日(NextPayIntDate)月份 <= 當月
+		// 2.計息起日(PrevPaidIntDate)月份 <= 當月
+		// 3.計息止日月份(NextPayIntDate) <= 當月
+		// 4.到期日(NextPayIntDate)月份 > 當月
+		// else 未到期
+		// 未到期利息=>以日計息，不分期且到期日當日也算1天
+		int yearMonth = this.txBuffer.getTxCom().getTbsdy() / 100;
+		boolean isShouldPaid = false;
+		if (iPrevPaidIntDate / 100 <= yearMonth && iNextPayIntDate / 100 <= yearMonth
+				&& ln.getMaturityDate() > yearMonth) {
+			isShouldPaid = true;
+		}
+		if (ln.getMaturityDate() < nextMonth01) {
+			dDateUtil.init();
+			dDateUtil.setDate_1(maturityDate);
+			dDateUtil.setDays(1);
+			maturityDate = dDateUtil.getCalenderDay();
+		}
+		if (!isShouldPaid) {
+			intCalcCode = "1";
+			amortizedCode = "1";
+			int intEndDate = iPayIntDate > maturityDate ? maturityDate : iPayIntDate;
+			loanCalcRepayIntCom.setIntEndDate(intEndDate); // 計息止日
+			loanCalcRepayIntCom.setTerms(0); // 本次計息期數
+			loanCalcRepayIntCom.setNextPayIntDate(intEndDate); // 下次繳息日,應繳息日,預定收息日
+			loanCalcRepayIntCom.setNextRepayDate(intEndDate); // 下次還本日,應還本日,預定還本日
+			loanCalcRepayIntCom.setMaturityDate(maturityDate);
+			loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO);
+		}
+
+		loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
+		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));
+		this.info("Caculate log BaTxCom Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
+				+ ", AcctCode=" + acctCode + ", CalcCode=" + ln.getIntCalcCode() + "/" + intCalcCode
+				+ ", AmortizedCode=" + ln.getAmortizedCode() + "/" + amortizedCode + ", SpecificDate="
+				+ ln.getSpecificDate() + " ,PrevPaidIntDate=" + iPrevPaidIntDate + " ,NextPayIntDate=" + iNextPayIntDate
+				+ " ,MaturityDate=" + ln.getMaturityDate() + "/" + maturityDate);
 	}
 
 	private void repayLoanBaTxVo(int iEntryDate, int iPayIntDate, int iRepayType, int iCustNo, LoanBorMain ln,
@@ -2861,15 +2947,15 @@ public class BaTxCom extends TradeBuffer {
 	public String getPayFeeFlag() {
 		return payFeeFlag;
 	}
-	
+
 	/**
-	 * 回收費用方式 
+	 * 回收費用方式
+	 * 
 	 * @param payFeeMethod Y/N
 	 */
 	public void setPayFeeMethod(String payFeeMethod) {
 		this.payFeeMethod = payFeeMethod;
 	}
-
 
 	/**
 	 * 是否可欠繳

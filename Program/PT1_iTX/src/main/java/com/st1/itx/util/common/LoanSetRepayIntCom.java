@@ -1,6 +1,5 @@
 package com.st1.itx.util.common;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -47,9 +45,6 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 	@Autowired
 	private LoanCalcRepayIntCom loanCalcRepayIntCom;
 
-	@Autowired
-	private DateUtil dDateUtil;
-
 	private int prevPayIntDate;
 
 	/**
@@ -71,7 +66,6 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		this.info("   IntEndDate = " + iIntEndDate);
 		this.info("   IntEndCode = " + iIntEndCode);
 		this.info("   EntryDate  = " + iEntryDate);
-		this.info("   PrevPayIntDate  = " + loanBorMain.getPrevPayIntDate());
 		prevPayIntDate = loanBorMain.getPrevPayIntDate() == 0 ? loanBorMain.getDrawdownDate()
 				: loanBorMain.getPrevPayIntDate();
 		this.info("   prevPayIntDate = " + prevPayIntDate);
@@ -147,12 +141,6 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		// 3.本息平均法(期金)
 		// 4.本金平均法
 		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(loanBorMain.getAmortizedCode())); // 攤還方式,還本方式
-
-		// 利息提存
-		if (iIntEndCode == 2) {
-			settingForMonthlyCalculateInterest(loanBorMain, facMain);
-		}
-
 		loanCalcRepayIntCom.setDelayFlag(0); // 0:收遲延息 1: 不收
 		loanCalcRepayIntCom.setNonePrincipalFlag(0); // 0:契約到期要還本 1:契約到期不還本記號
 		loanCalcRepayIntCom.setTbsDy(this.txBuffer.getTxCom().getTbsdy()); // 營業日期
@@ -179,80 +167,6 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		return loanCalcRepayIntCom;
 	}
 
-	/**
-	 * 
-	 * 每月月底提息參數設定 <BR>
-	 * 1.短擔以日計算 <BR>
-	 * 2.中長擔，已到期按月(下次繳息日 <= 下個月1日)；未到期，首次繳款按日 <BR>
-	 * 3.已過到期日，按日、不分期(以到期取息(到期繳息還本)計算) <BR>
-	 * 4.未到期以最後一段利率計算(計息程式內處理)
-	 * 
-	 * @param loanBorMain loanBorMain
-	 * @param facMain     facMain
-	 * @throws LogicException LogicException
-	 */
-	private void settingForMonthlyCalculateInterest(LoanBorMain loanBorMain, FacMain facMain) throws LogicException {
-
-		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
-		int thisMonth01 = (this.txBuffer.getTxCom().getTbsdy() / 100) * 100 + 1;
-
-		String intCalcCode = loanBorMain.getIntCalcCode();
-		String amortizedCode = loanBorMain.getAmortizedCode();
-		if (facMain.getAcctCode().equals("310")) {
-			// 1.短擔
-			intCalcCode = "1";// 計息方式 1:按日計息
-		} else {
-			// 2. 中長擔
-			// 2022-04-19 智偉增加
-			// 若帳號計息方式是1:按日計息 且 繳息日期(2碼)為1
-			if (intCalcCode.equals("1") && loanBorMain.getSpecificDd() == 1) {
-				// 計息方式改為2:按月計息
-				intCalcCode = "2";
-			}
-			// 2022-04-19 智偉增加
-			// 若帳號計息方式是2:按月計息 且 下繳日大於等於下月1日 且 上繳日小於本月1日
-			if (intCalcCode.equals("2") && loanBorMain.getNextPayIntDate() >= nextMonth01
-					&& loanBorMain.getPrevPayIntDate() < thisMonth01) {
-				// 計息方式改為1:按日計息
-				intCalcCode = "1";
-			}
-			// 2022-04-19 智偉補充說明:其他照帳號原本的計息方式
-		}
-		if (loanBorMain.getMaturityDate() < nextMonth01 && loanBorMain.getPrevPayIntDate() > 0
-				&& loanBorMain.getPrevPayIntDate() < loanBorMain.getMaturityDate()) {
-			// 2022-05-04 智偉: 到期日早於本月月底日
-			// 2022-05-04 智偉: 上繳日與到期日超過一期
-			dDateUtil.init();
-			dDateUtil.setDate_1(loanBorMain.getPrevPayIntDate());
-			dDateUtil.setDate_2(loanBorMain.getMaturityDate());
-			dDateUtil.dateDiff();
-			int unpayTerms = dDateUtil.getMons();
-
-			if (unpayTerms >= 2) {
-				// 計息方式調成1:以日計息
-				intCalcCode = "1";
-				amortizedCode = "2";
-				loanCalcRepayIntCom.setDueAmt(BigDecimal.ZERO); // 每期攤還金額
-
-				// 2022-05-09 智偉增加判斷
-				// 符合此條件者
-				// 照AS400多算一天利息
-				int orignalMaturityDate = loanBorMain.getMaturityDate();
-				dDateUtil.init();
-				dDateUtil.setDate_1(orignalMaturityDate);
-				dDateUtil.setDays(1);
-				int newMaturityDate = dDateUtil.getCalenderDay();
-				loanCalcRepayIntCom.setMaturityDate(newMaturityDate);
-			}
-		}
-		loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
-		loanCalcRepayIntCom.setAmortizedCode(this.parse.stringToInteger(amortizedCode));
-		this.info("Caculate log Set ... 戶號= " + loanBorMain.getCustNo() + "-" + loanBorMain.getFacmNo() + "-"
-				+ loanBorMain.getBormNo() + ", AcctCode=" + facMain.getAcctCode() + ", CalcCode ="
-				+ loanBorMain.getIntCalcCode() + "/" + intCalcCode + ", AmortizedCode=" + loanBorMain.getAmortizedCode()
-				+ "/" + amortizedCode + ", SpecificDate =" + loanBorMain.getSpecificDate() + " ,prevPayIntDate ="
-				+ prevPayIntDate);
-	}
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

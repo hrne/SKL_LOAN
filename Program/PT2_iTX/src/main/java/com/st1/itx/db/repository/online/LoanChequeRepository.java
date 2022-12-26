@@ -46,6 +46,9 @@ public interface LoanChequeRepository extends JpaRepository<LoanCheque, LoanCheq
   // CustNo >= ,AND CustNo <= ,AND StatusCode ^i ,AND ChequeNo >= ,AND ChequeNo <= ,AND  ChequeDate >= ,AND ChequeDate <=
   public Slice<LoanCheque> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(int custNo_0, int custNo_1, List<String> statusCode_2, int chequeNo_3, int chequeNo_4, int chequeDate_5, int chequeDate_6, Pageable pageable);
 
+  // AcDate = ,AND TellerNo = ,AND TxtNo =
+  public Slice<LoanCheque> findAllByAcDateIsAndTellerNoIsAndTxtNoIs(int acDate_0, String tellerNo_1, String txtNo_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

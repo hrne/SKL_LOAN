@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class BankRmtf implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -215822473601662893L;
-
-@EmbeddedId
+  @EmbeddedId
   private BankRmtfId bankRmtfId;
 
   // 會計日
@@ -97,12 +93,12 @@ public class BankRmtf implements Serializable {
   private String traderInfo;
 
   // AML回應碼
-  /* CdCode.AmlCheckItem0:非可疑名單/已完成名單確認1:需審查/確認2:為凍結名單/未確定名單D:刪除 */
+  /* CdCode.AmlCheckItem0:非可疑名單/已完成名單確認1:需審查/確認2:為凍結名單/未確定名單D:匯款轉帳檔已刪除 */
   @Column(name = "`AmlRsp`", length = 1)
   private String amlRsp;
 
   // 對帳類別
-  /* 轉AS400匯款轉帳檔的存摺代號,但舊資料有01,02,03,13不在代碼中CdCode.ReconCodeP01:銀行存款－郵局P02:銀行存款－新光A1~A7 (P03銀行存款－新光匯款轉帳)P04:銀行存款－台新TEM:員工扣薪15/非15???TCK:支票 */
+  /* 轉AS400匯款轉帳檔的存摺代號(舊資料有01,02,03,13亦新增代碼但目前已不使用)CdCode.ReconCodeP01:銀行存款－郵局C01:暫收款－非核心運用A1~A7:  (帳務:P03:銀行存款－新光)TEM:員工扣薪15/非15TCK:支票 */
   @Column(name = "`ReconCode`", length = 3)
   private String reconCode;
 
@@ -448,7 +444,7 @@ public class BankRmtf implements Serializable {
 0:非可疑名單/已完成名單確認
 1:需審查/確認
 2:為凍結名單/未確定名單
-D:刪除
+D:匯款轉帳檔已刪除
 	* @return String
 	*/
   public String getAmlRsp() {
@@ -461,7 +457,7 @@ D:刪除
 0:非可疑名單/已完成名單確認
 1:需審查/確認
 2:為凍結名單/未確定名單
-D:刪除
+D:匯款轉帳檔已刪除
   *
   * @param amlRsp AML回應碼
 	*/
@@ -471,13 +467,12 @@ D:刪除
 
 /**
 	* 對帳類別<br>
-	* 轉AS400匯款轉帳檔的存摺代號,但舊資料有01,02,03,13不在代碼中
+	* 轉AS400匯款轉帳檔的存摺代號(舊資料有01,02,03,13亦新增代碼但目前已不使用)
 CdCode.ReconCode
 P01:銀行存款－郵局
-P02:銀行存款－新光
-A1~A7 (P03銀行存款－新光匯款轉帳)
-P04:銀行存款－台新
-TEM:員工扣薪15/非15???
+C01:暫收款－非核心運用
+A1~A7:  (帳務:P03:銀行存款－新光)
+TEM:員工扣薪15/非15
 TCK:支票
 	* @return String
 	*/
@@ -487,13 +482,12 @@ TCK:支票
 
 /**
 	* 對帳類別<br>
-	* 轉AS400匯款轉帳檔的存摺代號,但舊資料有01,02,03,13不在代碼中
+	* 轉AS400匯款轉帳檔的存摺代號(舊資料有01,02,03,13亦新增代碼但目前已不使用)
 CdCode.ReconCode
 P01:銀行存款－郵局
-P02:銀行存款－新光
-A1~A7 (P03銀行存款－新光匯款轉帳)
-P04:銀行存款－台新
-TEM:員工扣薪15/非15???
+C01:暫收款－非核心運用
+A1~A7:  (帳務:P03:銀行存款－新光)
+TEM:員工扣薪15/非15
 TCK:支票
   *
   * @param reconCode 對帳類別

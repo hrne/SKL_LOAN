@@ -1,15 +1,20 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.TxArchiveTableLog;
-import com.st1.itx.db.domain.TxArchiveTableLogId;
 
 /**
  * Gen By Tool
@@ -17,11 +22,15 @@ import com.st1.itx.db.domain.TxArchiveTableLogId;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface TxArchiveTableLogRepositoryDay extends JpaRepository<TxArchiveTableLog, TxArchiveTableLogId> {
+public interface TxArchiveTableLogRepositoryDay extends JpaRepository<TxArchiveTableLog, Long> {
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxArchiveTableLog> findByTxArchiveTableLogId(TxArchiveTableLogId txArchiveTableLogId);
+  // Type = ,AND TableName = ,AND ExecuteDate = ,AND DataFrom= ,AND DataTo = ,AND BatchNo = ,AND CustNo = ,AND FacmNo = ,AND BormNo =
+  public Slice<TxArchiveTableLog> findAllByTypeIsAndTableNameIsAndExecuteDateIsAndDataFromIsAndDataToIsAndBatchNoIsAndCustNoIsAndFacmNoIsAndBormNoIs(String type_0, String tableName_1, int executeDate_2, String dataFrom_3, String dataTo_4, int batchNo_5, int custNo_6, int facmNo_7, int bormNo_8, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxArchiveTableLog> findByLogNo(Long logNo);
 
 }
+
