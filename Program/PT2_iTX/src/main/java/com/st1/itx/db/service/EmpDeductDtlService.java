@@ -87,9 +87,9 @@ public interface EmpDeductDtlService {
   public Slice<EmpDeductDtl> mediaDateRng(int mediaDate_0, String mediaKind_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
+   * Acdate = ,AND TitaTlrNo = ,AND TitaTxtNo =
    *
-   * @param acDate_0 acDate_0
+   * @param acdate_0 acdate_0
    * @param titaTlrNo_1 titaTlrNo_1
    * @param titaTxtNo_2 titaTxtNo_2
    * @param index Page Index
@@ -97,7 +97,7 @@ public interface EmpDeductDtlService {
    * @param titaVo Variable-Length Argument
    * @return Slice EmpDeductDtl EmpDeductDtl of List
    */
-  public Slice<EmpDeductDtl> findTxSeq(EmpDeductDtlId acDate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo);
+  public Slice<EmpDeductDtl> findTxSeq(int acdate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By EmpDeductDtl

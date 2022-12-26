@@ -217,7 +217,7 @@ em = null;
   }
 
   @Override
-  public Slice<EmpDeductDtl> findTxSeq(EmpDeductDtlId acDate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<EmpDeductDtl> findTxSeq(int acdate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<EmpDeductDtl> slice = null;
     if (titaVo.length != 0)
@@ -228,15 +228,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findTxSeq " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
+    this.info("findTxSeq " + dbName + " : " + "acdate_0 : " + acdate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = empDeductDtlReposDay.findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+      slice = empDeductDtlReposDay.findAllByAcdateIsAndTitaTlrNoIsAndTitaTxtNoIs(acdate_0, titaTlrNo_1, titaTxtNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = empDeductDtlReposMon.findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+      slice = empDeductDtlReposMon.findAllByAcdateIsAndTitaTlrNoIsAndTitaTxtNoIs(acdate_0, titaTlrNo_1, titaTxtNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = empDeductDtlReposHist.findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+      slice = empDeductDtlReposHist.findAllByAcdateIsAndTitaTlrNoIsAndTitaTxtNoIs(acdate_0, titaTlrNo_1, titaTxtNo_2, pageable);
     else 
-      slice = empDeductDtlRepos.findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+      slice = empDeductDtlRepos.findAllByAcdateIsAndTitaTlrNoIsAndTitaTxtNoIs(acdate_0, titaTlrNo_1, titaTxtNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

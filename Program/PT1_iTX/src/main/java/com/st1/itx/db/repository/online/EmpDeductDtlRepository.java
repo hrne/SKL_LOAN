@@ -37,8 +37,8 @@ public interface EmpDeductDtlRepository extends JpaRepository<EmpDeductDtl, EmpD
   // MediaDate = , AND MediaKind = 
   public Slice<EmpDeductDtl> findAllByMediaDateIsAndMediaKindIsOrderByEntryDateAscCustNoAscAchRepayCodeDesc(int mediaDate_0, String mediaKind_1, Pageable pageable);
 
-  // AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
-  public Slice<EmpDeductDtl> findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(EmpDeductDtlId acDate_0, String titaTlrNo_1, String titaTxtNo_2, Pageable pageable);
+  // Acdate = ,AND TitaTlrNo = ,AND TitaTxtNo =
+  public Slice<EmpDeductDtl> findAllByAcdateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acdate_0, String titaTlrNo_1, String titaTxtNo_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

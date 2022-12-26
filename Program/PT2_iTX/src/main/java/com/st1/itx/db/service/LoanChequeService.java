@@ -146,12 +146,10 @@ public interface LoanChequeService {
    * @param acDate_0 acDate_0
    * @param tellerNo_1 tellerNo_1
    * @param txtNo_2 txtNo_2
-   * @param index Page Index
-   * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice LoanCheque LoanCheque of List
    */
-  public Slice<LoanCheque> findTxSeq(int acDate_0, String tellerNo_1, String txtNo_2, int index, int limit, TitaVo... titaVo);
+  public LoanCheque findTxSeqFirst(int acDate_0, String tellerNo_1, String txtNo_2, TitaVo... titaVo);
 
   /**
    * hold By LoanCheque

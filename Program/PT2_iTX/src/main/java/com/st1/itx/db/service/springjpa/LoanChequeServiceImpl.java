@@ -310,31 +310,22 @@ em = null;
   }
 
   @Override
-  public Slice<LoanCheque> findTxSeq(int acDate_0, String tellerNo_1, String txtNo_2, int index, int limit, TitaVo... titaVo) {
+  public LoanCheque findTxSeqFirst(int acDate_0, String tellerNo_1, String txtNo_2, TitaVo... titaVo) {
     String dbName = "";
-    Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findTxSeq " + dbName + " : " + "acDate_0 : " + acDate_0 + " tellerNo_1 : " +  tellerNo_1 + " txtNo_2 : " +  txtNo_2);
+    this.info("findTxSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " tellerNo_1 : " +  tellerNo_1 + " txtNo_2 : " +  txtNo_2);
+    Optional<LoanCheque> loanChequeT = null;
     if (dbName.equals(ContentName.onDay))
-      slice = loanChequeReposDay.findAllByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2, pageable);
+      loanChequeT = loanChequeReposDay.findTopByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanChequeReposMon.findAllByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2, pageable);
+      loanChequeT = loanChequeReposMon.findTopByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanChequeReposHist.findAllByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2, pageable);
+      loanChequeT = loanChequeReposHist.findTopByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2);
     else 
-      slice = loanChequeRepos.findAllByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2, pageable);
+      loanChequeT = loanChequeRepos.findTopByAcDateIsAndTellerNoIsAndTxtNoIs(acDate_0, tellerNo_1, txtNo_2);
 
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
+    return loanChequeT.isPresent() ? loanChequeT.get() : null;
   }
 
   @Override
