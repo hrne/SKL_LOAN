@@ -1,0 +1,1 @@
+UPDATE "MlaundryDetail" SET "FlEntdy" = 0 

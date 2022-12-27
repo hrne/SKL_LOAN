@@ -64,7 +64,7 @@ public class L9135ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  	  AND A.\"AcSubCode\" NOT IN ('     ')";// --欄位五位
 		sql += "  	  AND A.\"EntAc\" > 0 ";
 		sql += "	ORDER BY A.\"AcNoCode\" ASC";
-		sql += "			,A.\"AcSubCode\" ASC";
+		sql += "			,A.\"AcSubCode\" DESC";
 		sql += "			,A.\"AcDtlCode\" ASC";
 		sql += "			,A.\"SlipNo\" ASC";
 

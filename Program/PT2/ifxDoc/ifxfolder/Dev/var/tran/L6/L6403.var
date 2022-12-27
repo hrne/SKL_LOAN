@@ -53,7 +53,7 @@ C(3,#FunCode,3,SHOW(#AuthNoFd2,#AuthNo2),HIDE(#AuthNoFd2,#AuthNo2))
 !Ap4: 100
 !Ap5: 120
 !Ap6: 140
-!Ap7: 20
+!Ap7: 30
 !Ap8: 170
 !Ap9: 180
 
@@ -100,7 +100,7 @@ INVOKEJS(SHOW,grd5_{i},0)
 ##loop {times:140,i:1}
 INVOKEJS(SHOW,grd6_{i},0)
 ##end
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 INVOKEJS(SHOW,grd7_{i},0)
 ##end
 ##loop {times:170,i:1}
@@ -859,7 +859,7 @@ C(2,#ApfType{i},$,$,C(5,#ApfBtn{i},V,C(3,#ApfSno{i},#it1,T(2,@OifBtn{i},#it2),$)
 #Ap7ProcA=@,1,S
 T(1,@ApCount,#ApL7,1,3)
 E(0,@ApIdx,4)
-##loop {times:20,i:1,j:0}
+##loop {times:30,i:1,j:0}
 T(1,@ApgType{i},#ApL7,#ApIdx,1)
 E(0,@ApIdx,#ApIdx+1)
 T(1,@ApgSno{i},#ApL7,#ApIdx,2)
@@ -876,7 +876,7 @@ C(3,#ApCount,{i},s,$)
 ##end
 
 #Ap7ProcB=@,1,S
-##loop {times:20,i:1,j:0}
+##loop {times:30,i:1,j:0}
 C(2,#ApgAuth{i},T(3,@ApgBtn{i}, ),T(3,@ApgBtn{i},V),T(3,@ApgBtn{i},V))
 C(2,#ApgAuth{i},T(3,@OigBtn{i}, ),T(3,@OigBtn{i},V),T(3,@OigBtn{i}, ))
 C(2,#ApgType{i},T(3,@ApgTypeX{i},子選單),T(3,@ApgTypeX{i},查詢交易),T(3,@ApgTypeX{i},維護交易),$)
@@ -893,7 +893,7 @@ BIND(#ApgBtn0,click, {cmd=CALLSEND;DOCODE=ApgBtnProc0})
 #ApgBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#ApgBtn0,V,T(3,@ApgBtn0, ),T(3,@ApgBtn0,V))
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 T(2,@ApgBtn{i},#ApgBtn0)
 C(5,#ApgBtn{i},V,C(3,#ApgType{i},1,T(3,@OigBtn{i},V),$),T(3,@OigBtn{i}, ))
 ##end
@@ -906,12 +906,12 @@ BIND(#OigBtn0,click, {cmd=CALLSEND;DOCODE=OigBtnProc0})
 #OigBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#OigBtn0,V,T(3,@OigBtn0, ),T(3,@OigBtn0,V))
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 C(2,#ApgType{i},T(2,@OigBtn{i},#OigBtn0),$,C(5,#ApgBtn{i},V,T(2,@OigBtn{i},#OigBtn0),$)) 
 ##end
 
 !
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 !權限勾選按鈕
 #ApgBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
 !限查詢按鈕
@@ -950,13 +950,13 @@ C(3,#ApgType{i},0,CALL(#OigSub,#ApgSno{i},#OigBtn{i}),$)
 ##end
 
 #ApgSub=@,1,S
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 C(3,#ApgSno{i},#it1,T(2,@ApgBtn{i},#it2),$)
 C(5,#ApgBtn{i},V,C(3,#ApgType{i},1,T(3,@OigBtn{i},V),$),T(3,@OigBtn{i}, ))
 ##end
 
 #OigSub=@,1,S
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 C(2,#ApgType{i},$,$,C(5,#ApgBtn{i},V,C(3,#ApgSno{i},#it1,T(2,@OigBtn{i},#it2),$),$)) 
 ##end
 
@@ -1442,7 +1442,7 @@ T(2,CODE:+#AuthNo)
 [
 [],
 [#<->#,"L7.介接外部系統"],
-["#grid#,{id:7,expand:true,loop:20,row_height:1}","　",
+["#grid#,{id:7,expand:true,loop:30,row_height:1}","　",
 [[#ApgBtn0,"執行權限"],[#OigBtn0,"限查詢"],"代號","名稱","類別"],
 [#ApgBtn1,#OigBtn1,#ApgCode1,#ApgDesc1,#ApgTypeX1]
 ],
@@ -1520,7 +1520,7 @@ T(2,CODE:+#AuthNo)
 #ApfBtn{i}
 #OifBtn{i}
 ##end
-##loop {times:20,i:1}
+##loop {times:30,i:1}
 #ApgCode{i}
 #ApgBtn{i}
 #OigBtn{i}

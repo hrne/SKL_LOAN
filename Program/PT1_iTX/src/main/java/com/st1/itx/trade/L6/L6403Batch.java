@@ -232,7 +232,7 @@ public class L6403Batch extends TradeBuffer {
 
 		}
 		// L7
-		for (int i = 1; i <= 20; i++) {
+		for (int i = 1; i <= 30; i++) {
 			String iTranNo = titaVo.get("ApgCode" + i);
 			if (iTranNo != null) {
 
