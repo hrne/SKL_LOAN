@@ -9474,12 +9474,15 @@ TXFORM=L6R27
 #L6R28ShortPrinLimit=N,5,S
 #L6R28ShortIntPercent=N,3,S
 #L6R28AmlFg=N,1,S
-#L6R28AmlUrl=x,50,S
-#L6R28FtpUrl=x,50,S
+#L6R28AmlUrl=x,100,S
+#L6R28FtpUrl=x,100,S
+#L6R28SmsFtpUrl=x,100,S
 #L6R28PerfDate=D,7,S
 #L6R28AcBookAdjDate=D,7,S
 #L6R28JcicEmpName=X,8,S
 #L6R28JcicEmpTel=X,16,S
+#L6R28EbsUrl=x,100,S
+#L6R28IcsUrl=x,100,S
 </L6R28.dec>
 
 <L6R28.tom>
@@ -9523,10 +9526,13 @@ TXFORM=L6R28
 #L6R28AmlFg
 #L6R28AmlUrl
 #L6R28FtpUrl
+#L6R28SmsFtpUrl
 #L6R28PerfDate
 #L6R28AcBookAdjDate
 #L6R28JcicEmpName
 #L6R28JcicEmpTel
+#L6R28EbsUrl
+#L6R28IcsUrl
 ^
 </L6R28.tom>
 

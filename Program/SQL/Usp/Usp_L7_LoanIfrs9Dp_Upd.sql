@@ -736,7 +736,7 @@ BEGIN
       FROM MonthData M
       LEFT JOIN "MonthlyLoanBal" MLB ON MLB."CustNo" = M."CustNo"
                                     AND MLB."FacmNo" = M."FacmNo"
-                                    AND MLB."BormNo" = M."FacmNo"
+                                    AND MLB."BormNo" = M."BormNo"
                                     AND MLB."YearMonth" IN (
                                             M."EndMonth1"
                                           , M."EndMonth2"
@@ -872,60 +872,70 @@ BEGIN
            , B."BormNo"
            , SUM(
              CASE
+               WHEN B."CustTotal1" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee1" - NVL(O1."OtherLawFee1",0)
              ELSE B."AvgLawFee1"
              END)                               AS "AvgLawFee1"
            , SUM(
              CASE
+               WHEN B."CustTotal2" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee2" - NVL(O1."OtherLawFee2",0)
              ELSE B."AvgLawFee2"
              END)                               AS "AvgLawFee2"
            , SUM(
              CASE
+               WHEN B."CustTotal3" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee3" - NVL(O1."OtherLawFee3",0)
              ELSE B."AvgLawFee3"
              END)                               AS "AvgLawFee3"
            , SUM(
              CASE
+               WHEN B."CustTotal4" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee4" - NVL(O1."OtherLawFee4",0)
              ELSE B."AvgLawFee4"
              END)                               AS "AvgLawFee4"
            , SUM(
              CASE
+               WHEN B."CustTotal5" = 0 THEN 0
                WHEN B."Seq" = G1."MaxSeq"
                THEN B."LawFee5" - NVL(O1."OtherLawFee5",0)
              ELSE B."AvgLawFee5"
              END)                               AS "AvgLawFee5"
            , SUM(
              CASE
+               WHEN B."FacTotal1" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee1" - NVL(O2."OtherInsuFee1",0)
              ELSE B."AvgInsuFee1"
              END)                               AS "AvgInsuFee1"
            , SUM(
              CASE
+               WHEN B."FacTotal2" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee2" - NVL(O2."OtherInsuFee2",0)
              ELSE B."AvgInsuFee2"
              END)                               AS "AvgInsuFee2"
            , SUM(
              CASE
+               WHEN B."FacTotal3" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee3" - NVL(O2."OtherInsuFee3",0)
              ELSE B."AvgInsuFee3"
              END)                               AS "AvgInsuFee3"
            , SUM(
              CASE
+               WHEN B."FacTotal4" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee4" - NVL(O2."OtherInsuFee4",0)
              ELSE B."AvgInsuFee4"
              END)                               AS "AvgInsuFee4"
            , SUM(
              CASE
+               WHEN B."FacTotal5" = 0 THEN 0
                WHEN B."FacSeq" = G2."MaxSeq"
                THEN B."InsuFee5" - NVL(O2."OtherInsuFee5",0)
              ELSE B."AvgInsuFee5"

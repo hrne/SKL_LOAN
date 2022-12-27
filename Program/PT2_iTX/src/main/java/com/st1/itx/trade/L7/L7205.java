@@ -96,10 +96,10 @@ public class L7205 extends TradeBuffer {
 		int iMfbsDy = tTxBizDate.getMfbsDy() + 19110000;// 畫面輸入年月的月底營業日
 		this.info("L7205 iMfbsDy : " + iMfbsDy);
 
-		if(titaVo.getParam("FILENA").trim().length() == 0) {
+		if (titaVo.getParam("FILENA").trim().length() == 0) {
 			throw new LogicException(titaVo, "E0014", "沒有選擇檔案");
 		}
-		
+
 		// 吃檔
 		String filename = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
@@ -294,6 +294,15 @@ public class L7205 extends TradeBuffer {
 		BigDecimal iFacmNo = BigDecimal.ZERO;
 		BigDecimal iAssetClass = BigDecimal.ZERO;
 		BigDecimal iLawAmount = BigDecimal.ZERO;
+
+		int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
+
+		this.info("輸入的年份：" + iYearMonth);
+		this.info("檔案的年份：" + fileYearMonth);
+		if (fileYearMonth != iYearMonth) {
+			throw new LogicException(titaVo, "E0015", "年月份錯誤 : 應為" + iYearMonth + ",資料上為：" + fileYearMonth);
+		}
+
 		for (int i = 2; i <= lastRowNum; i++) {
 
 			OccursList occursList = new OccursList();

@@ -298,6 +298,16 @@ public class SystemParas implements Serializable {
   @Column(name = "`BatchFireFeeFg`", length = 1)
   private String batchFireFeeFg;
 
+  // ICS啟用記號
+  /* Y:啟用N:不啟用 */
+  @Column(name = "`IcsFg`", length = 1)
+  private String icsFg;
+
+  // ICS網址
+  /* ICS資產資料傳輸到ICS系統,服務協定為RESTful */
+  @Column(name = "`IcsUrl`", length = 100)
+  private String icsUrl;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -1463,6 +1473,46 @@ N:不啟用
   }
 
 /**
+	* ICS啟用記號<br>
+	* Y:啟用
+N:不啟用
+	* @return String
+	*/
+  public String getIcsFg() {
+    return this.icsFg == null ? "" : this.icsFg;
+  }
+
+/**
+	* ICS啟用記號<br>
+	* Y:啟用
+N:不啟用
+  *
+  * @param icsFg ICS啟用記號
+	*/
+  public void setIcsFg(String icsFg) {
+    this.icsFg = icsFg;
+  }
+
+/**
+	* ICS網址<br>
+	* ICS資產資料傳輸到ICS系統,服務協定為RESTful
+	* @return String
+	*/
+  public String getIcsUrl() {
+    return this.icsUrl == null ? "" : this.icsUrl;
+  }
+
+/**
+	* ICS網址<br>
+	* ICS資產資料傳輸到ICS系統,服務協定為RESTful
+  *
+  * @param icsUrl ICS網址
+	*/
+  public void setIcsUrl(String icsUrl) {
+    this.icsUrl = icsUrl;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1550,6 +1600,7 @@ N:不啟用
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
            + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth
            + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg
-           + ", batchFireFeeFg=" + batchFireFeeFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

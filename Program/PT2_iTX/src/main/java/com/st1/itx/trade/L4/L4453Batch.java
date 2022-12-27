@@ -254,7 +254,7 @@ public class L4453Batch extends TradeBuffer {
 				String sInsuAmt = toFullWidth("" + insuFee.get(tmp));
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuMonth.get(tmp)), 5).substring(3, 5);
 
-				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp) + "\",\"您好：提醒您" + sInsuMonth
+				dataLines += "\"H1\",\"" + "\",\"" + custPhone.get(tmp) + "\",\"您好：提醒您" + sInsuMonth
 						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
 						+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
 				// Step3. send L6001
