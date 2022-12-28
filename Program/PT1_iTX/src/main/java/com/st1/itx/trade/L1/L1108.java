@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -14,11 +15,13 @@ import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.CustNoticeId;
+import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
+import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
@@ -40,6 +43,10 @@ public class L1108 extends TradeBuffer {
 
 	@Autowired
 	public CustNoticeService sCustNoticeService;
+	
+	@Autowired
+	public CustTelNoService sCustTelNoService;
+
 
 	/* DB服務注入 */
 	@Autowired
@@ -76,6 +83,7 @@ public class L1108 extends TradeBuffer {
 			throw new LogicException("E0001", "客戶資料主檔");
 		}
 
+		
 		FacMain tFacMain = new FacMain();
 		String iFormNo;
 		// 若額度號碼欄位輸入0時,寫一組額度為0的資料,作為此戶號的主要通知設定.
@@ -157,6 +165,29 @@ public class L1108 extends TradeBuffer {
 				String VarMsg = "N";
 				String VarEMail = "N";
 
+				String uKey = custMain.getCustUKey();
+				
+
+				Slice<CustTelNo> tCustTelNo = sCustTelNoService.findCustUKey(uKey, 0,Integer.MAX_VALUE, titaVo);
+				//CustUkey 接電話跟客戶主檔 要去判斷有無對應的該編號(05) 然後去看是否有簡訊
+				//有UKEY 但是要從L1905的資料裡面抓出對應編號
+				boolean ixy = titaVo.getParam("Msg" + i).trim().isEmpty();
+				this.info("MSG   = " + titaVo.getParam("Msg" + i).trim().isEmpty());
+				//05簡訊
+				if(tCustTelNo != null) {
+					CustTelNo sCustTelNo = new CustTelNo();
+					sCustTelNo = sCustTelNoService.custUKeyFirst(custMain.getCustUKey(), "05", titaVo);
+					if(sCustTelNo == null && !ixy ) {
+						throw new LogicException("E0005", "電話種類簡訊不存在，不發送簡訊限輸入'Y'");
+					}
+					
+				}
+				//CustMain Email
+				String sEmail = custMain.getEmail();
+				if(sEmail == null ) {
+					throw new LogicException("E0005", "電子信箱不存在，不發送Email限輸入'Y'");
+				}
+				
 				// FormNo報表代號
 				iFormNo = titaVo.getParam("FormNo" + i);
 

@@ -132,6 +132,11 @@ BEGIN
       SELECT "AcctCode"
            , "AcSubBookCode"
            , "CurrencyCode"
+           , SUM("DbAmt") AS "DbAmtSum"
+           , SUM("CrAmt") AS "CrAmtSum"
+           , SUM("CoreDbAmt") AS "CoreDbAmtSum"
+           , SUM("CoreCrAmt") AS "CoreCrAmtSum"
+           , SUM("YdBal") AS "YdBalSum"
            , SUM("TdBal") AS "TdBalSum"
       FROM "AcMain"
       WHERE "AcctCode" IN ('310','320','330','340','990') -- xwh 20211124 added 340
@@ -155,6 +160,11 @@ BEGIN
           ,NVL(S2."TdExtAmt",0)             AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "ReceivableBal"   -- 銷帳檔餘額 DECIMAL 18 2
           ,NVL(S3."LoanBal",0)              AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
+          ,NVL(S4."YdBalSum",0)             AS "YdBal"           -- 前日餘額 DECIMAL 18 2
+          ,NVL(S4."DbAmtSum",0)             AS "DbAmt"           -- 借方金額 DECIMAL 18 2
+          ,NVL(S4."CrAmtSum",0)             AS "CrAmt"           -- 貸方金額 DECIMAL 18 2
+          ,NVL(S4."CoreDbAmtSum",0)         AS "CoreDbAmt"       -- 核心借方金額 DECIMAL 18 2
+          ,NVL(S4."CoreCrAmtSum",0)         AS "CoreCrAmt"       -- 核心貸方金額 DECIMAL 18 2
           ,"EmpNo"                          AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
@@ -258,6 +268,11 @@ BEGIN
       SELECT "AcctCode"
            , "AcSubBookCode"
            , "CurrencyCode"
+           , SUM("DbAmt") AS "DbAmtSum"
+           , SUM("CrAmt") AS "CrAmtSum"
+           , SUM("CoreDbAmt") AS "CoreDbAmtSum"
+           , SUM("CoreCrAmt") AS "CoreCrAmtSum"
+           , SUM("YdBal") AS "YdBalSum"
            , SUM("TdBal") AS "TdBalSum"
       FROM "AcMain"
       WHERE "AcctCode" IN ('F09','F25') -- 2022-03-01 Wei
@@ -281,6 +296,11 @@ BEGIN
           ,NVL(S2."TdExtAmt",0)             AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "ReceivableBal"   -- 銷帳檔餘額 DECIMAL 18 2
           ,NVL(S3."InsuBal",0)              AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
+          ,NVL(S4."YdBalSum",0)             AS "YdBal"           -- 前日餘額 DECIMAL 18 2
+          ,NVL(S4."DbAmtSum",0)             AS "DbAmt"           -- 借方金額 DECIMAL 18 2
+          ,NVL(S4."CrAmtSum",0)             AS "CrAmt"           -- 貸方金額 DECIMAL 18 2
+          ,NVL(S4."CoreDbAmtSum",0)         AS "CoreDbAmt"       -- 核心借方金額 DECIMAL 18 2
+          ,NVL(S4."CoreCrAmtSum",0)         AS "CoreCrAmt"       -- 核心貸方金額 DECIMAL 18 2
           ,"EmpNo"                          AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
@@ -371,6 +391,11 @@ BEGIN
       SELECT "AcctCode"
            , "AcSubBookCode"
            , "CurrencyCode"
+           , SUM("DbAmt") AS "DbAmtSum"
+           , SUM("CrAmt") AS "CrAmtSum"
+           , SUM("CoreDbAmt") AS "CoreDbAmtSum"
+           , SUM("CoreCrAmt") AS "CoreCrAmtSum"
+           , SUM("YdBal") AS "YdBalSum"
            , SUM("TdBal") AS "TdBalSum"
       FROM "AcMain"
       WHERE "AcctCode" IN ('F07','F24') -- 2022-03-01 Wei
@@ -394,6 +419,11 @@ BEGIN
           ,NVL(S2."TdExtAmt",0)             AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "ReceivableBal"   -- 銷帳檔餘額 DECIMAL 18 2
           ,NVL(S3."LawFeeBal",0)            AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
+          ,NVL(S4."YdBalSum",0)             AS "YdBal"           -- 前日餘額 DECIMAL 18 2
+          ,NVL(S4."DbAmtSum",0)             AS "DbAmt"           -- 借方金額 DECIMAL 18 2
+          ,NVL(S4."CrAmtSum",0)             AS "CrAmt"           -- 貸方金額 DECIMAL 18 2
+          ,NVL(S4."CoreDbAmtSum",0)         AS "CoreDbAmt"       -- 核心借方金額 DECIMAL 18 2
+          ,NVL(S4."CoreCrAmtSum",0)         AS "CoreCrAmt"       -- 核心貸方金額 DECIMAL 18 2
           ,"EmpNo"                          AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
@@ -473,6 +503,11 @@ BEGIN
       SELECT "AcctCode"
            , "AcSubBookCode"
            , "CurrencyCode"
+           , SUM("DbAmt") AS "DbAmtSum"
+           , SUM("CrAmt") AS "CrAmtSum"
+           , SUM("CoreDbAmt") AS "CoreDbAmtSum"
+           , SUM("CoreCrAmt") AS "CoreCrAmtSum"
+           , SUM("YdBal") AS "YdBalSum"
            , SUM("TdBal") AS "TdBalSum"
       FROM "AcMain"
       WHERE "AcctCode" IN ('TAV') -- 2022-03-01 Wei
@@ -496,6 +531,11 @@ BEGIN
           ,NVL(S2."TdExtAmt",0)             AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "ReceivableBal"   -- 銷帳檔餘額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
+          ,NVL(S4."YdBalSum",0)             AS "YdBal"           -- 前日餘額 DECIMAL 18 2
+          ,NVL(S4."DbAmtSum",0)             AS "DbAmt"           -- 借方金額 DECIMAL 18 2
+          ,NVL(S4."CrAmtSum",0)             AS "CrAmt"           -- 貸方金額 DECIMAL 18 2
+          ,NVL(S4."CoreDbAmtSum",0)         AS "CoreDbAmt"       -- 核心借方金額 DECIMAL 18 2
+          ,NVL(S4."CoreCrAmtSum",0)         AS "CoreCrAmt"       -- 核心貸方金額 DECIMAL 18 2
           ,"EmpNo"                          AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
@@ -568,6 +608,11 @@ BEGIN
       SELECT "AcctCode"
            , "AcSubBookCode"
            , "CurrencyCode"
+           , SUM("DbAmt") AS "DbAmtSum"
+           , SUM("CrAmt") AS "CrAmtSum"
+           , SUM("CoreDbAmt") AS "CoreDbAmtSum"
+           , SUM("CoreCrAmt") AS "CoreCrAmtSum"
+           , SUM("YdBal") AS "YdBalSum"
            , SUM("TdBal") AS "TdBalSum"
       FROM "AcMain"
       WHERE "AcctCode" IN ('TCK') -- 2022-03-10 Wei
@@ -591,6 +636,11 @@ BEGIN
           ,NVL(S2."TdExtAmt",0)             AS "TdExtAmt"        -- 本日展期金額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "ReceivableBal"   -- 銷帳檔餘額 DECIMAL 18 2
           ,NVL(S2."ReceivableBal",0)        AS "AcctMasterBal"   -- 業務檔餘額 DECIMAL 18 2
+          ,NVL(S4."YdBalSum",0)             AS "YdBal"           -- 前日餘額 DECIMAL 18 2
+          ,NVL(S4."DbAmtSum",0)             AS "DbAmt"           -- 借方金額 DECIMAL 18 2
+          ,NVL(S4."CrAmtSum",0)             AS "CrAmt"           -- 貸方金額 DECIMAL 18 2
+          ,NVL(S4."CoreDbAmtSum",0)         AS "CoreDbAmt"       -- 核心借方金額 DECIMAL 18 2
+          ,NVL(S4."CoreCrAmtSum",0)         AS "CoreCrAmt"       -- 核心貸方金額 DECIMAL 18 2
           ,"EmpNo"                          AS "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
           ,JOB_START_TIME                   AS "CreateDate"      -- 建檔日期 DATE 
           ,"EmpNo"                          AS "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6

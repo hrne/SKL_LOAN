@@ -667,7 +667,7 @@ BEGIN
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" NOT IN ('990')
-                   THEN MLB."LoanBalance"
+                   THEN MLB."LoanBalance" + MLB."IntAmtAcc"
                  WHEN MLB."YearMonth" = M."EndMonth1" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
@@ -675,7 +675,7 @@ BEGIN
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth2" AND MLB."AcctCode" NOT IN ('990')
-                   THEN MLB."LoanBalance"
+                   THEN MLB."LoanBalance" + MLB."IntAmtAcc"
                  WHEN MLB."YearMonth" = M."EndMonth2" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
@@ -683,7 +683,7 @@ BEGIN
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth3" AND MLB."AcctCode" NOT IN ('990')
-                   THEN MLB."LoanBalance"
+                   THEN MLB."LoanBalance" + MLB."IntAmtAcc"
                  WHEN MLB."YearMonth" = M."EndMonth3" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
@@ -691,7 +691,7 @@ BEGIN
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth4" AND MLB."AcctCode" NOT IN ('990')
-                   THEN MLB."LoanBalance"
+                   THEN MLB."LoanBalance" + MLB."IntAmtAcc"
                  WHEN MLB."YearMonth" = M."EndMonth4" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
@@ -699,7 +699,7 @@ BEGIN
            , SUM (
                CASE
                  WHEN MLB."YearMonth" = M."EndMonth5" AND MLB."AcctCode" NOT IN ('990')
-                   THEN MLB."LoanBalance"
+                   THEN MLB."LoanBalance" + MLB."IntAmtAcc"
                  WHEN MLB."YearMonth" = M."EndMonth5" AND MLB."AcctCode" = '990'
                    THEN (MLB."OvduPrinAmt" + MLB."OvduIntAmt" - MLB."OvduRcvAmt" - MLB."BadDebtAmt")
                ELSE 0 END
@@ -1000,7 +1000,7 @@ BEGIN
                , ML."CustNo"
                , ML."FacmNo"
                , ML."BormNo"
-               , CASE WHEN ML."AcctCode" NOT IN ('990') THEN ML."LoanBalance"
+               , CASE WHEN ML."AcctCode" NOT IN ('990') THEN ML."LoanBalance" + ML."IntAmtAcc"
                       ELSE ML."OvduPrinAmt" + ML."OvduIntAmt" - ML."OvduRcvAmt" - ML."BadDebtAmt"
                  END AS "LoanBalance"     
                , ROW_NUMBER()
@@ -1034,7 +1034,7 @@ BEGIN
                , l."FacmNo"
                , l."BormNo"
                , f."TotalFee"
-               , TRUNC(f."TotalFee" * l."LoanBalance" / s."SumLoanBalance" , 0) AS "SharedFee"
+               , ROUND(f."TotalFee" * l."LoanBalance" / s."SumLoanBalance" , 0) AS "SharedFee"
                , l."LoanBalSeq"
                , s."MaxSeq"
           FROM feeData f
@@ -1105,7 +1105,9 @@ BEGIN
                , ML."CustNo"
                , ML."FacmNo"
                , ML."BormNo"
-               , ML."LoanBalance"
+               , CASE WHEN ML."AcctCode" NOT IN ('990') THEN ML."LoanBalance" + ML."IntAmtAcc"
+                      ELSE ML."OvduPrinAmt" + ML."OvduIntAmt" - ML."OvduRcvAmt" - ML."BadDebtAmt"
+                 END AS  "LoanBalance"    
                , ROW_NUMBER()
                  OVER (
                     PARTITION BY IA."DerDate"
@@ -1139,7 +1141,7 @@ BEGIN
                , l."FacmNo"
                , l."BormNo"
                , f."TotalInsuFee"
-               , TRUNC(f."TotalInsuFee" * l."LoanBalance" / s."SumLoanBalance" , 0) AS "SharedFee"
+               , ROUND(f."TotalInsuFee" * l."LoanBalance" / s."SumLoanBalance" , 0) AS "SharedFee"
                , l."LoanBalSeq"
                , s."MaxSeq"
           FROM insuFeeData f

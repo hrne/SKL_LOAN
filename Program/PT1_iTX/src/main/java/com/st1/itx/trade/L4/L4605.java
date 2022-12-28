@@ -124,7 +124,7 @@ public class L4605 extends TradeBuffer {
 				this.info("tInsuRenew : " + tInsuRenew.toString());
 				if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && !tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
 					error.put(tmp, 4);
-					alrdyInsu.put(tmp, newInsuNo);
+					alrdyInsu.put(tmp, tInsuRenew.getNowInsuNo());
 					continue;
 				}
 				if (tInsuRenew.getRenewCode() == 1) {

@@ -137,7 +137,7 @@ public class L7205 extends TradeBuffer {
 			// 切資料
 			setValueFromFileExcelNew(titaVo, iYearMonth);
 		} else if ("csv".equals(extension[extension.length - 1].toLowerCase())) {
-			setValueFromFile(dataLineList);
+			setValueFromFile(titaVo,dataLineList);
 		} else {
 			String ErrorMsg = "請上傳正確附檔名之檔案-csv,xls,xlsx";
 			throw new LogicException(titaVo, "E0014", ErrorMsg);
@@ -256,7 +256,7 @@ public class L7205 extends TradeBuffer {
 
 	}
 
-	public void setValueFromFile(ArrayList<String> lineList) {
+	public void setValueFromFile(TitaVo titaVo,ArrayList<String> lineList) throws LogicException {
 
 		// 依照行數擷取明細資料
 		for (String thisLine : lineList) {
@@ -275,8 +275,19 @@ public class L7205 extends TradeBuffer {
 				occursList.putParam("YearMonth", thisColumn[0]);
 				occursList.putParam("CustNo", thisColumn[1]);
 				occursList.putParam("FacmNo", thisColumn[2]);
+				
+				//判斷資產分類位置是否為空
+				if(thisColumn[3].trim().length() == 0) {
+					String ErrorMsg = "L7205(戶號 " + thisColumn[1]+ "  的資產分類欄位不得為空值，請重新上傳)";
+					throw new LogicException(titaVo, "E0015", ErrorMsg);
+				}
+				
 				occursList.putParam("AssetClass", thisColumn[3]);
+				
+				
 			}
+			
+
 			this.occursList.add(occursList);
 		}
 
@@ -320,10 +331,13 @@ public class L7205 extends TradeBuffer {
 //			this.info("iAssetClass=" + makeExcel.getValue(i, 8).toString());
 
 			// 正常是連續的資料串，遇到空值強行結束
-			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
-					|| makeExcel.getValue(i, 8).toString().length() == 0
-					|| makeExcel.getValue(i, 9).toString().length() == 0) {
-				break;
+//			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
+//					|| makeExcel.getValue(i, 8).toString().length() == 0
+//					|| makeExcel.getValue(i, 9).toString().length() == 0)
+			//第8欄位為資產分類
+			if (makeExcel.getValue(i, 8).toString().trim().length() == 0) {
+				String ErrorMsg = "L7205(第" + i + "列，戶號 " + makeExcel.getValue(i, 2).toString() + " 的資產分類欄位不得為空值，請重新上傳)";
+				throw new LogicException(titaVo, "E0015", ErrorMsg);
 			}
 
 			try {

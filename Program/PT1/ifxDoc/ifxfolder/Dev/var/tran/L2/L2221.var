@@ -23,7 +23,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[250,1000];printer.width=[20,160];">
 [
 ["[L2221]                                 交易關係人維護"],
-["#FdFunCd+功能",#FunCdX"],
+["#FdFunCd+功能",#FunCdX],
 ["#FdCaseNo+案件編號",#CaseNo],
 ["#FdCustId+統一編號",#CustId],
 ["#FdCustName+交易關係人姓名",#CustName],
@@ -113,13 +113,18 @@ IF(#FunCd ==4 || #FunCd ==5,T(3,@FdCaseNo, )T(3,@FdCustId, )T(3,@FdCustName, )T(
 C(3,#FunCd,1,$,s)
 @V(2,0)
 
+#SendL2r10=X,1,S
+C(3,#CaseNo,0,S,$)
+E(0,@RimCaseNo,#CaseNo)
+RESET_RIM(#SendL2r10,L2R10)
+S(L2R10,1,#RimCaseNo)
+R(1,L2R10)
+
 ![身分證號/統號]
 #CustId=X,10,I
 C(3,#FunCd,1,$,s)
 @V(7)A(ID_UNINO,0,#CustId)
 
-<include src="ROM.icf::L1R09.dec"/>
-<include src="ROM.icf::L2R16.dec"/>
 !RIM參數使用
 #RimCustId=X,10,S
 
@@ -173,6 +178,9 @@ HELP(#FacRelationCodeHelp)
 T(H,#FacRelationCode,#FacRelationCodeHelp)
 
 
+<include src="ROM.icf::L1R09.dec"/>
+<include src="ROM.icf::L2R16.dec"/>
+<include src="ROM.icf::L2R10.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -223,6 +231,7 @@ TXFORM=L2221
 ^
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R16.tom"/>
+<include src="ROM.icf::L2R10.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

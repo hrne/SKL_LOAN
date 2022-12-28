@@ -49,6 +49,11 @@ BEGIN
           ,SUM(S1."LDGETA")               AS "TdExtAmt"            -- 本日展期金額 DECIMAL 18 2 
           ,0                              AS "ReceivableBal"       -- 銷帳檔餘額 DECIMAL 18 2 
           ,0                              AS "AcctMasterBal"       -- 業務檔餘額 DECIMAL 18 2 
+          ,0                              AS "YdBal"               -- 前日餘額 DECIMAL 18 2
+          ,0                              AS "DbAmt"               -- 借方金額 DECIMAL 18 2
+          ,0                              AS "CrAmt"               -- 貸方金額 DECIMAL 18 2
+          ,0                              AS "CoreDbAmt"           -- 核心借方金額 DECIMAL 18 2
+          ,0                              AS "CoreCrAmt"           -- 核心貸方金額 DECIMAL 18 2
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  
           ,JOB_START_TIME                 AS "CreateDate"          -- 建檔日期時間 DATE   
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6  
