@@ -1557,7 +1557,7 @@ public class BaTxCom extends TradeBuffer {
 		int yearMonth = this.txBuffer.getTxCom().getTbsdy() / 100;
 		boolean isShouldPaid = false;
 		if (iPrevPaidIntDate / 100 <= yearMonth && iNextPayIntDate / 100 <= yearMonth
-				&& ln.getMaturityDate() > yearMonth) {
+				&& ln.getMaturityDate() / 100 > yearMonth) {
 			isShouldPaid = true;
 		}
 		if (ln.getMaturityDate() < nextMonth01) {

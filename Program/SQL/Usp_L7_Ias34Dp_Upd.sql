@@ -968,6 +968,217 @@ BEGIN
         AND LT."TitaHCode" = '0'
         AND LT."Interest" > 0
     )
+    , derData AS (
+      SELECT DISTINCT
+             "CustNo"
+           , "DerDate"
+      FROM "Ias34Dp"
+      WHERE "DataYM" = YYYYMM
+    )
+    , feeData AS (
+          SELECT DD."DerDate"
+               , FF."CustNo"
+               , SUM(NVL(FF."Fee",0)) AS "TotalFee"
+          FROM derData DD
+          LEFT JOIN "ForeclosureFee" FF ON FF."CustNo" = DD."CustNo"
+                                       AND FF."OpenAcDate" <= DD."DerDate"-- OpenAcDate起帳日期<=發生日
+          WHERE NVL(FF."CustNo",0) != 0
+--2022/11/4比照AS400,以下條件點掉
+            -- CloseDate銷號日期=0 或 >發生日(發生日當時未銷)
+--            AND CASE
+--                  WHEN FF."CloseDate" = 0
+--                  THEN 1
+--                  WHEN FF."CloseDate" > "InputDerogationDate"
+--                  THEN 1
+--                ELSE 0 END = 1
+--            AND FF."Fee" > 0
+          GROUP BY DD."DerDate"
+                 , FF."CustNo"
+     )
+     , loanBalData AS (
+          SELECT IA."DerDate"
+               , ML."CustNo"
+               , ML."FacmNo"
+               , ML."BormNo"
+               , CASE WHEN ML."AcctCode" NOT IN ('990') THEN ML."LoanBalance"
+                      ELSE ML."OvduPrinAmt" + ML."OvduIntAmt" - ML."OvduRcvAmt" - ML."BadDebtAmt"
+                 END AS "LoanBalance"     
+               , ROW_NUMBER()
+                 OVER (
+                    PARTITION BY IA."DerDate"
+                               , ML."CustNo"
+                    ORDER BY ML."FacmNo"
+                           , ML."BormNo"
+                 ) AS "LoanBalSeq"
+          FROM "MonthlyLoanBal" ML
+          LEFT JOIN "Ias34Dp" IA ON IA."DataYM" = YYYYMM
+                                AND IA."CustNo" = ML."CustNo"
+                                AND IA."FacmNo" = ML."FacmNo"
+                                AND IA."BormNo" = ML."BormNo"
+          WHERE ML."YearMonth"  = TRUNC(NVL(IA."DerDate",0) / 100)
+            AND ML."LoanBalance" != 0
+            AND NVL(IA."CustNo",0) != 0 -- 2022-12-27 Wei 有出現在Ias34Dp的戶號額度序號才加總餘額
+     )
+     , sumData AS (
+          SELECT "DerDate"
+               , "CustNo"
+               , SUM("LoanBalance") AS "SumLoanBalance"
+               , MAX("LoanBalSeq")  AS "MaxSeq"
+          FROM loanBalData
+          GROUP BY "DerDate"
+                 , "CustNo"
+     )
+     , sharedData AS (
+          SELECT l."DerDate"
+               , l."CustNo"
+               , l."FacmNo"
+               , l."BormNo"
+               , f."TotalFee"
+               , TRUNC(f."TotalFee" * l."LoanBalance" / s."SumLoanBalance" , 0) AS "SharedFee"
+               , l."LoanBalSeq"
+               , s."MaxSeq"
+          FROM feeData f
+          LEFT JOIN loanBalData l ON l."CustNo" = f."CustNo"
+                                 AND l."DerDate" = f."DerDate"
+          LEFT JOIN sumData s ON s."CustNo" = f."CustNo"
+                             AND s."DerDate" = f."DerDate"
+     )
+     , otherSharedData AS (
+          SELECT s1."DerDate"
+               , s1."CustNo"
+               , SUM(s2."SharedFee") AS "SharedFee"
+          FROM sharedData s1
+          LEFT JOIN sharedData s2 on s2."DerDate" = s1."DerDate"
+                                 and s2."CustNo" = S1."CustNo"
+                                 and s2."LoanBalSeq" < s1."LoanBalSeq"
+          WHERE s1."LoanBalSeq" = s1."MaxSeq"
+          GROUP BY s1."DerDate"
+                 , s1."CustNo"
+     )
+     , FFData AS (
+      SELECT s."DerDate"
+           , s."CustNo"
+           , s."FacmNo"
+           , s."BormNo"
+           ,  CASE
+                WHEN s."LoanBalSeq" = s."MaxSeq"
+                THEN s."TotalFee" - NVL(o."SharedFee",0)
+              ELSE s."SharedFee" END AS "FFee"
+      FROM sharedData s
+      LEFT JOIN otherSharedData o ON o."DerDate" = s."DerDate"
+                                 AND o."CustNo" = s."CustNo"
+    )
+    , insuDerData AS (
+      SELECT DISTINCT
+             "CustNo"
+           , "FacmNo"
+           , "DerDate"
+      FROM "Ias34Dp"
+      WHERE "DataYM" = YYYYMM
+    )
+    , insuFeeData AS (
+          SELECT DD."DerDate"
+               , DD."CustNo"
+               , DD."FacmNo"
+               , SUM(NVL(IR."TotInsuPrem",0)) AS "TotalInsuFee"
+          FROM insuDerData DD
+          LEFT JOIN "InsuRenew" IR ON IR."CustNo" = DD."CustNo"
+                                  AND IR."FacmNo" = DD."FacmNo"
+                                  -- InsuYearMonth火險年月<=發生日年月
+                                  AND IR."InsuYearMonth" <= TRUNC(DD."DerDate" / 100 )
+          WHERE NVL(IR."CustNo",0) != 0
+            -- AcDate會計日期=0 或>發生日(發生日當時未銷)
+            AND CASE
+                  WHEN IR."AcDate" = 0
+                  THEN 1
+                  WHEN IR."AcDate" > DD."DerDate"
+                  THEN 1
+                ELSE 0 END = 1
+            -- RenewCode是否續保=2續保
+            AND IR."RenewCode" = 2
+          GROUP BY DD."DerDate"
+                 , DD."CustNo"
+                 , DD."FacmNo"
+    )
+    , insuLoanBalData AS (
+          SELECT IA."DerDate"
+               , ML."CustNo"
+               , ML."FacmNo"
+               , ML."BormNo"
+               , ML."LoanBalance"
+               , ROW_NUMBER()
+                 OVER (
+                    PARTITION BY IA."DerDate"
+                               , ML."CustNo"
+                               , ML."FacmNo"
+                    ORDER BY ML."BormNo"
+                 ) AS "LoanBalSeq"
+          FROM "MonthlyLoanBal" ML
+          LEFT JOIN "Ias34Dp" IA ON IA."DataYM" = YYYYMM
+                                AND IA."CustNo" = ML."CustNo"
+                                AND IA."FacmNo" = ML."FacmNo"
+                                AND IA."BormNo" = ML."BormNo"
+          WHERE ML."YearMonth"  = TRUNC(IA."DerDate" / 100)
+            AND ML."LoanBalance" != 0
+            AND NVL(IA."CustNo",0) != 0 -- 2022-12-27 Wei 有出現在Ias34Dp的戶號額度序號才加總餘額
+    )
+    , insuSumData AS (
+          SELECT "DerDate"
+               , "CustNo"
+               , "FacmNo"
+               , SUM("LoanBalance") AS "SumLoanBalance"
+               , MAX("LoanBalSeq")  AS "MaxSeq"
+          FROM insuLoanBalData
+          GROUP BY "DerDate"
+                 , "CustNo"
+                 , "FacmNo"
+    )
+    , insuSharedData AS (
+          SELECT l."DerDate"
+               , l."CustNo"
+               , l."FacmNo"
+               , l."BormNo"
+               , f."TotalInsuFee"
+               , TRUNC(f."TotalInsuFee" * l."LoanBalance" / s."SumLoanBalance" , 0) AS "SharedFee"
+               , l."LoanBalSeq"
+               , s."MaxSeq"
+          FROM insuFeeData f
+          LEFT JOIN insuLoanBalData l ON l."CustNo" = f."CustNo"
+                                     AND l."FacmNo" = f."FacmNo"
+                                     AND l."DerDate" = f."DerDate"
+          LEFT JOIN insuSumData s ON s."CustNo" = f."CustNo"
+                                 AND s."FacmNo" = f."FacmNo"
+                                 AND s."DerDate" = f."DerDate"
+    )
+    , insuOtherSharedData AS (
+         SELECT s1."DerDate"
+              , s1."CustNo"
+              , s1."FacmNo"
+              , SUM(s2."SharedFee") AS "SharedFee"
+         FROM insuSharedData s1
+         LEFT JOIN insuSharedData s2 on s2."DerDate" = s1."DerDate"
+                                    and s2."CustNo" = S1."CustNo"
+                                    and s2."FacmNo" = S1."FacmNo"
+                                    and s2."LoanBalSeq" < s1."LoanBalSeq"
+         WHERE s1."LoanBalSeq" = s1."MaxSeq"
+         GROUP BY s1."DerDate"
+                , s1."CustNo"
+                , s1."FacmNo"
+    )
+     , IFData AS (
+      SELECT s."DerDate"
+           , s."CustNo"
+           , s."FacmNo"
+           , s."BormNo"
+           ,  CASE
+                WHEN s."LoanBalSeq" = s."MaxSeq"
+                THEN s."TotalInsuFee" - NVL(o."SharedFee",0)
+              ELSE s."SharedFee" END AS "InsuFee"
+      FROM insuSharedData s
+      LEFT JOIN insuOtherSharedData o ON o."DerDate" = s."DerDate"
+                                     AND o."CustNo" = s."CustNo"
+                                     AND o."FacmNo" = s."FacmNo"
+    )
     SELECT M."CustNo"                      AS  "CustNo"          -- 戶號
          , M."FacmNo"                      AS  "FacmNo"          -- 額度編號
          , M."BormNo"                      AS  "BormNo"          -- 撥款序號
@@ -984,10 +1195,9 @@ BEGIN
              WHEN M."DerDate" != 0      -- 減損發生日
              THEN "Fn_CalculateDerogationInterest"(M."CustNo",M."FacmNo",M."BormNo",NVL(ML."LoanBalance",0),NVL(LR."FitRate",0),LT."IntEndDate",M."DerDate")
            ELSE 0 END                       AS  "IntAmt"          -- 減損發生日月底 應收利息
-         -- 2022-07-13 Wei 新增 from Linda
-         , NVL("Fn_GetUnpaidInsuFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate") , 0)
-           + NVL("Fn_GetUnpaidForeclosureFee"(M."CustNo", M."FacmNo", M."BormNo", M."DerDate"), 0)
-                                           AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
+         -- 2022-12-27 Wei 修改 from Linda
+         , NVL(IFD."InsuFee",0)
+           + NVL(FF."FFee",0)               AS  "Fee"             -- 減損發生日當時 費用 (火險+法務)
          , CASE WHEN NVL(ML1."SumRcvPrin",0) = 0 THEN 0             -- 第一年累計回收本金=0則為0
                 ELSE ML1."SumRcvPrin" - NVL(ML."SumRcvPrin",0)      -- 第一年累計回收本金 減 減損發生日年月的累計回收本金
            END                             AS  "DerY1Amt"        -- 個案減損客觀證據發生後第一年本金回收金額
@@ -1171,7 +1381,15 @@ BEGIN
       LEFT JOIN "LoanBorMain" LM   ON LM."CustNo" = M."CustNo" 
                                   AND LM."FacmNo" = M."FacmNo" 
                                   AND LM."BormNo" = M."BormNo" 
-                                  
+      LEFT JOIN FFData FF ON FF."DerDate" = M."DerDate"
+                         AND FF."CustNo" = M."CustNo"
+                         AND FF."FacmNo" = M."FacmNo"
+                         AND FF."BormNo" = M."BormNo"
+      LEFT JOIN IFData IFD ON IFD."DerDate" = M."DerDate"
+                          AND IFD."CustNo" = M."CustNo"
+                          AND IFD."FacmNo" = M."FacmNo"
+                          AND IFD."BormNo" = M."BormNo"
+                         
     WHERE    M."DataYM"          =  YYYYMM
       ;
 

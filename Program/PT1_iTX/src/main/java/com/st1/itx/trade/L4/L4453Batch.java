@@ -112,7 +112,7 @@ public class L4453Batch extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		if (titaVo.isHcodeErase()) {
 //			刪除TxToDoDetail
-			dele("TEXT00",  titaVo);
+			dele("TEXT00", titaVo);
 			dele("MAIL00", titaVo);
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
 					"L4453 銀扣扣款前通知 訂正完畢，總筆數：" + totalCnt + ", 刪除筆數：" + deleteCnt, titaVo);
@@ -203,7 +203,11 @@ public class L4453Batch extends TradeBuffer {
 				if (tBankDeductDtl.getRepayType() == 5) {
 					TempVo dTempVo = new TempVo();
 					dTempVo = dTempVo.getVo(tBankDeductDtl.getJsonFields());
-					insuMonth.put(tmp, dTempVo.get("InsuDate").substring(0, 5));
+					if (dTempVo.get("InsuDate") != null) {
+						insuMonth.put(tmp, dTempVo.get("InsuDate").substring(0, 5));
+					} else {
+						insuMonth.put(tmp, "00000");
+					}
 					insuFee.put(tmp, tBankDeductDtl.getRepayAmt());
 				}
 				custId.put(tmp, tCustMain.getCustId());
@@ -223,12 +227,12 @@ public class L4453Batch extends TradeBuffer {
 	private void setText(tmpFacm tmp, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setText...");
-		String dataLines = "<" + noticePhoneNo + ">";
+		String dataLines = "";
 		if (tmp.getRepayType() == 1 || tmp.getRepayType() == 3) {
 			this.info("RepayType() == 1 3...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
-				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp)
-						+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+				dataLines += "\"H1\",\"" + "\",\"" + custPhone.get(tmp) + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate
+						+ "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
@@ -264,7 +268,7 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setBormNo(0);
 				tTxToDoDetail.setDtlValue("<火險扣款通知>");
 				tTxToDoDetail.setItemCode("TEXT00");
-				tTxToDoDetail.setStatus(0);			
+				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
 				txToDoCom.setTxBuffer(this.getTxBuffer());

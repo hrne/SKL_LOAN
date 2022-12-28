@@ -87,11 +87,7 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			   WHEN M.\"TotalLoanBal\" >= M2.\"TotalLoanBal\" THEN M.\"TotalLoanBal\" ";
 		sql += "			 ELSE M2.\"TotalLoanBal\" END AS F7";
 		sql += "			,M.\"TotalLoanBal\" AS F8";
-		sql += "			,M.\"TotalLoanBal\" - ";
-		sql += "			 CASE ";
-		sql += "			   WHEN M2.\"TotalLoanBal\" IS NULL THEN M.\"TotalLoanBal\" ";
-		sql += "			   WHEN M.\"TotalLoanBal\" >= M2.\"TotalLoanBal\" THEN M.\"TotalLoanBal\" ";
-		sql += "			 ELSE M2.\"TotalLoanBal\" END AS F9";
+		sql += "			,M.\"TotalLoanBal\" - NVL(M2.\"TotalLoanBal\",M.\"TotalLoanBal\") AS F9";
 		sql += "			,M.\"TotalLoanBal\" AS F10";
 		sql += "			,ROW_NUMBER () OVER (ORDER BY M.\"TotalLoanBal\" DESC) AS F11";
 		sql += "	  FROM \"mainData\" M ";
