@@ -55,8 +55,8 @@ public class L2419ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     THEN CB.\"IrCode\" ";
 		sql += "   ELSE CL.\"IrCode\" END AS \"IrCode\" ";
 		sql += " , SUBSTR(CB.\"BdLocation\", ";
-		sql += "          INSTR(CB.\"BdLocation\", CA.\"CityItem\" || CA.\"AreaItem\") ";
-		sql += "          + LENGTH(CA.\"CityItem\" || CA.\"AreaItem\") ";
+		sql += "          INSTR(CB.\"BdLocation\", CC.\"CityItem\" || CA.\"AreaItem\") ";
+		sql += "          + LENGTH(CC.\"CityItem\" || CA.\"AreaItem\") ";
 		sql += "         ) AS \"Road\" ";
 		sql += " , CB.\"BdNo1\" ";
 		sql += " , CB.\"BdNo2\" ";
@@ -106,6 +106,8 @@ public class L2419ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     ON IO.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "     AND IO.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "     AND IO.\"ClNo\" = CF.\"ClNo\" ";
+		sql += " LEFT JOIN \"CdCity\" CC ";
+		sql += "     ON CC.\"CityCode\" = CM.\"CityCode\" ";
 		sql += " LEFT JOIN \"CdArea\" CA ";
 		sql += "     ON CA.\"CityCode\" = CM.\"CityCode\" ";
 		sql += "     AND CA.\"AreaCode\" = CM.\"AreaCode\" ";

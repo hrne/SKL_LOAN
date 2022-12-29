@@ -198,7 +198,6 @@ public class L4721Report2 extends MakeReport {
 								+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
 						result.add(line);
 
-
 						// 05
 
 						// 0500036341+9510200000174395103000001743
@@ -231,8 +230,9 @@ public class L4721Report2 extends MakeReport {
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
 			line += "01";
-			line += FormatUtil.padX("", 10) + FormatUtil.padX(tmap.get("Location"), 105) + " "
-					+ FormatUtil.pad9(tmap.get("CustNo"), 7) + " " + FormatUtil.padX(tmap.get("CustName"), 79);
+			line += FormatUtil.padX("", 10) + FormatUtil.padX(tmap.get("Location"), 60) + "    "
+					+ FormatUtil.padX("", 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
+					+ FormatUtil.padX(tmap.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
 			// 加入明細
 			result.add(line);
 

@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R01 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R01.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,7 +46,8 @@ public class L6R01 extends TradeBuffer {
 		int iRimFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		String iRimTxCode = titaVo.getParam("RimTxCode");
 		String iBankCode = titaVo.getParam("RimL6R01BankCode");
-		String iBranchCode = titaVo.getParam("RimL6R01BranchCode");
+		String iBranchCode = titaVo.getParam("RimL6R01BranchCode").isEmpty() ? "    "
+				: titaVo.getParam("RimL6R01BranchCode");
 
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {

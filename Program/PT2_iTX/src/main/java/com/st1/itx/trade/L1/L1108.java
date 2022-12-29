@@ -180,7 +180,6 @@ public class L1108 extends TradeBuffer {
 					if(sCustTelNo == null && !ixy ) {
 						throw new LogicException("E0005", "電話種類簡訊不存在，不發送簡訊限輸入'Y'");
 					}
-					
 				}
 				//CustMain Email
 				String sEmail = custMain.getEmail();

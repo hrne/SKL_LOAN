@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class LoanBorTx implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2362447019245927075L;
-
-@EmbeddedId
+  @EmbeddedId
   private LoanBorTxId loanBorTxId;
 
   // 借款人戶號
@@ -72,7 +68,7 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
 
-  // 分錄序號(起)
+  // 入帳順序
   @Column(name = "`AcSeq`")
   private int acSeq = 0;
 
@@ -220,7 +216,7 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`Shortfall`")
   private BigDecimal shortfall = new BigDecimal("0");
 
-  // 累溢收金額(暫收貸)
+  // 溢收金額(暫收貸)
   @Column(name = "`Overflow`")
   private BigDecimal overflow = new BigDecimal("0");
 
@@ -433,7 +429,7 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 分錄序號(起)<br>
+	* 入帳順序<br>
 	* 
 	* @return Integer
 	*/
@@ -442,10 +438,10 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 分錄序號(起)<br>
+	* 入帳順序<br>
 	* 
   *
-  * @param acSeq 分錄序號(起)
+  * @param acSeq 入帳順序
 	*/
   public void setAcSeq(int acSeq) {
     this.acSeq = acSeq;
@@ -1106,7 +1102,7 @@ N:否
   }
 
 /**
-	* 累溢收金額(暫收貸)<br>
+	* 溢收金額(暫收貸)<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -1115,10 +1111,10 @@ N:否
   }
 
 /**
-	* 累溢收金額(暫收貸)<br>
+	* 溢收金額(暫收貸)<br>
 	* 
   *
-  * @param overflow 累溢收金額(暫收貸)
+  * @param overflow 溢收金額(暫收貸)
 	*/
   public void setOverflow(BigDecimal overflow) {
     this.overflow = overflow;

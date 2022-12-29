@@ -62,9 +62,9 @@ public class L7300 extends TradeBuffer {
 	private String tranTime = "";
 
 	private BigDecimal mrktValue = BigDecimal.ZERO;
-	
+
 	private String tranSerialSeq = "";
-	
+
 	private int seqL7300 = 0;
 
 	@Override
@@ -85,7 +85,7 @@ public class L7300 extends TradeBuffer {
 		tranTime += " " + rptUtil.showTime(titaVo.getCalTm());
 
 		tranSerialSeq = "LN_V0_" + stockDate + "_" + seqL7300;
-		
+
 		int lmnDy = this.txBuffer.getTxBizDate().getLmnDyf();
 
 		String yearMonth = "" + (int) (lmnDy / 100);
@@ -153,7 +153,7 @@ public class L7300 extends TradeBuffer {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("L7300 setLoanDto error = " + errors);
-				throw new LogicException("E9004", "設定上傳資料發生錯誤");
+				throw new LogicException("E9005", "設定上傳資料發生錯誤");
 			}
 			tranSubBatchSeq++;
 		}
@@ -208,7 +208,7 @@ public class L7300 extends TradeBuffer {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("L7300 setLoanDto error = " + errors);
-				throw new LogicException("E9004", "設定放款傳輸資料發生錯誤");
+				throw new LogicException("E9005", "設定放款傳輸資料發生錯誤");
 			}
 			assetsDataInfo.put(loanDto);
 			tranDataCount++;
@@ -233,7 +233,7 @@ public class L7300 extends TradeBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("ICS Exception = " + e.getMessage());
-			throw new LogicException("E9004", "ICS上傳資料時發生錯誤");
+			throw new LogicException("E9005", "");
 		}
 		this.info("ICS result = " + result);
 

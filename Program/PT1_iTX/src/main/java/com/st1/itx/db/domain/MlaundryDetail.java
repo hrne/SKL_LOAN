@@ -57,8 +57,7 @@ public class MlaundryDetail implements Serializable {
   private String rational;
 
   // 經辦合理性說明
-  /* 2022/8/25長度放大150 */
-  @Column(name = "`EmpNoDesc`", length = 150)
+  @Column(name = "`EmpNoDesc`", length = 200)
   private String empNoDesc;
 
   // 主管覆核
@@ -76,17 +75,8 @@ public class MlaundryDetail implements Serializable {
   private int managerCheckDate = 0;
 
   // 主管覆核說明
-  /* 2022/8/25長度放大150 */
-  @Column(name = "`ManagerDesc`", length = 150)
+  @Column(name = "`ManagerDesc`", length = 200)
   private String managerDesc;
-
-  // 流程控制帳務日
-  @Column(name = "`FlEntdy`")
-  private int flEntdy = 0;
-
-  // 流程控制序號
-  @Column(name = "`FlowNo`", length = 18)
-  private String flowNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -239,7 +229,7 @@ N:否
 
 /**
 	* 經辦合理性說明<br>
-	* 2022/8/25長度放大150
+	* 
 	* @return String
 	*/
   public String getEmpNoDesc() {
@@ -248,7 +238,7 @@ N:否
 
 /**
 	* 經辦合理性說明<br>
-	* 2022/8/25長度放大150
+	* 
   *
   * @param empNoDesc 經辦合理性說明
 	*/
@@ -319,7 +309,7 @@ N:不同意
 
 /**
 	* 主管覆核說明<br>
-	* 2022/8/25長度放大150
+	* 
 	* @return String
 	*/
   public String getManagerDesc() {
@@ -328,50 +318,12 @@ N:不同意
 
 /**
 	* 主管覆核說明<br>
-	* 2022/8/25長度放大150
+	* 
   *
   * @param managerDesc 主管覆核說明
 	*/
   public void setManagerDesc(String managerDesc) {
     this.managerDesc = managerDesc;
-  }
-
-/**
-	* 流程控制帳務日<br>
-	* 
-	* @return Integer
-	*/
-  public int getFlEntdy() {
-    return this.flEntdy;
-  }
-
-/**
-	* 流程控制帳務日<br>
-	* 
-  *
-  * @param flEntdy 流程控制帳務日
-	*/
-  public void setFlEntdy(int flEntdy) {
-    this.flEntdy = flEntdy;
-  }
-
-/**
-	* 流程控制序號<br>
-	* 
-	* @return String
-	*/
-  public String getFlowNo() {
-    return this.flowNo == null ? "" : this.flowNo;
-  }
-
-/**
-	* 流程控制序號<br>
-	* 
-  *
-  * @param flowNo 流程控制序號
-	*/
-  public void setFlowNo(String flowNo) {
-    this.flowNo = flowNo;
   }
 
 /**
@@ -454,7 +406,7 @@ N:不同意
   @Override
   public String toString() {
     return "MlaundryDetail [mlaundryDetailId=" + mlaundryDetailId + ", totalCnt=" + totalCnt + ", totalAmt=" + totalAmt + ", rational=" + rational
-           + ", empNoDesc=" + empNoDesc + ", managerCheck=" + managerCheck + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerDesc=" + managerDesc + ", flEntdy=" + flEntdy
-           + ", flowNo=" + flowNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", empNoDesc=" + empNoDesc + ", managerCheck=" + managerCheck + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerDesc=" + managerDesc + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

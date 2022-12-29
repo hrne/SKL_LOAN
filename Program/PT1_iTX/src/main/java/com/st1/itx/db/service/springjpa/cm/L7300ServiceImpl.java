@@ -41,7 +41,7 @@ public class L7300ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CASE";
 		sql += "          WHEN c.\"EntCode\" = '0' ";
 		sql += "          THEN '1' ";
-		sql += "        ELSE '2; ";
+		sql += "        ELSE '2' ";
 		sql += "        END                        AS \"LoanType\" "; // 貸款類別
 		sql += "      , CASE ";
 		sql += "          WHEN c.\"EntCode\" = '0' ";
@@ -57,15 +57,15 @@ public class L7300ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , m.\"AcSubBookCode\"        AS \"SubCompanyCode\" "; // 區隔帳冊別(資金來源)
 		sql += "      , nvl(cl.\"EvaNetWorth\", 0) AS \"MrktValue\" "; // 市價
 		sql += "      , m.\"PrinBalance\"          AS \"BookValue\" "; // 期初帳面金額
-		sql += " FROM \"MonthlyFacBal\"  m";
-		sql += " LEFT JOIN \"CustMain\" c ON c.\"CustNo\" = m.\"CustNo\"";
-		sql += " LEFT JOIN \"FacMain\" f ON f.\"CustNo\" = m.\"CustNo\"";
-		sql += "                        AND f.\"FacmNo\" = m.\"FacmNo\"";
-		sql += " LEFT JOIN \"ClImm\" cl ON cl.\"ClCode1\" = m.\"ClCode1\"";
-		sql += "                       AND cl.\"ClCode2\" = m.\"ClCode2\"";
-		sql += "                       AND cl.\"ClNo\" = m.\"ClNo\"";
-		sql += " WHERE m.\"Status\" IN (0,2,4,6,7)";
-		sql += "   AND m.\"YearMonth\" = :yearMonth";
+		sql += " FROM \"MonthlyFacBal\"  m ";
+		sql += " LEFT JOIN \"CustMain\" c ON c.\"CustNo\" = m.\"CustNo\" ";
+		sql += " LEFT JOIN \"FacMain\" f ON f.\"CustNo\" = m.\"CustNo\" ";
+		sql += "                        AND f.\"FacmNo\" = m.\"FacmNo\" ";
+		sql += " LEFT JOIN \"ClImm\" cl ON cl.\"ClCode1\" = m.\"ClCode1\" ";
+		sql += "                       AND cl.\"ClCode2\" = m.\"ClCode2\" ";
+		sql += "                       AND cl.\"ClNo\" = m.\"ClNo\" ";
+		sql += " WHERE m.\"Status\" IN (0,2,4,6,7) ";
+		sql += "   AND m.\"YearMonth\" = :yearMonth ";
 
 		this.info("sql=" + sql);
 

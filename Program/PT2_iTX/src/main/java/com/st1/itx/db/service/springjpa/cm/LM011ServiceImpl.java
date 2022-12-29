@@ -50,7 +50,6 @@ public class LM011ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,I.\"ExpLimitAmt\"";
 		sql += "            ,I.\"DbAcNoCode\"";
 		sql += "            ,I.\"CrAcNoCode\"";
-		sql += "            ,1";
 		sql += "      FROM \"Ias39LoanCommit\" I";
 		sql += "      WHERE I.\"DataYm\" = :entdy";
 		sql += "        AND I.\"DrawdownFg\" = :drawdownFg";

@@ -355,6 +355,7 @@ C(3,#FuncCode,5,s)
 C(3,#Level,3,$,s)
 C(4,#EmpNoDesc,C(4,#L8R50Rational,T(2,@EmpNoDesc,#DescX),$),$)
 
+
 !主管覆核
 #ManagerCheck=X,1,H
 T(4,@Level,LEVEL$)
@@ -413,7 +414,7 @@ T(H,#ManagerCheck,#AgreeHelp)
 #ManagerCheckDate=D,7,L
 
 !主管覆核說明
-#ManagerDesc=X,4.50,H
+#ManagerDesc=x,4.50,H
 TOOLTIP(Shift+Enter換行，Enter跳一下欄位)
 C(3,#FuncCode,4,s,$)
 C(3,#FuncCode,5,s,$)

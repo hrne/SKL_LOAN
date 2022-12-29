@@ -120,14 +120,14 @@ TXFORM=L7205
 </sub>
 
 !--------- OUTPUT畫面 --------
-<sub type="PART" name="L7205" layout="cols=1;screen.width=[300,700];printer.width=[20,20];">
-[
-["[L7205]                                 五類資產分類上傳轉檔作業"],
-["@上傳筆數",#CountAll],
-["@成功筆數",#CountS],
-["@失敗筆數",#CountF],
-]
-</sub>
+!<sub type="PART" name="L7205" layout="cols=1;screen.width=[300,700];printer.width=[20,20];">
+![
+!["[L7205]                                 五類資產分類上傳轉檔作業"],
+!["@上傳筆數",#CountAll],
+!["@成功筆數",#CountS],
+!["@失敗筆數",#CountF],
+!]
+!</sub>
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">

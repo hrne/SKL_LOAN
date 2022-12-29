@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM011ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -71,7 +72,22 @@ public class LM011Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lLM011, List<Map<String, String>> lLM011Drawdown, int date) throws LogicException {
 		this.info("LM011Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM011", "表外明細", "LM011表外明細" + dateYear + "年" + dateMonth + "月", "LM011表外明細.xlsx", "LNWLCTP");
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM011";
+		String fileItem = "表外明細";
+		String fileName =  "LM011表外明細" + dateYear + "年" + dateMonth + "月";
+		String defaultExcel =  "LM011_底稿_表外明細.xlsx";
+		String defaultSheet = "LNWLCTP";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr()
+//				, "LM011", "表外明細", "LM011表外明細" + dateYear + "年" + dateMonth + "月", "LM011表外明細.xlsx", "LNWLCTP");
 
 		int row = 2;
 
@@ -79,7 +95,7 @@ public class LM011Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lLM011) {
 
-				for (int i = 0; i <= 21; i++) {
+				for (int i = 0; i <= 20; i++) {
 
 					int col = i + 1;
 
@@ -153,6 +169,6 @@ public class LM011Report extends MakeReport {
 		}
 
 		makeExcel.close();
-		// makeExcel.toExcel(sno);
+		//makeExcel.toExcel(sno);
 	}
 }

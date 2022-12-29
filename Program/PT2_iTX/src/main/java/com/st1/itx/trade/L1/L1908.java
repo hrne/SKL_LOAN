@@ -149,7 +149,6 @@ public class L1908 extends TradeBuffer {
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "查詢語法錯誤"); // 查無資料
 		}
-
 	}
 
 	public ArrayList<TotaVo> run2(TitaVo titaVo) throws LogicException {
