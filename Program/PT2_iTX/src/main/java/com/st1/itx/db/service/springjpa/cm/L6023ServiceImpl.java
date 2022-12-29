@@ -60,6 +60,7 @@ public class L6023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int wkFacmNoStart = 0;
 
 		String sql = "SELECT";
+		sql += "  MIN(cl.\"CityCode\") AS \"CityCode\", ";
 		sql += "  MIN(co.\"LandOfficeCode\") AS \"LandOfficeCode\", ";
 		sql += " 	    MIN(co.\"RecWord\") AS \"RecWord\", ";
 		sql += " 	    MIN(co.\"RecWordItem\") AS \"RecWordItem\", ";

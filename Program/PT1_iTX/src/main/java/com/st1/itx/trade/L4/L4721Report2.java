@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -72,7 +73,7 @@ public class L4721Report2 extends MakeReport {
 
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		this.info("L4721Report2 exec start");
-		
+
 		this.titaVo = titaVo;
 		this.setTxBuffer(txbuffer);
 		baTxCom.setTxBuffer(txbuffer);
@@ -185,8 +186,6 @@ public class L4721Report2 extends MakeReport {
 						line = "";
 						line += "04";
 						result.add(line);
-						line = "";
-						result.add(line);
 
 						// 45
 
@@ -198,9 +197,7 @@ public class L4721Report2 extends MakeReport {
 								+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
 								+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
 						result.add(line);
-						line = "";
-						// 加入換行
-						result.add(line);
+
 
 						// 05
 
@@ -211,9 +208,7 @@ public class L4721Report2 extends MakeReport {
 								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
 								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
 						result.add(line);
-						line = "";
-						// 加入換行
-						result.add(line);
+
 						result = sameFacmno(mapL4721Detail, result, false);
 						// 換額度要重新算次數
 						times = 0;
@@ -233,13 +228,12 @@ public class L4721Report2 extends MakeReport {
 			// 01
 
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
+			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			line = "";
 			line += "01";
-			line += "地址" + tmap.get("Location") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
-					+ tmap.get("CustName");
+			line += FormatUtil.padX("", 10) + FormatUtil.padX(tmap.get("Location"), 105) + " "
+					+ FormatUtil.pad9(tmap.get("CustNo"), 7) + " " + FormatUtil.padX(tmap.get("CustName"), 79);
 			// 加入明細
-			result.add(line);
-			line = "";
 			result.add(line);
 
 			// 02
@@ -253,17 +247,25 @@ public class L4721Report2 extends MakeReport {
 			} else {
 				headerDueAmt = tmap.get("DueAmt");
 			}
+			String loanBalX = "+";
+			if (parse.stringToBigDecimal(tmap.get("LoanBal")).compareTo(BigDecimal.ZERO) < 0) {
+				loanBalX = "-";
+			}
+
+			String headerExcessiveX = "+";
+			if (parse.stringToBigDecimal(tmap.get("headerExcessive")).compareTo(BigDecimal.ZERO) < 0) {
+				headerExcessiveX = "-";
+			}
 
 			// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
 			line = "";
 			line += "02";
-			line += " " + tmap.get("CustName") + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + tmap.get("SpecificDd")
-					+ " 日" + "          " + tmap.get("RepayCodeX") + "   " + FormatUtil.pad9(tmap.get("LoanBal"), 11)
-					+ headerExcessive;
-
+			line += " " + FormatUtil.padX(tmap.get("CustName"), 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7)
+					+ FormatUtil.pad9(tmap.get("SpecificDd"), 6) + " 日" + "          "
+					+ FormatUtil.padX(tmap.get("RepayCodeX"), 8) + "   " + FormatUtil.pad9(titaVo.getCalDy(), 8)
+					+ FormatUtil.pad9(tmap.get("LoanBal"), 11) + loanBalX + FormatUtil.pad9(headerExcessive, 11)
+					+ headerExcessiveX;
 			// 加入明細
-			result.add(line);
-			line = "";
 			result.add(line);
 
 		} // if
@@ -277,31 +279,62 @@ public class L4721Report2 extends MakeReport {
 		String dateRange = " ";
 		String startDate = tmap.get("IntStartDate");
 		String endDate = tmap.get("IntEndDate");
-		String tstartDate = "0000000";
-		String tendDate = "0000000";
+		String tstartDate = "00000000";
+		String tendDate = "00000000";
 		// 組成yyymmdd-yyymmdd
 		if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
 
+//			if (!"".equals(showRocDate(startDate, 3))) {
+//				tstartDate = showRocDate(startDate, 3);
+//			}
+//
+//			if (!"".equals(showRocDate(endDate, 3))) {
+//				tendDate = showRocDate(endDate, 3);
+//			}
+
 			if (!"".equals(showRocDate(startDate, 3))) {
-				tstartDate = showRocDate(startDate, 3);
+				tstartDate = FormatUtil.pad9(startDate, 8);
 			}
 
 			if (!"".equals(showRocDate(endDate, 3))) {
-				tendDate = showRocDate(endDate, 3);
+				tendDate = FormatUtil.pad9(endDate, 8);
 			}
-
 			dateRange = tstartDate + "-" + tendDate;
 		}
 
-		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
-				+ FormatUtil.pad9(formatAmt(tmap.get("TxAmt"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("Principal"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("Interest"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("BreachAmt"), 0), 10) + "+"
-				+ FormatUtil.pad9(formatAmt(tmap.get("OtherFee"), 0), 10) + "+";
+		String txAmtX = "+";
+		if (parse.stringToBigDecimal(tmap.get("TxAmt")).compareTo(BigDecimal.ZERO) < 0) {
+			txAmtX = "-";
+		}
+
+		String principalX = "+";
+		if (parse.stringToBigDecimal(tmap.get("Principal")).compareTo(BigDecimal.ZERO) < 0) {
+			principalX = "-";
+		}
+
+		String interestX = "+";
+		if (parse.stringToBigDecimal(tmap.get("Interest")).compareTo(BigDecimal.ZERO) < 0) {
+			interestX = "-";
+		}
+
+		String breachAmtX = "+";
+		if (parse.stringToBigDecimal(tmap.get("BreachAmt")).compareTo(BigDecimal.ZERO) < 0) {
+			breachAmtX = "-";
+		}
+
+		String OtherFeeX = "+";
+		if (parse.stringToBigDecimal(tmap.get("OtherFee")).compareTo(BigDecimal.ZERO) < 0) {
+			OtherFeeX = "-";
+		}
+
+//		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
+		line += FormatUtil.pad9(tmap.get("EntryDate"), 8) + dateRange + " " + FormatUtil.padX(tmap.get("RepayCodeX"), 8)
+				+ "   " + FormatUtil.pad9(formatAmt(tmap.get("TxAmt"), 0), 10) + txAmtX
+				+ FormatUtil.pad9(formatAmt(tmap.get("Principal"), 0), 10) + principalX
+				+ FormatUtil.pad9(formatAmt(tmap.get("Interest"), 0), 10) + interestX
+				+ FormatUtil.pad9(formatAmt(tmap.get("BreachAmt"), 0), 10) + breachAmtX
+				+ FormatUtil.pad9(formatAmt(tmap.get("OtherFee"), 0), 10) + OtherFeeX;
 		// 加入明細
-		result.add(line);
-		line = "";
 		result.add(line);
 
 		return result;

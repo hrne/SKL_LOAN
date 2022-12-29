@@ -14,6 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM084ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -58,7 +59,21 @@ public class LM084Report extends MakeReport {
 			thisPageAging = getAgingText(lastAging);
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txnm, "", "A4", "P");
+		String txcd = this.txcd;
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String reportItem = this.txnm;
+		String security = "";
+		String pageSize = "A4";
+		String pageOrientation = "P";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
+
+		
+//		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txnm, "", "A4", "P");
 
 		if (listLM084 != null && listLM084.size() > 0) {
 			printDetail(listLM084);

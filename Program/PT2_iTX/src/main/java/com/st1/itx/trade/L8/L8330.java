@@ -125,7 +125,7 @@ public class L8330 extends TradeBuffer {
 				
 				// 4 start 延期繳款累積期數(月份)不得超過6期
 				if (!"L".equals(iDelayCode)) {
-					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custRcSubCourtEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode, 0,  1, titaVo);
+					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode,iDelayYM, 0,  1, titaVo);
 					if(sJcicZ451 != null) {
 						throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
 					}

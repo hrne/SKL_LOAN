@@ -98,7 +98,7 @@ public class L4R31 extends TradeBuffer {
 				this.totaVo.putParam("L4R31CalDate", tAchAuthLog.getProcessDate());
 				String ProcessTime = "";
 				if (tAchAuthLog.getProcessTime() == 0) {
-					this.totaVo.putParam("L4R31CalTime", tAchAuthLog.getProcessTime());
+					this.totaVo.putParam("L4R31CalTime", "");
 				} else {
 					ProcessTime = "" + tAchAuthLog.getProcessTime();
 					ProcessTime = ProcessTime.substring(0, 2) + ":" + ProcessTime.substring(2, 4) + ":"

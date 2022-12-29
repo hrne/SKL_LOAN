@@ -105,8 +105,8 @@ T(H,#FunCd,#FunCd2Help)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
 
 #CheckFunCd=X,1,S
-C(3,#FunCd,1,$,T(F,@LandOfficeCode,0))
-C(3,#FunCd,2,T(F,@RecWord,0),$)
+C(3,#FunCd,1,T(3,@FdCityCode,*)T(3,@FdLandOfficeCode,*)T(3,@FdRecWordItem,*),T(F,@LandOfficeCode,0))
+C(3,#FunCd,2,T(F,@CityCode,0)T(F,@RecWord,0)T(3,@FdRecWordItem,*),$)
 C(3,#FunCd,4,T(F,@CityCode,0)T(F,@RecWord,0)T(F,@RecWordItem,0),$)
 
 
@@ -125,7 +125,9 @@ E(0,1)ASGN(AGAIN$)
 #CityCode=X,4,I
 C(3,#FunCd,1,$,s)
 HELP(#L6r49ResultCity)
-@C(4,#CityCode,S,V(H,#L6r49ResultCity))
+@
+V(H,#L6r49ResultCity)
+! C(4,#CityCode,S,V(H,#L6r49ResultCity))
 
 #CityCodeX=X,20,L
 C(4,#CityCode,S,$)

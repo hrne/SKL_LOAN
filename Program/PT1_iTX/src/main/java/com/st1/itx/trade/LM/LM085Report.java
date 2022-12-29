@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM085ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -39,6 +40,8 @@ public class LM085Report extends MakeReport {
 	 * @param titaVo
 	 * @param yearMonth     當月西元年月
 	 * @param lastYearMonth 上個西元年月
+	 * @return 
+	 * @throws LogicException 
 	 */
 	public boolean exec(TitaVo titaVo, int yearMonth, int lastYearMonth) throws LogicException {
 
@@ -55,12 +58,30 @@ public class LM085Report extends MakeReport {
 		String unitCode = titaVo.getParam("UnitCode").toString();
 
 		// 開啟指定檔案
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM085", "放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")", "LM085-" + iRocYeatMonth + "_放款逾期月報表", "LM085_底稿_放款逾期月報表.xlsx",
-				"X月");
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM085",
+//				"放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")", "LM085-" + iRocYeatMonth + "_放款逾期月報表",
+//				"LM085_底稿_放款逾期月報表.xlsx", "X月");
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM085";
+		String fileItem = "放款逾期月報表-" + iRocYeatMonth + "(單位：" + unitName + ")";
+		String fileName = "LM085-" + iRocYeatMonth + "_放款逾期月報表";
+		String defaultExcel =  "LM085_底稿_放款逾期月報表.xlsx";
+		String defaultSheet = "X月";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
 
 		makeExcel.setSheet("X月", iYearMonth % 100 + "月");
 
-		makeExcel.setValue(2, 1, "－" + (iRocYeatMonth / 100) + "." + String.format("%02d", (iRocYeatMonth % 100)) + "－");
+		makeExcel.setValue(2, 1,
+				"－" + (iRocYeatMonth / 100) + "." + String.format("%02d", (iRocYeatMonth % 100)) + "－");
 
 		makeExcel.setValue(3, 7, "單位：" + unitName, "R");
 		makeExcel.setValue(26, 7, "單位：" + unitName, "R");
@@ -177,7 +198,7 @@ public class LM085Report extends MakeReport {
 			// B18
 			makeExcel.formulaCalculate(18, 2);
 
-			BigDecimal legalLoss = dataList.get(0).get("LegalLoss") == null || dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO : new BigDecimal(dataList.get(0).get("LegalLoss"));
+			BigDecimal legalLoss =  dataList.get(0).get("LegalLoss")==null ||  dataList.get(0).get("LegalLoss").isEmpty() ? BigDecimal.ZERO:new BigDecimal(dataList.get(0).get("LegalLoss"));
 			makeExcel.setValue(20, 2, legalLoss, "#,000", "C");
 
 			break;
@@ -185,7 +206,8 @@ public class LM085Report extends MakeReport {
 			row = 17;
 			for (Map<String, String> r : dataList) {
 				int rowSpace = Integer.valueOf(r.get("F0"));
-				BigDecimal percent = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO : new BigDecimal(r.get("F1"));
+				BigDecimal percent = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
+						: new BigDecimal(r.get("F1"));
 
 				makeExcel.setValue(row + rowSpace, 6, percent, "0.000 %");
 			}
@@ -198,7 +220,8 @@ public class LM085Report extends MakeReport {
 			row = 24;
 			for (Map<String, String> r : dataList) {
 				int count = Integer.valueOf(r.get("F0"));
-				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO : new BigDecimal(r.get("F1"));
+				BigDecimal amt = r.get("F1").isEmpty() || r.get("F1") == "0" ? BigDecimal.ZERO
+						: new BigDecimal(r.get("F1"));
 
 				this.info("count=" + count);
 				this.info("amt=" + amt);
@@ -358,7 +381,8 @@ public class LM085Report extends MakeReport {
 			makeExcel.setValue(vaRow, col, amt, "#,###.##0", "R");
 
 			// 逾放比
-			makeExcel.setValue(vaRow, 6, getBigDecimal(r.get("F4").toString()).divide(getBigDecimal(r.get("F2").toString()), 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
+			makeExcel.setValue(vaRow, 6, getBigDecimal(r.get("F4").toString())
+					.divide(getBigDecimal(r.get("F2").toString()), 5, BigDecimal.ROUND_HALF_UP), "0.####0", "R");
 
 			// 當年度轉呆金額
 			col = enToNumber(r.get("F5").toString());

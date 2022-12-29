@@ -57,6 +57,7 @@ public class L6202 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6607"); // 功能選擇錯誤
 		}
 
+
 		CdSyndFee tCdSyndFee = new CdSyndFee();
 		switch (iFunCd) {
 		case 1: // 新增
@@ -86,7 +87,7 @@ public class L6202 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tCdSyndFee2, tCdSyndFee);
-			dataLog.exec();
+			dataLog.exec("修改企金費用代碼");
 			break;
 
 		case 4: // 刪除
@@ -100,7 +101,7 @@ public class L6202 extends TradeBuffer {
 				}
 				try {
 					dataLog.setEnv(titaVo, tCdSyndFee, tCdSyndFee);
-					dataLog.exec("刪除聯貸費用代碼");
+					dataLog.exec("刪除企金費用代碼");
 					cdSyndFeeService.delete(tCdSyndFee);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤

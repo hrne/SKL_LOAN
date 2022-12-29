@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM083ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -63,7 +64,23 @@ public class LM083Report extends MakeReport {
 
 		this.info(txcd + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txcd, txName, txcd + "_" + txName, txcd + "_底稿_" + txName + ".xlsx", sheetName);
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = this.txcd;
+		String fileItem = txName;
+		String fileName = txcd + "_" + txName;
+		String defaultExcel =  txcd + "_底稿_" + txName + ".xlsx";
+		String defaultSheet = sheetName;
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+		
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), 
+//				txcd, txName, txcd + "_" + txName, txcd + "_底稿_" + txName + ".xlsx", sheetName);
 
 		String inputYearMonth = titaVo.getParam("InputYear") + titaVo.getParam("InputMonth");
 

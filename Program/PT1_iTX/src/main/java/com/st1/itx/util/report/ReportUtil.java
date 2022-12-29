@@ -275,7 +275,8 @@ public class ReportUtil extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble
+					+ "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -296,7 +297,8 @@ public class ReportUtil extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString
+						+ "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -321,6 +323,7 @@ public class ReportUtil extends CommBuffer {
 	 *             type = 0: yyyy/mm/dd<BR>
 	 *             type = 1: mm/dd/yy<BR>
 	 *             type = 2: yyyymmdd<BR>
+	 *             type = 3: yyyy-mm-dd<BR>
 	 * @return 西曆日期
 	 */
 	public String showBcDate(int date, int type) {
@@ -370,6 +373,9 @@ public class ReportUtil extends CommBuffer {
 		case 2:
 			result = year + month + day;
 			break;
+		case 3:
+			result = year + "-" + month + "-" + day;
+			break;
 		default:
 			result = year + month + day;
 			break;
@@ -386,6 +392,7 @@ public class ReportUtil extends CommBuffer {
 	 *             type = 0: yyyy/mm/dd<BR>
 	 *             type = 1: mm/dd/yy<BR>
 	 *             type = 2: yyyymmdd<BR>
+	 *             type = 3: yyyy-mm-dd<BR>
 	 * @return 西曆日期
 	 */
 	public String showBcDate(String date, int type) {

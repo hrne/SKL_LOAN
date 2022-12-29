@@ -178,7 +178,7 @@ T(3,[L6023] 收件字代碼查詢)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
-
+#OOCityCode=X,4,L
 ! 地政別代碼
 #OOLandOfficeCode=X,2,L
 
@@ -202,7 +202,7 @@ T(3,1)ASGN(LOOP$)
 E(0,2)
 
 #OOBUF2=X,65,S
-T(2,#OOFunc2+#OOLandOfficeCode+#OORecWord)
+T(2,#OOFunc2+#OOCityCode+#OOLandOfficeCode+#OORecWord)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=修改;ntxbuf=#OOBUF2})
@@ -212,7 +212,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=修改;ntxbuf=#OOBUF2})
 E(0,4)
 
 #OOBUF4=X,65,S
-T(2,#OOFunc4+#OOLandOfficeCode+#OORecWord)
+T(2,#OOFunc4+#OOCityCode+#OOLandOfficeCode+#OORecWord)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=刪除;ntxbuf=#OOBUF4})
@@ -232,6 +232,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6203;text=刪除;ntxbuf=#OOBUF4})
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L6023
+#OOCityCode
 #OOLandOfficeCode
 #OORecWord
 #OORecWordItem

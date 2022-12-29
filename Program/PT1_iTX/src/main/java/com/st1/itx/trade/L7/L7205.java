@@ -124,23 +124,19 @@ public class L7205 extends TradeBuffer {
 		this.info("file extension=" + extension[extension.length - 1]);
 		if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 			// 打開上傳的excel檔案，預設讀取第1個工作表
-
 			makeExcel.openExcel(filename, 1);
-			// 取得年月
-//			int fileYearMonth = new BigDecimal(makeExcel.getValue(1, 10).toString()).intValue() + 191100;
 
-//			this.info("fileYearMonth=" + fileYearMonth);
-
-//			if (fileYearMonth != iYearMonth) {
-//				throw new LogicException(titaVo, "E0015", "年月份錯誤 : " + iYearMonth);
-//			}
 			// 切資料
 			setValueFromFileExcelNew(titaVo, iYearMonth);
 		} else if ("csv".equals(extension[extension.length - 1].toLowerCase())) {
-			setValueFromFile(titaVo,dataLineList);
+
+			setValueFromFile(titaVo, dataLineList);
+
 		} else {
+
 			String ErrorMsg = "請上傳正確附檔名之檔案-csv,xls,xlsx";
 			throw new LogicException(titaVo, "E0014", ErrorMsg);
+
 		}
 
 		int CountAll = occursList.size();
@@ -157,6 +153,7 @@ public class L7205 extends TradeBuffer {
 			int yearmonth = parse.stringToInteger(tempOccursList.get("YearMonth"));
 			String assetclass = tempOccursList.get("AssetClass");
 			BigDecimal lawAmount = BigDecimal.ZERO;
+
 			if ("xlsx".equals(extension[extension.length - 1]) || "xls".equals(extension[extension.length - 1])) {
 				lawAmount = new BigDecimal(tempOccursList.get("LawAmount"));
 			}
@@ -256,7 +253,7 @@ public class L7205 extends TradeBuffer {
 
 	}
 
-	public void setValueFromFile(TitaVo titaVo,ArrayList<String> lineList) throws LogicException {
+	public void setValueFromFile(TitaVo titaVo, ArrayList<String> lineList) throws LogicException {
 
 		// 依照行數擷取明細資料
 		for (String thisLine : lineList) {
@@ -271,22 +268,27 @@ public class L7205 extends TradeBuffer {
 			// 4 AssetClass 資產五分類代號(有擔保部分) Decimal 1
 
 			String[] thisColumn = thisLine.split(",");
+			String yearMonth = "";
 			if (thisColumn.length >= 1 && thisColumn != null) {
-				occursList.putParam("YearMonth", thisColumn[0]);
+
+				if (Integer.valueOf(thisColumn[0].toString()) < 19110000) {
+					yearMonth = String.valueOf((Integer.valueOf(thisColumn[0].toString()) + 19110000));
+				} else {
+					yearMonth = thisColumn[0];
+				}
+				occursList.putParam("YearMonth", yearMonth);
 				occursList.putParam("CustNo", thisColumn[1]);
 				occursList.putParam("FacmNo", thisColumn[2]);
-				
-				//判斷資產分類位置是否為空
-				if(thisColumn[3].trim().length() == 0) {
-					String ErrorMsg = "L7205(戶號 " + thisColumn[1]+ "  的資產分類欄位不得為空值，請重新上傳)";
+
+				// 判斷資產分類位置是否為空
+				if (thisColumn[3].trim().length() == 0) {
+					String ErrorMsg = "L7205(戶號 " + thisColumn[1] + "  的資產分類欄位不得為空值，請重新上傳)";
 					throw new LogicException(titaVo, "E0015", ErrorMsg);
 				}
-				
+
 				occursList.putParam("AssetClass", thisColumn[3]);
-				
-				
+
 			}
-			
 
 			this.occursList.add(occursList);
 		}
@@ -334,9 +336,10 @@ public class L7205 extends TradeBuffer {
 //			if (makeExcel.getValue(i, 2).toString().length() == 0 || makeExcel.getValue(i, 3).toString().length() == 0
 //					|| makeExcel.getValue(i, 8).toString().length() == 0
 //					|| makeExcel.getValue(i, 9).toString().length() == 0)
-			//第8欄位為資產分類
+			// 第8欄位為資產分類
 			if (makeExcel.getValue(i, 8).toString().trim().length() == 0) {
-				String ErrorMsg = "L7205(第" + i + "列，戶號 " + makeExcel.getValue(i, 2).toString() + " 的資產分類欄位不得為空值，請重新上傳)";
+				String ErrorMsg = "L7205(第" + i + "列，戶號 " + makeExcel.getValue(i, 2).toString()
+						+ " 的資產分類欄位不得為空值，請重新上傳)";
 				throw new LogicException(titaVo, "E0015", ErrorMsg);
 			}
 

@@ -439,14 +439,14 @@
 			</flow>
 			<!-- Step: LM083 ICS放款資料 -->
 			<flow>
-				<step id="sLM083" parent="parentStep">
-					<tasklet ref="LM083" />
+				<step id="sLM083Batch" parent="parentStep">
+					<tasklet ref="LM083Batch" />
 				</step>
 			</flow>
 			<!-- Step: LM084 應收利息之帳齡分析表 -->
 			<flow>
-				<step id="sLM084" parent="parentStep">
-					<tasklet ref="LM084" />
+				<step id="sLM084Batch" parent="parentStep">
+					<tasklet ref="LM084Batch" />
 				</step>
 			</flow>
 			<!-- Batch: LM085 逾期月報表 -->
