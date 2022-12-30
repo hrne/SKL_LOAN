@@ -80,10 +80,7 @@ public class L2221 extends TradeBuffer {
 				tFacRelation.setCreditSysNo(iCaseNo);
 				tFacRelation.setCustUKey(Ukey);
 				tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
-				tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
-				tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
+
 
 				try {
 					sFacRelationService.insert(tFacRelation, titaVo);
@@ -131,10 +128,6 @@ public class L2221 extends TradeBuffer {
 				tFacRelation.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CaseNo")));
 				tFacRelation.setCustUKey(Ukey);
 				tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
-				tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
-				tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
 
 				try {
 					sFacRelationService.insert(tFacRelation, titaVo);
@@ -174,10 +167,7 @@ public class L2221 extends TradeBuffer {
 			tFacRelation.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CaseNo")));
 			tFacRelation.setCustUKey(Ukey);
 			tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
-			tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
-			tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
+
 
 			try {
 				sFacRelationService.update(tFacRelation, titaVo);
@@ -229,6 +219,8 @@ public class L2221 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "交易關係人檔");
 			}
+			dataLog.setEnv(titaVo, tFacRelation, tFacRelation);
+			dataLog.exec("刪除交易關係人檔");
 			this.totaVo.putParam("OWarningMsg", "");
 		} // else
 

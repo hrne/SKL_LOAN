@@ -979,7 +979,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLog.setCustId(iCustId);
 		tPostAuthLog.setRepayAcctSeq(acctSeq);
 		tPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-		tPostAuthLog.setProcessTime(Integer.parseInt(iProcessTime));
+		tPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 		tPostAuthLog.setAuthErrorCode(" ");
 		tPostAuthLog.setLimitAmt(iLimitAmt);
 		tPostAuthLog.setRelationCode(iRelationCode);
@@ -1020,7 +1020,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tAchAuthLog.setAchAuthLogId(tAchAuthLogId);
 		tAchAuthLog.setFacmNo(iFacmNo);
 		tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-		tAchAuthLog.setProcessTime(Integer.parseInt(iProcessTime));
+		tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 		tAchAuthLog.setLimitAmt(iLimitAmt);
 		tAchAuthLog.setAuthMeth("A");
 		tAchAuthLog.setAuthStatus(" ");

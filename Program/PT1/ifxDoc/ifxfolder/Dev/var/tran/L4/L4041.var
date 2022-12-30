@@ -128,7 +128,7 @@ T(3,)T(H,#FunctionCode,#FunctionHelp)
 !SWITCH(#FunctionCode,1,T(2,篩選資料),2,T(2,產出媒體檔),3,T(2,重製媒體碼),T(2,))
 
 #AuthApplCode=A,1,I
-C(3,#FunctionCode,1,$,s)
+C(3,#FunctionCode,1,$,S)
 HELP(#AuthApplCodeHelp)
 @V(H,#AuthApplCodeHelp)
 C(3,#AuthApplCode,1,INVOKEJS(SHOW,L4041_3,0)INVOKEJS(SHOW,L4041_4,0),INVOKEJS(SHOW,L4041_3,1)INVOKEJS(SHOW,L4041_4,1))
@@ -139,7 +139,7 @@ T(3,)T(H,#AuthApplCode,#AuthApplCodeHelp)
 
 ! 戶號
 #CustNo=A,7,I
-C(3,#FunctionCode,1,$,s)
+C(3,#FunctionCode,1,$,S)
 C(3,#AuthApplCode,1,S,$)
 
 #MRKEY=_,_,S
@@ -159,7 +159,6 @@ A(DATE,0,#PropDate)
 
 #AuthCreateDate=D,7,I
 C(3,#FunctionCode,1,S,$)
-C(3,#AuthApplCode,1,S,$)
 T(1,#SYSCDATE,2,7)
 @C(3,#AuthCreateDate,0,$,A(DATE,0,#AuthCreateDate))
 

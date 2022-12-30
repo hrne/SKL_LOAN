@@ -219,13 +219,12 @@ V(H,#TranKeyHelp)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
-C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 C(5,#TranKey_Tmp,7,K(MODIFYBUTTON,修改),$)
 C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
-C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0),$)
-
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1),$)
 
 #TranKeyX=X,4,L
 IF(#TranKey_Tmp==1||#TranKey_Tmp==7||#TranKey_Tmp==2,$,s)

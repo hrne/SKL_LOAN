@@ -301,6 +301,7 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						tempPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						tempPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 						tempPostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 						tempPostAuthLog.setPostMediaCode("Y");
 
@@ -508,6 +509,7 @@ public class L4041 extends TradeBuffer {
 						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId, titaVo);
 
 						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						newPostAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 						if (result.get("F1").equals("1")) {
 							newPostAuthLog.setPropDate(0);
 						}

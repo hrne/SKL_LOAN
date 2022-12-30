@@ -291,7 +291,7 @@ public class PdfGenerator extends CommBuffer {
 		content = null;
 		// 預設字型
 		try {
-			baseFont = setBaseFont("1");
+			baseFont = setBaseFont("2");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -772,7 +772,11 @@ public class PdfGenerator extends CommBuffer {
 			widthMax = document.getPageSize().getHeight();
 			heightMax = document.getPageSize().getWidth();
 		}
-
+		
+		this.info("paperorientaton =" + paperorientaton);
+		this.info("widthMax =" + widthMax);
+		this.info("heightMax =" + heightMax);
+		
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
 				underContent.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);
