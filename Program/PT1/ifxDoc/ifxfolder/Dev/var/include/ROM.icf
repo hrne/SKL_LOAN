@@ -2183,6 +2183,7 @@ TXFORM=L2R13
 #L2r14ClCode1=A,1,S
 #L2r14ClCode2=A,2,S
 #L2r14ClNo=A,7,S
+#L2r14ClSize=m,3,S
 </L2R14.dec>
 
 
@@ -2191,6 +2192,7 @@ TXFORM=L2R14
 #L2r14ClCode1
 #L2r14ClCode2
 #L2r14ClNo
+#L2r14ClSize
 ^
 </L2R14.tom>
 

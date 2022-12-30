@@ -57,12 +57,15 @@ E(0,0)
 ["#FdRateCode+利率區分",#RateCode,#RateCodeX],
 ["#FdLoanBal+貸出金額",#LoanBalX],
 ["#FdFirstDrawdownDate+首次撥款日",#FirstDrawdownDate],
-["#FdBreachDecreaseMonth+違約還款月數",#BreachDecreaseMonth],
+! ["#FdBreachDecreaseMonth+違約還款月數",#BreachDecreaseMonth],
 ["#FdApproveRate+核准利率",#ApproveRate,"@%"],
-["#FdBreachPercent+違約率-金額",#BreachPercent],
+! ["#FdBreachPercent+違約率-金額",#BreachPercent],
 ["#FdStoreRate+目前利率",#StoreRate,"@%",#DrawdownDate],
 ["#FdRateIncr+利率加減碼",#RateIncr,"@%"],
 ["#FdNextAdjRate+下次調整利率",#NextAdjRate,#NextAdjRateX,"@%",#NextAdjRateDate],
+[#<->#,"#FdBreachFlagX+是否限制清償",#BreachFlagX],
+[#<->#,"#FdBreachX+清償說明",#BreachX],
+[#<->#,"@",#ClBds],
 [#<->#,"#FdBdLocation+門牌號碼",#BdLocation],
 [#<->#,"#FdBdLocation",#OwnerName,"@@",#OwnerId],
 [#<->#,"#FdFloorArea+主建物",#FloorArea,"@坪"],
@@ -134,15 +137,22 @@ T(3,CdCode.BankCdAppl)
 #StatusHelp=x,100,S
 T(3,1:完全正常;2:非常正常;3:正常;4:不正常)
 
+!YesNo YesNo
+#CDDEF05=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim2,XXR99)
-S(XXR99,01,#CDDEF12,#CDDEF19,#CDDEF13,#BankCdRimName)
+S(XXR99,01,#CDDEF12,#CDDEF19,#CDDEF13,#BankCdRimName,#CDDEF05)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@CustTypeCodeHelp,#HelpDesc1)
 T(2,@FacmRateCodeHelp,#HelpDesc2)
 T(2,@RepayCodeHelp,#HelpDesc3)
 T(2,@BankCdHelp,#HelpDesc4)
+T(2,@YesNoHelp,#HelpDesc5)
 
 #RimTxCode=X,5,S
 T(2,#TXCD)
@@ -497,7 +507,7 @@ R(1,L2R14)
 #RimClCode2=A,2,S
 #RimClNo=A,7,S
 
-#RimL Q=X,1,S
+#RimLQ=X,1,S
 E(0,@RimClCode1,#L2r14ClCode1)
 E(0,@RimClCode2,#L2r14ClCode2)
 E(0,@RimClNo,#L2r14ClNo)
@@ -506,6 +516,11 @@ RESET_RIM(#RimL2r27A,L2R27)
 S(L2R27,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
 R(1,L2R27)
 
+#ClSize=m,3,S
+E(0,#L2r14ClSize)
+IF(#ClSize>1,INVOKEJS(SHOW,p1,15,15,1)T(3,@ClBds,該額度有多筆擔保品)K(LIGHT,#ClBds,TXTRED,0,1),INVOKEJS(SHOW,p1,15,15,0)T(3,@ClBds,)K(LIGHT,#ClBds,TXTRED,0,0))
+
+#ClBds=X,20,L
 
 ![下次調整利率]
 #FdNextAdjRate=X,2,L
@@ -520,7 +535,17 @@ E(0,#L3r09NextFitRate)
 #NextAdjRateDate=D,7,L
 ! C(3,#L3r09NextFitRate,0,S,$)
 E(0,#L3r09NextEffectDate)
-
+!是否限制清償
+#FdBreachFlagX=X,2,L
+#BreachFlag=X,1,S
+T(2,#L2r05BreachFlag)
+#BreachFlagX=X,10,L
+T(3,)T(H,#BreachFlag,#YesNoHelp)
+C(5,#BreachFlag,Y,INVOKEJS(SHOW,p1,14,14,1),INVOKEJS(SHOW,p1,14,14,0))
+!清償說明
+#FdBreachX=X,2,L
+#BreachX=X,4.50,L
+T(2,#L2r05Breach)
 
 #RimL2r63=X,1,S
 E(0,@RimCustNo,#CustNo)
@@ -763,6 +788,11 @@ T(3,1)ASGN(LOOP$)
 #ShortenYear
 #ExtendYear
 #ReMark
+#BreachFlag
+#BreachFlagX
+#BreachX
+#ClSize
+#ClBds
 </sub>
 
 

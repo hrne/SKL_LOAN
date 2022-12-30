@@ -52,10 +52,10 @@ public class L7300ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CASE ";
 		sql += "          WHEN NVL(cl.\"EvaNetWorth\", 0) = 0";
 		sql += "          THEN 0 ";
-		sql += "        ELSE ROUND(m.\"PrinBalance\" / cl.\"EvaNetWorth\" * 100, 2)";
+		sql += "        ELSE ROUND(f.\"LineAmt\" / cl.\"EvaNetWorth\" * 100, 2)";
 		sql += "        END                        AS \"LtvRatio\" "; // 貸款成數
 		sql += "      , m.\"AcSubBookCode\"        AS \"SubCompanyCode\" "; // 區隔帳冊別(資金來源)
-		sql += "      , nvl(cl.\"EvaNetWorth\", 0) AS \"MrktValue\" "; // 市價
+		sql += "      , m.\"PrinBalance\"          AS \"MrktValue\" "; // 市價
 		sql += "      , m.\"PrinBalance\"          AS \"BookValue\" "; // 期初帳面金額
 		sql += " FROM \"MonthlyFacBal\"  m ";
 		sql += " LEFT JOIN \"CustMain\" c ON c.\"CustNo\" = m.\"CustNo\" ";

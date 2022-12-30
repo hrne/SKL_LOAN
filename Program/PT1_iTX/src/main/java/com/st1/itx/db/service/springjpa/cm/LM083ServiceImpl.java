@@ -46,7 +46,7 @@ public class LM083ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           , CASE ";
 		sql += "               WHEN NVL(cl.\"EvaNetWorth\", 0) = 0";
 		sql += "               THEN 0 ";
-		sql += "             ELSE ROUND(m.\"PrinBalance\" / cl.\"EvaNetWorth\" * 100, 2)";
+		sql += "             ELSE ROUND(f.\"LineAmt\" / cl.\"EvaNetWorth\" * 100, 2)";
 		sql += "             END                        AS F3 "; // 貸款成數
 		sql += "           , CASE ";
 		sql += "               WHEN m.\"OvduTerm\" >= 1 ";

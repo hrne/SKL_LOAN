@@ -56,14 +56,16 @@ public class L2880Report extends MakeReport {
 
 		this.print(1, 53, "借款人戶號 . . .  " + titaVo.getParam("CustNo") + "-" + titaVo.getParam("FacmNo"));
 		this.print(3, 10, "身分證字號 . . .  " + titaVo.getParam("CustId"));
-		this.print(0, 53, "客戶別 . . . . .  " + titaVo.getParam("CustTypeCode") + "    " + titaVo.getParam("CustTypeCodeX"));
+		this.print(0, 53,
+				"客戶別 . . . . .  " + titaVo.getParam("CustTypeCode") + "    " + titaVo.getParam("CustTypeCodeX"));
 		this.print(1, 10, "中文姓名 . . . .  " + titaVo.getParam("CustName"));
 		this.print(0, 53, "繳款方式 . . . .  " + titaVo.getParam("RepayCode") + "    " + titaVo.getParam("RepayCodeX"));
 		this.print(1, 10, "配偶姓名 . . . .  " + titaVo.getParam("SpouseName") + "    " + titaVo.getParam("SpouseId"));
 		this.print(0, 53, "扣款銀行 . . . .  " + titaVo.getParam("RepayBank") + "    " + titaVo.getParam("RepayBankX"));
 		this.print(1, 10, "電子信箱 . . . .  " + titaVo.getParam("Email"));
 		this.print(2, 10, "基本利率代碼 . .  " + titaVo.getParam("ProdNo") + "  " + titaVo.getParam("ProdNoX"));
-		this.print(1, 10, "貸款期間 . . . .  " + titaVo.getParam("LoanTermYy") + "  年  " + titaVo.getParam("LoanTermMm") + "  月");
+		this.print(1, 10,
+				"貸款期間 . . . .  " + titaVo.getParam("LoanTermYy") + "  年  " + titaVo.getParam("LoanTermMm") + "  月");
 		this.print(0, 53, "利率區分 . . . .  " + titaVo.getParam("RateCode") + "  " + titaVo.getParam("RateCodeX"));
 		this.print(1, 10, "核准額度 . . . .  ");
 		this.print(0, 43, titaVo.getParam("ApplAmtX"), "R");
@@ -74,19 +76,48 @@ public class L2880Report extends MakeReport {
 		this.print(0, 53, "核准利率 . . . .  ");
 		this.print(0, 83, titaVo.getParam("ApproveRate"), "R");
 
-		this.print(1, 10, "違約還款月數 . .  " + titaVo.getParam("BreachDecreaseMonth"));
-		this.print(0, 53, "目前利率 . . . .  ");
-		this.print(0, 83, titaVo.getParam("StoreRate"), "R");
-		this.print(0, 85, DateFormat(titaVo.getParam("DrawdownDate")));
-		this.print(1, 10, "違約率－金額 . .  ");
-		this.print(0, 34, titaVo.getParam("BreachPercent"), "R");
+//		this.print(1, 10, "違約還款月數 . .  " + titaVo.getParam("BreachDecreaseMonth"));
+//		this.print(0, 53, "目前利率 . . . .  ");
+//		this.print(0, 83, titaVo.getParam("StoreRate"), "R");
+//		this.print(0, 85, DateFormat(titaVo.getParam("DrawdownDate")));
+
+		this.print(1, 10, "目前利率 . . . .  ");
+		this.print(0, 40, titaVo.getParam("StoreRate"), "R");
+		this.print(0, 42, DateFormat(titaVo.getParam("DrawdownDate")));
+
+//		this.print(1, 10, "違約率－金額 . .  ");
+//		this.print(0, 34, titaVo.getParam("BreachPercent"), "R");
 		this.print(0, 53, "下次調整利率 . .  ");
 		this.print(0, 83, titaVo.getParam("NextAdjRate"), "R");
 		this.print(0, 85, DateFormat(titaVo.getParam("NextAdjRateDate")));
 		this.print(1, 10, "利率加減碼 . . .  ");
 		this.print(0, 34, titaVo.getParam("RateIncr"), "R");
-		this.print(2, 10, "押品地址 . . . .  " + titaVo.getParam("BdLocation"));
-		this.print(1, 10, "押品提供人 . . .  " + titaVo.getParam("OwnerName") + "  " + titaVo.getParam("OwnerId"));
+		this.print(1, 10, "是否限制清償 . .  " + titaVo.getParam("BreachFlagX"));
+		if ("Y".equals(titaVo.getParam("BreachFlag"))) {
+
+			String breachX = titaVo.getParam("BreachX").toString();
+			String breachXX = "";
+			String s = "";
+			for (int i = 0; i < breachX.length(); i++) {
+				breachXX = toX(breachX.substring(i, i + 1), breachXX);
+			}
+			this.info("s = " + breachXX);
+			if (breachXX.length() > 60) {
+				this.print(1, 10, "清償說明 . . . .  " + breachXX.substring(0, 30));
+				this.print(1, 28, breachXX.substring(30, 60));
+				this.print(1, 28, breachXX.substring(60, breachXX.length()));
+			} else if (titaVo.getParam("BreachX").length() > 30) {
+				this.print(1, 10, "清償說明 . . . .  " + breachXX.substring(0, 30));
+				this.print(1, 28, breachXX.substring(30, breachXX.length()));
+			} else {
+				this.print(1, 10, "清償說明 . . . .  " + breachXX);
+			}
+		}
+		if (parse.stringToInteger(titaVo.getParam("ClSize")) > 1) {
+			this.print(2, 10, "該額度有多筆擔保品");
+		}
+		this.print(1, 10, "擔保品地址 . . .  " + titaVo.getParam("BdLocation"));
+		this.print(1, 10, "擔保品提供人 . .  " + titaVo.getParam("OwnerName") + "  " + titaVo.getParam("OwnerId"));
 		this.print(1, 10, "主建物（坪） . .  " + titaVo.getParam("FloorArea"));
 		this.print(1, 10, "公設（坪） . . .  " + titaVo.getParam("Area"));
 		this.print(1, 10, "車位（坪） . . .  " + titaVo.getParam("ParkingArea"));
@@ -162,4 +193,36 @@ public class L2880Report extends MakeReport {
 		return temp;
 	}
 
+	// 改全型
+	private String toX(String s, String breachXX) {
+
+		if ("0".equals(s)) {
+			breachXX += "０";
+		} else if ("1".equals(s)) {
+			breachXX += "１";
+		} else if ("2".equals(s)) {
+			breachXX += "２";
+		} else if ("3".equals(s)) {
+			breachXX += "３";
+		} else if ("4".equals(s)) {
+			breachXX += "４";
+		} else if ("5".equals(s)) {
+			breachXX += "５";
+		} else if ("6".equals(s)) {
+			breachXX += "６";
+		} else if ("7".equals(s)) {
+			breachXX += "７";
+		} else if ("8".equals(s)) {
+			breachXX += "８";
+		} else if ("9".equals(s)) {
+			breachXX += "９";
+		} else if (" ".equals(s)) {
+			breachXX += "";
+		} else if ("%".equals(s)) {
+			breachXX += "％";
+		} else {
+			breachXX += s;
+		}
+		return breachXX;
+	}
 }

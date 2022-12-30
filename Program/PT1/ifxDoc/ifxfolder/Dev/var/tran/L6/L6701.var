@@ -184,7 +184,6 @@ R(1,L2R09)
 !T(2,@BankItem,#L2r09BankItem)
 
 #SendL6R01=X,1,S
-C(3,#CHAIN,1,s,$)
 E(0,@RimFuncCode,#FuncCode)
 T(2,@RimL6R01BankCode,#BankCode)
 T(2,@RimL6R01BranchCode,#BranchCode)
@@ -193,7 +192,6 @@ S(L6R01,1,#RimFuncCode,#RimTxCode,#RimL6R01BankCode,#RimL6R01BranchCode)
 R(1,L6R01)
 
 #RecRim=X,1,S
-C(3,#CHAIN,1,s,$)
 T(2,@BankItem,#L6R01BankItem)
 T(2,@BranchItem,#L6R01BranchItem)
 
