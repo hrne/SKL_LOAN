@@ -317,7 +317,7 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF5A;ntxbuf5=type<-1
 #BTN5=X,16,I,ui:button;value:已入帳未還款查詢;enable:1;tabbable:1;title:L492A 已入帳未還款查詢
 
 #L492aRepayType=A,2,S
-
+#L492aRepayCode=A,2,O
 #L492aRepayAmt=m,14.2,S        
 
 ! #L492aMsgErr=X,1,S
@@ -573,7 +573,6 @@ CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
 #ExcessiveXX=X,50,L
 T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 
-
 ![減免金額]
 !減免違約金或利息之金額.輸入減免金額時,需刷主管卡.
 #FdReduceAmt=X,2,L
@@ -618,7 +617,6 @@ E(0,@RPTYPZ,90)
 #TotalRepayAmt=m,14.2,S
 E(0,#L3r06Principal+#L3r06Interest+#L3r06DelayInt+#L3r06BreachAmt+#L3r06AcctFee+#L3r06ModifyFee+#L3r06FireFee+#L3r06CollFireFee+#L3r06LawFee+#L3r06CollLawFee+#Shortfall-#TimReduceAmt-#OvduRepaid)
 E(0,@RPTOT,#TotalRepayAmt)
-E(0,@RP_EXCESSIVE,#Excessive)
 ! C(1,#TotalRepayAmt,E(0,@RPTOT,0)E(0,@TotalRepayAmt,0),$,$)
 
 !實際收付金額,轉暫收金額

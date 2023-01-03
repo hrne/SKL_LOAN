@@ -422,10 +422,6 @@ public class L3420 extends TradeBuffer {
 				wkBorMainStatus = 7; // 7: 部分轉呆戶
 				CaseClose8NormalRoutine();
 				break;
-			case 9: // 9:債權轉讓戶
-				wkBorMainStatus = 8; // 8: 債權轉讓戶
-				CaseClose9NormalRoutine();
-				break;
 			default:
 				throw new LogicException(titaVo, "E0010", "結案區分 = " + iCaseCloseCode); // 功能選擇錯誤
 			}
@@ -444,7 +440,7 @@ public class L3420 extends TradeBuffer {
 		// 帳務處理
 		if (iCaseCloseCode < 9) {
 			acRepayCom.setTxBuffer(this.txBuffer);
-			acRepayCom.settleRun(this.lLoanBorTx, this.baTxList, titaVo);
+			acRepayCom.settleLoanRun(this.lLoanBorTx, this.baTxList, titaVo);
 		}
 
 		// Check output
@@ -891,44 +887,6 @@ public class L3420 extends TradeBuffer {
 		}
 	}
 
-	// 9:債權轉讓戶
-	private void CaseClose9NormalRoutine() throws LogicException {
-		this.info("CaseClose9NormalRoutine ...");
-		List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復
-		lStatus.add(1);
-		lStatus.add(2);
-		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, 1, 999, lStatus, 0, Integer.MAX_VALUE);
-		lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
-
-		if (lLoanOverdue == null || lLoanOverdue.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "催收呆帳檔"); // 查詢資料不存在
-		}
-		for (LoanOverdue od : lLoanOverdue) {
-			wkCustNo = od.getCustNo();
-			wkFacmNo = od.getFacmNo();
-			wkBormNo = od.getBormNo();
-			wkOvduNo = od.getOvduNo();
-			// 鎖定催收呆帳檔、撥款主檔、額度檔
-			holdByOverdueRoutine(od);
-			// 更新欄
-			wkAfterLoanBal = BigDecimal.ZERO; // 債權轉讓戶放款餘額清零
-			wkPrincipal = tLoanBorMain.getLoanBal();
-			wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
-			// initialize tTempVo
-			tTempVo.clear();
-			// 新增交易暫存檔
-			AddTxTempOvduRoutine(od);
-			AddTxTempBormRoutine();
-			// 更新撥款主檔
-			UpdLoanBorMainRoutine();
-			// 新增放款交易內容檔
-			AddLoanBorTx9Routine(od);
-			// 更新催收呆帳檔
-			UpdLoanOvdu9Routine(od);
-		}
-	}
-
 	// 鎖定催收呆帳檔、撥款主檔、額度檔
 	private void holdByOverdueRoutine(LoanOverdue od) throws LogicException {
 		// 查詢額度檔
@@ -1231,19 +1189,6 @@ public class L3420 extends TradeBuffer {
 		}
 	}
 
-	// 債權轉讓戶更新催收呆帳檔
-	private void UpdLoanOvdu9Routine(LoanOverdue od) throws LogicException {
-		this.info("UpdLoanOvdu8Routine ... ");
-		tLoanOverdue.setAcDate(wkTbsDy);
-		tLoanOverdue.setStatus(5); // 5.催呆結案
-		try {
-			loanOverdueService.update(tLoanOverdue);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007",
-					"催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 催收序號 = " + wkOvduNo); // 更新資料時，發生錯誤
-		}
-	}
-
 	// 還原催收檔
 	private void RestoredOverdueRoutine() throws LogicException {
 		this.info("RestoredOverdueRoutine ... ");
@@ -1504,28 +1449,6 @@ public class L3420 extends TradeBuffer {
 		tTempVo.putParam("PaidTerms", 0);
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 
-		this.lLoanBorTx.add(tLoanBorTx);
-	}
-
-	// 新增放款交易內容檔
-	private void AddLoanBorTx9Routine(LoanOverdue od) throws LogicException {
-		this.info("AddLoanBorTx9Routine ... ");
-
-		tLoanBorTx = new LoanBorTx();
-		tLoanBorTxId = new LoanBorTxId();
-		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
-		tLoanBorTx.setRepayCode(iRpCode); // 還款來源
-		tLoanBorTx.setTxDescCode("340" + iCaseCloseCode);
-		tLoanBorTx.setEntryDate(iEntryDate);
-		tLoanBorTx.setAcctCode("990");
-		tLoanBorTx.setLoanBal(BigDecimal.ZERO);
-		tLoanBorTx.setDisplayflag("Y");
-		// 其他欄位
-		tTempVo.putParam("CaseCloseCode", iCaseCloseCode);
-		tTempVo.putParam("Note", iNote);
-		tTempVo.putParam("ReduceAmt", iReduceAmt); // 減免金額
-		tTempVo.putParam("PaidTerms", 0);
-		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		this.lLoanBorTx.add(tLoanBorTx);
 	}
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -150,7 +151,6 @@ public class L5711 extends TradeBuffer {
 			if (mApprAmt.compareTo(iNegTrans.getSklShareAmt()) == 0) {
 				return;
 			}
-			BigDecimal oldSklShareAmt = iNegTrans.getSklShareAmt();
 
 			try {
 				iNegTrans.setSklShareAmt(mApprAmt);
@@ -161,54 +161,6 @@ public class L5711 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "債務協商交易檔"); // 更新資料時，發生錯誤
 			}
 
-			if (this.txBuffer.getTxCom().isBookAcYes()) {
-				List<AcDetail> acDetailList = new ArrayList<AcDetail>();
-
-				// 先沖正原帳務
-				/* 借：債協退還款科目 */
-				AcDetail acDetail = new AcDetail();
-				acDetail = new AcDetail();
-				acDetail.setDbCr("D");
-				acDetail.setAcctCode(acNegCom.getReturnAcctCode(iNegTrans.getCustNo(), titaVo));
-
-				acDetail.setTxAmt(oldSklShareAmt); // 原DB金額
-				if (iPayerCustNo > 0) {
-					acDetail.setCustNo(iPayerCustNo);// 有保證人時使用付款人戶號
-				} else {
-					acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
-				}
-				acDetailList.add(acDetail);
-				/* 貸：債協暫收款科目 */
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode(acNegCom.getAcctCode(iNegTrans.getCustNo(), titaVo));
-				acDetail.setTxAmt(oldSklShareAmt); // 原DB金額
-				acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
-				acDetailList.add(acDetail);
-
-				// 寫本次新壽攤分金額
-				/* 借：債協暫收款科目 */
-				acDetail = new AcDetail();
-				acDetail.setDbCr("D");
-				acDetail.setAcctCode(acNegCom.getAcctCode(iNegTrans.getCustNo(), titaVo));
-				acDetail.setTxAmt(mApprAmt); // 新壽攤分金額
-				acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
-				acDetailList.add(acDetail);
-				/* 貸：債協退還款科目 */
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode(acNegCom.getReturnAcctCode(iNegTrans.getCustNo(), titaVo));
-				acDetail.setTxAmt(mApprAmt); // 新壽攤分金額
-				if (iPayerCustNo > 0) {
-					acDetail.setCustNo(iPayerCustNo);// 有保證人時使用付款人戶號
-				} else {
-					acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
-				}
-				acDetailList.add(acDetail);
-
-				this.txBuffer.addAllAcDetailList(acDetailList);
-
-			}
 		}
 	}
 

@@ -444,7 +444,7 @@ public class L3200 extends TradeBuffer {
 
 		// 帳務處理
 		acRepayCom.setTxBuffer(this.txBuffer);
-		acRepayCom.settleRun(this.lLoanBorTx, this.baTxList, titaVo);
+		acRepayCom.settleLoanRun(this.lLoanBorTx, this.baTxList, titaVo);
 
 		// 約定還本檔處理
 		if (iRepayType == 2) {
@@ -1590,6 +1590,7 @@ public class L3200 extends TradeBuffer {
 		this.info("addLoanIntDetailRoutine ... ");
 
 		int wkIntSeq = 0;
+		List<LoanIntDetail> lLoanIntDetail = new ArrayList<LoanIntDetail>();
 
 		for (CalcRepayIntVo c : lCalcRepayIntVo) {
 			wkIntSeq++;
@@ -1634,8 +1635,11 @@ public class L3200 extends TradeBuffer {
 			tLoanIntDetail.setExtraRepayFlag(c.getExtraRepayFlag());
 			tLoanIntDetail.setProdNo(tFacMain.getProdNo());
 			tLoanIntDetail.setBaseRateCode(tFacMain.getBaseRateCode());
+			lLoanIntDetail.add(tLoanIntDetail);
+		}
+		if (lLoanIntDetail.size() > 0) {
 			try {
-				loanIntDetailService.insert(tLoanIntDetail, titaVo);
+				loanIntDetailService.insertAll(lLoanIntDetail, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "計息明細 Key = " + tLoanIntDetailId); // 新增資料時，發生錯誤
 			}

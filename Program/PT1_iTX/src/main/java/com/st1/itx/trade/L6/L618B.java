@@ -84,8 +84,7 @@ public class L618B extends TradeBuffer {
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo = new TempVo();
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-	private BigDecimal wkTempAmt = BigDecimal.ZERO;
-	private BigDecimal wkOverflow = BigDecimal.ZERO;
+	private List<LoanBorTx> lLoanBorTx = new ArrayList<LoanBorTx>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -199,11 +198,11 @@ public class L618B extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+		
 		tLoanBorTx.setTxDescCode("6180");  // 6180 火險費用轉催收
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
 		tLoanBorTx.setTxAmt(iTxAmt); // 轉催呆金額放LoanBorTx交易金額
-		tLoanBorTx.setTempAmt(wkTempAmt);
-		tLoanBorTx.setOverflow(wkOverflow);
+		tLoanBorTx.setAcSeq(1); // 入帳順序
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tTempVo.clear();

@@ -15,11 +15,13 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegAppr02Id;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
+import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.db.service.NegAppr02Service;
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.db.service.NegTransService;
@@ -59,6 +61,8 @@ public class AcNegCom extends TradeBuffer {
 
 	@Autowired
 	public NegAppr02Service negAppr02Service;
+	@Autowired
+	public LoanOverdueService loanOverdueService;
 
 	@Override
 	/* 產生債協入帳明細 */
@@ -136,7 +140,7 @@ public class AcNegCom extends TradeBuffer {
 		tNegTransId.setTitaTxtNo(this.txBuffer.getTxCom().getRelTno());
 		tNegTrans.setNegTransId(tNegTransId);
 		// 正常交易新增、訂正交易要刪除
-		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正   
+		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正
 			tNegMain = negMainService.statusFirst("0", ac.getCustNo(), titaVo); // 0-正常
 			if (tNegMain == null) {
 				throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + ac.getCustNo());
@@ -222,40 +226,32 @@ public class AcNegCom extends TradeBuffer {
 	 * @return 債協退還款科目
 	 * @throws LogicException LogicException
 	 */
-	public String getReturnAcctCode(int custNo, TitaVo titaVo) throws LogicException {
-// T21  債協暫收款－退還款                                  案件種類 1:債協
-// T22  前調暫收款－退還款                                  案件種類 2:調解 
-// T23  更生暫收款－退還款                                  案件種類 3:更生   4:清算
-		NegMain tNegMain = new NegMain();
-		String acctCode = null;
+	public TempVo getReturnAcctCode(int custNo, TitaVo titaVo) throws LogicException {
+		TempVo tTempVo = new TempVo();
+		String acctCode = "TAV"; // 暫收可抵繳
+		int facmNo = 0;
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
-			acctCode = "T10";
+			acctCode = "T10"; // 債協暫收款－收款專戶
 		else {
-			tNegMain = negMainService.custNoFirst(custNo, titaVo);
-			if (tNegMain == null)
-				throw new LogicException(titaVo, "E6003", "acNegCom getReturnAcctCode 該戶非債協戶 " + custNo);
-			else {
-				switch (tNegMain.getCaseKindCode()) {
-
-				case "2":
-					acctCode = "T22";
-					break;
-
-				case "3":
-					acctCode = "T23";
-					break;
-
-				case "4":
-					acctCode = "T23";
-					break;
-
-				default:
-					acctCode = "T21";
-					break;
+			List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復
+			lStatus.add(2);
+			lStatus.add(3);
+			Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(custNo, 0, 999, 0, 990, 1, 999,
+					lStatus, 0, Integer.MAX_VALUE, titaVo);
+			facmNo = 1;
+			if (slLoanOverdue != null) {
+				int badDebtDate = 0;// 最小轉呆帳日期
+				for (LoanOverdue od : slLoanOverdue.getContent()) {
+					if (badDebtDate == 0 || od.getBadDebtDate() < badDebtDate) {
+						facmNo = od.getFacmNo();
+					}
 				}
 			}
 		}
-		return acctCode;
+		tTempVo = new TempVo();
+		tTempVo.putParam("FacmNo", facmNo);
+		tTempVo.putParam("AcctCode", acctCode);
+		return tTempVo;
 	}
 
 	/**
@@ -333,12 +329,14 @@ public class AcNegCom extends TradeBuffer {
 	 * @return TempVo
 	 * @throws LogicException LogicException
 	 */
-	public List<AcDetail> getNegAppr02CustNo(int entryDate, BigDecimal txAmt, int custNo, TitaVo titaVo) throws LogicException {
+	public List<AcDetail> getNegAppr02CustNo(int entryDate, BigDecimal txAmt, int custNo, TitaVo titaVo)
+			throws LogicException {
 		this.info("NegAppr02 entryDate=" + entryDate + ", txAmt=" + txAmt);
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		TempVo tTempVo = new TempVo();
 		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0，檢核成功 ,抓第一筆符合條件之資料
-		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE,
+				titaVo);
 		if (slNegAppr02 != null) {
 			for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
 				if (tNegAppr02.getAcDate() == 0

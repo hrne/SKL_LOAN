@@ -41,8 +41,8 @@ public class L6909 extends TradeBuffer {
 
 	// 額度小計
 	private HashMap<Integer, BigDecimal> facmYdBal = new HashMap<>();
+	private HashMap<Integer, Integer> facmYdDate = new HashMap<>();
 	private HashMap<Integer, BigDecimal> facmTdBal = new HashMap<>();
-	private HashMap<Integer, Integer> facmEntryDate = new HashMap<>();
 	private HashMap<Integer, Integer> facmAcDate = new HashMap<>();
 	private int acdate = 0;
 
@@ -57,8 +57,24 @@ public class L6909 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
 
-		// 會計日為零則以入帳日找入帳日，會計日不可小於暫收餘額檔會計日
 		List<Map<String, String>> acDateList = null;
+		int convertDate = 0;
+		// 讀取轉換日
+		try {
+			acDateList = l6909ServiceImpl.queryConvertDate(titaVo);
+		} catch (Exception e) {
+			throw new LogicException(titaVo, "E0001", "SQL ERROR");
+		}
+		// 起日最早為轉換日
+		if (acDateList != null) {
+			for (Map<String, String> t : acDateList) {
+				convertDate = parse.stringToInteger(t.get("AcDateS")) - 19110000;
+				titaVo.putParam("AcDateS", convertDate);
+			}
+		}
+
+		// 讀取暫收餘額檔餘額(非轉換)找出最小的AcDate; 會計日為零則以入帳日找會計日
+		acDateList = null;
 		try {
 			acDateList = l6909ServiceImpl.queryAcDate(titaVo);
 		} catch (Exception e) {
@@ -70,24 +86,28 @@ public class L6909 extends TradeBuffer {
 				titaVo.putParam("AcDateE", parse.stringToInteger(t.get("AcDateE")) - 19110000);
 			}
 		}
-		// 讀取暫收餘額檔餘額
+		// 讀取起日前一日的暫收款每日餘額檔
 		List<Map<String, String>> tavList = null;
 		try {
 			tavList = l6909ServiceImpl.queryDailyTav(titaVo);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
-
+		// 起日 < 轉換日，則昨日餘額 = 0;
 		if (tavList != null) {
 			for (Map<String, String> t : tavList) {
-				this.info("YdBal CustNo=" + titaVo.get("CustNo") + ", FacmNo=" + t.get("FacmNo") + ", YdBal="
-						+ t.get("YdBal"));
+				this.info("tavList=" + t.toString());
 				int facmNo = parse.stringToInteger(t.get("FacmNo"));
-				facmYdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
-				facmTdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
-				facmAcDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+				int ydDate = parse.stringToInteger(t.get("AcDate")) - 19110000;
+				if (ydDate < convertDate) {
+					facmYdBal.put(facmNo, BigDecimal.ZERO);
+					facmTdBal.put(facmNo, BigDecimal.ZERO);
+				} else {
+					facmYdDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+					facmAcDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+				}
 			}
-		}
+		} 
 
 		List<Map<String, String>> L6909List = null;
 		List<Map<String, String>> oList = new ArrayList<Map<String, String>>();
@@ -131,9 +151,6 @@ public class L6909 extends TradeBuffer {
 				} else {
 					facmTdBal.put(facmNo, tavCr.subtract(tavDb));
 				}
-				if (facmEntryDate.containsKey(facmNo)) {
-					facmEntryDate.put(facmNo, entrydate);
-				}
 				if (facmAcDate.containsKey(facmNo)) {
 					facmAcDate.put(facmNo, acdate);
 				}
@@ -162,7 +179,7 @@ public class L6909 extends TradeBuffer {
 					if (facmYdBal.get(facmNo).compareTo(BigDecimal.ZERO) != 0) {
 						OccursList occursList = new OccursList();
 						occursList.putParam("OOEntryDate", "");// 入帳日期
-						occursList.putParam("OOAcDate", "");// 會計日期
+						occursList.putParam("OOAcDate", facmYdDate.get(facmNo));// 會計日期
 						occursList.putParam("OOTAVFacmNo", parse.IntegerToString(facmNo, 3));// 暫收款額度
 						occursList.putParam("OODesc", "額度"); // 交易別
 						occursList.putParam("OOTAVDb", "");// 暫收借
@@ -213,7 +230,7 @@ public class L6909 extends TradeBuffer {
 			for (Integer facmNo : facmTdBal.keySet()) {
 				if (facmTdBal.get(facmNo).compareTo(BigDecimal.ZERO) != 0) {
 					OccursList occursList = new OccursList();
-					occursList.putParam("OOEntryDate", facmEntryDate.get(facmNo));// 入帳日期
+					occursList.putParam("OOEntryDate", "");// 入帳日期
 					occursList.putParam("OOAcDate", facmAcDate.get(facmNo));// 會計日期
 					occursList.putParam("OOTAVFacmNo", parse.IntegerToString(facmNo, 3));// 暫收款額度
 					occursList.putParam("OODesc", "額度"); // 交易別

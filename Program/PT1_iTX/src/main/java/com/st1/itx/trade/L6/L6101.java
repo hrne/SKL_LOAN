@@ -1,7 +1,9 @@
 package com.st1.itx.trade.L6;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,6 +18,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.domain.AcMain;
+import com.st1.itx.db.domain.AcMainId;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.TxToDoMain;
@@ -24,9 +28,11 @@ import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcCloseService;
+import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.TxToDoMainService;
+import com.st1.itx.db.service.springjpa.cm.L6101ServiceImpl;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.TxFlowService;
@@ -88,6 +94,12 @@ public class L6101 extends TradeBuffer {
 	AcReceivableService sAcReceivableService;
 
 	@Autowired
+	AcMainService sAcMainService;
+
+	@Autowired
+	L6101ServiceImpl l6101ServiceImpl;
+
+	@Autowired
 	DateUtil dDateUtil;
 
 	@Autowired
@@ -104,37 +116,37 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	L9133 tranL9133;
-	
+
 	@Autowired
 	L9130Report l9130Report;
 
 	@Autowired
 	L9130Report2022 l9130Report2022;
-	
+
 	@Autowired
 	L9131Report l9131Report;
 
 	@Autowired
 	L9132Report l9132Report;
-	
+
 	@Autowired
 	L9132ReportA l9132ReportA;
-	
+
 	@Autowired
 	L9132ReportB l9132ReportB;
-	
+
 	@Autowired
 	L9132ReportC l9132ReportC;
-	
+
 	@Autowired
 	L9132ReportD l9132ReportD;
 
 	@Autowired
 	L9133Report l9133Report;
-	
+
 	@Autowired
 	L9134Report l9134Report;
-	
+
 	@Autowired
 	L6101Excel l6101Excel;
 
@@ -177,7 +189,7 @@ public class L6101 extends TradeBuffer {
 		}
 
 		// 月底日關帳啟動提存
-		if (iMsgCode == 0 && iClsFg == 1  && "09".equals(iSecNo)) {
+		if (iMsgCode == 0 && iClsFg == 1 && "09".equals(iSecNo)) {
 			if (this.txBuffer.getMgBizDate().getTbsDy() == this.txBuffer.getMgBizDate().getMfbsDy()) {
 				// 應收利息提存
 				MySpring.newTask("BS900", this.txBuffer, titaVo);
@@ -224,6 +236,7 @@ public class L6101 extends TradeBuffer {
 		int batxTotCnt = 0;
 		int txFlowCnt = 0;
 		int acReceivableCnt = 0;
+		int acMainCnt = 0;
 
 		switch (cSecNo) {
 		case "02": // 2-支票繳款
@@ -320,6 +333,14 @@ public class L6101 extends TradeBuffer {
 			if (cClsFg == 1) {
 				acReceivableCnt = findAcReceivable(acReceivableCnt, titaVo);
 				if (acReceivableCnt > 0) {
+					cMsgCode = cMsgCode + 1;
+				}
+			}
+
+			// MsgCode=08 檢查會計總帳檔日結餘額
+			if (cClsFg == 1) {
+				acMainCnt = findAcMain(acMainCnt, titaVo);
+				if (acMainCnt > 0) {
 					cMsgCode = cMsgCode + 1;
 				}
 			}
@@ -477,20 +498,57 @@ public class L6101 extends TradeBuffer {
 			}
 		}
 
-		slAcReceivable = sAcReceivableService.acctCodeEq(0, "THC", 0, 9999999, 0, Integer.MAX_VALUE, titaVo);
-		if (slAcReceivable != null) {
-			for (AcReceivable tAcReceivable : slAcReceivable.getContent()) {
-				OccursList occursList = new OccursList();
-				occursList.putParam("OOMsgCode", "錯誤");
-				occursList.putParam("OOMessage", "暫收款－沖正，戶號：" + parse.IntegerToString(tAcReceivable.getCustNo(), 7)
-						+ "，有未銷餘額=" + tAcReceivable.getRvBal());
-				this.totaVo.addOccursList(occursList);
-				fAcReceivableCnt++;
-			}
-		}
-
 		this.info("L6101 findAcReceivable fUnProcessCnt : " + fAcReceivableCnt);
 		return fAcReceivableCnt;
+	}
+
+	// 讀取會計總帳檔
+	private int findAcMain(int fAcMainCnt, TitaVo titaVo) throws LogicException {
+		List<Map<String, String>> L6901List = null;
+
+		try {
+			L6901List = l6101ServiceImpl.findAcMainAll(this.txBuffer.getTxCom().getTbsdyf(), titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			throw new LogicException(titaVo, "E0001", "SQL ERROR");
+		}
+		if (L6901List == null || L6901List.size() == 0) {
+			return fAcMainCnt;
+		}
+		// 日結餘額檢查=1－不過餘額(借貸分由放款及核心系統出帳)時餘額歸零
+		for (Map<String, String> map : L6901List) {
+			if ("1".equals(map.get("ClsChkFlag")) && !"0".equals(map.get("TdBal"))) {
+				updAcMainCore(map, titaVo);
+			}
+		}
+		return fAcMainCnt;
+	}
+
+	// 更新會計會計總帳檔 ，借、貸金額寫入核心貸、借欄，餘額歸零
+	private void updAcMainCore(Map<String, String> map, TitaVo titaVo) throws LogicException {
+		// AcBookCode,AcSubBookCode,BranchNo,CurrencyCode,AcNoCode,AcSubCode,AcDtlCode,AcDate
+		AcMainId tAcMainId = new AcMainId();
+		tAcMainId.setAcBookCode(map.get("AcBookCode"));
+		tAcMainId.setAcSubBookCode(map.get("AcSubBookCode"));
+		tAcMainId.setBranchNo(map.get("BranchNo"));
+		tAcMainId.setCurrencyCode(map.get("CurrencyCode"));
+		tAcMainId.setAcNoCode(map.get("AcNoCode"));
+		tAcMainId.setAcSubCode(map.get("AcSubCode"));
+		tAcMainId.setAcDtlCode(map.get("AcDtlCode"));
+		tAcMainId.setAcDate(parse.stringToInteger(map.get("AcDate")));
+		AcMain tAcMain = sAcMainService.holdById(tAcMainId);
+		if (tAcMain == null) {
+			throw new LogicException(titaVo, "E0003", tAcMainId.toString()); // 修改資料不存在
+		}
+		tAcMain.setCoreDbAmt(tAcMain.getCrAmt());
+		tAcMain.setCoreCrAmt(tAcMain.getDbAmt());
+		tAcMain.setTdBal(BigDecimal.ZERO);
+
+		try {
+			sAcMainService.update(tAcMain);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
 	}
 
 	// 更新會計業務關帳控制檔
@@ -628,7 +686,6 @@ public class L6101 extends TradeBuffer {
 			titaVo.putParam("DoL9133", "N");
 		}
 
-		
 		if ("09".equals(uSecNo)) {
 
 			// 2021-12-15 智誠修改
@@ -637,9 +694,9 @@ public class L6101 extends TradeBuffer {
 			this.info("09=MySpring.newTask L9130");
 			// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
 			MySpring.newTask("L9130", this.txBuffer, titaVo);
-		}else if ("02".equals(uSecNo)) {
+		} else if ("02".equals(uSecNo)) {
 			this.info("02=exec L9130、L9131、L9132、L9132A、L9132B、L9132C");
-			
+
 			l9130Report.exec(titaVo);
 			l9130Report2022.exec(titaVo);
 			l9131Report.exec(titaVo);

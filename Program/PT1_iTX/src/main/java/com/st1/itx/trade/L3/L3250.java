@@ -102,6 +102,7 @@ public class L3250 extends TradeBuffer {
 	private BigDecimal iTempAmt = BigDecimal.ZERO;
 	private String iRvNo;
 	private String iAcctCode;
+	private BigDecimal wkOverAmt = BigDecimal.ZERO;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private int wkRepayCode = 0;
@@ -109,6 +110,7 @@ public class L3250 extends TradeBuffer {
 
 	// work area
 	private AcDetail acDetail;
+	private LoanBorTx tLoanBorTx;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
 	private TempVo tTempVo = new TempVo();
@@ -202,22 +204,59 @@ public class L3250 extends TradeBuffer {
 
 		
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
+		// 溢收金額
+		for (BaTxVo ba : this.baTxList) {
+			if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				BigDecimal acctAmt = BigDecimal.ZERO;
+				if (wkOverAmt.compareTo(ba.getAcctAmt()) > 0) {
+					acctAmt = ba.getAcctAmt();
+					wkOverAmt = wkOverAmt.subtract(ba.getAcctAmt());
+				} else {
+					acctAmt = wkOverAmt;
+					wkOverAmt = BigDecimal.ZERO;
+				}
+				if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+					AcDetail acDetail = new AcDetail();
+					acDetail.setDbCr("D");
+					acDetail.setAcctCode(ba.getAcctCode());
+					acDetail.setSumNo("090");
+					acDetail.setTxAmt(acctAmt);
+					acDetail.setCustNo(ba.getCustNo());
+					acDetail.setFacmNo(ba.getFacmNo());
+					acDetail.setBormNo(ba.getBormNo());
+					acDetail.setRvNo(ba.getRvNo());
+					acDetail.setReceivableFlag(ba.getReceivableFlag());
+					this.lAcDetail.add(acDetail);
+					this.info("settleTempAmt ba " + acDetail.toString());
+				}
+			}
+		}
 
-		// 暫收款金額 (暫收借)
-		acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
-
-		// 暫收款登錄
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0) {
-			lAcDetail.add(acDetail);
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("THC");
-			acDetail.setSumNo("099");
-			acDetail.setTxAmt(wkTxAmt);
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(0);
-			acDetail.setRvNo( "" + titaVo.getOrgEntdyI());
-			lAcDetail.add(acDetail);
+		if (slAcList != null) {
+			for (AcDetail ac : slAcList.getContent()) {
+				if ("D".equals(ac.getDbCr())) {
+					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
+							|| "P01".equals(ac.getAcctCode()) || "TEM".equals(ac.getAcctCode())
+							|| "TCK".equals(ac.getAcctCode())) {
+						String sumNo = "";
+						sumNo = "10" + wkRepayCode;
+						String rvNo = "";
+						if ("C01".equals(ac.getAcctCode())) {
+							rvNo = "0010060" + titaVo.getOrgEntdyI();
+						}
+						acDetail = new AcDetail();
+						acDetail.setDbCr("C");
+						acDetail.setAcctCode(ac.getAcctCode());
+						acDetail.setSumNo(sumNo);
+						acDetail.setTxAmt(ac.getTxAmt());
+						acDetail.setCustNo(iCustNo);
+						acDetail.setFacmNo(0);
+						lAcDetail.add(acDetail);
+						acDetail.setRvNo(rvNo);
+						lAcDetail.add(acDetail);
+					}
+				}
+			}
 		}
 
 		// 暫收款銷帳(費用科目)
@@ -257,7 +296,7 @@ public class L3250 extends TradeBuffer {
 		}
 
 		// 累溢收入帳(暫收貸)
-		acRepayCom.settleOverflow(lAcDetail, titaVo);
+		acRepayCom.settleOverflow(tLoanBorTx, this.lAcDetail, titaVo);
 
 		// 產生會計分錄
 		this.txBuffer.setAcDetailList(lAcDetail);
@@ -299,6 +338,7 @@ public class L3250 extends TradeBuffer {
 			if (tx.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
 				wkTxAmt = wkTxAmt.add(tx.getTxAmt());
 			}
+			tLoanBorTx = tx;
 		}
 	}
 

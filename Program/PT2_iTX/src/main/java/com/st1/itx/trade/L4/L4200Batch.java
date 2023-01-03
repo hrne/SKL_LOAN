@@ -702,8 +702,8 @@ public class L4200Batch extends TradeBuffer {
 
 				tBatxDetail.setTitaTlrNo("");
 				tBatxDetail.setTitaTxtNo("");
-				tBatxDetail.setMediaDate(0);
-				tBatxDetail.setMediaKind("");
+				tBatxDetail.setMediaDate(iAcDate);
+				tBatxDetail.setMediaKind(iBatchNo.substring(4, 6));  // 批號後兩碼(匯款轉帳)
 				tBatxDetail.setMediaSeq(i + 1);
 
 //			D.寫VO入各個對應Table (BankRmtf皆寫入)
@@ -1451,8 +1451,8 @@ public class L4200Batch extends TradeBuffer {
 						tBatxDetail.setProcNote(tempVo.getJsonString());
 						tBatxDetail.setTitaTlrNo("");
 						tBatxDetail.setTitaTxtNo("");
-						tBatxDetail.setMediaDate(0);
-						tBatxDetail.setMediaKind("");
+						tBatxDetail.setMediaDate(iAcDate);
+						tBatxDetail.setMediaKind(iBatchNo.substring(4, 6));
 						tBatxDetail.setMediaSeq(i + cheqCnt);
 // 						AML 姓名檢核
 						txAmlCom.setTxBuffer(this.getTxBuffer());

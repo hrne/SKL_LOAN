@@ -155,7 +155,8 @@ C(3,#FacmBormNo{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 ["#FdBreachAmt+違約金",#TwBreachAmt,#UsBreachAmt],["#FdLawFee+法務費",#TwLawFee,#UsLawFee],
 ["#FdShortfall+累短收",#ShortfallX,#ShortfallXX],["#FdExcessive+累溢收",#ExcessiveXX],
 [#<->#,"#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
-["#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],["#FdTmpAmt+暫收抵繳金額",#TmpAmt],
+["#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],
+!["#FdTmpAmt+暫收抵繳金額",#TmpAmt],
 ["#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
 ["@","@",],
 ["@","@",],
@@ -576,6 +577,8 @@ E(0,@RimCloseBreachAmt,0)
 RESET_RIM(#SendL3r06S,L3R06)
 S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
 R(1,L3R06)
+T(2,@TmpFacmNoX,#L3r06tmpFacmNoX)
+C(4,#TmpFacmNoX,T(3,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#TmpFacmNoX))
 E(0,@TwAcctFee,#L3r06AcctFee)
 E(0,@UsAcctFee,#L3r06AcctFee)
 E(0,@TwModifyFee,#L3r06ModifyFee)
@@ -1305,11 +1308,13 @@ T(2,@errmsg,不可超過累溢收金額)
 !暫收抵繳金額
 #FdTmpAmt=X,2,L
 
-#TmpAmt=m,14,I
-E(0,#L3r06Excessive)
-IF(#RepayType==1||#RepayType==2,$,s)
-@
-IF(#TmpAmt>#L3r06Excessive,V(P,#errmsg),$)
+!2022/12/15 LAI 改隱藏,給值=0
+#TmpAmt=m,14,S
+E(0,0)
+!E(0,#L3r06Excessive)
+!IF(#RepayType==1||#RepayType==2,$,s)
+!@
+!IF(#TmpAmt>#L3r06Excessive,V(P,#errmsg),$)
 
 
 #TotalReduceAmt=m,14.2,S

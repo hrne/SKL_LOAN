@@ -93,13 +93,14 @@ public class L7300 extends TradeBuffer {
 		// doQuery
 		List<Map<String, String>> resultList = sL7300ServiceImpl.findAll(yearMonth, titaVo);
 
-		if (resultList != null && !resultList.isEmpty()) {
-			this.info("ICS需傳輸資料為" + resultList.size() + "筆");
-			JSONObject requestJO = setIcsRequestJo(resultList, titaVo);
-			post(requestJO, titaVo);
-		} else {
+		if (resultList == null || resultList.isEmpty()) {
 			throw new LogicException("E0001", "ICS需傳輸資料為0筆");
 		}
+
+		this.info("ICS需傳輸資料為" + resultList.size() + "筆");
+		JSONObject requestJO = setIcsRequestJo(resultList, titaVo);
+		String response = post(requestJO, titaVo);
+		getResponseDetail(response, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -226,7 +227,7 @@ public class L7300 extends TradeBuffer {
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
 		RestTemplate restTemplate = new RestTemplate();
 		String result = null;
-		this.info("ICS request = " + request.toString());
+//		this.info("ICS request = " + request.toString());
 		try {
 			result = restTemplate.postForObject(apiUrl, request, String.class);
 		} catch (Exception e) {
@@ -247,5 +248,30 @@ public class L7300 extends TradeBuffer {
 //		headers.setBasicAuth(icsAuthArray[0], icsAuthArray[1], StandardCharsets.UTF_8); // 指定帳密編碼方式
 //		headers.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)); // 指定傳送/接收資料時可接受編碼方式
 		return headers;
+	}
+
+	private String getResponseDetail(String response, TitaVo titaVo) throws LogicException {
+//		S01	作業執行成功，資料庫新增傳輸內容
+//		S02	作業執行成功，資料庫新增傳輸內容，並根據邏輯刪除資料庫歷史資料
+//		E01	作業執行失敗，傳輸格式必輸入欄位不可為空值
+//		E02	作業執行失敗，傳輸格式必輸入欄位格式錯誤
+//		E03	作業執行失敗，傳輸格式子批次須小於等於母批次序號
+//		E04	作業執行失敗，本次傳輸筆數不一致
+//		E05	作業執行失敗，資產類別與傳輸資料格式有誤
+		JSONObject responseJO = null;
+		String tranStatus = null;
+		String errorMessage = null;
+		try {
+			responseJO = new JSONObject(response);
+			tranStatus = responseJO.getString("tran_status");
+			errorMessage = responseJO.getString("error_message");
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("ICS Exception = " + e.getMessage());
+			throw new LogicException("E9004", "分析ICS回傳資料時有誤");
+		}
+		tranStatus += errorMessage == null ? "" : errorMessage;
+		return tranStatus;
 	}
 }

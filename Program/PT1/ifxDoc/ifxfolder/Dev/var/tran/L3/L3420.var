@@ -1109,6 +1109,7 @@ T(2,董事會通過核定日期+#BadDebtDateYY+/+#BadDebtDateMM+/+#BadDebtDateDD
 !應收付類別,2:結案
 #TMPRPFG=X,1,S
 E(0,@RPFG,0)
+E(0,@OverRpAmt,0)
 C(3,#CaseCloseCode,0,E(0,@RPFG,2),$)
 C(3,#CaseCloseCode,1,E(0,@RPFG,2),$)
 C(3,#CaseCloseCode,2,E(0,@RPFG,2),$)
@@ -1137,7 +1138,7 @@ IF(#CaseCloseCode==1 || #CaseCloseCode==2,E(0,@RPTYPZ,91),$)
 !應收付總金額
 #TotalRepayAmt=m,14.2,S
 E(0,0)
-E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt-#Excessive)
+E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt)
 ! C(3,#CaseCloseCode,0,E(0,#Principal+#Interest+#Shortfall-#TimReduceAmt),$,)
 ! C(3,#CaseCloseCode,0,E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt),$)
 ! C(3,#CaseCloseCode,1,E(0,#Principal+#Interest+#DelayInt+#BreachAmt+#Shortfall+#AcctFee1+#ModifyFee1+#FireFee1+#LawFee1-#TimReduceAmt+#CloseBreachAmt),$)

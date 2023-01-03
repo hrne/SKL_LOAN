@@ -42,16 +42,15 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
-		this.info("FindAll CustNo=" + titaVo.get("CustNo") + ", EntryDate=" + titaVo.get("EntryDateS") + "~"
-				+ titaVo.get("EntryDateE") + ", AcDate=" + titaVo.get("AcDateS") + "~" + titaVo.get("AcDateE"));
+		this.info("FindAll CustNo=" + titaVo.get("CustNo") + ", AcDate=" + titaVo.get("AcDateS") + "~"
+				+ titaVo.get("AcDateE"));
 
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.get("FacmNo"));
-		int iEntryDateS = parse.stringToInteger(titaVo.get("EntryDateS").trim());
-		int iEntryDateE = parse.stringToInteger(titaVo.get("EntryDateE").trim());
+		int iTitaHCode = parse.stringToInteger(titaVo.get("TitaHCode"));
 		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
 		int iAcDateE = parse.stringToInteger(titaVo.get("AcDateE").trim());
-		String iSortCode = titaVo.get("SortCode").trim();
+		String iSortCode = titaVo.get("SortCode").trim(); // 0-會計日期+額度 1-入帳日期+額度 2-額度+入帳日期
 
 		String sql = "  SELECT  ";
 
@@ -62,18 +61,20 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
 		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
-		sql += "  	NVL(lx.\"EntryDate\",0) AS \"EntryDate\", ";
 		sql += "  	MIN(ad.\"TitaHCode\")   AS \"TitaHCode\", ";
-		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
-		sql += "    MIN(ad.\"CreateDate\")   AS \"CreateDate\",";
-		sql += "    ad.\"AcSeq\"        AS \"AcSeq\" ";
+		sql += "    ad.\"AcDate\"           AS \"AcDate\",";
+		sql += "    MIN(ad.\"CreateDate\")  AS \"CreateDate\",";
+		sql += "    MIN(ad.\"AcSeq\")       AS \"AcSeq\", ";
+		sql += "  	MAX(lx.\"EntryDate\")   AS \"EntryDate\", ";
+		sql += "    MAX(lx.\"TitaCalDy\")   AS \"TitaCalDy\", ";
+		sql += "    MAX(lx.\"TitaCalTm\")	AS \"TitaCalTm\"  ";
 		sql += "  FROM";
 		sql += "    \"AcDetail\"   ad";
 		sql += "  LEFT JOIN  \"LoanBorTx\"     lx";
-		sql += "    ON  lx.\"CustNo\" = ad.\"CustNo\" ";
-		sql += "    AND lx.\"FacmNo\" = NVL(JSON_VALUE(ad.\"JsonFields\",  '$.FacmNo'),ad.\"FacmNo\") ";
-		sql += "    AND lx.\"BormNo\" = NVL(JSON_VALUE(ad.\"JsonFields\",  '$.BormNo'),ad.\"BormNo\") ";
-		sql += "    AND lx.\"BorxNo\" = JSON_VALUE  (ad.\"JsonFields\",  '$.BorxNo') ";
+		sql += "    ON  lx.\"AcDate\" = ad.\"AcDate\" ";
+		sql += "    AND lx.\"TitaTlrNo\"= ad.\"TitaTlrNo\" ";
+		sql += "    AND lx.\"TitaTxtNo\" = ad.\"TitaTxtNo\" ";
+		sql += "    AND lx.\"AcSeq\" = 1 ";
 		sql += "  LEFT JOIN \"TxTranCode\"   tc ON tc.\"TranNo\" = ad.\"TitaTxCd\"";
 		sql += "  WHERE";
 		sql += "    ad.\"AcctCode\" = 'TAV' ";
@@ -83,24 +84,40 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "    AND ad.\"AcDate\" >= :acDateS ";
 		sql += "    AND ad.\"AcDate\" <= :acDateE ";
-		sql += "  GROUP BY ad.\"FacmNo\" ";
-		sql += "          ,ad.\"AcDate\"    ";
+		if (iTitaHCode == 0) {
+			sql += "    AND ad.\"TitaHCode\" in ('0','3','4') ";
+		}
+		sql += "  GROUP BY ad.\"AcDate\"    ";
 		sql += "          ,ad.\"TitaTlrNo\" ";
 		sql += "          ,ad.\"TitaTxtNo\" ";
 		sql += "          ,ad.\"TitaTxCd\"  ";
-		sql += "          ,ad.\"AcSeq\"  ";
+		sql += "          ,ad.\"FacmNo\" ";
 		sql += "          ,tc.\"TranItem\"  ";
-		sql += "          ,lx.\"Desc\"      ";
-		sql += "  	      ,lx.\"EntryDate\" ";
-		if ("1".equals(iSortCode)) {
-			sql += " ORDER BY  \"CreateDate\",\"AcSeq\" ";
+		if ("0".equals(iSortCode)) {
+			sql += " ORDER BY \"AcDate\" ASC              ";
+			sql += "         ,\"TitaCalDy\" ASC	          ";
+			sql += "         ,\"TitaCalTm\"	ASC           ";
+			sql += "         ,\"TitaTxtNo\"  ASC          ";
+			sql += "         ,\"FacmNo\" ASC              ";
+		} else if ("1".equals(iSortCode)) {
+			sql += " ORDER BY \"EntryDate\" ASC           ";
+			sql += "         ,\"FacmNo\" ASC              ";
+			sql += "         ,\"AcDate\" ASC	          ";
+			sql += "         ,\"TitaCalDy\" ASC	          ";
+			sql += "         ,\"TitaCalTm\"	ASC           ";
+			sql += "         ,\"TitaTxtNo\"  ASC          ";
 		} else {
-			sql += " ORDER BY  \"FacmNo\", \"CreateDate\", \"AcSeq\" ";
+			sql += " ORDER BY \"FacmNo\" ASC              ";
+			sql += "         ,\"EntryDate\" ASC	          ";
+			sql += "         ,\"AcDate\" ASC              ";
+			sql += "         ,\"TitaCalDy\" ASC	          ";
+			sql += "         ,\"TitaCalTm\"	ASC           ";
+			sql += "         ,\"TitaTxtNo\"  ASC          ";
 		}
 
 		sql += " " + sqlRow;
 
-		this.info("sql = " + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -149,8 +166,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , ROW_NUMBER ()  OVER ( PARTITION BY \"CustNo\", \"FacmNo\"  ORDER BY  \"AcDate\" DESC ) AS \"Seq\" ";
 		sql += "     FROM \"DailyTav\"  ";
 		sql += "     WHERE \"CustNo\" = :custno";
-		sql += "       AND \"CreateEmpNo\" <> '999999' ";
-		sql += "       AND \"AcDate\" <= :acDateS";
+		sql += "       AND \"AcDate\" < :acDateS";
 		if (iFacmNo > 0) {
 			sql += "    AND \"FacmNo\" = :facmno";
 		}
@@ -159,21 +175,13 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    \"CustNo\" ";
 		sql += "  , \"FacmNo\" ";
 		sql += "  , \"AcDate\" ";
-		sql += "  , \"TavBal\" + NVL(\"TxAmt\",0)  AS \"YdBal\" "; // 會計日相同需還原昨日餘額
+		sql += "  , \"TavBal\"    AS \"YdBal\" "; // 會計日相同需還原昨日餘額
 		sql += "  FROM ( SELECT  ";
 		sql += "           T.\"CustNo\" ";
 		sql += "         , T.\"FacmNo\" ";
 		sql += "         , T.\"AcDate\" ";
 		sql += "         , T.\"TavBal\" ";
-		sql += "         , SUM(CASE WHEN NVL(A.\"DbCr\",' ') = 'D' then A.\"TxAmt\"  ";
-		sql += "                    WHEN NVL(A.\"DbCr\",' ') = 'C' then 0 - A.\"TxAmt\" ";
-		sql += "                    ELSE 0  END)  AS \"TxAmt\" ";
 		sql += "         FROM TavData T ";
-		sql += "         LEFT JOIN \"AcDetail\" A ON A.\"CustNo\" = T.\"CustNo\" ";
-		sql += "                                 AND A.\"FacmNo\" = T.\"FacmNo\" ";
-		sql += "                                 AND A.\"AcDate\" = T.\"AcDate\" ";
-		sql += "                                 AND A.\"AcctCode\" = 'TAV' ";
-		sql += "                                 AND T.\"AcDate\" = :acDateS ";
 		sql += "         WHERE T.\"Seq\" =  1 ";
 		sql += "         GROUP BY T.\"CustNo\", T.\"FacmNo\", T.\"AcDate\", T.\"TavBal\"  ";
 		sql += "         ORDER BY T.\"CustNo\", T.\"FacmNo\" ";
@@ -202,7 +210,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	// 讀取暫收餘額檔餘額(非轉換)找出最小的AcDate
+	// 讀取暫收餘額檔餘額(非轉換)找出最小的AcDate; 會計日為零則以入帳日找會計日
 	public List<Map<String, String>> queryAcDate(TitaVo titaVo) throws LogicException {
 
 		this.info("queryAcDate CustNo=" + titaVo.get("CustNo") + ", EntryDate=" + titaVo.get("EntryDateS") + "~"
@@ -253,6 +261,30 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("entryDateS", iEntryDateS + 19110000);
 			query.setParameter("entryDateE", iEntryDateE + 19110000);
 		}
+
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		query.setFirstResult(0);
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(Integer.MAX_VALUE);
+
+		return this.convertToMap(query);
+	}
+
+	// 讀取暫收餘額檔轉換日
+	public List<Map<String, String>> queryConvertDate(TitaVo titaVo) throws LogicException {
+
+		String sql = " ";
+		sql += "     SELECT MAX(\"AcDate\") AS \"AcDateS\" ";
+		sql += "     FROM \"DailyTav\"  ";
+		sql += "     WHERE \"CreateEmpNo\" = '999999' ";
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定

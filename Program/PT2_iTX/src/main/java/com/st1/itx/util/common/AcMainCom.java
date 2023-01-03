@@ -24,23 +24,18 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
 /*----------------------- AcMainCom 總帳入帳處理 ------------------*/
-//    　CALL BY AcEnterCom 分錄入帳程式        
-//       1.<000:全帳冊>記到子目
-//       2.<10H:放款帳冊>記到細目
-//       3.細分帳冊別且有帳冊別者，另記一筆ex.<201:利變年金>
-//       4.細分帳冊別之借貸差額，另記帳冊別中介科目
-//    
 //    --- Input ---
 //     1.功能
 //        0.upd    入帳更新
-//        1.core   在核心入帳，更新餘額欄
+//        1.core   在核心入帳(新建銷帳檔)
 //        2.chgDy  系統換日過帳(含年初損益類結轉)  
 //    
 //     2.訂正記號 
 //        AcHcode        DECIMAL(1)        
-//        0.正常
-//        1.當日訂正       
-//        2.隔日訂正        
+//*     0-正常 
+//*     1-訂正未放行(刪除明細)
+//*     2-訂正或沖正帳務(要入總帳) 
+//*     3-訂正帳務(不入總帳)
 //    
 //     3.會計帳務明細 ArrayList
 //    
@@ -51,10 +46,11 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 總帳入帳處理<BR>
  * 1. run ：入帳更新總帳檔 call by AcEntetCom<BR>
- * 1.1 由會計明細累加至總帳檔帳冊別金額<BR>
- * 1.2 特殊帳冊別，差額寫入應收調撥款科目<BR>
+ * 1.1 由會計明細累加至總帳檔帳冊別金額，更新餘額 、借貸金額欄<BR>
+ * 1.2 帳冊別差額，寫入應收調撥款科目<BR>
  * 2. core ： 在核心入帳，更新餘額欄 call by AcReceivableCom<BR>
- * 2.1 不寫借貸金額，僅更新餘額 2.2 例如：暫付火險費借方出帳<BR>
+ * 2.1 業務銷帳科目如以維護方式寫入則由核心出帳，ex.暫付火險費借方<BR>
+ * 2.2 更新餘額 、借貸金額寫入核心欄<BR>
  * 3. changeDate：系統換日過帳(含年初損益類結轉) call by BS001(日始作業) <BR>
  * 3.1 將餘額過至次日<BR>
  * 3.2 年初時將損益類科目(4,5,6)，餘額歸零<BR>
@@ -117,10 +113,11 @@ public class AcMainCom extends TradeBuffer {
 				dbCr = ac.getDbCr();
 			}
 			// 交易金額
-			if (AcHcode == 1 || AcHcode == 3)
+			if (AcHcode == 1 || AcHcode == 3) {
 				txAmt = BigDecimal.ZERO.subtract(ac.getTxAmt()); // 當日訂正為負
-			else
+			} else {
 				txAmt = ac.getTxAmt(); // 正常及隔日訂正為正
+			}
 			// 業務科目代號
 			acctCode = ac.getAcctCode();
 			tAcMainId.setAcBookCode(ac.getAcBookCode());
@@ -170,10 +167,11 @@ public class AcMainCom extends TradeBuffer {
 						dbCr = "D";
 						acBookDiff = BigDecimal.ZERO.subtract(acBookDiff);
 					}
-					if (AcHcode == 1 || AcHcode == 3)
+					if (AcHcode == 1 || AcHcode == 3) {
 						txAmt = BigDecimal.ZERO.subtract(acBookDiff); // 訂正為負
-					else
+					} else {
 						txAmt = acBookDiff; // 正常及隔日訂正為正
+					}
 					procUpdate(0, titaVo);
 				}
 			}
@@ -204,11 +202,11 @@ public class AcMainCom extends TradeBuffer {
 			dbCr = ac.getDbCr();
 		}
 		// 交易金額
-		if (AcHcode == 1 || AcHcode == 3)
+		if (AcHcode == 1 || AcHcode == 3) {
 			txAmt = BigDecimal.ZERO.subtract(ac.getTxAmt()); // 當日訂正為負
-		else
+		} else {
 			txAmt = ac.getTxAmt(); // 正常及隔日訂正為正
-
+		}
 		// 1.<000:全帳冊>記到子目
 		tAcMainId.setAcBookCode("000");
 		tAcMainId.setAcSubBookCode(ac.getAcSubBookCode());

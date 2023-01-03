@@ -498,7 +498,7 @@ public class PdfGenerator extends CommBuffer {
 		StringBuilder ps = new StringBuilder();
 		int pw = 0;
 
-		StringBuilder prefix = new StringBuilder();
+//		StringBuilder prefix = new StringBuilder();
 		String space ="";
 		for (int i = 0; i < w2; i++) {
 //			prefix.append(" ");
@@ -769,8 +769,8 @@ public class PdfGenerator extends CommBuffer {
 			widthMax = document.getPageSize().getWidth();
 			heightMax = document.getPageSize().getHeight();
 		} else {
-			widthMax = document.getPageSize().getHeight();
-			heightMax = document.getPageSize().getWidth();
+			widthMax = document.getPageSize().getWidth();
+			heightMax = document.getPageSize().getHeight();
 		}
 		
 		this.info("paperorientaton =" + paperorientaton);

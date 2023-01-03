@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 //import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
-
+import com.st1.itx.dataVO.TempVo;
 /* Tita & Tota 資料物件 */
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
@@ -54,7 +54,6 @@ import com.st1.itx.util.common.NegReportCom;
  * @version 1.0.0
  */
 public class L5708 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5708.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegTransService sNegTransService;
@@ -133,7 +132,9 @@ public class L5708 extends TradeBuffer {
 					}
 				}
 
-				Map<Integer, BigDecimal> DistinctCustNo = new HashMap<Integer, BigDecimal>();
+				Map<Integer, BigDecimal> apprAmtCustNoMap = new HashMap<Integer, BigDecimal>();
+				Map<Integer, BigDecimal> sklAmtCustNoMap = new HashMap<Integer, BigDecimal>();
+				Map<Integer, Integer> tempCustNoMap = new HashMap<Integer, Integer>();
 				for (NegTransId NegTransIdVO : DistinctNegTransId) {
 					NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO);
 					if (NegTransVO != null) {
@@ -150,12 +151,19 @@ public class L5708 extends TradeBuffer {
 								// 最大債權
 								// 異動會計檔
 								int CustNo = NegTransVO.getCustNo();
-								BigDecimal ApprAmt = NegTransVO.getApprAmt();
-								if (!DistinctCustNo.containsKey(CustNo)) {
-									DistinctCustNo.put(CustNo, ApprAmt);
+								int iPayerCustNo = NegMainVO.getPayerCustNo();//保證人的付款戶號
+								if (iPayerCustNo > 0) {
+									tempCustNoMap.put(CustNo, iPayerCustNo);				
 								} else {
-									BigDecimal NewApprAmt = ApprAmt.add(DistinctCustNo.get(CustNo));
-									DistinctCustNo.put(CustNo, NewApprAmt);
+									tempCustNoMap.put(CustNo, CustNo);													
+								}
+								if (!apprAmtCustNoMap.containsKey(CustNo)) {
+									apprAmtCustNoMap.put(CustNo, NegTransVO.getApprAmt());
+									sklAmtCustNoMap.put(CustNo, NegTransVO.getSklShareAmt());
+									
+								} else {
+									apprAmtCustNoMap.put(CustNo, apprAmtCustNoMap.get(CustNo).add(NegTransVO.getApprAmt()));
+									sklAmtCustNoMap.put(CustNo, sklAmtCustNoMap.get(CustNo).add(NegTransVO.getSklShareAmt()));
 								}
 
 								int ExportDate = NegTransVO.getExportDate();
@@ -186,10 +194,11 @@ public class L5708 extends TradeBuffer {
 					}
 				}
 
-				if (DistinctCustNo != null && DistinctCustNo.size() != 0) {
-					for (int CustNo : DistinctCustNo.keySet()) {
-						BigDecimal ApprAmt = DistinctCustNo.get(CustNo);
-						/* 帳務 */
+				if (apprAmtCustNoMap != null && apprAmtCustNoMap.size() != 0) {
+					for (int CustNo : apprAmtCustNoMap.keySet()) {
+						BigDecimal apprAmt = apprAmtCustNoMap.get(CustNo);
+						BigDecimal sklAmt = sklAmtCustNoMap.get(CustNo);
+					/* 帳務 */
 						// 經辦登帳非訂正交易
 						if (this.txBuffer.getTxCom().isBookAcYes()) {
 							List<AcDetail> acDetailList = new ArrayList<AcDetail>();
@@ -198,7 +207,7 @@ public class L5708 extends TradeBuffer {
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
 							acDetail.setAcctCode(acNegCom.getAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(ApprAmt); // 金額
+							acDetail.setTxAmt(apprAmt.add(sklAmt)); // 金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 
@@ -206,7 +215,7 @@ public class L5708 extends TradeBuffer {
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
 							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(ApprAmt); // 金額
+							acDetail.setTxAmt(apprAmt); // 金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 
@@ -214,15 +223,26 @@ public class L5708 extends TradeBuffer {
 							acDetail = new AcDetail();
 							acDetail.setDbCr("D");
 							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(ApprAmt); // 金額
+							acDetail.setTxAmt(apprAmt); // 金額
 							acDetail.setCustNo(CustNo);// 戶號
+							acDetailList.add(acDetail);
+							
+							/* 貸：暫收可抵繳科目 */
+							acDetail = new AcDetail();
+							acDetail.setDbCr("C");
+							TempVo tTempVo = new TempVo();
+							tTempVo = acNegCom.getReturnAcctCode(tempCustNoMap.get(CustNo), titaVo);
+							acDetail.setCustNo(tempCustNoMap.get(CustNo));//實際借款人戶號
+							acDetail.setFacmNo(parse.stringToInteger(tTempVo.getParam("FacmNo")));
+							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
+							acDetail.setTxAmt(sklAmt); // 新壽攤分金額
 							acDetailList.add(acDetail);
 
 							/* 貸：P03 銀行存款－新光 */
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
 							acDetail.setAcctCode("P03");
-							acDetail.setTxAmt(ApprAmt); // 金額
+							acDetail.setTxAmt(apprAmt); // 金額
 							acDetail.setCustNo(CustNo);// 戶號+額度+撥款
 							acDetailList.add(acDetail);
 

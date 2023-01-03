@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -37,6 +39,10 @@ public class L3R05 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
+	private ArrayList<BaTxVo> baTxList = new ArrayList<BaTxVo>();
+	private BigDecimal oExcessive = BigDecimal.ZERO;
+	private BigDecimal oExcessiveAll = BigDecimal.ZERO;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L3R05 ");
@@ -52,57 +58,38 @@ public class L3R05 extends TradeBuffer {
 		// work area
 		BigDecimal wkTempAmt = new BigDecimal(0);
 		String wkTmpFacmNoX = "";
+		// 是否額度可抵繳
+		// 按指定額度：00-全費用類別
+		// 1.iFacmNo >0 該額度為指定額度則只有該額度可抵繳,如該額度為非指定額度則全部非指定額度可抵繳
+		// 2.iFacmNo =0 全部非指定額度可抵繳
+		// 96 : 單一額度轉帳
 		// 暫收可抵繳
+		baTxList = baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, iTempItemCode == 6 ? 96 : 0,
+				BigDecimal.ZERO, titaVo);
+
 		if (iTempReasonCode == 1 && iCustNo != this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
 
-// 是否額度可抵繳
-// 按指定額度：00-全費用類別
-//  1.iFacmNo >0 該額度為指定額度則只有該額度可抵繳,如該額度為非指定額度則全部非指定額度可抵繳
-//  2.iFacmNo =0 全部非指定額度可抵繳
-//	96 : 單一額度轉帳
-			baTxCom.settingUnPaid(titaVo.getEntDyI(), iCustNo, iFacmNo, 0, iTempItemCode == 6 ? 96 : 0, BigDecimal.ZERO,
-					titaVo);
-			wkTempAmt = baTxCom.getExcessive();
 			wkTmpFacmNoX = baTxCom.getTmpFacmNoX();
+			wkTempAmt = baTxCom.getExcessive();
+			oExcessiveAll = baTxCom.getExcessive().add(baTxCom.getExcessiveOther());
 		} else {
-			// 查詢會計銷帳檔
-			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0,
-					Integer.MAX_VALUE, titaVo);
-			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-			if (lAcReceivable != null && lAcReceivable.size() > 0) {
-				for (AcReceivable tAcReceivable : lAcReceivable) {
 
-					switch (iTempReasonCode) {
-					case 1: // 放款暫收款
-						// 放款專戶
-						if (tAcReceivable.getAcctCode().equals("TLD")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 2: // 債協暫收款
-						if (tAcReceivable.getAcctCode().substring(0, 2).equals("T1")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 3: // 債協退還款
-						if (tAcReceivable.getAcctCode().substring(0, 2).equals("T2")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 4: // AML暫收款
-						if (tAcReceivable.getAcctCode().equals("TAM")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 5: // 聯貸費攤提暫收款
-						if (tAcReceivable.getAcctCode().equals("TSL")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
+			if (this.baTxList != null) {
+				// 重新計算作帳金額
+				for (BaTxVo ba : this.baTxList) {
+					ba.setAcctAmt(BigDecimal.ZERO);
+				}
+				for (BaTxVo ba : this.baTxList) {
+					if (iTempReasonCode == 1 && ba.getAcctCode().equals("TLD")
+							|| (iTempReasonCode == 2 && ba.getAcctCode().substring(0, 2).equals("T1"))
+							|| (iTempReasonCode == 3 && ba.getAcctCode().substring(0, 2).equals("T2"))
+							|| (iTempReasonCode == 4 && ba.getAcctCode().equals("TAM"))) {
+						wkTempAmt = wkTempAmt.add(ba.getUnPaidAmt());
+
 					}
-
 				}
 			}
+
 		}
 
 		if ("L3220".equals(iTxCode) && (iTempItemCode == 4 || iTempItemCode == 5 || iTempItemCode == 11)
@@ -115,6 +102,7 @@ public class L3R05 extends TradeBuffer {
 
 		this.totaVo.putParam("L3r05TempAmt", wkTempAmt);
 		this.totaVo.putParam("L3r05TmpFacmNoX", wkTmpFacmNoX);
+		this.totaVo.putParam("L3r05ExcessiveAll", oExcessiveAll);
 
 		this.addList(this.totaVo);
 		return this.sendList();

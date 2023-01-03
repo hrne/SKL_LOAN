@@ -68,34 +68,22 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("iFacmNo     = " + iFacmNo); // 0
 
 		String sql = "";
-		sql += " WITH DT1 AS ( ";
-		sql += "   SELECT \"AcDate\" ";
-		sql += "        , \"CustNo\" ";
-		sql += "        , \"FacmNo\" ";
-		sql += "        , \"TavBal\" ";
-		sql += "   FROM \"DailyTav\" ";
-		sql += "   WHERE \"LatestFlag\" = 'Y' ";
-		sql += " ) ";
 		sql += " Select";
 		sql += "    A.\"AcNoCode\"          AS \"AcNoCode\", ";
 		sql += "    A.\"AcSubCode\"         AS \"AcSubCode\", ";
 		sql += "    A.\"AcDtlCode\"         AS \"AcDtlCode\", ";
 		sql += "    A.\"AcctCode\"          AS \"AcctCode\", ";
+		sql += "    C.\"Item\"              AS \"AcctItem\", ";
 		sql += "    A.\"CustNo\"            AS \"CustNo\", ";
 		sql += "    A.\"FacmNo\"            AS \"FacmNo\", ";
 		sql += "    A.\"RvNo\"              AS \"RvNo\", ";
 		sql += "    CASE ";
-		sql += "        WHEN NVL(DT1.\"AcDate\",0) != 0 ";
-		sql += "        THEN DT1.\"AcDate\" - 19110000 ";
 		sql += "        WHEN A.\"OpenAcDate\" = 0 THEN ";
 		sql += "            0 ";
 		sql += "        ELSE ";
 		sql += "            trunc(A.\"OpenAcDate\" - 19110000) ";
 		sql += "    END AS \"OpenAcDate\", ";
-		sql += "    CASE";
-		sql += "        WHEN NVL(DT1.\"AcDate\",0) != 0 ";
-		sql += "        THEN DT1.\"TavBal\" ";
-		sql += "    ELSE A.\"RvAmt\" END    AS \"RvAmt\", ";
+		sql += "    A.\"RvAmt\"             AS \"RvAmt\", ";
 		sql += "    CASE ";
 		sql += "        WHEN A.\"LastTxDate\" = 0 THEN ";
 		sql += "            0 ";
@@ -150,9 +138,8 @@ public class L6907ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "         GROUP BY \"AcctCode\" ";
 		sql += "    ) B ON A.\"AcctCode\" = B.\"AcctCode\" ";
-		sql += " LEFT JOIN DT1 ON DT1.\"CustNo\" = A.\"CustNo\" ";
-		sql += "              AND DT1.\"FacmNo\" = A.\"FacmNo\" ";
-		sql += "              AND A.\"AcctCode\" = 'TAV' ";
+		sql += " LEFT JOIN \"CdCode\" C ON C.\"DefCode\" = 'AcctCode' ";
+		sql += "                       AND C.\"Code\" = A.\"AcctCode\" ";
 		sql += " where A.\"AcBookCode\" = 000 "; // 固定傳入
 		if ("".equals(iAcctCode)) {
 			sql += "   and A.\"AcctFlag\"   = 0 ";

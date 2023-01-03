@@ -394,13 +394,14 @@ public class AcDetailCom extends TradeBuffer {
 		if (!ac.getAcctCode().equals(tCdAcCode.getAcctCode())) {
 			tTempVo.putParam("RvAcctCode", ac.getAcctCode());
 		}
-
+		
 		tAcDetail.setJsonFields(tTempVo.getJsonString());
 	}
 
 	/* 會計科子細目設定檔 */
 	private void findAcCode(AcDetail ac, TitaVo titaVo) throws LogicException {
-		// step 1. 轉換專戶
+		// step 1. 轉換業務科目
+// 1. 轉換專戶
 		// TAV -> TLD 0610940戶號(TLD 放款部專戶)
 		// TAV -> T10 -> 0601776戶號(T10 前置協商收款專戶)
 		if ("TAV".equals(ac.getAcctCode()) && ac.getCustNo() == this.txBuffer.getSystemParas().getLoanDeptCustNo()) {
@@ -412,29 +413,12 @@ public class AcDetailCom extends TradeBuffer {
 
 		String acctCode = ac.getAcctCode();
 
-// 銷帳科目記號ReceivableFlag = 3-未收款    
-// F10 帳管費  
-// TMI 火險保費 
-// F29 契變手續費
-// F12聯貸件收入
-// F27聯貸管理費收入
-
+// 2. 轉換短繳期金
 // 銷帳科目記號ReceivableFlag = 4-短繳期金 		               	         
-// Z10	短期擔保放款	  310	短期擔保放款
-// Z20	中期擔保放款	  320	中期擔保放款
-// Z30	長期擔保放款	  330	長期擔保放款
-// Z40	三十年房貸	  340	三十年房貸
-// IC1	短擔息
-// IC2	中擔息
-// IC3	長擔息
-// IC4	三十年房貸息
-// IOP	違約金
-// 銷帳科目記號ReceivableFlag = 5-另收欠款
-// F12聯貸件收入
-// F27聯貸管理費收入
-
-		// step 1. 轉換業務科目
-		// 短繳期金
+// Z10	短繳期金-短期擔保放款	  310	短期擔保放款
+// Z20	短繳期金-中期擔保放款	  320	中期擔保放款
+// Z30	短繳期金-長期擔保放款	  330	長期擔保放款
+// Z40	短繳期金-三十年房貸	  340	三十年房貸
 		if (ac.getReceivableFlag() == 4) {
 			if (ac.getRvNo().length() < 3) {
 				throw new LogicException("E6001", "AcDetailCom 短繳期金需有撥款序號"); // E6001 分錄檢核有誤
@@ -445,8 +429,9 @@ public class AcDetailCom extends TradeBuffer {
 			}
 		}
 
-		// 聯貸費攤提，未到期收入轉入TSL暫收款－聯貸費攤提
-		// F12聯貸件收入、 F27聯貸管理費收入
+// 3. 轉換費用攤提
+		// 企金費用攤提，未到期收入轉入TSL暫收款－費用攤提
+		// F12企金帳管費收入、 F27聯貸管理費收入
 		// 聯貸手續費:SL-費用代號(2)-流水號(3)-攤提年月(YYYMM)
 		if (acctCode.equals("F12") || acctCode.equals("F27")) {
 			if (ac.getReceivableFlag() == 3 && ac.getRvNo().length() >= 15

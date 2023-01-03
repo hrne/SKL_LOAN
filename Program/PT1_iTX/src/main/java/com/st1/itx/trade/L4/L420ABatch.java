@@ -198,6 +198,10 @@ public class L420ABatch extends TradeBuffer {
 						}
 						this.tTempVo = new TempVo();
 						tTempVo = tTempVo.getVo(t.getProcNote());
+						// 已訂正須人工處理
+						if (this.tTempVo.get("EraseCnt") != null) {
+							continue;							
+						}
 						tTempVo.remove("MergeCnt");
 						tTempVo.remove("MergeAmt");
 						tTempVo.remove("MergeSeq");

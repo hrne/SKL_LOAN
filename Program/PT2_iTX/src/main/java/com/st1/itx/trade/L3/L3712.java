@@ -173,7 +173,7 @@ public class L3712 extends TradeBuffer {
 		}
 		// 帳務處理
 		acRepayCom.setTxBuffer(this.txBuffer);
-		acRepayCom.settleRun(this.lLoanBorTx, this.baTxList, titaVo);
+		acRepayCom.settleLoanRun(this.lLoanBorTx, this.baTxList, titaVo);
 		
 		// end
 		this.addList(this.totaVo);

@@ -290,7 +290,7 @@ public class L3410 extends TradeBuffer {
 
 		// 帳務處理
 		acRepayCom.setTxBuffer(this.txBuffer);
-		acRepayCom.settleRun(this.lLoanBorTx, this.baTxList, titaVo);
+		acRepayCom.settleLoanRun(this.lLoanBorTx, this.baTxList, titaVo);
 
 		// Check output
 		checkOutputRoutine();

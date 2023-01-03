@@ -100,7 +100,7 @@ public class AcReceivableCom extends TradeBuffer {
 		int AcHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
 		int idx = 0;
 
-//		帳務訂正記號  AcHCode   0.正常     1.訂正     2.3.沖正   ；   訂正反序          
+//		帳務訂正記號  AcHCode   0.正常     1.訂正(不入帳)  2.沖正   3.訂正(入反向帳)
 		// 1.業務科目記號 = 1 資負明細科目（放款、催收款項) 且非L6801:放款戶帳冊別轉換
 		// 2.銷帳科目記號 <> 0 0－非銷帳科目 1－會計銷帳科目 2－業務銷帳科目 3-未收款, 4-短繳期金,
 		// 5-另收欠款,8-核心銷帳碼科目(不寫銷帳檔)
@@ -306,11 +306,13 @@ public class AcReceivableCom extends TradeBuffer {
 				procUpdate(titaVo.getHCodeI(), bizTbsdy);
 			}
 
+			// 業務銷帳科目如以維護方式寫入則由核心出帳
 			// 核心出帳更新總帳檔餘額
 			if (rv.getReceivableFlag() == 2) { // 2-核心出帳
 				acMainCom.setTxBuffer(this.txBuffer);
 				acMainCom.core(titaVo.getHCodeI(), ac, titaVo);
 			}
+			
 			this.info("AcReceivable mnt=" + ", RvBal=" + tAcReceivable.getRvBal());
 		}
 
@@ -515,22 +517,22 @@ public class AcReceivableCom extends TradeBuffer {
 
 	private void updAcReceivable(int AcHCode, int bizTbsdy) throws LogicException {
 		// 暫收可抵繳金額需全入全銷(反序訂正)
-		if ("TAV".equals(tAcReceivable.getAcctCode())) {
-			if (("C".equals(ac.getDbCr()) && tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) != 0)
-					|| ("D".equals(ac.getDbCr())
-							&& tAcReceivable.getRvBal().compareTo(tAcReceivable.getRvBal()) != 0)) {
-				String str = "戶號 " + tAcReceivable.getCustNo() + "-"
-						+ parse.IntegerToString(tAcReceivable.getFacmNo(), 3) + " 暫收可抵繳金額不符 :"
-						+ ("D".equals(ac.getDbCr()) ? "借:" : "貸:") + ac.getTxAmt() + ", 暫收可抵繳="
-						+ tAcReceivable.getRvBal();
-				if (titaVo.isHcodeErase()) {
+//		if ("TAV".equals(tAcReceivable.getAcctCode())) {
+//			if (("C".equals(ac.getDbCr()) && tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) != 0)
+//					|| ("D".equals(ac.getDbCr())
+//							&& tAcReceivable.getRvBal().compareTo(tAcReceivable.getRvBal()) != 0)) {
+//				String str = "戶號 " + tAcReceivable.getCustNo() + "-"
+//						+ parse.IntegerToString(tAcReceivable.getFacmNo(), 3) + " 暫收可抵繳金額不符 :"
+//						+ ("D".equals(ac.getDbCr()) ? "借:" : "貸:") + ac.getTxAmt() + ", 暫收可抵繳="
+//						+ tAcReceivable.getRvBal();
+//				if (titaVo.isHcodeErase()) {
 //					throw new LogicException(titaVo, "E6003", "暫收可抵繳需依序訂正  " + str);
-					this.info("暫收可抵繳需依序訂正  " + str);
-				} else {
-					throw new LogicException(titaVo, "E6003", "暫收可抵繳需全入全銷  " + str);
-				}
-			}
-		}
+//					this.info("暫收可抵繳需依序訂正  " + str);
+//				} else {
+//					throw new LogicException(titaVo, "E6003", "暫收可抵繳需全入全銷  " + str);
+//				}
+//			}
+//		}
 
 		// 帳冊別、科子細目
 		if (tAcReceivable.getAcSubBookCode().trim().isEmpty()) {

@@ -103,6 +103,7 @@ public class L3240 extends TradeBuffer {
 	private int wkBorxNo;
 	private int wkNewBorxNo;
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
+	private BigDecimal wkOverAmt = BigDecimal.ZERO;
 	private BigDecimal wkTxAmt = BigDecimal.ZERO;
 	private int wkRepayCode = 0;
 	private String wkReconCode = "";
@@ -112,6 +113,7 @@ public class L3240 extends TradeBuffer {
 	private LoanOverdue tLoanOverdue;
 	// work area
 	private AcDetail acDetail;
+	private LoanBorTx tLoanBorTx;
 	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 	private List<AcReceivable> lAcReceivableDelete = new ArrayList<AcReceivable>();
 	private List<AcReceivable> lAcReceivableInsert = new ArrayList<AcReceivable>();
@@ -158,52 +160,40 @@ public class L3240 extends TradeBuffer {
 		// 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH), 郵局 P01
 		Slice<AcDetail> slAcList = acDetailService.acdtlRelTxseqEq(titaVo.getOrgEntdyI() + 19110000,
 				titaVo.getOrgKin() + titaVo.getOrgTlr() + titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo); // findByTxseq
-		if (slAcList != null) {
-			for (AcDetail ac : slAcList.getContent()) {
-				if ("D".equals(ac.getDbCr())) {
-					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
-							|| "P01".equals(ac.getAcctCode())) {
-						String sumNo = "";
-						if ("P03".equals(ac.getAcctCode())) {
-							sumNo = "101";
-						} else {
-							sumNo = "102";
-						}
-						String rvNo = "";
-						if ("C01".equals(ac.getAcctCode())) {
-							rvNo = "0010060" + titaVo.getOrgEntdyI();
-						}
-						acDetail = new AcDetail();
-						acDetail.setDbCr("D");
-						acDetail.setAcctCode(ac.getAcctCode());
-						acDetail.setSumNo(sumNo);
-						acDetail.setTxAmt(ac.getTxAmt());
-						acDetail.setCustNo(iCustNo);
-						acDetail.setFacmNo(0);
-						lAcDetail.add(acDetail);
-						acDetail.setRvNo(rvNo);
-						lAcDetail.add(acDetail);
-						acDetail = new AcDetail();
-						acDetail.setDbCr("C");
-						acDetail.setAcctCode(ac.getAcctCode());
-						acDetail.setSumNo(sumNo);
-						acDetail.setTxAmt(ac.getTxAmt());
-						acDetail.setCustNo(iCustNo);
-						acDetail.setFacmNo(0);
-						lAcDetail.add(acDetail);
-						acDetail.setRvNo(rvNo);
-						lAcDetail.add(acDetail);
-					}
-				}
-			}
-		}
-
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
-		// 暫收款金額 (暫收借)
-		acRepayCom.settleTempAmt(this.baTxList, this.lAcDetail, titaVo);
 
 		// 沖正處理
 		repayEraseRoutine();
+
+		// 暫收款
+		this.info("TempAmt=" + wkTempAmt + " ,OverAmt=" + wkOverAmt);
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, 0, 0, 99, BigDecimal.ZERO, titaVo); // 99-費用全部
+		// 溢收金額
+		for (BaTxVo ba : this.baTxList) {
+			if (ba.getDataKind() == 3 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				BigDecimal acctAmt = BigDecimal.ZERO;
+				if (wkOverAmt.compareTo(ba.getAcctAmt()) > 0) {
+					acctAmt = ba.getAcctAmt();
+					wkOverAmt = wkOverAmt.subtract(ba.getAcctAmt());
+				} else {
+					acctAmt = wkOverAmt;
+					wkOverAmt = BigDecimal.ZERO;
+				}
+				if (wkOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+					AcDetail acDetail = new AcDetail();
+					acDetail.setDbCr("D");
+					acDetail.setAcctCode(ba.getAcctCode());
+					acDetail.setSumNo("090");
+					acDetail.setTxAmt(acctAmt);
+					acDetail.setCustNo(ba.getCustNo());
+					acDetail.setFacmNo(ba.getFacmNo());
+					acDetail.setBormNo(ba.getBormNo());
+					acDetail.setRvNo(ba.getRvNo());
+					acDetail.setReceivableFlag(ba.getReceivableFlag());
+					this.lAcDetail.add(acDetail);
+					this.info("settleTempAmt ba " + acDetail.toString());
+				}
+			}
+		}
 
 		if (iCaseCloseCode == 3 || iCaseCloseCode == 7 || iCaseCloseCode == 8) {
 			wkTxAmt = BigDecimal.ZERO;
@@ -231,20 +221,34 @@ public class L3240 extends TradeBuffer {
 		// L3240 TxAmt = 300 TempAmt = 300 Loan 0 ==> HCODE = 0 (入帳金額轉暫收款-冲正產生)
 		// Debit: Loan 500 Credit TAV 500(Tx 300, Temp 200)
 		// 轉催呆金額放LoanBorTx交易金額
-		// THC 暫收款－沖正
-		if (wkTxAmt.compareTo(BigDecimal.ZERO) > 0 && iCaseCloseCode < 3) {
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode("THC");
-			acDetail.setSumNo("099");
-			acDetail.setTxAmt(wkTxAmt);
-			acDetail.setCustNo(iCustNo);
-			acDetail.setFacmNo(0);
-			acDetail.setRvNo( "" + titaVo.getOrgEntdyI());
-			lAcDetail.add(acDetail);
+		if (slAcList != null) {
+			for (AcDetail ac : slAcList.getContent()) {
+				if ("D".equals(ac.getDbCr())) {
+					if ("P03".equals(ac.getAcctCode()) || "C01".equals(ac.getAcctCode())
+							|| "P01".equals(ac.getAcctCode()) || "TEM".equals(ac.getAcctCode())
+							|| "TCK".equals(ac.getAcctCode())) {
+						String sumNo = "";
+						sumNo = "10" + wkRepayCode;
+						String rvNo = "";
+						if ("C01".equals(ac.getAcctCode())) {
+							rvNo = "0010060" + titaVo.getOrgEntdyI();
+						}
+						acDetail = new AcDetail();
+						acDetail.setDbCr("C");
+						acDetail.setAcctCode(ac.getAcctCode());
+						acDetail.setSumNo(sumNo);
+						acDetail.setTxAmt(ac.getTxAmt());
+						acDetail.setCustNo(iCustNo);
+						acDetail.setFacmNo(0);
+						lAcDetail.add(acDetail);
+						acDetail.setRvNo(rvNo);
+						lAcDetail.add(acDetail);
+					}
+				}
+			}
 		}
 		// 累溢收入帳(暫收貸)
-		acRepayCom.settleOverflow(lAcDetail, titaVo);
+		acRepayCom.settleOverflow(tLoanBorTx, lAcDetail, titaVo);
 
 		// 產生會計分錄
 		this.txBuffer.setAcDetailList(lAcDetail);
@@ -292,6 +296,8 @@ public class L3240 extends TradeBuffer {
 			}
 			wkRepayCode = tx.getRepayCode();
 			wkTxAmt = wkTxAmt.add(tx.getTxAmt());
+			wkTempAmt = wkTempAmt.add(tx.getTempAmt());
+			wkOverAmt = wkOverAmt.add(tx.getOverflow());
 			wkBorxNo = tx.getBorxNo();
 			tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tx.getOtherFields());
@@ -323,6 +329,7 @@ public class L3240 extends TradeBuffer {
 				// 欠繳金額處理
 				unUpaidRoutine(tx);
 			}
+			tLoanBorTx = tx;
 		}
 	}
 
@@ -612,8 +619,6 @@ public class L3240 extends TradeBuffer {
 			acDetail.setBormNo(tx.getBormNo());
 			lAcDetail.add(acDetail);
 		}
-		wkTempAmt = wkTempAmt.add(tx.getPrincipal().add(tx.getInterest()).add(tx.getDelayInt()).add(tx.getBreachAmt())
-				.add(tx.getCloseBreachAmt()));
 	}
 
 	// 還原催收檔

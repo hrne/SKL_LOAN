@@ -112,16 +112,28 @@ public class L6907 extends TradeBuffer {
 
 			// 由L3200連動時處理
 			if ("L3200".equals(iTmpTxCode)) {
-				// 無指定額度全部為累溢收，全部不顯示
+				// 無指定額度全部為累溢收，全部不顯示 ==> 20221215 無設定指定額度則全部都可用
+				int checkSkip = 0;
 				if (slLoanFacTmp == null) {
-					continue;
+					checkSkip = 1;
 				} else if (istmpfacmno) {
-					// 指定額度只有該額度為溢收款，其他皆顯示
+					// 指定額度只有該額度為溢收款，其他皆顯示 ==> 20221215  指定額度可使用自已及非指定額度
 					if (iTmpFacmNo == parse.stringToInteger(tAcReceivable.get("FacmNo"))) {
-						continue;
+						checkSkip = 1;
+					} else {
+						boolean isDataFacmNoTmp = false;
+						for (LoanFacTmp t : slLoanFacTmp.getContent()) {
+							if (parse.stringToInteger(tAcReceivable.get("FacmNo")) == t.getFacmNo()) {
+								isDataFacmNoTmp = true;
+								break;
+							}
+						}
+						if (!isDataFacmNoTmp) {
+							checkSkip = 1;
+						}						
 					}
 				} else {
-					// 非指定額度該全部非指定額度為溢收款，指定額度顯示
+					// 非指定額度該全部非指定額度為溢收款，指定額度顯示 ==> 20221215 非指定額度可使用非指定額度
 					boolean isDataFacmNoTmp = false;
 					for (LoanFacTmp t : slLoanFacTmp.getContent()) {
 						if (parse.stringToInteger(tAcReceivable.get("FacmNo")) == t.getFacmNo()) {
@@ -130,8 +142,11 @@ public class L6907 extends TradeBuffer {
 						}
 					}
 					if (!isDataFacmNoTmp) {
-						continue;
+						checkSkip = 1;
 					}
+				}
+				if ( checkSkip ==0) {
+					continue;
 				}
 
 			}
@@ -152,6 +167,9 @@ public class L6907 extends TradeBuffer {
 			if ("0".equals(tAcReceivable.get("TitaTxtNo"))) {
 				l6908Flag = "";
 			}
+			if ("0".equals(tAcReceivable.get("TitaTxtNo")) || "999999".equals(tAcReceivable.get("LastUpdateEmpNo"))) {
+				l6908Flag = "";
+			}
 			// 交易序號 = 0不顯示按鈕
 			occursList.putParam("L6908Flag", l6908Flag);
 			// 戶號 OOCustNoX
@@ -159,9 +177,13 @@ public class L6907 extends TradeBuffer {
 			occursList.putParam("OOCustNo", tAcReceivable.get("CustNo"));
 			occursList.putParam("OOFacmNo", tAcReceivable.get("FacmNo"));
 
+			if (parse.stringToInteger(tAcReceivable.get("ReceivableFlag")) >= 3
+					&& tAcReceivable.get("RvAmt").compareTo(tAcReceivable.get("RvBal")) == 0) {
+				occursList.putParam("OOFacmNo", tAcReceivable.get("FacmNo"));
+			}
 			// 業務科目 OOAcctCodeX
 			occursList.putParam("OOAcctCode", tAcReceivable.get("AcctCode"));
-			occursList.putParam("OOAcctItem", getAcctItem(tAcReceivable, titaVo)); // 用不到
+			occursList.putParam("OOAcctItem", tAcReceivable.get("AcctItem"));
 			// 銷帳編號 OORvNo
 			occursList.putParam("OORvNo", tAcReceivable.get("RvNo"));
 			// 起帳日期 OOOpenAcDate
@@ -194,44 +216,4 @@ public class L6907 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
-	private String getAcctItem(Map<String, String> rv, TitaVo titaVo) throws LogicException {
-
-		acctCode = rv.get("AcctCode");
-		if (acctCode == null || acctCode.length() < 3)
-			acctCode = "   ";
-		String acctItem = "";
-
-		CdAcCode tCdAcCode = new CdAcCode();
-		CdAcCodeId CdAcCodeId = new CdAcCodeId();
-//	 	  銷帳科目記號ReceivableFlag = 4-短繳期金
-//		   Z10	短期擔保放款	310	短期擔保放款
-//		   Z20	中期擔保放款	320	中期擔保放款
-//		   Z30	長期擔保放款	330	長期擔保放款
-//		   Z40	三十年房貸	340	三十年房貸
-//
-//		   IC1	短擔息
-//		   IC2	中擔息
-//	       IC3	長擔息
-//		   IC4	三十年房貸息
-//		   IOP	清償違約金       
-//
-		if ("Z".equals(acctCode.substring(0, 1))) {
-			acctItem = "短繳本金";
-		}
-		if ("".equals(acctItem)) {
-			if (acctCode.trim().length() > 0) {
-				tCdAcCode = cdAcCodeService.acCodeAcctFirst(acctCode, titaVo);
-			} else {
-				CdAcCodeId.setAcNoCode(rv.get("AcNoCode"));
-				CdAcCodeId.setAcSubCode(rv.get("AcSubCode"));
-				CdAcCodeId.setAcDtlCode(rv.get("AcDtlCode"));
-				tCdAcCode = cdAcCodeService.findById(CdAcCodeId, titaVo);
-			}
-			acctItem = tCdAcCode.getAcctItem();
-		}
-
-		return acctItem;
-	}
-
 }
