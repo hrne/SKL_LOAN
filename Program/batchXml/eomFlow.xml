@@ -9,22 +9,26 @@
 	<job id="eomFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<!-- Usp_L2_ForeclosureFinished_Upd -->
-		<step id="l2ForeclosureFinishedUpd" parent="parentStep" next="l5InnReCheckUpd">
+		<step id="l2ForeclosureFinishedUpd" parent="parentStep"
+			next="l5InnReCheckUpd">
 			<tasklet ref="L2ForeclosureFinishedUpd" />
 		</step>
 		<!-- Usp_L5_InnReCheck_Upd -->
-		<step id="l5InnReCheckUpd" parent="parentStep" next="l9MonthlyLoanBalUpd">
+		<step id="l5InnReCheckUpd" parent="parentStep"
+			next="l9MonthlyLoanBalUpd">
 			<tasklet ref="L5InnReCheckUpd" />
 		</step>
 		<!-- Usp_L9_MonthlyLoanBal_Upd -->
-		<step id="l9MonthlyLoanBalUpd" parent="parentStep" next="l9MonthlyFacBalUpd">
+		<step id="l9MonthlyLoanBalUpd" parent="parentStep"
+			next="l9MonthlyFacBalUpd">
 			<tasklet ref="L9MonthlyLoanBalUpd" />
 		</step>
 		<!-- Usp_L9_MonthlyFacBal_Upd -->
 		<step id="l9MonthlyFacBalUpd" parent="parentStep" next="split1">
 			<tasklet ref="L9MonthlyFacBalUpd" />
 		</step>
-		<split id="split1" task-executor="taskExecutor" next="l8JcicMonthlyLoanDataUpd">
+		<split id="split1" task-executor="taskExecutor"
+			next="l8JcicMonthlyLoanDataUpd">
 			<flow>
 				<!-- Usp_L9_MonthlyLM028_Upd -->
 				<step id="l9MonthlyLM028Upd" parent="parentStep">
@@ -80,17 +84,19 @@
 		</step>
 
 		<!-- 聯徵申報月檔 -->
-		<step id="l8JcicB201Upd" parent="parentStep">
-			<tasklet ref="L8JcicB201Upd" />
-			<end on="FAILED" />
-			<next on="COMPLETED" to="l8JcicB207Upd" />
-		</step>
-		<step id="l8JcicB207Upd" parent="parentStep">
-			<tasklet ref="L8JcicB207Upd" />
-			<end on="FAILED" />
-			<next on="COMPLETED" to="splitJcic2" />
-		</step>
-
+		<split id="splitJcic1" task-executor="taskExecutor"
+			next="splitJcic2">
+			<flow>
+				<step id="l8JcicB201Upd" parent="parentStep">
+					<tasklet ref="L8JcicB201Upd" />
+				</step>
+			</flow>
+			<flow>
+				<step id="l8JcicRelUpd" parent="parentStep">
+					<tasklet ref="L8JcicRelUpd" />
+				</step>
+			</flow>
+		</split>
 		<split id="splitJcic2" task-executor="taskExecutor"
 			next="l8JcicB090Upd">
 			<flow>
@@ -108,6 +114,11 @@
 					<tasklet ref="L8JcicB680Upd" />
 				</step>
 			</flow>
+			<flow>
+				<step id="l8JcicB207Upd" parent="parentStep">
+					<tasklet ref="L8JcicB207Upd" />
+				</step>
+			</flow>
 		</split>
 
 		<step id="l8JcicB090Upd" parent="parentStep">
@@ -117,7 +128,7 @@
 		</step>
 
 		<split id="splitJcic3" task-executor="taskExecutor"
-			next="splitIas34">
+			next="splitJcic4">
 			<flow>
 				<step id="l8JcicB092Upd" parent="parentStep">
 					<tasklet ref="L8JcicB092Upd" />
@@ -133,6 +144,9 @@
 					<tasklet ref="L8JcicB094Upd" />
 				</step>
 			</flow>
+		</split>
+		<split id="splitJcic4" task-executor="taskExecutor"
+			next="splitIas34">
 			<flow>
 				<step id="l8JcicB095Upd" parent="parentStep">
 					<tasklet ref="L8JcicB095Upd" />
@@ -141,11 +155,6 @@
 			<flow>
 				<step id="l8JcicB096Upd" parent="parentStep">
 					<tasklet ref="L8JcicB096Upd" />
-				</step>
-			</flow>
-			<flow>
-				<step id="l8JcicRelUpd" parent="parentStep">
-					<tasklet ref="L8JcicRelUpd" />
 				</step>
 			</flow>
 		</split>
@@ -186,7 +195,8 @@
 		</split>
 
 		<!-- IFRS9 月檔 -->
-		<split id="splitIfrs9" task-executor="taskExecutor" next="startMonthlyRptFlow">
+		<split id="splitIfrs9" task-executor="taskExecutor"
+			next="startMonthlyRptFlow">
 			<flow>
 				<step id="l7LoanIfrs9ApUpd" parent="parentStep">
 					<tasklet ref="L7LoanIfrs9ApUpd" />
@@ -233,7 +243,8 @@
 				</step>
 			</flow>
 		</split>
-		<step id="startMonthlyRptFlow" parent="parentStep" next="eomFinal">
+		<step id="startMonthlyRptFlow" parent="parentStep"
+			next="eomFinal">
 			<job ref="monthlyRptFlow" job-launcher="jobLauncher" />
 		</step>
 		<!-- 每月批次結束，判斷是否需要執行年批 -->

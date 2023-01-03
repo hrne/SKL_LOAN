@@ -59,14 +59,13 @@ public class L4941 extends TradeBuffer {
 		List<AchAuthLogHistory> lAchAuthLogHistory = new ArrayList<AchAuthLogHistory>();
 
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		// wk
 		String wkUser = "";
 
 		Slice<AchAuthLogHistory> sAchAuthLogHistory = null;
 
-		sAchAuthLogHistory = achAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
+		sAchAuthLogHistory = achAuthLogHistoryService.custNoEq(custNo, index, limit, titaVo);
 
 		lAchAuthLogHistory = sAchAuthLogHistory == null ? null : sAchAuthLogHistory.getContent();
 
@@ -101,7 +100,7 @@ public class L4941 extends TradeBuffer {
 
 				}
 				this.info("updateTime = " + updateTime);
-
+				
 				occursList.putParam("OOLogNo", tAchAuthLogHistory.getLogNo());
 				occursList.putParam("OOCustNo", tAchAuthLogHistory.getCustNo());
 				occursList.putParam("OOFacmNo", tAchAuthLogHistory.getFacmNo());

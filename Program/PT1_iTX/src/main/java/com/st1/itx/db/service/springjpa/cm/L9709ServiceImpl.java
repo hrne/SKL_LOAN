@@ -37,16 +37,18 @@ public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9709ServiceImpl findAll endDate = " + endDate);
 
 		String sql = " ";
-		sql += " SELECT A.\"AcNoCode\"          AS F0";
-		sql += "      , SUM(NVL(A.\"DbAmt\",0)) AS F1 ";
-		sql += "      , SUM(NVL(A.\"CrAmt\",0)) AS F2 ";
+		sql += " SELECT A.\"AcNoCode\"";
+		sql += "      , A.\"AcDate\"";
+		sql += "      , SUM(NVL(A.\"DbAmt\",0)) AS \"DbAmt\" ";
+		sql += "      , SUM(NVL(A.\"CrAmt\",0)) AS \"CrAmt\" ";
 		sql += " FROM   \"AcMain\" A ";
 		sql += " WHERE A.\"AcDate\" >= :startDate ";
 		sql += "   AND A.\"AcDate\" <= :endDate ";
-		sql += "   AND A.\"AcNoCode\" IN ('20222180000', '20222180100', '20222180200') ";
-		sql += " GROUP BY A.\"AcNoCode\" ";
-		sql += " ORDER BY A.\"AcNoCode\" ";
-
+		sql += "   AND A.\"AcNoCode\" IN ('20222180000', '20222180100', '20222180200','20222060000') ";
+		sql += " GROUP BY A.\"AcDate\" ";
+		sql += " 		 ,A.\"AcNoCode\" ";
+		sql += " ORDER BY A.\"AcDate\" ";
+		sql += " 		 ,A.\"AcNoCode\" ";
 		this.info("sql=" + sql);
 		Query query;
 

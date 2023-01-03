@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AchAuthLogHistory;
@@ -45,6 +47,17 @@ public interface AchAuthLogHistoryService {
    * @return Slice AchAuthLogHistory AchAuthLogHistory of List
    */
   public Slice<AchAuthLogHistory> facmNoEq(int custNo_0, int facmNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustNo =
+   *
+   * @param custNo_0 custNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AchAuthLogHistory AchAuthLogHistory of List
+   */
+  public Slice<AchAuthLogHistory> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By AchAuthLogHistory

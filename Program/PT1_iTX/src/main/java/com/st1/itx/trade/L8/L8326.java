@@ -2,6 +2,7 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /* 套件 */
@@ -109,12 +110,16 @@ public class L8326 extends TradeBuffer {
 		iJcicZ447Id.setCustId(iCustId);
 		iJcicZ447Id.setApplyDate(iApplyDate);
 		iJcicZ447Id.setCourtCode(iCourtCode);
-		JcicZ451 iJcicZ451 = new JcicZ451();
+//		JcicZ451 iJcicZ451 = new JcicZ451();
+		Slice<JcicZ451> iJcicZ451;
 		JcicZ451Id iJcicZ451Id = new JcicZ451Id();
 		iJcicZ451Id.setSubmitKey(iSubmitKey);
 		iJcicZ451Id.setCustId(iCustId);
 		iJcicZ451Id.setApplyDate(iApplyDate);
 		iJcicZ451Id.setCourtCode(iCourtCode);
+		
+		this.info("iApplyDate   = " + iApplyDate);
+		
 		// 檢核項目(D-51)
 		if (!"4".equals(iTranKey_Tmp)) {
 
@@ -154,18 +159,28 @@ public class L8326 extends TradeBuffer {
 				// 1.5 檢核同一KEY值於'451':延期繳款期間不可報送「結案原因代號」 為'00'之本檔案資料
 				if ("00".equals(iCloseCode)) {
 					this.info("進入檢核結案原因代號00");
+					this.info("iJcicZ451Id     = "  + iJcicZ451Id);
 					// @@@SQL-Function需改為custRcSubCourtEq
 //					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000,
 //							iCourtCode, 0, 0, Integer.MAX_VALUE, titaVo);
-					iJcicZ451 = sJcicZ451Service.findById(iJcicZ451Id, titaVo);
+//					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custRcSubCourtEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode
+//							, 0, Integer.MAX_VALUE, titaVo);
+//					iJcicZ451 = (JcicZ451) sJcicZ451Service.custRcSubCourtEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode, 0, 1, titaVo);
+					iJcicZ451 = sJcicZ451Service.custRcSubCourtEq(iSubmitKey, iCustId, iApplyDate+19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					this.info("iJcicZ451   =  " + iJcicZ451);
 					if (iJcicZ451 != null) {
+						this.info("iJcicZ451.getContent()   = " + iJcicZ451.getContent());
+//					if (sJcicZ451 != null) {
 						this.info("有資料");
 						int sDelayYM = 0;
 //						for (JcicZ451 xJcicZ451 : iJcicZ451) {
 //							if (!"D".equals(iJcicZ451.getTranKey()) && iJcicZ451.getDelayYM() > sDelayYM) {
-						if (!"D".equals(iJcicZ451.getTranKey())) {
+//						if (!"D".equals(iJcicZ451.getTranKey())) {
+						List<JcicZ451> ixJcicZ451 = iJcicZ451 == null ? null : iJcicZ451.getContent();
+						for(JcicZ451 ixxJcicZ451:ixJcicZ451) {
+						if (!"D".equals(ixxJcicZ451.getTranKey())) {
 								this.info("有資料2");
-								sDelayYM = iJcicZ451.getDelayYM();
+								sDelayYM = ixxJcicZ451.getDelayYM();
 							}
 //						}
 						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
@@ -174,12 +189,13 @@ public class L8326 extends TradeBuffer {
 						if (txDate <= formateDelayYM) {
 							if ("C".equals(iTranKey)) {
 								throw new LogicException("E0007",
-										"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+										"於(451)前置調解延期繳款期間(" + ixxJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
 							} else {
 								throw new LogicException("E0005",
-										"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+										"於(451)前置調解延期繳款期間(" + ixxJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
 							}
 						}
+					}
 					}
 				} // 1.5 end
 			}
@@ -196,7 +212,7 @@ public class L8326 extends TradeBuffer {
 			chJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			this.info("TEST===" + chJcicZ446);
 			if (chJcicZ446 != null) {
-				throw new LogicException("E0002", "已有相同資料");
+				throw new LogicException("E0005", "已有相同資料");
 			}
 
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");

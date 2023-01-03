@@ -45,12 +45,9 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L4941]                                 ACH授權資料歷史紀錄查詢"],
 [#<->#,"#FdCustNo+戶號",#CustNo],
-[#<->#,"#FdFacmNo+額度",#FacmNo],
 ]
 
 #FdCustNo=X,2,L
-T(3,*)
-#FdFacmNo=X,2,L
 T(3,*)
 
 
@@ -114,7 +111,6 @@ T(3,N:N-新檔;O:O-舊檔;Y:Y)
 #NTXBUF=X,29,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustNo,#NTXBUF,1,7)
-T(1,@FacmNo,#NTXBUF,8,3)
 
 #PREVALUE=A,1,S
 
@@ -131,10 +127,6 @@ C(3,#CHAIN,0,$,s)
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,T(2,#CustNo)) 
 
-! 戶號
-#FacmNo=A,3,I
-C(3,#CHAIN,0,$,s)
-@V(2,0)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -227,7 +219,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_SEARCH})
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #CustNo
-#FacmNo
 #END
 </sub>
 

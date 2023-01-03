@@ -53,12 +53,12 @@ INVOKEJS(SHOW,p7,0)
 ["#FdTempItemCode+作業項目",#TempItemCode,#TempItemCodeX],
 ["#FdTempReasonCode+暫收帳戶",#TempReasonCode,#TempReasonCodeX],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
-["#FdTempAmt+暫收款金額",#TwTempAmt,#UsTempAmt],
+["#FdFacmNo+額度編號",#FacmNo,#TmpFacmNoXX],
+["#FdTempAmt+暫收款金額",#TwTempAmt,#UsTempAmt,#ExcessiveXX],
 ["#FdChequeAcct+支票帳號",#ChequeAcct,#BTN4],
 ["#FdChequeNo+支票號碼",#ChequeNo],
 ["#FdChequeAmt+支票金額",#ChequeAmtX],
 !["#FdTempDrawCode+代收抽退票",#TempDrawCode,#TempDrawCodeX],
-["#FdFacmNo+額度編號",#FacmNo,#TmpFacmNoXX],
 ["#FdDescription+摘要內容",#Description],
 ]
 
@@ -276,8 +276,6 @@ T(2,@RmkCustNo,#TimCustNo)
 <include src="COM.icf::LockControl.rtn"/>
 <include src="COM.icf::CustRmk.rtn"/>
 
-#TimFacmNo=A,3,S
-C(4,#ApplNo,E(0,0),E(0,#L2r05FacmNo))
 
 #TimCustNoX=x,100,S
 C(4,#CustNo,$,T(2,#CustNoX))
@@ -308,12 +306,12 @@ C(4,#Description,C(3,#TempItemCode,2,T(3,@Description,退票原因- -存款不�
 T(3,)T(H,#TempItemCode,#TempItemCodeHelp)
 
 #showbtn4=X,1,S
-SWITCH(#TempItemCode,01,SHOW(#BTN4)INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p1,8,10,1)
-                    ,02,SHOW(#BTN4)INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p1,8,10,1)
-                    ,03,SHOW(#BTN4)INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p1,8,10,1)
-                    ,04,HIDE(#BTN4)INVOKEJS(SHOW,p1,7,7,1)INVOKEJS(SHOW,p1,8,10,0)
-                    ,05,HIDE(#BTN4)INVOKEJS(SHOW,p1,7,7,1)INVOKEJS(SHOW,p1,8,10,0)
-                    ,11,HIDE(#BTN4)INVOKEJS(SHOW,p1,7,7,1)INVOKEJS(SHOW,p1,8,10,0))
+SWITCH(#TempItemCode,01,SHOW(#BTN4)INVOKEJS(SHOW,p1,8,8,0)INVOKEJS(SHOW,p1,9,11,1)
+                    ,02,SHOW(#BTN4)INVOKEJS(SHOW,p1,8,8,0)INVOKEJS(SHOW,p1,9,11,1)
+                    ,03,SHOW(#BTN4)INVOKEJS(SHOW,p1,8,8,0)INVOKEJS(SHOW,p1,9,11,1)
+                    ,04,HIDE(#BTN4)INVOKEJS(SHOW,p1,8,8,1)INVOKEJS(SHOW,p1,9,11,0)
+                    ,05,HIDE(#BTN4)INVOKEJS(SHOW,p1,8,8,1)INVOKEJS(SHOW,p1,9,11,0)
+                    ,11,HIDE(#BTN4)INVOKEJS(SHOW,p1,8,8,1)INVOKEJS(SHOW,p1,9,11,0))
 
 ![暫收帳戶]
 #FdTempReasonCode=X,2,L
@@ -347,6 +345,11 @@ RESET_RIM(#SendL3r05,L3R05)
 S(L3R05,1,#RimTxCode,#RimCustNo,#RimFacmNo,#RimTempReasonCode,#RimTempItemCode)
 R(1,L3R05)
 C(4,#L3r05TmpFacmNoX,T(2,@TmpFacmNoXX,),T(B,@TmpFacmNoXX,暫收指定額度：+#L3r05TmpFacmNoX))
+E(0,@Excessive,#L3r05TempAmt)
+E(0,@ExcessiveAll,#L3r05ExcessiveAll)
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+T(B,@ExcessiveXX,#ExcessiveX+（全戶：+#ExcessiveAllX+）)
 
 #TmpFacmNoXX=X,60,L
 
@@ -366,11 +369,28 @@ T(3,)T(H,#CurrencyCode,#CurrencyCodeHelp)
 #CURNM=_,_,S
 T(2,#CurrencyCode)
 
+
+
+
 #WkHideAmt=X,1,S
 C(3,#Precision,0,SHOW(#TwTempAmt)
                  HIDE(#UsTempAmt)
                 ,HIDE(#TwTempAmt)
                  SHOW(#UsTempAmt))
+
+
+
+![額度編號]
+!作業項目=9,10,25,29必須輸入,其他不可輸入
+#FdFacmNo=X,2,L
+
+#FacmNo=A,3,I
+IF(#TempItemCode==01 ||#TempItemCode==02,S,$)
+T(3,@RelationName,)
+
+#TimFacmNo=A,3,S
+C(4,#ApplNo,E(0,#FacmNo),E(0,#L2r05FacmNo))
+
 
 ![暫收款金額]
 !退還暫收款金額不可>該戶號目前暫收金額
@@ -400,6 +420,22 @@ V(5,0,#L3r05TempAmt)
 C(3,#Precision,0,E(0,#TwTempAmt),E(0,#UsTempAmt))
 C(3,#TimTempAmt,0,T(3,@FdChequeAcct,*)T(3,@FdChequeNo,*)
                  ,T(3,@FdChequeAcct, )T(3,@FdChequeNo, ))
+
+
+#FdExcessive=X,2,L
+
+#Excessive=m,14.2,S
+E(0,#L3r05TempAmt)
+#ExcessiveAll=m,14.2,S
+E(0,#L3r05ExcessiveAll)
+
+#ExcessiveX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Excessive,#ExcessiveX)
+#ExcessiveAllX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#ExcessiveAll,#ExcessiveAllX)
+#ExcessiveXX=X,50,L
+
+
 
 #WKHIDECHQAMT=X,1,S
 
@@ -474,14 +510,6 @@ C(4,#CustNo,$,T(2,@RpCustName,#CustNoX))
 C(4,#CustId,$,T(2,@RpCustName,#CustIdX))
 C(4,#ApplNo,$,T(2,@RpCustName,#ApplNoX))
 T(2,@RP_CUSTNM,#RpCustName)
-
-![額度編號]
-!作業項目=9,10,25,29必須輸入,其他不可輸入
-#FdFacmNo=X,2,L
-
-#FacmNo=A,3,I
-IF(#TempItemCode==01 ||#TempItemCode==02,S,$)
-T(3,@RelationName,)
 
 #MRKEY=_,_,S
 C(3,#TimFacmNo,0,T(2,#TimCustNo+-+#FacmNo),T(2,#TimCustNo+-+#TimFacmNo))
