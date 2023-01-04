@@ -93,7 +93,6 @@ public class L8921 extends TradeBuffer {
 			} else {
 				occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 			}
-			
 
 			occursList.putParam("OOFactor", tMlaundryChkDtl.getFactor()); // 交易樣態
 			occursList.putParam("OOEntryDate", tMlaundryChkDtl.getDtlEntryDate()); // 實際入帳日期

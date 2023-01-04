@@ -40,7 +40,7 @@ public class LM016ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT GC.\"CustNo\" AS F0";
 		sql += "            ,\"Fn_ParseEOL\"(CM.\"CustName\",0) AS F1";
 		sql += "            ,GC.\"FacmNo\" AS F2";
-		sql += "            ,DECODE(LM2.\"LoanBal\",0,0,LM.\"PrevPayIntDate\") AS F3";
+		sql += "            ,DECODE(DECODE(LM2.\"LoanBal\",0,0,LM.\"GraceDate\"),0,0,LM.\"PrevPayIntDate\") AS F3";
 		sql += "            ,DECODE(LM2.\"LoanBal\",0,0,LM.\"GraceDate\") AS F4";
 		sql += "            ,DECODE(LM2.\"LoanBal\",0,0,LM2.\"LoanBal\") AS F5";
 		sql += "            ,GC.\"ActUse\" AS F6";

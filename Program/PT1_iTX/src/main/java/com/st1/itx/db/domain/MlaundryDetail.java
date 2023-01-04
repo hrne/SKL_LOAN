@@ -78,6 +78,14 @@ public class MlaundryDetail implements Serializable {
   @Column(name = "`ManagerDesc`", length = 200)
   private String managerDesc;
 
+  // 流程控制帳務日
+  @Column(name = "`FlEntdy`")
+  private int flEntdy = 0;
+
+  // 流程控制序號
+  @Column(name = "`FlowNo`", length = 18)
+  private String flowNo;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -327,6 +335,44 @@ N:不同意
   }
 
 /**
+	* 流程控制帳務日<br>
+	* 
+	* @return Integer
+	*/
+  public int getFlEntdy() {
+    return StaticTool.bcToRoc(this.flEntdy);
+  }
+
+/**
+	* 流程控制帳務日<br>
+	* 
+  *
+  * @param flEntdy 流程控制帳務日
+  * @throws LogicException when Date Is Warn	*/
+  public void setFlEntdy(int flEntdy) throws LogicException {
+    this.flEntdy = StaticTool.rocToBc(flEntdy);
+  }
+
+/**
+	* 流程控制序號<br>
+	* 
+	* @return String
+	*/
+  public String getFlowNo() {
+    return this.flowNo == null ? "" : this.flowNo;
+  }
+
+/**
+	* 流程控制序號<br>
+	* 
+  *
+  * @param flowNo 流程控制序號
+	*/
+  public void setFlowNo(String flowNo) {
+    this.flowNo = flowNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -406,7 +452,7 @@ N:不同意
   @Override
   public String toString() {
     return "MlaundryDetail [mlaundryDetailId=" + mlaundryDetailId + ", totalCnt=" + totalCnt + ", totalAmt=" + totalAmt + ", rational=" + rational
-           + ", empNoDesc=" + empNoDesc + ", managerCheck=" + managerCheck + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerDesc=" + managerDesc + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", empNoDesc=" + empNoDesc + ", managerCheck=" + managerCheck + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerDesc=" + managerDesc + ", flEntdy=" + flEntdy
+           + ", flowNo=" + flowNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

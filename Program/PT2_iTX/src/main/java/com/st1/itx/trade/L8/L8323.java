@@ -84,20 +84,20 @@ public class L8323 extends TradeBuffer {
 		
 		BigDecimal iCivil323ExpAmt = new BigDecimal("0");
 		iCivil323ExpAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323ExpAmt").trim());
-		int ixCivil323ExpAmt = iCivil323ExpAmt.intValue();
-		
+		//int ixCivil323ExpAmt = iCivil323ExpAmt.intValue();
+		this.info("iCivil323ExpAmt     = " + iCivil323ExpAmt);
 		BigDecimal iCivil323CashAmt = new BigDecimal("0");
 		iCivil323CashAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323CashAmt").trim());
-		int ixCivil323CashAmt = iCivil323CashAmt.intValue();
-		
+		//int ixCivil323CashAmt = iCivil323CashAmt.intValue();
+		this.info("iCivil323CashAmt       = " + iCivil323CashAmt);
 		BigDecimal iCivil323CreditAmt = new BigDecimal("0");
 		iCivil323CreditAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323CreditAmt").trim());
-		int ixCivil323CreditAmt = iCivil323CreditAmt.intValue();
-		
+		//int ixCivil323CreditAmt = iCivil323CreditAmt.intValue();
+		this.info("iCivil323CreditAmt    = " + iCivil323CreditAmt);
 		BigDecimal iCivil323GuarAmt = new BigDecimal("0");
 		iCivil323GuarAmt = parse.stringToBigDecimal(titaVo.getParam("Civil323GuarAmt").trim());
-		int ixCivil323GuarAmt = iCivil323GuarAmt.intValue();
-		
+		//int ixCivil323GuarAmt = iCivil323GuarAmt.intValue();
+		this.info("iCivil323GuarAmt      = " + iCivil323GuarAmt );
 		int iReceExpPrin = Integer.valueOf(titaVo.getParam("ReceExpPrin").trim());
 		int iReceExpInte = Integer.valueOf(titaVo.getParam("ReceExpInte").trim());
 		int iReceExpPena = Integer.valueOf(titaVo.getParam("ReceExpPena").trim());
@@ -183,7 +183,9 @@ public class L8323 extends TradeBuffer {
 			// 7
 			// 第10欄「是否為本金融機構債務人」填報'Y',且第11欄「有擔保債權筆數」填報'0'者，檢核本檔案格式[第12+13+14+15欄'依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額]之值需大於0，否則予以剔退.
 			if ("Y".equals(iIsClaims) && iGuarLoanCnt == 0) {
-				if ((ixCivil323ExpAmt + ixCivil323CashAmt + ixCivil323CreditAmt + ixCivil323GuarAmt) <= 0) {
+				int ix = BigDecimal.ZERO.compareTo((iCivil323ExpAmt.add(iCivil323CashAmt).add(iCivil323CreditAmt).add(iCivil323GuarAmt)));
+				this.info("ix   = " + ix);
+				if (ix == 0 ) {
 					if ("A".equals(iTranKey)) {
 						throw new LogicException("E0005",
 								"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息餘額」之合計值需大於0.");

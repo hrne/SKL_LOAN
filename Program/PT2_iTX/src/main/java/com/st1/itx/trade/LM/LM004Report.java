@@ -41,10 +41,11 @@ public class LM004Report extends MakeReport {
 		} catch (Exception e) {
 			this.info("lM004ServiceImpl.findAll_Excel error = " + e.toString());
 		}
-
+		
+			
 		lm004report1.setParentTranCode(this.getParentTranCode());
-		lm004report2.setParentTranCode(this.getParentTranCode());
 		lm004report1.exec(titaVo, lM004List);
+		lm004report2.setParentTranCode(this.getParentTranCode());
 		lm004report2.exec(titaVo, lM004List_Excel);
 
 		return true;

@@ -28,82 +28,94 @@ public class LM004Report1 extends MakeReport {
 	@Override
 	public void printHeader() {
 		printHeaderL();
-		this.setBeginRow(9);
+		this.setBeginRow(10);
 		this.setMaxRows(60);
 
 	}
+
 	public void printHeaderL() {
-		this.print(-1, 172, "機密等級：密");
-		this.print(-2, 1, "　 程式 ID：" + this.getParentTranCode());
-		this.print(-2, 100, "新光人壽保險股份有限公司", "C");
-		this.print(-2, 172, "日　期：" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
-		this.print(-3, 1, "　 報　 表："+ this.getRptCode());
-		this.print(-3, 100, "長中短期放款到期明細表", "C");
-		this.print(-3, 172, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
-		this.print(-4, 172, "頁　數：" + this.getNowPage());
-		this.print(-5, 100, getshowRocDate(this.getReportDate()), "C");
-		this.print(-5, 172, "單　位：元");
+		int leftPos = 1;
+		int centerPos = 70;
+		int rightPos = 120;
+		this.print(-1, rightPos, "機密等級：密");
+		this.print(-2, leftPos, "　 程式 ID：" + this.getParentTranCode());
+		this.print(-2, centerPos, "新光人壽保險股份有限公司", "C");
+		this.print(-2, rightPos, "日　期：" + dDateUtil.getNowStringBc().substring(4, 6) + "/"
+				+ dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
+		this.print(-3, leftPos, "　 報　 表：" + this.getRptCode());
+		this.print(-3, centerPos, "長中短期放款到期明細表", "C");
+		this.print(-3, rightPos, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, rightPos, "頁　數：" + this.getNowPage());
+		this.print(-5, centerPos, getshowRocDate(this.getReportDate()), "C");
+		this.print(-5, rightPos, "單　位：元");
+		
+		setFontSize(8);
+		this.print(-7, 1, "　 是否　 商品");
+		this.print(-7, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 介紹人");
+		this.print(-8, 1,
+				"　本利攤　代號　擔保品地區別　 房貸專員　　 戶號　　　 戶名　　　　　 到期日　　 應完成日　　　　 貸放餘額　 上次繳息日　 介紹人　　　 代號　 部室　　　　 區部　　　　　　 通訊處");
+		this.print(-9, 0,
+				"--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
 
 	}
 
 	public void exec(TitaVo titaVo, List<Map<String, String>> LM004List) throws LogicException {
 		this.setCharSpaces(0);
-		
+
 //		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期明細表", "", "A4", "L");
-		String brno=titaVo.getBrno();
+		String brno = titaVo.getBrno();
 		int rptDate = titaVo.getEntDyI();
 		String rptCode = titaVo.getTxcd();
 		String rptName = "長中短期放款到期明細表";
 		String rptSize = "A4";
 		String security = "";
-		String pageOrien= "L";
-		
-		ReportVo reportVo = ReportVo.builder().setBrno(brno).setRptDate(rptDate)
-				.setRptCode(rptCode).setRptItem(rptName).setRptSize(rptSize)
-				.setSecurity(security).setPageOrientation(pageOrien).build();
-		
+		String pageOrien = "L";
+
+		ReportVo reportVo = ReportVo.builder().setBrno(brno).setRptDate(rptDate).setRptCode(rptCode).setRptItem(rptName)
+				.setRptSize(rptSize).setSecurity(security).setPageOrientation(pageOrien).build();
+
 		this.open(titaVo, reportVo);
 
+	
 		if (LM004List.size() != 0) {
-
-			setFontSize(8);
-			this.print(-6, 1, "　 是否　　商品");
-			this.print(-6, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　介紹人");
-			this.print(-7, 1, "　本利攤　 代號　 擔保品地區別　　房貸專員　　　戶號　　　　戶名　　　　　　到期日　　　應完成日　　　　　貸放餘額　　上次繳息日　　介紹人　　　　代號　　部室　　　　　區部" + "　　　　　　　通訊處");
-			this.print(-8, 0,
-					"--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 
 			for (Map<String, String> LM4Vo : LM004List) {
 
 				print(1, 5, LM4Vo.get("F0")); // 本利攤
-				print(0, 12, LM4Vo.get("F1")); // 代號
-				print(0, 20, LM4Vo.get("F2")); // 押品地區別
-				print(0, 23, LM4Vo.get("F3")); // 地區別
-				print(0, 34, LM4Vo.get("F4")); // 房貸專員
-				print(0, 47, PadStart(7, LM4Vo.get("F5")) + "-" + PadStart(3, LM4Vo.get("F6")));// 戶號
-				print(0, 60, LM4Vo.get("F7")); // 戶名
-				print(0, 76, showDate(LM4Vo.get("F8"), 1)); // 到期別
-				print(0, 88, showDate(LM4Vo.get("F9"), 1)); // 應完成日
+				print(0, 11, LM4Vo.get("F1")); // 代號
+				print(0, 17, LM4Vo.get("F2")); // 押品地區別
+				print(0, 20, LM4Vo.get("F3")); // 地區別
+				print(0, 29, LM4Vo.get("F4")); // 房貸專員
+				print(0, 39, PadStart(7, LM4Vo.get("F5")) + "-" + PadStart(3, LM4Vo.get("F6")));// 戶號
+				print(0, 50, LM4Vo.get("F7")); // 戶名
+				print(0, 64, showDate(LM4Vo.get("F8"), 1)); // 到期別
+				print(0, 74, showDate(LM4Vo.get("F9"), 1)); // 應完成日
 
 				BigDecimal f10 = new BigDecimal(LM4Vo.get("F10").toString());
-				print(0, 114, df1.format(f10), "R"); // 貸放餘額
+				print(0, 197, df1.format(f10), "R"); // 貸放餘額
 
-				print(0, 118, showDate(LM4Vo.get("F11"), 1)); // 上次繳息日
-				print(0, 132, LM4Vo.get("F12")); // 介紹人
-				print(0, 145, LM4Vo.get("F13")); // 介紹人代號
-				print(0, 154, LM4Vo.get("F14")); // 部室
-				print(0, 168, LM4Vo.get("F15")); // 區部
-				print(0, 186, LM4Vo.get("F16")); // 通訊處
+				print(0, 100, showDate(LM4Vo.get("F11"), 1)); // 上次繳息日
+				print(0, 112, LM4Vo.get("F12")); // 介紹人
+				print(0, 123, LM4Vo.get("F13")); // 介紹人代號
+				print(0, 130, LM4Vo.get("F14")); // 部室
+				print(0, 142, LM4Vo.get("F15")); // 區部
+				print(0, 157, LM4Vo.get("F16")); // 通訊處
 
 				CheckRow();
 			} // for
-
 		} // if
-		
-		this.close();		
-		//this.toPdf(sno);
+		else {
+			String text = "本日無資料";
+			print(1, 5, text); // 本利攤
+	
+		}
+
+		this.close();
+		// this.toPdf(sno);
 	}
 
 	private String showDate(String date, int iType) {
@@ -115,11 +127,11 @@ public class LM004Report1 extends MakeReport {
 		if (rocdate > 19110000) {
 			rocdate -= 19110000;
 		}
-		
+
 		String rocdatex = String.valueOf(rocdate);
-		
+
 		this.info("MakeReport.toPdf showRocDate2 = " + rocdatex);
-		
+
 		if (iType == 1) {
 			if (rocdatex.length() == 6) {
 				return rocdatex.substring(0, 2) + "/" + rocdatex.substring(2, 4) + "/" + rocdatex.substring(4, 6);
@@ -128,9 +140,11 @@ public class LM004Report1 extends MakeReport {
 			}
 		} else if (iType == 2) {
 			if (rocdatex.length() == 6) {
-				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6) + " 日";
+				return rocdatex.substring(0, 2) + " 年 " + rocdatex.substring(2, 4) + " 月 " + rocdatex.substring(4, 6)
+						+ " 日";
 			} else {
-				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7) + " 日";
+				return rocdatex.substring(0, 3) + " 年 " + rocdatex.substring(3, 5) + " 月 " + rocdatex.substring(5, 7)
+						+ " 日";
 			}
 		} else {
 			return rocdatex;
@@ -151,7 +165,8 @@ public class LM004Report1 extends MakeReport {
 			newPage();
 			this.print(-6, 1, "　 是否　　商品");
 			this.print(-6, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　介紹人");
-			this.print(-7, 1, "　本利攤　 代號　　押品地區別　　房貸專員　　　戶號　　　　戶名　　　　　　到期別　　　應完成日　　　　　貸放餘額　　上次繳息日　　介紹人　　　　代號　　部室　　　　　區部" + "　　　　　　　通訊處");
+			this.print(-7, 1, "　本利攤　 代號　　押品地區別　　房貸專員　　　戶號　　　　戶名　　　　　　到期別　　　應完成日　　　　　貸放餘額　　上次繳息日　　介紹人　　　　代號　　部室　　　　　區部"
+					+ "　　　　　　　通訊處");
 			this.print(-8, 0,
 					"--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		}

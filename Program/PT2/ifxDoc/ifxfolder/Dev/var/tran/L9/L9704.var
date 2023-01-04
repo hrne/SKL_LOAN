@@ -68,26 +68,27 @@ T(4,CHAIN$)
 #INIT=X,1,S
 CALL(#ALWAYS_HIGHLIGHT)
 
-!年月預設值為上月，若系統日(會計日期)為月底日則預設本月
-#DateOfThisMonth=A,8,S
-D(7,3,#SYSDATE,0,0)
-
-#MonthOfToday=A,2,S
-T(1,#DateOfThisMonth,5,2)
-
-
-#MonthOfTomorrow=A,2,S
-T(1,#SYSNDATE,4,2)
-
-#DateOfLastMonth=A,8,S
-D(7,3,#SYSDATE,1,0)
-
+!今天明天日期
+#Today=A,8,S
+D(6,2,#SYSDATE,0)
+#Tomorrow=A,8,S
+D(6,2,#SYSDATE,1)
+!今天明天日期之年
+#TodayYear=A,3,S
+T(1,#Today,2,3)
+#TomorrowYear=A,3,S
+T(1,#Tomorrow,2,3)
+!今天明天日期之月份
+#TodayMonth=A,2,S
+T(1,#Today,5,2)
+#TomorrowMonth=A,2,S
+T(1,#Tomorrow,5,2)
 
 #DefaultYear=A,3,S
-C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,2,3),T(1,#DateOfThisMonth,2,3))
+C(3,#TodayYear,#TomorrowYear,E(0,#TodayYear),E(0,#TomorrowYear))
 
 #DefaultMonth=A,2,S
-C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,5,2),T(2,#MonthOfToday))
+C(3,#TodayMonth,#TomorrowMonth,E(0,#TodayMonth),E(0,#TomorrowMonth))
 
 #ThisMonthDate=D,8,S
 E(0,0)
