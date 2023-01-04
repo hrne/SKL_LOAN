@@ -225,9 +225,22 @@ public class AcRepayCom extends TradeBuffer {
 			TitaVo titaVo) throws LogicException {
 		this.info("settleTempRun ... ilLoanBorTx.size=" + ilLoanBorTx.size() + ", iBaTxList.size=" + iBaTxList.size()
 				+ ", iAcDetailList.size=" + iAcDetailList.size());
+		if (this.baTxList != null) {
+			for (BaTxVo ba : this.baTxList) {
+				this.info("input " + ba.toString());
+			}
+		}
+		for (AcDetail ac : iAcDetailList) {
+			this.info("iinput " + ac.getDbCr() + " " + ac.getAcctCode() + " "
+					+ FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-"
+					+ ac.getBormNo() + " " + ac.getSumNo() + " " + ac.getRvNo());
+		}
+		for (LoanBorTx tx : ilLoanBorTx) {
+			this.info("input " + tx.toString());
+		}
+
 		this.titaVo = titaVo;
 		this.baTxList = iBaTxList;
-
 		if (ilLoanBorTx.size() > 0) {
 			this.iRepayCode = ilLoanBorTx.get(0).getRepayCode();
 			this.iEntryDate = ilLoanBorTx.get(0).getEntryDate();
@@ -925,8 +938,17 @@ public class AcRepayCom extends TradeBuffer {
 			this.lAcDetail = iAcList;
 			return this.lAcDetail;
 		}
+		this.lAcDetail = new ArrayList<AcDetail>();
 
-		// 放款還款
+		// 搬暫收款前分錄
+		for (AcDetail ac : iAcList) {
+			if ("090".equals(ac.getSumNo()) && "D".equals(ac.getDbCr())) {
+				break;
+			}
+			this.lAcDetail.add(ac);
+		}
+
+		// 搬暫收款後 splitAcSeq
 		for (AcDetail ac : iAcList) {
 			ii++;
 			if ("090".equals(ac.getSumNo()) && "D".equals(ac.getDbCr())) {
@@ -935,15 +957,6 @@ public class AcRepayCom extends TradeBuffer {
 			}
 		}
 		this.info("isTempTransfer=" + isTempTransfer + ", splitAcSeq=" + splitAcSeq);
-
-		this.lAcDetail = new ArrayList<AcDetail>();
-
-		int acSeq = 0;
-
-		// 搬暫收款前分錄
-		for (int i = 0; i < splitAcSeq; i++) {
-			this.lAcDetail.add(lAcDetailOld.get(i));
-		}
 
 		// 額度使用金額
 		HashMap<Integer, BigDecimal> tempAmtMap = new HashMap<>();
@@ -1037,6 +1050,7 @@ public class AcRepayCom extends TradeBuffer {
 			// 本額度抵繳
 			if (selfTempMap.get(txFacmNo) != null) {
 				selfTempAmt = selfTempMap.get(txFacmNo);
+				this.info("selfTempRepay txFacmNo=" + txFacmNo + ", selfTempAmt=" + selfTempAmt);
 				if (selfTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 					AcDetail acDetail = new AcDetail();
 					acDetail.setDbCr("D");
@@ -1050,11 +1064,14 @@ public class AcRepayCom extends TradeBuffer {
 				}
 			}
 			// 轉額度抵繳
-			if (tempAmtMap.get(txFacmNo).compareTo(BigDecimal.ZERO) > 0) {
+			BigDecimal transferTempAmt = BigDecimal.ZERO;
+			transferTempAmt = tempAmtMap.get(txFacmNo).subtract(selfTempAmt);
+			this.info("轉額度抵繳 txFacmNo=" + txFacmNo + ", selfTempAmt=" + selfTempAmt);
+			if (transferTempAmt.compareTo(BigDecimal.ZERO) > 0) {
 				AcDetail acDetail = new AcDetail();
 				acDetail.setDbCr("D");
 				acDetail.setAcctCode("TAV");
-				acDetail.setTxAmt(tempAmtMap.get(txFacmNo).subtract(selfTempAmt));
+				acDetail.setTxAmt(transferTempAmt);
 				acDetail.setCustNo(lAcDetailOld.get(0).getCustNo());
 				acDetail.setFacmNo(txFacmNo);
 				acDetail.setBormNo(0);
@@ -1068,7 +1085,7 @@ public class AcRepayCom extends TradeBuffer {
 			this.lAcDetail.add(lAcDetailOld.get(i));
 		}
 
-		acSeq = 0;
+		int acSeq = 0;
 		for (AcDetail ac : this.lAcDetail) {
 			acSeq++;
 			ac.setAcSeq(acSeq);

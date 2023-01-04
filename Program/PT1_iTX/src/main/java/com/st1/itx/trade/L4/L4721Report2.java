@@ -175,9 +175,9 @@ public class L4721Report2 extends MakeReport {
 					if (tempfacmno == parse.stringToInteger(mapL4721Detail.get("FacmNo"))) { // 相同額度
 						// 該額度第一次進要印0102
 						if (times == 0) {
-							result = sameFacmno(mapL4721Detail, result, false);
-						} else {
 							result = sameFacmno(mapL4721Detail, result, true);
+						} else {
+							result = sameFacmno(mapL4721Detail, result, false);
 						}
 						times++;
 					} else { // 不同額度 印04並且切到下一個額度循環
@@ -208,7 +208,7 @@ public class L4721Report2 extends MakeReport {
 								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
 						result.add(line);
 
-						result = sameFacmno(mapL4721Detail, result, false);
+						result = sameFacmno(mapL4721Detail, result, true);
 						// 換額度要重新算次數
 						times = 0;
 					} // else
@@ -228,10 +228,22 @@ public class L4721Report2 extends MakeReport {
 
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
 			// 011 1 0 0 0 台北市信義區永吉路１２０巷５０弄１號３樓 0001743 陳清耀
+
+			String locationX = tmap.get("Location").toString();
+			String locationXX = "";
+			String s = "";
+			for (int i = 0; i < locationX.length(); i++) {
+				locationXX = toX(locationX.substring(i, i + 1), locationXX);
+			}
+			String X = "";
+			X = toXX(locationXX, "　", 30);
+			this.info("X = " + X);
+			String C = "";
+			C = toXX("", "　", 20);
+
 			line = "";
 			line += "01";
-			line += FormatUtil.padX("", 10) + FormatUtil.padX(tmap.get("Location"), 60) + "    "
-					+ FormatUtil.padX("", 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
+			line += FormatUtil.padX("", 10) + X + "    " + C + " " + FormatUtil.pad9(tmap.get("CustNo"), 7) + " "
 					+ FormatUtil.padX(tmap.get("CustName"), 10) + "    " + FormatUtil.padX("", 65);
 			// 加入明細
 			result.add(line);
@@ -261,7 +273,7 @@ public class L4721Report2 extends MakeReport {
 			line = "";
 			line += "02";
 			line += " " + FormatUtil.padX(tmap.get("CustName"), 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7)
-					+ FormatUtil.pad9(tmap.get("SpecificDd"), 6) + " 日" + "          "
+					+ FormatUtil.rightPad9(tmap.get("SpecificDd"), 6) + " 日" + "          "
 					+ FormatUtil.padX(tmap.get("RepayCodeX"), 8) + "   " + FormatUtil.pad9(titaVo.getCalDy(), 8)
 					+ FormatUtil.pad9(tmap.get("LoanBal"), 11) + loanBalX + FormatUtil.pad9(headerExcessive, 11)
 					+ headerExcessiveX;
@@ -329,14 +341,67 @@ public class L4721Report2 extends MakeReport {
 
 //		line += showRocDate(tmap.get("EntryDate"), 3) + dateRange + " " + tmap.get("RepayCodeX") + "   "
 		line += FormatUtil.pad9(tmap.get("EntryDate"), 8) + dateRange + " " + FormatUtil.padX(tmap.get("RepayCodeX"), 8)
-				+ "   " + FormatUtil.pad9(formatAmt(tmap.get("TxAmt"), 0), 10) + txAmtX
-				+ FormatUtil.pad9(formatAmt(tmap.get("Principal"), 0), 10) + principalX
-				+ FormatUtil.pad9(formatAmt(tmap.get("Interest"), 0), 10) + interestX
-				+ FormatUtil.pad9(formatAmt(tmap.get("BreachAmt"), 0), 10) + breachAmtX
-				+ FormatUtil.pad9(formatAmt(tmap.get("OtherFee"), 0), 10) + OtherFeeX;
+				+ "   " + FormatUtil.pad9(tmap.get("TxAmt"), 10) + txAmtX + FormatUtil.pad9(tmap.get("Principal"), 10)
+				+ principalX + FormatUtil.pad9(tmap.get("Interest"), 10) + interestX
+				+ FormatUtil.pad9(tmap.get("BreachAmt"), 10) + breachAmtX + FormatUtil.pad9(tmap.get("OtherFee"), 10)
+				+ OtherFeeX;
 		// 加入明細
 		result.add(line);
 
 		return result;
+	}
+
+	// 改全型
+	private String toX(String s, String x) {
+
+		if ("0".equals(s)) {
+			x += "０";
+		} else if ("1".equals(s)) {
+			x += "１";
+		} else if ("2".equals(s)) {
+			x += "２";
+		} else if ("3".equals(s)) {
+			x += "３";
+		} else if ("4".equals(s)) {
+			x += "４";
+		} else if ("5".equals(s)) {
+			x += "５";
+		} else if ("6".equals(s)) {
+			x += "６";
+		} else if ("7".equals(s)) {
+			x += "７";
+		} else if ("8".equals(s)) {
+			x += "８";
+		} else if ("9".equals(s)) {
+			x += "９";
+		} else if (" ".equals(s)) {
+			x += "　";
+		} else if ("%".equals(s)) {
+			x += "％";
+		} else if (",".equals(s)) {
+			x += "，";
+		} else {
+			x += s;
+		}
+		return x;
+	}
+
+	// 改補足出出切位置
+	// s 傳入值
+	// x 補什麼值
+	// 長度
+	private String toXX(String s, String x, int i) {
+		String z = "";
+		if (s.length() < i) {
+			int il = i - s.length();
+			for (int ii = 0; ii < il; ii++) {
+				s += x;
+
+				this.info("s =" + s);
+			}
+			z = s;
+		}
+		this.info("z =" + z);
+		return z;
 	}
 }
