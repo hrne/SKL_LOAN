@@ -273,17 +273,13 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ")  ";
 
 		sql += "SELECT F.\"CustNo\"                              AS F0  "; // 戶號
-		sql += "     , F.\"EntryDate\"                           AS F1  "; // 入帳日期
+		sql += "     , :iEntryDateE                              AS F1  "; // 入帳日期-本次區間入帳迄日代表本批資料
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor1Amt\" >=   :iFactor1TotLimit ";
-//		sql += "         THEN  F.\"Factor1Cnt\" ";
 		sql += "         WHEN SC.\"Factor1Amt\" >=   :iFactor1TotLimit ";
 		sql += "         THEN  SC.\"Factor1Cnt\" ";
 		sql += "       ELSE 0 ";
 		sql += "       END                                     AS F2  "; // 洗錢樣態一累計筆數
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor1Amt\" >=   :iFactor1TotLimit ";
-//		sql += "         THEN  F.\"Factor1Amt\" ";
 		sql += "         WHEN SC.\"Factor1Amt\" >=   :iFactor1TotLimit ";
 		sql += "         THEN  SC.\"Factor1Amt\" ";
 		sql += "       ELSE 0 ";
@@ -294,15 +290,11 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ELSE 0 ";
 		sql += "       END                                     AS F4  "; // 洗錢樣態一資料重複 (1.是)
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor2Cnt\" >= :iFactor2Count ";
-//		sql += "         THEN  F.\"Factor2Cnt\" ";
 		sql += "         WHEN SC.\"Factor2Cnt\" >= :iFactor2Count ";
 		sql += "         THEN  SC.\"Factor2Cnt\" ";
 		sql += "       ELSE 0 ";
 		sql += "       END                                     AS F5  "; // 洗錢樣態二累計筆數
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor2Cnt\" >= :iFactor2Count ";
-//		sql += "         THEN  F.\"Factor2Amt\" ";
 		sql += "         WHEN SC.\"Factor2Cnt\" >= :iFactor2Count ";
 		sql += "         THEN  SC.\"Factor2Amt\" ";
 		sql += "       ELSE 0 ";
@@ -315,12 +307,12 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "FROM summaryData F ";
 		sql += "LEFT JOIN  \"MlaundryDetail\" D1 "; // 疑似洗錢交易合理性明細檔
 		sql += "       ON  D1.\"CustNo\" = F.\"CustNo\" ";
-		sql += "      AND  D1.\"EntryDate\" = F.\"EntryDate\" ";
+		sql += "      AND  D1.\"EntryDate\" = :iEntryDateE ";
 		sql += "      AND  D1.\"Factor\" = 1 ";
 		sql += "      AND  F.\"Factor1Amt\" >= :iFactor1TotLimit ";
 		sql += "LEFT JOIN  \"MlaundryDetail\" D2 "; // 疑似洗錢交易合理性明細檔
 		sql += "       ON  D2.\"CustNo\" = F.\"CustNo\" ";
-		sql += "      AND  D2.\"EntryDate\" = F.\"EntryDate\" ";
+		sql += "      AND  D2.\"EntryDate\" = :iEntryDateE ";
 		sql += "      AND  D2.\"Factor\" = 2 ";
 		sql += "      AND  F.\"Factor2Cnt\" >= :iFactor2Count ";
 		sql += "LEFT JOIN summaryCustNo SC ON SC.\"CustNo\" = F.\"CustNo\"  ";
@@ -356,12 +348,12 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE2")) + 19110000; // 入帳日期迄日
 
 //		this.info("findAll1 iFactor1TotLimit = " + iFactor1TotLimit);
-		this.info("findAll1 iFactor2Count = " + iFactor2Count);
-		this.info("findAll1 iFactor2AmtStart = " + iFactor2AmtStart);
-		this.info("findAll1 iFactor2AmtEnd = " + iFactor2AmtEnd);
-		this.info("findAll1 iFactorDays2 = " + iFactorDays);
-		this.info("findAll1 iEntryDateS = " + iEntryDateS);
-		this.info("findAll1 iEntryDateE = " + iEntryDateE);
+		this.info("findAll2 iFactor2Count = " + iFactor2Count);
+		this.info("findAll2 iFactor2AmtStart = " + iFactor2AmtStart);
+		this.info("findAll2 iFactor2AmtEnd = " + iFactor2AmtEnd);
+		this.info("findAll2 iFactorDays2 = " + iFactorDays);
+		this.info("findAll2 iEntryDateS = " + iEntryDateS);
+		this.info("findAll2 iEntryDateE = " + iEntryDateE);
 
 		String sql = "　";
 		sql += "WITH rawData AS ( ";
@@ -592,17 +584,13 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ")  ";
 		
 		sql += "SELECT F.\"CustNo\"                              AS F0  "; // 戶號
-		sql += "     , F.\"EntryDate\"                           AS F1  "; // 入帳日期
+		sql += "     , :iEntryDateE                              AS F1  "; // 入帳日期-本次區間入帳迄日代表本批資料
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor1Amt\" >=   :iFactor1TotLimit ";
-//		sql += "         THEN  F.\"Factor1Cnt\" ";
 		sql += "         WHEN SC.\"Factor1Amt\" >=   :iFactor1TotLimit ";
 		sql += "         THEN  SC.\"Factor1Cnt\" ";
 		sql += "       ELSE 0 ";
 		sql += "       END                                     AS F2  "; // 洗錢樣態一累計筆數
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor1Amt\" >=   :iFactor1TotLimit ";
-//		sql += "         THEN  F.\"Factor1Amt\" ";
 		sql += "         WHEN SC.\"Factor1Amt\" >=   :iFactor1TotLimit ";
 		sql += "         THEN  SC.\"Factor1Amt\" ";
 		sql += "       ELSE 0 ";
@@ -613,15 +601,11 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ELSE 0 ";
 		sql += "       END                                     AS F4  "; // 洗錢樣態一資料重複 (1.是)
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor2Cnt\" >= :iFactor2Count ";
-//		sql += "         THEN  F.\"Factor2Cnt\" ";
 		sql += "         WHEN SC.\"Factor2Cnt\" >= :iFactor2Count ";
 		sql += "         THEN  SC.\"Factor2Cnt\" ";
 		sql += "       ELSE 0 ";
 		sql += "       END                                     AS F5  "; // 洗錢樣態二累計筆數
 		sql += "     , CASE ";
-//		sql += "         WHEN F.\"Factor2Cnt\" >= :iFactor2Count ";
-//		sql += "         THEN  F.\"Factor2Amt\" ";
 		sql += "         WHEN SC.\"Factor2Cnt\" >= :iFactor2Count ";
 		sql += "         THEN  SC.\"Factor2Amt\" ";
 		sql += "       ELSE 0 ";
@@ -634,12 +618,12 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "FROM summaryData F ";
 		sql += "LEFT JOIN  \"MlaundryDetail\" D1 "; // 疑似洗錢交易合理性明細檔
 		sql += "       ON  D1.\"CustNo\" = F.\"CustNo\" ";
-		sql += "      AND  D1.\"EntryDate\" = F.\"EntryDate\" ";
+		sql += "      AND  D1.\"EntryDate\" = :iEntryDateE ";
 		sql += "      AND  D1.\"Factor\" = 1 ";
 		sql += "      AND  F.\"Factor1Amt\" >= :iFactor1TotLimit ";
 		sql += "LEFT JOIN  \"MlaundryDetail\" D2 "; // 疑似洗錢交易合理性明細檔
 		sql += "       ON  D2.\"CustNo\" = F.\"CustNo\" ";
-		sql += "      AND  D2.\"EntryDate\" = F.\"EntryDate\" ";
+		sql += "      AND  D2.\"EntryDate\" = :iEntryDateE ";
 		sql += "      AND  D2.\"Factor\" = 2 ";
 		sql += "      AND  F.\"Factor2Cnt\" >= :iFactor2Count ";
 		sql += "LEFT JOIN summaryCustNo SC ON SC.\"CustNo\" = F.\"CustNo\"  ";
@@ -718,9 +702,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += ")  ";
 		
 		sql += "SELECT F.\"CustNo\"                              AS F0 \n"; // 戶號
-		sql += "     , F.\"EntryDate\"                           AS F1 \n"; // 入帳日期
-//		sql += "     , F.\"Factor3Cnt\"                          AS F8 \n"; // 洗錢樣態三累計筆數
-//		sql += "     , F.\"Factor3Amt\"                          AS F9 \n"; // 洗錢樣態三累計金額
+		sql += "     , :iEntryDateE                              AS F1 \n"; // 入帳日期-本次區間入帳迄日代表本批資料
 		sql += "     , SC.\"Factor3Cnt\"                         AS F8 \n"; // 洗錢樣態三累計筆數
 		sql += "     , SC.\"Factor3Amt\"                         AS F9 \n"; // 洗錢樣態三累計金額
 		sql += "     , CASE \n";
@@ -731,7 +713,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "FROM bankRmtfData F \n";
 		sql += "LEFT JOIN  \"MlaundryDetail\" D3 \n"; // 疑似洗錢交易合理性明細檔
 		sql += "       ON  D3.\"CustNo\" =  F.\"CustNo\" \n";
-		sql += "      AND  D3.\"EntryDate\" =  F.\"EntryDate\" \n";
+		sql += "      AND  D3.\"EntryDate\" =  :iEntryDateE  \n";
 		sql += "      AND  D3.\"Factor\" =  3 \n";
 		sql += "LEFT JOIN summaryCustNo SC ON SC.\"CustNo\" = F.\"CustNo\"  ";
 		
@@ -755,7 +737,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE")) + 19110000; // 入帳日期迄日
 		
 		sql += " SELECT \n";
-		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期
+		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期-本次區間入帳迄日代表本批資料
 		sql += " ,F.\"Factor\"               AS F1 \n"; // 交易樣態
 		sql += " ,F.\"CustNo\"               AS F2 \n"; // 戶號
 		sql += " ,row_number() over (partition by F.\"EntryDate\", F.\"Factor\", F.\"CustNo\" order by F.\"DtlEntryDate\" ASC) \n";
@@ -769,7 +751,6 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,:EntryDateS                AS F10 \n"; // 統計期間起日
 		sql += "  FROM (                                            \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D1.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D1.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D1.\"CustNo\"               AS \"CustNo\"       \n";
@@ -785,11 +766,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON  B2.\"CustNo\" = D1.\"CustNo\"         \n";
 		sql += "              AND  NVL(B2.\"AmlRsp\",'9') in ('0','1','2') ";
 		sql += "              AND  B2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND  B2.\"EntryDate\" = D1.\"EntryDate\"   \n"; //調整
+		sql += "              AND  D1.\"EntryDate\"  =  :EntryDateE   \n"; //調整
 		sql += "        WHERE NVL(B2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D2.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D2.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D2.\"CustNo\"               AS \"CustNo\"    \n";
@@ -805,11 +785,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND A2.\"AcDate\" > 0                      \n";
 		sql += "              AND A2.\"ReturnCode\" IN ('00')            \n";
 		sql += "              AND A2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND A2.\"EntryDate\" = D2.\"EntryDate\"       \n"; //調整
+		sql += "              AND D2.\"EntryDate\" = :EntryDateE         \n"; //調整
 		sql += "        WHERE NVL(A2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D3.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D3.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D3.\"CustNo\"               AS \"CustNo\"    \n";
@@ -825,11 +804,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND P2.\"ProcNoteCode\" IN ('00')          \n";
 		sql += "              AND P2.\"AcDate\" > 0                      \n";
 		sql += "              AND P2.\"TransDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND P2.\"TransDate\" = D3.\"EntryDate\"    \n"; //調整
+		sql += "              AND D3.\"EntryDate\" = :EntryDateE        \n"; //調整
 		sql += "        WHERE NVL(P2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D4.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D4.\"Factor\"               AS \"Factor1Cnt\"   \n";
 		sql += "        ,D4.\"CustNo\"               AS \"CustNo\"    \n";
@@ -845,7 +823,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND C2.\"EntryDate\" > 0                   \n";
 		sql += "              AND C2.\"StatusCode\" =  '1'               \n"; // 1: 兌現入帳
 		sql += "              AND C2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "             AND  C2.\"EntryDate\" = D4.\"EntryDate\"    \n"; //調整
+		sql += "              AND D4.\"EntryDate\" = :EntryDateE         \n"; //調整
 		sql += "        WHERE NVL(C2.\"CustNo\",0)  > 0                  \n";
 		sql += "      ) F                                                \n";
 		sql += " WHERE (CASE WHEN F.\"Factor\" = 1                       \n";
@@ -877,7 +855,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE2")) + 19110000; // 入帳日期迄日
 		
 		sql += " SELECT \n";
-		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期
+		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期-本次區間入帳迄日代表本批資料
 		sql += " ,F.\"Factor\"               AS F1 \n"; // 交易樣態
 		sql += " ,F.\"CustNo\"               AS F2 \n"; // 戶號
 		sql += " ,row_number() over (partition by F.\"EntryDate\", F.\"Factor\", F.\"CustNo\" order by F.\"DtlEntryDate\" ASC) \n";
@@ -891,7 +869,6 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,:EntryDateS                AS F10 \n"; // 統計期間起日
 		sql += "  FROM (                                            \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D1.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D1.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D1.\"CustNo\"               AS \"CustNo\"       \n";
@@ -907,11 +884,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON  B2.\"CustNo\" = D1.\"CustNo\"         \n";
 		sql += "              AND  NVL(B2.\"AmlRsp\",'9') in ('0','1','2') ";
 		sql += "              AND  B2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND  B2.\"EntryDate\" = D1.\"EntryDate\"   \n"; //調整
+		sql += "              AND  D1.\"EntryDate\" = :EntryDateE        \n"; //調整
 		sql += "        WHERE NVL(B2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D2.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D2.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D2.\"CustNo\"               AS \"CustNo\"    \n";
@@ -927,11 +903,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND A2.\"AcDate\" > 0                      \n";
 		sql += "              AND A2.\"ReturnCode\" IN ('00')            \n";
 		sql += "              AND A2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND A2.\"EntryDate\" = D2.\"EntryDate\"    \n"; //調整
+		sql += "              AND D2.\"EntryDate\" = :EntryDateE         \n"; //調整
 		sql += "        WHERE NVL(A2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D3.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D3.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D3.\"CustNo\"               AS \"CustNo\"    \n";
@@ -947,11 +922,10 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND P2.\"ProcNoteCode\" IN ('00')          \n";
 		sql += "              AND P2.\"AcDate\" > 0                      \n";
 		sql += "              AND P2.\"TransDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND P2.\"TransDate\" = D3.\"EntryDate\"    \n"; //調整
+		sql += "              AND D3.\"EntryDate\" = :EntryDateE         \n"; //調整
 		sql += "        WHERE NVL(P2.\"CustNo\",0)  > 0                  \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D4.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D4.\"Factor\"               AS \"Factor1Cnt\"   \n";
 		sql += "        ,D4.\"CustNo\"               AS \"CustNo\"    \n";
@@ -967,7 +941,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND C2.\"EntryDate\" > 0                   \n";
 		sql += "              AND C2.\"StatusCode\" =  '1'               \n"; // 1: 兌現入帳
 		sql += "              AND C2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND C2.\"EntryDate\" = D4.\"EntryDate\"    \n"; //調整
+		sql += "              AND D4.\"EntryDate\" = :EntryDateE         \n"; //調整
 		sql += "        WHERE NVL(C2.\"CustNo\",0)  > 0                  \n";
 		sql += "      ) F                                                \n";
 //		sql += " WHERE (CASE WHEN F.\"Factor\" = 1                       \n";
@@ -996,7 +970,7 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iEntryDateE = Integer.parseInt(titaVo.getParam("EntryDateE3")) + 19110000; // 入帳日期迄日
 		String sql = "　";
 		sql += " SELECT \n";
-		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期
+		sql += "  F.\"EntryDate\"            AS F0 \n"; // 入帳日期-本次區間入帳迄日代表本批資料
 		sql += " ,F.\"Factor\"               AS F1 \n"; // 交易樣態
 		sql += " ,F.\"CustNo\"               AS F2 \n"; // 戶號
 		sql += " ,row_number() over (partition by F.\"EntryDate\", F.\"Factor\", F.\"CustNo\" order by F.\"DtlEntryDate\" ASC) \n";
@@ -1010,7 +984,6 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,:EntryDateS                AS F10 \n"; // 統計期間起日
 		sql += "  FROM (                                            \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D1.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D1.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D1.\"CustNo\"               AS \"CustNo\"       \n";
@@ -1026,12 +999,11 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ON  B2.\"CustNo\" = D1.\"CustNo\"         \n";
 		sql += "              AND  NVL(B2.\"AmlRsp\",'9') in ('0','1','2') ";
 		sql += "              AND  B2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND  B2.\"EntryDate\" = D1.\"EntryDate\"   \n"; //調整
-		sql += "        WHERE NVL(B2.\"CustNo\",0)  > 0                   \n";
+		sql += "              AND  D1.\"EntryDate\" = :EntryDateE        \n"; //調整
+		sql += "        WHERE NVL(B2.\"CustNo\",0)  > 0                  \n";
 //		sql += "          AND  D1.\"Rational\" = '?'                \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D2.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D2.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D2.\"CustNo\"               AS \"CustNo\"    \n";
@@ -1047,12 +1019,11 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND A2.\"AcDate\" > 0                      \n";
 		sql += "              AND A2.\"ReturnCode\" IN ('00')            \n";
 		sql += "              AND A2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND A2.\"EntryDate\" = D2.\"EntryDate\"    \n"; //調整
+		sql += "              AND D2.\"EntryDate\" = :EntryDateE   \n"; //調整
 		sql += "        WHERE NVL(A2.\"CustNo\",0)  > 0                  \n";
 //		sql += "          AND D2.\"Rational\" = '?'                   \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D3.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D3.\"Factor\"               AS \"Factor\"       \n";
 		sql += "        ,D3.\"CustNo\"               AS \"CustNo\"    \n";
@@ -1068,12 +1039,11 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND P2.\"ProcNoteCode\" IN ('00')          \n";
 		sql += "              AND P2.\"AcDate\" > 0                      \n";
 		sql += "              AND P2.\"TransDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND P2.\"TransDate\" = D3.\"EntryDate\"    \n"; //調整
+		sql += "              AND D3.\"EntryDate\" = :EntryDateE         \n"; //調整
 		sql += "        WHERE NVL(P2.\"CustNo\",0)  > 0                  \n";
 //		sql += "          AND D3.\"Rational\" = '?'                   \n";
 		sql += "        UNION ALL                                        \n";
 		sql += "        SELECT                                           \n";
-//		sql += "         D4.\"EntryDate\"            AS \"EntryDate\"    \n";
 		sql += "         :EntryDateE                 AS \"EntryDate\"    \n";
 		sql += "        ,D4.\"Factor\"               AS \"Factor1Cnt\"   \n";
 		sql += "        ,D4.\"CustNo\"               AS \"CustNo\"    \n";
@@ -1089,8 +1059,8 @@ public class L8202ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND C2.\"EntryDate\" > 0                   \n";
 		sql += "              AND C2.\"StatusCode\" =  '1'               \n"; // 1: 兌現入帳
 		sql += "              AND C2.\"EntryDate\" BETWEEN :EntryDateS AND :EntryDateE ";
-		sql += "              AND C2.\"EntryDate\" = D4.\"EntryDate\"    \n"; //調整
-		sql += "        WHERE NVL(C2.\"CustNo\",0)  > 0                    \n";
+		sql += "              AND D4.\"EntryDate\" = :EntryDateE         \n"; //調整
+		sql += "        WHERE NVL(C2.\"CustNo\",0)  > 0                  \n";
 //		sql += "          AND D4.\"Rational\" = '?'                    \n";
 		sql += "      ) F                                                \n";
 		sql += " WHERE (CASE WHEN F.\"Factor\" = 3                       \n";

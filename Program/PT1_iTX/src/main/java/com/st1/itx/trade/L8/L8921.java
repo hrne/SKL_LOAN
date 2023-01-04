@@ -53,8 +53,8 @@ public class L8921 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String DateTime; // YYY/MM/DD hh:mm:ss
-		String Date = "";
+//		String DateTime; // YYY/MM/DD hh:mm:ss
+//		String Date = "";
 		int iAcDateStart = this.parse.stringToInteger(titaVo.getParam("AcDateStart"));
 		int iAcDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDateEnd"));
 		int iFAcDateStart = iAcDateStart + 19110000;
@@ -71,9 +71,9 @@ public class L8921 extends TradeBuffer {
 		// 查詢疑似洗錢樣態檢核明細檔檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;
 		if(iFactor==0) {
-			slMlaundryChkDtl = sMlaundryChkDtlService.findDtlEntryDate(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
+			slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRange(iFAcDateStart, iFAcDateEnd, this.index, this.limit, titaVo);
 		} else {
-			slMlaundryChkDtl = sMlaundryChkDtlService.DtlEntryDateFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
+			slMlaundryChkDtl = sMlaundryChkDtlService.findFactor(iFAcDateStart, iFAcDateEnd, iFactor, this.index, this.limit, titaVo);
 		}
 		
 		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
@@ -110,11 +110,13 @@ public class L8921 extends TradeBuffer {
 			occursList.putParam("OOStartEntryDate", tMlaundryChkDtl.getStartEntryDate()); // 統計期間起日
 			occursList.putParam("OOEndEntryDate", tMlaundryChkDtl.getEntryDate()); // 統計期間止日
 
-			DateTime = this.parse.timeStampToString(tMlaundryChkDtl.getCreateDate()); // 產製日期
-			this.info("L8921 DateTime : " + DateTime);
-			Date = FormatUtil.left(DateTime, 9);
-			occursList.putParam("OOCreateDate", Date);
+//			DateTime = this.parse.timeStampToString(tMlaundryChkDtl.getCreateDate()); // 產製日期
+//			this.info("L8921 DateTime : " + DateTime);
+//			Date = FormatUtil.left(DateTime, 9);
+//			occursList.putParam("OOCreateDate", Date);
+			occursList.putParam("OOCreateDate", tMlaundryChkDtl.getEntryDate()); // 產製日期-本批統計期間止日
 
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

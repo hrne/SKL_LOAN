@@ -532,7 +532,7 @@ BEGIN
                      , 'TMI'   -- 實收火險保費  
                      , 'F07' ) -- 實收法拍費用 
              THEN JL."AcctCode"
-           ELSE TR1."ACTACT" END          AS "AcctCode" 
+           ELSE TO_CHAR(TR1."ACTACT") END          AS "AcctCode" 
           /* 更新交易別代碼 */ 
           -- 2022-11-07 Wei 新增 from Lai 寫在LoanBorTx.xlsx 的 交易別 Sheet
           ,CASE 

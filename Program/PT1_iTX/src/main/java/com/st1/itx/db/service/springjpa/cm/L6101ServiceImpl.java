@@ -39,6 +39,7 @@ public class L6101ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   ,C.\"AcNoItem\"          ";
 		sql += "   ,C.\"AcctItem\"          ";
 		sql += "   ,C.\"ClsChkFlag\"        ";
+		sql += " FROM \"CdAcCodeAcMain\" A  ";
 		sql += " LEFT JOIN \"CdAcCode\" C   ";
 		sql += "        on C.\"AcNoCode\"  = A.\"AcNoCode\"  ";
 		sql += "       and C.\"AcSubCode\" = A.\"AcSubCode\"  ";

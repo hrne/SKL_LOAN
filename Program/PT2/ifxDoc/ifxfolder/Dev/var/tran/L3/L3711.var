@@ -409,7 +409,7 @@ C(3,#Precision,0,SHOW(#TwReduceAmt)
 
 
 #SendL3r06A=X,1,S
-E(0,@RimFuncCode,2)
+E(0,@RimFuncCode,3)
 E(0,@RimCustNo,#TimCustNo)
 E(0,@RimFacmNo,#FacmNo)
 E(0,@RimBormNo,0)
@@ -578,57 +578,57 @@ C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 T(2,#CurrencyCode)
 
 ! !應收付類別,1:還款
-! #TMPRPFG=X,1,S
-! E(0,@RPFG,1)
+#TMPRPFG=X,1,S
+E(0,@RPFG,1)
 
 ! !還款來源,
-! #TMPRPTYP=X,1,S
-! C(3,#L492aRepayType,0,E(0,@RPTYPZ,90),E(0,@RPTYPZ,#L492aRepayCode))
+#TMPRPTYP=X,1,S
+C(3,#L492aRepayType,0,E(0,@RPTYPZ,90),E(0,@RPTYPZ,#L492aRepayCode))
 
 ! !應收付總金額,轉暫收金額
 #TotalRepayAmt=m,14.2,S
 E(0,#Interest-#TimReduceAmt)
-! E(3,@RPTOT,#TotalRepayAmt)
+E(3,@RPTOT,#TotalRepayAmt)
 
 ! !實際收付金額,轉暫收金額
 #RealRepayAmt=m,14.2,S
 C(3,#L492aRepayType,0,E(0,0),E(0,#L492aRepayAmt))
-! E(0,@RPAMTZ,#RealRepayAmt)
+E(0,@RPAMTZ,#RealRepayAmt)
 
 ![交易金額]
 #TXAMT=_,_,S
 E(0,#RealRepayAmt)
 IF(#L3r06Excessive<#TotalRepayAmt,ALERT(不可短繳),$)
 
-! ! ----------1:還款、2:結案，需輸入----------
-! ! 明細序號
-! #TMPSEQ=X,1,S
-! E(0,@RPSEQ,#DetailSeq)
+! ----------1:還款、2:結案，需輸入----------
+! 明細序號
+#TMPSEQ=X,1,S
+E(0,@RPSEQ,#DetailSeq)
 
-! ! 入帳日期
-! #TMPEntryDate=X,1,S
-! E(0,@RP_ENTRYDATE,#EntryDate)
+! 入帳日期
+#TMPEntryDate=X,1,S
+E(0,@RP_ENTRYDATE,#EntryDate)
 
-! ! 還款類別  1:期款 2:部分償還 3:結案 4:帳管費 5:火險費 6:契變手續費 7:法務費 9:其他
-! #TMPREPCAT=X,1,S
-! E(0,@RP_REPCAT,1)
+! 還款類別  1:期款 2:部分償還 3:結案 4:帳管費 5:火險費 6:契變手續費 7:法務費 9:其他
+#TMPREPCAT=X,1,S
+E(0,@RP_REPCAT,1)
 
-! ! 戶號
-! #TmpCustNo=X,1,S
-! E(0,@RP_CUSTNO,#TimCustNo)
+! 戶號
+#TmpCustNo=X,1,S
+E(0,@RP_CUSTNO,#TimCustNo)
 
-! ! 額度
-! #TMPFACMNO=X,1,S
-! E(0,@RP_FACMNO,#FacmNo)
-! E(0,@RP_TMPFACMNO,#L3r06tmpFacmNo)
-! T(2,@RP_TMPFACMNOX,#L3r06tmpFacmNoX)
-! T(2,@RP_TXCD,#TXCD)
+! 額度
+#TMPFACMNO=X,1,S
+E(0,@RP_FACMNO,#FacmNo)
+E(0,@RP_TMPFACMNO,#L3r06tmpFacmNo)
+T(2,@RP_TMPFACMNOX,#L3r06tmpFacmNoX)
+T(2,@RP_TXCD,#TXCD)
 
-! !類別   摘要
-! #TMPNOTE=X,1,S
-! T(2,@RP_NOTE,#DetailNote)
+!類別   摘要
+#TMPNOTE=X,1,S
+T(2,@RP_NOTE,#DetailNote)
 
-! <include src="RPDTL.icf::RPCOL.dec"/>
+<include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
@@ -640,11 +640,11 @@ IF(#L3r06Excessive<#TotalRepayAmt,ALERT(不可短繳),$)
 <include src="ROM.icf::L6R28.dec"/>
 </sub>
 !--------- 收付欄 -----------------------
-! <sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
-! [
-! <include src="RPDTL.icf::RPDTL.scr"/>
-! ]
-! </sub>
+<sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
+[
+<include src="RPDTL.icf::RPDTL.scr"/>
+]
+</sub>
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
@@ -673,6 +673,7 @@ T(3,[L3711] 應繳日變更-不可欠繳)
 #TotalRepayAmt#RealRepayAmt#RqspFlag
 #CustNo#CustId#ApplNo
 #TwReduceAmt#UsReduceAmt
+<include src="RPDTL.icf::RPDTL.tim"/>
 
 </sub>
 

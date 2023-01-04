@@ -78,7 +78,7 @@ public class L9709Report extends MakeReport {
 		
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9709").setRptItem("\"暫收放貸核心傳票檔資料").setSecurity("").setRptSize("A4").setPageOrientation("P")
+				.setRptCode("L9709").setRptItem("暫收放貸核心傳票檔資料").setSecurity("").setRptSize("A4").setPageOrientation("P")
 				.build();
 
 		this.open(titaVo, reportVo);

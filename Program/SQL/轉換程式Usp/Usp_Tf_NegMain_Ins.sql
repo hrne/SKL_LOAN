@@ -102,12 +102,13 @@ BEGIN
           ,JOB_START_TIME                 AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM REMIN_TBJCICMAIN JM
-    LEFT JOIN (SELECT "tbJCICAmtShare".CustIDN
-                     ,SUM("tbJCICAmtShare".SHARE_AMT) AS SUM_SHARE_AMT
-               FROM "tbJCICAmtShare"
-               WHERE "tbJCICAmtShare".CREDIT_CODE = '458'
-               GROUP BY "tbJCICAmtShare".CustIDN
-              ) S2 ON S2.CustIDN = JM.CustIDN
+    LEFT JOIN (
+      SELECT CustIDN
+            ,SUM(SHARE_AMT) AS SUM_SHARE_AMT
+      FROM REMIN_TBJCICAMTSHARE
+      WHERE CREDIT_CODE = '458'
+      GROUP BY CustIDN
+    ) S2 ON S2.CustIDN = JM.CustIDN
     LEFT JOIN (
       SELECT "SUBMITID"
            , "CUSTIDN"

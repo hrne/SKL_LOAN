@@ -916,7 +916,7 @@ public class L9110Report extends MakeReport {
 
 				fillData(titaVo, custEntCode.equals("1"));
 
-				if (tFacMain != null) {
+				if (tFacMain != null && !"Y".equals(tFacMain.getL9110Flag())) {
 					// 更新原DB
 					tFacMain = sFacMainService.holdById(tFacMain, titaVo);
 					tFacMain.setL9110Flag("Y");

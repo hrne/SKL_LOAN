@@ -1,9 +1,4 @@
---------------------------------------------------------
---  DDL for Procedure Usp_Tf_AcAcctCheck_Ins
---------------------------------------------------------
-set define off;
-
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_Tf_AcAcctCheck_Ins" 
+CREATE OR REPLACE PROCEDURE "Usp_Tf_AcAcctCheck_Ins" 
 ( 
     -- 參數 
     JOB_START_TIME OUT TIMESTAMP, --程式起始時間 
@@ -49,9 +44,12 @@ BEGIN
           ,SUM(S1."LDGETA")               AS "TdExtAmt"            -- 本日展期金額 DECIMAL 18 2 
           ,0                              AS "ReceivableBal"       -- 銷帳檔餘額 DECIMAL 18 2 
           ,0                              AS "AcctMasterBal"       -- 業務檔餘額 DECIMAL 18 2 
-          ,0                              AS "YdBal"               -- 前日餘額 DECIMAL 18 2
-          ,0                              AS "DbAmt"               -- 借方金額 DECIMAL 18 2
-          ,0                              AS "CrAmt"               -- 貸方金額 DECIMAL 18 2
+          ,SUM(CASE 
+             WHEN S3."DbCr" = 'D' THEN S1."LCDPDA" - S1."LCDPCA" -- 前日借方金額 
+           ELSE 0 - S1."LCDPDA" + S1."LCDPCA" END) -- 前日貸方金額 
+                                          AS "YdBal"               -- 前日餘額 DECIMAL 18 2
+          ,SUM(S1."LDGCDA")               AS "DbAmt"               -- 借方金額 DECIMAL 18 2
+          ,SUM(S1."LDGCCA")               AS "CrAmt"               -- 貸方金額 DECIMAL 18 2
           ,0                              AS "CoreDbAmt"           -- 核心借方金額 DECIMAL 18 2
           ,0                              AS "CoreCrAmt"           -- 核心貸方金額 DECIMAL 18 2
           ,'999999'                       AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6  

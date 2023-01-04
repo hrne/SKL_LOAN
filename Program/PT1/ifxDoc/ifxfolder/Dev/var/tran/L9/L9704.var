@@ -84,7 +84,7 @@ D(7,3,#SYSDATE,1,0)
 
 
 #DefaultYear=A,3,S
-C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,2,3),T(1,#SYSDATE,2,3))
+C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,2,3),T(1,#DateOfThisMonth,2,3))
 
 #DefaultMonth=A,2,S
 C(5,#MonthOfToday,#MonthOfTomorrow,T(1,#DateOfLastMonth,5,2),T(2,#MonthOfToday))

@@ -53,12 +53,7 @@ public class L8202Batch extends TradeBuffer {
 	private int processCnt = 0;
 	private int custNo;
 	private Boolean isError = false;
-	private int iEntryDateS = 0;
 	private int iEntryDateE = 0;
-	private int iEntryDateS2 = 0;
-	private int iEntryDateE2 = 0;
-	private int iEntryDateS3 = 0;
-	private int iEntryDateE3 = 0;
 
 	private List<Map<String, String>> fnAllList1 = new ArrayList<>();
 	private List<Map<String, String>> fnAllList2 = new ArrayList<>();
@@ -69,12 +64,7 @@ public class L8202Batch extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8202Batch ");
 		this.totaVo.init(titaVo);
-		iEntryDateS = parse.stringToInteger(titaVo.getParam("EntryDateSL")); // 樣態一入帳日期起日
-		iEntryDateE = parse.stringToInteger(titaVo.getParam("EntryDateE")); // 樣態一入帳日期迄日
-		iEntryDateS2 = parse.stringToInteger(titaVo.getParam("EntryDateSL2")); // 樣態二入帳日期起日
-		iEntryDateE2 = parse.stringToInteger(titaVo.getParam("EntryDateE2")); // 樣態二入帳日期迄日
-		iEntryDateS3 = parse.stringToInteger(titaVo.getParam("EntryDateSL3")); // 樣態三入帳日期起日
-		iEntryDateE3 = parse.stringToInteger(titaVo.getParam("EntryDateE3")); // 樣態三入帳日期迄日
+		iEntryDateE = parse.stringToInteger(titaVo.getParam("EntryDateE")); // 樣態一~三入帳日期迄日相同
 		// 刪除未寫疑似洗錢樣態檢核明細檔的疑似洗錢交易合理性明細檔
 		try {
 			deleteDetail(titaVo);
@@ -140,9 +130,9 @@ public class L8202Batch extends TradeBuffer {
 					"程式處理錯誤" + sendMsg, titaVo);
 		} else {
 			if (this.processCnt > 0) {
-				// ntxbuf: 起日YYYMMDD (迄日YYYMMDD 7+7,因樣態可設定不同天數故只保留起日)  
+				// ntxbuf: 起日YYYMMDD (迄日YYYMMDD 7+7,因樣態可設定不同天數故只保留止日)  
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L8921",
-						iEntryDateS + "" + iEntryDateE, "疑似洗錢樣態資料已產生，筆數：" + this.processCnt, titaVo);
+						iEntryDateE + "" + iEntryDateE, "疑似洗錢樣態資料已產生，筆數：" + this.processCnt, titaVo);
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", titaVo.getTlrNo(),
 						"無疑似洗錢樣態資料", titaVo);
@@ -458,45 +448,20 @@ public class L8202Batch extends TradeBuffer {
 	 * @throws LogicException deleteAll
 	 */
 	private void deleteDetail(TitaVo titaVo) throws LogicException {
-		this.info("L8202Batch deleteDetail Factor1");
-		Slice<MlaundryDetail> slMlaundryDetail1 = mlaundryDetailService.findEntryDateRangeFactor(iEntryDateS + 19110000,
-				iEntryDateE + 19110000, 1, Arrays.asList(new String[] { " ", "", null }), 0, Integer.MAX_VALUE, titaVo);
-		List<MlaundryDetail> lMlaundryDetail1 = slMlaundryDetail1 == null ? null : slMlaundryDetail1.getContent();
+		this.info("L8202Batch deleteDetail ");
+		//刪除此批製檔資料
+		Slice<MlaundryDetail> slMlaundryDetail = mlaundryDetailService.findEntryDateRange(iEntryDateE + 19110000,
+				iEntryDateE + 19110000, Arrays.asList(new String[] { " ", "", null }), 0, Integer.MAX_VALUE, titaVo);
+		List<MlaundryDetail> lMlaundryDetail = slMlaundryDetail == null ? null : slMlaundryDetail.getContent();
 
-		if (lMlaundryDetail1 != null) {
+		if (lMlaundryDetail != null) {
 			try {
-				mlaundryDetailService.deleteAll(lMlaundryDetail1, titaVo);
+				mlaundryDetailService.deleteAll(lMlaundryDetail, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryDetail deleteAllFactor1 error : " + e.getErrorMsg());
+				throw new LogicException("E0005", ", MlaundryDetail deleteAll error : " + e.getErrorMsg());
 			}
 		}
-		this.info("L8202Batch deleteDetail Factor2");
-		Slice<MlaundryDetail> slMlaundryDetail2 = mlaundryDetailService.findEntryDateRangeFactor(iEntryDateS2 + 19110000,
-				iEntryDateE2 + 19110000, 2, Arrays.asList(new String[] { " ", "", null }), 0, Integer.MAX_VALUE,
-				titaVo);
-		List<MlaundryDetail> lMlaundryDetail2 = slMlaundryDetail2 == null ? null
-				: slMlaundryDetail2.getContent();
 
-		if (lMlaundryDetail2 != null) {
-			try {
-				mlaundryDetailService.deleteAll(lMlaundryDetail2, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryDetail deleteAllFactor2 error : " + e.getErrorMsg());
-			}
-		}
-		this.info("L8202Batch deleteDetail Factor3");
-		Slice<MlaundryDetail> slMlaundryDetail3 = mlaundryDetailService.findEntryDateRangeFactor(iEntryDateS3 + 19110000,
-				iEntryDateE3 + 19110000, 3, Arrays.asList(new String[] { " ", "", null }), 0, Integer.MAX_VALUE,
-				titaVo);
-		List<MlaundryDetail> lMlaundryDetail3 = slMlaundryDetail3 == null ? null : slMlaundryDetail3.getContent();
-
-		if (lMlaundryDetail3 != null) {
-			try {
-				mlaundryDetailService.deleteAll(lMlaundryDetail3, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryDetail deleteAllFactor3 error : " + e.getErrorMsg());
-			}
-		}
 	}
 
 	/**
@@ -506,47 +471,21 @@ public class L8202Batch extends TradeBuffer {
 	 * @throws LogicException deleteAll
 	 */
 	private void deleteChkDetail(TitaVo titaVo) throws LogicException {
-		this.info("L8202Batch deleteChkDetail1");
-		Slice<MlaundryChkDtl> slMlaundryChkDtl1 = mlaundryChkDtlService.DtlEntryDateFactor(iEntryDateS + 19110000,
-				iEntryDateE + 19110000, 1, 0, Integer.MAX_VALUE, titaVo);
+		this.info("L8202Batch deleteChkDetail");
+		//刪除此批製檔資料,入帳日期(統計期間迄日)是掛同一天
+		Slice<MlaundryChkDtl> slMlaundryChkDtl = mlaundryChkDtlService.findEntryDateRange(iEntryDateE + 19110000,
+				iEntryDateE + 19110000, 0, Integer.MAX_VALUE, titaVo);
 
-		List<MlaundryChkDtl> lMlaundryChkDtl1 = slMlaundryChkDtl1 == null ? null : slMlaundryChkDtl1.getContent();
+		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? null : slMlaundryChkDtl.getContent();
 
-		if (lMlaundryChkDtl1 != null) {
+		if (lMlaundryChkDtl != null) {
 			try {
-				mlaundryChkDtlService.deleteAll(lMlaundryChkDtl1, titaVo);
+				mlaundryChkDtlService.deleteAll(lMlaundryChkDtl, titaVo);
 			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryChkDtl deleteAllFactor1 error : " + e.getErrorMsg());
+				throw new LogicException("E0005", ", MlaundryChkDtl deleteAll error : " + e.getErrorMsg());
 			}
 		}
 
-		this.info("L8202Batch deleteChkDetail2");
-		Slice<MlaundryChkDtl> slMlaundryChkDtl2 = mlaundryChkDtlService.DtlEntryDateFactor(iEntryDateS2 + 19110000,
-				iEntryDateE2 + 19110000, 2, 0, Integer.MAX_VALUE, titaVo);
-
-		List<MlaundryChkDtl> lMlaundryChkDtl2 = slMlaundryChkDtl2 == null ? null : slMlaundryChkDtl2.getContent();
-
-		if (lMlaundryChkDtl2 != null) {
-			try {
-				mlaundryChkDtlService.deleteAll(lMlaundryChkDtl2, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryChkDtl deleteAllFactor2 error : " + e.getErrorMsg());
-			}
-		}
-
-		this.info("L8202Batch deleteChkDetail3");
-		Slice<MlaundryChkDtl> slMlaundryChkDtl3 = mlaundryChkDtlService.DtlEntryDateFactor(iEntryDateS3 + 19110000,
-				iEntryDateE3 + 19110000, 3, 0, Integer.MAX_VALUE, titaVo);
-
-		List<MlaundryChkDtl> lMlaundryChkDtl3 = slMlaundryChkDtl3 == null ? null : slMlaundryChkDtl3.getContent();
-
-		if (lMlaundryChkDtl3 != null) {
-			try {
-				mlaundryChkDtlService.deleteAll(lMlaundryChkDtl3, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", ", MlaundryChkDtl deleteAllFactor3 error : " + e.getErrorMsg());
-			}
-		}
 	}
 
 	private void updateDetail(TitaVo titaVo) throws LogicException {
