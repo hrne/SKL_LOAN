@@ -178,9 +178,11 @@ BEGIN
                                                                            -- 核准額度 - 已動用額度餘額
                                                                            -- 撥款日＞月底日時，撥款金額要加回可動用餘額
          , NVL(F."RecycleCode",0)               AS "RecycleCode"        -- 該筆額度是否可循環動用  -- 0:非循環 1:循環
-         , CASE WHEN F."IrrevocableFlag" = 'Y' THEN 1
-                ELSE 0
-           END                                  AS "IrrevocableFlag"    -- 該筆額度是否為不可撤銷  -- 1=是 0=否
+--         , CASE WHEN F."IrrevocableFlag" = 'Y' THEN 1
+--                ELSE 0
+--           END                                  AS "IrrevocableFlag"    -- 該筆額度是否為不可撤銷  -- 1=是 0=否
+-- 2023/1/5 配合聯徵申報,目前並無可撤銷資料,故統一放"不可撤銷"
+         , 1                                    AS "IrrevocableFlag"    -- 該筆額度是否為不可撤銷  -- 1=是 0=否
          , CASE WHEN NVL(C."EntCode",' ') IN ('2') THEN '00000'
                 WHEN NVL(C."EntCode",' ') IN ('1') THEN        -- 企金 - 第一碼為CdIndustry.MainType	主計處大類
                      CDI."MainType" || SUBSTR(C."IndustryCode",3,4)       

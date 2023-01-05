@@ -653,6 +653,7 @@ C(3,#checkFlag,1,T(F,@CustId,0)T(F,@RelationCode,0),C(3,#PostSuccessFg,1,$,T(F,@
 IF(#FuncCode==4 || #FuncCode==5,s,$)
 IF(#AcctCheckFlag==0 || #AcctCheckFlag==8,$,s)
 
+
 #RelationCode=A,2,I
 IF(#FuncCode==4 || #FuncCode==5,s,$)
 C(3,#PostSuccessFg,1,s,$)
@@ -661,18 +662,6 @@ HELP(#RelationCodeHelp)
 ! C(3,#AcctCheckFlag,0,$,s)
 @
 V(H,#RelationCodeHelp)
-IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
-IF(#RelationCode==00,s,$)
-IF(#RelationCode==99
-,T(2,@RelAcctGender,)
-T(2,@RelAcctGenderX,)
-,IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11
-,T(2,@RelAcctGender,1)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
-,T(2,@RelAcctGender,2)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)))
-
-#RelationCodeX=X,4,L
-T(H,#RelationCode,#RelationCodeHelp)
-
 
 #closeRela=X,1,S
 IF(#FuncCode==1,$,s)
@@ -691,6 +680,19 @@ E(0,@RelAcctBirthday,0)
 T(2,@RelAcctGender,)
 T(2,@RelAcctGenderX,)
 )
+
+#RelationCodeX=X,4,L
+T(H,#RelationCode,#RelationCodeHelp)
+IF(#RelationCode==00,T(2,@CustId,#CustIdTemp),$)
+IF(#RelationCode==00,s,$)
+IF(#RelationCode==99
+,T(2,@RelAcctGender,)
+T(2,@RelAcctGenderX,)
+,IF(#RelationCode==01||#RelationCode==03||#RelationCode==05||#RelationCode==07||#RelationCode==08||#RelationCode==11
+,T(2,@RelAcctGender,1)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)
+,T(2,@RelAcctGender,2)T(H,@RelAcctGenderX,#RelAcctGender,#SexHelp)))
+
+
 
 ! 扣款人ＩＤ
 #CustIdTemp=X,10,S

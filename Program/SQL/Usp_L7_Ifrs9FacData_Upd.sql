@@ -189,10 +189,12 @@ BEGIN
                 WHEN F."RecycleCode" IN ('1') THEN 1
                 ELSE 0
            END                                  AS "RecycleCode"       -- 該筆額度是否可循環動用
-         , CASE WHEN F."IrrevocableFlag" IS NULL  THEN 0
-                WHEN F."IrrevocableFlag" IN ('Y') THEN 1               -- 不可撤銷
-                ELSE 0                                                 -- 可撤銷
-           END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷
+--         , CASE WHEN F."IrrevocableFlag" IS NULL  THEN 0
+--                WHEN F."IrrevocableFlag" IN ('Y') THEN 1               -- 不可撤銷
+--                ELSE 0                                                 -- 可撤銷
+--           END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷
+-- 2023/1/5 配合聯徵申報,目前並無可撤銷資料,故統一放"不可撤銷"
+         , 1                                    AS "IrrevocableFlag"   -- 該筆額度是否為不可徹銷 
          , NVL(Tav."TempAmt",0)                 AS "TempAmt"           -- 暫收款金額(台幣)
          , CASE
              WHEN M."DrawdownFg" = 0

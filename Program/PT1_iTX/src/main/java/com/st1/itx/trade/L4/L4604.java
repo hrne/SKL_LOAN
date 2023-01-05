@@ -18,12 +18,13 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.InsuRenew;
+import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.InsuRenewService;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -43,7 +44,8 @@ public class L4604 extends TradeBuffer {
 
 	@Autowired
 	public InsuRenewService insuRenewService;
-
+	@Autowired
+	public SystemParasService systemParasService;
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -93,7 +95,7 @@ public class L4604 extends TradeBuffer {
 				List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 				AcDetail acDetail = new AcDetail();
 				acDetail.setDbCr("D");
-				acDetail.setAcctCode("TMI"); // 暫付及待結轉帳項-火險保費
+				acDetail.setAcctCode("TMI"); // 暫收及待結轉帳項-火險保費
 				acDetail.setTxAmt(txAmt);
 				acDetail.setSlipNote(slipNote);
 				lAcDetail.add(acDetail);
@@ -142,6 +144,21 @@ public class L4604 extends TradeBuffer {
 			prodOutPut(lInsuRenew, titaVo);
 		}
 		totaVo.putParam("OCnt", cnt);
+
+		SystemParas tSystemParas = systemParasService.holdById("LN", titaVo);
+		if (tSystemParas != null) {
+			if (titaVo.isHcodeNormal()) {
+				titaVo.putParam("InsuEndMonthOld", tSystemParas.getInsuSettleDate());
+				tSystemParas.setInsuSettleDate(titaVo.getEntDyI());
+			} else {
+				tSystemParas.setInsuSettleDate(parse.stringToInteger(titaVo.getParam("InsuEndMonthOld")));
+			}
+			try {
+				systemParasService.update(tSystemParas);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "tSystemParas update error");
+			}
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -157,11 +174,7 @@ public class L4604 extends TradeBuffer {
 			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
-				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			} else {
-				acReceivable.setRvNo(FormatUtil.pad9(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
-			}
+			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
 			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 			acReceivableList.add(acReceivable);
 		}
@@ -179,11 +192,7 @@ public class L4604 extends TradeBuffer {
 			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			if (tInsuRenew.getEndoInsuNo().trim().isEmpty()) {
-				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			} else {
-				acReceivable.setRvNo(FormatUtil.pad9(tInsuRenew.getPrevInsuNo(), 17) + tInsuRenew.getEndoInsuNo()); // 銷帳編號(17)+批單號碼(1)
-			}
+			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
 			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
 			TempVo tTempVo = new TempVo();
 			tTempVo.clear();

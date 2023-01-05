@@ -167,7 +167,7 @@ public class L3005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND  ln3.\"RepayCode\" =  1         										 ";
 		sql += "  AND  NVL(JSON_VALUE(ln3.\"OtherFields\", '$.ReconCode'), ' ') = ' '        ";
 		sql += " left  join \"CdCode\" cdr  													 ";
-		sql += "   on  cdr.\"DefCode\" = 'RepayCode'   									     ";
+		sql += "   on  cdr.\"DefCode\" = 'BatchRepayCode'   									     ";
 		sql += "  AND  cdr.\"Code\"    = ln3.\"RepayCode\" 									 ";
 		sql += " left  join \"CdCode\" cdt													 ";
 		sql += "   on  cdt.\"DefCode\" = 'TxDescCode'   									     ";

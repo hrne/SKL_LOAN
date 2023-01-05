@@ -21,6 +21,8 @@ import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 //  -----------------------  應處理清單維護 ------------------ 
@@ -752,9 +754,6 @@ public class TxToDoCom extends TradeBuffer {
 		case "ACCL04":
 			settingValue = "ACCL04;Y;Y;Y;Y;-;L6985;L6985;L618D;Y;折溢價攤銷入帳";
 			break;
-		case "RVTX00":
-			settingValue = "RVTX00;-;C;-;-;Y;L6984;L6984;L3100;Y;預約撥款到期";
-			break;
 		case "TEXT00":
 			settingValue = "TEXT00;Y;Y;Y;Y;-;L698A;     ;L4710;-;簡訊通知";
 			break;
@@ -774,7 +773,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "L4602 ;Y;C;-;-;-;     ;L4602;L4602;-;火險出單明細表作業";
 			break;
 		case "L4604":
-			settingValue = "L4604 ;Y;C;-;-;-;     ;L4604;L4604;Y;火險保費未繳轉借支";
+			settingValue = "L4604 ;-;C;Y;Y;-;L698A;L4604;L4604;Y;火險保費未繳轉借支";
 			break;
 		case "L4702":
 			settingValue = "L4702 ;Y;C;Y;-;-;     ;L4702;L4702;-;繳息通知單產生作業";

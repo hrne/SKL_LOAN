@@ -1,0 +1,109 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM004)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20,20,20];">
+[
+["[LM004]                             LM004長中短期放款到期明細表"],
+["到期日",#DueDate],
+["本金餘額",#PrinBal,"元以上"]
+]
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+!-----------------------------------------------------
+
+#DueDate=D,7,I
+E(0,#SYSDATE)
+@V(7)
+A(DATE,0,#DueDate)
+V(5,0,#SYSDATE)
+
+
+#PrinBal=M,14,I
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(3,#HCODE,1,S,$)
+C(5,#TXFORM,LM004,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LM004">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,C5100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM004] LM004長中短期放款到期明細表)
+
+</sub>
+
+!---------- TXFORM = LM004 ----------
+<sub type="FORM" name="LM004">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM004,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM004] LM004長中短期放款到期明細表)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#DueDate
+#PrinBal
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LM004
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

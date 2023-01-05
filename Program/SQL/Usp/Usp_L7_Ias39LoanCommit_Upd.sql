@@ -45,9 +45,11 @@ BEGIN
            ELSE 0
            END                                  AS "AvblBal"           -- 可動用餘額
          , F."RecycleCode"                      AS "RecycleCode"       -- 該筆額度是否可循環動用  0:非循環動用 1:循環動用
-         , CASE WHEN F."IrrevocableFlag" IN ('Y') THEN 1
-                ELSE 0
-           END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:可撤銷     1:不可撤銷
+--         , CASE WHEN F."IrrevocableFlag" IN ('Y') THEN 1
+--                ELSE 0
+--           END                                  AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:可撤銷     1:不可撤銷
+-- 2023/1/5 配合聯徵申報,目前並無可撤銷資料,故統一放"不可撤銷"
+         , 1                                    AS "IrrevocableFlag"   -- 該筆額度是否為不可撤銷  0:可撤銷     1:不可撤銷
          , M."AcBookCode"                       AS "AcBookCode"        -- 帳冊別
          , M."AcSubBookCode"                    AS "AcSubBookCode"     -- 區隔帳冊
          , CASE
@@ -69,7 +71,7 @@ BEGIN
     LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                          AND F."FacmNo" = M."FacmNo"
     WHERE M."DataYM" = YYYYMM
-      AND F."IrrevocableFlag" = 'Y'   
+      --AND F."IrrevocableFlag" = 'Y'   --目前資料都是不可撤銷故點掉 
       AND ( TRUNC(NVL(M."UtilDeadline", 0) / 100 )  > YYYYMM  OR 
             TRUNC(NVL(F."RecycleDeadline", 0) / 100 )  > YYYYMM )
       AND TRUNC(NVL(M."ApproveDate", 0) / 100 )  <= YYYYMM      

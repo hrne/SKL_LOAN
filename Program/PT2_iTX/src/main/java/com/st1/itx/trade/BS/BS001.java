@@ -18,6 +18,7 @@ import com.st1.itx.db.domain.EmpDeductSchedule;
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcMainService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.db.service.TxBizDateService;
@@ -34,23 +35,22 @@ import com.st1.itx.util.parse.Parse;
  * 1.應處理清單－每日維護清檔 <br>
  * 2.總帳檔換日過帳(含年初損益類結轉)<br>
  * 3.新增當日應處理明細<br>
- * 3.1.每月21日(遇假日順延)，火險保費未繳轉借支<br>
+ * 3.1.每月20日(遇假日提前)，火險保費未繳轉借支<br>
  * 3.2.每月第2營業日，到期明細表<br>
  * 3.2.1.L9710寬限到期明細表 每月第2營業日印後2個月<br>
  * 3.2.2.L9711 放款到期明細表及通知單 每月第2營業日印後4個月<br>
  * 3.2.3.工作月結束次日，業績工作月結算啟動通知<br>
  * 4.啟動背景作業<br>
  * 4.1 BS004 新增應處理明細－員工資料異動更新<br>
- * 4.2 BS005 新增應處理明細－預約撥款到期<br>
- * 4.3 BS006 新增應處理明細－支票兌現檢核<br>
- * 4.4 BS007 新增應處理明細－未齊件到期通知<br>
- * 4.5 BS901 新增應處理明細－未付火險費提存，月初日迴轉上月<br>
- * 4.6 BS902 新增應處理明細－聯貸費用攤提(月初日)<br>
- * 4.7 BS010 新增應處理明細－轉列催收<br>
- * 4.8 BS020 新增整批入帳明細－暫收抵繳期款<br>
- * 4.9 BS060 現金流量預估資料檔維護(月底前五個營業日)<br>
- * 4.10 BS600 放款戶帳冊別轉換(帳冊別帳務調整日期等於系統營業日時)<br>
- * 4.11 BS902 新增應處理明細－聯貸費用攤提(月初日)<br>
+ * 4.2 BS006 新增應處理明細－支票兌現檢核<br>
+ * 4.3 BS007 新增應處理明細－未齊件到期通知<br>
+ * 4.4 BS901 新增應處理明細－未付火險費提存，月初日迴轉上月<br>
+ * 4.5 BS902 新增應處理明細－聯貸費用攤提(月初日)<br>
+ * 4.6 BS010 新增應處理明細－轉列催收<br>
+ * 4.7 BS020 新增整批入帳明細－暫收抵繳期款<br>
+ * 4.8 BS060 現金流量預估資料檔維護(月底前五個營業日)<br>
+ * 4.9 BS600 放款戶帳冊別轉換(帳冊別帳務調整日期等於系統營業日時)<br>
+ * 4.10 BS902 新增應處理明細－聯貸費用攤提(月初日)<br>
  * 
  * @author Lai
  * @version 1.0.0
@@ -126,9 +126,6 @@ public class BS001 extends TradeBuffer {
 		// 啟動背景作業－BS004 新增應處理明細－員工資料異動更新
 		MySpring.newTask("BS004", this.txBuffer, titaVo);
 
-		// 啟動背景作業－BS005 新增應處理明細－預約撥款到期
-		MySpring.newTask("BS005", this.txBuffer, titaVo);
-
 		// 啟動背景作業－BS006 新增應處理明細－支票兌現檢核
 		MySpring.newTask("BS006", this.txBuffer, titaVo);
 
@@ -167,12 +164,6 @@ public class BS001 extends TradeBuffer {
 			MySpring.newTask("BS600", this.txBuffer, titaVo);
 		}
 
-		// 2022-10-25 Wei
-		// 啟動背景作業－ BS996 將本日預撥資料寫入當日業績檔
-		String parm = tTxBizDate.getTbsDy() + ",N,0,0," + tTxBizDate.getTbsDy();
-		titaVo.putParam("Parm", parm);
-		MySpring.newTask("BS996", this.txBuffer, titaVo);
-
 		// end
 		return null;
 	}
@@ -193,14 +184,15 @@ public class BS001 extends TradeBuffer {
 			tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 		}
-		/* 1.每月21日(遇假日順延)，火險保費未繳轉借支 */
-		processDate = (this.txBuffer.getMgBizDate().getTbsDy() / 100) * 100 + 21;
-		if (this.txBuffer.getMgBizDate().getLbsDy() < processDate
-				&& this.txBuffer.getMgBizDate().getTbsDy() >= processDate) {
+		/* 1.每月20日(遇假日提前)，火險保費未繳轉借支 */
+		// 當月已執行<L4604>不會寫入應處理清單
+		processDate = (this.txBuffer.getMgBizDate().getTbsDy() / 100) * 100 + 20;
+		if (this.txBuffer.getSystemParas().getInsuSettleDate() / 100 < processDate / 100
+				&& this.txBuffer.getMgBizDate().getNbsDy() > processDate) {
 			tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setItemCode("L4604");
 			tTempVo.clear();
-			tTempVo.putParam("Note", "每月21日火險保費未繳轉借支");
+			tTempVo.putParam("Note", "每月20日火險保費未繳轉借支");
 			tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 		}

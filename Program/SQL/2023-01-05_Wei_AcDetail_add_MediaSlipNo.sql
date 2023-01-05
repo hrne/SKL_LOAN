@@ -1,0 +1,1 @@
+alter table "AcDetail" add "MediaSlipNo" varchar2(12);

@@ -78,10 +78,12 @@ BEGIN
          , NVL("FacMain"."UtilBal",0)             AS "UtilBal"           -- (額度)已動用額度餘額(循環動用還款時會減少,非循環動用還款時不會減少)
          , NVL("FacMain"."RecycleCode",'0')       AS "RecycleCode"       -- 循環動用 0: 非循環動用 1: 循環動用
          , NVL("FacMain"."RecycleDeadline",0)     AS "RecycleDeadline"   -- 循環動用期限
-         , CASE
-             WHEN "FacMain"."IrrevocableFlag" IS null OR TRIM("FacMain"."IrrevocableFlag") = '' THEN 'N'
-             ELSE "FacMain"."IrrevocableFlag"
-           END                                    AS "IrrevocableFlag"   -- 不可撤銷 Y:是  N:否
+--         , CASE
+--             WHEN "FacMain"."IrrevocableFlag" IS null OR TRIM("FacMain"."IrrevocableFlag") = '' THEN 'N'
+--             ELSE "FacMain"."IrrevocableFlag"
+--           END                                    AS "IrrevocableFlag"   -- 不可撤銷 Y:是  N:否
+-- 2023/1/5 配合聯徵申報,目前並無可撤銷資料,故統一放"不可撤銷"
+         , 'Y'                                    AS "IrrevocableFlag"   -- 不可撤銷 Y:是  N:否
          , CASE
              WHEN M."EntCode" IN ('1') THEN 'K'
              WHEN NVL(C."ClCode1", 0) = 9 AND NVL(C."ClCode2", 0) = 1 THEN 'O'  -- 車貸

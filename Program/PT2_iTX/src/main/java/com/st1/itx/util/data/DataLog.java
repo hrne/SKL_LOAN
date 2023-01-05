@@ -417,7 +417,7 @@ public class DataLog extends CommBuffer {
 					if(this.titaVo.isFuncindDel()) {
 						Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
 						valueMap.put("oldValue", oldValue.toString());
-						valueMap.put("newValue", oldValue.toString());
+						valueMap.put("newValue", "");
 
 						map.put(name, valueMap);
 					}

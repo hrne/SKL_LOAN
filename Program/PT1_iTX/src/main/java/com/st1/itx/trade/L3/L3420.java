@@ -166,6 +166,7 @@ public class L3420 extends TradeBuffer {
 	private int wkBorMainStatus = 88;
 	private int wkDueDate = 0;
 	private int wkCloseNo = 0;
+	private String wkFacCloseInsertFg = "";
 
 	private BigDecimal wkAfterLoanBal = BigDecimal.ZERO;
 	private BigDecimal wkPrincipal = BigDecimal.ZERO;
@@ -444,7 +445,7 @@ public class L3420 extends TradeBuffer {
 		}
 
 		// Check output
-		checkOutputRoutine();
+		outputRoutine();
 
 		// end
 		this.addList(this.totaVo);
@@ -455,8 +456,9 @@ public class L3420 extends TradeBuffer {
 
 	}
 
-	private void checkOutputRoutine() throws LogicException {
-
+	private void outputRoutine() throws LogicException {
+		titaVo.putParam("FacCloseInsertFg", wkFacCloseInsertFg);
+		titaVo.putParam("CloseNo", wkCloseNo);
 	}
 
 	// 結案檢核
@@ -1595,6 +1597,7 @@ public class L3420 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "清償作業檔 Key = " + iCustNo + wkCloseNo); // 新增資料時，發生錯誤 }
 			}
+			wkFacCloseInsertFg = "Y";
 		} else {
 			tFacClose = facCloseService.holdById(tFacClose, titaVo);
 			tFacClose.setCloseDate(iEntryDate);
@@ -1608,24 +1611,22 @@ public class L3420 extends TradeBuffer {
 	}
 
 	private void FacCloseErase() throws LogicException {
-		tFacClose = facCloseService.findFacmNoFirst(iCustNo, iFacmNo, Arrays.asList(new String[] { "0" }), titaVo);
-		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
-			tFacClose = facCloseService.findFacmNoFirst(iCustNo, 0, Arrays.asList(new String[] { "0" }), titaVo);
-		}
-		if (tFacClose == null || tFacClose.getEntryDate() != iEntryDate) {
+		if (titaVo.get("CloseNo") == null) {
 			return;
 		}
-		wkCloseNo = tFacClose.getCloseNo();
+		wkCloseNo = parse.stringToInteger(titaVo.get("CloseNo"));
+		wkFacCloseInsertFg = titaVo.get("FacCloseInsertFg");
+		if (wkCloseNo == 0) {
+			return;
+		}
 		tFacClose = facCloseService.holdById(new FacCloseId(iCustNo, wkCloseNo), titaVo);
-		// 申請日期自動寫入時為0
-		if (tFacClose.getApplDate() == 0) {
+		if ("Y".equals(titaVo.get("FacCloseInsertFg"))) {
 			try {
 				facCloseService.delete(tFacClose, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "清償作業檔 Key = " + iCustNo + wkCloseNo); // 新增資料時，發生錯誤 }
 			}
 		} else {
-			tFacClose = facCloseService.holdById(tFacClose, titaVo);
 			tFacClose.setCloseDate(0);
 			try {
 				facCloseService.update(tFacClose, titaVo);
