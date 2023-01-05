@@ -272,7 +272,8 @@ public class AcRepayCom extends TradeBuffer {
 			this.lAcDetail.add(ac);
 		}
 
-		// 交易明細
+		BigDecimal overflow = BigDecimal.ZERO;
+		int overFacmNo = 0;
 		for (LoanBorTx tx : ilLoanBorTx) {
 			// 暫收款登錄溢收
 			if ("L3210".equals(titaVo.getTxcd())) {
@@ -280,24 +281,43 @@ public class AcRepayCom extends TradeBuffer {
 				tx.setTxAmt(this.wkTxAmtRemaind);
 				tx.setTempAmt(this.wkTempAmtRemaind);
 				// 貸方：溢收款
-				BigDecimal overflow = settleOverflow(tx, this.lAcDetail, titaVo);
+				overflow = settleOverflow(tx, this.lAcDetail, titaVo);
 				tx.setOverflow(overflow);
 				this.wkTxAmtRemaind = BigDecimal.ZERO;
 				this.wkTempAmtRemaind = BigDecimal.ZERO;
+				overFacmNo = this.lAcDetail.get(this.lAcDetail.size() - 1).getFacmNo();
 			}
 			this.lLoanBorTx.add(tx);
 		}
 
 		// 貸方：費用
+		BigDecimal totalFee = BigDecimal.ZERO;
+
+		int splseq = this.lAcDetail.size();
 		if ("L3210".equals(titaVo.getTxcd()) || "L3230".equals(titaVo.getTxcd())) {
-			settleFee(true, titaVo);
+			totalFee = settleFee(true, titaVo);
+		}
+
+		// 暫收抵繳
+		if (totalFee.compareTo(BigDecimal.ZERO) > 0 && "L3210".equals(titaVo.getTxcd())) {
+			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("D");
+			acDetail.setAcctCode("TAV");
+			acDetail.setTxAmt(totalFee);
+			acDetail.setCustNo(this.lAcDetail.get(0).getCustNo());
+			acDetail.setFacmNo(overFacmNo);
+			acDetail.setBormNo(0);
+			acDetail.setSumNo("090"); // 暫收抵繳
+			this.lAcDetail.add(acDetail);
+		}
+
+		// 有費用暫收轉額度
+		if (totalFee.compareTo(BigDecimal.ZERO) > 0) {
+			this.lAcDetail = tempTransfer(splseq, this.lLoanBorTx, this.lAcDetail, titaVo);
 		}
 
 		// Json Field 放本戶累溢收
 		this.lLoanBorTx = setExcessive(this.lLoanBorTx, iBaTxList, this.lAcDetail, titaVo);
-
-		// 暫收轉額度
-		this.lAcDetail = tempTransfer(this.lLoanBorTx, this.lAcDetail, titaVo);
 
 		// 入帳順序
 		int lxAcseq = 0;
@@ -350,13 +370,15 @@ public class AcRepayCom extends TradeBuffer {
 	}
 
 	// 貸方：費用
-	private void settleFee(boolean isTempRepay, TitaVo titaVo) throws LogicException {
+	private BigDecimal settleFee(boolean isTempRepay, TitaVo titaVo) throws LogicException {
 		if (this.baTxList == null) {
-			return;
+			return BigDecimal.ZERO;
 		}
+		BigDecimal totalFee = BigDecimal.ZERO;
 		// 還放款為依序抵繳、暫收款為抵繳費用金額
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				totalFee = totalFee.add(ba.getAcctAmt());
 				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, "", iEntryDate, new TempVo(), titaVo);
 				settleFeeAmt(ba, "", tx); // 費用出帳
 				if (isTempRepay) {
@@ -387,6 +409,7 @@ public class AcRepayCom extends TradeBuffer {
 				this.lLoanBorTx.add(tx);
 			}
 		}
+		return totalFee;
 	}
 
 	private void updUnpaidAmt(List<LoanBorTx> ilLoanBorTx, TitaVo titaVo) throws LogicException {
@@ -622,7 +645,7 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setCustNo(wkCustNo);
 			acDetail.setFacmNo(wkFacmNo);
 			acDetail.setBormNo(0);
-			acDetail.setSumNo("090"); // 暫收可抵繳
+			acDetail.setSumNo("092"); // 暫收轉帳
 			this.lAcDetail.add(acDetail);
 		}
 
@@ -700,9 +723,9 @@ public class AcRepayCom extends TradeBuffer {
 	}
 
 	// 暫收轉額度
-	private List<AcDetail> tempTransfer(List<LoanBorTx> ilLoanBorTx, List<AcDetail> iAcList, TitaVo titaVo)
+	private List<AcDetail> tempTransfer(int splseq, List<LoanBorTx> ilLoanBorTx, List<AcDetail> iAcList, TitaVo titaVo)
 			throws LogicException {
-		this.info("transferTempAmt ...");
+		this.info("transferTempAmt ... splseq=" + splseq);
 		for (AcDetail ac : iAcList) {
 			this.info(ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " "
 					+ ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " " + ac.getSumNo() + " "
@@ -710,49 +733,22 @@ public class AcRepayCom extends TradeBuffer {
 		}
 
 		this.titaVo = titaVo;
-		// 暫收抵繳
-		List<AcDetail> lAcDetailOld = new ArrayList<AcDetail>();
-		for (AcDetail ac : iAcList) {
-			lAcDetailOld.add(ac);
-		}
-		int splitAcSeq = 0;
-		this.lAcDetail = new ArrayList<AcDetail>();
 
-		// 轉暫收款分錄
-		LoanBorTx lx = ilLoanBorTx.get(0);
-		BigDecimal overFlow = BigDecimal.ZERO;
-		int tempFacmNo = 0;
-		if (lx.getTxAmt().compareTo(BigDecimal.ZERO) > 0) {
-			tempFacmNo = lx.getFacmNo();
-			int ii = 0;
-			for (AcDetail ac : lAcDetailOld) {
-				ii++;
-				// 非暫收
-				if (!"TAV".equals(ac.getAcctCode())) {
-					ac.setSumNo("092"); // 暫收轉帳
+		int ii = 0;
+		this.lAcDetail = new ArrayList<AcDetail>();
+		List<AcDetail> lAcDetailOld = new ArrayList<AcDetail>();
+		HashMap<Integer, BigDecimal> tempBalMap = new HashMap<>(); // 暫收抵繳金額
+		for (AcDetail ac : iAcList) {
+			ii++;
+			lAcDetailOld.add(ac);
+			// 費用前分錄、不含暫收抵繳
+			if (ii <= splseq) {
+				if ("090".equals(ac.getSumNo()) && "D".equals(ac.getDbCr())) {
+					tempBalMap.put(ac.getFacmNo(), ac.getTxAmt());
+				} else {
 					this.lAcDetail.add(ac);
-				}
-				// 暫收借為轉出
-				if ("TAV".equals(ac.getAcctCode()) && "D".equals(ac.getDbCr())) {
-					ac.setSumNo("092"); // 暫收轉帳
-					this.lAcDetail.add(ac);
-				}
-				// 暫收貸為轉入
-				if ("TAV".equals(ac.getAcctCode()) && "C".equals(ac.getDbCr())) {
-					ac.setSumNo("092"); // 暫收轉帳
-					this.lAcDetail.add(ac);
-					splitAcSeq = ii;
-					overFlow = ac.getTxAmt();
-					break;
 				}
 			}
-		}
-
-		this.info("splitAcSeq=" + splitAcSeq + ", lAcDetailOld.size =" + lAcDetailOld.size());
-
-		// 無費用
-		if (splitAcSeq == lAcDetailOld.size()) {
-			return this.lAcDetail;
 		}
 
 		// 額度使用金額
@@ -763,7 +759,7 @@ public class AcRepayCom extends TradeBuffer {
 		// 計算費用交易明細中同的暫收借合計&&需轉收金額
 		BigDecimal tempAmtTotal = BigDecimal.ZERO;
 		for (LoanBorTx tx : ilLoanBorTx) {
-			if (!"TAV".equals(tx.getAcctCode())) {
+			if (tx.getFeeAmt().compareTo(BigDecimal.ZERO) > 0) {
 				this.info("transferTempAmt=" + tx.toString());
 				tempAmtTotal = tempAmtTotal.add(tx.getTempAmt());
 				if (tempAmtMap.get(tx.getFacmNo()) == null) {
@@ -778,21 +774,7 @@ public class AcRepayCom extends TradeBuffer {
 				}
 			}
 		}
-
-		// 有費用
-		HashMap<Integer, BigDecimal> tempBalMap = new HashMap<>();
-
-		// 暫收抵繳餘額 => 有溢收放費用暫收借合計，否則放暫收借
-		if (overFlow.compareTo(BigDecimal.ZERO) > 0) {
-			tempBalMap.put(tempFacmNo, tempAmtTotal);
-		} else {
-			for (AcDetail ac : lAcDetailOld) {
-				if ("090".equals(ac.getSumNo()) && "D".equals(ac.getDbCr())) {
-					tempBalMap.put(ac.getFacmNo(), ac.getTxAmt());
-				}
-			}
-		}
-
+		
 		// 本額度暫收抵繳金額
 		HashMap<Integer, BigDecimal> selfTempMap = new HashMap<>();
 
@@ -835,6 +817,7 @@ public class AcRepayCom extends TradeBuffer {
 				this.lAcDetail.add(acDetail);
 			}
 		}
+
 		// 轉入抵用其他額度
 		for (Iterator<Integer> itTxFacmNo = transferSet.iterator(); itTxFacmNo.hasNext();) {
 			int txFacmNo = itTxFacmNo.next();
@@ -890,7 +873,7 @@ public class AcRepayCom extends TradeBuffer {
 		}
 
 		// 搬暫收款後分錄
-		for (int i = splitAcSeq; i < lAcDetailOld.size(); i++) {
+		for (int i = splseq; i < lAcDetailOld.size(); i++) {
 			this.lAcDetail.add(lAcDetailOld.get(i));
 		}
 
@@ -963,7 +946,7 @@ public class AcRepayCom extends TradeBuffer {
 		// 轉額度金額
 		HashMap<Integer, BigDecimal> transferAmtMap = new HashMap<>();
 
-		// 計算交易明細中同的暫收借合計急需轉戰收金額
+		// 計算交易明細中同的暫收借合計及需轉戰收金額
 		for (LoanBorTx tx : ilLoanBorTx) {
 			this.info("transferTempAmt=" + tx.toString());
 			if (tx.getTempAmt().compareTo(BigDecimal.ZERO) > 0) {

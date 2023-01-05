@@ -345,7 +345,7 @@ public class Cs80UpDBS extends CommBuffer {
 			tTxFlow.setFlowMode(0);
 		}
 
-		// Adma 2022.12.27
+		// Adam 2022.12.27
 		if (this.txBuffer.getTxCom().getSubmitFg() == 2)
 			tTxFlow.setFlowMode(1);
 

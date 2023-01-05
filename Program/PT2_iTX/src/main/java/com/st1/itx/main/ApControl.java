@@ -376,7 +376,7 @@ public class ApControl extends SysLogger {
 					if (this.titaVo.isHcodeNormal() || this.titaVo.isHcodeModify()) {
 						TotaVo vo = new TotaVo();
 						vo.init(this.titaVo);
-						if (this.txBuffer.getTxCom().getSubmitFg() == 0) {
+						if (this.txBuffer.getTxCom().getSubmitFg() == 0 || this.txBuffer.getTxCom().getSubmitFg() == 2) {
 							vo.setWarnMsg("本交易需主管放行");
 						} else {
 							vo.setWarnMsg("本交易需提交");

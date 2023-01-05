@@ -449,13 +449,12 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settleUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settleUnPaid TxAmt 回收金額=" + iTxAmt);
 		this.info("BaTxCom settleUnPaid TempVo 處理說明=" + iTempVo.toString());
-		this.tempVo = iTempVo;
 // initial		
+		init();
+		this.tempVo = iTempVo;
 		if (tempVo.get("PayFeeMethod") != null) {
 			this.payFeeMethod = tempVo.get("PayFeeMethod");
 		}
-
-		init();
 
 // STEP 1:  Load repayLoanList facTempList, UnPaidlist 
 
@@ -1579,7 +1578,7 @@ public class BaTxCom extends TradeBuffer {
 				intCalcCode = "2";
 			}
 			// 2022-04-19 智偉增加
-			// 若帳號計息方式是2:按月計息 且 下繳日大於等於下月1日 且 上繳日小於本月1日
+			// 若帳號計息方式是2:按月計息 且 下繳日 大於等於下月1日 且 上繳日小於本月1日
 			if (intCalcCode.equals("2") && ln.getNextPayIntDate() >= nextMonth01
 					&& ln.getPrevPayIntDate() < thisMonth01) {
 				// 計息方式改為1:按日計息
@@ -1596,23 +1595,27 @@ public class BaTxCom extends TradeBuffer {
 		// else 未到期
 		// 未到期利息=>以日計息，不分期且到期日當日也算1天
 		int yearMonth = this.txBuffer.getTxCom().getTbsdy() / 100;
-		boolean isShouldPaid = false;
+		boolean isShouldPaid = false; // 已到期
 		if (iPrevPaidIntDate / 100 <= yearMonth && iNextPayIntDate / 100 <= yearMonth
 				&& ln.getMaturityDate() / 100 > yearMonth) {
 			isShouldPaid = true;
 		}
+		// 到期日為下月1日前
 		if (ln.getMaturityDate() < nextMonth01) {
 			dDateUtil.init();
 			dDateUtil.setDate_1(maturityDate);
 			dDateUtil.setDays(1);
 			maturityDate = dDateUtil.getCalenderDay();
-		} else {
-			// 未到期應繳日為1日 => 視為應繳
-			if (ln.getSpecificDd() == 1) {
-				isShouldPaid = true;
+		}
+
+		boolean isDefault = false; // 按原設定
+		// 未到期繳息日為1日超過1個月=>按原設定
+		if (!isShouldPaid) {
+			if (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate >= nextMonth01) {
+				isDefault = true;
 			}
 		}
-		if (!isShouldPaid) {
+		if (!isShouldPaid && !isDefault) {
 			intCalcCode = "1"; // 1:按日計息
 			amortizedCode = 2; // 2.到期取息(到期繳息還本)
 			int intEndDate = iPayIntDate > maturityDate ? maturityDate : iPayIntDate;
@@ -1632,6 +1635,7 @@ public class BaTxCom extends TradeBuffer {
 				+ ", SpecificDate=" + ln.getSpecificDate() + " ,PrevPaidIntDate=" + ln.getPrevPayIntDate() + "/"
 				+ iPrevPaidIntDate + " ,NextPayIntDate=" + ln.getNextRepayDate() + "/" + iNextPayIntDate
 				+ " ,MaturityDate=" + ln.getMaturityDate() + "/" + maturityDate);
+
 	}
 
 	private void repayLoanBaTxVo(int iEntryDate, int iPayIntDate, int iRepayType, int iCustNo, LoanBorMain ln,

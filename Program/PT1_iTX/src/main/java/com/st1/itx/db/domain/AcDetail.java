@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class AcDetail implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 209880584305725543L;
-
-@EmbeddedId
+  @EmbeddedId
   private AcDetailId acDetailId;
 
   // 登放日期
@@ -89,7 +85,7 @@ public class AcDetail implements Serializable {
   private BigDecimal txAmt = new BigDecimal("0");
 
   // 入總帳記號
-  /* 0:未入帳1:已入帳2:被沖正(訂正)3.沖正(訂正)9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用) */
+  /* 0:未入帳1:已入帳9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用) */
   @Column(name = "`EntAc`")
   private int entAc = 0;
 
@@ -179,6 +175,7 @@ public class AcDetail implements Serializable {
   private String titaTxCd;
 
   // 業務類別
+  /* 01:撥款匯款(含暫收退還匯款) 02-支票繳款(限期票、即期票存入) 09-放款(含抽退票) */
   @Column(name = "`TitaSecNo`", length = 2)
   private String titaSecNo;
 
@@ -207,6 +204,11 @@ public class AcDetail implements Serializable {
   // jason格式紀錄欄
   @Column(name = "`JsonFields`", length = 300)
   private String jsonFields;
+
+  // 傳票號碼
+  /* 格式:F10+民國年+月份(1碼)+日期+3碼序號此欄位會由總帳傳票資料傳輸程式回寫 */
+  @Column(name = "`MediaSlipNo`", length = 12)
+  private String mediaSlipNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -469,8 +471,6 @@ C:貸
 	* 入總帳記號<br>
 	* 0:未入帳
 1:已入帳
-2:被沖正(訂正)
-3.沖正(訂正)
 9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
 	* @return Integer
 	*/
@@ -482,8 +482,6 @@ C:貸
 	* 入總帳記號<br>
 	* 0:未入帳
 1:已入帳
-2:被沖正(訂正)
-3.沖正(訂正)
 9.提存傳票已上傳核心(產生傳票批號&amp;gt;=90上傳核心傳票檔時抓取EntAc=1,並更新為9，正常傳票與沖正傳票分批上傳核心時使用)
   *
   * @param entAc 入總帳記號
@@ -955,7 +953,7 @@ C:貸
 
 /**
 	* 業務類別<br>
-	* 
+	* 01:撥款匯款(含暫收退還匯款) 02-支票繳款(限期票、即期票存入) 09-放款(含抽退票)
 	* @return String
 	*/
   public String getTitaSecNo() {
@@ -964,7 +962,7 @@ C:貸
 
 /**
 	* 業務類別<br>
-	* 
+	* 01:撥款匯款(含暫收退還匯款) 02-支票繳款(限期票、即期票存入) 09-放款(含抽退票)
   *
   * @param titaSecNo 業務類別
 	*/
@@ -1091,6 +1089,27 @@ C:貸
   }
 
 /**
+	* 傳票號碼<br>
+	* 格式:F10+民國年+月份(1碼)+日期+3碼序號
+此欄位會由總帳傳票資料傳輸程式回寫
+	* @return String
+	*/
+  public String getMediaSlipNo() {
+    return this.mediaSlipNo == null ? "" : this.mediaSlipNo;
+  }
+
+/**
+	* 傳票號碼<br>
+	* 格式:F10+民國年+月份(1碼)+日期+3碼序號
+此欄位會由總帳傳票資料傳輸程式回寫
+  *
+  * @param mediaSlipNo 傳票號碼
+	*/
+  public void setMediaSlipNo(String mediaSlipNo) {
+    this.mediaSlipNo = mediaSlipNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1175,7 +1194,7 @@ C:貸
            + ", receivableFlag=" + receivableFlag + ", acBookFlag=" + acBookFlag + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", sumNo=" + sumNo + ", dscptCode=" + dscptCode
            + ", slipNote=" + slipNote + ", slipBatNo=" + slipBatNo + ", slipNo=" + slipNo + ", titaHCode=" + titaHCode + ", titaKinbr=" + titaKinbr + ", titaTlrNo=" + titaTlrNo
            + ", titaTxtNo=" + titaTxtNo + ", titaTxCd=" + titaTxCd + ", titaSecNo=" + titaSecNo + ", titaBatchNo=" + titaBatchNo + ", titaBatchSeq=" + titaBatchSeq + ", titaSupNo=" + titaSupNo
-           + ", titaRelCd=" + titaRelCd + ", slipSumNo=" + slipSumNo + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", titaRelCd=" + titaRelCd + ", slipSumNo=" + slipSumNo + ", jsonFields=" + jsonFields + ", mediaSlipNo=" + mediaSlipNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

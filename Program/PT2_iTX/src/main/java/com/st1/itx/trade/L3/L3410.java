@@ -196,6 +196,7 @@ public class L3410 extends TradeBuffer {
 		loanCom.setTxBuffer(this.txBuffer);
 		loanSetRepayIntCom.setTxBuffer(this.txBuffer);
 		baTxCom.setTxBuffer(this.txBuffer);
+		acRepayCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));

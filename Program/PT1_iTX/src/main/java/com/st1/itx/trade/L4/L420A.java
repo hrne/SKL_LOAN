@@ -11,7 +11,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
+import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.service.BatxHeadService;
+import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.SendRsp;
@@ -32,6 +35,9 @@ public class L420A extends TradeBuffer {
 
 	@Autowired
 	public BatxHeadService batxHeadService;
+
+	@Autowired
+	TxToDoMainService txToDoMainService;
 
 	@Autowired
 	SendRsp sendRsp;
@@ -63,6 +69,12 @@ public class L420A extends TradeBuffer {
 		} else {
 			// 啟動背景作業－整批檢核
 			MySpring.newTask("L420ABatch", this.txBuffer, titaVo);
+		}
+
+		/* 每月21日(遇假日順延)，火險保費未繳轉借支 */
+		TxToDoMain tTxToDoMain = txToDoMainService.findById("L4604", titaVo);
+		if (tTxToDoMain != null && tTxToDoMain.getUnProcessCnt() > 0) {
+			this.totaVo.setWarnMsg("整批入帳前需先執行<L4604-火險保費未繳轉借支>作業(每月21日)");
 		}
 
 		// end

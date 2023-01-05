@@ -17,6 +17,7 @@ import com.st1.itx.db.service.springjpa.cm.LM062ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.LM063ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component
 @Scope("prototype")
@@ -28,7 +29,7 @@ public class LM063Report extends MakeReport {
 
 	@Autowired
 	LM062ServiceImpl lm062ServiceImpl;
-
+	
 	@Autowired
 	MakeExcel makeExcel;
 
@@ -36,7 +37,7 @@ public class LM063Report extends MakeReport {
 	public void printTitle() {
 	}
 
-	public void exec(TitaVo titaVo, int yearMonth) throws LogicException {
+	public void exec(TitaVo titaVo,int yearMonth) throws LogicException {
 
 		this.info("LM063Report exec");
 		// 取得會計日(同頁面上會計日)
@@ -46,13 +47,29 @@ public class LM063Report extends MakeReport {
 		int iYear = yearMonth / 100;
 		// 月
 		int iMonth = yearMonth % 100;
-
+		
 		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
-		String txCD = "LM063";
 		String itemName = "02-企金3000萬以上";
+		
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String txcd = "LM063";
+		String fileItem = itemName+"-" + iYearMonth;
+		String fileName = txcd+"_"+ itemName+"-" + iYearMonth;
+		String defaultExcel = "LM063_底稿_企金3000萬以上.xls";
+		String defaultSheet = "簡表";
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, itemName + "-" + iYearMonth, txCD + "_" + itemName + "-" + iYearMonth, "LM063_底稿_企金3000萬以上.xls", "簡表");
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(fileItem).build();
+
+		// 開啟報表
+		makeExcel.open(titaVo, reportVo, fileName, defaultExcel, defaultSheet);
+
+		
+//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), txCD, itemName+"-" + iYearMonth,
+//				txCD+"_"+itemName+"-" + iYearMonth, "LM063_底稿_企金3000萬以上.xls", "簡表");
+
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
@@ -77,11 +94,11 @@ public class LM063Report extends MakeReport {
 
 		try {
 
-			fnAllList = lm063ServiceImpl.findAll(titaVo, yearMonth);
-
-			// 共用LM062Impl
-			fnAllList2 = lm062ServiceImpl.findList(titaVo, yearMonth, 2);
-
+			fnAllList = lm063ServiceImpl.findAll(titaVo,yearMonth);
+			
+			//共用LM062Impl
+			fnAllList2 = lm062ServiceImpl.findList(titaVo, yearMonth,2);
+			 
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -122,7 +139,8 @@ public class LM063Report extends MakeReport {
 						// B欄 戶號(數字右靠)
 						if (!tempNo.equals(tLDVo.get(fdnm))) {
 							tempNo = tLDVo.get(fdnm);
-							makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.valueOf(tLDVo.get(fdnm)), "R");
+							makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
+									: Integer.valueOf(tLDVo.get(fdnm)), "R");
 						} else {
 							makeExcel.setValue(row, i, "", "R");
 						}
@@ -130,22 +148,28 @@ public class LM063Report extends MakeReport {
 						break;
 					case 3:
 						// C欄 額度
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: Integer.valueOf(tLDVo.get(fdnm)),
+								"C");
 						break;
 					case 4:
 						// D欄 戶名
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 						break;
 					case 5:
 						// E欄 覆審月份
-						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.valueOf(tLDVo.get(fdnm));
+						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
+								: Integer.valueOf(tLDVo.get(fdnm));
 						day = day % 100;
 
 						makeExcel.setValue(row, i, day, "C");
 						break;
 					case 6:
 						// F欄 撥款日期
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
+								: Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
 
 						// 與前一筆是否相同
 						if (!date.equals(tLDVo.get(fdnm))) {
@@ -164,26 +188,36 @@ public class LM063Report extends MakeReport {
 					case 7:
 						// G欄 放款餘額
 
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: new BigDecimal(tLDVo.get(fdnm)),
+								"#,##0", "R");
 						// 所有金額總計
 						tot = tot.add(new BigDecimal(tLDVo.get(fdnm)));
 
 						break;
 					case 8:
 						// H欄 全戶餘額
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: new BigDecimal(tLDVo.get(fdnm)),
+								"#,##0", "R");
 						break;
 					case 9:
 						// I欄 展期記號
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 10:
 						// J欄 應覆審案件
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 11:
 						// K欄 評等
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm).equals("0") ? ""
+										: tLDVo.get(fdnm),"C");
 						break;
 					default:
 
@@ -199,106 +233,109 @@ public class LM063Report extends MakeReport {
 		} else {
 			makeExcel.setValue(3, 2, "本日無資料");
 		}
-
-		dataList(fnAllList2, itemName);
-
+		
+		
+		dataList(fnAllList2,itemName);
+		
 		makeExcel.close();
 
 	}
-
+	
+	
+	
 	/**
 	 * 資料明細
-	 * 
 	 * @param list
 	 * @param sheetName 工作表名稱
-	 */
-	public void dataList(List<Map<String, String>> list, String sheetName) throws LogicException {
-
+	 * @throws LogicException 
+	 * */
+	public void dataList(List<Map<String, String>> list,String sheetName) throws LogicException {
+		
 		makeExcel.setSheet(sheetName);
-
+		
 		int row = 2;
-
-		for (Map<String, String> r : list) {
-
+		
+		
+	for(Map<String, String> r:list) {
+			
 			int conditionCode = Integer.valueOf(r.get("F0"));
 			String branchNo = r.get("F1");
-			int custNo = Integer.valueOf(r.get("F2"));
-			int facmNo = Integer.valueOf(r.get("F3"));
-			int bormNo = Integer.valueOf(r.get("F4"));
+			int custNo = Integer.valueOf(r.get("F2").isEmpty() || r.get("F2")== null? "0":r.get("F2"));
+			int facmNo = Integer.valueOf(r.get("F3").isEmpty() || r.get("F3")== null? "0":r.get("F3"));
+			int bormNo = Integer.valueOf(r.get("F4").isEmpty() || r.get("F4")== null? "0":r.get("F4"));
 			String custName = r.get("F5");
-			int drawdownDate = Integer.valueOf(r.get("F6"));
+			int drawdownDate = Integer.valueOf(r.get("F6").isEmpty() || r.get("F6")== null? "0":r.get("F6"));
 			BigDecimal loanBal = new BigDecimal(r.get("F7"));
 			int maturityDate = Integer.valueOf(r.get("F8"));
-			int clcode1 = Integer.valueOf(r.get("F9"));
-			int clcode2 = Integer.valueOf(r.get("F10"));
-			int clno = Integer.valueOf(r.get("F11"));
+			int clcode1 = Integer.valueOf(r.get("F9").isEmpty() || r.get("F9")== null? "0":r.get("F9"));
+			int clcode2 = Integer.valueOf(r.get("F10").isEmpty() || r.get("F10")== null? "0":r.get("F10"));
+			int clno = Integer.valueOf(r.get("F11").isEmpty() || r.get("F11")== null? "0":r.get("F11"));
 			String cityShort = r.get("F12");
 			String areaShort = r.get("F13");
 			String part1 = r.get("F14");
 			String part2 = r.get("F15");
 			String location = r.get("F16");
-//			String cityName = r.get("F17");
-			int cityCode = Integer.valueOf(r.get("F17"));
+			int cityCode = Integer.valueOf(r.get("F17").isEmpty() || r.get("F17")== null? "0":r.get("F17"));
 			String unit = r.get("F18");
 			String sampleNum = r.get("F19");
 			String sampleType = r.get("F20");
-			int rechYM = Integer.valueOf(r.get("F21"));
+			int rechYM = Integer.valueOf(r.get("F21").trim().length()==0? "0" : r.get("F21"));
 			String usageItem = r.get("F22");
 			String remark = r.get("F23");
+			
+			//條件代碼
+			makeExcel.setValue(row,1,conditionCode,"R");
+			//營業單位
+			makeExcel.setValue(row,2,branchNo,"R");
+			//戶號
+			makeExcel.setValue(row,3,custNo,"#######","R");
+			//額度
+			makeExcel.setValue(row,4,facmNo,"R");
+			//撥款
+			makeExcel.setValue(row,5,bormNo,"R");
+			//戶名
+			makeExcel.setValue(row,6,custName,"L");
 
-			// 條件代碼
-			makeExcel.setValue(row, 1, conditionCode, "R");
-			// 營業單位
-			makeExcel.setValue(row, 2, branchNo, "R");
-			// 戶號
-			makeExcel.setValue(row, 3, custNo, "#######", "R");
-			// 額度
-			makeExcel.setValue(row, 4, facmNo, "R");
-			// 撥款
-			makeExcel.setValue(row, 5, bormNo, "R");
-			// 戶名
-			makeExcel.setValue(row, 6, custName, "L");
-
-			// 撥款日期
-			makeExcel.setValue(row, 7, drawdownDate, "", "R");
-			// 放款餘額
-			makeExcel.setValue(row, 8, loanBal, "#,##0", "R");
-			// 到期日
-			makeExcel.setValue(row, 9, maturityDate, "R");
-			// 押品1
-			makeExcel.setValue(row, 10, clcode1, "R");
-			// 押品2
-			makeExcel.setValue(row, 11, clcode2, "R");
-			// 押品號碼
-			makeExcel.setValue(row, 12, clno, "R");
-			// 縣市
-			makeExcel.setValue(row, 13, cityShort, "L");
-			// 鄉鎮區
-			makeExcel.setValue(row, 14, areaShort, "L");
-			// 段
-			makeExcel.setValue(row, 15, part1, "L");
-			// 小段
-			makeExcel.setValue(row, 16, part2, "L");
-			// 門牌號碼
-			makeExcel.setValue(row, 17, location, "L");
-			// 地區別
-			makeExcel.setValue(row, 18, cityCode, "L");
-			// 區域中心
-			makeExcel.setValue(row, 19, unit, "L");
-			// 抽樣總戶數
-			makeExcel.setValue(row, 20, sampleNum, "R");
-			// 抽樣別
-			makeExcel.setValue(row, 21, sampleType, "L");
-			// 覆審月份
-			makeExcel.setValue(row, 22, rechYM, "R");
-			// 增貸案件
-			makeExcel.setValue(row, 23, usageItem, "L");
-			// 資料說明(備註)
-			makeExcel.setValue(row, 24, remark, "L");
+			//撥款日期
+			makeExcel.setValue(row,7,drawdownDate,"","R");
+			//放款餘額
+			makeExcel.setValue(row,8,loanBal,"#,##0","R");
+			//到期日
+			makeExcel.setValue(row,9,maturityDate,"R");
+			//押品1
+			makeExcel.setValue(row,10,clcode1,"R");
+			//押品2
+			makeExcel.setValue(row,11,clcode2,"R");
+			//押品號碼
+			makeExcel.setValue(row,12,clno,"R");
+			//縣市
+			makeExcel.setValue(row,13,cityShort,"L");
+			//鄉鎮區
+			makeExcel.setValue(row,14,areaShort,"L");
+			//段
+			makeExcel.setValue(row,15,part1,"L");
+			//小段
+			makeExcel.setValue(row,16,part2,"L");
+			//門牌號碼
+			makeExcel.setValue(row,17,location,"L");
+			//地區別
+			makeExcel.setValue(row,18,cityCode,"L");
+			//區域中心
+			makeExcel.setValue(row,19,unit,"L");
+			//抽樣總戶數
+			makeExcel.setValue(row,20,sampleNum,"R");
+			//抽樣別
+			makeExcel.setValue(row,21,sampleType,"L");
+			//覆審月份
+			makeExcel.setValue(row,22,rechYM,"R");
+			//增貸案件
+			makeExcel.setValue(row,23,usageItem,"L");
+			//資料說明(備註)
+			makeExcel.setValue(row,24,remark,"L");
 
 			row++;
 		}
-
+		
 	}
 
 }

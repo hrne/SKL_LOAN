@@ -112,6 +112,8 @@ public class L3711 extends TradeBuffer {
 	private BigDecimal iReduceAmt;
 	private String iRqspFlag;
 	private int iRpCode; // 還款來源
+	private int iOverRpFg; // 1.短收 2.溢收
+	private BigDecimal iOverAmt; // 溢收金額
 
 	// work area
 	private int wkTbsDy;
@@ -165,8 +167,14 @@ public class L3711 extends TradeBuffer {
 		iNewSpecificDd = this.parse.stringToInteger(titaVo.getParam("NewSpecificDd"));
 		iNewPayIntDate = this.parse.stringToInteger(titaVo.getParam("NewPayIntDate"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
-		iRqspFlag = titaVo.getParam("RqspFlag");
-		iRpCode = 90;
+		iRqspFlag = titaVo.getParam("RqspFlag");		
+		iRpCode = this.parse.stringToInteger(titaVo.getParam("RpCode1"));// 還款來源
+		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收
+		iOverAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
+		// 不可有短繳金額
+		if (iOverRpFg == 1 && iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+			throw new LogicException(titaVo, "E3094", "短繳金額 = " + iOverAmt); // 不可有短繳金額
+		}
 
 		// 檢查到同戶帳務交易需由最近一筆交易開始訂正
 		if (titaVo.isHcodeErase()) {

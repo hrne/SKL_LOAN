@@ -4133,12 +4133,14 @@ TXFORM=L3R04
 <L3R05.dec>
 #L3r05TempAmt=m,14.2,S
 #L3r05TmpFacmNoX=X,50,S
+#L3r05ExcessiveAll=m,14.2,S
 </L3R05.dec>
 
 <L3R05.tom>
 TXFORM=L3R05
 #L3r05TempAmt
 #L3r05TmpFacmNoX
+#L3r05ExcessiveAll
 ^
 </L3R05.tom>
 

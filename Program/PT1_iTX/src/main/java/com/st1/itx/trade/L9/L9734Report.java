@@ -57,12 +57,14 @@ public class L9734Report extends MakeReport {
 	 * @param titaVo
 	 * @param yearMonth 西元年月
 	 * @param rptCode   報表代號
+	 * @return 
+	 * @throws LogicException 
 	 *
 	 * 
 	 */
 	public boolean exec(TitaVo titaVo, int yearMonth, String rptCode) throws LogicException {
 		this.info(txCD + " exec-" + rptCode);
-
+		
 		switch (rptCode) {
 		case "LM062":
 			lm062report.exec(titaVo, yearMonth);

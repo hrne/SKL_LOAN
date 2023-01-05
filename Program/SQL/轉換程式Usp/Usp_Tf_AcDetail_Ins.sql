@@ -405,6 +405,7 @@ BEGIN
              WHEN TO_NUMBER(NVL(S."JLNCRC",0)) = 4 -- 被沖正 
              THEN 2 -- 被沖正(隔日訂正) 
            ELSE 0 END                     AS "TitaHCode" 
+          ,''                             AS "MediaSlipNo"
     FROM S 
     LEFT JOIN ACT ON ACT."LMSACN" = NVL(S."LMSACN",0) 
                  AND NVL(S."LMSACN",0) > 0 
@@ -534,6 +535,7 @@ BEGIN
           ,'999999'                       AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0 
           ,JORP."NEWVBN"                  AS "SlipSumNo" 
           ,0                              AS "TitaHCode" 
+          ,''                             AS "MediaSlipNo"
     FROM JORP 
     LEFT JOIN "CdAcCode" S5 ON S5."AcNoCodeOld" = JORP."CORACC" 
                            AND S5."AcSubCode" = NVL(JORP."CORACS",'     ') 

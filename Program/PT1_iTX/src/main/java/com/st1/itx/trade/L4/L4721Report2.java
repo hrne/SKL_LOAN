@@ -207,7 +207,7 @@ public class L4721Report2 extends MakeReport {
 								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7) + "9510300"
 								+ FormatUtil.pad9(mapL4721Detail.get("CustNo"), 7);
 						result.add(line);
-
+						tempfacmno = parse.stringToInteger(mapL4721Detail.get("FacmNo"));
 						result = sameFacmno(mapL4721Detail, result, true);
 						// 換額度要重新算次數
 						times = 0;

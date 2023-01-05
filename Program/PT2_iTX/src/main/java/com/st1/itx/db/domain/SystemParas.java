@@ -308,6 +308,10 @@ public class SystemParas implements Serializable {
   @Column(name = "`IcsUrl`", length = 100)
   private String icsUrl;
 
+  // 火險保費已解付新產日期
+  @Column(name = "`InsuSettleDate`")
+  private int insuSettleDate = 0;
+
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -1513,6 +1517,25 @@ N:不啟用
   }
 
 /**
+	* 火險保費已解付新產日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getInsuSettleDate() {
+    return StaticTool.bcToRoc(this.insuSettleDate);
+  }
+
+/**
+	* 火險保費已解付新產日期<br>
+	* 
+  *
+  * @param insuSettleDate 火險保費已解付新產日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setInsuSettleDate(int insuSettleDate) throws LogicException {
+    this.insuSettleDate = StaticTool.rocToBc(insuSettleDate);
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1600,7 +1623,7 @@ N:不啟用
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
            + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth
            + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg
-           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", insuSettleDate=" + insuSettleDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

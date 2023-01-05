@@ -17,8 +17,9 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 2.本金利息 <BR>
 	 * 3.暫收抵繳 <BR>
 	 * 4.溢(C)短(D)繳 <BR>
-	 * 5.其他額度暫收可抵繳 <BR>
+	 * 5.其他額度暫收可抵繳(指定額度) <BR>
 	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金、繳本息之聯貸費用) <BR>
+	 * 9.其他(專戶、債協、AML...) <BR>
 	 */
 	private int dataKind = 0;
 
@@ -156,12 +157,12 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 費用金額
 	 */
 	private BigDecimal feeAmt = BigDecimal.ZERO;
-	
+
 	/**
 	 * 銷帳jason紀錄欄
 	 */
 	private String rvJsonFields = "";
-	
+
 	/* ------------------- 備註欄 ---------------- */
 	/**
 	 * 短繳本金(備註於本金利息該筆)
@@ -223,15 +224,15 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	private BigDecimal txAmt = BigDecimal.ZERO;
 
 	/**
-	 * 作帳金額  (檢核表計算用)
+	 * 作帳金額 (檢核表計算用)
 	 */
 	private BigDecimal acAmt = BigDecimal.ZERO;
-	
+
 	/**
 	 * 分錄序號 (檢核表計算用)
 	 */
 	private int acSeq = 0;
-	
+
 	/**
 	 * 額度科目 (檢核表計算用)
 	 */
@@ -254,18 +255,68 @@ public class BaTxVo implements Comparable<BaTxVo> {
 				+ ", facAcctCode=" + facAcctCode + "]";
 	}
 
+	/**
+	 * 資料類型<BR>
+	 * 1.應收費用+未收費用+短繳期金 <BR>
+	 * 2.本金利息 <BR>
+	 * 3.暫收抵繳 <BR>
+	 * 4.溢(C)短(D)繳 <BR>
+	 * 5.其他額度暫收可抵繳(指定額度) <BR>
+	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金、繳本息之聯貸費用) <BR>
+	 * 9.其他(專戶、債協、AML...) <BR>
+	 * 
+	 * @return 資料類型
+	 */
 	public int getDataKind() {
 		return dataKind;
 	}
 
+	/**
+	 * 資料類型<BR>
+	 * 1.應收費用+未收費用+短繳期金 <BR>
+	 * 2.本金利息 <BR>
+	 * 3.暫收抵繳 <BR>
+	 * 4.溢(C)短(D)繳 <BR>
+	 * 5.其他額度暫收可抵繳(指定額度) <BR>
+	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金、繳本息之聯貸費用) <BR>
+	 * 9.其他(專戶、債協、AML...) <BR>
+	 * 
+	 * @param dataKind 資料類型
+	 */
 	public void setDataKind(int dataKind) {
 		this.dataKind = dataKind;
 	}
 
+	/**
+	 * 還款類別 <BR>
+	 * 01-期款 <BR>
+	 * 02-部分償還 <BR>
+	 * 03-結案 <BR>
+	 * 04-帳管費 <BR>
+	 * 05-火險費 <BR>
+	 * 06-契變手續費 <BR>
+	 * 07-法務費 <BR>
+	 * 09-其他(清償違約金) <BR>
+	 * 
+	 * @return 還款類別
+	 */
 	public int getRepayType() {
 		return repayType;
 	}
 
+	/**
+	 * 還款類別 <BR>
+	 * 01-期款 <BR>
+	 * 02-部分償還 <BR>
+	 * 03-結案 <BR>
+	 * 04-帳管費 <BR>
+	 * 05-火險費 <BR>
+	 * 06-契變手續費 <BR>
+	 * 07-法務費 <BR>
+	 * 09-其他(清償違約金) <BR>
+	 * 
+	 * @param repayType 還款類別
+	 */
 	public void setRepayType(int repayType) {
 		this.repayType = repayType;
 	}
@@ -334,10 +385,20 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.unPaidAmt = unPaidAmt;
 	}
 
+	/**
+	 * 還款順序 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6.另收欠款> 7.未到期應繳本息
+	 * 
+	 * @return 還款順序
+	 */
 	public int getRepayPriority() {
 		return repayPriority;
 	}
 
+	/**
+	 * 還款順序 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6.另收欠款> 7.未到期應繳本息
+	 * 
+	 * @param repayPriority 還款順序
+	 */
 	public void setRepayPriority(int repayPriority) {
 		this.repayPriority = repayPriority;
 	}
@@ -502,7 +563,6 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		this.feeAmt = feeAmt;
 	}
 
-
 	public String getRvJsonFields() {
 		return rvJsonFields;
 	}
@@ -526,7 +586,6 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	public void setOverflow(BigDecimal overFlow) {
 		this.overflow = overFlow;
 	}
-
 
 	public BigDecimal getTxAmt() {
 		return txAmt;

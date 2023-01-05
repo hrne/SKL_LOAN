@@ -95,9 +95,9 @@ public class L8926 extends TradeBuffer {
 		totaVo.putParam("OManagerDate", tMlaundryDetail.getManagerDate());
 		totaVo.putParam("OManagerDesc", tMlaundryDetail.getManagerDesc() != null ? tMlaundryDetail.getManagerDesc().replace("$n", "\n") : "");
 		
-		// 查詢疑似洗錢樣態檢核明細檔檔
+		// 查詢疑似洗錢樣態檢核明細檔
 		Slice<MlaundryChkDtl> slMlaundryChkDtl;
-		slMlaundryChkDtl = sMlaundryChkDtlService.findDtlEntryDateRangeFactorCustNo(iAcDate, iAcDate, iFactor, iCustNo, this.index, this.limit, titaVo);
+		slMlaundryChkDtl = sMlaundryChkDtlService.findEntryDateRangeFactorCustNo(iAcDate, iAcDate, iFactor, iCustNo, this.index, this.limit, titaVo);
 
 		List<MlaundryChkDtl> lMlaundryChkDtl = slMlaundryChkDtl == null ? new ArrayList<MlaundryChkDtl>() : slMlaundryChkDtl.getContent();
 
@@ -130,10 +130,10 @@ public class L8926 extends TradeBuffer {
 			occursList.putParam("OOStartEntryDate", tMlaundryChkDtl.getStartEntryDate()); // 統計期間起日
 			occursList.putParam("OOEndEntryDate", tMlaundryChkDtl.getEntryDate()); // 統計期間迄日
 
-			DateTime = this.parse.timeStampToString(tMlaundryChkDtl.getCreateDate()); // 產製日期
-			this.info("L8926 DateTime : " + DateTime);
-			Date = FormatUtil.left(DateTime, 9);
-			occursList.putParam("OOCreateDate", Date);
+//			DateTime = this.parse.timeStampToString(tMlaundryChkDtl.getCreateDate()); // 產製日期
+//			this.info("L8926 DateTime : " + DateTime);
+//			Date = FormatUtil.left(DateTime, 9);
+			occursList.putParam("OOCreateDate", tMlaundryChkDtl.getEntryDate());// 產製日期
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

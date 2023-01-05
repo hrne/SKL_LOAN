@@ -255,6 +255,7 @@ public class L3220 extends TradeBuffer {
 						AcDetail acDetail = new AcDetail();
 						acDetail.setDbCr("D");
 						acDetail.setTxAmt(ba.getAcctAmt());
+						acDetail.setSumNo("090");
 						acDetail.setRvNo(ba.getRvNo());
 						acDetail.setAcctCode(ba.getAcctCode());
 						acDetail.setCurrencyCode(iCurrencyCode);

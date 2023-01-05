@@ -1082,7 +1082,6 @@ public class TxBatchCom extends TradeBuffer {
 			tBatxHead.setBatxTotAmt(tBatxHead.getBatxTotAmt().add(repayAmt));
 			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
 			tBatxHead.setUnfinishCnt(tBatxHead.getUnfinishCnt() + 1);
-			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
 		}
 		try {
 			batxHeadService.update(tBatxHead, titaVo);
@@ -1335,17 +1334,16 @@ public class TxBatchCom extends TradeBuffer {
 			tBatxDetail.setMediaSeq(tBankRmtf.getDetailSeq());
 		} else {
 			BankRmtfId tBankRmtfId = new BankRmtfId();
-			tBankRmtf = bankRmtfService.holdById(tBankRmtfId, titaVo);
 			if (!"".equals(tBatxDetail.getMediaKind())) {
 				tBankRmtfId.setAcDate(tBatxDetail.getMediaDate());
-				tBankRmtfId.setBatchNo("BATX" + tBatxDetail.getMediaKind());
+				tBankRmtfId.setBatchNo("BATX" + tBatxDetail.getMediaKind());  // 上傳批號後兩碼(匯款轉帳、支票兌現)
 				tBankRmtfId.setDetailSeq(tBatxDetail.getMediaSeq());
 			} else {
 				tBankRmtfId.setAcDate(tBatxDetail.getAcDate());
 				tBankRmtfId.setBatchNo(tBatxDetail.getBatchNo());
 				tBankRmtfId.setDetailSeq(tBatxDetail.getDetailSeq());
-				tBankRmtf = bankRmtfService.holdById(tBankRmtfId, titaVo);
 			}
+			tBankRmtf = bankRmtfService.holdById(tBankRmtfId, titaVo);
 			if (tBankRmtf == null) {
 				throw new LogicException("E0006", "TxBatchCom BankRmtf"); // E0006 鎖定資料時，發生錯誤
 			}
