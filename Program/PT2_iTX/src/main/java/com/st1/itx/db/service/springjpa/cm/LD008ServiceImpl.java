@@ -29,19 +29,50 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(int rptType, String acSubBookCode, TitaVo titaVo) throws Exception {
 		this.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
 
+		int iENTDAY = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+
 		String sql = " ";
+		sql += " WITH loanData AS ( ";
+		sql += "   SELECT B.\"CustNo\" ";
+		sql += "        , B.\"FacmNo\" ";
+		sql += "        , B.\"BormNo\" ";
+		sql += "        , CASE ";
+		sql += "            WHEN B.\"Status\" IN (2,5,6,7,8,9) ";
+		sql += "            THEN NVL(O.\"AcctCode\",'   ') ";
+		sql += "          ELSE F.\"AcctCode\" END         AS \"AcctCode\" ";
+		sql += "        , F.\"AcctCode\"                  AS \"FacAcctCode\" ";
+		sql += "        , CASE  ";
+		sql += "            WHEN B.\"Status\" IN (0,4)  ";
+		sql += "            THEN B.\"LoanBal\" ";
+		sql += "            WHEN B.\"Status\" IN (2,7)   ";
+		sql += "            THEN NVL(O.\"OvduBal\",0) ";
+		sql += "          ELSE 0 END                      AS \"LoanBalance\"  ";
+		sql += "   FROM \"LoanBorMain\" B ";
+		sql += "   LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = B.\"CustNo\" ";
+		sql += "                          AND F.\"FacmNo\" = B.\"FacmNo\" ";
+		sql += "   LEFT JOIN \"LoanOverdue\" O ON O.\"CustNo\" = B.\"CustNo\" ";
+		sql += "                              AND O.\"FacmNo\" = B.\"FacmNo\" ";
+		sql += "                              AND O.\"BormNo\" = B.\"BormNo\" ";
+		sql += "                              AND O.\"OvduNo\" = B.\"LastOvduNo\" ";
+		sql += "                              AND B.\"Status\" IN (2,5,6,7,8,9) ";
+		sql += "   WHERE B.\"Status\" in (0,1,2,3,4,5,6,7,8,9) ";
+		sql += "     AND B.\"DrawdownDate\" <= :TBSDYF ";
+		sql += " ) ";
 		sql += " SELECT S.\"DetailSeq\"";
 		sql += "       ,SUM(S.\"Counts\")      AS \"Counts\"";
 		sql += "       ,SUM(S.\"LoanBalance\") AS \"Amt\"";
 		sql += " FROM (  SELECT CASE";
 		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"IsRelated\" = 'Y'          THEN 1";
-		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 2"; // EntCode = 2 為企金自然人,算在個人戶
+		sql += "                  WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 2"; // EntCode = 2
+																											// 為企金自然人,算在個人戶
 		sql += "                  WHEN D.\"AcctCode\" = '310'                                    THEN 3";
 		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"IsRelated\" = 'Y'          THEN 4";
-		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 5"; // EntCode = 2 為企金自然人,算在個人戶
+		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 5"; // EntCode = 2
+																											// 為企金自然人,算在個人戶
 		sql += "                  WHEN D.\"AcctCode\" = '320'                                    THEN 6";
 		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"IsRelated\" = 'Y'          THEN 7";
-		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 8"; // EntCode = 2 為企金自然人,算在個人戶
+		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 8"; // EntCode = 2
+																											// 為企金自然人,算在個人戶
 		sql += "                  WHEN D.\"AcctCode\" = '330'                                    THEN 9";
 		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 10";
 		sql += "                  WHEN D.\"AcctCode\" = '340'                                    THEN 11";
@@ -54,9 +85,8 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      ,D.\"CustNo\"";
 		sql += "                      ,D.\"FacmNo\"";
 		sql += "                      ,SUM(D.\"LoanBalance\") AS \"LoanBalance\"";
-		sql += "                FROM \"DailyLoanBal\" D ";
+		sql += "                FROM loanData D ";
 		sql += "                WHERE D.\"LoanBalance\" > 0";
-		sql += "                  AND D.\"LatestFlag\" = 1";
 		sql += "                GROUP BY D.\"AcctCode\"";
 		sql += "                        ,D.\"FacAcctCode\"";
 		sql += "                        ,D.\"CustNo\"";
@@ -93,13 +123,12 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ,ROW_NUMBER() OVER (PARTITION BY A0.\"CustNo\"";
 		sql += "                                                           ,A0.\"FacmNo\"";
 		sql += "                                               ORDER BY A0.\"AcctCode\") AS \"Seq\"";
-		sql += "                     FROM \"DailyLoanBal\" D0";
+		sql += "                     FROM loanData D0";
 		sql += "                     LEFT JOIN \"AcReceivable\" A0 ON A0.\"AcctCode\" = D0.\"AcctCode\"";
 		sql += "                                                  AND A0.\"CustNo\"   = D0.\"CustNo\"";
 		sql += "                                                  AND A0.\"FacmNo\"   = D0.\"FacmNo\"";
 		sql += "                                                  AND SUBSTR(A0.\"RvNo\",0,3) = LPAD(D0.\"BormNo\",3,'0')";
 		sql += "                     WHERE D0.\"LoanBalance\" > 0";
-		sql += "                       AND D0.\"LatestFlag\" = 1";
 		sql += "                       AND A0.\"AcctCode\" IN ('310','320','330','340','990')";
 		sql += "                   ) A ON A.\"AcctCode\" = D.\"AcctCode\"";
 		sql += "                      AND A.\"CustNo\"   = D.\"CustNo\"";
@@ -134,6 +163,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (rptType < 9) {
 			query.setParameter("acSubBookCode", acSubBookCode);
 		}
+		query.setParameter("TBSDYF", iENTDAY);
 
 		return this.convertToMap(query);
 	}
@@ -164,12 +194,39 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findAll_related(int rptType, String acSubBookCode, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll_related(int rptType, String acSubBookCode, TitaVo titaVo)
+			throws Exception {
 		this.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
 
-//		int entdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iENTDAY = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 
 		String sql = " ";
+		sql += " WITH loanData AS ( ";
+		sql += "   SELECT B.\"CustNo\" ";
+		sql += "        , B.\"FacmNo\" ";
+		sql += "        , B.\"BormNo\" ";
+		sql += "        , CASE ";
+		sql += "            WHEN B.\"Status\" IN (2,5,6,7,8,9) ";
+		sql += "            THEN NVL(O.\"AcctCode\",'   ') ";
+		sql += "          ELSE F.\"AcctCode\" END         AS \"AcctCode\" ";
+		sql += "        , F.\"AcctCode\"                  AS \"FacAcctCode\" ";
+		sql += "        , CASE  ";
+		sql += "            WHEN B.\"Status\" IN (0,4)  ";
+		sql += "            THEN B.\"LoanBal\" ";
+		sql += "            WHEN B.\"Status\" IN (2,7)   ";
+		sql += "            THEN NVL(O.\"OvduBal\",0) ";
+		sql += "          ELSE 0 END                      AS \"LoanBalance\"  ";
+		sql += "   FROM \"LoanBorMain\" B ";
+		sql += "   LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = B.\"CustNo\" ";
+		sql += "                          AND F.\"FacmNo\" = B.\"FacmNo\" ";
+		sql += "   LEFT JOIN \"LoanOverdue\" O ON O.\"CustNo\" = B.\"CustNo\" ";
+		sql += "                              AND O.\"FacmNo\" = B.\"FacmNo\" ";
+		sql += "                              AND O.\"BormNo\" = B.\"BormNo\" ";
+		sql += "                              AND O.\"OvduNo\" = B.\"LastOvduNo\" ";
+		sql += "                              AND B.\"Status\" IN (2,5,6,7,8,9) ";
+		sql += "   WHERE B.\"Status\" in (0,1,2,3,4,5,6,7,8,9) ";
+		sql += "     AND B.\"DrawdownDate\" <= :TBSDYF ";
+		sql += " ) ";
 		sql += " SELECT S.\"DetailSeq\" ";
 		sql += "       ,SUM(S.\"Counts\")      AS \"Counts\" ";
 		sql += "       ,SUM(S.\"LoanBalance\") AS \"Amt\" ";
@@ -192,9 +249,8 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      ,D.\"CustNo\" ";
 		sql += "                      ,D.\"FacmNo\" ";
 		sql += "                      ,SUM(D.\"LoanBalance\") AS \"LoanBalance\" ";
-		sql += "                FROM \"DailyLoanBal\" D  ";
+		sql += "                FROM loanData D  ";
 		sql += "                WHERE D.\"LoanBalance\" > 0 ";
-		sql += "                  AND D.\"LatestFlag\" = 1";
 		sql += "                GROUP BY D.\"AcctCode\" ";
 		sql += "                        ,D.\"FacAcctCode\" ";
 		sql += "                        ,D.\"CustNo\" ";
@@ -231,13 +287,12 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                           ,ROW_NUMBER() OVER (PARTITION BY A0.\"CustNo\" ";
 		sql += "                                                           ,A0.\"FacmNo\" ";
 		sql += "                                               ORDER BY A0.\"AcctCode\") AS \"Seq\" ";
-		sql += "                     FROM \"DailyLoanBal\" D0 ";
+		sql += "                     FROM loanData D0 ";
 		sql += "                     LEFT JOIN \"AcReceivable\" A0 ON A0.\"AcctCode\" = D0.\"AcctCode\" ";
 		sql += "                                                  AND A0.\"CustNo\"   = D0.\"CustNo\" ";
 		sql += "                                                  AND A0.\"FacmNo\"   = D0.\"FacmNo\" ";
 		sql += "                                                  AND SUBSTR(A0.\"RvNo\",0,3) = LPAD(D0.\"BormNo\",3,'0') ";
 		sql += "                     WHERE D0.\"LoanBalance\" > 0 ";
-		sql += "                       AND D0.\"LatestFlag\" = 1 ";
 		sql += "                       AND A0.\"AcctCode\" IN ('310','320','330','340','990') ";
 		sql += "                   ) A ON A.\"AcctCode\" = D.\"AcctCode\" ";
 		sql += "                      AND A.\"CustNo\"   = D.\"CustNo\" ";
@@ -271,6 +326,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (rptType < 9) {
 			query.setParameter("acSubBookCode", acSubBookCode);
 		}
+		query.setParameter("TBSDYF", iENTDAY);
 
 		return this.convertToMap(query);
 	}

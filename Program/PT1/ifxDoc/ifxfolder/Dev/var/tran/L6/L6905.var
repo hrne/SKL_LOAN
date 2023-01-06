@@ -377,9 +377,9 @@ X(#OOCrAmt1)
 T(2,#OOTitaTxCd+ +#OOTranItem)
 
 !彙總別
-#OOSumNo=X,3,S
-#OOSumNoX=X,20,S
-C(4,#OOSumNo,S,T(H,#OOSumNo,#SumNoTypeHelp))
+! #OOSumNo=X,3,S
+! #OOSumNoX=X,20,S
+! C(4,#OOSumNo,S,T(H,#OOSumNo,#SumNoTypeHelp))
 !主管
 #OOTitaSupNo=X,6,S
 #OOSupItem=X,20,S
@@ -426,6 +426,17 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
 #OOLastEmp=x,47,S
 T(2,#OOTitaTlrNo+ +#OOTlrItem)
 
+#OOSlipBatNo=A,2,S
+
+#OOSlipSumNo=A,2,S
+
+#OOEntAc=A,1,S
+
+#OOMediaSlipNo=X,12,S
+
+#OORvNo=X,30,S
+
+
 </sub>
 
 
@@ -469,7 +480,6 @@ TXFORM=L6905
 #OOTitaTxtNo
 #OOTitaTxCd
 #OOTranItem
-#OOSumNo
 #OOTitaSupNo
 #OOSupItem
 #OOTitaTlrNo
@@ -478,6 +488,11 @@ TXFORM=L6905
 #OORelTxseq
 #OOSlipNo
 #OOLastUpdate
+#OOSlipBatNo
+#OOSlipSumNo
+#OOEntAc
+#OOMediaSlipNo
+#OORvNo
 
 ^
 </sub>
@@ -514,14 +529,24 @@ TXFORM=L6905
 {width:140,align:'right'}
 #OOLastDate=交易日期
 {width:80,align:'center'}
+
+#OOSlipBatNo=傳票批號
+{width:80,align:'center'}
+#OOSlipSumNo=彙總批號
+{width:80,align:'center'}
+#OOEntAc=入總帳記號
+{width:80,align:'center'}
+#OOMediaSlipNo=總帳傳票號碼
+{width:80,align:'center'}
+#OORvNo=銷帳碼
+{width:80,align:'center'}
+
 #OOLastTime=時間
 {width:80,align:'center'}
 #OOSlipNote=摘要
 {width:200,align:'left'}
 #OOTitaTxCdX=交易代號
 {width:150,align:'left'}
-#OOSumNoX=彙總別
-{width:70,align:'center'}
 #OOTitaTlrNoX=經辦
 {width:100,align:'center'}
 #OOTitaSupNoX=主管

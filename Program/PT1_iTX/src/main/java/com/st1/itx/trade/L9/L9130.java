@@ -81,7 +81,8 @@ public class L9130 extends TradeBuffer {
 		if (iBatchNo == 0) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[傳票批號]不得為0", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[傳票批號]不得為0", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -90,7 +91,8 @@ public class L9130 extends TradeBuffer {
 		if (iBatchNo > 99) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[傳票批號]不得大於99", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[傳票批號]不得大於99", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -99,7 +101,8 @@ public class L9130 extends TradeBuffer {
 		if (iMediaSeq == 0) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[總帳傳票媒體上傳序號]不得為0", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[總帳傳票媒體上傳序號]不得為0", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -108,7 +111,8 @@ public class L9130 extends TradeBuffer {
 		if (iMediaSeq > 999) {
 			this.info("L9130 iBatchNo = " + iBatchNo);
 
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(), titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[總帳傳票媒體上傳序號]不得大於999", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "L9130總帳傳票媒體檔產生,傳入參數[總帳傳票媒體上傳序號]不得大於999", titaVo);
 
 			this.addList(this.totaVo);
 			return this.sendList();
@@ -121,7 +125,8 @@ public class L9130 extends TradeBuffer {
 
 		this.info("ntxbuf = " + ntxbuf);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9130總帳傳票媒體檔產生已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+				"L9130總帳傳票媒體檔產生已完成", titaVo);
 
 		try {
 			tranL9131.run(titaVo);
@@ -191,6 +196,14 @@ public class L9130 extends TradeBuffer {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9130產生L9136檔案資料變更日報表時發生錯誤 = " + errors.toString());
 		}
+
+		StringBuilder backgroundJobs = new StringBuilder();
+		
+		backgroundJobs.append("jLD008;");
+		backgroundJobs.append("jLD009;");
+		
+		backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
+		titaVo.setBatchJobId(backgroundJobs.toString());
 
 		this.addList(this.totaVo);
 		return this.sendList();

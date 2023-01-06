@@ -152,41 +152,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						  		 AND AAC.\"AcDate\" = :today";
 		sql += "	ORDER BY R.\"AcctCode\" ASC";
 		sql += "			,R.\"AcSubBookCode\" ASC";
-	
-//		sql += " SELECT am.\"AcctCode\" AS F0 ";
-//		sql += "       ,CdC.\"Item\" AS F1 ";
-//		sql += "       ,am.\"AcSubBookCode\" AS F2 ";
-//		sql += "       ,CdCb.\"Item\" AS F3 ";
-//		sql += "       ,  aac.\"TdCnt\" ";
-//		sql += "        - aac.\"TdNewCnt\" ";
-//		sql += "        + aac.\"TdClsCnt\" ";
-//		sql += "        - aac.\"TdExtCnt\" AS F4 "; // 展出展入未完全
-//		sql += "       ,aac.\"TdNewCnt\" AS F5 ";
-//		sql += "       ,aac.\"TdClsCnt\" AS F6 ";
-//		sql += "       ,aac.\"TdExtCnt\" AS F7 "; // 展入件數
-//		sql += "       ,0 AS F8 "; // 展出件數; 展出的定義是什麼? LA$LDGP有兩個展期件數, LDGETC and LDGEIC, 哪一個是展出?
-//		sql += "       ,aac.\"TdNewCnt\" + aac.\"TdExtCnt\" - aac.\"TdClsCnt\" AS F9 "; // 展出展入未完全
-//		sql += "       ,aac.\"TdCnt\" AS F10 ";
-//		sql += "       ,am.\"YdBal\" AS F11 ";
-//		sql += "       ,am.\"DbAmt\" AS F12 ";
-//		sql += "       ,am.\"CrAmt\" AS F13 ";
-//		sql += "       ,am.\"DbAmt\" - am.\"CrAmt\" AS F14 ";
-//		sql += "       ,am.\"TdBal\" AS F15 ";
-//		sql += "       ,aac.\"TdExtAmt\" AS F16 ";
-//		sql += " FROM \"AcMain\" am ";
-//		sql += " LEFT JOIN \"AcAcctCheck\" aac ON aac.\"AcDate\" = am.\"AcDate\" ";
-//		sql += "                            AND NVL(aac.\"AcctCode\", ' ') = am.\"AcctCode\" ";
-//		sql += "                            AND NVL(aac.\"AcSubBookCode\", ' ') = am.\"AcSubBookCode\" ";
-//		sql += "                            AND aac.\"BranchNo\" = am.\"BranchNo\" ";
-//		sql += "                            AND aac.\"CurrencyCode\" = am.\"CurrencyCode\" ";.
-//		sql += " LEFT JOIN \"CdCode\" CdC ON CdC.\"DefCode\" = 'AcctCode' ";
-//		sql += "                       AND CdC.\"Code\" = am.\"AcctCode\" ";
-//		sql += " LEFT JOIN \"CdCode\" CdCb ON CdCb.\"DefCode\" = 'AcSubBookCode' ";
-//		sql += "                        AND CdCb.\"Code\" = am.\"AcSubBookCode\" ";
-//		sql += " WHERE am.\"AcctCode\" BETWEEN '310' AND '390' ";
-//		sql += "   AND am.\"AcDate\" = :today ";
-//		sql += " ORDER BY am.\"AcctCode\" ";
-//		sql += "         ,am.\"AcSubBookCode\" ";
+
 		this.info("sql=" + sql);
 		Query query;
 

@@ -847,14 +847,15 @@ public class TxBatchCom extends TradeBuffer {
 //		09其他		     09.其他	
 //      10AML凍結／未確定 X
 
-//      AmlRsp1 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單		
+//      09 其他  同戶合併 轉暫收        
+//      AmlRsp1 0.非可疑名單/已完成名單確認 1.需審查/確認 2.為凍結名單/未確定名單	
 		if ("2".equals(this.tTempVo.get("AmlRsp1")) || "2".equals(this.tTempVo.get("AmlRsp2")))
 			iReasonCode = 10;
 		else if ("1".equals(this.tTempVo.get("AmlRsp1")) || "1".equals(this.tTempVo.get("AmlRsp2")))
 			throw new LogicException(l3210TitaVo, "E0022", ""); // E0022 該筆資料需進行AML審查/確認
 		else if (tBatxDetail.getRepayCode() == 4)
 			iReasonCode = 8;
-		else if (tBatxDetail.getRepayType() == 11 && functionCode == 2)
+		else if (functionCode == 2 && !tTempVo.getParam("MergeSeq").equals(tTempVo.getParam("MergeCnt")))
 			iReasonCode = 9;
 		else if (tBatxDetail.getRepayType() == 11)
 			iReasonCode = 0;
@@ -1336,7 +1337,7 @@ public class TxBatchCom extends TradeBuffer {
 			BankRmtfId tBankRmtfId = new BankRmtfId();
 			if (!"".equals(tBatxDetail.getMediaKind())) {
 				tBankRmtfId.setAcDate(tBatxDetail.getMediaDate());
-				tBankRmtfId.setBatchNo("BATX" + tBatxDetail.getMediaKind());  // 上傳批號後兩碼(匯款轉帳、支票兌現)
+				tBankRmtfId.setBatchNo("BATX" + tBatxDetail.getMediaKind()); // 上傳批號後兩碼(匯款轉帳、支票兌現)
 				tBankRmtfId.setDetailSeq(tBatxDetail.getMediaSeq());
 			} else {
 				tBankRmtfId.setAcDate(tBatxDetail.getAcDate());
@@ -1527,7 +1528,7 @@ public class TxBatchCom extends TradeBuffer {
 		// 訂正
 		if (acDate == 0) {
 			tLoanCheque.setRepaidAmt(tLoanCheque.getRepaidAmt().subtract(iRpAmt));
-			if (tLoanCheque.getRepaidAmt().compareTo(new BigDecimal(0)) > 0) {				
+			if (tLoanCheque.getRepaidAmt().compareTo(new BigDecimal(0)) > 0) {
 				tLoanCheque.setStatusCode("1"); // 1: 兌現入帳
 			} else {
 				tLoanCheque.setStatusCode("4"); // 4: 兌現未入帳

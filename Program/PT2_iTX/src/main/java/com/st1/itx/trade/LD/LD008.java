@@ -43,8 +43,13 @@ public class LD008 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LD008 ");
 
+		if (!titaVo.containsKey("TotalItem")) {
+			lD008report.exec(titaVo, "0");
+			lD008report.exec(titaVo, "1");
+			return;
+		}
+
 		int totalItem = parse.stringToInteger(titaVo.getParam("TotalItem"));
-		String txcd = titaVo.getTxcd();
 		String subReportCode = "";
 
 		for (int i = 1; i <= totalItem; i++) {

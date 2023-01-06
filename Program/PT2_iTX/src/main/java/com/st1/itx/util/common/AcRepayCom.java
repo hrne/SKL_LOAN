@@ -37,7 +37,7 @@ import com.st1.itx.util.parse.Parse;
  * 1.run 收付欄出帳<BR>
  * 2.settleLoanRun 放款回收交易新增帳務及更新放款交易內容檔<BR>
  * 3.settleTempRun 暫收款交易新增帳務及更新放款交易內容檔 <BR>
- * 
+ * 4.
  * @author st1
  *
  */
@@ -606,35 +606,28 @@ public class AcRepayCom extends TradeBuffer {
 	/**
 	 * 累溢收(暫收貸)帳務處理
 	 * 
-	 * @param iLoanBorTx LoanBorTx
+	 * @param tx LoanBorTx
 	 * @param iAcList    List of AcDetail
 	 * @param titaVo     titaVo
 	 * @return 累溢收金額
 	 * @throws LogicException ....
 	 */
 
-	public BigDecimal settleOverflow(LoanBorTx iLoanBorTx, List<AcDetail> iAcList, TitaVo titaVo)
+	public BigDecimal settleOverflow(LoanBorTx tx, List<AcDetail> iAcList, TitaVo titaVo)
 			throws LogicException {
 		this.titaVo = titaVo;
 		this.lAcDetail = iAcList;
 		this.info("settleOverflow ..." + this.lAcDetail.size());
 
-		int wkCustNo = 0;
-		int wkFacmNo = 0;
 		BigDecimal wkOverflow = BigDecimal.ZERO;
 
 		// 借貸差
 		for (AcDetail ac : this.lAcDetail) {
-			wkCustNo = ac.getCustNo();
 			if ("D".equals(ac.getDbCr())) {
 				wkOverflow = wkOverflow.add(ac.getTxAmt());
 			} else {
 				wkOverflow = wkOverflow.subtract((ac.getTxAmt()));
 			}
-			if (ac.getFacmNo() > 0) {
-				wkFacmNo = ac.getFacmNo();
-			}
-			this.info("settleOverflow Overflow =" + wkOverflow + ac.toString());
 		}
 
 		if (wkOverflow.compareTo(BigDecimal.ZERO) > 0) {
@@ -642,8 +635,8 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setDbCr("C");
 			acDetail.setAcctCode("TAV");
 			acDetail.setTxAmt(wkOverflow);
-			acDetail.setCustNo(wkCustNo);
-			acDetail.setFacmNo(wkFacmNo);
+			acDetail.setCustNo(tx.getCustNo());
+			acDetail.setFacmNo(tx.getFacmNo());
 			acDetail.setBormNo(0);
 			acDetail.setSumNo("092"); // 暫收轉帳
 			this.lAcDetail.add(acDetail);
