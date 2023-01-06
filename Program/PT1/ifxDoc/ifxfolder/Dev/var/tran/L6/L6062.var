@@ -47,7 +47,7 @@ E(0,0)
 [
 ["[L6062]                                 行業別代號資料查詢"],
 ["#FdIndustryCode+行業代號",#IndustryCode],
-["#FdIndustryItem+行業名稱",#IndustryItem],
+["#FdIndustryItem+行業說明",#IndustryItem],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]

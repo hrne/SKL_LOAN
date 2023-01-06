@@ -180,6 +180,7 @@ public class L7205p extends TradeBuffer {
 
 			if (tMonthlyFacBal == null) {
 				CountF++; // 失敗筆數+1
+				this.info("fail custNo =" + custno + "-" + facmno);
 			} else {
 				tMonthlyFacBal.setAssetClass(assetclass);
 
@@ -255,11 +256,11 @@ public class L7205p extends TradeBuffer {
 //		this.totaVo.putParam("CountS", CountS);
 //		this.totaVo.putParam("CountF", CountF);
 
-		String note = "更新資料成功。總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
+		String note = "總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
 		// 如果有失敗筆數屬於失敗
-		if (CountF > 0) {
-			note = "更新資料失敗。總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
-		}
+//		if (CountF > 0) {
+//			note = "更新資料失敗。總筆數：" + CountAll + ",成功筆數：" + CountS + ",失敗筆數：" + CountF;
+//		}
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "",
 				titaVo.getParam("TLRNO"), note, titaVo);

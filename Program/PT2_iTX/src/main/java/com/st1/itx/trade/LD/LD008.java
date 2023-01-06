@@ -50,6 +50,7 @@ public class LD008 extends BatchBase implements Tasklet, InitializingBean {
 		}
 
 		int totalItem = parse.stringToInteger(titaVo.getParam("TotalItem"));
+
 		String subReportCode = "";
 
 		for (int i = 1; i <= totalItem; i++) {

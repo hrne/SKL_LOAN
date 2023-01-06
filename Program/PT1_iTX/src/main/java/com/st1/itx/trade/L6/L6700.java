@@ -24,7 +24,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6700 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6700.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -78,6 +77,9 @@ public class L6700 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", "未齊件代碼檔");
 				}
+				dataLog.setEnv(titaVo, cdLoanNotYet, cdLoanNotYet);
+				dataLog.exec("刪除未齊件代碼檔");
+				
 			}
 		}
 

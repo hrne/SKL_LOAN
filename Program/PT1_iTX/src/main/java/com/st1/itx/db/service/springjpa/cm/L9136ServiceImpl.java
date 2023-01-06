@@ -65,6 +65,8 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,JSON_QUERY(T.\"Content\",'$[*].n' WITH WRAPPER) AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
 		sql += "		  ,CE2.\"Fullname\" AS \"SupNoName\"";
+		sql += "		  ,T.\"TranNo\" AS \"TranNo\"";
+		sql += "		  ,TC.\"TranItem\" AS \"TranItem\"";
 		sql += "	FROM \"TxDataLog\" T";
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
 		sql += "	LEFT JOIN \"ClFac\" Cl ON Cl.\"CustNo\" = T.\"CustNo\"";
@@ -73,7 +75,9 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'ClCode2' || Cl.\"ClCode1\"";
 		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
 		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
-		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"AgentCode\" = CE.\"AdministratId\"";
+		sql += "	LEFT JOIN \"TxRecord\" TR ON TR.\"TxNo\" = T.\"TxSeq\"";
+		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = TR.\"SupNo\"";
+		sql += "	LEFT JOIN \"TxTranCode\" TC ON TC.\"TranNo\" = T.\"TranNo\"";
 		sql += "	WHERE T.\"TxDate\" BETWEEN :sAcDate AND :eAcDate";
 		sql += "	  AND JSON_QUERY(T.\"Content\",'$[*].f' WITH WRAPPER) IS NOT NULL";
 		sql += "	  AND T.\"TlrNo\" <> 'E-LOAN'";
@@ -131,21 +135,48 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  ,' ' AS \"Old\"";
 		sql += "		      ,CASE";
 		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
-		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
+		sql += "		      	  AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL";
 		sql += "		      	 THEN '訂正'";
 		sql += "		      	 WHEN T.\"Hcode\" <> 1 ";
-		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
-		sql += "		      	 THEN NVL(JSON_VALUE(\"TranData\",'$.RQSP'),'授權')";
-		sql += "		      	 WHEN JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)";
-		sql += "		      	 THEN '放行' ";
+		sql += "		      	  AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL";
+		sql += "		      	 THEN NVL(JSON_VALUE(T.\"TranData\",'$.RQSP'),'授權')";
+		sql += "		      	 WHEN JSON_VALUE(T.\"TranData\",'$.ACTFG') IN (2,4)";
+		sql += "		      	 THEN ";
+		sql += "				   CASE";
+		sql += "				     WHEN T.\"TranNo\" = 'L3100' THEN '撥款金額：' ||   TO_CHAR(NVL(JSON_VALUE(T.\"TranData\",'$.TXAMT'),'FM999,999,999,999,999'))";
+		sql += "				   	 WHEN T.\"TranNo\" = 'L5103' THEN '借閱原因：' ||   TO_CHAR(CC.\"Item\")";
+		sql += "				   	 ELSE '放行' END";
 		sql += "		      	 END AS \"New\"";
+//		sql += "		      ,CASE";
+//		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
+//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
+//		sql += "		      	 THEN '訂正'";
+//		sql += "		      	 WHEN T.\"Hcode\" <> 1 ";
+//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
+//		sql += "		      	 THEN NVL(JSON_VALUE(\"TranData\",'$.RQSP'),'授權')";
+//		sql += "		      	 WHEN JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)";
+//		sql += "		      	 THEN '放行' ";
+//		sql += "		      	 END AS \"New\"";
 		sql += "			  ,T.\"TlrNo\"";
-		sql += "			  ,JSON_VALUE(\"TranData\",'$.SUPNO') AS \"SupNo\"";
+		sql += "			  ,JSON_VALUE(T.\"TranData\",'$.SUPNO') AS \"SupNo\"";
+		sql += "			  ,T.\"TranNo\" AS \"TranNo\"";
+		sql += "		      ,CASE";
+		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
+		sql += "		      	  AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL";
+		sql += "		      	 THEN 1 ";
+		sql += "		      	 WHEN T.\"Hcode\" <> 1 ";
+		sql += "		      	  AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL";
+		sql += "		      	 THEN 1 ";
+		sql += "		      	 WHEN JSON_VALUE(T.\"TranData\",'$.ACTFG') IN (2,4)";
+		sql += "		      	 THEN 2";
+		sql += "		      	 ELSE 1 END AS \"Seq\"";
 		sql += "		FROM \"TxRecord\" T";
+		sql += "	    LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'UsageCodeX'";
+		sql += "						       AND CC.\"Code\" = JSON_VALUE(T.\"TranData\",'$.UsageCode')";
 		sql += "		WHERE T.\"Entdy\" BETWEEN :sAcDate AND :eAcDate";
-		sql += "		  AND ((T.\"Hcode\" = 1 AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL )";
-		sql += "		   OR (T.\"Hcode\" <> 1 AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL )";
-		sql += "		   OR ( JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)))";
+		sql += "		  AND ((T.\"Hcode\" = 1 AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL )";
+		sql += "		   OR (T.\"Hcode\" <> 1 AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL )";
+		sql += "		   OR ( JSON_VALUE(T.\"TranData\",'$.ACTFG') IN (2,4)))";
 		sql += "	)";
 		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
 		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
@@ -163,6 +194,9 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  ,T.\"New\" AS \"New\"";
 		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
 		sql += "		  ,CE2.\"Fullname\" AS \"SupNoName\"";
+		sql += "		  ,T.\"TranNo\" AS \"TranNo\"";
+		sql += "		  ,TC.\"TranItem\" AS \"TranItem\"";
+		sql += "		  ,T.\"Seq\" AS \"Seq\"";
 		sql += "	FROM \"tmpTxRecord\" T";
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
 		sql += "						  	 AND CM.\"CustNo\" > 0 ";
@@ -173,7 +207,9 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
 		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
 		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = T.\"SupNo\"";
-		sql += "	ORDER BY T.\"New\" ASC";
+		sql += "	LEFT JOIN \"TxTranCode\" TC ON TC.\"TranNo\" = T.\"TranNo\"";
+		sql += "	ORDER BY T.\"Seq\" ASC";
+		sql += "			,T.\"New\" ASC";
 		sql += "			,T.\"TxDate\" ASC";
 		sql += "			,T.\"TlrNo\" ASC";
 		sql += "			,T.\"TxSeq\" ASC";
@@ -190,7 +226,6 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 	
 	
 	public List<Map<String, String>> findSupNo(TitaVo titaVo,String TxNo) throws Exception {
-//		this.info("L9136 findSupNo =" + TxNo);
 	
 		String sql = " "; 
 		sql += " WITH \"count\" AS (";
@@ -224,8 +259,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = C.\"EmpNo\"";
 
 
-//		this.info("TxNo=" + TxNo);
-//		this.info("L9136ServiceImpl sql=" + sql);
+		this.info("L9136ServiceImpl sql=" + sql);
 
 		
 		Query query;
