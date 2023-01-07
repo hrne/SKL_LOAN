@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L6909ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SortMapListCom;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6909") // 暫收款查詢(依戶號)
@@ -38,11 +39,13 @@ public class L6909 extends TradeBuffer {
 
 	@Autowired
 	public L6909ServiceImpl l6909ServiceImpl;
+	@Autowired
+	DateUtil dDateUtil;
 
 	// 額度小計
 	private HashMap<Integer, BigDecimal> facmYdBal = new HashMap<>();
+	private HashMap<Integer, Integer> facmYdDate = new HashMap<>();
 	private HashMap<Integer, BigDecimal> facmTdBal = new HashMap<>();
-	private HashMap<Integer, Integer> facmEntryDate = new HashMap<>();
 	private HashMap<Integer, Integer> facmAcDate = new HashMap<>();
 	private int acdate = 0;
 
@@ -57,35 +60,71 @@ public class L6909 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE; // 316 * 100 = 31,600
 
-		// 會計日為零則以入帳日找入帳日，會計日不可小於暫收餘額檔會計日
 		List<Map<String, String>> acDateList = null;
+		int convertDate = 0;
+		// 讀取轉換日
 		try {
-			acDateList = l6909ServiceImpl.queryAcDate(titaVo);
+			acDateList = l6909ServiceImpl.queryConvertDate(titaVo);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
+		// 起日最早為轉換日
 		if (acDateList != null) {
 			for (Map<String, String> t : acDateList) {
-				titaVo.putParam("AcDateS", parse.stringToInteger(t.get("AcDateS")) - 19110000);
-				titaVo.putParam("AcDateE", parse.stringToInteger(t.get("AcDateE")) - 19110000);
+				convertDate = parse.stringToInteger(t.get("AcDateS")) - 19110000;
 			}
 		}
-		// 讀取暫收餘額檔餘額
+		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
+		// 以入帳日找會計日
+		if (iAcDateS == 0) {
+			acDateList = null;
+			try {
+				acDateList = l6909ServiceImpl.queryAcDate(titaVo);
+			} catch (Exception e) {
+				throw new LogicException(titaVo, "E0001", "SQL ERROR");
+			}
+			if (acDateList != null) {
+				for (Map<String, String> t : acDateList) {
+					iAcDateS = parse.stringToInteger(t.get("AcDateS")) - 19110000;
+				}
+			}
+
+		}
+		int ydDate = 0;
+		if (iAcDateS == 0 || iAcDateS <= convertDate) {
+			ydDate = convertDate;
+		} else {
+			dDateUtil.init();
+			dDateUtil.setDate_1(iAcDateS);
+			dDateUtil.setDays(-1);
+			ydDate = dDateUtil.getCalenderDay();
+		}
+
+		// 讀取暫收餘額檔昨日餘額
 		List<Map<String, String>> tavList = null;
 		try {
-			tavList = l6909ServiceImpl.queryDailyTav(titaVo);
+			tavList = l6909ServiceImpl.queryDailyTav(ydDate, titaVo);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
 
 		if (tavList != null) {
 			for (Map<String, String> t : tavList) {
-				this.info("YdBal CustNo=" + titaVo.get("CustNo") + ", FacmNo=" + t.get("FacmNo") + ", YdBal="
-						+ t.get("YdBal"));
+				this.info("tavList=" + t.toString());
 				int facmNo = parse.stringToInteger(t.get("FacmNo"));
-				facmYdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
-				facmTdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
-				facmAcDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+				// 比轉換日小放轉換日
+				int acDate = parse.stringToInteger(t.get("AcDate")) - 19110000;
+				if (acDate < convertDate) {
+					facmYdDate.put(facmNo, convertDate);
+					facmAcDate.put(facmNo, convertDate);
+					facmYdBal.put(facmNo, BigDecimal.ZERO);
+					facmTdBal.put(facmNo, BigDecimal.ZERO);
+				} else {
+					facmYdDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+					facmAcDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+					facmYdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
+					facmTdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
+				}
 			}
 		}
 
@@ -93,7 +132,7 @@ public class L6909 extends TradeBuffer {
 		List<Map<String, String>> oList = new ArrayList<Map<String, String>>();
 
 		try {
-			L6909List = l6909ServiceImpl.FindAll(titaVo, this.index, this.limit);
+			L6909List = l6909ServiceImpl.FindAll(ydDate, titaVo, this.index, this.limit);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR"); // 讀取DB時發生問題
 		}
@@ -131,9 +170,6 @@ public class L6909 extends TradeBuffer {
 				} else {
 					facmTdBal.put(facmNo, tavCr.subtract(tavDb));
 				}
-				if (facmEntryDate.containsKey(facmNo)) {
-					facmEntryDate.put(facmNo, entrydate);
-				}
 				if (facmAcDate.containsKey(facmNo)) {
 					facmAcDate.put(facmNo, acdate);
 				}
@@ -162,7 +198,7 @@ public class L6909 extends TradeBuffer {
 					if (facmYdBal.get(facmNo).compareTo(BigDecimal.ZERO) != 0) {
 						OccursList occursList = new OccursList();
 						occursList.putParam("OOEntryDate", "");// 入帳日期
-						occursList.putParam("OOAcDate", "");// 會計日期
+						occursList.putParam("OOAcDate", facmYdDate.get(facmNo));// 會計日期
 						occursList.putParam("OOTAVFacmNo", parse.IntegerToString(facmNo, 3));// 暫收款額度
 						occursList.putParam("OODesc", "額度"); // 交易別
 						occursList.putParam("OOTAVDb", "");// 暫收借
@@ -213,7 +249,7 @@ public class L6909 extends TradeBuffer {
 			for (Integer facmNo : facmTdBal.keySet()) {
 				if (facmTdBal.get(facmNo).compareTo(BigDecimal.ZERO) != 0) {
 					OccursList occursList = new OccursList();
-					occursList.putParam("OOEntryDate", facmEntryDate.get(facmNo));// 入帳日期
+					occursList.putParam("OOEntryDate", "");// 入帳日期
 					occursList.putParam("OOAcDate", facmAcDate.get(facmNo));// 會計日期
 					occursList.putParam("OOTAVFacmNo", parse.IntegerToString(facmNo, 3));// 暫收款額度
 					occursList.putParam("OODesc", "額度"); // 交易別

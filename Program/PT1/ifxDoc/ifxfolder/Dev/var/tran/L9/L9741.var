@@ -84,7 +84,7 @@ T(3,1:正常未繳;2:借支;3:催收未繳;9:全部)
 
 ! 火險到期年月
 #InsuYearMonth=A,5,I
-C(3,#CHAIN,0,$,s)
+!C(3,#CHAIN,0,$,s)
 T(1,@InsuYearMonth,#FORE_MONTH,2,5)
 @A(YM,1,#InsuYearMonth)
 
@@ -95,13 +95,28 @@ T(1,@InsuYearMonth,#FORE_MONTH,2,5)
 
 ! 查詢選項
 #SearchOption=A,1,I
-C(3,#CHAIN,0,$,s)
+!C(3,#CHAIN,0,$,s)
 E(0,9)  
 HELP(#SearchOptionHelp)
 @V(H,#SearchOptionHelp)
 
 #SearchOptionX=X,8,L
 T(3,)T(H,#SearchOption,#SearchOptionHelp)
+
+
+#tranNo=X,5,S
+T(3,L9741)
+!#SendL9R99=X,1,S
+!RESET_RIM(#SendL9R99,L9R99)
+S(L9R99,4,#tranNo,#InsuYearMonth,#CustNo,#SearchOption)
+R(1,L9R99)
+E(0,@InsuYearMonth,#OOInsuYearMonth)
+E(0,@CustNo,#OOCustNo)
+E(0,@SearchOption,#OOSearchOption)
+
+
+
+
 
 </sub>
 
@@ -115,15 +130,18 @@ T(3,)T(H,#SearchOption,#SearchOptionHelp)
 !---------- TXFORM = L9741 ----------
 <sub type="FORM" name="L9741">
 
-!#SCRPRT=_,_,S
-!C(5,#TXFORM,L9741,$,S)
+#SCRPRT=_,_,S
+C(5,#TXFORM,L9741,$,S)
 
 #SCRTIL=_,_,S
 T(3,[L9741] 火險及地震險保費 繳款通知單)
 
-!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#OOInsuYearMonth=A,5,I
+#OOCustNo=A,7,I
+#OOSearchOption=A,1,I
 
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 </sub>
@@ -139,7 +157,14 @@ T(3,[L9741] 火險及地震險保費 繳款通知單)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L9741^
+TXFORM=L9741
+^
+
+TXFORM=L9R99
+#OOInsuYearMonth
+#OOCustNo
+#OOSearchOption
+^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

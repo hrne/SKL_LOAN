@@ -41,14 +41,13 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
-	public List<Map<String, String>> FindAll(TitaVo titaVo, int index, int limit) throws Exception {
+	public List<Map<String, String>> FindAll(int iYdDate, TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("FindAll CustNo=" + titaVo.get("CustNo") + ", AcDate=" + titaVo.get("AcDateS") + "~"
 				+ titaVo.get("AcDateE"));
 
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.get("FacmNo"));
 		int iTitaHCode = parse.stringToInteger(titaVo.get("TitaHCode"));
-		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
 		int iAcDateE = parse.stringToInteger(titaVo.get("AcDateE").trim());
 		String iSortCode = titaVo.get("SortCode").trim(); // 0-會計日期+額度 1-入帳日期+額度 2-額度+入帳日期
 
@@ -82,7 +81,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (iFacmNo > 0) {
 			sql += "    AND ad.\"FacmNo\" = :facmno";
 		}
-		sql += "    AND ad.\"AcDate\" >= :acDateS ";
+		sql += "    AND ad.\"AcDate\" >  :acDateS ";
 		sql += "    AND ad.\"AcDate\" <= :acDateE ";
 		if (iTitaHCode == 0) {
 			sql += "    AND ad.\"TitaHCode\" in ('0','3','4') ";
@@ -125,7 +124,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 		// 如果沒取得變數則不會傳入query
 		query.setParameter("custno", iCustNo);
-		query.setParameter("acDateS", iAcDateS + 19110000);
+		query.setParameter("acDateS", iYdDate + 19110000);
 		query.setParameter("acDateE", iAcDateE + 19110000);
 		if (iFacmNo > 0) {
 			query.setParameter("facmno", iFacmNo);
@@ -148,14 +147,12 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	// 讀取AcDate當日暫收餘額檔反算昨日餘額
-	public List<Map<String, String>> queryDailyTav(TitaVo titaVo) throws LogicException {
-		this.info("queryDailyTav CustNo=" + titaVo.get("CustNo") + ", EntryDate=" + titaVo.get("EntryDateS") + "~"
-				+ titaVo.get("EntryDateE") + ", AcDate=" + titaVo.get("AcDateS") + "~" + titaVo.get("AcDateE"));
+	// 讀取暫收餘額檔昨日餘額
+	public List<Map<String, String>> queryDailyTav(int iYdDate, TitaVo titaVo) throws LogicException {
+		this.info("queryDailyTav CustNo=" + titaVo.get("CustNo") + ", iYdDate=" + iYdDate);
 
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.get("FacmNo"));
-		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
 
 		String sql = " ";
 		sql += " WITH TavData AS ( ";
@@ -166,7 +163,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , ROW_NUMBER ()  OVER ( PARTITION BY \"CustNo\", \"FacmNo\"  ORDER BY  \"AcDate\" DESC ) AS \"Seq\" ";
 		sql += "     FROM \"DailyTav\"  ";
 		sql += "     WHERE \"CustNo\" = :custno";
-		sql += "       AND \"AcDate\" < :acDateS";
+		sql += "       AND \"AcDate\"  <= :acDateS";
 		if (iFacmNo > 0) {
 			sql += "    AND \"FacmNo\" = :facmno";
 		}
@@ -194,7 +191,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("custno", iCustNo);
-		query.setParameter("acDateS", iAcDateS + 19110000);
+		query.setParameter("acDateS", iYdDate + 19110000);
 		if (iFacmNo > 0) {
 			query.setParameter("facmno", iFacmNo);
 		}
@@ -210,7 +207,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	// 讀取暫收餘額檔餘額(非轉換)找出最小的AcDate; 會計日為零則以入帳日找會計日
+	// 以入帳日找會計日
 	public List<Map<String, String>> queryAcDate(TitaVo titaVo) throws LogicException {
 
 		this.info("queryAcDate CustNo=" + titaVo.get("CustNo") + ", EntryDate=" + titaVo.get("EntryDateS") + "~"
@@ -218,35 +215,15 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		int iEntryDateS = parse.stringToInteger(titaVo.get("EntryDateS").trim());
 		int iEntryDateE = parse.stringToInteger(titaVo.get("EntryDateE").trim());
-		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
-		int iAcDateE = parse.stringToInteger(titaVo.get("AcDateE").trim());
 
 		String sql = " ";
-		sql += " WITH TavData AS ( ";
-		sql += "     SELECT \"CustNo\" ";
-		sql += "          , Min(\"AcDate\") AS \"AcDateS\" ";
-		sql += "     FROM \"DailyTav\"  ";
-		sql += "     WHERE \"CustNo\" = :custno";
-		sql += "      AND  \"CreateEmpNo\" <> '999999' ";
-		sql += "     GROUP BY \"CustNo\" ";
-		sql += " ) ";
-		if (iAcDateS > 0) {
-			sql += "  SELECT T.\"CustNo\" ";
-			sql += "       , CASE WHEN T.\"AcDateS\" < :acDateS THEN :acDateS ELSE  T.\"AcDateS\"  END AS \"AcDateS\" ";
-			sql += "       , :acDateE AS \"AcDateE\" ";
-			sql += "  FROM TavData T ";
-		} else {
-			sql += "  SELECT T.\"CustNo\" ";
-			sql += "       , MIN(L.\"AcDate\") AS \"AcDateS\" ";
-			sql += "       , MAX(L.\"AcDate\") AS \"AcDateE\" ";
-			sql += "  FROM TavData T ";
-			sql += "  LEFT JOIN \"LoanBorTx\" L ";
-			sql += "        ON L.\"CustNo\" = :custno";
-			sql += "       AND L.\"AcDate\" >=  T.\"AcDateS\" ";
-			sql += "       AND L.\"EntryDate\" >= :entryDateS ";
-			sql += "       AND L.\"EntryDate\" <= :entryDateE ";
-			sql += "  GROUP BY T.\"CustNo\" ";
-		}
+		sql += "  SELECT L.\"CustNo\" ";
+		sql += "       , MIN(L.\"AcDate\") AS \"AcDateS\" ";
+		sql += "  FROM \"LoanBorTx\" L ";
+		sql += "        ON L.\"CustNo\" = :custno";
+		sql += "       AND L.\"EntryDate\" >= :entryDateS ";
+		sql += "       AND L.\"EntryDate\" <= :entryDateE ";
+		sql += "  GROUP BY L.\"CustNo\" ";
 		this.info("sql=" + sql);
 
 		Query query;
@@ -254,13 +231,8 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("custno", iCustNo);
-		if (iAcDateS > 0) {
-			query.setParameter("acDateS", iAcDateS + 19110000);
-			query.setParameter("acDateE", iAcDateE + 19110000);
-		} else {
-			query.setParameter("entryDateS", iEntryDateS + 19110000);
-			query.setParameter("entryDateE", iEntryDateE + 19110000);
-		}
+		query.setParameter("entryDateS", iEntryDateS + 19110000);
+		query.setParameter("entryDateE", iEntryDateE + 19110000);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -275,7 +247,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// 讀取暫收餘額檔轉換日
 	public List<Map<String, String>> queryConvertDate(TitaVo titaVo) throws LogicException {
-
+		this.info("queryConvertDate");
 		String sql = " ";
 		sql += "     SELECT MAX(\"AcDate\") AS \"AcDateS\" ";
 		sql += "     FROM \"DailyTav\"  ";

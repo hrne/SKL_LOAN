@@ -863,6 +863,8 @@ T(2,*)
 T(2,*)
 #FdEsGcnl=X,2,L
 T(2,*)
+#FdPreStarBuildingYM=X,2,L
+#FdStarBuildingYM=X,2,L
 
 ![登放記號]
 #FdACTFG=X,2,L
@@ -1119,6 +1121,8 @@ T(2,@GrKind,#L2r05GrKind)
 T(2,@EsGcd,#L2r05EsGcd)
 T(2,@EsGKind,#L2r05EsGKind)
 T(2,@EsGcnl,#L2r05EsGcnl)
+E(0,@PreStarBuildingYM,#L2r05PreStarBuildingYM)
+E(0,@StarBuildingYM,#L2r05StarBuildingYM)
 E(0,@BaseRate,#L2r05BaseRate)
 ! C(3,#FuncCode,5,E(0,@BaseRate,#L2r05BaseRate),$)
 ##loop{times:10,n:1}
@@ -2409,14 +2413,14 @@ C(3,#RecycleCode,0,T(2,@FdRecycleDeadline, )
 
 #ShowP4=X,1,S
 C(3,#UpdateCode,1,
-    SHOW(#ExtraRepayCode,#ExtraRepayCodeX,#CustTypeCode,#CustTypeCodeX,#RuleCode,#RuleCodeX,#RecycleCode,#RecycleCodeX,#RecycleDeadlineX,#UsageCode,#UsageCodeX,#CompensateFlag,#CompensateFlagX,#IrrevocableFlag,#IrrevocableFlagX,#RateAdjNoticeCode,#RateAdjNoticeCodeX,#PieceCode,#PieceCodeX,#CreditScore,#Grcd,#EsGcd,#EsGcnl)
+    SHOW(#ExtraRepayCode,#ExtraRepayCodeX,#CustTypeCode,#CustTypeCodeX,#RuleCode,#RuleCodeX,#RecycleCode,#RecycleCodeX,#RecycleDeadlineX,#UsageCode,#UsageCodeX,#CompensateFlag,#CompensateFlagX,#IrrevocableFlag,#IrrevocableFlagX,#RateAdjNoticeCode,#RateAdjNoticeCodeX,#PieceCode,#PieceCodeX,#CreditScore,#Grcd,#EsGcd,#EsGcnl,#PreStarBuildingYM,#StarBuildingYM)
     HIDE(#LbCreditScoreX)
     C(3,#RecycleCode,0,HIDE(#RecycleDeadline)T(3, )
                      ,SHOW(#RecycleDeadline)T(2,#WkStar))
     C(3,#L2r01ExtraRepayCode,9,$,HIDE(#ExtraRepayCode))
     C(3,#L2r01RecycleCode,9,$,HIDE(#RecycleCode))                     
    ,SHOW(#ExtraRepayCodeX,#CustTypeCodeX,#RuleCodeX,#RecycleCodeX,#IntCalcCode,#LbRecycleDeadline,#UsageCodeX,#CompensateFlagX,#IrrevocableFlagX,#RateAdjNoticeCodeX,#PieceCodeX,#LbCreditScoreX)
-    HIDE(#ExtraRepayCode,#CustTypeCode,#RuleCode,#RecycleCode,#IntCalcCode,#RecycleDeadline,#UsageCode,#CompensateFlag,#IrrevocableFlag,#RateAdjNoticeCode,#CreditScore,#Grcd,#EsGcd,#EsGcnl)
+    HIDE(#ExtraRepayCode,#CustTypeCode,#RuleCode,#RecycleCode,#IntCalcCode,#RecycleDeadline,#UsageCode,#CompensateFlag,#IrrevocableFlag,#RateAdjNoticeCode,#CreditScore,#Grcd,#EsGcd,#EsGcnl,#PreStarBuildingYM,#StarBuildingYM)
     C(3,#RecycleCode,0,HIDE(#LbRecycleDeadline)
                      ,SHOW(#LbRecycleDeadline)))
 
@@ -3435,6 +3439,18 @@ HELP(#YesNoHelp)
 IF(#EsGcnl == #L2r05EsGcnl,s,$)
 V(H,#YesNoHelp)
 
+!約定動工年月
+#PreStarBuildingYM=A,5,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Hide7Fg,0,CALL(#HideP7),$)
+IF(#RuleCode==08,$,S)
+@A(YM,0,#PreStarBuildingYM)
+!實際興建年月
+#StarBuildingYM=A,5,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Hide7Fg,0,CALL(#HideP7),$)
+IF(#RuleCode==08,$,S)
+@A(YM,0,#StarBuildingYM)
 
 
 !--- P7 清償金類型
@@ -3827,6 +3843,7 @@ C(3,#CheckCode,0,$,S)
 ["#FdGrcd+綠色授信註記",#Grcd],["#FdGrKind+綠色支出類別",#GrKind,#GrKindX],
 ["#FdEsGcd+永續績效連結授信註記",#EsGcd],["#FdEsGKind+永續績效連結授信類別",#EsGKind,#EsGKindX],
 [#<->#,"#FdEsGcnl+永續績效連結授信約定條件全部未達成通報",#EsGcnl],
+["#FdPreStarBuildingYM+約定動工年月",#PreStarBuildingYM],["#FdStarBuildingYM+實際興建年月",#StarBuildingYM],
 ]
 </sub>
 
@@ -3893,6 +3910,8 @@ T(3,[L2154] 額度資料維護)
 #EsGcd
 #EsGKind
 #EsGcnl
+#PreStarBuildingYM
+#StarBuildingYM
 ##loop{times:10,n:1}
 #StepMonthS{n}#StepMonthE{n}#StepRateType{n}#StepRateIncr{n}
 ##end

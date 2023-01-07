@@ -497,6 +497,17 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05EsGcd", tFacMain.getEsGcd());
 		this.totaVo.putParam("L2r05EsGKind", tFacMain.getEsGKind());
 		this.totaVo.putParam("L2r05EsGcnl", tFacMain.getEsGcnl());
+		//購地貸款相關
+		if (tFacMain.getPreStarBuildingYM() > 0) {
+			this.totaVo.putParam("L2r05PreStarBuildingYM", tFacMain.getPreStarBuildingYM() - 191100);
+		} else {
+			this.totaVo.putParam("L2r05PreStarBuildingYM", tFacMain.getPreStarBuildingYM());
+		}
+		if (tFacMain.getStarBuildingYM() > 0) {
+			this.totaVo.putParam("L2r05StarBuildingYM", tFacMain.getStarBuildingYM() - 191100);
+		} else {
+			this.totaVo.putParam("L2r05StarBuildingYM", tFacMain.getStarBuildingYM());
+		}		
 
 	}
 
@@ -694,5 +705,9 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("L2r05EsGcd", "");
 		this.totaVo.putParam("L2r05EsGKind", "");
 		this.totaVo.putParam("L2r05EsGcnl", "");
+		//購地貸款相關
+		this.totaVo.putParam("L2r05PreStarBuildingYM", 0);
+		this.totaVo.putParam("L2r05StarBuildingYM", 0);
+		
 	}
 }

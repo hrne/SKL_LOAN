@@ -63,7 +63,7 @@ public class L6R07 extends TradeBuffer {
 		if (tCdOverdue != null) {
 			if (iRimTxCode.equals("L6605") && iRimFuncCode == 1) {
 //				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimOverdueSign")); // 新增資料已存在
-				throw new LogicException(titaVo, "E0005", "新增資料已存在"); // 更新資料時，發生錯誤
+				throw new LogicException(titaVo, "E0002", "新增資料已存在"); // 更新資料時，發生錯誤
 			} else {
 				/* 將每筆資料放入Tota */
 				moveTotaCdOverdue(tCdOverdue);

@@ -1867,6 +1867,8 @@ TXFORM=L2R04
 #L2r05EsGcd=X,1,S
 #L2r05EsGKind=X,1,S
 #L2r05EsGcnl=X,1,S
+#L2r05PreStarBuildingYM=A,5,S
+#L2r05StarBuildingYM=A,5,S
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}=n,1,S
 #L2r05BreachaYyB{n}=n,1,S
@@ -1995,6 +1997,8 @@ TXFORM=L2R05
 #L2r05EsGcd
 #L2r05EsGKind
 #L2r05EsGcnl
+#L2r05PreStarBuildingYM
+#L2r05StarBuildingYM
 ##loop{times:10,n:1}
 #L2r05BreachaYyA{n}
 #L2r05BreachaYyB{n}

@@ -1379,7 +1379,6 @@ C(3,#AmortizedCode,2,E(0,@IntCalcCode,1),$)
 #AmortizedCodeX=X,12,L
 T(H,#AmortizedCode,#FacmAmortizedCodeHelp)
 
-
 ![週期基準]
 !1:日 2:月 3:週
 !當商品不限制時,才須輸入,否則自動顯示不必輸入
@@ -1522,12 +1521,9 @@ HELP(#DepartmentCodeHelp)
 T(H,#DepartmentCode,#DepartmentCodeHelp)
 C(3,#DepartmentCode,0,T(F,@BreachFlag,0)T(F,@ProdBreachFlag,0),T(F,@BreachFlag,1)T(F,@ProdBreachFlag,1))
 
-
-
 !依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
 #checkDepartmentCode=X,1,S
 C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
-
 
 ![帳管費]
 !依商品資料自動顯示,可修改
@@ -1657,10 +1653,6 @@ SHOW(#StepMonthS{n},#StepX{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},
 C(3,#StepMonthS{n},0,E(0,@StepMonthE{m},#checkTerm)E(0,@Month{m},0)T(2,@test{n},僅可輸入0或空白),$)
 C(3,#StepMonthS{n},0,S,$)
 C(3,#StepMonthE{m},0,S,IF(#StepMonthS{n}!=#Month{m},V(P,#test{n}),$))
-
-! C(3,#StepMonthS{n},0,E(0,@StepMonthE{m},999),$)
-! C(3,#StepMonthS{n},0,S,$)
-! C(3,#StepMonthE{m},0,S,V(6,0,#StepMonthE{m}))
 
 #StepMonthE{n}=N,3,I
 C(3,#StepMonthS{n},0,S,$)
@@ -2580,6 +2572,22 @@ HELP(#YesNoHelp)
 !C(4,#EsGcnl,S,$)
 V(H,#YesNoHelp)
 
+!購地貸款相關 - 規定管制代碼#RuleCode=08購地貸款(央行管制)才需要填寫
+#FdPreStarBuildingYM=X,2,L
+#FdStarBuildingYM=X,2,L
+#HidePreStarBuildingYM=X,1,L
+C(3,#RuleCode,08,T(F,#PreStarBuildingYM,1),T(F,#PreStarBuildingYM,0))
+#HideStarBuildingYM=X,1,L
+C(3,#RuleCode,08,T(F,#StarBuildingYM,1),T(F,#StarBuildingYM,0))
+!約定動工年月
+#PreStarBuildingYM=A,5,I
+IF(#RuleCode==08,$,s)
+@A(YM,0,#PreStarBuildingYM)
+!實際興建年月
+#StarBuildingYM=A,5,I
+IF(#RuleCode==08,$,s)
+@A(YM,0,#StarBuildingYM)
+
 
 #MRKEY=_,_,S
 T(2,#CustNo+-+#FacmNo)
@@ -2731,6 +2739,7 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdGrcd+綠色授信註記",#Grcd],["#FdGrKind+綠色支出類別",#GrKind,#GrKindX],
 ["#FdEsGcd+永續績效連結授信註記",#EsGcd],["#FdEsGKind+永續績效連結授信類別",#EsGKind,#EsGKindX],
 [#<->#,"#FdEsGcnl+永續績效連結授信約定條件全部未達成通報",#EsGcnl],
+["#FdPreStarBuildingYM+約定動工年月",#PreStarBuildingYM],["#FdStarBuildingYM+實際興建年月",#StarBuildingYM],
 ]
 </sub>
 
@@ -2843,6 +2852,8 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 #EsGcd
 #EsGKind
 #EsGcnl
+#PreStarBuildingYM
+#StarBuildingYM
 </sub>
 
 

@@ -38,6 +38,7 @@ import com.st1.itx.util.parse.Parse;
  * 2.settleLoanRun 放款回收交易新增帳務及更新放款交易內容檔<BR>
  * 3.settleTempRun 暫收款交易新增帳務及更新放款交易內容檔 <BR>
  * 4.
+ * 
  * @author st1
  *
  */
@@ -606,15 +607,14 @@ public class AcRepayCom extends TradeBuffer {
 	/**
 	 * 累溢收(暫收貸)帳務處理
 	 * 
-	 * @param tx LoanBorTx
-	 * @param iAcList    List of AcDetail
-	 * @param titaVo     titaVo
+	 * @param tx      LoanBorTx
+	 * @param iAcList List of AcDetail
+	 * @param titaVo  titaVo
 	 * @return 累溢收金額
 	 * @throws LogicException ....
 	 */
 
-	public BigDecimal settleOverflow(LoanBorTx tx, List<AcDetail> iAcList, TitaVo titaVo)
-			throws LogicException {
+	public BigDecimal settleOverflow(LoanBorTx tx, List<AcDetail> iAcList, TitaVo titaVo) throws LogicException {
 		this.titaVo = titaVo;
 		this.lAcDetail = iAcList;
 		this.info("settleOverflow ..." + this.lAcDetail.size());
@@ -767,7 +767,7 @@ public class AcRepayCom extends TradeBuffer {
 				}
 			}
 		}
-		
+
 		// 本額度暫收抵繳金額
 		HashMap<Integer, BigDecimal> selfTempMap = new HashMap<>();
 
@@ -887,7 +887,7 @@ public class AcRepayCom extends TradeBuffer {
 	// 暫收轉額度
 	private List<AcDetail> loanTransfer(List<LoanBorTx> ilLoanBorTx, List<AcDetail> iAcList, TitaVo titaVo)
 			throws LogicException {
-		this.info("transferTempAmt ...");
+		this.info("loanTransfer ...");
 		for (AcDetail ac : iAcList) {
 			this.info(ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11) + " "
 					+ ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " " + ac.getSumNo() + " "
@@ -895,8 +895,6 @@ public class AcRepayCom extends TradeBuffer {
 		}
 
 		this.titaVo = titaVo;
-		// 暫收抵繳餘額
-		HashMap<Integer, BigDecimal> tempBalMap = new HashMap<>();
 		int splitAcSeq = 0;
 		// 暫收抵繳
 		List<AcDetail> lAcDetailOld = new ArrayList<AcDetail>();
@@ -924,11 +922,18 @@ public class AcRepayCom extends TradeBuffer {
 			this.lAcDetail.add(ac);
 		}
 
+		// 暫收抵繳餘額
+		HashMap<Integer, BigDecimal> tempBalMap = new HashMap<>();
+
 		// 搬暫收款後 splitAcSeq
 		for (AcDetail ac : iAcList) {
 			ii++;
 			if ("090".equals(ac.getSumNo()) && "D".equals(ac.getDbCr())) {
-				tempBalMap.put(ac.getFacmNo(), ac.getTxAmt());
+				if (tempBalMap.get(ac.getFacmNo()) == null) {
+					tempBalMap.put(ac.getFacmNo(), ac.getTxAmt());
+				} else {
+					tempBalMap.put(ac.getFacmNo(), tempBalMap.get(ac.getFacmNo()).add(ac.getTxAmt()));
+				}
 				splitAcSeq = ii;
 			}
 		}
@@ -948,12 +953,10 @@ public class AcRepayCom extends TradeBuffer {
 				} else {
 					tempAmtMap.put(tx.getFacmNo(), tx.getTempAmt().add(tempAmtMap.get(tx.getFacmNo())));
 				}
-				if (!"TAV".equals(tx.getAcctCode())) {
-					if (transferAmtMap.get(tx.getFacmNo()) == null) {
-						transferAmtMap.put(tx.getFacmNo(), tx.getTempAmt());
-					} else {
-						transferAmtMap.put(tx.getFacmNo(), tx.getTempAmt().add(transferAmtMap.get(tx.getFacmNo())));
-					}
+				if (transferAmtMap.get(tx.getFacmNo()) == null) {
+					transferAmtMap.put(tx.getFacmNo(), tx.getTempAmt());
+				} else {
+					transferAmtMap.put(tx.getFacmNo(), tx.getTempAmt().add(transferAmtMap.get(tx.getFacmNo())));
 				}
 			}
 		}
@@ -987,7 +990,7 @@ public class AcRepayCom extends TradeBuffer {
 		Set<Integer> tempBalSet = tempBalMap.keySet();
 		for (Iterator<Integer> itTxFacmNo = tempBalSet.iterator(); itTxFacmNo.hasNext();) {
 			int txFacmNo = itTxFacmNo.next();
-			this.info("tempBalSet txFacmNo=" + txFacmNo + ", tempBal" + tempBalMap.get(txFacmNo));
+			this.info("tempBalSet txFacmNo=" + txFacmNo + ", tempBal=" + tempBalMap.get(txFacmNo));
 			if (tempBalMap.get(txFacmNo).compareTo(BigDecimal.ZERO) > 0) {
 				AcDetail acDetail = new AcDetail();
 				acDetail.setDbCr("D");

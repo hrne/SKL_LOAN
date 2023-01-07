@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L6909ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SortMapListCom;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6909") // 暫收款查詢(依戶號)
@@ -38,6 +39,8 @@ public class L6909 extends TradeBuffer {
 
 	@Autowired
 	public L6909ServiceImpl l6909ServiceImpl;
+	@Autowired
+	DateUtil dDateUtil;
 
 	// 額度小計
 	private HashMap<Integer, BigDecimal> facmYdBal = new HashMap<>();
@@ -69,51 +72,67 @@ public class L6909 extends TradeBuffer {
 		if (acDateList != null) {
 			for (Map<String, String> t : acDateList) {
 				convertDate = parse.stringToInteger(t.get("AcDateS")) - 19110000;
-				titaVo.putParam("AcDateS", convertDate);
 			}
+		}
+		int iAcDateS = parse.stringToInteger(titaVo.get("AcDateS").trim());
+		// 以入帳日找會計日
+		if (iAcDateS == 0) {
+			acDateList = null;
+			try {
+				acDateList = l6909ServiceImpl.queryAcDate(titaVo);
+			} catch (Exception e) {
+				throw new LogicException(titaVo, "E0001", "SQL ERROR");
+			}
+			if (acDateList != null) {
+				for (Map<String, String> t : acDateList) {
+					iAcDateS = parse.stringToInteger(t.get("AcDateS")) - 19110000;
+				}
+			}
+
+		}
+		int ydDate = 0;
+		if (iAcDateS == 0 || iAcDateS <= convertDate) {
+			ydDate = convertDate;
+		} else {
+			dDateUtil.init();
+			dDateUtil.setDate_1(iAcDateS);
+			dDateUtil.setDays(-1);
+			ydDate = dDateUtil.getCalenderDay();
 		}
 
-		// 讀取暫收餘額檔餘額(非轉換)找出最小的AcDate; 會計日為零則以入帳日找會計日
-		acDateList = null;
-		try {
-			acDateList = l6909ServiceImpl.queryAcDate(titaVo);
-		} catch (Exception e) {
-			throw new LogicException(titaVo, "E0001", "SQL ERROR");
-		}
-		if (acDateList != null) {
-			for (Map<String, String> t : acDateList) {
-				titaVo.putParam("AcDateS", parse.stringToInteger(t.get("AcDateS")) - 19110000);
-				titaVo.putParam("AcDateE", parse.stringToInteger(t.get("AcDateE")) - 19110000);
-			}
-		}
-		// 讀取起日前一日的暫收款每日餘額檔
+		// 讀取暫收餘額檔昨日餘額
 		List<Map<String, String>> tavList = null;
 		try {
-			tavList = l6909ServiceImpl.queryDailyTav(titaVo);
+			tavList = l6909ServiceImpl.queryDailyTav(ydDate, titaVo);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
-		// 起日 < 轉換日，則昨日餘額 = 0;
+
 		if (tavList != null) {
 			for (Map<String, String> t : tavList) {
 				this.info("tavList=" + t.toString());
 				int facmNo = parse.stringToInteger(t.get("FacmNo"));
-				int ydDate = parse.stringToInteger(t.get("AcDate")) - 19110000;
-				if (ydDate < convertDate) {
+				// 比轉換日小放轉換日
+				int acDate = parse.stringToInteger(t.get("AcDate")) - 19110000;
+				if (acDate < convertDate) {
+					facmYdDate.put(facmNo, convertDate);
+					facmAcDate.put(facmNo, convertDate);
 					facmYdBal.put(facmNo, BigDecimal.ZERO);
 					facmTdBal.put(facmNo, BigDecimal.ZERO);
 				} else {
 					facmYdDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
 					facmAcDate.put(facmNo, parse.stringToInteger(t.get("AcDate")) - 19110000);
+					facmYdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
+					facmTdBal.put(facmNo, parse.stringToBigDecimal(t.get("YdBal")));
 				}
 			}
-		} 
+		}
 
 		List<Map<String, String>> L6909List = null;
 		List<Map<String, String>> oList = new ArrayList<Map<String, String>>();
 
 		try {
-			L6909List = l6909ServiceImpl.FindAll(titaVo, this.index, this.limit);
+			L6909List = l6909ServiceImpl.FindAll(ydDate, titaVo, this.index, this.limit);
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR"); // 讀取DB時發生問題
 		}

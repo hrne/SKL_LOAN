@@ -62,7 +62,10 @@ BEGIN
          , '90800000000'                        AS "DbAcNoCode"        -- 借方：備忘分錄會計科目
          -- 固定會計科目:90810000000-待抵銷不可撤銷放款承諾-表外曝險金額
          , '90810000000'                        AS "CrAcNoCode"        -- 貸方：備忘分錄會計科目
-         , M."DrawdownFg"                       AS "DrawdownFg"        -- 已核撥記號  0:未核撥  1:已核撥
+         , CASE WHEN M."DrawdownFg" = 0  AND 
+                     TRUNC(NVL(M."UtilDeadline", 0) / 100 ) <= YYYYMM THEN 1 -- 未撥款但動支期限已到期,屬已核撥
+                ELSE M."DrawdownFg"
+           END                                  AS "DrawdownFg"        -- 已核撥記號  0:未核撥  1:已核撥
          , SYSTIMESTAMP                         AS "CreateDate"        -- 建檔日期時間
          , EmpNo                                AS "CreateEmpNo"       -- 建檔人員
          , SYSTIMESTAMP                         AS "LastUpdate"        -- 最後更新日期時間
@@ -71,7 +74,6 @@ BEGIN
     LEFT JOIN "FacMain" F ON F."CustNo" = M."CustNo"
                          AND F."FacmNo" = M."FacmNo"
     WHERE M."DataYM" = YYYYMM
-      --AND F."IrrevocableFlag" = 'Y'   --目前資料都是不可撤銷故點掉 
       AND ( TRUNC(NVL(M."UtilDeadline", 0) / 100 )  > YYYYMM  OR 
             TRUNC(NVL(F."RecycleDeadline", 0) / 100 )  > YYYYMM )
       AND TRUNC(NVL(M."ApproveDate", 0) / 100 )  <= YYYYMM      

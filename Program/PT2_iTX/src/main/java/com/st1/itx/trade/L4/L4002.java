@@ -207,7 +207,7 @@ public class L4002 extends TradeBuffer {
 					isRepayCode1To4 = true;
 				}
 				// 可整批訂正
-				if (tBatxDetail.getProcStsCode().equals("6"))  {
+				if (tBatxDetail.getProcStsCode().equals("6")) {
 					isBatchErase = true;
 				}
 				// 可刪除回復 => 刪除且未曾入過
@@ -219,7 +219,7 @@ public class L4002 extends TradeBuffer {
 				case 1:
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(0);
+					grp1.setRepayCode(tBatxDetail.getRepayCode());
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
 					grp1.setRankFlag(1);
@@ -244,7 +244,7 @@ public class L4002 extends TradeBuffer {
 				case 3:
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(0);
+					grp1.setRepayCode(tBatxDetail.getRepayCode());
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
 					grp1.setRankFlag(1);
@@ -267,7 +267,7 @@ public class L4002 extends TradeBuffer {
 				case 4:
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(0);
+					grp1.setRepayCode(tBatxDetail.getRepayCode());
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
 					grp1.setRankFlag(1);
@@ -282,7 +282,7 @@ public class L4002 extends TradeBuffer {
 				default:
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(0);
+					grp1.setRepayCode(tBatxDetail.getRepayCode());
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
 					grp1.setRankFlag(1);
@@ -565,7 +565,11 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOBatchNo", tempL4002Vo.getBatchNo());
 				occursList.putParam("OORankFlag", tempL4002Vo.getRankFlag());
 				occursList.putParam("OOStatusCode", batxStatus);
-				occursList.putParam("OORepayCode", tempL4002Vo.getRepayCode());
+				if (tempL4002Vo.getRankFlag() == 1) {
+					occursList.putParam("OORepayCode", 0);
+				} else {
+					occursList.putParam("OORepayCode", tempL4002Vo.getRepayCode());
+				}
 				occursList.putParam("OOReconCode", tempL4002Vo.getReconCode());
 				occursList.putParam("OOFileName", tempL4002Vo.getFileName());
 				occursList.putParam("OOFileCnt", fileCnt.get(tempL4002Vo));

@@ -76,6 +76,7 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						   AND CC.\"Code\" = LPAD(Cl.\"ClCode2\",2,0)";
 		sql += "	LEFT JOIN \"CdEmp\" CE ON CE.\"EmployeeNo\" = T.\"TlrNo\"";
 		sql += "	LEFT JOIN \"TxRecord\" TR ON TR.\"TxNo\" = T.\"TxSeq\"";
+		sql += "						     AND TRIM(TR.\"MrKey\") = T.\"MrKey\"";
 		sql += "	LEFT JOIN \"CdEmp\" CE2 ON CE2.\"EmployeeNo\" = TR.\"SupNo\"";
 		sql += "	LEFT JOIN \"TxTranCode\" TC ON TC.\"TranNo\" = T.\"TranNo\"";
 		sql += "	WHERE T.\"TxDate\" BETWEEN :sAcDate AND :eAcDate";
@@ -142,21 +143,11 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		      	 THEN NVL(JSON_VALUE(T.\"TranData\",'$.RQSP'),'授權')";
 		sql += "		      	 WHEN JSON_VALUE(T.\"TranData\",'$.ACTFG') IN (2,4)";
 		sql += "		      	 THEN ";
-		sql += "				   CASE";
-		sql += "				     WHEN T.\"TranNo\" = 'L3100' THEN '撥款金額：' ||   TO_CHAR(NVL(JSON_VALUE(T.\"TranData\",'$.TXAMT'),'FM999,999,999,999,999'))";
+		sql += "				  (CASE";
+		sql += "				     WHEN T.\"TranNo\" = 'L3100' THEN '撥款金額：' ||   TO_CHAR(JSON_VALUE(T.\"TranData\",'$.TXAMT'),'FM999,999,999,999,999')";
 		sql += "				   	 WHEN T.\"TranNo\" = 'L5103' THEN '借閱原因：' ||   TO_CHAR(CC.\"Item\")";
-		sql += "				   	 ELSE '放行' END";
+		sql += "				   	 ELSE '放行' END )";
 		sql += "		      	 END AS \"New\"";
-//		sql += "		      ,CASE";
-//		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
-//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
-//		sql += "		      	 THEN '訂正'";
-//		sql += "		      	 WHEN T.\"Hcode\" <> 1 ";
-//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
-//		sql += "		      	 THEN NVL(JSON_VALUE(\"TranData\",'$.RQSP'),'授權')";
-//		sql += "		      	 WHEN JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)";
-//		sql += "		      	 THEN '放行' ";
-//		sql += "		      	 END AS \"New\"";
 		sql += "			  ,T.\"TlrNo\"";
 		sql += "			  ,JSON_VALUE(T.\"TranData\",'$.SUPNO') AS \"SupNo\"";
 		sql += "			  ,T.\"TranNo\" AS \"TranNo\"";
@@ -216,6 +207,17 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L9136ServiceImpl sql=" + sql);
 
+		
+//		sql += "		      ,CASE";
+//		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
+//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
+//		sql += "		      	 THEN '訂正'";
+//		sql += "		      	 WHEN T.\"Hcode\" <> 1 ";
+//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
+//		sql += "		      	 THEN NVL(JSON_VALUE(\"TranData\",'$.RQSP'),'授權')";
+//		sql += "		      	 WHEN JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)";
+//		sql += "		      	 THEN '放行' ";
+//		sql += "		      	 END AS \"New\"";
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);

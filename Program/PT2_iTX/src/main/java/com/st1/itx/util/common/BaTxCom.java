@@ -1609,9 +1609,9 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		boolean isDefault = false; // 按原設定
-		// 未到期繳息日為1日超過1個月=>按原設定
+		// 未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定
 		if (!isShouldPaid) {
-			if (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate >= nextMonth01) {
+			if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
 				isDefault = true;
 			}
 		}

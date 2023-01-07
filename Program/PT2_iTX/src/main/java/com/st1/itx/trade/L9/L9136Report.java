@@ -37,9 +37,10 @@ public class L9136Report extends MakeReport {
 
 	// 分頁標題分類
 	private String titleItem = "";
-
 	// 欄位標題
 	private String item = "";
+	// 資料來源 1:資料變更 2:主管核可、主管放行
+	private int dataSource = 1;
 
 //	private DecimalFormat formatAmt = new DecimalFormat("#,##0.00");
 
@@ -74,7 +75,7 @@ public class L9136Report extends MakeReport {
 
 		this.print(-5, cNum, showRocDate(this.isAcDate, 0) + " 至 " + showRocDate(this.ieAcDate, 0), "C");
 
-		this.print(-5, 3, titleItem);
+		this.print(-5, 3, "種類：" + titleItem);
 
 		this.print(-7, 3, "主管卡使用日");
 		this.print(-7, 28, "戶  號");
@@ -84,8 +85,13 @@ public class L9136Report extends MakeReport {
 		this.print(-7, 86, "押品號碼");
 //		this.print(-7, 100, "更正項目");
 		this.print(-7, 100, item);
-		this.print(-7, 121, "更  改  前  內  容");
-		this.print(-7, 148, "更  改  後  內  容");
+
+		if (dataSource == 1) {
+			this.print(-7, 121, "更  改  前  內  容");
+			this.print(-7, 148, "更  改  後  內  容");
+		} else {
+			this.print(-7, 135, "內  容");
+		}
 		this.print(-7, 177, "經辦");
 		this.print(-7, 186, "授權主管");
 		this.print(-7, 200, "備註");
@@ -121,6 +127,7 @@ public class L9136Report extends MakeReport {
 
 		this.titleItem = "資料變更";
 		this.item = "變更項目";
+		this.dataSource = 1;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
 				.setRptCode(tradeNo).setRptItem(tradeName).setSecurity("").setRptSize("A4").setPageOrientation("L")
@@ -134,11 +141,9 @@ public class L9136Report extends MakeReport {
 		if (l9136List != null && l9136List.size() != 0) {
 
 			for (Map<String, String> r : l9136List) {
-
 				count++;
+				
 
-//				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[", "").replaceAll("\\]", "")
-//						.replaceAll("\"\"", " ").replaceAll("\"", "").split(",");
 				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
 						.replaceAll("\"\\,\"", "@").split("@");
 
@@ -157,13 +162,6 @@ public class L9136Report extends MakeReport {
 				List<String> tmp2 = new ArrayList<String>(Arrays.asList(tmpOldContent));
 				List<String> tmp3 = new ArrayList<String>(Arrays.asList(tmpNewContent));
 
-				this.info("tmp1.size()=" + tmp1.size());
-				this.info("tmp1 = " + tmp1.toString());
-				this.info("tmp2.size()=" + tmp2.size());
-				this.info("tmp2 = " + tmp2.toString());
-				this.info("tmp3.size()=" + tmp3.size());
-				this.info("tmp3 = " + tmp3.toString());
-
 				// 避免有空白
 				if (tmp1.size() == 0 || tmp2.size() == 0 || tmp3.size() == 0) {
 					continue;
@@ -173,14 +171,19 @@ public class L9136Report extends MakeReport {
 					for (int j = 0; j < tmpWord.size(); j++) {
 						// 排除不需要的顯示的字串
 						if (tmp1.get(i).toString().indexOf(tmpWord.get(j).toString()) == 0) {
-
-							tmp1.remove(i);
-							tmp2.remove(i);
-							tmp3.remove(i);
-							break;
+							tmp1.set(i, "");
+							tmp2.set(i, "");
+							tmp3.set(i, "");
 						}
 					}
 				}
+
+				this.info("tmp1.size()=" + tmp1.size());
+				this.info("tmp1 = " + tmp1.toString());
+				this.info("tmp2.size()=" + tmp2.size());
+				this.info("tmp2 = " + tmp2.toString());
+				this.info("tmp3.size()=" + tmp3.size());
+				this.info("tmp3 = " + tmp3.toString());
 
 				if (tmp1.size() == tmp2.size() && tmp1.size() == tmp3.size() && tmp2.size() == tmp3.size()) {
 				} else {
@@ -189,8 +192,14 @@ public class L9136Report extends MakeReport {
 
 				for (int i = 0; i < tmp1.size(); i++) {
 
-					report(r, tmp1.get(i), tmp2.get(i), tmp3.get(i), 1);
-
+					//排除空值的資料
+					if (tmp1.get(i).length() != 0) {
+						
+						
+						
+						report(r, tmp1.get(i), tmp2.get(i), tmp3.get(i), this.dataSource);
+					}
+					
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
 
@@ -207,6 +216,7 @@ public class L9136Report extends MakeReport {
 
 		this.titleItem = "主管核可";
 		this.item = "交易別";
+		this.dataSource = 2;
 		this.newPage();
 
 		// 主管核可
@@ -216,7 +226,7 @@ public class L9136Report extends MakeReport {
 				if ("1".equals(r.get("Seq"))) {
 					count++;
 
-					report(r, r.get("Item"), r.get("Old"), r.get("New"), 2);
+					report(r, r.get("Item"), r.get("Old"), r.get("New"), this.dataSource);
 
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
@@ -234,6 +244,7 @@ public class L9136Report extends MakeReport {
 
 		this.titleItem = "主管放行";
 		this.item = "交易別";
+		this.dataSource = 2;
 		this.newPage();
 
 		// 主管放行
@@ -243,7 +254,7 @@ public class L9136Report extends MakeReport {
 				if ("2".equals(r.get("Seq"))) {
 					count++;
 
-					report(r, r.get("Item"), r.get("Old"), r.get("New"), 2);
+					report(r, r.get("Item"), r.get("Old"), r.get("New"), this.dataSource);
 
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
@@ -259,7 +270,7 @@ public class L9136Report extends MakeReport {
 
 		}
 
-		if (this.getNowPage() > 0 && count == l9136List.size() + l9136List2.size()) {
+		if (this.getNowPage() > 0 && count == (l9136List.size() + l9136List2.size())) {
 			ptfg = 9;
 
 			this.print(-45, this.getMidXAxis(), this.endText, "C");
@@ -290,16 +301,6 @@ public class L9136Report extends MakeReport {
 
 		if (dataSource == 1) {
 
-//			List<Map<String, String>> l9136findSupNo = null;
-//
-//			try {
-//				l9136findSupNo = l9136ServiceImpl.findSupNo(titaVo, r.get("TxSeq").toString());
-//			} catch (Exception e) {
-//				this.info("L9136ServiceImpl.findSupNo error = " + e.toString());
-//			}
-//
-//			supNoName = l9136findSupNo.get(0).get("SupNoName");
-//			txNo = String.valueOf(Integer.valueOf(l9136findSupNo.get(0).get("TxSeq")));
 			supNoName = r.get("SupNoName");
 			txNo = String.valueOf(Integer.valueOf(r.get("TxSeq").substring(10, 18)));
 
@@ -335,18 +336,31 @@ public class L9136Report extends MakeReport {
 		// 判斷屬於"資料變更"
 		if (dataSource == 1) {
 			// "資料變更"的 放入交易別
-			this.print(0, 56, r.get("TranNo") + " " + r.get("TranItem"));
+			// 1.有核准號碼、押品別、押品號碼
+			// 2.有L56XX 法催紀錄、L57XX 債務協商
+			if (r.get("ApproveNo").trim().length() != 0) {
+
+				// 核准號碼
+				this.print(0, 56, r.get("ApproveNo"));
+				// 押品別
+				this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
+				// 押品號碼
+				this.print(0, 86, r.get("ClNo"));
+
+			} else if ("L56".equals(r.get("TranNo").substring(0, 3)) || "L57".equals(r.get("TranNo").substring(0, 3))) {
+
+				this.print(0, 56, r.get("TranNo") + " " + r.get("TranItem"));
+
+			}
+
 		} else {
 			// 核准號碼
 			this.print(0, 56, r.get("ApproveNo"));
 			// 押品別
 			this.print(0, 66, r.get("ClCode1") + "  " + r.get("ClCode2") + "  " + r.get("ClName"));
-
+			// 押品號碼
+			this.print(0, 86, r.get("ClNo"));
 		}
-
-		// 押品號碼
-//		this.print(0, 86, "1705394");
-		this.print(0, 86, r.get("ClNo"));
 
 		// 變更項目/交易別
 		if (dataSource == 1) {
@@ -355,20 +369,27 @@ public class L9136Report extends MakeReport {
 
 		} else {
 			tmpUpdateItem = r.get("TranNo") + " " + r.get("TranItem");
-			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 20, ".", "R"));
+			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : tmpUpdateItem);
 		}
 
-		// 更改前內容
 //		String bfContent = tmpNewContent.trim().length() == 0 ? " "
 //				: String.format("%03d", Integer.valueOf(r.get("FacmNo"))) + "-"
 //						+ String.format("%03d", Integer.valueOf(r.get("BormNo"))) + " " + tmpOldContent;
-
+		// 更改前內容
 		this.print(0, 122, tmpOldContent.length() == 0 ? " " : fillUpWord(tmpOldContent, 22, " ", "R"));
 
 		// 更改後內容
 		String afContent = tmpNewContent.trim();
 
-		this.print(0, 149, afContent.length() == 0 ? " " : fillUpWord(afContent, 24, " ", "R"));
+		if (dataSource == 1) {
+
+			this.print(0, 149, afContent.length() == 0 ? " " : fillUpWord(afContent, 24, " ", "R"));
+
+		} else {
+
+			this.print(0, 135, afContent.length() == 0 ? " " : afContent);
+
+		}
 
 		// 經辦
 		this.print(0, 177, r.get("Name"));

@@ -481,6 +481,16 @@ public class L2153 extends TradeBuffer {
 			if (titaVo.get("EsGcnl") != null) {
 				tFacMain.setEsGcnl(titaVo.get("EsGcnl"));
 			}
+
+			// 約定動工年月- 目前E-LOAN固定放0
+			if (titaVo.get("PreStarBuildingYM") != null) {
+				tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")));
+			}
+			// 實際興建年月- 目前E-LOAN固定放0
+			if (titaVo.get("StarBuildingYM") != null) {
+				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")));
+			}
+			
 		} else {
 			tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
 			tFacMain.setGrcd(titaVo.getParam("Grcd"));
@@ -488,6 +498,16 @@ public class L2153 extends TradeBuffer {
 			tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
 			tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
 			tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
+			if(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")) >0 ) {
+				tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")) + 191100);
+			}else {
+				tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.get("PreStarBuildingYM")));
+			}
+			if(this.parse.stringToInteger(titaVo.get("StarBuildingYM")) > 0) {
+				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")) + 191100);
+			}else {
+				tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.get("StarBuildingYM")) );
+			}
 		}
 		if ("N".equals(tFacProd.getIncrFlag())) {
 			tFacMain.setRateIncr(new BigDecimal("0"));

@@ -49,12 +49,12 @@ T(2,@FKEY,7)
 #RPTFG=X,1,S
 E(0,0) 
 
-#buttonGo=X,1,S
-T(2,)
+#tranNo=X,5,S
+T(3,L9739)
 !#SendLMR42=X,1,S
-!RESET_RIM(#SendLMR42,L9R39)
-S(L9R39,0,#buttonGo)
-R(1,L9R39)
+!RESET_RIM(#SendLMR42,L9R99)
+S(L9R99,0,#tranNo)
+R(1,L9R99)
 
 
 ##loop{times:9,i:1}
@@ -148,7 +148,7 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#buttonGo
+#tranNo
 
 </sub>
 
@@ -159,7 +159,7 @@ TXFORM=L9739
 
 
 ^
-TXFORM=L9R39
+TXFORM=L9R99
 ##loop{times:9,i:1}
 #OOProdNo{i}
 #OOProdName{i}
