@@ -83,14 +83,13 @@ public class L9136Report extends MakeReport {
 		this.print(-7, 55, "核准號碼");
 		this.print(-7, 69, "押品別");
 		this.print(-7, 86, "押品號碼");
-//		this.print(-7, 100, "更正項目");
 		this.print(-7, 100, item);
 
 		if (dataSource == 1) {
 			this.print(-7, 121, "更  改  前  內  容");
 			this.print(-7, 148, "更  改  後  內  容");
 		} else {
-			this.print(-7, 135, "內  容");
+			this.print(-7, 140, "內  容");
 		}
 		this.print(-7, 177, "經辦");
 		this.print(-7, 186, "授權主管");
@@ -387,7 +386,7 @@ public class L9136Report extends MakeReport {
 
 		} else {
 
-			this.print(0, 135, afContent.length() == 0 ? " " : afContent);
+			this.print(0, 140, afContent.length() == 0 ? " " : afContent);
 
 		}
 

@@ -42,7 +42,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	public List<Map<String, String>> FindAll(int iYdDate, TitaVo titaVo, int index, int limit) throws Exception {
-		this.info("FindAll CustNo=" + titaVo.get("CustNo") + ", AcDate=" + titaVo.get("AcDateS") + "~"
+		this.info("FindAll CustNo=" + titaVo.get("CustNo") + ", AcDate=" + iYdDate + "~"
 				+ titaVo.get("AcDateE"));
 
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));

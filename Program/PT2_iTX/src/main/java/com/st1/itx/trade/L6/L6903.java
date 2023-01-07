@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -14,19 +15,19 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcMain;
-import com.st1.itx.db.domain.AcMainId;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.CdAcCodeService;
 import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxTranCodeService;
+import com.st1.itx.db.service.springjpa.cm.L6903ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -55,7 +56,10 @@ public class L6903 extends TradeBuffer {
 	@Autowired
 	public CdAcCodeService sCdAcCodeService;
 	@Autowired
-	public CdEmpService cdEmpService;
+	public CdEmpService cdEmpService;;
+	@Autowired
+	public L6903ServiceImpl l6903ServiceImpl;
+
 	@Autowired
 	Parse parse;
 	private String debits[] = { "1", "5", "6", "9" }; // 資產、支出為借方科目，負債、收入為貸方科目
@@ -103,6 +107,8 @@ public class L6903 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
 			}
 			classcode = tCdAcCode.getClassCode(); // 1:下編子細目
+		} else {
+			classcode = 2;
 		}
 
 		// 查詢會計總帳檔
@@ -110,7 +116,11 @@ public class L6903 extends TradeBuffer {
 		if (classcode == 1) {
 			slAcMain = sAcMainService.acmainAcBookCodeRange2(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
 					iCurrencyCode, iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, 0, Integer.MAX_VALUE, titaVo);
+		} else if (classcode == 2) {
+			slAcMain = sAcMainService.acmainAcBookCodeRange3(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
+					iCurrencyCode, iFAcDateSt, iFAcDateEd, 0, Integer.MAX_VALUE, titaVo);
 		} else {
+
 			slAcMain = sAcMainService.acmainAcBookCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
 					iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, 0, Integer.MAX_VALUE,
 					titaVo);
@@ -124,88 +134,78 @@ public class L6903 extends TradeBuffer {
 			}
 		}
 
-		// 查詢會計帳務明細檔
-		Slice<AcDetail> slAcDetail;
-		if (classcode == 1) {
-			slAcDetail = sAcDetailService.acdtlAcDateRange2(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode,
-					iAcNoCode, iAcSubCode, iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
-		} else {
-			slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode,
-					iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
+		List<Map<String, String>> dList = null;
+
+		try {
+			dList = l6903ServiceImpl.FindData(titaVo, this.index, this.limit);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			throw new LogicException(titaVo, "E5004", "");
 		}
 
-		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
-
-		if (lAcDetail == null || lAcDetail.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
+		if (this.index == 0 && (dList == null || dList.size() == 0)) {
+			throw new LogicException(titaVo, "E0001", "會計帳務明細檔");
 		}
-		// 如有找到資料
-		for (AcDetail tAcDetail : lAcDetail) {
+
+		for (Map<String, String> d : dList) {
 			// 不含未入帳,例如:未放行之交易
-			if (tAcDetail.getEntAc() == 0) {
+			if ("0".equals(d.get("EntAc"))) {
 				continue;
 			}
-
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOAcDate", tAcDetail.getAcDate());
-			occursList.putParam("OORelDy", tAcDetail.getRelDy());
-			occursList.putParam("OORelTxseq", tAcDetail.getRelTxseq());
-			iTranItem = "";
-			iTranItem = inqTxTranCode(tAcDetail.getTitaTxCd(), iTranItem, titaVo);
-			occursList.putParam("OOTranItem", iTranItem);
-			occursList.putParam("OOTitaTxCd", tAcDetail.getTitaTxCd());
-			String custNo = "";
-			if (tAcDetail.getCustNo() > 0) {
-				custNo = parse.IntegerToString(tAcDetail.getCustNo(), 7);
-			}
-			if (tAcDetail.getFacmNo() > 0) {
-				custNo += "-" + parse.IntegerToString(tAcDetail.getFacmNo(), 3);
-			}
-			if (tAcDetail.getBormNo() > 0) {
-				custNo += "-" + parse.IntegerToString(tAcDetail.getBormNo(), 3);
-			}
-			occursList.putParam("OOCustNo", custNo);
-			occursList.putParam("OODbCr", tAcDetail.getDbCr());
-			occursList.putParam("OOTxAmt", tAcDetail.getTxAmt());
-			occursList.putParam("OOSlipNote", tAcDetail.getSlipNote());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tAcDetail.getLastUpdate()) + " "
-					+ parse.timeStampToStringTime(tAcDetail.getLastUpdate()));
-			occursList.putParam("OOLastEmp",
-					tAcDetail.getLastUpdateEmpNo() + " " + empName(titaVo, tAcDetail.getLastUpdateEmpNo()));
 
-			// 餘額
-			// 借方科目{ "1", "5","6","9" }資產
-			// 借方科目本日餘額 = 昨日餘額 + 借方金額 - 貸方金額
-			// 貸方科目本日餘額 = 昨日餘額 + 貸方金額 - 借方金額
-			if (debitsList.contains(iAcNoCode.substring(0, 1))) {
-				if (tAcDetail.getDbCr().equals("D")) {
-					wkBal = wkBal.add(tAcDetail.getTxAmt());
-				} else {
-					wkBal = wkBal.subtract(tAcDetail.getTxAmt());
-				}
+			occursList.putParam("OOAcNoCode", d.get("AcNoCode"));
+			occursList.putParam("OOAcSubCode", d.get("AcSubCode"));
+			occursList.putParam("OOAcDtlCode", d.get("AcDtlCode"));
+			occursList.putParam("OOCustNo", d.get("CustNo"));
+			occursList.putParam("OOFacmNo", d.get("FacmNo"));
+			occursList.putParam("OOBormNo", d.get("BormNo"));
+
+			if ("D".equals(d.get("DbCr"))) {
+				occursList.putParam("OODbAmt", d.get("TxAmt"));
+				occursList.putParam("OOCrAmt", 0);
 			} else {
-				if (tAcDetail.getDbCr().equals("D")) {
-					wkBal = wkBal.subtract(tAcDetail.getTxAmt());
-				} else {
-					wkBal = wkBal.add(tAcDetail.getTxAmt());
-				}
+				occursList.putParam("OODbAmt", 0);
+				occursList.putParam("OOCrAmt", d.get("TxAmt"));
 			}
-
-			occursList.putParam("OOTdBal", wkBal);
+			String Odate = parse.stringToStringDateTime(d.get("CreateDate"));
+			this.info("CreateDate   = " + Odate);
+			String Date = FormatUtil.left(Odate, 9);
+			occursList.putParam("OOLastDate", Date);
+			String Time = FormatUtil.right(Odate, 8);
+			occursList.putParam("OOLastTime", Time);
+			occursList.putParam("OOSlipBatNo", d.get("SlipBatNo"));
+			occursList.putParam("OOSlipSumNo", d.get("SlipSumNo"));
+			occursList.putParam("OOEntAc", d.get("EntAc"));
+			occursList.putParam("OOMediaSlipNo", d.get("MediaSlipNo"));
+			occursList.putParam("OORvNo", d.get("RvNo"));
+			occursList.putParam("OOSlipNote", d.get("SlipNote"));
+			occursList.putParam("OOTitaTxCd", d.get("TitaTxCd"));
+			occursList.putParam("OOTranItem", d.get("TranItem"));
+			occursList.putParam("OOTitaTlrNo", d.get("TitaTlrNo"));
+			occursList.putParam("OOTlrItem", d.get("TlrName"));
+			occursList.putParam("OOTitaSupNo", d.get("TitaSupNo"));
+			occursList.putParam("OOSupItem", d.get("SupName"));
+			occursList.putParam("OOTitaTxtNo", FormatUtil.pad9(d.get("TitaTxtNo"), 8));
+			occursList.putParam("OOAcNoItem", d.get("AcNoItem"));
+			occursList.putParam("OOSlipNo", d.get("SlipNo"));
+			String DateTime = parse.stringToStringDateTime(d.get("LastUpdate"));
+			occursList.putParam("OOLastUpdate", DateTime);
+			occursList.putParam("OOLastEmp", d.get("TitaTlrNo"));
+			occursList.putParam("OOLastEmpName", empName(titaVo, d.get("TitaTlrNo")));
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
 
-		this.totaVo.putParam("OODbAmt", wkDb);
-		this.totaVo.putParam("OOCrAmt", wkCr);
+		this.totaVo.putParam("ODbAmt", wkDb);
+		this.totaVo.putParam("OCrAmt", wkCr);
 
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slAcDetail != null && slAcDetail.hasNext()) {
-			this.info("lAcDetail hasNext");
+		if (dList != null && dList.size() >= this.limit) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
-	//		this.totaVo.setMsgEndToAuto();// 自動折返
+//			 this.totaVo.setMsgEndToEnter();// 手動折返
+			this.totaVo.setMsgEndToAuto();// 自動折返
 		}
 
 		this.addList(this.totaVo);

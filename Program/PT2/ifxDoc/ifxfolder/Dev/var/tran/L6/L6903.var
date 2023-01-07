@@ -46,6 +46,9 @@ E(0,0)
 ["#FdBranchNo+單位別",#BranchNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],
+["#FdCustNo+戶號",#CustNo],
+["#FdMediaSlipNo+總帳傳票號碼",#MediaSlipNo],
+["#FdRvNo+銷帳碼",#RvNo],
 ["#FdAcDate+會計日期",#AcDateSt,"~",#AcDateEd],
 ]
 !---------- AP Button AREA ----------
@@ -97,7 +100,9 @@ C(3,#CHAIN,1,T(2,@AcDateEd,#CHAIN_AcDate),)
 #FdBranchNo=X,2,L
 #FdCurrencyCode=X,2,L
 #FdAcNoCode=X,2,L
-C(3,#CHAIN,1,T(3, ),T(3,*))
+#FdCustNo=X,2,L
+#FdMediaSlipNo=X,2,L
+#FdRvNo=X,2,L
 #FdAcDate=X,2,L
 C(3,#CHAIN,1,T(3, ),T(3,*))
 
@@ -165,7 +170,7 @@ AcDtlCode<-OOAcDtlCode})
 #AcNoCode=X,11,I
 C(3,#CHAIN,1,s,$)
 @T(3,@AcNoItem,)
-V(7)
+
 #AcSubCode=X,5,I
 C(3,#CHAIN,1,s,$)
 #AcDtlCode=X,2,I
@@ -183,6 +188,15 @@ R(1,L6R23)
 
 #AcNoItem=X,80,L
 T(2,#L6R23AcNoItem)
+
+!戶號
+#CustNo=A,7,I
+!總帳傳票號碼
+#MediaSlipNo=X,12,I
+
+!銷帳碼
+#RvNo=X,30,I
+
 
 !會計日期 必須輸入
 #DATE=D,8,S
@@ -230,82 +244,96 @@ T(3,[L6903] 會計帳務明細)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
 ! 借方合計
-#OODbAmt=m,14.2,S
-#OODbAmtX=m,14,L
-E(0,#OODbAmt)
-!#OODbAmtX=X,17,S
-!IF(#OODbAmt1==0,S,$)
-!X(#OODbAmt1)P(R,#OODbAmtX, )
-
+#ODbAmt=m,14.2,S
+#ODbAmtX=m,14,L
+E(0,#ODbAmt)
 ! 貸方合計
-#OOCrAmt=m,14.2,S
-#OOCrAmtX=m,14,L
-E(0,#OOCrAmt)
-!#OOCrAmtX=X,17,S
-!IF(#OOCrAmt1==0,S,$)
-!X(#OOCrAmt1)P(R,#OOCrAmtX, )
+#OCrAmt=m,14.2,S
+#OCrAmtX=m,14,L
+E(0,#OCrAmt)
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
-! 會計日期
-#OOAcDate=D,7,S
 
-!登放日期
-#OORelDy=D,7,S
-
-! 登放序號
-#OORelTxseq=X,18,S
-
-#OORelTxseqX=X,26,S
-T(2,#OORelDy+-+#OORelTxseq)
-! 交易代號
+!科目
+#OOAcNoCode=X,11,S
+!子目
+#OOAcSubCode=X,5,S
+!細目
+#OOAcDtlCode=X,2,S
+!科子細目
+#OOAcNoCodeX=X,21,S
+T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
+!科子細目名稱
+#OOAcNoItem=X,80,S
+!戶號
+#OOCustNo=A,7,S
+!額度編號
+#OOFacmNo=A,3,S
+!撥款序號
+#OOBormNo=A,3,S
+#OOCustNoX=X,15,S
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+!借方金額
+#OODbAmt=m,14.2,S
+#OODbAmt1=m,14,S
+E(0,#OODbAmt)
+#OODbAmtX=X,17,S
+IF(#OODbAmt1==0,S,$)
+X(#OODbAmt1)
+!貸方金額
+#OOCrAmt=m,14.2,S
+#OOCrAmt1=m,14,S
+E(0,#OOCrAmt)
+#OOCrAmtX=X,17,S
+IF(#OOCrAmt1==0,S,$)
+X(#OOCrAmt1)
+!交易日期
+#OOLastDate=X,9,S
+!時間
+#OOLastTime=X,8,S
+!摘要
+#OOSlipNote=X,160,S
+!交易代號
 #OOTitaTxCd=X,5,S
 #OOTranItem=X,80,S
 #OOTitaTxCdX=X,86,S
 T(2,#OOTitaTxCd+ +#OOTranItem)
-
-! 借貸
-#OODbCr=X,1,S
-
-#OODbCrX=X,2,S
-IF(#OODbCr=="D",T(3,借),T(3,貸))
-
-! 交易金額
-#OOTxAmt=+m,14.2,S
-T(3,@OODbAmt1,)
-T(3,@OOCrAmt1,)
-IF(#OODbCr=="D",E(0,@OODbAmt1,#OOTxAmt),E(0,@OOCrAmt1,#OOTxAmt))
-#OOTxAmt1=+m,14,S
-E(0,#OOTxAmt)
-#OOTxAmtX=X,17,S
-IF(#OOTxAmt1==0,S,$)
-X(#OOTxAmt1)
-!借方金額
-#OODbAmt1=X,17,S
-X(#OODbAmt1)
-!貸方金額
-#OOCrAmt1=X,17,S
-X(#OOCrAmt1)
-
-! 餘額
-#OOTdBal=+m,14.2,S
-#OOTdBal1=+m,14,S
-E(0,#OOTdBal)
-#OOTdBalX=X,17,S
-IF(#OOTdBal1==0,S,$)
-X(#OOTdBal1)
-
-! 摘要
-#OOSlipNote=X,160,S
-
-!最後修改人員&日期
+!主管
+#OOTitaSupNo=X,6,S
+#OOSupItem=X,20,S
+#OOTitaSupNoX=X,27,S
+T(2,#OOTitaSupNo+ +#OOSupItem)
+!登放日期
+#OORelDy=D,7,S
+!交易序號
+#OORelTxseq=X,18,S
+!傳票號碼
+#OOSlipNo=A,6,S
+!經辦
+#OOTitaTlrNo=X,6,S
+#OOTlrItem=X,40,S
+#OOTitaTlrNoX=X,47,S
+T(2,#OOTitaTlrNo+ +#OOTlrItem)
+#OOTitaTxtNo=X,8,S
+#OOTxtNo=A,8,S
+T(2,#OOTitaTxtNo)
+! 最後修改日期
 #OOLastUpdate=x,20,S
+! 最後修改人員
+#OOLastEmp=X,6,S
+#OOLastEmpName=X,40,S
+#OOLastEmpX=x,47,S
+T(2,#OOLastEmp+ +#OOLastEmpName)
+#OOSlipBatNo=A,2,S
+#OOSlipSumNo=A,2,S
+#OOEntAc=A,1,S
+#OOMediaSlipNo=X,12,S
+#OORvNo=X,30,S
 
-#OOLastEmp=x,47,S
 
-! 戶號
-#OOCustNo=X,15,S
+
 
 </sub>
 
@@ -319,6 +347,9 @@ X(#OOTdBal1)
 #AcNoCode
 #AcSubCode
 #AcDtlCode
+#CustNo
+#MediaSlipNo
+#RvNo
 #AcDateSt
 #AcDateEd
 #END
@@ -331,19 +362,36 @@ X(#OOTdBal1)
 <include src="ROM.icf::L6R23.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L6903
+#ODbAmt
+#OCrAmt
+#OOAcNoCode
+#OOAcSubCode
+#OOAcDtlCode
+#OOAcNoItem
+#OOCustNo
+#OOFacmNo
+#OOBormNo
 #OODbAmt
 #OOCrAmt
-#OOAcDate
-#OORelDy#OORelTxseq
+#OOLastDate
+#OOLastTime
+#OOSlipNote
+#OOTitaTxtNo
 #OOTitaTxCd
 #OOTranItem
-#OODbCr
-#OOTxAmt
-#OOTdBal
-#OOSlipNote
+#OOTitaSupNo
+#OOSupItem
+#OOTitaTlrNo
+#OOTlrItem
+#OORelDy
+#OORelTxseq
+#OOSlipNo
 #OOLastUpdate
-#OOLastEmp
-#OOCustNo
+#OOSlipBatNo
+#OOSlipSumNo
+#OOEntAc
+#OOMediaSlipNo
+#OORvNo
 ^
 </sub>
 
@@ -351,8 +399,8 @@ TXFORM=L6903
 <sub type="PART" name="L6903" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];">
 [
 ["[L6903]                                 會計帳務明細查詢"],
-["@借方合計",#OODbAmtX],
-["@貸方合計",#OOCrAmtX],
+["@借方合計",#ODbAmtX],
+["@貸方合計",#OCrAmtX],
 ]
 </sub>
 
@@ -363,35 +411,50 @@ TXFORM=L6903
 #RPTFG=0,QUERY.GRID,L6903
 #any={detail:true, header:'L6903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOAcDate=會計日期
+#OOAcNoCode=科目
 {width:80,align:'center'}
-
-#OOCustNo=戶號
-{width:130,align:'left'}
-
-#OOTitaTxCdX=交易代號
-{width:130,align:'left'}
-
-#OODbAmt1=借方金額
-{width:120,align:'right'}
-
-#OOCrAmt1=貸方金額
-{width:120,align:'right'}
-
-!#OOTdBalX=餘額
-!{width:120,align:'right'}
-
+#OOAcSubCode=子目
+{width:50,align:'center'}
+#OOAcDtlCode=細目
+{width:50,align:'center'}
+#OOCustNoX=戶號
+{width:120,align:'center'}
+#OODbAmtX=借方金額
+{width:140,align:'right'}
+#OOCrAmtX=貸方金額
+{width:140,align:'right'}
+#OOLastDate=交易日期
+{width:80,align:'center'}
+#OOSlipBatNo=傳票批號
+{width:80,align:'center'}
+#OOSlipSumNo=彙總批號
+{width:80,align:'center'}
+#OOEntAc=入總帳記號
+{width:80,align:'center'}
+#OOMediaSlipNo=總帳傳票號碼
+{width:80,align:'center'}
+#OORvNo=銷帳碼
+{width:80,align:'center'}
+#OOLastTime=時間
+{width:80,align:'center'}
 #OOSlipNote=摘要
 {width:200,align:'left'}
-
-#OORelTxseqX=登放日期、序號
-{width:200,align:'center'}
-
+#OOTitaTxCdX=交易代號
+{width:150,align:'left'}
+#OOTitaTlrNoX=經辦
+{width:100,align:'center'}
+#OOTitaSupNoX=主管
+{width:100,align:'center'}
+#OOTitaTxtNo=交易序號
+{width:80,align:'center'}
+#OOAcNoItem=科子細目名稱
+{width:300,align:'left'}
+#OOSlipNo=傳票號碼
+{width:70,align:'center'}
 #OOLastUpdate=最後修改日期
 {width:150,align:'center'}
-
-#OOLastEmp=最後修改人員
-{width:110,align:'center'}
+#OOLastEmpX=最後修改人員
+{width:120,align:'left'}
 ^
 
 <include src="PRT.icf::INQ01.sel" map="i=L6903;cpi=15"/>

@@ -68,7 +68,6 @@ public class L6909 extends TradeBuffer {
 		} catch (Exception e) {
 			throw new LogicException(titaVo, "E0001", "SQL ERROR");
 		}
-		// 起日最早為轉換日
 		if (acDateList != null) {
 			for (Map<String, String> t : acDateList) {
 				convertDate = parse.stringToInteger(t.get("AcDateS")) - 19110000;
@@ -90,6 +89,7 @@ public class L6909 extends TradeBuffer {
 			}
 
 		}
+		// 會計起日的昨日，不小於轉換日
 		int ydDate = 0;
 		if (iAcDateS == 0 || iAcDateS <= convertDate) {
 			ydDate = convertDate;
@@ -99,6 +99,7 @@ public class L6909 extends TradeBuffer {
 			dDateUtil.setDays(-1);
 			ydDate = dDateUtil.getCalenderDay();
 		}
+		this.info("convertDate=" + convertDate + ", ydDate=" + ydDate);
 
 		// 讀取暫收餘額檔昨日餘額
 		List<Map<String, String>> tavList = null;
@@ -112,7 +113,7 @@ public class L6909 extends TradeBuffer {
 			for (Map<String, String> t : tavList) {
 				this.info("tavList=" + t.toString());
 				int facmNo = parse.stringToInteger(t.get("FacmNo"));
-				// 比轉換日小放轉換日
+				// 不小於轉換日
 				int acDate = parse.stringToInteger(t.get("AcDate")) - 19110000;
 				if (acDate < convertDate) {
 					facmYdDate.put(facmNo, convertDate);
@@ -128,6 +129,7 @@ public class L6909 extends TradeBuffer {
 			}
 		}
 
+		// 讀取大於昨日的會計明細
 		List<Map<String, String>> L6909List = null;
 		List<Map<String, String>> oList = new ArrayList<Map<String, String>>();
 

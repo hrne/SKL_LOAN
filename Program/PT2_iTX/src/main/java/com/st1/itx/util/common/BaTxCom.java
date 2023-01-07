@@ -307,9 +307,9 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom settingUnPaid 戶號=" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("BaTxCom settingUnPaid RepayType 還款類別=" + iRepayType);
 		this.info("BaTxCom settingUnPaid TxAmt 回收金額=" + iTxAmt);
-		this.info("BaTxCom settingUnPaid TxAmt 回收費用方式=" + this.payFeeMethod);
+		this.info("BaTxCom settingUnPaid payFeeMethod 回收費用方式=" + this.payFeeMethod);
 		init();
-		this.info("BaTxCom settingUnPaid TxAmt 是否回收費用=" + this.payFeeMethod);
+		this.info("BaTxCom settingUnPaid payFeeFlag 是否回收費用=" + this.payFeeFlag);
 
 		// STEP 1: 設定預設值
 		// isPayAllFee 費用是否全部回收->
@@ -1609,10 +1609,12 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		boolean isDefault = false; // 按原設定
-		// 未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定
+		// 已到期外，未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定 
 		if (!isShouldPaid) {
-			if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
-				isDefault = true;
+			if (ln.getMaturityDate() < nextMonth01) {
+				if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
+					isDefault = true;
+				}
 			}
 		}
 		if (!isShouldPaid && !isDefault) {
@@ -1630,11 +1632,11 @@ public class BaTxCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 		loanCalcRepayIntCom.setAmortizedCode(amortizedCode);
 		this.info("Caculate log BaTxCom Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
-				+ ", isShouldPaid=" + isShouldPaid + ", AcctCode=" + acctCode + ", CalcCode=" + ln.getIntCalcCode()
-				+ "/" + intCalcCode + ", AmortizedCode=" + ln.getAmortizedCode() + "/" + amortizedCode
-				+ ", SpecificDate=" + ln.getSpecificDate() + " ,PrevPaidIntDate=" + ln.getPrevPayIntDate() + "/"
-				+ iPrevPaidIntDate + " ,NextPayIntDate=" + ln.getNextRepayDate() + "/" + iNextPayIntDate
-				+ " ,MaturityDate=" + ln.getMaturityDate() + "/" + maturityDate);
+				+ ", isShouldPaid=" + isShouldPaid + ", isShouldPaid" + isShouldPaid + ", AcctCode=" + acctCode
+				+ ", CalcCode=" + ln.getIntCalcCode() + "/" + intCalcCode + ", AmortizedCode=" + ln.getAmortizedCode()
+				+ "/" + amortizedCode + ", SpecificDate=" + ln.getSpecificDate() + " ,PrevPaidIntDate="
+				+ ln.getPrevPayIntDate() + "/" + iPrevPaidIntDate + " ,NextPayIntDate=" + ln.getNextRepayDate() + "/"
+				+ iNextPayIntDate + " ,MaturityDate=" + ln.getMaturityDate() + "/" + maturityDate);
 
 	}
 

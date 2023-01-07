@@ -677,6 +677,8 @@ class tmpBatx implements Comparable<tmpBatx> {
 			return this.reconCode.compareTo(other.reconCode);
 		} else if (this.fileName.compareTo(other.fileName) != 0) {
 			return this.fileName.compareTo(other.fileName);
+		} else if (this.rankFlag - other.rankFlag != 0) {
+			return this.rankFlag - other.rankFlag;
 		} else {
 			return 0;
 		}
@@ -736,10 +738,10 @@ class tmpBatx implements Comparable<tmpBatx> {
 		int result = 1;
 		result = prime * result + acDate;
 		result = prime * result + ((batchNo == null) ? 0 : batchNo.hashCode());
-		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
 		result = prime * result + rankFlag;
-		result = prime * result + ((reconCode == null) ? 0 : reconCode.hashCode());
 		result = prime * result + repayCode;
+		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+		result = prime * result + ((reconCode == null) ? 0 : reconCode.hashCode());
 		return result;
 	}
 

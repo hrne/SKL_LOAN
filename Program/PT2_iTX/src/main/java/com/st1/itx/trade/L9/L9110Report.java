@@ -338,9 +338,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 135, "授信姓名 ..... " + isNullorEmpty(tL9110.get("F53"), titaVo));
 
 			// 違約適用方式
-			if (tL9110.get("F58").isEmpty()) {
-				this.print(1, 5, "違約適用方式 . " + "無");
-			} else if ("999".equals(tL9110.get("F58"))) {
+			if (tL9110.get("F58").isEmpty() || "999".equals(tL9110.get("F58")) || "000".equals(tL9110.get("F58"))) {
 				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
 				if ("001".equals(tL9110.get("F58")) || "002".equals(tL9110.get("F58"))) {
@@ -696,9 +694,7 @@ public class L9110Report extends MakeReport {
 			this.print(0, 105, "徵信姓名 ..... " + isNullorEmpty(tL9110.get("F52"), titaVo));
 			this.print(0, 135, "授信姓名 ..... " + isNullorEmpty(tL9110.get("F53"), titaVo));
 			// 違約適用方式
-			if (tL9110.get("F58").isEmpty()) {
-				this.print(1, 5, "違約適用方式 . " + "無");
-			} else if ("999".equals(tL9110.get("F58"))) {
+			if (tL9110.get("F58").isEmpty() || "999".equals(tL9110.get("F58")) || "000".equals(tL9110.get("F58"))) {
 				this.print(1, 5, "違約適用方式 . " + "無");
 			} else {
 				if ("001".equals(tL9110.get("F58")) || "002".equals(tL9110.get("F58"))) {
