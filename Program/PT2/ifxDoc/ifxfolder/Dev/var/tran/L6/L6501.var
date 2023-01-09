@@ -51,6 +51,8 @@ E(0,0)
 ["#FdShortPrinPercent+回收時可短繳本金金額之百分比",#ShortPrinPercent," 限額",#ShortPrinLimit],
 ["#FdShortIntPercent+回收時可短繳利息金額之百分比",#ShortIntPercent],
 ["#FdPerfDate+業績日期",#PerfDate],["#FdAcBookAdjDate+帳冊別帳務調整日期",#AcBookAdjDate],
+[#<->#,"#FdBatchFireFeeFg+批次收取當月火險費",#BatchFireFeeFg],
+[#<->#,"#FdInsuSettleDate+火險保費已解付新產日期",#InsuSettleDate],
 [#<->#,"#FdAmlFg+AML檢查記號",#AmlFg,#AmlFgX],
 [#<->#,"#FdAmlUrl+AML網址",#AmlUrl],
 [#<->#,"#FdFtpUrl+FTP網址（撥款匯款媒體檔）",#FtpUrl],
@@ -142,6 +144,9 @@ T(3, )
 T(3,*)
 #FdIcsUrl=X,2,L
 T(3,*)
+#FdBatchFireFeeFg=X,2,L
+T(3,*)
+#FdInsuSettleDate=X,2,L
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -166,15 +171,23 @@ T(3,CdCode.DeductMethod)
 T(3,CdCode.AmlFg)                  
 #AmlFgHelp=x,100,S
 
+!YesNo YesNo
+#CDDEF05=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODEAchAuthOneTime,#CDCODSpcDateFlag,#CDCODEDeductMethod,#CDCODEAmlFg)
+S(XXR99,01,#CDCODEAchAuthOneTime,#CDCODSpcDateFlag,#CDCODEDeductMethod,#CDCODEAmlFg,#CDDEF05)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AchAuthOneTimeHelp,#HelpDesc1)
 T(2,@SpcDateHelp,#HelpDesc2)
 T(2,@DeductMethodHelp,#HelpDesc3)
 T(2,@AmlFgHelp,#HelpDesc4)
+T(2,@YesNoHelp,#HelpDesc5)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -275,6 +288,9 @@ E(0,@PerfDate,#L6R28PerfDate)
 E(0,@AcBookAdjDate,#L6R28AcBookAdjDate)
 T(2,@EbsUrl,#L6R28EbsUrl)
 T(2,@IcsUrl,#L6R28IcsUrl)
+T(2,@BatchFireFeeFg,#L6R28BatchFireFeeFg)
+E(0,@InsuSettleDate,#L6R28InsuSettleDate)
+
 
 
 ! 違約寬限天數(營業日)
@@ -438,6 +454,16 @@ T(H,#PostDeductMethod,#DeductMethodHelp)
 #ShortIntPercent=N,3,I
 @V(5,0,50)
 
+
+
+!批次收取當月火險費
+#BatchFireFeeFg=X,1,I
+HELP(#YesNoHelp)
+@V(7)
+ V(H,#YesNoHelp)
+!火險保費已解付新產日期
+#InsuSettleDate=D,7,L
+
 ! AML檢查記號 0:系統自動檢核 1:需人工確認 2:不檢核(測試套用)
 #AmlFg=N,1,I
 HELP(#AmlFgHelp)
@@ -464,6 +490,7 @@ T(H,#AmlFg,#AmlFgHelp)
 
 ! 帳冊別帳務調整日期
 #AcBookAdjDate=D,7,S
+
 
 ! EBS網址(會計資訊系統)
 #EbsUrl=x,100,I
@@ -537,6 +564,7 @@ T(3,[L6501] 系統變數及系統值設定)
 #ShortPrinPercent
 #ShortPrinLimit
 #ShortIntPercent
+#BatchFireFeeFg
 #AmlFg
 #AmlUrl
 #FtpUrl

@@ -293,8 +293,8 @@ public class SystemParas implements Serializable {
   @Column(name = "`AutoBatchFg`", length = 1)
   private String autoBatchFg;
 
-  // 整批入帳自動收取當月火險費
-  /* 整批入帳自動收取當月火險費設為Y時，入帳日等於當月火險費時整批入帳會自動收取設為N時，整批入帳檢核訊息[未收當月火險費:xxx,xxx] */
+  // 批次收取當月火險費
+  /* 批次收取當月火險費設為Y時，入帳日等於當月火險費時整批入帳會自動收取設為N時，整批入帳檢核訊息[未收當月火險費:xxx,xxx] */
   @Column(name = "`BatchFireFeeFg`", length = 1)
   private String batchFireFeeFg;
 
@@ -1454,8 +1454,8 @@ N:不啟用
   }
 
 /**
-	* 整批入帳自動收取當月火險費<br>
-	* 整批入帳自動收取當月火險費
+	* 批次收取當月火險費<br>
+	* 批次收取當月火險費
 設為Y時，入帳日等於當月火險費時整批入帳會自動收取
 設為N時，整批入帳檢核訊息[未收當月火險費:xxx,xxx]
 	* @return String
@@ -1465,12 +1465,12 @@ N:不啟用
   }
 
 /**
-	* 整批入帳自動收取當月火險費<br>
-	* 整批入帳自動收取當月火險費
+	* 批次收取當月火險費<br>
+	* 批次收取當月火險費
 設為Y時，入帳日等於當月火險費時整批入帳會自動收取
 設為N時，整批入帳檢核訊息[未收當月火險費:xxx,xxx]
   *
-  * @param batchFireFeeFg 整批入帳自動收取當月火險費
+  * @param batchFireFeeFg 批次收取當月火險費
 	*/
   public void setBatchFireFeeFg(String batchFireFeeFg) {
     this.batchFireFeeFg = batchFireFeeFg;

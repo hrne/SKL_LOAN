@@ -25,7 +25,6 @@ import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.trade.L4.L4450Batch;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
@@ -190,11 +189,14 @@ public class AcRepayCom extends TradeBuffer {
 		// 暫收轉額度
 		this.lAcDetail = loanTransfer(this.lLoanBorTx, this.lAcDetail, titaVo);
 
-		// 交易明細入帳順序
+		// 入帳順序、設定交易內容檔序號
 		int lxAcseq = 0;
 		for (LoanBorTx lx : this.lLoanBorTx) {
 			lxAcseq++;
 			lx.setAcSeq(lxAcseq);
+			if (lx.getBormNo() == 0) {
+				setFacmBorxNo(lx, titaVo);
+			}
 			this.info(lx.toString());
 		}
 
@@ -290,7 +292,6 @@ public class AcRepayCom extends TradeBuffer {
 				overFacmNo = this.lAcDetail.get(this.lAcDetail.size() - 1).getFacmNo();
 			}
 			this.lLoanBorTx.add(tx);
-			this.mapBorxNo.put("" + tx.getCustNo() + tx.getFacmNo(), tx.getBorxNo());
 		}
 
 		// 貸方：費用
@@ -322,11 +323,14 @@ public class AcRepayCom extends TradeBuffer {
 		// Json Field 放本戶累溢收
 		this.lLoanBorTx = setExcessive(this.lLoanBorTx, iBaTxList, this.lAcDetail, titaVo);
 
-		// 入帳順序
+		// 入帳順序、設定交易內容檔序號
 		int lxAcseq = 0;
 		for (LoanBorTx lx : this.lLoanBorTx) {
 			lxAcseq++;
 			lx.setAcSeq(lxAcseq);
+			if (lx.getBormNo() == 0) {
+				setFacmBorxNo(lx, titaVo);
+			}
 			this.info(lx.toString());
 		}
 		// insert LoanBorTx
@@ -1269,7 +1273,7 @@ public class AcRepayCom extends TradeBuffer {
 		// 新增放款交易內容檔(收回費用)
 		LoanBorTx tLoanBorTx = new LoanBorTx();
 		LoanBorTxId tLoanBorTxId = new LoanBorTxId();
-		setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
+		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, ba.getCustNo(), ba.getFacmNo(), titaVo);
 		tLoanBorTx.setCustNo(ba.getCustNo());
 		tLoanBorTx.setFacmNo(ba.getFacmNo());
 		tLoanBorTx.setTxDescCode("Fee");
@@ -1304,24 +1308,18 @@ public class AcRepayCom extends TradeBuffer {
 		return tLoanBorTx;
 	}
 
-	// 設定交易內容檔序號及共同內容
-	private int setFacmBorTx(LoanBorTx tLoanBorTx, LoanBorTxId tLoanBorTxId, int iCustNo, int iFacmNo, TitaVo titaVo)
-			throws LogicException {
-		this.info("setFacmBorTx ... ");
-		String tmp = "" + iCustNo + iFacmNo;
-		int borxNo;
-		if (this.mapBorxNo.get(tmp) == null) {
-			LoanBorTx tBorTx = loanBorTxService.bormNoDescFirst(iCustNo, iFacmNo, 0, titaVo);
-			if (tBorTx == null) {
-				borxNo = 1;
-			} else {
-				borxNo = tBorTx.getBorxNo() + 1;
-			}
-		} else {
+	// 設定交易內容檔序號
+	private int setFacmBorxNo(LoanBorTx tx, TitaVo titaVo) throws LogicException {
+		String tmp = "" + tx.getCustNo() + tx.getFacmNo();
+		int borxNo = tx.getBorxNo();
+		if (this.mapBorxNo.get(tmp) != null) {
 			borxNo = this.mapBorxNo.get(tmp) + 1;
+			LoanBorTxId txId = tx.getLoanBorTxId();
+			txId.setBorxNo(borxNo);
+			tx.setLoanBorTxId(txId);
+			tx.setBorxNo(borxNo);
 		}
 		this.mapBorxNo.put(tmp, borxNo);
-		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, 0, borxNo, titaVo);
 		return borxNo;
 	}
 }

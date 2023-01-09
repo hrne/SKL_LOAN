@@ -55,13 +55,14 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iAcDateS = this.parse.stringToInteger(titaVo.getParam("AcDateSt")) + 19110000;
 		int iAcDateE = this.parse.stringToInteger(titaVo.getParam("AcDateEd")) + 19110000;
 
-		String sql = "SELECT A.*,B.\"TranItem\" AS \"TranItem\",C.\"Fullname\" as \"TlrName\",D.\"Fullname\" as \"SupName\",E.\"AcNoItem\" AS \"AcNoItem\" ";
-		sql += "FROM \"AcDetail\" A ";
-		sql += "LEFT JOIN \"TxTranCode\" B on B.\"TranNo\"=A.\"TitaTxCd\" ";
-		sql += "LEFT JOIN \"CdEmp\" C on C.\"EmployeeNo\"=A.\"TitaTlrNo\" ";
-		sql += "LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"=A.\"TitaSupNo\" ";
-		sql += "LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"=A.\"AcNoCode\" and E.\"AcSubCode\"=A.\"AcSubCode\" and E.\"AcDtlCode\"=a.\"AcDtlCode\" ";
-		sql += "WHERE A.\"AcDate\" BETWEEN :AcDateS AND :AcDateE ";
+		String sql = "SELECT A.*,B.\"TranItem\" AS \"TranItem\" , C.\"Fullname\" as \"TlrName\" , D.\"Fullname\" as \"SupName\" , E.\"AcNoItem\" AS \"AcNoItem\" ";
+		sql += " FROM \"AcDetail\" A ";
+		sql += " LEFT JOIN \"TxTranCode\" B on B.\"TranNo\"= A.\"TitaTxCd\" ";
+		sql += " LEFT JOIN \"CdEmp\" C on C.\"EmployeeNo\"= A.\"TitaTlrNo\" ";
+		sql += " LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"= A.\"TitaSupNo\" ";
+		sql += " LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"= A.\"AcNoCode\" and E.\"AcSubCode\"= A.\"AcSubCode\" and E.\"AcDtlCode\"= a.\"AcDtlCode\" ";
+		sql += " WHERE A.\"AcDate\" BETWEEN :AcDateS AND :AcDateE ";
+		sql += " AND A.\"EntAc\" <> 0 ";
 
 		if (!iAcBookCode.isEmpty()) {
 			sql += "AND A.\"AcBookCode\" = :AcBookCode ";

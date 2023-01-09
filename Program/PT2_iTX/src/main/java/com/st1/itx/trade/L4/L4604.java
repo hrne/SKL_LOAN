@@ -121,9 +121,12 @@ public class L4604 extends TradeBuffer {
 			status = 1;
 		}
 		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
-		for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
-			if (tInsuRenew.getStatusCode() == status) {
-				lInsuRenew.add(tInsuRenew);
+
+		if (sInsuRenew != null) {
+			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
+				if (tInsuRenew.getStatusCode() == status) {
+					lInsuRenew.add(tInsuRenew);
+				}
 			}
 		}
 

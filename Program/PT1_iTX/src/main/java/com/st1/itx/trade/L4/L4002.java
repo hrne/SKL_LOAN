@@ -214,6 +214,12 @@ public class L4002 extends TradeBuffer {
 				if (isDeleteRecovery && tempVo.get("EraseCnt") != null) {
 					isDeleteRecovery = false;
 				}
+				if (tBatxDetail.getFileName().isEmpty()) {
+					tBatxDetail.setFileName(" ");
+				}				
+				if (tBatxDetail.getReconCode().isEmpty()) {
+					tBatxDetail.setReconCode(" ");
+				}
 
 				switch (tBatxDetail.getRepayCode()) {
 				case 1:

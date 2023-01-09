@@ -5841,6 +5841,18 @@ TXFORM=L4R33
 ^
 </L4R33.tom>
 
+<L4R34.dec>
+#L4r34TxAmt1=m,14,S
+#L4r34TxAmt2=m,14,S
+</L4R34.dec>
+
+<L4R34.tom>
+TXFORM=L4R34
+#L4r34TxAmt1
+#L4r34TxAmt2
+^
+</L4R34.tom>
+
 <L5R01.dec>
 #L5r01CustId=X,10,S
 #L5r01CustNo=9,7,S
@@ -9491,6 +9503,8 @@ TXFORM=L6R27
 #L6R28JcicEmpTel=X,16,S
 #L6R28EbsUrl=x,100,S
 #L6R28IcsUrl=x,100,S
+#L6R28BatchFireFeeFg=X,1,S
+#L6R28InsuSettleDate=D,7,S
 </L6R28.dec>
 
 <L6R28.tom>
@@ -9541,6 +9555,8 @@ TXFORM=L6R28
 #L6R28JcicEmpTel
 #L6R28EbsUrl
 #L6R28IcsUrl
+#L6R28BatchFireFeeFg
+#L6R28InsuSettleDate
 ^
 </L6R28.tom>
 

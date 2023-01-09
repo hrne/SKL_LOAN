@@ -256,10 +256,6 @@ public class AcReceivableCom extends TradeBuffer {
 				tAcReceivableId.setFacmNo(rv.getFacmNo());
 				tAcReceivableId.setRvNo(rv.getRvNo());
 				tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
-				if (tAcReceivable == null && rv.getReceivableFlag() == 4 && rv.getRvNo().length() > 3) {
-					tAcReceivableId.setRvNo(rv.getRvNo().substring(0, 3));
-					tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
-				}
 				if (tAcReceivable == null) {
 					throw new LogicException(titaVo, "E6003", "AcReceivable.mnt notfound " + tAcReceivableId);
 				}
@@ -312,7 +308,7 @@ public class AcReceivableCom extends TradeBuffer {
 				acMainCom.setTxBuffer(this.txBuffer);
 				acMainCom.core(titaVo.getHCodeI(), ac, titaVo);
 			}
-			
+
 			this.info("AcReceivable mnt=" + ", RvBal=" + tAcReceivable.getRvBal());
 		}
 
@@ -462,13 +458,13 @@ public class AcReceivableCom extends TradeBuffer {
 		tAcReceivableId.setAcctCode(wkAcctCode);
 		tAcReceivableId.setCustNo(ac.getCustNo());
 		tAcReceivableId.setFacmNo(ac.getFacmNo());
-		tAcReceivableId.setRvNo(wkRvNo);
-		tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
-		// 短繳科目轉換資料銷帳編號只到撥款
-		if (tAcReceivable == null && ac.getReceivableFlag() == 4 && wkRvNo.length() > 3 && wkRvFg > 0) {
+		// 短繳期金更新本金科目(3碼撥款序號)
+		if (ac.getReceivableFlag() == 4 && "3".equals(wkAcctCode.substring(0, 1)) && wkRvFg > 0) {
 			tAcReceivableId.setRvNo(wkRvNo.substring(0, 3));
-			tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
+		} else {
+			tAcReceivableId.setRvNo(wkRvNo);
 		}
+		tAcReceivable = acReceivableService.holdById(tAcReceivableId, titaVo); // holdById
 		if (tAcReceivable == null) {
 			// 0-起帳
 			if (wkRvFg == 0 || AcHCode >= 2) {
@@ -568,7 +564,7 @@ public class AcReceivableCom extends TradeBuffer {
 //			tAcReceivable.setRvAmt(tAcReceivable.getRvBal());
 //		}
 		// 累加會計日餘額
-		tAcReceivable.setAcBal(wkTxAmt.add(tAcReceivable.getAcBal())); 
+		tAcReceivable.setAcBal(wkTxAmt.add(tAcReceivable.getAcBal()));
 //4.設定銷帳記號	 銷帳記號 0.未銷、1.已銷
 		if (tAcReceivable.getRvBal().compareTo(BigDecimal.ZERO) == 0) {
 			tAcReceivable.setClsFlag(1);

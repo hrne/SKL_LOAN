@@ -163,7 +163,7 @@ public class BaTxCom extends TradeBuffer {
 	private String payMethod = "";// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 	private String tmpFacmNoX = "";// 暫收指定額度
 	private DecimalFormat df = new DecimalFormat("##,###,###,###,##0");
-
+	private String batchFireFeeFg = "Y"; // 批次收取當月火險費 ， Y=>入帳日等於當月火險費時自動收取，N=>檢核訊息[未收當月火險費:xxx,xxx]
 	private String payFeeMethod = "";// 回收費用方式 Y/N
 
 	// initialize variable
@@ -257,6 +257,7 @@ public class BaTxCom extends TradeBuffer {
 		this.collLawFee = BigDecimal.ZERO; // 催收法務費 F24
 		this.totalFee = BigDecimal.ZERO; // 費用總額
 		this.unPayFeeX = "";// 未收費用
+		this.batchFireFeeFg = "Y"; // 批次收取當月火險費
 	}
 
 	@Override
@@ -280,6 +281,7 @@ public class BaTxCom extends TradeBuffer {
 
 	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
+
 		this.baTxList = settingPayintDate(iEntryDate, iEntryDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt,
 				titaVo);
 		return this.baTxList;
@@ -368,6 +370,16 @@ public class BaTxCom extends TradeBuffer {
 				} else {
 					this.payFeeFlag = "N";
 				}
+			}
+		}
+
+		// L3XXX 整批入帳時試算
+		if (titaVo.isTrmtypBatch()) {
+			// 結案、火險，當期火險一律收、否則看設定
+			if (iRepayType == 5 || iRepayType == 99) {
+				this.batchFireFeeFg = "Y";
+			} else {
+				this.batchFireFeeFg = this.txBuffer.getSystemParas().getBatchFireFeeFg();
 			}
 		}
 
@@ -462,7 +474,6 @@ public class BaTxCom extends TradeBuffer {
 		int inputRepayType = iRepayType;
 		// input 還款額度
 		int inputFacmNo = iFacmNo;
-
 		// 回收金額(合併總金額)
 		BigDecimal repayAmt = iTxAmt;
 		if (tempVo.get("MergeAmt") != null) {
@@ -590,6 +601,7 @@ public class BaTxCom extends TradeBuffer {
 			this.info("inputRepayType=" + inputRepayType + "/" + iRepayType + ", inputFacmNo=" + inputFacmNo + "/"
 					+ iFacmNo);
 		}
+
 // STEP 3: 例外處理
 
 		// reLoad UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
@@ -612,6 +624,13 @@ public class BaTxCom extends TradeBuffer {
 			this.isPayAllFee = true; // 全部
 		} else {
 			this.isPayAllFee = false; // 部分
+		}
+
+		// 結案、火險，當期火險一律收、否則看設定
+		if (iRepayType == 3 || iRepayType == 5) {
+			this.batchFireFeeFg = "Y";
+		} else {
+			this.batchFireFeeFg = this.txBuffer.getSystemParas().getBatchFireFeeFg();
 		}
 
 		// isEmptyLoanBaTxVo 是否放未計息餘額
@@ -1609,7 +1628,7 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		boolean isDefault = false; // 按原設定
-		// 已到期外，未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定 
+		// 已到期外，未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定
 		if (!isShouldPaid) {
 			if (ln.getMaturityDate() < nextMonth01) {
 				if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
@@ -1795,7 +1814,9 @@ public class BaTxCom extends TradeBuffer {
 			if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType && iTxAmt.compareTo(ba.getUnPaidAmt()) == 0) {
 				ba.setRepayPriority(1);
 			} else if (ba.getDataKind() == 1) {
-				if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType) {
+				if (ba.getRepayPriority() > 0) {
+					continue;
+				} else if (ba.getRepayType() >= 4 && ba.getRepayType() == iRepayType) {
 					ba.setRepayPriority(2);
 				} else if (ba.getRepayType() == 1) {
 					ba.setRepayPriority(4);
@@ -1807,6 +1828,7 @@ public class BaTxCom extends TradeBuffer {
 			} else if (ba.getDataKind() == 6) {
 				ba.setRepayPriority(6);
 			} else {
+				continue;
 			}
 		}
 	}
@@ -1847,6 +1869,10 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		for (BaTxVo ba : this.baTxList) {
+			// 批次不收當月火險費
+			if ("N".equals(this.batchFireFeeFg) && ba.getRepayType() == 5 && ba.getRepayPriority() == 3) {
+			   continue;	
+			}				
 			if (this.isPayAllFee) {
 				// 全部回收費用
 				if (ba.getRepayPriority() == repayPriority && ba.getAcctAmt().equals(BigDecimal.ZERO)) { // 尚未作帳
@@ -2662,6 +2688,7 @@ public class BaTxCom extends TradeBuffer {
 										baTxVo.setDataKind(6); // 6.另收欠款(帳管費/手續費)
 									} else {
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+										baTxVo.setRepayPriority(2); // 2.應收費用
 										this.acctFee = this.acctFee.add(rv.getRvBal());
 									}
 									break;
@@ -2721,6 +2748,12 @@ public class BaTxCom extends TradeBuffer {
 										}
 										if (insuYearMonth <= (iPayIntDate / 100)) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+											if (insuYearMonth < (iPayIntDate / 100)) {
+												baTxVo.setRepayPriority(2); // 2.應收費用
+											} else {
+												baTxVo.setRepayPriority(3); // 3.未收費用
+											}
+
 											this.fireFee = this.fireFee.add(rv.getRvBal());
 										} else {
 											baTxVo.setDataKind(6); // 6.另收欠款(未到期火險費用)
