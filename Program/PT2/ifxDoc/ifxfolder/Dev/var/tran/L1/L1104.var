@@ -1183,8 +1183,7 @@ IF(#IncomeofyearlyAft==#IncomeofyearlyBef,T(3,),T(3,X))
 
 #YearMonthOfToday=X,5,S
 T(1,#SYSCDATE7,1,5)
-ALERT(#SYSCDATE7)
-ALERT(#YearMonthOfToday)
+
 !年收入資料年月
 #IncomeDataDateBef=X,5,L
 

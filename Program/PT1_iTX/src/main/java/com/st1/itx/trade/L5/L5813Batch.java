@@ -128,8 +128,9 @@ public class L5813Batch extends TradeBuffer {
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileCode + fileItem, fileName, 2);
 
 		for (Map<String, String> result : resultList) {
-			//只挑用途別是2的資料-代表有建物
-			if (!(("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode")))) {
+			//只挑用途別是2的資料-代表有建物,且利息需>0
+			if (!(("2").equals(result.get("UsageCode")) || ("02").equals(result.get("UsageCode")))
+					|| parse.stringToBigDecimal(result.get("YearlyInt")).compareTo(BigDecimal.ZERO) <= 0) {
 				continue;
 			}
 
@@ -336,6 +337,10 @@ public class L5813Batch extends TradeBuffer {
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5813", fileItem, fileName, "LNM572P-"+tYear);
 
 		for (Map<String, String> result : resultList) {
+			// 只挑利息需>0
+			if (parse.stringToBigDecimal(result.get("YearlyInt")).compareTo(BigDecimal.ZERO) <= 0) {
+				continue;
+			}
 
 			String bdOwner = ""; // 所有權人姓名
 			String bdCustId = ""; // 所有權人身分證

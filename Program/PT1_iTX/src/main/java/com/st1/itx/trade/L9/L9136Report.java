@@ -312,7 +312,7 @@ public class L9136Report extends MakeReport {
 		// 主管卡使用日
 		this.print(1, 1, showRocDate(r.get("AcDate"), 1) + "-");
 		// 交易序號(8碼)
-		this.print(0, 21, txNo, "R");
+		this.print(0, 21,fillUpWord(txNo, 7, "0", "L") , "R");
 
 		// 戶號-額度-撥款
 		if (!"0".equals(r.get("CustNo"))) {
