@@ -3,8 +3,6 @@ package com.st1.itx.db.repository.online;
 
 import java.util.Optional;
 
-import java.math.BigDecimal;
-import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;

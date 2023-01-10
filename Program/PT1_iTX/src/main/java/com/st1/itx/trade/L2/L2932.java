@@ -24,7 +24,6 @@ import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.Guarantor;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.AcReceivableService;

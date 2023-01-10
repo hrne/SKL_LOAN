@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * DailyTav 每日暫收款餘額檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class DailyTavId implements Serializable {
 
 
-  // 會計日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7786901914708118460L;
+
+// 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
 

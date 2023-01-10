@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.trade.LD.LD008Report;
+import com.st1.itx.trade.LD.LD009Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -43,6 +45,12 @@ public class L9130 extends TradeBuffer {
 	@Autowired
 	L9136 tranL9136;
 
+	@Autowired
+	LD008Report lD008Report;
+
+	@Autowired
+	LD009Report ld009report;
+	
 	@Autowired
 	WebClient webClient;
 
@@ -196,14 +204,10 @@ public class L9130 extends TradeBuffer {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9130產生L9136檔案資料變更日報表時發生錯誤 = " + errors.toString());
 		}
-
-		StringBuilder backgroundJobs = new StringBuilder();
 		
-		backgroundJobs.append("jLD008;");
-		backgroundJobs.append("jLD009;");
-		
-		backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
-		titaVo.setBatchJobId(backgroundJobs.toString());
+		lD008Report.exec(titaVo, "0");
+		lD008Report.exec(titaVo, "1");
+		ld009report.exec(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

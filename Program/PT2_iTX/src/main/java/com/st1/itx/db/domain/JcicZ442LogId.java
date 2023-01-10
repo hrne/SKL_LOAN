@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * JcicZ442Log 前置調解回報無擔保債權金額資料<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class JcicZ442LogId implements Serializable {
 
 
-  // 流水號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 325847698123103143L;
+
+// 流水號
   @Column(name = "`Ukey`", length = 32)
   private String ukey = " ";
 

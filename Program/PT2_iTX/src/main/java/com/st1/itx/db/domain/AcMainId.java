@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class AcMainId implements Serializable {
 
 
-  // 帳冊別
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1699563478594269783L;
+
+// 帳冊別
   /* 000:全公司 */
   @Column(name = "`AcBookCode`", length = 3)
   private String acBookCode = " ";

@@ -2,12 +2,8 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * LoanCheque 支票檔<br>
@@ -20,7 +16,12 @@ import com.st1.itx.Exception.LogicException;
 public class LoanChequeId implements Serializable {
 
 
-  // 支票帳號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1232599286754954089L;
+
+// 支票帳號
   @Column(name = "`ChequeAcct`")
   private int chequeAcct = 0;
 

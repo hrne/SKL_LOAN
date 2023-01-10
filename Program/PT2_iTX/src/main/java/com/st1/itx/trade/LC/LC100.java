@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -19,9 +17,7 @@ import com.st1.itx.db.domain.CdBranch;
 import com.st1.itx.db.domain.CdBranchGroup;
 import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.JcicZ041;
 import com.st1.itx.db.domain.TxAgent;
-import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.service.CdBranchService;

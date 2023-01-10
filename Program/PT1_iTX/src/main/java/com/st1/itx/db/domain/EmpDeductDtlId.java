@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class EmpDeductDtlId implements Serializable {
 
 
-  // 入帳日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -548534702324679504L;
+
+// 入帳日期
   @Column(name = "`EntryDate`")
   private int entryDate = 0;
 

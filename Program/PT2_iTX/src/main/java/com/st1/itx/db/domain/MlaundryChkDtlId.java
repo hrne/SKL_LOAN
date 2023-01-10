@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class MlaundryChkDtlId implements Serializable {
 
 
-  // 入帳日期(統計期間迄日)
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9127047863468867918L;
+
+// 入帳日期(統計期間迄日)
   @Column(name = "`EntryDate`")
   private int entryDate = 0;
 

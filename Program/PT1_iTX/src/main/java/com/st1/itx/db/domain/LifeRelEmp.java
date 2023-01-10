@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * LifeRelEmp 人壽利關人職員檔 T07_2
@@ -28,7 +25,12 @@ import com.st1.itx.Exception.LogicException;
 public class LifeRelEmp implements Serializable {
 
 
-  // 職員身分證/統一編號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1824311485350561629L;
+
+// 職員身分證/統一編號
   @Id
   @Column(name = "`EmpId`", length = 10)
   private String empId = " ";

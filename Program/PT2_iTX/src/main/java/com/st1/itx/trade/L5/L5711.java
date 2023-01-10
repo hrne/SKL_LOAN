@@ -2,8 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -12,10 +10,8 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegAppr01Id;
 import com.st1.itx.db.domain.NegMain;

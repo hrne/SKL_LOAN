@@ -1,7 +1,5 @@
 package com.st1.itx.trade.L1;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,14 +19,12 @@ import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustNotice;
 import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L1908ServiceImpl;
-import com.st1.itx.db.service.springjpa.cm.L1R04ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 

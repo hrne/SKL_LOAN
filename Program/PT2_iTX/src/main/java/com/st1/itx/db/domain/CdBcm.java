@@ -1,8 +1,6 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * CdBcm 分公司資料檔<br>
@@ -27,7 +23,12 @@ import com.st1.itx.Exception.LogicException;
 public class CdBcm implements Serializable {
 
 
-  // 單位代號
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7932779133216159298L;
+
+// 單位代號
   /* 10H200:放款審查課10H400:放款服務課10H600:放款管理課10H900:放款推展課10HC00:北部區域中心10HJ00:中部區域中心10HL00:南部區域中心 */
   @Id
   @Column(name = "`UnitCode`", length = 6)

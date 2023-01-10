@@ -2,7 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -11,8 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import com.st1.itx.util.StaticTool;
-import com.st1.itx.Exception.LogicException;
 
 /**
  * MlaundryParas 疑似洗錢樣態條件設定檔<br>
@@ -27,7 +24,12 @@ import com.st1.itx.Exception.LogicException;
 public class MlaundryParas implements Serializable {
 
 
-  // 業務類型
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2282386535693270236L;
+
+// 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)
