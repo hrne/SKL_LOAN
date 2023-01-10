@@ -40,7 +40,7 @@ public class L8351File extends MakeFile {
 		int date = Integer.valueOf(titaVo.getEntDy());
 		String brno = titaVo.getBrno();
 		String filecode = "L8351";
-		String fileitem = "暫定每月產檔";
+		String fileitem = "MU1人員名冊報送作業產出檔案";
 		// 檔名
 		//String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
 		String filename = iSubmitKey + iTxtDate.substring(3,7) + ".MU1";

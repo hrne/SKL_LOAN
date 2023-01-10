@@ -80,9 +80,7 @@ public class L8950ServiceImpl extends ASpringJpaParm implements InitializingBean
 	{
 		query.setParameter("DataDate", iDataDate);
 	}
-
 	return this.convertToMap(query);
-
 }
 
 }

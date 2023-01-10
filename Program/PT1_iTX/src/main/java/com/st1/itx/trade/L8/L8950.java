@@ -115,6 +115,7 @@ public class L8950 extends TradeBuffer {
 			titaVo.setReturnIndex(this.setIndexNext());
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
+		
 //		Slice<TbJcicMu01> iTbJcicMu01 = null;
 //		if (iEmpId.equals("") && iDataDate == 19110000) {
 //			iTbJcicMu01 = sTbJcicMu01Service.findAll(this.index, this.limit, titaVo);

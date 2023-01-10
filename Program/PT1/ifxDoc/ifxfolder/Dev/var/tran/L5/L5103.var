@@ -397,6 +397,7 @@ K(MODIFYBUTTON,1,LC104 上傳附件)
 
 #BUFA=X,74,S
 !T(2,#ApplEmpNo)
+T(2,0000       0)
 
 #BINDA=X,1,S
 BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFA;ntxbuf5=type<-1:
@@ -483,12 +484,16 @@ IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,2,s,$)
 @V(7)
 A(DATE,0,#ApplDate)
+IF(#ApplDate>#TODAY,V(P,借閱日期不可大於本日),$)
+
 
 #SetTmpApplDate=A,1,S
 E(0,@TmpApplDate,#ApplDate)
 
 #BUFB=X,74,S
 !T(2,#KeeperEmpNo)
+T(2,0000       0)
+
 !<瀏覽-員工號碼>
 #BINDB=X,1,S
 BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
@@ -534,11 +539,13 @@ C(3,#ApplCode,2,$,s)
 A(DATE,0,#ReturnDate)
 E(0,@TmpReturnDate,#ReturnDate)
 IF(#TmpReturnDate<#TmpApplDate,V(P,#AlertMsg1),$)
+IF(#TmpReturnDate>#TODAY,V(P,歸還日期不可大於本日),$)
 
 
 
 #BUFC=X,74,S
 !T(2,#KeeperEmpNo)
+T(2,0000       0)
 
 #BINDC=X,1,S
 BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFC;ntxbuf5=type<-1:

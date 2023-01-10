@@ -91,7 +91,7 @@ public class LNM34EPReport extends MakeReport {
 
 	private void genFile(TitaVo titaVo, List<Map<String, String>> L7List) throws LogicException {
 		this.info("=========== LNM34EP genFile : ");
-		boolean isNewForm = false; // 格式:false舊格式,true新格式
+		boolean isNewForm = true; // 格式:false舊格式,true新格式,2023/1/10設定為新格式
 		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13";
 		String txt1[] = txt.split(";");
 

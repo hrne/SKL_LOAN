@@ -1630,10 +1630,11 @@ public class BaTxCom extends TradeBuffer {
 		boolean isDefault = false; // 按原設定
 		// 已到期外，未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定
 		if (!isShouldPaid) {
+			if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
+				isDefault = true;
+			}	
 			if (ln.getMaturityDate() < nextMonth01) {
-				if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
-					isDefault = true;
-				}
+				isDefault = false;
 			}
 		}
 		if (!isShouldPaid && !isDefault) {
@@ -1651,7 +1652,7 @@ public class BaTxCom extends TradeBuffer {
 		loanCalcRepayIntCom.setIntCalcCode(intCalcCode);
 		loanCalcRepayIntCom.setAmortizedCode(amortizedCode);
 		this.info("Caculate log BaTxCom Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
-				+ ", isShouldPaid=" + isShouldPaid + ", isShouldPaid" + isShouldPaid + ", AcctCode=" + acctCode
+				+ ", isShouldPaid=" + isShouldPaid + ", isDefault=" + isDefault + ", AcctCode=" + acctCode
 				+ ", CalcCode=" + ln.getIntCalcCode() + "/" + intCalcCode + ", AmortizedCode=" + ln.getAmortizedCode()
 				+ "/" + amortizedCode + ", SpecificDate=" + ln.getSpecificDate() + " ,PrevPaidIntDate="
 				+ ln.getPrevPayIntDate() + "/" + iPrevPaidIntDate + " ,NextPayIntDate=" + ln.getNextRepayDate() + "/"
@@ -1871,8 +1872,8 @@ public class BaTxCom extends TradeBuffer {
 		for (BaTxVo ba : this.baTxList) {
 			// 批次不收當月火險費
 			if ("N".equals(this.batchFireFeeFg) && ba.getRepayType() == 5 && ba.getRepayPriority() == 3) {
-			   continue;	
-			}				
+				continue;
+			}
 			if (this.isPayAllFee) {
 				// 全部回收費用
 				if (ba.getRepayPriority() == repayPriority && ba.getAcctAmt().equals(BigDecimal.ZERO)) { // 尚未作帳

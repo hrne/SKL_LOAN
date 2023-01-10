@@ -1,0 +1,104 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,L9746)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[140,850];printer.width=[20,80];">
+[
+["[L9746]                                  介紹人換算業績報酬檢核表"],
+["#FdinputWorkMonth+工作月",#inputWorkMonth],
+]
+!---------- AP TEXT AREA Variables ----------
+#FdinputWorkMonth=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+!-----------------------------------------------------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+
+! 工作月必須小於等於系統會計日期所屬的工作月
+! 工作月為合理月份
+! 工作月
+#inputWorkMonth=A,5,I
+C(3,#inputWorkMonth,0,T(1,@inputWorkMonth,#SYSDATE,2,5),$)
+@
+C(3,#inputWorkMonth,0,S,A(YM13,1,#inputWorkMonth))
+
+<include src="ROM.icf::L0Rim.dec"/>
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(3,#HCODE,1,S,$)
+C(5,#TXFORM,L9746,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="L9746">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L9746,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L9746] 介紹人換算業績報酬檢核表)
+
+</sub>
+
+!---------- TXFORM = L9746 ----------
+<sub type="FORM" name="L9746">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L9746,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L9746] 介紹人換算業績報酬檢核表)
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#inputWorkMonth
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L9746
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

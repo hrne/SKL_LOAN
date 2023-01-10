@@ -43,7 +43,7 @@ public class L8350 extends TradeBuffer {
 		String iHeadOfficeCode = titaVo.getParam("HeadOfficeCode");
 		String iBranchCode = titaVo.getParam("BranchCode");
 		int iDataDate = Integer.valueOf(titaVo.getParam("DataDate"));
-		int iOldDataDate = Integer.valueOf(titaVo.getParam("OldDataDate"));
+//		int iOldDataDate = Integer.valueOf(titaVo.getParam("OldDataDate"));
 		String iEmpId = titaVo.getParam("EmpId");
 		String iEmailAccount = titaVo.getParam("EmailAccount");
 		String iTitle = titaVo.getParam("Title");
@@ -57,18 +57,18 @@ public class L8350 extends TradeBuffer {
 
 		String iAuthMgrIdS = titaVo.getParam("AuthMgrIdS");
 		String iAuthMgrIdE = titaVo.getParam("AuthMgrIdE");
-		int iOutJcicTxtDate = Integer.valueOf(titaVo.getParam("OutJcicTxtDate"));
+//		int iOutJcicTxtDate = Integer.valueOf(titaVo.getParam("OutJcicTxtDate"));
 
 		TbJcicMu01 iTbJcicMu01 = new TbJcicMu01();
 		TbJcicMu01Id iTbJcicMu01Id = new TbJcicMu01Id();
 
 		iTbJcicMu01Id.setHeadOfficeCode(iHeadOfficeCode);
 		iTbJcicMu01Id.setBranchCode(iBranchCode);
-		if (iFunCd.equals("2")) {
-			iTbJcicMu01Id.setDataDate(iOldDataDate);
-		} else {
-			iTbJcicMu01Id.setDataDate(iDataDate);
-		}
+//		if (iFunCd.equals("2")) {
+//			iTbJcicMu01.setDataDate(iOldDataDate);
+//		}else {
+//			iTbJcicMu01.setDataDate(iDataDate);
+//		}	
 		iTbJcicMu01Id.setEmpId(iEmpId);
 		iTbJcicMu01.setTbJcicMu01Id(iTbJcicMu01Id);
 		switch (iFunCd) {
@@ -84,7 +84,7 @@ public class L8350 extends TradeBuffer {
 			iTbJcicMu01.setAuthEndDay(iAuthEndDay);
 			iTbJcicMu01.setAuthMgrIdS(iAuthMgrIdS);
 			iTbJcicMu01.setAuthMgrIdE(iAuthMgrIdE);
-
+			
 			TbJcicMu01 aTbJcicMu01 = sTbJcicMu01Service.findById(iTbJcicMu01Id, titaVo);
 			this.info("前置=" + aTbJcicMu01);
 			if (aTbJcicMu01 == null) {
@@ -96,38 +96,42 @@ public class L8350 extends TradeBuffer {
 			}
 			break;
 		case "2":
-			try {
-				sTbJcicMu01Service.delete(iTbJcicMu01, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0007", "");
-			}
-
-			TbJcicMu01 dTbJcicMu01 = new TbJcicMu01();
+			//修改進入時不會再刪除資料，並記錄到L6932，只顯示最新的那一筆
+			this.info("iTbJcicMu01Id    = " + iTbJcicMu01Id);
 			TbJcicMu01Id dTbJcicMu01Id = new TbJcicMu01Id();
-
+			TbJcicMu01 nTbJcicMu01 = new TbJcicMu01();
+			nTbJcicMu01 = sTbJcicMu01Service.holdById(iTbJcicMu01Id, titaVo);
+			this.info("L8350資料2   = " + nTbJcicMu01);
+			if(nTbJcicMu01 == null) {
+				throw new LogicException("E0007", "無此更新資料");
+			}
+			TbJcicMu01 oTbJcicMu01Id = (TbJcicMu01) iDataLog.clone(nTbJcicMu01);
 			dTbJcicMu01Id.setHeadOfficeCode(iHeadOfficeCode);
 			dTbJcicMu01Id.setBranchCode(iBranchCode);
-			dTbJcicMu01Id.setDataDate(iDataDate);
 			dTbJcicMu01Id.setEmpId(iEmpId);
-			dTbJcicMu01.setTbJcicMu01Id(dTbJcicMu01Id);
-			dTbJcicMu01.setEmailAccount(iEmailAccount);
-			dTbJcicMu01.setTitle(iTitle);
-			dTbJcicMu01.setQryUserId(iQryUserId);
-			dTbJcicMu01.setAuthQryType(iAuthQryType);
-			dTbJcicMu01.setAuthItemQuery(iAuthItemQuery);
-			dTbJcicMu01.setAuthItemReview(iAuthItemReview);
-			dTbJcicMu01.setAuthItemOther(iAuthItemOther);
-			dTbJcicMu01.setAuthStartDay(iAuthStartDay);
-			dTbJcicMu01.setAuthEndDay(iAuthEndDay);
-			dTbJcicMu01.setAuthMgrIdS(iAuthMgrIdS);
-			dTbJcicMu01.setAuthMgrIdE(iAuthMgrIdE);
+			nTbJcicMu01.setDataDate(iDataDate);	
+			nTbJcicMu01.setTbJcicMu01Id(dTbJcicMu01Id);
+			nTbJcicMu01.setEmailAccount(iEmailAccount);
+			nTbJcicMu01.setTitle(iTitle);
+			nTbJcicMu01.setQryUserId(iQryUserId);
+			nTbJcicMu01.setAuthQryType(iAuthQryType);
+			nTbJcicMu01.setAuthItemQuery(iAuthItemQuery);
+			nTbJcicMu01.setAuthItemReview(iAuthItemReview);
+			nTbJcicMu01.setAuthItemOther(iAuthItemOther);
+			nTbJcicMu01.setAuthStartDay(iAuthStartDay);
+			nTbJcicMu01.setAuthEndDay(iAuthEndDay);
+			nTbJcicMu01.setAuthMgrIdS(iAuthMgrIdS);
+			nTbJcicMu01.setAuthMgrIdE(iAuthMgrIdE);
+			nTbJcicMu01.setOutJcictxtDate(0);
 
 			try {
-				sTbJcicMu01Service.insert(dTbJcicMu01, titaVo);
+				sTbJcicMu01Service.update(nTbJcicMu01, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
 
+			iDataLog.setEnv(titaVo, oTbJcicMu01Id, nTbJcicMu01);
+			iDataLog.exec("L8350修改");
 			break;
 		}
 

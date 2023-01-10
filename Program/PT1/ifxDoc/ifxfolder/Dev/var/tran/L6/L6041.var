@@ -88,8 +88,13 @@ C(3,#AdminFg,1,$,T(F,@BrNo,0))
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
-#NTXBUF=X,4,S
+#NTXBUF=X,12,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@BrNo,#NTXBUF,1,4)
+T(1,@TlrNo,#NTXBUF,5,6)
+T(1,@GroupNo,#NTXBUF,11,1)
+T(1,@LevelFg,#NTXBUF,12,1)
+
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -173,13 +178,14 @@ V(H,#LevelHelp)
 #LevelFgX=X,10,L
 T(H,#LevelFg,#LevelHelp)
 
+
 !<include src="COM.icf::RPTFG.dec"/>
 #RPTFG=A,1,S
 E(0,0)
 
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
-C(4,#NTXBUF5,T(3,1),T(3,2))
+C(4,#NTXBUF5,T(3,1),T(3,0))
 
 #RPTFG=_,_,S           
 
@@ -371,7 +377,7 @@ TXFORM=L6R20
 
 ^
 
-#RPTFG2=2,QUERY.GRID,L6041
+#RPTFG2=0,QUERY.GRID,L6041
 #any={detail:true, header:'L6041.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OTlrNo=使用者
