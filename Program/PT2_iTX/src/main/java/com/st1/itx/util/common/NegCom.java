@@ -48,7 +48,9 @@ import com.st1.itx.db.domain.JcicZ450Id;
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
 import com.st1.itx.db.domain.JcicZ447;
+import com.st1.itx.db.domain.JcicZ447Id;
 import com.st1.itx.db.domain.JcicZ572;
+import com.st1.itx.db.domain.JcicZ572Id;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 //import com.st1.itx.db.domain.AcReceivableId;
@@ -2211,12 +2213,12 @@ public class NegCom extends CommBuffer {
 		int custNo = 0;
 		if (CustId != null && CustId.length() != 0) {
 			CustMain custMain = sCustMainService.custIdFirst(CustId, titaVo);
-			if (custMain.getCustNo() == 0) {
+			if (custMain.getCustNo() == 0) {// 2023-1-10:與怡婷確認債協不需管客戶別,一律可以自動取號
 				// 共用代碼檔 00一般 01員工 02首購 03關企公司 04關企員工 05保戶 07員工二親等 09新二階員工
-				List<String> CustTypeCode = new ArrayList<String>();
-				CustTypeCode.add("05");
-				this.info("NegCom CustTypeCode=[" + custMain.getCustTypeCode() + "]");
-				if (CustTypeCode.contains(custMain.getCustTypeCode())) {
+//				List<String> CustTypeCode = new ArrayList<String>();
+//				CustTypeCode.add("05");
+//				this.info("NegCom CustTypeCode=[" + custMain.getCustTypeCode() + "]");
+//				if (CustTypeCode.contains(custMain.getCustTypeCode())) {
 					// 如果屬於保戶,可以自動給戶號 參考L2153
 					CustMain updCustMain = sCustMainService.holdById(custMain, titaVo);
 					if (updCustMain != null) {
@@ -2238,9 +2240,9 @@ public class NegCom extends CommBuffer {
 						// E0006 鎖定資料時，發生錯誤
 						throw new LogicException(titaVo, "E0006", "");
 					}
-				} else {
-					throw new LogicException(titaVo, "E0007", "此客戶非保貸戶,不可直接給予戶號");
-				}
+//				} else {
+//					throw new LogicException(titaVo, "E0007", "此客戶非保貸戶,不可直接給予戶號");
+//				}
 			}
 		}
 

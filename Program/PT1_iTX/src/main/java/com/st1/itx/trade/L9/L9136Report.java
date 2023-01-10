@@ -141,7 +141,6 @@ public class L9136Report extends MakeReport {
 
 			for (Map<String, String> r : l9136List) {
 				count++;
-				
 
 				String[] tmpUpdateItem = r.get("Item").replaceAll("\\[\"", "").replaceAll("\"\\]", "")
 						.replaceAll("\"\\,\"", "@").split("@");
@@ -191,14 +190,12 @@ public class L9136Report extends MakeReport {
 
 				for (int i = 0; i < tmp1.size(); i++) {
 
-					//排除空值的資料
+					// 排除空值的資料
 					if (tmp1.get(i).length() != 0) {
-						
-						
-						
+
 						report(r, tmp1.get(i), tmp2.get(i), tmp3.get(i), this.dataSource);
 					}
-					
+
 					// 超過40行 換新頁
 					if (this.NowRow >= 40) {
 
@@ -269,7 +266,8 @@ public class L9136Report extends MakeReport {
 
 		}
 
-		if (this.getNowPage() > 0 && count == (l9136List.size() + l9136List2.size())) {
+		if (this.getNowPage() > 0 && count == ((l9136List != null ? l9136List.size() : 0)
+				+ (l9136List2 != null ? l9136List2.size() : 0))) {
 			ptfg = 9;
 
 			this.print(-45, this.getMidXAxis(), this.endText, "C");
@@ -312,7 +310,7 @@ public class L9136Report extends MakeReport {
 		// 主管卡使用日
 		this.print(1, 1, showRocDate(r.get("AcDate"), 1) + "-");
 		// 交易序號(8碼)
-		this.print(0, 21,fillUpWord(txNo, 7, "0", "L") , "R");
+		this.print(0, 21, fillUpWord(txNo, 7, "0", "L"), "R");
 
 		// 戶號-額度-撥款
 		if (!"0".equals(r.get("CustNo"))) {

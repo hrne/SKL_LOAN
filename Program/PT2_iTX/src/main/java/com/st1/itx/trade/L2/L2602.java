@@ -101,7 +101,7 @@ public class L2602 extends TradeBuffer {
 				acReceivable.setReceivableFlag(2); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 				acReceivable.setAcctCode("F07"); // 業務科目
 				// 法拍費用
-				acReceivable.setRvAmt(tForeclosureFee.getFee()); // 記帳金額
+				acReceivable.setRvAmt(beforeForeclosureFee.getFee()); // 記帳金額
 				// 戶號 7
 				acReceivable.setCustNo(tForeclosureFee.getCustNo());// 戶號+額度
 				// 額度 3

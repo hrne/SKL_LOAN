@@ -1183,7 +1183,8 @@ IF(#IncomeofyearlyAft==#IncomeofyearlyBef,T(3,),T(3,X))
 
 #YearMonthOfToday=X,5,S
 T(1,#SYSCDATE7,1,5)
-
+ALERT(#SYSCDATE7)
+ALERT(#YearMonthOfToday)
 !年收入資料年月
 #IncomeDataDateBef=X,5,L
 
@@ -1201,7 +1202,7 @@ A(YM,0,#IncomeDataDateAft)
 
 #IncomeDataDateInd=_,_,L
 IF(#IncomeDataDateAft==#IncomeDataDateBef,T(3,),T(3,X))
-IF(#IncomeDataDateAft>#YearMonthOfToday,V(P,年收入資料年月不可大於日曆日),$)
+IF(#IncomeDataDateAft>#YearMonthOfToday,V(P,年收入資料年月不可大於日曆日年月),$)
 
 
 !串IND IF空白跳ERROR

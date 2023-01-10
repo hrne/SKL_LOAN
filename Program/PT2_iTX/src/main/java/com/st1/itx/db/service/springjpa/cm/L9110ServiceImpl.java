@@ -32,11 +32,13 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 自然人/法人Query(建物)
 		String sql = "";
-		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
+		sql += " SELECT  * FROM  ";
+		sql += " ( SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
 		sql += "                                     , CF.\"ClCode2\"";
 		sql += "                                     , CF.\"ClNo\"";
-		sql += "                          ORDER BY LO.\"OwnerPart\" DESC "; // -- ??? 待確認排序方式
-		sql += "                         )              AS Seq "; // -- 序號 F0
+		sql += "                                     , LO.\"Owner\"";
+		sql += "                          ORDER BY LO.\"OwnerPart\" DESC ";
+		sql += "                         )              AS SEQ "; // -- 序號 F0
 		sql += "      , LO.\"Owner\"                    AS Owner "; // -- 提供人 F1
 		sql += "      , LPAD(NVL(L.\"BdNo1\",0),5,'0') ";
 		sql += "        || '-' ";
@@ -119,8 +121,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'ClCode2' || CF.\"ClCode1\"";
 		sql += "                        AND CDC1.\"Code\"    = LPAD(CF.\"ClCode2\",2,'0')";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
-//		sql += "   AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
-		sql += "   AND NVL(L.\"ClNo\",0) > 0 "; // -- 主要擔保品
+		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
+		sql += " ) WHERE SEQ = 1   ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -330,12 +332,16 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 法人Query(火險)
 		String sql = "";
-		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
-		sql += "                           ORDER BY IR.\"InsuStartDate\" ASC";
+		sql += " SELECT * FROM ";
+		sql += " ( SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
 		sql += "                                  , CF.\"ClCode1\" ";
 		sql += "                                  , CF.\"ClCode2\" ";
 		sql += "                                  , CF.\"ClNo\" ";
-		sql += "                          )   AS Seq "; // -- 序號
+		sql += "                           ORDER BY CF.\"ClCode1\" ";
+		sql += "                                  , CF.\"ClCode2\" ";
+		sql += "                                  , CF.\"ClNo\" ";
+		sql += "                                  , IR.\"InsuStartDate\" DESC ";
+		sql += "                          )   AS SEQ "; // -- 序號
 		sql += "      , IR.\"NowInsuNo\"      AS NowInsuNo"; // -- 保單號碼
 		sql += "      , IR.\"FireInsuAmt\"    AS \"FireInsuAmt\""; // -- 火險金額
 		sql += "      , IR.\"InsuStartDate\"  AS InsuStartDate"; // -- 保險起日
@@ -377,6 +383,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND IR.\"InsuEndDate\"    >= :date ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo "; // 日期大於保險迄日
 		sql += "   AND NVL(IR.\"ClNo\",0) != 0 "; // 2022-04-25 智偉增加:有串到保險單資料才顯示
+		sql += " ) WHERE SEQ = 1  ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -396,11 +403,18 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9110ServiceImpl.queryLand");
 
 		String sql = ""; // -- L9110 Query(土地)
-		sql += "SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
-		sql += "                                     , CF.\"ClCode2\"";
+		sql += "SELECT * FROM ";
+		sql += "(SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\" ";
+		sql += "                                     , CF.\"ClCode2\" ";
 		sql += "                                     , CF.\"ClNo\"";
-		sql += "                          ORDER BY LO.\"LandSeq\""; // -- ??? 房地只取一筆?
-		sql += "                         )     AS Seq "; // -- F0 序號
+		sql += "                                     , LO.\"LandSeq\" ";
+		sql += "                                     , LO.\"Owner\" ";
+		sql += "                           ORDER BY    CF.\"ClCode1\" ";
+		sql += "                                     , CF.\"ClCode2\" ";
+		sql += "                                     , CF.\"ClNo\"";
+		sql += "                          			 , LO.\"LandSeq\" ";
+		sql += "                                     , LO.\"Owner\" ";
+		sql += "                         )     AS SEQ "; // -- F0 序號
 		sql += "     , LO.\"Owner\"							AS Owner "; // -- F1 提供人 ??? 房地只取一筆?
 		sql += "     , CITY.\"CityItem\"					AS CityItem "; // -- F2 縣市
 		sql += "     , AREA.\"AreaItem\"					AS AreaItem "; // -- F3 鄉鎮區
@@ -452,7 +466,8 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND CDC1.\"Code\"    = LPAD(CF.\"ClCode2\",2,'0')";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
 //		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
-		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
+		sql += "   AND NVL(L.\"ClNo\",0) > 0  ";
+		sql += " ) WHERE SEQ = 1  ";
 
 		this.info("sql=" + sql);
 		Query query;

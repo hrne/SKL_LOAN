@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.trade.LD.LD008Report;
-import com.st1.itx.trade.LD.LD009Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -33,29 +31,23 @@ public class L9130 extends TradeBuffer {
 	private L9130Report2022 l9130Report2022;
 
 	@Autowired
-	L9131 tranL9131;
+	private L9131 tranL9131;
 	@Autowired
-	L9132 tranL9132;
+	private L9132 tranL9132;
 	@Autowired
-	L9133 tranL9133;
+	private L9133 tranL9133;
 	@Autowired
-	L9134 tranL9134;
+	private L9134 tranL9134;
 	@Autowired
-	L9135 tranL9135;
+	private L9135 tranL9135;
 	@Autowired
-	L9136 tranL9136;
+	private L9136 tranL9136;
 
 	@Autowired
-	LD008Report lD008Report;
+	private WebClient webClient;
 
 	@Autowired
-	LD009Report ld009report;
-	
-	@Autowired
-	WebClient webClient;
-
-	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -204,10 +196,14 @@ public class L9130 extends TradeBuffer {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("L9130產生L9136檔案資料變更日報表時發生錯誤 = " + errors.toString());
 		}
+
+		StringBuilder backgroundJobs = new StringBuilder();
 		
-		lD008Report.exec(titaVo, "0");
-		lD008Report.exec(titaVo, "1");
-		ld009report.exec(titaVo);
+		backgroundJobs.append("jLD008;");
+		backgroundJobs.append("jLD009;");
+		
+		backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
+		titaVo.setBatchJobId(backgroundJobs.toString());
 
 		this.addList(this.totaVo);
 		return this.sendList();

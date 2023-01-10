@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.st1.itx.Exception.LogicException;
@@ -98,15 +100,18 @@ public class L7300 extends TradeBuffer {
 		}
 
 		this.info("ICS需傳輸資料為" + resultList.size() + "筆");
-		JSONObject requestJO = setIcsRequestJo(resultList, titaVo);
-		String response = post(requestJO, titaVo);
-		getResponseDetail(response, titaVo);
+		List<JSONObject> requestJOList = setIcsRequestJo(resultList, titaVo);
+		for (JSONObject requestJO : requestJOList) {
+			String response = post(requestJO, titaVo);
+			getResponseDetail(response, titaVo);
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
 	private void setApiUrl(TitaVo titaVo) throws LogicException {
+		this.info("L7300 setApiUrl");
 		SystemParas tSystemParas = sSystemParasService.findById("LN", titaVo);
 		if (tSystemParas == null) {
 			throw new LogicException("E0001", "L7300,SystemParas");
@@ -116,11 +121,14 @@ public class L7300 extends TradeBuffer {
 		this.info("icsFg = " + (icsFg == null ? "" : icsFg));
 	}
 
-	private JSONObject setIcsRequestJo(List<Map<String, String>> resultList, TitaVo titaVo) throws LogicException {
+	private List<JSONObject> setIcsRequestJo(List<Map<String, String>> resultList, TitaVo titaVo)
+			throws LogicException {
+		this.info("L7300 setIcsRequestJo");
 		List<JSONArray> assetsDataInfoList = setLoanDto(resultList, titaVo);
-		JSONObject requestJO = new JSONObject();
+		List<JSONObject> requestJOList = new ArrayList<>();
 		int tranSubBatchSeq = 1;
 		for (JSONArray assetsDataInfo : assetsDataInfoList) {
+			JSONObject requestJO = new JSONObject();
 			try {
 				// 變數名稱兩份文件不一致,先傳兩種
 				// 1:駝峰
@@ -156,16 +164,18 @@ public class L7300 extends TradeBuffer {
 				this.error("L7300 setLoanDto error = " + errors);
 				throw new LogicException("E9005", "設定上傳資料發生錯誤");
 			}
+			requestJOList.add(requestJO);
 			tranSubBatchSeq++;
 		}
-		return requestJO;
+		return requestJOList;
 	}
 
 	private List<JSONArray> setLoanDto(List<Map<String, String>> dataList, TitaVo titaVo) throws LogicException {
+		this.info("L7300 setLoanDto");
 		List<JSONArray> assetsDataInfoList = new ArrayList<>();
 		JSONArray assetsDataInfo = new JSONArray();
 		for (Map<String, String> data : dataList) {
-			if (assetsDataInfo.length() >= 99999) {
+			if (assetsDataInfo.length() >= 1000) {
 				assetsDataInfoList.add(assetsDataInfo);
 				tranBatchSeq++;
 				assetsDataInfo = new JSONArray();
@@ -222,14 +232,20 @@ public class L7300 extends TradeBuffer {
 	}
 
 	private String post(JSONObject requestJo, TitaVo titaVo) throws LogicException {
+		this.info("L7300 post");
 		String jsonString = requestJo.toString();
 		HttpHeaders headers = setIcsHeader();
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
 		String result = null;
 //		this.info("ICS request = " + request.toString());
 		try {
 			result = restTemplate.postForObject(apiUrl, request, String.class);
+		} catch (RestClientException re) {
+			StringWriter errors = new StringWriter();
+			re.printStackTrace(new PrintWriter(errors));
+			this.error("ICS RestClientException = " + re.getMessage());
+			throw new LogicException("E9005", "");
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -242,6 +258,7 @@ public class L7300 extends TradeBuffer {
 	}
 
 	private HttpHeaders setIcsHeader() {
+		this.info("L7300 setIcsHeader");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8); // 指定編碼方式
 //		String[] icsAuthArray = icsAuth.split(":");
@@ -250,7 +267,19 @@ public class L7300 extends TradeBuffer {
 		return headers;
 	}
 
+	// Override timeouts in request factory
+	private SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
+		SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+		// Connect timeout
+		clientHttpRequestFactory.setConnectTimeout(10_000); // 10_000 = 10000
+
+		// Read timeout
+		clientHttpRequestFactory.setReadTimeout(10_000);
+		return clientHttpRequestFactory;
+	}
+
 	private String getResponseDetail(String response, TitaVo titaVo) throws LogicException {
+		this.info("L7300 getResponseDetail");
 //		S01	作業執行成功，資料庫新增傳輸內容
 //		S02	作業執行成功，資料庫新增傳輸內容，並根據邏輯刪除資料庫歷史資料
 //		E01	作業執行失敗，傳輸格式必輸入欄位不可為空值
