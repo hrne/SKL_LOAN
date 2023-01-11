@@ -54,10 +54,10 @@ public class L420B extends TradeBuffer {
 		String iBatchNo = titaVo.getParam("BatchNo");
 
 		if (iFunctionCode == 0) {
-			/* 每月21日(遇假日順延)，火險保費未繳轉借支 */
+			/* 每月20日(遇假日提前)，火險保費未繳轉借支 */
 			TxToDoMain tTxToDoMain = txToDoMainService.findById("L4604", titaVo);
 			if (tTxToDoMain != null && tTxToDoMain.getUnProcessCnt() > 0) {
-				throw new LogicException(titaVo, "E0015", "整批入帳前需先執行<L4604-火險保費未繳轉借支>作業(每月21日)"); // 檢查錯誤
+				throw new LogicException(titaVo, "E0015", "整批入帳前需先執行<L4604-火險保費未繳轉借支>作業(每月20日)"); // 檢查錯誤
 			}
 		}
 

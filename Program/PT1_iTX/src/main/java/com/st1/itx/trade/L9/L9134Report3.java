@@ -70,11 +70,36 @@ public class L9134Report3 extends MakeReport {
 			makeExcel.setValue(2, 1, "本日無資料");
 		} else {
 			int row = 1;
-
+			/*
+			 * 20222010000 暫收及待結轉帳項－火險保費 
+			 * 20222020000 暫收及待結轉帳項－擔保放款 
+			 * 20222180000 暫收及待結轉帳項－債權協商
+			 * 20222180100 暫收及待結轉帳項－更生統一收付 
+			 * 20222180200 暫收及待結轉帳項－前置調解
+			 */
 			for (Map<String, String> r : list) {
 				row++;
 				makeExcel.setValue(row, 1, r.get("AcNoCode"));
-				makeExcel.setValue(row, 2, r.get("AcSubCode"));
+				
+				String AcNameCode = "";
+				if(r.get("AcNoCode").equals("20222010000")) {
+					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
+				}
+				if(r.get("AcNoCode").equals("20222020000")) {
+					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
+				}
+				if(r.get("AcNoCode").equals("20222180000")) {
+					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
+				}
+				if(r.get("AcNoCode").equals("20222180100")) {
+					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
+				}
+				if(r.get("AcNoCode").equals("20222180200")) {
+					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
+				}
+				
+				
+				makeExcel.setValue(row, 2, AcNameCode);
 				makeExcel.setValue(row, 3, r.get("AcDtlCode"));
 				makeExcel.setValue(row, 4, r.get("AcctItem"));
 				makeExcel.setValue(row, 5, r.get("CustNo"));

@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM003ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -28,28 +29,32 @@ public class LM003Report extends MakeReport {
 	private enum Columns {
 
 		// 這裡的宣告順序建議和輸出順序一樣
-
-		// 期間 44 L ; 57 R
-
-		// 撥款金額 73 R
-
-		// 結清:利率高轉貸 91 R
-		// 結清:買賣 107 R
-		// 結清:自行還款等 119 R
-		// 結清小計 133 R
-
-		// 非結清:部分還款 149 R
-		// 非結清:本金攤提 162 R
-		// 非結清:轉催收 175 R
-		// 非結清小計: 191 R
-
-		// 合計: 209 R
-		// 淨增減: 224 R
-		// 餘額: 240 R
-
-		yearMonth("F0", 44, 0, 60, false), drawdownAmt("F1", 0, 0, 76, false), highRate("F2", 0, 86, 94, true), trade("F3", 0, 101, 106, true), others("F4", 0, 114, 120, true),
-		closedRepaySum("F5", 0, 128, 134, true), partlyRepay("F6", 0, 143, 150, true), tenty("F7", 0, 157, 162, true), turnOvdu("F8", 0, 171, 178, true), unclosedRepaySum("F9", 0, 186, 192, true),
-		repayTotal("F10", 0, 203, 212, true), net("F16", 0, 0, 228, false), EOMBalance("F11", 0, 0, 242, false);
+		// 期間
+		yearMonth("F0", 8, 0, 18, false),
+		// 撥款
+		drawdownAmt("F1", 0, 0, 37, false),
+		// 利率高轉貸
+		highRate("F2", 0, 47, 54, true),
+		// 買賣
+		trade("F3", 0, 62, 66, true),
+		// 自行還款等
+		others("F4", 0, 76, 80, true),
+		// (結清)小計
+		closedRepaySum("F5", 0, 86, 94, true),
+		// 部分還款
+		partlyRepay("F6", 0, 108, 110, true),
+		// 本金攤提
+		tenty("F7", 0, 115, 122, true),
+		// 轉催收
+		turnOvdu("F8", 0, 135, 138, true),
+		// (非結清)小計
+		unclosedRepaySum("F9", 0, 143, 152, true),
+		// 合計
+		repayTotal("F10", 0, 166, 171, true),
+		// 淨增減
+		net("F16", 0, 183, 188, false),
+		// 月底餘額
+		EOMBalance("F11", 0, 197, 202, false);
 
 		private String keyword = "";
 		private int outputXPosR = 0;
@@ -58,6 +63,11 @@ public class LM003Report extends MakeReport {
 		private BigDecimal sum = BigDecimal.ZERO;
 		private Boolean hasRatioOutput = false;
 
+		/**
+		 * _keyword 欄位代號 _outputXPosL 靠左位置 _outputXPosC 置中位置 _outputXPosR 靠右位置
+		 * _hasRatioOutput 是否為百分比型態
+		 * 
+		 */
 		Columns(String _keyword, int _outputXPosL, int _outputXPosC, int _outputXPosR, Boolean _hasRatioOutput) {
 			this.keyword = _keyword;
 			this.outputXPosL = _outputXPosL;
@@ -112,7 +122,8 @@ public class LM003Report extends MakeReport {
 				case yearMonth:
 					// 年月份輸出
 					if (v.length() >= 6) {
-						lm003Report.print(0, c.getOutputXPosR(), (parse.stringToInteger(v.substring(0, 4)) - 1911) + "年" + v.substring(4, 6) + "月", "R");
+						lm003Report.print(0, c.getOutputXPosR(),
+								(parse.stringToInteger(v.substring(0, 4)) - 1911) + "年" + v.substring(4, 6) + "月", "R");
 					}
 					break;
 				default:
@@ -137,14 +148,15 @@ public class LM003Report extends MakeReport {
 				case yearMonth:
 					// 年月份輸出
 					if (lastF0.length() >= 6) {
-						lm003Report.print(0, c.getOutputXPosL(), (parse.stringToInteger(lastF0.substring(0, 4)) - 1911) + "年合計", "L");
+						lm003Report.print(0, c.getOutputXPosL(),
+								(parse.stringToInteger(lastF0.substring(0, 4)) - 1911) + "年合計", "L");
 					}
 					break;
 				default:
 					if (c.hasRatioOutput) // 目前此表要出年合計的 = 有顯示平均的; 如果未來有修改這裡需改
 					{
 						// 年合計金額輸出
-						lm003Report.print(0, c.getOutputXPosR(), formatAmt(c.getSum(), 2, 8), "R");
+						lm003Report.print(0, c.getOutputXPosL(), formatAmt(c.getSum(), 2, 8), "R");
 						break;
 					}
 				}
@@ -171,16 +183,18 @@ public class LM003Report extends MakeReport {
 				case yearMonth:
 					// 年月份輸出
 					if (lastF0.length() >= 6) {
-						lm003Report.print(0, c.getOutputXPosL(), (parse.stringToInteger(lastF0.substring(0, 4)) - 1911) + "年月平均", "L");
+						lm003Report.print(0, c.getOutputXPosL(),
+								(parse.stringToInteger(lastF0.substring(0, 4)) - 1911) + "年月平均", "L");
 					}
 					break;
 				default:
 					if (c.hasRatioOutput) {
 						// 月平均金額輸出
 						if (c.sum.compareTo(BigDecimal.ZERO) != 0) {
-							lm003Report.print(0, c.getOutputXPosR(), formatAmt(c.getSum().divide(monthCount, 2, RoundingMode.HALF_UP), 2, 8), "R");
+							lm003Report.print(0, c.getOutputXPosL(),
+									formatAmt(c.getSum().divide(monthCount, 2, RoundingMode.HALF_UP), 2, 8), "R");
 						} else {
-							lm003Report.print(0, c.getOutputXPosR(), formatAmt(BigDecimal.ZERO, 2), "R");
+							lm003Report.print(0, c.getOutputXPosL(), formatAmt(BigDecimal.ZERO, 2), "R");
 						}
 					}
 					break;
@@ -202,7 +216,8 @@ public class LM003Report extends MakeReport {
 				divisor = new BigDecimal(finalTLDVo.get(Columns.repayTotal.keyword)); // hard coded...
 			} catch (Exception e) {
 				lm003Report.error("LM003Report.printRepayRatios() - divisor");
-				lm003Report.error("received weird " + Columns.repayTotal.getKeyword() + ": " + finalTLDVo.get(Columns.repayTotal.getKeyword()));
+				lm003Report.error("received weird " + Columns.repayTotal.getKeyword() + ": "
+						+ finalTLDVo.get(Columns.repayTotal.getKeyword()));
 			}
 
 			lm003Report.info("lm003 Report doing printRepayRatios");
@@ -217,14 +232,17 @@ public class LM003Report extends MakeReport {
 						dividend = parse.stringToBigDecimal(finalTLDVo.get(Columns.values()[i].getKeyword()));
 					} catch (Exception e) {
 						lm003Report.error("LM003Report.printRepayRatios() - dividend");
-						lm003Report.error("Received weird " + Columns.values()[i].getKeyword() + ": " + finalTLDVo.get(Columns.values()[i].getKeyword()));
+						lm003Report.error("Received weird " + Columns.values()[i].getKeyword() + ": "
+								+ finalTLDVo.get(Columns.values()[i].getKeyword()));
 					}
 
 					lm003Report.info(Columns.values()[i].toString());
 					lm003Report.info("dividend: " + dividend.toString());
 
 					if (dividend.compareTo(BigDecimal.ZERO) > 0 && divisor.compareTo(BigDecimal.ZERO) > 0) {
-						lm003Report.print(0, Columns.values()[i].outputXPosC, dividend.divide(divisor, 5, RoundingMode.HALF_UP).multiply(getBigDecimal(100)).setScale(2, RoundingMode.HALF_UP) + "%",
+						lm003Report.print(0, Columns.values()[i].outputXPosC,
+								dividend.divide(divisor, 5, RoundingMode.HALF_UP).multiply(getBigDecimal(100))
+										.setScale(2, RoundingMode.HALF_UP) + "%",
 								"C");
 					} else {
 						lm003Report.print(0, Columns.values()[i].outputXPosC, "---", "C");
@@ -239,13 +257,19 @@ public class LM003Report extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.setFontSize(16);
-		this.print(-2, 52, titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶 - 撥款/還款金額比較月報表", "C");
+//		int leftPos = 2;
+		int centerPos = 55;
+		int rightPos = 180;
+
+		this.setFontSize(14);
+		this.print(-2, centerPos,
+				titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶 - 撥款/還款金額比較月報表", "C");
+
 		this.setFontSize(7);
-		this.print(-4, 243, "機密等級：密", "R");
-		this.setFontSize(8);
-		this.print(-5, 166, "單位：億元", "R");
-		this.setFontSize(6);
+
+		this.print(-5, rightPos, "機密等級：密");
+
+		this.print(-6, rightPos, "單位：億元");
 
 		this.setBeginRow(7);
 		this.setMaxRows(100);
@@ -268,57 +292,48 @@ public class LM003Report extends MakeReport {
 			this.error("lM003ServiceImpl.findAll error = " + e.getMessage());
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM003", titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶－撥款／還款金額比較月報表", "", "A4", "L");
+		String txcd = titaVo.getTxcd();
+		String reportName = titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶－撥款／還款金額比較月報表";
 
-		print(1, 1, "");
-		print(1, 42, "╔════════╦═══════╦═══════════════════════════════════════════════════════════════════╦═══════╦══════╗");
-		print(1, 42, "║　　　　 　　 　║　　　　　　　║　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　║　　　　　　　║　　　　　　║");
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(txcd).setRptItem(reportName).setSecurity("").setRptSize("A4").setPageOrientation("L")
+				.build();
 
-		print(0, 136, "還款(b)");
-		print(1, 42, "║　　　　　　　  ║　　　　　　　╠════════════════════════════╦════════════════════════════╦═════════╣　　　　　　  ║　　　　　　║");
-		print(0, 218, "淨增減");
-		print(0, 234, "月底");
-		print(1, 42, "║　　　　　　　  ║ 　　　　　 　║　　　　　　　　    　　　　　　　　　　　　　　　　　  ║　　　　　　　　　　　　　　　　　　　　　　　　　　    ║　　 　　　　     ║　　　　　　　║　　　　　　║");
-		print(0, 50, "期間");
-		print(0, 66, "撥款(a) ");
-		print(0, 101, "結清");
-		print(0, 160, "非結清");
-		print(1, 42, "║　　　　　　　　║　　　　　　　╠════════╦═════╦══════╦══════╬═══════╦═════╦═══════╦══════╣　　　　　　　　　║　　　　　　　║　　　　　　║");
-		print(0, 202, "合計");
-		print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+		this.open(titaVo, reportVo);
 
-		print(0, 81, "利率高轉貸");
-		print(0, 99, "買賣");
-		print(0, 109, "自行還款等");
-		print(0, 126, "小計");
+		// 42-12=30
+		int basePos = 3;
+		print(2, basePos,
+				"┌────────┬───────┬───────────────────────────────────────────────────────────────────┬───────┬──────┐");
 
-		print(0, 140, "部份還款");
-		print(0, 153, "本金攤提");
-
-		print(0, 168, "轉催收");
-		print(0, 184, "小計");
-
-		print(0, 221, "（ｃ＝ａ－ｂ）", "C");
-
-		print(0, 234, "餘額");
-
-		// 期間 44 L ; 57 R
-
-		// 撥款金額 73 R
-
-		// 結清:利率高轉貸 91 R
-		// 結清:買賣 107 R
-		// 結清:自行還款等 119 R
-		// 結清小計 133 R
-
-		// 非結清:部分還款 149 R
-		// 非結清:本金攤提 162 R
-		// 非結清:轉催收 175 R
-		// 非結清小計: 191 R
-
-		// 合計: 209 R
-		// 淨增減: 224 R
-		// 餘額: 240 R
+		print(1, basePos,
+				"│　　　　　　　　│　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　　│　　　　　　│");
+		print(0, basePos + 100, "還款(b)");
+		print(1, basePos,
+				"│　　　　　　　　│　　　　　　　├────────────────────────────┬────────────────────────────┬─────────┤　　　　　　　│　　　　　　│");
+		print(0, basePos + 176, "淨增減");
+		print(0, basePos + 192, "月底");
+		print(1, basePos,
+				"│　　　　　　　　│　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　　　　　　　　　　　　　　　　　　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
+		print(0, basePos + 8, "期間");
+		print(0, basePos + 24, "撥款(a) ");
+		print(0, basePos + 63, "結清");
+		print(0, basePos + 118, "非結清");
+		print(1, basePos,
+				"│　　　　　　　　│　　　　　　　├────────┬─────┬──────┬──────┼───────┬─────┬───────┬──────┤　　　　　　　　　│　　　　　　　│　　　　　　│");
+		print(0, basePos + 158, "合計");
+		print(0, basePos + 191, "餘額");
+		print(1, basePos,
+				"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
+		print(0, basePos + 44, "利率高轉貸", "C");
+		print(0, basePos + 59, "買賣", "C");
+		print(0, basePos + 72, "自行還款等", "C");
+		print(0, basePos + 86, "小計", "C");
+		print(0, basePos + 101, "部份還款", "C");
+		print(0, basePos + 115, "本金攤提", "C");
+		print(0, basePos + 129, "轉催收", "C");
+		print(0, basePos + 142, "小計");
+		print(0, basePos + 161, "（ｃ＝ａ－ｂ）", "C");
 
 		Map<String, String> lastTLDVo = null;
 
@@ -337,13 +352,17 @@ public class LM003Report extends MakeReport {
 					// 出上一筆資料的年的合計與月平均
 
 					if (!lastTLDVo.get("F0").substring(0, 4).equals(tLDVo.get("F0").substring(0, 4))) {
-						print(1, 42, "╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
-						print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+						print(1, basePos,
+								"├────────┼───────┼────────┼─────┼──────┼──────┼───────┼─────┼───────┼──────┼─────────┼───────┼──────┤");
+						print(1, basePos,
+								"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 
 						columnOutput.printYearlyTotal(lastTLDVo.get("F0"));
 
-						print(1, 42, "╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
-						print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+						print(1, basePos,
+								"├────────┼───────┼────────┼─────┼──────┼──────┼───────┼─────┼───────┼──────┼─────────┼───────┼──────┤");
+						print(1, basePos,
+								"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 
 						columnOutput.printYearlyAverage(lastTLDVo.get("F0"));
 
@@ -351,8 +370,10 @@ public class LM003Report extends MakeReport {
 					}
 				}
 
-				print(1, 42, "╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
-				print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+				print(1, basePos,
+						"├────────┼───────┼────────┼─────┼──────┼──────┼───────┼─────┼───────┼──────┼─────────┼───────┼──────┤");
+				print(1, basePos,
+						"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 
 				columnOutput.dealSingleMonth(tLDVo);
 
@@ -362,13 +383,17 @@ public class LM003Report extends MakeReport {
 
 			// 出最後一年的年月
 
-			print(1, 42, "╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
-			print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+			print(1, basePos,
+					"├────────┼───────┼────────┼─────┼──────┼──────┼───────┼─────┼───────┼──────┼─────────┼───────┼──────┤");
+			print(1, basePos,
+					"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 
 			columnOutput.printYearlyTotal(lastTLDVo.get("F0"));
 
-			print(1, 42, "╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
-			print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+			print(1, basePos,
+					"├────────┼───────┼────────┼─────┼──────┼──────┼───────┼─────┼───────┼──────┼─────────┼───────┼──────┤");
+			print(1, basePos,
+					"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 
 			columnOutput.printYearlyAverage(lastTLDVo.get("F0"));
 
@@ -376,11 +401,13 @@ public class LM003Report extends MakeReport {
 			print(0, 50, "本日無資料!!", "C");
 		}
 
-		print(1, 42, "╚════════╩═══════╩════════╩═════╩══════╩══════╩═══════╩═════╩═══════╩══════╩═════════╩═══════╩══════╝");
+		print(1, basePos,
+				"└────────┴───────┴────────┴─────┴──────┴──────┴───────┴─────┴───────┴──────┴─────────┴───────┴──────┘");
 
-		print(1, 42, "╔════════════════╦════════╦═════╦══════╦══════╦═══════╦═════╦═══════╦══════╦═════════╦═══════╦══════╗");
-		print(1, 42, "║　　　　當月還款分布%　　　 　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
-
+		print(1, basePos,
+				"┌────────────────┬────────┬─────┬──────┬──────┬───────┬─────┬───────┬──────┬─────────┬───────┬──────┐");
+		print(1, basePos,
+				"│　　　　當月還款分布％　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 		// 無資料時這個會是null
 		// 有資料時會是最後一個tLDVo
 		if (lastTLDVo != null) {
@@ -394,7 +421,8 @@ public class LM003Report extends MakeReport {
 			columnOutput.printRepayRatios(lastTLDVo);
 		}
 
-		print(1, 42, "╚════════════════╩════════╩═════╩══════╩══════╩═══════╩═════╩═══════╩══════╩═════════╩═══════╩══════╝");
+		print(1, basePos,
+				"└────────────────┴────────┴─────┴──────┴──────┴───────┴─────┴───────┴──────┴─────────┴───────┴──────┘");
 
 		if (lastTLDVo != null) {
 
@@ -408,22 +436,47 @@ public class LM003Report extends MakeReport {
 			String TurnOvdu = formatAmt(Columns.turnOvdu.getSum(), 2, 8);
 			String NatEnt = formatAmt(lastTLDVo.get("F14"), 2, 8);
 
-			String ActualRepay = formatAmt(
-					Columns.repayTotal.getSum().subtract(parse.stringToBigDecimal(lastTLDVo.get("F15"))).subtract(Columns.turnOvdu.getSum()).subtract(parse.stringToBigDecimal(lastTLDVo.get("F14"))),
-					2, 8);
+			String ActualRepay = formatAmt(Columns.repayTotal.getSum()
+					.subtract(parse.stringToBigDecimal(lastTLDVo.get("F15"))).subtract(Columns.turnOvdu.getSum())
+					.subtract(parse.stringToBigDecimal(lastTLDVo.get("F14"))), 2, 8);
 
 			print(1, 1, "");
-			print(1, 42, " ●" + year + "年" + month + "月底貸款總餘額：" + EOMBalance + "億元 ●企金：" + EOMBalanceEnt + "億元 ●房貸：" + EOMBalanceNat + "億元");
-			print(1, 42, " ●依報表：LN6361編制：撥款金額含催收回復，還款金額含轉催收。");
-			print(1, 42, " ●自行還款含內部代償、借新還舊、大額還款（1月~" + month + "月累積數" + Internal + "億）。");
+			print(1, basePos, " ●" + year + "年" + month + "月底貸款總餘額：" + EOMBalance + "億元 ●企金：" + EOMBalanceEnt
+					+ "億元 ●房貸：" + EOMBalanceNat + "億元");
+			print(1, basePos, " ●依報表：LN6361編制：撥款金額含催收回復，還款金額含轉催收。");
+			print(1, basePos, " ●自行還款含內部代償、借新還舊、大額還款（1月~" + month + "月累積數" + Internal + "億）。");
 
-			print(1, 42, " ●" + month + "月實際還款數：" + RepayTotal + "（帳載）-" + Internal + "（內部轉帳）-" + TurnOvdu + "（轉催收）-" + NatEnt + "（企金件以自然人申貸還款）＝" + ActualRepay + "億");
-			print(1, 42, " ●撥款金額包含企金件以自然人申貸撥款" + NatEnt + "億");
+			print(1, basePos, " ●" + month + "月實際還款數：" + RepayTotal + "（帳載）-" + Internal + "（內部轉帳）-" + TurnOvdu
+					+ "（轉催收）-" + NatEnt + "（企金件以自然人申貸還款）＝" + ActualRepay + "億");
+			print(1, basePos, " ●撥款金額包含企金件以自然人申貸撥款" + NatEnt + "億");
 		}
 
 		this.close();
-		// this.toPdf(sno);
 
 		return true;
 	}
+
+//	public String drawCustomized(String... vars) {
+//
+//		String text = "";
+//		String s = "";
+//		int c = 0;
+//
+//		// 兩個參數為一組，偶數數量參數
+//		if (vars.length % 2 == 0) {
+//			for (int i = 0; i < vars.length; i += 2) {
+//
+//				s = "".equals(vars[i]) ? "　" : vars[i];
+//				c = Integer.valueOf(vars[i + 1]);
+//
+//				for (int j = 1; j <= c; j++) {
+//					text += s;
+//				}
+//
+//			}
+//		}
+//
+//		return text;
+//	}
+
 }

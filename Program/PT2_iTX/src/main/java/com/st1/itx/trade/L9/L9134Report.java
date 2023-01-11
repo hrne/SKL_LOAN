@@ -119,17 +119,41 @@ public class L9134Report extends MakeReport {
 			print(1, 1, "本日無資料");
 		} else {
 			int lastAcDate = 0;
+			/*
+			 * 20222010000 暫收及待結轉帳項－火險保費 
+			 * 20222020000 暫收及待結轉帳項－擔保放款 
+			 * 20222180000 暫收及待結轉帳項－債權協商
+			 * 20222180100 暫收及待結轉帳項－更生統一收付 
+			 * 20222180200 暫收及待結轉帳項－前置調解
+			 */
 			for (Map<String, String> map : list) {
 				int acDate = Integer.parseInt(map.get("AcDate"));
 				if (lastAcDate != 0 && lastAcDate != acDate) {
 					// 印合計
 					printSum(lastAcDate);
 				}
-
 				// 新的一行
 				print(1, 0, "");
 				print(0, 8, showRocDate(acDate, 1)); // 會計日期
-				print(0, 19, map.get("AcNoCode")); // 會計科目
+				
+				String AcNameCode = "";
+				if(map.get("AcNoCode").equals("20222010000")) {
+					AcNameCode = map.get("AcNoCode")+"－火險保費 ";
+				}
+				if(map.get("AcNoCode").equals("20222020000")) {
+					AcNameCode = map.get("AcNoCode")+"－擔保放款  ";
+				}
+				if(map.get("AcNoCode").equals("20222180000")) {
+					AcNameCode = map.get("AcNoCode")+"－債權協商  ";
+				}
+				if(map.get("AcNoCode").equals("20222180100")) {
+					AcNameCode = map.get("AcNoCode")+"－更生統一收付   ";
+				}
+				if(map.get("AcNoCode").equals("20222180200")) {
+					AcNameCode = map.get("AcNoCode")+"－前置調解  ";
+				}
+				
+				print(0, 19, AcNameCode); // 會計科目	
 				print(0, 74, this.formatAmt(map.get("DrAmt"), 0), "R"); // 借方金額
 				print(0, 92, this.formatAmt(map.get("CrAmt"), 0), "R"); // 貸方金額
 				print(0, 116, this.formatAmt(map.get("DiffAmt"), 0), "R"); // 當日小計

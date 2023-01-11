@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class SystemParas implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3880252442861928781L;
-
-// 業務類型
+  // 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)
@@ -315,6 +311,32 @@ public class SystemParas implements Serializable {
   // 火險保費已解付新產日期
   @Column(name = "`InsuSettleDate`")
   private int insuSettleDate = 0;
+
+  // Jcic債協聯絡人部門
+  @Column(name = "`JcicZDep`", length = 3)
+  private String jcicZDep;
+
+  // Jcic債協聯絡人姓名
+  @Column(name = "`JcicZName`", length = 4)
+  private String jcicZName;
+
+  // Jcic債協聯絡人電話
+  /* 範例格式:02-23895858#7279 */
+  @Column(name = "`JcicZTel`", length = 16)
+  private String jcicZTel;
+
+  // JcicMU1聯絡人部門
+  @Column(name = "`JcicMU1Dep`", length = 3)
+  private String jcicMU1Dep;
+
+  // JcicMU1聯絡人姓名
+  @Column(name = "`JcicMU1Name`", length = 4)
+  private String jcicMU1Name;
+
+  // JcicMU1聯絡人電話
+  /* 範例格式:02-23895858#7279 */
+  @Column(name = "`JcicMU1Tel`", length = 16)
+  private String jcicMU1Tel;
 
   // 建檔日期時間
   @CreatedDate
@@ -1540,6 +1562,120 @@ N:不啟用
   }
 
 /**
+	* Jcic債協聯絡人部門<br>
+	* 
+	* @return String
+	*/
+  public String getJcicZDep() {
+    return this.jcicZDep == null ? "" : this.jcicZDep;
+  }
+
+/**
+	* Jcic債協聯絡人部門<br>
+	* 
+  *
+  * @param jcicZDep Jcic債協聯絡人部門
+	*/
+  public void setJcicZDep(String jcicZDep) {
+    this.jcicZDep = jcicZDep;
+  }
+
+/**
+	* Jcic債協聯絡人姓名<br>
+	* 
+	* @return String
+	*/
+  public String getJcicZName() {
+    return this.jcicZName == null ? "" : this.jcicZName;
+  }
+
+/**
+	* Jcic債協聯絡人姓名<br>
+	* 
+  *
+  * @param jcicZName Jcic債協聯絡人姓名
+	*/
+  public void setJcicZName(String jcicZName) {
+    this.jcicZName = jcicZName;
+  }
+
+/**
+	* Jcic債協聯絡人電話<br>
+	* 範例格式:02-23895858#7279
+	* @return String
+	*/
+  public String getJcicZTel() {
+    return this.jcicZTel == null ? "" : this.jcicZTel;
+  }
+
+/**
+	* Jcic債協聯絡人電話<br>
+	* 範例格式:02-23895858#7279
+  *
+  * @param jcicZTel Jcic債協聯絡人電話
+	*/
+  public void setJcicZTel(String jcicZTel) {
+    this.jcicZTel = jcicZTel;
+  }
+
+/**
+	* JcicMU1聯絡人部門<br>
+	* 
+	* @return String
+	*/
+  public String getJcicMU1Dep() {
+    return this.jcicMU1Dep == null ? "" : this.jcicMU1Dep;
+  }
+
+/**
+	* JcicMU1聯絡人部門<br>
+	* 
+  *
+  * @param jcicMU1Dep JcicMU1聯絡人部門
+	*/
+  public void setJcicMU1Dep(String jcicMU1Dep) {
+    this.jcicMU1Dep = jcicMU1Dep;
+  }
+
+/**
+	* JcicMU1聯絡人姓名<br>
+	* 
+	* @return String
+	*/
+  public String getJcicMU1Name() {
+    return this.jcicMU1Name == null ? "" : this.jcicMU1Name;
+  }
+
+/**
+	* JcicMU1聯絡人姓名<br>
+	* 
+  *
+  * @param jcicMU1Name JcicMU1聯絡人姓名
+	*/
+  public void setJcicMU1Name(String jcicMU1Name) {
+    this.jcicMU1Name = jcicMU1Name;
+  }
+
+/**
+	* JcicMU1聯絡人電話<br>
+	* 範例格式:02-23895858#7279
+	* @return String
+	*/
+  public String getJcicMU1Tel() {
+    return this.jcicMU1Tel == null ? "" : this.jcicMU1Tel;
+  }
+
+/**
+	* JcicMU1聯絡人電話<br>
+	* 範例格式:02-23895858#7279
+  *
+  * @param jcicMU1Tel JcicMU1聯絡人電話
+	*/
+  public void setJcicMU1Tel(String jcicMU1Tel) {
+    this.jcicMU1Tel = jcicMU1Tel;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1627,7 +1763,8 @@ N:不啟用
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
            + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth
            + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg
-           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", insuSettleDate=" + insuSettleDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName
+           + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name + ", jcicMU1Tel=" + jcicMU1Tel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
            + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

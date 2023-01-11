@@ -108,7 +108,7 @@ public class L9134Report2 extends MakeReport {
 		makeExcel.setValue(2, 8, "傳票號碼", "C");
 		makeExcel.setValue(2, 9, "交易序號", "C");
 		makeExcel.setValue(2, 10, "戶號", "C");
-		//2022-10-14新增額度欄位
+		// 2022-10-14新增額度欄位
 		makeExcel.setValue(2, 11, "額度", "C");
 		makeExcel.setValue(2, 12, "戶名", "C");
 
@@ -119,12 +119,38 @@ public class L9134Report2 extends MakeReport {
 			makeExcel.setValue(3, 1, "本日無資料");
 		} else {
 			int row = 2;
-
+			/*
+			 * 20222010000 暫收及待結轉帳項－火險保費 
+			 * 20222020000 暫收及待結轉帳項－擔保放款 
+			 * 20222180000 暫收及待結轉帳項－債權協商
+			 * 20222180100 暫收及待結轉帳項－更生統一收付 
+			 * 20222180200 暫收及待結轉帳項－前置調解
+			 */
 			for (Map<String, String> r : list) {
 				row++;
 
 				makeExcel.setValue(row, 1, r.get("AcDate"));
-				makeExcel.setValue(row, 2, r.get("AcNoCode"));
+				
+
+				String AcNameCode = "";
+				if(r.get("AcNoCode").equals("20222010000")) {
+					AcNameCode = r.get("AcNoCode")+"－火險保費 ";
+				}
+				if(r.get("AcNoCode").equals("20222020000")) {
+					AcNameCode = r.get("AcNoCode")+"－擔保放款  ";
+				}
+				if(r.get("AcNoCode").equals("20222180000")) {
+					AcNameCode = r.get("AcNoCode")+"－債權協商  ";
+				}
+				if(r.get("AcNoCode").equals("20222180100")) {
+					AcNameCode = r.get("AcNoCode")+"－更生統一收付   ";
+				}
+				if(r.get("AcNoCode").equals("20222180200")) {
+					AcNameCode = r.get("AcNoCode")+"－前置調解  ";
+				}
+				
+				
+				makeExcel.setValue(row, 2, AcNameCode);
 				makeExcel.setValue(row, 3, r.get("AcSubCode"));
 				makeExcel.setValue(row, 4, r.get("AcDtlCode"));
 				makeExcel.setValue(row, 5, r.get("AcctItem"));
@@ -132,8 +158,8 @@ public class L9134Report2 extends MakeReport {
 						"#,##0", "R");
 				makeExcel.setValue(row, 7, r.get("CrAmt").isEmpty() ? BigDecimal.ZERO : new BigDecimal(r.get("CrAmt")),
 						"#,##0", "R");
-				makeExcel.setValue(row, 8, r.get("SlipNo"),"R");
-				makeExcel.setValue(row, 9, r.get("TitaTxtNo"),"R");
+				makeExcel.setValue(row, 8, r.get("SlipNo"), "R");
+				makeExcel.setValue(row, 9, r.get("TitaTxtNo"), "R");
 				makeExcel.setValue(row, 10, r.get("CustNo"));
 				makeExcel.setValue(row, 11, r.get("FacmNo"));
 				makeExcel.setValue(row, 12, r.get("CustName"));
