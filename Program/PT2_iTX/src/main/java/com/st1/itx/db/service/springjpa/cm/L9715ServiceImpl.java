@@ -41,18 +41,23 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int ovduTermEnd = 999;
 		int ovduDaysStart = 0;
 		int ovduDaysEnd = 999999;
+		int dueMonth = 0;
 
 		this.info("L9715ServiceImpl APPRO_DAY = " + titaVo.getParam("APPRO_DAY"));
 		this.info("L9715ServiceImpl UNPAY_TERM_ST = " + titaVo.getParam("UNPAY_TERM_ST"));
 		this.info("L9715ServiceImpl UNPAY_TERM_ED = " + titaVo.getParam("UNPAY_TERM_ED"));
 		this.info("L9715ServiceImpl UNPAY_DAY_ST = " + titaVo.getParam("UNPAY_DAY_ST"));
 		this.info("L9715ServiceImpl UNPAY_DAY_ED = " + titaVo.getParam("UNPAY_DAY_ED"));
+		this.info("L9715ServiceImpl FUND_DAY = " + titaVo.getParam("FUND_DAY"));
 
 		approDate = Integer.parseInt(titaVo.getParam("APPRO_DAY")) + 19110000;
 		int unpayTermSt = Integer.parseInt(titaVo.getParam("UNPAY_TERM_ST"));
 		int unpayTermEd = Integer.parseInt(titaVo.getParam("UNPAY_TERM_ED"));
 		int unpayDaySt = Integer.parseInt(titaVo.getParam("UNPAY_DAY_ST"));
 		int unpayDayEd = Integer.parseInt(titaVo.getParam("UNPAY_DAY_ED"));
+
+		dueMonth = (Integer.parseInt(titaVo.getParam("FUND_DAY")) + 19110000) / 100;
+		this.info("L9715ServiceImpl dueMonth = " + dueMonth);
 
 		if (unpayTermSt > 0) {
 			ovduTermStart = unpayTermSt;
@@ -83,7 +88,9 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , COLL.\"PrinBalance\"      AS F7 "; // -- 本金餘額
 		sql += "      , NVL(LBM.\"StoreRate\",0)  AS F8 "; // -- 利率
 		sql += "      , COLL.\"PrevIntDate\"      AS F9 "; // -- 繳息迄日
-		sql += "      , COLL.\"NextIntDate\"      AS F10 "; // -- 最近應繳日
+		//20230110：IT說明以當月產表(月底產)的月份 + 應繳日期 為最近應繳日
+		sql += "      , :dueDate + LBM.\"SpecificDd\"      AS F10 "; // -- 最近應繳日
+//		sql += "      , COLL.\"NextIntDate\"      AS F10 "; // -- 最近應繳日
 		sql += "      , COLL.\"OvduDays\"         AS F11 "; // -- 逾期日數
 		sql += "      , NVL(CTN.\"LiaisonName\",N' ') ";
 		sql += "                                AS F12 "; // -- 聯絡人
@@ -104,6 +111,7 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
 		sql += "                  , \"FacmNo\" ";
 		sql += "                  , \"StoreRate\" ";
+		sql += "                  , \"SpecificDd\" ";
 		sql += "                  , ROW_NUMBER() OVER (PARTITION BY \"CustNo\",\"FacmNo\" ORDER BY \"BormNo\") AS SEQ ";
 		sql += "             FROM \"LoanBorMain\" ";
 		sql += "             WHERE \"LoanBal\" > 0 ";
@@ -168,7 +176,7 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		query = em.createNativeQuery(sql);
-
+		query.setParameter("dueDate", dueMonth * 100 );
 		query.setParameter("approDate", approDate);
 		query.setParameter("ovduTermStart", ovduTermStart);
 		query.setParameter("ovduTermEnd", ovduTermEnd);

@@ -25,6 +25,8 @@ import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.ClImmRankDetail;
+import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcCloseService;
@@ -35,6 +37,7 @@ import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.db.service.springjpa.cm.L6101ServiceImpl;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.trade.L9.L9130;
 import com.st1.itx.trade.L9.L9130Report;
@@ -95,6 +98,8 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	AcMainService sAcMainService;
+	@Autowired
+	SlipMedia2022Service slipMedia2022Service;
 
 	@Autowired
 	L6101ServiceImpl l6101ServiceImpl;
@@ -153,75 +158,30 @@ public class L6101 extends TradeBuffer {
 	@Autowired
 	TxToDoCom txToDoCom;
 
+	private int iClsFg = 0;
+	private int iMsgCode = 0;
+	private int iClsNo = 0;
+	private String iSecNo = "";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6101 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String iSecNo = titaVo.getParam("SecNo");
-		int iClsFg = this.parse.stringToInteger(titaVo.getParam("ClsFg"));
-		int iMsgCode = 0;
-		int iClsNo = 0;
+		String iItemCode = titaVo.getParam("ItemCode"); // 0:業務關帳作業;1:總帳傳票檔傳送作業
+		iSecNo = titaVo.getParam("SecNo");
+		iClsFg = this.parse.stringToInteger(titaVo.getParam("ClsFg"));
+		iMsgCode = 0;
+		iClsNo = 0;
 
-		// 檢查關帳作業
-		iMsgCode = CheckAcClose(iSecNo, iClsFg, iMsgCode, titaVo);
-		this.info("L6101 Check iMsgCode : " + iMsgCode);
-
-		// 更新會計業務關帳控制檔
-		if (iMsgCode == 0) {
-			iClsNo = updAcClose(iSecNo, iClsFg, iClsNo, titaVo);
-			this.info("L6101 after updAcClose iClsNo : " + iClsNo);
+		// 1:業務關帳作業
+		if ("0".equals(iItemCode)) {
+			acClose(titaVo);
 		}
-
-		// 更新上傳核心序號(09:放款)
-		// 啟動 L9130核心傳票媒體檔產生作業 ; L9131核心日結單代傳票列印 ; L9132傳票媒體明細表(核心) ; L9133會計與主檔餘額檢核表
-		if (iMsgCode == 0 && (iClsFg == 1 || iClsFg == 2)) {
-			if ("02".equals(iSecNo) || "09".equals(iSecNo)) {
-				updCoreSeq(iSecNo, iClsFg, iClsNo, titaVo);
-			}
-		}
-
-		// 寫入應處理清單-業績工作月結算啟動通知
-		// 放款關帳、工作月結束
-		if (iMsgCode == 0 && iClsFg == 1 && "09".equals(iSecNo)) {
-			txToDoPFCL(titaVo);
-		}
-
-		// 月底日關帳啟動提存
-		if (iMsgCode == 0 && iClsFg == 1 && "09".equals(iSecNo)) {
-			if (this.txBuffer.getMgBizDate().getTbsDy() == this.txBuffer.getMgBizDate().getMfbsDy()) {
-				// 應收利息提存
-				MySpring.newTask("BS900", this.txBuffer, titaVo);
-				// 應付未付火險費提存
-				MySpring.newTask("BS901", this.txBuffer, titaVo);
-			}
-		}
-
-		// 檢查正常
-		if (iMsgCode == 0) {
-			OccursList occursList = new OccursList();
-			occursList.putParam("OOMsgCode", 00);
-
-			// 0.開帳 1.關帳 2.關帳取消
-			if (iClsFg == 0) {
-				occursList.putParam("OOMessage", "開帳作業完成");
-			} else if (iClsFg == 1) {
-				occursList.putParam("OOMessage", "關帳作業完成");
-			} else {
-				occursList.putParam("OOMessage", "關帳取消作業完成");
-			}
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-		}
-
-		// 檢查錯誤
-		if (iMsgCode != 0) {
-			this.totaVo.putParam("OOResult", "9999");
-			this.totaVo.putParam("OOBatNo09", 00);
-			this.totaVo.putParam("OOBatNo01", 00);
-			this.totaVo.putParam("OOCoreSeqNo", 000);
+		// 2:總帳傳票檔傳送作業
+		if ("1".equals(iItemCode)) {
+			mediaSlip(titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -515,9 +475,10 @@ public class L6101 extends TradeBuffer {
 		if (L6901List == null || L6901List.size() == 0) {
 			return fAcMainCnt;
 		}
-		// 日結餘額檢查=1－不過餘額(借貸分由放款及核心系統出帳)時餘額歸零
+		// 日結餘額檢查=1－不過餘額(借貸分由放款及核心系統出帳)時餘額歸零(銷帳科目除外)
 		for (Map<String, String> map : L6901List) {
-			if ("1".equals(map.get("ClsChkFlag")) && !"0".equals(map.get("TdBal"))) {
+			if ("1".equals(map.get("ClsChkFlag")) && !"2".equals(map.get("ReceivableFlag"))
+					&& parse.stringToBigDecimal(map.get("TdBal")).compareTo(BigDecimal.ZERO) != 0) {
 				updAcMainCore(map, titaVo);
 			}
 		}
@@ -526,7 +487,7 @@ public class L6101 extends TradeBuffer {
 
 	// 更新會計會計總帳檔 ，借、貸金額寫入核心貸、借欄，餘額歸零
 	private void updAcMainCore(Map<String, String> map, TitaVo titaVo) throws LogicException {
-		// AcBookCode,AcSubBookCode,BranchNo,CurrencyCode,AcNoCode,AcSubCode,AcDtlCode,AcDate
+		this.info("updAcMainCore" + map.toString());
 		AcMainId tAcMainId = new AcMainId();
 		tAcMainId.setAcBookCode(map.get("AcBookCode"));
 		tAcMainId.setAcSubBookCode(map.get("AcSubBookCode"));
@@ -737,4 +698,159 @@ public class L6101 extends TradeBuffer {
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 		}
 	}
+
+	// 0:業務關帳作業
+	private void acClose(TitaVo titaVo) throws LogicException {
+
+		// 檢查關帳作業
+		iMsgCode = CheckAcClose(iSecNo, iClsFg, iMsgCode, titaVo);
+		this.info("L6101 Check iMsgCode : " + iMsgCode);
+
+		// 開帳檢查傳票媒體檔2022年格式媒體檔是否上傳完成
+		if (iClsFg == 0) {
+			CheckSlipMedia2022(titaVo);
+			AcClose tAcClose = new AcClose();
+			AcCloseId tAcCloseId = new AcCloseId();
+
+			tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+			tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+			tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
+
+			tAcClose = sAcCloseService.findById(tAcCloseId);
+
+			if (tAcClose == null) {
+				throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
+			}
+
+			Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(
+					this.txBuffer.getTxCom().getTbsdy() + 19110000, tAcClose.getClsNo(), 0, Integer.MAX_VALUE, titaVo);
+			for (SlipMedia2022 t : slslipMedia2022.getContent()) {
+				// 只檢查最新的
+				if (!t.getLatestFlag().equals("Y")) {
+					continue;
+				}
+				// 需完成上傳才可執行開帳作業
+				if (t.getTransferFlag().equals("N")) {
+					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
+				}
+			}
+		}
+
+		// 更新會計業務關帳控制檔
+		if (iMsgCode == 0) {
+			iClsNo = updAcClose(iSecNo, iClsFg, iClsNo, titaVo);
+			this.info("L6101 after updAcClose iClsNo : " + iClsNo);
+		}
+
+		// 更新上傳核心序號(09:放款)
+		// 啟動 L9130核心傳票媒體檔產生作業 ; L9131核心日結單代傳票列印 ; L9132傳票媒體明細表(核心) ; L9133會計與主檔餘額檢核表
+		if (iMsgCode == 0 && (iClsFg == 1 || iClsFg == 2)) {
+			if ("02".equals(iSecNo) || "09".equals(iSecNo)) {
+				updCoreSeq(iSecNo, iClsFg, iClsNo, titaVo);
+			}
+		}
+
+		// 寫入應處理清單-業績工作月結算啟動通知
+		// 放款關帳、工作月結束
+		if (iMsgCode == 0 && iClsFg == 1 && "09".equals(iSecNo)) {
+			txToDoPFCL(titaVo);
+		}
+
+		// 月底日關帳啟動提存
+		if (iMsgCode == 0 && iClsFg == 1 && "09".equals(iSecNo)) {
+			if (this.txBuffer.getMgBizDate().getTbsDy() == this.txBuffer.getMgBizDate().getMfbsDy()) {
+				// 應收利息提存
+				MySpring.newTask("BS900", this.txBuffer, titaVo);
+				// 應付未付火險費提存
+				MySpring.newTask("BS901", this.txBuffer, titaVo);
+			}
+		}
+
+		// 檢查正常
+		if (iMsgCode == 0) {
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOMsgCode", 00);
+
+			// 0.開帳 1.關帳 2.關帳取消
+			if (iClsFg == 0) {
+				occursList.putParam("OOMessage", "開帳作業完成");
+			} else if (iClsFg == 1) {
+				occursList.putParam("OOMessage", "關帳作業完成");
+			} else {
+				occursList.putParam("OOMessage", "關帳取消作業完成");
+			}
+
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
+		}
+
+		// 檢查錯誤
+		if (iMsgCode != 0) {
+			this.totaVo.putParam("OOResult", "9999");
+			this.totaVo.putParam("OOBatNo09", 00);
+			this.totaVo.putParam("OOBatNo01", 00);
+			this.totaVo.putParam("OOCoreSeqNo", 000);
+		}
+	}
+
+	// 1:總帳傳票檔傳送作業 L7400
+	private void mediaSlip(TitaVo titaVo) throws LogicException {
+
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
+
+		tAcClose = sAcCloseService.findById(tAcCloseId);
+
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
+		}
+		// 需檢查已關帳才可執行上傳作業
+		if (tAcClose.getClsFg() != 1) {
+			throw new LogicException(titaVo, "E0010", "需為關帳狀態 批號:" + tAcClose.getClsNo()); // 功能選擇錯誤
+		}
+
+		titaVo.putParam("AcDate", this.txBuffer.getTxCom().getTbsdy()); // 會計日期
+		if ("02".equals(iSecNo)) {
+			titaVo.putParam("BatchNo", 11); // 傳票批號 , 02:支票繳款時固定為11
+		} else {
+			titaVo.putParam("BatchNo", tAcClose.getClsNo()); // 傳票批號 , 09:放款時為業務關帳之次數
+		}
+		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
+		// 執行交易
+		MySpring.newTask("L7400", this.txBuffer, titaVo);
+	}
+
+	// 檢查上傳媒體檔是否已完成
+	private void CheckSlipMedia2022(TitaVo titaVo) throws LogicException {
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
+
+		tAcClose = sAcCloseService.findById(tAcCloseId);
+
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
+		}
+
+		Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(
+				this.txBuffer.getTxCom().getTbsdy() + 19110000, tAcClose.getClsNo(), 0, Integer.MAX_VALUE, titaVo);
+		for (SlipMedia2022 t : slslipMedia2022.getContent()) {
+			// 只檢查最新的
+			if (!t.getLatestFlag().equals("Y")) {
+				continue;
+			}
+			// 需完成上傳才可執行開帳作業
+			if (t.getTransferFlag().equals("N")) {
+				throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
+			}
+		}
+	}
+
 }

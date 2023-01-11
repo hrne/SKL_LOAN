@@ -97,10 +97,7 @@ CloseReasonCode 需左補0 (2)
                             AND APLP."LMSAPN" = E."LMSAPN"
     LEFT JOIN ( SELECT "LMSACN"
                      , "LMSAPN"
-                     , SUM(CASE
-                             WHEN "LMSLLD" <= "TbsDyF" -- 撥款日期<=轉換日時,為一般撥款
-                             THEN "LMSLBL"
-                           ELSE 0 END)           AS "LMSLBL" -- 放款餘額
+                     , SUM("LMSLBL")           AS "LMSLBL" -- 放款餘額
                 FROM "LA$LMSP"
                 GROUP BY "LMSACN"
                        , "LMSAPN"
@@ -112,10 +109,7 @@ CloseReasonCode 需左補0 (2)
                 GROUP BY "LMSACN"
               ) APLP2 ON APLP2."LMSACN" = E."LMSACN"
     LEFT JOIN ( SELECT "LMSACN"
-                     , SUM(CASE
-                             WHEN "LMSLLD" <= "TbsDyF" -- 撥款日期<=轉換日時,為一般撥款
-                             THEN "LMSLBL"
-                           ELSE 0 END)           AS "LMSLBL" -- 放款餘額
+                     , SUM("LMSLBL")           AS "LMSLBL" -- 放款餘額
                 FROM "LA$LMSP"
                 GROUP BY "LMSACN"
               ) LMSP2 ON LMSP2."LMSACN" = E."LMSACN"

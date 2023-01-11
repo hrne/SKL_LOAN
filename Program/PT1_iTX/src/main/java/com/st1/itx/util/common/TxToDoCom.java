@@ -21,6 +21,8 @@ import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 //  -----------------------  應處理清單維護 ------------------ 
@@ -759,10 +761,10 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
 			break;
 		case "L45101":
-			settingValue = "L45101;-;Y;-;-;Y;     ;L4510;L4511;-;產出15日薪員工扣薪檔";
+			settingValue = "L45101;-;-;-;-;-;     ;L4510;L4511;-;產出15日薪員工扣薪檔";
 			break;
 		case "L45102":
-			settingValue = "L45102;-;Y;-;-;Y;     ;L4510;L4511;-;產出非15日薪員工扣薪檔";
+			settingValue = "L45102;-;-;-;-;-;     ;L4510;L4511;-;產出非15日薪員工扣薪檔";
 			break;
 		case "EMEP00":
 			settingValue = "EMEP00;-;C;-;-;-;     ;L4200;L4200;-;員工扣薪入帳作業";

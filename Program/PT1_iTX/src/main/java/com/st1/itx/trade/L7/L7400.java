@@ -156,26 +156,45 @@ public class L7400 extends TradeBuffer {
 		// 2022-05-18 ST1 Wei 新增:
 		// 若 批號>=90 且 上傳EBS結果為成功時
 		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
-		if (sendEbsOK && iBatchNo >= 90) {
-			// iAcDate + 19110000
-			// iBatchNo
-			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
-					Integer.MAX_VALUE, titaVo);
-
-			if (slAcDetail != null && !slAcDetail.isEmpty()) {
-				List<AcDetail> lAcDetail = slAcDetail.getContent();
-				AcDetail tempAcDetail;
-				for (AcDetail tAcDetail : lAcDetail) {
-					tempAcDetail = sAcDetailService.holdById(tAcDetail, titaVo);
-					tempAcDetail.setEntAc(9);
+		if (sendEbsOK) {
+			for (SlipMedia2022 slipMedia : listSlipMedia2022) {
+				SlipMedia2022 tempSlipMedia = sSlipMedia2022Service.holdById(slipMedia, titaVo);
+				if (tempSlipMedia != null) {
+					tempSlipMedia.setTransferFlag("Y");
 					try {
-						sAcDetailService.update(tempAcDetail, titaVo);
+						sSlipMedia2022Service.update(tempSlipMedia, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+						throw new LogicException("E0003", "傳票媒體檔");
 					}
 				}
 			}
+			this.batchTransaction.commit();
+			if (iBatchNo >= 90) {
+				// iAcDate + 19110000
+				// iBatchNo
+				Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
+						Integer.MAX_VALUE, titaVo);
+
+				if (slAcDetail != null && !slAcDetail.isEmpty()) {
+					List<AcDetail> lAcDetail = slAcDetail.getContent();
+					AcDetail tempAcDetail;
+					for (AcDetail tAcDetail : lAcDetail) {
+						tempAcDetail = sAcDetailService.holdById(tAcDetail, titaVo);
+						tempAcDetail.setEntAc(9);
+						try {
+							sAcDetailService.update(tempAcDetail, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+						}
+					}
+					this.batchTransaction.commit();
+				}
+			}
 		}
+
+		sSlipMedia2022Service.Usp_L7_SlipMedia_Upd(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), iAcDate, iBatchNo,
+				titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -206,5 +225,4 @@ public class L7400 extends TradeBuffer {
 
 		return sendEbsOK;
 	}
-
 }

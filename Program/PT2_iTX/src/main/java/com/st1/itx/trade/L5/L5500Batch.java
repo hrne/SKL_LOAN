@@ -34,6 +34,9 @@ import com.st1.itx.db.service.HlEmpLnYg5PtService;
 import com.st1.itx.db.service.HlThreeDetailService;
 import com.st1.itx.db.service.HlThreeLaqhcpService;
 import com.st1.itx.db.service.springjpa.cm.L5500ServiceImpl;
+import com.st1.itx.trade.L9.L9744Batch;
+import com.st1.itx.trade.L9.L9745Batch;
+import com.st1.itx.trade.L9.L9746Batch;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -80,6 +83,25 @@ public class L5500Batch extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
+		
+	
+	/**
+	 * 三階放款明細統計（T9410051）
+	 */
+	@Autowired
+	public L9744Batch l9744Batch;
+	
+	/**
+	 * 放款專員明細統計（T9410052）
+	 */
+	@Autowired
+	public L9745Batch l9745Batch;
+	
+	/**
+	 * 介紹人換算業績報酬檢核表
+	 * */
+	@Autowired
+	public L9746Batch l9746Batch;
 
 	private int entday;
 	private int bworkmonth = 0;
@@ -88,7 +110,7 @@ public class L5500Batch extends TradeBuffer {
 	private String lworkmonthX = "";
 	private int workmonth = 0;
 	private String workmonthX = "";
-	private int workseason = 0;
+//	private int workseason = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -137,6 +159,10 @@ public class L5500Batch extends TradeBuffer {
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", msg, titaVo);
 
+		l9744Batch.run();
+		l9745Batch.run();
+		l9746Batch.run();
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -528,7 +554,7 @@ public class L5500Batch extends TradeBuffer {
 		sql += "  where aa.\"WorkMonth\"=:workmonth and bb.\"AreaCode\" is not null ";
 		sql += "  group by bb.\"AreaCode\" ";
 		sql += ") c on c.\"AreaCode\"=a.\"AreaCode\" ";
-		sql += "order by a.\"AreaCode\" ";
+		sql +="order by a.\"AreaCode\" ";
 
 		Map<String, String> conds = new HashMap<String, String>();
 

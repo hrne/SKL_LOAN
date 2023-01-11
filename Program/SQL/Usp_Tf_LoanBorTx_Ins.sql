@@ -250,7 +250,15 @@ BEGIN
           -- 左補零,總長度8 
           -- 2021-11-30 修改 只紀錄TRXNMT 
           ,LPAD(TR1."TRXNMT",8,0)         AS "TitaTxtNo"           -- 交易序號 VARCHAR2 8  
-          ,TR1."TRXTRN"                   AS "TitaTxCd"            -- 交易代號 VARCHAR2 5  
+          ,CASE 
+             WHEN CASE 
+                    WHEN TR1."TRXCRC" IN ('1','3') 
+                    THEN 0 - NVL(JL."JLNAMT",0) 
+                    ELSE NVL(JL."JLNAMT",0) 
+                  END != 0
+                  AND TR1."TRXTRN" = 3037
+             THEN 'L3230' -- 2023-01-11 Wei 增加此條件 from Lai : FeeAmt>0,且目前轉L3220的,改轉為L3230
+           ELSE TR1."TRXTRN" END          AS "TitaTxCd"            -- 交易代號 VARCHAR2 5  
           ,''                             AS "TitaCrDb"            -- 借貸別 VARCHAR2 1  
           ,TR1."TRXCRC"                   AS "TitaHCode"           -- 訂正別 VARCHAR2 1  
           ,'TWD'                          AS "TitaCurCd"           -- 幣別 VARCHAR2 3  
@@ -536,6 +544,12 @@ BEGIN
           /* 更新交易別代碼 */ 
           -- 2022-11-07 Wei 新增 from Lai 寫在LoanBorTx.xlsx 的 交易別 Sheet
           ,CASE 
+             WHEN CASE 
+                    WHEN TR1."TRXCRC" IN ('1','3') 
+                    THEN 0 - NVL(JL."JLNAMT",0) 
+                    ELSE NVL(JL."JLNAMT",0) 
+                  END != 0
+             THEN 'Fee' -- 2023-01-11 Wei 增加此條件 from Lai : FeeAmt>0,TxDescCode轉Fee
              WHEN TR1.TRXTRN='3025'
              THEN '3100'
              WHEN TR1.TRXTRN='3087' AND LBM."RenewFlag"='1'

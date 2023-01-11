@@ -66,7 +66,14 @@ BEGIN
         AND S."BorxNo" = T."BorxNo"
     )
     WHEN MATCHED THEN UPDATE SET
-    T."OtherFields" = S."OtherFields" || S."ReconCode"
+    T."TxDescCode" = '3211'
+    , T."OtherFields" = S."OtherFields" 
+                        || CASE  
+                             WHEN T."OtherFields" NOT LIKE '%TempReasonCode%' -- 若未有暫收原因,補上暫收原因
+                             THEN ',"TempReasonCode":"00"' 
+                           ELSE '' 
+                           END 
+                        || S."ReconCode"
     ;
 
     -- 記錄寫入筆數 

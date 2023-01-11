@@ -1,0 +1,1 @@
+ALTER TABLE "SlipMedia2022" ADD "TransferFlag" VARCHAR2(1) ;

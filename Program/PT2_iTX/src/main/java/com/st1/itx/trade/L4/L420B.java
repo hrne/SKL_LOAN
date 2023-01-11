@@ -34,7 +34,7 @@ public class L420B extends TradeBuffer {
 
 	@Autowired
 	public BatxHeadService batxHeadService;
-	
+
 	@Autowired
 	TxToDoMainService txToDoMainService;
 
@@ -45,18 +45,21 @@ public class L420B extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L420B ");
 		this.totaVo.init(titaVo);
-		
-		/* 每月21日(遇假日順延)，火險保費未繳轉借支 */
-		TxToDoMain tTxToDoMain = txToDoMainService.findById("L4604", titaVo);
-		if (tTxToDoMain != null && tTxToDoMain.getUnProcessCnt() > 0) {
-			throw new LogicException(titaVo, "E0015","整批入帳前需先執行<L4604-火險保費未繳轉借支>作業(每月21日)"); // 檢查錯誤
-		}
+
 		// 處理代碼 0:入帳 1:刪除 2:訂正
-		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		int iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 
 		// 會計日期、批號
 		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		String iBatchNo = titaVo.getParam("BatchNo");
+
+		if (iFunctionCode == 0) {
+			/* 每月21日(遇假日順延)，火險保費未繳轉借支 */
+			TxToDoMain tTxToDoMain = txToDoMainService.findById("L4604", titaVo);
+			if (tTxToDoMain != null && tTxToDoMain.getUnProcessCnt() > 0) {
+				throw new LogicException(titaVo, "E0015", "整批入帳前需先執行<L4604-火險保費未繳轉借支>作業(每月21日)"); // 檢查錯誤
+			}
+		}
 
 		// find 整批入帳總數檔
 		BatxHeadId tBatxHeadId = new BatxHeadId();
@@ -68,7 +71,7 @@ public class L420B extends TradeBuffer {
 		}
 // 處理代碼 0:入帳 1:刪除 2:訂正　4.刪除回復
 // BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除	
-		if (functionCode == 4) {
+		if (iFunctionCode == 4) {
 			if (!"8".equals(tBatxHead.getBatxExeCode())) {
 				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
 			}
@@ -78,8 +81,8 @@ public class L420B extends TradeBuffer {
 			}
 		}
 
-		if ((functionCode == 5 || "1".equals(tBatxHead.getBatxStsCode())) && !titaVo.getHsupCode().equals("1")) {
-			if ((functionCode == 5)) {
+		if ((iFunctionCode == 5 || "1".equals(tBatxHead.getBatxStsCode())) && !titaVo.getHsupCode().equals("1")) {
+			if (iFunctionCode == 5) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0005", "整批訂正");
 			} else {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");

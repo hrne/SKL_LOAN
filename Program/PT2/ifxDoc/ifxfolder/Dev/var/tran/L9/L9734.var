@@ -58,29 +58,29 @@ E(0,5)
 <include src="COM.icf::CheckAuth.rtn"/>
 
 #Report1=X,30,S
-T(3,A/LM062/個金3000萬以上)
+T(3,A/1/個金3000萬以上)
 #Report2=X,30,S
-T(3,B/LM063/企金3000萬以上)
+T(3,B/2/企金3000萬以上)
 #Report3=X,30,S
-T(3,C/LM064/個金2000萬以上小於3000萬)
+T(3,C/3/個金2000萬以上小於3000萬)
 #Report4=X,30,S
-T(3,D/LM065/個金100萬以上小於2000萬)
+T(3,D/4/個金100萬以上小於2000萬)
 #Report5=X,30,S
-T(3,E/LM066/企金未達3000萬)
+T(3,E/5/企金未達3000萬)
 #Report6=X,30,S
-T(3,F/LM067/土地覆審)
+T(3,F/6/土地覆審)
 
 ##loop{times:6,i:1}
 #ReportCat{i}=X,1,L
 T(1,#Report{i},1,1)
 HIDE(#ReportCat{i})
 
-#ReportCode{i}=X,5,L
-T(1,#Report{i},3,5)
-HIDE(#ReportCode{i})
+#Condition{i}=X,1,L
+T(1,#Report{i},3,1)
+HIDE(#Condition{i})
 
 #ReportName{i}=X,25,L
-T(1,#Report{i},9,25)
+T(1,#Report{i},5,25)
 ##end
 
 
@@ -194,7 +194,7 @@ C(5,#ReportCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
 ##loop{times:6,i:1}
 #BtnShell{i}
 #ReportCat{i}
-#ReportCode{i}
+#Condition{i}
 #ReportName{i}
 ##end
 </sub>
@@ -203,6 +203,7 @@ C(5,#ReportCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L9734^
+#COUNT
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 

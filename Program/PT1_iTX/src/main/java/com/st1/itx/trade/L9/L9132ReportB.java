@@ -80,8 +80,8 @@ public class L9132ReportB extends MakeReport {
 //		print(1, 1, "交易序號　傳票號碼　會計科目／名稱　　　　　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　戶名　　　經辦");
 //		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
 		
-		print(1, 1, "傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　 戶名　　　經辦    交易序號　          ");
-		print(1, 1, "－－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－  －－－－－－－－－  ");
+		print(1, 1, "交易序號　          傳票號碼  會計科目／名稱　　　　　　　　　　　　　　　　　　　　區隔帳冊　　　　　　　借方金額　　　　　　　貸方金額　　戶號　　 戶名　　　經辦    ");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－  ");
 		// -------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		// ----------12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
 	}
@@ -133,16 +133,17 @@ public class L9132ReportB extends MakeReport {
 				String custNo = result.get("CustNo") == null ? "" : result.get("CustNo");
 				String custName = result.get("CustName") == null ? "" : result.get("CustName");
 				String empName = result.get("EmpName") == null ? "" : result.get("EmpName");
-
-				print(1, 9, slipNo, "R");
-				print(0, 11, acNo);
-				print(0, 65, acSubBookItem);
-				print(0, 95, formatAmt(dbAmt, 0), "R");
-				print(0, 117, formatAmt(crAmt, 0), "R");
-				print(0, 127, custNo, "R");
-				print(0, 129, custName);
-				print(0, 139, empName);
-				print(0, 166, titaTxtNo, "R");
+				
+				print(1, 18, titaTxtNo, "R");
+				print(0, 29, slipNo, "R");
+				print(0, 31, acNo);
+				print(0, 85, acSubBookItem);
+				print(0, 115, formatAmt(dbAmt, 0), "R");
+				print(0, 137, formatAmt(crAmt, 0), "R");
+				print(0, 147, custNo, "R");
+				print(0, 149, custName);
+				print(0, 159, empName);
+				
 
 				// 加總
 				cnt = cnt.add(BigDecimal.ONE);

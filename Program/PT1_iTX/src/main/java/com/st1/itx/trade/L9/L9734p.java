@@ -64,7 +64,7 @@ public class L9734p extends TradeBuffer {
 			if (titaVo.getParam("BtnShell" + i).equals("V")) {
 
 				tradeName += (titaVo.getParam("ReportName" + i) + "、");
-				isFinish = l9734Report.exec(titaVo, iYearMonth, titaVo.getParam("ReportCode" + i));
+				isFinish = l9734Report.exec(titaVo, iYearMonth, Integer.valueOf(titaVo.getParam("Condition" + i)));
 			}
 		}
 

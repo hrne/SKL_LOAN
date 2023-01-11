@@ -253,7 +253,6 @@ SWITCH(#OOTitaCrDb,1,T(3,借),
 ! 業務科目
 #OOAcctCode=X,3,S
 
-
 !交易序號
 #TxtNo=A,8,L
 T(1,@TxtNo,#OORelNo,18,8)
@@ -269,7 +268,6 @@ T(1,@OOTxtNo,#OORelNo,18,8)
 T(2,@TXAMT,#OOFee)
 T(2,@MRKEY,#OOCustNo+-+#OOFacmNo)
 T(2,@BATCHNO,#OOItemCode)
-
 T(2,@TxItemCode,#OOItemCode)
 T(2,@TxCustNo,#OOCustNo)
 T(2,@TxFacmNo,#OOFacmNo)
@@ -401,7 +399,7 @@ TXFORM=L6987
 ifxBatch:{
 	name:'取消保留',
 	type:'5',
-	rim:'L618E',
+	rim:'L618A',
 	txtno:'#secret-no',
 	pfnx:"L618E.PFNX",
 	col_captions:["戶號","銷帳編號","交易序號","處理結果"],
@@ -450,7 +448,7 @@ ifxBatch:{
 ifxBatch:{
 	name:'保留;刪除',
 	type:'5',
-	rim:'L618E',
+	rim:'L618A',
 	txtno:'#secret-no',
 	pfnx:"L618E.PFNX",
 	col_captions:["戶號","銷帳編號","交易序號","處理結果"],
@@ -577,7 +575,7 @@ ifxBatch:{
 ifxBatch:{
 	name:'取消刪除',
 	type:'5',
-	rim:'L618E',
+	rim:'L618A',
 	txtno:'#secret-no',
 	pfnx:"L618E.PFNX",
 	col_captions:["戶號","銷帳編號","交易序號","處理結果"],
