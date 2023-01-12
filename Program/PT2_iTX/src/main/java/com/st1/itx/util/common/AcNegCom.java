@@ -122,7 +122,7 @@ public class AcNegCom extends TradeBuffer {
 			}
 
 			try {
-				negAppr02Service.update(tNegAppr02);
+				negAppr02Service.update(tNegAppr02, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔 + tNegAppr02Id)"); // 更新資料時，發生錯誤
 			}

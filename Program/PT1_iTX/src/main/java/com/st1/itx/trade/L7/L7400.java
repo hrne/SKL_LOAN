@@ -25,6 +25,8 @@ import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.EbsCom;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 /**
  * L7400 <BR>
@@ -49,6 +51,12 @@ public class L7400 extends TradeBuffer {
 
 	@Autowired
 	private EbsCom ebsCom;
+
+	@Autowired
+	private WebClient webClient;
+
+	@Autowired
+	private DateUtil dDateUtil;
 
 	private JSONArray journalTbl;
 	private BigInteger groupId;
@@ -219,6 +227,11 @@ public class L7400 extends TradeBuffer {
 		summaryTbl.put(summaryMap);
 
 		boolean sendEbsOK = ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
+
+		if (!sendEbsOK) {
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
+					titaVo.getTlrNo(), "總帳傳票資料傳輸,總帳系統回傳錯誤(" + ebsCom.getErrorMsg() + ")", titaVo);
+		}
 
 		drAmtTotal = BigDecimal.ZERO;
 		journalTbl = new JSONArray();

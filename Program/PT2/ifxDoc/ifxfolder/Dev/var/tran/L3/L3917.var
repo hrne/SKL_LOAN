@@ -116,6 +116,7 @@ T(1,@IntEndDate,#NTXBUF,30,7)
 T(1,@AcDate,#NTXBUF,37,7)
 T(1,@TellerNo,#NTXBUF,44,6)
 T(1,@TxtNo,#NTXBUF,50,8)
+T(1,@BormNo,#NTXBUF,58,3)
 
 #ChainCustNo=A,7,S
 
@@ -205,6 +206,8 @@ C(4,#TellerNo,S,$)
 #TxtNo=X,8,I
 C(3,#CHAIN,1,s,$)
 
+#BormNo=A,3,S
+
 #RPTFG=A,1,S
 
 #CHAINXMT=X,1,S
@@ -238,6 +241,8 @@ T(3,[L3917] 繳息情形)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #OCustNo=A,7,L
 #OFacmNo=A,3,L
+#OBormNo=A,3,L
+E(0,#BormNo)
 #OCustName=x,100,L
 #OCurrencyCode=X,3,L
 #OAcDate=D,7,L
@@ -246,7 +251,7 @@ T(3,[L3917] 繳息情形)
 #OIntEndDate=D,7,L
 #OTellerNo=X,6,L
 #OTellerName=x,40,L
-#OTxtNo=X,8,L
+#OTxtNo=X,18,L
 
 #OTxAmt=+m,14.2,S
 #OTxAmtX=X,22,L
@@ -377,7 +382,7 @@ TXFORM=L3917
 <sub type="PART" name="L3917" layout="cols=2;screen.width=[150,350,150,400];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3917]                                 繳息明細查詢"],
-[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@",#OCustName],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustName],
 [#<->#,"@入帳日期",#OEntryDate],
 ["@幣別",#OCurrencyCode],["@交易金額",#OTxAmtX],
 ["@回收金額",#ORepayAmtX],["@暫收金額",#OTempAmtX],

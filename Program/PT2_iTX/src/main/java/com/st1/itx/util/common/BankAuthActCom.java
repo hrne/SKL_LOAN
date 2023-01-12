@@ -610,6 +610,7 @@ public class BankAuthActCom extends TradeBuffer {
 			throw new LogicException("E0015", "已提出授權，不可變動"); // 檢查錯誤
 		}
 
+		tPostAuthLog.setCustId(iCustId);
 		tPostAuthLog.setLimitAmt(iLimitAmt);
 		tPostAuthLog.setRelationCode(iRelationCode);
 		tPostAuthLog.setRelAcctName(iRelAcctName);

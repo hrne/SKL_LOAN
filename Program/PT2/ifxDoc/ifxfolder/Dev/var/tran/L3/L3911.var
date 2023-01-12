@@ -523,7 +523,7 @@ IF(#OORepayCode == "", $,T(H,#OORepayCode,#RepayCodeHelp))
 
 !查詢
 #OOBUF1=X,100,S
-T(2,L3911+#OCustNo+#OOFacmNo+#OOEntryDate+#OOIntStartDate+#OOIntEndDate+#OOAcDate+#OOTellerNo+#OOTxtNo)
+T(2,L3911+#OCustNo+#OOFacmNo+#OOEntryDate+#OOIntStartDate+#OOIntEndDate+#OOAcDate+#OOTellerNo+#OOTxtNo+#OOBormNo)
 
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L3917; ntxbuf=#OOBUF1})

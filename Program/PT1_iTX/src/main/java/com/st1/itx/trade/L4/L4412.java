@@ -1,14 +1,18 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 //import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.domain.PostAuthLogId;
@@ -75,10 +79,7 @@ public class L4412 extends TradeBuffer {
 			// FunCode 2 修改
 		} else if ("2".equals(iFunCode)) {
 
-			// 授權狀態未授權先刪除後新增
 			if ("".equals(titaVo.getParam("AuthErrorCode").trim())) {
-//				bankAuthActCom.del("A", titaVo);
-//				bankAuthActCom.add("A", titaVo);
 				bankAuthActCom.update(titaVo);
 			} else {
 				if ("1".equals(iAuthApplCode)) {
@@ -96,7 +97,6 @@ public class L4412 extends TradeBuffer {
 			tPostAuthLogId.setRepayAcct(titaVo.getParam("RepayAcct"));
 			tPostAuthLogId.setAuthCode(titaVo.getParam("AuthCode"));
 			PostAuthLog tPostAuthLog = sPostAuthLogService.findById(tPostAuthLogId, titaVo);
-
 
 			if (tPostAuthLog == null) {
 				throw new LogicException("E0003", "郵局授權記錄檔");

@@ -133,6 +133,15 @@ BEGIN
         WHERE A."AcctCode" LIKE '3%'
            OR A."AcctCode" = '990' 
     )
+    , sumTxData AS (
+      SELECT "CustNo"
+           , "FacmNo"
+           , "BormNo"
+           , SUM("Principal") AS "SumRcvPrin"
+      FROM "LoanBorTx"
+      WHERE TitaHCode = '0' -- 訂正別 = 0:正常
+        AND NVL(JSON_VALUE("OtherFields", '$.CaseCloseCode'), '0') IN ('0','1','2') -- 轉催收不算
+    )
     SELECT D."MonthEndYm"             AS "YearMonth"           -- 資料年月
           ,D."CustNo"                 AS "CustNo"              -- 戶號 
           ,D."FacmNo"                 AS "FacmNo"              -- 額度 
@@ -165,7 +174,7 @@ BEGIN
           ,JOB_START_TIME             AS "LastUpdate"          -- 最後更新日期時間  
           ,EmpNo                      AS "LastUpdateEmpNo"     -- 最後更新人員 
           ,A."AcSubBookCode"          AS "AcSubBookCode"       -- 區隔帳冊       
-          ,0                          AS "SumRcvPrin"          -- 累計回收本金
+          ,NVL(STX."SumRcvPrin",0)    AS "SumRcvPrin"          -- 累計回收本金
           ,CASE
              WHEN NVL(LO."Status",0) IN (1,2) -- 1:催收 2:部分轉呆
                   AND (NVL(LO."OvduAmt",0) - NVL(LO."OvduBal",0) - NVL(LO."BadDebtAmt",0)) > 0
@@ -193,6 +202,9 @@ BEGIN
                               AND LO."FacmNo" = LBM."FacmNo"
                               AND LO."BormNo" = LBM."BormNo"
                               AND LO."OvduNo" = LBM."LastOvduNo"
+    LEFT JOIN "sumTxData" STX ON STX."CustNo" = D."CustNo"
+                             AND STX."FacmNo" = D."FacmNo"
+                             AND STX."BormNo" = D."BormNo"
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

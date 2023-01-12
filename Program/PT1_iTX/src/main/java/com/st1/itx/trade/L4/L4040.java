@@ -243,6 +243,7 @@ public class L4040 extends TradeBuffer {
 						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
 
 						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 						if ("A".equals(result.get("F5"))) {
 							tAchAuthLog.setPropDate(0);
 						}
@@ -352,7 +353,6 @@ public class L4040 extends TradeBuffer {
 								occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
 							}
 						} else {
-
 							occursList.putParam("OccCustId", FormatUtil.padX(result.get("F19"), 10));
 						}
 //							7.OccCustNo				用戶號碼		X	20	70	借款人戶號
@@ -419,6 +419,7 @@ public class L4040 extends TradeBuffer {
 						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
 
 						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						tAchAuthLog.setProcessTime(dateUtil.getNowIntegerTime());
 						tAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
 						tAchAuthLog.setBatchNo("Au" + batchNo + AuthSeq);
 						tAchAuthLog.setMediaCode("Y");

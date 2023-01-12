@@ -17,6 +17,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.CdCl;
 import com.st1.itx.db.domain.NegAppr02;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
@@ -133,7 +134,7 @@ public class L5702 extends TradeBuffer {
 			tNegTransId.setAcDate(AcDate);
 			tNegTransId.setTitaTlrNo(TransTitaTlrNo);
 			tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
-			tNegTrans = sNegTransService.findById(tNegTransId);
+			tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 			}
@@ -192,7 +193,7 @@ public class L5702 extends TradeBuffer {
 			tNegTransId.setAcDate(AcDate);
 			tNegTransId.setTitaTlrNo(TransTitaTlrNo);
 			tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
-			tNegTrans = sNegTransService.findById(tNegTransId);
+			tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 			}
@@ -215,7 +216,7 @@ public class L5702 extends TradeBuffer {
 
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 			this.info("NegTransAcYes");
-			NegTrans tNegTrans = sNegTransService.findById(tNegTransId);
+			NegTrans tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 
 			List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 			/* 借：債協暫收款科目 */
@@ -253,7 +254,7 @@ public class L5702 extends TradeBuffer {
 	private void updateNegAppr02(NegTransId tNegTransId, TitaVo titaVo) throws LogicException {
 		// NegAppr02一般債權撥付資料檔，有找到NegTrans的KEY值相同才維護
 		// 2022-3-22取消L5712暫收解入功能(更新NegAppr02.TxStatus,NegTransAcDate,NegTransTlrNo,NegTransTxtNo),無更新NegAppr02資料故以下程式不做
-		NegTrans tNegTrans = sNegTransService.findById(tNegTransId);
+		NegTrans tNegTrans = sNegTransService.findById(tNegTransId, titaVo);
 		if (tNegTrans == null) {
 			throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 		}

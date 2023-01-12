@@ -52,7 +52,8 @@ public class EbsCom extends CommBuffer {
 
 		if (ebsFg == null || ebsFg.isEmpty() || !ebsFg.equals("Y")) {
 			// 訊息通知 SystemParas.EbsFg != Y
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "",
+					"系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
 			return true;
 		}
 
@@ -67,7 +68,8 @@ public class EbsCom extends CommBuffer {
 
 		if (returnStatus != null && returnStatus.equals("S")) {
 			// 發送成功訊息
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功",
+					titaVo);
 			return true;
 		} else {
 			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
@@ -147,7 +149,8 @@ public class EbsCom extends CommBuffer {
 	private void insertSlipEbsRecord(JSONObject requestJo, String result, TitaVo titaVo) throws LogicException {
 		String groupId = null;
 		try {
-			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL").getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
+			groupId = requestJo.getJSONObject("main").getJSONObject("InputParameters").getJSONObject("P_SUMMARY_TBL")
+					.getJSONArray("P_SUMMARY_TBL_ITEM").getJSONObject(0).getString("GROUP_ID");
 		} catch (JSONException e1) {
 			groupId = "RequestERR";
 		}
@@ -166,12 +169,26 @@ public class EbsCom extends CommBuffer {
 		}
 	}
 
+	private String errorMsg = "";
+
 	private String analyzeResult(String result) throws LogicException {
 		JSONObject outputParameters = null;
 		String returnStatus = null;
+		JSONObject errorDetailsTbl = null;
+		errorMsg = "";
 		try {
 			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
 			returnStatus = outputParameters.getString("X_RETURN_STATUS");
+			if (returnStatus.equals("E")) {
+				errorDetailsTbl = outputParameters.getJSONObject("X_ERROR_DETAILS_TBL");
+				errorMsg += errorDetailsTbl.getString("JOURNAL_NAME");
+				errorMsg += ",";
+				errorMsg += errorDetailsTbl.getString("JE_LINE_NUM");
+				errorMsg += ",";
+				errorMsg += errorDetailsTbl.getString("ERROR_CODE");
+				errorMsg += ",";
+				errorMsg += errorDetailsTbl.getString("ERROR_MESSAGE");
+			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -179,6 +196,10 @@ public class EbsCom extends CommBuffer {
 			throw new LogicException("E9004", "EbsCom分析回傳資料時有誤");
 		}
 		return returnStatus;
+	}
+
+	public String getErrorMsg() {
+		return errorMsg;
 	}
 
 	@Override

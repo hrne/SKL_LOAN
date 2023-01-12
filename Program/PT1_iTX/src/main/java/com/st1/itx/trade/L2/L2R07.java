@@ -48,12 +48,12 @@ public class L2R07 extends TradeBuffer {
 
 	@Autowired
 	public CustRmkService custRmkService;
-	
+
 	@Autowired
 	public CdEmpService cdEmpService;
 	@Autowired
 	private CustRmkCom custRmkCom;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -95,6 +95,14 @@ public class L2R07 extends TradeBuffer {
 			tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		} else {
 			tCustMain = custMainService.custIdFirst(iCustId, titaVo);
+		}
+
+		if ("L4412".equals(iTxCode)) {
+			if (tCustMain != null) {
+				throw new LogicException(titaVo, "E0015", "扣款人ID已存在客戶主檔"); // 檢查錯誤
+			} else {
+				return this.sendList();
+			}
 		}
 		if (tCustMain != null) {
 			this.totaVo.putParam("L2r07CustId", tCustMain.getCustId());
@@ -145,7 +153,7 @@ public class L2R07 extends TradeBuffer {
 
 		// 查詢顧客控管警訊檔
 		custRmkCom.getCustRmkbyRim(totaVo, titaVo, iCustNo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -166,7 +174,8 @@ public class L2R07 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, 1, 999, 1, 900, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, 1, 999, 1, 900, this.index,
+				this.limit, titaVo);
 		if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 			for (LoanBorMain ln : lLoanBorMain.getContent()) {
 				if (ln.getStatus() == 0 || ln.getStatus() == 4) { // 0: 正常戶 4: 逾期戶
@@ -207,13 +216,16 @@ public class L2R07 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, 1, 999, this.index, this.limit, titaVo);
+		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, 1, 999, this.index, this.limit,
+				titaVo);
 		if (!(lFacMain == null || lFacMain.isEmpty())) {
 			for (FacMain t : lFacMain.getContent()) {
-				Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, t.getFacmNo(), t.getFacmNo(), 1, 900, this.index, this.limit, titaVo);
+				Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, t.getFacmNo(), t.getFacmNo(),
+						1, 900, this.index, this.limit, titaVo);
 				if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 					for (LoanBorMain k : lLoanBorMain.getContent()) {
-						if ((k.getStatus() == 0 || k.getStatus() == 4) && ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
+						if ((k.getStatus() == 0 || k.getStatus() == 4)
+								&& ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
 							wkFacmCount++;
 							this.totaVo.putParam("L2r07FacmNo", k.getFacmNo());
 							this.totaVo.putParam("L2r07BormNo", k.getBormNo());
@@ -221,7 +233,8 @@ public class L2R07 extends TradeBuffer {
 						}
 					}
 					for (LoanBorMain k : lLoanBorMain) {
-						if ((k.getStatus() == 0 || k.getStatus() == 4) && ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
+						if ((k.getStatus() == 0 || k.getStatus() == 4)
+								&& ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
 							wkBormCount++;
 						}
 					}
@@ -250,7 +263,8 @@ public class L2R07 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, iFacmNo, FacmNoEnd, this.index, this.limit, titaVo);
+		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, iFacmNo, FacmNoEnd, this.index,
+				this.limit, titaVo);
 		if (lFacMain == null || lFacMain.isEmpty()) {
 			throw new LogicException(titaVo, "E3085", " 額度主檔"); // 該戶號沒有額度編號，不可做內容變更
 		}
@@ -259,7 +273,8 @@ public class L2R07 extends TradeBuffer {
 			this.totaVo.putParam("L2r07FacmNo", fac.getFacmNo());
 		}
 		for (FacMain fac : lFacMain.getContent()) {
-			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, fac.getFacmNo(), fac.getFacmNo(), 1, 900, this.index, this.limit, titaVo);
+			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, fac.getFacmNo(), fac.getFacmNo(),
+					1, 900, this.index, this.limit, titaVo);
 			if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 				for (LoanBorMain ln : lLoanBorMain.getContent()) {
 					if (ln.getStatus() == 0 || ln.getStatus() == 2 || ln.getStatus() == 4 || ln.getStatus() == 7) {

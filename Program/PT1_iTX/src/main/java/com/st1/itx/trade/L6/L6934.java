@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.st1.itx.db.service.TxDataLogService;
 import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.Exception.LogicException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -106,13 +109,17 @@ public class L6934 extends TradeBuffer {
 			String fld = "";
 			if (map.get("f") != null) {
 				fld = map.get("f").toString();
+			} else {
+				continue;
 			}
 			String oval = map.get("o").toString();
 			String nval = map.get("n").toString();
-			if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld) || "上次會計日".equals(fld)
-					|| "會計日期".equals(fld) || "上次交易行別".equals(fld) || "上次交易日".equals(fld)) {
+			if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld)
+					|| "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld) || "上次會計日".equals(fld) || "會計日期".equals(fld)
+					|| "上次交易行別".equals(fld) || "上次交易日".equals(fld)) {
 				continue;
 			}
+
 			this.info(fld + " = " + oval + " to " + nval);
 //			if (iChainFlag == 1 && ("L5701").equals(TranNo)) { // L5701 喘息期歷程特殊需求
 //				if ("延期繳款年月(起)".equals(fld) || "延期繳款年月(訖)".equals(fld)) {

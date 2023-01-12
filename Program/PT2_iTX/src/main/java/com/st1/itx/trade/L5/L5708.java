@@ -136,14 +136,14 @@ public class L5708 extends TradeBuffer {
 				Map<Integer, BigDecimal> sklAmtCustNoMap = new HashMap<Integer, BigDecimal>();
 				Map<Integer, Integer> tempCustNoMap = new HashMap<Integer, Integer>();
 				for (NegTransId NegTransIdVO : DistinctNegTransId) {
-					NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO);
+					NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
 					if (NegTransVO != null) {
 
 						NegMainId NegMainIdVO = new NegMainId();
 						NegMainIdVO.setCaseSeq(NegTransVO.getCaseSeq());
 						NegMainIdVO.setCustNo(NegTransVO.getCustNo());
 
-						NegMain NegMainVO = sNegMainService.findById(NegMainIdVO);
+						NegMain NegMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
 						if (NegMainVO != null) {
 
 							String IsMainFin = NegMainVO.getIsMainFin();

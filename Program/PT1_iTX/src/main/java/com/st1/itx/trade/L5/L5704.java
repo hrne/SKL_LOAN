@@ -62,7 +62,7 @@ public class L5704 extends TradeBuffer {
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	public DateUtil dDateUtil;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -109,20 +109,21 @@ public class L5704 extends TradeBuffer {
 						+ mBringUpDate);
 
 				NegAppr tNegAppr = new NegAppr();
-				tNegAppr = sNegApprService.findById(new NegApprId(iYearMonth, i));
+				tNegAppr = sNegApprService.findById(new NegApprId(iYearMonth, i), titaVo);
 
 				if (tNegAppr == null) {
 					throw new LogicException(titaVo, "E0001", "撥付日期設定檔"); // 查無資料
 				} 
 				if (tNegAppr != null) {
 					NegAppr dNegAppr = new NegAppr();
-					dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, i));
+					dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, i), titaVo);
 					NegAppr beforeNegAppr = (NegAppr) dataLog.clone(dNegAppr);
 						dNegAppr.setExportDate(mExportDate);
 						dNegAppr.setApprAcDate(mApprAcDate);
 						dNegAppr.setBringUpDate(mBringUpDate);
+
 						try {
-							sNegApprService.update(dNegAppr);
+						sNegApprService.update(dNegAppr, titaVo);
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "撥付日期設定檔"); // 修改資料時，發生錯誤
 						}
@@ -145,8 +146,7 @@ public class L5704 extends TradeBuffer {
 			for (NegAppr tNegAppr : lNegAppr) {
 				this.info("FunctionCode=4 HoldBy");
 				NegAppr dNegAppr = new NegAppr();
-				dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, tNegAppr.getKindCode()));
-				NegAppr beforeNegAppr = (NegAppr) dataLog.clone(dNegAppr);
+				dNegAppr = sNegApprService.holdById(new NegApprId(iYearMonth, tNegAppr.getKindCode()), titaVo);
 
 				if (dNegAppr == null) {
 					throw new LogicException(titaVo, "E0004", "撥付日期設定檔"); // 刪除資料不存在
@@ -156,11 +156,11 @@ public class L5704 extends TradeBuffer {
 //				}
 				int tKindCode = dNegAppr.getKindCode();
 				try {
-					sNegApprService.delete(dNegAppr);
+					sNegApprService.delete(dNegAppr, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}
-				dataLog.setEnv(titaVo, beforeNegAppr,dNegAppr);
+				dataLog.setEnv(titaVo, dNegAppr,dNegAppr);
 				dataLog.exec("刪除撥付日期設定檔-類別="+tKindCode);
 			}
 		}
@@ -200,7 +200,7 @@ public class L5704 extends TradeBuffer {
 			}
 
 			try {
-				sNegApprService.insert(tNegAppr);
+				sNegApprService.insert(tNegAppr, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "撥付日期設定檔"); // 新增資料時，發生錯誤
 			}

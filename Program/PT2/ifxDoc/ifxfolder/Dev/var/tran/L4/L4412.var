@@ -712,6 +712,16 @@ T(2,@RelationId,#CustId)
 C(3,#RelationCode,0,$,s)
 C(3,#Type,1,IF(#CustId==#CustIdTemp,$,V(P,非本人ID)),IF(#CustId==#CustIdTemp,$,V(P,非授權檔ID))))
 
+! 本人且與護皓不同id時檢查ID不應存在客戶檔
+#RimL2r07CheckId=X,1,S
+C(3,#RelationCode,0,$,s)
+C(5,#CustId,#CustIdTemp,s,$)
+T(2,@RimTxCode,#TXCD)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
 ! IF(#CustId==#CustIdTemp,s,$)
 ! C(5,#CustId,#CustIdTemp,$,V(P,與主檔設定ID不合))
 ! C(5,#CustId,#L4r03CustId,E(0,@checkFlag,0),E(0,@checkFlag,1))
