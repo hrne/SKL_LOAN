@@ -54,9 +54,9 @@ public class Manufacture extends CommBuffer {
 
 	@Override
 	public void exec() throws LogicException {
-		long fileno = Long.parseLong(this.titaVo.getParam("fileno"));
-		makeReport.setTitaVo(this.titaVo);
-		makeExcel.setTitaVo(this.titaVo);
+		long fileno = Long.parseLong(this.getTitaVo().getParam("fileno"));
+		makeReport.setTitaVo(this.getTitaVo());
+		makeExcel.setTitaVo(this.getTitaVo());
 
 		TxFile tTxFile = sTxFileService.findById(fileno);
 
