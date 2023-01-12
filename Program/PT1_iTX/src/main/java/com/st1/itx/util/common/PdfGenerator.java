@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +35,7 @@ import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.TxFile;
@@ -91,7 +90,8 @@ public class PdfGenerator extends CommBuffer {
 
 	private String rptTlrNo;
 
-	private Timestamp rptCreateDate;
+	private String rptDate;
+	private String rptTime;
 
 	private String signOffTeller;
 
@@ -188,10 +188,18 @@ public class PdfGenerator extends CommBuffer {
 		// nothing
 	}
 
-	public void generatePdf(long pdfNo, String fileName) throws LogicException {
+	public void generatePdf(long pdfNo, String fileName, TitaVo titaVo) throws LogicException {
 		this.info("generatePdf pdfNo = " + pdfNo + ", fileName = " + fileName);
 
 		this.pdfNo = pdfNo;
+
+		rptTlrNo = titaVo == null ? "" : titaVo.getTlrNo();
+		rptDate = titaVo == null ? "" : titaVo.getCalDy();
+		rptTime = titaVo == null ? "" : titaVo.getCalTm();
+
+		this.info("rptTlrNo = " + rptTlrNo);
+		this.info("rptDate = " + rptDate);
+		this.info("rptTime = " + rptTime);
 
 		settingFromTxFile(fileName);
 
@@ -499,7 +507,7 @@ public class PdfGenerator extends CommBuffer {
 		int pw = 0;
 
 //		StringBuilder prefix = new StringBuilder();
-		String space ="";
+		String space = "";
 		for (int i = 0; i < w2; i++) {
 //			prefix.append(" ");
 			space = space + " ";
@@ -678,12 +686,6 @@ public class PdfGenerator extends CommBuffer {
 			throw new LogicException("E0015", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo + "，不為PDF格式");
 		}
 
-		rptTlrNo = tTxFile.getCreateEmpNo();
-
-		rptCreateDate = tTxFile.getCreateDate();
-
-		this.info("rptTlrNo = " + rptTlrNo);
-
 		setListMapFromJson(tTxFile.getFileData());
 
 		outputFile = setOutputFile(fileName, tTxFile.getFileOutput());
@@ -753,8 +755,6 @@ public class PdfGenerator extends CommBuffer {
 
 		watermark.append(empNm).append(" ");
 
-		String rptDate = new SimpleDateFormat("yyyyMMdd").format(rptCreateDate);
-		String rptTime = new SimpleDateFormat("HHmmss").format(rptCreateDate);
 		watermark.append(rptUtil.showRocDate(rptDate, 2)).append(" ").append(rptUtil.showTime(rptTime));
 
 		underContent.setGState(graphicState);
@@ -765,18 +765,13 @@ public class PdfGenerator extends CommBuffer {
 		float widthMax;
 		float heightMax;
 
-		if ("P".equals(paperorientaton)) {
-			widthMax = document.getPageSize().getWidth();
-			heightMax = document.getPageSize().getHeight();
-		} else {
-			widthMax = document.getPageSize().getWidth();
-			heightMax = document.getPageSize().getHeight();
-		}
-		
+		widthMax = document.getPageSize().getWidth();
+		heightMax = document.getPageSize().getHeight();
+
 		this.info("paperorientaton =" + paperorientaton);
 		this.info("widthMax =" + widthMax);
 		this.info("heightMax =" + heightMax);
-		
+
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
 				underContent.showTextAligned(Element.ALIGN_CENTER, watermark.toString(), w, h, 15f);

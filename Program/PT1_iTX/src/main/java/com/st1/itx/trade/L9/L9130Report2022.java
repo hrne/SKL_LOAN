@@ -7,9 +7,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -25,10 +22,10 @@ import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.springjpa.cm.L9130ServiceImpl;
-import com.st1.itx.util.common.EbsCom;
 import com.st1.itx.util.common.GSeqCom;
-import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.format.FormatUtil;
 
 /**
@@ -47,6 +44,9 @@ import com.st1.itx.util.format.FormatUtil;
  * 說明:相同上傳核心序號(MediaSeq)下， <BR>
  * 有不同區隔帳冊(AcSubBookCode)時， <BR>
  * 需產生不同傳票號碼(MediaSlipNo)。 <BR>
+ * 2023-01-06 修改 智偉 <BR>
+ * 說明:本支程式改為不傳送,只產檔產表 <BR>
+ * 由新增程式L7400傳送 <BR>
  * 
  * @author st1-ChihWei
  *
@@ -67,120 +67,118 @@ public class L9130Report2022 extends MakeReport {
 	private SlipMedia2022Service sSlipMedia2022Service;
 
 	@Autowired
-	private MakeFile makeFile;
-
-	@Autowired
 	private L9130ServiceImpl l9130ServiceImpl;
 
 	@Autowired
-	private EbsCom ebsCom;
+	private MakeExcel makeExcel;
 
 	/* 自動取號 */
 	@Autowired
-	GSeqCom gGSeqCom;
+	private GSeqCom gGSeqCom;
 
-	JSONArray journalTbl;
-	BigInteger groupId;
+	private BigInteger groupId;
 
 	// 會計日期 #AcDate=D,7,I
-	int iAcDate;
+	private int iAcDate;
 
 	// 傳票批號 #BatchNo=A,2,I
-	int iBatchNo;
+	private int iBatchNo;
 
 	// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
-	int iMediaSeq;
+	private int iMediaSeq;
 
-	String slipNo;
+	private String slipNo;
 
 	// 帳冊別
-	String acBookCode = "";
+	private String acBookCode = "";
 
 	// 帳冊別中文
-	String acBookItem = "";
+	private String acBookItem = "";
 
 	// 科目中文
-	String acNoItem = "";
+	private String acNoItem = "";
 
 	// 借貸別
-	String dbCr = "";
+	private String dbCr = "";
 
 	// 交易金額
-	BigDecimal txAmt;
+	private BigDecimal txAmt;
 
 	// 傳票日期
-	String slipDate;
+	private String slipDate;
 
 	// 科目代號
-	String acNoCode = "";
+	private String acNoCode = "";
 
 	// 子目代號
-	String acSubNoCode = "";
+	private String acSubNoCode = "";
 
 	// 金額
-	String txBal = "";
+	private String txBal = "";
 
 	// 傳票摘要
-	String slipRmk = " ";
+	private String slipRmk = " ";
 
 	// 會計科目銷帳碼
-	String acReceivableCode = " ";
+	private String acReceivableCode = " ";
 
 	// 成本月份
-	String costMonth = " ";
+	private String costMonth = " ";
 
 	// 保單號碼
-	String insuNo = " ";
+	private String insuNo = " ";
 
 	// 業務員代號
-	String empNo = " ";
+	private String empNo = " ";
 
 	// 薪碼
-	String salaryCode = " ";
+	private String salaryCode = " ";
 
 	// 幣別
-	String currencyCode = "NTD";
+	private String currencyCode = "NTD";
 
 	// 區隔帳冊
-	String acSubBookCode = " ";
+	private String acSubBookCode = " ";
 
 	// 部門代號
-	String deptCode = "10H000";
+	private String deptCode = "10H000";
 
 	// 業務員代號
-	String salesmanCode = " ";
+	private String salesmanCode = " ";
 
 	// 成本單位
-	String costUnit = "10H000";
+	private String costUnit = "10H000";
 
 	// 通路別
-	String salesChannelType = " ";
+	private String salesChannelType = " ";
 
 	// 會計準則類型
-	String ifrsType = "1";
+	private String ifrsType = "1";
 
 	// 關係人ID
-	String relationId = " ";
+	private String relationId = " ";
 
 	// 關聯方代號
-	String relateCode = " ";
+	private String relateCode = " ";
 
 	// IFRS17群組
-	String ifrs17Group = " ";
+	private String ifrs17Group = " ";
 
-	String lastAcSubBookCode;
+	private String lastAcSubBookCode;
 
 	// 應收調撥款金額
-	BigDecimal transferAmt;
+	private BigDecimal transferAmt;
 
 	// For EBS WS P_SUMMARY_TBL.TOTAL_AMOUNT - 該批號下各幣別傳票借方總金額
-	BigDecimal drAmtTotal;
+	private BigDecimal drAmtTotal;
 
 	// 作業人員
-	String tellerNo = "";
+	private String tellerNo = "";
 
 	// For EBS WS JE_LINE_NUM
-	int lineNum;
+	private int lineNum;
+
+	private int rowCursor = 1;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("L9130Report2022 exec ...");
@@ -205,32 +203,13 @@ public class L9130Report2022 extends MakeReport {
 		this.info("L9130Report2022 iMediaSeq = " + iMediaSeq);
 		this.info("L9130Report2022 slipNo = " + slipNo);
 
-		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000)).add(new BigDecimal(iMediaSeq));
+		BigDecimal tmpGroupId = new BigDecimal(iAcDate + 19110000).multiply(new BigDecimal(1000))
+				.add(new BigDecimal(iMediaSeq));
 
 		groupId = tmpGroupId.toBigInteger();
 
-		// brno 單位
-		String brno = titaVo.getBrno();
-		// date 檔案日期
-		int date = iAcDate + 19110000;
-		// no 檔案編號
-		String no = "L9130";
-		// desc 檔案說明
-		String desc = "總帳傳票媒體檔_" + FormatUtil.pad9("" + iMediaSeq, 3);
-
-		// 檔名編碼方式
-		// 固定值 核心傳票媒體上傳序號
-		// jori 999
-
-		// name 輸出檔案名稱
-		String name = "總帳傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
-
-		// format 輸出檔案格式 1.UTF8 2.BIG5
-		int format = 2;
-
-		makeFile.open(titaVo, date, brno, no, desc, name, format);
-
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
+				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
 
 		SlipMedia2022 tempTableSlipMedia2022;
 
@@ -270,7 +249,12 @@ public class L9130Report2022 extends MakeReport {
 
 		drAmtTotal = BigDecimal.ZERO;
 
-		journalTbl = new JSONArray();
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode("L9130").setRptItem("總帳傳票資料").build();
+
+		makeExcel.open(titaVo, reportVo, "總帳傳票資料_" + slipNo, "L9130_底稿_總帳傳票資料.xlsx", "明細");
+
+		rowCursor = 3;
 
 		for (Map<String, String> l9130 : l9130List) {
 
@@ -303,65 +287,6 @@ public class L9130Report2022 extends MakeReport {
 			// 傳票媒體檔的金額處理,借方為正數,貸方為負數
 			txBal = dbCr.equals("D") ? txAmt.toString() : txAmt.negate().toString();
 
-			JSONObject dataJo = new JSONObject();
-
-			try {
-				dataJo.put("GROUP_ID", groupId);
-				dataJo.put("BATCH_DATE", slipDate);
-				dataJo.put("JE_SOURCE_NAME", "LN");
-				dataJo.put("USER_LEDGER_CODE", acBookCode);
-				dataJo.put("CONVENTION", ifrsType);
-				dataJo.put("JOURNAL_NAME", slipNo);
-				dataJo.put("CURRENCY_CODE", currencyCode);
-				dataJo.put("ISSUED_BY", tellerNo);
-				dataJo.put("ACCOUNTING_DATE", slipDate);
-				dataJo.put("JE_LINE_NUM", "" + lineNum);
-				dataJo.put("SEGREGATE_CODE", acSubBookCode);
-				dataJo.put("ACCOUNT_CODE", acNoCode);
-				dataJo.put("SUBACCOUNT_CODE", acSubNoCode.trim().isEmpty() ? "00000" : acSubNoCode);
-				dataJo.put("COSTCENTER_CODE", costUnit);
-				dataJo.put("CHANNEL_CODE", "00"); // 通路代號
-				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
-				dataJo.put("INTERCOMPANY_CODE", "999");
-				dataJo.put("DEPARTMENT_CODE", deptCode);
-				dataJo.put("ENTERED_AMOUNT", txBal);
-				dataJo.put("LINE_DESC", slipRmk);
-				dataJo.put("WRITE_OFF_CODE", acReceivableCode);
-				dataJo.put("RELATIONSHIP", "");
-			} catch (JSONException e) {
-				this.error("L9130Report22 error = " + e.getMessage());
-			}
-
-			journalTbl.put(dataJo);
-
-			String data = "";
-
-			data += acBookCode + ","; // 帳冊別
-			data += slipNo + ","; // 傳票號碼
-			data += i + ","; // 傳票明細序號
-			data += slipDate + ","; // 傳票日期
-			data += acNoCode + ","; // 科目代號
-			data += acSubNoCode + ","; // 子目代號
-			data += deptCode + ","; // 部門代號
-			data += txBal + ","; // 金額
-			data += slipRmk + ","; // 傳票摘要
-			data += acReceivableCode + ","; // 會計科目銷帳碼
-			data += costMonth + ","; // 成本月份
-			data += insuNo + ","; // 保單號碼
-			data += salesmanCode + ","; // 業務員代號
-			data += salaryCode + ","; // 薪碼
-			data += currencyCode + ","; // 幣別
-			data += acSubBookCode + ","; // 區隔帳冊
-			data += costUnit + ","; // 成本單位
-			data += salesChannelType + ","; // 通路別
-			data += ifrsType + ","; // 會計準則類型
-			data += relationId + ","; // 關係人ID
-			data += relateCode + ","; // 關聯方代號
-			data += ifrs17Group; // IFRS17群組
-
-			// 寫入一筆到報表檔
-			makeFile.put(data);
-
 			// 寫入一筆到SlipMedia2022
 			SlipMedia2022 tSlipMedia2022 = new SlipMedia2022();
 
@@ -389,12 +314,37 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setCostMonth(costMonth);
 			tSlipMedia2022.setDeptCode(deptCode);
 			tSlipMedia2022.setLatestFlag("Y");
+			tSlipMedia2022.setTransferFlag("N");
 
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "傳票媒體檔");
 			}
+
+			// 入Excel
+			makeExcel.setValue(rowCursor, 1, groupId); // GROUP_ID
+			makeExcel.setValue(rowCursor, 2, slipDate); // BATCH_DATE
+			makeExcel.setValue(rowCursor, 3, "LN"); // JE_SOURCE_NAME
+			makeExcel.setValue(rowCursor, 4, acBookCode); // USER_LEDGER_CODE
+			makeExcel.setValue(rowCursor, 5, "1"); // CONVENTION
+			makeExcel.setValue(rowCursor, 6, slipNo); // JOURNAL_NAME
+			makeExcel.setValue(rowCursor, 7, currencyCode); // CURRENCY_CODE
+			makeExcel.setValue(rowCursor, 8, ""); // ISSUED_BY
+			makeExcel.setValue(rowCursor, 9, slipDate); // ACCOUNTING_DATE
+			makeExcel.setValue(rowCursor, 10, lineNum); // JE_LINE_NUM
+			makeExcel.setValue(rowCursor, 11, acSubBookCode); // SEGREGATE_CODE
+			makeExcel.setValue(rowCursor, 12, acNoCode); // ACCOUNT_CODE
+			makeExcel.setValue(rowCursor, 13, acSubNoCode.trim().isEmpty() ? "00000" : acSubNoCode); // SUBACCOUNT_CODE
+			makeExcel.setValue(rowCursor, 14, "10H000"); // COSTCENTER_CODE
+			makeExcel.setValue(rowCursor, 15, "00"); // CHANNEL_CODE
+			makeExcel.setValue(rowCursor, 16, "000000000000000"); // IFRS17_GROUP_CODE
+			makeExcel.setValue(rowCursor, 17, "999"); // INTERCOMPANY_CODE
+			makeExcel.setValue(rowCursor, 18, deptCode); // DEPARTMENT_CODE
+			makeExcel.setValue(rowCursor, 19, txBal); // ENTERED_AMOUNT
+			makeExcel.setValue(rowCursor, 20, slipRmk); // LINE_DESC
+			makeExcel.setValue(rowCursor, 21, acReceivableCode); // WRITE_OFF_CODE
+			makeExcel.setValue(rowCursor, 22, ""); // RELATIONSHIP
 
 			// 特殊處理:同區隔帳冊借貸金額加總後，寫一筆反向10340000000 應收調撥款
 			// 計算借貸方金額加總
@@ -409,24 +359,25 @@ public class L9130Report2022 extends MakeReport {
 
 			i++;
 			lineNum++;
+			rowCursor++;
 		}
 
 		// 全部傳票印完，執行特殊處理
 		specialHandling(i, titaVo);
 
-		// 統計並送出
-		boolean sendEbsOK = doSummaryAndSendToEbs(titaVo);
-
 		// 寫產檔記錄到TxFile
-		long fileno = makeFile.close();
+		long excelNo = makeExcel.close();
 
+		makeExcel.toExcel(excelNo);
+		
 		// 2022-05-18 ST1 Wei 新增:
 		// 若 批號>=90 且 上傳EBS結果為成功時
 		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
-		if (sendEbsOK && iBatchNo >= 90) {
+		if (iBatchNo >= 90) {
 			// iAcDate + 19110000
 			// iBatchNo
-			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
+			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
+					Integer.MAX_VALUE, titaVo);
 
 			if (slAcDetail == null || slAcDetail.isEmpty()) {
 				return;
@@ -445,45 +396,6 @@ public class L9130Report2022 extends MakeReport {
 				}
 			}
 		}
-
-		this.info("makeFile close fileno = " + fileno);
-	}
-
-	private boolean doSummaryAndSendToEbs(TitaVo titaVo) throws LogicException {
-
-		JSONArray summaryTbl = new JSONArray();
-
-		JSONObject summaryMap = new JSONObject();
-
-		try {
-			summaryMap.put("GROUP_ID", groupId);
-			summaryMap.put("BATCH_DATE", slipDate);
-			summaryMap.put("JE_SOURCE_NAME", "LN");
-			summaryMap.put("TOTAL_LINES", lineNum - 1);
-			summaryMap.put("CURRENCY_CODE", "NTD");
-			summaryMap.put("TOTAL_AMOUNT", drAmtTotal);
-		} catch (JSONException e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9130Report22 Exception = " + e.getMessage());
-			throw new LogicException("CE000", "彙總上傳資料時有誤");
-		}
-
-		summaryTbl.put(summaryMap);
-
-//        "GROUP_ID": 20200615002,
-//        "BATCH_DATE": "20200615",
-//        "JE_SOURCE_NAME": "PL",
-//        "TOTAL_LINES": 2,
-//        "CURRENCY_CODE": "NTD",
-//        "TOTAL_AMOUNT": 12450
-
-		boolean sendEbsOK = ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
-
-		drAmtTotal = BigDecimal.ZERO;
-		journalTbl = new JSONArray();
-
-		return sendEbsOK;
 	}
 
 	/**
@@ -576,68 +488,7 @@ public class L9130Report2022 extends MakeReport {
 			String tempAcReceivableCode = deptCode + slipDateROC + FormatUtil.pad9(String.valueOf(iBatchNo), 2);
 			this.info("tempAcReceivableCode = " + tempAcReceivableCode);
 			String tempSlipRmk = "應收調撥款";
-
-			JSONObject dataJo = new JSONObject();
-
-			try {
-				dataJo.put("GROUP_ID", groupId);
-				dataJo.put("BATCH_DATE", slipDate);
-				dataJo.put("JE_SOURCE_NAME", "LN");
-				dataJo.put("USER_LEDGER_CODE", acBookCode);
-				dataJo.put("CONVENTION", ifrsType);
-				dataJo.put("JOURNAL_NAME", slipNo);
-				dataJo.put("CURRENCY_CODE", currencyCode);
-				dataJo.put("ISSUED_BY", tellerNo);
-				dataJo.put("ACCOUNTING_DATE", slipDate);
-				dataJo.put("JE_LINE_NUM", "" + lineNum);
-				dataJo.put("SEGREGATE_CODE", lastAcSubBookCode);
-				dataJo.put("ACCOUNT_CODE", tempAcNoCode);
-				dataJo.put("SUBACCOUNT_CODE", tempAcSubNoCode.trim().isEmpty() ? "00000" : tempAcSubNoCode);
-				dataJo.put("COSTCENTER_CODE", costUnit);
-				dataJo.put("CHANNEL_CODE", "00"); // 通路代號
-				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
-				dataJo.put("INTERCOMPANY_CODE", "999"); // 關聯方代號
-				dataJo.put("DEPARTMENT_CODE", deptCode);
-				dataJo.put("ENTERED_AMOUNT", transferAmt.negate()); // 寫一筆反向
-				dataJo.put("LINE_DESC", tempSlipRmk);
-				dataJo.put("WRITE_OFF_CODE", tempAcReceivableCode);
-				dataJo.put("RELATIONSHIP", "");
-			} catch (JSONException e) {
-				this.error("L9130Report22 error = " + e.getMessage());
-			}
-
-			journalTbl.put(dataJo);
-
-			String data = "";
-
-			data += acBookCode + ","; // 帳冊別
-			data += slipNo + ","; // 傳票號碼
-			data += i + ","; // 傳票明細序號
-			data += slipDate + ","; // 傳票日期
-			data += tempAcNoCode + ","; // 科目代號
-			data += tempAcSubNoCode + ","; // 子目代號
-			data += deptCode + ","; // 部門代號
-			// 傳票媒體檔的金額處理,借方為正數,貸方為負數
-			// 這裡無論如何，反向即可
-			data += transferAmt.negate().toString() + ","; // 金額
-			data += tempSlipRmk + ","; // 傳票摘要
-			data += tempAcReceivableCode + ","; // 會計科目銷帳碼
-			data += costMonth + ","; // 成本月份
-			data += insuNo + ","; // 保單號碼
-			data += salesmanCode + ","; // 業務員代號
-			data += salaryCode + ","; // 薪碼
-			data += currencyCode + ","; // 幣別
-			data += lastAcSubBookCode + ","; // 區隔帳冊
-			data += costUnit + ","; // 成本單位
-			data += salesChannelType + ","; // 通路別
-			data += ifrsType + ","; // 會計準則類型
-			data += relationId + ","; // 關係人ID
-			data += relateCode + ","; // 關聯方代號
-			data += ifrs17Group; // IFRS17群組
-
-			// 寫入一筆到報表檔
-			makeFile.put(data);
-
+			
 			// 寫入一筆到SlipMedia2022
 			SlipMedia2022 tSlipMedia2022 = new SlipMedia2022();
 
@@ -667,15 +518,39 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setCostMonth(costMonth);
 			tSlipMedia2022.setDeptCode(deptCode);
 			tSlipMedia2022.setLatestFlag("Y");
+			tSlipMedia2022.setTransferFlag("N");
 
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "傳票媒體檔");
 			}
-
-			i++;
+			// 入Excel
+			makeExcel.setValue(rowCursor, 1, groupId); // GROUP_ID
+			makeExcel.setValue(rowCursor, 2, slipDate); // BATCH_DATE
+			makeExcel.setValue(rowCursor, 3, "LN"); // JE_SOURCE_NAME
+			makeExcel.setValue(rowCursor, 4, acBookCode); // USER_LEDGER_CODE
+			makeExcel.setValue(rowCursor, 5, "1"); // CONVENTION
+			makeExcel.setValue(rowCursor, 6, slipNo); // JOURNAL_NAME
+			makeExcel.setValue(rowCursor, 7, currencyCode); // CURRENCY_CODE
+			makeExcel.setValue(rowCursor, 8, ""); // ISSUED_BY
+			makeExcel.setValue(rowCursor, 9, slipDate); // ACCOUNTING_DATE
+			makeExcel.setValue(rowCursor, 10, lineNum); // JE_LINE_NUM
+			makeExcel.setValue(rowCursor, 11, lastAcSubBookCode); // SEGREGATE_CODE
+			makeExcel.setValue(rowCursor, 12, tempAcNoCode); // ACCOUNT_CODE
+			makeExcel.setValue(rowCursor, 13, tempAcSubNoCode.trim().isEmpty() ? "00000" : tempAcSubNoCode); // SUBACCOUNT_CODE
+			makeExcel.setValue(rowCursor, 14, "10H000"); // COSTCENTER_CODE
+			makeExcel.setValue(rowCursor, 15, "00"); // CHANNEL_CODE
+			makeExcel.setValue(rowCursor, 16, "000000000000000"); // IFRS17_GROUP_CODE
+			makeExcel.setValue(rowCursor, 17, "999"); // INTERCOMPANY_CODE
+			makeExcel.setValue(rowCursor, 18, deptCode); // DEPARTMENT_CODE
+			makeExcel.setValue(rowCursor, 19, transferAmt); // ENTERED_AMOUNT
+			makeExcel.setValue(rowCursor, 20, tempSlipRmk); // LINE_DESC
+			makeExcel.setValue(rowCursor, 21, tempAcReceivableCode); // WRITE_OFF_CODE
+			makeExcel.setValue(rowCursor, 22, ""); // RELATIONSHIP
+			
 			lineNum++;
+			rowCursor++;
 		}
 
 		// 計算借方加總

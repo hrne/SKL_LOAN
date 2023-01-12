@@ -82,9 +82,9 @@ public class L5073 extends TradeBuffer {
 		}
 		// 如有找到資料
 		for (NegAppr tNegAppr : lNegAppr) {
-			if(tNegAppr.getExportDate() == 0) {
-				continue;
-			}
+			//if(tNegAppr.getExportDate() == 0) {
+			//	continue;
+			//}
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOYyyyMm", tNegAppr.getYyyyMm() - 191100);
 			occursList.putParam("OOKindCode", tNegAppr.getKindCode());

@@ -38,19 +38,19 @@ public class LM003Report extends MakeReport {
 		// 買賣
 		trade("F3", 0, 62, 66, true),
 		// 自行還款等
-		others("F4", 0, 76, 80, true),
+		others("F4", 0, 75, 80, true),
 		// (結清)小計
-		closedRepaySum("F5", 0, 86, 94, true),
+		closedRepaySum("F5", 0, 89, 94, true),
 		// 部分還款
-		partlyRepay("F6", 0, 108, 110, true),
+		partlyRepay("F6", 0, 104, 110, true),
 		// 本金攤提
-		tenty("F7", 0, 115, 122, true),
+		tenty("F7", 0, 118, 122, true),
 		// 轉催收
-		turnOvdu("F8", 0, 135, 138, true),
+		turnOvdu("F8", 0, 132, 138, true),
 		// (非結清)小計
-		unclosedRepaySum("F9", 0, 143, 152, true),
+		unclosedRepaySum("F9", 0, 147, 152, true),
 		// 合計
-		repayTotal("F10", 0, 166, 171, true),
+		repayTotal("F10", 0, 164, 171, true),
 		// 淨增減
 		net("F16", 0, 183, 188, false),
 		// 月底餘額
@@ -156,7 +156,7 @@ public class LM003Report extends MakeReport {
 					if (c.hasRatioOutput) // 目前此表要出年合計的 = 有顯示平均的; 如果未來有修改這裡需改
 					{
 						// 年合計金額輸出
-						lm003Report.print(0, c.getOutputXPosL(), formatAmt(c.getSum(), 2, 8), "R");
+						lm003Report.print(0, c.getOutputXPosR(), formatAmt(c.getSum(), 2, 8), "R");
 						break;
 					}
 				}
@@ -191,10 +191,10 @@ public class LM003Report extends MakeReport {
 					if (c.hasRatioOutput) {
 						// 月平均金額輸出
 						if (c.sum.compareTo(BigDecimal.ZERO) != 0) {
-							lm003Report.print(0, c.getOutputXPosL(),
+							lm003Report.print(0, c.getOutputXPosR(),
 									formatAmt(c.getSum().divide(monthCount, 2, RoundingMode.HALF_UP), 2, 8), "R");
 						} else {
-							lm003Report.print(0, c.getOutputXPosL(), formatAmt(BigDecimal.ZERO, 2), "R");
+							lm003Report.print(0, c.getOutputXPosR(), formatAmt(BigDecimal.ZERO, 2), "R");
 						}
 					}
 					break;
@@ -240,7 +240,7 @@ public class LM003Report extends MakeReport {
 					lm003Report.info("dividend: " + dividend.toString());
 
 					if (dividend.compareTo(BigDecimal.ZERO) > 0 && divisor.compareTo(BigDecimal.ZERO) > 0) {
-						lm003Report.print(0, Columns.values()[i].outputXPosC,
+						lm003Report.print(0, Columns.values()[i].outputXPosR,
 								dividend.divide(divisor, 5, RoundingMode.HALF_UP).multiply(getBigDecimal(100))
 										.setScale(2, RoundingMode.HALF_UP) + "%",
 								"C");
@@ -322,7 +322,7 @@ public class LM003Report extends MakeReport {
 		print(1, basePos,
 				"│　　　　　　　　│　　　　　　　├────────┬─────┬──────┬──────┼───────┬─────┬───────┬──────┤　　　　　　　　　│　　　　　　　│　　　　　　│");
 		print(0, basePos + 158, "合計");
-		print(0, basePos + 191, "餘額");
+		print(0, basePos + 192, "餘額");
 		print(1, basePos,
 				"│　　　　　　　　│　　　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
 		print(0, basePos + 44, "利率高轉貸", "C");
@@ -405,9 +405,9 @@ public class LM003Report extends MakeReport {
 				"└────────┴───────┴────────┴─────┴──────┴──────┴───────┴─────┴───────┴──────┴─────────┴───────┴──────┘");
 
 		print(1, basePos,
-				"┌────────────────┬────────┬─────┬──────┬──────┬───────┬─────┬───────┬──────┬─────────┬───────┬──────┐");
+				"┌────────────────┬────────┬─────┬──────┬──────┬───────┬─────┬───────┬──────┬─────────┬──────────────┐");
 		print(1, basePos,
-				"│　　　　當月還款分布％　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　│　　　　　　│");
+				"│　　　　當月還款分布％　　　　　│　　　　　　　　│　　　　　│　　　　　　│　　　　　　│　　　　　　　│　　　　　│　　　　　　　│　　　　　　│　　　　　　　　　│　　　　　　　　　　　　　　│");
 		// 無資料時這個會是null
 		// 有資料時會是最後一個tLDVo
 		if (lastTLDVo != null) {
@@ -422,7 +422,7 @@ public class LM003Report extends MakeReport {
 		}
 
 		print(1, basePos,
-				"└────────────────┴────────┴─────┴──────┴──────┴───────┴─────┴───────┴──────┴─────────┴───────┴──────┘");
+				"└────────────────┴────────┴─────┴──────┴──────┴───────┴─────┴───────┴──────┴─────────┴──────────────┘");
 
 		if (lastTLDVo != null) {
 

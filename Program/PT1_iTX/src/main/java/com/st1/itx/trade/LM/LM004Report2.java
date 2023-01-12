@@ -34,15 +34,15 @@ public class LM004Report2 extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
 		String entdy = titaVo.get("ENTDY").toString();
-		
+
 		int reportDate = titaVo.getEntDyI() + 19110000;
 		String brno = titaVo.getBrno();
 		String txcd = "LM004";
 		String fileItem = "長中短期放款到期追蹤表";
 		String fileName = "LM004長中短期放款到期追蹤表";
-		String defaultExcel = "LM004長中短期放款到期追蹤表.xls";
+		String defaultExcel = "LM004_底稿_長中短期放款到期追蹤表.xls";
 		String defaultSheet = "10806";
-		String  newSheetName =showDate(entdy, 1);
+		String newSheetName = showDate(entdy, 1);
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
 				.setRptItem(fileItem).build();
@@ -57,8 +57,8 @@ public class LM004Report2 extends MakeReport {
 		int num = 1;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
-		makeExcel.setShiftRow(3, LDList.size() - 25);
-		
+		makeExcel.setShiftRow(3, LDList.size() > 25 ? LDList.size() - 25 : 1);
+
 		for (Map<String, String> tLDVo : LDList) {
 
 			int col = 0;

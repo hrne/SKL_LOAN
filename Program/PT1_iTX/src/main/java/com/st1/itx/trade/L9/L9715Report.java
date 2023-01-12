@@ -18,6 +18,7 @@ import com.st1.itx.db.service.springjpa.cm.L9715ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.common.data.ReportVo;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -101,7 +102,19 @@ public class L9715Report extends MakeReport {
 
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9715", "業務專辦照顧十八個月明細表", "密", "A4", "L");
+		//this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9715", "業務專辦照顧十八個月明細表", "密", "A4", "L");
+		String txcd = titaVo.getTxcd();
+		int reportDate = titaVo.getEntDyI() + 19110000;
+		String brno = titaVo.getBrno();
+		String reportItem = "業務專案照顧十八個月明細表";
+		String security = "密";
+		String pageSize = "A4";
+		String pageOrientation = "L";
+
+		ReportVo reportVo = ReportVo.builder().setRptDate(reportDate).setBrno(brno).setRptCode(txcd)
+				.setRptItem(reportItem).setSecurity(security).setRptSize(pageSize).setPageOrientation(pageOrientation)
+				.build();
+		this.open(titaVo, reportVo);
 
 		// 基礎日期
 		fundDay = titaVo.getParam("FUND_DAY");

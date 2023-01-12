@@ -110,6 +110,9 @@ public class BaTxCom extends TradeBuffer {
 // isAcLoanInt 是否利息提存
 	private boolean isAcLoanInt = false;
 
+// isCaculateSpecialAdjust  是否計息特殊調整
+	boolean isCaculateSpecialAdjust = false;
+
 // isEmptyLoanBaTxVo 是否放未計息餘額
 	private boolean isEmptyLoanBaTxVo = false;
 
@@ -1512,8 +1515,8 @@ public class BaTxCom extends TradeBuffer {
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 2, iEntryDate, titaVo);
 				}
 				// 每月月底提息特殊參數設定
-				caculateSpecialAdjust(iPayIntDate, ln.getPrevPayIntDate(), ln.getNextPayIntDate(), ln,
-						loanCalcRepayIntCom, titaVo);
+				this.isCaculateSpecialAdjust = caculateSpecialAdjust(iPayIntDate, ln.getPrevPayIntDate(),
+						ln.getNextPayIntDate(), ln, loanCalcRepayIntCom, titaVo);
 				for (int i = 1; i <= wkTerms; i++) {
 					if (i == wkTerms) {
 						loanCalcRepayIntCom.setTerms(0); // 本次計息期數
@@ -1536,8 +1539,9 @@ public class BaTxCom extends TradeBuffer {
 						break;
 					}
 					// 每月月底提息特殊參數設定
-					caculateSpecialAdjust(iPayIntDate, loanCalcRepayIntCom.getPrevRepaidDate(),
-							loanCalcRepayIntCom.getNextPayIntDate(), ln, loanCalcRepayIntCom, titaVo);
+					this.isCaculateSpecialAdjust = caculateSpecialAdjust(iPayIntDate,
+							loanCalcRepayIntCom.getPrevRepaidDate(), loanCalcRepayIntCom.getNextPayIntDate(), ln,
+							loanCalcRepayIntCom, titaVo);
 				}
 				this.info("Caculate log Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
 						+ ", principal=" + this.principal + ", interest=" + this.interest + ", delayInt="
@@ -1568,13 +1572,13 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	// 每月月底提息特殊參數設定
-	private void caculateSpecialAdjust(int iPayIntDate, int iPrevPaidIntDate, int iNextPayIntDate, LoanBorMain ln,
+	private boolean caculateSpecialAdjust(int iPayIntDate, int iPrevPaidIntDate, int iNextPayIntDate, LoanBorMain ln,
 			LoanCalcRepayIntCom loanCalcRepayIntCom, TitaVo titaVo) throws LogicException {
 // 1.短擔以日計算 
 // 2.中長擔，已到期按月(下次繳息日 <= 下個月1日)；未到期，首次繳款按日  
 // 3. 未到期利息=>以日計息，不分期且到期日當日也算1天 
 // 4.未到期以最後一段利率計算(計息程式內處理)
-
+		boolean isSpecialAdjust = false;
 		int nextMonth01 = (this.txBuffer.getTxCom().getNbsdy() / 100) * 100 + 1;
 		int thisMonth01 = (this.txBuffer.getTxCom().getTbsdy() / 100) * 100 + 1;
 
@@ -1632,12 +1636,13 @@ public class BaTxCom extends TradeBuffer {
 		if (!isShouldPaid) {
 			if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
 				isDefault = true;
-			}	
+			}
 			if (ln.getMaturityDate() < nextMonth01) {
 				isDefault = false;
 			}
 		}
 		if (!isShouldPaid && !isDefault) {
+			isSpecialAdjust = true;
 			intCalcCode = "1"; // 1:按日計息
 			amortizedCode = 2; // 2.到期取息(到期繳息還本)
 			int intEndDate = iPayIntDate > maturityDate ? maturityDate : iPayIntDate;
@@ -1657,6 +1662,7 @@ public class BaTxCom extends TradeBuffer {
 				+ "/" + amortizedCode + ", SpecificDate=" + ln.getSpecificDate() + " ,PrevPaidIntDate="
 				+ ln.getPrevPayIntDate() + "/" + iPrevPaidIntDate + " ,NextPayIntDate=" + ln.getNextRepayDate() + "/"
 				+ iNextPayIntDate + " ,MaturityDate=" + ln.getMaturityDate() + "/" + maturityDate);
+		return isSpecialAdjust;
 
 	}
 
@@ -1686,13 +1692,24 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
+		// 利息
+		BigDecimal wkInterest = loanCalcRepayIntCom.getInterest();
+		// 計息特殊調整: 運算過程中取小數點後九位(以下捨去)， 利息小數點後捨去
+		if (this.isCaculateSpecialAdjust && lCalcRepayIntVo != null) {
+			wkInterest = BigDecimal.ZERO;
+			for (CalcRepayIntVo ca : lCalcRepayIntVo) {
+				wkInterest = wkInterest
+						.add(ca.getAmount().multiply(ca.getStoreRate()).multiply(new BigDecimal(ca.getDays()))
+								.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(0, RoundingMode.DOWN));
+			}
+		}
 		baTxVo.setPrincipal(wkPrincipal); // 本金
-		baTxVo.setInterest(loanCalcRepayIntCom.getInterest()); // // 利息
+		baTxVo.setInterest(wkInterest); // // 利息
 		baTxVo.setDelayInt(loanCalcRepayIntCom.getDelayInt()); // 延滯息
 		baTxVo.setBreachAmt(loanCalcRepayIntCom.getBreachAmt()); // 違約金
 		baTxVo.setLoanBalPaid(ln.getLoanBal().subtract(wkPrincipal)); // 還款後餘額
 		this.principal = this.principal.add(wkPrincipal);
-		this.interest = this.interest.add(loanCalcRepayIntCom.getInterest());
+		this.interest = this.interest.add(wkInterest);
 		this.delayInt = this.delayInt.add(loanCalcRepayIntCom.getDelayInt());
 		this.breachAmt = this.breachAmt.add(loanCalcRepayIntCom.getBreachAmt());
 		baTxVo.setUnPaidAmt(

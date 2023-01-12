@@ -56,7 +56,22 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String CustId = titaVo.getParam("CustId");
 
 		// 額度
-		String sql = "select * from (  SELECT     ";
+		String sql = "select \"CreditSysNo\"		";
+		sql += " 			,\"ApplNo\"     				";
+		sql += " 			,\"CustNo\"     				";
+		sql += " 			,\"FacmNo\"     				";
+		sql += " 			,\"CustName\"     				";
+		sql += " 			,\"UKey\"     				";
+		sql += " 			,\"Id\"     				";
+		sql += " 			,\"Name\"     				";
+		sql += " 			,\"TypeCode\"     				";
+		sql += " 			,\"Type\"     				";
+		sql += " 			,\"Relation\"     				";
+		sql += " 			,\"ClCode1\"     				";
+		sql += " 			,\"ClCode2\"     				";
+		sql += " 			,\"ClNo\"     				";
+		sql += " 			,\"Modify\"     				";
+		sql += " from (  SELECT     		";
 		sql += "    LPAD(fa.\"CreditSysNo\",7,'0')   AS \"CreditSysNo\",";
 		sql += "    fa.\"ApplNo\"        AS \"ApplNo\",";
 		sql += "    CASE";
@@ -224,7 +239,23 @@ public class L2023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    cu.\"CustId\" = :custid";
 		sql += "    AND fr.\"CreditSysNo\" = fa.\"CreditSysNo\"";
 
-		sql += "  ) ORDER BY \"CreditSysNo\", \"ApplNo\", \"CustNo\", \"FacmNo\", \"TypeCode\" ";
+		sql += "  ) ";
+		sql += "GROUP BY	 \"CreditSysNo\"		";
+		sql += " 			,\"ApplNo\"     				";
+		sql += " 			,\"CustNo\"     				";
+		sql += " 			,\"FacmNo\"     				";
+		sql += " 			,\"CustName\"     				";
+		sql += " 			,\"UKey\"     				";
+		sql += " 			,\"Id\"     				";
+		sql += " 			,\"Name\"     				";
+		sql += " 			,\"TypeCode\"     				";
+		sql += " 			,\"Type\"     				";
+		sql += " 			,\"Relation\"     				";
+		sql += " 			,\"ClCode1\"     				";
+		sql += " 			,\"ClCode2\"     				";
+		sql += " 			,\"ClNo\"     				";
+		sql += " 			,\"Modify\"     				";
+		sql += " ORDER BY \"CreditSysNo\", \"ApplNo\", \"CustNo\", \"FacmNo\", \"TypeCode\" ";
 		sql += " " + sqlRow;
 
 		this.info("sql=" + sql);

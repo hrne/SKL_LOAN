@@ -597,7 +597,7 @@ T(H,#BussNationalityCode,#NationalityCodeHelp)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
-C(5,#NationalityCode,TW,T(2,@SpouseId,*)C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),s),s)
+C(5,#NationalityCode,TW,T(2,@SpouseId,)C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),s),s)
 C(5,#FdSpouseId,*,V(7),$)
 C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
 

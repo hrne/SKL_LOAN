@@ -89,10 +89,10 @@ public class L3912 extends TradeBuffer {
 			RPTFG = 2;
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3200") || tLoanBorTx.getTitaTxCd().equals("L3240")) {
 			RPTFG = 3;
-		} else if (tLoanBorTx.getTitaTxCd().equals("L3711")) {
+		} else if (tLoanBorTx.getTitaTxCd().equals("L3711") || tLoanBorTx.getTitaTxCd().equals("L3712")) {
 			RPTFG = 4;
-		} else if (tLoanBorTx.getTitaTxCd().equals("L3712")) {
-			RPTFG = 4;
+			tTempVo.putParam("OldSpecificDd", (tLoanBorTx.getIntStartDate() % 100));
+			tTempVo.putParam("NewSpecificDd", (tLoanBorTx.getIntEndDate() % 100));
 		} else if (tLoanBorTx.getTitaTxCd().equals("L3721")) {
 			RPTFG = 5;
 		} else if ("L618C".equals(tLoanBorTx.getTitaTxCd()) || "L618B".equals(tLoanBorTx.getTitaTxCd())) {
