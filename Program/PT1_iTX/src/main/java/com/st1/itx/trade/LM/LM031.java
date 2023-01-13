@@ -1,35 +1,51 @@
 package com.st1.itx.trade.LM;
 
-import java.util.ArrayList;
-
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.MySpring;
+import com.st1.itx.tradeService.BatchBase;
 
 @Service("LM031")
-@Scope("prototype")
+@Scope("step")
 /**
  * 
  * 
  * @author ChihWei
  * @version 1.0.0
  */
-public class LM031 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM031.class);
+public class LM031 extends BatchBase implements Tasklet, InitializingBean {
+
+	@Autowired
+	LM031Report lm031report;
+
 
 	@Override
-	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active LM031 ");
-		this.totaVo.init(titaVo);
-
-		MySpring.newTask("LM031p", this.txBuffer, titaVo);
-
-		this.addList(this.totaVo);
-		return this.sendList();
+	public void afterPropertiesSet() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		// TODO Auto-generated method stub
+		return this.exec(contribution, "M");
+	}
+
+	@Override
+	public void run() throws LogicException {
+		this.info("active LM031 ");
+		lm031report.setParentTranCode(this.getParent());
+		lm031report.setTxBuffer(this.getTxBuffer());
+		lm031report.exec(titaVo);
+	}
+
+
+
 }

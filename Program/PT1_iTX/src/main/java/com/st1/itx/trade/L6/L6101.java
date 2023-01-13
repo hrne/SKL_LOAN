@@ -25,6 +25,7 @@ import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.ClImmRankDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxToDoDetail;
@@ -648,6 +649,9 @@ public class L6101 extends TradeBuffer {
 
 		if ("09".equals(uSecNo)) {
 
+			this.info("BatchNo ="+titaVo.get("BatchNo"));
+			this.info("MediaSeq ="+titaVo.get("MediaSeq"));
+			this.info("AcDate ="+titaVo.get("AcDate"));
 			// 2021-12-15 智誠修改
 //			MySpring.newTask("L6101Report", this.txBuffer, titaVo);
 			l6101Excel.exec(titaVo);
@@ -840,14 +844,16 @@ public class L6101 extends TradeBuffer {
 
 		Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(
 				this.txBuffer.getTxCom().getTbsdy() + 19110000, tAcClose.getClsNo(), 0, Integer.MAX_VALUE, titaVo);
-		for (SlipMedia2022 t : slslipMedia2022.getContent()) {
-			// 只檢查最新的
-			if (!t.getLatestFlag().equals("Y")) {
-				continue;
-			}
-			// 需完成上傳才可執行開帳作業
-			if (t.getTransferFlag().equals("N")) {
-				throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
+		if (slslipMedia2022 != null) {
+			for (SlipMedia2022 t : slslipMedia2022.getContent()) {
+				// 只檢查最新的
+				if (!t.getLatestFlag().equals("Y")) {
+					continue;
+				}
+				// 需完成上傳才可執行開帳作業
+				if (t.getTransferFlag().equals("N")) {
+					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
+				}
 			}
 		}
 	}

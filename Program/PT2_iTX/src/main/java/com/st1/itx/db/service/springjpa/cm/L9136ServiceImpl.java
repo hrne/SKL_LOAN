@@ -111,7 +111,27 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 			acDateEnd = this.parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		}
 		String sql = " "; 
-		sql += "	WITH \"tmpTxRecord\" AS(";
+
+		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
+		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
+		sql += "		  ,T.\"CustNo\" AS \"CustNo\"";
+		sql += "		  ,T.\"FacmNo\" AS \"FacmNo\"";
+		sql += "		  ,T.\"BormNo\" AS \"BormNo\"";
+		sql += "		  ,SUBSTR(cm.\"CustName\",0,5) AS \"CustName\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',to_char(Cl.\"ApproveNo\")) AS \"ApproveNo\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',to_char(Cl.\"ClCode1\")) AS \"ClCode1\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',to_char(Cl.\"ClCode2\")) AS \"ClCode2\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',to_char(CC.\"Item\")) AS \"ClName\"";
+		sql += "		  ,DECODE(T.\"FacmNo\",0,' ',to_char(Cl.\"ClNo\")) AS \"ClNo\"";
+		sql += "		  ,T.\"Item\" AS \"Item\"";
+		sql += "		  ,T.\"Old\" AS \"Old\"";
+		sql += "		  ,T.\"New\" AS \"New\"";
+		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
+		sql += "		  ,CE2.\"Fullname\" AS \"SupNoName\"";
+		sql += "		  ,T.\"TranNo\" AS \"TranNo\"";
+		sql += "		  ,TC.\"TranItem\" AS \"TranItem\"";
+		sql += "		  ,T.\"Seq\" AS \"Seq\"";
+		sql += "	FROM (";
 		sql += "		SELECT T.\"Entdy\" AS \"TxDate\"";
 		sql += "			  ,T.\"TxSeq\"";
 		sql += "			  ,TO_NUMBER( ";
@@ -167,28 +187,8 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		WHERE T.\"Entdy\" BETWEEN :sAcDate AND :eAcDate";
 		sql += "		  AND ((T.\"Hcode\" = 1 AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL )";
 		sql += "		   OR (T.\"Hcode\" <> 1 AND JSON_VALUE(T.\"TranData\",'$.SUPNO') IS NOT NULL )";
-		sql += "		   OR ( JSON_VALUE(T.\"TranData\",'$.ACTFG') IN (2,4)))";
-		sql += "	)";
-		sql += "	SELECT T.\"TxDate\" AS \"AcDate\"";
-		sql += "		  ,T.\"TxSeq\" AS \"TxSeq\"";
-		sql += "		  ,T.\"CustNo\" AS \"CustNo\"";
-		sql += "		  ,T.\"FacmNo\" AS \"FacmNo\"";
-		sql += "		  ,T.\"BormNo\" AS \"BormNo\"";
-		sql += "		  ,SUBSTR(cm.\"CustName\",0,5) AS \"CustName\"";
-		sql += "		  ,DECODE(T.\"FacmNo\",0,' ','',' ',Cl.\"ApproveNo\") AS \"ApproveNo\"";
-		sql += "		  ,DECODE(T.\"FacmNo\",0,' ','',' ',Cl.\"ClCode1\") AS \"ClCode1\"";
-		sql += "		  ,DECODE(T.\"FacmNo\",0,' ','',' ',Cl.\"ClCode2\") AS \"ClCode2\"";
-		sql += "		  ,DECODE(T.\"FacmNo\",0,' ','',' ',CC.\"Item\") AS \"ClName\"";
-		sql += "		  ,DECODE(T.\"FacmNo\",0,' ','',' ',Cl.\"ClNo\") AS \"ClNo\"";
-		sql += "		  ,T.\"Item\" AS \"Item\"";
-		sql += "		  ,T.\"Old\" AS \"Old\"";
-		sql += "		  ,T.\"New\" AS \"New\"";
-		sql += "		  ,CE.\"Fullname\" AS \"Name\"";
-		sql += "		  ,CE2.\"Fullname\" AS \"SupNoName\"";
-		sql += "		  ,T.\"TranNo\" AS \"TranNo\"";
-		sql += "		  ,TC.\"TranItem\" AS \"TranItem\"";
-		sql += "		  ,T.\"Seq\" AS \"Seq\"";
-		sql += "	FROM \"tmpTxRecord\" T";
+		sql += "		   OR ( JSON_VALUE(T.\"TranData\",'$.ACTFG') IN (2,4))) )T";
+		
 		sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = T.\"CustNo\"";
 		sql += "						  	 AND CM.\"CustNo\" > 0 ";
 		sql += "	LEFT JOIN \"ClFac\" Cl ON Cl.\"CustNo\" = T.\"CustNo\"";
@@ -207,17 +207,6 @@ public class L9136ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L9136ServiceImpl sql=" + sql);
 
-		
-//		sql += "		      ,CASE";
-//		sql += "		      	 WHEN T.\"Hcode\" = 1 ";
-//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
-//		sql += "		      	 THEN '訂正'";
-//		sql += "		      	 WHEN T.\"Hcode\" <> 1 ";
-//		sql += "		      	  AND JSON_VALUE(\"TranData\",'$.SUPNO') IS NOT NULL";
-//		sql += "		      	 THEN NVL(JSON_VALUE(\"TranData\",'$.RQSP'),'授權')";
-//		sql += "		      	 WHEN JSON_VALUE(\"TranData\",'$.ACTFG') IN (2,4)";
-//		sql += "		      	 THEN '放行' ";
-//		sql += "		      	 END AS \"New\"";
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);

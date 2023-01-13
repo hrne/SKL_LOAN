@@ -92,11 +92,12 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,F.\"MaturityDate\"                           F21 ";
 		sql += "       ,M.\"AcctCode\"                               F22 ";
 		sql += "       ,F.\"LineAmt\"                                F23 ";
-//		sql += "       ,CB.\"TotalFloor\"                            F24 ";
 		sql += "       ,TO_NUMBER(F.\"UsageCode\")                   F24 ";
 		sql += "       ,F.\"ProdNo\"                                 F25 ";
 		sql += "       ,M.\"EntCode\"                                F26 ";
 		sql += "       ,E.\"Fullname\"                               F27 ";
+		sql += "       ,E2.\"CenterCodeAccName\"                     F28 ";
+		sql += "       ,E2.\"Fullname\"                              F29 ";
 		sql += " FROM \"MonthlyFacBal\" M ";
 		sql += " LEFT JOIN \"MonthlyFacBal\" L ON L.\"YearMonth\" = \"Fn_GetLastMonth\"(:entdy) ";
 		sql += "                              AND L.\"CustNo\"    = M.\"CustNo\" ";
@@ -109,6 +110,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND CB.\"ClCode2\" =  M.\"ClCode2\" ";
 		sql += "                            AND CB.\"ClNo\"    =  M.\"ClNo\" ";
 		sql += " LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = M.\"AccCollPsn\" ";
+		sql += " LEFT JOIN \"CdEmp\" E2 ON E2.\"EmployeeNo\" = F.\"Supervisor\" ";//核決主管
 		sql += " LEFT JOIN \"AcReceivable\" A ON A.\"CustNo\" = M.\"CustNo\" ";
 		sql += "                             AND A.\"AcctCode\" = 'TAV' ";
 		sql += " WHERE M.\"YearMonth\" = :entdy ";

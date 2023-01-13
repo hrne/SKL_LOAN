@@ -30,11 +30,8 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int entdy) throws Exception {
 
-		int entdy = parse.stringToInteger(titaVo.get("inputDate")) + 19110000;
-
-		this.info("lM031 inputDate in BC: " + entdy);
 		this.info("lM031.findAll ");
 		String sql = "";
 		sql += " SELECT   LB.\"CustNo\" ";
@@ -46,6 +43,7 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         ,C.\"EntCode\" ";
 		sql += "         ,F.\"RecycleCode\" ";
 		sql += "         ,F.\"RecycleDeadline\" ";
+		sql += "         ,F.\"UtilDeadline\" ";
 		sql += "         ,LB.\"PrevPayIntDate\" ";
 		sql += " FROM \"LoanBorMain\" LB ";
 		sql += " LEFT JOIN \"FacMain\" F ON LB.\"CustNo\" = F.\"CustNo\" ";
@@ -53,12 +51,10 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CollList\" L ON L.\"CustNo\" = F.\"CustNo\" ";
 		sql += "                         AND L.\"FacmNo\" = F.\"FacmNo\" ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = F.\"CustNo\" ";
-		sql += " WHERE C.\"EntCode\" = '1' ";
-		sql += "   AND F.\"RecycleDeadline\" <= :entdy ";
-		sql += "   AND F.\"RecycleCode\" = 1 ";
-		sql += "   AND LB.\"DrawdownAmt\" > 0 ";
-		sql += "   AND LB.\"LoanBal\" > 0 ";
-		sql += "   AND LB.\"BormNo\" <= 900 ";
+		sql += " WHERE C.\"EntCode\" IN ('1','2') ";//--1:企金、2：企金自然人
+		sql += "   AND (LB.\"LoanBal\" > 0";//-- 有放款餘額出表 
+		sql += "    OR (F.\"UtilAmt\" > 0 ";//--或未撥款的且可動用餘額>0 出表
+		sql += "   AND F.\"UtilBal\" = 0))";
 		sql += " ORDER BY LB.\"CustNo\" ";
 		sql += "         ,LB.\"FacmNo\" ";
 		sql += "         ,LB.\"BormNo\" ";
@@ -68,8 +64,6 @@ public class LM031ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
-		query.setParameter("entdy", entdy);
 
 		return this.convertToMap(query);
 	}

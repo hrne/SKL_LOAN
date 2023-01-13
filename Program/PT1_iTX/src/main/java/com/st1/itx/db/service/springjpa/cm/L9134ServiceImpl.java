@@ -55,8 +55,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     FROM \"AcDetail\" ";
 		sql += "     WHERE \"AcDate\" >= :startDate ";
 		sql += "       AND \"AcDate\" <= :endDate ";
-		//sql += "       AND \"AcNoCode\" IN ('20222020000','20222180000','20222180200') ";
-		sql += "       AND \"AcNoCode\" LIKE '20222%' ";
+		sql += "       AND \"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
+		//sql += "       AND \"AcNoCode\" LIKE '20222%' ";
 		sql += "     GROUP BY \"AcDate\" ";
 		sql += "            , \"AcNoCode\" ";
 		sql += " ) ";
@@ -117,7 +117,8 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND C.\"AcDtlCode\" = AD.\"AcDtlCode\" ";
 		sql += "     WHERE AD.\"AcDate\" >= :startDate ";
 		sql += "       AND AD.\"AcDate\" <= :endDate ";
-		sql += "       AND AD.\"AcNoCode\" LIKE '20222%' ";
+		sql += "       AND AD.\"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
+		//sql += "       AND AD.\"AcNoCode\" LIKE '20222%' ";
 		sql += "     ORDER BY AD.\"AcDate\" ";
 		sql += "            , AD.\"AcNoCode\" ASC ";
 		sql += "            , AD.\"AcSubCode\" ASC ";
@@ -164,6 +165,7 @@ public class L9134ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            AND CC.\"Code\" = AC.\"AcSubBookCode\" ";
 		sql += "     LEFT JOIN \"CollList\" CO ON CO.\"CustNo\" = AC.\"CustNo\" ";
 		sql += "                              AND CO.\"FacmNo\" = AC.\"FacmNo\" ";
+		//sql += "      WHERE AC.\"AcNoCode\" IN ('20222010000','20222020000','20222180000', '20222180100' ,'20222180200') ";
 		sql += "     WHERE AC.\"AcNoCode\" LIKE '20222%' ";
 		sql += "       AND AC.\"RvBal\" > 0 ";
 		sql += "     ORDER BY AC.\"AcNoCode\" ASC ";
