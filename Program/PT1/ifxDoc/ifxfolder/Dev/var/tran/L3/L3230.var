@@ -565,10 +565,10 @@ CALL2(#ADJUSTDOT,#Precision,#L3r05TempAmt,#TempAmtX)
 
 
 ![暫收款金額]
-!退還暫收款金額不可>該戶號目前暫收金額
+!退還暫收款金額不可>目前暫收餘額額
 !INVOKEJS(SHOW,p1,4,8,1)
 #TEMPAMTMSG=x,50,S
-T(2,該戶號目前暫收款金額為+#TempAmtX)
+T(2,暫收餘額額為+#TempAmtX)
 #TwTempAmt=m,14,I
 !C(3,#Precision,0,$,s)
 @

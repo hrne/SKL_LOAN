@@ -13,12 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.CdBankService;
-import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.TbJcicMu01Service;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L8950ServiceImpl")
 @Repository

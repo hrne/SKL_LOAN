@@ -414,7 +414,6 @@ public class L3230 extends TradeBuffer {
 				acDetail.setCurrencyCode(iCurrencyCode);
 				acDetail.setCustNo(iCustNo);
 				acDetail.setFacmNo(ba.getFacmNo());
-				acDetail.setSlipNote(iNote);
 				lAcDetail.add(acDetail);
 			}
 		}
@@ -495,7 +494,6 @@ public class L3230 extends TradeBuffer {
 			acDetail.setTxAmt(iRpAmt);
 			acDetail.setCustNo(iRpCustNo);
 			acDetail.setFacmNo(iRpFacmNo);
-			acDetail.setSlipNote(iNote);
 			lAcDetail.add(acDetail);
 			break;
 		case 94: // 轉債協暫收款
@@ -505,7 +503,6 @@ public class L3230 extends TradeBuffer {
 			acDetail.setAcctCode(acNegCom.getAcctCode(iRpCustNo, titaVo));
 			acDetail.setSumNo("094");
 			acDetail.setTxAmt(iRpAmt);
-			acDetail.setSlipNote(iNote);
 			lAcDetail.add(acDetail);
 			break;
 		case 95: // 轉債協退還款
@@ -526,7 +523,6 @@ public class L3230 extends TradeBuffer {
 		acDetail.setCustNo(iCustNo);
 		acDetail.setAcSubBookCode(iAcSubBookCode); // 區隔帳冊
 		acDetail.setAcBookFlag(3); // 帳冊別記號 (3: 指定帳冊)
-		acDetail.setSlipNote(iNote);
 		lAcDetail.add(acDetail);
 	}
 
@@ -539,7 +535,6 @@ public class L3230 extends TradeBuffer {
 		acDetail.setCurrencyCode(iCurrencyCode);
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
-		acDetail.setSlipNote(iNote);
 		lAcDetail.add(acDetail);
 	}
 
@@ -552,7 +547,6 @@ public class L3230 extends TradeBuffer {
 		acDetail.setTxAmt(iTempAmt);
 		acDetail.setCustNo(iCustNo);
 		acDetail.setFacmNo(iFacmNo);
-		acDetail.setSlipNote(iNote);
 		lAcDetail.add(acDetail);
 	}
 

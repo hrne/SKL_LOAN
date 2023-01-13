@@ -25,7 +25,6 @@ import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.CdWorkMonth;
-import com.st1.itx.db.domain.ClImmRankDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxToDoDetail;

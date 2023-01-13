@@ -79,7 +79,7 @@ public class L9731Report extends MakeReport {
 
 				rptItem = "人工檢核表(" + tradeName + ")";
 				// L9731-人工檢核表(XXXX)-YYYMM
-				fileName = txcd + "-" + rptItem + " - " + rocYearMonth;
+				fileName = txcd + "-" + rptItem +"-"+ rocYearMonth;
 				
 				defaultName = "L9731_底稿_人工檢核表" + i + ".xlsx";
 				

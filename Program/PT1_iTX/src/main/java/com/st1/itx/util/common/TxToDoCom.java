@@ -21,8 +21,6 @@ import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 //  -----------------------  應處理清單維護 ------------------ 

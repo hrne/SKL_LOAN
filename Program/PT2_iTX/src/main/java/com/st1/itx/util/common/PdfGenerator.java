@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -686,6 +687,18 @@ public class PdfGenerator extends CommBuffer {
 			throw new LogicException("E0015", "(PdfGenerator)輸出檔(TxFile)序號:" + this.pdfNo + "，不為PDF格式");
 		}
 
+		rptTlrNo = rptTlrNo == null || rptTlrNo.isEmpty() ? tTxFile.getTlrNo() : rptTlrNo;
+		rptDate = rptDate == null || rptDate.isEmpty()
+				? new SimpleDateFormat("yyyy-MM-dd").format(tTxFile.getCreateDate())
+				: rptDate;
+		rptTime = rptTime == null || rptTime.isEmpty()
+				? new SimpleDateFormat("HH:mm:ss").format(tTxFile.getCreateDate())
+				: rptTime;
+
+		this.info("rptTlrNo = " + rptTlrNo);
+		this.info("rptDate = " + rptDate);
+		this.info("rptTime = " + rptTime);
+
 		setListMapFromJson(tTxFile.getFileData());
 
 		outputFile = setOutputFile(fileName, tTxFile.getFileOutput());
@@ -755,7 +768,7 @@ public class PdfGenerator extends CommBuffer {
 
 		watermark.append(empNm).append(" ");
 
-		watermark.append(rptUtil.showRocDate(rptDate, 2)).append(" ").append(rptUtil.showTime(rptTime));
+		watermark.append(rptDate).append(" ").append(rptTime);
 
 		underContent.setGState(graphicState);
 		underContent.beginText();

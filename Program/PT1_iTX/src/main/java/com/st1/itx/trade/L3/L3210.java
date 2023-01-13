@@ -275,7 +275,6 @@ public class L3210 extends TradeBuffer {
 				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
-				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
 				lAcDetail.add(acDetail);
 				this.info("SlipNote = " + acDetail.getSlipNote());
 				addLoanBorTxRoutine(acDetail);
@@ -291,7 +290,6 @@ public class L3210 extends TradeBuffer {
 						acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 						acDetail.setTxAmt(iTempAmt);
 						acDetail.setCustNo(iCustNo);
-						acDetail.setSlipNote("一般債權撥付");
 						lAcDetail.add(acDetail);
 						// 貸 : 一般債權人撥付款
 						lAcDetail.addAll(lAcDetailApp02);
@@ -308,7 +306,6 @@ public class L3210 extends TradeBuffer {
 				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
-				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
 				lAcDetail.add(acDetail);
 				addLoanBorTxRoutine(acDetail);
 				break;
@@ -334,7 +331,6 @@ public class L3210 extends TradeBuffer {
 				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 				acDetail.setTxAmt(iTempAmt);
 				acDetail.setCustNo(iCustNo);
-				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
 				lAcDetail.add(acDetail);
 				addLoanBorTxRoutine(acDetail);
 				break;

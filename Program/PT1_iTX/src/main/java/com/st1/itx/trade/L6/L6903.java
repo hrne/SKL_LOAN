@@ -191,7 +191,7 @@ public class L6903 extends TradeBuffer {
 			occursList.putParam("OOLastUpdate", DateTime);
 			occursList.putParam("OOLastEmp", d.get("TitaTlrNo"));
 			occursList.putParam("OOLastEmpName", empName(titaVo, d.get("TitaTlrNo")));
-
+			occursList.putParam("OOAcDate", parse.stringToInteger(d.get("AcDate")) - 19110000);
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

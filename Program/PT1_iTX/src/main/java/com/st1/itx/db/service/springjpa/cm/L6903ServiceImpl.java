@@ -62,7 +62,7 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdEmp\" D on D.\"EmployeeNo\"= A.\"TitaSupNo\" ";
 		sql += " LEFT JOIN \"CdAcCode\" E on E.\"AcNoCode\"= A.\"AcNoCode\" and E.\"AcSubCode\"= A.\"AcSubCode\" and E.\"AcDtlCode\"= a.\"AcDtlCode\" ";
 		sql += " WHERE A.\"AcDate\" BETWEEN :AcDateS AND :AcDateE ";
-		sql += " AND A.\"EntAc\" <> 0 ";
+	//	sql += " AND A.\"EntAc\" <> 0 ";
 
 		if (!iAcBookCode.isEmpty()) {
 			sql += "AND A.\"AcBookCode\" = :AcBookCode ";

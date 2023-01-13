@@ -474,8 +474,6 @@ public class AcRepayCom extends TradeBuffer {
 
 		acDetail = new AcDetail();
 
-		acDetail.setDscptCode(titaVo.get("RpDscpt" + i)); // 摘要代號
-		acDetail.setSlipNote(titaVo.get("RpNote" + i)); // 摘要
 		acDetail.setTxAmt(rpAmt);
 
 		// 戶號 0123456-890-234
@@ -1245,7 +1243,6 @@ public class AcRepayCom extends TradeBuffer {
 			acDetail.setCustNo(ba.getCustNo());
 			acDetail.setFacmNo(ba.getFacmNo());
 			acDetail.setBormNo(ba.getBormNo());
-			acDetail.setSlipNote(iNote);
 
 			lAcDetail.add(acDetail);
 			tx.setTxAmt(acDetail.getTxAmt()); // 轉催呆金額放LoanBorTx交易金額
@@ -1260,7 +1257,6 @@ public class AcRepayCom extends TradeBuffer {
 		acDetail.setBormNo(ba.getBormNo());
 		acDetail.setRvNo(ba.getRvNo());
 		acDetail.setReceivableFlag(ba.getReceivableFlag());
-		acDetail.setSlipNote(iNote);
 		this.lAcDetail.add(acDetail);
 
 	}

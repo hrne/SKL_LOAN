@@ -1463,7 +1463,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void toPdf(long pdfno) throws LogicException {
-		pdfGenerator.generatePdf(pdfno, "", titaVo);
+		pdfGenerator.generatePdf(pdfno, "", this.getTitaVo());
 	}
 
 	/**
@@ -1474,7 +1474,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void toPdf(long pdfno, String filename) throws LogicException {
-		pdfGenerator.generatePdf(pdfno, filename, titaVo);
+		pdfGenerator.generatePdf(pdfno, filename, this.getTitaVo());
 	}
 
 	private void toPrint(int row, int column, String string, String align) {

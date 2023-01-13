@@ -220,16 +220,17 @@ TXFORM=L6069
 #OOBTN4=
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
-#OOCustNo=代碼
-{width:150,align:'left'}
 
 #OOCode=代碼檔代碼
 {width:150,align:'left'}
 
-#OOItem=代碼類別說明
+#OODefItem=代碼類別名稱
 {width:400,align:'left'}
 
-#OODefItem=代碼類別名稱
+#OOCustNo=代碼
+{width:150,align:'left'}
+
+#OOItem=代碼類別說明
 {width:400,align:'left'}
 
 #OOType=業務類別
@@ -243,16 +244,16 @@ TXFORM=L6069
 #RPTFG2=2,QUERY.GRID,L6069
 #any={detail:true, header:'L6069.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOCustNo=代碼
-{width:150,align:'left'}
-
 #OOCode=代碼檔代碼
 {width:150,align:'left'}
 
-#OOItem=代碼類別說明
+#OODefItem=代碼類別名稱
 {width:400,align:'left'}
 
-#OODefItem=代碼類別名稱
+#OOCustNo=代碼
+{width:150,align:'left'}
+
+#OOItem=代碼類別說明
 {width:400,align:'left'}
 
 #OOType=業務類別
