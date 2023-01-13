@@ -243,7 +243,7 @@ public class LM003Report extends MakeReport {
 						lm003Report.print(0, Columns.values()[i].outputXPosR,
 								dividend.divide(divisor, 5, RoundingMode.HALF_UP).multiply(getBigDecimal(100))
 										.setScale(2, RoundingMode.HALF_UP) + "%",
-								"C");
+								"R");
 					} else {
 						lm003Report.print(0, Columns.values()[i].outputXPosC, "---", "C");
 					}
