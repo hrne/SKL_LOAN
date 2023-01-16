@@ -21,12 +21,15 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
+import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.EbsCom;
+import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * L7400 <BR>
@@ -51,6 +54,10 @@ public class L7400 extends TradeBuffer {
 
 	@Autowired
 	private EbsCom ebsCom;
+	@Autowired
+	public Parse parse;
+	@Autowired
+	private TxToDoCom txToDoCom;
 
 	@Autowired
 	private WebClient webClient;
@@ -202,7 +209,16 @@ public class L7400 extends TradeBuffer {
 
 		sSlipMedia2022Service.Usp_L7_SlipMedia_Upd(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), iAcDate, iBatchNo,
 				titaVo);
-
+		if (sendEbsOK) {
+			//	TxToDo回寫狀態
+			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
+			tTxToDoDetailId.setCustNo(0);
+			tTxToDoDetailId.setFacmNo(0);
+			tTxToDoDetailId.setBormNo(0);
+			tTxToDoDetailId.setDtlValue(iBatchNo + "-" + parse.IntegerToString(iMediaSeq, 3));
+			tTxToDoDetailId.setItemCode("L7400");
+			txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

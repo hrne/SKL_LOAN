@@ -141,7 +141,7 @@ public class L2R05 extends TradeBuffer {
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("RimApplNo"));
 		iCaseNo = this.parse.stringToInteger(titaVo.getParam("RimCaseNo"));
-
+		this.info("iCustNo   = " + iCustNo);
 		List<LoanNotYet> lLoanNotYet = new ArrayList<LoanNotYet>();
 
 		// 檢查輸入資料
