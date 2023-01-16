@@ -215,7 +215,7 @@ E(0,1)
 C(3,#CHAIN,1,s,$)
 T(2,#DT_MONTH+#DT_01)
 @V(7)A(4,0,#AcDateSt)
-IF(#AcDateSt > #DT ,V(P,不可大於會計日),$)
+!IF(#AcDateSt > #DT ,V(P,不可大於會計日),$)
 
 #AcDateEd=D,7,I
 C(3,#CHAIN,1,XMT(),$)
@@ -255,6 +255,8 @@ E(0,#OCrAmt)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
+!會計日期
+#OOAcDate=D,7,S
 
 !科目
 #OOAcNoCode=X,11,S
@@ -392,6 +394,7 @@ TXFORM=L6903
 #OOEntAc
 #OOMediaSlipNo
 #OORvNo
+#OOAcDate
 ^
 </sub>
 
@@ -410,7 +413,9 @@ TXFORM=L6903
 
 #RPTFG=0,QUERY.GRID,L6903
 #any={detail:true, header:'L6903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
-
+!會計日期
+#OOAcDate=會計日期
+{width:80,align:'center'}
 #OOAcNoCode=科目
 {width:80,align:'center'}
 #OOAcSubCode=子目
@@ -423,8 +428,6 @@ TXFORM=L6903
 {width:140,align:'right'}
 #OOCrAmtX=貸方金額
 {width:140,align:'right'}
-#OOLastDate=交易日期
-{width:80,align:'center'}
 #OOSlipBatNo=傳票批號
 {width:80,align:'center'}
 #OOSlipSumNo=彙總批號
@@ -434,6 +437,8 @@ TXFORM=L6903
 #OOMediaSlipNo=總帳傳票號碼
 {width:80,align:'center'}
 #OORvNo=銷帳碼
+{width:80,align:'center'}
+#OOLastDate=交易日期
 {width:80,align:'center'}
 #OOLastTime=時間
 {width:80,align:'center'}

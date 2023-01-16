@@ -527,9 +527,6 @@ TXFORM=L6905
 {width:140,align:'right'}
 #OOCrAmtX=貸方金額
 {width:140,align:'right'}
-#OOLastDate=交易日期
-{width:80,align:'center'}
-
 #OOSlipBatNo=傳票批號
 {width:80,align:'center'}
 #OOSlipSumNo=彙總批號
@@ -540,7 +537,8 @@ TXFORM=L6905
 {width:80,align:'center'}
 #OORvNo=銷帳碼
 {width:80,align:'center'}
-
+#OOLastDate=交易日期
+{width:80,align:'center'}
 #OOLastTime=時間
 {width:80,align:'center'}
 #OOSlipNote=摘要

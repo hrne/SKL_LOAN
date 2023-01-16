@@ -21,7 +21,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanFacTmp;
@@ -1542,8 +1544,9 @@ public class BaTxCom extends TradeBuffer {
 							loanCalcRepayIntCom, titaVo);
 				}
 				this.info("Caculate log Set ... 戶號= " + ln.getCustNo() + "-" + ln.getFacmNo() + "-" + ln.getBormNo()
-						+ ", principal=" + this.principal + ", interest=" + this.interest + ", delayInt="
-						+ this.delayInt + " ,breachAmt=" + this.breachAmt);
+						+ ", isCaculateSpecialAdjust=" + this.isCaculateSpecialAdjust + ", principal=" + this.principal
+						+ ", interest=" + this.interest + ", delayInt=" + this.delayInt + " ,breachAmt="
+						+ this.breachAmt);
 				break;
 			}
 			if (wkTerms > this.terms) {
@@ -1632,6 +1635,7 @@ public class BaTxCom extends TradeBuffer {
 		boolean isDefault = false; // 按原設定
 		// 已到期外，未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定
 		if (!isShouldPaid) {
+			isSpecialAdjust = true;
 			if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
 				isDefault = true;
 			}
@@ -1640,7 +1644,6 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		if (!isShouldPaid && !isDefault) {
-			isSpecialAdjust = true;
 			intCalcCode = "1"; // 1:按日計息
 			amortizedCode = 2; // 2.到期取息(到期繳息還本)
 			int intEndDate = iPayIntDate > maturityDate ? maturityDate : iPayIntDate;
@@ -1696,10 +1699,18 @@ public class BaTxCom extends TradeBuffer {
 		if (this.isCaculateSpecialAdjust && lCalcRepayIntVo != null) {
 			wkInterest = BigDecimal.ZERO;
 			for (CalcRepayIntVo ca : lCalcRepayIntVo) {
-				wkInterest = wkInterest
-						.add(ca.getAmount().multiply(ca.getStoreRate()).multiply(new BigDecimal(ca.getDays()))
-								.divide(new BigDecimal(36500), 9, RoundingMode.DOWN).setScale(0, RoundingMode.DOWN));
+				if (ca.getInterestFlag() == 1) {
+					wkInterest = wkInterest.add(ca.getAmount().multiply(ca.getStoreRate())
+							.multiply(new BigDecimal(ca.getDays())).divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+							.setScale(0, RoundingMode.DOWN));
+				} else {
+					BigDecimal wkMonthDenominator = new BigDecimal(1200).multiply(
+							new BigDecimal((ln.getPayIntFreq() == 99 ? 1 : ln.getPayIntFreq()) * ca.getMonthLimit()));
+					wkInterest = ca.getAmount().multiply(ca.getStoreRate()).multiply(new BigDecimal(ca.getDays()))
+							.divide(wkMonthDenominator, 9, RoundingMode.DOWN).setScale(0, RoundingMode.DOWN);
+				}
 			}
+			this.info("CaculateSpecialAdjus");
 		}
 		baTxVo.setPrincipal(wkPrincipal); // 本金
 		baTxVo.setInterest(wkInterest); // // 利息

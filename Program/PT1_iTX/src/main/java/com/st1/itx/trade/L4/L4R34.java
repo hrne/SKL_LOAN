@@ -26,7 +26,6 @@ public class L4R34 extends TradeBuffer {
 	@Autowired
 	public InsuRenewService insuRenewService;
 
-
 	@Autowired
 	public Parse parse;
 
@@ -36,7 +35,6 @@ public class L4R34 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		int iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-
 
 // 與新光產險對帳後，列應付費用
 // 一、正常繳款(放款系統出帳)
@@ -52,8 +50,7 @@ public class L4R34 extends TradeBuffer {
 		BigDecimal txAmt2 = BigDecimal.ZERO;
 
 		// 已繳
-		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index,
-				this.limit);
+		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, 0, Integer.MIN_VALUE);
 		if (sInsuRenew != null) {
 			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
 				if (tInsuRenew.getStatusCode() == 0) {
@@ -62,7 +59,7 @@ public class L4R34 extends TradeBuffer {
 			}
 		}
 		// 未繳
-		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, this.index, this.limit);
+		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, 0, Integer.MIN_VALUE);
 		if (sInsuRenew != null) {
 			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
 				if (tInsuRenew.getStatusCode() == 0) {
@@ -73,7 +70,6 @@ public class L4R34 extends TradeBuffer {
 
 		totaVo.putParam("L4r34TxAmt1", txAmt1);
 		totaVo.putParam("L4r34TxAmt2", txAmt2);
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

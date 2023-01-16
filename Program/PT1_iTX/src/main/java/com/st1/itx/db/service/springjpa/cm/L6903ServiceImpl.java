@@ -94,7 +94,7 @@ public class L6903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iRvNo.isEmpty()) {
 			sql += "AND A.\"RvNo\" like :RvNo ";
 		}
-		sql += "ORDER BY A.\"AcDate\" ASC ";
+		sql += "ORDER BY A.\"AcDate\" ASC ,A.\"AcNoCode\",A.\"AcSubCode\",A.\"AcDtlCode\" ";
 
 		sql += sqlRow;
 

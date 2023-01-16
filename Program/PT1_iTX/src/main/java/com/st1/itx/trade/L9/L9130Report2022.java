@@ -250,9 +250,9 @@ public class L9130Report2022 extends MakeReport {
 		drAmtTotal = BigDecimal.ZERO;
 
 		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
-				.setRptCode("L9130").setRptItem("總帳傳票資料").build();
+				.setRptCode("L9130").setRptItem("總帳傳票資料_" + iBatchNo).build();
 
-		makeExcel.open(titaVo, reportVo, "總帳傳票資料_" + slipNo, "L9130_底稿_總帳傳票資料.xlsx", "明細");
+		makeExcel.open(titaVo, reportVo, "總帳傳票資料_" + iBatchNo, "L9130_底稿_總帳傳票資料.xlsx", "明細");
 
 		rowCursor = 3;
 
@@ -369,7 +369,7 @@ public class L9130Report2022 extends MakeReport {
 		long excelNo = makeExcel.close();
 
 		makeExcel.toExcel(excelNo);
-		
+
 		// 2022-05-18 ST1 Wei 新增:
 		// 若 批號>=90 且 上傳EBS結果為成功時
 		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
@@ -488,7 +488,7 @@ public class L9130Report2022 extends MakeReport {
 			String tempAcReceivableCode = deptCode + slipDateROC + FormatUtil.pad9(String.valueOf(iBatchNo), 2);
 			this.info("tempAcReceivableCode = " + tempAcReceivableCode);
 			String tempSlipRmk = "應收調撥款";
-			
+
 			// 寫入一筆到SlipMedia2022
 			SlipMedia2022 tSlipMedia2022 = new SlipMedia2022();
 
@@ -548,7 +548,7 @@ public class L9130Report2022 extends MakeReport {
 			makeExcel.setValue(rowCursor, 20, tempSlipRmk); // LINE_DESC
 			makeExcel.setValue(rowCursor, 21, tempAcReceivableCode); // WRITE_OFF_CODE
 			makeExcel.setValue(rowCursor, 22, ""); // RELATIONSHIP
-			
+
 			lineNum++;
 			rowCursor++;
 		}
