@@ -56,6 +56,8 @@ T(3,[L7300] 表外放款承諾資料產出)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
+#TranStatus=x,500,L
+
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
@@ -71,8 +73,17 @@ T(3,1)ASGN(LOOP$)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L7300^
+TXFORM=L7300
+#TranStatus
+^
 <include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L7300" layout="cols=1;screen.width=[200,700];printer.width=[15,30,15,30];order=1">
+[
+["[L7300]                                 L7300"],
+["傳輸結果",#TranStatus],
+]
 </sub>
 
 !---------- 單據輸出組合 ----------

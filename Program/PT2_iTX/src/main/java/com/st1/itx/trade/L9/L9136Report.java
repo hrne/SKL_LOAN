@@ -208,7 +208,7 @@ public class L9136Report extends MakeReport {
 
 			}
 
-		}else {
+		} else {
 			this.print(1, 1, "本日無資料");
 		}
 
@@ -219,7 +219,7 @@ public class L9136Report extends MakeReport {
 
 		// 主管核可
 		if (l9136List2 != null && l9136List2.size() != 0) {
-
+			int tmpCount = 0;
 			for (Map<String, String> r : l9136List2) {
 				if ("1".equals(r.get("Seq"))) {
 					count++;
@@ -233,12 +233,17 @@ public class L9136Report extends MakeReport {
 						this.newPage();
 
 					}
-
+					
+					tmpCount = count;
 				}
-
 			}
 
-		}else {
+			//沒有增加筆數表示此表無資料
+			if (tmpCount != count) {
+				this.print(1, 1, "本日無資料");
+			}
+
+		} else {
 			this.print(1, 1, "本日無資料");
 		}
 
@@ -249,7 +254,7 @@ public class L9136Report extends MakeReport {
 
 		// 主管放行
 		if (l9136List2 != null && l9136List2.size() != 0) {
-
+			int tmpCount = 0;
 			for (Map<String, String> r : l9136List2) {
 				if ("2".equals(r.get("Seq"))) {
 					count++;
@@ -263,12 +268,16 @@ public class L9136Report extends MakeReport {
 						this.newPage();
 
 					}
-
+					tmpCount = count;
 				}
 
 			}
+			//沒有增加筆數表示此表無資料
+			if (tmpCount != count) {
+				this.print(1, 1, "本日無資料");
+			}
 
-		}else {
+		} else {
 			this.print(1, 1, "本日無資料");
 		}
 
@@ -277,10 +286,6 @@ public class L9136Report extends MakeReport {
 			ptfg = 9;
 
 			this.print(-45, this.getMidXAxis(), this.endText, "C");
-		}
-
-		if (l9136List == null && l9136List2 == null) {
-			this.print(1, 1, "本日無資料");
 		}
 
 		this.close();

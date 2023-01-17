@@ -35,12 +35,12 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[180,820];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
 ["[L7400]                                 總帳傳票資料傳輸"],
 ["#R1+@會計日期",#AcDate],
 ["#R2+@傳票批號",#BatchNo],
-["#R3+@核心傳票媒體上傳序號",#MediaSeq],
+["#R3+@傳票資料上傳序號",#MediaSeq],
 ]
 
 ! 2021-07-28 智偉增加
@@ -65,6 +65,12 @@ T(3,@R3,*)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+#NTXBUF=X,12,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@AcDate,#NTXBUF,1,7)
+T(1,@BatchNo,#NTXBUF,8,2)
+T(1,@MediaSeq,#NTXBUF,10,3)
+
 #INIT=X,1,S
 CALL(#ALWAYS_HIGHLIGHT)
 
@@ -87,7 +93,7 @@ A(DATE,0,#AcDate)
 @V(2,0)
 
 
-!核心傳票媒體上傳序號
+!傳票資料上傳序號
 #MediaSeq=A,3,I
 @V(2,0)
 
@@ -109,11 +115,18 @@ E(0,0)
 T(3,[L7400] 總帳傳票資料傳輸)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+#SendStatus=X,1,L
+IF(#SendStatus=="S",E(0,@RPTFG,0),$)
+IF(#SendStatus=="F",E(0,@RPTFG,1),$)
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
-
+#GroupId=x,20,L
+#JournalName=x,20,L
+#JeLineNum=x,10,L
+#ErrorCode=x,10,L
+#ErrorMessage=x,200,L
 
 </sub>
 
@@ -128,11 +141,38 @@ T(3,1)ASGN(LOOP$)
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L7400^
+TXFORM=L7400
+#SendStatus
+#GroupId
+#JournalName
+#JeLineNum
+#ErrorCode
+#ErrorMessage
+^
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
+
+#RPTFG=1,QUERY.GRID,L7400
+#any={detail:true, header:'L7400.part', caption:'總帳系統回覆資料錯誤', width:1100, rowNum:10, rowList:[20,40,60]}
+
+#GroupId=GroupId
+{width:150,align:'left'}
+
+#JournalName=JournalName
+{width:150,align:'left'}
+
+#JeLineNum=JeLineNum
+{width:100,align:'right'}
+
+#ErrorCode=ErrorCode
+{width:100,align:'left'}
+
+#ErrorMessage=ErrorMessage
+{width:200,align:'left'}
+^
+
 </sub>

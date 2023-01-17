@@ -75,7 +75,8 @@ public class L9133 extends TradeBuffer {
 
 		this.info("ntxbuf = " + ntxbuf);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf, "L9133會計與主檔餘額檢核表已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", ntxbuf,
+				"L9133會計與主檔餘額檢核表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -84,15 +85,8 @@ public class L9133 extends TradeBuffer {
 	public void doRpt(TitaVo titaVo) throws LogicException {
 		this.info("L9133 doRpt started.");
 
-		String parentTranCode = titaVo.getTxcd();
-
-		l9133Report.setParentTranCode(parentTranCode);
-
 		// 撈資料組報表
 		boolean isDiff = l9133Report.exec(titaVo);
-
-		// 寫產檔記錄到TxFile
-		l9133Report.close();
 
 		// 若有差額才產生明細表
 		if (isDiff) {
@@ -101,13 +95,8 @@ public class L9133 extends TradeBuffer {
 			// 執行預存程式更新會計業務檢核檔
 			sAcAcctCheckDetailService.Usp_L6_AcAcctCheckDetail_Ins(iAcDate, empNo, titaVo);
 
-			l9133Report2.setParentTranCode(parentTranCode);
-
 			// 撈資料組報表
 			l9133Report2.exec(titaVo);
-
-			// 寫產檔記錄到TxFile
-			l9133Report2.close();
 
 			this.info("L9133 l9133Report2 finished.");
 		}

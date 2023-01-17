@@ -242,24 +242,20 @@ BEGIN
     )
     ,"Insu" AS (
       SELECT CASE
-               WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'TMI'
+               WHEN S1."StatusCode" = 0 THEN 'TMI'
                WHEN S1."StatusCode" = 1 THEN 'F09'
                WHEN S1."StatusCode" = 2 THEN 'F25'
              ELSE ' ' END           AS "AcctCode"
            , '00A'                  AS "AcSubBookCode"
            , 'TWD'                  AS "CurrencyCode"
-           , SUM(S1."TotInsuPrem" ) AS "InsuBal"
+           , SUM(S1."TotInsuPrem")  AS "InsuBal"
       FROM "InsuRenew" S1
       WHERE S1."AcDate" = 0
         AND S1."TotInsuPrem" > 0
         AND S1."RenewCode" != 1
-        AND CASE
-              WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'Y'
-              WHEN S1."StatusCode" = 1 THEN 'Y'
-              WHEN S1."StatusCode" = 2 THEN 'Y'
-            ELSE 'N' END = 'Y'
+        AND S1."StatusCode" IN (0,1,2)
       GROUP BY CASE
-                 WHEN S1."StatusCode" = 0 AND S1."TotInsuPrem" != 0 THEN 'TMI'
+                 WHEN S1."StatusCode" = 0 THEN 'TMI'
                  WHEN S1."StatusCode" = 1 THEN 'F09'
                  WHEN S1."StatusCode" = 2 THEN 'F25'
                ELSE ' ' END

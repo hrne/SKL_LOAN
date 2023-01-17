@@ -59,9 +59,9 @@ public class L6068 extends TradeBuffer {
 		// 查詢報表代號對照檔
 		Slice<CdReport> slCdReport;
 		if (iFormName.isEmpty()) {
-			slCdReport = sCdReportService.formNoLike(iFormNo.trim() + "%", this.index, this.limit, titaVo);
+			slCdReport = sCdReportService.formNoLike( "%" + iFormNo.trim() + "%", this.index, this.limit, titaVo);
 		} else {
-			slCdReport = sCdReportService.formNameLike(iFormName.trim() + "%", this.index, this.limit, titaVo);
+			slCdReport = sCdReportService.formNameLike( "%" + iFormName.trim() + "%", this.index, this.limit, titaVo);
 		}
 		List<CdReport> lCdReport = slCdReport == null ? null : slCdReport.getContent();
 
@@ -83,7 +83,7 @@ public class L6068 extends TradeBuffer {
 			occursList.putParam("OOSignCode", tCdReport.getSignCode());
 			occursList.putParam("OOWatermarkFlag", tCdReport.getWatermarkFlag());
 			occursList.putParam("OOEnable", tCdReport.getEnable());
-			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdReport.getLastUpdate()) + " " + parse.timeStampToStringTime(tCdReport.getLastUpdate()));
+			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdReport.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdReport.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdReport.getLastUpdateEmpNo() + " " + empName(titaVo, tCdReport.getLastUpdateEmpNo()));
 
 			/* 將每筆資料放入Tota的OcList */
@@ -99,7 +99,6 @@ public class L6068 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 	private String empName(TitaVo titaVo, String empNo) throws LogicException {
 		String rs = empNo;
 

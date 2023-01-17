@@ -209,31 +209,30 @@ public class AcEnterCom extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.titaVo = titaVo;
 
-		// 開帳狀態檢核
-		acCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		acCloseId.setBranchNo(titaVo.getAcbrNo());
-		acCloseId.setSecNo("09"); // 業務類別: 09-放款
-		tAcClose = acCloseService.findById(acCloseId, titaVo); // holdById
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E6005", "未執行 L6880_系統換日"); // 檢查錯誤
-		}
-		switch (tAcClose.getClsFg()) {
-		case 0: // 0:開帳
-			break;
-		case 1: // 1:關帳
-			throw new LogicException(titaVo, "E6005", "已關帳(09:放款)"); // 非開帳狀態
-		case 2: // 2:關帳取消
-			break;
-		case 3: // 3:夜間批次執行中
-			throw new LogicException(titaVo, "E6005", "夜間批次執行中"); // 非開帳狀態
-		case 4: // 4.夜間批次執行完畢
-			throw new LogicException(titaVo, "E6005", "夜間批次執行完畢，需續執行 L6880_系統換日"); // 非開帳狀態
+		// 開帳狀態檢核(非提存入賬)
+		if (!"L618D".equals(titaVo.getTxcd())) {
+			acCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+			acCloseId.setBranchNo(titaVo.getAcbrNo());
+			acCloseId.setSecNo("09"); // 業務類別: 09-放款
+			tAcClose = acCloseService.findById(acCloseId, titaVo); // holdById
+			if (tAcClose == null) {
+				throw new LogicException(titaVo, "E6005", "未執行 L6880_系統換日"); // 檢查錯誤
+			}
+			switch (tAcClose.getClsFg()) {
+			case 0: // 0:開帳
+				break;
+			case 1: // 1:關帳
+				throw new LogicException(titaVo, "E6005", "已關帳(09:放款)"); // 非開帳狀態
+			case 2: // 2:關帳取消
+				break;
+			case 3: // 3:夜間批次執行中
+				throw new LogicException(titaVo, "E6005", "夜間批次執行中"); // 非開帳狀態
+			case 4: // 4.夜間批次執行完畢
+				throw new LogicException(titaVo, "E6005", "夜間批次執行完畢，需續執行 L6880_系統換日"); // 非開帳狀態
+			}
 		}
 
-		// 登放日期、序號、帳務訂正記號
-		if (tAcClose.getClsFg() != 0) {
-			throw new LogicException(titaVo, "E0015", "關帳狀態(09:放款)<>0-開帳" + tAcClose.getClsFg()); // 檢查錯誤
-		}
+		// 登放日期、登放序號
 		if (titaVo.isHcodeErase()) {
 			RelDy = titaVo.getOrgEntdyI() + 19110000; // 登放日期
 		} else {
@@ -241,7 +240,9 @@ public class AcEnterCom extends TradeBuffer {
 		}
 		RelDy = this.txBuffer.getTxCom().getReldy() + 19110000; // 登放日期
 		RelTxseq = this.txBuffer.getTxCom().getRelNo(); // 登放序號
-		AcHCode = this.txBuffer.getTxCom().getBookAcHcode(); // 帳務訂正記號
+
+		// 帳務訂正記號
+		AcHCode = this.txBuffer.getTxCom().getBookAcHcode();
 
 		this.info("AcEnterCom.... : AcHCode=" + AcHCode);
 //		帳務訂正記號  AcHCode   0.正常     1.訂正     2.沖正             

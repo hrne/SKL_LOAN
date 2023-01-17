@@ -1,4 +1,4 @@
-create or replace PROCEDURE "Usp_L6_AcAcctCheckDetail_Ins" 
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE "Usp_L6_AcAcctCheckDetail_Ins" 
 (    
     -- 參數
     TBSDYF         IN  INT,        -- 系統營業日(西元)
@@ -29,7 +29,24 @@ BEGIN
     ;
 
     -- 寫入資料
-    INSERT INTO "AcAcctCheckDetail"
+    INSERT INTO "AcAcctCheckDetail" (
+      "AcDate"            -- 會計日期 Decimald 8
+      , "BranchNo"        -- 單位別 VARCHAR2 4
+      , "CurrencyCode"    -- 幣別 VARCHAR2 3
+      , "AcSubBookCode"
+      , "AcctCode"        -- 業務科目代號 VARCHAR2 3
+      , "AcctItem"        -- 業務科目名稱 NVARCHAR2  20
+      , "CustNo"          -- 戶號 DECIMAL 7
+      , "FacmNo"          -- 額度號碼 DECIMAL 3
+      , "BormNo"          -- 撥款序號 DECIMAL 3
+      , "AcBal"           -- 會計帳餘額 DECIMAL 16 2
+      , "AcctMasterBal"   -- 業務帳餘額 DECIAML 16 2
+      , "DiffBal"         -- 差額 DECIMAL 18 2
+      , "CreateEmpNo"     -- 建檔人員 VARCHAR2 6
+      , "CreateDate"      -- 建檔日期 DATE 
+      , "LastUpdateEmpNo" -- 最後維護人員 VARCHAR2 6
+      , "LastUpdate"      -- 最後維護日期 DATE 
+    )
     WITH "AcctCodeData" AS (
       SELECT "AcctCode"
             ,"AcctItem"
@@ -38,7 +55,13 @@ BEGIN
             ,"CurrencyCode"
             ,"AcSubBookCode"
       FROM "AcAcctCheck"
-      WHERE "AcctMasterBal" <> "ReceivableBal"
+      WHERE CASE
+              WHEN "AcctMasterBal" != "ReceivableBal"
+              THEN 1
+              WHEN "AcctMasterBal" != "TdBal"
+              THEN 1
+            ELSE 0 
+            END = 1
         AND "AcDate" = TBSDYF
         AND "AcctCode" IN ('310','320','330','340','990') -- xwh 20211124 added 340
     )
@@ -100,7 +123,7 @@ BEGIN
            , NVL(A."RvBal",0)                         AS "AcBal"           -- 會計帳餘額 DECIMAL 16 2
            , NVL(L."LoanBal",0)                       AS "AcctMasterBal"   -- 業務帳餘額 DECIAML 16 2
            , NVL(A."RvBal",0)
-            - NVL(L."LoanBal",0)                      AS "DiffBal"         -- 差額 DECIMAL 18 2
+             - NVL(L."LoanBal",0)                     AS "DiffBal"         -- 差額 DECIMAL 18 2
       FROM "AR" A
       FULL OUTER JOIN "Loan" L ON (
         L."AcctCode" = A."AcctCode"

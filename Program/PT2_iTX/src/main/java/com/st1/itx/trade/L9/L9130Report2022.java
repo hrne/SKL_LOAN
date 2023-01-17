@@ -388,16 +388,10 @@ public class L9130Report2022 extends MakeReport {
 				}
 				// 媒體傳票號碼
 				for (SlipMedia2022 md : lSlipMedia2022) {
-					String receivableCode = "";
+					String receivableCode = " ";
 					if (ac.getReceivableFlag() == 8) {
 						receivableCode = ac.getRvNo();
 					}
-					this.info("AcBookCode= " + ac.getAcBookCode() + ";" + md.getAcBookCode());
-					this.info("AcSubBookCode= " + ac.getAcSubBookCode() + ";" + md.getAcSubBookCode());
-					this.info("AcNoCode= " + ac.getAcNoCode() + ";" + md.getAcNoCode());
-					this.info("AcSubCode= " + ac.getAcSubCode() + ";" + md.getAcSubCode());
-					this.info("DbCr= " + ac.getDbCr() + ";" + md.getDbCr());
-					this.info("receivableCode= " + receivableCode + ";" + md.getReceiveCode());
 					if (ac.getAcBookCode().equals(md.getAcBookCode())
 							&& ac.getAcSubBookCode().equals(md.getAcSubBookCode())
 							&& ac.getAcNoCode().equals(md.getAcNoCode()) && ac.getAcSubCode().equals(md.getAcSubCode())

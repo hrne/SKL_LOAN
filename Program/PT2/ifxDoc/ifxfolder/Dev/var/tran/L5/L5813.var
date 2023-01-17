@@ -36,6 +36,10 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
+!月報環境也可執行=>E(0,5)
+#FUNCIND=_,_,S
+E(0,5)
+
 #CHK=X,1,S
 T(F,@CalDy,1)
 

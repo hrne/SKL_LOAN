@@ -58,7 +58,7 @@ public class EbsCom extends CommBuffer {
 			// 訊息通知 SystemParas.EbsFg != Y
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "",
 					"系統參數設定檔的EBS啟用記號不為Y，L9130總帳傳票不上傳至EBS", titaVo);
-			return true;
+			return false;
 		}
 
 		// 組合上傳資料

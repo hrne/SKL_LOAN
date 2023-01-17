@@ -103,7 +103,8 @@ public class L7300 extends TradeBuffer {
 		List<JSONObject> requestJOList = setIcsRequestJo(resultList, titaVo);
 		for (JSONObject requestJO : requestJOList) {
 			String response = post(requestJO, titaVo);
-			getResponseDetail(response, titaVo);
+			String tranStatus = getResponseDetail(response, titaVo);
+			totaVo.putParam("TranStatus", tranStatus);
 		}
 
 		this.addList(this.totaVo);
@@ -130,8 +131,7 @@ public class L7300 extends TradeBuffer {
 		for (JSONArray assetsDataInfo : assetsDataInfoList) {
 			JSONObject requestJO = new JSONObject();
 			try {
-				// 變數名稱兩份文件不一致,先傳兩種
-				// 1:駝峰
+				// 變數名稱:駝峰
 				requestJO.putOpt("tranSerialSeq", tranSerialSeq); // 傳輸交易序號
 				requestJO.putOpt("tranBatchSeq", tranBatchSeq); // 傳輸母批次序號
 				requestJO.putOpt("tranSubBatchSeq", tranSubBatchSeq); // 傳輸子批次序號
@@ -144,20 +144,6 @@ public class L7300 extends TradeBuffer {
 				requestJO.putOpt("version", "V0"); // 版本
 				requestJO.putOpt("assetsCode", "A"); // 資產代號
 				requestJO.putOpt("assetsDataInfo", assetsDataInfo);
-
-				// 2:全部小寫,用底線分隔
-				requestJO.putOpt("tran_serial_seq", tranSerialSeq); // 傳輸交易序號
-				requestJO.putOpt("tran_batch_seq", tranBatchSeq); // 傳輸母批次序號
-				requestJO.putOpt("tran_sub_batch_seq", tranSubBatchSeq); // 傳輸子批次序號
-				requestJO.putOpt("tran_data_sum", mrktValue); // 傳輸資料金額加總
-				requestJO.putOpt("tran_data_count", tranDataCount); // 傳輸資料總數
-				requestJO.putOpt("op_type", "A"); // 作業別
-				requestJO.putOpt("sys_src", "LN"); // 系統來源
-				requestJO.putOpt("tran_time", tranTime); // 傳輸日期時間
-				requestJO.putOpt("cv_date", stockDate); // 評價日
-				requestJO.putOpt("version", "V0"); // 版本
-				requestJO.putOpt("assets_code", "A"); // 資產代號
-				requestJO.putOpt("assets_data_info", assetsDataInfo);
 			} catch (JSONException e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
@@ -165,6 +151,10 @@ public class L7300 extends TradeBuffer {
 				throw new LogicException("E9005", "設定上傳資料發生錯誤");
 			}
 			requestJOList.add(requestJO);
+			this.info("傳輸交易序號 tranSerialSeq =" + tranSerialSeq);
+			this.info("傳輸母批次序號 tranBatchSeq =" + tranBatchSeq);
+			this.info("傳輸子批次序號 tranSubBatchSeq =" + tranSubBatchSeq);
+			this.info("傳輸資料總數 tranDataCount =" + tranDataCount);
 			tranSubBatchSeq++;
 		}
 		return requestJOList;
@@ -175,7 +165,7 @@ public class L7300 extends TradeBuffer {
 		List<JSONArray> assetsDataInfoList = new ArrayList<>();
 		JSONArray assetsDataInfo = new JSONArray();
 		for (Map<String, String> data : dataList) {
-			if (assetsDataInfo.length() >= 1000) {
+			if (assetsDataInfo.length() >= 100000) {
 				assetsDataInfoList.add(assetsDataInfo);
 				tranBatchSeq++;
 				assetsDataInfo = new JSONArray();
@@ -183,8 +173,7 @@ public class L7300 extends TradeBuffer {
 			JSONObject loanDto = new JSONObject();
 			mrktValue = mrktValue.add(rptUtil.getBigDecimal(data.get("MrktValue")));
 			try {
-				// 變數名稱兩份文件不一致,先傳兩種
-				// 1:駝峰
+				// 變數名稱:駝峰
 				loanDto.put("tranDataId", data.get("TranDataId")); // 傳輸筆數序號
 				loanDto.put("assetsCodeDtl", "A25"); // 資產細項代號
 				loanDto.put("stockDate", stockDate); // 庫存日(帳務日)
@@ -199,22 +188,6 @@ public class L7300 extends TradeBuffer {
 				loanDto.put("currency", "NTD"); // 交易幣別
 				loanDto.put("mrktValue", data.get("MrktValue")); // 市價
 				loanDto.put("bookValue", data.get("BookValue")); // 期初帳面金額
-
-				// 2:全部小寫,用底線分隔
-				loanDto.put("tran_data_id", data.get("TranDataId")); // 傳輸筆數序號
-				loanDto.put("assets_code_dtl", "A25"); // 資產細項代號
-				loanDto.put("stock_date", stockDate); // 庫存日(帳務日)
-				loanDto.put("maturity_date", data.get("MaturityDate")); // 到期日
-				loanDto.put("loan_type", data.get("LoanType")); // 貸款類別(以過往提供ICS填報作業規則進行分類，
-				// 若為「企金，商業及農業抵押貸款」填入1；若為「房貸，住宅不動產抵押貸款」填入2。)
-				loanDto.put("counterparty", data.get("Counterparty")); // 交易對手(公司戶填入客戶名稱，個人戶則填入代碼)
-				loanDto.put("loan_int", data.get("LoanInt")); // 放款利率
-				loanDto.put("ltv_ratio", data.get("LtvRatio")); // 貸款成數(LTV,%)
-				loanDto.put("sub_company_code", data.get("SubCompanyCode")); // 區隔帳冊別(資金來源)
-				loanDto.put("ac_currency", "NTD"); // 記帳幣
-				loanDto.put("currency", "NTD"); // 交易幣別
-				loanDto.put("mrkt_value", data.get("MrktValue")); // 市價
-				loanDto.put("book_value", data.get("BookValue")); // 期初帳面金額
 			} catch (JSONException e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
@@ -245,7 +218,7 @@ public class L7300 extends TradeBuffer {
 			StringWriter errors = new StringWriter();
 			re.printStackTrace(new PrintWriter(errors));
 			this.error("ICS RestClientException = " + re.getMessage());
-			throw new LogicException("E9005", "");
+			throw new LogicException("E9005", re.getMessage());
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -297,8 +270,7 @@ public class L7300 extends TradeBuffer {
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.error("ICS Exception = " + e.getMessage());
-			throw new LogicException("E9004", "分析ICS回傳資料時有誤");
+			this.info("ICS Exception = " + e.getMessage());
 		}
 		tranStatus += errorMessage == null ? "" : errorMessage;
 		return tranStatus;

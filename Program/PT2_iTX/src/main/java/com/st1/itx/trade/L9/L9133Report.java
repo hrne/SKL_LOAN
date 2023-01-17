@@ -12,105 +12,36 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcAcctCheck;
 import com.st1.itx.db.service.AcAcctCheckService;
-import com.st1.itx.db.service.CdAcCodeService;
-import com.st1.itx.db.service.CdCodeService;
-import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.tradeService.CommBuffer;
+import com.st1.itx.util.common.MakeExcel;
+import com.st1.itx.util.common.data.ReportVo;
 
 @Component("L9133Report")
 @Scope("prototype")
-
-public class L9133Report extends MakeReport {
-
-	/* DB服務注入 */
-	@Autowired
-	AcAcctCheckService sAcAcctCheckService;
+public class L9133Report extends CommBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	CdCodeService sCdCodeService;
+	private AcAcctCheckService sAcAcctCheckService;
 
-	/* DB服務注入 */
 	@Autowired
-	CdEmpService sCdEmpService;
+	private MakeExcel makeExcel;
 
-	/* DB服務注入 */
-	@Autowired
-	CdAcCodeService sCdAcCodeService;
-
-	// ReportDate : 報表日期(帳務日)
-	// ReportCode : 報表編號
-	// ReportItem : 報表名稱
-	// Security : 報表機密等級(中文敍述)
-	// PageSize : 紙張大小;
-	// PageOrientation : 紙張方向
-	// P:Portrait Orientation (直印) , L:Landscape Orientation(橫印)
-	private int reportDate = 0;
-	private String brno = "";
 	private String reportCode = "L9133";
 	private String reportItem = "放款會計與主檔餘額檢核表";
-	private String security = "機密";
-	private String pageSize = "A4";
-	private String pageOrientation = "L";
-
-	// 製表日期
-	private String nowDate;
-	// 製表時間
-	private String nowTime;
-
-	@Autowired
-	DateUtil dDateUtil;
-
-	// 自訂表頭
-	@Override
-	public void printHeader() {
-
-		this.info("L9133Report.printHeader");
-
-		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
-		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
-		this.print(-1, 145, "機密等級：" + this.security);
-		this.print(-2, 1, "報　表：" + this.reportCode);
-		this.print(-2, 85, this.reportItem, "C");
-		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
-		this.print(-3, 145, "時　　間：" + showTime(this.nowTime));
-		this.print(-4, 145, "頁　　次：" + this.getNowPage());
-		this.print(-4, 85, showRocDate(this.reportDate), "C");
-		// 明細表頭
-		/**
-		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-		 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-		 */
-		this.print(-5, 1, "區隔帳冊　科目　　　　　　　　　　　會計帳餘額　　　　　　　　　　　　　銷帳檔餘額　　　　　　　　　　　　　　主檔餘額　　　　　　　　　　　　　　　　差額");
-
-		// 明細起始列(自訂亦必須)
-		this.setBeginRow(6);
-
-		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(40);
-
-	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9133Report exec ...");
 
-		// 設定字體1:標楷體 字體大小12
-		this.setFont(1, 12);
+		int reportDate = Integer.parseInt(titaVo.getParam("AcDate")) + 19110000;
 
-		this.reportDate = Integer.valueOf(titaVo.getParam("AcDate")) + 19110000;
+		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+				.setRptCode(reportCode).setRptItem(reportItem).build();
 
-		this.brno = titaVo.getBrno();
-
-		this.nowDate = dDateUtil.getNowStringRoc();
-		this.nowTime = dDateUtil.getNowStringTime();
-
-		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
-
-		this.setCharSpaces(0);
+		makeExcel.open(titaVo, reportVo, reportItem, "L9133_底稿_會計與主檔餘額檢核表.xlsx", "檢核表");
 
 		// 查會計業務檢核檔
-		Slice<AcAcctCheck> slAcAcctCheck = sAcAcctCheckService.findAcDate(this.reportDate, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcAcctCheck> slAcAcctCheck = sAcAcctCheckService.findAcDate(reportDate, 0, Integer.MAX_VALUE, titaVo);
 		List<AcAcctCheck> lAcAcctCheck = slAcAcctCheck == null ? null : slAcAcctCheck.getContent();
 
 		if (lAcAcctCheck == null || lAcAcctCheck.size() == 0) {
@@ -120,10 +51,15 @@ public class L9133Report extends MakeReport {
 		// 是否有差額
 		boolean isDiff = false;
 
+		int rowCursor = 0;
+		int rowCursorMain = 1;
+		int rowCursorUnpaid = 1;
+
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
 			// 2022-03-16 智偉新增判斷:會計帳&銷帳檔&主檔 皆為0者不顯示
-			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal()).add(tAcAcctCheck.getAcctMasterBal());
+			BigDecimal total = tAcAcctCheck.getTdBal().add(tAcAcctCheck.getReceivableBal())
+					.add(tAcAcctCheck.getAcctMasterBal());
 			if (total.compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
@@ -131,14 +67,11 @@ public class L9133Report extends MakeReport {
 			String acSubBookCode = tAcAcctCheck.getAcSubBookCode();// 區隔帳冊
 			String acctCode = tAcAcctCheck.getAcctCode();// 科目
 			String acctItem = tAcAcctCheck.getAcctItem();// 科目
-			String acMainBal = formatAmt(tAcAcctCheck.getTdBal(), 0);// 會計帳餘額
-			String receivableBal = formatAmt(tAcAcctCheck.getReceivableBal(), 0);// 銷帳檔餘額
-			String masterBal = formatAmt(tAcAcctCheck.getAcctMasterBal(), 0);// 主檔餘額
+			BigDecimal acMainBal = tAcAcctCheck.getTdBal();// 會計帳餘額
+			BigDecimal receivableBal = tAcAcctCheck.getReceivableBal();// 銷帳檔餘額
+			BigDecimal masterBal = tAcAcctCheck.getAcctMasterBal();// 主檔餘額
 
 			// 明細資料新的一行
-			print(1, 1, "　　");
-			print(0, 1, acSubBookCode);// 區隔帳冊
-			print(0, 11, acctItem);// 科目
 			if (acctCode != null && !acctCode.isEmpty()) {
 				switch (acctCode) {
 				case "310":
@@ -146,32 +79,53 @@ public class L9133Report extends MakeReport {
 				case "330":
 				case "340":
 				case "990":
+					makeExcel.setSheet("檢核表");
+					rowCursorMain++;
+					rowCursor = rowCursorMain;
+					break;
 				case "F07":
 				case "F09":
 				case "F24":
 				case "F25":
 				case "TAV":
-					print(0, 47, acMainBal, "R"); // 業務科目或銷帳科目才顯示會計帳餘額
-					break;
 				default:
+					makeExcel.setSheet("未銷帳");
+					rowCursorUnpaid++;
+					rowCursor = rowCursorUnpaid;
 					break;
 				}
 			}
-			print(0, 83, receivableBal, "R");// 銷帳檔餘額
-			print(0, 119, masterBal, "R");// 主檔餘額
+			makeExcel.setValue(rowCursor, 1, acSubBookCode); // 區隔帳冊
+			makeExcel.setValue(rowCursor, 2, acctCode + " " + acctItem); // 科目
+			makeExcel.setValue(rowCursor, 3, acMainBal, "#,##0"); // 業務科目或銷帳科目才顯示會計帳餘額
+			makeExcel.setValue(rowCursor, 4, receivableBal, "#,##0"); // 銷帳檔餘額
+			makeExcel.setValue(rowCursor, 5, masterBal, "#,##0"); // 主檔餘額
+
+			// 差額 (會計檔餘額-主檔餘額)
+			BigDecimal diffAcAmt = acMainBal.subtract(masterBal);
+			makeExcel.setValue(rowCursor, 6, diffAcAmt, "#,##0"); // 會計檔與主檔差額
 
 			// 差額 (銷帳檔餘額-主檔餘額)
-			String diffAmt = formatAmt(tAcAcctCheck.getReceivableBal().subtract(tAcAcctCheck.getAcctMasterBal()), 0);
-			print(0, 155, diffAmt, "R");
+			BigDecimal diffReceivableAmt = receivableBal.subtract(masterBal);
+			makeExcel.setValue(rowCursor, 7, diffReceivableAmt, "#,##0"); // 銷帳檔與主檔差額
 
 			// 有差額就把記號改為true
-			if (tAcAcctCheck.getReceivableBal().subtract(tAcAcctCheck.getAcctMasterBal()).compareTo(BigDecimal.ZERO) != 0) {
+			if (acMainBal.subtract(masterBal).compareTo(BigDecimal.ZERO) != 0) {
+				isDiff = true;
+			}
+			if (receivableBal.subtract(masterBal).compareTo(BigDecimal.ZERO) != 0) {
 				isDiff = true;
 			}
 		}
+		long excelNo = makeExcel.close();
+
+		makeExcel.toExcel(excelNo);
 
 		// "是否有差額"參數傳回交易主程式
 		return isDiff;
 	}
 
+	@Override
+	public void exec() throws LogicException {
+	}
 }

@@ -437,29 +437,38 @@ T(H,#TypeCode,#TypeCodeHelp)
 #WKSPC=X,2,S
 
 #WKSTAR=X,1,S
-C(2,#FunCd,S,T(3,*),S,S,S,S)
+!C(2,#FunCd,S,T(3,*),S,S,S,S)
+C(2,#FunCd,S,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*)S)
+
+!#WKSTARX=X,1,S
+!C(2,#FunCd,S,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 
 #Fd=X,1,S
 T(2,@FdCustName,#WKSTAR)
 T(2,@FdEName,#WKSPC)
 T(2,@FdBirthday,#WKSTAR)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+!C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 
 T(2,@FdEntCode,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+!C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdCustTypeCode,#Fd)
 T(2,@FdIndustryCode,#Fd)
 T(2,@FdNationalityCode,#WKSTAR)
 T(2,@FdBussNationalityCode,#WKSTAR)
 T(2,@FdSubCompanyFg,#Fd)
 T(2,@FdSpouseId,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+!C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdSpouseName,#Fd)
 T(2,@FdRegZip3,#WKSPC)
 T(2,@FdRegZip2,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+!C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdRegCityCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+!C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdCurrCityCode,#Fd)
 T(2,@FdIncomeOfYearly,#WKSPC)
 T(2,@FdIncomeDataDate,#WKSPC)
@@ -571,12 +580,14 @@ HELP(#NationalityCodeHelp)
 @
 C(5,#FdNationalityCode,*,V(7),$)
 C(4,#NationalityCode,$,V(H,#NationalityCodeHelp))
+C(5,#NationalityCode,TW,T(2,#FdSpouseId,*)
 
 #NationalityCodex=X,50,L
 T(H,#NationalityCode,#NationalityCodeHelp)
 
 #T1=X,1,S
 C(5,#NationalityCode,TW,C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC)),T(2,#WKSPC))
+!C(5,#NationalityCode,TW,C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTARX),T(2,#WKSTARX)),T(2,#WKSTARX))
 T(2,@FdSpouseId,#T1)
 
 !公司營業地
@@ -588,9 +599,10 @@ HELP(#NationalityCodeHelp)
 @
 C(5,#FdBussNationalityCode,*,V(7),$)
 C(4,#BussNationalityCode,$,V(H,#NationalityCodeHelp))
-
+C(5,#NationalityCode,TW,T(2,#FdSpouseId,*),V(7),$)
 #BussNationalityCodex=X,40,L
 T(H,#BussNationalityCode,#NationalityCodeHelp)
+
 
 !負責人身分證字號
 #SpouseId=X,10,I
@@ -598,7 +610,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
 C(5,#NationalityCode,TW,T(2,@SpouseId,)C(4,#SpouseId,V(P,當公司註冊地為TW時，不可空白),s),s)
-C(5,#FdSpouseId,*,V(7),$)
+!C(5,#NationalityCode,TW,T(2,#FdSpouseId,*),V(7),$)
 C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
 
 !負責人姓名

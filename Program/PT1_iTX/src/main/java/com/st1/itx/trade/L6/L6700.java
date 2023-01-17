@@ -70,7 +70,7 @@ public class L6700 extends TradeBuffer {
 				}
 				//
 				dataLog.setEnv(titaVo, cdLoanNotYet2, cdLoanNotYet);
-				dataLog.exec();
+				dataLog.exec("修改未齊件代碼檔");
 			} else if ("4".equals(iFunCode)) {
 				try {
 					cdLoanNotYetService.delete(cdLoanNotYet, titaVo);

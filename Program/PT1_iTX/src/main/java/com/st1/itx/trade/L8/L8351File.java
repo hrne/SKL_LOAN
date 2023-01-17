@@ -16,6 +16,9 @@ import com.st1.itx.db.service.TbJcicMu01Service;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.db.domain.SystemParas;
+import com.st1.itx.db.service.SystemParasService;
+
 
 @Component("L8351File")
 @Scope("prototype")
@@ -32,6 +35,9 @@ public class L8351File extends MakeFile {
 	@Autowired
 	public TbJcicMu01Service iTbJcicMu01Service;
 
+	@Autowired
+	public SystemParasService sSystemParasService;
+
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		String iSubmitKey = titaVo.getParam("SubmitKey");
@@ -41,6 +47,25 @@ public class L8351File extends MakeFile {
 		String brno = titaVo.getBrno();
 		String filecode = "L8351";
 		String fileitem = "MU1人員名冊報送作業產出檔案";
+
+		// 查詢系統參數設定檔-JCIC放款報送人員資料
+		String iRimBusinessType = "LN";
+		String jcicMU1Dep = "";
+		String jcicMU1Name = "";
+		String jcicMU1Tel = "";
+		SystemParas tSystemParas = sSystemParasService.findById(iRimBusinessType, titaVo);
+		/* 如有找到資料 */
+		if (tSystemParas != null) {
+			jcicMU1Dep = tSystemParas.getJcicMU1Dep();
+			jcicMU1Name = tSystemParas.getJcicMU1Name();
+			jcicMU1Tel = tSystemParas.getJcicMU1Tel();
+			if (jcicMU1Dep == null || jcicMU1Name == null || jcicMU1Tel == null) {
+				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC報送人員資料");
+			}
+		} else {
+			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
+		}
+
 		// 檔名
 		//String filename = iSubmitKey + iTxtDate.substring(3) + iTxtCount + ".MU1";
 		String filename = iSubmitKey + iTxtDate.substring(3,7) + ".MU1";
@@ -49,9 +74,9 @@ public class L8351File extends MakeFile {
 		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(0, Integer.MAX_VALUE, titaVo);
 
 		// 第一行
-		String iContactX = FormatUtil.padX("放款部聯絡人-張舜雯", 80);
+		String iContactX = FormatUtil.padX(jcicMU1Dep+"聯絡人-"+jcicMU1Name, 80);
 //		String iFirstLine = String.format("JCIC-DAT-MU01-V%s-%s     %s01          02-23895858#7076"+iContactX, iTxtCount, iSubmitKey, iTxtDate, iTxtCount);
-		String iFirstLine = "JCIC-DAT-MU01-V01-458     " + iTxtDate + "01          02-23895858#7075" + iContactX;
+		String iFirstLine = "JCIC-DAT-MU01-V01-458     " + iTxtDate + "01          "+jcicMU1Tel + iContactX;
 		this.put(iFirstLine);
 
 		if (iTbJcicMu01 == null) {
@@ -139,10 +164,10 @@ public class L8351File extends MakeFile {
 							+ "                         ";
 					this.put(iContent);
 					// 修改Jcic日期為今天日期
-					TbJcicMu01 bTbJcicMu01 = iTbJcicMu01Service.holdById(aTbJcicMu01.getTbJcicMu01Id());
+					TbJcicMu01 bTbJcicMu01 = iTbJcicMu01Service.holdById(aTbJcicMu01.getTbJcicMu01Id(), titaVo);
 					bTbJcicMu01.setOutJcictxtDate(Integer.valueOf(titaVo.getCalDy()) + 19110000);
 					try {
-						iTbJcicMu01Service.update(bTbJcicMu01);
+						iTbJcicMu01Service.update(bTbJcicMu01, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料修改錯誤
 					}
