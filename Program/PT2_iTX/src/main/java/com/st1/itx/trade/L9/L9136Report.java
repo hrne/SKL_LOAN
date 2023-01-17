@@ -208,6 +208,8 @@ public class L9136Report extends MakeReport {
 
 			}
 
+		}else {
+			this.print(1, 1, "本日無資料");
 		}
 
 		this.titleItem = "主管核可";
@@ -236,6 +238,8 @@ public class L9136Report extends MakeReport {
 
 			}
 
+		}else {
+			this.print(1, 1, "本日無資料");
 		}
 
 		this.titleItem = "主管放行";
@@ -264,6 +268,8 @@ public class L9136Report extends MakeReport {
 
 			}
 
+		}else {
+			this.print(1, 1, "本日無資料");
 		}
 
 		if (this.getNowPage() > 0 && count == ((l9136List != null ? l9136List.size() : 0)
@@ -366,7 +372,7 @@ public class L9136Report extends MakeReport {
 
 		} else {
 			tmpUpdateItem = r.get("TranNo") + " " + r.get("TranItem");
-			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : tmpUpdateItem);
+			this.print(0, 97, tmpUpdateItem.length() == 0 ? " " : fillUpWord(tmpUpdateItem, 36, " ", "R"));
 		}
 
 //		String bfContent = tmpNewContent.trim().length() == 0 ? " "

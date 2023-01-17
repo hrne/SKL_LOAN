@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -208,25 +209,23 @@ public class L9130Report2022 extends MakeReport {
 
 		groupId = tmpGroupId.toBigInteger();
 
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
-				iMediaSeq, "Y", 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findBatchNo(iAcDate + 19110000, iBatchNo, 0,
+				Integer.MAX_VALUE, titaVo);
 
 		SlipMedia2022 tempTableSlipMedia2022;
+		List<SlipMedia2022> lSlipMedia2022old = new ArrayList<SlipMedia2022>();
 
 		// 若已存在,是重新製作傳票媒體
 		if (sSlipMedia2022 != null && !sSlipMedia2022.isEmpty()) {
+			lSlipMedia2022old = sSlipMedia2022.getContent();
 			// 更新原傳票媒體的"是否為最新"(LatestFlag)欄位
-			for (SlipMedia2022 tSlipMedia2022 : sSlipMedia2022.getContent()) {
-				SlipMedia2022Id pkSlipMedia2022Id = tSlipMedia2022.getSlipMedia2022Id();
-				tempTableSlipMedia2022 = sSlipMedia2022Service.holdById(pkSlipMedia2022Id, titaVo);
-				if (tempTableSlipMedia2022 != null) {
-					tempTableSlipMedia2022.setLatestFlag("N");
-					try {
-						sSlipMedia2022Service.update(tempTableSlipMedia2022, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0003", "傳票媒體檔");
-					}
-				}
+			for (SlipMedia2022 tSlipMedia2022 : lSlipMedia2022old) {
+				tSlipMedia2022.setLatestFlag("N");
+			}
+			try {
+				sSlipMedia2022Service.updateAll(lSlipMedia2022old, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0003", "傳票媒體檔");
 			}
 		}
 
@@ -256,6 +255,7 @@ public class L9130Report2022 extends MakeReport {
 
 		rowCursor = 3;
 
+		List<SlipMedia2022> lSlipMedia2022 = new ArrayList<SlipMedia2022>();
 		for (Map<String, String> l9130 : l9130List) {
 
 			acSubBookCode = l9130.get("F6"); // 區隔帳冊
@@ -315,7 +315,7 @@ public class L9130Report2022 extends MakeReport {
 			tSlipMedia2022.setDeptCode(deptCode);
 			tSlipMedia2022.setLatestFlag("Y");
 			tSlipMedia2022.setTransferFlag("N");
-
+			lSlipMedia2022.add(tSlipMedia2022);
 			try {
 				sSlipMedia2022Service.insert(tSlipMedia2022, titaVo);
 			} catch (DBException e) {
@@ -373,29 +373,47 @@ public class L9130Report2022 extends MakeReport {
 		// 2022-05-18 ST1 Wei 新增:
 		// 若 批號>=90 且 上傳EBS結果為成功時
 		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
-		if (iBatchNo >= 90) {
-			// iAcDate + 19110000
-			// iBatchNo
-			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
-					Integer.MAX_VALUE, titaVo);
+		// iAcDate + 19110000
+		// iBatchNo
+		Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0, Integer.MAX_VALUE,
+				titaVo);
 
-			if (slAcDetail == null || slAcDetail.isEmpty()) {
-				return;
-			} else {
-				List<AcDetail> lAcDetail = slAcDetail.getContent();
-
-				AcDetail tempAcDetail;
-				for (AcDetail tAcDetail : lAcDetail) {
-					tempAcDetail = sAcDetailService.holdById(tAcDetail, titaVo);
-					tempAcDetail.setEntAc(9);
-					try {
-						sAcDetailService.update(tempAcDetail, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		if (slAcDetail == null || slAcDetail.isEmpty()) {
+			return;
+		} else {
+			List<AcDetail> lAcDetail = slAcDetail.getContent();
+			for (AcDetail ac : lAcDetail) {
+				if (iBatchNo >= 90) {
+					ac.setEntAc(9);
+				}
+				// 媒體傳票號碼
+				for (SlipMedia2022 md : lSlipMedia2022) {
+					String receivableCode = "";
+					if (ac.getReceivableFlag() == 8) {
+						receivableCode = ac.getRvNo();
+					}
+					this.info("AcBookCode= " + ac.getAcBookCode() + ";" + md.getAcBookCode());
+					this.info("AcSubBookCode= " + ac.getAcSubBookCode() + ";" + md.getAcSubBookCode());
+					this.info("AcNoCode= " + ac.getAcNoCode() + ";" + md.getAcNoCode());
+					this.info("AcSubCode= " + ac.getAcSubCode() + ";" + md.getAcSubCode());
+					this.info("DbCr= " + ac.getDbCr() + ";" + md.getDbCr());
+					this.info("receivableCode= " + receivableCode + ";" + md.getReceiveCode());
+					if (ac.getAcBookCode().equals(md.getAcBookCode())
+							&& ac.getAcSubBookCode().equals(md.getAcSubBookCode())
+							&& ac.getAcNoCode().equals(md.getAcNoCode()) && ac.getAcSubCode().equals(md.getAcSubCode())
+							&& ac.getDbCr().equals(md.getDbCr()) && receivableCode.equals(md.getReceiveCode())) {
+						this.info("成功 >" + md.getMediaSlipNo());
+						ac.setMediaSlipNo(md.getMediaSlipNo());
 					}
 				}
 			}
+			try {
+				sAcDetailService.updateAll(lAcDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
 		}
+
 	}
 
 	/**

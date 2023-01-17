@@ -9505,6 +9505,12 @@ TXFORM=L6R27
 #L6R28IcsUrl=x,100,S
 #L6R28BatchFireFeeFg=X,1,S
 #L6R28InsuSettleDate=D,7,S
+#L6R28JcicZDep=X,6,S
+#L6R28JcicZName=X,8,S
+#L6R28JcicZTel=X,16,S
+#L6R28JcicMU1Dep=X,6,S
+#L6R28JcicMU1Name=X,8,S
+#L6R28JcicMU1Tel=X,16,S
 </L6R28.dec>
 
 <L6R28.tom>
@@ -9557,6 +9563,13 @@ TXFORM=L6R28
 #L6R28IcsUrl
 #L6R28BatchFireFeeFg
 #L6R28InsuSettleDate
+#L6R28JcicZDep
+#L6R28JcicZName
+#L6R28JcicZTel
+#L6R28JcicMU1Dep
+#L6R28JcicMU1Name
+#L6R28JcicMU1Tel
+
 ^
 </L6R28.tom>
 

@@ -50,6 +50,7 @@ BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L4961; ntxbuf=#BUFA})
 ! 轉發日期
 #InsuEndMonth=A,5,I
 @A(YM,1,#InsuEndMonth)
+#InsuEndMonthOld=A,5,S
 
 #BUFB=X,8,S
 T(2,1+#InsuEndMonth+99+0)
@@ -124,6 +125,7 @@ E(0,1)ASGN(LOOP$)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #InsuEndMonth
+#InsuEndMonthOld
 </sub>
 
 !------ 下行電文TOM ------

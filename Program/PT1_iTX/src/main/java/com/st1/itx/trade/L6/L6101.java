@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -22,23 +22,24 @@ import com.st1.itx.db.domain.AcMain;
 import com.st1.itx.db.domain.AcMainId;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.BankRemit;
-import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.CdWorkMonth;
-import com.st1.itx.db.domain.ClImmRankDetail;
 import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcMainService;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.BankRemitService;
-import com.st1.itx.db.service.TxToDoMainService;
-import com.st1.itx.db.service.springjpa.cm.L6101ServiceImpl;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.TxFlowService;
+import com.st1.itx.db.service.TxToDoDetailService;
+import com.st1.itx.db.service.TxToDoMainService;
+import com.st1.itx.db.service.springjpa.cm.L6101ServiceImpl;
 import com.st1.itx.trade.L9.L9130;
 import com.st1.itx.trade.L9.L9130Report;
 import com.st1.itx.trade.L9.L9130Report2022;
@@ -80,6 +81,8 @@ public class L6101 extends TradeBuffer {
 
 	@Autowired
 	TxToDoMainService sTxToDoMainService;
+	@Autowired
+	TxToDoDetailService txToDoDetailService;
 
 	@Autowired
 	BatxHeadService sBatxHeadService;
@@ -161,6 +164,8 @@ public class L6101 extends TradeBuffer {
 	private int iClsFg = 0;
 	private int iMsgCode = 0;
 	private int iClsNo = 0;
+	private int iCoreSeqNo = 0;
+
 	private String iSecNo = "";
 
 	@Override
@@ -169,20 +174,18 @@ public class L6101 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String iItemCode = titaVo.getParam("ItemCode"); // 0:業務關帳作業;1:總帳傳票檔傳送作業
 		iSecNo = titaVo.getParam("SecNo");
 		iClsFg = this.parse.stringToInteger(titaVo.getParam("ClsFg"));
+		iCoreSeqNo = this.parse.stringToInteger(titaVo.getParam("CoreSeqNo"));
 		iMsgCode = 0;
 		iClsNo = 0;
 
+		this.info("SecNo = " + iSecNo);
+		this.info("ClsFg = " + iClsFg);
+		this.info("CoreSeqNo = " + iCoreSeqNo);
+
 		// 1:業務關帳作業
-		if ("0".equals(iItemCode)) {
-			acClose(titaVo);
-		}
-		// 2:總帳傳票檔傳送作業
-		if ("1".equals(iItemCode)) {
-			mediaSlip(titaVo);
-		}
+		acClose(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -649,9 +652,9 @@ public class L6101 extends TradeBuffer {
 
 		if ("09".equals(uSecNo)) {
 
-			this.info("BatchNo ="+titaVo.get("BatchNo"));
-			this.info("MediaSeq ="+titaVo.get("MediaSeq"));
-			this.info("AcDate ="+titaVo.get("AcDate"));
+			this.info("BatchNo =" + titaVo.get("BatchNo"));
+			this.info("MediaSeq =" + titaVo.get("MediaSeq"));
+			this.info("AcDate =" + titaVo.get("AcDate"));
 			// 2021-12-15 智誠修改
 //			MySpring.newTask("L6101Report", this.txBuffer, titaVo);
 			l6101Excel.exec(titaVo);
@@ -710,33 +713,34 @@ public class L6101 extends TradeBuffer {
 		this.info("L6101 Check iMsgCode : " + iMsgCode);
 
 		// 開帳檢查傳票媒體檔2022年格式媒體檔是否上傳完成
-		if (iClsFg == 0) {
-			CheckSlipMedia2022(titaVo);
-			AcClose tAcClose = new AcClose();
-			AcCloseId tAcCloseId = new AcCloseId();
 
-			tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-			tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-			tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
 
-			tAcClose = sAcCloseService.findById(tAcCloseId);
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
 
-			if (tAcClose == null) {
-				throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
-			}
+		tAcClose = sAcCloseService.findById(tAcCloseId);
 
-			Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(
-					this.txBuffer.getTxCom().getTbsdy() + 19110000, tAcClose.getClsNo(), 0, Integer.MAX_VALUE, titaVo);
-			for (SlipMedia2022 t : slslipMedia2022.getContent()) {
-				// 只檢查最新的
-				if (!t.getLatestFlag().equals("Y")) {
-					continue;
-				}
-				// 需完成上傳才可執行開帳作業
-				if (t.getTransferFlag().equals("N")) {
-					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
-				}
-			}
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
+		}
+		// 開帳及關帳取消時檢查
+		if (iClsFg == 0 || iClsFg == 2) {
+			// 檢查上傳媒體檔是否已完成
+			CheckSlipMedia2022(iClsFg, tAcClose, titaVo);
+		}
+		this.info("iClsFg = " + iClsFg);
+		// 關帳
+		if (iClsFg == 1) {
+			this.info("iClsFg = 1");
+			txToDoL7400(titaVo);
+		}
+		// 關帳取消
+		if (iClsFg == 2) {
+			this.info("iClsFg = 2");
+			txToDoL7400Delete(tAcClose, titaVo);
 		}
 
 		// 更新會計業務關帳控制檔
@@ -827,35 +831,66 @@ public class L6101 extends TradeBuffer {
 		MySpring.newTask("L7400", this.txBuffer, titaVo);
 	}
 
-	// 檢查上傳媒體檔是否已完成
-	private void CheckSlipMedia2022(TitaVo titaVo) throws LogicException {
-		AcClose tAcClose = new AcClose();
-		AcCloseId tAcCloseId = new AcCloseId();
+	// 開帳檢查上傳媒體檔不可有"未完成"
+	// 取消關帳檢查上傳媒體檔不可"已完成"
+	private void CheckSlipMedia2022(int iClsFg, AcClose tAcClose, TitaVo titaVo) throws LogicException {
 
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo(iSecNo); // 業務類別: 1-撥款匯款 2-支票繳款 3-債協 9-放款
-
-		tAcClose = sAcCloseService.findById(tAcCloseId);
-
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0015", "會計業務關帳控制檔 業務類別:" + iSecNo); // 檢查錯誤
-		}
-
-		Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(
-				this.txBuffer.getTxCom().getTbsdy() + 19110000, tAcClose.getClsNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(tAcClose.getAcDate() + 19110000,
+				tAcClose.getClsNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slslipMedia2022 != null) {
 			for (SlipMedia2022 t : slslipMedia2022.getContent()) {
 				// 只檢查最新的
 				if (!t.getLatestFlag().equals("Y")) {
 					continue;
 				}
-				// 需完成上傳才可執行開帳作業
-				if (t.getTransferFlag().equals("N")) {
+				// 開帳檢查上傳媒體檔不可有"未完成"
+				if (iClsFg == 0 && t.getTransferFlag().equals("N")) {
 					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行開帳作業 業務類別:" + iSecNo); // 檢查錯誤
+				}
+				// 取消關帳檢查上傳媒體檔不可"已完成"
+				if (iClsFg == 2 && t.getTransferFlag().equals("Y")) {
+					throw new LogicException(titaVo, "E0015", "上傳已完成 不可執行取消關帳作業 業務類別:" + iSecNo); // 檢查錯誤
 				}
 			}
 		}
+
 	}
 
+	// 寫入應處理清單-
+	private void txToDoL7400(TitaVo titaVo) throws LogicException {
+		this.info("txToDoL7400 ...");
+		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+		TempVo tTempVo = new TempVo();
+		tTxToDoDetail.setItemCode("L7400");
+		tTxToDoDetail.setDtlValue(
+				this.txBuffer.getTxCom().getTbsdy() + titaVo.getParam("BatNo") + parse.IntegerToString(iCoreSeqNo, 3));
+		tTempVo.clear();
+		tTempVo.putParam("會計日期：", this.txBuffer.getTxCom().getTbsdy());
+		tTempVo.putParam("業務批號：", titaVo.getParam("BatNo"));
+		tTempVo.putParam("上傳核心序號：", parse.IntegerToString(iCoreSeqNo, 3));
+		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
+		txToDoCom.setTxBuffer(txBuffer);
+		txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
+
+	}
+
+	// 刪除應處理清單-
+	private void txToDoL7400Delete(AcClose tAcClose, TitaVo titaVo) throws LogicException {
+		this.info("txToDoL7400Delete ...");
+
+		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+		tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId("L7400", 0, 0, 0,
+				tAcClose.getAcDate() + titaVo.getParam("BatNo") + parse.IntegerToString(tAcClose.getCoreSeqNo(), 3)),
+				titaVo);
+		if (tTxToDoDetail != null) {
+			try {
+				this.info("DeleteAll...");
+				txToDoCom.setTxBuffer(txBuffer);
+				txToDoCom.addDetail(true, 1, tTxToDoDetail, titaVo);
+			} catch (LogicException e) {
+				this.info("DeleteAll Error : " + e.getErrorMsg());
+			}
+		}
+
+	}
 }

@@ -9,10 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.MySpring;
 
 /**
  * 每日資料庫複製<BR>
@@ -41,6 +47,8 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	JobMainService sJobMainService;
+	@Autowired
+	AcCloseService sAcCloseService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -57,10 +65,24 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public void run() throws LogicException {
+		this.info("DailyCopy Start ... ");
+		String execEnv = this.titaVo.getParam(ContentName.dataBase);
+
+		this.info("DailyCopy execEnv = " + execEnv);
+
+		if (!execEnv.equals(ContentName.onLine)) {
+			this.info("DailyCopy 執行環境非Online,不做備份,結束程式.");
+			return;
+		}
+
 		this.info("DailyCopy 日報環境開始複製");
+
+		TitaVo tempTitaVo = (TitaVo) this.titaVo.clone();
+
 		// 複製到日報環境
-		this.titaVo.putParam(ContentName.dataBase, ContentName.onDay);
-		doCopy();
+		tempTitaVo.putParam(ContentName.dataBase, ContentName.onDay);
+
+		doCopy(tempTitaVo);
 		this.info("DailyCopy 日報環境複製完成");
 
 		// 帳務日
@@ -74,21 +96,33 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 		// 每月月底日才執行
 		if (tbsdyf == mfbsdyf) {
 			this.info("DailyCopy 月報環境開始複製");
-			this.titaVo.putParam(ContentName.dataBase, ContentName.onMon);
+			tempTitaVo.putParam(ContentName.dataBase, ContentName.onMon);
 			// 複製到月報環境
-			doCopy();
+			doCopy(tempTitaVo);
 			this.info("DailyCopy 月報環境複製完成");
 		}
 
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
+		tAcClose = sAcCloseService.holdById(tAcCloseId);
+		tAcClose.setClsFg(4); // 4:夜間批次執行完畢
+
+		try {
+			sAcCloseService.update(tAcClose);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "更新關帳狀態(09:放款)"); // 更新資料時，發生錯誤
+		}
 		this.info("DailyCopy exit.");
 	}
 
-	private void doCopy() throws LogicException {
-		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
-		String tlrNo = this.titaVo.getTlrNo();
+	private void doCopy(TitaVo tempTitaVo) throws LogicException {
 
-		String targetEnv = this.titaVo.getParam(ContentName.dataBase);
-		this.info("DailyCopy doCopy 目標環境: " + this.titaVo.getParam(ContentName.dataBase));
+		String targetEnv = tempTitaVo.getParam(ContentName.dataBase);
+		this.info("DailyCopy doCopy 目標環境: " + tempTitaVo.getParam(ContentName.dataBase));
 
 		// 防呆
 		if (targetEnv == null || targetEnv.isEmpty() || targetEnv.equals(ContentName.onLine)) {
@@ -96,14 +130,6 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 			return;
 		}
 
-		// 關閉全部ForeignKey
-		sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 0, titaVo);
-
-		// 複製資料
-		sJobMainService.Usp_Cp_CdCode_Ins(tlrNo, titaVo);
-		// TODO: 全部Table
-
-		// 開啟全部ForeignKey
-		sJobMainService.Usp_Cp_ForeignKeyControl_Upd(tbsdyf, tlrNo, 1, titaVo);
+		MySpring.newTask("DailyCopyProcess", this.txBuffer, tempTitaVo);
 	}
 }

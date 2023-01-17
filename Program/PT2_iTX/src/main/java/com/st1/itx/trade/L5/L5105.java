@@ -57,11 +57,11 @@ public class L5105 extends TradeBuffer {
 		// 更新覆審案件明細檔
 		InnReCheck tInnReCheck = new InnReCheck();
 
-		tInnReCheck = sInnReCheckService.holdById(new InnReCheckId(iFYearMonth, iConditionCode, iCustNo, iFacmNo));
+		tInnReCheck = sInnReCheckService.holdById(new InnReCheckId(iFYearMonth, iConditionCode, iCustNo, iFacmNo), titaVo);
 		if (tInnReCheck != null) {
 			try {
 				moveInnReCheck(tInnReCheck, iFYearMonth, iConditionCode, iCustNo, iFacmNo, titaVo);
-				sInnReCheckService.update(tInnReCheck);
+				sInnReCheckService.update(tInnReCheck, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}

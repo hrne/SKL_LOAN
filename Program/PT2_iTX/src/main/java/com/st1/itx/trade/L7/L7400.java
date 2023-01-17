@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
@@ -117,110 +119,123 @@ public class L7400 extends TradeBuffer {
 		lineNum = 1;
 		drAmtTotal = BigDecimal.ZERO;
 		journalTbl = new JSONArray();
+		boolean sendEbsOK = true;
 		String dbCr;
 		BigDecimal txAmt;
 		String txBal;
-
-		for (SlipMedia2022 slipMedia : listSlipMedia2022) {
-			JSONObject dataJo = new JSONObject();
-
-			slipDate = "" + slipMedia.getAcDate();
-			dbCr = slipMedia.getDbCr();
-			txAmt = slipMedia.getTxAmt();
-
-			// 借方金額累加
-			drAmtTotal = dbCr.equals("D") ? drAmtTotal.add(txAmt) : drAmtTotal;
-
-			// 傳票媒體檔的金額處理,借方為正數,貸方為負數
-			txBal = dbCr.equals("D") ? txAmt.toString() : txAmt.negate().toString();
-
-			try {
-				dataJo.put("GROUP_ID", groupId);
-				dataJo.put("BATCH_DATE", slipDate);
-				dataJo.put("JE_SOURCE_NAME", "LN");
-				dataJo.put("USER_LEDGER_CODE", slipMedia.getAcBookCode());
-				dataJo.put("CONVENTION", IFRS_TYPE);
-				dataJo.put("JOURNAL_NAME", slipMedia.getMediaSlipNo());
-				dataJo.put("CURRENCY_CODE", slipMedia.getCurrencyCode());
-				dataJo.put("ISSUED_BY", tellerNo);
-				dataJo.put("ACCOUNTING_DATE", slipDate);
-				dataJo.put("JE_LINE_NUM", "" + lineNum);
-				dataJo.put("SEGREGATE_CODE", slipMedia.getAcSubBookCode());
-				dataJo.put("ACCOUNT_CODE", slipMedia.getAcNoCode());
-				dataJo.put("SUBACCOUNT_CODE",
-						slipMedia.getAcSubCode().trim().isEmpty() ? "00000" : slipMedia.getAcSubCode());
-				dataJo.put("COSTCENTER_CODE", COST_UNIT);
-				dataJo.put("CHANNEL_CODE", "00"); // 通路代號
-				dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
-				dataJo.put("INTERCOMPANY_CODE", "999");
-				dataJo.put("DEPARTMENT_CODE", slipMedia.getDeptCode());
-				dataJo.put("ENTERED_AMOUNT", txBal);
-				dataJo.put("LINE_DESC", slipMedia.getSlipRmk());
-				dataJo.put("WRITE_OFF_CODE", slipMedia.getReceiveCode());
-				dataJo.put("RELATIONSHIP", "");
-			} catch (JSONException e) {
-				this.error("L7400 error = " + e.getMessage());
-			}
-			journalTbl.put(dataJo);
-			lineNum++;
-		}
-
-		// 統計並送出
-		boolean sendEbsOK = doSummaryAndSendToEbs(titaVo);
-
-		// 2022-05-18 ST1 Wei 新增:
-		// 若 批號>=90 且 上傳EBS結果為成功時
-		// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
-		if (sendEbsOK) {
+		if (listSlipMedia2022 != null) {
 			for (SlipMedia2022 slipMedia : listSlipMedia2022) {
-				SlipMedia2022 tempSlipMedia = sSlipMedia2022Service.holdById(slipMedia, titaVo);
-				if (tempSlipMedia != null) {
-					tempSlipMedia.setTransferFlag("Y");
-					try {
-						sSlipMedia2022Service.update(tempSlipMedia, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0003", "傳票媒體檔");
-					}
-				}
-			}
-			this.batchTransaction.commit();
-			if (iBatchNo >= 90) {
-				// iAcDate + 19110000
-				// iBatchNo
-				Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
-						Integer.MAX_VALUE, titaVo);
+				JSONObject dataJo = new JSONObject();
 
-				if (slAcDetail != null && !slAcDetail.isEmpty()) {
-					List<AcDetail> lAcDetail = slAcDetail.getContent();
-					AcDetail tempAcDetail;
-					for (AcDetail tAcDetail : lAcDetail) {
-						tempAcDetail = sAcDetailService.holdById(tAcDetail, titaVo);
-						tempAcDetail.setEntAc(9);
+				slipDate = "" + slipMedia.getAcDate();
+				dbCr = slipMedia.getDbCr();
+				txAmt = slipMedia.getTxAmt();
+
+				// 借方金額累加
+				drAmtTotal = dbCr.equals("D") ? drAmtTotal.add(txAmt) : drAmtTotal;
+
+				// 傳票媒體檔的金額處理,借方為正數,貸方為負數
+				txBal = dbCr.equals("D") ? txAmt.toString() : txAmt.negate().toString();
+
+				try {
+					dataJo.put("GROUP_ID", groupId);
+					dataJo.put("BATCH_DATE", slipDate);
+					dataJo.put("JE_SOURCE_NAME", "LN");
+					dataJo.put("USER_LEDGER_CODE", slipMedia.getAcBookCode());
+					dataJo.put("CONVENTION", IFRS_TYPE);
+					dataJo.put("JOURNAL_NAME", slipMedia.getMediaSlipNo());
+					dataJo.put("CURRENCY_CODE", slipMedia.getCurrencyCode());
+					dataJo.put("ISSUED_BY", tellerNo);
+					dataJo.put("ACCOUNTING_DATE", slipDate);
+					dataJo.put("JE_LINE_NUM", "" + lineNum);
+					dataJo.put("SEGREGATE_CODE", slipMedia.getAcSubBookCode());
+					dataJo.put("ACCOUNT_CODE", slipMedia.getAcNoCode());
+					dataJo.put("SUBACCOUNT_CODE",
+							slipMedia.getAcSubCode().trim().isEmpty() ? "00000" : slipMedia.getAcSubCode());
+					dataJo.put("COSTCENTER_CODE", COST_UNIT);
+					dataJo.put("CHANNEL_CODE", "00"); // 通路代號
+					dataJo.put("IFRS17_GROUP_CODE", "000000000000000"); // IFRS17群組代號，若無IFRS17群組代號需放000000000000000
+					dataJo.put("INTERCOMPANY_CODE", "999");
+					dataJo.put("DEPARTMENT_CODE", slipMedia.getDeptCode());
+					dataJo.put("ENTERED_AMOUNT", txBal);
+					dataJo.put("LINE_DESC", slipMedia.getSlipRmk());
+					dataJo.put("WRITE_OFF_CODE", slipMedia.getReceiveCode());
+					dataJo.put("RELATIONSHIP", "");
+				} catch (JSONException e) {
+					this.error("L7400 error = " + e.getMessage());
+				}
+				journalTbl.put(dataJo);
+				lineNum++;
+			}
+			// 統計並送出
+			sendEbsOK = doSummaryAndSendToEbs(titaVo);
+
+			// 2022-05-18 ST1 Wei 新增:
+			// 若 批號>=90 且 上傳EBS結果為成功時
+			// 將AcDetail內 本次上傳資料 的 EntAc 更新為9
+			if (sendEbsOK) {
+				for (SlipMedia2022 slipMedia : listSlipMedia2022) {
+					slipMedia.setTransferFlag("Y");
+				}
+
+				try {
+					sSlipMedia2022Service.updateAll(listSlipMedia2022, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0003", "傳票媒體檔");
+				}
+
+				if (iBatchNo >= 90) {
+					// iAcDate + 19110000
+					// iBatchNo
+					Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
+							Integer.MAX_VALUE, titaVo);
+
+					if (slAcDetail != null && !slAcDetail.isEmpty()) {
+						List<AcDetail> lAcDetail = slAcDetail.getContent();
+
+						for (AcDetail tAcDetail : lAcDetail) {
+							tAcDetail.setEntAc(9);
+						}
 						try {
-							sAcDetailService.update(tempAcDetail, titaVo);
+							sAcDetailService.updateAll(lAcDetail, titaVo);
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 						}
 					}
-					this.batchTransaction.commit();
 				}
+			}
+
+			sSlipMedia2022Service.Usp_L7_SlipMedia_Upd(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), iAcDate,
+					iBatchNo, titaVo);
+
+			// TxToDo回寫狀態
+			updateTxToDo(iAcDate, iBatchNo, iMediaSeq, titaVo);
+		} else {
+			List<Map<String, String>> errorList = ebsCom.getErrorList();
+			for (Map<String, String> error : errorList) {
+				OccursList occurslist = new OccursList();
+				occurslist.putParam("GroupId", error.get("GroupId"));
+				occurslist.putParam("JournalName", error.get("JournalName"));
+				occurslist.putParam("JeLineNum", error.get("JeLineNum"));
+				occurslist.putParam("ErrorCode", error.get("ErrorCode"));
+				occurslist.putParam("ErrorMessage", error.get("ErrorMessage"));
+				this.totaVo.addOccursList(occurslist);
 			}
 		}
 
-		sSlipMedia2022Service.Usp_L7_SlipMedia_Upd(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), iAcDate, iBatchNo,
-				titaVo);
-		if (sendEbsOK) {
-			//	TxToDo回寫狀態
-			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-			tTxToDoDetailId.setCustNo(0);
-			tTxToDoDetailId.setFacmNo(0);
-			tTxToDoDetailId.setBormNo(0);
-			tTxToDoDetailId.setDtlValue(iBatchNo + "-" + parse.IntegerToString(iMediaSeq, 3));
-			tTxToDoDetailId.setItemCode("L7400");
-			txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
-		}
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void updateTxToDo(int iAcDate, int iBatchNo, int iMediaSeq, TitaVo titaVo) throws LogicException {
+		TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
+		tTxToDoDetailId.setCustNo(0);
+		tTxToDoDetailId.setFacmNo(0);
+		tTxToDoDetailId.setBormNo(0);
+		tTxToDoDetailId.setDtlValue(iAcDate + parse.IntegerToString(iBatchNo, 2) + parse.IntegerToString(iMediaSeq, 3));
+		tTxToDoDetailId.setItemCode("L7400");
+		txToDoCom.setTxBuffer(txBuffer);
+		txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 	}
 
 	private boolean doSummaryAndSendToEbs(TitaVo titaVo) throws LogicException {
@@ -243,11 +258,6 @@ public class L7400 extends TradeBuffer {
 		summaryTbl.put(summaryMap);
 
 		boolean sendEbsOK = ebsCom.sendSlipMediaToEbs(summaryTbl, journalTbl, titaVo);
-
-		if (!sendEbsOK) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", titaVo.getTxcd(),
-					titaVo.getTlrNo(), "總帳傳票資料傳輸,總帳系統回傳錯誤(" + ebsCom.getErrorMsg() + ")", titaVo);
-		}
 
 		drAmtTotal = BigDecimal.ZERO;
 		journalTbl = new JSONArray();

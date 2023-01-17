@@ -81,11 +81,11 @@ public class L5R05 extends TradeBuffer {
 //				L5r05IsMainFin=X,1
 		if (CustId != null && CustId.length() != 0) {
 			int CustNo = 0;
-			CustMain CustMainVO = sCustMainService.custIdFirst(CustId);
+			CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
 			if (CustMainVO != null) {
 				CustNo = CustMainVO.getCustNo();
 				int CaseSeq = 0;
-				NegMain NegMainVO = sNegMainService.custNoFirst(CustNo);
+				NegMain NegMainVO = sNegMainService.custNoFirst(CustNo, titaVo);
 				if (NegMainVO != null) {
 					CaseSeq = NegMainVO.getCaseSeq();
 					totaVo.putParam("L5r05CustId", CustId);
@@ -93,7 +93,7 @@ public class L5R05 extends TradeBuffer {
 					totaVo.putParam("L5r05CaseSeq", CaseSeq);
 					totaVo.putParam("L5r05IsMainFin", NegMainVO.getIsMainFin());
 
-					Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(CustNo, CaseSeq, this.index, this.limit);
+					Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(CustNo, CaseSeq, this.index, this.limit, titaVo);
 					List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
 
 //					List<NegFinShare> lNegFinShare=sNegFinShareService.findAll();

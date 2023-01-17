@@ -21,6 +21,8 @@ import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 //  -----------------------  應處理清單維護 ------------------ 
@@ -93,7 +95,7 @@ public class TxToDoCom extends TradeBuffer {
 	@Autowired
 	Parse parse;
 	@Autowired
-	MakeReport makeReport;	
+	MakeReport makeReport;
 
 	private TxToDoDetail tDetail = new TxToDoDetail();
 	private TxToDoDetailId tDetailId = new TxToDoDetailId();
@@ -345,15 +347,15 @@ public class TxToDoCom extends TradeBuffer {
 			if (tDetailId.getDtlValue() == null || tDetailId.getDtlValue().trim().length() == 0)
 				tDetailId.setDtlValue(" ");
 			tDetail = txToDoDetailService.holdById(tDetailId, titaVo);
-			if (tDetail == null)
+			if (tDetail == null) {
 				this.info("TxToDoCom ... updByDetailId notfound ");
-			else {
+			} else {
 				if (status == 2 && titaVo.isHcodeErase()) {
 					status = 0;
 				}
-				if (tDetail.getStatus() == status)
+				if (tDetail.getStatus() == status) {
 					this.info("TxToDoCom ... updByDetailId same status");
-				else {
+				} else {
 					tMain = txToDoMainService.holdById(tDetailId.getItemCode(), titaVo);
 					if (tMain == null)
 						throw new LogicException(titaVo, "E0006", "TxToDoMain Notfound" + tDetailId);
@@ -703,7 +705,8 @@ public class TxToDoCom extends TradeBuffer {
 //		
 // 3.處理功能 
 //   C-連結處理交易，執行交易處理後由TxToDoCom共用程式將明細檔狀態更改為已處理
-//   Y-有自動處理功能，由該執行交易程式將明細檔狀態更改為已處理
+//   Y-有連結勾選功能，由該執行交易程式將明細檔狀態更改為已處理
+//   I-有連結交易畫面按鈕，由該執行交易程式將明細檔狀態更改為已處理
 //   M-人工自行處理，執行交易不會變動明細檔狀態(訂定執行交易僅用於經辦權限判讀)
 		switch (itemCode) {
 //                            1    2 3 4 5 6 7     8     9     A B
@@ -798,7 +801,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "NOTI02;R;-;Y;-;-;     ;     ;L4454;-;銀扣二扣失敗明信片";
 			break;
 		case "L2880": // 個人房貸
-			settingValue = "L2880;R;-;Y;-;-;     ;     ;L2880;-;個人房貸調整作業";
+			settingValue = "L2880 ;R;-;Y;-;-;     ;     ;L2880;-;個人房貸調整作業";
 			break;
 		case "L2921":
 			settingValue = "L2921 ;-;M;-;-;-;L2921;     ;L2921;-;未齊件到期通知";
@@ -808,6 +811,9 @@ public class TxToDoCom extends TradeBuffer {
 			break;
 		case "AMLM":
 			settingValue = "AMLM  ;-;Y;-;-;-;L8082;L8082;L8101;Y;AML定審中、低風險處理";
+			break;
+		case "L7400": // 總帳傳票資料傳輸
+			settingValue = "L7400 ;-;I;-;-;-;L698A;L698A;L7400;Y;總帳傳票資料傳輸";
 			break;
 //		case "AMLL":
 //			settingValue = "AMLL  ;-;Y;-;-;-;L8083;L8083;L8101;Y;AML定審低風險處理";

@@ -81,8 +81,7 @@ public class L4604 extends TradeBuffer {
 //  　　貸:20210391 應付費用-待匯
 
 		// 已繳
-		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index,
-				this.limit);
+		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999,  0, Integer.MAX_VALUE,titaVo);
 		if (sInsuRenew != null) {
 			BigDecimal txAmt = BigDecimal.ZERO;
 			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
@@ -113,7 +112,7 @@ public class L4604 extends TradeBuffer {
 		}
 
 		// 未繳
-		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, this.index, this.limit);
+		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, 0, Integer.MAX_VALUE,titaVo);
 		int status = 0;
 		if (titaVo.isHcodeNormal()) {
 			status = 0;

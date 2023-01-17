@@ -126,7 +126,7 @@ public class L5601 extends TradeBuffer {
 			} else if (iFunctioncd.equals("2")) {
 				if (bCollTel != null) {
 					CollTel uCollTel = new CollTel();
-					uCollTel = iCollTelService.holdById(aCollTelId);
+					uCollTel = iCollTelService.holdById(aCollTelId, titaVo);
 					CollTel beforeCollTel = (CollTel) iDataLog.clone(uCollTel);
 					uCollTel.setTelDate(Integer.valueOf(titaVo.getParam("TelDate")));
 					uCollTel.setTelTime(titaVo.getParam("TelTime"));
@@ -154,7 +154,7 @@ public class L5601 extends TradeBuffer {
 						iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 					}
 					CollTel uCollTel = new CollTel();
-					uCollTel = iCollTelService.holdById(aCollTelId);
+					uCollTel = iCollTelService.holdById(aCollTelId, titaVo);
 					if (uCollTel != null) {
 						try {
 							iCollTelService.delete(aCollTel, titaVo);

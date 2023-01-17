@@ -107,7 +107,7 @@ public class L5605 extends TradeBuffer {
 			} else {
 				if (tCollRemind != null) {
 					CollRemind uCollRemind = new CollRemind();
-					uCollRemind = iCollRemindService.holdById(iCollRemindId);
+					uCollRemind = iCollRemindService.holdById(iCollRemindId, titaVo);
 					CollRemind beforeCollRemind = (CollRemind) iDataLog.clone(uCollRemind);
 					uCollRemind.setCondCode(titaVo.getParam("CondCode"));
 					uCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("RemindDate")));
@@ -116,7 +116,7 @@ public class L5605 extends TradeBuffer {
 					try {
 						iCollRemindService.update(uCollRemind, titaVo);
 						iDataLog.setEnv(titaVo, beforeCollRemind, uCollRemind);
-						iDataLog.exec("修改法催紀錄提醒事項檔");
+						iDataLog.exec("修改法催紀錄提醒事項檔");		
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
@@ -132,7 +132,7 @@ public class L5605 extends TradeBuffer {
 			CollList neCollList = iCollListService.findById(cCollListid, titaVo);
 			if (neCollList != null) {
 				try {
-					CollList upCollList = iCollListService.holdById(neCollList);
+					CollList upCollList = iCollListService.holdById(neCollList, titaVo);
 					upCollList.setTxCode("6"); // 上次作業項目
 					upCollList.setTxDate(Integer.valueOf(titaVo.getCalDy())); // 上次作業日期
 					iCollListService.update(upCollList, titaVo);

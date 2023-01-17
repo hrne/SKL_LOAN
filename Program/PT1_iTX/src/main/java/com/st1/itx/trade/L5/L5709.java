@@ -207,7 +207,7 @@ public class L5709 extends TradeBuffer {
 					for (NegAppr01 NegAppr01VO : lNegAppr01) {
 						NegAppr01Id NegAppr01IdVO = NegAppr01VO.getNegAppr01Id();
 
-						NegAppr01 NegAppr01UpdVO = sNegAppr01Service.holdById(NegAppr01IdVO);
+						NegAppr01 NegAppr01UpdVO = sNegAppr01Service.holdById(NegAppr01IdVO, titaVo);
 						if (NegAppr01UpdVO != null) {
 							BigDecimal ApprAmt = new BigDecimal(Detail[7]);// 撥付金額
 							BigDecimal Hund = new BigDecimal(100);// 撥付金額
@@ -237,7 +237,7 @@ public class L5709 extends TradeBuffer {
 							}
 
 							try {
-								sNegAppr01Service.update(NegAppr01UpdVO);
+								sNegAppr01Service.update(NegAppr01UpdVO, titaVo);
 							} catch (DBException e) {
 								throw new LogicException(titaVo, "E0007", "最大債權撥付資料檔");
 							}

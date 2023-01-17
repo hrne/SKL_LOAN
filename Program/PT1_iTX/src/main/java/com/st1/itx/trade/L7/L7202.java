@@ -80,9 +80,9 @@ public class L7202 extends TradeBuffer {
 
 				tIas39LGD.setDate(this.parse.stringToInteger(titaVo.getParam("Date" + i)));
 				tIas39LGD.setType(titaVo.getParam("Type" + i));
-				// tIas39LGD.setTypeDesc(titaVo.getParam("TypeDesc" + i)); 改使用下拉式選單
+				//tIas39LGD.setTypeDesc(titaVo.getParam("TypeDesc" + i)); 改使用下拉式選單
 				tIas39LGD.setLGDPercent(this.parse.stringToBigDecimal(titaVo.getParam("LGDPercent" + i)));
-				// tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
+				//tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
 
 				tIas39LGD.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tIas39LGD.setCreateEmpNo(titaVo.getTlrNo());
@@ -90,11 +90,12 @@ public class L7202 extends TradeBuffer {
 				tIas39LGD.setLastUpdateEmpNo(titaVo.getTlrNo());
 
 				try {
-					sIas39LGDService.insert(tIas39LGD);
+					sIas39LGDService.insert(tIas39LGD, titaVo);
 				} catch (DBException e) {
 					if (e.getErrorId() == 2) {
-						throw new LogicException(titaVo, "E0002", "生效日期=" + titaVo.getParam("Date" + i) + ",類別=" + titaVo.getParam("Type" + i)); // E0002
-																																					// 新增資料已存在(XXX)
+						throw new LogicException(titaVo, "E0002",
+								"生效日期=" + titaVo.getParam("Date" + i) + ",類別=" + titaVo.getParam("Type" + i)); // E0002
+																												// 新增資料已存在(XXX)
 					} else {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
@@ -117,24 +118,25 @@ public class L7202 extends TradeBuffer {
 				}
 
 				Ias39LGD tIas39LGD = new Ias39LGD();
-				tIas39LGD = sIas39LGDService.holdById(new Ias39LGDId(iDate, iType));
+				tIas39LGD = sIas39LGDService.holdById(new Ias39LGDId(iDate, iType), titaVo);
 
 				if (tIas39LGD == null) {
-					throw new LogicException(titaVo, "E0003", "生效日期=" + titaVo.getParam("Date" + i) + ",類別=" + titaVo.getParam("Type" + i)); // E0003
-																																				// 修改資料不存在(XXX)
+					throw new LogicException(titaVo, "E0003",
+							"生效日期=" + titaVo.getParam("Date" + i) + ",類別=" + titaVo.getParam("Type" + i)); // E0003
+																											// 修改資料不存在(XXX)
 				}
 
 				Ias39LGD tIas39LGD2 = (Ias39LGD) dataLog.clone(tIas39LGD); ////
 
 				tIas39LGD.setDate(this.parse.stringToInteger(titaVo.getParam("Date" + i)));
 				tIas39LGD.setType(titaVo.getParam("Type" + i));
-				// tIas39LGD.setTypeDesc(titaVo.getParam("TypeDesc" + i));
+				//tIas39LGD.setTypeDesc(titaVo.getParam("TypeDesc" + i));
 				tIas39LGD.setLGDPercent(this.parse.stringToBigDecimal(titaVo.getParam("LGDPercent" + i)));
-				// tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
+				//tIas39LGD.setEnable(titaVo.getParam("Enable" + i));
 				tIas39LGD.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tIas39LGD.setLastUpdateEmpNo(titaVo.getTlrNo());
 				try {
-					tIas39LGD = sIas39LGDService.update2(tIas39LGD); ////
+					tIas39LGD = sIas39LGDService.update2(tIas39LGD, titaVo); ////
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
@@ -142,7 +144,7 @@ public class L7202 extends TradeBuffer {
 				dataLog.exec("修改違約損失率檔"); ////
 			}
 
-		} else if (!(funcd.equals("5"))) {
+		}  else if (!(funcd.equals("5"))) {
 			throw new LogicException(titaVo, "E0010", "L7202"); // 功能選擇錯誤
 		}
 

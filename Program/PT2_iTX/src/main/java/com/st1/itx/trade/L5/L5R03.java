@@ -70,7 +70,7 @@ public class L5R03 extends TradeBuffer {
 		this.info("L5R03 NegTransIdVO AcDate=[" + AcDate + "],TitaTlrNo=[" + RimTitaTlrNo + "],TitaTxtNo=[" + RimTitaTxtNo + "]");
 
 		NegTrans NegTransVO = new NegTrans();
-		NegTransVO = sNegTransService.findById(NegTransIdVO);
+		NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
 		if (NegTransVO != null) {
 			// 2.得到Main的資料
 			// 3.單筆試算

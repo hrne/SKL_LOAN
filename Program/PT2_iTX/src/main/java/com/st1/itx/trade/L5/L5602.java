@@ -111,7 +111,7 @@ public class L5602 extends TradeBuffer {
 			if (iFuntionCd.equals("2")) {
 				if (tCollMeet != null) {
 					CollMeet uCollMeet = new CollMeet();
-					uCollMeet = iCollMeetService.holdById(iCollMeetId);
+					uCollMeet = iCollMeetService.holdById(iCollMeetId, titaVo);
 					CollMeet beforeCollMeetr = (CollMeet) iDataLog.clone(uCollMeet);
 					uCollMeet.setMeetDate(Integer.valueOf(titaVo.getParam("MeetDate")));
 					uCollMeet.setMeetTime(titaVo.getParam("MeetTime"));
@@ -139,7 +139,7 @@ public class L5602 extends TradeBuffer {
 						iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 					}
 					CollMeet uCollMeet = new CollMeet();
-					uCollMeet = iCollMeetService.holdById(iCollMeetId);
+					uCollMeet = iCollMeetService.holdById(iCollMeetId, titaVo);
 					if (uCollMeet != null) {
 						try {
 							iCollMeetService.delete(uCollMeet, titaVo);

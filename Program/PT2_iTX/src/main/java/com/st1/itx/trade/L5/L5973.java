@@ -89,7 +89,7 @@ public class L5973 extends TradeBuffer {
 
 		int iCustNo = 0;
 		if (CustId != null && CustId.length() != 0) {
-			CustMain CustMainVO = sCustMainService.custIdFirst(CustId);
+			CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
 			if (CustMainVO != null) {
 				iCustNo = CustMainVO.getCustNo();
 			}

@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.JobMainService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
@@ -43,6 +47,8 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	JobMainService sJobMainService;
+	@Autowired
+	AcCloseService sAcCloseService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -96,6 +102,20 @@ public class DailyCopy extends BatchBase implements Tasklet, InitializingBean {
 			this.info("DailyCopy 月報環境複製完成");
 		}
 
+		AcClose tAcClose = new AcClose();
+		AcCloseId tAcCloseId = new AcCloseId();
+
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("09"); // 業務類別: 09-放款
+		tAcClose = sAcCloseService.holdById(tAcCloseId);
+		tAcClose.setClsFg(4); // 4:夜間批次執行完畢
+
+		try {
+			sAcCloseService.update(tAcClose);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "更新關帳狀態(09:放款)"); // 更新資料時，發生錯誤
+		}
 		this.info("DailyCopy exit.");
 	}
 

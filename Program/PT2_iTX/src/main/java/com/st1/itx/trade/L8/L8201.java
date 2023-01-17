@@ -67,7 +67,7 @@ public class L8201 extends TradeBuffer {
 		case 1: // 新增
 			moveMlaundryParas(tMlaundryParas, iFuncCode, titaVo);
 			try {
-				sMlaundryParasService.insert(tMlaundryParas);
+				sMlaundryParasService.insert(tMlaundryParas, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", iBusinessType); // 新增資料已存在
@@ -77,7 +77,7 @@ public class L8201 extends TradeBuffer {
 			}
 			break;
 		case 2: // 修改
-			tMlaundryParas = sMlaundryParasService.holdById(iBusinessType);
+			tMlaundryParas = sMlaundryParasService.holdById(iBusinessType, titaVo);
 			if (tMlaundryParas == null) {
 				throw new LogicException(titaVo, "E0003", iBusinessType); // 修改資料不存在
 			}
@@ -91,7 +91,7 @@ public class L8201 extends TradeBuffer {
 			MlaundryParas tMlaundryParas2 = (MlaundryParas) dataLog.clone(tMlaundryParas); ////
 			try {
 				moveMlaundryParas(tMlaundryParas, iFuncCode, titaVo);
-				tMlaundryParas = sMlaundryParasService.update2(tMlaundryParas);
+				tMlaundryParas = sMlaundryParasService.update2(tMlaundryParas, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
@@ -100,10 +100,10 @@ public class L8201 extends TradeBuffer {
 
 			break;
 		case 4: // 刪除
-			tMlaundryParas = sMlaundryParasService.holdById(iBusinessType);
+			tMlaundryParas = sMlaundryParasService.holdById(iBusinessType, titaVo);
 			if (tMlaundryParas != null) {
 				try {
-					sMlaundryParasService.delete(tMlaundryParas);
+					sMlaundryParasService.delete(tMlaundryParas, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}

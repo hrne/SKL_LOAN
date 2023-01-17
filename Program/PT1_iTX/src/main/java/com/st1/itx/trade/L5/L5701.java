@@ -201,7 +201,7 @@ public class L5701 extends TradeBuffer {
 		NegMainId.setCaseSeq(IntCaseSeq);
 
 		NegMain InputNegMain = InputNegMain(NegMainId);// 畫面上的資料
-		NegMain NegMainVO = sNegMainService.findById(NegMainId);
+		NegMain NegMainVO = sNegMainService.findById(NegMainId, titaVo);
 		if (NegMainVO != null) {// 修改內容使用InputNegMain時須補畫面上與程式內沒有更新的欄位
 			if (("02").equals(FunctionCode) || ("10").equals(FunctionCode)) {
 				InputNegMain.setAccuTempAmt(NegMainVO.getAccuTempAmt());
@@ -287,8 +287,8 @@ public class L5701 extends TradeBuffer {
 				}
 				
 				try {
-					sNegMainService.holdById(NegMainId);
-					sNegMainService.delete(NegMainVO);
+					sNegMainService.holdById(NegMainId, titaVo);
+					sNegMainService.delete(NegMainVO, titaVo);
 				} catch (DBException e) {
 					// E0008 刪除資料時，發生錯誤
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
@@ -505,7 +505,7 @@ public class L5701 extends TradeBuffer {
 			throw new LogicException(titaVo, "", "發生未預期的錯誤");
 		}
 		InputNegMain.setNegMainId(NegMainIdVO);
-		NegMain NegMainVO = sNegMainService.findById(NegMainIdVO);
+		NegMain NegMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
 
 		BigDecimal cPrincipalBal = BigDecimal.ZERO;
 
@@ -536,7 +536,7 @@ public class L5701 extends TradeBuffer {
 
 		if (NegMainVO != null) {
 			// UPDATE
-			NegMain sNegMsain = sNegMainService.holdById(NegMainVO.getNegMainId());
+			NegMain sNegMsain = sNegMainService.holdById(NegMainVO.getNegMainId(), titaVo);
 
 			if (InputNegMain.getDeferYMStart() > 0) {// 設定喘息期一併異動下次繳款日與還款結束日
 				if (sNegMsain.getDeferYMStart() != InputNegMain.getDeferYMStart() || sNegMsain.getDeferYMEnd() != InputNegMain.getDeferYMEnd()) {
@@ -591,7 +591,7 @@ public class L5701 extends TradeBuffer {
 
 			NegMain beforeNegMain = (NegMain) iDataLog.clone(sNegMsain);
 			try {
-				sNegMsain = sNegMainService.update(InputNegMain);
+				sNegMsain = sNegMainService.update(InputNegMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
@@ -612,7 +612,7 @@ public class L5701 extends TradeBuffer {
 
 			try {
 				this.info("InputNegMain==" + InputNegMain);
-				sNegMainService.insert(InputNegMain);
+				sNegMainService.insert(InputNegMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
@@ -626,7 +626,7 @@ public class L5701 extends TradeBuffer {
 
 		if (lNegFinShare != null && lNegFinShare.size() != 0) {
 			try {
-				sNegFinShareService.deleteAll(lNegFinShare);
+				sNegFinShareService.deleteAll(lNegFinShare, titaVo);
 			} catch (DBException e) {
 				// E0008 刪除資料時，發生錯誤
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
@@ -641,7 +641,7 @@ public class L5701 extends TradeBuffer {
 
 		if (lNegFinShareLog != null && lNegFinShareLog.size() != 0) {
 			try {
-				sNegFinShareLogService.deleteAll(lNegFinShareLog);
+				sNegFinShareLogService.deleteAll(lNegFinShareLog, titaVo);
 			} catch (DBException e) {
 				// E0008 刪除資料時，發生錯誤
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
@@ -679,14 +679,14 @@ public class L5701 extends TradeBuffer {
 				NegFinShare.setCancelDate(parse.stringToInteger(NegFinShareCancelDate[i]));
 				NegFinShare.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 
-				NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareId);
+				NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareId, titaVo);
 				if (NegFinShareVO != null) {
 					// UPDATE
 					try {
-						sNegFinShareService.holdById(NegFinShareVO.getNegFinShareId());
+						sNegFinShareService.holdById(NegFinShareVO.getNegFinShareId(), titaVo);
 						NegFinShare.setCreateDate(NegFinShareVO.getCreateDate());
 						NegFinShare.setCreateEmpNo(NegFinShareVO.getCreateEmpNo());
-						sNegFinShareService.update(NegFinShare);
+						sNegFinShareService.update(NegFinShare, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
@@ -694,7 +694,7 @@ public class L5701 extends TradeBuffer {
 					// throw new LogicException(titaVo, "XXXXX", "查無資料");
 					// INSERT
 					try {
-						sNegFinShareService.insert(NegFinShare);
+						sNegFinShareService.insert(NegFinShare, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 					}
@@ -740,7 +740,7 @@ public class L5701 extends TradeBuffer {
 				NegFinShareLog.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 
 				try {
-					sNegFinShareLogService.insert(NegFinShareLog);
+					sNegFinShareLogService.insert(NegFinShareLog, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 

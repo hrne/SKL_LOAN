@@ -39,7 +39,6 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6101]                                 業務關帳作業"],
-["#FdItemCode+作業項目",#ItemCode,#ItemCodeX],
 ["#FdSecNo+業務類別",#SecNo,#SecNoX],
 ["#FdClsFg+關帳狀態",#ClsFg,#ClsFgX],
 ["#FdBatNo+業務批號",#BatNo],
@@ -72,8 +71,6 @@ T(3,CdCode.SecNo)
                                         
 #SecNoHelp=x,100,S
 
-#ItemCodeHelp=x,1024,S
-T(3,0:業務關帳作業;1:總帳傳票檔傳送作業)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -85,8 +82,6 @@ T(2,@SecNoHelp,#HelpDesc2)
 T(2,@ClsFg1Help,0:開帳;+#HelpDesc1)
 
 ! 必輸欄位
-#FdItemCode=X,2,L
-T(3,*)
 #FdSecNo=X,2,L
 T(3,*)
 #FdClsFg=X,2,L
@@ -94,25 +89,15 @@ T(3,*)
 #FdBatNo=X,2,L
 #FdCoreSeqNo=X,2,L
 
+#sysDateD7=D,7,S
+E(0,#SYSDATE)
 ! 顯示框線
 #WKTF=X,1,S
 T(F,@SecNo,1)T(F,@ClsFg,1)T(F,@BatNo,0)T(F,@CoreSeqNo,0))
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-!作業項目
-#ItemCode=X,1,I
-HELP(#ItemCodeHelp)
-@V(7)
-V(H,#ItemCodeHelp)
 
-#ItemCodeX=X,20,L
-T(3,)
-T(H,#ItemCode,#ItemCodeHelp)
-
-#CheckItemCode=X,1,S
-IF(#ItemCode==0,INVOKEJS(SHOW,p1,3,5,1),$)
-IF(#ItemCode==1,INVOKEJS(SHOW,p1,3,5,0),$)
 
 !業務類別
 #SecNo=X,2,I
@@ -124,7 +109,6 @@ V(H,#SecNoHelp)
 T(H,#SecNo,#SecNoHelp)
 
 #SendL6R27=X,1,S
-IF(#ItemCode==1,S,$)
 T(2,@RimSecNo,#SecNo)
 RESET_RIM(#SendL6R27,L6R27)
 S(L6R27,1,#RimSecNo)
@@ -136,7 +120,6 @@ E(0,@CoreSeqNo,#L6R27CoreSeqNo)
 
 !關帳狀態   !02支票繳款不可選[開帳]，限選[關帳]及[關帳取消)
 #ClsFg=A,1,I
-IF(#ItemCode==1,S,$)
 C(3,#SecNo,2,HELP(#ClsFgHelp)
             ,HELP(#ClsFg1Help))
 @T(3,@ClsFgX,)
@@ -148,7 +131,6 @@ T(H,#ClsFg,#ClsFg1Help)
 
 !業務批號 !若開帳,則＋１
 #BatNo=A,2,L
-IF(#ItemCode==1,S,$)
 C(3,#ClsFg,0,E(0,#L6R27BatNo+1),E(0,#L6R27BatNo))
 
 !業務關帳次數 未用畫面拿掉
@@ -156,7 +138,6 @@ C(3,#ClsFg,0,E(0,#L6R27BatNo+1),E(0,#L6R27BatNo))
 
 !上傳核心序號 ! 02支票繳款/09放款 關帳時＋１ , 上傳核心序號都是更新在 09 那筆
 #CoreSeqNo=A,3,L
-IF(#ItemCode==1,S,$)
 C(3,#SecNo,9,$,S))
 @C(3,#ClsFg,1,E(0,#L6R27CoreSeqNo+1),S))
 
@@ -187,6 +168,14 @@ E(0,0)
 
 #SCRTIL=_,_,S
 T(3,[L6101] 業務關帳作業)
+
+#BUF1=X,12,S
+T(2,#sysDateD7+#BatNo+#CoreSeqNo)
+
+#button=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L7400; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
+C(3,#ClsFg,1,K(MODIFYBUTTON,1,總帳傳票資料傳輸),$)
+
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
@@ -223,7 +212,6 @@ T(3,1)ASGN(LOOP$)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#ItemCode
 #SecNo
 #ClsFg
 #BatNo

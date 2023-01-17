@@ -19,7 +19,8 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.common.SendRsp;
 
 /**
- * Tita FuncCode=9,1 BusinessType=X,2 JcicEmpName=x,8 JcicEmpTel=x,16 END=X,1
+ * Tita FuncCode=9,1 BusinessType=X,2 
+ * JcicEmpName=x,8 JcicEmpTel=x,16  END=X,1
  */
 
 @Service("L8501")
@@ -52,6 +53,7 @@ public class L8501 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iBusinessType = titaVo.getParam("BusinessType");
+		int iJcicKind = this.parse.stringToInteger(titaVo.getParam("JcicKind"));
 		this.info("L8501 iBusinessType : " + iBusinessType);
 
 		// 檢查輸入資料
@@ -64,19 +66,19 @@ public class L8501 extends TradeBuffer {
 		SystemParas tSystemParas = new SystemParas();
 		switch (iFuncCode) {
 		case 2: // 修改
-			tSystemParas = sSystemParasService.holdById(iBusinessType);
+			tSystemParas = sSystemParasService.holdById(iBusinessType, titaVo);
 			if (tSystemParas == null) {
 				throw new LogicException(titaVo, "E0003", iBusinessType); // 修改資料不存在
 			}
 			SystemParas tSystemParas2 = (SystemParas) dataLog.clone(tSystemParas); ////
+			moveSystemParas(tSystemParas, iFuncCode, iJcicKind, titaVo);
 			try {
-				moveSystemParas(tSystemParas, iFuncCode, titaVo);
 				tSystemParas = sSystemParasService.update2(tSystemParas, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
 			dataLog.setEnv(titaVo, tSystemParas2, tSystemParas); ////
-			dataLog.exec("修改系統變數級參數設定值-JCIC放款報送人員維護"); ////
+			dataLog.exec("修改系統變數級參數設定值-JCIC報送人員維護"); ////
 			break;
 
 		}
@@ -85,12 +87,24 @@ public class L8501 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveSystemParas(SystemParas mSystemParas, int mFuncCode, TitaVo titaVo) throws LogicException {
+	private void moveSystemParas(SystemParas mSystemParas, int mFuncCode,int iJcicKind, TitaVo titaVo) throws LogicException {
 
-		mSystemParas.setJcicEmpName(titaVo.getParam("JcicEmpName"));
-		mSystemParas.setJcicEmpTel(titaVo.getParam("JcicEmpTel"));
-
-		mSystemParas.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-		mSystemParas.setLastUpdateEmpNo(titaVo.getTlrNo());
+		if (iJcicKind == 1) {// 放款
+			mSystemParas.setJcicEmpName(titaVo.getParam("JcicEmpName"));
+			mSystemParas.setJcicEmpTel(titaVo.getParam("JcicEmpTel"));
+		}
+		if (iJcicKind == 2) {// 債協
+			mSystemParas.setJcicZDep(titaVo.getParam("JcicZDep"));
+			mSystemParas.setJcicZName(titaVo.getParam("JcicZName"));
+			mSystemParas.setJcicZTel(titaVo.getParam("JcicZTel"));
+		}
+		if (iJcicKind == 3) {// MUI
+			mSystemParas.setJcicMU1Dep(titaVo.getParam("JcicMU1Dep"));
+			mSystemParas.setJcicMU1Name(titaVo.getParam("JcicMU1Name"));
+			mSystemParas.setJcicMU1Tel(titaVo.getParam("JcicMU1Tel"));
+		}
+		
+		//mSystemParas.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		//mSystemParas.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 }

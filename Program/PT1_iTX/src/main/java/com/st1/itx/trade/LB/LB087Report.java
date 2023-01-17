@@ -126,12 +126,12 @@ public class LB087Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		String sfileNo2 = titaVo.getParam("FileNo");
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
-			sfileNo2 = "01";
+			sfileNo2 = "01"; 
 		}
 
 		// 查詢系統參數設定檔-JCIC放款報送人員資料
@@ -144,12 +144,12 @@ public class LB087Report extends MakeReport {
 			jcicEmpName = tSystemParas.getJcicEmpName();
 			jcicEmpTel = tSystemParas.getJcicEmpTel();
 			if (jcicEmpName == null || jcicEmpTel == null) {
-				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC放款報送人員資料");
+				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC報送人員資料");
 			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
 		}
-
+		
 		String txt = "";
 		String txt1[] = txt.split(";");
 
@@ -157,10 +157,12 @@ public class LB087Report extends MakeReport {
 			String strContent = "";
 
 			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".087"; // 458+月日+序號.087
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔",
+					strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B087-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2 + StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
+			strContent = "JCIC-DAT-B087-V01-458" + StringUtils.repeat(" ", 5) + strToday + sfileNo2
+					+ StringUtils.repeat(" ", 10) + makeFile.fillStringR(jcicEmpTel, 16, ' ')
 					+ makeFile.fillStringR("審查單位聯絡人－" + jcicEmpName, 89, ' ');
 			makeFile.put(strContent);
 
@@ -190,7 +192,8 @@ public class LB087Report extends MakeReport {
 			}
 
 			// 末筆
-			strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 6, '0') + StringUtils.repeat(" ", 137);
+			strContent = "TRLR" + StringUtils.repeat(" ", 3) + makeFile.fillStringL(String.valueOf(listCount), 6, '0')
+					+ StringUtils.repeat(" ", 137);
 			makeFile.put(strContent);
 
 			makeFile.close();
@@ -212,7 +215,7 @@ public class LB087Report extends MakeReport {
 			strTodayMM = strToday.substring(3, 5); // 月
 			strTodaydd = strToday.substring(5, 7); // 日
 		}
-		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));// 檔案序號
+		int ifileNo = Integer.parseInt(titaVo.getParam("FileNo"));//檔案序號
 		String sfileNo1 = String.valueOf(ifileNo);
 		if (ifileNo == 0) {
 			sfileNo1 = "1";
@@ -222,7 +225,8 @@ public class LB087Report extends MakeReport {
 		String txt = "";
 
 		// B087 帳號轉換資料檔
-		inf = "資料別(1~2),交易代碼(3),報送單位代號(4~6),註記對象統一編號(7~14),發生違約日(15~21),註記對象屬性(22),註記內容(23~120)," + "空白(103~122),授信戶IDN/BAN(123~132),空白(133~150)";
+		inf = "資料別(1~2),交易代碼(3),報送單位代號(4~6),註記對象統一編號(7~14),發生違約日(15~21),註記對象屬性(22),註記內容(23~120),"
+				+ "空白(103~122),授信戶IDN/BAN(123~132),空白(133~150)";
 		txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9";
 
 		String txt1[] = txt.split(";");
@@ -232,7 +236,8 @@ public class LB087Report extends MakeReport {
 			String strFileName = "458" + strTodayMM + strTodaydd + sfileNo1 + ".087.CSV"; // 458+月日+序號+.087.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔", strFileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔",
+					strFileName, 2);
 
 			// 標題列
 			strContent = inf;

@@ -100,10 +100,10 @@ public class L5R01 extends TradeBuffer {
 				if (iCustNo == 0 && iCaseSeq == 0) {
 					// E0001 查詢資料不存在
 					// throw new LogicException(titaVo, "E0001", "查無資料");
-					CustMain CustMainVO = sCustMainService.custIdFirst(CustId);
+					CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
 					if (CustMainVO != null) {
 						iCustNo = CustMainVO.getCustNo();
-						NegMain NegMainVO = sNegMainService.custNoFirst(iCustNo);
+						NegMain NegMainVO = sNegMainService.custNoFirst(iCustNo, titaVo);
 						if (NegMainVO != null) {
 							iCaseSeq = NegMainVO.getCaseSeq();
 						}
@@ -123,7 +123,7 @@ public class L5R01 extends TradeBuffer {
 		NegMainIdVO.setCaseSeq(iCaseSeq);
 
 		NegMain NegMainVO = new NegMain();
-		NegMainVO = sNegMainService.findById(NegMainIdVO);
+		NegMainVO = sNegMainService.findById(NegMainIdVO, titaVo);
 		if (NegMainVO != null) {
 			totaVo.putParam("L5r01CustId", CustId);//
 			totaVo.putParam("L5r01CustNo", NegMainVO.getCustNo());//
@@ -164,7 +164,7 @@ public class L5R01 extends TradeBuffer {
 		}
 
 		// 丟TRANS檔案
-		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(iCustNo, iCaseSeq, this.index, this.limit);
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(iCustNo, iCaseSeq, this.index, this.limit, titaVo);
 		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
 		int lNegFinShareS = 0;
 		if (lNegFinShare != null && lNegFinShare.size() != 0) {

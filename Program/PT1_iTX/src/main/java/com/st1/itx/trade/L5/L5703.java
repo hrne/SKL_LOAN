@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.NegAppr01;
+import com.st1.itx.db.domain.NegAppr01Id;
 /* DB容器 */
 import com.st1.itx.db.domain.NegFinAcct;
 import com.st1.itx.db.domain.NegFinShare;
@@ -95,7 +97,7 @@ public class L5703 extends TradeBuffer {
 		switch (FunCode) {
 
 		case "1":
-			NegFinAcctVO = sNegFinAcctService.findById(FinCode);
+			NegFinAcctVO = sNegFinAcctService.findById(FinCode, titaVo);
 
 			if (NegFinAcctVO != null) {
 				throw new LogicException(titaVo, "E0002", "債務協商債權機構帳戶檔");
@@ -115,7 +117,7 @@ public class L5703 extends TradeBuffer {
 			tNegFinAcct.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tNegFinAcct.setLastUpdateEmpNo(titaVo.get("TlrNo"));
 			try {
-				sNegFinAcctService.insert(tNegFinAcct);
+				sNegFinAcctService.insert(tNegFinAcct, titaVo);
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				// E0005 新增資料時，發生錯誤
@@ -126,7 +128,7 @@ public class L5703 extends TradeBuffer {
 
 		case "2":
 
-			NegFinAcctVO = sNegFinAcctService.holdById(FinCode);
+			NegFinAcctVO = sNegFinAcctService.holdById(FinCode, titaVo);
 
 			if (NegFinAcctVO == null) {
 				throw new LogicException(titaVo, "E0003", "債務協商債權機構帳戶檔");
@@ -143,7 +145,7 @@ public class L5703 extends TradeBuffer {
 			//NegFinAcctVO.setLastUpdateEmpNo(titaVo.get("TlrNo"));
 
 			try {
-				sNegFinAcctService.update(NegFinAcctVO);
+				sNegFinAcctService.update(NegFinAcctVO, titaVo);
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				// E0007 更新資料時，發生錯誤
@@ -157,7 +159,7 @@ public class L5703 extends TradeBuffer {
 
 		case "4":
 
-			NegFinAcctVO = sNegFinAcctService.holdById(FinCode);
+			NegFinAcctVO = sNegFinAcctService.holdById(FinCode, titaVo);
 
 			if (NegFinAcctVO == null) {
 				throw new LogicException(titaVo, "E0004", "債務協商債權機構帳戶檔");
@@ -166,7 +168,7 @@ public class L5703 extends TradeBuffer {
 			chkstatus(FinCode, titaVo);
 			
 			try {
-				sNegFinAcctService.delete(NegFinAcctVO);
+				sNegFinAcctService.delete(NegFinAcctVO, titaVo);
 			} catch (DBException e) {
 				// TODO Auto-generated catch block
 				// E0008 刪除資料時，發生錯誤
@@ -201,7 +203,7 @@ public class L5703 extends TradeBuffer {
 			NegFinShareId.setCustNo(tNegMain.getCustNo());
 			NegFinShareId.setFinCode(FinCode);
 			NegFinShare.setNegFinShareId(NegFinShareId);
-			NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareId);
+			NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareId, titaVo);
 			if (NegFinShareVO != null) {
 				throw new LogicException(titaVo, "E5009", "尚有債協主檔戶況正常之資料,不可刪除");
 			}
@@ -272,7 +274,7 @@ public class L5703 extends TradeBuffer {
 					tNegAppr01.setRemitBank(tRemitBank);
 					tNegAppr01.setRemitAcct(tRemitAcct);
 					try {
-						tNegAppr01 = sNegAppr01Service.update(tNegAppr01);
+						tNegAppr01 = sNegAppr01Service.update(tNegAppr01, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "最大債權撥付資料檔");
 					}

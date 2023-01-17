@@ -146,7 +146,7 @@ public class L5971 extends TradeBuffer {
 				NegMainId.setCustNo(parse.stringToInteger(String.valueOf(NegTransCustNo)));
 
 				NegMain NegMainVO = new NegMain();
-				NegMainVO = sNegMainService.findById(NegMainId);
+				NegMainVO = sNegMainService.findById(NegMainId, titaVo);
 				String NegMainCaseKindCode = "";// 案件種類
 				BigDecimal NegMainPrincipalBal = new BigDecimal(0);// 總本金餘額
 				BigDecimal NegMainAccuOverAmt = new BigDecimal(0);// 累溢收金額

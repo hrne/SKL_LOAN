@@ -125,7 +125,7 @@ public class L5972 extends TradeBuffer {
 				}
 				this.info("L5972 FunctionCode IS Null iDateFrom=[" + iDateFrom + "],iDateTo=[" + iDateTo + "]");
 				if (CustId != null && CustId.length() != 0) {
-					CustMain CustMainVO = sCustMainService.custIdFirst(CustId);
+					CustMain CustMainVO = sCustMainService.custIdFirst(CustId, titaVo);
 					if (CustMainVO != null) {
 						iCustNo = CustMainVO.getCustNo();
 					} else {
@@ -163,7 +163,7 @@ public class L5972 extends TradeBuffer {
 				NegTransIdVO.setTitaTlrNo(TitaTlrNo);
 				NegTransIdVO.setTitaTxtNo(parse.stringToInteger(TitaTxtNo));
 
-				NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO);
+				NegTrans NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
 				if (NegTransVO != null) {
 					lNegTrans.add(NegTransVO);
 				}

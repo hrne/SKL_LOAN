@@ -111,7 +111,7 @@ public class L5103 extends TradeBuffer {
 					tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 					tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-					tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
+					tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
 
 					if (tInnDocRecord != null) {
 						tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
@@ -122,13 +122,16 @@ public class L5103 extends TradeBuffer {
 							tInnDocRecord.setReturnEmpNo(rEmpNo);
 						}
 						try {
-							innDocRecordService.update(tInnDocRecord);
+							innDocRecordService.update(tInnDocRecord, titaVo);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", "L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+							throw new LogicException(titaVo, "E0007",
+									"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
 						}
 //						清償歸檔需更新清償作業檔的銷號欄
 						if ("2".equals(applCode) && "01".equals(usageCode)) {
-							FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(parse.stringToInteger(titaVo.getParam("CustNo")), parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
+							FacClose mFacClose = facCloseService.findFacmNoMaxCloseNoFirst(
+									parse.stringToInteger(titaVo.getParam("CustNo")),
+									parse.stringToInteger(titaVo.getParam("FacmNo")), titaVo);
 							if (mFacClose != null) {
 								FacClose tFacClose = facCloseService.holdById(mFacClose, titaVo);
 
@@ -140,7 +143,8 @@ public class L5103 extends TradeBuffer {
 								try {
 									facCloseService.update(tFacClose, titaVo);
 								} catch (DBException e) {
-									throw new LogicException(titaVo, "E0007", "L5103 isHcodeNormal 2 update " + e.getErrorMsg());
+									throw new LogicException(titaVo, "E0007",
+											"L5103 isHcodeNormal 2 update " + e.getErrorMsg());
 								}
 							}
 						}
@@ -156,13 +160,13 @@ public class L5103 extends TradeBuffer {
 					tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 					tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-					tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
+					tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
 
 					if (tInnDocRecord != null) {
 						tInnDocRecord.setTitaActFg("1");
 
 						try {
-							innDocRecordService.update(tInnDocRecord);
+							innDocRecordService.update(tInnDocRecord, titaVo);
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "L5103 isHcodeErase 2 update " + e.getErrorMsg());
 						}
@@ -179,7 +183,7 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-			tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
+			tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
 
 			if (tInnDocRecord == null) {
 				throw new LogicException(titaVo, "E0003", "L5103 isHcodeErase 3");
@@ -195,7 +199,7 @@ public class L5103 extends TradeBuffer {
 					tInnDocRecord.setReturnEmpNo("");
 				}
 				try {
-					innDocRecordService.update(tInnDocRecord);
+					innDocRecordService.update(tInnDocRecord, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 isHcodeErase 3 update " + e.getErrorMsg());
 				}
@@ -214,7 +218,7 @@ public class L5103 extends TradeBuffer {
 					tInnDocRecord.setReturnEmpNo(rEmpNo);
 				}
 				try {
-					innDocRecordService.update(tInnDocRecord);
+					innDocRecordService.update(tInnDocRecord, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 isHcodeErase 3 update " + e.getErrorMsg());
 				}
@@ -227,7 +231,7 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 			tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-			tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
+			tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
 
 			if (tInnDocRecord == null) {
 				throw new LogicException(titaVo, "E0001", "L5103 isHcodeErase 4 ");
@@ -237,7 +241,7 @@ public class L5103 extends TradeBuffer {
 
 				tInnDocRecord.setTitaActFg("3");
 				try {
-					innDocRecordService.update(tInnDocRecord);
+					innDocRecordService.update(tInnDocRecord, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 InnDocRecord update " + e.getErrorMsg());
 				}
@@ -246,7 +250,7 @@ public class L5103 extends TradeBuffer {
 
 				tInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
 				try {
-					innDocRecordService.update(tInnDocRecord);
+					innDocRecordService.update(tInnDocRecord, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", "L5103 InnDocRecord update " + e.getErrorMsg());
 				}
@@ -286,7 +290,7 @@ public class L5103 extends TradeBuffer {
 			nInnDocRecord.setFacmNoMemo(titaVo.getParam("FacmNoMemo"));
 
 			try {
-				innDocRecordService.update(nInnDocRecord);
+				innDocRecordService.update(nInnDocRecord, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
 			}
@@ -343,7 +347,7 @@ public class L5103 extends TradeBuffer {
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
+		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
 
 		if (tInnDocRecord != null) {
 			tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
@@ -398,7 +402,7 @@ public class L5103 extends TradeBuffer {
 		tInnDocRecordId.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
 		tInnDocRecordId.setApplSeq(titaVo.getParam("ApplSeq"));
 
-		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId);
+		tInnDocRecord = innDocRecordService.holdById(tInnDocRecordId, titaVo);
 
 		if (tInnDocRecord != null) {
 			if (("1").equals(tInnDocRecord.getApplCode())) {// 申請登錄時才可刪除

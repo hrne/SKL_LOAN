@@ -96,6 +96,7 @@ E(0,8),
 
 #checkautofg=X,1,S
 IF(#AutoFg=="Y",E(0,@RPTFG,7),$)
+! C(3,#SelectCode,9,IF(#AutoFg=="I",E(0,@RPTFG,9),$),$)
 
 
 
@@ -229,6 +230,14 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=#OOExcuteTxcd;ntxbuf=#OOBUF5})
 C(5,#OOExcuteTxcd,L1103,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=修改;ntxbuf=#OOBUFL1}),$)
 C(5,#OOExcuteTxcd,L3731,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=改呆帳結案戶;ntxbuf=#OOBUF5}),$)
 
+
+!L7400
+#OOBUF6=X,58,S
+T(2,#OODtlValue)
+
+!L7400
+#OOBTN6=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd; ntxcd=#OOExcuteTxcd;ntxbuf=#OOBUF6})
 
 
 </sub>
@@ -518,18 +527,14 @@ ifxBatch:{
 #RPTFG=8,QUERY.GRID
 #any={detail:true, caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
+#OOBTN6=
+{width:100,search:false,formatter:'cust:bind-button:總帳傳票資料傳輸;L7400 總帳傳票資料傳輸',align:'center',canExport:false}
+
 #OOStatus_LB=狀態
 {width:80,align:'center'}
 
-#OOCustNoX=戶號
-{width:150,align:'center'}
-
-#OOCustName=戶名
-{width:100,align:'left'}
-
 #OODtlValue=明細項目
 {width:300,align:'left'}
-
 
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
@@ -537,15 +542,10 @@ ifxBatch:{
 #OOAcDate=資料日期
 {width:80,align:'center'}
 
-#OOBTN5=
-{width:100,search:false,formatter:'cust:bind-button:#OOExcuteTxcd',align:'center',canExport:false}
-
-
 #OOTxSn=交易序號
 {width:160,align:'left'}
 
 ^
-
 
 <include src="PRT.icf::INQ01.sel" map="i=L698A;cpi=15"/>
 

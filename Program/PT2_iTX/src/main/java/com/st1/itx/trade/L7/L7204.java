@@ -69,9 +69,11 @@ public class L7204 extends TradeBuffer {
 		if (tFacMain == null) {
 			switch (funcd) {
 			case "1": // 若為新增，但額度資料不存在，拋錯
-				throw new LogicException("E0001", "額度主檔(戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ")");
+				throw new LogicException("E0001",
+						"額度主檔(戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ")");
 			case "2": // 若為修改，但額度資料不存在，拋錯
-				throw new LogicException("E0001", "額度主檔(戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ")");
+				throw new LogicException("E0001",
+						"額度主檔(戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ")");
 			default:
 				break;
 			}
@@ -80,7 +82,8 @@ public class L7204 extends TradeBuffer {
 		// 新增
 		if (funcd.equals("1")) {
 
-			this.info("L7204 funcd 1 : " + titaVo.getParam("CustNo") + "-" + titaVo.getParam("FacmNo") + "-" + titaVo.getParam("MarkDate"));
+			this.info("L7204 funcd 1 : " + titaVo.getParam("CustNo") + "-" + titaVo.getParam("FacmNo") + "-"
+					+ titaVo.getParam("MarkDate"));
 
 			Ias39Loss tIas39Loss = new Ias39Loss();
 			Ias39LossId tIas39LossId = new Ias39LossId();
@@ -100,16 +103,19 @@ public class L7204 extends TradeBuffer {
 			tIas39Loss.setStartDate(this.parse.stringToInteger(titaVo.getParam("StartDate")));
 			tIas39Loss.setEndDate(this.parse.stringToInteger(titaVo.getParam("EndDate")));
 
-			tIas39Loss.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+			tIas39Loss.setCreateDate(
+					parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 			tIas39Loss.setCreateEmpNo(titaVo.getTlrNo());
-			tIas39Loss.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+			tIas39Loss.setLastUpdate(
+					parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 			tIas39Loss.setLastUpdateEmpNo(titaVo.getTlrNo());
 
 			try {
-				sIas39LossService.insert(tIas39Loss);
+				sIas39LossService.insert(tIas39Loss, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", "戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ",發生日期=" + titaVo.getParam("MarkDate")); // 新增資料已存在
+					throw new LogicException(titaVo, "E0002", "戶號=" + titaVo.getParam("CustNo") + ",額度="
+							+ titaVo.getParam("FacmNo") + ",發生日期=" + titaVo.getParam("MarkDate")); // 新增資料已存在
 				} else {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 				}
@@ -122,13 +128,15 @@ public class L7204 extends TradeBuffer {
 			iMarkDate = this.parse.stringToInteger(titaVo.getParam("MarkDate"));
 			iMarkDate = iMarkDate + 19110000;
 
-			this.info("L7204 funcd 2 : " + titaVo.getParam("CustNo") + "-" + titaVo.getParam("FacmNo") + "-" + titaVo.getParam("MarkDate"));
+			this.info("L7204 funcd 2 : " + titaVo.getParam("CustNo") + "-" + titaVo.getParam("FacmNo") + "-"
+					+ titaVo.getParam("MarkDate"));
 
 			Ias39Loss tIas39Loss = new Ias39Loss();
-			tIas39Loss = sIas39LossService.holdById(new Ias39LossId(iCustNo, iFacmNo, iMarkDate));
+			tIas39Loss = sIas39LossService.holdById(new Ias39LossId(iCustNo, iFacmNo, iMarkDate), titaVo);
 
 			if (tIas39Loss == null) {
-				throw new LogicException(titaVo, "E0003", "戶號=" + titaVo.getParam("CustNo") + ",額度=" + titaVo.getParam("FacmNo") + ",發生日期=" + titaVo.getParam("MarkDate")); // 修改資料不存在
+				throw new LogicException(titaVo, "E0003", "戶號=" + titaVo.getParam("CustNo") + ",額度="
+						+ titaVo.getParam("FacmNo") + ",發生日期=" + titaVo.getParam("MarkDate")); // 修改資料不存在
 			}
 
 			Ias39Loss tIas39Loss2 = (Ias39Loss) dataLog.clone(tIas39Loss); ////
@@ -143,10 +151,11 @@ public class L7204 extends TradeBuffer {
 			tIas39Loss.setStartDate(this.parse.stringToInteger(titaVo.getParam("StartDate")));
 			tIas39Loss.setEndDate(this.parse.stringToInteger(titaVo.getParam("EndDate")));
 
-			tIas39Loss.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
+			tIas39Loss.setLastUpdate(
+					parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 			tIas39Loss.setLastUpdateEmpNo(titaVo.getTlrNo());
 			try {
-				tIas39Loss = sIas39LossService.update2(tIas39Loss); ////
+				tIas39Loss = sIas39LossService.update2(tIas39Loss, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}

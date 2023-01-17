@@ -22,7 +22,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R09 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5R09.class);
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService custMainService;
@@ -53,9 +52,9 @@ public class L5R09 extends TradeBuffer {
 		/* DB服務 */
 		CustMain tCustMain = new CustMain();
 		if (CustId.isEmpty()) {
-			tCustMain = custMainService.custNoFirst(iCustNo, iCustNo);
+			tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		} else {
-			tCustMain = custMainService.custIdFirst(CustId);
+			tCustMain = custMainService.custIdFirst(CustId, titaVo);
 		}
 		if (tCustMain != null) {
 			this.totaVo.putParam("L5r09CustId", tCustMain.getCustId());

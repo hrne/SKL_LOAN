@@ -209,7 +209,7 @@ public class L597A extends TradeBuffer {
 					NegTransIdVO.setTitaTxtNo(parse.stringToInteger(lData[22]));
 
 					NegTrans NegTransVO = new NegTrans();
-					NegTransVO = sNegTransService.findById(NegTransIdVO);
+					NegTransVO = sNegTransService.findById(NegTransIdVO, titaVo);
 					if (NegTransVO != null) {
 						Map<String, String> Map = NegCom.trialNegtrans(NegTransVO, "0", TxKind, titaVo);
 						NewtransTxKind = Map.get("NewtransTxKind");// 試算交易別

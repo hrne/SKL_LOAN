@@ -3,7 +3,11 @@ package com.st1.itx.util.common;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -72,7 +76,7 @@ public class EbsCom extends CommBuffer {
 					titaVo);
 			return true;
 		} else {
-			throw new LogicException("E9004", "EbsCom上傳之資料檢核有誤");
+			return false;
 		}
 	}
 
@@ -171,35 +175,60 @@ public class EbsCom extends CommBuffer {
 
 	private String errorMsg = "";
 
+	private List<Map<String, String>> errorList = null;
+
 	private String analyzeResult(String result) throws LogicException {
 		JSONObject outputParameters = null;
 		String returnStatus = null;
 		JSONObject errorDetailsTbl = null;
+		JSONArray errorDetailsTblItem = null;
 		errorMsg = "";
+		List<Map<String, String>> errorList = new ArrayList<>();
 		try {
 			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
 			returnStatus = outputParameters.getString("X_RETURN_STATUS");
-			if (returnStatus.equals("E")) {
-				errorDetailsTbl = outputParameters.getJSONObject("X_ERROR_DETAILS_TBL");
-				errorMsg += errorDetailsTbl.getString("JOURNAL_NAME");
-				errorMsg += ",";
-				errorMsg += errorDetailsTbl.getString("JE_LINE_NUM");
-				errorMsg += ",";
-				errorMsg += errorDetailsTbl.getString("ERROR_CODE");
-				errorMsg += ",";
-				errorMsg += errorDetailsTbl.getString("ERROR_MESSAGE");
-			}
+
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("EbsCom Exception = " + e.getMessage());
 			throw new LogicException("E9004", "EbsCom分析回傳資料時有誤");
 		}
+		try {
+			if (returnStatus.equals("E")) {
+				errorDetailsTbl = outputParameters.getJSONObject("X_ERROR_DETAILS_TBL");
+				if (errorDetailsTbl != null) {
+					errorDetailsTblItem = errorDetailsTbl.getJSONArray("X_ERROR_DETAILS_TBL_ITEM");
+					if (errorDetailsTblItem != null) {
+						int size = errorDetailsTblItem.length();
+						for (int i = 0; i < size; i++) {
+							Map<String, String> error = new HashMap<>();
+							JSONObject errorDetail = errorDetailsTblItem.getJSONObject(i);
+							error.put("GroupId", errorDetail.getString("GROUP_ID"));
+							error.put("JournalName", errorDetail.getString("JOURNAL_NAME"));
+							error.put("JeLineNum", errorDetail.getString("JE_LINE_NUM"));
+							error.put("ErrorCode", errorDetail.getString("ERROR_CODE"));
+							error.put("ErrorMessage", errorDetail.getString("ERROR_MESSAGE"));
+							errorList.add(error);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("EbsCom Exception = " + e.getMessage());
+			throw new LogicException("E9004", "EbsCom分析錯誤訊息時有誤");
+		}
 		return returnStatus;
 	}
 
 	public String getErrorMsg() {
 		return errorMsg;
+	}
+
+	public List<Map<String, String>> getErrorList() {
+		return errorList == null ? new ArrayList<>() : errorList;
 	}
 
 	@Override

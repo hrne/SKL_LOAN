@@ -154,7 +154,7 @@ public class LB201Report extends MakeReport {
 			jcicEmpName = tSystemParas.getJcicEmpName();
 			jcicEmpTel = tSystemParas.getJcicEmpTel();
 			if (jcicEmpName == null || jcicEmpTel == null) {
-				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC放款報送人員資料");
+				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC報送人員資料");
 			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料

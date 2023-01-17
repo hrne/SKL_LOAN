@@ -79,7 +79,7 @@ public class L5401 extends TradeBuffer {
 		PfBsOfficer iPfBsOfficer = new PfBsOfficer();
 		iPfBsOfficerId.setEmpNo(iEmpNo);
 		iPfBsOfficerId.setWorkMonth(iWorkMonth);
-		iPfBsOfficer = iPfBsOfficerService.holdById(iPfBsOfficerId);
+		iPfBsOfficer = iPfBsOfficerService.holdById(iPfBsOfficerId, titaVo);
 		switch (ifFunctionCode) {
 		case "1": // 新增
 			if (iPfBsOfficer == null) {
@@ -153,7 +153,7 @@ public class L5401 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2007", ""); // 無資料錯誤
 			} else {
 				try {
-					iPfBsOfficerService.delete(iPfBsOfficer);
+					iPfBsOfficerService.delete(iPfBsOfficer, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 資料新建錯誤
 				}

@@ -208,6 +208,32 @@ public class AcEnterCom extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.titaVo = titaVo;
+
+		// 開帳狀態檢核
+		acCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		acCloseId.setBranchNo(titaVo.getAcbrNo());
+		acCloseId.setSecNo("09"); // 業務類別: 09-放款
+		tAcClose = acCloseService.findById(acCloseId, titaVo); // holdById
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E6005", "未執行 L6880_系統換日"); // 檢查錯誤
+		}
+		switch (tAcClose.getClsFg()) {
+		case 0: // 0:開帳
+			break;
+		case 1: // 1:關帳
+			throw new LogicException(titaVo, "E6005", "已關帳(09:放款)"); // 非開帳狀態
+		case 2: // 2:關帳取消
+			break;
+		case 3: // 3:夜間批次執行中
+			throw new LogicException(titaVo, "E6005", "夜間批次執行中"); // 非開帳狀態
+		case 4: // 4.夜間批次執行完畢
+			throw new LogicException(titaVo, "E6005", "夜間批次執行完畢，需續執行 L6880_系統換日"); // 非開帳狀態
+		}
+
+		// 登放日期、序號、帳務訂正記號
+		if (tAcClose.getClsFg() != 0) {
+			throw new LogicException(titaVo, "E0015", "關帳狀態(09:放款)<>0-開帳" + tAcClose.getClsFg()); // 檢查錯誤
+		}
 		if (titaVo.isHcodeErase()) {
 			RelDy = titaVo.getOrgEntdyI() + 19110000; // 登放日期
 		} else {
@@ -455,28 +481,16 @@ public class AcEnterCom extends TradeBuffer {
 		acCloseId.setSecNo("09"); // 業務類別: 09-放款
 		tAcClose = acCloseService.holdById(acCloseId, titaVo); // holdById
 		if (tAcClose == null) {
-			tAcClose = new AcClose();
-			tAcClose.setAcCloseId(acCloseId);
-			tAcClose.setClsFg(0);
-			tAcClose.setBatNo(1);
-			tAcClose.setClsNo(0);
-			SlipNo = 0; // 傳票號碼
-			tAcClose.setSlipNo(acList.size());
-			try {
-				acCloseService.insert(tAcClose, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E6003", "Acclose insert " + e.getErrorMsg());
-			}
-		} else {
-			SlipNo = tAcClose.getSlipNo(); // 傳票號碼
-			// 登帳且非訂正=>更新傳票號碼
-			if (titaVo.isActfgEntry() && AcHCode != 1)
-				tAcClose.setSlipNo(SlipNo + acList.size());
-			try {
-				acCloseService.update(tAcClose, titaVo); // update AcClose
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E6003", "Acclose update " + tAcClose + e.getErrorMsg());
-			}
+			throw new LogicException(titaVo, "E0006", "會計業務關帳控制檔"); // 鎖定資料時，發生錯誤
+		}
+		SlipNo = tAcClose.getSlipNo(); // 傳票號碼
+		// 登帳且非訂正=>更新傳票號碼
+		if (titaVo.isActfgEntry() && AcHCode != 1)
+			tAcClose.setSlipNo(SlipNo + acList.size());
+		try {
+			acCloseService.update(tAcClose, titaVo); // update AcClose
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E6003", "Acclose update " + tAcClose + e.getErrorMsg());
 		}
 
 		// 傳票批號 ==> >= 90 :提存入帳，支票繳款:固定 11
@@ -552,7 +566,8 @@ public class AcEnterCom extends TradeBuffer {
 		}
 		for (AcDetail ac : acList) {
 			this.info(checkAc + ac.getDbCr() + " " + ac.getAcctCode() + " " + FormatUtil.padLeft("" + ac.getTxAmt(), 11)
-					+ " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " " + ac.getSumNo()+ " " + ac.getRvNo() );
+					+ " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " " + ac.getSumNo() + " "
+					+ ac.getRvNo());
 		}
 		this.info(checkAc + "DB=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", Cr=" + CrAmt + ", diff="
 				+ DbAmt.subtract(CrAmt));
@@ -668,7 +683,7 @@ public class AcEnterCom extends TradeBuffer {
 			return;
 		}
 		// else
-		AcHCode = 3; 
+		AcHCode = 3;
 		this.info("getAcHCode AcHCode=3");
 	}
 
@@ -677,7 +692,6 @@ public class AcEnterCom extends TradeBuffer {
 //	     1.自動設定為一段式交易
 //	     2.原分錄入總帳記號皆設定為 2:被沖正 
 //	     3.依原分錄產生借貸相反之新分錄
-//       4.隔日沖正，將來源科目沖至暫收款－沖正(THC)
 		AcDetail acDetail = new AcDetail();
 		List<AcDetail> acList2 = new ArrayList<AcDetail>();
 
@@ -692,9 +706,9 @@ public class AcEnterCom extends TradeBuffer {
 				}
 				this.info("procAcHCode2 ac=" + ac.toString());
 				if (titaVo.getEntDyI() == titaVo.getOrgEntdyI()) {
-					ac.setTitaHCode("2"); // 訂正別 2:被訂正					
+					ac.setTitaHCode("2"); // 訂正別 2:被訂正
 				} else {
-					ac.setTitaHCode("4"); // 訂正別 4:被沖正					
+					ac.setTitaHCode("4"); // 訂正別 4:被沖正
 				}
 				// 產生新分錄，入總帳記號3.沖正
 				acSeq++;

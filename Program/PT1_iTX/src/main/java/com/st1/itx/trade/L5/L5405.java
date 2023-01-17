@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.PfDeparment;
 import com.st1.itx.db.domain.PfDeparmentId;
 import com.st1.itx.db.service.CdBcmService;
@@ -74,7 +76,7 @@ public class L5405 extends TradeBuffer {
 		iPfDeparmentId.setDistCode(iDistCode);
 		iPfDeparmentId.setDeptCode(iDeptCode);
 		iPfDeparmentId.setUnitCode(iUnitCode);
-		PfDeparment xPfDeparment = iPfDeparmentService.findById(iPfDeparmentId);
+		PfDeparment xPfDeparment = iPfDeparmentService.findById(iPfDeparmentId, titaVo);
 		switch (iFunctionCd) {
 		case 1:
 			if (xPfDeparment == null) {
@@ -87,7 +89,7 @@ public class L5405 extends TradeBuffer {
 				iPfDeparment.setEmpName(iEmpName);
 				iPfDeparment.setDepartOfficer(iDepartOfficer);
 				iPfDeparment.setGoalCnt(iGoalCnt);
-				iPfDeparment.setSumGoalCnt(iSumGoalCnt);
+				iPfDeparment.setSumGoalCnt(iSumGoalCnt); 
 				iPfDeparment.setGoalAmt(iGoalAmt);
 				iPfDeparment.setSumGoalAmt(iSumGoalAmt);
 				try {
@@ -104,7 +106,7 @@ public class L5405 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "");
 			} else {
 				try {
-					PfDeparment hPfDeparment = iPfDeparmentService.holdById(iPfDeparmentId);
+					PfDeparment hPfDeparment = iPfDeparmentService.holdById(iPfDeparmentId, titaVo);
 					PfDeparment oldPfDeparment = (PfDeparment) iDataLog.clone(hPfDeparment);
 					hPfDeparment.setEmpNo(iEmpNo);
 					hPfDeparment.setPfDeparmentId(iPfDeparmentId);
@@ -115,14 +117,14 @@ public class L5405 extends TradeBuffer {
 					hPfDeparment.setEmpName(iEmpName);
 					hPfDeparment.setDepartOfficer(iDepartOfficer);
 					hPfDeparment.setGoalCnt(iGoalCnt);
-					hPfDeparment.setSumGoalCnt(iSumGoalCnt);
+					hPfDeparment.setSumGoalCnt(iSumGoalCnt); 
 					hPfDeparment.setGoalAmt(iGoalAmt);
 					hPfDeparment.setSumGoalAmt(iSumGoalAmt);
 					iPfDeparmentService.update(hPfDeparment, titaVo);
 					// 紀錄變更前變更後
 					iDataLog.setEnv(titaVo, oldPfDeparment, hPfDeparment);
 					iDataLog.exec();
-					iBcmCom.checkDiff(oldPfDeparment, hPfDeparment, titaVo);
+					iBcmCom.checkDiff(oldPfDeparment,hPfDeparment,titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料更新錯誤
 				}
@@ -133,8 +135,8 @@ public class L5405 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", "");
 			} else {
 				try {
-					PfDeparment hPfDeparment = iPfDeparmentService.holdById(iPfDeparmentId);
-					iPfDeparmentService.delete(hPfDeparment);
+					PfDeparment hPfDeparment = iPfDeparmentService.holdById(iPfDeparmentId, titaVo);
+					iPfDeparmentService.delete(hPfDeparment, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 資料刪除錯誤
 				}

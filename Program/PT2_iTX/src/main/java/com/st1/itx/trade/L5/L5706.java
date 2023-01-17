@@ -619,7 +619,7 @@ public class L5706 extends TradeBuffer {
 		this.info("Delete All==" + mNegFinShare);
 		if (mNegFinShare != null) {
 			try {
-				sNegFinShareService.deleteAll(mNegFinShare);
+				sNegFinShareService.deleteAll(mNegFinShare, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}
@@ -1121,7 +1121,7 @@ public class L5706 extends TradeBuffer {
 		// ZZM262寫本次單獨受償的債權機構資料紀錄在NegFinShareLog
 
 		// 計算目前債務協商債權分攤檔簽約金額加總
-		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(tNegMain.getCustNo(), tNegMain.getCaseSeq(), this.index, 30);
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(tNegMain.getCustNo(), tNegMain.getCaseSeq(), this.index, 30, titaVo);
 		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
 		BigDecimal sumContractAmt = new BigDecimal("0");
 		if (lNegFinShare == null) {

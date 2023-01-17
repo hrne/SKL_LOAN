@@ -114,7 +114,7 @@ public class L5603 extends TradeBuffer {
 			} else if (iFunctionCd.equals("2")) {
 				if (tCollLetter != null) {
 					CollLetter uCollLetter = new CollLetter();
-					uCollLetter = iCollLetterService.holdById(iCollLetterId);
+					uCollLetter = iCollLetterService.holdById(iCollLetterId, titaVo);
 					CollLetter beforeCollLetter = (CollLetter) iDataLog.clone(uCollLetter);
 					uCollLetter.setMailTypeCode(titaVo.getParam("MailTypeCode"));
 					uCollLetter.setMailDate(Integer.valueOf(titaVo.getParam("MailDate")));
@@ -141,7 +141,7 @@ public class L5603 extends TradeBuffer {
 						iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 					}
 					CollLetter uCollLetter = new CollLetter();
-					uCollLetter = iCollLetterService.holdById(iCollLetterId);
+					uCollLetter = iCollLetterService.holdById(iCollLetterId, titaVo);
 					if (uCollLetter != null) {
 						try {
 							iCollLetterService.delete(iCollLetter, titaVo);
