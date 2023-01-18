@@ -211,7 +211,7 @@ public class L7300 extends TradeBuffer {
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
 		RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
 		String result = null;
-//		this.info("ICS request = " + request.toString());
+		this.info("ICS request = " + request.toString().substring(0, 500));
 		try {
 			result = restTemplate.postForObject(apiUrl, request, String.class);
 		} catch (RestClientException re) {
@@ -244,10 +244,10 @@ public class L7300 extends TradeBuffer {
 	private SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
 		SimpleClientHttpRequestFactory clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
 		// Connect timeout
-		clientHttpRequestFactory.setConnectTimeout(10_000); // 10_000 = 10000
+		clientHttpRequestFactory.setConnectTimeout(300_000); // 10_000 = 10000
 
 		// Read timeout
-		clientHttpRequestFactory.setReadTimeout(10_000);
+		clientHttpRequestFactory.setReadTimeout(300_000);
 		return clientHttpRequestFactory;
 	}
 

@@ -41,6 +41,7 @@ import com.st1.itx.eum.ThreadVariable;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.data.Manufacture;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.log.SysLogger;
 import com.st1.itx.util.menu.MenuBuilder;
@@ -55,6 +56,9 @@ public class AjaxController extends SysLogger {
 
 	@Autowired
 	private TxFileService txFileService;
+	
+	@Autowired
+	private DateUtil dateUtil;
 
 	@PostConstruct
 	public void init() {
@@ -125,8 +129,8 @@ public class AjaxController extends SysLogger {
 		}
 	}
 
-	@RequestMapping(value = "download/file/{sno}/{fileType}/{name}")
-	public void getFile(@PathVariable String sno, @PathVariable String fileType, String name, HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "download/file/{tlrNo}/{sno}/{fileType}/{name}")
+	public void getFile(@PathVariable String tlrNo, @PathVariable String sno, @PathVariable String fileType, String name, HttpServletResponse response) throws Exception {
 		ThreadVariable.setObject(ContentName.loggerFg, true);
 		this.mustInfo("getFile...");
 
@@ -161,7 +165,10 @@ public class AjaxController extends SysLogger {
 		}
 
 		TitaVo titaVo = new TitaVo();
+		titaVo.putParam(ContentName.tlrno, tlrNo);
 		titaVo.putParam("fileno", sno);
+		titaVo.putParam(ContentName.caldy, dateUtil.getNowStringRoc());
+		titaVo.putParam(ContentName.caltm, dateUtil.getNowStringTime());
 
 		Manufacture manufacture = MySpring.getBean("manufacture", Manufacture.class);
 		manufacture.setTitaVo(titaVo);

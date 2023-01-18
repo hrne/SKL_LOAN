@@ -1,0 +1,114 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L7401)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,100,S
+K(MODIFYBUTTON,執行)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L7401]                                 會計總帳檔上傳作業"],
+["#FdBUTTON_FLD+選擇檔案",#BUTTON_FLD],
+]
+
+!---------- AP TEXT AREA Variables ----------
+#BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600
+
+#FdYear=X,2,L
+T(3,*)
+#FdBUTTON_FLD=X,2,L
+
+! 宣告按鈕事件
+#BIND_ABA=X,1,S
+BIND(#BUTTON_FLD,click)
+
+! 上傳欄名返回傳接收變數
+#FILENA=x,1000,S
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NEXT_MONTH=D,8,S
+D(7,2,#SYSDATE,1,0)
+
+#DATE=D,8,S
+T(4,DATE$)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L7401 ----------
+<sub type="FORM" name="L7401">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L7401,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L7401] 會計總帳檔上傳作業)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+! 筆數(TOTA)
+#Count=N,16,L
+
+! 金額(TOTA)
+#Amount=N,16,L
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FILENA
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L7401
+#Count
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L7401" layout="cols=1;screen.width=[300,700];printer.width=[20,20];">
+[
+["[L7401]                                 會計總帳檔上傳作業"],
+["@筆數",#Count],
+["@","會計總帳檔更新完成"],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#RPTFG=0,QUERY.GRID,L7401
+#any={detail:false, header:'L7401.part', caption:'', width:1000, rowNum:20, rowList:[60,40,60]}
+^
+
+</sub>

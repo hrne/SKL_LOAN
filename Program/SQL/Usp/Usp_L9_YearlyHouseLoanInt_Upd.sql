@@ -100,8 +100,8 @@ BEGIN
       SELECT A."CustNo" 
            , A."FacmNo"
            , SUM( CASE WHEN A."TitaHCode" = '3'
-                           THEN 0 - A."Interest" - A."DelayInt"
-                       ELSE A."Interest" + A."DelayInt"
+                           THEN 0 - A."Interest" - A."DelayInt" - A."BreachAmt"
+                       ELSE A."Interest" + A."DelayInt" + A."BreachAmt"
                   END ) AS "YearlyInt" -- 修改:累計實收利息
       FROM "LoanBorTx" A
       LEFT JOIN "FacMain" F ON F."CustNo" = A."CustNo"
@@ -112,6 +112,11 @@ BEGIN
         AND A."TitaHCode" IN ('0','3','4')  -- 新增:交易明細的訂正別
         AND A."AcDate" >= SDATE
         AND A."AcDate" <= EDATE
+        AND CASE
+              WHEN A."Interest"  != 0 THEN 1
+              WHEN A."DelayInt"  != 0 THEN 1
+              WHEN A."BreachAmt" != 0 THEN 1
+            ELSE 0 END = 1 -- 利息需有值
         AND CASE
               WHEN CustNo != 0
                    AND A."CustNo" = CustNo
@@ -143,16 +148,19 @@ BEGIN
     , LBM AS (
       SELECT LB."CustNo"
            , LB."FacmNo"
-           , SUM( CASE WHEN LB."RenewFlag" IN ('0','1') THEN LB."DrawdownAmt"
+           , SUM( CASE WHEN LB."RenewFlag" IN ('0') THEN LB."DrawdownAmt" -- 借新還舊不計入
                        ELSE 0 
                   END       )  AS "LoanAmt"
            , MAX( CASE WHEN LB."Status" = '0' THEN NVL(LB."MaturityDate",0)
                       ELSE 0 END ) AS "MaturityDate1" 
            , MAX( CASE WHEN LB."Status" NOT IN ('0') AND LB."BormNo" = TMP."LastBormNo" THEN NVL(LB."MaturityDate",0)
-                      ELSE 0 END) AS "MaturityDate2" 
+                      ELSE 0 END) AS "MaturityDate2"
+           , MAX(NVL(F."LineAmt",0)) AS   "LineAmt" -- 核准額度          
       FROM "LoanBorMain" LB
       LEFT JOIN LBMTMP TMP ON TMP."CustNo" = LB."CustNo"
                           AND TMP."FacmNo" = LB."FacmNo"
+      LEFT JOIN "FacMain" F ON  F."CustNo" = LB."CustNo"
+                           AND  F."FacmNo" = LB."FacmNo"                    
       GROUP BY LB."CustNo"
              , LB."FacmNo"
     )
@@ -184,7 +192,9 @@ BEGIN
            ELSE '00' END              AS "UsageCode"           -- 資金用途別 
           ,F."AcctCode"               AS "AcctCode"            -- 業務科目代號  
           ,F."RepayCode"              AS "RepayCode"           -- 繳款方式 
-          ,NVL(LBM."LoanAmt",0)       AS "LoanAmt"             -- 撥款金額
+          ,CASE WHEN NVL(LBM."LoanAmt",0) > NVL(LBM."LineAmt",0) THEN NVL(LBM."LineAmt",0) 
+                ELSE NVL(LBM."LoanAmt",0)
+           END                        AS "LoanAmt"             -- 撥款金額 (初貸金額大於核准金額,則改用核准金額)
           ,NVL(MFB."LoanBal",0)       AS "LoanBal"             -- 放款餘額
           ,F."FirstDrawdownDate"      AS "FirstDrawdownDate"   -- 初貸日
           , CASE WHEN LBM."MaturityDate1" > 0 THEN LBM."MaturityDate1"
@@ -232,7 +242,7 @@ BEGIN
                   AND MFB."FacmNo" = A."FacmNo"
 
     WHERE NVL(F."AcctCode",' ') != ' '
-      --AND A."YearlyInt" > 0 -- 利息為0不需寫入,改由JAVA產媒體檔時剔除
+      --AND A."YearlyInt" > 0 -- 利息為0不需寫入=>改由JAVA產媒體檔時剔除
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;
