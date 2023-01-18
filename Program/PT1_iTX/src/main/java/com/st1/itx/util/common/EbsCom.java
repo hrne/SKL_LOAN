@@ -72,7 +72,7 @@ public class EbsCom extends CommBuffer {
 
 		if (returnStatus != null && returnStatus.equals("S")) {
 			// 發送成功訊息
-			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L9130總帳傳票上傳至EBS成功",
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "", "", "L7400總帳傳票上傳至EBS成功",
 					titaVo);
 			return true;
 		} else {
@@ -183,7 +183,7 @@ public class EbsCom extends CommBuffer {
 		JSONObject errorDetailsTbl = null;
 		JSONArray errorDetailsTblItem = null;
 		errorMsg = "";
-		List<Map<String, String>> errorList = new ArrayList<>();
+		errorList = new ArrayList<>();
 		try {
 			outputParameters = new JSONObject(result).getJSONObject("OutputParameters");
 			returnStatus = outputParameters.getString("X_RETURN_STATUS");

@@ -211,7 +211,7 @@ public class L7300 extends TradeBuffer {
 		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
 		RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
 		String result = null;
-		this.info("ICS request = " + request.toString().substring(0, 500));
+		this.info("ICS request = " + request.toString());
 		try {
 			result = restTemplate.postForObject(apiUrl, request, String.class);
 		} catch (RestClientException re) {
