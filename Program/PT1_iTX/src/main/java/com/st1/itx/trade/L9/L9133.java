@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.service.AcAcctCheckDetailService;
 import com.st1.itx.db.service.AcAcctCheckService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -29,10 +28,6 @@ public class L9133 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	AcAcctCheckService sAcAcctCheckService;
-
-	/* DB服務注入 */
-	@Autowired
-	AcAcctCheckDetailService sAcAcctCheckDetailService;
 
 	/* 報表服務注入 */
 	@Autowired
@@ -91,9 +86,6 @@ public class L9133 extends TradeBuffer {
 		// 若有差額才產生明細表
 		if (isDiff) {
 			this.info("l9133Report2 started.");
-
-			// 執行預存程式更新會計業務檢核檔
-			sAcAcctCheckDetailService.Usp_L6_AcAcctCheckDetail_Ins(iAcDate, empNo, titaVo);
 
 			// 撈資料組報表
 			l9133Report2.exec(titaVo);

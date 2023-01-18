@@ -47,6 +47,14 @@ BEGIN
           ,CASE 
              WHEN S3."AcNoCode" = '40903030000' -- 手續費收入－放款帳管費 
              THEN '01' 
+             WHEN S2."CORACC" IN ('40903300'
+                                 ,'20232020'
+                                 ,'20232180'
+                                 ,'20232181'
+                                 ,'20232182'
+                                 ,'40907400'
+                                 ) 
+             THEN '01' 
            ELSE '  ' END                  AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
           ,S1."TRXDAT"                    AS "AcDate"              -- 會計日期 Decimald 8 0 
           ,SUM(CASE 
@@ -78,7 +86,13 @@ BEGIN
     LEFT JOIN "CdAcCode" S3 ON S3."AcNoCodeOld" = S2."CORACC" -- 2021-07-15 修改以8碼會科串接 
                            AND S3."AcSubCode" = NVL(S2."CORACS",'     ') 
                            AND S3."AcDtlCode" = CASE 
-                                                  WHEN S2."CORACC" IN ('40903300','20232020','20232182','20232180','20232181','40907400') 
+                                                  WHEN S2."CORACC" IN ('40903300'
+                                                                      ,'20232020'
+                                                                      ,'20232180'
+                                                                      ,'20232181'
+                                                                      ,'20232182'
+                                                                      ,'40907400'
+                                                                      ) 
                                                        AND NVL(S2."CORACS",'     ') = '     ' 
                                                   THEN '01' 
                                                 ELSE '  ' END 

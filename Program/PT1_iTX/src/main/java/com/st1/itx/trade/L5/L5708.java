@@ -207,7 +207,7 @@ public class L5708 extends TradeBuffer {
 							AcDetail acDetail = new AcDetail();
 							acDetail.setDbCr("D");
 							acDetail.setAcctCode(acNegCom.getAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt.add(sklAmt)); // 金額
+							acDetail.setTxAmt(apprAmt.add(sklAmt)); // 撥付+新壽攤分金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 
@@ -215,7 +215,7 @@ public class L5708 extends TradeBuffer {
 							acDetail = new AcDetail();
 							acDetail.setDbCr("C");
 							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt); // 金額
+							acDetail.setTxAmt(apprAmt.add(sklAmt)); // 撥付+新壽攤分金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 
@@ -223,7 +223,23 @@ public class L5708 extends TradeBuffer {
 							acDetail = new AcDetail();
 							acDetail.setDbCr("D");
 							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
-							acDetail.setTxAmt(apprAmt); // 金額
+							acDetail.setTxAmt(apprAmt); // 撥付金額
+							acDetail.setCustNo(CustNo);// 戶號
+							acDetailList.add(acDetail);
+
+							/* 貸：P03 銀行存款－新光 */
+							acDetail = new AcDetail();
+							acDetail.setDbCr("C");
+							acDetail.setAcctCode("P03");
+							acDetail.setTxAmt(apprAmt); // 撥付金額
+							acDetail.setCustNo(CustNo);// 戶號+額度+撥款
+							acDetailList.add(acDetail);
+
+							/* 借：應付代收款 */
+							acDetail = new AcDetail();
+							acDetail.setDbCr("D");
+							acDetail.setAcctCode(acNegCom.getApprAcctCode(CustNo, titaVo));
+							acDetail.setTxAmt(sklAmt); // 新壽攤分金額
 							acDetail.setCustNo(CustNo);// 戶號
 							acDetailList.add(acDetail);
 							
@@ -236,14 +252,6 @@ public class L5708 extends TradeBuffer {
 							acDetail.setFacmNo(parse.stringToInteger(tTempVo.getParam("FacmNo")));
 							acDetail.setAcctCode(tTempVo.getParam("AcctCode"));
 							acDetail.setTxAmt(sklAmt); // 新壽攤分金額
-							acDetailList.add(acDetail);
-
-							/* 貸：P03 銀行存款－新光 */
-							acDetail = new AcDetail();
-							acDetail.setDbCr("C");
-							acDetail.setAcctCode("P03");
-							acDetail.setTxAmt(apprAmt); // 金額
-							acDetail.setCustNo(CustNo);// 戶號+額度+撥款
 							acDetailList.add(acDetail);
 
 							this.txBuffer.addAllAcDetailList(acDetailList);

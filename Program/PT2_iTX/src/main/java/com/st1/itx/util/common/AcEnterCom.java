@@ -482,7 +482,17 @@ public class AcEnterCom extends TradeBuffer {
 		acCloseId.setSecNo("09"); // 業務類別: 09-放款
 		tAcClose = acCloseService.holdById(acCloseId, titaVo); // holdById
 		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0006", "會計業務關帳控制檔"); // 鎖定資料時，發生錯誤
+			tAcClose = new AcClose();
+			tAcClose.setAcCloseId(acCloseId);
+			tAcClose.setClsFg(0);
+			tAcClose.setBatNo(1);
+			tAcClose.setClsNo(0);
+			tAcClose.setSlipNo(0);
+			try {
+				acCloseService.insert(tAcClose, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E6003", "Acclose insert " + e.getErrorMsg());
+			}
 		}
 		SlipNo = tAcClose.getSlipNo(); // 傳票號碼
 		// 登帳且非訂正=>更新傳票號碼

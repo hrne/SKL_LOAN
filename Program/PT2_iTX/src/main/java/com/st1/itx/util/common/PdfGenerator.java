@@ -688,6 +688,7 @@ public class PdfGenerator extends CommBuffer {
 		}
 
 		rptTlrNo = rptTlrNo == null || rptTlrNo.isEmpty() ? tTxFile.getTlrNo() : rptTlrNo;
+		rptTlrNo = rptTlrNo == null || rptTlrNo.isEmpty() ? tTxFile.getCreateEmpNo() : rptTlrNo;
 		rptDate = rptDate == null || rptDate.isEmpty()
 				? new SimpleDateFormat("yyyy-MM-dd").format(tTxFile.getCreateDate())
 				: rptDate;

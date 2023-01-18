@@ -353,7 +353,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 					sqlWhere += "AND NegTran.\"RepayDate\" = :AcDate ";
 				}
 				// 20201127 發現已經沒有CustMain.CustTypeCode[10 保貸戶] 用[05 保戶]取代-Jacky
-				String CustTypeCode = "05";
+				String CustTypeCode = "XX"; // 2023/1/17改為全部都劃分在放款攤分,沒有保單攤分,以XX沒有的代碼代替
 				if (State == 6 || State == 9) {
 					// 06:放款攤分
 					// 09:本月放款
@@ -516,9 +516,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if ("L5074".equals(UseSerch)) {
 			slectDataHeaderNameL = slectSummaryDataHeaderName.length;
 		}
-		for (Object obj : lObject) {
-			@SuppressWarnings("unchecked")
-			Map<String, String> MapObj = (Map<String, String>) obj;
+		for (Map<String, String> MapObj : lObject) {
 			String row[] = new String[slectDataHeaderNameL];
 			for (int i = 0; i < slectDataHeaderNameL; i++) {
 				row[i] = MapObj.get("F" + String.valueOf(i));

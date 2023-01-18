@@ -27,6 +27,7 @@ import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.StaticTool;
 import com.st1.itx.util.common.EbsCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.date.DateUtil;
@@ -129,7 +130,7 @@ public class L7400 extends TradeBuffer {
 		BigDecimal txAmt;
 		String txBal;
 		for (SlipMedia2022 slipMedia : listSlipMedia2022) {
-			slipDate = "" + slipMedia.getAcDate();
+			slipDate = "" + StaticTool.rocToBc(slipMedia.getAcDate()); // 資料庫拿出來是民國年,傳輸介面要西元年
 			dbCr = slipMedia.getDbCr();
 			txAmt = slipMedia.getTxAmt();
 

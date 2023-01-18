@@ -58,8 +58,17 @@ public class L6870 extends TradeBuffer {
 		}
 		if ("L6870".equals(titaVo.getTxcd())) {
 			iEntday = titaVo.get("iEntday").trim();
-			if (tAcClose.getClsFg() != 1) {
-				throw new LogicException(titaVo, "E0015", "關帳狀態(09:放款)<>1-關帳" + tAcClose.getClsFg()); // 檢查錯誤
+			switch (tAcClose.getClsFg()) {
+			case 0: // 0:開帳
+				throw new LogicException(titaVo, "E0015", "放款業務未關帳"); // 檢查錯誤
+			case 1: // 1:關帳
+				break;
+			case 2: // 2:關帳取消
+				throw new LogicException(titaVo, "E0015", "放款業務未關帳"); // 檢查錯誤
+			case 3: // 3:夜間批次執行中
+				throw new LogicException(titaVo, "E0015", "夜間批次執行中"); // 檢查錯誤
+			case 4: // 4.夜間批次執行完畢
+				throw new LogicException(titaVo, "E0015", "夜間批次已執行完畢"); // 檢查錯誤
 			}
 			TxToDoMain tTxToDoMain = sTxToDoMainService.findById("L7400", titaVo);
 			if (tTxToDoMain != null && tTxToDoMain.getUnProcessCnt() > 0) {
@@ -68,13 +77,17 @@ public class L6870 extends TradeBuffer {
 			tAcClose.setClsFg(3); // 3:夜間批次執行中
 		} else {
 			iEntday = "" + this.txBuffer.getTxBizDate().getTbsDy();
-			// Parm :1.夜間批次異常，強制啟動
-			// Parm :2  夜間批次異常，強制結束
+			// Parm :1 設定為關帳
+			// Parm :3 設定為夜間批次開始
+			// Parm :4.設定為夜間批次結束
 			if ("1".equals(titaVo.getParam("Parm"))) {
-				this.totaVo.setWarnMsg("夜間批次作業，已啟動");
+				this.totaVo.setWarnMsg("設定為關帳");
+				tAcClose.setClsFg(1); // 1:關帳
+			} else if ("3".equals(titaVo.getParam("Parm"))) {
+				this.totaVo.setWarnMsg("設定為夜間批次開始");
 				tAcClose.setClsFg(3); // 3:夜間批次執行中
-			} else if ("2".equals(titaVo.getParam("Parm"))) {
-				this.totaVo.setWarnMsg("夜間批次作業，已結束");
+			} else if ("4".equals(titaVo.getParam("Parm"))) {
+				this.totaVo.setWarnMsg("設定為夜間批次結束");
 				tAcClose.setClsFg(4); // 4:夜間批次執行完畢
 			} else {
 				throw new LogicException(titaVo, "E0015", "參數：1/2 ，1-強制啟動 2-強制結束"); // 檢查錯誤

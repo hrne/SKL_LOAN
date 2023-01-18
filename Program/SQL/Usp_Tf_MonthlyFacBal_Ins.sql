@@ -133,7 +133,7 @@ BEGIN
               ,0                              AS "BadDebtBal"          -- 呆帳餘額 DECIMAL 16 2
               ,''                             AS "AccCollPsn"          -- 催收員 VARCHAR2 6 0
               ,''                             AS "LegalPsn"            -- 法務人員 VARCHAR2 6 0
-              ,0                              AS "Status"              -- 戶況 DECIMAL 2 0
+              ,S0."Status"                    AS "Status"              -- 戶況 DECIMAL 2 0
               ,S1."ACTACT"                    AS "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
               ,S1."LMSFAC"                    AS "FacAcctCode"         -- 額度業務科目 VARCHAR2 3 0
               ,0                              AS "ClCustNo"            -- 同擔保品戶號 DECIMAL 7 0
@@ -197,6 +197,14 @@ BEGIN
               SELECT "ADTYMT"
                     ,"LMSACN"
                     ,"LMSAPN"
+                    -- 2:催收戶
+                    -- 6:呆帳戶
+                    ,MAX(
+                      CASE
+                        WHEN "LMSFDB" = 0 -- 轉呆金額為0,才是催收戶
+                        THEN 2
+                      ELSE 6 END
+                     )             AS "Status"
                     ,SUM("LMSLBL") AS "LMSLBL" -- 本金餘額
                     ,SUM("LMSFPN") AS "LMSFPN" -- 轉催收本金
                     ,SUM("LMSFIN") AS "LMSFIN" -- 轉催收利息
@@ -205,7 +213,6 @@ BEGIN
               WHERE "ADTYMT" >= "DateStart"
                 AND "ACTACT" = '990' 
                 AND "LMSFBD" > 0 -- 催收開始日不為0
-                AND "LMSFDB" = 0 -- 轉呆金額為0,才是催收戶
               GROUP BY "ADTYMT"
                       ,"LMSACN"
                       ,"LMSAPN"
@@ -226,7 +233,6 @@ BEGIN
                    WHERE "ADTYMT" >= "DateStart"
                      AND "ACTACT" = '990' 
                      AND "LMSFBD" > 0 -- 催收開始日不為0
-                     AND "LMSFDB" = 0 -- 轉呆金額為0,才是催收戶
                   ) S1 ON S1."ADTYMT" = S0."ADTYMT"
                       AND S1."LMSACN" = S0."LMSACN"
                       AND S1."LMSAPN" = S0."LMSAPN"
@@ -268,7 +274,7 @@ BEGIN
               ,0                              AS "BadDebtBal"          -- 呆帳餘額 DECIMAL 16 2
               ,''                             AS "AccCollPsn"          -- 催收員 VARCHAR2 6 0
               ,''                             AS "LegalPsn"            -- 法務人員 VARCHAR2 6 0
-              ,0                              AS "Status"              -- 戶況 DECIMAL 2 0
+              ,S0."Status"                    AS "Status"              -- 戶況 DECIMAL 2 0
               ,S0."ACTACT"                    AS "AcctCode"            -- 業務科目代號 VARCHAR2 3 0
               ,FAC."AcctCode"                 AS "FacAcctCode"         -- 額度業務科目 VARCHAR2 3 0
               ,0                              AS "ClCustNo"            -- 同擔保品戶號 DECIMAL 7 0
@@ -318,6 +324,12 @@ BEGIN
               SELECT MSTP."ADTYMT"
                    , MSTP."LMSACN"
                    , MSTP."LMSAPN"
+                   , MIN(
+                       CASE
+                         WHEN MSTP."LMSLBL" != 0
+                         THEN 0
+                       ELSE 3 END
+                     )         AS "Status"
                    , MAX(MSTP."ACTACT") AS "ACTACT"
                    , SUM(MSTP."LMSLBL") AS "LMSLBL" -- 本金餘額
               FROM "LA$MSTP" MSTP

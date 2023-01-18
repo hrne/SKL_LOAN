@@ -28,7 +28,7 @@ public class L9133Report extends CommBuffer {
 	private MakeExcel makeExcel;
 
 	private String reportCode = "L9133";
-	private String reportItem = "放款會計與主檔餘額檢核表";
+	private String reportItem = "會計與主檔餘額檢核表";
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9133Report exec ...");
@@ -54,6 +54,7 @@ public class L9133Report extends CommBuffer {
 		int rowCursor = 0;
 		int rowCursorMain = 1;
 		int rowCursorUnpaid = 1;
+		int rowCursorReceivable = 1;
 
 		for (AcAcctCheck tAcAcctCheck : lAcAcctCheck) {
 
@@ -83,11 +84,24 @@ public class L9133Report extends CommBuffer {
 					rowCursorMain++;
 					rowCursor = rowCursorMain;
 					break;
+				case "TAV":
+				case "TCK":
+				case "TAM":
+				case "TRO":
+				case "TLD":
+				case "TSL":
+				case "T10":
+				case "T11":
+				case "T12":
+				case "T13":
+					makeExcel.setSheet("應收應付");
+					rowCursorReceivable++;
+					rowCursor = rowCursorReceivable;
+					break;
 				case "F07":
 				case "F09":
 				case "F24":
 				case "F25":
-				case "TAV":
 				default:
 					makeExcel.setSheet("未銷帳");
 					rowCursorUnpaid++;
