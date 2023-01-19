@@ -140,9 +140,11 @@ public class BST03 extends TradeBuffer {
 		}
 		if (tNegMain != null && "N".equals(tNegMain.getIsMainFin())) {
 			Slice<NegAppr02> slNegAppr02 = negAppr02Service.acDateEq(0, 0, Integer.MAX_VALUE, titaVo);
-			for (NegAppr02 n : slNegAppr02.getContent()) {
-				if (t.getRepayAmt().compareTo(n.getTxAmt()) == 0) {
-					custNo = n.getCustNo();
+			if (slNegAppr02 != null) {
+				for (NegAppr02 n : slNegAppr02.getContent()) {
+					if (t.getRepayAmt().compareTo(n.getTxAmt()) == 0) {
+						custNo = n.getCustNo();
+					}
 				}
 			}
 		}
@@ -211,9 +213,9 @@ public class BST03 extends TradeBuffer {
 		NegTrans tNegTrans = new NegTrans();
 		NegMain tNegMain = new NegMain();
 
-		tNegTransId.setAcDate(this.txBuffer.getTxCom().getReldy());
-		tNegTransId.setTitaTlrNo(this.txBuffer.getTxCom().getRelTlr());
-		tNegTransId.setTitaTxtNo(this.txBuffer.getTxCom().getRelTno());
+		tNegTransId.setAcDate(t.getAcDate());
+		tNegTransId.setTitaTlrNo(t.getTitaTlrNo());
+		tNegTransId.setTitaTxtNo(parse.stringToInteger(t.getTitaTxtNo()));
 		tNegTrans.setNegTransId(tNegTransId);
 		// 正常交易新增、訂正交易要刪除
 		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.訂正 2.3.沖正

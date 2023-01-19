@@ -64,14 +64,14 @@ public class L9705p extends TradeBuffer {
 			this.error("l9705ServiceImpl.findAll error = " + errors.toString());
 		}
 		if (l9705ListA3.size() > 0) {
-			// A3
+			// A3 通知單
 			l9705Report.exec(l9705ListA3, titaVo, txbuffer);
 		}
 		if (l9705ListN.size() > 0) {
-			// 非A3
+			// 非A3 通知單
 			l9705Report.exec(l9705ListN, titaVo, txbuffer);
 		}
-		// by eric 2021.12.10
+		// by eric 2021.12.10 明細表
 		l9705Form.exec(l9705ListAll, titaVo, txbuffer);
 
 		this.addList(this.totaVo);

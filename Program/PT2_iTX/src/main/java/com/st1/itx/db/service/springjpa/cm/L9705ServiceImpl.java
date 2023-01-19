@@ -26,14 +26,15 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
+
 	/**
-	 * @param titaVo 
+	 * @param titaVo
 	 * @param reconCode 對帳類別(A3/N/All/null)
-	 * @return 
-	 * @throws LogicException 
+	 * @return
+	 * @throws LogicException
 	 * 
 	 * 
-	 * */
+	 */
 	public List<Map<String, String>> findAll(TitaVo titaVo, String reconCode) throws LogicException {
 
 		this.info("l9705.findAll");
@@ -107,6 +108,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "      and LRC.\"FacmNo\" = M.\"FacmNo\"       ";
 			sql += "      and LRC.\"BormNo\" = M.\"BormNo\"       ";
 		}
+		//從L4702的部分還款
 		if ("4".equals(condition1)) {
 			sql += " left join (                                  ";
 			sql += "      select                                  ";
@@ -133,12 +135,12 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "      WHERE F.\"DepartmentCode\" = :corpInd ";
 
-		if ("A3".equals(reconCode)) {
-			sql += "      	AND NVL(BATX.\"ReconCode\",' ') = 'A3' ";
-		} else if ("N".equals(reconCode)) {
-			sql += "      	AND NVL(BATX.\"ReconCode\",' ') <> 'A3' ";
-		}else {
-			
+		if ("4".equals(condition1)) {
+			if ("A3".equals(reconCode)) {
+				sql += "      	AND NVL(BATX.\"ReconCode\",' ') = 'A3' ";
+			} else if ("N".equals(reconCode)) {
+				sql += "      	AND NVL(BATX.\"ReconCode\",' ') <> 'A3' ";
+			}
 		}
 
 		if (Integer.valueOf(custNoStart) > 0) {

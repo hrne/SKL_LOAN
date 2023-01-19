@@ -72,9 +72,12 @@ public abstract class BatchBase {
 				this.titaVo.putParam(ContentName.kinbr, "0000");
 				this.titaVo.putParam(ContentName.tlrno, tlrNo);
 				this.titaVo.putParam(ContentName.empnot, tlrNo);
-			} else {
+			} else 
 				this.titaVo = this.titaVo.getVo(txCruiser.getParameter());
-			}
+			
+			this.titaVo.putParam(ContentName.tlrno, "BAT001");
+			this.titaVo.putParam(ContentName.empnot, "BAT001");
+			
 			if ("0".equals(this.excuteMode))
 				this.titaVo.putParam(ContentName.dataBase, this.dataBase);
 			else {

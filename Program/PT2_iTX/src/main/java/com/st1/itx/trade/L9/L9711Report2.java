@@ -268,9 +268,9 @@ public class L9711Report2 extends MakeReport {
 				break;
 			}
 			this.info("baTxVo.getDataKind()=" + baTxVo.getDataKind());
-//			if (baTxVo.getDataKind() != 2) {
-//				continue;
-//			}
+			if (baTxVo.getDataKind() != 2) {
+				continue;
+			}
 			tempDate = String.valueOf(baTxVo.getPayIntDate()).toString();
 
 			// 違約金

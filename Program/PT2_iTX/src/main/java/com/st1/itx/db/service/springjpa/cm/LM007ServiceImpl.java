@@ -37,8 +37,8 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '320' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC2Amt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" <> '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3EntAmt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '330' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC3Amt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' AND S1.\"EntCode\" <> '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4EntAmt\"";
-		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4Amt\"";
+		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '340' THEN S1.\"TxAmt\" ELSE 0 END) AS \"IC4EntAmt\"";
+		sql += "            ,SUM(0) AS \"IC4Amt\"";
 		sql += "            ,SUM(CASE WHEN S1.\"AcctCode\" = '990' AND S1.\"EntCode\" = '0' THEN S1.\"TxAmt\" ELSE 0 END) AS \"ColAmt\"";
 		sql += "      FROM(SELECT A.\"AcSubBookCode\" AS F0";
 		sql += "                 ,MOD(TRUNC(A.\"AcDate\" / 100), 100) AS \"AcMonth\"";

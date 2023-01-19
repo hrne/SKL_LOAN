@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.st1.itx.db.domain.SystemParas;
 import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.springjpa.cm.L7300ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.JsonDoubleCom;
 import com.st1.itx.util.common.RestCom;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.report.ReportUtil;
@@ -87,7 +89,7 @@ public class L7300 extends TradeBuffer {
 		tranTime += rptUtil.showBcDate(titaVo.getCalDy(), 3);
 		tranTime += " " + rptUtil.showTime(titaVo.getCalTm());
 
-		tranSerialSeq = "LN_V0_" + rptUtil.showBcDate(stockDate, 2) + "_" + FormatUtil.pad9("" + seqL7300, 2);
+		tranSerialSeq = "LN_V0_" + rptUtil.showBcDate(titaVo.getEntDyI(), 2) + "_" + FormatUtil.pad9("" + seqL7300, 1);
 
 		int lmnDy = this.txBuffer.getTxBizDate().getLmnDyf();
 
@@ -135,7 +137,7 @@ public class L7300 extends TradeBuffer {
 				requestJO.putOpt("tranSerialSeq", tranSerialSeq); // 傳輸交易序號
 				requestJO.putOpt("tranBatchSeq", tranBatchSeq); // 傳輸母批次序號
 				requestJO.putOpt("tranSubBatchSeq", tranSubBatchSeq); // 傳輸子批次序號
-				requestJO.putOpt("tranDataSum", mrktValue); // 傳輸資料金額加總
+				requestJO.putOpt("tranDataSum", new JsonDoubleCom(mrktValue)); // 傳輸資料金額加總
 				requestJO.putOpt("tranDataCount", tranDataCount); // 傳輸資料總數
 				requestJO.putOpt("opType", "A"); // 作業別
 				requestJO.putOpt("sysSrc", "LN"); // 系統來源
@@ -174,20 +176,56 @@ public class L7300 extends TradeBuffer {
 			mrktValue = mrktValue.add(rptUtil.getBigDecimal(data.get("MrktValue")));
 			try {
 				// 變數名稱:駝峰
-				loanDto.put("tranDataId", data.get("TranDataId")); // 傳輸筆數序號
-				loanDto.put("assetsCodeDtl", "A25"); // 資產細項代號
-				loanDto.put("stockDate", stockDate); // 庫存日(帳務日)
-				loanDto.put("maturityDate", rptUtil.showBcDate(data.get("MaturityDate"), 3)); // 到期日
-				loanDto.put("loanType", data.get("LoanType")); // 貸款類別(以過往提供ICS填報作業規則進行分類，
+
+				// 傳輸筆數序號
+				// 左補零補足5碼
+				loanDto.putOpt("tranDataId", FormatUtil.pad9(data.get("TranDataId"), 5));
+
+				// 資產細項代號
+				loanDto.putOpt("assetsCodeDtl", "A25");
+
+				// 庫存日(帳務日)
+				// yyyy-mm-dd
+				loanDto.putOpt("stockDate", stockDate);
+
+				// 到期日
+				// yyyy-mm-dd
+				loanDto.putOpt("maturityDate", rptUtil.showBcDate(data.get("MaturityDate"), 3));
+
+				// 貸款類別(以過往提供ICS填報作業規則進行分類，
 				// 若為「企金，商業及農業抵押貸款」填入1；若為「房貸，住宅不動產抵押貸款」填入2。)
-				loanDto.put("counterparty", data.get("Counterparty")); // 交易對手(公司戶填入客戶名稱，個人戶則填入代碼)
-				loanDto.put("loanInt", data.get("LoanInt")); // 放款利率
-				loanDto.put("ltvRatio", data.get("LtvRatio")); // 貸款成數(LTV,%)
-				loanDto.put("subCompanyCode", data.get("SubCompanyCode")); // 區隔帳冊別(資金來源)
-				loanDto.put("acCurrency", "NTD"); // 記帳幣
-				loanDto.put("currency", "NTD"); // 交易幣別
-				loanDto.put("mrktValue", data.get("MrktValue")); // 市價
-				loanDto.put("bookValue", data.get("BookValue")); // 期初帳面金額
+				loanDto.putOpt("loanType", data.get("LoanType"));
+
+				// 交易對手(公司戶填入客戶名稱，個人戶則填入代碼)
+				loanDto.putOpt("counterparty", data.get("Counterparty"));
+
+				// 放款利率
+				// Number(5,4)
+				loanDto.putOpt("loanInt", new JsonDoubleCom(
+						rptUtil.getBigDecimal(data.get("LoanInt")).setScale(4, RoundingMode.HALF_UP)));
+
+				// 貸款成數(LTV,%)
+				// Number(5,2)
+				loanDto.putOpt("ltvRatio", new JsonDoubleCom(
+						rptUtil.getBigDecimal(data.get("LtvRatio")).setScale(2, RoundingMode.HALF_UP)));
+
+				// 區隔帳冊別(資金來源)
+				loanDto.putOpt("subCompanyCode", data.get("SubCompanyCode"));
+
+				// 記帳幣
+				loanDto.putOpt("acCurrency", "NTD");
+
+				// 交易幣別
+				loanDto.putOpt("currency", "NTD");
+
+				// 市價
+				// Number(20,5)
+				loanDto.putOpt("mrktValue", new JsonDoubleCom(rptUtil.getBigDecimal(data.get("MrktValue"))));
+
+				// 期初帳面金額
+				// Number(20,5)
+				loanDto.putOpt("bookValue", new JsonDoubleCom(rptUtil.getBigDecimal(data.get("BookValue"))));
+
 			} catch (JSONException e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));

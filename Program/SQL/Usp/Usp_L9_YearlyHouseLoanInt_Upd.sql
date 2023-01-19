@@ -62,13 +62,13 @@ BEGIN
             WHEN StartMonth != 0  
                  AND JSON_VALUE("JsonFields",  '$.StartMonth') = StartMonth THEN 1
             WHEN StartMonth = 0
-                 AND NVL(JSON_VALUE("JsonFields",  '$.StartMonth'),0) = 0 THEN 1
+                 AND NVL(JSON_VALUE("JsonFields",  '$.StartMonth'),0) = (YYYY *100 + 01) THEN 1
             ELSE 0 END = 1          
       AND CASE
             WHEN EndMonth != 0  
                  AND JSON_VALUE("JsonFields",  '$.EndMonth') = EndMonth THEN 1
             WHEN EndMonth = 0
-                 AND NVL(JSON_VALUE("JsonFields",  '$.EndMonth'),0) = EndMonth THEN 1
+                 AND NVL(JSON_VALUE("JsonFields",  '$.EndMonth'),0) = (YYYY *100 + 12) THEN 1
             ELSE 0 END = 1          
       AND CASE
             WHEN CustNo != 0
@@ -213,14 +213,14 @@ BEGIN
            || CASE
                 WHEN StartMonth != 0
                 THEN TO_CHAR(StartMonth)
-              ELSE '0' END
+              ELSE TO_CHAR( YYYY * 100 + 01 )  END
            || '"' -- StartMonth 繳息所屬年月-起月	DECIMAL	西元年月yyymm
            || ',' 
            || '"EndMonth":"' 
            || CASE
                 WHEN EndMonth != 0
                 THEN TO_CHAR(EndMonth)
-              ELSE '0' END
+              ELSE TO_CHAR( YYYY * 100 + 12 ) END
            || '"' -- EndMonth	繳息所屬年月-迄月	DECIMAL	西元年月yyymm
            || '}'                         AS "JsonFields"          -- jason格式紀錄欄 NVARCHAR2 300
           ,JOB_START_TIME             AS "CreateDate"          -- 建檔日期時間  
