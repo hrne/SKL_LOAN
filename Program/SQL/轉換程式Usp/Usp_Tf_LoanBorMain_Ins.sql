@@ -307,8 +307,10 @@ BEGIN
           ,'N'                            AS "NotYetFlag"          -- 未齊件 VARCHAR2 1  
           /* 2021-03-19 智偉修改:原欄位值為0、1，新系統為Y/N */ 
           /* 2022-01-14 智偉修改:新系統修改欄位定義 0:正常 1.展期(不同額度) 2.借新還舊(同額度) */ 
+          /* 2023-01-18 智偉修改:要跟舊系統一樣 */
           ,CASE 
-             WHEN NVL(T2."RenewFlag",0) != 0 
+             WHEN LMSP."LMSNEW" = '1' 
+                  AND NVL(T2."RenewFlag",0) != 0
              THEN T2."RenewFlag" 
              WHEN LMSP."LMSNEW" = '1' 
              THEN 1 

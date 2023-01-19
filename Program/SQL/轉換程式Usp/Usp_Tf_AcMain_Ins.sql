@@ -46,6 +46,7 @@ BEGIN
           ,NVL(S2."CORACS",'     ')       AS "AcSubCode"           -- 子目代號 VARCHAR2 5 0 
           ,CASE 
              WHEN S3."AcNoCode" = '40903030000' -- 手續費收入－放款帳管費 
+                  AND NVL(S2."CORACS",'     ') = '     ' 
              THEN '01' 
              WHEN S2."CORACC" IN ('40903300'
                                  ,'20232020'
@@ -54,6 +55,7 @@ BEGIN
                                  ,'20232182'
                                  ,'40907400'
                                  ) 
+                  AND NVL(S2."CORACS",'     ') = '     ' 
              THEN '01' 
            ELSE '  ' END                  AS "AcDtlCode"           -- 細目代號 VARCHAR2 2 0 
           ,S1."TRXDAT"                    AS "AcDate"              -- 會計日期 Decimald 8 0 
@@ -106,6 +108,20 @@ BEGIN
              ELSE '00A' END 
            , S3."AcNoCode" 
            , NVL(S2."CORACS",'     ')  
+           , CASE 
+               WHEN S3."AcNoCode" = '40903030000' -- 手續費收入－放款帳管費 
+                    AND NVL(S2."CORACS",'     ') = '     ' 
+               THEN '01' 
+               WHEN S2."CORACC" IN ('40903300'
+                                   ,'20232020'
+                                   ,'20232180'
+                                   ,'20232181'
+                                   ,'20232182'
+                                   ,'40907400'
+                                   ) 
+                    AND NVL(S2."CORACS",'     ') = '     ' 
+               THEN '01' 
+             ELSE '  ' END
            , S1."TRXDAT" 
            , S3."AcctCode" 
     ; 

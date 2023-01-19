@@ -421,7 +421,7 @@ BEGIN
                       THEN A."RvBal"
                     ELSE 0 END AS "TempAmt" -- 暫收金額
             FROM "MonthlyFacBal" M
-            LEFT JOIN "LastMonthData" LMD ON LMD."LastMonth" = M."YearMonth"
+            LEFT JOIN LastMonthData LMD ON LMD."LastMonth" = M."YearMonth"
             LEFT JOIN "AcReceivable" A ON A."CustNo" = M."CustNo"
                                       AND A."FacmNo" = M."FacmNo"
             LEFT JOIN "InsuRenew" IR ON IR."CustNo" = A."CustNo"

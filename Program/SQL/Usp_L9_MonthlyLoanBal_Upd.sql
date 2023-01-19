@@ -139,7 +139,7 @@ BEGIN
            , "BormNo"
            , SUM("Principal") AS "SumRcvPrin"
       FROM "LoanBorTx"
-      WHERE TitaHCode = '0' -- 訂正別 = 0:正常
+      WHERE "TitaHCode" = '0' -- 訂正別 = 0:正常
         AND NVL(JSON_VALUE("OtherFields", '$.CaseCloseCode'), '0') IN ('0','1','2') -- 轉催收不算
     )
     SELECT D."MonthEndYm"             AS "YearMonth"           -- 資料年月
@@ -202,9 +202,9 @@ BEGIN
                               AND LO."FacmNo" = LBM."FacmNo"
                               AND LO."BormNo" = LBM."BormNo"
                               AND LO."OvduNo" = LBM."LastOvduNo"
-    LEFT JOIN "sumTxData" STX ON STX."CustNo" = D."CustNo"
-                             AND STX."FacmNo" = D."FacmNo"
-                             AND STX."BormNo" = D."BormNo"
+    LEFT JOIN sumTxData STX ON STX."CustNo" = D."CustNo"
+                           AND STX."FacmNo" = D."FacmNo"
+                           AND STX."BormNo" = D."BormNo"
     ;
 
     INS_CNT := INS_CNT + sql%rowcount;

@@ -116,7 +116,7 @@ public class L7401 extends TradeBuffer {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", "資料更新成功", titaVo);
 				this.addList(this.totaVo);
 			} else {
-				
+
 				String note = "此檔資料已存在";
 
 				throw new LogicException(titaVo, "E0007", note);
@@ -189,6 +189,11 @@ public class L7401 extends TradeBuffer {
 				// 科目名稱
 				iAcNoName = String.valueOf(makeExcel.getValue(row, 5)).trim();
 				iCoreAcMain.setAcNoName(iAcNoName);
+
+				if (iAcNoCode.length() == 0 && iAcNoName.length() == 0) {
+					continue;
+				}
+
 				// 子目代號
 				iAcSubCode = "     ";
 				iCoreAcMainId.setAcSubCode(iAcSubCode);
@@ -264,6 +269,8 @@ public class L7401 extends TradeBuffer {
 			resText = decimalFormat.toPlainString();
 		} else if (text.contains("-") || text.length() == 0) {
 			resText = "-";
+		} else if (text.contains(".") || text.length() < 11) {
+			resText = String.valueOf(Integer.valueOf(text));
 		} else {
 			resText = text;
 		}

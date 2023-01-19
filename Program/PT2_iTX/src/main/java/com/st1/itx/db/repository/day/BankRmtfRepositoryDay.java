@@ -3,9 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +27,9 @@ public interface BankRmtfRepositoryDay extends JpaRepository<BankRmtf, BankRmtfI
 
   // AcDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
   public Optional<BankRmtf> findTopByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acDate_0, String titaTlrNo_1, String titaTxtNo_2);
+
+  // EntryDate >= ,AND AcDate<= 
+  public Slice<BankRmtf> findAllByEntryDateGreaterThanEqualAndAcDateLessThanEqual(int entryDate_0, int acDate_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
