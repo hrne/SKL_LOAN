@@ -24,6 +24,7 @@ import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
@@ -331,15 +332,15 @@ public class L3R06 extends TradeBuffer {
 								ln.getSpecificDd(), ln.getPrevPayIntDate());
 					}
 
-					// 可回收期數
+					// 已到期期數 = 計算至會計日期的期數
 					wkPreRepayTermNo = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
 							ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
 							this.txBuffer.getTxCom().getTbsdy());
 
-					// 可回收期數；可回收期數 = 已到期期數 + 預收期數
+					// 可回收期數 = 已到期期數 + 預收期數
 					wkPreRepayTermNo = wkPreRepayTermNo + this.txBuffer.getSystemParas().getPreRepayTerms();
-
-					if (iRepayTerms > 0) { // 回收期數 > 0
+					// 輸入之回收期數不可 > [可回收期數-計算至上次繳息日之期數]
+					if (iRepayTerms > 0) {  
 						if ((iRepayTerms + wkPrevTermNo) > wkPreRepayTermNo) {
 							this.info(" 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo() + ",可預收迄日"
 									+ wkPreRepayDate + ",可回收期數= " + (wkPreRepayTermNo - wkPrevTermNo));

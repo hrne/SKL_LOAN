@@ -92,7 +92,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ac.\"OpenTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
 		sql += "    ac.\"OpenTxCd\"     AS \"TitaTxCd\",";
-		sql += "    ac.\"SlipNote\"     AS \"SlipNote\",";
+		sql += "    JSON_VALUE  (tx.\"OtherFields\",  '$.Note')     AS \"SlipNote\",";
 		sql += "    ac.\"OpenAcDate\"   AS \"AcDate\",";
 		sql += "    ac.\"CreateDate\"   AS \"CreateDate\",";
 		sql += "    0                   AS \"EntryDate\",";
@@ -101,7 +101,11 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    0                    AS \"DB\"";
 		sql += "  FROM";
 		sql += "    \"AcReceivable\"   ac";
-		sql += "    LEFT JOIN \"TxTranCode\"     tc ON tc.\"TranNo\" = ac.\"OpenTxCd\"";
+		sql += "    LEFT JOIN \"TxTranCode\"     tc ON tc.\"TranNo\" = ac.\"OpenTxCd\" ";
+		sql += "    LEFT JOIN \"LoanBorTx\"     tx ON tx.\"AcDate\" = ac.\"OpenAcDate\" ";
+		sql += "    						AND   	  tx.\"TitaTlrNo\" = ac.\"OpenTlrNo\" ";
+		sql += "    						AND   	  to_number(tx.\"TitaTxtNo\") = ac.\"OpenTxtNo\" ";
+		sql += "    						AND 	  tx.\"AcSeq\" <= 1 ";
 		sql += "  WHERE";
 		sql += "    ac.\"AcctCode\" = :acctcode";
 		sql += "    AND ac.\"CustNo\" = :custno";
@@ -116,7 +120,7 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ad.\"TitaTxtNo\"    AS \"TitaTxtNo\",";
 		sql += "    tc.\"TranItem\"     AS \"TranItem\",";
 		sql += "    ad.\"TitaTxCd\"     AS \"TitaTxCd\",";
-		sql += "    ad.\"SlipNote\"     AS \"SlipNote\",";
+		sql += "    JSON_VALUE  (tx.\"OtherFields\",  '$.Note')     AS \"SlipNote\",";
 		sql += "    ad.\"AcDate\"       AS \"AcDate\",";
 		sql += "    ad.\"CreateDate\"   AS \"CreateDate\",";
 		sql += "    0                   AS \"EntryDate\",";
@@ -147,7 +151,11 @@ public class L6908ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND  ad.\"TitaTlrNo\"= ar.\"OpenTlrNo\" ";
 		sql += "              AND  ad.\"TitaTxtNo\"= ar.\"OpenTxtNo\" ";
 		sql += "             THEN 1 ELSE 0 END = 0 ";
-		sql += "  LEFT JOIN \"TxTranCode\"   tc ON tc.\"TranNo\" = ad.\"TitaTxCd\"";
+		sql += "  LEFT JOIN \"TxTranCode\"    tc ON   tc.\"TranNo\" = ad.\"TitaTxCd\"";
+		sql += "  LEFT JOIN \"LoanBorTx\"     tx ON   tx.\"AcDate\" = ad.\"AcDate\" ";
+		sql += "    					  		AND   tx.\"TitaTlrNo\" = ad.\"TitaTlrNo\" ";
+		sql += "    							AND   to_number(tx.\"TitaTxtNo\") = ad.\"TitaTxtNo\" ";
+		sql += "    							AND   tx.\"AcSeq\" <= 1 ";
 		sql += "  WHERE";
 		sql += "    ar.\"AcctCode\" = :acctcode";
 		sql += "    AND ar.\"CustNo\" = :custno";

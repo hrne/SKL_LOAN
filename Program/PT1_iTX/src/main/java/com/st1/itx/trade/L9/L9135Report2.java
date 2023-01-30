@@ -2,9 +2,12 @@ package com.st1.itx.trade.L9;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -13,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
 import com.st1.itx.util.common.MakeFile;
+import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.parse.Parse;
 
 @Component("L9135Report2")
