@@ -63,12 +63,16 @@ BEGIN
                  AND JSON_VALUE("JsonFields",  '$.StartMonth') = StartMonth THEN 1
             WHEN StartMonth = 0
                  AND NVL(JSON_VALUE("JsonFields",  '$.StartMonth'),0) = (YYYY *100 + 01) THEN 1
+            WHEN StartMonth = 0
+                 AND NVL(JSON_VALUE("JsonFields",  '$.StartMonth'),0) = 0 THEN 1
             ELSE 0 END = 1          
       AND CASE
             WHEN EndMonth != 0  
                  AND JSON_VALUE("JsonFields",  '$.EndMonth') = EndMonth THEN 1
             WHEN EndMonth = 0
                  AND NVL(JSON_VALUE("JsonFields",  '$.EndMonth'),0) = (YYYY *100 + 12) THEN 1
+            WHEN EndMonth = 0
+                 AND NVL(JSON_VALUE("JsonFields",  '$.EndMonth'),0) = 0 THEN 1
             ELSE 0 END = 1          
       AND CASE
             WHEN CustNo != 0

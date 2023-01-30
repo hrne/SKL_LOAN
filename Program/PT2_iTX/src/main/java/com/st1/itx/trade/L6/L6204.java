@@ -12,12 +12,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxErrCode;
-import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.TxErrCodeService;
-import com.st1.itx.db.service.TxTranCodeService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.menu.MenuBuilder;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L6204")

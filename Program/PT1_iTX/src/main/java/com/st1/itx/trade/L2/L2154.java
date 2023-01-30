@@ -34,7 +34,6 @@ import com.st1.itx.db.service.FacProdStepRateService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.data.DataLog;
@@ -92,8 +91,6 @@ public class L2154 extends TradeBuffer {
 	DataLog datalog;
 	@Autowired
 	BankAuthActCom bankAuthActCom;
-	@Autowired
-	public AuthLogCom authLogCom;
 
 	// input area
 	private TitaVo titaVo = new TitaVo();
@@ -145,6 +142,7 @@ public class L2154 extends TradeBuffer {
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		iProdNo = titaVo.getParam("ProdNo");
+//		iBreachCode = titaVo.getParam("BreachCode");
 		wkCustNo = iCustNo;
 		wkFacmNo = iFacmNo;
 
@@ -201,7 +199,7 @@ public class L2154 extends TradeBuffer {
 		}
 
 		// 新增交易暫存檔
-		AddTxTempRoutine(1);
+		AddTxTempRoutine();
 
 		// 更新額度主檔
 		if (tFacMain.getActFg() == 1 && titaVo.isHcodeNormal()) {
@@ -277,7 +275,6 @@ public class L2154 extends TradeBuffer {
 				if (tFacMain == null) {
 					throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 鎖定資料時，發生錯誤
 				}
-
 				tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
 				tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
 				tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
@@ -357,55 +354,12 @@ public class L2154 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0008",
 								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
-					// by eric 2022.4.23
-					tTempVo = tTempVo.getVo(tx.getText());
-					beforeFacMain = (FacMain) datalog.clone(tFacMain);
-					beforeFacMain = tempVoToFacMain(beforeFacMain, tTempVo);
-					beforeFacMain.setActFg(tFacMain.getActFg());
-					beforeFacMain.setLastAcctDate(tFacMain.getLastAcctDate());
-					beforeFacMain.setLastKinbr(tFacMain.getLastKinbr());
-					beforeFacMain.setLastTlrNo(tFacMain.getLastTlrNo());
-					beforeFacMain.setLastTxtNo(tFacMain.getLastTxtNo());
-					datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-
-					if (!tTempVo.get("RepayBank").equals(this.titaVo.getParam("RepayBank"))) {
-						datalog.setLog("扣款銀行", tTempVo.get("RepayBank"), this.titaVo.getParam("RepayBank"));
-					}
-					if (!tTempVo.get("RepayAcctNo").equals(this.titaVo.getParam("RepayAcctNo"))) {
-						datalog.setLog("扣款帳號", tTempVo.get("RepayAcctNo"), this.titaVo.getParam("RepayAcctNo"));
-					}
-					if (!tTempVo.get("PostCode").equals(this.titaVo.getParam("PostCode"))) {
-						datalog.setLog("扣款帳號.郵局存款別", tTempVo.get("PostCode"), this.titaVo.getParam("PostCode"));
-					}
-					if (!tTempVo.get("RelationCode").equals(this.titaVo.getParam("RelationCode"))) {
-						datalog.setLog("扣款帳號.與借款人關係", tTempVo.get("RelationCode"),
-								this.titaVo.getParam("RelationCode"));
-					}
-					if (!tTempVo.get("RelationName").equals(this.titaVo.getParam("RelationName"))) {
-						datalog.setLog("扣款帳號.帳戶戶名", tTempVo.get("RelationName"), this.titaVo.getParam("RelationName"));
-					}
-					if (!tTempVo.get("RelationId").equals(this.titaVo.getParam("RelationId"))) {
-						datalog.setLog("扣款帳號.身份證字號", tTempVo.get("RelationId"), this.titaVo.getParam("RelationId"));
-					}
-					if (!tTempVo.get("RelationBirthday").equals(this.titaVo.getParam("RelationBirthday"))) {
-						datalog.setLog("扣款帳號.出生日期", tTempVo.get("RelationBirthday"),
-								this.titaVo.getParam("RelationBirthday"));
-					}
-					if (!tTempVo.get("RelationGender").equals(this.titaVo.getParam("RelationGender"))) {
-						datalog.setLog("扣款帳號.性別", tTempVo.get("RelationGender"),
-								this.titaVo.getParam("RelationGender"));
-					}
-
-					datalog.exec("修改額度主檔資料", String.format("%07d-%03d-%07d", tFacMain.getCustNo(), tFacMain.getFacmNo(),
-							tFacMain.getApplNo()));
-
 					break;
 				case 4: // 刪除, 刪除額度資料及清償金類型
-
 					// 刪除時更新案件申請檔
 					UpdateAppl();
 					// 新增交易暫存檔
-					AddTxTempRoutine(2);
+					AddTxTempRoutine();
 					// 刪除時檢查為該戶號最後一筆額度 客戶主檔該額度-1
 					CustMain tCustMain = null;
 					tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
@@ -417,38 +371,23 @@ public class L2154 extends TradeBuffer {
 					if (tCustMain == null) {
 						throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
 					}
-//					if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
-//						tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
-//						try {
-//							custMainService.update(tCustMain, titaVo);
-//						} catch (DBException e) {
-//							throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-//						}
-//					}
+					if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
+						tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
+						try {
+							custMainService.update(tCustMain, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
+						}
+					}
 					try {
 						facMainService.delete(tFacMain, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
 					}
-
-					// 抓更新刪除額度後目前最後一筆額度 2022.4.13
-					tFacMain = facMainService.findLastFacmNoFirst(wkCustNo, titaVo);
-					if (tFacMain == null) {
-						tCustMain.setLastFacmNo(0);
-					} else {
-						tCustMain.setLastFacmNo(tFacMain.getFacmNo());
-					}
-					try {
-						custMainService.update(tCustMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
-					}
-
 					// 刪除階梯式利率
 					DeleteFacProdStepRateRoutine();
 					break;
 				}
-
 			}
 			// 放行訂正
 			if (titaVo.isHcodeErase()) {
@@ -468,9 +407,6 @@ public class L2154 extends TradeBuffer {
 						throw new LogicException(titaVo, "E0008",
 								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
-					// by eric 2022.4.23
-					datalog.delete(titaVo);
-
 					break;
 				case 4: // 刪除
 					// 還原額度檔
@@ -479,7 +415,6 @@ public class L2154 extends TradeBuffer {
 				}
 			}
 		}
-
 		// 銀扣授權帳號檔
 		bankAuthActRoutine();
 	}
@@ -500,7 +435,7 @@ public class L2154 extends TradeBuffer {
 	}
 
 	// 新增交易暫存檔
-	private void AddTxTempRoutine(int actfg) throws LogicException {
+	private void AddTxTempRoutine() throws LogicException {
 		this.info("AddTxTempRoutine ...");
 
 		tTxTemp = new TxTemp();
@@ -509,6 +444,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("LastBormNo", tFacMain.getLastBormNo());
 		tTempVo.putParam("LastBormRvNo", tFacMain.getLastBormRvNo());
+//		tTempVo.putParam("CustUKey", tFacMain.getCustUKey());
 		tTempVo.putParam("ApplNo", tFacMain.getApplNo());
 		tTempVo.putParam("AnnualIncr", tFacMain.getAnnualIncr());
 		tTempVo.putParam("EmailIncr", tFacMain.getEmailIncr());
@@ -519,6 +455,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
 		tTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
 		tTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
+//		tTempVo.putParam("CopyFlag", tFacMain.getCopyFlag());
 		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
 		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
 		tTempVo.putParam("ContractNo", tFacMain.getContractNo());
@@ -540,11 +477,15 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("LoanTermMm", tFacMain.getLoanTermMm());
 		tTempVo.putParam("LoanTermDd", tFacMain.getLoanTermDd());
 		tTempVo.putParam("AmortizedCode", tFacMain.getAmortizedCode());
+//		tTempVo.putParam("CancelCode", tFacMain.getCancelCode());
 		tTempVo.putParam("FreqBase", tFacMain.getFreqBase());
 		tTempVo.putParam("PayIntFreq", tFacMain.getPayIntFreq());
 		tTempVo.putParam("RepayFreq", tFacMain.getRepayFreq());
 		tTempVo.putParam("UtilDeadline", tFacMain.getUtilDeadline());
 		tTempVo.putParam("GracePeriod", tFacMain.getGracePeriod());
+//		tTempVo.putParam("DuePayAmt", tFacMain.getDuePayAmt());
+//		tTempVo.putParam("DuePayLimit", tFacMain.getDuePayLimit());
+//		tTempVo.putParam("PayIntLimit", tFacMain.getPayIntLimit());
 		tTempVo.putParam("AcctFee", tFacMain.getAcctFee());
 		tTempVo.putParam("HandlingFee", tFacMain.getHandlingFee());
 		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
@@ -572,7 +513,11 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
 		tTempVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
 		tTempVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
+//		tTempVo.putParam("AchAuthCode", tFacMain.getAchAuthCode());
+//		tTempVo.putParam("AchBank", tFacMain.getAchBank());
+//		tTempVo.putParam("AchAuthNo", tFacMain.getAchAuthNo());
 		tTempVo.putParam("Introducer", tFacMain.getIntroducer());
+//		tTempVo.putParam("Prohibityear", tFacMain.getProhibityear());
 		tTempVo.putParam("District", tFacMain.getDistrict());
 		tTempVo.putParam("FireOfficer", tFacMain.getFireOfficer());
 		tTempVo.putParam("Estimate", tFacMain.getEstimate());
@@ -585,51 +530,16 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("EstimateReview", tFacMain.getEstimateReview());
 		tTempVo.putParam("Coorgnizer", tFacMain.getCoorgnizer());
 		tTempVo.putParam("AdvanceCloseCode", tFacMain.getAdvanceCloseCode());
+//		tTempVo.putParam("BreachCode", tFacMain.getBreachCode());
+//		tTempVo.putParam("BreachGetCode", tFacMain.getBreachGetCode());
+//		tTempVo.putParam("DecreaseFlag", tFacMain.getDecreaseFlag());
 		tTempVo.putParam("ActFg", tFacMain.getActFg());
 		tTempVo.putParam("LastAcctDate", tFacMain.getLastAcctDate());
 		tTempVo.putParam("LastKinbr", tFacMain.getLastKinbr());
 		tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
 		tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
 		tTempVo.putParam("AcDate", tFacMain.getAcDate());
-		// 新增綠色授信
-		tTempVo.putParam("Grcd", tFacMain.getGrcd());
-		tTempVo.putParam("GrKind", tFacMain.getGrKind());
-		tTempVo.putParam("EsGcd", tFacMain.getEsGcd());
-		tTempVo.putParam("EsGKind", tFacMain.getEsGKind());
-		tTempVo.putParam("EsGcnl", tFacMain.getEsGcnl());
-		// 購地貸款相關
-		tTempVo.putParam("PreStarBuildingYM", tFacMain.getPreStarBuildingYM());
-		tTempVo.putParam("StarBuildingYM", tFacMain.getStarBuildingYM());
-
 		tTxTemp.setText(tTempVo.getJsonString());
-
-		if (actfg == 1) {
-			if (tFacMain.getRepayCode() == 2) {
-				TempVo tempVo = authLogCom.exec(wkCustNo, wkFacmNo, titaVo);
-				if (tempVo == null) {
-					throw new LogicException(titaVo, "E0001", " 額度主檔 借款人戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 查詢資料不存在
-				}
-				tTempVo.putParam("RepayBank", tempVo.getParam("RepayBank"));
-				tTempVo.putParam("RepayAcctNo", tempVo.getParam("RepayAcctNo"));
-				tTempVo.putParam("PostCode", tempVo.getParam("PostCode"));
-				tTempVo.putParam("AchAuthCode", tempVo.getParam("AchAuthCode"));
-				tTempVo.putParam("RelationCode", tempVo.getParam("RelationCode"));
-				tTempVo.putParam("RelationName", tempVo.getParam("RelationName"));
-				tTempVo.putParam("RelationId", tempVo.getParam("RelationId"));
-				tTempVo.putParam("RelationBirthday", tempVo.getParam("RelationBirthday"));
-				tTempVo.putParam("RelationGender", tempVo.getParam("RelationGender"));
-			} else {
-				tTempVo.putParam("RepayBank", "");
-				tTempVo.putParam("RepayAcctNo", "");
-				tTempVo.putParam("PostCode", "");
-				tTempVo.putParam("AchAuthCode", "");
-				tTempVo.putParam("RelationCode", "");
-				tTempVo.putParam("RelationName", "");
-				tTempVo.putParam("RelationId", "");
-				tTempVo.putParam("RelationBirthday", 0);
-				tTempVo.putParam("RelationGender", "");
-			}
-		}
 		try {
 			txTempService.insert(tTxTemp, titaVo);
 		} catch (DBException e) {
@@ -656,11 +566,15 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(titaVo.getParam("LoanTermMm")));
 		tFacMain.setLoanTermDd(this.parse.stringToInteger(titaVo.getParam("LoanTermDd")));
 		tFacMain.setAmortizedCode(titaVo.getParam("AmortizedCode"));
+//		tFacMain.setCancelCode(this.parse.stringToInteger(titaVo.getParam("CancelCode")));
 		tFacMain.setFreqBase(titaVo.getParam("FreqBase"));
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(titaVo.getParam("UtilDeadline")));
 		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
+//		tFacMain.setDuePayAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayAmt")));
+//		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayLimit")));
+//		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimPayIntLimit")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
@@ -680,7 +594,19 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
+//		tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
+//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(titaVo.getParam("RepayAcctNo")));
+//		tFacMain.setPostCode(titaVo.getParam("PostCode"));
+//		tFacMain.setRelationCode(titaVo.getParam("RelationCode"));
+//		tFacMain.setRelationName(titaVo.getParam("RelationName"));
+//		tFacMain.setRelationId(titaVo.getParam("RelationId"));
+//		tFacMain.setRelationBirthday(this.parse.stringToInteger(titaVo.getParam("RelationBirthday")));
+//		tFacMain.setRelationGender(titaVo.getParam("RelationGender"));
+//		tFacMain.setAchAuthCode(titaVo.getParam("AchAuthCode"));
+//		tFacMain.setAchBank(this.parse.stringToInteger(titaVo.getParam("AchBank")));
+//		tFacMain.setAchAuthNo(titaVo.getParam("AchAuthNo"));
 		tFacMain.setIntroducer(titaVo.getParam("Introducer"));
+//		tFacMain.setProhibityear(parse.stringToInteger(titaVo.getParam("Prohibityear")));
 		tFacMain.setDistrict(titaVo.getParam("District"));
 		tFacMain.setFireOfficer(titaVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(titaVo.getParam("Estimate"));
@@ -692,29 +618,16 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(titaVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(titaVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
+//		tFacMain.setAdvanceCloseCode(titaVo.getParam("AdvanceCloseCode"));
+//		tFacMain.setBreachCode(titaVo.getParam("BreachCode"));
+//		tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
+//		tFacMain.setDecreaseFlag(titaVo.getParam("DecreaseFlag"));
 		tFacMain.setActFg(titaVo.getActFgI());
 		tFacMain.setLastAcctDate(titaVo.getEntDyI());
 		tFacMain.setLastKinbr(titaVo.getKinbr());
 		tFacMain.setLastTlrNo(titaVo.getTlrNo());
 		tFacMain.setLastTxtNo(titaVo.getTxtNo());
 		tFacMain.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		// 新增綠色授信相關
-		tFacMain.setGrcd(titaVo.getParam("Grcd"));
-		tFacMain.setGrKind(titaVo.getParam("GrKind"));
-		tFacMain.setEsGcd(titaVo.getParam("EsGcd"));
-		tFacMain.setEsGKind(titaVo.getParam("EsGKind"));
-		tFacMain.setEsGcnl(titaVo.getParam("EsGcnl"));
-		// 購地貸款相關
-		if (this.parse.stringToInteger(titaVo.getParam("PreStarBuildingYM")) > 0) {
-			tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.getParam("PreStarBuildingYM")) + 191100);
-		} else {
-			tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(titaVo.getParam("PreStarBuildingYM")));
-		}
-		if (this.parse.stringToInteger(titaVo.getParam("StarBuildingYM")) > 0) {
-			tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.getParam("StarBuildingYM")) + 191100);
-		} else {
-			tFacMain.setStarBuildingYM(this.parse.stringToInteger(titaVo.getParam("StarBuildingYM")));
-		}
 
 		this.info("RepayCode = " + titaVo.getParam("RepayCode"));
 		if ("02".equals(titaVo.getParam("RepayCode")) || "2".equals(titaVo.getParam("RepayCode"))) {
@@ -728,8 +641,8 @@ public class L2154 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
 		}
-//		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-//		datalog.exec("修改額度主檔資料");
+		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
+		datalog.exec();
 
 	}
 
@@ -744,22 +657,6 @@ public class L2154 extends TradeBuffer {
 		// 放款交易訂正交易須由最後一筆交易開始訂正
 		loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
 		beforeFacMain = (FacMain) datalog.clone(tFacMain);
-
-		// by eric 2022.4.23
-		tFacMain = tempVoToFacMain(tFacMain, tTempVo);
-
-		try {
-			tFacMain = facMainService.update2(tFacMain, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007",
-					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
-		}
-//		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
-//		datalog.exec("修改額度主檔資料");
-	}
-
-	// by eric 2022.4.23
-	private FacMain tempVoToFacMain(FacMain tFacMain, TempVo tTempVo) throws LogicException {
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
 		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
 		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
@@ -775,11 +672,15 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
 		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
 		tFacMain.setAmortizedCode(tTempVo.getParam("AmortizedCode"));
+//		tFacMain.setCancelCode(tTempVo.getParam("CancelCode"));
 		tFacMain.setFreqBase(tTempVo.getParam("FreqBase"));
 		tFacMain.setPayIntFreq(this.parse.stringToInteger(tTempVo.getParam("PayIntFreq")));
 		tFacMain.setRepayFreq(this.parse.stringToInteger(tTempVo.getParam("RepayFreq")));
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(tTempVo.getParam("UtilDeadline")));
 		tFacMain.setGracePeriod(this.parse.stringToInteger(tTempVo.getParam("GracePeriod")));
+//		tFacMain.setDuePayAmt(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayAmt")));
+//		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayLimit")));
+//		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(tTempVo.getParam("PayIntLimit")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
 		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(tTempVo.getParam("HandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
@@ -796,10 +697,25 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
+		// ProdBreachFlag為N時寫入
+		if ("N".equals(tFacMain.getProdBreachFlag())) {
+			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
+		}
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
+//		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
+//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(tTempVo.getParam("RepayAcctNo")));
+//		tFacMain.setPostCode(tTempVo.getParam("PostCode"));
+//		tFacMain.setRelationCode(tTempVo.getParam("RelationCode"));
+//		tFacMain.setRelationName(tTempVo.getParam("RelationName"));
+//		tFacMain.setRelationId(tTempVo.getParam("RelationId"));
+//		tFacMain.setRelationBirthday(this.parse.stringToInteger(tTempVo.getParam("RelationBirthday")));
+//		tFacMain.setRelationGender(tTempVo.getParam("RelationGender"));
+//		tFacMain.setAchAuthCode(tTempVo.getParam("AchAuthCode"));
+//		tFacMain.setAchBank(this.parse.stringToInteger(tTempVo.getParam("AchBank")));
+//		tFacMain.setAchAuthNo(tTempVo.getParam("AchAuthNo"));
 		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
+//		tFacMain.setProhibityear(this.parse.stringToInteger(tTempVo.getParam("Prohibityear")));
 		tFacMain.setDistrict(tTempVo.getParam("District"));
 		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
 		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
@@ -811,6 +727,10 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
+//		tFacMain.setAdvanceCloseCode(tTempVo.getParam("AdvanceCloseCode"));
+//		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
+//		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
+//		tFacMain.setDecreaseFlag(tTempVo.getParam("DecreaseFlag"));
 		tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
 		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
 		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
@@ -818,25 +738,14 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
 
-		// 新增綠色授信相關
-		tFacMain.setGrcd(tTempVo.getParam("Grcd"));
-		tFacMain.setGrKind(tTempVo.getParam("GrKind"));
-		tFacMain.setEsGcd(tTempVo.getParam("EsGcd"));
-		tFacMain.setEsGKind(tTempVo.getParam("EsGKind"));
-		tFacMain.setEsGcnl(tTempVo.getParam("EsGcnl"));
-		// 購地貸款相關
-		if (this.parse.stringToInteger(tTempVo.getParam("PreStarBuildingYM")) > 0) {
-			tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("PreStarBuildingYM")) + 191100);
-		} else {
-			tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("PreStarBuildingYM")));
+		try {
+			tFacMain = facMainService.update2(tFacMain, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007",
+					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
-		if (this.parse.stringToInteger(tTempVo.getParam("StarBuildingYM")) > 0) {
-			tFacMain.setStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("StarBuildingYM")) + 191100);
-		} else {
-			tFacMain.setStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("StarBuildingYM")));
-		}
-
-		return tFacMain;
+		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
+		datalog.exec();
 	}
 
 	// 放行訂正時, 還原被刪除的額度檔
@@ -852,6 +761,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFacMainId(tFacMainId);
 		tFacMain.setLastBormNo(this.parse.stringToInteger(tTempVo.getParam("LastBormNo")));
 		tFacMain.setLastBormRvNo(this.parse.stringToInteger(tTempVo.getParam("LastBormRvNo")));
+//		tFacMain.setCustUKey(tTempVo.getParam("CustUKey"));
 		tFacMain.setApplNo(this.parse.stringToInteger(tTempVo.getParam("ApplNo")));
 		tFacMain.setAnnualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("AnnualIncr")));
 		tFacMain.setEmailIncr(this.parse.stringToBigDecimal(tTempVo.getParam("EmailIncr")));
@@ -861,6 +771,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setUtilBal(this.parse.stringToBigDecimal(tTempVo.getParam("UtilBal")));
 		tFacMain.setFirstDrawdownDate(this.parse.stringToInteger(tTempVo.getParam("FirstDrawdownDate")));
 		tFacMain.setMaturityDate(this.parse.stringToInteger(tTempVo.getParam("MaturityDate")));
+//		tFacMain.setCopyFlag(tTempVo.getParam("CopyFlag"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
 		tFacMain.setContractNo(tTempVo.getParam("ContractNo"));
@@ -906,6 +817,17 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
+//		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
+//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(tTempVo.getParam("RepayAcctNo")));
+//		tFacMain.setPostCode(tTempVo.getParam("PostCode"));
+//		tFacMain.setRelationCode(tTempVo.getParam("RelationCode"));
+//		tFacMain.setRelationName(tTempVo.getParam("RelationName"));
+//		tFacMain.setRelationId(tTempVo.getParam("RelationId"));
+//		tFacMain.setRelationBirthday(this.parse.stringToInteger(tTempVo.getParam("RelationBirthday")));
+//		tFacMain.setRelationGender(tTempVo.getParam("RelationGender"));
+//		tFacMain.setAchAuthCode(tTempVo.getParam("AchAuthCode"));
+//		tFacMain.setAchBank(this.parse.stringToInteger(tTempVo.getParam("AchBank")));
+//		tFacMain.setAchAuthNo(tTempVo.getParam("AchAuthNo"));
 		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
 		tFacMain.setDistrict(tTempVo.getParam("District"));
 		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
@@ -918,31 +840,16 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
 		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
+//		tFacMain.setAdvanceCloseCode(tTempVo.getParam("AdvanceCloseCode"));
+//		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
+//		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
+//		tFacMain.setDecreaseFlag(tTempVo.getParam("DecreaseFlag"));
 		tFacMain.setActFg(titaVo.getActFgI());
 		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
 		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
 		tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
-
-		// 新增綠色授信相關
-		tFacMain.setGrcd(tTempVo.getParam("Grcd"));
-		tFacMain.setGrKind(tTempVo.getParam("GrKind"));
-		tFacMain.setEsGcd(tTempVo.getParam("EsGcd"));
-		tFacMain.setEsGKind(tTempVo.getParam("EsGKind"));
-		tFacMain.setEsGcnl(tTempVo.getParam("EsGcnl"));
-		// 購地貸款相關
-		if (this.parse.stringToInteger(tTempVo.getParam("PreStarBuildingYM")) > 0) {
-			tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("PreStarBuildingYM")) + 191100);
-		} else {
-			tFacMain.setPreStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("PreStarBuildingYM")));
-		}
-		if (this.parse.stringToInteger(tTempVo.getParam("StarBuildingYM")) > 0) {
-			tFacMain.setStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("StarBuildingYM")) + 191100);
-		} else {
-			tFacMain.setStarBuildingYM(this.parse.stringToInteger(tTempVo.getParam("StarBuildingYM")));
-		}
-		
 		try {
 			tFacMain = facMainService.insert(tFacMain, titaVo);
 		} catch (DBException e) {
@@ -1002,13 +909,22 @@ public class L2154 extends TradeBuffer {
 		// 更新階梯式利率
 		FacProdStepRate tFacProdStepRate = new FacProdStepRate();
 
+//			if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 		for (int i = 1; i <= 10; i++) {
 			if (this.parse.stringToDouble(titaVo.getParam("StepMonthE" + i)) > 0) {
 				tFacProdStepRate.setProdNo(sProdNo);
 				tFacProdStepRate.setMonthStart(this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i)));
 				tFacProdStepRate.setFacProdStepRateId(
 						new FacProdStepRateId(sProdNo, this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
+//				if (i == 10) {
+//					tFacProdStepRate.setMonthEnd(999);
+//				} else {
+//					if (this.parse.stringToInteger(titaVo.getParam("StepMonthS" + (i + 1))) == 0) {
+//						tFacProdStepRate.setMonthEnd(999);
+//					} else {
 				tFacProdStepRate.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("StepMonthE" + i)));
+//					}
+//				}
 				tFacProdStepRate.setRateType(titaVo.getParam("StepRateType" + i));
 				tFacProdStepRate.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("StepRateIncr" + i)));
 				tFacProdStepRate.setCreateDate(
@@ -1027,6 +943,7 @@ public class L2154 extends TradeBuffer {
 				break;
 			}
 		}
+//			}
 
 	}
 

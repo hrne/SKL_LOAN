@@ -51,7 +51,6 @@ public class L7300 extends TradeBuffer {
 	@Autowired
 	private ReportUtil rptUtil;
 
-	// http://10.11.100.22:7001/api-ics/tran-data/Loan
 	private String apiUrl = "";
 
 	private String icsFg = "";
@@ -245,8 +244,7 @@ public class L7300 extends TradeBuffer {
 	private String post(JSONObject requestJo) throws LogicException {
 		this.info("L7300 post");
 		String jsonString = requestJo.toString();
-		HttpHeaders headers = setIcsHeader();
-		HttpEntity<?> request = new HttpEntity<Object>(jsonString, headers);
+		HttpEntity<?> request = new HttpEntity<Object>(jsonString, setIcsHeader());
 		String result = null;
 		this.info("ICS request = " + request.toString());
 		RestCom restCom = new RestCom();
@@ -294,6 +292,9 @@ public class L7300 extends TradeBuffer {
 		JSONObject responseJO = null;
 		String tranStatus = null;
 		String errorMessage = null;
+		if (response != null && !response.isEmpty()) {
+			this.info("ICS response = " + response);
+		}
 		try {
 			responseJO = new JSONObject(response);
 			tranStatus = responseJO.getString("tran_status");
@@ -303,7 +304,11 @@ public class L7300 extends TradeBuffer {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("ICS Exception = " + e.getMessage());
 		}
-		tranStatus += errorMessage == null ? "" : errorMessage;
+		tranStatus += " ";
+		if (errorMessage != null && !errorMessage.isEmpty()) {
+			tranStatus += " ";
+			tranStatus += errorMessage;
+		}
 		return tranStatus;
 	}
 }

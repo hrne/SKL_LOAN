@@ -12,6 +12,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L9135ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L9135ServiceImpl2;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
@@ -28,9 +29,12 @@ public class L9135p extends TradeBuffer {
 
 	@Autowired
 	L9135Report l9135Report;
+	L9135Report l9135Report2;
 
 	@Autowired
 	L9135ServiceImpl l9135ServiceImpl;
+	@Autowired
+	L9135ServiceImpl2 l9135ServiceImpl2;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -53,7 +57,7 @@ public class L9135p extends TradeBuffer {
 		l9135Report.setParentTranCode(parentTranCode);
 
 		List<Map<String, String>> l9135List = null;
-
+		List<Map<String, String>> l9135List2 = null;
 		// 帳務日(西元)
 //		int tbsdy = this.txBuffer.getTxCom().getTbsdyf();
 
@@ -65,6 +69,7 @@ public class L9135p extends TradeBuffer {
 		try {
 
 			l9135List = l9135ServiceImpl.findAll(titaVo);
+			l9135List2 = l9135ServiceImpl2.findAll(titaVo);
 
 		} catch (Exception e) {
 
@@ -75,15 +80,17 @@ public class L9135p extends TradeBuffer {
 		if (l9135List != null && !l9135List.isEmpty()) {
 
 			this.info("active L9135report data detail");
-			l9135Report.exec(titaVo, l9135List, acDate);
+			l9135Report.exec(titaVo,l9135List, acDate);
 			infoNotification = "L9135 銀行存款媒體明細表(總帳)";
+			l9135Report2.exec(titaVo,l9135List2, acDate);
 
 		} else {
 
 			infoNotification = "L9135 查無資料";
 
 		}
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO") + "L9135", infoNotification, titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO") + "L9135", infoNotification, titaVo);
 
 		this.addList(this.totaVo);
 
