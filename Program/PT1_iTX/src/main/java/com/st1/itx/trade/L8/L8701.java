@@ -21,11 +21,13 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.DailyLoanBal;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.DailyLoanBalService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeExcel;
@@ -65,6 +67,8 @@ public class L8701 extends TradeBuffer {
 	public AcDetailService acDetailService;
 	@Autowired
 	public WebClient webClient;
+	@Autowired
+	public FacShareApplService facShareApplService;
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -119,6 +123,10 @@ public class L8701 extends TradeBuffer {
 			if (iExcelline == 1) {// 第一行 資料交換序號
 				Data.add((String) map.get("f1"));
 				iCode = (String) map.get("f1");
+				if(iCode.length() < 13) {
+					throw new LogicException(titaVo, "E5009", "上傳檔案的第一欄[資料交換序號]與檔名不符");
+				}
+				
 				if( !sfilename.substring(0, 13).equals(iCode.substring(0, 13))) {
 					throw new LogicException(titaVo, "E5009", "上傳檔案的第一欄[資料交換序號]與檔名不符");
 				}
@@ -137,7 +145,6 @@ public class L8701 extends TradeBuffer {
 				iDataDatef = (String) map.get("f5");// 資料基準日 => 上傳csv資料E欄<索取日迄日>
 				iDataDate = Integer.parseInt(iDataDatef) - 19110000;
 				iBday = Integer.parseInt((String) map.get("f3"));//=> 上傳csv資料C欄<生日>
-				memo = "";
 				this.info("iDataDatef==" + iDataDatef);
 				getDataRoutine(titaVo);
 			}
@@ -196,7 +203,8 @@ public class L8701 extends TradeBuffer {
 		}
 		int icustno = tCustMain.getCustNo();
 		int iday = tCustMain.getBirthday() + 19110000;
-//		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findAll(0, Integer.MAX_VALUE, titaVo);
+
+		//		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findAll(0, Integer.MAX_VALUE, titaVo);
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(icustno, 0, 999, 0, 999, 0,
 				Integer.MAX_VALUE, titaVo);
 		if (slLoanBorMain == null) {
@@ -218,9 +226,15 @@ public class L8701 extends TradeBuffer {
 				continue;
 			}
 
-			if(ln.getCustNo()!=tCustMain.getCustNo()) {
+			if (ln.getCustNo() != icustno) {
 				continue;
 			}
+
+			memo = "";
+			//檔案內的生日與客戶檔不同:備註填報"生日不符"
+			if(iBday != iday) {
+				memo = "生日不符 ";
+			}				
 			
 			acctCode = "";
 			loanBal = BigDecimal.ZERO;
@@ -234,9 +248,17 @@ public class L8701 extends TradeBuffer {
 				loanBal = tDailyLoanBal.getLoanBalance();
 			}
 			if (loanBal.compareTo(BigDecimal.ZERO) > 0) {
-				if(iBday != iday) {
-					memo = "生日不符";
-				}				
+				// 共同借款人:備註填報"聯名戶"
+				Slice<FacShareAppl> slFacShareAppl = facShareApplService.findCustNoEq(icustno, 0, Integer.MAX_VALUE,
+						titaVo);
+				if (slFacShareAppl != null) {
+					for (FacShareAppl fs : slFacShareAppl.getContent()) {
+						if (fs.getFacmNo() == ln.getFacmNo()) {
+							memo = memo + "聯名戶";
+							continue;
+						}
+					}
+				}
 				outputRoutine(ln, titaVo);
 			}
 		}
@@ -369,19 +391,19 @@ public class L8701 extends TradeBuffer {
 		strField += makeFile.fillStringR(memo, 120, ' ');// 備註 120碼
 		Data.add(strField);
 
-		this.info("債務人統編 :" + iCustId);
-		this.info("債務人名稱 :" + tCustMain.getCustName());
-		this.info("金融機構代碼 :" + "4580000");
-		this.info("放款種類 :" + "B");
-		this.info("授信帳號=" + parse.IntegerToString(ln.getCustNo(), 7) + parse.IntegerToString(ln.getFacmNo(), 3) + parse.IntegerToString(ln.getBormNo(), 3));
-		this.info("放款科目 :" + oAcctItem);
-		this.info("資料基準日 :" + iDataDatef);
-		this.info("初貸日期 :" + (tFacMain.getFirstDrawdownDate() + 19110000));
-		this.info("契約起始日期 :" + (ln.getDrawdownDate() + 19110000));
-		this.info("契約終止日期 :" + (ln.getMaturityDate() + 19110000));
-		this.info("基準日放款餘 :" + loanBal);
-		this.info("借款用途 :" + oUsageItem);
-		this.info("備註 :" + "");
+		//this.info("債務人統編 :" + iCustId);
+		//this.info("債務人名稱 :" + tCustMain.getCustName());
+		//this.info("金融機構代碼 :" + "4580000");
+		//this.info("放款種類 :" + "B");
+		//this.info("授信帳號=" + parse.IntegerToString(ln.getCustNo(), 7) + parse.IntegerToString(ln.getFacmNo(), 3) + parse.IntegerToString(ln.getBormNo(), 3));
+		//this.info("放款科目 :" + oAcctItem);
+		//this.info("資料基準日 :" + iDataDatef);
+		//this.info("初貸日期 :" + (tFacMain.getFirstDrawdownDate() + 19110000));
+		//this.info("契約起始日期 :" + (ln.getDrawdownDate() + 19110000));
+		//this.info("契約終止日期 :" + (ln.getMaturityDate() + 19110000));
+		//this.info("基準日放款餘 :" + loanBal);
+		//this.info("借款用途 :" + oUsageItem);
+		//this.info("備註 :" + "");
 
 	}
 }

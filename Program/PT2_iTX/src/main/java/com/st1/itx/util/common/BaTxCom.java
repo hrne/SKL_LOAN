@@ -21,7 +21,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanFacTmp;
@@ -1587,19 +1589,17 @@ public class BaTxCom extends TradeBuffer {
 		String acctCode = loanCalcRepayIntCom.getAcctCode();
 
 		// 短擔=>按日計息
-		// 中長擔應繳日為1日=>按月計息但下繳日大於等於下月1日 且 上繳日小於本月1日=>按日計息
+		// 中長擔上繳日為1日=>按月計息但下繳日大於等於下月1日 且 上繳日小於本月1日=>按日計息
 		if (acctCode.equals("310")) {
 			// 1.短擔
 			intCalcCode = "1";// 計息方式 1:按日計息
 		} else {
 			// 2. 中長擔
-			// 2022-04-19 智偉增加
-			// 若帳號計息方式是1:按日計息 且 繳息日期(2碼)為1
-			if (intCalcCode.equals("1") && ln.getSpecificDd() == 1) {
+			// 若帳號計息方式是1:按日計息 且上繳日為1日
+			if (intCalcCode.equals("1") && (ln.getPrevPayIntDate() % 100 == 1)) {
 				// 計息方式改為2:按月計息
 				intCalcCode = "2";
 			}
-			// 2022-04-19 智偉增加
 			// 若帳號計息方式是2:按月計息 且 下繳日 大於等於下月1日 且 上繳日小於本月1日
 			if (intCalcCode.equals("2") && ln.getNextPayIntDate() >= nextMonth01
 					&& ln.getPrevPayIntDate() < thisMonth01) {
@@ -1698,8 +1698,9 @@ public class BaTxCom extends TradeBuffer {
 			wkInterest = BigDecimal.ZERO;
 			for (CalcRepayIntVo ca : lCalcRepayIntVo) {
 				if (ca.getInterestFlag() == 1) {
-					wkInterest = wkInterest.add(ca.getAmount().multiply(ca.getStoreRate())
-							.multiply(new BigDecimal(ca.getDays())).divide(new BigDecimal(36500), 9, RoundingMode.DOWN)
+					BigDecimal wkDaysDenominator = new BigDecimal(ca.getDays()).divide(new BigDecimal(36500), 9,
+							RoundingMode.DOWN);
+					wkInterest = wkInterest.add(ca.getAmount().multiply(ca.getStoreRate()).multiply(wkDaysDenominator)
 							.setScale(0, RoundingMode.DOWN));
 				} else {
 					BigDecimal wkMonthDenominator = new BigDecimal(1200).multiply(

@@ -213,7 +213,7 @@ T(H,#DscptCode,#DscptCodeHelp)
 T(H,#RepayType,#RepayTypeHelp)
 
 !虛擬帳號
-#VirtualAcctNo=X,14,L
+#VirtualAcctNo=X,17,L
 
 !AML回應碼
 #AmlRsp=X,1,L

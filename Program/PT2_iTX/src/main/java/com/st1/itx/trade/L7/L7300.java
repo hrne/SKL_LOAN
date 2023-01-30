@@ -273,7 +273,7 @@ public class L7300 extends TradeBuffer {
 	private HttpHeaders setIcsHeader() {
 		this.info("L7300 setIcsHeader");
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON_UTF8); // 指定編碼方式
+		headers.setContentType(MediaType.APPLICATION_JSON); // 指定編碼方式
 //		String[] icsAuthArray = icsAuth.split(":");
 //		headers.setBasicAuth(icsAuthArray[0], icsAuthArray[1], StandardCharsets.UTF_8); // 指定帳密編碼方式
 //		headers.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8)); // 指定傳送/接收資料時可接受編碼方式

@@ -101,6 +101,9 @@ public class PdfGenerator extends CommBuffer {
 	// 列印明細
 	private List<HashMap<String, Object>> listMap = null;
 
+	// 寬度點數
+	private double xPoints = 0;
+
 	// 高度點數
 	private double yPoints = 0;
 
@@ -202,9 +205,9 @@ public class PdfGenerator extends CommBuffer {
 		this.info("rptDate = " + rptDate);
 		this.info("rptTime = " + rptTime);
 
-		settingFromTxFile(fileName);
-
 		init();
+
+		settingFromTxFile(fileName);
 
 		try {
 			for (HashMap<String, Object> map : this.listMap) {
@@ -257,6 +260,8 @@ public class PdfGenerator extends CommBuffer {
 					break;
 				}
 			}
+
+			this.checkConfidentiality();
 
 			if (reportVo.isUseDefault()) {
 				stamper.setFormFlattening(true);
@@ -354,8 +359,10 @@ public class PdfGenerator extends CommBuffer {
 		}
 
 		if ("P".equals(paperorientaton)) {
+			this.xPoints = stamper.getWriter().getPageSize().getWidth();
 			this.yPoints = stamper.getWriter().getPageSize().getHeight();
 		} else {
+			this.xPoints = stamper.getWriter().getPageSize().getHeight();
 			this.yPoints = stamper.getWriter().getPageSize().getWidth();
 		}
 
@@ -381,31 +388,31 @@ public class PdfGenerator extends CommBuffer {
 		// 輸出檔名
 		fos = new FileOutputStream(new File(outfile));
 		// 報表啟始
-		String papersize = map.get("paper").toString();
+		String paperSize = map.get("paper").toString();
 
-		String[] pageSizes = papersize.split(",");
+		String[] pageSizeSplit = paperSize.split(",");
 
-		Rectangle pagesize = PageSize.A4; // 預設A4
+		Rectangle pageRectangle = PageSize.A4; // 預設A4
 
-		if ("LETTER".equals(papersize)) {
-			pagesize = PageSize.LETTER;
-		} else if ("A5".equals(papersize)) {
-			pagesize = PageSize.A5;
+		if ("LETTER".equals(paperSize)) {
+			pageRectangle = PageSize.LETTER;
+		} else if ("A5".equals(paperSize)) {
+			pageRectangle = PageSize.A5;
 //		} else if (i != -1) {
 			// 自訂尺寸,以inch為單位
-		} else if (pageSizes.length == 2) {
-			long n1 = (long) Math.ceil((Double.parseDouble(pageSizes[0]) * 72));
-			long n2 = (long) Math.ceil((Double.parseDouble(pageSizes[1]) * 72));
-			pagesize = new Rectangle(n1, n2);
+		} else if (pageSizeSplit.length == 2) {
+			long n1 = (long) Math.ceil((Double.parseDouble(pageSizeSplit[0]) * 72));
+			long n2 = (long) Math.ceil((Double.parseDouble(pageSizeSplit[1]) * 72));
+			pageRectangle = new Rectangle(n1, n2);
 		}
 
 		paperorientaton = map.get("paper.orientation").toString();
 
 		// 建立一個Document物件，並設定頁面大小及左、右、上、下的邊界，rotate()橫印
 		if ("P".equals(paperorientaton)) {
-			document = new Document(pagesize, 0, 0, 0, 0);
+			document = new Document(pageRectangle, 0, 0, 0, 0);
 		} else {
-			document = new Document(pagesize.rotate(), 0, 0, 0, 0);
+			document = new Document(pageRectangle.rotate(), 0, 0, 0, 0);
 		}
 
 		// 設定要輸出的Stream
@@ -421,8 +428,10 @@ public class PdfGenerator extends CommBuffer {
 		}
 
 		if ("P".equals(paperorientaton)) {
+			this.xPoints = writer.getPageSize().getWidth();
 			this.yPoints = writer.getPageSize().getHeight();
 		} else {
+			this.xPoints = writer.getPageSize().getHeight();
 			this.yPoints = writer.getPageSize().getWidth();
 		}
 
@@ -635,6 +644,7 @@ public class PdfGenerator extends CommBuffer {
 	}
 
 	private void setNewPage() throws DocumentException, IOException {
+		this.checkConfidentiality();
 		// 新頁
 		if (reportVo.isUseDefault()) {
 			if (this.nowPage > 0) {
@@ -701,6 +711,8 @@ public class PdfGenerator extends CommBuffer {
 		this.info("rptTime = " + rptTime);
 
 		setListMapFromJson(tTxFile.getFileData());
+
+		this.reportVo.setRptCode(tTxFile.getFileCode());
 
 		outputFile = setOutputFile(fileName, tTxFile.getFileOutput());
 
@@ -801,5 +813,40 @@ public class PdfGenerator extends CommBuffer {
 		if (tCdReport != null && tCdReport.getWatermarkFlag() != 1) {
 			watermarkFlag = false;
 		}
+	}
+
+	private void checkConfidentiality() {
+		if (reportVo == null) {
+			this.info("checkConfidentiality reportVo is null ");
+		}
+		if (reportVo.getRptCode() == null) {
+			this.info("checkConfidentiality reportVo.getRptCode() is null ");
+		}
+		if (titaVo == null) {
+			this.info("checkConfidentiality titaVo is null ");
+			titaVo = new TitaVo();
+			titaVo.init();
+		}
+		String confidentiality = rptUtil.getConfidentiality(reportVo.getRptCode(), titaVo);
+
+		switch (confidentiality) {
+		case "2":
+			printConfidentiality("SKL-B#DB*B94!5");
+			break;
+		case "3":
+			printConfidentiality("SKL-A#CF*13D!A");
+			break;
+		default:
+			this.info("confidentiality = " + confidentiality);
+			break;
+		}
+	}
+
+	private void printConfidentiality(String txt) {
+		content.beginText();
+		content.setFontAndSize(baseFont, pdfFontSize);
+		content.setCharacterSpacing(charSpaces);
+		content.showTextAligned(PdfContentByte.ALIGN_LEFT, txt, 5, 5, 0);
+		content.endText();
 	}
 }

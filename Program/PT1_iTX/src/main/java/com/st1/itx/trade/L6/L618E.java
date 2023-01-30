@@ -21,7 +21,6 @@ import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.TxToDoCom;
@@ -48,8 +47,6 @@ public class L618E extends TradeBuffer {
 	LoanCom loanCom;
 	@Autowired
 	public TxToDoCom txToDoCom;
-	@Autowired
-	public AcDetailCom acDetailCom;
 	@Autowired
 	public AcReceivableCom acReceivableCom;
 
@@ -78,6 +75,9 @@ public class L618E extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L618E ");
 		this.totaVo.init(titaVo);
+		loanCom.setTxBuffer(this.txBuffer);
+		txToDoCom.setTxBuffer(this.txBuffer);
+		acReceivableCom.setTxBuffer(this.txBuffer);
 
 //		呆帳戶法務費墊付
 
@@ -88,7 +88,6 @@ public class L618E extends TradeBuffer {
 		iAcctCode = titaVo.getParam("AcctCode");
 		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
 //		update應處理清單
-		txToDoCom.setTxBuffer(this.txBuffer);
 		TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 
 		tTxToDoDetailId.setCustNo(iCustNo);
@@ -97,8 +96,6 @@ public class L618E extends TradeBuffer {
 		tTxToDoDetailId.setDtlValue(iRvNo);
 		txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 
-		
-		
 		// 銷帳檔有資料時先銷銷帳檔
 		if (!"".equals(iAcctCode)) {
 			acReceivable = new AcReceivable();
@@ -112,7 +109,6 @@ public class L618E extends TradeBuffer {
 			acReceivable.setRvNo(iRvNo); // 銷帳編號
 			acReceivable.setOpenAcDate(this.txBuffer.getTxBizDate().getTbsDy());
 			acReceivableList.add(acReceivable);
-			acReceivableCom.setTxBuffer(this.getTxBuffer());
 			acReceivableCom.mnt(1, acReceivableList, titaVo); // 0-起帳 1-銷帳
 
 		}
@@ -175,8 +171,7 @@ public class L618E extends TradeBuffer {
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setTxDescCode("6182"); // 6182 呆帳戶法務費墊付
 		tLoanBorTx.setEntryDate(titaVo.getEntDyI());
-		//
-		tLoanBorTx.setDisplayflag("A"); // A:帳務
+		tLoanBorTx.setDisplayflag("Y"); // Y:非帳務
 		tLoanBorTx.setTxAmt(iTxAmt);
 		tTempVo.clear();
 		tTempVo.putParam("RvNo", iRvNo);

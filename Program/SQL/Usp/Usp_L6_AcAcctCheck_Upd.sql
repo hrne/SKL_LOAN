@@ -490,6 +490,15 @@ BEGIN
         AND S2."AcctCode" IN ( 'F10' -- 帳管費
                              , 'F29' -- 契變手續費
                              , 'TAV' -- 暫收款
+                             , "TCK" -- 2023-01-30 Wei from Lai
+                             , "TAM" -- 2023-01-30 Wei from Lai
+                             , "TRO" -- 2023-01-30 Wei from Lai
+                             , "TLD" -- 2023-01-30 Wei from Lai
+                             , "TSL" -- 2023-01-30 Wei from Lai
+                             , "T10" -- 2023-01-30 Wei from Lai
+                             , "T11" -- 2023-01-30 Wei from Lai
+                             , "T12" -- 2023-01-30 Wei from Lai
+                             , "T13" -- 2023-01-30 Wei from Lai
                              ) -- Wei 2022-01-27
       GROUP BY "AcctCode"
              , "AcSubBookCode"
@@ -506,7 +515,17 @@ BEGIN
            , SUM("YdBal") AS "YdBalSum"
            , SUM("TdBal") AS "TdBalSum"
       FROM "AcMain"
-      WHERE "AcctCode" IN ('TAV') -- 2022-03-01 Wei
+      WHERE "AcctCode" IN ('TAV'
+                          ,"TCK" -- 2023-01-30 Wei from Lai
+                          ,"TAM" -- 2023-01-30 Wei from Lai
+                          ,"TRO" -- 2023-01-30 Wei from Lai
+                          ,"TLD" -- 2023-01-30 Wei from Lai
+                          ,"TSL" -- 2023-01-30 Wei from Lai
+                          ,"T10" -- 2023-01-30 Wei from Lai
+                          ,"T11" -- 2023-01-30 Wei from Lai
+                          ,"T12" -- 2023-01-30 Wei from Lai
+                          ,"T13" -- 2023-01-30 Wei from Lai
+                          ) -- 2022-03-01 Wei
         AND "AcDate" = TBSDYF
         AND "AcBookCode" = '000'
       GROUP BY "AcctCode"

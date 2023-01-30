@@ -6,15 +6,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdReport;
+import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.tradeService.CommBuffer;
 
 @Component
 @Scope("prototype")
 public class ReportUtil extends CommBuffer {
+
+	@Autowired
+	CdReportService cdReportService;
 
 	/**
 	 * 為了 formatAmt() 預先建好的單位 prefabs 利用 static block 做初始化, 確保 formatAmtTemplates
@@ -606,5 +613,15 @@ public class ReportUtil extends CommBuffer {
 			}
 		}
 		return false;
+	}
+
+	public String getConfidentiality(String reportCode, TitaVo titaVo) {
+		if (reportCode != null && !reportCode.isEmpty()) {
+			CdReport cdReport = cdReportService.findById(reportCode, titaVo);
+			if (cdReport != null && cdReport.getConfidentiality() != null) {
+				return cdReport.getConfidentiality();
+			}
+		}
+		return "0";
 	}
 }

@@ -36,7 +36,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 
 		// 撥款金額
-		sql += " WITH TotalDrawdownAmt AS ( ";
+		sql += " WITH \"TotalDrawdownAmt\" AS ( ";
 		sql += " SELECT SUBSTR(lbm.\"DrawdownDate\", 1, 6) \"YearMonth\" ";
 		sql += "       ,SUM(lbm.\"DrawdownAmt\") \"Total\" ";
 		sql += " FROM \"LoanBorMain\" lbm ";
@@ -61,7 +61,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 所以一旦額度主檔有提前清償原因，而清償檔沒有資料
 		// 歷史資料的金額會錯誤
 
-		sql += " , CloseAmt AS ( ";
+		sql += " , \"CloseAmt\" AS ( ";
 		sql += " SELECT mlb.\"YearMonth\" ";
 		sql += "       ,SUM(DECODE(NVL(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\"), 4, mlbLast.\"LoanBalance\", 0)) \"CloseAmt4\" ";
 		sql += "       ,SUM(DECODE(NVL(fc.\"CloseReasonCode\", fm.\"AdvanceCloseCode\"), 1, mlbLast.\"LoanBalance\", 0)) \"CloseAmt1\" ";
@@ -110,7 +110,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 轉催收
 
-		sql += " , TurnOvdu AS ( ";
+		sql += " , \"TurnOvdu\" AS ( ";
 		sql += " SELECT SUBSTR(lbtx.\"AcDate\", 1, 6) \"YearMonth\" ";
 		sql += "       ,SUM(\"Principal\") \"Total\" ";
 		sql += " FROM \"LoanBorTx\" lbtx ";
@@ -120,16 +120,17 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " GROUP BY SUBSTR(lbtx.\"AcDate\", 1, 6) ";
 		sql += " ) ";
 		sql += "  ";
+		//AcctCode=990
 
 		// 部分還本
 
-		sql += " , PartlyRepay AS ( ";
+		sql += " , \"PartlyRepay\" AS ( ";
 		sql += " SELECT SUBSTR(lbtx.\"AcDate\", 1, 6) \"YearMonth\" ";
 		sql += "       ,SUM(CASE lbtx.\"TitaTxCd\" ";
 		sql += "                 WHEN 'L3200' ";
 		sql += "                 THEN lbtx.\"ExtraRepay\" ";
 		sql += "                 WHEN 'L3420' ";
-		sql += "                 THEN lbtx.\"Principal\" ";
+		sql += "                 THEN lbtx.\"Principal\" - lbtx.\"ExtraRepay\" ";
 		sql += "            ELSE 0 END) \"Total\" ";
 		sql += " FROM \"LoanBorTx\" lbtx ";
 		sql += " LEFT JOIN \"LoanBorMain\" lbm ON lbm.\"CustNo\" = lbtx.\"CustNo\" ";
@@ -156,7 +157,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 本金攤提
 
-		sql += " , Tenty AS ( ";
+		sql += " , \"Tenty\" AS ( ";
 		sql += " SELECT SUBSTR(lbtx.\"EntryDate\", 1, 6) \"YearMonth\" ";
 		sql += "       ,SUM(lbtx.\"Principal\") \"Total\" ";
 		sql += " FROM \"LoanBorTx\" lbtx ";
@@ -182,7 +183,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 企金別月底餘額
 
-		sql += " , EOMBalanceByEntCode AS ( ";
+		sql += " , \"EOMBalanceByEntCode\" AS ( ";
 		sql += " SELECT MLB.\"YearMonth\" ";
 		sql += "       ,SUM(DECODE(MLB.\"EntCode\", 1, MLB.\"LoanBalance\", 0)) \"TotalEnterprise\" ";
 		sql += "       ,SUM(DECODE(MLB.\"EntCode\", 1, 0, MLB.\"LoanBalance\")) \"TotalNatural\" ";
@@ -199,7 +200,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 自然人全年申貸撥款額
 
-		sql += " , NaturalDrawdownAmtYearly AS ( ";
+		sql += " , \"NaturalDrawdownAmtYearly\" AS ( ";
 		sql += " SELECT SUBSTR(lbm.\"DrawdownDate\", 1, 4) \"DrawdownYear\" ";
 		sql += "       ,SUM(lbm.\"DrawdownAmt\") \"Total\" ";
 		sql += " FROM \"LoanBorMain\" lbm ";
@@ -209,7 +210,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " GROUP BY SUBSTR(lbm.\"DrawdownDate\", 1, 4) ";
 		sql += " ) ";
 		sql += "  ";
-		sql += " , OutputYearMonth AS ( ";
+		sql += " , \"OutputYearMonth\" AS ( ";
 		sql += " SELECT TO_CHAR(ADD_MONTHS(TO_DATE(:yearMonthMin, 'YYYYMM'), LEVEL - 1), 'YYYYMM') \"YearMonth\" ";
 		sql += " FROM DUAL ";
 		sql += " CONNECT BY LEVEL <= CEIL(MONTHS_BETWEEN(TO_DATE(:yearMonthMax, 'YYYYMM'), TO_DATE(:yearMonthMin, 'YYYYMM'))) + 1 ";
@@ -247,14 +248,14 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        - NVL(S4.\"Total\", 0) ";
 		sql += "        - NVL(S5.\"Total\", 0) ";
 		sql += "        - NVL(S6.\"Total\", 0) \"Net\" "; // F16 淨增減
-		sql += " FROM OutputYearMonth S1 ";
-		sql += " LEFT JOIN TotalDrawdownAmt S2 ON S2.\"YearMonth\" = S1.\"YearMonth\" ";
-		sql += " LEFT JOIN CloseAmt S3 ON S3.\"YearMonth\" = S1.\"YearMonth\" ";
-		sql += " LEFT JOIN PartlyRepay S4 ON S4.\"YearMonth\" = S1.\"YearMonth\" ";
-		sql += " LEFT JOIN Tenty S5 ON S5.\"YearMonth\" = S1.\"YearMonth\" ";
-		sql += " LEFT JOIN TurnOvdu S6 ON S6.\"YearMonth\" = S1.\"YearMonth\" ";
-		sql += " LEFT JOIN EOMBalanceByEntCode S8 ON S8.\"YearMonth\" = S1.\"YearMonth\" ";
-		sql += " LEFT JOIN NaturalDrawdownAmtYearly S9 ON S9.\"DrawdownYear\" = SUBSTR(S1.\"YearMonth\", 1, 4) ";
+		sql += " FROM \"OutputYearMonth\" S1 ";
+		sql += " LEFT JOIN \"TotalDrawdownAmt\" S2 ON S2.\"YearMonth\" = S1.\"YearMonth\" ";
+		sql += " LEFT JOIN \"CloseAmt\" S3 ON S3.\"YearMonth\" = S1.\"YearMonth\" ";
+		sql += " LEFT JOIN \"PartlyRepay\" S4 ON S4.\"YearMonth\" = S1.\"YearMonth\" ";
+		sql += " LEFT JOIN \"Tenty\" S5 ON S5.\"YearMonth\" = S1.\"YearMonth\" ";
+		sql += " LEFT JOIN \"TurnOvdu\" S6 ON S6.\"YearMonth\" = S1.\"YearMonth\" ";
+		sql += " LEFT JOIN \"EOMBalanceByEntCode\" S8 ON S8.\"YearMonth\" = S1.\"YearMonth\" ";
+		sql += " LEFT JOIN \"NaturalDrawdownAmtYearly\" S9 ON S9.\"DrawdownYear\" = SUBSTR(S1.\"YearMonth\", 1, 4) ";
 		sql += " ORDER BY S1.\"YearMonth\" ";
 		this.info("sql=" + sql);
 

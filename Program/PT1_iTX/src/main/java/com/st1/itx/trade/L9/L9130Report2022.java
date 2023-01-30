@@ -248,7 +248,7 @@ public class L9130Report2022 extends MakeReport {
 
 		drAmtTotal = BigDecimal.ZERO;
 
-		ReportVo reportVo = ReportVo.builder().setRptDate(titaVo.getEntDyI()).setBrno(titaVo.getKinbr())
+		ReportVo reportVo = ReportVo.builder().setRptDate(iAcDate + 19110000).setBrno(titaVo.getKinbr())
 				.setRptCode("L9130").setRptItem("總帳傳票資料_" + iBatchNo).build();
 
 		makeExcel.open(titaVo, reportVo, "總帳傳票資料_" + iBatchNo, "L9130_底稿_總帳傳票資料.xlsx", "明細");

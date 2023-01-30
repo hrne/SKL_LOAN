@@ -495,6 +495,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					this.info("specifyPayTermsRoutine-0");
 					specifyTermsRoutine();
 				} else {
+					this.info("specifyPayTermsRoutine dateDif " + wkIntStartDate + "~" + iNextPayIntDate);
 					dDateUtil.init();
 					dDateUtil.setDate_1(wkIntStartDate);
 					dDateUtil.setDate_2(iNextPayIntDate);
@@ -1078,9 +1079,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		tLoanRateChange = new LoanRateChange();
 		// 利息提存未到期利息以最後一段利率計算
-		if (iIntEndCode == 2 && iIntEndDate > 0 && iIntEndDate > iEntryDate) {
+		if (iIntEndCode == 2 && iIntEndDate > 0) {
 			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
-					iEntryDate + 19110000, titaVo);
+					iIntEndDate + 19110000, titaVo);
 		} else {
 			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
 					wkIntStartDate + 19110000, titaVo);

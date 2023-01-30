@@ -270,7 +270,13 @@ public class L7401 extends TradeBuffer {
 		} else if (text.contains("-") || text.length() == 0) {
 			resText = "-";
 		} else if (text.contains(".") || text.length() < 11) {
-			resText = String.valueOf(Integer.valueOf(text));
+			int j = 0;
+			for (int i = 0; i < text.length(); i++) {
+				if (text.contains(".")) {
+					j = i;
+				}
+			}
+			resText = String.valueOf(Integer.valueOf(text.substring(0, j - 1)));
 		} else {
 			resText = text;
 		}

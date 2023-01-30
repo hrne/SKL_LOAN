@@ -143,7 +143,17 @@ BEGIN
                    WHEN S1."TRXTRN" = '3086' 
                         AND S1."TRXTCT" = '6' 
                    THEN 0 -- 2022-10-28 修改: 轉呆金額 
-                 ELSE S1."TRXAMT" END )     AS "TRXAMT" -- 計算交易總金額 
+                 ELSE S1."TRXAMT" END
+                 +
+                 -- 2023-01-30 智偉增加 from 賴桑 : 交易金額不含支票兌現
+                 CASE
+                   WHEN TR1."TRXCRC" IN ('1','3')  AND TR1."TRXNTX" != 0
+                   THEN TR1."TRXNTX"
+                   WHEN TR1."TRXNTX" != 0
+                   THEN 0 - TR1."TRXNTX"
+                 ELSE 0
+                 END   
+                 )     AS "TRXAMT" -- 計算交易總金額 
             ,SUM(CASE 
                    WHEN S1."TRXTRN" = '3031' THEN S1."TRXAMT" -- 3031:回收登錄 
                    WHEN S1."TRXTRN" = '3041' THEN S1."TRXAMT" -- 3041:結案登錄 
@@ -212,13 +222,40 @@ BEGIN
       LEFT JOIN "CdAcCode" CAC ON CAC."AcNoCodeOld" = L.CORACC 
                               AND CAC."AcSubCode" = NVL(L.CORACS,'     ') 
                               AND CAC."AcDtlCode" = CASE 
-                                                      WHEN L.CORACC IN ('40903300','20232020','20232182','20232180','20232181','40907400') 
+                                                      WHEN L.CORACC IN ('40903300'
+                                                                       ,'20232020'
+                                                                       ,'20232182'
+                                                                       ,'20232180'
+                                                                       ,'20232181'
+                                                                       ,'40907400') 
                                                            AND NVL(L.CORACS,'     ') = '     ' 
                                                       THEN '01' 
                                                     ELSE '  ' END 
       WHERE NVL(J.TRXTRN,' ') != '3037' 
         AND T.TRXAMT = NVL(J.JLNAMT,0) 
-        AND CAC."AcctCode" IN ('F10','F29','TMI','F07') 
+        AND CAC."AcctCode" IN ('F07' -- 暫付法務費
+                              ,'F08' -- 收回呆帳及過期帳
+                              ,'TMI' -- 火險保費
+                              ,'F09' -- 暫付火險保費
+                              ,'F10' -- 帳管費/手續費
+                              ,'F12' -- 企金件
+                              ,'F13' -- 沖什項收入
+                              ,'F14' -- NPL-銷項稅額
+                              ,'F15' -- 921貸款戶
+                              ,'F16' -- 3200億專案
+                              ,'F17' -- 3200億-利變
+                              ,'F18' -- 沖備抵呆帳
+                              ,'F19' -- 轉債協暫收款
+                              ,'F20' -- 轉應付代收
+                              ,'F21' -- 88風災
+                              ,'F22' -- 88風災-保費
+                              ,'F23' -- 3200億傳統A
+                              ,'F24' -- 催收款項-法務費用
+                              ,'F25' -- 催收款項-火險費用
+                              ,'F27' -- 聯貸管理費
+                              ,'F29' -- 契變手續費
+                              ,'F30' -- 呆帳戶法務費墊付
+                              ) 
     ) 
     , correctTx AS ( 
       SELECT DISTINCT 
@@ -304,14 +341,6 @@ BEGIN
              WHEN TR1."TRXCRC" IN ('1','3') 
              THEN 0 - NVL(JL."JLNAMT",0) 
            ELSE NVL(JL."JLNAMT",0) 
-           END
-           +
-           CASE
-             WHEN TR1."TRXCRC" IN ('1','3')  AND TR1."TRXNTX" != 0
-             THEN NVL(JL."JLNAMT",0) 
-             WHEN TR1."TRXNTX" != 0
-             THEN 0 - TR1."TRXNTX"
-           ELSE 0
            END                            AS "TxAmt"               -- 交易金額 DECIMAL 16 2 
           ,TR1."LMSLBL"                   AS "LoanBal"             -- 放款餘額 DECIMAL 16 2 
           ,TR1."TRXISD"                   AS "IntStartDate"        -- 計息起日 DECIMALD 8  
@@ -534,11 +563,31 @@ BEGIN
           ,TR1."BSTBTN" AS "SlipSumNo" 
           ,CASE
              -- 2022-12-01 Wei from Lai 口頭說要新增
+             -- 2023-01-30 Wei from Lai 增加這些科目
              WHEN JL."AcctCode"
-                  IN ( 'F10'   -- 實收帳管費 
-                     , 'F29'   -- 實收契變手續費 
-                     , 'TMI'   -- 實收火險保費  
-                     , 'F07' ) -- 實收法拍費用 
+                  IN ('F07' -- 暫付法務費
+                     ,'F08' -- 收回呆帳及過期帳
+                     ,'TMI' -- 火險保費
+                     ,'F09' -- 暫付火險保費
+                     ,'F10' -- 帳管費/手續費
+                     ,'F12' -- 企金件
+                     ,'F13' -- 沖什項收入
+                     ,'F14' -- NPL-銷項稅額
+                     ,'F15' -- 921貸款戶
+                     ,'F16' -- 3200億專案
+                     ,'F17' -- 3200億-利變
+                     ,'F18' -- 沖備抵呆帳
+                     ,'F19' -- 轉債協暫收款
+                     ,'F20' -- 轉應付代收
+                     ,'F21' -- 88風災
+                     ,'F22' -- 88風災-保費
+                     ,'F23' -- 3200億傳統A
+                     ,'F24' -- 催收款項-法務費用
+                     ,'F25' -- 催收款項-火險費用
+                     ,'F27' -- 聯貸管理費
+                     ,'F29' -- 契變手續費
+                     ,'F30' -- 呆帳戶法務費墊付
+                     )  
              THEN JL."AcctCode"
            ELSE TO_CHAR(TR1."ACTACT") END          AS "AcctCode" 
           /* 更新交易別代碼 */ 

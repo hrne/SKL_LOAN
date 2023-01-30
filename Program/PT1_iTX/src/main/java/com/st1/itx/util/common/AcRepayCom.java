@@ -140,7 +140,7 @@ public class AcRepayCom extends TradeBuffer {
 		settlePayment(titaVo);
 
 		// step 3. 費用出帳
-		settleFee(false, titaVo);
+		settleFee(false, "", titaVo);
 
 		// step 4. 本金利息出帳、計算交易明細的交易金額及暫收借金額
 		for (LoanBorTx tx : ilLoanBorTx) {
@@ -294,8 +294,12 @@ public class AcRepayCom extends TradeBuffer {
 		// step 4. 費用出帳
 		BigDecimal totalFee = BigDecimal.ZERO;
 		int splseq = this.lAcDetail.size();
+		String iNote = "";
+		if ("L3230".equals(titaVo.getTxcd())) {
+			iNote = titaVo.getParam("Description");
+		}
 		if ("L3210".equals(titaVo.getTxcd()) || "L3230".equals(titaVo.getTxcd())) {
-			totalFee = settleFee(true, titaVo);
+			totalFee = settleFee(true, iNote, titaVo);
 		}
 
 		// step 5. 暫收抵繳出帳 ==> 僅L3210暫收款登錄
@@ -378,7 +382,7 @@ public class AcRepayCom extends TradeBuffer {
 	}
 
 	// 費用出帳
-	private BigDecimal settleFee(boolean isTempRepay, TitaVo titaVo) throws LogicException {
+	private BigDecimal settleFee(boolean isTempRepay, String iNote, TitaVo titaVo) throws LogicException {
 		// 依應繳試算 List <BaTxVo>內費用類別
 		if (this.baTxList == null) {
 			return BigDecimal.ZERO;
@@ -388,8 +392,8 @@ public class AcRepayCom extends TradeBuffer {
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 				totalFee = totalFee.add(ba.getAcctAmt());
-				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, "", iEntryDate, new TempVo(), titaVo);
-				settleFeeAmt(ba, "", tx); // 費用出帳
+				LoanBorTx tx = addFeeBorTxRoutine(ba, iRepayCode, iNote, iEntryDate, new TempVo(), titaVo);
+				settleFeeAmt(ba, tx); // 費用出帳
 				if (isTempRepay) {
 					tx.setTxAmt(BigDecimal.ZERO);
 					tx.setTempAmt(ba.getAcctAmt());
@@ -1245,7 +1249,7 @@ public class AcRepayCom extends TradeBuffer {
 	}
 
 	// 新增放款交易內容檔(收回費用)
-	private void settleFeeAmt(BaTxVo ba, String iNote, LoanBorTx tx) throws LogicException {
+	private void settleFeeAmt(BaTxVo ba, LoanBorTx tx) throws LogicException {
 		this.info("settleFeeAmt ... ");
 		// 轉呆帳 借:備抵呆帳
 		if (iCaseCloseCode == 7 || iCaseCloseCode == 8) {
