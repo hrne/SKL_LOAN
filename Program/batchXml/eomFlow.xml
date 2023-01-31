@@ -8,6 +8,10 @@
 	<!-- 作業名稱 -->
 	<job id="eomFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
+		<step id="startBS900" parent="parentStep"
+			next="l2ForeclosureFinishedUpd">
+			<tasklet ref="StartBS900" />
+		</step>
 		<!-- Usp_L2_ForeclosureFinished_Upd -->
 		<step id="l2ForeclosureFinishedUpd" parent="parentStep"
 			next="l5InnReCheckUpd">
@@ -80,7 +84,7 @@
 		<step id="l7Ias39LoanCommitUpd" parent="parentStep">
 			<tasklet ref="L7Ias39LoanCommitUpd" />
 			<end on="FAILED" />
-			<next on="COMPLETED" to="l8JcicB201Upd" />
+			<next on="COMPLETED" to="splitJcic1" />
 		</step>
 
 		<!-- 聯徵申報月檔 -->

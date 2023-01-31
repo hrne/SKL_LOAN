@@ -175,6 +175,7 @@ public class BS900 extends TradeBuffer {
 					tTempVo.putParam("CrRvNo1", rvNo);
 					tTempVo.putParam("CrTxAmt1", t.getTxAmt());
 					tTempVo.putParam("DbAcctCode1", t.getAcctCode());
+					tTempVo.putParam("DbRvNo1", rvNo);
 					tTempVo.putParam("DbTxAmt1", t.getTxAmt());
 					tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 					lTxToDoDetail.add(tTxToDoDetail);
@@ -287,6 +288,7 @@ public class BS900 extends TradeBuffer {
 		tTempVo.putParam("DbRvNo1", rvNo);
 		tTempVo.putParam("DbTxAmt1", intAmt);
 		tTempVo.putParam("CrAcctCode1", acctCode);
+		tTempVo.putParam("CrRvNo1", rvNo);
 		tTempVo.putParam("CrTxAmt1", intAmt);
 		tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 		lTxToDoDetail.add(tTxToDoDetail);

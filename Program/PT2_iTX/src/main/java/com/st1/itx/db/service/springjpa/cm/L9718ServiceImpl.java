@@ -37,6 +37,11 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
+		if (iMonth == 1) {
+			iYear = iYear - 1;
+			iMonth = 12;
+		}
+
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		// 當日(int)
 		int nowDate = Integer.valueOf(iEntdy);
@@ -121,32 +126,19 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "LEFT JOIN (SELECT \"CustNo\"";
 		sql += "                 ,\"FacmNo\"";
 		sql += "                 ,MAX(\"IntEndDate\")  AS \"IntEndDate\"";
-		sql += "                 ,SUM(CASE WHEN NVL(JSON_VALUE(\"OtherFields\", '$.RepayCode'),'0') = '1'";
-		sql += "                           THEN \"TxAmt\"";
-		sql += "                           WHEN NVL(JSON_VALUE(\"OtherFields\", '$.RepayCode'),'0') = '0' AND \"TitaTxCd\" = 'L3210'";
-		sql += "                           THEN \"TxAmt\"";
-		sql += "                           ELSE 0";
-		sql += "                      END) AS \"OvTxAmt\"";
-		sql += "                 ,MAX(CASE WHEN NVL(JSON_VALUE(\"OtherFields\", '$.RepayCode'),'0') = '1'";
-		sql += "                           THEN \"EntryDate\"";
-		sql += "                           WHEN NVL(JSON_VALUE(\"OtherFields\",  '$.RepayCode'),'0') = '0' AND \"TitaTxCd\" = 'L3210'";
-		sql += "                           THEN \"EntryDate\"";
-		sql += "                          ELSE 0";
-		sql += "                      END) AS \"OvEntryDate\"";
+		sql += "                 ,SUM(\"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\")) AS \"OvTxAmt\"";
+		sql += "                 ,MAX(\"EntryDate\") AS \"OvEntryDate\"";
 		sql += "                 ,SUM(\"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\") AS \"LnTxAmt\"";
-		sql += "                 ,MAX(CASE WHEN (\"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\") > 0";
-		sql += "                           THEN \"EntryDate\"";
-		sql += "                           ELSE 0";
-		sql += "                      END) AS \"LnEntryDate\"";
+		sql += "                 ,MAX(\"EntryDate\") AS \"LnEntryDate\"";
 		sql += "           FROM \"LoanBorTx\"";
 		sql += "           WHERE \"TitaHCode\" = '0'";
+		sql += "           	 AND \"Principal\" + \"Interest\" +  \"DelayInt\" + \"BreachAmt\" > 0";
 		sql += "             AND \"EntryDate\" >= :inputEntryDateMin";
 		sql += "             AND \"EntryDate\" <= :inputEntryDateMax";
 		sql += "           GROUP BY \"CustNo\", \"FacmNo\"";
 		sql += "          ) TX ON TX.\"CustNo\"  = M.\"CustNo\"";
 		sql += "              AND TX.\"FacmNo\"  = M.\"FacmNo\"";
 		sql += "WHERE M.\"YearMonth\" = :inputYearMonth";
-//        sql += "  AND M.\"Status\" = 0";
 		sql += "  AND (:inputCollector = '999999' OR NVL(M.\"AccCollPsn\",' ') = :inputCollector)";
 		sql += "  AND (M.\"OvduBal\" > 0 OR M.\"OvduDays\" > 0 )";
 		sql += "  AND FAC.\"FirstDrawdownDate\" >= :inputDrawdownDate";
@@ -157,20 +149,28 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
-		LocalDate lastYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYearMonth").substring(0, 3)) + 1911, Integer.parseInt(titaVo.getParam("inputYearMonth").substring(3)), 1);
+		LocalDate lastYearMonth = LocalDate.of(
+				Integer.parseInt(titaVo.getParam("inputYearMonth").substring(0, 3)) + 1911,
+				Integer.parseInt(titaVo.getParam("inputYearMonth").substring(3)), 1);
 		lastYearMonth = lastYearMonth.minusMonths(1);
-		this.info("inputEntryDateMin=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
-		this.info("inputEntryDateMax=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
+		this.info("inputEntryDateMin="
+				+ Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
+		this.info("inputEntryDateMax="
+				+ Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
 		this.info("inputYearMonth=" + iYear + String.format("%02d", iMonth));
 		this.info("inputCollectorShow=" + titaVo.getParam("inputCollector"));
-		this.info("inputDrawdownDate=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
+		this.info("inputDrawdownDate="
+				+ Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("inputEntryDateMin", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
-		query.setParameter("inputEntryDateMax", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
+		query.setParameter("inputEntryDateMin",
+				Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
+		query.setParameter("inputEntryDateMax",
+				Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
 		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
 		query.setParameter("inputCollector", titaVo.getParam("inputCollector"));
-		query.setParameter("inputDrawdownDate", Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
+		query.setParameter("inputDrawdownDate",
+				Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 
 		return this.convertToMap(query.getResultList());
 	}
