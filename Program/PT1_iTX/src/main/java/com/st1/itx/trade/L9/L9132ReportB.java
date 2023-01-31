@@ -134,7 +134,7 @@ public class L9132ReportB extends MakeReport {
 				String custName = result.get("CustName") == null ? "" : result.get("CustName");
 				String empName = result.get("EmpName") == null ? "" : result.get("EmpName");
 				
-				print(1, 18, titaTxtNo, "R");
+				print(1, 19, titaTxtNo, "R");
 				print(0, 29, slipNo, "R");
 				print(0, 31, acNo);
 				print(0, 85, acSubBookItem);
@@ -155,7 +155,7 @@ public class L9132ReportB extends MakeReport {
 			print(1, 1, "本日無資料");
 		}
 		// 印總計
-		print(1, 1, "－－－－　－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－－　－－－－");
+		print(1, 1, "－－－－－－－－－  －－－－  －－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－　－－－　 －－－－  ");
 		print(1, 1, "　合　　　　　計：　　　　　　　　　筆");
 		print(0, 32, formatAmt(cnt, 0), "R");
 		print(0, 113, formatAmt(dbAmtTotal, 0), "R");

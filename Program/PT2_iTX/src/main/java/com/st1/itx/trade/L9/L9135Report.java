@@ -15,6 +15,7 @@ import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 
+
 @Component("L9135Report")
 @Scope("prototype")
 
@@ -55,7 +56,7 @@ public class L9135Report extends MakeReport {
 	public void printHeader() {
 		this.setFontSize(10);
 		this.setCharSpaces(0);
-
+		
 		int rNum = 3;
 		int lNum = 146;
 		int cNum = this.getMidXAxis();
@@ -66,9 +67,11 @@ public class L9135Report extends MakeReport {
 		this.print(-3, rNum, "　報　表：" + this.getRptCode());
 		String tim = String.format("%02d", Integer.parseInt(dateUtil.getNowStringBc().substring(4, 6)));
 
-		this.print(-2, lNum, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + dateUtil.getNowStringBc().substring(2, 4));
+		this.print(-2, lNum, "日　  期：" + tim + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/"
+				+ dateUtil.getNowStringBc().substring(2, 4));
 		this.print(-3, cNum, tradeName, "C");
-		this.print(-3, lNum, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, lNum, "時　  間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, lNum, "頁　  數：   " + Integer.toString(this.getNowPage()));
 
 		this.print(-5, cNum, showRocDate(this.iAcDate, 0), "C");
@@ -121,7 +124,8 @@ public class L9135Report extends MakeReport {
 	 * @param iAcDate     會計日
 	 */
 
-	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate) throws LogicException {
+	public List<Map<String, String>> exec(TitaVo titaVo, List<Map<String, String>> l9135Result, int iAcDate)
+			throws LogicException {
 
 		this.info("L9135Report exec");
 
@@ -157,7 +161,7 @@ public class L9135Report extends MakeReport {
 
 				// 超過40行 換新頁
 				if (this.NowRow >= 40) {
-
+					
 					this.print(2, 80, this.nextPageText, "C");
 					this.newPage();
 
@@ -207,5 +211,6 @@ public class L9135Report extends MakeReport {
 		tmpAmtDb += Integer.valueOf(r.get("DbTxAmt"));
 		tmpAmtCr += Integer.valueOf(r.get("CrTxAmt"));
 	}
+
 
 }

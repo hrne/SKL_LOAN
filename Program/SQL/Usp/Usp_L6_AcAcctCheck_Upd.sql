@@ -253,7 +253,7 @@ BEGIN
       WHERE S1."RenewCode" = 2
         AND S1."TotInsuPrem" > 0
         AND S1."RenewCode" = 2
-        AND (   (S1."StatusCode" IN (0) and S1."AcDate" >= SP."InsuSettleDate") -- 火險保費已解付新產日期
+        AND (   (S1."StatusCode" IN (0) and S1."AcDate" > 0 AND  S1."InsuYearMonth" >= trunc(SP."InsuSettleDate" / 100)) -- 火險保費已解付新產日期
              OR (S1."StatusCode" IN (1,2) and S1."AcDate" = 0 )) 
       GROUP BY CASE
                  WHEN S1."StatusCode" = 0 THEN 'TMI'

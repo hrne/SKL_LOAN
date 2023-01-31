@@ -112,7 +112,7 @@ V(5,0,#DefaultYear)
 #InputMonth=A,2,I
 E(0,#DefaultMonth)
 @V(2,0)
-IF(#InputYear==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
+!IF(#InputYear==#DefaultYear,V(5,0,#DefaultMonth),V(5,0,12))
 
 #ThisMonth=A,5,S
 E(0,@ThisMonthDate,#InputYear*100)

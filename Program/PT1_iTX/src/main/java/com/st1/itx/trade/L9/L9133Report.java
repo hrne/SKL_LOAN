@@ -133,13 +133,17 @@ public class L9133Report extends CommBuffer {
 			// 有差額就把記號改為true
 			if (sheet == 1 || sheet == 2) {
 				if (acMainBal.subtract(masterBal).compareTo(BigDecimal.ZERO) != 0) {
-					isDiff = true;
 					diffAcAmt = acMainBal.subtract(masterBal); // 差額 (會計檔餘額-主檔餘額)
+					if (sheet == 1) {
+						isDiff = true;
+					}
 				}
 			}
 			if (!"TMI".equals(acctCode) && receivableBal.subtract(masterBal).compareTo(BigDecimal.ZERO) != 0) {
-				isDiff = true;
 				diffReceivableAmt = receivableBal.subtract(masterBal); // 銷帳檔與主檔差額
+				if (sheet == 1) {
+					isDiff = true;
+				}
 			}
 			makeExcel.setValue(rowCursor, 1, acSubBookCode); // 區隔帳冊
 			makeExcel.setValue(rowCursor, 2, acctCode + " " + acctItem); // 科目
