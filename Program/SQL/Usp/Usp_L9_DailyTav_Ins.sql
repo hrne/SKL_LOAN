@@ -53,7 +53,7 @@ BEGIN
                            AND DT."LatestFlag" = 'Y'
     LEFT JOIN "LoanFacTmp" LFT ON LFT."CustNo" = AR."CustNo"
                               AND LFT."FacmNo" = AR."FacmNo"
-    WHERE AR."AcctCode" IN ('TAV','T10','TLD')
+    WHERE AR."AcctCode" IN ('TAV','TAM','TSL','TLD','T10','T11','T12','T13')
       AND NVL(DT."TavBal",0) != AR."RvBal"
     ;
 

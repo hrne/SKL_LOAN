@@ -1081,7 +1081,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		// 利息提存未到期利息以最後一段利率計算
 		if (iIntEndCode == 2 && iIntEndDate > 0) {
 			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
-					iIntEndDate + 19110000, titaVo);
+					iEntryDate + 19110000, titaVo);
 		} else {
 			tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
 					wkIntStartDate + 19110000, titaVo);

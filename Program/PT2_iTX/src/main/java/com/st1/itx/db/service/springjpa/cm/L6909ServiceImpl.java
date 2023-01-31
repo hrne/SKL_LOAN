@@ -163,6 +163,7 @@ public class L6909ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , ROW_NUMBER ()  OVER ( PARTITION BY \"CustNo\", \"FacmNo\"  ORDER BY  \"AcDate\" DESC ) AS \"Seq\" ";
 		sql += "     FROM \"DailyTav\"  ";
 		sql += "     WHERE \"CustNo\" = :custno";
+		sql += "       AND \"AcctCode\" = 'TAV' ";
 		sql += "       AND \"AcDate\"  <= :acDateS";
 		if (iFacmNo > 0) {
 			sql += "    AND \"FacmNo\" = :facmno";

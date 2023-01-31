@@ -125,7 +125,15 @@ BEGIN
           ,"SettingDate"         -- 額度設定日 DECIMALD 8 
           ,"PreStarBuildingYM"   -- 約定動工年月 DECIMAL 6
           ,"StarBuildingYM"      -- 實際興建年月 DECIMAL 6
-    ) 
+          ,"BreachFlag"          -- 是否綁約
+          ,"BreachCode"          -- 違約適用方式
+          ,"BreachGetCode"       -- 違約金收取方式
+          ,"ProhibitMonth"       -- 限制清償期限
+          ,"BreachPercent"       -- 違約金百分比
+          ,"BreachDecreaseMonth" -- 違約金分段月數
+          ,"BreachDecrease"      -- 分段遞減百分比
+          ,"BreachStartPercent"  -- 還款起算比例%
+    )
     SELECT APLP."LMSACN"                  AS "CustNo"              -- 借款人戶號 DECIMAL 7  
           ,APLP."LMSAPN"                  AS "FacmNo"              -- 額度編號 DECIMAL 3  
           ,NVL(LMSP."LastBormNo",0)       AS "LastBormNo"          -- 已撥款序號 DECIMAL 3  
@@ -275,36 +283,14 @@ BEGIN
           ,LS."EMPCOD"                    AS "Coorgnizer"          -- 協辦人 VARCHAR2 6  
           -- 2021-03-11 修正邏輯 
           ,APLP."APLPSN"                  AS "AdvanceCloseCode"    -- 提前清償原因 DECIMAL 2 
-          -- ,CASE 
-          --    WHEN NVL(R1."PSNBCD",0) > 0 THEN 1 -- 10/19 Wei修改 
-          --    WHEN APLP."IRTBCD" IN ('FA','FB','FC','FE','FF','FG','FI','FJ','FK','FM','FN','FO') 
-          --                                THEN 1 
-          --    WHEN APLP."IRTBCD" IN ('HA','HB','HC','H3','H4','H5') 
-          --                                THEN 1 
-          --    WHEN APLP."APLPAC" = 5 THEN 1 
-          --    WHEN APLP."APLPAC" = 6 THEN 1 
-          --    WHEN APLP."APLPAC" = 0 THEN 9 
-          --  ELSE 0 END                     AS "AdvanceCloseCode"    -- 提前清償記號 DECIMAL 2 
-          -- ,APLP."APLNER"                  AS "Prohibityear"        -- 限制清償年限 DECIMAL 2  
-          -- ,CASE 
-          --    WHEN NVL(R1."PSNBCD",0) > 0   THEN LPAD(TO_CHAR(NVL(R1."PSNBCD",0)),3,'0') -- 10/19 Wei修改,以商品別的違約適用方式為優先寫入 
-          --    WHEN APLP."IRTBCD" = '1' THEN '001' 
-          --    WHEN APLP."IRTBCD" = '2' THEN '002' 
-          --    WHEN APLP."APLPAC" = 5   THEN '003' 
-          --    WHEN APLP."APLPAC" = 6   THEN '004' 
-          --    WHEN APLP."APLPAC" = 0   THEN '999' 
-          --  ELSE LPAD(TO_CHAR(APLP."APLPAC"),3,'0') END 
-          --                                 AS "BreachCode"          -- 違約適用方式 VARCHAR2 3 
-          -- ,'2'                            AS "BreachGetCode"       -- 違約金收取方式 VARCHAR2 1  
-          -- ,''                             AS "DecreaseFlag"        -- 是否每月按比例減少 VARCHAR2 1  
           ,'Y'                            AS "ProdBreachFlag"      -- 違約適用方式是否按商品設定 varchar2 1 
           ,''                             AS "BreachDescription"   -- 違約適用說明 nvarchar2 100 
           ,APLP."APLCRD"                  AS "CreditScore"         -- 信用評分 DECIMAL 3  
           ,APLP."APLCSD"                  AS "GuaranteeDate"       -- 對保日期 DECIMALD 8  
           ,CLF."CNTRCTNO"                 AS "ContractNo"          -- 合約編號 VARCHAR2 10  
           ,CASE 
-             WHEN NVL(APLP."GDRSTS",0) = 1 
-             THEN 'Y' 
+             WHEN NVL(APLP."GDRNUM",0) != 0 -- 2023-01-31 Wei FROM 家興 額度主檔的核准號碼在ClFac有關聯擔保品設Y 沒有設N
+             THEN 'Y'
            ELSE 'N' END                   AS "ColSetFlag"          -- 擔保品設定記號 VARCHAR2 1  
           ,0                              AS "ActFg"               -- 交易進行記號 DECIMAL 1  
           ,0                              AS "LastAcctDate"        -- 上次交易日 NUMBER(8,0) 
@@ -345,6 +331,17 @@ BEGIN
           ,APLP."APLSDT"                  AS "SettingDate"         -- 額度設定日 DECIMALD 8 
           ,NVL(APLP.APLPSC,0)             AS "PreStarBuildingYM"   -- 約定動工年月 DECIMAL 6
           ,NVL(APLP.APLRSC,0)             AS "StarBuildingYM"      -- 實際興建年月 DECIMAL 6
+          ,CASE
+             WHEN NVL(APLP.APLPAC,0) != 0
+             THEN 'Y'
+           ELSE 'N' END                   AS "BreachFlag"          -- 是否綁約
+          ,LPAD(APLP.APLPAC,3,'0')        AS "BreachCode"          -- 違約適用方式
+          ,'2'                            AS "BreachGetCode"       -- 違約金收取方式
+          ,APLP.APLNER * 12               AS "ProhibitMonth"       -- 限制清償期限
+          ,PROD."BreachPercent"           AS "BreachPercent"       -- 違約金百分比
+          ,PROD."BreachDecreaseMonth"     AS "BreachDecreaseMonth" -- 違約金分段月數
+          ,PROD."BreachDecreaseMonth"     AS "BreachDecrease"      -- 分段遞減百分比
+          ,0                              AS "BreachStartPercent"  -- 還款起算比例%
     FROM "LA$APLP" APLP 
     LEFT JOIN "CU$CUSP" CUSP ON CUSP."LMSACN" = APLP."LMSACN" 
     LEFT JOIN "FacCaseAppl" APPL ON APPL."ApplNo" = APLP."APLNUM" 

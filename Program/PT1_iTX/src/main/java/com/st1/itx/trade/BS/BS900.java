@@ -92,7 +92,6 @@ public class BS900 extends TradeBuffer {
 	private int iAcDate;
 	private int iAcDateReverse = 0;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
-	private List<AcDetail> lAcDetail = new ArrayList<AcDetail>();;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -151,7 +150,7 @@ public class BS900 extends TradeBuffer {
 				titaVo);
 		if (slAcDetail != null) {
 			for (AcDetail t : slAcDetail.getContent()) {
-				if ("ICR".equals(t.getAcctCode()) && "0".equals(t.getTitaHCode())) {
+				if (!"ICR".equals(t.getAcctCode()) && "0".equals(t.getTitaHCode())) {
 					// 銷帳碼=原銷帳碼
 					String rvNo = t.getRvNo();
 					// 無銷帳碼則自編
