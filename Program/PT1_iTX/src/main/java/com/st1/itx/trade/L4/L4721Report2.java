@@ -188,15 +188,18 @@ public class L4721Report2 extends MakeReport {
 						result.add(line);
 
 						// 45
-
 						// 45 額度 003 利率自 109 年 09 月 01 日起， 由 1.68% 調整為 1.41% 。
-						line = "";
-						line += "45";
-						line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
-								+ showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
-								+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
-								+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
-						result.add(line);
+						BigDecimal presentRate = parse.stringToBigDecimal(mapL4721Detail.get("PresentRate"));
+						BigDecimal adjustedRate = parse.stringToBigDecimal(mapL4721Detail.get("AdjustedRate"));
+						if (presentRate.compareTo(adjustedRate) != 0) {
+							line = "";
+							line += "45";
+							line += " 額度 " + FormatUtil.pad9(mapL4721Detail.get("FacmNo"), 3) + "     " + "利率自"
+									+ showRocDate(mapL4721Detail.get("TxEffectDate"), 0) + "起，　由"
+									+ formatAmt(mapL4721Detail.get("PresentRate"), 2) + "%" + "調整為"
+									+ formatAmt(mapL4721Detail.get("AdjustedRate"), 2) + "。";
+							result.add(line);
+						}
 
 						// 05
 
@@ -237,7 +240,7 @@ public class L4721Report2 extends MakeReport {
 			}
 			String X = "";
 			X = toXX(locationXX, "　", 30);
-			this.info("X = " + X);
+
 			String C = "";
 			C = toXX("", "　", 20);
 
@@ -270,10 +273,14 @@ public class L4721Report2 extends MakeReport {
 			}
 
 			// 02 陳＊耀 0001743 10 日 銀行扣款 0109091600003683931+00000000000+
+			int specificDd = 0;
+			if (tmap.get("SpecificDd") != null || !tmap.get("SpecificDd").isEmpty()) {
+				specificDd = parse.stringToInteger(tmap.get("SpecificDd"));
+			}
 			line = "";
 			line += "02";
 			line += " " + FormatUtil.padX(tmap.get("CustName"), 40) + " " + FormatUtil.pad9(tmap.get("CustNo"), 7)
-					+ FormatUtil.rightPad9(tmap.get("SpecificDd"), 6) + " 日" + "          "
+					+ leftPadding(parse.IntegerToString(specificDd, 2), 6, ' ') + " 日" + "          "
 					+ FormatUtil.padX(tmap.get("RepayCodeX"), 8) + "   " + FormatUtil.pad9(titaVo.getCalDy(), 8)
 					+ FormatUtil.pad9(tmap.get("LoanBal"), 11) + loanBalX + FormatUtil.pad9(headerExcessive, 11)
 					+ headerExcessiveX;
@@ -397,11 +404,25 @@ public class L4721Report2 extends MakeReport {
 			for (int ii = 0; ii < il; ii++) {
 				s += x;
 
-				this.info("s =" + s);
 			}
 			z = s;
 		}
-		this.info("z =" + z);
+
 		return z;
+	}
+
+//	向左補特定字元
+//	str 原本的字串
+//	length 填補後的總長度
+//	padChar 要填補的字元
+	private static String leftPadding(String str, int length, char padChar) {
+		if (str == null) {
+			str = "";
+		}
+		if (str.length() > length) {
+			return str;
+		}
+		String pattern = "%" + length + "s";
+		return String.format(pattern, str).replace(' ', padChar);
 	}
 }

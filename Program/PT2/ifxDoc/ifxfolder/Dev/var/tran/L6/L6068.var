@@ -76,8 +76,11 @@ T(3,CdCode.RptWaterCode)
 #EnableFg=x,1000,S
 T(3,CdCode.EnableFg)
 
+#Confidentiality=x,1000,S
+T(3,CdCode.Confidentiality)
+
 #RIM1=X,1,S
-S(XXR99,01,#RptCycle,#RptSendCode,#RptSignCode,#EnableFg,#RptWaterCode)
+S(XXR99,01,#RptCycle,#RptSendCode,#RptSignCode,#EnableFg,#RptWaterCode,#Confidentiality)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@RptCycle,#HelpDesc1)
@@ -85,6 +88,7 @@ T(2,@RptSendCode,#HelpDesc2)
 T(2,@RptSignCode,#HelpDesc3)
 T(2,@EnableFg,#HelpDesc4)
 T(2,@RptWaterCode,#HelpDesc5)
+T(2,@Confidentiality,#HelpDesc6)
 !---------------------------------
 
 #CHAIN=A,1,S
@@ -185,6 +189,12 @@ T(H,#OOWatermarkFlag,#RptWaterCode)
 #OOEnableX=X,20,L
 T(H,#OOEnable,#EnableFg)
 
+! 機密等級(TOTA)
+#OOConfidentiality=X,1,L
+
+#OOConfidentialityX=X,20,L
+T(H,#OOConfidentiality,#Confidentiality)
+
 !最後修改人員&日期
 #OOLastUpdate=x,20,S
 
@@ -194,8 +204,8 @@ T(H,#OOEnable,#EnableFg)
 #OOFunc2=A,1,S
 E(0,2)
 
-#OOBUF2=X,179,S
-T(2,#OOFunc2+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable)
+#OOBUF2=X,180,S
+T(2,#OOFunc2+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=修改;ntxbuf=#OOBUF2})
@@ -204,8 +214,8 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=修改;ntxbuf=#OOBUF2})
 #OOFunc4=A,1,S
 E(0,4)
 
-#OOBUF4=X,179,S
-T(2,#OOFunc4+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable)
+#OOBUF4=X,180,S
+T(2,#OOFunc4+#OOFormNo+#OOFormName+#OOCycle+#OOSendCode+#OOLetter+#OOMessage+#OOEmail+#OOSignCode+#OOUsageDesc+#OOEnable+#OOConfidentiality)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L6608;text=刪除;ntxbuf=#OOBUF4})
@@ -237,6 +247,7 @@ TXFORM=L6068
 #OOSignCode
 #OOWatermarkFlag
 #OOEnable
+#OOConfidentiality
 #OOLastUpdate
 #OOLastEmp
 ^
@@ -293,6 +304,9 @@ TXFORM=L6068
 {width:100,align:'left'}
 
 #OOEnableX=啟用記號
+{width:70,align:'left'}
+
+#OOConfidentialityX=機密等級
 {width:70,align:'left'}
 
 #OOLastUpdate=最後修改日期

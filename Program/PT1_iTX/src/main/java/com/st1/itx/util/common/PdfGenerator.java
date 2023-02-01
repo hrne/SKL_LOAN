@@ -594,11 +594,13 @@ public class PdfGenerator extends CommBuffer {
 	}
 
 	private BaseFont setBaseFont(String type) throws IOException, DocumentException {
+		File font = new File(fontFolder + "kaiuE.ttf");
+
 		// 標楷體
-		String fontname = fontFolder + "kaiu.ttf";
-		
-		File font = new File(fontFolder + "mingliu.ttf");
-		
+		String fontname = fontFolder + (font.exists() ? "kaiuE.ttf" : "kaiu.ttf");
+
+		font = new File(fontFolder + "mingliu.ttf");
+
 		// 細明體
 		if ("2".equals(type)) {
 			fontname = fontFolder + (!font.exists() ? "mingliu.ttc,0" : "mingliu.ttf,0");

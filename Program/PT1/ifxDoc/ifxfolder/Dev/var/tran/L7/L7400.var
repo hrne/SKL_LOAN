@@ -82,9 +82,10 @@ T(1,#DT1,2,7)
 
 !會計日期
 #AcDate=D,7,I
-T(2,#DT2)
+C(4,#AcDate,T(2,#DT2),$)
+
 @V(7)
-V(5,0,#DT2)
+! V(5,0,#DT2)
 A(DATE,0,#AcDate)
 
 

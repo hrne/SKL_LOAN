@@ -35,6 +35,7 @@ E(0,0)
 ["#FdWatermark+浮水印記號",#Watermark,#WatermarkX],
 ["#FdEnable+啟用記號",#Enable,#EnableX],
 ["#FdSendCode+寄送記號",#SendCode,#SendCodeX],
+["#FdConfidentiality+機密等級",#Confidentiality,#ConfidentialityX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -68,8 +69,8 @@ T(3,*)
 T(3,*)
 #FdEmailFg=X,2,L
 T(3,*)
-
-
+#FdConfidentiality=X,2,L
+T(3,*)
 
 !---------- AP TEXT AREA Variables ----------
 
@@ -79,7 +80,7 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:[L6068  報表代號對照檔]連動進入),$)
 
-#NTXBUF=X,179,S
+#NTXBUF=X,180,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CHAIN_FuncCode=X,1,S
@@ -115,6 +116,8 @@ T(1,#NTXBUF,99,80)
 #CHAIN_Enable=X,1,S
 T(1,#NTXBUF,179,1)
 
+#CHAIN_Confidentiality=X,1,S
+T(1,#NTXBUF,180,1)
 
 #CHAINSET=X,1,S
 C(3,#CHAIN,1,$,S)
@@ -156,6 +159,10 @@ T(3,CdCode.RptWaterCode)
 T(3,CdCode.EnableFg)
 #EnableFg=x,1000,S
 
+#CODEConfidentiality=x,30,S
+T(3,CdCode.Confidentiality)
+#ConfidentialityCode=x,1000,S
+
 #YesNoCode=x,20,S
 T(3,CdCode.YesNo)
 
@@ -163,7 +170,7 @@ T(3,CdCode.YesNo)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CODEFuncCode2,#CODERptCycle,#CODERptSendCode,#CODERptSignCode,#CODEEnableFg,#CODERptWaterCode,#YesNoCode)
+S(XXR99,01,#CODEFuncCode2,#CODERptCycle,#CODERptSendCode,#CODERptSignCode,#CODEEnableFg,#CODERptWaterCode,#YesNoCode,#CODEConfidentiality)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCode2Help,#HelpDesc1)
@@ -173,6 +180,7 @@ T(2,@RptSignCode,#HelpDesc4)
 T(2,@EnableFg,#HelpDesc5)
 T(2,@RptWaterCode,#HelpDesc6)
 T(2,@YesNoHelp,#HelpDesc7)
+T(2,@ConfidentialityCode,#HelpDesc8)
 !---------------------------------
 
 ! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
@@ -228,6 +236,7 @@ T(2,@FdEmail,#WKSTAR2)
 T(2,@FdSignCode,#WKSTAR2)
 T(2,@FdUsageDesc,#WKSTAR2)
 T(2,@FdEnable,#WKSTAR2)
+T(2,@FdConfidentiality,#WKSTAR2)
 
 ! 報表代號
 #FormNo=X,10,I
@@ -253,11 +262,13 @@ E(0,@SignCode,#L6R31SignCode)
 T(2,@UsageDesc,#L6R31UsageDesc)
 E(0,@Watermark,#L6R31Watermark)
 T(2,@Enable,#L6R31Enable)
+T(2,@Confidentiality,#L6R31Confidentiality)
 T(H,@CycleX,#Cycle,#RptCycle)
 T(H,@SendCodeX,#SendCode,#RptSendCode)
 T(H,@SignCodeX,#SignCode,#RptSignCode)
 T(H,@WatermarkX,#Watermark,#RptWaterCode)
 T(H,@EnableX,#Enable,#EnableFg)
+T(H,@ConfidentialityX,#Confidentiality,#ConfidentialityCode)
 C(3,#SendCode,0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
 C(3,#SendCode,2,INVOKEJS(SHOW,p3,1),INVOKEJS(SHOW,p3,0))
 T(2,@LetterFg,#L6R31LetterFg)
@@ -337,7 +348,15 @@ T(H,#SendCode,#RptSendCode)
 C(3,#SendCode,0,INVOKEJS(SHOW,p2,0),INVOKEJS(SHOW,p2,1))
 C(3,#SendCode,2,INVOKEJS(SHOW,p3,1),INVOKEJS(SHOW,p3,0))
 
+! 機密等級
+#Confidentiality=X,1,I
+C(2,#FuncCode,$,$,$,$,s,s)
+HELP(#ConfidentialityCode)
+@T(3,@ConfidentialityX,)
+V(H,#ConfidentialityCode)
 
+#ConfidentialityX=X,20,L
+T(H,#Confidentiality,#ConfidentialityCode)
 
 </sub>
 
@@ -477,7 +496,7 @@ T(3,[L6608] 報表代號對照檔維護)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#FuncCode#FormNo#FormName#Cycle#SendCode#Letter#Message#Email#SignCode#UsageDesc#Watermark#Enable
+#FuncCode#FormNo#FormName#Cycle#SendCode#Letter#Message#Email#SignCode#UsageDesc#Watermark#Enable#Confidentiality
 #LetterFg
 #MessageFg
 #EmailFg

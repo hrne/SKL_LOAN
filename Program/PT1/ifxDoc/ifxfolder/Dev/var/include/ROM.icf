@@ -9605,6 +9605,7 @@ TXFORM=L6R29
 #L6R31UsageDesc=X,80,S
 #L6R31Watermark=A,1,S
 #L6R31Enable=X,1,S
+#L6R31Confidentiality=X,1,S
 #L6R31LetterFg=X,1,S
 #L6R31MessageFg=X,1,S
 #L6R31EmailFg=X,1,S
@@ -9623,6 +9624,7 @@ TXFORM=L6R31
 #L6R31UsageDesc
 #L6R31Watermark
 #L6R31Enable
+#L6R31Confidentiality
 #L6R31LetterFg
 #L6R31MessageFg
 #L6R31EmailFg

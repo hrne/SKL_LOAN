@@ -34,13 +34,13 @@ public class L6608 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdReportService sCdReportService;
+	private CdReportService sCdReportService;
 	@Autowired
-	DateUtil dDateUtil;
+	private DateUtil dDateUtil;
 	@Autowired
-	Parse parse;
+	private Parse parse;
 	@Autowired
-	public DataLog dataLog;
+	private DataLog dataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -122,6 +122,7 @@ public class L6608 extends TradeBuffer {
 		mCdReport.setSignCode(this.parse.stringToInteger((titaVo.getParam("SignCode"))));
 		mCdReport.setWatermarkFlag(this.parse.stringToInteger(titaVo.getParam("Watermark")));
 		mCdReport.setEnable(titaVo.getParam("Enable"));
+		mCdReport.setConfidentiality(titaVo.getParam("Confidentiality"));
 		
 		mCdReport.setLetterFg(titaVo.getParam("LetterFg"));
 		mCdReport.setMessageFg(titaVo.getParam("MessageFg"));

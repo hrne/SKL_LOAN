@@ -36,11 +36,11 @@ public class L6068 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdReportService sCdReportService;
+	private CdReportService sCdReportService;
 	@Autowired
-	public CdEmpService cdEmpService;
+	private CdEmpService cdEmpService;
 	@Autowired
-	Parse parse;
+	private Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -83,6 +83,7 @@ public class L6068 extends TradeBuffer {
 			occursList.putParam("OOSignCode", tCdReport.getSignCode());
 			occursList.putParam("OOWatermarkFlag", tCdReport.getWatermarkFlag());
 			occursList.putParam("OOEnable", tCdReport.getEnable());
+			occursList.putParam("OOConfidentiality", tCdReport.getConfidentiality());
 			occursList.putParam("OOLastUpdate", parse.timeStampToStringDate(tCdReport.getLastUpdate())+ " " +parse.timeStampToStringTime(tCdReport.getLastUpdate()));
 			occursList.putParam("OOLastEmp", tCdReport.getLastUpdateEmpNo() + " " + empName(titaVo, tCdReport.getLastUpdateEmpNo()));
 

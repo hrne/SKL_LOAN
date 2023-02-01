@@ -31,9 +31,9 @@ public class L6R31 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public CdReportService sCdReportService;
+	private CdReportService sCdReportService;
 	@Autowired
-	Parse parse;
+	private Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -95,11 +95,12 @@ public class L6R31 extends TradeBuffer {
 		this.totaVo.putParam("L6R31UsageDesc", mCdReport.getUsageDesc());
 		this.totaVo.putParam("L6R31Watermark", mCdReport.getWatermarkFlag());
 		this.totaVo.putParam("L6R31Enable", mCdReport.getEnable());
-
+		this.totaVo.putParam("L6R31Confidentiality", mCdReport.getConfidentiality());
+		
 		this.totaVo.putParam("L6R31LetterFg", mCdReport.getLetterFg());
 		this.totaVo.putParam("L6R31MessageFg", mCdReport.getMessageFg());
 		this.totaVo.putParam("L6R31EmailFg", mCdReport.getEmailFg());
-
+		
 	}
 
 }

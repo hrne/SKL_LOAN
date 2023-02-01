@@ -60,6 +60,7 @@ public class LM086ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
 		sql += "   AND M.\"PrinBalance\" >=  :lowerLimit ";
 		sql += "   AND M.\"PrinBalance\" > 0 ";
+		sql += "   AND M.\"AcctCode\" != '990' ";
 		sql += " ORDER BY M.\"AcctCode\" ";
 		sql += "        , M.\"CustNo\" ";
 		sql += "        , M.\"FacmNo\" ";
