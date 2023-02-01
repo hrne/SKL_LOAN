@@ -155,8 +155,6 @@ public class L7400 extends TradeBuffer {
 
 			updateSlipMediaAll(listSlipMedia2022, titaVo);
 
-			updateAcDetailAllWhenBatchNoOver90(iAcDate, iBatchNo, titaVo);
-
 			sSlipMedia2022Service.Usp_L7_SlipMedia_Upd(titaVo.getEntDyI() + 19110000, titaVo.getTlrNo(), iAcDate,
 					iBatchNo, titaVo);
 
@@ -210,28 +208,6 @@ public class L7400 extends TradeBuffer {
 			this.error("L7400 error = " + e.getMessage());
 		}
 		journalTbl.put(dataJo);
-	}
-
-	private void updateAcDetailAllWhenBatchNoOver90(int iAcDate, int iBatchNo, TitaVo titaVo) throws LogicException {
-		if (iBatchNo >= 90) {
-			// iAcDate + 19110000
-			// iBatchNo
-			Slice<AcDetail> slAcDetail = sAcDetailService.findSlipBatNo(iAcDate + 19110000, iBatchNo, 0,
-					Integer.MAX_VALUE, titaVo);
-
-			if (slAcDetail != null && !slAcDetail.isEmpty()) {
-				List<AcDetail> lAcDetail = slAcDetail.getContent();
-
-				for (AcDetail tAcDetail : lAcDetail) {
-					tAcDetail.setEntAc(9);
-				}
-				try {
-					sAcDetailService.updateAll(lAcDetail, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-			}
-		}
 	}
 
 	private void updateSlipMediaAll(List<SlipMedia2022> listSlipMedia2022, TitaVo titaVo) throws LogicException {

@@ -71,6 +71,8 @@ public class L7300 extends TradeBuffer {
 
 	private int seqL7300 = 1;
 
+	private int batchMaxCount = 1000;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7300 ");
@@ -121,6 +123,7 @@ public class L7300 extends TradeBuffer {
 		}
 		icsFg = tSystemParas.getIcsFg();
 		apiUrl = tSystemParas.getIcsUrl();
+		batchMaxCount = tSystemParas.getIcsBatchMaxCount();
 		this.info("icsFg = " + (icsFg == null ? "" : icsFg));
 	}
 
@@ -166,7 +169,7 @@ public class L7300 extends TradeBuffer {
 		List<JSONArray> assetsDataInfoList = new ArrayList<>();
 		JSONArray assetsDataInfo = new JSONArray();
 		for (Map<String, String> data : dataList) {
-			if (assetsDataInfo.length() >= 100000) {
+			if (assetsDataInfo.length() >= batchMaxCount) {
 				assetsDataInfoList.add(assetsDataInfo);
 				tranBatchSeq++;
 				assetsDataInfo = new JSONArray();
@@ -189,7 +192,12 @@ public class L7300 extends TradeBuffer {
 
 				// 到期日
 				// yyyy-mm-dd
-				loanDto.putOpt("maturityDate", rptUtil.showBcDate(data.get("MaturityDate"), 3));
+				// 2023-02-01 增加防呆:額度檔到期日可能有0
+				String maturityDate = data.get("MaturityDate");
+				if (maturityDate == null || maturityDate.isEmpty() || maturityDate.equals("0")) {
+					maturityDate = "19110101";
+				}
+ 				loanDto.putOpt("maturityDate", rptUtil.showBcDate(maturityDate, 3));
 
 				// 貸款類別(以過往提供ICS填報作業規則進行分類，
 				// 若為「企金，商業及農業抵押貸款」填入1；若為「房貸，住宅不動產抵押貸款」填入2。)
@@ -256,13 +264,12 @@ public class L7300 extends TradeBuffer {
 			this.error("ICS RestClientException = " + re.getMessage());
 			if (re.getCause() instanceof IOException) {
 				throw new LogicException("E9005", "連線中斷");
-			} else {
-				throw new LogicException("E9005", re.getMessage());
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("ICS Exception = " + e.getMessage());
+			this.info("ICS result = " + result);
 			throw new LogicException("E9005", "");
 		}
 		this.info("ICS result = " + result);

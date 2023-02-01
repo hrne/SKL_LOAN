@@ -45,14 +45,17 @@ public class LM086ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , CAC.\"AcctItem\" ";
 		sql += " , LPAD(M.\"CustNo\",7,'0') || '-' || LPAD(M.\"FacmNo\",3,'0') AS \"CustNo\" ";
 		sql += " , SUBSTR(CM.\"CustName\",0,8) AS \"CustName\" ";
-		sql += " , \"Fn_GetCdCode\"('CustTypeCode', CM.\"CustTypeCode\") AS \"CustType\" ";
+		sql += " , \"Fn_GetCdCode\"('CustTypeCode', FM.\"CustTypeCode\") AS \"CustType\" ";
 		sql += " , M.\"PrinBalance\" ";
 		sql += " , M.\"StoreRate\" ";
 		sql += " , \"Fn_GetCdCode\"('ClCode2' || M.\"ClCode1\" , LPAD(M.\"ClCode2\",2,'0')) AS \"ClItem\" ";
 		sql += " , CI.\"IndustryItem\" ";
 		sql += " FROM \"MonthlyFacBal\" M ";
 		sql += " LEFT JOIN \"CdAcCode\" CAC ON CAC.\"AcctCode\" = M.\"AcctCode\" ";
+		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = M.\"CustNo\" ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\" ";
+		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"CustNo\" = M.\"CustNo\" ";
+		sql += "                         AND FM.\"FacmNo\" = M.\"FacmNo\" ";
 		sql += " LEFT JOIN \"CdIndustry\" CI ON CI.\"IndustryCode\" = CM.\"IndustryCode\" ";
 		sql += " WHERE M.\"YearMonth\" = :yearMonth ";
 		sql += "   AND M.\"PrinBalance\" >=  :lowerLimit ";

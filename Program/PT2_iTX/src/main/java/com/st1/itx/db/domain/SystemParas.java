@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class SystemParas implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8584368392896615295L;
-
-// 業務類型
+  // 業務類型
   /* LN */
   @Id
   @Column(name = "`BusinessType`", length = 2)
@@ -311,6 +307,11 @@ public class SystemParas implements Serializable {
   /* ICS資產資料傳輸到ICS系統,服務協定為RESTful */
   @Column(name = "`IcsUrl`", length = 100)
   private String icsUrl;
+
+  // ICS每批最大筆數
+  /* ICS資產資料傳輸參數 */
+  @Column(name = "`IcsBatchMaxCount`")
+  private int icsBatchMaxCount = 0;
 
   // 火險保費已解付新產日期
   @Column(name = "`InsuSettleDate`")
@@ -1547,6 +1548,25 @@ N:不啟用
   }
 
 /**
+	* ICS每批最大筆數<br>
+	* ICS資產資料傳輸參數
+	* @return Integer
+	*/
+  public int getIcsBatchMaxCount() {
+    return this.icsBatchMaxCount;
+  }
+
+/**
+	* ICS每批最大筆數<br>
+	* ICS資產資料傳輸參數
+  *
+  * @param icsBatchMaxCount ICS每批最大筆數
+	*/
+  public void setIcsBatchMaxCount(int icsBatchMaxCount) {
+    this.icsBatchMaxCount = icsBatchMaxCount;
+  }
+
+/**
 	* 火險保費已解付新產日期<br>
 	* 
 	* @return Integer
@@ -1767,8 +1787,8 @@ N:不啟用
            + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode
            + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", loanMediaFtpUrl=" + loanMediaFtpUrl + ", loanMediaFtpAuth=" + loanMediaFtpAuth
            + ", smsFtpUrl=" + smsFtpUrl + ", smsFtpAuth=" + smsFtpAuth + ", smsFtpFlag=" + smsFtpFlag + ", jcicEmpName=" + jcicEmpName + ", jcicEmpTel=" + jcicEmpTel + ", autoBatchFg=" + autoBatchFg
-           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep + ", jcicZName=" + jcicZName
-           + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name + ", jcicMU1Tel=" + jcicMU1Tel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", batchFireFeeFg=" + batchFireFeeFg + ", icsFg=" + icsFg + ", icsUrl=" + icsUrl + ", icsBatchMaxCount=" + icsBatchMaxCount + ", insuSettleDate=" + insuSettleDate + ", jcicZDep=" + jcicZDep
+           + ", jcicZName=" + jcicZName + ", jcicZTel=" + jcicZTel + ", jcicMU1Dep=" + jcicMU1Dep + ", jcicMU1Name=" + jcicMU1Name + ", jcicMU1Tel=" + jcicMU1Tel + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

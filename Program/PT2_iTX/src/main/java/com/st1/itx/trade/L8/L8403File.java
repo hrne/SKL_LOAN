@@ -68,6 +68,7 @@ import com.st1.itx.db.service.JcicZ574LogService;
 import com.st1.itx.db.service.JcicZ574Service;
 import com.st1.itx.db.service.JcicZ575LogService;
 import com.st1.itx.db.service.JcicZ575Service;
+import com.st1.itx.db.service.SystemParasService;
 import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ442LogService;
 import com.st1.itx.db.service.JcicZ442Service;
@@ -104,6 +105,8 @@ public class L8403File extends MakeFile {
 	public CustMainService sCustMainService;
 	@Autowired
 	public Parse parse;
+	@Autowired
+	public SystemParasService sSystemParasService;
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
@@ -598,11 +601,25 @@ public class L8403File extends MakeFile {
 		if(ixReportTime<10) {
 			iReportTime = "0"+iReportTime;	
 		}
-		
+		String iRimBusinessType = "LN";
+		String jcicMU1Dep = "";
+		String jcicMU1Name = "";
+		String jcicMU1Tel = "";
 		// 頭筆資料
 		// JCIC-DAT-Z040-V01
-		String iContactX = FormatUtil.padX("放款部聯絡人-邱怡婷", 80);
-		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + iReportTime+"          02-23895858#7076" + iContactX;
+		SystemParas tSystemParas = sSystemParasService.findById(iRimBusinessType, titaVo);
+		if (tSystemParas != null) {
+			jcicMU1Dep = tSystemParas.getJcicZDep();
+			jcicMU1Name = tSystemParas.getJcicZName();
+			jcicMU1Tel = tSystemParas.getJcicZTel();
+			if (jcicMU1Dep == null || jcicMU1Name == null || jcicMU1Tel == null) {
+				throw new LogicException(titaVo, "E0015", "請執行L8501設定JCIC報送人員資料");
+			}
+		} else {
+			throw new LogicException(titaVo, "E0001", "系統參數設定檔"); // 查無資料
+		}
+		String iContactX = FormatUtil.padX(jcicMU1Dep+"聯絡人-"+jcicMU1Name, 80);
+		headText = "JCIC-DAT-Z" + tranCode + "-V01-458     " + iReportDate + iReportTime+"          "+jcicMU1Tel + iContactX;
 		// 檔名
 		// 金融機構總行代號+月份+日期+次數.檔案類別
 		fileName = iSubmitKey + iReportDate.substring(3) + iReportTime + "." + tranCode;
@@ -5630,7 +5647,7 @@ public class L8403File extends MakeFile {
 					sJcicZ573.setActualFilingMark("N");
 				} else {
 //					sJcicZ573.setActualFilingDate(sJcicZ573.getActualFilingDate());
-					sJcicZ573.setActualFilingMark("Y");
+					sJcicZ573.setActualFilingMark("");
 				}
 				try {
 					sJcicZ573Service.update(sJcicZ573, titaVo);
