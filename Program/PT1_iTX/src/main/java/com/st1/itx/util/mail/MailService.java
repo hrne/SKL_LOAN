@@ -50,7 +50,7 @@ public class MailService extends CommBuffer {
 	private String username = "systemOne86995619@outlook.com"; // like yourname@outlook.com
 
 	@Value("${mailPWD}")
-	private final String password = "86995619@st1"; // password here
+	private final String mailPWD = "86995619@st1"; // mailPWD here
 
 	private String mailServer = "";
 
@@ -105,7 +105,7 @@ public class MailService extends CommBuffer {
 //		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password);
+				return new PasswordAuthentication(username, mailPWD);
 			}
 		});
 		this.session.setDebug(true);
