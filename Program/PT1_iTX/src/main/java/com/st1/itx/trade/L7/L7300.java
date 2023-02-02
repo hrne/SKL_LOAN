@@ -26,6 +26,11 @@ public class L7300 extends TradeBuffer {
 		this.info("active L7300");
 		this.totaVo.init(titaVo);
 
+//		int dataDate = this.txBuffer.getTxBizDate().getLmnDy();
+		int dataDate = titaVo.getEntDyI();
+		titaVo.putParam("IcsVersion", "V0");
+		titaVo.putParam("DataDate", dataDate);
+
 		MySpring.newTask("L7300p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);

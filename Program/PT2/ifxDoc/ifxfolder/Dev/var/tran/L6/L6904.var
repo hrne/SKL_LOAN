@@ -191,7 +191,7 @@ T(1,#DATE,2,7)
 #AcDate=D,7,I
 T(2,#DT)
 @V(7)A(4,0,#AcDate)
-IF(#AcDate > #DT,V(P,不可大於會計日),$)
+!IF(#AcDate > #DT,V(P,不可大於會計日),$)
 
 !彙計方式
 #InqType=A,1,I

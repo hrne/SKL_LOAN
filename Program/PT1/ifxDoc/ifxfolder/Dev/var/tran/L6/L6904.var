@@ -191,7 +191,7 @@ T(1,#DATE,2,7)
 #AcDate=D,7,I
 T(2,#DT)
 @V(7)A(4,0,#AcDate)
-IF(#AcDate > #DT,V(P,不可大於會計日),$)
+!IF(#AcDate > #DT,V(P,不可大於會計日),$)
 
 !彙計方式
 #InqType=A,1,I
@@ -290,11 +290,6 @@ T(2,#AcBookCode+#AcSubBookCode+#BranchNo+#CurrencyCode+#OOAcNoCode+#OOAcSubCode+
 #OOBTN5=X,4,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L6905;text=明細;ntxbuf=#OOBUF5})
 
-!最後修改人員&日期
-#OOLastUpdate=x,20,S
-
-#OOLastEmp=x,47,S
-
 </sub>
 
 
@@ -331,8 +326,6 @@ TXFORM=L6904
 #OODbAmt
 #OOCrCnt
 #OOCrAmt
-#OOLastUpdate
-#OOLastEmp
 ^
 </sub>
 
@@ -370,11 +363,6 @@ TXFORM=L6904
 {width:80,align:'right'}
 #OOCrAmtX=貸方金額
 {width:150,align:'right'}
-#OOLastUpdate=最後修改日期
-{width:150,align:'center'}
-#OOLastEmp=最後修改人員
-{width:110,align:'center'}
-
 ^
 <include src="PRT.icf::INQ01.sel" map="i=L6904;cpi=15"/>
 %

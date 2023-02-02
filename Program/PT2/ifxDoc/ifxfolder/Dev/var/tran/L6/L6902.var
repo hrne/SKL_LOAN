@@ -164,11 +164,13 @@ E(0,1)
 #AcDateSt=D,7,I
 T(2,#DT_MONTH+#DT_01)
 @V(7)A(4,0,#AcDateSt)
-IF(#AcDateSt > #DT ,V(P,不可大於會計日),$)
+!IF(#AcDateSt > #DT ,V(P,不可大於會計日),$)
 
 #AcDateEd=D,7,I
-T(2,#DT)
-@V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,#DT)
+IF(#AcDateSt>#DT,T(2,#AcDateSt),T(2,#DT))
+
+
+@V(7)A(4,0,#AcDateEd)V(5,#AcDateSt,9999999)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R23.dec"/>

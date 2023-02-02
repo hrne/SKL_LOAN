@@ -139,7 +139,7 @@ public class MakeReport extends CommBuffer {
 	// 簽核
 	private String signOff1 = "$$$Sign off1$$$";
 
-	private String rptPassword = "";
+	private String rptEncryption;
 
 	/**
 	 * 印表機套印模式
@@ -455,7 +455,7 @@ public class MakeReport extends CommBuffer {
 		map.put("paper.orientation", reportVo.getPageOrientation());
 		map.put("font", this.font);
 		map.put("font.size", this.fontSize);
-		map.put("p", this.rptPassword);
+		map.put("p", this.rptEncryption);
 		listMap.add(map);
 	}
 
@@ -497,7 +497,7 @@ public class MakeReport extends CommBuffer {
 		map.put("paper.orientation", reportVo.getPageOrientation());
 		map.put("font", this.font);
 		map.put("font.size", this.fontSize);
-		map.put("p", this.rptPassword);
+		map.put("p", this.rptEncryption);
 		listMap.add(map);
 	}
 
@@ -1345,7 +1345,7 @@ public class MakeReport extends CommBuffer {
 	 * @param value 值
 	 */
 	public void setPassword(String value) {
-		this.rptPassword = value;
+		this.rptEncryption = value;
 	}
 
 	public void setRptCode(String rptCode) {

@@ -155,7 +155,7 @@ public class L3210 extends TradeBuffer {
 		titaVo.setTxAmt(iTempAmt);
 
 		// 期票、即期票 => 業務類別 = 02-支票繳款 else 09-放款
-		if (iTempSourceCode == 3 || iTempSourceCode == 6) {
+		if (iTempReasonCode == 3 || iTempReasonCode == 6) {
 			titaVo.putParam("SECNO", "02");
 		} else {
 			titaVo.putParam("SECNO", "09");

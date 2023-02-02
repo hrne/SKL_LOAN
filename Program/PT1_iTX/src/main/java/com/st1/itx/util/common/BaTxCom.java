@@ -21,7 +21,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanFacTmp;
@@ -1629,10 +1631,11 @@ public class BaTxCom extends TradeBuffer {
 		}
 
 		boolean isDefault = false; // 按原設定
-		// 已到期外，未到期繳息日為1日或上次繳息日為本月1日且超過1個月=>按原設定
+		// 已到期外，未到期繳息日為1日且上次繳息日小於等於本月1日或上次繳息日為本月1日且超過1個月=>按原設定
 		if (!isShouldPaid) {
 			isSpecialAdjust = true;
-			if (ln.getSpecificDd() == 1 || (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
+			if ((ln.getSpecificDd() == 1 && iPrevPaidIntDate <= thisMonth01)
+					|| (iPrevPaidIntDate == thisMonth01 && iNextPayIntDate > nextMonth01)) {
 				isDefault = true;
 			}
 			if (ln.getMaturityDate() < nextMonth01) {
@@ -1696,10 +1699,11 @@ public class BaTxCom extends TradeBuffer {
 			wkInterest = BigDecimal.ZERO;
 			for (CalcRepayIntVo ca : lCalcRepayIntVo) {
 				if (ca.getInterestFlag() == 1) {
-					BigDecimal wkDaysDenominator = new BigDecimal(ca.getDays()).divide(new BigDecimal(36500), 9,
+					BigDecimal wkDaysDenominator = new BigDecimal(ca.getDays()).divide(new BigDecimal(36500), 10,
 							RoundingMode.DOWN);
-					wkInterest = wkInterest.add(ca.getAmount().multiply(ca.getStoreRate()).multiply(wkDaysDenominator)
-							.setScale(0, RoundingMode.DOWN));
+					BigDecimal wkAmountDenominator = ca.getAmount().multiply(ca.getStoreRate()).setScale(0,
+							RoundingMode.DOWN);
+					wkInterest = wkAmountDenominator.multiply(wkDaysDenominator).setScale(0, RoundingMode.DOWN);
 				} else {
 					BigDecimal wkMonthDenominator = new BigDecimal(1200).multiply(
 							new BigDecimal((ln.getPayIntFreq() == 99 ? 1 : ln.getPayIntFreq()) * ca.getMonthLimit()));

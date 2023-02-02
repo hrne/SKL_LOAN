@@ -13,8 +13,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.SlipMedia2022;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.service.SlipMedia2022Service;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
@@ -44,6 +46,9 @@ public class L618D extends TradeBuffer {
 	public TxToDoDetailService txToDoDetailService;
 
 	@Autowired
+	public SlipMedia2022Service slipMedia2022Service;
+
+	@Autowired
 	public TxToDoCom txToDoCom;
 
 	@Autowired
@@ -64,11 +69,16 @@ public class L618D extends TradeBuffer {
 		// 會計日期
 		int iAcdate = parse.stringToInteger(titaVo.getParam("TxAcDate"));
 		String iSlipBatNo = titaVo.getParam("TxSlipBatNo");
+		
+		// 檢查同傳票批號不可有未完成上傳
+		CheckSlipMedia2022(iAcdate, parse.stringToInteger(iSlipBatNo), titaVo);
+
 		boolean isSendMsg = false;
 		List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 		AcDetail acDetail = new AcDetail();
 		TempVo tTempVo = new TempVo();
-		TxToDoDetail tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId(iItemCode, 0, 0, 0, iTxDtlValue), titaVo);
+		TxToDoDetail tTxToDoDetail = txToDoDetailService.findById(new TxToDoDetailId(iItemCode, 0, 0, 0, iTxDtlValue),
+				titaVo);
 		if (tTxToDoDetail == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料
 		}
@@ -76,14 +86,16 @@ public class L618D extends TradeBuffer {
 		txToDoCom.updDetailStatus(2, tTxToDoDetail.getTxToDoDetailId(), titaVo);
 
 		// 同批號處理完畢，送出<執行L6102>訊息
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 2, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 2, this.index,
+				Integer.MAX_VALUE, titaVo);
 		if (slTxToDoDetail != null) {
 			int unFinishCnt = 0;
 			for (TxToDoDetail tx : slTxToDoDetail.getContent()) {
 				TempVo txTempVo = new TempVo();
 				txTempVo = txTempVo.getVo(tx.getProcessNote());
 				if (txTempVo.getParam("SlipBatNo").equals(iSlipBatNo)) {
-					if ((titaVo.isHcodeNormal() && tx.getStatus() <= 1) || (titaVo.isHcodeErase() && tx.getStatus() == 2)) {
+					if ((titaVo.isHcodeNormal() && tx.getStatus() <= 1)
+							|| (titaVo.isHcodeErase() && tx.getStatus() == 2)) {
 						unFinishCnt++;
 					}
 				}
@@ -145,10 +157,30 @@ public class L618D extends TradeBuffer {
 
 // BroadCast L6102
 		if (isSendMsg) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102", titaVo.getParam("TxAcDate") + iSlipBatNo, "請執行L6102-核心傳票相關單獨作業，傳票批號: " + iSlipBatNo, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6102",
+					titaVo.getParam("TxAcDate") + iSlipBatNo, "請執行L6102-核心傳票相關單獨作業，傳票批號: " + iSlipBatNo, titaVo);
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	// 同傳票批號不可有未完成上傳
+	private void CheckSlipMedia2022(int iAcDate, int iBatchNo, TitaVo titaVo) throws LogicException {
+
+		Slice<SlipMedia2022> slslipMedia2022 = slipMedia2022Service.findBatchNo(iAcDate + 19110000, iBatchNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slslipMedia2022 != null) {
+			for (SlipMedia2022 t : slslipMedia2022.getContent()) {
+				// 只檢查最新的
+				if (!t.getLatestFlag().equals("Y")) {
+					continue;
+				}
+				// 核心傳票相關單獨作業檢查上傳媒體檔不可有"未完成"
+				if (t.getTransferFlag().equals("N")) {
+					throw new LogicException(titaVo, "E0015", "上傳未完成 不可執行核心傳票相關單獨作業 傳票批號:" + iBatchNo); // 檢查錯誤
+				}
+			}
+		}
 	}
 }

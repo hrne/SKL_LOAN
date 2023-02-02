@@ -177,6 +177,7 @@ T(2,@FdYear,*)
 T(2,@FdCourtDiv,*)
 T(3,@TranKeyHelp,A:新增;C:異動;D:刪除))
 
+
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
@@ -260,10 +261,11 @@ C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
 
 
-#ApproveClose=X,1,S
-C(5,#TranKey_Tmp,2,$,s)
-C(5,#TranKey,D,s,$)
+!#ApproveClose=X,1,S
+!C(5,#TranKey_Tmp,2,$,s)
+!C(5,#TranKey,D,s,$)
 !C(5,#L8r28CaseStatus,D,T(2,@Approve,N)T(F,@Approve,0),T(F,@Approve,1))
+
 
 ![債務人IDN]
 #CustId=X,10,L
@@ -310,6 +312,10 @@ C(5,#CaseStatus,G,T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt
 C(5,#CaseStatus,H,T(2,@FdApprove, )T(F,@Approve,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0),$)
 
 #CaseStatusX=X,40,L
+C(5,#TranKey_Tmp,7,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 T(H,#CaseStatus,#CaseStatus56Help)
 C(5,#CaseStatus,B,$,C(5,#CaseStatus,C,$,T(3,@Approve,)T(H,@ApproveX,#Approve,#YesNoHelp)))
 C(5,#CaseStatus,D,T(3,@Approve,N)T(H,@ApproveX,#Approve,#YesNoHelp),T(3,@Approve,)T(3,@ApproveX,))
@@ -389,22 +395,17 @@ C(5,#CaseStatus,B,$,C(5,#CaseStatus,C,$,S))
 HELP(#YesNoHelp)
 @T(3,@ApproveX,)
 V(H,#YesNoHelp)
-IF(#CaseStatus=="A",S,$)
-IF(#CaseStatus=="D",S,$)
-IF(#CaseStatus=="E",S,$)
-IF(#CaseStatus=="F",S,$)
-IF(#CaseStatus=="G",S,$)
-IF(#CaseStatus=="H",S,$)
-
 #ApproveX=X,2,L
-IF(#CaseStatus=="A",S,$)
-IF(#CaseStatus=="D",S,$)
-IF(#CaseStatus=="E",S,$)
-IF(#CaseStatus=="F",S,$)
-IF(#CaseStatus=="G",S,$)
-IF(#CaseStatus=="H",S,$)
 T(H,@ApproveX,#Approve,#YesNoHelp)
-
+!IF(#CaseStatus=="A",S,$)
+!IF(#CaseStatus=="D",S,$)
+!IF(#CaseStatus=="E",S,$)
+!IF(#CaseStatus=="F",S,$)
+!IF(#CaseStatus=="G",S,$)
+!IF(#CaseStatus=="H",S,$)
+!HELP(#YesNoHelp)
+!@T(3,@ApproveX,)
+!V(H,#YesNoHelp)
 
 !原始債權金額 13
 #OutstandAmt=M,9,I

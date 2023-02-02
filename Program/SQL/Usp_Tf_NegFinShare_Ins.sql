@@ -29,17 +29,16 @@ BEGIN
           ,NVL(S.RC_AMT,0)                    AS "ContractAmt"         -- 簽約金額 DECIMAL 16 2
           ,NVL(S.CREDIT_RATE,0)               AS "AmtRatio"            -- 債權比例%  DECIMAL 5 2
           ,NVL(S.PERIOD_AMT,0)                AS "DueAmt"              -- 期款 DECIMAL 16 2
-          ,NVL(S.DEL_DATE,0)                  AS "CancelDate"          -- 註銷日期 DecimalD 8 0
-          ,S.DEL_AMT                          AS "CancelAmt"           -- 註銷本金 DECIMAL 16 2
           ,JOB_START_TIME                     AS "CreateDate"          -- 建檔日期時間 DATE 8 0
-          ,'999999'                           AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
+          ,S.MODIFYUSERID                     AS "CreateEmpNo"         -- 建檔人員 VARCHAR2 6 0
           ,JOB_START_TIME                     AS "LastUpdate"          -- 最後更新日期時間 DATE 8 0
-          ,'999999'                           AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
+          ,S.MODIFYUSERID                     AS "LastUpdateEmpNo"     -- 最後更新人員 VARCHAR2 6 0
     FROM REMIN_TBJCICSHARE S
     LEFT JOIN REMIN_TBJCICMAIN JM ON JM.CustIDN = S.CustIDN
                                  AND JM.RC_DATE = S.RC_DATE
     LEFT JOIN "NegMain" M ON M."CustNo"   = JM.RC_ACCOUNT
                          AND M."ApplDate" = JM.RC_DATE
+    WHERE NVL(S.DEL_DATE,0) = 0 -- 2023-02-02 Wei from Linda 有註銷日期的不寫入
     ;
 
     -- 記錄寫入筆數

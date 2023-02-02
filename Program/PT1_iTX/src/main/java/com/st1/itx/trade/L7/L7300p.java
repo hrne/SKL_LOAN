@@ -34,6 +34,7 @@ import com.st1.itx.util.common.RestCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.http.WebClient;
+import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.report.ReportUtil;
 
 /**
@@ -65,6 +66,9 @@ public class L7300p extends TradeBuffer {
 	@Autowired
 	private ReportUtil rptUtil;
 
+	@Autowired
+	private Parse parse;
+
 	private String apiUrl = "";
 
 	private String icsFg = "";
@@ -88,7 +92,7 @@ public class L7300p extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L7300p ");
-		tempTitaVo = (TitaVo) titaVo.clone();
+		tempTitaVo = titaVo;
 		this.totaVo.init(titaVo);
 
 		setApiUrl(titaVo);
@@ -99,13 +103,32 @@ public class L7300p extends TradeBuffer {
 			throw new LogicException("E0001", "ICS啟用記號不為Y,請檢查系統參數設定(L6501)");
 		}
 
-		stockDate = rptUtil.showBcDate(titaVo.getEntDyI(), 3);
+		String icsVersion = titaVo.getParam("IcsVersion");
+		int dataDate = parse.stringToInteger(titaVo.getParam("DataDate"));
+
+		if (icsVersion != null) {
+			icsVersion = icsVersion.toUpperCase();
+		}
+
+		switch (icsVersion) {
+		case "V0":
+		case "V1":
+		case "V2":
+		case "V3":
+			break;
+		default:
+			this.error("L7300 ICS Version 參數限為V0、V1、V2、V3");
+			sendWebMsg("L7300 ICS Version 參數限為V0、V1、V2、V3");
+			break;
+		}
+
+		stockDate = rptUtil.showBcDate(dataDate, 3);
 
 		tranTime += rptUtil.showBcDate(titaVo.getCalDy(), 3);
 		tranTime += " " + rptUtil.showTime(titaVo.getCalTm());
 
 		try {
-			seqL7300 = gGSeqCom.getSeqNo(titaVo.getEntDyI(), 3, "L7", "7300", 99, titaVo);
+			seqL7300 = gGSeqCom.getSeqNo(dataDate, 3, "L7", "73" + icsVersion, 99, titaVo);
 		} catch (LogicException e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -114,14 +137,21 @@ public class L7300p extends TradeBuffer {
 
 		this.info("seqL7300 = " + seqL7300);
 
-		tranSerialSeq = "LN_V0_" + rptUtil.showBcDate(titaVo.getEntDyI(), 2) + "_" + FormatUtil.pad9("" + seqL7300, 2);
+		tranSerialSeq = "LN_" + icsVersion + "_" + rptUtil.showBcDate(dataDate, 2) + "_"
+				+ FormatUtil.pad9("" + seqL7300, 2);
 
-		int lmnDy = this.txBuffer.getTxBizDate().getLmnDyf();
-
-		String yearMonth = "" + (lmnDy / 100);
+		String yearMonth = "" + ((dataDate + 19110000) / 100);
 
 		// doQuery
-		List<Map<String, String>> resultList = sL7300ServiceImpl.findAll(yearMonth, titaVo);
+		List<Map<String, String>> resultList = null;
+		
+		if (icsVersion.equals("V0")) {
+			// V0 傳送當下即時資料
+			resultList = sL7300ServiceImpl.findNow( titaVo);
+		} else {
+			// V1 V2 V3 傳月底日資料
+			resultList = sL7300ServiceImpl.findAll(yearMonth, titaVo);
+		}
 
 		if (resultList == null || resultList.isEmpty()) {
 			sendWebMsg("L7300 E0001 ICS需傳輸資料為0筆");
@@ -132,7 +162,7 @@ public class L7300p extends TradeBuffer {
 		List<JSONObject> requestJOList = setIcsRequestJo(resultList);
 		for (JSONObject requestJO : requestJOList) {
 			String response = post(requestJO);
-			getResponseDetail(response);
+			getResponseDetail(response, requestJO);
 		}
 
 		this.addList(this.totaVo);
@@ -334,7 +364,7 @@ public class L7300p extends TradeBuffer {
 		return headers;
 	}
 
-	private void getResponseDetail(String response) {
+	private void getResponseDetail(String response, JSONObject requestJo) {
 		this.info("L7300 getResponseDetail");
 //		S01	作業執行成功，資料庫新增傳輸內容
 //		S02	作業執行成功，資料庫新增傳輸內容，並根據邏輯刪除資料庫歷史資料
@@ -344,21 +374,30 @@ public class L7300p extends TradeBuffer {
 //		E04	作業執行失敗，本次傳輸筆數不一致
 //		E05	作業執行失敗，資產類別與傳輸資料格式有誤
 		JSONObject responseJO = null;
-		String tranStatus = null;
-		String tranMessage = null;
+		String tranSubBatchSeq = "";
+		try {
+			tranSubBatchSeq = requestJo.getString("tranSubBatchSeq");
+		} catch (JSONException e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("ICS Exception = " + e.getMessage());
+		}
+		String tranStatus = "L7300 " + tranSerialSeq + "-" + tranSubBatchSeq + " ";
 		JSONArray errorMessageDtl = null;
 		try {
 			responseJO = new JSONObject(response);
-			tranStatus = responseJO.getString("tranStatus");
-			tranMessage = responseJO.getString("tranMessage");
-			tranStatus += " ";
-			tranStatus += tranMessage;
-			sendWebMsg(tranStatus);
-			errorMessageDtl = responseJO.getJSONArray("errorMessageDtl");
+			tranStatus = responseJO.getString("tranStatus") + " ";
+			tranStatus += responseJO.getString("tranMessage");
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("ICS Exception = " + e.getMessage());
+		}
+		sendWebMsg(tranStatus);
+		try {
+			errorMessageDtl = responseJO.optJSONArray("errorMessageDtl");
 			if (errorMessageDtl != null) {
-				for (int i = 0; i < errorMessageDtl.length(); i++) {
-					sendWebMsg(errorMessageDtl.getString(i));
-				}
+				sendWebMsg(errorMessageDtl.toString());
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();

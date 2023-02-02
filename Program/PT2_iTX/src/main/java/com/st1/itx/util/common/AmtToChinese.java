@@ -8,14 +8,15 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 
-@Component("mtToChinese")
+@Component
 @Scope("prototype")
 public class AmtToChinese {
 
 	// 大寫數字
 	private static final String[] NUMBERS = { "零", "壹", "貳", "參", "肆", "伍", "陸", "柒", "捌", "玖" };
 	// 整數部分的單位
-	private static final String[] IUNIT = { "元", "拾", "佰", "仟", "萬", "拾", "佰", "仟", "億", "拾", "佰", "仟", "萬", "拾", "佰", "仟" };
+	private static final String[] IUNIT = { "元", "拾", "佰", "仟", "萬", "拾", "佰", "仟", "億", "拾", "佰", "仟", "萬", "拾", "佰",
+			"仟" };
 	// 小數部分的單位
 	private static final String[] DUNIT = { "角", "分", "釐" };
 
@@ -124,22 +125,22 @@ public class AmtToChinese {
 			return "";
 
 		for (int i = 0; i < length; i++) {
-			String key = "";
+			String k = "";
 			if (integers[i] == 0) {
 				if ((length - i) == 13)// 萬（億）
-					key = IUNIT[4];
+					k = IUNIT[4];
 				else if ((length - i) == 9) {// 億
-					key = IUNIT[8];
+					k = IUNIT[8];
 				} else if ((length - i) == 5 && isWan) {// 萬
-					key = IUNIT[4];
+					k = IUNIT[4];
 				} else if ((length - i) == 1) {// 元
-					key = IUNIT[0];
+					k = IUNIT[0];
 				}
 				if ((length - i) > 1 && integers[i + 1] != 0) {
-					key += NUMBERS[0];
+					k += NUMBERS[0];
 				}
 			}
-			chineseInteger.append(integers[i] == 0 ? key : (NUMBERS[integers[i]] + IUNIT[length - i - 1]));
+			chineseInteger.append(integers[i] == 0 ? k : (NUMBERS[integers[i]] + IUNIT[length - i - 1]));
 		}
 		return chineseInteger.toString();
 	}
