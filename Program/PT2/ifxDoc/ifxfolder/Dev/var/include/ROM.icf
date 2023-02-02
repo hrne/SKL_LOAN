@@ -5883,8 +5883,6 @@ TXFORM=L4R34
 #L5r01NegFinShareContractAmt{i}=m,14,S
 #L5r01NegFinShareAmtRatio{i}=m,3.2,S
 #L5r01NegFinShareDueAmt{i}=m,14,S
-#L5r01NegFinShareCancelDate{i}=D,7,S
-#L5r01NegFinShareCancelAmt{i}=m,14,S
 ##end
 </L5R01.dec>
 
@@ -5919,8 +5917,6 @@ TXFORM=L5R01
 #L5r01NegFinShareContractAmt{i}
 #L5r01NegFinShareAmtRatio{i}
 #L5r01NegFinShareDueAmt{i}
-#L5r01NegFinShareCancelDate{i}
-#L5r01NegFinShareCancelAmt{i}
 ##end
 ^
 </L5R01.tom>
@@ -6164,8 +6160,6 @@ TXFORM=L5R04
 #L5r05NegFinShareContractAmt{i}=m,14,S
 #L5r05NegFinShareAmtRatio{i}=m,2.4,S
 #L5r05NegFinShareDueAmt{i}=m,14,S
-#L5r05NegFinShareCancelDate{i}=D,7,S
-#L5r05NegFinShareCancelAmt{i}=m,14,S
 ##end
 </L5R05.dec>
 
@@ -6181,8 +6175,6 @@ TXFORM=L5R05
 #L5r05NegFinShareContractAmt{i}
 #L5r05NegFinShareAmtRatio{i}
 #L5r05NegFinShareDueAmt{i}
-#L5r05NegFinShareCancelDate{i}
-#L5r05NegFinShareCancelAmt{i}
 ##end
 ^
 </L5R05.tom>

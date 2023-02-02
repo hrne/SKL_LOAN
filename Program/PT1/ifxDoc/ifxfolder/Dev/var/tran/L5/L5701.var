@@ -284,8 +284,8 @@ T(2,@FinCodeName{i},#L5r01NegFinShareFinName{i})
 E(0,@NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i})
 E(0,@NegFinShareAmtRatio{i},#L5r01NegFinShareAmtRatio{i})
 E(0,@NegFinShareDueAmt{i},#L5r01NegFinShareDueAmt{i})
-T(2,@NegFinShareCancelDate{i},#L5r01NegFinShareCancelDate{i})
-E(0,@NegFinShareCancelAmt{i},#L5r01NegFinShareCancelAmt{i})
+!T(2,@NegFinShareCancelDate{i},#L5r01NegFinShareCancelDate{i})
+!E(0,@NegFinShareCancelAmt{i},#L5r01NegFinShareCancelAmt{i})
 ##end
 T(H,@CaseKindCodeX,#CaseKindCode,#CaseKindCodeHelp)
 T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
@@ -987,7 +987,8 @@ D(8)
 @A(DATE,0,#NegFinShareCancelDate{i})
 IF(#FunctionCode=="02"
  ,IF(#NegFinShareCancelDate{i}>0
-  ,IF(#NegFinShareCancelDate{i}==#L5r01NegFinShareCancelDate{i}
+!  ,IF(#NegFinShareCancelDate{i}==#L5r01NegFinShareCancelDate{i}
+  ,IF(#NegFinShareCancelDate{i}==0
    ,$
    ,IF(#NegFinShareContractAmt{i}==#L5r01NegFinShareContractAmt{i}
     ,$

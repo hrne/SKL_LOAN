@@ -603,7 +603,7 @@ public class PdfGenerator extends CommBuffer {
 
 		// 細明體
 		if ("2".equals(type)) {
-			fontname = fontFolder + (!font.exists() ? "mingliu.ttc,0" : "mingliu.ttf,0");
+			fontname = fontFolder + (!font.exists() ? "mingliu.ttc,0" : "mingliu.ttf");
 			// 微軟正黑體
 		} else if ("3".equals(type)) {
 			fontname = fontFolder + "msjh.ttc,0";

@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.NegFinShareLogRepositoryHist;
 import com.st1.itx.db.service.NegFinShareLogService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -238,7 +239,9 @@ public class NegFinShareLogServiceImpl extends ASpringJpaParm implements NegFinS
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Insert..." + dbName + " " + negFinShareLog.getNegFinShareLogId());
 		if (this.findById(negFinShareLog.getNegFinShareLogId()) != null)
 			throw new DBException(2);
@@ -267,7 +270,9 @@ public class NegFinShareLogServiceImpl extends ASpringJpaParm implements NegFinS
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + negFinShareLog.getNegFinShareLogId());
 		if (!empNot.isEmpty())
 			negFinShareLog.setLastUpdateEmpNo(empNot);
@@ -290,7 +295,9 @@ public class NegFinShareLogServiceImpl extends ASpringJpaParm implements NegFinS
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("Update..." + dbName + " " + negFinShareLog.getNegFinShareLogId());
 		if (!empNot.isEmpty())
 			negFinShareLog.setLastUpdateEmpNo(empNot);
@@ -338,7 +345,9 @@ public class NegFinShareLogServiceImpl extends ASpringJpaParm implements NegFinS
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 			empNot = empNot.isEmpty() ? "System" : empNot;
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("InsertAll...");
 		for (NegFinShareLog t : negFinShareLog) {
 			if (!empNot.isEmpty())
@@ -370,7 +379,9 @@ public class NegFinShareLogServiceImpl extends ASpringJpaParm implements NegFinS
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+			empNot = ThreadVariable.getEmpNot();
+
 		this.info("UpdateAll...");
 		if (negFinShareLog == null || negFinShareLog.size() == 0)
 			throw new DBException(6);

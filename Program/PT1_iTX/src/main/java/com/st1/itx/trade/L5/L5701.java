@@ -676,16 +676,16 @@ public class L5701 extends TradeBuffer {
 				NegFinShare.setContractAmt(parse.stringToBigDecimal(NegFinShareContractAmt[i]));
 				NegFinShare.setAmtRatio(parse.stringToBigDecimal(NegFinShareAmtRatio[i]));
 				NegFinShare.setDueAmt(parse.stringToBigDecimal(NegFinShareDueAmt[i]));
-				NegFinShare.setCancelDate(parse.stringToInteger(NegFinShareCancelDate[i]));
-				NegFinShare.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
+				//NegFinShare.setCancelDate(parse.stringToInteger(NegFinShareCancelDate[i]));
+				//NegFinShare.setCancelAmt(parse.stringToBigDecimal(NegFinShareCancelAmt[i]));
 
 				NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareId, titaVo);
 				if (NegFinShareVO != null) {
 					// UPDATE
 					try {
 						sNegFinShareService.holdById(NegFinShareVO.getNegFinShareId(), titaVo);
-						NegFinShare.setCreateDate(NegFinShareVO.getCreateDate());
-						NegFinShare.setCreateEmpNo(NegFinShareVO.getCreateEmpNo());
+						//NegFinShare.setCreateDate(NegFinShareVO.getCreateDate());
+						//NegFinShare.setCreateEmpNo(NegFinShareVO.getCreateEmpNo());
 						sNegFinShareService.update(NegFinShare, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());

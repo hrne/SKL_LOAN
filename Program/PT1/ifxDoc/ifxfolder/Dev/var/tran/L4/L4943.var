@@ -401,8 +401,6 @@ C(3,#FunctionCode,7,BIND(grid,cancel),$)
 C(3,#FunctionCode,7,s,$)
 IF(#OOAcDate=="0000000"&&#OReturnCode=="",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
 
-
-
 ! <查詢> 6+7+7+3+7+1+16+7=54
 #OOBUF_C=X,410,S
 T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote+#OORepayAmt)
@@ -415,7 +413,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C})
 
 ! <交易>
 #OOBUF_D=X,390,S
-T(2,#TXCD+#OOCustNo+#OOFacmNo+000+#OOEntryDate+0000+#OOTitaTlrNo+#OOTitaTxtNo+9)
+T(2,#TXCD+#OOCustNo+000+000+#OOEntryDate+0000+#OOTitaTlrNo+#OOTitaTxtNo+9)
 ! T(2,#TXCD+#CustNo+000+000+#OOAcDate+#OOTxNo+9)
 
 #OOBTN_D=A,2,O

@@ -179,8 +179,8 @@ public class L5R01 extends TradeBuffer {
 				totaVo.putParam("L5r01NegFinShareContractAmt" + Row + "", NegFinShareVO.getContractAmt());// 簽約金額
 				totaVo.putParam("L5r01NegFinShareAmtRatio" + Row + "", NegFinShareVO.getAmtRatio());// 債權比例%
 				totaVo.putParam("L5r01NegFinShareDueAmt" + Row + "", NegFinShareVO.getDueAmt());// 期款
-				totaVo.putParam("L5r01NegFinShareCancelDate" + Row + "", NegFinShareVO.getCancelDate());// 註銷日期
-				totaVo.putParam("L5r01NegFinShareCancelAmt" + Row + "", NegFinShareVO.getCancelAmt());// 註銷本金
+				//totaVo.putParam("L5r01NegFinShareCancelDate" + Row + "", NegFinShareVO.getCancelDate());// 註銷日期
+				//totaVo.putParam("L5r01NegFinShareCancelAmt" + Row + "", NegFinShareVO.getCancelAmt());// 註銷本金
 			}
 		}
 
@@ -190,8 +190,8 @@ public class L5R01 extends TradeBuffer {
 			totaVo.putParam("L5r01NegFinShareContractAmt" + i + "", "");// 簽約金額
 			totaVo.putParam("L5r01NegFinShareAmtRatio" + i + "", "");// 債權比例%
 			totaVo.putParam("L5r01NegFinShareDueAmt" + i + "", "");// 期款
-			totaVo.putParam("L5r01NegFinShareCancelDate" + i + "", "");// 註銷日期
-			totaVo.putParam("L5r01NegFinShareCancelAmt" + i + "", "");// 註銷本金
+			//totaVo.putParam("L5r01NegFinShareCancelDate" + i + "", "");// 註銷日期
+			//totaVo.putParam("L5r01NegFinShareCancelAmt" + i + "", "");// 註銷本金
 		}
 
 		this.addList(this.totaVo);

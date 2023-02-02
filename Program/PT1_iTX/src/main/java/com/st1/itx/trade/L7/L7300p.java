@@ -132,8 +132,7 @@ public class L7300p extends TradeBuffer {
 		List<JSONObject> requestJOList = setIcsRequestJo(resultList);
 		for (JSONObject requestJO : requestJOList) {
 			String response = post(requestJO);
-			String tranStatus = getResponseDetail(response);
-			totaVo.putParam("TranStatus", tranStatus);
+			getResponseDetail(response);
 		}
 
 		this.addList(this.totaVo);
@@ -335,7 +334,7 @@ public class L7300p extends TradeBuffer {
 		return headers;
 	}
 
-	private String getResponseDetail(String response) {
+	private void getResponseDetail(String response) {
 		this.info("L7300 getResponseDetail");
 //		S01	作業執行成功，資料庫新增傳輸內容
 //		S02	作業執行成功，資料庫新增傳輸內容，並根據邏輯刪除資料庫歷史資料
@@ -346,25 +345,26 @@ public class L7300p extends TradeBuffer {
 //		E05	作業執行失敗，資產類別與傳輸資料格式有誤
 		JSONObject responseJO = null;
 		String tranStatus = null;
-		String errorMessage = null;
-		if (response != null && !response.isEmpty()) {
-			this.info("ICS response = " + response);
-		}
+		String tranMessage = null;
+		JSONArray errorMessageDtl = null;
 		try {
 			responseJO = new JSONObject(response);
-			tranStatus = responseJO.getString("tran_status");
-			errorMessage = responseJO.getString("error_message");
+			tranStatus = responseJO.getString("tranStatus");
+			tranMessage = responseJO.getString("tranMessage");
+			tranStatus += " ";
+			tranStatus += tranMessage;
+			sendWebMsg(tranStatus);
+			errorMessageDtl = responseJO.getJSONArray("errorMessageDtl");
+			if (errorMessageDtl != null) {
+				for (int i = 0; i < errorMessageDtl.length(); i++) {
+					sendWebMsg(errorMessageDtl.getString(i));
+				}
+			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("ICS Exception = " + e.getMessage());
 		}
-		tranStatus += " ";
-		if (errorMessage != null && !errorMessage.isEmpty()) {
-			tranStatus += " ";
-			tranStatus += errorMessage;
-		}
-		return tranStatus;
 	}
 
 	private void sendWebMsg(String msg) {

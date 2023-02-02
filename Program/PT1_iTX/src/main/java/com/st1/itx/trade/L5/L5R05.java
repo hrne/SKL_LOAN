@@ -111,8 +111,8 @@ public class L5R05 extends TradeBuffer {
 							totaVo.putParam("L5r05NegFinShareContractAmt" + Row + "", NegFinShareVO.getContractAmt());// 簽約金額
 							totaVo.putParam("L5r05NegFinShareAmtRatio" + Row + "", NegFinShareVO.getAmtRatio());// 債權比例%
 							totaVo.putParam("L5r05NegFinShareDueAmt" + Row + "", NegFinShareVO.getDueAmt());// 期款
-							totaVo.putParam("L5r05NegFinShareCancelDate" + Row + "", NegFinShareVO.getCancelDate());// 註銷日期
-							totaVo.putParam("L5r05NegFinShareCancelAmt" + Row + "", NegFinShareVO.getCancelAmt());// 註銷本金
+							//totaVo.putParam("L5r05NegFinShareCancelDate" + Row + "", NegFinShareVO.getCancelDate());// 註銷日期
+							//totaVo.putParam("L5r05NegFinShareCancelAmt" + Row + "", NegFinShareVO.getCancelAmt());// 註銷本金
 						}
 						for (int i = lNegFinShareS; i < 30; i++) {
 							int Row = i + 1;
@@ -121,8 +121,8 @@ public class L5R05 extends TradeBuffer {
 							totaVo.putParam("L5r05NegFinShareContractAmt" + Row + "", "");// 簽約金額
 							totaVo.putParam("L5r05NegFinShareAmtRatio" + Row + "", "");// 債權比例%
 							totaVo.putParam("L5r05NegFinShareDueAmt" + Row + "", "");// 期款
-							totaVo.putParam("L5r05NegFinShareCancelDate" + Row + "", "");// 註銷日期
-							totaVo.putParam("L5r05NegFinShareCancelAmt" + Row + "", "");// 註銷本金
+							//totaVo.putParam("L5r05NegFinShareCancelDate" + Row + "", "");// 註銷日期
+							//totaVo.putParam("L5r05NegFinShareCancelAmt" + Row + "", "");// 註銷本金
 						}
 					} else {
 						// E0001 查詢資料不存在
