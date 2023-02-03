@@ -591,7 +591,10 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(titaVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(titaVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
+		// ProdBreachFlag為N時寫入
+		if ("N".equals(tFacMain.getProdBreachFlag())) {
+			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
+		}
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
@@ -814,7 +817,10 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
+		// ProdBreachFlag為N時寫入
+		if ("N".equals(tFacMain.getProdBreachFlag())) {
+			tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
+		}
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));

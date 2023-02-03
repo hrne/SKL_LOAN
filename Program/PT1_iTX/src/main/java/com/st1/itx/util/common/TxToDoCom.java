@@ -21,6 +21,8 @@ import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 //  -----------------------  應處理清單維護 ------------------ 
@@ -772,7 +774,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "L4602 ;Y;C;-;-;-;     ;L4602;L4602;-;火險出單明細表作業";
 			break;
 		case "L4604":
-			settingValue = "L4604 ;-;C;Y;Y;-;L698A;L4604;L4604;Y;火險保費未繳轉借支";
+			settingValue = "L4604 ;-;C;Y;Y;-;L698B;L4604;L4604;Y;火險保費未繳轉借支";//由L698A調整為L698B無戶號戶名
 			break;
 		case "L4702":
 			settingValue = "L4702 ;Y;C;Y;-;-;     ;L4702;L4702;-;繳息通知單產生作業";
@@ -811,7 +813,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "AMLM  ;-;Y;-;-;-;L8082;L8082;L8101;Y;AML定審中、低風險處理";
 			break;
 		case "L7400": // 總帳傳票資料傳輸
-			settingValue = "L7400 ;-;I;-;-;-;L698A;L698A;L7400;Y;總帳傳票資料傳輸";
+			settingValue = "L7400 ;-;I;-;-;-;L698B;L698B;L7400;Y;總帳傳票資料傳輸";//由L698A調整為L698B無戶號戶名
 			break;
 //		case "AMLL":
 //			settingValue = "AMLL  ;-;Y;-;-;-;L8083;L8083;L8101;Y;AML定審低風險處理";

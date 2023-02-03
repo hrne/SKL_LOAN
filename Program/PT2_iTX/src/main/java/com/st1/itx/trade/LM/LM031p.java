@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class LM031p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM031p.class);
 
 	@Autowired
 	LM031Report lM031Report;
